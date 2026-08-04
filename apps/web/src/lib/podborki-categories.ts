@@ -38,6 +38,7 @@ export const PODBORKI_CATEGORIES: PodborkiCategoryMeta[] = [
 export const LANDING_SLUG_TO_CATEGORY: Record<string, PodborkiCategorySlug> = {
   'new-year': 'seasonal',
   'salute-9-may': 'seasonal',
+  'moscow-city-day': 'seasonal',
   'family-kids': 'for-whom',
   'river-party': 'for-whom',
   'active-sport': 'for-whom',

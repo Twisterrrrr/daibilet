@@ -64,6 +64,7 @@ const CITY_HUB_LANDING_SHORT: Record<string, string> = {
   'bridges-night': 'Мосты',
   'moscow-dinner-boat': 'Ужин',
   'moscow-museums': 'Музеи',
+  'moscow-city-day': 'День города',
   'spb-yards': 'Дворы',
   standup: 'Стендап',
   'family-kids': 'Семьям',

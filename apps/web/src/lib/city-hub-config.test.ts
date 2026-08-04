@@ -19,6 +19,11 @@ test('resolveCityHubConfig returns moscow venuesTopN', () => {
   const config = resolveCityHubConfig('moscow');
   assert.equal(config?.venuesTopN, 12);
   assert.ok(config?.featuredDirections?.some((item) => item.id === 'theatre'));
+  assert.equal(config?.highlightSeason?.label, 'День города');
+  assert.equal(
+    config?.featuredDirections?.find((item) => item.id === 'city-day')?.landingSlug,
+    'moscow-city-day',
+  );
 });
 
 test('isCityHubSectionHidden respects hideSections', () => {

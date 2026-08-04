@@ -29,6 +29,7 @@ const LANDING_TO_TOPIC: Record<string, BlogTopicId> = {
   'concerts-genre': 'concerts',
   'river-cruises': 'river',
   'moscow-dinner-boat': 'river',
+  'moscow-city-day': 'river',
   'bus-tours': 'tours',
   'country-tours': 'tours',
   excursions: 'tours',

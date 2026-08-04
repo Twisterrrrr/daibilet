@@ -23,6 +23,7 @@ export const CITY_LANDING_PATH_BY_SLUG: Record<string, string> = {
   'spb-yards': 'spb-yards',
   'moscow-dinner-boat': 'dinner-boat',
   'moscow-museums': 'moscow-museums',
+  'moscow-city-day': 'den-goroda',
   planetarium: 'planetarium',
 };
 
@@ -73,6 +74,7 @@ export const DEFAULT_CITY_BY_LANDING_SLUG: Record<string, string> = {
   'spb-yards': 'saint-petersburg',
   'moscow-dinner-boat': 'moscow',
   'moscow-museums': 'moscow',
+  'moscow-city-day': 'moscow',
   planetarium: 'saint-petersburg',
 };
 

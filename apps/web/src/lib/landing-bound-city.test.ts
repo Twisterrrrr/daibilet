@@ -11,6 +11,7 @@ import {
 test('resolveLandingBoundCitySlug: CITY-scoped landings', () => {
   assert.equal(resolveLandingBoundCitySlug('moscow-museums'), 'moscow');
   assert.equal(resolveLandingBoundCitySlug('moscow-dinner-boat'), 'moscow');
+  assert.equal(resolveLandingBoundCitySlug('moscow-city-day'), 'moscow');
   assert.equal(resolveLandingBoundCitySlug('spb-yards'), 'saint-petersburg');
   assert.equal(resolveLandingBoundCitySlug('bridges-night'), 'saint-petersburg');
   assert.equal(resolveLandingBoundCitySlug('planetarium'), 'saint-petersburg');

@@ -263,6 +263,59 @@ test('salute-9-may rejects City Day fireworks and keeps Victory Day', () => {
   }, salute), false);
 });
 
+test('moscow-city-day matches Moscow City Day and rejects Victory Day / other cities', () => {
+  const cityDay = findLandingRule('moscow-city-day');
+  assert.ok(cityDay);
+
+  assert.equal(matchesLandingRule({
+    title: 'Речная Прогулка на День Города с праздничным фейерверком, с ужином, DJ дискотека',
+    category: 'Мероприятия',
+    tags: ['Водные экскурсии', 'Речные прогулки'],
+    city: 'Москва',
+  }, cityDay), true);
+
+  assert.equal(matchesLandingRule({
+    title: 'ДЕНЬ ГОРОДА НА ФЛАГМАНЕ С ИГРИСТЫМ И ДИ-ДЖЕЕМ!!!',
+    category: 'Мероприятия',
+    city: 'Москва',
+  }, cityDay), true);
+
+  assert.equal(matchesLandingRule({
+    title: 'Прогулка к салюту 9 мая с ужином',
+    category: 'Экскурсии',
+    city: 'Москва',
+  }, cityDay), false);
+
+  assert.equal(matchesLandingRule({
+    title: 'День города "Татарская эстрада Live"',
+    category: 'Мероприятия',
+    city: 'Казань',
+  }, cityDay), false);
+
+  assert.equal(matchesLandingRule({
+    title: 'Вечерний круиз по Москве-реке',
+    category: 'Экскурсии',
+    city: 'Москва',
+  }, cityDay), false);
+
+  assert.equal(
+    matchingLandingSlugs({
+      title: 'Салют на День города с теплохода',
+      category: 'Экскурсии',
+      city: 'Москва',
+    }).includes('moscow-city-day'),
+    true,
+  );
+  assert.equal(
+    matchingLandingSlugs({
+      title: 'Салют на День города с теплохода',
+      category: 'Экскурсии',
+      city: 'Москва',
+    }).includes('salute-9-may'),
+    false,
+  );
+});
+
 test('applies canonical subcategory rules and Moscow-time schedule', () => {
   assert.equal(matchingLandingSlugs({
     title: 'Обзорная экскурсия по городу',

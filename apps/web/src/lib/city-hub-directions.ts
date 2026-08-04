@@ -16,6 +16,7 @@ const WATER_LANDING_SLUGS = new Set([
   'river-party',
   'bridges-night',
   'moscow-dinner-boat',
+  'moscow-city-day',
 ]);
 
 /** Cities where boat/river landings are expected; landlocked hubs never auto-promote them. */

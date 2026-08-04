@@ -47,14 +47,15 @@ export const CITY_HUB_CONFIG: Record<string, CityHubConfig> = {
     venuesTopN: 10,
   },
   moscow: {
+    highlightSeason: { label: 'День города', monthsHint: 'сентябрь' },
     primaryCta: { label: 'События в Москве', target: '#affiche' },
     featuredDirections: [
-      { id: 'theatre', label: 'Театр', categoryKey: 'Театр', emphasis: 'primary' },
+      { id: 'city-day', label: 'День города', landingSlug: 'moscow-city-day', emphasis: 'primary' },
+      { id: 'theatre', label: 'Театр', categoryKey: 'Театр' },
       { id: 'concerts', label: 'Концерты', landingSlug: 'concerts-genre' },
       { id: 'river', label: 'Речные прогулки', landingSlug: 'river-cruises' },
       { id: 'museums', label: 'Музеи', landingSlug: 'moscow-museums', categoryKey: 'Музеи и арт' },
       { id: 'bus', label: 'Автобусные экскурсии', landingSlug: 'bus-tours' },
-      { id: 'family', label: 'Семейные', landingSlug: 'family-kids' },
     ],
     sectionOrderAfterAffiche: ['directions', 'venues', 'travel', 'sights'],
     venuesTopN: 12,

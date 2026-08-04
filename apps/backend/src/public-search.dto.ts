@@ -25,6 +25,7 @@ const CITY_SCOPED_LANDING_PATH: Record<string, { city: string; topic: string }> 
   'spb-yards': { city: 'saint-petersburg', topic: 'spb-yards' },
   'moscow-dinner-boat': { city: 'moscow', topic: 'dinner-boat' },
   'moscow-museums': { city: 'moscow', topic: 'moscow-museums' },
+  'moscow-city-day': { city: 'moscow', topic: 'den-goroda' },
   planetarium: { city: 'moscow', topic: 'planetarium' },
 };
 

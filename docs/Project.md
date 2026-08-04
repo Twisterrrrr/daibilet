@@ -29,7 +29,7 @@
 
 Порядок owner: **не** параллельный redesign всего. Срезы:
 
-0. Landing matching quality (`salute-9-may` vs День города) - critical
+0. Landing matching quality: `moscow-city-day` (День города Мск) + `salute-9-may` off-season - critical
 1. `/podborki` practical hub polish
 2. Tabular multilanding (river/bridges) rows + sticky filters + `?type=`
 3. Blog conversion layer (chips + reading progress; schema/related уже были)

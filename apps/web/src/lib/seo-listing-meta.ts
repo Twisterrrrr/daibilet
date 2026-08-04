@@ -94,6 +94,7 @@ const CATEGORY_LABELS: Record<string, ListingCategoryLabels> = {
   rooftops: { titleCategory: 'Смотровые площадки', seekCategory: 'смотровые площадки' },
   'new-year': { titleCategory: 'Новогодние события', seekCategory: 'новогодние события' },
   'salute-9-may': { titleCategory: 'Салют 9 мая', seekCategory: 'салют 9 мая' },
+  'moscow-city-day': { titleCategory: 'День города', seekCategory: 'день города' },
   'moscow-museums': { titleCategory: 'Музеи и выставки', seekCategory: 'музеи и выставки' },
   'moscow-dinner-boat': { titleCategory: 'Ужин на теплоходе', seekCategory: 'ужин на теплоходе' },
   'spb-yards': { titleCategory: 'Экскурсии по дворам', seekCategory: 'экскурсии по дворам' },

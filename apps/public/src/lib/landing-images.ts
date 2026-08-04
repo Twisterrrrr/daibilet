@@ -7,6 +7,7 @@ const LANDING_CARD_IMAGES: Record<string, string> = {
   'bridges-night': '/images/landings/bridges-night.png',
   'new-year': '/images/landings/new-year.png',
   'moscow-dinner-boat': '/images/landings/moscow-dinner-boat.png',
+  'moscow-city-day': '/images/landings/salute-9-may.png',
   'salute-9-may': '/images/landings/salute-9-may.png',
   'bus-tours': '/images/landings/bus-tours.png',
   standup: '/images/landings/standup.png',

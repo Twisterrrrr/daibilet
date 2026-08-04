@@ -69,6 +69,7 @@ import {
   LANDING_SLUG_ALIASES,
   explainLandingRuleMatch,
   matchesLandingRule,
+  OFF_SEASON_LANDING_SLUGS,
   resolveLandingRuleBySlug,
   sessionMatchesLandingSlug,
 } from './landing-rules.ts';
@@ -4109,7 +4110,9 @@ export async function buildPublicSearch(db, searchParams) {
   }
 
   if (items.length < 8) {
-    const landings = buildPublicLandings(sessions).filter((landing) => landing.events > 0);
+    const landings = buildPublicLandings(sessions).filter(
+      (landing) => landing.events > 0 && !OFF_SEASON_LANDING_SLUGS.has(landing.slug),
+    );
     for (const landing of landings) {
       if (items.length >= 8) break;
       const label = `${landing.title} ${landing.subtitle}`.toLowerCase();
@@ -4133,11 +4136,11 @@ export async function buildPublicSearch(db, searchParams) {
 const PROMO_LANDING_ORDER = [
   'spb-yards',
   'bridges-night',
+  'moscow-city-day',
   'moscow-dinner-boat',
   'moscow-museums',
   'river-party',
   'concerts-genre',
-  'salute-9-may',
   'family-kids',
   'new-year',
   'bus-tours',
@@ -4164,6 +4167,7 @@ const PUBLIC_CITY_LANDING_PATH = new Map([
   ['spb-yards', 'spb-yards'],
   ['moscow-dinner-boat', 'dinner-boat'],
   ['moscow-museums', 'moscow-museums'],
+  ['moscow-city-day', 'den-goroda'],
   ['planetarium', 'planetarium'],
 ]);
 
@@ -4174,6 +4178,7 @@ const PUBLIC_DEFAULT_CITY_BY_LANDING = new Map([
   ['spb-yards', 'saint-petersburg'],
   ['moscow-dinner-boat', 'moscow'],
   ['moscow-museums', 'moscow'],
+  ['moscow-city-day', 'moscow'],
   ['planetarium', 'saint-petersburg'],
 ]);
 
@@ -4242,16 +4247,18 @@ const PROMO_CITY_LANDING_BOOSTS = {
   'saint-petersburg': ['spb-yards', 'bridges-night'],
   'санкт-петербург': ['spb-yards', 'bridges-night'],
   'spb': ['spb-yards', 'bridges-night'],
-  'moscow': ['moscow-dinner-boat', 'moscow-museums'],
-  'moskva': ['moscow-dinner-boat', 'moscow-museums'],
-  'москва': ['moscow-dinner-boat', 'moscow-museums'],
+  'moscow': ['moscow-city-day', 'moscow-dinner-boat', 'moscow-museums'],
+  'moskva': ['moscow-city-day', 'moscow-dinner-boat', 'moscow-museums'],
+  'москва': ['moscow-city-day', 'moscow-dinner-boat', 'moscow-museums'],
 };
 
 export { LANDING_PAGE_SESSION_LIMIT, scopePublicCatalogSessions, selectLandingPageSessions };
 
 function buildSortedPublicLandings(sessions, cityFilter = '') {
   return sortPromoLandings(
-    buildPublicLandings(sessions).filter((landing) => landing.events > 0),
+    buildPublicLandings(sessions).filter(
+      (landing) => landing.events > 0 && !OFF_SEASON_LANDING_SLUGS.has(landing.slug),
+    ),
     cityFilter,
   );
 }
@@ -4875,7 +4882,9 @@ export async function buildPublicCityPage(db, citySlugOrId) {
   const venueCount = countDistinctSessionVenues(matchedSessions);
   const prices = sessions.map((session) => session.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
   const categories = countBy(sessions.map((event) => event.category).filter(Boolean));
-  const landings = buildPublicLandings(sessions).filter((landing) => landing.events > 0);
+  const landings = buildPublicLandings(sessions).filter(
+    (landing) => landing.events > 0 && !OFF_SEASON_LANDING_SLUGS.has(landing.slug),
+  );
   const entityLabel = destinationPrepositional(destination);
 
   return {
@@ -7747,6 +7756,7 @@ const CITY_HUB_LANDING_SHORT = {
   'bridges-night': 'Мосты',
   'moscow-dinner-boat': 'Ужин',
   'moscow-museums': 'Музеи',
+  'moscow-city-day': 'День города',
   'spb-yards': 'Дворы',
   standup: 'Стендап',
   'family-kids': 'Семьям',

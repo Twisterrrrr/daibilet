@@ -144,6 +144,46 @@ export const LANDING_RULES: LandingRule[] = [
     excludeKeywords: ['автобус', 'пешеход', 'мастер-класс'],
   },
   {
+    // Moscow City Day seasonal landing (not Victory Day / salute-9-may).
+    slug: 'moscow-city-day',
+    title: 'День города в Москве',
+    subtitle: 'Праздничные прогулки, салют и программы к Дню города',
+    city: 'Москва',
+    chips: ['день города', 'салют', 'теплоход'],
+    keywords: [
+      'день города',
+      'дня города',
+      'дню города',
+      'днем города',
+      'днём города',
+      'городск',
+      'салют',
+      'фейерверк',
+      'теплоход',
+      'речн',
+    ],
+    keywordScope: 'content',
+    requiredAnyKeywords: [
+      'день города',
+      'дня города',
+      'дню города',
+      'днем города',
+      'днём города',
+    ],
+    // Keep Victory Day / 9 May salute on salute-9-may only.
+    excludeKeywords: [
+      '9 мая',
+      '9.05',
+      '09.05',
+      '09 мая',
+      'день победы',
+      'дня победы',
+      'дню победы',
+      'днем победы',
+      'днём победы',
+    ],
+  },
+  {
     slug: 'salute-9-may',
     title: 'Салют 9 мая',
     subtitle: 'Лучшие точки обзора и экскурсии к Дню Победы',
@@ -495,8 +535,12 @@ export const LANDING_SLUG_ALIASES: Record<string, string[]> = {
   'family-kids': ['kids-family', 'detyam'],
   'concerts-genre': ['concerts', 'concerts-genres'],
   'moscow-museums': ['moscow-museums-workshops'],
+  'moscow-city-day': ['den-goroda-moskva', 'den-goroda', 'city-day-moscow'],
   'active-sport': ['active-extreme', 'autosport'],
 };
+
+/** Seasonally off landings: keep page, hide from /podborki and promo hub. */
+export const OFF_SEASON_LANDING_SLUGS = new Set<string>(['salute-9-may']);
 
 export function resolveLandingRuleBySlug(landingSlug: string): LandingRule | undefined {
   const key = String(landingSlug || '').trim().toLowerCase().replace(/_/g, '-');

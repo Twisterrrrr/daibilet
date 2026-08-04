@@ -23,6 +23,7 @@ const LANDING_EMOJI: Record<string, string> = {
   'river-party': '🎉',
   'bridges-night': '🌉',
   'moscow-dinner-boat': '🍽',
+  'moscow-city-day': '🎆',
   'moscow-museums': '🏛',
   'spb-yards': '🏛',
   standup: '🎤',
@@ -46,7 +47,7 @@ function landingGradient(slug: string): string {
     return 'from-sky-600 via-primary-700 to-slate-900';
   }
   if (slug.includes('bus')) return 'from-amber-500 via-orange-600 to-rose-600';
-  if (slug.includes('salute') || slug.includes('new-year')) {
+  if (slug.includes('salute') || slug.includes('new-year') || slug.includes('city-day')) {
     return 'from-violet-700 via-fuchsia-600 to-indigo-900';
   }
   if (slug.includes('standup')) return 'from-emerald-600 via-teal-600 to-cyan-800';
