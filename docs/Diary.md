@@ -10,11 +10,7 @@
 - Affordance: квадрат `rounded` + видимый check (slate-300 unchecked), `title`/`aria-label` «Отметить выполненным», фиксированный `size-5` + `self-center`.
 
 ### Проблемы
-- Нет. (BUILD_ID после MSK deploy.)
-
----
-
-## 2026-08-04 - My Day: must-see mini-card geometry (wider + 2× thumb)
+- Нет. Live: `e5cf78c` (+ tip `74fead9`), MSK **BUILD_ID=`Tn0XvhLW4knVakxHU8x6V`**, `/my-day` 200; marker `size-5 min-h-5` + title-row layout.
 
 ### Наблюдения
 - Owner оставил horizontal carousel mini-cards (chips + thumb/title/desc/+); полный откат к accordion-grid не нужен.
