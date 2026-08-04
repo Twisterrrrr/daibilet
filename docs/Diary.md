@@ -14,6 +14,7 @@
 ### Проблемы
 - После STEP 0 на салюте 0 сессий до появления Victory Day inventory - ожидаемо.
 - `[buy]` shortcode renderer есть, в контенте 0 вхождений - content seed deferred.
+- Live MSK **BUILD_ID=`BCWcAIglYC8cAP-6Zgr4k`** (включает `eae17f4` + follow-up My Day `e617ac1`); smoke: salute sessions=0 / no city-day, cityday event 200 без `salute-9-may`, `/podborki` `/rechnye-progulki` `/razvodnye-mosty` `/blog` 200.
 
 ---
 

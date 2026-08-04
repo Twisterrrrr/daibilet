@@ -11,12 +11,12 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| FIX.SALUTE0 | `salute-9-may`: exclude День города + require 9 мая / День Победы | Критический | ✅ `83271ec` API restart MSK; live sessions=0 city-day leak gone |
-| UX.POD1 | `/podborki`: category jump chips + SEO «Развернуть» + lazy cards + count/priceFrom | Высокий | ✅ `7535f02` (+ tabular/blog follow-up deploy) |
+| FIX.SALUTE0 | `salute-9-may`: exclude День города + require 9 мая / День Победы | Критический | ✅ `83271ec` live BUILD **`BCWcAIglYC8cAP-6Zgr4k`**; sessions=0, city-day leak gone |
+| UX.POD1 | `/podborki`: category jump chips + SEO «Развернуть» + lazy cards + count/priceFrom | Высокий | ✅ `7535f02` live **`BCWcAIglYC8cAP-6Zgr4k`** |
 | UX.POD2 | `/podborki` masonry / view counters / purchase carousel / infinite scroll | Средний | ⚠️ deferred |
-| UX.LAND2 | Tabular landings: clearer rows, timeslot chips, sticky filters, `?type=` | Высокий | ✅ code shipped this phase |
+| UX.LAND2 | Tabular landings: clearer rows, timeslot chips, sticky filters, `?type=` | Высокий | ✅ `eae17f4` live **`BCWcAIglYC8cAP-6Zgr4k`** |
 | UX.LAND2b | Invent new differentiator DTO badge fields | Низкий | ⚠️ deferred (reuse deriveLandingCardBadges / bridges heuristics) |
-| UX.BLOG3 | Blog hub chips river/tours + article reading progress | Высокий | ✅ this phase |
+| UX.BLOG3 | Blog hub chips river/tours + article reading progress | Высокий | ✅ `eae17f4` live **`BCWcAIglYC8cAP-6Zgr4k`** |
 | UX.BLOG3b | Sticky buy CTA + CMS product-card constructor + seed `[buy]` in articles | Средний | ⚠️ deferred (renderer exists; content 0 `[buy]`) |
 
 ---
