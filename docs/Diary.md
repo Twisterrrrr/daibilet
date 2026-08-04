@@ -1,3 +1,18 @@
+## 2026-08-04 - /my-day mobile: wider top actions + walk/auto right
+
+### Наблюдения
+- Owner annotated mobile: узкая колонка Поделиться/Сохранить/Очистить top-right - мало тапа, давит H1.
+- Пешком/Авто слева у `км · около …` - стрелка в правый край той же строки.
+
+### Решения
+- Mobile: `data-day-mobile-actions-row` - full-width ряд `flex-1` кнопок под H1 (`sm:hidden`); H1 на всю ширину; desktop `data-day-desktop-actions` без изменений.
+- Distance row: `justify-between` на mobile; `sm:justify-start` - left cluster как desktop polish.
+
+### Проблемы
+- (после deploy) BUILD_ID + `/my-day` 200.
+
+---
+
 ## 2026-08-04 - /my-day presets: «Читать об этом в блоге»
 
 ### Наблюдения
