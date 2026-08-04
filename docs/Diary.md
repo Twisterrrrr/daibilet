@@ -12,6 +12,7 @@
 
 ### Проблемы
 - Thin TC rows в DB остаются; публично уже soft-404. Отдельный unpublish/HIDE - optional data cleanup, не блокер UI.
+- MSK **BUILD_ID=`CbKLIANk3tWkfiFKxUSCW`** (`ba13ec2`); smoke: `/my-day` 200; matches `stadion-polet` → 1 saleable match, **0** admission attach; bad TC API → `null`.
 
 ---
 
