@@ -7,7 +7,7 @@
 - `DayRoutePanel`: после `summaryLine` вместо `.` - ` •` (middle dot), одна строка: `N точек из 10 • Страница {City_Род}`.
 
 ### Проблемы
-- (BUILD_ID после MSK deploy)
+- Нет. tip `2bf58e9`, MSK **BUILD_ID=`J2r1pJc-sK2W_wGzB2KzY`**; `/my-day` 200; source `scopeCityName ? ' •'`.
 
 ---
 

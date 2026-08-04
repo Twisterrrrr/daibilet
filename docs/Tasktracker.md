@@ -256,7 +256,7 @@ Canon: [inc-504-ssr-hardening.md](./inc-504-ssr-hardening.md).
 | UX.MYDAY-HOT-IMG | Hot Picks covers NN: editorial image lookup + classic 6 GenerateImage; photo-bg cards; catalog city warm-fix; order must-see→своё→hot | Критический | ✅ `6c24691` MSK **BUILD_ID=`p_VZM1zRvVXb6MQNYt_yt`** |
 | UX.MYDAY-OSM | `/my-day` Leaflet OSM map: numbered markers + polyline; Оптимизировать у карты; Яндекс external | Критический | ✅ `6c24691` MSK **BUILD_ID=`p_VZM1zRvVXb6MQNYt_yt`** |
 | UX.MYDAY-TICKET-URL | `/my-day` ticket CTA: never `/events/{venueSlug}`; sanitize + Hot Pick venue program fallback | Критический | ✅ `101d5b8` MSK **BUILD_ID=`ixSmgk9DbvgZ4YYbGLgmY`** `/my-day` 200; venues/niko1560 OK |
-| UX.MYDAY-HDR | `/my-day` header: `N точек из 10` + unpaid билеты; H1 предложный; без %/окно/Яндекс/дубль Точки | Критический | ✅ `495c8f0` MSK **BUILD_ID=`_gsuIDWy0smbTa0LMOzng`** `/my-day` 200 |
+| UX.MYDAY-HDR | `/my-day` header: `N точек из 10` + unpaid билеты; H1 предложный; без %/окно/Яндекс/дубль Точки; subtitle `N • Страница` | Критический | ✅ `2bf58e9` MSK **BUILD_ID=`J2r1pJc-sK2W_wGzB2KzY`** `/my-day` 200 (bullet sep) |
 | UX.MYDAY-P4 | Free-window upsell polish (multi-gap / ETA) | Средний | ⏳ partial MVP in COMM |
 | UX.MYDAY-P5 | hookFact + mini description on day cards | Средний | ✅ 3f9a70e MSK **BUILD_ID=E6nQnmKCtloz0ynXA2y24** Hot Picks cover+hook; must-see mini-cards; free-window; search thumb+hook |
 | UX.MYDAY-P6 | City «собрать за минуту» template variants | Высокий | ⏳ partial: hub «Готовые сценарии» under must-see; H1 «Собери свой день» |
