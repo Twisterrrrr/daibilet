@@ -65,6 +65,25 @@ if [[ "${DAIBILET_DEPLOY_REEXEC:-}" != "1" ]]; then
   exec bash "$APP_DIR/deploy/scripts/deploy-prod-next.sh" "$@"
 fi
 
+# INC.504.23: exclusive deploy lock + active marker so minutely SSR healthcheck
+# does not SIGKILL+start mid-build (ENOENT prerender-manifest → crash-loop 502).
+mkdir -p /var/lock
+DEPLOY_LOCK="${DAIBILET_WEB_DEPLOY_LOCK:-/var/lock/daibilet-web-deploy.lock}"
+DEPLOY_ACTIVE="${DAIBILET_WEB_DEPLOY_ACTIVE:-/var/lock/daibilet-web-deploy.active}"
+exec 9>"$DEPLOY_LOCK"
+if ! flock -n 9; then
+  echo "ERROR: another deploy holds ${DEPLOY_LOCK} (owner: $(cat "${DEPLOY_ACTIVE}" 2>/dev/null || echo unknown))"
+  exit 75
+fi
+# Drop stale ad-hoc /tmp locks from older wrappers (non-flock markers).
+rm -f /tmp/daibilet-web-deploy.lock /tmp/daibilet-web-deploy.lock.owner 2>/dev/null || true
+echo "pid=$$ host=$(hostname) at=$(date -u +%FT%TZ) branch=${BRANCH}" >"$DEPLOY_ACTIVE"
+clear_deploy_active() {
+  rm -f "$DEPLOY_ACTIVE" 2>/dev/null || true
+}
+trap clear_deploy_active EXIT
+echo "Deploy lock acquired (${DEPLOY_LOCK}); healthcheck will SKIP while ${DEPLOY_ACTIVE} exists"
+
 corepack enable 2>/dev/null || true
 corepack prepare pnpm@11.7.0 --activate 2>/dev/null || true
 
@@ -237,18 +256,44 @@ reap_orphan_next_build_workers "post-build"
 rm -rf apps/web/.next/cache
 echo "Cleared apps/web/.next/cache"
 
+if [[ ! -f "${WEB_NEXT_DIR}/prerender-manifest.json" || ! -f "${WEB_NEXT_DIR}/BUILD_ID" ]]; then
+  echo "ERROR: post-build .next incomplete (missing prerender-manifest or BUILD_ID)"
+  if [[ -f "${WEB_NEXT_PREV}/prerender-manifest.json" && -f "${WEB_NEXT_PREV}/BUILD_ID" ]]; then
+    rm -rf "${WEB_NEXT_DIR}"
+    cp -a "${WEB_NEXT_PREV}" "${WEB_NEXT_DIR}"
+    echo "Restored .next from .next.prev (BUILD_ID=$(cat "${WEB_NEXT_DIR}/BUILD_ID"))"
+  else
+    echo "No healthy .next.prev — refusing to start web"
+    exit 1
+  fi
+fi
+
 if systemctl is-active --quiet "$API_SERVICE"; then
   systemctl restart "$API_SERVICE"
 fi
 
 if systemctl is-enabled --quiet "$WEB_SERVICE" 2>/dev/null; then
+  systemctl reset-failed "$WEB_SERVICE" 2>/dev/null || true
   systemctl start "$WEB_SERVICE"
 else
   echo "Warning: enable $WEB_SERVICE after first install"
 fi
 
-sleep 4
-curl -fsS "http://127.0.0.1:${WEB_PORT}/api/health" >/dev/null && echo "Next /api/health OK on :$WEB_PORT"
+# Wait for Ready (healthcheck cold-start grace is 90s; keep deploy smoke tight).
+WEB_READY=0
+for _i in 1 2 3 4 5 6 7 8; do
+  sleep 2
+  if curl -fsS --max-time 3 "http://127.0.0.1:${WEB_PORT}/api/health" >/dev/null 2>&1; then
+    WEB_READY=1
+    echo "Next /api/health OK on :$WEB_PORT"
+    break
+  fi
+done
+if [[ "$WEB_READY" -ne 1 ]]; then
+  echo "Warning: Next /api/health not OK after start retries — check journalctl -u $WEB_SERVICE"
+fi
+# Marker cleared by EXIT trap after remaining post-steps; keep it through warm/indexnow
+# so healthcheck still skips during post-deploy load spikes.
 
 # Serve /images/* and /_next/static from disk (bypass Node + proxy_cache).
 NGINX_STATIC_PATCHED=0

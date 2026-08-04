@@ -208,11 +208,13 @@ chmod 644 /etc/cron.d/daibilet-tasks
 | Job | Schedule | Notes |
 |-----|----------|-------|
 | warm hubs | **OFF** (INC.504.20) | commented; optional `0 */2` after hang root cause closed |
-| SSR healthcheck | `* * * * *` | `ssr-healthcheck.sh` via flock+timeout 90s; curl fail **or** TTFB>5s → **SIGKILL+start** + `pkill -f '[w]arm-hub-pages'`; log `/var/log/daibilet/ssr-health.log` |
+| SSR healthcheck | `* * * * *` | `ssr-healthcheck.sh` via flock+timeout 90s; curl fail **or** TTFB>5s → **SIGKILL+start** + `pkill -f '[w]arm-hub-pages'`; log `/var/log/daibilet/ssr-health.log`; **INC.504.23:** SKIP while deploy active marker / missing prerender-manifest / cold-start grace 90s |
 
 INC.504.19: не писать `TTFB=$(curl … \|\| echo 999)` - при hang multiline ломает `bc` и restart никогда не срабатывает.
 
 INC.504.20: **не** держать inline `date +%Y…` / `%{time_…}` без `\%` в `/etc/cron.d/*` - cron трактует голый `%` как newline и обрезает CMD (healthcheck «стрелял» каждую минуту, но restart-ветка была мертва). Логика вынесена в `deploy/cron/ssr-healthcheck.sh`. Dry: `DAIBILET_SSR_HEALTH_DRY_RUN=1 DAIBILET_SSR_HEALTH_URL=http://127.0.0.1:39999/ /opt/daibilet/deploy/cron/ssr-healthcheck.sh`.
+
+INC.504.23: `deploy-prod-next.sh` держит flock `/var/lock/daibilet-web-deploy.lock` + marker `daibilet-web-deploy.active` на всё окно stop→build→start→warm. Healthcheck при curl=7 mid-deploy больше не поднимает web на half-built `.next` (ENOENT `prerender-manifest.json` → crash-loop 502, в т.ч. на `/my-day`).
 
 ### OOM watch
 `ash

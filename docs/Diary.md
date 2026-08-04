@@ -1,3 +1,22 @@
+## 2026-08-04 - INC.504.23: /my-day 502 = deploy×healthcheck race (not my-day SSR)
+
+### Наблюдения
+- Owner: `https://daibilet.ru/my-day` 502; `/` и `/cities` тоже 502 в том же окне (не уникальный crash маршрута).
+- `/my-day` page = тонкий client shell (`DayRoutePanel`); prerender HTML 200 когда web жив.
+- journal: `ENOENT …/.next/prerender-manifest.json` при `next start` mid-deploy; health log `curl=7` → SIGKILL+start каждую минуту пока web stopped на `web:build`; отдельно `curl=28` убивал cold-start (<90s).
+- Live после `ba13ec2` deploy: **BUILD_ID=`CbKLIANk3tWkfiFKxUSCW`**, `/my-day` 200; MemoryCurrent ~1.5G / High 1.5G.
+
+### Решения
+- `ssr-healthcheck.sh`: SKIP при fresh `daibilet-web-deploy.active`, missing prerender-manifest, cold-start grace 90s; abort start если marker/manifest пропали после SIGKILL.
+- `deploy-prod-next.sh`: flock `/var/lock/daibilet-web-deploy.lock` + active marker на stop→build→start→warm; verify `.next` before start; health wait retries.
+- `start-web-prod.sh`: refuse start без prerender-manifest + BUILD_ID.
+
+### Проблемы
+- Окно stop→build по-прежнему даёт краткий 502 (ожидаемо); цель - не усугублять crash-loop healthcheck'ом.
+- Корневой SSR hang / MemoryHigh pressure (INC.504.15) остаётся открытым.
+
+---
+
 ## 2026-08-04 - /my-day: cull unsaleable buy CTA (Полет soft-404)
 
 ### Наблюдения
