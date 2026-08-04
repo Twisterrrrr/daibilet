@@ -9,7 +9,7 @@
 - Restored `data-day-plan-accordion` form (title/note/advanced coords); invite «своё место» снова открывает accordion; search create row оставлен как доп. путь.
 
 ### Проблемы
-- Нет. Deploy BUILD_ID / smoke `/my-day` - ниже после ship.
+- Нет. Live: `5c13bc5`, MSK **BUILD_ID=`uoDz6BgaWtWh7P4AC0wF4`**, `/my-day` 200; chunk markers `data-day-must-see-carousel` + `data-day-plan-accordion`.
 
 ---
 
