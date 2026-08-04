@@ -32,10 +32,18 @@ STATIC_LOCATION = f"""
 
 def insert_static_location(block: str) -> str:
     if "location ^~ /_next/static/" in block:
-        # Refresh alias path if root changed.
+        # Refresh only the location body. Do NOT span from the preceding comment:
+        # /images/ may sit between "# Next build artifacts" and this location when
+        # patch-prod-nginx-images-static.py runs first.
         return re.sub(
-            r"\n    # Next build artifacts:.*?location \^~ /_next/static/ \{.*?\n    \}\n",
-            "\n" + STATIC_LOCATION.rstrip() + "\n",
+            r"\n    location \^~ /_next/static/ \{.*?\n    \}\n",
+            "\n"
+            + "    location ^~ /_next/static/ {\n"
+            + f"        alias {STATIC_ROOT}/;\n"
+            + "        access_log off;\n"
+            + "        expires 365d;\n"
+            + '        add_header Cache-Control "public, max-age=31536000, immutable";\n'
+            + "    }\n",
             block,
             count=1,
             flags=re.S,

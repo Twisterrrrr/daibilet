@@ -295,7 +295,21 @@ fi
 # Marker cleared by EXIT trap after remaining post-steps; keep it through warm/indexnow
 # so healthcheck still skips during post-deploy load spikes.
 
+# F4.6 nginx: admin.daibilet.ru → Next only (no /legacy)
+if [[ "$APPLY_ADMIN_NGINX_PATCH" == "1" && -f "$APP_DIR/deploy/nginx/patch-prod-admin-next.py" ]]; then
+  if python3 "$APP_DIR/deploy/nginx/patch-prod-admin-next.py"; then
+    if nginx -t 2>/dev/null; then
+      systemctl reload nginx && echo "nginx reloaded (admin Next-only, no /legacy)"
+    else
+      echo "Warning: nginx -t failed after admin patch — not reloading"
+    fi
+  else
+    echo "Warning: patch-prod-admin-next.py failed"
+  fi
+fi
+
 # Serve /images/* and /_next/static from disk (bypass Node + proxy_cache).
+# AFTER admin patch: that script rewrites daibilet.conf and would drop these aliases.
 NGINX_STATIC_PATCHED=0
 for _patch in patch-prod-nginx-images-static.py patch-prod-nginx-next-static.py; do
   if [[ -f "$APP_DIR/deploy/nginx/$_patch" ]]; then
@@ -311,19 +325,6 @@ if [[ "$NGINX_STATIC_PATCHED" == "1" ]]; then
     systemctl reload nginx && echo "nginx reloaded (/images + /_next/static alias)"
   else
     echo "Warning: nginx -t failed after static alias patch — not reloading"
-  fi
-fi
-
-# F4.6 nginx: admin.daibilet.ru → Next only (no /legacy)
-if [[ "$APPLY_ADMIN_NGINX_PATCH" == "1" && -f "$APP_DIR/deploy/nginx/patch-prod-admin-next.py" ]]; then
-  if python3 "$APP_DIR/deploy/nginx/patch-prod-admin-next.py"; then
-    if nginx -t 2>/dev/null; then
-      systemctl reload nginx && echo "nginx reloaded (admin Next-only, no /legacy)"
-    else
-      echo "Warning: nginx -t failed after admin patch — not reloading"
-    fi
-  else
-    echo "Warning: patch-prod-admin-next.py failed"
   fi
 fi
 
