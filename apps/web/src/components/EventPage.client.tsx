@@ -14,14 +14,17 @@ import {
 import {
   formatAgeLimit,
   formatBuyCardPrice,
+  formatBuyCardPriceHint,
   formatCategoryPrice,
   formatHeroBuyButtonPrice,
   formatPriceRub,
   formatVacantSeats,
+  getTicketOldPrice,
   getTicketPriceRange,
   buildGroupedTicketCategories,
   FLEXIBLE_SCHEDULE_LABEL,
   isFlexibleScheduleSession,
+  isOpenDateEvent,
   scrollToBuyCard,
 } from '@/lib/event-page-utils';
 import { dayRouteItemFromEvent } from '@/lib/day-route-from-place';
@@ -54,9 +57,12 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
   const teplohod = getTeplohodWidgetIds(event);
   const primaryOffer = offers.find((offer) => offer.active !== false) || offers[0] || null;
   const priceRange = getTicketPriceRange(payload);
+  const oldPrice = getTicketOldPrice(payload, priceRange);
+  const priceHint = priceRange ? formatBuyCardPriceHint(priceRange) : null;
   const ticketCategories = buildGroupedTicketCategories(payload);
   const purchaseOptions = payload.purchaseOptions ?? [];
   const showMultiPurchase = purchaseOptions.length >= 2;
+  const openDateTicket = isOpenDateEvent(payload);
   const visibleSessions = listPurchasableSessionVariants(sessions as EventSession[]).slice(0, 5);
   const allFlexible =
     visibleSessions.length > 0 && visibleSessions.every((session) => isFlexibleScheduleSession(session));
@@ -102,19 +108,25 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
   return (
     <div className="rounded-card border border-slate-200 bg-white p-6 shadow-card sm:p-7">
       {priceRange ? (
-        <div className="flex items-baseline gap-2">
-          <span className="text-3xl font-bold text-graphite">{formatBuyCardPrice(priceRange)}</span>
-          <span className="text-sm text-graphite-muted">/ чел.</span>
+        <div>
+          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <span className="text-3xl font-bold tracking-tight text-graphite sm:text-4xl">
+              {formatBuyCardPrice(priceRange)}
+            </span>
+            {oldPrice ? (
+              <span className="text-base text-graphite-muted line-through decoration-slate-400">
+                {formatPriceRub(oldPrice)}
+              </span>
+            ) : null}
+            <span className="text-sm text-graphite-muted">/ чел.</span>
+          </div>
+          {priceHint ? <p className="mt-1 text-xs text-graphite-muted">{priceHint}</p> : null}
         </div>
       ) : (
         <p className="text-lg font-semibold text-graphite-muted">Цена уточняется</p>
       )}
 
-      {dayRouteVenue ? (
-        <div className="mt-4">
-          <AddToDayRouteButton intent="day" className="w-full !rounded-xl" venue={dayRouteVenue} />
-        </div>
-      ) : null}
+      {openDateTicket ? <OpenDateStepper className="mt-5" /> : null}
       {showMultiPurchase ? (
         <div className="mt-6">
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-graphite-muted">
@@ -252,6 +264,12 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
         </>
       )}
 
+      {dayRouteVenue ? (
+        <div className="mt-4">
+          <AddToDayRouteButton intent="day" className="w-full !rounded-xl" venue={dayRouteVenue} />
+        </div>
+      ) : null}
+
       <div className="mt-5 flex items-center justify-center gap-2 rounded-xl bg-surface-muted px-3 py-2.5 text-center">
         <Shield className="h-4 w-4 shrink-0 text-graphite-muted" strokeWidth={1.75} />
         <span className="text-xs text-graphite-muted">
@@ -259,6 +277,37 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
         </span>
       </div>
     </div>
+  );
+}
+
+function OpenDateStepper({ className = '' }: { className?: string }) {
+  const steps = [
+    { n: '1', label: 'Покупаете' },
+    { n: '2', label: 'Код на email' },
+    { n: '3', label: 'Приходите в любой день' },
+  ] as const;
+
+  return (
+    <ol
+      className={`grid gap-2 rounded-xl bg-emerald-50/80 px-3.5 py-3 ring-1 ring-emerald-100/80 sm:grid-cols-3 ${className}`}
+      aria-label="Как работает билет с открытой датой"
+    >
+      {steps.map((step, index) => (
+        <li key={step.n} className="flex items-start gap-2 text-sm text-emerald-950">
+          <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-emerald-600 text-[11px] font-bold text-white">
+            {step.n}
+          </span>
+          <span className="leading-snug">
+            {step.label}
+            {index < steps.length - 1 ? (
+              <span className="ml-1 hidden text-emerald-700/50 sm:inline" aria-hidden>
+                →
+              </span>
+            ) : null}
+          </span>
+        </li>
+      ))}
+    </ol>
   );
 }
 
@@ -395,8 +444,10 @@ export function EventHero({ payload }: { payload: PublicEventPageDto }) {
   const { event, stats } = payload;
   const ageLimit = formatAgeLimit(event.ageLimit);
   const priceRange = getTicketPriceRange(payload);
+  const oldPrice = getTicketOldPrice(payload, priceRange);
   const fallbackPrice = formatPriceRub(stats.priceFrom ?? event.priceFrom);
   const priceLabel = priceRange ? formatHeroBuyButtonPrice(priceRange) : fallbackPrice ? `от ${fallbackPrice}` : '';
+  const openDateTicket = isOpenDateEvent(payload);
   const heroImage = String(event.imageUrl || '').trim();
   const heroObjectPosition = resolveEventHeroObjectPosition({
     slug: event.slug,
@@ -453,6 +504,23 @@ export function EventHero({ payload }: { payload: PublicEventPageDto }) {
             <h1 className="mt-2 text-2xl font-bold leading-tight text-white sm:text-3xl lg:text-4xl">
               {event.seoH1 || event.title}
             </h1>
+
+            {openDateTicket ? (
+              <p className="mt-3 text-sm font-medium text-emerald-200/95">
+                1. Покупаете → 2. Код на email → 3. Приходите в любой день
+              </p>
+            ) : null}
+
+            {priceRange || fallbackPrice ? (
+              <div className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                <span className="text-2xl font-bold text-white sm:text-3xl">
+                  {priceRange ? formatBuyCardPrice(priceRange) : `от ${fallbackPrice}`}
+                </span>
+                {oldPrice ? (
+                  <span className="text-sm text-white/55 line-through">{formatPriceRub(oldPrice)}</span>
+                ) : null}
+              </div>
+            ) : null}
 
             <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/85">
               {ageLimit ? (

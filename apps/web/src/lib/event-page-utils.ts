@@ -118,19 +118,41 @@ export function getTicketPriceRange(payload: PublicEventPageDto): TicketPriceRan
 }
 
 export function formatBuyCardPrice(range: TicketPriceRange): string {
-  const min = Math.round(range.min);
-  const max = Math.round(range.max);
-  if (min === max) return `${formatNumber(min)} ₽`;
-  return `${formatNumber(min)} - ${formatNumber(max)} ₽`;
+  return `от ${formatNumber(Math.round(range.min))} ₽`;
 }
 
-export function formatBuyCardPriceHint(_range: TicketPriceRange): string | null {
-  return null;
+export function formatBuyCardPriceHint(range: TicketPriceRange): string | null {
+  const min = Math.round(range.min);
+  const max = Math.round(range.max);
+  if (min === max) return null;
+  return `до ${formatNumber(max)} ₽ в зависимости от категории`;
 }
 
 /** Hero CTA intentionally advertises only the minimum available price. */
 export function formatHeroBuyButtonPrice(range: TicketPriceRange): string {
   return `от ${formatNumber(Math.round(range.min))} ₽`;
+}
+
+/** Highest valid oldPrice above the current min - for strikethrough when discount exists. */
+export function getTicketOldPrice(payload: PublicEventPageDto, range?: TicketPriceRange | null): number | null {
+  const min = range?.min ?? getTicketPriceRange(payload)?.min;
+  if (min == null) return null;
+  let best: number | null = null;
+  for (const item of payload.ticketPrices ?? []) {
+    const old = item.oldPriceRub;
+    if (typeof old === 'number' && old > min && old >= MIN_DISPLAY_PRICE_RUB) {
+      best = best == null ? old : Math.max(best, old);
+    }
+  }
+  return best;
+}
+
+export function isOpenDateEvent(payload: PublicEventPageDto): boolean {
+  const eventType = String(payload.event.eventType || '').toLowerCase();
+  if (eventType === 'open_date') return true;
+  const sessions = payload.sessions ?? [];
+  if (!sessions.length) return false;
+  return sessions.every((session) => isFlexibleScheduleSession(session));
 }
 
 export type TicketCategoryRow = {

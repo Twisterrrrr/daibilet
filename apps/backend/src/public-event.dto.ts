@@ -603,6 +603,7 @@ function mapOfferRecord(offer: OfferRecord): MappedOffer {
     sourceCode: offer.sourceCode,
     title: offer.title || 'Ticketscloud widget',
     priceRub: offer.priceRub,
+    oldPriceRub: offer.oldPriceRub ?? null,
     widgetUrl: offer.widgetUrl,
     deeplinkUrl: offer.deeplinkUrl,
     active: offer.active,
@@ -1008,6 +1009,10 @@ function buildTicketPrices(
       key: `offer:${offer.id}:${normalizeGroupPart(title)}:${offer.priceRub}`,
       title,
       priceRub: Number(offer.priceRub),
+      oldPriceRub:
+        typeof offer.oldPriceRub === 'number' && offer.oldPriceRub > Number(offer.priceRub)
+          ? Number(offer.oldPriceRub)
+          : null,
       source: sourceLabel(offer.sourceCode),
       sourceTicketId: offer.sourceTicketId,
       description: resolveOfferTicketDescription(offer, title),

@@ -7,6 +7,19 @@
 
 ---
 
+## Catalog + event detail UX (2026-08-04)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| UX.CAT-A1 | Category chips horizontal, no tall counts; date select no «Люб» trunc | Высокий | ✅ |
+| UX.CAT-A2 | Hide page-size on mobile/tablet; «Показать ещё» load-more | Высокий | ✅ |
+| UX.EVT-B1 | Open-date how-to stepper under title | Высокий | ✅ |
+| UX.EVT-B2 | Price primary «от X ₽» + oldPrice strikethrough | Высокий | ✅ |
+| UX.CAT-A3 | Empty state Popular recommend block | Средний | ⚠️ deferred |
+| UX.EVT-B3 | Full tabs Программа / Где / Отзывы | Низкий | ⚠️ deferred |
+
+---
+
 ## Mobile homepage UX cleanup (2026-08-04)
 
 | # | Задача | Приоритет | Статус |

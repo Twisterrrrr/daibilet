@@ -1,3 +1,21 @@
+## 2026-08-04 - Catalog + event detail UX (A1/A2/B1/B2)
+
+### Наблюдения
+- Owner UX audit listing `/events` + event detail: chips с counts («Мероприятия 2092»), trunc select «Любая дата»→«Люб», page-size 50/100 на узких экранах, open-date без how-to, buy-card показывает scary range как primary.
+- Parallel agents: home mobile + AddToDayRouteButton - эти файлы не трогали (только порядок day-route CTA в BuyCard).
+
+### Решения
+- **A1:** category chips без счётчиков; date select label «Дата» + min-width; calendar input только sm+.
+- **A2:** page-size selector `hidden lg:block`; mobile pagination = «Показать ещё N» (без infinite).
+- **B1:** open-date stepper под title (hero) + в BuyCard (`eventType=open_date` / flexible sessions).
+- **B2:** primary price = **от X ₽**; range → hint; strikethrough `oldPriceRub` если есть (проброс из EventOffer в ticketPrices).
+- **Deferred:** empty-state recommend block; full tabs Программа/Где/Отзывы.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-04 - Mobile homepage UX cleanup
 
 ### Наблюдения

@@ -308,6 +308,7 @@ export interface PublicOfferDto extends PurchaseFields {
   sourceCode: string;
   title?: string | null;
   priceRub?: number | null;
+  oldPriceRub?: number | null;
   active: boolean;
 }
 

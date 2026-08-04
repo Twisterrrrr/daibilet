@@ -249,7 +249,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
             ))}
           </div>
 
-          <div className="relative hidden sm:block">
+          <div className="relative hidden lg:block">
             <label htmlFor="catalog-page-size" className="sr-only">
               Карточек на странице
             </label>

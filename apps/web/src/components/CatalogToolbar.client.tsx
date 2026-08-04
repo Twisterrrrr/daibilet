@@ -209,7 +209,7 @@ export function CatalogToolbar({
         </label>
 
         <div className="flex items-center gap-1.5 sm:contents">
-          <div className="relative min-w-0 flex-1 sm:w-40 sm:flex-none">
+          <div className="relative min-w-[7.25rem] flex-1 sm:w-44 sm:flex-none sm:min-w-[10rem]">
             <label htmlFor="catalog-date" className="sr-only">
               Когда
             </label>
@@ -222,7 +222,7 @@ export function CatalogToolbar({
                 if (event.target.value === 'custom') return;
                 setDate(event.target.value);
               }}
-              className="h-11 w-full appearance-none rounded-xl bg-surface-muted pl-3 pr-9 text-sm font-medium text-graphite outline-none transition hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-70 sm:h-10 sm:bg-transparent sm:hover:bg-surface-muted"
+              className="h-11 w-full min-w-0 appearance-none rounded-xl bg-surface-muted pl-3 pr-9 text-sm font-medium text-graphite outline-none transition hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-70 sm:h-10 sm:bg-transparent sm:hover:bg-surface-muted"
             >
               {CATALOG_DATE_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -244,7 +244,8 @@ export function CatalogToolbar({
             />
           </div>
 
-          <label className="relative min-w-[9.5rem] flex-none sm:w-36">
+          {/* Exact calendar: desktop only; mobile uses date select + advanced filters. */}
+          <label className="relative hidden min-w-[9.5rem] flex-none sm:block sm:w-36">
             <span className="sr-only">Точная дата</span>
             <input
               type="date"
@@ -303,12 +304,12 @@ export function CatalogToolbar({
         }}
       />
 
-      {/* Одна лента категорий с иконками и counts */}
+      {/* Горизонтальные tag-chips без счётчиков («Мероприятия 2092»). */}
       <div className="-mx-4 px-4 pt-1 sm:mx-0 sm:px-0">
         <div
           role="tablist"
           aria-label="Категории"
-          className="horizontal-snap-row flex gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="horizontal-snap-row flex flex-nowrap gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           <CategoryTabs filters={filters} categories={facets.categories} />
         </div>
@@ -355,8 +356,7 @@ function CategoryTabs({
               className="catalog-chip snap-start cursor-not-allowed opacity-40"
             >
               <CategoryTabIcon name={label} className="text-graphite-muted" />
-              <span>{label}</span>
-              <span className="tabular-nums text-graphite-muted/80">0</span>
+              <span className="whitespace-nowrap">{label}</span>
             </span>
           );
         }
@@ -370,13 +370,13 @@ function CategoryTabs({
             })}
             role="tab"
             aria-selected={active}
+            title={item.events > 0 ? `${label}: ${item.events}` : label}
             className={`catalog-chip snap-start ${
               active ? 'catalog-chip-on' : empty ? 'catalog-chip-idle opacity-50' : 'catalog-chip-idle'
             }`}
           >
             <CategoryTabIcon name={label} className={active ? 'text-white/85' : 'text-graphite-muted'} />
-            <span>{label}</span>
-            <span className={`tabular-nums ${active ? 'text-white/65' : 'text-graphite-muted/80'}`}>{item.events}</span>
+            <span className="whitespace-nowrap">{label}</span>
           </Link>
         );
       })}

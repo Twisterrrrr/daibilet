@@ -25,7 +25,8 @@ export const CATALOG_SORT_OPTIONS: Array<{ value: CatalogSort; label: string }> 
 ];
 
 export const CATALOG_DATE_OPTIONS = [
-  { value: 'all', label: 'Любая дата' },
+  /** Short label: mobile select truncates «Любая дата» to «Люб». */
+  { value: 'all', label: 'Дата' },
   { value: 'today', label: 'Сегодня' },
   { value: 'tomorrow', label: 'Завтра' },
   { value: 'weekend', label: 'На выходных' },

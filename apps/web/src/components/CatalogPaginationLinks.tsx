@@ -46,6 +46,9 @@ export function CatalogPaginationLinks({
   const totalPages = Math.max(1, Math.ceil(total / limit));
   if (totalPages <= 1) return null;
 
+  const shown = Math.min(page * limit, total);
+  const remaining = Math.max(total - shown, 0);
+
   const buildHref = (targetPage: number) => {
     const params = new URLSearchParams();
     for (const [key, value] of Object.entries(searchParams)) {
@@ -60,7 +63,6 @@ export function CatalogPaginationLinks({
 
   const prevPage = page > 1 ? page - 1 : null;
   const nextPage = page < totalPages ? page + 1 : null;
-  const mobileItems = buildPaginationItems(page, totalPages, 0);
   const desktopItems = buildPaginationItems(page, totalPages, 1);
 
   const pageBtn =
@@ -70,65 +72,80 @@ export function CatalogPaginationLinks({
   const navBtn =
     'inline-flex min-h-10 items-center justify-center rounded-lg border border-slate-200 px-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:pointer-events-none disabled:opacity-40';
 
-  const renderItems = (items: Array<number | 'ellipsis'>, className: string) => (
-    <ol className={className}>
-      {items.map((item, index) =>
-        item === 'ellipsis' ? (
-          <li
-            key={`ellipsis-${index}`}
-            className="inline-flex min-h-10 min-w-8 items-center justify-center text-sm text-slate-400"
-            aria-hidden
-          >
-            …
-          </li>
-        ) : (
-          <li key={item}>
-            {item === page ? (
-              <span className={pageBtnActive} aria-current="page">
-                {item}
-              </span>
-            ) : (
-              <Link href={buildHref(item)} className={pageBtnIdle} aria-label={`Страница ${item}`}>
-                {item}
-              </Link>
-            )}
-          </li>
-        ),
-      )}
-    </ol>
-  );
-
   return (
-    <nav aria-label="Пагинация каталога" className="mt-10 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-      <p className="text-sm text-slate-500">
-        Страница {page} из {totalPages} · {pluralEvents(total)}
+    <nav aria-label="Пагинация каталога" className="mt-10 flex flex-col gap-4">
+      <p className="text-center text-sm text-slate-500 sm:text-left">
+        Показано {shown} из {total} · {pluralEvents(total)}
       </p>
 
-      <div className="flex flex-wrap items-center justify-between gap-1.5 sm:justify-start sm:gap-2">
+      {/* Mobile: load-more style CTA without infinite scroll risk */}
+      <div className="flex flex-col items-center gap-3 sm:hidden">
+        {nextPage ? (
+          <Link
+            href={buildHref(nextPage)}
+            rel="next"
+            className="inline-flex min-h-11 w-full max-w-sm items-center justify-center rounded-full bg-primary-600 px-8 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700"
+          >
+            Показать ещё{remaining > 0 ? ` ${Math.min(limit, remaining)}` : ''}
+          </Link>
+        ) : null}
+        {prevPage ? (
+          <Link href={buildHref(prevPage)} rel="prev" className="text-sm font-medium text-slate-500 hover:text-slate-800">
+            ← Назад
+          </Link>
+        ) : null}
+      </div>
+
+      {/* Desktop: classic page strip */}
+      <div className="hidden flex-wrap items-center justify-between gap-2 sm:flex">
         {prevPage ? (
           <Link href={buildHref(prevPage)} rel="prev" className={navBtn} aria-label="Предыдущая страница">
-            <span className="sm:hidden">←</span>
-            <span className="hidden sm:inline">← Назад</span>
+            ← Назад
           </Link>
         ) : (
           <span className={navBtn} aria-disabled="true">
-            <span className="sm:hidden">←</span>
-            <span className="hidden sm:inline">← Назад</span>
+            ← Назад
           </span>
         )}
 
-        {renderItems(mobileItems, 'flex items-center gap-1 sm:hidden')}
-        {renderItems(desktopItems, 'hidden sm:flex sm:flex-wrap sm:items-center sm:gap-1.5')}
+        <ol className="flex flex-wrap items-center gap-1.5">
+          {desktopItems.map((item, index) =>
+            item === 'ellipsis' ? (
+              <li
+                key={`ellipsis-${index}`}
+                className="inline-flex min-h-10 min-w-8 items-center justify-center text-sm text-slate-400"
+                aria-hidden
+              >
+                …
+              </li>
+            ) : (
+              <li key={item}>
+                {item === page ? (
+                  <span className={pageBtnActive} aria-current="page">
+                    {item}
+                  </span>
+                ) : (
+                  <Link href={buildHref(item)} className={pageBtnIdle} aria-label={`Страница ${item}`}>
+                    {item}
+                  </Link>
+                )}
+              </li>
+            ),
+          )}
+        </ol>
 
         {nextPage ? (
-          <Link href={buildHref(nextPage)} rel="next" className={`${navBtn} border-slate-900 bg-slate-900 text-white hover:bg-slate-800`} aria-label="Следующая страница">
-            <span className="sm:hidden">→</span>
-            <span className="hidden sm:inline">Дальше →</span>
+          <Link
+            href={buildHref(nextPage)}
+            rel="next"
+            className={`${navBtn} border-slate-900 bg-slate-900 text-white hover:bg-slate-800`}
+            aria-label="Следующая страница"
+          >
+            Дальше →
           </Link>
         ) : (
           <span className={navBtn} aria-disabled="true">
-            <span className="sm:hidden">→</span>
-            <span className="hidden sm:inline">Дальше →</span>
+            Дальше →
           </span>
         )}
       </div>
