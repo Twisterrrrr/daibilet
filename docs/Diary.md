@@ -23,7 +23,7 @@
 - Distance row: `justify-between` на mobile; `sm:justify-start` - left cluster как desktop polish.
 
 ### Проблемы
-- (после deploy) BUILD_ID + `/my-day` 200.
+- Нет. Live tip `9ea1c5e` (в `1f08893`), MSK **BUILD_ID=`JHo5binbjsG01hIPE_9_0`**, `/my-day` 200; chunks: `data-day-mobile-actions-row` + `sm:justify-start`.
 
 ---
 

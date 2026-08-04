@@ -120,7 +120,8 @@
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
 | UX.MYDAY-MATCHES-TITLE | Matches accordion: «Подходящие экскурсии» → «События поблизости» | Высокий | ✅ `1f08893` MSK **BUILD_ID=`JHo5binbjsG01hIPE_9_0`** `/my-day` 200 |
-| UX.MYDAY-MUSTSEE-BLUE | Must-see bulk «Добавить главные места»: `sky-600` primary (как Яндекс CTA) | Высокий | 🔄 commit+MSK deploy |
+| UX.MYDAY-MUSTSEE-EXPAND | Must-see: «Развернуть»/«Свернуть» - carousel ↔ list (mobile stack / desktop wrap) | Высокий | 🔄 commit+MSK deploy |
+| UX.MYDAY-MUSTSEE-BLUE | Must-see bulk «Добавить главные места»: `sky-600` primary (как Яндекс CTA) | Высокий | ✅ shipped earlier (sky-600 live) |
 | UX.MYDAY-HEADER-SEARCH | ≥1 stop: hide mid starter card; compact city+search under H1; empty starter unchanged | Высокий | ✅ `c8f918f` MSK **BUILD_ID=`E2goVq9U7X9ujiRnLliZf`** `/my-day` 200 |
 
 ## /my-day starter geometry (2026-08-03)
@@ -209,9 +210,10 @@ Canon: [inc-504-ssr-hardening.md](./inc-504-ssr-hardening.md).
 | UX.MYDAY-PLANCHECK2 | planDone checkbox leftmost (superseded - remove control) | Критический | 🚫 superseded by DROP |
 | UX.MYDAY-PLANCHECK-DROP | Remove planDone checkbox+strike; map focus hint 260ch / line-clamp-4 | Критический | ✅ `66bcac4` MSK **BUILD_ID=`esVyb5mav-fjNqzDQm4-g`** `/my-day` 200 |
 | UX.MYDAY-TOOLBAR | Route chrome: mobile mid = Распланировать primary (no Yandex); Share/Save/Clear column; text walk/auto | Критический | ✅ `c8b83bd` MSK **BUILD_ID=`esVyb5mav-fjNqzDQm4-g`** `/my-day` 200 |
-| UX.MYDAY-MOB-POLISH2 | Mobile: top actions full-width row under H1; Пешком/Авто right on km/ETA; desktop chrome intact | Критический | 🔄 in progress |
+| UX.MYDAY-MOB-POLISH2 | Mobile: top actions full-width row under H1; Пешком/Авто right on km/ETA; desktop chrome intact | Критический | ✅ `9ea1c5e` tip `1f08893` MSK **BUILD_ID=`JHo5binbjsG01hIPE_9_0`** `/my-day` 200 |
 | UX.MYDAY-DESK-POLISH | Desktop: actions top-right w/ Share; walk/auto by meta; Yandex only on map; Optimize ghost mid-list | Критический | ✅ `c32443f` tip `94cbe86` MSK **BUILD_ID=`iQt0EenjDINCgdzm4GPuR`** `/my-day` 200 |
-| UX.MYDAY-DESK-POLISH2 | City picker wider (NN full); hour-plan + Optimize on «Маршрут · N» title row; top-right Save/Clear/Share only | Критический | 🔄 in progress |
+| UX.MYDAY-DESK-POLISH2 | City picker wider (NN full); hour-plan + Optimize on «Маршрут · N» title row; top-right Save/Clear/Share only | Критический | ✅ `fa6e1fd` tip `441ce9ea` MSK **BUILD_ID=`4sb26gUETqq22pmF7ycwM`** `/my-day` 200 |
+| UX.MYDAY-DESK-POLISH3 | CTAs+walk/auto on km row (right); airy title row; city pin + wider picker (~26rem) | Критический | 🔄 in progress |
 | FIX.MYDAY-SALEABLE | Cull unsaleable/thin TC buy CTA on venue stops (Полет soft-404) | Критический | ✅ `ba13ec2` MSK **BUILD_ID=`CbKLIANk3tWkfiFKxUSCW`** |
 | UX.MYDAY-F | Мой день: filters + auto-pick + top-up (product next) | Высокий | ⏳ поверх MOB канона |
 | UX.MYDAY-IA | `/my-day` catalog-first + text accordion (collapsed) | Критический | ✅ live **BUILD_ID=`MvYEsYnvAH_KMCxXkt2S6`** |
