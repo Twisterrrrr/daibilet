@@ -417,9 +417,9 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 | INC.504.20 | Owner fury ~17:19 UTC: live hang again (0B TTFB); SIGKILL+start; **cron `%` truncates healthcheck** (log empty despite minutely fire); warm **OFF**; `ssr-healthcheck.sh` + SIGKILL recovery | Критический | ✅ mitigated live MSK; warm off until hang RC; root still INC.504.15 |
 | INC.504.21 | 2026-08-02 ~07:19 UTC: SSR hang 0B TTFB again (~11h next RSS~1.6G); SIGKILL+start; healthcheck silent - script **644 not +x** → Permission denied; chmod 755 + cron via `/bin/bash` | Критический | ✅ mitigated live MSK; auto-net fixed; root still INC.504.15 |
 | INC.504.22 | **Codex handoff:** независимый RCA + PR-sized фикс SSR hang (event-loop / Prisma in Next). Brief: [codex-ssr-hang-brief.md](./codex-ssr-hang-brief.md); canon [inc-504-ssr-hardening.md](./inc-504-ssr-hardening.md) | Критический | ✅ merge `f93b770` MSK BUILD `3zmDWHpY7rXAJgqu0-pnR` |
-| INC.504.23 | Owner 502 `/my-day` 2026-08-04: не SSR my-day; minutely healthcheck SIGKILL+start mid-deploy (curl=7) → ENOENT prerender-manifest crash-loop; cold-start curl=28 kill. Fix: deploy flock+active marker; healthcheck SKIP; start-web refuse incomplete `.next` | Критический | 🔄 ship |
+| INC.504.25 | Owner 502 `/my-day` 2026-08-04: не SSR my-day; minutely healthcheck SIGKILL+start mid-deploy (curl=7) → ENOENT prerender-manifest crash-loop; cold-start curl=28 kill. Fix: deploy flock+active marker; healthcheck SKIP; start-web refuse incomplete `.next` | Критический | ✅ `59aba2f` MSK **BUILD_ID=`3VxNvT0CDvcI3jB-BMvpP`**; health SKIP mid-deploy; NRestarts=0; `/my-day` `/` 200 |
 
-См. Diary 2026-07-30 «Prod 504: daibilet-web hang», «2026-08-01 INC.504.13», «INC.504.17», «INC.504.18», «INC.504.19», «INC.504.20», «INC.504.21»; brief Codex `INC.504.22`.
+См. Diary 2026-07-30 «Prod 504: daibilet-web hang», «2026-08-01 INC.504.13», «INC.504.17», «INC.504.18», «INC.504.19», «INC.504.20», «INC.504.21»; brief Codex `INC.504.22`; deploy race `INC.504.25`.
 
 ---
 
