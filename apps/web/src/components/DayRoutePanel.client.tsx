@@ -4594,18 +4594,22 @@ function DayRouteVenueCard({
         </div>
 
         <div className="min-w-0 flex-1" data-day-stop-text-col>
-          <div className="mb-0.5 flex items-center gap-2">
+          {softTimeNode || purchased ? (
+            <div className="mb-0.5 flex items-center gap-2">
+              {softTimeNode}
+              {purchased ? (
+                <span className="text-[11px] font-bold uppercase tracking-wide text-primary-700">
+                  Оплачено
+                </span>
+              ) : null}
+            </div>
+          ) : null}
+          <div className="flex items-center gap-2">
             {planCheck}
-            {softTimeNode}
-            {purchased ? (
-              <span className="text-[11px] font-bold uppercase tracking-wide text-primary-700">
-                Оплачено
-              </span>
-            ) : null}
+            <p className="min-w-0 flex-1 truncate text-sm font-semibold leading-snug text-slate-900">
+              {titleNode}
+            </p>
           </div>
-          <p className="truncate text-sm font-semibold leading-snug text-slate-900">
-            {titleNode}
-          </p>
           {placeLine || !hasCoords ? (
             <p
               className={`mt-0.5 mb-0 line-clamp-1 text-xs leading-snug ${
