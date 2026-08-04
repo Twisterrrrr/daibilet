@@ -30,6 +30,7 @@
 
 ### Проблемы
 - Real QR still needs orders API (qa.md).
+- Live: `e617ac1`, MSK **BUILD_ID=`BCWcAIglYC8cAP-6Zgr4k`**, `/my-day` 200 (chunk markers hour-plan / carousel).
 
 ---
 
