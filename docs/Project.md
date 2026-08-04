@@ -41,16 +41,21 @@
 
 ---
 
-## Must-see count tiers (канон 2026-08-04)
+## Must-see count tiers (канон 2026-08-04, corr. capitals)
 
-Редакционный объём `cityInfo.mustSee` / «Главные места» на city hub и в «Мой день». Не путать с лимитом точек в плане дня (ниже).
+Редакционный объём `cityInfo.mustSee` / «Главные места» на city hub и в каталоге «Мой день». **Не** путать с лимитом точек в одном плане дня (ниже).
 
 | Тир | Объём must-see | Где применять |
 |-----|----------------|---------------|
 | **Floor** | **6** | Все standalone hubs (минимум после batch1-7) |
 | **Typical hub** | **6-8** | Обычный областной центр / региональный хаб |
-| **Large tourist** | **12-18** + filter tabs (Главные / Гастро / Музеи / Парки / Храмы - пустые скрыты) | Крупные туристические города (цель для Москвы и СПб) |
-| **NN-style exception** | **~20-30** landmarks + gastro-пакет + именованные `dayRoutePresets` | Только Нижний Новгород (owner-пакет). **Не клонировать** на остальные города |
+| **Large tourist** | **~12-18** + filter tabs (Главные / Гастро / Музеи / Парки / Храмы - пустые скрыты) | Крупные **нестоличные** туристические города (default tier) |
+| **Capitals (MSK + SPB)** | **Широкий каталог** - ориентир **30-50+**, **без жёсткого потолка 18**; качество важнее числа (slug, coords, hook, filter-классификация) | Москва и Санкт-Петербург - богатство столичного хаба |
+| **NN deep pack (reference)** | Deep pack landmarks + gastro-пакет + именованные `dayRoutePresets` | Нижний Новгород - **референс** глубины и пресетов, не единственная модель и не потолок для столиц |
+
+**Продуктовое правило: hub breadth ≠ day length.**
+- Hub / фильтры могут показывать **много** must-see точек.
+- Один день в `/my-day` - soft ~10 / hard ~15; остальное - несколько дней, пресеты или выборочный набор. Пользователь **не** обязан добавлять всё из хаба.
 
 **Связь с «Мой день» (код, не путать с тирами must-see):**
 - Soft guideline: `DAY_ROUTE_SOFT = 10` (warn «день уже плотный», add ещё можно)
@@ -59,17 +64,17 @@
 
 Источник констант: `apps/web/src/lib/day-route.ts`. Фильтр-табы: `apps/web/src/lib/must-see-filters.ts` (уже на hub / my-day).
 
-### Москва и Санкт-Петербург - план расширения (не NN-46)
+### Москва и Санкт-Петербург - широкий must-see (не потолок 18)
 
-**Факт сейчас:** оба на floor **6** (как typical), без `dayRoutePresets`. Готовых списков 12-18 точек в repo / briefs / `.deploy-tmp` нет - seed/invent 18 venues **не** делаем до списка от owner.
+**Факт сейчас:** оба на floor **6** (как typical), без `dayRoutePresets`. Готовых широких списков (30-50+) в repo / briefs / `.deploy-tmp` нет - seed/invent десятки venues **не** делаем до списка / OK от owner.
 
-**Цель:** тир **Large tourist 12-18** каждый. **Не** клонировать NN (~46 + gastro pack + 3 presets).
+**Цель:** тир **Capitals** - широкий curated set (ориентир 30-50+, без жёсткого потолка 18). Filter tabs обязательны. **Не** ограничивать столицы тиром Large tourist 12-18. NN - референс deep pack + gastro + named presets, не единственная модель клонирования.
 
 **Структура контента:**
 1. Первые **6** оставить как ядро вкладки «Главные».
-2. Добить тематическими слотами (музеи, виды/смотровые, прогулки/набережные, классические landmarks) так, чтобы filter tabs имели смысл (не одна куча в «Главные»).
-3. Гастро - **опционально отдельно** от must-see landmarks (как NN gastro-пакет), не обязательный Phase B; если добавлять - через gastro-классификацию фильтров, не раздувая «Главные» ресторанами.
-4. `dayRoutePresets` (именованные «готовые дни») - **Phase 2**, после стабильного 12-18 списка.
+2. Наращивать тематическими слотами (музеи, виды/смотровые, прогулки/набережные, классические landmarks и др.), чтобы filter tabs имели смысл (не одна куча в «Главные»).
+3. Гастро - **опционально отдельно** от must-see landmarks (как у NN), не обязательный Phase B; если добавлять - через gastro-классификацию фильтров, не раздувая «Главные» ресторанами.
+4. `dayRoutePresets` (именованные «готовые дни» / multi-day) - **Phase 2**, после стабильного широкого списка; помогают разнести богатство хаба по дням при лимите плана 10/15.
 
 **Prerequisites (уже есть / проверить перед content batch):**
 - UX filter tabs на hub + my-day - shipped (`must-see-filters`).
@@ -79,16 +84,16 @@
 **Rollout:**
 | Фаза | Что | Статус |
 |------|-----|--------|
-| **A** | Зафиксировать канон тиров + этот план в docs | ✅ этот документ |
-| **B** | Content batch **одного** города → 12-18 must-see + seed/enrich | ⏳ ждём список / confirm города |
+| **A** | Зафиксировать канон тиров + этот план в docs (corr. capitals wide) | ✅ этот документ |
+| **B** | Content batch **одного** города → широкий must-see (30-50+ quality-guided) + seed/enrich | ⏳ ждём список / OK draft / confirm города |
 | **C** | Второй город тем же шаблоном | ⏳ после B |
 
 **Рекомендация порядка Phase B → C: сначала Санкт-Петербург, потом Москва.**
 - У СПб уже сильнее day-route поверхность (boat wizard `isSpbDayRouteCity`, зрелые editorial slugs Эрмитаж/крепость/…).
-- Классический tourist set легче курировать в 12-18 без расползания «всего города».
-- Москва - выше трафик, но шире и риск «ещё один Сити/парк» без жёсткого списка; лучше копировать проверенный шаблон СПб.
+- Шаблон фильтров + качество точек проще отладить на СПб, затем масштабировать на Москву.
+- Москва - выше трафик и шире сетка; лучше копировать проверенный процесс СПб, не ужимать до 18.
 
-Owner: подтвердить город-first и прислать/утвердить список 12-18 (или расширить существующие 6). Без списка - только docs, без seed.
+Owner: подтвердить город-first и прислать/утвердить широкий список (или OK на draft wide SPB/MSK lists). Без списка / OK - только docs, без seed.
 
 Gaps/сводка hubs: [city-hub-content-gaps.md](./city-hub-content-gaps.md).
 
@@ -238,7 +243,7 @@ Cherry-pick из **`codex/phase2-foundation`**: schema, event change requests, a
 - **Venue logistics (CV.9):** ✅ shipped - manual CMS `metroStation` / `wayToFind` / `parkingInfo`; блок на venue page; event modal + Yandex iframe (coords) / external button; address sync-only; OSM keep на venue pages (unify deferred). Geocode auto-fill 🚫. Спека: [venue-logistics-spec.md](./venue-logistics-spec.md). Не путать с **CV.5** (скидки).
 - **VenueKind location types:** `PARK` / `MONUMENT` (public `park` / `monument`) для каталога локаций / «Важные места». Park admission (платный вход, Монрепо) - **не** в MVP catalog/finance mix (см. qa.md).
 - **Location↔Excursion (MVP):** явные `EventVenueRouteItem` (`RouteItemRole`, таблица `event_venue_route_items`) role=`STOP` (остановки маршрута). `Event.venueId` = только старт. На странице локации: `stopEvents`; если пусто и есть coords - geo fallback `nearbyEvents` (~300м, UI «Рядом», без merge). `Venue.hookFact` для карточек. Пермь must-see slugs: `permskaya-galereya`, `permsky-solenye-ushi`, `naberezhnaya-kamy`, `muzej-hohlovka`, `teatr-teatr`, `permskaya-esplanada`. Admin: «Подобрать рядом» (`GET …/venue-link-suggestions`) + merge apply (`POST …/venue-links:apply`). «Собери свой день» / **Мой день**: localStorage planner + commercial checklist (readiness %, status chips, ticket handoff, recommend carousel, free-window) - канон [myday-commercial-canon.md](./myday-commercial-canon.md); `/my-day` noindex + short share `/d/{code}` (`day_route_shares` → redirect `/my-day?city=&items=`; legacy `?day=`) + match API (STOP>start>nearby). Не swipe/Tinder UX.
-- **City hub «Главные места»:** editorial `cityInfo.mustSee` / `sights` могут иметь `href` | `venueSlug` | `locationSlug`; title линкуется на `/venues/{slug}` или `/locations/{slug}` (без битых ссылок если entity нет). Content places (park/monument/outdoor/attraction/museum/theater) с PUBLISHED|CANDIDATE и minimal profile попадают в каталоги `/venues` и `/locations` даже без events. **Объём must-see** - канон тиров выше (floor 6 / typical 6-8 / large tourist 12-18 / NN exception); Москва и СПб сейчас floor 6, цель large tourist (не NN-46).
+- **City hub «Главные места»:** editorial `cityInfo.mustSee` / `sights` могут иметь `href` | `venueSlug` | `locationSlug`; title линкуется на `/venues/{slug}` или `/locations/{slug}` (без битых ссылок если entity нет). Content places (park/monument/outdoor/attraction/museum/theater) с PUBLISHED|CANDIDATE и minimal profile попадают в каталоги `/venues` и `/locations` даже без events. **Объём must-see** - канон тиров выше (floor 6 / typical 6-8 / large tourist ~12-18 non-capital / capitals MSK+SPB wide 30-50+ без потолка 18 / NN deep pack reference); hub breadth ≠ day length (soft 10 / hard 15). Москва и СПб сейчас floor 6, цель capitals wide.
 - **Prisma 7** — schema/migrations; runtime read через dto port
 - **Консистентность:** parity scripts; константы каталога в `@daibilet/contracts`
 - **SEO:** title template `%s | Дайбилет` без дублей; `og:url` route-specific (`seo-meta.ts`); flat entity URLs + city hubs (см. URL / SEO policy выше)

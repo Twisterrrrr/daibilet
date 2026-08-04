@@ -1,19 +1,37 @@
+## 2026-08-04 - Must-see tiers: capitals MSK/SPB wide (corr.)
+
+### Наблюдения
+- Owner correction: MSK и SPB **не** капить на 12-18; нужен широкий curated set как у столичного хаба (ориентир 30-50+ / без жёсткого потолка 18).
+- Large tourist ~12-18 + tabs остаётся default для **крупных нестоличных** городов.
+- Day planner без изменений: soft ~10 / hard ~15; multi-day / presets для остального; hub может показывать много точек с фильтрами.
+- Факт: `moscow` / `saint-petersburg` = 6 must-see; широких списков в repo нет - seed не выдумываем.
+
+### Решения
+- Project.md: тир **Capitals (MSK+SPB)** = wide 30-50+ quality-guided; правило **hub breadth ≠ day length**; NN = deep pack reference, не единственная модель.
+- Tasktracker MS.TIER* + city-hub-content-gaps + этот Diary - выровнены под corr.
+- Docs-only: commit + push, без web deploy / без смены `DAY_ROUTE_*`.
+
+### Проблемы
+- Phase B content fill blocked до списка owner или OK на draft wide SPB/MSK.
+
+---
+
 ## 2026-08-04 - Must-see count tiers canon + MSK/SPB plan
 
 ### Наблюдения
 - Owner: зафиксировать тиры объёма must-see; ответить что делать с Москвой и СПб (сейчас floor 6 как остальные).
 - Факт: `moscow` / `saint-petersburg` = 6 must-see, без presets; `nizhny-novgorod` = 46 + gastro + `dayRoutePresets` (исключение).
-- Готовых списков 12-18 для MSK/SPB в docs / briefs / `.deploy-tmp` нет - seed не выдумываем.
+- Готовых списков для MSK/SPB в docs / briefs / `.deploy-tmp` нет - seed не выдумываем.
 - Day-route уже: soft `DAY_ROUTE_SOFT=10`, hard `DAY_ROUTE_MAX=15`; filter tabs shipped.
 
 ### Решения
-- Канон в Project.md: floor **6** / typical **6-8** / large tourist **12-18** + tabs / NN exception **не клонировать**.
-- MSK+SPB цель: **12-18** каждый; первые 6 = «Главные»; thematic slots; gastro optional отдельно; presets = Phase 2.
+- (superseded corr. выше) Изначально: floor **6** / typical **6-8** / large tourist **12-18** + tabs / NN exception.
+- **Corr. owner:** MSK+SPB = capitals wide (не 12-18); large tourist 12-18 только non-capital default.
 - Rollout: Phase A docs ✅; Phase B content одного города; Phase C второй. Рекомендация first: **СПб**, затем Москва.
-- Docs-only: commit + push, без web deploy. Gaps: одна строка про тиры.
+- Docs-only: commit + push, без web deploy.
 
 ### Проблемы
-- Нет списка точек от owner - Phase B blocked до confirm города + списка 12-18.
+- Нет списка точек от owner - Phase B blocked до confirm города + списка / OK draft.
 
 ---
 

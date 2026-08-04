@@ -86,4 +86,4 @@
 
 Batch7 (2026-08-04): 6-я must-see точка для Казань / Калининград / Владимир / Владивосток / Иркутск / Улан-Удэ.
 
-**Канон тиров** (см. Project.md): floor 6 / typical 6-8 / large tourist 12-18 + tabs / NN exception ~20-30+gastro+presets. Москва и СПб сейчас floor 6 - план расширения до 12-18 (не NN-46), Phase B рекомендуем СПб first.
+**Канон тиров** (см. Project.md): floor 6 / typical 6-8 / large tourist ~12-18 (non-capital) + tabs / **capitals MSK+SPB wide ~30-50+ без жёсткого потолка 18** / NN deep pack + gastro + presets как референс. Hub breadth ≠ day length (soft 10 / hard 15). Москва и СПб сейчас floor 6 - план широкого каталога; Phase B рекомендуем СПб first; seed только после списка owner или OK на draft.

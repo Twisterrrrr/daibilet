@@ -11,11 +11,11 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| MS.TIER1 | Канон тиров must-see в Project.md (floor 6 / 6-8 / 12-18 / NN exception) + soft/hard day-route cite | Высокий | ✅ docs |
-| MS.TIER2 | План MSK+SPB → large tourist 12-18 (не NN-46); Phase A docs | Высокий | ✅ docs |
-| MS.TIER3 | Phase B: content batch первого города (рекомендация: СПб) - список owner → cityInfo + seed/enrich | Высокий | ⏳ ждут confirm города + список |
+| MS.TIER1 | Канон тиров: floor 6 / typical 6-8 / large tourist ~12-18 (non-capital) / **capitals MSK+SPB wide 30-50+ (без потолка 18)** / NN deep pack reference; hub ≠ day (SOFT 10 / MAX 15) | Высокий | ✅ docs corr. capitals |
+| MS.TIER2 | План MSK+SPB → **capitals wide** (не 12-18, не клон-only NN); Phase A docs | Высокий | ✅ docs corr. |
+| MS.TIER3 | Phase B: content batch первого города (рекомендация: СПб) - широкий список owner / OK draft → cityInfo + seed/enrich | Высокий | ⏳ ждут confirm города + список или OK draft |
 | MS.TIER4 | Phase C: второй город тем же шаблоном (Москва после СПб) | Средний | ⏳ |
-| MS.TIER5 | Phase 2 optional: `dayRoutePresets` для MSK/SPB после стабильных 12-18 | Низкий | ⏳ |
+| MS.TIER5 | Phase 2 optional: `dayRoutePresets` / multi-day для MSK/SPB после стабильного широкого каталога | Низкий | ⏳ |
 | MS.TIER6 | Гастро-пакет отдельно от landmarks (если нужно) - не смешивать в «Главные» | Низкий | ⏳ |
 
 ---
