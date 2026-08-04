@@ -11,6 +11,10 @@
 ### Проблемы
 - Нет. Live: `66bcac4`, MSK **BUILD_ID=`esVyb5mav-fjNqzDQm4-g`**, `/my-day` 200; chunk без `data-day-plan-done` / «Отметить выполненным», есть `line-clamp-4` + focus subtitle.
 
+---
+
+## 2026-08-04 - /my-day mobile: actions column + Распланировать mid CTA
+
 ### Наблюдения
 - Owner annotated screenshot: Поделиться/Сохранить/Очистить - колонка top-right; mid Yandex marked X (дубль sticky «Карта»); «Распланировать» → primary mid CTA.
 - Пешком/Авто pill крал акцент у primary - нужен plain text + underline/weight.
