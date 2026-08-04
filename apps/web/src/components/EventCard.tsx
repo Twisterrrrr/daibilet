@@ -184,22 +184,23 @@ export function EventCard({
 
       <div className={`flex flex-1 flex-col ${compact ? 'gap-2.5 p-3.5 sm:gap-3 sm:p-4' : 'gap-3 p-4 sm:p-5'}`}>
         {/* Meta сразу под фото, над названием (как ожидает owner / как в list-карточке). */}
-        {pseudoRating != null || durationLabel || ageLabel || destinationLabel ? (
+        {/* Mobile: skip rating/duration/age noise - keep city when present. */}
+        {destinationLabel || (pseudoRating != null && !compact) || durationLabel || ageLabel ? (
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
             {pseudoRating != null ? (
-              <span className="event-card-meta">
+              <span className={`event-card-meta ${compact ? '' : 'hidden sm:inline-flex'}`}>
                 <Star className="event-card-meta-icon" />
                 <span className="font-medium text-graphite">{pseudoRating.toFixed(1)}</span>
               </span>
             ) : null}
             {durationLabel ? (
-              <span className="event-card-meta">
+              <span className="event-card-meta hidden sm:inline-flex">
                 <Clock className="event-card-meta-icon" />
                 <span className="truncate">{durationLabel}</span>
               </span>
             ) : null}
             {ageLabel ? (
-              <span className="event-card-meta">
+              <span className="event-card-meta hidden sm:inline-flex">
                 <Users className="event-card-meta-icon" />
                 <span className="truncate">{ageLabel}</span>
               </span>
@@ -316,13 +317,15 @@ export function EventCard({
             <>
               <div className="relative z-[2] flex min-w-0 flex-1 flex-wrap items-center gap-2">
                 {priceFooterLabel ? (
-                  <span className="text-ui-sm font-bold text-graphite sm:text-base">{priceFooterLabel}</span>
+                  <span className="text-base font-extrabold tracking-tight text-graphite sm:text-base sm:font-bold">
+                    {priceFooterLabel}
+                  </span>
                 ) : null}
                 {dayRouteVenue ? (
                   <AddToDayRouteButton
                     intent="day"
                     compact
-                    className="!min-h-9 !px-2.5 !py-1.5 !text-[11px]"
+                    className="!min-h-9 !px-2.5 !py-1.5 !text-[11px] max-sm:hidden"
                     venue={dayRouteVenue}
                   />
                 ) : null}
@@ -338,8 +341,9 @@ export function EventCard({
                   })
                 }
               >
-                <Ticket className="h-3.5 w-3.5" strokeWidth={1.75} />
-                Купить билет
+                <Ticket className="hidden h-3.5 w-3.5 sm:inline" strokeWidth={1.75} />
+                <span className="sm:hidden">Купить</span>
+                <span className="hidden sm:inline">Купить билет</span>
               </Link>
             </>
           )}
@@ -563,15 +567,15 @@ function ShowcaseEventCard({
           </Link>
         </h3>
 
-        {/* ★ rating · Type · City - one compact meta row */}
+        {/* ★ rating · Type · City - one compact meta row; rating hidden on narrow to cut noise */}
         <div className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-1">
-          <span className="event-card-meta">
+          <span className="event-card-meta hidden sm:inline-flex">
             <Star className="event-card-meta-icon" />
             <span className="font-medium text-graphite">{pseudoRating.toFixed(1)}</span>
           </span>
           {categoryLabel ? (
             <>
-              <span className="text-ui-xs text-graphite-muted" aria-hidden>
+              <span className="hidden text-ui-xs text-graphite-muted sm:inline" aria-hidden>
                 ·
               </span>
               <span className="rounded-md bg-surface-muted px-2 py-0.5 text-ui-xs font-medium text-graphite-muted">
@@ -592,7 +596,7 @@ function ShowcaseEventCard({
         <div className="flex min-w-0 flex-col gap-0.5">
           <p className="event-card-meta">
             <Clock className="event-card-meta-icon" />
-            <span className="truncate">{dateLabel}</span>
+            <span className="truncate font-medium text-graphite">{dateLabel}</span>
           </p>
           {locationLine ? (
             <p className="event-card-meta">
@@ -603,10 +607,17 @@ function ShowcaseEventCard({
         </div>
 
         <div className="mt-auto flex items-center justify-between gap-3 pt-1">
-          {priceLabel ? <span className="text-ui-sm font-bold text-graphite">{priceLabel}</span> : <span />}
+          {priceLabel ? (
+            <span className="text-base font-extrabold tracking-tight text-graphite sm:text-ui-sm sm:font-bold">
+              {priceLabel}
+            </span>
+          ) : (
+            <span />
+          )}
           <span className="inline-flex items-center gap-1 rounded-lg bg-primary-600 px-3 py-1.5 text-ui-xs font-semibold text-white sm:text-ui-sm">
-            <Ticket className="h-3.5 w-3.5" strokeWidth={1.75} />
-            Купить билет
+            <Ticket className="hidden h-3.5 w-3.5 sm:inline" strokeWidth={1.75} />
+            <span className="sm:hidden">Купить</span>
+            <span className="hidden sm:inline">Купить билет</span>
           </span>
         </div>
       </div>

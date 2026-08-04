@@ -1,3 +1,21 @@
+## 2026-08-04 - Mobile homepage UX cleanup
+
+### Наблюдения
+- Owner review главной на мобилке: hero chips сливаются в тёмную массу; 8 city-tiles / format photo cards съедают высоту; EventCard шумна (иконки + рейтинг); нижние тексты trust/how без clamp.
+- Предыдущий MSK deploy `3e91e0e` («В мой день») уже complete (`BUILD_ID=symjivN_JtjbNOfzDYEFl`), деплой не ждал.
+
+### Решения
+- Hero: сильнее dark overlay (`HeroMedia` / `HomeHeroBackground`); chips = светлые badge (`bg-white/95`).
+- Форматы на mobile: icon-on-white chip rail вместо тёмных photo tiles; города: ScrollRail вместо 2×4 grid.
+- EventCard mobile: скрыты meta-icons / rating / duration; цена жирнее; CTA «Купить» без Ticket-icon; day-route chip hidden max-sm; desktop без лома.
+- Trust/how: `ExpandableBlurb` «Развернуть» на mobile; чуть больше `--space-section`.
+- Discount badge: deferred (нет `oldPrice` в catalog session DTO).
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-04 - Must-see tiers: capitals MSK/SPB wide (corr.)
 
 ### Наблюдения
@@ -83,6 +101,7 @@
 
 ### Проблемы
 - Царское / Кронштадт / Стрелка пока без entity slug (нет битой ссылки); Петергоф линкуется. Seed entities - follow-up.
+- Live: tip `16d10ca`, **BUILD_ID=`pA38C3r_vUStAEuHiAZuO`**; `/cities/sankt-peterburg` 200 + `data-city-significant-suburbs`.
 
 ---
 

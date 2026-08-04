@@ -7,6 +7,18 @@
 
 ---
 
+## Mobile homepage UX cleanup (2026-08-04)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| UX.HOME-MOB1 | Hero overlay + light category chips | Высокий | ✅ |
+| UX.HOME-MOB2 | Format tiles → light icon rail; cities → ScrollRail (mobile) | Высокий | ✅ |
+| UX.HOME-MOB3 | EventCard mobile denoise (icons/price/CTA); keep buy CTA | Высокий | ✅ |
+| UX.HOME-MOB4 | Trust/how ExpandableBlurb + section spacing | Средний | ✅ |
+| UX.HOME-MOB5 | Discount badge on card image | Низкий | ⚠️ deferred (нет oldPrice в session catalog DTO) |
+
+---
+
 ## Must-see count tiers + MSK/SPB (2026-08-04)
 
 | # | Задача | Приоритет | Статус |

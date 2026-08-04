@@ -37,10 +37,10 @@ export function HomeHeroBackground({ image }: HomeHeroBackgroundProps) {
           loaded ? 'opacity-100' : 'opacity-0'
         }`}
       />
-      {/* Text contrast only - navy lives on the section base under images, not as a blue wash on photos */}
-      <div className="absolute inset-0 bg-slate-900/15" />
-      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-slate-900/30 to-slate-900/5" />
-      <div className="absolute inset-0 bg-gradient-to-br from-sky-900/25 via-transparent to-primary-900/20" />
+      {/* Text contrast - stronger dark wash so white titles read on busy photos */}
+      <div className="absolute inset-0 bg-slate-950/40" />
+      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-900/45 to-slate-950/25" />
+      <div className="absolute inset-0 bg-gradient-to-br from-sky-900/20 via-transparent to-primary-900/15" />
     </div>
   );
 }

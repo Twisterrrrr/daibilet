@@ -5,12 +5,15 @@ import {
   CheckCircle2,
   ChevronRight,
   Landmark,
+  Map,
   MapPin,
+  Moon,
   Ship,
   UtensilsCrossed,
 } from 'lucide-react';
 
 import { CityCard } from '@/components/CityCard';
+import { ExpandableBlurb } from '@/components/ExpandableBlurb.client';
 import { HomeCityAwareSections } from '@/components/HomeCityAwareSections.client';
 import { HomeHero } from '@/components/HomeHero.client';
 import { HomeVenuesSection } from '@/components/HomeVenuesSection.client';
@@ -26,6 +29,16 @@ import { landingCategoryHref } from '@/lib/landing-routes';
 import { withSoftTimeout } from '@/lib/soft-timeout';
 import { getActiveHeroBanners, heroFramesFromBanners } from '@/server/hero-banners';
 import { fetchPublicApiJson } from '@/server/public-api-client';
+
+function formatTileIcon(title: string) {
+  const key = title.toLowerCase();
+  const cls = 'h-6 w-6 text-primary-600';
+  if (key.includes('речн')) return <Ship className={cls} aria-hidden />;
+  if (key.includes('обзор') || key.includes('экскур')) return <Map className={cls} aria-hidden />;
+  if (key.includes('музе')) return <Landmark className={cls} aria-hidden />;
+  if (key.includes('ночн')) return <Moon className={cls} aria-hidden />;
+  return <CalendarDays className={cls} aria-hidden />;
+}
 
 /** External CDN HEAD fingerprints must not stall home TTFB on bad egress/DNS. */
 const HOME_FINGERPRINTS_TIMEOUT_MS = 800;
@@ -112,13 +125,25 @@ export async function HomePageContent() {
               <div className="flex items-end justify-between gap-4">
                 <div>
                   <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Популярные города</h2>
-                  <p className="mt-1 text-sm text-slate-500">Выберите город — покажем афишу и подборки</p>
+                  <p className="mt-1 text-sm text-slate-500">Выберите город - покажем афишу и подборки</p>
                 </div>
                 <Link href="/cities" className="shrink-0 text-sm font-semibold text-primary-600 hover:text-primary-700">
                   Все города →
                 </Link>
               </div>
-              <ul className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+              {/* Mobile: horizontal rail saves ~40% height vs 2×4 dark photo grid */}
+              <ScrollRail
+                className="mt-6 sm:hidden"
+                viewportClassName="flex flex-nowrap gap-3 snap-x snap-mandatory"
+                aria-label="Популярные города"
+              >
+                {topCities.map((city) => (
+                  <div key={city.slug || city.name} className="w-[min(42vw,160px)] shrink-0 snap-start">
+                    <CityCard city={city} />
+                  </div>
+                ))}
+              </ScrollRail>
+              <ul className="mt-8 hidden grid-cols-2 gap-3 sm:grid sm:grid-cols-4 sm:gap-4">
                 {topCities.map((city) => (
                   <li key={city.slug || city.name}>
                     <CityCard city={city} />
@@ -141,32 +166,24 @@ export async function HomePageContent() {
               Все подборки <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
-          {/* lg+: все 4 превью в ряд без скролла; ScrollRail только до lg */}
+          {/* Mobile: light icon chips (no heavy dark photo mass). lg+: photo tiles. */}
           <ScrollRail
             className="mt-6 lg:hidden"
-            viewportClassName="flex flex-nowrap gap-3 snap-x snap-mandatory"
+            viewportClassName="flex flex-nowrap gap-3 snap-x snap-mandatory px-0.5 pb-1"
             aria-label="Форматы отдыха"
           >
             {HOME_FORMAT_TILES.map((tile) => (
               <Link
                 key={tile.title}
                 href={tile.href}
-                className="horizontal-snap-card group relative min-h-[148px] overflow-hidden rounded-card bg-slate-800 text-white shadow-card transition duration-300 hover:-translate-y-0.5 hover:shadow-card-hover"
+                className="flex w-[5.75rem] shrink-0 snap-start flex-col items-center gap-2 rounded-2xl bg-white px-2 py-3 text-center shadow-card ring-1 ring-slate-200/80 transition hover:ring-primary/30"
               >
-                <SafeImage
-                  src={tile.imageUrl}
-                  alt=""
-                  fill
-                  sizes="70vw"
-                  className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-                  fallback={<div className={`absolute inset-0 bg-gradient-to-br ${tile.fallbackGradient}`} />}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/5" />
-                <div className="relative z-[1] flex h-full min-h-[148px] flex-col justify-end p-5">
-                  <h3 className="text-lg font-bold text-white">{tile.title}</h3>
-                  <p className="mt-1 text-sm text-white/90">{tile.subtitle}</p>
-                  <ChevronRight className="absolute bottom-4 right-4 h-5 w-5 text-white/80 transition group-hover:translate-x-0.5 group-hover:text-white" />
-                </div>
+                <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-50">
+                  {formatTileIcon(tile.title)}
+                </span>
+                <span className="line-clamp-2 text-[11px] font-semibold leading-snug text-slate-800">
+                  {tile.title}
+                </span>
               </Link>
             ))}
           </ScrollRail>
@@ -369,7 +386,7 @@ export async function HomePageContent() {
         </div>
       </section>
 
-      <section className="section-y mt-20 bg-slate-50">
+      <section className="section-y mt-4 bg-slate-50 sm:mt-8">
         <div className="container-page">
           <h2 className="font-display text-center text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
             Как купить билет
@@ -384,7 +401,14 @@ export async function HomePageContent() {
                   {item.step}
                 </span>
                 <h3 className="mt-4 font-semibold text-graphite">{item.title}</h3>
-                <p className="mt-2 text-sm leading-6 text-graphite-muted">{item.text}</p>
+                <ExpandableBlurb
+                  text={item.text}
+                  className="mt-2 text-sm leading-6 text-graphite-muted"
+                  clampClassName="line-clamp-2 md:line-clamp-none"
+                  moreLabel="Развернуть"
+                  lessLabel="Свернуть"
+                  buttonClassName="mt-1 text-xs font-semibold text-primary-600 underline-offset-2 hover:underline md:hidden"
+                />
               </li>
             ))}
           </ol>
@@ -401,7 +425,14 @@ export async function HomePageContent() {
               <div key={title} className="rounded-card bg-white p-5 shadow-card">
                 <CheckCircle2 className="h-6 w-6 text-primary-600" />
                 <h3 className="mt-3 font-semibold text-graphite">{title}</h3>
-                <p className="mt-2 text-sm leading-6 text-graphite-muted">{text}</p>
+                <ExpandableBlurb
+                  text={text}
+                  className="mt-2 text-sm leading-6 text-graphite-muted"
+                  clampClassName="line-clamp-2 md:line-clamp-none"
+                  moreLabel="Развернуть"
+                  lessLabel="Свернуть"
+                  buttonClassName="mt-1 text-xs font-semibold text-primary-600 underline-offset-2 hover:underline md:hidden"
+                />
               </div>
             ))}
           </div>

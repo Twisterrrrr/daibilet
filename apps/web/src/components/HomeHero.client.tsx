@@ -145,7 +145,7 @@ export function HomeHero({ destinations, frames, videoSrc }: HomeHeroProps) {
         </div>
       </form>
 
-      <div className="mt-4 flex w-full max-w-5xl flex-wrap items-center justify-center gap-2">
+      <div className="mt-4 flex w-full max-w-5xl flex-wrap items-center justify-center gap-2" data-home-hero-chips>
         {HERO_QUICK_CHIPS.map((chip) => {
           let href = chip.href;
           if (chip.href.startsWith('/events')) {
@@ -162,7 +162,7 @@ export function HomeHero({ destinations, frames, videoSrc }: HomeHeroProps) {
             <a
               key={chip.label}
               href={href}
-              className="rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-sm transition hover:bg-white/20"
+              className="rounded-full border border-slate-200/80 bg-white/95 px-3.5 py-1.5 text-xs font-semibold text-slate-800 shadow-sm backdrop-blur-sm transition hover:bg-white hover:text-primary-700"
             >
               {chip.label}
             </a>

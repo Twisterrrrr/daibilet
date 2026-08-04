@@ -77,10 +77,12 @@ export function HeroMedia({
       ) : (
         <div className="absolute inset-0 bg-slate-900" />
       )}
+      {/* Dark translucent wash so white titles stay readable on busy hero photos */}
+      <div className="absolute inset-0 bg-slate-950/35" />
       <div
         className={
           overlayClassName ||
-          'absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-900/40 to-slate-900/20'
+          'absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-900/50 to-slate-950/35'
         }
       />
     </div>
