@@ -24,7 +24,7 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| UX.HOME-MOB1 | Hero overlay + light category chips | Высокий | ✅ |
+| UX.HOME-MOB1 | Hero overlay + light category chips | Высокий | ✅ `2aaea86`+`405ac6d` MSK **BUILD_ID=`fjFoVm-Yur__0z8lPkrlv`** |
 | UX.HOME-MOB2 | Format tiles → light icon rail; cities → ScrollRail (mobile) | Высокий | ✅ |
 | UX.HOME-MOB3 | EventCard mobile denoise (icons/price/CTA); keep buy CTA | Высокий | ✅ |
 | UX.HOME-MOB4 | Trust/how ExpandableBlurb + section spacing | Средний | ✅ |

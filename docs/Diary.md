@@ -28,10 +28,12 @@
 - EventCard mobile: скрыты meta-icons / rating / duration; цена жирнее; CTA «Купить» без Ticket-icon; day-route chip hidden max-sm; desktop без лома.
 - Trust/how: `ExpandableBlurb` «Развернуть» на mobile; чуть больше `--space-section`.
 - Discount badge: deferred (нет `oldPrice` в catalog session DTO).
+- Hotfix: lucide `Map` shadowing `new Map()` → `Map as MapIcon` (`405ac6d`).
+- Live: `2aaea86`+`405ac6d`, MSK **BUILD_ID=`fjFoVm-Yur__0z8lPkrlv`**, `/` 200, markers `data-home-hero-chips` / `bg-slate-950/35` / `Развернуть`.
 
 ### Проблемы
-- Нет.
-
+- Первый web:build упал на `TypeError: i is not a constructor` (Map shadow); откат `.next.prev`, затем фикс и redeploy OK.
+- Параллельный HEAD `c04ca02` (catalog chips, другой агент) поверх наших коммитов; наш UX в ancestry.
 ---
 
 ## 2026-08-04 - Must-see tiers: capitals MSK/SPB wide (corr.)
