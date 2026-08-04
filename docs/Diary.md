@@ -64,7 +64,7 @@
 - Только стиль кнопки: `bg-sky-600 hover:bg-sky-700` (как `data-day-yandex-cta` / mobile hour-plan). Текст и логика без изменений.
 
 ### Проблемы
-- (после deploy) BUILD_ID + `/my-day` 200.
+- Нет. Tip `441ce9e` (ancestor tip `1f088934`); MSK **BUILD_ID=`JHo5binbjsG01hIPE_9_0`**; `/my-day` 200; chunk `data-day-must-see-bulk` + `bg-sky-600`.
 
 ---
 
