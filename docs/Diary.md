@@ -1,3 +1,19 @@
+## 2026-08-04 - /my-day desktop: city width + hour-plan on title row
+
+### Наблюдения
+- Owner annotated desktop: city pill «Нижний Новг...» truncate; «Распланировать день по часам» в top-right - стрелка вниз к ряду «Маршрут · N» рядом с «Оптимизировать».
+
+### Решения
+- Header compact CityPicker: `sm:w/min-w-[16rem] sm:max-w-[18rem]` (было 11.5rem) - полное «Нижний Новгород».
+- Top-right `data-day-desktop-actions`: только Сохранить / Очистить / Поделиться.
+- Title row `justify-between`: слева Маршрут + Сетка/Список; справа `data-day-desktop-route-title-actions` = Распланировать + Оптимизировать.
+- Mobile: mid `data-day-mobile-route-actions` без изменений; toolbar `lg:hidden`.
+
+### Проблемы
+- (после deploy) BUILD_ID + `/my-day` 200.
+
+---
+
 ## 2026-08-04 - /my-day: hide starter card when route has stops
 
 ### Наблюдения

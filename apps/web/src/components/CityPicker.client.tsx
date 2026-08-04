@@ -195,7 +195,7 @@ export function CityPicker({
         {variant === 'header' ? (
           <span className="hidden min-w-0 truncate sm:inline">{selectedLabel}</span>
         ) : (
-          <span className="block truncate">{selectedLabel}</span>
+          <span className="block truncate whitespace-nowrap">{selectedLabel}</span>
         )}
         {variant === 'hero' || variant === 'compact' ? (
           <ChevronDown

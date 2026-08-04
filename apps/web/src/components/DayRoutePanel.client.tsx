@@ -2403,7 +2403,7 @@ function DayRoutePanelInner() {
         data-day-header-search="1"
         data-day-city-search-stack
       >
-        <div data-day-city-picker className="w-full shrink-0 sm:w-[11.5rem] sm:max-w-[11.5rem]">
+        <div data-day-city-picker className="w-full shrink-0 sm:w-[16rem] sm:min-w-[16rem] sm:max-w-[18rem]">
           <CityPicker
             cities={destinations}
             value={selectedCity?.cityValue || 'all'}
@@ -2568,14 +2568,41 @@ function DayRoutePanelInner() {
     );
   }
 
-  /** Desktop mid-list: Optimize ghost only (no Yandex above cards). */
-  function renderDesktopListOptimize() {
-    if (!canOptimize) return null;
+  /** Desktop title row: Hour plan + Optimize flush right (no Yandex above cards). */
+  function renderDesktopRouteTitleActions() {
+    const canHourPlan = route.venues.length >= DAY_ROUTE_MIN;
+    if (!canHourPlan && !canOptimize) return null;
     return (
       <div
-        className="hidden lg:flex lg:w-full lg:justify-end"
-        data-day-desktop-list-optimize
+        className="hidden shrink-0 items-center justify-end gap-1.5 lg:flex"
+        data-day-desktop-route-title-actions
       >
+        {canHourPlan ? (
+          hourPlanOn ? (
+            <button
+              type="button"
+              data-day-hour-reset
+              onClick={() => {
+                setHourPlanOn(false);
+                setHourSheetOpen(false);
+              }}
+              className="inline-flex min-h-8 items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
+            >
+              <Clock className="h-3.5 w-3.5 shrink-0" />
+              Сбросить время
+            </button>
+          ) : (
+            <button
+              type="button"
+              data-day-hour-plan
+              onClick={() => setHourSheetOpen(true)}
+              className="inline-flex min-h-8 items-center justify-center gap-1.5 rounded-full border border-primary-200 bg-primary-50 px-3 py-1.5 text-xs font-semibold text-primary-800 transition hover:bg-primary-100"
+            >
+              <Clock className="h-3.5 w-3.5 shrink-0" />
+              Распланировать день по часам
+            </button>
+          )
+        ) : null}
         {renderOptimizeGhost()}
       </div>
     );
@@ -2668,7 +2695,7 @@ function DayRoutePanelInner() {
           ) : null}
         </div>
 
-        {/* Desktop top-right: Save / Hour plan / Clear + Share */}
+        {/* Desktop top-right: Save / Clear + Share (hour-plan lives on route title row) */}
         <div
           className="relative hidden shrink-0 flex-wrap items-center justify-end gap-2 sm:flex"
           ref={shareMenuRef}
@@ -2685,32 +2712,6 @@ function DayRoutePanelInner() {
                 <Printer className="h-3.5 w-3.5" />
                 Сохранить
               </button>
-              {route.venues.length >= DAY_ROUTE_MIN ? (
-                hourPlanOn ? (
-                  <button
-                    type="button"
-                    data-day-hour-reset
-                    onClick={() => {
-                      setHourPlanOn(false);
-                      setHourSheetOpen(false);
-                    }}
-                    className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition duration-200 hover:bg-slate-50"
-                  >
-                    <Clock className="h-3.5 w-3.5" />
-                    Сбросить время
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    data-day-hour-plan
-                    onClick={() => setHourSheetOpen(true)}
-                    className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-2xl border border-primary-200 bg-primary-50 px-3 py-1.5 text-xs font-semibold text-primary-800 transition duration-200 hover:bg-primary-100"
-                  >
-                    <Clock className="h-3.5 w-3.5" />
-                    Распланировать день по часам
-                  </button>
-                )
-              ) : null}
               <button
                 type="button"
                 onClick={() => {
@@ -2842,7 +2843,7 @@ function DayRoutePanelInner() {
       {/* 1. Route list - always expanded */}
       {!route.venues.length ? null : (
         <section className="mt-5 w-full sm:mt-8" data-day-route-list>
-          {/* Row 1: title + quiet Список/Карта (mobile) / Сетка/Список (desktop) */}
+          {/* Row 1: title + Сетка/Список | desktop Hour plan + Optimize; mobile Список/Карта */}
           <div className="flex min-w-0 items-center justify-between gap-2">
             <div className="flex min-w-0 flex-wrap items-center gap-2">
               <h2
@@ -2897,41 +2898,44 @@ function DayRoutePanelInner() {
                 </button>
               </div>
             </div>
-            {hasMapStops ? (
-              <div
-                className="inline-flex shrink-0 rounded-full border border-slate-200/80 bg-slate-50 p-0.5 lg:hidden"
-                role="group"
-                aria-label="Вид: список или карта"
-                data-day-mobile-view-toggle
-              >
-                <button
-                  type="button"
-                  aria-pressed={mobileView === 'list'}
-                  onClick={() => setMobileView('list')}
-                  className={`inline-flex min-h-7 items-center gap-1 rounded-full px-2.5 text-[11px] font-semibold transition ${
-                    mobileView === 'list'
-                      ? 'bg-white text-slate-800 shadow-sm'
-                      : 'text-slate-500 hover:text-slate-700'
-                  }`}
+            <div className="flex shrink-0 items-center gap-2">
+              {hasMapStops ? (
+                <div
+                  className="inline-flex shrink-0 rounded-full border border-slate-200/80 bg-slate-50 p-0.5 lg:hidden"
+                  role="group"
+                  aria-label="Вид: список или карта"
+                  data-day-mobile-view-toggle
                 >
-                  <List className="h-3.5 w-3.5" />
-                  Список
-                </button>
-                <button
-                  type="button"
-                  aria-pressed={mobileView === 'map'}
-                  onClick={() => setMobileView('map')}
-                  className={`inline-flex min-h-7 items-center gap-1 rounded-full px-2.5 text-[11px] font-semibold transition ${
-                    mobileView === 'map'
-                      ? 'bg-white text-slate-800 shadow-sm'
-                      : 'text-slate-500 hover:text-slate-700'
-                  }`}
-                >
-                  <MapPin className="h-3.5 w-3.5" />
-                  Карта
-                </button>
-              </div>
-            ) : null}
+                  <button
+                    type="button"
+                    aria-pressed={mobileView === 'list'}
+                    onClick={() => setMobileView('list')}
+                    className={`inline-flex min-h-7 items-center gap-1 rounded-full px-2.5 text-[11px] font-semibold transition ${
+                      mobileView === 'list'
+                        ? 'bg-white text-slate-800 shadow-sm'
+                        : 'text-slate-500 hover:text-slate-700'
+                    }`}
+                  >
+                    <List className="h-3.5 w-3.5" />
+                    Список
+                  </button>
+                  <button
+                    type="button"
+                    aria-pressed={mobileView === 'map'}
+                    onClick={() => setMobileView('map')}
+                    className={`inline-flex min-h-7 items-center gap-1 rounded-full px-2.5 text-[11px] font-semibold transition ${
+                      mobileView === 'map'
+                        ? 'bg-white text-slate-800 shadow-sm'
+                        : 'text-slate-500 hover:text-slate-700'
+                    }`}
+                  >
+                    <MapPin className="h-3.5 w-3.5" />
+                    Карта
+                  </button>
+                </div>
+              ) : null}
+              {renderDesktopRouteTitleActions()}
+            </div>
           </div>
 
           {/* Row 2: distance/time meta + Пешком/Авто inline (left cluster, quiet text) */}
@@ -2959,10 +2963,9 @@ function DayRoutePanelInner() {
             </div>
           ) : null}
 
-          {/* Row 3: mobile = Распланировать primary + Optimize; desktop = Optimize ghost only (Yandex on map) */}
-          <div data-day-route-toolbar className="mt-3 w-full shrink-0 lg:mt-3 lg:flex lg:justify-end">
+          {/* Row 3: mobile = Распланировать primary + Optimize; desktop actions on title row */}
+          <div data-day-route-toolbar className="mt-3 w-full shrink-0 lg:hidden">
             {renderMobileRouteActions()}
-            {renderDesktopListOptimize()}
           </div>
 
           {missingCoordsCount > 0 ? (
