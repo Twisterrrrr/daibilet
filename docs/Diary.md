@@ -45,7 +45,7 @@
 - Mid desktop: `data-day-desktop-list-optimize` ghost only; map `data-day-map-yandex-toolbar` - только Яндекс.
 
 ### Проблемы
-- Нет. Deploy/BUILD_ID - после MSK.
+- Нет. Live tip `94cbe86` (наш `c32443f` + blog follow-up), MSK **BUILD_ID=`iQt0EenjDINCgdzm4GPuR`**, `/my-day` 200; chunks: `data-day-desktop-list-optimize` + `data-day-map-yandex-toolbar` + `data-day-desktop-actions`.
 
 ---
 
