@@ -25,7 +25,7 @@
 - Layout carousel + «Добавить своё место» accordion + hour-plan/groups без изменений.
 
 ### Проблемы
-- Нет. (BUILD_ID после MSK deploy.)
+- Нет. Live: `754fd12`, MSK **BUILD_ID=`ZqoDR5hR_voM4u3qKvngF`**, `/my-day` 200.
 
 ---
 
