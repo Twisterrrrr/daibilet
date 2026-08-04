@@ -1,3 +1,16 @@
+## 2026-08-04 - /my-day presets: blog link under title
+
+### Наблюдения
+- Owner (скрин): «Читать об этом в блоге» стояла под списком точек, над «Собрать день» - стрелка вверх к title пресета.
+
+### Решения
+- `CityDayPresetBlock`: quiet-link сразу под `preset.title` (до description и списка точек); только при `blogSlug`. CTA без изменений.
+
+### Проблемы
+- (после deploy) BUILD_ID + `/my-day` 200.
+
+---
+
 ## 2026-08-04 - /my-day matches: «События поблизости»
 
 ### Наблюдения

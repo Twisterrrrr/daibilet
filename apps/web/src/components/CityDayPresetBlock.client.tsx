@@ -115,6 +115,18 @@ export function CityDayPresetBlock({
                   <p className={`text-sm font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-950'}`}>
                     {preset.title}
                   </p>
+                  {preset.blogSlug ? (
+                    <Link
+                      href={`/blog/${preset.blogSlug}`}
+                      className={`mt-0.5 inline-block text-xs font-medium underline-offset-2 hover:underline ${
+                        editorial
+                          ? 'text-zinc-500 hover:text-zinc-800'
+                          : 'text-slate-500 hover:text-primary-700'
+                      }`}
+                    >
+                      Читать об этом в блоге
+                    </Link>
+                  ) : null}
                   {preset.description ? (
                     <p className={`mt-0.5 text-xs leading-5 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
                       {preset.description}
@@ -126,18 +138,6 @@ export function CityDayPresetBlock({
                   >
                     {items.length} точек: {titles}
                   </p>
-                  {preset.blogSlug ? (
-                    <Link
-                      href={`/blog/${preset.blogSlug}`}
-                      className={`mt-1.5 inline-block text-xs font-medium underline-offset-2 hover:underline ${
-                        editorial
-                          ? 'text-zinc-500 hover:text-zinc-800'
-                          : 'text-slate-500 hover:text-primary-700'
-                      }`}
-                    >
-                      Читать об этом в блоге
-                    </Link>
-                  ) : null}
                 </div>
                 <button
                   type="button"
