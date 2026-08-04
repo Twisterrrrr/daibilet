@@ -1,3 +1,18 @@
+## 2026-08-04 - My Day: planDone checkbox leftmost on stop cards
+
+### Наблюдения
+- Owner обвёл `data-day-plan-done` между thumb и title и стрелкой указал в крайний левый край карточки - чекбокс мешал читать title/desc.
+- Square affordance + aria «Отметить выполненным» из `e5cf78c` оставляем; hour-plan soft times / ticket cards не трогаем.
+
+### Решения
+- Grid: порядок `[✓] [↑↓] [thumb+N] [title/meta…] [nav][X]`; чекбокс вне text-col.
+- List dense: `[✓] [↑↓] [N] [title…]` - тот же leftmost control.
+
+### Проблемы
+- Нет. Deploy/BUILD_ID - после MSK.
+
+---
+
 ## 2026-08-04 - /my-day: calm route toolbar hierarchy (mobile)
 
 ### Наблюдения
@@ -10607,3 +10622,15 @@ evalidateNextBlogArticle (/blog, slug, city hub).
 
 ### Проблемы
 - Moscow must-see привязались к latin `moskva` (первый hit в aliases), не к `москва` — оба title Москва. Listing smoke: /locations|/venues и detail pages (kreml/ermitazh/petergof) отдают must-see; полный список на каталоге пагинирован.
+
+## 2026-08-04 - Публикация гида «Инстаграмный Нижний»
+
+### Наблюдения
+- Для Нижнего Новгорода уже есть именованный сценарий «Инстаграмный Нижний» в `cityInfo` и публичные карточки всех точек маршрута.
+
+### Решения
+- Добавлена PUBLISHED-статья `instagramnyi-nizhnii` с реальными ссылками на city hub, локации, гастро-площадку и `/my-day`.
+- Сгенерированы уникальные cover и две inline-фотографии, размещённые в `apps/web/public/images/blog` и зеркале `apps/public/public/images/blog`.
+
+### Проблемы
+- Глубокая ссылка, которая применяет именованный сценарий напрямую из URL, в текущем `my-day` не поддерживается: сценарий выбирается в интерфейсе.

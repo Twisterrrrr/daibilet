@@ -197,6 +197,7 @@ Canon: [inc-504-ssr-hardening.md](./inc-504-ssr-hardening.md).
 | UX.MYDAY-MINICARD | Must-see mini-cards (thumb+desc) in H-carousel; restore своё место accordion | Критический | ✅ `5c13bc5` MSK **BUILD_ID=`uoDz6BgaWtWh7P4AC0wF4`** `/my-day` 200 |
 | UX.MYDAY-MINICARD2 | Must-see cards wider (24rem) + 2× thumb (96px); keep H-carousel | Критический | ✅ `754fd12` MSK **BUILD_ID=`ZqoDR5hR_voM4u3qKvngF`** `/my-day` 200 |
 | UX.MYDAY-PLANCHECK | Stop grid: planDone checkbox beside title (not empty tall pill); square affordance | Критический | ✅ `e5cf78c` MSK **BUILD_ID=`Tn0XvhLW4knVakxHU8x6V`** `/my-day` 200 |
+| UX.MYDAY-PLANCHECK2 | planDone checkbox leftmost: `[✓][↑↓][thumb+N][title…]` away from content | Критический | 🔄 commit+deploy |
 | UX.MYDAY-TOOLBAR | Route chrome: one primary Yandex CTA; Optimize ghost; quiet List/Map + flat km/ETA+walk/auto | Критический | 🔄 commit+deploy |
 | FIX.MYDAY-SALEABLE | Cull unsaleable/thin TC buy CTA on venue stops (Полет soft-404) | Критический | ✅ `ba13ec2` MSK **BUILD_ID=`CbKLIANk3tWkfiFKxUSCW`** |
 | UX.MYDAY-F | Мой день: filters + auto-pick + top-up (product next) | Высокий | ⏳ поверх MOB канона |

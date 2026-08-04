@@ -4368,7 +4368,7 @@ function DayRouteVenueCard({
         data-day-stop-focused={focused ? '1' : undefined}
       >
         {/*
-          Dense list: number + ↑↓; title / address / segment as 3 lines,
+          Dense list: [✓] [↑↓] [N]; title / address / segment as 3 lines,
           vertically centered with side controls.
         */}
         <div
@@ -4377,12 +4377,6 @@ function DayRouteVenueCard({
           } ${purchased ? 'border-l-4 border-primary-600 pl-1.5' : ''}`}
         >
           {planCheck}
-          <span
-            className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-900 text-[10px] font-bold text-white"
-            aria-label={`Точка ${index + 1}`}
-          >
-            {index + 1}
-          </span>
           {reorderLocked ? (
             <div
               className="flex h-8 w-5 shrink-0 items-center justify-center text-slate-300"
@@ -4417,6 +4411,12 @@ function DayRouteVenueCard({
               </button>
             </div>
           )}
+          <span
+            className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-900 text-[10px] font-bold text-white"
+            aria-label={`Точка ${index + 1}`}
+          >
+            {index + 1}
+          </span>
           <div
             className={`min-w-0 flex-1 self-center leading-tight ${
               !purchased && isCommerce ? 'border-l-4 border-primary-600 pl-2' : ''
@@ -4539,7 +4539,7 @@ function DayRouteVenueCard({
     >
       {/*
         Owner v7: single compact row
-        [↑↓ left] [thumb+N] [✓ title / address / meta] [✈][X]
+        [✓ left] [↑↓] [thumb+N] [title / address / meta] [✈][X]
       */}
       <div
         className={`flex items-center gap-2 rounded-2xl border bg-white px-2.5 py-2 sm:gap-3 sm:px-3 sm:py-2.5 ${
@@ -4550,6 +4550,7 @@ function DayRouteVenueCard({
               : 'border-slate-200'
         }`}
       >
+        {planCheck}
         {reorderLocked ? (
           <div
             className="flex h-10 w-6 shrink-0 items-center justify-center text-slate-300"
@@ -4615,12 +4616,9 @@ function DayRouteVenueCard({
               ) : null}
             </div>
           ) : null}
-          <div className="flex items-center gap-2">
-            {planCheck}
-            <p className="min-w-0 flex-1 truncate text-sm font-semibold leading-snug text-slate-900">
-              {titleNode}
-            </p>
-          </div>
+          <p className="truncate text-sm font-semibold leading-snug text-slate-900">
+            {titleNode}
+          </p>
           {placeLine || !hasCoords ? (
             <p
               className={`mt-0.5 mb-0 line-clamp-1 text-xs leading-snug ${
