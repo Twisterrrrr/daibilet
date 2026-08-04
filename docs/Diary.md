@@ -9,7 +9,7 @@
 - Чуть воздуха в sheet (`px-3/4`, border-b, helper padding).
 
 ### Проблемы
-- (BUILD_ID после MSK deploy)
+- Нет. Live MSK `ee0fa90` **BUILD_ID=`rcgg8GueqCiyG9m8Dr0cg`**.
 
 ---
 
