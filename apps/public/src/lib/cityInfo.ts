@@ -558,7 +558,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       },
       {
         id: 'spb-5',
-        title: 'Владимирская / барный',
+        title: 'Литературный Петербург',
         description: 'Литературные адреса, Фонтанка и две исторические гастрономические остановки.',
         stops: [
           spbPresetStop('Литературно-мемориальный музей Достоевского'),

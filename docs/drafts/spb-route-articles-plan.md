@@ -11,7 +11,7 @@
 | Васильевский остров | «Васильевский остров пешком: от Стрелки до Севкабеля» | `/blog/spb-vasilevskiy-ostrov-marshrut` |
 | Петроградская | «Петроградская сторона: крепость, модерн и вид на Неву» | `/blog/spb-petrogradskaya-storona` |
 | Коломна и каналы | «Коломна и каналы: тихий Петербург за день» | `/blog/spb-kolomna-kanaly` |
-| Владимирская / барный | «Владимирская и вокруг: Достоевский, бары и вечерний город» | `/blog/spb-vladimirskaya-gastro` |
+| Литературный Петербург | «Владимирская и вокруг: Достоевский, бары и вечерний город» | `/blog/spb-vladimirskaya-gastro` |
 
 Каждая статья имеет уникальные cover и две inline-иллюстрации в `apps/public/public/images/blog/`, статус `PUBLISHED`, ссылку на `/cities/saint-petersburg` и готовый сценарий через `/my-day?city=saint-petersburg`. Поле `blogSlug` заполнено на всех пяти соответствующих `dayRoutePresets`.
 
