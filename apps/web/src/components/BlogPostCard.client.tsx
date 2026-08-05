@@ -197,9 +197,11 @@ export function BlogPostCard({
         {excerpt ? (
           <p
             className={[
-              // Clamp fills the card body; meta stays at bottom via mt-auto (no empty flex gap).
+              // Soft safety clamp only - list leads must not die mid-sentence with empty card space.
               'mt-2 leading-relaxed text-slate-600',
-              isSmall ? 'line-clamp-3 text-xs sm:text-sm' : 'line-clamp-4 text-sm',
+              isSmall
+                ? 'line-clamp-[10] text-xs sm:text-sm sm:line-clamp-[12]'
+                : 'line-clamp-[12] text-sm',
             ].join(' ')}
           >
             {excerpt}

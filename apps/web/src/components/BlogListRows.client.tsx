@@ -72,7 +72,7 @@ function BlogListRow({ post }: { post: BlogCardDto }) {
         </h2>
 
         {excerpt ? (
-          <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-slate-600 sm:mt-1.5 sm:line-clamp-3 sm:text-sm">
+          <p className="mt-1 line-clamp-[8] text-xs leading-relaxed text-slate-600 sm:mt-1.5 sm:line-clamp-[10] sm:text-sm">
             {excerpt}
           </p>
         ) : null}
