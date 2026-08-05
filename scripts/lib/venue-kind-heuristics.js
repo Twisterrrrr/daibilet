@@ -189,7 +189,6 @@ const GASTRO_RE = new RegExp(
     'гастробар',
     'стейк[\\s-]?хаус',
     'марципан',
-    'пивовар',
     `${W}bier${WEND}`,
     `${W}паб${WEND}`,
     `${W}pub${WEND}`,

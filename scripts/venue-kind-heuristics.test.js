@@ -86,5 +86,9 @@ assert.strictEqual(
   reclassifyLocationGastro('Магазин-музей «Кёнигсбергский марципан»', 'kaliningrad-kenigsbergskiy-martsipan', 'ATTRACTION'),
   'GASTRO',
 );
+assert.strictEqual(
+  reclassifyLocationGastro('Жигулёвский пивоваренный завод', 'samara-zhigulevskiy-pivovarennyy-zavod', 'ATTRACTION'),
+  null,
+);
 
 console.log('venue-kind-heuristics: ok');
