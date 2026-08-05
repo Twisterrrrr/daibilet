@@ -1,3 +1,38 @@
+## 2026-08-05 - /locations: почему нет сгенерированных фото + фикс overlay
+
+### Наблюдения
+- Owner: «почему мы не используем сгенерированные фото в локациях?»
+- Wiring уже был: `resolveVenueHeroImage` → SSR `toVenueCatalogCard` / PDP. Эталон JPG в `apps/public/public/images/venues/` (+ sync на build в gitignored `apps/web/public/images`).
+- В map только NN pack (~46) + SPB Главные 1-12 + мечеть. Mass Top-100 AI stills (~63 orphan JPG на диске) намеренно сняты из map (owner: нереалистично).
+- Баг: city-scoped refetch в `LocationsCatalogView` брал raw `/api/public/venues` **без** editorial overlay → карточки с выбранным городом снова показывали stub/gradient.
+
+### Решения
+- `LocationsCatalogView`: `toVenueCatalogCard` на client fetch (как DayRoutePanel / SSR list).
+- `VenuePageView`: `withEditorialHero` на soft-nav client fetch.
+- Тесты editorial override / stub drop; комментарий map без Top-100.
+
+### Проблемы
+- Большинству локаций каталога фото просто не генерировали. Кураторский batch / реальные covers - отдельно; не возвращать mass Top-100 AI в map без OK owner.
+
+---
+
+## 2026-08-05 - SPB hub: editorial blurbs over Venue crumbs
+
+### Наблюдения
+- Owner screenshot карточек «В маршрут» (Троицкий мост, Зодчего Росси, Рубинштейна, Университетская наб., Царскосельский лицей, Юсуповский): хвосты-крошки (`Нева`, `пл. Островского`, `Владимирская`, `Васильевский`), строчная у лицея, обрезка mid-thought (`где...`, `Один из...`).
+- В `cityInfo` mustSee крошки уже срезаны (`3a41e8f8`); на UI снова появлялись, потому что `dayRouteHookLine` брал Venue `hookFact`/`shortDescription` (старый seed с хвостами и усечением) поверх editorial `desc`.
+- Suburb nested POI: 53+ `desc` со строчной буквы в seed (лицей и др.).
+
+### Решения
+- Hub / my-day must-see: `preferEditorial: true` - сначала `cityInfo.desc`, Venue только fallback.
+- `stripLocationCrumbTail` в `dayRouteHookLine` (defense-in-depth для venue blurbs).
+- Seed web+public: capitalize SPB lowercase descs; rewrite 6 annotated blurbs без крошек и без mid-cut.
+
+### Проблемы
+- Нет. Commit+push без deploy (по запросу owner).
+
+---
+
 ## 2026-08-05 - KGD gastro → каталог /locations (owner override)
 
 ### Наблюдения

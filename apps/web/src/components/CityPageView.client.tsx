@@ -1359,6 +1359,7 @@ function CitySignificantSuburbsBlock({
                 hookFact: matchedVenue?.hookFact,
                 shortDescription: matchedVenue?.shortDescription,
                 desc: place.desc,
+                preferEditorial: true,
               }) || '';
             const nested = Array.isArray(place.places) ? place.places.filter((p) => p?.name) : [];
             return (
@@ -1723,6 +1724,7 @@ function CitySightsMustSeeList({
               hookFact: matchedVenue?.hookFact,
               shortDescription: matchedVenue?.shortDescription,
               desc: place.desc,
+              preferEditorial: true,
             }) || '';
           const nested = Array.isArray(place.places) ? place.places.filter((item) => item?.name) : [];
           return (

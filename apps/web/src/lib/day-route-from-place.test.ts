@@ -82,6 +82,33 @@ test('dayRouteHookLine prefers hookFact then shortDescription then desc', () => 
   assert.equal(dayRouteHookLine({ desc: 'Только cityInfo desc' }), 'Только cityInfo desc');
 });
 
+test('dayRouteHookLine preferEditorial keeps cityInfo over venue crumbs', () => {
+  assert.equal(
+    dayRouteHookLine({
+      preferEditorial: true,
+      hookFact: 'факт площадки',
+      shortDescription: 'Ракурс на крепость. Нева',
+      desc: 'Ракурс на крепость и ростральные колонны.',
+    }),
+    'Ракурс на крепость и ростральные колонны.',
+  );
+});
+
+test('dayRouteHookLine strips trailing location crumbs from venue blurbs', () => {
+  assert.equal(
+    dayRouteHookLine({
+      shortDescription: 'Идеальная перспектива к Александринке. пл. Островского',
+    }),
+    'Идеальная перспектива к Александринке.',
+  );
+  assert.equal(
+    dayRouteHookLine({
+      shortDescription: 'Вечерняя жизнь и старый доходный фонд. Владимирская',
+    }),
+    'Вечерняя жизнь и старый доходный фонд.',
+  );
+});
+
 test('capitalizeSentenceStart uppercases first letter only', () => {
   assert.equal(capitalizeSentenceStart('главный готический храм'), 'Главный готический храм');
   assert.equal(capitalizeSentenceStart('Главный уже с большой'), 'Главный уже с большой');

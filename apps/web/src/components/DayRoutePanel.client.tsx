@@ -1011,6 +1011,7 @@ function DayRoutePanelInner() {
             hookFact: matched?.hookFact,
             shortDescription: matched?.shortDescription,
             desc: place.desc,
+            preferEditorial: true,
           }),
         };
       })
@@ -2119,6 +2120,7 @@ function DayRoutePanelInner() {
         hookFact: matchedSource?.hookFact,
         shortDescription: matchedSource?.shortDescription,
         desc: mustSeeRow?.place.desc,
+        preferEditorial: true,
       },
       260,
     );

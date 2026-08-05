@@ -54,21 +54,45 @@ export function capitalizeSentenceStart(value: string | null | undefined): strin
   return text.slice(0, index) + upper + text.slice(index + 1);
 }
 
-/** Full «зачем сюда» text: venue hookFact → shortDescription → editorial must-see desc.
+/**
+ * Strip trailing location crumbs glued to blurbs («. Нева», «. пл. Островского»).
+ * Address belongs in address field, not in the 2-line hub annotation.
+ */
+export function stripLocationCrumbTail(value: string): string {
+  const text = String(value || '').trim();
+  if (!text) return text;
+  return text
+    .replace(
+      /\.\s+(?:Центр(?:\s*\/\s*(?:ВО|Владимирский|Петроградка))?|ВО|Нева|Мойка|Фонтанка|Лахта|Коломна|Исаакий|Петропавловка|Гавань(?:\s*\/\s*ВО)?|Дворцовая|Адмиралтейская|Адмиралтейский|Владимирская|Литейный|Сенная|Приморский|Московский(?:\s+пр\.\s*\/\s*Цветочная)?|Крестовский(?:\s+остров)?|Выборгская|Инженерная|Невский(?:\s*\/\s*Фонтанка)?|Петроградка|Петроградская(?:\s*\/\s*Заячий)?|Петроградская\s+сторона|Петроградская\s+наб\.?|Васильевский(?:\s+остров)?|Василеостровская|канал\s+Грибоедова|пл\.\s*Искусств|пл\.\s*Островского|пл\.\s*Александра\s+Невского|наб\.\s*Фонтанки|Университетская\s+наб\.?|Кронверкский|Кронверкская\s+наб\.?|Миллионная|Соляной\s+пер\.?|Смольная\s+наб\.?|Исаакиевская\s+пл\.?|пр\.\s*Шаумяна|Невский,\s*\d+|Кожевенная\s+линия|Шпалерная|Театральная|Садовая|Лиговский|Чернышевская|Каменноостровский|Александровский\s+парк|Метро\s+Крестовский\s+остров|у\s+Невского|у\s+Михайловского\s+замка|Центр\s*\/\s*Петроградка|Заячий)\s*$/u,
+      '.',
+    )
+    .trim();
+}
+
+/** Full «зачем сюда» text.
+ * Default (search/catalog): venue hookFact → shortDescription → editorial desc.
+ * Hub cards (`preferEditorial`): cityInfo desc first, so supplier crumbs/truncation cannot overwrite.
  * Optional `maxLen` truncates for compact hints (search). Cards pass no maxLen = full text. */
 export function dayRouteHookLine(
   sources: {
     hookFact?: string | null;
     shortDescription?: string | null;
     desc?: string | null;
+    /** Prefer editorial cityInfo desc over Venue blurbs (city hub / my-day must-see). */
+    preferEditorial?: boolean;
   },
   maxLen?: number | null,
 ): string | null {
+  const picked = sources.preferEditorial
+    ? sources.desc || sources.hookFact || sources.shortDescription || ''
+    : sources.hookFact || sources.shortDescription || sources.desc || '';
   const raw = capitalizeSentenceStart(
-    String(sources.hookFact || sources.shortDescription || sources.desc || '')
-      .trim()
-      .replace(/\s+/g, ' ')
-      .replace(/[—–]/g, '-'),
+    stripLocationCrumbTail(
+      String(picked)
+        .trim()
+        .replace(/\s+/g, ' ')
+        .replace(/[—–]/g, '-'),
+    ),
   );
   if (!raw) return null;
   const limit = maxLen == null || maxLen <= 0 ? null : maxLen;
