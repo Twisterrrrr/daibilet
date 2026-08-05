@@ -1,5 +1,12 @@
 import { formatNumber } from '@/lib/format';
-import { formatSessionTime, isSameSessionDay, parseSessionStartsAt, resolveSessionTimeZoneForSession, SITE_TIME_ZONE } from '@/lib/datetime';
+import {
+  formatSessionTime,
+  isSameSessionDay,
+  isSessionTomorrow,
+  parseSessionStartsAt,
+  resolveSessionTimeZoneForSession,
+  SITE_TIME_ZONE,
+} from '@/lib/datetime';
 import type { PublicSessionDto } from '@daibilet/contracts/public';
 
 export const LOW_TICKETS_THRESHOLD = 20;
@@ -187,6 +194,39 @@ export function formatEventNextSession(event: PublicSessionDto): string | null {
 
 export function isSessionToday(iso: string, timeZone: string = SITE_TIME_ZONE): boolean {
   return isSameSessionDay(iso, new Date(), timeZone);
+}
+
+/** Compact cover badge: «Сегодня» / «Завтра» / «15 авг». Null if no session date. */
+export function formatCoverDateBadge(event: PublicSessionDto): string | null {
+  if (isOpenDate(event)) return null;
+  const timeZone = resolveSessionTimeZoneForSession(event);
+  if (event.startsAt) {
+    const d = parseSessionStartsAt(event.startsAt);
+    if (Number.isFinite(d.getTime())) {
+      if (isSessionToday(event.startsAt, timeZone)) return 'Сегодня';
+      if (isSessionTomorrow(event.startsAt, timeZone)) return 'Завтра';
+      return new Intl.DateTimeFormat('ru-RU', {
+        day: 'numeric',
+        month: 'short',
+        timeZone,
+      })
+        .format(d)
+        .replace(/\./g, '')
+        .replace(/\u00a0/g, ' ')
+        .trim();
+    }
+  }
+  const fallback = event.dateLabel?.trim();
+  if (!fallback) return null;
+  const lower = fallback.toLocaleLowerCase('ru-RU');
+  if (lower.startsWith('сегодня')) return 'Сегодня';
+  if (lower.startsWith('завтра')) return 'Завтра';
+  return fallback
+    .replace(/\./g, '')
+    .replace(/^[а-яёa-z]{1,3},\s*/iu, '')
+    .replace(/\u00a0/g, ' ')
+    .replace(/,\s*\d{1,2}:\d{2}.*$/u, '')
+    .trim() || null;
 }
 
 export function getDepartingSoonMinutes(startsAt: string): number | null {

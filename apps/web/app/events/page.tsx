@@ -61,7 +61,18 @@ export default async function EventsCatalogPage() {
               <div className="h-8 w-full max-w-xl animate-pulse rounded-xl bg-surface-muted" />
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 xl:grid-cols-4">
                 {Array.from({ length: 8 }).map((_, index) => (
-                  <div key={index} className="h-72 animate-pulse rounded-card bg-surface-muted" />
+                  <div key={index} className="overflow-hidden rounded-card bg-white shadow-card">
+                    <div className="aspect-[16/9] animate-pulse bg-slate-200/80" />
+                    <div className="space-y-3 p-4">
+                      <div className="h-3 w-24 animate-pulse rounded bg-slate-200/80" />
+                      <div className="h-4 w-full animate-pulse rounded bg-slate-200/80" />
+                      <div className="h-4 w-[85%] animate-pulse rounded bg-slate-200/70" />
+                      <div className="flex items-center justify-between pt-2">
+                        <div className="h-5 w-20 animate-pulse rounded bg-slate-200/80" />
+                        <div className="h-8 w-24 animate-pulse rounded-lg bg-slate-200/80" />
+                      </div>
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>

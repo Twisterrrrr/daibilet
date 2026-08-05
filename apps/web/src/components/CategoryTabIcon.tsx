@@ -1,6 +1,8 @@
 import {
   Bike,
+  Bus,
   Landmark,
+  Mic2,
   Music2,
   Ship,
   Sparkles,
@@ -11,7 +13,7 @@ import {
 } from 'lucide-react';
 
 const CATEGORY_ICONS: Record<string, LucideIcon> = {
-  Экскурсии: Tent,
+  Экскурсии: Bus,
   'Музеи и арт': Landmark,
   Музеи: Landmark,
   Залы: Landmark,
@@ -20,10 +22,14 @@ const CATEGORY_ICONS: Record<string, LucideIcon> = {
   'Активный отдых': Bike,
   Речные: Ship,
   'Речные прогулки': Ship,
+  Катера: Ship,
   Концерты: Music2,
+  Шоу: Mic2,
   Выставки: Landmark,
   Театры: Theater,
   Детям: Sparkles,
+  'Для детей': Sparkles,
+  Туры: Tent,
 };
 
 export function CategoryTabIcon({

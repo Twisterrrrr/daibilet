@@ -34,6 +34,24 @@
 
 ---
 
+## 2026-08-05 - Catalog /events conversion polish (MVP)
+
+### Наблюдения
+- Owner: каталог `/events` должен быть конверсионным и визуально дорогим (brand primary/sky, не dark-orange template).
+
+### Решения
+- Sticky filter bar (mobile+desktop): backdrop-blur; категории с иконками; active = primary.
+- Быстрые тогглы в sticky: Сегодня / Завтра / Бесплатные / С детьми (`date`, `minPrice/maxPrice=0`, `ageMax=12`) - без ломки SEO URL.
+- EventCard: date badge на cover; убраны fake ★/посетили; hover CTA «Выбрать сеанс» → event; цена через `formatPriceFrom`.
+- Skeleton pulse-карточки при подгрузке; page SEO-пагинация сохранена (infinite scroll не добавляли).
+- Deferred: split map view, sticky mini-cart.
+- Commit+push; web deploy нет.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-05 - Hub suburbs: bulk «В маршрут» у вектора
 
 ### Наблюдения

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ChevronDown, Search, SlidersHorizontal, X } from 'lucide-react';
+import { Baby, ChevronDown, Gift, Search, SlidersHorizontal, Sun, Sunrise, X } from 'lucide-react';
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 
 import { CatalogAdvancedFiltersPanel } from '@/components/CatalogAdvancedFiltersPanel.client';
@@ -27,6 +27,8 @@ type CatalogToolbarProps = {
 };
 
 const SEARCH_DEBOUNCE_MS = 350;
+/** Events with ageLimit ≤ 12 - family-friendly quick filter. */
+const KIDS_AGE_MAX = 12;
 
 export function CatalogToolbar({
   facets,
@@ -129,15 +131,23 @@ export function CatalogToolbar({
 
   if (compact) {
     return (
-      <div className="flex items-center gap-2">
-        <div className="horizontal-snap-row flex min-w-0 flex-1 gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <CategoryTabs filters={filters} categories={facets.categories} />
+      <div className="space-y-2">
+        <div className="flex items-center gap-2">
+          <div className="horizontal-snap-row flex min-w-0 flex-1 gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <CategoryTabs filters={filters} categories={facets.categories} />
+          </div>
+          <FiltersButton
+            open={filtersOpen}
+            count={advancedCount}
+            disabled={disabled}
+            onClick={() => setFiltersOpen(true)}
+          />
         </div>
-        <FiltersButton
-          open={filtersOpen}
-          count={advancedCount}
+        <QuickFilterToggles
+          filters={filters}
+          qDraft={qDraft}
           disabled={disabled}
-          onClick={() => setFiltersOpen(true)}
+          onNavigate={navigate}
         />
         <CatalogAdvancedFiltersPanel
           open={filtersOpen}
@@ -304,8 +314,14 @@ export function CatalogToolbar({
         }}
       />
 
-      {/* Горизонтальные tag-chips без счётчиков («Мероприятия 2092»). */}
-      <div className="-mx-4 px-4 pt-1 sm:mx-0 sm:px-0">
+      {/* Быстрые тогглы + категории в sticky-зоне */}
+      <div className="-mx-4 space-y-3 px-4 pt-1 sm:mx-0 sm:px-0">
+        <QuickFilterToggles
+          filters={filters}
+          qDraft={qDraft}
+          disabled={disabled}
+          onNavigate={navigate}
+        />
         <div
           role="tablist"
           aria-label="Категории"
@@ -314,6 +330,102 @@ export function CatalogToolbar({
           <CategoryTabs filters={filters} categories={facets.categories} />
         </div>
       </div>
+    </div>
+  );
+}
+
+function QuickFilterToggles({
+  filters,
+  qDraft,
+  disabled,
+  onNavigate,
+}: {
+  filters: CatalogFilterValues;
+  qDraft: string;
+  disabled?: boolean;
+  onNavigate: (next: CatalogFilterValues) => void;
+}) {
+  const hasCustomRange = Boolean(filters.from || filters.to);
+  const todayOn = !hasCustomRange && filters.date === 'today';
+  const tomorrowOn = !hasCustomRange && filters.date === 'tomorrow';
+  const freeOn = filters.minPrice === 0 && filters.maxPrice === 0;
+  const kidsOn = filters.ageMax === KIDS_AGE_MAX;
+
+  const withQ = (next: CatalogFilterValues): CatalogFilterValues => ({
+    ...next,
+    q: qDraft.trim() || filters.q,
+    page: undefined,
+  });
+
+  const toggleDate = (value: 'today' | 'tomorrow') => {
+    const active = value === 'today' ? todayOn : tomorrowOn;
+    onNavigate(
+      withQ({
+        ...filters,
+        date: active ? undefined : value,
+        from: undefined,
+        to: undefined,
+        sort: active ? filters.sort : 'time',
+      }),
+    );
+  };
+
+  const toggleFree = () => {
+    onNavigate(
+      withQ({
+        ...filters,
+        minPrice: freeOn ? undefined : 0,
+        maxPrice: freeOn ? undefined : 0,
+      }),
+    );
+  };
+
+  const toggleKids = () => {
+    onNavigate(
+      withQ({
+        ...filters,
+        ageMax: kidsOn ? undefined : KIDS_AGE_MAX,
+      }),
+    );
+  };
+
+  const chips: Array<{
+    key: string;
+    label: string;
+    active: boolean;
+    icon: typeof Sun;
+    onClick: () => void;
+  }> = [
+    { key: 'today', label: 'Сегодня', active: todayOn, icon: Sun, onClick: () => toggleDate('today') },
+    { key: 'tomorrow', label: 'Завтра', active: tomorrowOn, icon: Sunrise, onClick: () => toggleDate('tomorrow') },
+    { key: 'free', label: 'Бесплатные', active: freeOn, icon: Gift, onClick: toggleFree },
+    { key: 'kids', label: 'С детьми', active: kidsOn, icon: Baby, onClick: toggleKids },
+  ];
+
+  return (
+    <div
+      role="group"
+      aria-label="Быстрые фильтры"
+      className="horizontal-snap-row flex flex-nowrap gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+    >
+      {chips.map((chip) => {
+        const Icon = chip.icon;
+        return (
+          <button
+            key={chip.key}
+            type="button"
+            disabled={disabled}
+            aria-pressed={chip.active}
+            onClick={chip.onClick}
+            className={`catalog-quick-chip snap-start disabled:opacity-60 ${
+              chip.active ? 'catalog-quick-chip-on' : 'catalog-quick-chip-idle'
+            }`}
+          >
+            <Icon aria-hidden className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
+            <span className="whitespace-nowrap">{chip.label}</span>
+          </button>
+        );
+      })}
     </div>
   );
 }

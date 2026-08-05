@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react';
 import Link from 'next/link';
-import { Clock, MapPin, Star, Ticket, Users } from 'lucide-react';
+import { Clock, MapPin, Ticket, Users } from 'lucide-react';
 
 import { EventFavoriteButton } from '@/components/EventFavoriteButton.client';
 import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
@@ -22,6 +22,7 @@ import {
   collectAllDisplaySlotLabels,
   COMPACT_MOBILE_SLOT_LIMIT,
   CATALOG_DISPLAY_SLOT_LIMIT,
+  formatCoverDateBadge,
   formatEventNextSession,
   formatPriceRub,
   formatShowcasePriceLabel,
@@ -30,7 +31,6 @@ import {
   getDepartingSoonMinutes,
   isOpenDate,
   MIN_DISPLAY_PRICE_RUB,
-  resolvePseudoRating,
   WIDE_DISPLAY_SLOT_LIMIT,
 } from '@/lib/event-card-meta';
 import { resolveEventCardObjectPosition } from '@/lib/event-image-focus';
@@ -105,8 +105,7 @@ export function EventCard({
   const allSlotLabels = collectAllDisplaySlotLabels(session);
   const showSlotPills = allSlotLabels.length > 0;
   const sessionMetaLabel = openDate ? null : nextSessionLabel;
-  // Landings: no fake ★ - only real micro-badges from tags/subcategories/title.
-  const pseudoRating = landingActions ? null : resolvePseudoRating(session.groupKey || session.id);
+  // List DTO has no real rating / visit counts - never invent ★ 4.9.
   const landingBadges = landingActions ? deriveLandingCardBadges(session) : [];
   const locationLabel = resolveEventCardLocationLabel(session);
   const durationLabel = extractDurationLabel(session.tags);
@@ -114,6 +113,7 @@ export function EventCard({
   // Missing display price (<100 / null) is not "soon" - event can still be on sale.
   const showSoonBadge = false;
   const priceFooterLabel = hasPrice ? formatPriceFrom(session.priceFrom) : null;
+  const coverDateBadge = formatCoverDateBadge(session);
   const purchase = useCatalogPurchase(session);
   // Catalog list: no hidden widget DOM. Purchase UX lives on event page / landing CTA.
   const showPurchaseWidgets = landingActions && !suppressPurchaseAnchors && purchase.purchaseEnabled;
@@ -179,6 +179,11 @@ export function EventCard({
         />
 
         <EventImageBadges event={session} showSoonBadge={showSoonBadge} />
+        {coverDateBadge ? (
+          <span className="absolute bottom-2 left-2 z-[2] rounded-lg bg-slate-950/80 px-2 py-1 text-[11px] font-semibold tracking-wide text-white backdrop-blur-sm sm:bottom-3 sm:left-3 sm:text-xs">
+            {coverDateBadge}
+          </span>
+        ) : null}
         <EventFavoriteButton eventId={session.id} className="right-2 top-2 sm:right-3 sm:top-3" />
         {!landingActions && dayRouteVenue ? (
           <AddToDayRouteButton
@@ -193,15 +198,8 @@ export function EventCard({
 
       <div className={`flex flex-1 flex-col ${compact ? 'gap-2.5 p-3.5 sm:gap-3 sm:p-4' : 'gap-3 p-4 sm:p-5'}`}>
         {/* Meta сразу под фото, над названием (как ожидает owner / как в list-карточке). */}
-        {/* Mobile: skip rating/duration/age noise - keep city when present. */}
-        {destinationLabel || (pseudoRating != null && !compact) || durationLabel || ageLabel ? (
+        {destinationLabel || durationLabel || ageLabel ? (
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-            {pseudoRating != null ? (
-              <span className={`event-card-meta ${compact ? '' : 'hidden sm:inline-flex'}`}>
-                <Star className="event-card-meta-icon" />
-                <span className="font-medium text-graphite">{pseudoRating.toFixed(1)}</span>
-              </span>
-            ) : null}
             {durationLabel ? (
               <span className="event-card-meta hidden sm:inline-flex">
                 <Clock className="event-card-meta-icon" />
@@ -331,21 +329,36 @@ export function EventCard({
               ) : (
                 <span />
               )}
-              <Link
-                href={href}
-                className={DETAILS_LINK_CLASS}
-                onClick={() =>
-                  trackProductCardClick({
-                    eventId: session.id,
-                    slug: session.slug,
-                    source: 'event_card_cta',
-                  })
-                }
-              >
-                <Ticket className="hidden h-3.5 w-3.5 sm:inline" strokeWidth={1.75} />
-                <span className="sm:hidden">Купить</span>
-                <span className="hidden sm:inline">Купить билет</span>
-              </Link>
+              <div className="relative z-[2] flex items-center gap-2">
+                <Link
+                  href={href}
+                  className="pointer-events-none absolute right-full mr-2 hidden items-center whitespace-nowrap rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-ui-xs font-semibold text-primary-700 opacity-0 shadow-sm transition group-hover:pointer-events-auto group-hover:opacity-100 hover:border-primary/30 hover:bg-primary/5 focus-visible:pointer-events-auto focus-visible:opacity-100 sm:inline-flex sm:text-ui-sm"
+                  onClick={() =>
+                    trackProductCardClick({
+                      eventId: session.id,
+                      slug: session.slug,
+                      source: 'event_card_sessions',
+                    })
+                  }
+                >
+                  Выбрать сеанс
+                </Link>
+                <Link
+                  href={href}
+                  className={DETAILS_LINK_CLASS}
+                  onClick={() =>
+                    trackProductCardClick({
+                      eventId: session.id,
+                      slug: session.slug,
+                      source: 'event_card_cta',
+                    })
+                  }
+                >
+                  <Ticket className="hidden h-3.5 w-3.5 sm:inline" strokeWidth={1.75} />
+                  <span className="sm:hidden">Купить</span>
+                  <span className="hidden sm:inline">Купить билет</span>
+                </Link>
+              </div>
             </>
           )}
         </div>
@@ -501,12 +514,12 @@ function ShowcaseEventCard({
     </div>
   );
   const hasPrice = typeof session.priceFrom === 'number' && session.priceFrom >= MIN_DISPLAY_PRICE_RUB;
-  const pseudoRating = resolvePseudoRating(session.groupKey || session.id);
   const dateLabel = rail ? formatShowcaseSessionDateCompact(session) : formatShowcaseSessionDate(session);
   const cityLabel = resolveEventCardDestinationLabel(session) || null;
   const locationLine = resolveShowcaseLocationLine(session, cityLabel);
   const categoryLabel = session.category?.trim() || null;
   const priceLabel = hasPrice ? formatShowcasePriceLabel(session.priceFrom) : null;
+  const coverDateBadge = formatCoverDateBadge(session);
 
   return (
     <article className="group event-card">
@@ -547,6 +560,11 @@ function ShowcaseEventCard({
         />
 
         <EventImageBadges event={session} rail={rail} editorsPick={editorsPickBadge} />
+        {coverDateBadge ? (
+          <span className="absolute bottom-2 left-2 z-[2] rounded-lg bg-slate-950/80 px-2 py-1 text-[11px] font-semibold tracking-wide text-white backdrop-blur-sm sm:left-3 sm:text-xs">
+            {coverDateBadge}
+          </span>
+        ) : null}
         <EventFavoriteButton eventId={session.id} className="right-2 top-2 sm:right-3 sm:top-3" />
       </div>
 
@@ -568,31 +586,25 @@ function ShowcaseEventCard({
           </Link>
         </h3>
 
-        {/* ★ rating · Type · City - one compact meta row; rating hidden on narrow to cut noise */}
-        <div className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-1">
-          <span className="event-card-meta hidden sm:inline-flex">
-            <Star className="event-card-meta-icon" />
-            <span className="font-medium text-graphite">{pseudoRating.toFixed(1)}</span>
-          </span>
-          {categoryLabel ? (
-            <>
-              <span className="hidden text-ui-xs text-graphite-muted sm:inline" aria-hidden>
-                ·
-              </span>
+        {(categoryLabel || cityLabel) ? (
+          <div className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-1">
+            {categoryLabel ? (
               <span className="rounded-md bg-surface-muted px-2 py-0.5 text-ui-xs font-medium text-graphite-muted">
                 {categoryLabel}
               </span>
-            </>
-          ) : null}
-          {cityLabel ? (
-            <>
-              <span className="text-ui-xs text-graphite-muted" aria-hidden>
-                ·
-              </span>
-              <span className="truncate text-ui-xs text-graphite-muted">{cityLabel}</span>
-            </>
-          ) : null}
-        </div>
+            ) : null}
+            {cityLabel ? (
+              <>
+                {categoryLabel ? (
+                  <span className="text-ui-xs text-graphite-muted" aria-hidden>
+                    ·
+                  </span>
+                ) : null}
+                <span className="truncate text-ui-xs text-graphite-muted">{cityLabel}</span>
+              </>
+            ) : null}
+          </div>
+        ) : null}
 
         <div className="flex min-w-0 flex-col gap-0.5">
           <p className="event-card-meta">

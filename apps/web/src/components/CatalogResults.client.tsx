@@ -1,14 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, Star, Grid3X3, List, Table2 } from 'lucide-react';
+import { ArrowRight, Grid3X3, List, Table2 } from 'lucide-react';
 
 import { EventCard } from '@/components/EventCard';
 import { EventCardHorizontal } from '@/components/EventCardHorizontal';
 import type { PublicCatalogListItemDto } from '@daibilet/contracts/public';
 import { trackCatalogBannerClick } from '@/lib/catalog-analytics';
-import { formatPriceFrom, formatNumber } from '@/lib/format';
-import { formatShowcaseSessionDate, MIN_DISPLAY_PRICE_RUB, resolvePseudoRating } from '@/lib/event-card-meta';
+import { formatPriceFrom } from '@/lib/format';
+import { formatShowcaseSessionDate, MIN_DISPLAY_PRICE_RUB } from '@/lib/event-card-meta';
 import { resolveEventCardDestinationLabel } from '@/lib/event-location';
 import { eventHref, sessionVenueHref } from '@/lib/routes';
 import type { CatalogViewMode } from '@/lib/catalog-view-mode';
@@ -215,14 +215,11 @@ function CatalogTable({ items }: { items: PublicCatalogListItemDto[] }) {
             <th className="px-4 py-3 font-semibold">Город</th>
             <th className="px-4 py-3 font-semibold">Дата</th>
             <th className="px-4 py-3 font-semibold">Цена</th>
-            <th className="px-4 py-3 font-semibold">Рейтинг</th>
             <th className="px-4 py-3" />
           </tr>
         </thead>
         <tbody>
           {items.map((session) => {
-            const rating = resolvePseudoRating(session.groupKey || session.id);
-            const reviewCount = Math.max(session.sessionCount || 1, 1) * 37 + (session.id.charCodeAt(0) % 90);
             const cityLabel = resolveEventCardDestinationLabel(session);
             const venueLink = sessionVenueHref(session);
             return (
@@ -257,17 +254,10 @@ function CatalogTable({ items }: { items: PublicCatalogListItemDto[] }) {
                     ? formatPriceFrom(session.priceFrom)
                     : '—'}
                 </td>
-                <td className="whitespace-nowrap px-4 py-3 align-top">
-                  <span className="inline-flex items-center gap-1 text-slate-700">
-                    <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                    <span className="font-medium">{rating.toFixed(1)}</span>
-                    <span className="text-xs text-slate-400">({formatNumber(reviewCount)})</span>
-                  </span>
-                </td>
                 <td className="px-4 py-3 align-top">
                   <Link
                     href={eventHref(session)}
-                    className="inline-flex min-h-9 items-center justify-center rounded-full bg-slate-900 px-4 text-sm font-semibold text-white hover:bg-slate-800"
+                    className="inline-flex min-h-9 items-center justify-center rounded-full bg-primary-600 px-4 text-sm font-semibold text-white hover:bg-primary-700"
                   >
                     Купить
                   </Link>

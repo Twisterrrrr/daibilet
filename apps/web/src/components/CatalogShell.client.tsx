@@ -192,7 +192,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
 
   return (
     <>
-      <div className="catalog-toolbar sticky top-[var(--site-header-height)] z-30 -mx-4 border-b border-slate-200/60 bg-white/95 px-4 py-3 backdrop-blur sm:static sm:-mx-6 sm:bg-white sm:px-6 sm:py-4 sm:backdrop-blur-none">
+      <div className="catalog-toolbar sticky top-[var(--site-header-height)] z-30 -mx-4 border-b border-slate-200/60 px-4 py-3 sm:-mx-6 sm:px-6 sm:py-3.5">
         <CatalogToolbar
           facets={facets}
           values={filterValues}
@@ -206,8 +206,8 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
       {/* Meta слева; sort + view справа (без дубля сортировки) */}
       <div className="mt-5 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 sm:mt-6">
         <p className="min-w-0 text-sm text-graphite-muted">
-          {loading && !catalog ? 'Загрузка…' : null}
-          {catalog ? (
+          {loading ? 'Загрузка…' : null}
+          {!loading && catalog ? (
             <>
               {pluralEvents(catalog.total)}
               {catalog.items.length < catalog.total ? ` · показано ${catalog.items.length}` : ''}
@@ -228,7 +228,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
                 type="button"
                 role="radio"
                 aria-checked={filterValues.sort === option.value}
-                disabled={(loading && !catalog) || cityBootstrapPending}
+                disabled={loading || cityBootstrapPending}
                 onClick={() => {
                   router.push(
                     buildCatalogHref({
@@ -256,7 +256,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
             <select
               id="catalog-page-size"
               value={filterValues.limit ?? CATALOG_PAGE_SIZE_DEFAULT}
-              disabled={(loading && !catalog) || cityBootstrapPending}
+              disabled={loading || cityBootstrapPending}
               onChange={(event) => {
                 router.push(
                   buildCatalogHref({
@@ -283,12 +283,8 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
         </div>
       </div>
 
-      {(loading && !catalog) || (cityBootstrapPending && !catalog) ? (
-        <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
-          {Array.from({ length: 8 }).map((_, index) => (
-            <div key={index} className="h-72 animate-pulse rounded-xl bg-slate-100" />
-          ))}
-        </div>
+      {loading || (cityBootstrapPending && !catalog) ? (
+        <CatalogCardSkeletonGrid />
       ) : (
         <CatalogResults
           items={catalog?.items ?? []}
@@ -303,7 +299,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
         />
       )}
 
-      {catalog ? (
+      {catalog && !loading ? (
         <CatalogPaginationLinks
           page={Math.min(
             query.page,
@@ -336,6 +332,32 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
         </Link>
       </nav>
     </>
+  );
+}
+
+function CatalogCardSkeletonGrid() {
+  return (
+    <div
+      className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4"
+      aria-busy="true"
+      aria-label="Загрузка каталога"
+    >
+      {Array.from({ length: 8 }).map((_, index) => (
+        <div key={index} className="overflow-hidden rounded-card bg-white shadow-card">
+          <div className="aspect-[16/9] animate-pulse bg-slate-200/80" />
+          <div className="space-y-3 p-4">
+            <div className="h-3 w-24 animate-pulse rounded bg-slate-200/80" />
+            <div className="h-4 w-full animate-pulse rounded bg-slate-200/80" />
+            <div className="h-4 w-[85%] animate-pulse rounded bg-slate-200/70" />
+            <div className="h-3 w-32 animate-pulse rounded bg-slate-100" />
+            <div className="flex items-center justify-between pt-2">
+              <div className="h-5 w-20 animate-pulse rounded bg-slate-200/80" />
+              <div className="h-8 w-24 animate-pulse rounded-lg bg-slate-200/80" />
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
   );
 }
 

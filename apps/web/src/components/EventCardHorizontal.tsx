@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Clock, MapPin, Star, Ticket, Users } from 'lucide-react';
+import { Clock, MapPin, Ticket, Users } from 'lucide-react';
 
 import { EventFavoriteButton } from '@/components/EventFavoriteButton.client';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
@@ -10,12 +10,12 @@ import { collectCatalogLabels, extractDurationLabel } from '@/lib/catalog-labels
 import { EventImageBadges } from '@/lib/event-card-badges';
 import {
   collectAllDisplaySlotLabels,
+  formatCoverDateBadge,
   formatEventNextSession,
   formatListDescription,
   getDepartingSoonMinutes,
   isOpenDate,
   MIN_DISPLAY_PRICE_RUB,
-  resolvePseudoRating,
   WIDE_DISPLAY_SLOT_LIMIT,
 } from '@/lib/event-card-meta';
 import { resolveEventCardObjectPosition } from '@/lib/event-image-focus';
@@ -52,7 +52,6 @@ export function EventCardHorizontal({ session }: { session: PublicCatalogListIte
   const wideSlotMore = Math.max(0, displaySlotLabels.length - WIDE_DISPLAY_SLOT_LIMIT);
   const sessionMetaLabel = openDate ? null : nextSessionLabel;
   const descriptionText = formatListDescription(session.description);
-  const pseudoRating = resolvePseudoRating(session.groupKey || session.id);
   const destinationLabel = resolveEventCardDestinationLabel(session);
   const locationLabel = resolveEventCardLocationLabel(session);
   const pinLines = resolveEventCardPinLines(session);
@@ -60,6 +59,7 @@ export function EventCardHorizontal({ session }: { session: PublicCatalogListIte
   const durationLabel = extractDurationLabel(session.tags);
   const ageLabel = session.ageLimit?.trim() || null;
   const priceFooterLabel = hasPrice ? formatPriceFrom(session.priceFrom) : null;
+  const coverDateBadge = formatCoverDateBadge(session);
   const venueHref = sessionVenueHref(session);
 
   return (
@@ -100,15 +100,16 @@ export function EventCardHorizontal({ session }: { session: PublicCatalogListIte
           }
         />
         <EventImageBadges event={session} rail recommendVariant="compact" />
+        {coverDateBadge ? (
+          <span className="absolute bottom-2 left-2 z-[2] rounded-lg bg-slate-950/80 px-2 py-1 text-[11px] font-semibold tracking-wide text-white backdrop-blur-sm sm:text-xs">
+            {coverDateBadge}
+          </span>
+        ) : null}
         <EventFavoriteButton eventId={session.id} className="right-2 top-2 sm:right-3 sm:top-3" />
       </div>
 
       <div className="flex flex-1 flex-col gap-3 p-4 sm:p-5 sm:pl-6">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-          <span className="event-card-meta">
-            <Star className="event-card-meta-icon" />
-            <span className="font-medium text-graphite">{pseudoRating.toFixed(1)}</span>
-          </span>
           {durationLabel ? (
             <span className="event-card-meta">
               <Clock className="event-card-meta-icon" />

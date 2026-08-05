@@ -193,7 +193,7 @@ html[data-nav-pending='1'] {
   }
 
   .catalog-toolbar {
-    @apply border-b border-slate-200/60 bg-white;
+    @apply border-b border-slate-200/60 bg-white/90 backdrop-blur-md supports-[backdrop-filter]:bg-white/80;
   }
 
   .catalog-chip {
@@ -205,7 +205,19 @@ html[data-nav-pending='1'] {
   }
 
   .catalog-chip-on {
-    @apply bg-graphite text-white hover:bg-graphite hover:text-white;
+    @apply bg-primary-600 text-white hover:bg-primary-700 hover:text-white;
+  }
+
+  .catalog-quick-chip {
+    @apply inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 sm:min-h-8 sm:text-sm;
+  }
+
+  .catalog-quick-chip-idle {
+    @apply bg-white text-graphite-muted ring-1 ring-slate-200/80 hover:bg-surface-muted hover:text-graphite;
+  }
+
+  .catalog-quick-chip-on {
+    @apply bg-primary-600 text-white ring-1 ring-primary-600 hover:bg-primary-700;
   }
 
   .horizontal-snap-row {

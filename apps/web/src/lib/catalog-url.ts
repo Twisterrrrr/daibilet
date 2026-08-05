@@ -131,8 +131,15 @@ export function clearCatalogFilterKey(
     delete next.from;
     delete next.to;
   }
-  if (key === 'minPrice') delete next.minPrice;
-  if (key === 'maxPrice') delete next.maxPrice;
+  if (key === 'minPrice') {
+    delete next.minPrice;
+    // Free preset is min=0 & max=0 - clear both together.
+    if (next.maxPrice === 0) delete next.maxPrice;
+  }
+  if (key === 'maxPrice') {
+    delete next.maxPrice;
+    if (next.minPrice === 0) delete next.minPrice;
+  }
   if (key === 'ageMax') delete next.ageMax;
   if (key === 'sort') next.sort = 'time';
   delete next.page;

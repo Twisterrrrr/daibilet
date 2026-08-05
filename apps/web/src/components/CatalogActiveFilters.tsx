@@ -49,8 +49,12 @@ export function CatalogActiveFilters({ values }: { values: CatalogFilterValues }
     if (values.maxPrice != null) chips.push({ key: 'maxPrice', label: `до ${values.maxPrice} ₽` });
   }
   if (values.ageMax != null && values.ageMax >= 0) {
+    const kidsLabel = values.ageMax === 12 ? 'С детьми' : null;
     const ageLabel = AGE_FILTER_OPTIONS.find((item) => item.value === values.ageMax)?.label;
-    chips.push({ key: 'ageMax', label: ageLabel ? `Возраст ${ageLabel}` : `до ${values.ageMax}+` });
+    chips.push({
+      key: 'ageMax',
+      label: kidsLabel || (ageLabel ? `Возраст ${ageLabel}` : `до ${values.ageMax}+`),
+    });
   }
 
   if (!chips.length) return null;
