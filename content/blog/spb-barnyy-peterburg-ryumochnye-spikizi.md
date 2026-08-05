@@ -14,7 +14,7 @@ date: "5 авг 2026"
 readMin: 8
 imageAlt: "Компания друзей за столиком в баре Петербурга вечером"
 coverImageUrl: "/images/blog/spb-barnyy-peterburg-ryumochnye-spikizi.jpg"
-publishedAt: "2026-08-05T11:10:00+03:00"
+publishedAt: "2026-08-05T06:30:00+03:00"
 status: PUBLISHED
 ---
 
