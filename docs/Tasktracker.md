@@ -19,6 +19,7 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
+| FIX.LOC-EDITORIAL-IMG | `/locations` city refetch без `toVenueCatalogCard` → editorial covers не на карточках; soft-nav PDP тоже | Высокий | ✅ overlay на client fetch; map scope = NN + SPB top-12 (не mass Top-100) |
 | MS.KGD-CITY-CATALOG | KGD city mustSee (не только owner 11): seed 24 catalog places + cityInfo slugs; биржа hub-only | Критический | ✅ `22f6f4f`+`7b18498`; MSK insert 22/update 2 + repair sobor/ostrov/monuments; live location ~23→25+, institution ~24 |
 | MS.KGD-GASTRO-LOC | Owner override: 5 KGD gastro → `/locations` (ATTRACTION, не CLUB_BAR) + locationSlug wiring | Высокий | ✅ `d4e99de`; MSK insert 5; location 25→30; 5/5 PDP `/locations/*` 200; deploy HEAD `2f2e24de` |
 | FIX.CITY-ALIAS | Legacy `/cities/sankt-peterburg` → permanent redirect на canonical `/cities/saint-petersburg`, чтобы не вызывать city DTO с неканоническим slug | Критический | ✅ `c5f1869`, MSK BUILD_ID=`IQlhDY1eF5GvuOGLXURHb`; direct и public smoke: 308 → canonical, 200 |
@@ -30,7 +31,7 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| BLOG.TOP100-PLACE-IMGS | Top-100 Parts 1-5: компактный float `[image]` на каждую точку 1-75 + те же JPG в venues для my-day/каталога | Высокий | ⚠️ rolled back place-фото; noindex Parts 1-5 (`isIndexable:false`) |
+| BLOG.TOP100-PLACE-IMGS | Top-100 Parts 1-5: компактный float `[image]` на каждую точку 1-75 + те же JPG в venues для my-day/каталога | Высокий | ⚠️ place-AI rolled back; ✅ noindex live `c153eff` BUILD_ID=`J9XJVsVPehERFhNoMUy5v` |
 | BLOG.HERO-SERIES-BR | Hero H1: перенос после точки перед «Часть N» для Top-100 / Beyond-Top-100 | Высокий | ✅ `07c4fc7`, MSK BUILD_ID=`tU2lr7PmZB4kN1JCHGX_V` |
 | BLOG.RESTORE-SPB-BARS | Вернуть owner-текст статьи «Барный Петербург» без SEO-переписывания, проверить реальные адреса, venue links, изображения и production Article | Критический | 🔄 локальный текст восстановлен, ожидаются sync, upsert и MSK deploy |
 
@@ -216,6 +217,7 @@
 | UX.MS2b | Hub must-see mobile: fix 85/15 peek (`w-max` ломал % → `contents`+`flex-[0_0_85%]` + line-clamp) | Критический | ✅ `3a9bae6` MSK **BUILD_ID=`enL85fpbBPEAS0-dH3Aa-`** nn 200 |
 | UX.MS2c | Hub must-see mobile: peek ~80% + ExpandableBlurb; presets blog link new line + breathing room | Высокий | ✅ `4ea04c4` → expand removed in UX.HUB-BLURB |
 | UX.HUB-BLURB | City hub: capitalize must-see/suburb blurbs + drop mobile ExpandableBlurb; seed lowercase `desc` fix | Высокий | ✅ `8e29027` MSK **BUILD_ID=`5rOJ9dbBh58TQKyE5YGPr`** kaliningrad/nn 200 |
+| UX.HUB-BLURB2 | SPB hub: preferEditorial over Venue crumbs/truncation; capitalize suburb nested; strip crumb tails | Высокий | ✅ commit+push (no deploy) 2026-08-05 |
 | UX.MS3 | «Главные места» md+: page prev/next вместо scrollbar UX; mobile swipe as-is | Высокий | ✅ `5ffbfded` MSK **BUILD_ID=`blIpyGTrMYrwYoh4jkBws`** moscow/nn smoke 200 |
 
 ---
