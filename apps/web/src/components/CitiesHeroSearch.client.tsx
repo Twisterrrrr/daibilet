@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { Search } from 'lucide-react';
 
+import { LuckyCityButton } from '@/components/LuckyCityButton.client';
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
 import { pluralEvents } from '@/lib/format';
 import { cityHref } from '@/lib/routes';
@@ -60,7 +61,8 @@ export function CitiesHeroSearch({ destinations }: { destinations: PublicDestina
         </ul>
       ) : null}
 
-      <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="Быстрый переход">
+      <div className="mt-3 flex flex-wrap items-center gap-2" role="group" aria-label="Быстрый переход">
+        <LuckyCityButton cities={destinations} variant="hero" />
         <a
           href="#cities-all"
           className="rounded-full bg-slate-900 px-3.5 py-1.5 text-xs font-semibold text-white"

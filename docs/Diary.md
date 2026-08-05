@@ -1,3 +1,23 @@
+## 2026-08-05 - `/cities` hub: из справочника в увлекательный хаб
+
+### Наблюдения
+- Owner: `/cities` выглядел как телефонный справочник - длинные text-heavy карточки, без вайба и без play.
+- Нужен shippable срез: сетка, vibe-теги, CountUp, random city, лёгкая карта без тяжёлых deps.
+
+### Решения
+- Route: `apps/web/app/cities/page.tsx` + `CitiesCatalogView` / `CityCard` / `CitiesHeroSearch` / `RussiaMap`.
+- Компактная сетка 2→4 колонок; descriptions убраны с листинга; hover lift + primary-blue shadow (не orange/purple).
+- Статический `city-vibe-tags.ts` (emoji + label, дефис); hubTags chips остаются.
+- `CountUp`: IntersectionObserver + rAF 0→N.
+- `LuckyCityButton`: roulette имён + модалка «Как насчет {город}?» + CTA хаб/афиша.
+- `RussiaMap`: simplified SVG pin-board с tooltip «Город: N событий» (без topoJSON).
+- Deploy не делали (канон batch / по запросу).
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-05 - Hub suburbs: bulk «В маршрут» у вектора
 
 ### Наблюдения

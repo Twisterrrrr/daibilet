@@ -4,9 +4,9 @@ import { useMemo, useState } from 'react';
 import { ArrowDownAZ, ArrowUpAZ, Hash } from 'lucide-react';
 
 import { CityCard } from '@/components/CityCard';
+import { LuckyCityButton } from '@/components/LuckyCityButton.client';
 import { RegionDestinationLink } from '@/components/RegionDestinationLink';
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
-import { resolveCityBrief } from '@/lib/cityInfo';
 import { filterOrphanRegions, resolveCityRegion } from '@/lib/cityRegionHub';
 import { pluralCities } from '@/lib/format';
 
@@ -36,6 +36,11 @@ export function CitiesCatalogView({
     });
   }, [destinations, query, sortMode]);
 
+  const allCities = useMemo(
+    () => destinations.filter((item) => item.type === 'city'),
+    [destinations],
+  );
+
   const regions = useMemo(() => {
     const normalized = query.trim().toLowerCase();
     const filtered = destinations
@@ -56,22 +61,24 @@ export function CitiesCatalogView({
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="min-w-0 flex-1">
           {hideIntro ? (
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center justify-between gap-3">
               <h2 className="font-display text-xl font-bold text-slate-900 sm:text-2xl">
                 Все города
                 {cities.length > 0 ? (
                   <span className="ml-2 text-base font-medium text-slate-500">({pluralCities(cities.length)})</span>
                 ) : null}
               </h2>
-              <div className="shrink-0 sm:hidden">
+              <div className="flex shrink-0 items-center gap-2 sm:hidden">
+                <LuckyCityButton cities={allCities} variant="toolbar" />
                 <CitiesSortControls sortMode={sortMode} onSortModeChange={setSortMode} compact />
               </div>
             </div>
           ) : (
             <>
-              <div className="flex items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center justify-between gap-3">
                 <h1 className="font-display text-3xl font-bold text-slate-900">Города</h1>
-                <div className="shrink-0 sm:hidden">
+                <div className="flex shrink-0 items-center gap-2 sm:hidden">
+                  <LuckyCityButton cities={allCities} variant="toolbar" />
                   <CitiesSortControls sortMode={sortMode} onSortModeChange={setSortMode} compact />
                 </div>
               </div>
@@ -91,6 +98,7 @@ export function CitiesCatalogView({
             className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm sm:w-56"
           />
           <div className="hidden shrink-0 sm:flex sm:items-center sm:gap-2">
+            <LuckyCityButton cities={allCities} variant="toolbar" />
             <span className="text-sm text-slate-500">Сортировка:</span>
             <CitiesSortControls sortMode={sortMode} onSortModeChange={setSortMode} />
           </div>
@@ -105,13 +113,12 @@ export function CitiesCatalogView({
       ) : null}
 
       {cities.length > 0 ? (
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-4">
           {cities.map((city) => (
             <CityCard
               key={`${city.type}:${city.id || city.slug || city.name}`}
               city={city}
-              large
-              description={resolveCityBrief(city.slug, city.sourceSlug, city.name)}
+              compact
               region={resolveCityRegion(city, destinations)}
             />
           ))}
@@ -123,7 +130,7 @@ export function CitiesCatalogView({
           <div className="mb-5">
             <h2 className="font-display text-xl font-bold text-slate-900 sm:text-2xl">Области и направления</h2>
             <p className="mt-1 text-sm text-slate-500">
-              События в городах без отдельной карточки — курорты, пригороды и малые населённые пункты
+              События в городах без отдельной карточки - курорты, пригороды и малые населённые пункты
             </p>
           </div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -167,7 +174,7 @@ function CitiesSortControls({
         className={`inline-flex items-center gap-1.5 rounded-md ${buttonClass} text-sm font-medium transition-colors ${
           sortMode === 'asc' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-50'
         }`}
-        title="По алфавиту А–Я"
+        title="По алфавиту А-Я"
       >
         <ArrowDownAZ className="h-4 w-4" />
         <span className="sr-only">А–Я</span>
@@ -178,7 +185,7 @@ function CitiesSortControls({
         className={`inline-flex items-center gap-1.5 rounded-md ${buttonClass} text-sm font-medium transition-colors ${
           sortMode === 'desc' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-50'
         }`}
-        title="По алфавиту Я–А"
+        title="По алфавиту Я-А"
       >
         <ArrowUpAZ className="h-4 w-4" />
         <span className="sr-only">Я–А</span>

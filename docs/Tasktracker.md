@@ -67,7 +67,7 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| PH2.CITY1 | `/cities` hub carousel / tile IA polish (UX.CITY-HUB) | Средний | ⚠️ next phase |
+| PH2.CITY1 | `/cities` hub: compact grid, vibe tags, CountUp, LuckyCity, pin-board map (UX.CITY-HUB) | Средний | ✅ code ship; deploy пачкой / по запросу |
 | PH2.CITY2 | Capitals must-see wide pack (MSK/SPB) после owner list (MS.TIER3/4) | Высокий | ⏳ owner list |
 | PH2.VEN1 | Venue PDP monetization: clearer ticket path, related events density | Средний | ⚠️ next phase (UX.VENUE-MON) |
 | PH2.LOC1 | `/locations` IA rebuild: primary job + demote from nav или city-hub section (UX.LOC8) | Высокий | ⏳ |
@@ -91,7 +91,7 @@
 | UX.CAT-A2 | Hide page-size; «Показать ещё» | Средний | ✅ shipped earlier; infinite scroll = backlog |
 | UX.CAT-A3 | Empty state Popular recommend block | Средний | ⚠️ backlog |
 | UX.EVT-B3 | Full tabs Программа if structured data | Низкий | ⚠️ backlog |
-| UX.CITY-HUB | Cities hub carousel redesign | Средний | ⚠️ backlog |
+| UX.CITY-HUB | `/cities`: compact 2-4 col cards, vibe tags, CountUp, «Куда поехать?», SVG pin-board | Средний | ✅ code; deploy n/a |
 | UX.VENUE-MON | Venue/location monetization UX | Средний | ⚠️ backlog |
 | UX.EVT-SEAT | Venue seatmap / taxi deep-link | Низкий | ⚠️ backlog |
 

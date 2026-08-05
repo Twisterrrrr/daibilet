@@ -61,12 +61,12 @@ export default async function CitiesIndexPage() {
             <ul className="grid h-full grid-cols-2 content-start gap-2.5 sm:grid-cols-3">
               {topCities.map((city) => (
                 <li key={city.slug || city.name} className="min-w-0">
-                  <CityCard city={city} imageVariant="top" />
+                  <CityCard city={city} imageVariant="top" compact />
                 </li>
               ))}
             </ul>
           ) : null}
-          <RussiaMap className="h-full min-h-[14rem] self-stretch" />
+          <RussiaMap className="h-full min-h-[14rem] self-stretch" destinations={cities} />
         </div>
       </HeroLayout>
       <div id="cities-all" className="container-page scroll-mt-24 bg-slate-50 py-10">
