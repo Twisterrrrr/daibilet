@@ -47,6 +47,7 @@ import {
   type DayRouteSearchOption,
 } from '@/components/DayRouteSearchSelect.client';
 import { MobileStickyActionBar } from '@/components/MobileStickyActionBar';
+import { SuburbsCarousel } from '@/components/SuburbsCarousel.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from '@/lib/catalog-url';
 import { resolveCityInfo } from '@/lib/cityInfo';
@@ -970,6 +971,11 @@ function DayRoutePanelInner() {
   const mustSeePlaces = useMemo(() => {
     const info = resolveCityInfo(pageCitySlug, selectedCity?.selectedDestination?.sourceSlug);
     return info?.mustSee || [];
+  }, [pageCitySlug, selectedCity?.selectedDestination?.sourceSlug]);
+
+  const significantSuburbs = useMemo(() => {
+    const info = resolveCityInfo(pageCitySlug, selectedCity?.selectedDestination?.sourceSlug);
+    return info?.significantSuburbs?.length ? info.significantSuburbs : [];
   }, [pageCitySlug, selectedCity?.selectedDestination?.sourceSlug]);
 
   const dayRoutePresets = useMemo(() => {
@@ -3823,6 +3829,16 @@ function DayRoutePanelInner() {
           namedPresets={dayRoutePresets}
           navigateToMyDay={false}
           inMyDay
+        />
+      ) : null}
+
+      {hasPageCity && significantSuburbs.length ? (
+        <SuburbsCarousel
+          places={significantSuburbs}
+          venues={matchSources}
+          city={dayPresetCityCtx}
+          cityGenitive={cityToGenitive(pageCityName)}
+          className="mt-5"
         />
       ) : null}
 
