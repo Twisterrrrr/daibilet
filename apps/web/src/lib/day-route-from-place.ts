@@ -116,6 +116,9 @@ function findVenueForPlace(
   if (slug) {
     const bySlug = venues.find((venue) => String(venue.slug || '').trim() === slug);
     if (bySlug) return bySlug;
+    // Explicit editorial slug missing from hub: never glue a different venue by loose name
+    // (mosque «Санкт-Петербургская…» previously matched «МТС Live Холл Санкт-Петербург»).
+    return null;
   }
   const placeName = String(place.name || '').trim();
   if (!placeName || !venues.length) return null;

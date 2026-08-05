@@ -255,6 +255,34 @@ test('dayRouteItemFromMustSee returns null without slug or match', () => {
   );
 });
 
+test('dayRouteItemFromMustSee does not glue SPB mosque to MTS Live Hall', () => {
+  const mts = {
+    id: 'venue_mts',
+    slug: 'mts-live-holl-sankt-peterburg',
+    name: 'МТС Live Холл Санкт-Петербург',
+    title: 'МТС Live Холл Санкт-Петербург',
+    shortDescription:
+      'Высокотехнологичный многоуровневый концертный комплекс в историческом районе Петербурга.',
+    heroImageUrl: 'https://example.com/ded-moroz.jpg',
+  };
+  const item = dayRouteItemFromMustSee(
+    {
+      name: 'Санкт-Петербургская соборная мечеть',
+      desc: 'Монументальное здание с лазурным майоликовым куполом.',
+      locationSlug: 'saint-petersburg-sobornaya-mechet',
+    },
+    [...venues, mts],
+    city,
+  );
+  assert.ok(item);
+  assert.equal(item!.id, 'saint-petersburg-sobornaya-mechet');
+  assert.equal(item!.slug, 'saint-petersburg-sobornaya-mechet');
+  assert.notEqual(item!.imageUrl, mts.heroImageUrl);
+  assert.equal(item!.imageUrl, '/images/venues/saint-petersburg/sobornaya-mechet.jpg');
+  assert.equal(item!.latitude, 59.9552);
+  assert.equal(item!.longitude, 30.3239);
+});
+
 test('buildCityDayRoutePreset takes all resolvable must-see up to soft guideline', () => {
   const places = [
     { name: 'Эрмитаж', desc: '', venueSlug: 'ermitazh' },

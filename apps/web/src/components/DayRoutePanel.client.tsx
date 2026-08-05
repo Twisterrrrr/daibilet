@@ -3397,7 +3397,9 @@ function DayRoutePanelInner() {
                             )}
                           </div>
                           <span className="min-w-0 flex-1 py-0.5">
-                            <span className="block truncate text-sm font-semibold leading-snug">{place.name}</span>
+                            <span className="block line-clamp-2 text-sm font-semibold leading-snug">
+                              {place.name}
+                            </span>
                             {hook ? (
                               <span className="mt-0.5 block line-clamp-2 text-[11px] leading-snug text-slate-500">
                                 {hook}

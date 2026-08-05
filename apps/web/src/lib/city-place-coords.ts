@@ -58,8 +58,13 @@ const NIZHNY_NOVGOROD_COORDS: Record<string, EditorialPlaceCoords> = {
   'nizhny-novgorod-fonoteca-bar': { latitude: 56.319874, longitude: 43.996841 },
 };
 
+const SAINT_PETERSBURG_COORDS: Record<string, EditorialPlaceCoords> = {
+  'saint-petersburg-sobornaya-mechet': { latitude: 59.9552, longitude: 30.3239 },
+};
+
 const EDITORIAL_COORDS_BY_SLUG: Record<string, EditorialPlaceCoords> = {
   ...NIZHNY_NOVGOROD_COORDS,
+  ...SAINT_PETERSBURG_COORDS,
 };
 
 export function lookupEditorialPlaceCoords(

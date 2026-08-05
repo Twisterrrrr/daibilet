@@ -1,7 +1,10 @@
 /**
- * Editorial hero covers for /my-day Hot Picks when catalog hub omits heroImageUrl.
+ * Editorial hero covers for /my-day Hot Picks, location/venue catalog cards & PDP
+ * when hub omits heroImageUrl or only has a dark /venues/generated stub.
+ * Same files feed Top-100 blog inlines (copied under /images/blog/spb-top-100-p*.jpg);
+ * catalog/my-day use /images/venues/{city}/*.jpg and object-cover for aspect.
  * Nizhny pack: /images/venues/nizhny-novgorod/*.jpg
- * SPB pack: /images/venues/saint-petersburg/*.jpg (Главные 1-12 + tips carousel)
+ * SPB pack: /images/venues/saint-petersburg/*.jpg (Top-100 + Главные)
  */
 
 const NIZHNY_NOVGOROD_IMAGES: Record<string, string> = {
@@ -71,6 +74,42 @@ const SAINT_PETERSBURG_IMAGES: Record<string, string> = {
   'saint-petersburg-mihaylovskiy-zamok':
     '/images/venues/saint-petersburg/mihaylovskiy-zamok.jpg',
   'saint-petersburg-anichkov-most': '/images/venues/saint-petersburg/anichkov-most.jpg',
+  // Top-100 linked places beyond Главные 1-12 (blog + catalog + my-day)
+  'saint-petersburg-russkiy-muzey': '/images/venues/saint-petersburg/russkiy-muzey.jpg',
+  'saint-petersburg-glavnyy-shtab-ermitazh':
+    '/images/venues/saint-petersburg/glavnyy-shtab-ermitazh.jpg',
+  'saint-petersburg-muzey-faberzhe': '/images/venues/saint-petersburg/muzey-faberzhe.jpg',
+  'saint-petersburg-kunstkamera': '/images/venues/saint-petersburg/kunstkamera.jpg',
+  'saint-petersburg-tsentralnyy-voenno-morskoy-muzey':
+    '/images/venues/saint-petersburg/tsentralnyy-voenno-morskoy-muzey.jpg',
+  erarta: '/images/venues/saint-petersburg/erarta.jpg',
+  'saint-petersburg-muzey-anny-ahmatovoy-v-fontannom-dome':
+    '/images/venues/saint-petersburg/muzey-anny-ahmatovoy.jpg',
+  'saint-petersburg-muzey-politicheskoy-istorii-osobnyak-kshesinskoy':
+    '/images/venues/saint-petersburg/muzey-politicheskoy-istorii.jpg',
+  'saint-petersburg-dohodnyy-dom-baka':
+    '/images/venues/saint-petersburg/dohodnyy-dom-baka.jpg',
+  'saint-petersburg-tolstovskiy-dom': '/images/venues/saint-petersburg/tolstovskiy-dom.jpg',
+  'saint-petersburg-rotonda-na-gorohovoy':
+    '/images/venues/saint-petersburg/rotonda-na-gorohovoy.jpg',
+  'saint-petersburg-mozaichnyy-dvorik':
+    '/images/venues/saint-petersburg/mozaichnyy-dvorik.jpg',
+  'saint-petersburg-dohodnyy-dom-muruzi':
+    '/images/venues/saint-petersburg/dohodnyy-dom-muruzi.jpg',
+  'saint-petersburg-novaya-gollandiya':
+    '/images/venues/saint-petersburg/novaya-gollandiya.jpg',
+  'saint-petersburg-bertgold-tsentr':
+    '/images/venues/saint-petersburg/bertgold-tsentr.jpg',
+  'saint-petersburg-loft-proekt-etazhi':
+    '/images/venues/saint-petersburg/loft-proekt-etazhi.jpg',
+  'saint-petersburg-ulitsa-rubinshteyna':
+    '/images/venues/saint-petersburg/ulitsa-rubinshteyna.jpg',
+  'saint-petersburg-pyshechnaya-na-bolshoy-konyushennoy':
+    '/images/venues/saint-petersburg/pyshechnaya-na-bolshoy-konyushennoy.jpg',
+  'saint-petersburg-spikizi-bar-el-copitas':
+    '/images/venues/saint-petersburg/spikizi-bar-el-copitas.jpg',
+  'saint-petersburg-sobornaya-mechet':
+    '/images/venues/saint-petersburg/sobornaya-mechet.jpg',
 };
 
 const EDITORIAL_IMAGES_BY_SLUG: Record<string, string> = {
@@ -86,4 +125,28 @@ export function lookupEditorialPlaceImage(
     .toLowerCase();
   if (!key) return null;
   return EDITORIAL_IMAGES_BY_SLUG[key] || null;
+}
+
+/** True for dark auto stubs that should lose to editorial covers. */
+export function isGeneratedVenueStub(url: string | null | undefined): boolean {
+  const value = String(url || '')
+    .trim()
+    .toLowerCase();
+  if (!value) return true;
+  return value.includes('/venues/generated/') || value.includes('venue-auto-stub');
+}
+
+/**
+ * Prefer curated editorial cover for catalog cards / PDP / my-day.
+ * Hub photo wins only when no editorial map entry and hub is a real image.
+ */
+export function resolveVenueHeroImage(
+  slug: string | null | undefined,
+  hubImageUrl?: string | null,
+): string | null {
+  const editorial = lookupEditorialPlaceImage(slug);
+  if (editorial) return editorial;
+  const hub = String(hubImageUrl || '').trim() || null;
+  if (!hub || isGeneratedVenueStub(hub)) return null;
+  return hub;
 }

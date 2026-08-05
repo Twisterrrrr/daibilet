@@ -1,3 +1,18 @@
+## 2026-08-05 - My Day: мечеть ← МТС Live Hall (ложный name-match)
+
+### Наблюдения
+- Карточка «Санкт-Петербургская соборная мечеть» в must-see /my-day показывала Ded Moroz + текст «Высокотехнологичный многоуровневый концертный комплекс…» и truncate заголовка.
+- Root: `namesLooselyMatch` склеивал мечеть с venue `mts-live-holl-sankt-peterburg` по гео-токенам «санкт»+«петербург»; hook брал `shortDescription`/`heroImageUrl` чужой площадки. У мечети не было `locationSlug`.
+
+### Решения
+- Гео-шум в `namesLooselyMatch`; при явном slug без hub-hit - без name-fallback; `locationSlug` + editorial cover/coords; title `line-clamp-2`; seed-запись в `must-see-editorial.json`.
+- Commit+push; live web deploy + MSK seed editorial venue ещё нужны для PDP `/locations/...`.
+
+### Проблемы
+- В live DB сущности мечети нет (`/locations/saint-petersburg-sobornaya-mechet` = «не найдена») - после web deploy карточка My Day чинится из editorial; полноценная PDP - после seed.
+
+---
+
 ## 2026-08-05 - My Day stop rail: buy CTA / match title wrap
 
 ### Наблюдения

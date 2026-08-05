@@ -83,4 +83,21 @@ describe('namesLooselyMatch', () => {
   it('rejects short noisy tokens', () => {
     assert.equal(namesLooselyMatch('парк', 'Парк Горького'), false);
   });
+
+  it('rejects city-name glue between mosque and MTS Live Hall', () => {
+    assert.equal(
+      namesLooselyMatch(
+        'Санкт-Петербургская соборная мечеть',
+        'МТС Live Холл Санкт-Петербург',
+      ),
+      false,
+    );
+  });
+
+  it('still matches short mosque name to full official title', () => {
+    assert.equal(
+      namesLooselyMatch('соборная мечеть', 'Санкт-Петербургская соборная мечеть'),
+      true,
+    );
+  });
 });
