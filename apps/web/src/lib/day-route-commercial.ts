@@ -298,17 +298,35 @@ export function matchIsSingleVenueAdmission(match: DayRouteMatchOfferStub): bool
   return true;
 }
 
-/** Primary buy CTA on ticketed stop card: «Купить билет от X» when real price known. */
+export type DayRouteBuyCtaParts = {
+  /** Main action line, e.g. «Купить билет» - never includes price. */
+  action: string;
+  /** «от N ₽» or null; keep on one line in UI (whitespace-nowrap). */
+  price: string | null;
+};
+
+/**
+ * Structured buy CTA for stop right-rail layout:
+ * [icon] + action / price as separate lines - icon must not sit between Russian words.
+ */
+export function formatDayRouteBuyCtaParts(
+  venue: Pick<DayRouteVenueItem, 'priceFromRub' | 'sessionLabel'>,
+): DayRouteBuyCtaParts {
+  const price = priceSuffixLabel(venue.priceFromRub) || null;
+  if (price) return { action: 'Купить билет', price };
+  const soft = String(venue.sessionLabel || '').trim();
+  if (soft && !/вечерн/i.test(soft) && !/^билет/i.test(soft) && !isSoftDaypart(soft)) {
+    return { action: 'Купить билет на это же время', price: null };
+  }
+  return { action: 'Купить билет', price: null };
+}
+
+/** Primary buy CTA label (aria / flat string): «Купить билет от X» when real price known. */
 export function formatDayRouteBuyCtaLabel(
   venue: Pick<DayRouteVenueItem, 'priceFromRub' | 'sessionLabel'>,
 ): string {
-  const price = priceSuffixLabel(venue.priceFromRub);
-  if (price) return `Купить билет ${price}`;
-  const soft = String(venue.sessionLabel || '').trim();
-  if (soft && !/вечерн/i.test(soft) && !/^билет/i.test(soft) && !isSoftDaypart(soft)) {
-    return 'Купить билет на это же время';
-  }
-  return 'Купить билет';
+  const { action, price } = formatDayRouteBuyCtaParts(venue);
+  return price ? `${action} ${price}` : action;
 }
 
 function isSoftDaypart(label: string): boolean {

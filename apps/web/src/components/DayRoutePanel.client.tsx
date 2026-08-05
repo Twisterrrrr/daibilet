@@ -133,6 +133,7 @@ import {
   dayRouteStopTicketQrData,
   findDayRouteFreeWindowGaps,
   formatDayRouteBuyCtaLabel,
+  formatDayRouteBuyCtaParts,
   pickNearbyUpsellsForStop,
   type DayRouteMatchOfferStub,
 } from '@/lib/day-route-commercial';
@@ -4335,6 +4336,7 @@ function DayRouteVenueCard({
   const chip = classifyDayRouteCommercialChip(venue);
   const showStatusChip = chip.kind !== 'free';
   const buyCtaLabel = formatDayRouteBuyCtaLabel(venue);
+  const buyCtaParts = formatDayRouteBuyCtaParts(venue);
   const addressLine =
     formatStreetAddress(venue.address, { city: venue.city }) || String(venue.address || '').trim() || '';
   const titleNorm = venue.title.toLowerCase().replace(/\s+/g, ' ');
@@ -4422,7 +4424,7 @@ function DayRouteVenueCard({
   const commerceRail =
     ticketUrl || nearbyUpsells.length > 0 ? (
       <div
-        className="flex min-w-0 flex-col gap-0.5 sm:max-w-[min(18rem,42%)] sm:items-end sm:text-right"
+        className="flex w-full min-w-0 flex-col gap-0.5 sm:w-[11.5rem] sm:shrink-0 sm:items-end sm:text-right"
         data-day-stop-commerce
       >
         {ticketUrl ? (
@@ -4431,30 +4433,49 @@ function DayRouteVenueCard({
             target="_blank"
             rel="noopener noreferrer"
             data-day-buy-ticket
+            aria-label={buyCtaLabel}
             onClick={() => onBuyClick(ticketUrl)}
-            className="inline-flex items-center gap-1 text-[12px] font-semibold text-amber-700 underline-offset-2 hover:underline sm:justify-end"
+            className="inline-flex max-w-full items-start gap-1.5 text-[12px] font-semibold text-amber-700 underline-offset-2 hover:underline"
           >
-            <Ticket className="h-3.5 w-3.5 shrink-0" aria-hidden />
-            {buyCtaLabel}
+            <Ticket className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
+            <span className="flex min-w-0 flex-col leading-snug sm:items-end">
+              <span>{buyCtaParts.action}</span>
+              {buyCtaParts.price ? (
+                <span className="whitespace-nowrap tabular-nums">{buyCtaParts.price}</span>
+              ) : null}
+            </span>
           </a>
         ) : null}
         {!ticketUrl
-          ? nearbyUpsells.map((u) => (
-              <a
-                key={u.eventId}
-                href={u.ticketUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                data-day-stop-event-pick={u.eventId}
-                onClick={() => onBuyClick(u.ticketUrl)}
-                className="line-clamp-2 text-[11px] font-medium text-primary-700 underline-offset-2 hover:underline sm:text-right"
-                title={u.line}
-              >
-                {u.priceFromRub != null
-                  ? `${u.line.replace(/^Рядом:\s*/i, '')}`
-                  : u.title}
-              </a>
-            ))
+          ? nearbyUpsells.map((u) => {
+              const pickTitle = String(u.title || '')
+                .trim()
+                .replace(/^Рядом:\s*/i, '');
+              const pickPrice =
+                u.priceFromRub != null ? formatPriceFrom(u.priceFromRub) : null;
+              const pickPriceOk = pickPrice && pickPrice !== 'Цена уточняется' ? pickPrice : null;
+              return (
+                <a
+                  key={u.eventId}
+                  href={u.ticketUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-day-stop-event-pick={u.eventId}
+                  onClick={() => onBuyClick(u.ticketUrl)}
+                  className="flex w-full min-w-0 flex-col gap-0.5 text-[11px] font-medium text-primary-700 underline-offset-2 hover:underline sm:items-end sm:text-right"
+                  title={u.line}
+                >
+                  <span className="line-clamp-2 w-full min-w-0 overflow-hidden break-words leading-snug">
+                    {pickTitle || u.line.replace(/^Рядом:\s*/i, '')}
+                  </span>
+                  {pickPriceOk ? (
+                    <span className="whitespace-nowrap tabular-nums text-amber-700">
+                      {pickPriceOk}
+                    </span>
+                  ) : null}
+                </a>
+              );
+            })
           : null}
         {ticketUrl && sessionDisplay ? (
           <span className="text-[10px] text-slate-500">{sessionDisplay}</span>
@@ -4597,7 +4618,9 @@ function DayRouteVenueCard({
               </div>
             ) : null}
           </div>
-          {commerceRail ? <div className="hidden sm:block">{commerceRail}</div> : null}
+          {commerceRail ? (
+            <div className="hidden sm:block sm:shrink-0">{commerceRail}</div>
+          ) : null}
           {actionButtons}
         </div>
       </li>
@@ -4771,7 +4794,9 @@ function DayRouteVenueCard({
         </div>
 
         <div className="flex shrink-0 items-center gap-2" data-day-stop-top-right>
-          {commerceRail ? <div className="hidden sm:block">{commerceRail}</div> : null}
+          {commerceRail ? (
+            <div className="hidden sm:block sm:shrink-0">{commerceRail}</div>
+          ) : null}
           {mapsUrl ? (
             <a
               href={mapsUrl}

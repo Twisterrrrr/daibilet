@@ -1,4 +1,18 @@
-## 2026-08-05 - Location PDP «Рядом»: dedupe TC session twins
+## 2026-08-05 - My Day stop rail: buy CTA / match title wrap
+
+### Наблюдения
+- Owner: правый рельс списка остановок «Мой день» ломал CTA - иконка билета визуально между «билет» и «от», рубль «₽» уезжал на третью строку; длинные matched-title резались mid-word.
+- Root: `commerceRail` в `DayRoutePanel` - одна строка `Купить билет от N ₽` + icon в `inline-flex` при слишком узкой колонке (`min-w-0` / `max-w 42%` без стабильной ширины).
+
+### Решения
+- `formatDayRouteBuyCtaParts`: action / price раздельно; UI `[icon] Купить билет` + `от N ₽` с `whitespace-nowrap tabular-nums`.
+- Rail: `sm:w-[11.5rem] sm:shrink-0`; event pick - `line-clamp-2` + цена отдельной строкой.
+- Commit+push only; live нужен batch/«выкатывай».
+
+### Проблемы
+- Нет.
+
+---
 
 ### Наблюдения
 - Live `/locations/osobnyak-polovcova`: блок «Рядом» (geo 300м, без STOP) показывал 12 карточек - 5× «Queen в Особняке Половцова» (цены 1500/1750/3000) и 6× одинаковая «Обзорная… Исаакиевский собор» по 1200.
