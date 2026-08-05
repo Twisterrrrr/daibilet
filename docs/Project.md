@@ -1,9 +1,10 @@
 # Project — Daibilet (Next full-stack migration)
 
-**Обновлено:** 2026-08-04  
+**Обновлено:** 2026-08-05  
 **Ветка migration / prod:** `feat/next-monorepo`  
 **Prod catalog:** Next `apps/web` `:3001` + legacy API `:4000` на МСК `201.24.125.184`  
-**Web deploy canon:** **MSK-only** - build + swap/restart на `daibilet-msk` (`201.24.125.184`). SPB `.16` (Intelligent Hoopoe) **retired** из pipeline (owner удаляет VM в панели).
+**Web deploy canon:** **MSK-only** - build + swap/restart на `daibilet-msk` (`201.24.125.184`). SPB `.16` (Intelligent Hoopoe) **retired** из pipeline (owner удаляет VM в панели).  
+**Deploy cadence (owner 2026-08-05):** основная работа локально / preview; агенты делают **commit + push** после итерации; **web deploy на live - пачкой раз в сутки или по явному запросу owner** (не после каждого мелкого UI/контент-фикса). Исключения сразу: live 500, критичный хаб-редирект, security, launch-blocker без локальной проверки. Seed/apply в prod DB - по запросу или в том же batch. Docs-only = commit + push без deploy.
 
 ---
 
@@ -147,7 +148,7 @@ packages/config   — shared tsconfig/eslint
 | Diligent Polydeuces | `85.193.80.159` | **battle finance** - checkout, supplier LK, orders/purchases, YooKassa |
 | ~~Intelligent Hoopoe~~ | ~~`213.171.7.16`~~ | **retired** из deploy/build pipeline (owner: удалить VM в Timeweb). Не builder, не apex DNS |
 
-### Web deploy (канон 2026-08-01)
+### Web deploy (канон host 2026-08-01 · cadence 2026-08-05)
 
 ```bash
 # На MSK (ssh daibilet-msk / 201.24.125.184), в /opt/daibilet:
@@ -158,7 +159,7 @@ BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh
 - Event SSG: build-phase public-api retries + soft TimeoutError on `/events/[slug]` (не валит весь build). Override: `EVENT_SSG_TOP_N=100` или `0` (skip event SSG). Runtime: ISR `revalidate=7200` + `unstable_cache` (tags `event-page` / `event-page:{slug}`); on-demand via `POST /api/internal/revalidate` `{ slug }` + Bearer `DAIBILET_NEXT_REVALIDATE_SECRET`.
 - Destinations chrome (`getCachedDestinations`): TTL **86400** + tags `destinations` / `public-surfaces` (не капит event ISR). Bust: admin city update → `revalidateNextDestinations`, или вручную `POST /api/internal/revalidate` `{ "tags": ["destinations"] }`.
 - **Не** билдить на SPB `.16` и не тащить `.next` tar с другого хоста.
-- Docs-only / handoff = commit+push **без** web deploy; runtime/UI = commit+push+MSK deploy.
+- **Cadence:** основная работа локально / preview; после итерации - **commit + push**. Web deploy на live - **пачкой раз в сутки или по явному запросу owner** («выкатывай» / «деплой»). Не после каждого мелкого UI/контент-фикса (lock + 10–20 мин build на VPS). Исключения сразу: live 500, критичный хаб-редирект, security, launch-blocker без локальной проверки. Seed/apply prod DB - по запросу или в том же batch. Docs-only / handoff = commit+push **без** web deploy.
 - SSH: `daibilet-msk` / `daibilet_msk80_key`. Finance `.159` не трогать из catalog deploy.
 
 - Catalog ↔ finance: **только API / read projection**, без shared money/catalog DB и без ad-hoc writes finance→catalog.

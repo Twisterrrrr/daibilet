@@ -8,11 +8,16 @@
 - `docs/qa.md` - открытые вопросы архитектуры
 
 Правила:
-1. **Авто-commit + push + deploy после продуктовой итерации (owner 2026-07-31).** Ask-first commit отменён для UI/product итераций. Когда итерация дала рабочий локальный результат (фикс hero, матчинг статей, seed/link fixes, runtime/UI и т.п.) - агент **сам, без запросов к owner**:
+1. **Авто-commit + push после продуктовой итерации; web deploy - batch / по запросу (owner 2026-08-05).** Ask-first commit отменён для UI/product итераций. Когда итерация дала рабочий локальный результат (фикс hero, матчинг статей, seed/link fixes, runtime/UI и т.п.) - агент **сам, без запросов к owner**:
    - коммитит только релевантные изменения (не мусор `.deploy-tmp/`, `tmp-*`, одноразовые smoke-скрипты без нужды; не secrets / `.env`);
    - обычный `git push` на tracked branch (НЕ force-push);
-   - если итерация затрагивает live web/runtime - деплой web по канону: **MSK-only** (`daibilet-msk` / `201.24.125.184`): `BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh` (stop web → `pnpm web:build` → start web / atomic `.next` на том же хосте). **Не** использовать SPB `.16` как builder.
-   - **Канон docs vs runtime:** docs-only / handoff-правки = commit + push, **без** web deploy. Runtime/UI/seed/link/код, влияющий на live = commit + push + deploy.
+   - **основная работа и проверка - локально / preview.** Не гонять полный MSK build после каждого мелкого UI/контент-фикса: агенты бьются за deploy-lock, VPS тратит 10–20 мин на итерацию.
+   - **Web deploy на live** (`daibilet-msk` / `201.24.125.184`, MSK-only): `BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh` - **не** после каждой итерации, а:
+     - **пачкой раз в сутки** (nightly / утренний batch), **или**
+     - **по явному запросу owner** («выкатывай», «деплой», «на live»);
+     - **исключения (деплой сразу):** live HTTP 500 / сломанный критичный хаб-редирект / security / launch-blocker, который нельзя проверить локально.
+   - **Не** использовать SPB `.16` как builder.
+   - **Канон docs vs runtime:** docs-only / handoff = commit + push, **без** web deploy. Runtime/UI/код копятся в ветке через commit + push; на live попадают batch/по запросу (см. выше). Seed/apply в **prod DB** - только по запросу owner или как часть согласованного batch (не «на каждый чих»).
 2. Обновляй Diary/Tasktracker при значимых архитектурных или launch-blocker фиксах.
 3. Сохраняй совместимость MVP-ветки `feat/next-monorepo`; не плодить параллельные расхождения с Codex.
 4. Общайся с командой на русском.

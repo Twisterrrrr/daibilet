@@ -19,6 +19,22 @@
 
 ---
 
+## 2026-08-05 - Deploy cadence: batch / по запросу
+
+### Наблюдения
+- Частые per-iteration MSK deploy тормозили работу: 10–20 мин build, deploy-lock между агентами, нестабильный live BUILD_ID.
+- Owner подтвердил смену канона: основная часть локально, деплой общим раз в сутки / по запросу.
+
+### Решения
+- `.cursorrules` + `Project.md`: авто **commit + push** после продуктовой итерации; **web deploy** - nightly/batch или явный «выкатывай»; исключения сразу для live 500 / critical redirect / security / unblockable launch-blocker.
+- Seed/apply prod DB - по запросу или в том же batch.
+- Docs-only без изменений: commit + push, без deploy.
+
+### Проблемы
+- Нет. Уже запущенные деплои в очереди докатываются; новые итерации без явного запроса на live не деплоим.
+
+---
+
 ## 2026-08-05 - Blog longread: один body-размер по эталону owner
 
 ### Наблюдения

@@ -7,6 +7,14 @@
 
 ---
 
+---
+
+## Ops: deploy cadence (2026-08-05)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| OPS.DEPLOY-CADENCE | Канон: commit+push после итерации; MSK web deploy пачкой раз в сутки / по запросу owner; hotfix-исключения | Высокий | ✅ `.cursorrules` + Project.md 2026-08-05 |
+
 ## Runtime URL integrity (2026-08-05)
 
 | # | Задача | Приоритет | Статус |
