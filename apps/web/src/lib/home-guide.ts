@@ -39,7 +39,19 @@ export type HomeGuideChip = {
   label: string;
   href: string;
   /** Lucide icon key resolved in UI. */
-  icon: 'mic' | 'ship' | 'map' | 'calendar' | 'gift' | 'sparkles' | 'landmark';
+  icon:
+    | 'mic'
+    | 'ship'
+    | 'map'
+    | 'calendar'
+    | 'gift'
+    | 'sparkles'
+    | 'landmark'
+    | 'pin'
+    | 'route'
+    | 'theater';
+  /** Shown only in desktop category rail (not mobile stories strip). */
+  desktopOnly?: boolean;
 };
 
 /** Horizontal stories under mobile header. */
@@ -82,7 +94,7 @@ export const HOME_STORIES: HomeGuideChip[] = [
   },
 ];
 
-/** Desktop category carousel under bento (icons, brand primary/sky). */
+/** Desktop category rail under bento (icons, brand primary/sky). Equal-width on lg+. */
 export const HOME_CATEGORY_CHIPS: HomeGuideChip[] = [
   {
     id: 'standup',
@@ -109,6 +121,13 @@ export const HOME_CATEGORY_CHIPS: HomeGuideChip[] = [
     icon: 'landmark',
   },
   {
+    id: 'theater',
+    label: 'Театр',
+    href: landingCategoryHref('unusual-theatres'),
+    icon: 'theater',
+    desktopOnly: true,
+  },
+  {
     id: 'today',
     label: 'Сегодня',
     href: buildCatalogHref({ date: 'today', sort: 'popular' }),
@@ -119,6 +138,20 @@ export const HOME_CATEGORY_CHIPS: HomeGuideChip[] = [
     label: 'Бесплатно',
     href: buildCatalogHref({ minPrice: 0, maxPrice: 0, sort: 'popular' }),
     icon: 'gift',
+  },
+  {
+    id: 'podborki',
+    label: 'Подборки',
+    href: '/podborki',
+    icon: 'sparkles',
+    desktopOnly: true,
+  },
+  {
+    id: 'locations',
+    label: 'Локации',
+    href: '/locations',
+    icon: 'pin',
+    desktopOnly: true,
   },
 ];
 

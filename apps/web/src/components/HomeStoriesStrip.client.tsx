@@ -6,9 +6,12 @@ import {
   Gift,
   Landmark,
   Map as MapIcon,
+  MapPin,
   Mic2,
+  Route,
   Ship,
   Sparkles,
+  Theater,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -24,6 +27,9 @@ const ICON_MAP: Record<HomeGuideChip['icon'], LucideIcon> = {
   gift: Gift,
   sparkles: Sparkles,
   landmark: Landmark,
+  pin: MapPin,
+  route: Route,
+  theater: Theater,
 };
 
 function storyHref(chip: HomeGuideChip, cityValue: string): string {

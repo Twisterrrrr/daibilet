@@ -16,17 +16,19 @@ import {
   Gift,
   Landmark,
   Map as MapIcon,
+  MapPin,
   Mic2,
   Route,
   Ship,
   Sparkles,
+  Theater,
   type LucideIcon,
 } from 'lucide-react';
 
 import { SafeImage } from '@/components/SafeImage.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import type { PublicCatalogListItemDto, PublicSessionDto } from '@daibilet/contracts/public';
-import { catalogHrefWithSelectedCity } from '@/lib/catalog-url';
+import { catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from '@/lib/catalog-url';
 import { inCityPrepositional } from '@/lib/city-declension';
 import {
   HOME_CATEGORY_CHIPS,
@@ -45,6 +47,9 @@ const ICON_MAP: Record<HomeGuideChip['icon'], LucideIcon> = {
   gift: Gift,
   sparkles: Sparkles,
   landmark: Landmark,
+  pin: MapPin,
+  route: Route,
+  theater: Theater,
 };
 
 /** Auto-advance interval for the event afisha carousel. */
@@ -57,7 +62,7 @@ type HomeGuideHeroProps = {
   fingerprints?: Record<string, string>;
 };
 
-function chipHref(chip: HomeGuideChip, cityValue: string): string {
+function chipHref(chip: HomeGuideChip, cityValue: string, citySlug?: string | null): string {
   if (chip.href.startsWith('/events')) {
     const qs = chip.href.includes('?') ? chip.href.slice(chip.href.indexOf('?') + 1) : '';
     const params = new URLSearchParams(qs);
@@ -69,6 +74,12 @@ function chipHref(chip: HomeGuideChip, cityValue: string): string {
       minPrice: params.has('minPrice') ? Number(params.get('minPrice')) : undefined,
       maxPrice: params.has('maxPrice') ? Number(params.get('maxPrice')) : undefined,
     });
+  }
+  if (chip.href === '/locations' || chip.href.startsWith('/locations?')) {
+    return venueCatalogHrefWithSelectedCity('/locations', cityValue);
+  }
+  if (chip.href === '/my-day' || chip.href.startsWith('/my-day')) {
+    return buildMyDayHref(citySlug);
   }
   return chip.href;
 }
@@ -380,9 +391,9 @@ export function HomeGuideHero({ sessions, fingerprints }: HomeGuideHeroProps) {
           </div>
         </div>
 
-        {/* Desktop category carousel */}
+        {/* Desktop category rail - equal flex across full container width */}
         <div
-          className="mt-5 hidden gap-3 overflow-x-auto pb-1 snap-x snap-mandatory lg:flex [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="mt-5 hidden w-full gap-2 lg:flex lg:gap-2.5 xl:gap-3"
           role="navigation"
           aria-label="Категории"
         >
@@ -391,13 +402,15 @@ export function HomeGuideHero({ sessions, fingerprints }: HomeGuideHeroProps) {
             return (
               <Link
                 key={chip.id}
-                href={chipHref(chip, cityValue)}
-                className="flex w-[7.75rem] shrink-0 snap-start flex-col items-center gap-2 rounded-2xl bg-white px-3 py-3.5 text-center shadow-card ring-1 ring-slate-200/70 transition hover:ring-primary/35 hover:shadow-card-hover"
+                href={chipHref(chip, cityValue, citySlug)}
+                className="flex min-w-0 flex-1 flex-col items-center gap-2 rounded-2xl bg-white px-1.5 py-3.5 text-center shadow-card ring-1 ring-slate-200/70 transition hover:ring-primary/35 hover:shadow-card-hover md:px-2 lg:py-3.5"
               >
-                <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-50 to-sky-50 text-primary-600">
+                <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-50 to-sky-50 text-primary-600 xl:h-11 xl:w-11">
                   <Icon className="h-5 w-5" aria-hidden />
                 </span>
-                <span className="text-xs font-semibold leading-tight text-slate-800">{chip.label}</span>
+                <span className="line-clamp-2 text-[11px] font-semibold leading-tight text-slate-800 xl:text-xs">
+                  {chip.label}
+                </span>
               </Link>
             );
           })}
