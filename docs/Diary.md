@@ -1,3 +1,20 @@
+## 2026-08-05 - spb-s-rebenkom-v-dozhd: «провести» на live CMS
+
+### Наблюдения
+- Owner видел на `/blog` строку «Планетарий… как собрать…» и называл её заголовком.
+- В MD/`blog-posts.ts` это **excerpt** (уже «провести» с `2fde4d1`); `title`/`seoH1` - «Куда сходить…», без «собрать». В `blog-article-bodies` title нет.
+- Live Article после `2fde4d1` ещё держал старый excerpt: upsert не делали; плюс in-memory public API cache.
+
+### Решения
+- MSK: `blog-upsert-articles.js --slug=spb-s-rebenkom-v-dozhd` (status остался PUBLISHED).
+- Bust API cache (`/api/public/destinations?refresh=1`) + Next revalidate tags `blog-page`/`articles` paths `/blog` + article.
+- Smoke: DB/API/local Next/public - excerpt с «провести». Web deploy не делали.
+
+### Проблемы
+- Прямой DB upsert не инвалидирует `withPublicResponseCache` у API - нужен refresh/restart.
+
+---
+
 ## 2026-08-05 - `/cities` hub: из справочника в увлекательный хаб
 
 ### Наблюдения
@@ -49,6 +66,23 @@
 
 ### Проблемы
 - Нет.
+
+---
+
+## 2026-08-05 - spb-s-rebenkom-v-dozhd: «провести» на live CMS
+
+### Наблюдения
+- Owner видел на `/blog` строку «Планетарий… как собрать…» и называл её заголовком.
+- В MD/`blog-posts.ts` это **excerpt** (уже «провести» с `2fde4d1`); `title`/`seoH1` - «Куда сходить…», без «собрать». В `blog-article-bodies` title нет.
+- Live Article после `2fde4d1` ещё держал старый excerpt: upsert не делали; плюс in-memory public API cache.
+
+### Решения
+- MSK: `blog-upsert-articles.js --slug=spb-s-rebenkom-v-dozhd` (status остался PUBLISHED).
+- Bust API cache (`/api/public/destinations?refresh=1`) + Next revalidate tags `blog-page`/`articles` paths `/blog` + article.
+- Smoke: DB/API/local Next/public - excerpt с «провести». Web deploy не делали.
+
+### Проблемы
+- Прямой DB upsert не инвалидирует `withPublicResponseCache` у API - нужен refresh/restart.
 
 ---
 
