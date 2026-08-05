@@ -18,7 +18,9 @@ export type MustSeeFilterId =
   | 'park'
   | 'temple'
   | 'creative'
-  | 'secret';
+  | 'secret'
+  | 'houses'
+  | 'mansions';
 
 export type MustSeeFilterTab = {
   id: MustSeeFilterId;
@@ -47,6 +49,8 @@ const FILTER_LABELS: Record<MustSeeFilterId, string> = {
   temple: 'Храмы',
   creative: 'Необычное',
   secret: 'Секретные',
+  houses: 'Доходные дома и парадные',
+  mansions: 'Особняки и городские усадьбы',
 };
 
 /** Tab order in UI (main always first when present). */
@@ -61,6 +65,8 @@ const FILTER_ORDER: MustSeeFilterId[] = [
   'temple',
   'creative',
   'secret',
+  'houses',
+  'mansions',
   'gastro',
 ];
 
@@ -163,7 +169,9 @@ export function classifyMustSeePlace(place: MustSeeClassifyInput): MustSeeFilter
     override === 'park' ||
     override === 'temple' ||
     override === 'creative' ||
-    override === 'secret'
+    override === 'secret' ||
+    override === 'houses' ||
+    override === 'mansions'
   ) {
     return override;
   }
@@ -197,6 +205,8 @@ export function buildMustSeeFilterTabs(
     temple: 0,
     creative: 0,
     secret: 0,
+    houses: 0,
+    mansions: 0,
   };
   for (const place of places) {
     counts[classifyMustSeePlace(place)] += 1;

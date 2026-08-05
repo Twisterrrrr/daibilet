@@ -1386,6 +1386,12 @@ function CitySignificantSuburbsBlock({
                     >
                       Пригород
                     </p>
+                    {place.travelVector ? (
+                      <p className={`mt-1 text-xs font-semibold ${editorial ? 'text-zinc-700' : 'text-slate-700'}`}>
+                        {place.travelVector}
+                        {place.stationHub ? ` - ${place.stationHub}` : ''}
+                      </p>
+                    ) : null}
                     {placeHref ? (
                       <Link
                         href={placeHref}
@@ -1404,6 +1410,11 @@ function CitySignificantSuburbsBlock({
                         }`}
                       >
                         {blurb}
+                      </p>
+                    ) : null}
+                    {place.gastroHint ? (
+                      <p className={`mt-2 text-xs ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+                        Гастро-остановка: {place.gastroHint}
                       </p>
                     ) : null}
                     {nested.length ? (
@@ -1702,6 +1713,7 @@ function CitySightsMustSeeList({
               shortDescription: matchedVenue?.shortDescription,
               desc: place.desc,
             }) || '';
+          const nested = Array.isArray(place.places) ? place.places.filter((item) => item?.name) : [];
           return (
             <li
               key={`${place.name}:${index}`}
@@ -1735,6 +1747,31 @@ function CitySightsMustSeeList({
                   >
                     {blurb}
                   </p>
+                ) : null}
+                {place.seasonLabel ? (
+                  <span className="mt-2 inline-flex rounded-full bg-sky-50 px-2 py-1 text-[10px] font-semibold text-sky-800">
+                    {place.seasonLabel}
+                  </span>
+                ) : null}
+                {nested.length ? (
+                  <ul className="mt-3 space-y-1.5 border-t border-slate-100 pt-3 text-sm">
+                    {nested.map((item, nestedIndex) => {
+                      const nestedRoute = dayRouteItemFromMustSee(
+                        { name: item.name, desc: String(item.desc || ''), href: item.href, venueSlug: item.venueSlug, locationSlug: item.locationSlug },
+                        venues,
+                        city,
+                      );
+                      return (
+                        <li key={`${item.name}:${nestedIndex}`} className="flex items-start justify-between gap-2">
+                          <span className={editorial ? 'text-zinc-600' : 'text-slate-600'}>
+                            <b className={editorial ? 'text-zinc-900' : 'text-slate-900'}>{item.name}</b>
+                            {item.desc ? ` - ${capitalizeSentenceStart(item.desc)}` : ''}
+                          </span>
+                          {nestedRoute ? <AddToDayRouteButton compact className="!min-h-8 !px-2 !py-1 !text-[10px]" venue={nestedRoute} /> : null}
+                        </li>
+                      );
+                    })}
+                  </ul>
                 ) : null}
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   {dayRouteItem ? (
