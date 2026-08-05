@@ -111,7 +111,7 @@ function renderInlineToken(token: InlineToken, key: string): React.ReactNode {
       );
     case 'strong':
       return (
-        <strong key={key} className="font-semibold text-slate-900">
+        <strong key={key} className="font-bold text-slate-900">
           {token.value}
         </strong>
       );
@@ -527,19 +527,29 @@ function renderParagraphNodes(
 
 function BlogPullQuote({ text, cite }: ParsedQuote) {
   return (
-    <blockquote className="my-10 border-l-[3px] border-slate-900 pl-5 sm:my-12 sm:pl-6">
-      <p className="font-display text-xl font-semibold leading-[1.35] text-slate-900 sm:text-2xl sm:leading-[1.3]">
+    <blockquote className="my-8 border-l-2 border-slate-300 pl-4 sm:my-10">
+      <p className={BODY_TEXT_CLASS}>
         {renderInline(text, 'quote-')}
       </p>
-      {cite ? <cite className="mt-3 block text-sm not-italic text-slate-500">- {cite}</cite> : null}
+      {cite ? <cite className={`mt-2 block not-italic text-slate-500 ${BODY_TEXT_CLASS}`}>- {cite}</cite> : null}
     </blockquote>
   );
 }
 
+/** Left-rail tips only. «Адрес» = plain body line (owner longread canon). */
+const TIP_CALLOUT_LABELS = new Set(['Атмосферная деталь', 'Практический совет', 'Лайфхак']);
+
 function BlogCallout({ label, text }: { label: string; text: string }) {
+  const isTip = TIP_CALLOUT_LABELS.has(label);
   return (
-    <p className="my-4 border-l-2 border-slate-300/90 py-0.5 pl-4 text-base font-normal leading-[1.65] text-slate-800 sm:text-[1.0625rem]">
-      <strong className="font-semibold text-slate-900">{label}:</strong>{' '}
+    <p
+      className={
+        isTip
+          ? `${BODY_TEXT_CLASS} my-4 border-l-2 border-slate-300 py-0.5 pl-4`
+          : `${BODY_TEXT_CLASS} my-2`
+      }
+    >
+      <strong className="font-bold text-slate-900">{label}:</strong>{' '}
       {renderInline(text, `callout-${label}-`)}
     </p>
   );
@@ -578,19 +588,24 @@ function tableRowsFromBlock(block: Extract<ContentBlock, { type: 'table' }>): st
   return block.lines.filter((line) => !isTableSeparator(line)).map(parseTableRow);
 }
 
-const PARAGRAPH_CLASS =
+/**
+ * Owner longread canon (Top-100): one body size/weight for prose, catchphrase,
+ * tip callouts and address. Bold only on labels / catchphrase / headings.
+ * Do not invent smaller taglines or giant pull-quotes for labeled tips.
+ */
+const BODY_TEXT_CLASS =
   'text-base font-normal leading-[1.65] text-pretty text-slate-800 [overflow-wrap:break-word] sm:text-[1.0625rem] sm:leading-[1.65]';
-const LEAD_PARAGRAPH_CLASS =
-  'text-[1.0625rem] font-normal leading-[1.65] text-pretty text-slate-800 [overflow-wrap:break-word] sm:text-lg sm:leading-[1.6]';
+const PARAGRAPH_CLASS = BODY_TEXT_CLASS;
+const LEAD_PARAGRAPH_CLASS = BODY_TEXT_CLASS;
+/** Same metrics as body; bold only (do not mix font-normal + font-bold in one className). */
 const TAGLINE_CLASS =
-  'mb-3 text-[0.9375rem] font-semibold leading-snug text-slate-800 sm:text-base';
+  'mb-3 text-base font-bold leading-[1.65] text-pretty text-slate-900 [overflow-wrap:break-word] sm:text-[1.0625rem] sm:leading-[1.65]';
 const H2_CLASS =
-  'scroll-mt-24 mb-5 border-b border-slate-200/90 pb-3 font-display text-[1.45rem] font-bold tracking-tight text-slate-950 sm:text-[1.7rem] lg:text-[1.8rem] [&:not(:first-child)]:mt-14 [&:not(:first-child)]:pt-1';
+  'scroll-mt-24 mb-5 text-[1.35rem] font-bold leading-snug tracking-tight text-slate-950 sm:text-[1.5rem] [&:not(:first-child)]:mt-12';
 const H3_CLASS =
-  'scroll-mt-24 mb-2 font-display text-[1.125rem] font-bold tracking-tight text-slate-900 sm:text-xl [&:not(:first-child)]:mt-10';
-const HR_CLASS = 'my-10 border-0 border-t border-slate-200/90';
-const LIST_CLASS =
-  'my-5 space-y-2.5 pl-6 text-base leading-[1.65] text-pretty text-slate-800 sm:text-[1.0625rem]';
+  'scroll-mt-24 mb-2 text-[1.125rem] font-bold leading-snug tracking-tight text-slate-900 sm:text-[1.25rem] [&:not(:first-child)]:mt-10';
+const HR_CLASS = 'my-8 border-0 border-t border-slate-200/90';
+const LIST_CLASS = `my-5 space-y-2.5 pl-6 ${BODY_TEXT_CLASS}`;
 
 function normalizeImageSrc(src: string): string {
   const trimmed = src.trim();
