@@ -119,19 +119,22 @@ test('podborki intent keeps intent and swaps city segment', () => {
   );
 });
 
-test('blog stays on blog with city slug query', () => {
+test('blog header city change persists without ?city=', () => {
   assert.equal(
     resolveCityChangeHref({ pathname: '/blog', cityName: 'Москва', destinations }),
-    '/blog?city=moscow',
+    null,
   );
   assert.equal(
     resolveCityChangeHref({ pathname: '/blog/some-article', cityName: 'Уфа', destinations }),
-    '/blog?city=ufa',
+    null,
   );
   assert.equal(
     resolveCityChangeHref({ pathname: '/blog', cityName: 'all', destinations }),
-    '/blog',
+    null,
   );
+  assert.deepEqual(resolveCityChangeNav({ pathname: '/blog', cityName: 'Москва', destinations }), {
+    action: 'persist',
+  });
 });
 
 test('home and my-day persist; static/unknown fallback (no catalog dump)', () => {

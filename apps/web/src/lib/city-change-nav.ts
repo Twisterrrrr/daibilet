@@ -108,12 +108,9 @@ export function resolveCityChangeNav(input: CityChangeNavInput): CityChangeNavRe
     }
   }
 
-  // Blog list / article: stay on blog with city slug filter.
+  // Blog: header city only persists - feed is cross-city; in-page `?city=` is the materials filter.
   if (path === '/blog' || path.startsWith('/blog/')) {
-    if (name === 'all' || !citySlug) {
-      return { action: 'navigate', href: '/blog' };
-    }
-    return { action: 'navigate', href: `/blog?city=${encodeURIComponent(citySlug)}` };
+    return { action: 'persist' };
   }
 
   return { action: 'fallback' };

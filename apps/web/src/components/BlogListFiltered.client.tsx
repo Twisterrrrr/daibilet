@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { LayoutGrid, List } from 'lucide-react';
 
@@ -114,18 +114,17 @@ export function BlogListFiltered({
   posts,
   allPosts,
   initialFilters,
-  headerCitySlug = null,
-  hasLocalPosts = true,
-  emptyCityLabel = null,
+  featuredSlot = null,
 }: {
   posts: BlogCardDto[];
   /** Full blog list for city filter dropdown counts (without hero split). */
   allPosts?: BlogCardDto[];
   initialFilters?: BlogListFilters;
-  headerCitySlug?: string | null;
-  hasLocalPosts?: boolean;
-  /** Header city display name for empty-state banner (only when 0 matches). */
-  emptyCityLabel?: string | null;
+  /**
+   * «Материал недели» block. When URL materials filters are active, filtered
+   * results render above this slot; when idle - featured stays above the feed.
+   */
+  featuredSlot?: ReactNode;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -168,14 +167,12 @@ export function BlogListFiltered({
       if (!matchesQuery(post, query)) return false;
       return true;
     });
-    // Explicit dropdown city = hard filter; header city = hard filter only when local posts exist.
+    // Only explicit in-page `?city=` hard-filters. Header CityPicker does not.
     if (urlCity !== 'all') {
       list = filterBlogFeedByCity(list, urlCity);
-    } else if (headerCitySlug && hasLocalPosts) {
-      list = filterBlogFeedByCity(list, headerCitySlug);
     }
     return list;
-  }, [posts, author, topic, query, urlCity, headerCitySlug, hasLocalPosts]);
+  }, [posts, author, topic, query, urlCity]);
 
   useEffect(() => {
     const page = paginateBlogFeedByCursor(filtered, { cursor: null, limit: PAGE_SIZE });
@@ -245,25 +242,66 @@ export function BlogListFiltered({
       : paginateBlogFeedByCursor(filtered, { cursor: null, limit: PAGE_SIZE }).items;
 
   /**
-   * Empty-city banner only when the *active* city filter has 0 article hits.
-   * Prefer explicit dropdown `?city=`; else header city. Never show when matches > 0
-   * (avoids false «нет статей» while «Найдено: N» / city option count is positive).
+   * Empty-city banner only when explicit dropdown / URL `?city=` has 0 article hits.
+   * Header city never drives this banner.
    */
-  const emptyCheckSlug =
-    urlCity !== 'all' ? canonicalizeBlogCitySlug(urlCity) : canonicalizeBlogCitySlug(headerCitySlug);
+  const emptyCheckSlug = urlCity !== 'all' ? canonicalizeBlogCitySlug(urlCity) : null;
   const emptyCheckCount = emptyCheckSlug
     ? filterBlogFeedByCity(cityOptionsSource, emptyCheckSlug).length
     : -1;
-  const bannerLabel =
-    (urlCity !== 'all' ? cityFilterLabel(urlCity) : null) ||
-    emptyCityLabel ||
-    (emptyCheckSlug ? cityFilterLabel(emptyCheckSlug) : null);
+  const bannerLabel = emptyCheckSlug ? cityFilterLabel(urlCity) : null;
   const showEmptyCityBanner = Boolean(emptyCheckSlug && bannerLabel && emptyCheckCount === 0);
 
   const selectClass =
     'min-w-[10rem] flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-primary-400 focus:ring-2 focus:ring-primary-100 sm:max-w-[16rem] sm:flex-none';
 
-  return (
+  const filtersBar = (
+    <div className="mb-4 flex flex-col gap-3 border-b border-slate-200 pb-5 sm:flex-row sm:flex-wrap sm:items-center">
+      <select
+        className={selectClass}
+        value={urlCity}
+        onChange={(event) => setFilter('city', event.target.value)}
+        aria-label="Фильтр по городу"
+      >
+        <option value="all">Все города</option>
+        {cityOptions.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label} ({option.count})
+          </option>
+        ))}
+      </select>
+
+      <select
+        className={selectClass}
+        value={author}
+        onChange={(event) => setFilter('author', event.target.value)}
+        aria-label="Фильтр по автору"
+      >
+        <option value="all">Все авторы</option>
+        {authorOptions.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label} ({option.count})
+          </option>
+        ))}
+      </select>
+
+      {hasActive ? (
+        <button
+          type="button"
+          onClick={resetFilters}
+          className="py-2.5 text-sm font-medium text-primary-600 hover:text-primary-700"
+        >
+          Сбросить
+        </button>
+      ) : null}
+
+      <div className="sm:ml-auto">
+        <BlogViewModeToggle mode={viewMode} onChange={setViewMode} />
+      </div>
+    </div>
+  );
+
+  const feedBody = (
     <div id="blog-feed" className="scroll-mt-24">
       {showEmptyCityBanner ? (
         <div
@@ -273,50 +311,6 @@ export function BlogListFiltered({
           Пока нет статей про {bannerLabel} - смотрите свежее по России.
         </div>
       ) : null}
-
-      <div className="mb-4 flex flex-col gap-3 border-b border-slate-200 pb-5 sm:flex-row sm:flex-wrap sm:items-center">
-        <select
-          className={selectClass}
-          value={urlCity}
-          onChange={(event) => setFilter('city', event.target.value)}
-          aria-label="Фильтр по городу"
-        >
-          <option value="all">Все города</option>
-          {cityOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label} ({option.count})
-            </option>
-          ))}
-        </select>
-
-        <select
-          className={selectClass}
-          value={author}
-          onChange={(event) => setFilter('author', event.target.value)}
-          aria-label="Фильтр по автору"
-        >
-          <option value="all">Все авторы</option>
-          {authorOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label} ({option.count})
-            </option>
-          ))}
-        </select>
-
-        {hasActive ? (
-          <button
-            type="button"
-            onClick={resetFilters}
-            className="py-2.5 text-sm font-medium text-primary-600 hover:text-primary-700"
-          >
-            Сбросить
-          </button>
-        ) : null}
-
-        <div className="sm:ml-auto">
-          <BlogViewModeToggle mode={viewMode} onChange={setViewMode} />
-        </div>
-      </div>
 
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-slate-500">
@@ -365,6 +359,25 @@ export function BlogListFiltered({
             </button>
           ) : null}
         </div>
+      )}
+    </div>
+  );
+
+  return (
+    <div>
+      {/* Materials filter immediately after hero (parent places this block under hero). */}
+      {filtersBar}
+
+      {hasActive ? (
+        <>
+          <div className="mb-8">{feedBody}</div>
+          {featuredSlot}
+        </>
+      ) : (
+        <>
+          {featuredSlot}
+          {feedBody}
+        </>
       )}
     </div>
   );

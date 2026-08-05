@@ -1,13 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { Suspense, useMemo } from 'react';
+import { Suspense, useMemo, type ReactNode } from 'react';
 
 import { BlogFeaturedHero } from '@/components/BlogFeaturedHero';
 import { BlogListFiltered } from '@/components/BlogListFiltered.client';
 import { BlogListHero } from '@/components/BlogListHero';
-import { useBlogHeaderCity } from '@/components/useBlogHeaderCity';
-import { filterBlogFeedByCity } from '@/lib/blog-feed-rank';
 import { cityFilterLabel } from '@/lib/blog-meta';
 import type { BlogSidebarPromoDto } from '@/lib/blog-sidebar-promo';
 import { splitBlogListingHero, type BlogCardDto } from '@/lib/blog-utils';
@@ -29,19 +27,8 @@ export function BlogListingBody({
   hotMinPrices = {},
   afishaPromos = {},
 }: BlogListingBodyProps) {
-  const { citySlug, cityName, cityReady } = useBlogHeaderCity();
-
-  const localPosts = useMemo(
-    () => (citySlug ? filterBlogFeedByCity(posts, citySlug) : posts),
-    [posts, citySlug],
-  );
-  const hasLocalPosts = !citySlug || localPosts.length > 0;
-
-  const listingPosts = citySlug && hasLocalPosts ? localPosts : posts;
-  const { featured, feed, hot } = useMemo(
-    () => splitBlogListingHero(listingPosts),
-    [listingPosts],
-  );
+  // Cross-city feed by default: header CityPicker must not hard-filter /blog.
+  const { featured, feed, hot } = useMemo(() => splitBlogListingHero(posts), [posts]);
 
   const fallbackCityLabel = featured ? cityFilterLabel(featured.citySlug, featured.city) : null;
   const afishaFallbackCityName =
@@ -52,7 +39,16 @@ export function BlogListingBody({
       ? fallbackCityLabel
       : featured?.city || null;
 
-  const emptyCityLabel = cityName || (citySlug ? cityFilterLabel(citySlug) : null);
+  const featuredSlot: ReactNode = featured ? (
+    <BlogFeaturedHero
+      featured={featured}
+      hotPosts={hot}
+      hotMinPrices={hotMinPrices}
+      afishaPromos={afishaPromos}
+      afishaFallbackCityName={afishaFallbackCityName}
+      afishaFallbackCitySlug={featured?.citySlug}
+    />
+  ) : null;
 
   return (
     <>
@@ -68,24 +64,10 @@ export function BlogListingBody({
           </div>
         }
       >
-        <BlogListHero
-          breadcrumbs={breadcrumbs}
-          cityName={cityReady && hasLocalPosts ? cityName : null}
-        />
+        <BlogListHero breadcrumbs={breadcrumbs} />
       </Suspense>
 
       <div className="container-page py-10 sm:py-14">
-        {featured ? (
-          <BlogFeaturedHero
-            featured={featured}
-            hotPosts={hot}
-            hotMinPrices={hotMinPrices}
-            afishaPromos={afishaPromos}
-            afishaFallbackCityName={afishaFallbackCityName}
-            afishaFallbackCitySlug={featured?.citySlug}
-          />
-        ) : null}
-
         <Suspense
           fallback={
             <div className="space-y-4">
@@ -102,9 +84,7 @@ export function BlogListingBody({
             posts={feed}
             allPosts={posts}
             initialFilters={initialFilters}
-            headerCitySlug={citySlug}
-            hasLocalPosts={hasLocalPosts}
-            emptyCityLabel={cityReady ? emptyCityLabel : null}
+            featuredSlot={featuredSlot}
           />
         </Suspense>
 

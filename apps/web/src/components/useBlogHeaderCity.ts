@@ -5,6 +5,11 @@ import { useMemo } from 'react';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { resolveBlogRankCitySlug } from '@/lib/blog-feed-rank';
 
+/**
+ * Header CityPicker → blog city slug.
+ * `/blog` listing no longer hard-filters by this (owner 2026-08-05): use in-page
+ * materials `?city=` instead. Hook kept for soft-geo / future surfaces.
+ */
 export function useBlogHeaderCity() {
   const selectedCity = useSelectedCityOptional();
 

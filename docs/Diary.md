@@ -1,3 +1,36 @@
+## 2026-08-05 - Blog: скрыть сегодняшние статьи кроме «Барный Петербург»
+
+### Наблюдения
+- Owner: постепенная публикация - на сайте оставить только «Барный Петербург»; остальные материалы от 2026-08-05 спрятать.
+- Top-100 ×5 и Beyond ×7 уже DRAFT (`5b288fa`) - не трогали.
+
+### Решения
+- ×5 районных гидов → `status: DRAFT`, `isIndexable: false`:
+  `spb-zolotoy-treugolnik-za-1-den`, `spb-vasilevskiy-ostrov-marshrut`, `spb-petrogradskaya-storona`, `spb-kolomna-kanaly`, `spb-vladimirskaya-gastro`.
+- Публичным остаётся `spb-barnyy-peterburg-ryumochnye-spikizi` (PUBLISHED).
+- В `blog-posts.ts` этих slug не было. Live: upsert DRAFT на MSK + revalidate `/blog` (без web deploy).
+
+### Проблемы
+- Нет.
+
+---
+
+## 2026-08-05 - /blog: decouple header city + materials filter after hero
+
+### Наблюдения
+- Owner: статьи блога жёстко завязаны на город в шапке - смена CityPicker прятала чужие материалы.
+- `BlogListingBody` + `BlogListFiltered` hard-filter по `useBlogHeaderCity`; `resolveCityChangeNav` на `/blog` вёл на `?city=`.
+
+### Решения
+- Лента `/blog` кросс-городская по умолчанию: header city не фильтрует и не меняет featured/feed split.
+- In-page фильтр (город + автор) сразу после hero; при активном `?city=`/`?author=`/`topic`/`q` - результаты над блоком «Материал недели»; idle - hero → featured → feed.
+- `resolveCityChangeNav`: blog → `persist` (как home/my-day), без авто-`?city=`.
+
+### Проблемы
+- Нет. Commit+push без MSK deploy (batch cadence).
+
+---
+
 ## 2026-08-05 - Catalog LocationCard: strip Venue crumb tails
 
 ### Наблюдения
@@ -687,7 +720,7 @@
 ### Решения
 - Канон: смена города в хедере переключает city filter **внутри текущей секции**, не дампит в каталог.
 - Чистый хелпер `resolveCityChangeNav` (`apps/web/src/lib/city-change-nav.ts`) + `setCity` path-aware map.
-- Матрица: `/cities`→hub; events/venues/locations (+PDP)→section `?city=`; podborki intent→`/podborki/{intent}/{slug}`; blog→`/blog?city=slug`; my-day/home→persist (+confirm на my-day); multi-city landing→swap segment; static→persist only.
+- Матрица: `/cities`→hub; events/venues/locations (+PDP)→section `?city=`; podborki intent→`/podborki/{intent}/{slug}`; blog→persist (in-page `?city=` filter); my-day/home→persist (+confirm на my-day); multi-city landing→swap segment; static→persist only.
 - `/my-day` confirm-reset не регрессирован.
 
 ### Проблемы

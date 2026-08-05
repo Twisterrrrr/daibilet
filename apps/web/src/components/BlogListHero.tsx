@@ -23,7 +23,10 @@ const HERO_TOPIC_IDS: BlogTopicId[] = ['standup', 'routes', 'kids', 'concerts', 
 
 type BlogListHeroProps = {
   breadcrumbs: BreadcrumbItem[];
-  /** Geo copy only when the selected city has published posts (see BlogListingBody). */
+  /**
+   * Optional geo copy. Blog index is cross-city by default - do not pass header CityPicker
+   * city here; in-page materials filter owns city scoping.
+   */
   cityName?: string | null;
 };
 

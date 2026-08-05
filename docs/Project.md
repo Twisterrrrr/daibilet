@@ -224,7 +224,7 @@ BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh
 
 ### URL / SEO policy (2026-07-19, доп. 2026-07-22)
 
-- **Header city change (2026-08-04):** смена города в шапке остаётся в текущей секции (`resolveCityChangeNav`): `/cities`→hub, catalogs/PDP→`?city=` той же секции, podborki intent→city segment, blog→`/blog?city=`, my-day/home→persist (+confirm на my-day), multi-city landing→swap segment. **Не** дампить в `/events`, если пользователь не в каталоге событий.
+- **Header city change (2026-08-04, blog 2026-08-05):** смена города в шапке остаётся в текущей секции (`resolveCityChangeNav`): `/cities`→hub, catalogs/PDP→`?city=` той же секции, podborki intent→city segment, **blog→persist only** (лента кросс-городская; фильтр материалов на `/blog` через in-page `?city=`/`?author=`), my-day/home→persist (+confirm на my-day), multi-city landing→swap segment. **Не** дампить в `/events`, если пользователь не в каталоге событий.
 - **Flat URL:** `/events/{slug}`, `/venues/{slug}`, `/cities/{slug}` — без city-prefix в path (`/{city}/venues/...` и т.п. **отклонено**).
 - **SEO-фокус:** city hubs `/cities/{slug}` + **category×city landings** (`/rechnye-progulki/moscow`, `/stendap-i-yumor/kazan`, …) + intent `/podborki/{intent}`; sitemap + canonical.
 - **Meta (city listing):** обычные города - `[Категория] в [Городе] [Год] - купить билеты…`; Казань/Екатеринбург - `[Категория] в {City_Пр} [Год]: купить билеты…` (`seo-listing-meta.ts`, падежи в `city-declension.ts`).
@@ -374,7 +374,7 @@ Daily scan saleable public catalog texts (`title`/`description` + override) на
 
 Документы: [ai-journalists/README.md](./ai-journalists/README.md), реестр [ai-journalists/personas.json](./ai-journalists/personas.json).
 
-**CMS:** у `Article` есть `authorId` / `authorName` / `articleType` (миграция `20260719140000_article_author_type`). Публичный `/blog` фильтрует по **городу** и **автору** (`?city=&author=`). Тип статьи хранится в БД для контент-плана, в UI не дублируется отдельным фильтром.
+**CMS:** у `Article` есть `authorId` / `authorName` / `articleType` (миграция `20260719140000_article_author_type`). Публичный `/blog` фильтрует по **городу** и **автору** только через in-page `?city=&author=` (не через header CityPicker). Тип статьи хранится в БД для контент-плана, в UI не дублируется отдельным фильтром.
 
 Канон приветствия Макса: **«Эй, кто на маршруте!»** (не «Касатики»).
 
