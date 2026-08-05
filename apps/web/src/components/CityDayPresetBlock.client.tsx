@@ -13,7 +13,7 @@ import {
   type DayRouteVenueMatchSource,
 } from '@/lib/day-route-from-place';
 import { mustSeePlacesForDefaultPreset } from '@/lib/must-see-filters';
-import { replaceDayRouteFromVenues } from '@/lib/day-route';
+import { dayRoutePointsWord, replaceDayRouteFromVenues } from '@/lib/day-route';
 
 type Props = {
   places: CityMustSeeItem[];
@@ -58,9 +58,9 @@ export function CityDayPresetBlock({
         items: buildCityDayRoutePreset(preset.stops, venues, city),
         available: cityDayRoutePresetAvailable(preset.stops, venues, city),
       }))
-      // Опубликованный гид полезен до появления в каталоге достаточного числа
-      // точек. Сценарий виден, но незавершенный маршрут не предлагаем.
-      .filter((row) => row.available || Boolean(row.preset.blogSlug));
+      // Сценарий обязан собирать план: гид без resolvable stops не маскируем
+      // под готовый маршрут.
+      .filter((row) => row.available);
   }, [namedPresets, venues, city]);
 
   const fallbackPreset = useMemo(() => {
@@ -149,13 +149,9 @@ export function CityDayPresetBlock({
                       }`}
                       title={titles}
                     >
-                      {items.length} точек: {titles}
+                      {items.length} {dayRoutePointsWord(items.length)}: {titles}
                     </p>
-                  ) : (
-                    <p className={`mt-1.5 text-[13px] leading-5 ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}>
-                      Полный маршрут - в подробном гиде.
-                    </p>
-                  )}
+                  ) : null}
                 </div>
                 {available ? (
                   <button

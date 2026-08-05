@@ -548,7 +548,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       },
       {
         id: 'spb-3',
-        title: 'Петроградская',
+        title: 'Петроградская сторона',
         description: 'Крепость, музеи и прогулка по Неве с финалом у гастрономического якоря.',
         blogSlug: 'spb-petrogradskaya-storona',
         stops: [
