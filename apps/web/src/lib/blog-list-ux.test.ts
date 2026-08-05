@@ -30,7 +30,7 @@ test('blog topics: standup / kids / routes / concerts', () => {
   assert.equal(parseBlogTopicParam('nope'), 'all');
 });
 
-test('blog listing CTA prefers schedule label', () => {
+test('blog listing CTA uses events label', () => {
   const cta = resolveBlogListingCta({
     slug: 'spb-stendap-gid',
     title: 'Стендап в Петербурге',
@@ -38,7 +38,7 @@ test('blog listing CTA prefers schedule label', () => {
     citySlug: 'saint-petersburg',
   });
   assert.ok(cta);
-  assert.equal(cta?.label, 'Смотреть расписание');
+  assert.equal(cta?.label, 'Смотреть события');
   assert.ok(cta?.href);
 });
 

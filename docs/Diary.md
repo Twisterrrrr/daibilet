@@ -1,3 +1,20 @@
+## 2026-08-05 - UX: blog materials filter under hero + CTA row
+
+### Наблюдения
+- Owner: фильтр «Все города / авторы / Найдено» визуально не под hero.
+- Root cause: selects были до featured, но «Найдено» жило внутри `feedBody` **после** «материала недели» - блок фильтра выглядел разорванным / ниже.
+- Header CityPicker на `/blog` уже `persist` и `/blog` не в `CITY_FILTER_PATHS`; live без deploy мог ещё показывать старый hard-filter.
+
+### Решения
+- `BlogListFiltered`: единый materials bar (selects + toggle + Найдено) сразу под hero, до featured/ленты.
+- CTA: «Смотреть события», в одной строке с meta, `ml-auto`.
+- Тест: `/blog` не city-filter path.
+
+### Проблемы
+- Нет. Deploy ждёт «выкатывай».
+
+---
+
 ## 2026-08-05 - UX: visual anchors на ленте `/blog`
 
 ### Наблюдения

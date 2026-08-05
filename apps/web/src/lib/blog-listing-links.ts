@@ -140,7 +140,7 @@ export function resolveBlogListingQuickLinks(input: {
 
 /**
  * Явный CTA на карточке листинга: CHPU / афиша города.
- * «Смотреть расписание» - если есть целевой лендинг; иначе «К событиям».
+ * «Смотреть события» - если есть целевой лендинг или афиша города.
  * Без пустого «Купить билет» без event.
  */
 export function resolveBlogListingCta(input: {
@@ -153,17 +153,17 @@ export function resolveBlogListingCta(input: {
   const city = normalizeKnownCitySlug(input.citySlug);
   const primary = resolvePrimaryLanding(input.slug, input.title, input.tag, city);
   if (primary?.href) {
-    return { href: primary.href, label: 'Смотреть расписание' };
+    return { href: primary.href, label: 'Смотреть события' };
   }
 
   const eventsHref = city ? resolveBlogCityEventsHref(input.city, city) : null;
   if (eventsHref) {
-    return { href: eventsHref, label: 'К событиям' };
+    return { href: eventsHref, label: 'Смотреть события' };
   }
 
   const hubHref = city ? resolveBlogCityHref(input.city, city) : null;
   if (hubHref) {
-    return { href: hubHref, label: 'К событиям' };
+    return { href: hubHref, label: 'Смотреть события' };
   }
 
   return null;

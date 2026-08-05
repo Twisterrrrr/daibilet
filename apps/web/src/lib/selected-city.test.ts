@@ -59,6 +59,9 @@ test('isCityFilterPath covers events venues locations podborki', () => {
   assert.equal(isCityFilterPath('/podborki'), true);
   assert.equal(isCityFilterPath('/cities'), false);
   assert.equal(isCityFilterPath('/events/slug'), true);
+  // Blog materials filter is in-page only - header CityPicker must not inject ?city=.
+  assert.equal(isCityFilterPath('/blog'), false);
+  assert.equal(isCityFilterPath('/blog/some-slug'), false);
 });
 
 test('mergeStoredCityIntoSearchParams injects storage city only when city missing', () => {

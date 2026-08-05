@@ -79,7 +79,7 @@ export function BlogListingBody({
         <BlogListHero breadcrumbs={breadcrumbs} />
       </Suspense>
 
-      <div className="container-page py-10 sm:py-14">
+      <div className="container-page pt-6 pb-10 sm:pt-8 sm:pb-14">
         <Suspense
           fallback={
             <div className="space-y-4">

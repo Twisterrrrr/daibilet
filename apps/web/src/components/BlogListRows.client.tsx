@@ -97,19 +97,6 @@ function BlogListRow({ post }: { post: BlogCardDto }) {
           </p>
         ) : null}
 
-        <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-500 sm:text-xs">
-          {post.authorName || post.authorId ? (
-            <span className={blogAuthorNameClassName(post.articleType)}>
-              {post.authorName || authorLabel(post.authorId)}
-            </span>
-          ) : null}
-          {dateLabel ? <time dateTime={post.publishedAt || undefined}>{dateLabel}</time> : null}
-          <span className="inline-flex items-center gap-1">
-            <Clock className="h-3.5 w-3.5" aria-hidden />
-            {post.readMin} мин
-          </span>
-        </div>
-
         {chips.length || quickLinks.length || cta ? (
           <div className="mt-2 flex flex-wrap items-center gap-1.5" aria-label="Метки и разделы">
             {chips.map((chip) => (
@@ -133,17 +120,32 @@ function BlogListRow({ post }: { post: BlogCardDto }) {
                 {link.label}
               </Link>
             ))}
-            {cta ? (
-              <Link
-                href={cta.href}
-                className="group/cta inline-flex items-center gap-1.5 rounded-md bg-primary-600 px-2.5 py-1 text-[11px] font-semibold text-white transition-all duration-300 hover:bg-primary-700 sm:text-xs"
-              >
-                {cta.label}
-                <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover/cta:translate-x-1" aria-hidden />
-              </Link>
-            ) : null}
           </div>
         ) : null}
+
+        <div className="mt-auto flex flex-wrap items-center justify-between gap-x-3 gap-y-2 pt-2">
+          <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-500 sm:text-xs">
+            {post.authorName || post.authorId ? (
+              <span className={blogAuthorNameClassName(post.articleType)}>
+                {post.authorName || authorLabel(post.authorId)}
+              </span>
+            ) : null}
+            {dateLabel ? <time dateTime={post.publishedAt || undefined}>{dateLabel}</time> : null}
+            <span className="inline-flex items-center gap-1">
+              <Clock className="h-3.5 w-3.5" aria-hidden />
+              {post.readMin} мин
+            </span>
+          </div>
+          {cta ? (
+            <Link
+              href={cta.href}
+              className="group/cta ml-auto inline-flex shrink-0 items-center gap-1.5 rounded-md bg-primary-600 px-2.5 py-1 text-[11px] font-semibold text-white transition-all duration-300 hover:bg-primary-700 sm:text-xs"
+            >
+              {cta.label}
+              <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover/cta:translate-x-1" aria-hidden />
+            </Link>
+          ) : null}
+        </div>
       </div>
     </article>
   );

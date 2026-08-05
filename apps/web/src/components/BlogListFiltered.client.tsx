@@ -259,48 +259,61 @@ export function BlogListFiltered({
     'min-w-[10rem] flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-primary-400 focus:ring-2 focus:ring-primary-100 sm:max-w-[16rem] sm:flex-none';
 
   const filtersBar = (
-    <div className="mb-4 flex flex-col gap-3 border-b border-slate-200 pb-5 sm:flex-row sm:flex-wrap sm:items-center">
-      <select
-        className={selectClass}
-        value={urlCity}
-        onChange={(event) => setFilter('city', event.target.value)}
-        aria-label="Фильтр по городу"
-      >
-        <option value="all">Все города</option>
-        {cityOptions.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label} ({option.count})
-          </option>
-        ))}
-      </select>
-
-      <select
-        className={selectClass}
-        value={author}
-        onChange={(event) => setFilter('author', event.target.value)}
-        aria-label="Фильтр по автору"
-      >
-        <option value="all">Все авторы</option>
-        {authorOptions.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label} ({option.count})
-          </option>
-        ))}
-      </select>
-
-      {hasActive ? (
-        <button
-          type="button"
-          onClick={resetFilters}
-          className="py-2.5 text-sm font-medium text-primary-600 hover:text-primary-700"
+    <div className="mb-8 space-y-3 border-b border-slate-200 pb-5">
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+        <select
+          className={selectClass}
+          value={urlCity}
+          onChange={(event) => setFilter('city', event.target.value)}
+          aria-label="Фильтр материалов по городу"
         >
-          Сбросить
-        </button>
-      ) : null}
+          <option value="all">Все города</option>
+          {cityOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label} ({option.count})
+            </option>
+          ))}
+        </select>
 
-      <div className="sm:ml-auto">
-        <BlogViewModeToggle mode={viewMode} onChange={setViewMode} />
+        <select
+          className={selectClass}
+          value={author}
+          onChange={(event) => setFilter('author', event.target.value)}
+          aria-label="Фильтр по автору"
+        >
+          <option value="all">Все авторы</option>
+          {authorOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label} ({option.count})
+            </option>
+          ))}
+        </select>
+
+        {hasActive ? (
+          <button
+            type="button"
+            onClick={resetFilters}
+            className="py-2.5 text-sm font-medium text-primary-600 hover:text-primary-700"
+          >
+            Сбросить
+          </button>
+        ) : null}
+
+        <div className="sm:ml-auto">
+          <BlogViewModeToggle mode={viewMode} onChange={setViewMode} />
+        </div>
       </div>
+
+      <p className="text-sm text-slate-500">
+        Найдено: <span className="font-semibold text-slate-800">{filtered.length}</span>
+        {posts.length ? <span> из {posts.length}</span> : null}
+        {filtered.length > 0 ? (
+          <span className="text-slate-400">
+            {' '}
+            (показано {displayPosts.length})
+          </span>
+        ) : null}
+      </p>
     </div>
   );
 
@@ -314,19 +327,6 @@ export function BlogListFiltered({
           Пока нет статей про {bannerLabel} - смотрите свежее по России.
         </div>
       ) : null}
-
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-slate-500">
-          Найдено: <span className="font-semibold text-slate-800">{filtered.length}</span>
-          {posts.length ? <span> из {posts.length}</span> : null}
-          {filtered.length > 0 ? (
-            <span className="text-slate-400">
-              {' '}
-              (показано {displayPosts.length})
-            </span>
-          ) : null}
-        </p>
-      </div>
 
       {filtered.length > 0 ? (
         <>
@@ -371,7 +371,10 @@ export function BlogListFiltered({
 
   return (
     <div>
-      {/* Materials filter immediately after hero (parent places this block under hero). */}
+      {/*
+        Materials filter MUST sit immediately under BlogListHero, before featured/feed.
+        Root cause of owner complaint: «Найдено» lived inside feedBody after featuredSlot.
+      */}
       {filtersBar}
 
       {hasActive ? (

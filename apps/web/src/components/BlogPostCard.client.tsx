@@ -48,19 +48,24 @@ function BlogCardMeta({
   dateLabel,
   isLarge,
   onDark = false,
+  className = '',
 }: {
   post: BlogCardDto;
   dateLabel: string;
   isLarge: boolean;
   onDark?: boolean;
+  className?: string;
 }) {
   return (
     <div
       className={[
         'flex flex-wrap items-center gap-3',
         onDark ? 'text-white/70' : 'text-slate-500',
-        isLarge ? 'mt-3 text-xs sm:text-sm' : 'text-[11px]',
-      ].join(' ')}
+        isLarge ? 'text-xs sm:text-sm' : 'text-[11px]',
+        className,
+      ]
+        .filter(Boolean)
+        .join(' ')}
     >
       {post.authorName || post.authorId ? (
         <span className={onDark ? 'font-medium text-white/85' : blogAuthorNameClassName(post.articleType)}>
@@ -246,22 +251,24 @@ export function BlogPostCard({
               {primary}
             </p>
           ) : null}
-          {cta ? (
-            <div className="mt-4">
+          <div className="mt-auto flex flex-wrap items-center justify-between gap-x-3 gap-y-2 pt-4">
+            <div className="min-w-0">
+              <BlogCardMeta post={post} dateLabel={dateLabel} isLarge />
+            </div>
+            {cta ? (
               <Link
                 href={cta.href}
-                className="group/cta inline-flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:bg-primary-700"
+                className="group/cta ml-auto inline-flex shrink-0 items-center gap-2 rounded-xl bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:bg-primary-700"
               >
                 {cta.label}
                 <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/cta:translate-x-1" aria-hidden />
               </Link>
-            </div>
-          ) : (
-            <Link href={articleHref}>
-              <ReadMoreCue />
-            </Link>
-          )}
-          <BlogCardMeta post={post} dateLabel={dateLabel} isLarge />
+            ) : (
+              <Link href={articleHref} className="ml-auto shrink-0">
+                <ReadMoreCue />
+              </Link>
+            )}
+          </div>
         </div>
       </article>
     );
@@ -394,22 +401,24 @@ export function BlogPostCard({
               ))}
             </div>
           ) : null}
-          {cta ? (
-            <div className="mt-3">
+          <div className="mt-auto flex flex-wrap items-center justify-between gap-x-3 gap-y-2 pt-3">
+            <div className="min-w-0">
+              <BlogCardMeta post={post} dateLabel={dateLabel} isLarge />
+            </div>
+            {cta ? (
               <Link
                 href={cta.href}
-                className="group/cta inline-flex items-center gap-2 rounded-xl bg-primary-600 px-3.5 py-2 text-sm font-semibold text-white transition-all duration-300 hover:bg-primary-700"
+                className="group/cta ml-auto inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-primary-600 px-3.5 py-2 text-sm font-semibold text-white transition-all duration-300 hover:bg-primary-700"
               >
                 {cta.label}
                 <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/cta:translate-x-1" aria-hidden />
               </Link>
-            </div>
-          ) : (
-            <Link href={articleHref}>
-              <ReadMoreCue />
-            </Link>
-          )}
-          <BlogCardMeta post={post} dateLabel={dateLabel} isLarge />
+            ) : (
+              <Link href={articleHref} className="ml-auto shrink-0">
+                <ReadMoreCue />
+              </Link>
+            )}
+          </div>
         </div>
       </article>
     );
