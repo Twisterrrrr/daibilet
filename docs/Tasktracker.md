@@ -161,6 +161,8 @@
 |---|--------|-----------|--------|
 | UX.ECARD-DAY-OVERLAY | EventCard grid: «В мой день»/«Добавлено» на cover bottom-right overlay; footer = price+Купить | Высокий | ✅ `49be710` MSK **BUILD_ID=`J2r1pJc-sK2W_wGzB2KzY`** `/events` 200 |
 
+| UX.MYDAY-MOSQUE-MATCH | SPB соборная мечеть: ложный match → МТС Live Hall (Ded Moroz + concert copy); truncate title | Критический | ✅ code: geo-noise matcher + locationSlug + editorial cover; push; live deploy+seed pending |
+
 ## /my-day starter → header search (2026-08-04)
 
 | # | Задача | Приоритет | Статус |
