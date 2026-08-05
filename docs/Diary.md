@@ -1,3 +1,18 @@
+## 2026-08-05 - /my-day SPB: editorial covers для Главных 1-12
+
+### Наблюдения
+- Owner screenshot: «Выбор Дайбилет» (Советы) и chips «Главные места» SPB показывали dark gradient / MapPin вместо фото (Эрмитаж, Петропавловка, Дворцовая, Исаакий, Спас на Крови…).
+- Hub `heroImageUrl` часто dark `/venues/generated` stub; editorial fallback был только для NN.
+
+### Решения
+- 12 GenerateImage → `apps/public/public/images/venues/saint-petersburg/*.jpg`.
+- `city-place-images.ts`: `SAINT_PETERSBURG_IMAGES` по slug из `cityInfo` mustSee (venueSlug / locationSlug); `dayRouteItemFromMustSee` editorial wins over hub stub.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-05 - Blog hero: перенос перед «Часть N» в сериях Top-100
 
 ### Наблюдения

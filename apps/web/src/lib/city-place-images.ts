@@ -1,6 +1,7 @@
 /**
  * Editorial hero covers for /my-day Hot Picks when catalog hub omits heroImageUrl.
  * Nizhny pack: /images/venues/nizhny-novgorod/*.jpg
+ * SPB pack: /images/venues/saint-petersburg/*.jpg (Главные 1-12 + tips carousel)
  */
 
 const NIZHNY_NOVGOROD_IMAGES: Record<string, string> = {
@@ -52,8 +53,29 @@ const NIZHNY_NOVGOROD_IMAGES: Record<string, string> = {
   "nizhny-novgorod-naberezhnaya-fedorovskogo": "/images/venues/nizhny-novgorod/naberezhnaya-fedorovskogo.jpg",
 };
 
+const SAINT_PETERSBURG_IMAGES: Record<string, string> = {
+  ermitazh: '/images/venues/saint-petersburg/ermitazh.jpg',
+  'saint-petersburg-petropavlovskaya-krepost':
+    '/images/venues/saint-petersburg/petropavlovskaya-krepost.jpg',
+  'saint-petersburg-dvortsovaya-ploschad':
+    '/images/venues/saint-petersburg/dvortsovaya-ploschad.jpg',
+  'saint-petersburg-isaakievskiy-sobor':
+    '/images/venues/saint-petersburg/isaakievskiy-sobor.jpg',
+  'saint-petersburg-spas-na-krovi': '/images/venues/saint-petersburg/spas-na-krovi.jpg',
+  'saint-petersburg-kazanskiy-sobor': '/images/venues/saint-petersburg/kazanskiy-sobor.jpg',
+  'saint-petersburg-nevskiy-prospekt': '/images/venues/saint-petersburg/nevskiy-prospekt.jpg',
+  'saint-petersburg-admiralteystvo': '/images/venues/saint-petersburg/admiralteystvo.jpg',
+  'saint-petersburg-mednyy-vsadnik': '/images/venues/saint-petersburg/mednyy-vsadnik.jpg',
+  'saint-petersburg-strelka-vasilevskogo-ostrova':
+    '/images/venues/saint-petersburg/strelka-vasilevskogo-ostrova.jpg',
+  'saint-petersburg-mihaylovskiy-zamok':
+    '/images/venues/saint-petersburg/mihaylovskiy-zamok.jpg',
+  'saint-petersburg-anichkov-most': '/images/venues/saint-petersburg/anichkov-most.jpg',
+};
+
 const EDITORIAL_IMAGES_BY_SLUG: Record<string, string> = {
   ...NIZHNY_NOVGOROD_IMAGES,
+  ...SAINT_PETERSBURG_IMAGES,
 };
 
 export function lookupEditorialPlaceImage(
