@@ -2,9 +2,10 @@
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { Map as MapIcon, Search } from 'lucide-react';
 
+import { CatalogInfiniteSentinel } from '@/components/CatalogInfiniteSentinel.client';
 import { LocationCard } from '@/components/LocationCard.client';
 import { LocationsCatalogMap } from '@/components/LocationsCatalogMap.client';
 import { LocationsCatalogSkeleton } from '@/components/VenueCatalogSkeletons';
@@ -14,44 +15,52 @@ import { catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from '@
 import { cityToGenitive, cityToPrepositional } from '@/lib/city-declension';
 import { formatCountFloorTenPlus, formatNumber, pluralCities } from '@/lib/format';
 import { persistSelectedCity, resolveCatalogCityFilter } from '@/lib/selected-city';
-import { toVenueCatalogCard } from '@/lib/venue-catalog-card';
-import type { VenueCatalogCard } from '@/lib/venue-map-types';
+import {
+  fetchVenueCatalogPage,
+  fetchVenueCatalogPins,
+  VENUE_CATALOG_PAGE_SIZE,
+  type VenueCatalogFeedPage,
+  type VenueCatalogMapPin,
+  type VenueCatalogSort,
+} from '@/lib/venue-catalog-feed';
 import {
   LOCATION_LOGISTICS_OPTIONS,
   normalizeVenueKind,
-  resolveLocationLogisticsGroup,
-  resolvePublicVenueType,
   venueTypeLabel,
   type LocationLogisticsGroup,
 } from '@/lib/venue-meta';
 import { venueHref } from '@/lib/routes';
 
-type SortMode = 'events' | 'asc' | 'desc';
-
-const SORT_OPTIONS: Array<[SortMode, string]> = [
+const SORT_OPTIONS: Array<[VenueCatalogSort, string]> = [
   ['events', 'По афише'],
   ['asc', 'А–Я'],
   ['desc', 'Я–А'],
 ];
 
-function hasCatalogCoords(venue: VenueCatalogCard): boolean {
-  const lat = Number(venue.latitude);
-  const lng = Number(venue.longitude);
-  return Number.isFinite(lat) && Number.isFinite(lng) && !(lat === 0 && lng === 0);
+function cityOptionsFromStats(cities: Record<string, number>): Array<[string, number]> {
+  return [...Object.entries(cities)].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'ru'));
 }
 
-export function LocationsCatalogView({ venues: initialVenues }: { venues: VenueCatalogCard[] }) {
+export function LocationsCatalogView({ initialPage }: { initialPage: VenueCatalogFeedPage }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const selectedCity = useSelectedCityOptional();
-  const [venues, setVenues] = useState(initialVenues);
   const [query, setQuery] = useState('');
-  const [sortMode, setSortMode] = useState<SortMode>('events');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [sortMode, setSortMode] = useState<VenueCatalogSort>('events');
   const [isPending, startTransition] = useTransition();
+  const [venues, setVenues] = useState(initialPage.venues);
+  const [total, setTotal] = useState(initialPage.total);
+  const [nextCursor, setNextCursor] = useState<string | null>(initialPage.nextCursor);
+  const [stats, setStats] = useState(initialPage.stats);
   const [catalogLoading, setCatalogLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [showMap, setShowMap] = useState(false);
+  const [mapPins, setMapPins] = useState<VenueCatalogMapPin[]>([]);
+  const [mapLoading, setMapLoading] = useState(false);
   const [selectedPinId, setSelectedPinId] = useState<string | null>(null);
   const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const loadMoreLock = useRef(false);
 
   const urlCity = searchParams.get('city')?.trim() || '';
   const rawLogistics = searchParams.get('logistics')?.trim() || '';
@@ -62,42 +71,30 @@ export function LocationsCatalogView({ venues: initialVenues }: { venues: VenueC
   const typeFilter = rawType ? normalizeVenueKind(rawType) : 'all';
   const cityReady = selectedCity?.cityReady ?? true;
 
-  // City-scoped API includes 0-event editorial must-see; global SSR alone can miss them.
+  const cityOptions = useMemo(() => cityOptionsFromStats(stats.cities || {}), [stats.cities]);
+
+  const cityFilter = useMemo(() => {
+    if (urlCity) {
+      return resolveCatalogCityFilter(urlCity, cityOptions, selectedCity?.cityLabel);
+    }
+    if (!cityReady || !selectedCity || selectedCity.cityValue === 'all') return 'all';
+    return resolveCatalogCityFilter(selectedCity.cityValue, cityOptions, selectedCity.cityLabel);
+  }, [urlCity, cityReady, selectedCity, cityOptions]);
+
   const cityFetchKey = useMemo(() => {
     if (urlCity && urlCity !== 'all') return urlCity;
+    if (cityFilter !== 'all') return cityFilter;
     const dest = selectedCity?.selectedDestination;
     if (!dest || selectedCity?.cityValue === 'all') return '';
     return dest.sourceSlug || dest.slug || selectedCity.cityLabel || '';
-  }, [urlCity, selectedCity]);
+  }, [urlCity, cityFilter, selectedCity]);
 
   useEffect(() => {
-    // City-scoped fetch owns the list when a city filter is active.
-    if (cityFetchKey) return;
-    setVenues(initialVenues);
-  }, [initialVenues, cityFetchKey]);
+    const timer = window.setTimeout(() => setDebouncedQuery(query.trim()), 250);
+    return () => window.clearTimeout(timer);
+  }, [query]);
 
-  useEffect(() => {
-    if (!cityReady) return;
-    const controller = new AbortController();
-    const params = new URLSearchParams({ family: 'location', limit: '500' });
-    if (cityFetchKey) params.set('city', cityFetchKey);
-    // Empty SSR always refetch; city filter always refetch for editorial places.
-    if (!cityFetchKey && initialVenues.length > 0) return;
-    setCatalogLoading(true);
-    fetch(`/api/public/venues?${params.toString()}`, { signal: controller.signal })
-      .then(async (response) => (response.ok ? ((await response.json()) as { venues?: VenueCatalogCard[] }) : null))
-      .then((data) => {
-        // API returns hub heroImageUrl; overlay editorial covers like SSR VenueListPage.
-        if (data?.venues?.length) {
-          setVenues(data.venues.map((item) => toVenueCatalogCard(item)));
-        }
-      })
-      .catch(() => undefined)
-      .finally(() => setCatalogLoading(false));
-    return () => controller.abort();
-  }, [cityFetchKey, cityReady, initialVenues.length]);
-
-  // Desktop: open map by default when enough pins exist.
+  // Desktop: open map by default when enough pins exist - pins load lazily below.
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const mq = window.matchMedia('(min-width: 1024px)');
@@ -109,25 +106,86 @@ export function LocationsCatalogView({ venues: initialVenues }: { venues: VenueC
     return () => mq.removeEventListener('change', sync);
   }, []);
 
+  const feedQuery = useMemo(
+    () => ({
+      family: 'location' as const,
+      city: cityFetchKey || undefined,
+      type: typeFilter !== 'all' ? typeFilter : undefined,
+      logistics: logisticsFilter !== 'all' ? logisticsFilter : undefined,
+      sort: sortMode,
+      q: debouncedQuery || undefined,
+      limit: VENUE_CATALOG_PAGE_SIZE,
+    }),
+    [cityFetchKey, typeFilter, logisticsFilter, sortMode, debouncedQuery],
+  );
+
+  // Filters reset cursor and refetch first page server-side (not client filter on 5k).
+  useEffect(() => {
+    if (!cityReady && !urlCity) return;
+    const controller = new AbortController();
+    setCatalogLoading(true);
+    loadMoreLock.current = false;
+    fetchVenueCatalogPage(feedQuery, { signal: controller.signal })
+      .then((page) => {
+        setVenues(page.venues);
+        setTotal(page.total);
+        setNextCursor(page.nextCursor);
+        setStats(page.stats);
+      })
+      .catch(() => undefined)
+      .finally(() => {
+        if (!controller.signal.aborted) setCatalogLoading(false);
+      });
+    return () => controller.abort();
+  }, [feedQuery, cityReady, urlCity]);
+
+  // Map pins: only when showMap - separate lean mode=pins request.
+  useEffect(() => {
+    if (!showMap) return;
+    if (!cityReady && !urlCity) return;
+    const controller = new AbortController();
+    setMapLoading(true);
+    fetchVenueCatalogPins(
+      {
+        family: 'location',
+        city: cityFetchKey || undefined,
+        type: typeFilter !== 'all' ? typeFilter : undefined,
+        logistics: logisticsFilter !== 'all' ? logisticsFilter : undefined,
+        q: debouncedQuery || undefined,
+      },
+      { signal: controller.signal },
+    )
+      .then((pins) => setMapPins(pins))
+      .catch(() => undefined)
+      .finally(() => {
+        if (!controller.signal.aborted) setMapLoading(false);
+      });
+    return () => controller.abort();
+  }, [showMap, cityFetchKey, typeFilter, logisticsFilter, debouncedQuery, cityReady, urlCity]);
+
+  const loadMore = useCallback(() => {
+    if (!nextCursor || loadingMore || catalogLoading || loadMoreLock.current) return;
+    loadMoreLock.current = true;
+    setLoadingMore(true);
+    fetchVenueCatalogPage({ ...feedQuery, cursor: nextCursor })
+      .then((page) => {
+        setVenues((prev) => {
+          const seen = new Set(prev.map((item) => item.id));
+          return [...prev, ...page.venues.filter((item) => !seen.has(item.id))];
+        });
+        setNextCursor(page.nextCursor);
+        setTotal(page.total);
+        if (page.stats.venues) setStats(page.stats);
+      })
+      .catch(() => undefined)
+      .finally(() => {
+        loadMoreLock.current = false;
+        setLoadingMore(false);
+      });
+  }, [nextCursor, loadingMore, catalogLoading, feedQuery]);
+
   const cityPending = !urlCity && Boolean(selectedCity) && !cityReady;
   const listPending = cityPending || isPending || catalogLoading;
-
-  const cityOptions = useMemo(() => {
-    const counts = new Map<string, number>();
-    for (const venue of venues) {
-      if (!venue.city || venue.city === 'Не указан') continue;
-      counts.set(venue.city, (counts.get(venue.city) || 0) + 1);
-    }
-    return [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'ru'));
-  }, [venues]);
-
-  const cityFilter = useMemo(() => {
-    if (urlCity) {
-      return resolveCatalogCityFilter(urlCity, cityOptions, selectedCity?.cityLabel);
-    }
-    if (!cityReady || !selectedCity || selectedCity.cityValue === 'all') return 'all';
-    return resolveCatalogCityFilter(selectedCity.cityValue, cityOptions, selectedCity.cityLabel);
-  }, [urlCity, cityReady, selectedCity, cityOptions]);
 
   const setCityFilter = (next: string) => {
     persistSelectedCity(next === 'all' ? 'all' : next);
@@ -155,65 +213,28 @@ export function LocationsCatalogView({ venues: initialVenues }: { venues: VenueC
     });
   };
 
-  // Facet chip counts must match the city dropdown universe (e.g. SPb 20), not the global catalog.
-  const cityScopedVenues = useMemo(() => {
-    if (cityFilter === 'all') return venues;
-    const byName = venues.filter((venue) => venue.city === cityFilter);
-    // City-scoped API already narrowed the list; slug URL (?city=saint-petersburg)
-    // may not equal display title «Санкт-Петербург».
-    if (byName.length === 0 && cityFetchKey) return venues;
-    return byName;
-  }, [venues, cityFilter, cityFetchKey]);
-
   const logisticsOptions = useMemo(() => {
-    const counts = new Map<string, number>();
-    for (const venue of cityScopedVenues) {
-      const key = resolveLocationLogisticsGroup(venue.type, venue.name);
-      if (key === 'other') continue;
-      counts.set(key, (counts.get(key) || 0) + 1);
-    }
-    return LOCATION_LOGISTICS_OPTIONS.filter((option) => option.value === 'all' || counts.has(option.value)).map(
-      (option) => ({
-        ...option,
-        count: option.value === 'all' ? cityScopedVenues.length : counts.get(option.value) || 0,
-      }),
-    );
-  }, [cityScopedVenues]);
+    const counts = stats.logistics || {};
+    const scopedTotal = stats.venues || total;
+    return LOCATION_LOGISTICS_OPTIONS.filter(
+      (option) => option.value === 'all' || counts[option.value],
+    ).map((option) => ({
+      ...option,
+      count: option.value === 'all' ? scopedTotal : counts[option.value] || 0,
+    }));
+  }, [stats.logistics, stats.venues, total]);
 
-  const filteredVenues = useMemo(() => {
-    if (listPending) return [];
-    const normalized = query.trim().toLowerCase();
-    const filtered = cityScopedVenues.filter((venue) => {
-      if (logisticsFilter !== 'all' && resolveLocationLogisticsGroup(venue.type, venue.name) !== logisticsFilter) {
-        return false;
-      }
-      if (typeFilter !== 'all' && resolvePublicVenueType(venue.type, venue.name) !== typeFilter) return false;
-      if (!normalized) return true;
-      return [venue.name, venue.city, venue.address, venue.shortDescription, venue.wayToFind, venueTypeLabel(venue.type, venue.name)]
-        .filter(Boolean)
-        .join(' ')
-        .toLowerCase()
-        .includes(normalized);
-    });
-
-    return [...filtered].sort((left, right) => {
-      if (sortMode === 'events') return right.events - left.events || left.name.localeCompare(right.name, 'ru');
-      if (sortMode === 'desc') return right.name.localeCompare(left.name, 'ru');
-      return left.name.localeCompare(right.name, 'ru');
-    });
-  }, [cityScopedVenues, query, logisticsFilter, typeFilter, sortMode, listPending]);
-
-  const mapPins = useMemo(
+  const mapPinsForUi = useMemo(
     () =>
-      filteredVenues.filter(hasCatalogCoords).map((venue) => ({
-        id: venue.id,
-        title: venue.name,
-        href: venueHref(venue),
-        latitude: Number(venue.latitude),
-        longitude: Number(venue.longitude),
-        typeLabel: venueTypeLabel(venue.type, venue.name),
+      mapPins.map((pin) => ({
+        id: pin.id,
+        title: pin.name,
+        href: venueHref({ id: pin.id, slug: pin.slug, name: pin.name, type: pin.kind }),
+        latitude: pin.latitude,
+        longitude: pin.longitude,
+        typeLabel: venueTypeLabel(pin.kind, pin.name),
       })),
-    [filteredVenues],
+    [mapPins],
   );
 
   const onPinClick = (id: string) => {
@@ -232,24 +253,29 @@ export function LocationsCatalogView({ venues: initialVenues }: { venues: VenueC
   const heroDescription = cityName
     ? `Причалы, парки и места встречи ${cityToGenitive(cityName)}.`
     : 'Причалы, парки и места встречи для экскурсий и событий.';
+  const heroTotal = stats.venues || total;
 
   const listBlock = listPending ? (
     <LocationsCatalogSkeleton />
-  ) : filteredVenues.length > 0 ? (
-    <div className="grid grid-cols-1 gap-3">
-      {filteredVenues.map((venue) => (
-        <div
-          key={venue.id}
-          ref={(node) => {
-            if (node) cardRefs.current.set(venue.id, node);
-            else cardRefs.current.delete(venue.id);
-          }}
-          className={selectedPinId === venue.id ? 'ring-2 ring-primary-500/40 rounded-2xl' : undefined}
-        >
-          <LocationCard venue={venue} href={venueHref(venue)} nextSlot={venue.nextSlot} />
-        </div>
-      ))}
-    </div>
+  ) : venues.length > 0 ? (
+    <>
+      <div className="grid grid-cols-1 gap-3">
+        {venues.map((venue) => (
+          <div
+            key={venue.id}
+            ref={(node) => {
+              if (node) cardRefs.current.set(venue.id, node);
+              else cardRefs.current.delete(venue.id);
+            }}
+            className={selectedPinId === venue.id ? 'ring-2 ring-primary-500/40 rounded-2xl' : undefined}
+          >
+            <LocationCard venue={venue} href={venueHref(venue)} nextSlot={venue.nextSlot} />
+          </div>
+        ))}
+      </div>
+      {loadingMore ? <div className="mt-4"><LocationsCatalogSkeleton count={3} /></div> : null}
+      <CatalogInfiniteSentinel enabled={Boolean(nextCursor) && !loadingMore} onIntersect={loadMore} />
+    </>
   ) : (
     <div className="rounded-2xl border border-dashed border-slate-300 bg-white py-16 text-center text-slate-500">
       <p className="text-lg font-semibold text-slate-700">Ничего не нашли</p>
@@ -264,7 +290,7 @@ export function LocationsCatalogView({ venues: initialVenues }: { venues: VenueC
         variant="minimal"
         dense
         breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Локации' }]}
-        eyebrow={`${formatCountFloorTenPlus(venues.length)} локаций · ${pluralCities(cityCount)}`}
+        eyebrow={`${formatCountFloorTenPlus(heroTotal)} локаций · ${pluralCities(cityCount)}`}
         title={heroTitle}
         description={cityName ? heroDescription : 'Места встречи и точки старта. Город - в шапке.'}
         tone="light"
@@ -328,9 +354,9 @@ export function LocationsCatalogView({ venues: initialVenues }: { venues: VenueC
               'Обновляем список…'
             ) : (
               <>
-                Найдено: {formatNumber(filteredVenues.length)}
-                {cityScopedVenues.length ? (
-                  <span className="font-normal text-slate-500"> из {formatNumber(cityScopedVenues.length)}</span>
+                Найдено: {formatNumber(total)}
+                {venues.length && venues.length < total ? (
+                  <span className="font-normal text-slate-500"> · показано {formatNumber(venues.length)}</span>
                 ) : null}
               </>
             )}
@@ -351,7 +377,7 @@ export function LocationsCatalogView({ venues: initialVenues }: { venues: VenueC
             </button>
             <select
               value={sortMode}
-              onChange={(event) => setSortMode(event.target.value as SortMode)}
+              onChange={(event) => setSortMode(event.target.value as VenueCatalogSort)}
               className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none"
             >
               {SORT_OPTIONS.map(([value, label]) => (
@@ -370,17 +396,21 @@ export function LocationsCatalogView({ venues: initialVenues }: { venues: VenueC
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(320px,42%)] lg:items-start">
             <div className="min-w-0">{listBlock}</div>
             <aside className="sticky top-[calc(var(--site-header-height)+1rem)] hidden self-start lg:block">
-              {mapPins.length > 0 ? (
+              {mapLoading ? (
+                <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-6 text-sm text-slate-500">
+                  Загружаем точки карты…
+                </div>
+              ) : mapPinsForUi.length > 0 ? (
                 <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
                   <LocationsCatalogMap
-                    pins={mapPins}
+                    pins={mapPinsForUi}
                     selectedId={selectedPinId}
                     onPinClick={onPinClick}
-                    layoutKey={`${showMap}-${mapPins.length}-${cityFilter}-${logisticsFilter}`}
+                    layoutKey={`${showMap}-${mapPinsForUi.length}-${cityFilter}-${logisticsFilter}`}
                     className="h-[min(70vh,640px)] w-full"
                   />
                   <p className="border-t border-slate-100 px-3 py-2 text-xs text-slate-500">
-                    {formatNumber(mapPins.length)} точек с координатами на карте
+                    {formatNumber(mapPinsForUi.length)} точек с координатами на карте
                   </p>
                 </div>
               ) : (
@@ -391,13 +421,17 @@ export function LocationsCatalogView({ venues: initialVenues }: { venues: VenueC
             </aside>
             {/* Mobile map panel when toggle on */}
             <div className="lg:hidden">
-              {mapPins.length > 0 ? (
+              {mapLoading ? (
+                <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-500">
+                  Загружаем карту…
+                </div>
+              ) : mapPinsForUi.length > 0 ? (
                 <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
                   <LocationsCatalogMap
-                    pins={mapPins}
+                    pins={mapPinsForUi}
                     selectedId={selectedPinId}
                     onPinClick={onPinClick}
-                    layoutKey={`m-${showMap}-${mapPins.length}`}
+                    layoutKey={`m-${showMap}-${mapPinsForUi.length}`}
                     className="h-72 w-full"
                   />
                 </div>

@@ -357,6 +357,29 @@ export interface PublicVenuePageDto extends ApiEnvelope {
 export interface PublicVenuesDto extends ApiEnvelope {
   total: number;
   venues: PublicVenueDto[];
+  /** Opaque cursor for infinite scroll; null when no more pages. */
+  nextCursor?: string | null;
+  hasMore?: boolean;
+  limit?: number;
+  /** Lazy map pins (`mode=pins`) - slug/name/lat/lng/kind only. */
+  pins?: PublicVenueMapPinDto[];
+  stats?: {
+    venues: number;
+    cities: Record<string, number>;
+    types: Record<string, number>;
+    scales?: Record<string, number>;
+    logistics?: Record<string, number>;
+  };
+}
+
+/** Lean pin for `/locations` map - fetched only when map is visible. */
+export interface PublicVenueMapPinDto {
+  id: string;
+  slug?: string | null;
+  name: string;
+  latitude: number;
+  longitude: number;
+  kind: string;
 }
 
 export interface PublicLandingPageDto extends ApiEnvelope {

@@ -1,3 +1,21 @@
+## 2026-08-05 - `/venues`+`/locations`: lazy cursor + снятие cap 500
+
+### Наблюдения
+- Owner: hero и kind chips ровно **500** на `/venues` и `/locations` - «где зарезано».
+- Корни: `publicVenueHubRows(..., wideHub ? 2000 : 500)` в `buildPublicVenuesCatalog`; `fetchLeanPublicVenueRows` take max 2000 / default 500; client `limit: '500'`; hero от `venues.length`.
+
+### Решения
+- Hub catalog: `VENUE_CATALOG_HUB_MAX=10000`, всегда `requireEvents:false`; warm short-circuit отключён (он и держал 500).
+- List: cursor pages `limit=36`, `nextCursor`/`hasMore`; total+stats от полного filtered set.
+- UI: IntersectionObserver load-more; фильтры refetch первой пачки; map pins только при `showMap` (`mode=pins`).
+- Cache key: `city+kind+cursor(+scale/logistics)` via `unstable_cache` v4.
+- Commit+push; web deploy нет.
+
+### Проблемы
+- Total/facets всё ещё in-memory после kind-resolution (не сырой SQL COUNT(*)); при >10k venues понадобится DB cursor.
+
+---
+
 ## 2026-08-05 - Home: витрина → персональный гид (MVP)
 
 ### Наблюдения

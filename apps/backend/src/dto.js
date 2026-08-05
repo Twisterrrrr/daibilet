@@ -6657,14 +6657,15 @@ function venueGroupsOverlap(a, b) {
 
 export async function publicVenueHubRows(db, limit = 500, options = {}) {
   const now = Date.now();
-  const cacheKey = `${limit}:${options.requireEvents === false ? 'all' : 'hub'}`;
+  const take = Math.max(1, Math.min(Number(limit) || 500, 10000));
+  const cacheKey = `${take}:${options.requireEvents === false ? 'all' : 'hub'}`;
   if (publicVenueHubCache?.cacheKey === cacheKey && publicVenueHubCache.expiresAt > now) {
     return publicVenueHubCache.rows;
   }
 
   // Lean Prisma select + `_count` (active events) - no full catalog session hydrate for tiles.
   // Hero covers still need event/override fallbacks when Venue.heroImageUrl is empty.
-  const leanRows = await fetchLeanPublicVenueRows(Math.max(limit, 500), { leanText: false });
+  const leanRows = await fetchLeanPublicVenueRows(take, { leanText: false });
   const venueIds = leanRows.map((row) => row.id);
   const missingHeroIds = leanRows
     .filter((row) => !pickRealPublicImageUrl(row.heroImageUrl))
@@ -7659,6 +7660,102 @@ function applyPublicVenueDisplayName(row, type) {
   return name;
 }
 
+/** Catalog first paint / infinite scroll page size (24–48 band). */
+const VENUE_CATALOG_PAGE_DEFAULT = 36;
+const VENUE_CATALOG_PAGE_MAX = 100;
+/** Explicit dump requests (DayRoute) - not used as catalog universe cap. */
+const VENUE_CATALOG_DUMP_MAX = 2000;
+/**
+ * Hub universe for /venues|/locations list+stats.
+ * Former `take(500)` / `wideHub ? 2000 : 500` made hero + kind chips stuck at exactly 500.
+ */
+const VENUE_CATALOG_HUB_MAX = 10000;
+
+const MUSEUM_SCALE_KINDS = new Set(['museum', 'art_space', 'museum_art_space']);
+const LARGE_HALL_KINDS = new Set(['theater', 'concert_hall']);
+const INTIMATE_KINDS = new Set(['bar', 'club_bar_restaurant']);
+const LARGE_HALL_NAME_RE =
+  /\b(большой|марийский|новат|оперн|балет|филармон|консерватор|дворец\s+спорт|ледовый|арена|стадион)\b/iu;
+const INTIMATE_NAME_RE = /\b(камерн|лофт|клуб|бар|рюмочн|speakeasy|спикизи|галере)\b/iu;
+const PIER_LOGISTICS_KINDS = new Set(['pier', 'pier_water']);
+const BUS_LOGISTICS_KINDS = new Set(['bus']);
+const WALKING_LOGISTICS_KINDS = new Set([
+  'park',
+  'monument',
+  'outdoor_location',
+  'attraction',
+  'gastro',
+  'meeting_point',
+  'sport_activity_space',
+]);
+
+function resolveInstitutionScaleFromKind(type, name) {
+  if (MUSEUM_SCALE_KINDS.has(type)) return 'museum';
+  if (LARGE_HALL_KINDS.has(type)) return 'large_hall';
+  if (INTIMATE_KINDS.has(type)) return 'intimate';
+  const text = String(name || '');
+  if (LARGE_HALL_NAME_RE.test(text)) return 'large_hall';
+  if (INTIMATE_NAME_RE.test(text)) return 'intimate';
+  return 'other';
+}
+
+function resolveLocationLogisticsFromKind(type, name) {
+  if (PIER_LOGISTICS_KINDS.has(type)) return 'pier';
+  if (BUS_LOGISTICS_KINDS.has(type)) return 'bus';
+  if (WALKING_LOGISTICS_KINDS.has(type)) return 'walking';
+  const text = String(name || '').toLowerCase();
+  if (/причал|пристань|дебаркадер|набережн/.test(text)) return 'pier';
+  if (/автобус|автовокзал|место посадки/.test(text)) return 'bus';
+  if (/пешеход|прогулк|двор|улица|площад|парк|сквер/.test(text)) return 'walking';
+  return 'other';
+}
+
+function encodeVenueCatalogCursor(slug) {
+  const value = String(slug || '').trim();
+  if (!value) return null;
+  return Buffer.from(JSON.stringify({ s: value }), 'utf8').toString('base64url');
+}
+
+function decodeVenueCatalogCursor(raw) {
+  const value = String(raw || '').trim();
+  if (!value) return null;
+  try {
+    const parsed = JSON.parse(Buffer.from(value, 'base64url').toString('utf8'));
+    const slug = String(parsed?.s || '').trim();
+    return slug || null;
+  } catch {
+    return null;
+  }
+}
+
+function sortVenueCatalogItems(items, sortMode) {
+  const mode = sortMode === 'asc' || sortMode === 'desc' ? sortMode : 'events';
+  return [...items].sort((a, b) => {
+    if (mode === 'events') {
+      return (Number(b.events) || 0) - (Number(a.events) || 0) || String(a.name || '').localeCompare(String(b.name || ''), 'ru');
+    }
+    const cmp = String(a.name || '').localeCompare(String(b.name || ''), 'ru');
+    return mode === 'asc' ? cmp : -cmp;
+  });
+}
+
+function paginateVenueCatalogItems(items, { cursor, limit }) {
+  const decoded = decodeVenueCatalogCursor(cursor);
+  let start = 0;
+  if (decoded) {
+    const idx = items.findIndex((item) => String(item.slug || '') === decoded);
+    start = idx >= 0 ? idx + 1 : items.length;
+  }
+  const page = items.slice(start, start + limit);
+  const last = page[page.length - 1];
+  const hasMore = start + page.length < items.length;
+  return {
+    page,
+    hasMore,
+    nextCursor: hasMore && last?.slug ? encodeVenueCatalogCursor(last.slug) : null,
+  };
+}
+
 function mapPublicVenueListItem(row) {
   const normalized = applyPublicVenueNormalization(row);
   const type = resolvePublicVenueKindFromRow(normalized);
@@ -7670,6 +7767,7 @@ function mapPublicVenueListItem(row) {
   const citySlug =
     normalizeNullableString(normalized.citySlug) ||
     (normalized.city && normalized.city !== 'Не указан' ? publicCitySlug(normalized.city) : null);
+  // Lean list DTO: no sessions / mini-affiche / empty categories blob.
   return {
     id: normalized.id,
     slug: publicVenueSlug(normalized.slug, name, normalized.id),
@@ -7682,7 +7780,6 @@ function mapPublicVenueListItem(row) {
     longitude: coords?.longitude ?? null,
     metroStation: normalizeNullableString(normalized.metroStation),
     wayToFind: normalizeNullableString(normalized.wayToFind),
-    parkingInfo: normalizeNullableString(normalized.parkingInfo),
     hookFact: normalizeNullableString(normalized.hookFact),
     type,
     template: publicVenuePageTemplate(type),
@@ -7693,78 +7790,154 @@ function mapPublicVenueListItem(row) {
     stopEventCount: Number.isFinite(Number(normalized.stopEventCount))
       ? Number(normalized.stopEventCount)
       : undefined,
-    categories: {},
     nextSlot: normalized.nextSessionStartsAt ? formatTime(normalized.nextSessionStartsAt) : null,
   };
 }
 
+function mapPublicVenuePinItem(venue) {
+  const lat = Number(venue.latitude);
+  const lng = Number(venue.longitude);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng) || (lat === 0 && lng === 0)) return null;
+  return {
+    id: venue.id,
+    slug: venue.slug,
+    name: venue.name,
+    latitude: lat,
+    longitude: lng,
+    kind: venue.type,
+  };
+}
+
+function hasValidVenueCatalogCoords(venue) {
+  const lat = Number(venue.latitude);
+  const lng = Number(venue.longitude);
+  return Number.isFinite(lat) && Number.isFinite(lng) && !(lat === 0 && lng === 0);
+}
+
 export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchParams()) {
-  const limit = clampNumber(searchParams.get('limit'), 1, 500, 240);
+  const mode = String(searchParams.get('mode') || 'list').trim().toLowerCase();
+  const isPins = mode === 'pins';
+  const requestedLimit = Number(searchParams.get('limit'));
+  const listLimitMax =
+    Number.isFinite(requestedLimit) && requestedLimit > VENUE_CATALOG_PAGE_MAX
+      ? VENUE_CATALOG_DUMP_MAX
+      : VENUE_CATALOG_PAGE_MAX;
+  const limit = isPins
+    ? clampNumber(searchParams.get('limit'), 1, VENUE_CATALOG_HUB_MAX, VENUE_CATALOG_HUB_MAX)
+    : clampNumber(searchParams.get('limit'), 1, listLimitMax, VENUE_CATALOG_PAGE_DEFAULT);
+  const cursorRaw = String(searchParams.get('cursor') || '').trim();
   const query = String(searchParams.get('q') || '').trim().toLowerCase();
   const cityFilter = String(searchParams.get('city') || '').trim().toLowerCase();
   const typeFilter = String(searchParams.get('type') || '').trim().toLowerCase();
   const familyFilter = String(searchParams.get('family') || '').trim().toLowerCase();
+  const scaleFilter = String(searchParams.get('scale') || '').trim().toLowerCase();
+  const logisticsFilter = String(searchParams.get('logistics') || '').trim().toLowerCase();
+  const sortMode = String(searchParams.get('sort') || 'events').trim().toLowerCase();
 
-  // Warm list = global family browse only (top hub with events).
-  // Never short-circuit city-scoped: a few event venues for Nizhny/SPB would
-  // hide editorial 0-event must-see (kreml/yarmarka/…) and break /my-day picks.
-  // Location family also skips warm short-circuit so editorial content places
-  // (0 events) are not truncated by the event-sorted warm snapshot.
-  if (!query && !typeFilter && familyFilter && !cityFilter && familyFilter !== 'location') {
-    const warmList = warmVenueCatalogList(familyFilter);
-    if (warmList) {
-      const venues = warmList.slice(0, limit);
-      const cities = countBy(venues.map((venue) => venue.city).filter(Boolean));
-      const types = countBy(venues.map((venue) => venue.type).filter(Boolean));
+  const buildEnvelope = (filteredItems, pageItems, nextCursor, hasMore, facetSource) => {
+    const citySource = facetSource?.cityUniverse || filteredItems;
+    const typeSource = facetSource?.typeUniverse || filteredItems;
+    const scaleSource = facetSource?.scaleUniverse || filteredItems;
+    const cities = countBy(citySource.map((venue) => venue.city).filter(Boolean));
+    const types = countBy(typeSource.map((venue) => venue.type).filter(Boolean));
+    const scales = countBy(
+      scaleSource
+        .filter((venue) => venue.template === 'institution')
+        .map((venue) => resolveInstitutionScaleFromKind(venue.type, venue.name))
+        .filter((value) => value !== 'other'),
+    );
+    const logistics = countBy(
+      scaleSource
+        .filter((venue) => venue.template === 'location')
+        .map((venue) => resolveLocationLogisticsFromKind(venue.type, venue.name))
+        .filter((value) => value !== 'other'),
+    );
+    if (isPins) {
       return {
         generatedAt: new Date().toISOString(),
-        total: venues.length,
-        venues,
-        stats: {
-          venues: venues.length,
-          cities,
-          types,
-        },
+        total: filteredItems.length,
+        pins: filteredItems.map(mapPublicVenuePinItem).filter(Boolean),
+        venues: [],
+        nextCursor: null,
+        hasMore: false,
+        limit,
+        stats: { venues: filteredItems.length, cities, types, scales, logistics },
       };
     }
+    return {
+      generatedAt: new Date().toISOString(),
+      total: filteredItems.length,
+      venues: pageItems,
+      nextCursor,
+      hasMore,
+      limit,
+      stats: {
+        venues: filteredItems.length,
+        cities,
+        types,
+        scales,
+        logistics,
+      },
+    };
+  };
+
+  const applyListFilters = (items) => {
+    // Facet stages mirror /venues|/locations chips: city universe → type → scale/logistics.
+    let working = items;
+    if (query) {
+      working = working.filter((venue) =>
+        [venue.name, venue.city, venue.address, venue.type, venue.wayToFind, venue.shortDescription]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase()
+          .includes(query),
+      );
+    }
+    if (familyFilter) {
+      working = working.filter((venue) => venue.template === familyFilter);
+    }
+    const cityUniverse = working;
+    if (cityFilter) {
+      working = working.filter((venue) => publicVenueRowMatchesCityFilter(venue, cityFilter));
+    }
+    const typeUniverse = working;
+    if (typeFilter) {
+      working = working.filter((venue) => venue.type === typeFilter);
+    }
+    const scaleUniverse = working;
+    if (scaleFilter === 'museum' || scaleFilter === 'large_hall' || scaleFilter === 'intimate') {
+      working = working.filter(
+        (venue) => resolveInstitutionScaleFromKind(venue.type, venue.name) === scaleFilter,
+      );
+    }
+    if (logisticsFilter === 'pier' || logisticsFilter === 'bus' || logisticsFilter === 'walking') {
+      working = working.filter(
+        (venue) => resolveLocationLogisticsFromKind(venue.type, venue.name) === logisticsFilter,
+      );
+    }
+    return { filtered: working, cityUniverse, typeUniverse, scaleUniverse };
+  };
+
+  // Do NOT short-circuit on warmVenueCatalogList: it was built from hub take(500)
+  // and pinned hero/chips at exactly 500. Always load full catalog hub + paginate.
+
+  // Full eligible hub for accurate total/stats; page size is applied via cursor below.
+  // requireEvents:false keeps 0-event editorial must-see in /locations and /venues.
+  const rows = await publicVenueHubRows(db, VENUE_CATALOG_HUB_MAX, { requireEvents: false });
+  const mapped = rows.map(mapPublicVenueListItem);
+  const { filtered, cityUniverse, typeUniverse, scaleUniverse } = applyListFilters(mapped);
+  const sorted = sortVenueCatalogItems(filtered, sortMode);
+  const facetSource = { cityUniverse, typeUniverse, scaleUniverse };
+
+  if (isPins) {
+    return buildEnvelope(sorted.filter(hasValidVenueCatalogCoords), [], null, false, facetSource);
   }
 
-  // Location family + city-scoped: wider lean hub + content places (0 events).
-  const wideHub = Boolean(cityFilter) || familyFilter === 'location';
-  const rows = await publicVenueHubRows(db, wideHub ? 2000 : 500, wideHub ? { requireEvents: false } : {});
-  const venues = rows
-    .filter((row) => {
-      if (!query) return true;
-      return [row.name, row.city, row.address, row.proposedKind].filter(Boolean).join(' ').toLowerCase().includes(query);
-    })
-    .filter((row) => {
-      if (!cityFilter) return true;
-      return publicVenueRowMatchesCityFilter(row, cityFilter);
-    })
-    .filter((row) => {
-      if (!typeFilter) return true;
-      return resolvePublicVenueKindFromRow(row) === typeFilter;
-    })
-    .filter((row) => {
-      if (!familyFilter) return true;
-      const template = publicVenuePageTemplate(resolvePublicVenueKindFromRow(row));
-      return template === familyFilter;
-    })
-    .slice(0, limit)
-    .map(mapPublicVenueListItem);
-
-  const cities = countBy(venues.map((venue) => venue.city).filter(Boolean));
-  const types = countBy(venues.map((venue) => venue.type).filter(Boolean));
-  return {
-    generatedAt: new Date().toISOString(),
-    total: venues.length,
-    venues,
-    stats: {
-      venues: venues.length,
-      cities,
-      types,
-    },
-  };
+  const { page, hasMore, nextCursor } = paginateVenueCatalogItems(sorted, {
+    cursor: cursorRaw,
+    limit,
+  });
+  return buildEnvelope(sorted, page, nextCursor, hasMore, facetSource);
 }
 
 /** Short hub chips on `/cities` cards (CHPU landings). */

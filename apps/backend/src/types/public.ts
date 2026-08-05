@@ -298,6 +298,26 @@ export interface PublicVenuePageDto extends ApiEnvelope {
 export interface PublicVenuesDto extends ApiEnvelope {
   total: number;
   venues: PublicVenueDto[];
+  nextCursor?: string | null;
+  hasMore?: boolean;
+  limit?: number;
+  pins?: PublicVenueMapPinDto[];
+  stats?: {
+    venues: number;
+    cities: Record<string, number>;
+    types: Record<string, number>;
+    scales?: Record<string, number>;
+    logistics?: Record<string, number>;
+  };
+}
+
+export interface PublicVenueMapPinDto {
+  id: string;
+  slug?: string | null;
+  name: string;
+  latitude: number;
+  longitude: number;
+  kind: string;
 }
 
 export interface PublicLandingPageDto extends ApiEnvelope {

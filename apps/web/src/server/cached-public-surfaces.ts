@@ -121,14 +121,56 @@ export async function getCachedDestinations() {
   )();
 }
 
-export async function getCachedVenuesCatalog(family: 'institution' | 'location', limit = 500) {
+export async function getCachedVenuesCatalog(
+  family: 'institution' | 'location',
+  options: {
+    limit?: number;
+    city?: string;
+    type?: string;
+    scale?: string;
+    logistics?: string;
+    sort?: string;
+    cursor?: string;
+    q?: string;
+  } = {},
+) {
+  const limit = options.limit ?? 36;
+  const city = options.city?.trim() || '';
+  const type = options.type?.trim() || '';
+  const scale = options.scale?.trim() || '';
+  const logistics = options.logistics?.trim() || '';
+  const sort = options.sort?.trim() || 'events';
+  const cursor = options.cursor?.trim() || '';
+  const q = options.q?.trim() || '';
+  // Cache key: city+kind+cursor(+scale/logistics[+sort/q]).
+  const cacheKeyParts = [
+    'public-venues-catalog-v4-http',
+    family,
+    String(limit),
+    city || 'all',
+    type || 'all',
+    scale || 'all',
+    logistics || 'all',
+    sort,
+    cursor || '',
+    q,
+  ];
   const cached = unstable_cache(
-    () =>
-      fetchPublicApiJson<PublicVenuesDto>('/api/public/venues', {
-        searchParams: { family, limit },
+    () => {
+      const searchParams: Record<string, string | number> = { family, limit };
+      if (city) searchParams.city = city;
+      if (type) searchParams.type = type;
+      if (scale) searchParams.scale = scale;
+      if (logistics) searchParams.logistics = logistics;
+      if (sort && sort !== 'events') searchParams.sort = sort;
+      if (cursor) searchParams.cursor = cursor;
+      if (q) searchParams.q = q;
+      return fetchPublicApiJson<PublicVenuesDto>('/api/public/venues', {
+        searchParams,
         timeoutMs: 5_000,
-      }),
-    ['public-venues-catalog-v3-http', family, String(limit)],
+      });
+    },
+    cacheKeyParts,
     surfaceCacheOptions,
   );
   return cached();

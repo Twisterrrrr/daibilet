@@ -15,6 +15,12 @@
 |---|--------|-----------|--------|
 | OPS.DEPLOY-CADENCE | Канон: commit+push после итерации; MSK web deploy пачкой раз в сутки / по запросу owner; hotfix-исключения | Высокий | ✅ `.cursorrules` + Project.md 2026-08-05 |
 
+## Catalog lazy / venues+locations perf (2026-08-05)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| PERF.VENUE-CAT-LAZY | `/venues`+`/locations`: page=36 + cursor IO + server filters + lean DTO + lazy map pins + cache key; снять take(500) cap на hub/total | Высокий | ✅ code; deploy пачкой / по запросу |
+
 ## Home personal guide (2026-08-05)
 
 | # | Задача | Приоритет | Статус |

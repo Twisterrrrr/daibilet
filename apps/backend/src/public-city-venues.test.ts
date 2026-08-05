@@ -74,12 +74,11 @@ test('publicVenueRowMatchesCityFilter accepts nizhny aliases and slug prefix', (
 });
 
 test('city-scoped family catalog must not short-circuit on warm-only event venues', () => {
-  // Documented contract: when city= is set, warm list alone is insufficient -
-  // buildPublicVenuesCatalog must fall through to requireEvents:false hub so
-  // editorial must-see (0 events) are included. Regression guard for /my-day.
-  // Location family also skips warm short-circuit (same editorial gap).
+  // Documented contract: catalog loads full hub (VENUE_CATALOG_HUB_MAX) with
+  // requireEvents:false so editorial must-see (0 events) are included and
+  // hero/chips totals are not pinned at take(500).
   const source = require('node:fs').readFileSync(new URL('./dto.js', import.meta.url), 'utf8');
-  assert.match(source, /Never short-circuit city-scoped/);
-  assert.match(source, /familyFilter !== 'location'/);
-  assert.match(source, /wideHub/);
+  assert.match(source, /VENUE_CATALOG_HUB_MAX/);
+  assert.match(source, /requireEvents: false/);
+  assert.match(source, /Do NOT short-circuit on warmVenueCatalogList/);
 });

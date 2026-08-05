@@ -1136,11 +1136,11 @@ export async function warmPublicCaches(reason) {
       Promise.all([...publicCacheWarmers].map((warmer) => Promise.resolve().then(() => warmer(reason)))),
     ]);
     await Promise.all([
-      withPublicResponseCache('venues:family=institution&limit=500', () =>
-        buildPublicVenuesCatalog(db, new URLSearchParams({ family: 'institution', limit: '500' })),
+      withPublicResponseCache('venues:family=institution&limit=36', () =>
+        buildPublicVenuesCatalog(db, new URLSearchParams({ family: 'institution', limit: '36' })),
       ),
-      withPublicResponseCache('venues:family=location&limit=500', () =>
-        buildPublicVenuesCatalog(db, new URLSearchParams({ family: 'location', limit: '500' })),
+      withPublicResponseCache('venues:family=location&limit=36', () =>
+        buildPublicVenuesCatalog(db, new URLSearchParams({ family: 'location', limit: '36' })),
       ),
       // Key SSR routes: top cities + landings after deploy/sync.
       withPublicResponseCache('city:sankt-peterburg', () => buildPublicCityPage(db, 'sankt-peterburg').catch(() => null)),

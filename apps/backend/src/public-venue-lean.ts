@@ -70,11 +70,14 @@ type VenueListRecord = Prisma.VenueGetPayload<{ select: typeof venueListSelect }
  * Also unions content places (park/monument/museum/…) with PUBLISHED|CANDIDATE
  * so zero-event must-see entities are not dropped by the top-N event sort.
  */
+/** Catalog hub must load the full eligible set - take(500) made hero/chips stuck at 500. */
+export const VENUE_LEAN_HUB_MAX = 10_000;
+
 export async function fetchLeanPublicVenueRows(
-  limit = 500,
+  limit = VENUE_LEAN_HUB_MAX,
   options: { leanText?: boolean; q?: string } = {},
 ): Promise<LeanPublicVenueRow[]> {
-  const take = Math.max(1, Math.min(Number(limit) || 500, 2000));
+  const take = Math.max(1, Math.min(Number(limit) || VENUE_LEAN_HUB_MAX, VENUE_LEAN_HUB_MAX));
   const q = String(options.q || '').trim();
   const where: Prisma.VenueWhereInput = {
     pageStatus: { not: 'HIDDEN' },
@@ -90,7 +93,7 @@ export async function fetchLeanPublicVenueRows(
   const contentKinds = [...CONTENT_PLACE_DB_KINDS] as VenueKind[];
   // Full editorial set (SPB/KGD must-see etc.). Former A→Z take:400 dropped
   // titles after «П» (Петропавловская, Спас, Стрелка…) from /locations.
-  const contentTake = Math.min(Math.max(take, 500), 2000);
+  const contentTake = Math.min(Math.max(take, 500), VENUE_LEAN_HUB_MAX);
   const [rows, contentRows] = await Promise.all([
     prisma.venue.findMany({
       where,

@@ -10,8 +10,7 @@ import { VenueCatalogPageSkeleton } from '@/components/VenueCatalogSkeletons';
 import { JsonLdScripts } from '@/components/JsonLdScripts';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
-import type { VenueCatalogCard } from '@/lib/venue-map-types';
-import { toVenueCatalogCard } from '@/lib/venue-catalog-card';
+import { mapVenueCatalogFeedPage, VENUE_CATALOG_PAGE_SIZE } from '@/lib/venue-catalog-feed';
 import { evaluateVenueIndexability, robotsForIndexability } from '@/lib/hub-indexability';
 import { venueHref } from '@/lib/routes';
 import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
@@ -34,6 +33,15 @@ const EMPTY_ADMISSION: FinanceAdmissionListResult = {
   summary: { published: 0, canSell: 0 },
   total: 0,
 };
+
+const EMPTY_FEED = mapVenueCatalogFeedPage({
+  generatedAt: new Date(0).toISOString(),
+  total: 0,
+  venues: [],
+  nextCursor: null,
+  hasMore: false,
+  limit: VENUE_CATALOG_PAGE_SIZE,
+});
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -90,35 +98,42 @@ export async function generateVenueDetailMetadata(slug: string): Promise<Metadat
 }
 
 export async function VenueListPage({ family }: Pick<PageProps, 'family'>) {
-  let venues: VenueCatalogCard[] = [];
+  let initialPage = EMPTY_FEED;
   try {
     const payload = await withSoftTimeout(
-      getCachedVenuesCatalog(family, 500),
+      getCachedVenuesCatalog(family, { limit: VENUE_CATALOG_PAGE_SIZE }),
       VENUE_LIST_TIMEOUT_MS,
-      { generatedAt: new Date(0).toISOString(), total: 0, venues: [] },
+      {
+        generatedAt: new Date(0).toISOString(),
+        total: 0,
+        venues: [],
+        nextCursor: null,
+        hasMore: false,
+        limit: VENUE_CATALOG_PAGE_SIZE,
+      },
       `venue-list-${family}`,
     );
-    venues = (payload.venues ?? []).map(toVenueCatalogCard);
+    initialPage = mapVenueCatalogFeedPage(payload);
     // Soft-timeout empty HTML was poisoning nginx proxy_cache (30m HIT, 0 venues for every city).
-    if (!venues.length) {
+    if (!initialPage.venues.length) {
       noStore();
-      const retry = await getCachedVenuesCatalog(family, 500);
-      venues = (retry.venues ?? []).map(toVenueCatalogCard);
-      if (!venues.length) noStore();
+      const retry = await getCachedVenuesCatalog(family, { limit: VENUE_CATALOG_PAGE_SIZE });
+      initialPage = mapVenueCatalogFeedPage(retry);
+      if (!initialPage.venues.length) noStore();
     }
   } catch {
     noStore();
-    venues = [];
+    initialPage = EMPTY_FEED;
   }
   return (
     <SiteLayout>
       {family === 'location' ? (
         <Suspense fallback={<VenueCatalogPageSkeleton family="location" />}>
-          <LocationsCatalogView venues={venues} />
+          <LocationsCatalogView initialPage={initialPage} />
         </Suspense>
       ) : (
         <Suspense fallback={<VenueCatalogPageSkeleton family="institution" />}>
-          <VenuesCatalogView venues={venues} />
+          <VenuesCatalogView initialPage={initialPage} />
         </Suspense>
       )}
     </SiteLayout>

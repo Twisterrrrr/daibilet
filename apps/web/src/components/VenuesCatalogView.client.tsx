@@ -2,27 +2,30 @@
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useMemo, useState, useTransition } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { Grid3X3, List, Search } from 'lucide-react';
 
+import { CatalogInfiniteSentinel } from '@/components/CatalogInfiniteSentinel.client';
 import { InstitutionCard } from '@/components/InstitutionCard.client';
 import { InstitutionList } from '@/components/InstitutionListRow.client';
 import { VenuesCatalogSkeleton } from '@/components/VenueCatalogSkeletons';
 import { HeroLayout } from '@/components/HeroLayout';
 import { HeroMedia } from '@/components/HeroMedia.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
-import type { VenueCatalogCard } from '@/lib/venue-map-types';
 import { catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from '@/lib/catalog-url';
 import { cityToGenitive } from '@/lib/city-declension';
 import { formatNumber, pluralCities, pluralEvents, pluralVenues } from '@/lib/format';
 import { persistSelectedCity, resolveCatalogCityFilter } from '@/lib/selected-city';
 import {
+  fetchVenueCatalogPage,
+  VENUE_CATALOG_PAGE_SIZE,
+  type VenueCatalogFeedPage,
+  type VenueCatalogSort,
+} from '@/lib/venue-catalog-feed';
+import {
   INSTITUTION_CATALOG_TYPE_OPTIONS,
   INSTITUTION_SCALE_OPTIONS,
   normalizeVenueKind,
-  resolveInstitutionScale,
-  resolvePublicVenueType,
-  venueTypeLabel,
   type InstitutionScale,
 } from '@/lib/venue-meta';
 import { venueHref } from '@/lib/routes';
@@ -38,12 +41,11 @@ const VENUES_HERO_FRAMES = [
   },
 ];
 
-type SortMode = 'events' | 'asc' | 'desc';
 type ViewMode = 'cards' | 'list';
 
 const VENUES_VIEW_MODE_KEY = 'daibilet:venues-view-mode';
 
-const SORT_OPTIONS: Array<[SortMode, string]> = [
+const SORT_OPTIONS: Array<[VenueCatalogSort, string]> = [
   ['events', 'По афише'],
   ['asc', 'А–Я'],
   ['desc', 'Я–А'],
@@ -59,14 +61,26 @@ function readStoredViewMode(): ViewMode {
   }
 }
 
-export function VenuesCatalogView({ venues }: { venues: VenueCatalogCard[] }) {
+function cityOptionsFromStats(cities: Record<string, number>): Array<[string, number]> {
+  return [...Object.entries(cities)].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'ru'));
+}
+
+export function VenuesCatalogView({ initialPage }: { initialPage: VenueCatalogFeedPage }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const selectedCity = useSelectedCityOptional();
   const [query, setQuery] = useState('');
-  const [sortMode, setSortMode] = useState<SortMode>('events');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [sortMode, setSortMode] = useState<VenueCatalogSort>('events');
   const [viewMode, setViewMode] = useState<ViewMode>('cards');
   const [isPending, startTransition] = useTransition();
+  const [venues, setVenues] = useState(initialPage.venues);
+  const [total, setTotal] = useState(initialPage.total);
+  const [nextCursor, setNextCursor] = useState<string | null>(initialPage.nextCursor);
+  const [stats, setStats] = useState(initialPage.stats);
+  const [catalogLoading, setCatalogLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const loadMoreLock = useRef(false);
 
   const urlCity = searchParams.get('city')?.trim() || '';
   const rawType = searchParams.get('type')?.trim() || '';
@@ -76,16 +90,8 @@ export function VenuesCatalogView({ venues }: { venues: VenueCatalogCard[] }) {
     rawScale === 'museum' || rawScale === 'large_hall' || rawScale === 'intimate' ? rawScale : 'all';
   const cityReady = selectedCity?.cityReady ?? true;
   const cityPending = !urlCity && Boolean(selectedCity) && !cityReady;
-  const listPending = cityPending || isPending;
 
-  const cityOptions = useMemo(() => {
-    const counts = new Map<string, number>();
-    for (const venue of venues) {
-      if (!venue.city || venue.city === 'Не указан') continue;
-      counts.set(venue.city, (counts.get(venue.city) || 0) + 1);
-    }
-    return [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'ru'));
-  }, [venues]);
+  const cityOptions = useMemo(() => cityOptionsFromStats(stats.cities || {}), [stats.cities]);
 
   const cityFilter = useMemo(() => {
     if (urlCity) {
@@ -95,9 +101,77 @@ export function VenuesCatalogView({ venues }: { venues: VenueCatalogCard[] }) {
     return resolveCatalogCityFilter(selectedCity.cityValue, cityOptions, selectedCity.cityLabel);
   }, [urlCity, cityReady, selectedCity, cityOptions]);
 
+  const cityFetchKey = useMemo(() => {
+    if (urlCity && urlCity !== 'all') return urlCity;
+    if (cityFilter !== 'all') return cityFilter;
+    const dest = selectedCity?.selectedDestination;
+    if (!dest || selectedCity?.cityValue === 'all') return '';
+    return dest.sourceSlug || dest.slug || selectedCity.cityLabel || '';
+  }, [urlCity, cityFilter, selectedCity]);
+
   useEffect(() => {
     setViewMode(readStoredViewMode());
   }, []);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setDebouncedQuery(query.trim()), 250);
+    return () => window.clearTimeout(timer);
+  }, [query]);
+
+  const feedQuery = useMemo(
+    () => ({
+      family: 'institution' as const,
+      city: cityFetchKey || undefined,
+      type: typeFilter !== 'all' ? typeFilter : undefined,
+      scale: scaleFilter !== 'all' ? scaleFilter : undefined,
+      sort: sortMode,
+      q: debouncedQuery || undefined,
+      limit: VENUE_CATALOG_PAGE_SIZE,
+    }),
+    [cityFetchKey, typeFilter, scaleFilter, sortMode, debouncedQuery],
+  );
+
+  // Filters reset cursor and refetch first page server-side.
+  useEffect(() => {
+    if (!cityReady && !urlCity) return;
+    const controller = new AbortController();
+    setCatalogLoading(true);
+    loadMoreLock.current = false;
+    fetchVenueCatalogPage(feedQuery, { signal: controller.signal })
+      .then((page) => {
+        setVenues(page.venues);
+        setTotal(page.total);
+        setNextCursor(page.nextCursor);
+        setStats(page.stats);
+      })
+      .catch(() => undefined)
+      .finally(() => {
+        if (!controller.signal.aborted) setCatalogLoading(false);
+      });
+    return () => controller.abort();
+  }, [feedQuery, cityReady, urlCity]);
+
+  const loadMore = useCallback(() => {
+    if (!nextCursor || loadingMore || catalogLoading || loadMoreLock.current) return;
+    loadMoreLock.current = true;
+    setLoadingMore(true);
+    const controller = new AbortController();
+    fetchVenueCatalogPage({ ...feedQuery, cursor: nextCursor }, { signal: controller.signal })
+      .then((page) => {
+        setVenues((prev) => {
+          const seen = new Set(prev.map((item) => item.id));
+          return [...prev, ...page.venues.filter((item) => !seen.has(item.id))];
+        });
+        setNextCursor(page.nextCursor);
+        setTotal(page.total);
+        if (page.stats.venues) setStats(page.stats);
+      })
+      .catch(() => undefined)
+      .finally(() => {
+        loadMoreLock.current = false;
+        setLoadingMore(false);
+      });
+  }, [nextCursor, loadingMore, catalogLoading, feedQuery]);
 
   const setViewModePersisted = (value: ViewMode) => {
     setViewMode(value);
@@ -139,55 +213,25 @@ export function VenuesCatalogView({ venues }: { venues: VenueCatalogCard[] }) {
     });
   };
 
+  const listPending = cityPending || isPending || catalogLoading;
+
   const typeOptions = useMemo(() => {
-    const counts = new Map<string, number>();
-    for (const venue of venues) {
-      const key = resolvePublicVenueType(venue.type, venue.name);
-      counts.set(key, (counts.get(key) || 0) + 1);
-    }
-    return INSTITUTION_CATALOG_TYPE_OPTIONS.filter((option) => counts.has(option.value)).map((option) => ({
+    const counts = stats.types || {};
+    return INSTITUTION_CATALOG_TYPE_OPTIONS.filter((option) => counts[option.value]).map((option) => ({
       ...option,
-      count: counts.get(option.value) || 0,
+      count: counts[option.value] || 0,
     }));
-  }, [venues]);
+  }, [stats.types]);
 
   const scaleOptions = useMemo(() => {
-    const counts = new Map<string, number>();
-    for (const venue of venues) {
-      if (cityFilter !== 'all' && venue.city !== cityFilter) continue;
-      const key = resolveInstitutionScale(venue.type, venue.name);
-      if (key === 'other') continue;
-      counts.set(key, (counts.get(key) || 0) + 1);
-    }
-    return INSTITUTION_SCALE_OPTIONS.filter((option) => option.value === 'all' || counts.has(option.value)).map(
-      (option) => ({
-        ...option,
-        count: option.value === 'all' ? undefined : counts.get(option.value) || 0,
-      }),
-    );
-  }, [venues, cityFilter]);
-
-  const filteredVenues = useMemo(() => {
-    if (listPending) return [];
-    const normalized = query.trim().toLowerCase();
-    const list = venues.filter((venue) => {
-      if (cityFilter !== 'all' && venue.city !== cityFilter) return false;
-      if (typeFilter !== 'all' && resolvePublicVenueType(venue.type, venue.name) !== typeFilter) return false;
-      if (scaleFilter !== 'all' && resolveInstitutionScale(venue.type, venue.name) !== scaleFilter) return false;
-      if (!normalized) return true;
-      return [venue.name, venue.city, venue.address, venue.shortDescription, venueTypeLabel(venue.type, venue.name)]
-        .filter(Boolean)
-        .join(' ')
-        .toLowerCase()
-        .includes(normalized);
-    });
-
-    return [...list].sort((a, b) => {
-      if (sortMode === 'events') return b.events - a.events || a.name.localeCompare(b.name, 'ru');
-      const cmp = a.name.localeCompare(b.name, 'ru');
-      return sortMode === 'asc' ? cmp : -cmp;
-    });
-  }, [venues, query, cityFilter, typeFilter, scaleFilter, sortMode, listPending]);
+    const counts = stats.scales || {};
+    return INSTITUTION_SCALE_OPTIONS.filter(
+      (option) => option.value === 'all' || counts[option.value],
+    ).map((option) => ({
+      ...option,
+      count: option.value === 'all' ? undefined : counts[option.value] || 0,
+    }));
+  }, [stats.scales]);
 
   const cityCount = cityOptions.length;
   const eventsHref = catalogHrefWithSelectedCity(selectedCity?.cityValue);
@@ -196,13 +240,10 @@ export function VenuesCatalogView({ venues }: { venues: VenueCatalogCard[] }) {
   const heroTitle = cityName
     ? `Музеи, театры и пространства ${cityToGenitive(cityName)}`
     : 'Музеи, театры и пространства';
-  const scopedVenues = useMemo(() => {
-    if (cityFilter === 'all') return venues;
-    return venues.filter((venue) => venue.city === cityFilter);
-  }, [venues, cityFilter]);
+  const heroTotal = stats.venues || total;
   const scopedEvents = useMemo(
-    () => scopedVenues.reduce((sum, venue) => sum + (venue.events || 0), 0),
-    [scopedVenues],
+    () => venues.reduce((sum, venue) => sum + (venue.events || 0), 0),
+    [venues],
   );
 
   return (
@@ -211,10 +252,10 @@ export function VenuesCatalogView({ venues }: { venues: VenueCatalogCard[] }) {
         variant="imageOverlay"
         breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Площадки' }]}
         eyebrow={
-          venues.length
+          heroTotal
             ? cityCount
-              ? `${pluralVenues(venues.length)} · ${pluralCities(cityCount)}`
-              : pluralVenues(venues.length)
+              ? `${pluralVenues(heroTotal)} · ${pluralCities(cityCount)}`
+              : pluralVenues(heroTotal)
             : 'Площадки'
         }
         title={heroTitle}
@@ -233,9 +274,9 @@ export function VenuesCatalogView({ venues }: { venues: VenueCatalogCard[] }) {
           />
         }
       >
-        {!listPending && scopedVenues.length ? (
+        {!listPending && heroTotal ? (
           <p className="mx-auto mt-4 max-w-4xl text-sm font-medium text-white/85">
-            В афише {pluralVenues(scopedVenues.length)}
+            В афише {pluralVenues(heroTotal)}
             {scopedEvents > 0 ? ` · ${pluralEvents(scopedEvents)}` : ''}
           </p>
         ) : null}
@@ -266,7 +307,7 @@ export function VenuesCatalogView({ venues }: { venues: VenueCatalogCard[] }) {
           </select>
           <select
             value={sortMode}
-            onChange={(event) => setSortMode(event.target.value as SortMode)}
+            onChange={(event) => setSortMode(event.target.value as VenueCatalogSort)}
             className="rounded-xl bg-slate-100 px-3 py-2.5 text-sm outline-none"
           >
             {SORT_OPTIONS.map(([value, label]) => (
@@ -337,7 +378,6 @@ export function VenuesCatalogView({ venues }: { venues: VenueCatalogCard[] }) {
 
       <div className="sticky top-[var(--site-header-height)] z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
         <div className="container-page flex items-center justify-end gap-3 py-3">
-
           <div className="flex shrink-0 overflow-hidden rounded-xl bg-slate-100 p-1" role="radiogroup" aria-label="Вид каталога">
             <button
               type="button"
@@ -374,8 +414,10 @@ export function VenuesCatalogView({ venues }: { venues: VenueCatalogCard[] }) {
               'Обновляем список…'
             ) : (
               <>
-                Найдено: {formatNumber(filteredVenues.length)}
-                {venues.length ? <span className="font-normal text-slate-500"> из {formatNumber(venues.length)}</span> : null}
+                Найдено: {formatNumber(total)}
+                {venues.length && venues.length < total ? (
+                  <span className="font-normal text-slate-500"> · показано {formatNumber(venues.length)}</span>
+                ) : null}
               </>
             )}
           </h2>
@@ -385,17 +427,21 @@ export function VenuesCatalogView({ venues }: { venues: VenueCatalogCard[] }) {
         </div>
 
         {listPending ? (
-          <VenuesCatalogSkeleton />
-        ) : filteredVenues.length > 0 ? (
-          viewMode === 'list' ? (
-            <InstitutionList venues={filteredVenues} hrefFor={venueHref} />
-          ) : (
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-              {filteredVenues.map((venue) => (
-                <InstitutionCard key={venue.id} venue={venue} href={venueHref(venue)} />
-              ))}
-            </div>
-          )
+          <VenuesCatalogSkeleton count={8} />
+        ) : venues.length > 0 ? (
+          <>
+            {viewMode === 'list' ? (
+              <InstitutionList venues={venues} hrefFor={venueHref} />
+            ) : (
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
+                {venues.map((venue) => (
+                  <InstitutionCard key={venue.id} venue={venue} href={venueHref(venue)} />
+                ))}
+              </div>
+            )}
+            {loadingMore ? <div className="mt-6"><VenuesCatalogSkeleton count={3} /></div> : null}
+            <CatalogInfiniteSentinel enabled={Boolean(nextCursor) && !loadingMore} onIntersect={loadMore} />
+          </>
         ) : (
           <div className="rounded-2xl border border-dashed border-slate-300 bg-white py-16 text-center text-slate-500">
             <p className="text-lg font-semibold text-slate-700">Ничего не нашли</p>
