@@ -70,6 +70,10 @@ export function InstitutionVenueLayout({
     `${venue.name} — ${typeLabel.toLowerCase()} в ${venue.city}. Афиша, билеты и ближайшие сеансы.`;
   const categories = Object.entries(venue.categories || {}).sort((a, b) => b[1] - a[1]);
   const nextSessions = sessions.slice(0, 4);
+  // An institution can be a useful editorial place without an active sale.
+  // In that case it must not imitate a ticket page.
+  const hasTicketSales = sessions.length > 0 || admissionProducts.length > 0;
+  const hasAfisha = sessions.length > 0;
 
   const heroGradient = isTheatre
     ? 'bg-gradient-to-r from-rose-900/95 via-slate-900/80 to-slate-900/50'
@@ -112,9 +116,11 @@ export function InstitutionVenueLayout({
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur">
                   {typeEmoji} {typeLabel}
                 </span>
-                <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur">
-                  {formatNumber(stats.events)} в афише
-                </span>
+                {hasAfisha ? (
+                  <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur">
+                    {formatNumber(stats.events)} в афише
+                  </span>
+                ) : null}
               </div>
 
               <h1 className="mt-4 font-display text-3xl font-extrabold leading-tight text-white sm:text-4xl md:text-5xl">{title}</h1>
@@ -137,19 +143,23 @@ export function InstitutionVenueLayout({
             </div>
 
             <div className="flex flex-col items-start gap-2 md:items-end">
-              <div className="md:text-right">
-                <div className="text-sm text-white/70">Билет от</div>
-                <div className="text-3xl font-extrabold">{formatMoney(stats.priceFrom)}</div>
-              </div>
-              <a
-                href="#venue-program"
-                className={`inline-flex items-center gap-2 rounded-full px-6 py-3 font-bold shadow-lg transition hover:opacity-95 ${
-                  isTheatre ? 'bg-rose-500 text-white hover:bg-rose-600' : 'bg-white text-slate-900 hover:bg-slate-100'
-                }`}
-              >
-                <Ticket className="h-4 w-4" />
-                {isTheatre ? 'К афише' : 'Купить билет'}
-              </a>
+              {hasTicketSales ? (
+                <>
+                  <div className="md:text-right">
+                    <div className="text-sm text-white/70">Билет от</div>
+                    <div className="text-3xl font-extrabold">{formatMoney(stats.priceFrom)}</div>
+                  </div>
+                  <a
+                    href={admissionProducts.length ? '#venue-admission' : '#venue-program'}
+                    className={`inline-flex items-center gap-2 rounded-full px-6 py-3 font-bold shadow-lg transition hover:opacity-95 ${
+                      isTheatre ? 'bg-rose-500 text-white hover:bg-rose-600' : 'bg-white text-slate-900 hover:bg-slate-100'
+                    }`}
+                  >
+                    <Ticket className="h-4 w-4" />
+                    {isTheatre ? 'К афише' : 'Купить билет'}
+                  </a>
+                </>
+              ) : null}
               <AddToDayRouteButton
                 variant="dark"
                 venue={{
@@ -183,10 +193,10 @@ export function InstitutionVenueLayout({
         <div className="container-page flex gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {[
             ...(admissionProducts.length ? [['#venue-admission', 'Входные билеты'] as const] : []),
-            ['#venue-program', 'Афиша и билеты'] as const,
+            ...(hasAfisha ? [['#venue-program', 'Афиша и билеты'] as const] : []),
             ['#about', 'О месте'] as const,
             ['#practical', 'Адрес и карта'] as const,
-            ['#faq', 'Вопросы'] as const,
+            ...(hasTicketSales ? [['#faq', 'Вопросы'] as const] : []),
           ].map(([href, label]) => (
             <a
               key={href}
@@ -245,23 +255,25 @@ export function InstitutionVenueLayout({
             ) : null}
           </section>
 
-          <section id="faq">
-            <h2 className="text-xl font-bold text-slate-900">Частые вопросы</h2>
-            <div className="mt-4 space-y-2">
-              {FAQ_ITEMS.map((item) => (
-                <details key={item.question} className="group rounded-xl border border-slate-200 bg-white">
-                  <summary className="flex cursor-pointer list-none items-center justify-between p-4">
-                    <span className="flex items-center gap-2 font-medium text-slate-900">
-                      <HelpCircle className="h-4 w-4 text-primary-600" />
-                      {item.question}
-                    </span>
-                    <ChevronDown className="h-4 w-4 text-slate-400 transition group-open:rotate-180" />
-                  </summary>
-                  <div className="px-4 pb-4 text-sm text-slate-700">{item.answer}</div>
-                </details>
-              ))}
-            </div>
-          </section>
+          {hasTicketSales ? (
+            <section id="faq">
+              <h2 className="text-xl font-bold text-slate-900">Частые вопросы</h2>
+              <div className="mt-4 space-y-2">
+                {FAQ_ITEMS.map((item) => (
+                  <details key={item.question} className="group rounded-xl border border-slate-200 bg-white">
+                    <summary className="flex cursor-pointer list-none items-center justify-between p-4">
+                      <span className="flex items-center gap-2 font-medium text-slate-900">
+                        <HelpCircle className="h-4 w-4 text-primary-600" />
+                        {item.question}
+                      </span>
+                      <ChevronDown className="h-4 w-4 text-slate-400 transition group-open:rotate-180" />
+                    </summary>
+                    <div className="px-4 pb-4 text-sm text-slate-700">{item.answer}</div>
+                  </details>
+                ))}
+              </div>
+            </section>
+          ) : null}
 
           {relatedVenues.length > 0 ? (
             <section>
@@ -287,10 +299,12 @@ export function InstitutionVenueLayout({
                   {streetAddress || `${venue.city} - адрес уточняется`}
                 </div>
               )}
-              <div className="mt-3 flex items-start gap-2 text-sm text-slate-700">
-                <Ticket className="mt-0.5 h-4 w-4 shrink-0 text-primary-600" />
-                {formatNumber(stats.events)} событий · от {formatMoney(stats.priceFrom)}
-              </div>
+              {hasTicketSales ? (
+                <div className="mt-3 flex items-start gap-2 text-sm text-slate-700">
+                  <Ticket className="mt-0.5 h-4 w-4 shrink-0 text-primary-600" />
+                  {formatNumber(stats.events)} событий · от {formatMoney(stats.priceFrom)}
+                </div>
+              ) : null}
               {hasMap ? (
                 <a
                   href={`https://yandex.ru/maps/?pt=${venue.longitude},${venue.latitude}&z=17&l=map`}
@@ -343,19 +357,40 @@ export function InstitutionVenueLayout({
       </div>
 
       <MobileStickyActionBar>
-        <div>
-          <div className="text-[10px] uppercase tracking-wider text-slate-500">Билет от</div>
-          <div className="text-lg font-extrabold text-slate-900">{formatMoney(stats.priceFrom)}</div>
-        </div>
-        <a
-          href="#venue-program"
-          className={`inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-full px-5 text-sm font-bold text-white shadow-lg ${
-            isTheatre ? 'bg-rose-600 hover:bg-rose-700' : 'bg-primary-600 hover:bg-primary-700'
-          }`}
-        >
-          <Ticket className="h-4 w-4" />
-          К афише
-        </a>
+        {hasTicketSales ? (
+          <>
+            <div>
+              <div className="text-[10px] uppercase tracking-wider text-slate-500">Билет от</div>
+              <div className="text-lg font-extrabold text-slate-900">{formatMoney(stats.priceFrom)}</div>
+            </div>
+            <a
+              href={admissionProducts.length ? '#venue-admission' : '#venue-program'}
+              className={`inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-full px-5 text-sm font-bold text-white shadow-lg ${
+                isTheatre ? 'bg-rose-600 hover:bg-rose-700' : 'bg-primary-600 hover:bg-primary-700'
+              }`}
+            >
+              <Ticket className="h-4 w-4" />
+              К афише
+            </a>
+          </>
+        ) : (
+          <AddToDayRouteButton
+            className="min-h-11 w-full rounded-full px-4 text-sm"
+            venue={{
+              id: venue.id,
+              slug: venue.slug,
+              title: venue.title || venue.name,
+              city: venue.city,
+              cityId: venue.cityId,
+              citySlug: venue.citySlug,
+              href: venueHref(venue),
+              imageUrl: venue.heroImageUrl,
+              address: venue.address,
+              latitude: venue.latitude,
+              longitude: venue.longitude,
+            }}
+          />
+        )}
       </MobileStickyActionBar>
     </div>
   );

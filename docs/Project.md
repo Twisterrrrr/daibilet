@@ -202,6 +202,7 @@ BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh
 - **Локация** - парки / набережные / памятники / улицы (must-see без institution). **Площадка** - афиша + institution.
 - **Музеи и арт-галереи** всегда **Площадки** (`MUSEUM_ART_SPACE` / institution), даже только-инфо и без договора - блок хаба города.
 - Театры / залы / клубы → Площадки. Договор ≠ тип сущности.
+- Редакционные гастро-точки, бары и особняки без продаваемых будущих событий → **Локации**. Если legacy kind временно остаётся institution, при `upcomingEventsCount=0` и без admission запрещены билетные chrome, цена, CTA, афиша и FAQ.
 - Одна физическая точка = одна публичная карточка; локация→venue = upgrade / hide+301, не twin `PUBLISHED`.
 
 ---

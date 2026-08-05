@@ -7,6 +7,7 @@ import { ArrowLeft, Grid3X3, ListFilter } from 'lucide-react';
 import { EventCard } from '@/components/EventCard';
 import { InstitutionVenueLayout } from '@/components/InstitutionVenueLayout.client';
 import { LocationVenueLayout } from '@/components/LocationVenueLayout.client';
+import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { VenueAdmissionBlock } from '@/components/VenueAdmissionBlock';
 import type { PublicVenueDto, PublicVenuePageDto } from '@daibilet/contracts/public';
 import { venueMatchesRouteSlug } from '@/lib/day-route';
@@ -61,6 +62,7 @@ export function VenuePageView({
 }) {
   const params = useParams();
   const pathname = usePathname();
+  const selectedCity = useSelectedCityOptional();
   const routeSlug = React.useMemo(() => {
     const fromPath = slugFromPathname(pathname);
     if (fromPath) return fromPath;
@@ -159,6 +161,14 @@ export function VenuePageView({
   const isInstitutionPage = pageTemplate === 'institution';
   const useLovableLayout = isLocationPage || isInstitutionPage;
 
+  // A flat venue URL has no city segment. Make its verified venue city the
+  // header context instead of leaking a previously selected destination.
+  React.useEffect(() => {
+    const city = String(venue?.city || '').trim();
+    if (!city || city === 'Не указан' || selectedCity?.cityValue === city) return;
+    selectedCity?.setCity(city, { skipRouteConfirm: true });
+  }, [selectedCity, venue?.city]);
+
   return (
     <div className={`min-h-screen text-slate-900 ${useLovableLayout ? 'bg-slate-50' : 'bg-white'}`}>
       <div>
@@ -209,7 +219,7 @@ export function VenuePageView({
               </div>
             ) : null}
 
-            {contentReady ? (
+            {contentReady && baseSessions.length > 0 ? (
             <section id="venue-program" className={`container-page py-8 ${useLovableLayout ? '' : 'grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]'}`}>
               <div className={useLovableLayout ? 'rounded-2xl border border-slate-200 bg-white p-6' : ''}>
                 <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -272,7 +282,7 @@ export function VenuePageView({
                 </aside>
               ) : null}
             </section>
-            ) : (
+            ) : contentReady ? null : (
               <div className="container-page py-8">
                 <div className="rounded-2xl border border-slate-200 bg-white p-8 text-sm text-slate-500">
                   Загружаем расписание и билеты...

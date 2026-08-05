@@ -259,6 +259,66 @@ function normalizePlaceTitle(value) {
     .trim();
 }
 
+function normalizeVenueIdentity(value) {
+  return normalizePlaceTitle(value)
+    .replace(/\b(бар|ресторан|кафе|арт|клуб|спикизи|паб|гастробар|фудмолл)\b/g, ' ')
+    .replace(/\bна\s+(невском|рубинштейна|жуковского|большой конюшенной)\b/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function normalizeAddress(value) {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/ё/g, 'е')
+    .replace(/[«»"'()[\],.]/g, ' ')
+    .replace(/\b(улица|ул|проспект|пр|набережная|наб|дом|д)\b/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function distanceMeters(left, right) {
+  const latA = Number(left?.latitude);
+  const lngA = Number(left?.longitude);
+  const latB = Number(right?.latitude);
+  const lngB = Number(right?.longitude);
+  if (![latA, lngA, latB, lngB].every(Number.isFinite)) return null;
+  const radians = Math.PI / 180;
+  const latDelta = (latB - latA) * radians;
+  const lngDelta = (lngB - lngA) * radians;
+  const a =
+    Math.sin(latDelta / 2) ** 2 +
+    Math.cos(latA * radians) * Math.cos(latB * radians) * Math.sin(lngDelta / 2) ** 2;
+  return 6_371_000 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function findExistingVenueCandidate(rows, item) {
+  const itemIdentity = normalizeVenueIdentity(item.title);
+  const itemAddress = normalizeAddress(item.address);
+  let best = null;
+
+  for (const row of rows) {
+    const rowIdentity = normalizeVenueIdentity(row.title);
+    const rowAddress = normalizeAddress(row.address);
+    const distance = distanceMeters(row, item);
+    const titleMatch =
+      itemIdentity.length >= 8 &&
+      rowIdentity.length >= 8 &&
+      (itemIdentity === rowIdentity || itemIdentity.includes(rowIdentity) || rowIdentity.includes(itemIdentity));
+    const addressMatch = itemAddress.length >= 8 && itemAddress === rowAddress;
+    const nearby = distance != null && distance <= 100;
+    if (!titleMatch && !addressMatch && !nearby && row.slug !== item.slug) continue;
+
+    const score =
+      (titleMatch ? 10_000 : 0) +
+      (addressMatch ? 5_000 : 0) +
+      (nearby ? Math.max(0, 1_000 - Math.round(distance || 0)) : 0) +
+      (row.slug === item.slug ? 100 : 0);
+    if (!best || score > best.score) best = { row, score };
+  }
+  return best?.row || null;
+}
+
 function slugify(value) {
   const map = { а:'a', б:'b', в:'v', г:'g', д:'d', е:'e', ё:'e', ж:'zh', з:'z', и:'i', й:'y', к:'k', л:'l', м:'m', н:'n', о:'o', п:'p', р:'r', с:'s', т:'t', у:'u', ф:'f', х:'h', ц:'ts', ч:'ch', ш:'sh', щ:'sch', ъ:'', ы:'y', ь:'', э:'e', ю:'yu', я:'ya' };
   return String(value || '').toLowerCase().split('').map((char) => map[char] ?? char).join('')
@@ -321,22 +381,18 @@ async function main() {
       let canonicalPath =
         inferred.family === 'institution' ? `/venues/${item.slug}` : `/locations/${item.slug}`;
 
-      // One physical point has one entity: first reuse its slug, then title in
-      // the target city, then the supplied coordinates. This makes owner packs
-      // safe to rerun after an earlier manual/catalog seed.
-      const before = await pool.query(
-        `select id, slug, "shortDescription", description, "hookFact", latitude, longitude,
+      // One physical point has one entity. Exact slug matching alone is not
+      // enough: editorial packs often spell a bar or mansion differently from
+      // the imported event venue. Match normalized title, verified address or
+      // coordinates within 100m before creating anything new.
+      const candidates = await pool.query(
+        `select id, slug, title, "shortDescription", description, "hookFact", latitude, longitude,
                 address, "metroStation", "wayToFind", kind, "pageStatus", "cityId"
          from "Venue"
-         where slug = $1
-            or ("cityId" = $2 and lower(title) = lower($3))
-            or ("cityId" = $2 and latitude is not null and longitude is not null
-                and abs(latitude - $4) < 0.00001 and abs(longitude - $5) < 0.00001)
-         order by case when slug = $1 then 0 when lower(title) = lower($3) then 1 else 2 end
-         limit 1`,
-        [item.slug, city.id, item.title, item.latitude, item.longitude],
+         where "cityId" = $1`,
+        [city.id],
       );
-      const existing = before.rows[0] || null;
+      const existing = findExistingVenueCandidate(candidates.rows, item);
       const action = existing ? 'update' : 'insert';
       // Existing public links remain canonical. The owner row enriches that
       // entity instead of producing a twin under a newly generated slug.
