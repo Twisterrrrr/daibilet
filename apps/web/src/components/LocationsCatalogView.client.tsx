@@ -195,11 +195,11 @@ export function LocationsCatalogView({ venues: initialVenues }: { venues: VenueC
         className="bg-slate-50"
       >
         {typeOptions.length ? (
-          <div className="mt-4 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="mt-4 flex flex-wrap gap-2">
             <button
               type="button"
               onClick={() => setTypeFilter('all')}
-              className={`inline-flex shrink-0 items-center rounded-full px-4 py-2 text-sm font-semibold transition ${
+              className={`inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold transition ${
                 typeFilter === 'all' ? 'bg-slate-900 text-white' : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50'
               }`}
             >
@@ -213,7 +213,7 @@ export function LocationsCatalogView({ venues: initialVenues }: { venues: VenueC
                   key={option.value}
                   type="button"
                   onClick={() => setTypeFilter(active ? 'all' : option.value)}
-                  className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition ${
+                  className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition ${
                     active ? 'bg-slate-900 text-white' : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50'
                   }`}
                 >
