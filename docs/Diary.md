@@ -1,3 +1,21 @@
+## 2026-08-06 - Home hero: ротация реальных событий афиши
+
+### Наблюдения
+- Owner: главный баннер должен быть ротируемой афишей разных событий, не миксом CTA (my-day / rivers / podborki).
+- Предыдущая итерация (`e11ec78`) дала snap-карусель до 5 смешанных слайдов.
+
+### Решения
+- `buildHomeHeroSlides(sessions)` - до 5 слайдов из live catalog (`/api/public/events`, popular + cover diversity); CTA на event PDP.
+- City-aware: `HomeGuideHero` фильтрует сессии по выбранному городу (как `HomeGuideEvents`).
+- Stories chips («Реки и каналы!», «Бесплатно» и т.д.) без изменений; my-day остаётся боковой панелью bento.
+- Auto-rotate не включали - ручной snap + dots.
+- Deploy web не гоняли.
+
+### Проблемы
+- Нет: при пустом каталоге один fallback-слайд на `/events`.
+
+---
+
 ## 2026-08-05 - Home guide: stories labels + hero carousel
 
 ### Наблюдения

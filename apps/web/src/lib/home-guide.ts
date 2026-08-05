@@ -1,8 +1,20 @@
 import { landingCategoryHref } from '@/lib/landing-routes';
 import { CANONICAL_LANDING_SLUGS } from '@/lib/landing-constants';
 import { buildCatalogHref } from '@/lib/catalog-url';
-import { resolveHomePromoImage } from '@/lib/home-scenarios';
-import { pluralEvents } from '@/lib/format';
+import { formatPriceFrom } from '@/lib/format';
+import {
+  buildPopularEvents,
+  createHomePickState,
+} from '@/lib/home-showcase-sections';
+import { eventHref } from '@/lib/routes';
+import {
+  sessionHasCoverImage,
+  spreadCatalogSessionsByCoverImage,
+} from '@/lib/session-cover-image';
+import type { PublicCatalogListItemDto, PublicSessionDto } from '@daibilet/contracts/public';
+
+/** Max event slides in the home hero carousel. */
+export const HOME_HERO_EVENT_SLIDE_LIMIT = 5;
 
 /** Single slide in the home hero carousel. */
 export type HomeHeroSlide = {
@@ -116,145 +128,69 @@ export function buildMyDayHref(citySlug?: string | null): string {
   return `/my-day?city=${encodeURIComponent(slug)}`;
 }
 
-type LandingLite = {
-  slug: string;
-  title: string;
-  subtitle?: string | null;
-  events: number;
-  priceFrom?: number | null;
-};
+type HeroSession = PublicSessionDto | PublicCatalogListItemDto;
 
-type BannerLite = {
-  title: string;
-  imageUrl: string;
-  link: string | null;
-};
+const FALLBACK_HERO_IMAGE = '/images/home/format-tours.jpg';
+
+function sessionHeroSubtitle(session: HeroSession): string {
+  const when = [session.dateLabel, session.timeLabel].filter(Boolean).join(', ');
+  const priceLabel = formatPriceFrom(session.priceFrom);
+  const price = priceLabel === 'Цена уточняется' ? null : priceLabel;
+  const place = [session.venue, session.city].filter(Boolean).join(', ');
+  return [when, price, place].filter(Boolean).join(' · ') || 'Событие из афиши';
+}
+
+/** Map a catalog session to a hero carousel slide (PDP href). */
+export function sessionToHomeHeroSlide(session: HeroSession): HomeHeroSlide {
+  const imageUrl = String(session.imageUrl || '').trim() || FALLBACK_HERO_IMAGE;
+  return {
+    id: `event-${session.id}`,
+    badge: session.category?.trim() || 'Афиша',
+    title: session.title,
+    subtitle: sessionHeroSubtitle(session),
+    href: eventHref(session),
+    imageUrl,
+    ctaLabel: 'Смотреть событие',
+  };
+}
 
 /**
- * Build hero carousel slides from live home data (banners, landings, catalog counts).
- * No invented events - only real routes and promo sources already on the home page.
+ * Build hero carousel from live catalog events (popular + cover diversity).
+ * Prefers sessions with real cover images; falls back to a single afisha CTA if empty.
  */
-export function buildHomeHeroSlides(input: {
-  banners: BannerLite[];
-  landings: LandingLite[];
-  liveEvents?: number;
-}): HomeHeroSlide[] {
-  const slides: HomeHeroSlide[] = [];
-  const usedHrefs = new Set<string>();
-  const push = (slide: HomeHeroSlide) => {
-    if (usedHrefs.has(slide.href)) return;
-    usedHrefs.add(slide.href);
-    slides.push(slide);
-  };
+export function buildHomeHeroSlides(
+  sessions: HeroSession[],
+  options: { fingerprints?: Map<string, string> } = {},
+): HomeHeroSlide[] {
+  const fingerprints = options.fingerprints ?? new Map<string, string>();
+  const withCover = sessions.filter((session) => sessionHasCoverImage(session));
+  const pool = withCover.length >= 2 ? withCover : sessions;
 
-  const banner = input.banners[0];
-  if (banner?.imageUrl) {
-    push({
-      id: 'featured-banner',
-      badge: 'Событие недели',
-      title: banner.title || 'Афиша на неделю',
-      subtitle: 'Подборка ярких событий - выбирайте и бронируйте онлайн',
-      href: banner.link || '/events?sort=popular',
-      imageUrl: banner.imageUrl,
-      ctaLabel: 'Смотреть афишу',
-    });
-  } else if (input.landings[0]) {
-    const landing = input.landings[0];
-    push({
-      id: `landing-${landing.slug}`,
-      badge: 'Подборка',
-      title: landing.title,
-      subtitle: landing.subtitle || `${pluralEvents(landing.events)} - готовая подборка`,
-      href: landingCategoryHref(landing.slug),
-      imageUrl: resolveHomePromoImage(landing.slug, landing.title),
-      ctaLabel: 'Смотреть подборку',
-    });
+  if (!pool.length) {
+    return [
+      {
+        id: 'fallback-afisha',
+        badge: 'Афиша',
+        title: 'Куда сходить на этой неделе',
+        subtitle: 'Экскурсии, музеи, река и концерты в одном каталоге',
+        href: '/events?sort=popular',
+        imageUrl: FALLBACK_HERO_IMAGE,
+        ctaLabel: 'Открыть афишу',
+      },
+    ];
   }
 
-  const eventsLabel =
-    typeof input.liveEvents === 'number' && input.liveEvents > 0
-      ? `${pluralEvents(input.liveEvents)} в каталоге - фильтруйте по городу и дате`
-      : 'Экскурсии, музеи, река и концерты в одном каталоге';
+  const pickState = createHomePickState({ fingerprints });
+  const popular = buildPopularEvents(
+    pool as PublicSessionDto[],
+    HOME_HERO_EVENT_SLIDE_LIMIT * 2,
+    pickState,
+  );
+  const diversified = spreadCatalogSessionsByCoverImage(popular, fingerprints).slice(
+    0,
+    HOME_HERO_EVENT_SLIDE_LIMIT,
+  );
+  const chosen = diversified.length ? diversified : popular.slice(0, HOME_HERO_EVENT_SLIDE_LIMIT);
 
-  push({
-    id: 'afisha',
-    badge: 'Афиша',
-    title: 'Куда сходить на этой неделе',
-    subtitle: eventsLabel,
-    href: '/events?sort=popular',
-    imageUrl: '/images/home/format-tours.jpg',
-    ctaLabel: 'Открыть афишу',
-  });
-
-  push({
-    id: 'my-day',
-    badge: 'Мой день',
-    title: 'Соберите свой день в городе',
-    subtitle: 'Музеи, прогулки и события по порядку - без хаоса в заметках',
-    href: '/my-day',
-    imageUrl: '/images/home/format-museums.jpg',
-    ctaLabel: 'Собрать маршрут',
-  });
-
-  const riverLanding =
-    input.landings.find((item) => /river|cruise|теплоход|канал|реч/i.test(`${item.slug} ${item.title}`)) ||
-    null;
-  if (riverLanding) {
-    push({
-      id: `landing-${riverLanding.slug}`,
-      badge: 'Реки и каналы',
-      title: riverLanding.title,
-      subtitle: riverLanding.subtitle || `${pluralEvents(riverLanding.events)} - прогулки по воде`,
-      href: landingCategoryHref(riverLanding.slug),
-      imageUrl: resolveHomePromoImage(riverLanding.slug, riverLanding.title),
-      ctaLabel: 'Смотреть прогулки',
-    });
-  } else {
-    push({
-      id: 'river',
-      badge: 'Реки и каналы',
-      title: 'Речные прогулки и каналы',
-      subtitle: 'Теплоходы, набережные и вечерние маршруты',
-      href: landingCategoryHref(CANONICAL_LANDING_SLUGS.river),
-      imageUrl: '/images/home/format-river.jpg',
-      ctaLabel: 'Смотреть прогулки',
-    });
-  }
-
-  push({
-    id: 'podborki',
-    badge: 'Подборки',
-    title: 'Готовые сценарии под настроение',
-    subtitle: 'Топ-подборки, бесплатные события и тематические лендинги',
-    href: '/podborki',
-    imageUrl: '/images/home/format-night.jpg',
-    ctaLabel: 'Смотреть подборки',
-  });
-
-  for (const landing of input.landings) {
-    if (slides.length >= 5) break;
-    push({
-      id: `landing-${landing.slug}`,
-      badge: 'Подборка',
-      title: landing.title,
-      subtitle: landing.subtitle || `${pluralEvents(landing.events)} - готовая подборка`,
-      href: landingCategoryHref(landing.slug),
-      imageUrl: resolveHomePromoImage(landing.slug, landing.title),
-      ctaLabel: 'Смотреть подборку',
-    });
-  }
-
-  if (slides.length === 0) {
-    push({
-      id: 'fallback',
-      badge: 'Афиша',
-      title: 'Куда сходить на этой неделе',
-      subtitle: 'Экскурсии, музеи, река и концерты в одном каталоге',
-      href: '/events?sort=popular',
-      imageUrl: '/images/home/format-tours.jpg',
-      ctaLabel: 'Смотреть афишу',
-    });
-  }
-
-  return slides.slice(0, 5);
+  return chosen.map(sessionToHomeHeroSlide);
 }

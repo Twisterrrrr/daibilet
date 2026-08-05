@@ -4,6 +4,7 @@ import Link from 'next/link';
 import {
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -22,14 +23,17 @@ import {
 
 import { SafeImage } from '@/components/SafeImage.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
+import type { PublicCatalogListItemDto, PublicSessionDto } from '@daibilet/contracts/public';
 import { catalogHrefWithSelectedCity } from '@/lib/catalog-url';
 import { cityToPrepositional } from '@/lib/city-declension';
 import {
   HOME_CATEGORY_CHIPS,
+  buildHomeHeroSlides,
   buildMyDayHref,
   type HomeGuideChip,
   type HomeHeroSlide,
 } from '@/lib/home-guide';
+import { filterSessionsByCity } from '@/lib/landing-city';
 
 const ICON_MAP: Record<HomeGuideChip['icon'], LucideIcon> = {
   mic: Mic2,
@@ -41,8 +45,11 @@ const ICON_MAP: Record<HomeGuideChip['icon'], LucideIcon> = {
   landmark: Landmark,
 };
 
+type PublicSession = PublicSessionDto | PublicCatalogListItemDto;
+
 type HomeGuideHeroProps = {
-  slides: HomeHeroSlide[];
+  sessions: PublicSession[];
+  fingerprints?: Record<string, string>;
 };
 
 function chipHref(chip: HomeGuideChip, cityValue: string): string {
@@ -61,11 +68,8 @@ function chipHref(chip: HomeGuideChip, cityValue: string): string {
   return chip.href;
 }
 
-function slideHref(slide: HomeHeroSlide, cityValue: string, citySlug: string | null): string {
-  if (slide.id === 'my-day' || slide.href === '/my-day' || slide.href.startsWith('/my-day?')) {
-    return buildMyDayHref(citySlug);
-  }
-  if (slide.href.startsWith('/events')) {
+function slideHref(slide: HomeHeroSlide, cityValue: string): string {
+  if (slide.href.startsWith('/events?') || slide.href === '/events') {
     const qs = slide.href.includes('?') ? slide.href.slice(slide.href.indexOf('?') + 1) : '';
     const params = new URLSearchParams(qs);
     return catalogHrefWithSelectedCity(cityValue, {
@@ -125,10 +129,10 @@ function HeroSlideCard({
 }
 
 /**
- * Personal-guide hero: desktop bento (featured carousel ~60% + Мой день ~40%) + category rail.
- * Mobile: horizontal snap carousel of offers + compact my-day CTA (stories live above).
+ * Personal-guide hero: desktop bento (event afisha carousel ~60% + Мой день ~40%) + category rail.
+ * Mobile: horizontal snap carousel of real events + compact my-day CTA (stories live above).
  */
-export function HomeGuideHero({ slides }: HomeGuideHeroProps) {
+export function HomeGuideHero({ sessions, fingerprints }: HomeGuideHeroProps) {
   const selectedCity = useSelectedCityOptional();
   const cityReady = selectedCity?.cityReady ?? false;
   const cityValue = cityReady ? selectedCity?.cityValue ?? 'all' : 'all';
@@ -140,7 +144,21 @@ export function HomeGuideHero({ slides }: HomeGuideHeroProps) {
   const citySlug = selectedCity?.selectedDestination?.slug || null;
   const myDayHref = buildMyDayHref(citySlug);
 
-  const safeSlides = slides.length > 0 ? slides : [];
+  const fingerprintMap = useMemo(
+    () => new Map(Object.entries(fingerprints || {})),
+    [fingerprints],
+  );
+
+  const scopedSessions = useMemo(() => {
+    if (!cityReady || !cityName || cityValue === 'all') return sessions;
+    return filterSessionsByCity(sessions as PublicSessionDto[], cityName, citySlug) as PublicSession[];
+  }, [sessions, cityReady, cityName, citySlug, cityValue]);
+
+  const safeSlides = useMemo(
+    () => buildHomeHeroSlides(scopedSessions, { fingerprints: fingerprintMap }),
+    [scopedSessions, fingerprintMap],
+  );
+
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -162,6 +180,12 @@ export function HomeGuideHero({ slides }: HomeGuideHeroProps) {
     });
     setActiveIndex(best);
   }, [safeSlides.length]);
+
+  useEffect(() => {
+    setActiveIndex(0);
+    const el = scrollerRef.current;
+    if (el) el.scrollTo({ left: 0 });
+  }, [cityValue, safeSlides.length]);
 
   useEffect(() => {
     const el = scrollerRef.current;
@@ -187,13 +211,13 @@ export function HomeGuideHero({ slides }: HomeGuideHeroProps) {
     <section className="border-b border-slate-100 bg-gradient-to-b from-sky-50/80 via-white to-white">
       <div className="container-page py-4 sm:py-6 lg:py-8">
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] lg:gap-4 lg:items-stretch">
-          {/* Featured carousel ~60% */}
+          {/* Featured event carousel ~60% */}
           <div className="min-w-0">
             {safeSlides.length <= 1 ? (
               safeSlides[0] ? (
                 <HeroSlideCard
                   slide={safeSlides[0]}
-                  href={slideHref(safeSlides[0], cityValue, citySlug)}
+                  href={slideHref(safeSlides[0], cityValue)}
                   priority
                   asHeading="h1"
                 />
@@ -205,7 +229,7 @@ export function HomeGuideHero({ slides }: HomeGuideHeroProps) {
                   className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
                   role="region"
                   aria-roledescription="carousel"
-                  aria-label="Предложения на главной"
+                  aria-label="Афиша событий"
                 >
                   {safeSlides.map((slide, index) => (
                     <div
@@ -216,21 +240,21 @@ export function HomeGuideHero({ slides }: HomeGuideHeroProps) {
                     >
                       <HeroSlideCard
                         slide={slide}
-                        href={slideHref(slide, cityValue, citySlug)}
+                        href={slideHref(slide, cityValue)}
                         priority={index === 0}
                         asHeading={index === 0 ? 'h1' : 'h2'}
                       />
                     </div>
                   ))}
                 </div>
-                <div className="mt-3 flex items-center justify-center gap-1.5" role="tablist" aria-label="Слайды баннера">
+                <div className="mt-3 flex items-center justify-center gap-1.5" role="tablist" aria-label="Слайды афиши">
                   {safeSlides.map((slide, index) => (
                     <button
                       key={slide.id}
                       type="button"
                       role="tab"
                       aria-selected={index === activeIndex}
-                      aria-label={`Слайд ${index + 1}: ${slide.badge}`}
+                      aria-label={`Слайд ${index + 1}: ${slide.title}`}
                       onClick={() => goTo(index)}
                       className={
                         index === activeIndex

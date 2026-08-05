@@ -15,17 +15,14 @@ import { mergeBlogCards } from '@/lib/blog-utils';
 import '@/lib/env';
 import { formatMoney, formatNumber, pluralEvents } from '@/lib/format';
 import { resolveHomePromoImage } from '@/lib/home-scenarios';
-import { buildHomeHeroSlides } from '@/lib/home-guide';
 import { podborkiBentoCellClass, podborkiBentoSpan, PODBORKI_BENTO_GRID_CLASS } from '@/lib/podborki-bento';
 import { landingCategoryHref } from '@/lib/landing-routes';
 import { withSoftTimeout } from '@/lib/soft-timeout';
 import { getHomeCoverFingerprints, getHomePageData } from '@/server/cached-home-data';
-import { getActiveHeroBanners } from '@/server/hero-banners';
 import { fetchPublicApiJson } from '@/server/public-api-client';
 
 /** External CDN HEAD fingerprints must not stall home TTFB on bad egress/DNS. */
 const HOME_FINGERPRINTS_TIMEOUT_MS = 800;
-const HOME_HERO_BANNERS_TIMEOUT_MS = 700;
 const HOME_ARTICLES_TIMEOUT_MS = 1_200;
 type BlogApiArticles = NonNullable<Parameters<typeof mergeBlogCards>[0]>;
 
@@ -68,23 +65,11 @@ async function HomePageBody() {
   const blogPosts = orderedBlog.slice(0, 4);
   const [featuredBlog, ...restBlog] = blogPosts;
 
-  const heroBanners = await withSoftTimeout(
-    getActiveHeroBanners(),
-    HOME_HERO_BANNERS_TIMEOUT_MS,
-    [],
-    'home-hero-banners',
-  );
-  const heroSlides = buildHomeHeroSlides({
-    banners: heroBanners,
-    landings: promoLandings,
-    liveEvents,
-  });
-
   return (
     <div className="pb-24 lg:pb-0">
       <HomeStoriesStrip />
 
-      <HomeGuideHero slides={heroSlides} />
+      <HomeGuideHero sessions={sessions} fingerprints={fingerprintsRecord} />
 
       {/* 2. Cities */}
       {topCities.length ? (
