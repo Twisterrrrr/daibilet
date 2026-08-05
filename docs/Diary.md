@@ -13,6 +13,7 @@
 
 ### Проблемы
 - Hub title-links на новые slug требуют web deploy (batch / «выкатывай»). Каталог listing - после MSK DB seed + API cache.
+- Первый apply с proximity-dedupe (<100м без title) перезаписал собор островом Канта и схлопнул два памятника у БФУ. Починено `repair-kgd-mustsee-dedupe.js` + ужесточение match в enrich (title/address/slug, не coords alone).
 
 ---
 
