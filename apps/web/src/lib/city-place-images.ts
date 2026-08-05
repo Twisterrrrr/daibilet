@@ -2,6 +2,7 @@
  * Editorial hero covers for /my-day Hot Picks, location/venue catalog cards & PDP
  * when hub omits heroImageUrl or only has a dark /venues/generated stub.
  * SPB: Главные 1-12 + мечеть + Top-100 linked place stills under /images/venues/saint-petersburg/.
+ * KGD: mustSee + day-route + suburb stops under /images/venues/kaliningrad/.
  * Blog Top-100/Beyond series is DRAFT (admin-only); assets still feed catalog/my-day.
  */
 
@@ -110,9 +111,84 @@ const SAINT_PETERSBURG_IMAGES: Record<string, string> = {
     '/images/venues/saint-petersburg/spikizi-bar-el-copitas.jpg',
 };
 
+const KALININGRAD_IMAGES: Record<string, string> = {
+  'kaliningrad-kafedral-nyy-sobor':
+    '/images/venues/kaliningrad/kafedral-nyy-sobor.jpg',
+  'kaliningrad-muzey-mirovogo-okeana':
+    '/images/venues/kaliningrad/muzey-mirovogo-okeana.jpg',
+  'kaliningrad-muzey-yantarya': '/images/venues/kaliningrad/muzey-yantarya.jpg',
+  'kaliningrad-muzey-izobrazitelnyh-iskusstv':
+    '/images/venues/kaliningrad/muzey-izobrazitelnyh-iskusstv.jpg',
+  'kaliningrad-muzey-bunker': '/images/venues/kaliningrad/muzey-bunker.jpg',
+  'kaliningrad-fort-5': '/images/venues/kaliningrad/fort-5.jpg',
+  'kaliningrad-istoriko-hudozhestvennyy-muzey':
+    '/images/venues/kaliningrad/istoriko-hudozhestvennyy-muzey.jpg',
+  'kaliningrad-art-prostranstvo-vorota':
+    '/images/venues/kaliningrad/art-prostranstvo-vorota.jpg',
+  'kaliningrad-muzey-kvartira-altes-haus':
+    '/images/venues/kaliningrad/muzey-kvartira-altes-haus.jpg',
+  'kaliningrad-muzey-vodokanal':
+    '/images/venues/kaliningrad/muzey-vodokanal.jpg',
+  'kaliningrad-rybnaya-derevnya':
+    '/images/venues/kaliningrad/rybnaya-derevnya.jpg',
+  'kaliningrad-rayon-vill-amalienau':
+    '/images/venues/kaliningrad/rayon-vill-amalienau.jpg',
+  'kaliningrad-rayon-maraunenhof':
+    '/images/venues/kaliningrad/rayon-maraunenhof.jpg',
+  'kaliningrad-korolevskie-vorota':
+    '/images/venues/kaliningrad/korolevskie-vorota.jpg',
+  'kaliningrad-brandenburgskie-vorota':
+    '/images/venues/kaliningrad/brandenburgskie-vorota.jpg',
+  'kaliningrad-fridlandskie-vorota':
+    '/images/venues/kaliningrad/fridlandskie-vorota.jpg',
+  'kaliningrad-rosgartenskie-vorota':
+    '/images/venues/kaliningrad/rosgartenskie-vorota.jpg',
+  'kaliningrad-dom-sovetov': '/images/venues/kaliningrad/dom-sovetov.jpg',
+  'kaliningrad-ostrov-kanta': '/images/venues/kaliningrad/ostrov-kanta.jpg',
+  'kaliningrad-verhnee-ozero': '/images/venues/kaliningrad/verhnee-ozero.jpg',
+  'kaliningrad-nizhnee-ozero': '/images/venues/kaliningrad/nizhnee-ozero.jpg',
+  'kaliningrad-tsentralnyy-park':
+    '/images/venues/kaliningrad/tsentralnyy-park.jpg',
+  'kaliningrad-zoopark': '/images/venues/kaliningrad/zoopark.jpg',
+  'kaliningrad-pamyatnik-boruschiesya-zubry':
+    '/images/venues/kaliningrad/pamyatnik-boruschiesya-zubry.jpg',
+  'kaliningrad-pamyatnik-immanuilu-kantu':
+    '/images/venues/kaliningrad/pamyatnik-immanuilu-kantu.jpg',
+  'kaliningrad-krestovozdvizhenskiy-sobor':
+    '/images/venues/kaliningrad/krestovozdvizhenskiy-sobor.jpg',
+  'kaliningrad-hram-hrista-spasitelya':
+    '/images/venues/kaliningrad/hram-hrista-spasitelya.jpg',
+  'kaliningrad-kirkha-svyatogo-semeystva':
+    '/images/venues/kaliningrad/kirkha-svyatogo-semeystva.jpg',
+  'kaliningrad-yuditten-kirkha':
+    '/images/venues/kaliningrad/yuditten-kirkha.jpg',
+  'kaliningrad-shtayndamm-99': '/images/venues/kaliningrad/shtayndamm-99.jpg',
+  'kaliningrad-gastrobar-sol': '/images/venues/kaliningrad/gastrobar-sol.jpg',
+  'kaliningrad-zotler-bier': '/images/venues/kaliningrad/zotler-bier.jpg',
+  'kaliningrad-redyuit': '/images/venues/kaliningrad/redyuit.jpg',
+  'kaliningrad-kenigsbergskiy-martsipan':
+    '/images/venues/kaliningrad/kenigsbergskiy-martsipan.jpg',
+  'kaliningrad-kurshskaya-kosa':
+    '/images/venues/kaliningrad/kurshskaya-kosa.jpg',
+  'kaliningrad-dyuna-efa': '/images/venues/kaliningrad/dyuna-efa.jpg',
+  'kaliningrad-tantsuyuschiy-les':
+    '/images/venues/kaliningrad/tantsuyuschiy-les.jpg',
+  'kaliningrad-muzey-koshek-murarium':
+    '/images/venues/kaliningrad/muzey-koshek-murarium.jpg',
+  'kaliningrad-vodonapornaya-bashnya-raushena':
+    '/images/venues/kaliningrad/vodonapornaya-bashnya-raushena.jpg',
+  'kaliningrad-shvedskaya-krepost-pillau':
+    '/images/venues/kaliningrad/shvedskaya-krepost-pillau.jpg',
+  'kaliningrad-yantarnyy-kombinat':
+    '/images/venues/kaliningrad/yantarnyy-kombinat.jpg',
+  'kaliningrad-smotrovaya-yantarnogo-kombinata':
+    '/images/venues/kaliningrad/smotrovaya-yantarnogo-kombinata.jpg',
+};
+
 const EDITORIAL_IMAGES_BY_SLUG: Record<string, string> = {
   ...NIZHNY_NOVGOROD_IMAGES,
   ...SAINT_PETERSBURG_IMAGES,
+  ...KALININGRAD_IMAGES,
 };
 
 export function lookupEditorialPlaceImage(
