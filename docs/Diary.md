@@ -7,8 +7,8 @@
 
 ### Решения
 - Bracket-aware parseMustSee; slugify через `hasOwnProperty`; mustSee seed всегда `PUBLISHED`; existing Venue = skip (не clobber kind).
-- cityInfo web+public: **184/184** со slug; MSK insert-missing для 129 новых карточек.
-- Deploy MSK web+API после seed.
+- cityInfo web+public: **184/184** со slug; MSK insert-missing: **130 inserted** / 54 skipped-exists.
+- Deploy MSK: `596b16a`, BUILD_ID=`m88BYqEA8iK42Fq3pNrmq`; API restart; smoke PDP/hub 200 (ранний 500 = transient post-restart).
 
 ### Проблемы
 - Часть name→kind heuristic грубая (Эрарта как ATTRACTION в dry-run inference) - на existing slug не перезаписываем; новые editorial PDP ок для хаб-линка.
