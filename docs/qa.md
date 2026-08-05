@@ -1,5 +1,9 @@
 # qa.md — открытые вопросы
 
+## 2026-08-05 - Deploy cadence (закрыто)
+
+Owner: основная работа локально / preview; агенты **commit + push** после итерации; **MSK web deploy** - пачкой раз в сутки или по явному запросу («выкатывай»). Исключения сразу: live 500, критичный хаб-редирект, security, launch-blocker без локальной проверки. Seed/apply prod DB - по запросу или в batch. Зафиксировано в `.cursorrules` + [Project.md](./Project.md).
+
 ## 2026-08-05 - Editorial places → catalog (открыто)
 
 `cityInfo.mustSee`, nested POI пригородов, stops пресетов и упоминания в статьях сейчас не имеют единого обязательного identity/seed-flow с `Venue`. Для широкого СПб это привело к тому, что только первоначально засеянные точки имеют public entity, а новые editorial-точки остаются inline.

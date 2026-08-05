@@ -28,7 +28,7 @@ function BlogCardMeta({
     <div
       className={[
         'flex flex-wrap items-center gap-3 text-slate-500',
-        isLarge ? 'mt-3 text-xs sm:text-sm' : 'mt-4 text-[11px]',
+        isLarge ? 'mt-3 text-xs sm:text-sm' : 'text-[11px]',
       ].join(' ')}
     >
       {post.authorName || post.authorId ? (
