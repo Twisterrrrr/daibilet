@@ -30,16 +30,43 @@ test('blog topics: standup / kids / routes / concerts', () => {
   assert.equal(parseBlogTopicParam('nope'), 'all');
 });
 
-test('blog listing CTA uses events label', () => {
-  const cta = resolveBlogListingCta({
+test('blog listing CTA: city → Больше про …', () => {
+  const spb = resolveBlogListingCta({
     slug: 'spb-stendap-gid',
     title: 'Стендап в Петербурге',
     city: 'Санкт-Петербург',
     citySlug: 'saint-petersburg',
   });
-  assert.ok(cta);
-  assert.equal(cta?.label, 'Смотреть события');
-  assert.ok(cta?.href);
+  assert.ok(spb);
+  assert.equal(spb?.label, 'Больше про Питер');
+  assert.ok(spb?.href);
+
+  const msk = resolveBlogListingCta({
+    slug: 'moskva-rechnye-progulki-kak-vybrat',
+    title: 'Речные прогулки в Москве',
+    city: 'Москва',
+    citySlug: 'moscow',
+  });
+  assert.ok(msk);
+  assert.equal(msk?.label, 'Больше про Москву');
+  assert.ok(msk?.href);
+});
+
+test('blog listing CTA: topic without city', () => {
+  const concerts = resolveBlogListingCta({
+    slug: 'kak-vybrat-koncert',
+    title: 'Как выбрать концерт',
+    tag: 'Концерты',
+  });
+  assert.ok(concerts);
+  assert.equal(concerts?.label, 'Смотреть концерты');
+
+  const routes = resolveBlogListingCta({
+    slug: 'moscow-2-dnya-samostoyatelno-marshrut',
+    title: 'Москва за 2 дня: маршрут',
+  });
+  assert.ok(routes);
+  assert.equal(routes?.label, 'Больше маршрутов');
 });
 
 test('static cards expose date + topics + searchText', () => {

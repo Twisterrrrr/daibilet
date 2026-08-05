@@ -1,3 +1,20 @@
+## 2026-08-05 - UX: blog cards polish (clamp / serif / CTA)
+
+### Наблюдения
+- Owner после deploy BUILD_ID `LV0jzT3jaueTAOmX202ic`: mid-sentence ellipsis на лидах large/lead; правая колонка magazine с `font-display` vs serif слева; CTA `ml-auto`/`justify-between` на узких карточках; универсальное «Смотреть события».
+
+### Решения
+- Убран агрессивный `line-clamp` с excerpt (large/lead/strip/small/list rows); лид живёт в доступной высоте карточки.
+- Заголовки magazine + list rows → единый `font-serif`.
+- Meta+CTA: `flex-wrap` без `justify-between`/`ml-auto` - CTA слева рядом/под meta.
+- `resolveBlogListingCta`: город → «Больше про Питер/Москву/…»; иначе тема (концерты/прогулки/маршруты); fallback «Смотреть афишу».
+- Deploy MSK по запросу owner (не в этой итерации).
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-05 - UX: blog materials filter under hero + CTA row
 
 ### Наблюдения

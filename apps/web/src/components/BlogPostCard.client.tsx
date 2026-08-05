@@ -208,7 +208,7 @@ export function BlogPostCard({
         </div>
         <div className="mt-6 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <p className="font-display text-sm font-bold text-white/95">{post.title}</p>
+            <p className="font-serif text-sm font-semibold text-white/95">{post.title}</p>
             <BlogCardMeta post={post} dateLabel={dateLabel} isLarge={false} onDark />
           </div>
           <ReadMoreCue onDark />
@@ -247,24 +247,22 @@ export function BlogPostCard({
             </Link>
           </h2>
           {primary ? (
-            <p className="mt-3 line-clamp-4 text-base leading-relaxed text-graphite-muted sm:line-clamp-5 sm:text-lg">
+            <p className="mt-3 text-base leading-relaxed text-graphite-muted sm:text-lg">
               {primary}
             </p>
           ) : null}
-          <div className="mt-auto flex flex-wrap items-center justify-between gap-x-3 gap-y-2 pt-4">
-            <div className="min-w-0">
-              <BlogCardMeta post={post} dateLabel={dateLabel} isLarge />
-            </div>
+          <div className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-2 pt-4">
+            <BlogCardMeta post={post} dateLabel={dateLabel} isLarge />
             {cta ? (
               <Link
                 href={cta.href}
-                className="group/cta ml-auto inline-flex shrink-0 items-center gap-2 rounded-xl bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:bg-primary-700"
+                className="group/cta inline-flex shrink-0 items-center gap-2 rounded-xl bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:bg-primary-700"
               >
                 {cta.label}
                 <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/cta:translate-x-1" aria-hidden />
               </Link>
             ) : (
-              <Link href={articleHref} className="ml-auto shrink-0">
+              <Link href={articleHref} className="shrink-0">
                 <ReadMoreCue />
               </Link>
             )}
@@ -336,11 +334,11 @@ export function BlogPostCard({
         </Link>
         <div className="flex min-w-0 flex-1 flex-col p-4 sm:p-5">
           <TagChips tag={tag} city={post.city} citySlug={post.citySlug} articleType={post.articleType} />
-          <h2 className="font-display text-base font-extrabold leading-snug text-slate-900 transition-colors duration-300 group-hover:text-primary-700 sm:text-lg">
+          <h2 className="font-serif text-base font-semibold leading-snug tracking-tight text-slate-900 transition-colors duration-300 group-hover:text-primary-700 sm:text-lg">
             <Link href={articleHref}>{post.title}</Link>
           </h2>
           {excerpt ? (
-            <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-slate-600">{excerpt}</p>
+            <p className="mt-2 text-sm leading-relaxed text-slate-600">{excerpt}</p>
           ) : null}
           <div className="mt-auto pt-2">
             <ReadMoreCue />
@@ -384,7 +382,7 @@ export function BlogPostCard({
             </Link>
           </h2>
           {hasCopy ? (
-            <p className="mt-2.5 whitespace-pre-line text-sm leading-relaxed text-graphite-muted line-clamp-[10] sm:text-base sm:leading-[1.55] sm:line-clamp-[12]">
+            <p className="mt-2.5 whitespace-pre-line text-sm leading-relaxed text-graphite-muted sm:text-base sm:leading-[1.55]">
               {[primary, secondary].filter(Boolean).join('\n\n')}
             </p>
           ) : null}
@@ -401,20 +399,18 @@ export function BlogPostCard({
               ))}
             </div>
           ) : null}
-          <div className="mt-auto flex flex-wrap items-center justify-between gap-x-3 gap-y-2 pt-3">
-            <div className="min-w-0">
-              <BlogCardMeta post={post} dateLabel={dateLabel} isLarge />
-            </div>
+          <div className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-2 pt-3">
+            <BlogCardMeta post={post} dateLabel={dateLabel} isLarge />
             {cta ? (
               <Link
                 href={cta.href}
-                className="group/cta ml-auto inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-primary-600 px-3.5 py-2 text-sm font-semibold text-white transition-all duration-300 hover:bg-primary-700"
+                className="group/cta inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-primary-600 px-3.5 py-2 text-sm font-semibold text-white transition-all duration-300 hover:bg-primary-700"
               >
                 {cta.label}
                 <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/cta:translate-x-1" aria-hidden />
               </Link>
             ) : (
-              <Link href={articleHref} className="ml-auto shrink-0">
+              <Link href={articleHref} className="shrink-0">
                 <ReadMoreCue />
               </Link>
             )}
@@ -449,7 +445,7 @@ export function BlogPostCard({
         <TagChips tag={tag} city={post.city} citySlug={post.citySlug} articleType={post.articleType} />
         <h2
           className={[
-            'font-display font-extrabold leading-snug text-slate-900 transition-colors duration-300 group-hover:text-primary-700',
+            'font-serif font-semibold leading-snug tracking-tight text-slate-900 transition-colors duration-300 group-hover:text-primary-700',
             isSmall ? 'text-base sm:text-[1.1rem]' : 'text-lg sm:text-xl',
           ].join(' ')}
         >
@@ -459,9 +455,7 @@ export function BlogPostCard({
           <p
             className={[
               'mt-2 leading-relaxed text-slate-600',
-              isSmall
-                ? 'line-clamp-[10] text-xs sm:text-sm sm:line-clamp-[12]'
-                : 'line-clamp-[12] text-sm',
+              isSmall ? 'text-xs sm:text-sm' : 'text-sm',
             ].join(' ')}
           >
             {excerpt}

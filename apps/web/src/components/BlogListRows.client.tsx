@@ -85,14 +85,14 @@ function BlogListRow({ post }: { post: BlogCardDto }) {
       ) : null}
 
       <div className="flex min-w-0 flex-1 flex-col py-2.5 pr-3 sm:py-3 sm:pr-4">
-        <h2 className="font-display text-base font-extrabold leading-snug text-slate-900 sm:text-lg md:text-xl">
+        <h2 className="font-serif text-base font-semibold leading-snug tracking-tight text-slate-900 sm:text-lg md:text-xl">
           <Link href={articleHref} className="transition-colors duration-300 hover:text-primary-700">
             {post.title}
           </Link>
         </h2>
 
         {excerpt ? (
-          <p className="mt-1 line-clamp-[8] text-xs leading-relaxed text-slate-600 sm:mt-1.5 sm:line-clamp-[10] sm:text-sm">
+          <p className="mt-1 text-xs leading-relaxed text-slate-600 sm:mt-1.5 sm:text-sm">
             {excerpt}
           </p>
         ) : null}
@@ -123,7 +123,7 @@ function BlogListRow({ post }: { post: BlogCardDto }) {
           </div>
         ) : null}
 
-        <div className="mt-auto flex flex-wrap items-center justify-between gap-x-3 gap-y-2 pt-2">
+        <div className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-2 pt-2">
           <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-500 sm:text-xs">
             {post.authorName || post.authorId ? (
               <span className={blogAuthorNameClassName(post.articleType)}>
@@ -139,7 +139,7 @@ function BlogListRow({ post }: { post: BlogCardDto }) {
           {cta ? (
             <Link
               href={cta.href}
-              className="group/cta ml-auto inline-flex shrink-0 items-center gap-1.5 rounded-md bg-primary-600 px-2.5 py-1 text-[11px] font-semibold text-white transition-all duration-300 hover:bg-primary-700 sm:text-xs"
+              className="group/cta inline-flex shrink-0 items-center gap-1.5 rounded-md bg-primary-600 px-2.5 py-1 text-[11px] font-semibold text-white transition-all duration-300 hover:bg-primary-700 sm:text-xs"
             >
               {cta.label}
               <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover/cta:translate-x-1" aria-hidden />

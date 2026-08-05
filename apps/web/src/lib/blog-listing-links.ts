@@ -138,9 +138,75 @@ export function resolveBlogListingQuickLinks(input: {
   return links.slice(0, limit);
 }
 
+/** Короткое имя города для CTA «Больше про …» (винительный / привычная форма). */
+const BLOG_CTA_CITY_SHORT: Record<string, string> = {
+  moscow: 'Москву',
+  'saint-petersburg': 'Питер',
+  kazan: 'Казань',
+  ekaterinburg: 'Екатеринбург',
+  kaliningrad: 'Калининград',
+  'nizhny-novgorod': 'Нижний',
+};
+
+/** Контекстный лейбл по landing slug / теме (без города). */
+const BLOG_CTA_LANDING_LABELS: Record<string, string> = {
+  'river-cruises': 'Смотреть прогулки',
+  'river-party': 'Смотреть прогулки',
+  'moscow-dinner-boat': 'Смотреть прогулки',
+  'concerts-genre': 'Смотреть концерты',
+  'walking-tours': 'Больше маршрутов',
+  'bus-tours': 'Смотреть экскурсии',
+  'country-tours': 'Смотреть экскурсии',
+  excursions: 'Смотреть экскурсии',
+  standup: 'Смотреть стендап',
+  'family-kids': 'Смотреть для детей',
+  'bridges-night': 'Смотреть мосты',
+  rooftops: 'Смотреть крыши',
+  exhibitions: 'Смотреть выставки',
+  'moscow-museums': 'Смотреть выставки',
+  'unusual-theatres': 'Смотреть театр',
+  'spb-yards': 'Больше маршрутов',
+  planetarium: 'Смотреть афишу',
+  'active-sport': 'Смотреть афишу',
+};
+
+function resolveBlogCtaLabel(input: {
+  citySlug?: string | null;
+  city?: string | null;
+  landingSlug?: string | null;
+  tag?: string | null;
+  title?: string | null;
+}): string {
+  const city = normalizeKnownCitySlug(input.citySlug);
+  if (city && BLOG_CTA_CITY_SHORT[city]) {
+    return `Больше про ${BLOG_CTA_CITY_SHORT[city]}`;
+  }
+  if (city && input.city) {
+    const short =
+      String(input.city).trim() === 'Санкт-Петербург' ? 'Питер' : String(input.city).trim();
+    if (short) return `Больше про ${short}`;
+  }
+
+  const landing = String(input.landingSlug || '').trim();
+  if (landing && BLOG_CTA_LANDING_LABELS[landing]) {
+    return BLOG_CTA_LANDING_LABELS[landing];
+  }
+
+  const hay = `${input.tag || ''} ${input.title || ''}`.toLowerCase();
+  if (/концерт|джаз|музык/.test(hay)) return 'Смотреть концерты';
+  if (/речн|теплоход|прогулк|канал|нева/.test(hay)) return 'Смотреть прогулки';
+  if (/маршрут|пеш(ие|ая|еход)|двор/.test(hay)) return 'Больше маршрутов';
+  if (/стендап|stand.?up|юмор/.test(hay)) return 'Смотреть стендап';
+  if (/дет|семь|kids|family/.test(hay)) return 'Смотреть для детей';
+  if (/выставк|музе/.test(hay)) return 'Смотреть выставки';
+  if (/экскурс|автобус/.test(hay)) return 'Смотреть экскурсии';
+
+  return 'Смотреть афишу';
+}
+
 /**
  * Явный CTA на карточке листинга: CHPU / афиша города.
- * «Смотреть события» - если есть целевой лендинг или афиша города.
+ * Лейбл контекстный: город → «Больше про …»; иначе тема/landing; иначе «Смотреть афишу».
  * Без пустого «Купить билет» без event.
  */
 export function resolveBlogListingCta(input: {
@@ -152,18 +218,26 @@ export function resolveBlogListingCta(input: {
 }): SeoLink | null {
   const city = normalizeKnownCitySlug(input.citySlug);
   const primary = resolvePrimaryLanding(input.slug, input.title, input.tag, city);
+  const label = resolveBlogCtaLabel({
+    citySlug: city,
+    city: input.city,
+    landingSlug: primary?.landingSlug,
+    tag: input.tag,
+    title: input.title,
+  });
+
   if (primary?.href) {
-    return { href: primary.href, label: 'Смотреть события' };
+    return { href: primary.href, label };
   }
 
   const eventsHref = city ? resolveBlogCityEventsHref(input.city, city) : null;
   if (eventsHref) {
-    return { href: eventsHref, label: 'Смотреть события' };
+    return { href: eventsHref, label };
   }
 
   const hubHref = city ? resolveBlogCityHref(input.city, city) : null;
   if (hubHref) {
-    return { href: hubHref, label: 'Смотреть события' };
+    return { href: hubHref, label };
   }
 
   return null;
