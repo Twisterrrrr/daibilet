@@ -16,8 +16,20 @@ export function matchDestination(destinations: PublicDestinationDto[], value?: s
   const needle = String(value || '').trim();
   if (!needle || needle === 'all') return null;
   return destinations.find(
-    (item) => item.name.toLowerCase() === needle.toLowerCase() || item.slug === needle,
+    (item) =>
+      item.name.toLowerCase() === needle.toLowerCase() ||
+      item.slug === needle ||
+      item.sourceSlug === needle,
   ) || null;
+}
+
+/** Selected destination for an explicit `/cities/[slug]` hub route. */
+export function resolveCityHubDestination(
+  destinations: PublicDestinationDto[],
+  pathname: string | null | undefined,
+): PublicDestinationDto | null {
+  const match = String(pathname || '').match(/^\/cities\/([^/?#]+)\/?$/);
+  return match ? matchDestination(destinations, decodeURIComponent(match[1])) : null;
 }
 
 export function readStoredSelectedCity(destinations: PublicDestinationDto[]): string | null {

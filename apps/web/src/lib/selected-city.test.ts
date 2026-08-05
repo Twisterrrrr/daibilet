@@ -9,6 +9,7 @@ import {
   mergeStoredCityIntoSearchParams,
   pathHrefWithSelectedCity,
   resolveCatalogCityFilter,
+  resolveCityHubDestination,
   SELECTED_CITY_STORAGE_KEY,
 } from './selected-city.ts';
 
@@ -94,6 +95,25 @@ test('matchDestination resolves by name and slug', () => {
   assert.equal(matchDestination([...destinations], 'ufa')?.name, 'Уфа');
   assert.equal(matchDestination([...destinations], 'Уфа')?.slug, 'ufa');
   assert.equal(matchDestination([...destinations], 'all'), null);
+});
+
+test('resolveCityHubDestination follows the city route including source slug', () => {
+  const cities = [
+    ...destinations,
+    {
+      id: '3',
+      name: 'Санкт-Петербург',
+      slug: 'sankt-peterburg',
+      sourceSlug: 'saint-petersburg',
+      type: 'city' as const,
+      events: 100,
+      venues: 20,
+      categories: [],
+    },
+  ];
+  assert.equal(resolveCityHubDestination(cities, '/cities/sankt-peterburg')?.name, 'Санкт-Петербург');
+  assert.equal(resolveCityHubDestination(cities, '/cities/saint-petersburg')?.name, 'Санкт-Петербург');
+  assert.equal(resolveCityHubDestination(cities, '/cities'), null);
 });
 
 test('resolveCatalogCityFilter maps slug via resolved label', () => {

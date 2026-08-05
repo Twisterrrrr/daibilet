@@ -39,13 +39,13 @@ const FILTER_LABELS: Record<MustSeeFilterId, string> = {
   main: 'Главные места',
   gastro: 'Гастрономические точки',
   museum: 'Музеи',
-  science: 'Наука',
+  science: 'Семейное',
   literature: 'Литература',
-  views: 'Виды',
-  street: 'Улицы',
-  park: 'Парки / набережные',
+  views: 'Виды / набережные',
+  street: 'Улицы / дворы',
+  park: 'Парки',
   temple: 'Храмы',
-  creative: 'Креатив',
+  creative: 'Необычное',
   secret: 'Секретные',
 };
 

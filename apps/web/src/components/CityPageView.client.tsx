@@ -1433,6 +1433,13 @@ function CitySignificantSuburbsBlock({
                             >
                               <div className="flex flex-wrap items-start justify-between gap-x-2 gap-y-1">
                                 <div className="min-w-0 flex-1">
+                                  <span
+                                    className={`mr-1.5 inline-flex rounded-full px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide ${
+                                      editorial ? 'bg-zinc-100 text-zinc-500' : 'bg-primary-50 text-primary-700'
+                                    }`}
+                                  >
+                                    Пригород
+                                  </span>
                                   {poiHref ? (
                                     <Link
                                       href={poiHref}

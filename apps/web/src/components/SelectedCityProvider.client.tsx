@@ -22,6 +22,7 @@ import {
   mergeStoredCityIntoSearchParams,
   persistSelectedCity,
   readStoredSelectedCity,
+  resolveCityHubDestination,
   resolveCityLabel,
 } from '@/lib/selected-city';
 import {
@@ -102,6 +103,12 @@ export function SelectedCityProvider({
 
   // Sync before paint so the first meaningful filter render already has the stored city.
   useLayoutEffect(() => {
+    const fromCityHub = resolveCityHubDestination(destinations, pathname);
+    if (fromCityHub) {
+      setCityLabel(fromCityHub.name);
+      setCityReady(true);
+      return;
+    }
     const landingRoute = resolveLandingRouteFromLocation(pathname);
     if (landingRoute?.citySlug && MULTI_CITY_LANDING_SLUGS.has(canonicalLandingSlug(landingRoute.landingSlug))) {
       const fromLanding =
@@ -162,8 +169,9 @@ export function SelectedCityProvider({
 
   // Keep storage aligned with an explicit catalog city (including deep-links).
   useLayoutEffect(() => {
-    if (!isCityFilterPath(pathname) || !urlCity) return;
-    const matched = matchDestination(destinations, urlCity);
+    const matched = isCityFilterPath(pathname) && urlCity
+      ? matchDestination(destinations, urlCity)
+      : resolveCityHubDestination(destinations, pathname);
     if (matched) persistSelectedCity(matched.name);
   }, [destinations, pathname, urlCity]);
 
