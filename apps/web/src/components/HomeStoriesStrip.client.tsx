@@ -61,7 +61,7 @@ export function HomeStoriesStrip() {
             <Link
               key={story.id}
               href={storyHref(story, cityValue)}
-              className="flex w-[4.75rem] shrink-0 snap-start flex-col items-center gap-1.5"
+              className="flex w-[5.5rem] shrink-0 snap-start flex-col items-center gap-1.5"
             >
               <span className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-sky-500 p-[2px] shadow-sm shadow-primary-500/20">
                 <span className="flex h-full w-full items-center justify-center rounded-full bg-white">

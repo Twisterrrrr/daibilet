@@ -33,6 +33,7 @@
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
 | UX.HOME-GUIDE | Главная: desktop bento-hero + my-day + categories; mobile stories + bottom nav; секции cities/events/lucky/podborki/blog/trust | Высокий | ✅ 8d844ae; deploy пачкой / по запросу |
+| UX.HOME-GUIDE2 | Mobile stories labels «Реки и каналы!» / «Бесплатно»; hero banner → snap-carousel реальных офферов (afisha / my-day / river / podborki) | Высокий | ✅ код; deploy пачкой / по запросу |
 
 ## Runtime URL integrity (2026-08-05)
 

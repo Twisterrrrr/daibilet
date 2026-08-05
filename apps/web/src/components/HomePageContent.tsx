@@ -15,7 +15,7 @@ import { mergeBlogCards } from '@/lib/blog-utils';
 import '@/lib/env';
 import { formatMoney, formatNumber, pluralEvents } from '@/lib/format';
 import { resolveHomePromoImage } from '@/lib/home-scenarios';
-import type { HomeFeaturedBanner } from '@/lib/home-guide';
+import { buildHomeHeroSlides } from '@/lib/home-guide';
 import { podborkiBentoCellClass, podborkiBentoSpan, PODBORKI_BENTO_GRID_CLASS } from '@/lib/podborki-bento';
 import { landingCategoryHref } from '@/lib/landing-routes';
 import { withSoftTimeout } from '@/lib/soft-timeout';
@@ -28,41 +28,6 @@ const HOME_FINGERPRINTS_TIMEOUT_MS = 800;
 const HOME_HERO_BANNERS_TIMEOUT_MS = 700;
 const HOME_ARTICLES_TIMEOUT_MS = 1_200;
 type BlogApiArticles = NonNullable<Parameters<typeof mergeBlogCards>[0]>;
-
-function resolveFeaturedBanner(input: {
-  banners: Array<{ title: string; imageUrl: string; link: string | null }>;
-  landings: Array<{ slug: string; title: string; subtitle?: string | null; events: number; priceFrom?: number | null }>;
-}): HomeFeaturedBanner {
-  const banner = input.banners[0];
-  if (banner?.imageUrl) {
-    return {
-      title: banner.title || 'Афиша на неделю',
-      subtitle: 'Подборка ярких событий - выбирайте и бронируйте онлайн',
-      href: banner.link || '/events?sort=popular',
-      imageUrl: banner.imageUrl,
-      ctaLabel: 'Смотреть афишу',
-    };
-  }
-
-  const landing = input.landings[0];
-  if (landing) {
-    return {
-      title: landing.title,
-      subtitle: landing.subtitle || `${pluralEvents(landing.events)} - готовая подборка`,
-      href: landingCategoryHref(landing.slug),
-      imageUrl: resolveHomePromoImage(landing.slug, landing.title),
-      ctaLabel: 'Смотреть афишу',
-    };
-  }
-
-  return {
-    title: 'Куда сходить на этой неделе',
-    subtitle: 'Экскурсии, музеи, река и концерты в одном каталоге',
-    href: '/events?sort=popular',
-    imageUrl: '/images/home/format-tours.jpg',
-    ctaLabel: 'Смотреть афишу',
-  };
-}
 
 async function HomePageBody() {
   const [{ destinationsPayload, catalogPayload, landingsCatalog }, fingerprintsRecord] =
@@ -109,16 +74,17 @@ async function HomePageBody() {
     [],
     'home-hero-banners',
   );
-  const featured = resolveFeaturedBanner({
+  const heroSlides = buildHomeHeroSlides({
     banners: heroBanners,
     landings: promoLandings,
+    liveEvents,
   });
 
   return (
     <div className="pb-24 lg:pb-0">
       <HomeStoriesStrip />
 
-      <HomeGuideHero featured={featured} />
+      <HomeGuideHero slides={heroSlides} />
 
       {/* 2. Cities */}
       {topCities.length ? (

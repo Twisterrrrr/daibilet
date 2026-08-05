@@ -2,6 +2,12 @@
 
 import Link from 'next/link';
 import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import {
   ArrowRight,
   CalendarDays,
   Gift,
@@ -21,8 +27,8 @@ import { cityToPrepositional } from '@/lib/city-declension';
 import {
   HOME_CATEGORY_CHIPS,
   buildMyDayHref,
-  type HomeFeaturedBanner,
   type HomeGuideChip,
+  type HomeHeroSlide,
 } from '@/lib/home-guide';
 
 const ICON_MAP: Record<HomeGuideChip['icon'], LucideIcon> = {
@@ -36,7 +42,7 @@ const ICON_MAP: Record<HomeGuideChip['icon'], LucideIcon> = {
 };
 
 type HomeGuideHeroProps = {
-  featured: HomeFeaturedBanner;
+  slides: HomeHeroSlide[];
 };
 
 function chipHref(chip: HomeGuideChip, cityValue: string): string {
@@ -55,11 +61,74 @@ function chipHref(chip: HomeGuideChip, cityValue: string): string {
   return chip.href;
 }
 
+function slideHref(slide: HomeHeroSlide, cityValue: string, citySlug: string | null): string {
+  if (slide.id === 'my-day' || slide.href === '/my-day' || slide.href.startsWith('/my-day?')) {
+    return buildMyDayHref(citySlug);
+  }
+  if (slide.href.startsWith('/events')) {
+    const qs = slide.href.includes('?') ? slide.href.slice(slide.href.indexOf('?') + 1) : '';
+    const params = new URLSearchParams(qs);
+    return catalogHrefWithSelectedCity(cityValue, {
+      q: params.get('q') || undefined,
+      category: params.get('category') || undefined,
+      date: params.get('date') || undefined,
+      sort: (params.get('sort') as 'popular' | 'time' | undefined) || undefined,
+      minPrice: params.has('minPrice') ? Number(params.get('minPrice')) : undefined,
+      maxPrice: params.has('maxPrice') ? Number(params.get('maxPrice')) : undefined,
+    });
+  }
+  return slide.href;
+}
+
+function HeroSlideCard({
+  slide,
+  href,
+  priority,
+  asHeading = 'h2',
+}: {
+  slide: HomeHeroSlide;
+  href: string;
+  priority?: boolean;
+  asHeading?: 'h1' | 'h2';
+}) {
+  const TitleTag = asHeading;
+  return (
+    <Link
+      href={href}
+      className="group relative flex h-full min-h-[200px] w-full flex-col overflow-hidden rounded-2xl bg-slate-800 text-white shadow-card sm:min-h-[240px] lg:min-h-[300px]"
+    >
+      <SafeImage
+        src={slide.imageUrl}
+        alt=""
+        fill
+        priority={priority}
+        sizes="(max-width: 1024px) 92vw, 60vw"
+        className="object-cover transition duration-500 group-hover:scale-[1.03]"
+        fallback={<div className="absolute inset-0 bg-gradient-to-br from-primary-700 via-sky-700 to-slate-900" />}
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-900/35 to-primary-900/10" />
+      <div className="relative z-[1] flex h-full min-h-[200px] flex-col justify-end p-5 sm:min-h-[240px] sm:p-6 lg:min-h-[300px] lg:p-8">
+        <span className="inline-flex w-fit rounded-full bg-white/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-white backdrop-blur-sm">
+          {slide.badge}
+        </span>
+        <TitleTag className="mt-3 max-w-xl font-display text-2xl font-bold leading-tight tracking-tight text-white sm:text-3xl lg:text-4xl">
+          {slide.title}
+        </TitleTag>
+        <p className="mt-2 max-w-lg text-sm text-white/85 sm:text-base">{slide.subtitle}</p>
+        <span className="mt-5 inline-flex w-fit items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-primary-700 shadow-sm transition group-hover:bg-sky-50">
+          {slide.ctaLabel}
+          <ArrowRight className="h-4 w-4" aria-hidden />
+        </span>
+      </div>
+    </Link>
+  );
+}
+
 /**
- * Personal-guide hero: desktop bento (featured ~60% + Мой день ~40%) + category rail.
- * Mobile: featured banner + compact my-day CTA (stories live above).
+ * Personal-guide hero: desktop bento (featured carousel ~60% + Мой день ~40%) + category rail.
+ * Mobile: horizontal snap carousel of offers + compact my-day CTA (stories live above).
  */
-export function HomeGuideHero({ featured }: HomeGuideHeroProps) {
+export function HomeGuideHero({ slides }: HomeGuideHeroProps) {
   const selectedCity = useSelectedCityOptional();
   const cityReady = selectedCity?.cityReady ?? false;
   const cityValue = cityReady ? selectedCity?.cityValue ?? 'all' : 'all';
@@ -70,40 +139,110 @@ export function HomeGuideHero({ featured }: HomeGuideHeroProps) {
       : null;
   const citySlug = selectedCity?.selectedDestination?.slug || null;
   const myDayHref = buildMyDayHref(citySlug);
-  const afishaHref = catalogHrefWithSelectedCity(cityValue, { sort: 'popular' });
+
+  const safeSlides = slides.length > 0 ? slides : [];
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const syncActive = useCallback(() => {
+    const el = scrollerRef.current;
+    if (!el || !safeSlides.length) return;
+    const children = Array.from(el.children) as HTMLElement[];
+    if (!children.length) return;
+    const mid = el.scrollLeft + el.clientWidth / 2;
+    let best = 0;
+    let bestDist = Number.POSITIVE_INFINITY;
+    children.forEach((child, index) => {
+      const center = child.offsetLeft + child.offsetWidth / 2;
+      const dist = Math.abs(center - mid);
+      if (dist < bestDist) {
+        bestDist = dist;
+        best = index;
+      }
+    });
+    setActiveIndex(best);
+  }, [safeSlides.length]);
+
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    syncActive();
+    el.addEventListener('scroll', syncActive, { passive: true });
+    window.addEventListener('resize', syncActive, { passive: true });
+    return () => {
+      el.removeEventListener('scroll', syncActive);
+      window.removeEventListener('resize', syncActive);
+    };
+  }, [syncActive]);
+
+  const goTo = (index: number) => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const child = el.children[index] as HTMLElement | undefined;
+    if (!child) return;
+    el.scrollTo({ left: child.offsetLeft, behavior: 'smooth' });
+  };
 
   return (
     <section className="border-b border-slate-100 bg-gradient-to-b from-sky-50/80 via-white to-white">
       <div className="container-page py-4 sm:py-6 lg:py-8">
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] lg:gap-4 lg:items-stretch">
-          {/* Featured ~60% */}
-          <Link
-            href={featured.href || afishaHref}
-            className="group relative min-h-[200px] overflow-hidden rounded-2xl bg-slate-800 text-white shadow-card sm:min-h-[240px] lg:min-h-[300px]"
-          >
-            <SafeImage
-              src={featured.imageUrl}
-              alt=""
-              fill
-              sizes="(max-width: 1024px) 100vw, 60vw"
-              className="object-cover transition duration-500 group-hover:scale-[1.03]"
-              fallback={<div className="absolute inset-0 bg-gradient-to-br from-primary-700 via-sky-700 to-slate-900" />}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-900/35 to-primary-900/10" />
-            <div className="relative z-[1] flex h-full min-h-[200px] flex-col justify-end p-5 sm:min-h-[240px] sm:p-6 lg:min-h-[300px] lg:p-8">
-              <span className="inline-flex w-fit rounded-full bg-white/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-white backdrop-blur-sm">
-                Событие недели
-              </span>
-              <h1 className="mt-3 max-w-xl font-display text-2xl font-bold leading-tight tracking-tight text-white sm:text-3xl lg:text-4xl">
-                {featured.title}
-              </h1>
-              <p className="mt-2 max-w-lg text-sm text-white/85 sm:text-base">{featured.subtitle}</p>
-              <span className="mt-5 inline-flex w-fit items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-primary-700 shadow-sm transition group-hover:bg-sky-50">
-                {featured.ctaLabel}
-                <ArrowRight className="h-4 w-4" aria-hidden />
-              </span>
-            </div>
-          </Link>
+          {/* Featured carousel ~60% */}
+          <div className="min-w-0">
+            {safeSlides.length <= 1 ? (
+              safeSlides[0] ? (
+                <HeroSlideCard
+                  slide={safeSlides[0]}
+                  href={slideHref(safeSlides[0], cityValue, citySlug)}
+                  priority
+                  asHeading="h1"
+                />
+              ) : null
+            ) : (
+              <>
+                <div
+                  ref={scrollerRef}
+                  className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                  role="region"
+                  aria-roledescription="carousel"
+                  aria-label="Предложения на главной"
+                >
+                  {safeSlides.map((slide, index) => (
+                    <div
+                      key={slide.id}
+                      className="w-[min(100%,calc(100%-1.25rem))] shrink-0 snap-start sm:w-[min(100%,calc(100%-1.5rem))] lg:w-full lg:shrink-0"
+                      aria-roledescription="slide"
+                      aria-label={`${index + 1} из ${safeSlides.length}`}
+                    >
+                      <HeroSlideCard
+                        slide={slide}
+                        href={slideHref(slide, cityValue, citySlug)}
+                        priority={index === 0}
+                        asHeading={index === 0 ? 'h1' : 'h2'}
+                      />
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-3 flex items-center justify-center gap-1.5" role="tablist" aria-label="Слайды баннера">
+                  {safeSlides.map((slide, index) => (
+                    <button
+                      key={slide.id}
+                      type="button"
+                      role="tab"
+                      aria-selected={index === activeIndex}
+                      aria-label={`Слайд ${index + 1}: ${slide.badge}`}
+                      onClick={() => goTo(index)}
+                      className={
+                        index === activeIndex
+                          ? 'h-2 w-5 rounded-full bg-primary-600 transition-all'
+                          : 'h-2 w-2 rounded-full bg-slate-300 transition-all hover:bg-slate-400'
+                      }
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
 
           {/* My Day ~40% - desktop panel; mobile compact card below featured */}
           <div className="relative flex flex-col justify-between overflow-hidden rounded-2xl bg-gradient-to-br from-primary-600 via-primary-600 to-sky-500 p-5 text-white shadow-card sm:p-6 lg:min-h-[300px] lg:p-7">
@@ -156,12 +295,12 @@ export function HomeGuideHero({ featured }: HomeGuideHeroProps) {
               <Link
                 key={chip.id}
                 href={chipHref(chip, cityValue)}
-                className="flex w-[7.25rem] shrink-0 snap-start flex-col items-center gap-2 rounded-2xl bg-white px-3 py-3.5 text-center shadow-card ring-1 ring-slate-200/70 transition hover:ring-primary/35 hover:shadow-card-hover"
+                className="flex w-[7.75rem] shrink-0 snap-start flex-col items-center gap-2 rounded-2xl bg-white px-3 py-3.5 text-center shadow-card ring-1 ring-slate-200/70 transition hover:ring-primary/35 hover:shadow-card-hover"
               >
                 <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-50 to-sky-50 text-primary-600">
                   <Icon className="h-5 w-5" aria-hidden />
                 </span>
-                <span className="text-xs font-semibold text-slate-800">{chip.label}</span>
+                <span className="text-xs font-semibold leading-tight text-slate-800">{chip.label}</span>
               </Link>
             );
           })}

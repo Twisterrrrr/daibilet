@@ -1,3 +1,19 @@
+## 2026-08-05 - Home guide: stories labels + hero carousel
+
+### Наблюдения
+- Owner screenshot: chips «Река» / «Бесплатное»; главный баннер статичный («Событие недели / Друзья на набережной»).
+- Нужны живые предложения (афиша, подборки, my-day), не одна CMS-карточка.
+
+### Решения
+- `HOME_STORIES` / `HOME_CATEGORY_CHIPS`: «Реки и каналы!» + «Бесплатно» (href без смены: river landing / free price filter).
+- `buildHomeHeroSlides` из banners + promo landings + live events count → до 5 слайдов; `HomeGuideHero` horizontal snap + dots + peek next на mobile.
+- Deploy web не гоняли (owner не просил «выкатывай»).
+
+### Проблемы
+- Нет: данные слайдов только из уже существующих home sources.
+
+---
+
 ## 2026-08-05 - SPB must-see finish: coords backfill + city DTO headroom
 
 ### Наблюдения
