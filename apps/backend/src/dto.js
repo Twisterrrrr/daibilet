@@ -6576,10 +6576,16 @@ function resolvePublicVenueCity(row) {
   const dbCity = cleanDisplayName(row.city);
   const name = row.name || row.title || '';
   const address = row.address || '';
-  const inferred = inferCityNameFromText(name, address);
   const canonicalDb = canonicalizePublicCityName(dbCity);
-
-  if (inferred) return routeCityToPublicDisplayName(inferred);
+  // Prefer DB city. Stem inference («казан» ⊂ «Казанский собор») must not
+  // reassign SPB/KGD editorial places to another known city.
+  if (canonicalDb && !venueLocationContradictsCity(name, address, canonicalDb)) {
+    return routeCityToPublicDisplayName(canonicalDb);
+  }
+  const inferred = inferCityNameFromText(name, address);
+  if (inferred && (!canonicalDb || venueLocationContradictsCity(name, address, canonicalDb))) {
+    return routeCityToPublicDisplayName(inferred);
+  }
   if (canonicalDb) return routeCityToPublicDisplayName(canonicalDb);
   if (dbCity && dbCity !== 'Не указан') return routeCityToPublicDisplayName(dbCity);
   const locality = inferVenueLocalityLabel(name, address);
@@ -7688,7 +7694,9 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
   // Warm list = global family browse only (top hub with events).
   // Never short-circuit city-scoped: a few event venues for Nizhny/SPB would
   // hide editorial 0-event must-see (kreml/yarmarka/…) and break /my-day picks.
-  if (!query && !typeFilter && familyFilter && !cityFilter) {
+  // Location family also skips warm short-circuit so editorial content places
+  // (0 events) are not truncated by the event-sorted warm snapshot.
+  if (!query && !typeFilter && familyFilter && !cityFilter && familyFilter !== 'location') {
     const warmList = warmVenueCatalogList(familyFilter);
     if (warmList) {
       const venues = warmList.slice(0, limit);
@@ -7707,12 +7715,9 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
     }
   }
 
-  // City-scoped: wider lean hub + content places (0 events) so Nizhny etc. appear.
-  const rows = await publicVenueHubRows(
-    db,
-    cityFilter ? 2000 : 500,
-    cityFilter ? { requireEvents: false } : {},
-  );
+  // Location family + city-scoped: wider lean hub + content places (0 events).
+  const wideHub = Boolean(cityFilter) || familyFilter === 'location';
+  const rows = await publicVenueHubRows(db, wideHub ? 2000 : 500, wideHub ? { requireEvents: false } : {});
   const venues = rows
     .filter((row) => {
       if (!query) return true;
@@ -9039,7 +9044,9 @@ function inferCityNameFromText(...parts) {
     const needle = city.toLowerCase();
     if (haystack.includes(needle)) return city;
     const stem = cityNameStem(city);
-    if (stem.length >= 4 && haystack.includes(stem)) return city;
+    // Word-boundary stem only: bare includes(«казан») false-positives
+    // «Казанский собор» / «Казанская площадь» in Saint Petersburg.
+    if (stem.length >= 4 && haystackIncludesCityToken(haystack, stem)) return city;
   }
 
   const match = haystack.match(/(?:^|\s)г\.?\s*([а-яё][а-яё\s-]{2,40})/i);

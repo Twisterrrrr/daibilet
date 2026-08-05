@@ -1,3 +1,24 @@
+## 2026-08-05 - Locations: СПб must-see не были в каталоге
+
+### Наблюдения
+- Owner: «В locations так и нет добавленных новых объектов» при фильтре Санкт-Петербург.
+- В MSK DB owner pack уже был (76 SPB / 11 KGD matched): seed `enrich-must-see-editorial` отработал раньше.
+- Глобальный `/api/public/venues?family=location` не отдавал Петропавловскую, Невский, Спас и др.: content-place union в `fetchLeanPublicVenueRows` был `take:400` по A→Z, а до «П» уже 585 точек.
+- SSR Locations грузил warm/global список без city; клиент только фильтровал по имени - отсутствующие в global не появлялись.
+- Стем «казан» от «Казань» ложно ставил город «Казань» на «Казанский собор» (СПб).
+
+### Решения
+- Content-place take поднят до `min(max(take,500),2000)`.
+- Location family каталог: без warm short-circuit, hub `requireEvents:false` + limit 2000.
+- `LocationsCatalogView`: city-scoped refetch `?family=location&city=…`.
+- `inferCityNameFromText` / `resolvePublicVenueCity`: word-boundary stem + приоритет DB city.
+- Hygiene: канон slug Казанского собора, kind кафедрального собора КГД.
+
+### Проблемы
+- Музеи (Эрмитаж и др.) остаются family=institution → `/venues`, не `/locations` (канон venueSlug).
+
+---
+
 ## 2026-08-05 - Venue PDP: setCity не должен выкидывать на /venues
 
 ### Наблюдения

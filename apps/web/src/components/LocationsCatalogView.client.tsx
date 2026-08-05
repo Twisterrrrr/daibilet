@@ -35,16 +35,34 @@ export function LocationsCatalogView({ venues: initialVenues }: { venues: VenueC
   const [isPending, startTransition] = useTransition();
   const [catalogLoading, setCatalogLoading] = useState(false);
 
-  useEffect(() => {
-    setVenues(initialVenues);
-  }, [initialVenues]);
+  const urlCity = searchParams.get('city')?.trim() || '';
+  const rawType = searchParams.get('type')?.trim() || '';
+  const typeFilter = rawType ? normalizeVenueKind(rawType) : 'all';
+  const cityReady = selectedCity?.cityReady ?? true;
 
-  // Safety net when SSR soft-timeout / nginx HIT served empty catalog.
+  // City-scoped API includes 0-event editorial must-see; global SSR alone can miss them.
+  const cityFetchKey = useMemo(() => {
+    if (urlCity && urlCity !== 'all') return urlCity;
+    const dest = selectedCity?.selectedDestination;
+    if (!dest || selectedCity?.cityValue === 'all') return '';
+    return dest.sourceSlug || dest.slug || selectedCity.cityLabel || '';
+  }, [urlCity, selectedCity]);
+
   useEffect(() => {
-    if (initialVenues.length > 0) return;
+    // City-scoped fetch owns the list when a city filter is active.
+    if (cityFetchKey) return;
+    setVenues(initialVenues);
+  }, [initialVenues, cityFetchKey]);
+
+  useEffect(() => {
+    if (!cityReady) return;
     const controller = new AbortController();
+    const params = new URLSearchParams({ family: 'location', limit: '500' });
+    if (cityFetchKey) params.set('city', cityFetchKey);
+    // Empty SSR always refetch; city filter always refetch for editorial places.
+    if (!cityFetchKey && initialVenues.length > 0) return;
     setCatalogLoading(true);
-    fetch('/api/public/venues?family=location&limit=500', { signal: controller.signal })
+    fetch(`/api/public/venues?${params.toString()}`, { signal: controller.signal })
       .then(async (response) => (response.ok ? ((await response.json()) as { venues?: VenueCatalogCard[] }) : null))
       .then((data) => {
         if (data?.venues?.length) setVenues(data.venues);
@@ -52,12 +70,8 @@ export function LocationsCatalogView({ venues: initialVenues }: { venues: VenueC
       .catch(() => undefined)
       .finally(() => setCatalogLoading(false));
     return () => controller.abort();
-  }, [initialVenues]);
+  }, [cityFetchKey, cityReady, initialVenues.length]);
 
-  const urlCity = searchParams.get('city')?.trim() || '';
-  const rawType = searchParams.get('type')?.trim() || '';
-  const typeFilter = rawType ? normalizeVenueKind(rawType) : 'all';
-  const cityReady = selectedCity?.cityReady ?? true;
   const cityPending = !urlCity && Boolean(selectedCity) && !cityReady;
   const listPending = cityPending || isPending || catalogLoading;
 
@@ -104,8 +118,12 @@ export function LocationsCatalogView({ venues: initialVenues }: { venues: VenueC
   // Facet chip counts must match the city dropdown universe (e.g. SPb 20), not the global catalog.
   const cityScopedVenues = useMemo(() => {
     if (cityFilter === 'all') return venues;
-    return venues.filter((venue) => venue.city === cityFilter);
-  }, [venues, cityFilter]);
+    const byName = venues.filter((venue) => venue.city === cityFilter);
+    // City-scoped API already narrowed the list; slug URL (?city=saint-petersburg)
+    // may not equal display title «Санкт-Петербург».
+    if (byName.length === 0 && cityFetchKey) return venues;
+    return byName;
+  }, [venues, cityFilter, cityFetchKey]);
 
   const typeOptions = useMemo(() => {
     const counts = new Map<string, number>();

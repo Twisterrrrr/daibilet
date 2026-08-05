@@ -77,7 +77,9 @@ test('city-scoped family catalog must not short-circuit on warm-only event venue
   // Documented contract: when city= is set, warm list alone is insufficient -
   // buildPublicVenuesCatalog must fall through to requireEvents:false hub so
   // editorial must-see (0 events) are included. Regression guard for /my-day.
+  // Location family also skips warm short-circuit (same editorial gap).
   const source = require('node:fs').readFileSync(new URL('./dto.js', import.meta.url), 'utf8');
   assert.match(source, /Never short-circuit city-scoped/);
-  assert.match(source, /familyFilter && !cityFilter/);
+  assert.match(source, /familyFilter !== 'location'/);
+  assert.match(source, /wideHub/);
 });

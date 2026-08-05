@@ -88,6 +88,9 @@ export async function fetchLeanPublicVenueRows(
   }
 
   const contentKinds = [...CONTENT_PLACE_DB_KINDS] as VenueKind[];
+  // Full editorial set (SPB/KGD must-see etc.). Former A→Z take:400 dropped
+  // titles after «П» (Петропавловская, Спас, Стрелка…) from /locations.
+  const contentTake = Math.min(Math.max(take, 500), 2000);
   const [rows, contentRows] = await Promise.all([
     prisma.venue.findMany({
       where,
@@ -109,7 +112,7 @@ export async function fetchLeanPublicVenueRows(
           },
           select: venueListSelect,
           orderBy: [{ title: 'asc' }],
-          take: Math.min(take, 400),
+          take: contentTake,
         }),
   ]);
 
