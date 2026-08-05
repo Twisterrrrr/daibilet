@@ -1,3 +1,21 @@
+## 2026-08-05 - /blog mobile UX (owner markup)
+
+### Наблюдения
+- Owner mobile скрины `/blog`: зачёркнуты topic chips и grid/list toggle; поиск/селекты и карточки слишком низкие по touch-target.
+
+### Решения
+- Topic chips в `BlogListHero`: `hidden md:flex` (desktop оставляем).
+- View toggle в `BlogListFiltered`: `hidden md:inline-flex`; ниже md всегда magazine (`matchMedia`).
+- Search + city/author selects: mobile ~h-14 / text-base, desktop прежние размеры.
+- `BlogPostCard` + `BlogFeaturedHero` (+ «Свежее» thumbs): +30-40% min-h/padding/thumbs на &lt;md.
+- Excerpt `spb-s-rebenkom-v-dozhd`: «собрать» → «провести» (MD + `blog-posts.ts`).
+- Commit+push; web deploy не делали.
+
+### Проблемы
+- Prod DB excerpt обновится при следующем upsert/seed по запросу owner (локальный source уже «провести»).
+
+---
+
 ## 2026-08-05 - MSK deploy: blog card UX + SPB suburbs
 
 ### Наблюдения

@@ -198,15 +198,15 @@ export function BlogPostCard({
     return (
       <Link
         href={articleHref}
-        className={`group relative flex min-h-[12rem] flex-col justify-between overflow-hidden rounded-card bg-gradient-to-br p-6 text-white shadow-card transition-all duration-300 hover:scale-[1.01] hover:shadow-lg sm:min-h-[14rem] sm:p-8 ${blogQuoteSurfaceClassName(displayTag || tag)}`}
+        className={`group relative flex min-h-[16.5rem] flex-col justify-between overflow-hidden rounded-card bg-gradient-to-br p-8 text-white shadow-card transition-all duration-300 hover:scale-[1.01] hover:shadow-lg md:min-h-[14rem] md:p-8 ${blogQuoteSurfaceClassName(displayTag || tag)}`}
       >
         <div>
           <TagChips tag={tag} city={post.city} citySlug={post.citySlug} articleType={post.articleType} />
-          <p className="font-serif text-xl font-medium leading-snug tracking-tight sm:text-2xl md:text-[1.65rem] md:leading-[1.3]">
+          <p className="font-serif text-2xl font-medium leading-snug tracking-tight md:text-[1.65rem] md:leading-[1.3]">
             {quoteText}
           </p>
         </div>
-        <div className="mt-6 flex flex-wrap items-end justify-between gap-3">
+        <div className="mt-8 flex flex-wrap items-end justify-between gap-3 md:mt-6">
           <div>
             <p className="font-serif text-sm font-semibold text-white/95">{post.title}</p>
             <BlogCardMeta post={post} dateLabel={dateLabel} isLarge={false} onDark />
@@ -224,7 +224,7 @@ export function BlogPostCard({
         <Link
           href={articleHref}
           aria-label={post.title}
-          className="relative block aspect-[16/10] w-full shrink-0 overflow-hidden bg-gradient-to-br from-sky-100 to-primary-50 sm:aspect-[2/1] lg:aspect-auto lg:min-h-[22rem] lg:w-[58%]"
+          className="relative block aspect-[16/11] min-h-[12rem] w-full shrink-0 overflow-hidden bg-gradient-to-br from-sky-100 to-primary-50 md:aspect-[2/1] md:min-h-0 lg:aspect-auto lg:min-h-[22rem] lg:w-[58%]"
         >
           {hasCover ? (
             <SafeImage
@@ -239,9 +239,9 @@ export function BlogPostCard({
             <CoverFallback large />
           )}
         </Link>
-        <div className="flex min-w-0 flex-1 flex-col justify-center p-5 sm:p-7 lg:p-8">
+        <div className="flex min-w-0 flex-1 flex-col justify-center p-7 md:p-7 lg:p-8">
           <TagChips tag={tag} city={post.city} citySlug={post.citySlug} articleType={post.articleType} />
-          <h2 className="font-serif text-3xl font-semibold leading-[1.12] tracking-tight text-graphite sm:text-4xl">
+          <h2 className="font-serif text-[1.85rem] font-semibold leading-[1.12] tracking-tight text-graphite md:text-4xl">
             <Link href={articleHref} className="transition-colors duration-300 hover:text-primary-700">
               {post.title}
             </Link>
@@ -275,7 +275,7 @@ export function BlogPostCard({
   if (isBanner) {
     const bannerLead = excerpt || expandLargeListingCopy(post.slug, excerpt, 180).primary;
     return (
-      <article className="group relative flex min-h-[14rem] overflow-hidden rounded-card bg-slate-900 shadow-card transition-all duration-300 hover:scale-[1.01] hover:shadow-lg sm:min-h-[16rem] lg:min-h-[18rem]">
+      <article className="group relative flex min-h-[19rem] overflow-hidden rounded-card bg-slate-900 shadow-card transition-all duration-300 hover:scale-[1.01] hover:shadow-lg md:min-h-[16rem] lg:min-h-[18rem]">
         <Link href={articleHref} aria-label={post.title} className="absolute inset-0 block">
           {hasCover ? (
             <SafeImage
@@ -294,9 +294,9 @@ export function BlogPostCard({
             className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/50 to-slate-950/10"
           />
         </Link>
-        <div className="relative z-10 mt-auto flex w-full max-w-3xl flex-col gap-2 p-5 sm:gap-3 sm:p-7">
+        <div className="relative z-10 mt-auto flex w-full max-w-3xl flex-col gap-3 p-7 md:gap-3 md:p-7">
           <TagChips tag={tag} city={post.city} citySlug={post.citySlug} articleType={post.articleType} />
-          <h2 className="font-serif text-xl font-semibold leading-[1.15] tracking-tight text-white sm:text-2xl lg:text-3xl">
+          <h2 className="font-serif text-2xl font-semibold leading-[1.15] tracking-tight text-white md:text-2xl lg:text-3xl">
             <Link href={articleHref} className="hover:text-white/90">
               {post.title}
             </Link>
@@ -313,11 +313,11 @@ export function BlogPostCard({
 
   if (isStrip) {
     return (
-      <article className={`${cardShell} sm:flex-row`}>
+      <article className={`${cardShell} md:flex-row`}>
         <Link
           href={articleHref}
           aria-label={post.title}
-          className="relative block aspect-[16/10] w-full shrink-0 overflow-hidden bg-gradient-to-br from-sky-100 to-primary-50 sm:aspect-auto sm:w-[42%] sm:min-h-[9.5rem]"
+          className="relative block aspect-[16/11] min-h-[11rem] w-full shrink-0 overflow-hidden bg-gradient-to-br from-sky-100 to-primary-50 md:aspect-auto md:min-h-[9.5rem] md:w-[42%]"
         >
           {hasCover ? (
             <SafeImage
@@ -332,9 +332,9 @@ export function BlogPostCard({
             <CoverFallback />
           )}
         </Link>
-        <div className="flex min-w-0 flex-1 flex-col p-4 sm:p-5">
+        <div className="flex min-w-0 flex-1 flex-col p-6 md:p-5">
           <TagChips tag={tag} city={post.city} citySlug={post.citySlug} articleType={post.articleType} />
-          <h2 className="font-serif text-base font-semibold leading-snug tracking-tight text-slate-900 transition-colors duration-300 group-hover:text-primary-700 sm:text-lg">
+          <h2 className="font-serif text-lg font-semibold leading-snug tracking-tight text-slate-900 transition-colors duration-300 group-hover:text-primary-700 md:text-lg">
             <Link href={articleHref}>{post.title}</Link>
           </h2>
           {excerpt ? (
@@ -359,7 +359,7 @@ export function BlogPostCard({
         <Link
           href={articleHref}
           aria-label={post.title}
-          className="relative block aspect-[2/1] min-h-[9.5rem] shrink-0 overflow-hidden bg-gradient-to-br from-sky-100 to-primary-50 sm:min-h-[11rem]"
+          className="relative block aspect-[2/1] min-h-[13rem] shrink-0 overflow-hidden bg-gradient-to-br from-sky-100 to-primary-50 md:min-h-[11rem]"
         >
           {hasCover ? (
             <SafeImage
@@ -374,9 +374,9 @@ export function BlogPostCard({
             <CoverFallback large />
           )}
         </Link>
-        <div className="flex min-w-0 flex-1 flex-col p-5 sm:p-6">
+        <div className="flex min-w-0 flex-1 flex-col p-7 md:p-6">
           <TagChips tag={tag} city={post.city} citySlug={post.citySlug} articleType={post.articleType} />
-          <h2 className="font-serif text-2xl font-semibold leading-[1.15] tracking-tight text-graphite sm:text-3xl">
+          <h2 className="font-serif text-[1.65rem] font-semibold leading-[1.15] tracking-tight text-graphite md:text-3xl">
             <Link href={articleHref} className="transition-colors duration-300 hover:text-primary-700">
               {post.title}
             </Link>
@@ -424,8 +424,8 @@ export function BlogPostCard({
     <Link href={articleHref} className={cardShell}>
       <div
         className={[
-          'relative overflow-hidden bg-gradient-to-br from-sky-100 to-primary-50',
-          isSmall ? 'aspect-[16/10]' : 'aspect-[16/9]',
+          'relative min-h-[9rem] overflow-hidden bg-gradient-to-br from-sky-100 to-primary-50 md:min-h-0',
+          isSmall ? 'aspect-[16/11] md:aspect-[16/10]' : 'aspect-[16/10] md:aspect-[16/9]',
         ].join(' ')}
       >
         {hasCover ? (
@@ -441,12 +441,17 @@ export function BlogPostCard({
           <CoverFallback />
         )}
       </div>
-      <div className={['flex flex-1 flex-col', isSmall ? 'p-4' : 'p-5'].join(' ')}>
+      <div
+        className={[
+          'flex flex-1 flex-col',
+          isSmall ? 'p-5 md:p-4' : 'p-7 md:p-5',
+        ].join(' ')}
+      >
         <TagChips tag={tag} city={post.city} citySlug={post.citySlug} articleType={post.articleType} />
         <h2
           className={[
             'font-serif font-semibold leading-snug tracking-tight text-slate-900 transition-colors duration-300 group-hover:text-primary-700',
-            isSmall ? 'text-base sm:text-[1.1rem]' : 'text-lg sm:text-xl',
+            isSmall ? 'text-lg md:text-[1.1rem]' : 'text-xl md:text-xl',
           ].join(' ')}
         >
           {post.title}
@@ -455,7 +460,7 @@ export function BlogPostCard({
           <p
             className={[
               'mt-2 leading-relaxed text-slate-600',
-              isSmall ? 'text-xs sm:text-sm' : 'text-sm',
+              isSmall ? 'text-sm md:text-sm' : 'text-base md:text-sm',
             ].join(' ')}
           >
             {excerpt}

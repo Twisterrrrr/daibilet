@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { LayoutGrid, List, Search } from 'lucide-react';
+import { LayoutGrid, List } from 'lucide-react';
 
 import { BlogListRows } from '@/components/BlogListRows.client';
 import { BlogMagazineGrid } from '@/components/BlogMagazineGrid.client';
@@ -62,7 +62,7 @@ function BlogViewModeToggle({
 }) {
   return (
     <div
-      className="inline-flex h-10 shrink-0 items-center overflow-hidden rounded-xl bg-slate-100 p-1 ring-1 ring-slate-200/80"
+      className="hidden h-10 shrink-0 items-center overflow-hidden rounded-xl bg-slate-100 p-1 ring-1 ring-slate-200/80 md:inline-flex"
       role="radiogroup"
       aria-label="Вид списка статей"
     >
@@ -134,6 +134,8 @@ export function BlogListFiltered({
   const searchParams = useSearchParams();
   const cityOptionsSource = allPosts?.length ? allPosts : posts;
   const [viewMode, setViewModeState] = useState<BlogViewMode>('magazine');
+  /** Below md toggle is hidden - always magazine so user is not stuck in list. */
+  const [isMdUp, setIsMdUp] = useState(false);
   const [cursor, setCursor] = useState<string | null>(null);
   const [visiblePosts, setVisiblePosts] = useState<BlogCardDto[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
@@ -178,13 +180,6 @@ export function BlogListFiltered({
   }, [posts, author, topic, query, urlCity]);
 
   useEffect(() => {
-    const page = paginateBlogFeedByCursor(filtered, { cursor: null, limit: PAGE_SIZE });
-    setCursor(null);
-    setVisiblePosts(page.items);
-    setNextCursor(page.nextCursor);
-  }, [filtered, viewMode]);
-
-  useEffect(() => {
     const fromUrl = searchParams.get('view');
     if (fromUrl) {
       setViewModeState(parseBlogViewMode(fromUrl));
@@ -192,6 +187,23 @@ export function BlogListFiltered({
     }
     setViewModeState(readStoredBlogViewMode() || 'magazine');
   }, [searchParams]);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 768px)');
+    const sync = () => setIsMdUp(mq.matches);
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, []);
+
+  const effectiveViewMode: BlogViewMode = isMdUp ? viewMode : 'magazine';
+
+  useEffect(() => {
+    const page = paginateBlogFeedByCursor(filtered, { cursor: null, limit: PAGE_SIZE });
+    setCursor(null);
+    setVisiblePosts(page.items);
+    setNextCursor(page.nextCursor);
+  }, [filtered, effectiveViewMode]);
 
   const setViewMode = useCallback(
     (next: BlogViewMode) => {
@@ -256,7 +268,7 @@ export function BlogListFiltered({
   const showEmptyCityBanner = Boolean(emptyCheckSlug && bannerLabel && emptyCheckCount === 0);
 
   const selectClass =
-    'min-w-[10rem] flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-primary-400 focus:ring-2 focus:ring-primary-100 sm:max-w-[16rem] sm:flex-none';
+    'min-h-14 min-w-[10rem] flex-1 rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-base text-slate-800 outline-none transition focus:border-primary-400 focus:ring-2 focus:ring-primary-100 md:min-h-11 md:px-3 md:py-2.5 md:text-sm sm:max-w-[16rem] sm:flex-none';
 
   const filtersBar = (
     <div className="mb-8 space-y-3 border-b border-slate-200 pb-5">
@@ -330,7 +342,7 @@ export function BlogListFiltered({
 
       {filtered.length > 0 ? (
         <>
-          {viewMode === 'list' ? (
+          {effectiveViewMode === 'list' ? (
             <BlogListRows posts={displayPosts} />
           ) : (
             <BlogMagazineGrid posts={displayPosts} editorialQuote={editorialQuote} />
