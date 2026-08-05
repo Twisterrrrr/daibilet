@@ -216,14 +216,14 @@ function scheduleCityPageRebuild(
         : Promise.resolve(null),
       matchedSessions[0]?.cityId
         ? withTimeout(
-            publicPublishedVenuesByCityId(legacyDb, matchedSessions[0].cityId, 80),
+            publicPublishedVenuesByCityId(legacyDb, matchedSessions[0].cityId, 250),
             CITY_SECONDARY_TIMEOUT_MS,
             [],
             'city-content-venues',
           )
         : Promise.resolve([]),
     ]);
-    const venues = mergeCityPageVenues(sessionVenues, contentVenues, 80);
+    const venues = mergeCityPageVenues(sessionVenues, contentVenues, 250);
     cityPerfMark('venues+city-record', mapStartedAt, { venues: venues.length });
     const venueCount = countDistinctSessionVenues(matchedSessions);
     const prices = matchedSessions
