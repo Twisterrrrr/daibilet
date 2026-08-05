@@ -49,6 +49,31 @@ export function blogCityBadgeClassName(citySlug?: string | null): string {
   );
 }
 
+/** Цветные плашки тегов/тем на карточках ленты (без purple glow). */
+const BLOG_TAG_BADGE_RULES: Array<{ re: RegExp; className: string }> = [
+  { re: /маршрут|гид|обзор|дайджест/i, className: 'bg-sky-50 text-sky-900 ring-sky-200/80' },
+  { re: /река|теплоход|мост|канал|нева/i, className: 'bg-cyan-50 text-cyan-900 ring-cyan-200/80' },
+  { re: /концерт|музык|джаз|фестив/i, className: 'bg-rose-50 text-rose-900 ring-rose-200/80' },
+  { re: /дет|семь|kids/i, className: 'bg-amber-50 text-amber-950 ring-amber-200/80' },
+  { re: /стендап|юмор|комик/i, className: 'bg-emerald-50 text-emerald-900 ring-emerald-200/80' },
+  { re: /экскурси|тур|дворы|парадн/i, className: 'bg-orange-50 text-orange-950 ring-orange-200/80' },
+  { re: /москва|moscow/i, className: 'bg-rose-50 text-rose-800 ring-rose-200/80' },
+  {
+    re: /петербург|питер|spb|saint-petersburg/i,
+    className: 'bg-sky-50 text-sky-900 ring-sky-200/80',
+  },
+  { re: /от автора|колонк/i, className: 'bg-primary-50 text-primary-900 ring-primary-200/70' },
+];
+
+export function blogTagBadgeClassName(tag?: string | null): string {
+  const label = String(tag || '').trim();
+  if (!label) return 'bg-primary-50 text-primary-800 ring-primary-200/70';
+  for (const rule of BLOG_TAG_BADGE_RULES) {
+    if (rule.re.test(label)) return rule.className;
+  }
+  return 'bg-primary-50 text-primary-800 ring-primary-200/70';
+}
+
 export type BlogArticleType = keyof typeof BLOG_ARTICLE_TYPE_LABELS;
 
 /** Канонические метаданные по slug (статика + backfill эвристики). */

@@ -20,6 +20,16 @@ type BlogListingBodyProps = {
   afishaPromos?: Record<string, BlogSidebarPromoDto>;
 };
 
+function resolveEditorialQuote(featured: BlogCardDto | null | undefined): string | null {
+  if (!featured) return null;
+  const raw = String(featured.excerpt || '').trim().replace(/\s+/g, ' ');
+  if (!raw) return null;
+  if (raw.length <= 180) return raw;
+  const cut = raw.slice(0, 180);
+  const lastSpace = cut.lastIndexOf(' ');
+  return `${(lastSpace > 80 ? cut.slice(0, lastSpace) : cut).trim()}...`;
+}
+
 export function BlogListingBody({
   posts,
   breadcrumbs,
@@ -50,16 +60,18 @@ export function BlogListingBody({
     />
   ) : null;
 
+  const editorialQuote = resolveEditorialQuote(featured);
+
   return (
     <>
       <Suspense
         fallback={
-          <div className="border-b border-slate-200 bg-slate-50">
+          <div className="border-b border-slate-200/70 bg-gradient-to-br from-sky-50 via-white to-primary-50/40">
             <div className="container-page space-y-4 py-8 sm:py-10">
-              <div className="h-4 w-32 animate-pulse rounded bg-slate-200" />
-              <div className="h-10 w-full max-w-2xl animate-pulse rounded-lg bg-slate-200" />
-              <div className="h-5 w-full max-w-xl animate-pulse rounded bg-slate-200" />
-              <div className="h-11 w-full max-w-xl animate-pulse rounded-2xl bg-slate-200" />
+              <div className="h-4 w-32 animate-pulse rounded bg-sky-100/80" />
+              <div className="h-10 w-full max-w-2xl animate-pulse rounded-lg bg-gradient-to-r from-sky-100/90 to-primary-100/70" />
+              <div className="h-5 w-full max-w-xl animate-pulse rounded bg-sky-100/70" />
+              <div className="h-11 w-full max-w-xl animate-pulse rounded-2xl bg-primary-100/60" />
             </div>
           </div>
         }
@@ -71,10 +83,13 @@ export function BlogListingBody({
         <Suspense
           fallback={
             <div className="space-y-4">
-              <div className="h-10 w-full max-w-xl animate-pulse rounded-xl bg-slate-200" />
+              <div className="h-10 w-full max-w-xl animate-pulse rounded-xl bg-gradient-to-r from-sky-100 to-primary-100/70" />
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 {Array.from({ length: 6 }).map((_, index) => (
-                  <div key={index} className="h-64 animate-pulse rounded-2xl bg-slate-200" />
+                  <div
+                    key={index}
+                    className="h-64 animate-pulse rounded-2xl bg-gradient-to-br from-sky-100/90 via-primary-50 to-amber-50/80"
+                  />
                 ))}
               </div>
             </div>
@@ -85,6 +100,7 @@ export function BlogListingBody({
             allPosts={posts}
             initialFilters={initialFilters}
             featuredSlot={featuredSlot}
+            editorialQuote={editorialQuote}
           />
         </Suspense>
 

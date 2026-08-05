@@ -2,13 +2,20 @@
 
 import type { ReactNode } from 'react';
 import Link from 'next/link';
-import { Clock } from 'lucide-react';
+import { BookOpen, Clock } from 'lucide-react';
 
 import { SafeImage } from '@/components/SafeImage.client';
 import { BLOG_POSTS } from '@/data/blog-posts';
 import type { BlogCardDto } from '@/lib/blog-utils';
 import { resolveBlogCardDateLabel } from '@/lib/blog-utils';
-import { authorLabel, blogAuthorNameClassName, normalizeBlogTagLabel } from '@/lib/blog-meta';
+import {
+  authorLabel,
+  blogAuthorNameClassName,
+  blogCityBadgeClassName,
+  blogTagBadgeClassName,
+  cityFilterLabel,
+  normalizeBlogTagLabel,
+} from '@/lib/blog-meta';
 import {
   resolveBlogListingCta,
   resolveBlogListingQuickLinks,
@@ -36,19 +43,26 @@ function BlogListRow({ post }: { post: BlogCardDto }) {
     citySlug: post.citySlug,
   });
 
-  const chips: Array<{ key: string; label: string }> = [];
+  const chips: Array<{ key: string; label: string; kind: 'tag' | 'city' }> = [];
   const displayTag = normalizeBlogTagLabel(tag, post.articleType);
   if (displayTag) {
-    chips.push({ key: `tag-${displayTag}`, label: displayTag });
+    chips.push({ key: `tag-${displayTag}`, label: displayTag, kind: 'tag' });
   }
-  if (post.city) chips.push({ key: `city-${post.city}`, label: post.city });
+  const cityLabel = cityFilterLabel(post.citySlug, post.city);
+  if (post.city && cityLabel !== 'Без города') {
+    chips.push({
+      key: `city-${post.city}`,
+      label: cityLabel === 'Санкт-Петербург' ? 'Питер' : cityLabel,
+      kind: 'city',
+    });
+  }
 
   return (
-    <article className="group flex gap-3 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:border-primary/30 hover:shadow-md sm:gap-4">
+    <article className="group flex gap-3 overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md sm:gap-4">
       <Link
         href={articleHref}
         aria-label={post.title}
-        className="relative aspect-video w-[9rem] shrink-0 self-start overflow-hidden bg-slate-200 sm:w-52 md:w-64 lg:w-72"
+        className="relative aspect-video w-[9rem] shrink-0 self-start overflow-hidden bg-gradient-to-br from-sky-100 to-primary-50 sm:w-52 md:w-64 lg:w-72"
       >
         <SafeImage
           src={post.coverImageUrl}
@@ -57,15 +71,15 @@ function BlogListRow({ post }: { post: BlogCardDto }) {
           sizes="(max-width: 640px) 9rem, (max-width: 768px) 13rem, (max-width: 1024px) 16rem, 18rem"
           className="object-cover transition-transform duration-500 group-hover:scale-105"
           fallback={
-            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-300 to-slate-400 text-2xl">
-              📰
+            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-sky-100 via-primary-50 to-amber-50 text-primary-300">
+              <BookOpen className="h-8 w-8" strokeWidth={1.25} aria-hidden />
             </div>
           }
         />
       </Link>
 
       <div className="flex min-w-0 flex-1 flex-col py-2.5 pr-3 sm:py-3 sm:pr-4">
-        <h2 className="font-display text-base font-bold leading-snug text-slate-900 sm:text-lg md:text-xl">
+        <h2 className="font-display text-base font-extrabold leading-snug text-slate-900 sm:text-lg md:text-xl">
           <Link href={articleHref} className="hover:text-primary-700">
             {post.title}
           </Link>
@@ -95,7 +109,11 @@ function BlogListRow({ post }: { post: BlogCardDto }) {
             {chips.map((chip) => (
               <span
                 key={chip.key}
-                className="inline-flex max-w-full truncate rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-medium text-slate-700 sm:text-xs"
+                className={`inline-flex max-w-full truncate rounded-md px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ring-1 sm:text-xs ${
+                  chip.kind === 'city'
+                    ? blogCityBadgeClassName(post.citySlug)
+                    : blogTagBadgeClassName(chip.label)
+                }`}
               >
                 {chip.label}
               </span>
@@ -104,7 +122,7 @@ function BlogListRow({ post }: { post: BlogCardDto }) {
               <Link
                 key={link.href}
                 href={link.href}
-                className="inline-flex max-w-full items-center truncate rounded-md border border-slate-200 bg-white px-2 py-0.5 text-[11px] font-medium text-slate-700 transition hover:border-primary/40 hover:bg-primary-50/70 hover:text-primary-700 sm:text-xs"
+                className="inline-flex max-w-full items-center truncate rounded-md bg-primary-50 px-2 py-0.5 text-[11px] font-medium text-primary-800 ring-1 ring-primary-100 transition hover:bg-primary-100 hover:text-primary-900 sm:text-xs"
               >
                 {link.label}
               </Link>
@@ -112,7 +130,7 @@ function BlogListRow({ post }: { post: BlogCardDto }) {
             {cta ? (
               <Link
                 href={cta.href}
-                className="inline-flex items-center rounded-md bg-slate-900 px-2.5 py-1 text-[11px] font-semibold text-white transition hover:bg-slate-800 sm:text-xs"
+                className="inline-flex items-center rounded-md bg-primary-600 px-2.5 py-1 text-[11px] font-semibold text-white transition hover:bg-primary-700 sm:text-xs"
               >
                 {cta.label}
               </Link>

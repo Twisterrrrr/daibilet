@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { LayoutGrid, List } from 'lucide-react';
+import { LayoutGrid, List, Search } from 'lucide-react';
 
 import { BlogListRows } from '@/components/BlogListRows.client';
 import { BlogMagazineGrid } from '@/components/BlogMagazineGrid.client';
@@ -115,6 +115,7 @@ export function BlogListFiltered({
   allPosts,
   initialFilters,
   featuredSlot = null,
+  editorialQuote = null,
 }: {
   posts: BlogCardDto[];
   /** Full blog list for city filter dropdown counts (without hero split). */
@@ -125,6 +126,8 @@ export function BlogListFiltered({
    * results render above this slot; when idle - featured stays above the feed.
    */
   featuredSlot?: ReactNode;
+  /** Short quote for magazine editorial break (from featured excerpt). */
+  editorialQuote?: string | null;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -330,14 +333,14 @@ export function BlogListFiltered({
           {viewMode === 'list' ? (
             <BlogListRows posts={displayPosts} />
           ) : (
-            <BlogMagazineGrid posts={displayPosts} />
+            <BlogMagazineGrid posts={displayPosts} editorialQuote={editorialQuote} />
           )}
           {hasMore ? (
             <div className="mt-8 flex justify-center">
               <button
                 type="button"
                 onClick={loadMore}
-                className="rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-800 transition hover:border-primary/40 hover:bg-primary-50/60 hover:text-primary-800"
+                className="rounded-xl border border-primary/30 bg-primary-50/50 px-5 py-2.5 text-sm font-semibold text-primary-800 transition hover:border-primary/50 hover:bg-primary-50 hover:text-primary-900"
                 data-cursor={cursor || undefined}
               >
                 Показать ещё
@@ -346,14 +349,17 @@ export function BlogListFiltered({
           ) : null}
         </>
       ) : (
-        <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50/80 py-16 text-center text-slate-500">
-          <p className="text-lg font-semibold text-slate-700">Ничего не нашли</p>
-          <p className="mt-1 text-sm">Попробуйте сбросить фильтры или изменить запрос</p>
+        <div className="rounded-2xl border border-primary/15 bg-gradient-to-br from-sky-50 via-white to-primary-50/60 py-14 text-center sm:py-16">
+          <div className="mx-auto mb-4 grid size-12 place-items-center rounded-2xl bg-primary-100/80 text-primary-600">
+            <Search className="h-5 w-5" aria-hidden />
+          </div>
+          <p className="text-lg font-semibold text-slate-800">Ничего не нашли</p>
+          <p className="mt-1 text-sm text-slate-600">Попробуйте сбросить фильтры или изменить запрос</p>
           {hasActive ? (
             <button
               type="button"
               onClick={resetFilters}
-              className="mt-4 text-sm font-semibold text-primary-600 hover:text-primary-700"
+              className="mt-5 inline-flex items-center justify-center rounded-xl border border-primary/30 bg-white px-4 py-2 text-sm font-semibold text-primary-700 transition hover:border-primary/50 hover:bg-primary-50"
             >
               Сбросить фильтры
             </button>

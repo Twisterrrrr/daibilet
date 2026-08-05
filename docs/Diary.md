@@ -1,3 +1,19 @@
+## 2026-08-05 - UX: оживление ленты `/blog`
+
+### Наблюдения
+- Owner: лента скучная из-за серого фона, однотипной сетки, слабых заголовков и серых заглушек.
+
+### Решения
+- `BlogFeaturedHero`: full-bleed cover + текст поверх (serif H2, primary CTA).
+- `BlogMagazineGrid`: rhythm trio → banner → strip + editorial break из excerpt featured.
+- Карточки: крупнее titles, цветные tag/city chips (`blogTagBadgeClassName`), primary quick-links, BookOpen fallbacks.
+- Skeleton/empty: sky/primary gradient вместо flat slate.
+
+### Проблемы
+- Нет. Deploy MSK ждёт «выкатывай».
+
+---
+
 ## 2026-08-05 - Blog: скрыть сегодняшние статьи кроме «Барный Петербург»
 
 ### Наблюдения
