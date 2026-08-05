@@ -14,7 +14,7 @@ export function LocationCardSkeleton() {
 export function InstitutionCardSkeleton() {
   return (
     <div className="flex animate-pulse flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white">
-      <div className="aspect-[4/3] bg-slate-200" />
+      <div className="aspect-[3/4] bg-slate-200 sm:aspect-[2/3]" />
       <div className="flex flex-1 flex-col gap-3 p-4">
         <div className="h-5 w-4/5 rounded bg-slate-200" />
         <div className="h-4 w-1/2 rounded bg-slate-100" />
@@ -30,7 +30,7 @@ export function InstitutionCardSkeleton() {
 
 export function LocationsCatalogSkeleton({ count = 6 }: { count?: number }) {
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <div className="grid grid-cols-1 gap-3">
       {Array.from({ length: count }).map((_, index) => (
         <LocationCardSkeleton key={index} />
       ))}
@@ -40,7 +40,7 @@ export function LocationsCatalogSkeleton({ count = 6 }: { count?: number }) {
 
 export function VenuesCatalogSkeleton({ count = 8 }: { count?: number }) {
   return (
-    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {Array.from({ length: count }).map((_, index) => (
         <InstitutionCardSkeleton key={index} />
       ))}

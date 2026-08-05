@@ -36,4 +36,15 @@ export type VenueCatalogCard = {
   heroImageUrl?: string | null;
   nextSlot?: string | null;
   categories?: Record<string, number>;
+  metroStation?: string | null;
+  /** Landmark / «Как найти» from Venue.wayToFind when API sends it. */
+  wayToFind?: string | null;
+  stopEventCount?: number;
+  /** Only render stars when API actually provides a rating - never invent. */
+  rating?: number | null;
+  /**
+   * Mini-афиша titles (1-3) when catalog DTO already includes upcoming sessions.
+   * Absent on lean hub list today - cards skip without fakes.
+   */
+  upcomingTitles?: string[];
 };

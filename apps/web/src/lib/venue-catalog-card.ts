@@ -17,6 +17,12 @@ type VenueCatalogSource = {
   shortDescription?: string | null;
   heroImageUrl?: string | null;
   nextSlot?: string | null;
+  metroStation?: string | null;
+  wayToFind?: string | null;
+  stopEventCount?: number | null;
+  rating?: number | null;
+  upcomingTitles?: string[] | null;
+  categories?: Record<string, number> | null;
 };
 
 function hasValidCatalogCoords(latitude: unknown, longitude: unknown): boolean {
@@ -35,6 +41,15 @@ function hasValidCatalogCoords(latitude: unknown, longitude: unknown): boolean {
 export function toVenueCatalogCard(venue: VenueCatalogSource): VenueCatalogCard {
   const hasCoords = hasValidCatalogCoords(venue.latitude, venue.longitude);
   const slug = String(venue.slug || venue.id);
+  const ratingRaw = venue.rating;
+  const rating =
+    ratingRaw != null && Number.isFinite(Number(ratingRaw)) && Number(ratingRaw) > 0
+      ? Number(ratingRaw)
+      : null;
+  const upcomingTitles = Array.isArray(venue.upcomingTitles)
+    ? venue.upcomingTitles.map((title) => String(title || '').trim()).filter(Boolean).slice(0, 3)
+    : undefined;
+
   return {
     id: venue.id,
     slug,
@@ -51,5 +66,14 @@ export function toVenueCatalogCard(venue: VenueCatalogSource): VenueCatalogCard 
     shortDescription: venue.shortDescription ?? null,
     heroImageUrl: resolveVenueHeroImage(slug, venue.heroImageUrl),
     nextSlot: venue.nextSlot ?? null,
+    metroStation: venue.metroStation ?? null,
+    wayToFind: venue.wayToFind ?? null,
+    stopEventCount:
+      venue.stopEventCount != null && Number.isFinite(Number(venue.stopEventCount))
+        ? Number(venue.stopEventCount)
+        : undefined,
+    rating,
+    upcomingTitles: upcomingTitles?.length ? upcomingTitles : undefined,
+    categories: venue.categories || undefined,
   };
 }

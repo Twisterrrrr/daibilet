@@ -71,6 +71,39 @@ test('toVenueCatalogCard keeps valid latitude/longitude for day-route', () => {
   assert.equal(card.cityId, 'city_spb');
 });
 
+test('toVenueCatalogCard keeps wayToFind and skips fake rating', () => {
+  const card = toVenueCatalogCard({
+    id: 'venue_way',
+    slug: 'prichal-test',
+    name: 'Причал',
+    city: 'Санкт-Петербург',
+    type: 'pier',
+    events: 1,
+    wayToFind: 'Спуск у синей калитки',
+    metroStation: 'Гостиный двор',
+    rating: null,
+    latitude: 59.93,
+    longitude: 30.33,
+  });
+  assert.equal(card.wayToFind, 'Спуск у синей калитки');
+  assert.equal(card.metroStation, 'Гостиный двор');
+  assert.equal(card.rating, null);
+});
+
+test('toVenueCatalogCard keeps positive rating and upcomingTitles when provided', () => {
+  const card = toVenueCatalogCard({
+    id: 'venue_rated',
+    name: 'Музей',
+    city: 'Санкт-Петербург',
+    type: 'museum',
+    events: 2,
+    rating: 4.7,
+    upcomingTitles: ['Выставка А', 'Лекция Б', 'Тур В', 'Лишнее'],
+  });
+  assert.equal(card.rating, 4.7);
+  assert.deepEqual(card.upcomingTitles, ['Выставка А', 'Лекция Б', 'Тур В']);
+});
+
 test('toVenueCatalogCard rejects null-island and non-finite coords', () => {
   assert.equal(
     toVenueCatalogCard({

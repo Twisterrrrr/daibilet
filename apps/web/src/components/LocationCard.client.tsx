@@ -23,6 +23,8 @@ const TYPE_GRADIENT: Record<string, string> = {
 };
 
 const CONTENT_KINDS = new Set(['park', 'monument', 'outdoor_location', 'attraction']);
+/** Logistics points: icon rail instead of large hero photo. */
+const LOGISTICS_ICON_KINDS = new Set(['pier', 'pier_water', 'bus', 'meeting_point', 'venue', 'other']);
 
 /** Strip legacy «Место посадки - / — » prefix from bus boarding titles. */
 function stripBoardingPlacePrefix(name: string): string {
@@ -75,17 +77,20 @@ export function LocationCard({
     | 'longitude'
   > & {
     cityId?: string | null;
+    wayToFind?: string | null;
   };
   href: string;
   nextSlot?: string | null;
 }) {
   const kind = normalizeVenueKind(venue.type);
   const isContentPlace = CONTENT_KINDS.has(kind);
+  const preferIconRail = LOGISTICS_ICON_KINDS.has(kind) || !venue.heroImageUrl;
   const TypeIcon = venueTypeIcon(venue.type);
   const typeLabel = venueTypeLabel(venue.type);
   const gradient = TYPE_GRADIENT[venue.type] || 'from-sky-500 via-primary-600 to-indigo-600';
   const street = formatStreetAddress(venue.address, { city: venue.city }) || venue.city;
   const metro = nonEmptyLogisticsText(venue.metroStation);
+  const wayToFind = nonEmptyLogisticsText(venue.wayToFind);
   const stopCount = Number(venue.stopEventCount ?? 0);
   const activityCount = stopCount > 0 ? stopCount : Number(venue.events || 0);
   // Same strip as hub/my-day: cut address crumbs («. Нева», «. пл. …») from Venue blurbs.
@@ -114,11 +119,13 @@ export function LocationCard({
     <div className="group relative flex items-stretch overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lg">
       <Link href={href} className="flex min-w-0 flex-1 items-stretch no-underline">
         <div
-          className={`relative flex w-24 shrink-0 flex-col items-center justify-center overflow-hidden p-3 text-white sm:w-28 ${
-            isContentPlace && venue.heroImageUrl ? 'bg-slate-900' : `bg-gradient-to-br ${gradient}`
+          className={`relative flex w-16 shrink-0 flex-col items-center justify-center overflow-hidden p-2.5 text-white sm:w-20 ${
+            !preferIconRail && isContentPlace && venue.heroImageUrl
+              ? 'bg-slate-900'
+              : `bg-gradient-to-br ${gradient}`
           }`}
         >
-          {isContentPlace && venue.heroImageUrl ? (
+          {!preferIconRail && isContentPlace && venue.heroImageUrl ? (
             <SafeImage
               src={venue.heroImageUrl}
               alt=""
@@ -128,21 +135,33 @@ export function LocationCard({
             />
           ) : (
             <>
-              <TypeIcon className="h-8 w-8" />
-              <div className="mt-2 text-center text-[10px] font-semibold uppercase tracking-wider opacity-90">
+              <TypeIcon className="h-7 w-7 sm:h-8 sm:w-8" strokeWidth={1.75} />
+              <div className="mt-1.5 text-center text-[9px] font-semibold uppercase tracking-wider opacity-90 sm:text-[10px]">
                 {typeLabel}
               </div>
             </>
           )}
         </div>
 
-        <div className="flex min-w-0 flex-1 flex-col p-4">
-          <h3 className="line-clamp-2 text-base font-semibold text-slate-900 group-hover:text-primary-600">
+        <div className="flex min-w-0 flex-1 flex-col p-3.5 sm:p-4">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-600">
+              {typeLabel}
+            </span>
+          </div>
+          <h3 className="mt-1 line-clamp-2 text-base font-semibold text-slate-900 group-hover:text-primary-600">
             {displayName}
           </h3>
 
           {isContentPlace && hook ? (
-            <p className="mt-2 line-clamp-2 text-sm text-slate-600">{hook}</p>
+            <p className="mt-1.5 line-clamp-2 text-sm text-slate-600">{hook}</p>
+          ) : null}
+
+          {wayToFind ? (
+            <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-slate-500">
+              <span className="font-semibold text-slate-600">Как найти: </span>
+              {wayToFind}
+            </p>
           ) : null}
 
           {isContentPlace ? (

@@ -2,10 +2,11 @@
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useMemo, useState, useTransition } from 'react';
-import { Search } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
+import { Map as MapIcon, Search } from 'lucide-react';
 
 import { LocationCard } from '@/components/LocationCard.client';
+import { LocationsCatalogMap } from '@/components/LocationsCatalogMap.client';
 import { LocationsCatalogSkeleton } from '@/components/VenueCatalogSkeletons';
 import { HeroLayout } from '@/components/HeroLayout';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
@@ -15,7 +16,14 @@ import { formatCountFloorTenPlus, formatNumber, pluralCities } from '@/lib/forma
 import { persistSelectedCity, resolveCatalogCityFilter } from '@/lib/selected-city';
 import { toVenueCatalogCard } from '@/lib/venue-catalog-card';
 import type { VenueCatalogCard } from '@/lib/venue-map-types';
-import { LOCATION_CATALOG_TYPE_OPTIONS, normalizeVenueKind, resolvePublicVenueType, venueTypeLabel } from '@/lib/venue-meta';
+import {
+  LOCATION_LOGISTICS_OPTIONS,
+  normalizeVenueKind,
+  resolveLocationLogisticsGroup,
+  resolvePublicVenueType,
+  venueTypeLabel,
+  type LocationLogisticsGroup,
+} from '@/lib/venue-meta';
 import { venueHref } from '@/lib/routes';
 
 type SortMode = 'events' | 'asc' | 'desc';
@@ -26,6 +34,12 @@ const SORT_OPTIONS: Array<[SortMode, string]> = [
   ['desc', 'Я–А'],
 ];
 
+function hasCatalogCoords(venue: VenueCatalogCard): boolean {
+  const lat = Number(venue.latitude);
+  const lng = Number(venue.longitude);
+  return Number.isFinite(lat) && Number.isFinite(lng) && !(lat === 0 && lng === 0);
+}
+
 export function LocationsCatalogView({ venues: initialVenues }: { venues: VenueCatalogCard[] }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -35,8 +49,15 @@ export function LocationsCatalogView({ venues: initialVenues }: { venues: VenueC
   const [sortMode, setSortMode] = useState<SortMode>('events');
   const [isPending, startTransition] = useTransition();
   const [catalogLoading, setCatalogLoading] = useState(false);
+  const [showMap, setShowMap] = useState(false);
+  const [selectedPinId, setSelectedPinId] = useState<string | null>(null);
+  const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
   const urlCity = searchParams.get('city')?.trim() || '';
+  const rawLogistics = searchParams.get('logistics')?.trim() || '';
+  const logisticsFilter: LocationLogisticsGroup | 'all' =
+    rawLogistics === 'pier' || rawLogistics === 'bus' || rawLogistics === 'walking' ? rawLogistics : 'all';
+  // Legacy ?type= still works for deep-links; logistics chips are the primary UX.
   const rawType = searchParams.get('type')?.trim() || '';
   const typeFilter = rawType ? normalizeVenueKind(rawType) : 'all';
   const cityReady = selectedCity?.cityReady ?? true;
@@ -76,6 +97,18 @@ export function LocationsCatalogView({ venues: initialVenues }: { venues: VenueC
     return () => controller.abort();
   }, [cityFetchKey, cityReady, initialVenues.length]);
 
+  // Desktop: open map by default when enough pins exist.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mq = window.matchMedia('(min-width: 1024px)');
+    const sync = () => {
+      if (mq.matches) setShowMap(true);
+    };
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, []);
+
   const cityPending = !urlCity && Boolean(selectedCity) && !cityReady;
   const listPending = cityPending || isPending || catalogLoading;
 
@@ -101,18 +134,21 @@ export function LocationsCatalogView({ venues: initialVenues }: { venues: VenueC
     const params = new URLSearchParams(searchParams.toString());
     if (next === 'all') params.delete('city');
     else params.set('city', next);
-    // Type facets are city-scoped; drop stale global type (e.g. outdoor_location=151).
+    // Facets are city-scoped; drop stale filters.
     params.delete('type');
+    params.delete('logistics');
     const qs = params.toString();
     startTransition(() => {
       router.replace(qs ? `/locations?${qs}` : '/locations', { scroll: false });
     });
   };
 
-  const setTypeFilter = (next: string) => {
+  const setLogisticsFilter = (next: LocationLogisticsGroup | 'all') => {
     const params = new URLSearchParams(searchParams.toString());
-    if (next === 'all') params.delete('type');
-    else params.set('type', next);
+    if (next === 'all') params.delete('logistics');
+    else params.set('logistics', next);
+    // Logistics group replaces fine-grained type facet.
+    params.delete('type');
     const qs = params.toString();
     startTransition(() => {
       router.replace(qs ? `/locations?${qs}` : '/locations', { scroll: false });
@@ -129,38 +165,31 @@ export function LocationsCatalogView({ venues: initialVenues }: { venues: VenueC
     return byName;
   }, [venues, cityFilter, cityFetchKey]);
 
-  const typeOptions = useMemo(() => {
+  const logisticsOptions = useMemo(() => {
     const counts = new Map<string, number>();
     for (const venue of cityScopedVenues) {
-      const key = resolvePublicVenueType(venue.type, venue.name);
+      const key = resolveLocationLogisticsGroup(venue.type, venue.name);
+      if (key === 'other') continue;
       counts.set(key, (counts.get(key) || 0) + 1);
     }
-    return LOCATION_CATALOG_TYPE_OPTIONS.filter((option) => counts.has(option.value)).map((option) => ({
-      ...option,
-      count: counts.get(option.value) || 0,
-    }));
+    return LOCATION_LOGISTICS_OPTIONS.filter((option) => option.value === 'all' || counts.has(option.value)).map(
+      (option) => ({
+        ...option,
+        count: option.value === 'all' ? cityScopedVenues.length : counts.get(option.value) || 0,
+      }),
+    );
   }, [cityScopedVenues]);
-
-  // Drop type=… that has 0 matches in the current city (deep-link / leftover URL).
-  useEffect(() => {
-    if (listPending || typeFilter === 'all') return;
-    if (typeOptions.some((option) => option.value === typeFilter)) return;
-    const params = new URLSearchParams(searchParams.toString());
-    if (!params.has('type')) return;
-    params.delete('type');
-    const qs = params.toString();
-    startTransition(() => {
-      router.replace(qs ? `/locations?${qs}` : '/locations', { scroll: false });
-    });
-  }, [listPending, typeFilter, typeOptions, searchParams, router]);
 
   const filteredVenues = useMemo(() => {
     if (listPending) return [];
     const normalized = query.trim().toLowerCase();
     const filtered = cityScopedVenues.filter((venue) => {
+      if (logisticsFilter !== 'all' && resolveLocationLogisticsGroup(venue.type, venue.name) !== logisticsFilter) {
+        return false;
+      }
       if (typeFilter !== 'all' && resolvePublicVenueType(venue.type, venue.name) !== typeFilter) return false;
       if (!normalized) return true;
-      return [venue.name, venue.city, venue.address, venue.shortDescription, venueTypeLabel(venue.type, venue.name)]
+      return [venue.name, venue.city, venue.address, venue.shortDescription, venue.wayToFind, venueTypeLabel(venue.type, venue.name)]
         .filter(Boolean)
         .join(' ')
         .toLowerCase()
@@ -172,7 +201,26 @@ export function LocationsCatalogView({ venues: initialVenues }: { venues: VenueC
       if (sortMode === 'desc') return right.name.localeCompare(left.name, 'ru');
       return left.name.localeCompare(right.name, 'ru');
     });
-  }, [cityScopedVenues, query, typeFilter, sortMode, listPending]);
+  }, [cityScopedVenues, query, logisticsFilter, typeFilter, sortMode, listPending]);
+
+  const mapPins = useMemo(
+    () =>
+      filteredVenues.filter(hasCatalogCoords).map((venue) => ({
+        id: venue.id,
+        title: venue.name,
+        href: venueHref(venue),
+        latitude: Number(venue.latitude),
+        longitude: Number(venue.longitude),
+        typeLabel: venueTypeLabel(venue.type, venue.name),
+      })),
+    [filteredVenues],
+  );
+
+  const onPinClick = (id: string) => {
+    setSelectedPinId(id);
+    const node = cardRefs.current.get(id);
+    node?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  };
 
   const cityCount = cityOptions.length;
   const eventsHref = catalogHrefWithSelectedCity(selectedCity?.cityValue);
@@ -185,9 +233,33 @@ export function LocationsCatalogView({ venues: initialVenues }: { venues: VenueC
     ? `Причалы, парки и места встречи ${cityToGenitive(cityName)}.`
     : 'Причалы, парки и места встречи для экскурсий и событий.';
 
+  const listBlock = listPending ? (
+    <LocationsCatalogSkeleton />
+  ) : filteredVenues.length > 0 ? (
+    <div className="grid grid-cols-1 gap-3">
+      {filteredVenues.map((venue) => (
+        <div
+          key={venue.id}
+          ref={(node) => {
+            if (node) cardRefs.current.set(venue.id, node);
+            else cardRefs.current.delete(venue.id);
+          }}
+          className={selectedPinId === venue.id ? 'ring-2 ring-primary-500/40 rounded-2xl' : undefined}
+        >
+          <LocationCard venue={venue} href={venueHref(venue)} nextSlot={venue.nextSlot} />
+        </div>
+      ))}
+    </div>
+  ) : (
+    <div className="rounded-2xl border border-dashed border-slate-300 bg-white py-16 text-center text-slate-500">
+      <p className="text-lg font-semibold text-slate-700">Ничего не нашли</p>
+      <p className="mt-1 text-sm">Попробуйте убрать фильтры или изменить запрос</p>
+    </div>
+  );
+
   return (
     <>
-      {/* Mobile template: dense hero, type chips first (UX.LOC4). */}
+      {/* Mobile template: dense hero, logistics chips first (UX logistics). */}
       <HeroLayout
         variant="minimal"
         dense
@@ -198,27 +270,17 @@ export function LocationsCatalogView({ venues: initialVenues }: { venues: VenueC
         tone="light"
         className="bg-slate-50"
       >
-        {typeOptions.length ? (
+        {logisticsOptions.length ? (
           <div className="mt-4 flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => setTypeFilter('all')}
-              className={`inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold transition ${
-                typeFilter === 'all' ? 'bg-slate-900 text-white' : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50'
-              }`}
-            >
-              Все локации
-              <span className="ml-1.5 text-xs opacity-75">({cityScopedVenues.length})</span>
-            </button>
-            {typeOptions.map((option) => {
-              const active = typeFilter === option.value;
+            {logisticsOptions.map((option) => {
+              const active = logisticsFilter === option.value;
               return (
                 <button
                   key={option.value}
                   type="button"
-                  onClick={() => setTypeFilter(active ? 'all' : option.value)}
+                  onClick={() => setLogisticsFilter(active && option.value !== 'all' ? 'all' : option.value)}
                   className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition ${
-                    active ? 'bg-slate-900 text-white' : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50'
+                    active ? 'bg-primary-600 text-white' : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50'
                   }`}
                 >
                   {option.label}
@@ -274,6 +336,19 @@ export function LocationsCatalogView({ venues: initialVenues }: { venues: VenueC
             )}
           </h2>
           <div className="flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setShowMap((value) => !value)}
+              className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-semibold transition ${
+                showMap
+                  ? 'bg-primary-600 text-white'
+                  : 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+              }`}
+              aria-pressed={showMap}
+            >
+              <MapIcon className="h-4 w-4" />
+              {showMap ? 'Скрыть карту' : 'Показать картой'}
+            </button>
             <select
               value={sortMode}
               onChange={(event) => setSortMode(event.target.value as SortMode)}
@@ -291,19 +366,50 @@ export function LocationsCatalogView({ venues: initialVenues }: { venues: VenueC
           </div>
         </div>
 
-        {listPending ? (
-          <LocationsCatalogSkeleton />
-        ) : filteredVenues.length > 0 ? (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            {filteredVenues.map((venue) => (
-              <LocationCard key={venue.id} venue={venue} href={venueHref(venue)} />
-            ))}
+        {showMap ? (
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(320px,42%)] lg:items-start">
+            <div className="min-w-0">{listBlock}</div>
+            <aside className="sticky top-[calc(var(--site-header-height)+1rem)] hidden self-start lg:block">
+              {mapPins.length > 0 ? (
+                <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                  <LocationsCatalogMap
+                    pins={mapPins}
+                    selectedId={selectedPinId}
+                    onPinClick={onPinClick}
+                    layoutKey={`${showMap}-${mapPins.length}-${cityFilter}-${logisticsFilter}`}
+                    className="h-[min(70vh,640px)] w-full"
+                  />
+                  <p className="border-t border-slate-100 px-3 py-2 text-xs text-slate-500">
+                    {formatNumber(mapPins.length)} точек с координатами на карте
+                  </p>
+                </div>
+              ) : (
+                <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-6 text-sm text-slate-500">
+                  У отфильтрованных точек пока нет координат для карты.
+                </div>
+              )}
+            </aside>
+            {/* Mobile map panel when toggle on */}
+            <div className="lg:hidden">
+              {mapPins.length > 0 ? (
+                <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                  <LocationsCatalogMap
+                    pins={mapPins}
+                    selectedId={selectedPinId}
+                    onPinClick={onPinClick}
+                    layoutKey={`m-${showMap}-${mapPins.length}`}
+                    className="h-72 w-full"
+                  />
+                </div>
+              ) : (
+                <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-500">
+                  Нет координат для карты.
+                </div>
+              )}
+            </div>
           </div>
         ) : (
-          <div className="rounded-2xl border border-dashed border-slate-300 bg-white py-16 text-center text-slate-500">
-            <p className="text-lg font-semibold text-slate-700">Ничего не нашли</p>
-            <p className="mt-1 text-sm">Попробуйте убрать фильтры или изменить запрос</p>
-          </div>
+          listBlock
         )}
 
         <nav className="mt-8 flex flex-wrap gap-4 text-sm text-slate-500">

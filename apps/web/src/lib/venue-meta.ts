@@ -261,3 +261,65 @@ export const LOCATION_CATALOG_TYPE_OPTIONS = CATALOG_TYPE_OPTIONS.filter((option
     emoji: locationTypeEmoji(option.value),
   }),
 );
+
+/** UX-масштаб площадок на `/venues` - только эвристики по kind, без Prisma. */
+export type InstitutionScale = 'museum' | 'large_hall' | 'intimate' | 'other';
+
+const MUSEUM_SCALE_KINDS = new Set(['museum', 'art_space', 'museum_art_space']);
+const LARGE_HALL_KINDS = new Set(['theater', 'concert_hall']);
+const INTIMATE_KINDS = new Set(['bar', 'club_bar_restaurant']);
+
+const LARGE_HALL_NAME_RE =
+  /\b(большой|марийский|новат|оперн|балет|филармон|консерватор|дворец\s+спорт|ледовый|арена|стадион)\b/iu;
+const INTIMATE_NAME_RE = /\b(камерн|лофт|клуб|бар|рюмочн|speakeasy|спикизи|галере)\b/iu;
+
+export function resolveInstitutionScale(type?: string | null, name?: string | null): InstitutionScale {
+  const publicType = resolvePublicVenueType(type, name);
+  if (MUSEUM_SCALE_KINDS.has(publicType)) return 'museum';
+  if (LARGE_HALL_KINDS.has(publicType)) return 'large_hall';
+  if (INTIMATE_KINDS.has(publicType)) return 'intimate';
+  const text = String(name || '');
+  if (LARGE_HALL_NAME_RE.test(text)) return 'large_hall';
+  if (INTIMATE_NAME_RE.test(text)) return 'intimate';
+  return 'other';
+}
+
+export const INSTITUTION_SCALE_OPTIONS: Array<{ value: InstitutionScale | 'all'; label: string }> = [
+  { value: 'all', label: 'Все масштабы' },
+  { value: 'museum', label: 'Музеи' },
+  { value: 'large_hall', label: 'Крупные залы' },
+  { value: 'intimate', label: 'Камерные' },
+];
+
+/** Логистические группы на `/locations` - причалы / автобусы / пешеходные. */
+export type LocationLogisticsGroup = 'pier' | 'bus' | 'walking' | 'other';
+
+const PIER_KINDS = new Set(['pier', 'pier_water']);
+const BUS_KINDS = new Set(['bus']);
+const WALKING_KINDS = new Set([
+  'park',
+  'monument',
+  'outdoor_location',
+  'attraction',
+  'meeting_point',
+  'sport_activity_space',
+]);
+
+export function resolveLocationLogisticsGroup(type?: string | null, name?: string | null): LocationLogisticsGroup {
+  const key = resolvePublicVenueType(type, name);
+  if (PIER_KINDS.has(key)) return 'pier';
+  if (BUS_KINDS.has(key)) return 'bus';
+  if (WALKING_KINDS.has(key)) return 'walking';
+  const text = String(name || '').toLowerCase();
+  if (/причал|пристань|дебаркадер|набережн/.test(text)) return 'pier';
+  if (/автобус|автовокзал|место посадки/.test(text)) return 'bus';
+  if (/пешеход|прогулк|двор|улица|площад|парк|сквер/.test(text)) return 'walking';
+  return 'other';
+}
+
+export const LOCATION_LOGISTICS_OPTIONS: Array<{ value: LocationLogisticsGroup | 'all'; label: string }> = [
+  { value: 'all', label: 'Все точки' },
+  { value: 'pier', label: 'Причалы' },
+  { value: 'bus', label: 'Автобусы' },
+  { value: 'walking', label: 'Пешеходные' },
+];

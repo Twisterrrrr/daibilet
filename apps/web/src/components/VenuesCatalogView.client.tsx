@@ -16,7 +16,15 @@ import { catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from '@
 import { cityToGenitive } from '@/lib/city-declension';
 import { formatNumber, pluralCities, pluralEvents, pluralVenues } from '@/lib/format';
 import { persistSelectedCity, resolveCatalogCityFilter } from '@/lib/selected-city';
-import { INSTITUTION_CATALOG_TYPE_OPTIONS, normalizeVenueKind, resolvePublicVenueType, venueTypeLabel } from '@/lib/venue-meta';
+import {
+  INSTITUTION_CATALOG_TYPE_OPTIONS,
+  INSTITUTION_SCALE_OPTIONS,
+  normalizeVenueKind,
+  resolveInstitutionScale,
+  resolvePublicVenueType,
+  venueTypeLabel,
+  type InstitutionScale,
+} from '@/lib/venue-meta';
 import { venueHref } from '@/lib/routes';
 
 const VENUES_HERO_FRAMES = [
@@ -63,6 +71,9 @@ export function VenuesCatalogView({ venues }: { venues: VenueCatalogCard[] }) {
   const urlCity = searchParams.get('city')?.trim() || '';
   const rawType = searchParams.get('type')?.trim() || '';
   const typeFilter = rawType ? normalizeVenueKind(rawType) : 'all';
+  const rawScale = searchParams.get('scale')?.trim() || '';
+  const scaleFilter: InstitutionScale | 'all' =
+    rawScale === 'museum' || rawScale === 'large_hall' || rawScale === 'intimate' ? rawScale : 'all';
   const cityReady = selectedCity?.cityReady ?? true;
   const cityPending = !urlCity && Boolean(selectedCity) && !cityReady;
   const listPending = cityPending || isPending;
@@ -118,6 +129,16 @@ export function VenuesCatalogView({ venues }: { venues: VenueCatalogCard[] }) {
     });
   };
 
+  const setScaleFilter = (next: InstitutionScale | 'all') => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (next === 'all') params.delete('scale');
+    else params.set('scale', next);
+    const qs = params.toString();
+    startTransition(() => {
+      router.replace(qs ? `/venues?${qs}` : '/venues', { scroll: false });
+    });
+  };
+
   const typeOptions = useMemo(() => {
     const counts = new Map<string, number>();
     for (const venue of venues) {
@@ -130,12 +151,29 @@ export function VenuesCatalogView({ venues }: { venues: VenueCatalogCard[] }) {
     }));
   }, [venues]);
 
+  const scaleOptions = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const venue of venues) {
+      if (cityFilter !== 'all' && venue.city !== cityFilter) continue;
+      const key = resolveInstitutionScale(venue.type, venue.name);
+      if (key === 'other') continue;
+      counts.set(key, (counts.get(key) || 0) + 1);
+    }
+    return INSTITUTION_SCALE_OPTIONS.filter((option) => option.value === 'all' || counts.has(option.value)).map(
+      (option) => ({
+        ...option,
+        count: option.value === 'all' ? undefined : counts.get(option.value) || 0,
+      }),
+    );
+  }, [venues, cityFilter]);
+
   const filteredVenues = useMemo(() => {
     if (listPending) return [];
     const normalized = query.trim().toLowerCase();
     const list = venues.filter((venue) => {
       if (cityFilter !== 'all' && venue.city !== cityFilter) return false;
       if (typeFilter !== 'all' && resolvePublicVenueType(venue.type, venue.name) !== typeFilter) return false;
+      if (scaleFilter !== 'all' && resolveInstitutionScale(venue.type, venue.name) !== scaleFilter) return false;
       if (!normalized) return true;
       return [venue.name, venue.city, venue.address, venue.shortDescription, venueTypeLabel(venue.type, venue.name)]
         .filter(Boolean)
@@ -149,7 +187,7 @@ export function VenuesCatalogView({ venues }: { venues: VenueCatalogCard[] }) {
       const cmp = a.name.localeCompare(b.name, 'ru');
       return sortMode === 'asc' ? cmp : -cmp;
     });
-  }, [venues, query, cityFilter, typeFilter, sortMode, listPending]);
+  }, [venues, query, cityFilter, typeFilter, scaleFilter, sortMode, listPending]);
 
   const cityCount = cityOptions.length;
   const eventsHref = catalogHrefWithSelectedCity(selectedCity?.cityValue);
@@ -272,6 +310,29 @@ export function VenuesCatalogView({ venues }: { venues: VenueCatalogCard[] }) {
             })}
           </div>
         ) : null}
+
+        {scaleOptions.length > 1 ? (
+          <div className="mx-auto mt-3 flex max-w-5xl flex-wrap justify-center gap-1.5 px-1">
+            {scaleOptions.map((option) => {
+              const active = scaleFilter === option.value;
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => setScaleFilter(active && option.value !== 'all' ? 'all' : option.value)}
+                  className={`inline-flex h-9 items-center gap-1 rounded-lg px-3 text-sm font-semibold transition ${
+                    active
+                      ? 'bg-primary-500 text-white'
+                      : 'bg-white/10 text-white/90 ring-1 ring-white/20 hover:bg-white/20'
+                  }`}
+                >
+                  {option.label}
+                  {option.count != null ? <span className="text-xs opacity-80">({option.count})</span> : null}
+                </button>
+              );
+            })}
+          </div>
+        ) : null}
       </HeroLayout>
 
       <div className="sticky top-[var(--site-header-height)] z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
@@ -329,7 +390,7 @@ export function VenuesCatalogView({ venues }: { venues: VenueCatalogCard[] }) {
           viewMode === 'list' ? (
             <InstitutionList venues={filteredVenues} hrefFor={venueHref} />
           ) : (
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
               {filteredVenues.map((venue) => (
                 <InstitutionCard key={venue.id} venue={venue} href={venueHref(venue)} />
               ))}
@@ -346,7 +407,7 @@ export function VenuesCatalogView({ venues }: { venues: VenueCatalogCard[] }) {
           <h2 className="text-xl font-bold text-slate-900">Площадки в каталоге</h2>
           <p className="text-sm leading-7 text-slate-600">
             На Дайбилет собраны музеи, галереи, театры, концертные залы и клубы с актуальной афишей и покупкой через
-            билетные системы организаторов. Причалы и точки отправления речных прогулок — в разделе{' '}
+            билетные системы организаторов. Причалы и точки отправления речных прогулок - в разделе{' '}
             <Link href={locationsHref} className="font-semibold text-primary-600 no-underline hover:underline">
               Локации
             </Link>
