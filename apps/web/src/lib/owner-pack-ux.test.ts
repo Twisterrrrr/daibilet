@@ -4,6 +4,7 @@ import test from 'node:test';
 import { decodeBlogFeedCursor, encodeBlogFeedCursor, paginateBlogFeedByCursor } from './blog-cursor.ts';
 import { filterBlogFeedByCity, rankBlogFeedByCity, resolveBlogRankCitySlug } from './blog-feed-rank.ts';
 import { groupPodborkiByCategory } from './podborki-categories.ts';
+import { pickPodborkiFeatured, pickPodborkiTrending } from './podborki-hero.ts';
 
 test('filterBlogFeedByCity: empty for city without published posts', () => {
   const posts = [
@@ -82,4 +83,34 @@ test('groupPodborkiByCategory: sense blocks', () => {
   assert.equal(sections[0]?.slug, 'by-type');
   assert.equal(sections[1]?.slug, 'for-whom');
   assert.equal(sections[2]?.slug, 'seasonal');
+});
+
+test('groupPodborkiByCategory: Moscow City Day lifts seasonal to front', () => {
+  const sections = groupPodborkiByCategory([
+    { slug: 'moscow-museums', title: 'Музеи и выставки в Москве', events: 40 },
+    { slug: 'river-cruises', title: 'Речные', events: 20 },
+    { slug: 'moscow-city-day', title: 'День города в Москве', events: 11 },
+  ]);
+  assert.equal(sections[0]?.slug, 'seasonal');
+  assert.equal(sections[0]?.items[0]?.slug, 'moscow-city-day');
+  assert.ok(sections.some((section) => section.slug === 'by-type'));
+});
+
+test('pickPodborkiFeatured prefers Moscow City Day over museums and river', () => {
+  const featured = pickPodborkiFeatured([
+    { slug: 'moscow-museums', title: 'Музеи', events: 61, layoutVariant: 'HERO_FEATURED' },
+    { slug: 'river-cruises', title: 'Речные', events: 80 },
+    { slug: 'moscow-city-day', title: 'День города в Москве', events: 11 },
+  ]);
+  assert.equal(featured?.slug, 'moscow-city-day');
+  const trending = pickPodborkiTrending(
+    [
+      { slug: 'moscow-museums', title: 'Музеи', events: 61 },
+      { slug: 'standup', title: 'Стендап', events: 40 },
+      { slug: 'bus-tours', title: 'Автобус', events: 20 },
+    ],
+    'moscow-city-day',
+    3,
+  );
+  assert.equal(trending.some((item) => item.slug === 'moscow-museums'), false);
 });

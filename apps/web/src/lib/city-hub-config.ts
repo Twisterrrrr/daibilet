@@ -48,14 +48,15 @@ export const CITY_HUB_CONFIG: Record<string, CityHubConfig> = {
   },
   moscow: {
     highlightSeason: { label: 'День города', monthsHint: 'сентябрь' },
-    primaryCta: { label: 'События в Москве', target: '#affiche' },
+    primaryCta: { label: 'День города', target: '/moscow/den-goroda' },
     featuredDirections: [
-      { id: 'city-day', label: 'День города', landingSlug: 'moscow-city-day', emphasis: 'primary' },
+      { id: 'city-day', label: 'День города в Москве', landingSlug: 'moscow-city-day', emphasis: 'primary' },
       { id: 'theatre', label: 'Театр', categoryKey: 'Театр' },
       { id: 'concerts', label: 'Концерты', landingSlug: 'concerts-genre' },
       { id: 'river', label: 'Речные прогулки', landingSlug: 'river-cruises' },
-      { id: 'museums', label: 'Музеи', landingSlug: 'moscow-museums', categoryKey: 'Музеи и арт' },
       { id: 'bus', label: 'Автобусные экскурсии', landingSlug: 'bus-tours' },
+      // Museums/workshops stay available but must not displace City Day in the top.
+      { id: 'museums', label: 'Музеи и выставки', landingSlug: 'moscow-museums', categoryKey: 'Музеи и арт' },
     ],
     sectionOrderAfterAffiche: ['directions', 'venues', 'travel', 'sights'],
     venuesTopN: 12,

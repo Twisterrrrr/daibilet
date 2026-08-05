@@ -59,6 +59,23 @@ export const LANDING_SLUG_TO_CATEGORY: Record<string, PodborkiCategorySlug> = {
   'moscow-dinner-boat': 'by-type',
 };
 
+/** Pin to the front of a sense-block (and boost that block when present). */
+export const PODBORKI_PIN_FIRST_SLUGS = ['moscow-city-day'] as const;
+
+const PODBORKI_PIN_FIRST = new Set<string>(PODBORKI_PIN_FIRST_SLUGS);
+
+function pinFirstItems<T extends { slug: string }>(items: T[]): T[] {
+  if (items.length < 2) return items;
+  const pinned: T[] = [];
+  const rest: T[] = [];
+  for (const item of items) {
+    if (PODBORKI_PIN_FIRST.has(item.slug)) pinned.push(item);
+    else rest.push(item);
+  }
+  if (!pinned.length) return items;
+  return [...pinned, ...rest];
+}
+
 export function resolvePodborkiCategorySlug(
   landingSlug: string,
   dbCategorySlug?: string | null,
@@ -96,11 +113,20 @@ export function groupPodborkiByCategory(
     bucket.push(item);
   }
 
+  const hasSeasonPin = (bySlug.get('seasonal') || []).some((item) => PODBORKI_PIN_FIRST.has(item.slug));
+
   return [...categoryMeta]
+    .map((meta) => {
+      // When Moscow City Day is in catalog, lift «Сезонное» above «По типу» so it is not buried.
+      if (hasSeasonPin && meta.slug === 'seasonal') {
+        return { ...meta, sortOrder: Math.min(meta.sortOrder, 5) };
+      }
+      return meta;
+    })
     .sort((a, b) => a.sortOrder - b.sortOrder || a.title.localeCompare(b.title, 'ru'))
     .map((meta) => ({
       ...meta,
-      items: bySlug.get(meta.slug) || [],
+      items: pinFirstItems(bySlug.get(meta.slug) || []),
     }))
     .filter((section) => section.items.length > 0);
 }

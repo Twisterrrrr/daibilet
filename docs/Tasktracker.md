@@ -48,7 +48,7 @@
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
 | FIX.SALUTE0 | `salute-9-may`: exclude День города + require 9 мая / День Победы | Критический | ✅ `83271ec` live BUILD **`BCWcAIglYC8cAP-6Zgr4k`**; sessions=0, city-day leak gone |
-| FIX.CITYDAY | NEW `moscow-city-day` landing `/moscow/den-goroda/` + hide salute from hub | Критический | ✅ `4555e19` live BUILD **`J2r1pJc-sK2W_wGzB2KzY`**; events=11; salute off hub |
+| FIX.CITYDAY-TOP | Москва: City Day выше мастер-классов в hub/podborki/promo; museums title без «мастер-классы» | Высокий | ✅ code; deploy пачкой / по запросу |
 | FIX.CITYDAY-PRICE | Landing rows: min as fixed price → `formatMoneyRange` (мин-макс / `от`) | Высокий | ✅ `be2f075`/`c8f43ae`; MSK BUILD_ID=`LV0jzT3jaueTAOmX202ic`; landing range+ot smoke OK |
 | UX.POD1 | `/podborki`: category jump chips + SEO «Развернуть» + lazy cards + count/priceFrom | Высокий | ✅ `7535f02` live **`BCWcAIglYC8cAP-6Zgr4k`** |
 | UX.POD2 | `/podborki` masonry / view counters / purchase carousel / infinite scroll | Средний | ⚠️ deferred |

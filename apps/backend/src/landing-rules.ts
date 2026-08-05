@@ -342,10 +342,10 @@ export const LANDING_RULES: LandingRule[] = [
   },
   {
     slug: 'moscow-museums',
-    title: 'Музеи и мастер-классы в Москве',
+    title: 'Музеи и выставки в Москве',
     subtitle: 'Выставки, экскурсии и творческие занятия',
     city: 'Москва',
-    chips: ['музеи', 'мастер-класс', 'творчество'],
+    chips: ['музеи', 'выставки', 'творчество'],
     // city is a filter only (global matcher); requiredAny* keep museum/workshop signal.
     tags: ['Музеи', 'Мастер-класс', 'Мастер-классы', 'Выставки'],
     requiredAnySubcategories: ['Музеи', 'Мастер-класс', 'Мастер-классы', 'Выставки'],

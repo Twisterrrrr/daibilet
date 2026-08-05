@@ -750,7 +750,23 @@
 
 ---
 
-## 2026-08-04 - NEW landing: День города в Москве (`moscow-city-day`)
+## 2026-08-05 - Москва: День города выше мастер-классов в топе
+
+### Наблюдения
+- Owner: на Moscow hub/подборках «Музеи и мастер-классы» вытесняли сезонный City Day, хотя карточка `moscow-city-day` уже есть.
+- В `/podborki` seasonal был последним блоком; featured hero брал river/museums по events/HERO_FEATURED.
+
+### Решения
+- Hub `featuredDirections`: City Day #1 + CTA `/moscow/den-goroda`; museums опущены и переименованы в «Музеи и выставки».
+- Podborki: pin `moscow-city-day` в featured/trending; lift seasonal section when pin present.
+- Promo boosts MSK: museums убраны из top boost; `landing-rules` title без «мастер-классы».
+- `cityInfo.moscow.seasonalTip` → `/moscow/den-goroda`.
+
+### Проблемы
+- Deploy на live не делали (каденс batch / по запросу).
+
+---
+
 
 ### Наблюдения
 - Owner: «где лендинг День города в Москве? выключить Салют 9 мая, а события дня города включить в новый».

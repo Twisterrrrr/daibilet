@@ -4139,7 +4139,6 @@ const PROMO_LANDING_ORDER = [
   'bridges-night',
   'moscow-city-day',
   'moscow-dinner-boat',
-  'moscow-museums',
   'river-party',
   'concerts-genre',
   'family-kids',
@@ -4149,6 +4148,7 @@ const PROMO_LANDING_ORDER = [
   'standup',
   'planetarium',
   'active-sport',
+  'moscow-museums',
 ];
 
 const PUBLIC_LANDING_CATEGORY_PATH = new Map([
@@ -4248,9 +4248,10 @@ const PROMO_CITY_LANDING_BOOSTS = {
   'saint-petersburg': ['spb-yards', 'bridges-night'],
   'санкт-петербург': ['spb-yards', 'bridges-night'],
   'spb': ['spb-yards', 'bridges-night'],
-  'moscow': ['moscow-city-day', 'moscow-dinner-boat', 'moscow-museums'],
-  'moskva': ['moscow-city-day', 'moscow-dinner-boat', 'moscow-museums'],
-  'москва': ['moscow-city-day', 'moscow-dinner-boat', 'moscow-museums'],
+  // City Day first; museums/workshops deliberately not boosted into Moscow top.
+  'moscow': ['moscow-city-day', 'moscow-dinner-boat', 'river-cruises', 'concerts-genre'],
+  'moskva': ['moscow-city-day', 'moscow-dinner-boat', 'river-cruises', 'concerts-genre'],
+  'москва': ['moscow-city-day', 'moscow-dinner-boat', 'river-cruises', 'concerts-genre'],
 };
 
 export { LANDING_PAGE_SESSION_LIMIT, scopePublicCatalogSessions, selectLandingPageSessions };

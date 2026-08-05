@@ -177,6 +177,18 @@ export function resolveFeaturedDirections(input: {
     .filter((landing) => Number(landing.events) > 0)
     .filter((landing) => isWaterLandingAllowedForCity(landing.slug, input.citySlug))
     .filter((landing) => !usedLandingSlugs.has(landing.slug))
+    .slice()
+    .sort((a, b) => {
+      // Moscow: City Day before museums/workshops in unconfigured fallback.
+      const city = normalizeCityHubSlug(input.citySlug);
+      if (city === 'moscow') {
+        const rank = (slug: string) =>
+          slug === 'moscow-city-day' ? 0 : slug === 'moscow-museums' ? 90 : 50;
+        const diff = rank(a.slug) - rank(b.slug);
+        if (diff !== 0) return diff;
+      }
+      return 0;
+    })
     .slice(0, Math.max(0, limit - resolved.length))
     .map((landing) => ({
       id: `landing:${landing.slug}`,

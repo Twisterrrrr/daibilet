@@ -20,10 +20,19 @@ test('resolveCityHubConfig returns moscow venuesTopN', () => {
   assert.equal(config?.venuesTopN, 12);
   assert.ok(config?.featuredDirections?.some((item) => item.id === 'theatre'));
   assert.equal(config?.highlightSeason?.label, 'День города');
+  assert.equal(config?.primaryCta?.target, '/moscow/den-goroda');
   assert.equal(
     config?.featuredDirections?.find((item) => item.id === 'city-day')?.landingSlug,
     'moscow-city-day',
   );
+  assert.equal(config?.featuredDirections?.[0]?.id, 'city-day');
+  assert.equal(
+    config?.featuredDirections?.find((item) => item.id === 'museums')?.landingSlug,
+    'moscow-museums',
+  );
+  const museumIndex = config?.featuredDirections?.findIndex((item) => item.id === 'museums') ?? -1;
+  const cityDayIndex = config?.featuredDirections?.findIndex((item) => item.id === 'city-day') ?? -1;
+  assert.ok(cityDayIndex >= 0 && museumIndex > cityDayIndex);
 });
 
 test('isCityHubSectionHidden respects hideSections', () => {

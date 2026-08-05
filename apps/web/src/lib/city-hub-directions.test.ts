@@ -26,6 +26,27 @@ test('SPb museums resolve via exhibitions landing, not moscow-museums', () => {
   assert.equal(museums?.label, 'Музеи');
 });
 
+test('Moscow featured directions pin City Day ahead of museums', () => {
+  const config = resolveCityHubConfig('moscow');
+  const rows = resolveFeaturedDirections({
+    config,
+    landings: [
+      { slug: 'moscow-museums', title: 'Музеи и выставки в Москве', events: 61 },
+      { slug: 'concerts-genre', title: 'Концерты', events: 40 },
+      { slug: 'river-cruises', title: 'Речные прогулки', events: 30 },
+      { slug: 'bus-tours', title: 'Автобусные', events: 20 },
+      { slug: 'moscow-city-day', title: 'День города в Москве', events: 11 },
+    ],
+    categories: [['Театр', 15]],
+    citySlug: 'moscow',
+  });
+
+  assert.equal(rows[0]?.slug, 'moscow-city-day');
+  assert.equal(rows[0]?.label, 'День города в Москве');
+  const museumIndex = rows.findIndex((row) => row.slug === 'moscow-museums');
+  assert.ok(museumIndex > 0);
+});
+
 test('museums fall back to category when landing slug missing for city', () => {
   const rows = resolveFeaturedDirections({
     config: {
