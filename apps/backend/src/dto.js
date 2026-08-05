@@ -8581,12 +8581,6 @@ export async function publicPublishedVenuesByCityId(db, cityId, limit = 200) {
       where venue."cityId" = $1
         and venue."pageStatus" in ('PUBLISHED', 'CANDIDATE')
       order by
-        case
-          when venue.latitude is not null
-           and venue.longitude is not null
-           and not (venue.latitude = 0 and venue.longitude = 0) then 0
-          else 1
-        end,
         case when venue.slug like 'nizhny-novgorod-%' then 0 else 1 end,
         case when venue.slug like 'saint-petersburg-%' or venue.slug in ('ermitazh','erarta','planetarii-1') then 0 else 1 end,
         venue.title asc
