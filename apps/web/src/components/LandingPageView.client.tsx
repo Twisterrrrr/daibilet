@@ -85,7 +85,7 @@ import {
   riverCityGuideBySlug,
   type RiverCitySpot,
 } from '@/data/river-landings';
-import { formatMoney, formatNumber } from '@/lib/format';
+import { formatMoney, formatMoneyRange, formatNumber } from '@/lib/format';
 import {
   collectSessionStartsAtTimes,
   getSessionHour,
@@ -1926,7 +1926,7 @@ function LandingDinnerScheduleRow({ group, isOptimal }: { group: EventGroup; isO
   const href = eventHref(session);
   const priceLabel =
     typeof group.priceFrom === 'number' && group.priceFrom >= MIN_DISPLAY_PRICE_RUB
-      ? formatMoney(group.priceFrom).replace(/^от\s+/i, '')
+      ? formatMoneyRange(group.priceFrom, group.priceTo)
       : 'Купить';
   const vacant = session.vacant ?? group.vacant;
   const soldOut = typeof vacant === 'number' && vacant <= 0;
@@ -2087,7 +2087,7 @@ function LandingScenarioGuide({
           <div className="mt-4 grid gap-3 text-sm leading-6 text-slate-600">
             <ScenarioFact icon={<Ticket className="h-4 w-4" />} label="Вариантов" value={formatNumber(stats.events)} />
             <ScenarioFact icon={<CalendarDays className="h-4 w-4" />} label="Ближайших сеансов" value={formatNumber(stats.sessions)} />
-            <ScenarioFact icon={<MapPin className="h-4 w-4" />} label="Цена" value={formatMoney(stats.priceFrom)} />
+            <ScenarioFact icon={<MapPin className="h-4 w-4" />} label="Цена" value={formatMoneyRange(stats.priceFrom, stats.priceTo)} />
           </div>
           {topVenues.length ? (
             <div className="mt-5">
@@ -2203,7 +2203,7 @@ function LandingEditorialIntro({
           <div className="mt-5 grid gap-3 sm:grid-cols-3">
             <EditorialFact icon={<TrendingUp className="h-5 w-5" />} title="Варианты" text={`${formatNumber(stats.events)} карточек с расписанием и ценами`} />
             <EditorialFact icon={<MapPin className="h-5 w-5" />} title="География" text={topCities.length ? topCities.map(([name]) => name).join(', ') : 'подборка по доступным городам'} />
-            <EditorialFact icon={<Ticket className="h-5 w-5" />} title="Цена" text={`от ${formatMoney(stats.priceFrom).replace(/^от\s+/i, '')}`} />
+            <EditorialFact icon={<Ticket className="h-5 w-5" />} title="Цена" text={formatMoneyRange(stats.priceFrom, stats.priceTo)} />
           </div>
         </div>
 
@@ -2302,13 +2302,13 @@ function LandingHowToChoose({
           { icon: <Clock className="h-6 w-6 text-primary" />, title: 'Выберите время', text: 'Самые зрелищные рейсы стартуют в 23:30-00:30, когда мосты разводятся один за другим.' },
           { icon: <MapPin className="h-6 w-6 text-primary" />, title: 'Определите причал', text: topVenues ? `Популярные: ${topVenues}. Ближайший к вам причал сэкономит время.` : 'Выберите удобную точку отправления на набережной.' },
           { icon: <Ship className="h-6 w-6 text-primary" />, title: 'Сравните теплоходы', text: 'Обратите внимание на вместимость, наличие крытой палубы и бортового кафе.' },
-          { icon: <Wallet className="h-6 w-6 text-primary" />, title: 'Сравните цены', text: `Цены от ${formatMoney(stats.priceFrom).replace(/^от\s+/i, '')}. Смотрите маршрут, причал и комфорт борта.` },
+          { icon: <Wallet className="h-6 w-6 text-primary" />, title: 'Сравните цены', text: `Цены ${formatMoneyRange(stats.priceFrom, stats.priceTo)}. Смотрите маршрут, причал и комфорт борта.` },
         ]
       : [
           { icon: <Clock className="h-6 w-6 text-primary" />, title: 'Выберите дату', text: 'Используйте фильтры «сегодня», «завтра» и «вечером» для быстрого поиска.' },
           { icon: <MapPin className="h-6 w-6 text-primary" />, title: 'Уточните город', text: Object.keys(stats.cities).length > 1 ? 'Начните с города, затем сравните площадки и маршруты.' : 'Проверьте адрес старта и удобство маршрута.' },
           { icon: <Ticket className="h-6 w-6 text-primary" />, title: 'Сверьте формат', text: 'Читайте возраст, длительность и что входит в билет до оплаты.' },
-          { icon: <Wallet className="h-6 w-6 text-primary" />, title: 'Сравните цены', text: `В подборке цена от ${formatMoney(stats.priceFrom).replace(/^от\s+/i, '')}. Оплата - в виджете организатора.` },
+          { icon: <Wallet className="h-6 w-6 text-primary" />, title: 'Сравните цены', text: `В подборке ${formatMoneyRange(stats.priceFrom, stats.priceTo)}. Оплата - в виджете организатора.` },
         ]);
 
   const title = contentPack?.howToTitle || (isRiver ? 'Как выбрать прогулку' : 'Как выбрать событие');
@@ -3132,7 +3132,7 @@ function LandingScheduleRow({ group, isOptimal, profile }: { group: EventGroup; 
   const href = eventHref(session);
   const priceLabel =
     typeof group.priceFrom === 'number' && group.priceFrom >= MIN_DISPLAY_PRICE_RUB
-      ? formatMoney(group.priceFrom).replace(/^от\s+/i, '')
+      ? formatMoneyRange(group.priceFrom, group.priceTo)
       : 'Купить';
   const buyButtonClass =
     'inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 active:scale-[0.98]';
@@ -3567,7 +3567,7 @@ function LandingEventsTable({ groups }: { groups: EventGroup[] }) {
                   );
                 })()}
               </td>
-              <td className="px-4 py-3 align-top font-semibold text-slate-950">{formatMoney(group.priceFrom)}</td>
+              <td className="px-4 py-3 align-top font-semibold text-slate-950">{formatMoneyRange(group.priceFrom, group.priceTo)}</td>
               <td className="px-4 py-3 align-top text-slate-600">{group.vacant ?? '-'}</td>
               <td className="px-4 py-3 align-top"><BuyLink session={group.representative} /></td>
             </tr>
