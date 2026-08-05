@@ -46,7 +46,7 @@ test('publicVenuesForSessionsFromHub matches hub rows outside slug-only sessions
   assert.equal(bySlug.length, 1);
 });
 
-test('mergeCityPageVenues prefers session rows then appends content by slug', () => {
+test('mergeCityPageVenues prefers content/editorial then appends session venues', () => {
   const merged = mergeCityPageVenues(
     [{ id: 'v1', slug: 'hall-a', name: 'Hall', latitude: null, longitude: null }],
     [
@@ -56,9 +56,9 @@ test('mergeCityPageVenues prefers session rows then appends content by slug', ()
     10,
   );
   assert.equal(merged.length, 2);
-  assert.equal(merged[0].slug, 'hall-a');
-  assert.equal(merged[1].slug, 'nizhny-novgorod-nizhegorodskaya-yarmarka');
-  assert.equal(merged[1].latitude, 56.3);
+  assert.equal(merged[0].slug, 'nizhny-novgorod-nizhegorodskaya-yarmarka');
+  assert.equal(merged[1].slug, 'hall-a');
+  assert.equal(merged[0].latitude, 56.3);
 });
 
 test('publicVenueRowMatchesCityFilter accepts nizhny aliases and slug prefix', () => {

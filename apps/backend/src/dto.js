@@ -8638,8 +8638,20 @@ export function mergeCityPageVenues(sessionVenues, contentVenues, limit = 250) {
     for (const key of keys) seen.add(key);
     out.push(item);
   };
-  for (const item of sessionVenues || []) take(item);
+  // Content/editorial first (must-see /locations), then event venues.
+  // Old order let session rows fill the cap and drop seeded must-see without tickets.
+  const sessionBudget = Math.min(48, Math.max(16, Math.floor(cap * 0.2)));
   for (const item of contentVenues || []) take(item);
+  let sessionTaken = 0;
+  for (const item of sessionVenues || []) {
+    if (sessionTaken >= sessionBudget && out.length >= Math.min(cap, (contentVenues || []).length + sessionBudget)) {
+      break;
+    }
+    const before = out.length;
+    take(item);
+    if (out.length > before) sessionTaken += 1;
+  }
+  for (const item of sessionVenues || []) take(item);
   return out;
 }
 
