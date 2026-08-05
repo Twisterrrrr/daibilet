@@ -1,3 +1,4 @@
+import { resolveVenueHeroImage } from './city-place-images';
 import type { VenueCatalogCard } from './venue-map-types';
 
 type VenueCatalogSource = {
@@ -33,9 +34,10 @@ function hasValidCatalogCoords(latitude: unknown, longitude: unknown): boolean {
 /** Keep catalog cards lean but never drop lat/lng needed by «Мой день». */
 export function toVenueCatalogCard(venue: VenueCatalogSource): VenueCatalogCard {
   const hasCoords = hasValidCatalogCoords(venue.latitude, venue.longitude);
+  const slug = String(venue.slug || venue.id);
   return {
     id: venue.id,
-    slug: String(venue.slug || venue.id),
+    slug,
     name: venue.name,
     city: venue.city,
     cityId: venue.cityId ?? null,
@@ -47,7 +49,7 @@ export function toVenueCatalogCard(venue: VenueCatalogSource): VenueCatalogCard 
     events: venue.events || 0,
     hookFact: venue.hookFact ?? null,
     shortDescription: venue.shortDescription ?? null,
-    heroImageUrl: venue.heroImageUrl ?? null,
+    heroImageUrl: resolveVenueHeroImage(slug, venue.heroImageUrl),
     nextSlot: venue.nextSlot ?? null,
   };
 }

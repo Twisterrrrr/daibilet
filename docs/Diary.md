@@ -1,3 +1,20 @@
+## 2026-08-05 - Top-100: фото на каждую локацию + reuse в my-day/каталоге
+
+### Наблюдения
+- В статьях серии Top-100 (части 1-5, точки 1-75) было только cover + 1-2 inline - longread без визуала у мест.
+- Owner: компактные float left/right в тексте; те же кадры - в my-day и каталоге `/locations`/`/venues` (object-cover под нужный aspect).
+
+### Решения
+- GenerateImage/copy → `apps/public/public/images/blog/spb-top-100-p{NN}-*.jpg` (75 шт.) + копии в `venues/saint-petersburg/` для linked slug.
+- В MD: `[image side=left|right]` после первого абзаца каждой `### N`; старые общие `-inline` убраны; `blog:sync-bodies`.
+- `BlogArticleContent`: при ≥3 inline все float (не full-width первое).
+- `resolveVenueHeroImage` + `toVenueCatalogCard` + `VenueDetailPage` / share meta - editorial wins над hub stub.
+
+### Проблемы
+- Нет. Live: commit+push; web deploy - batch / по запросу; `blog:upsert` на MSK для тел статей.
+
+---
+
 ## 2026-08-05 - KGD city mustSee → каталог /locations|/venues
 
 ### Наблюдения

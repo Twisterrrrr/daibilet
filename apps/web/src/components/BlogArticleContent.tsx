@@ -677,6 +677,9 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
   const nodes: React.ReactNode[] = [];
   let isLeadParagraph = true;
   let bodyImagesRendered = 0;
+  const totalImageBlocks = blocks.filter((b) => b.type === 'image').length;
+  // Dense longreads (≥3 inline): float all. Short articles: first stays full-width break.
+  const denseInlineGallery = totalImageBlocks >= 3;
 
   for (let index = 0; index < blocks.length; index += 1) {
     const block = blocks[index];
@@ -712,7 +715,8 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
     if (block.type === 'image') {
       const { paragraphs, endIndex } = collectParagraphBlocks(blocks, index + 1);
       // Первое inline - полноширинный break (удержание внимания); дальше можно float.
-      const preferStandalone = bodyImagesRendered === 0;
+      // Dense (≥3): все float, включая первое - иначе Top-100 с 15 фото ломает макет.
+      const preferStandalone = bodyImagesRendered === 0 && !denseInlineGallery;
       if (paragraphs.length > 0 && !preferStandalone) {
         nodes.push(
           <BlogFloatedSection key={`img-p-${index}`} image={block.image}>
