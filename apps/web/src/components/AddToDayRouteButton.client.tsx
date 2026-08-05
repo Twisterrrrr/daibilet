@@ -200,3 +200,137 @@ export function AddToDayRouteButton({
     </button>
   );
 }
+
+type ManyProps = {
+  venues: DayRouteVenueItem[];
+  className?: string;
+  variant?: 'light' | 'dark' | 'overlay';
+  compact?: boolean;
+};
+
+/** Bulk «В маршрут» for a suburb slide: adds every listed point in one tap. */
+export function AddManyToDayRouteButton({
+  venues,
+  className = '',
+  variant = 'light',
+  compact = false,
+}: ManyProps) {
+  const [live, setLive] = useState(false);
+  useLayoutEffect(() => {
+    setLive(true);
+  }, []);
+
+  const route = useDayRouteState();
+  const payloads = venues
+    .map((venue) => {
+      const id = normalizeDayRouteVenueId(venue);
+      return id ? { ...venue, id } : null;
+    })
+    .filter((item): item is DayRouteVenueItem => Boolean(item));
+
+  const allActive =
+    payloads.length > 0 &&
+    payloads.every((payload) => isInDayRoute(payload.id, route, payload.slug));
+  const full = !allActive && route.venues.length >= DAY_ROUTE_MAX;
+
+  const base =
+    variant === 'dark'
+      ? allActive
+        ? 'bg-white text-emerald-950'
+        : 'bg-white/15 text-white hover:bg-white/25'
+      : variant === 'overlay'
+        ? allActive
+          ? 'bg-emerald-600/95 text-white shadow-sm backdrop-blur-sm hover:bg-emerald-700'
+          : 'bg-white/90 text-slate-800 shadow-sm backdrop-blur-sm hover:bg-white'
+        : allActive
+          ? 'bg-emerald-600 text-white hover:bg-emerald-700'
+          : 'bg-slate-100 text-slate-800 hover:bg-slate-200';
+
+  const label = allActive ? 'В маршруте' : compact ? 'В маршрут' : 'В мой маршрут';
+
+  function applyBulk() {
+    if (!live) {
+      flashDayRouteFeedback('Секунду, загружается…');
+      return;
+    }
+    if (!payloads.length) {
+      flashDayRouteFeedback('Нельзя добавить: нет точек');
+      return;
+    }
+    const before = readDayRouteFresh();
+    const beforeCount = before.venues.length;
+    if (allActive) {
+      flashDayRouteFeedback('Уже в маршруте');
+      return;
+    }
+    if (before.venues.length >= DAY_ROUTE_MAX) {
+      flashDayRouteFeedback(dayRouteHardLimitMessage());
+      return;
+    }
+
+    let added = 0;
+    for (const payload of payloads) {
+      const current = readDayRouteFresh();
+      if (current.venues.some((item) => sameDayRouteVenue(item, payload))) continue;
+      if (current.venues.length >= DAY_ROUTE_MAX) break;
+      addToDayRoute(payload);
+      added += 1;
+    }
+
+    const after = readDayRouteFresh();
+    const n = after.venues.length;
+    if (added > 0) {
+      flashDayRouteFeedback(
+        added > 1
+          ? `Добавлено ${added} точек · ${n}`
+          : dayRouteAddSuccessMessage(n),
+      );
+      return;
+    }
+    if (n >= DAY_ROUTE_MAX && beforeCount >= DAY_ROUTE_MAX) {
+      flashDayRouteFeedback(dayRouteHardLimitMessage());
+      return;
+    }
+    flashDayRouteFeedback('Уже в маршруте');
+  }
+
+  return (
+    <button
+      type="button"
+      disabled={!live || !payloads.length || (full && !allActive)}
+      title={
+        !live
+          ? 'Секунду…'
+          : !payloads.length
+            ? 'Нельзя добавить: нет точек'
+            : full && !allActive
+              ? dayRouteHardLimitMessage()
+              : allActive
+                ? 'Уже в маршруте (убрать можно в Мой день)'
+                : isDayRouteAtSoft(route.venues.length) && !allActive
+                  ? DAY_ROUTE_SOFT_WARN
+                  : 'Добавить все точки пригорода в маршрут'
+      }
+      aria-pressed={allActive}
+      aria-label={
+        allActive
+          ? 'Все точки пригорода уже в маршруте дня'
+          : `Добавить все точки пригорода в маршрут (${payloads.length})`
+      }
+      data-day-route-bulk={payloads.length || undefined}
+      data-day-route-live={live ? '1' : '0'}
+      onPointerDown={(event) => {
+        event.stopPropagation();
+      }}
+      onClick={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        applyBulk();
+      }}
+      className={`inline-flex min-h-10 min-w-[2.75rem] shrink-0 items-center justify-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${base} ${className}`}
+    >
+      {allActive ? <Check className="h-3.5 w-3.5 shrink-0" /> : <Route className="h-3.5 w-3.5 shrink-0" />}
+      <span>{label}</span>
+    </button>
+  );
+}

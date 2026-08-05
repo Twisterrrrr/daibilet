@@ -26,7 +26,10 @@ import { matchSightAfficheLink, resolveFeaturedDirections } from '@/lib/city-hub
 import { resolveCityImageObjectPosition } from '@/lib/city-image-focus';
 import { resolveCityImage } from '@/lib/city-images';
 import { CITY_NIGHT_HERO } from '@/lib/city-night-hero';
-import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
+import {
+  AddManyToDayRouteButton,
+  AddToDayRouteButton,
+} from '@/components/AddToDayRouteButton.client';
 import { CityDayPresetBlock } from '@/components/CityDayPresetBlock.client';
 import { MustSeeFilterTabs } from '@/components/MustSeeFilterTabs.client';
 import {
@@ -1362,6 +1365,36 @@ function CitySignificantSuburbsBlock({
                 preferEditorial: true,
               }) || '';
             const nested = Array.isArray(place.places) ? place.places.filter((p) => p?.name) : [];
+            const nestedRouteItems = nested
+              .map((poi) => {
+                const poiAsMustSee: CityMustSeeItem = {
+                  name: poi.name,
+                  desc: String(poi.desc || ''),
+                  href: poi.href,
+                  venueSlug: poi.venueSlug,
+                  locationSlug: poi.locationSlug,
+                };
+                return dayRouteItemFromMustSee(poiAsMustSee, venues, city, { isSuburb: true });
+              })
+              .filter((item): item is NonNullable<typeof item> => Boolean(item));
+            // Bulk CTA: all nested points of the slide; fallback to suburb root if no list.
+            const bulkVenues =
+              nestedRouteItems.length > 0
+                ? nestedRouteItems
+                : dayRouteItem
+                  ? [dayRouteItem]
+                  : [];
+            const vectorTitle = place.travelVector
+              ? `${place.travelVector}${place.stationHub ? ` - ${place.stationHub}` : ''}`
+              : '';
+            const bulkCta =
+              bulkVenues.length > 0 ? (
+                <AddManyToDayRouteButton
+                  compact
+                  className="!min-h-8 !px-2.5 !py-1.5 !text-[11px]"
+                  venues={bulkVenues}
+                />
+              ) : null;
             return (
               <article
                 key={`${place.name}:${index}`}
@@ -1388,11 +1421,18 @@ function CitySignificantSuburbsBlock({
                     >
                       Пригород
                     </p>
-                    {place.travelVector ? (
-                      <p className={`mt-1 text-xs font-semibold ${editorial ? 'text-zinc-700' : 'text-slate-700'}`}>
-                        {place.travelVector}
-                        {place.stationHub ? ` - ${place.stationHub}` : ''}
-                      </p>
+                    {vectorTitle ? (
+                      <div className="mt-1 flex flex-wrap items-start gap-x-2 gap-y-1.5">
+                        <h2
+                          className={`min-w-0 flex-1 text-sm font-semibold leading-5 sm:text-base ${
+                            editorial ? 'text-zinc-800' : 'text-slate-800'
+                          }`}
+                          data-city-suburb-vector
+                        >
+                          {vectorTitle}
+                        </h2>
+                        {bulkCta}
+                      </div>
                     ) : null}
                     {place.travelVectorBlurb ? (
                       <p className={`mt-1 text-xs leading-5 ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}>
@@ -1401,24 +1441,45 @@ function CitySignificantSuburbsBlock({
                     ) : null}
                     {place.stationName ? (
                       <p className={`mt-1 text-xs ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-                        Станция: {place.stationName}
+                        Где выходить: {place.stationName}
                       </p>
                     ) : null}
-                    <h3
-                      className={`${titleClass} mt-0.5 break-words`}
-                      data-city-suburb-title
-                    >
-                      {placeHref ? (
-                        <Link
-                          href={placeHref}
-                          className="underline decoration-slate-300 underline-offset-2 hover:decoration-current"
+                    {vectorTitle ? (
+                      <h3
+                        className={`${titleClass} mt-1.5 break-words`}
+                        data-city-suburb-title
+                      >
+                        {placeHref ? (
+                          <Link
+                            href={placeHref}
+                            className="underline decoration-slate-300 underline-offset-2 hover:decoration-current"
+                          >
+                            {place.name}
+                          </Link>
+                        ) : (
+                          place.name
+                        )}
+                      </h3>
+                    ) : (
+                      <div className="mt-0.5 flex flex-wrap items-start gap-x-2 gap-y-1.5">
+                        <h2
+                          className={`${titleClass} min-w-0 flex-1 break-words`}
+                          data-city-suburb-title
                         >
-                          {place.name}
-                        </Link>
-                      ) : (
-                        place.name
-                      )}
-                    </h3>
+                          {placeHref ? (
+                            <Link
+                              href={placeHref}
+                              className="underline decoration-slate-300 underline-offset-2 hover:decoration-current"
+                            >
+                              {place.name}
+                            </Link>
+                          ) : (
+                            place.name
+                          )}
+                        </h2>
+                        {bulkCta}
+                      </div>
+                    )}
                     {blurb ? (
                       <p
                         className={`mt-1.5 text-sm leading-6 break-words ${
@@ -1442,16 +1503,6 @@ function CitySignificantSuburbsBlock({
                       >
                         {nested.map((poi, poiIndex) => {
                           const poiHref = resolveCityPlaceTitleHref(poi, venues);
-                          const poiAsMustSee: CityMustSeeItem = {
-                            name: poi.name,
-                            desc: String(poi.desc || ''),
-                            href: poi.href,
-                            venueSlug: poi.venueSlug,
-                            locationSlug: poi.locationSlug,
-                          };
-                          const poiDayRoute = dayRouteItemFromMustSee(poiAsMustSee, venues, city, {
-                            isSuburb: true,
-                          });
                           return (
                             <li
                               key={`${poi.name}:${poiIndex}`}
@@ -1460,54 +1511,34 @@ function CitySignificantSuburbsBlock({
                               }`}
                               data-city-suburb-place
                             >
-                              <div className="flex flex-wrap items-start justify-between gap-x-2 gap-y-1">
-                                <div className="min-w-0 flex-1">
-                                  {poiHref ? (
-                                    <Link
-                                      href={poiHref}
-                                      className={`font-medium underline decoration-slate-300 underline-offset-2 hover:decoration-current ${
-                                        editorial ? 'text-zinc-900' : 'text-slate-900'
-                                      }`}
-                                    >
-                                      {poi.name}
-                                    </Link>
-                                  ) : (
-                                    <span
-                                      className={`font-medium ${
-                                        editorial ? 'text-zinc-900' : 'text-slate-900'
-                                      }`}
-                                    >
-                                      {poi.name}
-                                    </span>
-                                  )}
-                                  {poi.desc ? (
-                                    <span className={editorial ? 'text-zinc-500' : 'text-slate-500'}>
-                                      {' - '}
-                                      {capitalizeSentenceStart(poi.desc)}
-                                    </span>
-                                  ) : null}
-                                </div>
-                                {poiDayRoute ? (
-                                  <AddToDayRouteButton
-                                    compact
-                                    className="!min-h-8 !px-2 !py-1 !text-[10px]"
-                                    venue={poiDayRoute}
-                                  />
-                                ) : null}
-                              </div>
+                              {poiHref ? (
+                                <Link
+                                  href={poiHref}
+                                  className={`font-medium underline decoration-slate-300 underline-offset-2 hover:decoration-current ${
+                                    editorial ? 'text-zinc-900' : 'text-slate-900'
+                                  }`}
+                                >
+                                  {poi.name}
+                                </Link>
+                              ) : (
+                                <span
+                                  className={`font-medium ${
+                                    editorial ? 'text-zinc-900' : 'text-slate-900'
+                                  }`}
+                                >
+                                  {poi.name}
+                                </span>
+                              )}
+                              {poi.desc ? (
+                                <span className={editorial ? 'text-zinc-500' : 'text-slate-500'}>
+                                  {' - '}
+                                  {capitalizeSentenceStart(poi.desc)}
+                                </span>
+                              ) : null}
                             </li>
                           );
                         })}
                       </ol>
-                    ) : null}
-                    {dayRouteItem ? (
-                      <div className="mt-3">
-                        <AddToDayRouteButton
-                          compact
-                          className="!min-h-9 !px-2.5 !py-1.5 !text-[11px]"
-                          venue={dayRouteItem}
-                        />
-                      </div>
                     ) : null}
                   </div>
                 </div>
