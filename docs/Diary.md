@@ -11272,3 +11272,18 @@ evalidateNextBlogArticle (/blog, slug, city hub).
 
 ### Проблемы
 - Локальная production-сборка остановилась до TypeScript-проверки из-за поврежденной зависимости `styled-jsx/style` в `node_modules`; нужна чистая установка зависимостей вне продуктового diff.
+
+---
+
+## 2026-08-05 - Repair SPB cityInfo deploy syntax
+
+### Наблюдения
+- Deploy commit `8585d1e` откатился на MSK до `BUILD_ID=3ovHY4yBqkWQ_hi0SWJDf`: TypeScript parser остановился на лишней запятой перед `travelVector` в объекте Петергофа.
+- Тот же ошибочный шаблон был в 11 объектах `significantSuburbs` web cityInfo. В public mirror таких malformed объектов не найдено.
+
+### Решения
+- Поля `travelVector`, `stationHub` и `gastroHint` перенесены внутрь соответствующих объектов без лишней запятой.
+- `node --check apps/web/src/lib/cityInfo.ts` успешно завершился; оба cityInfo дополнительно просканированы на двойные и начальные запятые перед полями.
+
+### Проблемы
+- Локальный `pnpm` недоступен в PATH, поэтому полный `pnpm --filter @daibilet/web typecheck` выполняется на MSK в составе канонического deploy.
