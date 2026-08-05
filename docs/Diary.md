@@ -15,6 +15,21 @@
 
 ---
 
+## 2026-08-05 - Top-100: noindex + снять массовые AI place-фото
+
+### Наблюдения
+- Owner: серия ещё не должна быть в поисковиках; массовые GenerateImage place-кадры не привязаны к реальности.
+
+### Решения
+- `isIndexable: false` в frontmatter Parts 1-5; `blog-upsert` читает флаг (PUBLISHED + noindex).
+- Убраны per-place `[image]` из тел; возвращены 1-2 atmospheric inline.
+- Из `SAINT_PETERSBURG_IMAGES` сняты Top-100 extensions (остались Главные 1-12 + мечеть).
+
+### Проблемы
+- Пересъём/кураторские фото по локациям - отдельный проход, не GenerateImage mass.
+
+---
+
 ## 2026-08-05 - Top-100: фото на каждую локацию + reuse в my-day/каталоге
 
 ### Наблюдения

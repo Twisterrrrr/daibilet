@@ -84,7 +84,21 @@ async function upsertArticle(article) {
     stripColumnMetaPrefix(meta.seoDescription) || excerpt;
   const seoH1 = meta.seoH1 || title;
   const canonicalPath = meta.canonicalPath || `/blog/${slug}`;
-  const isIndexable = status === 'PUBLISHED';
+  // Frontmatter isIndexable:false → noindex even when PUBLISHED (preview without SERP).
+  // Default: PUBLISHED indexes; other statuses do not.
+  const metaIndexable = meta.isIndexable;
+  const isIndexable =
+    metaIndexable === false ||
+    metaIndexable === 'false' ||
+    metaIndexable === 0 ||
+    metaIndexable === '0'
+      ? false
+      : metaIndexable === true ||
+          metaIndexable === 'true' ||
+          metaIndexable === 1 ||
+          metaIndexable === '1'
+        ? true
+        : status === 'PUBLISHED';
   const citySlug = canonicalBlogCitySlug(meta.citySlug) || meta.citySlug || null;
   const cityId = await resolveCityId(citySlug);
   const authorId = meta.authorId || (meta.author === 'Макс' ? 'max' : null) || 'editorial';
@@ -105,7 +119,7 @@ async function upsertArticle(article) {
 
   if (dryRun) {
     console.log(
-      `[dry-run] ${slug} status=${status} publishedAt=${publishedAt || '-'} force=${forcePublishedAt} city=${meta.citySlug || '-'} author=${authorId} type=${normalizedType} chars=${content.length}`,
+      `[dry-run] ${slug} status=${status} isIndexable=${isIndexable} publishedAt=${publishedAt || '-'} force=${forcePublishedAt} city=${meta.citySlug || '-'} author=${authorId} type=${normalizedType} chars=${content.length}`,
     );
     return;
   }
@@ -159,7 +173,7 @@ async function upsertArticle(article) {
       ],
     );
     console.log(
-      `updated ${slug} (${status}) publishedAt=${publishedAt || '-'} force=${forcePublishedAt} author=${authorId} type=${normalizedType}`,
+      `updated ${slug} (${status}) isIndexable=${isIndexable} publishedAt=${publishedAt || '-'} force=${forcePublishedAt} author=${authorId} type=${normalizedType}`,
     );
     return;
   }

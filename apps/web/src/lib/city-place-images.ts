@@ -74,40 +74,7 @@ const SAINT_PETERSBURG_IMAGES: Record<string, string> = {
   'saint-petersburg-mihaylovskiy-zamok':
     '/images/venues/saint-petersburg/mihaylovskiy-zamok.jpg',
   'saint-petersburg-anichkov-most': '/images/venues/saint-petersburg/anichkov-most.jpg',
-  // Top-100 linked places beyond Главные 1-12 (blog + catalog + my-day)
-  'saint-petersburg-russkiy-muzey': '/images/venues/saint-petersburg/russkiy-muzey.jpg',
-  'saint-petersburg-glavnyy-shtab-ermitazh':
-    '/images/venues/saint-petersburg/glavnyy-shtab-ermitazh.jpg',
-  'saint-petersburg-muzey-faberzhe': '/images/venues/saint-petersburg/muzey-faberzhe.jpg',
-  'saint-petersburg-kunstkamera': '/images/venues/saint-petersburg/kunstkamera.jpg',
-  'saint-petersburg-tsentralnyy-voenno-morskoy-muzey':
-    '/images/venues/saint-petersburg/tsentralnyy-voenno-morskoy-muzey.jpg',
-  erarta: '/images/venues/saint-petersburg/erarta.jpg',
-  'saint-petersburg-muzey-anny-ahmatovoy-v-fontannom-dome':
-    '/images/venues/saint-petersburg/muzey-anny-ahmatovoy.jpg',
-  'saint-petersburg-muzey-politicheskoy-istorii-osobnyak-kshesinskoy':
-    '/images/venues/saint-petersburg/muzey-politicheskoy-istorii.jpg',
-  'saint-petersburg-dohodnyy-dom-baka':
-    '/images/venues/saint-petersburg/dohodnyy-dom-baka.jpg',
-  'saint-petersburg-tolstovskiy-dom': '/images/venues/saint-petersburg/tolstovskiy-dom.jpg',
-  'saint-petersburg-rotonda-na-gorohovoy':
-    '/images/venues/saint-petersburg/rotonda-na-gorohovoy.jpg',
-  'saint-petersburg-mozaichnyy-dvorik':
-    '/images/venues/saint-petersburg/mozaichnyy-dvorik.jpg',
-  'saint-petersburg-dohodnyy-dom-muruzi':
-    '/images/venues/saint-petersburg/dohodnyy-dom-muruzi.jpg',
-  'saint-petersburg-novaya-gollandiya':
-    '/images/venues/saint-petersburg/novaya-gollandiya.jpg',
-  'saint-petersburg-bertgold-tsentr':
-    '/images/venues/saint-petersburg/bertgold-tsentr.jpg',
-  'saint-petersburg-loft-proekt-etazhi':
-    '/images/venues/saint-petersburg/loft-proekt-etazhi.jpg',
-  'saint-petersburg-ulitsa-rubinshteyna':
-    '/images/venues/saint-petersburg/ulitsa-rubinshteyna.jpg',
-  'saint-petersburg-pyshechnaya-na-bolshoy-konyushennoy':
-    '/images/venues/saint-petersburg/pyshechnaya-na-bolshoy-konyushennoy.jpg',
-  'saint-petersburg-spikizi-bar-el-copitas':
-    '/images/venues/saint-petersburg/spikizi-bar-el-copitas.jpg',
+  // Editorial must-see covers only (not mass Top-100 AI place stills).
   'saint-petersburg-sobornaya-mechet':
     '/images/venues/saint-petersburg/sobornaya-mechet.jpg',
 };
