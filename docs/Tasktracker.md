@@ -32,9 +32,9 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| UX.BLOG-DECOUPLE-CITY | `/blog`: отвязать ленту от header CityPicker; фильтр материалов сразу после hero; при активном фильтре результаты над «материалом недели» | Высокий | ✅ `c8f43ae`+follow-up; MSK BUILD_ID=`LV0jzT3jaueTAOmX202ic`; smoke /blog 200 (filter under hero, CTA, no header-city force) |
-| UX.BLOG-LISTING-VITALITY | `/blog`: featured overlay, magazine mix (banner/strip/lead/quote), serif titles, vivid chips, micro-interactions | Высокий | ✅ `6b3f675`+`c8f43ae`; MSK BUILD_ID=`LV0jzT3jaueTAOmX202ic`; smoke /blog 200 |
-| UX.BLOG-CARD-POLISH | `/blog` cards: no mid-sentence clamp; serif titles everywhere; CTA left-wrap; contextual CTA labels | Высокий | ✅ `feb7a61`; deploy ждёт owner |
+| UX.BLOG-DECOUPLE-CITY | `/blog`: отвязать ленту от header CityPicker; фильтр материалов сразу после hero; при активном фильтре результаты над «материалом недели» | Высокий | ✅ `c8f43ae`+follow-up; superseded live MSK BUILD_ID=`Jsmb7n_Z-x0_R9CMBr80P` HEAD=`9c188c9`; smoke /blog 200 |
+| UX.BLOG-LISTING-VITALITY | `/blog`: featured overlay, magazine mix (banner/strip/lead/quote), serif titles, vivid chips, micro-interactions | Высокий | ✅ `6b3f675`+`c8f43ae`; superseded live MSK BUILD_ID=`Jsmb7n_Z-x0_R9CMBr80P` HEAD=`9c188c9`; smoke /blog 200 |
+| UX.BLOG-CARD-POLISH | `/blog` cards: no mid-sentence clamp; serif titles everywhere; CTA left-wrap; contextual CTA labels | Высокий | ✅ `feb7a61`+`a6c06b7`; MSK BUILD_ID=`Jsmb7n_Z-x0_R9CMBr80P` HEAD=`9c188c9`; smoke /blog 200 contextual CTA |
 | BLOG.TOP100-PLACE-IMGS | Top-100 / Beyond: скрыть с сайта (DRAFT); place JPG в venues для locations/my-day | Высокий | ✅ `5b288fa`/`61f676e`, MSK BUILD_ID=`kkfM8hMpE0f52IqGemiqu`; ×12 DRAFT, 404 UI |
 | BLOG.HIDE-AUG5-EXCEPT-BARS | Скрыть все статьи от 2026-08-05 кроме «Барный Петербург»; постепенная публикация | Критический | ✅ `be2f075` + MSK upsert DRAFT ×5; public only `spb-barnyy-peterburg-ryumochnye-spikizi`; soft-404 / article:null; web deploy n/a |
 | BLOG.HERO-SERIES-BR | Hero H1: перенос после точки перед «Часть N» для Top-100 / Beyond-Top-100 | Высокий | ✅ `07c4fc7`, MSK BUILD_ID=`tU2lr7PmZB4kN1JCHGX_V` |
@@ -115,7 +115,7 @@
 | MS.TIER1 | Канон тиров: floor 6 / typical 6-8 / large tourist ~12-18 (non-capital) / **capitals MSK+SPB wide 30-50+ (без потолка 18)** / NN deep pack reference; hub ≠ day (SOFT 10 / MAX 15) | Высокий | ✅ docs corr. capitals |
 | MS.TIER2 | План MSK+SPB → **capitals wide** (не 12-18, не клон-only NN); Phase A docs | Высокий | ✅ docs corr. |
 | MS.SUB1 | `significantSuburbs` + блок «Значимые пригороды {City_Род}» на hub; СПб: Петергоф/Царское/Кронштадт | Высокий | ✅ `16d10ca` MSK **BUILD_ID=`pA38C3r_vUStAEuHiAZuO`** |
-| MS.SUB3 | Hub suburbs: snap carousel (1 card/screen) + чистый бейдж «Пригород», nested POI capitalize + «В маршрут» | Высокий | ✅ `d6ca3ec`, copy/route badge updated 2026-08-05 |
+| MS.SUB3 | Hub suburbs: snap carousel (1 card/screen) + чистый бейдж «Пригород», nested POI capitalize + «В маршрут»; h2/ol/no Day-trip (`9c188c9`) | Высокий | ✅ `d6ca3ec`+`9c188c9`; MSK BUILD_ID=`Jsmb7n_Z-x0_R9CMBr80P`; smoke SPB hub 200 |
 | MS.GUIDE1 | Канон hub → тематические blog-гиды → CTA билетов (закрытие гэпа при узком каталоге) | Высокий | ✅ docs |
 | MS.TIER3 | Phase B: Санкт-Петербург - широкий `cityInfo` с тематическими chip, гастро-слоем и пригородами | Высокий | ✅ 120 city must-see, 20 gastro, 5 пригородов / 25 POI, 6 day presets. После failed deploy `8585d1e` исправлены 11 malformed объектов пригородов; web и public cityInfo просканированы, parse восстановлен. Owner override: 5 транспортных векторов с хабами, blurb, станциями и гастро-остановками, Кронштадт обновлен Якорной площадью и Петровским доком. |
 | MS.SPB-KGD-SEED | Owner-verified SPB + KGD must-see, gastro и suburb POI: idempotent catalog dual-write, verified address/coords, slug wiring | Критический | ✅ MSK seed: 67 inserted, 20 updated, no missing city; 67 cityInfo links; deploy 2026-08-05 BUILD_ID=`htTqoT7UE2NcJBJevr_3v` |

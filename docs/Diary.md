@@ -1,3 +1,20 @@
+## 2026-08-05 - MSK deploy: blog card UX + SPB suburbs
+
+### Наблюдения
+- Owner: «выкатывай». Ahead of live BUILD_ID `LV0jzT3jaueTAOmX202ic` / web `c8f43ae`: `feb7a61`/`a6c06b7` (blog clamp/serif/contextual CTA) + `9c188c9` (SPB suburbs: h2, ol, В маршрут stubs, no Day-trip).
+- Lock clear; MSK-only `BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh` (не SPB .16).
+
+### Решения
+- Deploy complete: HEAD `9c188c9`, BUILD_ID=`Jsmb7n_Z-x0_R9CMBr80P`.
+- Smoke `/blog` 200: client chunk содержит шаблон «Больше про » + short names (Питер/Москву); `font-serif` на карточках; mid-sentence `line-clamp` снят с lead/excerpt.
+- Smoke city hub SPB (`/cities/saint-petersburg`, legacy `sankt-peterburg` → canonical): 200; h2 «Значимые пригороды»; Кронштадт с «В маршрут»; nested `<ol>`; Day-trip отсутствует.
+- Warm note: одноразовый 500 на SPB hub mid-warm; повторный smoke 200.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-05 - Hub: пригороды SPB (copy / h2 / «В маршрут»)
 
 ### Наблюдения
