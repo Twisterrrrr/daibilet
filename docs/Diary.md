@@ -10,7 +10,7 @@
 - UI по-прежнему `formatMoney` → «от X ₽». Radius/STOP-gate без изменений.
 
 ### Проблемы
-- Live обновится после MSK web/API batch или явного «выкатывай» (UX, не 500).
+- Закрыто 2026-08-05 MSK: git pull 97a6ad8->0f5e847, systemctl restart daibilet-api, BRANCH=feat/next-monorepo deploy-prod-next. BUILD_ID 8Fo0L9-oGyooggq9uzfYC -> H2fqyKT5FuijMNsiHKmPr. Smoke: nearby Polovtsov 4 unique titles (1x Queen), /locations without soon-excursion copy, flex-wrap chips, new BUILD_ID static 200 / old 404.
 
 ---
 
