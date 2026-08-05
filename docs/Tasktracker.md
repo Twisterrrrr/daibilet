@@ -219,7 +219,7 @@
 | UX.MS2c | Hub must-see mobile: peek ~80% + ExpandableBlurb; presets blog link new line + breathing room | Высокий | ✅ `4ea04c4` → expand removed in UX.HUB-BLURB |
 | UX.HUB-BLURB | City hub: capitalize must-see/suburb blurbs + drop mobile ExpandableBlurb; seed lowercase `desc` fix | Высокий | ✅ `8e29027` MSK **BUILD_ID=`5rOJ9dbBh58TQKyE5YGPr`** kaliningrad/nn 200 |
 | UX.HUB-BLURB2 | SPB hub: preferEditorial over Venue crumbs/truncation; capitalize suburb nested; strip crumb tails | Высокий | ✅ `b293dae` push (no deploy) 2026-08-05 |
-| UX.CAT-CRUMB | Catalog LocationCard/InstitutionCard: dayRouteHookLine strip crumb tails (Нева, пл., metro) | Высокий | ✅ push (no deploy) 2026-08-05 |
+| UX.CAT-CRUMB | Catalog LocationCard/InstitutionCard: dayRouteHookLine strip crumb tails (Нева, пл., metro) | Высокий | ✅ `63b1e23` push (no deploy) 2026-08-05 |
 | UX.MS3 | «Главные места» md+: page prev/next вместо scrollbar UX; mobile swipe as-is | Высокий | ✅ `5ffbfded` MSK **BUILD_ID=`blIpyGTrMYrwYoh4jkBws`** moscow/nn smoke 200 |
 
 ---
