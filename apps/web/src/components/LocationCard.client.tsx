@@ -40,8 +40,8 @@ function sameAddressLabel(a: string, b: string): boolean {
   return Boolean(a && b && norm(a) === norm(b));
 }
 
-function contentActivityLabel(count: number): string {
-  if (count <= 0) return 'Скоро появятся экскурсии';
+function contentActivityLabel(count: number): string | null {
+  if (count <= 0) return null;
   const mod10 = count % 10;
   const mod100 = count % 100;
   if (mod10 === 1 && mod100 !== 11) return `${count} экскурсия проходит здесь`;
@@ -91,18 +91,19 @@ export function LocationCard({
   const displayName = stripBoardingPlacePrefix(venue.name);
   const routeTitle = stripBoardingPlacePrefix(venue.title || venue.name);
   const showStreet = Boolean(street) && !sameAddressLabel(street, displayName);
-
-  const eventsChip = (
+  const activityLabel = isContentPlace ? contentActivityLabel(activityCount) : null;
+  const eventsChipLabel = isContentPlace
+    ? activityLabel
+      ? activityLabel.split(' ').slice(0, 2).join(' ')
+      : null
+    : venue.events > 0
+      ? pluralEvents(venue.events)
+      : null;
+  const eventsChip = eventsChipLabel ? (
     <span className="shrink-0 rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-700">
-      {isContentPlace
-        ? activityCount > 0
-          ? contentActivityLabel(activityCount).split(' ').slice(0, 2).join(' ')
-          : 'Скоро'
-        : venue.events > 0
-          ? pluralEvents(venue.events)
-          : 'Скоро'}
+      {eventsChipLabel}
     </span>
-  );
+  ) : null;
 
   return (
     <div className="group relative flex items-stretch overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lg">
@@ -140,7 +141,9 @@ export function LocationCard({
           ) : null}
 
           {isContentPlace ? (
-            <p className="mt-2 text-xs font-semibold text-emerald-700">{contentActivityLabel(activityCount)}</p>
+            activityLabel ? (
+              <p className="mt-2 text-xs font-semibold text-emerald-700">{activityLabel}</p>
+            ) : null
           ) : (
             <>
               {showStreet ? (

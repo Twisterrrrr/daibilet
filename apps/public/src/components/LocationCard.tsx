@@ -45,9 +45,11 @@ export function LocationCard({
       <div className="flex min-w-0 flex-1 flex-col p-4">
         <div className="flex items-start justify-between gap-3">
           <h3 className="line-clamp-2 text-base font-semibold text-slate-900 group-hover:text-primary-600">{venue.name}</h3>
-          <span className="shrink-0 rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-700">
-            {venue.events > 0 ? pluralEvents(venue.events) : 'Скоро'}
-          </span>
+          {venue.events > 0 ? (
+            <span className="shrink-0 rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-700">
+              {pluralEvents(venue.events)}
+            </span>
+          ) : null}
         </div>
 
         <div className="mt-2 flex items-center gap-1.5 text-sm text-slate-500">

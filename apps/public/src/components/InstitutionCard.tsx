@@ -80,9 +80,9 @@ export function InstitutionCard({
         <div className="mt-4 flex items-end justify-between border-t border-slate-100 pt-3">
           <div>
             <div className="text-xs text-slate-400">{venue.city}</div>
-            <div className="text-sm font-semibold text-slate-900">
-              {venue.events > 0 ? pluralEvents(venue.events) : 'Афиша скоро'}
-            </div>
+            {venue.events > 0 ? (
+              <div className="text-sm font-semibold text-slate-900">{pluralEvents(venue.events)}</div>
+            ) : null}
           </div>
           <span className="inline-flex items-center gap-1 rounded-full bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white group-hover:bg-primary-600">
             <Ticket className="h-3.5 w-3.5" />
