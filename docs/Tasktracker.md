@@ -12,7 +12,7 @@
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
 | FIX.CITY-ALIAS | Legacy `/cities/sankt-peterburg` → permanent redirect на canonical `/cities/saint-petersburg`, чтобы не вызывать city DTO с неканоническим slug | Критический | ✅ `c5f1869`, MSK BUILD_ID=`IQlhDY1eF5GvuOGLXURHb`; direct и public smoke: 308 → canonical, 200 |
-| FIX.EDITORIAL-VENUES | Убрать SPB thin twins, направить zero-event editorial в `/locations`, скрыть ticket chrome без saleable offer и усилить seed dedupe | Критический | 🔄 commit + MSK deploy |
+| FIX.EDITORIAL-VENUES | Убрать SPB thin twins, направить zero-event editorial в `/locations`, скрыть ticket chrome без saleable offer и усилить seed dedupe | Критический | ✅ `2897a74`, MSK BUILD_ID=`pB-uPQAXNmSrmo1y5dDNh`; El Copitas 200 без buy CTA, «Синий Пушкин» twin скрыт |
 
 ---
 
