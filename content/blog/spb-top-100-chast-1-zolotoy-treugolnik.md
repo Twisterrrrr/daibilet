@@ -14,7 +14,7 @@ date: "5 авг 2026"
 readMin: 18
 imageAlt: "Дворцовая площадь и Зимний дворец в утреннем Петербурге"
 coverImageUrl: "/images/blog/spb-top-100-chast-1-zolotoy-treugolnik.jpg"
-publishedAt: "2026-08-05T11:00:00+03:00"
+publishedAt: "2026-08-05T09:00:00+03:00"
 status: PUBLISHED
 ---
 

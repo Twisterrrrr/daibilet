@@ -14,7 +14,7 @@ date: "5 авг 2026"
 readMin: 16
 imageAlt: "Михайловский дворец - Русский музей в Петербурге"
 coverImageUrl: "/images/blog/spb-top-100-chast-2-muzei.jpg"
-publishedAt: "2026-08-05T11:05:00+03:00"
+publishedAt: "2026-08-05T09:05:00+03:00"
 status: PUBLISHED
 ---
 

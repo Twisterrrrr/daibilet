@@ -14,7 +14,7 @@ date: "5 авг 2026"
 readMin: 14
 imageAlt: "Петербургский двор-колодец с галереями"
 coverImageUrl: "/images/blog/spb-top-100-chast-3-dvory-paradnye.jpg"
-publishedAt: "2026-08-05T11:10:00+03:00"
+publishedAt: "2026-08-05T09:10:00+03:00"
 status: PUBLISHED
 ---
 
