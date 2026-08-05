@@ -19,7 +19,7 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| UX.HOME-GUIDE | Главная: desktop bento-hero + my-day + categories; mobile stories + bottom nav; секции cities/events/lucky/podborki/blog/trust | Высокий | ✅ code ship; deploy пачкой / по запросу |
+| UX.HOME-GUIDE | Главная: desktop bento-hero + my-day + categories; mobile stories + bottom nav; секции cities/events/lucky/podborki/blog/trust | Высокий | ✅ 8d844ae; deploy пачкой / по запросу |
 
 ## Runtime URL integrity (2026-08-05)
 
