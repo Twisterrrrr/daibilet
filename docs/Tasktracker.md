@@ -1,6 +1,6 @@
 # Tasktracker — Daibilet
 
-**Обновлено:** 2026-08-05
+**Обновлено:** 2026-08-06
 **Источники:** [Project.md](./Project.md), [current-state.md](./current-state.md), [migration-spb-to-msk.md](./migration-spb-to-msk.md), [widget-etalon-slugs.md](./widget-etalon-slugs.md), [content-blog-plan.md](./content-blog-plan.md), [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brief.md), [mobile-templates.md](./mobile-templates.md), [catalog-location-venue-canon.md](./catalog-location-venue-canon.md)
 
 **Легенда:** ✅ done · 🔄 in progress · ⏳ todo · 🚫 blocked · ⚠️ deferred
@@ -14,6 +14,12 @@
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
 | OPS.DEPLOY-CADENCE | Канон: commit+push после итерации; MSK web deploy пачкой раз в сутки / по запросу owner; hotfix-исключения | Высокий | ✅ `.cursorrules` + Project.md 2026-08-05 |
+
+## Locations kind chips (2026-08-06)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| FIX.LOC-KIND-CHIPS | `/locations`: вернуть kind-чипы из `stats.types` (park/monument/attraction/…); logistics secondary | Критический | ✅ code; deploy пачкой / по запросу |
 
 ## SPB must-see ↔ catalog links (2026-08-05)
 

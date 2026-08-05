@@ -24,6 +24,7 @@ import {
   type VenueCatalogSort,
 } from '@/lib/venue-catalog-feed';
 import {
+  LOCATION_CATALOG_TYPE_OPTIONS,
   LOCATION_LOGISTICS_OPTIONS,
   normalizeVenueKind,
   venueTypeLabel,
@@ -66,7 +67,7 @@ export function LocationsCatalogView({ initialPage }: { initialPage: VenueCatalo
   const rawLogistics = searchParams.get('logistics')?.trim() || '';
   const logisticsFilter: LocationLogisticsGroup | 'all' =
     rawLogistics === 'pier' || rawLogistics === 'bus' || rawLogistics === 'walking' ? rawLogistics : 'all';
-  // Legacy ?type= still works for deep-links; logistics chips are the primary UX.
+  // Kind chips are primary; logistics stays a secondary quick-toggle (does not hide kinds).
   const rawType = searchParams.get('type')?.trim() || '';
   const typeFilter = rawType ? normalizeVenueKind(rawType) : 'all';
   const cityReady = selectedCity?.cityReady ?? true;
@@ -201,17 +202,44 @@ export function LocationsCatalogView({ initialPage }: { initialPage: VenueCatalo
     });
   };
 
-  const setLogisticsFilter = (next: LocationLogisticsGroup | 'all') => {
+  const setTypeFilter = (next: string) => {
     const params = new URLSearchParams(searchParams.toString());
-    if (next === 'all') params.delete('logistics');
-    else params.set('logistics', next);
-    // Logistics group replaces fine-grained type facet.
-    params.delete('type');
+    if (next === 'all') params.delete('type');
+    else params.set('type', next);
     const qs = params.toString();
     startTransition(() => {
       router.replace(qs ? `/locations?${qs}` : '/locations', { scroll: false });
     });
   };
+
+  const setLogisticsFilter = (next: LocationLogisticsGroup | 'all') => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (next === 'all') params.delete('logistics');
+    else params.set('logistics', next);
+    const qs = params.toString();
+    startTransition(() => {
+      router.replace(qs ? `/locations?${qs}` : '/locations', { scroll: false });
+    });
+  };
+
+  const typeOptions = useMemo(() => {
+    const counts = stats.types || {};
+    const known = LOCATION_CATALOG_TYPE_OPTIONS.filter((option) => counts[option.value]).map((option) => ({
+      ...option,
+      count: counts[option.value] || 0,
+    }));
+    const knownValues = new Set(known.map((option) => option.value));
+    const extras = Object.entries(counts)
+      .filter(([value, count]) => Boolean(count) && !knownValues.has(value) && value !== 'online')
+      .map(([value, count]) => ({
+        value,
+        label: venueTypeLabel(value),
+        template: 'location' as const,
+        count,
+      }))
+      .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label, 'ru'));
+    return [...known, ...extras];
+  }, [stats.types]);
 
   const logisticsOptions = useMemo(() => {
     const counts = stats.logistics || {};
@@ -285,7 +313,7 @@ export function LocationsCatalogView({ initialPage }: { initialPage: VenueCatalo
 
   return (
     <>
-      {/* Mobile template: dense hero, logistics chips first (UX logistics). */}
+      {/* Mobile template: dense hero, kind chips primary + logistics secondary. */}
       <HeroLayout
         variant="minimal"
         dense
@@ -296,8 +324,41 @@ export function LocationsCatalogView({ initialPage }: { initialPage: VenueCatalo
         tone="light"
         className="bg-slate-50"
       >
-        {logisticsOptions.length ? (
-          <div className="mt-4 flex flex-wrap gap-2">
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => setTypeFilter('all')}
+            className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition ${
+              typeFilter === 'all'
+                ? 'bg-primary-600 text-white'
+                : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50'
+            }`}
+          >
+            Все точки
+            <span className="text-xs opacity-75">({heroTotal})</span>
+          </button>
+          {typeOptions.map((option) => {
+            const active = typeFilter === option.value;
+            return (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => setTypeFilter(active ? 'all' : option.value)}
+                className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition ${
+                  active
+                    ? 'bg-primary-600 text-white'
+                    : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                {option.label}
+                <span className="text-xs opacity-75">({option.count})</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {logisticsOptions.length > 1 ? (
+          <div className="mt-3 flex flex-wrap gap-1.5">
             {logisticsOptions.map((option) => {
               const active = logisticsFilter === option.value;
               return (
@@ -305,8 +366,10 @@ export function LocationsCatalogView({ initialPage }: { initialPage: VenueCatalo
                   key={option.value}
                   type="button"
                   onClick={() => setLogisticsFilter(active && option.value !== 'all' ? 'all' : option.value)}
-                  className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition ${
-                    active ? 'bg-primary-600 text-white' : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50'
+                  className={`inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-semibold transition ${
+                    active
+                      ? 'bg-slate-800 text-white'
+                      : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50'
                   }`}
                 >
                   {option.label}
@@ -406,7 +469,7 @@ export function LocationsCatalogView({ initialPage }: { initialPage: VenueCatalo
                     pins={mapPinsForUi}
                     selectedId={selectedPinId}
                     onPinClick={onPinClick}
-                    layoutKey={`${showMap}-${mapPinsForUi.length}-${cityFilter}-${logisticsFilter}`}
+                    layoutKey={`${showMap}-${mapPinsForUi.length}-${cityFilter}-${typeFilter}-${logisticsFilter}`}
                     className="h-[min(70vh,640px)] w-full"
                   />
                   <p className="border-t border-slate-100 px-3 py-2 text-xs text-slate-500">

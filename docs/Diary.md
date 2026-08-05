@@ -1,3 +1,19 @@
+## 2026-08-06 - `/locations`: вернули kind-чипы
+
+### Наблюдения
+- Owner screenshot SPB `/locations`: только logistics-чипы «Все точки / Причалы / Автобусы / Пешеходные» - парки, памятники, outdoor, gastro и т.д. пропали.
+- Root cause: `LocationsCatalogView` после `107369d` сделал logistics primary UX и спрятал `stats.types`.
+
+### Решения
+- Primary chips снова из `LOCATION_CATALOG_TYPE_OPTIONS` + `stats.types` (с fallback extras).
+- Logistics оставлены secondary quick-toggles без взаимного сброса `type`.
+- В options добавлен `meeting_point`. Deploy web не гоняли.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-06 - Home hero: ротация реальных событий афиши
 
 ### Наблюдения

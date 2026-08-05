@@ -231,6 +231,7 @@ export const CATALOG_TYPE_OPTIONS: Array<{ value: string; label: string; templat
   { value: 'sport_activity_space', label: 'Спорт / активность', template: 'location' },
   { value: 'attraction', label: 'Достопримечательность', template: 'location' },
   { value: 'gastro', label: 'Гастро', template: 'location' },
+  { value: 'meeting_point', label: 'Точка сбора', template: 'location' },
   { value: 'other', label: 'Другое', template: 'location' },
 ];
 
@@ -322,8 +323,9 @@ export function resolveLocationLogisticsGroup(type?: string | null, name?: strin
   return 'other';
 }
 
+/** Secondary quick-toggles on `/locations` - do not replace kind chips. */
 export const LOCATION_LOGISTICS_OPTIONS: Array<{ value: LocationLogisticsGroup | 'all'; label: string }> = [
-  { value: 'all', label: 'Все точки' },
+  { value: 'all', label: 'Любая логистика' },
   { value: 'pier', label: 'Причалы' },
   { value: 'bus', label: 'Автобусы' },
   { value: 'walking', label: 'Пешеходные' },

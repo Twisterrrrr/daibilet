@@ -14,6 +14,9 @@ describe('park + monument venue kinds', () => {
     const values = LOCATION_CATALOG_TYPE_OPTIONS.map((option) => option.value);
     assert.ok(values.includes('park'));
     assert.ok(values.includes('monument'));
+    assert.ok(values.includes('meeting_point'));
+    assert.ok(values.includes('gastro'));
+    assert.ok(values.includes('outdoor_location'));
   });
 
   it('labels and plurals are RU', () => {
