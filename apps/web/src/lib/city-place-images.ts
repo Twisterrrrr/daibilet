@@ -4,7 +4,8 @@
  * Same files feed Top-100 blog inlines (copied under /images/blog/spb-top-100-p*.jpg);
  * catalog/my-day use /images/venues/{city}/*.jpg and object-cover for aspect.
  * Nizhny pack: /images/venues/nizhny-novgorod/*.jpg
- * SPB pack: /images/venues/saint-petersburg/*.jpg (Top-100 + Главные)
+ * SPB pack: /images/venues/saint-petersburg/*.jpg (Главные 1-12 + мечеть;
+ * mass Top-100 AI stills live on disk but are intentionally unmapped).
  */
 
 const NIZHNY_NOVGOROD_IMAGES: Record<string, string> = {

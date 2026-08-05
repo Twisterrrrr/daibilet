@@ -13,6 +13,7 @@ import { catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from '@
 import { cityToGenitive, cityToPrepositional } from '@/lib/city-declension';
 import { formatCountFloorTenPlus, formatNumber, pluralCities } from '@/lib/format';
 import { persistSelectedCity, resolveCatalogCityFilter } from '@/lib/selected-city';
+import { toVenueCatalogCard } from '@/lib/venue-catalog-card';
 import type { VenueCatalogCard } from '@/lib/venue-map-types';
 import { LOCATION_CATALOG_TYPE_OPTIONS, normalizeVenueKind, resolvePublicVenueType, venueTypeLabel } from '@/lib/venue-meta';
 import { venueHref } from '@/lib/routes';
@@ -65,7 +66,10 @@ export function LocationsCatalogView({ venues: initialVenues }: { venues: VenueC
     fetch(`/api/public/venues?${params.toString()}`, { signal: controller.signal })
       .then(async (response) => (response.ok ? ((await response.json()) as { venues?: VenueCatalogCard[] }) : null))
       .then((data) => {
-        if (data?.venues?.length) setVenues(data.venues);
+        // API returns hub heroImageUrl; overlay editorial covers like SSR VenueListPage.
+        if (data?.venues?.length) {
+          setVenues(data.venues.map((item) => toVenueCatalogCard(item)));
+        }
       })
       .catch(() => undefined)
       .finally(() => setCatalogLoading(false));

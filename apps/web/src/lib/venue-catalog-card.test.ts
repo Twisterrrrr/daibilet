@@ -22,6 +22,35 @@ test('toVenueCatalogCard keeps hookFact for my-day picker cards', () => {
   assert.equal(card.heroImageUrl, '/k.jpg');
 });
 
+test('toVenueCatalogCard prefers editorial cover over hub stub', () => {
+  const card = toVenueCatalogCard({
+    id: 'venue_spb_square',
+    slug: 'saint-petersburg-dvortsovaya-ploschad',
+    name: 'Дворцовая площадь',
+    city: 'Санкт-Петербург',
+    type: 'outdoor_location',
+    events: 0,
+    heroImageUrl: '/images/venues/generated/venue-auto-stub.jpg',
+  });
+  assert.equal(
+    card.heroImageUrl,
+    '/images/venues/saint-petersburg/dvortsovaya-ploschad.jpg',
+  );
+});
+
+test('toVenueCatalogCard drops unmapped generated stubs', () => {
+  const card = toVenueCatalogCard({
+    id: 'venue_plain',
+    slug: 'some-unmapped-park',
+    name: 'Парк',
+    city: 'Санкт-Петербург',
+    type: 'park',
+    events: 0,
+    heroImageUrl: '/images/venues/generated/venue-auto-abc.jpg',
+  });
+  assert.equal(card.heroImageUrl, null);
+});
+
 test('toVenueCatalogCard keeps valid latitude/longitude for day-route', () => {
   const card = toVenueCatalogCard({
     id: 'venue_60b602fed94a1fa681b69c1d',

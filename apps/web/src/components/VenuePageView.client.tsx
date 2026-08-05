@@ -10,6 +10,7 @@ import { LocationVenueLayout } from '@/components/LocationVenueLayout.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { VenueAdmissionBlock } from '@/components/VenueAdmissionBlock';
 import type { PublicVenueDto, PublicVenuePageDto } from '@daibilet/contracts/public';
+import { resolveVenueHeroImage } from '@/lib/city-place-images';
 import { venueMatchesRouteSlug } from '@/lib/day-route';
 import { formatMoney, formatNumber } from '@/lib/format';
 import { formatStreetAddress } from '@/lib/address';
@@ -25,6 +26,15 @@ import {
 } from '@/lib/venue-program';
 import { venuePageTemplate } from '@/lib/venue-meta';
 import { eventHref } from '@/lib/routes';
+
+/** Match SSR VenueDetailPage: curated cover wins over hub stub / supplier thumb. */
+function withEditorialHero(payload: PublicVenuePageDto): PublicVenuePageDto {
+  const venue = payload.venue;
+  if (!venue) return payload;
+  const editorialHero = resolveVenueHeroImage(venue.slug, venue.heroImageUrl);
+  if (!editorialHero || editorialHero === venue.heroImageUrl) return payload;
+  return { ...payload, venue: { ...venue, heroImageUrl: editorialHero } };
+}
 
 function slugFromPathname(pathname: string | null | undefined): string {
   const path = String(pathname || '');
@@ -116,7 +126,7 @@ export function VenuePageView({
         if (!venueMatchesRouteSlug(data.venue, routeSlug)) {
           throw new Error('Страница не найдена');
         }
-        return data;
+        return withEditorialHero(data);
       })
       .then((data) => {
         setPayload(data);
