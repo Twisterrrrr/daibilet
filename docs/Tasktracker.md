@@ -1,6 +1,6 @@
 # Tasktracker — Daibilet
 
-**Обновлено:** 2026-08-04
+**Обновлено:** 2026-08-05
 **Источники:** [Project.md](./Project.md), [current-state.md](./current-state.md), [migration-spb-to-msk.md](./migration-spb-to-msk.md), [widget-etalon-slugs.md](./widget-etalon-slugs.md), [content-blog-plan.md](./content-blog-plan.md), [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brief.md), [mobile-templates.md](./mobile-templates.md), [catalog-location-venue-canon.md](./catalog-location-venue-canon.md)
 
 **Легенда:** ✅ done · 🔄 in progress · ⏳ todo · 🚫 blocked · ⚠️ deferred
@@ -84,6 +84,7 @@
 | MS.TIER4 | Phase C: второй город тем же шаблоном (Москва после СПб) | Средний | ⏳ |
 | MS.TIER5 | Phase 2 optional: `dayRoutePresets` / multi-day для MSK/SPB после стабильного широкого каталога | Низкий | ✅ СПб: 5 пеших кластеров с гастро-остановками, всегда видимый companion-гид и CTA планировщика только для маршрута с ≥3 разрешимыми точками |
 | MS.TIER6 | Гастро-пакет отдельно от landmarks (если нужно) - не смешивать в «Главные» | Низкий | ✅ СПб: 20 точек во вкладке «Гастрономические точки» |
+| MS.SPB-BRIDGES | Хаб СПб: справочный блок о разводе мостов с сезонным ориентиром, ссылкой на night-bridges и «Мой день» | Средний | ✅ `/cities/saint-petersburg` → `/saint-petersburg/night-bridges` |
 | MS.SUB2 | Seed entities: Стрелка ВО, Царское Село, Кронштадт (+ enrich) | Средний | ⏳ |
 
 ---

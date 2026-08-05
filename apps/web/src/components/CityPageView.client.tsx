@@ -346,6 +346,7 @@ export function CityPageView({
                   </p>
                 </div>
                 <CityTravelSection travel={guide?.travel} editorial={editorial} nested />
+                <CitySeasonalTip tip={guide?.seasonalTip} editorial={editorial} />
                 {hasFaq ? (
                   <CityFaqSection cityName={city.name} items={unifiedFaq} editorial={editorial} nested />
                 ) : null}
@@ -1925,6 +1926,43 @@ function CityTravelSection({
         </div>
       </div>
     </section>
+  );
+}
+
+function CitySeasonalTip({
+  tip,
+  editorial = false,
+}: {
+  tip?: CityInfoEntry['seasonalTip'];
+  editorial?: boolean;
+}) {
+  if (!tip) return null;
+  return (
+    <div className={`container-page py-2 sm:py-4 ${editorial ? 'bg-zinc-50' : 'bg-slate-50'}`}>
+      <aside
+        aria-label={tip.title}
+        className={`max-w-3xl rounded-xl border p-4 sm:p-5 ${
+          editorial ? 'border-zinc-200 bg-white' : 'border-sky-100 bg-white'
+        }`}
+      >
+        <h3 className={`text-base font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-950'}`}>{tip.title}</h3>
+        <p className={`mt-1.5 text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>{tip.description}</p>
+        <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-sm font-semibold">
+          <Link
+            href={tip.href}
+            className={editorial ? 'text-zinc-900 underline-offset-4 hover:underline' : 'text-primary-700 hover:text-primary-800'}
+          >
+            {tip.linkLabel} →
+          </Link>
+          <Link
+            href="/my-day?city=saint-petersburg"
+            className={editorial ? 'text-zinc-900 underline-offset-4 hover:underline' : 'text-primary-700 hover:text-primary-800'}
+          >
+            Собрать вечер в Мой день →
+          </Link>
+        </div>
+      </aside>
+    </div>
   );
 }
 
