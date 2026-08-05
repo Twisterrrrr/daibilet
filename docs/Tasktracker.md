@@ -20,6 +20,7 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
+| BLOG.HERO-SERIES-BR | Hero H1: перенос после точки перед «Часть N» для Top-100 / Beyond-Top-100 | Высокий | 🔄 commit+deploy |
 | BLOG.RESTORE-SPB-BARS | Вернуть owner-текст статьи «Барный Петербург» без SEO-переписывания, проверить реальные адреса, venue links, изображения и production Article | Критический | 🔄 локальный текст восстановлен, ожидаются sync, upsert и MSK deploy |
 
 ---
@@ -37,6 +38,7 @@
 | UX.BLOG3 | Blog hub chips river/tours + article reading progress | Высокий | ✅ `eae17f4` live **`BCWcAIglYC8cAP-6Zgr4k`** |
 | UX.BLOG3b | Sticky buy CTA + CMS product-card constructor + seed `[buy]` in articles | Средний | ⚠️ deferred (renderer exists; content 0 `[buy]`) |
 | FIX.BLOG-EMPTY | False «нет статей про {city}» banner while city filter has matches | Критический | ✅ `d393520` live BUILD **`8bCshKtFiFhBS9SzTqnaE`** |
+| FIX.BLOG-RELATED-ALIGN | «Читайте также»: top-align city label with thumb (`items-start`) | Высокий | 🔄 commit/deploy |
 
 ---
 

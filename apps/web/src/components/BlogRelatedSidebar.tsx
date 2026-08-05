@@ -60,8 +60,8 @@ export function BlogRelatedSidebar({
                 .join(' · ');
               return (
               <li key={post.slug}>
-                <Link href={`/blog/${post.slug}`} className="group flex gap-3">
-                  <div className="relative h-16 w-20 shrink-0 overflow-hidden bg-slate-100">
+                <Link href={`/blog/${post.slug}`} className="group flex items-start gap-3">
+                  <div className="relative size-16 shrink-0 self-start overflow-hidden bg-slate-100">
                     <SafeImage
                       src={post.coverImageUrl}
                       alt=""
@@ -71,13 +71,13 @@ export function BlogRelatedSidebar({
                       fallback={<div className="h-full w-full bg-gradient-to-br from-slate-200 to-slate-300" />}
                     />
                   </div>
-                  <div className="min-w-0">
+                  <div className="min-w-0 self-start pt-0">
                     {metaLabel ? (
-                      <p className="text-[10px] font-medium uppercase tracking-wider text-slate-500">
+                      <p className="m-0 text-[10px] font-medium uppercase leading-none tracking-wider text-slate-500">
                         {metaLabel}
                       </p>
                     ) : null}
-                    <h3 className="mt-0.5 line-clamp-3 font-display text-sm font-bold leading-snug text-slate-900 group-hover:text-primary-700">
+                    <h3 className="mt-1 line-clamp-3 font-display text-sm font-bold leading-snug text-slate-900 group-hover:text-primary-700">
                       {post.title}
                     </h3>
                   </div>

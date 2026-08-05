@@ -1,3 +1,30 @@
+## 2026-08-05 - Blog hero: перенос перед «Часть N» в сериях Top-100
+
+### Наблюдения
+- Owner: H1 Part 1 «Топ-100 мест Петербурга. Часть 1: …» ломался посередине фразы после точки - нужен осознанный перенос строки.
+
+### Решения
+- `splitBlogSeriesHeroTitle` в `blog-utils`: паттерн `…. Часть N:` → `<br />` в `BlogArticleHero` (web + legacy public).
+- Frontmatter `title` / SEO / карточки без изменений - совместимо с параллельной заменой body Part 1 из Downloads.
+
+### Проблемы
+- Нет.
+
+---
+
+## 2026-08-05 - Blog «Читайте также»: top-align thumb + label
+
+### Наблюдения
+- Owner screenshot: в сайдбаре related eyebrow «ГОРОД · …» визуально выше верха квадратного thumb.
+
+### Решения
+- `BlogRelatedSidebar`: ряд `items-start`, thumb `size-16 self-start`, meta `m-0 leading-none` без отступа сверху - верх лейбла и фото на одной линии.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-05 - Серия «Больше чем ТОП-100» (СПб), Parts 1-7
 
 ### Наблюдения
