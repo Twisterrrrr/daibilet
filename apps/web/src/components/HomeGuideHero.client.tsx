@@ -99,27 +99,27 @@ function HeroSlideCard({
   return (
     <Link
       href={href}
-      className="group relative flex h-full min-h-[200px] w-full flex-col overflow-hidden rounded-2xl bg-slate-800 text-white shadow-card sm:min-h-[240px] lg:min-h-[300px]"
+      className="group relative flex h-full min-h-[200px] w-full flex-col overflow-hidden rounded-2xl bg-slate-900 text-white shadow-card md:min-h-[240px] lg:min-h-[260px]"
     >
       <SafeImage
         src={slide.imageUrl}
         alt=""
         fill
         priority={priority}
-        sizes="(max-width: 1024px) 92vw, 60vw"
+        sizes="(max-width: 768px) 92vw, (max-width: 1024px) 66vw, 55vw"
         className="object-cover transition duration-500 group-hover:scale-[1.03]"
-        fallback={<div className="absolute inset-0 bg-gradient-to-br from-primary-700 via-sky-700 to-slate-900" />}
+        fallback={<div className="absolute inset-0 bg-gradient-to-br from-slate-900 to-neutral-800" />}
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-900/35 to-primary-900/10" />
-      <div className="relative z-[1] flex h-full min-h-[200px] flex-col justify-end p-5 sm:min-h-[240px] sm:p-6 lg:min-h-[300px] lg:p-8">
+      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/45 to-slate-900/10" />
+      <div className="relative z-[1] mt-auto flex flex-col justify-end p-5 sm:p-6 md:p-6 lg:p-7">
         <span className="inline-flex w-fit rounded-full bg-white/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-white backdrop-blur-sm">
           {slide.badge}
         </span>
-        <TitleTag className="mt-3 max-w-xl font-display text-2xl font-bold leading-tight tracking-tight text-white sm:text-3xl lg:text-4xl">
+        <TitleTag className="mt-3 max-w-xl font-display text-2xl font-bold leading-tight tracking-tight text-white sm:text-3xl md:text-[1.75rem] lg:text-3xl">
           {slide.title}
         </TitleTag>
-        <p className="mt-2 max-w-lg text-sm text-white/85 sm:text-base">{slide.subtitle}</p>
-        <span className="mt-5 inline-flex w-fit items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-primary-700 shadow-sm transition group-hover:bg-sky-50">
+        <p className="mt-2 max-w-lg text-sm text-white/85 sm:text-base md:text-sm lg:text-base">{slide.subtitle}</p>
+        <span className="mt-4 inline-flex w-fit items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-primary-700 shadow-sm transition group-hover:bg-sky-50 md:mt-5">
           {slide.ctaLabel}
           <ArrowRight className="h-4 w-4" aria-hidden />
         </span>
@@ -129,7 +129,7 @@ function HeroSlideCard({
 }
 
 /**
- * Personal-guide hero: desktop bento (event afisha carousel ~60% + Мой день ~40%) + category rail.
+ * Personal-guide hero: desktop bento (afisha carousel 2/3 + Мой день 1/3) + category rail.
  * Mobile: horizontal snap carousel of real events + compact my-day CTA (stories live above).
  */
 export function HomeGuideHero({ sessions, fingerprints }: HomeGuideHeroProps) {
@@ -208,25 +208,27 @@ export function HomeGuideHero({ sessions, fingerprints }: HomeGuideHeroProps) {
   };
 
   return (
-    <section className="border-b border-slate-100 bg-gradient-to-b from-sky-50/80 via-white to-white">
-      <div className="container-page py-4 sm:py-6 lg:py-8">
-        <div className="grid gap-3 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] lg:gap-4 lg:items-stretch">
-          {/* Featured event carousel ~60% */}
-          <div className="min-w-0">
+    <section className="border-b border-slate-200/70 bg-gradient-to-b from-sky-50/70 via-neutral-50 to-neutral-50">
+      <div className="container-page py-4 sm:py-5 md:py-6 lg:py-7">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-3 md:items-stretch md:gap-4">
+          {/* Featured event carousel - 2/3 on md+ */}
+          <div className="flex min-w-0 flex-col md:col-span-2 md:h-full">
             {safeSlides.length <= 1 ? (
               safeSlides[0] ? (
-                <HeroSlideCard
-                  slide={safeSlides[0]}
-                  href={slideHref(safeSlides[0], cityValue)}
-                  priority
-                  asHeading="h1"
-                />
+                <div className="min-h-[200px] flex-1 md:min-h-[240px] lg:min-h-[260px]">
+                  <HeroSlideCard
+                    slide={safeSlides[0]}
+                    href={slideHref(safeSlides[0], cityValue)}
+                    priority
+                    asHeading="h1"
+                  />
+                </div>
               ) : null
             ) : (
               <>
                 <div
                   ref={scrollerRef}
-                  className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                  className="flex min-h-[200px] flex-1 gap-3 overflow-x-auto snap-x snap-mandatory md:min-h-[240px] lg:min-h-[260px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
                   role="region"
                   aria-roledescription="carousel"
                   aria-label="Афиша событий"
@@ -234,7 +236,7 @@ export function HomeGuideHero({ sessions, fingerprints }: HomeGuideHeroProps) {
                   {safeSlides.map((slide, index) => (
                     <div
                       key={slide.id}
-                      className="w-[min(100%,calc(100%-1.25rem))] shrink-0 snap-start sm:w-[min(100%,calc(100%-1.5rem))] lg:w-full lg:shrink-0"
+                      className="w-[min(100%,calc(100%-1.25rem))] shrink-0 snap-start sm:w-[min(100%,calc(100%-1.5rem))] md:w-full md:shrink-0"
                       aria-roledescription="slide"
                       aria-label={`${index + 1} из ${safeSlides.length}`}
                     >
@@ -268,8 +270,8 @@ export function HomeGuideHero({ sessions, fingerprints }: HomeGuideHeroProps) {
             )}
           </div>
 
-          {/* My Day ~40% - desktop panel; mobile compact card below featured */}
-          <div className="relative flex flex-col justify-between overflow-hidden rounded-2xl bg-gradient-to-br from-primary-600 via-primary-600 to-sky-500 p-5 text-white shadow-card sm:p-6 lg:min-h-[300px] lg:p-7">
+          {/* My Day - 1/3 on md+, same stretch height as banner cell */}
+          <div className="relative flex flex-col justify-between overflow-hidden rounded-2xl bg-gradient-to-br from-primary-600 via-primary-600 to-sky-500 p-5 text-white shadow-card sm:p-6 md:col-span-1 md:h-full md:min-h-[240px] md:p-6 lg:min-h-[260px] lg:p-7">
             <div
               className="pointer-events-none absolute -right-8 -top-8 h-40 w-40 rounded-full bg-sky-300/25 blur-2xl"
               aria-hidden
@@ -280,16 +282,16 @@ export function HomeGuideHero({ sessions, fingerprints }: HomeGuideHeroProps) {
                 <Route className="h-3.5 w-3.5" aria-hidden />
                 Мой день
               </span>
-              <h2 className="mt-3 font-display text-xl font-bold leading-snug tracking-tight sm:text-2xl lg:text-[1.65rem]">
+              <h2 className="mt-3 font-display text-xl font-bold leading-snug tracking-tight sm:text-2xl md:text-xl lg:text-[1.55rem]">
                 {cityName
                   ? `Соберите маршрут в ${cityToPrepositional(cityName)}`
                   : 'Соберите свой день в городе'}
               </h2>
-              <p className="mt-2 text-sm text-white/85">
+              <p className="mt-2 text-sm text-white/85 md:text-[13px] lg:text-sm">
                 Музеи, прогулки и события по порядку - без хаоса в заметках.
               </p>
             </div>
-            <div className="relative z-[1] mt-5 flex flex-col gap-2 sm:mt-6">
+            <div className="relative z-[1] mt-5 flex flex-col gap-2 sm:mt-6 md:mt-auto md:pt-4">
               <Link
                 href={myDayHref}
                 className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-primary-700 shadow-sm transition hover:bg-sky-50"

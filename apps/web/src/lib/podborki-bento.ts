@@ -60,11 +60,11 @@ export function podborkiBentoSpan(item: PodborkiBentoItem): PodborkiBentoSpan {
 
 export function podborkiBentoCellClass(span: PodborkiBentoSpan): string {
   if (span === 2) {
-    return 'col-span-2 row-span-1 min-h-[12.5rem] sm:min-h-[14rem]';
+    return 'col-span-1 row-span-1 min-h-[12.5rem] md:col-span-2 md:min-h-[14rem]';
   }
-  return 'col-span-1 row-span-1 min-h-[11rem] sm:min-h-[12.5rem]';
+  return 'col-span-1 row-span-1 min-h-[11rem] md:min-h-[12.5rem]';
 }
 
-/** Tailwind grid shell for bento sections. */
+/** Tailwind grid shell for bento sections (home + /podborki). */
 export const PODBORKI_BENTO_GRID_CLASS =
-  'grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4 auto-rows-fr';
+  'grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4 lg:grid-cols-4 auto-rows-fr';

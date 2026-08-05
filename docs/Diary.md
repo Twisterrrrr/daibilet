@@ -14,6 +14,23 @@
 
 ---
 
+## 2026-08-06 - Home desktop: anti mobile-stretch
+
+### Наблюдения
+- Owner: mobile home ок; desktop - «mobile stretch» (50/50 hero, sausage cities, skinny blog strip, white gaps).
+
+### Решения
+- Hero: `md:grid-cols-3` - афиша-карусель `md:col-span-2` (image bg + overlay, компактнее) + Мой день `md:col-span-1` stretch; chips «Реки и каналы!» / «Бесплатно» без отката.
+- Cities: mobile snap сохранён; desktop `md:grid-cols-3 lg:grid-cols-6`.
+- Podborki: `grid-cols-1 md:grid-cols-2 lg:grid-cols-4`, gradient fallback `slate-900→neutral-800`, крупнее текст.
+- Blog side: `lg:flex-row` мини-карточки вместо вертикальной полосы.
+- Page: `bg-neutral-50`, белые карточки. Deploy не гоняли.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-06 - Home hero: ротация реальных событий афиши
 
 ### Наблюдения

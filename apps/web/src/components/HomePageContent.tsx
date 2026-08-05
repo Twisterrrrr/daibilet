@@ -66,14 +66,14 @@ async function HomePageBody() {
   const [featuredBlog, ...restBlog] = blogPosts;
 
   return (
-    <div className="pb-24 lg:pb-0">
+    <div className="bg-neutral-50 pb-24 lg:pb-0">
       <HomeStoriesStrip />
 
       <HomeGuideHero sessions={sessions} fingerprints={fingerprintsRecord} />
 
       {/* 2. Cities */}
       {topCities.length ? (
-        <section id="destinations" className="section-y border-b border-slate-100">
+        <section id="destinations" className="section-y border-b border-slate-200/70">
           <div className="container-page">
             <div className="flex items-end justify-between gap-4">
               <div>
@@ -87,7 +87,7 @@ async function HomePageBody() {
               </Link>
             </div>
             <ScrollRail
-              className="mt-6 sm:hidden"
+              className="mt-6 md:hidden"
               viewportClassName="flex flex-nowrap gap-3 snap-x snap-mandatory"
               aria-label="Популярные города"
             >
@@ -97,10 +97,10 @@ async function HomePageBody() {
                 </div>
               ))}
             </ScrollRail>
-            <ul className="mt-8 hidden grid-cols-2 gap-3 sm:grid sm:grid-cols-4 lg:grid-cols-6 sm:gap-4">
+            <ul className="mt-6 hidden gap-4 overflow-x-visible md:grid md:grid-cols-3 lg:grid-cols-6">
               {topCities.slice(0, 6).map((city) => (
                 <li key={city.slug || city.name}>
-                  <CityCard city={city} />
+                  <CityCard city={city} compact />
                 </li>
               ))}
             </ul>
@@ -117,9 +117,9 @@ async function HomePageBody() {
 
       {/* 4. Lucky city randomizer */}
       {cities.some((c) => c.events > 0) ? (
-        <section className="section-y bg-gradient-to-r from-primary-50/80 via-sky-50/60 to-white">
+        <section className="section-y">
           <div className="container-page">
-            <div className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-primary-100/80 bg-white/80 p-5 shadow-card sm:flex-row sm:items-center sm:p-6">
+            <div className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-primary-100/80 bg-white p-5 shadow-card sm:flex-row sm:items-center sm:p-6">
               <div className="flex items-start gap-3">
                 <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-500 to-sky-500 text-white shadow-sm">
                   <Dices className="h-5 w-5" aria-hidden />
@@ -165,23 +165,37 @@ async function HomePageBody() {
                   <li key={landing.slug} className={podborkiBentoCellClass(span)}>
                     <Link
                       href={landingCategoryHref(landing.slug)}
-                      className="group relative flex h-full min-h-[inherit] overflow-hidden rounded-card bg-slate-800 text-left text-white shadow-card transition duration-300 hover:-translate-y-0.5 hover:shadow-card-hover"
+                      className="group relative flex h-full min-h-[inherit] overflow-hidden rounded-card bg-gradient-to-br from-slate-900 to-neutral-800 text-left text-white shadow-card transition duration-300 hover:-translate-y-0.5 hover:shadow-card-hover"
                     >
                       <SafeImage
                         src={imageUrl}
                         alt=""
                         fill
-                        sizes={span === 2 ? '50vw' : '25vw'}
+                        sizes={span === 2 ? '(max-width: 1024px) 100vw, 50vw' : '(max-width: 1024px) 50vw, 25vw'}
                         className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-                        fallback={<div className="absolute inset-0 bg-gradient-to-br from-primary-800 via-sky-900 to-slate-950" />}
+                        fallback={<div className="absolute inset-0 bg-gradient-to-br from-slate-900 to-neutral-800" />}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-black/10" />
-                      <div className="relative z-[1] flex h-full w-full flex-col justify-end p-4 sm:p-5">
-                        <h3 className="text-base font-bold text-white sm:text-lg">{landing.title}</h3>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-transparent" />
+                      <div
+                        className={
+                          span === 2
+                            ? 'relative z-[1] flex h-full w-full flex-col justify-end p-5 sm:p-6 md:justify-center md:px-8'
+                            : 'relative z-[1] flex h-full w-full flex-col justify-end p-4 sm:p-5'
+                        }
+                      >
+                        <h3
+                          className={
+                            span === 2
+                              ? 'font-display text-xl font-bold leading-snug text-white sm:text-2xl lg:text-[1.65rem]'
+                              : 'font-display text-lg font-bold leading-snug text-white sm:text-xl'
+                          }
+                        >
+                          {landing.title}
+                        </h3>
                         {landing.subtitle ? (
-                          <p className="mt-1 line-clamp-2 text-sm text-white/90">{landing.subtitle}</p>
+                          <p className="mt-1.5 line-clamp-2 text-sm text-white/90 sm:text-[15px]">{landing.subtitle}</p>
                         ) : null}
-                        <div className="mt-3 text-sm font-semibold text-white">
+                        <div className="mt-3 text-sm font-semibold text-white/95">
                           {pluralEvents(landing.events)}
                           {landing.priceFrom != null ? ` · ${formatMoney(landing.priceFrom)}` : ''}
                         </div>
@@ -197,7 +211,7 @@ async function HomePageBody() {
 
       {/* 6. Blog magazine */}
       {featuredBlog ? (
-        <section id="blog" className="section-y bg-surface-muted">
+        <section id="blog" className="section-y">
           <div className="container-page">
             <div className="flex flex-wrap items-end justify-between gap-3">
               <div>
@@ -213,10 +227,10 @@ async function HomePageBody() {
                 Все материалы <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
-            <div className="mt-6 grid gap-4 lg:grid-cols-[1.2fr_1fr]">
+            <div className="mt-6 grid gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] lg:items-stretch">
               <Link
                 href={`/blog/${featuredBlog.slug}`}
-                className="group relative min-h-[240px] overflow-hidden rounded-card bg-slate-900 text-white shadow-card sm:min-h-[280px]"
+                className="group relative min-h-[240px] overflow-hidden rounded-card bg-slate-900 text-white shadow-card sm:min-h-[280px] lg:min-h-full"
               >
                 <SafeImage
                   src={featuredBlog.coverImageUrl}
@@ -234,14 +248,14 @@ async function HomePageBody() {
                   <p className="mt-2 line-clamp-2 text-sm text-white/85">{featuredBlog.excerpt}</p>
                 </div>
               </Link>
-              <div className="grid gap-4">
+              <div className="flex flex-col gap-3 sm:gap-4 lg:flex-row lg:items-stretch lg:gap-3">
                 {restBlog.slice(0, 3).map((post) => (
                   <Link
                     key={post.slug}
                     href={`/blog/${post.slug}`}
-                    className="group flex gap-4 rounded-card bg-white p-4 shadow-card transition duration-300 hover:-translate-y-0.5 hover:shadow-card-hover"
+                    className="group flex gap-4 rounded-card bg-white p-4 shadow-card transition duration-300 hover:-translate-y-0.5 hover:shadow-card-hover lg:min-w-0 lg:flex-1 lg:flex-col lg:gap-2.5 lg:p-3"
                   >
-                    <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-slate-200">
+                    <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-slate-200 lg:aspect-[4/3] lg:h-auto lg:w-full">
                       <SafeImage
                         src={post.coverImageUrl}
                         alt=""
@@ -252,10 +266,10 @@ async function HomePageBody() {
                     </div>
                     <div className="min-w-0">
                       <p className="text-xs font-semibold uppercase tracking-wide text-primary-600">{post.tag}</p>
-                      <h3 className="mt-1 line-clamp-2 text-sm font-semibold text-slate-900 group-hover:text-primary-700">
+                      <h3 className="mt-1 line-clamp-2 text-sm font-semibold text-slate-900 group-hover:text-primary-700 lg:text-[13px] lg:leading-snug">
                         {post.title}
                       </h3>
-                      <p className="mt-1 line-clamp-2 text-xs text-slate-500">{post.excerpt}</p>
+                      <p className="mt-1 line-clamp-2 text-xs text-slate-500 lg:line-clamp-3">{post.excerpt}</p>
                     </div>
                   </Link>
                 ))}
@@ -268,7 +282,7 @@ async function HomePageBody() {
       {/* 7. Trust strip - live counts only, no fake reviews */}
       <section className="section-y">
         <div className="container-page">
-          <div className="flex flex-col gap-4 rounded-2xl border border-slate-100 bg-gradient-to-r from-primary-50/50 via-white to-sky-50/40 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8 sm:py-6">
+          <div className="flex flex-col gap-4 rounded-2xl border border-slate-200/80 bg-white px-5 py-5 shadow-card sm:flex-row sm:items-center sm:justify-between sm:px-8 sm:py-6">
             <p className="text-sm font-medium text-slate-600 sm:max-w-xs">
               Живая афиша по России - события, города и маршруты в одном гиде
             </p>
