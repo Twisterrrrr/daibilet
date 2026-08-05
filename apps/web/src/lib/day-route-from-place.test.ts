@@ -295,6 +295,20 @@ test('dayRouteItemFromMustSee returns null without slug or match', () => {
   );
 });
 
+test('dayRouteItemFromMustSee suburb stub without slug still pins to route', () => {
+  const item = dayRouteItemFromMustSee(
+    { name: 'Якорная площадь', desc: 'Главная площадь Кронштадта.' },
+    venues,
+    city,
+    { isSuburb: true },
+  );
+  assert.ok(item);
+  assert.equal(item!.title, 'Якорная площадь');
+  assert.equal(item!.id, 'suburb:yakornaya-ploschad');
+  assert.equal(item!.slug, null);
+  assert.equal(item!.isSuburb, true);
+});
+
 test('dayRouteItemFromMustSee does not glue SPB mosque to MTS Live Hall', () => {
   const mts = {
     id: 'venue_mts',

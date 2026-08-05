@@ -12,7 +12,7 @@ import {
   type DayRouteVenueItem,
 } from './day-route';
 import { isValidCoordinatePair } from './day-route-score';
-import { eventHref, venueHref } from './routes';
+import { eventHref, transliterateSlug, venueHref } from './routes';
 
 /** Default preset fills toward soft density guideline. */
 export const DAY_ROUTE_PRESET_SIZE = DAY_ROUTE_SOFT;
@@ -174,7 +174,7 @@ function coordsFromPlace(
   return coordsFromVenue(lookupEditorialPlaceCoords(slug));
 }
 
-/** Must-see / sight → day-route item when slug or venue match exists. */
+/** Must-see / sight → day-route item when slug, venue match, or suburb editorial stub exists. */
 export function dayRouteItemFromMustSee(
   place: CityMustSeeItem,
   venues: DayRouteVenueMatchSource[],
@@ -184,7 +184,16 @@ export function dayRouteItemFromMustSee(
   const matched = findVenueForPlace(place, venues);
   const slug = pickPlaceSlug(place) || String(matched?.slug || '').trim() || null;
   const editorialId = String(place.dayRouteId || '').trim();
-  const id = String(matched?.id || slug || editorialId).trim();
+  // Significant-suburb nested POIs often lack catalog slug; still allow «В маршрут»
+  // via a stable editorial id so every listed point can be pinned.
+  const suburbStubId =
+    options.isSuburb && !matched && !slug && !editorialId
+      ? (() => {
+          const key = transliterateSlug(place.name);
+          return key ? `suburb:${key}` : '';
+        })()
+      : '';
+  const id = String(matched?.id || slug || editorialId || suburbStubId).trim();
   if (!id) return null;
 
   const href =

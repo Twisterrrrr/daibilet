@@ -1326,7 +1326,7 @@ function CitySignificantSuburbsBlock({
 
   return (
     <div className="mt-10" data-city-significant-suburbs>
-      <h3
+      <h2
         className={
           editorial
             ? 'font-serif text-2xl font-semibold text-zinc-950 sm:text-3xl'
@@ -1334,9 +1334,9 @@ function CitySignificantSuburbsBlock({
         }
       >
         Значимые пригороды {cityGenitive}
-      </h3>
+      </h2>
       <p className={`mt-1.5 text-sm ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-        Day-trip рядом с городом - отдельные мини-локации и точки внутри них.
+        Поездка на день рядом с городом - отдельные мини-локации и точки внутри них.
       </p>
       {/* One suburb per snap screen: mobile ~92% + peek; desktop full-bleed card + arrows. */}
       <div className="relative mt-5">
@@ -1404,17 +1404,21 @@ function CitySignificantSuburbsBlock({
                         Станция: {place.stationName}
                       </p>
                     ) : null}
-                    {placeHref ? (
-                      <Link
-                        href={placeHref}
-                        className={`${titleClass} mt-0.5 break-words underline decoration-slate-300 underline-offset-2 hover:decoration-current`}
-                        data-city-suburb-title
-                      >
-                        {place.name}
-                      </Link>
-                    ) : (
-                      <div className={`${titleClass} mt-0.5 break-words`}>{place.name}</div>
-                    )}
+                    <h3
+                      className={`${titleClass} mt-0.5 break-words`}
+                      data-city-suburb-title
+                    >
+                      {placeHref ? (
+                        <Link
+                          href={placeHref}
+                          className="underline decoration-slate-300 underline-offset-2 hover:decoration-current"
+                        >
+                          {place.name}
+                        </Link>
+                      ) : (
+                        place.name
+                      )}
+                    </h3>
                     {blurb ? (
                       <p
                         className={`mt-1.5 text-sm leading-6 break-words ${
@@ -1430,8 +1434,8 @@ function CitySignificantSuburbsBlock({
                       </p>
                     ) : null}
                     {nested.length ? (
-                      <ul
-                        className={`mt-3 space-y-2 border-t pt-3 ${
+                      <ol
+                        className={`mt-3 list-decimal space-y-2 border-t pt-3 pl-5 ${
                           editorial ? 'border-zinc-100' : 'border-slate-100'
                         }`}
                         data-city-suburb-places
@@ -1451,18 +1455,13 @@ function CitySignificantSuburbsBlock({
                           return (
                             <li
                               key={`${poi.name}:${poiIndex}`}
-                              className="text-sm leading-5"
+                              className={`text-sm leading-5 ${
+                                editorial ? 'marker:text-zinc-500' : 'marker:text-slate-500'
+                              }`}
                               data-city-suburb-place
                             >
                               <div className="flex flex-wrap items-start justify-between gap-x-2 gap-y-1">
                                 <div className="min-w-0 flex-1">
-                                  <span
-                                    className={`mr-1.5 inline-flex rounded-full px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide ${
-                                      editorial ? 'bg-zinc-100 text-zinc-500' : 'bg-primary-50 text-primary-700'
-                                    }`}
-                                  >
-                                    Пригород
-                                  </span>
                                   {poiHref ? (
                                     <Link
                                       href={poiHref}
@@ -1499,7 +1498,7 @@ function CitySignificantSuburbsBlock({
                             </li>
                           );
                         })}
-                      </ul>
+                      </ol>
                     ) : null}
                     {dayRouteItem ? (
                       <div className="mt-3">
