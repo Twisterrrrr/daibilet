@@ -1,3 +1,21 @@
+## 2026-08-05 - KGD city mustSee → каталог /locations|/venues
+
+### Наблюдения
+- Owner: «все локации Калининграда по ходу так и не доехали в каталог».
+- Live API: ~9 `family=location`, ~16-17 `family=institution` для kaliningrad. Owner pack KGD-001…011 закрыл только узкий набор; в `cityInfo.mustSee` 35 точек, из них wired было 5, остальные hub-only.
+- Парки / ворота / храмы / outdoor без Venue не попадали в `/locations`; музеи без seed - не в `/venues`.
+
+### Решения
+- Канон-пакет `scripts/data/must-see-editorial-kaliningrad-city.json` (24 city places) + merge в `must-see-editorial.json`; slug wiring в web/public `cityInfo`.
+- Виды: музеи → `MUSEUM_ART_SPACE` (/venues); кирха Св. Семейства → `CONCERT_HALL` (филармония); парки/озера/зоопарк → `PARK`; памятники → `MONUMENT`; ворота/храмы/районы/Дом Советов → `OUTDOOR_LOCATION`.
+- Hub-only намеренно: 5 gastro (нет owner-verified FOOD-строк, в отличие от SPB) + «Здание Кёнигсбергской биржи» (антидубль здания музея ИЗО).
+- SignificantSuburbs не раздуваем в city-каталог сверх уже seeded POI. Apply на MSK через `enrich-must-see-editorial.js --apply --file=...`.
+
+### Проблемы
+- Hub title-links на новые slug требуют web deploy (batch / «выкатывай»). Каталог listing - после MSK DB seed + API cache.
+
+---
+
 ## 2026-08-05 - My Day: мечеть ← МТС Live Hall (ложный name-match)
 
 ### Наблюдения
