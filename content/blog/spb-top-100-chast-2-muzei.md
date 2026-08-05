@@ -24,7 +24,7 @@ status: PUBLISHED
 
 ## Абсолютная классика: хранители мирового наследия
 
-### 16. [Русский музей](/venues/saint-petersburg-russkiy-muzey) (Михайловский дворец)
+### 16. [Русский музей](/locations/russkiy-muzey-c5b60f6c6057) (Михайловский дворец)
 
 **Главное хранилище русской души**
 
@@ -84,7 +84,7 @@ status: PUBLISHED
 
 ## Кабинеты редкостей и загадки науки
 
-### 19. [Кунсткамера](/locations/saint-petersburg-kunstkamera)
+### 19. [Кунсткамера](/locations/kunstkamera-7781ff68ac5a)
 
 **Петровский шок и этнографические сокровища**
 
