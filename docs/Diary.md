@@ -33,6 +33,22 @@
 
 ---
 
+## 2026-08-05 - Outdoor vs Attraction: здания не «Открытая локация»
+
+### Наблюдения
+- Чип `/locations?type=outdoor_location` в СПб показывал особняки, дворцы, Адмиралтейство - это здания, не открытый уличный доступ.
+- Маппинг: UI `outdoor_location` ← Prisma `OUTDOOR_LOCATION` («Открытая локация»); `attraction` ← `ATTRACTION` («Достопримечательность»). Stored kind побеждает в `resolvePublicVenueKind`.
+
+### Решения
+- Канон: outdoor = улица/мост/набережная/площадь/ворота/открытый комплекс; здания → `ATTRACTION`.
+- Эвристики: `scripts/lib/venue-kind-heuristics.js` + `scripts/reclassify-outdoor-buildings.js`; seed/enrich must-see переведены на общий infer.
+- MSK DB: 41 row (SPB 33 + KGD 8): 39→ATTRACTION, 1→MONUMENT (Медный всадник), 1→PARK (Танцующий лес). API restart. Web deploy не нужен.
+
+### Проблемы
+- Нет. Живые outdoors (Дворцовая площадь, мосты, набережные, ворота KGD) остались `OUTDOOR_LOCATION`.
+
+---
+
 ## 2026-08-05 - KGD gastro → каталог /locations (owner override)
 
 ### Наблюдения

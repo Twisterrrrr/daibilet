@@ -362,28 +362,10 @@ function parseMustSee(source) {
   return rows;
 }
 
+const { inferMustSeeKindAndFamily } = require('./lib/venue-kind-heuristics');
+
 function inferKindAndFamily(name) {
-  const n = String(name || '').toLowerCase();
-  if (/парк|сад\b|эспланад|зарядье|вднх|петергоф|монрепо|витославлиц/.test(n)) {
-    return { kind: 'PARK', family: 'location', confident: true };
-  }
-  if (/памятник|скульптур|бюст|голова ленина|тысячелетие россии/.test(n)) {
-    return { kind: 'MONUMENT', family: 'location', confident: true };
-  }
-  if (/театр|оперн|балет|маска/.test(n)) {
-    return { kind: 'THEATER', family: 'institution', confident: true };
-  }
-  if (/музей|галере|эрмитаж|третьяков|дацан|хохловк|арт[-\s]?пространств/.test(n)) {
-    return { kind: 'MUSEUM_ART_SPACE', family: 'institution', confident: true };
-  }
-  if (
-    /набережн|площад|кремл|крепост|собор|храм|улиц|рынок|склад|мост|лестниц|остров|фонтан|ситі|сити|стрелка|дворищ|городищ|канал|дворц/.test(
-      n,
-    )
-  ) {
-    return { kind: 'OUTDOOR_LOCATION', family: 'location', confident: true };
-  }
-  return { kind: 'OUTDOOR_LOCATION', family: 'location', confident: false };
+  return inferMustSeeKindAndFamily(name);
 }
 
 async function upsertVenue(pool, venue) {

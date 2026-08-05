@@ -649,48 +649,10 @@ async function insertVenue(pool, ctx) {
   );
 }
 
+const { inferMustSeeKindAndFamily } = require('./lib/venue-kind-heuristics');
+
 function inferKindAndFamily(name, item = null) {
-  if (item && item.kind) {
-    const family =
-      item.familyHint ||
-      (['MUSEUM_ART_SPACE', 'THEATER', 'CONCERT_HALL', 'CLUB_BAR_RESTAURANT', 'VENUE'].includes(
-        item.kind,
-      )
-        ? 'institution'
-        : 'location');
-    return { kind: item.kind, family };
-  }
-  const n = String(name || '').toLowerCase();
-  if (/кафе|ресторан|бар|трактир|пельмен|пицц|гастро|кофе/.test(n)) {
-    return { kind: 'CLUB_BAR_RESTAURANT', family: 'institution' };
-  }
-  if (/парк|сад\b|эспланад|зарядье|вднх|петергоф|столб|зоопарк|академгородок|хутор|лесопарк/.test(n)) {
-    return { kind: 'PARK', family: 'location' };
-  }
-  if (/памятник|скульптур|бюст|катер/.test(n)) {
-    return { kind: 'MONUMENT', family: 'location' };
-  }
-  if (/театр|оперн|балет|новат/.test(n)) {
-    return { kind: 'THEATER', family: 'institution' };
-  }
-  if (
-    /музей|галере|эрмитаж|третьяков|пряник|оружия|ельцин|погребаль|суриков|пароход|комбинат|октава|космическ|арсенал|гцси/.test(
-      n,
-    )
-  ) {
-    return { kind: 'MUSEUM_ART_SPACE', family: 'institution' };
-  }
-  if (
-    /набережн|площад|кремл|крепост|собор|храм|церков|монастыр|улиц|мост|лестниц|остров|фонтан|сити|стрелка|ворот|башня|костёл|костел|бункер|часовн|деревн|коса|плотн|городок|кластер|пакгауз|ярмарк|усадьб|палат|вокзал|домик|банк/.test(
-      n,
-    )
-  ) {
-    return { kind: 'OUTDOOR_LOCATION', family: 'location' };
-  }
-  if (item && item.familyHint === 'institution') {
-    return { kind: 'VENUE', family: 'institution' };
-  }
-  return { kind: 'OUTDOOR_LOCATION', family: 'location' };
+  return inferMustSeeKindAndFamily(name, item);
 }
 
 async function resolveCity(pool, cache, cityKey) {
