@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 /**
- * Reclassify Venue rows wrongly stored as OUTDOOR_LOCATION that are buildings
- * → ATTRACTION (or MONUMENT/PARK when clear).
+ * Reclassify Venue rows wrongly stored as OUTDOOR_LOCATION
+ * → ATTRACTION / PARK / MONUMENT / GASTRO / PIER / MEETING_POINT.
  *
- * Owner rule: outdoor = street/bridge/open access; buildings = attraction.
+ * Owner rule: outdoor = street/bridge/open access only.
  *
  * Usage:
  *   node scripts/reclassify-outdoor-buildings.js --dry-run
  *   node scripts/reclassify-outdoor-buildings.js --apply
+ *   node scripts/reclassify-outdoor-buildings.js --apply --cities=all
  *   node scripts/reclassify-outdoor-buildings.js --apply --cities=saint-petersburg,kaliningrad
  */
 const path = require('path');
@@ -22,13 +23,8 @@ const { Pool } = requireFromDbPackage('pg');
 
 const APPLY = process.argv.includes('--apply');
 const citiesArg = process.argv.find((a) => a.startsWith('--cities='));
-const CITY_FILTER = citiesArg
-  ? citiesArg
-      .slice('--cities='.length)
-      .split(',')
-      .map((s) => s.trim().toLowerCase())
-      .filter(Boolean)
-  : ['saint-petersburg', 'kaliningrad', 'санкт-петербург', 'калининград'];
+const CITY_FILTER_RAW = citiesArg ? citiesArg.slice('--cities='.length).trim() : 'all';
+const ALL_CITIES = CITY_FILTER_RAW === 'all' || CITY_FILTER_RAW === '*';
 
 const CITY_SLUG_EXPAND = {
   'saint-petersburg': ['saint-petersburg', 'санкт-петербург', 'sankt-peterburg', 'spb'],
@@ -64,9 +60,27 @@ async function main() {
     max: 1,
   });
 
-  const citySlugs = expandCitySlugs(CITY_FILTER);
-  const { rows } = await pool.query(
-    `
+  let rows;
+  if (ALL_CITIES) {
+    const r = await pool.query(`
+      SELECT v.id, v.slug, v.title, v.kind::text AS kind, c.slug AS city_slug
+      FROM "Venue" v
+      JOIN "City" c ON c.id = v."cityId"
+      WHERE v.kind = 'OUTDOOR_LOCATION'::"VenueKind"
+        AND v."pageStatus" IN ('PUBLISHED'::"VenuePageStatus", 'CANDIDATE'::"VenuePageStatus")
+      ORDER BY c.slug, v.title
+    `);
+    rows = r.rows;
+  } else {
+    const list =
+      CITY_FILTER_RAW.length > 0
+        ? CITY_FILTER_RAW.split(',')
+            .map((s) => s.trim().toLowerCase())
+            .filter(Boolean)
+        : ['saint-petersburg', 'kaliningrad'];
+    const citySlugs = expandCitySlugs(list);
+    const r = await pool.query(
+      `
       SELECT v.id, v.slug, v.title, v.kind::text AS kind, c.slug AS city_slug
       FROM "Venue" v
       JOIN "City" c ON c.id = v."cityId"
@@ -75,18 +89,23 @@ async function main() {
         AND lower(c.slug) = ANY($1::text[])
       ORDER BY c.slug, v.title
     `,
-    [citySlugs],
-  );
+      [citySlugs],
+    );
+    rows = r.rows;
+  }
 
   const moves = [];
+  const byKind = Object.create(null);
   for (const row of rows) {
     const next = reclassifyOutdoorBuilding(row.title, row.slug);
     if (!next || next === row.kind) continue;
     moves.push({ ...row, nextKind: next });
+    byKind[next] = (byKind[next] || 0) + 1;
   }
 
   console.log(`outdoor rows scanned: ${rows.length}`);
   console.log(`to reclassify: ${moves.length}`);
+  console.log('by target kind:', JSON.stringify(byKind));
   for (const m of moves) {
     console.log(`${m.city_slug} | ${m.kind} → ${m.nextKind} | ${m.slug} | ${m.title}`);
   }

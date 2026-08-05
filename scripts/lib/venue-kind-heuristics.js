@@ -1,10 +1,11 @@
 /**
- * Owner product rule (2026-08-05):
- * - OUTDOOR_LOCATION = street / bridge / square / embankment / open street access
- * - Buildings (palace, mansion, cathedral, fortress, …) → ATTRACTION
- * - Parks → PARK; monuments → MONUMENT; museums → MUSEUM_ART_SPACE
+ * Owner product rules (2026-08-05):
+ * - OUTDOOR_LOCATION = street / bridge / square / embankment / open street access only
+ * - Buildings → ATTRACTION; parks → PARK; monuments → MONUMENT; museums → MUSEUM_ART_SPACE
+ * - Cafe/restaurant/bar on /locations → GASTRO (not CLUB_BAR_RESTAURANT / not outdoor)
+ * - Pier / bus boarding → PIER / MEETING_POINT
  *
- * Shared by must-see seed/enrich and outdoor→attraction reclassify.
+ * Shared by must-see seed/enrich and outdoor→* / gastro reclassify scripts.
  */
 
 'use strict';
@@ -13,7 +14,7 @@
 const W = String.raw`(?<![\p{L}\p{N}_])`;
 const WEND = String.raw`(?![\p{L}\p{N}_])`;
 
-/** True open-air / street-access places (stay OUTDOOR_LOCATION when not park/monument). */
+/** True open-air / street-access places (stay OUTDOOR_LOCATION when not park/monument/building). */
 const TRUE_OUTDOOR_RE = new RegExp(
   [
     'набережн',
@@ -45,6 +46,14 @@ const TRUE_OUTDOOR_RE = new RegExp(
     'рыбн(?:ая|ой)\\s+деревн',
     `${W}остров${WEND}`,
     `${W}порт${WEND}`,
+    'арбат',
+    'плотинк',
+    'слобод',
+    'квартал',
+    'городищ',
+    'писаниц',
+    'петроглиф',
+    'курган(?!ский)',
   ].join('|'),
   'iu',
 );
@@ -68,8 +77,11 @@ const BUILDING_ATTRACTION_RE = new RegExp(
     'доходн(?:ый|ого)\\s+дом',
     'толстовск(?:ий|ого)\\s+дом',
     'дом\\s+советов',
+    'дом\\s+павлова',
     'лицей',
     'крепост',
+    'кремл',
+    'детинец',
     `${W}форт${WEND}`,
     'башня',
     'павильон',
@@ -78,7 +90,7 @@ const BUILDING_ATTRACTION_RE = new RegExp(
     'мавзоле',
     'резиденц',
     'усадьб',
-    'палат[аы]',
+    'палат[аык]',
     'лофт',
     'смотр(?:овая|овой)',
     'лахта\\s*центр',
@@ -95,6 +107,20 @@ const BUILDING_ATTRACTION_RE = new RegExp(
     'спас\\s+на\\s+крови',
     'мечет',
     'синагог',
+    'гостиный\\s+двор',
+    'гостиные\\s+ряды',
+    'торговые\\s+ряды',
+    'завод',
+    'мельниц',
+    'каланч',
+    'терем',
+    'океанариум',
+    'маяк',
+    'водонапорн',
+    'ледокол',
+    'фуникул',
+    'метротрам',
+    'гэс',
   ].join('|'),
   'iu',
 );
@@ -111,19 +137,68 @@ const PARK_RE = new RegExp(
     'витославлиц',
     'зоопарк',
     'лесопарк',
+    'ботаническ',
+    'заповедник',
     'танцующ(?:ий|его)\\s+лес',
+    'соснов(?:ый|ого)\\s+бор',
   ].join('|'),
   'iu',
 );
 
-const MONUMENT_RE = /памятник|скульптур|бюст|медн(?:ый|ого)\s+всадник|голова ленина|тысячелетие россии/i;
+const MONUMENT_RE =
+  /памятник|скульптур|бюст|монумент|мемориал|медн(?:ый|ого)\s+всадник|голова ленина|тысячелетие россии|колонн/i;
 
 const MUSEUM_RE =
   /музей|галере|эрмитаж|третьяков|дацан|хохловк|арт[-\s]?пространств|кунсткамер/i;
 
 const THEATER_RE = /театр|оперн|балет|маска|новат/i;
 
-const GASTRO_RE = /кафе|ресторан|бар|трактир|пельмен|пицц|гастро|кофе|пышечн|пышк/i;
+const PIER_RE = /причал|пристань|дебаркадер|причальн/i;
+
+const BUS_STOP_RE =
+  /автобус|автовокзал|место посадки|точка посадки|посадк(?:а|и)\s+на\s+автобус|автобусн(?:ая|ый)\s+(?:остановк|площадк)/i;
+
+/**
+ * Gastro on /locations. Avoid false positives:
+ * - кафедральный / кафедра…
+ * - …барова / …барский as part of street names (use word-edge бар)
+ */
+const GASTRO_RE = new RegExp(
+  [
+    `${W}кафе(?!драл)`,
+    'ресторан',
+    `${W}бар${WEND}`,
+    'гастробар',
+    'гастроном',
+    'пышечн',
+    `${W}пышк`,
+    'кофейн',
+    `${W}кофе${WEND}`,
+    'трактир',
+    'пиццери',
+    'пельменн',
+    'кондитер',
+    'рюмочн',
+    'бистро',
+    'фудмолл',
+    'фудкорт',
+    'пекарн',
+    'булочн',
+    'чебуречн',
+    'спикизи',
+    'гастробар',
+    'стейк[\\s-]?хаус',
+    `${W}паб${WEND}`,
+    `${W}pub${WEND}`,
+    'restaurant',
+    `${W}cafe${WEND}`,
+    `${W}bar${WEND}`,
+  ].join('|'),
+  'iu',
+);
+
+/** Markets / food halls that are tourist gastro points on locations (not true outdoor). */
+const GASTRO_MARKET_RE = /(?:рынок|фудмолл|фудкорт|гастрономическ)/i;
 
 /**
  * Infer Prisma VenueKind for must-see / content places.
@@ -145,8 +220,16 @@ function inferMustSeeKindAndFamily(name, item = null) {
 
   const n = String(name || '').toLowerCase();
 
+  // Explicit institution gastro (events / venue catalog) stays CLUB_BAR.
   if (GASTRO_RE.test(n) && item && item.familyHint === 'institution') {
     return { kind: 'CLUB_BAR_RESTAURANT', family: 'institution', confident: true };
+  }
+
+  if (PIER_RE.test(n)) {
+    return { kind: 'PIER', family: 'location', confident: true };
+  }
+  if (BUS_STOP_RE.test(n)) {
+    return { kind: 'MEETING_POINT', family: 'location', confident: true };
   }
 
   if (PARK_RE.test(n) && !/парковк/i.test(n)) {
@@ -162,6 +245,11 @@ function inferMustSeeKindAndFamily(name, item = null) {
     return { kind: 'MUSEUM_ART_SPACE', family: 'institution', confident: true };
   }
 
+  // Tourist gastro on locations catalog → GASTRO (owner 2026-08-05).
+  if (GASTRO_RE.test(n) || (GASTRO_MARKET_RE.test(n) && /рынок|фуд/i.test(n))) {
+    return { kind: 'GASTRO', family: 'location', confident: true };
+  }
+
   // Buildings before outdoor: «Дворцовый мост» stays outdoor via TRUE_OUTDOOR; «Мраморный дворец» → attraction.
   if (BUILDING_ATTRACTION_RE.test(n) && !TRUE_OUTDOOR_RE.test(n)) {
     return { kind: 'ATTRACTION', family: 'location', confident: true };
@@ -169,7 +257,7 @@ function inferMustSeeKindAndFamily(name, item = null) {
 
   // Palace/cathedral even when outdoor tokens absent; exclude дворцовая площадь/наб/мост.
   if (
-    /(?:^|[\s«"'(])(?:особняк|дворец|замок|собор|храм|церковь|монастырь|адмиралтейство|крепость|кирха|костёл|костел)(?:[\s"'»),!.]|$)/i.test(
+    /(?:^|[\s«"'(])(?:особняк|дворец|замок|собор|храм|церковь|монастырь|адмиралтейство|крепость|кремль|кирха|костёл|костел)(?:[\s"'»),!.]|$)/i.test(
       n,
     ) &&
     !/дворцов(?:ая|ый|ого|ую)\s+(?:площад|набережн|мост)/i.test(n)
@@ -177,13 +265,20 @@ function inferMustSeeKindAndFamily(name, item = null) {
     return { kind: 'ATTRACTION', family: 'location', confident: true };
   }
 
-  if (TRUE_OUTDOOR_RE.test(n)) {
-    return { kind: 'OUTDOOR_LOCATION', family: 'location', confident: true };
+  // Building + outdoor token (e.g. «Караульная гора и часовня») → attraction when building wins.
+  if (BUILDING_ATTRACTION_RE.test(n) && TRUE_OUTDOOR_RE.test(n)) {
+    // Prefer outdoor only when outdoor token is the primary noun (площадь/мост/улица/наб as head).
+    if (
+      /^(?:.*\s)?(?:площад|набережн|мост|улиц|проспект|просп\.|ворота|бульвар|сквер)\w*\s*$/i.test(n) ||
+      /дворцов(?:ая|ый|ого|ую)\s+(?:площад|набережн|мост)/i.test(n)
+    ) {
+      return { kind: 'OUTDOOR_LOCATION', family: 'location', confident: true };
+    }
+    return { kind: 'ATTRACTION', family: 'location', confident: true };
   }
 
-  // Tourist gastro on locations catalog (KGD override pattern) → ATTRACTION, not outdoor.
-  if (GASTRO_RE.test(n)) {
-    return { kind: 'ATTRACTION', family: 'location', confident: false };
+  if (TRUE_OUTDOOR_RE.test(n)) {
+    return { kind: 'OUTDOOR_LOCATION', family: 'location', confident: true };
   }
 
   if (item && item.familyHint === 'institution') {
@@ -195,30 +290,56 @@ function inferMustSeeKindAndFamily(name, item = null) {
 }
 
 /**
- * If stored OUTDOOR_LOCATION is clearly a building, return target kind; else null.
+ * If stored OUTDOOR_LOCATION should be another kind, return target; else null.
  * @param {string} title
  * @param {string} [slug]
- * @returns {'ATTRACTION' | 'MONUMENT' | 'PARK' | 'MUSEUM_ART_SPACE' | null}
+ * @returns {'ATTRACTION'|'MONUMENT'|'PARK'|'MUSEUM_ART_SPACE'|'GASTRO'|'PIER'|'MEETING_POINT'|null}
  */
 function reclassifyOutdoorBuilding(title, slug = '') {
   const text = `${title || ''} ${slug || ''}`.toLowerCase();
   if (!text.trim()) return null;
 
-  // Keep true outdoors even if name contains «дворц…» (Дворцовая площадь / набережная / мост).
-  if (TRUE_OUTDOOR_RE.test(text) && !BUILDING_ATTRACTION_RE.test(text) && !MONUMENT_RE.test(text)) {
-    return null;
-  }
+  if (PIER_RE.test(text)) return 'PIER';
+  if (BUS_STOP_RE.test(text)) return 'MEETING_POINT';
 
-  if (PARK_RE.test(text) && !BUILDING_ATTRACTION_RE.test(text)) return 'PARK';
-  if (MONUMENT_RE.test(text)) return 'MONUMENT';
+  if (GASTRO_RE.test(text)) return 'GASTRO';
+  if (GASTRO_MARKET_RE.test(text) && /рынок|фуд/i.test(text) && !TRUE_OUTDOOR_RE.test(text)) {
+    return 'GASTRO';
+  }
+  // «Рыбный рынок» even with outdoor tokens → gastro tourist point
+  if (/рынок/i.test(text) && GASTRO_MARKET_RE.test(text)) return 'GASTRO';
+
+  if (PARK_RE.test(text) && !/парковк/i.test(text) && !BUILDING_ATTRACTION_RE.test(text)) {
+    return 'PARK';
+  }
+  if (MONUMENT_RE.test(text) && !TRUE_OUTDOOR_RE.test(text)) return 'MONUMENT';
+  if (MONUMENT_RE.test(text) && BUILDING_ATTRACTION_RE.test(text)) return 'MONUMENT';
   if (MUSEUM_RE.test(text) && /музей|кунсткамер|галере|эрмитаж/i.test(text)) {
-    // Keep on /locations as ATTRACTION when already a location card; museum upgrade is separate.
-    // Кунсткамера etc. wrongly outdoor → ATTRACTION (owner: buildings = достопримечательность).
     return 'ATTRACTION';
   }
+
+  // Keep true outdoors when outdoor token is the place head (наб/площадь/мост/улица/ворота…),
+  // even if a building word appears as adjective (Кремлёвская набережная).
+  // Note: JS \\w is ASCII-only - use \\p{L} for Cyrillic tails.
+  if (TRUE_OUTDOOR_RE.test(text) && !MONUMENT_RE.test(text)) {
+    const outdoorHead =
+      /(?:площад|набережн|мост|улиц|проспект|просп\.|ворота|бульвар|сквер|променад|эспланад|коса|дюна|остров|порт|стрелка)[\p{L}\p{N}_]*\s*$/iu.test(
+        text.replace(/\s+/g, ' ').trim(),
+      ) ||
+      /дворцов(?:ая|ый|ого|ую)\s+(?:площад|набережн|мост)/i.test(text) ||
+      /(?:^|[\s«"'])(?:новая\s+голланди|севкабель|рыбн(?:ая|ой)\s+деревн)/i.test(text);
+    if (
+      outdoorHead &&
+      !/собор|храм|церков|монастыр|дворец(?!\s*(?:площад|набережн|мост))|замок|крепост|особняк/i.test(text)
+    ) {
+      return null;
+    }
+    if (!BUILDING_ATTRACTION_RE.test(text)) return null;
+  }
+
   if (BUILDING_ATTRACTION_RE.test(text)) return 'ATTRACTION';
   if (
-    /(?:особняк|дворец|замок|собор|храм|церковь|монастырь|адмиралтейство|крепость|кирха|костёл|костел|лицей|лофт|ротонд|башня|дом советов|доходн|пышечн|ресторан|кафе|бар|мечет|синагог|спас\s+на\s+крови)/i.test(
+    /(?:особняк|дворец|замок|собор|храм|церковь|монастырь|адмиралтейство|крепость|кремль|кирха|костёл|костел|лицей|лофт|ротонд|башня|дом советов|доходн|пышечн|ресторан|кафе(?!драл)|мечет|синагог|спас\s+на\s+крови|гостиный|ряды|завод|мельниц|каланч|терем|океанариум|маяк)/i.test(
       text,
     ) &&
     !/дворцов(?:ая|ый|ого|ую)\s+(?:площад|набережн|мост)/i.test(text)
@@ -228,9 +349,42 @@ function reclassifyOutdoorBuilding(title, slug = '') {
   return null;
 }
 
+/**
+ * Location-family rows that are cafe/restaurant/bar → GASTRO.
+ * Does not touch CLUB_BAR_RESTAURANT (institution /venues).
+ * @param {string} title
+ * @param {string} [slug]
+ * @param {string} [storedKind]
+ * @returns {'GASTRO'|null}
+ */
+function reclassifyLocationGastro(title, slug = '', storedKind = '') {
+  const kind = String(storedKind || '').toUpperCase();
+  if (
+    [
+      'CLUB_BAR_RESTAURANT',
+      'MUSEUM_ART_SPACE',
+      'THEATER',
+      'CONCERT_HALL',
+      'GASTRO',
+      'PIER',
+      'MEETING_POINT',
+      'ONLINE',
+    ].includes(kind)
+  ) {
+    return null;
+  }
+  const text = `${title || ''} ${slug || ''}`.toLowerCase();
+  if (!text.trim()) return null;
+  if (GASTRO_RE.test(text)) return 'GASTRO';
+  if (/рынок/i.test(text) && /рыбн|гастро|фуд|еды|food/i.test(text)) return 'GASTRO';
+  return null;
+}
+
 module.exports = {
   TRUE_OUTDOOR_RE,
   BUILDING_ATTRACTION_RE,
+  GASTRO_RE,
   inferMustSeeKindAndFamily,
   reclassifyOutdoorBuilding,
+  reclassifyLocationGastro,
 };

@@ -40,6 +40,8 @@ enum VenueKind {
   ATTRACTION
   PARK
   MONUMENT
+  /// Tourist cafe/restaurant/bar on /locations (not institution CLUB_BAR_RESTAURANT).
+  GASTRO
   ONLINE
   OTHER
 }

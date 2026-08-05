@@ -24,6 +24,7 @@ export const LOCATION_KINDS = new Set([
   'outdoor_location',
   'sport_activity_space',
   'attraction',
+  'gastro',
   'other',
 ]);
 
@@ -43,6 +44,7 @@ const VENUE_TYPE_LABELS: Record<string, string> = {
   outdoor_location: 'Открытая локация',
   sport_activity_space: 'Спорт / активность',
   attraction: 'Достопримечательность',
+  gastro: 'Гастро',
   meeting_point: 'Точка сбора',
   online: 'Онлайн',
   other: 'Локация',
@@ -62,6 +64,7 @@ export const CATALOG_TYPE_OPTIONS: Array<{ value: string; label: string; templat
   { value: 'outdoor_location', label: 'Открытая локация', template: 'location' },
   { value: 'sport_activity_space', label: 'Спорт / активность', template: 'location' },
   { value: 'attraction', label: 'Достопримечательность', template: 'location' },
+  { value: 'gastro', label: 'Гастро', template: 'location' },
   { value: 'other', label: 'Другое', template: 'location' },
 ];
 
@@ -191,6 +194,7 @@ export const LOCATION_TYPE_EMOJI: Record<string, string> = {
   outdoor_location: '🌳',
   sport_activity_space: '⚡',
   attraction: '🏛',
+  gastro: '🍽',
   other: '📍',
 };
 

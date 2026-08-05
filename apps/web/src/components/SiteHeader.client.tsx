@@ -122,9 +122,9 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
               cities={destinations}
               value={cityValue}
               onChange={onCityChange}
-              allLabel="Все города"
+              allLabel="Фильтр по городу"
               variant="header"
-              className="shrink-0 sm:min-w-0 sm:max-w-[9.5rem] xl:max-w-[12rem]"
+              className="shrink-0 sm:min-w-0 sm:max-w-[14rem] xl:max-w-[16rem]"
             />
           </div>
 
@@ -361,7 +361,7 @@ function MobileNavSheet({
         <nav aria-label="Мобильная навигация" className="flex-1 overflow-y-auto p-2">
           {/* UX.LOC2: city first after search - not buried below nav/FAQ */}
           <div className="px-2 py-1">
-            <p className="mb-1 px-2 text-xs font-medium uppercase tracking-wide text-graphite-muted">Город</p>
+            <p className="mb-1 px-2 text-xs font-medium uppercase tracking-wide text-graphite-muted">Фильтр по городу</p>
             <CityPicker
               cities={destinations}
               value={cityValue}
@@ -369,7 +369,7 @@ function MobileNavSheet({
                 onCityChange(name);
                 onClose();
               }}
-              allLabel={cityLabel === 'Все города' ? 'Все города' : cityLabel}
+              allLabel={cityLabel === 'Все города' || cityLabel === 'Фильтр по городу' ? 'Фильтр по городу' : cityLabel}
               variant="compact"
               className="w-full"
             />

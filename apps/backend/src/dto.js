@@ -6169,7 +6169,7 @@ function normalizeVenuePayload(payload) {
 
   if (Object.prototype.hasOwnProperty.call(payload, 'kind')) {
     const value = normalizeNullableString(payload.kind);
-    const allowed = new Set(['VENUE', 'MUSEUM_ART_SPACE', 'THEATER', 'CONCERT_HALL', 'CLUB_BAR_RESTAURANT', 'PIER', 'MEETING_POINT', 'OUTDOOR_LOCATION', 'SPORT_ACTIVITY_SPACE', 'ATTRACTION', 'PARK', 'MONUMENT', 'ONLINE', 'OTHER']);
+    const allowed = new Set(['VENUE', 'MUSEUM_ART_SPACE', 'THEATER', 'CONCERT_HALL', 'CLUB_BAR_RESTAURANT', 'PIER', 'MEETING_POINT', 'OUTDOOR_LOCATION', 'SPORT_ACTIVITY_SPACE', 'ATTRACTION', 'PARK', 'MONUMENT', 'GASTRO', 'ONLINE', 'OTHER']);
     normalized.kind = value && allowed.has(value) ? value : null;
   }
 
@@ -7542,6 +7542,7 @@ function resolvePublicVenueKind(storedKind, name, address, options = {}) {
   if (stored === 'monument') return 'monument';
   if (stored === 'outdoor_location') return 'outdoor_location';
   if (stored === 'attraction') return 'attraction';
+  if (stored === 'gastro') return 'gastro';
   if (stored === 'theater') return 'theater';
   if (stored === 'museum_art_space' || stored === 'museum' || stored === 'art_space') {
     return finalizeMuseumArtPublicKind(stored, name, address, { id, slug, shortDescription, description });

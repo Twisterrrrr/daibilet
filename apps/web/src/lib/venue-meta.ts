@@ -31,6 +31,7 @@ const VENUE_TYPE_LABELS: Record<string, string> = {
   monument: 'Памятник',
   sport_activity_space: 'Спорт / активность',
   attraction: 'Достопримечательность',
+  gastro: 'Гастро',
   meeting_point: 'Точка сбора',
   online: 'Онлайн',
   other: 'Локация',
@@ -54,6 +55,7 @@ const VENUE_TYPE_BREADCRUMB_PLURALS: Record<string, string> = {
   monument: 'Памятники',
   sport_activity_space: 'Спорт и активность',
   attraction: 'Достопримечательности',
+  gastro: 'Гастро',
   meeting_point: 'Точки сбора',
   online: 'Онлайн',
   other: 'Локации',
@@ -228,6 +230,7 @@ export const CATALOG_TYPE_OPTIONS: Array<{ value: string; label: string; templat
   { value: 'outdoor_location', label: 'Открытая локация', template: 'location' },
   { value: 'sport_activity_space', label: 'Спорт / активность', template: 'location' },
   { value: 'attraction', label: 'Достопримечательность', template: 'location' },
+  { value: 'gastro', label: 'Гастро', template: 'location' },
   { value: 'other', label: 'Другое', template: 'location' },
 ];
 
@@ -243,6 +246,7 @@ export function locationTypeEmoji(type?: string | null): string {
     outdoor_location: '🌳',
     sport_activity_space: '⚡',
     attraction: '🏛',
+    gastro: '🍽',
     other: '📍',
   };
   return map[key] || '📍';
@@ -301,6 +305,7 @@ const WALKING_KINDS = new Set([
   'monument',
   'outdoor_location',
   'attraction',
+  'gastro',
   'meeting_point',
   'sport_activity_space',
 ]);

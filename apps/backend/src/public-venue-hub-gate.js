@@ -9,6 +9,7 @@ export const CONTENT_PLACE_DB_KINDS = new Set([
   'MONUMENT',
   'OUTDOOR_LOCATION',
   'ATTRACTION',
+  'GASTRO',
   'MUSEUM_ART_SPACE',
   'THEATER',
   'CLUB_BAR_RESTAURANT',
@@ -22,6 +23,7 @@ export const CONTENT_PLACE_STORED_KINDS = new Set([
   'CLUB',
   'BAR',
   'RESTAURANT',
+  'GASTRO',
 ]);
 
 /** Public snake_case kinds (after resolvePublicVenueKind). */
@@ -30,6 +32,7 @@ export const CONTENT_PLACE_PUBLIC_KINDS = new Set([
   'monument',
   'outdoor_location',
   'attraction',
+  'gastro',
   'museum',
   'art_space',
   'theater',

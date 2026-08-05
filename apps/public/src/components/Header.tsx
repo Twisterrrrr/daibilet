@@ -200,7 +200,7 @@ function HeaderCitySelector({
     <CityPicker
       value={value}
       onChange={selectCity}
-      allLabel="Все города"
+      allLabel="Фильтр по городу"
       variant={compact ? 'compact' : 'header'}
       className={compact ? 'w-full' : 'hidden lg:block'}
     />

@@ -29,6 +29,7 @@
 | MS.KGD-CITY-CATALOG | KGD city mustSee (не только owner 11): seed 24 catalog places + cityInfo slugs; биржа hub-only | Критический | ✅ `22f6f4f`+`7b18498`; MSK insert 22/update 2 + repair sobor/ostrov/monuments; live location ~23→25+, institution ~24 |
 | MS.KGD-GASTRO-LOC | Owner override: 5 KGD gastro → `/locations` (ATTRACTION, не CLUB_BAR) + locationSlug wiring | Высокий | ✅ `d4e99de`; MSK insert 5; location 25→30; 5/5 PDP `/locations/*` 200; deploy HEAD `2f2e24de` |
 | FIX.OUTDOOR-VS-ATTRACTION | Здания не outdoor: SPB/KGD OUTDOOR→ATTRACTION (+monument/park); heuristics + MSK apply | Высокий | ✅ 41 rows MSK; `venue-kind-heuristics` + reclassify script; API restart; web deploy n/a |
+| FIX.OUTDOOR-GASTRO-KINDS | OUTDOOR→точные kinds (all cities); location cafe→`GASTRO`; шапка «Фильтр по городу» | Высокий | ✅ heuristics+migration GASTRO; MSK migrate+reclassify; API restart; web label batch |
 | FIX.CITY-ALIAS | Legacy `/cities/sankt-peterburg` → permanent redirect на canonical `/cities/saint-petersburg`, чтобы не вызывать city DTO с неканоническим slug | Критический | ✅ `c5f1869`, MSK BUILD_ID=`IQlhDY1eF5GvuOGLXURHb`; direct и public smoke: 308 → canonical, 200 |
 | FIX.EDITORIAL-VENUES | Убрать SPB thin twins, направить zero-event editorial в `/locations`, скрыть ticket chrome без saleable offer и усилить seed dedupe | Критический | ✅ `2897a74`, MSK BUILD_ID=`pB-uPQAXNmSrmo1y5dDNh`; El Copitas 200 без buy CTA, «Синий Пушкин» twin скрыт |
 

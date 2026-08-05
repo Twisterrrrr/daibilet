@@ -336,6 +336,24 @@
 
 ---
 
+## 2026-08-05 - OUTDOOR reclassify (all cities) + GASTRO + шапка
+
+### Наблюдения
+- После SPB/KGD-патча в MSK осталось ~298 `OUTDOOR_LOCATION` (соборы, кремли, рынки) по всем городам.
+- Кафе/рестораны в `/locations` лежали как `ATTRACTION`; UI-тип «Гастро» отсутствовал в Prisma.
+- В шапке лейбл «Город» / allLabel «Все города» путал с blog-фильтром.
+
+### Решения
+- `VenueKind.GASTRO` (location family) + UI label «Гастро»; `CLUB_BAR_RESTAURANT` остаётся institution `/venues`.
+- Расширены `venue-kind-heuristics` + `reclassify-outdoor-buildings.js --cities=all` + `reclassify-location-gastro.js`.
+- Шапка: `SiteHeader` / public `Header` allLabel и mobile section → «Фильтр по городу» (blog «Все города» не трогали).
+- MSK: migrate GASTRO → apply outdoor+gastro → restart `daibilet-api`. Web deploy отложен (batch).
+
+### Проблемы
+- Нет. Лейбл шапки на live после web batch.
+
+---
+
 ## 2026-08-05 - Outdoor vs Attraction: здания не «Открытая локация»
 
 ### Наблюдения
