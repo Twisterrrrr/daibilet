@@ -202,6 +202,7 @@ const CITY_TITLE_ALIASES = {
 
 const dryRun = process.argv.includes('--dry-run') || !process.argv.includes('--apply');
 const writeCityInfo = process.argv.includes('--write-cityinfo');
+const writeCityInfoOnly = process.argv.includes('--write-cityinfo-only');
 const citiesFilter = parseCitiesFilter(process.argv);
 const connectionString =
   process.env.DATABASE_URL || 'postgresql://daibilet:daibilet@127.0.0.1:5437/daibilet';
@@ -275,6 +276,26 @@ async function main() {
   const rows = citiesFilter.size
     ? all.filter((row) => citiesFilter.has(row.cityKey))
     : all;
+
+  if (writeCityInfoOnly) {
+    const resolvedRows = rows.map((item) => ({
+      item,
+      family: inferKindAndFamily(item.title, item).family,
+    }));
+    console.log(
+      JSON.stringify(
+        {
+          dryRun: false,
+          total: rows.length,
+          cityInfo: writeOwnerCityInfo(resolvedRows, false),
+          note: 'cityInfo-only mode does not access the database',
+        },
+        null,
+        2,
+      ),
+    );
+    return;
+  }
 
   const pool = new Pool({ connectionString, max: 2 });
   const cityCache = new Map();
