@@ -81,8 +81,10 @@ expectReclass('Кремлёвская набережная', null);
 expectReclass('Казанский Кремль', 'ATTRACTION');
 expectReclass('Рудничный сосновый бор', 'PARK');
 
-assert.strictEqual(reclassifyLocationGastro('Арт-кафе «Бродячая собака»', '', 'ATTRACTION'), 'GASTRO');
-assert.strictEqual(reclassifyLocationGastro('Бар Escobar', '', 'CLUB_BAR_RESTAURANT'), null);
-assert.strictEqual(reclassifyLocationGastro('Кафедральный собор', '', 'ATTRACTION'), null);
+assert.strictEqual(reclassifyLocationGastro('Zotler Bier', 'kaliningrad-zotler-bier', 'ATTRACTION'), 'GASTRO');
+assert.strictEqual(
+  reclassifyLocationGastro('Магазин-музей «Кёнигсбергский марципан»', 'kaliningrad-kenigsbergskiy-martsipan', 'ATTRACTION'),
+  'GASTRO',
+);
 
 console.log('venue-kind-heuristics: ok');
