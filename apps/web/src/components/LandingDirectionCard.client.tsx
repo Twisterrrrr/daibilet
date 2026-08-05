@@ -34,31 +34,38 @@ const LANDING_EMOJI: Record<string, string> = {
   'active-sport': '🏎',
 };
 
-function formatLandingPrice(value?: number | null): string {
-  if (!value || value <= 0) return '—';
-  return formatPriceFrom(value);
+/** Brand primary / sky / cyan - no purple-neon / orange-glow. */
+function landingGradient(slug: string): string {
+  if (slug.includes('river') || slug.includes('bridge') || slug.includes('boat')) {
+    return 'from-sky-600 via-primary-700 to-cyan-950';
+  }
+  if (slug.includes('standup')) return 'from-cyan-700 via-sky-800 to-slate-950';
+  if (slug.includes('family') || slug.includes('kids') || slug.includes('planet')) {
+    return 'from-sky-500 via-cyan-600 to-primary-900';
+  }
+  if (slug.includes('yard') || slug.includes('museum') || slug.includes('exhibit')) {
+    return 'from-slate-700 via-primary-800 to-sky-950';
+  }
+  if (slug.includes('bus') || slug.includes('walk') || slug.includes('excursion') || slug.includes('tour')) {
+    return 'from-sky-600 via-cyan-700 to-slate-900';
+  }
+  if (slug.includes('salute') || slug.includes('new-year') || slug.includes('city-day')) {
+    return 'from-primary-600 via-sky-700 to-cyan-950';
+  }
+  if (slug.includes('concert') || slug.includes('theatre') || slug.includes('rooftop')) {
+    return 'from-primary-700 via-sky-800 to-slate-950';
+  }
+  if (slug.includes('active') || slug.includes('sport')) {
+    return 'from-slate-700 via-sky-900 to-cyan-950';
+  }
+  return 'from-primary-700 via-sky-700 to-cyan-900';
 }
 
-function landingGradient(slug: string): string {
-  if (slug.includes('yard') || slug.includes('paradn') || slug.includes('museum')) {
-    return 'from-amber-700 via-orange-800 to-stone-900';
-  }
-  if (slug.includes('river') || slug.includes('bridge') || slug.includes('boat')) {
-    return 'from-sky-600 via-primary-700 to-slate-900';
-  }
-  if (slug.includes('bus')) return 'from-amber-500 via-orange-600 to-rose-600';
-  if (slug.includes('salute') || slug.includes('new-year') || slug.includes('city-day')) {
-    return 'from-violet-700 via-fuchsia-600 to-indigo-900';
-  }
-  if (slug.includes('standup')) return 'from-emerald-600 via-teal-600 to-cyan-800';
-  if (slug.includes('family') || slug.includes('kids')) {
-    return 'from-pink-500 via-rose-500 to-orange-500';
-  }
-  if (slug.includes('concert')) return 'from-red-600 via-rose-700 to-purple-900';
-  if (slug.includes('active') || slug.includes('sport')) {
-    return 'from-slate-700 via-zinc-800 to-black';
-  }
-  return 'from-indigo-600 via-primary to-fuchsia-700';
+function formatLandingPriceBadge(value?: number | null): string | null {
+  if (typeof value !== 'number') return null;
+  if (value === 0) return 'Бесплатно';
+  if (value > 0) return formatPriceFrom(value);
+  return null;
 }
 
 function landingBenefit(landing: LandingDirectionCardItem): string {
@@ -84,10 +91,30 @@ function LandingCityBadge({
   const cityName = boundName || filterName;
   if (!cityName) return null;
   return (
-    <span className="inline-flex w-fit max-w-full items-center gap-1 rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-semibold leading-none text-slate-900 shadow-sm backdrop-blur-sm sm:px-2.5 sm:py-1 sm:text-[11px]">
+    <span className="inline-flex w-fit max-w-full items-center gap-1 rounded-full bg-white/85 px-2 py-0.5 text-[10px] font-semibold leading-none text-slate-900 shadow-sm backdrop-blur-md sm:px-2.5 sm:py-1 sm:text-[11px]">
       <MapPin className="h-3 w-3 shrink-0 text-primary-700" aria-hidden />
       <span className="truncate">{cityName}</span>
     </span>
+  );
+}
+
+function CardStatBadges({
+  landing,
+}: {
+  landing: LandingDirectionCardItem;
+}) {
+  const price = formatLandingPriceBadge(landing.priceFrom);
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      <span className="inline-flex items-center rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-semibold text-white backdrop-blur-md ring-1 ring-white/25 sm:text-[11px]">
+        {pluralEvents(landing.events)}
+      </span>
+      {price ? (
+        <span className="inline-flex items-center rounded-full bg-sky-400/25 px-2 py-0.5 text-[10px] font-semibold text-white backdrop-blur-md ring-1 ring-sky-200/30 sm:text-[11px]">
+          {price}
+        </span>
+      ) : null}
+    </div>
   );
 }
 
@@ -98,6 +125,7 @@ export function LandingDirectionCard({
   variant = 'tile',
   rank,
   showFilterCityBadge = false,
+  featured = false,
 }: {
   landing: LandingDirectionCardItem;
   citySlug?: string | null;
@@ -106,14 +134,14 @@ export function LandingDirectionCard({
   rank?: number;
   /** Show selected-city badge on national landings when catalog is city-filtered. */
   showFilterCityBadge?: boolean;
+  /** Taller tile for bento wide cells. */
+  featured?: boolean;
 }) {
   const emoji = LANDING_EMOJI[landing.slug] || '✨';
   const imageUrl = resolveLandingCardImage(landing.slug);
   const href = landingCategoryHref(landing.slug, citySlug && citySlug !== 'all' ? citySlug : undefined);
   const hasPrice = typeof landing.priceFrom === 'number' && landing.priceFrom > 0;
-  const priceLabel = hasPrice ? formatLandingPrice(landing.priceFrom) : null;
-  const eventsLabel = pluralEvents(landing.events);
-  const metaLine = priceLabel ? `${eventsLabel} · ${priceLabel}` : eventsLabel;
+  const priceLabel = hasPrice ? formatPriceFrom(landing.priceFrom) : formatLandingPriceBadge(landing.priceFrom);
   const cityBadge = (
     <LandingCityBadge
       slug={landing.slug}
@@ -135,12 +163,11 @@ export function LandingDirectionCard({
             fill
             loading="lazy"
             sizes={IMAGE_SIZES.landingBanner}
-            className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+            className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.08]"
           />
         ) : (
           <div className={`absolute inset-0 bg-gradient-to-br ${landingGradient(landing.slug)}`} />
         )}
-        {/* Читаемость слева + лёгкий fade справа, чтобы баннер «дышал» на широком экране. */}
         <div
           aria-hidden
           className="absolute inset-0 bg-gradient-to-r from-slate-950 from-[8%] via-slate-950/88 via-[42%] to-slate-950/25 to-[88%]"
@@ -159,7 +186,9 @@ export function LandingDirectionCard({
               <span className="underline-offset-4 group-hover:underline">{landing.title}</span>
             </h3>
             <p className="mt-2 max-w-xl text-sm leading-6 text-white/80 sm:text-[0.95rem]">{landingBenefit(landing)}</p>
-            <p className="mt-3 text-sm font-semibold text-white/90">{metaLine}</p>
+            <div className="mt-3">
+              <CardStatBadges landing={landing} />
+            </div>
           </div>
           <span className="inline-flex shrink-0 items-center gap-2 self-start rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-slate-950 shadow-sm transition group-hover:gap-3 lg:self-end">
             Открыть подборку
@@ -170,10 +199,14 @@ export function LandingDirectionCard({
     );
   }
 
+  const heightClass = featured
+    ? 'h-full min-h-[12.5rem] sm:min-h-[14rem]'
+    : 'h-full min-h-[11rem] sm:min-h-[12.5rem]';
+
   return (
     <Link
       href={href}
-      className="group relative flex h-56 flex-col justify-end overflow-hidden rounded-card bg-slate-900 shadow-card transition duration-300 hover:-translate-y-0.5 hover:shadow-card-hover sm:h-60"
+      className={`group relative flex ${heightClass} flex-col justify-end overflow-hidden rounded-2xl bg-slate-900 shadow-sm ring-1 ring-slate-900/10 transition duration-300 hover:-translate-y-0.5 hover:shadow-md`}
     >
       {imageUrl ? (
         <SafeImage
@@ -182,26 +215,36 @@ export function LandingDirectionCard({
           fill
           loading="lazy"
           sizes={IMAGE_SIZES.landingCard}
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
+          className="object-cover transition-transform duration-500 group-hover:scale-[1.08]"
         />
       ) : (
-        <div className={`absolute inset-0 bg-gradient-to-br ${landingGradient(landing.slug)} opacity-90`} />
+        <div className={`absolute inset-0 bg-gradient-to-br ${landingGradient(landing.slug)}`} />
       )}
-      <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/5" />
-      {cityBadge ? <div className="absolute left-2 top-2 z-[2] sm:left-3 sm:top-3">{cityBadge}</div> : null}
+      <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/45 to-transparent" />
+      <div className="absolute left-2 top-2 z-[2] flex max-w-[calc(100%-1rem)] flex-wrap gap-1.5 sm:left-3 sm:top-3">
+        {cityBadge}
+        <span className="inline-flex items-center rounded-full bg-white/85 px-2 py-0.5 text-[10px] font-semibold text-slate-900 shadow-sm backdrop-blur-md sm:text-[11px]">
+          {pluralEvents(landing.events)}
+        </span>
+        {priceLabel ? (
+          <span className="inline-flex items-center rounded-full bg-sky-500/90 px-2 py-0.5 text-[10px] font-semibold text-white shadow-sm backdrop-blur-md sm:text-[11px]">
+            {priceLabel}
+          </span>
+        ) : null}
+      </div>
       <div className="relative z-[1] p-4 text-white sm:p-5">
         <span className="text-xl" aria-hidden>
           {emoji}
         </span>
-        <h3 className="font-display mt-1 text-lg font-bold text-white sm:text-xl">
+        <h3 className={`font-display mt-1 font-bold text-white ${featured ? 'text-xl sm:text-2xl' : 'text-lg sm:text-xl'}`}>
           <span className="underline-offset-4 group-hover:underline">{landing.title}</span>
         </h3>
         {landing.subtitle ? (
           <p className="mt-1 line-clamp-2 text-xs text-white/80 sm:text-sm">{landing.subtitle}</p>
         ) : null}
         <p className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-white/90 group-hover:text-white sm:text-sm">
-          {metaLine}
-          <ArrowRight className="h-3.5 w-3.5" />
+          Смотреть
+          <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
         </p>
       </div>
     </Link>

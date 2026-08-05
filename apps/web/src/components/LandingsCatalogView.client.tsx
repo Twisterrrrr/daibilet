@@ -14,7 +14,7 @@ import { ScrollRail } from '@/components/ScrollRail.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { buildCatalogPresetHref } from '@/lib/catalog-links';
 import { CATALOG_PRESETS } from '@/lib/catalog-presets';
-import { formatNumber, pluralEvents } from '@/lib/format';
+import { formatNumber, formatPriceFrom, pluralEvents } from '@/lib/format';
 import { resolveLandingCardImage } from '@/lib/landing-images';
 import {
   landingCategoryHref,
@@ -24,24 +24,25 @@ import {
 } from '@/lib/landing-routes';
 import { resolveLandingCityName } from '@/lib/landing-city';
 import {
+  PODBORKI_BENTO_GRID_CLASS,
+  podborkiBentoCellClass,
+  podborkiBentoSpan,
+} from '@/lib/podborki-bento';
+import {
   groupPodborkiByCategory,
   type PodborkiCatalogItem,
   type PodborkiCategoryMeta,
 } from '@/lib/podborki-categories';
 import { pickPodborkiFeatured, pickPodborkiTrending } from '@/lib/podborki-hero';
-import { balancedTileGridClass } from '@/lib/balanced-tile-grid';
+import {
+  filterPodborkiByMood,
+  PODBORKI_MOODS,
+  type PodborkiMoodId,
+} from '@/lib/podborki-moods';
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
 
 const PODBORKI_SEO_TEXT =
   'Подборки Дайбилет собирают готовые маршруты и события по типу, аудитории и сезону: речные прогулки, автобусные обзоры, музеи, стендап, семейные программы и праздничные даты. В каждой карточке видно число актуальных сеансов и цену от, чтобы сразу перейти к билетам без долгого поиска по афише. Фильтр города в шапке сужает каталог под ваш маршрут, а быстрые чипы помогают начать с настроения - с детьми, бюджетно, на воде или культурно.';
-
-const MOOD_CHIPS: Array<{ label: string; href: string }> = [
-  { label: 'С детьми', href: landingCategoryHref('family-kids') },
-  { label: 'Для двоих', href: '/events?q=романт&sort=popular' },
-  { label: 'Бюджетно', href: buildCatalogPresetHref('cheap') },
-  { label: 'Культура', href: landingCategoryHref('exhibitions') },
-  { label: 'На воде', href: landingCategoryHref('river-cruises') },
-];
 
 const EMPTY_CITY_COPY = {
   title: 'Пока готовых подборок по выбранному городу еще нет',
@@ -70,6 +71,14 @@ function resolveCityName(cities: PublicDestinationDto[], filter: string): string
   if (bySlug?.name) return bySlug.name;
   const byName = cities.find((item) => item.name.toLowerCase() === filter.toLowerCase());
   return byName?.name || filter;
+}
+
+function featuredPriceLine(item: PodborkiCatalogItem): string {
+  if (typeof item.priceFrom === 'number' && item.priceFrom === 0) return ' · Бесплатно';
+  if (typeof item.priceFrom === 'number' && item.priceFrom > 0) {
+    return ` · ${formatPriceFrom(item.priceFrom)}`;
+  }
+  return '';
 }
 
 export function LandingsCatalogView({
@@ -103,14 +112,13 @@ export function LandingsCatalogView({
   const pickerValue = citySlug === 'all' ? 'all' : cityName;
   const seasonText = seasonalBannerText();
   const citySelected = citySlug !== 'all';
-  // landings-catalog scopes by session.city / destination (RU name) or citySlug aliases
-  // like moskva / sankt-peterburg - not SEO latin moscow / saint-petersburg.
   const apiCityParam = citySelected
     ? (cityName !== 'all' ? cityName : citySlug)
     : '';
 
   const [cityScopedItems, setCityScopedItems] = useState<PodborkiCatalogItem[] | null>(null);
   const [cityCatalogLoading, setCityCatalogLoading] = useState(false);
+  const [activeMood, setActiveMood] = useState<PodborkiMoodId | null>(null);
 
   useEffect(() => {
     if (!citySelected || !apiCityParam) {
@@ -156,7 +164,6 @@ export function LandingsCatalogView({
       )
       .catch((error: unknown) => {
         if (error instanceof DOMException && error.name === 'AbortError') return;
-        // Fallback: city-bound only until next successful fetch.
         setCityScopedItems(initialItems.filter((item) => landingMatchesBoundCity(item.slug, citySlug)));
       })
       .finally(() => {
@@ -166,12 +173,13 @@ export function LandingsCatalogView({
     return () => controller.abort();
   }, [apiCityParam, citySelected, citySlug, initialItems]);
 
-  // While city catalog loads: city-bound only (avoid flash of full national list).
-  const items = useMemo(() => {
+  const cityItems = useMemo(() => {
     if (!citySelected) return initialItems;
     if (cityScopedItems) return cityScopedItems;
     return initialItems.filter((item) => landingMatchesBoundCity(item.slug, citySlug));
   }, [cityScopedItems, citySelected, citySlug, initialItems]);
+
+  const items = useMemo(() => filterPodborkiByMood(cityItems, activeMood), [activeMood, cityItems]);
 
   const featured = pickPodborkiFeatured(items);
   const trending = pickPodborkiTrending(items, featured?.slug, 3);
@@ -187,6 +195,15 @@ export function LandingsCatalogView({
 
   const sections = groupPodborkiByCategory(items, categories.length ? categories : undefined);
 
+  const popularRail = useMemo(() => {
+    return [...items].sort((a, b) => b.events - a.events).slice(0, 8);
+  }, [items]);
+
+  const displayCityLabel =
+    citySelected
+      ? resolveLandingCityName(citySlug) || (cityName !== 'all' ? cityName : null)
+      : null;
+
   const handleCityChange = (value: string) => {
     if (value === 'all') {
       router.push('/podborki');
@@ -195,6 +212,10 @@ export function LandingsCatalogView({
     const next = cities.find((item) => item.name === value);
     const slug = next?.slug || value;
     router.push(`/podborki?city=${encodeURIComponent(slug)}`);
+  };
+
+  const toggleMood = (id: PodborkiMoodId) => {
+    setActiveMood((prev) => (prev === id ? null : id));
   };
 
   return (
@@ -211,17 +232,31 @@ export function LandingsCatalogView({
           </p>
         ) : null}
 
-        <div className="mt-5 flex flex-wrap gap-2" role="group" aria-label="Настроение">
-          {MOOD_CHIPS.map((chip) => (
-            <Link
-              key={chip.label}
-              href={chip.href}
-              className="inline-flex rounded-full bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-50 hover:text-primary-700"
-            >
-              {chip.label}
-            </Link>
-          ))}
-        </div>
+        <ScrollRail
+          className="mt-5"
+          viewportClassName="flex flex-nowrap gap-2 pb-0.5"
+          aria-label="Настроение"
+        >
+          {PODBORKI_MOODS.map((mood) => {
+            const active = activeMood === mood.id;
+            return (
+              <button
+                key={mood.id}
+                type="button"
+                data-rail-item
+                onClick={() => toggleMood(mood.id)}
+                aria-pressed={active}
+                className={
+                  active
+                    ? 'inline-flex shrink-0 rounded-full bg-primary-600 px-3.5 py-2 text-sm font-semibold text-white shadow-sm transition'
+                    : 'inline-flex shrink-0 rounded-full bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-50 hover:text-primary-700'
+                }
+              >
+                {mood.label}
+              </button>
+            );
+          })}
+        </ScrollRail>
 
         {sections.length ? (
           <ScrollRail
@@ -243,7 +278,6 @@ export function LandingsCatalogView({
           </ScrollRail>
         ) : null}
 
-        {/* Featured + trending: full container-page width, equal-height row. */}
         <div
           className={
             trending.length
@@ -263,14 +297,14 @@ export function LandingsCatalogView({
                   fill
                   priority
                   sizes={IMAGE_SIZES.landingBanner}
-                  className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                  className="object-cover transition-transform duration-700 group-hover:scale-[1.08]"
                 />
               ) : (
-                <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-950" />
+                <div className="absolute inset-0 bg-gradient-to-br from-primary-700 via-sky-700 to-cyan-950" />
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-900/35 to-transparent" />
               {featuredCityName ? (
-                <span className="absolute left-3 top-3 z-[2] inline-flex items-center rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-semibold text-slate-900 shadow-sm backdrop-blur-sm">
+                <span className="absolute left-3 top-3 z-[2] inline-flex items-center rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-semibold text-slate-900 shadow-sm backdrop-blur-md">
                   {featuredCityName}
                 </span>
               ) : null}
@@ -279,9 +313,7 @@ export function LandingsCatalogView({
                 <span className="font-display text-2xl font-extrabold leading-tight text-white sm:text-3xl">{featured.title}</span>
                 <span className="text-sm text-white/80">
                   {pluralEvents(featured.events)}
-                  {typeof featured.priceFrom === 'number' && featured.priceFrom > 0
-                    ? ` · от ${featured.priceFrom.toLocaleString('ru-RU')} ₽`
-                    : ''}
+                  {featuredPriceLine(featured)}
                   {featured.subtitle ? ` · ${featured.subtitle}` : ''}
                 </span>
                 <span className="inline-flex items-center gap-1 text-sm font-semibold text-white">
@@ -296,7 +328,9 @@ export function LandingsCatalogView({
                 ? 'Подбираем подборки по городу…'
                 : citySelected
                   ? EMPTY_CITY_COPY.title
-                  : 'Подборки скоро появятся'}
+                  : activeMood
+                    ? 'Нет подборок под это настроение - снимите фильтр или выберите другое.'
+                    : 'Подборки скоро появятся'}
             </div>
           )}
 
@@ -394,41 +428,20 @@ export function LandingsCatalogView({
                       {section.items.length}
                     </span>
                   </div>
-                  {/* Мобилка/планшет: горизонтальный скролл; lg+: сетка без обрезки */}
-                  <ScrollRail
-                    className="-mx-4 sm:mx-0 lg:hidden"
-                    viewportClassName="flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:px-0"
-                    aria-label={section.title}
-                  >
-                    {section.items.map((landing) => (
-                      <div
-                        key={landing.slug}
-                        data-rail-item
-                        className="w-[min(18rem,calc(100%-0.875rem))] shrink-0 snap-start sm:w-[17.5rem]"
-                      >
-                        <LandingDirectionCard
-                          landing={landing}
-                          citySlug={citySlug}
-                          showFilterCityBadge={citySelected}
-                        />
-                      </div>
-                    ))}
-                  </ScrollRail>
-                  <ul
-                    className={`hidden gap-3 lg:grid ${balancedTileGridClass(section.items.length, {
-                      lg: 3,
-                      xl: 4,
-                    })}`}
-                  >
-                    {section.items.map((landing) => (
-                      <li key={landing.slug}>
-                        <LandingDirectionCard
-                          landing={landing}
-                          citySlug={citySlug}
-                          showFilterCityBadge={citySelected}
-                        />
-                      </li>
-                    ))}
+                  <ul className={PODBORKI_BENTO_GRID_CLASS}>
+                    {section.items.map((landing) => {
+                      const span = podborkiBentoSpan(landing);
+                      return (
+                        <li key={landing.slug} className={podborkiBentoCellClass(span)}>
+                          <LandingDirectionCard
+                            landing={landing}
+                            citySlug={citySlug}
+                            showFilterCityBadge={citySelected}
+                            featured={span === 2}
+                          />
+                        </li>
+                      );
+                    })}
                   </ul>
                 </div>
               ))}
@@ -440,18 +453,58 @@ export function LandingsCatalogView({
                   ? 'Подбираем подборки по городу…'
                   : citySelected
                     ? EMPTY_CITY_COPY.title
-                    : 'Популярные запросы скоро появятся'}
+                    : activeMood
+                      ? 'Нет подборок под это настроение'
+                      : 'Популярные запросы скоро появятся'}
               </p>
               <p className="mt-1 text-sm text-slate-400">
                 {cityCatalogLoading
                   ? 'Считаем события в выбранном городе'
                   : citySelected
                     ? EMPTY_CITY_COPY.hint
-                    : 'Пока доступны быстрые фильтры выше'}
+                    : activeMood
+                      ? 'Снимите фильтр настроения или выберите другое'
+                      : 'Пока доступны быстрые фильтры выше'}
               </p>
+              {activeMood ? (
+                <button
+                  type="button"
+                  onClick={() => setActiveMood(null)}
+                  className="mt-4 inline-flex rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white"
+                >
+                  Сбросить настроение
+                </button>
+              ) : null}
             </div>
           )}
         </section>
+
+        {popularRail.length >= 3 ? (
+          <section className="mt-14">
+            <h2 className="font-display text-xl font-bold text-slate-900">
+              {displayCityLabel ? `Популярно в ${displayCityLabel}` : 'Популярно сейчас'}
+            </h2>
+            <ScrollRail
+              className="mt-4"
+              viewportClassName="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              aria-label={displayCityLabel ? `Популярно в ${displayCityLabel}` : 'Популярно сейчас'}
+            >
+              {popularRail.map((landing) => (
+                <div
+                  key={`popular-${landing.slug}`}
+                  data-rail-item
+                  className="w-[min(16.5rem,calc(100%-1.5rem))] shrink-0 snap-start sm:w-[17rem]"
+                >
+                  <LandingDirectionCard
+                    landing={landing}
+                    citySlug={citySlug}
+                    showFilterCityBadge={citySelected}
+                  />
+                </div>
+              ))}
+            </ScrollRail>
+          </section>
+        ) : null}
 
         <div className="mt-12 rounded-2xl border border-slate-200 bg-white px-4 py-5 shadow-sm sm:px-6">
           <h2 className="font-display text-base font-bold text-slate-900 sm:text-lg">

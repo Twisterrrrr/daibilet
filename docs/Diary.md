@@ -18,6 +18,22 @@
 
 ---
 
+## 2026-08-05 - /podborki Bento + mood filters
+
+### Наблюдения
+- Owner: `/podborki` выглядел как одинаковый список; нужны вовлекающие карточки (фото/градиент), mood chips, разноразмерная сетка.
+
+### Решения
+- Mood filters (клиент): Романтическое / С друзьями / С детьми / Под дождь / Бюджетно - `podborki-moods.ts` (slug map + heuristics, без Prisma).
+- Bento: `podborki-bento.ts` - river/city-day/seasonal/топ → 2 cols, standup/niche → 1; сетка в `LandingsCatalogView`.
+- Карточки: cover или brand gradient (primary/sky/cyan); badges событий + «от X ₽»/«Бесплатно»; hover scale ~1.08; backdrop-blur.
+- Netflix-ряд «Популярно в {город}» под bento. Deploy не делали.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-05 - Hub suburbs: bulk «В маршрут» у вектора
 
 ### Наблюдения

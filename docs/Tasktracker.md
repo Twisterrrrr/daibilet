@@ -51,7 +51,8 @@
 | FIX.CITYDAY-TOP | Москва: City Day выше мастер-классов в hub/podborki/promo; museums title без «мастер-классы» | Высокий | ✅ code; deploy пачкой / по запросу |
 | FIX.CITYDAY-PRICE | Landing rows: min as fixed price → `formatMoneyRange` (мин-макс / `от`) | Высокий | ✅ `be2f075`/`c8f43ae`; MSK BUILD_ID=`LV0jzT3jaueTAOmX202ic`; landing range+ot smoke OK |
 | UX.POD1 | `/podborki`: category jump chips + SEO «Развернуть» + lazy cards + count/priceFrom | Высокий | ✅ `7535f02` live **`BCWcAIglYC8cAP-6Zgr4k`** |
-| UX.POD2 | `/podborki` masonry / view counters / purchase carousel / infinite scroll | Средний | ⚠️ deferred |
+| UX.POD-BENTO | `/podborki`: Bento grid + mood filters + rich cards (photo/gradient) + badges + popular rail | Высокий | ✅ code commit; deploy пачкой / по запросу |
+| UX.POD2 | `/podborki` masonry / view counters / purchase carousel / infinite scroll | Средний | ⚠️ deferred (bento закрывает часть masonry) |
 | UX.LAND2 | Tabular landings: clearer rows, timeslot chips, sticky filters, `?type=` | Высокий | ✅ `eae17f4` live **`BCWcAIglYC8cAP-6Zgr4k`** |
 | UX.LAND2b | Invent new differentiator DTO badge fields | Низкий | ⚠️ deferred (reuse deriveLandingCardBadges / bridges heuristics) |
 | UX.BLOG3 | Blog hub chips river/tours + article reading progress | Высокий | ✅ `eae17f4` live **`BCWcAIglYC8cAP-6Zgr4k`** |

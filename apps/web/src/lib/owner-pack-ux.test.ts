@@ -5,6 +5,8 @@ import { decodeBlogFeedCursor, encodeBlogFeedCursor, paginateBlogFeedByCursor } 
 import { filterBlogFeedByCity, rankBlogFeedByCity, resolveBlogRankCitySlug } from './blog-feed-rank.ts';
 import { groupPodborkiByCategory } from './podborki-categories.ts';
 import { pickPodborkiFeatured, pickPodborkiTrending } from './podborki-hero.ts';
+import { podborkiBentoSpan } from './podborki-bento.ts';
+import { filterPodborkiByMood, landingMatchesMood } from './podborki-moods.ts';
 
 test('filterBlogFeedByCity: empty for city without published posts', () => {
   const posts = [
@@ -113,4 +115,29 @@ test('pickPodborkiFeatured prefers Moscow City Day over museums and river', () =
     3,
   );
   assert.equal(trending.some((item) => item.slug === 'moscow-museums'), false);
+});
+
+test('podborkiBentoSpan: river/city-day wide, standup narrow', () => {
+  assert.equal(podborkiBentoSpan({ slug: 'river-cruises', events: 10 }), 2);
+  assert.equal(podborkiBentoSpan({ slug: 'moscow-city-day', events: 5 }), 2);
+  assert.equal(podborkiBentoSpan({ slug: 'standup', events: 40 }), 1);
+  assert.equal(podborkiBentoSpan({ slug: 'new-year', categorySlug: 'seasonal' }), 2);
+});
+
+test('landingMatchesMood: romantic / kids / budget heuristics', () => {
+  assert.equal(landingMatchesMood({ slug: 'river-cruises', title: 'Речные' }, 'romantic'), true);
+  assert.equal(landingMatchesMood({ slug: 'standup', title: 'Стендап' }, 'romantic'), false);
+  assert.equal(landingMatchesMood({ slug: 'family-kids', title: 'С детьми' }, 'kids'), true);
+  assert.equal(landingMatchesMood({ slug: 'walking-tours', title: 'Пешком', priceFrom: 0 }, 'budget'), true);
+  assert.equal(landingMatchesMood({ slug: 'moscow-museums', title: 'Музеи' }, 'rain'), true);
+});
+
+test('filterPodborkiByMood: null mood returns all', () => {
+  const items = [
+    { slug: 'standup', title: 'Стендап', events: 3 },
+    { slug: 'family-kids', title: 'Семья', events: 2 },
+  ];
+  assert.equal(filterPodborkiByMood(items, null).length, 2);
+  assert.equal(filterPodborkiByMood(items, 'kids').map((i) => i.slug).join(','), 'family-kids');
+  assert.equal(filterPodborkiByMood(items, 'friends').map((i) => i.slug).join(','), 'standup');
 });
