@@ -38,7 +38,7 @@ test('blog listing CTA: city → Больше про …', () => {
     citySlug: 'saint-petersburg',
   });
   assert.ok(spb);
-  assert.equal(spb?.label, 'Больше про Питер');
+  assert.equal(spb?.label, 'Больше про Санкт-Петербург');
   assert.ok(spb?.href);
 
   const msk = resolveBlogListingCta({

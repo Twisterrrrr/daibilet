@@ -56,7 +56,7 @@ function BlogListRow({ post }: { post: BlogCardDto }) {
   if (post.city && cityLabel !== 'Без города') {
     chips.push({
       key: `city-${post.city}`,
-      label: cityLabel === 'Санкт-Петербург' ? 'Питер' : cityLabel,
+      label: cityLabel,
       kind: 'city',
     });
   }

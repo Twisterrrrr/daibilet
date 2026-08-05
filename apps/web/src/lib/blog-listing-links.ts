@@ -138,10 +138,10 @@ export function resolveBlogListingQuickLinks(input: {
   return links.slice(0, limit);
 }
 
-/** Короткое имя города для CTA «Больше про …» (винительный / привычная форма). */
+/** Имя города для CTA «Больше про …» (винительный / каноническая форма). */
 const BLOG_CTA_CITY_SHORT: Record<string, string> = {
   moscow: 'Москву',
-  'saint-petersburg': 'Питер',
+  'saint-petersburg': 'Санкт-Петербург',
   kazan: 'Казань',
   ekaterinburg: 'Екатеринбург',
   kaliningrad: 'Калининград',
@@ -182,9 +182,8 @@ function resolveBlogCtaLabel(input: {
     return `Больше про ${BLOG_CTA_CITY_SHORT[city]}`;
   }
   if (city && input.city) {
-    const short =
-      String(input.city).trim() === 'Санкт-Петербург' ? 'Питер' : String(input.city).trim();
-    if (short) return `Больше про ${short}`;
+    const name = String(input.city).trim();
+    if (name) return `Больше про ${name}`;
   }
 
   const landing = String(input.landingSlug || '').trim();

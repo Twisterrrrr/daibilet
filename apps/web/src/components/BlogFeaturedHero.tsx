@@ -199,7 +199,7 @@ export function BlogFeaturedHero({
                           <span
                             className={`inline-flex w-fit max-w-full truncate rounded-md px-1.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide ring-1 md:text-[10px] ${blogCityBadgeClassName(post.citySlug)}`}
                           >
-                            {cityLabel === 'Санкт-Петербург' ? 'Питер' : cityLabel}
+                            {cityLabel}
                           </span>
                         ) : null}
                         <Link

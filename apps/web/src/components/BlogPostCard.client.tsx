@@ -121,7 +121,7 @@ function TagChips({
         <span
           className={`inline-flex max-w-full truncate rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ring-1 transition-colors duration-300 sm:text-[11px] ${blogCityBadgeClassName(citySlug)}`}
         >
-          {cityLabel === 'Санкт-Петербург' ? 'Питер' : cityLabel}
+          {cityLabel}
         </span>
       ) : null}
     </div>
