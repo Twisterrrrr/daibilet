@@ -93,6 +93,8 @@ export function BlogPostCard({
   const cardShell = [
     'group flex h-full flex-col overflow-hidden rounded-card bg-white shadow-card transition duration-300',
     'hover:-translate-y-0.5 hover:shadow-card-hover',
+    // Whole-card <Link>: keep title color stable (:visited must not turn blue).
+    'text-slate-900 visited:text-slate-900',
   ].join(' ');
 
   // Large: title → текст → chips → CTA → meta с датой (без nested <a>).
@@ -195,17 +197,17 @@ export function BlogPostCard({
         {excerpt ? (
           <p
             className={[
-              // Не ставить flex-1 на line-clamp: бокс растёт выше N строк,
-              // и браузер рисует «...» посреди фразы, хотя текст ещё виден ниже.
+              // Clamp fills the card body; meta stays at bottom via mt-auto (no empty flex gap).
               'mt-2 leading-relaxed text-slate-600',
-              isSmall ? 'line-clamp-2 text-xs sm:text-sm' : 'line-clamp-3 text-sm',
+              isSmall ? 'line-clamp-3 text-xs sm:text-sm' : 'line-clamp-4 text-sm',
             ].join(' ')}
           >
             {excerpt}
           </p>
         ) : null}
-        <div className="flex-1" />
-        <BlogCardMeta post={post} dateLabel={dateLabel} isLarge={false} />
+        <div className="mt-auto pt-3">
+          <BlogCardMeta post={post} dateLabel={dateLabel} isLarge={false} />
+        </div>
       </div>
     </Link>
   );
