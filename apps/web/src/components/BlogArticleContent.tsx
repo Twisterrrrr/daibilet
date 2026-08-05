@@ -72,6 +72,7 @@ export function parseImageBlock(block: string): ParsedImageBlock | null {
 
 type ContentBlock =
   | { type: 'paragraph'; text: string }
+  | { type: 'tagline'; text: string }
   | { type: 'h2'; text: string }
   | { type: 'h3'; text: string }
   | { type: 'ul'; items: string[] }
@@ -79,9 +80,20 @@ type ContentBlock =
   | { type: 'table'; lines: string[] }
   | { type: 'image'; image: ParsedImageBlock }
   | { type: 'quote'; data: ParsedQuote }
+  | { type: 'callout'; label: string; text: string }
+  | { type: 'hr' }
   | { type: 'cta'; data: ReturnType<typeof parseCtaBlock> & object }
   | { type: 'buy'; data: NonNullable<ReturnType<typeof parseBuyBlock>> }
   | { type: 'note'; data: NonNullable<ReturnType<typeof parseNoteBlock>> };
+
+const CALLOUT_LABEL_RE =
+  /^\*\*(Атмосферная деталь|Практический совет|Лайфхак|Адрес):\*\*\s*(.+)$/s;
+
+export function parseCalloutText(text: string): { label: string; body: string } | null {
+  const match = String(text || '').trim().match(CALLOUT_LABEL_RE);
+  if (!match?.[1] || !match[2]) return null;
+  return { label: match[1], body: match[2].trim() };
+}
 
 function renderInlineToken(token: InlineToken, key: string): React.ReactNode {
   switch (token.type) {
@@ -161,9 +173,13 @@ function parseTableRow(line: string): string[] {
     .map((cell) => cell.trim());
 }
 
-function isStandaloneBoldHeading(line: string): boolean {
+function isStandaloneBoldTagline(line: string): boolean {
   const trimmed = line.trim();
   return trimmed.startsWith('**') && trimmed.endsWith('**') && !trimmed.includes('[');
+}
+
+function isHrLine(line: string): boolean {
+  return /^(-{3,}|\*{3,}|_{3,})$/.test(line.trim());
 }
 
 function isOrderedListLine(line: string): boolean {
@@ -189,7 +205,8 @@ function isSpecialLine(line: string): boolean {
   if (isTableLine(trimmed)) return true;
   if (isBlockquoteLine(trimmed)) return true;
   if (trimmed.startsWith('## ') || trimmed.startsWith('### ') || trimmed.startsWith('# ')) return true;
-  if (isStandaloneBoldHeading(trimmed)) return true;
+  if (isStandaloneBoldTagline(trimmed)) return true;
+  if (isHrLine(trimmed)) return true;
   if (isOrderedListLine(trimmed) || isUnorderedListLine(trimmed)) return true;
   return false;
 }
@@ -252,7 +269,19 @@ export function parseContentBlocks(content: string): ContentBlock[] {
         index += 1;
       }
       const text = quoteLines.join('\n').trim();
-      if (text) blocks.push({ type: 'quote', data: { text } });
+      const callout = parseCalloutText(text);
+      if (callout) {
+        blocks.push({ type: 'callout', label: callout.label, text: callout.body });
+      } else if (text) {
+        blocks.push({ type: 'quote', data: { text } });
+      }
+      continue;
+    }
+
+    if (isHrLine(line)) {
+      flushParagraph();
+      blocks.push({ type: 'hr' });
+      index += 1;
       continue;
     }
 
@@ -285,9 +314,9 @@ export function parseContentBlocks(content: string): ContentBlock[] {
       continue;
     }
 
-    if (isStandaloneBoldHeading(line)) {
+    if (isStandaloneBoldTagline(line)) {
       flushParagraph();
-      blocks.push({ type: 'h2', text: line.replace(/^\*\*|\*\*$/g, '') });
+      blocks.push({ type: 'tagline', text: line.replace(/^\*\*|\*\*$/g, '') });
       index += 1;
       continue;
     }
@@ -499,6 +528,15 @@ function BlogPullQuote({ text, cite }: ParsedQuote) {
   );
 }
 
+function BlogCallout({ label, text }: { label: string; text: string }) {
+  return (
+    <p className="my-4 text-base leading-[1.65] text-slate-800 sm:text-[1.0625rem]">
+      <strong className="font-semibold text-slate-900">{label}:</strong>{' '}
+      {renderInline(text, `callout-${label}-`)}
+    </p>
+  );
+}
+
 function BlogFlexRow({
   image,
   children,
@@ -533,13 +571,16 @@ function tableRowsFromBlock(block: Extract<ContentBlock, { type: 'table' }>): st
 }
 
 const PARAGRAPH_CLASS =
-  'text-base leading-[1.65] text-pretty text-slate-800 [overflow-wrap:break-word] sm:text-[1.0625rem] sm:leading-[1.65]';
+  'text-base font-normal leading-[1.65] text-pretty text-slate-800 [overflow-wrap:break-word] sm:text-[1.0625rem] sm:leading-[1.65]';
 const LEAD_PARAGRAPH_CLASS =
-  'text-[1.0625rem] leading-[1.65] text-pretty text-slate-800 [overflow-wrap:break-word] sm:text-lg sm:leading-[1.6]';
+  'text-[1.0625rem] font-normal leading-[1.65] text-pretty text-slate-800 [overflow-wrap:break-word] sm:text-lg sm:leading-[1.6]';
+const TAGLINE_CLASS =
+  'mb-4 text-base font-semibold leading-snug text-slate-900 sm:text-[1.0625rem]';
 const H2_CLASS =
-  'scroll-mt-24 mb-4 border-b border-slate-200/90 pb-2.5 font-display text-[1.45rem] font-bold tracking-tight text-slate-950 sm:text-[1.7rem] lg:text-[1.8rem] [&:not(:first-child)]:mt-12 [&:not(:first-child)]:pt-1';
+  'scroll-mt-24 mb-5 border-b border-slate-200/90 pb-3 font-display text-[1.45rem] font-bold tracking-tight text-slate-950 sm:text-[1.7rem] lg:text-[1.8rem] [&:not(:first-child)]:mt-14 [&:not(:first-child)]:pt-1';
 const H3_CLASS =
-  'scroll-mt-24 mb-3 font-display text-[1.125rem] font-bold tracking-tight text-slate-900 sm:text-xl [&:not(:first-child)]:mt-8';
+  'scroll-mt-24 mb-2 font-display text-[1.125rem] font-bold tracking-tight text-slate-900 sm:text-xl [&:not(:first-child)]:mt-10';
+const HR_CLASS = 'my-10 border-0 border-t border-slate-200/90';
 const LIST_CLASS =
   'my-5 space-y-2.5 pl-6 text-base leading-[1.65] text-pretty text-slate-800 sm:text-[1.0625rem]';
 
@@ -685,6 +726,22 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
         break;
       case 'quote':
         nodes.push(<BlogPullQuote key={`quote-${index}`} {...block.data} />);
+        isLeadParagraph = false;
+        break;
+      case 'callout':
+        nodes.push(<BlogCallout key={`callout-${index}`} label={block.label} text={block.text} />);
+        isLeadParagraph = false;
+        break;
+      case 'hr':
+        nodes.push(<hr key={`hr-${index}`} className={HR_CLASS} />);
+        isLeadParagraph = false;
+        break;
+      case 'tagline':
+        nodes.push(
+          <p key={`tagline-${index}`} className={TAGLINE_CLASS}>
+            {renderInline(block.text, `tagline-${index}-`)}
+          </p>,
+        );
         isLeadParagraph = false;
         break;
       case 'buy':
