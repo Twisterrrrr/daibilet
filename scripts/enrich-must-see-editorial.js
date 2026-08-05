@@ -10,6 +10,7 @@
  *   node scripts/enrich-must-see-editorial.js --dry-run
  *   node scripts/enrich-must-see-editorial.js --apply
  *   node scripts/enrich-must-see-editorial.js --apply --cities=moscow,saint-petersburg
+ *   node scripts/enrich-must-see-editorial.js --apply --file=scripts/data/spb-kgd-venue-coords.json
  */
 const path = require('path');
 const fs = require('fs');
@@ -200,6 +201,7 @@ const CITY_TITLE_ALIASES = {
 };
 
 const dryRun = process.argv.includes('--dry-run') || !process.argv.includes('--apply');
+const writeCityInfo = process.argv.includes('--write-cityinfo');
 const citiesFilter = parseCitiesFilter(process.argv);
 const connectionString =
   process.env.DATABASE_URL || 'postgresql://daibilet:daibilet@127.0.0.1:5437/daibilet';
@@ -209,11 +211,65 @@ main().catch((error) => {
   process.exitCode = 1;
 });
 
+function normalizeInput(raw) {
+  if (Array.isArray(raw)) return raw;
+  if (!Array.isArray(raw?.places)) throw new Error('Editorial JSON must be an array or owner { places } pack');
+
+  const blurbs = loadCityInfoBlurbs();
+  return raw.places.map(([ownerId, cityKey, title, address, latitude, longitude]) => {
+    const blurb = blurbs.get(normalizePlaceTitle(title)) || '';
+    return {
+      ownerId,
+      cityKey,
+      title,
+      slug: `${cityKey}-${slugify(title)}`,
+      address,
+      latitude,
+      longitude,
+      shortDescription: blurb || title,
+      description: blurb || title,
+      // The owner rows contain verified logistics data; no fabricated transit copy.
+      wayToFind: null,
+      metroStation: null,
+    };
+  });
+}
+
+function loadCityInfoBlurbs() {
+  const result = new Map();
+  const cityInfoPath = path.join(rootDir, 'apps', 'web', 'src', 'lib', 'cityInfo.ts');
+  if (!fs.existsSync(cityInfoPath)) return result;
+  const source = fs.readFileSync(cityInfoPath, 'utf8');
+  const re = /\{\s*name:\s*'((?:\\'|[^'])*)'[^{}]*?desc:\s*'((?:\\'|[^'])*)'/g;
+  let match;
+  while ((match = re.exec(source))) {
+    result.set(normalizePlaceTitle(match[1].replace(/\\'/g, "'")), match[2].replace(/\\'/g, "'"));
+  }
+  return result;
+}
+
+function normalizePlaceTitle(value) {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/ё/g, 'е')
+    .replace(/[«»"'()[\],.]/g, ' ')
+    .replace(/\b(улица|ул|проспект|пр|набережная|наб)\b/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function slugify(value) {
+  const map = { а:'a', б:'b', в:'v', г:'g', д:'d', е:'e', ё:'e', ж:'zh', з:'z', и:'i', й:'y', к:'k', л:'l', м:'m', н:'n', о:'o', п:'p', р:'r', с:'s', т:'t', у:'u', ф:'f', х:'h', ц:'ts', ч:'ch', ш:'sh', щ:'sch', ъ:'', ы:'y', ь:'', э:'e', ю:'yu', я:'ya' };
+  return String(value || '').toLowerCase().split('').map((char) => map[char] ?? char).join('')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').replace(/-{2,}/g, '-').slice(0, 72);
+}
+
 async function main() {
   if (!fs.existsSync(DATA_PATH)) {
     throw new Error(`Missing data file: ${DATA_PATH}`);
   }
-  const all = JSON.parse(fs.readFileSync(DATA_PATH, 'utf8'));
+  const raw = JSON.parse(fs.readFileSync(DATA_PATH, 'utf8'));
+  const all = normalizeInput(raw);
   if (!Array.isArray(all) || !all.length) throw new Error('Editorial JSON empty');
 
   const rows = citiesFilter.size
@@ -223,6 +279,7 @@ async function main() {
   const pool = new Pool({ connectionString, max: 2 });
   const cityCache = new Map();
   const report = { dryRun, total: rows.length, byAction: {}, sample: [], missingCity: [] };
+  const resolvedRows = [];
 
   try {
     const hasHookFact = await columnExists(pool, 'Venue', 'hookFact');
@@ -240,17 +297,32 @@ async function main() {
 
       const inferred = inferKindAndFamily(item.title, item);
       const pageStatus = 'PUBLISHED';
-      const canonicalPath =
+      let canonicalPath =
         inferred.family === 'institution' ? `/venues/${item.slug}` : `/locations/${item.slug}`;
 
+      // One physical point has one entity: first reuse its slug, then title in
+      // the target city, then the supplied coordinates. This makes owner packs
+      // safe to rerun after an earlier manual/catalog seed.
       const before = await pool.query(
         `select id, slug, "shortDescription", description, "hookFact", latitude, longitude,
                 address, "metroStation", "wayToFind", kind, "pageStatus", "cityId"
-         from "Venue" where slug = $1 limit 1`,
-        [item.slug],
+         from "Venue"
+         where slug = $1
+            or ("cityId" = $2 and lower(title) = lower($3))
+            or ("cityId" = $2 and latitude is not null and longitude is not null
+                and abs(latitude - $4) < 0.00001 and abs(longitude - $5) < 0.00001)
+         order by case when slug = $1 then 0 when lower(title) = lower($3) then 1 else 2 end
+         limit 1`,
+        [item.slug, city.id, item.title, item.latitude, item.longitude],
       );
       const existing = before.rows[0] || null;
       const action = existing ? 'update' : 'insert';
+      // Existing public links remain canonical. The owner row enriches that
+      // entity instead of producing a twin under a newly generated slug.
+      if (existing && existing.slug !== item.slug) item.slug = existing.slug;
+      canonicalPath =
+        inferred.family === 'institution' ? `/venues/${item.slug}` : `/locations/${item.slug}`;
+      resolvedRows.push({ item, family: inferred.family });
 
       if (!dryRun) {
         if (existing) {
@@ -290,11 +362,37 @@ async function main() {
         });
       }
     }
+    if (writeCityInfo) report.cityInfo = writeOwnerCityInfo(resolvedRows, dryRun);
   } finally {
     await pool.end();
   }
 
   console.log(JSON.stringify(report, null, 2));
+}
+
+function writeOwnerCityInfo(rows, dryRun) {
+  const filePath = path.join(rootDir, 'apps', 'web', 'src', 'lib', 'cityInfo.ts');
+  if (!fs.existsSync(filePath)) return { changed: false, reason: 'missing' };
+  const before = fs.readFileSync(filePath, 'utf8');
+  let wired = 0;
+  const after = before.replace(/\{[^{}]*name:\s*'((?:\\'|[^'])*)'[^{}]*\}/g, (block, rawName) => {
+    if (/\b(?:venueSlug|locationSlug):/.test(block)) return block;
+    const target = rows.find(({ item }) => placeNamesMatch(rawName, item.title));
+    if (!target) return block;
+    const key = target.family === 'institution' ? 'venueSlug' : 'locationSlug';
+    wired += 1;
+    return block.replace(/\s*\}$/, `, ${key}: '${target.item.slug}' }`);
+  });
+  if (!dryRun && after !== before) fs.writeFileSync(filePath, after, 'utf8');
+  return { changed: after !== before, wired, dryRun };
+}
+
+function placeNamesMatch(left, right) {
+  const a = normalizePlaceTitle(left)
+    .replace(/\bв развод\b|\bулица\b/g, '').replace(/\s+/g, ' ').trim();
+  const b = normalizePlaceTitle(right)
+    .replace(/\bулица\b/g, '').replace(/\s+/g, ' ').trim();
+  return a === b || (Math.min(a.length, b.length) >= 12 && (a.includes(b) || b.includes(a)));
 }
 
 async function updateVenue(pool, ctx) {
