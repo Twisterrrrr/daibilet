@@ -23,7 +23,7 @@
 
 ### Решения
 - `LandingScheduleRow` / dinner row / table / editorial facts: `formatMoneyRange(min, max)` → `мин-макс ₽` или `от мин ₽`.
-- Зеркало в `apps/public` `LandingPage.tsx`. Deploy MSK не делали - ждём owner.
+- Зеркало в `apps/public` `LandingPage.tsx`. Код в `be2f075` (push вместе с blog DRAFT). Deploy MSK не делали - ждём owner.
 
 ### Проблемы
 - Нет. Per-session DTO по-прежнему отдаёт только min билета; range на карточке = разброс mins по сессиям группы.
