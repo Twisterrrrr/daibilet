@@ -1,44 +1,27 @@
 import Link from 'next/link';
-import {
-  ArrowRight,
-  CalendarDays,
-  CheckCircle2,
-  ChevronRight,
-  Landmark,
-  Map as MapIcon,
-  MapPin,
-  Moon,
-  Ship,
-  UtensilsCrossed,
-} from 'lucide-react';
+import { Suspense } from 'react';
+import { ArrowRight, Dices } from 'lucide-react';
 
 import { CityCard } from '@/components/CityCard';
-import { ExpandableBlurb } from '@/components/ExpandableBlurb.client';
-import { HomeCityAwareSections } from '@/components/HomeCityAwareSections.client';
-import { HomeHero } from '@/components/HomeHero.client';
-import { HomeVenuesSection } from '@/components/HomeVenuesSection.client';
+import { HomeBottomNav } from '@/components/HomeBottomNav.client';
+import { HomeGuideEvents } from '@/components/HomeGuideEvents.client';
+import { HomeGuideHero } from '@/components/HomeGuideHero.client';
+import { HomePageSkeleton } from '@/components/HomePageSkeleton';
+import { HomeStoriesStrip } from '@/components/HomeStoriesStrip.client';
+import { LuckyCityButton } from '@/components/LuckyCityButton.client';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { ScrollRail } from '@/components/ScrollRail.client';
 import { mergeBlogCards } from '@/lib/blog-utils';
 import '@/lib/env';
-import { getHomeCoverFingerprints, getHomePageData } from '@/server/cached-home-data';
 import { formatMoney, formatNumber, pluralEvents } from '@/lib/format';
-import { HOME_FORMAT_TILES, HOME_HOW_IT_WORKS, HOME_TRUST_ITEMS, resolveHomePromoImage } from '@/lib/home-scenarios';
-import { balancedTileGridClass } from '@/lib/balanced-tile-grid';
+import { resolveHomePromoImage } from '@/lib/home-scenarios';
+import type { HomeFeaturedBanner } from '@/lib/home-guide';
+import { podborkiBentoCellClass, podborkiBentoSpan, PODBORKI_BENTO_GRID_CLASS } from '@/lib/podborki-bento';
 import { landingCategoryHref } from '@/lib/landing-routes';
 import { withSoftTimeout } from '@/lib/soft-timeout';
-import { getActiveHeroBanners, heroFramesFromBanners } from '@/server/hero-banners';
+import { getHomeCoverFingerprints, getHomePageData } from '@/server/cached-home-data';
+import { getActiveHeroBanners } from '@/server/hero-banners';
 import { fetchPublicApiJson } from '@/server/public-api-client';
-
-function formatTileIcon(title: string) {
-  const key = title.toLowerCase();
-  const cls = 'h-6 w-6 text-primary-600';
-  if (key.includes('речн')) return <Ship className={cls} aria-hidden />;
-  if (key.includes('обзор') || key.includes('экскур')) return <MapIcon className={cls} aria-hidden />;
-  if (key.includes('музе')) return <Landmark className={cls} aria-hidden />;
-  if (key.includes('ночн')) return <Moon className={cls} aria-hidden />;
-  return <CalendarDays className={cls} aria-hidden />;
-}
 
 /** External CDN HEAD fingerprints must not stall home TTFB on bad egress/DNS. */
 const HOME_FINGERPRINTS_TIMEOUT_MS = 800;
@@ -46,23 +29,43 @@ const HOME_HERO_BANNERS_TIMEOUT_MS = 700;
 const HOME_ARTICLES_TIMEOUT_MS = 1_200;
 type BlogApiArticles = NonNullable<Parameters<typeof mergeBlogCards>[0]>;
 
-function promoBlockIcon(slug: string, index: number) {
-  const key = String(slug || '').toLowerCase();
-  const cls = 'mb-3 h-7 w-7 text-white/90 drop-shadow';
-  if (key.includes('bridge')) return <Landmark className={cls} />;
-  if (key.includes('dinner') || key.includes('ужин')) return <UtensilsCrossed className={cls} />;
-  if (key.includes('party') || key.includes('disco')) return <CalendarDays className={cls} />;
-  if (key.includes('bus')) return <MapPin className={cls} />;
-  if (key.includes('concert')) return <CalendarDays className={cls} />;
-  if (index % 3 === 0) return <Ship className={cls} />;
-  if (index % 3 === 1) return <CalendarDays className={cls} />;
-  return <UtensilsCrossed className={cls} />;
+function resolveFeaturedBanner(input: {
+  banners: Array<{ title: string; imageUrl: string; link: string | null }>;
+  landings: Array<{ slug: string; title: string; subtitle?: string | null; events: number; priceFrom?: number | null }>;
+}): HomeFeaturedBanner {
+  const banner = input.banners[0];
+  if (banner?.imageUrl) {
+    return {
+      title: banner.title || 'Афиша на неделю',
+      subtitle: 'Подборка ярких событий - выбирайте и бронируйте онлайн',
+      href: banner.link || '/events?sort=popular',
+      imageUrl: banner.imageUrl,
+      ctaLabel: 'Смотреть афишу',
+    };
+  }
+
+  const landing = input.landings[0];
+  if (landing) {
+    return {
+      title: landing.title,
+      subtitle: landing.subtitle || `${pluralEvents(landing.events)} - готовая подборка`,
+      href: landingCategoryHref(landing.slug),
+      imageUrl: resolveHomePromoImage(landing.slug, landing.title),
+      ctaLabel: 'Смотреть афишу',
+    };
+  }
+
+  return {
+    title: 'Куда сходить на этой неделе',
+    subtitle: 'Экскурсии, музеи, река и концерты в одном каталоге',
+    href: '/events?sort=popular',
+    imageUrl: '/images/home/format-tours.jpg',
+    ctaLabel: 'Смотреть афишу',
+  };
 }
 
-export async function HomePageContent() {
-  // Hero banners: unstable_cache 300s (matches page revalidate). Do not call
-  // connection() here - it forces dynamic no-store and kills CDN/ISR HIT on `/`.
-  const [{ destinationsPayload, catalogPayload, landingsCatalog, venuesPayload }, fingerprintsRecord] =
+async function HomePageBody() {
+  const [{ destinationsPayload, catalogPayload, landingsCatalog }, fingerprintsRecord] =
     await Promise.all([
       getHomePageData(),
       withSoftTimeout(
@@ -75,19 +78,16 @@ export async function HomePageContent() {
 
   const destinations = destinationsPayload?.destinations ?? [];
   const cities = destinations.filter((item) => item.type === 'city');
-  const topCities = [...cities].sort((a, b) => b.events - a.events || a.name.localeCompare(b.name, 'ru')).slice(0, 8);
-  // Same definition as footer / PublicStatsDto.destinations: cities + regions with events.
+  const topCities = [...cities]
+    .sort((a, b) => b.events - a.events || a.name.localeCompare(b.name, 'ru'))
+    .slice(0, 8);
   const liveCities = destinations.filter((item) => (item.events || 0) > 0).length;
   const liveEvents = catalogPayload?.total ?? catalogPayload?.items?.length ?? 0;
-  const liveVenues = venuesPayload?.total ?? venuesPayload?.venues?.length ?? 0;
 
   const sessions = catalogPayload?.items ?? [];
-  const fingerprints = new Map(Object.entries(fingerprintsRecord));
   const sparseCatalog = sessions.length < 12;
 
-  const allVenues = venuesPayload?.venues ?? [];
-
-  const promoLandings = (landingsCatalog?.items || []).filter((item) => item.events > 0).slice(0, 6);
+  const promoLandings = (landingsCatalog?.items || []).filter((item) => item.events > 0).slice(0, 4);
   let blogCards = mergeBlogCards(null);
   try {
     const articlesPayload = await fetchPublicApiJson<{ articles?: BlogApiArticles }>('/api/public/articles', {
@@ -102,192 +102,137 @@ export async function HomePageContent() {
     : [...blogCards].reverse();
   const blogPosts = orderedBlog.slice(0, 4);
   const [featuredBlog, ...restBlog] = blogPosts;
+
   const heroBanners = await withSoftTimeout(
     getActiveHeroBanners(),
     HOME_HERO_BANNERS_TIMEOUT_MS,
     [],
     'home-hero-banners',
   );
-  const heroFrames = heroFramesFromBanners(heroBanners);
+  const featured = resolveFeaturedBanner({
+    banners: heroBanners,
+    landings: promoLandings,
+  });
 
   return (
-    <>
-      <HomeHero destinations={destinations} frames={heroFrames} />
+    <div className="pb-24 lg:pb-0">
+      <HomeStoriesStrip />
 
-      <HomeCityAwareSections
-        sessions={sessions}
-        fingerprints={Object.fromEntries(fingerprints)}
-        sparseCatalog={sparseCatalog}
-      >
-        {topCities.length ? (
-          <section id="destinations" className="section-y border-b border-slate-100">
-            <div className="container-page">
-              <div className="flex items-end justify-between gap-4">
-                <div>
-                  <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Популярные города</h2>
-                  <p className="mt-1 text-sm text-slate-500">Выберите город - покажем афишу и подборки</p>
-                </div>
-                <Link href="/cities" className="shrink-0 text-sm font-semibold text-primary-600 hover:text-primary-700">
-                  Все города →
-                </Link>
+      <HomeGuideHero featured={featured} />
+
+      {/* 2. Cities */}
+      {topCities.length ? (
+        <section id="destinations" className="section-y border-b border-slate-100">
+          <div className="container-page">
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+                  Популярные города
+                </h2>
+                <p className="mt-1 text-sm text-slate-500">Выберите город - покажем афишу и подборки</p>
               </div>
-              {/* Mobile: horizontal rail saves ~40% height vs 2×4 dark photo grid */}
-              <ScrollRail
-                className="mt-6 sm:hidden"
-                viewportClassName="flex flex-nowrap gap-3 snap-x snap-mandatory"
-                aria-label="Популярные города"
-              >
-                {topCities.map((city) => (
-                  <div key={city.slug || city.name} className="w-[min(42vw,160px)] shrink-0 snap-start">
-                    <CityCard city={city} />
-                  </div>
-                ))}
-              </ScrollRail>
-              <ul className="mt-8 hidden grid-cols-2 gap-3 sm:grid sm:grid-cols-4 sm:gap-4">
-                {topCities.map((city) => (
-                  <li key={city.slug || city.name}>
-                    <CityCard city={city} />
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </section>
-        ) : null}
-      </HomeCityAwareSections>
-
-      <section id="formats" className="section-y">
-        <div className="container-page">
-          <div className="flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Выберите формат отдыха</h2>
-              <p className="mt-1 text-sm text-slate-500">Сценарии под настроение, компанию и сезон</p>
-            </div>
-            <Link href="/podborki" className="inline-flex items-center gap-1 text-sm font-semibold text-primary-600 hover:text-primary-700">
-              Все подборки <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-          {/* Mobile: light icon chips (no heavy dark photo mass). lg+: photo tiles. */}
-          <ScrollRail
-            className="mt-6 lg:hidden"
-            viewportClassName="flex flex-nowrap gap-3 snap-x snap-mandatory px-0.5 pb-1"
-            aria-label="Форматы отдыха"
-          >
-            {HOME_FORMAT_TILES.map((tile) => (
-              <Link
-                key={tile.title}
-                href={tile.href}
-                className="flex w-[5.75rem] shrink-0 snap-start flex-col items-center gap-2 rounded-2xl bg-white px-2 py-3 text-center shadow-card ring-1 ring-slate-200/80 transition hover:ring-primary/30"
-              >
-                <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-50">
-                  {formatTileIcon(tile.title)}
-                </span>
-                <span className="line-clamp-2 text-[11px] font-semibold leading-snug text-slate-800">
-                  {tile.title}
-                </span>
+              <Link href="/cities" className="shrink-0 text-sm font-semibold text-primary-600 hover:text-primary-700">
+                Все города →
               </Link>
-            ))}
-          </ScrollRail>
-          <ul className={`mt-6 hidden gap-3 lg:grid ${balancedTileGridClass(HOME_FORMAT_TILES.length, { lg: 4 })}`}>
-            {HOME_FORMAT_TILES.map((tile) => (
-              <li key={tile.title}>
-                <Link
-                  href={tile.href}
-                  className="group relative flex min-h-[148px] overflow-hidden rounded-card bg-slate-800 text-white shadow-card transition duration-300 hover:-translate-y-0.5 hover:shadow-card-hover"
-                >
-                  <SafeImage
-                    src={tile.imageUrl}
-                    alt=""
-                    fill
-                    sizes="25vw"
-                    className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-                    fallback={<div className={`absolute inset-0 bg-gradient-to-br ${tile.fallbackGradient}`} />}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/5" />
-                  <div className="relative z-[1] flex h-full min-h-[148px] w-full flex-col justify-end p-5">
-                    <h3 className="text-lg font-bold text-white">{tile.title}</h3>
-                    <p className="mt-1 text-sm text-white/90">{tile.subtitle}</p>
-                    <ChevronRight className="absolute bottom-4 right-4 h-5 w-5 text-white/80 transition group-hover:translate-x-0.5 group-hover:text-white" />
-                  </div>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
+            </div>
+            <ScrollRail
+              className="mt-6 sm:hidden"
+              viewportClassName="flex flex-nowrap gap-3 snap-x snap-mandatory"
+              aria-label="Популярные города"
+            >
+              {topCities.map((city) => (
+                <div key={city.slug || city.name} className="w-[min(42vw,160px)] shrink-0 snap-start" data-rail-item>
+                  <CityCard city={city} />
+                </div>
+              ))}
+            </ScrollRail>
+            <ul className="mt-8 hidden grid-cols-2 gap-3 sm:grid sm:grid-cols-4 lg:grid-cols-6 sm:gap-4">
+              {topCities.slice(0, 6).map((city) => (
+                <li key={city.slug || city.name}>
+                  <CityCard city={city} />
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      ) : null}
 
-      <HomeVenuesSection venues={allVenues} />
+      {/* 3. Top events */}
+      <HomeGuideEvents
+        sessions={sessions}
+        fingerprints={fingerprintsRecord}
+        sparseCatalog={sparseCatalog}
+      />
 
+      {/* 4. Lucky city randomizer */}
+      {cities.some((c) => c.events > 0) ? (
+        <section className="section-y bg-gradient-to-r from-primary-50/80 via-sky-50/60 to-white">
+          <div className="container-page">
+            <div className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-primary-100/80 bg-white/80 p-5 shadow-card sm:flex-row sm:items-center sm:p-6">
+              <div className="flex items-start gap-3">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-500 to-sky-500 text-white shadow-sm">
+                  <Dices className="h-5 w-5" aria-hidden />
+                </span>
+                <div>
+                  <h2 className="font-display text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
+                    Куда поехать?
+                  </h2>
+                  <p className="mt-1 text-sm text-slate-500">
+                    Случайный город с живой афишей - если не можете выбрать сами
+                  </p>
+                </div>
+              </div>
+              <LuckyCityButton cities={cities} variant="toolbar" />
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      {/* 5. Podborki bento */}
       {promoLandings.length ? (
         <section id="landings" className="section-y">
           <div className="container-page">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Тематические подборки</h2>
-                <p className="mt-1 text-sm text-slate-500">Готовые списки под настроение и повод - от прогулок до концертов</p>
+                <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+                  Подборки
+                </h2>
+                <p className="mt-1 text-sm text-slate-500">Готовые списки под настроение и повод</p>
               </div>
-              <Link href="/podborki" className="inline-flex items-center gap-1 text-sm font-semibold text-primary-700 hover:text-primary-800">
-                Все подборки <ArrowRight className="h-4 w-4" />
+              <Link
+                href="/podborki"
+                className="inline-flex items-center gap-1 text-sm font-semibold text-primary-700 hover:text-primary-800"
+              >
+                Смотреть все <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
-            {/* Мобилка: горизонтальный скролл; lg+: сетка 3 колонки (до 6 карточек = 2 ряда) */}
-            <ScrollRail
-              className="mt-6 lg:hidden"
-              viewportClassName="flex flex-nowrap gap-3 snap-x snap-mandatory"
-              aria-label="Тематические подборки"
-            >
-              {promoLandings.map((landing, index) => {
+            <ul className={`mt-6 ${PODBORKI_BENTO_GRID_CLASS}`}>
+              {promoLandings.map((landing) => {
+                const span = podborkiBentoSpan(landing);
                 const imageUrl = resolveHomePromoImage(landing.slug, landing.title);
                 return (
-                  <Link
-                    key={landing.slug}
-                    href={landingCategoryHref(landing.slug)}
-                    className="horizontal-snap-card group relative min-h-[168px] overflow-hidden rounded-card bg-slate-800 text-left text-white shadow-card transition duration-300 hover:-translate-y-0.5 hover:shadow-card-hover sm:min-h-[180px]"
-                  >
-                    <SafeImage
-                      src={imageUrl}
-                      alt=""
-                      fill
-                      sizes="75vw"
-                      className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-                      fallback={<div className="absolute inset-0 bg-gradient-to-br from-slate-700 to-slate-950" />}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-black/10" />
-                    <div className="relative z-[1] flex h-full min-h-[168px] flex-col justify-end p-5 sm:min-h-[180px] sm:p-6">
-                      {promoBlockIcon(landing.slug, index)}
-                      <h3 className="text-lg font-bold text-white">{landing.title}</h3>
-                      <p className="mt-1 text-sm text-white/90">{landing.subtitle}</p>
-                      <div className="mt-4 text-sm font-semibold text-white">
-                        {pluralEvents(landing.events)} · {formatMoney(landing.priceFrom)}
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })}
-            </ScrollRail>
-            <ul className={`mt-6 hidden gap-3 lg:grid ${balancedTileGridClass(promoLandings.length, { lg: 3 })}`}>
-              {promoLandings.map((landing, index) => {
-                const imageUrl = resolveHomePromoImage(landing.slug, landing.title);
-                return (
-                  <li key={landing.slug}>
+                  <li key={landing.slug} className={podborkiBentoCellClass(span)}>
                     <Link
                       href={landingCategoryHref(landing.slug)}
-                      className="group relative flex min-h-[168px] overflow-hidden rounded-card bg-slate-800 text-left text-white shadow-card transition duration-300 hover:-translate-y-0.5 hover:shadow-card-hover sm:min-h-[180px]"
+                      className="group relative flex h-full min-h-[inherit] overflow-hidden rounded-card bg-slate-800 text-left text-white shadow-card transition duration-300 hover:-translate-y-0.5 hover:shadow-card-hover"
                     >
                       <SafeImage
                         src={imageUrl}
                         alt=""
                         fill
-                        sizes="33vw"
+                        sizes={span === 2 ? '50vw' : '25vw'}
                         className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-                        fallback={<div className="absolute inset-0 bg-gradient-to-br from-slate-700 to-slate-950" />}
+                        fallback={<div className="absolute inset-0 bg-gradient-to-br from-primary-800 via-sky-900 to-slate-950" />}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-black/10" />
-                      <div className="relative z-[1] flex h-full min-h-[168px] w-full flex-col justify-end p-5 sm:min-h-[180px] sm:p-6">
-                        {promoBlockIcon(landing.slug, index)}
-                        <h3 className="text-lg font-bold text-white">{landing.title}</h3>
-                        <p className="mt-1 text-sm text-white/90">{landing.subtitle}</p>
-                        <div className="mt-4 text-sm font-semibold text-white">
-                          {pluralEvents(landing.events)} · {formatMoney(landing.priceFrom)}
+                      <div className="relative z-[1] flex h-full w-full flex-col justify-end p-4 sm:p-5">
+                        <h3 className="text-base font-bold text-white sm:text-lg">{landing.title}</h3>
+                        {landing.subtitle ? (
+                          <p className="mt-1 line-clamp-2 text-sm text-white/90">{landing.subtitle}</p>
+                        ) : null}
+                        <div className="mt-3 text-sm font-semibold text-white">
+                          {pluralEvents(landing.events)}
+                          {landing.priceFrom != null ? ` · ${formatMoney(landing.priceFrom)}` : ''}
                         </div>
                       </div>
                     </Link>
@@ -299,15 +244,21 @@ export async function HomePageContent() {
         </section>
       ) : null}
 
+      {/* 6. Blog magazine */}
       {featuredBlog ? (
         <section id="blog" className="section-y bg-surface-muted">
           <div className="container-page">
             <div className="flex flex-wrap items-end justify-between gap-3">
               <div>
-                <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Идеи для поездок и отдыха</h2>
-                <p className="mt-1 text-sm text-slate-500">Статьи и советы перед выбором события</p>
+                <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+                  Идеи для поездок
+                </h2>
+                <p className="mt-1 text-sm text-slate-500">Журнал Дайбилет - маршруты и советы</p>
               </div>
-              <Link href="/blog" className="inline-flex items-center gap-1 text-sm font-semibold text-primary-600 hover:text-primary-700">
+              <Link
+                href="/blog"
+                className="inline-flex items-center gap-1 text-sm font-semibold text-primary-600 hover:text-primary-700"
+              >
                 Все материалы <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
@@ -332,7 +283,7 @@ export async function HomePageContent() {
                   <p className="mt-2 line-clamp-2 text-sm text-white/85">{featuredBlog.excerpt}</p>
                 </div>
               </Link>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+              <div className="grid gap-4">
                 {restBlog.slice(0, 3).map((post) => (
                   <Link
                     key={post.slug}
@@ -350,7 +301,9 @@ export async function HomePageContent() {
                     </div>
                     <div className="min-w-0">
                       <p className="text-xs font-semibold uppercase tracking-wide text-primary-600">{post.tag}</p>
-                      <h3 className="mt-1 line-clamp-2 text-sm font-semibold text-slate-900 group-hover:text-primary-700">{post.title}</h3>
+                      <h3 className="mt-1 line-clamp-2 text-sm font-semibold text-slate-900 group-hover:text-primary-700">
+                        {post.title}
+                      </h3>
                       <p className="mt-1 line-clamp-2 text-xs text-slate-500">{post.excerpt}</p>
                     </div>
                   </Link>
@@ -361,104 +314,36 @@ export async function HomePageContent() {
         </section>
       ) : null}
 
-      <section className="section-y bg-surface-muted/60">
-        <div className="container-page">
-          <div className="grid gap-6 rounded-card bg-white p-6 shadow-card sm:grid-cols-3 sm:p-8">
-            <div>
-              <p className="font-display text-3xl font-bold tracking-tight text-graphite sm:text-4xl">
-                {formatNumber(liveCities)}
-              </p>
-              <p className="mt-1 text-sm text-graphite-muted">городов с афишей</p>
-            </div>
-            <div>
-              <p className="font-display text-3xl font-bold tracking-tight text-graphite sm:text-4xl">
-                {formatNumber(liveEvents)}
-              </p>
-              <p className="mt-1 text-sm text-graphite-muted">событий онлайн</p>
-            </div>
-            <div>
-              <p className="font-display text-3xl font-bold tracking-tight text-graphite sm:text-4xl">
-                {formatNumber(liveVenues)}
-              </p>
-              <p className="mt-1 text-sm text-graphite-muted">площадок в каталоге</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="section-y mt-4 bg-slate-50 sm:mt-8">
-        <div className="container-page">
-          <h2 className="font-display text-center text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-            Как купить билет
-          </h2>
-          <p className="mx-auto mt-3 max-w-2xl text-center text-sm leading-6 text-graphite-muted">
-            Три шага от выбора до входа - билет сразу на телефон.
-          </p>
-          <ol className="mt-8 grid gap-4 sm:grid-cols-3">
-            {HOME_HOW_IT_WORKS.map((item) => (
-              <li key={item.step} className="rounded-card bg-white p-5 shadow-card">
-                <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary-600 text-sm font-bold text-white">
-                  {item.step}
-                </span>
-                <h3 className="mt-4 font-semibold text-graphite">{item.title}</h3>
-                <ExpandableBlurb
-                  text={item.text}
-                  className="mt-2 text-sm leading-6 text-graphite-muted"
-                  clampClassName="line-clamp-2 md:line-clamp-none"
-                  moreLabel="Развернуть"
-                  lessLabel="Свернуть"
-                  buttonClassName="mt-1 text-xs font-semibold text-primary-600 underline-offset-2 hover:underline md:hidden"
-                />
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
+      {/* 7. Trust strip - live counts only, no fake reviews */}
       <section className="section-y">
         <div className="container-page">
-          <h2 className="font-display text-center text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Почему выбирают Дайбилет</h2>
-          <div
-            className={`mt-8 grid gap-4 sm:grid-cols-2 ${balancedTileGridClass(HOME_TRUST_ITEMS.length, { lg: 4 })}`}
-          >
-            {HOME_TRUST_ITEMS.map(({ title, text }) => (
-              <div key={title} className="rounded-card bg-white p-5 shadow-card">
-                <CheckCircle2 className="h-6 w-6 text-primary-600" />
-                <h3 className="mt-3 font-semibold text-graphite">{title}</h3>
-                <ExpandableBlurb
-                  text={text}
-                  className="mt-2 text-sm leading-6 text-graphite-muted"
-                  clampClassName="line-clamp-2 md:line-clamp-none"
-                  moreLabel="Развернуть"
-                  lessLabel="Свернуть"
-                  buttonClassName="mt-1 text-xs font-semibold text-primary-600 underline-offset-2 hover:underline md:hidden"
-                />
+          <div className="flex flex-col gap-4 rounded-2xl border border-slate-100 bg-gradient-to-r from-primary-50/50 via-white to-sky-50/40 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8 sm:py-6">
+            <p className="text-sm font-medium text-slate-600 sm:max-w-xs">
+              Живая афиша по России - события, города и маршруты в одном гиде
+            </p>
+            <dl className="flex flex-wrap gap-6 sm:gap-10">
+              <div>
+                <dt className="text-xs font-medium uppercase tracking-wide text-slate-400">Городов</dt>
+                <dd className="font-display text-2xl font-bold text-primary-700">{formatNumber(liveCities)}</dd>
               </div>
-            ))}
+              <div>
+                <dt className="text-xs font-medium uppercase tracking-wide text-slate-400">Событий</dt>
+                <dd className="font-display text-2xl font-bold text-primary-700">{formatNumber(liveEvents)}</dd>
+              </div>
+            </dl>
           </div>
         </div>
       </section>
 
-      {/* B2B-блок: data-nosnippet чтобы не попадал в SERP вместо meta description */}
-      <section id="partner" className="section-y bg-gradient-to-r from-primary-600 to-sky-500" data-nosnippet>
-        <div className="container-page">
-          <div className="flex flex-col items-center gap-6 sm:flex-row sm:justify-between">
-            <div className="text-center sm:text-left">
-              <h2 className="font-display text-2xl font-bold text-white sm:text-3xl">Проводите экскурсии или мероприятия?</h2>
-              <p className="mt-2 max-w-xl text-sm text-white/85 sm:text-base">
-                Добавьте свои события на Дайбилет и получайте продажи через каталог, подборки и городские страницы.
-              </p>
-            </div>
-            <Link
-              href="/offer"
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-primary-700 shadow-sm transition hover:bg-slate-50"
-            >
-              Стать партнёром
-              <ArrowRight className="h-5 w-5" />
-            </Link>
-          </div>
-        </div>
-      </section>
-    </>
+      <HomeBottomNav />
+    </div>
+  );
+}
+
+export function HomePageContent() {
+  return (
+    <Suspense fallback={<HomePageSkeleton />}>
+      <HomePageBody />
+    </Suspense>
   );
 }

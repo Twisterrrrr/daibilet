@@ -15,6 +15,12 @@
 |---|--------|-----------|--------|
 | OPS.DEPLOY-CADENCE | Канон: commit+push после итерации; MSK web deploy пачкой раз в сутки / по запросу owner; hotfix-исключения | Высокий | ✅ `.cursorrules` + Project.md 2026-08-05 |
 
+## Home personal guide (2026-08-05)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| UX.HOME-GUIDE | Главная: desktop bento-hero + my-day + categories; mobile stories + bottom nav; секции cities/events/lucky/podborki/blog/trust | Высокий | ✅ code ship; deploy пачкой / по запросу |
+
 ## Runtime URL integrity (2026-08-05)
 
 | # | Задача | Приоритет | Статус |

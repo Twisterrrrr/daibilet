@@ -1,3 +1,22 @@
+## 2026-08-05 - Home: витрина → персональный гид (MVP)
+
+### Наблюдения
+- Owner: главная должна вести как гид (Мой день + афиша), а не как витрина с search-hero.
+- Desktop: bento (featured ~60% + «Мой день» ~40%) + category chips; mobile: stories + sticky bottom nav.
+- Parallel agents трогают events/podborki/venues - правки держали в home-файлах.
+
+### Решения
+- Новый каркас: HomeGuideHero, HomeStoriesStrip, HomeBottomNav, HomeGuideEvents, HomePageSkeleton.
+- Порядок секций: hero → города → «Куда сходить» → lucky-pick → bento подборки → blog magazine → live trust strip.
+- Brand primary/sky; дефис; без «Питер»; без fake reviews.
+- Suspense + brand-tinted skeleton; pb-24 + fixed bottom nav на mobile.
+- Commit+push; web deploy не делали.
+
+### Проблемы
+- Старый HomeHero / HomeCityAwareSections пока в репо (не подключены) - можно вычистить отдельным PR.
+
+---
+
 ## 2026-08-05 - spb-s-rebenkom-v-dozhd: «провести» на live CMS
 
 ### Наблюдения
