@@ -37,6 +37,8 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      // Legacy-транслитерация не должна вызывать city DTO с неканоническим slug.
+      { source: '/cities/sankt-peterburg', destination: '/cities/saint-petersburg', permanent: true },
       { source: '/my-orders', destination: '/account/purchases', permanent: true },
       { source: '/river-cruises', destination: '/rechnye-progulki', permanent: true },
       { source: '/river-cruises/:city', destination: '/rechnye-progulki/:city', permanent: true },

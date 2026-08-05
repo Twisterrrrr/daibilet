@@ -1,3 +1,18 @@
+## 2026-08-05 - Legacy alias городского хаба СПб
+
+### Наблюдения
+- Canonical `/cities/saint-petersburg` отвечает 200, а legacy transliteration `/cities/sankt-peterburg` вызывает HTTP 500.
+- Alias в `cityInfo` и UI-конфигурации не нормализует slug до server-side запроса `/api/public/cities/:slug`, поэтому не защищает HTTP route.
+
+### Решения
+- Добавлен permanent redirect на уровне Next config: `/cities/sankt-peterburg` → `/cities/saint-petersburg`.
+- Это сохраняет один индексируемый URL, не запускает DTO-построение для legacy slug и не требует изменений каталожных данных.
+
+### Проблемы
+- Нужны production build, MSK deploy и smoke обоих URL.
+
+---
+
 ## 2026-08-05 - Owner seed СПб и Калининграда
 
 ### Наблюдения

@@ -7,6 +7,14 @@
 
 ---
 
+## Runtime URL integrity (2026-08-05)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| FIX.CITY-ALIAS | Legacy `/cities/sankt-peterburg` → permanent redirect на canonical `/cities/saint-petersburg`, чтобы не вызывать city DTO с неканоническим slug | Критический | 🔄 локально исправлено, ожидаются build, MSK deploy и HTTP smoke |
+
+---
+
 ## Blog content integrity (2026-08-05)
 
 | # | Задача | Приоритет | Статус |
