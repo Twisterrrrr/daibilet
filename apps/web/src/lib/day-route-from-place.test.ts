@@ -107,6 +107,19 @@ test('dayRouteHookLine strips trailing location crumbs from venue blurbs', () =>
     }),
     'Вечерняя жизнь и старый доходный фонд.',
   );
+  // Catalog /locations card (Троицкий мост) - Venue.shortDescription crumb tail
+  assert.equal(
+    dayRouteHookLine({
+      shortDescription: 'Ракурс на крепость и ростральные колонны. Нева',
+    }),
+    'Ракурс на крепость и ростральные колонны.',
+  );
+  assert.equal(
+    dayRouteHookLine({
+      shortDescription: 'Панорамный вид на стрелку и ростральные. Васильевский',
+    }),
+    'Панорамный вид на стрелку и ростральные.',
+  );
 });
 
 test('capitalizeSentenceStart uppercases first letter only', () => {

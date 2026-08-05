@@ -3,6 +3,7 @@ import { Clock, MapPin, Train } from 'lucide-react';
 
 import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import { formatStreetAddress } from '@/lib/address';
+import { dayRouteHookLine } from '@/lib/day-route-from-place';
 import { pluralEvents } from '@/lib/format';
 import { venueTypeIcon, venueTypeLabel, normalizeVenueKind } from '@/lib/venue-meta';
 import type { PublicVenueDto } from '@daibilet/contracts/public';
@@ -87,7 +88,11 @@ export function LocationCard({
   const metro = nonEmptyLogisticsText(venue.metroStation);
   const stopCount = Number(venue.stopEventCount ?? 0);
   const activityCount = stopCount > 0 ? stopCount : Number(venue.events || 0);
-  const hook = String(venue.hookFact || venue.shortDescription || '').trim();
+  // Same strip as hub/my-day: cut address crumbs («. Нева», «. пл. …») from Venue blurbs.
+  const hook = dayRouteHookLine({
+    hookFact: venue.hookFact,
+    shortDescription: venue.shortDescription,
+  });
   const displayName = stripBoardingPlacePrefix(venue.name);
   const routeTitle = stripBoardingPlacePrefix(venue.title || venue.name);
   const showStreet = Boolean(street) && !sameAddressLabel(street, displayName);

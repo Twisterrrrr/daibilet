@@ -6,6 +6,7 @@ import { MapPin, Ticket } from 'lucide-react';
 import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { formatStreetAddress } from '@/lib/address';
+import { dayRouteHookLine } from '@/lib/day-route-from-place';
 import { pluralEvents } from '@/lib/format';
 import type { VenueCatalogCard } from '@/lib/venue-map-types';
 import { resolvePublicVenueType, venueTypeLabel } from '@/lib/venue-meta';
@@ -34,6 +35,7 @@ export function InstitutionCard({ venue, href }: { venue: InstitutionCardVenue; 
   const gradient = TYPE_GRADIENT[publicType] || 'from-slate-700 via-slate-800 to-slate-950';
   const street = formatStreetAddress(venue.address, { city: venue.city });
   const category = topCategory(venue);
+  const blurb = dayRouteHookLine({ shortDescription: venue.shortDescription });
 
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-card bg-white shadow-card transition duration-300 hover:-translate-y-0.5 hover:shadow-card-hover">
@@ -67,8 +69,8 @@ export function InstitutionCard({ venue, href }: { venue: InstitutionCardVenue; 
             </div>
           </div>
 
-          {venue.shortDescription ? (
-            <p className="line-clamp-2 text-xs leading-relaxed text-graphite-muted">{venue.shortDescription}</p>
+          {blurb ? (
+            <p className="line-clamp-2 text-xs leading-relaxed text-graphite-muted">{blurb}</p>
           ) : null}
           {category ? <p className="text-xs text-graphite-muted">В афише: {category}</p> : null}
 
