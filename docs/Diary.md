@@ -347,7 +347,7 @@
 - `VenueKind.GASTRO` (location family) + UI label «Гастро»; `CLUB_BAR_RESTAURANT` остаётся institution `/venues`.
 - Расширены `venue-kind-heuristics` + `reclassify-outdoor-buildings.js --cities=all` + `reclassify-location-gastro.js`.
 - Шапка: `SiteHeader` / public `Header` allLabel и mobile section → «Фильтр по городу» (blog «Все города» не трогали).
-- MSK: migrate GASTRO → outdoor 116 (93 ATTRACTION / 11 PARK / 10 MONUMENT / 2 GASTRO) → location gastro +10 total → restart `daibilet-api`. Web deploy отложен (batch; лейбл шапки на live после batch).
+- MSK: migrate GASTRO → outdoor 116 (93 ATTRACTION / 11 PARK / 10 MONUMENT / 2 GASTRO) → location gastro итого 12 → restart `daibilet-api`. Web deploy отложен (batch; лейбл шапки на live после batch).
 
 ### Проблемы
 - Нет. Лейбл шапки на live после web batch.
