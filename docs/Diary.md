@@ -9,9 +9,10 @@
 - Добавлен версионируемый owner pack `scripts/data/spb-kgd-venue-coords.json` и расширен идемпотентный enrich: дедупликация по slug, title в городе и координатам до insert.
 - Скрипт выбирает `venues` для музеев и гастро-площадок, `locations` для улиц, мостов, набережных, парков и памятников; бережет уже существующий публичный slug и умеет проставлять его в `apps/web` cityInfo.
 - SPB-EVENT-001 включен в петербургский пакет после корректировки owner, без нормализации или подмены переданных адреса и координат.
+- На MSK применены 67 insert и 20 update без пропущенных городов; 67 matching cityInfo записей получили slug. Bar guide upserted в `Article`, «Барный Петербург» получил семь resolvable stop и deployed с BUILD_ID `htTqoT7UE2NcJBJevr_3v`.
 
 ### Проблемы
-- Локальная PostgreSQL на `127.0.0.1:5437` недоступна, поэтому apply выполняется на MSK catalog host после push.
+- Локальная PostgreSQL на `127.0.0.1:5437` недоступна, поэтому apply выполняется на MSK catalog host после push. В deploy warm legacy-alias `/cities/sankt-peterburg` ответил 500, однако canonical `/cities/saint-petersburg`, seeded venue и статья после deploy отдают 200.
 
 ---
 
