@@ -166,7 +166,7 @@ export function VenuePageView({
   React.useEffect(() => {
     const city = String(venue?.city || '').trim();
     if (!city || city === 'Не указан' || selectedCity?.cityValue === city) return;
-    selectedCity?.setCity(city, { skipRouteConfirm: true });
+    selectedCity?.setCity(city, { skipRouteConfirm: true, persistOnly: true });
   }, [selectedCity, venue?.city]);
 
   return (

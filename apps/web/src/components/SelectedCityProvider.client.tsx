@@ -36,6 +36,11 @@ import {
 export type SetCityOptions = {
   /** Share hydrate already replaced the route - do not confirm/clear again. */
   skipRouteConfirm?: boolean;
+  /**
+   * Sync header/storage city without leaving the current URL.
+   * Use on venue/event PDPs - otherwise resolveCityChangeNav dumps PDP → catalog index.
+   */
+  persistOnly?: boolean;
 };
 
 type SelectedCityContextValue = {
@@ -204,6 +209,9 @@ export function SelectedCityProvider({
       persistSelectedCity(name);
       setCityLabel(name === 'all' ? 'Все города' : name);
       setCityReady(true);
+
+      // PDP hydrate (venue/location): only align chrome city - never navigate away.
+      if (options?.persistOnly) return true;
 
       const searchParams = searchParamsKey
         ? new URLSearchParams(searchParamsKey)

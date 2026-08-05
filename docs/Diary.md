@@ -1,3 +1,19 @@
+## 2026-08-05 - Venue PDP: setCity не должен выкидывать на /venues
+
+### Наблюдения
+- Owner: `/venues/ermitazh` открывается и сразу уводит на общий каталог площадок.
+- Причина: `VenuePageView` синхронизировал город хедера через `setCity`, а `resolveCityChangeNav` для PDP `/venues/[slug]` всегда делает navigate → `/venues?city=…`.
+
+### Решения
+- `SetCityOptions.persistOnly`: только persist + label, без router navigation.
+- `VenuePageView` sync города: `{ skipRouteConfirm: true, persistOnly: true }`.
+- Ручная смена города в хедере по-прежнему уводит с PDP на индекс секции (канон).
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-05 - SPB mustSee: убрать адресные хвосты из аннотаций
 
 ### Наблюдения
