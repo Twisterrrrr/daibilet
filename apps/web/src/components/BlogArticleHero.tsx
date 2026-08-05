@@ -6,6 +6,7 @@ import { BookOpen, Clock, MapPin } from 'lucide-react';
 import { PageBreadcrumbBar, type BreadcrumbItem } from '@/components/PageBreadcrumbs';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { blogAuthorNameClassName } from '@/lib/blog-meta';
+import { splitBlogSeriesHeroTitle } from '@/lib/blog-utils';
 
 type BlogArticleHeroProps = {
   breadcrumbs: BreadcrumbItem[];
@@ -36,6 +37,8 @@ export function BlogArticleHero({
   authorName,
   articleType,
 }: BlogArticleHeroProps) {
+  const seriesTitle = splitBlogSeriesHeroTitle(title);
+
   return (
     <>
       <PageBreadcrumbBar items={breadcrumbs} />
@@ -83,7 +86,15 @@ export function BlogArticleHero({
               </div>
 
               <h1 className="font-display mt-3 max-w-4xl text-[2rem] font-extrabold leading-[1.08] tracking-tight text-white sm:text-4xl lg:text-5xl xl:text-[3.35rem]">
-                {title}
+                {seriesTitle ? (
+                  <>
+                    {seriesTitle.lead}
+                    <br />
+                    {seriesTitle.rest}
+                  </>
+                ) : (
+                  title
+                )}
               </h1>
 
               {description ? (

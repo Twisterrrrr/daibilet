@@ -273,6 +273,23 @@ export function mergeBlogCards(
 }
 
 /**
+ * Series titles like «Топ-100 мест Петербурга. Часть 1: …» /
+ * «Больше чем ТОП-100. Часть 4: …» → intentional hero line break after the period.
+ * Plain title string stays intact for SEO, cards, and OG.
+ */
+const BLOG_SERIES_PART_BREAK = /^(.+\.)\s+(Часть\s+\d+:[\s\S]*)$/u;
+
+export function splitBlogSeriesHeroTitle(
+  title: string,
+): { lead: string; rest: string } | null {
+  const trimmed = String(title || '').trim();
+  if (!trimmed) return null;
+  const match = trimmed.match(BLOG_SERIES_PART_BREAK);
+  if (!match?.[1] || !match[2]) return null;
+  return { lead: match[1], rest: match[2] };
+}
+
+/**
  * Hero / feed split for `/blog`:
  * - featured = isFeatured, else latest (first in list)
  * - feed = everything except featured (no duplicate in magazine first slot)

@@ -26,6 +26,13 @@ export function BlogArticleHero({
 }: BlogArticleHeroProps) {
   const [hasImageError, setHasImageError] = React.useState(false);
   const showImage = Boolean(coverImageUrl) && !hasImageError;
+  // «…Петербурга. Часть N:» / «Больше чем ТОП-100. Часть N:» → break after period
+  const seriesMatch = String(title || '')
+    .trim()
+    .match(/^(.+\.)\s+(Часть\s+\d+:[\s\S]*)$/u);
+  const seriesTitle = seriesMatch?.[1] && seriesMatch[2]
+    ? { lead: seriesMatch[1], rest: seriesMatch[2] }
+    : null;
 
   return (
     <>
@@ -62,7 +69,17 @@ export function BlogArticleHero({
                 </a>
               ) : null}
             </div>
-            <h1 className="font-display mt-2 max-w-4xl text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">{title}</h1>
+            <h1 className="font-display mt-2 max-w-4xl text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">
+              {seriesTitle ? (
+                <>
+                  {seriesTitle.lead}
+                  <br />
+                  {seriesTitle.rest}
+                </>
+              ) : (
+                title
+              )}
+            </h1>
             {description ? <p className="mt-3 max-w-2xl text-base text-white/85 sm:text-lg">{description}</p> : null}
             <div className="mt-5 flex flex-wrap items-center gap-4 text-sm text-white/70">
               {publishedLabel ? <span>{publishedLabel}</span> : null}
