@@ -1,3 +1,19 @@
+## 2026-08-05 - Location PDP «Рядом»: dedupe TC session twins
+
+### Наблюдения
+- Live `/locations/osobnyak-polovcova`: блок «Рядом» (geo 300м, без STOP) показывал 12 карточек - 5× «Queen в Особняке Половцова» (цены 1500/1750/3000) и 6× одинаковая «Обзорная… Исаакиевский собор» по 1200.
+- Root cause: `loadNearbyEventsForVenue` отдавал сырые `Event` rows без схлопывания; TC = один продукт на много session-id/slug. Тот же класс бага, что `/my-day` matches (2026-08-03, title-first dedupe).
+
+### Решения
+- Backend: `dedupePublicVenueLinkedEvents` (title+venue, min `priceFrom`) до slice(12) в nearby; тот же pass на stopEvents.
+- Web safety-net: `dedupeVenueLinkedEvents` в `day-route-score` + `LocationVenueLayout` (`data-venue-linked-events-deduped`).
+- UI по-прежнему `formatMoney` → «от X ₽». Radius/STOP-gate без изменений.
+
+### Проблемы
+- Live обновится после MSK web/API batch или явного «выкатывай» (UX, не 500).
+
+---
+
 ## 2026-08-05 - Locations: СПб must-see не были в каталоге
 
 ### Наблюдения

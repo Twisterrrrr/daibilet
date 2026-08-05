@@ -118,6 +118,64 @@ function isBetterDayRouteMatch(a: DayRouteMatchRankable, b: DayRouteMatchRankabl
 }
 
 /**
+ * Location PDP STOP / «Рядом» cards: one offer per title+venue (TC session twins).
+ * Mirrors apps/backend public-venue-linked-events.ts.
+ */
+export function venueLinkedEventDedupeKey(input: {
+  id: string;
+  slug: string;
+  title: string;
+  venue?: string | null;
+  venueId?: string | null;
+}): string {
+  const titleKey = normalizeDayRouteTitleKey(input.title);
+  const venueKey =
+    normalizeDayRouteTitleKey(input.venue || '') ||
+    String(input.venueId || '')
+      .trim()
+      .toLowerCase();
+  const venueSuffix = venueKey ? `|venue:${venueKey}` : '';
+
+  if (titleKey.length >= 12) return `title:${titleKey}${venueSuffix}`;
+  const base = dayRouteEventBaseSlug(input.slug, input.id);
+  if (base.length >= 8) return `slug:${base}${venueSuffix}`;
+  if (titleKey.length >= 8) return `title:${titleKey}${venueSuffix}`;
+  return `id:${input.id}`;
+}
+
+export type VenueLinkedEventRankable = {
+  id: string;
+  slug: string;
+  title: string;
+  priceFrom?: number | null;
+  venue?: string | null;
+  venueId?: string | null;
+};
+
+/** First sibling wins (caller order = distance); priceFrom = min across twins. */
+export function dedupeVenueLinkedEvents<T extends VenueLinkedEventRankable>(events: T[]): T[] {
+  const best = new Map<string, T>();
+  for (const event of events) {
+    const key = venueLinkedEventDedupeKey(event);
+    const prev = best.get(key);
+    if (!prev) {
+      best.set(key, event);
+      continue;
+    }
+    const prevPrice = Number.isFinite(Number(prev.priceFrom))
+      ? Number(prev.priceFrom)
+      : Number.POSITIVE_INFINITY;
+    const nextPrice = Number.isFinite(Number(event.priceFrom))
+      ? Number(event.priceFrom)
+      : Number.POSITIVE_INFINITY;
+    if (nextPrice < prevPrice) {
+      best.set(key, { ...prev, priceFrom: event.priceFrom ?? null });
+    }
+  }
+  return [...best.values()];
+}
+
+/**
  * Classify selected venue ids against one event.
  * Nearby only for ids not already in stop/start.
  */

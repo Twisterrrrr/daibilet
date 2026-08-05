@@ -24,6 +24,7 @@ import { expandSessionPurchaseVariants, isSessionPurchaseBlocked } from '@/lib/e
 import { formatMoney, formatNumber } from '@/lib/format';
 import { formatStreetAddress } from '@/lib/address';
 import { build2gisRouteUrl } from '@/lib/maps';
+import { dedupeVenueLinkedEvents } from '@/lib/day-route-score';
 import type { VenueEventGroup } from '@/lib/venue-program';
 import { normalizeVenueKind, resolveLocationVenueCopy, venueTypeIcon, venueTypeLabel } from '@/lib/venue-meta';
 import { eventHref, venueHref } from '@/lib/routes';
@@ -64,14 +65,19 @@ export function LocationVenueLayout({
     normalizeVenueKind(venue.type) === 'outdoor_location' ||
     normalizeVenueKind(venue.type) === 'attraction';
   const todaySlots = React.useMemo(() => collectTodayTimeSlots(sessions), [sessions]);
+  const uniqueStopEvents = React.useMemo(() => dedupeVenueLinkedEvents(stopEvents), [stopEvents]);
+  const uniqueNearbyEvents = React.useMemo(
+    () => dedupeVenueLinkedEvents(nearbyEvents),
+    [nearbyEvents],
+  );
   const TypeIcon = venueTypeIcon(venue.type);
   const typeLabel = venueTypeLabel(venue.type);
   const routeCount = routeGroups.length || stats.events;
   const { fullDescription, heroLead } = resolveLocationVenueCopy(venue);
   const stopExcursionCount =
-    stopEvents.length > 0 ? stopEvents.length : Number(venue.stopEventCount ?? 0);
+    uniqueStopEvents.length > 0 ? uniqueStopEvents.length : Number(venue.stopEventCount ?? 0);
   const hasStopExcursions = stopExcursionCount > 0;
-  const hasNearbyExcursions = nearbyEvents.length > 0;
+  const hasNearbyExcursions = uniqueNearbyEvents.length > 0;
 
   return (
     <div className="bg-slate-50 pb-24 lg:pb-0">
@@ -358,8 +364,8 @@ export function LocationVenueLayout({
                   ? 'Маршруты с явной остановкой у этой локации.'
                   : 'Явных остановок пока нет - показываем события со стартом в радиусе 300 м.'}
               </p>
-              <ul className="mt-4 space-y-3">
-                {(hasStopExcursions ? stopEvents : nearbyEvents).map((event) => (
+              <ul className="mt-4 space-y-3" data-venue-linked-events-deduped>
+                {(hasStopExcursions ? uniqueStopEvents : uniqueNearbyEvents).map((event) => (
                   <li key={event.id}>
                     <a
                       href={`/events/${encodeURIComponent(event.slug)}`}

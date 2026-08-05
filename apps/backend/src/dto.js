@@ -105,6 +105,7 @@ import {
   lookupDestinationCatalogSessions,
   publicDestinationFromSession,
 } from './public-destination.ts';
+import { dedupePublicVenueLinkedEvents } from './public-venue-linked-events.ts';
 
 export { pickCatalogSubcategories };
 export {
@@ -4589,7 +4590,7 @@ async function loadStopEventsForVenue(db, venueIds) {
     `,
     [venueIds],
   );
-  return result.rows.map(mapSlimPublicStopEvent);
+  return dedupePublicVenueLinkedEvents(result.rows.map(mapSlimPublicStopEvent));
 }
 
 async function loadNearbyEventsForVenue(db, venue, excludeEventIds = []) {
@@ -4630,16 +4631,18 @@ async function loadNearbyEventsForVenue(db, venue, excludeEventIds = []) {
   );
 
   const excluded = new Set(excludeEventIds.map(String));
-  return result.rows
-    .filter((row) => !excluded.has(String(row.id)))
-    .map((row) => {
-      const distance = haversineMeters(lat, lng, Number(row.venueLatitude), Number(row.venueLongitude));
-      return { ...row, distanceMeters: distance };
-    })
-    .filter((row) => Number.isFinite(row.distanceMeters) && row.distanceMeters <= 300)
-    .sort((a, b) => a.distanceMeters - b.distanceMeters || String(a.title).localeCompare(String(b.title), 'ru'))
-    .slice(0, 12)
-    .map(mapSlimPublicStopEvent);
+  // Dedupe before slice: TC often fills the top-N with session twins of 1–2 titles.
+  return dedupePublicVenueLinkedEvents(
+    result.rows
+      .filter((row) => !excluded.has(String(row.id)))
+      .map((row) => {
+        const distance = haversineMeters(lat, lng, Number(row.venueLatitude), Number(row.venueLongitude));
+        return { ...row, distanceMeters: distance };
+      })
+      .filter((row) => Number.isFinite(row.distanceMeters) && row.distanceMeters <= 300)
+      .sort((a, b) => a.distanceMeters - b.distanceMeters || String(a.title).localeCompare(String(b.title), 'ru'))
+      .map(mapSlimPublicStopEvent),
+  ).slice(0, 12);
 }
 
 async function loadPublicEventVenueStops(db, eventId) {

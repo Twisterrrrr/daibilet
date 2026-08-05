@@ -7,6 +7,7 @@ import {
   dayRouteEventBaseSlug,
   dayRouteMatchDedupeKey,
   dedupeDayRouteMatches,
+  dedupeVenueLinkedEvents,
   haversineMeters,
   isValidCoordinatePair,
   normalizeDayRouteTitleKey,
@@ -137,4 +138,34 @@ test('dedupeDayRouteMatches collapses unique-slug TC sessions by title', () => {
   );
   assert.equal(out.length, 1);
   assert.equal(out[0]?.priceFromRub, 1200);
+});
+
+test('dedupeVenueLinkedEvents collapses Queen sessions to min price', () => {
+  const venue = 'Особняк А.А. Половцова (Дом Архитектора)';
+  const out = dedupeVenueLinkedEvents([
+    {
+      id: 'evt_1',
+      slug: 'tc-1-queen-v-osobnyake-polovcova',
+      title: 'Queen в Особняке Половцова',
+      venue,
+      priceFrom: 1750,
+    },
+    {
+      id: 'evt_2',
+      slug: 'queen-v-osobnyake-polovcova-2',
+      title: 'Queen в Особняке Половцова',
+      venue,
+      priceFrom: 1500,
+    },
+    {
+      id: 'evt_3',
+      slug: 'tc-3-queen-v-osobnyake-polovcova',
+      title: 'Queen в Особняке Половцова',
+      venue,
+      priceFrom: 3000,
+    },
+  ]);
+  assert.equal(out.length, 1);
+  assert.equal(out[0]?.id, 'evt_1');
+  assert.equal(out[0]?.priceFrom, 1500);
 });
