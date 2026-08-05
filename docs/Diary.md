@@ -9,7 +9,8 @@
 - Это сохраняет один индексируемый URL, не запускает DTO-построение для legacy slug и не требует изменений каталожных данных.
 
 ### Проблемы
-- Нужны production build, MSK deploy и smoke обоих URL.
+- Локальный `pnpm` отсутствует; web typecheck дополнительно блокируют существующие ошибки Prisma и `day-route-match`, не связанные с redirect. Production build на MSK прошёл успешно.
+- Deploy warm зафиксировал старый 500 до повторной проверки, но прямой запрос к Next `:3001` и публичный smoke после deploy подтвердили `308` legacy URL и `200` canonical URL.
 
 ---
 

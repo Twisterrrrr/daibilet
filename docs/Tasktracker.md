@@ -11,7 +11,7 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| FIX.CITY-ALIAS | Legacy `/cities/sankt-peterburg` → permanent redirect на canonical `/cities/saint-petersburg`, чтобы не вызывать city DTO с неканоническим slug | Критический | 🔄 локально исправлено, ожидаются build, MSK deploy и HTTP smoke |
+| FIX.CITY-ALIAS | Legacy `/cities/sankt-peterburg` → permanent redirect на canonical `/cities/saint-petersburg`, чтобы не вызывать city DTO с неканоническим slug | Критический | ✅ `c5f1869`, MSK BUILD_ID=`IQlhDY1eF5GvuOGLXURHb`; direct и public smoke: 308 → canonical, 200 |
 
 ---
 
