@@ -156,7 +156,8 @@ export function dayRouteItemFromMustSee(
 ): DayRouteVenueItem | null {
   const matched = findVenueForPlace(place, venues);
   const slug = pickPlaceSlug(place) || String(matched?.slug || '').trim() || null;
-  const id = String(matched?.id || slug || '').trim();
+  const editorialId = String(place.dayRouteId || '').trim();
+  const id = String(matched?.id || slug || editorialId).trim();
   if (!id) return null;
 
   const href =

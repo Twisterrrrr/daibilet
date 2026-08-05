@@ -11,6 +11,8 @@ export type CityPlaceLinkFields = {
 export type CityMustSeeItem = CityPlaceLinkFields & {
   name: string;
   desc: string;
+  /** Стабильный editorial id для остановки без публичной entity-карточки. */
+  dayRouteId?: string;
   /** Optional day-route coords when hub venues omit the place. */
   latitude?: number | null;
   longitude?: number | null;
@@ -131,9 +133,13 @@ const SLUG_ALIASES: Record<string, string> = {
 };
 
 /** Компактная editorial-точка для preset. Основной mustSee остаётся источником ссылок и координат. */
-const spbPresetStop = (name: string): CityMustSeeItem => ({
+const spbPresetStop = (
+  name: string,
+  route?: Pick<CityMustSeeItem, 'dayRouteId' | 'latitude' | 'longitude'>,
+): CityMustSeeItem => ({
   name,
   desc: 'Точка маршрута по Санкт-Петербургу.',
+  ...route,
 });
 
 export const CITY_INFO: Record<string, CityInfoEntry> = {
@@ -509,14 +515,26 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         description: 'Парадные площади, дворцы и две гастрономические остановки в самом центре.',
         blogSlug: 'spb-zolotoy-treugolnik-za-1-den',
         stops: [
-          spbPresetStop('Медный всадник / Сенатская площадь'),
+          spbPresetStop('Медный всадник / Сенатская площадь', {
+            dayRouteId: 'spb-senatskaya-ploschad',
+            latitude: 59.9364,
+            longitude: 30.3023,
+          }),
           spbPresetStop('Адмиралтейство'),
           spbPresetStop('Александровский сад'),
-          spbPresetStop('Исаакиевский собор'),
+          spbPresetStop('Исаакиевский собор', {
+            dayRouteId: 'spb-isaakievskiy-sobor',
+            latitude: 59.9343,
+            longitude: 30.3061,
+          }),
           spbPresetStop('Колоннада Исаакия'),
           spbPresetStop('Синий мост'),
           spbPresetStop('Большая Морская'),
-          spbPresetStop('Дворцовая площадь'),
+          spbPresetStop('Дворцовая площадь', {
+            dayRouteId: 'spb-dvortsovaya-ploschad',
+            latitude: 59.939,
+            longitude: 30.3158,
+          }),
           spbPresetStop('Эрмитаж'),
           spbPresetStop('Главный штаб (Эрмитаж)'),
           spbPresetStop('Пышечная на Большой Конюшенной'),
@@ -532,14 +550,26 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         description: 'Музеи, набережные и гастрономия Васильевского острова.',
         blogSlug: 'spb-vasilevskiy-ostrov-marshrut',
         stops: [
-          spbPresetStop('Стрелка Васильевского острова'),
+          spbPresetStop('Стрелка Васильевского острова', {
+            dayRouteId: 'spb-strelka-vasilevskogo-ostrova',
+            latitude: 59.944,
+            longitude: 30.303,
+          }),
           spbPresetStop('Зоологический музей РАН'),
-          spbPresetStop('Кунсткамера'),
+          spbPresetStop('Кунсткамера', {
+            dayRouteId: 'spb-kunstkamera',
+            latitude: 59.941,
+            longitude: 30.304,
+          }),
           spbPresetStop('Университетская набережная'),
           spbPresetStop('Академия художеств'),
           spbPresetStop('Линии Васильевского острова'),
           spbPresetStop('Аптека доктора Пеля'),
-          spbPresetStop('Василеостровский рынок'),
+          spbPresetStop('Василеостровский рынок', {
+            dayRouteId: 'spb-vasileostrovskiy-rynok',
+            latitude: 59.9469,
+            longitude: 30.2761,
+          }),
           spbPresetStop('Набережная Макарова'),
           spbPresetStop('Эрарта'),
           spbPresetStop('Севкабель Порт'),
@@ -552,13 +582,25 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         description: 'Крепость, музеи и прогулка по Неве с финалом у гастрономического якоря.',
         blogSlug: 'spb-petrogradskaya-storona',
         stops: [
-          spbPresetStop('Петропавловская крепость'),
+          spbPresetStop('Петропавловская крепость', {
+            dayRouteId: 'spb-petropavlovskaya-krepost',
+            latitude: 59.9502,
+            longitude: 30.3164,
+          }),
           spbPresetStop('Петропавловский собор'),
           spbPresetStop('Артиллерийский музей'),
           spbPresetStop('Ленинградский зоопарк'),
-          spbPresetStop('Александровский парк'),
+          spbPresetStop('Александровский парк', {
+            dayRouteId: 'spb-aleksandrovskiy-park',
+            latitude: 59.9528,
+            longitude: 30.3131,
+          }),
           spbPresetStop('Музей политической истории (особняк Кшесинской)'),
-          spbPresetStop('Санкт-Петербургская соборная мечеть'),
+          spbPresetStop('Санкт-Петербургская соборная мечеть', {
+            dayRouteId: 'spb-sobornaya-mechet',
+            latitude: 59.9572,
+            longitude: 30.3202,
+          }),
           spbPresetStop('Каменноостровский проспект'),
           spbPresetStop('Павловский дом-музей'),
           spbPresetStop('Петроградская набережная'),
