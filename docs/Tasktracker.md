@@ -38,7 +38,7 @@
 | UX.BLOG3 | Blog hub chips river/tours + article reading progress | Высокий | ✅ `eae17f4` live **`BCWcAIglYC8cAP-6Zgr4k`** |
 | UX.BLOG3b | Sticky buy CTA + CMS product-card constructor + seed `[buy]` in articles | Средний | ⚠️ deferred (renderer exists; content 0 `[buy]`) |
 | FIX.BLOG-EMPTY | False «нет статей про {city}» banner while city filter has matches | Критический | ✅ `d393520` live BUILD **`8bCshKtFiFhBS9SzTqnaE`** |
-| FIX.BLOG-RELATED-ALIGN | «Читайте также»: top-align city label with thumb (`items-start`) | Высокий | 🔄 commit/deploy |
+| FIX.BLOG-RELATED-ALIGN | «Читайте также»: top-align city label with thumb (`items-start`) | Высокий | ✅ `65817a4` live BUILD **`a6m32PsB5Fd_uG4bluOp8`** |
 
 ---
 
