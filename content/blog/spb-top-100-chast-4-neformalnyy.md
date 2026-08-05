@@ -15,7 +15,7 @@ readMin: 14
 imageAlt: "Крыша лофта и закат над крышами Петербурга"
 coverImageUrl: "/images/blog/spb-top-100-chast-4-neformalnyy.jpg"
 publishedAt: "2026-08-05T09:15:00+03:00"
-status: PUBLISHED
+status: DRAFT
 isIndexable: false
 ---
 

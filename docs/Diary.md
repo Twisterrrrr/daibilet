@@ -66,6 +66,21 @@
 
 ---
 
+## 2026-08-05 - Top-100 + Beyond: полностью скрыть с сайта (DRAFT)
+
+### Наблюдения
+- Owner правит обе серии в админке; с публичного блога убрать целиком. Place-фото оставить для locations / my-day.
+
+### Решения
+- MD ×12 (`spb-top-100-*`, `spb-beyond-top100-*`): `status: DRAFT`, `isIndexable: false`.
+- Убраны из `BLOG_POSTS` static feed.
+- `SAINT_PETERSBURG_IMAGES`: снова map linked Top-100 places → venues JPG для catalog/PDP/my-day.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-05 - Top-100: noindex + снять массовые AI place-фото
 
 ### Наблюдения

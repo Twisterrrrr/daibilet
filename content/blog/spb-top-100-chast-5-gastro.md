@@ -15,7 +15,7 @@ readMin: 14
 imageAlt: "Пышки и кофе в легендарной пышечной Петербурга"
 coverImageUrl: "/images/blog/spb-top-100-chast-5-gastro.jpg"
 publishedAt: "2026-08-05T09:20:00+03:00"
-status: PUBLISHED
+status: DRAFT
 isIndexable: false
 ---
 
