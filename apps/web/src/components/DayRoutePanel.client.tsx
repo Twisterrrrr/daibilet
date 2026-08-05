@@ -3101,11 +3101,9 @@ function DayRoutePanelInner() {
                       }
                       travelMode={travelMode}
                       focused={focusedStopId === venue.id}
-                      nearbyUpsells={
-                        effectiveStopViewMode === 'grid'
-                          ? []
-                          : pickNearbyUpsellsForStop(venue, matchOfferStubs, { limit: 1 })
-                      }
+                      nearbyUpsells={pickNearbyUpsellsForStop(venue, matchOfferStubs, {
+                        limit: 2,
+                      })}
                       onMoveUp={() => setRoute(moveDayRoutePlanVenue(venue.id, -1))}
                       onMoveDown={() => setRoute(moveDayRoutePlanVenue(venue.id, 1))}
                       onRemove={() => setRoute(removeFromDayRoute(venue.id))}
@@ -4304,6 +4302,7 @@ function DayRouteVenueCard({
   travelMode: DayRouteTravelMode;
   nearbyUpsells?: Array<{
     eventId: string;
+    title: string;
     ticketUrl: string;
     line: string;
     priceFromRub: number | null;
@@ -4317,6 +4316,9 @@ function DayRouteVenueCard({
   onShowTicket: () => void;
   onSetNote: (note: string) => void;
 }) {
+  // Ticket QR / «отметить купленным» живут в блоке «Билеты в поездке», не в строке места.
+  void onToggleBought;
+  void onShowTicket;
   const textStop = isTextDayRouteStop(venue);
   const purchased = group === 'purchased' || Boolean(venue.ticketBought);
   const reorderLocked = purchased || group === 'overflow' || dayRouteStopReorderLocked(venue);
@@ -4416,6 +4418,50 @@ function DayRouteVenueCard({
     </div>
   );
 
+  /** Right-rail: pick event / buy. No «Показать билет» / «Отметить» on the place row. */
+  const commerceRail =
+    ticketUrl || nearbyUpsells.length > 0 ? (
+      <div
+        className="flex min-w-0 flex-col gap-0.5 sm:max-w-[min(18rem,42%)] sm:items-end sm:text-right"
+        data-day-stop-commerce
+      >
+        {ticketUrl ? (
+          <a
+            href={ticketUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-day-buy-ticket
+            onClick={() => onBuyClick(ticketUrl)}
+            className="inline-flex items-center gap-1 text-[12px] font-semibold text-amber-700 underline-offset-2 hover:underline sm:justify-end"
+          >
+            <Ticket className="h-3.5 w-3.5 shrink-0" aria-hidden />
+            {buyCtaLabel}
+          </a>
+        ) : null}
+        {!ticketUrl
+          ? nearbyUpsells.map((u) => (
+              <a
+                key={u.eventId}
+                href={u.ticketUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-day-stop-event-pick={u.eventId}
+                onClick={() => onBuyClick(u.ticketUrl)}
+                className="line-clamp-2 text-[11px] font-medium text-primary-700 underline-offset-2 hover:underline sm:text-right"
+                title={u.line}
+              >
+                {u.priceFromRub != null
+                  ? `${u.line.replace(/^Рядом:\s*/i, '')}`
+                  : u.title}
+              </a>
+            ))
+          : null}
+        {ticketUrl && sessionDisplay ? (
+          <span className="text-[10px] text-slate-500">{sessionDisplay}</span>
+        ) : null}
+      </div>
+    ) : null;
+
   if (variant === 'list') {
     return (
       <li
@@ -4423,21 +4469,20 @@ function DayRouteVenueCard({
         data-day-plan-stop={venue.id}
         data-day-stop-variant="list"
         data-day-stop-list="dense"
+        data-day-stop-layout="place-event-row"
         data-ticket-bought={bought ? '1' : '0'}
         data-commercial-chip={chip.kind}
         data-day-session={sessionDisplay || undefined}
         data-day-stop-focused={focused ? '1' : undefined}
       >
         {/*
-          Dense list: [↑↓] [N]; title / address / segment as 3 lines,
-          vertically centered with side controls.
+          Dense list: [↑↓ N] | place (title/meta/segment) | event/buy rail | [maps][X]
         */}
         <div
           className={`flex w-full items-center gap-1.5 py-1.5 md:gap-3 lg:gap-4 ${
             focused ? 'rounded-md bg-emerald-50/80 px-1' : ''
           } ${purchased ? 'border-l-4 border-primary-600 pl-1.5' : ''}`}
         >
-          {/* Index cluster stays tight; row gap widens title indent on md+ */}
           <div className="flex shrink-0 items-center gap-1" data-day-stop-index-cluster>
             {reorderLocked ? (
               <div
@@ -4512,41 +4557,8 @@ function DayRouteVenueCard({
                 {segmentLine}
               </p>
             ) : null}
-            {ticketUrl || isCommerce ? (
-              <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
-                {ticketUrl ? (
-                  <a
-                    href={ticketUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    data-day-buy-ticket
-                    onClick={() => onBuyClick(ticketUrl)}
-                    className="text-[11px] font-semibold text-amber-700 underline-offset-2 hover:underline"
-                  >
-                    {buyCtaLabel}
-                  </a>
-                ) : null}
-                <button
-                  type="button"
-                  onClick={onShowTicket}
-                  data-day-show-ticket
-                  className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary-700 underline-offset-2 hover:underline"
-                >
-                  <QrCode className="h-3 w-3" />
-                  Показать билет
-                </button>
-                {ticketUrl ? (
-                  <button
-                    type="button"
-                    onClick={onToggleBought}
-                    data-day-ticket-bought
-                    className="text-[11px] font-medium text-slate-600 underline-offset-2 hover:underline"
-                  >
-                    {bought ? 'Билет отмечен' : 'Отметить купленным'}
-                  </button>
-                ) : null}
-              </div>
-            ) : null}
+            {/* Mobile: commerce under place; desktop uses right rail */}
+            {commerceRail ? <div className="mt-1 sm:hidden">{commerceRail}</div> : null}
             {textStop ? (
               <div className="mt-0.5" data-day-custom-address>
                 {addressOpen ? (
@@ -4585,6 +4597,7 @@ function DayRouteVenueCard({
               </div>
             ) : null}
           </div>
+          {commerceRail ? <div className="hidden sm:block">{commerceRail}</div> : null}
           {actionButtons}
         </div>
       </li>
@@ -4709,7 +4722,7 @@ function DayRouteVenueCard({
               {segmentDistanceLabel ? (
                 <span className="text-[11px] text-slate-500">{segmentDistanceLabel}</span>
               ) : null}
-              {sessionDisplay ? (
+              {sessionDisplay && !ticketUrl ? (
                 <span className="inline-flex items-center rounded-md bg-emerald-50 px-1.5 py-0.5 text-[11px] font-medium text-emerald-800">
                   {sessionDisplay}
                 </span>
@@ -4717,41 +4730,7 @@ function DayRouteVenueCard({
             </div>
           ) : null}
 
-          {ticketUrl || isCommerce ? (
-            <div className="mt-1 flex flex-wrap items-center gap-1.5">
-              {ticketUrl ? (
-                <a
-                  href={ticketUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  data-day-buy-ticket
-                  onClick={() => onBuyClick(ticketUrl)}
-                  className="text-[11px] font-semibold text-amber-700 underline-offset-2 hover:underline"
-                >
-                  {buyCtaLabel}
-                </a>
-              ) : null}
-              <button
-                type="button"
-                onClick={onShowTicket}
-                data-day-show-ticket
-                className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary-700 underline-offset-2 hover:underline"
-              >
-                <QrCode className="h-3 w-3" />
-                Показать билет
-              </button>
-              {ticketUrl ? (
-                <button
-                  type="button"
-                  onClick={onToggleBought}
-                  data-day-ticket-bought
-                  className="text-[11px] font-medium text-slate-600 underline-offset-2 hover:underline"
-                >
-                  {bought ? 'Билет отмечен' : 'Отметить'}
-                </button>
-              ) : null}
-            </div>
-          ) : null}
+          {commerceRail ? <div className="mt-1 sm:hidden">{commerceRail}</div> : null}
           {textStop ? (
             <div className="mt-1" data-day-custom-address>
               {addressOpen ? (
@@ -4791,7 +4770,8 @@ function DayRouteVenueCard({
           ) : null}
         </div>
 
-        <div className="flex shrink-0 items-center gap-0.5" data-day-stop-top-right>
+        <div className="flex shrink-0 items-center gap-2" data-day-stop-top-right>
+          {commerceRail ? <div className="hidden sm:block">{commerceRail}</div> : null}
           {mapsUrl ? (
             <a
               href={mapsUrl}
