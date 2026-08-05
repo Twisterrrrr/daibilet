@@ -11851,3 +11851,21 @@ evalidateNextBlogArticle (/blog, slug, city hub).
 
 ### Проблемы
 - Локальный `pnpm` недоступен в PATH; синтаксис проверяется Node, а полный web typecheck и build выполняются на MSK deploy.
+
+---
+
+## 2026-08-05 - MSK deploy: blog vitality + landing price range
+
+### Наблюдения
+- Owner: «выкатывай». Local eat/next-monorepo был sync с origin (c8f43ae); на MSK lock был clear.
+- Канон: BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh на daibilet-msk (.184), без SPB builder.
+
+### Решения
+- Fast-forward e2f075c..c8f43ae2, web:build, restart sequence по канону.
+- **BUILD_ID=LV0jzT3jaueTAOmX202ic**, HEAD=c8f43ae2. Services daibilet-web/daibilet-api active, deploy lock clear.
+- Smoke: /blog 200 - page chunk содержит «Смотреть события», «Свежие материалы», «Фильтр материалов по городу», «Найдено:»; лента не форсится header city.
+- Smoke landings: /rechnye-progulki/moscow 200 - ormatMoneyRange (100-1 269 ₽ + формы от … ₽); /avtobusnye-ekskursii/moscow 200 с от.
+- Tasktracker: UX.BLOG-LISTING-VITALITY, UX.BLOG-DECOUPLE-CITY, FIX.CITYDAY-PRICE отмечены live с BUILD_ID.
+
+### Проблемы
+- Post-deploy warm: 2 event SSG warm 500; hub warm 10/12 (moscow/spb 500 на первом проходе) - не блокирует blog/landing surface; IndexNow api.indexnow.org 403 (yandex 202).
