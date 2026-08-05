@@ -11,7 +11,7 @@
 - MSK: `enrich-must-see-editorial.js --apply --file=...gastro.json`; listing после DB (+ cache); hub-ссылки - после web deploy cityInfo.
 
 ### Проблемы
-- Параллельный MSK web deploy: seed/API можно без ожидания; web cityInfo - после idle / в том же batch.
+- Параллельный MSK web deploy: DB seed применён без ожидания; web cityInfo в FF `d4e99de`→`2f2e24de`, BUILD_ID=`6J6_Y3VwcR1r3vzfJltw6`. Ранний smoke: 500 на 2 PDP (transient); финал: location 25→30, institution 24, 5/5 PDP 200, hub `/cities/kaliningrad` 200.
 
 ---
 
