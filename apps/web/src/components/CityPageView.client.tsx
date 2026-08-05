@@ -1392,6 +1392,16 @@ function CitySignificantSuburbsBlock({
                         {place.stationHub ? ` - ${place.stationHub}` : ''}
                       </p>
                     ) : null}
+                    {place.travelVectorBlurb ? (
+                      <p className={`mt-1 text-xs leading-5 ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}>
+                        {place.travelVectorBlurb}
+                      </p>
+                    ) : null}
+                    {place.stationName ? (
+                      <p className={`mt-1 text-xs ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+                        Станция: {place.stationName}
+                      </p>
+                    ) : null}
                     {placeHref ? (
                       <Link
                         href={placeHref}
