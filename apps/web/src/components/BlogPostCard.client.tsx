@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { BookOpen, Calendar, Clock } from 'lucide-react';
+import { ArrowRight, BookOpen, Calendar, Clock } from 'lucide-react';
 
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { BLOG_POSTS } from '@/data/blog-posts';
@@ -11,6 +11,7 @@ import {
   authorLabel,
   blogAuthorNameClassName,
   blogCityBadgeClassName,
+  blogQuoteSurfaceClassName,
   blogTagBadgeClassName,
   cityFilterLabel,
   normalizeBlogTagLabel,
@@ -20,7 +21,14 @@ import {
   resolveBlogListingQuickLinks,
 } from '@/lib/blog-listing-links';
 
-export type BlogPostCardVariant = 'large' | 'small' | 'default' | 'banner' | 'strip';
+export type BlogPostCardVariant =
+  | 'large'
+  | 'small'
+  | 'default'
+  | 'banner'
+  | 'strip'
+  | 'lead'
+  | 'quote';
 
 function CoverFallback({ large = false }: { large?: boolean }) {
   return (
@@ -99,19 +107,35 @@ function TagChips({
     <div className="mb-2 flex flex-wrap gap-1.5">
       {displayTag ? (
         <span
-          className={`inline-flex max-w-full truncate rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ring-1 sm:text-[11px] ${blogTagBadgeClassName(displayTag)}`}
+          className={`inline-flex max-w-full truncate rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ring-1 transition-colors duration-300 sm:text-[11px] ${blogTagBadgeClassName(displayTag)}`}
         >
           {displayTag}
         </span>
       ) : null}
       {showCity ? (
         <span
-          className={`inline-flex max-w-full truncate rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ring-1 sm:text-[11px] ${blogCityBadgeClassName(citySlug)}`}
+          className={`inline-flex max-w-full truncate rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ring-1 transition-colors duration-300 sm:text-[11px] ${blogCityBadgeClassName(citySlug)}`}
         >
           {cityLabel === 'Санкт-Петербург' ? 'Питер' : cityLabel}
         </span>
       ) : null}
     </div>
+  );
+}
+
+function ReadMoreCue({ onDark = false }: { onDark?: boolean }) {
+  return (
+    <span
+      className={[
+        'mt-3 inline-flex items-center gap-1.5 text-sm font-semibold transition-all duration-300',
+        onDark
+          ? 'text-white/90 group-hover:gap-2.5'
+          : 'text-primary-700 group-hover:gap-2.5 group-hover:text-primary-800',
+      ].join(' ')}
+    >
+      Читать
+      <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" aria-hidden />
+    </span>
   );
 }
 
@@ -122,6 +146,8 @@ export function BlogPostCard({
   post: BlogCardDto;
   variant?: BlogPostCardVariant;
 }) {
+  if (!post?.slug || !post?.title) return null;
+
   const staticPost = BLOG_POSTS.find((item) => item.slug === post.slug);
   const dateLabel = resolveBlogCardDateLabel(post);
   const tag = post.tag || staticPost?.tag || 'Гид';
@@ -129,10 +155,13 @@ export function BlogPostCard({
   const isSmall = variant === 'small';
   const isBanner = variant === 'banner';
   const isStrip = variant === 'strip';
+  const isLead = variant === 'lead';
+  const isQuote = variant === 'quote';
   const articleHref = `/blog/${post.slug}`;
   const excerpt = String(post.excerpt || '').trim();
-  const largeCopy = isLarge ? expandLargeListingCopy(post.slug, excerpt, 900) : null;
-  const quickLinks = isLarge
+  const hasCover = Boolean(String(post.coverImageUrl || '').trim());
+  const largeCopy = isLarge || isLead ? expandLargeListingCopy(post.slug, excerpt, 900) : null;
+  const quickLinks = isLarge || isLead
     ? resolveBlogListingQuickLinks({
         slug: post.slug,
         title: post.title,
@@ -142,7 +171,7 @@ export function BlogPostCard({
         limit: 4,
       })
     : [];
-  const cta = isLarge
+  const cta = isLarge || isLead
     ? resolveBlogListingCta({
         slug: post.slug,
         title: post.title,
@@ -153,24 +182,108 @@ export function BlogPostCard({
     : null;
 
   const cardShell = [
-    'group flex h-full flex-col overflow-hidden rounded-card bg-white shadow-card transition duration-300',
-    'hover:-translate-y-0.5 hover:shadow-card-hover',
+    'group flex h-full flex-col overflow-hidden rounded-card bg-white shadow-card transition-all duration-300',
+    'hover:-translate-y-0.5 hover:scale-[1.01] hover:shadow-lg',
     'text-slate-900 visited:text-slate-900',
   ].join(' ');
+
+  if (isQuote) {
+    const quoteText = excerpt || post.title;
+    const displayTag = normalizeBlogTagLabel(tag, post.articleType);
+    return (
+      <Link
+        href={articleHref}
+        className={`group relative flex min-h-[12rem] flex-col justify-between overflow-hidden rounded-card bg-gradient-to-br p-6 text-white shadow-card transition-all duration-300 hover:scale-[1.01] hover:shadow-lg sm:min-h-[14rem] sm:p-8 ${blogQuoteSurfaceClassName(displayTag || tag)}`}
+      >
+        <div>
+          <TagChips tag={tag} city={post.city} citySlug={post.citySlug} articleType={post.articleType} />
+          <p className="font-serif text-xl font-medium leading-snug tracking-tight sm:text-2xl md:text-[1.65rem] md:leading-[1.3]">
+            {quoteText}
+          </p>
+        </div>
+        <div className="mt-6 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="font-display text-sm font-bold text-white/95">{post.title}</p>
+            <BlogCardMeta post={post} dateLabel={dateLabel} isLarge={false} onDark />
+          </div>
+          <ReadMoreCue onDark />
+        </div>
+      </Link>
+    );
+  }
+
+  if (isLead) {
+    const primary = largeCopy?.primary || excerpt;
+    return (
+      <article className={`${cardShell} lg:flex-row`}>
+        <Link
+          href={articleHref}
+          aria-label={post.title}
+          className="relative block aspect-[16/10] w-full shrink-0 overflow-hidden bg-gradient-to-br from-sky-100 to-primary-50 sm:aspect-[2/1] lg:aspect-auto lg:min-h-[22rem] lg:w-[58%]"
+        >
+          {hasCover ? (
+            <SafeImage
+              src={post.coverImageUrl}
+              alt=""
+              fill
+              sizes={IMAGE_SIZES.blogFeatured}
+              className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+              fallback={<CoverFallback large />}
+            />
+          ) : (
+            <CoverFallback large />
+          )}
+        </Link>
+        <div className="flex min-w-0 flex-1 flex-col justify-center p-5 sm:p-7 lg:p-8">
+          <TagChips tag={tag} city={post.city} citySlug={post.citySlug} articleType={post.articleType} />
+          <h2 className="font-serif text-3xl font-semibold leading-[1.12] tracking-tight text-graphite sm:text-4xl">
+            <Link href={articleHref} className="transition-colors duration-300 hover:text-primary-700">
+              {post.title}
+            </Link>
+          </h2>
+          {primary ? (
+            <p className="mt-3 line-clamp-4 text-base leading-relaxed text-graphite-muted sm:line-clamp-5 sm:text-lg">
+              {primary}
+            </p>
+          ) : null}
+          {cta ? (
+            <div className="mt-4">
+              <Link
+                href={cta.href}
+                className="group/cta inline-flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:bg-primary-700"
+              >
+                {cta.label}
+                <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/cta:translate-x-1" aria-hidden />
+              </Link>
+            </div>
+          ) : (
+            <Link href={articleHref}>
+              <ReadMoreCue />
+            </Link>
+          )}
+          <BlogCardMeta post={post} dateLabel={dateLabel} isLarge />
+        </div>
+      </article>
+    );
+  }
 
   if (isBanner) {
     const bannerLead = excerpt || expandLargeListingCopy(post.slug, excerpt, 180).primary;
     return (
-      <article className="group relative flex min-h-[14rem] overflow-hidden rounded-card bg-slate-900 shadow-card sm:min-h-[16rem] lg:min-h-[18rem]">
+      <article className="group relative flex min-h-[14rem] overflow-hidden rounded-card bg-slate-900 shadow-card transition-all duration-300 hover:scale-[1.01] hover:shadow-lg sm:min-h-[16rem] lg:min-h-[18rem]">
         <Link href={articleHref} aria-label={post.title} className="absolute inset-0 block">
-          <SafeImage
-            src={post.coverImageUrl}
-            alt=""
-            fill
-            sizes={IMAGE_SIZES.blogFeatured}
-            className="object-cover transition-transform duration-700 group-hover:scale-105"
-            fallback={<CoverFallback large />}
-          />
+          {hasCover ? (
+            <SafeImage
+              src={post.coverImageUrl}
+              alt=""
+              fill
+              sizes={IMAGE_SIZES.blogFeatured}
+              className="object-cover transition-transform duration-700 group-hover:scale-105"
+              fallback={<CoverFallback large />}
+            />
+          ) : (
+            <CoverFallback large />
+          )}
           <span
             aria-hidden
             className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/50 to-slate-950/10"
@@ -186,6 +299,7 @@ export function BlogPostCard({
           {bannerLead ? (
             <p className="line-clamp-2 text-sm leading-relaxed text-white/80 sm:text-base">{bannerLead}</p>
           ) : null}
+          <ReadMoreCue onDark />
           <BlogCardMeta post={post} dateLabel={dateLabel} isLarge onDark />
         </div>
       </article>
@@ -200,24 +314,29 @@ export function BlogPostCard({
           aria-label={post.title}
           className="relative block aspect-[16/10] w-full shrink-0 overflow-hidden bg-gradient-to-br from-sky-100 to-primary-50 sm:aspect-auto sm:w-[42%] sm:min-h-[9.5rem]"
         >
-          <SafeImage
-            src={post.coverImageUrl}
-            alt=""
-            fill
-            sizes={IMAGE_SIZES.blogCard}
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
-            fallback={<CoverFallback />}
-          />
+          {hasCover ? (
+            <SafeImage
+              src={post.coverImageUrl}
+              alt=""
+              fill
+              sizes={IMAGE_SIZES.blogCard}
+              className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+              fallback={<CoverFallback />}
+            />
+          ) : (
+            <CoverFallback />
+          )}
         </Link>
         <div className="flex min-w-0 flex-1 flex-col p-4 sm:p-5">
           <TagChips tag={tag} city={post.city} citySlug={post.citySlug} articleType={post.articleType} />
-          <h2 className="font-display text-base font-extrabold leading-snug text-slate-900 group-hover:text-primary-700 sm:text-lg">
+          <h2 className="font-display text-base font-extrabold leading-snug text-slate-900 transition-colors duration-300 group-hover:text-primary-700 sm:text-lg">
             <Link href={articleHref}>{post.title}</Link>
           </h2>
           {excerpt ? (
             <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-slate-600">{excerpt}</p>
           ) : null}
-          <div className="mt-auto pt-3">
+          <div className="mt-auto pt-2">
+            <ReadMoreCue />
             <BlogCardMeta post={post} dateLabel={dateLabel} isLarge={false} />
           </div>
         </div>
@@ -237,19 +356,23 @@ export function BlogPostCard({
           aria-label={post.title}
           className="relative block aspect-[2/1] min-h-[9.5rem] shrink-0 overflow-hidden bg-gradient-to-br from-sky-100 to-primary-50 sm:min-h-[11rem]"
         >
-          <SafeImage
-            src={post.coverImageUrl}
-            alt=""
-            fill
-            sizes={IMAGE_SIZES.blogFeatured}
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
-            fallback={<CoverFallback large />}
-          />
+          {hasCover ? (
+            <SafeImage
+              src={post.coverImageUrl}
+              alt=""
+              fill
+              sizes={IMAGE_SIZES.blogFeatured}
+              className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+              fallback={<CoverFallback large />}
+            />
+          ) : (
+            <CoverFallback large />
+          )}
         </Link>
         <div className="flex min-w-0 flex-1 flex-col p-5 sm:p-6">
           <TagChips tag={tag} city={post.city} citySlug={post.citySlug} articleType={post.articleType} />
           <h2 className="font-serif text-2xl font-semibold leading-[1.15] tracking-tight text-graphite sm:text-3xl">
-            <Link href={articleHref} className="hover:text-primary-700">
+            <Link href={articleHref} className="transition-colors duration-300 hover:text-primary-700">
               {post.title}
             </Link>
           </h2>
@@ -264,7 +387,7 @@ export function BlogPostCard({
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="inline-flex max-w-full items-center truncate rounded-lg bg-primary-50 px-2.5 py-1 text-xs font-medium text-primary-800 ring-1 ring-primary-100 transition hover:bg-primary-100 hover:text-primary-900 sm:text-sm"
+                  className="inline-flex max-w-full items-center truncate rounded-lg bg-primary-50 px-2.5 py-1 text-xs font-medium text-primary-800 ring-1 ring-primary-100 transition-all duration-300 hover:translate-x-0.5 hover:bg-primary-100 hover:text-primary-900 sm:text-sm"
                 >
                   {link.label}
                 </Link>
@@ -275,12 +398,17 @@ export function BlogPostCard({
             <div className="mt-3">
               <Link
                 href={cta.href}
-                className="inline-flex items-center justify-center rounded-xl bg-primary-600 px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-primary-700"
+                className="group/cta inline-flex items-center gap-2 rounded-xl bg-primary-600 px-3.5 py-2 text-sm font-semibold text-white transition-all duration-300 hover:bg-primary-700"
               >
                 {cta.label}
+                <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/cta:translate-x-1" aria-hidden />
               </Link>
             </div>
-          ) : null}
+          ) : (
+            <Link href={articleHref}>
+              <ReadMoreCue />
+            </Link>
+          )}
           <BlogCardMeta post={post} dateLabel={dateLabel} isLarge />
         </div>
       </article>
@@ -295,20 +423,24 @@ export function BlogPostCard({
           isSmall ? 'aspect-[16/10]' : 'aspect-[16/9]',
         ].join(' ')}
       >
-        <SafeImage
-          src={post.coverImageUrl}
-          alt=""
-          fill
-          sizes={IMAGE_SIZES.blogCard}
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-          fallback={<CoverFallback />}
-        />
+        {hasCover ? (
+          <SafeImage
+            src={post.coverImageUrl}
+            alt=""
+            fill
+            sizes={IMAGE_SIZES.blogCard}
+            className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+            fallback={<CoverFallback />}
+          />
+        ) : (
+          <CoverFallback />
+        )}
       </div>
       <div className={['flex flex-1 flex-col', isSmall ? 'p-4' : 'p-5'].join(' ')}>
         <TagChips tag={tag} city={post.city} citySlug={post.citySlug} articleType={post.articleType} />
         <h2
           className={[
-            'font-display font-extrabold leading-snug text-slate-900 group-hover:text-primary-700',
+            'font-display font-extrabold leading-snug text-slate-900 transition-colors duration-300 group-hover:text-primary-700',
             isSmall ? 'text-base sm:text-[1.1rem]' : 'text-lg sm:text-xl',
           ].join(' ')}
         >
@@ -326,7 +458,8 @@ export function BlogPostCard({
             {excerpt}
           </p>
         ) : null}
-        <div className="mt-auto pt-3">
+        <div className="mt-auto pt-2">
+          <ReadMoreCue />
           <BlogCardMeta post={post} dateLabel={dateLabel} isLarge={false} />
         </div>
       </div>

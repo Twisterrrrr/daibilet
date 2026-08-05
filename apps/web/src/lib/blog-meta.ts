@@ -49,29 +49,47 @@ export function blogCityBadgeClassName(citySlug?: string | null): string {
   );
 }
 
-/** Цветные плашки тегов/тем на карточках ленты (без purple glow). */
+/** Цветные плашки тегов/тем на карточках ленты (сочные, без purple glow). */
 const BLOG_TAG_BADGE_RULES: Array<{ re: RegExp; className: string }> = [
-  { re: /маршрут|гид|обзор|дайджест/i, className: 'bg-sky-50 text-sky-900 ring-sky-200/80' },
-  { re: /река|теплоход|мост|канал|нева/i, className: 'bg-cyan-50 text-cyan-900 ring-cyan-200/80' },
-  { re: /концерт|музык|джаз|фестив/i, className: 'bg-rose-50 text-rose-900 ring-rose-200/80' },
-  { re: /дет|семь|kids/i, className: 'bg-amber-50 text-amber-950 ring-amber-200/80' },
-  { re: /стендап|юмор|комик/i, className: 'bg-emerald-50 text-emerald-900 ring-emerald-200/80' },
-  { re: /экскурси|тур|дворы|парадн/i, className: 'bg-orange-50 text-orange-950 ring-orange-200/80' },
-  { re: /москва|moscow/i, className: 'bg-rose-50 text-rose-800 ring-rose-200/80' },
+  { re: /маршрут|гид|обзор|дайджест/i, className: 'bg-sky-600 text-white ring-sky-700/40' },
+  { re: /река|теплоход|мост|канал|нева/i, className: 'bg-cyan-600 text-white ring-cyan-700/40' },
+  { re: /концерт|музык|джаз|фестив/i, className: 'bg-rose-600 text-white ring-rose-700/40' },
+  { re: /дет|семь|kids/i, className: 'bg-amber-500 text-white ring-amber-600/40' },
+  { re: /стендап|юмор|комик/i, className: 'bg-emerald-600 text-white ring-emerald-700/40' },
+  { re: /экскурси|тур|дворы|парадн/i, className: 'bg-orange-500 text-white ring-orange-600/40' },
+  { re: /москва|moscow/i, className: 'bg-rose-600 text-white ring-rose-700/40' },
   {
     re: /петербург|питер|spb|saint-petersburg/i,
-    className: 'bg-sky-50 text-sky-900 ring-sky-200/80',
+    className: 'bg-sky-600 text-white ring-sky-700/40',
   },
-  { re: /от автора|колонк/i, className: 'bg-primary-50 text-primary-900 ring-primary-200/70' },
+  { re: /от автора|колонк/i, className: 'bg-primary-600 text-white ring-primary-700/40' },
 ];
 
 export function blogTagBadgeClassName(tag?: string | null): string {
   const label = String(tag || '').trim();
-  if (!label) return 'bg-primary-50 text-primary-800 ring-primary-200/70';
+  if (!label) return 'bg-primary-600 text-white ring-primary-700/40';
   for (const rule of BLOG_TAG_BADGE_RULES) {
     if (rule.re.test(label)) return rule.className;
   }
-  return 'bg-primary-50 text-primary-800 ring-primary-200/70';
+  return 'bg-primary-600 text-white ring-primary-700/40';
+}
+
+/** Фоновые акценты для quote-карточек (без картинки). */
+const BLOG_QUOTE_SURFACE_RULES: Array<{ re: RegExp; className: string }> = [
+  { re: /маршрут|гид|обзор/i, className: 'from-sky-600 via-sky-700 to-cyan-800' },
+  { re: /река|теплоход|мост|канал/i, className: 'from-cyan-600 via-teal-700 to-sky-900' },
+  { re: /концерт|музык|джаз|фестив/i, className: 'from-rose-600 via-rose-700 to-orange-800' },
+  { re: /дет|семь/i, className: 'from-amber-500 via-orange-600 to-rose-700' },
+  { re: /стендап|юмор/i, className: 'from-emerald-600 via-teal-700 to-cyan-900' },
+  { re: /экскурси|тур|дворы/i, className: 'from-orange-500 via-amber-600 to-rose-800' },
+];
+
+export function blogQuoteSurfaceClassName(tag?: string | null): string {
+  const label = String(tag || '').trim();
+  for (const rule of BLOG_QUOTE_SURFACE_RULES) {
+    if (rule.re.test(label)) return rule.className;
+  }
+  return 'from-primary-600 via-sky-700 to-cyan-900';
 }
 
 export type BlogArticleType = keyof typeof BLOG_ARTICLE_TYPE_LABELS;

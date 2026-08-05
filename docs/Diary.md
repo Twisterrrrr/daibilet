@@ -1,3 +1,18 @@
+## 2026-08-05 - UX: visual anchors на ленте `/blog`
+
+### Наблюдения
+- Owner: уточнил index-driven якоря (lead / каждая 5-я quote без фото), микроанимации, сочные теги, без серых дыр.
+
+### Решения
+- Magazine/list: index 0 → `lead`, index % 5 === 4 → `quote` (яркий градиент, без cover).
+- Теги: solid color chips; quote surface по теме; CTA `ArrowRight` + `hover:translate-x-1` / `hover:scale-[1.01]`.
+- Пустые slug/title не рендерим; без cover - gradient fallback, не серая плита.
+
+### Проблемы
+- Нет. Deploy ждёт «выкатывай».
+
+---
+
 ## 2026-08-05 - UX: оживление ленты `/blog`
 
 ### Наблюдения

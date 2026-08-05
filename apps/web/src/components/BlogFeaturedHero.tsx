@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { Ticket } from 'lucide-react';
+import { ArrowRight, Ticket } from 'lucide-react';
 
 import { BlogAfishaPromo } from '@/components/BlogAfishaPromo.client';
 import { resolveBlogCityEventsHref, resolveBlogCityHref } from '@/lib/blog-article-city';
@@ -143,14 +143,15 @@ export function BlogFeaturedHero({
           <div className="flex flex-wrap gap-2 pt-1">
             <Link
               href={articleHref}
-              className="inline-flex items-center justify-center rounded-xl bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-500"
+              className="group/cta inline-flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-300 hover:bg-primary-500"
             >
               Читать
+              <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/cta:translate-x-1" aria-hidden />
             </Link>
             {scheduleCta ? (
               <Link
                 href={scheduleCta.href}
-                className="inline-flex items-center justify-center rounded-xl border border-white/35 bg-white/10 px-4 py-2.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/20"
+                className="inline-flex items-center justify-center rounded-xl border border-white/35 bg-white/10 px-4 py-2.5 text-sm font-semibold text-white backdrop-blur-sm transition-all duration-300 hover:translate-x-0.5 hover:bg-white/20"
               >
                 {scheduleCta.label}
               </Link>

@@ -33,7 +33,7 @@
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
 | UX.BLOG-DECOUPLE-CITY | `/blog`: отвязать ленту от header CityPicker; фильтр материалов сразу после hero; при активном фильтре результаты над «материалом недели» | Высокий | ✅ `4624942` |
-| UX.BLOG-LISTING-VITALITY | `/blog`: featured overlay, magazine mix (banner/strip), serif titles, color chips, less-grey empty/skeleton | Высокий | ✅ `6b3f675`; await MSK deploy |
+| UX.BLOG-LISTING-VITALITY | `/blog`: featured overlay, magazine mix (banner/strip/lead/quote), serif titles, vivid chips, micro-interactions | Высокий | ✅ `6b3f675`+follow-up; await MSK deploy |
 | BLOG.TOP100-PLACE-IMGS | Top-100 / Beyond: скрыть с сайта (DRAFT); place JPG в venues для locations/my-day | Высокий | ✅ `5b288fa`/`61f676e`, MSK BUILD_ID=`kkfM8hMpE0f52IqGemiqu`; ×12 DRAFT, 404 UI |
 | BLOG.HIDE-AUG5-EXCEPT-BARS | Скрыть все статьи от 2026-08-05 кроме «Барный Петербург»; постепенная публикация | Критический | ✅ `be2f075` + MSK upsert DRAFT ×5; public only `spb-barnyy-peterburg-ryumochnye-spikizi`; soft-404 / article:null; web deploy n/a |
 | BLOG.HERO-SERIES-BR | Hero H1: перенос после точки перед «Часть N» для Top-100 / Beyond-Top-100 | Высокий | ✅ `07c4fc7`, MSK BUILD_ID=`tU2lr7PmZB4kN1JCHGX_V` |

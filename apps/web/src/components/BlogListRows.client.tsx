@@ -2,8 +2,9 @@
 
 import type { ReactNode } from 'react';
 import Link from 'next/link';
-import { BookOpen, Clock } from 'lucide-react';
+import { ArrowRight, BookOpen, Clock } from 'lucide-react';
 
+import { BlogPostCard } from '@/components/BlogPostCard.client';
 import { SafeImage } from '@/components/SafeImage.client';
 import { BLOG_POSTS } from '@/data/blog-posts';
 import type { BlogCardDto } from '@/lib/blog-utils';
@@ -22,11 +23,14 @@ import {
 } from '@/lib/blog-listing-links';
 
 function BlogListRow({ post }: { post: BlogCardDto }) {
+  if (!post?.slug || !post?.title) return null;
+
   const staticPost = BLOG_POSTS.find((item) => item.slug === post.slug);
   const dateLabel = resolveBlogCardDateLabel(post);
   const tag = post.tag || staticPost?.tag || 'Гид';
   const articleHref = `/blog/${post.slug}`;
   const excerpt = String(post.excerpt || '').trim();
+  const hasCover = Boolean(String(post.coverImageUrl || '').trim());
   const quickLinks = resolveBlogListingQuickLinks({
     slug: post.slug,
     title: post.title,
@@ -58,29 +62,31 @@ function BlogListRow({ post }: { post: BlogCardDto }) {
   }
 
   return (
-    <article className="group flex gap-3 overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md sm:gap-4">
-      <Link
-        href={articleHref}
-        aria-label={post.title}
-        className="relative aspect-video w-[9rem] shrink-0 self-start overflow-hidden bg-gradient-to-br from-sky-100 to-primary-50 sm:w-52 md:w-64 lg:w-72"
-      >
-        <SafeImage
-          src={post.coverImageUrl}
-          alt=""
-          fill
-          sizes="(max-width: 640px) 9rem, (max-width: 768px) 13rem, (max-width: 1024px) 16rem, 18rem"
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-          fallback={
-            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-sky-100 via-primary-50 to-amber-50 text-primary-300">
-              <BookOpen className="h-8 w-8" strokeWidth={1.25} aria-hidden />
-            </div>
-          }
-        />
-      </Link>
+    <article className="group flex gap-3 overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:scale-[1.01] hover:border-primary/30 hover:shadow-lg sm:gap-4">
+      {hasCover ? (
+        <Link
+          href={articleHref}
+          aria-label={post.title}
+          className="relative aspect-video w-[9rem] shrink-0 self-start overflow-hidden bg-gradient-to-br from-sky-100 to-primary-50 sm:w-52 md:w-64 lg:w-72"
+        >
+          <SafeImage
+            src={post.coverImageUrl}
+            alt=""
+            fill
+            sizes="(max-width: 640px) 9rem, (max-width: 768px) 13rem, (max-width: 1024px) 16rem, 18rem"
+            className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+            fallback={
+              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-sky-100 via-primary-50 to-amber-50 text-primary-300">
+                <BookOpen className="h-8 w-8" strokeWidth={1.25} aria-hidden />
+              </div>
+            }
+          />
+        </Link>
+      ) : null}
 
       <div className="flex min-w-0 flex-1 flex-col py-2.5 pr-3 sm:py-3 sm:pr-4">
         <h2 className="font-display text-base font-extrabold leading-snug text-slate-900 sm:text-lg md:text-xl">
-          <Link href={articleHref} className="hover:text-primary-700">
+          <Link href={articleHref} className="transition-colors duration-300 hover:text-primary-700">
             {post.title}
           </Link>
         </h2>
@@ -109,7 +115,7 @@ function BlogListRow({ post }: { post: BlogCardDto }) {
             {chips.map((chip) => (
               <span
                 key={chip.key}
-                className={`inline-flex max-w-full truncate rounded-md px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ring-1 sm:text-xs ${
+                className={`inline-flex max-w-full truncate rounded-md px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ring-1 transition-colors duration-300 sm:text-xs ${
                   chip.kind === 'city'
                     ? blogCityBadgeClassName(post.citySlug)
                     : blogTagBadgeClassName(chip.label)
@@ -122,7 +128,7 @@ function BlogListRow({ post }: { post: BlogCardDto }) {
               <Link
                 key={link.href}
                 href={link.href}
-                className="inline-flex max-w-full items-center truncate rounded-md bg-primary-50 px-2 py-0.5 text-[11px] font-medium text-primary-800 ring-1 ring-primary-100 transition hover:bg-primary-100 hover:text-primary-900 sm:text-xs"
+                className="inline-flex max-w-full items-center truncate rounded-md bg-primary-50 px-2 py-0.5 text-[11px] font-medium text-primary-800 ring-1 ring-primary-100 transition-all duration-300 hover:translate-x-0.5 hover:bg-primary-100 hover:text-primary-900 sm:text-xs"
               >
                 {link.label}
               </Link>
@@ -130,9 +136,10 @@ function BlogListRow({ post }: { post: BlogCardDto }) {
             {cta ? (
               <Link
                 href={cta.href}
-                className="inline-flex items-center rounded-md bg-primary-600 px-2.5 py-1 text-[11px] font-semibold text-white transition hover:bg-primary-700 sm:text-xs"
+                className="group/cta inline-flex items-center gap-1.5 rounded-md bg-primary-600 px-2.5 py-1 text-[11px] font-semibold text-white transition-all duration-300 hover:bg-primary-700 sm:text-xs"
               >
                 {cta.label}
+                <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover/cta:translate-x-1" aria-hidden />
               </Link>
             ) : null}
           </div>
@@ -152,12 +159,20 @@ export function BlogListRows({
   insertAfter?: number;
   insert?: ReactNode;
 }) {
+  const valid = posts.filter((post) => Boolean(post?.slug && post?.title));
+
   return (
     <ul className="flex flex-col gap-3 sm:gap-3.5">
-      {posts.flatMap((post, index) => {
+      {valid.flatMap((post, index) => {
         const nodes = [
           <li key={post.slug}>
-            <BlogListRow post={post} />
+            {index === 0 ? (
+              <BlogPostCard post={post} variant="lead" />
+            ) : index % 5 === 4 ? (
+              <BlogPostCard post={post} variant="quote" />
+            ) : (
+              <BlogListRow post={post} />
+            )}
           </li>,
         ];
         if (insert && insertAfter > 0 && index + 1 === insertAfter) {

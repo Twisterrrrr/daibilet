@@ -1,71 +1,122 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
 
 import { BlogPostCard } from '@/components/BlogPostCard.client';
 import type { BlogCardDto } from '@/lib/blog-utils';
 
 type MagazineRow =
+  | { kind: 'lead'; post: BlogCardDto }
+  | { kind: 'quote'; post: BlogCardDto }
   | { kind: 'trio'; mirror: boolean; large: BlogCardDto; small: [BlogCardDto, BlogCardDto] }
   | { kind: 'pair'; lead: BlogCardDto; side: BlogCardDto; mirror: boolean }
   | { kind: 'strip'; posts: [BlogCardDto, BlogCardDto, BlogCardDto] }
   | { kind: 'banner'; post: BlogCardDto }
   | { kind: 'single'; post: BlogCardDto };
 
+/**
+ * Index-driven visual anchors (not a flat .map of identical cards):
+ * - index 0 → full-bleed lead
+ * - every 5th (4, 9, 14…) → quote / no-image accent
+ * - remaining → trio / strip / banner rhythm
+ */
 function buildMagazineRows(posts: BlogCardDto[]): MagazineRow[] {
+  const valid = posts.filter((post) => Boolean(post?.slug && post?.title));
+  if (!valid.length) return [];
+
   const rows: MagazineRow[] = [];
   let i = 0;
-  let cycle = 0;
+  let pack = 0;
 
-  while (i < posts.length) {
-    const left = posts.length - i;
-    const phase = cycle % 3;
-    const mirror = Math.floor(cycle / 3) % 2 === 1;
+  rows.push({ kind: 'lead', post: valid[0]! });
+  i = 1;
 
-    if (phase === 1 && left >= 1) {
-      rows.push({ kind: 'banner', post: posts[i]! });
+  while (i < valid.length) {
+    const post = valid[i]!;
+
+    // Visual anchor: every 5th article in the original feed index (0-based: 4, 9…).
+    if (i % 5 === 4) {
+      rows.push({ kind: 'quote', post });
       i += 1;
-      cycle += 1;
+      continue;
+    }
+
+    const left = valid.length - i;
+    const mirror = pack % 2 === 1;
+    const phase = pack % 3;
+
+    if (phase === 1 && left >= 1 && i % 5 !== 4) {
+      rows.push({ kind: 'banner', post });
+      i += 1;
+      pack += 1;
       continue;
     }
 
     if (phase === 2 && left >= 3) {
-      rows.push({
-        kind: 'strip',
-        posts: [posts[i]!, posts[i + 1]!, posts[i + 2]!],
-      });
+      const a = valid[i]!;
+      const b = valid[i + 1]!;
+      const c = valid[i + 2]!;
+      // Avoid swallowing a quote-index post into a strip.
+      if (i % 5 === 4 || (i + 1) % 5 === 4 || (i + 2) % 5 === 4) {
+        if (i % 5 === 4) {
+          rows.push({ kind: 'quote', post: a });
+          i += 1;
+          continue;
+        }
+        rows.push({ kind: 'single', post: a });
+        i += 1;
+        pack += 1;
+        continue;
+      }
+      rows.push({ kind: 'strip', posts: [a, b, c] });
       i += 3;
-      cycle += 1;
+      pack += 1;
       continue;
     }
 
     if (left >= 3) {
+      const a = valid[i]!;
+      const b = valid[i + 1]!;
+      const c = valid[i + 2]!;
+      if (i % 5 === 4 || (i + 1) % 5 === 4 || (i + 2) % 5 === 4) {
+        if (i % 5 === 4) {
+          rows.push({ kind: 'quote', post: a });
+          i += 1;
+          continue;
+        }
+        rows.push({ kind: 'banner', post: a });
+        i += 1;
+        pack += 1;
+        continue;
+      }
       rows.push({
         kind: 'trio',
         mirror,
-        large: posts[i]!,
-        small: [posts[i + 1]!, posts[i + 2]!],
+        large: a,
+        small: [b, c],
       });
       i += 3;
-      cycle += 1;
+      pack += 1;
       continue;
     }
 
     if (left === 2) {
       rows.push({
         kind: 'pair',
-        lead: posts[i]!,
-        side: posts[i + 1]!,
+        lead: valid[i]!,
+        side: valid[i + 1]!,
         mirror,
       });
       i += 2;
-      cycle += 1;
+      pack += 1;
       continue;
     }
 
-    rows.push({ kind: left === 1 && cycle > 0 ? 'banner' : 'single', post: posts[i]! });
+    rows.push({ kind: 'single', post });
     i += 1;
-    cycle += 1;
+    pack += 1;
   }
 
   return rows;
@@ -136,7 +187,7 @@ function EditorialBreak({ quote }: { quote: string }) {
   return (
     <aside
       aria-label="Редакционная врезка"
-      className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary-600 via-sky-600 to-cyan-700 px-6 py-8 text-white shadow-md sm:px-10 sm:py-10"
+      className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary-600 via-sky-600 to-cyan-700 px-6 py-8 text-white shadow-md transition-all duration-300 hover:shadow-lg sm:px-10 sm:py-10"
     >
       <span
         aria-hidden
@@ -147,8 +198,9 @@ function EditorialBreak({ quote }: { quote: string }) {
       <p className="relative font-serif text-lg font-medium leading-snug tracking-tight sm:text-xl md:text-2xl md:leading-[1.35]">
         {quote}
       </p>
-      <p className="relative mt-4 text-xs font-semibold uppercase tracking-[0.16em] text-white/70">
+      <p className="relative mt-4 inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-white/70">
         Редакция Дайбилет
+        <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" aria-hidden />
       </p>
     </aside>
   );
@@ -182,7 +234,11 @@ export function BlogMagazineGrid({
                 : `${row.kind}-${row.post.slug}-${index}`;
 
         const rowNode =
-          row.kind === 'trio' ? (
+          row.kind === 'lead' ? (
+            <BlogPostCard post={row.post} variant="lead" />
+          ) : row.kind === 'quote' ? (
+            <BlogPostCard post={row.post} variant="quote" />
+          ) : row.kind === 'trio' ? (
             <TrioRow large={row.large} small={row.small} mirror={row.mirror} />
           ) : row.kind === 'pair' ? (
             <PairRow lead={row.lead} side={row.side} mirror={row.mirror} />
