@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return { title: 'Переезд статьи' };
   }
   const article = await loadArticle(decoded);
-  if (!article) return { title: 'Статья не найдена' };
+  if (!article) notFound();
 
   return buildBlogArticleMetadata(article);
 }

@@ -1,3 +1,18 @@
+## 2026-08-05 - Catalog LocationCard: strip Venue crumb tails
+
+### Наблюдения
+- После MSK smoke: hub must-see крошки уже срезаны (`preferEditorial` + `stripLocationCrumbTail`), но `/locations` карточка (Троицкий мост) всё ещё заканчивалась на «Нева» - `LocationCard` брал raw `hookFact`/`shortDescription` в обход `dayRouteHookLine`.
+
+### Решения
+- `LocationCard` и `InstitutionCard`: blurb через `dayRouteHookLine` (тот же `stripLocationCrumbTail`).
+- Тест на catalog-хвост «Ракурс на крепость и ростральные колонны. Нева».
+- DB batch clean не делали - display strip durable; следующий web deploy подхватит.
+
+### Проблемы
+- Нет. Commit+push без deploy (owner только что задеплоил).
+
+---
+
 ## 2026-08-05 - /locations: почему нет сгенерированных фото + фикс overlay
 
 ### Наблюдения
