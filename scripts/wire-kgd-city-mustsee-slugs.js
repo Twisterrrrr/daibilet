@@ -20,16 +20,8 @@ for (const row of pack) {
   });
 }
 
-const HUB_ONLY = new Set(
-  [
-    'Здание Кёнигсбергской биржи',
-    'Ресторан «Штайндамм 99»',
-    'Гастробар «Соль»',
-    'Zotler Bier',
-    'Ресторан «Редюит»',
-    'Магазин-музей «Кёнигсбергский марципан»',
-  ].map(norm),
-);
+// Антидубль здания музея ИЗО. Gastro (5) - в каталоге /locations как ATTRACTION.
+const HUB_ONLY = new Set(['Здание Кёнигсбергской биржи'].map(norm));
 
 const files = [
   path.join(root, 'apps/web/src/lib/cityInfo.ts'),

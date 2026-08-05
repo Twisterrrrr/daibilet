@@ -1,3 +1,20 @@
+## 2026-08-05 - KGD gastro → каталог /locations (owner override)
+
+### Наблюдения
+- Ранее 5 gastro в KGD mustSee оставлены hub-only (нет owner FOOD-pack как у SPB).
+- Owner: если события не продаём - точка всё равно должна быть в каталоге локаций (`/locations`), не только на хабе.
+
+### Решения
+- Kind `ATTRACTION` + `familyHint: location` → `publicVenuePageTemplate` = location (`/locations/...`). Не `CLUB_BAR_RESTAURANT` (institution → `/venues`).
+- Пакет `scripts/data/must-see-editorial-kaliningrad-gastro.json` (5) merged в city + `must-see-editorial.json`; `locationSlug` в web/public `cityInfo`.
+- Hub-only остаётся только «Здание Кёнигсбергской биржи» (антидубль музея ИЗО).
+- MSK: `enrich-must-see-editorial.js --apply --file=...gastro.json`; listing после DB (+ cache); hub-ссылки - после web deploy cityInfo.
+
+### Проблемы
+- Параллельный MSK web deploy: seed/API можно без ожидания; web cityInfo - после idle / в том же batch.
+
+---
+
 ## 2026-08-05 - Top-100: фото на каждую локацию + reuse в my-day/каталоге
 
 ### Наблюдения

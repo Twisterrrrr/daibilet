@@ -19,7 +19,8 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| MS.KGD-CITY-CATALOG | KGD city mustSee (не только owner 11): seed 24 catalog places + cityInfo slugs; gastro/биржа hub-only | Критический | ✅ `22f6f4f`+`7b18498`; MSK insert 22/update 2 + repair sobor/ostrov/monuments; live location ~23→25+, institution ~24 |
+| MS.KGD-CITY-CATALOG | KGD city mustSee (не только owner 11): seed 24 catalog places + cityInfo slugs; биржа hub-only | Критический | ✅ `22f6f4f`+`7b18498`; MSK insert 22/update 2 + repair sobor/ostrov/monuments; live location ~23→25+, institution ~24 |
+| MS.KGD-GASTRO-LOC | Owner override: 5 KGD gastro → `/locations` (ATTRACTION, не CLUB_BAR) + locationSlug wiring | Высокий | 🔄 seed pack + cityInfo; MSK apply + smoke |
 | FIX.CITY-ALIAS | Legacy `/cities/sankt-peterburg` → permanent redirect на canonical `/cities/saint-petersburg`, чтобы не вызывать city DTO с неканоническим slug | Критический | ✅ `c5f1869`, MSK BUILD_ID=`IQlhDY1eF5GvuOGLXURHb`; direct и public smoke: 308 → canonical, 200 |
 | FIX.EDITORIAL-VENUES | Убрать SPB thin twins, направить zero-event editorial в `/locations`, скрыть ticket chrome без saleable offer и усилить seed dedupe | Критический | ✅ `2897a74`, MSK BUILD_ID=`pB-uPQAXNmSrmo1y5dDNh`; El Copitas 200 без buy CTA, «Синий Пушкин» twin скрыт |
 
