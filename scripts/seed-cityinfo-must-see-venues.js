@@ -18,6 +18,7 @@ const path = require('path');
 const fs = require('fs');
 const { createRequire } = require('module');
 const crypto = require('crypto');
+const { inferMustSeeKindAndFamily } = require('./lib/venue-kind-heuristics');
 
 const rootDir = path.resolve(__dirname, '..');
 loadRootEnv(rootDir);
@@ -245,7 +246,7 @@ async function main() {
       uniqueSlug(slugify(item.name), slugUsed);
     slugUsed.add(slug);
 
-    const pageStatus = inferred.confident ? 'PUBLISHED' : 'CANDIDATE';
+    const pageStatus = 'PUBLISHED';
     const canonicalPath =
       inferred.family === 'institution' ? `/venues/${slug}` : `/locations/${slug}`;
 
@@ -310,18 +311,16 @@ async function main() {
     for (const filePath of CITY_INFO_PATHS.filter((p) => fs.existsSync(p))) {
       const before = fs.readFileSync(filePath, 'utf8');
       const after = applyCityInfoSlugs(before, patch);
+      const rel = path.relative(rootDir, filePath);
       if (before === after) {
-        report[`cityInfo:${path.basename(path.dirname(path.dirname(filePath)))}`] = 'unchanged';
-      } else if (dryRun) {
-        report[`cityInfo:${path.relative(rootDir, filePath)}`] = {
-          wouldChange: true,
-          patchCount: Object.keys(patch).length,
-        };
+        report[`cityInfo:${rel}`] = 'unchanged';
       } else {
+        // CityInfo slug wiring is local source-of-truth; allow write without DB --apply.
         fs.writeFileSync(filePath, after, 'utf8');
-        report[`cityInfo:${path.relative(rootDir, filePath)}`] = {
+        report[`cityInfo:${rel}`] = {
           written: true,
           patchCount: Object.keys(patch).length,
+          dryRunDb: dryRun,
         };
       }
     }
@@ -334,17 +333,34 @@ async function main() {
 function parseMustSee(source) {
   const start = source.indexOf('export const CITY_INFO');
   const body = source.slice(start);
-  const mustSeeRe = /mustSee:\s*\[([\s\S]*?)\]\s*,/g;
   const rows = [];
-  let m;
-  while ((m = mustSeeRe.exec(body))) {
-    const before = body.slice(Math.max(0, m.index - 800), m.index);
+  // Bracket-aware: themeTags: ['…'] used to truncate non-greedy [\s\S]*?
+  const markerRe = /mustSee:\s*\[/g;
+  let marker;
+  while ((marker = markerRe.exec(body))) {
+    const arrStart = marker.index + marker[0].length - 1; // '['
+    let depth = 0;
+    let arrEnd = -1;
+    for (let i = arrStart; i < body.length; i++) {
+      const ch = body[i];
+      if (ch === '[') depth++;
+      else if (ch === ']') {
+        depth--;
+        if (depth === 0) {
+          arrEnd = i;
+          break;
+        }
+      }
+    }
+    if (arrEnd < 0) continue;
+    const before = body.slice(Math.max(0, marker.index - 800), marker.index);
     const keyMatch = [...before.matchAll(/(?:'([^']+)'|([a-z0-9-]+))\s*:\s*\{/g)].pop();
     const cityKey = keyMatch ? keyMatch[1] || keyMatch[2] : null;
     if (!cityKey) continue;
+    const arrayBody = body.slice(arrStart + 1, arrEnd);
     const itemRe = /\{([^{}]*)\}/g;
     let im;
-    while ((im = itemRe.exec(m[1]))) {
+    while ((im = itemRe.exec(arrayBody))) {
       const block = im[1];
       const nameMatch = block.match(/name:\s*'((?:\\'|[^'])*)'/);
       if (!nameMatch) continue;
@@ -358,11 +374,10 @@ function parseMustSee(source) {
         href: (block.match(/href:\s*'([^']+)'/) || [])[1] || null,
       });
     }
+    markerRe.lastIndex = arrEnd + 1;
   }
   return rows;
 }
-
-const { inferMustSeeKindAndFamily } = require('./lib/venue-kind-heuristics');
 
 function inferKindAndFamily(name) {
   return inferMustSeeKindAndFamily(name);
@@ -377,67 +392,10 @@ async function upsertVenue(pool, venue) {
     `ven_ms_${crypto.createHash('sha1').update(venue.slug).digest('hex').slice(0, 16)}`;
   const seoTitle = `${venue.name} | Дайбилет`;
 
+  // Existing catalog rows: never clobber kind/status/title (owner editorial / supplier).
+  // Seed is insert-missing for hub linking; enrich-must-see-editorial handles profile fills.
   if (before.rows[0]) {
-    if (venue.hasHookFact) {
-      await pool.query(
-        `
-          update "Venue"
-          set
-            title = $2,
-            kind = $3::"VenueKind",
-            "pageStatus" = $4::"VenuePageStatus",
-            "cityId" = $5,
-            "shortDescription" = coalesce(nullif(trim("shortDescription"), ''), $6),
-            "seoH1" = coalesce(nullif(trim("seoH1"), ''), $2),
-            "seoTitle" = coalesce(nullif(trim("seoTitle"), ''), $7),
-            "seoDescription" = coalesce(nullif(trim("seoDescription"), ''), $6),
-            "canonicalPath" = coalesce(nullif(trim("canonicalPath"), ''), $8),
-            "isIndexable" = case when $4::text = 'PUBLISHED' then true else "isIndexable" end,
-            "updatedAt" = now()
-          where slug = $1
-        `,
-        [
-          venue.slug,
-          venue.name,
-          venue.kind,
-          venue.pageStatus,
-          venue.cityId,
-          venue.shortDescription,
-          seoTitle,
-          venue.canonicalPath,
-        ],
-      );
-    } else {
-      await pool.query(
-        `
-          update "Venue"
-          set
-            title = $2,
-            kind = $3::"VenueKind",
-            "pageStatus" = $4::"VenuePageStatus",
-            "cityId" = $5,
-            "shortDescription" = coalesce(nullif(trim("shortDescription"), ''), $6),
-            "seoH1" = coalesce(nullif(trim("seoH1"), ''), $2),
-            "seoTitle" = coalesce(nullif(trim("seoTitle"), ''), $7),
-            "seoDescription" = coalesce(nullif(trim("seoDescription"), ''), $6),
-            "canonicalPath" = coalesce(nullif(trim("canonicalPath"), ''), $8),
-            "isIndexable" = case when $4::text = 'PUBLISHED' then true else "isIndexable" end,
-            "updatedAt" = now()
-          where slug = $1
-        `,
-        [
-          venue.slug,
-          venue.name,
-          venue.kind,
-          venue.pageStatus,
-          venue.cityId,
-          venue.shortDescription,
-          seoTitle,
-          venue.canonicalPath,
-        ],
-      );
-    }
-    return 'updated';
+    return 'skipped-exists';
   }
 
   if (venue.hasHookFact) {
@@ -628,7 +586,7 @@ function slugify(input) {
   return String(input || '')
     .toLowerCase()
     .split('')
-    .map((ch) => map[ch] || ch)
+    .map((ch) => (Object.prototype.hasOwnProperty.call(map, ch) ? map[ch] : ch))
     .join('')
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')

@@ -1,3 +1,20 @@
+## 2026-08-05 - SPB must-see: seed 129 missing catalog PDPs + wire 184/184
+
+### Наблюдения
+- Owner: «линкуем и потом выкладываем» - не только hygiene 55, а добить остальные.
+- Seed `seed-cityinfo-must-see-venues.js` парсил только ~21 SPB mustSee: non-greedy `[\s\S]*?` рвался на `themeTags: [...]`.
+- Slugify: `map[ch] || ch` глотал `ь: ''` (falsy) → soft-sign становился `-` (`bol-shaya`).
+
+### Решения
+- Bracket-aware parseMustSee; slugify через `hasOwnProperty`; mustSee seed всегда `PUBLISHED`; existing Venue = skip (не clobber kind).
+- cityInfo web+public: **184/184** со slug; MSK insert-missing для 129 новых карточек.
+- Deploy MSK web+API после seed.
+
+### Проблемы
+- Часть name→kind heuristic грубая (Эрарта как ATTRACTION в dry-run inference) - на existing slug не перезаписываем; новые editorial PDP ок для хаб-линка.
+
+---
+
 ## 2026-08-05 - SPB must-see hub ↔ catalog: hygiene after 1c6c2b5
 
 ### Наблюдения

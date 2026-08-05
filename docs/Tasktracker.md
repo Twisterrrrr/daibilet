@@ -19,7 +19,8 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| HUB.SPB-NEST-SLUG | Хаб СПб: убрать nested с must-see + title/«В маршрут» → `/locations`\|`/venues` только при реальном PDP | Критический | ✅ nested `1c6c2b5`; slug hygiene: 55/184 working PDP (было 86 wired / ~32 soft-404); commit+push, deploy нет |
+| HUB.SPB-NEST-SLUG | Хаб СПб: убрать nested с must-see + title/«В маршрут» → `/locations`\|`/venues` только при реальном PDP | Критический | ✅ nested `1c6c2b5`; slug hygiene 55; **seed+wire 184/184** + MSK insert 129; deploy ниже |
+| HUB.SPB-SEED-LINK | Seed 129 missing SPB mustSee → Venue + cityInfo slug; fix themeTags parser + soft-sign slugify | Критический | 🔄 in progress |
 
 ## Catalog lazy / venues+locations perf (2026-08-05)
 
