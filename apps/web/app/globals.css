@@ -526,6 +526,10 @@ body > div:has(iframe[src*='ticketscloud']) {
   background: transparent !important;
   border: 0 !important;
 }
+/* Leaflet OSM attribution: hide UA flag badge, keep © OpenStreetMap text */
+.leaflet-attribution-flag {
+  display: none !important;
+}
 
 /* Мой день: чистый маршрутный лист для печати / Save as PDF */
 @media print {
