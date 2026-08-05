@@ -1734,7 +1734,8 @@ function CitySightsMustSeeList({
           tabIndex={0}
         >
         {/* Mobile: contents hoists cards into the flex scrollport so % = viewport; md: 2-row grid. */}
-        <ol className="contents md:grid md:w-max md:auto-cols-[min(22rem,calc(50vw-3rem))] md:grid-flow-col md:grid-rows-2 md:gap-x-6 md:gap-y-5">
+        {/* md: auto rows (not grid-rows-2=1fr) + items-start — иначе равная высота рядов даёт белую дыру между карточками. */}
+        <ol className="contents md:grid md:w-max md:auto-cols-[min(22rem,calc(50vw-3rem))] md:grid-flow-col md:grid-rows-[auto_auto] md:items-start md:gap-x-6 md:gap-y-5">
         {visiblePlaces.map((place, index) => {
           const afficheLink = matchSightAfficheLink({
             sightName: place.name,
@@ -1756,11 +1757,11 @@ function CitySightsMustSeeList({
               desc: place.desc,
               preferEditorial: true,
             }) || '';
-          const nested = Array.isArray(place.places) ? place.places.filter((item) => item?.name) : [];
+          // Nested sub-spots (places[]) stay in suburb cards / articles / location PDP - not on hub must-see.
           return (
             <li
               key={`${place.name}:${index}`}
-              className="flex min-w-0 shrink-0 snap-start gap-3 pr-1 [flex:0_0_80%] md:w-auto md:min-w-0 md:max-w-none md:pr-0 md:[flex:none]"
+              className="flex min-w-0 shrink-0 snap-start items-start gap-3 pr-1 [flex:0_0_80%] md:w-auto md:min-w-0 md:max-w-none md:pr-0 md:[flex:none]"
               data-city-must-see-card
             >
               <span
@@ -1795,26 +1796,6 @@ function CitySightsMustSeeList({
                   <span className="mt-2 inline-flex rounded-full bg-sky-50 px-2 py-1 text-[10px] font-semibold text-sky-800">
                     {place.seasonLabel}
                   </span>
-                ) : null}
-                {nested.length ? (
-                  <ul className="mt-3 space-y-1.5 border-t border-slate-100 pt-3 text-sm">
-                    {nested.map((item, nestedIndex) => {
-                      const nestedRoute = dayRouteItemFromMustSee(
-                        { name: item.name, desc: String(item.desc || ''), href: item.href, venueSlug: item.venueSlug, locationSlug: item.locationSlug },
-                        venues,
-                        city,
-                      );
-                      return (
-                        <li key={`${item.name}:${nestedIndex}`} className="flex items-start justify-between gap-2">
-                          <span className={editorial ? 'text-zinc-600' : 'text-slate-600'}>
-                            <b className={editorial ? 'text-zinc-900' : 'text-slate-900'}>{item.name}</b>
-                            {item.desc ? ` - ${capitalizeSentenceStart(item.desc)}` : ''}
-                          </span>
-                          {nestedRoute ? <AddToDayRouteButton compact className="!min-h-8 !px-2 !py-1 !text-[10px]" venue={nestedRoute} /> : null}
-                        </li>
-                      );
-                    })}
-                  </ul>
                 ) : null}
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   {dayRouteItem ? (
