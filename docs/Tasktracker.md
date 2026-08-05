@@ -34,7 +34,7 @@
 |---|--------|-----------|--------|
 | UX.BLOG-DECOUPLE-CITY | `/blog`: отвязать ленту от header CityPicker; фильтр материалов сразу после hero; при активном фильтре результаты над «материалом недели» | Высокий | ✅ `4624942` |
 | BLOG.TOP100-PLACE-IMGS | Top-100 / Beyond: скрыть с сайта (DRAFT); place JPG в venues для locations/my-day | Высокий | ✅ `5b288fa`/`61f676e`, MSK BUILD_ID=`kkfM8hMpE0f52IqGemiqu`; ×12 DRAFT, 404 UI |
-| BLOG.HIDE-AUG5-EXCEPT-BARS | Скрыть все статьи от 2026-08-05 кроме «Барный Петербург»; постепенная публикация | Критический | 🔄 MD ×5 DRAFT; публичный `spb-barnyy-peterburg-ryumochnye-spikizi`; нужен MSK upsert |
+| BLOG.HIDE-AUG5-EXCEPT-BARS | Скрыть все статьи от 2026-08-05 кроме «Барный Петербург»; постепенная публикация | Критический | ✅ `be2f075` + MSK upsert DRAFT ×5; public only `spb-barnyy-peterburg-ryumochnye-spikizi`; soft-404 / article:null; web deploy n/a |
 | BLOG.HERO-SERIES-BR | Hero H1: перенос после точки перед «Часть N» для Top-100 / Beyond-Top-100 | Высокий | ✅ `07c4fc7`, MSK BUILD_ID=`tU2lr7PmZB4kN1JCHGX_V` |
 | BLOG.RESTORE-SPB-BARS | Вернуть owner-текст статьи «Барный Петербург» без SEO-переписывания, проверить реальные адреса, venue links, изображения и production Article | Критический | 🔄 локальный текст восстановлен, ожидаются sync, upsert и MSK deploy |
 

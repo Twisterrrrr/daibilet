@@ -9,9 +9,10 @@
   `spb-zolotoy-treugolnik-za-1-den`, `spb-vasilevskiy-ostrov-marshrut`, `spb-petrogradskaya-storona`, `spb-kolomna-kanaly`, `spb-vladimirskaya-gastro`.
 - Публичным остаётся `spb-barnyy-peterburg-ryumochnye-spikizi` (PUBLISHED).
 - В `blog-posts.ts` этих slug не было. Live: upsert DRAFT на MSK + revalidate `/blog` (без web deploy).
+- MSK 2026-08-05: upsert ×5 DRAFT/`isIndexable=false`; API `article:null` + soft-404 title; listing без ×5; барный гид PUBLISHED в ленте.
 
 ### Проблемы
-- Нет.
+- Нет. Web deploy не нужен - soft-404 для DRAFT уже live с Top-100 (`61f676e`).
 
 ---
 
