@@ -32,7 +32,7 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| UX.BLOG-DECOUPLE-CITY | `/blog`: отвязать ленту от header CityPicker; фильтр материалов сразу после hero; при активном фильтре результаты над «материалом недели» | Высокий | ✅ commit pending |
+| UX.BLOG-DECOUPLE-CITY | `/blog`: отвязать ленту от header CityPicker; фильтр материалов сразу после hero; при активном фильтре результаты над «материалом недели» | Высокий | ✅ `4624942` |
 | BLOG.TOP100-PLACE-IMGS | Top-100 / Beyond: скрыть с сайта (DRAFT); place JPG в venues для locations/my-day | Высокий | ✅ `5b288fa`/`61f676e`, MSK BUILD_ID=`kkfM8hMpE0f52IqGemiqu`; ×12 DRAFT, 404 UI |
 | BLOG.HIDE-AUG5-EXCEPT-BARS | Скрыть все статьи от 2026-08-05 кроме «Барный Петербург»; постепенная публикация | Критический | 🔄 MD ×5 DRAFT; публичный `spb-barnyy-peterburg-ryumochnye-spikizi`; нужен MSK upsert |
 | BLOG.HERO-SERIES-BR | Hero H1: перенос после точки перед «Часть N» для Top-100 / Beyond-Top-100 | Высокий | ✅ `07c4fc7`, MSK BUILD_ID=`tU2lr7PmZB4kN1JCHGX_V` |
@@ -46,6 +46,7 @@
 |---|--------|-----------|--------|
 | FIX.SALUTE0 | `salute-9-may`: exclude День города + require 9 мая / День Победы | Критический | ✅ `83271ec` live BUILD **`BCWcAIglYC8cAP-6Zgr4k`**; sessions=0, city-day leak gone |
 | FIX.CITYDAY | NEW `moscow-city-day` landing `/moscow/den-goroda/` + hide salute from hub | Критический | ✅ `4555e19` live BUILD **`J2r1pJc-sK2W_wGzB2KzY`**; events=11; salute off hub |
+| FIX.CITYDAY-PRICE | Landing rows: min as fixed price → `formatMoneyRange` (мин-макс / `от`) | Высокий | 🔄 commit+push; MSK deploy ждёт owner |
 | UX.POD1 | `/podborki`: category jump chips + SEO «Развернуть» + lazy cards + count/priceFrom | Высокий | ✅ `7535f02` live **`BCWcAIglYC8cAP-6Zgr4k`** |
 | UX.POD2 | `/podborki` masonry / view counters / purchase carousel / infinite scroll | Средний | ⚠️ deferred |
 | UX.LAND2 | Tabular landings: clearer rows, timeslot chips, sticky filters, `?type=` | Высокий | ✅ `eae17f4` live **`BCWcAIglYC8cAP-6Zgr4k`** |
