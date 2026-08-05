@@ -180,7 +180,13 @@ export function VenuesCatalogView({ venues }: { venues: VenueCatalogCard[] }) {
             : 'Площадки'
         }
         title={heroTitle}
-        description="Постоянные экспозиции, временные выставки, вечерние программы. Электронные билеты без очередей."
+        description={
+          <>
+            Постоянные экспозиции, временные выставки, вечерние программы.
+            <br />
+            Электронные билеты без очередей.
+          </>
+        }
         tone="dark"
         media={
           <HeroMedia
@@ -195,7 +201,7 @@ export function VenuesCatalogView({ venues }: { venues: VenueCatalogCard[] }) {
             {scopedEvents > 0 ? ` · ${pluralEvents(scopedEvents)}` : ''}
           </p>
         ) : null}
-        <div className="mx-auto mt-6 flex max-w-4xl flex-col gap-3 rounded-2xl bg-white p-3 text-left text-slate-900 shadow-lg sm:flex-row">
+        <div className="mx-auto mt-6 flex max-w-5xl flex-col gap-3 rounded-2xl bg-white p-3 text-left text-slate-900 shadow-lg sm:flex-row">
           <div className="flex flex-1 items-center gap-2 rounded-xl bg-slate-100 px-3">
             <Search className="h-4 w-4 text-slate-400" />
             <input
