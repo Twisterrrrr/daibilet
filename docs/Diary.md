@@ -27,7 +27,7 @@
 - В `CityInfoEntry` добавлено необязательное поле `seasonalTip`, чтобы аналогичные проверенные сезонные справки могли быть добавлены другим городам без встраивания контента в компонент.
 
 ### Проблемы
-- Нет. Нужны typecheck, production deploy на MSK и HTTP smoke.
+- Локальный `pnpm typecheck` не запущен: в Windows-окружении нет Node.js/pnpm. MSK production build прошел успешно; после автоматического warm сервис кратко оказался inactive из-за неполного `.next`, затем systemd восстановил runtime. Повторный smoke канонических hub, landing и «Мой день» - 200.
 
 ---
 
