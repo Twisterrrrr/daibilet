@@ -259,6 +259,14 @@ export function parseContentBlocks(content: string): ContentBlock[] {
       continue;
     }
 
+    const plainCallout = parseCalloutText(line);
+    if (plainCallout) {
+      flushParagraph();
+      blocks.push({ type: 'callout', label: plainCallout.label, text: plainCallout.body });
+      index += 1;
+      continue;
+    }
+
     if (isBlockquoteLine(line)) {
       flushParagraph();
       const quoteLines: string[] = [];
@@ -273,7 +281,7 @@ export function parseContentBlocks(content: string): ContentBlock[] {
       if (callout) {
         blocks.push({ type: 'callout', label: callout.label, text: callout.body });
       } else if (text) {
-        blocks.push({ type: 'quote', data: { text } });
+        blocks.push({ type: 'paragraph', text });
       }
       continue;
     }
@@ -530,7 +538,7 @@ function BlogPullQuote({ text, cite }: ParsedQuote) {
 
 function BlogCallout({ label, text }: { label: string; text: string }) {
   return (
-    <p className="my-4 text-base leading-[1.65] text-slate-800 sm:text-[1.0625rem]">
+    <p className="my-4 border-l-2 border-slate-300/90 py-0.5 pl-4 text-base font-normal leading-[1.65] text-slate-800 sm:text-[1.0625rem]">
       <strong className="font-semibold text-slate-900">{label}:</strong>{' '}
       {renderInline(text, `callout-${label}-`)}
     </p>
@@ -575,7 +583,7 @@ const PARAGRAPH_CLASS =
 const LEAD_PARAGRAPH_CLASS =
   'text-[1.0625rem] font-normal leading-[1.65] text-pretty text-slate-800 [overflow-wrap:break-word] sm:text-lg sm:leading-[1.6]';
 const TAGLINE_CLASS =
-  'mb-4 text-base font-semibold leading-snug text-slate-900 sm:text-[1.0625rem]';
+  'mb-3 text-[0.9375rem] font-semibold leading-snug text-slate-800 sm:text-base';
 const H2_CLASS =
   'scroll-mt-24 mb-5 border-b border-slate-200/90 pb-3 font-display text-[1.45rem] font-bold tracking-tight text-slate-950 sm:text-[1.7rem] lg:text-[1.8rem] [&:not(:first-child)]:mt-14 [&:not(:first-child)]:pt-1';
 const H3_CLASS =
