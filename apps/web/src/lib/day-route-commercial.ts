@@ -8,6 +8,7 @@ import {
   DAY_ROUTE_SOFT,
   encodeDayRouteShareTime,
   formatDayRouteHHMM,
+  isDayRoutePlaceholderTitle,
   resolveDayRouteTicketUrl,
   type DayRouteVenueItem,
 } from './day-route';
@@ -306,24 +307,23 @@ export type DayRouteBuyCtaParts = {
 };
 
 /**
- * Structured buy CTA for stop right-rail layout:
- * [icon] + action / price as separate lines - icon must not sit between Russian words.
+ * Structured buy CTA parts (aria / legacy). Visible stop chips use
+ * {@link formatDayRouteOfferChip} so the event name is never dropped.
  */
 export function formatDayRouteBuyCtaParts(
-  venue: Pick<DayRouteVenueItem, 'priceFromRub' | 'sessionLabel'>,
+  venue: Pick<DayRouteVenueItem, 'priceFromRub' | 'sessionLabel' | 'title'>,
 ): DayRouteBuyCtaParts {
   const price = priceSuffixLabel(venue.priceFromRub) || null;
-  if (price) return { action: 'Купить билет', price };
   const soft = String(venue.sessionLabel || '').trim();
   if (soft && !/вечерн/i.test(soft) && !/^билет/i.test(soft) && !isSoftDaypart(soft)) {
-    return { action: 'Купить билет на это же время', price: null };
+    return { action: 'Купить билет на это же время', price };
   }
-  return { action: 'Купить билет', price: null };
+  return { action: 'Купить билет', price };
 }
 
 /** Primary buy CTA label (aria / flat string): «Купить билет от X» when real price known. */
 export function formatDayRouteBuyCtaLabel(
-  venue: Pick<DayRouteVenueItem, 'priceFromRub' | 'sessionLabel'>,
+  venue: Pick<DayRouteVenueItem, 'priceFromRub' | 'sessionLabel' | 'title'>,
 ): string {
   const { action, price } = formatDayRouteBuyCtaParts(venue);
   return price ? `${action} ${price}` : action;
@@ -335,11 +335,70 @@ function isSoftDaypart(label: string): boolean {
   );
 }
 
-export function formatNearbyUpsellLine(match: {
+/**
+ * Resolve a human event/offer name for stop chips.
+ * Never return empty / bare «Купить билет» - fall through match → session → venue.
+ */
+export function resolveDayRouteOfferTitle(
+  ...candidates: Array<string | null | undefined>
+): string {
+  const cleaned: string[] = [];
+  for (const raw of candidates) {
+    let t = String(raw || '').trim();
+    if (!t) continue;
+    t = t.replace(/^Рядом:\s*/i, '').trim();
+    t = t.replace(/\s*\(\s*от\s+[\d\s\u00a0]+₽\s*\)\s*$/i, '').trim();
+    if (!t) continue;
+    if (/^купить\s+билет/i.test(t)) continue;
+    if (t === 'Билет рядом' || t === 'Билет') {
+      cleaned.push(t);
+      continue;
+    }
+    if (isDayRoutePlaceholderTitle(t)) {
+      cleaned.push(t);
+      continue;
+    }
+    return t;
+  }
+  for (const t of cleaned) {
+    if (t && !isDayRoutePlaceholderTitle(t) && t !== 'Билет рядом') return t;
+  }
+  return cleaned[0] || 'Билет';
+}
+
+export type DayRouteOfferChip = {
+  /** Event / match name (always non-empty). */
   title: string;
+  /** «от N ₽» or null. */
+  price: string | null;
+  /** Visible chip: «Title · от N ₽» or just title. */
+  label: string;
+};
+
+/** Horizontal stop-card chip: title + optional price, never bare buy CTA. */
+export function formatDayRouteOfferChip(input: {
+  title?: string | null;
+  priceFromRub?: number | null;
+  sessionLabel?: string | null;
+  fallbackTitle?: string | null;
+}): DayRouteOfferChip {
+  const soft = String(input.sessionLabel || '').trim();
+  const sessionAsTitle =
+    soft && !isSoftDaypart(soft) && !/^билет/i.test(soft) && !/вечерн/i.test(soft) ? soft : null;
+  const title = resolveDayRouteOfferTitle(input.title, sessionAsTitle, input.fallbackTitle);
+  const price = priceSuffixLabel(input.priceFromRub) || null;
+  return {
+    title,
+    price,
+    label: price ? `${title} · ${price}` : title,
+  };
+}
+
+export function formatNearbyUpsellLine(match: {
+  title?: string | null;
   priceFromRub: number | null;
 }): string {
-  const title = String(match.title || '').trim() || 'Билет рядом';
+  const title = resolveDayRouteOfferTitle(match.title);
   const price = priceSuffixLabel(match.priceFromRub);
   if (price) return `Рядом: ${title} (${price})`;
   return `Рядом: ${title}`;
@@ -448,7 +507,7 @@ export function pickNearbyUpsellsForStop(
     seen.add(row.match.eventId);
     out.push({
       eventId: row.match.eventId,
-      title: row.match.title,
+      title: resolveDayRouteOfferTitle(row.match.title),
       ticketUrl: matchTicketUrl(row.match),
       priceFromRub: realPriceRub(row.match.priceFromRub),
       line: formatNearbyUpsellLine(row.match),
@@ -504,15 +563,24 @@ export function applyMatchCommerceToVenues(
     if (admission) {
       const ticketUrl = matchTicketUrl(admission);
       const priceFromRub = realPriceRub(admission.priceFromRub);
+      const admissionTitle = resolveDayRouteOfferTitle(admission.title);
+      const shouldLiftTitle =
+        isDayRoutePlaceholderTitle(current.title) ||
+        !String(current.title || '').trim() ||
+        current.title === current.id ||
+        current.title === current.eventId;
+      const nextTitle = shouldLiftTitle && admissionTitle !== 'Билет' ? admissionTitle : current.title;
       const same =
         current.eventId === admission.eventId &&
         current.eventSlug === admission.slug &&
         current.ticketUrl === ticketUrl &&
+        current.title === nextTitle &&
         (priceFromRub == null || current.priceFromRub === priceFromRub);
       if (same) return current;
       changed = true;
       return {
         ...current,
+        title: nextTitle,
         eventId: admission.eventId,
         eventSlug: admission.slug,
         ticketUrl,
@@ -520,12 +588,35 @@ export function applyMatchCommerceToVenues(
       };
     }
     if (!dayRouteStopHasTicket(current)) return current;
-    const priceFromRub = findPriceForTicketedStop(current, matches);
-    if (priceFromRub != null && current.priceFromRub !== priceFromRub) {
-      changed = true;
-      return { ...current, priceFromRub };
+    const eventId = String(current.eventId || '').trim();
+    const eventSlug = String(current.eventSlug || '').trim();
+    const linkedMatch =
+      eventId || eventSlug
+        ? matches.find(
+            (m) =>
+              (eventId && m.eventId === eventId) || (eventSlug && m.slug === eventSlug),
+          )
+        : undefined;
+    let nextVenue = current;
+    if (
+      linkedMatch &&
+      (isDayRoutePlaceholderTitle(current.title) ||
+        !String(current.title || '').trim() ||
+        current.title === current.id ||
+        current.title === current.eventId)
+    ) {
+      const lifted = resolveDayRouteOfferTitle(linkedMatch.title, current.title);
+      if (lifted && lifted !== current.title && lifted !== 'Билет') {
+        changed = true;
+        nextVenue = { ...nextVenue, title: lifted };
+      }
     }
-    return current;
+    const priceFromRub = findPriceForTicketedStop(nextVenue, matches);
+    if (priceFromRub != null && nextVenue.priceFromRub !== priceFromRub) {
+      changed = true;
+      return { ...nextVenue, priceFromRub };
+    }
+    return nextVenue;
   });
   return { venues: next, changed };
 }

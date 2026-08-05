@@ -8,6 +8,8 @@ import {
   dayRouteStopReorderLocked,
   dayRouteStopTicketQrData,
   findDayRouteFreeWindowGaps,
+  formatDayRouteOfferChip,
+  resolveDayRouteOfferTitle,
 } from './day-route-commercial';
 import type { DayRouteVenueItem } from './day-route';
 
@@ -168,5 +170,33 @@ describe('day-route-commercial free windows', () => {
       { afterIndex: 1, meters: 1500 },
       { afterIndex: 3, meters: 3000 },
     ]);
+  });
+});
+
+describe('day-route-commercial offer chips', () => {
+  it('never drops event title for buy chip', () => {
+    const chip = formatDayRouteOfferChip({
+      title: 'Элитный Stand-up',
+      priceFromRub: 600,
+    });
+    assert.equal(chip.title, 'Элитный Stand-up');
+    assert.equal(chip.price, 'от 600 ₽');
+    assert.equal(chip.label, 'Элитный Stand-up · от 600 ₽');
+  });
+
+  it('falls back through session then venue when match title empty', () => {
+    assert.equal(
+      resolveDayRouteOfferTitle('', 'сб, 19:00', 'Comedy Club'),
+      'сб, 19:00',
+    );
+    assert.equal(resolveDayRouteOfferTitle(null, null, 'Comedy Club'), 'Comedy Club');
+    assert.equal(resolveDayRouteOfferTitle('Купить билет', null, 'Микс'), 'Микс');
+  });
+
+  it('strips Рядом prefix and parenthetical price from line fallbacks', () => {
+    assert.equal(
+      resolveDayRouteOfferTitle('', 'Рядом: Микс (от 1 500 ₽)', 'Venue'),
+      'Микс',
+    );
   });
 });

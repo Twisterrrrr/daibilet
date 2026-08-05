@@ -175,6 +175,7 @@
 | UX.ECARD-DAY-OVERLAY | EventCard grid: «В мой день»/«Добавлено» на cover bottom-right overlay; footer = price+Купить | Высокий | ✅ `49be710` MSK **BUILD_ID=`J2r1pJc-sK2W_wGzB2KzY`** `/events` 200 |
 
 | UX.MYDAY-MOSQUE-MATCH | SPB соборная мечеть: ложный match → МТС Live Hall (Ded Moroz + concert copy / Anna-Elza PDP); truncate title | Критический | ✅ code `2cdebd4`; MSK DB promote+revalidate (`fix-spb-sobornaya-mechet-venue`); web deploy matcher still pending «выкатывай» |
+| UX.MYDAY-STOP-CHIPS | Stop cards: offer chips горизонтально (flex-wrap) + всегда title·price (не столбик ml-auto / не голый «Купить билет») | Критический | ✅ code push; deploy n/a |
 
 ## /my-day starter → header search (2026-08-04)
 

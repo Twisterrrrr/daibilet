@@ -365,7 +365,20 @@
 
 ---
 
-## 2026-08-05 - Top-100: noindex + снять массовые AI place-фото
+## 2026-08-05 - My Day stop cards: horizontal offer chips + title
+
+### Наблюдения
+- Owner SPB screens: stop-card commerce - варианты событий столбиком справа с дырой в строке; на Comedy Club / Stand Up видно только «Купить билет от X ₽» без имени события.
+
+### Решения
+- Root layout: `commerceRail` был `flex-col` + `sm:w-[11.5rem] sm:items-end` (фикс CTA wrap 2026-08-05) - узкая правая колонка. Заменено на `flex flex-row flex-wrap items-center gap-2` chips в общей строке stop-card.
+- Root title: ticket CTA рендерил только `formatDayRouteBuyCtaParts` («Купить билет» / цена) без match/venue name. Добавлены `resolveDayRouteOfferTitle` + `formatDayRouteOfferChip` (`Title · от N ₽`); admission/linked match поднимают placeholder title.
+- Файлы: `DayRoutePanel.client.tsx`, `day-route-commercial.ts` (+test). Commit+push; deploy нет.
+
+### Проблемы
+- Нет.
+
+---
 
 ### Наблюдения
 - Owner: серия ещё не должна быть в поисковиках; массовые GenerateImage place-кадры не привязаны к реальности.
