@@ -306,14 +306,17 @@ function findExistingVenueCandidate(rows, item) {
       rowIdentity.length >= 8 &&
       (itemIdentity === rowIdentity || itemIdentity.includes(rowIdentity) || rowIdentity.includes(itemIdentity));
     const addressMatch = itemAddress.length >= 8 && itemAddress === rowAddress;
+    // Nearby alone is not enough: island parks vs temples, twin monuments
+    // at one campus would otherwise overwrite an unrelated slug.
+    const exactSlug = row.slug === item.slug;
+    if (!titleMatch && !addressMatch && !exactSlug) continue;
     const nearby = distance != null && distance <= 100;
-    if (!titleMatch && !addressMatch && !nearby && row.slug !== item.slug) continue;
 
     const score =
       (titleMatch ? 10_000 : 0) +
       (addressMatch ? 5_000 : 0) +
       (nearby ? Math.max(0, 1_000 - Math.round(distance || 0)) : 0) +
-      (row.slug === item.slug ? 100 : 0);
+      (exactSlug ? 100 : 0);
     if (!best || score > best.score) best = { row, score };
   }
   return best?.row || null;
