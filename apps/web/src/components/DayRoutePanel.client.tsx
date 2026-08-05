@@ -3839,7 +3839,6 @@ function DayRoutePanelInner() {
           venues={matchSources}
           city={dayPresetCityCtx}
           cityGenitive={cityToGenitive(pageCityName)}
-          compact
           className="mt-5"
         />
       ) : null}
