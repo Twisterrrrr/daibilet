@@ -9,7 +9,7 @@
 - Search + city/author selects: mobile ~h-14 / text-base, desktop прежние размеры.
 - `BlogPostCard` + `BlogFeaturedHero` (+ «Свежее» thumbs): +30-40% min-h/padding/thumbs на &lt;md.
 - Excerpt `spb-s-rebenkom-v-dozhd`: «собрать» → «провести» (MD + `blog-posts.ts`).
-- Commit+push; web deploy не делали.
+- Commit+push `2fde4d1`; web deploy не делали.
 
 ### Проблемы
 - Prod DB excerpt обновится при следующем upsert/seed по запросу owner (локальный source уже «провести»).
