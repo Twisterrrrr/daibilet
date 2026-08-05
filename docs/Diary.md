@@ -1,3 +1,23 @@
+## 2026-08-05 - SPB must-see hub ↔ catalog: hygiene after 1c6c2b5
+
+### Наблюдения
+- `1c6c2b5` уже убрал nested `places[]` с карточек хаба (Новая Голландия: Бутылка/Кузница) и UI title→PDP.
+- В `cityInfo` после того фикса было **86/184** со slug, но live PDP: ~32 soft-404 («Площадка не найдена») - выдуманные `saint-petersburg-*` вне owner pack / без рабочей карточки.
+- Owner pack `spb-kgd-venue-coords.json` (76) уже в MSK DB (dry-run: 76 update / 0 insert). Supplier-twins (`russkiy-muzey-c5b60…`, `kunstkamera-7781…`) часто дают **500** на PDP - не линкуем.
+- Live hub уже без Бутылка/Кузница; web deploy cityInfo ещё нужен для slug-hygiene на live.
+
+### Решения
+- Срезаны soft-404 slug’ы (парки/храмы/гастро из списка 1c6c2b5 без реальной карточки) + битые twin-ссылки (Русский музей / Кунсткамера / Юсуповский / Половцов / Мясников).
+- Добавлен 1:1: `Планетарий №1` → `venueSlug: planetarii-1` (PDP 200).
+- Итог web `cityInfo`: **55/184 (30%)** со slug, **55/55** live PDP ok. Остальные 129 - нет рабочей каталожной сущности (hub-only).
+- Seed apply не требовался (pack уже matched). Deploy нет.
+
+### Проблемы
+- Русский музей / Кунсткамера и др. остаются без хаб-линка, пока нет стабильного editorial PDP (не 500 / не soft-404).
+- `apps/public` cityInfo почти без SPB slug (legacy) - Next hub = `apps/web`.
+
+---
+
 ## 2026-08-05 - `/venues`+`/locations`: lazy cursor + снятие cap 500
 
 ### Наблюдения

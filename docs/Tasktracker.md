@@ -15,6 +15,12 @@
 |---|--------|-----------|--------|
 | OPS.DEPLOY-CADENCE | Канон: commit+push после итерации; MSK web deploy пачкой раз в сутки / по запросу owner; hotfix-исключения | Высокий | ✅ `.cursorrules` + Project.md 2026-08-05 |
 
+## SPB must-see ↔ catalog links (2026-08-05)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| HUB.SPB-NEST-SLUG | Хаб СПб: убрать nested с must-see + title/«В маршрут» → `/locations`\|`/venues` только при реальном PDP | Критический | ✅ nested `1c6c2b5`; slug hygiene: 55/184 working PDP (было 86 wired / ~32 soft-404); commit+push, deploy нет |
+
 ## Catalog lazy / venues+locations perf (2026-08-05)
 
 | # | Задача | Приоритет | Статус |
