@@ -22,6 +22,11 @@ export type SuburbsCarouselProps = {
   cityGenitive: string;
   /** Hub editorial typography; my-day keeps default slate. */
   editorial?: boolean;
+  /**
+   * My-day: large suburb name + numbered points only.
+   * Hide travel essays, gastro blurbs, station tips, and per-POI descriptions.
+   */
+  compact?: boolean;
   titleClass?: string;
   /** Outer wrapper class (hub `mt-10`, my-day `mt-5`). */
   className?: string;
@@ -38,6 +43,7 @@ export function SuburbsCarousel({
   city,
   cityGenitive,
   editorial = false,
+  compact = false,
   titleClass,
   className = 'mt-10',
 }: SuburbsCarouselProps) {
@@ -136,11 +142,13 @@ export function SuburbsCarousel({
       >
         Значимые пригороды {cityGenitive}
       </h2>
-      <p className={`mt-1.5 text-sm ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-        Поездка на день рядом с городом - отдельные мини-локации и точки внутри них.
-      </p>
+      {!compact ? (
+        <p className={`mt-1.5 text-sm ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+          Поездка на день рядом с городом - отдельные мини-локации и точки внутри них.
+        </p>
+      ) : null}
       {/* One suburb per snap screen: mobile ~92% + peek; desktop full-bleed card + arrows. */}
-      <div className="relative mt-5">
+      <div className={compact ? 'relative mt-4' : 'relative mt-5'}>
         <div
           ref={railRef}
           className="horizontal-snap-row flex flex-nowrap gap-3 touch-pan-x snap-x snap-mandatory md:gap-4 md:[scrollbar-width:none] md:[&::-webkit-scrollbar]:hidden"
@@ -193,6 +201,73 @@ export function SuburbsCarousel({
                   venues={bulkVenues}
                 />
               ) : null;
+
+            if (compact) {
+              return (
+                <article
+                  key={`${place.name}:${index}`}
+                  className="flex w-[min(92%,36rem)] shrink-0 snap-start flex-col rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 md:w-[calc(100%-0.25rem)]"
+                  data-city-suburb-card
+                  data-city-suburb-compact
+                  aria-label={`${index + 1} из ${places.length}: ${place.name}`}
+                >
+                  <div className="flex items-start gap-3">
+                    <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-primary-50 text-sm font-bold text-primary-700">
+                      {index + 1}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-start gap-x-2 gap-y-1.5">
+                        <h3
+                          className="min-w-0 flex-1 break-words text-xl font-bold leading-snug text-slate-950 sm:text-2xl"
+                          data-city-suburb-title
+                        >
+                          {placeHref ? (
+                            <Link
+                              href={placeHref}
+                              className="underline decoration-slate-300 underline-offset-2 hover:decoration-current"
+                            >
+                              {place.name}
+                            </Link>
+                          ) : (
+                            place.name
+                          )}
+                        </h3>
+                        {bulkCta}
+                      </div>
+                      {nested.length ? (
+                        <ol
+                          className="mt-3 list-decimal space-y-1.5 border-t border-slate-100 pt-3 pl-5"
+                          data-city-suburb-places
+                        >
+                          {nested.map((poi, poiIndex) => {
+                            const poiHref = resolveCityPlaceTitleHref(poi, venues);
+                            return (
+                              <li
+                                key={`${poi.name}:${poiIndex}`}
+                                className="text-base leading-6 marker:text-slate-400"
+                                data-city-suburb-place
+                              >
+                                {poiHref ? (
+                                  <Link
+                                    href={poiHref}
+                                    className="font-medium text-slate-900 underline decoration-slate-300 underline-offset-2 hover:decoration-current"
+                                  >
+                                    {poi.name}
+                                  </Link>
+                                ) : (
+                                  <span className="font-medium text-slate-900">{poi.name}</span>
+                                )}
+                              </li>
+                            );
+                          })}
+                        </ol>
+                      ) : null}
+                    </div>
+                  </div>
+                </article>
+              );
+            }
+
             return (
               <article
                 key={`${place.name}:${index}`}

@@ -3839,6 +3839,7 @@ function DayRoutePanelInner() {
           venues={matchSources}
           city={dayPresetCityCtx}
           cityGenitive={cityToGenitive(pageCityName)}
+          compact
           className="mt-5"
         />
       ) : null}
@@ -3986,23 +3987,24 @@ function DayRoutePanelInner() {
             Купить билеты
           </button>
         ) : null}
-        {yandexUrl ? (
-          <a
-            href={yandexUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+        {hasMapStops ? (
+          <button
+            type="button"
+            onClick={() => setMobileView('map')}
+            aria-pressed={mobileView === 'map'}
+            data-day-sticky-map
             className="inline-flex h-11 flex-1 items-center justify-center gap-1.5 rounded-full bg-sky-600 px-3 text-sm font-bold text-white hover:bg-sky-700"
           >
-            <ExternalLink className="h-4 w-4" />
+            <MapPin className="h-4 w-4" />
             Карта
-          </a>
+          </button>
         ) : (
           <button
             type="button"
             disabled
             className="inline-flex h-11 flex-1 cursor-not-allowed items-center justify-center gap-1.5 rounded-full bg-slate-200 px-3 text-sm font-bold text-slate-500"
           >
-            <ExternalLink className="h-4 w-4" />
+            <MapPin className="h-4 w-4" />
             Карта
           </button>
         )}
