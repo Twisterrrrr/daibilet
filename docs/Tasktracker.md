@@ -32,7 +32,7 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| BLOG.TOP100-PLACE-IMGS | Top-100 Parts 1-5: компактный float `[image]` на каждую точку 1-75 + те же JPG в venues для my-day/каталога | Высокий | ⚠️ place-AI rolled back; ✅ noindex live `c153eff` BUILD_ID=`J9XJVsVPehERFhNoMUy5v` |
+| BLOG.TOP100-PLACE-IMGS | Top-100 / Beyond: скрыть с сайта (DRAFT); place JPG оставить в venues для locations/my-day | Высокий | 🔄 DRAFT upsert + deploy map |
 | BLOG.HERO-SERIES-BR | Hero H1: перенос после точки перед «Часть N» для Top-100 / Beyond-Top-100 | Высокий | ✅ `07c4fc7`, MSK BUILD_ID=`tU2lr7PmZB4kN1JCHGX_V` |
 | BLOG.RESTORE-SPB-BARS | Вернуть owner-текст статьи «Барный Петербург» без SEO-переписывания, проверить реальные адреса, venue links, изображения и production Article | Критический | 🔄 локальный текст восстановлен, ожидаются sync, upsert и MSK deploy |
 
@@ -166,7 +166,7 @@
 |---|--------|-----------|--------|
 | UX.ECARD-DAY-OVERLAY | EventCard grid: «В мой день»/«Добавлено» на cover bottom-right overlay; footer = price+Купить | Высокий | ✅ `49be710` MSK **BUILD_ID=`J2r1pJc-sK2W_wGzB2KzY`** `/events` 200 |
 
-| UX.MYDAY-MOSQUE-MATCH | SPB соборная мечеть: ложный match → МТС Live Hall (Ded Moroz + concert copy); truncate title | Критический | ✅ code: geo-noise matcher + locationSlug + editorial cover; push; live deploy+seed pending |
+| UX.MYDAY-MOSQUE-MATCH | SPB соборная мечеть: ложный match → МТС Live Hall (Ded Moroz + concert copy / Anna-Elza PDP); truncate title | Критический | ✅ code `2cdebd4`; MSK DB promote+revalidate (`fix-spb-sobornaya-mechet-venue`); web deploy matcher still pending «выкатывай» |
 
 ## /my-day starter → header search (2026-08-04)
 

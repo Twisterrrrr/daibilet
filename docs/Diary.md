@@ -137,13 +137,15 @@
 ### Наблюдения
 - Карточка «Санкт-Петербургская соборная мечеть» в must-see /my-day показывала Ded Moroz + текст «Высокотехнологичный многоуровневый концертный комплекс…» и truncate заголовка.
 - Root: `namesLooselyMatch` склеивал мечеть с venue `mts-live-holl-sankt-peterburg` по гео-токенам «санкт»+«петербург»; hook брал `shortDescription`/`heroImageUrl` чужой площадки. У мечети не было `locationSlug`.
+- Follow-up owner: на «странице мечети» видно новогоднее шоу «Анна и Эльза». E2E: событие `evt_6a46c069…` корректно на МТС (`venue_67af2b9a…`, ~5.3 км от мечети). В БД уже был TC-stub `sobornaya-mechet-652d…` (coords верные, `MEETING_POINT`/`NONE`) - public API отдавал null, hub уводил на МТС PDP с афишей зала.
 
 ### Решения
 - Гео-шум в `namesLooselyMatch`; при явном slug без hub-hit - без name-fallback; `locationSlug` + editorial cover/coords; title `line-clamp-2`; seed-запись в `must-see-editorial.json`.
-- Commit+push; live web deploy + MSK seed editorial venue ещё нужны для PDP `/locations/...`.
+- MSK content: `scripts/fix-spb-sobornaya-mechet-venue.js --apply` - promote stub → `saint-petersburg-sobornaya-mechet`, `ATTRACTION`/`PUBLISHED`, editorial profile; Anna/Elza venueId не трогали. Revalidate `/locations/saint-petersburg-sobornaya-mechet`.
+- Smoke: mosque PDP title = мечеть; nearby без Анны/Эльзы/МТС; событие остаётся на МТС Live.
 
 ### Проблемы
-- В live DB сущности мечети нет (`/locations/saint-petersburg-sobornaya-mechet` = «не найдена») - после web deploy карточка My Day чинится из editorial; полноценная PDP - после seed.
+- Matcher/geo-noise в live Next bundle ещё нужен web deploy («выкатывай») - иначе My Day/hub без явного slug могут снова склеить с МТС на старом клиенте. PDP по editorial slug уже живой после DB+revalidate.
 
 ---
 
