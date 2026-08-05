@@ -7494,6 +7494,10 @@ function inferPublicVenueKindFromName(name, address) {
   const text = venueNameAddressText(name, address);
   if (MEETING_POINT_TEXT_RE.test(text)) return 'meeting_point';
   if (/смотров(?:ая|ой|ую|ые)\s+площадк/i.test(text)) return 'museum';
+  // Named loft / event space must not become pier just because address is on an embankment.
+  if (/(?:^|[\s«"'(])лофт(?:[\s"'»),!.]|$)|(?:^|[\s-])loft(?:[\s.-]|$)|лофт[-\s]?проект/i.test(text)) {
+    return 'venue';
+  }
   if (hasBusLikeText(name, address)) return 'bus';
   if (hasStrongPierLocationText(name, address)) return 'pier';
   if (/турбаз|база отдыха|глэмпинг/i.test(text)) return 'outdoor_location';
@@ -7558,15 +7562,20 @@ function resolvePublicVenueKind(storedKind, name, address, options = {}) {
 
   // Water-only catalog events are not enough: bus transfer points (пл. Восстания etc.)
   // often sell Ladoga/boat tickets while the physical stop is still a boarding point.
+  // Explicit VENUE/loft CMS kind wins over embankment address heuristics (Высота 21 etc.).
+  const nameOnly = String(name || '');
+  const storedVenueNotPier =
+    (stored === 'venue' || stored === 'other') && !/причал|пристань/i.test(nameOnly);
   if (
-    stored === 'pier' ||
-    hasStrongPierLocationText(name, address) ||
-    hasPierLikeText(name, address) ||
-    inferred === 'pier' ||
-    (hasWaterOnlyEvents(waterEvents, totalEvents) &&
-      !isViewingPlatformLikeVenue(name, address, shortDescription, description) &&
-      stored !== 'meeting_point' &&
-      !/\bпл\.|\bплощад|\bметро\b|\bм\.\s|вокзал|место посадки|точка сбора/i.test(text))
+    !storedVenueNotPier &&
+    (stored === 'pier' ||
+      hasStrongPierLocationText(name, address) ||
+      hasPierLikeText(name, address) ||
+      inferred === 'pier' ||
+      (hasWaterOnlyEvents(waterEvents, totalEvents) &&
+        !isViewingPlatformLikeVenue(name, address, shortDescription, description) &&
+        stored !== 'meeting_point' &&
+        !/\bпл\.|\bплощад|\bметро\b|\bм\.\s|вокзал|место посадки|точка сбора/i.test(text)))
   ) {
     return 'pier';
   }
