@@ -28,7 +28,7 @@
 - `resolveVenueHeroImage` + `toVenueCatalogCard` + `VenueDetailPage` / share meta - editorial wins над hub stub.
 
 ### Проблемы
-- Нет. Live: commit+push; web deploy - batch / по запросу; `blog:upsert` на MSK для тел статей.
+- Нет. Live 2026-08-05: MSK `3ebcaa2`, BUILD_ID=`qL0Q5LhLLeWqYil3I48D6`; `blog:upsert` ×5 Top-100; smoke parts 1/2/5 → 200 + 15 unique place imgs; assets blog/venues 200.
 
 ---
 

@@ -30,7 +30,7 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| BLOG.TOP100-PLACE-IMGS | Top-100 Parts 1-5: компактный float `[image]` на каждую точку 1-75 + те же JPG в venues для my-day/каталога | Высокий | ✅ `4c5d00c`; deploy/upsert - batch / по запросу |
+| BLOG.TOP100-PLACE-IMGS | Top-100 Parts 1-5: компактный float `[image]` на каждую точку 1-75 + те же JPG в venues для my-day/каталога | Высокий | ✅ `4c5d00c`/`3ebcaa2`, MSK BUILD_ID=`qL0Q5LhLLeWqYil3I48D6`; upsert ×5; smoke 15 imgs/part |
 | BLOG.HERO-SERIES-BR | Hero H1: перенос после точки перед «Часть N» для Top-100 / Beyond-Top-100 | Высокий | ✅ `07c4fc7`, MSK BUILD_ID=`tU2lr7PmZB4kN1JCHGX_V` |
 | BLOG.RESTORE-SPB-BARS | Вернуть owner-текст статьи «Барный Петербург» без SEO-переписывания, проверить реальные адреса, venue links, изображения и production Article | Критический | 🔄 локальный текст восстановлен, ожидаются sync, upsert и MSK deploy |
 
