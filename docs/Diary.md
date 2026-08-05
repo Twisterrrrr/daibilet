@@ -19,6 +19,23 @@
 
 ---
 
+## 2026-08-05 - Blog longread: один body-размер по эталону owner
+
+### Наблюдения
+- Owner: агент «втюхивает» свой стандарт вместо эталона (тёмный mockup / MD).
+- Catchphrase был меньше body (`0.9375rem`), H2/H3 на `font-display`, pull-quote гигантский, «Адрес» с левой полосой как tip.
+
+### Решения
+- Единый `BODY_TEXT_CLASS` для абзацев, tip-callout, списков, lead.
+- Tagline = тот же размер + `font-bold` (без уменьшения).
+- Tip callout (`Атмосферная деталь` / `Практический совет` / `Лайфхак`): border-l + body size; `Адрес` - plain body без rail.
+- H2/H3 без `font-display` / без underline border-b; pull-quote больше не text-xl/2xl.
+
+### Проблемы
+- Нужен web deploy, чтобы увидеть на live.
+
+---
+
 ## 2026-08-05 - Venue PDP: setCity не должен выкидывать на /venues
 
 ### Наблюдения
