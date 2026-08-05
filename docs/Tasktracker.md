@@ -39,7 +39,7 @@
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
 | UX.HOME-GUIDE | Главная: desktop bento-hero + my-day + categories; mobile stories + bottom nav; секции cities/events/lucky/podborki/blog/trust | Высокий | ✅ 8d844ae; deploy пачкой / по запросу |
-| UX.HOME-GUIDE2 | Mobile stories labels «Реки и каналы!» / «Бесплатно»; hero banner → snap-carousel **реальных событий афиши** (до 5, city-aware; без микса my-day/river/podborki CTA) | Высокий | ✅ код; deploy пачкой / по запросу |
+| UX.HOME-GUIDE2 | Mobile stories «Реки и каналы!» / «Бесплатно»; hero = snap + **auto 2с** real afisha events (до 5, city-aware); My Day «Спланируй свой день в {prep}» | Высокий | ✅ код; deploy пачкой / по запросу |
 | UX.HOME-DESK | Desktop anti-stretch: bento 2/3+1/3, cities grid, podborki bento, blog side flex-row, bg-neutral-50; mobile as-is | Высокий | ✅ код; deploy пачкой / по запросу |
 
 ## Runtime URL integrity (2026-08-05)

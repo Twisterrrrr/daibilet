@@ -11,6 +11,8 @@ import {
 import {
   ArrowRight,
   CalendarDays,
+  ChevronLeft,
+  ChevronRight,
   Gift,
   Landmark,
   Map as MapIcon,
@@ -25,7 +27,7 @@ import { SafeImage } from '@/components/SafeImage.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import type { PublicCatalogListItemDto, PublicSessionDto } from '@daibilet/contracts/public';
 import { catalogHrefWithSelectedCity } from '@/lib/catalog-url';
-import { cityToPrepositional } from '@/lib/city-declension';
+import { inCityPrepositional } from '@/lib/city-declension';
 import {
   HOME_CATEGORY_CHIPS,
   buildHomeHeroSlides,
@@ -44,6 +46,9 @@ const ICON_MAP: Record<HomeGuideChip['icon'], LucideIcon> = {
   sparkles: Sparkles,
   landmark: Landmark,
 };
+
+/** Auto-advance interval for the event afisha carousel. */
+const HERO_AUTO_ROTATE_MS = 2_000;
 
 type PublicSession = PublicSessionDto | PublicCatalogListItemDto;
 
@@ -160,7 +165,10 @@ export function HomeGuideHero({ sessions, fingerprints }: HomeGuideHeroProps) {
   );
 
   const scrollerRef = useRef<HTMLDivElement>(null);
+  const activeIndexRef = useRef(0);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const [reduceMotion, setReduceMotion] = useState(false);
 
   const syncActive = useCallback(() => {
     const el = scrollerRef.current;
@@ -178,10 +186,28 @@ export function HomeGuideHero({ sessions, fingerprints }: HomeGuideHeroProps) {
         best = index;
       }
     });
+    activeIndexRef.current = best;
     setActiveIndex(best);
   }, [safeSlides.length]);
 
+  const goTo = useCallback(
+    (index: number, behavior: ScrollBehavior = 'smooth') => {
+      const el = scrollerRef.current;
+      if (!el) return;
+      const count = safeSlides.length;
+      if (!count) return;
+      const next = ((index % count) + count) % count;
+      const child = el.children[next] as HTMLElement | undefined;
+      if (!child) return;
+      el.scrollTo({ left: child.offsetLeft, behavior });
+      activeIndexRef.current = next;
+      setActiveIndex(next);
+    },
+    [safeSlides.length],
+  );
+
   useEffect(() => {
+    activeIndexRef.current = 0;
     setActiveIndex(0);
     const el = scrollerRef.current;
     if (el) el.scrollTo({ left: 0 });
@@ -199,13 +225,30 @@ export function HomeGuideHero({ sessions, fingerprints }: HomeGuideHeroProps) {
     };
   }, [syncActive]);
 
-  const goTo = (index: number) => {
-    const el = scrollerRef.current;
-    if (!el) return;
-    const child = el.children[index] as HTMLElement | undefined;
-    if (!child) return;
-    el.scrollTo({ left: child.offsetLeft, behavior: 'smooth' });
-  };
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const apply = () => setReduceMotion(mq.matches);
+    apply();
+    mq.addEventListener('change', apply);
+    return () => mq.removeEventListener('change', apply);
+  }, []);
+
+  // Auto-rotate every 2s; pause on hover/focus/touch; off when prefers-reduced-motion.
+  useEffect(() => {
+    if (safeSlides.length <= 1 || paused || reduceMotion) return;
+    const id = window.setInterval(() => {
+      goTo(activeIndexRef.current + 1);
+    }, HERO_AUTO_ROTATE_MS);
+    return () => window.clearInterval(id);
+  }, [safeSlides.length, paused, reduceMotion, goTo]);
+
+  const pause = useCallback(() => setPaused(true), []);
+  const resume = useCallback(() => setPaused(false), []);
+
+  const myDayHeadline = cityName
+    ? `Спланируй свой день ${inCityPrepositional(cityName)}`
+    : 'Спланируй свой день в городе';
 
   return (
     <section className="border-b border-slate-200/70 bg-gradient-to-b from-sky-50/70 via-neutral-50 to-neutral-50">
@@ -227,27 +270,57 @@ export function HomeGuideHero({ sessions, fingerprints }: HomeGuideHeroProps) {
             ) : (
               <>
                 <div
-                  ref={scrollerRef}
-                  className="flex min-h-[200px] flex-1 gap-3 overflow-x-auto snap-x snap-mandatory md:min-h-[240px] lg:min-h-[260px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-                  role="region"
-                  aria-roledescription="carousel"
-                  aria-label="Афиша событий"
+                  className="relative min-h-[200px] flex-1 md:min-h-[240px] lg:min-h-[260px]"
+                  onMouseEnter={pause}
+                  onMouseLeave={resume}
+                  onFocusCapture={pause}
+                  onBlurCapture={(event) => {
+                    const next = event.relatedTarget as Node | null;
+                    if (next && event.currentTarget.contains(next)) return;
+                    resume();
+                  }}
+                  onTouchStart={pause}
+                  onTouchEnd={resume}
                 >
-                  {safeSlides.map((slide, index) => (
-                    <div
-                      key={slide.id}
-                      className="w-[min(100%,calc(100%-1.25rem))] shrink-0 snap-start sm:w-[min(100%,calc(100%-1.5rem))] md:w-full md:shrink-0"
-                      aria-roledescription="slide"
-                      aria-label={`${index + 1} из ${safeSlides.length}`}
-                    >
-                      <HeroSlideCard
-                        slide={slide}
-                        href={slideHref(slide, cityValue)}
-                        priority={index === 0}
-                        asHeading={index === 0 ? 'h1' : 'h2'}
-                      />
-                    </div>
-                  ))}
+                  <div
+                    ref={scrollerRef}
+                    className="flex h-full gap-3 overflow-x-auto snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                    role="region"
+                    aria-roledescription="carousel"
+                    aria-label="Афиша событий"
+                  >
+                    {safeSlides.map((slide, index) => (
+                      <div
+                        key={slide.id}
+                        className="w-[min(100%,calc(100%-1.25rem))] shrink-0 snap-start sm:w-[min(100%,calc(100%-1.5rem))] md:w-full md:shrink-0"
+                        aria-roledescription="slide"
+                        aria-label={`${index + 1} из ${safeSlides.length}`}
+                      >
+                        <HeroSlideCard
+                          slide={slide}
+                          href={slideHref(slide, cityValue)}
+                          priority={index === 0}
+                          asHeading={index === 0 ? 'h1' : 'h2'}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    aria-label="Предыдущий слайд"
+                    onClick={() => goTo(activeIndex - 1)}
+                    className="absolute left-2 top-1/2 z-[2] flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-slate-800 shadow-sm backdrop-blur-sm transition hover:bg-white md:left-3 md:h-10 md:w-10"
+                  >
+                    <ChevronLeft className="h-5 w-5" aria-hidden />
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Следующий слайд"
+                    onClick={() => goTo(activeIndex + 1)}
+                    className="absolute right-2 top-1/2 z-[2] flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-slate-800 shadow-sm backdrop-blur-sm transition hover:bg-white md:right-3 md:h-10 md:w-10"
+                  >
+                    <ChevronRight className="h-5 w-5" aria-hidden />
+                  </button>
                 </div>
                 <div className="mt-3 flex items-center justify-center gap-1.5" role="tablist" aria-label="Слайды афиши">
                   {safeSlides.map((slide, index) => (
@@ -283,9 +356,7 @@ export function HomeGuideHero({ sessions, fingerprints }: HomeGuideHeroProps) {
                 Мой день
               </span>
               <h2 className="mt-3 font-display text-xl font-bold leading-snug tracking-tight sm:text-2xl md:text-xl lg:text-[1.55rem]">
-                {cityName
-                  ? `Соберите маршрут в ${cityToPrepositional(cityName)}`
-                  : 'Соберите свой день в городе'}
+                {myDayHeadline}
               </h2>
               <p className="mt-2 text-sm text-white/85 md:text-[13px] lg:text-sm">
                 Музеи, прогулки и события по порядку - без хаоса в заметках.
@@ -296,14 +367,14 @@ export function HomeGuideHero({ sessions, fingerprints }: HomeGuideHeroProps) {
                 href={myDayHref}
                 className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-primary-700 shadow-sm transition hover:bg-sky-50"
               >
-                Собрать маршрут
+                Спланировать день
                 <ArrowRight className="h-4 w-4" aria-hidden />
               </Link>
               <Link
                 href={myDayHref}
                 className="inline-flex min-h-10 items-center justify-center rounded-xl border border-white/35 bg-white/10 px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/20"
               >
-                Спланировать выходной
+                Собрать маршрут
               </Link>
             </div>
           </div>

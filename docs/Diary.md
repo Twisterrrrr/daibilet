@@ -31,6 +31,23 @@
 
 ---
 
+## 2026-08-06 - Home hero: auto-rotate + My Day copy
+
+### Наблюдения
+- Owner (desktop annotations): баннер событий - auto-scroll 2с + стрелки L/R; pause hover/focus/touch; reduced-motion.
+- Заголовок «Соберите маршрут в Санкт-Петербурге» звучит криво; дательного «по городу» в declension нет.
+
+### Решения
+- Auto-rotate 2с; стрелки; pause on hover/focus/touch; `prefers-reduced-motion: reduce` → без auto.
+- Headline: «Спланируй свой день {inCityPrepositional(city)}»; CTA primary «Спланировать день».
+- Слайды по-прежнему из live catalog (до 5), city-aware (`0dc0f9a`).
+- Deploy не гоняли.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-06 - Home hero: ротация реальных событий афиши
 
 ### Наблюдения
