@@ -1,3 +1,18 @@
+## 2026-08-05 - SPB must-see finish: coords backfill + city DTO headroom
+
+### Наблюдения
+- После seed 130 новых Venue были без lat/lng; `publicPublishedVenuesByCityId` требовал coords и резал city DTO до 80 - must-see slug в cityInfo были, но payload хаба их не видел.
+
+### Решения
+- `backfill-spb-mustsee-coords.js` из owner pack `spb-kgd-venue-coords.json` (76 SPB).
+- City DTO: content venues без обязательных coords, cap 250/400, приоритет SPB/NN editorial slug.
+- API restart + revalidate `/cities/saint-petersburg`.
+
+### Проблемы
+- Точки вне owner pack (много gastro/houses) остаются без coords до кураторского geo-pass; на хаб попадают по slug из cityInfo.
+
+---
+
 ## 2026-08-05 - SPB must-see: seed 129 missing catalog PDPs + wire 184/184
 
 ### Наблюдения

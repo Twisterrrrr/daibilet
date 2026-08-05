@@ -4881,8 +4881,8 @@ export async function buildPublicCityPage(db, citySlugOrId) {
   const sessions = matchedSessions.slice(0, 160);
   const sessionVenues = await resolvePublicVenuesForSessions(db, matchedSessions, venueHubRows, 24);
   const cityId = matchedSessions[0]?.cityId || null;
-  const contentVenues = cityId ? await publicPublishedVenuesByCityId(db, cityId, 80) : [];
-  const cityVenues = mergeCityPageVenues(sessionVenues, contentVenues, 80);
+  const contentVenues = cityId ? await publicPublishedVenuesByCityId(db, cityId, 250) : [];
+  const cityVenues = mergeCityPageVenues(sessionVenues, contentVenues, 250);
   const venueCount = countDistinctSessionVenues(matchedSessions);
   const prices = sessions.map((session) => session.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
   const categories = countBy(sessions.map((event) => event.category).filter(Boolean));
@@ -8550,9 +8550,10 @@ export function publicVenueRowMatchesCityFilter(row, cityFilterRaw) {
  * Published/candidate content places for a city (must-see) with coords.
  * City hubs only had session venues before - editorial sights never reached day-route.
  */
-export async function publicPublishedVenuesByCityId(db, cityId, limit = 80) {
+export async function publicPublishedVenuesByCityId(db, cityId, limit = 200) {
   const id = String(cityId || '').trim();
-  const cap = Math.min(Math.max(1, Number(limit) || 80), 120);
+  // City hubs with dense must-see (SPB ~180+) need headroom beyond old 80/120.
+  const cap = Math.min(Math.max(1, Number(limit) || 200), 400);
   if (!id) return [];
 
   const result = await db.query(
@@ -8579,11 +8580,15 @@ export async function publicPublishedVenuesByCityId(db, cityId, limit = 80) {
       join "City" city on city.id = venue."cityId"
       where venue."cityId" = $1
         and venue."pageStatus" in ('PUBLISHED', 'CANDIDATE')
-        and venue.latitude is not null
-        and venue.longitude is not null
-        and not (venue.latitude = 0 and venue.longitude = 0)
       order by
+        case
+          when venue.latitude is not null
+           and venue.longitude is not null
+           and not (venue.latitude = 0 and venue.longitude = 0) then 0
+          else 1
+        end,
         case when venue.slug like 'nizhny-novgorod-%' then 0 else 1 end,
+        case when venue.slug like 'saint-petersburg-%' or venue.slug in ('ermitazh','erarta','planetarii-1') then 0 else 1 end,
         venue.title asc
       limit $2
     `,
@@ -8620,8 +8625,8 @@ export async function publicPublishedVenuesByCityId(db, cityId, limit = 80) {
 }
 
 /** Prefer session/hub venues, then append published city content places (dedupe by id/slug). */
-export function mergeCityPageVenues(sessionVenues, contentVenues, limit = 80) {
-  const cap = Math.min(Math.max(1, Number(limit) || 80), 120);
+export function mergeCityPageVenues(sessionVenues, contentVenues, limit = 250) {
+  const cap = Math.min(Math.max(1, Number(limit) || 250), 400);
   const out = [];
   const seen = new Set();
   const take = (item) => {
