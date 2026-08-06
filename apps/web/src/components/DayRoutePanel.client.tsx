@@ -370,7 +370,8 @@ function DayRoutePanelInner() {
   const [formError, setFormError] = useState<string | null>(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
   /** Exclusive accordion: route list stays outside; all other sections collapse. */
-  const [openPanel, setOpenPanel] = useState<DayRouteAccordionId | null>(null);
+  /** Must-see open by default so the grid is visible without an extra expand click. */
+  const [openPanel, setOpenPanel] = useState<DayRouteAccordionId | null>('mustSee');
   const [locationsCatalog, setLocationsCatalog] = useState<VenueCatalogCard[]>([]);
   const [venuesCatalog, setVenuesCatalog] = useState<VenueCatalogCard[]>([]);
   const [eventsCatalog, setEventsCatalog] = useState<PublicCatalogListItemDto[]>([]);
@@ -387,8 +388,6 @@ function DayRoutePanelInner() {
   const [catalogError, setCatalogError] = useState<string | null>(null);
   const [destinationsFallback, setDestinationsFallback] = useState<PublicDestinationDto[]>([]);
   const [mustSeeFilter, setMustSeeFilter] = useState<MustSeeFilterId>('main');
-  /** Must-see chips: H-carousel (default) vs full list (mobile stack / desktop wrap). */
-  const [mustSeeExpanded, setMustSeeExpanded] = useState(false);
   /** Hot Picks tab: Советы / Культура / Еда и бары. */
   const [hotPickTab, setHotPickTab] = useState<HotPickTabId>('tips');
   /** Stop focused from map pin click. */
@@ -3313,28 +3312,6 @@ function DayRoutePanelInner() {
                           ? 'Добавить главные места'
                           : 'Добавить выбранные'}
                       </button>
-                      {mustSeeFiltered.length > 0 ? (
-                        <button
-                          type="button"
-                          onClick={() => setMustSeeExpanded((open) => !open)}
-                          aria-expanded={mustSeeExpanded}
-                          aria-controls="day-must-see-list"
-                          data-day-must-see-expand
-                          className="hidden min-h-8 items-center justify-center gap-1 px-1.5 text-xs font-medium text-slate-500 transition hover:text-slate-800 sm:inline-flex"
-                        >
-                          {mustSeeExpanded ? (
-                            <>
-                              <ChevronUp className="h-3.5 w-3.5" />
-                              Свернуть
-                            </>
-                          ) : (
-                            <>
-                              <ChevronDown className="h-3.5 w-3.5" />
-                              Развернуть
-                            </>
-                          )}
-                        </button>
-                      ) : null}
                     </div>
                   </div>
                   <MustSeeFilterTabs
@@ -3349,14 +3326,9 @@ function DayRoutePanelInner() {
                   />
                   <div
                     id="day-must-see-list"
-                    className={
-                      mustSeeExpanded
-                        ? 'mt-3 grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3'
-                        : 'mt-3 grid grid-cols-1 gap-2.5 sm:flex sm:snap-x sm:snap-mandatory sm:gap-2.5 sm:overflow-x-auto sm:pb-1'
-                    }
+                    className="mt-3 grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3"
                     data-day-must-see-list
-                    data-day-must-see-carousel={mustSeeExpanded ? undefined : '1'}
-                    data-day-must-see-expanded={mustSeeExpanded ? '1' : undefined}
+                    data-day-must-see-expanded="1"
                   >
                     {mustSeeFiltered.map(({ place, item, hook }) => {
                       const inRoute =
@@ -3380,11 +3352,7 @@ function DayRoutePanelInner() {
                                   : hook || 'Добавить в день'
                           }
                           onClick={() => addMustSeeItem(item)}
-                          className={`flex items-center gap-3 rounded-xl border px-2.5 py-1.5 text-left transition disabled:cursor-not-allowed ${
-                            mustSeeExpanded
-                              ? 'w-full min-w-0'
-                              : 'w-full min-w-0 sm:w-[min(100%,24rem)] sm:shrink-0 sm:snap-start'
-                          } ${
+                          className={`flex w-full min-w-0 items-center gap-3 rounded-xl border px-2.5 py-1.5 text-left transition disabled:cursor-not-allowed ${
                             inRoute
                               ? 'border-emerald-400 bg-emerald-50 text-emerald-900'
                               : 'border-slate-200 bg-white text-slate-800 hover:border-emerald-300 hover:bg-emerald-50/50'
@@ -4447,11 +4415,14 @@ function DayRouteVenueCard({
     </div>
   );
 
-  /** Offer chips below main stop row (wrap, full width) - never over travel meta. */
+  /**
+   * Offer chips: stacked below on mobile; own right column on lg+.
+   * Sibling of the place/meta cluster (not inside its flex-wrap) so chips never overlay ~time/km.
+   */
   const commerceRail =
     ticketUrl || nearbyUpsells.length > 0 ? (
       <div
-        className="flex w-full min-w-0 flex-row flex-wrap items-center gap-2"
+        className="flex w-full min-w-0 flex-row flex-wrap items-center gap-2 lg:w-auto lg:max-w-[min(100%,22rem)] lg:shrink-0 lg:justify-end lg:self-center"
         data-day-stop-commerce
       >
         {ticketUrl ? (
@@ -4512,21 +4483,22 @@ function DayRouteVenueCard({
         data-day-plan-stop={venue.id}
         data-day-stop-variant="list"
         data-day-stop-list="dense"
-        data-day-stop-layout="place-then-offers"
+        data-day-stop-layout="place-offers-lg-row"
         data-ticket-bought={bought ? '1' : '0'}
         data-commercial-chip={chip.kind}
         data-day-session={sessionDisplay || undefined}
         data-day-stop-focused={focused ? '1' : undefined}
       >
         {/*
-          Dense list: main row [↑↓ N | place | maps/X], offers on next row.
+          Dense list: mobile stacked [place | maps/X] then offers;
+          lg+ horizontal [↑↓ N | place | maps/X | offers].
         */}
         <div
-          className={`flex w-full flex-col gap-1.5 py-1.5 ${
+          className={`flex w-full flex-col gap-1.5 py-1.5 lg:flex-row lg:items-center lg:gap-3 ${
             focused ? 'rounded-md bg-emerald-50/80 px-1' : ''
           } ${purchased ? 'border-l-4 border-primary-600 pl-1.5' : ''}`}
         >
-          <div className="flex w-full items-center gap-1.5 md:gap-2 lg:gap-3">
+          <div className="flex min-w-0 w-full flex-1 items-center gap-1.5 md:gap-2 lg:gap-3">
             <div className="flex shrink-0 items-center gap-1" data-day-stop-index-cluster>
               {reorderLocked ? (
                 <div
@@ -4652,7 +4624,7 @@ function DayRouteVenueCard({
       className="h-auto w-full self-start scroll-mt-4"
       data-day-plan-stop={venue.id}
       data-day-stop-variant="grid"
-      data-day-stop-layout="owner-v8"
+      data-day-stop-layout="owner-v9-lg-row"
       data-ticket-bought={bought ? '1' : '0'}
       data-commercial-chip={chip.kind}
       data-day-session={sessionDisplay || undefined}
@@ -4660,8 +4632,8 @@ function DayRouteVenueCard({
       data-day-commerce={isCommerce ? '1' : '0'}
     >
       {/*
-        Owner v8: main row like «Руки Вверх» (thumb + title + travel + actions),
-        offer chips on a separate full-width row below - never over meta.
+        Owner v9: mobile - main row then offers below (no meta overlap);
+        lg+ - left place/travel cluster, right offer chips (own column, wrap).
       */}
       <div
         className={`flex flex-col gap-2 rounded-2xl border bg-white px-2.5 py-2 sm:px-3 sm:py-2.5 ${
@@ -4672,7 +4644,8 @@ function DayRouteVenueCard({
               : 'border-slate-200'
         }`}
       >
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-3">
+          <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
           {reorderLocked ? (
             <div
               className="flex h-10 w-6 shrink-0 items-center justify-center text-slate-300"
@@ -4836,9 +4809,10 @@ function DayRouteVenueCard({
               <X className="h-4 w-4" />
             </button>
           </div>
-        </div>
+          </div>
 
-        {commerceRail}
+          {commerceRail}
+        </div>
       </div>
     </li>
   );

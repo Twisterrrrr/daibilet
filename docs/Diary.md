@@ -1,3 +1,18 @@
+## 2026-08-06 - My Day stop offers: desktop right column
+
+### Наблюдения
+- Owner: ticket/event pills («Элитный Stand-up · от 600 ₽») сидят под title/address/travel; на desktop справа от title пустое место.
+
+### Решения
+- `DayRouteVenueCard` list + grid: mobile по-прежнему stacked (offers ниже); lg+ `flex-row` - слева place/travel/actions, справа `commerceRail` (own column, wrap, max-w ~22rem).
+- Не возвращаем chips в один flex-wrap с travel meta (баг owner-v7 overlap).
+- `data-day-stop-layout`: `place-offers-lg-row` / `owner-v9-lg-row`.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-06 - Suburb nested POI: coords for day-route
 
 ### Наблюдения
