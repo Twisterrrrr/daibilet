@@ -48,7 +48,7 @@
 - Нет.
 
 ### Live
-- (после deploy)
+- Commit `54a9ffd` (live tip incl. follow-ups → `9a259f4e`); MSK **BUILD_ID=`AF2liBH4Eu1LzXz8b0Yu2`**; smoke `/cities` 200; 8× `cities/top/*.jpg` 200; в HTML нет «Все города»; есть CTA-row + `lg:grid-cols-4` + full-width map `lg:min-h-[22rem]`.
 
 ---
 
