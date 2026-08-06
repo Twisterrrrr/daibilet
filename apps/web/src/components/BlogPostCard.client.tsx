@@ -132,7 +132,7 @@ function ReadMoreCue({ onDark = false }: { onDark?: boolean }) {
   return (
     <span
       className={[
-        'mt-3 inline-flex items-center gap-1.5 text-sm font-semibold transition-all duration-300',
+        'inline-flex items-center gap-1.5 text-sm font-semibold transition-all duration-300',
         onDark
           ? 'text-white/90 group-hover:gap-2.5'
           : 'text-primary-700 group-hover:gap-2.5 group-hover:text-primary-800',
@@ -143,6 +143,10 @@ function ReadMoreCue({ onDark = false }: { onDark?: boolean }) {
     </span>
   );
 }
+
+/** Meta → CTA: column gap ≥12px; never collapse to gap-y-2 when wrapped. */
+const BLOG_META_CTA_FOOTER =
+  'mt-auto flex flex-col items-start gap-3 pt-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-4 sm:gap-y-3';
 
 export function BlogPostCard({
   post,
@@ -251,7 +255,7 @@ export function BlogPostCard({
               {primary}
             </p>
           ) : null}
-          <div className="mt-auto flex flex-col items-start gap-3 pt-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-3 sm:gap-y-2">
+          <div className={BLOG_META_CTA_FOOTER}>
             <BlogCardMeta post={post} dateLabel={dateLabel} isLarge />
             {cta ? (
               <Link
@@ -340,7 +344,7 @@ export function BlogPostCard({
           {excerpt ? (
             <p className="mt-2 text-sm leading-relaxed text-slate-600">{excerpt}</p>
           ) : null}
-          <div className="mt-auto pt-2">
+          <div className="mt-auto flex flex-col gap-3 pt-4">
             <ReadMoreCue />
             <BlogCardMeta post={post} dateLabel={dateLabel} isLarge={false} />
           </div>
@@ -399,7 +403,7 @@ export function BlogPostCard({
               ))}
             </div>
           ) : null}
-          <div className="mt-auto flex flex-col items-start gap-3 pt-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-3 sm:gap-y-2">
+          <div className={BLOG_META_CTA_FOOTER}>
             <BlogCardMeta post={post} dateLabel={dateLabel} isLarge />
             {cta ? (
               <Link
@@ -466,7 +470,7 @@ export function BlogPostCard({
             {excerpt}
           </p>
         ) : null}
-        <div className="mt-auto pt-2">
+        <div className="mt-auto flex flex-col gap-3 pt-4">
           <ReadMoreCue />
           <BlogCardMeta post={post} dateLabel={dateLabel} isLarge={false} />
         </div>
