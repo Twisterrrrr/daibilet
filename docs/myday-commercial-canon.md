@@ -14,12 +14,15 @@
 
 1. `ticketBought` → **Билет отмечен**
 2. timed (`startsAt` / `sessionLabel` → HH:MM) → **Сеанс HH:00**
-3. есть checkout (`ticketUrl` / eventId/slug) → **Билет оформляется…** (soft «Вечерний сеанс» для affiche stub)
+3. есть checkout (`ticketUrl` / eventId/slug) без часов → kind `needs_ticket`, **без текста** (не писать «Билет оформляется…»; soft «Вечерний сеанс» для affiche stub OK)
 4. иначе → без бейджа (не писать «Вход свободный»)
 
-Карточка компактная (белый фон) + chip только для commerce + CTA «Купить билет от {цена}» при наличии URL/цены.
+Venue-bound (площадка + прикреплённое событие, дата неизвестна): под карточкой ссылка на **страницу площадки** + «от N ₽» (`dayRouteOfferIsVenueBound`), не buy-pill конкретного события.
 
-Under-stop: на бесплатной точке - «Рядом: …» из matches (STOP/nearby/excursion), CTA «Купить билет».
+Карточка компактная (белый фон) + chip только для commerce + CTA «Купить билет от {цена}» при наличии URL/цены (event-as-stop).
+
+Under-stop: на бесплатной точке - блок **«События поблизости»** + chips из matches (STOP/nearby/excursion); при 2+ - список под карточкой. Grid: офферы под shell, равная высота основных карточек; list: пилюли `justify-center`.
+Handoff-модалка «Оформили билет?» - off (`SHOW_DAY_TICKET_HANDOFF_MODAL=false`).
 Trip tickets: блок «Ваши билеты в этой поездке» для `ticketBought` (QR из orders API - open, см. qa.md).
 
 ## Hot Picks («Выбор Дайбилет»)

@@ -285,6 +285,7 @@
 | UX.MYDAY-STOP-OFFERS-BELOW | Stop cards: offer chips ниже main row (не поверх ~time/km); layout как «Руки Вверх» | Критический | ✅ push; deploy n/a (owner не просил выкатывай) |
 | UX.MYDAY-STOP-OFFERS-LG-ROW | Desktop lg+: offers справа в одном ряду с place/travel; mobile stacked ниже | Критический | ✅ `a201ea9`; MSK **BUILD_ID=`4cziKHuRaIqdm9UB0NYYW`** `/my-day` 200 |
 | UX.MYDAY-STOP-OFFERS-TIGHT | Grid: offers ниже (не lg-row в 3-col); list: offers сразу после place/actions без flex-1 gap | Критический | ✅ `51f2141`; MSK **BUILD_ID=`UB4mAZHXczwOOfwND5chE`** `/my-day` 200 |
+| UX.MYDAY-STOP-OFFERS-VENUE | Venue-bound: афиша площадки+от N; без «Билет оформляется»; лейбл nearby; grid equal shell; handoff off | Критический | 🔄 in progress |
 | UX.MYDAY-MUSTSEE-ALWAYS | Must-see: убрать Свернуть/Развернуть; всегда full grid; accordion open by default | Высокий | ✅ `998bd69` MSK **BUILD_ID=`4cziKHuRaIqdm9UB0NYYW`** `/my-day` 200 |
 
 ## /my-day starter → header search (2026-08-04)

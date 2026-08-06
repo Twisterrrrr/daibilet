@@ -77,7 +77,9 @@ export function dayRouteStopTicketQrData(
  * Chip rules (priority):
  * 1. ticketBought → «Билет отмечен»
  * 2. timed session → «Сеанс HH:00»
- * 3. ticketUrl / event → «Билет оформляется…» (pending until ticketBought)
+ * 3. ticketUrl / event without clock → kind `needs_ticket`, **empty label**
+ *    (owner 2026-08-06: never show «Билет оформляется…» - unclear who processes it;
+ *     soft «Вечерний сеанс» still OK as affiche stub)
  * 4. else → kind `free` (UI hides badge; no «Вход свободный»)
  *
  * Soft session labels without HH:MM (e.g. «Вечерний сеанс») stay needs_ticket -
@@ -98,9 +100,39 @@ export function classifyDayRouteCommercialChip(
     if (/вечерн/i.test(soft)) {
       return { kind: 'needs_ticket', label: soft };
     }
-    return { kind: 'needs_ticket', label: 'Билет оформляется…' };
+    return { kind: 'needs_ticket', label: '' };
   }
   return { kind: 'free', label: '' };
+}
+
+/**
+ * Venue-hosted commerce without a chosen visit slot: stop is a place/institution,
+ * ticket points at an event/admission attached onto it (id/slug ≠ event).
+ * UI: link to venue page + «от N ₽», not a specific-event buy pill.
+ */
+export function dayRouteOfferIsVenueBound(
+  venue: Pick<
+    DayRouteVenueItem,
+    'id' | 'slug' | 'eventId' | 'eventSlug' | 'ticketUrl' | 'startsAt' | 'sessionLabel' | 'title'
+  >,
+): boolean {
+  if (!dayRouteStopHasTicket(venue)) return false;
+  if (dayRouteSessionTimeLabel(venue)) return false;
+  const eventId = String(venue.eventId || '').trim();
+  const eventSlug = String(venue.eventSlug || '').trim();
+  const stopId = String(venue.id || '').trim();
+  const stopSlug = String(venue.slug || '').trim();
+  if (!eventId && !eventSlug) return false;
+  if (eventId && eventId === stopId) return false;
+  if (eventSlug && (eventSlug === stopId || (stopSlug && eventSlug === stopSlug))) return false;
+  return true;
+}
+
+/** «от N ₽» for venue-bound under-stop CTA, or null when price unknown. */
+export function dayRouteVenueBoundPriceLabel(
+  venue: Pick<DayRouteVenueItem, 'priceFromRub'>,
+): string | null {
+  return priceSuffixLabel(venue.priceFromRub) || null;
 }
 
 export type DayRouteReadiness = {

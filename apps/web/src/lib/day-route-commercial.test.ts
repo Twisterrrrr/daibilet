@@ -4,9 +4,11 @@ import { describe, it } from 'node:test';
 import {
   classifyDayRouteCommercialChip,
   computeDayRouteReadiness,
+  dayRouteOfferIsVenueBound,
   dayRouteStopIsCommerce,
   dayRouteStopReorderLocked,
   dayRouteStopTicketQrData,
+  dayRouteVenueBoundPriceLabel,
   findDayRouteFreeWindowGaps,
   formatDayRouteOfferChip,
   resolveDayRouteOfferTitle,
@@ -47,12 +49,57 @@ describe('day-route-commercial chips', () => {
     assert.equal(chip.label, 'Сеанс 19:30');
   });
 
-  it('needs ticket when checkout exists without time', () => {
+  it('needs ticket when checkout exists without time - empty label (no «Билет оформляется»)', () => {
     const chip = classifyDayRouteCommercialChip(
       stop({ id: 'venue_3', slug: 'museum-3', title: 'Музей', ticketUrl: '/events/museum-ticket', eventId: 'evt_z' }),
     );
     assert.equal(chip.kind, 'needs_ticket');
-    assert.equal(chip.label, 'Билет оформляется…');
+    assert.equal(chip.label, '');
+  });
+
+  it('detects venue-bound offer vs event-as-stop', () => {
+    assert.equal(
+      dayRouteOfferIsVenueBound(
+        stop({
+          id: 'venue_sp',
+          slug: 'siniy-pushkin',
+          title: 'Синий Пушкин',
+          ticketUrl: '/events/pushkin-show',
+          eventId: 'evt_pushkin',
+          priceFromRub: 290,
+        }),
+      ),
+      true,
+    );
+    assert.equal(
+      dayRouteOfferIsVenueBound(
+        stop({
+          id: 'evt_pushkin',
+          slug: 'pushkin-show',
+          title: 'Шоу',
+          ticketUrl: '/events/pushkin-show',
+          eventId: 'evt_pushkin',
+          eventSlug: 'pushkin-show',
+          priceFromRub: 290,
+        }),
+      ),
+      false,
+    );
+    assert.equal(
+      dayRouteOfferIsVenueBound(
+        stop({
+          id: 'venue_sp',
+          slug: 'siniy-pushkin',
+          title: 'Синий Пушкин',
+          ticketUrl: '/events/pushkin-show',
+          eventId: 'evt_pushkin',
+          startsAt: '2026-08-06T20:00:00+03:00',
+          sessionLabel: 'чт, 20:00',
+        }),
+      ),
+      false,
+    );
+    assert.equal(dayRouteVenueBoundPriceLabel(stop({ id: 'x', title: 'X', priceFromRub: 290 })), 'от 290 ₽');
   });
 
   it('keeps soft evening session label without inventing clock time', () => {
