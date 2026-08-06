@@ -19,8 +19,8 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| SEO.LAND-TITLE-HUMAN | H1/title: `в {City_Пр}` без em dash/дубля; хвост `сегодня, date: афиша…`; single colon | Критический | 🔄 code; MSK deploy |
-| SEO.LAND-EVENT-WINDOW | Holiday landings: session+UI date filter в календарном окне (salute/NY/city-day/valentine) | Критический | 🔄 code; MSK deploy |
+| SEO.LAND-TITLE-HUMAN | H1/title: `в {City_Пр}` без em dash/дубля; хвост `сегодня, date: афиша…`; single colon | Критический | ✅ `a87135f` MSK **BUILD_ID=`KWAMgGe2IltGyCb_4gusR`** |
+| SEO.LAND-EVENT-WINDOW | Holiday landings: session+UI date filter в календарном окне (salute/NY/city-day/valentine) | Критический | ✅ `a87135f` MSK **BUILD_ID=`KWAMgGe2IltGyCb_4gusR`** |
 
 ## Multi-landing mobile city switch (2026-08-06)
 

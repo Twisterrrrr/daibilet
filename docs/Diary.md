@@ -13,6 +13,9 @@
 ### Проблемы
 - Параллельный mobile city-switcher правит `LandingPageView.client.tsx` - держать оба фикса в одном коммите ветки.
 
+### Live
+- MSK BUILD_ID=`KWAMgGe2IltGyCb_4gusR` @`a87135f`. Smoke: `/ekskursii/moscow` title «Экскурсии в Москве сегодня, 6 августа: афиша, цены и билеты»; museums без дубля; `/moscow/den-goroda` «…, 4-6 сентября: афиша…» (окно, без «сегодня»).
+
 ---
 
 ## 2026-08-06 - Multi-landing mobile city switch restored
