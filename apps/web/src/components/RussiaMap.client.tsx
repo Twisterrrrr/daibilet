@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useMemo } from 'react';
 
@@ -92,12 +91,6 @@ export function RussiaMap({ className = '', destinations = [] }: RussiaMapProps)
       </div>
       <div className="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 px-4 py-2.5">
         <span className="text-xs text-slate-500">Нажмите точку на карте</span>
-        <Link
-          href="#cities-all"
-          className="text-xs font-semibold text-primary-700 hover:text-primary-800 hover:underline"
-        >
-          Все города
-        </Link>
       </div>
     </div>
   );

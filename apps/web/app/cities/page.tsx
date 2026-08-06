@@ -8,6 +8,7 @@ import { RussiaMap } from '@/components/RussiaMap.client';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
 import { withSoftTimeout } from '@/lib/soft-timeout';
+import { cityHasTopPreview, cityImageSlug } from '@/lib/city-images';
 import { getCachedDestinations } from '@/server/cached-public-surfaces';
 
 export const metadata: Metadata = {
@@ -21,6 +22,7 @@ export const metadata: Metadata = {
 export const revalidate = 86400;
 
 const CITIES_DESTINATIONS_TIMEOUT_MS = 2500;
+const TOP_CITIES_COUNT = 8;
 
 export default async function CitiesIndexPage() {
   let destinations: Awaited<ReturnType<typeof getCachedDestinations>>['destinations'] = [];
@@ -38,7 +40,13 @@ export default async function CitiesIndexPage() {
   }
 
   const cities = destinations.filter((item) => item.type === 'city');
-  const topCities = [...cities].sort((a, b) => b.events - a.events || a.name.localeCompare(b.name, 'ru')).slice(0, 6);
+  const byPopularity = (a: (typeof cities)[number], b: (typeof cities)[number]) =>
+    b.events - a.events || a.name.localeCompare(b.name, 'ru');
+  // Prefer cities with daytime `cities/top` previews, then fill by popularity.
+  const withTop = [...cities].filter(cityHasTopPreview).sort(byPopularity);
+  const withoutTop = [...cities].filter((city) => !cityHasTopPreview(city)).sort(byPopularity);
+  const topCities = [...withTop, ...withoutTop].slice(0, TOP_CITIES_COUNT);
+  const topSlugs = topCities.map((city) => cityImageSlug(city)).filter(Boolean);
 
   return (
     <SiteLayout>
@@ -49,28 +57,21 @@ export default async function CitiesIndexPage() {
         description="Выберите город - покажем афишу, площадки и подборки с актуальными билетами."
       >
         <CitiesHeroSearch destinations={cities} />
-        {/* Top tiles + aside: full container-page width (same as «Все города» below). */}
-        <div
-          className={
-            topCities.length
-              ? 'mt-6 grid w-full items-stretch gap-3 lg:grid-cols-[minmax(0,2.35fr)_minmax(12.5rem,0.9fr)] lg:gap-4'
-              : 'mt-6 w-full'
-          }
-        >
-          {topCities.length ? (
-            <ul className="grid h-full grid-cols-2 content-start gap-2.5 sm:grid-cols-3">
-              {topCities.map((city) => (
-                <li key={city.slug || city.name} className="min-w-0">
-                  <CityCard city={city} imageVariant="top" compact />
-                </li>
-              ))}
-            </ul>
-          ) : null}
-          <RussiaMap className="h-full min-h-[14rem] self-stretch" destinations={cities} />
+        {topCities.length ? (
+          <ul className="mt-6 grid w-full grid-cols-2 content-start gap-2.5 sm:grid-cols-3 lg:grid-cols-4">
+            {topCities.map((city) => (
+              <li key={city.slug || city.name} className="min-w-0">
+                <CityCard city={city} imageVariant="top" compact />
+              </li>
+            ))}
+          </ul>
+        ) : null}
+        <div className="mt-4 w-full lg:mt-5">
+          <RussiaMap className="min-h-[16rem] w-full sm:min-h-[18rem] lg:min-h-[22rem]" destinations={cities} />
         </div>
       </HeroLayout>
       <div id="cities-all" className="container-page scroll-mt-24 bg-slate-50 py-10">
-        <CitiesCatalogView destinations={destinations} hideIntro />
+        <CitiesCatalogView destinations={destinations} hideIntro excludeSlugs={topSlugs} />
       </div>
     </SiteLayout>
   );

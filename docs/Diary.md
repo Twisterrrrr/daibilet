@@ -13,7 +13,26 @@
 
 ---
 
-## 2026-08-06 - Suburb nested POI: coords for day-route
+## 2026-08-06 - `/cities` desktop: top-8 + full-width map
+
+### Наблюдения
+- Owner: на desktop `/cities` кнопки random/Популярные/По алфавиту не в одном ряду; топ-тайлы + карта в узком aside; «Все города (n)» лишний; нужны 8 главных городов со светлыми daytime-превью.
+
+### Решения
+- `CitiesHeroSearch`: mobile без изменений (random отдельно, sorts рядом); desktop `sm:flex-row` - все три CTA в одной горизонтальной строке.
+- Layout: 8 top tiles (`imageVariant="top"`) → full-width OSM `RussiaMap` → остальной каталог без дублей top-8 (`excludeSlugs`).
+- Daytime previews: +`sochi.jpg` / `kaliningrad.jpg` в `cities/top`; `CITY_TOP_PREVIEW_SLUGS` расширен до 8.
+- Убраны UI «Все города (n)» в каталоге и ссылка «Все города» в футере карты.
+
+### Проблемы
+- Нет.
+
+### Live
+- (после deploy)
+
+---
+
+
 
 ### Наблюдения
 - Owner: «по точкам пригородов вообще нет координат, соответственно маршрут не строится».

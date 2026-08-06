@@ -61,7 +61,8 @@ export function CitiesHeroSearch({ destinations }: { destinations: PublicDestina
         </ul>
       ) : null}
 
-      <div className="mt-3 flex flex-col gap-2" role="group" aria-label="Быстрый переход">
+      {/* Mobile: random alone, sorts together. Desktop: all three in one row. */}
+      <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2" role="group" aria-label="Быстрый переход">
         <LuckyCityButton cities={destinations} variant="hero" className="w-full sm:w-auto" />
         <div className="flex flex-wrap items-center gap-2">
           <a

@@ -7,6 +7,7 @@ import { CityCard } from '@/components/CityCard';
 import { LuckyCityButton } from '@/components/LuckyCityButton.client';
 import { RegionDestinationLink } from '@/components/RegionDestinationLink';
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
+import { cityImageSlug } from '@/lib/city-images';
 import { filterOrphanRegions, resolveCityRegion } from '@/lib/cityRegionHub';
 import { pluralCities } from '@/lib/format';
 
@@ -15,26 +16,38 @@ type SortMode = 'events' | 'asc' | 'desc';
 export function CitiesCatalogView({
   destinations,
   hideIntro = false,
+  excludeSlugs,
 }: {
   destinations: PublicDestinationDto[];
   /** When parent already rendered HeroLayout H1. */
   hideIntro?: boolean;
+  /** Featured top tiles already shown above - omit from the list below (unless searching). */
+  excludeSlugs?: string[];
 }) {
   const [query, setQuery] = useState('');
   const [sortMode, setSortMode] = useState<SortMode>('events');
+
+  const excluded = useMemo(() => {
+    if (!excludeSlugs?.length) return null;
+    return new Set(excludeSlugs);
+  }, [excludeSlugs]);
 
   const cities = useMemo(() => {
     const normalized = query.trim().toLowerCase();
     const filtered = destinations
       .filter((item) => item.type === 'city')
-      .filter((item) => !normalized || item.name.toLowerCase().includes(normalized));
+      .filter((item) => !normalized || item.name.toLowerCase().includes(normalized))
+      .filter((item) => {
+        if (!excluded || excluded.size === 0 || normalized) return true;
+        return !excluded.has(cityImageSlug(item));
+      });
 
     return [...filtered].sort((a, b) => {
       if (sortMode === 'events') return b.events - a.events || a.name.localeCompare(b.name, 'ru');
       const cmp = a.name.localeCompare(b.name, 'ru');
       return sortMode === 'asc' ? cmp : -cmp;
     });
-  }, [destinations, query, sortMode]);
+  }, [destinations, query, sortMode, excluded]);
 
   const allCities = useMemo(
     () => destinations.filter((item) => item.type === 'city'),
@@ -54,24 +67,19 @@ export function CitiesCatalogView({
     });
   }, [destinations, query, sortMode]);
 
-  const orphanRegions = useMemo(() => filterOrphanRegions(regions, cities), [regions, cities]);
+  const orphanRegions = useMemo(
+    () => filterOrphanRegions(regions, allCities),
+    [regions, allCities],
+  );
 
   return (
     <>
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="min-w-0 flex-1">
           {hideIntro ? (
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <h2 className="font-display text-xl font-bold text-slate-900 sm:text-2xl">
-                Все города
-                {cities.length > 0 ? (
-                  <span className="ml-2 text-base font-medium text-slate-500">({pluralCities(cities.length)})</span>
-                ) : null}
-              </h2>
-              <div className="flex shrink-0 items-center gap-2 sm:hidden">
-                <LuckyCityButton cities={allCities} variant="toolbar" />
-                <CitiesSortControls sortMode={sortMode} onSortModeChange={setSortMode} compact />
-              </div>
+            <div className="flex flex-wrap items-center justify-end gap-3 sm:hidden">
+              <LuckyCityButton cities={allCities} variant="toolbar" />
+              <CitiesSortControls sortMode={sortMode} onSortModeChange={setSortMode} compact />
             </div>
           ) : (
             <>

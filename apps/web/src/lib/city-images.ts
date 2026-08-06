@@ -65,6 +65,8 @@ const CITY_TOP_PREVIEW_SLUGS = new Set([
   'ekaterinburg',
   'nizhny-novgorod',
   'samara',
+  'sochi',
+  'kaliningrad',
 ]);
 
 function isUsableRemoteImage(url: string): boolean {
@@ -74,6 +76,15 @@ function isUsableRemoteImage(url: string): boolean {
 function cityCardImageSlug(city: CityImageSource): string {
   const slug = citySlug(city);
   return CITY_CARD_IMAGE_ALIASES[slug] || slug;
+}
+
+/** Normalized image slug (aliases applied) for dedupe / exclude sets. */
+export function cityImageSlug(city: CityImageSource): string {
+  return cityCardImageSlug(city);
+}
+
+export function cityHasTopPreview(city: CityImageSource): boolean {
+  return CITY_TOP_PREVIEW_SLUGS.has(cityCardImageSlug(city));
 }
 
 /** Distinct daytime previews for popular top tiles on `/cities`. */
