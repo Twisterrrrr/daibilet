@@ -134,7 +134,7 @@ export async function getCachedVenuesCatalog(
     q?: string;
   } = {},
 ) {
-  const limit = options.limit ?? 36;
+  const limit = options.limit ?? 24;
   const city = options.city?.trim() || '';
   const type = options.type?.trim() || '';
   const scale = options.scale?.trim() || '';

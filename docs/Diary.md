@@ -1,4 +1,20 @@
-## 2026-08-06 - Pier card showed ship «Москва-99» as venue title
+## 2026-08-06 - `/venues`+`/locations`: faster first list + drop secondary filters
+
+### Наблюдения
+- Curl HTML ~0.3s; «медленно» = клиент после paint: `cityReady` → лишний `fetchVenueCatalogPage` даже когда SSR `initialPage` уже under «все города»; skeleton прятал полезный SSR-список.
+- `/locations`: Leaflet + pins на desktop сразу конкурировали с first useful list.
+- Secondary-чипы scale (venues) и logistics (locations) - рано как фильтр (owner: убрать).
+
+### Решения
+- Skip refetch когда `feedQueryKey === initialQueryKey` (как CatalogShell на `/events`); skeleton только если `venues.length === 0`.
+- Map: `dynamic()` + pins только при `showMap`; desktop idle/`requestIdleCallback` (~2.5s), mobile off до клика.
+- Page size 36→24; debounce поиска уже был (250ms).
+- UI scale/logistics chips выпилены; `?scale=`/`?logistics=` не шлём с клиента (API оставлен). Блок «Логистика» на карточке venue не трогали.
+
+### Проблемы
+- Нет.
+
+---
 
 ### Наблюдения
 - Owner: бейдж ПРИЧАЛ, title «Теплоход «Москва – 99»», address Адмиралтейская наб., 10, city Москва.

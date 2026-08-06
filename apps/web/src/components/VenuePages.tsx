@@ -10,7 +10,11 @@ import { VenueCatalogPageSkeleton } from '@/components/VenueCatalogSkeletons';
 import { JsonLdScripts } from '@/components/JsonLdScripts';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
-import { mapVenueCatalogFeedPage, VENUE_CATALOG_PAGE_SIZE } from '@/lib/venue-catalog-feed';
+import {
+  mapVenueCatalogFeedPage,
+  venueCatalogDefaultQueryKey,
+  VENUE_CATALOG_PAGE_SIZE,
+} from '@/lib/venue-catalog-feed';
 import { evaluateVenueIndexability, robotsForIndexability } from '@/lib/hub-indexability';
 import { venueHref } from '@/lib/routes';
 import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
@@ -125,15 +129,16 @@ export async function VenueListPage({ family }: Pick<PageProps, 'family'>) {
     noStore();
     initialPage = EMPTY_FEED;
   }
+  const initialQueryKey = venueCatalogDefaultQueryKey(family);
   return (
     <SiteLayout>
       {family === 'location' ? (
         <Suspense fallback={<VenueCatalogPageSkeleton family="location" />}>
-          <LocationsCatalogView initialPage={initialPage} />
+          <LocationsCatalogView initialPage={initialPage} initialQueryKey={initialQueryKey} />
         </Suspense>
       ) : (
         <Suspense fallback={<VenueCatalogPageSkeleton family="institution" />}>
-          <VenuesCatalogView initialPage={initialPage} />
+          <VenuesCatalogView initialPage={initialPage} initialQueryKey={initialQueryKey} />
         </Suspense>
       )}
     </SiteLayout>

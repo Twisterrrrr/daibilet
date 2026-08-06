@@ -1,5 +1,6 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
@@ -7,7 +8,6 @@ import { Map as MapIcon, Search } from 'lucide-react';
 
 import { CatalogInfiniteSentinel } from '@/components/CatalogInfiniteSentinel.client';
 import { LocationCard } from '@/components/LocationCard.client';
-import { LocationsCatalogMap } from '@/components/LocationsCatalogMap.client';
 import { LocationsCatalogSkeleton } from '@/components/VenueCatalogSkeletons';
 import { HeroLayout } from '@/components/HeroLayout';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
@@ -22,6 +22,7 @@ import {
 import {
   fetchVenueCatalogPage,
   fetchVenueCatalogPins,
+  venueCatalogCacheKey,
   VENUE_CATALOG_PAGE_SIZE,
   type VenueCatalogFeedPage,
   type VenueCatalogMapPin,
@@ -29,12 +30,25 @@ import {
 } from '@/lib/venue-catalog-feed';
 import {
   LOCATION_CATALOG_TYPE_OPTIONS,
-  LOCATION_LOGISTICS_OPTIONS,
   normalizeVenueKind,
   venueTypeLabel,
-  type LocationLogisticsGroup,
 } from '@/lib/venue-meta';
 import { venueHref } from '@/lib/routes';
+
+const LocationsCatalogMap = dynamic(
+  () =>
+    import('@/components/LocationsCatalogMap.client').then((mod) => ({
+      default: mod.LocationsCatalogMap,
+    })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-6 text-sm text-slate-500">
+        Загружаем карту…
+      </div>
+    ),
+  },
+);
 
 const SORT_OPTIONS: Array<[VenueCatalogSort, string]> = [
   ['events', 'По афише'],
@@ -46,7 +60,28 @@ function cityOptionsFromStats(cities: Record<string, number>): Array<[string, nu
   return [...Object.entries(cities)].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'ru'));
 }
 
-export function LocationsCatalogView({ initialPage }: { initialPage: VenueCatalogFeedPage }) {
+function applyInitialPage(
+  page: VenueCatalogFeedPage,
+  setters: {
+    setVenues: (v: VenueCatalogFeedPage['venues']) => void;
+    setTotal: (n: number) => void;
+    setNextCursor: (c: string | null) => void;
+    setStats: (s: VenueCatalogFeedPage['stats']) => void;
+  },
+) {
+  setters.setVenues(page.venues);
+  setters.setTotal(page.total);
+  setters.setNextCursor(page.nextCursor);
+  setters.setStats(page.stats);
+}
+
+export function LocationsCatalogView({
+  initialPage,
+  initialQueryKey = '',
+}: {
+  initialPage: VenueCatalogFeedPage;
+  initialQueryKey?: string;
+}) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const selectedCity = useSelectedCityOptional();
@@ -68,12 +103,10 @@ export function LocationsCatalogView({ initialPage }: { initialPage: VenueCatalo
   const loadMoreLock = useRef(false);
   const catalogRequestId = useRef(0);
   const mapRequestId = useRef(0);
+  const mapUserToggled = useRef(false);
 
   const urlCity = searchParams.get('city')?.trim() || '';
-  const rawLogistics = searchParams.get('logistics')?.trim() || '';
-  const logisticsFilter: LocationLogisticsGroup | 'all' =
-    rawLogistics === 'pier' || rawLogistics === 'bus' || rawLogistics === 'walking' ? rawLogistics : 'all';
-  // Kind chips are primary; logistics stays a secondary quick-toggle (does not hide kinds).
+  // ?logistics= ignored: secondary logistics chips removed until product asks again.
   const rawType = searchParams.get('type')?.trim() || '';
   const typeFilter = rawType ? normalizeVenueKind(rawType) : 'all';
   const cityReady = selectedCity?.cityReady ?? true;
@@ -108,16 +141,32 @@ export function LocationsCatalogView({ initialPage }: { initialPage: VenueCatalo
     return () => window.clearTimeout(timer);
   }, [query]);
 
-  // Desktop: open map by default when enough pins exist - pins load lazily below.
+  // Desktop: open map after idle so first useful list paints without Leaflet/pins.
+  // Mobile stays off until user taps «Показать картой».
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const mq = window.matchMedia('(min-width: 1024px)');
-    const sync = () => {
-      if (mq.matches) setShowMap(true);
+    if (!window.matchMedia('(min-width: 1024px)').matches) return;
+
+    let cancelled = false;
+    const openIfUntouched = () => {
+      if (cancelled || mapUserToggled.current) return;
+      setShowMap(true);
     };
-    sync();
-    mq.addEventListener('change', sync);
-    return () => mq.removeEventListener('change', sync);
+
+    let idleId: number | undefined;
+    let timeoutId: number | undefined;
+    const ric = window.requestIdleCallback?.bind(window);
+    if (ric) {
+      idleId = ric(openIfUntouched, { timeout: 2500 });
+    } else {
+      timeoutId = window.setTimeout(openIfUntouched, 1500);
+    }
+
+    return () => {
+      cancelled = true;
+      if (idleId != null) window.cancelIdleCallback?.(idleId);
+      if (timeoutId != null) window.clearTimeout(timeoutId);
+    };
   }, []);
 
   const feedQuery = useMemo(
@@ -125,13 +174,14 @@ export function LocationsCatalogView({ initialPage }: { initialPage: VenueCatalo
       family: 'location' as const,
       city: cityFetchKey || undefined,
       type: typeFilter !== 'all' ? typeFilter : undefined,
-      logistics: logisticsFilter !== 'all' ? logisticsFilter : undefined,
       sort: sortMode,
       q: debouncedQuery || undefined,
       limit: VENUE_CATALOG_PAGE_SIZE,
     }),
-    [cityFetchKey, typeFilter, logisticsFilter, sortMode, debouncedQuery],
+    [cityFetchKey, typeFilter, sortMode, debouncedQuery],
   );
+
+  const feedQueryKey = useMemo(() => venueCatalogCacheKey(feedQuery), [feedQuery]);
 
   // Filters reset cursor and refetch first page server-side (not client filter on 5k).
   useEffect(() => {
@@ -139,6 +189,19 @@ export function LocationsCatalogView({ initialPage }: { initialPage: VenueCatalo
       setCatalogLoading(false);
       return;
     }
+
+    if (
+      initialQueryKey &&
+      feedQueryKey === initialQueryKey &&
+      initialPage.venues.length > 0
+    ) {
+      catalogRequestId.current += 1;
+      applyInitialPage(initialPage, { setVenues, setTotal, setNextCursor, setStats });
+      setCatalogLoading(false);
+      loadMoreLock.current = false;
+      return;
+    }
+
     const controller = new AbortController();
     const requestId = ++catalogRequestId.current;
     setCatalogLoading(true);
@@ -161,7 +224,7 @@ export function LocationsCatalogView({ initialPage }: { initialPage: VenueCatalo
     return () => {
       controller.abort();
     };
-  }, [feedQuery, cityReady, urlCity]);
+  }, [feedQuery, feedQueryKey, cityReady, urlCity, initialQueryKey, initialPage]);
 
   // Map pins: only when showMap - separate lean mode=pins request.
   useEffect(() => {
@@ -178,7 +241,6 @@ export function LocationsCatalogView({ initialPage }: { initialPage: VenueCatalo
         family: 'location',
         city: cityFetchKey || undefined,
         type: typeFilter !== 'all' ? typeFilter : undefined,
-        logistics: logisticsFilter !== 'all' ? logisticsFilter : undefined,
         q: debouncedQuery || undefined,
       },
       { signal: controller.signal },
@@ -197,7 +259,7 @@ export function LocationsCatalogView({ initialPage }: { initialPage: VenueCatalo
     return () => {
       controller.abort();
     };
-  }, [showMap, cityFetchKey, typeFilter, logisticsFilter, debouncedQuery, cityReady, urlCity]);
+  }, [showMap, cityFetchKey, typeFilter, debouncedQuery, cityReady, urlCity]);
 
   const loadMore = useCallback(() => {
     if (!nextCursor || loadingMore || catalogLoading || loadMoreLock.current) return;
@@ -221,8 +283,13 @@ export function LocationsCatalogView({ initialPage }: { initialPage: VenueCatalo
   }, [nextCursor, loadingMore, catalogLoading, feedQuery]);
 
   const cityPending = !urlCity && Boolean(selectedCity) && !cityReady;
-  // Do not gate on isPending: Cyrillic soft-nav can leave useTransition pending forever.
-  const listPending = cityPending || catalogLoading;
+  const listPending = (cityPending || catalogLoading) && venues.length === 0;
+  const listRefreshing = (cityPending || catalogLoading) && venues.length > 0;
+
+  const toggleMap = () => {
+    mapUserToggled.current = true;
+    setShowMap((value) => !value);
+  };
 
   const setCityFilter = (next: string) => {
     persistSelectedCity(next === 'all' ? 'all' : next);
@@ -247,16 +314,7 @@ export function LocationsCatalogView({ initialPage }: { initialPage: VenueCatalo
     const params = new URLSearchParams(searchParams.toString());
     if (next === 'all') params.delete('type');
     else params.set('type', next);
-    const qs = params.toString();
-    startTransition(() => {
-      router.replace(qs ? `/locations?${qs}` : '/locations', { scroll: false });
-    });
-  };
-
-  const setLogisticsFilter = (next: LocationLogisticsGroup | 'all') => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (next === 'all') params.delete('logistics');
-    else params.set('logistics', next);
+    params.delete('logistics');
     const qs = params.toString();
     startTransition(() => {
       router.replace(qs ? `/locations?${qs}` : '/locations', { scroll: false });
@@ -281,17 +339,6 @@ export function LocationsCatalogView({ initialPage }: { initialPage: VenueCatalo
       .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label, 'ru'));
     return [...known, ...extras];
   }, [stats.types]);
-
-  const logisticsOptions = useMemo(() => {
-    const counts = stats.logistics || {};
-    const scopedTotal = stats.venues || total;
-    return LOCATION_LOGISTICS_OPTIONS.filter(
-      (option) => option.value === 'all' || counts[option.value],
-    ).map((option) => ({
-      ...option,
-      count: option.value === 'all' ? scopedTotal : counts[option.value] || 0,
-    }));
-  }, [stats.logistics, stats.venues, total]);
 
   const mapPinsForUi = useMemo(
     () =>
@@ -359,7 +406,7 @@ export function LocationsCatalogView({ initialPage }: { initialPage: VenueCatalo
 
   return (
     <>
-      {/* Mobile template: dense hero, kind chips primary + logistics secondary. */}
+      {/* Mobile template: dense hero, kind chips primary. */}
       <HeroLayout
         variant="minimal"
         dense
@@ -404,29 +451,6 @@ export function LocationsCatalogView({ initialPage }: { initialPage: VenueCatalo
           })}
         </div>
 
-        {logisticsOptions.length > 1 ? (
-          <div className="mt-2.5 flex gap-1.5 overflow-x-auto pb-0.5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden md:flex-wrap md:overflow-visible">
-            {logisticsOptions.map((option) => {
-              const active = logisticsFilter === option.value;
-              return (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => setLogisticsFilter(active && option.value !== 'all' ? 'all' : option.value)}
-                  className={`inline-flex shrink-0 items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-semibold transition ${
-                    active
-                      ? 'bg-slate-800 text-white'
-                      : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50'
-                  }`}
-                >
-                  {option.label}
-                  <span className="text-xs opacity-75">({option.count})</span>
-                </button>
-              );
-            })}
-          </div>
-        ) : null}
-
         <div className="mt-4 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-3 text-slate-900 shadow-sm sm:flex-row">
           <div className="flex flex-1 items-center gap-2 rounded-xl bg-slate-100 px-3">
             <Search className="h-4 w-4 shrink-0 text-slate-400" />
@@ -460,7 +484,7 @@ export function LocationsCatalogView({ initialPage }: { initialPage: VenueCatalo
       <div className="container-page py-6 sm:py-8">
         <div className="mb-4 flex flex-wrap items-baseline justify-between gap-3">
           <h2 className="text-lg font-semibold text-slate-900">
-            {listPending ? (
+            {listPending || listRefreshing ? (
               'Обновляем список…'
             ) : (
               <>
@@ -474,7 +498,7 @@ export function LocationsCatalogView({ initialPage }: { initialPage: VenueCatalo
           <div className="flex flex-wrap items-center gap-3">
             <button
               type="button"
-              onClick={() => setShowMap((value) => !value)}
+              onClick={toggleMap}
               className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-semibold transition ${
                 showMap
                   ? 'bg-primary-600 text-white'
@@ -516,7 +540,7 @@ export function LocationsCatalogView({ initialPage }: { initialPage: VenueCatalo
                     pins={mapPinsForUi}
                     selectedId={selectedPinId}
                     onPinClick={onPinClick}
-                    layoutKey={`${showMap}-${mapPinsForUi.length}-${cityFilter}-${typeFilter}-${logisticsFilter}`}
+                    layoutKey={`${showMap}-${mapPinsForUi.length}-${cityFilter}-${typeFilter}`}
                     className="h-[min(70vh,640px)] w-full"
                   />
                   <p className="border-t border-slate-100 px-3 py-2 text-xs text-slate-500">

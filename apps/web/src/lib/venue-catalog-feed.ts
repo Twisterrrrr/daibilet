@@ -3,8 +3,8 @@ import type { PublicVenuesDto } from '@daibilet/contracts/public';
 import { toVenueCatalogCard } from '@/lib/venue-catalog-card';
 import type { VenueCatalogCard } from '@/lib/venue-map-types';
 
-/** First screen + infinite-scroll page size (24–48 band). */
-export const VENUE_CATALOG_PAGE_SIZE = 36;
+/** First screen + infinite-scroll page size (24–48 band). Trimmed for faster first paint. */
+export const VENUE_CATALOG_PAGE_SIZE = 24;
 
 export type VenueCatalogFamily = 'institution' | 'location';
 export type VenueCatalogSort = 'events' | 'asc' | 'desc';
@@ -78,6 +78,15 @@ export function venueCatalogCacheKey(query: VenueCatalogFeedQuery): string {
     query.cursor || '',
     String(query.limit || VENUE_CATALOG_PAGE_SIZE),
   ].join('|');
+}
+
+/** SSR default feed key: unfiltered «all cities», sort by events. */
+export function venueCatalogDefaultQueryKey(family: VenueCatalogFamily): string {
+  return venueCatalogCacheKey({
+    family,
+    sort: 'events',
+    limit: VENUE_CATALOG_PAGE_SIZE,
+  });
 }
 
 export function mapVenueCatalogFeedPage(payload: PublicVenuesDto | null | undefined): VenueCatalogFeedPage {

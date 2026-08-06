@@ -22,15 +22,14 @@ import {
 } from '@/lib/selected-city';
 import {
   fetchVenueCatalogPage,
+  venueCatalogCacheKey,
   VENUE_CATALOG_PAGE_SIZE,
   type VenueCatalogFeedPage,
   type VenueCatalogSort,
 } from '@/lib/venue-catalog-feed';
 import {
   INSTITUTION_CATALOG_TYPE_OPTIONS,
-  INSTITUTION_SCALE_OPTIONS,
   normalizeVenueKind,
-  type InstitutionScale,
 } from '@/lib/venue-meta';
 import { venueHref } from '@/lib/routes';
 
@@ -69,7 +68,28 @@ function cityOptionsFromStats(cities: Record<string, number>): Array<[string, nu
   return [...Object.entries(cities)].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'ru'));
 }
 
-export function VenuesCatalogView({ initialPage }: { initialPage: VenueCatalogFeedPage }) {
+function applyInitialPage(
+  page: VenueCatalogFeedPage,
+  setters: {
+    setVenues: (v: VenueCatalogFeedPage['venues']) => void;
+    setTotal: (n: number) => void;
+    setNextCursor: (c: string | null) => void;
+    setStats: (s: VenueCatalogFeedPage['stats']) => void;
+  },
+) {
+  setters.setVenues(page.venues);
+  setters.setTotal(page.total);
+  setters.setNextCursor(page.nextCursor);
+  setters.setStats(page.stats);
+}
+
+export function VenuesCatalogView({
+  initialPage,
+  initialQueryKey = '',
+}: {
+  initialPage: VenueCatalogFeedPage;
+  initialQueryKey?: string;
+}) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const selectedCity = useSelectedCityOptional();
@@ -90,9 +110,7 @@ export function VenuesCatalogView({ initialPage }: { initialPage: VenueCatalogFe
   const urlCity = searchParams.get('city')?.trim() || '';
   const rawType = searchParams.get('type')?.trim() || '';
   const typeFilter = rawType ? normalizeVenueKind(rawType) : 'all';
-  const rawScale = searchParams.get('scale')?.trim() || '';
-  const scaleFilter: InstitutionScale | 'all' =
-    rawScale === 'museum' || rawScale === 'large_hall' || rawScale === 'intimate' ? rawScale : 'all';
+  // ?scale= ignored: secondary scale chips removed until product asks again.
   const cityReady = selectedCity?.cityReady ?? true;
   const cityPending = !urlCity && Boolean(selectedCity) && !cityReady;
 
@@ -135,23 +153,39 @@ export function VenuesCatalogView({ initialPage }: { initialPage: VenueCatalogFe
       family: 'institution' as const,
       city: cityFetchKey || undefined,
       type: typeFilter !== 'all' ? typeFilter : undefined,
-      scale: scaleFilter !== 'all' ? scaleFilter : undefined,
       sort: sortMode,
       q: debouncedQuery || undefined,
       limit: VENUE_CATALOG_PAGE_SIZE,
     }),
-    [cityFetchKey, typeFilter, scaleFilter, sortMode, debouncedQuery],
+    [cityFetchKey, typeFilter, sortMode, debouncedQuery],
   );
+
+  const feedQueryKey = useMemo(() => venueCatalogCacheKey(feedQuery), [feedQuery]);
 
   // Filters reset cursor and refetch first page server-side.
   useEffect(() => {
     if (!cityReady && !urlCity) {
-      // Abort leftover in-flight work must not leave skeletons forever.
+      // Keep SSR list while SelectedCity hydrates - do not skeleton useful cards.
       setCatalogLoading(false);
       return;
     }
+
+    // SSR unfiltered page already matches current filters (all cities / default sort).
+    if (
+      initialQueryKey &&
+      feedQueryKey === initialQueryKey &&
+      initialPage.venues.length > 0
+    ) {
+      catalogRequestId.current += 1;
+      applyInitialPage(initialPage, { setVenues, setTotal, setNextCursor, setStats });
+      setCatalogLoading(false);
+      loadMoreLock.current = false;
+      return;
+    }
+
     const controller = new AbortController();
     const requestId = ++catalogRequestId.current;
+    // Stale-while-revalidate: keep prior cards visible; skeleton only when empty.
     setCatalogLoading(true);
     loadMoreLock.current = false;
     fetchVenueCatalogPage(feedQuery, { signal: controller.signal })
@@ -173,7 +207,7 @@ export function VenuesCatalogView({ initialPage }: { initialPage: VenueCatalogFe
     return () => {
       controller.abort();
     };
-  }, [feedQuery, cityReady, urlCity]);
+  }, [feedQuery, feedQueryKey, cityReady, urlCity, initialQueryKey, initialPage]);
 
   const loadMore = useCallback(() => {
     if (!nextCursor || loadingMore || catalogLoading || loadMoreLock.current) return;
@@ -216,6 +250,7 @@ export function VenuesCatalogView({ initialPage }: { initialPage: VenueCatalogFe
         catalogCityQueryValue(selectedCity?.destinations || [], next),
       );
     }
+    params.delete('scale');
     const qs = params.toString();
     startTransition(() => {
       router.replace(qs ? `/venues?${qs}` : '/venues', { scroll: false });
@@ -226,24 +261,16 @@ export function VenuesCatalogView({ initialPage }: { initialPage: VenueCatalogFe
     const params = new URLSearchParams(searchParams.toString());
     if (next === 'all') params.delete('type');
     else params.set('type', next);
+    params.delete('scale');
     const qs = params.toString();
     startTransition(() => {
       router.replace(qs ? `/venues?${qs}` : '/venues', { scroll: false });
     });
   };
 
-  const setScaleFilter = (next: InstitutionScale | 'all') => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (next === 'all') params.delete('scale');
-    else params.set('scale', next);
-    const qs = params.toString();
-    startTransition(() => {
-      router.replace(qs ? `/venues?${qs}` : '/venues', { scroll: false });
-    });
-  };
-
-  // Do not gate on isPending: Cyrillic soft-nav can leave useTransition pending forever.
-  const listPending = cityPending || catalogLoading;
+  // Skeleton only when we have nothing useful to show (SSR empty / first load).
+  const listPending = (cityPending || catalogLoading) && venues.length === 0;
+  const listRefreshing = (cityPending || catalogLoading) && venues.length > 0;
 
   const typeOptions = useMemo(() => {
     const counts = stats.types || {};
@@ -252,16 +279,6 @@ export function VenuesCatalogView({ initialPage }: { initialPage: VenueCatalogFe
       count: counts[option.value] || 0,
     }));
   }, [stats.types]);
-
-  const scaleOptions = useMemo(() => {
-    const counts = stats.scales || {};
-    return INSTITUTION_SCALE_OPTIONS.filter(
-      (option) => option.value === 'all' || counts[option.value],
-    ).map((option) => ({
-      ...option,
-      count: option.value === 'all' ? undefined : counts[option.value] || 0,
-    }));
-  }, [stats.scales]);
 
   const cityCount = cityOptions.length;
   const eventsHref = catalogHrefWithSelectedCity(
@@ -386,29 +403,6 @@ export function VenuesCatalogView({ initialPage }: { initialPage: VenueCatalogFe
             })}
           </div>
         ) : null}
-
-        {scaleOptions.length > 1 ? (
-          <div className="mx-auto mt-3 flex max-w-5xl flex-wrap justify-center gap-1.5 px-1">
-            {scaleOptions.map((option) => {
-              const active = scaleFilter === option.value;
-              return (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => setScaleFilter(active && option.value !== 'all' ? 'all' : option.value)}
-                  className={`inline-flex h-9 items-center gap-1 rounded-lg px-3 text-sm font-semibold transition ${
-                    active
-                      ? 'bg-primary-500 text-white'
-                      : 'bg-white/10 text-white/90 ring-1 ring-white/20 hover:bg-white/20'
-                  }`}
-                >
-                  {option.label}
-                  {option.count != null ? <span className="text-xs opacity-80">({option.count})</span> : null}
-                </button>
-              );
-            })}
-          </div>
-        ) : null}
       </HeroLayout>
 
       <div className="sticky top-[var(--site-header-height)] z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
@@ -445,7 +439,7 @@ export function VenuesCatalogView({ initialPage }: { initialPage: VenueCatalogFe
       <div className="container-page py-8">
         <div className="mb-4 flex items-baseline justify-between gap-3">
           <h2 className="text-lg font-semibold text-slate-900">
-            {listPending ? (
+            {listPending || listRefreshing ? (
               'Обновляем список…'
             ) : (
               <>
