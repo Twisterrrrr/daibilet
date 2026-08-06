@@ -121,7 +121,7 @@ async function HomePageBody() {
               </ScrollRail>
               <ul className="mt-6 hidden gap-4 overflow-x-visible md:grid md:grid-cols-3 lg:grid-cols-6">
                 {topCities.slice(0, 6).map((city) => (
-                  <li key={city.slug || city.name}>
+                  <li key={city.slug || city.name} className="min-w-0">
                     <CityCard city={city} compact />
                   </li>
                 ))}
