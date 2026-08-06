@@ -14,7 +14,12 @@
 ### Проблемы
 - Нет.
 
+### Live
+- Commit `b1ad969`; MSK **BUILD_ID=`8B9zL38_0_PF3aLi_QgFt`**. Smoke: `/venues` `/locations` 200; HTML без «Все масштабы» / «Любая логистика»; kind-чипы «Все точки» на месте.
+
 ---
+
+## 2026-08-06 - Pier card showed ship «Москва-99» as venue title
 
 ### Наблюдения
 - Owner: бейдж ПРИЧАЛ, title «Теплоход «Москва – 99»», address Адмиралтейская наб., 10, city Москва.
