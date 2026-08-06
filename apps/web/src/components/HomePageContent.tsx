@@ -10,7 +10,6 @@ import { HomePageSkeleton } from '@/components/HomePageSkeleton';
 import { HomeStoriesStrip } from '@/components/HomeStoriesStrip.client';
 import { LuckyCityButton } from '@/components/LuckyCityButton.client';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
-import { ScrollRail } from '@/components/ScrollRail.client';
 import { mergeBlogCards } from '@/lib/blog-utils';
 import '@/lib/env';
 import { formatMoney, formatNumber, pluralEvents } from '@/lib/format';
@@ -86,21 +85,11 @@ async function HomePageBody() {
                 Все города →
               </Link>
             </div>
-            <ScrollRail
-              className="mt-6 md:hidden"
-              viewportClassName="flex flex-nowrap gap-3 snap-x snap-mandatory"
-              aria-label="Популярные города"
-            >
-              {topCities.map((city) => (
-                <div key={city.slug || city.name} className="w-[min(42vw,160px)] shrink-0 snap-start" data-rail-item>
-                  <CityCard city={city} />
-                </div>
-              ))}
-            </ScrollRail>
-            <ul className="mt-6 hidden gap-4 overflow-x-visible md:grid md:grid-cols-3 lg:grid-cols-6">
+            {/* Mobile: vertical left-aligned stack (no horizontal snap sausage). Desktop: 3/6 grid. */}
+            <ul className="mt-6 grid grid-cols-1 gap-4 overflow-x-visible md:grid-cols-3 lg:grid-cols-6">
               {topCities.slice(0, 6).map((city) => (
-                <li key={city.slug || city.name}>
-                  <CityCard city={city} compact />
+                <li key={city.slug || city.name} className="min-w-0 text-left">
+                  <CityCard city={city} compact imageVariant="top" />
                 </li>
               ))}
             </ul>

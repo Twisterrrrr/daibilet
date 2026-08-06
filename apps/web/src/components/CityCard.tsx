@@ -22,7 +22,7 @@ type CityCardProps = {
   /** Long briefs stay on city hub; listing uses line-clamp-1 or omits. */
   description?: string;
   region?: CityCardRegion | null;
-  /** `top` - daytime landmark previews for `/cities` hero tiles only. */
+  /** `top` - daytime landmark previews (`/images/cities/top/*.jpg`) for home + `/cities` hero tiles. */
   imageVariant?: 'default' | 'top';
   /** Compact listing: bigger title, vibe tags, no text-heavy body. */
   compact?: boolean;
@@ -35,7 +35,7 @@ function CityHubTags({ city }: { city: PublicDestinationDto }) {
 
   return (
     <ul
-      className="mt-2 flex min-w-0 flex-nowrap gap-1"
+      className="mt-2 flex min-w-0 flex-wrap gap-1"
       aria-label={`Популярные направления: ${city.name}`}
     >
       {tags.map((tag) => {
@@ -46,10 +46,10 @@ function CityHubTags({ city }: { city: PublicDestinationDto }) {
               ? `/events?city=${encodeURIComponent(city.name)}&category=${encodeURIComponent(tag.label)}`
               : cityHref(city);
         return (
-          <li key={`${tag.kind}:${tag.slug || tag.label}`} className="min-w-0 shrink">
+          <li key={`${tag.kind}:${tag.slug || tag.label}`} className="min-w-0 max-w-full">
             <Link
               href={href}
-              className="inline-flex max-w-full whitespace-nowrap truncate rounded-md bg-primary-50 px-2 py-0.5 text-[10px] font-semibold leading-4 text-primary-800 transition hover:bg-primary-100"
+              className="inline-flex max-w-full truncate rounded-md bg-primary-50 px-2 py-0.5 text-[10px] font-semibold leading-4 text-primary-800 transition hover:bg-primary-100"
             >
               {tag.label}
             </Link>
@@ -109,20 +109,21 @@ export function CityCard({
             fill
             sizes={IMAGE_SIZES.cityCard}
             style={{ objectPosition: imageFocus }}
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            className="object-cover brightness-[1.08] contrast-[0.98] transition-transform duration-500 group-hover:scale-105"
             fallback={<div className="absolute inset-0 bg-gradient-to-br from-primary-700 to-primary-900" />}
           />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/10" />
-          <div className="absolute inset-x-0 bottom-0 p-3 sm:p-3.5">
-            <h3 className={`${cityCardTitleClass(titleVariant)} line-clamp-2`}>{city.name}</h3>
+          {/* Lighter scrim so daytime landmarks stay bright; text still readable. */}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-black/15 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 p-2.5 text-left sm:p-3">
+            <h3 className={`${cityCardTitleClass(titleVariant)} line-clamp-2 break-words`}>{city.name}</h3>
             {showBrief ? (
-              <p className="mt-1 line-clamp-1 text-xs text-white/65 opacity-0 transition-opacity duration-200 group-hover:opacity-100 sm:text-sm">
+              <p className="mt-1 line-clamp-1 text-[11px] text-white/70 opacity-0 transition-opacity duration-200 group-hover:opacity-100 sm:text-xs">
                 {brief}
               </p>
             ) : null}
-            <div className="mt-1.5 flex flex-col gap-0.5 text-xs text-white/90 sm:text-sm">
-              <span className="flex items-center gap-1.5">
-                <MapPin className="h-3.5 w-3.5 shrink-0" />
+            <div className="mt-1 flex flex-col gap-0.5 text-[11px] text-white/90 sm:text-xs">
+              <span className="flex min-w-0 items-center gap-1">
+                <MapPin className="h-3 w-3 shrink-0" />
                 {city.events > 0 ? (
                   <CountUp
                     value={city.events}
@@ -134,8 +135,8 @@ export function CityCard({
                 )}
               </span>
               {city.venues != null && city.venues > 0 ? (
-                <span className="flex items-center gap-1.5 text-white/75">
-                  <Landmark className="h-3.5 w-3.5 shrink-0" />
+                <span className="flex min-w-0 items-center gap-1 text-white/80">
+                  <Landmark className="h-3 w-3 shrink-0" />
                   <span className="truncate">{pluralVenues(city.venues)}</span>
                 </span>
               ) : null}
