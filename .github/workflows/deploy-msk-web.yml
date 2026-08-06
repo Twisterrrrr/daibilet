@@ -1,0 +1,110 @@
+name: Deploy MSK web (CI build + atomic swap)
+
+# Builds apps/web on GitHub runners, ships .next to daibilet-msk, swaps without
+# in-place web:build on the 4GB VPS. Fallback remains:
+#   BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh
+#
+# Required repo secrets:
+#   MSK_SSH_HOST   - e.g. 201.24.125.184 or daibilet-msk
+#   MSK_SSH_USER   - deploy user with systemd rights for daibilet-web
+#   MSK_SSH_KEY    - private key (PEM)
+# Optional (bake into Next public bundle; match prod .env when possible):
+#   NEXT_PUBLIC_TC_WIDGET_TOKEN
+#   NEXT_PUBLIC_TEP_WIDGET_ID
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Git ref to deploy (branch or SHA). Empty = workflow ref."
+        required: false
+        default: ""
+      skip_swap:
+        description: "Build artifact only (skip SSH swap)"
+        type: boolean
+        default: false
+
+concurrency:
+  group: deploy-msk-web
+  cancel-in-progress: false
+
+jobs:
+  build-and-swap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+
+      - name: Resolve deploy SHA
+        id: meta
+        run: |
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "short=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.7.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Prisma generate
+        run: pnpm db:generate
+
+      - name: Build web
+        env:
+          NODE_OPTIONS: --max-old-space-size=6144
+          EVENT_SSG_TOP_N: "40"
+          NEXT_PUBLIC_TC_WIDGET_TOKEN: ${{ secrets.NEXT_PUBLIC_TC_WIDGET_TOKEN }}
+          NEXT_PUBLIC_TEP_WIDGET_ID: ${{ secrets.NEXT_PUBLIC_TEP_WIDGET_ID }}
+        run: pnpm web:build
+
+      - name: Pack .next artifact
+        run: |
+          test -f apps/web/.next/BUILD_ID
+          test -f apps/web/.next/prerender-manifest.json
+          echo "BUILD_ID=$(cat apps/web/.next/BUILD_ID)"
+          rm -rf apps/web/.next/cache
+          tar -C apps/web -czf /tmp/daibilet-web-next.tgz .next
+          ls -lh /tmp/daibilet-web-next.tgz
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-next-${{ steps.meta.outputs.short }}
+          path: /tmp/daibilet-web-next.tgz
+          retention-days: 7
+
+      - name: Swap on MSK
+        if: ${{ inputs.skip_swap != true }}
+        env:
+          MSK_SSH_HOST: ${{ secrets.MSK_SSH_HOST }}
+          MSK_SSH_USER: ${{ secrets.MSK_SSH_USER }}
+          MSK_SSH_KEY: ${{ secrets.MSK_SSH_KEY }}
+          DEPLOY_SHA: ${{ steps.meta.outputs.sha }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${MSK_SSH_HOST:-}" || -z "${MSK_SSH_USER:-}" || -z "${MSK_SSH_KEY:-}" ]]; then
+            echo "ERROR: set secrets MSK_SSH_HOST, MSK_SSH_USER, MSK_SSH_KEY"
+            exit 2
+          fi
+          install -d -m 700 "$HOME/.ssh"
+          install -m 600 /dev/null "$HOME/.ssh/msk_key"
+          printf '%s\n' "$MSK_SSH_KEY" > "$HOME/.ssh/msk_key"
+          SSH=(ssh -i "$HOME/.ssh/msk_key" -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o BatchMode=yes)
+          SCP=(scp -i "$HOME/.ssh/msk_key" -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o BatchMode=yes)
+          REMOTE_TGZ="/tmp/daibilet-web-next-${DEPLOY_SHA}.tgz"
+          "${SCP[@]}" /tmp/daibilet-web-next.tgz "${MSK_SSH_USER}@${MSK_SSH_HOST}:${REMOTE_TGZ}"
+          "${SSH[@]}" "${MSK_SSH_USER}@${MSK_SSH_HOST}" \
+            "cd /opt/daibilet && git fetch origin feat/next-monorepo && \
+             git checkout feat/next-monorepo && git reset --hard origin/feat/next-monorepo && \
+             ARTIFACT=${REMOTE_TGZ} GIT_SHA=${DEPLOY_SHA} BRANCH=feat/next-monorepo \
+             bash ./deploy/scripts/swap-web-next-artifact.sh && rm -f ${REMOTE_TGZ}"
