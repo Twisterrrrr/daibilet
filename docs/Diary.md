@@ -13,6 +13,9 @@
 ### Проблемы
 - Нет (покрытие 65/65 по live API slugs, unit test).
 
+### Live
+- Commit `b17c53a`; MSK **BUILD_ID=`XqE2Bn0VE2kfPHTvm6z82`**; `/cities` 200; HTML `data-cities-map-pins="65"`.
+
 ---
 
 ## 2026-08-06 - Suburbs cards: hanging nums + anno-size text

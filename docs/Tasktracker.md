@@ -51,7 +51,7 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| FIX.CITIES-MAP-ALL | OSM `/cities`: все live cities (не hardcoded top-11); coords lib + pins=destinations | Высокий | 🔄 commit+deploy |
+| FIX.CITIES-MAP-ALL | OSM `/cities`: все live cities (не hardcoded top-11); coords lib + pins=destinations | Высокий | ✅ `b17c53a`; MSK BUILD_ID=`XqE2Bn0VE2kfPHTvm6z82`; live `data-cities-map-pins=65` |
 
 ## `/cities` map event counts (2026-08-06)
 
