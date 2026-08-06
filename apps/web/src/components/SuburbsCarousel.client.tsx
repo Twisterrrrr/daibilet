@@ -34,9 +34,10 @@ export type SuburbsCarouselProps = {
 
 /**
  * Significant-suburbs rail: one suburb vector per snap slide.
- * Hub: desktop arrows + dots; mobile swipe; title = name, subtitle = vector;
- * mobile collapses essay/gastro/POI descs behind «Ещё».
- * Compact (my-day): arrows primary (loop), optional swipe; CTA under point list.
+ * Hub: desktop arrows (equal side gutters); mobile swipe + dots; title = name,
+ * subtitle = vector; mobile collapses essay/gastro/POI descs behind «Ещё».
+ * Compact (my-day): arrows primary (loop) all breakpoints, no pager dots;
+ * desktop CTA on title row; mobile CTA under point list.
  * Bulk «В маршрут» adds all nested points of the active slide.
  */
 export function SuburbsCarousel({
@@ -148,9 +149,11 @@ export function SuburbsCarousel({
   if (!places.length) return null;
 
   // Compact (my-day): arrows on all breakpoints. Hub: md+ only.
+  // Gutters = 3rem; arrow w-10 at inset 0.25rem → equal 0.25rem gap content↔arrow each side.
   const arrowClass = compact
     ? 'absolute top-1/2 z-10 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200/90 bg-white/95 text-slate-700 shadow-md backdrop-blur transition-[opacity,colors] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:ring-offset-2'
     : 'absolute top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200/90 bg-white/95 text-slate-700 shadow-md backdrop-blur transition-[opacity,colors] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:ring-offset-2 md:inline-flex';
+  const railGutterClass = compact ? 'px-12' : 'md:px-12';
 
   return (
     <div className={className} data-city-significant-suburbs>
@@ -168,19 +171,20 @@ export function SuburbsCarousel({
           Поездка на день рядом с городом - отдельные мини-локации и точки внутри них.
         </p>
       ) : null}
-      {/* One suburb per snap screen; compact cards leave side margin so arrows stay clear. */}
+      {/* Symmetric side gutters for arrows; rail is full width inside gutter. */}
       <div className={compact ? 'relative mt-4' : 'relative mt-5'}>
-        <div
-          ref={railRef}
-          className={
-            compact
-              ? 'horizontal-snap-row flex flex-nowrap gap-3 touch-pan-x snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
-              : 'horizontal-snap-row flex flex-nowrap gap-3 touch-pan-x snap-x snap-mandatory md:gap-4 md:[scrollbar-width:none] md:[&::-webkit-scrollbar]:hidden'
-          }
-          data-city-suburb-rail
-          aria-label={`Значимые пригороды ${cityGenitive}`}
-          tabIndex={0}
-        >
+        <div className={railGutterClass}>
+          <div
+            ref={railRef}
+            className={
+              compact
+                ? 'horizontal-snap-row flex flex-nowrap gap-0 touch-pan-x snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
+                : 'horizontal-snap-row flex flex-nowrap gap-3 touch-pan-x snap-x snap-mandatory md:gap-0 md:[scrollbar-width:none] md:[&::-webkit-scrollbar]:hidden'
+            }
+            data-city-suburb-rail
+            aria-label={`Значимые пригороды ${cityGenitive}`}
+            tabIndex={0}
+          >
           {places.map((place, index) => {
             const placeHref = resolveCityPlaceTitleHref(place, venues);
             const dayRouteItem = dayRouteItemFromMustSee(place, venues, city, { isSuburb: true });
@@ -221,7 +225,7 @@ export function SuburbsCarousel({
             const vectorTitle = place.travelVector
               ? `${place.travelVector}${place.stationHub ? ` - ${place.stationHub}` : ''}`
               : '';
-            const bulkCta =
+            const renderBulkCta = () =>
               bulkVenues.length > 0 ? (
                 <AddManyToDayRouteButton
                   compact
@@ -229,37 +233,45 @@ export function SuburbsCarousel({
                   venues={bulkVenues}
                 />
               ) : null;
+            const hasBulkCta = bulkVenues.length > 0;
 
             if (compact) {
               return (
                 <article
                   key={`${place.name}:${index}`}
-                  className="mx-8 flex w-[min(85%,32rem)] shrink-0 snap-start flex-col rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 md:mx-12 md:w-[calc(100%-6rem)]"
+                  className="flex w-full shrink-0 snap-start flex-col rounded-2xl border border-slate-200 bg-white p-4 sm:p-5"
                   data-city-suburb-card
                   data-city-suburb-compact
                   aria-label={`${index + 1} из ${places.length}: ${place.name}`}
                 >
-                  {/* Header: [number] [LARGE name]; vector as subtitle. CTA at bottom. */}
+                  {/* Header: [number] [LARGE name] [desktop CTA]; vector subtitle. */}
                   <div className="flex items-start gap-2.5 sm:gap-3">
                     <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-50 text-sm font-bold leading-none text-primary-700">
                       {index + 1}
                     </span>
                     <div className="min-w-0 flex-1">
-                      <h3
-                        className="break-words text-xl font-bold leading-snug text-slate-950 sm:text-2xl"
-                        data-city-suburb-title
-                      >
-                        {placeHref ? (
-                          <Link
-                            href={placeHref}
-                            className="underline decoration-slate-300 underline-offset-2 hover:decoration-current"
-                          >
-                            {place.name}
-                          </Link>
-                        ) : (
-                          place.name
-                        )}
-                      </h3>
+                      <div className="flex flex-wrap items-start gap-x-2 gap-y-1.5">
+                        <h3
+                          className="min-w-0 flex-1 break-words text-xl font-bold leading-snug text-slate-950 sm:text-2xl"
+                          data-city-suburb-title
+                        >
+                          {placeHref ? (
+                            <Link
+                              href={placeHref}
+                              className="underline decoration-slate-300 underline-offset-2 hover:decoration-current"
+                            >
+                              {place.name}
+                            </Link>
+                          ) : (
+                            place.name
+                          )}
+                        </h3>
+                        {hasBulkCta ? (
+                          <div className="hidden shrink-0 md:block" data-city-suburb-cta-header>
+                            {renderBulkCta()}
+                          </div>
+                        ) : null}
+                      </div>
                       {vectorTitle ? (
                         <p
                           className="mt-1 text-sm leading-5 text-slate-600"
@@ -298,9 +310,12 @@ export function SuburbsCarousel({
                       })}
                     </ol>
                   ) : null}
-                  {bulkCta ? (
-                    <div className="mt-3 flex justify-end border-t border-slate-100 pt-3">
-                      {bulkCta}
+                  {hasBulkCta ? (
+                    <div
+                      className="mt-3 flex justify-end border-t border-slate-100 pt-3 md:hidden"
+                      data-city-suburb-cta-footer
+                    >
+                      {renderBulkCta()}
                     </div>
                   ) : null}
                 </article>
@@ -401,7 +416,7 @@ export function SuburbsCarousel({
             return (
               <article
                 key={`${place.name}:${index}`}
-                className={`flex w-[min(92%,36rem)] shrink-0 snap-start flex-col rounded-2xl border p-4 sm:p-5 md:w-[calc(100%-0.25rem)] ${
+                className={`flex w-[min(92%,36rem)] shrink-0 snap-start flex-col rounded-2xl border p-4 sm:p-5 md:w-full ${
                   editorial ? 'border-zinc-200 bg-white' : 'border-slate-200 bg-white'
                 }`}
                 data-city-suburb-card
@@ -422,7 +437,7 @@ export function SuburbsCarousel({
                       <h3 className={`${hubNameClass} min-w-0 flex-1 break-words`} data-city-suburb-title>
                         {nameHeading}
                       </h3>
-                      {bulkCta ? <div className="shrink-0">{bulkCta}</div> : null}
+                      {hasBulkCta ? <div className="shrink-0">{renderBulkCta()}</div> : null}
                     </div>
                     {vectorTitle ? (
                       <p
@@ -484,6 +499,7 @@ export function SuburbsCarousel({
               </article>
             );
           })}
+          </div>
         </div>
         <button
           type="button"
@@ -522,9 +538,10 @@ export function SuburbsCarousel({
           <ArrowRight className="h-5 w-5" aria-hidden />
         </button>
       </div>
-      {places.length > 1 ? (
+      {/* Compact: arrows on all breakpoints - no pager. Hub: mobile-only (no arrows below md). */}
+      {!compact && places.length > 1 ? (
         <div
-          className={`mt-3 flex items-center justify-center ${compact ? 'gap-1' : 'gap-1.5'}`}
+          className="mt-3 flex items-center justify-center gap-1.5 md:hidden"
           data-city-suburb-dots
           role="tablist"
           aria-label="Страницы пригородов"
@@ -537,14 +554,10 @@ export function SuburbsCarousel({
               aria-selected={activeIndex === index}
               aria-label={`${place.name} (${index + 1} из ${places.length})`}
               onClick={() => goToIndex(index)}
-              className={`rounded-full transition-[width,background-color] ${
-                compact ? 'h-1.5' : 'h-2'
-              } ${
+              className={`h-2 rounded-full transition-[width,background-color] ${
                 activeIndex === index
-                  ? `${editorial ? 'bg-zinc-800' : 'bg-primary-600'} ${compact ? 'w-3.5' : 'w-5'}`
-                  : `${editorial ? 'bg-zinc-300 hover:bg-zinc-400' : 'bg-slate-300 hover:bg-slate-400'} ${
-                      compact ? 'w-1.5' : 'w-2'
-                    }`
+                  ? `${editorial ? 'bg-zinc-800' : 'bg-primary-600'} w-5`
+                  : `${editorial ? 'bg-zinc-300 hover:bg-zinc-400' : 'bg-slate-300 hover:bg-slate-400'} w-2`
               }`}
             />
           ))}
