@@ -175,6 +175,8 @@ type DayRouteAccordionId = 'mustSee' | 'text' | 'matches';
 type DayRouteStopViewMode = 'grid' | 'list';
 
 const DAY_ROUTE_STOP_VIEW_KEY = 'daibilet:dayRouteStopView';
+/** Owner 2026-08-06: post-buy modal «Оформили билет?» off until UX revisit. Buy links still open. */
+const SHOW_DAY_TICKET_HANDOFF_MODAL = false;
 
 function readStopViewMode(): DayRouteStopViewMode {
   if (typeof window === 'undefined') return 'grid';
