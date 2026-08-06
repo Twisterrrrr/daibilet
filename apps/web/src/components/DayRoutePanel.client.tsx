@@ -399,12 +399,22 @@ function DayRoutePanelInner() {
   /** Desktop (≥lg) can pick grid/list; mobile always dense list (no density toggle). */
   const [isLgUp, setIsLgUp] = useState(false);
   const listRootRef = useRef<HTMLDivElement | null>(null);
-  /** After external «Купить билет» - ask guest to mark bought. */
-  const [ticketHandoff, setTicketHandoff] = useState<{
+  /** After external «Купить билет» - ask guest to mark bought (gated by SHOW_DAY_TICKET_HANDOFF_MODAL). */
+  const [ticketHandoff, setTicketHandoffState] = useState<{
     venueId: string;
     ticketUrl: string;
     title: string;
   } | null>(null);
+  const setTicketHandoff = (
+    next: {
+      venueId: string;
+      ticketUrl: string;
+      title: string;
+    } | null,
+  ) => {
+    if (!SHOW_DAY_TICKET_HANDOFF_MODAL && next !== null) return;
+    setTicketHandoffState(next);
+  };
   /** Show-ticket modal: real QR only when ticketQrData exists; else stub. */
   const [ticketView, setTicketView] = useState<{
     venueId: string;
@@ -4023,7 +4033,7 @@ function DayRoutePanelInner() {
           document.body,
         )
       : null}
-    {ticketHandoff ? (
+    {SHOW_DAY_TICKET_HANDOFF_MODAL && ticketHandoff ? (
       <div
         className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 p-4 sm:items-center print:hidden"
         role="dialog"
@@ -4419,11 +4429,12 @@ function DayRouteVenueCard({
    * Offer chips: always after the place/actions cluster (no ml-auto / justify-end gap).
    * List lg+: same row, immediately after maps/X. Grid + list mobile: full-width row below.
    * Sibling of place/meta (not inside its wrap) so chips never overlay ~time/km.
+   * Full-width below: justify-center so stacked offer pills sit in the middle (not left + empty right).
    */
   const commerceRail =
     ticketUrl || nearbyUpsells.length > 0 ? (
       <div
-        className="flex w-full min-w-0 flex-row flex-wrap items-center justify-start gap-1.5 lg:w-auto lg:max-w-[min(100%,28rem)] lg:shrink-0 lg:self-center"
+        className="flex w-full min-w-0 flex-row flex-wrap items-center justify-center gap-1.5 lg:w-auto lg:max-w-[min(100%,28rem)] lg:shrink-0 lg:self-center"
         data-day-stop-commerce
       >
         {ticketUrl ? (

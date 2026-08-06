@@ -1,3 +1,17 @@
+## 2026-08-06 - My-day: выключили модалку «Оформили билет?»
+
+### Наблюдения
+- Owner: уведомление/модалку «Оформили билет?» пока лучше убрать (раньше clarification был «не убирать» - пересмотр UX).
+- Flow покупки: `<a target=_blank>` / `window.open(ticketUrl)` остаются; модалка только handoff после клика.
+
+### Решения
+- `DayRoutePanel.client.tsx`: флаг `SHOW_DAY_TICKET_HANDOFF_MODAL = false` + gated `setTicketHandoff` и render. Код модалки сохранён для возврата.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-06 - `/venues`+`/locations`: faster first list + drop secondary filters
 
 ### Наблюдения
