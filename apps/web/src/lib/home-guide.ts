@@ -1,5 +1,4 @@
 import { landingCategoryHref } from '@/lib/landing-routes';
-import { CANONICAL_LANDING_SLUGS } from '@/lib/landing-constants';
 import { buildCatalogHref } from '@/lib/catalog-url';
 import { formatPriceFrom } from '@/lib/format';
 import {
@@ -41,6 +40,7 @@ export type HomeGuideChip = {
   /** Lucide icon key resolved in UI. */
   icon:
     | 'mic'
+    | 'music'
     | 'ship'
     | 'map'
     | 'calendar'
@@ -54,7 +54,7 @@ export type HomeGuideChip = {
   desktopOnly?: boolean;
 };
 
-/** Horizontal stories under mobile header. */
+/** Horizontal quick links under mobile header (no river - owner 2026-08-06). */
 export const HOME_STORIES: HomeGuideChip[] = [
   {
     id: 'top-podborki',
@@ -69,16 +69,20 @@ export const HOME_STORIES: HomeGuideChip[] = [
     icon: 'calendar',
   },
   {
-    id: 'river',
-    label: 'Реки и каналы!',
-    href: landingCategoryHref(CANONICAL_LANDING_SLUGS.river),
-    icon: 'ship',
-  },
-  {
     id: 'free',
     label: 'Бесплатно',
     href: buildCatalogHref({ minPrice: 0, maxPrice: 0, sort: 'popular' }),
     icon: 'gift',
+  },
+];
+
+/** Mobile vertical category CTAs (stacked - not a horizontal chip row). */
+export const HOME_MOBILE_CATEGORY_STACK: HomeGuideChip[] = [
+  {
+    id: 'concerts',
+    label: 'Концерты',
+    href: landingCategoryHref('concerts-genre'),
+    icon: 'music',
   },
   {
     id: 'standup',
@@ -101,12 +105,6 @@ export const HOME_CATEGORY_CHIPS: HomeGuideChip[] = [
     label: 'Стендап',
     href: buildCatalogHref({ q: 'стендап', sort: 'popular' }),
     icon: 'mic',
-  },
-  {
-    id: 'river',
-    label: 'Реки и каналы!',
-    href: landingCategoryHref(CANONICAL_LANDING_SLUGS.river),
-    icon: 'ship',
   },
   {
     id: 'excursions',

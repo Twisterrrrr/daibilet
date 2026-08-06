@@ -1,3 +1,19 @@
+## 2026-08-06 - Home mobile polish + My Day banner
+
+### Наблюдения
+- Owner: noisy Instagram-style quick chips; «Реки и каналы!» лишний; города ~36vw слишком узкие для названия; Концерт/Стендап/Экскурсии в строку на мобилке; нужен My Day CTA после городов (не в hero).
+
+### Решения
+- `HomeStoriesStrip`: quiet white pills + primary-50 icon (без gradient ring); chips = Топ-подборки / Сегодня / Бесплатно; river убран из `HOME_STORIES` и `HOME_CATEGORY_CHIPS`.
+- Города: `42vw` / max `152px`; hubTags `flex-col` на mobile.
+- `HomeCategoryStack`: Концерты / Стендап / Экскурсии столбиком перед афишей (lg:hidden).
+- `HomeMyDayBanner` после «Популярные города»: headline с `inCityPrepositional`, fallback Москва, CTA «Давай попробуем» → `buildMyDayHref`.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-06 - OSM: снова убрали UA-флаг Leaflet с `/cities`
 
 ### Наблюдения

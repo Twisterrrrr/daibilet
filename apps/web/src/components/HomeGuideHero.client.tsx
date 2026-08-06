@@ -18,6 +18,7 @@ import {
   Map as MapIcon,
   MapPin,
   Mic2,
+  Music2,
   Route,
   Ship,
   Sparkles,
@@ -40,6 +41,7 @@ import { filterSessionsByCity } from '@/lib/landing-city';
 
 const ICON_MAP: Record<HomeGuideChip['icon'], LucideIcon> = {
   mic: Mic2,
+  music: Music2,
   ship: Ship,
   map: MapIcon,
   calendar: CalendarDays,

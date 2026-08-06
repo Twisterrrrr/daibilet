@@ -4,8 +4,10 @@ import { ArrowRight, Dices } from 'lucide-react';
 
 import { CityCard } from '@/components/CityCard';
 import { HomeBottomNav } from '@/components/HomeBottomNav.client';
+import { HomeCategoryStack } from '@/components/HomeCategoryStack.client';
 import { HomeGuideEvents } from '@/components/HomeGuideEvents.client';
 import { HomeHero } from '@/components/HomeHero.client';
+import { HomeMyDayBanner } from '@/components/HomeMyDayBanner.client';
 import { HomePageSkeleton } from '@/components/HomePageSkeleton';
 import { HomeStoriesStrip } from '@/components/HomeStoriesStrip.client';
 import { LuckyCityButton } from '@/components/LuckyCityButton.client';
@@ -105,7 +107,7 @@ async function HomePageBody() {
               {topCities.map((city) => (
                 <div
                   key={city.slug || city.name}
-                  className="w-[min(36vw,132px)] shrink-0 snap-start"
+                  className="w-[min(42vw,152px)] shrink-0 snap-start"
                   data-rail-item
                 >
                   <CityCard city={city} />
@@ -122,6 +124,12 @@ async function HomePageBody() {
           </div>
         </section>
       ) : null}
+
+      {/* My Day CTA - after cities, not in hero */}
+      <HomeMyDayBanner />
+
+      {/* Mobile: Концерты / Стендап / Экскурсии stacked near afisha */}
+      <HomeCategoryStack />
 
       {/* 3. Top events */}
       <HomeGuideEvents
