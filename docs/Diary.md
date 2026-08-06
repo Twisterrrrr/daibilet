@@ -1,3 +1,18 @@
+## 2026-08-06 - My Day grid offers: compact shell + «Билеты от» + inline Поблизости
+
+### Наблюдения
+- Owner: «Афиша» → «Билеты от N ₽»; shell тянулся из-за items-stretch/flex-1; nearby лейбл отдельно + w-full пилюли.
+
+### Решения
+- Venue CTA: «Билеты от N ₽».
+- Grid: items-start, shell без flex-1/h-full.
+- Nearby: «Поблизости» + hug links в одном flex-wrap ряду.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-06 - Blog: hide «Хаб Регионы» CTA
 
 ### Наблюдения

@@ -3043,7 +3043,7 @@ function DayRoutePanelInner() {
               <ul
                 className={
                   effectiveStopViewMode === 'grid'
-                    ? 'grid w-full grid-cols-1 items-stretch gap-1.5 sm:grid-cols-2 lg:grid-cols-3'
+                    ? 'grid w-full grid-cols-1 items-start gap-1.5 sm:grid-cols-2 lg:grid-cols-3'
                     : 'grid w-full grid-cols-1 items-start gap-0'
                 }
                 data-day-plan-list="purchased"
@@ -3097,7 +3097,7 @@ function DayRoutePanelInner() {
             <ul
               className={
                 effectiveStopViewMode === 'grid'
-                  ? 'grid w-full grid-cols-1 items-stretch gap-1.5 sm:grid-cols-2 lg:grid-cols-3'
+                  ? 'grid w-full grid-cols-1 items-start gap-1.5 sm:grid-cols-2 lg:grid-cols-3'
                   : 'grid w-full grid-cols-1 items-start gap-0'
               }
               data-day-plan-list="plans"
@@ -3210,7 +3210,7 @@ function DayRoutePanelInner() {
               <ul
                 className={
                   effectiveStopViewMode === 'grid'
-                    ? 'grid w-full grid-cols-1 items-stretch gap-1.5 sm:grid-cols-2 lg:grid-cols-3'
+                    ? 'grid w-full grid-cols-1 items-start gap-1.5 sm:grid-cols-2 lg:grid-cols-3'
                     : 'grid w-full grid-cols-1 items-start gap-0'
                 }
                 data-day-plan-list="overflow"
@@ -4431,113 +4431,101 @@ function DayRouteVenueCard({
 
   /**
    * Offer chips: always after the place/actions cluster (no ml-auto / justify-end gap).
-   * List lg+: same row, immediately after maps/X. Grid + list mobile: full-width row below.
-   * Sibling of place/meta (not inside its wrap) so chips never overlay ~time/km.
-   * Full-width below: justify-center so stacked offer pills sit in the middle (not left + empty right).
-   * Venue-bound (place + attached event, no clock): link to venue page + «от N ₽», not event buy.
+   * List lg+: same row, immediately after maps/X. Grid + list mobile: below card shell.
+   * Venue-bound: «Билеты от N ₽» → venue page. Nearby: «Поблизости» + hug-content links (wrap).
    */
   const venueBound = dayRouteOfferIsVenueBound(venue);
   const venueBoundPrice = dayRouteVenueBoundPriceLabel(venue);
   const showVenueBoundCta = venueBound && Boolean(href);
   const showTicketBuy = Boolean(ticketUrl) && !showVenueBoundCta;
   const showNearbyOffers = nearbyUpsells.length > 0;
-  const nearbyAsStack = nearbyUpsells.length >= 2;
+  const venueTicketsLabel = venueBoundPrice ? `Билеты ${venueBoundPrice}` : 'Билеты';
   const commerceRail =
     showTicketBuy || showVenueBoundCta || showNearbyOffers ? (
       <div
-        className={`flex w-full min-w-0 flex-col gap-1 ${
+        className={`flex w-full min-w-0 flex-col items-center gap-1 ${
           variant === 'list'
-            ? 'lg:w-auto lg:max-w-[min(100%,28rem)] lg:shrink-0 lg:self-center'
+            ? 'lg:w-auto lg:max-w-[min(100%,28rem)] lg:shrink-0 lg:self-center lg:items-start'
             : ''
         }`}
         data-day-stop-commerce
         data-day-stop-venue-bound={showVenueBoundCta ? '1' : undefined}
       >
-        {showNearbyOffers ? (
-          <p
-            className="m-0 text-center text-[10px] font-semibold uppercase tracking-wide text-slate-500"
-            data-day-stop-offers-label
+        {showVenueBoundCta ? (
+          <Link
+            href={href!}
+            data-day-stop-venue-affiche
+            aria-label={
+              venueBoundPrice
+                ? `Билеты на площадке ${venue.title}, ${venueBoundPrice}`
+                : `Билеты на площадке ${venue.title}`
+            }
+            title={venueTicketsLabel}
+            className="inline-flex w-auto max-w-full items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-800 hover:bg-slate-100"
           >
-            События поблизости
-          </p>
+            <Ticket className="h-3.5 w-3.5 shrink-0" aria-hidden />
+            <span className="min-w-0 truncate leading-snug">{venueTicketsLabel}</span>
+          </Link>
         ) : null}
-        <div
-          className={`flex w-full min-w-0 items-center justify-center gap-1.5 ${
-            nearbyAsStack ? 'flex-col' : 'flex-row flex-wrap'
-          }`}
-        >
-          {showVenueBoundCta ? (
-            <Link
-              href={href!}
-              data-day-stop-venue-affiche
-              aria-label={
-                venueBoundPrice
-                  ? `Афиша площадки ${venue.title}, ${venueBoundPrice}`
-                  : `Афиша площадки ${venue.title}`
-              }
-              title={venueBoundPrice ? `Афиша · ${venueBoundPrice}` : 'Афиша площадки'}
-              className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-800 hover:bg-slate-100"
+        {showTicketBuy && ticketUrl ? (
+          <a
+            href={ticketUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-day-buy-ticket
+            aria-label={`${buyCtaLabel}: ${buyOfferChip.title}`}
+            title={buyOfferChip.label}
+            onClick={() => onBuyClick(ticketUrl)}
+            className="inline-flex w-auto max-w-full items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-900 hover:bg-amber-100"
+          >
+            <Ticket className="h-3.5 w-3.5 shrink-0" aria-hidden />
+            <span className="min-w-0 truncate leading-snug">{buyOfferChip.title}</span>
+            {buyOfferChip.price ? (
+              <span className="shrink-0 whitespace-nowrap tabular-nums text-amber-800">
+                · {buyOfferChip.price}
+              </span>
+            ) : null}
+          </a>
+        ) : null}
+        {showNearbyOffers ? (
+          <div
+            className="flex max-w-full flex-wrap items-center justify-center gap-x-1.5 gap-y-1"
+            data-day-stop-nearby-row
+          >
+            <span
+              className="shrink-0 text-[10px] font-semibold uppercase tracking-wide text-slate-500"
+              data-day-stop-offers-label
             >
-              <Ticket className="h-3.5 w-3.5 shrink-0" aria-hidden />
-              <span className="min-w-0 truncate leading-snug">Афиша</span>
-              {venueBoundPrice ? (
-                <span className="shrink-0 whitespace-nowrap tabular-nums text-amber-800">
-                  · {venueBoundPrice}
-                </span>
-              ) : null}
-            </Link>
-          ) : null}
-          {showTicketBuy && ticketUrl ? (
-            <a
-              href={ticketUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              data-day-buy-ticket
-              aria-label={`${buyCtaLabel}: ${buyOfferChip.title}`}
-              title={buyOfferChip.label}
-              onClick={() => onBuyClick(ticketUrl)}
-              className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-900 hover:bg-amber-100"
-            >
-              <Ticket className="h-3.5 w-3.5 shrink-0" aria-hidden />
-              <span className="min-w-0 truncate leading-snug">{buyOfferChip.title}</span>
-              {buyOfferChip.price ? (
-                <span className="shrink-0 whitespace-nowrap tabular-nums text-amber-800">
-                  · {buyOfferChip.price}
-                </span>
-              ) : null}
-            </a>
-          ) : null}
-          {showNearbyOffers
-            ? nearbyUpsells.map((u) => {
-                const offerChip = formatDayRouteOfferChip({
-                  title: resolveDayRouteOfferTitle(u.title, u.line, venue.title),
-                  priceFromRub: u.priceFromRub,
-                  fallbackTitle: venue.title,
-                });
-                return (
-                  <a
-                    key={u.eventId}
-                    href={u.ticketUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    data-day-stop-event-pick={u.eventId}
-                    onClick={() => onBuyClick(u.ticketUrl)}
-                    className={`inline-flex max-w-full items-center gap-1 rounded-full border border-primary-100 bg-primary-50/70 px-2.5 py-1 text-[11px] font-medium text-primary-800 hover:bg-primary-50 ${
-                      nearbyAsStack ? 'w-full justify-center' : ''
-                    }`}
-                    title={u.line}
-                  >
-                    <span className="min-w-0 truncate leading-snug">{offerChip.title}</span>
-                    {offerChip.price ? (
-                      <span className="shrink-0 whitespace-nowrap tabular-nums text-amber-800">
-                        · {offerChip.price}
-                      </span>
-                    ) : null}
-                  </a>
-                );
-              })
-            : null}
-        </div>
+              Поблизости
+            </span>
+            {nearbyUpsells.map((u) => {
+              const offerChip = formatDayRouteOfferChip({
+                title: resolveDayRouteOfferTitle(u.title, u.line, venue.title),
+                priceFromRub: u.priceFromRub,
+                fallbackTitle: venue.title,
+              });
+              return (
+                <a
+                  key={u.eventId}
+                  href={u.ticketUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-day-stop-event-pick={u.eventId}
+                  onClick={() => onBuyClick(u.ticketUrl)}
+                  className="inline-flex w-auto max-w-full items-center gap-1 rounded-full border border-primary-100 bg-primary-50/70 px-2.5 py-1 text-[11px] font-medium text-primary-800 hover:bg-primary-50"
+                  title={u.line}
+                >
+                  <span className="min-w-0 truncate leading-snug">{offerChip.title}</span>
+                  {offerChip.price ? (
+                    <span className="shrink-0 whitespace-nowrap tabular-nums text-amber-800">
+                      · {offerChip.price}
+                    </span>
+                  ) : null}
+                </a>
+              );
+            })}
+          </div>
+        ) : null}
       </div>
     ) : null;
 
@@ -4687,7 +4675,7 @@ function DayRouteVenueCard({
 
   return (
     <li
-      className="flex h-full w-full flex-col scroll-mt-4"
+      className="flex w-full flex-col scroll-mt-4"
       data-day-plan-stop={venue.id}
       data-day-stop-variant="grid"
       data-day-stop-layout="place-then-offers"
@@ -4698,11 +4686,11 @@ function DayRouteVenueCard({
       data-day-commerce={isCommerce ? '1' : '0'}
     >
       {/*
-        Grid cards live in sm:2 / lg:3 columns - too narrow for place|offers row.
-        Equal-height main place shell (items-stretch); offers full-width below (do not inflate shell).
+        Grid: shell = content height only (no flex-1 / stretch empty space).
+        Offers hug content under the card; long nearby links wrap to next line.
       */}
       <div
-        className={`flex min-h-0 flex-1 flex-col gap-2 rounded-2xl border bg-white px-2.5 py-2 sm:px-3 sm:py-2.5 ${
+        className={`flex flex-col gap-1.5 rounded-2xl border bg-white px-2.5 py-2 sm:px-3 sm:py-2 ${
           focused
             ? 'border-emerald-400 ring-1 ring-emerald-200'
             : purchased || isCommerce
@@ -4711,7 +4699,7 @@ function DayRouteVenueCard({
         }`}
         data-day-stop-shell
       >
-        <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
+        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           {reorderLocked ? (
             <div
               className="flex h-10 w-6 shrink-0 items-center justify-center text-slate-300"
