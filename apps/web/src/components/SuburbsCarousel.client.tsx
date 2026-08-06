@@ -8,12 +8,40 @@ import { AddManyToDayRouteButton } from '@/components/AddToDayRouteButton.client
 import { resolveCityPlaceTitleHref } from '@/lib/city-place-href';
 import type { CityMustSeeItem, CitySuburbItem } from '@/lib/cityInfo';
 import {
-  capitalizeSentenceStart,
   dayRouteHookLine,
   dayRouteItemFromMustSee,
   type DayRouteCityContext,
   type DayRouteVenueMatchSource,
 } from '@/lib/day-route-from-place';
+
+/** Nested POI line: bold place name + plain continuation after ` - `. */
+function SuburbPlaceLabel({
+  name,
+  href,
+  desc,
+}: {
+  name: string;
+  href: string | null;
+  desc: string;
+}) {
+  const nameNode = href ? (
+    <Link
+      href={href}
+      className="font-semibold underline decoration-slate-300 underline-offset-2 hover:decoration-current"
+    >
+      {name}
+    </Link>
+  ) : (
+    <span className="font-semibold">{name}</span>
+  );
+  if (!desc) return <>{nameNode}</>;
+  return (
+    <>
+      {nameNode}
+      <span className="font-normal">{` - ${desc}`}</span>
+    </>
+  );
+}
 
 export type SuburbsCarouselProps = {
   places: CitySuburbItem[];
@@ -299,19 +327,7 @@ export function SuburbsCarousel({
                                 {poiIndex + 1}.
                               </span>
                               <span className="min-w-0 text-sm leading-5 text-slate-600">
-                                {poiHref ? (
-                                  <Link
-                                    href={poiHref}
-                                    className="underline decoration-slate-300 underline-offset-2 hover:decoration-current"
-                                  >
-                                    {poi.name}
-                                  </Link>
-                                ) : (
-                                  poi.name
-                                )}
-                                {poiDesc ? (
-                                  <span>{` - ${capitalizeSentenceStart(poiDesc)}`}</span>
-                                ) : null}
+                                <SuburbPlaceLabel name={poi.name} href={poiHref} desc={poiDesc} />
                               </span>
                             </li>
                           );
@@ -367,19 +383,7 @@ export function SuburbsCarousel({
                           {poiIndex + 1}.
                         </span>
                         <span className={`min-w-0 text-sm leading-5 ${poiTextClass}`}>
-                          {poiHref ? (
-                            <Link
-                              href={poiHref}
-                              className="underline decoration-slate-300 underline-offset-2 hover:decoration-current"
-                            >
-                              {poi.name}
-                            </Link>
-                          ) : (
-                            poi.name
-                          )}
-                          {poiDesc ? (
-                            <span>{` - ${capitalizeSentenceStart(poiDesc)}`}</span>
-                          ) : null}
+                          <SuburbPlaceLabel name={poi.name} href={poiHref} desc={poiDesc} />
                         </span>
                       </li>
                     );
