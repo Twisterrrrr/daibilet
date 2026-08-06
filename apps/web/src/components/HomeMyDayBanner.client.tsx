@@ -44,6 +44,37 @@ export function HomeMyDayBanner() {
             className="pointer-events-none absolute -bottom-12 left-8 h-32 w-32 rounded-full bg-white/10 blur-2xl"
             aria-hidden
           />
+          {/* Subtle map-route dots: dashed paths between pins, low-opacity so copy/CTA stay readable */}
+          <svg
+            className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.22]"
+            viewBox="0 0 640 220"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            preserveAspectRatio="xMidYMid slice"
+            aria-hidden
+          >
+            <path
+              d="M48 168 C120 40, 200 190, 280 78 C340 10, 400 150, 480 62 C540 12, 580 120, 620 88"
+              stroke="white"
+              strokeWidth="1.5"
+              strokeDasharray="5 7"
+              strokeLinecap="round"
+            />
+            <path
+              d="M20 90 C90 150, 150 30, 230 120 C300 190, 370 40, 450 110 C520 165, 570 50, 630 140"
+              stroke="white"
+              strokeWidth="1.25"
+              strokeDasharray="4 8"
+              strokeLinecap="round"
+              opacity="0.7"
+            />
+            <circle cx="48" cy="168" r="3.5" fill="white" />
+            <circle cx="280" cy="78" r="3" fill="white" />
+            <circle cx="480" cy="62" r="3.5" fill="white" />
+            <circle cx="620" cy="88" r="2.5" fill="white" />
+            <circle cx="230" cy="120" r="2.5" fill="white" opacity="0.85" />
+            <circle cx="450" cy="110" r="3" fill="white" opacity="0.85" />
+          </svg>
           <div className="relative z-[1] flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between sm:gap-8">
             <div className="min-w-0 max-w-xl">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide backdrop-blur-sm">
