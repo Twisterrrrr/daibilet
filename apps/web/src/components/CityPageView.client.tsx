@@ -1284,6 +1284,15 @@ function CitySightsMustSeeList({
   // With category tabs show the full filtered set; single-tab cities keep top-6.
   const visiblePlaces =
     filterMeta.tabs.length >= 2 ? filteredPlaces : filteredPlaces.slice(0, 6);
+  // <4 places: md+ fill width with a horizontal grid (2→2 cols, 3→3). Avoid 2-row
+  // column-flow carousel that stacks 1–3 cards in one narrow column with empty right side.
+  const sparseGrid = visiblePlaces.length > 0 && visiblePlaces.length < 4;
+  const sparseColsClass =
+    visiblePlaces.length <= 1
+      ? 'md:grid-cols-1 md:max-w-xl'
+      : visiblePlaces.length === 2
+        ? 'md:grid-cols-2'
+        : 'md:grid-cols-3';
 
   const railRef = React.useRef<HTMLDivElement>(null);
   const [canPrev, setCanPrev] = React.useState(false);
@@ -1313,7 +1322,7 @@ function CitySightsMustSeeList({
       window.removeEventListener('resize', syncRail);
       ro?.disconnect();
     };
-  }, [syncRail, activeId, visiblePlaces.length]);
+  }, [syncRail, activeId, visiblePlaces.length, sparseGrid]);
 
   const scrollPage = (dir: -1 | 1) => {
     const el = railRef.current;
@@ -1327,6 +1336,7 @@ function CitySightsMustSeeList({
 
   const arrowClass =
     'absolute top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200/90 bg-white/95 text-slate-700 shadow-md backdrop-blur transition-[opacity,colors] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:ring-offset-2 md:inline-flex';
+  const showRailArrows = !sparseGrid && hasOverflow;
 
   return (
     <>
@@ -1336,19 +1346,30 @@ function CitySightsMustSeeList({
         onChange={setFilterId}
         editorial={editorial}
       />
-      {/* Mobile: 1-card ~80/20 peek swipe. md+: 2-row columns + page prev/next (no scrollbar UX). */}
+      {/* Mobile: 1-card ~80/20 peek swipe. md+: sparse (<4) = width grid; ≥4 = 2-row carousel. */}
       <div className="relative mt-6">
         <div
           key={activeId}
           ref={railRef}
-          className="horizontal-snap-row flex flex-nowrap gap-2.5 touch-pan-x snap-x snap-mandatory md:block md:[scrollbar-width:none] md:[&::-webkit-scrollbar]:hidden"
+          className={
+            sparseGrid
+              ? 'horizontal-snap-row flex flex-nowrap gap-2.5 touch-pan-x snap-x snap-mandatory md:block md:overflow-visible'
+              : 'horizontal-snap-row flex flex-nowrap gap-2.5 touch-pan-x snap-x snap-mandatory md:block md:[scrollbar-width:none] md:[&::-webkit-scrollbar]:hidden'
+          }
           data-city-must-see-rail
+          data-city-must-see-layout={sparseGrid ? 'sparse-grid' : 'carousel'}
           aria-label="Главные места"
           tabIndex={0}
         >
-        {/* Mobile: contents hoists cards into the flex scrollport so % = viewport; md: 2-row grid. */}
-        {/* md: auto rows (not grid-rows-2=1fr) + items-start — иначе равная высота рядов даёт белую дыру между карточками. */}
-        <ol className="contents md:grid md:w-max md:auto-cols-[min(22rem,calc(50vw-3rem))] md:grid-flow-col md:grid-rows-[auto_auto] md:items-start md:gap-x-6 md:gap-y-5">
+        {/* Mobile: contents hoists cards into the flex scrollport so % = viewport. */}
+        {/* md sparse: N-col grid. md carousel: auto rows + flow-col (avoids equal-row white gap). */}
+        <ol
+          className={
+            sparseGrid
+              ? `contents md:grid md:w-full md:items-start md:gap-x-6 md:gap-y-5 ${sparseColsClass}`
+              : 'contents md:grid md:w-max md:auto-cols-[min(22rem,calc(50vw-3rem))] md:grid-flow-col md:grid-rows-[auto_auto] md:items-start md:gap-x-6 md:gap-y-5'
+          }
+        >
         {visiblePlaces.map((place, index) => {
           const afficheLink = matchSightAfficheLink({
             sightName: place.name,
@@ -1385,17 +1406,28 @@ function CitySightsMustSeeList({
                 {index + 1}
               </span>
               <div className="min-w-0 flex-1 pr-0.5">
-                {placeHref ? (
-                  <Link
-                    href={placeHref}
-                    className={`${titleClass} break-words underline decoration-slate-300 underline-offset-2 hover:decoration-current`}
-                    data-city-must-see-title
-                  >
-                    {place.name}
-                  </Link>
-                ) : (
-                  <div className={`${titleClass} break-words`}>{place.name}</div>
-                )}
+                <div className="flex flex-wrap items-start gap-x-2 gap-y-1.5">
+                  {placeHref ? (
+                    <Link
+                      href={placeHref}
+                      className={`${titleClass} min-w-0 flex-1 break-words underline decoration-slate-300 underline-offset-2 hover:decoration-current`}
+                      data-city-must-see-title
+                    >
+                      {place.name}
+                    </Link>
+                  ) : (
+                    <div className={`${titleClass} min-w-0 flex-1 break-words`}>{place.name}</div>
+                  )}
+                  {dayRouteItem ? (
+                    <div className="hidden shrink-0 md:block">
+                      <AddToDayRouteButton
+                        compact
+                        className="!min-h-9 !px-2.5 !py-1.5 !text-[11px]"
+                        venue={dayRouteItem}
+                      />
+                    </div>
+                  ) : null}
+                </div>
                 {blurb ? (
                   <p
                     className={`mt-1 text-sm leading-6 break-words ${
@@ -1412,11 +1444,13 @@ function CitySightsMustSeeList({
                 ) : null}
                 <div className="my-2.5 flex flex-wrap items-center gap-2">
                   {dayRouteItem ? (
-                    <AddToDayRouteButton
-                      compact
-                      className="!min-h-9 !px-2.5 !py-1.5 !text-[11px]"
-                      venue={dayRouteItem}
-                    />
+                    <div className="md:hidden">
+                      <AddToDayRouteButton
+                        compact
+                        className="!min-h-9 !px-2.5 !py-1.5 !text-[11px]"
+                        venue={dayRouteItem}
+                      />
+                    </div>
                   ) : null}
                   {afficheLink ? (
                     afficheLink.href.startsWith('#') ? (
@@ -1463,7 +1497,7 @@ function CitySightsMustSeeList({
           disabled={!canPrev}
           onClick={() => scrollPage(-1)}
           className={`${arrowClass} left-1 ${
-            hasOverflow
+            showRailArrows
               ? canPrev
                 ? 'opacity-100 hover:bg-white hover:text-slate-950'
                 : 'pointer-events-none opacity-40'
@@ -1481,7 +1515,7 @@ function CitySightsMustSeeList({
           disabled={!canNext}
           onClick={() => scrollPage(1)}
           className={`${arrowClass} right-1 ${
-            hasOverflow
+            showRailArrows
               ? canNext
                 ? 'opacity-100 hover:bg-white hover:text-slate-950'
                 : 'pointer-events-none opacity-40'
