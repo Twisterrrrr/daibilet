@@ -1,3 +1,20 @@
+## 2026-08-06 - City hub / podborki: Perm direction cards bleed (badge + images + copy)
+
+### Наблюдения
+- Owner на хабе Перми: на карточках направлений бейдж «Санкт-Петербург», одно и то же SPB-фото (Спас на Крови / `format-tours.jpg`) на экскурсиях / пеших / загородных / крышах, у rooftops subtitle про Москва-Сити.
+
+### Решения
+- `LandingCityBadge`: в city context бейдж = выбранный город; city-bound чужого города скрыт.
+- `resolveFeaturedDirections`: gate через `landingMatchesCatalogCity` (режет `country-tours` / `spb-yards` на Перми).
+- `landing-images`: уникальные обложки + override для `perm` (Кама / центр); fallback больше не `format-tours.jpg`.
+- `landing-rules` rooftops subtitle без Москва-Сити.
+- City hub `PopularDirections`: `showFilterCityBadge`.
+
+### Проблемы
+- cityInfo must-see Перми не трогали (параллельный агент).
+
+---
+
 ## 2026-08-06 - City hub must-see: sparse card width cap
 
 ### Наблюдения

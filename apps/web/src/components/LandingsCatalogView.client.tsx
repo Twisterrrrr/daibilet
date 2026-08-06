@@ -183,7 +183,7 @@ export function LandingsCatalogView({
 
   const featured = pickPodborkiFeatured(items);
   const trending = pickPodborkiTrending(items, featured?.slug, 3);
-  const featuredImage = featured ? resolveLandingCardImage(featured.slug) : null;
+  const featuredImage = featured ? resolveLandingCardImage(featured.slug, citySelected ? citySlug : null) : null;
   const featuredHref = featured
     ? landingCategoryHref(featured.slug, citySelected ? citySlug : undefined)
     : '/events';

@@ -17,9 +17,30 @@ const LANDING_CARD_IMAGES: Record<string, string> = {
   'concerts-genre': '/images/landings/concerts-genre.png',
   'moscow-museums': '/images/landings/moscow-museums.png',
   'active-sport': '/images/landings/active-sport.png',
+  rooftops: '/images/landings/rooftops.jpg',
+  'walking-tours': '/images/landings/walking-tours.jpg',
+  excursions: '/images/landings/excursions.jpg',
+  'country-tours': '/images/landings/country-tours.jpg',
 };
 
-export function resolveLandingCardImage(slug: string): string | null {
+const CITY_LANDING_CARD_IMAGES: Record<string, Partial<Record<string, string>>> = {
+  perm: {
+    'river-cruises': '/images/landings/perm/kama-embankment.jpg',
+    excursions: '/images/landings/perm/city-center.jpg',
+    'walking-tours': '/images/landings/perm/kama-embankment.jpg',
+    rooftops: '/images/landings/perm/kama-embankment.jpg',
+    'bus-tours': '/images/landings/perm/city-center.jpg',
+  },
+};
+
+export function resolveLandingCardImage(slug: string, citySlug?: string | null): string | null {
   const canonical = canonicalLandingSlug(slug);
+  const city = String(citySlug || '')
+    .trim()
+    .toLowerCase();
+  if (city) {
+    const override = CITY_LANDING_CARD_IMAGES[city]?.[canonical];
+    if (override) return override;
+  }
   return LANDING_CARD_IMAGES[canonical] || null;
 }

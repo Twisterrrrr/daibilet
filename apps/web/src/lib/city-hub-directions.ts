@@ -1,6 +1,6 @@
 import type { CityHubConfig, FeaturedDirectionConfig } from './city-hub-config.ts';
 import { normalizeCityHubSlug } from './city-hub-config.ts';
-import { landingCategoryHref } from './landing-routes.ts';
+import { landingCategoryHref, landingMatchesCatalogCity } from './landing-routes.ts';
 
 export type LandingLike = {
   slug: string;
@@ -99,6 +99,13 @@ function resolveCategoryDirection(
   };
 }
 
+function isLandingAllowedInCityHub(landingSlug: string, citySlug?: string | null): boolean {
+  if (!isWaterLandingAllowedForCity(landingSlug, citySlug)) return false;
+  if (!citySlug) return true;
+  // Bound (SPB yards / country-tours) + allowlist - same gate as /podborki city filter.
+  return landingMatchesCatalogCity(landingSlug, citySlug);
+}
+
 function resolveDirectionFromConfig(
   item: FeaturedDirectionConfig,
   landings: LandingLike[],
@@ -110,7 +117,7 @@ function resolveDirectionFromConfig(
     if (
       landing &&
       Number(landing.events) > 0 &&
-      isWaterLandingAllowedForCity(landing.slug, citySlug)
+      isLandingAllowedInCityHub(landing.slug, citySlug)
     ) {
       return {
         id: item.id,
@@ -175,7 +182,7 @@ export function resolveFeaturedDirections(input: {
 
   const landingFallback = input.landings
     .filter((landing) => Number(landing.events) > 0)
-    .filter((landing) => isWaterLandingAllowedForCity(landing.slug, input.citySlug))
+    .filter((landing) => isLandingAllowedInCityHub(landing.slug, input.citySlug))
     .filter((landing) => !usedLandingSlugs.has(landing.slug))
     .slice()
     .sort((a, b) => {
@@ -248,7 +255,7 @@ export function matchSightAfficheLink(input: {
     if (
       landing &&
       Number(landing.events) > 0 &&
-      isWaterLandingAllowedForCity(landing.slug, input.citySlug)
+      isLandingAllowedInCityHub(landing.slug, input.citySlug)
     ) {
       return {
         href: landingCategoryHref(landing.slug, input.citySlug),

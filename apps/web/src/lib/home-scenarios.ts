@@ -71,7 +71,8 @@ export function resolveHomePromoImage(slug: string, title?: string | null): stri
   for (const item of HOME_PROMO_IMAGES) {
     if (item.match.test(haystack)) return item.imageUrl;
   }
-  return '/images/home/format-tours.jpg';
+  // Neutral museums stock - not SPB Savior-on-Blood (`format-tours.jpg`).
+  return '/images/home/format-museums.jpg';
 }
 
 export const HOME_TRUST_ITEMS = [

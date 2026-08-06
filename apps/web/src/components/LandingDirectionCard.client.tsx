@@ -7,7 +7,11 @@ import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { formatPriceFrom, pluralEvents } from '@/lib/format';
 import { resolveLandingCityName } from '@/lib/landing-city';
 import { resolveLandingCardImage } from '@/lib/landing-images';
-import { landingCategoryHref, resolveLandingBoundCitySlug } from '@/lib/landing-routes';
+import {
+  landingCategoryHref,
+  normalizeKnownCitySlug,
+  resolveLandingBoundCitySlug,
+} from '@/lib/landing-routes';
 
 export type LandingDirectionCardItem = {
   slug: string;
@@ -84,11 +88,20 @@ function LandingCityBadge({
 }) {
   const boundSlug = resolveLandingBoundCitySlug(slug);
   const boundName = boundSlug ? resolveLandingCityName(boundSlug) : null;
-  const filterName =
-    !boundName && showFilterCityBadge && filterCitySlug && filterCitySlug !== 'all'
-      ? resolveLandingCityName(filterCitySlug)
-      : null;
-  const cityName = boundName || filterName;
+  const filterSlug =
+    filterCitySlug && filterCitySlug !== 'all' ? normalizeKnownCitySlug(filterCitySlug) : null;
+  const filterName = filterSlug
+    ? resolveLandingCityName(filterSlug) || resolveLandingCityName(filterCitySlug)
+    : null;
+  const inCityContext = Boolean(filterSlug && (showFilterCityBadge || filterName));
+
+  // City-bound landing in another city's hub/catalog - hide badge (card should be filtered out).
+  if (boundSlug && filterSlug && boundSlug !== filterSlug) {
+    return null;
+  }
+
+  // Prefer selected city for multi-city landings; keep permanent city for bound landings.
+  const cityName = boundName || (inCityContext ? filterName : null);
   if (!cityName) return null;
   return (
     <span className="inline-flex w-fit max-w-full items-center gap-1 rounded-full bg-white/85 px-2 py-0.5 text-[10px] font-semibold leading-none text-slate-900 shadow-sm backdrop-blur-md sm:px-2.5 sm:py-1 sm:text-[11px]">
@@ -138,15 +151,16 @@ export function LandingDirectionCard({
   featured?: boolean;
 }) {
   const emoji = LANDING_EMOJI[landing.slug] || '✨';
-  const imageUrl = resolveLandingCardImage(landing.slug);
-  const href = landingCategoryHref(landing.slug, citySlug && citySlug !== 'all' ? citySlug : undefined);
+  const contextCity = citySlug && citySlug !== 'all' ? citySlug : undefined;
+  const imageUrl = resolveLandingCardImage(landing.slug, contextCity);
+  const href = landingCategoryHref(landing.slug, contextCity);
   const hasPrice = typeof landing.priceFrom === 'number' && landing.priceFrom > 0;
   const priceLabel = hasPrice ? formatPriceFrom(landing.priceFrom) : formatLandingPriceBadge(landing.priceFrom);
   const cityBadge = (
     <LandingCityBadge
       slug={landing.slug}
       filterCitySlug={citySlug}
-      showFilterCityBadge={showFilterCityBadge}
+      showFilterCityBadge={showFilterCityBadge || Boolean(contextCity)}
     />
   );
 

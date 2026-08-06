@@ -1088,6 +1088,7 @@ function PopularDirections({
                 citySlug={citySlug}
                 variant="banner"
                 rank={index + 1}
+                showFilterCityBadge
               />
             ))}
           </div>

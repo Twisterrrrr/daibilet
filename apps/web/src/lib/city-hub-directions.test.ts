@@ -119,3 +119,25 @@ test('empty city landing counts are never shown as top-queries chips', () => {
   assert.equal(rows[0]?.slug, 'standup');
   assert.equal(rows[0]?.events, 12);
 });
+
+test('Perm hub hides SPB-only country-tours even with positive count', () => {
+  const rows = resolveFeaturedDirections({
+    config: null,
+    landings: [
+      { slug: 'country-tours', title: 'Загородные экскурсии', events: 14 },
+      { slug: 'spb-yards', title: 'Дворы', events: 9 },
+      { slug: 'excursions', title: 'Экскурсии', events: 11 },
+      { slug: 'walking-tours', title: 'Пешие экскурсии', events: 8 },
+      { slug: 'rooftops', title: 'Смотровые площадки и крыши', events: 3 },
+    ],
+    categories: [],
+    citySlug: 'perm',
+    limit: 8,
+  });
+
+  assert.equal(rows.some((row) => row.slug === 'country-tours'), false);
+  assert.equal(rows.some((row) => row.slug === 'spb-yards'), false);
+  assert.ok(rows.some((row) => row.slug === 'excursions'));
+  assert.ok(rows.some((row) => row.slug === 'walking-tours'));
+  assert.ok(rows.some((row) => row.slug === 'rooftops'));
+});
