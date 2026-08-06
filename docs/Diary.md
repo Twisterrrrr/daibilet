@@ -1,3 +1,21 @@
+## 2026-08-06 - `/cities` OSM map: «Скоро события» вместо счётчиков
+
+### Наблюдения
+- Пины `RussiaMap` всегда показывали «Скоро события», хотя карточки городов имели реальные `events` (Москва ~800+, СПб ~900+).
+- `CITY_PINS` используют SEO slug (`moscow`, `saint-petersburg`, `nizhny-novgorod`), а `/api/public/destinations` отдаёт DB/TEP slug (`moskva`, `sankt-peterburg`, `nizhniy-novgorod`). Lookup по exact slug давал 0.
+
+### Решения
+- `RussiaMap.client.tsx`: индекс events по raw slug + `normalizeCitySlug` + fallback по имени города.
+- SEO href пинов (`/cities/moscow` и т.п.) не трогали.
+
+### Проблемы
+- Параллельные MSK deploy после нашего build кратко гасили web (502); live tip `ee6fd749` включает фикс.
+
+### Live
+- Commit `3df066c` (в tip `ee6fd749`); MSK **BUILD_ID=`cr_HR-Mm4jbjC788zYriW`**; `/cities` 200; pin lookup: moscow 806, saint-petersburg 893, kazan 57.
+
+---
+
 ## 2026-08-06 - City hub must-see: sparse horizontal grid
 
 ### Наблюдения

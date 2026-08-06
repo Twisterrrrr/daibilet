@@ -21,6 +21,12 @@
 |---|--------|-----------|--------|
 | UX.MUSTSEE-SPARSE | City hub «Главные места»: при <4 местах md+ горизонтальный грид вместо узкой 2-row колонки | Высокий | ✅ `2519d5f`; MSK BUILD_ID=`cr_HR-Mm4jbjC788zYriW`; smoke `/cities/perm` 200 + `sparse-grid` |
 
+## `/cities` map event counts (2026-08-06)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| FIX.CITIES-MAP-COUNTS | OSM пины `/cities`: реальные `events` вместо «Скоро события» (slug alias SEO↔API) | Высокий | ✅ `3df066c`; MSK BUILD_ID=`cr_HR-Mm4jbjC788zYriW`; lookup moscow/spb/kazan >0 |
+
 ## `/cities` desktop redesign (2026-08-06)
 
 | # | Задача | Приоритет | Статус |
