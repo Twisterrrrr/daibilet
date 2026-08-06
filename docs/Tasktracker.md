@@ -9,6 +9,12 @@
 
 ---
 
+## Event hero venue badge link (2026-08-06)
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| UX.EVENT-VENUE-BADGE-LINK | Hero badge pin+название площадки → Link на `/venues`/`/locations` (как адрес при наличии slug) | Высокий | ✅ `9a9722a` MSK **BUILD_ID=`KqGMFbvqJXi3JrYxNtIje`** |
+
 ## Moskva-99 pier title (2026-08-06)
 
 | ID | Задача | Приоритет | Статус |

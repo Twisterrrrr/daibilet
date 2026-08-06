@@ -1,3 +1,19 @@
+## 2026-08-06 - Event hero: кликабельный бейдж площадки
+
+### Наблюдения
+- На PDP бейдж pin+название площадки в hero был `<span>` (не кликабелен); адрес ниже открывал модалку через `EventVenueTrigger`.
+
+### Решения
+- `EventPage.client.tsx` `EventHero`: при `venueId`/`venueSlug` бейдж → `Link` на `venueHref` (`/venues` или `/locations`); hover/underline. Без slug/id - span, без мёртвой ссылки.
+
+### Проблемы
+- Нет.
+
+### Live
+- Commit `9a9722a`; MSK **BUILD_ID=`KqGMFbvqJXi3JrYxNtIje`**. Smoke: `/events/tc-6a354197f25c30e2516f5990-elitnyi-stand-up` 200, HTML `href="/venues/evgenich-na-rubinshteina-6930909cfc27bb700696490f"`.
+
+---
+
 ## 2026-08-06 - My-day: выключили модалку «Оформили билет?»
 
 ### Наблюдения
