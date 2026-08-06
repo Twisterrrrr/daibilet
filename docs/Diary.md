@@ -19,6 +19,10 @@
 - Локального DATABASE_URL нет - seed на MSK после deploy.
 - Nominatim не использовали (rate-limit / abort); owner/curated coords.
 
+### Live
+- Commits `fe810e0` (pack+previews) + `3a637c6` (coords expand); MSK **BUILD_ID=`lYsWHccwLK_ab0KcRNm_i`**.
+- Seed: insert **37** / skip **6** legacy; smoke `/cities/perm` local+https **200** (ЦГК/Шпагин/НьюТон/suburbs + «В маршрут»); `/my-day` **200**; covers `/images/venues/perm/*` **200**.
+
 ---
 
 ## 2026-08-06 - City hub / podborki: Perm direction cards bleed (badge + images + copy)
