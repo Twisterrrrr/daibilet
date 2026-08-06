@@ -108,11 +108,16 @@ export function BlogListHero({ breadcrumbs, cityName = null }: BlogListHeroProps
 
   return (
     <HeroLayout variant="minimal" breadcrumbs={breadcrumbs} title={title} description={description}>
-      <form className="relative mt-5 block max-w-xl" onSubmit={submitSearch} role="search">
+      {/* Desktop search only - on mobile articles matter more than the search field. */}
+      <form
+        className="relative mt-5 hidden max-w-xl md:block"
+        onSubmit={submitSearch}
+        role="search"
+      >
         <label className="relative block">
           <span className="sr-only">Поиск по статьям</span>
           <Search
-            className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400 md:left-3.5 md:h-4 md:w-4"
+            className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
             aria-hidden
           />
           <input
@@ -120,7 +125,7 @@ export function BlogListHero({ breadcrumbs, cityName = null }: BlogListHeroProps
             value={searchDraft}
             onChange={(event) => setSearchDraft(event.target.value)}
             placeholder="Найти статью: стендап, маршрут, концерт…"
-            className="h-14 w-full rounded-2xl border border-slate-200 bg-white py-4 pl-12 pr-4 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-primary-400 focus:ring-2 focus:ring-primary-100 md:h-11 md:py-3 md:pl-10 md:text-sm"
+            className="h-11 w-full rounded-2xl border border-slate-200 bg-white py-3 pl-10 pr-4 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-primary-400 focus:ring-2 focus:ring-primary-100"
             aria-label="Поиск по статьям блога"
           />
         </label>

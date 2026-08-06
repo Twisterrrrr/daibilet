@@ -123,7 +123,7 @@ function BlogListRow({ post }: { post: BlogCardDto }) {
           </div>
         ) : null}
 
-        <div className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-2 pt-2">
+        <div className="mt-auto flex flex-col items-start gap-3 pt-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-3 sm:gap-y-2">
           <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-500 sm:text-xs">
             {post.authorName || post.authorId ? (
               <span className={blogAuthorNameClassName(post.articleType)}>

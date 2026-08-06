@@ -1410,7 +1410,7 @@ function CitySightsMustSeeList({
                     {place.seasonLabel}
                   </span>
                 ) : null}
-                <div className="mt-2 flex flex-wrap items-center gap-2">
+                <div className="my-2.5 flex flex-wrap items-center gap-2">
                   {dayRouteItem ? (
                     <AddToDayRouteButton
                       compact

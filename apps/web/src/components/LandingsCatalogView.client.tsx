@@ -227,14 +227,14 @@ export function LandingsCatalogView({
         description="Подборки под настроение: для двоих, с детьми, бюджетно или культурно - сразу к билетам."
       >
         {seasonText ? (
-          <p className="mt-4 max-w-2xl rounded-2xl bg-sky-50 px-4 py-3 text-sm leading-relaxed text-slate-700 ring-1 ring-sky-100">
+          <p className="mt-4 hidden max-w-2xl rounded-2xl bg-sky-50 px-4 py-3 text-sm leading-relaxed text-slate-700 ring-1 ring-sky-100 md:block">
             {seasonText}
           </p>
         ) : null}
 
         <ScrollRail
           className="mt-5"
-          viewportClassName="flex flex-nowrap gap-2 pb-0.5"
+          viewportClassName="flex flex-nowrap gap-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           aria-label="Настроение"
         >
           {PODBORKI_MOODS.map((mood) => {

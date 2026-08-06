@@ -324,11 +324,12 @@ export function LocationsCatalogView({ initialPage }: { initialPage: VenueCatalo
         tone="light"
         className="bg-slate-50"
       >
-        <div className="mt-4 flex flex-wrap gap-2">
+        {/* Mobile: one horizontal chip rail (not a tall wrap stack). Desktop: wrap as before. */}
+        <div className="mt-4 flex gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden md:flex-wrap md:overflow-visible">
           <button
             type="button"
             onClick={() => setTypeFilter('all')}
-            className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition ${
+            className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition ${
               typeFilter === 'all'
                 ? 'bg-primary-600 text-white'
                 : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50'
@@ -344,7 +345,7 @@ export function LocationsCatalogView({ initialPage }: { initialPage: VenueCatalo
                 key={option.value}
                 type="button"
                 onClick={() => setTypeFilter(active ? 'all' : option.value)}
-                className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition ${
+                className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition ${
                   active
                     ? 'bg-primary-600 text-white'
                     : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50'
@@ -358,7 +359,7 @@ export function LocationsCatalogView({ initialPage }: { initialPage: VenueCatalo
         </div>
 
         {logisticsOptions.length > 1 ? (
-          <div className="mt-3 flex flex-wrap gap-1.5">
+          <div className="mt-2.5 flex gap-1.5 overflow-x-auto pb-0.5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden md:flex-wrap md:overflow-visible">
             {logisticsOptions.map((option) => {
               const active = logisticsFilter === option.value;
               return (
@@ -366,7 +367,7 @@ export function LocationsCatalogView({ initialPage }: { initialPage: VenueCatalo
                   key={option.value}
                   type="button"
                   onClick={() => setLogisticsFilter(active && option.value !== 'all' ? 'all' : option.value)}
-                  className={`inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-semibold transition ${
+                  className={`inline-flex shrink-0 items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-semibold transition ${
                     active
                       ? 'bg-slate-800 text-white'
                       : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50'

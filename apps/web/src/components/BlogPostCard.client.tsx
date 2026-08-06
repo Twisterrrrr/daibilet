@@ -251,7 +251,7 @@ export function BlogPostCard({
               {primary}
             </p>
           ) : null}
-          <div className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-2 pt-4">
+          <div className="mt-auto flex flex-col items-start gap-3 pt-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-3 sm:gap-y-2">
             <BlogCardMeta post={post} dateLabel={dateLabel} isLarge />
             {cta ? (
               <Link
@@ -399,7 +399,7 @@ export function BlogPostCard({
               ))}
             </div>
           ) : null}
-          <div className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-2 pt-3">
+          <div className="mt-auto flex flex-col items-start gap-3 pt-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-3 sm:gap-y-2">
             <BlogCardMeta post={post} dateLabel={dateLabel} isLarge />
             {cta ? (
               <Link

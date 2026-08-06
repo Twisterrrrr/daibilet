@@ -3320,7 +3320,7 @@ function DayRoutePanelInner() {
                           aria-expanded={mustSeeExpanded}
                           aria-controls="day-must-see-list"
                           data-day-must-see-expand
-                          className="inline-flex min-h-8 items-center justify-center gap-1 px-1.5 text-xs font-medium text-slate-500 transition hover:text-slate-800"
+                          className="hidden min-h-8 items-center justify-center gap-1 px-1.5 text-xs font-medium text-slate-500 transition hover:text-slate-800 sm:inline-flex"
                         >
                           {mustSeeExpanded ? (
                             <>
@@ -3352,7 +3352,7 @@ function DayRoutePanelInner() {
                     className={
                       mustSeeExpanded
                         ? 'mt-3 grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3'
-                        : 'mt-3 flex snap-x snap-mandatory gap-2.5 overflow-x-auto pb-1'
+                        : 'mt-3 grid grid-cols-1 gap-2.5 sm:flex sm:snap-x sm:snap-mandatory sm:gap-2.5 sm:overflow-x-auto sm:pb-1'
                     }
                     data-day-must-see-list
                     data-day-must-see-carousel={mustSeeExpanded ? undefined : '1'}
@@ -3383,7 +3383,7 @@ function DayRoutePanelInner() {
                           className={`flex items-center gap-3 rounded-xl border px-2.5 py-1.5 text-left transition disabled:cursor-not-allowed ${
                             mustSeeExpanded
                               ? 'w-full min-w-0'
-                              : 'w-[min(100%,24rem)] shrink-0 snap-start'
+                              : 'w-full min-w-0 sm:w-[min(100%,24rem)] sm:shrink-0 sm:snap-start'
                           } ${
                             inRoute
                               ? 'border-emerald-400 bg-emerald-50 text-emerald-900'

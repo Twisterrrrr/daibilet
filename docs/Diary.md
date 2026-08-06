@@ -1,4 +1,25 @@
-## 2026-08-06 - Home mobile polish + My Day banner
+## 2026-08-06 - Mobile catalog density (podborki / locations / blog / city / my-day)
+
+### Наблюдения
+- Owner: на `/podborki` сезонная плашка «Летом в приоритете…» лишняя в mobile шапке; scrollbar под mood-chips выглядит недоделанным.
+- `/locations`: wrap-чипы типов + логистики съедают половину экрана.
+- `/blog`: поиск важнее статей на мобилке - нет; CTA «Больше про …» слишком близко к мета-строке.
+- City must-see: кнопки «В маршрут» без воздуха после описания.
+- `/my-day`: Главные места в карусели + «Развернуть» дублируют аккордеон на мобилке.
+
+### Решения
+- Подборки: season banner `hidden md:block`; mood ScrollRail без scrollbar visual.
+- Локации: горизонтальный chip-rail на mobile (swipe), wrap на md+.
+- Блог: search form `hidden md:block`; CTA под мета-строкой с `gap-3` на mobile.
+- City must-see actions: `my-2.5` (10px).
+- My-day must-see: на mobile всегда вертикальный список; «Развернуть» только `sm+`.
+
+### Проблемы
+- Нет.
+
+---
+
+
 
 ### Наблюдения
 - Owner: noisy Instagram-style quick chips; «Реки и каналы!» лишний; города ~36vw слишком узкие для названия; Концерт/Стендап/Экскурсии в строку на мобилке; нужен My Day CTA после городов (не в hero).
