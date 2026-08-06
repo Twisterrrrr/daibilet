@@ -4447,11 +4447,11 @@ function DayRouteVenueCard({
     </div>
   );
 
-  /** Offer chips in-row (wrap): title · price - never bare «Купить билет». */
+  /** Offer chips below main stop row (wrap, full width) - never over travel meta. */
   const commerceRail =
     ticketUrl || nearbyUpsells.length > 0 ? (
       <div
-        className="flex min-w-0 flex-row flex-wrap items-center gap-2"
+        className="flex w-full min-w-0 flex-row flex-wrap items-center gap-2"
         data-day-stop-commerce
       >
         {ticketUrl ? (
@@ -4512,96 +4512,270 @@ function DayRouteVenueCard({
         data-day-plan-stop={venue.id}
         data-day-stop-variant="list"
         data-day-stop-list="dense"
-        data-day-stop-layout="place-event-row"
+        data-day-stop-layout="place-then-offers"
         data-ticket-bought={bought ? '1' : '0'}
         data-commercial-chip={chip.kind}
         data-day-session={sessionDisplay || undefined}
         data-day-stop-focused={focused ? '1' : undefined}
       >
         {/*
-          Dense list: [↑↓ N] | place (title/meta) | event chips (wrap) | [maps][X]
+          Dense list: main row [↑↓ N | place | maps/X], offers on next row.
         */}
         <div
-          className={`flex w-full flex-wrap items-center gap-1.5 py-1.5 md:gap-2 lg:gap-3 ${
+          className={`flex w-full flex-col gap-1.5 py-1.5 ${
             focused ? 'rounded-md bg-emerald-50/80 px-1' : ''
           } ${purchased ? 'border-l-4 border-primary-600 pl-1.5' : ''}`}
         >
-          <div className="flex shrink-0 items-center gap-1" data-day-stop-index-cluster>
-            {reorderLocked ? (
-              <div
-                className="flex h-8 w-5 shrink-0 items-center justify-center text-slate-300"
-                data-day-stop-sort="locked"
-                title="Сеанс с фиксированным временем - порядок нельзя менять"
-                aria-hidden
-              >
-                <Ticket className="h-3 w-3" />
-              </div>
-            ) : (
-              <div
-                className="flex shrink-0 flex-col items-center leading-none"
-                data-day-stop-sort
-              >
-                <button
-                  type="button"
-                  aria-label="Выше"
-                  disabled={index === 0}
-                  onClick={onMoveUp}
-                  className="rounded p-0 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
+          <div className="flex w-full items-center gap-1.5 md:gap-2 lg:gap-3">
+            <div className="flex shrink-0 items-center gap-1" data-day-stop-index-cluster>
+              {reorderLocked ? (
+                <div
+                  className="flex h-8 w-5 shrink-0 items-center justify-center text-slate-300"
+                  data-day-stop-sort="locked"
+                  title="Сеанс с фиксированным временем - порядок нельзя менять"
+                  aria-hidden
                 >
-                  <ChevronUp className="h-3 w-3" />
-                </button>
-                <button
-                  type="button"
-                  aria-label="Ниже"
-                  disabled={index >= total - 1}
-                  onClick={onMoveDown}
-                  className="rounded p-0 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
+                  <Ticket className="h-3 w-3" />
+                </div>
+              ) : (
+                <div
+                  className="flex shrink-0 flex-col items-center leading-none"
+                  data-day-stop-sort
                 >
-                  <ChevronDown className="h-3 w-3" />
-                </button>
-              </div>
-            )}
+                  <button
+                    type="button"
+                    aria-label="Выше"
+                    disabled={index === 0}
+                    onClick={onMoveUp}
+                    className="rounded p-0 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
+                  >
+                    <ChevronUp className="h-3 w-3" />
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Ниже"
+                    disabled={index >= total - 1}
+                    onClick={onMoveDown}
+                    className="rounded p-0 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
+                  >
+                    <ChevronDown className="h-3 w-3" />
+                  </button>
+                </div>
+              )}
+              <span
+                className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-900 text-[10px] font-bold text-white"
+                aria-label={`Точка ${index + 1}`}
+              >
+                {index + 1}
+              </span>
+            </div>
+            <div
+              className={`min-w-0 flex-1 self-center leading-tight ${
+                !purchased && isCommerce ? 'border-l-4 border-primary-600 pl-2' : ''
+              }`}
+            >
+              {softTimeNode}
+              {purchased ? (
+                <p className="m-0 text-[11px] font-bold uppercase tracking-wide text-primary-700">
+                  Оплачено
+                </p>
+              ) : null}
+              <p className="m-0 truncate text-[13px] font-semibold text-slate-900">
+                {titleNode}
+                {suburbBadge}
+              </p>
+              {metaLine ? (
+                <p
+                  className={`m-0 mt-px truncate text-[11px] ${
+                    !hasCoords ? 'text-amber-700' : 'text-slate-500'
+                  }`}
+                >
+                  {metaLine}
+                </p>
+              ) : null}
+              {segmentLine ? (
+                <p
+                  className="m-0 mt-px truncate text-[11px] text-slate-500"
+                  data-day-segment-hint="1"
+                >
+                  {segmentLine}
+                </p>
+              ) : null}
+              {textStop ? (
+                <div className="mt-0.5" data-day-custom-address>
+                  {addressOpen ? (
+                    <form
+                      className="flex gap-1"
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        onSetNote(addressDraft.trim());
+                        setAddressOpen(false);
+                      }}
+                    >
+                      <input
+                        type="text"
+                        value={addressDraft}
+                        onChange={(e) => setAddressDraft(e.target.value)}
+                        placeholder="Адрес или заметка"
+                        className="min-h-7 w-full rounded-md border border-slate-200 px-2 text-[11px] outline-none focus:border-primary-400"
+                        autoFocus
+                      />
+                      <button type="submit" className="text-[11px] font-semibold text-primary-700">
+                        Ок
+                      </button>
+                    </form>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAddressDraft(String(venue.note || venue.address || ''));
+                        setAddressOpen(true);
+                      }}
+                      className="text-[11px] font-medium text-slate-400 underline-offset-2 hover:text-slate-600 hover:underline"
+                    >
+                      {venue.note || venue.address ? 'Изменить адрес' : 'Указать адрес'}
+                    </button>
+                  )}
+                </div>
+              ) : null}
+            </div>
+            {actionButtons}
+          </div>
+          {commerceRail}
+        </div>
+      </li>
+    );
+  }
+
+  return (
+    <li
+      className="h-auto w-full self-start scroll-mt-4"
+      data-day-plan-stop={venue.id}
+      data-day-stop-variant="grid"
+      data-day-stop-layout="owner-v8"
+      data-ticket-bought={bought ? '1' : '0'}
+      data-commercial-chip={chip.kind}
+      data-day-session={sessionDisplay || undefined}
+      data-day-stop-focused={focused ? '1' : undefined}
+      data-day-commerce={isCommerce ? '1' : '0'}
+    >
+      {/*
+        Owner v8: main row like «Руки Вверх» (thumb + title + travel + actions),
+        offer chips on a separate full-width row below - never over meta.
+      */}
+      <div
+        className={`flex flex-col gap-2 rounded-2xl border bg-white px-2.5 py-2 sm:px-3 sm:py-2.5 ${
+          focused
+            ? 'border-emerald-400 ring-1 ring-emerald-200'
+            : purchased || isCommerce
+              ? 'border-l-4 border-l-primary-600 border-slate-200'
+              : 'border-slate-200'
+        }`}
+      >
+        <div className="flex items-center gap-2 sm:gap-3">
+          {reorderLocked ? (
+            <div
+              className="flex h-10 w-6 shrink-0 items-center justify-center text-slate-300"
+              data-day-stop-sort="locked"
+              title="Сеанс с фиксированным временем - порядок нельзя менять"
+              aria-hidden
+            >
+              <Ticket className="h-3.5 w-3.5" />
+            </div>
+          ) : (
+            <div
+              className="flex shrink-0 flex-col items-center leading-none"
+              data-day-stop-sort
+            >
+              <button
+                type="button"
+                aria-label="Выше"
+                disabled={index === 0}
+                onClick={onMoveUp}
+                className="rounded p-0.5 text-slate-500 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
+              >
+                <ChevronUp className="h-3.5 w-3.5" />
+              </button>
+              <button
+                type="button"
+                aria-label="Ниже"
+                disabled={index >= total - 1}
+                onClick={onMoveDown}
+                className="rounded p-0.5 text-slate-500 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
+              >
+                <ChevronDown className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          )}
+
+          <div className="relative h-14 w-14 shrink-0 sm:h-16 sm:w-16" data-day-stop-thumb>
             <span
-              className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-900 text-[10px] font-bold text-white"
+              className="absolute -left-1 -top-1 z-10 inline-flex h-5 w-5 items-center justify-center rounded-full bg-slate-900 text-[10px] font-bold text-white shadow-sm"
               aria-label={`Точка ${index + 1}`}
+              data-day-stop-number
             >
               {index + 1}
             </span>
+            <div className="relative h-full w-full overflow-hidden rounded-xl bg-slate-100">
+              {venue.imageUrl ? (
+                <SafeImage src={venue.imageUrl} alt="" fill sizes="4rem" className="object-cover" />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center text-slate-400">
+                  <MapPin className="h-5 w-5" />
+                </div>
+              )}
+            </div>
           </div>
-          <div
-            className={`min-w-0 flex-1 basis-[10rem] self-center leading-tight ${
-              !purchased && isCommerce ? 'border-l-4 border-primary-600 pl-2' : ''
-            }`}
-          >
-            {softTimeNode}
-            {purchased ? (
-              <p className="m-0 text-[11px] font-bold uppercase tracking-wide text-primary-700">
-                Оплачено
-              </p>
+
+          <div className="min-w-0 flex-1" data-day-stop-text-col>
+            {softTimeNode || purchased ? (
+              <div className="mb-0.5 flex items-center gap-2">
+                {softTimeNode}
+                {purchased ? (
+                  <span className="text-[11px] font-bold uppercase tracking-wide text-primary-700">
+                    Оплачено
+                  </span>
+                ) : null}
+              </div>
             ) : null}
-            <p className="m-0 truncate text-[13px] font-semibold text-slate-900">
+            <p className="truncate text-sm font-semibold leading-snug text-slate-900">
               {titleNode}
               {suburbBadge}
             </p>
-            {metaLine ? (
+            {placeLine || !hasCoords ? (
               <p
-                className={`m-0 mt-px truncate text-[11px] ${
-                  !hasCoords ? 'text-amber-700' : 'text-slate-500'
+                className={`mt-0.5 mb-0 line-clamp-1 text-xs leading-snug ${
+                  !hasCoords && !placeLine ? 'font-medium text-amber-700' : 'text-slate-500'
                 }`}
               >
-                {metaLine}
+                {placeLine || 'Нет координат'}
+                {placeLine && !hasCoords ? ' · Нет координат' : ''}
               </p>
             ) : null}
-            {segmentLine ? (
-              <p
-                className="m-0 mt-px truncate text-[11px] text-slate-500"
-                data-day-segment-hint="1"
-              >
-                {segmentLine}
-              </p>
+
+            {segmentTimeLabel || segmentDistanceLabel || sessionDisplay ? (
+              <div className="mt-1 flex flex-wrap items-center gap-1.5" data-day-stop-bottom-row>
+                {segmentTimeLabel ? (
+                  <span
+                    className="inline-flex items-center rounded-md border border-slate-100 bg-slate-50 px-1.5 py-0.5 text-[11px] font-medium text-slate-600"
+                    data-day-segment-hint
+                  >
+                    {segmentTimeLabel}
+                  </span>
+                ) : null}
+                {segmentDistanceLabel ? (
+                  <span className="text-[11px] text-slate-500">{segmentDistanceLabel}</span>
+                ) : null}
+                {sessionDisplay && !ticketUrl ? (
+                  <span className="inline-flex items-center rounded-md bg-emerald-50 px-1.5 py-0.5 text-[11px] font-medium text-emerald-800">
+                    {sessionDisplay}
+                  </span>
+                ) : null}
+              </div>
             ) : null}
+
             {textStop ? (
-              <div className="mt-0.5" data-day-custom-address>
+              <div className="mt-1" data-day-custom-address>
                 {addressOpen ? (
                   <form
                     className="flex gap-1"
@@ -4616,10 +4790,10 @@ function DayRouteVenueCard({
                       value={addressDraft}
                       onChange={(e) => setAddressDraft(e.target.value)}
                       placeholder="Адрес или заметка"
-                      className="min-h-7 w-full rounded-md border border-slate-200 px-2 text-[11px] outline-none focus:border-primary-400"
+                      className="min-h-8 w-full rounded-md border border-slate-200 px-2 text-xs outline-none focus:border-primary-400"
                       autoFocus
                     />
-                    <button type="submit" className="text-[11px] font-semibold text-primary-700">
+                    <button type="submit" className="text-xs font-semibold text-primary-700">
                       Ок
                     </button>
                   </form>
@@ -4638,203 +4812,33 @@ function DayRouteVenueCard({
               </div>
             ) : null}
           </div>
-          {commerceRail}
-          {actionButtons}
-        </div>
-      </li>
-    );
-  }
 
-  return (
-    <li
-      className="h-auto w-full self-start scroll-mt-4"
-      data-day-plan-stop={venue.id}
-      data-day-stop-variant="grid"
-      data-day-stop-layout="owner-v7"
-      data-ticket-bought={bought ? '1' : '0'}
-      data-commercial-chip={chip.kind}
-      data-day-session={sessionDisplay || undefined}
-      data-day-stop-focused={focused ? '1' : undefined}
-      data-day-commerce={isCommerce ? '1' : '0'}
-    >
-      {/*
-        Owner v7: single compact row
-        [↑↓] [thumb+N] [title / address / meta] [offer chips wrap] [✈][X]
-      */}
-      <div
-        className={`flex flex-wrap items-center gap-2 rounded-2xl border bg-white px-2.5 py-2 sm:gap-3 sm:px-3 sm:py-2.5 ${
-          focused
-            ? 'border-emerald-400 ring-1 ring-emerald-200'
-            : purchased || isCommerce
-              ? 'border-l-4 border-l-primary-600 border-slate-200'
-              : 'border-slate-200'
-        }`}
-      >
-        {reorderLocked ? (
-          <div
-            className="flex h-10 w-6 shrink-0 items-center justify-center text-slate-300"
-            data-day-stop-sort="locked"
-            title="Сеанс с фиксированным временем - порядок нельзя менять"
-            aria-hidden
-          >
-            <Ticket className="h-3.5 w-3.5" />
-          </div>
-        ) : (
-          <div
-            className="flex shrink-0 flex-col items-center leading-none"
-            data-day-stop-sort
-          >
+          <div className="flex shrink-0 items-center gap-1" data-day-stop-top-right>
+            {mapsUrl ? (
+              <a
+                href={mapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Открыть в Яндекс.Картах"
+                title="Открыть в Яндекс.Картах"
+                data-day-stop-maps
+                className="inline-flex items-center justify-center rounded-lg p-2 text-sky-600 hover:bg-sky-50"
+              >
+                <Navigation className="h-4 w-4" />
+              </a>
+            ) : null}
             <button
               type="button"
-              aria-label="Выше"
-              disabled={index === 0}
-              onClick={onMoveUp}
-              className="rounded p-0.5 text-slate-500 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
+              aria-label="Удалить точку"
+              onClick={onRemove}
+              className="inline-flex items-center justify-center rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
             >
-              <ChevronUp className="h-3.5 w-3.5" />
-            </button>
-            <button
-              type="button"
-              aria-label="Ниже"
-              disabled={index >= total - 1}
-              onClick={onMoveDown}
-              className="rounded p-0.5 text-slate-500 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
-            >
-              <ChevronDown className="h-3.5 w-3.5" />
+              <X className="h-4 w-4" />
             </button>
           </div>
-        )}
-
-        <div className="relative h-14 w-14 shrink-0 sm:h-16 sm:w-16" data-day-stop-thumb>
-          <span
-            className="absolute -left-1 -top-1 z-10 inline-flex h-5 w-5 items-center justify-center rounded-full bg-slate-900 text-[10px] font-bold text-white shadow-sm"
-            aria-label={`Точка ${index + 1}`}
-            data-day-stop-number
-          >
-            {index + 1}
-          </span>
-          <div className="relative h-full w-full overflow-hidden rounded-xl bg-slate-100">
-            {venue.imageUrl ? (
-              <SafeImage src={venue.imageUrl} alt="" fill sizes="4rem" className="object-cover" />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center text-slate-400">
-                <MapPin className="h-5 w-5" />
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="min-w-0 flex-1" data-day-stop-text-col>
-          {softTimeNode || purchased ? (
-            <div className="mb-0.5 flex items-center gap-2">
-              {softTimeNode}
-              {purchased ? (
-                <span className="text-[11px] font-bold uppercase tracking-wide text-primary-700">
-                  Оплачено
-                </span>
-              ) : null}
-            </div>
-          ) : null}
-          <p className="truncate text-sm font-semibold leading-snug text-slate-900">
-            {titleNode}
-            {suburbBadge}
-          </p>
-          {placeLine || !hasCoords ? (
-            <p
-              className={`mt-0.5 mb-0 line-clamp-1 text-xs leading-snug ${
-                !hasCoords && !placeLine ? 'font-medium text-amber-700' : 'text-slate-500'
-              }`}
-            >
-              {placeLine || 'Нет координат'}
-              {placeLine && !hasCoords ? ' · Нет координат' : ''}
-            </p>
-          ) : null}
-
-          {segmentTimeLabel || segmentDistanceLabel || sessionDisplay ? (
-            <div className="mt-1 flex flex-wrap items-center gap-1.5" data-day-stop-bottom-row>
-              {segmentTimeLabel ? (
-                <span
-                  className="inline-flex items-center rounded-md border border-slate-100 bg-slate-50 px-1.5 py-0.5 text-[11px] font-medium text-slate-600"
-                  data-day-segment-hint
-                >
-                  {segmentTimeLabel}
-                </span>
-              ) : null}
-              {segmentDistanceLabel ? (
-                <span className="text-[11px] text-slate-500">{segmentDistanceLabel}</span>
-              ) : null}
-              {sessionDisplay && !ticketUrl ? (
-                <span className="inline-flex items-center rounded-md bg-emerald-50 px-1.5 py-0.5 text-[11px] font-medium text-emerald-800">
-                  {sessionDisplay}
-                </span>
-              ) : null}
-            </div>
-          ) : null}
-
-          {textStop ? (
-            <div className="mt-1" data-day-custom-address>
-              {addressOpen ? (
-                <form
-                  className="flex gap-1"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    onSetNote(addressDraft.trim());
-                    setAddressOpen(false);
-                  }}
-                >
-                  <input
-                    type="text"
-                    value={addressDraft}
-                    onChange={(e) => setAddressDraft(e.target.value)}
-                    placeholder="Адрес или заметка"
-                    className="min-h-8 w-full rounded-md border border-slate-200 px-2 text-xs outline-none focus:border-primary-400"
-                    autoFocus
-                  />
-                  <button type="submit" className="text-xs font-semibold text-primary-700">
-                    Ок
-                  </button>
-                </form>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAddressDraft(String(venue.note || venue.address || ''));
-                    setAddressOpen(true);
-                  }}
-                  className="text-[11px] font-medium text-slate-400 underline-offset-2 hover:text-slate-600 hover:underline"
-                >
-                  {venue.note || venue.address ? 'Изменить адрес' : 'Указать адрес'}
-                </button>
-              )}
-            </div>
-          ) : null}
         </div>
 
         {commerceRail}
-
-        <div className="flex shrink-0 items-center gap-1" data-day-stop-top-right>
-          {mapsUrl ? (
-            <a
-              href={mapsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Открыть в Яндекс.Картах"
-              title="Открыть в Яндекс.Картах"
-              data-day-stop-maps
-              className="inline-flex items-center justify-center rounded-lg p-2 text-sky-600 hover:bg-sky-50"
-            >
-              <Navigation className="h-4 w-4" />
-            </a>
-          ) : null}
-          <button
-            type="button"
-            aria-label="Удалить точку"
-            onClick={onRemove}
-            className="inline-flex items-center justify-center rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
       </div>
     </li>
   );

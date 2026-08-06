@@ -571,6 +571,21 @@
 
 ---
 
+## 2026-08-06 - My Day stop cards: offers below main row
+
+### Наблюдения
+- Owner screenshot: event/ticket pills перекрывали ~time/km на stop cards. Чисто читался только «Руки Вверх Бар» (без commerce chips в той же flex-строке).
+
+### Решения
+- Root: commerceRail стоял sibling в lex-wrap рядом с title/meta/actions (owner-v7 / place-event-row) - при wrap чипы залезали на travel meta.
+- Layout owner-v8 / place-then-offers: main row = thumb+N + title/city + time/km + maps/X; offer chips - отдельный full-width ряд ниже с gap. Title·price сохранены.
+- Файл: DayRoutePanel.client.tsx. Commit+push; deploy нет.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-05 - My Day stop cards: horizontal offer chips + title
 
 ### Наблюдения
