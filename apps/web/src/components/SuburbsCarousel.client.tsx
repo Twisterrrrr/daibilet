@@ -147,7 +147,7 @@ export function SuburbsCarousel({
           Поездка на день рядом с городом - отдельные мини-локации и точки внутри них.
         </p>
       ) : null}
-      {/* One suburb per snap screen: mobile ~92% + peek; desktop full-bleed card + arrows. */}
+      {/* One suburb per snap screen; compact cards leave side margin so arrows stay clear. */}
       <div className={compact ? 'relative mt-4' : 'relative mt-5'}>
         <div
           ref={railRef}
@@ -206,64 +206,61 @@ export function SuburbsCarousel({
               return (
                 <article
                   key={`${place.name}:${index}`}
-                  className="flex w-[min(92%,36rem)] shrink-0 snap-start flex-col rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 md:w-[calc(100%-0.25rem)]"
+                  className="mx-8 flex w-[min(85%,32rem)] shrink-0 snap-start flex-col rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 md:mx-12 md:w-[calc(100%-6rem)]"
                   data-city-suburb-card
                   data-city-suburb-compact
                   aria-label={`${index + 1} из ${places.length}: ${place.name}`}
                 >
-                  <div className="flex items-start gap-3">
-                    <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-primary-50 text-sm font-bold text-primary-700">
+                  {/* Header: [number] [LARGE name] [В маршрут] - one row; mx clears carousel arrows. */}
+                  <div className="flex items-center gap-2.5 sm:gap-3">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-50 text-sm font-bold leading-none text-primary-700">
                       {index + 1}
                     </span>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-start gap-x-2 gap-y-1.5">
-                        <h3
-                          className="min-w-0 flex-1 break-words text-xl font-bold leading-snug text-slate-950 sm:text-2xl"
-                          data-city-suburb-title
+                    <h3
+                      className="min-w-0 flex-1 break-words text-xl font-bold leading-snug text-slate-950 sm:text-2xl"
+                      data-city-suburb-title
+                    >
+                      {placeHref ? (
+                        <Link
+                          href={placeHref}
+                          className="underline decoration-slate-300 underline-offset-2 hover:decoration-current"
                         >
-                          {placeHref ? (
-                            <Link
-                              href={placeHref}
-                              className="underline decoration-slate-300 underline-offset-2 hover:decoration-current"
-                            >
-                              {place.name}
-                            </Link>
-                          ) : (
-                            place.name
-                          )}
-                        </h3>
-                        {bulkCta}
-                      </div>
-                      {nested.length ? (
-                        <ol
-                          className="mt-3 list-decimal space-y-1.5 border-t border-slate-100 pt-3 pl-5"
-                          data-city-suburb-places
-                        >
-                          {nested.map((poi, poiIndex) => {
-                            const poiHref = resolveCityPlaceTitleHref(poi, venues);
-                            return (
-                              <li
-                                key={`${poi.name}:${poiIndex}`}
-                                className="text-base leading-6 marker:text-slate-400"
-                                data-city-suburb-place
-                              >
-                                {poiHref ? (
-                                  <Link
-                                    href={poiHref}
-                                    className="font-medium text-slate-900 underline decoration-slate-300 underline-offset-2 hover:decoration-current"
-                                  >
-                                    {poi.name}
-                                  </Link>
-                                ) : (
-                                  <span className="font-medium text-slate-900">{poi.name}</span>
-                                )}
-                              </li>
-                            );
-                          })}
-                        </ol>
-                      ) : null}
-                    </div>
+                          {place.name}
+                        </Link>
+                      ) : (
+                        place.name
+                      )}
+                    </h3>
+                    {bulkCta ? <div className="shrink-0">{bulkCta}</div> : null}
                   </div>
+                  {nested.length ? (
+                    <ol
+                      className="mt-3 list-decimal space-y-1.5 border-t border-slate-100 pt-3 pl-5"
+                      data-city-suburb-places
+                    >
+                      {nested.map((poi, poiIndex) => {
+                        const poiHref = resolveCityPlaceTitleHref(poi, venues);
+                        return (
+                          <li
+                            key={`${poi.name}:${poiIndex}`}
+                            className="text-base leading-6 marker:text-slate-400"
+                            data-city-suburb-place
+                          >
+                            {poiHref ? (
+                              <Link
+                                href={poiHref}
+                                className="font-medium text-slate-900 underline decoration-slate-300 underline-offset-2 hover:decoration-current"
+                              >
+                                {poi.name}
+                              </Link>
+                            ) : (
+                              <span className="font-medium text-slate-900">{poi.name}</span>
+                            )}
+                          </li>
+                        );
+                      })}
+                    </ol>
+                  ) : null}
                 </article>
               );
             }
@@ -286,14 +283,6 @@ export function SuburbsCarousel({
                     {index + 1}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p
-                      className={`text-[11px] font-medium uppercase tracking-wide ${
-                        editorial ? 'text-zinc-400' : 'text-slate-400'
-                      }`}
-                      data-city-suburb-badge
-                    >
-                      Пригород
-                    </p>
                     {vectorTitle ? (
                       <div className="mt-1 flex flex-wrap items-start gap-x-2 gap-y-1.5">
                         <h2
