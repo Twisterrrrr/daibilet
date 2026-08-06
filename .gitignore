@@ -30,6 +30,10 @@ data/*.log
 .agents/
 .codex-screenshots/
 
+# One-off agent/deploy scratch (smoke scripts, patches) — never commit
+.deploy-tmp/
+tmp-*/
+
 # Generated supplier snapshots and local SQL dumps
 data/ticketscloud/*.json
 data/db/*.sql
