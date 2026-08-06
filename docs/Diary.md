@@ -10,6 +10,9 @@
 ### Проблемы
 - Нет.
 
+### Live
+- Commit `eca4c00`; MSK **BUILD_ID=`WA7He7JopvW8n-kr9KReK`**. Smoke: `/my-day` 200; handoff-маркеры в HTML нет (флаг off).
+
 ---
 
 ## 2026-08-06 - `/venues`+`/locations`: faster first list + drop secondary filters
