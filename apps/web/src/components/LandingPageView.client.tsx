@@ -48,12 +48,14 @@ import {
 } from '@/lib/landing-constants';
 import {
   busLandingHref,
+  isLandingCityAllowed,
   landingCategoryHref,
   landingPageHref,
   MULTI_CITY_LANDING_SLUGS,
   normalizeCitySlug,
   normalizeKnownCitySlug,
   partyLandingHref,
+  PRIORITY_LISTING_CITY_SLUGS,
   resolveConcertGenreTag,
   riverLandingHref,
 } from '@/lib/landing-routes';
@@ -584,6 +586,126 @@ function buildLandingShellPage(slug: string, citySlug?: string): PublicLandingPa
 }
 
 const BUS_CITY_ORDER = Object.keys(BUS_CITY_META);
+
+type LandingCitySwitchItem = { name: string; slug: string; href: string };
+
+/** City switch targets for multi-city landings - not derived from city-filtered stats. */
+function resolveLandingCitySwitchItems(
+  landingSlug: string,
+  profile: LandingProfile,
+): LandingCitySwitchItem[] {
+  const slug = canonicalLandingSlug(landingSlug);
+  if (!MULTI_CITY_LANDING_SLUGS.has(slug) || profile === 'bridges') return [];
+
+  const items: LandingCitySwitchItem[] = [];
+  const seen = new Set<string>();
+  const push = (name: string, cityKey: string, href: string) => {
+    const key = normalizeKnownCitySlug(cityKey) || cityKey;
+    if (!key || seen.has(key) || !isLandingCityAllowed(slug, key)) return;
+    const label = String(name || '').trim();
+    if (!label || /^не указан$/i.test(label)) return;
+    seen.add(key);
+    items.push({ name: label, slug: key, href });
+  };
+
+  if (profile === 'bus') {
+    for (const name of BUS_CITY_ORDER) {
+      const meta = BUS_CITY_META[name];
+      const cityKey = citySlugByName(name) || meta?.slug;
+      if (!cityKey) continue;
+      push(name, cityKey, busLandingHref(cityKey));
+    }
+    return items;
+  }
+
+  if (profile === 'river') {
+    for (const name of RIVER_CITY_ORDER) {
+      const guide = riverCityGuide(name);
+      if (!guide?.slug) continue;
+      push(name, guide.slug, riverLandingHref(guide.slug));
+    }
+    return items;
+  }
+
+  if (profile === 'seasonal') {
+    const order = getSeasonalLanding(landingSlug)?.cityOrder || [];
+    for (const name of order) {
+      const guide = seasonalCityGuide(landingSlug, name);
+      if (!guide?.slug) continue;
+      push(name, guide.slug, landingCategoryHref(landingSlug, guide.slug));
+    }
+    if (items.length) return items;
+  }
+
+  for (const cityKey of PRIORITY_LISTING_CITY_SLUGS) {
+    const name = resolveLandingCityName(cityKey);
+    if (!name) continue;
+    push(name, cityKey, landingCategoryHref(landingSlug, cityKey));
+  }
+  return items;
+}
+
+function landingCitySwitchAllHref(landingSlug: string, profile: LandingProfile): string {
+  if (profile === 'bus') return busLandingRoot(landingSlug);
+  if (profile === 'river') return riverLandingRoot(landingSlug);
+  if (profile === 'seasonal') return seasonalLandingRoot(landingSlug);
+  return landingCategoryHref(landingSlug);
+}
+
+function LandingMultiCitySwitch({
+  landingSlug,
+  profile,
+  citySlug,
+  tone = 'filter',
+  className = '',
+}: {
+  landingSlug: string;
+  profile: LandingProfile;
+  citySlug?: string;
+  tone?: 'hero' | 'filter';
+  className?: string;
+}) {
+  const items = resolveLandingCitySwitchItems(landingSlug, profile);
+  if (items.length < 2) return null;
+
+  const current = normalizeKnownCitySlug(citySlug);
+  const allHref = landingCitySwitchAllHref(landingSlug, profile);
+  const chipBase =
+    'inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-lg border px-3.5 py-1.5 text-sm font-medium transition-all';
+  const activeCls =
+    tone === 'hero'
+      ? 'border-primary-foreground bg-primary-foreground text-primary'
+      : 'border-primary bg-primary text-primary-foreground';
+  const idleCls =
+    tone === 'hero'
+      ? 'border-primary-foreground/35 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/20'
+      : 'border-border bg-background text-foreground hover:border-primary/40 hover:text-primary';
+
+  return (
+    <div
+      className={`flex items-center gap-1.5 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${className}`}
+      role="navigation"
+      aria-label="Сменить город"
+    >
+      <a href={allHref} className={`${chipBase} ${!current ? activeCls : idleCls}`}>
+        Все города
+      </a>
+      {items.map((item) => {
+        const active = current === item.slug;
+        return (
+          <a
+            key={item.slug}
+            href={item.href}
+            className={`${chipBase} ${active ? activeCls : idleCls}`}
+            aria-current={active ? 'page' : undefined}
+          >
+            {item.name}
+          </a>
+        );
+      })}
+    </div>
+  );
+}
 
 function readLandingGenreFromUrl(): string {
   const params = new URLSearchParams(window.location.search);
@@ -1429,6 +1551,15 @@ function LandingHero({
               </>
             )}
           </h1>
+          {!isBridges && MULTI_CITY_LANDING_SLUGS.has(canonicalLandingSlug(landingSlug)) ? (
+            <LandingMultiCitySwitch
+              landingSlug={landingSlug}
+              profile={profile}
+              citySlug={citySlug}
+              tone="hero"
+              className="mb-5 md:hidden"
+            />
+          ) : null}
           <p className="mb-6 max-w-2xl text-lg leading-relaxed text-primary-foreground/75">{heroSubtitle}</p>
           <ul className="mb-8 flex flex-wrap gap-x-5 gap-y-2 text-sm text-primary-foreground/80">
             <li className="inline-flex items-center gap-1.5">
@@ -2745,21 +2876,23 @@ function LandingFilters({
   const showTimeSlot = profile === 'bus' || profile === 'river' || isSeasonal || isBridges;
   const currentCityName = resolveLandingCityName(citySlug);
   const cityOptions = Object.entries(stats.cities).sort((a, b) => b[1] - a[1]).slice(0, 12);
-  const orderedCityNames = isBus
-    ? filterCityOrderByStats(BUS_CITY_ORDER, stats.cities)
-    : isRiver
-      ? filterCityOrderByStats(RIVER_CITY_ORDER, stats.cities)
-      : isSeasonal && landingSlug
-        ? resolveSeasonalCityNames(landingSlug, cityOptions)
-        : cityOptions.map(([name]) => name);
+  const switchItems =
+    landingSlug && !isBridges ? resolveLandingCitySwitchItems(landingSlug, profile) : [];
+  const orderedCityNames = switchItems.length
+    ? switchItems.map((item) => item.name)
+    : isSeasonal && landingSlug
+      ? resolveSeasonalCityNames(landingSlug, cityOptions)
+      : cityOptions.map(([name]) => name);
   const meaningfulCityCount = Object.keys(stats.cities).filter(
     (name) => name && !/^не указан$/i.test(name.trim()),
   ).length;
+  // Multi-city ЧПУ: always offer switch (even on /…/moscow) - not intentional to hide on mobile/city pages.
+  // National non-multi: only when payload has several cities and landing is not city-locked.
   const showCityFilter = isBridges
     ? false
-    : isBus || isRiver || isSeasonal
-    ? orderedCityNames.length > 1
-    : !landingCity && meaningfulCityCount > 1;
+    : switchItems.length > 1
+      ? true
+      : !landingCity && meaningfulCityCount > 1;
   const sortTabs: Array<{ label: string; value: SortFilter }> = isBus || isRiver || isSeasonal
     ? [
         { label: 'По цене', value: 'price' },
@@ -3009,16 +3142,14 @@ function LandingFilters({
           </div>
         ) : null}
         {showCityFilter ? (
-          <select
-            value={city}
-            onChange={(event) => selectCity(event.target.value)}
-            className="h-9 w-full rounded-lg border border-input bg-background px-3 text-sm"
+          <div
+            className="flex items-center gap-1.5 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            role="group"
+            aria-label="Сменить город"
           >
-            <option value="all">Все города</option>
-            {orderedCityNames.map((name) => (
-              <option key={name} value={name}>{name}</option>
-            ))}
-          </select>
+            {cityChip('all', 'Все города', city === 'all')}
+            {orderedCityNames.map((name) => cityChip(name, name, city === name))}
+          </div>
         ) : null}
         {showTimeSlot ? timeSlotSelect : null}
         <div className="flex items-center gap-2">
@@ -3836,15 +3967,6 @@ function sortEventGroups(groups: EventGroup[], sort: SortFilter): EventGroup[] {
 
 function defaultLandingDateFilter(_profile: LandingProfile): DateFilter {
   return 'all';
-}
-
-function filterCityOrderByStats(order: string[], cities: Record<string, number>): string[] {
-  const withEvents = new Set(
-    Object.entries(cities)
-      .filter(([, count]) => count > 0)
-      .map(([name]) => name),
-  );
-  return order.filter((name) => withEvents.has(name));
 }
 
 function resolveSeasonalCityNames(landingSlug: string, cityOptions: Array<[string, number]>): string[] {

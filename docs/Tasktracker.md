@@ -15,6 +15,12 @@
 |---|--------|-----------|--------|
 | OPS.DEPLOY-CADENCE | Канон: commit+push после итерации; MSK web deploy пачкой раз в сутки / по запросу owner; hotfix-исключения | Высокий | ✅ `.cursorrules` + Project.md 2026-08-05 |
 
+## Multi-landing mobile city switch (2026-08-06)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| UX.LAND-CITY-MOBILE | Multi-city landings: city chips on mobile (hero + filters); was hidden via `!landingCity` | Высокий | 🔄 fix in branch; deploy TBD |
+
 ## Venues catalog hang on city filter (2026-08-06)
 
 | # | Задача | Приоритет | Статус |

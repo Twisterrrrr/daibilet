@@ -1,3 +1,20 @@
+## 2026-08-06 - Multi-landing mobile city switch restored
+
+### Наблюдения
+- Owner: на multi-landings mobile нет city filter/switcher - «беззубость мультиподхода»; спросил, специально ли.
+- Не специально: `LandingFilters.showCityFilter` гасился через `!landingCity` на ЧПУ `/{intent}/{city}`; после city-filter stats тоже одномерные.
+- Header CityPicker на mobile - только pin; in-page switch отсутствовал.
+
+### Решения
+- `LandingMultiCitySwitch`: чипы «Все города» + priority/guide cities → тот же intent другого города.
+- Mobile hero (`md:hidden`) под H1 + sticky filters (chips вместо select).
+- Список городов не из отфильтрованных stats (PRIORITY / bus / river / seasonal order).
+
+### Проблемы
+- Параллельный агент может править landing titles в тех же файлах - коммитить только city-switch hunks.
+
+---
+
 ## 2026-08-06 - Venues catalog: infinite «Обновляем список…» for Perm
 
 ### Наблюдения
