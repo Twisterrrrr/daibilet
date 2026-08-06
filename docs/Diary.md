@@ -13,8 +13,12 @@
 ### Проблемы
 - Нет.
 
+### Live
+- Commit `092275c` (в live как предок `4ceeb769`); MSK **BUILD_ID=`dyEQk5zL6swNlXdGGDoOH`**; smoke `/` + `/cities` 200; в HTML есть Спектакли / `50vw,176px` / Популярные+По алфавиту.
+
 ---
 
+## 2026-08-06 - Mobile catalog density (podborki / locations / blog / city / my-day)
 
 ### Наблюдения
 - Owner: на `/podborki` сезонная плашка «Летом в приоритете…» лишняя в mobile шапке; scrollbar под mood-chips выглядит недоделанным.
