@@ -5,7 +5,7 @@ import { ArrowRight, Dices } from 'lucide-react';
 import { CityCard } from '@/components/CityCard';
 import { HomeBottomNav } from '@/components/HomeBottomNav.client';
 import { HomeCategoryStack } from '@/components/HomeCategoryStack.client';
-import { HomeGuideEvents } from '@/components/HomeGuideEvents.client';
+import { HomeCityAwareSections } from '@/components/HomeCityAwareSections.client';
 import { HomeHero } from '@/components/HomeHero.client';
 import { HomeMyDayBanner } from '@/components/HomeMyDayBanner.client';
 import { HomePageSkeleton } from '@/components/HomePageSkeleton';
@@ -128,14 +128,15 @@ async function HomePageBody() {
       {/* My Day CTA - after cities, not in hero */}
       <HomeMyDayBanner />
 
-      {/* 3. Top events */}
-      <HomeGuideEvents
+      {/* 3. Editors pick + «Куда сходить» + popular (city-scoped).
+          Restored after personal-guide refactor dropped HomeCityAwareSections. */}
+      <HomeCityAwareSections
         sessions={sessions}
         fingerprints={fingerprintsRecord}
         sparseCatalog={sparseCatalog}
       />
 
-      {/* Mobile formats: after «Куда сходить», away from My Day CTA */}
+      {/* Mobile formats: after event rails, away from My Day CTA */}
       <HomeCategoryStack />
 
       {/* 4. Lucky city randomizer */}

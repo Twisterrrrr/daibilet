@@ -1,3 +1,19 @@
+## 2026-08-06 - Home: restore «Выбор редакции»
+
+### Наблюдения
+- Owner: с главной пропал блок «Выбор редакции».
+- Root cause: `8d844ae` (personal guide MVP) заменил `HomeCityAwareSections` на упрощённый `HomeGuideEvents` («Куда сходить» only) - editors-pick rail отпал вместе с секцией.
+
+### Решения
+- Вернул `HomeCityAwareSections` в `HomePageContent` после городов / My Day banner: `#editors-pick` → home-now tabs → «Популярное».
+- Данные те же (`buildHomePageSectionsSync` / PINNED + catalog fill) - не пустой API.
+- Не трогал параллельные правки My Day banner / city under-tag font.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-06 - Landing titles + holiday date windows
 
 ### Наблюдения
