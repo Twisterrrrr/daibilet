@@ -44,7 +44,7 @@ export default function AboutPage() {
           </section>
 
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
-            <h2 className="text-xl font-bold text-slate-900">Как покупаете билет</h2>
+            <h2 className="text-xl font-bold text-slate-900">Покупка билетов</h2>
             <p className="mt-3 leading-7 text-slate-600">
               Оплата проходит в виджете билетной системы партнёра (Ticketscloud или Теплоход). Мы не подменяем цену и
               не обещаем скидки, которых нет в источнике. После оплаты заказ можно найти в разделе «Мои покупки».
