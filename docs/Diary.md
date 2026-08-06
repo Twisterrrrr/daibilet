@@ -4,17 +4,20 @@
 - Owner дал полный гайд Перми (main/museums/gastro + 5 арт-площадок + suburbs Хохловка/Кунгур/Белая гора/Губаха-Усьва).
 - В cityInfo было только 6 пунктов; Хохловка дублировалась бы как mustSee и suburb.
 - Seed insert-missing раньше не писал address/lat/lng - my-day опирается на coords в cityInfo.
+- Предыдущий агент завис на Nominatim; довели без geocoding API: curated coords + `suburb-nested-coords.json`.
 
 ### Решения
 - `perm.mustSee` = 35 уникальных мест с `mustSeeFilter`, address, lat/lng; legacy slugs сохранены (`permskaya-galereya`, `naberezhnaya-kamy`, `teatr-teatr`, `permskaya-esplanada`, `permsky-solenye-ushi`; `muzej-hohlovka` только в suburbs).
 - `significantSuburbs` x4, 20 nested POI с coords; dayRoutePresets x2.
 - `address` в CityMustSeeItem / SuburbPlace + fallback в `dayRouteItemFromMustSee`.
-- 19 GenerateImage → `apps/public/public/images/venues/perm/` + `PERM_IMAGES` / `PERM_COORDS`.
+- 19 GenerateImage → `apps/public/public/images/venues/perm/` + `PERM_IMAGES` / полный `PERM_COORDS` (43 slug).
+- `scripts/data/suburb-nested-coords.json` +20 Perm nested (как KGD/SPB).
 - `scripts/seed-perm-must-see-pack.js` insert-missing + soft coords/address backfill.
+- web + public `cityInfo` sync (блоки равны).
 
 ### Проблемы
 - Локального DATABASE_URL нет - seed на MSK после deploy.
-- Nominatim для «Набережная Камы, Монастырская 1Б» увёл далеко; owner coords оставлены.
+- Nominatim не использовали (rate-limit / abort); owner/curated coords.
 
 ---
 

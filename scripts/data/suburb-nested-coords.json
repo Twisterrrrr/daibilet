@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "note": "Curated lat/lng for significantSuburbs nested POIs (SPB + KGD). Prefer owner pack SUB/KGD rows where titles match; remaining are well-known landmark pins for day-route / OSM. Vyborg owner SUB lat 59.x corrected to 60.x.",
+  "note": "Curated lat/lng for significantSuburbs nested POIs (SPB + KGD + Perm). Prefer owner pack rows where titles match; remaining are well-known landmark pins for day-route / OSM. Vyborg owner SUB lat 59.x corrected to 60.x.",
   "places": [
     {
       "city": "saint-petersburg",
@@ -625,6 +625,166 @@
       "latitude": 54.8675,
       "longitude": 19.9435,
       "source": "landmark Amber Castle"
+    },
+    {
+      "city": "perm",
+      "suburb": "╨е╨╛╤Е╨╗╨╛╨▓╨║╨░",
+      "name": "╨С╨╛╨│╨╛╤А╨╛╨┤╨╕╤Ж╨║╨░╤П ╤Ж╨╡╤А╨║╨╛╨▓╤М",
+      "latitude": 58.2609,
+      "longitude": 56.2621,
+      "source": "owner-pack Perm suburb curated"
+    },
+    {
+      "city": "perm",
+      "suburb": "╨е╨╛╤Е╨╗╨╛╨▓╨║╨░",
+      "name": "╨г╤Б╤В╤М-╨С╨╛╤А╨╛╨▓╤Б╨║╨╕╨╣ ╤Б╨╛╨╗╤М╨╖╨░╨▓╨╛╨┤",
+      "latitude": 58.2632,
+      "longitude": 56.2648,
+      "source": "owner-pack Perm suburb curated"
+    },
+    {
+      "city": "perm",
+      "suburb": "╨е╨╛╤Е╨╗╨╛╨▓╨║╨░",
+      "name": "╨Т╨╡╤В╤А╤П╨╜╨░╤П ╨╝╨╡╨╗╤М╨╜╨╕╤Ж╨░",
+      "latitude": 58.2598,
+      "longitude": 56.2612,
+      "source": "owner-pack Perm suburb curated"
+    },
+    {
+      "city": "perm",
+      "suburb": "╨е╨╛╤Е╨╗╨╛╨▓╨║╨░",
+      "name": "╨б╤В╨╛╤А╨╛╨╢╨╡╨▓╨░╤П ╨▒╨░╤И╨╜╤П",
+      "latitude": 58.2624,
+      "longitude": 56.2639,
+      "source": "owner-pack Perm suburb curated"
+    },
+    {
+      "city": "perm",
+      "suburb": "╨е╨╛╤Е╨╗╨╛╨▓╨║╨░",
+      "name": "╨г╤Б╨░╨┤╤М╨▒╨░ ╨С╨░╤П╨╜╨┤╨╕╨╜╤Л╤Е",
+      "latitude": 58.2612,
+      "longitude": 56.2642,
+      "source": "owner-pack Perm suburb curated"
+    },
+    {
+      "city": "perm",
+      "suburb": "╨Ъ╤Г╨╜╨│╤Г╤А",
+      "name": "╨Ъ╤Г╨╜╨│╤Г╤А╤Б╨║╨░╤П ╨╗╨╡╨┤╤П╨╜╨░╤П ╨┐╨╡╤Й╨╡╤А╨░",
+      "latitude": 57.4409,
+      "longitude": 57.006,
+      "source": "owner-pack Perm suburb curated"
+    },
+    {
+      "city": "perm",
+      "suburb": "╨Ъ╤Г╨╜╨│╤Г╤А",
+      "name": "╨Я╤Г╨┐ ╨Ч╨╡╨╝╨╗╨╕",
+      "latitude": 57.43121,
+      "longitude": 56.9428,
+      "source": "owner-pack Perm suburb curated"
+    },
+    {
+      "city": "perm",
+      "suburb": "╨Ъ╤Г╨╜╨│╤Г╤А",
+      "name": "╨Ь╤Г╨╖╨╡╨╣ ╨║╤Г╨┐╨╡╤З╨╡╤Б╤В╨▓╨░",
+      "latitude": 57.4335,
+      "longitude": 56.9455,
+      "source": "owner-pack Perm suburb curated"
+    },
+    {
+      "city": "perm",
+      "suburb": "╨Ъ╤Г╨╜╨│╤Г╤А",
+      "name": "╨в╨╕╤Е╨▓╨╕╨╜╤Б╨║╨░╤П ╤Ж╨╡╤А╨║╨╛╨▓╤М",
+      "latitude": 57.4308,
+      "longitude": 56.9512,
+      "source": "owner-pack Perm suburb curated"
+    },
+    {
+      "city": "perm",
+      "suburb": "╨Ъ╤Г╨╜╨│╤Г╤А",
+      "name": "╨Т╤П╨╖╨╛╨▓╤Б╨║╨░╤П ╨┐╤А╤П╨╜╨╕╤З╨╜╨░╤П",
+      "latitude": 57.4322,
+      "longitude": 56.9442,
+      "source": "owner-pack Perm suburb curated"
+    },
+    {
+      "city": "perm",
+      "suburb": "╨С╨╡╨╗╨░╤П ╨│╨╛╤А╨░",
+      "name": "╨С╨╡╨╗╨╛╨│╨╛╤А╤Б╨║╨╕╨╣ ╨б╨▓╤П╤В╨╛-╨Э╨╕╨║╨╛╨╗╨░╨╡╨▓╤Б╨║╨╕╨╣ ╨╝╨╛╨╜╨░╤Б╤В╤Л╤А╤М",
+      "latitude": 57.39202,
+      "longitude": 56.229,
+      "source": "owner-pack Perm suburb curated"
+    },
+    {
+      "city": "perm",
+      "suburb": "╨С╨╡╨╗╨░╤П ╨│╨╛╤А╨░",
+      "name": "╨ж╨░╤А╤Б╨║╨╕╨╣ ╨║╤А╨╡╤Б╤В",
+      "latitude": 57.3914,
+      "longitude": 56.2306,
+      "source": "owner-pack Perm suburb curated"
+    },
+    {
+      "city": "perm",
+      "suburb": "╨С╨╡╨╗╨░╤П ╨│╨╛╤А╨░",
+      "name": "╨Ъ╤Г╨┐╨╡╨╗╤М",
+      "latitude": 57.3906,
+      "longitude": 56.2278,
+      "source": "owner-pack Perm suburb curated"
+    },
+    {
+      "city": "perm",
+      "suburb": "╨С╨╡╨╗╨░╤П ╨│╨╛╤А╨░",
+      "name": "╨Ъ╨░╨╝╨╡╨╜╤М ╨Х╤А╨╝╨░╨║",
+      "latitude": 57.3736,
+      "longitude": 57.0667,
+      "source": "owner-pack Perm suburb curated"
+    },
+    {
+      "city": "perm",
+      "suburb": "╨С╨╡╨╗╨░╤П ╨│╨╛╤А╨░",
+      "name": "╨Т╨╛╨┤╨╛╨┐╨░╨┤ ╨Я╨╗╨░╨║╤Г╨╜",
+      "latitude": 57.3481,
+      "longitude": 57.0506,
+      "source": "owner-pack Perm suburb curated"
+    },
+    {
+      "city": "perm",
+      "suburb": "╨У╤Г╨▒╨░╤Е╨░ / ╨г╤Б╤М╨▓╨░",
+      "name": "╨г╤Б╤М╨▓╨╕╨╜╤Б╨║╨╕╨╡ ╤Б╤В╨╛╨╗╨▒╤Л",
+      "latitude": 58.7175,
+      "longitude": 57.6152,
+      "source": "owner-pack Perm suburb curated"
+    },
+    {
+      "city": "perm",
+      "suburb": "╨У╤Г╨▒╨░╤Е╨░ / ╨г╤Б╤М╨▓╨░",
+      "name": "╨Ъ╨░╨╝╨╡╨╜╨╜╤Л╨╣ ╨│╨╛╤А╨╛╨┤",
+      "latitude": 58.72359,
+      "longitude": 57.63404,
+      "source": "owner-pack Perm suburb curated"
+    },
+    {
+      "city": "perm",
+      "suburb": "╨У╤Г╨▒╨░╤Е╨░ / ╨г╤Б╤М╨▓╨░",
+      "name": "╨У╨╛╤А╨░ ╨Ъ╤А╨╡╤Б╤В╨╛╨▓╨░╤П",
+      "latitude": 58.82861,
+      "longitude": 57.585,
+      "source": "owner-pack Perm suburb curated"
+    },
+    {
+      "city": "perm",
+      "suburb": "╨У╤Г╨▒╨░╤Е╨░ / ╨г╤Б╤М╨▓╨░",
+      "name": "╨б╨╡╤А╨┤╤Ж╨╡ ╨Я╨░╤А╨╝╤Л",
+      "latitude": 58.705,
+      "longitude": 57.602,
+      "source": "owner-pack Perm suburb curated"
+    },
+    {
+      "city": "perm",
+      "suburb": "╨У╤Г╨▒╨░╤Е╨░ / ╨г╤Б╤М╨▓╨░",
+      "name": "╨Я╨╡╤Й╨╡╤А╨░ ╨а╨╛╤Б╤Б╨╕╨╣╤Б╨║╨░╤П",
+      "latitude": 58.7245,
+      "longitude": 57.636,
+      "source": "owner-pack Perm suburb curated"
     }
   ]
 }
