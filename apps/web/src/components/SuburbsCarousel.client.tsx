@@ -37,7 +37,7 @@ export type SuburbsCarouselProps = {
  * Hub: desktop arrows; mobile swipe + dots; title = name, subtitle = vector;
  * mobile collapses essay/gastro/POI descs behind «Ещё».
  * Compact (my-day): arrows (loop), no pager; mini `desc` under title;
- * CTA left-aligned under points; desktop shows up to 3 cards.
+ * hanging POI nums under badge; text+CTA on title left edge; desktop up to 3 cards.
  * Bulk «В маршрут» adds all nested points of the active slide.
  */
 export function SuburbsCarousel({
@@ -67,8 +67,6 @@ export function SuburbsCarousel({
   const mutedClass = editorial ? 'text-zinc-500' : 'text-slate-500';
   const softClass = editorial ? 'text-zinc-600' : 'text-slate-600';
   const borderSoft = editorial ? 'border-zinc-100' : 'border-slate-100';
-  const markerClass = editorial ? 'marker:text-zinc-500' : 'marker:text-slate-500';
-  const poiNameClass = editorial ? 'text-zinc-900' : 'text-slate-900';
 
   const syncRail = React.useCallback(() => {
     const el = railRef.current;
@@ -245,12 +243,12 @@ export function SuburbsCarousel({
                   data-city-suburb-compact
                   aria-label={`${index + 1} из ${places.length}: ${place.name}`}
                 >
-                  {/* Header: [number] [name]; mini anno + optional travel vector. */}
-                  <div className="flex items-start gap-2.5 sm:gap-3">
+                  {/* Col1 = badge / hanging nums; col2 = title, anno, point text, CTA. */}
+                  <div className="grid grid-cols-[2.25rem_minmax(0,1fr)] gap-x-2.5 sm:gap-x-3">
                     <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-50 text-sm font-bold leading-none text-primary-700">
                       {index + 1}
                     </span>
-                    <div className="min-w-0 flex-1">
+                    <div className="min-w-0">
                       <h3
                         className="break-words text-xl font-bold leading-snug text-slate-950 sm:text-2xl"
                         data-city-suburb-title
@@ -283,43 +281,52 @@ export function SuburbsCarousel({
                         </p>
                       ) : null}
                     </div>
+                    {nested.length ? (
+                      <ol
+                        className="col-span-2 mt-3 grid grid-cols-[2.25rem_minmax(0,1fr)] gap-x-2.5 gap-y-1.5 border-t border-slate-100 pt-3 sm:gap-x-3"
+                        data-city-suburb-places
+                      >
+                        {nested.map((poi, poiIndex) => {
+                          const poiHref = resolveCityPlaceTitleHref(poi, venues);
+                          const poiDesc = String(poi.desc || '').trim();
+                          return (
+                            <li
+                              key={`${poi.name}:${poiIndex}`}
+                              className="contents"
+                              data-city-suburb-place
+                            >
+                              <span className="text-center text-sm leading-5 tabular-nums text-slate-400">
+                                {poiIndex + 1}.
+                              </span>
+                              <span className="min-w-0 text-sm leading-5 text-slate-600">
+                                {poiHref ? (
+                                  <Link
+                                    href={poiHref}
+                                    className="underline decoration-slate-300 underline-offset-2 hover:decoration-current"
+                                  >
+                                    {poi.name}
+                                  </Link>
+                                ) : (
+                                  poi.name
+                                )}
+                                {poiDesc ? (
+                                  <span>{` - ${capitalizeSentenceStart(poiDesc)}`}</span>
+                                ) : null}
+                              </span>
+                            </li>
+                          );
+                        })}
+                      </ol>
+                    ) : null}
+                    {hasBulkCta ? (
+                      <div
+                        className="col-start-2 mt-3 border-t border-slate-100 pt-3"
+                        data-city-suburb-cta-footer
+                      >
+                        {renderBulkCta()}
+                      </div>
+                    ) : null}
                   </div>
-                  {nested.length ? (
-                    <ol
-                      className="mt-3 list-decimal space-y-1.5 border-t border-slate-100 pt-3 pl-5"
-                      data-city-suburb-places
-                    >
-                      {nested.map((poi, poiIndex) => {
-                        const poiHref = resolveCityPlaceTitleHref(poi, venues);
-                        return (
-                          <li
-                            key={`${poi.name}:${poiIndex}`}
-                            className="text-base leading-6 marker:text-slate-400"
-                            data-city-suburb-place
-                          >
-                            {poiHref ? (
-                              <Link
-                                href={poiHref}
-                                className="font-medium text-slate-900 underline decoration-slate-300 underline-offset-2 hover:decoration-current"
-                              >
-                                {poi.name}
-                              </Link>
-                            ) : (
-                              <span className="font-medium text-slate-900">{poi.name}</span>
-                            )}
-                          </li>
-                        );
-                      })}
-                    </ol>
-                  ) : null}
-                  {hasBulkCta ? (
-                    <div
-                      className="mt-3 flex justify-start border-t border-slate-100 pt-3"
-                      data-city-suburb-cta-footer
-                    >
-                      {renderBulkCta()}
-                    </div>
-                  ) : null}
                 </article>
               );
             }
@@ -338,69 +345,47 @@ export function SuburbsCarousel({
             ) : (
               place.name
             );
-            const nestedRichList = nested.length ? (
-              <ol
-                className={`mt-3 list-decimal space-y-2 border-t pt-3 pl-5 ${borderSoft}`}
-                data-city-suburb-places
-              >
-                {nested.map((poi, poiIndex) => {
-                  const poiHref = resolveCityPlaceTitleHref(poi, venues);
-                  return (
-                    <li
-                      key={`${poi.name}:${poiIndex}`}
-                      className={`text-sm leading-5 ${markerClass}`}
-                      data-city-suburb-place
-                    >
-                      {poiHref ? (
-                        <Link
-                          href={poiHref}
-                          className={`font-medium underline decoration-slate-300 underline-offset-2 hover:decoration-current ${poiNameClass}`}
-                        >
-                          {poi.name}
-                        </Link>
-                      ) : (
-                        <span className={`font-medium ${poiNameClass}`}>{poi.name}</span>
-                      )}
-                      {poi.desc ? (
-                        <span className={mutedClass}>
-                          {' - '}
-                          {capitalizeSentenceStart(poi.desc)}
+            const numClass = editorial ? 'text-zinc-400' : 'text-slate-400';
+            const poiTextClass = editorial ? 'text-zinc-600' : 'text-slate-600';
+            const renderHubPoints = (withDesc: boolean) =>
+              nested.length ? (
+                <ol
+                  className={`col-span-2 mt-3 grid grid-cols-[2rem_minmax(0,1fr)] gap-x-3 gap-y-1.5 border-t pt-3 ${borderSoft}`}
+                  data-city-suburb-places
+                  data-city-suburb-places-compact={withDesc ? undefined : '1'}
+                >
+                  {nested.map((poi, poiIndex) => {
+                    const poiHref = resolveCityPlaceTitleHref(poi, venues);
+                    const poiDesc = withDesc ? String(poi.desc || '').trim() : '';
+                    return (
+                      <li
+                        key={`${poi.name}:${poiIndex}`}
+                        className="contents"
+                        data-city-suburb-place
+                      >
+                        <span className={`text-center text-sm leading-5 tabular-nums ${numClass}`}>
+                          {poiIndex + 1}.
                         </span>
-                      ) : null}
-                    </li>
-                  );
-                })}
-              </ol>
-            ) : null;
-            const nestedCompactList = nested.length ? (
-              <ol
-                className={`mt-3 list-decimal space-y-1.5 border-t pt-3 pl-5 ${borderSoft}`}
-                data-city-suburb-places
-                data-city-suburb-places-compact="1"
-              >
-                {nested.map((poi, poiIndex) => {
-                  const poiHref = resolveCityPlaceTitleHref(poi, venues);
-                  return (
-                    <li
-                      key={`${poi.name}:${poiIndex}`}
-                      className={`text-sm leading-5 ${markerClass}`}
-                      data-city-suburb-place
-                    >
-                      {poiHref ? (
-                        <Link
-                          href={poiHref}
-                          className={`font-medium underline decoration-slate-300 underline-offset-2 hover:decoration-current ${poiNameClass}`}
-                        >
-                          {poi.name}
-                        </Link>
-                      ) : (
-                        <span className={`font-medium ${poiNameClass}`}>{poi.name}</span>
-                      )}
-                    </li>
-                  );
-                })}
-              </ol>
-            ) : null;
+                        <span className={`min-w-0 text-sm leading-5 ${poiTextClass}`}>
+                          {poiHref ? (
+                            <Link
+                              href={poiHref}
+                              className="underline decoration-slate-300 underline-offset-2 hover:decoration-current"
+                            >
+                              {poi.name}
+                            </Link>
+                          ) : (
+                            poi.name
+                          )}
+                          {poiDesc ? (
+                            <span>{` - ${capitalizeSentenceStart(poiDesc)}`}</span>
+                          ) : null}
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ol>
+              ) : null;
             const richEssay = (
               <>
                 {place.travelVectorBlurb ? (
@@ -425,7 +410,8 @@ export function SuburbsCarousel({
                 data-city-suburb-expanded={expanded ? '1' : undefined}
                 aria-label={`${index + 1} из ${places.length}: ${place.name}`}
               >
-                <div className="flex items-start gap-3">
+                {/* Col1 = badge / hanging nums; col2 = title + copy + CTA. */}
+                <div className="grid grid-cols-[2rem_minmax(0,1fr)] gap-x-3">
                   <span
                     className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold ${
                       editorial ? 'bg-zinc-100 text-zinc-800' : 'bg-primary-50 text-primary-700'
@@ -433,8 +419,7 @@ export function SuburbsCarousel({
                   >
                     {index + 1}
                   </span>
-                  <div className="min-w-0 flex-1">
-                    {/* Title = suburb name; subtitle = travel vector / station hub. */}
+                  <div className="min-w-0">
                     <h3 className={`${hubNameClass} break-words`} data-city-suburb-title>
                       {nameHeading}
                     </h3>
@@ -449,60 +434,52 @@ export function SuburbsCarousel({
                     {place.stationName ? (
                       <p className={`mt-1 text-xs ${softClass}`}>Где выходить: {place.stationName}</p>
                     ) : null}
-
-                    {/* Desktop: full richness always. */}
-                    <div className="hidden md:block">
-                      {richEssay}
-                      {nestedRichList}
-                    </div>
-
-                    {/* Mobile: short list by default; essay + POI descs behind «Ещё». */}
-                    <div className="md:hidden">
-                      {expanded ? (
-                        <>
-                          {richEssay}
-                          {nestedRichList}
-                        </>
-                      ) : (
-                        nestedCompactList
-                      )}
-                      {hasRichExtras ? (
-                        <button
-                          type="button"
-                          className={`mt-2 inline-flex min-h-8 items-center gap-1 text-xs font-medium ${softClass} transition hover:opacity-80`}
-                          aria-expanded={expanded}
-                          data-city-suburb-expand
-                          onClick={() =>
-                            setExpandedByIndex((prev) => ({
-                              ...prev,
-                              [index]: !prev[index],
-                            }))
-                          }
-                        >
-                          {expanded ? (
-                            <>
-                              <ChevronUp className="h-3.5 w-3.5" aria-hidden />
-                              Свернуть
-                            </>
-                          ) : (
-                            <>
-                              <ChevronDown className="h-3.5 w-3.5" aria-hidden />
-                              Ещё
-                            </>
-                          )}
-                        </button>
-                      ) : null}
-                    </div>
-
-                    {hasBulkCta ? (
-                      <div
-                        className="mt-3 flex justify-start border-t pt-3"
-                        data-city-suburb-cta-footer
-                      >
-                        {renderBulkCta()}
-                      </div>
-                    ) : null}
+                    <div className="hidden md:block">{richEssay}</div>
+                    {expanded ? <div className="md:hidden">{richEssay}</div> : null}
                   </div>
+
+                  <div className="hidden md:contents">{renderHubPoints(true)}</div>
+                  <div className="contents md:hidden">
+                    {expanded ? renderHubPoints(true) : renderHubPoints(false)}
+                  </div>
+
+                  {hasRichExtras ? (
+                    <div className="col-start-2 mt-2 md:hidden">
+                      <button
+                        type="button"
+                        className={`inline-flex min-h-8 items-center gap-1 text-xs font-medium ${softClass} transition hover:opacity-80`}
+                        aria-expanded={expanded}
+                        data-city-suburb-expand
+                        onClick={() =>
+                          setExpandedByIndex((prev) => ({
+                            ...prev,
+                            [index]: !prev[index],
+                          }))
+                        }
+                      >
+                        {expanded ? (
+                          <>
+                            <ChevronUp className="h-3.5 w-3.5" aria-hidden />
+                            Свернуть
+                          </>
+                        ) : (
+                          <>
+                            <ChevronDown className="h-3.5 w-3.5" aria-hidden />
+                            Ещё
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  ) : null}
+
+                  {hasBulkCta ? (
+                    <div
+                      className={`col-start-2 mt-3 border-t pt-3 ${borderSoft}`}
+                      data-city-suburb-cta-footer
+                    >
+                      {renderBulkCta()}
+                    </div>
+                  ) : null}
                 </div>
               </article>
             );

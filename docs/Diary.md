@@ -1,3 +1,16 @@
+## 2026-08-06 - Suburbs cards: hanging nums + anno-size text
+
+### Наблюдения
+- Owner: пункты списка крупнее/темнее аннотации; текст и CTA уезжали от линии заголовка; номера должны висеть влево под круглым бейджем.
+
+### Решения
+- `SuburbsCarousel` compact+hub: CSS grid `badge|content`; POI nums в col1 под бейджем; имя/desc и «В маршрут» в col2 = линия title/anno; `text-sm leading-5` как anno.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-06 - My-day suburbs: anno + 3-up desktop
 
 ### Наблюдения
