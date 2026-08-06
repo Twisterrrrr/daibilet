@@ -32,7 +32,8 @@
 - Старые deep-link с кириллическим `?city=` всё ещё открываются, но больше не клинят skeleton.
 
 ### Live
-- (после deploy) BUILD_ID TBD; smoke `/venues?city=perm` + Cyrillic path.
+- Commits `2c23d1d` + `84076fd`; MSK **BUILD_ID=`e-XzQltin9RuCjX0zo1VU`**.
+- Smoke Playwright: `/venues?city=perm` и Cyrillic → «Найдено: 23», pending=0; `/cities/perm` 200.
 
 ---
 

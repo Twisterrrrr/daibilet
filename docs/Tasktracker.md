@@ -25,7 +25,7 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| FIX.VENUES-CITY-PENDING | `/venues` Пермь: infinite «Обновляем список…» (Cyrillic `?city=` + abort/isPending) | Критический | 🔄 fix in branch; deploy TBD |
+| FIX.VENUES-CITY-PENDING | `/venues` Пермь: infinite «Обновляем список…» (Cyrillic `?city=` + abort/isPending) | Критический | ✅ `2c23d1d`+`84076fd`; MSK BUILD_ID=`e-XzQltin9RuCjX0zo1VU`; smoke Найдено:23 |
 
 ## Perm must-see pack + my-day (2026-08-06)
 
