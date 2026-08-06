@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [integrate/mvp-launch, feat/next-monorepo, main, master]
+  pull_request:
+    branches: [integrate/mvp-launch, feat/next-monorepo, main, master]
+
+jobs:
+  validate-build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # pnpm must be on PATH before setup-node cache: pnpm
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.7.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Prisma validate and generate
+        run: |
+          pnpm db:validate
+          pnpm db:generate
+          pnpm db:typecheck
+
+      - name: Backend typecheck and unit tests
+        run: |
+          pnpm backend:typecheck
+          pnpm backend:test:ts
+
+      - name: Next web build
+        run: pnpm web:build
+
+      - name: Admin production build
+        env:
+          NODE_ENV: development
+          VITE_DAIBILET_API_URL: /api
+        run: pnpm admin:build
+
+      - name: Syntax check deploy and import scripts
+        run: |
+          node --check scripts/tc-import-catalog.js
+          node --check scripts/sync-invariants-check.js
+          node --check scripts/lib/provider-link-sync.js
+          node --check scripts/lib/event-import-guard.js
+          bash -n deploy/scripts/deploy-from-git.sh
+          bash -n deploy/scripts/deploy-staging.sh
+          bash -n deploy/scripts/deploy-prod-next.sh
+          bash -n deploy/scripts/swap-web-next-artifact.sh
+          bash -n scripts/post-deploy-check.sh
+          bash -n scripts/run-parity-check.sh
