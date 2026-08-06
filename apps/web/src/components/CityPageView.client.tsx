@@ -1407,7 +1407,8 @@ function CitySightsMustSeeList({
                 {index + 1}
               </span>
               <div className="min-w-0 flex-1 pr-0.5">
-                <div className="flex flex-wrap items-start gap-x-2 gap-y-1.5">
+                {/* title + CTA on one row: items-center so multi-line names don't leave the button top-stuck */}
+                <div className="flex items-center gap-2">
                   {placeHref ? (
                     <Link
                       href={placeHref}
