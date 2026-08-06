@@ -4,9 +4,12 @@
 export function HomePageSkeleton() {
   return (
     <div className="pb-24 lg:pb-0" aria-busy="true" aria-label="Загрузка главной">
-      <div className="container-page pt-4 lg:pt-8">
+      {/* Full-bleed search-hero placeholder */}
+      <div className="min-h-[320px] animate-pulse bg-gradient-to-br from-[#122868] via-sky-900 to-slate-900 sm:min-h-[380px] lg:min-h-[420px]" />
+
+      <div className="container-page mt-6 space-y-10 lg:mt-10">
         {/* Mobile stories */}
-        <div className="mb-4 flex gap-3 overflow-hidden lg:hidden">
+        <div className="flex gap-3 overflow-hidden lg:hidden">
           {Array.from({ length: 5 }).map((_, i) => (
             <span
               key={i}
@@ -15,17 +18,6 @@ export function HomePageSkeleton() {
           ))}
         </div>
 
-        {/* Full-width featured banner */}
-        <div className="min-h-[200px] animate-pulse rounded-2xl bg-gradient-to-br from-primary-100 via-sky-100 to-primary-50 sm:min-h-[260px] lg:min-h-[280px]" />
-
-        <div className="mt-5 hidden gap-3 lg:flex">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <span key={i} className="h-20 w-24 shrink-0 animate-pulse rounded-2xl bg-primary-50" />
-          ))}
-        </div>
-      </div>
-
-      <div className="container-page mt-10 space-y-10">
         <SectionSkeleton cards={6} />
         <SectionSkeleton cards={4} tall />
         <div className="h-28 animate-pulse rounded-2xl bg-gradient-to-r from-primary-50 via-sky-50 to-primary-50" />

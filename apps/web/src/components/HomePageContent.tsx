@@ -5,7 +5,7 @@ import { ArrowRight, Dices } from 'lucide-react';
 import { CityCard } from '@/components/CityCard';
 import { HomeBottomNav } from '@/components/HomeBottomNav.client';
 import { HomeGuideEvents } from '@/components/HomeGuideEvents.client';
-import { HomeGuideHero } from '@/components/HomeGuideHero.client';
+import { HomeHero } from '@/components/HomeHero.client';
 import { HomePageSkeleton } from '@/components/HomePageSkeleton';
 import { HomeStoriesStrip } from '@/components/HomeStoriesStrip.client';
 import { LuckyCityButton } from '@/components/LuckyCityButton.client';
@@ -18,10 +18,12 @@ import { podborkiBentoCellClass, podborkiBentoSpan, PODBORKI_BENTO_GRID_CLASS } 
 import { landingCategoryHref } from '@/lib/landing-routes';
 import { withSoftTimeout } from '@/lib/soft-timeout';
 import { getHomeCoverFingerprints, getHomePageData } from '@/server/cached-home-data';
+import { getActiveHeroBanners, heroFramesFromBanners } from '@/server/hero-banners';
 import { fetchPublicApiJson } from '@/server/public-api-client';
 
 /** External CDN HEAD fingerprints must not stall home TTFB on bad egress/DNS. */
 const HOME_FINGERPRINTS_TIMEOUT_MS = 800;
+const HOME_HERO_BANNERS_TIMEOUT_MS = 700;
 const HOME_ARTICLES_TIMEOUT_MS = 1_200;
 type BlogApiArticles = NonNullable<Parameters<typeof mergeBlogCards>[0]>;
 
@@ -63,12 +65,20 @@ async function HomePageBody() {
     : [...blogCards].reverse();
   const blogPosts = orderedBlog.slice(0, 4);
   const [featuredBlog, ...restBlog] = blogPosts;
+  const heroBanners = await withSoftTimeout(
+    getActiveHeroBanners(),
+    HOME_HERO_BANNERS_TIMEOUT_MS,
+    [],
+    'home-hero-banners',
+  );
+  const heroFrames = heroFramesFromBanners(heroBanners);
 
   return (
     <div className="bg-neutral-50 pb-24 lg:pb-0">
-      <HomeStoriesStrip />
+      {/* Classic search-hero: rotating emotion photos + city/date/category find form */}
+      <HomeHero destinations={destinations} frames={heroFrames} />
 
-      <HomeGuideHero sessions={sessions} fingerprints={fingerprintsRecord} />
+      <HomeStoriesStrip />
 
       {/* 2. Cities */}
       {topCities.length ? (

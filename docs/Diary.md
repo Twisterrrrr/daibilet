@@ -1,3 +1,19 @@
+## 2026-08-06 - Home: вернули search-hero с ротацией фото
+
+### Наблюдения
+- Owner clarification: модалку «Оформили билет?» в my-day **не** убирать.
+- Нужна более ранняя шапка главной: блок поиска (город / дата / категория) + смена фото, не afisha-carousel `HomeGuideHero`.
+
+### Решения
+- На `/` снова `HomeHero` + `HeroMedia` rotator (`heroFramesFromBanners` / emotion pool) поверх navy base.
+- `HomeGuideHero` отключён с главной (файл в репо остаётся). Stories / cities / events ниже сохранены.
+- Ticket-confirm modal в `DayRoutePanel` не трогали.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-06 - Home My Day: одна primary CTA
 
 ### Наблюдения
