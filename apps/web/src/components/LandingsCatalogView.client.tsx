@@ -234,7 +234,7 @@ export function LandingsCatalogView({
 
         <ScrollRail
           className="mt-5"
-          viewportClassName="flex flex-nowrap gap-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          viewportClassName="flex flex-nowrap gap-2 pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           aria-label="Настроение"
         >
           {PODBORKI_MOODS.map((mood) => {
@@ -261,7 +261,7 @@ export function LandingsCatalogView({
         {sections.length ? (
           <ScrollRail
             className="mt-4"
-            viewportClassName="flex flex-nowrap gap-2 pb-0.5"
+            viewportClassName="flex flex-nowrap gap-2 pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             aria-label="Категории подборок"
           >
             {sections.map((section) => (
@@ -374,7 +374,7 @@ export function LandingsCatalogView({
       <div className="container-page bg-slate-50 py-10 sm:py-12">
         <section>
           <h2 className="font-display text-xl font-bold text-slate-900">Быстрые подборки</h2>
-          <ScrollRail className="mt-3" viewportClassName="flex flex-nowrap gap-2 pb-0.5" aria-label="Быстрые подборки">
+          <ScrollRail className="mt-3" viewportClassName="flex flex-nowrap gap-2 pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Быстрые подборки">
             {CATALOG_PRESETS.map((preset) => (
               <Link
                 key={preset.slug}
