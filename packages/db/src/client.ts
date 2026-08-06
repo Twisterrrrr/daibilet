@@ -5,8 +5,8 @@ import { Prisma, PrismaClient } from './generated/prisma/client.ts';
 const defaultDatabaseUrl = 'postgresql://daibilet:daibilet@127.0.0.1:5437/daibilet';
 
 type GlobalWithPrisma = typeof globalThis & {
-  __daibiletPrisma?: PrismaClient;
-  __daibiletPgPool?: Pool;
+  __daibiletPrisma?: PrismaClient | undefined;
+  __daibiletPgPool?: Pool | undefined;
 };
 
 const globalForPrisma = globalThis as GlobalWithPrisma;
