@@ -1,3 +1,20 @@
+## 2026-08-06 - `/cities` map: только 8–11 пинов вместо всех городов
+
+### Наблюдения
+- Owner: на https://daibilet.ru/cities на карте только ~8 городов.
+- `RussiaMap` строил маркеры из hardcoded `CITY_PINS` (~11 major hubs). Top-8 на странице - только плитки-герой (`TOP_CITIES_COUNT`), карта к ним не должна быть привязана.
+- Live destinations: 65 городов (`type=city`); PublicDestinationDto без lat/lng.
+
+### Решения
+- `city-map-coords.ts`: центры всех standalone/live городов (API slug + SEO aliases + RU names).
+- `RussiaMap`: пины = все `destinations` type=city с координатами; `data-cities-map-pins`; счётчик в шапке карты.
+- Top-8 tiles без изменений.
+
+### Проблемы
+- Нет (покрытие 65/65 по live API slugs, unit test).
+
+---
+
 ## 2026-08-06 - Suburbs cards: hanging nums + anno-size text
 
 ### Наблюдения
