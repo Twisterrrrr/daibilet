@@ -9,6 +9,7 @@ import {
   type LocationsCatalogMapPin,
 } from '@/components/LocationsCatalogMap.client';
 import { pluralEvents } from '@/lib/format';
+import { normalizeCitySlug } from '@/lib/landing-routes';
 
 type CityMapPin = {
   slug: string;
@@ -17,7 +18,7 @@ type CityMapPin = {
   longitude: number;
 };
 
-/** Major destination centers - OSM pins for `/cities` overview. */
+/** Major destination centers - OSM pins for `/cities` overview (SEO hub slugs). */
 const CITY_PINS: CityMapPin[] = [
   { slug: 'saint-petersburg', name: 'Санкт-Петербург', latitude: 59.9343, longitude: 30.3351 },
   { slug: 'moscow', name: 'Москва', latitude: 55.7558, longitude: 37.6173 },
@@ -37,18 +38,50 @@ type RussiaMapProps = {
   destinations?: PublicDestinationDto[];
 };
 
+/** Index keys so SEO pins (`moscow`) match API destination slugs (`moskva`). */
+function destinationEventLookupKeys(item: PublicDestinationDto): string[] {
+  const keys = new Set<string>();
+  for (const raw of [item.slug, item.sourceSlug]) {
+    const key = String(raw || '')
+      .trim()
+      .toLowerCase();
+    if (!key) continue;
+    keys.add(key);
+    const canonical = normalizeCitySlug(key);
+    if (canonical) keys.add(canonical);
+  }
+  const name = String(item.name || '')
+    .trim()
+    .toLowerCase();
+  if (name) keys.add(`name:${name}`);
+  return [...keys];
+}
+
+function eventsForPin(eventsByKey: Map<string, number>, pin: CityMapPin): number {
+  const bySlug = eventsByKey.get(pin.slug);
+  if (typeof bySlug === 'number') return bySlug;
+  const canonical = normalizeCitySlug(pin.slug);
+  if (canonical) {
+    const byCanonical = eventsByKey.get(canonical);
+    if (typeof byCanonical === 'number') return byCanonical;
+  }
+  return eventsByKey.get(`name:${pin.name.toLowerCase()}`) ?? 0;
+}
+
 /**
  * OSM multi-pin map for `/cities` hero (Leaflet + OpenStreetMap, same stack as `/locations`).
  */
 export function RussiaMap({ className = '', destinations = [] }: RussiaMapProps) {
   const router = useRouter();
 
-  const eventsBySlug = useMemo(() => {
+  const eventsByKey = useMemo(() => {
     const map = new Map<string, number>();
     for (const item of destinations) {
       if (item.type !== 'city') continue;
-      const key = (item.slug || item.sourceSlug || '').toLowerCase();
-      if (key) map.set(key, item.events);
+      const events = Number(item.events) || 0;
+      for (const key of destinationEventLookupKeys(item)) {
+        map.set(key, Math.max(map.get(key) || 0, events));
+      }
     }
     return map;
   }, [destinations]);
@@ -56,7 +89,7 @@ export function RussiaMap({ className = '', destinations = [] }: RussiaMapProps)
   const pins: LocationsCatalogMapPin[] = useMemo(
     () =>
       CITY_PINS.map((pin) => {
-        const events = eventsBySlug.get(pin.slug) ?? 0;
+        const events = eventsForPin(eventsByKey, pin);
         return {
           id: pin.slug,
           title: pin.name,
@@ -66,7 +99,7 @@ export function RussiaMap({ className = '', destinations = [] }: RussiaMapProps)
           typeLabel: events > 0 ? pluralEvents(events) : 'Скоро события',
         };
       }),
-    [eventsBySlug],
+    [eventsByKey],
   );
 
   return (
