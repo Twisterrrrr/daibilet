@@ -12,6 +12,7 @@
 
 ### Проблемы
 - TC venue.name = судно; без override address мог остаться Адмиралтейской из supplier - канон owner = Воскресенская.
+- Commit `b3260aa`; MSK **BUILD_ID=`hd6dzEAUlinQkyxz8kEng`**; ensure DB title/address/kind=PIER; smoke API name `Причал — Воскресенская наб., 10`, city Санкт-Петербург.
 
 ---
 
