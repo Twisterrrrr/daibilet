@@ -107,7 +107,7 @@ async function HomePageBody() {
               {topCities.map((city) => (
                 <div
                   key={city.slug || city.name}
-                  className="w-[min(50vw,176px)] shrink-0 snap-start"
+                  className="w-[min(52vw,196px)] shrink-0 snap-start"
                   data-rail-item
                 >
                   <CityCard city={city} />

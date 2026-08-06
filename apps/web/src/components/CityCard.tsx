@@ -49,7 +49,7 @@ function CityHubTags({ city }: { city: PublicDestinationDto }) {
           <li key={`${tag.kind}:${tag.slug || tag.label}`} className="min-w-0 shrink">
             <Link
               href={href}
-              className="inline-flex max-w-full truncate whitespace-nowrap rounded-md bg-primary-50 px-1.5 py-0.5 text-[9px] font-semibold leading-4 text-primary-800 transition hover:bg-primary-100 sm:px-2 sm:text-[10px]"
+              className="inline-flex max-w-full truncate whitespace-nowrap rounded-md bg-primary-50 px-1.5 py-0.5 text-[12px] font-semibold leading-4 text-primary-800 transition hover:bg-primary-100 sm:px-2 sm:text-[13px]"
             >
               {tag.label}
             </Link>
@@ -68,7 +68,7 @@ function CityVibeRow({ city }: { city: PublicDestinationDto }) {
     <ul className="mt-2 flex min-w-0 flex-wrap gap-1" aria-label={`Вайб: ${city.name}`}>
       {vibes.map((tag) => (
         <li key={tag.label}>
-          <span className="inline-flex items-center gap-1 rounded-md bg-slate-100/90 px-1.5 py-0.5 text-[10px] font-medium text-slate-700">
+          <span className="inline-flex items-center gap-1 rounded-md bg-slate-100/90 px-1.5 py-0.5 text-xs font-medium text-slate-700">
             <span aria-hidden>{tag.emoji}</span>
             {tag.label}
           </span>
