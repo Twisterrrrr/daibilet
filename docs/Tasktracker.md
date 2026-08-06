@@ -219,7 +219,8 @@
 | UX.MYDAY-MOSQUE-MATCH | SPB соборная мечеть: ложный match → МТС Live Hall (Ded Moroz + concert copy / Anna-Elza PDP); truncate title | Критический | ✅ code `2cdebd4`; MSK DB promote+revalidate (`fix-spb-sobornaya-mechet-venue`); web deploy matcher still pending «выкатывай» |
 | UX.MYDAY-STOP-CHIPS | Stop cards: offer chips горизонтально (flex-wrap) + всегда title·price (не столбик ml-auto / не голый «Купить билет») | Критический | ✅ `3d2686b` push; deploy n/a |
 | UX.MYDAY-STOP-OFFERS-BELOW | Stop cards: offer chips ниже main row (не поверх ~time/km); layout как «Руки Вверх» | Критический | ✅ push; deploy n/a (owner не просил выкатывай) |
-| UX.MYDAY-STOP-OFFERS-LG-ROW | Desktop lg+: offers справа в одном ряду с place/travel; mobile stacked ниже | Критический | 🔄 commit+MSK deploy |
+| UX.MYDAY-STOP-OFFERS-LG-ROW | Desktop lg+: offers справа в одном ряду с place/travel; mobile stacked ниже | Критический | 🔄 `a201ea9` + MSK deploy |
+| UX.MYDAY-MUSTSEE-ALWAYS | Must-see: убрать Свернуть/Развернуть; всегда full grid; accordion open by default | Высокий | 🔄 ship + MSK deploy |
 
 ## /my-day starter → header search (2026-08-04)
 
@@ -229,7 +230,7 @@
 | UX.MYDAY-CITY-RESET | Смена города на /my-day: confirm сброс маршрута если >=1 stop (header+on-page) | Высокий | ✅ `6e5e922` MSK **BUILD_ID=`neGTZ9t_aXfs0StFNoZZo`** `/my-day` 200 |
 | UX.MYDAY-MATCHES-TITLE | Matches accordion: «Подходящие экскурсии» → «События поблизости» | Высокий | ✅ `1f08893` MSK **BUILD_ID=`JHo5binbjsG01hIPE_9_0`** `/my-day` 200 |
 | UX.MYDAY-MATCHES-ORDER | Matches между «Главные места» и «своё место»; drop «Места экскурсии не в маршруте» | Критический | ✅ `3e9b6fa` MSK **BUILD_ID=`M7xdN7ovP2s4tAjJKQYPY`** `/my-day` 200 |
-| UX.MYDAY-MUSTSEE-EXPAND | Must-see: «Развернуть»/«Свернуть» - carousel ↔ full-width grid (1/2/3 cols) + dense left actions | Высокий | ✅ `1ba63e4` MSK **BUILD_ID=`enL85fpbBPEAS0-dH3Aa-`** `/my-day` 200 |
+| UX.MYDAY-MUSTSEE-EXPAND | Must-see: «Развернуть»/«Свернуть» - carousel ↔ full-width grid (superseded by ALWAYS) | Высокий | ✅ `1ba63e4` → superseded |
 | UX.MYDAY-MUSTSEE-BLUE | Must-see bulk «Добавить главные места»: `sky-600` primary (как Яндекс CTA) | Высокий | ✅ `441ce9e` MSK **BUILD_ID=`JHo5binbjsG01hIPE_9_0`** `/my-day` 200 |
 | UX.MYDAY-EMPTY-SHARE | Empty: restore starter subtitle (no invite dup); hide Share/Save/Clear at 0 stops | Высокий | ✅ `1ba63e4` live `5f5bd84` MSK **BUILD_ID=`M7xdN7ovP2s4tAjJKQYPY`** `/my-day` 200 |
 | UX.MYDAY-HEADER-SEARCH | ≥1 stop: hide mid starter card; compact city+search under H1; empty starter unchanged | Высокий | ✅ `c8f918f` MSK **BUILD_ID=`E2goVq9U7X9ujiRnLliZf`** `/my-day` 200 |

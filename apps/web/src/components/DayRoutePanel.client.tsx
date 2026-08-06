@@ -370,7 +370,8 @@ function DayRoutePanelInner() {
   const [formError, setFormError] = useState<string | null>(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
   /** Exclusive accordion: route list stays outside; all other sections collapse. */
-  const [openPanel, setOpenPanel] = useState<DayRouteAccordionId | null>(null);
+  /** Must-see open by default so the grid is visible without an extra expand click. */
+  const [openPanel, setOpenPanel] = useState<DayRouteAccordionId | null>('mustSee');
   const [locationsCatalog, setLocationsCatalog] = useState<VenueCatalogCard[]>([]);
   const [venuesCatalog, setVenuesCatalog] = useState<VenueCatalogCard[]>([]);
   const [eventsCatalog, setEventsCatalog] = useState<PublicCatalogListItemDto[]>([]);
@@ -387,8 +388,6 @@ function DayRoutePanelInner() {
   const [catalogError, setCatalogError] = useState<string | null>(null);
   const [destinationsFallback, setDestinationsFallback] = useState<PublicDestinationDto[]>([]);
   const [mustSeeFilter, setMustSeeFilter] = useState<MustSeeFilterId>('main');
-  /** Must-see chips: H-carousel (default) vs full list (mobile stack / desktop wrap). */
-  const [mustSeeExpanded, setMustSeeExpanded] = useState(false);
   /** Hot Picks tab: Советы / Культура / Еда и бары. */
   const [hotPickTab, setHotPickTab] = useState<HotPickTabId>('tips');
   /** Stop focused from map pin click. */
@@ -3313,28 +3312,6 @@ function DayRoutePanelInner() {
                           ? 'Добавить главные места'
                           : 'Добавить выбранные'}
                       </button>
-                      {mustSeeFiltered.length > 0 ? (
-                        <button
-                          type="button"
-                          onClick={() => setMustSeeExpanded((open) => !open)}
-                          aria-expanded={mustSeeExpanded}
-                          aria-controls="day-must-see-list"
-                          data-day-must-see-expand
-                          className="hidden min-h-8 items-center justify-center gap-1 px-1.5 text-xs font-medium text-slate-500 transition hover:text-slate-800 sm:inline-flex"
-                        >
-                          {mustSeeExpanded ? (
-                            <>
-                              <ChevronUp className="h-3.5 w-3.5" />
-                              Свернуть
-                            </>
-                          ) : (
-                            <>
-                              <ChevronDown className="h-3.5 w-3.5" />
-                              Развернуть
-                            </>
-                          )}
-                        </button>
-                      ) : null}
                     </div>
                   </div>
                   <MustSeeFilterTabs
@@ -3349,14 +3326,9 @@ function DayRoutePanelInner() {
                   />
                   <div
                     id="day-must-see-list"
-                    className={
-                      mustSeeExpanded
-                        ? 'mt-3 grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3'
-                        : 'mt-3 grid grid-cols-1 gap-2.5 sm:flex sm:snap-x sm:snap-mandatory sm:gap-2.5 sm:overflow-x-auto sm:pb-1'
-                    }
+                    className="mt-3 grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3"
                     data-day-must-see-list
-                    data-day-must-see-carousel={mustSeeExpanded ? undefined : '1'}
-                    data-day-must-see-expanded={mustSeeExpanded ? '1' : undefined}
+                    data-day-must-see-expanded="1"
                   >
                     {mustSeeFiltered.map(({ place, item, hook }) => {
                       const inRoute =
@@ -3380,11 +3352,7 @@ function DayRoutePanelInner() {
                                   : hook || 'Добавить в день'
                           }
                           onClick={() => addMustSeeItem(item)}
-                          className={`flex items-center gap-3 rounded-xl border px-2.5 py-1.5 text-left transition disabled:cursor-not-allowed ${
-                            mustSeeExpanded
-                              ? 'w-full min-w-0'
-                              : 'w-full min-w-0 sm:w-[min(100%,24rem)] sm:shrink-0 sm:snap-start'
-                          } ${
+                          className={`flex w-full min-w-0 items-center gap-3 rounded-xl border px-2.5 py-1.5 text-left transition disabled:cursor-not-allowed ${
                             inRoute
                               ? 'border-emerald-400 bg-emerald-50 text-emerald-900'
                               : 'border-slate-200 bg-white text-slate-800 hover:border-emerald-300 hover:bg-emerald-50/50'

@@ -13,6 +13,26 @@
 
 ---
 
+## 2026-08-06 - My Day must-see: always expanded grid
+
+### Наблюдения
+- Owner: у «Главные места» кружок на «Свернуть» рядом с «Добавить главные места»; «уберем опцию, будем показывать развернутым».
+- Параллельный stop-offers commit (`a201ea9`) случайно захватил этот UX; потом `9a259f4` вернул carousel toggle - откат отменён намеренным коммитом.
+
+### Решения
+- Убран toggle `mustSeeExpanded` / `data-day-must-see-expand` («Свернуть»/«Развернуть») и carousel-режим.
+- Сетка must-see всегда `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3` + `data-day-must-see-expanded="1"`.
+- Аккордеон «Главные места» открыт по умолчанию (`openPanel = 'mustSee'`); header chevron оставлен для плотности страницы.
+- «Добавить главные места» и filter chips без изменений.
+
+### Проблемы
+- Нет.
+
+### Live
+- (после MSK deploy)
+
+---
+
 ## 2026-08-06 - `/cities` desktop: top-8 + full-width map
 
 ### Наблюдения
@@ -32,7 +52,7 @@
 
 ---
 
-
+## 2026-08-06 - Suburb nested POI: coords for day-route
 
 ### Наблюдения
 - Owner: «по точкам пригородов вообще нет координат, соответственно маршрут не строится».
