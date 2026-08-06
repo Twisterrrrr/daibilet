@@ -1,3 +1,21 @@
+## 2026-08-06 - City hub must-see: sparse horizontal grid
+
+### Наблюдения
+- Owner (Пермь): при 2 местах в «Зачем ехать» / «Главные места» карточки стопкой в одной узкой колонке, справа пусто. 2-row `grid-flow-col` карусель бессмысленна при <4 пунктах.
+
+### Решения
+- `CitySightsMustSeeList` (`CityPageView.client.tsx`): если `visiblePlaces.length < 4` на md+ - горизонтальный грид (`1` / `2` / `3` cols), `data-city-must-see-layout="sparse-grid"`; стрелки карусели скрыты.
+- При ≥4 - прежняя 2-row column-flow карусель (`layout="carousel"`). Mobile swipe без изменений.
+- CTA «В маршрут»: на md+ рядом с title (как suburbs); на mobile под описанием.
+
+### Проблемы
+- Параллельный MSK deploy перебил web mid-warm (краткий 502); финальный tip `ee6fd749` включает фикс.
+
+### Live
+- Commit `2519d5f` (ancestor of `ee6fd749`); MSK **BUILD_ID=`cr_HR-Mm4jbjC788zYriW`**; smoke `/cities/perm` local+https **200**; HTML `data-city-must-see-layout="sparse-grid"`, 2 cards.
+
+---
+
 ## 2026-08-06 - My Day stop offers: desktop right column
 
 ### Наблюдения

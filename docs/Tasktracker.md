@@ -15,6 +15,12 @@
 |---|--------|-----------|--------|
 | OPS.DEPLOY-CADENCE | Канон: commit+push после итерации; MSK web deploy пачкой раз в сутки / по запросу owner; hotfix-исключения | Высокий | ✅ `.cursorrules` + Project.md 2026-08-05 |
 
+## City hub must-see sparse grid (2026-08-06)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| UX.MUSTSEE-SPARSE | City hub «Главные места»: при <4 местах md+ горизонтальный грид вместо узкой 2-row колонки | Высокий | ✅ `2519d5f`; MSK BUILD_ID=`cr_HR-Mm4jbjC788zYriW`; smoke `/cities/perm` 200 + `sparse-grid` |
+
 ## `/cities` desktop redesign (2026-08-06)
 
 | # | Задача | Приоритет | Статус |
