@@ -1,3 +1,33 @@
+## 2026-08-06 - Blog: hide «Хаб Регионы» CTA
+
+### Наблюдения
+- В «Дальше по теме» для статей с citySlug=`regions` рисовалась кнопка «Хаб Регионы» → `/cities/regions` (псевдогород, не хаб).
+
+### Решения
+- `resolveBlogCityHref` / `resolveBlogCityEventsHref` возвращают null для regions/multi и лейблов Регионы / Несколько городов / Без города (web+public).
+
+### Проблемы
+- Нет.
+
+---
+
+## 2026-08-06 - My Day stop offers: venue link + лейбл + equal grid
+
+### Наблюдения
+- Предыдущие агенты по my-day offers упали; в WIP уже были helpers `dayRouteOfferIsVenueBound` / empty chip (без «Билет оформляется…»), grid/list layout и handoff off (`703d1ca` / `eca4c00`).
+- Owner: лейбл «События поблизости» над офферами; venue без даты → ссылка на площадку + «от N ₽»; grid не раздувать; list pills center; модалка off.
+
+### Решения
+- Chip pending: empty label (не UI «Билет оформляется…»).
+- Venue-bound CTA: `Link` на venue page + price; event buy-pill только для event-as-stop.
+- Nearby upsells: лейбл + chips; при 2+ - вертикальный список под карточкой, `justify-center`.
+- Grid: `items-stretch`, shell равной высоты, офферы `data-day-stop-offers-below` вне shell.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-06 - Event hero: кликабельный бейдж площадки
 
 ### Наблюдения
