@@ -354,38 +354,32 @@ export function HomeGuideHero({ sessions, fingerprints }: HomeGuideHeroProps) {
             )}
           </div>
 
-          {/* My Day - 1/3 on md+, same stretch height as banner cell */}
-          <div className="relative flex flex-col justify-between overflow-hidden rounded-2xl bg-gradient-to-br from-primary-600 via-primary-600 to-sky-500 p-5 text-white shadow-card sm:p-6 md:col-span-1 md:h-full md:min-h-[240px] md:p-6 lg:min-h-[260px] lg:p-7">
+          {/* My Day - 1/3 on md+, same stretch height as banner cell; single primary CTA */}
+          <div className="relative flex flex-col justify-between overflow-hidden rounded-2xl bg-gradient-to-br from-primary-600 via-primary-600 to-sky-500 p-6 text-white shadow-card sm:p-7 md:col-span-1 md:h-full md:min-h-[240px] md:p-7 lg:min-h-[260px] lg:p-8">
             <div
               className="pointer-events-none absolute -right-8 -top-8 h-40 w-40 rounded-full bg-sky-300/25 blur-2xl"
               aria-hidden
             />
             <div className="pointer-events-none absolute -bottom-10 left-6 h-32 w-32 rounded-full bg-white/10 blur-2xl" aria-hidden />
-            <div className="relative z-[1]">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide backdrop-blur-sm">
-                <Route className="h-3.5 w-3.5" aria-hidden />
-                Мой день
-              </span>
-              <h2 className="mt-3 font-display text-xl font-bold leading-snug tracking-tight sm:text-2xl md:text-xl lg:text-[1.55rem]">
-                {myDayHeadline}
-              </h2>
-              <p className="mt-2 text-sm text-white/85 md:text-[13px] lg:text-sm">
-                Музеи, прогулки и события по порядку - без хаоса в заметках.
-              </p>
-            </div>
-            <div className="relative z-[1] mt-5 flex flex-col gap-2 sm:mt-6 md:mt-auto md:pt-4">
+            <div className="relative z-[1] flex flex-1 flex-col justify-between gap-6">
+              <div>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide backdrop-blur-sm">
+                  <Route className="h-3.5 w-3.5" aria-hidden />
+                  Мой день
+                </span>
+                <h2 className="mt-4 font-display text-2xl font-bold leading-snug tracking-tight sm:text-[1.7rem] md:text-[1.45rem] lg:text-[1.7rem]">
+                  {myDayHeadline}
+                </h2>
+                <p className="mt-3 text-sm leading-relaxed text-white/90 sm:text-[15px] md:text-sm lg:text-[15px]">
+                  Музеи, прогулки и события по порядку - без хаоса в заметках.
+                </p>
+              </div>
               <Link
                 href={myDayHref}
-                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-primary-700 shadow-sm transition hover:bg-sky-50"
+                className="inline-flex w-full min-h-12 items-center justify-center gap-2 rounded-xl bg-white px-5 py-3.5 text-base font-semibold text-primary-700 shadow-sm transition hover:bg-sky-50"
               >
                 Спланировать день
                 <ArrowRight className="h-4 w-4" aria-hidden />
-              </Link>
-              <Link
-                href={myDayHref}
-                className="inline-flex min-h-10 items-center justify-center rounded-xl border border-white/35 bg-white/10 px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/20"
-              >
-                Собрать маршрут
               </Link>
             </div>
           </div>
