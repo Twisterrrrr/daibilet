@@ -18,7 +18,7 @@
 
 ---
 
-
+## 2026-08-06 - Hub suburbs: title hierarchy + mobile «Ещё»
 
 ### Наблюдения
 - Owner скрин блока «Значимые пригороды» (не compact my-day): крупным шёл `travelVector` + stationHub, имя пригорода («Петергоф») оказывалось mid-card.
@@ -27,10 +27,13 @@
 ### Решения
 - `SuburbsCarousel` hub rich: title = `place.name` (крупный h3), subtitle = `travelVector - stationHub` (`data-city-suburb-vector`); CTA рядом с именем.
 - Mobile: по умолчанию короткий layout (имя + вектор + станция + список POI без desc); essay/gastro/POI-desc за кнопкой «Ещё» / «Свернуть». Desktop `md+` - полная rich-карточка без коллапса.
-- Compact my-day не трогали (там имя уже было title).
+- Compact my-day: позже выровнен отдельно (CTA вниз + loop arrows), иерархия name/vector сохранена.
 
 ### Проблемы
 - Нет.
+
+### Live
+- Commit `915083b` (в live как предок `b40978b`); MSK **BUILD_ID=`jvN4iczAP8rqDdevfj0AW`**; smoke `/cities/saint-petersburg` 200; в HTML `data-city-suburb-title` перед `data-city-suburb-vector`, есть `data-city-suburb-expand`.
 
 ---
 
