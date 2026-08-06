@@ -66,6 +66,13 @@ import {
 } from '@/lib/bridges-session-utils';
 import { resolveLandingCopy, shouldUseLandingCopy } from '@/lib/landing-copy';
 import { applyLandingSeoMeta, resolveLandingSeo } from '@/lib/landing-seo';
+import {
+  isDateInsideLandingWindow,
+  isSessionInsideLandingWindow,
+  listLandingWindowDays,
+  resolveLandingEventWindow,
+  type LandingEventWindow,
+} from '@/lib/landing-event-windows';
 import { useLandingTodayReference } from '@/lib/use-landing-today-reference';
 import { buildCategoryCityListingMeta } from '@/lib/seo-listing-meta';
 import { LandingSeoBottom, landingBlocksHaveSeoText } from '@/components/LandingSeoBottom.client';
@@ -108,7 +115,7 @@ import type { PublicLandingDto, PublicLandingPageDto, PublicSessionDto } from '@
 
 type LandingContentBlock = NonNullable<PublicLandingPageDto['blocks']>[number];
 
-type DateFilter = 'all' | 'today' | 'tomorrow' | 'weekend' | 'evening';
+type DateFilter = 'all' | 'today' | 'tomorrow' | 'weekend' | 'evening' | 'window' | `day:${string}`;
 type SortFilter = 'price' | 'rating' | 'time';
 type ViewMode = 'list' | 'table' | 'cards';
 type LandingProfile = 'bus' | 'dinner' | 'river' | 'seasonal' | 'bridges' | 'default';
@@ -812,7 +819,9 @@ export function LandingPageView({
     }
     return resolveConcertGenreTag(initialGenre) || 'all';
   });
-  const [dateFilter, setDateFilter] = React.useState<DateFilter>(defaultLandingDateFilter(profile));
+  const [dateFilter, setDateFilter] = React.useState<DateFilter>(() =>
+    defaultLandingDateFilter(profile, slug),
+  );
   const [sort, setSort] = React.useState<SortFilter>(profile === 'bus' || profile === 'dinner' ? 'price' : 'time');
   const [menuFilter, setMenuFilter] = React.useState<MenuFilter>('all');
   const [dinnerTimeFilter, setDinnerTimeFilter] = React.useState<DinnerTimeFilter>('all');
@@ -832,7 +841,7 @@ export function LandingPageView({
   React.useEffect(() => {
     const nextProfile = getLandingProfile(slug);
     setSort(nextProfile === 'bus' || nextProfile === 'dinner' ? 'price' : 'time');
-    setDateFilter(defaultLandingDateFilter(nextProfile));
+    setDateFilter(defaultLandingDateFilter(nextProfile, slug));
     setMenuFilter('all');
     setDinnerTimeFilter('all');
     setDinnerBadgeFilter('all');
@@ -943,6 +952,7 @@ export function LandingPageView({
           landingSlug: slug,
           cityName,
           fallbackTitle: payload.landing.title,
+          referenceDate: todayReference,
         })
       : null;
     applyLandingSeoMeta({
@@ -973,10 +983,13 @@ export function LandingPageView({
             ]
           : undefined,
     });
-    if (listingMeta && typeof document !== 'undefined') {
-      document.title = listingMeta.title;
-      const desc = document.querySelector('meta[name="description"]');
-      if (desc) desc.setAttribute('content', listingMeta.description);
+    if (typeof document !== 'undefined') {
+      // H1 and <title> share the same human pattern from resolveLandingSeo.
+      document.title = seo.title;
+      if (listingMeta) {
+        const desc = document.querySelector('meta[name="description"]');
+        if (desc) desc.setAttribute('content', listingMeta.description);
+      }
     }
   }, [payload?.landing, payload?.stats, slug, profile, citySlug, todayReference]);
 
@@ -985,6 +998,15 @@ export function LandingPageView({
 
     return payload.sessions.filter((session) => {
       if (!session.startsAt && !isOpenDate(session)) return false;
+      const eventWindow = resolveLandingEventWindow(slug, todayReference);
+      if (eventWindow) {
+        const timeZone = resolveSessionTimeZoneForSession(session);
+        const times = collectSessionStartsAtTimes(session);
+        if (!times.length) return false;
+        if (!times.some((startsAt) => isSessionInsideLandingWindow(startsAt, eventWindow, timeZone))) {
+          return false;
+        }
+      }
       if (city !== 'all' && !sessionMatchesCity(session, city)) return false;
       if (category !== 'all' && session.category !== category && !session.tags.includes(category)) return false;
       if (profile === 'dinner' && !matchesMenuFilter(session, menuFilter)) return false;
@@ -1002,10 +1024,10 @@ export function LandingPageView({
         if (needles.length && !needles.some((needle) => text.includes(needle))) return false;
       }
       if ((profile === 'bus' || profile === 'river' || profile === 'seasonal' || profile === 'bridges') && !matchesTimeSlotFilter(session, timeSlot)) return false;
-      if (profile !== 'bridges' && !matchesDateFilter(session, dateFilter)) return false;
+      if (profile !== 'bridges' && !matchesDateFilter(session, dateFilter, eventWindow, todayReference)) return false;
       return true;
     });
-  }, [category, city, dateFilter, menuFilter, dinnerTimeFilter, dinnerBadgeFilter, contextChip, timeSlot, payload, profile, sessionsReady]);
+  }, [category, city, dateFilter, menuFilter, dinnerTimeFilter, dinnerBadgeFilter, contextChip, timeSlot, payload, profile, sessionsReady, slug, todayReference]);
 
   const allGroups = React.useMemo(
     () => (payload && sessionsReady ? groupLandingSessions(payload.sessions) : []),
@@ -1141,7 +1163,7 @@ export function LandingPageView({
                 setDinnerTimeFilter={setDinnerTimeFilter}
                 setDinnerBadgeFilter={setDinnerBadgeFilter}
                 reset={() => {
-                  setDateFilter('all');
+                  setDateFilter(defaultLandingDateFilter(profile, slug));
                   setSort('price');
                   setMenuFilter('all');
                   setDinnerTimeFilter('all');
@@ -1170,7 +1192,7 @@ export function LandingPageView({
               reset={() => {
                 setCity(cityName || 'all');
                 setCategory('all');
-                setDateFilter(defaultLandingDateFilter(profile));
+                setDateFilter(defaultLandingDateFilter(profile, landingSlug));
                 setSort(profile === 'bus' ? 'price' : 'time');
                 setTimeSlot('');
               }}
@@ -1209,7 +1231,7 @@ export function LandingPageView({
               onReset={() => {
                 setCity(cityName || 'all');
                 setCategory('all');
-                setDateFilter(defaultLandingDateFilter(profile));
+                setDateFilter(defaultLandingDateFilter(profile, landingSlug));
                 setSort(profile === 'bus' ? 'price' : 'time');
                 setTimeSlot('');
                 setContextChip(null);
@@ -2904,12 +2926,13 @@ function LandingFilters({
         { label: 'По цене', value: 'price' },
         { label: 'По рейтингу', value: 'rating' },
       ];
-  const dateChips: Array<{ label: string; value: DateFilter }> = [
-    { label: 'Сегодня', value: 'today' },
-    { label: 'Завтра', value: 'tomorrow' },
-    { label: 'Любая дата', value: 'all' },
-    ...(isSeasonal || isBus || isRiver || isBridges ? [] : [{ label: 'Вечером', value: 'evening' as DateFilter }]),
-  ];
+  const eventWindow = landingSlug ? resolveLandingEventWindow(landingSlug) : null;
+  const dateChips = resolveLandingDateChips({
+    profile,
+    landingSlug,
+    eventWindow,
+    isSeasonal: isSeasonal || isBus || isRiver || isBridges,
+  });
   const countLabel = isBus && currentCityName ? 'экскурсий' : isBus ? 'экскурсий' : isRiver && currentCityName ? 'прогулок' : isSeasonal ? 'программ' : 'рейсов';
 
   const timeSlotSelect = (
@@ -3965,8 +3988,60 @@ function sortEventGroups(groups: EventGroup[], sort: SortFilter): EventGroup[] {
   return sorted.sort((a, b) => new Date(a.firstStartsAt || 0).getTime() - new Date(b.firstStartsAt || 0).getTime());
 }
 
-function defaultLandingDateFilter(_profile: LandingProfile): DateFilter {
-  return 'all';
+function dayFilterValue(date: Date): `day:${string}` {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `day:${y}-${m}-${d}`;
+}
+
+function parseDayFilterValue(filter: DateFilter): Date | null {
+  if (!filter.startsWith('day:')) return null;
+  const raw = filter.slice(4);
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(raw);
+  if (!match) return null;
+  return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+}
+
+function formatChipDayLabel(date: Date): string {
+  return new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'short' }).format(date);
+}
+
+function resolveLandingDateChips(input: {
+  profile: LandingProfile;
+  landingSlug?: string;
+  eventWindow: LandingEventWindow | null;
+  isSeasonal: boolean;
+}): Array<{ label: string; value: DateFilter }> {
+  const { eventWindow, isSeasonal } = input;
+  if (eventWindow) {
+    const days = listLandingWindowDays(eventWindow, 14);
+    if (eventWindow.singleDay || days.length === 1) {
+      const day = days[0] || eventWindow.start;
+      return [{ label: eventWindow.label || formatChipDayLabel(day), value: dayFilterValue(day) }];
+    }
+    if (days.length <= 7) {
+      return [
+        { label: 'Все даты', value: 'window' },
+        ...days.map((day) => ({ label: formatChipDayLabel(day), value: dayFilterValue(day) })),
+      ];
+    }
+    return [{ label: `Сезон: ${eventWindow.label}`, value: 'window' }];
+  }
+
+  return [
+    { label: 'Сегодня', value: 'today' },
+    { label: 'Завтра', value: 'tomorrow' },
+    { label: 'Любая дата', value: 'all' },
+    ...(isSeasonal ? [] : [{ label: 'Вечером', value: 'evening' as DateFilter }]),
+  ];
+}
+
+function defaultLandingDateFilter(_profile: LandingProfile, landingSlug?: string): DateFilter {
+  const window = landingSlug ? resolveLandingEventWindow(landingSlug) : null;
+  if (!window) return 'all';
+  if (window.singleDay) return dayFilterValue(window.start);
+  return 'window';
 }
 
 function resolveSeasonalCityNames(landingSlug: string, cityOptions: Array<[string, number]>): string[] {
@@ -3978,12 +4053,23 @@ function resolveSeasonalCityNames(landingSlug: string, cityOptions: Array<[strin
     .filter((name) => name && !/^не указан$/i.test(name.trim()));
 }
 
-function matchesDateFilter(session: PublicSessionDto, filter: DateFilter): boolean {
-  if (filter === 'all') return true;
+function matchesDateFilter(
+  session: PublicSessionDto,
+  filter: DateFilter,
+  eventWindow: LandingEventWindow | null = null,
+  referenceDate: Date = new Date(),
+): boolean {
+  if (filter === 'all' || filter === 'window') return true;
   if (isOpenDate(session)) return true;
   const timeZone = resolveSessionTimeZoneForSession(session);
   const times = collectSessionStartsAtTimes(session);
   if (!times.length) return false;
+
+  const dayValue = parseDayFilterValue(filter);
+  if (dayValue) {
+    if (eventWindow && !isDateInsideLandingWindow(dayValue, eventWindow)) return false;
+    return times.some((startsAt) => isSameSessionDay(startsAt, dayValue, timeZone));
+  }
 
   if (filter === 'evening') {
     return (
@@ -3993,8 +4079,21 @@ function matchesDateFilter(session: PublicSessionDto, filter: DateFilter): boole
     );
   }
 
+  // Relative chips only when that calendar day sits inside the holiday window (if any).
+  if (eventWindow) {
+    if (filter === 'today' && !isDateInsideLandingWindow(referenceDate, eventWindow)) return false;
+    if (filter === 'tomorrow') {
+      const tomorrow = new Date(
+        referenceDate.getFullYear(),
+        referenceDate.getMonth(),
+        referenceDate.getDate() + 1,
+      );
+      if (!isDateInsideLandingWindow(tomorrow, eventWindow)) return false;
+    }
+  }
+
   return times.some((startsAt) => {
-    if (filter === 'today') return isSameSessionDay(startsAt, new Date(), timeZone);
+    if (filter === 'today') return isSameSessionDay(startsAt, referenceDate, timeZone);
     if (filter === 'tomorrow') return isSessionTomorrow(startsAt, timeZone);
     if (filter === 'weekend') return isSessionWeekend(startsAt, timeZone);
     return true;

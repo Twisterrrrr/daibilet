@@ -13,30 +13,40 @@ import {
   shouldShowThinRelatedCards,
 } from '@/lib/seo-listing-meta';
 
-test('category×city title formula (legacy dash)', () => {
+test('category×city title: в {city} сегодня, date: афиша (no dash, no year glue)', () => {
   const title = buildCategoryCityMetaTitle({
     categoryTitle: 'Концерты',
     cityName: 'Москва',
-    year: 2026,
+    landingSlug: 'concerts-genre',
+    referenceDate: new Date('2026-08-06T12:00:00+03:00'),
   });
-  assert.equal(
-    title,
-    'Концерты в Москве 2026 - купить билеты, расписание и цены на Дайбилет',
-  );
+  assert.equal(title, 'Концерты в Москве сегодня, 6 августа: афиша, цены и билеты');
   assert.ok(!title.includes('\u2014') && !title.includes('\u2013'));
+  assert.ok(!/: :/.test(title));
 });
 
-test('category×city title formula (Kazan colon)', () => {
+test('category×city title strips duplicate city from category label', () => {
   const title = buildCategoryCityMetaTitle({
-    categoryTitle: 'Экскурсии',
-    cityName: 'Казань',
-    year: 2026,
+    categoryTitle: 'Музеи и выставки в Москве',
+    cityName: 'Москва',
+    landingSlug: 'moscow-museums',
+    referenceDate: new Date('2026-08-06T12:00:00+03:00'),
   });
-  assert.equal(
-    title,
-    'Экскурсии в Казани 2026: купить билеты, расписание и цены на Дайбилет',
-  );
-  assert.ok(!title.includes('\u2014') && !title.includes('\u2013'));
+  assert.equal(title, 'Музеи и выставки в Москве сегодня, 6 августа: афиша, цены и билеты');
+  assert.equal((title.match(/Москв/gi) || []).length, 1);
+});
+
+test('category×city title for salute uses May 9 window (no wrong today)', () => {
+  const title = buildCategoryCityMetaTitle({
+    categoryTitle: 'Салют 9 мая',
+    cityName: 'Москва',
+    landingSlug: 'salute-9-may',
+    referenceDate: new Date('2026-08-06T12:00:00+03:00'),
+  });
+  assert.match(title, /Салют 9 мая в Москве/);
+  assert.match(title, /9 мая/);
+  assert.equal(/сегодня/i.test(title), false);
+  assert.ok(!/: :/.test(title));
 });
 
 test('category×city description formula (legacy)', () => {
@@ -68,9 +78,10 @@ test('listing meta bundles labels', () => {
     landingSlug: 'concerts-genre',
     cityName: 'Москва',
     year: 2026,
+    referenceDate: new Date('2026-08-06T12:00:00+03:00'),
   });
   assert.equal(meta.labels.titleCategory, 'Концерты');
-  assert.match(meta.title, /^Концерты в Москве 2026/);
+  assert.match(meta.title, /^Концерты в Москве сегодня, 6 августа/);
 });
 
 test('listing meta appends real priceFrom only', () => {

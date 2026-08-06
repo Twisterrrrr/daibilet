@@ -64,15 +64,23 @@ export async function buildLandingMetadata(pathname: string): Promise<Metadata> 
   let shareTitle: string;
 
   if (cityName) {
+    const seo = resolveLandingSeo({
+      slug,
+      profile,
+      landingTitle: landing.title,
+      cityName,
+      stats: finalized.stats,
+      landingEvents: landing.events,
+    });
     const listingMeta = buildCategoryCityListingMeta({
       landingSlug: slug,
       cityName,
       fallbackTitle: landing.title,
       priceFrom,
     });
-    title = listingMeta.title;
+    title = seo.title;
     description = listingMeta.description;
-    shareTitle = listingMeta.title;
+    shareTitle = seo.title;
   } else {
     const seo = resolveLandingSeo({
       slug,

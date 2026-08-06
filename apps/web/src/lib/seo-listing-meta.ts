@@ -1,5 +1,11 @@
 import { cityToPrepositional, inCityPrepositional, isSeoExpansionCity } from '@/lib/city-declension';
+import { formatLandingTodayParts, SITE_TIME_ZONE } from '@/lib/datetime';
 import { canonicalLandingSlug } from '@/lib/landing-constants';
+import {
+  resolveLandingEventWindow,
+  resolveLandingTitleDateShort,
+} from '@/lib/landing-event-windows';
+import { stripCityFromLandingTopic } from '@/lib/landing-seo';
 
 /**
  * Порог коммерческой SEO-страницы: ниже - noindex,follow (страница жива для UX).
@@ -120,22 +126,34 @@ export function listingSeoYear(referenceDate: Date = new Date()): number {
 }
 
 /**
- * Title (absolute, бренд уже внутри).
- * Казань/Екб: `{Категория} в {City_Пр} {Год}: купить билеты, расписание и цены на Дайбилет`
- * Остальные: `{Категория} в {City_Пр} {Год} - купить билеты, расписание и цены на Дайбилет`
+ * Title (absolute).
+ * Pattern: `{Категория} в {City_Пр} сегодня, {date}: афиша, цены и билеты`
+ * Without em/en dash; city once in prepositional; holiday landings use window date when outside season.
  */
 export function buildCategoryCityMetaTitle(input: {
   categoryTitle: string;
   cityName: string;
   year?: number;
+  referenceDate?: Date;
+  timeZone?: string;
+  landingSlug?: string;
 }): string {
-  const category = String(input.categoryTitle || '').trim() || 'События';
-  const cityPrep = cityToPrepositional(String(input.cityName || '').trim() || 'городе');
-  const year = input.year ?? listingSeoYear();
-  if (isSeoExpansionCity(input.cityName)) {
-    return `${category} в ${cityPrep} ${year}: купить билеты, расписание и цены на Дайбилет`;
-  }
-  return `${category} в ${cityPrep} ${year} - купить билеты, расписание и цены на Дайбилет`;
+  const cityRaw = String(input.cityName || '').trim() || 'городе';
+  const intent = stripCityFromLandingTopic(String(input.categoryTitle || '').trim() || 'События', cityRaw);
+  const cityPrep = cityToPrepositional(cityRaw);
+  const timeZone = input.timeZone || SITE_TIME_ZONE;
+  const reference = input.referenceDate || new Date();
+  const titleDate = input.landingSlug
+    ? resolveLandingTitleDateShort(input.landingSlug, reference, timeZone)
+    : {
+        short: formatLandingTodayParts(reference, timeZone).short,
+        useTodayWord: true,
+        window: resolveLandingEventWindow('', reference),
+      };
+  const datePart = titleDate.useTodayWord
+    ? `сегодня, ${titleDate.short}`
+    : titleDate.short;
+  return `${intent} в ${cityPrep} ${datePart}: афиша, цены и билеты`;
 }
 
 /**
@@ -173,6 +191,7 @@ export function buildCategoryCityListingMeta(input: {
   cityName: string;
   fallbackTitle?: string | null;
   year?: number;
+  referenceDate?: Date;
   /** Реальный min priceFrom из офферов; без выдуманных цен. */
   priceFrom?: number | null;
 }): { title: string; description: string; labels: ListingCategoryLabels } {
@@ -192,6 +211,8 @@ export function buildCategoryCityListingMeta(input: {
       categoryTitle: labels.titleCategory,
       cityName: input.cityName,
       year: input.year,
+      referenceDate: input.referenceDate,
+      landingSlug: input.landingSlug,
     }),
     description,
   };
