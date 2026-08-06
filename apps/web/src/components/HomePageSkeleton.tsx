@@ -15,11 +15,8 @@ export function HomePageSkeleton() {
           ))}
         </div>
 
-        {/* Desktop bento / mobile featured */}
-        <div className="grid gap-3 lg:grid-cols-[1.5fr_1fr] lg:gap-4">
-          <div className="min-h-[200px] animate-pulse rounded-2xl bg-gradient-to-br from-primary-100 via-sky-100 to-primary-50 sm:min-h-[260px] lg:min-h-[320px]" />
-          <div className="hidden min-h-[320px] animate-pulse rounded-2xl bg-gradient-to-br from-sky-100 via-primary-50 to-sky-50 lg:block" />
-        </div>
+        {/* Full-width featured banner */}
+        <div className="min-h-[200px] animate-pulse rounded-2xl bg-gradient-to-br from-primary-100 via-sky-100 to-primary-50 sm:min-h-[260px] lg:min-h-[280px]" />
 
         <div className="mt-5 hidden gap-3 lg:flex">
           {Array.from({ length: 6 }).map((_, i) => (
