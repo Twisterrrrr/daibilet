@@ -238,11 +238,26 @@ function normalizePublicVenueAddress(address, city) {
   return enrichBareStreetAddress(text);
 }
 
+function stripVesselNamesForCityInference(text) {
+  return String(text || '')
+    .replace(/(?:теплоход|катер|яхт[аы]?|судно|пароход|корабль)\s*[«"'][^»"']+[»"']/giu, ' ')
+    .replace(/(?:теплоход|катер|яхт[аы]?|судно|пароход|корабль)\s+[\p{L}][\p{L}\d.\s-]*[-–—]\s*\d{1,4}/giu, ' ')
+    .replace(/\b[\p{L}]+[-–—]\d{1,4}\b/giu, ' ');
+}
+
 function inferCityFromAddressText(text) {
-  const value = String(text || '').toLowerCase();
+  const value = stripVesselNamesForCityInference(text).toLowerCase();
   if (value.includes('ефремкино') || value.includes('хакас') || value.includes('ширинск')) return 'Абакан';
   if (value.includes('суздал')) return 'Суздаль';
   if (value.includes('всеволожск')) return 'Всеволожск';
+  // SPB embankment piers without city token in address (avoid Moscow from ship «Москва-N»).
+  if (
+    /воскресенск|адмиралтейск|синопск|дворцов(?:ая|ой)?\s+наб|университетск|фонтанк|английск(?:ая|ой)?\s+наб|макаров/i.test(
+      value,
+    )
+  ) {
+    return 'Санкт-Петербург';
+  }
   return null;
 }
 
@@ -358,6 +373,22 @@ function venueTitleLooksLikeEmbankmentAddress(name) {
   );
 }
 
+/** Ship / boat hull names must not be shown as pier venue titles. */
+export function venueTitleLooksLikeVesselName(name) {
+  const text = String(name || '').trim();
+  if (!text) return false;
+  if (STREET_MARKER_RE.test(text) || /(?:^|\s)причал(?:\s|$)|(?:^|\s)пристань(?:\s|$)/i.test(text)) {
+    return false;
+  }
+  // Do not use \b with Cyrillic - JS word boundaries are ASCII-only.
+  if (/^(?:теплоход|катер|яхт[аы]?|судно|пароход|корабль)(?:\s|[«"']|$)/iu.test(text)) return true;
+  // Hull codes like «Москва-99», «РИО-1» without street context.
+  if (/^[«"']?[\p{L}][\p{L}\d.\s-]{0,40}[»"']?\s*[-–—]\s*\d{1,4}[»"']?$/iu.test(text)) {
+    return true;
+  }
+  return false;
+}
+
 function looksLikeNamedLandmark(title) {
   return /(?:^|\s)(?:мост|угол|площадь|сквер|памятник|парк|дворец|крепость|собор|театр|музей|спуск|набережная\s+[\p{L}]+(?:\s+[\p{L}]+){0,2}\s+и\s+[\p{L}])/iu.test(
     String(title || ''),
@@ -380,6 +411,7 @@ function shouldUsePierAddressDisplayName(name, address) {
   const title = formatPublicVenueTitle(name);
   if (!address) return false;
   if (hasDescriptivePierTitle(title)) return false;
+  if (venueTitleLooksLikeVesselName(title)) return true;
   if (/^при(?:чал|стан(?:ь|и)?)\b/i.test(title) && /\d/.test(title)) {
     const locationPart = stripPierPrefixFromTitle(title);
     if (venueTitleLooksLikeEmbankmentAddress(locationPart)) return true;
@@ -529,7 +561,13 @@ export function normalizePublicVenueRecord(input = {}) {
   }
 
   const inferredCity = inferCityFromAddressText(`${title} ${address}`);
-  if (inferredCity && (!city || city === 'Не указан' || cityContradictsAddress(city, title, address))) {
+  if (
+    inferredCity &&
+    (!city ||
+      city === 'Не указан' ||
+      cityContradictsAddress(city, title, address) ||
+      (venueTitleLooksLikeVesselName(title) && normalizeKey(inferredCity) !== normalizeKey(city)))
+  ) {
     city = inferredCity;
   }
 

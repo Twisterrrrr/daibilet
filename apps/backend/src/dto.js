@@ -4768,20 +4768,27 @@ export async function buildPublicVenuePage(db, venueSlugOrId) {
     shortDescription: mergedGroup?.shortDescription || canonicalVenue.shortDescription,
     description: canonicalVenue.description,
   });
-  const displayName = applyPublicVenueDisplayName(
-    {
-      name: formatPublicVenueTitle(canonicalVenue.title),
-      address: mergedGroup?.address || canonicalVenue.address,
-      city: canonicalVenue.city || 'Не указан',
-    },
-    resolvedType,
-  );
-  const normalizedVenue = applyPublicVenueNormalization({
-    name: displayName,
-    title: displayName,
+  const displayBase = applyPublicVenueNormalization({
+    id: canonicalVenue.id,
+    slug: canonicalVenue.slug,
+    name: formatPublicVenueTitle(canonicalVenue.title),
+    title: formatPublicVenueTitle(canonicalVenue.title),
     address: mergedGroup?.address || canonicalVenue.address,
     city: canonicalVenue.city || 'Не указан',
   });
+  const displayName = applyPublicVenueDisplayName(
+    {
+      name: displayBase.name || displayBase.title,
+      address: displayBase.address,
+      city: displayBase.city || 'Не указан',
+    },
+    resolvedType,
+  );
+  const normalizedVenue = {
+    ...displayBase,
+    name: displayName,
+    title: displayName,
+  };
   const hasDescription = Boolean(String(canonicalVenue.description || mergedGroup?.shortDescription || canonicalVenue.shortDescription || '').trim());
   const hasAddress = Boolean(String(normalizedVenue.address || '').trim());
   const hasHeroImage = Boolean(resolveVenueHeroImageUrl(
@@ -9235,6 +9242,10 @@ function inferCityNameFromText(...parts) {
     .filter(Boolean)
     .join(' ')
     .toLowerCase()
+    // Ship hull titles like «Теплоход «Москва-99»» must not imply city Москва.
+    .replace(/(?:теплоход|катер|яхт[аы]?|судно|пароход|корабль)\s*[«"'][^»"']+[»"']/giu, ' ')
+    .replace(/(?:теплоход|катер|яхт[аы]?|судно|пароход|корабль)\s+[а-яёa-z][\p{L}\d.\s-]*[-–—]\s*\d{1,4}/giu, ' ')
+    .replace(/\b[а-яёa-z]+[-–—]\d{1,4}\b/giu, ' ')
     .replace(/\s+/g, ' ');
   if (!haystack) return null;
 

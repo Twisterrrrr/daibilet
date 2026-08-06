@@ -1,3 +1,20 @@
+## 2026-08-06 - Pier card showed ship «Москва-99» as venue title
+
+### Наблюдения
+- Owner: бейдж ПРИЧАЛ, title «Теплоход «Москва – 99»», address Адмиралтейская наб., 10, city Москва.
+- Канон: это имя судна; причал = Воскресенская наб., 10, Санкт-Петербург (не Адмиралтейская, не Москва из корпуса).
+- Live: `venue_6a4d040007d4af979f35e566` / `teplohod-moskva-99`; twin `teplohod-moskva-64` уже на Воскресенской, но cityId=Москва.
+
+### Решения
+- Override + ensure script: title/address → Воскресенская наб., 10, city SPB.
+- Системно: pier display не показывает hull-name; city inference strips «Москва-N» / «Теплоход «…»»; SPB embankment addresses infer Санкт-Петербург.
+- Detail path: normalize(+id) before pier display name.
+
+### Проблемы
+- TC venue.name = судно; без override address мог остаться Адмиралтейской из supplier - канон owner = Воскресенская.
+
+---
+
 ## 2026-08-06 - Tretyakov TC venue title was street address
 
 ### Наблюдения

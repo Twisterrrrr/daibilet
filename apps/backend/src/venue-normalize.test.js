@@ -53,3 +53,41 @@ test('normalizePublicVenueRecord renames Lavrushinsky address-title to Tretyakov
   assert.equal(byMatch.title, 'Третьяковская галерея');
   assert.equal(byMatch.address, 'Лаврушинский переулок, 10');
 });
+
+test('normalizePublicVenueRecord maps ship Moskva-99 to Voskresenskaya pier in SPB', () => {
+  const byId = normalizePublicVenueRecord({
+    id: 'venue_6a4d040007d4af979f35e566',
+    title: 'Теплоход «Москва – 99»',
+    address: 'Адмиралтейская наб., 10',
+    city: 'Москва',
+  });
+  assert.equal(byId.title, 'Воскресенская наб., 10');
+  assert.equal(byId.address, 'Воскресенская наб., 10');
+  assert.equal(byId.city, 'Санкт-Петербург');
+
+  const byTitle = normalizePublicVenueRecord({
+    title: 'Теплоход «Москва – 99»',
+    address: 'Адмиралтейская наб., 10',
+    city: 'Москва',
+  });
+  assert.equal(byTitle.title, 'Воскресенская наб., 10');
+  assert.equal(byTitle.city, 'Санкт-Петербург');
+});
+
+test('formatPierLocationDisplayName replaces vessel hull title with pier address', async () => {
+  const { formatPierLocationDisplayName } = await import('./venue-normalize.js');
+  assert.equal(
+    formatPierLocationDisplayName('Теплоход «РИО-1»', 'Ленинградское шоссе, 51А', 'Москва'),
+    'Причал — Ленинградское шоссе, 51А',
+  );
+});
+
+test('inferCityFromAddressText prefers SPB embankment over ship Moskva-N', () => {
+  const result = normalizePublicVenueRecord({
+    title: 'Теплоход «Москва – 64»',
+    address: 'ул. Воскресенская наб, 10',
+    city: 'Москва',
+  });
+  // Override by match title/aliases may apply; city must not stay Москва from hull name.
+  assert.equal(result.city, 'Санкт-Петербург');
+});

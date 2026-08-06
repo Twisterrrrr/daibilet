@@ -9,6 +9,12 @@
 
 ---
 
+## Moskva-99 pier title (2026-08-06)
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| VEN.MOSKVA99-PIER | TC pier `teplohod-moskva-99`: title был именем судна → Воскресенская наб., 10 (СПБ); city не Москва из корпуса; vessel→pier display + ensure | Высокий | ✅ |
+
 ## Tretyakov venue title (2026-08-06)
 
 | ID | Задача | Приоритет | Статус |
