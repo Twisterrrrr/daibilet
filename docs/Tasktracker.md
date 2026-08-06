@@ -19,7 +19,7 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| FIX.SUBURB-COORDS | Nested POI пригородов СПб+KGD: lat/lng в cityInfo + проброс в «В маршрут» / DayRoutePanel | Критический | 🔄 code+pack 78 pts; deploy MSK |
+| FIX.SUBURB-COORDS | Nested POI пригородов СПб+KGD: lat/lng в cityInfo + проброс в «В маршрут» / DayRoutePanel | Критический | ✅ `39458e4`; MSK BUILD_ID=`5ueueXbge5GLt1fGTox0I`; 78/78 coords smoke |
 
 ## Locations kind chips (2026-08-06)
 

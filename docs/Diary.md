@@ -16,6 +16,9 @@
 ### Проблемы
 - DB Venue backfill для suburb slug не обязателен для my-day (coords идут из cityInfo в localStorage); PDP по-прежнему на catalog.
 
+### Live
+- Commit `39458e4`; MSK **BUILD_ID=`5ueueXbge5GLt1fGTox0I`**; smoke `/my-day` 200, `/cities/kaliningrad` 200 (Светлогорск в HTML).
+
 ---
 
 ## 2026-08-06 - Hub suburbs: title hierarchy + mobile «Ещё»
