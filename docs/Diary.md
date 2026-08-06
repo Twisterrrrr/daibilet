@@ -26,8 +26,9 @@
 - Override в `scripts/data/venue-address-overrides.json` + `scripts/fix-moscow-tretyakovka-venue-title.js`.
 - Unit: `venue-normalize.test.js` (id + match).
 
-### Проблемы
-- Две сущности с одним именем (editorial PUBLISHED 0 events + TC CANDIDATE с афишей) - merge отдельно, не в этом фиксе.
+### Live
+- Commit `b7caf93`; MSK deploy completed (**BUILD_ID=`TPHCAYseu7pbeD6mNHEZq`**), затем concurrent deploy сменил tip на **`GaFFsO9l2pR-JVxoCPWFn`**.
+- Smoke `/locations/moskva-lavrushinskii-pereulok-10-…`: title «Третьяковская галерея», address «Лаврушинский переулок, 10», без title-адреса в HTML.
 
 ---
 

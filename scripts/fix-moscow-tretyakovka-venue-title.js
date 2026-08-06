@@ -25,6 +25,8 @@ const VENUE_SLUG = 'moskva-lavrushinskii-pereulok-10-6a1fd5158bd71b8ae77e127c';
 const NEXT = {
   title: 'Третьяковская галерея',
   address: 'Лаврушинский переулок, 10',
+  /** TC put the street line into description; clear if it still mirrors the old address-title. */
+  clearAddressDescription: true,
 };
 
 const dryRun = process.argv.includes('--dry-run') || !process.argv.includes('--apply');
@@ -42,7 +44,7 @@ async function main() {
 
   try {
     const found = await pool.query(
-      `select id, slug, title, address, kind::text, "pageStatus"::text
+      `select id, slug, title, address, description, kind::text, "pageStatus"::text
        from "Venue"
        where id = $1 or slug = $2
        limit 1`,
@@ -52,22 +54,27 @@ async function main() {
       throw new Error(`Venue not found: ${VENUE_ID} / ${VENUE_SLUG}`);
     }
     const row = found.rows[0];
+    const clearDescription =
+      NEXT.clearAddressDescription &&
+      /лаврушинск/i.test(String(row.description || '')) &&
+      !/третьяков/i.test(String(row.description || ''));
     console.log('before', {
       id: row.id,
       slug: row.slug,
       title: row.title,
       address: row.address,
+      description: row.description,
       kind: row.kind,
       pageStatus: row.pageStatus,
     });
 
-    if (row.title === NEXT.title && row.address === NEXT.address) {
+    if (row.title === NEXT.title && row.address === NEXT.address && !clearDescription) {
       console.log('already fixed; nothing to do');
       return;
     }
 
     if (dryRun) {
-      console.log('dry-run would set', NEXT);
+      console.log('dry-run would set', { ...NEXT, description: clearDescription ? null : '(keep)' });
       return;
     }
 
@@ -75,10 +82,11 @@ async function main() {
       `update "Venue"
        set title = $2,
            address = $3,
+           description = case when $4::boolean then null else description end,
            "updatedAt" = now()
        where id = $1
-       returning id, slug, title, address`,
-      [row.id, NEXT.title, NEXT.address],
+       returning id, slug, title, address, description`,
+      [row.id, NEXT.title, NEXT.address, clearDescription],
     );
     console.log('after', updated.rows[0]);
   } finally {
