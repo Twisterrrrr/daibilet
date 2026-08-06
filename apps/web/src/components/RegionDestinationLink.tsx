@@ -27,11 +27,13 @@ export function RegionDestinationLink({
   return (
     <Link
       href={cityHref(region)}
-      className={`flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm shadow-sm transition-all hover:border-primary-300 hover:shadow-md ${className}`.trim()}
+      className={`flex items-start gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm shadow-sm transition-all hover:border-primary-300 hover:shadow-md sm:items-center ${className}`.trim()}
     >
-      <span className="truncate font-medium text-slate-700">+ {region.name}</span>
-      <span className="shrink-0 text-slate-400">{pluralEvents(region.events)}</span>
-      <ArrowRight className="ml-auto h-3.5 w-3.5 shrink-0 text-slate-400" />
+      <span className="min-w-0 flex-1 break-words font-medium text-slate-700 line-clamp-2 sm:line-clamp-1">
+        + {region.name}
+      </span>
+      <span className="shrink-0 pt-0.5 text-slate-400 sm:pt-0">{pluralEvents(region.events)}</span>
+      <ArrowRight className="mt-0.5 h-3.5 w-3.5 shrink-0 text-slate-400 sm:mt-0 sm:ml-auto" />
     </Link>
   );
 }
