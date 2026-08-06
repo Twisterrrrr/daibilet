@@ -7,12 +7,10 @@ import { useSelectedCityOptional } from '@/components/SelectedCityProvider.clien
 import { inCityPrepositional } from '@/lib/city-declension';
 import { buildMyDayHref } from '@/lib/home-guide';
 
-const FALLBACK_CITY = 'Москва';
-const FALLBACK_CITY_SLUG = 'moscow';
-
 /**
  * Mid-page My Day promo after «Популярные города».
  * Restores the former hero panel as a dedicated banner (not back in hero).
+ * Headline: city selected → «… в {City_Пр}»; all cities / none → without «в …».
  */
 export function HomeMyDayBanner() {
   const selectedCity = useSelectedCityOptional();
@@ -24,12 +22,12 @@ export function HomeMyDayBanner() {
         (selectedCity?.cityLabel !== 'Все города' ? selectedCity?.cityLabel : null)
       : null;
   const citySlug =
-    cityValue !== 'all'
-      ? selectedCity?.selectedDestination?.slug || null
-      : FALLBACK_CITY_SLUG;
+    cityValue !== 'all' ? selectedCity?.selectedDestination?.slug || null : null;
 
-  const titleCity = cityName?.trim() || FALLBACK_CITY;
-  const headline = `Спланируй свой день ${inCityPrepositional(titleCity)}`;
+  const titleCity = cityName?.trim() || null;
+  const headline = titleCity
+    ? `Спланируй свой день ${inCityPrepositional(titleCity)}`
+    : 'Спланируй свой день';
   const href = buildMyDayHref(citySlug);
 
   return (
