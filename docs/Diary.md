@@ -1,3 +1,21 @@
+## 2026-08-06 - /cities: SVG-карту заменили на OSM + pins
+
+### Наблюдения
+- Owner: текущая карта на `/cities` (упрощённый SVG silhouette + % pins) не нужна в таком виде - либо OSM с пинами, либо убрать.
+- На `/cities/[slug]` отдельного map-блока нет; проблема была в index aside `RussiaMap`.
+- В проекте уже есть Leaflet OSM: `LocationsCatalogMap` (`/locations`), `DayRouteOsmMap`, `OsmMapEmbed`.
+
+### Решения
+- `RussiaMap` переведён на `LocationsCatalogMap` (OSM tiles) + 11 центров крупных городов с lat/lng.
+- Клик по пину → `/cities/{slug}`; подпись событий в `typeLabel` маркера.
+- City.lat/lng в schema нет - для overview хватило статического списка (тот же набор, что был на SVG-доске).
+- Home carousel / CityCard не трогали (параллельный агент).
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-06 - Home cities: карусель + тёмные обложки
 
 ### Наблюдения

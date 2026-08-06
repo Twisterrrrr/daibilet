@@ -122,7 +122,7 @@
 | UX.CAT-A2 | Hide page-size; «Показать ещё» | Средний | ✅ shipped earlier; infinite scroll = backlog |
 | UX.CAT-A3 | Empty state Popular recommend block | Средний | ⚠️ backlog |
 | UX.EVT-B3 | Full tabs Программа if structured data | Низкий | ⚠️ backlog |
-| UX.CITY-HUB | `/cities`: compact 2-4 col cards, vibe tags, CountUp, «Куда поехать?», SVG pin-board | Средний | ✅ code; deploy n/a |
+| UX.CITY-HUB | `/cities`: compact 2-4 col cards, vibe tags, CountUp, «Куда поехать?», OSM pins (не SVG) | Средний | ✅ OSM+pins ship; deploy MSK |
 | UX.VENUE-MON | Venue/location monetization UX | Средний | ⚠️ backlog |
 | UX.EVT-SEAT | Venue seatmap / taxi deep-link | Низкий | ⚠️ backlog |
 
