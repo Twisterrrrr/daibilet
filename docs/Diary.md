@@ -1,3 +1,18 @@
+## 2026-08-06 - OSM: снова убрали UA-флаг Leaflet с `/cities`
+
+### Наблюдения
+- Owner: на `/cities` после замены SVG→OSM (`ce3d376`) снова виден украинский флаг в attribution.
+- Прежний фикс `e12818e` только прятал `.leaflet-attribution-flag` в `globals.css`, но upstream `leaflet.css` задаёт `display: inline !important` и при динамическом `import('leaflet/dist/leaflet.css')` перебивает hide.
+
+### Решения
+- Общий `loadDaibiletLeaflet()`: prefix без UA SVG + CSS override после leaflet.css.
+- Подключено в `LocationsCatalogMap` (`/cities`, `/locations`), `DayRouteOsmMap`, `OsmMapEmbed`.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-06 - /cities: SVG-карту заменили на OSM + pins
 
 ### Наблюдения

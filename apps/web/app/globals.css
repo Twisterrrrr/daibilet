@@ -526,7 +526,10 @@ body > div:has(iframe[src*='ticketscloud']) {
   background: transparent !important;
   border: 0 !important;
 }
-/* Leaflet OSM attribution: hide UA flag badge, keep © OpenStreetMap text */
+/* Leaflet OSM attribution: hide UA flag badge, keep © OpenStreetMap text.
+   Upstream leaflet.css forces display:inline !important; belt-and-suspenders
+   with src/styles/leaflet-daibilet.css (loaded after leaflet) + JS prefix strip. */
+.leaflet-control-attribution .leaflet-attribution-flag,
 .leaflet-attribution-flag {
   display: none !important;
 }

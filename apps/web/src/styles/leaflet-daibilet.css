@@ -1,0 +1,4 @@
+/* Loaded after leaflet.css so !important beats upstream display:inline */
+.leaflet-control-attribution .leaflet-attribution-flag {
+  display: none !important;
+}

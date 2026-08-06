@@ -3,6 +3,8 @@
 import * as React from 'react';
 import type { Map as LeafletMap, Marker as LeafletMarker, Polyline as LeafletPolyline } from 'leaflet';
 
+import { loadDaibiletLeaflet } from '@/lib/leaflet-daibilet';
+
 export type DayRouteMapStop = {
   id: string;
   title: string;
@@ -78,10 +80,8 @@ export function DayRouteOsmMap({
     let resizeObserver: ResizeObserver | null = null;
 
     void (async () => {
-      const leaflet = await import('leaflet');
-      await import('leaflet/dist/leaflet.css');
+      const L = await loadDaibiletLeaflet();
       if (cancelled || !node) return;
-      const L = leaflet.default;
 
       let map = mapRef.current;
       if (!map) {

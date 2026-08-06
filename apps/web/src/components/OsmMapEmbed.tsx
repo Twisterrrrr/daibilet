@@ -3,6 +3,8 @@
 import * as React from 'react';
 import type { Map as LeafletMap } from 'leaflet';
 
+import { loadDaibiletLeaflet } from '@/lib/leaflet-daibilet';
+
 const DEFAULT_ZOOM = 16;
 const MIN_ZOOM = 3;
 const MAX_ZOOM = 19;
@@ -41,11 +43,8 @@ export function OsmMapEmbed({
     let resizeObserver: ResizeObserver | null = null;
 
     void (async () => {
-      const leaflet = await import('leaflet');
-      await import('leaflet/dist/leaflet.css');
+      const L = await loadDaibiletLeaflet();
       if (cancelled || !node) return;
-
-      const L = leaflet.default;
 
       map = L.map(node, {
         center: [lat, lng],

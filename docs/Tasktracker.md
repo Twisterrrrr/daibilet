@@ -376,6 +376,7 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 | UX.LOC8 | IA: demote `/locations` из primary nav или секция city hub (owner V1/V2) | Средний | ⏳ |
 | UX.LOC9 | Unified `/places` (venues+locations tabs) | Низкий | ⚠️ после LOC8 |
 | UX.MAP1 | Location map zoom-out (`-`): OSM MapLibre embed floor → Leaflet `OsmMapEmbed` | Высокий | ✅ `4c93418` MSK **BUILD_ID=`HDL3hw0HUymPBt_oi5syV`** |
+| UX.MAP-UA | Leaflet attribution: strip UA flag project-wide (`loadDaibiletLeaflet`) | Высокий | 🔄 `/cities` regression after OSM pins |
 | LOC.BUS1 | `pl-vosstaniya` wrongly pier → bus (override + DB MEETING_POINT + water-only gate) | Критический | ✅ `1698c9e` MSK **BUILD_ID=`uAAeJS3sG_GuPNfbwQqKy`** |
 
 ---
