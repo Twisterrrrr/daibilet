@@ -271,7 +271,7 @@ export function BlogListFiltered({
     'min-h-14 min-w-[10rem] flex-1 rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-base text-slate-800 outline-none transition focus:border-primary-400 focus:ring-2 focus:ring-primary-100 md:min-h-11 md:px-3 md:py-2.5 md:text-sm sm:max-w-[16rem] sm:flex-none';
 
   const filtersBar = (
-    <div className="mb-8 space-y-3 border-b border-slate-200 pb-5">
+    <div className="mb-8 border-b border-slate-200 pb-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
         <select
           className={selectClass}
@@ -311,21 +311,20 @@ export function BlogListFiltered({
           </button>
         ) : null}
 
-        <div className="sm:ml-auto">
+        <div className="flex w-full flex-wrap items-center justify-between gap-x-3 gap-y-2 sm:ml-auto sm:w-auto sm:justify-end">
+          <p className="text-sm text-slate-500">
+            Найдено: <span className="font-semibold text-slate-800">{filtered.length}</span>
+            {posts.length ? <span> из {posts.length}</span> : null}
+            {filtered.length > 0 ? (
+              <span className="text-slate-400">
+                {' '}
+                (показано {displayPosts.length})
+              </span>
+            ) : null}
+          </p>
           <BlogViewModeToggle mode={viewMode} onChange={setViewMode} />
         </div>
       </div>
-
-      <p className="text-sm text-slate-500">
-        Найдено: <span className="font-semibold text-slate-800">{filtered.length}</span>
-        {posts.length ? <span> из {posts.length}</span> : null}
-        {filtered.length > 0 ? (
-          <span className="text-slate-400">
-            {' '}
-            (показано {displayPosts.length})
-          </span>
-        ) : null}
-      </p>
     </div>
   );
 
