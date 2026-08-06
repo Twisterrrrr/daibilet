@@ -39,7 +39,7 @@
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
 | CONT.PERM-MUSTSEE | Пермь: полный mustSee (35) + 4 suburbs/20 nested coords, dedupe legacy 6 slugs, 19 previews, seed pack, my-day address/coords | Высокий | ✅ `fe810e0`+`3a637c6`; MSK BUILD_ID=`lYsWHccwLK_ab0KcRNm_i`; seed +37; smoke `/cities/perm`+`/my-day` 200 |
-| CONT.PERM-PREVIEWS | Пермь: добить превью 24 недостающих slug (gastro/museums/arch/suburb parents) → 43/43 | Высокий | ⏳ commit+deploy |
+| CONT.PERM-PREVIEWS | Пермь: добить превью 24 недостающих slug (gastro/museums/arch/suburb parents) → 43/43 | Высокий | ✅ `2ee5bf1`; MSK BUILD_ID=`wN-IZ38TNvl4wjTyGylky`; static 200 ×43 |
 
 ## City hub must-see sparse grid (2026-08-06)
 

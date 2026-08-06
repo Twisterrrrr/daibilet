@@ -13,7 +13,7 @@
 - Нет.
 
 ### Live
-- (после deploy)
+- Commit `2ee5bf1`; MSK **BUILD_ID=`wN-IZ38TNvl4wjTyGylky`**; covers `/images/venues/perm/*` **200** (43 files); `/cities/perm` **200**. Seed не нужен.
 
 ---
 
