@@ -223,7 +223,7 @@ export function dayRouteItemFromMustSee(
     isSuburb: options.isSuburb || undefined,
     href,
     imageUrl,
-    address: String(matched?.address || '').trim() || null,
+    address: String(matched?.address || place.address || '').trim() || null,
     ...coordsFromPlace(place, matched, slug),
   };
 }

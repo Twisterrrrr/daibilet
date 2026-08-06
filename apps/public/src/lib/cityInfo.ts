@@ -11,6 +11,10 @@ export type CityPlaceLinkFields = {
 export type CityMustSeeItem = CityPlaceLinkFields & {
   name: string;
   desc: string;
+  /** Адрес для хаба / my-day, если у Venue ещё нет address. */
+  address?: string | null;
+  /** Стабильный editorial id для остановки без публичной entity-карточки. */
+  dayRouteId?: string;
   /** Optional day-route coords when hub venues omit the place. */
   latitude?: number | null;
   longitude?: number | null;
@@ -36,7 +40,9 @@ export type CityMustSeeItem = CityPlaceLinkFields & {
   seasonLabel?: string;
   places?: CitySuburbPlace[];
   travelVector?: string;
+  travelVectorBlurb?: string;
   stationHub?: string;
+  stationName?: string;
   gastroHint?: string;
 };
 
@@ -44,6 +50,7 @@ export type CityMustSeeItem = CityPlaceLinkFields & {
 export type CitySuburbPlace = CityPlaceLinkFields & {
   name: string;
   desc?: string;
+  address?: string | null;
   seasonLabel?: string;
   /** Стабильный editorial id для остановки без публичной entity-карточки. */
   dayRouteId?: string;
@@ -1942,43 +1949,142 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       'Масштабный культурный центр Прикамья, где суровая промышленная история Урала соединилась с авангардным современным искусством. Город бескрайней тайги, могучей Камы и знаменитого «пермского периода» в геологии.',
     hookFact: 'Знаете ли вы, что Пермь - родина знаменитых «реальных пацанов», но при этом местный Театр оперы и балета считается одним из лучших в России, а пермская балетная школа ценится наравне с петербургской?',
     mustSee: [
+      // --- Главные прогулочные зоны ---
+      { name: 'Набережная Камы', desc: 'Главный променад вдоль реки с амфитеатром, причалами и панорамой на Каму.', address: 'ул. Монастырская, 1Б', locationSlug: 'naberezhnaya-kamy', mustSeeFilter: 'main', latitude: 58.0211, longitude: 56.2464 },
+      { name: 'Арт-объект «Счастье не за горами»', desc: 'Красные буквы у Речного вокзала - самый узнаваемый фото-символ Перми.', address: 'ул. Берег Камы (у Речного вокзала)', locationSlug: 'perm-schaste-ne-za-gorami', mustSeeFilter: 'main', latitude: 58.0224, longitude: 56.252 },
+      { name: 'Городская эспланада', desc: 'Открытое пешеходное пространство в центре с фонтанами и событиями.', address: 'ул. Ленина (между ул. Попова и ул. Борчанинова)', locationSlug: 'permskaya-esplanada', mustSeeFilter: 'main', latitude: 58.0105, longitude: 56.2285 },
+      { name: 'Соборная площадь', desc: 'Историческое ядро города у Петропавловского собора.', address: 'Соборная площадь', locationSlug: 'perm-sobornaya-ploschad', mustSeeFilter: 'main', latitude: 58.0163, longitude: 56.2378 },
+      { name: 'Старокирпичный переулок', desc: 'Камерный прогулочный карман в центре с кирпичной застройкой.', address: 'ул. Ленина, 44', locationSlug: 'perm-starokirpichnyy-pereulok', mustSeeFilter: 'street', latitude: 58.0139, longitude: 56.2427 },
+      { name: 'Парк Горького (и Ротонда)', desc: 'Классический городской парк с ротондой и аллеями.', address: 'ул. Сибирская, 49', locationSlug: 'perm-park-gorkogo', mustSeeFilter: 'park', latitude: 58.0051, longitude: 56.2524 },
+      { name: 'Райский сад', desc: 'Зеленый уголок в Мотовилихе у музейного кластера.', address: 'ул. 1905 года, 2', locationSlug: 'perm-rayskiy-sad', mustSeeFilter: 'park', latitude: 58.0315, longitude: 56.3129 },
+      // --- Музеи и театры ---
+      { name: 'Пермская художественная галерея', desc: 'Уникальная коллекция пермской деревянной скульптуры - «пермские боги».', address: 'ул. Театральная, 2', venueSlug: 'permskaya-galereya', mustSeeFilter: 'museum', latitude: 58.0175, longitude: 56.2541 },
+      { name: 'Музей пермских древностей', desc: 'Археология и палеонтология Прикамья, пермский геологический период.', address: 'ул. Сибирская, 15', venueSlug: 'perm-muzey-permskikh-drevnostey', mustSeeFilter: 'museum', latitude: 58.0125, longitude: 56.2494 },
+      { name: 'Дом Мешкова', desc: 'Исторический особняк на набережной, филиал краеведческого музея.', address: 'ул. Монастырская, 11', venueSlug: 'perm-dom-meshkova', mustSeeFilter: 'museum', latitude: 58.0191, longitude: 56.2443 },
+      { name: 'PERMM', desc: 'Музей современного искусства в бывшем речного флота здании.', address: 'ул. Крисанова, 4', venueSlug: 'perm-permm', mustSeeFilter: 'museum', latitude: 58.0104, longitude: 56.2166 },
+      { name: 'Театр оперы и балета им. Чайковского', desc: 'Один из сильнейших оперно-балетных театров страны.', address: 'ул. Петропавловская, 25А', venueSlug: 'perm-teatr-opery-i-baleta', mustSeeFilter: 'museum', latitude: 58.0161, longitude: 56.2479 },
+      { name: 'Театр-Театр', desc: 'Драматическая сцена-трансформер и смелые постановки.', address: 'ул. Ленина, 53', venueSlug: 'teatr-teatr', mustSeeFilter: 'museum', latitude: 58.0091, longitude: 56.2185 },
+      { name: 'Музей истории Мотовилихинских заводов', desc: 'Промышленная история Мотовилихи и оружейного производства.', address: 'ул. 1905 года, 20', venueSlug: 'perm-muzey-motovilihinskih-zavodov', mustSeeFilter: 'museum', latitude: 58.0339, longitude: 56.3155 },
+      { name: 'Музей-диорама на горе Вышка', desc: 'Панорама Мотовилихи и диорама боевых действий Гражданской войны.', address: 'ул. Огородникова, 2', venueSlug: 'perm-muzey-diorama-vyshka', mustSeeFilter: 'museum', latitude: 58.0345, longitude: 56.3216 },
+      { name: 'Центр городской культуры (ЦГК)', desc: 'Главное независимое пространство: выставки, лекции, кино и маркеты.', address: 'ул. Пушкина, 15', venueSlug: 'perm-cgk', mustSeeFilter: 'creative', latitude: 58.0108, longitude: 56.2494 },
+      { name: 'Частная галерея «Марис-Арт»', desc: 'Камерная галерея: живопись, графика и скульптура мастеров Урала.', address: 'ул. Восстания, 35', venueSlug: 'perm-maris-art', mustSeeFilter: 'museum', latitude: 58.0305, longitude: 56.3023 },
+      { name: 'Галерея «25\'17»', desc: 'Современная выставочная площадка: персональные и сборные экспозиции, аукционы.', address: 'ул. 25-го Октября, 17', venueSlug: 'perm-galereya-2517', mustSeeFilter: 'museum', latitude: 58.0138, longitude: 56.2497 },
+      { name: 'Парк науки «НьюТон»', desc: 'Интерактивный научно-развлекательный центр для семьи.', address: 'ул. Чернышевского, 28', venueSlug: 'perm-park-nauki-nyuton', mustSeeFilter: 'science', latitude: 57.9995, longitude: 56.2625 },
+      { name: 'Завод Шпагина', desc: 'Бывший метизно-ремонтный завод - главный фестивальный кластер Перми.', address: 'ул. Советская, 1Б', locationSlug: 'perm-zavod-shpagina', mustSeeFilter: 'creative', latitude: 58.0202, longitude: 56.2554 },
+      // --- Памятники и архитектура ---
+      { name: 'Пермяк - солёные уши', desc: 'Жанровый памятник у «Грибоедова»: фото с бронзовыми ушами.', address: 'Комсомольский проспект, 27', locationSlug: 'permsky-solenye-ushi', mustSeeFilter: 'main', latitude: 58.0108, longitude: 56.2415 },
+      { name: 'Пермский медведь', desc: 'Бронзовый символ города на пешеходной Ленина.', address: 'ул. Ленина, 58', locationSlug: 'perm-permskiy-medved', mustSeeFilter: 'main', latitude: 58.0116, longitude: 56.2393 },
+      { name: 'Дом Грибушина', desc: 'Особняк в стиле модерн с богатым фасадным декором.', address: 'ул. Ленина, 13А', locationSlug: 'perm-dom-gribushina', mustSeeFilter: 'houses', latitude: 58.0177, longitude: 56.2514 },
+      { name: 'Башня смерти', desc: 'Доминанта конструктивизма - бывшее здание НКВД.', address: 'Комсомольский проспект, 74', locationSlug: 'perm-bashnya-smerti', mustSeeFilter: 'main', latitude: 57.9944, longitude: 56.2573 },
+      { name: 'Собор Петра и Павла', desc: 'Старейший каменный храм Перми на Соборной площади.', address: 'ул. 25-го Октября, 1', locationSlug: 'perm-sobor-petra-i-pavla', mustSeeFilter: 'temple', latitude: 58.0185, longitude: 56.2559 },
+      { name: 'Вознесенская (Феодосьевская) церковь', desc: 'Краснокирпичный храм с узнаваемым силуэтом у эспланады.', address: 'ул. Борчанинова, 11', locationSlug: 'perm-voznesenskaya-tserkov', mustSeeFilter: 'temple', latitude: 58.0069, longitude: 56.2291 },
+      { name: 'Парк камней / Пермские ворота', desc: 'Арт-объект из бревен у вокзала и геологическая экспозиция камней.', address: 'площадь Гайдара', locationSlug: 'perm-park-kamney-permskie-vorota', mustSeeFilter: 'main', latitude: 58.0035, longitude: 56.1916 },
+      // --- Гастро ---
+      { name: 'Чомга', desc: 'Локальная кухня у парка Горького.', address: 'ул. Сибирская, 47А', locationSlug: 'perm-chomga', mustSeeFilter: 'gastro', latitude: 58.0055, longitude: 56.2519 },
+      { name: 'Пермские посикунчики', desc: 'Классика уличной пермской выпечки.', address: 'ул. Пермская, 56', locationSlug: 'perm-permskie-posikunchiki', mustSeeFilter: 'gastro', latitude: 58.0135, longitude: 56.2412 },
+      { name: 'Nolan Wine & Kitchen', desc: 'Винная кухня в центре.', address: 'ул. Петропавловская, 59', locationSlug: 'perm-nolan-wine-kitchen', mustSeeFilter: 'gastro', latitude: 58.0121, longitude: 56.2341 },
+      { name: 'Belka', desc: 'Камерное гастро-место на Сибирской.', address: 'ул. Сибирская, 19Б', locationSlug: 'perm-belka', mustSeeFilter: 'gastro', latitude: 58.0108, longitude: 56.2505 },
+      { name: 'Партизан', desc: 'Гастробар на Комсомольском проспекте.', address: 'Комсомольский проспект, 1', locationSlug: 'perm-partizan', mustSeeFilter: 'gastro', latitude: 58.0169, longitude: 56.2345 },
+      { name: 'Демидовская пивоварня', desc: 'Крафтовое пиво и кухня в центре.', address: 'ул. Ленина, 46А', locationSlug: 'perm-demidovskaya-pivovarnya', mustSeeFilter: 'gastro', latitude: 58.0133, longitude: 56.2435 },
+      { name: 'Cup by Cup', desc: 'Кофейня на Сибирской.', address: 'ул. Сибирская, 30', locationSlug: 'perm-cup-by-cup', mustSeeFilter: 'gastro', latitude: 58.0094, longitude: 56.2526 },
+      { name: 'Gastroport', desc: 'Гастропространство у Решетниковского спуска.', address: 'ул. Решетниковский спуск, 1', locationSlug: 'perm-gastroport', mustSeeFilter: 'gastro', latitude: 58.0183, longitude: 56.2163 },
+    ],
+    significantSuburbs: [
       {
-        name: 'Пермская художественная галерея',
-        desc: 'Знаменитый музей, хранящий уникальную коллекцию пермской деревянной скульптуры («пермские боги»)',
-        venueSlug: 'permskaya-galereya',
-      },
-      {
-        name: 'Скульптура «Пермяк солёные уши»',
-        desc: 'Забавный жанровый памятник, к которому принято прикладывать лицо для фото',
-        locationSlug: 'permsky-solenye-ushi',
-      },
-      {
-        name: 'Набережная Камы',
-        desc: 'Благоустроенная речная променада с легендарной арт-инсталляцией «Счастье не за горами»',
-        locationSlug: 'naberezhnaya-kamy',
-      },
-      {
-        name: 'Архитектурно-этнографический музей «Хохловка»',
-        desc: 'Музей деревянного зодчества под открытым небом на берегу залива (в пригороде)',
+        name: 'Хохловка',
+        desc: 'Архитектурно-этнографический музей под открытым небом на берегу Камы - деревянное зодчество Прикамья.',
+        address: 'Пермский край, Ильинский район',
         venueSlug: 'muzej-hohlovka',
+        latitude: 58.26186,
+        longitude: 56.26314,
+        places: [
+          { name: 'Богородицкая церковь', desc: 'Деревянный храм, перевезенный в музей с берегов Камы.', latitude: 58.2609, longitude: 56.2621 },
+          { name: 'Усть-Боровский сользавод', desc: 'Комплекс солеваренного промысла - визитная карточка музейной экспозиции.', latitude: 58.2632, longitude: 56.2648 },
+          { name: 'Ветряная мельница', desc: 'Классический ветряк среди изб и хозяйственных построек.', latitude: 58.2598, longitude: 56.2612 },
+          { name: 'Сторожевая башня', desc: 'Оборонительная деревянная башня на холме над заливом.', latitude: 58.2624, longitude: 56.2639 },
+          { name: 'Усадьба Баяндиных', desc: 'Купеческая усадьба с жилым домом и надворными постройками.', latitude: 58.2612, longitude: 56.2642 },
+        ],
       },
       {
-        name: 'Пермский академический Театр-Театр',
-        desc: 'Знаменитый драматический театр с уникальной сценой-трансформером и смелыми постановками',
-        venueSlug: 'teatr-teatr',
+        name: 'Кунгур',
+        desc: 'Город купечества и ледяной пещеры в 90 км от Перми - отдельный день на природу и старый центр.',
+        address: 'г. Кунгур, Пермский край',
+        locationSlug: 'perm-kungur',
+        latitude: 57.4333,
+        longitude: 56.95,
+        places: [
+          { name: 'Кунгурская ледяная пещера', desc: 'Одна из самых известных карстовых пещер Урала с ледяными гротами.', locationSlug: 'perm-kungurskaya-ledyanaya-peshchera', latitude: 57.4409, longitude: 57.006 },
+          { name: 'Пуп Земли', desc: 'Символический «центр» Кунгура и точка сбора для прогулок по старому городу.', latitude: 57.43121, longitude: 56.9428 },
+          { name: 'Музей купечества', desc: 'Быт и история кунгурских купцов в историческом особняке.', latitude: 57.4335, longitude: 56.9455 },
+          { name: 'Тихвинская церковь', desc: 'Храмовая доминанта старого Кунгура.', latitude: 57.4308, longitude: 56.9512 },
+          { name: 'Вязовская пряничная', desc: 'Местная пряничная традиция - сладкий сувенир из Кунгура.', latitude: 57.4322, longitude: 56.9442 },
+        ],
       },
       {
-        name: 'Эспланада',
-        desc: 'Гигантское открытое пешеходное пространство в центре города с поющими фонтанами и арт-объектами',
-        locationSlug: 'permskaya-esplanada',
+        name: 'Белая гора',
+        desc: 'Белогорский монастырь на высокой горе и окрестные природные точки Прикамья.',
+        address: 'с. Белая Гора, Кунгурский район',
+        locationSlug: 'perm-belaya-gora',
+        latitude: 57.39202,
+        longitude: 56.229,
+        places: [
+          { name: 'Белогорский Свято-Николаевский монастырь', desc: '«Уральский Афон» - белокаменный собор на вершине Белой горы.', locationSlug: 'perm-belogorskiy-monastyr', latitude: 57.39202, longitude: 56.229 },
+          { name: 'Царский крест', desc: 'Крупный поклонный крест с видом на округу.', latitude: 57.3914, longitude: 56.2306 },
+          { name: 'Купель', desc: 'Святой источник и купель у подножия монастырской горы.', latitude: 57.3906, longitude: 56.2278 },
+          { name: 'Камень Ермак', desc: 'Скальный останец на Сылве, связанный с маршрутами Ермака.', latitude: 57.3736, longitude: 57.0667 },
+          { name: 'Водопад Плакун', desc: 'Живописный известняковый водопад в Суксунском районе.', latitude: 57.3481, longitude: 57.0506 },
+        ],
+      },
+      {
+        name: 'Губаха / Усьва',
+        desc: 'Горнозаводской край: скалы, столбы, каменный город и маршруты «Сердца Пармы».',
+        address: 'Губаха / Усьва, Пермский край',
+        locationSlug: 'perm-gubakha-usva',
+        latitude: 58.723,
+        longitude: 57.633,
+        places: [
+          { name: 'Усьвинские столбы', desc: 'Вертикальные скалы над рекой Усьвой - визитная карточка района.', locationSlug: 'perm-usvinskie-stolby', latitude: 58.7175, longitude: 57.6152 },
+          { name: 'Каменный город', desc: 'Скальный «город» останцев среди тайги у Губахи.', locationSlug: 'perm-kamennyy-gorod', latitude: 58.72359, longitude: 57.63404 },
+          { name: 'Гора Крестовая', desc: 'Горнолыжный и видовой склон над Губахой.', latitude: 58.82861, longitude: 57.585 },
+          { name: 'Сердце Пармы', desc: 'Локации и виды, связанные с фильмом и книгой о Парме.', latitude: 58.705, longitude: 57.602 },
+          { name: 'Пещера Российская', desc: 'Карстовая пещера в районе Каменного города.', latitude: 58.7245, longitude: 57.636 },
+        ],
+      },
+    ],
+    dayRoutePresets: [
+      {
+        id: 'perm-classic-one-day',
+        title: 'Классическая Пермь за 1 день',
+        description: 'Набережная, Счастье, центр, галерея, эспланада и гастро-пауза.',
+        stops: [
+          { name: 'Набережная Камы', desc: 'Старт у Камы', locationSlug: 'naberezhnaya-kamy' },
+          { name: 'Арт-объект «Счастье не за горами»', desc: 'Фото-символ города', locationSlug: 'perm-schaste-ne-za-gorami' },
+          { name: 'Пермская художественная галерея', desc: 'Пермские боги', venueSlug: 'permskaya-galereya' },
+          { name: 'Пермяк - солёные уши', desc: 'Жанровый памятник', locationSlug: 'permsky-solenye-ushi' },
+          { name: 'Пермские посикунчики', desc: 'Обед', locationSlug: 'perm-permskie-posikunchiki' },
+          { name: 'Городская эспланада', desc: 'Центр и фонтаны', locationSlug: 'permskaya-esplanada' },
+          { name: 'Театр-Театр', desc: 'Вечерняя культура', venueSlug: 'teatr-teatr' },
+        ],
+      },
+      {
+        id: 'perm-art-cluster',
+        title: 'Арт и креатив',
+        description: 'Шпагин, PERMM, ЦГК, галереи и набережная.',
+        stops: [
+          { name: 'Завод Шпагина', desc: 'Фестивальный кластер', locationSlug: 'perm-zavod-shpagina' },
+          { name: 'PERMM', desc: 'Современное искусство', venueSlug: 'perm-permm' },
+          { name: 'Центр городской культуры (ЦГК)', desc: 'Независимая сцена', venueSlug: 'perm-cgk' },
+          { name: 'Галерея «25\'17»', desc: 'Выставки', venueSlug: 'perm-galereya-2517' },
+          { name: 'Набережная Камы', desc: 'Финал у воды', locationSlug: 'naberezhnaya-kamy' },
+        ],
       },
     ],
     travel:
-      "Международный аэропорт Большое Савино принимает десятки ежедневных прямых рейсов из Москвы (около 2 часов в воздухе), Санкт-Петербурга и крупных региональных центров. Пермь также является важнейшей станцией на главном ходу Транссиба, а автопутешественники едут по федеральной трассе Р-242. Идеальный сезон для визита — лето (с июня по август), когда широкая Кама становится судоходной, на городской набережной проходят масштабные арт-фестивали, а погода комфортна для поездок на уральскую природу. Зима привлекает любителей горнолыжного спорта в Губаху и ценителей заснеженной уральской тайги.",
+      'Международный аэропорт Большое Савино принимает десятки ежедневных прямых рейсов из Москвы (около 2 часов в воздухе), Санкт-Петербурга и крупных региональных центров. Пермь также является важнейшей станцией на главном ходу Транссиба, а автопутешественники едут по федеральной трассе Р-242. Идеальный сезон для визита - лето (с июня по август), когда широкая Кама становится судоходной, на городской набережной проходят масштабные арт-фестивали, а погода комфортна для поездок на уральскую природу. Зима привлекает любителей горнолыжного спорта в Губаху и ценителей заснеженной уральской тайги.',
     faq: [
-    { q: "Где находится тот самый знаменитый арт-объект «Счастье не за горами»?", a: "Легендарные огромные красные буквы установлены на парапете городской набережной Камы у здания бывшего Речного вокзала (ныне музей «Россия — моя история»)." },
-    { q: "Что такое пермский деревянный бог и где его увидеть?", a: "Это уникальная коллекция старинной сакральной деревянной скульптуры XVII–XIX веков, в которой христианские сюжеты переплелись с языческими традициями; она хранится в Пермской государственной художественной галерее." },
-    { q: "Как добраться из Перми до знаменитой Кунгурской ледяной пещеры?", a: "Одна из главных природных достопримечательностей Урала расположена в 90 км от города в Кунгуре; туда удобнее всего доехать на утренней пригородной электричке за 1,5 часа." },
+      { q: 'Где находится тот самый знаменитый арт-объект «Счастье не за горами»?', a: 'Легендарные огромные красные буквы установлены на парапете городской набережной Камы у здания бывшего Речного вокзала.' },
+      { q: 'Что такое пермский деревянный бог и где его увидеть?', a: 'Это уникальная коллекция старинной сакральной деревянной скульптуры XVII-XIX веков, в которой христианские сюжеты переплелись с языческими традициями; она хранится в Пермской государственной художественной галерее.' },
+      { q: 'Как добраться из Перми до знаменитой Кунгурской ледяной пещеры?', a: 'Одна из главных природных достопримечательностей Урала расположена в 90 км от города в Кунгуре; туда удобнее всего доехать на утренней пригородной электричке за 1,5 часа.' },
     ],
   },
   sortavala: {

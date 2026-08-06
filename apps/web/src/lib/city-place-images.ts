@@ -185,10 +185,36 @@ const KALININGRAD_IMAGES: Record<string, string> = {
     '/images/venues/kaliningrad/smotrovaya-yantarnogo-kombinata.jpg',
 };
 
+/** Perm hero covers for hub / my-day / catalog (legacy + new pack slugs). */
+const PERM_IMAGES: Record<string, string> = {
+  'naberezhnaya-kamy': '/images/venues/perm/naberezhnaya-kamy.jpg',
+  'perm-schaste-ne-za-gorami': '/images/venues/perm/schaste-ne-za-gorami.jpg',
+  'permskaya-esplanada': '/images/venues/perm/permskaya-esplanada.jpg',
+  'perm-park-gorkogo': '/images/venues/perm/park-gorkogo.jpg',
+  'permskaya-galereya': '/images/venues/perm/permskaya-galereya.jpg',
+  'perm-permm': '/images/venues/perm/permm.jpg',
+  'teatr-teatr': '/images/venues/perm/teatr-teatr.jpg',
+  'permsky-solenye-ushi': '/images/venues/perm/permsky-solenye-ushi.jpg',
+  'perm-zavod-shpagina': '/images/venues/perm/zavod-shpagina.jpg',
+  'perm-cgk': '/images/venues/perm/cgk.jpg',
+  'perm-sobor-petra-i-pavla': '/images/venues/perm/sobor-petra-i-pavla.jpg',
+  'muzej-hohlovka': '/images/venues/perm/muzej-hohlovka.jpg',
+  'perm-kungurskaya-ledyanaya-peshchera':
+    '/images/venues/perm/kungurskaya-ledyanaya-peshchera.jpg',
+  'perm-belogorskiy-monastyr': '/images/venues/perm/belogorskiy-monastyr.jpg',
+  'perm-kamennyy-gorod': '/images/venues/perm/kamennyy-gorod.jpg',
+  'perm-usvinskie-stolby': '/images/venues/perm/usvinskie-stolby.jpg',
+  'perm-dom-meshkova': '/images/venues/perm/dom-meshkova.jpg',
+  'perm-park-kamney-permskie-vorota':
+    '/images/venues/perm/park-kamney-permskie-vorota.jpg',
+  'perm-teatr-opery-i-baleta': '/images/venues/perm/teatr-opery-i-baleta.jpg',
+};
+
 const EDITORIAL_IMAGES_BY_SLUG: Record<string, string> = {
   ...NIZHNY_NOVGOROD_IMAGES,
   ...SAINT_PETERSBURG_IMAGES,
   ...KALININGRAD_IMAGES,
+  ...PERM_IMAGES,
 };
 
 export function lookupEditorialPlaceImage(

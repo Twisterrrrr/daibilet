@@ -62,9 +62,28 @@ const SAINT_PETERSBURG_COORDS: Record<string, EditorialPlaceCoords> = {
   'saint-petersburg-sobornaya-mechet': { latitude: 59.9552, longitude: 30.3239 },
 };
 
+/** Perm fallback coords (cityInfo items also carry lat/lng for my-day). */
+const PERM_COORDS: Record<string, EditorialPlaceCoords> = {
+  'naberezhnaya-kamy': { latitude: 58.0211, longitude: 56.2464 },
+  'perm-schaste-ne-za-gorami': { latitude: 58.0224, longitude: 56.252 },
+  'permskaya-esplanada': { latitude: 58.0105, longitude: 56.2285 },
+  'permskaya-galereya': { latitude: 58.0175, longitude: 56.2541 },
+  'permsky-solenye-ushi': { latitude: 58.0108, longitude: 56.2415 },
+  'teatr-teatr': { latitude: 58.0091, longitude: 56.2185 },
+  'muzej-hohlovka': { latitude: 58.26186, longitude: 56.26314 },
+  'perm-kungurskaya-ledyanaya-peshchera': { latitude: 57.4409, longitude: 57.006 },
+  'perm-belogorskiy-monastyr': { latitude: 57.39202, longitude: 56.229 },
+  'perm-kamennyy-gorod': { latitude: 58.72359, longitude: 57.63404 },
+  'perm-usvinskie-stolby': { latitude: 58.7175, longitude: 57.6152 },
+  'perm-zavod-shpagina': { latitude: 58.0202, longitude: 56.2554 },
+  'perm-cgk': { latitude: 58.0108, longitude: 56.2494 },
+  'perm-permm': { latitude: 58.0104, longitude: 56.2166 },
+};
+
 const EDITORIAL_COORDS_BY_SLUG: Record<string, EditorialPlaceCoords> = {
   ...NIZHNY_NOVGOROD_COORDS,
   ...SAINT_PETERSBURG_COORDS,
+  ...PERM_COORDS,
 };
 
 export function lookupEditorialPlaceCoords(

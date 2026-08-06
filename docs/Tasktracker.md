@@ -15,6 +15,12 @@
 |---|--------|-----------|--------|
 | OPS.DEPLOY-CADENCE | Канон: commit+push после итерации; MSK web deploy пачкой раз в сутки / по запросу owner; hotfix-исключения | Высокий | ✅ `.cursorrules` + Project.md 2026-08-05 |
 
+## Perm must-see pack + my-day (2026-08-06)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| CONT.PERM-MUSTSEE | Пермь: полный mustSee (35) + 4 suburbs/20 nested coords, dedupe legacy 6 slugs, 19 previews, seed pack, my-day address/coords | Высокий | 🔄 commit+push+MSK |
+
 ## City hub must-see sparse grid (2026-08-06)
 
 | # | Задача | Приоритет | Статус |
