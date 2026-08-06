@@ -27,7 +27,7 @@
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
 | UX.LAND-CITY-MOBILE | Multi-city landings: city chips on mobile (hero + filters); was hidden via `!landingCity` | Высокий | ✅ `523f374`; MSK BUILD_ID=`wEmnlocTyWo2TN1TtTixI`; smoke cityNav=2 on `/ekskursii/moscow` + vystavki + peshie |
-| FIX.LAND-ALL-CITIES | Multi-landing «Все города»: не redirect на stored city; national URL держится | Критический | 🔄 landings only |
+| FIX.LAND-ALL-CITIES | Multi-landing «Все города»: не redirect на stored city; national URL держится | Критический | ✅ `fec351b`; MSK BUILD_ID=`gR6L-p00T5e5YGU3tMO8j` |
 
 ## Venues catalog hang on city filter (2026-08-06)
 

@@ -13,7 +13,7 @@
 - Нет.
 
 ### Live
-- (pending deploy)
+- Commit `fec351b`; MSK **BUILD_ID=`gR6L-p00T5e5YGU3tMO8j`**. Smoke: `/progulki-po-krysham` 200, «Все города»×4, cityNav×2; `/progulki-po-krysham/moscow` + single-city dinner/bridges 200.
 
 ---
 
