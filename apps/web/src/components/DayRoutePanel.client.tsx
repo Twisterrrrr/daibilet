@@ -4416,13 +4416,14 @@ function DayRouteVenueCard({
   );
 
   /**
-   * Offer chips: stacked below on mobile; own right column on lg+.
-   * Sibling of the place/meta cluster (not inside its flex-wrap) so chips never overlay ~time/km.
+   * Offer chips: always after the place/actions cluster (no ml-auto / justify-end gap).
+   * List lg+: same row, immediately after maps/X. Grid + list mobile: full-width row below.
+   * Sibling of place/meta (not inside its wrap) so chips never overlay ~time/km.
    */
   const commerceRail =
     ticketUrl || nearbyUpsells.length > 0 ? (
       <div
-        className="flex w-full min-w-0 flex-row flex-wrap items-center gap-2 lg:w-auto lg:max-w-[min(100%,22rem)] lg:shrink-0 lg:justify-end lg:self-center"
+        className="flex w-full min-w-0 flex-row flex-wrap items-center justify-start gap-1.5 lg:w-auto lg:max-w-[min(100%,28rem)] lg:shrink-0 lg:self-center"
         data-day-stop-commerce
       >
         {ticketUrl ? (
@@ -4483,7 +4484,7 @@ function DayRouteVenueCard({
         data-day-plan-stop={venue.id}
         data-day-stop-variant="list"
         data-day-stop-list="dense"
-        data-day-stop-layout="place-offers-lg-row"
+        data-day-stop-layout="place-offers-tight"
         data-ticket-bought={bought ? '1' : '0'}
         data-commercial-chip={chip.kind}
         data-day-session={sessionDisplay || undefined}
@@ -4491,14 +4492,15 @@ function DayRouteVenueCard({
       >
         {/*
           Dense list: mobile stacked [place | maps/X] then offers;
-          lg+ horizontal [↑↓ N | place | maps/X | offers].
+          lg+ horizontal [↑↓ N | place | maps/X | offers] - offers immediately after
+          actions (no flex-1 / justify-end giant gap to the right edge).
         */}
         <div
-          className={`flex w-full flex-col gap-1.5 py-1.5 lg:flex-row lg:items-center lg:gap-3 ${
+          className={`flex w-full flex-col gap-1.5 py-1.5 lg:flex-row lg:flex-wrap lg:items-center lg:justify-start lg:gap-x-2.5 lg:gap-y-1 ${
             focused ? 'rounded-md bg-emerald-50/80 px-1' : ''
           } ${purchased ? 'border-l-4 border-primary-600 pl-1.5' : ''}`}
         >
-          <div className="flex min-w-0 w-full flex-1 items-center gap-1.5 md:gap-2 lg:gap-3">
+          <div className="flex min-w-0 w-full items-center gap-1.5 md:gap-2 lg:w-auto lg:max-w-[min(100%,36rem)] lg:flex-none lg:gap-3">
             <div className="flex shrink-0 items-center gap-1" data-day-stop-index-cluster>
               {reorderLocked ? (
                 <div
@@ -4624,7 +4626,7 @@ function DayRouteVenueCard({
       className="h-auto w-full self-start scroll-mt-4"
       data-day-plan-stop={venue.id}
       data-day-stop-variant="grid"
-      data-day-stop-layout="owner-v9-lg-row"
+      data-day-stop-layout="place-then-offers"
       data-ticket-bought={bought ? '1' : '0'}
       data-commercial-chip={chip.kind}
       data-day-session={sessionDisplay || undefined}
@@ -4632,8 +4634,9 @@ function DayRouteVenueCard({
       data-day-commerce={isCommerce ? '1' : '0'}
     >
       {/*
-        Owner v9: mobile - main row then offers below (no meta overlap);
-        lg+ - left place/travel cluster, right offer chips (own column, wrap).
+        Grid cards live in sm:2 / lg:3 columns - too narrow for place|offers row.
+        Always: main row [↑↓ | thumb | title/meta | maps/X], offers full-width below
+        (avoids chip overlap on thumb/actions and meta under the image).
       */}
       <div
         className={`flex flex-col gap-2 rounded-2xl border bg-white px-2.5 py-2 sm:px-3 sm:py-2.5 ${
@@ -4644,8 +4647,7 @@ function DayRouteVenueCard({
               : 'border-slate-200'
         }`}
       >
-        <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-3">
-          <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
+        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           {reorderLocked ? (
             <div
               className="flex h-10 w-6 shrink-0 items-center justify-center text-slate-300"
@@ -4809,10 +4811,9 @@ function DayRouteVenueCard({
               <X className="h-4 w-4" />
             </button>
           </div>
-          </div>
-
-          {commerceRail}
         </div>
+
+        {commerceRail}
       </div>
     </li>
   );

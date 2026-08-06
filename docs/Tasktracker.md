@@ -265,6 +265,7 @@
 | UX.MYDAY-STOP-CHIPS | Stop cards: offer chips горизонтально (flex-wrap) + всегда title·price (не столбик ml-auto / не голый «Купить билет») | Критический | ✅ `3d2686b` push; deploy n/a |
 | UX.MYDAY-STOP-OFFERS-BELOW | Stop cards: offer chips ниже main row (не поверх ~time/km); layout как «Руки Вверх» | Критический | ✅ push; deploy n/a (owner не просил выкатывай) |
 | UX.MYDAY-STOP-OFFERS-LG-ROW | Desktop lg+: offers справа в одном ряду с place/travel; mobile stacked ниже | Критический | ✅ `a201ea9`; MSK **BUILD_ID=`4cziKHuRaIqdm9UB0NYYW`** `/my-day` 200 |
+| UX.MYDAY-STOP-OFFERS-TIGHT | Grid: offers ниже (не lg-row в 3-col); list: offers сразу после place/actions без flex-1 gap | Критический | 🔄 commit+deploy |
 | UX.MYDAY-MUSTSEE-ALWAYS | Must-see: убрать Свернуть/Развернуть; всегда full grid; accordion open by default | Высокий | ✅ `998bd69` MSK **BUILD_ID=`4cziKHuRaIqdm9UB0NYYW`** `/my-day` 200 |
 
 ## /my-day starter → header search (2026-08-04)

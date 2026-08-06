@@ -1,3 +1,22 @@
+## 2026-08-06 - My Day stop offers: grid overlap + list gap
+
+### Наблюдения
+- Grid (lg:3 cols): `lg:flex-row` place|offers внутри узкой карточки - chips наезжали на thumb/maps/X, `~мин/км` уезжал под картинку.
+- List: place-cluster с `flex-1` + commerce `lg:justify-end` - пилюли у правого края с гигантским whitespace.
+
+### Решения
+- Grid: всегда stacked `place-then-offers` (main row, offers ниже) - колонки слишком узкие для side-by-side.
+- List: `place-offers-tight` - place `lg:w-auto lg:flex-none` (без `flex-1`); commerce `justify-start` без `lg:justify-end`.
+- `data-day-stop-layout`: `place-then-offers` / `place-offers-tight`.
+
+### Проблемы
+- Нет.
+
+### Live
+- (pending deploy)
+
+---
+
 ## 2026-08-06 - Perm: добили превью must-see / suburbs
 
 ### Наблюдения
