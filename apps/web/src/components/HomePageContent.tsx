@@ -83,58 +83,56 @@ async function HomePageBody() {
 
       <HomeStoriesStrip />
 
-      {/* 2. Cities */}
-      {topCities.length ? (
-        <section id="destinations" className="section-y border-b border-slate-200/70">
-          <div className="container-page">
-            <div className="flex items-end justify-between gap-4">
-              <div>
-                <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-                  Популярные города
-                </h2>
-                <p className="mt-1 text-sm text-slate-500">Выберите город - покажем афишу и подборки</p>
-              </div>
-              <Link href="/cities" className="shrink-0 text-sm font-semibold text-primary-600 hover:text-primary-700">
-                Все города →
-              </Link>
-            </div>
-            {/* Mobile: compact horizontal carousel (dark city covers). Desktop: 3/6 grid. */}
-            <ScrollRail
-              className="mt-6 md:hidden"
-              viewportClassName="flex flex-nowrap gap-2.5 snap-x snap-mandatory"
-              aria-label="Популярные города"
-            >
-              {topCities.map((city) => (
-                <div
-                  key={city.slug || city.name}
-                  className="w-[min(52vw,196px)] shrink-0 snap-start"
-                  data-rail-item
-                >
-                  <CityCard city={city} />
-                </div>
-              ))}
-            </ScrollRail>
-            <ul className="mt-6 hidden gap-4 overflow-x-visible md:grid md:grid-cols-3 lg:grid-cols-6">
-              {topCities.slice(0, 6).map((city) => (
-                <li key={city.slug || city.name}>
-                  <CityCard city={city} compact />
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-      ) : null}
-
-      {/* My Day CTA - after cities, not in hero */}
-      <HomeMyDayBanner />
-
-      {/* 3. Editors pick + «Куда сходить» + popular (city-scoped).
-          Restored after personal-guide refactor dropped HomeCityAwareSections. */}
+      {/* Editors-pick first, then cities + My Day as children, then home-now / popular. */}
       <HomeCityAwareSections
         sessions={sessions}
         fingerprints={fingerprintsRecord}
         sparseCatalog={sparseCatalog}
-      />
+      >
+        {topCities.length ? (
+          <section id="destinations" className="section-y border-b border-slate-200/70">
+            <div className="container-page">
+              <div className="flex items-end justify-between gap-4">
+                <div>
+                  <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+                    Популярные города
+                  </h2>
+                  <p className="mt-1 text-sm text-slate-500">Выберите город - покажем афишу и подборки</p>
+                </div>
+                <Link href="/cities" className="shrink-0 text-sm font-semibold text-primary-600 hover:text-primary-700">
+                  Все города →
+                </Link>
+              </div>
+              {/* Mobile: compact horizontal carousel (dark city covers). Desktop: 3/6 grid. */}
+              <ScrollRail
+                className="mt-6 md:hidden"
+                viewportClassName="flex flex-nowrap gap-2.5 snap-x snap-mandatory"
+                aria-label="Популярные города"
+              >
+                {topCities.map((city) => (
+                  <div
+                    key={city.slug || city.name}
+                    className="w-[min(52vw,196px)] shrink-0 snap-start"
+                    data-rail-item
+                  >
+                    <CityCard city={city} />
+                  </div>
+                ))}
+              </ScrollRail>
+              <ul className="mt-6 hidden gap-4 overflow-x-visible md:grid md:grid-cols-3 lg:grid-cols-6">
+                {topCities.slice(0, 6).map((city) => (
+                  <li key={city.slug || city.name}>
+                    <CityCard city={city} compact />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
+        ) : null}
+
+        {/* My Day CTA - after cities, not in hero */}
+        <HomeMyDayBanner />
+      </HomeCityAwareSections>
 
       {/* Mobile formats: after event rails, away from My Day CTA */}
       <HomeCategoryStack />
