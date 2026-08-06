@@ -33,6 +33,7 @@ import { extractDurationLabel } from '@/lib/catalog-labels';
 import { dayRouteItemFromEvent } from '@/lib/day-route-from-place';
 import { buildEventBreadcrumbs } from '@/lib/structured-data';
 import { resolveEventHeroObjectPosition } from '@/lib/event-image-focus';
+import { venueHref } from '@/lib/routes';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { CheckoutModalButton } from '@/components/CheckoutModal.client';
 import { EventVenueTrigger } from '@/components/EventVenueModal.client';
@@ -555,9 +556,20 @@ export function EventHero({
   });
   const nextSession = pickRepresentativeSession((payload.sessions ?? []) as EventSession[]);
   const canOpenVenueModal = Boolean(event.venue && (event.venueId || event.venueSlug));
+  const venuePageHref = canOpenVenueModal
+    ? venueHref({
+        id: event.venueId || event.venueSlug || event.venue,
+        slug: event.venueSlug,
+        name: event.venue,
+        type: event.venueKind,
+      })
+    : null;
   const breadcrumbs = buildEventBreadcrumbs(event);
   const placeLabel = event.venue || event.city || null;
   const metro = String(event.venueMetroStation || '').trim();
+  const venueBadgeClassName =
+    'inline-flex max-w-full items-center gap-1 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-medium text-white backdrop-blur-sm';
+  const venueBadgeLinkClassName = `${venueBadgeClassName} cursor-pointer transition hover:bg-white/25 hover:underline hover:decoration-white/50 hover:underline-offset-2`;
 
   return (
     <div className="relative">
@@ -618,10 +630,17 @@ export function EventHero({
                 </span>
               ) : null}
               {placeLabel ? (
-                <span className="inline-flex max-w-full items-center gap-1 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-medium text-white backdrop-blur-sm">
-                  <MapPin className="h-3 w-3 shrink-0" strokeWidth={1.75} />
-                  <span className="truncate">{placeLabel}</span>
-                </span>
+                venuePageHref ? (
+                  <Link href={venuePageHref} className={venueBadgeLinkClassName}>
+                    <MapPin className="h-3 w-3 shrink-0" strokeWidth={1.75} />
+                    <span className="truncate">{placeLabel}</span>
+                  </Link>
+                ) : (
+                  <span className={venueBadgeClassName}>
+                    <MapPin className="h-3 w-3 shrink-0" strokeWidth={1.75} />
+                    <span className="truncate">{placeLabel}</span>
+                  </span>
+                )
               ) : null}
               {metro ? (
                 <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-medium text-white backdrop-blur-sm">
