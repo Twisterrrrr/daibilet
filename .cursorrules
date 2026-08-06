@@ -12,10 +12,11 @@
    - коммитит только релевантные изменения (не мусор `.deploy-tmp/`, `tmp-*`, одноразовые smoke-скрипты без нужды; не secrets / `.env`);
    - обычный `git push` на tracked branch (НЕ force-push);
    - **основная работа и проверка - локально / preview.** Не гонять полный MSK build после каждого мелкого UI/контент-фикса: агенты бьются за deploy-lock, VPS тратит 10–20 мин на итерацию.
-   - **Web deploy на live** (`daibilet-msk` / `201.24.125.184`, MSK-only): `BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh` - **не** после каждой итерации, а:
-     - **пачкой раз в сутки** (nightly / утренний batch), **или**
-     - **по явному запросу owner** («выкатывай», «деплой», «на live»);
-     - **исключения (деплой сразу):** live HTTP 500 / сломанный критичный хаб-редирект / security / launch-blocker, который нельзя проверить локально.
+   - **Web deploy на live** (`daibilet-msk` / `201.24.125.184`):
+     - **предпочтительно:** GitHub Actions workflow **Deploy MSK web** (CI build + `swap-web-next-artifact.sh`);
+     - **fallback:** `BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh` на MSK;
+     - **не** после каждой итерации, а пачкой / по запросу owner («выкатывай»);
+     - **исключения (деплой сразу):** live HTTP 500 / сломанный критичный хаб-редирект / security / launch-blocker.
    - **Не** использовать SPB `.16` как builder.
    - **Канон docs vs runtime:** docs-only / handoff = commit + push, **без** web deploy. Runtime/UI/код копятся в ветке через commit + push; на live попадают batch/по запросу (см. выше). Seed/apply в **prod DB** - только по запросу owner или как часть согласованного batch (не «на каждый чих»).
 2. Обновляй Diary/Tasktracker при значимых архитектурных или launch-blocker фиксах.

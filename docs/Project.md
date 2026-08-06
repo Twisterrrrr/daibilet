@@ -3,7 +3,11 @@
 **Обновлено:** 2026-08-05  
 **Ветка migration / prod:** `feat/next-monorepo`  
 **Prod catalog:** Next `apps/web` `:3001` + legacy API `:4000` на МСК `201.24.125.184`  
-**Web deploy canon:** **MSK-only** - build + swap/restart на `daibilet-msk` (`201.24.125.184`). SPB `.16` (Intelligent Hoopoe) **retired** из pipeline (owner удаляет VM в панели).  
+**Web deploy canon:**  
+1. **Предпочтительно (быстро):** GitHub Actions `Deploy MSK web` - CI `pnpm web:build` → artifact `.next` → atomic swap на `daibilet-msk` (`deploy/scripts/swap-web-next-artifact.sh`). Secrets: `MSK_SSH_HOST`, `MSK_SSH_USER`, `MSK_SSH_KEY`.  
+2. **Fallback:** MSK in-place `BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh` (stop → build на VPS → start).  
+SPB `.16` **retired**.  
+
 **Deploy cadence (owner 2026-08-05):** основная работа локально / preview; агенты делают **commit + push** после итерации; **web deploy на live - пачкой раз в сутки или по явному запросу owner** (не после каждого мелкого UI/контент-фикса). Исключения сразу: live 500, критичный хаб-редирект, security, launch-blocker без локальной проверки. Seed/apply в prod DB - по запросу или в том же batch. Docs-only = commit + push без deploy.
 
 ---

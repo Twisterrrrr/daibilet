@@ -1,5 +1,15 @@
 # qa.md — открытые вопросы
 
+## 2026-08-06 - CI deploy secrets (открыто)
+
+Workflow `Deploy MSK web` в репо. Нужно в GitHub repo secrets:
+1. `MSK_SSH_HOST` (IP или `daibilet-msk`)
+2. `MSK_SSH_USER`
+3. `MSK_SSH_KEY` (deploy key с правом `git` + `systemctl` daibilet-web)
+4. Опционально `NEXT_PUBLIC_TC_WIDGET_TOKEN`, `NEXT_PUBLIC_TEP_WIDGET_ID` (parity с prod `.env`)
+
+После этого «выкатывай» = Actions → Deploy MSK web → Run workflow.
+
 ## 2026-08-05 - Deploy cadence (закрыто)
 
 Owner: основная работа локально / preview; агенты **commit + push** после итерации; **MSK web deploy** - пачкой раз в сутки или по явному запросу («выкатывай»). Исключения сразу: live 500, критичный хаб-редирект, security, launch-blocker без локальной проверки. Seed/apply prod DB - по запросу или в batch. Зафиксировано в `.cursorrules` + [Project.md](./Project.md).

@@ -1,3 +1,18 @@
+## 2026-08-06 - CI deploy MSK web (CI build + atomic swap)
+
+### Наблюдения
+- Owner: «почему не CI?» - SSH сам быстрый, тормозит in-place `web:build` на 4GB MSK.
+
+### Решения
+- Workflow `.github/workflows/deploy-msk-web.yml` (workflow_dispatch): CI `pnpm web:build` → tgz `.next` → scp → `swap-web-next-artifact.sh` (flock, stop, swap, health, rollback `.next.prev`).
+- Secrets: `MSK_SSH_HOST`, `MSK_SSH_USER`, `MSK_SSH_KEY` (+ optional NEXT_PUBLIC_*).
+- Fallback: прежний `deploy-prod-next.sh` на MSK.
+
+### Проблемы
+- До первых secrets workflow только соберёт artifact при `skip_swap` или упадёт на SSH step.
+
+---
+
 ## 2026-08-06 - My Day grid offers: compact shell + «Билеты от» + inline Поблизости
 
 ### Наблюдения

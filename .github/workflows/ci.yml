@@ -53,5 +53,7 @@ jobs:
           node --check scripts/lib/event-import-guard.js
           bash -n deploy/scripts/deploy-from-git.sh
           bash -n deploy/scripts/deploy-staging.sh
+          bash -n deploy/scripts/deploy-prod-next.sh
+          bash -n deploy/scripts/swap-web-next-artifact.sh
           bash -n scripts/post-deploy-check.sh
           bash -n scripts/run-parity-check.sh
