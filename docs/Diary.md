@@ -7,6 +7,7 @@
 ### Решения
 - Общий `loadDaibiletLeaflet()`: prefix без UA SVG + CSS override после leaflet.css.
 - Подключено в `LocationsCatalogMap` (`/cities`, `/locations`), `DayRouteOsmMap`, `OsmMapEmbed`.
+- Commit `d5de7b9`; MSK **BUILD_ID=`R3nyHuxEYbZ-N4toJ2Lxo`**; smoke `/cities` 200.
 
 ### Проблемы
 - Нет.
