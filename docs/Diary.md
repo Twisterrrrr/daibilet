@@ -26,6 +26,9 @@
 ### Проблемы
 - Нет.
 
+### Live
+- Commit `ebac995`; MSK **BUILD_ID=`lToO4hCB_xvFKPGzX8dKL`**. Smoke: `/my-day` HTTPS+local **200**; код на MSK с `dayRouteOfferIsVenueBound` / `data-day-stop-offers-label` / handoff flag false.
+
 ---
 
 ## 2026-08-06 - Event hero: кликабельный бейдж площадки
