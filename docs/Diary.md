@@ -13,6 +13,9 @@
 ### Проблемы
 - cityInfo must-see Перми не трогали (параллельный агент).
 
+### Live
+- Commit `e39b0a2`; MSK **BUILD_ID=`IZ3zP74TeExUVdQgfDRFw`**; smoke `/cities/perm` 200; directions: 0×«Санкт-Петербург», есть «Пермь», covers `perm/kama`+`city-center`, без `format-tours`; rooftops subtitle без Москва-Сити; API restart для rules.
+
 ---
 
 ## 2026-08-06 - City hub must-see: sparse card width cap
