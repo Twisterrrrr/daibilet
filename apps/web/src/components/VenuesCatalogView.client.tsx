@@ -106,10 +106,10 @@ export function VenuesCatalogView({ initialPage }: { initialPage: VenueCatalogFe
     return resolveCatalogCityFilter(selectedCity.cityValue, cityOptions, selectedCity.cityLabel);
   }, [urlCity, cityReady, selectedCity, cityOptions]);
 
-  // Prefer resolved title so perm / пермь / Пермь share one fetch key (no abort thrash).
+  // Prefer URL token when present so slug pages do not refetch as display title when label hydrates.
   const cityFetchKey = useMemo(() => {
-    if (cityFilter !== 'all') return cityFilter;
     if (urlCity && urlCity !== 'all') return urlCity;
+    if (cityFilter !== 'all') return cityFilter;
     const dest = selectedCity?.selectedDestination;
     if (!dest || selectedCity?.cityValue === 'all') return '';
     return dest.name || selectedCity.cityLabel || dest.slug || '';
