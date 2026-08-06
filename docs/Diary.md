@@ -1,3 +1,20 @@
+## 2026-08-06 - Blog share preview: og:image 404 на *-og.jpg
+
+### Наблюдения
+- Owner: «почему для статей ссылка передается без превью?» (WhatsApp/Telegram/iMessage unfurl).
+- Meta на `/blog/[slug]` уже есть (`og:title/description/image`, `twitter:card=summary_large_image`), URL абсолютный https.
+- `resolveBlogShareImage` всегда подставлял `/images/blog/{slug}-og.jpg`, но у большинства PUBLISHED статей файла не было → scraper получал **404** и не рисовал карточку. Cover `.jpg` при этом отдавался 200 (~2MB).
+
+### Решения
+- `resolveBlogShareImage`: брать `*-og.*` только если файл есть на диске; иначе fallback на реальный cover URL.
+- Сгенерированы недостающие 1200x630 `*-og.jpg` (×117) в `apps/public/public/images/blog/` + скрипт `scripts/generate-blog-og-images.py`.
+- Тест `blog-article-seo.test.ts`.
+
+### Проблемы
+- Кэш превью у Telegram/FB может держать старый «пустой» unfurl - после деплоя сбросить через debugger / `?v=` один раз.
+
+---
+
 ## 2026-08-06 - Home/cities mobile: formats + hubTags + sort row
 
 ### Наблюдения

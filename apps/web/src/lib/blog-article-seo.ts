@@ -1,3 +1,6 @@
+import { existsSync } from 'node:fs';
+import path from 'node:path';
+
 import type { Metadata } from 'next';
 
 import { resolveBlogCityHref } from '@/lib/blog-article-city';
@@ -16,19 +19,43 @@ function resolveBlogMetaDescription(article: BlogArticleDto): string {
 const SITE_URL = (process.env.DAIBILET_SITE_URL || 'https://daibilet.ru').replace(/\/$/, '');
 const SITE_NAME = 'Дайбилет';
 
-function absoluteUrl(path: string): string {
-  if (/^https?:\/\//i.test(path)) return path;
-  return `${SITE_URL}${path.startsWith('/') ? path : `/${path}`}`;
+function absoluteUrl(pathName: string): string {
+  if (/^https?:\/\//i.test(pathName)) return pathName;
+  return `${SITE_URL}${pathName.startsWith('/') ? pathName : `/${pathName}`}`;
 }
 
-/** Для шаринга: 1200x630 *-og.* рядом с обложкой блога (Telegram/VK капризны к progressive и «не тому» кадру). */
-function resolveBlogShareImage(coverImageUrl?: string | null): string | undefined {
+/** Local public asset check - scrapers 404 on invented *-og.jpg and drop the preview. */
+export function publicAssetExists(urlPath: string): boolean {
+  const rel = String(urlPath || '')
+    .trim()
+    .replace(/^https?:\/\/[^/]+/i, '')
+    .split(/[?#]/)[0]
+    .replace(/^\/+/, '');
+  if (!rel || rel.includes('..')) return false;
+  const cwd = process.cwd();
+  const candidates = [
+    path.join(cwd, 'public', rel),
+    path.join(cwd, 'apps', 'web', 'public', rel),
+    path.join(cwd, 'apps', 'public', 'public', rel),
+  ];
+  return candidates.some((filePath) => existsSync(filePath));
+}
+
+/**
+ * Prefer 1200x630 *-og.* next to the cover (Telegram/VK).
+ * If the og file is missing on disk, fall back to the real cover URL - never emit a 404 image.
+ */
+export function resolveBlogShareImage(coverImageUrl?: string | null): string | undefined {
   if (!coverImageUrl) return undefined;
   const raw = coverImageUrl.trim();
   if (!raw) return undefined;
   if (/-og\.(jpe?g|png|webp)(\?|$)/i.test(raw)) return absoluteUrl(raw);
   if (/\/images\/blog\/[^?#]+\.(jpe?g|png|webp)(\?|$)/i.test(raw)) {
-    return absoluteUrl(raw.replace(/(\.(jpe?g|png|webp))(\?|$)/i, '-og$1$3'));
+    const ogPath = raw.replace(/(\.(jpe?g|png|webp))(\?|$)/i, '-og$1$3');
+    if (publicAssetExists(ogPath.split(/[?#]/)[0])) {
+      return absoluteUrl(ogPath);
+    }
+    return absoluteUrl(raw);
   }
   return absoluteUrl(raw);
 }
