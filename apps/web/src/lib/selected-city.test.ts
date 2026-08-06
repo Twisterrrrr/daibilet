@@ -3,6 +3,7 @@ import test from 'node:test';
 
 import { buildCatalogHref, catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from './catalog-url.ts';
 import {
+  catalogCityQueryValue,
   isCityFilterPath,
   matchDestination,
   mergeStoredCityIntoEventsParams,
@@ -80,7 +81,7 @@ test('mergeStoredCityIntoSearchParams injects storage city only when city missin
     storage.set(SELECTED_CITY_STORAGE_KEY, 'Уфа');
     const injected = mergeStoredCityIntoSearchParams([...destinations], new URLSearchParams('date=today'));
     assert.ok(injected);
-    assert.equal(injected!.get('city'), 'Уфа');
+    assert.equal(injected!.get('city'), 'ufa');
     assert.equal(injected!.get('date'), 'today');
 
     const kept = mergeStoredCityIntoEventsParams([...destinations], new URLSearchParams('city=Москва&date=today'));
@@ -128,4 +129,10 @@ test('resolveCatalogCityFilter maps slug via resolved label', () => {
   assert.equal(resolveCatalogCityFilter('moscow', options, 'Москва'), 'Москва');
   assert.equal(resolveCatalogCityFilter('ufa', options, 'Уфа'), 'Уфа');
   assert.equal(resolveCatalogCityFilter('all', options), 'all');
+});
+
+test('catalogCityQueryValue prefers destination slug', () => {
+  assert.equal(catalogCityQueryValue([...destinations], 'Уфа'), 'ufa');
+  assert.equal(catalogCityQueryValue([...destinations], 'moscow'), 'moscow');
+  assert.equal(catalogCityQueryValue([...destinations], 'all'), 'all');
 });

@@ -14,7 +14,11 @@ import { useSelectedCityOptional } from '@/components/SelectedCityProvider.clien
 import { catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from '@/lib/catalog-url';
 import { cityToGenitive, cityToPrepositional } from '@/lib/city-declension';
 import { formatCountFloorTenPlus, formatNumber, pluralCities } from '@/lib/format';
-import { persistSelectedCity, resolveCatalogCityFilter } from '@/lib/selected-city';
+import {
+  catalogCityQueryValue,
+  persistSelectedCity,
+  resolveCatalogCityFilter,
+} from '@/lib/selected-city';
 import {
   fetchVenueCatalogPage,
   fetchVenueCatalogPins,
@@ -49,7 +53,7 @@ export function LocationsCatalogView({ initialPage }: { initialPage: VenueCatalo
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [sortMode, setSortMode] = useState<VenueCatalogSort>('events');
-  const [isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
   const [venues, setVenues] = useState(initialPage.venues);
   const [total, setTotal] = useState(initialPage.total);
   const [nextCursor, setNextCursor] = useState<string | null>(initialPage.nextCursor);
@@ -62,6 +66,8 @@ export function LocationsCatalogView({ initialPage }: { initialPage: VenueCatalo
   const [selectedPinId, setSelectedPinId] = useState<string | null>(null);
   const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const loadMoreLock = useRef(false);
+  const catalogRequestId = useRef(0);
+  const mapRequestId = useRef(0);
 
   const urlCity = searchParams.get('city')?.trim() || '';
   const rawLogistics = searchParams.get('logistics')?.trim() || '';
@@ -82,13 +88,20 @@ export function LocationsCatalogView({ initialPage }: { initialPage: VenueCatalo
     return resolveCatalogCityFilter(selectedCity.cityValue, cityOptions, selectedCity.cityLabel);
   }, [urlCity, cityReady, selectedCity, cityOptions]);
 
+  // Prefer resolved title so slug/name aliases share one fetch key.
   const cityFetchKey = useMemo(() => {
-    if (urlCity && urlCity !== 'all') return urlCity;
     if (cityFilter !== 'all') return cityFilter;
+    if (urlCity && urlCity !== 'all') return urlCity;
     const dest = selectedCity?.selectedDestination;
     if (!dest || selectedCity?.cityValue === 'all') return '';
-    return dest.sourceSlug || dest.slug || selectedCity.cityLabel || '';
-  }, [urlCity, cityFilter, selectedCity]);
+    return dest.name || selectedCity.cityLabel || dest.slug || '';
+  }, [
+    urlCity,
+    cityFilter,
+    selectedCity?.cityValue,
+    selectedCity?.cityLabel,
+    selectedCity?.selectedDestination,
+  ]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => setDebouncedQuery(query.trim()), 250);
@@ -122,29 +135,43 @@ export function LocationsCatalogView({ initialPage }: { initialPage: VenueCatalo
 
   // Filters reset cursor and refetch first page server-side (not client filter on 5k).
   useEffect(() => {
-    if (!cityReady && !urlCity) return;
+    if (!cityReady && !urlCity) {
+      setCatalogLoading(false);
+      return;
+    }
     const controller = new AbortController();
+    const requestId = ++catalogRequestId.current;
     setCatalogLoading(true);
     loadMoreLock.current = false;
     fetchVenueCatalogPage(feedQuery, { signal: controller.signal })
       .then((page) => {
+        if (requestId !== catalogRequestId.current) return;
         setVenues(page.venues);
         setTotal(page.total);
         setNextCursor(page.nextCursor);
         setStats(page.stats);
       })
-      .catch(() => undefined)
+      .catch((error: unknown) => {
+        if (requestId !== catalogRequestId.current) return;
+        if (error instanceof DOMException && error.name === 'AbortError') return;
+      })
       .finally(() => {
-        if (!controller.signal.aborted) setCatalogLoading(false);
+        if (requestId === catalogRequestId.current) setCatalogLoading(false);
       });
-    return () => controller.abort();
+    return () => {
+      controller.abort();
+    };
   }, [feedQuery, cityReady, urlCity]);
 
   // Map pins: only when showMap - separate lean mode=pins request.
   useEffect(() => {
     if (!showMap) return;
-    if (!cityReady && !urlCity) return;
+    if (!cityReady && !urlCity) {
+      setMapLoading(false);
+      return;
+    }
     const controller = new AbortController();
+    const requestId = ++mapRequestId.current;
     setMapLoading(true);
     fetchVenueCatalogPins(
       {
@@ -156,12 +183,20 @@ export function LocationsCatalogView({ initialPage }: { initialPage: VenueCatalo
       },
       { signal: controller.signal },
     )
-      .then((pins) => setMapPins(pins))
-      .catch(() => undefined)
+      .then((pins) => {
+        if (requestId !== mapRequestId.current) return;
+        setMapPins(pins);
+      })
+      .catch((error: unknown) => {
+        if (requestId !== mapRequestId.current) return;
+        if (error instanceof DOMException && error.name === 'AbortError') return;
+      })
       .finally(() => {
-        if (!controller.signal.aborted) setMapLoading(false);
+        if (requestId === mapRequestId.current) setMapLoading(false);
       });
-    return () => controller.abort();
+    return () => {
+      controller.abort();
+    };
   }, [showMap, cityFetchKey, typeFilter, logisticsFilter, debouncedQuery, cityReady, urlCity]);
 
   const loadMore = useCallback(() => {
@@ -186,13 +221,19 @@ export function LocationsCatalogView({ initialPage }: { initialPage: VenueCatalo
   }, [nextCursor, loadingMore, catalogLoading, feedQuery]);
 
   const cityPending = !urlCity && Boolean(selectedCity) && !cityReady;
-  const listPending = cityPending || isPending || catalogLoading;
+  // Do not gate on isPending: Cyrillic soft-nav can leave useTransition pending forever.
+  const listPending = cityPending || catalogLoading;
 
   const setCityFilter = (next: string) => {
     persistSelectedCity(next === 'all' ? 'all' : next);
     const params = new URLSearchParams(searchParams.toString());
     if (next === 'all') params.delete('city');
-    else params.set('city', next);
+    else {
+      params.set(
+        'city',
+        catalogCityQueryValue(selectedCity?.destinations || [], next),
+      );
+    }
     // Facets are city-scoped; drop stale filters.
     params.delete('type');
     params.delete('logistics');
@@ -272,8 +313,13 @@ export function LocationsCatalogView({ initialPage }: { initialPage: VenueCatalo
   };
 
   const cityCount = cityOptions.length;
-  const eventsHref = catalogHrefWithSelectedCity(selectedCity?.cityValue);
-  const venuesHref = venueCatalogHrefWithSelectedCity('/venues', selectedCity?.cityValue);
+  const eventsHref = catalogHrefWithSelectedCity(
+    selectedCity?.selectedDestination?.slug || selectedCity?.cityValue,
+  );
+  const venuesHref = venueCatalogHrefWithSelectedCity(
+    '/venues',
+    selectedCity?.selectedDestination?.slug || selectedCity?.cityValue,
+  );
   const cityName = cityFilter !== 'all' ? cityFilter : null;
   const heroTitle = cityName
     ? `Локации и точки сбора в ${cityToPrepositional(cityName)}`

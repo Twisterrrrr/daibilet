@@ -15,7 +15,11 @@ import { useSelectedCityOptional } from '@/components/SelectedCityProvider.clien
 import { catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from '@/lib/catalog-url';
 import { cityToGenitive } from '@/lib/city-declension';
 import { formatNumber, pluralCities, pluralEvents, pluralVenues } from '@/lib/format';
-import { persistSelectedCity, resolveCatalogCityFilter } from '@/lib/selected-city';
+import {
+  catalogCityQueryValue,
+  persistSelectedCity,
+  resolveCatalogCityFilter,
+} from '@/lib/selected-city';
 import {
   fetchVenueCatalogPage,
   VENUE_CATALOG_PAGE_SIZE,
@@ -73,7 +77,7 @@ export function VenuesCatalogView({ initialPage }: { initialPage: VenueCatalogFe
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [sortMode, setSortMode] = useState<VenueCatalogSort>('events');
   const [viewMode, setViewMode] = useState<ViewMode>('cards');
-  const [isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
   const [venues, setVenues] = useState(initialPage.venues);
   const [total, setTotal] = useState(initialPage.total);
   const [nextCursor, setNextCursor] = useState<string | null>(initialPage.nextCursor);
@@ -81,6 +85,7 @@ export function VenuesCatalogView({ initialPage }: { initialPage: VenueCatalogFe
   const [catalogLoading, setCatalogLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const loadMoreLock = useRef(false);
+  const catalogRequestId = useRef(0);
 
   const urlCity = searchParams.get('city')?.trim() || '';
   const rawType = searchParams.get('type')?.trim() || '';
@@ -101,13 +106,20 @@ export function VenuesCatalogView({ initialPage }: { initialPage: VenueCatalogFe
     return resolveCatalogCityFilter(selectedCity.cityValue, cityOptions, selectedCity.cityLabel);
   }, [urlCity, cityReady, selectedCity, cityOptions]);
 
+  // Prefer resolved title so perm / пермь / Пермь share one fetch key (no abort thrash).
   const cityFetchKey = useMemo(() => {
-    if (urlCity && urlCity !== 'all') return urlCity;
     if (cityFilter !== 'all') return cityFilter;
+    if (urlCity && urlCity !== 'all') return urlCity;
     const dest = selectedCity?.selectedDestination;
     if (!dest || selectedCity?.cityValue === 'all') return '';
-    return dest.sourceSlug || dest.slug || selectedCity.cityLabel || '';
-  }, [urlCity, cityFilter, selectedCity]);
+    return dest.name || selectedCity.cityLabel || dest.slug || '';
+  }, [
+    urlCity,
+    cityFilter,
+    selectedCity?.cityValue,
+    selectedCity?.cityLabel,
+    selectedCity?.selectedDestination,
+  ]);
 
   useEffect(() => {
     setViewMode(readStoredViewMode());
@@ -133,22 +145,34 @@ export function VenuesCatalogView({ initialPage }: { initialPage: VenueCatalogFe
 
   // Filters reset cursor and refetch first page server-side.
   useEffect(() => {
-    if (!cityReady && !urlCity) return;
+    if (!cityReady && !urlCity) {
+      // Abort leftover in-flight work must not leave skeletons forever.
+      setCatalogLoading(false);
+      return;
+    }
     const controller = new AbortController();
+    const requestId = ++catalogRequestId.current;
     setCatalogLoading(true);
     loadMoreLock.current = false;
     fetchVenueCatalogPage(feedQuery, { signal: controller.signal })
       .then((page) => {
+        if (requestId !== catalogRequestId.current) return;
         setVenues(page.venues);
         setTotal(page.total);
         setNextCursor(page.nextCursor);
         setStats(page.stats);
       })
-      .catch(() => undefined)
+      .catch((error: unknown) => {
+        if (requestId !== catalogRequestId.current) return;
+        if (error instanceof DOMException && error.name === 'AbortError') return;
+        // Fail soft: empty list / keep prior cards, but always leave pending.
+      })
       .finally(() => {
-        if (!controller.signal.aborted) setCatalogLoading(false);
+        if (requestId === catalogRequestId.current) setCatalogLoading(false);
       });
-    return () => controller.abort();
+    return () => {
+      controller.abort();
+    };
   }, [feedQuery, cityReady, urlCity]);
 
   const loadMore = useCallback(() => {
@@ -186,7 +210,12 @@ export function VenuesCatalogView({ initialPage }: { initialPage: VenueCatalogFe
     persistSelectedCity(next === 'all' ? 'all' : next);
     const params = new URLSearchParams(searchParams.toString());
     if (next === 'all') params.delete('city');
-    else params.set('city', next);
+    else {
+      params.set(
+        'city',
+        catalogCityQueryValue(selectedCity?.destinations || [], next),
+      );
+    }
     const qs = params.toString();
     startTransition(() => {
       router.replace(qs ? `/venues?${qs}` : '/venues', { scroll: false });
@@ -213,7 +242,8 @@ export function VenuesCatalogView({ initialPage }: { initialPage: VenueCatalogFe
     });
   };
 
-  const listPending = cityPending || isPending || catalogLoading;
+  // Do not gate on isPending: Cyrillic soft-nav can leave useTransition pending forever.
+  const listPending = cityPending || catalogLoading;
 
   const typeOptions = useMemo(() => {
     const counts = stats.types || {};
@@ -234,8 +264,13 @@ export function VenuesCatalogView({ initialPage }: { initialPage: VenueCatalogFe
   }, [stats.scales]);
 
   const cityCount = cityOptions.length;
-  const eventsHref = catalogHrefWithSelectedCity(selectedCity?.cityValue);
-  const locationsHref = venueCatalogHrefWithSelectedCity('/locations', selectedCity?.cityValue);
+  const eventsHref = catalogHrefWithSelectedCity(
+    selectedCity?.selectedDestination?.slug || selectedCity?.cityValue,
+  );
+  const locationsHref = venueCatalogHrefWithSelectedCity(
+    '/locations',
+    selectedCity?.selectedDestination?.slug || selectedCity?.cityValue,
+  );
   const cityName = cityFilter !== 'all' ? cityFilter : null;
   const heroTitle = cityName
     ? `Музеи, театры и пространства ${cityToGenitive(cityName)}`

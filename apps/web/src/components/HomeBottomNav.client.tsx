@@ -18,12 +18,13 @@ export function HomeBottomNav() {
   const cityReady = selectedCity?.cityReady ?? false;
   const cityValue = cityReady ? selectedCity?.cityValue ?? 'all' : 'all';
   const citySlug = selectedCity?.selectedDestination?.slug || null;
+  const cityQuery = citySlug || cityValue;
 
   const items = [
     {
       id: 'afisha',
       label: 'Афиша',
-      href: catalogHrefWithSelectedCity(cityValue, { sort: 'popular' }),
+      href: catalogHrefWithSelectedCity(cityQuery, { sort: 'popular' }),
       icon: CalendarDays,
       accent: false,
       match: (path: string) => path === '/events' || path.startsWith('/events/'),
@@ -47,7 +48,7 @@ export function HomeBottomNav() {
     {
       id: 'locations',
       label: 'Локации',
-      href: venueCatalogHrefWithSelectedCity('/locations', cityValue),
+      href: venueCatalogHrefWithSelectedCity('/locations', cityQuery),
       icon: MapPin,
       accent: false,
       match: (path: string) => path === '/locations' || path.startsWith('/locations/'),

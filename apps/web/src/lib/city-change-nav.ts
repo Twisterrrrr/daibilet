@@ -96,12 +96,13 @@ export function resolveCityChangeNav(input: CityChangeNavInput): CityChangeNavRe
       }
 
       // Leaving a PDP: drop deep-link noise; keep filters when already on the index.
+      // Prefer ASCII slug in ?city= (Cyrillic names thrash App Router soft-nav / catalog fetch).
       const params =
         path === root
           ? new URLSearchParams(input.searchParams?.toString() || '')
           : new URLSearchParams();
       if (name === 'all') params.delete('city');
-      else params.set('city', name);
+      else params.set('city', citySlug || name);
       params.delete('page');
       const query = params.toString();
       return { action: 'navigate', href: query ? `${root}?${query}` : root };

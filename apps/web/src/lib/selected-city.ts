@@ -59,6 +59,20 @@ export function persistSelectedCity(name: string) {
 }
 
 /**
+ * Prefer ASCII destination slug in `?city=` so soft-nav / useSearchParams stay stable.
+ * Cyrillic display names (Пермь) were aborting catalog refetches and leaving skeletons forever.
+ */
+export function catalogCityQueryValue(
+  destinations: PublicDestinationDto[],
+  cityNameOrSlug: string,
+): string {
+  const needle = String(cityNameOrSlug || '').trim();
+  if (!needle || needle === 'all') return needle;
+  const matched = matchDestination(destinations, needle);
+  return matched?.slug?.trim() || matched?.sourceSlug?.trim() || matched?.name || needle;
+}
+
+/**
  * If a city-filter page has no explicit `city` query, inject the stored header city.
  * Preserves deep-links that already set `city`.
  */
@@ -73,7 +87,7 @@ export function mergeStoredCityIntoSearchParams(
   if (!stored) return null;
 
   const next = new URLSearchParams(searchParams.toString());
-  next.set('city', stored);
+  next.set('city', catalogCityQueryValue(destinations, stored));
   return next;
 }
 

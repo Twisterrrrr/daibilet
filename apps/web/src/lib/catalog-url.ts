@@ -90,7 +90,10 @@ export function catalogHrefWithSelectedCity(
   return buildCatalogHref({ ...values, city });
 }
 
-/** `/venues` or `/locations` href with header city when none is explicit. */
+/**
+ * `/venues` or `/locations` href with header city when none is explicit.
+ * Pass destination slug when available - Cyrillic `?city=Пермь` soft-nav hangs catalog loading.
+ */
 export function venueCatalogHrefWithSelectedCity(
   path: '/venues' | '/locations',
   cityValue: string | null | undefined,

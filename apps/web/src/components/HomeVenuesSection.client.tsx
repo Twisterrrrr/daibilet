@@ -36,7 +36,10 @@ export function HomeVenuesSection({ venues }: { venues: PublicVenueDto[] }) {
 
   if (!homeVenues.length) return null;
 
-  const venuesHref = venueCatalogHrefWithSelectedCity('/venues', cityReady ? cityValue : 'all');
+  const venuesHref = venueCatalogHrefWithSelectedCity(
+    '/venues',
+    cityReady ? citySlug || cityValue : 'all',
+  );
   const cityHint = cityReady && cityName ? ` · ${cityName}` : '';
 
   return (

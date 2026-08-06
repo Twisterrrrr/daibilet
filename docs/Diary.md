@@ -1,4 +1,24 @@
-## 2026-08-06 - Perm must-see full pack + my-day wiring
+## 2026-08-06 - Venues catalog: infinite «Обновляем список…» for Perm
+
+### Наблюдения
+- Owner: `/venues` с Пермью висит на скелетонах «Обновляем список…».
+- API `/api/public/venues?city=perm|Пермь` 200, ~16-23 venues - не backend hang.
+- Playwright: `?city=perm` (ASCII) ок; `?city=Пермь` (кириллица из header/storage) ловит abort thrash / soft-nav pending.
+- Баг UX: `listPending = cityPending || isPending || catalogLoading`; abort finally не снимал loading; early-return при `!cityReady && !urlCity` оставлял skeleton.
+
+### Решения
+- `?city=` в catalog nav / storage inject / header → ASCII destination slug.
+- Venues+Locations: request-id loading, clear on early-return; listPending без isPending.
+- Стабильный `cityFetchKey` по resolved title.
+
+### Проблемы
+- Старые deep-link с кириллическим `?city=` всё ещё открываются, но больше не клинят skeleton.
+
+### Live
+- (после deploy) BUILD_ID TBD; smoke `/venues?city=perm` + Cyrillic path.
+
+---
+
 
 ### Наблюдения
 - Owner дал полный гайд Перми (main/museums/gastro + 5 арт-площадок + suburbs Хохловка/Кунгур/Белая гора/Губаха-Усьва).

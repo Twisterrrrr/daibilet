@@ -15,6 +15,12 @@
 |---|--------|-----------|--------|
 | OPS.DEPLOY-CADENCE | Канон: commit+push после итерации; MSK web deploy пачкой раз в сутки / по запросу owner; hotfix-исключения | Высокий | ✅ `.cursorrules` + Project.md 2026-08-05 |
 
+## Venues catalog hang on city filter (2026-08-06)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| FIX.VENUES-CITY-PENDING | `/venues` Пермь: infinite «Обновляем список…» (Cyrillic `?city=` + abort/isPending) | Критический | 🔄 fix in branch; deploy TBD |
+
 ## Perm must-see pack + my-day (2026-08-06)
 
 | # | Задача | Приоритет | Статус |

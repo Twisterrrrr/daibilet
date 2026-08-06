@@ -63,16 +63,20 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
   const cityLabel = selectedCity?.cityLabel ?? 'Все города';
   const cityValue = selectedCity?.cityValue ?? 'all';
   const cityReady = selectedCity?.cityReady ?? false;
+  const cityQuery =
+    cityReady && cityValue !== 'all'
+      ? selectedCity?.selectedDestination?.slug || cityValue
+      : 'all';
   const onCityChange = selectedCity?.setCity ?? (() => undefined);
   const navLinks = NAV_LINKS.map((item) => {
     if ('catalog' in item && item.catalog) {
-      return { ...item, href: catalogHrefWithSelectedCity(cityReady ? cityValue : 'all') };
+      return { ...item, href: catalogHrefWithSelectedCity(cityQuery) };
     }
     if ('venueCatalog' in item && item.venueCatalog) {
       const path = item.venueCatalog === 'venues' ? '/venues' : '/locations';
       return {
         ...item,
-        href: venueCatalogHrefWithSelectedCity(path, cityReady ? cityValue : 'all'),
+        href: venueCatalogHrefWithSelectedCity(path, cityQuery),
       };
     }
     return { ...item, href: item.href };
