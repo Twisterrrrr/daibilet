@@ -107,7 +107,7 @@ async function HomePageBody() {
               {topCities.map((city) => (
                 <div
                   key={city.slug || city.name}
-                  className="w-[min(42vw,152px)] shrink-0 snap-start"
+                  className="w-[min(50vw,176px)] shrink-0 snap-start"
                   data-rail-item
                 >
                   <CityCard city={city} />
@@ -128,15 +128,15 @@ async function HomePageBody() {
       {/* My Day CTA - after cities, not in hero */}
       <HomeMyDayBanner />
 
-      {/* Mobile: Концерты / Стендап / Экскурсии stacked near afisha */}
-      <HomeCategoryStack />
-
       {/* 3. Top events */}
       <HomeGuideEvents
         sessions={sessions}
         fingerprints={fingerprintsRecord}
         sparseCatalog={sparseCatalog}
       />
+
+      {/* Mobile formats: after «Куда сходить», away from My Day CTA */}
+      <HomeCategoryStack />
 
       {/* 4. Lucky city randomizer */}
       {cities.some((c) => c.events > 0) ? (

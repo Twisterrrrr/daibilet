@@ -1,4 +1,20 @@
-## 2026-08-06 - Mobile catalog density (podborki / locations / blog / city / my-day)
+## 2026-08-06 - Home/cities mobile: formats + hubTags + sort row
+
+### Наблюдения
+- Owner: HomeCategoryStack из 3 пунктов выглядел как урезанный фильтр и сидел слишком высоко под My Day.
+- hubTags городов снова ушли в колонку на mobile; карточки 42vw узкие для трёх меток в ряд.
+- На `/cities` «Популярные»/«По алфавиту» wrap'ились отдельно от random CTA.
+
+### Решения
+- `HOME_MOBILE_CATEGORY_STACK`: 6 форматов (Концерты, Спектакли, Экскурсии, Музеи, Речные прогулки, Стендап); UI - 2-col grid; блок после «Куда сходить».
+- `CityHubTags`: снова горизонтальный ряд; carousel `50vw` / max `176px`; чуть мельче tag text.
+- `CitiesHeroSearch`: random CTA своей строкой; Популярные + По алфавиту вместе ниже.
+
+### Проблемы
+- Нет.
+
+---
+
 
 ### Наблюдения
 - Owner: на `/podborki` сезонная плашка «Летом в приоритете…» лишняя в mobile шапке; scrollbar под mood-chips выглядит недоделанным.

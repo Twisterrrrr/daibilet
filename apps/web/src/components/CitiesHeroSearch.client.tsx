@@ -61,20 +61,22 @@ export function CitiesHeroSearch({ destinations }: { destinations: PublicDestina
         </ul>
       ) : null}
 
-      <div className="mt-3 flex flex-wrap items-center gap-2" role="group" aria-label="Быстрый переход">
-        <LuckyCityButton cities={destinations} variant="hero" />
-        <a
-          href="#cities-all"
-          className="rounded-full bg-slate-900 px-3.5 py-1.5 text-xs font-semibold text-white"
-        >
-          Популярные
-        </a>
-        <a
-          href="#cities-all"
-          className="rounded-full bg-white px-3.5 py-1.5 text-xs font-semibold text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50"
-        >
-          По алфавиту
-        </a>
+      <div className="mt-3 flex flex-col gap-2" role="group" aria-label="Быстрый переход">
+        <LuckyCityButton cities={destinations} variant="hero" className="w-full sm:w-auto" />
+        <div className="flex flex-wrap items-center gap-2">
+          <a
+            href="#cities-all"
+            className="rounded-full bg-slate-900 px-3.5 py-1.5 text-xs font-semibold text-white"
+          >
+            Популярные
+          </a>
+          <a
+            href="#cities-all"
+            className="rounded-full bg-white px-3.5 py-1.5 text-xs font-semibold text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50"
+          >
+            По алфавиту
+          </a>
+        </div>
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import { landingCategoryHref } from '@/lib/landing-routes';
+import { CANONICAL_LANDING_SLUGS } from '@/lib/landing-constants';
 import { buildCatalogHref } from '@/lib/catalog-url';
 import { formatPriceFrom } from '@/lib/format';
 import {
@@ -76,7 +77,7 @@ export const HOME_STORIES: HomeGuideChip[] = [
   },
 ];
 
-/** Mobile vertical category CTAs (stacked - not a horizontal chip row). */
+/** Mobile category CTAs - full format set (2-col grid in UI). */
 export const HOME_MOBILE_CATEGORY_STACK: HomeGuideChip[] = [
   {
     id: 'concerts',
@@ -85,16 +86,34 @@ export const HOME_MOBILE_CATEGORY_STACK: HomeGuideChip[] = [
     icon: 'music',
   },
   {
-    id: 'standup',
-    label: 'Стендап',
-    href: buildCatalogHref({ q: 'стендап', sort: 'popular' }),
-    icon: 'mic',
+    id: 'theater',
+    label: 'Спектакли',
+    href: landingCategoryHref('unusual-theatres'),
+    icon: 'theater',
   },
   {
     id: 'excursions',
     label: 'Экскурсии',
     href: buildCatalogHref({ category: 'Экскурсии', sort: 'popular' }),
     icon: 'map',
+  },
+  {
+    id: 'museums',
+    label: 'Музеи',
+    href: buildCatalogHref({ category: 'Музеи и арт', sort: 'popular' }),
+    icon: 'landmark',
+  },
+  {
+    id: 'river',
+    label: 'Речные прогулки',
+    href: landingCategoryHref(CANONICAL_LANDING_SLUGS.river),
+    icon: 'ship',
+  },
+  {
+    id: 'standup',
+    label: 'Стендап',
+    href: buildCatalogHref({ q: 'стендап', sort: 'popular' }),
+    icon: 'mic',
   },
 ];
 
