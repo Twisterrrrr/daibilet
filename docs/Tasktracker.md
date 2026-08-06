@@ -15,6 +15,12 @@
 |---|--------|-----------|--------|
 | OPS.DEPLOY-CADENCE | Канон: commit+push после итерации; MSK web deploy пачкой раз в сутки / по запросу owner; hotfix-исключения | Высокий | ✅ `.cursorrules` + Project.md 2026-08-05 |
 
+## Suburb nested coords → day-route (2026-08-06)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| FIX.SUBURB-COORDS | Nested POI пригородов СПб+KGD: lat/lng в cityInfo + проброс в «В маршрут» / DayRoutePanel | Критический | 🔄 code+pack 78 pts; deploy MSK |
+
 ## Locations kind chips (2026-08-06)
 
 | # | Задача | Приоритет | Статус |

@@ -309,6 +309,24 @@ test('dayRouteItemFromMustSee suburb stub without slug still pins to route', () 
   assert.equal(item!.isSuburb, true);
 });
 
+test('dayRouteItemFromMustSee suburb stub carries editorial lat/lng', () => {
+  const item = dayRouteItemFromMustSee(
+    {
+      name: 'Променад и Солнечные часы «Зодиак»',
+      desc: 'Набережная Светлогорска.',
+      latitude: 54.9405,
+      longitude: 20.1485,
+    },
+    venues,
+    city,
+    { isSuburb: true },
+  );
+  assert.ok(item);
+  assert.equal(item!.latitude, 54.9405);
+  assert.equal(item!.longitude, 20.1485);
+  assert.equal(item!.isSuburb, true);
+});
+
 test('dayRouteItemFromMustSee does not glue SPB mosque to MTS Live Hall', () => {
   const mts = {
     id: 'venue_mts',

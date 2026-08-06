@@ -1,0 +1,630 @@
+{
+  "schemaVersion": 1,
+  "note": "Curated lat/lng for significantSuburbs nested POIs (SPB + KGD). Prefer owner pack SUB/KGD rows where titles match; remaining are well-known landmark pins for day-route / OSM. Vyborg owner SUB lat 59.x corrected to 60.x.",
+  "places": [
+    {
+      "city": "saint-petersburg",
+      "suburb": "Петергоф",
+      "name": "Нижний парк Петергофа",
+      "latitude": 59.885112,
+      "longitude": 29.908214,
+      "source": "owner-pack SUB-001"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Петергоф",
+      "name": "Большой каскад",
+      "latitude": 59.88935,
+      "longitude": 29.90855,
+      "source": "landmark Grand Cascade"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Петергоф",
+      "name": "Парк Александрия",
+      "latitude": 59.8808,
+      "longitude": 29.9212,
+      "source": "landmark Alexandria Park"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Петергоф",
+      "name": "Готическая капелла",
+      "latitude": 59.8786,
+      "longitude": 29.9261,
+      "source": "landmark Gothic Chapel"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Петергоф",
+      "name": "Дворец Монплезир",
+      "latitude": 59.8879,
+      "longitude": 29.9184,
+      "source": "landmark Monplaisir"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Царское Село / Пушкин",
+      "name": "Екатерининский дворец",
+      "latitude": 59.715911,
+      "longitude": 30.395812,
+      "source": "owner-pack SUB-003"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Царское Село / Пушкин",
+      "name": "Царскосельский лицей",
+      "latitude": 59.716912,
+      "longitude": 30.397114,
+      "source": "owner-pack SUB-004"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Царское Село / Пушкин",
+      "name": "Александровский дворец",
+      "latitude": 59.71855,
+      "longitude": 30.39135,
+      "source": "landmark Alexander Palace"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Царское Село / Пушкин",
+      "name": "Павильон «Эрмитаж»",
+      "latitude": 59.71345,
+      "longitude": 30.39865,
+      "source": "landmark Hermitage pavilion"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Царское Село / Пушкин",
+      "name": "Ратная палата",
+      "latitude": 59.71235,
+      "longitude": 30.40585,
+      "source": "landmark Martial Chamber"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Кронштадт",
+      "name": "Морской Никольский собор",
+      "latitude": 59.993412,
+      "longitude": 29.777414,
+      "source": "owner-pack SUB-008"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Кронштадт",
+      "name": "Якорная площадь",
+      "latitude": 59.99185,
+      "longitude": 29.77645,
+      "source": "landmark Anchor Square"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Кронштадт",
+      "name": "Парк «Остров фортов»",
+      "latitude": 59.9952,
+      "longitude": 29.7018,
+      "source": "landmark Island of Forts"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Кронштадт",
+      "name": "Музей военно-морской славы",
+      "latitude": 59.989211,
+      "longitude": 29.761512,
+      "source": "owner-pack SUB-009"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Кронштадт",
+      "name": "Петровский док",
+      "latitude": 59.99095,
+      "longitude": 29.76635,
+      "source": "landmark Petrovsky Dock"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Гатчина",
+      "name": "Большой Гатчинский дворец",
+      "latitude": 59.564112,
+      "longitude": 30.108114,
+      "source": "owner-pack SUB-006"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Гатчина",
+      "name": "Приоратский дворец",
+      "latitude": 59.558311,
+      "longitude": 30.120812,
+      "source": "owner-pack SUB-007"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Гатчина",
+      "name": "Дворцовый парк в Гатчине",
+      "latitude": 59.56585,
+      "longitude": 30.11145,
+      "source": "landmark Gatchina Palace Park"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Гатчина",
+      "name": "Павильон Орла",
+      "latitude": 59.56915,
+      "longitude": 30.10785,
+      "source": "landmark Eagle Pavilion"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Гатчина",
+      "name": "Гатчинский гейзер (Источник)",
+      "latitude": 59.5512,
+      "longitude": 30.0685,
+      "source": "landmark Gatchina geyser"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Павловск",
+      "name": "Павловский парк",
+      "latitude": 59.6875,
+      "longitude": 30.4485,
+      "source": "landmark Pavlovsk Park"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Павловск",
+      "name": "Павловский дворец",
+      "latitude": 59.685911,
+      "longitude": 30.453912,
+      "source": "owner-pack SUB-005"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Павловск",
+      "name": "Долина реки Славянки",
+      "latitude": 59.68385,
+      "longitude": 30.44715,
+      "source": "landmark Slavyanka valley"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Павловск",
+      "name": "Павильон «Пиль-башня»",
+      "latitude": 59.68245,
+      "longitude": 30.44185,
+      "source": "landmark Pil-tower"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Павловск",
+      "name": "Собственный садик императрицы",
+      "latitude": 59.68545,
+      "longitude": 30.45335,
+      "source": "landmark Private Garden"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Ораниенбаум / Ломоносов",
+      "name": "Большой Меншиковский дворец",
+      "latitude": 59.91485,
+      "longitude": 29.75365,
+      "source": "landmark Menshikov Palace"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Ораниенбаум / Ломоносов",
+      "name": "Китайский дворец",
+      "latitude": 59.90895,
+      "longitude": 29.75085,
+      "source": "landmark Chinese Palace"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Ораниенбаум / Ломоносов",
+      "name": "Павильон Катальной горки",
+      "latitude": 59.90785,
+      "longitude": 29.75345,
+      "source": "landmark Katalnaya Gorka"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Ораниенбаум / Ломоносов",
+      "name": "Дворец Петра III",
+      "latitude": 59.91055,
+      "longitude": 29.75515,
+      "source": "landmark Palace of Peter III"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Ораниенбаум / Ломоносов",
+      "name": "Парк Ораниенбаум",
+      "latitude": 59.91185,
+      "longitude": 29.75245,
+      "source": "landmark Oranienbaum Park"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Стрельна",
+      "name": "Константиновский дворец",
+      "latitude": 59.85585,
+      "longitude": 30.05765,
+      "source": "landmark Konstantinovsky Palace"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Стрельна",
+      "name": "Путевой дворец Петра I",
+      "latitude": 59.85195,
+      "longitude": 30.04285,
+      "source": "landmark Travel Palace Peter I"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Стрельна",
+      "name": "Константиновский парк",
+      "latitude": 59.85455,
+      "longitude": 30.05615,
+      "source": "landmark Konstantinovsky Park"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Стрельна",
+      "name": "Львовский дворец",
+      "latitude": 59.84985,
+      "longitude": 30.04845,
+      "source": "landmark Lvov Palace"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Стрельна",
+      "name": "Орловский парк",
+      "latitude": 59.84755,
+      "longitude": 30.06125,
+      "source": "landmark Orlovsky Park"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Выборг",
+      "name": "Выборгский замок",
+      "latitude": 60.7158,
+      "longitude": 28.7292,
+      "source": "landmark Vyborg Castle (owner SUB-010 lat typo 59->60)"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Выборг",
+      "name": "Башня Святого Олафа",
+      "latitude": 60.71595,
+      "longitude": 28.72855,
+      "source": "landmark St Olaf Tower"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Выборг",
+      "name": "Скальный парк Монрепо",
+      "latitude": 60.7321,
+      "longitude": 28.7245,
+      "source": "landmark Monrepos (owner SUB-011 lat typo 59->60)"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Выборг",
+      "name": "Часовая башня",
+      "latitude": 60.71285,
+      "longitude": 28.73145,
+      "source": "landmark Vyborg Clock Tower"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Выборг",
+      "name": "Библиотека Алвара Аалто",
+      "latitude": 60.709,
+      "longitude": 28.7478,
+      "source": "landmark Aalto Library"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Курортный район / Побережье",
+      "name": "Сестрорецкий Рубеж",
+      "latitude": 60.0925,
+      "longitude": 29.9595,
+      "source": "landmark Sestroretsk Rubezh"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Курортный район / Побережье",
+      "name": "Экотропа «Комаровский берег»",
+      "latitude": 60.1865,
+      "longitude": 29.7965,
+      "source": "landmark Komarovo shore"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Курортный район / Побережье",
+      "name": "Музей-усадьба И. Е. Репина «Пенаты»",
+      "latitude": 60.1565,
+      "longitude": 29.8625,
+      "source": "landmark Penaty"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Курортный район / Побережье",
+      "name": "Комаровский некрополь",
+      "latitude": 60.1845,
+      "longitude": 29.8085,
+      "source": "landmark Komarovo necropolis"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Курортный район / Побережье",
+      "name": "Заказник «Сестрорецкое болото»",
+      "latitude": 60.1055,
+      "longitude": 30.0155,
+      "source": "landmark Sestroretsk bog"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Шлиссельбург / Ладога",
+      "name": "Крепость Орешек",
+      "latitude": 59.9535,
+      "longitude": 31.0385,
+      "source": "landmark Oreshek fortress"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Шлиссельбург / Ладога",
+      "name": "Секретный дом (Старая тюрьма)",
+      "latitude": 59.9538,
+      "longitude": 31.0392,
+      "source": "landmark Secret House Oreshek"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Шлиссельбург / Ладога",
+      "name": "Королевская башня",
+      "latitude": 59.9541,
+      "longitude": 31.0375,
+      "source": "landmark Royal Tower Oreshek"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Шлиссельбург / Ладога",
+      "name": "Староладожский канал",
+      "latitude": 59.9395,
+      "longitude": 31.0285,
+      "source": "landmark Staraya Ladoga canal"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Шлиссельбург / Ладога",
+      "name": "Памятник Петру I в Шлиссельбурге",
+      "latitude": 59.9485,
+      "longitude": 31.0335,
+      "source": "landmark Peter I monument"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Сосновый Бор / Атомград",
+      "name": "Андерсенград",
+      "latitude": 59.897811,
+      "longitude": 29.086412,
+      "source": "owner-pack SUB-012"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Сосновый Бор / Атомград",
+      "name": "Природный парк «Липовский пляж»",
+      "latitude": 59.9055,
+      "longitude": 29.0455,
+      "source": "landmark Lipovsky beach"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Сосновый Бор / Атомград",
+      "name": "Парк «Приморский»",
+      "latitude": 59.9015,
+      "longitude": 29.0725,
+      "source": "landmark Primorsky park"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Сосновый Бор / Атомград",
+      "name": "Копорская крепость",
+      "latitude": 59.7085,
+      "longitude": 29.0325,
+      "source": "landmark Koporye fortress"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Сосновый Бор / Атомград",
+      "name": "Ранчо «Эвелон»",
+      "latitude": 59.8755,
+      "longitude": 29.1255,
+      "source": "landmark Evelon ranch"
+    },
+    {
+      "city": "kaliningrad",
+      "suburb": "Куршская коса",
+      "name": "Дюна Эфа",
+      "latitude": 55.223412,
+      "longitude": 20.901412,
+      "source": "owner-pack KGD-006"
+    },
+    {
+      "city": "kaliningrad",
+      "suburb": "Куршская коса",
+      "name": "Танцующий лес",
+      "latitude": 55.181211,
+      "longitude": 20.854112,
+      "source": "owner-pack KGD-007"
+    },
+    {
+      "city": "kaliningrad",
+      "suburb": "Куршская коса",
+      "name": "Орнитологическая станция «Фрингилла»",
+      "latitude": 55.1585,
+      "longitude": 20.8255,
+      "source": "landmark Fringilla"
+    },
+    {
+      "city": "kaliningrad",
+      "suburb": "Куршская коса",
+      "name": "Высота Мюллера",
+      "latitude": 55.1725,
+      "longitude": 20.8415,
+      "source": "landmark Muller Height"
+    },
+    {
+      "city": "kaliningrad",
+      "suburb": "Зеленоградск (Кранц)",
+      "name": "Курортный проспект",
+      "latitude": 54.9595,
+      "longitude": 20.4765,
+      "source": "landmark Kurortny prospect"
+    },
+    {
+      "city": "kaliningrad",
+      "suburb": "Зеленоградск (Кранц)",
+      "name": "Музей кошек «Мурариум»",
+      "latitude": 54.958914,
+      "longitude": 20.481211,
+      "source": "owner-pack KGD-008"
+    },
+    {
+      "city": "kaliningrad",
+      "suburb": "Зеленоградск (Кранц)",
+      "name": "Памятник зеленоградским котам",
+      "latitude": 54.9598,
+      "longitude": 20.4755,
+      "source": "landmark Cats monument"
+    },
+    {
+      "city": "kaliningrad",
+      "suburb": "Зеленоградск (Кранц)",
+      "name": "Бювет «Королева Луиза»",
+      "latitude": 54.9615,
+      "longitude": 20.4785,
+      "source": "landmark Queen Louise pump room"
+    },
+    {
+      "city": "kaliningrad",
+      "suburb": "Зеленоградск (Кранц)",
+      "name": "Музей «Домик Ангелов»",
+      "latitude": 54.9582,
+      "longitude": 20.4745,
+      "source": "landmark Angels House"
+    },
+    {
+      "city": "kaliningrad",
+      "suburb": "Светлогорск (Раушен)",
+      "name": "Водонапорная башня Раушена",
+      "latitude": 54.943112,
+      "longitude": 20.151214,
+      "source": "owner-pack KGD-009"
+    },
+    {
+      "city": "kaliningrad",
+      "suburb": "Светлогорск (Раушен)",
+      "name": "Променад и Солнечные часы «Зодиак»",
+      "latitude": 54.9405,
+      "longitude": 20.1485,
+      "source": "landmark Zodiac sundial promenade"
+    },
+    {
+      "city": "kaliningrad",
+      "suburb": "Светлогорск (Раушен)",
+      "name": "Канатная дорога",
+      "latitude": 54.9415,
+      "longitude": 20.1495,
+      "source": "landmark Svetlogorsk cable car"
+    },
+    {
+      "city": "kaliningrad",
+      "suburb": "Светлогорск (Раушен)",
+      "name": "Органный зал «Макаров»",
+      "latitude": 54.9445,
+      "longitude": 20.1525,
+      "source": "landmark Organ Hall Makarov"
+    },
+    {
+      "city": "kaliningrad",
+      "suburb": "Светлогорск (Раушен)",
+      "name": "Вилла Порт",
+      "latitude": 54.9455,
+      "longitude": 20.1555,
+      "source": "landmark Villa Port"
+    },
+    {
+      "city": "kaliningrad",
+      "suburb": "Балтийск (Пиллау)",
+      "name": "Шведская крепость Пиллау",
+      "latitude": 54.639411,
+      "longitude": 19.891114,
+      "source": "owner-pack KGD-010"
+    },
+    {
+      "city": "kaliningrad",
+      "suburb": "Балтийск (Пиллау)",
+      "name": "Маяк Пиллау",
+      "latitude": 54.6415,
+      "longitude": 19.8825,
+      "source": "landmark Pillau lighthouse"
+    },
+    {
+      "city": "kaliningrad",
+      "suburb": "Балтийск (Пиллау)",
+      "name": "Памятник Елизавете Петровне",
+      "latitude": 54.6385,
+      "longitude": 19.8855,
+      "source": "landmark Elizabeth monument"
+    },
+    {
+      "city": "kaliningrad",
+      "suburb": "Балтийск (Пиллау)",
+      "name": "Пехотные казармы",
+      "latitude": 54.6405,
+      "longitude": 19.8935,
+      "source": "landmark Infantry barracks"
+    },
+    {
+      "city": "kaliningrad",
+      "suburb": "Балтийск (Пиллау)",
+      "name": "Немецкий аэродром Нойтиф",
+      "latitude": 54.6125,
+      "longitude": 19.8755,
+      "source": "landmark Neutief airfield"
+    },
+    {
+      "city": "kaliningrad",
+      "suburb": "Янтарный (Пальмикен)",
+      "name": "Смотровая площадка Янтарного комбината",
+      "latitude": 54.869212,
+      "longitude": 19.94151,
+      "source": "owner-pack KGD-011"
+    },
+    {
+      "city": "kaliningrad",
+      "suburb": "Янтарный (Пальмикен)",
+      "name": "Пляж «Шахта Анна»",
+      "latitude": 54.8725,
+      "longitude": 19.9355,
+      "source": "landmark Anna mine beach"
+    },
+    {
+      "city": "kaliningrad",
+      "suburb": "Янтарный (Пальмикен)",
+      "name": "Парк Беккера",
+      "latitude": 54.8685,
+      "longitude": 19.9455,
+      "source": "landmark Becker Park"
+    },
+    {
+      "city": "kaliningrad",
+      "suburb": "Янтарный (Пальмикен)",
+      "name": "Янтарный замок",
+      "latitude": 54.8675,
+      "longitude": 19.9435,
+      "source": "landmark Amber Castle"
+    }
+  ]
+}

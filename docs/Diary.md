@@ -1,4 +1,24 @@
-## 2026-08-06 - Hub suburbs: title hierarchy + mobile «Ещё»
+## 2026-08-06 - Suburb nested POI: coords for day-route
+
+### Наблюдения
+- Owner: «по точкам пригородов вообще нет координат, соответственно маршрут не строится».
+- `significantSuburbs` nested POI (СПб 55 + KGD 23): у большинства нет slug; `dayRouteItemFromMustSee` создавал stub `suburb:*` без lat/lng.
+- `CitySuburbPlace` не имел полей coords; `SuburbsCarousel` не пробрасывал lat/lng в day-route item.
+- Даже точки со slug опирались только на hub venues / editorial map (почти пустой для suburb).
+
+### Решения
+- Тип `CitySuburbPlace`: `latitude` / `longitude` / `dayRouteId`.
+- `SuburbsCarousel` передаёт coords в `dayRouteItemFromMustSee`.
+- Кураторский pack `scripts/data/suburb-nested-coords.json` (78 точек) + `scripts/apply-suburb-nested-coords.js` → inject в web/public `cityInfo`.
+- Источники: owner pack SUB/KGD где есть; иначе landmark pins. Выборг: исправлен typo owner SUB lat 59→60.
+- Public Kronstadt nested list выровнен с web (Якорная площадь / Петровский док).
+
+### Проблемы
+- DB Venue backfill для suburb slug не обязателен для my-day (coords идут из cityInfo в localStorage); PDP по-прежнему на catalog.
+
+---
+
+
 
 ### Наблюдения
 - Owner скрин блока «Значимые пригороды» (не compact my-day): крупным шёл `travelVector` + stationHub, имя пригорода («Петергоф») оказывалось mid-card.
