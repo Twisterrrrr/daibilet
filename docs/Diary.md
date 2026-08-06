@@ -1,3 +1,22 @@
+## 2026-08-06 - Multi-landing «Все города» stuck on city redirect
+
+### Наблюдения
+- Owner: `/progulki-po-krysham/` (и другие multi) - чип «Все города» не держится, уводит на город (часто Москва).
+- `SelectedCityProvider` на national URL (`/{intent}/` без city) делал `router.replace` в `/{intent}/{storedCity}/` из localStorage - как `?city=` у каталогов, но ломал канон агрегации.
+
+### Решения
+- Убран auto-inject stored city → multi-landing path.
+- National `/{intent}/` = «Все города»; chip вызывает `setCity('all')` (чистит storage + CHPU без city).
+- Single-city / city-scoped landings не затронуты (`CITY_SCOPED_LANDING_SLUGS`).
+
+### Проблемы
+- Нет.
+
+### Live
+- (pending deploy)
+
+---
+
 ## 2026-08-06 - My Day stop offers: grid overlap + list gap
 
 ### Наблюдения
@@ -13,7 +32,7 @@
 - Нет.
 
 ### Live
-- (pending deploy)
+- Commit `51f2141` (deploy HEAD `c7bfb13`); MSK **BUILD_ID=`UB4mAZHXczwOOfwND5chE`**; smoke `/my-day` local+https **200**.
 
 ---
 
