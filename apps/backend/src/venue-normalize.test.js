@@ -34,3 +34,22 @@ test('normalizePublicVenueRecord strips poisoned ул. г. prefix', () => {
   assert.doesNotMatch(String(result.address), /^ул\.\s*г\./i);
   assert.match(String(result.address), /Садовая/i);
 });
+
+test('normalizePublicVenueRecord renames Lavrushinsky address-title to Tretyakov Gallery', () => {
+  const byId = normalizePublicVenueRecord({
+    id: 'venue_6a1fd5158bd71b8ae77e127c',
+    title: 'Москва, Лаврушинский переулок, 10',
+    address: 'Москва, Лаврушинский переулок, 10',
+    city: 'Москва',
+  });
+  assert.equal(byId.title, 'Третьяковская галерея');
+  assert.equal(byId.address, 'Лаврушинский переулок, 10');
+
+  const byMatch = normalizePublicVenueRecord({
+    title: 'Москва, Лаврушинский переулок',
+    address: 'Лаврушинский переулок, 10',
+    city: 'Москва',
+  });
+  assert.equal(byMatch.title, 'Третьяковская галерея');
+  assert.equal(byMatch.address, 'Лаврушинский переулок, 10');
+});

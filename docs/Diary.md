@@ -1,3 +1,19 @@
+## 2026-08-06 - Tretyakov TC venue title was street address
+
+### Наблюдения
+- Owner: карточка venue показывала «Москва, Лаврушинский переулок», хотя shortDescription и события про Третьяковскую галерею (Шишкин, Лаврушинский пер., 10).
+- TC stub `venue_6a1fd5158bd71b8ae77e127c` / `moskva-lavrushinskii-pereulok-10-…`: title=address. Канон must-see `moscow-tret-yakovskaya-galereya` уже «Третьяковская галерея», но 0 событий; у TC-строки ~378 events.
+
+### Решения
+- Prod DB: title → «Третьяковская галерея», address → «Лаврушинский переулок, 10».
+- Override в `scripts/data/venue-address-overrides.json` + `scripts/fix-moscow-tretyakovka-venue-title.js`.
+- Unit: `venue-normalize.test.js` (id + match).
+
+### Проблемы
+- Две сущности с одним именем (editorial PUBLISHED 0 events + TC CANDIDATE с афишей) - merge отдельно, не в этом фиксе.
+
+---
+
 ## 2026-08-06 - Multi-landing «Все города» stuck on city redirect
 
 ### Наблюдения

@@ -9,6 +9,12 @@
 
 ---
 
+## Tretyakov venue title (2026-08-06)
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| VEN.TRETYAKOV-TITLE | TC venue `moskva-lavrushinskii-pereulok-10-…`: title был адресом → «Третьяковская галерея»; address «Лаврушинский переулок, 10»; override + MSK DB | Высокий | ✅ |
+
 ## Ops: deploy cadence (2026-08-05)
 
 | # | Задача | Приоритет | Статус |
