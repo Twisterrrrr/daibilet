@@ -1,3 +1,22 @@
+## 2026-08-06 - Perm: добили превью must-see / suburbs
+
+### Наблюдения
+- Owner: не все точки Перми имеют превью на hub / my-day.
+- Было 19/43 slug в `PERM_IMAGES` + файлы в `apps/public/public/images/venues/perm/`.
+
+### Решения
+- +24 GenerateImage → `venues/perm/` (gastro, музеи, архитектура, suburb parents Kungur/Belaya Gora/Gubakha).
+- `PERM_IMAGES` = полный набор 43 slug из cityInfo (mustSee + suburb roots + nested со slug).
+- Seed/prod DB не нужен: editorial cover резолвится статикой через `lookupEditorialPlaceImage`.
+
+### Проблемы
+- Нет.
+
+### Live
+- (после deploy)
+
+---
+
 ## 2026-08-06 - `/cities` map: только 8–11 пинов вместо всех городов
 
 ### Наблюдения

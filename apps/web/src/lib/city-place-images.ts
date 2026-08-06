@@ -190,24 +190,54 @@ const PERM_IMAGES: Record<string, string> = {
   'naberezhnaya-kamy': '/images/venues/perm/naberezhnaya-kamy.jpg',
   'perm-schaste-ne-za-gorami': '/images/venues/perm/schaste-ne-za-gorami.jpg',
   'permskaya-esplanada': '/images/venues/perm/permskaya-esplanada.jpg',
+  'perm-sobornaya-ploschad': '/images/venues/perm/sobornaya-ploschad.jpg',
+  'perm-starokirpichnyy-pereulok':
+    '/images/venues/perm/starokirpichnyy-pereulok.jpg',
   'perm-park-gorkogo': '/images/venues/perm/park-gorkogo.jpg',
+  'perm-rayskiy-sad': '/images/venues/perm/rayskiy-sad.jpg',
   'permskaya-galereya': '/images/venues/perm/permskaya-galereya.jpg',
-  'perm-permm': '/images/venues/perm/permm.jpg',
-  'teatr-teatr': '/images/venues/perm/teatr-teatr.jpg',
-  'permsky-solenye-ushi': '/images/venues/perm/permsky-solenye-ushi.jpg',
-  'perm-zavod-shpagina': '/images/venues/perm/zavod-shpagina.jpg',
-  'perm-cgk': '/images/venues/perm/cgk.jpg',
-  'perm-sobor-petra-i-pavla': '/images/venues/perm/sobor-petra-i-pavla.jpg',
-  'muzej-hohlovka': '/images/venues/perm/muzej-hohlovka.jpg',
-  'perm-kungurskaya-ledyanaya-peshchera':
-    '/images/venues/perm/kungurskaya-ledyanaya-peshchera.jpg',
-  'perm-belogorskiy-monastyr': '/images/venues/perm/belogorskiy-monastyr.jpg',
-  'perm-kamennyy-gorod': '/images/venues/perm/kamennyy-gorod.jpg',
-  'perm-usvinskie-stolby': '/images/venues/perm/usvinskie-stolby.jpg',
+  'perm-muzey-permskikh-drevnostey':
+    '/images/venues/perm/muzey-permskikh-drevnostey.jpg',
   'perm-dom-meshkova': '/images/venues/perm/dom-meshkova.jpg',
+  'perm-permm': '/images/venues/perm/permm.jpg',
+  'perm-teatr-opery-i-baleta': '/images/venues/perm/teatr-opery-i-baleta.jpg',
+  'teatr-teatr': '/images/venues/perm/teatr-teatr.jpg',
+  'perm-muzey-motovilihinskih-zavodov':
+    '/images/venues/perm/muzey-motovilihinskih-zavodov.jpg',
+  'perm-muzey-diorama-vyshka': '/images/venues/perm/muzey-diorama-vyshka.jpg',
+  'perm-cgk': '/images/venues/perm/cgk.jpg',
+  'perm-maris-art': '/images/venues/perm/maris-art.jpg',
+  'perm-galereya-2517': '/images/venues/perm/galereya-2517.jpg',
+  'perm-park-nauki-nyuton': '/images/venues/perm/park-nauki-nyuton.jpg',
+  'perm-zavod-shpagina': '/images/venues/perm/zavod-shpagina.jpg',
+  'permsky-solenye-ushi': '/images/venues/perm/permsky-solenye-ushi.jpg',
+  'perm-permskiy-medved': '/images/venues/perm/permskiy-medved.jpg',
+  'perm-dom-gribushina': '/images/venues/perm/dom-gribushina.jpg',
+  'perm-bashnya-smerti': '/images/venues/perm/bashnya-smerti.jpg',
+  'perm-sobor-petra-i-pavla': '/images/venues/perm/sobor-petra-i-pavla.jpg',
+  'perm-voznesenskaya-tserkov':
+    '/images/venues/perm/voznesenskaya-tserkov.jpg',
   'perm-park-kamney-permskie-vorota':
     '/images/venues/perm/park-kamney-permskie-vorota.jpg',
-  'perm-teatr-opery-i-baleta': '/images/venues/perm/teatr-opery-i-baleta.jpg',
+  'perm-chomga': '/images/venues/perm/chomga.jpg',
+  'perm-permskie-posikunchiki':
+    '/images/venues/perm/permskie-posikunchiki.jpg',
+  'perm-nolan-wine-kitchen': '/images/venues/perm/nolan-wine-kitchen.jpg',
+  'perm-belka': '/images/venues/perm/belka.jpg',
+  'perm-partizan': '/images/venues/perm/partizan.jpg',
+  'perm-demidovskaya-pivovarnya':
+    '/images/venues/perm/demidovskaya-pivovarnya.jpg',
+  'perm-cup-by-cup': '/images/venues/perm/cup-by-cup.jpg',
+  'perm-gastroport': '/images/venues/perm/gastroport.jpg',
+  'muzej-hohlovka': '/images/venues/perm/muzej-hohlovka.jpg',
+  'perm-kungur': '/images/venues/perm/kungur.jpg',
+  'perm-kungurskaya-ledyanaya-peshchera':
+    '/images/venues/perm/kungurskaya-ledyanaya-peshchera.jpg',
+  'perm-belaya-gora': '/images/venues/perm/belaya-gora.jpg',
+  'perm-belogorskiy-monastyr': '/images/venues/perm/belogorskiy-monastyr.jpg',
+  'perm-gubakha-usva': '/images/venues/perm/gubakha-usva.jpg',
+  'perm-kamennyy-gorod': '/images/venues/perm/kamennyy-gorod.jpg',
+  'perm-usvinskie-stolby': '/images/venues/perm/usvinskie-stolby.jpg',
 };
 
 const EDITORIAL_IMAGES_BY_SLUG: Record<string, string> = {
