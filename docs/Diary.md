@@ -1,3 +1,20 @@
+## 2026-08-06 - Landing titles + holiday date windows
+
+### Наблюдения
+- Owner: H1/title вида «Экскурсии — Москва сегодня…» (em dash + именительный) и дубль города «…в Москве — Москва».
+- Двойное двоеточие `: :` перед «афиша» на rooftops и др.
+- Сезонные посадки (салют / NY / день города / valentine) показывали события вне праздничного окна; UI «Любая дата» тоже не был ограничен.
+
+### Решения
+- `landing-seo`: `{Intent} в {City_Пр} сегодня, {date}: афиша…`; strip city/dash glue; normalize colon; H1=`<title>`.
+- `landing-event-windows`: окна salute=9 May, NY=24 Dec-14 Jan, valentine=9-19 Feb, moscow-city-day=1st Sat Sep ±1d.
+- SSR `finalizeLandingPayload` + client filter + date chips ограничены окном (без unbounded «любая дата»).
+
+### Проблемы
+- Параллельный mobile city-switcher правит `LandingPageView.client.tsx` - держать оба фикса в одном коммите ветки.
+
+---
+
 ## 2026-08-06 - Multi-landing mobile city switch restored
 
 ### Наблюдения
@@ -12,6 +29,9 @@
 
 ### Проблемы
 - Параллельный агент может править landing titles в тех же файлах - коммитить только city-switch hunks.
+
+### Live
+- MSK BUILD_ID=`wEmnlocTyWo2TN1TtTixI` @`523f374` (+ docs follow-up). Smoke mobile UA: `/ekskursii/moscow`, `/vystavki-i-muzei/moscow`, `/peshie-ekskursii/saint-petersburg` → 200, `aria-label="Сменить город"` ×2 (hero+filters), «Все города» + cross-city links.
 
 ---
 
