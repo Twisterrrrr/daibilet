@@ -11,6 +11,9 @@
 ### Проблемы
 - Нет.
 
+### Live
+- Commit `a201ea9`; MSK **BUILD_ID=`4cziKHuRaIqdm9UB0NYYW`**; smoke `/my-day` local+https 200.
+
 ---
 
 ## 2026-08-06 - My Day must-see: always expanded grid
