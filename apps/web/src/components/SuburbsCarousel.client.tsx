@@ -33,11 +33,11 @@ export type SuburbsCarouselProps = {
 };
 
 /**
- * Significant-suburbs rail: one suburb vector per snap slide.
- * Hub: desktop arrows (equal side gutters); mobile swipe + dots; title = name,
- * subtitle = vector; mobile collapses essay/gastro/POI descs behind «Ещё».
- * Compact (my-day): arrows primary (loop) all breakpoints, no pager dots;
- * desktop CTA on title row; mobile CTA under point list.
+ * Significant-suburbs rail.
+ * Hub: desktop arrows; mobile swipe + dots; title = name, subtitle = vector;
+ * mobile collapses essay/gastro/POI descs behind «Ещё».
+ * Compact (my-day): arrows (loop), no pager; mini `desc` under title;
+ * CTA left-aligned under points; desktop shows up to 3 cards.
  * Bulk «В маршрут» adds all nested points of the active slide.
  */
 export function SuburbsCarousel({
@@ -178,8 +178,8 @@ export function SuburbsCarousel({
             ref={railRef}
             className={
               compact
-                ? 'horizontal-snap-row flex flex-nowrap gap-0 touch-pan-x snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
-                : 'horizontal-snap-row flex flex-nowrap gap-3 touch-pan-x snap-x snap-mandatory md:gap-0 md:[scrollbar-width:none] md:[&::-webkit-scrollbar]:hidden'
+                ? 'horizontal-snap-row flex flex-nowrap gap-3 touch-pan-x snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:gap-4'
+                : 'horizontal-snap-row flex flex-nowrap gap-3 touch-pan-x snap-x snap-mandatory md:gap-4 md:[scrollbar-width:none] md:[&::-webkit-scrollbar]:hidden'
             }
             data-city-suburb-rail
             aria-label={`Значимые пригороды ${cityGenitive}`}
@@ -236,45 +236,47 @@ export function SuburbsCarousel({
             const hasBulkCta = bulkVenues.length > 0;
 
             if (compact) {
+              const miniAnno = String(place.desc || '').trim();
               return (
                 <article
                   key={`${place.name}:${index}`}
-                  className="flex w-full shrink-0 snap-start flex-col rounded-2xl border border-slate-200 bg-white p-4 sm:p-5"
+                  className="flex w-full shrink-0 snap-start flex-col rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 md:w-[calc((100%-1rem)/2)] lg:w-[calc((100%-2rem)/3)]"
                   data-city-suburb-card
                   data-city-suburb-compact
                   aria-label={`${index + 1} из ${places.length}: ${place.name}`}
                 >
-                  {/* Header: [number] [LARGE name] [desktop CTA]; vector subtitle. */}
+                  {/* Header: [number] [name]; mini anno + optional travel vector. */}
                   <div className="flex items-start gap-2.5 sm:gap-3">
                     <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-50 text-sm font-bold leading-none text-primary-700">
                       {index + 1}
                     </span>
                     <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-start gap-x-2 gap-y-1.5">
-                        <h3
-                          className="min-w-0 flex-1 break-words text-xl font-bold leading-snug text-slate-950 sm:text-2xl"
-                          data-city-suburb-title
+                      <h3
+                        className="break-words text-xl font-bold leading-snug text-slate-950 sm:text-2xl"
+                        data-city-suburb-title
+                      >
+                        {placeHref ? (
+                          <Link
+                            href={placeHref}
+                            className="underline decoration-slate-300 underline-offset-2 hover:decoration-current"
+                          >
+                            {place.name}
+                          </Link>
+                        ) : (
+                          place.name
+                        )}
+                      </h3>
+                      {miniAnno ? (
+                        <p
+                          className="mt-1.5 line-clamp-3 text-sm leading-5 text-slate-600"
+                          data-city-suburb-anno
                         >
-                          {placeHref ? (
-                            <Link
-                              href={placeHref}
-                              className="underline decoration-slate-300 underline-offset-2 hover:decoration-current"
-                            >
-                              {place.name}
-                            </Link>
-                          ) : (
-                            place.name
-                          )}
-                        </h3>
-                        {hasBulkCta ? (
-                          <div className="hidden shrink-0 md:block" data-city-suburb-cta-header>
-                            {renderBulkCta()}
-                          </div>
-                        ) : null}
-                      </div>
+                          {miniAnno}
+                        </p>
+                      ) : null}
                       {vectorTitle ? (
                         <p
-                          className="mt-1 text-sm leading-5 text-slate-600"
+                          className="mt-1 text-xs leading-5 text-slate-500"
                           data-city-suburb-vector
                         >
                           {vectorTitle}
@@ -312,7 +314,7 @@ export function SuburbsCarousel({
                   ) : null}
                   {hasBulkCta ? (
                     <div
-                      className="mt-3 flex justify-end border-t border-slate-100 pt-3 md:hidden"
+                      className="mt-3 flex justify-start border-t border-slate-100 pt-3"
                       data-city-suburb-cta-footer
                     >
                       {renderBulkCta()}
@@ -416,7 +418,7 @@ export function SuburbsCarousel({
             return (
               <article
                 key={`${place.name}:${index}`}
-                className={`flex w-[min(92%,36rem)] shrink-0 snap-start flex-col rounded-2xl border p-4 sm:p-5 md:w-full ${
+                className={`flex w-[min(92%,22rem)] shrink-0 snap-start flex-col rounded-2xl border p-4 sm:p-5 md:w-[calc((100%-1rem)/2)] lg:w-[calc((100%-2rem)/3)] ${
                   editorial ? 'border-zinc-200 bg-white' : 'border-slate-200 bg-white'
                 }`}
                 data-city-suburb-card
@@ -433,12 +435,9 @@ export function SuburbsCarousel({
                   </span>
                   <div className="min-w-0 flex-1">
                     {/* Title = suburb name; subtitle = travel vector / station hub. */}
-                    <div className="flex flex-wrap items-start gap-x-2 gap-y-1.5">
-                      <h3 className={`${hubNameClass} min-w-0 flex-1 break-words`} data-city-suburb-title>
-                        {nameHeading}
-                      </h3>
-                      {hasBulkCta ? <div className="shrink-0">{renderBulkCta()}</div> : null}
-                    </div>
+                    <h3 className={`${hubNameClass} break-words`} data-city-suburb-title>
+                      {nameHeading}
+                    </h3>
                     {vectorTitle ? (
                       <p
                         className={`mt-1 text-sm leading-5 ${softClass}`}
@@ -494,6 +493,15 @@ export function SuburbsCarousel({
                         </button>
                       ) : null}
                     </div>
+
+                    {hasBulkCta ? (
+                      <div
+                        className="mt-3 flex justify-start border-t pt-3"
+                        data-city-suburb-cta-footer
+                      >
+                        {renderBulkCta()}
+                      </div>
+                    ) : null}
                   </div>
                 </div>
               </article>
