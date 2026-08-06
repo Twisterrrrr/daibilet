@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ChevronDown, ChevronUp } from 'lucide-react';
 
 import { AddManyToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import { resolveCityPlaceTitleHref } from '@/lib/city-place-href';
@@ -35,6 +35,8 @@ export type SuburbsCarouselProps = {
 /**
  * Significant-suburbs rail: one suburb vector per snap slide.
  * Desktop: arrows + dots; mobile: touch swipe (`horizontal-snap-row`).
+ * Hub rich: title = suburb name, subtitle = travelVector + stationHub;
+ * mobile collapses essay/gastro/POI descs behind «Ещё».
  * Bulk «В маршрут» adds all nested points of the active slide.
  */
 export function SuburbsCarousel({
@@ -52,10 +54,18 @@ export function SuburbsCarousel({
   const [canNext, setCanNext] = React.useState(false);
   const [hasOverflow, setHasOverflow] = React.useState(false);
   const [activeIndex, setActiveIndex] = React.useState(0);
+  /** Hub rich cards: mobile collapses essay/gastro/POI descs behind «Ещё». */
+  const [expandedByIndex, setExpandedByIndex] = React.useState<Record<number, boolean>>({});
 
   const resolvedTitleClass =
     titleClass ||
     `font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-950'}`;
+  const hubNameClass = `${resolvedTitleClass} text-xl leading-snug sm:text-2xl`;
+  const mutedClass = editorial ? 'text-zinc-500' : 'text-slate-500';
+  const softClass = editorial ? 'text-zinc-600' : 'text-slate-600';
+  const borderSoft = editorial ? 'border-zinc-100' : 'border-slate-100';
+  const markerClass = editorial ? 'marker:text-zinc-500' : 'marker:text-slate-500';
+  const poiNameClass = editorial ? 'text-zinc-900' : 'text-slate-900';
 
   const syncRail = React.useCallback(() => {
     const el = railRef.current;
@@ -265,6 +275,97 @@ export function SuburbsCarousel({
               );
             }
 
+            const expanded = Boolean(expandedByIndex[index]);
+            const hasRichExtras = Boolean(
+              blurb || place.travelVectorBlurb || place.gastroHint || nested.some((p) => p.desc),
+            );
+            const nameHeading = placeHref ? (
+              <Link
+                href={placeHref}
+                className="underline decoration-slate-300 underline-offset-2 hover:decoration-current"
+              >
+                {place.name}
+              </Link>
+            ) : (
+              place.name
+            );
+            const nestedRichList = nested.length ? (
+              <ol
+                className={`mt-3 list-decimal space-y-2 border-t pt-3 pl-5 ${borderSoft}`}
+                data-city-suburb-places
+              >
+                {nested.map((poi, poiIndex) => {
+                  const poiHref = resolveCityPlaceTitleHref(poi, venues);
+                  return (
+                    <li
+                      key={`${poi.name}:${poiIndex}`}
+                      className={`text-sm leading-5 ${markerClass}`}
+                      data-city-suburb-place
+                    >
+                      {poiHref ? (
+                        <Link
+                          href={poiHref}
+                          className={`font-medium underline decoration-slate-300 underline-offset-2 hover:decoration-current ${poiNameClass}`}
+                        >
+                          {poi.name}
+                        </Link>
+                      ) : (
+                        <span className={`font-medium ${poiNameClass}`}>{poi.name}</span>
+                      )}
+                      {poi.desc ? (
+                        <span className={mutedClass}>
+                          {' - '}
+                          {capitalizeSentenceStart(poi.desc)}
+                        </span>
+                      ) : null}
+                    </li>
+                  );
+                })}
+              </ol>
+            ) : null;
+            const nestedCompactList = nested.length ? (
+              <ol
+                className={`mt-3 list-decimal space-y-1.5 border-t pt-3 pl-5 ${borderSoft}`}
+                data-city-suburb-places
+                data-city-suburb-places-compact="1"
+              >
+                {nested.map((poi, poiIndex) => {
+                  const poiHref = resolveCityPlaceTitleHref(poi, venues);
+                  return (
+                    <li
+                      key={`${poi.name}:${poiIndex}`}
+                      className={`text-sm leading-5 ${markerClass}`}
+                      data-city-suburb-place
+                    >
+                      {poiHref ? (
+                        <Link
+                          href={poiHref}
+                          className={`font-medium underline decoration-slate-300 underline-offset-2 hover:decoration-current ${poiNameClass}`}
+                        >
+                          {poi.name}
+                        </Link>
+                      ) : (
+                        <span className={`font-medium ${poiNameClass}`}>{poi.name}</span>
+                      )}
+                    </li>
+                  );
+                })}
+              </ol>
+            ) : null;
+            const richEssay = (
+              <>
+                {place.travelVectorBlurb ? (
+                  <p className={`mt-1.5 text-xs leading-5 ${mutedClass}`}>{place.travelVectorBlurb}</p>
+                ) : null}
+                {blurb ? (
+                  <p className={`mt-1.5 text-sm leading-6 break-words ${mutedClass}`}>{blurb}</p>
+                ) : null}
+                {place.gastroHint ? (
+                  <p className={`mt-2 text-xs ${softClass}`}>Гастро-остановка: {place.gastroHint}</p>
+                ) : null}
+              </>
+            );
+
             return (
               <article
                 key={`${place.name}:${index}`}
@@ -272,6 +373,7 @@ export function SuburbsCarousel({
                   editorial ? 'border-zinc-200 bg-white' : 'border-slate-200 bg-white'
                 }`}
                 data-city-suburb-card
+                data-city-suburb-expanded={expanded ? '1' : undefined}
                 aria-label={`${index + 1} из ${places.length}: ${place.name}`}
               >
                 <div className="flex items-start gap-3">
@@ -283,122 +385,68 @@ export function SuburbsCarousel({
                     {index + 1}
                   </span>
                   <div className="min-w-0 flex-1">
+                    {/* Title = suburb name; subtitle = travel vector / station hub. */}
+                    <div className="flex flex-wrap items-start gap-x-2 gap-y-1.5">
+                      <h3 className={`${hubNameClass} min-w-0 flex-1 break-words`} data-city-suburb-title>
+                        {nameHeading}
+                      </h3>
+                      {bulkCta ? <div className="shrink-0">{bulkCta}</div> : null}
+                    </div>
                     {vectorTitle ? (
-                      <div className="mt-1 flex flex-wrap items-start gap-x-2 gap-y-1.5">
-                        <h2
-                          className={`min-w-0 flex-1 text-sm font-semibold leading-5 sm:text-base ${
-                            editorial ? 'text-zinc-800' : 'text-slate-800'
-                          }`}
-                          data-city-suburb-vector
-                        >
-                          {vectorTitle}
-                        </h2>
-                        {bulkCta}
-                      </div>
-                    ) : null}
-                    {place.travelVectorBlurb ? (
-                      <p className={`mt-1 text-xs leading-5 ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}>
-                        {place.travelVectorBlurb}
+                      <p
+                        className={`mt-1 text-sm leading-5 ${softClass}`}
+                        data-city-suburb-vector
+                      >
+                        {vectorTitle}
                       </p>
                     ) : null}
                     {place.stationName ? (
-                      <p className={`mt-1 text-xs ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-                        Где выходить: {place.stationName}
-                      </p>
+                      <p className={`mt-1 text-xs ${softClass}`}>Где выходить: {place.stationName}</p>
                     ) : null}
-                    {vectorTitle ? (
-                      <h3 className={`${resolvedTitleClass} mt-1.5 break-words`} data-city-suburb-title>
-                        {placeHref ? (
-                          <Link
-                            href={placeHref}
-                            className="underline decoration-slate-300 underline-offset-2 hover:decoration-current"
-                          >
-                            {place.name}
-                          </Link>
-                        ) : (
-                          place.name
-                        )}
-                      </h3>
-                    ) : (
-                      <div className="mt-0.5 flex flex-wrap items-start gap-x-2 gap-y-1.5">
-                        <h2
-                          className={`${resolvedTitleClass} min-w-0 flex-1 break-words`}
-                          data-city-suburb-title
+
+                    {/* Desktop: full richness always. */}
+                    <div className="hidden md:block">
+                      {richEssay}
+                      {nestedRichList}
+                    </div>
+
+                    {/* Mobile: short list by default; essay + POI descs behind «Ещё». */}
+                    <div className="md:hidden">
+                      {expanded ? (
+                        <>
+                          {richEssay}
+                          {nestedRichList}
+                        </>
+                      ) : (
+                        nestedCompactList
+                      )}
+                      {hasRichExtras ? (
+                        <button
+                          type="button"
+                          className={`mt-2 inline-flex min-h-8 items-center gap-1 text-xs font-medium ${softClass} transition hover:opacity-80`}
+                          aria-expanded={expanded}
+                          data-city-suburb-expand
+                          onClick={() =>
+                            setExpandedByIndex((prev) => ({
+                              ...prev,
+                              [index]: !prev[index],
+                            }))
+                          }
                         >
-                          {placeHref ? (
-                            <Link
-                              href={placeHref}
-                              className="underline decoration-slate-300 underline-offset-2 hover:decoration-current"
-                            >
-                              {place.name}
-                            </Link>
+                          {expanded ? (
+                            <>
+                              <ChevronUp className="h-3.5 w-3.5" aria-hidden />
+                              Свернуть
+                            </>
                           ) : (
-                            place.name
+                            <>
+                              <ChevronDown className="h-3.5 w-3.5" aria-hidden />
+                              Ещё
+                            </>
                           )}
-                        </h2>
-                        {bulkCta}
-                      </div>
-                    )}
-                    {blurb ? (
-                      <p
-                        className={`mt-1.5 text-sm leading-6 break-words ${
-                          editorial ? 'text-zinc-500' : 'text-slate-500'
-                        }`}
-                      >
-                        {blurb}
-                      </p>
-                    ) : null}
-                    {place.gastroHint ? (
-                      <p className={`mt-2 text-xs ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-                        Гастро-остановка: {place.gastroHint}
-                      </p>
-                    ) : null}
-                    {nested.length ? (
-                      <ol
-                        className={`mt-3 list-decimal space-y-2 border-t pt-3 pl-5 ${
-                          editorial ? 'border-zinc-100' : 'border-slate-100'
-                        }`}
-                        data-city-suburb-places
-                      >
-                        {nested.map((poi, poiIndex) => {
-                          const poiHref = resolveCityPlaceTitleHref(poi, venues);
-                          return (
-                            <li
-                              key={`${poi.name}:${poiIndex}`}
-                              className={`text-sm leading-5 ${
-                                editorial ? 'marker:text-zinc-500' : 'marker:text-slate-500'
-                              }`}
-                              data-city-suburb-place
-                            >
-                              {poiHref ? (
-                                <Link
-                                  href={poiHref}
-                                  className={`font-medium underline decoration-slate-300 underline-offset-2 hover:decoration-current ${
-                                    editorial ? 'text-zinc-900' : 'text-slate-900'
-                                  }`}
-                                >
-                                  {poi.name}
-                                </Link>
-                              ) : (
-                                <span
-                                  className={`font-medium ${
-                                    editorial ? 'text-zinc-900' : 'text-slate-900'
-                                  }`}
-                                >
-                                  {poi.name}
-                                </span>
-                              )}
-                              {poi.desc ? (
-                                <span className={editorial ? 'text-zinc-500' : 'text-slate-500'}>
-                                  {' - '}
-                                  {capitalizeSentenceStart(poi.desc)}
-                                </span>
-                              ) : null}
-                            </li>
-                          );
-                        })}
-                      </ol>
-                    ) : null}
+                        </button>
+                      ) : null}
+                    </div>
                   </div>
                 </div>
               </article>
