@@ -4,6 +4,7 @@ import * as React from 'react';
 import { Anchor, ArrowRight, Briefcase, Bus, Cake, CalendarDays, CheckCircle2, ChevronDown, Clock, Eye, Headphones, Heart, HelpCircle, Lightbulb, Mail, MapPin, Mic, Moon, Music, Search, Shield, Ship, Sparkles, Star, Sun, Tag, Ticket, TrendingUp, Users, UtensilsCrossed, Wallet } from 'lucide-react';
 
 import { EventCard } from '@/components/EventCard';
+import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { BridgesLandingGuide, BridgesShipChecklist } from '@/components/landing/BridgesLandingGuide.client';
 import {
   BridgesComparisonTable,
@@ -672,6 +673,7 @@ function LandingMultiCitySwitch({
   tone?: 'hero' | 'filter';
   className?: string;
 }) {
+  const selectedCity = useSelectedCityOptional();
   const items = resolveLandingCitySwitchItems(landingSlug, profile);
   if (items.length < 2) return null;
 
@@ -694,7 +696,16 @@ function LandingMultiCitySwitch({
       role="navigation"
       aria-label="Сменить город"
     >
-      <a href={allHref} className={`${chipBase} ${!current ? activeCls : idleCls}`}>
+      <a
+        href={allHref}
+        className={`${chipBase} ${!current ? activeCls : idleCls}`}
+        onClick={(event) => {
+          // Clear header/storage city so chrome matches national aggregation URL.
+          if (!selectedCity) return;
+          event.preventDefault();
+          selectedCity.setCity('all');
+        }}
+      >
         Все города
       </a>
       {items.map((item) => {

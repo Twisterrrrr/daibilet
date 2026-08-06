@@ -21,13 +21,11 @@ import {
   matchDestination,
   mergeStoredCityIntoSearchParams,
   persistSelectedCity,
-  readStoredSelectedCity,
   resolveCityHubDestination,
   resolveCityLabel,
 } from '@/lib/selected-city';
 import {
   landingCategoryHref,
-  isLandingCityAllowed,
   MULTI_CITY_LANDING_SLUGS,
   normalizeKnownCitySlug,
   resolveLandingRouteFromLocation,
@@ -152,25 +150,9 @@ export function SelectedCityProvider({
     router.replace(query ? `${base}?${query}` : base, { scroll: false });
   }, [destinations, pathname, router, searchParamsKey]);
 
-  // Multi-city national landing without city segment — sync header city into path (like ?city= on catalogs).
-  useLayoutEffect(() => {
-    const landingRoute = resolveLandingRouteFromLocation(pathname);
-    if (!landingRoute) return;
-    const slug = canonicalLandingSlug(landingRoute.landingSlug);
-    if (!MULTI_CITY_LANDING_SLUGS.has(slug)) return;
-    if (landingRoute.citySlug) return;
-
-    const stored = readStoredSelectedCity(destinations);
-    if (!stored) return;
-    const matched = matchDestination(destinations, stored);
-    const citySlug =
-      normalizeKnownCitySlug(matched?.slug) ||
-      normalizeKnownCitySlug(matched?.sourceSlug) ||
-      normalizeKnownCitySlug(stored);
-    if (!citySlug || !isLandingCityAllowed(slug, citySlug)) return;
-
-    router.replace(landingCategoryHref(slug, citySlug), { scroll: false });
-  }, [destinations, pathname, router]);
+  // Do NOT inject stored header city into multi-landing national URLs.
+  // `/{intent}/` without city is the canonical «Все города» aggregation; forcing
+  // `/{intent}/{city}/` from localStorage made the all-cities chip unreachable.
 
   // Keep storage aligned with an explicit catalog city (including deep-links).
   useLayoutEffect(() => {
