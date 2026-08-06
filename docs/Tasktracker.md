@@ -20,7 +20,7 @@
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
 | UX.MUSTSEE-SPARSE | City hub «Главные места»: при <4 местах md+ горизонтальный грид вместо узкой 2-row колонки | Высокий | ✅ `2519d5f`; MSK BUILD_ID=`cr_HR-Mm4jbjC788zYriW`; smoke `/cities/perm` 200 + `sparse-grid` |
-| UX.MUSTSEE-SPARSE-CAP | Sparse must-see: не растягивать 1–3 карточки на всю ширину; max-w = carousel `22rem`, left-align | Высокий | 🔄 layout fix in progress → MSK |
+| UX.MUSTSEE-SPARSE-CAP | Sparse must-see: не растягивать 1–3 карточки на всю ширину; max-w = carousel `22rem`, left-align | Высокий | ✅ `d94a407`; MSK BUILD_ID=`KIUzWWqOhq_t5Woo8FLpd`; smoke `/cities/perm` 200 + `sparse-grid` + `min(22rem` |
 
 ## `/cities` map event counts (2026-08-06)
 

@@ -10,7 +10,7 @@
 - Нет (layout-only; cityInfo Perm pack не трогали).
 
 ### Live
-- Pending MSK deploy.
+- Commit `d94a407`; MSK **BUILD_ID=`KIUzWWqOhq_t5Woo8FLpd`**; smoke `/cities/perm` local+https **200**; HTML `sparse-grid` + capped `min(22rem`.
 
 ---
 
