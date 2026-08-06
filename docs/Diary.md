@@ -32,11 +32,7 @@
 - Нет.
 
 ### Live
-- (после MSK deploy)
-
----
-
-## 2026-08-06 - `/cities` desktop: top-8 + full-width map
+- Commit `998bd69`; MSK **BUILD_ID=`4cziKHuRaIqdm9UB0NYYW`**; smoke `/my-day` 200 (public + :3001); chunk `data-day-must-see-expanded`, без `data-day-must-see-expand` / `mustSeeExpanded`.
 
 ### Наблюдения
 - Owner: на desktop `/cities` кнопки random/Популярные/По алфавиту не в одном ряду; топ-тайлы + карта в узком aside; «Все города (n)» лишний; нужны 8 главных городов со светлыми daytime-превью.
