@@ -42,6 +42,7 @@
 - На `/` снова `HomeHero` + `HeroMedia` rotator (`heroFramesFromBanners` / emotion pool) поверх navy base.
 - `HomeGuideHero` отключён с главной (файл в репо остаётся). Stories / cities / events ниже сохранены.
 - Ticket-confirm modal в `DayRoutePanel` не трогали.
+- Commit `3f1a1f9`; MSK **BUILD_ID=`1x2J9HMR87fUIVEMHeTdt`**; smoke `/` 200 (search + hero-emotion-01..06), `/my-day` 200.
 
 ### Проблемы
 - Нет.
