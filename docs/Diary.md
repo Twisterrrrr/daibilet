@@ -29,6 +29,9 @@
 ### Проблемы
 - Кэш превью у Telegram/FB может держать старый «пустой» unfurl - после деплоя сбросить через debugger / `?v=` один раз.
 
+### Live
+- Commit `bdc7c39`; MSK **BUILD_ID=`lSsMWuQohOpyC2-In4hHs`**; sample `*-og.jpg` → 200; meta `og:image` указывает на существующий файл.
+
 ---
 
 ## 2026-08-06 - Home/cities mobile: formats + hubTags + sort row
