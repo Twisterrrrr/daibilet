@@ -1,3 +1,19 @@
+## 2026-08-06 - City hub must-see: sparse card width cap
+
+### Наблюдения
+- Owner (Пермь): после sparse-grid 2 места растянуты на всю ширину; огромный зазор title ↔ «В маршрут».
+
+### Решения
+- `CitySightsMustSeeList` sparse: колонки `minmax(0,min(22rem,calc(50vw-3rem)))` как у carousel `auto-cols`; `md:w-max` + `justify-items-start` вместо `md:w-full`. Mobile без изменений.
+
+### Проблемы
+- Нет (layout-only; cityInfo Perm pack не трогали).
+
+### Live
+- Pending MSK deploy.
+
+---
+
 ## 2026-08-06 - `/cities` OSM map: «Скоро события» вместо счётчиков
 
 ### Наблюдения

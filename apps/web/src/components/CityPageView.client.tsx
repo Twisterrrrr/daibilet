@@ -1284,15 +1284,15 @@ function CitySightsMustSeeList({
   // With category tabs show the full filtered set; single-tab cities keep top-6.
   const visiblePlaces =
     filterMeta.tabs.length >= 2 ? filteredPlaces : filteredPlaces.slice(0, 6);
-  // <4 places: md+ fill width with a horizontal grid (2→2 cols, 3→3). Avoid 2-row
-  // column-flow carousel that stacks 1–3 cards in one narrow column with empty right side.
+  // <4 places: md+ horizontal grid (2→2 cols, 3→3), same card track as ≥4 carousel.
+  // Cap column width so 1–3 cards stay standard size and left-aligned (no full-bleed stretch).
   const sparseGrid = visiblePlaces.length > 0 && visiblePlaces.length < 4;
   const sparseColsClass =
     visiblePlaces.length <= 1
-      ? 'md:grid-cols-1 md:max-w-xl'
+      ? 'md:grid-cols-[minmax(0,min(22rem,calc(50vw-3rem)))]'
       : visiblePlaces.length === 2
-        ? 'md:grid-cols-2'
-        : 'md:grid-cols-3';
+        ? 'md:grid-cols-[repeat(2,minmax(0,min(22rem,calc(50vw-3rem))))]'
+        : 'md:grid-cols-[repeat(3,minmax(0,min(22rem,calc(50vw-3rem))))]';
 
   const railRef = React.useRef<HTMLDivElement>(null);
   const [canPrev, setCanPrev] = React.useState(false);
@@ -1346,7 +1346,7 @@ function CitySightsMustSeeList({
         onChange={setFilterId}
         editorial={editorial}
       />
-      {/* Mobile: 1-card ~80/20 peek swipe. md+: sparse (<4) = width grid; ≥4 = 2-row carousel. */}
+      {/* Mobile: 1-card ~80/20 peek swipe. md+: sparse (<4) = capped card grid; ≥4 = 2-row carousel. */}
       <div className="relative mt-6">
         <div
           key={activeId}
@@ -1362,11 +1362,11 @@ function CitySightsMustSeeList({
           tabIndex={0}
         >
         {/* Mobile: contents hoists cards into the flex scrollport so % = viewport. */}
-        {/* md sparse: N-col grid. md carousel: auto rows + flow-col (avoids equal-row white gap). */}
+        {/* md sparse: N-col capped grid (w-max, left). md carousel: auto rows + flow-col. */}
         <ol
           className={
             sparseGrid
-              ? `contents md:grid md:w-full md:items-start md:gap-x-6 md:gap-y-5 ${sparseColsClass}`
+              ? `contents md:grid md:w-max md:max-w-full md:items-start md:justify-items-start md:gap-x-6 md:gap-y-5 ${sparseColsClass}`
               : 'contents md:grid md:w-max md:auto-cols-[min(22rem,calc(50vw-3rem))] md:grid-flow-col md:grid-rows-[auto_auto] md:items-start md:gap-x-6 md:gap-y-5'
           }
         >
