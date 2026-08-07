@@ -21,7 +21,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| UX.BUY-1 | Checkout form admission → finance stub/yookassa soft (`/checkout/admissions/[slug]` + `/checkout/actions/admission`) | Критический | ✅ |
+| UX.BUY-1 | Checkout form admission → finance stub/yookassa soft (`/checkout/admissions/[slug]` + `/checkout/actions/admission`) | Критический | ✅ `98b02aa9` MSK **BUILD_ID=`yLJ-Q_y3Eo-p8_NM0luGe`** |
 | UX.BUY-2 | Result / thank-you ` /checkout/result?order=publicCode` | Критический | ✅ |
 | UX.BUY-3 | Account purchases: internal (publicCode/status/title) + widget ExternalOrder | Высокий | ✅ |
 | UX.BUY-4 | URL canon docs (catalog vs pay parallel) + CTA same-origin | Высокий | ✅ |

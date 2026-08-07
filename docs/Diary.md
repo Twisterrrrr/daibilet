@@ -36,8 +36,12 @@
 - BFF: `POST /checkout/actions/admission`, `GET /checkout/actions/order`, `GET /checkout/actions/internal-purchases` (finance soft; вне nginx `/api/` → backend :4000).
 - Split: Cursor = UX/UI; Codex = fulfillment PDF/mail, admission YooKassa public, order lookup APIs, pay experiment.
 
+- Ship: commits `d13b68a5` + BFF path fix `98b02aa9`; MSK Deploy **31178880463** **BUILD_ID=`yLJ-Q_y3Eo-p8_NM0luGe`**.
+- Live smoke: `POST /checkout/actions/admission` → 201 STUB `publicCode=9378416`; pages `/checkout/admissions/…` + `/checkout/result` 200.
+
 ### Проблемы
 - Без Codex public order API result/account опираются на ответ checkout + localStorage.
+- nginx `/api/*` → backend :4000, поэтому BFF лежит под `/checkout/actions/*` (не `/api/`).
 - Wide catalog CTA по-прежнему out.
 
 ---
