@@ -11,9 +11,9 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| PERF.WM1 | Home `/` private/no-store из raw articles fetch → ISR `unstable_cache` + drop unused venues/stats SSR | Критический | 🔄 deploy |
-| PERF.WM2 | Blog `[slug]` raw fetch → `getCachedBlogArticle` ISR | Высокий | 🔄 deploy |
-| PERF.WM3 | SSR healthcheck: false curl=28 on large `/` → skip if TTFB OK; max-time 12s | Критический | 🔄 deploy |
+| PERF.WM1 | Home `/` private/no-store из raw articles fetch → ISR `unstable_cache` + drop unused venues/stats SSR | Критический | ✅ `5b15d6a1` MSK **BUILD_ID=`h-wuzCSpK1J_r3Ox9MklZ`** Deploy **31179359213** `s-maxage=300` HIT |
+| PERF.WM2 | Blog `[slug]` raw fetch → `getCachedBlogArticle` ISR | Высокий | 🔄 code in `5b15d6a1`; live still `no-store` (follow-up) |
+| PERF.WM3 | SSR healthcheck: false curl=28 on large `/` → skip if TTFB OK; max-time 12s | Критический | ✅ live script on MSK + `5b15d6a1` |
 | PERF.WM4 | Lean home HTML (~730KB) / optional VM upsizing | Средний | ⏳ owner |
 
 ## SEO soft-404 / HTTP 404 (2026-08-07)
@@ -35,16 +35,15 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| UX.BUY-1 | Path A: thin admission → YooKassa redirect (`/checkout/admissions/[slug]` + actions) | Критический | 🔄 thin UI + auto yookassa-first |
+| UX.BUY-1 | Path A: thin admission → YooKassa redirect (`/checkout/admissions/[slug]` + actions) | Критический | ✅ `98b02aa9` MSK **BUILD_ID=`yLJ-Q_y3Eo-p8_NM0luGe`** |
 | UX.BUY-2 | Result / thank-you `/checkout/result?order=publicCode` | Критический | ✅ |
 | UX.BUY-3 | Account purchases: internal (publicCode/status/title) + widget ExternalOrder | Высокий | ✅ |
 | UX.BUY-4 | URL canon: Path A vs Path B + pay parallel | Высокий | ✅ |
 | UX.BUY-5 | Codex: public admission create-payment → confirmationUrl (+ return `?order=`) | Критический | ⏳ Codex |
 | UX.BUY-6 | Codex: m2m / public purchases-by-email для fan-in в account | Высокий | ⏳ Codex |
-| UX.BUY-7 | Path B scaffold `/checkout/calc` (placeholder; wire later) | Низкий | ✅ scaffold |
-| UX.BUY-8 | Path B real calc (qty/packages/promo) when product needs | Средний | ⚠️ deferred |
-| UX.BUY-7 | UI polish: offer qty>1, phone, resume unpaid confirmationUrl | Средний | ⏳ thin only |
-| UX.BUY-8 | Full checkout UI + internal calc (cart/multi-offer) | Низкий | ⚠️ deferred (owner 2026-08-07) |
+| UX.BUY-7 | Path A polish: offer qty>1, phone, resume unpaid confirmationUrl | Средний | ⏳ thin only |
+| UX.BUY-8 | Path B complex calc (cart/multi-offer) — future internal pricing; не museum | Низкий | ⚠️ future OK, not museum (LOCKED 2026-08-07) |
+| UX.BUY-9 | Path B scaffold `/checkout/calc` (placeholder; wire later) | Низкий | ⚠️ optional scaffold |
 
 ---
 

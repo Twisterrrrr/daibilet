@@ -1,19 +1,18 @@
-## 2026-08-07 - Buyer checkout MVP: direct YooKassa redirect (LOCKED)
+## 2026-08-07 - Buyer checkout: два пути (LOCKED)
 
 ### Наблюдения
-- Owner: для **простых музейных / admission** билетов сложный checkout не нужен → **direct YooKassa** (`create-payment` → `confirmationUrl`).
-- Сложный calc UI **не запрещён** - нужен позже для продуктов с внутренним расчетом цены; museum flow через него не вести.
-- Catalog track: thin entry + result + account; FIN.LC3 sandbox confirmationUrl OK.
-- Public `/api/checkout/yookassa` пока event-only (admission → validation); soft-fallback STUB до Codex.
+- Owner: simple museum / direct ticket ≠ complex calc UI.
+- Catalog thin entry + result + account на redirect-пути; FIN.LC3 sandbox confirmationUrl OK.
+- Public `/api/checkout/yookassa` пока event-only (admission validation); soft-fallback STUB до Codex.
 
 ### Решения
-- **Path A (NOW):** thin email → create-payment → redirect `confirmationUrl`. Catalog URLs: `/checkout/admissions/{slug}`, result, account.
-- **Path B (FUTURE):** complex calc scaffold `/checkout/calc` - wire когда появится продукт с calc; CTA музеев не сюда.
-- Default BFF mode `auto` (yookassa-first, stub soft-fallback). Codex: public admission create-payment.
-- Docs: catalog-finance-projection Path A/B; qa §4b/4c; Tasktracker UX.BUY-7 scaffold / UX.BUY-8 deferred.
+- **LOCKED 2026-08-07 — два пути:**
+  1. **Path A (NOW):** simple museum / direct ticket → thin email → create-payment → redirect YooKassa `confirmationUrl`. Без complex checkout.
+  2. **Path B (FUTURE, OK):** complex calc UI когда нужен внутренний сложный pricing; **не** для simple museum CTA.
+- Docs: qa.md §4c, Tasktracker UX.BUY-8, catalog-finance-projection Path A/B.
 
 ### Проблемы
-- Webhook cabinet / e2e PENDING→SUCCEEDED ещё open (FIN.W1).
+- Webhook e2e PENDING→SUCCEEDED ещё open (FIN.W1).
 - Wide catalog CTA по-прежнему out.
 - Public admission→YooKassa ещё Codex (UX.BUY-5).
 
@@ -33,6 +32,7 @@
 - Home: убрать raw `fetchPublicApiJson` articles (`cache:no-store`) из RSC → `getHomeArticles` + `unstable_cache`; выкинуть мёртвые home venues/stats из `getHomePageData`.
 - Blog `[slug]`: `getCachedBlogArticle` / `getCachedBlogRelated` (тот же no-store → dynamic баг).
 - `ssr-healthcheck.sh`: `--max-time` 12с; SKIP recover если curl=28 при OK TTFB≤5с (не accept-loop hang).
+- Deploy: `5b15d6a1` GHA **31179359213** **BUILD_ID=`h-wuzCSpK1J_r3Ox9MklZ`**. Post-smoke `/`: `s-maxage=300` + Next HIT + nginx HIT, TTFB ~0.16с, total ~0.33с (было ~2-3с). Healthcheck script installed on MSK.
 
 ### Проблемы
 - HTML `/` ~730KB остаётся тяжёлым (owner/host follow-up: lean home DTO / gzip already; VM upgrade не срочен при load <1).
