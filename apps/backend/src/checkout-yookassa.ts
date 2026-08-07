@@ -25,6 +25,7 @@ import {
   isAdmissionCheckoutPayload,
   loadStubCheckoutAdmissionProduct,
   loadStubCheckoutEvent,
+  IDEMPOTENCY_KEY_MAX_LENGTH,
   normalizeIdempotencyKey,
   normalizeStubCheckoutPayload,
   paymentResultSelect,
@@ -1123,12 +1124,23 @@ async function yookassaJsonRequest<T>(input: {
 }): Promise<T> {
   const fetchImpl = input.fetchImpl || globalThis.fetch;
   if (!fetchImpl) throw new YooKassaCheckoutError('YOOKASSA_PAYMENT_FAILED', 500, [], 'fetch is not available');
+  const idempotenceKey = input.idempotenceKey
+    ? normalizeIdempotencyKey(input.idempotenceKey) || input.idempotenceKey.slice(0, IDEMPOTENCY_KEY_MAX_LENGTH)
+    : undefined;
+  if (idempotenceKey && idempotenceKey.length > IDEMPOTENCY_KEY_MAX_LENGTH) {
+    throw new YooKassaCheckoutError(
+      'YOOKASSA_PAYMENT_FAILED',
+      500,
+      [],
+      `Idempotence-Key exceeds ${IDEMPOTENCY_KEY_MAX_LENGTH} characters`,
+    );
+  }
   const init: RequestInit = {
     method: input.method,
     headers: {
       authorization: `Basic ${Buffer.from(`${input.config.shopId}:${input.config.secretKey}`).toString('base64')}`,
       'content-type': 'application/json',
-      ...(input.idempotenceKey ? { 'Idempotence-Key': input.idempotenceKey } : {}),
+      ...(idempotenceKey ? { 'Idempotence-Key': idempotenceKey } : {}),
     },
   };
   if (input.body) init.body = JSON.stringify(input.body);

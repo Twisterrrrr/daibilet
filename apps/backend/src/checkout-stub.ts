@@ -1,4 +1,4 @@
-import { randomInt } from 'node:crypto';
+import { createHash, randomInt } from 'node:crypto';
 import type {
   CheckoutSubjectType,
   StubCheckoutCreateDto,
@@ -1227,10 +1227,15 @@ function cleanString(value: string | null | undefined): string | null {
   return cleaned ? cleaned : null;
 }
 
+/** YooKassa Idempotence-Key max length is 64 chars; keep local+provider key identical. */
+export const IDEMPOTENCY_KEY_MAX_LENGTH = 64;
+
 export function normalizeIdempotencyKey(value: string | null | undefined): string | null {
   const cleaned = cleanString(value);
   if (!cleaned) return null;
-  return cleaned.slice(0, 120);
+  if (cleaned.length <= IDEMPOTENCY_KEY_MAX_LENGTH) return cleaned;
+  // Preserve uniqueness for long client keys (UUID+slug+prefix) instead of truncating.
+  return createHash('sha256').update(cleaned, 'utf8').digest('hex').slice(0, IDEMPOTENCY_KEY_MAX_LENGTH);
 }
 
 export function toIso(value: Date | null | undefined): string | null {

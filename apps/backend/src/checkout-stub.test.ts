@@ -3,13 +3,27 @@ import test from 'node:test';
 import {
   classifyStubCheckoutSubject,
   computeStubCheckoutTotals,
+  IDEMPOTENCY_KEY_MAX_LENGTH,
   isStubCheckoutEnabled,
   isAdmissionCheckoutPayload,
+  normalizeIdempotencyKey,
   validateStubAdmissionCheckoutReadiness,
   validateStubCheckoutReadiness,
 } from './checkout-stub.js';
 
 const now = new Date('2026-07-22T12:00:00.000Z');
+
+test('normalizeIdempotencyKey keeps short keys and hashes long ones to YooKassa max length', () => {
+  assert.equal(normalizeIdempotencyKey(null), null);
+  assert.equal(normalizeIdempotencyKey('  yk-short-key  '), 'yk-short-key');
+  const longKey = `supplier-lc-admission-yookassa-${'a'.repeat(36)}-${Date.now()}`;
+  assert.ok(longKey.length > IDEMPOTENCY_KEY_MAX_LENGTH);
+  const normalized = normalizeIdempotencyKey(longKey);
+  assert.ok(normalized);
+  assert.equal(normalized!.length, IDEMPOTENCY_KEY_MAX_LENGTH);
+  assert.equal(normalizeIdempotencyKey(longKey), normalized);
+  assert.notEqual(normalized, longKey.slice(0, IDEMPOTENCY_KEY_MAX_LENGTH));
+});
 
 test('stub checkout is disabled in production unless explicitly enabled', () => {
   assert.equal(isStubCheckoutEnabled({ NODE_ENV: 'production' } as NodeJS.ProcessEnv), false);

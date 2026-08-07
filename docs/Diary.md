@@ -1,3 +1,23 @@
+## 2026-08-07 — YooKassa Idempotence-Key ≤64
+
+### Наблюдения
+
+- Supplier LC кнопка YooKassa на admissions падала с `invalid_request`: `Idempotence key is too long`.
+- Клиентский ключ был `supplier-lc-admission-yookassa-{uuid}-{timestamp}` (~80+ символов).
+- `normalizeIdempotencyKey` раньше резал до 120, что выше лимита YooKassa (64).
+
+### Решения
+
+- `normalizeIdempotencyKey`: если ключ > 64, заменяем на `sha256(key).hex` (ровно 64 символа) - один ключ для local idempotency и YooKassa header.
+- Defense-in-depth в `yookassaJsonRequest` перед отправкой `Idempotence-Key`.
+- Supplier UI smoke-ключи укорочены до `slc-yk-{id16}-{ts36}` / `slc-stub-...`.
+
+### Проблемы
+
+- Без backend-хеша любой длинный клиентский Idempotency-Key снова ломал create-payment.
+
+---
+
 ## 2026-08-07 — Supplier write-flow + YooKassa reconcile ops
 
 ### Наблюдения
