@@ -33,6 +33,7 @@ test('uses ProviderLink SESSION identity for a Ticketscloud slot', () => {
       providerEventId: 'tc-event-parent',
     }],
   }));
+  assert.ok(result);
 
   const purchaseUrl = result.upcomingSlots?.[0]?.purchaseUrl;
   assert.ok(purchaseUrl);
@@ -46,6 +47,7 @@ test('skips teplohod placeholder image and falls back to venue hero', () => {
     imageUrl: 'https://api.teplohod.info/v1/image?item=&dirtyAlias=placeHolder.gif',
     venueHeroImageUrl: 'https://api.teplohod.info/v1/image?item=Event179&dirtyAlias=b82266d150-1.jpg',
   }));
+  assert.ok(result);
 
   assert.equal(
     result.imageUrl,
@@ -59,6 +61,7 @@ test('rewrites pre-signed Teplohod S3 URLs to stable image proxy', () => {
     imageUrl:
       'https://s3.twcstorage.ru/teplohod-private/images/cache/Events/Event498/38b30dabbe-1.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Expires=21600&X-Amz-Signature=deadbeef',
   }));
+  assert.ok(result);
 
   assert.equal(
     result.imageUrl,
@@ -82,6 +85,7 @@ test('uses ProviderLink SESSION parent identity for a Teplohod slot', () => {
       providerEventId: '14',
     }],
   }));
+  assert.ok(result);
 
   assert.equal(
     result.upcomingSlots?.[0]?.purchaseUrl,
@@ -96,6 +100,7 @@ test('keeps open-date events saleable without a fake schedule', () => {
     startsAt: null,
     upcomingSlots: [],
   }));
+  assert.ok(result);
 
   assert.equal(result.startsAt, '');
   assert.equal(result.dateLabel, 'Открытая дата');
@@ -109,11 +114,11 @@ test('dated TicketsCloud without schedule does not get fake open-date labels', (
     startsAt: null,
     upcomingSlots: [],
   }));
+  assert.ok(result);
 
   assert.notEqual(result.dateLabel, 'Открытая дата');
   assert.notEqual(result.timeLabel, 'В виджете');
 });
-
 test('converts imported Moscow wall time to the real UTC instant', () => {
   const prismaTimestamp = new Date('2026-07-10T16:30:00.000Z');
 

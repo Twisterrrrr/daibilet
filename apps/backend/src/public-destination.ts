@@ -106,7 +106,12 @@ export function lookupDestinationCatalogSessions(
   );
 }
 
-export function countDistinctSessionVenues(sessions: PublicSessionDto[]): number {
+export type SessionVenueCountFields = Pick<
+  PublicSessionDto,
+  'venueId' | 'venueSlug' | 'venue' | 'city'
+>;
+
+export function countDistinctSessionVenues(sessions: SessionVenueCountFields[]): number {
   const keys = new Set<string>();
   for (const session of sessions || []) {
     if (session?.venueId) {
@@ -222,7 +227,8 @@ export function destinationPrepositional(destination: Pick<DestinationRecord, 's
     'amurskaya-oblast': 'в Амурской области',
     'hanty-mansiyskiy-avtonomnyy-okrug': 'в Ханты-Мансийском автономном округе',
   };
-  if (bySlug[destination.slug]) return bySlug[destination.slug];
+  const knownForm = bySlug[destination.slug];
+  if (knownForm) return knownForm;
 
   const name = cleanDisplayName(destination.name);
   if (!name) return 'в выбранном направлении';

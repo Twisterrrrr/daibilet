@@ -382,8 +382,8 @@ async function searchEventsIlikeFallback(
     slug: row.slug,
     title: row.title,
     score: 0.4,
-    city: row.primaryCity?.title,
-    venue: row.venue?.title,
+    city: row.primaryCity?.title ?? null,
+    venue: row.venue?.title ?? null,
     imageUrl: row.imageUrl,
   }));
 }
@@ -497,7 +497,7 @@ async function searchVenuesIlikeFallback(
     slug: row.slug,
     title: row.title,
     score: 0.4,
-    city: row.city?.title,
+    city: row.city?.title ?? null,
     imageUrl: row.heroImageUrl,
     kind: String(row.kind),
   }));
@@ -547,6 +547,6 @@ async function searchLandingsIlike(terms: string[], limit: number): Promise<Trgm
     slug: row.slug,
     title: row.title,
     score: 0.45,
-    city: row.city?.title,
+    city: row.city?.title ?? null,
   }));
 }

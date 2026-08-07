@@ -65,6 +65,7 @@ export interface PublicSessionDto extends PurchaseFields {
   venueId?: string | null;
   venueSlug?: string | null;
   venue: string;
+  venueAddress?: string | null;
   venueKind: string;
   offerTitle?: string | null;
   offerSourceCode?: string | null;

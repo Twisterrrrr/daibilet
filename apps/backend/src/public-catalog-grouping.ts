@@ -31,16 +31,16 @@ export function regroupMappedPublicCatalogSessions(sessions: PublicSessionDto[])
       continue;
     }
 
-    const slotFromSession = session.startsAt
+    const slotFromSession: CatalogSlot | null = session.startsAt
       ? {
           eventId: session.id,
           startsAt: session.startsAt,
           dateLabel: session.dateLabel,
           timeLabel: session.timeLabel,
-          purchaseUrl: session.purchaseUrl,
+          purchaseUrl: session.purchaseUrl ?? null,
           sourceStatus: session.sourceStatus || null,
-          purchaseReady: session.purchaseReady,
           vacant: session.vacant ?? null,
+          ...(session.purchaseReady === undefined ? {} : { purchaseReady: session.purchaseReady }),
         }
       : null;
     const current = groups.get(key);
@@ -126,12 +126,14 @@ export function dedupeCrossSourceCatalogSessions(sessions: PublicSessionDto[]): 
     if (used.has(index)) continue;
 
     let current = pierSessions[index];
+    if (!current) continue;
     used.add(index);
     const pierKey = canonicalSessionPierKey(current);
 
     for (let otherIndex = index + 1; otherIndex < pierSessions.length; otherIndex += 1) {
       if (used.has(otherIndex)) continue;
       const other = pierSessions[otherIndex];
+      if (!other) continue;
       if (canonicalSessionPierKey(other) !== pierKey) continue;
       if (sessionWidgetProvider(current) === sessionWidgetProvider(other)) continue;
       if (!crossSourceTitlesMatch(current.title, other.title)) continue;
@@ -193,7 +195,6 @@ export function isPublicSessionPurchaseBlocked(session: PublicSessionDto): boole
   const provider = String(session.purchaseProvider || session.offerSourceCode || '').toUpperCase();
   if (
     (provider.includes('TEPLOHOD') || provider.includes('TEP') || String(purchaseUrl).includes('teplohod.info')) &&
-    session.purchaseReady !== false &&
     purchaseUrl
   ) {
     return false;

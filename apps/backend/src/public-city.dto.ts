@@ -196,7 +196,18 @@ function scheduleCityPageRebuild(
       return payload;
     }
 
-    const destination = publicDestinationFromSession(matchedSessions[0]);
+    const seedSession = matchedSessions[0];
+    if (!seedSession) {
+      const payload = null;
+      pageCache.set(cacheKey, {
+        expiresAt: builtAt + PUBLIC_CITY_CACHE_MS,
+        staleUntil: builtAt + PUBLIC_CITY_STALE_MS,
+        payload,
+      });
+      cityPerfMark('empty', buildStartedAt, { slug: cacheKey });
+      return payload;
+    }
+    const destination = publicDestinationFromSession(seedSession);
     const sessions = matchedSessions.slice(0, CITY_SSR_SESSION_LIMIT).map((session) => toPublicCatalogListItem(session));
     const mapStartedAt = Date.now();
     const [sessionVenues, cityRecord, contentVenues] = await Promise.all([
@@ -206,17 +217,17 @@ function scheduleCityPageRebuild(
         [],
         'resolve-venues',
       ),
-      destination.type === 'city' && matchedSessions[0]?.cityId
+      destination.type === 'city' && seedSession.cityId
         ? withTimeout(
-            prisma.city.findUnique({ where: { id: matchedSessions[0].cityId } }),
+            prisma.city.findUnique({ where: { id: seedSession.cityId } }),
             CITY_SECONDARY_TIMEOUT_MS,
             null,
             'city-record',
           )
         : Promise.resolve(null),
-      matchedSessions[0]?.cityId
+      seedSession.cityId
         ? withTimeout(
-            publicPublishedVenuesByCityId(legacyDb, matchedSessions[0].cityId, 250),
+            publicPublishedVenuesByCityId(legacyDb, seedSession.cityId, 250),
             CITY_SECONDARY_TIMEOUT_MS,
             [],
             'city-content-venues',

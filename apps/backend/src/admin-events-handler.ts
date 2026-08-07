@@ -42,9 +42,14 @@ async function handleEventOverrideUpdate(
   const slugRow = await deps.db
     .query('select slug from "Event" where id = $1 limit 1', [eventId])
     .catch(() => null);
-  deps.invalidatePublicCaches('event override update', {
-    slug: slugRow && 'rows' in slugRow ? (slugRow.rows?.[0] as { slug?: string } | undefined)?.slug : undefined,
-  });
+  const overrideSlug =
+    slugRow && 'rows' in slugRow
+      ? (slugRow.rows?.[0] as { slug?: string } | undefined)?.slug
+      : undefined;
+  deps.invalidatePublicCaches(
+    'event override update',
+    overrideSlug ? { slug: overrideSlug } : {},
+  );
   sendJson(context.response, result);
   return true;
 }
@@ -66,9 +71,14 @@ async function handleEventModerationUpdate(
   const slugRow = await deps.db
     .query('select slug from "Event" where id = $1 limit 1', [eventId])
     .catch(() => null);
-  deps.invalidatePublicCaches('event moderation update', {
-    slug: slugRow && 'rows' in slugRow ? (slugRow.rows?.[0] as { slug?: string } | undefined)?.slug : undefined,
-  });
+  const moderationSlug =
+    slugRow && 'rows' in slugRow
+      ? (slugRow.rows?.[0] as { slug?: string } | undefined)?.slug
+      : undefined;
+  deps.invalidatePublicCaches(
+    'event moderation update',
+    moderationSlug ? { slug: moderationSlug } : {},
+  );
   sendJson(context.response, result);
   return true;
 }

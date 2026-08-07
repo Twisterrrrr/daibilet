@@ -6,7 +6,6 @@ export type PublicOfferLike = {
   priceRub?: number | null;
   sortOrder?: number | string | null;
   active?: boolean | null;
-  [key: string]: unknown;
 };
 
 function normalizeGroupPart(value: unknown): string {

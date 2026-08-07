@@ -50,7 +50,9 @@ test('regroupMappedPublicCatalogSessions merges slots by groupKey', () => {
     }),
   ]);
   assert.equal(grouped.length, 1);
-  assert.deepEqual(grouped[0].groupEventIds, ['a', 'b']);
+  const merged = grouped[0];
+  assert.ok(merged);
+  assert.deepEqual(merged.groupEventIds, ['a', 'b']);
 });
 
 test('dedupeCrossSourceCatalogSessions leaves non-widget sessions untouched', () => {
