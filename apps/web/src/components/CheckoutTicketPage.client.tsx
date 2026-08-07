@@ -24,16 +24,23 @@ type LookupResponse = {
 
 type Props = {
   publicCode: string;
+  /** Catalog fixture - skip finance lookup (visual QA). */
+  demoOrder?: BuyerInternalOrderRecord;
+  /** Banner above the card for demo / preview routes. */
+  demoBanner?: string;
 };
 
-export function CheckoutTicketView({ publicCode }: Props) {
+export function CheckoutTicketView({ publicCode, demoOrder, demoBanner }: Props) {
   const code = publicCode.trim();
-  const [loading, setLoading] = useState(Boolean(code));
-  const [order, setOrder] = useState<BuyerInternalOrderRecord | null>(null);
-  const [emailHint, setEmailHint] = useState<'sent' | 'skipped' | 'unknown'>('unknown');
+  const isDemo = Boolean(demoOrder);
+  const [loading, setLoading] = useState(Boolean(code) && !isDemo);
+  const [order, setOrder] = useState<BuyerInternalOrderRecord | null>(demoOrder || null);
+  const [emailHint, setEmailHint] = useState<'sent' | 'skipped' | 'unknown'>(
+    isDemo ? 'sent' : 'unknown',
+  );
 
   useEffect(() => {
-    if (!code) {
+    if (isDemo || !code) {
       setLoading(false);
       return;
     }
@@ -81,7 +88,7 @@ export function CheckoutTicketView({ publicCode }: Props) {
     return () => {
       disposed = true;
     };
-  }, [code]);
+  }, [code, isDemo]);
 
   if (!code) {
     return (
@@ -111,6 +118,11 @@ export function CheckoutTicketView({ publicCode }: Props) {
       </section>
 
       <section className="container-page py-8 sm:py-10">
+        {demoBanner ? (
+          <p className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-950 print:hidden">
+            {demoBanner}
+          </p>
+        ) : null}
         {loading ? (
           <div className="flex min-h-[30vh] items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin text-primary-600" />

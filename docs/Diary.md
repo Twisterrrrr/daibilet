@@ -1,3 +1,19 @@
+## 2026-08-07 - Buyer ticket demo preview (`/checkout/ticket/demo`)
+
+### Наблюдения
+- Owner: на реальных заказах карточка часто sparse - нужен визуальный эталон полного билета со всеми полями.
+- Finance seed на `.159` не обязателен и рискованнее; catalog demo достаточно для QA.
+
+### Решения
+- Статический route `/checkout/ticket/demo` (приоритетнее `[publicCode]`) + fixture `buildDemoBuyerTicketOrder()`.
+- Разные `ticketNumber` и `publicCode`; категории Взрослый/Льготный/Детский; notices; demo support phone; QR без finance.
+- Без seed CheckoutOrder на finance.
+
+### Проблемы
+- Реальные заказы останутся sparse, пока finance lookup DTO / Path A не отдаёт полный набор полей.
+
+---
+
 ## 2026-08-07 - Buyer ticket card: full visit fields
 
 ### Наблюдения

@@ -160,6 +160,41 @@ export function formatTicketLineItem(item: BuyerTicketLineItem): string {
   return `${title} - ${qty} чел`;
 }
 
+/**
+ * Catalog-only fixture for visual QA of the full ticket card.
+ * Does not call finance; safe for `/checkout/ticket/demo`.
+ */
+export function buildDemoBuyerTicketOrder(): BuyerInternalOrderRecord {
+  const mapped = mapFinanceOrderStatus('CONFIRMED');
+  return {
+    publicCode: 'DB26-A9K3M2',
+    ticketNumber: 'TKT-78451209',
+    status: 'CONFIRMED',
+    displayStatus: mapped.displayStatus,
+    statusTone: mapped.statusTone,
+    title: 'Входной билет',
+    email: 'anna.smirnova@example.com',
+    buyerName: 'Анна Смирнова',
+    eventTitle: 'Постоянная экспозиция',
+    venueTitle: 'Третьяковская галерея',
+    venueAddress: 'Лаврушинский переулок, 10, Москва',
+    venueSlug: 'tretyakovskaya-galereya',
+    sessionStartsAt: '2026-08-15T11:00:00.000Z',
+    validUntil: null,
+    validityMode: 'SESSION',
+    lineItems: [
+      { ticketTitle: 'Взрослый', quantity: 4 },
+      { ticketTitle: 'Льготный', quantity: 2 },
+      { ticketTitle: 'Детский', quantity: 1 },
+    ],
+    amountRub: 4700,
+    purchasedAt: '2026-08-07T12:24:00.000Z',
+    supplierSupportPhone: '+7 (495) 123-45-67',
+    mode: 'YOOKASSA',
+    source: 'internal',
+  };
+}
+
 export function readInternalOrdersFromStorage(): BuyerInternalOrderRecord[] {
   if (typeof window === 'undefined') return [];
   try {

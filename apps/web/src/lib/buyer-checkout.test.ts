@@ -3,6 +3,7 @@ import test from 'node:test';
 
 import {
   amountRubFromKopecks,
+  buildDemoBuyerTicketOrder,
   filterInternalOrdersForEmail,
   formatTicketLineItem,
   isOpenDateOrder,
@@ -56,6 +57,24 @@ test('filterInternalOrdersForEmail', () => {
 test('formatTicketLineItem uses hyphen', () => {
   assert.equal(formatTicketLineItem({ ticketTitle: 'Взрослый', quantity: 4 }), 'Взрослый - 4 чел');
   assert.equal(formatTicketLineItem({ ticketTitle: 'Льготный', quantity: 2 }), 'Льготный - 2 чел');
+});
+
+test('buildDemoBuyerTicketOrder fills full card fixture', () => {
+  const demo = buildDemoBuyerTicketOrder();
+  assert.notEqual(demo.ticketNumber, demo.publicCode);
+  assert.equal(demo.lineItems?.length, 3);
+  assert.equal(formatTicketLineItem(demo.lineItems![0]), 'Взрослый - 4 чел');
+  assert.equal(formatTicketLineItem(demo.lineItems![1]), 'Льготный - 2 чел');
+  assert.equal(formatTicketLineItem(demo.lineItems![2]), 'Детский - 1 чел');
+  assert.ok(demo.eventTitle);
+  assert.ok(demo.venueTitle);
+  assert.ok(demo.venueAddress);
+  assert.ok(demo.buyerName);
+  assert.ok(demo.sessionStartsAt);
+  assert.ok(demo.purchasedAt);
+  assert.ok(demo.supplierSupportPhone);
+  assert.equal(demo.amountRub, 4700);
+  assert.equal(demo.displayStatus, 'Оплачен');
 });
 
 test('isOpenDateOrder prefers validityMode and validUntil', () => {
