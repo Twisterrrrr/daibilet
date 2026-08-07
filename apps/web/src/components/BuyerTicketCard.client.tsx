@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { CheckCircle2, Clock3, Copy, Printer } from 'lucide-react';
+import { CheckCircle2, Clock3, Copy, Download } from 'lucide-react';
 import { useCallback, useState, type ReactNode } from 'react';
 
 import {
@@ -259,8 +259,8 @@ export function BuyerTicketCard({ order, origin, emailHint = 'unknown', classNam
           onClick={() => window.print()}
           className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-primary-600 px-5 py-3 text-sm font-semibold text-white hover:bg-primary-700"
         >
-          <Printer className="h-4 w-4" />
-          Распечатать билет
+          <Download className="h-4 w-4" />
+          Скачать / распечатать
         </button>
         <button
           type="button"

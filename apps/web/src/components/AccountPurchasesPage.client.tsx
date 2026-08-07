@@ -42,8 +42,8 @@ function internalToBuyerOrder(row: BuyerInternalOrderRecord): BuyerOrder {
     ticketCount: 1,
     message:
       row.mode === 'STUB'
-        ? 'Тестовый заказ (STUB). Откройте билет по кнопке - письмо уходит только если настроен SMTP каталога.'
-        : 'Внутренний заказ Дайбилет. Откройте билет по коду или из письма со ссылкой.',
+        ? 'Тестовый заказ (STUB). Скачайте билет из списка - письмо уходит только если настроен SMTP каталога.'
+        : null,
     tickets: [
       {
         id: `internal-ticket:${row.publicCode}`,
@@ -153,8 +153,8 @@ export function AccountPurchasesPageView() {
               </div>
               <h1 className="mt-4 text-4xl font-extrabold sm:text-5xl">Мои покупки</h1>
               <p className="mt-4 max-w-3xl text-base leading-7 text-primary-50/88">
-                Заказы на email {user?.email}: внутренние билеты Дайбилет (код, статус, ссылка на билет) и покупки через
-                виджеты Ticketscloud / Teplohod.
+                Заказы на email {user?.email}: скачайте билет Дайбилет прямо из списка или откройте страницу с QR и
+                картой. Также здесь покупки через виджеты Ticketscloud / Teplohod.
               </p>
             </div>
             <button
@@ -203,7 +203,7 @@ export function AccountPurchasesPageView() {
               </div>
             </div>
 
-            <div className="grid gap-4">
+            <div className="grid gap-2.5">
               {mergedRows.map((order) => (
                 <BuyerOrderCard key={order.id} order={order} />
               ))}

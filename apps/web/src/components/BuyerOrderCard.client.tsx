@@ -1,10 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, CheckCircle2, Clock3, HelpCircle, Ticket, XCircle } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Clock3, Download, ExternalLink, HelpCircle, XCircle } from 'lucide-react';
 
 import { SITE_TIME_ZONE, parseSessionStartsAt } from '@/lib/datetime';
-import { buyerTicketPath } from '@/lib/buyer-ticket';
+import { buyerTicketPath, openBuyerTicketDownload } from '@/lib/buyer-ticket';
 import { formatNumber } from '@/lib/format';
 
 export type BuyerOrder = {
@@ -40,65 +40,88 @@ export type BuyerOrder = {
 };
 
 export function BuyerOrderCard({ order }: { order: BuyerOrder }) {
+  const isInternal = order.sourceKind === 'internal';
+  const title = order.eventTitle || (isInternal ? 'Входной билет' : 'Заказ');
+  const purchaseLabel = formatPurchaseDateTime(order.purchasedAt);
+  const amountLabel = order.amountRub != null ? `${formatNumber(order.amountRub)} ₽` : null;
+  const ticketRows = order.tickets.length
+    ? order.tickets
+    : [
+        {
+          id: `${order.id}:fallback`,
+          number: order.number,
+          displayStatus: order.displayStatus,
+          eventId: order.eventId,
+          eventTitle: order.eventTitle,
+          eventUrl: order.eventUrl,
+          startsAt: null as string | null,
+        },
+      ];
+
   return (
-    <article className="overflow-hidden rounded-2xl bg-white shadow-[0_14px_40px_rgba(15,23,42,0.08)]">
-      <div className="grid gap-4 p-5 lg:grid-cols-[minmax(0,1fr)_minmax(260px,340px)]">
-        <div className="min-w-0">
+    <article
+      className="overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-[0_4px_16px_rgba(15,23,42,0.04)]"
+      data-buyer-order-row
+    >
+      <div className="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+        <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <StatusPill order={order} />
-            {order.sourceKind === 'internal' ? (
-              <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800">
-                Заказ Дайбилет
+            {isInternal ? (
+              <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-800">
+                Дайбилет
               </span>
             ) : order.providerName ? (
-              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
-                Покупка в {order.providerName}
+              <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-semibold text-slate-600">
+                {order.providerName}
               </span>
             ) : null}
+            <span className="font-mono text-[11px] tabular-nums text-slate-400">№{order.number}</span>
           </div>
-          <h2 className="mt-3 text-xl font-bold text-slate-950">Заказ №{order.number}</h2>
-          {order.sourceKind === 'internal' ? (
-            <p className="mt-1 text-xs font-medium text-slate-500">Код заказа (publicCode)</p>
-          ) : null}
-          {order.eventTitle ? (
-            order.eventUrl ? (
-              <Link href={order.eventUrl} className="mt-2 inline-flex items-center gap-1 text-base font-semibold text-primary-700 hover:text-primary-800">
-                {order.eventTitle}
-                <ArrowRight className="h-4 w-4" />
+          <div className="mt-1.5 min-w-0">
+            {order.eventUrl ? (
+              <Link
+                href={order.eventUrl}
+                className="line-clamp-1 text-sm font-semibold text-slate-950 hover:text-primary-700"
+              >
+                {title}
               </Link>
             ) : (
-              <p className="mt-2 text-base font-semibold text-slate-800">{order.eventTitle}</p>
-            )
-          ) : null}
-          {order.sourceKind === 'internal' ? (
+              <p className="line-clamp-1 text-sm font-semibold text-slate-950">{title}</p>
+            )}
+            <p className="mt-0.5 text-xs text-slate-500">
+              {purchaseLabel}
+              {amountLabel ? ` · ${amountLabel}` : ''}
+              {` · ${formatCount(order.ticketCount || ticketRows.length, ['билет', 'билета', 'билетов'])}`}
+            </p>
+          </div>
+        </div>
+
+        {isInternal ? (
+          <div className="flex shrink-0 flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => openBuyerTicketDownload(order.number)}
+              className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg bg-primary-600 px-3.5 py-2 text-sm font-semibold text-white hover:bg-primary-700"
+            >
+              <Download className="h-3.5 w-3.5" />
+              Скачать
+            </button>
             <Link
               href={buyerTicketPath(order.number)}
-              className="mt-3 inline-flex items-center gap-2 rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
+              className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
             >
-              <Ticket className="h-4 w-4" />
-              Открыть билет
+              <ExternalLink className="h-3.5 w-3.5" />
+              Открыть
             </Link>
-          ) : null}
-          {order.message ? <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500">{order.message}</p> : null}
-        </div>
-
-        <dl className="grid gap-2 rounded-xl bg-slate-50 p-4 text-sm">
-          <InfoRow label="Покупатель" value={order.buyer.name || 'не указан'} />
-          <InfoRow label="Email" value={order.buyer.email || '-'} />
-          <InfoRow label="Телефон" value={order.buyer.phone || '-'} />
-          <InfoRow label="Дата покупки" value={formatPurchaseDateTime(order.purchasedAt)} />
-          {order.amountRub ? <InfoRow label="Сумма" value={`${formatNumber(order.amountRub)} ₽`} /> : null}
-        </dl>
+          </div>
+        ) : null}
       </div>
 
-      <div className="bg-slate-50/70 px-5 py-4">
-        <div className="mb-3 flex items-center justify-between gap-3">
-          <h3 className="text-sm font-semibold text-slate-800">Билеты</h3>
-          <span className="text-xs font-semibold text-slate-500">{formatCount(order.ticketCount, ['билет', 'билета', 'билетов'])}</span>
-        </div>
-        {order.tickets.length ? (
-          <div className="grid gap-2">
-            {order.tickets.map((ticket) => {
+      {ticketRows.length > 1 || (!isInternal && order.tickets.length > 0) ? (
+        <div className="border-t border-slate-100 bg-slate-50/60 px-4 py-2">
+          <ul className="divide-y divide-slate-100/80">
+            {ticketRows.map((ticket) => {
               const reviewHref = buildReviewWriteHref({
                 eventId: ticket.eventId || order.eventId || '',
                 eventUrl: ticket.eventUrl || order.eventUrl || '',
@@ -108,45 +131,50 @@ export function BuyerOrderCard({ order }: { order: BuyerOrder }) {
                 name: order.buyer.name || '',
               });
               return (
-                <div key={ticket.id} className="grid gap-2 rounded-xl bg-white p-3 text-sm sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+                <li
+                  key={ticket.id}
+                  className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 py-2 first:pt-0 last:pb-0"
+                >
                   <div className="min-w-0">
-                    <div className="font-semibold text-slate-900">{ticket.number || 'Билет без номера'}</div>
-                    <div className="mt-1 text-xs text-slate-500">{ticket.eventTitle || order.eventTitle || 'Событие уточняется'}</div>
-                    {ticket.startsAt ? (
-                      <div className="mt-1 text-xs text-slate-600">
-                        <span className="text-slate-400">Сеанс:</span> {formatSessionDateTime(ticket.startsAt)}
-                      </div>
+                    <p className="truncate text-xs font-semibold text-slate-800">
+                      {ticket.number || 'Билет без номера'}
+                      {ticket.startsAt ? (
+                        <span className="ml-2 font-normal text-slate-500">
+                          {formatSessionDateTime(ticket.startsAt)}
+                        </span>
+                      ) : null}
+                    </p>
+                    {(ticket.eventTitle || order.eventTitle) && ticket.eventTitle !== order.eventTitle ? (
+                      <p className="mt-0.5 truncate text-[11px] text-slate-500">
+                        {ticket.eventTitle || order.eventTitle}
+                      </p>
                     ) : null}
                   </div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">{ticket.displayStatus}</span>
-                    {order.sourceKind === 'internal' ? (
-                      <Link
-                        href={buyerTicketPath(order.number)}
-                        className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800 hover:bg-emerald-100"
-                      >
-                        Открыть билет
-                      </Link>
-                    ) : null}
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <span className="rounded-full bg-white px-2 py-0.5 text-[11px] font-semibold text-slate-600 ring-1 ring-slate-200/80">
+                      {ticket.displayStatus}
+                    </span>
                     {reviewHref ? (
                       <Link
                         href={reviewHref}
-                        className="rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700 hover:bg-primary-100"
+                        className="rounded-full bg-primary-50 px-2.5 py-0.5 text-[11px] font-semibold text-primary-700 hover:bg-primary-100"
                       >
-                        Оставить отзыв
+                        Отзыв
                       </Link>
                     ) : null}
                   </div>
-                </div>
+                </li>
               );
             })}
-          </div>
-        ) : (
-          <p className="rounded-xl bg-white p-4 text-sm leading-6 text-slate-500">
-            Билеты по этому заказу пока не найдены. Для отмененных или истекших заказов это нормально; для активного заказа оператор сверит статус по номеру.
-          </p>
-        )}
-      </div>
+          </ul>
+        </div>
+      ) : null}
+
+      {!order.tickets.length && !isInternal ? (
+        <p className="border-t border-slate-100 px-4 py-2.5 text-xs leading-5 text-slate-500">
+          Билеты по этому заказу пока не найдены. Для отмененных или истекших заказов это нормально.
+        </p>
+      ) : null}
     </article>
   );
 }
@@ -178,19 +206,10 @@ function StatusPill({ order }: { order: BuyerOrder }) {
   const Icon = order.statusTone === 'live' ? CheckCircle2 : order.statusTone === 'error' ? XCircle : Clock3;
   const className = styles[order.statusTone as keyof typeof styles] || styles.incomplete;
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${className}`}>
-      <Icon className="h-3.5 w-3.5" />
+    <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${className}`}>
+      <Icon className="h-3 w-3" />
       {order.displayStatus}
     </span>
-  );
-}
-
-function InfoRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-3">
-      <dt className="shrink-0 text-slate-500">{label}</dt>
-      <dd className="min-w-0 whitespace-normal break-words text-right font-semibold text-slate-800">{value}</dd>
-    </div>
   );
 }
 
@@ -209,9 +228,9 @@ function formatSessionDateTime(value?: string | null): string {
 }
 
 function formatPurchaseDateTime(value?: string | null): string {
-  if (!value) return 'не указана';
+  if (!value) return 'дата не указана';
   const date = parseSessionStartsAt(value);
-  if (Number.isNaN(date.getTime())) return 'не указана';
+  if (Number.isNaN(date.getTime())) return 'дата не указана';
   return new Intl.DateTimeFormat('ru-RU', {
     day: 'numeric',
     month: 'short',

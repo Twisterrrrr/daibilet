@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Loader2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { BuyerTicketCard } from '@/components/BuyerTicketCard.client';
 import { BuyerTicketVenueMapPanel } from '@/components/BuyerTicketVenueMapPanel.client';
@@ -35,6 +35,7 @@ type Props = {
 export function CheckoutTicketView({ publicCode, demoOrder, demoBanner }: Props) {
   const code = publicCode.trim();
   const isDemo = Boolean(demoOrder);
+  const printTriggeredRef = useRef(false);
   const [loading, setLoading] = useState(Boolean(code) && !isDemo);
   const [order, setOrder] = useState<BuyerInternalOrderRecord | null>(demoOrder || null);
   const [emailHint, setEmailHint] = useState<'sent' | 'skipped' | 'unknown'>(
@@ -91,6 +92,19 @@ export function CheckoutTicketView({ publicCode, demoOrder, demoBanner }: Props)
       disposed = true;
     };
   }, [code, isDemo]);
+
+  /* Purchases list "Скачать" → ?print=1 opens print / Save as PDF dialog once ticket is ready. */
+  useEffect(() => {
+    if (loading || !order || printTriggeredRef.current) return;
+    if (typeof window === 'undefined') return;
+    const wantsPrint = new URLSearchParams(window.location.search).get('print') === '1';
+    if (!wantsPrint) return;
+    printTriggeredRef.current = true;
+    const timer = window.setTimeout(() => {
+      window.print();
+    }, 450);
+    return () => window.clearTimeout(timer);
+  }, [loading, order]);
 
   if (!code) {
     return (

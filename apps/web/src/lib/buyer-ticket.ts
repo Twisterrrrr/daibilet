@@ -7,9 +7,21 @@ export function buyerTicketPath(publicCode: string): string {
   return `/checkout/ticket/${encodeURIComponent(code)}`;
 }
 
+/** Opens ticket page and triggers browser print / Save as PDF dialog. */
+export function buyerTicketPrintPath(publicCode: string): string {
+  return `${buyerTicketPath(publicCode)}?print=1`;
+}
+
 export function buyerTicketAbsoluteUrl(publicCode: string, origin?: string): string {
   const base = (origin || 'https://daibilet.ru').replace(/\/$/, '');
   return `${base}${buyerTicketPath(publicCode)}`;
+}
+
+/** Open print-optimized ticket in a new tab (print dialog → Save as PDF). */
+export function openBuyerTicketDownload(publicCode: string): void {
+  const code = String(publicCode || '').trim();
+  if (!code || typeof window === 'undefined') return;
+  window.open(buyerTicketPrintPath(code), '_blank', 'noopener,noreferrer');
 }
 
 export function buyerResultPath(publicCode: string, mode?: string | null): string {
