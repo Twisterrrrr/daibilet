@@ -15,7 +15,8 @@
 
 ### Проблемы
 - Thin util copies (`publicCitySlug` и city routing) ещё в dto.js и venue-read - не business dual-edit rules.
-- Live MSK нужен deploy (API + web бандл), иначе prod остаётся на старом dto-path.
+- Hotfix после extract: `publicEventSlug` забыт в `mapSlimPublicStopEvent` → venue page 500; fixed `2bdeeb2`.
+- MSK live: GH Deploy MSK web @`7201be8` **BUILD_ID=`4fbNTV2DxiwjqKsrLmILJ`** + API HEAD `2bdeeb21`; smoke `/venues/ermitazh` API+web 200.
 
 ---
 
