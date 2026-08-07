@@ -81,7 +81,8 @@ Owner: основная работа локально / preview; агенты **
    - **Catalog / Cursor (shipped MVP):** `daibilet.ru/checkout/admissions/{slug}`, result `daibilet.ru/checkout/result?order={publicCode}`, account `daibilet.ru/account/purchases`.
    - **Codex experiment:** buyer UI на `pay.daibilet.ru` (`.159`). Supplier LC на pay не ломать.
    - Return URL для ЮKassa: пока выставлять под активный buyer surface (catalog MVP или pay experiment); webhook остаётся на `finance-api`.
-5. **Webhook registration (2026-08-07):** для текущего shop API-доступ **не** позволяет webhook-management (API register → 401 «Authentication type is not allowed»; payment create при этом OK). **Webhook для этого магазина нужно регистрировать вручную в кабинете ЮKassa** (URL выше) **или** получить credentials/token с правом webhook-management. FIN.LC3 create-payment/STUB smoke ✅; MIG.9.5 / FIN.W1 webhook step 🔒 owner-manual.
+4c. **Buyer checkout MVP path — LOCKED 2026-08-07 (owner):** **direct YooKassa** через `create-payment` → redirect на `confirmationUrl`. Полноценный checkout UI со сложным внутренним расчётом (корзина, multi-offer calc, custom payment form) - **deferred**, только когда реально понадобится. Cursor/Codex параллельные эксперименты целят **thin redirect + result + account**, не heavy checkout form. STUB остаётся admin/dev; webhook на `finance-api` без изменений.
+5. **Webhook registration (2026-08-07):** API register → 401 auth type (webhook-mgmt недоступен для текущих credentials) - обход: **ручная регистрация в кабинете**. Owner ✅ URL = canon `https://finance-api.daibilet.ru/api/checkout/yookassa/webhook` (events succeeded / waiting_for_capture / canceled; ранее ошибочно было `pay.daibilet.ru`). FIN.LC3 ✅; MIG.9.5 / FIN.W1 cabinet ✅; next ⏳ e2e sandbox PENDING→SUCCEEDED.
 
 ### Owner minimum (обновлено 2026-08-07)
 
@@ -90,7 +91,8 @@ Owner: основная работа локально / preview; агенты **
 - Egress `.159` outbound 443+DNS ✅ (sandbox create-payment OK)
 - FIN.LC3 ✅ confirmationUrl / STUB smoke
 - SSH для Codex: ключ `daibilet_spb_finance` / pubkey в `authorized_keys`
-- **Open:** webhook URL в кабинете ЮKassa (или token с webhook-management) - см. п.5
+- Webhook cabinet ✅ canon finance-api (см. п.5)
+- **Open:** e2e sandbox pay verify PENDING→SUCCEEDED после webhook delivery
 
 `.16` (Intelligent Hoopoe) **труп** (MIG.9.7 ✅ 2026-08-07): снят из docs/scripts inventory. Wipe VM в Timeweb = owner, если ещё биллится. Apex DNS / web build = MSK `.184` only. Teplohod allowlist = `.184`, не `.16`.
 

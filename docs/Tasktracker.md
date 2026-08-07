@@ -585,7 +585,7 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 | FIN.LC4 | Owner: SG Diligent Polydeuces outbound 443 (+ DNS) | Критический | ✅ PASS (egress green; sandbox create-payment OK 2026-08-07) |
 | FIN.LC5 | YOOKASSA_SECRET_KEY на `.159` + CHECKOUT=1 after egress | Критический | ✅ key `<set>`; CHECKOUT=1; VERIFY_WEBHOOK=1; STUB=1 (2026-08-07) |
 | FIN.LC6 | Codex SSH access (daibilet_spb_finance / pubkey) | Критический | ⏳ owner: Cursor has key; Codex needs same |
-| FIN.W1 | Week1: YooKassa+webhook/reconcile+runbook (4-5d after D0) | Критический | 🔄 create-payment/STUB smoke ✅; webhook register 🔒 owner-manual / blocked: API 401 auth type not allowed for webhook-mgmt |
+| FIN.W1 | Week1: YooKassa+webhook/reconcile+runbook (4-5d after D0) | Критический | 🔄 create-payment/STUB ✅; webhook cabinet ✅ canon `finance-api…/webhook` (events succeeded/waiting_for_capture/canceled; было ошибочно `pay.`); next ⏳ e2e sandbox pay PENDING→SUCCEEDED |
 | FIN.W2 | Week2: supplier LC + admin legal/bank approve + capacity reaper | Высокий | ⏳ |
 | FIN.W3 | Week3: controlled catalog path + ledger MVP + m2m Bearer | Высокий | ⏳ wide CTA still out |
 | FIN.W4 | Week4: harden, scheduled reconcile, docs, smoke matrix | Средний | ⏳ |
@@ -701,14 +701,14 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 | MIG.9.2 | Phase 2: fresh finance PG на `.159` (не catalog dump) | Критический | ✅ PG `:5437` + migrations/seed smoke 2026-07-30 |
 | MIG.9.3 | Phase 3: finance app + HTTP/TLS `pay`/`supplier`/`finance-api` | Критический | 🔄 API `:4100` + nginx · TLS ✅ LE SAN pay/supplier/finance-api · STUB on / YooKassa off |
 | MIG.9.4 | Phase 4: optional staging/build scaffolding на `.159` (не justification для `.16`) | Средний | ✅ N/A - SPB `.16` retired from build; staging на `.159` optional later |
-| MIG.9.5 | Phase 5: YooKassa webhook → finance-api canon; dual only if prior live | Критический | 🔒 URL locked; VERIFY=1; API register 401 «Authentication type is not allowed» → owner: cabinet manual OR token with webhook-management |
+| MIG.9.5 | Phase 5: YooKassa webhook → finance-api canon; dual only if prior live | Критический | ✅ cabinet URL = canon `https://finance-api.daibilet.ru/api/checkout/yookassa/webhook` (owner 2026-08-07; было `pay.`); VERIFY=1; next ⏳ e2e sandbox PENDING→SUCCEEDED |
 | MIG.9.6 | Phase 6: smoke `pay`/`supplier`/webhook; catalog `.184` без cutover | Критический | ⏳ |
 | MIG.9.7 | Phase 7: retire Intelligent Hoopoe `.16` from repo/ops + **wipe VM in Timeweb** | Высокий | ✅ repo/docs/scripts 2026-08-07 (owner confirmed «труп»); **VM wipe в панели Timeweb = owner**, если ещё биллится |
 | PERF.OOM4 | MSK: снять `cpus:1`/`workerThreads:false`, heap build 5120Mi | Высокий | ✅ |
 
 План: [migration-spb-to-msk.md](./migration-spb-to-msk.md) · roles/MIG.9: [spb-migrate-4gb-to-8gb.md](./spb-migrate-4gb-to-8gb.md) · [spb-finance-host.md](./spb-finance-host.md)  
 Домены finance (**канон**): **`pay.daibilet.ru`** (buyer) · `supplier.daibilet.ru` · `finance-api.daibilet.ru` - DNS+TLS ✅. Alias `checkout.` / `finance.` не обязательны ([qa.md](./qa.md)).  
-Owner minimum: MSK→`.159` сеть ✅ · YooKassa `SHOP_ID`/`SECRET=<set>` ✅ · egress `.159` ✅ · FIN.LC3 smoke ✅ · **webhook register** 🔒 owner cabinet (API auth type без webhook-mgmt) · Codex SSH.  
+Owner minimum: MSK→`.159` сеть ✅ · YooKassa `SHOP_ID`/`SECRET=<set>` ✅ · egress `.159` ✅ · FIN.LC3 smoke ✅ · **webhook cabinet** ✅ canon finance-api (не pay) · next ⏳ e2e sandbox PENDING→SUCCEEDED · Codex SSH.  
 **Web deploy canon:** MSK-only (`deploy-prod-next.sh` / CI Deploy MSK web) на `.184`. SPB `.16` Intelligent Hoopoe = труп (MIG.9.7 ✅ docs; wipe VM = owner Timeweb).
 
 ---
@@ -1667,6 +1667,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | Дата | Изменение |
 |------|-----------|
+| 2026-08-07 | **FIN.W1/MIG.9.5 webhook cabinet ✅** - owner: URL = `finance-api…/yookassa/webhook` (events succeeded/waiting_for_capture/canceled; было ошибочно `pay.`); next = e2e sandbox PENDING→SUCCEEDED; no web deploy |
 | 2026-08-07 | **FIN.LC3 ✅** - `.159` YooKassa sandbox create-payment + STUB smoke; health 200; VERIFY=1; webhook API register 401 → FIN.W1/MIG.9.5 owner cabinet; wide CTA / `.184` not touched |
 | 2026-08-07 | **F5.3b ✅** - `public-venue-read.js`; next city/venue/search без dto.js; server.js retire out of scope; dual-edit landing-rules docs cleared |
 | 2026-08-07 | **MIG.9.7 ✅** - owner: Intelligent Hoopoe `.16` «труп»; refs убраны из активных docs/scripts; MSK-only; Teplohod allowlist = `.184`; wipe VM в Timeweb = owner |

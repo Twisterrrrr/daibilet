@@ -68,6 +68,21 @@
 
 ---
 
+## 2026-08-07 - YooKassa webhook cabinet = canon finance-api
+
+### Наблюдения
+- Owner подтвердил: в кабинете ЮKassa webhook URL = `https://finance-api.daibilet.ru/api/checkout/yookassa/webhook` (events: `payment.succeeded`, `waiting_for_capture`, `canceled`).
+- Ранее было ошибочно `pay.daibilet.ru` (buyer surface, не API webhook).
+
+### Решения
+- FIN.W1 / MIG.9.5: cabinet register ✅; next = e2e sandbox pay verify PENDING→SUCCEEDED.
+- Docs-only commit; secrets / web deploy не трогали.
+
+### Проблемы
+- Нет новых. API auto-register по-прежнему 401 auth type - не нужно после ручной регистрации.
+
+---
+
 ## 2026-08-07 - FIN.LC3 smoke closed (finance `.159`)
 
 ### Наблюдения
