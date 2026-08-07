@@ -202,7 +202,7 @@ function HeaderCitySelector({
       onChange={selectCity}
       allLabel="Фильтр по городу"
       variant={compact ? 'compact' : 'header'}
-      className={compact ? 'w-full' : 'hidden lg:block'}
+      className={compact ? 'w-full' : 'shrink-0 sm:min-w-0 sm:max-w-[14rem]'}
     />
   );
 }
@@ -311,6 +311,11 @@ function MobileNavSheet({
           </button>
         </div>
         <nav aria-label="Мобильная навигация" className="flex-1 overflow-y-auto p-2">
+          <div className="px-2 py-1">
+            <p className="mb-1 px-2 text-xs font-medium uppercase tracking-wide text-slate-500">Фильтр по городу</p>
+            <HeaderCitySelector cityLabel={cityLabel} onDestination={onDestination} onNavigate={onNavigate} compact />
+          </div>
+          <div className="my-2 border-t border-slate-200" />
           {NAV_LINKS.map((item) => (
             <button
               key={item.href}
@@ -331,8 +336,6 @@ function MobileNavSheet({
             <HelpCircle className="h-4 w-4" />
             Помощь и FAQ
           </button>
-          <div className="my-2 border-t border-slate-200" />
-          <HeaderCitySelector cityLabel={cityLabel} onDestination={onDestination} onNavigate={onNavigate} compact />
           <div className="my-2 border-t border-slate-200" />
           {isLoggedIn ? (
             <>

@@ -121,7 +121,7 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
               <DaibiletLogo textClassName="text-lg sm:text-xl lg:text-2xl" />
             </Link>
 
-            {/* Mobile: city = pin icon + popup (label was eaten in sticky). sm+ shows name. */}
+            {/* PH2.LOC2 / UX.LOC1: city outside burger - pin icon + dropdown (label from sm+). */}
             <CityPicker
               cities={destinations}
               value={cityValue}

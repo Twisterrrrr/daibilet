@@ -63,20 +63,21 @@ export function CityPicker({
     if (!button) return;
 
     const rect = button.getBoundingClientRect();
-    const menuWidth = variant === 'compact' ? rect.width : Math.max(rect.width, 256);
-    const left = variant === 'compact' ? rect.left : rect.left;
-    const spaceBelow = window.innerHeight - rect.bottom - 8;
-    const spaceAbove = rect.top - 8;
+    const menuWidth =
+      variant === 'compact' ? Math.max(rect.width, 256) : Math.max(rect.width, 256);
+    const pad = 8;
+    const left = Math.min(Math.max(pad, rect.left), Math.max(pad, window.innerWidth - menuWidth - pad));
+    const spaceBelow = window.innerHeight - rect.bottom - pad;
+    const spaceAbove = rect.top - pad;
     const openUp = spaceBelow < 220 && spaceAbove > spaceBelow;
 
     if (openUp) {
-      const maxHeight = Math.min(MENU_MAX_HEIGHT, spaceAbove);
       setMenuStyle({
         position: 'fixed',
         left,
         width: menuWidth,
         bottom: window.innerHeight - rect.top + 4,
-        maxHeight,
+        maxHeight: Math.min(MENU_MAX_HEIGHT, spaceAbove),
         visibility: 'visible',
       });
       return;
@@ -134,7 +135,8 @@ export function CityPicker({
       ? 'relative h-11 w-full rounded-xl bg-slate-50 pl-10 pr-8 text-left text-sm font-medium text-slate-800 outline-none transition hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-primary/25'
       : variant === 'compact'
         ? 'relative flex w-full items-center gap-2 rounded-lg py-3 pl-10 pr-10 text-left text-base font-medium text-slate-700 hover:bg-slate-100'
-        : 'inline-flex items-center gap-1 rounded-full px-2 py-1 text-sm font-medium text-slate-600 transition hover:bg-slate-100';
+        : // Header: mobile = pin icon only; sm+ shows city name (parity with apps/web).
+          'inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-slate-600 outline-none transition hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-primary/25 sm:h-auto sm:w-auto sm:max-w-full sm:justify-start sm:gap-1.5 sm:px-1.5 sm:py-1 sm:text-sm sm:font-medium';
 
   const menu = open
     ? createPortal(
@@ -210,8 +212,14 @@ export function CityPicker({
         onClick={toggleOpen}
         className={buttonClassName}
       >
-        {variant === 'header' ? <MapPin className="h-4 w-4 shrink-0" /> : null}
-        <span className={variant === 'header' ? 'truncate' : 'block truncate'}>{selectedLabel}</span>
+        {variant === 'header' ? (
+          <MapPin className={`h-5 w-5 shrink-0 sm:h-4 sm:w-4 ${open ? 'text-primary-600' : ''}`} />
+        ) : null}
+        {variant === 'header' ? (
+          <span className="hidden min-w-0 truncate sm:inline">{selectedLabel}</span>
+        ) : (
+          <span className="block truncate">{selectedLabel}</span>
+        )}
         {variant === 'hero' || variant === 'compact' ? (
           <ChevronDown
             className={`pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 shrink-0 text-slate-400 transition ${
@@ -219,7 +227,7 @@ export function CityPicker({
             } ${variant === 'compact' ? 'right-4' : ''}`}
           />
         ) : (
-          <ChevronDown className={`h-3.5 w-3.5 shrink-0 opacity-60 transition ${open ? 'rotate-180' : ''}`} />
+          <ChevronDown className={`hidden h-3.5 w-3.5 shrink-0 opacity-60 transition sm:inline ${open ? 'rotate-180' : ''}`} />
         )}
       </button>
       {menu}
