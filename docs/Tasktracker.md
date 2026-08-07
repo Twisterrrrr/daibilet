@@ -7,6 +7,15 @@
 
 ---
 
+## Webmaster slow server response (2026-08-07)
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| PERF.WM1 | Home `/` private/no-store из raw articles fetch → ISR `unstable_cache` + drop unused venues/stats SSR | Критический | 🔄 deploy |
+| PERF.WM2 | Blog `[slug]` raw fetch → `getCachedBlogArticle` ISR | Высокий | 🔄 deploy |
+| PERF.WM3 | SSR healthcheck: false curl=28 on large `/` → skip if TTFB OK; max-time 12s | Критический | 🔄 deploy |
+| PERF.WM4 | Lean home HTML (~730KB) / optional VM upsizing | Средний | ⏳ owner |
+
 ## SEO soft-404 / HTTP 404 (2026-08-07)
 
 | ID | Задача | Приоритет | Статус |

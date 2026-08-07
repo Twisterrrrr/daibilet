@@ -4,11 +4,9 @@ import { notFound, permanentRedirect } from 'next/navigation';
 import { BlogArticleView } from '@/components/BlogArticleView';
 import '@/lib/env';
 import { buildBlogArticleJsonLd, buildBlogArticleMetadata } from '@/lib/blog-article-seo';
-import { mergeBlogCards, pickRelatedBlogCards, resolveStaticArticle, type BlogArticleDto } from '@/lib/blog-utils';
-import { fetchPublicApiJson } from '@/server/public-api-client';
+import { getCachedBlogArticle, getCachedBlogRelated } from '@/server/cached-blog-data';
 
 export const revalidate = 300;
-type BlogApiArticles = NonNullable<Parameters<typeof mergeBlogCards>[0]>;
 
 /** Старые slug → каноническая статья (объединения / переезды). */
 const BLOG_SLUG_REDIRECTS: Record<string, string> = {
@@ -28,41 +26,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (BLOG_SLUG_REDIRECTS[decoded]) {
     return { title: 'Переезд статьи' };
   }
-  const article = await loadArticle(decoded);
+  const article = await getCachedBlogArticle(decoded);
   if (!article) notFound();
 
   return buildBlogArticleMetadata(article);
-}
-
-async function loadArticle(slug: string) {
-  try {
-    const payload = await fetchPublicApiJson<{
-      article?: BlogArticleDto | null;
-      cmsOwned?: boolean;
-    }>(`/api/public/articles/${encodeURIComponent(slug)}`, {
-      timeoutMs: 3_000,
-      notFoundAsNull: true,
-    });
-    if (payload?.article) return payload.article;
-    // CMS owns this slug (draft/review/archive) - do not resurrect static fallback body.
-    if (payload?.cmsOwned) return null;
-  } catch {
-    // fallback below
-  }
-  return resolveStaticArticle(slug);
-}
-
-async function loadRelated(article: NonNullable<Awaited<ReturnType<typeof loadArticle>>>) {
-  let posts = mergeBlogCards(null);
-  try {
-    const payload = await fetchPublicApiJson<{ articles?: BlogApiArticles }>('/api/public/articles', {
-      timeoutMs: 3_000,
-    });
-    posts = mergeBlogCards(payload?.articles);
-  } catch {
-    // static fallback already in mergeBlogCards(null)
-  }
-  return pickRelatedBlogCards(article, posts, 5);
 }
 
 export default async function BlogArticlePage({ params }: PageProps) {
@@ -71,10 +38,10 @@ export default async function BlogArticlePage({ params }: PageProps) {
   const redirectTo = BLOG_SLUG_REDIRECTS[decoded];
   if (redirectTo) permanentRedirect(redirectTo);
 
-  const article = await loadArticle(decoded);
+  const article = await getCachedBlogArticle(decoded);
   if (!article) notFound();
 
-  const related = await loadRelated(article);
+  const related = await getCachedBlogRelated(article);
   const jsonLdBlocks = buildBlogArticleJsonLd(article);
 
   return (

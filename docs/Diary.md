@@ -1,3 +1,25 @@
+## 2026-08-07 - Webmaster «Долгий ответ сервера» (TTFB / home ISR)
+
+### Наблюдения
+- Yandex Webmaster: среднее время ответа страниц >3с.
+- Live warm TTFB (curl `time_starttransfer`, 2026-08-07): `/` ~0.20с, `/events` ~0.17с, `/cities/moscow` ~0.15с, `/cities/sankt-peterburg` ~0.21с, `/my-day` ~0.17с, `/venues` ~0.17с, `/blog` ~0.20с, blog slug ~0.20с. **Но** `/` total ~1.8-3.1с (HTML ~730KB), `Cache-Control: private, no-store`, nginx `X-Cache-Status: MISS`.
+- Хабы `/events` `/cities/*` `/my-day` `/blog` - `s-maxage` + `x-nextjs-cache: HIT/STALE`, nginx HIT.
+- MSK: web+API active, load ~0.75/4c, mem OK (~2.5/7.8Gi), next RSS ~0.9G, NRestarts=0. API `/api/health` ~2ms.
+- SSR health log: ложные SIGKILL при `TTFB=0.02-0.25` + `curl=28` (body timeout `--max-time 5` на тяжёлом `/`) → cold-start storms; journal: частые `home-venues` TimeoutError (venues fetch на home **не использовался** UI).
+- Soft-404 агент параллельно (loading.tsx) - не пересекались по nginx; blog `[slug]` ISR - наш слой поверх.
+
+### Решения
+- Home: убрать raw `fetchPublicApiJson` articles (`cache:no-store`) из RSC → `getHomeArticles` + `unstable_cache`; выкинуть мёртвые home venues/stats из `getHomePageData`.
+- Blog `[slug]`: `getCachedBlogArticle` / `getCachedBlogRelated` (тот же no-store → dynamic баг).
+- `ssr-healthcheck.sh`: `--max-time` 12с; SKIP recover если curl=28 при OK TTFB≤5с (не accept-loop hang).
+
+### Проблемы
+- HTML `/` ~730KB остаётся тяжёлым (owner/host follow-up: lean home DTO / gzip already; VM upgrade не срочен при load <1).
+- Prisma hero banners всё ещё в web-процессе (INC.504.15); warm-hub cron OFF.
+- API venues?limit=200 иногда ~5с под нагрузкой - отдельный backend perf, не блокер после снятия с home SSR.
+
+---
+
 ## 2026-08-07 - SEO soft-404 → HTTP 404 (Yandex Webmaster)
 
 ### Наблюдения

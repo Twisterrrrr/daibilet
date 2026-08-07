@@ -5,8 +5,6 @@ import type {
   PublicCatalogDto,
   PublicDestinationDto,
   PublicLandingDto,
-  PublicStatsDto,
-  PublicVenuesDto,
 } from '@daibilet/contracts/public';
 import { HOME_PAGE_CACHE_TAG, PUBLIC_PAGE_REVALIDATE } from '@/server/cache-config';
 import { resolveCoverContentFingerprints } from '@/server/cover-image-fingerprint';
@@ -23,9 +21,9 @@ type HomePageData = {
   destinationsPayload: { generatedAt?: string; destinations: PublicDestinationDto[] };
   catalogPayload: PublicCatalogDto;
   landingsCatalog: { generatedAt?: string; city?: string; items: PublicLandingDto[] };
-  venuesPayload: PublicVenuesDto;
-  statsPayload: PublicStatsDto;
 };
+
+type HomeArticlesPayload = { articles?: unknown };
 
 function emptyHomePageData(): HomePageData {
   const generatedAt = new Date().toISOString();
@@ -47,11 +45,6 @@ function emptyHomePageData(): HomePageData {
       },
     },
     landingsCatalog: { generatedAt, city: 'all', items: [] },
-    venuesPayload: { generatedAt, total: 0, venues: [] },
-    statsPayload: {
-      generatedAt,
-      stats: { events: 0, destinations: 0, venues: 0, landings: 0 },
-    },
   };
 }
 
@@ -100,40 +93,35 @@ export const getHomeLandings = unstable_cache(
   homeCacheOptions,
 );
 
-export const getHomeVenues = unstable_cache(
+/**
+ * Blog promo strip on home. Must stay inside unstable_cache: a raw
+ * fetchPublicApiJson (cache: 'no-store') in the RSC tree forces the whole `/`
+ * route to private/no-store and disables nginx ISR HIT for Yandex/crawlers.
+ */
+export const getHomeArticles = unstable_cache(
   () =>
-    fetchPublicApiJson<PublicVenuesDto>('/api/public/venues', {
-      searchParams: { family: 'institution', limit: 200 },
-      timeoutMs: 5_000,
+    fetchPublicApiJson<HomeArticlesPayload>('/api/public/articles', {
+      timeoutMs: 1_200,
     }),
-  ['home-venues-v3-http'],
+  ['home-articles-v1-http'],
   homeCacheOptions,
 );
 
-export const getHomeStats = unstable_cache(
-  () => fetchPublicApiJson<PublicStatsDto>('/api/public/stats', { timeoutMs: 3_000 }),
-  ['home-stats-v3-http'],
-  homeCacheOptions,
-);
-
-/** Partial failure (e.g. stats) must not wipe the whole home — use allSettled + empty fallbacks. */
+/** Partial failure must not wipe the whole home — use allSettled + empty fallbacks. */
 export async function getHomePageData(): Promise<HomePageData> {
   const empty = emptyHomePageData();
-  const [destinationsResult, catalogResult, landingsResult, venuesResult, statsResult] =
-    await Promise.allSettled([
-      getHomeDestinations(),
-      getHomeCatalog(),
-      getHomeLandings(),
-      getHomeVenues(),
-      getHomeStats(),
-    ]);
+  // Home UI only needs destinations + catalog + landings. Venues/stats were fetched
+  // but unused (and venues?limit=200 often hit 5s API timeouts under load).
+  const [destinationsResult, catalogResult, landingsResult] = await Promise.allSettled([
+    getHomeDestinations(),
+    getHomeCatalog(),
+    getHomeLandings(),
+  ]);
 
   return {
     destinationsPayload:
       destinationsResult.status === 'fulfilled' ? destinationsResult.value : empty.destinationsPayload,
     catalogPayload: catalogResult.status === 'fulfilled' ? catalogResult.value : empty.catalogPayload,
     landingsCatalog: landingsResult.status === 'fulfilled' ? landingsResult.value : empty.landingsCatalog,
-    venuesPayload: venuesResult.status === 'fulfilled' ? venuesResult.value : empty.venuesPayload,
-    statsPayload: statsResult.status === 'fulfilled' ? statsResult.value : empty.statsPayload,
   };
 }

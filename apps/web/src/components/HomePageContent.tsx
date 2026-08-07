@@ -20,9 +20,8 @@ import { resolveHomePromoImage } from '@/lib/home-scenarios';
 import { podborkiBentoCellClass, podborkiBentoSpan, PODBORKI_BENTO_GRID_CLASS } from '@/lib/podborki-bento';
 import { landingCategoryHref } from '@/lib/landing-routes';
 import { withSoftTimeout } from '@/lib/soft-timeout';
-import { getHomeCoverFingerprints, getHomePageData } from '@/server/cached-home-data';
+import { getHomeArticles, getHomeCoverFingerprints, getHomePageData } from '@/server/cached-home-data';
 import { getActiveHeroBanners, heroFramesFromBanners } from '@/server/hero-banners';
-import { fetchPublicApiJson } from '@/server/public-api-client';
 
 /** External CDN HEAD fingerprints must not stall home TTFB on bad egress/DNS. */
 const HOME_FINGERPRINTS_TIMEOUT_MS = 800;
@@ -31,7 +30,7 @@ const HOME_ARTICLES_TIMEOUT_MS = 1_200;
 type BlogApiArticles = NonNullable<Parameters<typeof mergeBlogCards>[0]>;
 
 async function HomePageBody() {
-  const [{ destinationsPayload, catalogPayload, landingsCatalog }, fingerprintsRecord] =
+  const [{ destinationsPayload, catalogPayload, landingsCatalog }, fingerprintsRecord, articlesPayload] =
     await Promise.all([
       getHomePageData(),
       withSoftTimeout(
@@ -39,6 +38,12 @@ async function HomePageBody() {
         HOME_FINGERPRINTS_TIMEOUT_MS,
         {},
         'home-cover-fingerprints',
+      ),
+      withSoftTimeout(
+        getHomeArticles(),
+        HOME_ARTICLES_TIMEOUT_MS,
+        null,
+        'home-articles',
       ),
     ]);
 
@@ -54,15 +59,9 @@ async function HomePageBody() {
   const sparseCatalog = sessions.length < 12;
 
   const promoLandings = (landingsCatalog?.items || []).filter((item) => item.events > 0).slice(0, 4);
-  let blogCards = mergeBlogCards(null);
-  try {
-    const articlesPayload = await fetchPublicApiJson<{ articles?: BlogApiArticles }>('/api/public/articles', {
-      timeoutMs: HOME_ARTICLES_TIMEOUT_MS,
-    });
-    blogCards = mergeBlogCards(articlesPayload?.articles);
-  } catch {
-    // fallback to static posts
-  }
+  const blogCards = mergeBlogCards(
+    (articlesPayload?.articles as BlogApiArticles | undefined) ?? null,
+  );
   const orderedBlog = blogCards.some((card) => card.publishedAt)
     ? blogCards
     : [...blogCards].reverse();

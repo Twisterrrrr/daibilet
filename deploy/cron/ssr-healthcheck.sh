@@ -44,10 +44,20 @@ if [[ ! -f "$PRERENDER_MANIFEST" ]]; then
   exit 0
 fi
 
+# Home HTML is ~700KB+. Under load full-body transfer can exceed --max-time while
+# TTFB stays healthy (0.05-0.4s) → curl=28 false hang → SIGKILL cold-start storm
+# (Yandex Webmaster "Долгий ответ сервера"). Only treat as hung when first byte is
+# late or the connection never starts (curl 7/28 with empty/zero TTFB).
+CURL_MAX_TIME="${DAIBILET_SSR_CURL_MAX_TIME:-12}"
 CODE=0
-TTFB="$(curl -o /dev/null -s -w '%{time_starttransfer}' --max-time 5 "$URL")" || CODE=$?
+TTFB="$(curl -o /dev/null -s -w '%{time_starttransfer}' --max-time "$CURL_MAX_TIME" "$URL")" || CODE=$?
 BAD=0
 if [ "$CODE" -ne 0 ]; then
+  if [ "$CODE" -eq 28 ] && [ -n "$TTFB" ] && command -v bc >/dev/null \
+    && (( $(echo "$TTFB > 0 && $TTFB <= $TTFB_LIMIT" | bc -l) )); then
+    log_msg "SKIP recover: body timeout after OK TTFB=${TTFB} curl=28 (not SSR hang; max-time=${CURL_MAX_TIME}s)"
+    exit 0
+  fi
   BAD=1
 elif command -v bc >/dev/null && [ -n "$TTFB" ] && (( $(echo "$TTFB > $TTFB_LIMIT" | bc -l) )); then
   BAD=1

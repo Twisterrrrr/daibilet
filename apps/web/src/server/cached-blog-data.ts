@@ -7,8 +7,11 @@ import type { BlogSidebarPromoDto } from '@/lib/blog-sidebar-promo';
 import {
   expandListingExcerpt,
   mergeBlogCards,
-  splitBlogListingHero,
+  pickRelatedBlogCards,
+  resolveStaticArticle,
+  type BlogArticleDto,
   type BlogCardDto,
+  splitBlogListingHero,
 } from '@/lib/blog-utils';
 import { BLOG_PAGE_CACHE_TAG, PUBLIC_PAGE_REVALIDATE } from '@/server/cache-config';
 import { fetchPublicApiJson } from '@/server/public-api-client';
@@ -21,6 +24,48 @@ const blogCacheOptions = {
 };
 
 type BlogApiArticles = NonNullable<Parameters<typeof mergeBlogCards>[0]>;
+
+async function loadBlogArticle(slug: string): Promise<BlogArticleDto | null> {
+  try {
+    const payload = await fetchPublicApiJson<{
+      article?: BlogArticleDto | null;
+      cmsOwned?: boolean;
+    }>(`/api/public/articles/${encodeURIComponent(slug)}`, {
+      timeoutMs: 3_000,
+      notFoundAsNull: true,
+    });
+    if (payload?.article) return payload.article;
+    // CMS owns this slug (draft/review/archive) - do not resurrect static fallback body.
+    if (payload?.cmsOwned) return null;
+  } catch {
+    // fallback below
+  }
+  return resolveStaticArticle(slug);
+}
+
+async function loadBlogRelated(article: BlogArticleDto): Promise<BlogCardDto[]> {
+  let posts = mergeBlogCards(null);
+  try {
+    const payload = await fetchPublicApiJson<{ articles?: BlogApiArticles }>('/api/public/articles', {
+      timeoutMs: 3_000,
+    });
+    posts = mergeBlogCards(payload?.articles);
+  } catch {
+    // static fallback already in mergeBlogCards(null)
+  }
+  return pickRelatedBlogCards(article, posts, 5);
+}
+
+/** Per-slug ISR entry so `/blog/[slug]` is not forced private/no-store by raw fetch. */
+export function getCachedBlogArticle(slug: string) {
+  const key = String(slug || '').trim();
+  return unstable_cache(() => loadBlogArticle(key), ['blog-article-v1-http', key], blogCacheOptions)();
+}
+
+export function getCachedBlogRelated(article: BlogArticleDto) {
+  const key = String(article.slug || '').trim();
+  return unstable_cache(() => loadBlogRelated(article), ['blog-related-v1-http', key], blogCacheOptions)();
+}
 
 function withListingExcerpts(posts: BlogCardDto[]): BlogCardDto[] {
   return posts.map((post) => ({
