@@ -615,7 +615,7 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 | INC.504.2 | nginx: прямой bypass `/images/*` static, без `/_next/image` для локальных файлов | Средний | ✅ |
 | INC.504.3 | Пересмотр daibilet-web MemoryMax/heap + OOMPolicy=continue (High 1.5G / Max 2G / heap 1280 на 7.8Gi) | Критический | done 2026-07-31 MSK live |
 | INC.504.4 | SWR catalog rebuild: non-blocking / async (не блокировать event loop 49-219с) | Критический | ✅ MSK live BUILD `GMlh5-uhf-R2iVlZbSFXY`: disk+child/cron+forever-SWR+reap |
-| INC.504.5 | Dual catalog SWR cache (`dto.js` + `public-catalog.dto.ts`) - merge/unify в F5.3b | Средний | ⏳ |
+| INC.504.5 | Dual catalog SWR cache (`dto.js` + `public-catalog.dto.ts`) - merge/unify (вынесено из F5.3b) | Средний | ⏳ |
 | INC.504.6 | nginx proxy_cache SWR: `background_update` + TTL 30m (browser clear ≠ cold Next) | Критический | ✅ |
 | INC.504.7 | City hub ISR: `unstable_cache` + `generateStaticParams` (было no-store / 20-30с) | Критический | ✅ |
 | INC.504.8 | Cron warm-hub: flock + timeout 90s + per-fetch 15s (anti pile-up) | Критический | done 2026-07-31 MSK live |
@@ -1127,7 +1127,7 @@ Owner-locked порядок: Hero → Советы → Расписание → 
 ## Решение владельца (2026-07-23; lock 2026-07-25)
 
 - **F4 admin → Next** - ✅ **done (F4.6)**; Vite `/legacy` hard-retired. Канон: Next admin на `admin.daibilet.ru`.
-- Launch-фокус: качество landing matching + актуальность событий; dual-edit `dto.js` + `landing-rules.ts` до F5 (без codegen).
+- Launch-фокус: качество landing matching + актуальность событий; landing rules SoT = `landing-rules.ts` (F5.2 ✅; dual-edit снят).
 - Finance contour / ЛК поставщиков отложен: продукт ещё не готов. Изменения Codex finance не трогаем.
 - Blog anti-spam LOCK: хаос-темп гидов при 80–90% index; 1 пн-колонка/нед; Pack B = новый угол, не rewrite 9 longforms.
 - SEO LOCK: TOP-15 editorial focus без URL churn; `MIN_LISTING=6`; CHPU density; телефон только после 8-800.
@@ -1606,7 +1606,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | F5.1 | Public helpers + catalog datetime/subcategories из TS; grouping в dto (bridge) | Высокий | ✅ 2026-07-30 |
 | F5.2 | Landing match single source (`landing-rules.ts`); dto без дубля rules | Высокий | ✅ 2026-07-30 |
 | F5.3a | Catalog grouping + city destination helpers в TS (`public-catalog-grouping`, `public-destination`) | Высокий | ✅ 2026-07-30 |
-| F5.3b | Venue pages + `publicVenueHubRows` + server.js admin (bridge dto.js) | Средний | ⏳ |
+| F5.3b | Venue pages + `publicVenueHubRows` → `public-venue-read.js`; next path без dto.js; server.js retire **не** в scope | Средний | ✅ 2026-08-07 |
 
 ---
 
@@ -1634,6 +1634,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | Дата | Изменение |
 |------|-----------|
+| 2026-08-07 | **F5.3b ✅** - `public-venue-read.js`; next city/venue/search без dto.js; server.js retire out of scope; dual-edit landing-rules docs cleared |
 | 2026-08-07 | **MIG.9.7 ✅** - owner: Intelligent Hoopoe `.16` «труп»; refs убраны из активных docs/scripts; MSK-only; Teplohod allowlist = `.184`; wipe VM в Timeweb = owner |
 | 2026-08-02 | INC.504.22 live MSK: PR #3 merge `f93b770`, BUILD `3zmDWHpY7rXAJgqu0-pnR`; public SSR via backend HTTP; web:build requires daibilet-api; root still INC.504.15 |
 | 2026-08-02 | INC.504.21: SSR hang again (0B TTFB ~07:19 UTC); SIGKILL+start; healthcheck silent - script 644 not executable; chmod 755 + cron `/bin/bash` invoke; warm still OFF |

@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { buildPublicVenuePage, buildPublicVenuesCatalog } from './dto.js';
+import { buildPublicVenuePage, buildPublicVenuesCatalog } from './public-venue-read.js';
 import { createDb } from './db.js';
 import type {
   PublicVenueDto,

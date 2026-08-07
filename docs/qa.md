@@ -146,7 +146,7 @@ Owner: основная работа локально / preview; агенты **
 
 1. **Отдельный `admin.` vhost Next до полного port UI:** ✅ **ЗАКРЫТО / superseded (F4.6).** Решение 2026-07-23: early vhost **не нужен**; Vite был каноном до cutover; Next shell (F4.1) - только при критической массе UI. Сейчас канон - Next admin only. Finance / ЛК поставщиков отложены (P.3).
 2. **F4.1 env:** ✅ **ЗАКРЫТО.** Явный `DAIBILET_ADMIN_API_URL=http://127.0.0.1:4000` в systemd/docker unit admin - **не** shared env `daibilet-web`. См. [phase-f4-admin-cutover.md](./phases/phase-f4-admin-cutover.md).
-3. **Rules single-source codegen:** ✅ **ЗАКРЫТО.** **Не** до F5. Регламент: ручной dual-update `dto.js` + `landing-rules.ts`.
+3. **Rules single-source codegen:** ✅ **ЗАКРЫТО (F5.2).** SoT = `landing-rules.ts`; dto.js импортирует rules/matchers. Codegen не нужен. Dual-edit снят.
 4. **Scheduled listing garbage audit:** ✅ **ЗАКРЫТО = ДА.** Код: `pnpm audit:listings` (SEO.20) - saleable public events, stop-words + Telegram. Cron `0 4 * * *` на prod - **⏳ owner** (нужны `TELEGRAM_BOT_TOKEN`/`TELEGRAM_CHAT_ID`). Soft: `скидк*` нет; CAPS только shout-title (≥70% upper); HTML-теги только в title. `LandingMatch` PINNED/EXCLUDED не заменяет пересчёт automatic rows.
 
 ## 2026-07-23 - SEO-листинги, решения владельца — ЗАКРЫТО (lock 2026-07-25)

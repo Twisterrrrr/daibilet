@@ -140,7 +140,7 @@ packages/contracts — Zod/types, catalog constants
 packages/config   — shared tsconfig/eslint
 ```
 
-**Read path:** `@daibilet/backend/public-read` → `public-*.dto.ts` (+ lean catalog list-item). Landing page DTO использует legacy `dto.js` как источник данных и правил. `apps/backend/src/landing-rules.ts` должен оставаться синхронен с `dto.js` до F5.
+**Read path:** `@daibilet/backend/public-read` → `public-*.dto.ts` (+ lean catalog list-item). Landing match SoT: `landing-rules.ts` (dto.js только импортирует). Venue hub/page/catalog SoT: `public-venue-read.js` (dto.js re-export для legacy `server.js`).
 
 **Write/sync path:** legacy `server.js` / sync scripts; после sync — `invalidatePublicCaches({ warm: true })` + Next revalidate.
 
@@ -261,7 +261,7 @@ Cherry-pick из **`codex/phase2-foundation`**: schema, event change requests, a
 | F2 Public SSR | ✅ | View Source без JS, parity scripts |
 | F3 Cutover | ✅ | nginx → Next prod (`:3001`) |
 | F4 Admin + worker | ✅ | Next admin ops; Vite `/legacy` hard-retired |
-| F5 Retire dto.js | ⏳ | parity 100%, server.js removed |
+| F5 Retire dto.js | 🔄 | F5.3b ✅ venue-read TS path; full delete dto.js / server.js = F5.3c+ |
 
 Детали: [phases/phase-f-next-fullstack.md](./phases/phase-f-next-fullstack.md), F3: [phases/phase-f3-cutover-checklist.md](./phases/phase-f3-cutover-checklist.md).
 

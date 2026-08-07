@@ -1,3 +1,24 @@
+## 2026-08-07 - F5.3b closed: public-venue-read
+
+### Наблюдения
+- F5.3b висел: Diary 2026-07-30 заявлял `public-venue-read.ts`, но файл в git не попал; `public-city.dto` / `public-venue.dto` снова тянули builders из `dto.js`.
+- Exit F5.3b ошибочно включал retire `server.js`; owner: полный parity venue hub + снять server.js как цель.
+- Stale docs ещё писали dual-edit `dto.js` + `landing-rules.ts` (F5.2 уже SoT = landing-rules).
+
+### Решения
+- `apps/backend/src/public-venue-read.js`: hub/page/catalog/resolve/published/merge + kind/gate helpers; cache clear/warm.
+- Next path: `public-city.dto` / `public-venue.dto` / `public-search.dto` → `./public-venue-read.js` (не dto.js).
+- `buildPublicVenuePage`: lazy `getPublicCatalogSessions()` из `public-catalog.dto`.
+- `dto.js` re-export для legacy `server.js` / warm; `clearPublicDataCaches` → `clearPublicVenueReadCache()`.
+- Тесты: `public-venue-read.test.ts` + `public-city-venues` (17 pass). Docs: Tasktracker F5.3b ✅; f5-retire-dto-map; Project/qa dual-edit сняты.
+- Scope: admin venue routes / delete server.js → F5.3c+; INC.504.5 dual catalog SWR отдельно.
+
+### Проблемы
+- Thin util copies (`publicCitySlug` и city routing) ещё в dto.js и venue-read - не business dual-edit rules.
+- Live MSK нужен deploy (API + web бандл), иначе prod остаётся на старом dto-path.
+
+---
+
 ## 2026-08-07 - Москва hub Phase C draft (MS.TIER4)
 
 ### Наблюдения

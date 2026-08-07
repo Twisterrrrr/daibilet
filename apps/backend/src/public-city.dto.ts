@@ -6,7 +6,7 @@ import {
   resolvePublicVenuesForSessions,
   publicPublishedVenuesByCityId,
   mergeCityPageVenues,
-} from './dto.js';
+} from './public-venue-read.js';
 import {
   buildCityHubSeoTitle,
   buildPublicDestinationRowsFromSessions,

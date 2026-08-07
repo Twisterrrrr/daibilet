@@ -1,5 +1,5 @@
 import { prisma } from '@daibilet/db';
-import { publicVenueSlug } from './dto.js';
+import { publicVenueSlug } from './public-venue-read.js';
 import { expandSearchQuery } from './search-synonyms.js';
 
 const LANDING_CATEGORY_PATH: Record<string, string> = {
