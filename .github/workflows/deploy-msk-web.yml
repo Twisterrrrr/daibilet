@@ -16,9 +16,9 @@ on:
   workflow_dispatch:
     inputs:
       ref:
-        description: "Git ref to deploy (branch or SHA). Empty = workflow ref."
+        description: "Git ref to deploy (branch or SHA). Default: feat/next-monorepo (MVP monorepo with pnpm-lock.yaml)."
         required: false
-        default: ""
+        default: "feat/next-monorepo"
       skip_swap:
         description: "Build artifact only (skip SSH swap)"
         type: boolean
@@ -36,7 +36,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.ref || github.sha }}
+          ref: ${{ inputs.ref || 'feat/next-monorepo' }}
 
       - name: Resolve deploy SHA
         id: meta
