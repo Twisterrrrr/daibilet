@@ -80,7 +80,7 @@
 | UX.BUY-10h | Ticket map scroll parity: drop sticky, pageScrollFriendly Leaflet (no wheel steal) | Высокий | ✅ `c1d40e2f` |
 | UX.BUY-11 | Best-effort buyer email (SMTP_* on web; else save-code copy) | Высокий | ✅ (MSK SMTP unset → `smtp_not_configured` + UI copy) |
 | UX.BUY-12 | YooKassa return → catalog result/ticket (`?order=`); localStorage recovery | Высокий | ✅ catalog; finance must set return_url |
-| UX.BUY-13 | Account purchases: compact list + in-place download (`?print=1` / Save as PDF) + secondary open ticket | Высокий | 🔄 shipping |
+| UX.BUY-13 | Account purchases: compact list + in-place download (`?print=1` / Save as PDF) + secondary open ticket | Высокий | ✅ `60a783b4` MSK **BUILD_ID=`lr_2kHu4E71Ae91U5LXfw`** |
 
 ---
 

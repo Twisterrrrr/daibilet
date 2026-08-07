@@ -27,6 +27,7 @@
 - Primary: «Скачать» → `openBuyerTicketDownload` → `/checkout/ticket/{code}?print=1` (новая вкладка, auto `window.print` / Save as PDF).
 - Secondary: «Открыть» → страница билета с картой.
 - Кнопка на карточке билета: «Скачать / распечатать».
+- Ship: `60a783b4` · MSK **BUILD_ID=`lr_2kHu4E71Ae91U5LXfw`** · `/account/purchases` + demo ticket HTTP 200.
 
 ### Проблемы
 - Настоящий server-side PDF ещё нет; UX опирается на print dialog браузера.
@@ -41,6 +42,7 @@
 ### Решения
 - Убран `lg:sticky` / `max-h` у map panel - обе колонки скроллятся вместе со страницей.
 - `OsmMapEmbed` `pageScrollFriendly`: wheel zoom off; drag/touch unlock после клика; `touch-action: pan-y` пока locked.
+- Ship: `c1d40e2f` · live tip `60a783b4` · **BUILD_ID=`lr_2kHu4E71Ae91U5LXfw`** · demo HTTP 200.
 
 ### Проблемы
 - Нет.
