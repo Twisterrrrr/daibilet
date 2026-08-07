@@ -8,6 +8,7 @@
 - `BuyerTicketCard` пересобран под mockup: header (тип + № билета) → main (дата primary / событие / площадка / адрес + QR, `order-first` на mobile) → details (посетитель, состав × qty, итого, код заказа secondary, покупка, support если есть) → warning (15-20 мин + не светить QR) → Print + Copy code.
 - Helpers: `formatBuyerTicketWhen`, `formatTicketLineItemsCompact`.
 - Demo `/checkout/ticket/demo` без изменений API - та же fixture.
+- Ship: `85c8dfd4` · MSK **BUILD_ID=`ct1lgVvvXSEKIIe1GmofQ`** · demo HTTP 200.
 
 ### Проблемы
 - Реальные заказы по-прежнему sparse без полного finance DTO.
