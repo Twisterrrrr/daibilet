@@ -42,8 +42,8 @@ function internalToBuyerOrder(row: BuyerInternalOrderRecord): BuyerOrder {
     ticketCount: 1,
     message:
       row.mode === 'STUB'
-        ? 'Тестовый заказ (STUB). Письмо и PDF подключает finance отдельно.'
-        : null,
+        ? 'Тестовый заказ (STUB). Откройте билет по кнопке - письмо уходит только если настроен SMTP каталога.'
+        : 'Внутренний заказ Дайбилет. Откройте билет по коду или из письма со ссылкой.',
     tickets: [
       {
         id: `internal-ticket:${row.publicCode}`,
@@ -153,8 +153,8 @@ export function AccountPurchasesPageView() {
               </div>
               <h1 className="mt-4 text-4xl font-extrabold sm:text-5xl">Мои покупки</h1>
               <p className="mt-4 max-w-3xl text-base leading-7 text-primary-50/88">
-                Заказы на email {user?.email}: виджеты Ticketscloud / Teplohod и внутренние заказы Дайбилет (код заказа
-                и статус).
+                Заказы на email {user?.email}: внутренние билеты Дайбилет (код, статус, ссылка на билет) и покупки через
+                виджеты Ticketscloud / Teplohod.
               </p>
             </div>
             <button

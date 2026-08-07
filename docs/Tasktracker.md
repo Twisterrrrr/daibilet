@@ -33,17 +33,22 @@
 - **Path B (FUTURE, allowed):** complex internal calc UI when pricing needs it - scaffold `/checkout/calc`; не подключать museum CTA сюда.
 - Cursor/Codex parallel = thin redirect + result + account (не heavy form для музеев).
 
+**CLOSED 2026-08-07 (owner: без Codex):** buyer-visible ticket fulfillment UX на catalog - ticket card, «Мои покупки», best-effort mail, return wiring. Wide CTA out.
+
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
 | UX.BUY-1 | Path A: thin admission → YooKassa redirect (`/checkout/admissions/[slug]` + actions) | Критический | ✅ thin `7e3eeb1d` |
-| UX.BUY-2 | Result / thank-you `/checkout/result?order=publicCode` | Критический | ✅ |
-| UX.BUY-3 | Account purchases: internal (publicCode/status/title) + widget ExternalOrder | Высокий | ✅ |
+| UX.BUY-2 | Result / thank-you `/checkout/result?order=publicCode` + ticket card | Критический | ✅ ticket UX |
+| UX.BUY-3 | Account purchases: internal (publicCode/status/title + link to ticket) + widget ExternalOrder | Высокий | ✅ |
 | UX.BUY-4 | URL canon: Path A vs Path B + pay parallel | Высокий | ✅ |
-| UX.BUY-5 | Codex: public admission create-payment → confirmationUrl (+ return `?order=`) | Критический | ⏳ Codex |
-| UX.BUY-6 | Codex: m2m / public purchases-by-email для fan-in в account | Высокий | ⏳ Codex |
+| UX.BUY-5 | Codex: public admission create-payment → confirmationUrl (+ return `?order=`) | Критический | ⏳ finance handoff (return_url) |
+| UX.BUY-6 | Codex: m2m / public purchases-by-email для fan-in в account | Высокий | ⏳ Codex / soft localStorage+soft API |
 | UX.BUY-7 | Path A polish: offer qty>1, phone, resume unpaid confirmationUrl | Средний | ⏳ thin only |
 | UX.BUY-8 | Path B complex calc (cart/multi-offer) — future internal pricing; не museum | Низкий | ⚠️ deferred (allowed later) |
 | UX.BUY-9 | Path B scaffold `/checkout/calc` (placeholder; wire later) | Низкий | ✅ `7e3eeb1d` |
+| UX.BUY-10 | Ticket page `/checkout/ticket/{publicCode}` (HTML ticket + print + QR) | Критический | ✅ catalog closed without Codex |
+| UX.BUY-11 | Best-effort buyer email (SMTP_* on web; else save-code copy) | Высокий | ✅ (MSK SMTP unset → skip + UI copy) |
+| UX.BUY-12 | YooKassa return → catalog result/ticket (`?order=`); localStorage recovery | Высокий | ✅ catalog; finance must set return_url |
 
 ---
 

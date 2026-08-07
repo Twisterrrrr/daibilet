@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 
+import { buyerTicketAbsoluteUrl } from '@/lib/buyer-ticket';
 import { submitAdmissionCheckout } from '@/server/finance-checkout-client';
+import { sendBuyerTicketEmail, isBuyerTicketSmtpConfigured } from '@/server/buyer-ticket-mail';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -32,6 +34,10 @@ export async function POST(request: Request) {
     'https://daibilet.ru'
   ).replace(/\/$/, '');
 
+  // Canon return for YooKassa: finance must append ?order={publicCode} when creating payment.
+  // Base without code is intentional - publicCode is assigned on finance at create time.
+  const returnUrl = body.returnUrl || `${siteUrl}/checkout/result`;
+
   const result = await submitAdmissionCheckout({
     admissionProductSlug: String(body.admissionProductSlug || ''),
     admissionOfferId: String(body.admissionOfferId || ''),
@@ -41,7 +47,7 @@ export async function POST(request: Request) {
       name: body.buyer?.name ?? null,
       phone: body.buyer?.phone ?? null,
     },
-    returnUrl: body.returnUrl || `${siteUrl}/checkout/result`,
+    returnUrl,
     mode: body.mode,
   });
 
@@ -57,6 +63,31 @@ export async function POST(request: Request) {
     );
   }
 
+  const ticketUrl = buyerTicketAbsoluteUrl(result.publicCode, siteUrl);
+  // Preferred return after pay: catalog ticket/result with publicCode (finance-owned append).
+  const catalogReturnWithOrder = `${siteUrl}/checkout/result?order=${encodeURIComponent(result.publicCode)}`;
+
+  let emailSent = false;
+  let emailReason: string | null = null;
+
+  // Notify immediately for confirmed stub / already-paid; YooKassa PENDING waits for webhook (finance)
+  // but we still try a "pending ticket link" mail so buyer has the code.
+  const buyerEmail = result.order.email || String(body.buyer?.email || '');
+  if (buyerEmail.includes('@')) {
+    const mail = await sendBuyerTicketEmail({
+      to: buyerEmail,
+      publicCode: result.publicCode,
+      title: result.order.title,
+      ticketUrl,
+      amountRub: result.order.amountRub,
+      mode: result.mode,
+    });
+    emailSent = mail.sent;
+    emailReason = mail.reason || null;
+  } else {
+    emailReason = 'email_missing';
+  }
+
   return NextResponse.json(
     {
       ok: true,
@@ -65,6 +96,13 @@ export async function POST(request: Request) {
       status: result.status,
       confirmationUrl: result.confirmationUrl,
       order: result.order,
+      ticketUrl,
+      catalogReturnWithOrder,
+      emailSent,
+      emailReason,
+      emailConfigured: isBuyerTicketSmtpConfigured(),
+      // Handoff note for finance: set YooKassa return_url to catalogReturnWithOrder (not supplier SPA).
+      returnUrlHint: catalogReturnWithOrder,
     },
     { status: 201 },
   );

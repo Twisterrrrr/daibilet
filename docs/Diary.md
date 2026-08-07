@@ -80,6 +80,31 @@
 
 ---
 
+## 2026-08-07 - Buyer ticket fulfillment UX closed without Codex
+
+### Наблюдения
+- Owner: закрыть buyer ticket fulfillment (как выглядит билет, куда уходит, ЛК) на Cursor/catalog, не ждать Codex на `.159`.
+- YooKassa sandbox pay уже даёт CONFIRMED (пример publicCode 4476287); Path A thin checkout на catalog есть.
+- На MSK `/opt/daibilet/.env` **нет** `SMTP_*` - письмо покупателю сейчас skip.
+- Finance order-by-code / purchases-by-email public API по-прежнему soft/empty - account опирается на localStorage + soft fan-in.
+
+### Решения
+- URL canon ticket:
+  - thank-you `/checkout/result?order={publicCode}` (карточка билета + print/QR/copy)
+  - dedicated `/checkout/ticket/{publicCode}`
+  - account `/account/purchases` → кнопка «Открыть билет»
+- BFF: `POST /checkout/actions/notify-ticket` (SMTP graceful); admission возвращает `ticketUrl`, `catalogReturnWithOrder`, `emailSent`.
+- Return wiring: catalog передаёт base `…/checkout/result`; после create знает `catalogReturnWithOrder=…?order={code}`. **Finance handoff:** YooKassa `return_url` = этот URL (не supplier SPA). Пока return без `?order=` - recovery из localStorage на result.
+- Email: если появятся `SMTP_HOST`+`SMTP_FROM` на web process + nodemailer - письмо со ссылкой; иначе UI «сохраните код / ссылку».
+- Wide CTA не трогали. Secrets / `.159` не трогали.
+
+### Проблемы
+- PDF attach / webhook PENDING→CONFIRMED notify = finance-only (остаётся Codex/`.159`).
+- Стабильный purchases-by-email без localStorage = UX.BUY-6 (Codex).
+- QR картинка через api.qrserver.com (MVP); код заказа всегда на карточке для печати offline.
+
+---
+
 ## 2026-08-07 - Buyer UX MVP on daibilet.ru (Cursor catalog track)
 
 ### Наблюдения

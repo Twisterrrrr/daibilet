@@ -6,6 +6,7 @@ import { Loader2 } from 'lucide-react';
 import { useMemo, useState, type FormEvent } from 'react';
 
 import { upsertInternalOrderInStorage } from '@/lib/buyer-checkout';
+import { buyerResultPath } from '@/lib/buyer-ticket';
 import { formatNumber } from '@/lib/format';
 import type { FinanceAdmissionProduct } from '@/lib/finance-projection';
 import { useUserAuth } from '@/hooks/useUserAuth';
@@ -20,6 +21,10 @@ type CheckoutApiOk = {
   publicCode: string;
   status: string;
   confirmationUrl: string | null;
+  ticketUrl?: string;
+  catalogReturnWithOrder?: string;
+  emailSent?: boolean;
+  emailReason?: string | null;
   order: {
     publicCode: string;
     status: string;
@@ -79,6 +84,7 @@ export function AdmissionCheckoutForm({ product }: Props) {
           admissionOfferId: defaultOffer.id,
           quantity: 1,
           buyer: { email: trimmedEmail },
+          // Finance should append ?order={publicCode} to this base when creating YooKassa payment.
           returnUrl: `${window.location.origin}/checkout/result`,
           // Prefer YooKassa confirmationUrl; stub only if finance admits no yookassa path yet.
           mode: 'auto',
@@ -103,14 +109,24 @@ export function AdmissionCheckoutForm({ product }: Props) {
         source: 'internal',
       });
 
+      if (payload.emailSent) {
+        try {
+          window.sessionStorage.setItem(`daibilet.ticketMailSent.${payload.publicCode}`, '1');
+        } catch {
+          // ignore
+        }
+      }
+
       if (payload.confirmationUrl) {
+        // After pay, buyer should land on catalog result/ticket (finance return_url handoff).
+        // localStorage keeps publicCode if return URL still lacks ?order=.
         window.location.href = payload.confirmationUrl;
         return;
       }
 
-      // Soft path while Codex finishes public admission→YooKassa: show result with publicCode.
+      // Confirmed without redirect (STUB): thank-you + ticket card.
       router.push(
-        `/checkout/result?order=${encodeURIComponent(payload.publicCode)}&mode=${encodeURIComponent(payload.mode)}`,
+        `${buyerResultPath(payload.publicCode, payload.mode)}`,
       );
     } catch {
       setError('Сеть недоступна. Проверьте соединение и попробуйте снова.');
