@@ -38,6 +38,22 @@ jobs:
   validate-build-test:
     if: ${{ (github.event_name == 'workflow_dispatch' && inputs.suite == 'all') || github.event_name == 'pull_request' || github.ref_name == 'integrate/mvp-launch' || github.ref_name == 'feat/next-monorepo' || github.ref_name == 'main' || github.ref_name == 'master' }}
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://daibilet:daibilet@127.0.0.1:5437/daibilet
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: daibilet
+          POSTGRES_PASSWORD: daibilet
+          POSTGRES_DB: daibilet
+        ports:
+          - 5437:5432
+        options: >-
+          --health-cmd "pg_isready -U daibilet -d daibilet"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v4
 
@@ -58,6 +74,7 @@ jobs:
         run: |
           pnpm db:validate
           pnpm db:generate
+          pnpm db:deploy
           pnpm db:typecheck
 
       - name: Backend typecheck and unit tests
@@ -88,6 +105,22 @@ jobs:
   finance-supplier-check:
     if: ${{ (github.event_name == 'workflow_dispatch' && (inputs.suite == 'all' || inputs.suite == 'finance')) || startsWith(github.ref_name, 'codex/') || startsWith(github.ref_name, 'cursor/') || startsWith(github.ref_name, 'feat/') || startsWith(github.head_ref, 'codex/') || startsWith(github.head_ref, 'cursor/') || startsWith(github.head_ref, 'feat/') }}
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://daibilet:daibilet@127.0.0.1:5437/daibilet
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: daibilet
+          POSTGRES_PASSWORD: daibilet
+          POSTGRES_DB: daibilet
+        ports:
+          - 5437:5432
+        options: >-
+          --health-cmd "pg_isready -U daibilet -d daibilet"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v4
 
@@ -107,6 +140,7 @@ jobs:
         run: |
           pnpm db:validate
           pnpm db:generate
+          pnpm db:deploy
           pnpm db:typecheck
 
       - name: Finance contracts and backend
