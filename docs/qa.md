@@ -77,14 +77,15 @@ Owner: основная работа локально / preview; агенты **
 2. **`finance-api.daibilet.ru`:** ✅ отдельный hostname для API/projection/webhooks (DNS+TLS). Path на `pay` не обязателен.
 3. **`supplier.daibilet.ru`:** ✅ DNS + TLS (вместе с `pay` / `finance-api`). Alias partners/cabinet не нужен.
 4. **YooKassa webhook URL:** ✅ **LOCKED 2026-07-31 (Codex).** Canon: `https://finance-api.daibilet.ru/api/checkout/yookassa/webhook`. Dual-webhook 3-7d **только** если были живые платежи/вебхуки на старом endpoint; иначе skip.
-4b. **Buyer checkout URL canon (2026-08-07):** два параллельных трека, без force-merge.
-   - **Catalog / Cursor (shipped MVP):** `daibilet.ru/checkout/admissions/{slug}`, result `daibilet.ru/checkout/result?order={publicCode}`, account `daibilet.ru/account/purchases`.
-   - **Codex experiment:** buyer UI на `pay.daibilet.ru` (`.159`). Supplier LC на pay не ломать.
-   - Return URL для ЮKassa: пока выставлять под активный buyer surface (catalog MVP или pay experiment); webhook остаётся на `finance-api`.
+4b. **Buyer checkout URL canon (2026-08-07):** два параллельных host-трека + Path A/B product, без force-merge.
+   - **Catalog / Cursor Path A:** `daibilet.ru/checkout/admissions/{slug}`, result `…/checkout/result?order={publicCode}`, account `…/account/purchases`.
+   - **Catalog Path B (future calc):** scaffold `daibilet.ru/checkout/calc` - не для museum CTA.
+   - **Codex experiment:** thin buyer UI на `pay.daibilet.ru` (`.159`). Supplier LC на pay не ломать.
+   - Return URL для ЮKassa: активный buyer surface (catalog Path A или pay); webhook на `finance-api`.
 4c. **Buyer checkout — два пути LOCKED 2026-08-07 (owner):**
-   1. **Простой музей / direct ticket pay:** только `create-payment` → redirect YooKassa (`confirmationUrl`). **Без** complex checkout UI.
-   2. **Complex calc checkout UI:** можно строить **на будущее**, когда появится внутренний сложный pricing (корзина / multi-offer / custom calc). **Не** подключать к simple museum flow.
-   Thin entry + result + account остаются на redirect-пути. STUB = admin/dev; webhook на `finance-api` без изменений.
+   1. **Path A / простой музей:** только `create-payment` → redirect YooKassa (`confirmationUrl`). **Без** complex checkout UI.
+   2. **Path B / complex calc:** можно строить **на будущее**, когда появится внутренний сложный pricing (корзина / multi-offer / custom calc). **Не** подключать к simple museum flow.
+   Thin entry + result + account остаются на Path A. STUB = soft-fallback/admin-dev; webhook на `finance-api` без изменений.
 5. **Webhook registration (2026-08-07):** API register → 401 auth type (webhook-mgmt недоступен для текущих credentials) - обход: **ручная регистрация в кабинете**. Owner ✅ URL = canon `https://finance-api.daibilet.ru/api/checkout/yookassa/webhook` (events succeeded / waiting_for_capture / canceled; ранее ошибочно было `pay.daibilet.ru`). FIN.LC3 ✅; MIG.9.5 / FIN.W1 cabinet ✅; next ⏳ e2e sandbox PENDING→SUCCEEDED.
 
 ### Owner minimum (обновлено 2026-08-07)

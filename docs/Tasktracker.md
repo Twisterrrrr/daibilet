@@ -35,15 +35,15 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| UX.BUY-1 | Path A: thin admission → YooKassa redirect (`/checkout/admissions/[slug]` + actions) | Критический | ✅ `98b02aa9` MSK **BUILD_ID=`yLJ-Q_y3Eo-p8_NM0luGe`** |
+| UX.BUY-1 | Path A: thin admission → YooKassa redirect (`/checkout/admissions/[slug]` + actions) | Критический | ✅ thin `7e3eeb1d` |
 | UX.BUY-2 | Result / thank-you `/checkout/result?order=publicCode` | Критический | ✅ |
 | UX.BUY-3 | Account purchases: internal (publicCode/status/title) + widget ExternalOrder | Высокий | ✅ |
 | UX.BUY-4 | URL canon: Path A vs Path B + pay parallel | Высокий | ✅ |
 | UX.BUY-5 | Codex: public admission create-payment → confirmationUrl (+ return `?order=`) | Критический | ⏳ Codex |
 | UX.BUY-6 | Codex: m2m / public purchases-by-email для fan-in в account | Высокий | ⏳ Codex |
 | UX.BUY-7 | Path A polish: offer qty>1, phone, resume unpaid confirmationUrl | Средний | ⏳ thin only |
-| UX.BUY-8 | Path B complex calc (cart/multi-offer) — future internal pricing; не museum | Низкий | ⚠️ future OK, not museum (LOCKED 2026-08-07) |
-| UX.BUY-9 | Path B scaffold `/checkout/calc` (placeholder; wire later) | Низкий | ⚠️ optional scaffold |
+| UX.BUY-8 | Path B complex calc (cart/multi-offer) — future internal pricing; не museum | Низкий | ⚠️ deferred (allowed later) |
+| UX.BUY-9 | Path B scaffold `/checkout/calc` (placeholder; wire later) | Низкий | ✅ `7e3eeb1d` |
 
 ---
 
