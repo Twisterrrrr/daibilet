@@ -9,6 +9,7 @@ const SITE_URL = (
 const CRAWL_DISALLOW = [
   '/api/',
   '/account/',
+  '/checkout/',
   '/login',
   '/admin/',
   '/reviews/write',
@@ -21,7 +22,7 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: '*',
         allow: '/',
         // /admin on daibilet.ru; admin.daibilet.ru is also Basic Auth + noindex layout.
-        // Checkout success is external (partner iframe); account purchases covered by /account/.
+        // Buyer checkout/result + account are private flows; widget checkout stays on partner hosts.
         disallow: [...CRAWL_DISALLOW],
       },
       // Explicit allow for major crawlers (do not block Googlebot / Yandex site-wide)

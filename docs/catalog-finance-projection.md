@@ -22,7 +22,10 @@
 **Оплата:**
 
 - Импортные provider-события → виджет TC/TEP (как сейчас). **Не** YooKassa.
-- AdmissionProduct / DAIBILET_MANAGED PLATFORM → Daibilet checkout на finance (`pay.daibilet.ru`; ранее предлагался alias `checkout.daibilet.ru`).
+- AdmissionProduct / DAIBILET_MANAGED PLATFORM → Daibilet checkout.
+  - **Catalog / Cursor UX track (shipped):** `daibilet.ru/checkout/admissions/{slug}` → result `daibilet.ru/checkout/result?order={publicCode}` → account `daibilet.ru/account/purchases`.
+  - **Codex parallel experiment:** buyer routes on `pay.daibilet.ru` (`.159`) - не force-merge с catalog track.
+  - Alias `checkout.daibilet.ru` не обязателен.
 
 ---
 
@@ -234,7 +237,8 @@ Venue page может иметь admission **независимо** от афи�
 | Flag off until egress | `DAIBILET_YOOKASSA_CHECKOUT=0` | ✅ **kept 0** - egress FAIL 2026-07-31 |
 | Shop credentials | `YOOKASSA_SHOP_ID`, `YOOKASSA_SECRET_KEY` | ✅ `SHOP_ID=1424801`; `SECRET_KEY=<set>` (Cursor merge 2026-07-31; never in chat/git) |
 | Return base (interim) | `YOOKASSA_RETURN_BASE_URL` | ✅ `https://supplier.daibilet.ru` (interim) |
-| Return / thank-you (canon) | `pay.daibilet.ru/checkout/result?order=publicCode` | ⏳ Codex finance-side |
+| Return / thank-you (catalog Cursor) | `daibilet.ru/checkout/result?order=publicCode` | ✅ MVP 2026-08-07 |
+| Return / thank-you (Codex pay experiment) | `pay.daibilet.ru/checkout/result?order=publicCode` | 🔄 parallel |
 | Webhook verify flag | `DAIBILET_YOOKASSA_VERIFY_WEBHOOK` | ✅ `=0` until verify ready (ETA 1-2d after egress) |
 | Webhook canon URL | `https://finance-api.daibilet.ru/api/checkout/yookassa/webhook` | 🔒 locked; register in ЮKassa after smoke |
 | Dual-webhook old endpoint | 3-7d only if prior live payments | 🔒 skip if no prior internal live payments |
@@ -259,7 +263,7 @@ Venue page может иметь admission **независимо** от афи�
 | Admin approve legal/bank | DoD: approve/reject + comment + verifiedAt/by + immutable snapshot; ETA **2-3d** |
 | Ledger MVP | sale / commission / refund adjustment; **real payouts out** |
 | m2m | **Bearer** recommended (not IP-only); ETA 0.5-1d when token from owner |
-| Return URL | `pay.daibilet.ru/checkout/result?order=publicCode` |
+| Return URL | Catalog MVP: `daibilet.ru/checkout/result?order=publicCode`; Codex parallel: `pay.daibilet.ru/checkout/result?order=publicCode` |
 | PP identity | MVP = `publicCode` + buyer email/phone; ExternalOrder catalog-only |
 | SSH | Cursor has `daibilet_spb_finance`; Codex needs same key / owner adds Codex pubkey |
 | Secret | installed on `.159` by Cursor from owner local env; verify only `<set>`; **never in chat** |

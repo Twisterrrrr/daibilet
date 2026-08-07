@@ -1,3 +1,27 @@
+## 2026-08-07 - Buyer UX MVP on daibilet.ru (Cursor catalog track)
+
+### Наблюдения
+- `pay.daibilet.ru` сейчас отдаёт supplier SPA; `/checkout/admissions/*` там без buyer-формы.
+- Finance public STUB admission работает: `POST /api/checkout/stub` + `admissionProductSlug` + `admissionOfferId` + `buyer` → 201 `publicCode`.
+- Public `/api/checkout/yookassa` пока event-only (admission → validation eventId); FIN.LC3 confirmationUrl был через finance/supplier path.
+- Стабильного public order-by-code / purchases-by-email ещё нет - account soft-fail + localStorage cache после checkout.
+- Owner: Codex строит **параллельный** buyer experiment на pay/.159 - catalog track не ждёт и не merge-ит поверх.
+
+### Решения
+- URL canon **catalog / Cursor:** 
+  - checkout `https://daibilet.ru/checkout/admissions/{slug}`
+  - result `https://daibilet.ru/checkout/result?order={publicCode}`
+  - account `https://daibilet.ru/account/purchases`
+- CTA admission: same-origin relative path (env `FINANCE_CHECKOUT_BASE_URL` / `BUYER_CHECKOUT_HOST=pay` только если явно нужен pay).
+- BFF: `POST /api/checkout/admission`, `GET /api/checkout/order`, `GET /api/account/internal-purchases` (finance soft).
+- Split: Cursor = UX/UI; Codex = fulfillment PDF/mail, admission YooKassa public, order lookup APIs, pay experiment.
+
+### Проблемы
+- Без Codex public order API result/account опираются на ответ checkout + localStorage.
+- Wide catalog CTA по-прежнему out.
+
+---
+
 ## 2026-08-07 - FIN.LC3 smoke closed (finance `.159`)
 
 ### Наблюдения

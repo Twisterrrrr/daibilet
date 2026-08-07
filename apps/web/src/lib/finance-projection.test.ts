@@ -88,13 +88,24 @@ test('mapAdmissionProduct: strips STUB seed shortDescription', () => {
   assert.equal(mapped.shortDescription, null);
 });
 
-test('resolveAdmissionCheckoutUrl: absolute and relative', () => {
+test('resolveAdmissionCheckoutUrl: catalog same-origin by default', () => {
   assert.equal(
     resolveAdmissionCheckoutUrl('https://checkout.example/path', {}),
     'https://checkout.example/path',
   );
+  // Absolute pay checkout → catalog relative (Cursor UX track), unless BUYER_CHECKOUT_HOST=pay
+  assert.equal(
+    resolveAdmissionCheckoutUrl('https://pay.daibilet.ru/checkout/admissions/x', {}),
+    '/checkout/admissions/x',
+  );
   assert.equal(
     resolveAdmissionCheckoutUrl('https://checkout.daibilet.ru/checkout/admissions/x', {}),
+    '/checkout/admissions/x',
+  );
+  assert.equal(
+    resolveAdmissionCheckoutUrl('https://pay.daibilet.ru/checkout/admissions/x', {
+      BUYER_CHECKOUT_HOST: 'pay',
+    }),
     'https://pay.daibilet.ru/checkout/admissions/x',
   );
   assert.equal(
@@ -109,10 +120,8 @@ test('resolveAdmissionCheckoutUrl: absolute and relative', () => {
     }),
     'https://pay.daibilet.ru/checkout/admissions/x',
   );
-  assert.equal(
-    resolveAdmissionCheckoutUrl('/checkout/admissions/x', {}),
-    'https://pay.daibilet.ru/checkout/admissions/x',
-  );
+  // Default catalog track: relative path on daibilet.ru
+  assert.equal(resolveAdmissionCheckoutUrl('/checkout/admissions/x', {}), '/checkout/admissions/x');
   assert.equal(resolveAdmissionCheckoutUrl(null, {}), null);
   assert.equal(resolveAdmissionCheckoutUrl('', {}), null);
 });

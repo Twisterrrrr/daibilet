@@ -168,7 +168,7 @@ BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh
 - SSH: `daibilet-msk` / `daibilet_msk80_key`. Finance `.159` не трогать из catalog deploy.
 
 - Catalog ↔ finance: **только API / read projection**, без shared money/catalog DB и без ad-hoc writes finance→catalog.
-- Checkout primary hostname: **`pay.daibilet.ru`** (optional alias `checkout.daibilet.ru` - см. qa.md); также `supplier.daibilet.ru`, `finance-api.daibilet.ru`.
+- Checkout hostnames: **catalog buyer MVP** на `daibilet.ru/checkout/*` (Cursor); **Codex parallel** на `pay.daibilet.ru` (не merge поверх); optional alias `checkout.daibilet.ru` - см. qa.md; также `supplier.daibilet.ru`, `finance-api.daibilet.ru`.
 - `.184` не переезжает на СПб; ops на catalog - perf/DTO/SSR/DNS only.
 - TC/Teplohod widgets + secrets остаются на catalog; finance владеет INTERNAL_SALES / AdmissionProduct / CheckoutOrder.
 - **Канон границы и gap:** [catalog-finance-projection.md](./catalog-finance-projection.md) · host roles: [spb-finance-host.md](./spb-finance-host.md) · migrate: [spb-migrate-4gb-to-8gb.md](./spb-migrate-4gb-to-8gb.md).

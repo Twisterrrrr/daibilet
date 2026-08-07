@@ -75,7 +75,7 @@ export function AdmissionProductCard({ product, showVenue = false, className = '
           <a
             href={checkoutUrl}
             className="inline-flex min-h-10 items-center justify-center rounded-full bg-primary-600 px-4 text-sm font-semibold text-white hover:bg-primary-700"
-            rel="noopener noreferrer"
+            {...(/^https?:\/\//i.test(checkoutUrl) ? { rel: 'noopener noreferrer' } : {})}
           >
             Оформить
           </a>

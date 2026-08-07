@@ -13,6 +13,8 @@ export type BuyerOrder = {
   displayStatus: string;
   statusTone: string;
   providerName?: string | null;
+  /** widget = TC/TEP ExternalOrder; internal = CheckoutOrder / Daibilet */
+  sourceKind?: 'widget' | 'internal';
   buyer: {
     name?: string | null;
     email?: string | null;
@@ -43,11 +45,20 @@ export function BuyerOrderCard({ order }: { order: BuyerOrder }) {
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <StatusPill order={order} />
-            {order.providerName ? (
-              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">Покупка в {order.providerName}</span>
+            {order.sourceKind === 'internal' ? (
+              <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800">
+                Заказ Дайбилет
+              </span>
+            ) : order.providerName ? (
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+                Покупка в {order.providerName}
+              </span>
             ) : null}
           </div>
           <h2 className="mt-3 text-xl font-bold text-slate-950">Заказ №{order.number}</h2>
+          {order.sourceKind === 'internal' ? (
+            <p className="mt-1 text-xs font-medium text-slate-500">Код заказа (publicCode)</p>
+          ) : null}
           {order.eventTitle ? (
             order.eventUrl ? (
               <Link href={order.eventUrl} className="mt-2 inline-flex items-center gap-1 text-base font-semibold text-primary-700 hover:text-primary-800">
@@ -128,7 +139,8 @@ export function BuyerOrdersEmptyState({ lookup }: { lookup: string }) {
       <HelpCircle className="mx-auto h-10 w-10 text-slate-300" />
       <h2 className="mt-3 text-xl font-bold text-slate-950">Заказов пока нет</h2>
       <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-slate-500">
-        По email «{lookup}» заказов не найдено. Убедитесь, что при покупке в виджете указан тот же email, что и в аккаунте.
+        По email «{lookup}» заказов не найдено. Убедитесь, что при покупке (виджет или Дайбилет) указан тот же email, что и в
+        аккаунте.
       </p>
       <a href="mailto:hello@daibilet.ru" className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-primary-700 hover:text-primary-800">
         Написать в поддержку <ArrowRight className="h-4 w-4" />

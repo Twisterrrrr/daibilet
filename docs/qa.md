@@ -76,7 +76,11 @@ Owner: основная работа локально / preview; агенты **
 1. **Checkout hostname:** **`pay.daibilet.ru`** - канон ✅ (A → `.159`, TLS+nginx на finance). Alias **`checkout.daibilet.ru`** не обязателен / не создан.
 2. **`finance-api.daibilet.ru`:** ✅ отдельный hostname для API/projection/webhooks (DNS+TLS). Path на `pay` не обязателен.
 3. **`supplier.daibilet.ru`:** ✅ DNS + TLS (вместе с `pay` / `finance-api`). Alias partners/cabinet не нужен.
-4. **YooKassa webhook URL:** ✅ **LOCKED 2026-07-31 (Codex).** Canon: `https://finance-api.daibilet.ru/api/checkout/yookassa/webhook`. `pay.daibilet.ru` = user checkout/return only. Dual-webhook 3-7d **только** если были живые платежи/вебхуки на старом endpoint; иначе skip.
+4. **YooKassa webhook URL:** ✅ **LOCKED 2026-07-31 (Codex).** Canon: `https://finance-api.daibilet.ru/api/checkout/yookassa/webhook`. Dual-webhook 3-7d **только** если были живые платежи/вебхуки на старом endpoint; иначе skip.
+4b. **Buyer checkout URL canon (2026-08-07):** два параллельных трека, без force-merge.
+   - **Catalog / Cursor (shipped MVP):** `daibilet.ru/checkout/admissions/{slug}`, result `daibilet.ru/checkout/result?order={publicCode}`, account `daibilet.ru/account/purchases`.
+   - **Codex experiment:** buyer UI на `pay.daibilet.ru` (`.159`). Supplier LC на pay не ломать.
+   - Return URL для ЮKassa: пока выставлять под активный buyer surface (catalog MVP или pay experiment); webhook остаётся на `finance-api`.
 5. **Webhook registration (2026-08-07):** для текущего shop API-доступ **не** позволяет webhook-management (API register → 401 «Authentication type is not allowed»; payment create при этом OK). **Webhook для этого магазина нужно регистрировать вручную в кабинете ЮKassa** (URL выше) **или** получить credentials/token с правом webhook-management. FIN.LC3 create-payment/STUB smoke ✅; MIG.9.5 / FIN.W1 webhook step 🔒 owner-manual.
 
 ### Owner minimum (обновлено 2026-08-07)
@@ -92,7 +96,7 @@ Owner: основная работа локально / preview; агенты **
 
 ### PurchaseProjection / dual order sources
 
-6. **Checkout domain model:** после split DB - `CheckoutOrder` только на finance; `ExternalOrder` остаётся на catalog. Как buyer/admin видят оба контура: (A) finance агрегирует External через catalog read API, (B) catalog агрегирует Checkout через finance API, (C) отдельный BFF? Рекомендация архитектора: **(B)** для buyer UI на catalog + admin proxy; supplier LC читает finance напрямую.
+6. **Checkout domain model:** после split DB - `CheckoutOrder` только на finance; `ExternalOrder` остаётся на catalog. Как buyer/admin видят оба контура: (A) finance агрегирует External через catalog read API, (B) catalog агрегирует Checkout через finance API, (C) отдельный BFF? Рекомендация архитектора: **(B)** для buyer UI на catalog + admin proxy; supplier LC читает finance напрямую. **MVP 2026-08-07 (Cursor):** catalog account мержит widget ExternalOrder + soft finance/internal cache; полный fan-in ждёт Codex public/m2m purchases-by-email.
 7. **PurchaseProjection identity:** ✅ **LOCKED (Codex).** MVP = `publicCode` + buyer email/phone. `siteUserId` bridge до первой внутренней продажи не обязателен (buyer account v2).
 8. **ExternalOrder на finance?** ✅ **LOCKED.** External остаётся catalog-only; projection - read fan-in, не dual-write / не mirror copy.
 

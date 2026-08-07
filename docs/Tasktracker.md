@@ -1,9 +1,25 @@
 # Tasktracker — Daibilet
 
-**Обновлено:** 2026-08-06
+**Обновлено:** 2026-08-07
 **Источники:** [Project.md](./Project.md), [current-state.md](./current-state.md), [migration-spb-to-msk.md](./migration-spb-to-msk.md), [widget-etalon-slugs.md](./widget-etalon-slugs.md), [content-blog-plan.md](./content-blog-plan.md), [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brief.md), [mobile-templates.md](./mobile-templates.md), [catalog-location-venue-canon.md](./catalog-location-venue-canon.md)
 
 **Легенда:** ✅ done · 🔄 in progress · ⏳ todo · 🚫 blocked · ⚠️ deferred
+
+---
+
+## Buyer UX catalog track (Cursor, 2026-08-07)
+
+Параллельно Codex эксперимент на `pay/.159`. Catalog track = `daibilet.ru` / `apps/web`. Не force-merge.
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| UX.BUY-1 | Checkout form admission → finance stub/yookassa soft (`/checkout/admissions/[slug]`) | Критический | ✅ |
+| UX.BUY-2 | Result / thank-you ` /checkout/result?order=publicCode` | Критический | ✅ |
+| UX.BUY-3 | Account purchases: internal (publicCode/status/title) + widget ExternalOrder | Высокий | ✅ |
+| UX.BUY-4 | URL canon docs (catalog vs pay parallel) + CTA same-origin | Высокий | ✅ |
+| UX.BUY-5 | Codex: admission на public `/api/checkout/yookassa` + order-by-code + email/PDF/mail | Критический | ⏳ Codex |
+| UX.BUY-6 | Codex: m2m / public purchases-by-email для fan-in в account | Высокий | ⏳ Codex |
+| UX.BUY-7 | UI polish: offer qty>1, phone, resume unpaid confirmationUrl | Средний | ⏳ next UX |
 
 ---
 

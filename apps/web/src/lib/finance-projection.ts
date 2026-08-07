@@ -64,8 +64,14 @@ export const CITY_ADMISSION_MIN_PUBLISHED_DEFAULT = 1;
 
 const MIN_DISPLAY_PRICE_RUB = 100;
 
-/** Buyer checkout host (canon). Alias checkout.daibilet.ru is not used. */
+/**
+ * Legacy pay host (Codex parallel buyer experiment / supplier SPA).
+ * Catalog buyer UX default is same-origin on daibilet.ru - see resolveAdmissionCheckoutUrl.
+ */
 export const FINANCE_CHECKOUT_BASE_URL_DEFAULT = 'https://pay.daibilet.ru';
+
+/** Catalog buyer checkout surface (Cursor UX track). */
+export const CATALOG_BUYER_CHECKOUT_ORIGIN_DEFAULT = 'same-origin';
 
 function asRecord(value: unknown): Record<string, unknown> | null {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
@@ -220,8 +226,11 @@ export function shouldShowAdmissionCta(product: Pick<FinanceAdmissionProduct, 'c
 
 /**
  * Resolve checkout URL for browser navigation.
- * Relative checkoutPath → FINANCE_CHECKOUT_BASE_URL / NEXT_PUBLIC_* (default pay.daibilet.ru).
- * Absolute legacy checkout.daibilet.ru → rewritten to pay.daibilet.ru.
+ *
+ * URL canon (2026-08-07):
+ * - Catalog / Cursor buyer UX: same-origin `/checkout/admissions/{slug}` on daibilet.ru
+ * - Codex parallel experiment may use pay.daibilet.ru - set FINANCE_CHECKOUT_BASE_URL / NEXT_PUBLIC_* explicitly
+ * - Absolute legacy checkout.daibilet.ru → rewritten to pay.daibilet.ru
  */
 export function resolveAdmissionCheckoutUrl(
   checkoutPath: string | null | undefined,
@@ -230,22 +239,45 @@ export function resolveAdmissionCheckoutUrl(
   const path = typeof checkoutPath === 'string' ? checkoutPath.trim() : '';
   if (!path) return null;
 
-  if (/^https?:\/\//i.test(path)) return normalizeFinanceCheckoutAbsoluteUrl(path);
+  if (/^https?:\/\//i.test(path)) {
+    // Prefer catalog buyer routes even if finance still emits pay absolute URLs.
+    const normalized = normalizeFinanceCheckoutAbsoluteUrl(path);
+    try {
+      const url = new URL(normalized);
+      if (/^pay\.daibilet\.ru$/i.test(url.hostname) && url.pathname.startsWith('/checkout/')) {
+        const preferPay =
+          String(env.BUYER_CHECKOUT_HOST || env.NEXT_PUBLIC_BUYER_CHECKOUT_HOST || '')
+            .trim()
+            .toLowerCase() === 'pay';
+        if (!preferPay) return `${url.pathname}${url.search}`;
+      }
+    } catch {
+      // fall through
+    }
+    return normalized;
+  }
+
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
 
   // Direct process.env.NEXT_PUBLIC_* so Next inlines it into client bundles.
   const bakedPublic = process.env.NEXT_PUBLIC_FINANCE_CHECKOUT_BASE_URL;
-  const baseRaw = (
+  const explicitBase = (
     env.FINANCE_CHECKOUT_BASE_URL ||
     env.NEXT_PUBLIC_FINANCE_CHECKOUT_BASE_URL ||
     bakedPublic ||
-    FINANCE_CHECKOUT_BASE_URL_DEFAULT
+    ''
   )
     .trim()
     .replace(/\/$/, '');
-  const base = normalizeFinanceCheckoutAbsoluteUrl(baseRaw);
 
-  if (!base) return path.startsWith('/') ? path : `/${path}`;
-  return `${base}${path.startsWith('/') ? path : `/${path}`}`;
+  // Default catalog track: keep relative path on daibilet.ru (apps/web checkout pages).
+  if (!explicitBase || explicitBase === 'same-origin' || explicitBase === '/') {
+    return normalizedPath;
+  }
+
+  const base = normalizeFinanceCheckoutAbsoluteUrl(explicitBase);
+  if (!base) return normalizedPath;
+  return `${base}${normalizedPath}`;
 }
 
 export function shouldShowCityAdmissionBlock(
