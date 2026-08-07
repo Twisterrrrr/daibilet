@@ -1,3 +1,19 @@
+## 2026-08-07 - Ticket page: order code ≠ ticket number
+
+### Наблюдения
+- Owner: на `/checkout/ticket/{code}` код показывался трижды (hero / title «Заказ N» / «Код заказа»).
+- Уточнение: музеям нужен **отдельный номер билета** vs код заказа; сейчас в модели только `CheckoutOrder.publicCode`.
+
+### Решения
+- Hero «Ваш билет» без повтора номера; title не дублирует `Заказ {code}`.
+- Карточка: крупный **«Код заказа»** = `publicCode`; **«Номер билета»** отдельно (пока тот же код + подпись про сканер музея); optional `ticketNumber` в типе на будущее.
+- QR caption: «ссылка на страницу билета» (не пропуск музея).
+- qa.md LOCKED draft: order ≠ ticket; issuance A/B later.
+- Ship: `9cd66ed2` · Deploy **31190783370** · **BUILD_ID=`vH1YOLuir-6HoFg7VQAgQ`**.
+
+### Проблемы
+- Реальный museum ticket id / scanner issuance ещё нет - UI честно показывает временное совпадение.
+
 ## 2026-08-07 - Must-see hub targets LOCKED (~200 / ~50)
 
 ### Наблюдения
