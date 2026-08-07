@@ -62,11 +62,13 @@ function buildHeaders(env: FinanceProjectionEnv): Headers {
 }
 
 function resolveBuyerCheckoutMode(env: FinanceProjectionEnv = process.env): BuyerCheckoutMode {
-  const raw = String(env.BUYER_CHECKOUT_MODE || env.DAIBILET_BUYER_CHECKOUT_MODE || 'stub')
+  // Default auto: try YooKassa confirmationUrl first; soft-fall to STUB until Codex
+  // exposes public admission create-payment. Override: BUYER_CHECKOUT_MODE=yookassa|stub.
+  const raw = String(env.BUYER_CHECKOUT_MODE || env.DAIBILET_BUYER_CHECKOUT_MODE || 'auto')
     .trim()
     .toLowerCase();
   if (raw === 'yookassa' || raw === 'auto' || raw === 'stub') return raw;
-  return 'stub';
+  return 'auto';
 }
 
 function asRecord(value: unknown): Record<string, unknown> | null {
@@ -248,8 +250,10 @@ export async function submitAdmissionCheckout(
   const attempts: Array<{ label: string; path: string; body: unknown }> = [];
 
   if (mode === 'yookassa' || mode === 'auto') {
+    // Prefer public create-payment; supplier authenticated path is out of catalog buyer scope.
     attempts.push({ label: 'YOOKASSA', path: '/api/checkout/yookassa', body: buildYookassaBody(input) });
   }
+  // STUB only when explicitly requested or as auto soft-fallback (Codex admission YooKassa gap).
   if (mode === 'stub' || mode === 'auto') {
     attempts.push({ label: 'STUB', path: '/api/checkout/stub', body: buildStubBody(input) });
   }

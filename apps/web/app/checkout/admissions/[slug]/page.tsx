@@ -16,16 +16,20 @@ type PageProps = { params: Promise<{ slug: string }> };
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const product = await fetchAdmissionProductBySlug(slug);
-  const title = product?.shortTitle || product?.title || 'Оформление билета';
+  const title = product?.shortTitle || product?.title || 'Оплата билета';
   return {
     title: `${title} - оплата`,
-    description: 'Оформление входного билета на Дайбилет.',
+    description: 'Оплата входного билета на Дайбилет через ЮKassa.',
     robots: { index: false, follow: false },
   };
 }
 
 export const dynamic = 'force-dynamic';
 
+/**
+ * Simple admission / museum path: thin email → YooKassa confirmationUrl.
+ * Complex pricing calculator (future) is a separate surface under /checkout/calc.
+ */
 export default async function AdmissionCheckoutPage({ params }: PageProps) {
   const { slug } = await params;
   const product = await fetchAdmissionProductBySlug(slug);
@@ -71,7 +75,7 @@ export default async function AdmissionCheckoutPage({ params }: PageProps) {
                 <span>/</span>
               </>
             ) : null}
-            <span className="text-white">Оформление</span>
+            <span className="text-white">Оплата</span>
           </div>
           <div className="mt-5 flex flex-wrap gap-2">
             <span className="rounded-full bg-white/12 px-3 py-1 text-xs font-semibold text-white/90">
@@ -91,35 +95,14 @@ export default async function AdmissionCheckoutPage({ params }: PageProps) {
           <h1 className="mt-4 max-w-3xl text-3xl font-extrabold tracking-tight sm:text-4xl">
             {product.shortTitle || product.title}
           </h1>
-          {product.shortDescription ? (
-            <p className="mt-3 max-w-2xl text-base leading-7 text-white/80">{product.shortDescription}</p>
-          ) : (
-            <p className="mt-3 max-w-2xl text-base leading-7 text-white/80">
-              Укажите email и тариф - мы создадим заказ и направим к оплате, если она доступна.
-            </p>
-          )}
+          <p className="mt-3 max-w-2xl text-base leading-7 text-white/80">
+            Email для билета - и сразу оплата в ЮKassa.
+          </p>
         </div>
       </section>
 
       <section className="container-page py-8 sm:py-10">
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(280px,360px)]">
-          <AdmissionCheckoutForm product={product} />
-          <aside className="h-fit rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-600">
-            <h2 className="text-base font-bold text-slate-900">Как проходит оплата</h2>
-            <ol className="mt-3 list-decimal space-y-2 pl-5 leading-6">
-              <li>Выбираете тариф и указываете email для билета.</li>
-              <li>Мы создаем заказ в платежном контуре Дайбилет.</li>
-              <li>Если ЮKassa доступна - откроется страница оплаты; иначе покажем подтверждение тестового заказа.</li>
-            </ol>
-            <p className="mt-4 leading-6">
-              Код заказа пригодится в разделе{' '}
-              <Link href="/account/purchases" className="font-semibold text-primary-700 hover:underline">
-                Мои покупки
-              </Link>
-              .
-            </p>
-          </aside>
-        </div>
+        <AdmissionCheckoutForm product={product} />
       </section>
     </SiteLayout>
   );

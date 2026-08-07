@@ -1,18 +1,21 @@
 ## 2026-08-07 - Buyer checkout MVP: direct YooKassa redirect (LOCKED)
 
 ### Наблюдения
-- Owner: buyer checkout на сейчас = **direct YooKassa** (`create-payment` → `confirmationUrl` redirect), без тяжёлой внутренней формы расчёта.
-- Catalog track уже имеет thin entry + result + account; FIN.LC3 sandbox confirmationUrl OK.
-- Риск расхождения Cursor/Codex: один трек тянет full checkout UI, другой - redirect.
+- Owner: для **простых музейных / admission** билетов сложный checkout не нужен → **direct YooKassa** (`create-payment` → `confirmationUrl`).
+- Сложный calc UI **не запрещён** - нужен позже для продуктов с внутренним расчетом цены; museum flow через него не вести.
+- Catalog track: thin entry + result + account; FIN.LC3 sandbox confirmationUrl OK.
+- Public `/api/checkout/yookassa` пока event-only (admission → validation); soft-fallback STUB до Codex.
 
 ### Решения
-- **LOCKED:** MVP path = create-payment → redirect YooKassa; custom checkout calc / heavy form - deferred until needed.
-- Параллельные эксперименты целят thin redirect + result + account; не force-merge catalog vs pay.
-- Docs: qa.md §4c, Tasktracker UX.BUY-* + UX.BUY-8 deferred.
+- **Path A (NOW):** thin email → create-payment → redirect `confirmationUrl`. Catalog URLs: `/checkout/admissions/{slug}`, result, account.
+- **Path B (FUTURE):** complex calc scaffold `/checkout/calc` - wire когда появится продукт с calc; CTA музеев не сюда.
+- Default BFF mode `auto` (yookassa-first, stub soft-fallback). Codex: public admission create-payment.
+- Docs: catalog-finance-projection Path A/B; qa §4b/4c; Tasktracker UX.BUY-7 scaffold / UX.BUY-8 deferred.
 
 ### Проблемы
 - Webhook cabinet / e2e PENDING→SUCCEEDED ещё open (FIN.W1).
 - Wide catalog CTA по-прежнему out.
+- Public admission→YooKassa ещё Codex (UX.BUY-5).
 
 ---
 

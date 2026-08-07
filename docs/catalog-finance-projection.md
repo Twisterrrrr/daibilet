@@ -23,8 +23,9 @@
 
 - Импортные provider-события → виджет TC/TEP (как сейчас). **Не** YooKassa.
 - AdmissionProduct / DAIBILET_MANAGED PLATFORM → Daibilet checkout.
-  - **Catalog / Cursor UX track (shipped):** `daibilet.ru/checkout/admissions/{slug}` → result `daibilet.ru/checkout/result?order={publicCode}` → account `daibilet.ru/account/purchases`.
-  - **Codex parallel experiment:** buyer routes on `pay.daibilet.ru` (`.159`) - не force-merge с catalog track.
+  - **Path A - simple admissions / museums (NOW):** thin email → finance create-payment → **redirect YooKassa `confirmationUrl`**. No multi-step calc. Catalog: `daibilet.ru/checkout/admissions/{slug}` → result `…/checkout/result?order={publicCode}` → account `…/account/purchases`.
+  - **Path B - complex calc (FUTURE, optional):** internal pricing UI when product needs qty/packages/promo - scaffold `daibilet.ru/checkout/calc`. Simple museum flow must **not** go through Path B.
+  - **Codex parallel experiment:** thin buyer routes on `pay.daibilet.ru` (`.159`) - не force-merge с catalog track.
   - Alias `checkout.daibilet.ru` не обязателен.
 
 ---

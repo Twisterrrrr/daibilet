@@ -35,30 +35,37 @@ type CheckoutApiOk = {
   };
 };
 
+/**
+ * Thin museum / simple-admission path (owner 2026-08-07):
+ * email (required by API) → create-payment → redirect confirmationUrl.
+ * No multi-step calc here - complex pricing UI lives under /checkout/calc (future).
+ */
 export function AdmissionCheckoutForm({ product }: Props) {
   const router = useRouter();
   const { user } = useUserAuth();
   const offers = product.offers;
-  const defaultOfferId = useMemo(() => {
-    const cheapest = [...offers].sort((a, b) => a.priceRub - b.priceRub)[0];
-    return cheapest?.id || offers[0]?.id || '';
+
+  // Silent default offer (cheapest) - not a buyer-facing calculator.
+  const defaultOffer = useMemo(() => {
+    if (!offers.length) return null;
+    return [...offers].sort((a, b) => a.priceRub - b.priceRub)[0] || offers[0];
   }, [offers]);
 
-  const [offerId, setOfferId] = useState(defaultOfferId);
   const [email, setEmail] = useState(user?.email || '');
-  const [name, setName] = useState(user?.name || '');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const selected = offers.find((offer) => offer.id === offerId) || offers[0];
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
     setError(null);
 
     const trimmedEmail = email.trim().toLowerCase();
-    if (!trimmedEmail.includes('@') || !offerId) {
-      setError('Укажите корректный email и тариф');
+    if (!trimmedEmail.includes('@')) {
+      setError('Укажите email для билета');
+      return;
+    }
+    if (!defaultOffer) {
+      setError('Тариф временно недоступен');
       return;
     }
 
@@ -69,13 +76,12 @@ export function AdmissionCheckoutForm({ product }: Props) {
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
           admissionProductSlug: product.slug,
-          admissionOfferId: offerId,
+          admissionOfferId: defaultOffer.id,
           quantity: 1,
-          buyer: {
-            email: trimmedEmail,
-            name: name.trim() || null,
-          },
+          buyer: { email: trimmedEmail },
           returnUrl: `${window.location.origin}/checkout/result`,
+          // Prefer YooKassa confirmationUrl; stub only if finance admits no yookassa path yet.
+          mode: 'auto',
         }),
       });
       const payload = (await response.json().catch(() => ({}))) as CheckoutApiOk & {
@@ -87,7 +93,7 @@ export function AdmissionCheckoutForm({ product }: Props) {
         setError(
           payload.detail ||
             payload.error ||
-            'Не удалось создать заказ. Попробуйте позже или напишите в поддержку.',
+            'Не удалось начать оплату. Попробуйте позже или напишите в поддержку.',
         );
         return;
       }
@@ -102,6 +108,7 @@ export function AdmissionCheckoutForm({ product }: Props) {
         return;
       }
 
+      // Soft path while Codex finishes public admission→YooKassa: show result with publicCode.
       router.push(
         `/checkout/result?order=${encodeURIComponent(payload.publicCode)}&mode=${encodeURIComponent(payload.mode)}`,
       );
@@ -112,13 +119,27 @@ export function AdmissionCheckoutForm({ product }: Props) {
     }
   }
 
+  const priceRub = defaultOffer?.priceRub;
+
   return (
     <form
       onSubmit={(event) => void onSubmit(event)}
-      className="rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_14px_40px_rgba(15,23,42,0.06)] sm:p-6"
+      className="max-w-lg rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_14px_40px_rgba(15,23,42,0.06)] sm:p-6"
     >
-      <h2 className="text-xl font-bold text-slate-950">Контакты и тариф</h2>
-      <p className="mt-1 text-sm text-slate-500">Билет и чек отправим на указанный email.</p>
+      <h2 className="text-xl font-bold text-slate-950">Оплата картой</h2>
+      <p className="mt-1 text-sm text-slate-500">
+        Укажите email - сразу перейдём к оплате в ЮKassa.
+      </p>
+
+      {priceRub != null ? (
+        <p className="mt-4 text-sm text-slate-700">
+          К оплате:{' '}
+          <span className="font-bold text-slate-950">{formatNumber(priceRub)} ₽</span>
+          {defaultOffer?.title ? (
+            <span className="text-slate-500"> · {defaultOffer.title}</span>
+          ) : null}
+        </p>
+      ) : null}
 
       <label className="mt-5 block text-sm font-semibold text-slate-800">
         Email
@@ -133,61 +154,21 @@ export function AdmissionCheckoutForm({ product }: Props) {
         />
       </label>
 
-      <label className="mt-4 block text-sm font-semibold text-slate-800">
-        Имя <span className="font-normal text-slate-400">(необязательно)</span>
-        <input
-          type="text"
-          autoComplete="name"
-          value={name}
-          onChange={(event) => setName(event.target.value)}
-          className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-base font-normal text-slate-900 outline-none ring-primary-500/30 focus:border-primary-500 focus:ring-4"
-          placeholder="Как к вам обращаться"
-        />
-      </label>
-
-      <fieldset className="mt-5">
-        <legend className="text-sm font-semibold text-slate-800">Тариф</legend>
-        <div className="mt-2 grid gap-2">
-          {offers.map((offer) => {
-            const active = offer.id === offerId;
-            return (
-              <label
-                key={offer.id}
-                className={`flex cursor-pointer items-center justify-between gap-3 rounded-xl border px-3 py-3 transition ${
-                  active
-                    ? 'border-primary-500 bg-primary-50/70 ring-2 ring-primary-500/20'
-                    : 'border-slate-200 bg-white hover:border-slate-300'
-                }`}
-              >
-                <span className="flex items-center gap-3">
-                  <input
-                    type="radio"
-                    name="offer"
-                    value={offer.id}
-                    checked={active}
-                    onChange={() => setOfferId(offer.id)}
-                    className="h-4 w-4 accent-primary-600"
-                  />
-                  <span className="text-sm font-semibold text-slate-900">{offer.title}</span>
-                </span>
-                <span className="text-sm font-bold text-slate-900">{formatNumber(offer.priceRub)} ₽</span>
-              </label>
-            );
-          })}
-        </div>
-      </fieldset>
-
       {error ? (
         <div className="mt-4 rounded-xl bg-red-50 px-3 py-2.5 text-sm text-red-800">{error}</div>
       ) : null}
 
       <button
         type="submit"
-        disabled={submitting || !selected}
+        disabled={submitting || !defaultOffer}
         className="mt-6 inline-flex w-full min-h-12 items-center justify-center gap-2 rounded-full bg-primary-600 px-5 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-60"
       >
         {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-        {submitting ? 'Создаем заказ…' : selected ? `Оплатить ${formatNumber(selected.priceRub)} ₽` : 'Оплатить'}
+        {submitting
+          ? 'Переходим к оплате…'
+          : priceRub != null
+            ? `Оплатить ${formatNumber(priceRub)} ₽`
+            : 'Оплатить'}
       </button>
 
       <p className="mt-3 text-center text-xs leading-5 text-slate-500">
