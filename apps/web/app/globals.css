@@ -537,7 +537,7 @@ body > div:has(iframe[src*='ticketscloud']) {
 /* Мой день: чистый маршрутный лист для печати / Save as PDF */
 @media print {
   @page {
-    margin: 14mm 12mm;
+    margin: 12mm;
   }
 
   html,
@@ -560,15 +560,39 @@ body > div:has(iframe[src*='ticketscloud']) {
     display: block !important;
   }
 
-  /* Buyer ticket: readable A4-ish sheet without chrome */
+  /* Buyer ticket: one A4 sheet, full usable width, no chrome/actions */
   [data-buyer-ticket] {
     break-inside: avoid;
     page-break-inside: avoid;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
   }
 
+  [data-buyer-ticket-actions],
   [data-buyer-ticket] .print\:hidden,
   .print\:hidden {
     display: none !important;
+  }
+
+  /* Print always uses two columns (text left / QR right) like tablet+ */
+  [data-buyer-ticket] .buyer-ticket-main {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 160px !important;
+    align-items: start !important;
+    gap: 20px !important;
+  }
+
+  [data-buyer-ticket] .buyer-ticket-info {
+    order: 0 !important;
+  }
+
+  [data-buyer-ticket] .buyer-ticket-qr {
+    order: 0 !important;
+    justify-self: end !important;
   }
 }
 

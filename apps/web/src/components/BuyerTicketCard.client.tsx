@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { CheckCircle2, Clock3, Copy, Printer } from 'lucide-react';
-import { useCallback, useState } from 'react';
+import { useCallback, useState, type ReactNode } from 'react';
 
 import {
   formatBuyerDateTime,
@@ -38,6 +38,31 @@ function ticketProductTitle(order: BuyerInternalOrderRecord): string {
   return raw;
 }
 
+function DetailRow({
+  label,
+  value,
+  valueClassName = '',
+  className = '',
+}: {
+  label: string;
+  value: ReactNode;
+  valueClassName?: string;
+  className?: string;
+}) {
+  return (
+    <div
+      className={`flex flex-col gap-0.5 border-b border-black/[0.04] py-2.5 first:pt-0 last:border-b-0 last:pb-0 min-[500px]:flex-row min-[500px]:items-start min-[500px]:justify-between min-[500px]:gap-4 ${className}`}
+    >
+      <dt className="shrink-0 text-sm text-slate-500 min-[500px]:text-[15px]">{label}</dt>
+      <dd
+        className={`min-w-0 text-sm font-semibold leading-6 text-slate-900 min-[500px]:max-w-[70%] min-[500px]:text-right min-[500px]:text-[15px] ${valueClassName}`}
+      >
+        {value}
+      </dd>
+    </div>
+  );
+}
+
 export function BuyerTicketCard({ order, origin, emailHint = 'unknown', className = '' }: Props) {
   const status = mapFinanceOrderStatus(order.status);
   const isPaid = status.statusTone === 'live';
@@ -50,7 +75,7 @@ export function BuyerTicketCard({ order, origin, emailHint = 'unknown', classNam
     typeof window !== 'undefined'
       ? buyerTicketAbsoluteUrl(order.publicCode, origin || window.location.origin)
       : buyerTicketAbsoluteUrl(order.publicCode, origin);
-  const qrUrl = buyerTicketQrImageUrl(ticketUrl, 168);
+  const qrUrl = buyerTicketQrImageUrl(ticketUrl, 180);
   const [copied, setCopied] = useState(false);
 
   const openDate = isOpenDateOrder(order);
@@ -79,11 +104,11 @@ export function BuyerTicketCard({ order, origin, emailHint = 'unknown', classNam
 
   return (
     <article
-      className={`buyer-ticket mx-auto w-full max-w-[650px] overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_4px_20px_rgba(0,0,0,0.05)] sm:p-7 print:max-w-none print:border-slate-300 print:p-0 print:shadow-none ${className}`}
+      className={`buyer-ticket w-full max-w-[650px] overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_4px_20px_rgba(0,0,0,0.05)] min-[500px]:mx-auto min-[500px]:p-6 min-[640px]:p-7 print:mx-0 print:max-w-none print:rounded-none print:border print:border-slate-300 print:p-0 print:shadow-none ${className}`}
       data-buyer-ticket
     >
       {/* Status chips - screen only */}
-      <div className="mb-4 flex flex-wrap items-center gap-2 print:hidden">
+      <div className="mb-3 flex flex-wrap items-center gap-2 print:hidden min-[500px]:mb-4">
         <span
           className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${
             isPaid
@@ -104,20 +129,24 @@ export function BuyerTicketCard({ order, origin, emailHint = 'unknown', classNam
       </div>
 
       {/* Header: type + ticket number */}
-      <header className="mb-5 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 border-b-2 border-dashed border-slate-200 pb-5">
-        <h2 className="font-display text-xl font-extrabold uppercase tracking-wide text-slate-950 sm:text-2xl">
+      <header className="mb-4 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 border-b-2 border-dashed border-slate-200 pb-4 min-[500px]:mb-5 min-[500px]:pb-5">
+        <h2 className="font-display text-lg font-extrabold uppercase tracking-wide text-slate-950 min-[500px]:text-xl min-[640px]:text-2xl">
           {productTitle}
         </h2>
-        <p className="font-mono text-base tabular-nums text-slate-600 sm:text-lg">
+        <p className="font-mono text-sm tabular-nums text-slate-600 min-[500px]:text-base min-[640px]:text-lg">
           <span className="text-slate-400">№</span> {ticketNumber}
         </p>
       </header>
 
-      {/* Main: event info + QR (QR first on mobile) */}
-      <div className="mb-6 grid gap-5 sm:grid-cols-[minmax(0,1fr)_160px] sm:items-start">
-        <div className="order-2 min-w-0 sm:order-none">
+      {/*
+        Layout (owner / mockup max-width: 500px):
+        - <500px phone: QR top-center under ticket number, text below (scan without scroll)
+        - ≥500px tablet/desktop + print: text left, QR right
+      */}
+      <div className="buyer-ticket-main mb-5 grid grid-cols-1 gap-4 min-[500px]:mb-6 min-[500px]:grid-cols-[minmax(0,1fr)_160px] min-[500px]:items-start min-[500px]:gap-5 print:mb-5 print:grid-cols-[minmax(0,1fr)_160px] print:items-start print:gap-5">
+        <div className="buyer-ticket-info order-2 min-w-0 min-[500px]:order-none print:order-none">
           {whenLabel ? (
-            <p className="text-lg font-bold leading-snug text-primary-600 sm:text-xl">
+            <p className="text-base font-bold leading-snug text-primary-600 min-[500px]:text-lg min-[640px]:text-xl">
               {whenPrefix ? (
                 <>
                   <span className="font-semibold text-primary-600/80">{whenPrefix}: </span>
@@ -130,8 +159,8 @@ export function BuyerTicketCard({ order, origin, emailHint = 'unknown', classNam
           ) : null}
           {mainHeadline ? (
             <h3
-              className={`text-xl font-bold leading-snug text-slate-950 sm:text-[22px] ${
-                whenLabel ? 'mt-3' : ''
+              className={`text-lg font-bold leading-snug text-slate-950 min-[500px]:text-xl min-[640px]:text-[22px] ${
+                whenLabel ? 'mt-2 min-[500px]:mt-3' : ''
               }`}
             >
               {mainHeadline}
@@ -140,92 +169,65 @@ export function BuyerTicketCard({ order, origin, emailHint = 'unknown', classNam
           {venueTitle ? (
             <p
               className={`text-[15px] font-medium leading-6 text-slate-600 ${
-                whenLabel || mainHeadline ? 'mt-3' : ''
+                whenLabel || mainHeadline ? 'mt-2 min-[500px]:mt-3' : ''
               }`}
             >
               {venueTitle}
             </p>
           ) : null}
           {venueAddress ? (
-            <p className="mt-1.5 text-[13px] leading-5 text-slate-500">{venueAddress}</p>
+            <p className="mt-1 text-[13px] leading-5 text-slate-500">{venueAddress}</p>
           ) : null}
           {!ticketIssuedSeparately ? (
-            <p className="mt-3 text-xs leading-5 text-slate-400 print:hidden">
+            <p className="mt-2 text-xs leading-5 text-slate-400 print:hidden min-[500px]:mt-3">
               Номер билета пока совпадает с кодом заказа. Отдельный номер будет выдан при подключении
               сканера музея.
             </p>
           ) : null}
         </div>
 
-        <div className="order-1 flex flex-col items-center justify-self-center sm:order-none sm:justify-self-end">
+        <div className="buyer-ticket-qr order-1 flex flex-col items-center justify-self-center min-[500px]:order-none min-[500px]:justify-self-end print:order-none print:justify-self-end">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={qrUrl}
             alt={`QR: ссылка на страницу билета ${orderCode}`}
-            width={150}
-            height={150}
-            className="h-[150px] w-[150px] rounded-lg border border-slate-200 bg-white p-1.5"
+            width={160}
+            height={160}
+            className="h-[160px] w-[160px] rounded-lg border border-slate-200 bg-white p-1.5 min-[500px]:h-[150px] min-[500px]:w-[150px] print:h-[150px] print:w-[150px] print:border-slate-400"
           />
-          <p className="mt-2 max-w-[11rem] text-center text-[11px] leading-4 text-slate-500">
+          <p className="mt-2 max-w-[12rem] text-center text-[11px] leading-4 text-slate-500 print:text-[10px]">
             Покажите код на экране телефона или распечатайте
           </p>
         </div>
       </div>
 
       {/* Details */}
-      <dl className="mb-6 space-y-0 rounded-xl bg-slate-50 px-4 py-4 sm:px-5 print:bg-transparent print:px-0">
-        {buyerName ? (
-          <div className="flex items-start justify-between gap-4 border-b border-black/[0.04] py-2 first:pt-0 last:border-b-0 last:pb-0">
-            <dt className="shrink-0 text-[15px] text-slate-500">Посетитель</dt>
-            <dd className="text-right text-[15px] font-semibold text-slate-900">{buyerName}</dd>
-          </div>
-        ) : null}
-        {composition ? (
-          <div className="flex items-start justify-between gap-4 border-b border-black/[0.04] py-2 first:pt-0 last:border-b-0 last:pb-0">
-            <dt className="shrink-0 text-[15px] text-slate-500">Состав заказа</dt>
-            <dd className="max-w-[65%] text-right text-[15px] font-semibold leading-6 text-slate-900">
-              {composition}
-            </dd>
-          </div>
-        ) : null}
+      <dl className="mb-5 rounded-xl bg-slate-50 px-3.5 py-3.5 min-[500px]:mb-6 min-[500px]:px-5 min-[500px]:py-4 print:mb-5 print:rounded-none print:bg-transparent print:px-0 print:py-0">
+        {buyerName ? <DetailRow label="Посетитель" value={buyerName} /> : null}
+        {composition ? <DetailRow label="Состав заказа" value={composition} /> : null}
         {order.amountRub != null ? (
-          <div className="flex items-start justify-between gap-4 border-b border-black/[0.04] py-2 first:pt-0 last:border-b-0 last:pb-0">
-            <dt className="shrink-0 text-[15px] text-slate-500">Итоговая стоимость</dt>
-            <dd className="text-right text-lg font-bold text-slate-950">
-              {formatNumber(order.amountRub)} ₽
-            </dd>
-          </div>
+          <DetailRow
+            label="Итоговая стоимость"
+            value={`${formatNumber(order.amountRub)} ₽`}
+            valueClassName="text-base font-bold text-slate-950 min-[500px]:text-lg"
+          />
         ) : null}
         {ticketIssuedSeparately ? (
-          <div className="flex items-start justify-between gap-4 border-b border-black/[0.04] py-2 first:pt-0 last:border-b-0 last:pb-0">
-            <dt className="shrink-0 text-[15px] text-slate-500">Код заказа</dt>
-            <dd className="font-mono text-right text-[15px] font-semibold tabular-nums text-slate-700">
-              {orderCode}
-            </dd>
-          </div>
+          <DetailRow
+            label="Код заказа"
+            value={orderCode}
+            valueClassName="font-mono tabular-nums text-slate-700"
+          />
         ) : null}
-        {purchaseAt ? (
-          <div className="flex items-start justify-between gap-4 border-b border-black/[0.04] py-2 first:pt-0 last:border-b-0 last:pb-0">
-            <dt className="shrink-0 text-[15px] text-slate-500">Дата покупки</dt>
-            <dd className="text-right text-[15px] font-semibold text-slate-900">{purchaseAt}</dd>
-          </div>
-        ) : null}
+        {purchaseAt ? <DetailRow label="Дата покупки" value={purchaseAt} /> : null}
         {order.email ? (
-          <div className="flex items-start justify-between gap-4 border-b border-black/[0.04] py-2 first:pt-0 last:border-b-0 last:pb-0 print:hidden">
-            <dt className="shrink-0 text-[15px] text-slate-500">Email</dt>
-            <dd className="break-all text-right text-[15px] font-semibold text-slate-900">{order.email}</dd>
-          </div>
+          <DetailRow label="Email" value={order.email} className="print:hidden" valueClassName="break-all" />
         ) : null}
-        {supportPhone ? (
-          <div className="flex items-start justify-between gap-4 border-b border-black/[0.04] py-2 first:pt-0 last:border-b-0 last:pb-0">
-            <dt className="shrink-0 text-[15px] text-slate-500">Телефон поддержки</dt>
-            <dd className="text-right text-[15px] font-semibold text-slate-900">{supportPhone}</dd>
-          </div>
-        ) : null}
+        {supportPhone ? <DetailRow label="Телефон поддержки" value={supportPhone} /> : null}
       </dl>
 
       {/* Warning */}
-      <div className="mb-6 rounded-r-lg border-l-4 border-amber-400 bg-amber-50 px-4 py-3.5 text-[13px] leading-5 text-amber-950 print:bg-transparent">
+      <div className="mb-5 rounded-r-lg border-l-4 border-amber-400 bg-amber-50 px-3.5 py-3 text-[13px] leading-5 text-amber-950 min-[500px]:mb-6 min-[500px]:px-4 min-[500px]:py-3.5 print:mb-0 print:border-l-2 print:border-slate-400 print:bg-transparent print:px-3 print:py-2">
         <p className="font-bold">Обратите внимание:</p>
         <ul className="mt-1.5 list-none space-y-1">
           <li>
@@ -247,12 +249,15 @@ export function BuyerTicketCard({ order, origin, emailHint = 'unknown', classNam
         </p>
       ) : null}
 
-      {/* Actions */}
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 print:hidden">
+      {/* Actions - never print (ink / form) */}
+      <div
+        className="grid grid-cols-1 gap-3 min-[500px]:grid-cols-2 print:hidden"
+        data-buyer-ticket-actions
+      >
         <button
           type="button"
           onClick={() => window.print()}
-          className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary-600 px-5 py-3 text-sm font-semibold text-white hover:bg-primary-700"
+          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-primary-600 px-5 py-3 text-sm font-semibold text-white hover:bg-primary-700"
         >
           <Printer className="h-4 w-4" />
           Распечатать билет
@@ -260,17 +265,17 @@ export function BuyerTicketCard({ order, origin, emailHint = 'unknown', classNam
         <button
           type="button"
           onClick={() => void copyTicketCode()}
-          className="inline-flex items-center justify-center gap-2 rounded-lg bg-slate-200 px-5 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-300"
+          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-slate-200 px-5 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-300"
         >
           <Copy className="h-4 w-4" />
           {copied ? 'Скопировано' : 'Копировать код'}
         </button>
       </div>
 
-      <div className="mt-3 flex flex-wrap gap-2 print:hidden">
+      <div className="mt-3 flex flex-wrap gap-2 print:hidden" data-buyer-ticket-actions>
         <Link
           href="/account/purchases"
-          className="inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+          className="inline-flex min-h-10 items-center justify-center rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900"
         >
           Мои покупки
         </Link>

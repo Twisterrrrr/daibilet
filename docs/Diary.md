@@ -1,3 +1,18 @@
+## 2026-08-07 - Buyer ticket: 500px adaptive + print actions hide
+
+### Наблюдения
+- Owner: desktop/tablet = 2 колонки (текст слева, QR справа); phone <500px = QR сверху под номером; печать - без синей/серой кнопок действий.
+
+### Решения
+- Breakpoint `min-[500px]` / mockup `max-width: 500px`: QR `order-1` на phone, 2-col с 500px+.
+- Print CSS: `[data-buyer-ticket-actions]` + `.print:hidden` hidden; ticket full width; print всегда 2-col.
+- Detail rows stack on phone, side-by-side from 500px.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-07 - Buyer ticket card: owner mockup hierarchy
 
 ### Наблюдения

@@ -117,20 +117,20 @@ export function CheckoutTicketView({ publicCode, demoOrder, demoBanner }: Props)
         </div>
       </section>
 
-      <section className="container-page py-8 sm:py-10">
+      <section className="container-page py-5 min-[500px]:py-8 sm:py-10 print:max-w-none print:px-0 print:py-0">
         {demoBanner ? (
           <p className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-950 print:hidden">
             {demoBanner}
           </p>
         ) : null}
         {loading ? (
-          <div className="flex min-h-[30vh] items-center justify-center">
+          <div className="flex min-h-[30vh] items-center justify-center print:hidden">
             <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
           </div>
         ) : order ? (
           <BuyerTicketCard order={order} emailHint={emailHint} />
         ) : (
-          <p className="text-slate-600">Не удалось загрузить билет. Попробуйте обновить страницу.</p>
+          <p className="text-slate-600 print:hidden">Не удалось загрузить билет. Попробуйте обновить страницу.</p>
         )}
       </section>
     </>
