@@ -50,6 +50,7 @@
 | UX.BUY-10b | «Код заказа» once + «Номер билета» (пока = publicCode + caption); QR = ссылка на страницу; qa LOCKED draft order≠ticket | Критический | ✅ `9cd66ed2` MSK **BUILD_ID=`vH1YOLuir-6HoFg7VQAgQ`** Deploy **31190783370** |
 | UX.BUY-10c | Ticket card fields: datetime/validUntil, event, venue, address, payer, categories×qty, total, purchasedAt, notices, support phone (soft-fail) | Критический | ✅ `94d932f6` MSK **BUILD_ID=`fbv4D-L-6qEj1yHNUgMhj`** Deploy **31193227838** |
 | UX.BUY-10d | Demo preview `/checkout/ticket/demo` - full fixture card (no finance) for visual QA | Высокий | ✅ `938c0b9c` MSK **BUILD_ID=`AxY25gz4cpfuKxB9sf-yd`** Deploy **31194500195** |
+| UX.BUY-10e | Ticket card redesign по owner HTML mockup: QR focus/mobile-top, date top, details+warning, print/copy | Критический | 🔄 in progress |
 | UX.BUY-11 | Best-effort buyer email (SMTP_* on web; else save-code copy) | Высокий | ✅ (MSK SMTP unset → `smtp_not_configured` + UI copy) |
 | UX.BUY-12 | YooKassa return → catalog result/ticket (`?order=`); localStorage recovery | Высокий | ✅ catalog; finance must set return_url |
 
@@ -1357,7 +1358,8 @@ Owner-locked порядок: Hero → Советы → Расписание → 
 | B.28b | Afisha promo: цена/тайтлы/chips по header geo; полоса под 3 первыми статьями фида | Критический | 🚫 owner: афиша должна быть в углу | агент |
 | B.28c | Owner fix: swap колонок + rich Афиша в углу под «Свежее» (не mid-feed) | Критический | ✅ `9be0a98` prod @`ab1dc94` | агент |
 | B.29 | Pack B GPT brief: 9 гидов + 2 колонки Макса (`blog-content-gpt-briefs.md`) | Высокий | ⏳ brief ✅ 2026-07-27; тексты GPT → owner review → agent publish | владелец + агент |
-| B.30 | Pack C: 9 гидов + 2 колонки Макса (1024610) | Высокий | ✅ контент+images; log:upsert prod; slug 404 до publishedAt | владелец + агент |
+| B.30 | Pack C: 9 гидов + 2 колонки Макса (1024610) | Высокий | ✅ контент+images; blog:upsert prod; slug 404 до publishedAt | владелец + агент |
+| B.30a | Owner early-publish: Самара `samara-vykhodnye-dva-dnya-bez-gonki` (из списка 8 городов) | Высокий | 🔄 2026-08-07: publishedAt→now, upsert+revalidate | агент |
 | B.31 | Blog inline images: подпись (figcaption/alt) скрыта по умолчанию, показ при hover | Средний | ✅ 2026-07-27 `BlogFigure` web+public: `group-hover` + `@media(hover:hover)`, `title`+`alt` на img | агент |
 
 ---

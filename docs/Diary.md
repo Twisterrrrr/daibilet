@@ -1,3 +1,36 @@
+## 2026-08-07 - Buyer ticket card: owner mockup hierarchy
+
+### Наблюдения
+- Owner прислал polished HTML mockup: QR в фокусе (на mobile сверху), дата самым видным, крупный контраст, чистая карточка под смартфон и A4.
+- Предыдущий layout: ticket number в сером блоке, QR справа снизу на десктопе, дата в dl-строках - не соответствовал иерархии mockup.
+
+### Решения
+- `BuyerTicketCard` пересобран под mockup: header (тип + № билета) → main (дата primary / событие / площадка / адрес + QR, `order-first` на mobile) → details (посетитель, состав × qty, итого, код заказа secondary, покупка, support если есть) → warning (15-20 мин + не светить QR) → Print + Copy code.
+- Helpers: `formatBuyerTicketWhen`, `formatTicketLineItemsCompact`.
+- Demo `/checkout/ticket/demo` без изменений API - та же fixture.
+
+### Проблемы
+- Реальные заказы по-прежнему sparse без полного finance DTO.
+
+---
+
+## 2026-08-07 - Early publish Pack C: Самара
+
+### Наблюдения
+- Owner: выбрать ONE город из списка (Самара/Уфа/Ростов/Нск/Сочи/КГД/Красноярск/Ярославль) и опубликовать сейчас.
+- Все 8 MD уже готовы (cover+2 inline на диске, status PUBLISHED), но live 404 из-за будущего `publishedAt` (Pack C календарь с 14–24 авг).
+- Самара = A11, первый слот регионального пакета, самый ранний в календаре; ассеты уже 200 на CDN.
+
+### Решения
+- `publishedAt` → `2026-08-07T19:40:00+03:00`; date «7 авг 2026».
+- MSK: `blog:upsert --slug=… --force-published-at` + revalidate `/blog` + article path.
+- msk-2…5 companions не трогали.
+
+### Проблемы
+- Полный web rebuild не обязателен (images уже live); достаточно DB upsert + ISR revalidate.
+
+---
+
 ## 2026-08-07 - Buyer ticket demo preview (`/checkout/ticket/demo`)
 
 ### Наблюдения
