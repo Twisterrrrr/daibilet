@@ -28,15 +28,18 @@
 
 Параллельно Codex эксперимент на `pay/.159`. Catalog track = `daibilet.ru` / `apps/web`. Не force-merge.
 
+**LOCKED 2026-08-07 (owner):** MVP path = `create-payment` → redirect YooKassa (`confirmationUrl`). Custom checkout UI + сложный внутренний calc - **⚠️ deferred**. Параллельные эксперименты Cursor/Codex = thin redirect + result + account (не heavy form).
+
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| UX.BUY-1 | Checkout form admission → finance stub/yookassa soft (`/checkout/admissions/[slug]` + `/checkout/actions/admission`) | Критический | ✅ `98b02aa9` MSK **BUILD_ID=`yLJ-Q_y3Eo-p8_NM0luGe`** |
-| UX.BUY-2 | Result / thank-you ` /checkout/result?order=publicCode` | Критический | ✅ |
+| UX.BUY-1 | Thin admission entry → finance stub/yookassa soft (`/checkout/admissions/[slug]` + `/checkout/actions/admission`) → confirmationUrl redirect | Критический | ✅ `98b02aa9` MSK **BUILD_ID=`yLJ-Q_y3Eo-p8_NM0luGe`** |
+| UX.BUY-2 | Result / thank-you `/checkout/result?order=publicCode` | Критический | ✅ |
 | UX.BUY-3 | Account purchases: internal (publicCode/status/title) + widget ExternalOrder | Высокий | ✅ |
 | UX.BUY-4 | URL canon docs (catalog vs pay parallel) + CTA same-origin | Высокий | ✅ |
-| UX.BUY-5 | Codex: admission на public `/api/checkout/yookassa` + order-by-code + email/PDF/mail | Критический | ⏳ Codex |
+| UX.BUY-5 | Codex: admission на public `/api/checkout/yookassa` + order-by-code + email/PDF/mail (thin redirect path) | Критический | ⏳ Codex |
 | UX.BUY-6 | Codex: m2m / public purchases-by-email для fan-in в account | Высокий | ⏳ Codex |
-| UX.BUY-7 | UI polish: offer qty>1, phone, resume unpaid confirmationUrl | Средний | ⏳ next UX |
+| UX.BUY-7 | UI polish: offer qty>1, phone, resume unpaid confirmationUrl | Средний | ⏳ thin only |
+| UX.BUY-8 | Full checkout UI + internal calc (cart/multi-offer) | Низкий | ⚠️ deferred (owner 2026-08-07) |
 
 ---
 

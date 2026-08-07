@@ -1,3 +1,21 @@
+## 2026-08-07 - Buyer checkout MVP: direct YooKassa redirect (LOCKED)
+
+### Наблюдения
+- Owner: buyer checkout на сейчас = **direct YooKassa** (`create-payment` → `confirmationUrl` redirect), без тяжёлой внутренней формы расчёта.
+- Catalog track уже имеет thin entry + result + account; FIN.LC3 sandbox confirmationUrl OK.
+- Риск расхождения Cursor/Codex: один трек тянет full checkout UI, другой - redirect.
+
+### Решения
+- **LOCKED:** MVP path = create-payment → redirect YooKassa; custom checkout calc / heavy form - deferred until needed.
+- Параллельные эксперименты целят thin redirect + result + account; не force-merge catalog vs pay.
+- Docs: qa.md §4c, Tasktracker UX.BUY-* + UX.BUY-8 deferred.
+
+### Проблемы
+- Webhook cabinet / e2e PENDING→SUCCEEDED ещё open (FIN.W1).
+- Wide catalog CTA по-прежнему out.
+
+---
+
 ## 2026-08-07 - Webmaster «Долгий ответ сервера» (TTFB / home ISR)
 
 ### Наблюдения
