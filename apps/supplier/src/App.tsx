@@ -78,13 +78,15 @@ export function App() {
     setSupplierKeyState(value);
     if (value.trim()) window.localStorage.setItem(STORAGE_KEY, value.trim());
     else window.localStorage.removeItem(STORAGE_KEY);
-    const next = new URLSearchParams(searchParams);
-    if (value.trim()) next.set('supplier', value.trim());
-    else next.delete('supplier');
-    next.delete('slug');
-    next.delete('supplierId');
-    setSearchParams(next, { replace: true });
-  }, [searchParams, setSearchParams]);
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (value.trim()) next.set('supplier', value.trim());
+      else next.delete('supplier');
+      next.delete('slug');
+      next.delete('supplierId');
+      return next;
+    }, { replace: true });
+  }, [setSearchParams]);
 
   const clearAuthSession = React.useCallback(() => {
     setAccessToken('');
@@ -95,6 +97,7 @@ export function App() {
   React.useEffect(() => {
     if (!accessToken) {
       setAuthLoading(false);
+      setAuthSession(null);
       return;
     }
 
@@ -102,10 +105,14 @@ export function App() {
     setAuthLoading(true);
     supplierGet<SupplierPortalMeDto>('/api/supplier/auth/me', supplierKey, controller.signal, accessToken)
       .then((session) => {
+        if (controller.signal.aborted) return;
         setAuthSession(session);
         if (!supplierKey.trim()) setSupplierKey(session.currentSupplier.id);
       })
-      .catch(() => {
+      .catch((error) => {
+        if (controller.signal.aborted) return;
+        const message = error instanceof Error ? error.message : String(error);
+        if (message.toLowerCase().includes("abort")) return;
         clearAuthSession();
       })
       .finally(() => {
@@ -113,7 +120,9 @@ export function App() {
       });
 
     return () => controller.abort();
-  }, [accessToken, clearAuthSession, setSupplierKey, supplierKey]);
+    // setSupplierKey identity changes with URL searchParams; do not re-run /me on that alone.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accessToken, clearAuthSession, supplierKey]);
 
   const handleLogin = React.useCallback((payload: SupplierPortalAuthDto) => {
     window.localStorage.setItem(SUPPLIER_ACCESS_TOKEN_STORAGE_KEY, payload.accessToken);
@@ -135,7 +144,7 @@ export function App() {
     }
   }, [accessToken, clearAuthSession, setSupplierKey]);
 
-  const hasSupplierAccess = Boolean(supplierKey.trim());
+  const hasSupplierAccess = Boolean(accessToken && authSession && supplierKey.trim());
 
   return (
     <div className="app-shell">
