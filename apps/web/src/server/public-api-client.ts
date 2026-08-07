@@ -58,7 +58,37 @@ export function isTimeoutError(error: unknown): boolean {
   return msg.includes('timeout') || msg.includes('aborted due to timeout');
 }
 
-function isProductionBuildPhase(): boolean {
+/** ECONNREFUSED / ENOTFOUND / fetch failed - typical CI runner without local API. */
+export function isUnavailableError(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false;
+  const err = error as {
+    name?: string;
+    code?: number | string;
+    message?: string;
+    cause?: { code?: number | string; message?: string };
+  };
+  const code = String(err.code || err.cause?.code || '').toUpperCase();
+  if (
+    code === 'ECONNREFUSED' ||
+    code === 'ENOTFOUND' ||
+    code === 'ECONNRESET' ||
+    code === 'EAI_AGAIN' ||
+    code === 'UND_ERR_CONNECT_TIMEOUT' ||
+    code === 'UND_ERR_SOCKET'
+  ) {
+    return true;
+  }
+  const msg = `${err.message || ''} ${err.cause?.message || ''}`.toLowerCase();
+  return (
+    msg.includes('fetch failed') ||
+    msg.includes('econnrefused') ||
+    msg.includes('enotfound') ||
+    msg.includes('other side closed') ||
+    msg.includes('socket hang up')
+  );
+}
+
+export function isProductionBuildPhase(): boolean {
   return process.env.NEXT_PHASE === 'phase-production-build';
 }
 
@@ -109,8 +139,15 @@ export async function fetchPublicApiJson<T>(
         await sleep(retryDelayMs * 2 ** attempt);
         continue;
       }
+      // Connection refused will not heal on retry during CI without API/tunnel.
       break;
     }
+  }
+
+  // Match top-event-slugs: do not abort the whole Next build when API is down in CI.
+  if (isProductionBuildPhase() && isUnavailableError(lastError) && options.notFoundAsNull) {
+    console.warn(`[public-api] unavailable during SSG, soft-null ${apiPath}:`, lastError);
+    return null as T;
   }
 
   throw lastError;

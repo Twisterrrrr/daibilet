@@ -4,7 +4,7 @@
 **Ветка migration / prod:** `feat/next-monorepo`  
 **Prod catalog:** Next `apps/web` `:3001` + legacy API `:4000` на МСК `201.24.125.184`  
 **Web deploy canon:**  
-1. **Предпочтительно (быстро):** GitHub Actions `Deploy MSK web` - CI `pnpm web:build` → artifact `.next` → atomic swap на `daibilet-msk` (`deploy/scripts/swap-web-next-artifact.sh`). Secrets: `MSK_SSH_HOST`, `MSK_SSH_USER`, `MSK_SSH_KEY`.  
+1. **Предпочтительно (быстро):** GitHub Actions `Deploy MSK web` - CI `pnpm web:build` (SSH local-forward к MSK API `:4000`, `EVENT_SSG_TOP_N=0`) → artifact `.next` → atomic swap на `daibilet-msk` (`deploy/scripts/swap-web-next-artifact.sh`). Secrets: `MSK_SSH_HOST`, `MSK_SSH_USER`, `MSK_SSH_KEY`. Postgres наружу не открываем.  
 2. **Fallback:** MSK in-place `BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh` (stop → build на VPS → start).  
 SPB `.16` **retired**.  
 

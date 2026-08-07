@@ -1,4 +1,20 @@
-## 2026-08-06 - CI deploy MSK web (CI build + atomic swap)
+## 2026-08-07 - CI Deploy MSK web: SSG without local DB/API
+
+### Наблюдения
+- `Deploy MSK web` падал на hosted runner: Prisma P1001 `127.0.0.1:5437` в `top-event-slugs` (soft warn ok) и hard-fail prerender `/` - `fetch failed` / ECONNREFUSED `:4000`.
+- Root cause `/`: `withSoftTimeout` ловил только hang, не reject; `getHomeCoverFingerprints` → `getHomeCatalog` бросал ECONNREFUSED и валил `Promise.all` в `HomePageBody`. CI не имел ни Postgres, ни API; workflow не прокидывал `DATABASE_URL` / tunnel (намеренно - не открывать prod DB публично).
+
+### Решения
+- Workflow: SSH local-forward `GH:4000 → MSK 127.0.0.1:4000` перед `pnpm web:build` (секреты `MSK_SSH_*`); health `/api/health` или `/api/public/stats`.
+- `EVENT_SSG_TOP_N=0` в CI - skip Prisma event SSG без `DATABASE_URL` / без DB tunnel.
+- Soft-fail safety net: `withSoftTimeout` ловит reject; home fingerprints try/catch; `/podborki` `allSettled`; landing candidate soft-catch; `fetchPublicApiJson` soft-null на build+unavailable+`notFoundAsNull`.
+- Канон сохранён: CI build + atomic swap; Postgres не торчит наружу; fallback `deploy-prod-next.sh` на MSK.
+
+### Проблемы
+- Нет (ожидаем re-dispatch workflow после push на `feat/next-monorepo` + sync workflow на `main`).
+
+---
+
 
 ### Наблюдения
 - Owner: «почему не CI?» - SSH сам быстрый, тормозит in-place `web:build` на 4GB MSK.

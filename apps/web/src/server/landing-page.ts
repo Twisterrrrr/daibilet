@@ -34,20 +34,24 @@ export async function fetchLandingPageDto(
   citySlug?: string | null,
 ): Promise<PublicLandingPageDto | null> {
   for (const candidate of landingFetchCandidates(slug)) {
-    const payload = await fetchPublicApiJson<PublicLandingPageDto | null>(
-      `/api/public/landings/${encodeURIComponent(candidate)}`,
-      {
-        searchParams: citySlug ? { city: citySlug } : null,
-        timeoutMs: 5_000,
-        notFoundAsNull: true,
-      },
-    );
-    if (!payload?.landing) continue;
-    if (candidate === slug) return payload;
-    return {
-      ...payload,
-      landing: { ...payload.landing, slug },
-    };
+    try {
+      const payload = await fetchPublicApiJson<PublicLandingPageDto | null>(
+        `/api/public/landings/${encodeURIComponent(candidate)}`,
+        {
+          searchParams: citySlug ? { city: citySlug } : null,
+          timeoutMs: 5_000,
+          notFoundAsNull: true,
+        },
+      );
+      if (!payload?.landing) continue;
+      if (candidate === slug) return payload;
+      return {
+        ...payload,
+        landing: { ...payload.landing, slug },
+      };
+    } catch (error) {
+      console.warn(`[landing-page] soft-fail candidate=${candidate} during fetch:`, error);
+    }
   }
   return null;
 }

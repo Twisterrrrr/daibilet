@@ -257,6 +257,14 @@
 | OPS.SSG3 | `EVENT_SSG_TOP_N` default 40; `0`=skip; deploy export | Критический | ✅ `8423289` |
 | OPS.SSG4 | deploy: `.next.prev` save + restore on build fail | Критический | ✅ `8423289` |
 
+## CI Deploy MSK web SSG (2026-08-07)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| OPS.CI1 | SSH tunnel CI→MSK API :4000 for SSG (no public Postgres) | Критический | ✅ |
+| OPS.CI2 | `EVENT_SSG_TOP_N=0` on CI (skip Prisma event prebuild) | Критический | ✅ |
+| OPS.CI3 | Soft-fail home/podborki/landings/`withSoftTimeout` on API down | Критический | ✅ |
+
 ## City hub hookFact + IA (2026-08-03)
 
 | # | Задача | Приоритет | Статус |

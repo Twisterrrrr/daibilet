@@ -79,11 +79,16 @@ export const getHomeCatalog = unstable_cache(
  */
 export const getHomeCoverFingerprints = unstable_cache(
   async (): Promise<Record<string, string>> => {
-    const catalog = await getHomeCatalog();
-    const map = await resolveCoverContentFingerprints(
-      (catalog.items ?? []).map((item) => item.imageUrl),
-    );
-    return Object.fromEntries(map);
+    try {
+      const catalog = await getHomeCatalog();
+      const map = await resolveCoverContentFingerprints(
+        (catalog.items ?? []).map((item) => item.imageUrl),
+      );
+      return Object.fromEntries(map);
+    } catch (error) {
+      console.warn('[home-cover-fingerprints] unavailable during SSG, skipping:', error);
+      return {};
+    }
   },
   ['home-cover-fingerprints-v1'],
   homeCacheOptions,

@@ -4,7 +4,7 @@ import { Suspense } from 'react';
 import { LandingsCatalogView } from '@/components/LandingsCatalogView.client';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
-import { type PodborkiCatalogItem } from '@/lib/podborki-categories';
+import { PODBORKI_CATEGORIES, type PodborkiCatalogItem } from '@/lib/podborki-categories';
 import { buildShareMetadata, pageTitle } from '@/lib/seo-meta';
 import {
   getCachedDestinations,
@@ -36,11 +36,27 @@ export async function generateMetadata(): Promise<Metadata> {
  * `/api/public/landings-catalog?city=` when a city is selected and merges city-bound cards.
  */
 export default async function PodborkiCatalogPage() {
-  const [catalog, destinationsPayload, meta] = await Promise.all([
+  const emptyCatalog = { generatedAt: new Date(0).toISOString(), city: 'all', items: [] as NonNullable<
+    Awaited<ReturnType<typeof getCachedLandingsCatalog>>
+  >['items'] };
+  const emptyDestinations = {
+    generatedAt: new Date(0).toISOString(),
+    destinations: [] as Awaited<ReturnType<typeof getCachedDestinations>>['destinations'],
+  };
+
+  const [catalogResult, destinationsResult, metaResult] = await Promise.allSettled([
     getCachedLandingsCatalog('all'),
     getCachedDestinations(),
     getCachedPodborkiMeta(),
   ]);
+
+  const catalog = catalogResult.status === 'fulfilled' ? catalogResult.value : emptyCatalog;
+  const destinationsPayload =
+    destinationsResult.status === 'fulfilled' ? destinationsResult.value : emptyDestinations;
+  const meta =
+    metaResult.status === 'fulfilled'
+      ? metaResult.value
+      : { layoutBySlug: {}, categoryBySlug: {}, categories: PODBORKI_CATEGORIES };
 
   const items: PodborkiCatalogItem[] = (catalog.items ?? []).map((item) => ({
     slug: item.slug,
