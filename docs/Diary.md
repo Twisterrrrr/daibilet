@@ -1,3 +1,19 @@
+## 2026-08-07 - Москва hub Phase C draft (MS.TIER4)
+
+### Наблюдения
+- Owner: «по Москве сегодня соберем хаб - места, картинки, пригороды, seed/link/suburbs/vectors/гиды к сценариям линк с my-day».
+- До прохода Москва была floor **6** mustSee, без suburbs / presets / venue images. СПб Phase B - эталон.
+
+### Решения
+- Draft pack в `CITY_INFO.moscow` (web + public), commit `3d3c917`: **58** mustSee с фильтрами, **8** suburbs (40 POI) + travel vectors, **5** presets (`msk-1`…`msk-5`).
+- Docs: `docs/drafts/moscow-must-see-draft.md`, `moscow-route-articles-plan.md`; patch-script `scripts/data/patch-moscow-hub-pack.js`; suburb coords +40.
+- Companion: `moscow-2-dnya-…` → `msk-1` + CTA `/my-day?city=moscow`. Гастро-бренды не выдумывали.
+
+### Проблемы
+- Owner OK на состав; local/prod DB seed не применён (нет DATABASE_URL / ECONNREFUSED :5437); place images `/images/venues/moscow/` пусто; 4 companion-статьи только в плане.
+
+---
+
 ## 2026-08-07 - Venues vs locations: owner OK option A + nav V1
 
 ### Наблюдения
