@@ -83,8 +83,8 @@ curl -sS https://daibilet.ru/robots.txt | grep -i sitemap
 
 | Задача | Кто | Статус |
 |--------|-----|--------|
-| SEO.IN2 sitemap в Вебмастер + GSC | владелец | ⏳ |
-| SEO.IN3 / SEO.16 переобход TOP-15 | владелец | ⏳ |
+| SEO.IN2 sitemap в Вебмастер + GSC | владелец | ✅ 2026-08-07 owner: сделано ранее; нет трафика |
+| SEO.IN3 / SEO.16 переобход TOP-15 | владелец | ✅ 2026-08-07 owner: сделано ранее; нет трафика |
 | robots.txt → sitemap | код | ✅ |
 | IndexNow notify on deploy | код | ✅ SEO.IN1 |
 

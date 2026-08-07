@@ -1,9 +1,10 @@
 # Яндекс.Метрика - цели воронки (CV.2b-e, CV.2f)
 
-**Обновлено:** 2026-07-27  
+**Обновлено:** 2026-08-07  
 **Счётчик:** `106786540` (`NEXT_PUBLIC_YANDEX_METRIKA_ID`)  
 **Код:** `apps/web/src/lib/catalog-analytics.ts`  
-**GTM:** опционально (дублирует `dataLayer.push`)
+**GTM:** опционально (дублирует `dataLayer.push`)  
+**Owner 2026-08-07:** цели в кабинете **сделаны ранее**; пустые отчёты = нет трафика (не открытый TODO).
 
 ---
 
@@ -11,10 +12,10 @@
 
 | Goal id | Смысл | Код шлёт? | Где wired | Маркетолог |
 |---------|-------|-----------|-----------|------------|
-| `product_card_click` | Клик карточки → страница события | ✅ | `EventCard`, `EventCardHorizontal` | ⏳ создать цель в Метрике |
-| `select_tickets` | Клик «Купить» / открытие виджета TC или Teplohod | ✅ | `TcWidgetButton`, `TeplohodWidgetButton`, `CatalogPurchaseTrigger` | ⏳ создать цель |
-| `catalog_interstitial_click` | Клик interstitial-баннера в `/events` | ✅ | `CatalogResults` → `trackCatalogBannerClick` | ⏳ цель + GTM trigger |
-| `purchase_success` | Факт оплаты | ❌ **не шлём** | helper `trackPurchaseSuccess` готов, вызовов нет | ⏳ можно создать заранее; ждём callback |
+| `product_card_click` | Клик карточки → страница события | ✅ | `EventCard`, `EventCardHorizontal` | ✅ цель создана (owner) |
+| `select_tickets` | Клик «Купить» / открытие виджета TC или Teplohod | ✅ | `TcWidgetButton`, `TeplohodWidgetButton`, `CatalogPurchaseTrigger` | ✅ цель создана (owner) |
+| `catalog_interstitial_click` | Клик interstitial-баннера в `/events` | ✅ | `CatalogResults` → `trackCatalogBannerClick` | ✅ цель + GTM (owner) |
+| `purchase_success` | Факт оплаты | ❌ **не шлём** | helper `trackPurchaseSuccess` готов, вызовов нет | ✅ цель опц. создана; ждём callback |
 
 **Важно:** id целей **case-sensitive**, ровно как в таблице.
 
@@ -111,9 +112,9 @@ typeof window.ym
 
 | ID | Статус |
 |----|--------|
-| CV.2b `catalog_interstitial_click` | код ✅ / маркетолог ⏳ |
-| CV.2c `product_card_click` | код ✅ / маркетолог ⏳ |
-| CV.2d `select_tickets` | код ✅ / маркетолог ⏳ |
-| CV.2e `purchase_success` | код ❌ / маркетолог ⏳ (цель заранее OK) |
+| CV.2b `catalog_interstitial_click` | ✅ код + кабинет (2026-08-07) |
+| CV.2c `product_card_click` | ✅ код + кабинет (2026-08-07) |
+| CV.2d `select_tickets` | ✅ код + кабинет (2026-08-07) |
+| CV.2e `purchase_success` | ✅ цель в кабинете; код ❌ ждёт callback |
 | CV.2f Webvisor SOP | процесс ⏳ |
 | SEO.IN4 счётчик на сайте | ✅ не трогать код |

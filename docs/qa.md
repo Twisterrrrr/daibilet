@@ -34,18 +34,18 @@ Owner: основная работа локально / preview; агенты **
 
 **Закрыто owner:** локация = парки/набережные/памятники/улицы; venue = афиша + institution. **Музеи и арт-галереи всегда Площадки** (даже только-инфо, без договора) - блок хаба. Одна точка = одна карточка; локация→venue = upgrade / hide+301, не twin PUBLISHED.
 
-Остаётся открытым (см. UX ниже): единый `/places`, лейбл «Локации», IA demote `/locations` - это UX/nav, не смена антидубль-канона.
+**LOCKED 2026-08-07 (owner OK, option A):** URL-семейство от **kind/role**, не от наличия билетов. Музей/театр/зал без афиши → всё равно `/venues`, buy-chrome скрыт до offers/sessions. Достопримечательности / парки / причалы / гастро-как-day-point → `/locations`. **Не** переносить «пока нет билетов» временно в `/locations`. Commerce влияет только на UI chrome. Три оси: `kind`→URL, `offers`→chrome, `pageStatus`→модерация. Nav **V1** (пункт `/locations` в primary). Единый `/places` - deferred. Rename лейбла → «Места и точки сбора» = follow-up (UX.LOC3), не блокер IA.
 
-## 2026-08-01 - UX: Locations + mobile catalog (открыто)
+## 2026-08-01 - UX: Locations + mobile catalog — ЗАКРЫТО (часть; LOCKED 2026-08-07)
 
 Контекст: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brief.md). Задачи UX.LOC* в Tasktracker.
 
-1. **Лейбл `/locations`:** «Точки сбора» / «Места встречи» / оставить «Локации»?
-2. **Nav:** оставить пункт (с новым label), убрать в secondary/footer, или только из city hub?
-3. **Default city:** «Все города» ok, или first-visit city gate (Kassir-like)?
-4. **Гео suggest (IP/GPS):** нужен ли с явным confirm (не silent auto-switch)?
-5. **Список `/locations`:** только места с событиями, или SEO-контентные без афиши тоже (VK.8)?
-6. **Единый `/places`:** интересен в ближайший квартал или рано?
+1. **Лейбл `/locations`:** ✅ target **«Места и точки сбора»** (follow-up UX.LOC3; сейчас «Локации» ok до rename).
+2. **Nav:** ✅ **V1** - оставить в primary nav (не demote в footer / только city hub). UX.LOC8 / PH2.LOC1 decision locked.
+3. **Default city:** ⏳ «Все города» ok vs first-visit city gate - ещё открыто (не блокер family).
+4. **Гео suggest (IP/GPS):** ⏳ confirm vs silent - ещё открыто.
+5. **Список `/locations`:** ✅ SEO-контентные без афиши **да** (VK.8); family ≠ ticket gate. Institution без tickets остаётся `/venues`.
+6. **Единый `/places`:** ✅ **рано / deferred** (UX.LOC9 / PH2.PLC1).
 
 ## 2026-07-31 - Location↔Excursion linking (открыто)
 
@@ -86,7 +86,7 @@ Owner: основная работа локально / preview; агенты **
 - SSH для Codex: ключ `daibilet_spb_finance` / pubkey в `authorized_keys`
 - Webhook register в кабинете ЮKassa - после egress green
 
-`.16` (Intelligent Hoopoe) **retired from deploy/build pipeline (2026-08-01)**. Owner: optional backup → удалить VM в Timeweb. Apex DNS уже на `.184`. Web deploy = MSK-only.
+`.16` (Intelligent Hoopoe) **труп** (MIG.9.7 ✅ 2026-08-07): снят из docs/scripts inventory. Wipe VM в Timeweb = owner, если ещё биллится. Apex DNS / web build = MSK `.184` only. Teplohod allowlist = `.184`, не `.16`.
 
 ### PurchaseProjection / dual order sources
 
@@ -126,18 +126,13 @@ Owner: основная работа локально / preview; агенты **
 3. **Admin address:** только новые logistics-поля editable; `address` остаётся **sync-only** (readonly display).
 4. **Event DTO:** slim logistics fields встроены в event page SSR payload (0ms modal). Fetch при клике **не** делаем.
 
-## 2026-07-25 - Catalog interstitial analytics — ЗАКРЫТО (расширено 2026-07-26)
+## 2026-07-25 - Catalog interstitial analytics — ЗАКРЫТО (owner confirm 2026-08-07)
 
-1. **GTM / Metrika goals:** frontend raw push **корректен и готов** (`dataLayer` + `ym('reachGoal', …)` при `NEXT_PUBLIC_YANDEX_METRIKA_ID`). **Решение owner:** в кабинетах нужна настройка цели/триггера - без неё события не попадут в отчёты конверсий.
-   - **Яндекс.Метрика:** Цели → JavaScript-событие → id ровно (case-sensitive):
-     - `catalog_interstitial_click` (CV.2b)
-     - `product_card_click` (CV.2c) - клик карточки события
-     - `select_tickets` (CV.2d) - клик Купить / открытие виджета
-     - `purchase_success` (CV.2e) - создать заранее; **код пока НЕ шлёт** (нет widget success / thank-you)
-   - **GTM:** Custom Event trigger с тем же именем + Tag. Без trigger `dataLayer` push отбрасывается.
-   - **Purchase meaning:** оплата в виджете провайдера (Ticketscloud / Teplohod), не «редирект в виджет». Клиентский fake purchase запрещён.
-   - **Webvisor (CV.2f):** первый месяц - ежедневно 10-15 мин просмотр сессий воронки card→виджет (процесс маркетолога).
-   - Задачи: **CV.2b–CV.2f** в Tasktracker.
+1. **GTM / Metrika goals:** ✅ **ЗАКРЫТО (2026-08-07).** Frontend push корректен (`dataLayer` + `ym('reachGoal', …)`). Owner: цели в Метрике (`catalog_interstitial_click`, `product_card_click`, `select_tickets`, опц. `purchase_success`) **сделаны ранее**; пустые отчёты = **нет трафика**, не открытый TODO кабинета.
+   - Id целей case-sensitive; GTM Custom Event (если используется) - тем же именем.
+   - **Purchase meaning:** оплата в виджете провайдера; код `purchase_success` **не шлёт** без widget callback / thank-you (engineering follow-up).
+   - **Webvisor (CV.2f):** процесс маркетолога (10-15 мин/день) - отдельно от создания целей.
+   - Закрыты в Tasktracker: **CV.2b–CV.2e**; sitemap/переобход: **SEO.IN2–IN3 / SEO.T5 / SEO.LC6 / SEO.16**.
 
 ## 2026-07-23 - Антиспам блога / индекс (owner) — ЗАКРЫТО (lock 2026-07-25)
 

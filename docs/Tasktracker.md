@@ -177,10 +177,10 @@
 | PH2.CITY1 | `/cities` hub: compact grid, vibe tags, CountUp, LuckyCity, OSM pins (не SVG) | Средний | ✅ `ce3d376` MSK **BUILD_ID=`1x2J9HMR87fUIVEMHeTdt`** |
 | PH2.CITY2 | Capitals must-see wide pack (MSK/SPB) после owner list (MS.TIER3/4) | Высокий | ⏳ owner list |
 | PH2.VEN1 | Venue PDP monetization: clearer ticket path, related events density | Средний | ⚠️ next phase (UX.VENUE-MON) |
-| PH2.LOC1 | `/locations` IA rebuild: primary job + demote from nav или city-hub section (UX.LOC8) | Высокий | ⏳ |
+| PH2.LOC1 | `/locations` IA: decision V1 keep primary nav (UX.LOC8); label «Места и точки сбора» = UX.LOC3 | Высокий | ✅ decided 2026-08-07 owner A+V1; rename ⏳ LOC3; `/places` deferred |
 | PH2.LOC2 | Mobile city chrome: CityPicker visible outside burger (brief quick win) | Критический | ⏳ |
 | PH2.LOC3 | `/locations` hero: drop map-first on mobile; dense city-first | Высокий | ⏳ (partial LOC4 done) |
-| PH2.PLC1 | Unified `/places` venues+locations tabs (UX.LOC9) | Низкий | ⚠️ after LOC8 |
+| PH2.PLC1 | Unified `/places` venues+locations tabs (UX.LOC9) | Низкий | ⚠️ deferred (owner 2026-08-07) |
 
 ---
 
@@ -388,12 +388,12 @@ Canon: [inc-504-ssr-hardening.md](./inc-504-ssr-hardening.md).
 | UX.LOC4 | `/locations`: dense hero; блок «Популярные города» (RussiaMap) убран с локаций | Высокий | ✅ `c698f2c` MSK **BUILD_ID=`SdwQIxr9a9CVj7jfdAKWh`** |
 | UX.MOB1 | Shared `MobileStickyActionBar` + location/institution/my-day sticky CTAs | Высокий | ✅ |
 | UX.MOB2 | Event mobile hero: не full-viewport (`min(42vh,20rem)`) | Средний | ✅ |
-| UX.LOC3 | Rename nav/H1 «Локации» → job-label - после owner Q1 | Высокий | ⏳ |
+| UX.LOC3 | Rename nav/H1 «Локации» → «Места и точки сбора» (owner target; V1 nav stays) | Высокий | ⏳ |
 | UX.LOC5 | `/events` mobile: context line «События в {город}»; banner если city=all | Высокий | ⏳ |
 | UX.LOC6 | Bottom-sheet CityPicker: поиск + популярные + «Все города» | Высокий | ⏳ |
 | UX.LOC7 | Catalog mobile date UX: один entry (chips/sheet) | Средний | ⏳ |
-| UX.LOC8 | IA: demote `/locations` из primary nav или секция city hub | Средний | ⏳ |
-| UX.LOC9 | Unified `/places` (venues+locations tabs) | Низкий | ⚠️ после LOC8 |
+| UX.LOC8 | IA nav: V1 keep `/locations` in primary (не demote) | Средний | ✅ decided 2026-08-07 owner OK A+V1 |
+| UX.LOC9 | Unified `/places` (venues+locations tabs) | Низкий | ⚠️ deferred (owner 2026-08-07) |
 | UX.MYDAY-UX0804 | Must-see carousel; ticket groups; hour-plan sheet+soft hints; custom search | Критический | ✅ `e617ac1` MSK **BUILD_ID=`BCWcAIglYC8cAP-6Zgr4k`** `/my-day` 200 |
 | UX.MYDAY-MINICARD | Must-see mini-cards (thumb+desc) in H-carousel; restore своё место accordion | Критический | ✅ `5c13bc5` MSK **BUILD_ID=`uoDz6BgaWtWh7P4AC0wF4`** `/my-day` 200 |
 | UX.MYDAY-MINICARD2 | Must-see cards wider (24rem) + 2× thumb (96px); keep H-carousel | Критический | ✅ `754fd12` MSK **BUILD_ID=`ZqoDR5hR_voM4u3qKvngF`** `/my-day` 200 |
@@ -457,13 +457,13 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 | UX.LOC0 | Research brief: audit `/locations` + mobile `/events` city UX + competitor patterns | Высокий | ✅ docs |
 | UX.LOC1 | Mobile sticky header: city chip (сейчас CityPicker только `lg+`; в меню город внизу) | Критический | ✅ 2026-08-02 |
 | UX.LOC2 | `MobileNavSheet`: блок «Город» сразу после поиска | Критический | ✅ 2026-08-02 |
-| UX.LOC3 | Rename nav/H1 «Локации» → job-label (Точки сбора / Места встречи) - после owner Q1 | Высокий | ⏳ |
+| UX.LOC3 | Rename nav/H1 «Локации» → «Места и точки сбора» (owner target; V1 nav stays) | Высокий | ⏳ |
 | UX.LOC4 | `/locations`: dense hero; «Популярные города» (RussiaMap) убран с локаций | Высокий | ✅ `c698f2c` MSK **BUILD_ID=`SdwQIxr9a9CVj7jfdAKWh`** |
 | UX.LOC5 | `/events` mobile: context line «События в {город}»; banner если city=all | Высокий | ⏳ |
 | UX.LOC6 | Bottom-sheet CityPicker: поиск + популярные + «Все города» | Высокий | ⏳ |
 | UX.LOC7 | Catalog mobile date UX: один entry (chips/sheet), не select+date input разом | Средний | ⏳ |
-| UX.LOC8 | IA: demote `/locations` из primary nav или секция city hub (owner V1/V2) | Средний | ⏳ |
-| UX.LOC9 | Unified `/places` (venues+locations tabs) | Низкий | ⚠️ после LOC8 |
+| UX.LOC8 | IA nav: V1 keep `/locations` in primary (не demote) | Средний | ✅ decided 2026-08-07 owner OK A+V1 |
+| UX.LOC9 | Unified `/places` (venues+locations tabs) | Низкий | ⚠️ deferred (owner 2026-08-07) |
 | UX.MAP1 | Location map zoom-out (`-`): OSM MapLibre embed floor → Leaflet `OsmMapEmbed` | Высокий | ✅ `4c93418` MSK **BUILD_ID=`HDL3hw0HUymPBt_oi5syV`** |
 | UX.MAP-UA | Leaflet attribution: strip UA flag project-wide (`loadDaibiletLeaflet`) | Высокий | ✅ `d5de7b9` MSK **BUILD_ID=`R3nyHuxEYbZ-N4toJ2Lxo`** `/cities` 200 |
 | LOC.BUS1 | `pl-vosstaniya` wrongly pier → bus (override + DB MEETING_POINT + water-only gate) | Критический | ✅ `1698c9e` MSK **BUILD_ID=`uAAeJS3sG_GuPNfbwQqKy`** |
@@ -662,7 +662,7 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 | MIG.6 | Smoke на МСК (IP/`--resolve`) до DNS | Критический | ✅ |
 | MIG.7 | DNS A `daibilet.ru`/`www` → `201.24.125.184` + post-smoke | Критический | ✅ 2026-07-30 |
 | MIG.8 | СПб: stop public web/api + TC timer + crontab sync; PG snapshot; host → finance+staging | Средний | ✅ 2026-07-30 · [spb-finance-host.md](./spb-finance-host.md) |
-| MIG.9 | Role lock: `.184` catalog · `.159` battle finance · `.16` **retired from pipeline** (owner deletes VM) | Высокий | ✅ pipeline 2026-08-01 · VM wipe = owner Timeweb panel · [spb-finance-host.md](./spb-finance-host.md) |
+| MIG.9 | Role lock: `.184` catalog · `.159` battle finance · `.16` **труп** (снят из inventory) | Высокий | ✅ 2026-08-07 · [spb-finance-host.md](./spb-finance-host.md) |
 | MIG.9.0 | Phase 0: SSH/firewall `.159` + DNS A `pay`/`supplier`/`finance-api` → `.159` | Критический | ✅ SSH/UFW + DNS A + TLS SAN 2026-07-30 (`checkout`/`finance.` не нужны) |
 | MIG.9.1 | Phase 1: base stack docker/nginx/node на `.159` | Высокий | ✅ 2026-07-30 |
 | MIG.9.2 | Phase 2: fresh finance PG на `.159` (не catalog dump) | Критический | ✅ PG `:5437` + migrations/seed smoke 2026-07-30 |
@@ -670,13 +670,13 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 | MIG.9.4 | Phase 4: optional staging/build scaffolding на `.159` (не justification для `.16`) | Средний | ✅ N/A - SPB `.16` retired from build; staging на `.159` optional later |
 | MIG.9.5 | Phase 5: YooKassa webhook → finance-api canon; dual only if prior live | Критический | 🔒 URL locked; VERIFY=0; register after egress+smoke |
 | MIG.9.6 | Phase 6: smoke `pay`/`supplier`/webhook; catalog `.184` без cutover | Критический | ⏳ |
-| MIG.9.7 | Phase 7: backup `.16` off-box (optional) + **delete Intelligent Hoopoe in Timeweb** | Высокий | 🔄 pipeline retired 2026-08-01; VM wipe = **owner** (SSH still OK with `daibilet_staging_key`) |
+| MIG.9.7 | Phase 7: retire Intelligent Hoopoe `.16` from repo/ops + **wipe VM in Timeweb** | Высокий | ✅ repo/docs/scripts 2026-08-07 (owner confirmed «труп»); **VM wipe в панели Timeweb = owner**, если ещё биллится |
 | PERF.OOM4 | MSK: снять `cpus:1`/`workerThreads:false`, heap build 5120Mi | Высокий | ✅ |
 
 План: [migration-spb-to-msk.md](./migration-spb-to-msk.md) · roles/MIG.9: [spb-migrate-4gb-to-8gb.md](./spb-migrate-4gb-to-8gb.md) · [spb-finance-host.md](./spb-finance-host.md)  
 Домены finance (**канон**): **`pay.daibilet.ru`** (buyer) · `supplier.daibilet.ru` · `finance-api.daibilet.ru` - DNS+TLS ✅. Alias `checkout.` / `finance.` не обязательны ([qa.md](./qa.md)).  
 Owner minimum: MSK→`.159` сеть ✅ · YooKassa `SECRET_KEY=<set>` ✅ · **egress `.159` outbound 443+DNS** 🚫 · Codex SSH · webhook register after smoke.  
-**Web deploy canon (2026-08-01):** MSK-only `deploy-prod-next.sh` на `.184`. SPB `.16` **не** builder - owner удаляет VM (MIG.9.7).
+**Web deploy canon:** MSK-only (`deploy-prod-next.sh` / CI Deploy MSK web) на `.184`. SPB `.16` Intelligent Hoopoe = труп (MIG.9.7 ✅ docs; wipe VM = owner Timeweb).
 
 ---
 
@@ -852,8 +852,8 @@ enue_54cabc2b9cb5385a9f65b95a: 404 hub (MEETING_POINT/NONE) - ensure script + TC
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
 | SEO.IN1 | IndexNow: key file `/indexnow-key.txt` + `/{key}.txt` + notify Yandex/Bing on revalidate / article publish / deploy-warm (без спама каталогом) | Критический | ✅ `96fd5a9` / fix `683455d` / `d355b62`; prod key 200; Yandex IndexNow 202 |
-| SEO.IN2 | Owner: добавить sitemap `https://daibilet.ru/sitemap.xml` в Яндекс.Вебмастер (если ещё нет) | Высокий | ⏳ **владелец** (чеклист `docs/webmaster-top15-checklist.md`) |
-| SEO.IN3 | Owner: Переобход TOP-15 URL после deploy (Вебмастер → Индексирование → Переобход) | Высокий | ⏳ **владелец** (см. `docs/webmaster-top15-checklist.md`) |
+| SEO.IN2 | Owner: добавить sitemap `https://daibilet.ru/sitemap.xml` в Яндекс.Вебмастер (если ещё нет) | Высокий | ✅ 2026-08-07 owner: сделано ранее; нет трафика |
+| SEO.IN3 | Owner: Переобход TOP-15 URL после deploy (Вебмастер → Индексирование → Переобход) | Высокий | ✅ 2026-08-07 owner: сделано ранее; нет трафика |
 | SEO.IN4 | Метрика уже на сайте (ID 106786540) - не трогать код; цели CV.2b отдельно | — | ✅ already |
 
 ---
@@ -869,7 +869,7 @@ enue_54cabc2b9cb5385a9f65b95a: 404 hub (MEETING_POINT/NONE) - ensure script + TC
 | SEO.LC3 | Meta: реальный `priceFrom` only; убрать invent «от 100» в `landing-seo` | Критический | ✅ |
 | SEO.LC4 | National + city×category metadata через `buildLandingMetadata` / `seo-listing-meta` | Высокий | ✅ |
 | SEO.LC5 | Landing grid «Показать ещё» (page 48) + chip touch ~44px | Средний | ✅ |
-| SEO.LC6 | Owner: Webmaster sitemap + reindex TOP | Высокий | ⏳ **владелец** (IN2/IN3) |
+| SEO.LC6 | Owner: Webmaster sitemap + reindex TOP | Высокий | ✅ 2026-08-07 = IN2/IN3; owner: сделано ранее; нет трафика |
 
 ---
 
@@ -932,10 +932,10 @@ enue_54cabc2b9cb5385a9f65b95a: 404 hub (MEETING_POINT/NONE) - ensure script + TC
 |---|--------|-----------|--------|
 | CV.1 | `/events` filters: sticky «Показать N вариантов» + live preview count | Критический | ✅ debounce 350ms; zero CTA: «Нет подходящих событий» (pastel gray) |
 | CV.2 | `/events` grid: interstitial баннеры каждые 8 карточек → гиды/подборки | Высокий | ✅ soft tint + badge «Подборка»/«Из Блога»; compact mobile + click track |
-| CV.2b | Настроить цель `catalog_interstitial_click` в Метрике + триггер/тег в GTM (маркетолог; frontend push уже есть) | Высокий | ⏳ handoff: `docs/metrika-goals-checklist.md`; код ✅ |
-| CV.2c | Метрика: цель `product_card_click` (клик карточки события) - маркетолог создаёт JS-событие | Критический | ⏳ handoff: код ✅ (`EventCard`); см. `docs/metrika-goals-checklist.md` |
-| CV.2d | Метрика: цель `select_tickets` (клик Купить / открытие виджета TC\|Teplohod) - маркетолог | Критический | ⏳ handoff: код ✅ (`TcWidget`/`TeplohodWidget`); см. checklist |
-| CV.2e | Метрика: цель `purchase_success` - маркетолог может создать заранее; **код НЕ шлёт** без callback виджета / thank-you / webhook | Высокий | ⏳ documented `docs/metrika-goals-checklist.md`; код ❌ |
+| CV.2b | Настроить цель `catalog_interstitial_click` в Метрике + триггер/тег в GTM (маркетолог; frontend push уже есть) | Высокий | ✅ 2026-08-07 owner: цели сделаны ранее; нет трафика; код ✅ |
+| CV.2c | Метрика: цель `product_card_click` (клик карточки события) - маркетолог создаёт JS-событие | Критический | ✅ 2026-08-07 owner: сделано ранее; нет трафика; код ✅ |
+| CV.2d | Метрика: цель `select_tickets` (клик Купить / открытие виджета TC\|Teplohod) - маркетолог | Критический | ✅ 2026-08-07 owner: сделано ранее; нет трафика; код ✅ |
+| CV.2e | Метрика: цель `purchase_success` - маркетолог может создать заранее; **код НЕ шлёт** без callback виджета / thank-you / webhook | Высокий | ✅ 2026-08-07 owner: цель опц. создана ранее; код ❌ ждёт callback |
 | CV.2f | Webvisor SOP (маркетолог): первый месяц ежедневно 10-15 мин просмотр сессий воронки card→виджет | Высокий | ⏳ SOP в `docs/metrika-goals-checklist.md` §5 |
 | CV.3 | Home: live stats (города/события/площадки) + «Как купить» 3 шага | Высокий | ✅ step3 email/SMS/phone; how-to-buy mt-20 + bg-slate-50; social proof = destinations с events (city+region, ≈stats.destinations) до CV.11 |
 | CV.4 | Blog: native `[buy]` card (цена + CTA), без «сайт партнёра» | Высокий | ✅ live DTO + no-store; min `от N ₽` + fixed price width; единственный embed-путь (см. CV.8 🚫) |
@@ -993,7 +993,7 @@ Owner-locked порядок: Hero → Советы → Расписание → 
 | SEO.T2 | `/events` + filters: dynamic title + noindex на query | Критический | ✅ |
 | SEO.T3 | Event twins: date/venue disambiguator в title | Высокий | ✅ |
 | SEO.T4 | `not-found` metadata; HOME/social-preview без em dash | Высокий | ✅ |
-| SEO.T5 | Deploy + revalidate / переобход Вебмастер | Критический | ⏳ |
+| SEO.T5 | Deploy + revalidate / переобход Вебмастер | Критический | ✅ 2026-08-07 owner: переобход сделан ранее; нет трафика |
 
 ---
 
@@ -1154,7 +1154,7 @@ Owner-locked порядок: Hero → Советы → Расписание → 
 | SEO.13 | SSR JSON-LD: BreadcrumbList (listing+event) + ItemList только на CHPU landings (non-empty) | Высокий | ✅ 2026-07-23 | агент |
 | SEO.14 | `/podborki` tag cloud → CHPU landings/intent вместо `/events?q=` | Высокий | ✅ 2026-07-23 (топ-24: 23 CHPU / 1 fallback) | агент |
 | SEO.15 | Казань/Екб: падежи + meta-шаблоны listing/hub/event + thin cards (6–7) | Критический | ✅ 2026-07-23 | агент |
-| SEO.16 | Ручной переобход TOP-15 в Яндекс.Вебмастер / GSC | Высокий | ⏳ `docs/webmaster-top15-checklist.md`; клики только владелец | **владелец** |
+| SEO.16 | Ручной переобход TOP-15 в Яндекс.Вебмастер / GSC | Высокий | ✅ 2026-08-07 owner: сделано ранее; нет трафика | **владелец** |
 | SEO.17 | Sitemap: intents без thin (&lt; 6); smoke prod index + landings/static | Высокий | ✅ 2026-07-23 @`0fe5140`+prod | агент |
 | SEO.18 | План 20-30 путеводителей → CHPU (`docs/seo-guide-articles-plan.md`) | Высокий | ✅ 2026-07-23 batch #1 = 10 Казань/Екб | агент |
 | SEO.19 | Batch #1 генерация/размещение 10 гидов (GPT → MD → blog) | Высокий | ⏳ пачка A+МСК/СПб owner rewrite ✅; хаос-календарь ✅; Pack B = новый commercial угол (top5/events), не rewrite 9 longforms | владелец + агент |
@@ -1634,6 +1634,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | Дата | Изменение |
 |------|-----------|
+| 2026-08-07 | **MIG.9.7 ✅** - owner: Intelligent Hoopoe `.16` «труп»; refs убраны из активных docs/scripts; MSK-only; Teplohod allowlist = `.184`; wipe VM в Timeweb = owner |
 | 2026-08-02 | INC.504.22 live MSK: PR #3 merge `f93b770`, BUILD `3zmDWHpY7rXAJgqu0-pnR`; public SSR via backend HTTP; web:build requires daibilet-api; root still INC.504.15 |
 | 2026-08-02 | INC.504.21: SSR hang again (0B TTFB ~07:19 UTC); SIGKILL+start; healthcheck silent - script 644 not executable; chmod 755 + cron `/bin/bash` invoke; warm still OFF |
 | 2026-08-01 | INC.504.20: SSR hang again (0B TTFB ~17:19 UTC); SIGKILL+start; cron bare `%` killed healthcheck restart branch; warm OFF; `ssr-healthcheck.sh` + SIGKILL recovery live MSK |

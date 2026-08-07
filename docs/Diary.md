@@ -1,3 +1,53 @@
+## 2026-08-07 - Venues vs locations: owner OK option A + nav V1
+
+### Наблюдения
+- Owner подтвердил architecture option A: URL-семейство от kind/role, не от ticket availability.
+- Риск путаницы: «пока нет билетов» ошибочно уводили institution в `/locations`.
+
+### Решения
+- Музей/театр/зал без афиши → `/venues`; buy-chrome скрыт до offers/sessions.
+- Sights / parks / piers / gastro-as-day-point → `/locations`.
+- Commerce = только UI chrome. Оси: kind→URL, offers→chrome, pageStatus→модерация.
+- Nav **V1** (оставить `/locations` в primary). `/places` deferred. Rename лейбла «Места и точки сбора» = UX.LOC3 follow-up.
+- Docs: qa LOCKED, catalog-location-venue-canon note, Tasktracker UX.LOC8 / PH2.LOC1 decided. Docs-only commit+push; web deploy не нужен.
+
+### Проблемы
+- Нет.
+
+---
+
+## 2026-08-07 - SPB `.16` Intelligent Hoopoe: труп, MSK-only inventory
+
+### Наблюдения
+- Owner confirmed: Timeweb SPB VPS `213.171.7.16` (Intelligent Hoopoe) - «убираем везде, он уже труп».
+- Агент не удаляет VM в панели Timeweb: wipe/billing = owner, если машина ещё крутится.
+
+### Решения
+- Активные docs/runbooks/scripts: MSK-only (`.184` catalog+build · `.159` finance). Убраны инструкции SSH/build/deploy на `.16`.
+- MIG.9.7 → ✅ (repo/ops); Diary/Tasktracker/Project/current-state/spb-finance-host обновлены.
+- Teplohod allowlist: боевой sync IP = **`201.24.125.184`**, не `.16`. Owner: сверить в кабинете Teplohod перед/после wipe старого IP.
+- Исторические записи Diary / audit snapshots не переписывались wholesale.
+
+### Проблемы
+- Если `.16` ещё в биллинге Timeweb - owner должен удалить/выключить VM в панели.
+
+---
+
+## 2026-08-07 - Owner: Метрика цели + Вебмастер sitemap/переобход уже сделаны
+
+### Наблюдения
+- Owner подтвердил: цели Яндекс.Метрики (`product_card_click`, `select_tickets`, `catalog_interstitial_click`, опц. `purchase_success`) и Вебмастер (sitemap `https://daibilet.ru/sitemap.xml` + переобход TOP-15) **давно сделаны**; пустые отчёты = нет трафика, не открытый owner TODO.
+
+### Решения
+- Закрыты в Tasktracker: CV.2b–CV.2e, SEO.IN2–IN3, SEO.T5, SEO.LC6, SEO.16 (+ чеклисты/qa).
+- Docs-only commit+push; web deploy не нужен.
+- CV.2f (Webvisor SOP) и код `purchase_success` (нет widget callback) остаются отдельно.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-07 - CI Deploy MSK web: SSG without local DB/API
 
 ### Наблюдения
@@ -15,6 +65,7 @@
 
 ---
 
+## 2026-08-07 - CI Deploy MSK web workflow (artifact swap)
 
 ### Наблюдения
 - Owner: «почему не CI?» - SSH сам быстрый, тормозит in-place `web:build` на 4GB MSK.
