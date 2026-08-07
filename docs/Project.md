@@ -61,7 +61,7 @@ packages/config   — shared tsconfig/eslint
 
 **Supplier LC modes:** `Supplier.integrationMode` отделяет тип подключения от способа продажи: `IMPORTED_TICKETING_SYSTEM` = read-only зеркало импортов, `INTERNAL_SALES` = продажи и каталог внутри Daibilet, `API_SYNC` = внешняя система с настройкой routes/webhooks и health. Реквизиты поставщика пишутся через supplier-scoped onboarding flow: юрпрофиль и основной счет после правок переводятся в `INCOMPLETE` для проверки админом.
 
-**Supplier write-flow:** поставщик не редактирует каталог напрямую. В `apps/supplier` есть раздел "Заявки": создание/правка `AdmissionProduct` и создание/правка событий уходят в общую очередь `EventChangeRequest` с `payload.subject = EVENT | ADMISSION_PRODUCT`. Админский экран approve/reject остается единым. Auto-apply включен только для безопасных event update-сценариев; `CREATE` и admission-заявки требуют ручного применения оператором до появления устойчивого набора первых поставщиков.
+**Supplier write-flow:** поставщик не редактирует каталог напрямую. В `apps/supplier` есть раздел "Заявки": создание/правка `AdmissionProduct` и создание/правка событий уходят в общую очередь `EventChangeRequest` с `payload.subject = EVENT | ADMISSION_PRODUCT`. Админский экран approve/reject/apply остается единым. Admission `CREATE/UPDATE` после approve применяется оператором в admin: создается/обновляется `AdmissionProduct`, активные `AdmissionOffer` заменяются ручными категориями, продукт выходит как `PUBLISHED + PLATFORM + DAIBILET_MANAGED`. Event `CREATE` остается ручным до отдельного event create applier.
 
 ---
 

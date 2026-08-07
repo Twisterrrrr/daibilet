@@ -1,4 +1,6 @@
 import type {
+  AdmissionProductType,
+  AdmissionValidityMode,
   EventActorType,
   EventChangeLogAction,
   EventChangeRequestStatus,
@@ -21,7 +23,8 @@ export interface ApplyEventChangeRequestInput {
 
 export interface ApplyEventChangeRequestResult {
   requestId: string;
-  eventId: string;
+  eventId?: string | null;
+  admissionProductId?: string | null;
   status: 'APPLIED';
   appliedAt: string;
   logAction: EventChangeLogAction;
@@ -62,6 +65,21 @@ export interface EventChangeRequestTransaction {
     updateMany(args: unknown): Promise<{ count: number } | unknown>;
     create(args: unknown): Promise<unknown>;
   };
+  admissionProduct: {
+    create(args: unknown): Promise<{ id: string } | unknown>;
+    findFirst(args: unknown): Promise<{ id: string; updatedAt?: Date | string } | null>;
+    update(args: unknown): Promise<{ id: string } | unknown>;
+  };
+  admissionOffer: {
+    updateMany(args: unknown): Promise<{ count: number } | unknown>;
+    create(args: unknown): Promise<unknown>;
+  };
+  supplierVenue: {
+    findFirst(args: unknown): Promise<{ id: string } | null>;
+  };
+  venue: {
+    findUnique(args: unknown): Promise<{ id: string; cityId: string | null } | null>;
+  };
   eventChangeLog: {
     create(args: unknown): Promise<unknown>;
   };
@@ -74,6 +92,7 @@ export interface EventChangeRequestRecord {
   type: EventChangeRequestType;
   status: EventChangeRequestStatus;
   payload: unknown;
+  createdBySiteUserId?: string | null;
   event: EventChangeRequestEventRecord | null;
 }
 
@@ -101,12 +120,8 @@ export async function applyApprovedEventChangeRequest(
       );
     }
 
-    if (request.type === 'CREATE') {
-      throw new EventChangeRequestApplyError(
-        'EVENT_CHANGE_CREATE_UNSUPPORTED',
-        'Applying CREATE requests is not enabled yet.',
-        501,
-      );
+    if (payloadSubject(request.payload) === 'ADMISSION_PRODUCT') {
+      return applyAdmissionProductChangeRequest(tx, request, input);
     }
 
     if (!request.eventId || !request.event) {
@@ -173,6 +188,251 @@ export async function applyApprovedEventChangeRequest(
       logAction,
     };
   });
+}
+
+async function applyAdmissionProductChangeRequest(
+  tx: EventChangeRequestTransaction,
+  request: EventChangeRequestRecord,
+  input: ApplyEventChangeRequestInput,
+): Promise<ApplyEventChangeRequestResult> {
+  const transitionResult = validateEventChangeRequestTransition({
+    currentStatus: request.status,
+    action: 'apply',
+    actorType: 'SYSTEM',
+    requestType: request.type,
+    managementMode: 'DAIBILET_MANAGED',
+    scheduleLocked: false,
+  });
+  if (!transitionResult.ok) {
+    throw new EventChangeRequestApplyError(
+      transitionResult.code,
+      transitionResult.message,
+      transitionResult.code === 'INVALID_TRANSITION' ? 409 : 400,
+    );
+  }
+
+  const payload = assertAdmissionProductPayload(request.payload);
+  const appliedAt = new Date();
+  const admissionProductId = request.type === 'CREATE'
+    ? await createAdmissionProductFromRequest(tx, request, payload, appliedAt, input.actorSiteUserId ?? null)
+    : await updateAdmissionProductFromRequest(tx, request, payload, appliedAt, input.actorSiteUserId ?? null);
+
+  await tx.eventChangeRequest.update({
+    where: { id: request.id },
+    data: {
+      status: transitionResult.transition.to,
+      appliedAt,
+    },
+  });
+
+  return {
+    requestId: request.id,
+    admissionProductId,
+    eventId: null,
+    status: 'APPLIED',
+    appliedAt: appliedAt.toISOString(),
+    logAction: request.type === 'CREATE' ? 'CREATED' : 'UPDATED',
+  };
+}
+
+async function createAdmissionProductFromRequest(
+  tx: EventChangeRequestTransaction,
+  request: EventChangeRequestRecord,
+  payload: AdmissionProductChangeRequestPayload,
+  appliedAt: Date,
+  actorSiteUserId: string | null,
+): Promise<string> {
+  if (!request.supplierId) {
+    throw new EventChangeRequestApplyError(
+      'ADMISSION_PRODUCT_SUPPLIER_REQUIRED',
+      'Admission product requests must be linked to a supplier.',
+      409,
+    );
+  }
+  const draft = payload.admissionProduct || {};
+  const title = cleanText(draft.title);
+  const venueId = cleanText(draft.venueId);
+  if (!title) {
+    throw new EventChangeRequestApplyError(
+      'ADMISSION_PRODUCT_TITLE_REQUIRED',
+      'Admission product title is required.',
+      422,
+    );
+  }
+  if (!venueId) {
+    throw new EventChangeRequestApplyError(
+      'ADMISSION_PRODUCT_VENUE_REQUIRED',
+      'Admission product venue is required.',
+      422,
+    );
+  }
+  const venue = await tx.venue.findUnique({
+    where: { id: venueId },
+    select: { id: true, cityId: true },
+  });
+  if (!venue) {
+    throw new EventChangeRequestApplyError(
+      'ADMISSION_PRODUCT_VENUE_NOT_FOUND',
+      'Admission product venue was not found.',
+      404,
+    );
+  }
+  await assertSupplierVenueAccess(tx, request.supplierId, venueId);
+
+  const offers = normalizeAdmissionOffers(payload.offers || []);
+  const priceFromRub = pickAdmissionPriceFrom(offers);
+  const created = await tx.admissionProduct.create({
+    data: {
+      slug: admissionProductSlug(title, request.id),
+      title,
+      shortTitle: cleanText(draft.shortTitle),
+      description: cleanText(draft.description),
+      shortDescription: cleanText(draft.shortDescription),
+      type: normalizeAdmissionProductType(draft.type),
+      status: 'PUBLISHED',
+      purchaseFlow: 'PLATFORM',
+      managementMode: 'DAIBILET_MANAGED',
+      sourceCode: 'MANUAL',
+      imageUrl: cleanText(draft.imageUrl),
+      priceFromRub,
+      ticketsVacant: normalizeNullableInt(draft.ticketsVacant),
+      validityMode: normalizeAdmissionValidityMode(draft.validityMode),
+      validFrom: parseOptionalDate(draft.validFrom),
+      validTo: parseOptionalDate(draft.validTo),
+      validDaysAfterPurchase: normalizeNullableInt(draft.validDaysAfterPurchase),
+      cityId: venue.cityId,
+      venueId,
+      supplierId: request.supplierId,
+      createdByType: 'SUPPLIER',
+      createdBySiteUserId: request.createdBySiteUserId ?? null,
+      moderatedBySiteUserId: actorSiteUserId,
+      moderatedAt: appliedAt,
+    },
+  }) as { id: string };
+
+  await replaceAdmissionOffers(tx, created.id, offers);
+  return created.id;
+}
+
+async function updateAdmissionProductFromRequest(
+  tx: EventChangeRequestTransaction,
+  request: EventChangeRequestRecord,
+  payload: AdmissionProductChangeRequestPayload,
+  appliedAt: Date,
+  actorSiteUserId: string | null,
+): Promise<string> {
+  const admissionProductId = cleanText(payload.admissionProductId);
+  if (!admissionProductId) {
+    throw new EventChangeRequestApplyError(
+      'ADMISSION_PRODUCT_ID_REQUIRED',
+      'Admission product update requests must include admissionProductId.',
+      422,
+    );
+  }
+  const existing = await tx.admissionProduct.findFirst({
+    where: {
+      id: admissionProductId,
+      ...(request.supplierId ? { supplierId: request.supplierId } : {}),
+    },
+    select: { id: true, updatedAt: true },
+  });
+  if (!existing) {
+    throw new EventChangeRequestApplyError(
+      'ADMISSION_PRODUCT_NOT_FOUND',
+      'Admission product was not found for this request.',
+      404,
+    );
+  }
+
+  const draft = payload.admissionProduct || {};
+  const nextVenueId = cleanText(draft.venueId);
+  let cityId: string | null | undefined;
+  if (nextVenueId) {
+    if (request.supplierId) await assertSupplierVenueAccess(tx, request.supplierId, nextVenueId);
+    const venue = await tx.venue.findUnique({
+      where: { id: nextVenueId },
+      select: { id: true, cityId: true },
+    });
+    if (!venue) {
+      throw new EventChangeRequestApplyError(
+        'ADMISSION_PRODUCT_VENUE_NOT_FOUND',
+        'Admission product venue was not found.',
+        404,
+      );
+    }
+    cityId = venue.cityId;
+  }
+
+  const data: Record<string, unknown> = pickDefined({
+    title: cleanText(draft.title),
+    shortTitle: nullableCleanText(draft.shortTitle),
+    description: nullableCleanText(draft.description),
+    shortDescription: nullableCleanText(draft.shortDescription),
+    type: draft.type ? normalizeAdmissionProductType(draft.type) : undefined,
+    imageUrl: nullableCleanText(draft.imageUrl),
+    ticketsVacant: draft.ticketsVacant !== undefined ? normalizeNullableInt(draft.ticketsVacant) : undefined,
+    validityMode: draft.validityMode ? normalizeAdmissionValidityMode(draft.validityMode) : undefined,
+    validFrom: draft.validFrom !== undefined ? parseOptionalDate(draft.validFrom) : undefined,
+    validTo: draft.validTo !== undefined ? parseOptionalDate(draft.validTo) : undefined,
+    validDaysAfterPurchase: draft.validDaysAfterPurchase !== undefined ? normalizeNullableInt(draft.validDaysAfterPurchase) : undefined,
+    venueId: nextVenueId || undefined,
+    cityId,
+    moderatedBySiteUserId: actorSiteUserId,
+    moderatedAt: appliedAt,
+  });
+
+  const offers = normalizeAdmissionOffers(payload.offers || []);
+  if (offers.length) data.priceFromRub = pickAdmissionPriceFrom(offers);
+  await tx.admissionProduct.update({
+    where: { id: admissionProductId },
+    data,
+  });
+  if (offers.length) await replaceAdmissionOffers(tx, admissionProductId, offers);
+  return admissionProductId;
+}
+
+async function assertSupplierVenueAccess(
+  tx: EventChangeRequestTransaction,
+  supplierId: string,
+  venueId: string,
+): Promise<void> {
+  const link = await tx.supplierVenue.findFirst({
+    where: { supplierId, venueId, isActive: true },
+    select: { id: true },
+  });
+  if (!link) {
+    throw new EventChangeRequestApplyError(
+      'SUPPLIER_VENUE_REQUIRED',
+      'Admission product venue is not linked to this supplier.',
+      403,
+    );
+  }
+}
+
+async function replaceAdmissionOffers(
+  tx: EventChangeRequestTransaction,
+  admissionProductId: string,
+  offers: AdmissionOfferPayload[],
+): Promise<void> {
+  if (!offers.length) return;
+  await tx.admissionOffer.updateMany({
+    where: { admissionProductId, active: true },
+    data: { active: false },
+  });
+  for (const offer of offers) {
+    await tx.admissionOffer.create({
+      data: {
+        admissionProductId,
+        sourceCode: 'MANUAL',
+        title: offer.title,
+        priceRub: offer.priceRub,
+        oldPriceRub: offer.oldPriceRub ?? null,
+        capacityTotal: offer.capacityTotal ?? null,
+        groupSize: offer.groupSize ?? 1,
+        active: offer.active ?? true,
+      },
+    });
+  }
 }
 
 async function applyPayload(
@@ -447,8 +707,156 @@ function pickDefined<T extends Record<string, unknown>>(data: T): Partial<T> {
   ) as Partial<T>;
 }
 
+function assertAdmissionProductPayload(payload: unknown): AdmissionProductChangeRequestPayload {
+  const record = asRecord(payload);
+  if (!record || record.subject !== 'ADMISSION_PRODUCT') {
+    throw new EventChangeRequestApplyError(
+      'ADMISSION_PRODUCT_PAYLOAD_INVALID',
+      'Admission product change request payload is invalid.',
+      422,
+    );
+  }
+  return {
+    subject: 'ADMISSION_PRODUCT',
+    admissionProductId: cleanText(record.admissionProductId),
+    admissionProduct: asRecord(record.admissionProduct) || {},
+    offers: Array.isArray(record.offers)
+      ? record.offers.map((offer) => asRecord(offer)).filter((offer): offer is Record<string, unknown> => Boolean(offer))
+      : [],
+  };
+}
+
+function payloadSubject(payload: unknown): string | null {
+  return asRecord(payload)?.subject as string | null;
+}
+
+function asRecord(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : null;
+}
+
+function normalizeAdmissionOffers(offers: Record<string, unknown>[]): AdmissionOfferPayload[] {
+  return offers
+    .map((offer) => ({
+      title: cleanText(offer.title) || 'Билет',
+      priceRub: normalizeRequiredPrice(offer.priceRub),
+      oldPriceRub: normalizeNullableInt(offer.oldPriceRub),
+      capacityTotal: normalizeNullableInt(offer.capacityTotal),
+      groupSize: normalizePositiveInt(offer.groupSize) ?? 1,
+      active: offer.active === false ? false : true,
+    }))
+    .filter((offer) => offer.priceRub != null) as AdmissionOfferPayload[];
+}
+
+function pickAdmissionPriceFrom(offers: AdmissionOfferPayload[]): number | null {
+  const values = offers
+    .filter((offer) => offer.active !== false && typeof offer.priceRub === 'number' && offer.priceRub >= 100)
+    .map((offer) => offer.priceRub);
+  return values.length ? Math.min(...values) : null;
+}
+
+function normalizeAdmissionProductType(value: unknown): AdmissionProductType {
+  const allowed = new Set<AdmissionProductType>([
+    'MUSEUM_ENTRY',
+    'GALLERY_ENTRY',
+    'ART_SPACE_ENTRY',
+    'EXHIBITION_ENTRY',
+    'OBSERVATION_ENTRY',
+    'PARK_ENTRY',
+    'ATTRACTION_ENTRY',
+    'ZOO_ENTRY',
+    'AQUARIUM_ENTRY',
+    'COMPLEX_ENTRY',
+    'OTHER',
+  ]);
+  return allowed.has(value as AdmissionProductType) ? value as AdmissionProductType : 'OTHER';
+}
+
+function normalizeAdmissionValidityMode(value: unknown): AdmissionValidityMode {
+  const allowed = new Set<AdmissionValidityMode>([
+    'OPEN_DATE',
+    'FIXED_WINDOW',
+    'VALID_DAYS_AFTER_PURCHASE',
+  ]);
+  return allowed.has(value as AdmissionValidityMode) ? value as AdmissionValidityMode : 'OPEN_DATE';
+}
+
+function admissionProductSlug(title: string, requestId: string): string {
+  const base = slugify(title).slice(0, 80) || 'admission';
+  const digits = requestId.replace(/\D/g, '').slice(-7);
+  const suffix = digits || slugify(requestId).replace(/-/g, '').slice(-8) || Date.now().toString(36).slice(-8);
+  return `${base}-${suffix}`;
+}
+
+function slugify(value: string): string {
+  const translit: Record<string, string> = {
+    а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e', ж: 'zh', з: 'z', и: 'i', й: 'y',
+    к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p', р: 'r', с: 's', т: 't', у: 'u', ф: 'f',
+    х: 'h', ц: 'c', ч: 'ch', ш: 'sh', щ: 'sch', ъ: '', ы: 'y', ь: '', э: 'e', ю: 'yu', я: 'ya',
+  };
+  return value
+    .trim()
+    .toLowerCase()
+    .split('')
+    .map((char) => translit[char] ?? char)
+    .join('')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .replace(/-{2,}/g, '-');
+}
+
+function cleanText(value: unknown): string | null {
+  const text = String(value ?? '').trim();
+  return text || null;
+}
+
+function nullableCleanText(value: unknown): string | null | undefined {
+  return value === undefined ? undefined : cleanText(value);
+}
+
+function normalizeRequiredPrice(value: unknown): number | null {
+  const number = normalizeNullableInt(value);
+  return number != null && number >= 0 ? number : null;
+}
+
+function normalizeNullableInt(value: unknown): number | null {
+  if (value === null || value === undefined || value === '') return null;
+  const number = Number(value);
+  return Number.isFinite(number) ? Math.trunc(number) : null;
+}
+
+function normalizePositiveInt(value: unknown): number | null {
+  const number = normalizeNullableInt(value);
+  return number != null && number > 0 ? number : null;
+}
+
+function parseOptionalDate(value: unknown): Date | null {
+  const text = cleanText(value);
+  if (!text) return null;
+  const time = Date.parse(text);
+  if (!Number.isFinite(time)) return null;
+  return new Date(time);
+}
+
 type BasePayload = {
   baseSnapshot?: { eventUpdatedAt?: string };
+};
+
+type AdmissionProductChangeRequestPayload = {
+  subject: 'ADMISSION_PRODUCT';
+  admissionProductId?: string | null;
+  admissionProduct: Record<string, unknown>;
+  offers: Record<string, unknown>[];
+};
+
+type AdmissionOfferPayload = {
+  title: string;
+  priceRub: number;
+  oldPriceRub?: number | null;
+  capacityTotal?: number | null;
+  groupSize?: number;
+  active?: boolean;
 };
 
 type ContentUpdatePayload = BasePayload & {

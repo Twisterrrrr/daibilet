@@ -147,6 +147,48 @@ test('archives active offers on replace-all and creates manual offers', async ()
   assert.equal(calls.eventUpdates.at(-1)?.data.priceFromRub, 800);
 });
 
+test('applies admission product create request with manual offers', async () => {
+  const { client, calls } = createMockClient({
+    id: 'cr_adm_1234567',
+    eventId: null,
+    supplierId: 'sup_1',
+    type: 'CREATE',
+    status: 'APPROVED',
+    payload: {
+      subject: 'ADMISSION_PRODUCT',
+      admissionProduct: {
+        title: 'Билет в тестовый музей',
+        type: 'MUSEUM_ENTRY',
+        venueId: 'venue_1',
+        validityMode: 'OPEN_DATE',
+        validDaysAfterPurchase: 30,
+        ticketsVacant: 20,
+      },
+      offers: [
+        { title: 'Взрослый', priceRub: 500 },
+        { title: 'Детский', priceRub: 250 },
+      ],
+    },
+    event: null,
+  });
+
+  const result = await applyApprovedEventChangeRequest({ requestId: 'cr_adm_1234567', actorSiteUserId: 'admin_1' }, client);
+
+  assert.equal(result.status, 'APPLIED');
+  assert.equal(result.eventId, null);
+  assert.equal(result.admissionProductId, 'adm_created');
+  assert.equal(result.logAction, 'CREATED');
+  assert.equal(calls.admissionProductCreates[0]?.data.slug, 'bilet-v-testovyy-muzey-1234567');
+  assert.equal(calls.admissionProductCreates[0]?.data.status, 'PUBLISHED');
+  assert.equal(calls.admissionProductCreates[0]?.data.purchaseFlow, 'PLATFORM');
+  assert.equal(calls.admissionProductCreates[0]?.data.priceFromRub, 250);
+  assert.equal(calls.admissionProductCreates[0]?.data.cityId, 'city_1');
+  assert.equal(calls.admissionOfferCreates.length, 2);
+  assert.equal(calls.admissionOfferCreates[0]?.data.sourceCode, 'MANUAL');
+  assert.equal(calls.requestUpdates[0]?.data.status, 'APPLIED');
+  assert.equal(calls.logs.length, 0);
+});
+
 test('blocks source-managed schedule apply through state rules', async () => {
   const { client } = createMockClient({
     id: 'cr_1',
@@ -184,6 +226,10 @@ function createMockClient(request: EventChangeRequestRecord): {
     sessionCreates: [],
     offerUpdateMany: [],
     offerCreates: [],
+    admissionProductCreates: [],
+    admissionProductUpdates: [],
+    admissionOfferUpdateMany: [],
+    admissionOfferCreates: [],
     requestUpdates: [],
     logs: [],
   };
@@ -230,6 +276,39 @@ function createMockClient(request: EventChangeRequestRecord): {
         return {};
       },
     },
+    admissionProduct: {
+      async create(args: unknown) {
+        calls.admissionProductCreates.push(args as MockCall);
+        return { id: 'adm_created' };
+      },
+      async findFirst() {
+        return { id: 'adm_existing', updatedAt: eventUpdatedAt };
+      },
+      async update(args: unknown) {
+        calls.admissionProductUpdates.push(args as MockCall);
+        return { id: 'adm_existing' };
+      },
+    },
+    admissionOffer: {
+      async updateMany(args: unknown) {
+        calls.admissionOfferUpdateMany.push(args as MockCall);
+        return { count: 1 };
+      },
+      async create(args: unknown) {
+        calls.admissionOfferCreates.push(args as MockCall);
+        return {};
+      },
+    },
+    supplierVenue: {
+      async findFirst() {
+        return { id: 'supplier_venue_1' };
+      },
+    },
+    venue: {
+      async findUnique() {
+        return { id: 'venue_1', cityId: 'city_1' };
+      },
+    },
     eventChangeLog: {
       async create(args: unknown) {
         calls.logs.push(args as MockCall);
@@ -255,6 +334,10 @@ interface MockCalls {
   sessionCreates: MockCall[];
   offerUpdateMany: MockCall[];
   offerCreates: MockCall[];
+  admissionProductCreates: MockCall[];
+  admissionProductUpdates: MockCall[];
+  admissionOfferUpdateMany: MockCall[];
+  admissionOfferCreates: MockCall[];
   requestUpdates: MockCall[];
   logs: MockCall[];
 }

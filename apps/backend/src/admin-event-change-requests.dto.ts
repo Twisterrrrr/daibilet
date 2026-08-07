@@ -235,6 +235,7 @@ function buildWhere(query: AdminEventChangeRequestsQuery): Prisma.EventChangeReq
 
 export function mapEventChangeRequestRow(row: EventChangeRequestRow): AdminEventChangeRequestRowDto {
   const subject = payloadSubject(row.payload);
+  const applyableStatus = row.status === 'APPROVED' || row.status === 'APPLY_FAILED';
   return {
     id: row.id,
     eventId: row.eventId,
@@ -286,7 +287,11 @@ export function mapEventChangeRequestRow(row: EventChangeRequestRow): AdminEvent
     actions: {
       canApprove: row.status === 'SUBMITTED',
       canReject: row.status === 'SUBMITTED',
-      canApply: subject === 'EVENT' && Boolean(row.eventId) && (row.status === 'APPROVED' || row.status === 'APPLY_FAILED') && row.type !== 'CREATE',
+      canApply: applyableStatus && (
+        subject === 'ADMISSION_PRODUCT'
+          ? (row.type === 'CREATE' || row.type === 'UPDATE')
+          : Boolean(row.eventId) && row.type !== 'CREATE'
+      ),
     },
   };
 }

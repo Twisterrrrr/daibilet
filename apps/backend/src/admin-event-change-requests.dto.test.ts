@@ -77,6 +77,33 @@ test('allows apply action for approved non-create requests', () => {
   assert.equal(row.actions.canApply, true);
 });
 
+test('allows apply action for approved admission product create requests', () => {
+  const row = mapEventChangeRequestRow({
+    id: 'cr_adm',
+    eventId: null,
+    supplierId: 'sup_1',
+    type: 'CREATE',
+    status: 'APPROVED',
+    title: 'Новый входной билет',
+    summary: null,
+    payload: { subject: 'ADMISSION_PRODUCT', admissionProduct: { title: 'Билет' }, offers: [] },
+    adminComment: null,
+    submittedAt: null,
+    reviewedAt: null,
+    appliedAt: null,
+    createdAt: new Date('2026-08-01T09:00:00.000Z'),
+    updatedAt: new Date('2026-08-01T10:00:00.000Z'),
+    event: null,
+    supplier: null,
+    createdBy: null,
+    reviewedBy: null,
+  } as any);
+
+  assert.equal(row.actions.canApprove, false);
+  assert.equal(row.actions.canReject, false);
+  assert.equal(row.actions.canApply, true);
+});
+
 test('builds detail diff from current override and proposed payload', () => {
   const detail = mapEventChangeRequestDetailRow({
     id: 'cr_1',

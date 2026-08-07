@@ -12,14 +12,16 @@
 - Добавлен supplier API: `GET /api/supplier/change-requests`, `POST /api/supplier/change-requests/admissions`, `POST /api/supplier/change-requests/events`.
 - Новый `RequestsPage` в `apps/supplier` дает две формы: входной билет площадки и событие/open-date. Поставщик видит статус заявки без технических id.
 - Backend проверяет, что новая заявка с `venueId` относится к площадке поставщика через `SupplierVenue`.
-- Admin apply для admission/create не включен автоматически: оператор approve/reject уже видит заявку, а применение оставлено ручным до первых реальных музеев/галерей.
+- Admin apply для admission `CREATE/UPDATE` включен после approve: оператор применяет заявку, создается/обновляется `AdmissionProduct`, активные `AdmissionOffer` заменяются manual-категориями, продукт выходит как `PUBLISHED + PLATFORM + DAIBILET_MANAGED`.
+- Event `CREATE` пока не применяется автоматически: для событий оставлен текущий безопасный apply существующих карточек, полноценный event-create applier будет отдельным блоком.
 - Добавлены `daibilet-finance-yookassa-reconcile.service/timer` и runbook для запуска reconcile каждые 5 минут на `.159`.
 
 ### Проверки
 
 - `pnpm --config.engine-strict=false --filter @daibilet/backend typecheck` — OK.
 - `pnpm --config.engine-strict=false --filter @daibilet/supplier typecheck` — OK.
-- `pnpm --config.engine-strict=false --filter @daibilet/backend exec tsx --test src/supplier-change-requests-handler.test.ts src/admin-event-change-requests.dto.test.ts` — OK, DB-aware supplier test skipped without `DATABASE_URL`.
+- `DATABASE_URL=postgresql://daibilet:daibilet@127.0.0.1:5437/daibilet pnpm --config.engine-strict=false --filter @daibilet/backend exec tsx --test src/supplier-change-requests-handler.test.ts` — OK: supplier request → admin approve/apply → admission created → STUB order → supplier orders projection.
+- `pnpm --config.engine-strict=false --filter @daibilet/backend exec tsx --test src/event-change-request-applier.test.ts src/admin-event-change-requests.dto.test.ts src/supplier-change-requests-handler.test.ts` — OK; DB-aware supplier test skipped without `DATABASE_URL`.
 - `pnpm --config.engine-strict=false --filter @daibilet/supplier build` — OK.
 
 ---
