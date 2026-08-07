@@ -122,7 +122,7 @@ function mapOrderFromFinancePayload(
     asString(subject.admissionProductTitle) ||
     asString(subject.eventTitle) ||
     asString(order.title) ||
-    `Заказ ${publicCode}`;
+    'Входной билет';
   const email = asString(buyer.email) || fallbackEmail;
   const amountRub =
     amountRubFromKopecks(

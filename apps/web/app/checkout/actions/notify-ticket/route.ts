@@ -44,7 +44,7 @@ export async function POST(request: Request) {
   const email = String(body.email || order?.email || '')
     .trim()
     .toLowerCase();
-  const title = String(body.title || order?.title || `Заказ ${publicCode}`).trim();
+  const title = String(body.title || order?.title || 'Входной билет').trim();
   const status = String(body.status || order?.status || 'CONFIRMED').trim();
   const mapped = mapFinanceOrderStatus(status);
 

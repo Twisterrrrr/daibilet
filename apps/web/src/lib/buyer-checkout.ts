@@ -113,7 +113,7 @@ function normalizeInternalOrderRecord(raw: unknown): BuyerInternalOrderRecord | 
     status,
     displayStatus: typeof row.displayStatus === 'string' ? row.displayStatus : mapped.displayStatus,
     statusTone: typeof row.statusTone === 'string' ? row.statusTone : mapped.statusTone,
-    title: title || `Заказ ${publicCode}`,
+    title: title || 'Входной билет',
     email,
     purchasedAt: typeof row.purchasedAt === 'string' ? row.purchasedAt : null,
     amountRub: typeof row.amountRub === 'number' && Number.isFinite(row.amountRub) ? row.amountRub : null,

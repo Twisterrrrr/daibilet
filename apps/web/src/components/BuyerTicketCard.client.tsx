@@ -16,9 +16,25 @@ type Props = {
   className?: string;
 };
 
+/** Avoid repeating the order code as the ticket headline when it is already shown once below. */
+function ticketProductTitle(order: BuyerInternalOrderRecord): string {
+  const raw = (order.title || '').trim();
+  if (!raw) return 'Входной билет';
+  const withoutOrderPrefix = raw.replace(/^заказ\s*№?\s*/i, '').trim();
+  if (
+    withoutOrderPrefix === order.publicCode ||
+    withoutOrderPrefix === `#${order.publicCode}` ||
+    raw === order.publicCode
+  ) {
+    return 'Входной билет';
+  }
+  return raw;
+}
+
 export function BuyerTicketCard({ order, origin, emailHint = 'unknown', className = '' }: Props) {
   const status = mapFinanceOrderStatus(order.status);
   const isPaid = status.statusTone === 'live';
+  const productTitle = ticketProductTitle(order);
   const ticketUrl =
     typeof window !== 'undefined'
       ? buyerTicketAbsoluteUrl(order.publicCode, origin || window.location.origin)
@@ -67,15 +83,16 @@ export function BuyerTicketCard({ order, origin, emailHint = 'unknown', classNam
           </div>
 
           <p className="mt-4 text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Дайбилет</p>
-          <h2 className="mt-1 text-2xl font-extrabold tracking-tight text-slate-950 sm:text-3xl">
-            {order.title || 'Входной билет'}
-          </h2>
+          <h2 className="mt-1 text-2xl font-extrabold tracking-tight text-slate-950 sm:text-3xl">{productTitle}</h2>
 
-          <dl className="mt-5 grid gap-3 text-sm sm:grid-cols-2">
-            <div>
-              <dt className="text-slate-500">Код заказа</dt>
-              <dd className="mt-0.5 font-mono text-lg font-bold tracking-wide text-slate-950">{order.publicCode}</dd>
-            </div>
+          <div className="mt-5 rounded-xl bg-slate-50 px-4 py-3 sm:px-5 sm:py-4">
+            <p className="text-xs font-medium text-slate-500">Код билета</p>
+            <p className="mt-1 font-mono text-3xl font-extrabold tracking-wide text-slate-950 sm:text-4xl">
+              {order.publicCode}
+            </p>
+          </div>
+
+          <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
             {order.amountRub != null ? (
               <div>
                 <dt className="text-slate-500">Сумма</dt>
@@ -83,7 +100,7 @@ export function BuyerTicketCard({ order, origin, emailHint = 'unknown', classNam
               </div>
             ) : null}
             {order.email ? (
-              <div className="sm:col-span-2">
+              <div className={order.amountRub != null ? '' : 'sm:col-span-2'}>
                 <dt className="text-slate-500">Покупатель</dt>
                 <dd className="mt-0.5 break-all font-semibold text-slate-800">{order.email}</dd>
               </div>
@@ -102,9 +119,8 @@ export function BuyerTicketCard({ order, origin, emailHint = 'unknown', classNam
             </p>
           ) : emailHint === 'skipped' ? (
             <p className="mt-3 rounded-xl bg-amber-50 px-3 py-2.5 text-sm leading-6 text-amber-900">
-              Письмо пока не отправляется автоматически. Сохраните код{' '}
-              <span className="font-mono font-semibold">{order.publicCode}</span> и ссылку на эту страницу - они
-              нужны, чтобы открыть билет позже.
+              Письмо пока не отправляется автоматически. Сохраните код выше и ссылку на эту страницу - они нужны,
+              чтобы открыть билет позже.
             </p>
           ) : null}
         </div>

@@ -87,7 +87,7 @@ export function CheckoutResultView() {
             status: modeHint === 'STUB' ? 'CONFIRMED' : fromYookassa || modeHint === 'YOOKASSA' ? 'PENDING' : 'PENDING',
             displayStatus: mapped.displayStatus,
             statusTone: mapped.statusTone,
-            title: `Заказ ${code}`,
+            title: 'Входной билет',
             email: user?.email || '',
             purchasedAt: null,
             amountRub: null,
