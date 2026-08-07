@@ -1,6 +1,6 @@
 # Москва: черновик must-see + пригороды (Phase C / MS.TIER4)
 
-**Статус:** owner OK → hub ship (2026-08-07): seed/images/presets + companions msk-1…5; gastro list open.  
+**Статус:** owner OK hub ship; companions msk-2…5 сняты с публикации (owner 2026-08-07: несогласованная отсебятина). Оставлен только msk-1 blog link. Gastro list open.  
 **Дата:** 2026-08-07  
 **Шаблон:** как СПб Phase B - mustSee с chip-фильтрами, `significantSuburbs` + travel vectors, `dayRoutePresets` → `/my-day`.  
 **Правила:** дефис `-`, без «Питер»; гастро-рестораны не выдумывать без owner list (в pack только рынок «Даниловский» как creative).
@@ -29,7 +29,7 @@
 1. ~~**Состав 58**~~ - OK 2026-08-07.
 2. ~~**Пригороды**~~ - OK.
 3. **Гастро** - список рынков / кафе для chip «Гастрономические точки» (как у СПб).
-4. ~~**Companion-статьи**~~ - msk-1…5 PUBLISHED (cover+inline+CTA).
+4. **Companion-статьи** - msk-1 live; msk-2…5 **HIDDEN** (ждут owner-текст).
 5. ~~**Prod seed**~~ - done на MSK.
 
 Спорные / на усмотрение: Политех (режим площадок), Бункер-42, Останкино (очереди/погода), Экспериментариум (коммерческий музей).
@@ -114,10 +114,10 @@
 | id | Title | blogSlug |
 |----|-------|----------|
 | msk-1 | Парадный центр | `moscow-2-dnya-samostoyatelno-marshrut` (есть) |
-| msk-2 | Замоскворечье | `moscow-zamoskvoreche-tretyakovka` (план) |
-| msk-3 | ВДНХ и космос | `moscow-vdnh-kosmos-den` (план) |
-| msk-4 | Воробьевы и Сити | `moscow-vorobevy-gory-siti` (план) |
-| msk-5 | Коломенское + Царицыно | `moscow-kolomenskoe-tsaritsyno` (план) |
+| msk-2 | Замоскворечье | `moscow-zamoskvoreche-tretyakovka` (**HIDDEN**, ждать owner) |
+| msk-3 | ВДНХ и космос | `moscow-vdnh-kosmos-den` (**HIDDEN**, ждать owner) |
+| msk-4 | Воробьевы и Сити | `moscow-vorobevy-gory-siti` (**HIDDEN**, ждать owner) |
+| msk-5 | Коломенское + Царицыно | `moscow-kolomenskoe-tsaritsyno` (**HIDDEN**, ждать owner) |
 
 CTA планировщика: `/my-day?city=moscow`.
 

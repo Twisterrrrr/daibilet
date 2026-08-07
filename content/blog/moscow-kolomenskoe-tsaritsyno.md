@@ -15,8 +15,8 @@ readMin: 7
 imageAlt: "Церковь Вознесения в Коломенском на зелёном холме"
 coverImageUrl: "/images/blog/moscow-kolomenskoe-tsaritsyno.jpg"
 publishedAt: "2026-08-07T12:30:00+03:00"
-status: PUBLISHED
-isIndexable: true
+status: HIDDEN
+isIndexable: false
 ---
 
 Два дворцово-парковых ансамбля на юге Москвы в один день реальны только с ранним стартом. [Коломенское](/locations/moscow-kolomenskoe) и [Царицыно](/locations/moscow-tsaritsyno) далеко друг от друга по ощущению времени: много ходьбы, мало «быстрых» остановок. Если начать после полудня, получится один парк и чувство, что второй вы украли у себя.

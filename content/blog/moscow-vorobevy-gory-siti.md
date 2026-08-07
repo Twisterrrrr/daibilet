@@ -15,8 +15,8 @@ readMin: 8
 imageAlt: "Смотровая площадка Воробьевых гор с видом на Москву-реку и небоскребы"
 coverImageUrl: "/images/blog/moscow-vorobevy-gory-siti.jpg"
 publishedAt: "2026-08-07T12:20:00+03:00"
-status: PUBLISHED
-isIndexable: true
+status: HIDDEN
+isIndexable: false
 ---
 
 Запад Москвы удобно собирать одной линией: высота, монастырь, парк у реки и современный горизонт Сити. День получается цельным, если не прыгать обратно в Кремль «на полчаса» и не пытаться совместить это с ВДНХ.

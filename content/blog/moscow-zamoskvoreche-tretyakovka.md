@@ -15,8 +15,8 @@ readMin: 8
 imageAlt: "Кирпичный фасад Третьяковской галереи и тихая улица Замоскворечья"
 coverImageUrl: "/images/blog/moscow-zamoskvoreche-tretyakovka.jpg"
 publishedAt: "2026-08-07T12:00:00+03:00"
-status: PUBLISHED
-isIndexable: true
+status: HIDDEN
+isIndexable: false
 ---
 
 Южный берег Москвы живёт другим темпом, чем Красная площадь. Здесь ниже дома, короче переулки и чаще хочется просто идти, а не «закрывать» список. Один день в Замоскворечье хорошо складывается вокруг [Третьяковской галереи](/venues/moscow-tret-yakovskaya-galereya): музей как якорь, улицы и мосты как дыхание между залами.

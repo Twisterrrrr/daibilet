@@ -15,8 +15,8 @@ readMin: 8
 imageAlt: "Арка главного входа ВДНХ и аллея павильонов в солнечный день"
 coverImageUrl: "/images/blog/moscow-vdnh-kosmos-den.jpg"
 publishedAt: "2026-08-07T12:10:00+03:00"
-status: PUBLISHED
-isIndexable: true
+status: HIDDEN
+isIndexable: false
 ---
 
 Север Москвы легко переоценить по карте и недооценить ногами. [ВДНХ](/locations/moscow-vdnh) - не «одна точка», а длинный парк с павильонами, очередями и соблазном зайти везде. Один день здесь работает, если выбрать тему: архитектура и прогулка, космос, семья - и не смешивать всё сразу.

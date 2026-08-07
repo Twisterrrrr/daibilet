@@ -1141,7 +1141,6 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         id: 'msk-2',
         title: 'Замоскворечье и Третьяковка',
         description: 'Южный берег: Третьяковка, Пятницкая, Патриарший мост и ХХС.',
-        blogSlug: 'moscow-zamoskvoreche-tretyakovka',
         stops: [
           mskPresetStop('Третьяковская галерея', { venueSlug: 'moscow-tret-yakovskaya-galereya', latitude: 55.7415, longitude: 37.6208 }),
           mskPresetStop('Пятницкая улица', { locationSlug: 'moscow-pyatnitskaya-ulitsa', latitude: 55.7425, longitude: 37.6285 }),
@@ -1157,7 +1156,6 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         id: 'msk-3',
         title: 'ВДНХ и космос',
         description: 'Северный день: арка ВДНХ, павильоны, музей космонавтики и Останкино.',
-        blogSlug: 'moscow-vdnh-kosmos-den',
         stops: [
           mskPresetStop('ВДНХ', { locationSlug: 'moscow-vdnh', latitude: 55.826, longitude: 37.637 }),
           mskPresetStop('Музей космонавтики', { venueSlug: 'moscow-muzey-kosmonavtiki', latitude: 55.8227, longitude: 37.6397 }),
@@ -1171,7 +1169,6 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         id: 'msk-4',
         title: 'Воробьевы горы и Сити',
         description: 'Западный вектор: смотровая, Новодевичий, река и небоскребы.',
-        blogSlug: 'moscow-vorobevy-gory-siti',
         stops: [
           mskPresetStop('Воробьевы горы', { locationSlug: 'moscow-vorobevy-gory', latitude: 55.7102, longitude: 37.559 }),
           mskPresetStop('Смотровая на Воробьевых горах', { locationSlug: 'moscow-smotrovaya-vorobevyh-gor', latitude: 55.7102, longitude: 37.559 }),
@@ -1186,7 +1183,6 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         id: 'msk-5',
         title: 'Усадьбы юга: Коломенское и Царицыно',
         description: 'Два дворцово-парковых ансамбля на юге - лучше с ранним стартом.',
-        blogSlug: 'moscow-kolomenskoe-tsaritsyno',
         stops: [
           mskPresetStop('Коломенское', { locationSlug: 'moscow-kolomenskoe', latitude: 55.6672, longitude: 37.6708 }),
           mskPresetStop('Храм Вознесения в Коломенском', { locationSlug: 'moscow-hram-vozneseniya-kolomenskoe', latitude: 55.667, longitude: 37.6705 }),
