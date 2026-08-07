@@ -7,6 +7,7 @@
 - Breakpoint `min-[500px]` / mockup `max-width: 500px`: QR `order-1` на phone, 2-col с 500px+.
 - Print CSS: `[data-buyer-ticket-actions]` + `.print:hidden` hidden; ticket full width; print всегда 2-col.
 - Detail rows stack on phone, side-by-side from 500px.
+- Ship: `88fba3bf` + `f060277d` · MSK **BUILD_ID=`W4QpN2EaaFUk32IZsAwFi`** · demo HTTP 200.
 
 ### Проблемы
 - Нет.
