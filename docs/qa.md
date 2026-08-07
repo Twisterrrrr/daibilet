@@ -1,5 +1,20 @@
 # qa.md — открытые вопросы
 
+## 2026-08-07 - Must-see hub volume (LOCKED)
+
+**LOCKED owner 2026-08-07** (см. [Project.md](./Project.md) § Must-see count tiers):
+
+| Слой | Target |
+|------|--------|
+| Moscow + SPB hubs | ~**200** точек в хабе (must-see / places layer) |
+| Other cities (top-8 start) | ~**50** на старте, потом посмотрим; **не** capitals-wide |
+
+**Факт сейчас:** SPB ~184 (near); Moscow ~58 (gap ~142 к 200); other top-8 - floor/large mixed (старый ориентир 12-18 снят).
+
+**Не путать:** sync / `CANDIDATE` Venue count **≠** hub count. Хаб = curated `mustSee` (+ suburbs / nested places по канону), не дамп кандидатов из синка.
+
+Открыто только execution: список/batch для MSK grow и top-8 →50; seed/apply prod - по запросу.
+
 ## 2026-08-06 - CI deploy secrets (открыто)
 
 Workflow `Deploy MSK web` в репо. Нужно в GitHub repo secrets:

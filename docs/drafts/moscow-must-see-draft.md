@@ -11,7 +11,7 @@
 
 | Слой | Кол-во | Примечание |
 |------|--------|------------|
-| mustSee (в городе) | **58** | capitals канон 30-50+ |
+| mustSee (в городе) | **58** | LOCKED target ~**200**; gap ~142 |
 | significantSuburbs | **8** × 5 POI = 40 | векторы + вокзалы |
 | dayRoutePresets | **5** | `msk-1`…`msk-5`; companion blogSlug |
 | gastro layer | 0 брендов | ждать owner list |

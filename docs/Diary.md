@@ -1,3 +1,20 @@
+## 2026-08-07 - Must-see hub targets LOCKED (~200 / ~50)
+
+### Наблюдения
+- Owner product lock: capitals hub (MSK+SPB) ~**200** must-see/places; other cities ~**50** start (не capitals-wide).
+- Approx now: SPB ~184 (near), Moscow ~58 (needs grow), top-8 still on old floor/large (~12-18 mindset).
+
+### Решения
+- Docs канон обновлён: снят ориентир capitals 30-50+ и large tourist 12-18.
+- **CANDIDATE / sync Venue ≠ hub count** - хаб только curated mustSee (+ suburbs и т.п.).
+- Tasktracker: MS.TIER1/2 lock, PH2.CITY2 grow, PH2.CITY3 top-8~50, MS.MSK-GROW200 (gap ~142).
+
+### Проблемы
+- Москва: content gap ~142 curated точек до ~200.
+- Top-8: нужна смена цели с 12-18 на ~50 без раздувания до capitals-wide.
+
+---
+
 ## 2026-08-07 - Buyer checkout: два пути (LOCKED)
 
 ### Наблюдения
