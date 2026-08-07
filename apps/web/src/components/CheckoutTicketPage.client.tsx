@@ -143,13 +143,12 @@ export function CheckoutTicketView({ publicCode, demoOrder, demoBanner }: Props)
               <BuyerTicketCard order={order} emailHint={emailHint} className="mx-0 max-w-none" />
             </div>
             {venuePin ? (
-              <div className="min-w-0 print:hidden lg:min-h-full">
+              <div className="min-w-0 print:hidden">
                 <BuyerTicketVenueMapPanel
                   lat={venuePin.lat}
                   lng={venuePin.lng}
                   venueTitle={order.venueTitle}
                   venueAddress={order.venueAddress}
-                  className="lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)]"
                 />
               </div>
             ) : null}

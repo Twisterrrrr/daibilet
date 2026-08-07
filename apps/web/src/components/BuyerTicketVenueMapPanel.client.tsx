@@ -15,7 +15,7 @@ type Props = {
 
 /**
  * Equal-weight companion to BuyerTicketCard on the ticket PAGE (not inside the printable card).
- * OSM/Leaflet pin - print:hidden at page layout.
+ * Scrolls with the page (no sticky / nested scroll). OSM pin; print:hidden at page layout.
  */
 export function BuyerTicketVenueMapPanel({
   lat,
@@ -44,11 +44,12 @@ export function BuyerTicketVenueMapPanel({
         </div>
       </div>
 
-      <div className="relative min-h-[260px] flex-1 bg-slate-50 sm:min-h-[320px] lg:min-h-0">
+      <div className="relative min-h-[260px] flex-1 bg-slate-50 sm:min-h-[320px]">
         <OsmMapEmbed
           lat={lat}
           lng={lng}
           title={`Карта: ${title}`}
+          pageScrollFriendly
           className="absolute inset-0 h-full w-full"
         />
       </div>

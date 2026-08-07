@@ -1,3 +1,17 @@
+## 2026-08-07 - Buyer ticket map: uniform page scroll
+
+### Наблюдения
+- Owner: карта справа ок, но «прокрутка действует не одинаково» - левая колонка ехала со страницей, правая sticky + max-h и жесты Leaflet перехватывали скролл.
+
+### Решения
+- Убран `lg:sticky` / `max-h` у map panel - обе колонки скроллятся вместе со страницей.
+- `OsmMapEmbed` `pageScrollFriendly`: wheel zoom off; drag/touch unlock после клика; `touch-action: pan-y` пока locked.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-07 - Buyer ticket page: venue map block
 
 ### Наблюдения

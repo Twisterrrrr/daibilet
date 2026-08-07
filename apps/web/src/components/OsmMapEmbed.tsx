@@ -19,17 +19,24 @@ const MARKER_HTML =
 /**
  * Interactive OSM map (Leaflet). Replaces openstreetmap.org/export/embed.html:
  * upstream MapLibre embed effectively floors zoom at fitBounds, so native "-" often no-ops.
+ *
+ * Wheel zoom is always off (page scroll stays primary); use +/- controls.
+ * With `pageScrollFriendly`, pan/touch-zoom unlock only after click/tap so the page
+ * and map columns scroll together without gesture fighting.
  */
 export function OsmMapEmbed({
   lat,
   lng,
   title,
   className,
+  pageScrollFriendly = false,
 }: {
   lat: number;
   lng: number;
   title: string;
   className?: string;
+  /** Disable drag/touch until user clicks the map; never steal wheel scroll. */
+  pageScrollFriendly?: boolean;
 }) {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const mapRef = React.useRef<LeafletMap | null>(null);
@@ -41,6 +48,12 @@ export function OsmMapEmbed({
     let cancelled = false;
     let map: LeafletMap | null = null;
     let resizeObserver: ResizeObserver | null = null;
+    let unlocked = false;
+
+    const setLockedChrome = (locked: boolean) => {
+      node.dataset.mapInteraction = locked ? 'locked' : 'active';
+      node.style.touchAction = locked ? 'pan-y' : 'none';
+    };
 
     void (async () => {
       const L = await loadDaibiletLeaflet();
@@ -53,6 +66,11 @@ export function OsmMapEmbed({
         maxZoom: MAX_ZOOM,
         scrollWheelZoom: false,
         zoomControl: false,
+        dragging: !pageScrollFriendly,
+        touchZoom: !pageScrollFriendly,
+        doubleClickZoom: true,
+        boxZoom: false,
+        keyboard: false,
       });
       mapRef.current = map;
 
@@ -78,6 +96,24 @@ export function OsmMapEmbed({
       });
       L.marker([lat, lng], { icon, title, keyboard: false }).addTo(map);
 
+      if (pageScrollFriendly) {
+        setLockedChrome(true);
+        const unlock = () => {
+          if (unlocked || !map) return;
+          unlocked = true;
+          map.dragging.enable();
+          map.touchZoom.enable();
+          setLockedChrome(false);
+          map.off('click', unlock);
+          map.off('focus', unlock);
+        };
+        // click/tap only (not pointerdown) so a vertical page-scroll gesture stays page scroll
+        map.on('click', unlock);
+        map.on('focus', unlock);
+      } else {
+        setLockedChrome(false);
+      }
+
       const syncSize = () => {
         map?.invalidateSize({ animate: false });
       };
@@ -92,7 +128,7 @@ export function OsmMapEmbed({
       map?.remove();
       mapRef.current = null;
     };
-  }, [lat, lng, title]);
+  }, [lat, lng, title, pageScrollFriendly]);
 
   return (
     <div
@@ -101,6 +137,8 @@ export function OsmMapEmbed({
       role="region"
       aria-label={title}
       data-osm-map="leaflet"
+      data-map-interaction={pageScrollFriendly ? 'locked' : 'active'}
+      tabIndex={pageScrollFriendly ? 0 : undefined}
     />
   );
 }

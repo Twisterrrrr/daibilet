@@ -2,3 +2,13 @@
 .leaflet-control-attribution .leaflet-attribution-flag {
   display: none !important;
 }
+
+/* Ticket / content pages: locked map lets vertical page scroll pass through */
+[data-osm-map='leaflet'][data-map-interaction='locked'] {
+  cursor: grab;
+  touch-action: pan-y !important;
+}
+
+[data-osm-map='leaflet'][data-map-interaction='active'] {
+  cursor: grab;
+}
