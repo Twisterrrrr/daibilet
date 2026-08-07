@@ -1,6 +1,6 @@
 # Москва: черновик must-see + пригороды (Phase C / MS.TIER4)
 
-**Статус:** draft для owner-review, уже вшит в runtime `CITY_INFO.moscow` (web + public).  
+**Статус:** owner OK → seed/images live (2026-08-07); gastro + companions msk-2…5 open.  
 **Дата:** 2026-08-07  
 **Шаблон:** как СПб Phase B - mustSee с chip-фильтрами, `significantSuburbs` + travel vectors, `dayRoutePresets` → `/my-day`.  
 **Правила:** дефис `-`, без «Питер»; гастро-рестораны не выдумывать без owner list (в pack только рынок «Даниловский» как creative).
@@ -11,11 +11,12 @@
 
 | Слой | Кол-во | Примечание |
 |------|--------|------------|
-| mustSee (в городе) | **58** | capitals канон 30-50+; можно ужать после owner OK |
+| mustSee (в городе) | **58** | capitals канон 30-50+ |
 | significantSuburbs | **8** × 5 POI = 40 | векторы + вокзалы |
 | dayRoutePresets | **5** | `msk-1`…`msk-5`; companion blogSlug |
 | gastro layer | 0 брендов | ждать owner list |
-| place images | 0 | `/images/venues/moscow/` ещё нет |
+| place images | **58** | `/images/venues/moscow/` + `MOSCOW_IMAGES` |
+| prod seed | **52 insert / 6 skip** | MSK DB; coords 58/58 |
 
 ### Уже было (floor 6)
 
@@ -23,13 +24,13 @@
 
 ---
 
-## Owner OK нужен на
+## Owner follow-ups
 
-1. **Состав 58** - что убрать / добавить (особенно creative: Винзавод, Artplay, Флакон; science: Экспериментариум).
-2. **Пригороды** - Мелихово и Бородино vs альтернативы (Гжель, Дубна, Суздаль out of scope?).
-3. **Гастро** - список рынков / кафе для chip «Гастрономические точки» (как 45 у СПб).
-4. **Companion-статьи** - 4 новых slug в плане (сейчас live только `moscow-2-dnya-…` на `msk-1`).
-5. **Prod seed** - `seed-cityinfo-must-see-venues.js --cities=moscow --apply --write-cityinfo` на MSK DB.
+1. ~~**Состав 58**~~ - OK 2026-08-07.
+2. ~~**Пригороды**~~ - OK.
+3. **Гастро** - список рынков / кафе для chip «Гастрономические точки» (как у СПб).
+4. **Companion-статьи** - 4 новых slug в плане (live только `moscow-2-dnya-…` на `msk-1`; CTA wired).
+5. ~~**Prod seed**~~ - done на MSK.
 
 Спорные / на усмотрение: Политех (режим площадок), Бункер-42, Останкино (очереди/погода), Экспериментариум (коммерческий музей).
 

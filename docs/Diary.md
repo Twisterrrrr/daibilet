@@ -1,3 +1,23 @@
+## 2026-08-07 - Москва Phase C live (seed + images)
+
+### Наблюдения
+- Owner OK на draft 58 mustSee / 8 suburbs / 5 presets.
+- Deploy MSK web run **31166455240** success (SHA `ac94123`, cityInfo draft already live).
+- Prod seed: 52 inserted, 6 skipped-exists; cityInfo slug unchanged (уже были).
+- Coords enrich from cityInfo: 52 updated, 6 already, DB `no_coords=0` for 58 moscow-*.
+
+### Решения
+- `scripts/apply-moscow-mustsee-coords.js` + `scripts/generate-moscow-venue-covers.mjs`.
+- Covers: 12 GenerateImage (Главные) + 46 sharp catalog pack → `/images/venues/moscow/` (web+public); `MOSCOW_IMAGES` в `city-place-images.ts`.
+- Companion msk-2…5: blogSlug CTA уже в presets / my-day; полные статьи (cover+inline) отложены - план в `moscow-route-articles-plan.md`.
+- Gastro brands - ждут owner list (в pack только Даниловский рынок).
+
+### Проблемы
+- Local sharp был broken (detect-libc); gen на MSK + local после fix.
+- 4 companion articles ещё не PUBLISHED (только slug wiring).
+
+---
+
 ## 2026-08-07 - F5.3b closed: public-venue-read
 
 ### Наблюдения

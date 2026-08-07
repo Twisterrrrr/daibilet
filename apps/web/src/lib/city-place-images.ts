@@ -3,8 +3,93 @@
  * when hub omits heroImageUrl or only has a dark /venues/generated stub.
  * SPB: Главные 1-12 + мечеть + Top-100 linked place stills under /images/venues/saint-petersburg/.
  * KGD: mustSee + day-route + suburb stops under /images/venues/kaliningrad/.
+ * MSK: Phase C mustSee under /images/venues/moscow/ (12 GenerateImage main + sharp pack).
  * Blog Top-100/Beyond series is DRAFT (admin-only); assets still feed catalog/my-day.
  */
+
+const MOSCOW_IMAGES: Record<string, string> = {
+  'moscow-krasnaya-ploschad-i-kreml':
+    '/images/venues/moscow/krasnaya-ploschad-kreml.jpg',
+  'moscow-sobor-vasiliya-blazhennogo':
+    '/images/venues/moscow/sobor-vasiliya-blazhennogo.jpg',
+  'moscow-bol-shoy-teatr': '/images/venues/moscow/bolshoy-teatr.jpg',
+  'moscow-tret-yakovskaya-galereya':
+    '/images/venues/moscow/tretyakovskaya-galereya.jpg',
+  'moscow-park-zaryad-e': '/images/venues/moscow/park-zaryade.jpg',
+  'moscow-vdnh': '/images/venues/moscow/vdnh.jpg',
+  'moscow-moskva-siti': '/images/venues/moscow/moskva-siti.jpg',
+  'moscow-vorobevy-gory': '/images/venues/moscow/vorobevy-gory.jpg',
+  'moscow-hram-hrista-spasitelya':
+    '/images/venues/moscow/hram-hrista-spasitelya.jpg',
+  'moscow-novodevichiy-monastyr':
+    '/images/venues/moscow/novodevichiy-monastyr.jpg',
+  'moscow-ostankinskaya-telebashnya':
+    '/images/venues/moscow/ostankinskaya-telebashnya.jpg',
+  'moscow-gum': '/images/venues/moscow/gum.jpg',
+  'moscow-gmii-imeni-pushkina': '/images/venues/moscow/gmii-pushkina.jpg',
+  'moscow-novaya-tretyakovka': '/images/venues/moscow/novaya-tretyakovka.jpg',
+  'moscow-muzey-garazh': '/images/venues/moscow/muzey-garazh.jpg',
+  'moscow-muzey-kosmonavtiki': '/images/venues/moscow/muzey-kosmonavtiki.jpg',
+  'moscow-politehnicheskiy-muzey':
+    '/images/venues/moscow/politehnicheskiy-muzey.jpg',
+  'moscow-evreyskiy-muzey': '/images/venues/moscow/evreyskiy-muzey.jpg',
+  'moscow-muzey-moskvy': '/images/venues/moscow/muzey-moskvy.jpg',
+  'moscow-bunker-42': '/images/venues/moscow/bunker-42.jpg',
+  'moscow-muzey-bulgakova': '/images/venues/moscow/muzey-bulgakova.jpg',
+  'moscow-muzey-russkogo-impressionizma':
+    '/images/venues/moscow/muzey-russkogo-impressionizma.jpg',
+  'moscow-paryaschiy-most-zaryadya':
+    '/images/venues/moscow/paryaschiy-most-zaryadya.jpg',
+  'moscow-smotrovaya-vorobevyh-gor':
+    '/images/venues/moscow/smotrovaya-vorobevyh-gor.jpg',
+  'moscow-patriarshiy-most': '/images/venues/moscow/patriarshiy-most.jpg',
+  'moscow-krymskaya-naberezhnaya':
+    '/images/venues/moscow/krymskaya-naberezhnaya.jpg',
+  'moscow-kremlevskaya-naberezhnaya':
+    '/images/venues/moscow/kremlevskaya-naberezhnaya.jpg',
+  'moscow-smotrovaya-moskva-siti':
+    '/images/venues/moscow/smotrovaya-moskva-siti.jpg',
+  'moscow-kotelnicheskaya-naberezhnaya':
+    '/images/venues/moscow/kotelnicheskaya-naberezhnaya.jpg',
+  'moscow-smotrovaya-ostankino':
+    '/images/venues/moscow/smotrovaya-ostankino.jpg',
+  'moscow-staryy-arbat': '/images/venues/moscow/staryy-arbat.jpg',
+  'moscow-nikolskaya-ulitsa': '/images/venues/moscow/nikolskaya-ulitsa.jpg',
+  'moscow-patriarshie-prudy': '/images/venues/moscow/patriarshie-prudy.jpg',
+  'moscow-kuznetskiy-most': '/images/venues/moscow/kuznetskiy-most.jpg',
+  'moscow-kamergerskiy-pereulok':
+    '/images/venues/moscow/kamergerskiy-pereulok.jpg',
+  'moscow-pyatnitskaya-ulitsa':
+    '/images/venues/moscow/pyatnitskaya-ulitsa.jpg',
+  'moscow-park-gorkogo': '/images/venues/moscow/park-gorkogo.jpg',
+  'moscow-muzeon': '/images/venues/moscow/muzeon.jpg',
+  'moscow-kolomenskoe': '/images/venues/moscow/kolomenskoe.jpg',
+  'moscow-tsaritsyno': '/images/venues/moscow/tsaritsyno.jpg',
+  'moscow-kuskovo': '/images/venues/moscow/kuskovo.jpg',
+  'moscow-izmaylovskiy-park': '/images/venues/moscow/izmaylovskiy-park.jpg',
+  'moscow-sokolniki': '/images/venues/moscow/sokolniki.jpg',
+  'moscow-aptekarskiy-ogorod':
+    '/images/venues/moscow/aptekarskiy-ogorod.jpg',
+  'moscow-kazanskiy-sobor-krasnaya':
+    '/images/venues/moscow/kazanskiy-sobor-krasnaya.jpg',
+  'moscow-pokrovskiy-monastyr':
+    '/images/venues/moscow/pokrovskiy-monastyr.jpg',
+  'moscow-donskoy-monastyr': '/images/venues/moscow/donskoy-monastyr.jpg',
+  'moscow-bogoyavlenskiy-sobor-elohovo':
+    '/images/venues/moscow/bogoyavlenskiy-sobor-elohovo.jpg',
+  'moscow-hram-vozneseniya-kolomenskoe':
+    '/images/venues/moscow/hram-vozneseniya-kolomenskoe.jpg',
+  'moscow-marfo-mariinskaya-obitel':
+    '/images/venues/moscow/marfo-mariinskaya-obitel.jpg',
+  'moscow-zoopark': '/images/venues/moscow/zoopark.jpg',
+  'moscow-moskvarium': '/images/venues/moscow/moskvarium.jpg',
+  'moscow-planetariy': '/images/venues/moscow/planetariy.jpg',
+  'moscow-eksperimentanium': '/images/venues/moscow/eksperimentanium.jpg',
+  'moscow-vinzavod': '/images/venues/moscow/vinzavod.jpg',
+  'moscow-artplay': '/images/venues/moscow/artplay.jpg',
+  'moscow-flakon': '/images/venues/moscow/flakon.jpg',
+  'moscow-danilovskiy-rynok': '/images/venues/moscow/danilovskiy-rynok.jpg',
+};
 
 const NIZHNY_NOVGOROD_IMAGES: Record<string, string> = {
   "nizhny-novgorod-nizhegorodskaya-yarmarka": "/images/venues/nizhny-novgorod/nizhegorodskaya-yarmarka.jpg",
@@ -245,6 +330,7 @@ const EDITORIAL_IMAGES_BY_SLUG: Record<string, string> = {
   ...SAINT_PETERSBURG_IMAGES,
   ...KALININGRAD_IMAGES,
   ...PERM_IMAGES,
+  ...MOSCOW_IMAGES,
 };
 
 export function lookupEditorialPlaceImage(

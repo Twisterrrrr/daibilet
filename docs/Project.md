@@ -81,7 +81,7 @@ SPB `.16` **retired**.
 
 ### Москва и Санкт-Петербург - широкий must-see (не потолок 18)
 
-**Факт (2026-08-07):** Санкт-Петербург - wide pack в runtime (`mustSee` ~184 + suburbs + 6 presets). Москва - Phase C draft в runtime: **58** mustSee с фильтрами, **8** пригородов / 40 POI + travel vectors, **5** `dayRoutePresets` (`msk-1`…`msk-5`). Draft для review: `docs/drafts/moscow-must-see-draft.md`. Гастро-бренды MSK и place-images `/images/venues/moscow/` - ещё нет. Prod seed MSK - после owner OK / batch.
+**Факт (2026-08-07):** Санкт-Петербург - wide pack в runtime (`mustSee` ~184 + suburbs + 6 presets). Москва - Phase C live: **58** mustSee с фильтрами, **8** пригородов / 40 POI + travel vectors, **5** `dayRoutePresets` (`msk-1`…`msk-5`); prod seed MSK (52 insert / 6 skip) + coords 58/58; place images `/images/venues/moscow/` (58: 12 GenerateImage main + sharp pack) + `MOSCOW_IMAGES` в `city-place-images.ts`. Companion live: `moscow-2-dnya-…` (`msk-1`); msk-2…5 - blogSlug CTA wired, статьи в плане. Гастро-бренды MSK - ждут owner list.
 
 **Цель:** тир **Capitals** - широкий curated set (ориентир 30-50+, без жёсткого потолка 18). Filter tabs обязательны. **Не** ограничивать столицы тиром Large tourist 12-18. NN - референс deep pack + gastro + named presets, не единственная модель клонирования.
 

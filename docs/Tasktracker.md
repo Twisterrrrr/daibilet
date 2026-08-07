@@ -175,7 +175,7 @@
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
 | PH2.CITY1 | `/cities` hub: compact grid, vibe tags, CountUp, LuckyCity, OSM pins (не SVG) | Средний | ✅ `ce3d376` MSK **BUILD_ID=`1x2J9HMR87fUIVEMHeTdt`** |
-| PH2.CITY2 | Capitals must-see wide pack (MSK/SPB) после owner list (MS.TIER3/4) | Высокий | 🔄 SPB ✅; MSK draft runtime `3d3c917` (58 mustSee / 8 suburbs / 5 presets) - ждёт owner OK + seed/images/guides |
+| PH2.CITY2 | Capitals must-see wide pack (MSK/SPB) после owner list (MS.TIER3/4) | Высокий | 🔄 SPB ✅; MSK Phase C live: seed 52+6, coords 58, images 58, presets 5; gastro + 4 companions - open |
 | PH2.VEN1 | Venue PDP monetization: clearer ticket path, related events density | Средний | ⚠️ next phase (UX.VENUE-MON) |
 | PH2.LOC1 | `/locations` IA: decision V1 keep primary nav (UX.LOC8); label «Места и точки сбора» = UX.LOC3 | Высокий | ✅ decided 2026-08-07 owner A+V1; rename ⏳ LOC3; `/places` deferred |
 | PH2.LOC2 | Mobile city chrome: CityPicker visible outside burger (brief quick win) | Критический | ✅ = UX.LOC1 pin+dropdown `cc05efa`; public parity 2026-08-07 |
@@ -229,8 +229,8 @@
 | MS.TIER3 | Phase B: Санкт-Петербург - широкий `cityInfo` с тематическими chip, гастро-слоем и пригородами | Высокий | ✅ 120 city must-see, 20 gastro, 5 пригородов / 25 POI, 6 day presets. После failed deploy `8585d1e` исправлены 11 malformed объектов пригородов; web и public cityInfo просканированы, parse восстановлен. Owner override: 5 транспортных векторов с хабами, blurb, станциями и гастро-остановками, Кронштадт обновлен Якорной площадью и Петровским доком. |
 | MS.SPB-KGD-SEED | Owner-verified SPB + KGD must-see, gastro и suburb POI: idempotent catalog dual-write, verified address/coords, slug wiring | Критический | ✅ MSK seed: 67 inserted, 20 updated, no missing city; 67 cityInfo links; deploy 2026-08-05 BUILD_ID=`htTqoT7UE2NcJBJevr_3v` |
 | LOC.SPB-MUSTSEE | SPB editorial locations missing from `/locations` despite DB seed (content take 400 A→Z + warm short-circuit) | Критический | ✅ `a8b106e`+follow-ups MSK; catalog shows Петропавловская/Дворцовая/Спас; BUILD_ID=`8Fo0L9-oGyooggq9uzfYC` |
-| MS.TIER4 | Phase C: второй город тем же шаблоном (Москва после СПб) | Средний | 🔄 `3d3c917` draft в cityInfo (web+public): 58 mustSee + chips, 8 suburbs/40 POI + vectors, 5 presets; docs `moscow-must-see-draft.md` + route plan; seed/images/gastro/4 companions - next |
-| MS.TIER5 | Phase 2 optional: `dayRoutePresets` / multi-day для MSK/SPB после стабильного широкого каталога | Низкий | 🔄 СПб ✅ 6; Москва draft 5 (`msk-1`…`msk-5`, companion live только `moscow-2-dnya-…`) |
+| MS.TIER4 | Phase C: второй город тем же шаблоном (Москва после СПб) | Средний | 🔄 owner OK; seed MSK **52 inserted / 6 skipped**; coords **58/58**; images **58** + `MOSCOW_IMAGES`; hub/presets live; gastro list + companions msk-2…5 articles - next |
+| MS.TIER5 | Phase 2 optional: `dayRoutePresets` / multi-day для MSK/SPB после стабильного широкого каталога | Низкий | 🔄 СПб ✅ 6; Москва ✅ 5 presets + blogSlug CTA; companion article live только `moscow-2-dnya-…` (`msk-1`) |
 | MS.TIER7 | Сценарии hub: не показывать preset без минимум 3 разрешимых точек и «Собрать день»; склонять «N точка/точки/точек» через общий formatter | Критический | ✅ 2026-08-05 |
 | MS.TIER6 | Гастро-пакет отдельно от landmarks (если нужно) - не смешивать в «Главные» | Низкий | ✅ СПб: 20 точек во вкладке «Гастрономические точки» |
 | MS.SPB-BRIDGES | Хаб СПб: справочный блок о разводе мостов с сезонным ориентиром, ссылкой на night-bridges и «Мой день» | Средний | ✅ `3c87de0`, MSK BUILD_ID=`IH8INbeVzpCW8pHY46i6b`; smoke 200 |
