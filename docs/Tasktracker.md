@@ -46,8 +46,8 @@
 | UX.BUY-7 | Path A polish: offer qty>1, phone, resume unpaid confirmationUrl | Средний | ⏳ thin only |
 | UX.BUY-8 | Path B complex calc (cart/multi-offer) — future internal pricing; не museum | Низкий | ⚠️ deferred (allowed later) |
 | UX.BUY-9 | Path B scaffold `/checkout/calc` (placeholder; wire later) | Низкий | ✅ `7e3eeb1d` |
-| UX.BUY-10 | Ticket page `/checkout/ticket/{publicCode}` (HTML ticket + print + QR) | Критический | ✅ catalog closed without Codex |
-| UX.BUY-11 | Best-effort buyer email (SMTP_* on web; else save-code copy) | Высокий | ✅ (MSK SMTP unset → skip + UI copy) |
+| UX.BUY-10 | Ticket page `/checkout/ticket/{publicCode}` (HTML ticket + print + QR) | Критический | ✅ `ca8332f4` MSK **BUILD_ID=`DZbsDCMDPTaUyaA071LUP`** Deploy **31186135682** |
+| UX.BUY-11 | Best-effort buyer email (SMTP_* on web; else save-code copy) | Высокий | ✅ (MSK SMTP unset → `smtp_not_configured` + UI copy) |
 | UX.BUY-12 | YooKassa return → catalog result/ticket (`?order=`); localStorage recovery | Высокий | ✅ catalog; finance must set return_url |
 
 ---

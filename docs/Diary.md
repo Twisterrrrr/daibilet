@@ -97,11 +97,13 @@
 - Return wiring: catalog передаёт base `…/checkout/result`; после create знает `catalogReturnWithOrder=…?order={code}`. **Finance handoff:** YooKassa `return_url` = этот URL (не supplier SPA). Пока return без `?order=` - recovery из localStorage на result.
 - Email: если появятся `SMTP_HOST`+`SMTP_FROM` на web process + nodemailer - письмо со ссылкой; иначе UI «сохраните код / ссылку».
 - Wide CTA не трогали. Secrets / `.159` не трогали.
+- Ship: `ca8332f4` · MSK Deploy **31186135682** · **BUILD_ID=`DZbsDCMDPTaUyaA071LUP`**. Email: `smtp_not_configured` (ожидаемо).
 
 ### Проблемы
 - PDF attach / webhook PENDING→CONFIRMED notify = finance-only (остаётся Codex/`.159`).
 - Стабильный purchases-by-email без localStorage = UX.BUY-6 (Codex).
 - QR картинка через api.qrserver.com (MVP); код заказа всегда на карточке для печати offline.
+- YooKassa `return_url` всё ещё может указывать на supplier/pay, если finance не выставил catalog URL - handoff.
 
 ---
 
