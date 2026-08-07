@@ -14,7 +14,7 @@ date: "7 авг 2026"
 readMin: 8
 imageAlt: "Арка главного входа ВДНХ и аллея павильонов в солнечный день"
 coverImageUrl: "/images/blog/moscow-vdnh-kosmos-den.jpg"
-publishedAt: "2026-08-07T14:10:00+03:00"
+publishedAt: "2026-08-07T12:10:00+03:00"
 status: PUBLISHED
 isIndexable: true
 ---

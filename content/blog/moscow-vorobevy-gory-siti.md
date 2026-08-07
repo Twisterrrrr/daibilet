@@ -14,7 +14,7 @@ date: "7 авг 2026"
 readMin: 8
 imageAlt: "Смотровая площадка Воробьевых гор с видом на Москву-реку и небоскребы"
 coverImageUrl: "/images/blog/moscow-vorobevy-gory-siti.jpg"
-publishedAt: "2026-08-07T14:20:00+03:00"
+publishedAt: "2026-08-07T12:20:00+03:00"
 status: PUBLISHED
 isIndexable: true
 ---

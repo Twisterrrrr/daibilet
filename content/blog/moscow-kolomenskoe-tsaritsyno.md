@@ -14,7 +14,7 @@ date: "7 авг 2026"
 readMin: 7
 imageAlt: "Церковь Вознесения в Коломенском на зелёном холме"
 coverImageUrl: "/images/blog/moscow-kolomenskoe-tsaritsyno.jpg"
-publishedAt: "2026-08-07T14:30:00+03:00"
+publishedAt: "2026-08-07T12:30:00+03:00"
 status: PUBLISHED
 isIndexable: true
 ---

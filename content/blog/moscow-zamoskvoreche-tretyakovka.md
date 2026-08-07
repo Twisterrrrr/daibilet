@@ -14,7 +14,7 @@ date: "7 авг 2026"
 readMin: 8
 imageAlt: "Кирпичный фасад Третьяковской галереи и тихая улица Замоскворечья"
 coverImageUrl: "/images/blog/moscow-zamoskvoreche-tretyakovka.jpg"
-publishedAt: "2026-08-07T14:00:00+03:00"
+publishedAt: "2026-08-07T12:00:00+03:00"
 status: PUBLISHED
 isIndexable: true
 ---
