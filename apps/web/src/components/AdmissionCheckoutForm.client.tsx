@@ -64,7 +64,7 @@ export function AdmissionCheckoutForm({ product }: Props) {
 
     setSubmitting(true);
     try {
-      const response = await fetch('/api/checkout/admission', {
+      const response = await fetch('/checkout/actions/admission', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({

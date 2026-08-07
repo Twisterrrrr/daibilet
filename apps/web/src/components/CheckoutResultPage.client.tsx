@@ -43,7 +43,7 @@ export function CheckoutResultView() {
       if (!disposed && cached) setOrder(cached);
 
       try {
-        const response = await fetch(`/api/checkout/order?order=${encodeURIComponent(publicCode)}`, {
+        const response = await fetch(`/checkout/actions/order?order=${encodeURIComponent(publicCode)}`, {
           cache: 'no-store',
         });
         const payload = (await response.json().catch(() => null)) as LookupResponse | null;

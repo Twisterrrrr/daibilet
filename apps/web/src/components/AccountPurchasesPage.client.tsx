@@ -85,7 +85,7 @@ export function AccountPurchasesPageView() {
     const run = async () => {
       try {
         const response = await fetch(
-          `/api/account/internal-purchases?email=${encodeURIComponent(user.email)}`,
+          `/checkout/actions/internal-purchases?email=${encodeURIComponent(user.email)}`,
           { cache: 'no-store' },
         );
         const data = (await response.json().catch(() => null)) as {

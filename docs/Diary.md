@@ -13,7 +13,7 @@
   - result `https://daibilet.ru/checkout/result?order={publicCode}`
   - account `https://daibilet.ru/account/purchases`
 - CTA admission: same-origin relative path (env `FINANCE_CHECKOUT_BASE_URL` / `BUYER_CHECKOUT_HOST=pay` только если явно нужен pay).
-- BFF: `POST /api/checkout/admission`, `GET /api/checkout/order`, `GET /api/account/internal-purchases` (finance soft).
+- BFF: `POST /checkout/actions/admission`, `GET /checkout/actions/order`, `GET /checkout/actions/internal-purchases` (finance soft; вне nginx `/api/` → backend :4000).
 - Split: Cursor = UX/UI; Codex = fulfillment PDF/mail, admission YooKassa public, order lookup APIs, pay experiment.
 
 ### Проблемы
