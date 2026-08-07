@@ -236,6 +236,123 @@ export interface SupplierPortalOrdersListDto {
   items: SupplierPortalOrderRowDto[];
 }
 
+export type SupplierPortalChangeRequestSubject = 'EVENT' | 'ADMISSION_PRODUCT';
+
+export interface SupplierPortalChangeRequestRowDto {
+  id: string;
+  subject: SupplierPortalChangeRequestSubject;
+  subjectId: string | null;
+  type: string;
+  status: string;
+  title: string | null;
+  summary: string | null;
+  adminComment: string | null;
+  submittedAt: string | null;
+  reviewedAt: string | null;
+  appliedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  event: {
+    id: string;
+    slug: string;
+    title: string;
+    status: string;
+  } | null;
+  admissionProduct: {
+    id: string;
+    slug: string;
+    title: string;
+    status: string;
+  } | null;
+}
+
+export interface SupplierPortalChangeRequestsListDto {
+  generatedAt: string;
+  total: number;
+  limit: number;
+  offset: number;
+  hasMore: boolean;
+  filters: {
+    status: string | null;
+    subject: SupplierPortalChangeRequestSubject | null;
+  };
+  items: SupplierPortalChangeRequestRowDto[];
+}
+
+export interface SupplierPortalChangeRequestCreateResultDto {
+  request: SupplierPortalChangeRequestRowDto;
+}
+
+export interface SupplierPortalOfferDraftDto {
+  title: string;
+  priceRub: number;
+  oldPriceRub?: number | null;
+  capacityTotal?: number | null;
+  groupSize?: number;
+  active?: boolean;
+}
+
+export interface SupplierPortalAdmissionChangeRequestCreateDto {
+  admissionProductId?: string | null;
+  title?: string | null;
+  summary?: string | null;
+  admissionProduct: {
+    title?: string | null;
+    shortTitle?: string | null;
+    description?: string | null;
+    shortDescription?: string | null;
+    type?: string | null;
+    venueId?: string | null;
+    validityMode?: string | null;
+    validFrom?: string | null;
+    validTo?: string | null;
+    validDaysAfterPurchase?: number | null;
+    ticketsVacant?: number | null;
+    imageUrl?: string | null;
+  };
+  offers?: SupplierPortalOfferDraftDto[];
+}
+
+export interface SupplierPortalEventChangeRequestCreateDto {
+  eventId?: string | null;
+  type?: string | null;
+  title?: string | null;
+  summary?: string | null;
+  event?: {
+    title?: string | null;
+    kind?: string | null;
+    description?: string | null;
+    shortDescription?: string | null;
+    ageLimit?: string | null;
+    primaryCityId?: string | null;
+    venueId?: string | null;
+    categoryId?: string | null;
+    primarySubcategoryId?: string | null;
+    imageUrl?: string | null;
+  };
+  content?: {
+    title?: string | null;
+    description?: string | null;
+    shortDescription?: string | null;
+    ageLimit?: string | null;
+  };
+  schedule?: {
+    mode?: string | null;
+    openDate?: {
+      validFrom?: string | null;
+      validTo?: string | null;
+      validDays?: number | null;
+    } | null;
+    sessions?: Array<{
+      startsAt: string;
+      endsAt?: string | null;
+      capacityTotal?: number | null;
+    }>;
+    defaultCapacityTotal?: number | null;
+  };
+  offers?: SupplierPortalOfferDraftDto[];
+}
+
 export interface SupplierPortalFinanceDto {
   generatedAt: string;
   supplier: SupplierPortalIdentityDto;

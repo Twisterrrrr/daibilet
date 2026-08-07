@@ -46,6 +46,7 @@ import { createPublicReadStackWarmer } from './public-warmup.js';
 import { createSupplierAdmissionYooKassaPurchaseRouteHandler } from './supplier-admission-yookassa-purchase-handler.js';
 import { createSupplierAdmissionStubPurchaseRouteHandler } from './supplier-admission-stub-purchase-handler.js';
 import { createSupplierAuthRouteHandler, resolveSupplierPortalSearchParams } from './supplier-auth-handler.js';
+import { createSupplierChangeRequestsRouteHandler } from './supplier-change-requests-handler.js';
 import { createSupplierPortalRouteHandler } from './supplier-portal-handler.js';
 import { createSupplierProfileWriteRouteHandler } from './supplier-profile-write-handler.js';
 import {
@@ -178,6 +179,9 @@ const server = startServer({
         resolveSearchParams: resolveSupplierPortalSearchParams,
       }),
       createSupplierProfileWriteRouteHandler({
+        resolveSearchParams: resolveSupplierPortalSearchParams,
+      }),
+      createSupplierChangeRequestsRouteHandler({
         resolveSearchParams: resolveSupplierPortalSearchParams,
       }),
       createSupplierPortalRouteHandler({

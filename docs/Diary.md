@@ -1,3 +1,29 @@
+## 2026-08-07 — Supplier write-flow + YooKassa reconcile ops
+
+### Наблюдения
+
+- ЛК поставщика уже показывал события, входные билеты, заказы и readiness, но поставщик не мог инициировать создание или правку карточек без ручного сообщения админу.
+- В схеме уже есть `EventChangeRequest`, поэтому отдельная таблица заявок для admission-продуктов сейчас только раздула бы фазу 2.
+- YooKassa reconcile был реализован как CLI, но для `.159` не хватало явного timer/runbook, чтобы зависшие `PENDING_PAYMENT` не держали capacity после включения sandbox/controlled продаж.
+
+### Решения
+
+- `EventChangeRequest` стал общей очередью supplier-заявок: `payload.subject = EVENT | ADMISSION_PRODUCT`.
+- Добавлен supplier API: `GET /api/supplier/change-requests`, `POST /api/supplier/change-requests/admissions`, `POST /api/supplier/change-requests/events`.
+- Новый `RequestsPage` в `apps/supplier` дает две формы: входной билет площадки и событие/open-date. Поставщик видит статус заявки без технических id.
+- Backend проверяет, что новая заявка с `venueId` относится к площадке поставщика через `SupplierVenue`.
+- Admin apply для admission/create не включен автоматически: оператор approve/reject уже видит заявку, а применение оставлено ручным до первых реальных музеев/галерей.
+- Добавлены `daibilet-finance-yookassa-reconcile.service/timer` и runbook для запуска reconcile каждые 5 минут на `.159`.
+
+### Проверки
+
+- `pnpm --config.engine-strict=false --filter @daibilet/backend typecheck` — OK.
+- `pnpm --config.engine-strict=false --filter @daibilet/supplier typecheck` — OK.
+- `pnpm --config.engine-strict=false --filter @daibilet/backend exec tsx --test src/supplier-change-requests-handler.test.ts src/admin-event-change-requests.dto.test.ts` — OK, DB-aware supplier test skipped without `DATABASE_URL`.
+- `pnpm --config.engine-strict=false --filter @daibilet/supplier build` — OK.
+
+---
+
 ## 2026-08-02 — Supplier LC order operations view
 
 ### Наблюдения

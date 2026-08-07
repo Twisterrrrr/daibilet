@@ -234,6 +234,7 @@ function buildWhere(query: AdminEventChangeRequestsQuery): Prisma.EventChangeReq
 }
 
 export function mapEventChangeRequestRow(row: EventChangeRequestRow): AdminEventChangeRequestRowDto {
+  const subject = payloadSubject(row.payload);
   return {
     id: row.id,
     eventId: row.eventId,
@@ -285,7 +286,7 @@ export function mapEventChangeRequestRow(row: EventChangeRequestRow): AdminEvent
     actions: {
       canApprove: row.status === 'SUBMITTED',
       canReject: row.status === 'SUBMITTED',
-      canApply: (row.status === 'APPROVED' || row.status === 'APPLY_FAILED') && row.type !== 'CREATE',
+      canApply: subject === 'EVENT' && Boolean(row.eventId) && (row.status === 'APPROVED' || row.status === 'APPLY_FAILED') && row.type !== 'CREATE',
     },
   };
 }
@@ -298,6 +299,11 @@ function normalizeLimit(limit: number | undefined): number {
 function payloadKeys(payload: unknown): string[] {
   if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return [];
   return Object.keys(payload).sort();
+}
+
+function payloadSubject(payload: unknown): 'EVENT' | 'ADMISSION_PRODUCT' {
+  const record = asRecord(payload);
+  return record?.subject === 'ADMISSION_PRODUCT' ? 'ADMISSION_PRODUCT' : 'EVENT';
 }
 
 function toIso(value: Date | null): string | null {

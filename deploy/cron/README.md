@@ -2,6 +2,26 @@
 
 После deploy фаз A–D на staging/prod.
 
+## Finance .159: YooKassa reconcile timer
+
+Для finance-сервера `.159` использовать systemd timer, а не crontab. Он раз в 5 минут закрывает зависшие `CheckoutOrder(PENDING_PAYMENT)` после grace window и освобождает capacity, если webhook не пришел.
+
+```bash
+cp /opt/daibilet/deploy/systemd/daibilet-finance-yookassa-reconcile.service /etc/systemd/system/
+cp /opt/daibilet/deploy/systemd/daibilet-finance-yookassa-reconcile.timer /etc/systemd/system/
+systemctl daemon-reload
+systemctl enable --now daibilet-finance-yookassa-reconcile.timer
+```
+
+Ручная проверка:
+
+```bash
+cd /opt/daibilet
+npm run backend:checkout:yookassa:reconcile -- --limit=20 --grace-minutes=10
+```
+
+См. [docs/finance-159-smoke-runbook.md](../../docs/finance-159-smoke-runbook.md).
+
 ## Prod: Ticketscloud orders-only (обязательно для зеркала заказов)
 
 Только `npm run tc:orders` — **не** каталог (`tc:sync` / `tep:sync`).

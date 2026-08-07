@@ -125,3 +125,39 @@ DAIBILET_YOOKASSA_CHECKOUT=1
 - projection contract smoke зелёный;
 - catalog CTA всё ещё gated по `canSell && checkoutPath`;
 - владелец подтверждает тестовый платеж и отмену/возврат.
+
+## YooKassa reconcile / reaper
+
+Назначение: не держать зависшие `CheckoutOrder(PENDING_PAYMENT)` и зарезервированную вместимость, если webhook не пришел или платеж завис.
+
+Ручной dry-run:
+
+```bash
+cd /opt/daibilet
+npm run backend:checkout:yookassa:reconcile -- --limit=20 --grace-minutes=10
+```
+
+Применить изменения:
+
+```bash
+cd /opt/daibilet
+npm run backend:checkout:yookassa:reconcile -- --apply --limit=100 --grace-minutes=10
+```
+
+Установить timer на `.159`:
+
+```bash
+cp /opt/daibilet/deploy/systemd/daibilet-finance-yookassa-reconcile.service /etc/systemd/system/
+cp /opt/daibilet/deploy/systemd/daibilet-finance-yookassa-reconcile.timer /etc/systemd/system/
+systemctl daemon-reload
+systemctl enable --now daibilet-finance-yookassa-reconcile.timer
+systemctl list-timers daibilet-finance-yookassa-reconcile.timer
+```
+
+Ожидания:
+
+- timer запускается раз в 5 минут;
+- `--grace-minutes=10` не трогает свежие платежи;
+- `LOCAL_EXPIRED_WITHOUT_PROVIDER_PAYMENT` безопасно отменяет локальный резерв и возвращает capacity;
+- при provider id reconcile читает YooKassa API и применяет terminal status как webhook;
+- exit code `2` означает, что есть failed orders и нужен разбор `journalctl -u daibilet-finance-yookassa-reconcile.service`.

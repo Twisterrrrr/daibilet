@@ -1,6 +1,6 @@
 # Project — Daibilet (Next full-stack migration)
 
-**Обновлено:** 2026-07-22  
+**Обновлено:** 2026-08-07
 **Ветка migration / prod:** `feat/next-monorepo`  
 **Prod:** Next `apps/web` `:3001` + legacy API `:4000` + Vite admin static
 
@@ -60,6 +60,8 @@ packages/config   — shared tsconfig/eslint
 **Venue admission path:** музеи, арт-площадки, зоопарки, парки и другие места с входными билетами продаются через `AdmissionProduct` / `AdmissionOffer`, а не через фейковые события. `Event` остается для афиши и расписания; `AdmissionProduct` живет на странице площадки и может участвовать в city/home blocks как самостоятельный продаваемый объект.
 
 **Supplier LC modes:** `Supplier.integrationMode` отделяет тип подключения от способа продажи: `IMPORTED_TICKETING_SYSTEM` = read-only зеркало импортов, `INTERNAL_SALES` = продажи и каталог внутри Daibilet, `API_SYNC` = внешняя система с настройкой routes/webhooks и health. Реквизиты поставщика пишутся через supplier-scoped onboarding flow: юрпрофиль и основной счет после правок переводятся в `INCOMPLETE` для проверки админом.
+
+**Supplier write-flow:** поставщик не редактирует каталог напрямую. В `apps/supplier` есть раздел "Заявки": создание/правка `AdmissionProduct` и создание/правка событий уходят в общую очередь `EventChangeRequest` с `payload.subject = EVENT | ADMISSION_PRODUCT`. Админский экран approve/reject остается единым. Auto-apply включен только для безопасных event update-сценариев; `CREATE` и admission-заявки требуют ручного применения оператором до появления устойчивого набора первых поставщиков.
 
 ---
 
