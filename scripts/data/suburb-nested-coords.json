@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "note": "Curated lat/lng for significantSuburbs nested POIs (SPB + KGD + Perm). Prefer owner pack rows where titles match; remaining are well-known landmark pins for day-route / OSM. Vyborg owner SUB lat 59.x corrected to 60.x.",
+  "note": "Curated lat/lng for significantSuburbs nested POIs (SPB + KGD + Perm + Moscow). Prefer owner pack rows where titles match; remaining are well-known landmark pins for day-route / OSM.",
   "places": [
     {
       "city": "saint-petersburg",
@@ -785,6 +785,326 @@
       "latitude": 58.7245,
       "longitude": 57.636,
       "source": "owner-pack Perm suburb curated"
+    },
+    {
+      "city": "moscow",
+      "suburb": "Сергиев Посад",
+      "name": "Троице-Сергиева лавра",
+      "latitude": 56.3105,
+      "longitude": 38.1305,
+      "source": "msk-hub-draft-2026-08-07"
+    },
+    {
+      "city": "moscow",
+      "suburb": "Сергиев Посад",
+      "name": "Надкладезная часовня",
+      "latitude": 56.3108,
+      "longitude": 38.1312,
+      "source": "msk-hub-draft-2026-08-07"
+    },
+    {
+      "city": "moscow",
+      "suburb": "Сергиев Посад",
+      "name": "Музей игрушки",
+      "latitude": 56.3085,
+      "longitude": 38.1355,
+      "source": "msk-hub-draft-2026-08-07"
+    },
+    {
+      "city": "moscow",
+      "suburb": "Сергиев Посад",
+      "name": "Келарский пруд",
+      "latitude": 56.3095,
+      "longitude": 38.1285,
+      "source": "msk-hub-draft-2026-08-07"
+    },
+    {
+      "city": "moscow",
+      "suburb": "Сергиев Посад",
+      "name": "Проспект Красной Армии",
+      "latitude": 56.3125,
+      "longitude": 38.1335,
+      "source": "msk-hub-draft-2026-08-07"
+    },
+    {
+      "city": "moscow",
+      "suburb": "Коломна",
+      "name": "Коломенский кремль",
+      "latitude": 55.1035,
+      "longitude": 38.7525,
+      "source": "msk-hub-draft-2026-08-07"
+    },
+    {
+      "city": "moscow",
+      "suburb": "Коломна",
+      "name": "Музей пастилы",
+      "latitude": 55.1045,
+      "longitude": 38.7555,
+      "source": "msk-hub-draft-2026-08-07"
+    },
+    {
+      "city": "moscow",
+      "suburb": "Коломна",
+      "name": "Соборная площадь",
+      "latitude": 55.104,
+      "longitude": 38.7535,
+      "source": "msk-hub-draft-2026-08-07"
+    },
+    {
+      "city": "moscow",
+      "suburb": "Коломна",
+      "name": "Набережная Москвы-реки",
+      "latitude": 55.1025,
+      "longitude": 38.7515,
+      "source": "msk-hub-draft-2026-08-07"
+    },
+    {
+      "city": "moscow",
+      "suburb": "Коломна",
+      "name": "Фабрика музей «Коломенская пастила»",
+      "latitude": 55.1055,
+      "longitude": 38.7565,
+      "source": "msk-hub-draft-2026-08-07"
+    },
+    {
+      "city": "moscow",
+      "suburb": "Звенигород",
+      "name": "Саввино-Сторожевский монастырь",
+      "latitude": 55.7285,
+      "longitude": 36.8155,
+      "source": "msk-hub-draft-2026-08-07"
+    },
+    {
+      "city": "moscow",
+      "suburb": "Звенигород",
+      "name": "Собор Рождества Богородицы",
+      "latitude": 55.7288,
+      "longitude": 36.8158,
+      "source": "msk-hub-draft-2026-08-07"
+    },
+    {
+      "city": "moscow",
+      "suburb": "Звенигород",
+      "name": "Городок / Успенский собор",
+      "latitude": 55.7295,
+      "longitude": 36.8545,
+      "source": "msk-hub-draft-2026-08-07"
+    },
+    {
+      "city": "moscow",
+      "suburb": "Звенигород",
+      "name": "Сквер на набережной",
+      "latitude": 55.7305,
+      "longitude": 36.8525,
+      "source": "msk-hub-draft-2026-08-07"
+    },
+    {
+      "city": "moscow",
+      "suburb": "Звенигород",
+      "name": "Музей истории Звенигорода",
+      "latitude": 55.7315,
+      "longitude": 36.8555,
+      "source": "msk-hub-draft-2026-08-07"
+    },
+    {
+      "city": "moscow",
+      "suburb": "Архангельское",
+      "name": "Большой дворец",
+      "latitude": 55.7865,
+      "longitude": 37.2835,
+      "source": "msk-hub-draft-2026-08-07"
+    },
+    {
+      "city": "moscow",
+      "suburb": "Архангельское",
+      "name": "Храм Архангела Михаила",
+      "latitude": 55.7855,
+      "longitude": 37.2825,
+      "source": "msk-hub-draft-2026-08-07"
+    },
+    {
+      "city": "moscow",
+      "suburb": "Архангельское",
+      "name": "Парк Архангельского",
+      "latitude": 55.7875,
+      "longitude": 37.2845,
+      "source": "msk-hub-draft-2026-08-07"
+    },
+    {
+      "city": "moscow",
+      "suburb": "Архангельское",
+      "name": "Колоннада",
+      "latitude": 55.7868,
+      "longitude": 37.2838,
+      "source": "msk-hub-draft-2026-08-07"
+    },
+    {
+      "city": "moscow",
+      "suburb": "Архангельское",
+      "name": "Музей усадьбы",
+      "latitude": 55.7862,
+      "longitude": 37.2842,
+      "source": "msk-hub-draft-2026-08-07"
+    },
+    {
+      "city": "moscow",
+      "suburb": "Истра / Новый Иерусалим",
+      "name": "Ново-Иерусалимский монастырь",
+      "latitude": 55.9215,
+      "longitude": 36.8455,
+      "source": "msk-hub-draft-2026-08-07"
+    },
+    {
+      "city": "moscow",
+      "suburb": "Истра / Новый Иерусалим",
+      "name": "Воскресенский собор",
+      "latitude": 55.9218,
+      "longitude": 36.8458,
+      "source": "msk-hub-draft-2026-08-07"
+    },
+    {
+      "city": "moscow",
+      "suburb": "Истра / Новый Иерусалим",
+      "name": "Музей «Новый Иерусалим»",
+      "latitude": 55.9195,
+      "longitude": 36.8485,
+      "source": "msk-hub-draft-2026-08-07"
+    },
+    {
+      "city": "moscow",
+      "suburb": "Истра / Новый Иерусалим",
+      "name": "Скит Патриарха Никона",
+      "latitude": 55.9225,
+      "longitude": 36.8445,
+      "source": "msk-hub-draft-2026-08-07"
+    },
+    {
+      "city": "moscow",
+      "suburb": "Истра / Новый Иерусалим",
+      "name": "Набережная Истры",
+      "latitude": 55.921,
+      "longitude": 36.844,
+      "source": "msk-hub-draft-2026-08-07"
+    },
+    {
+      "city": "moscow",
+      "suburb": "Абрамцево",
+      "name": "Усадебный дом",
+      "latitude": 56.2335,
+      "longitude": 37.9675,
+      "source": "msk-hub-draft-2026-08-07"
+    },
+    {
+      "city": "moscow",
+      "suburb": "Абрамцево",
+      "name": "Церковь Спаса Нерукотворного",
+      "latitude": 56.2345,
+      "longitude": 37.9685,
+      "source": "msk-hub-draft-2026-08-07"
+    },
+    {
+      "city": "moscow",
+      "suburb": "Абрамцево",
+      "name": "Беседка «Избушка на курьих ножках»",
+      "latitude": 56.234,
+      "longitude": 37.967,
+      "source": "msk-hub-draft-2026-08-07"
+    },
+    {
+      "city": "moscow",
+      "suburb": "Абрамцево",
+      "name": "Парк Абрамцева",
+      "latitude": 56.233,
+      "longitude": 37.9665,
+      "source": "msk-hub-draft-2026-08-07"
+    },
+    {
+      "city": "moscow",
+      "suburb": "Абрамцево",
+      "name": "Мастерская керамики",
+      "latitude": 56.2338,
+      "longitude": 37.968,
+      "source": "msk-hub-draft-2026-08-07"
+    },
+    {
+      "city": "moscow",
+      "suburb": "Бородино",
+      "name": "Бородинское поле",
+      "latitude": 55.5255,
+      "longitude": 35.8215,
+      "source": "msk-hub-draft-2026-08-07"
+    },
+    {
+      "city": "moscow",
+      "suburb": "Бородино",
+      "name": "Главный монумент",
+      "latitude": 55.5265,
+      "longitude": 35.8225,
+      "source": "msk-hub-draft-2026-08-07"
+    },
+    {
+      "city": "moscow",
+      "suburb": "Бородино",
+      "name": "Спасо-Бородинский монастырь",
+      "latitude": 55.5185,
+      "longitude": 35.8155,
+      "source": "msk-hub-draft-2026-08-07"
+    },
+    {
+      "city": "moscow",
+      "suburb": "Бородино",
+      "name": "Музей Бородина",
+      "latitude": 55.5275,
+      "longitude": 35.8205,
+      "source": "msk-hub-draft-2026-08-07"
+    },
+    {
+      "city": "moscow",
+      "suburb": "Бородино",
+      "name": "Шевардинский редут",
+      "latitude": 55.5215,
+      "longitude": 35.8015,
+      "source": "msk-hub-draft-2026-08-07"
+    },
+    {
+      "city": "moscow",
+      "suburb": "Мелихово",
+      "name": "Дом Чехова",
+      "latitude": 55.1185,
+      "longitude": 37.6485,
+      "source": "msk-hub-draft-2026-08-07"
+    },
+    {
+      "city": "moscow",
+      "suburb": "Мелихово",
+      "name": "Флигель «Чеховская аптека»",
+      "latitude": 55.1188,
+      "longitude": 37.6488,
+      "source": "msk-hub-draft-2026-08-07"
+    },
+    {
+      "city": "moscow",
+      "suburb": "Мелихово",
+      "name": "Сад Мелихова",
+      "latitude": 55.1182,
+      "longitude": 37.6475,
+      "source": "msk-hub-draft-2026-08-07"
+    },
+    {
+      "city": "moscow",
+      "suburb": "Мелихово",
+      "name": "Школа Чехова",
+      "latitude": 55.1195,
+      "longitude": 37.6495,
+      "source": "msk-hub-draft-2026-08-07"
+    },
+    {
+      "city": "moscow",
+      "suburb": "Мелихово",
+      "name": "Сцена под открытым небом",
+      "latitude": 55.1175,
+      "longitude": 37.648,
+      "source": "msk-hub-draft-2026-08-07"
     }
   ]
 }
