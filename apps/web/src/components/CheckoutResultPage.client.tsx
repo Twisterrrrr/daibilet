@@ -210,14 +210,14 @@ export function CheckoutResultView() {
         </div>
       </section>
 
-      <section className="container-page py-8 sm:py-10">
+      <section className="container-page py-8 sm:py-10 print:max-w-none print:px-0 print:py-0">
         {loading ? (
-          <div className="flex min-h-[20vh] items-center justify-center">
+          <div className="flex min-h-[20vh] items-center justify-center print:hidden">
             <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
           </div>
         ) : order ? (
           <div className="grid gap-6">
-            <div className="print:hidden flex flex-wrap items-center gap-2 text-sm text-slate-600">
+            <div className="mb-0 flex flex-wrap items-center gap-2 text-sm text-slate-600 print:hidden">
               <Icon className="h-4 w-4 text-emerald-700" />
               <span>{order.displayStatus || status.displayStatus}</span>
               <span className="text-slate-300">·</span>
