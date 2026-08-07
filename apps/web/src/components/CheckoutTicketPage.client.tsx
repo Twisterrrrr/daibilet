@@ -7,7 +7,9 @@ import { useEffect, useState } from 'react';
 import { BuyerTicketCard } from '@/components/BuyerTicketCard.client';
 import {
   mapFinanceOrderStatus,
+  mergeBuyerInternalOrders,
   readInternalOrdersFromStorage,
+  upsertInternalOrderInStorage,
   type BuyerInternalOrderRecord,
 } from '@/lib/buyer-checkout';
 
@@ -47,7 +49,9 @@ export function CheckoutTicketView({ publicCode }: Props) {
         });
         const payload = (await response.json().catch(() => null)) as LookupResponse | null;
         if (!disposed && payload?.found && payload.order) {
-          setOrder(payload.order);
+          const merged = mergeBuyerInternalOrders(payload.order, cached);
+          setOrder(merged);
+          upsertInternalOrderInStorage(merged);
         } else if (!disposed && !cached) {
           const mapped = mapFinanceOrderStatus('CONFIRMED');
           setOrder({

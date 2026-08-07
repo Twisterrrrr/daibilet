@@ -6,6 +6,20 @@
 
 **Не** считать collapse к одному числу product end-state. Issuance path A/B (кто выдаёт ticket id, когда пишем в order/ticket row) - follow-up, не блокер текущего UX.
 
+## 2026-08-07 - Buyer ticket fields / finance enrichment gaps
+
+Catalog ticket card soft-fail показывает поля из create response + cache + product/venue enrich. Для reopen без localStorage / полного public order DTO нужны на finance:
+
+| Field | Create STUB today | Public order lookup | Notes |
+|-------|-------------------|---------------------|-------|
+| buyer.name | ✅ | ? soft | |
+| venueTitle | ✅ subject | ? | |
+| venueAddress | ❌ | ❌ | catalog venue enrich interim |
+| validTo / validityMode | product ✅; order ❌ | ❌ | open-date ticket needs order snapshot |
+| item(s) title+qty | ✅ single `item` | ? | multi-line `items[]` later |
+| supplierSupportPhone | ❌ public supplier | ❌ | hide until present |
+| session startsAt | null open-date | ? | |
+
 ## 2026-08-07 - Must-see hub volume (LOCKED)
 
 **LOCKED owner 2026-08-07** (см. [Project.md](./Project.md) § Must-see count tiers):

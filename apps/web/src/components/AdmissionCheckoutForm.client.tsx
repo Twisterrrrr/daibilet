@@ -36,6 +36,17 @@ type CheckoutApiOk = {
     amountRub: number | null;
     mode: string;
     confirmationUrl?: string | null;
+    buyerName?: string | null;
+    eventTitle?: string | null;
+    venueTitle?: string | null;
+    venueAddress?: string | null;
+    venueSlug?: string | null;
+    admissionProductSlug?: string | null;
+    sessionStartsAt?: string | null;
+    validUntil?: string | null;
+    validityMode?: string | null;
+    lineItems?: Array<{ ticketTitle: string; quantity: number }>;
+    supplierSupportPhone?: string | null;
     source: 'internal';
   };
 };
@@ -57,6 +68,8 @@ export function AdmissionCheckoutForm({ product }: Props) {
   }, [offers]);
 
   const [email, setEmail] = useState(user?.email || '');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -83,7 +96,12 @@ export function AdmissionCheckoutForm({ product }: Props) {
           admissionProductSlug: product.slug,
           admissionOfferId: defaultOffer.id,
           quantity: 1,
-          buyer: { email: trimmedEmail },
+          buyer: {
+            email: trimmedEmail,
+            firstName: firstName.trim() || undefined,
+            lastName: lastName.trim() || undefined,
+            name: [firstName.trim(), lastName.trim()].filter(Boolean).join(' ') || undefined,
+          },
           // Finance should append ?order={publicCode} to this base when creating YooKassa payment.
           returnUrl: `${window.location.origin}/checkout/result`,
           // Prefer YooKassa confirmationUrl; stub only if finance admits no yookassa path yet.
@@ -169,6 +187,31 @@ export function AdmissionCheckoutForm({ product }: Props) {
           placeholder="you@example.com"
         />
       </label>
+
+      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        <label className="block text-sm font-semibold text-slate-800">
+          Имя
+          <input
+            type="text"
+            autoComplete="given-name"
+            value={firstName}
+            onChange={(event) => setFirstName(event.target.value)}
+            className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-base font-normal text-slate-900 outline-none ring-primary-500/30 focus:border-primary-500 focus:ring-4"
+            placeholder="Иван"
+          />
+        </label>
+        <label className="block text-sm font-semibold text-slate-800">
+          Фамилия
+          <input
+            type="text"
+            autoComplete="family-name"
+            value={lastName}
+            onChange={(event) => setLastName(event.target.value)}
+            className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-base font-normal text-slate-900 outline-none ring-primary-500/30 focus:border-primary-500 focus:ring-4"
+            placeholder="Петров"
+          />
+        </label>
+      </div>
 
       {error ? (
         <div className="mt-4 rounded-xl bg-red-50 px-3 py-2.5 text-sm text-red-800">{error}</div>

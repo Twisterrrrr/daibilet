@@ -9,6 +9,7 @@ import {
   mapFinanceOrderStatus,
   type BuyerCheckoutMode,
   type BuyerInternalOrderRecord,
+  type BuyerTicketLineItem,
 } from '@/lib/buyer-checkout';
 import {
   resolveFinanceApiBaseUrl,
@@ -102,6 +103,29 @@ function pickConfirmationUrl(payload: Record<string, unknown>): string | null {
   return null;
 }
 
+function mapLineItem(raw: unknown): BuyerTicketLineItem | null {
+  const row = asRecord(raw);
+  if (!row) return null;
+  const ticketTitle =
+    asString(row.ticketTitle) || asString(row.offerTitle) || asString(row.title);
+  if (!ticketTitle) return null;
+  const quantityRaw = row.quantity;
+  const quantity =
+    typeof quantityRaw === 'number' && Number.isFinite(quantityRaw)
+      ? Math.max(1, Math.round(quantityRaw))
+      : 1;
+  return { ticketTitle, quantity };
+}
+
+function mapLineItemsFromOrder(order: Record<string, unknown>): BuyerTicketLineItem[] {
+  const itemsRaw = Array.isArray(order.items) ? order.items : null;
+  if (itemsRaw?.length) {
+    return itemsRaw.map(mapLineItem).filter((row): row is BuyerTicketLineItem => Boolean(row));
+  }
+  const single = mapLineItem(order.item);
+  return single ? [single] : [];
+}
+
 function mapOrderFromFinancePayload(
   payload: unknown,
   fallbackEmail: string,
@@ -116,19 +140,41 @@ function mapOrderFromFinancePayload(
   const buyer = asRecord(order.buyer) || {};
   const subject = asRecord(order.subject) || {};
   const totals = asRecord(order.totals) || {};
+  const item = asRecord(order.item) || {};
   const status = asString(order.status) || 'PENDING';
   const mapped = mapFinanceOrderStatus(status);
-  const title =
-    asString(subject.admissionProductTitle) ||
-    asString(subject.eventTitle) ||
-    asString(order.title) ||
-    'Входной билет';
+  const eventTitle = asString(subject.eventTitle);
+  const admissionTitle = asString(subject.admissionProductTitle);
+  const title = admissionTitle || eventTitle || asString(order.title) || 'Входной билет';
   const email = asString(buyer.email) || fallbackEmail;
   const amountRub =
     amountRubFromKopecks(
       typeof totals.totalKopecks === 'number' ? totals.totalKopecks : null,
     ) ??
     (typeof order.amountRub === 'number' ? order.amountRub : null);
+
+  const validityMode =
+    asString(order.validityMode) ||
+    asString(subject.validityMode) ||
+    asString(item.validityMode);
+  const validUntil =
+    asString(order.validUntil) ||
+    asString(order.validTo) ||
+    asString(subject.validUntil) ||
+    asString(subject.validTo) ||
+    asString(item.validUntil) ||
+    asString(item.validTo);
+  const sessionStartsAt =
+    asString(item.startsAt) ||
+    asString(order.startsAt) ||
+    asString(subject.startsAt);
+  const supplierSupportPhone =
+    asString(order.supplierSupportPhone) ||
+    asString(subject.supplierSupportPhone) ||
+    asString(asRecord(order.supplier)?.supportPhone) ||
+    asString(asRecord(order.supplier)?.phone) ||
+    asString(asRecord(subject.supplier)?.supportPhone) ||
+    asString(asRecord(subject.supplier)?.phone);
 
   return {
     publicCode,
@@ -142,6 +188,18 @@ function mapOrderFromFinancePayload(
     amountRub,
     mode: asString(root.mode) || mode,
     confirmationUrl: pickConfirmationUrl(root) || pickConfirmationUrl(order),
+    buyerName: asString(buyer.name) || asString(buyer.fullName),
+    eventTitle,
+    venueTitle: asString(subject.venueTitle) || asString(order.venueTitle),
+    venueAddress: asString(subject.venueAddress) || asString(order.venueAddress) || asString(item.venueAddress),
+    venueSlug: asString(subject.venueSlug) || asString(order.venueSlug),
+    admissionProductSlug:
+      asString(subject.admissionProductSlug) || asString(order.admissionProductSlug),
+    sessionStartsAt,
+    validUntil,
+    validityMode,
+    lineItems: mapLineItemsFromOrder(order),
+    supplierSupportPhone,
     source: 'internal',
   };
 }

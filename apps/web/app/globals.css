@@ -559,5 +559,16 @@ body > div:has(iframe[src*='ticketscloud']) {
   [data-day-print-sheet] {
     display: block !important;
   }
+
+  /* Buyer ticket: readable A4-ish sheet without chrome */
+  [data-buyer-ticket] {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  [data-buyer-ticket] .print\:hidden,
+  .print\:hidden {
+    display: none !important;
+  }
 }
 

@@ -20,6 +20,8 @@ const sampleProduct = {
   purchaseFlow: 'PLATFORM',
   managementMode: 'DAIBILET_MANAGED',
   validityMode: 'OPEN_DATE',
+  validFrom: null,
+  validTo: '2027-08-07T09:58:56.703Z',
   priceFromRub: 350,
   ticketsVacant: 97,
   canSell: true,
@@ -56,6 +58,8 @@ test('mapAdmissionProduct: maps public fields and keeps canSell', () => {
   assert.equal(mapped.checkoutPath, '/checkout/admissions/phase-g-test-museum-entry');
   assert.equal(mapped.venue?.slug, 'phase-g-test-museum');
   assert.equal(mapped.offers.length, 2);
+  assert.equal(mapped.validTo, '2027-08-07T09:58:56.703Z');
+  assert.equal(mapped.validityMode, 'OPEN_DATE');
   assert.equal('paymentMode' in mapped, false);
 });
 

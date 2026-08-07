@@ -1,3 +1,21 @@
+## 2026-08-07 - Buyer ticket card: full visit fields
+
+### Наблюдения
+- Owner: на `/checkout/ticket/{code}` нужны дата/время (или срок open-date), событие, площадка, адрес, плательщик, категории+qty, сумма, дата покупки, 2 notice, телефон поддержки.
+- Finance STUB create уже отдаёт `buyer.name`, `subject.venueTitle`, `item.ticketTitle/quantity`, `paidAt/totals`; product detail - `validTo` / `OPEN_DATE`. Address - catalog venue; support phone в public supplier/product **нет**.
+
+### Решения
+- Расширен `BuyerInternalOrderRecord` + finance map + localStorage normalize/merge.
+- Admission BFF обогащает заказ: product `validTo`/venue + catalog address; form принимает имя/фамилию (optional).
+- UI soft-fail (секция только при данных); open-date → «Действует до»; notices всегда; support phone скрыт если нет.
+- Gaps для Codex finance: address/validUntil/supportPhone/multi-items в public order lookup DTO.
+
+### Проблемы
+- Без cache + без стабильного order-by-code lookup карточка остаётся sparse (UX.BUY-6).
+- Multi-category qty на Path A thin form пока 1 offer×qty; полный basket = Path B later.
+
+---
+
 ## 2026-08-07 - Ticket page: order code ≠ ticket number
 
 ### Наблюдения

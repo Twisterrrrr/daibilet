@@ -35,6 +35,10 @@ export type FinanceAdmissionProduct = {
   purchaseFlow?: string | null;
   managementMode?: string | null;
   validityMode?: string | null;
+  /** Open-date / window end (ISO) when finance exposes it. */
+  validFrom?: string | null;
+  validTo?: string | null;
+  validDaysAfterPurchase?: number | null;
   priceFromRub?: number | null;
   ticketsVacant?: number | null;
   canSell: boolean;
@@ -42,6 +46,8 @@ export type FinanceAdmissionProduct = {
   city?: FinanceAdmissionRef | null;
   venue?: FinanceAdmissionRef | null;
   supplier?: FinanceAdmissionRef | null;
+  /** Emergency / org support phone when finance adds it to public DTO. */
+  supportPhone?: string | null;
   offers: FinanceAdmissionOffer[];
 };
 
@@ -170,6 +176,14 @@ export function mapAdmissionProduct(raw: unknown): FinanceAdmissionProduct | nul
   const offersRaw = Array.isArray(row.offers) ? row.offers : [];
   const offers = offersRaw.map(mapOffer).filter((o): o is FinanceAdmissionOffer => Boolean(o));
 
+  const supplier = mapRef(row.supplier);
+  const supplierRecord = asRecord(row.supplier);
+  const supportPhone =
+    asString(row.supportPhone) ||
+    asString(row.supplierSupportPhone) ||
+    asString(supplierRecord?.supportPhone) ||
+    asString(supplierRecord?.phone);
+
   return {
     id,
     slug,
@@ -181,13 +195,17 @@ export function mapAdmissionProduct(raw: unknown): FinanceAdmissionProduct | nul
     purchaseFlow: asString(row.purchaseFlow),
     managementMode: asString(row.managementMode),
     validityMode: asString(row.validityMode),
+    validFrom: asString(row.validFrom),
+    validTo: asString(row.validTo) || asString(row.validUntil),
+    validDaysAfterPurchase: asNumber(row.validDaysAfterPurchase),
     priceFromRub: asNumber(row.priceFromRub),
     ticketsVacant: asNumber(row.ticketsVacant),
     canSell,
     checkoutPath: asString(row.checkoutPath),
     city: mapRef(row.city),
     venue: mapRef(row.venue),
-    supplier: mapRef(row.supplier),
+    supplier,
+    supportPhone,
     offers,
   };
 }

@@ -9,7 +9,9 @@ import { BuyerTicketCard } from '@/components/BuyerTicketCard.client';
 import {
   filterInternalOrdersForEmail,
   mapFinanceOrderStatus,
+  mergeBuyerInternalOrders,
   readInternalOrdersFromStorage,
+  upsertInternalOrderInStorage,
   type BuyerInternalOrderRecord,
 } from '@/lib/buyer-checkout';
 import { buyerTicketPath } from '@/lib/buyer-ticket';
@@ -78,8 +80,10 @@ export function CheckoutResultView() {
         });
         const payload = (await response.json().catch(() => null)) as LookupResponse | null;
         if (!disposed && payload?.found && payload.order) {
-          setOrder(payload.order);
-          setPublicCode(payload.order.publicCode);
+          const merged = mergeBuyerInternalOrders(payload.order, cached);
+          setOrder(merged);
+          setPublicCode(merged.publicCode);
+          upsertInternalOrderInStorage(merged);
         } else if (!disposed && !cached) {
           const mapped = mapFinanceOrderStatus(modeHint === 'STUB' ? 'CONFIRMED' : 'PENDING');
           setOrder({
