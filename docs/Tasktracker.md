@@ -48,7 +48,7 @@
 | UX.BUY-9 | Path B scaffold `/checkout/calc` (placeholder; wire later) | Низкий | ✅ `7e3eeb1d` |
 | UX.BUY-10 | Ticket page `/checkout/ticket/{publicCode}` (HTML ticket + print + QR) | Критический | ✅ `ca8332f4` + order≠ticket follow-up |
 | UX.BUY-10b | «Код заказа» once + «Номер билета» (пока = publicCode + caption); QR = ссылка на страницу; qa LOCKED draft order≠ticket | Критический | ✅ `9cd66ed2` MSK **BUILD_ID=`vH1YOLuir-6HoFg7VQAgQ`** Deploy **31190783370** |
-| UX.BUY-10c | Ticket card fields: datetime/validUntil, event, venue, address, payer, categories×qty, total, purchasedAt, notices, support phone (soft-fail) | Критический | 🔄 catalog enrich + UI; finance gaps documented |
+| UX.BUY-10c | Ticket card fields: datetime/validUntil, event, venue, address, payer, categories×qty, total, purchasedAt, notices, support phone (soft-fail) | Критический | ✅ `94d932f6` MSK **BUILD_ID=`fbv4D-L-6qEj1yHNUgMhj`** Deploy **31193227838** |
 | UX.BUY-11 | Best-effort buyer email (SMTP_* on web; else save-code copy) | Высокий | ✅ (MSK SMTP unset → `smtp_not_configured` + UI copy) |
 | UX.BUY-12 | YooKassa return → catalog result/ticket (`?order=`); localStorage recovery | Высокий | ✅ catalog; finance must set return_url |
 

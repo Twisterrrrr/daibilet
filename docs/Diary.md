@@ -9,6 +9,7 @@
 - Admission BFF обогащает заказ: product `validTo`/venue + catalog address; form принимает имя/фамилию (optional).
 - UI soft-fail (секция только при данных); open-date → «Действует до»; notices всегда; support phone скрыт если нет.
 - Gaps для Codex finance: address/validUntil/supportPhone/multi-items в public order lookup DTO.
+- Ship: `94d932f6` · Deploy **31193227838** · **BUILD_ID=`fbv4D-L-6qEj1yHNUgMhj`**.
 
 ### Проблемы
 - Без cache + без стабильного order-by-code lookup карточка остаётся sparse (UX.BUY-6).
