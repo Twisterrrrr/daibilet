@@ -2401,6 +2401,10 @@ export function publicVenueSlug(slug, title, id) {
   return dedupeVenueSlugSuffix(stripOpaqueVenueIdSuffix(normalized || raw));
 }
 
+function publicEventSlug(value) {
+  return publicCitySlug(value);
+}
+
 function publicCitySlug(value) {
   const letters = {
     а: 'a',
