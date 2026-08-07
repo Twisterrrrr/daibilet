@@ -39,9 +39,9 @@ function ticketProductTitle(order: BuyerInternalOrderRecord): string {
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="border-b border-slate-100 py-2.5 last:border-b-0 sm:py-3">
-      <dt className="text-xs font-medium text-slate-500">{label}</dt>
-      <dd className="mt-0.5 text-sm font-semibold leading-6 text-slate-900 sm:text-base">{value}</dd>
+    <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 border-b border-slate-100 py-2.5 last:border-b-0 sm:py-3">
+      <dt className="shrink-0 text-xs font-medium text-slate-500 sm:text-sm">{label}:</dt>
+      <dd className="min-w-0 flex-1 text-sm font-semibold leading-6 text-slate-900 sm:text-base">{value}</dd>
     </div>
   );
 }
@@ -134,9 +134,9 @@ export function BuyerTicketCard({ order, origin, emailHint = 'unknown', classNam
             </p>
           </div>
 
-          <div className="mt-3 rounded-xl border border-slate-100 px-4 py-2.5 sm:px-5 sm:py-3 print:border-0 print:px-0 print:py-1">
-            <p className="text-xs font-medium text-slate-500">Код заказа</p>
-            <p className="mt-1 font-mono text-base font-semibold tracking-wide text-slate-700 sm:text-lg">
+          <div className="mt-3 flex flex-wrap items-baseline gap-x-2 gap-y-0.5 rounded-xl border border-slate-100 px-4 py-2.5 sm:px-5 sm:py-3 print:border-0 print:px-0 print:py-1">
+            <p className="shrink-0 text-xs font-medium text-slate-500 sm:text-sm">Код заказа:</p>
+            <p className="min-w-0 font-mono text-base font-semibold tracking-wide text-slate-700 sm:text-lg">
               {orderCode}
             </p>
           </div>
@@ -148,9 +148,9 @@ export function BuyerTicketCard({ order, origin, emailHint = 'unknown', classNam
             {venueAddress ? <InfoRow label="Адрес" value={venueAddress} /> : null}
             {buyerName ? <InfoRow label="Плательщик" value={buyerName} /> : null}
             {lineItems.length ? (
-              <div className="border-b border-slate-100 py-2.5 last:border-b-0 sm:py-3">
-                <dt className="text-xs font-medium text-slate-500">Категории билетов</dt>
-                <dd className="mt-0.5 space-y-1 text-sm font-semibold leading-6 text-slate-900 sm:text-base">
+              <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 border-b border-slate-100 py-2.5 last:border-b-0 sm:py-3">
+                <dt className="shrink-0 text-xs font-medium text-slate-500 sm:text-sm">Категории билетов:</dt>
+                <dd className="min-w-0 flex-1 space-y-0.5 text-sm font-semibold leading-6 text-slate-900 sm:text-base">
                   {lineItems.map((item) => (
                     <p key={`${item.ticketTitle}-${item.quantity}`}>{formatTicketLineItem(item)}</p>
                   ))}
