@@ -74,7 +74,7 @@ export async function generateVenueListMetadata(
 
 export async function generateVenueDetailMetadata(slug: string): Promise<Metadata> {
   const payload = await getCachedPublicVenueDto(decodeURIComponent(slug));
-  if (!payload?.venue) return { title: 'Площадка не найдена' };
+  if (!payload?.venue) notFound();
   const venue = payload.venue;
   const heroForShare =
     resolveVenueHeroImage(venue.slug || slug, venue.heroImageUrl) || venue.heroImageUrl;

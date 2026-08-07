@@ -66,7 +66,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   try {
     const payload = await getCachedPublicEventDto(slug);
-    if (!payload?.event) return { title: pageTitle('Событие не найдено') };
+    if (!payload?.event) notFound();
 
     const event = payload.event;
     const path = event.canonicalPath || eventHref(event);

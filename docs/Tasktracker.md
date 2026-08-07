@@ -7,6 +7,14 @@
 
 ---
 
+## SEO soft-404 / HTTP 404 (2026-08-07)
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| SEO.SOFT404 | Yandex: missing pages must return HTTP 404 (not 200 + not-found UI). Root cause: loading.tsx streaming. Fix: `(catalog)/loading` + drop detail/root loading; metadata notFound() | Критический | 🔄 deploy |
+
+---
+
 ## Buyer UX catalog track (Cursor, 2026-08-07)
 
 Параллельно Codex эксперимент на `pay/.159`. Catalog track = `daibilet.ru` / `apps/web`. Не force-merge.

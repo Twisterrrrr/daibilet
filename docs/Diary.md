@@ -1,3 +1,23 @@
+## 2026-08-07 - SEO soft-404 → HTTP 404 (Yandex Webmaster)
+
+### Наблюдения
+- Yandex: daibilet.ru отдаёт soft-404 (HTTP 200 + UI «не найдена») на несуществующие URL.
+- Live probe до фикса (все **200**, `NEXT_HTTP_ERROR_FALLBACK`, noindex): `/this-page-does-not-exist-xyz123`, `/events/no-such-slug-zzz`, `/venues/no-such`, `/cities/no-such`, `/blog/no-such`, `/locations/no-such`, `/foo/bar`.
+- Корень: `notFound()` вызывался корректно, но `app/loading.tsx` + segment `loading.tsx` (в т.ч. parent над `[slug]`) включали streaming → статус блокировался на 200.
+- Prod nginx: Next proxy (не SPA `try_files → index.html`). Staging example всё ещё SPA fallback - не live apex.
+
+### Решения
+- Удалён root `app/loading.tsx` и detail `loading.tsx` у routes с `notFound()`.
+- Catalog skeletons перенесены в `(catalog)/loading.tsx` (URL не меняется) - soft-nav на листингах сохранён, detail/catch-all без streaming до `notFound()`.
+- `generateMetadata` / landing metadata тоже зовут `notFound()` при отсутствии сущности.
+- Регрессия: `seo-http-404-loading.test.ts` (запрет loading на notFound-сегментах).
+
+### Проблемы
+- После deploy сбросить/дождаться nginx `proxy_cache` (кэшировал soft-404 как 200 на 30m).
+- Soft-nav на detail PDP без segment loading - только NavigationProgress; catalog loading остаётся.
+
+---
+
 ## 2026-08-07 - Buyer UX MVP on daibilet.ru (Cursor catalog track)
 
 ### Наблюдения

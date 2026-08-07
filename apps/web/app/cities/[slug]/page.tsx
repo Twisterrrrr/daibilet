@@ -77,7 +77,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const payload = await getCachedPublicCityDto(decodeURIComponent(slug));
-  if (!payload?.city) return { title: pageTitle('Город не найден') };
+  if (!payload?.city) notFound();
 
   const city = payload.city;
   const path = city.canonicalPath || `/cities/${city.slug}`;

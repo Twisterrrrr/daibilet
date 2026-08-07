@@ -43,11 +43,12 @@ function resolveLandingProfileKind(slug: string): LandingProfileKind {
 
 export async function buildLandingMetadata(pathname: string): Promise<Metadata> {
   const route = resolveLandingRouteFromLocation(pathname);
-  if (!route) return { title: pageTitle('Подборка') };
+  // Call notFound() here too so crawlers get HTTP 404 (not soft-404 title with 200).
+  if (!route) notFound();
 
   const slug = canonicalLandingSlug(route.landingSlug);
   const payload = await fetchLandingPageDto(slug, route.citySlug);
-  if (!payload?.landing) return { title: pageTitle('Подборка') };
+  if (!payload?.landing) notFound();
 
   // Genre/tag live only on client (?genre=) so generateMetadata stays ISR-safe.
   const finalized = finalizeLandingPayload(payload, slug, route.citySlug);
