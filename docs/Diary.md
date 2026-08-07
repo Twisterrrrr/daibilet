@@ -1,3 +1,19 @@
+## 2026-08-07 - Москва Phase C hub ship (companions msk-2…5)
+
+### Наблюдения
+- После `65c8d8b` + Deploy **31170119217** (**BUILD_ID=`hZRMIROKILBA5UyaG8PI4`**) hub/my-day/venue covers live; companions ещё 404 soft.
+- Gastro brands по-прежнему ждут owner list (в pack только Даниловский рынок).
+
+### Решения
+- 4 companion-гида PUBLISHED: `moscow-zamoskvoreche-tretyakovka`, `moscow-vdnh-kosmos-den`, `moscow-vorobevy-gory-siti`, `moscow-kolomenskoe-tsaritsyno` (cover + 2 inline + CTA `/my-day?city=moscow`).
+- MSK: `git pull` + `sync-public-assets` + `blog-upsert` по 4 slug; web deploy пачкой с companions.
+- Tasktracker: MS.TIER4 / MS.TIER5 / PH2.CITY2 закрыты по hub pack.
+
+### Проблемы
+- Hub must-see карусель text+CTA (без фото) - editorial covers на my-day / venue PDP - by design.
+
+---
+
 ## 2026-08-07 - Москва Phase C live (seed + images)
 
 ### Наблюдения
@@ -9,14 +25,11 @@
 ### Решения
 - `scripts/apply-moscow-mustsee-coords.js` + `scripts/generate-moscow-venue-covers.mjs`.
 - Covers: 12 GenerateImage (Главные) + 46 sharp catalog pack → `/images/venues/moscow/` (web+public); `MOSCOW_IMAGES` в `city-place-images.ts`.
-- Companion msk-2…5: blogSlug CTA уже в presets / my-day; полные статьи (cover+inline) отложены - план в `moscow-route-articles-plan.md`.
-- Gastro brands - ждут owner list (в pack только Даниловский рынок).
 - Ship commit `65c8d8b`; Deploy MSK web **31170119217** success; **BUILD_ID=`hZRMIROKILBA5UyaG8PI4`**.
-- Smoke: `/cities/moscow` 200 (presets + suburbs + mustSee links), `/my-day?city=moscow` 200, `/locations/moscow-krasnaya-ploschad-i-kreml` 200, `/images/venues/moscow/vdnh.jpg` 200 (~2.7MB).
+- Smoke: `/cities/moscow` 200, `/my-day?city=moscow` 200, `/locations/moscow-krasnaya-ploschad-i-kreml` 200, `/images/venues/moscow/vdnh.jpg` 200.
 
 ### Проблемы
 - Local sharp был broken (detect-libc); gen на MSK + local после fix.
-- 4 companion articles ещё не PUBLISHED (только slug wiring).
 
 ---
 

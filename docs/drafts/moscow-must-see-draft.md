@@ -1,6 +1,6 @@
 # Москва: черновик must-see + пригороды (Phase C / MS.TIER4)
 
-**Статус:** owner OK → seed/images live (2026-08-07); gastro + companions msk-2…5 open.  
+**Статус:** owner OK → hub ship (2026-08-07): seed/images/presets + companions msk-1…5; gastro list open.  
 **Дата:** 2026-08-07  
 **Шаблон:** как СПб Phase B - mustSee с chip-фильтрами, `significantSuburbs` + travel vectors, `dayRoutePresets` → `/my-day`.  
 **Правила:** дефис `-`, без «Питер»; гастро-рестораны не выдумывать без owner list (в pack только рынок «Даниловский» как creative).
@@ -29,7 +29,7 @@
 1. ~~**Состав 58**~~ - OK 2026-08-07.
 2. ~~**Пригороды**~~ - OK.
 3. **Гастро** - список рынков / кафе для chip «Гастрономические точки» (как у СПб).
-4. **Companion-статьи** - 4 новых slug в плане (live только `moscow-2-dnya-…` на `msk-1`; CTA wired).
+4. ~~**Companion-статьи**~~ - msk-1…5 PUBLISHED (cover+inline+CTA).
 5. ~~**Prod seed**~~ - done на MSK.
 
 Спорные / на усмотрение: Политех (режим площадок), Бункер-42, Останкино (очереди/погода), Экспериментариум (коммерческий музей).
