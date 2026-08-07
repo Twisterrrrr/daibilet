@@ -1,13 +1,42 @@
 name: CI
 
 on:
+  workflow_dispatch:
+    inputs:
+      suite:
+        description: Check suite to run
+        required: true
+        type: choice
+        default: all
+        options:
+          - all
+          - finance
   push:
-    branches: [integrate/mvp-launch, feat/next-monorepo, main, master]
+    branches:
+      - integrate/mvp-launch
+      - feat/next-monorepo
+      - main
+      - master
+      - 'codex/**'
+      - 'cursor/**'
+      - 'feat/**'
   pull_request:
-    branches: [integrate/mvp-launch, feat/next-monorepo, main, master]
+    branches:
+      - integrate/mvp-launch
+      - feat/next-monorepo
+      - main
+      - master
+      - 'codex/**'
+      - 'cursor/**'
+      - 'feat/**'
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   validate-build-test:
+    if: ${{ (github.event_name == 'workflow_dispatch' && inputs.suite == 'all') || github.event_name == 'pull_request' || github.ref_name == 'integrate/mvp-launch' || github.ref_name == 'feat/next-monorepo' || github.ref_name == 'main' || github.ref_name == 'master' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -55,3 +84,38 @@ jobs:
           bash -n deploy/scripts/deploy-staging.sh
           bash -n scripts/post-deploy-check.sh
           bash -n scripts/run-parity-check.sh
+
+  finance-supplier-check:
+    if: ${{ (github.event_name == 'workflow_dispatch' && (inputs.suite == 'all' || inputs.suite == 'finance')) || startsWith(github.ref_name, 'codex/') || startsWith(github.ref_name, 'cursor/') || startsWith(github.ref_name, 'feat/') || startsWith(github.head_ref, 'codex/') || startsWith(github.head_ref, 'cursor/') || startsWith(github.head_ref, 'feat/') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.7.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Prisma validate and generate
+        run: |
+          pnpm db:validate
+          pnpm db:generate
+          pnpm db:typecheck
+
+      - name: Finance contracts and backend
+        run: |
+          pnpm --filter @daibilet/contracts typecheck
+          pnpm backend:typecheck
+          pnpm backend:test:ts
+
+      - name: Supplier app
+        run: |
+          pnpm supplier:typecheck
+          pnpm supplier:build
