@@ -1,3 +1,24 @@
+## 2026-08-07 - FIN.LC3 smoke closed (finance `.159`)
+
+### Наблюдения
+- Owner/Codex: `daibilet-finance-api` restarted, active; `https://finance-api.daibilet.ru/api/health` → 200.
+- Flags on `.159`: `DAIBILET_YOOKASSA_CHECKOUT=1`, `DAIBILET_STUB_CHECKOUT=1`, `DAIBILET_YOOKASSA_VERIFY_WEBHOOK=1`; `YOOKASSA_SHOP_ID` / `SECRET` set (no values in docs/git).
+- YooKassa sandbox create-payment: confirmationUrl OK, mode YOOKASSA, paymentStatus PENDING, publicCode 6037662; no `YOOKASSA_PAYMENT_FAILED`.
+- STUB smoke OK: mode STUB, CONFIRMED/SUCCEEDED, publicCode 9032330, warnings [].
+- Webhook register via API → 401 `invalid_credentials` «Authentication type is not allowed»: payment API works with current pair; webhook management not allowed for this API access.
+- Wide CTA not touched; `.184` / TC / TEP not touched; no secrets committed.
+
+### Решения
+- FIN.LC3 закрыт (sandbox purchase smoke).
+- Canonical webhook URL остаётся `https://finance-api.daibilet.ru/api/checkout/yookassa/webhook`.
+- Next (owner): register webhook вручную в кабинете ЮKassa **или** получить доступ/token с правом webhook-management.
+- FIN.W1 / MIG.9.5: webhook = owner-manual / blocked on cabinet auth type; create-payment path уже зелёный.
+
+### Проблемы
+- Авто-регистрация webhook через API недоступна для текущего типа credentials магазина (401 auth type). Не блокер payment create; блокер только webhook delivery setup до ручной регистрации.
+
+---
+
 ## 2026-08-07 - Москва Phase C hub ship (companions msk-2…5)
 
 ### Наблюдения

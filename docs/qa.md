@@ -76,34 +76,36 @@ Owner: основная работа локально / preview; агенты **
 1. **Checkout hostname:** **`pay.daibilet.ru`** - канон ✅ (A → `.159`, TLS+nginx на finance). Alias **`checkout.daibilet.ru`** не обязателен / не создан.
 2. **`finance-api.daibilet.ru`:** ✅ отдельный hostname для API/projection/webhooks (DNS+TLS). Path на `pay` не обязателен.
 3. **`supplier.daibilet.ru`:** ✅ DNS + TLS (вместе с `pay` / `finance-api`). Alias partners/cabinet не нужен.
-4. **YooKassa webhook URL:** ✅ **LOCKED 2026-07-31 (Codex).** Canon: `https://finance-api.daibilet.ru/api/checkout/yookassa/webhook`. `pay.daibilet.ru` = user checkout/return only. Dual-webhook 3-7d **только** если были живые платежи/вебхуки на старом endpoint; иначе skip. Register в ЮKassa - после egress + sandbox smoke.
+4. **YooKassa webhook URL:** ✅ **LOCKED 2026-07-31 (Codex).** Canon: `https://finance-api.daibilet.ru/api/checkout/yookassa/webhook`. `pay.daibilet.ru` = user checkout/return only. Dual-webhook 3-7d **только** если были живые платежи/вебхуки на старом endpoint; иначе skip.
+5. **Webhook registration (2026-08-07):** для текущего shop API-доступ **не** позволяет webhook-management (API register → 401 «Authentication type is not allowed»; payment create при этом OK). **Webhook для этого магазина нужно регистрировать вручную в кабинете ЮKassa** (URL выше) **или** получить credentials/token с правом webhook-management. FIN.LC3 create-payment/STUB smoke ✅; MIG.9.5 / FIN.W1 webhook step 🔒 owner-manual.
 
-### Owner minimum (обновлено 2026-07-31)
+### Owner minimum (обновлено 2026-08-07)
 
 - Timeweb allow **MSK `.184` → finance `.159`** ✅ (Fair Snipe)
-- YooKassa secrets на `.159`: `SHOP_ID` + `SECRET_KEY=<set>` ✅ (Cursor; never chat/git). **`DAIBILET_YOOKASSA_CHECKOUT=1`** (egress PASS 2026-07-31)
-- **Blocker:** Diligent Polydeuces **outbound 443 + DNS** с `.159` (сейчас DNS timeout → YooKassa/GitHub FAIL)
+- YooKassa secrets на `.159`: `SHOP_ID` + `SECRET=<set>` ✅ (never chat/git). Flags: `DAIBILET_YOOKASSA_CHECKOUT=1`, `DAIBILET_STUB_CHECKOUT=1`, `DAIBILET_YOOKASSA_VERIFY_WEBHOOK=1`
+- Egress `.159` outbound 443+DNS ✅ (sandbox create-payment OK)
+- FIN.LC3 ✅ confirmationUrl / STUB smoke
 - SSH для Codex: ключ `daibilet_spb_finance` / pubkey в `authorized_keys`
-- Webhook register в кабинете ЮKassa - после egress green
+- **Open:** webhook URL в кабинете ЮKassa (или token с webhook-management) - см. п.5
 
 `.16` (Intelligent Hoopoe) **труп** (MIG.9.7 ✅ 2026-08-07): снят из docs/scripts inventory. Wipe VM в Timeweb = owner, если ещё биллится. Apex DNS / web build = MSK `.184` only. Teplohod allowlist = `.184`, не `.16`.
 
 ### PurchaseProjection / dual order sources
 
-5. **Checkout domain model:** после split DB - `CheckoutOrder` только на finance; `ExternalOrder` остаётся на catalog. Как buyer/admin видят оба контура: (A) finance агрегирует External через catalog read API, (B) catalog агрегирует Checkout через finance API, (C) отдельный BFF? Рекомендация архитектора: **(B)** для buyer UI на catalog + admin proxy; supplier LC читает finance напрямую.
-6. **PurchaseProjection identity:** ✅ **LOCKED (Codex).** MVP = `publicCode` + buyer email/phone. `siteUserId` bridge до первой внутренней продажи не обязателен (buyer account v2).
-7. **ExternalOrder на finance?** ✅ **LOCKED.** External остаётся catalog-only; projection - read fan-in, не dual-write / не mirror copy.
+6. **Checkout domain model:** после split DB - `CheckoutOrder` только на finance; `ExternalOrder` остаётся на catalog. Как buyer/admin видят оба контура: (A) finance агрегирует External через catalog read API, (B) catalog агрегирует Checkout через finance API, (C) отдельный BFF? Рекомендация архитектора: **(B)** для buyer UI на catalog + admin proxy; supplier LC читает finance напрямую.
+7. **PurchaseProjection identity:** ✅ **LOCKED (Codex).** MVP = `publicCode` + buyer email/phone. `siteUserId` bridge до первой внутренней продажи не обязателен (buyer account v2).
+8. **ExternalOrder на finance?** ✅ **LOCKED.** External остаётся catalog-only; projection - read fan-in, не dual-write / не mirror copy.
 
 ### Projection sync & auth
 
-8. **Sync frequency:** catalog читает finance admission/supplier projection: on-request (SSR fetch + short cache), cron materialize в catalog read-tables, или edge cache? Для MVP рекомендовать **SSR/ISR fetch + short TTL (≤5–15 мин)** без writes в catalog DB.
-9. **Service auth catalog→finance:** ✅ **LOCKED 2026-07-31 (Codex).** Рекомендация: **m2m Bearer** token (не IP-only). ETA 0.5-1d когда owner даст token в env. IP allowlist - дополнение, не единственный контроль.
-10. **Public vs internal projection routes:** одни и те же DTO за CDN, или `/api/public/projection/*` без PII и `/api/internal/projection/*` с service auth для admin?
+9. **Sync frequency:** catalog читает finance admission/supplier projection: on-request (SSR fetch + short cache), cron materialize в catalog read-tables, или edge cache? Для MVP рекомендовать **SSR/ISR fetch + short TTL (≤5–15 мин)** без writes в catalog DB.
+10. **Service auth catalog→finance:** ✅ **LOCKED 2026-07-31 (Codex).** Рекомендация: **m2m Bearer** token (не IP-only). ETA 0.5-1d когда owner даст token в env. IP allowlist - дополнение, не единственный контроль.
+11. **Public vs internal projection routes:** одни и те же DTO за CDN, или `/api/public/projection/*` без PII и `/api/internal/projection/*` с service auth для admin?
 
 ### Product display
 
-11. **Порог city hub:** сколько published AdmissionProduct / venues нужно, чтобы показывать блок museums/admission на `/cities/[slug]` (например ≥3)?
-12. **Карточка в `/events`:** отдельная вкладка/фильтр «Входные билеты» vs mixed feed с `cardType=ADMISSION` - что предпочтительнее для SEO?
+12. **Порог city hub:** сколько published AdmissionProduct / venues нужно, чтобы показывать блок museums/admission на `/cities/[slug]` (например ≥3)?
+13. **Карточка в `/events`:** отдельная вкладка/фильтр «Входные билеты» vs mixed feed с `cardType=ADMISSION` - что предпочтительнее для SEO?
 
 ## 2026-07-25 - Env isolation / robots / admin auth (owner audit) — ЗАКРЫТО
 
