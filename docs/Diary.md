@@ -8,6 +8,7 @@
 - Статический route `/checkout/ticket/demo` (приоритетнее `[publicCode]`) + fixture `buildDemoBuyerTicketOrder()`.
 - Разные `ticketNumber` и `publicCode`; категории Взрослый/Льготный/Детский; notices; demo support phone; QR без finance.
 - Без seed CheckoutOrder на finance.
+- Ship: `938c0b9c` · Deploy **31194500195** · **BUILD_ID=`AxY25gz4cpfuKxB9sf-yd`** · URL https://daibilet.ru/checkout/ticket/demo
 
 ### Проблемы
 - Реальные заказы останутся sparse, пока finance lookup DTO / Path A не отдаёт полный набор полей.
