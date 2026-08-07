@@ -7,6 +7,7 @@
 - Page layout `lg:grid-cols-2`: билет | OSM Leaflet map (`OsmMapEmbed` / `BuyerTicketVenueMapPanel`).
 - Mobile: карта ниже билета (QR остаётся в первом viewport). Print: map `print:hidden`.
 - DTO: `venueLatitude`/`venueLongitude`; demo Третьяковка 55.7415/37.6201; soft-enrich из `/api/public/venues/{slug}`.
+- Ship: `9088eb80` · MSK **BUILD_ID=`kmmoWrUnfs9ap8QBd4z75`** · demo HTTP 200.
 
 ### Проблемы
 - Без coords в DTO/catalog map-блок не показывается.

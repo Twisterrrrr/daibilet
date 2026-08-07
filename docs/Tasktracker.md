@@ -52,7 +52,7 @@
 | UX.BUY-10d | Demo preview `/checkout/ticket/demo` - full fixture card (no finance) for visual QA | Высокий | ✅ `938c0b9c` MSK **BUILD_ID=`AxY25gz4cpfuKxB9sf-yd`** Deploy **31194500195** |
 | UX.BUY-10e | Ticket card redesign по owner HTML mockup: QR focus/mobile-top, date top, details+warning, print/copy | Критический | ✅ `85c8dfd4` MSK **BUILD_ID=`ct1lgVvvXSEKIIe1GmofQ`** demo 200 |
 | UX.BUY-10f | Ticket adaptive 500px (QR top phone / 2-col tablet+) + print hide actions | Критический | ✅ `88fba3bf`/`f060277d` MSK **BUILD_ID=`W4QpN2EaaFUk32IZsAwFi`** demo 200 |
-| UX.BUY-10g | Ticket PAGE: equal-weight OSM map + venue pin (desktop right / mobile below / print hide) | Высокий | 🔄 in progress |
+| UX.BUY-10g | Ticket PAGE: equal-weight OSM map + venue pin (desktop right / mobile below / print hide) | Высокий | ✅ `9088eb80` MSK **BUILD_ID=`kmmoWrUnfs9ap8QBd4z75`** demo 200 |
 | UX.BUY-11 | Best-effort buyer email (SMTP_* on web; else save-code copy) | Высокий | ✅ (MSK SMTP unset → `smtp_not_configured` + UI copy) |
 | UX.BUY-12 | YooKassa return → catalog result/ticket (`?order=`); localStorage recovery | Высокий | ✅ catalog; finance must set return_url |
 
