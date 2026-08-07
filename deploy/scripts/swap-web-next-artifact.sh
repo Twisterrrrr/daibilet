@@ -120,4 +120,12 @@ if [[ "$WEB_READY" -ne 1 ]]; then
 fi
 
 curl -fsS -o /dev/null -w "smoke / =%{http_code}\n" -H "Cache-Control: no-cache" "http://127.0.0.1:${WEB_PORT}/" || true
+
+# Drop HTML soft-404 / ISR poison from nginx proxy_cache (only caches 200).
+# Without this, Yandex/crawlers keep seeing HTTP 200 for missing URLs for up to 30m.
+if [[ -d /var/cache/nginx/daibilet ]]; then
+  rm -rf /var/cache/nginx/daibilet/* || true
+  echo "Purged nginx proxy_cache /var/cache/nginx/daibilet"
+fi
+
 echo "Artifact swap complete → BUILD_ID=$(cat "${WEB_NEXT_DIR}/BUILD_ID") HEAD=$(git rev-parse --short HEAD)"

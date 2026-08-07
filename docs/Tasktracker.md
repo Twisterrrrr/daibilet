@@ -20,7 +20,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| SEO.SOFT404 | Yandex: missing pages must return HTTP 404 (not 200 + not-found UI). Root cause: loading.tsx streaming. Fix: `(catalog)/loading` + drop detail/root loading; metadata notFound() | Критический | 🔄 deploy |
+| SEO.SOFT404 | Yandex: missing pages must return HTTP 404 (not 200 + not-found UI). Root cause: loading.tsx streaming. Fix: `(catalog)/loading` + drop detail/root loading; metadata notFound(); swap purges nginx proxy_cache | Критический | ✅ `df694617` MSK **BUILD_ID=`WQ0R0rX_aIzMOEtDwXMo1`** (+ cache purge redeploy) |
 
 ---
 
@@ -28,16 +28,21 @@
 
 Параллельно Codex эксперимент на `pay/.159`. Catalog track = `daibilet.ru` / `apps/web`. Не force-merge.
 
-**LOCKED 2026-08-07 (owner):** MVP path = `create-payment` → redirect YooKassa (`confirmationUrl`). Custom checkout UI + сложный внутренний calc - **⚠️ deferred**. Параллельные эксперименты Cursor/Codex = thin redirect + result + account (не heavy form).
+**LOCKED 2026-08-07 (owner):**
+- **Path A (NOW):** simple museum / admission → thin email → create-payment → redirect `confirmationUrl` (ЮKassa). Custom multi-step checkout **не** нужен для этого потока.
+- **Path B (FUTURE, allowed):** complex internal calc UI when pricing needs it - scaffold `/checkout/calc`; не подключать museum CTA сюда.
+- Cursor/Codex parallel = thin redirect + result + account (не heavy form для музеев).
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| UX.BUY-1 | Thin admission entry → finance stub/yookassa soft (`/checkout/admissions/[slug]` + `/checkout/actions/admission`) → confirmationUrl redirect | Критический | ✅ `98b02aa9` MSK **BUILD_ID=`yLJ-Q_y3Eo-p8_NM0luGe`** |
+| UX.BUY-1 | Path A: thin admission → YooKassa redirect (`/checkout/admissions/[slug]` + actions) | Критический | 🔄 thin UI + auto yookassa-first |
 | UX.BUY-2 | Result / thank-you `/checkout/result?order=publicCode` | Критический | ✅ |
 | UX.BUY-3 | Account purchases: internal (publicCode/status/title) + widget ExternalOrder | Высокий | ✅ |
-| UX.BUY-4 | URL canon docs (catalog vs pay parallel) + CTA same-origin | Высокий | ✅ |
-| UX.BUY-5 | Codex: admission на public `/api/checkout/yookassa` + order-by-code + email/PDF/mail (thin redirect path) | Критический | ⏳ Codex |
+| UX.BUY-4 | URL canon: Path A vs Path B + pay parallel | Высокий | ✅ |
+| UX.BUY-5 | Codex: public admission create-payment → confirmationUrl (+ return `?order=`) | Критический | ⏳ Codex |
 | UX.BUY-6 | Codex: m2m / public purchases-by-email для fan-in в account | Высокий | ⏳ Codex |
+| UX.BUY-7 | Path B scaffold `/checkout/calc` (placeholder; wire later) | Низкий | ✅ scaffold |
+| UX.BUY-8 | Path B real calc (qty/packages/promo) when product needs | Средний | ⚠️ deferred |
 | UX.BUY-7 | UI polish: offer qty>1, phone, resume unpaid confirmationUrl | Средний | ⏳ thin only |
 | UX.BUY-8 | Full checkout UI + internal calc (cart/multi-offer) | Низкий | ⚠️ deferred (owner 2026-08-07) |
 

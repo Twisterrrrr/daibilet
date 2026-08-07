@@ -53,7 +53,8 @@
 - Регрессия: `seo-http-404-loading.test.ts` (запрет loading на notFound-сегментах).
 
 ### Проблемы
-- После deploy сбросить/дождаться nginx `proxy_cache` (кэшировал soft-404 как 200 на 30m).
+- После первого swap nginx `proxy_cache` ещё держал soft-404 как 200 HIT/STALE на части URL; origin уже 404 (`?soft404fix=1`).
+- В `swap-web-next-artifact.sh` добавлен `rm -rf /var/cache/nginx/daibilet/*` (как в full deploy-prod-next).
 - Soft-nav на detail PDP без segment loading - только NavigationProgress; catalog loading остаётся.
 
 ---
