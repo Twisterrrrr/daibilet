@@ -573,6 +573,7 @@ body > div:has(iframe[src*='ticketscloud']) {
   }
 
   [data-buyer-ticket-actions],
+  [data-buyer-ticket-map],
   [data-buyer-ticket] .print\:hidden,
   .print\:hidden {
     display: none !important;

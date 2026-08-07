@@ -83,6 +83,15 @@ function asString(value: unknown): string | null {
   return trimmed || null;
 }
 
+function asNumber(value: unknown): number | null {
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  if (typeof value === 'string' && value.trim()) {
+    const n = Number(value.replace(',', '.'));
+    if (Number.isFinite(n)) return n;
+  }
+  return null;
+}
+
 function pickConfirmationUrl(payload: Record<string, unknown>): string | null {
   const direct =
     asString(payload.confirmationUrl) ||
@@ -193,6 +202,16 @@ function mapOrderFromFinancePayload(
     venueTitle: asString(subject.venueTitle) || asString(order.venueTitle),
     venueAddress: asString(subject.venueAddress) || asString(order.venueAddress) || asString(item.venueAddress),
     venueSlug: asString(subject.venueSlug) || asString(order.venueSlug),
+    venueLatitude:
+      asNumber(subject.venueLatitude) ??
+      asNumber(subject.latitude) ??
+      asNumber(order.venueLatitude) ??
+      asNumber(order.latitude),
+    venueLongitude:
+      asNumber(subject.venueLongitude) ??
+      asNumber(subject.longitude) ??
+      asNumber(order.venueLongitude) ??
+      asNumber(order.longitude),
     admissionProductSlug:
       asString(subject.admissionProductSlug) || asString(order.admissionProductSlug),
     sessionStartsAt,

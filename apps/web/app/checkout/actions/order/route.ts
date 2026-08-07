@@ -9,42 +9,78 @@ import { fetchPublicApiJson } from '@/server/public-api-client';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
+type VenuePublicBits = {
+  address?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  title?: string | null;
+};
+
+function parseVenueCoords(venue: VenuePublicBits | null | undefined): {
+  lat: number | null;
+  lng: number | null;
+} {
+  const lat = Number(venue?.latitude);
+  const lng = Number(venue?.longitude);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return { lat: null, lng: null };
+  if (lat === 0 && lng === 0) return { lat: null, lng: null };
+  if (Math.abs(lat) > 90 || Math.abs(lng) > 180) return { lat: null, lng: null };
+  return { lat, lng };
+}
+
+async function fetchVenueBits(venueSlug: string): Promise<VenuePublicBits | null> {
+  try {
+    const venuePayload = await fetchPublicApiJson<{
+      venue?: VenuePublicBits | null;
+    } | null>(`/api/public/venues/${encodeURIComponent(venueSlug)}`, {
+      timeoutMs: 2_500,
+    });
+    return venuePayload?.venue || null;
+  } catch {
+    return null;
+  }
+}
+
 async function softEnrichTicketOrder(order: BuyerInternalOrderRecord): Promise<BuyerInternalOrderRecord> {
-  const slug = order.admissionProductSlug;
-  if (!slug) return order;
-
-  const needsProduct =
-    !order.validUntil ||
-    !order.venueTitle ||
-    !order.validityMode ||
-    !order.supplierSupportPhone;
+  const needsProduct = Boolean(
+    order.admissionProductSlug &&
+      (!order.validUntil || !order.venueTitle || !order.validityMode || !order.supplierSupportPhone),
+  );
   const needsAddress = !order.venueAddress;
+  const needsCoords = order.venueLatitude == null || order.venueLongitude == null;
 
-  if (!needsProduct && !needsAddress) return order;
+  if (!needsProduct && !needsAddress && !needsCoords) return order;
 
-  const product = needsProduct ? await fetchAdmissionProductBySlug(slug) : null;
+  const product = needsProduct && order.admissionProductSlug
+    ? await fetchAdmissionProductBySlug(order.admissionProductSlug)
+    : null;
   const venueSlug = order.venueSlug || product?.venue?.slug || null;
+
   let venueAddress = order.venueAddress || null;
-  if (needsAddress && venueSlug) {
-    try {
-      const venuePayload = await fetchPublicApiJson<{
-        venue?: { address?: string | null } | null;
-      } | null>(`/api/public/venues/${encodeURIComponent(venueSlug)}`, {
-        timeoutMs: 2_500,
-      });
-      const address = String(venuePayload?.venue?.address || '').trim();
-      if (address) venueAddress = address;
-    } catch {
-      // soft-fail
+  let venueLatitude = order.venueLatitude ?? null;
+  let venueLongitude = order.venueLongitude ?? null;
+  let venueTitle = order.venueTitle || product?.venue?.title || null;
+
+  if (venueSlug && (needsAddress || needsCoords || !venueTitle)) {
+    const venue = await fetchVenueBits(venueSlug);
+    const address = String(venue?.address || '').trim();
+    if (address) venueAddress = address;
+    if (!venueTitle) venueTitle = String(venue?.title || '').trim() || venueTitle;
+    const coords = parseVenueCoords(venue);
+    if (coords.lat != null && coords.lng != null) {
+      venueLatitude = coords.lat;
+      venueLongitude = coords.lng;
     }
   }
 
   const openDate = isOpenDateValidity(product?.validityMode) || isOpenDateValidity(order.validityMode);
   const enrichment: BuyerInternalOrderRecord = {
     ...order,
-    venueTitle: order.venueTitle || product?.venue?.title || null,
+    venueTitle,
     venueAddress,
     venueSlug,
+    venueLatitude,
+    venueLongitude,
     validityMode: order.validityMode || product?.validityMode || null,
     validUntil: order.validUntil || product?.validTo || null,
     sessionStartsAt: openDate ? null : order.sessionStartsAt,

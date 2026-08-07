@@ -36,6 +36,9 @@ export type BuyerInternalOrderRecord = {
   venueTitle?: string | null;
   venueAddress?: string | null;
   venueSlug?: string | null;
+  /** Venue pin for ticket page map (catalog / finance enrich; soft-fail if absent). */
+  venueLatitude?: number | null;
+  venueLongitude?: number | null;
   admissionProductSlug?: string | null;
   /** Session start ISO; null for open-date admissions. */
   sessionStartsAt?: string | null;
@@ -131,6 +134,8 @@ export function mergeBuyerInternalOrders(
     venueTitle: pickStr(primary.venueTitle, secondary.venueTitle),
     venueAddress: pickStr(primary.venueAddress, secondary.venueAddress),
     venueSlug: pickStr(primary.venueSlug, secondary.venueSlug),
+    venueLatitude: pickNum(primary.venueLatitude, secondary.venueLatitude),
+    venueLongitude: pickNum(primary.venueLongitude, secondary.venueLongitude),
     admissionProductSlug: pickStr(primary.admissionProductSlug, secondary.admissionProductSlug),
     sessionStartsAt: pickStr(primary.sessionStartsAt, secondary.sessionStartsAt),
     validUntil: pickStr(primary.validUntil, secondary.validUntil),
@@ -207,6 +212,9 @@ export function buildDemoBuyerTicketOrder(): BuyerInternalOrderRecord {
     venueTitle: 'Третьяковская галерея',
     venueAddress: 'Лаврушинский переулок, 10, Москва',
     venueSlug: 'tretyakovskaya-galereya',
+    // Main Tretyakov building (Lavrushinsky 10) - demo pin for ticket page map.
+    venueLatitude: 55.7415,
+    venueLongitude: 37.6201,
     sessionStartsAt: '2026-08-15T11:00:00.000Z',
     validUntil: null,
     validityMode: 'SESSION',
@@ -221,6 +229,19 @@ export function buildDemoBuyerTicketOrder(): BuyerInternalOrderRecord {
     mode: 'YOOKASSA',
     source: 'internal',
   };
+}
+
+/** Valid WGS84 pin for ticket page map; null if missing / garbage. */
+export function buyerTicketVenueCoords(
+  order: Pick<BuyerInternalOrderRecord, 'venueLatitude' | 'venueLongitude'>,
+): { lat: number; lng: number } | null {
+  if (order.venueLatitude == null || order.venueLongitude == null) return null;
+  const lat = Number(order.venueLatitude);
+  const lng = Number(order.venueLongitude);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+  if (lat === 0 && lng === 0) return null;
+  if (Math.abs(lat) > 90 || Math.abs(lng) > 180) return null;
+  return { lat, lng };
 }
 
 export function readInternalOrdersFromStorage(): BuyerInternalOrderRecord[] {
@@ -287,6 +308,15 @@ function normalizeLineItems(raw: unknown): BuyerTicketLineItem[] {
     .filter((row): row is BuyerTicketLineItem => Boolean(row));
 }
 
+function asOptionalNumber(value: unknown): number | null {
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  if (typeof value === 'string' && value.trim()) {
+    const n = Number(value.replace(',', '.'));
+    if (Number.isFinite(n)) return n;
+  }
+  return null;
+}
+
 function normalizeInternalOrderRecord(raw: unknown): BuyerInternalOrderRecord | null {
   if (!raw || typeof raw !== 'object') return null;
   const row = raw as Record<string, unknown>;
@@ -313,6 +343,8 @@ function normalizeInternalOrderRecord(raw: unknown): BuyerInternalOrderRecord | 
     venueTitle: asOptionalString(row.venueTitle),
     venueAddress: asOptionalString(row.venueAddress),
     venueSlug: asOptionalString(row.venueSlug),
+    venueLatitude: asOptionalNumber(row.venueLatitude),
+    venueLongitude: asOptionalNumber(row.venueLongitude),
     admissionProductSlug: asOptionalString(row.admissionProductSlug),
     sessionStartsAt: asOptionalString(row.sessionStartsAt),
     validUntil: asOptionalString(row.validUntil),

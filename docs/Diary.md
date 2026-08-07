@@ -1,3 +1,18 @@
+## 2026-08-07 - Buyer ticket page: venue map block
+
+### Наблюдения
+- Owner: на странице билета справа равнозначный блок с картой и пином площадки (не внутри печатной карточки).
+
+### Решения
+- Page layout `lg:grid-cols-2`: билет | OSM Leaflet map (`OsmMapEmbed` / `BuyerTicketVenueMapPanel`).
+- Mobile: карта ниже билета (QR остаётся в первом viewport). Print: map `print:hidden`.
+- DTO: `venueLatitude`/`venueLongitude`; demo Третьяковка 55.7415/37.6201; soft-enrich из `/api/public/venues/{slug}`.
+
+### Проблемы
+- Без coords в DTO/catalog map-блок не показывается.
+
+---
+
 ## 2026-08-07 - Buyer ticket: 500px adaptive + print actions hide
 
 ### Наблюдения

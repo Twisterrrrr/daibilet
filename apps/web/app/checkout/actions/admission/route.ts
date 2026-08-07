@@ -52,17 +52,30 @@ async function enrichOrderFromCatalog(
   const venueSlug = product?.venue?.slug || order.venueSlug || null;
 
   let venueAddress: string | null = order.venueAddress || null;
-  if (!venueAddress && venueSlug) {
+  let venueLatitude = order.venueLatitude ?? null;
+  let venueLongitude = order.venueLongitude ?? null;
+  if (venueSlug && (!venueAddress || venueLatitude == null || venueLongitude == null)) {
     try {
       const venuePayload = await fetchPublicApiJson<{
-        venue?: { address?: string | null } | null;
+        venue?: {
+          address?: string | null;
+          latitude?: number | null;
+          longitude?: number | null;
+        } | null;
       } | null>(`/api/public/venues/${encodeURIComponent(venueSlug)}`, {
         timeoutMs: 2_500,
       });
-      const address = String(venuePayload?.venue?.address || '').trim();
+      const venue = venuePayload?.venue;
+      const address = String(venue?.address || '').trim();
       if (address) venueAddress = address;
+      const lat = Number(venue?.latitude);
+      const lng = Number(venue?.longitude);
+      if (Number.isFinite(lat) && Number.isFinite(lng) && !(lat === 0 && lng === 0)) {
+        venueLatitude = lat;
+        venueLongitude = lng;
+      }
     } catch {
-      // soft-fail address enrichment
+      // soft-fail address / coords enrichment
     }
   }
 
@@ -81,6 +94,8 @@ async function enrichOrderFromCatalog(
     venueTitle: order.venueTitle || product?.venue?.title || null,
     venueAddress,
     venueSlug,
+    venueLatitude,
+    venueLongitude,
     admissionProductSlug: order.admissionProductSlug || product?.slug || input.admissionProductSlug,
     validityMode: order.validityMode || product?.validityMode || null,
     validUntil: order.validUntil || product?.validTo || null,

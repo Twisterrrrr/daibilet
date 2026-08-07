@@ -4,6 +4,7 @@ import test from 'node:test';
 import {
   amountRubFromKopecks,
   buildDemoBuyerTicketOrder,
+  buyerTicketVenueCoords,
   filterInternalOrdersForEmail,
   formatBuyerTicketWhen,
   formatTicketLineItem,
@@ -95,6 +96,16 @@ test('buildDemoBuyerTicketOrder fills full card fixture', () => {
   assert.ok(demo.supplierSupportPhone);
   assert.equal(demo.amountRub, 4700);
   assert.equal(demo.displayStatus, 'Оплачен');
+  const pin = buyerTicketVenueCoords(demo);
+  assert.ok(pin);
+  assert.ok(Math.abs(pin!.lat - 55.7415) < 0.01);
+  assert.ok(Math.abs(pin!.lng - 37.6201) < 0.01);
+});
+
+test('buyerTicketVenueCoords rejects missing or zero pin', () => {
+  assert.equal(buyerTicketVenueCoords({}), null);
+  assert.equal(buyerTicketVenueCoords({ venueLatitude: 0, venueLongitude: 0 }), null);
+  assert.equal(buyerTicketVenueCoords({ venueLatitude: 55.7, venueLongitude: null }), null);
 });
 
 test('isOpenDateOrder prefers validityMode and validUntil', () => {

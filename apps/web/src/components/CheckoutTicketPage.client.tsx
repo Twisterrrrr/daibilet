@@ -5,7 +5,9 @@ import { Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { BuyerTicketCard } from '@/components/BuyerTicketCard.client';
+import { BuyerTicketVenueMapPanel } from '@/components/BuyerTicketVenueMapPanel.client';
 import {
+  buyerTicketVenueCoords,
   mapFinanceOrderStatus,
   mergeBuyerInternalOrders,
   readInternalOrdersFromStorage,
@@ -105,6 +107,8 @@ export function CheckoutTicketView({ publicCode, demoOrder, demoBanner }: Props)
     );
   }
 
+  const venuePin = order ? buyerTicketVenueCoords(order) : null;
+
   return (
     <>
       <section className="bg-gradient-to-br from-emerald-700 via-emerald-800 to-slate-950 text-white print:hidden">
@@ -128,7 +132,28 @@ export function CheckoutTicketView({ publicCode, demoOrder, demoBanner }: Props)
             <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
           </div>
         ) : order ? (
-          <BuyerTicketCard order={order} emailHint={emailHint} />
+          <div
+            className={
+              venuePin
+                ? 'grid grid-cols-1 items-stretch gap-5 lg:grid-cols-2 lg:gap-6'
+                : 'grid grid-cols-1'
+            }
+          >
+            <div className="min-w-0">
+              <BuyerTicketCard order={order} emailHint={emailHint} className="mx-0 max-w-none" />
+            </div>
+            {venuePin ? (
+              <div className="min-w-0 print:hidden lg:min-h-full">
+                <BuyerTicketVenueMapPanel
+                  lat={venuePin.lat}
+                  lng={venuePin.lng}
+                  venueTitle={order.venueTitle}
+                  venueAddress={order.venueAddress}
+                  className="lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)]"
+                />
+              </div>
+            ) : null}
+          </div>
         ) : (
           <p className="text-slate-600 print:hidden">Не удалось загрузить билет. Попробуйте обновить страницу.</p>
         )}
