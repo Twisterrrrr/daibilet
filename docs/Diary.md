@@ -3,10 +3,12 @@
 ### Наблюдения
 - После `65c8d8b` + Deploy **31170119217** (**BUILD_ID=`hZRMIROKILBA5UyaG8PI4`**) hub/my-day/venue covers live; companions ещё 404 soft.
 - Gastro brands по-прежнему ждут owner list (в pack только Даниловский рынок).
+- Первый upsert с `publishedAt` 14:00+03 не проходил фильтр `publishedAt <= now()` (сервер ~10:51 UTC) - исправлено на 12:xx+03 + `--force-published-at` + restart API.
 
 ### Решения
 - 4 companion-гида PUBLISHED: `moscow-zamoskvoreche-tretyakovka`, `moscow-vdnh-kosmos-den`, `moscow-vorobevy-gory-siti`, `moscow-kolomenskoe-tsaritsyno` (cover + 2 inline + CTA `/my-day?city=moscow`).
-- MSK: `git pull` + `sync-public-assets` + `blog-upsert` по 4 slug; web deploy пачкой с companions.
+- MSK: sync-public-assets + blog-upsert; Deploy **31171583238** **BUILD_ID=`YDWwMoEX33uU7Y3eajUtJ`** HEAD `1caebb65`.
+- Smoke: 4 blog 200 + body/CTA; hub/my-day 200; cover jpg 200.
 - Tasktracker: MS.TIER4 / MS.TIER5 / PH2.CITY2 закрыты по hub pack.
 
 ### Проблемы
