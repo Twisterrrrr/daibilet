@@ -20,7 +20,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| SEO.SOFT404 | Yandex: missing pages must return HTTP 404 (not 200 + not-found UI). Root cause: loading.tsx streaming. Fix: `(catalog)/loading` + drop detail/root loading; metadata notFound(); swap purges nginx proxy_cache | Критический | ✅ `df694617` MSK **BUILD_ID=`WQ0R0rX_aIzMOEtDwXMo1`** (+ cache purge redeploy) |
+| SEO.SOFT404 | Yandex: missing pages must return HTTP 404 (not 200 + not-found UI). Root cause: loading.tsx streaming. Fix: `(catalog)/loading` + drop detail/root loading; metadata notFound(); swap purges nginx proxy_cache | Критический | ✅ `61bb52dd` MSK **BUILD_ID=`9tTC33CUihsVjB1M_cDp9`** |
 
 ---
 

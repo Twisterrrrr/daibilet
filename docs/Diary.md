@@ -58,6 +58,7 @@
 ### Проблемы
 - После первого swap nginx `proxy_cache` ещё держал soft-404 как 200 HIT/STALE на части URL; origin уже 404 (`?soft404fix=1`).
 - В `swap-web-next-artifact.sh` добавлен `rm -rf /var/cache/nginx/daibilet/*` (как в full deploy-prod-next).
+- Live after purge redeploy: все probe URL → **HTTP 404**, valid `/` `/events` `/cities/moscow` → 200. BUILD_ID=`9tTC33CUihsVjB1M_cDp9` HEAD=`61bb52dd`.
 - Soft-nav на detail PDP без segment loading - только NavigationProgress; catalog loading остаётся.
 
 ---
