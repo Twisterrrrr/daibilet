@@ -1360,7 +1360,7 @@ Owner-locked порядок: Hero → Советы → Расписание → 
 | B.28c | Owner fix: swap колонок + rich Афиша в углу под «Свежее» (не mid-feed) | Критический | ✅ `9be0a98` prod @`ab1dc94` | агент |
 | B.29 | Pack B GPT brief: 9 гидов + 2 колонки Макса (`blog-content-gpt-briefs.md`) | Высокий | ⏳ brief ✅ 2026-07-27; тексты GPT → owner review → agent publish | владелец + агент |
 | B.30 | Pack C: 9 гидов + 2 колонки Макса (1024610) | Высокий | ✅ контент+images; blog:upsert prod; slug 404 до publishedAt | владелец + агент |
-| B.30a | Owner early-publish: Самара `samara-vykhodnye-dva-dnya-bez-gonki` (из списка 8 городов) | Высокий | 🔄 2026-08-07: publishedAt→now, upsert+revalidate | агент |
+| B.30a | Owner early-publish: Самара `samara-vykhodnye-dva-dnya-bez-gonki` (из списка 8 городов) | Высокий | ✅ 2026-08-07 `836a75f8` upsert+revalidate; live 200; BUILD_ID=`ct1lgVvvXSEKIIe1GmofQ` (concurrent MSK deploy) | агент |
 | B.31 | Blog inline images: подпись (figcaption/alt) скрыта по умолчанию, показ при hover | Средний | ✅ 2026-07-27 `BlogFigure` web+public: `group-hover` + `@media(hover:hover)`, `title`+`alt` на img | агент |
 
 ---

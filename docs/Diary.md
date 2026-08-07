@@ -39,11 +39,14 @@
 
 ### Решения
 - `publishedAt` → `2026-08-07T19:40:00+03:00`; date «7 авг 2026».
-- MSK: `blog:upsert --slug=… --force-published-at` + revalidate `/blog` + article path.
+- Commit `836a75f8` + push; MSK pull; `blog:upsert --slug=… --force-published-at`.
+- Revalidate tags `blog-page`/`articles` + paths `/blog`, article, `/cities/samara`.
+- Web: concurrent `deploy-prod-next` (ticket redesign) поднял **BUILD_ID=`ct1lgVvvXSEKIIe1GmofQ`** с нашим коммитом в истории.
+- Smoke live: article/listing/hub 200; cover+inline в HTML.
 - msk-2…5 companions не трогали.
 
 ### Проблемы
-- Полный web rebuild не обязателен (images уже live); достаточно DB upsert + ISR revalidate.
+- Отдельный собственный rebuild не стартовали: на MSK уже шёл deploy-lock; дождались чужого build и сделали upsert+revalidate.
 
 ---
 
