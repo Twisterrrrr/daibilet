@@ -154,10 +154,38 @@ export function formatBuyerDateTime(iso: string | null | undefined): string | nu
   });
 }
 
+/** Ticket card headline date: «15 августа 2026 г. в 14:00». */
+export function formatBuyerTicketWhen(iso: string | null | undefined): string | null {
+  if (!iso) return null;
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return null;
+  const dayPart = date.toLocaleDateString('ru-RU', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+  const timePart = date.toLocaleTimeString('ru-RU', {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+  return `${dayPart} в ${timePart}`;
+}
+
 export function formatTicketLineItem(item: BuyerTicketLineItem): string {
   const title = String(item.ticketTitle || '').trim() || 'Билет';
   const qty = Math.max(1, Math.round(Number(item.quantity) || 1));
   return `${title} - ${qty} чел`;
+}
+
+/** Compact composition line for ticket details: «Взрослый × 4, Льготный × 2». */
+export function formatTicketLineItemsCompact(items: BuyerTicketLineItem[]): string {
+  return items
+    .map((item) => {
+      const title = String(item.ticketTitle || '').trim() || 'Билет';
+      const qty = Math.max(1, Math.round(Number(item.quantity) || 1));
+      return `${title} × ${qty}`;
+    })
+    .join(', ');
 }
 
 /**

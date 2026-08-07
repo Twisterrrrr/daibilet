@@ -5,7 +5,9 @@ import {
   amountRubFromKopecks,
   buildDemoBuyerTicketOrder,
   filterInternalOrdersForEmail,
+  formatBuyerTicketWhen,
   formatTicketLineItem,
+  formatTicketLineItemsCompact,
   isOpenDateOrder,
   mapFinanceOrderStatus,
   mergeBuyerInternalOrders,
@@ -57,6 +59,24 @@ test('filterInternalOrdersForEmail', () => {
 test('formatTicketLineItem uses hyphen', () => {
   assert.equal(formatTicketLineItem({ ticketTitle: 'Взрослый', quantity: 4 }), 'Взрослый - 4 чел');
   assert.equal(formatTicketLineItem({ ticketTitle: 'Льготный', quantity: 2 }), 'Льготный - 2 чел');
+});
+
+test('formatTicketLineItemsCompact joins categories', () => {
+  assert.equal(
+    formatTicketLineItemsCompact([
+      { ticketTitle: 'Взрослый', quantity: 4 },
+      { ticketTitle: 'Льготный', quantity: 2 },
+      { ticketTitle: 'Детский', quantity: 1 },
+    ]),
+    'Взрослый × 4, Льготный × 2, Детский × 1',
+  );
+});
+
+test('formatBuyerTicketWhen uses в before time', () => {
+  const label = formatBuyerTicketWhen('2026-08-15T11:00:00.000Z');
+  assert.ok(label);
+  assert.match(label!, /в \d{2}:\d{2}/);
+  assert.match(label!, /августа/);
 });
 
 test('buildDemoBuyerTicketOrder fills full card fixture', () => {
