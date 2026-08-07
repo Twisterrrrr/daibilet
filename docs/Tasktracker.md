@@ -178,7 +178,7 @@
 | PH2.CITY2 | Capitals must-see wide pack (MSK/SPB) после owner list (MS.TIER3/4) | Высокий | ⏳ owner list |
 | PH2.VEN1 | Venue PDP monetization: clearer ticket path, related events density | Средний | ⚠️ next phase (UX.VENUE-MON) |
 | PH2.LOC1 | `/locations` IA: decision V1 keep primary nav (UX.LOC8); label «Места и точки сбора» = UX.LOC3 | Высокий | ✅ decided 2026-08-07 owner A+V1; rename ⏳ LOC3; `/places` deferred |
-| PH2.LOC2 | Mobile city chrome: CityPicker visible outside burger (brief quick win) | Критический | ⏳ |
+| PH2.LOC2 | Mobile city chrome: CityPicker visible outside burger (brief quick win) | Критический | ✅ = UX.LOC1 pin+dropdown `cc05efa`; public parity 2026-08-07 |
 | PH2.LOC3 | `/locations` hero: drop map-first on mobile; dense city-first | Высокий | ⏳ (partial LOC4 done) |
 | PH2.PLC1 | Unified `/places` venues+locations tabs (UX.LOC9) | Низкий | ⚠️ deferred (owner 2026-08-07) |
 

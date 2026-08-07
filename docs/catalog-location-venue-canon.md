@@ -15,6 +15,7 @@
 | **Площадка (Venue)** | Institution / место афиши (и museum/gallery даже только-инфо). События не обязательны для institution kinds ниже. | `/venues/{slug}` |
 
 - **Договор / коммерция ≠ тип справочника.** Есть договор или нет - отдельный контур (finance, supplier LC, admission). Тип «локация vs площадка» решает продуктовая роль места в каталоге и хабе, не наличие контракта.
+- **Нет билетов / нет афиши ≠ смена URL-семейства.** (LOCKED 2026-08-07, owner option A.) Family берётся из **kind/role**, не из ticket availability. Музей/театр/зал без offers → всё равно `/venues`; buy-chrome скрыт до появления offers/sessions. Парки / достопримечательности / причалы / гастро-как-day-point → `/locations`. **Запрещено** временно класть institution «пока нет билетов» в `/locations`. Три оси: `kind`→URL, `offers`→UI chrome, `pageStatus`→модерация.
 - В Prisma обе роли живут в модели `Venue` (+ `VenueKind` / public kind / pageStatus). Разделение для пользователя и SEO - через публичные семейства каталога (`/locations` vs `/venues`) и family-фильтры API, не через две независимые таблицы «на каждое имя».
 
 ---
@@ -105,6 +106,7 @@ Must-see / Hot Picks / city hub `mustSee` обязаны ссылаться на
 - [ ] Если афиша/institution появилась у существующей локации - план upgrade / hide+301, не второй PUBLISHED.
 - [ ] Must-see / Hot Picks / hub ссылки ведут на канон, не на twin.
 - [ ] Договор с объектом не использован как критерий «делать Venue» (для музеев/галерей Venue и без договора).
+- [ ] Отсутствие tickets/sessions не использовано как повод перенести institution в `/locations`.
 
 ---
 
@@ -113,4 +115,4 @@ Must-see / Hot Picks / city hub `mustSee` обязаны ссылаться на
 - [Project.md](./Project.md) - краткий pointer + VenueKind / Location↔Excursion
 - [myday-commercial-canon.md](./myday-commercial-canon.md) - planner UX
 - [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brief.md) - UX `/locations`
-- [qa.md](./qa.md) - открытые вопросы (единый `/places`, лейбл «Локации»)
+- [qa.md](./qa.md) - LOCKED 2026-08-07 option A + V1 nav; `/places` deferred; rename лейбла = UX.LOC3

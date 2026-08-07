@@ -16,6 +16,22 @@
 
 ---
 
+## 2026-08-07 - PH2.LOC2: CityPicker вне бургера (mobile)
+
+### Наблюдения
+- Owner: закрыть PH2.LOC2 - «через пиктограмму и дропдаун».
+- В `apps/web` уже было: sticky `CityPicker` variant `header` = MapPin icon-only до `sm` + portal-dropdown (UX.LOC1 / `cc05efa`); desktop без изменений.
+- В legacy `apps/public` город ещё был `hidden lg:block` - только в sheet внизу.
+
+### Решения
+- PH2.LOC2 → ✅ (канон web = pin вне бургера; public Header/CityPicker выровнены под тот же паттерн, city в sheet сверху).
+- Новый MSK web deploy не нужен: runtime уже на live с UX.LOC1.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-07 - SPB `.16` Intelligent Hoopoe: труп, MSK-only inventory
 
 ### Наблюдения
@@ -47,6 +63,7 @@
 - Нет.
 
 ---
+
 
 ## 2026-08-07 - CI Deploy MSK web: SSG without local DB/API
 
@@ -13032,3 +13049,4 @@ evalidateNextBlogArticle (/blog, slug, city hub).
 
 ### Проблемы
 - Post-deploy warm: 2 event SSG warm 500; hub warm 10/12 (moscow/spb 500 на первом проходе) - не блокирует blog/landing surface; IndexNow api.indexnow.org 403 (yandex 202).
+

@@ -81,7 +81,7 @@ SPB `.16` **retired**.
 
 ### Москва и Санкт-Петербург - широкий must-see (не потолок 18)
 
-**Факт сейчас:** оба на floor **6** (как typical), без `dayRoutePresets`. Готовых широких списков (30-50+) в repo / briefs / `.deploy-tmp` нет - seed/invent десятки venues **не** делаем до списка / OK от owner.
+**Факт (2026-08-07):** Санкт-Петербург - wide pack в runtime (`mustSee` ~184 + suburbs + 6 presets). Москва - Phase C draft в runtime: **58** mustSee с фильтрами, **8** пригородов / 40 POI + travel vectors, **5** `dayRoutePresets` (`msk-1`…`msk-5`). Draft для review: `docs/drafts/moscow-must-see-draft.md`. Гастро-бренды MSK и place-images `/images/venues/moscow/` - ещё нет. Prod seed MSK - после owner OK / batch.
 
 **Цель:** тир **Capitals** - широкий curated set (ориентир 30-50+, без жёсткого потолка 18). Filter tabs обязательны. **Не** ограничивать столицы тиром Large tourist 12-18. NN - референс deep pack + gastro + named presets, не единственная модель клонирования.
 
@@ -201,14 +201,16 @@ BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh
 - City/landing SSR: ≤48 lean cards.
 - Redirects: `www` → apex; `/river-cruises` → `/rechnye-progulki`.
 
-### Location vs Venue (антидубли, 2026-08-02)
+### Location vs Venue (антидубли, 2026-08-02; option A LOCKED 2026-08-07)
 
 **Канон:** [catalog-location-venue-canon.md](./catalog-location-venue-canon.md).
 
-- **Локация** - парки / набережные / памятники / улицы (must-see без institution). **Площадка** - афиша + institution.
+- **Локация** - парки / набережные / памятники / улицы / причалы / гастро-как-day-point (must-see без institution). **Площадка** - афиша + institution.
 - **Музеи и арт-галереи** всегда **Площадки** (`MUSEUM_ART_SPACE` / institution), даже только-инфо и без договора - блок хаба города.
 - Театры / залы / клубы → Площадки. Договор ≠ тип сущности.
-- Редакционные гастро-точки, бары и особняки без продаваемых будущих событий → **Локации**. Если legacy kind временно остаётся institution, при `upcomingEventsCount=0` и без admission запрещены билетные chrome, цена, CTA, афиша и FAQ.
+- **URL-семейство от kind/role, не от билетов** (owner option A): museum/theater/hall без афиши → всё равно `/venues`, buy-chrome скрыт до offers/sessions. **Не** временно переносить «нет билетов» в `/locations`. Commerce = UI chrome only. Оси: `kind`→URL, `offers`→chrome, `pageStatus`→модерация.
+- Редакционные гастро-точки / day-point без institution-афиши → **Локации** (`GASTRO`). Если legacy kind временно institution, при `upcomingEventsCount=0` и без admission запрещены билетные chrome, цена, CTA, афиша и FAQ (но URL family не менять из-за пустой афиши).
+- Nav: **V1** - `/locations` в primary; rename лейбла «Места и точки сбора» = UX.LOC3 follow-up. Единый `/places` deferred.
 - Одна физическая точка = одна публичная карточка; локация→venue = upgrade / hide+301, не twin `PUBLISHED`.
 
 ---
@@ -274,7 +276,7 @@ Cherry-pick из **`codex/phase2-foundation`**: schema, event change requests, a
 - **Venue logistics (CV.9):** ✅ shipped - manual CMS `metroStation` / `wayToFind` / `parkingInfo`; блок на venue page; event modal + Yandex iframe (coords) / external button; address sync-only; OSM keep на venue pages (unify deferred). Geocode auto-fill 🚫. Спека: [venue-logistics-spec.md](./venue-logistics-spec.md). Не путать с **CV.5** (скидки).
 - **VenueKind location types:** `PARK` / `MONUMENT` (public `park` / `monument`) для каталога локаций / «Важные места». Park admission (платный вход, Монрепо) - **не** в MVP catalog/finance mix (см. qa.md).
 - **Location↔Excursion (MVP):** явные `EventVenueRouteItem` (`RouteItemRole`, таблица `event_venue_route_items`) role=`STOP` (остановки маршрута). `Event.venueId` = только старт. На странице локации: `stopEvents`; если пусто и есть coords - geo fallback `nearbyEvents` (~300м, UI «Рядом», без merge). `Venue.hookFact` для карточек. Пермь must-see slugs: `permskaya-galereya`, `permsky-solenye-ushi`, `naberezhnaya-kamy`, `muzej-hohlovka`, `teatr-teatr`, `permskaya-esplanada`. Admin: «Подобрать рядом» (`GET …/venue-link-suggestions`) + merge apply (`POST …/venue-links:apply`). «Собери свой день» / **Мой день**: localStorage planner + commercial checklist (readiness %, status chips, ticket handoff, recommend carousel, free-window) - канон [myday-commercial-canon.md](./myday-commercial-canon.md); `/my-day` noindex + short share `/d/{code}` (`day_route_shares` → redirect `/my-day?city=&items=`; legacy `?day=`) + match API (STOP>start>nearby). Не swipe/Tinder UX.
-- **City hub «Главные места»:** editorial `cityInfo.mustSee` / `sights` могут иметь `href` | `venueSlug` | `locationSlug`; title линкуется на `/venues/{slug}` или `/locations/{slug}` (без битых ссылок если entity нет). Content places (park/monument/outdoor/attraction/museum/theater) с PUBLISHED|CANDIDATE и minimal profile попадают в каталоги `/venues` и `/locations` даже без events. **Объём must-see** - канон тиров выше (floor 6 / typical 6-8 / large tourist ~12-18 non-capital / capitals MSK+SPB wide 30-50+ без потолка 18 / NN deep pack reference); hub breadth ≠ day length (soft 10 / hard 15). Москва и СПб сейчас floor 6, цель capitals wide.
+- **City hub «Главные места»:** editorial `cityInfo.mustSee` / `sights` могут иметь `href` | `venueSlug` | `locationSlug`; title линкуется на `/venues/{slug}` или `/locations/{slug}` (без битых ссылок если entity нет). Content places (park/monument/outdoor/attraction/museum/theater) с PUBLISHED|CANDIDATE и minimal profile попадают в каталоги `/venues` и `/locations` даже без events. **Объём must-see** - канон тиров выше (floor 6 / typical 6-8 / large tourist ~12-18 non-capital / capitals MSK+SPB wide 30-50+ без потолка 18 / NN deep pack reference); hub breadth ≠ day length (soft 10 / hard 15). СПб wide в runtime; Москва Phase C draft (58+) - см. § capitals выше.
 - **Prisma 7** — schema/migrations; runtime read через dto port
 - **Консистентность:** parity scripts; константы каталога в `@daibilet/contracts`
 - **SEO:** title template `%s | Дайбилет` без дублей; `og:url` route-specific (`seo-meta.ts`); flat entity URLs + city hubs (см. URL / SEO policy выше)
