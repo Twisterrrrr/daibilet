@@ -35,6 +35,10 @@ export function BuyerTicketCard({ order, origin, emailHint = 'unknown', classNam
   const status = mapFinanceOrderStatus(order.status);
   const isPaid = status.statusTone === 'live';
   const productTitle = ticketProductTitle(order);
+  const orderCode = order.publicCode;
+  const issuedTicketNumber = (order.ticketNumber || '').trim();
+  const ticketNumber = issuedTicketNumber || orderCode;
+  const ticketIssuedSeparately = Boolean(issuedTicketNumber && issuedTicketNumber !== orderCode);
   const ticketUrl =
     typeof window !== 'undefined'
       ? buyerTicketAbsoluteUrl(order.publicCode, origin || window.location.origin)
@@ -86,9 +90,19 @@ export function BuyerTicketCard({ order, origin, emailHint = 'unknown', classNam
           <h2 className="mt-1 text-2xl font-extrabold tracking-tight text-slate-950 sm:text-3xl">{productTitle}</h2>
 
           <div className="mt-5 rounded-xl bg-slate-50 px-4 py-3 sm:px-5 sm:py-4">
-            <p className="text-xs font-medium text-slate-500">Код билета</p>
+            <p className="text-xs font-medium text-slate-500">Код заказа</p>
             <p className="mt-1 font-mono text-3xl font-extrabold tracking-wide text-slate-950 sm:text-4xl">
-              {order.publicCode}
+              {orderCode}
+            </p>
+          </div>
+
+          <div className="mt-3 rounded-xl border border-slate-100 px-4 py-3 sm:px-5">
+            <p className="text-xs font-medium text-slate-500">Номер билета</p>
+            <p className="mt-1 font-mono text-xl font-bold tracking-wide text-slate-900">{ticketNumber}</p>
+            <p className="mt-1.5 text-xs leading-5 text-slate-500">
+              {ticketIssuedSeparately
+                ? 'Отдельный номер билета музея / площадки.'
+                : 'Пока совпадает с кодом заказа. Отдельный номер будет выдан при подключении сканера музея.'}
             </p>
           </div>
 
@@ -109,7 +123,7 @@ export function BuyerTicketCard({ order, origin, emailHint = 'unknown', classNam
 
           <p className="mt-5 text-sm leading-6 text-slate-600">
             {isPaid
-              ? 'Покажите этот экран или распечатанный билет на входе. Код и QR - ваш пропуск.'
+              ? 'Покажите этот экран или распечатанный билет на входе. Сохраните код заказа и ссылку на страницу.'
               : 'После оплаты статус обновится. Сохраните код заказа и ссылку на билет.'}
           </p>
 
@@ -119,8 +133,8 @@ export function BuyerTicketCard({ order, origin, emailHint = 'unknown', classNam
             </p>
           ) : emailHint === 'skipped' ? (
             <p className="mt-3 rounded-xl bg-amber-50 px-3 py-2.5 text-sm leading-6 text-amber-900">
-              Письмо пока не отправляется автоматически. Сохраните код выше и ссылку на эту страницу - они нужны,
-              чтобы открыть билет позже.
+              Письмо пока не отправляется автоматически. Сохраните код заказа выше и ссылку на эту страницу - они
+              нужны, чтобы открыть билет позже.
             </p>
           ) : null}
         </div>
@@ -129,13 +143,13 @@ export function BuyerTicketCard({ order, origin, emailHint = 'unknown', classNam
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={qrUrl}
-            alt={`QR билета ${order.publicCode}`}
+            alt={`QR: ссылка на страницу билета ${orderCode}`}
             width={168}
             height={168}
             className="h-[168px] w-[168px] rounded-lg bg-white p-2 shadow-sm"
           />
           <p className="max-w-[11rem] text-center text-[11px] leading-4 text-slate-500">
-            QR ведёт на страницу билета. На входе достаточно кода заказа.
+            QR - ссылка на страницу билета.
           </p>
         </div>
       </div>
@@ -151,11 +165,11 @@ export function BuyerTicketCard({ order, origin, emailHint = 'unknown', classNam
         </button>
         <button
           type="button"
-          onClick={() => void copyText(order.publicCode, 'code')}
+          onClick={() => void copyText(orderCode, 'code')}
           className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
         >
           <Copy className="h-4 w-4" />
-          {copied === 'code' ? 'Скопировано' : 'Копировать код'}
+          {copied === 'code' ? 'Скопировано' : 'Копировать код заказа'}
         </button>
         <button
           type="button"

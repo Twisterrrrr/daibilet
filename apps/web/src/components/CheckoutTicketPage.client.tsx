@@ -101,7 +101,7 @@ export function CheckoutTicketView({ publicCode }: Props) {
           <p className="text-sm font-semibold text-emerald-100/80">Дайбилет</p>
           <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">Ваш билет</h1>
           <p className="mt-3 max-w-2xl text-base leading-7 text-emerald-50/90">
-            Сохраните страницу или распечатайте билет перед визитом. Код и QR - в карточке ниже.
+            Сохраните страницу или распечатайте билет перед визитом. Код заказа и QR - в карточке ниже.
           </p>
         </div>
       </section>

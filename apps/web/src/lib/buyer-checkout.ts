@@ -18,6 +18,11 @@ export type BuyerInternalOrderRecord = {
   amountRub: number | null;
   mode: string;
   confirmationUrl?: string | null;
+  /**
+   * Museum / venue ticket id when issued separately from CheckoutOrder.publicCode.
+   * Absent today: UI shows publicCode as temporary ticket number with an explicit caption.
+   */
+  ticketNumber?: string | null;
   source: 'internal';
 };
 
@@ -119,6 +124,7 @@ function normalizeInternalOrderRecord(raw: unknown): BuyerInternalOrderRecord | 
     amountRub: typeof row.amountRub === 'number' && Number.isFinite(row.amountRub) ? row.amountRub : null,
     mode: typeof row.mode === 'string' ? row.mode : 'STUB',
     confirmationUrl: typeof row.confirmationUrl === 'string' ? row.confirmationUrl : null,
+    ticketNumber: typeof row.ticketNumber === 'string' ? row.ticketNumber.trim() || null : null,
     source: 'internal',
   };
 }

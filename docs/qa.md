@@ -1,5 +1,11 @@
 # qa.md — открытые вопросы
 
+## 2026-08-07 - Order code ≠ ticket number (LOCKED draft)
+
+**LOCKED draft (owner 2026-08-07):** `CheckoutOrder.publicCode` = **код заказа** (buyer support / payment). **Номер билета** музея / площадки - отдельная сущность; сегодня отдельного id нет, UI временно показывает тот же `publicCode` с подписью, что до issuance они совпадают / номер «будет выдан при подключении сканера музея».
+
+**Не** считать collapse к одному числу product end-state. Issuance path A/B (кто выдаёт ticket id, когда пишем в order/ticket row) - follow-up, не блокер текущего UX.
+
 ## 2026-08-07 - Must-see hub volume (LOCKED)
 
 **LOCKED owner 2026-08-07** (см. [Project.md](./Project.md) § Must-see count tiers):
