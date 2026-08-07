@@ -61,6 +61,7 @@
 | Документ | Описание |
 |----------|----------|
 | [catalog-finance-projection.md](./catalog-finance-projection.md) | **Lock:** граница catalog ↔ finance, projection matrix, PurchaseProjection gap |
+| [museum-contract-readiness.md](./museum-contract-readiness.md) | **Museum-1:** роли/функции, Stage 0 Codex brief, Stage 1 schedule, Stage 2 LK |
 | [spb-finance-host.md](./spb-finance-host.md) | Host roles `.184` / `.159` / `.16` |
 | [phase-2-finance-supplier-blueprint.md](./phase-2-finance-supplier-blueprint.md) | Phase G product / checkout / supplier LC |
 | [integrations.md](./integrations.md) | Ticketscloud, Teplohod |

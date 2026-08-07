@@ -1,5 +1,19 @@
 # qa.md — открытые вопросы
 
+## 2026-08-07 - Museum-1 / first contract (открыто, owner)
+
+Контекст: [museum-contract-readiness.md](./museum-contract-readiness.md). Stage 0 = Path A linear admissions до первого договора.
+
+1. **54-ФЗ / fiscal:** на museum-1 чек от Daibilet в режиме SINGLE_MERCHANT - OK, или нужна другая схема до live money?
+2. **Формат `ticketNumber`:** генерирует Daibilet (наш id) или музей задаёт/импортирует внешний код до сканера?
+3. **Scanner day-1:** достаточно печатного номера + кода заказа для ручного контроля на входе, или scan API обязателен до подписания?
+4. **Email production:** канон SMTP на MSK web (`SMTP_*`) или письма с finance `.159`?
+5. **Support phone на билете:** единый номер Дайбилет vs телефон конкретного музея в supplier DTO?
+6. **Первый музей:** какой venue/город/slug для seed template (controlled, не wide CTA)?
+7. **Возвраты до Stage 2:** только ops manual - подтверждаем?
+
+Связанные gaps (не новые product forks): order≠ticket issuance; webhook e2e; reconcile; supportPhone в public DTO; purchases-by-email - см. ниже и readiness Stage 0 checklist.
+
 ## 2026-08-07 - Order code ≠ ticket number (LOCKED draft)
 
 **LOCKED draft (owner 2026-08-07):** `CheckoutOrder.publicCode` = **код заказа** (buyer support / payment). **Номер билета** музея / площадки - отдельная сущность; сегодня отдельного id нет, UI временно показывает тот же `publicCode` с подписью, что до issuance они совпадают / номер «будет выдан при подключении сканера музея».

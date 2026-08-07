@@ -1,9 +1,33 @@
 # Tasktracker — Daibilet
 
 **Обновлено:** 2026-08-07
-**Источники:** [Project.md](./Project.md), [current-state.md](./current-state.md), [migration-spb-to-msk.md](./migration-spb-to-msk.md), [widget-etalon-slugs.md](./widget-etalon-slugs.md), [content-blog-plan.md](./content-blog-plan.md), [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brief.md), [mobile-templates.md](./mobile-templates.md), [catalog-location-venue-canon.md](./catalog-location-venue-canon.md)
+**Источники:** [Project.md](./Project.md), [current-state.md](./current-state.md), [migration-spb-to-msk.md](./migration-spb-to-msk.md), [widget-etalon-slugs.md](./widget-etalon-slugs.md), [content-blog-plan.md](./content-blog-plan.md), [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brief.md), [mobile-templates.md](./mobile-templates.md), [catalog-location-venue-canon.md](./catalog-location-venue-canon.md), [museum-contract-readiness.md](./museum-contract-readiness.md)
 
 **Легенда:** ✅ done · 🔄 in progress · ⏳ todo · 🚫 blocked · ⚠️ deferred
+
+---
+
+## Epic: First museum contract (Stage 0) → Codex (2026-08-07)
+
+**Канон / brief:** [museum-contract-readiness.md](./museum-contract-readiness.md) (матрица ролей + copy-paste «Задача для Codex» + e2e).  
+**Path A only** (linear admissions / OPEN_DATE). Wide CTA out. Path B calc out. Secrets / `.159` env не трогать из catalog agents.
+
+| ID | Задача | Приоритет | Статус | Owner |
+|----|--------|-----------|--------|-------|
+| M1.DOC | Docs: readiness matrix Stage 0/1/2 + Codex brief | Критический | ✅ `docs/museum-contract-readiness.md` | Cursor arch |
+| M1.PAY | Public admission create-payment + `return_url` catalog `?order=` | Критический | ⏳ | Codex (UX.BUY-5) |
+| M1.WH | Webhook e2e sandbox PENDING→SUCCEEDED + verify + idempotency | Критический | ⏳ | Codex (FIN.W1 / MIG.9.5) |
+| M1.REC | Reconcile path (manual + timer draft) если webhook lost | Критический | ⏳ | Codex |
+| M1.TKT | Issuance: `ticketNumber` ≠ `publicCode`; order-by-code DTO полный | Критический | ⏳ | Codex |
+| M1.BUY | purchases-by-email / m2m для account fan-in | Высокий | ⏳ | Codex (UX.BUY-6 / CF.P1c) |
+| M1.SUP | Museum supplier template + LC orders + legal/bank approve + supportPhone DTO | Критический | ⏳ | Codex (FIN.W2) |
+| M1.OPS | Runbook: reconcile + manual refund/cancel + support search | Высокий | ⏳ | Codex |
+| M1.MAIL | Buyer email link (finance mail или SMTP) / documented fallback | Высокий | ⏳ | Codex + owner SMTP |
+| M1.E2E | E2e matrix T1-T8 из readiness doc перед договором | Критический | ⏳ | Codex + Cursor smoke |
+| M1.S1 | Stage 1 outline: scheduled-events supplier (sessions/capacity) | Средний | ⚠️ deferred after M1 | - |
+| M1.S2 | Stage 2 outline: full LK clients/orders/fin reporting | Средний | ⚠️ deferred after S1 | - |
+
+**Acceptance museum-1:** см. блок «Задача для Codex» в readiness doc. Catalog buyer ticket UX (Path A UI) = ✅ Cursor; блокер = finance fulfillment.
 
 ---
 
@@ -1698,6 +1722,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | Дата | Изменение |
 |------|-----------|
+| 2026-08-07 | **M1.* epic ✅ docs** - [museum-contract-readiness.md](./museum-contract-readiness.md): роли/функции, Stage 0 Codex brief (pay/webhook/reconcile/ticket issuance/supplier LC), Stage 1 schedule + Stage 2 full LK outlines; Tasktracker M1.*; qa Museum-1 questions; docs-only no web deploy |
 | 2026-08-07 | **FIN.W1/MIG.9.5 webhook cabinet ✅** - owner: URL = `finance-api…/yookassa/webhook` (events succeeded/waiting_for_capture/canceled; было ошибочно `pay.`); next = e2e sandbox PENDING→SUCCEEDED; no web deploy |
 | 2026-08-07 | **FIN.LC3 ✅** - `.159` YooKassa sandbox create-payment + STUB smoke; health 200; VERIFY=1; webhook API register 401 → FIN.W1/MIG.9.5 owner cabinet; wide CTA / `.184` not touched |
 | 2026-08-07 | **F5.3b ✅** - `public-venue-read.js`; next city/venue/search без dto.js; server.js retire out of scope; dual-edit landing-rules docs cleared |

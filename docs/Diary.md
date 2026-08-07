@@ -1,3 +1,38 @@
+## 2026-08-07 - Museum-1 readiness: roles matrix + Codex Stage 0 brief
+
+### Наблюдения
+- Owner: продумать все логичные функции контура для всех ролей; поставить Codex задачу до первого договора с музеем; затем Stage 1 (поставщик с расписанием) и Stage 2 (полный ЛК: клиенты/заказы/финотчётность).
+- Catalog Path A buyer UX (thin checkout, ticket page, purchases list, demo) уже закрыт Cursor; finance create-payment sandbox (FIN.LC3) OK; webhook e2e / reconcile / issuance order≠ticket / public order DTO / supportPhone / SMTP - ещё gaps.
+- Wide CTA и Path B calc для музея запрещены product lock.
+
+### Решения
+- Новый канон: [museum-contract-readiness.md](./museum-contract-readiness.md) - матрица ролей, Stage 0 DONE/TODO/TEST, e2e T1-T8, Stage 1/2 outlines, out-of-scope, copy-paste «Задача для Codex».
+- Tasktracker epic `M1.*` (критический) указывает Codex на этот doc.
+- qa.md: блок Museum-1 owner questions (fiscal, ticket format, scanner day-1, SMTP host, support phone, first venue, refunds).
+- Docs-only: commit+push, без MSK web deploy.
+
+### Проблемы
+- Launch-blockers для договора остаются на Codex/`.159`: admission create-payment public path, return_url catalog, webhook e2e, reconcile, ticket issuance, order DTO, supplier LC Path A.
+
+---
+
+## 2026-08-07 - Account purchases: compact list + download
+
+### Наблюдения
+- Owner: `/account/purchases` - билеты удобным списком, не в полный рост; скачать прямо там.
+- Full ticket+map остаётся на `/checkout/ticket/{code}`; PDF API в каталоге нет - только print CSS + `window.print`.
+
+### Решения
+- `BuyerOrderCard` → компактные строки (статус, название, дата/сумма, действия); без полной `BuyerTicketCard` в списке.
+- Primary: «Скачать» → `openBuyerTicketDownload` → `/checkout/ticket/{code}?print=1` (новая вкладка, auto `window.print` / Save as PDF).
+- Secondary: «Открыть» → страница билета с картой.
+- Кнопка на карточке билета: «Скачать / распечатать».
+
+### Проблемы
+- Настоящий server-side PDF ещё нет; UX опирается на print dialog браузера.
+
+---
+
 ## 2026-08-07 - Buyer ticket map: uniform page scroll
 
 ### Наблюдения
