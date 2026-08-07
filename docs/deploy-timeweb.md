@@ -1,23 +1,23 @@
 ﻿# Deploy: Timeweb Cloud MVP
 
 Дата: 2026-06-20.  
-**Исторический runbook** (ранний MVP на СПб). **Актуально 2026-08-01:** live catalog + web build = MSK `201.24.125.184` (`daibilet-msk`); SPB `213.171.7.16` retired from pipeline - см. [Project.md](./Project.md), [spb-finance-host.md](./spb-finance-host.md), `deploy/scripts/deploy-prod-next.sh`.
+**Исторический runbook** (ранний MVP на СПб). **Актуально 2026-08-07:** live catalog + web build = MSK `201.24.125.184` (`daibilet-msk`). SPB Intelligent Hoopoe `213.171.7.16` = **труп** (MIG.9.7) - см. [Project.md](./Project.md), [spb-finance-host.md](./spb-finance-host.md), `deploy/scripts/deploy-prod-next.sh`.
 
 Цель: поднять новый легкий MVP на сервере Timeweb Cloud без потери старой версии `daibilet.ru`.
 
-## Известная инфраструктура (snapshot 2026-06 - устарело)
+## Известная инфраструктура (канон)
 
-- ~~IPv4: `213.171.7.16`~~ → **prod catalog:** `201.24.125.184`
+- **Prod catalog IPv4:** `201.24.125.184`
 - SSH prod: `ssh daibilet-msk` (`daibilet_msk80_key`).
 - Public: `https://daibilet.ru` (DNS → MSK).
 - Admin: `https://admin.daibilet.ru`.
 - API: `https://api.daibilet.ru`.
 
-<details><summary>Legacy IP snapshot (Intelligent Hoopoe, do not use as builder)</summary>
+<details><summary>Legacy IP snapshot (Intelligent Hoopoe `.16` - труп, не использовать)</summary>
 
-- IPv4: `213.171.7.16`.
+- IPv4: `213.171.7.16` (historical MVP host).
 - IPv6: `2a03:6f01:1:2::ef11`.
-- SSH (пока VM жив): `ssh -i ~/.ssh/daibilet_staging_key root@213.171.7.16`.
+- SSH key `daibilet_staging_key` - legacy; не ops-канон.
 
 </details>
 
@@ -84,7 +84,7 @@ TICKETSCLOUD_GRPC_ENDPOINT=simple.ticketscloud.com:443
 TICKETSCLOUD_WIDGET_BASE_URL=https://ticketscloud.org/v1/widgets/common
 
 TEP_API_URL=https://api.teplohod.info/v1
-# Teplohod: токен не нужен, доступ по белому IP сервера (213.171.7.16 в allowlist)
+# Teplohod: токен не нужен, доступ по белому IP catalog-хоста (201.24.125.184 в allowlist)
 TEP_WIDGET_ID=14208
 TEP_WIDGET_BASE_URL=https://teplohod.info
 ```
@@ -209,7 +209,7 @@ curl -u "admin@daibilet.ru:<password>" -X POST https://admin.daibilet.ru/api/v1/
 curl "https://api.daibilet.ru/api/public/stats?refresh=1"
 ```
 
-Teplohod лучше проверять именно на сервере `213.171.7.16`, потому что этот IP добавлен в whitelist.
+Teplohod sync проверять на MSK `201.24.125.184` - этот IP должен быть в whitelist партнёра (не старый `.16`).
 
 ## Smoke before DNS/upstream switch
 

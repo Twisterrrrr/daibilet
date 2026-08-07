@@ -144,13 +144,14 @@ packages/config   — shared tsconfig/eslint
 
 **Write/sync path:** legacy `server.js` / sync scripts; после sync — `invalidatePublicCaches({ warm: true })` + Next revalidate.
 
-### Host roles (lock 2026-07-30 · SPB builder retired 2026-08-01)
+### Host roles (lock 2026-07-30 · MSK-only catalog 2026-08-07)
 
 | Server | IP | Role |
 |--------|-----|------|
 | Friendly Pheasant | `201.24.125.184` | **battle catalog** - public, admin, import, SEO, TC/Teplohod catalog; **единственный web build host** |
 | Diligent Polydeuces | `85.193.80.159` | **battle finance** - checkout, supplier LK, orders/purchases, YooKassa |
-| ~~Intelligent Hoopoe~~ | ~~`213.171.7.16`~~ | **retired** из deploy/build pipeline (owner: удалить VM в Timeweb). Не builder, не apex DNS |
+
+~~Intelligent Hoopoe `213.171.7.16`~~ - **труп** (owner 2026-08-07): снят из deploy/docs/scripts inventory. Wipe VM в панели Timeweb = owner, если ещё биллится. Не SSH, не builder, не apex DNS.
 
 ### Web deploy (канон host 2026-08-01 · cadence 2026-08-05)
 
@@ -162,7 +163,7 @@ BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh
 - Скрипт сам: `git pull` → **stop** `daibilet-web` → save healthy `.next`→`.next.prev` → `pnpm web:build` (heap 5120Mi, default `EVENT_SSG_TOP_N=40`) → on fail restore `.next.prev`+start web; on ok restart api/web → nginx static/cache hygiene.
 - Event SSG: build-phase public-api retries + soft TimeoutError on `/events/[slug]` (не валит весь build). Override: `EVENT_SSG_TOP_N=100` или `0` (skip event SSG). Runtime: ISR `revalidate=7200` + `unstable_cache` (tags `event-page` / `event-page:{slug}`); on-demand via `POST /api/internal/revalidate` `{ slug }` + Bearer `DAIBILET_NEXT_REVALIDATE_SECRET`.
 - Destinations chrome (`getCachedDestinations`): TTL **86400** + tags `destinations` / `public-surfaces` (не капит event ISR). Bust: admin city update → `revalidateNextDestinations`, или вручную `POST /api/internal/revalidate` `{ "tags": ["destinations"] }`.
-- **Не** билдить на SPB `.16` и не тащить `.next` tar с другого хоста.
+- Build только на MSK (или CI → swap на MSK). Не тащить `.next` tar с чужого хоста.
 - **Cadence:** основная работа локально / preview; после итерации - **commit + push**. Web deploy на live - **пачкой раз в сутки или по явному запросу owner** («выкатывай» / «деплой»). Не после каждого мелкого UI/контент-фикса (lock + 10–20 мин build на VPS). Исключения сразу: live 500, критичный хаб-редирект, security, launch-blocker без локальной проверки. Seed/apply prod DB - по запросу или в том же batch. Docs-only / handoff = commit+push **без** web deploy.
 - SSH: `daibilet-msk` / `daibilet_msk80_key`. Finance `.159` не трогать из catalog deploy.
 

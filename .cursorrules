@@ -17,7 +17,7 @@
      - **fallback:** `BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh` на MSK;
      - **не** после каждой итерации, а пачкой / по запросу owner («выкатывай»);
      - **исключения (деплой сразу):** live HTTP 500 / сломанный критичный хаб-редирект / security / launch-blocker.
-   - **Не** использовать SPB `.16` как builder.
+   - Web build / live catalog только MSK `.184` (`daibilet-msk`). SPB Intelligent Hoopoe `.16` снят из inventory (труп; wipe в панели Timeweb = owner).
    - **Канон docs vs runtime:** docs-only / handoff = commit + push, **без** web deploy. Runtime/UI/код копятся в ветке через commit + push; на live попадают batch/по запросу (см. выше). Seed/apply в **prod DB** - только по запросу owner или как часть согласованного batch (не «на каждый чих»).
 2. Обновляй Diary/Tasktracker при значимых архитектурных или launch-blocker фиксах.
 3. Сохраняй совместимость MVP-ветки `feat/next-monorepo`; не плодить параллельные расхождения с Codex.

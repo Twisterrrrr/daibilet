@@ -1,12 +1,12 @@
 # СПб / finance host — canonical roles (lock 2026-07-30)
 
-**Обновлено:** 2026-08-01  
+**Обновлено:** 2026-08-07  
 **План миграции:** [spb-migrate-4gb-to-8gb.md](./spb-migrate-4gb-to-8gb.md)  
 **Phase G product:** [phase-2-finance-supplier-blueprint.md](./phase-2-finance-supplier-blueprint.md)
 
 **MSK Timeweb SG:** панель **Fair Snipe** (2026-07-31) - egress TCP `80`/`443` → finance `.159` ✅ (раньше self-loop был у **Daring Aquila** ≈ Friendly Pheasant `.184`). DNS `:53` any рекомендуется. Step 1 network MSK→finance **closed**.
 
-**Web deploy (2026-08-01):** build **только** на MSK `.184` (`deploy-prod-next.sh`). SPB `.16` **не** builder - owner удаляет VM в Timeweb (MIG.9.7).
+**Web deploy:** build **только** на MSK `.184` (`deploy-prod-next.sh` / CI Deploy MSK web).
 
 ## Role matrix (canonical)
 
@@ -14,11 +14,12 @@
 |--------|-----|----------|-------------|
 | Friendly Pheasant (МСК) | `201.24.125.184` | catalog / prod + **web build** | **battle catalog:** public, admin, import, SEO, TC/Teplohod catalog |
 | Diligent Polydeuces (СПб 8 ГБ) | `85.193.80.159` | finance API + TLS vhosts | **battle finance:** primary finance, supplier LK, buyer checkout (`pay`) |
-| ~~Intelligent Hoopoe (СПб 4 ГБ)~~ | ~~`213.171.7.16`~~ | leftover post-MIG.8 | **retired from pipeline** → delete VM in Timeweb |
 
-**Коротко:** `.184` = battle catalog + build · `.159` = battle finance · `.16` = demolish (owner).
+**Коротко:** `.184` = battle catalog + build · `.159` = battle finance.
 
-SSH: MSK `daibilet_msk80_key` / `daibilet-msk` · `.16` `daibilet_staging_key` (пока VM жив) · `.159` `daibilet_spb_finance` (alias `daibilet-spb8` / `spb8` / `daibilet-finance`). Codex также имеет свой SSH-ключ на `.159` (активный деплой - **не** перебивать параллельным SSH без координации).
+~~Intelligent Hoopoe `213.171.7.16`~~ - **труп** (owner 2026-08-07). Снят из repo/ops inventory (MIG.9.7 ✅). Wipe VM в панели Timeweb = owner, если ещё биллится. Не SSH, не builder, не apex.
+
+SSH: MSK `daibilet_msk80_key` / `daibilet-msk` · `.159` `daibilet_spb_finance` (alias `daibilet-spb8` / `spb8` / `daibilet-finance`). Codex также имеет свой SSH-ключ на `.159` (активный деплой - **не** перебивать параллельным SSH без координации). Legacy `daibilet_staging_key` указывал на `.16` - больше не использовать.
 
 ### Состояние `.159` (2026-07-30, Cursor deploy P0+P1)
 
@@ -68,47 +69,23 @@ SSH: MSK `daibilet_msk80_key` / `daibilet-msk` · `.16` `daibilet_staging_key` (
 | `finance-api.daibilet.ru` | API / projection / webhooks Host | ✅ |
 | `finance.daibilet.ru` | legacy/опциональный vhost | ❌ не создан (не обязателен) |
 
-Apex `daibilet.ru` / `www` / `api` / `admin` каталога остаются на `.184` (не на `.16`).
+Apex `daibilet.ru` / `www` / `api` / `admin` каталога остаются на `.184`.
 
 ---
 
-## Состояние `213.171.7.16` (retired from pipeline 2026-08-01)
+## ~~Intelligent Hoopoe `.16`~~ - retired / труп (2026-08-07)
 
-SSH probe: `daibilet_staging_key` → OK. Public web/api/timers уже off (MIG.8). **Не** использовать как builder. Удаление VM - только owner в панели Timeweb.
+Owner: VM «уже труп» - убрана из активных docs/scripts. Агент **не** удаляет VM в панели Timeweb; если биллинг ещё идёт - wipe = owner.
 
-### Что можно безопасно снести вместе с VM
-
-| Компонент | Примечание |
-|-----------|------------|
-| `/opt/daibilet`, `/opt/daibilet-staging`, `/opt/daibilet-spbboats-backup-*` | leftover app code |
-| Postgres Docker `daibilet-tours-postgres` `:5437` | **не** live catalog (truth = MSK); не money DB |
-| nginx `daibilet.conf` + старые LE certs на этом хосте | apex DNS уже на `.184` |
-| `/root/backups/*` на диске `.16` | перед wipe - optional scp off-box |
-| SSH host keys / `daibilet_staging_key` доступ | после delete VM ключ бесполезен для `.16` |
-| failed `daibilet-*-rebuild.service` units | мусор |
-
-### Что должно остаться (НЕ на `.16`)
-
-| Компонент | Где |
-|-----------|-----|
+| Что было на `.16` | Куда ушло / статус |
+|-------------------|--------------------|
 | Live catalog web/api/PG/nginx/TLS | MSK `.184` |
-| Finance API / pay / supplier / YooKassa | `.159` |
-| Apex DNS `daibilet.ru` / `www` / `api` / `admin` | → `.184` |
-| Finance DNS `pay` / `supplier` / `finance-api` | → `.159` |
-| TC/TEP sync cron + secrets | MSK `.184` (убедиться Teplohod allowlist = `.184`) |
+| Finance / pay / supplier / YooKassa | `.159` |
+| Apex DNS | → `.184` |
+| TC/TEP sync + Teplohod allowlist | MSK **`201.24.125.184`** (не `.16`) |
+| Staging/build scaffolding | не использовать; build = MSK/CI |
 
-### Исторический inventory (MIG.8)
-
-| Компонент | Статус |
-|-----------|--------|
-| Postgres Docker `:5437` (`daibilet-tours-postgres`) | running leftover (не live) |
-| nginx + TLS certs | reserve |
-| `/opt/daibilet`, `/opt/daibilet-staging` | код на диске |
-| Staging units `daibilet-*-staging` | disabled |
-| `daibilet-web` / `daibilet-api` / TC timer / crontab sync | stop+disable (MIG.8) |
-| Snapshots `/root/backups/daibilet-pg-mig8-*` | на диске `.16` |
-
-Не коммитить dump/`.env` в git.
+Не коммитить dump/`.env` в git. Ключ `daibilet_staging_key` - legacy, не ops-канон.
 
 ---
 
@@ -118,10 +95,10 @@ SSH probe: `daibilet_staging_key` → OK. Public web/api/timers уже off (MIG.
 2. **Не** включать TC/TEP catalog sync на СПб finance - source of truth каталога = МСК.
 3. Finance PG на `.159` - **отдельный** volume/DB; не restore catalog dump как money DB.
 4. Catalog ↔ finance **только API / projection**; internal orders/purchases/suppliers живут на finance; ExternalOrder mirror остаётся на catalog до явного bridge.
-5. YooKassa: только internal/PLATFORM path; webhook → новый finance API; старый держать до smoke; затем отключить. **Не** для TC/TEP widgets.
-6. **`.16` retired from pipeline (2026-08-01):** optional off-box backup → **удалить VM Intelligent Hoopoe в панели Timeweb**. Не держать как builder.
+5. YooKassa: только internal/PLATFORM path; webhook → finance API. **Не** для TC/TEP widgets. **Не** трогать secrets `.159` без owner.
+6. ~~`.16`~~ не в inventory. Wipe в Timeweb = owner.
 7. Public DNS apex остаётся на `201.24.125.184`.
 8. Ownership: Cursor = catalog/widgets; Codex = finance/admission/checkout на `.159`. См. [catalog-finance-projection.md](./catalog-finance-projection.md).
-9. Web deploy = **MSK-only** (`deploy-prod-next.sh` на `.184`).
+9. Web deploy = **MSK-only** (`deploy-prod-next.sh` / CI на `.184`).
 
 См. [spb-migrate-4gb-to-8gb.md](./spb-migrate-4gb-to-8gb.md), [migration-spb-to-msk.md](./migration-spb-to-msk.md).

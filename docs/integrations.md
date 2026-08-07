@@ -199,7 +199,7 @@ Base URL:
 
 - прямые запросы с локальной машины могут не проходить, если локальный IP не в allowlist;
 - для разработки парсера используйте fixture-ответы или `npm run tep:fixture-bridge` + `TEP_API_URL=http://127.0.0.1:8787/v1`;
-- боевой импорт и auto-sync — только с сервера `213.171.7.16` (или другого IP из allowlist);
+- боевой импорт и auto-sync - только с MSK catalog `201.24.125.184` (IP в Teplohod allowlist);
 - в админке при 403 показывать: `source_unreachable_or_ip_not_allowed`.
 
 Рекомендуемые переменные окружения:

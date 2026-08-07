@@ -1,6 +1,6 @@
 # Города вне публичного каталога destinations
 
-Дата аудита: 2026-07-19 (prod DB `213.171.7.16`)  
+Дата аудита: 2026-07-19 (prod DB тогда на historical host `213.171.7.16`; live catalog сейчас MSK `.184`)
 **Обновление политики:** 2026-07-19 — см. ниже; код `data/geo/city-routing.ru.json` + `isPublicRegionName`.
 
 Критерий включения в исходную выборку: distinct `City.title` с событиями **READY** и/или **saleable**, но город **не** был в `standaloneCities` на момент аудита (36 city destinations).

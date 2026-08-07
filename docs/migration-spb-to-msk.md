@@ -10,7 +10,7 @@
 | Роль | IP | Факт |
 |------|-----|------|
 | **Battle catalog (МСК)** | `201.24.125.184` | Apex DNS `daibilet.ru` / `www` → сюда; TLS+PG+web/api live; **web build host** |
-| **Leftover СПб 4 ГБ** | `213.171.7.16` | Public web/api сняты; **pipeline retired 2026-08-01** → owner delete VM (не apex DNS, не builder) |
+| **~~СПб 4 ГБ Intelligent Hoopoe~~** | ~~`213.171.7.16`~~ | **труп** (MIG.9.7 ✅ 2026-08-07) - снят из inventory; wipe VM = owner Timeweb |
 | **Battle finance (СПб 8 ГБ)** | `85.193.80.159` | `pay` / `supplier` / `finance-api` DNS+TLS ✅ |
 
 Исторический снимок 2026-07-29 ниже сохранён как audit trail (на момент снимка apex ещё указывал на `.16`).
@@ -21,7 +21,7 @@
 
 | Роль | Хост | IP | SSH | Статус (на дату снимка) |
 |------|------|-----|-----|--------|
-| **Prod live (СПб)** | `6726557-ls758282.twc1.net` | `213.171.7.16` | `root` + `%USERPROFILE%\.ssh\daibilet_staging_key` | *тогда* DNS apex → сюда; стек полный · **сейчас** leftover build/reserve |
+| **Prod live (СПб)** | `6726557-ls758282.twc1.net` | `213.171.7.16` | `root` + `daibilet_staging_key` | *тогда* DNS apex → сюда · **сейчас** труп / не ops |
 | **Цель (МСК)** | `msk-1-vm-5a5i` | `201.24.125.184` | `ssh daibilet-msk` (`daibilet_msk80_key`) | *тогда* SSH OK; код есть; БД/TLS нет · **сейчас** battle catalog + apex DNS |
 | ~~Старый МСК IP~~ | - | ~~`81.19.135.200`~~ | - | Снят: снаружи TCP 22 был `filtered` (TSPU/путь); IP заменён |
 
@@ -96,13 +96,13 @@ Host daibilet-msk msk
 1. ✅ TTL заранее снизить (если ещё не низкий).
 2. ✅ A-записи `daibilet.ru` / `www` → `201.24.125.184` (MIG.7, 2026-07-30).
 3. ✅ Проверка снаружи: HTTPS 200 post-cutover (см. Tasktracker MIG.7).
-4. ✅ СПб public снят (MIG.8); IP `.16` оставлен как build/reserve до finance smoke (MIG.9.4/.9.6), не удалять сразу.
+4. ✅ СПб public снят (MIG.8); `.16` later retired (MIG.9.7).
 
 ### C. После стабилизации
 
 1. ✅ Обновить docs (`current-state.md`) - prod IP = МСК.
-2. ⏳ Обновить deploy-скрипты/CI secrets, если захардкожен `213.171.7.16`.
-3. ✅ MIG.8 (2026-07-30): СПб public web/api + TC timer + crontab catalog/orders sync сняты; PG snapshot в `/root/backups/`; `.16` = leftover build/reserve ([spb-finance-host.md](./spb-finance-host.md)). IP СПб не удалять до MIG.9.7.
+2. ✅ Deploy/docs: нет активного хардкода `.16` как build/deploy host (2026-08-07).
+3. ✅ MIG.8 + MIG.9.7: `.16` = труп в inventory; wipe VM в Timeweb = owner ([spb-finance-host.md](./spb-finance-host.md)).
 4. ⏳ Отвязать старый floating IP `81.19.135.200` в панели при необходимости.
 
 ---

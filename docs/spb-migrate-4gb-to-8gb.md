@@ -11,15 +11,15 @@
 |------------------|-----|----------|-------------|
 | **Friendly Pheasant** | `201.24.125.184` | catalog / prod + web build | **battle catalog:** public, admin, import, SEO, TC/Teplohod catalog |
 | **Diligent Polydeuces** | `85.193.80.159` | finance API + TLS | **battle finance:** primary finance / supplier / buyer checkout |
-| ~~**Intelligent Hoopoe**~~ | ~~`213.171.7.16`~~ | post-MIG.8 leftover | **retired from pipeline 2026-08-01** → owner deletes VM |
+| ~~**Intelligent Hoopoe**~~ | ~~`213.171.7.16`~~ | **труп** | **MIG.9.7 ✅ 2026-08-07** - снят из inventory; wipe VM = owner Timeweb |
 
-**Коротко:** `.184` = battle catalog + build · `.159` = battle finance · `.16` = demolish (owner Timeweb).
+**Коротко:** `.184` = battle catalog + build · `.159` = battle finance · `.16` = dead (owner wipe if billed).
 
 | SSH key (факт) | Host |
 |----------------|------|
 | `daibilet_msk80_key` / `daibilet-msk` | `201.24.125.184` |
-| `daibilet_staging_key` | `213.171.7.16` (пока VM жив) |
 | `daibilet_spb_finance` (`daibilet-finance-159`) | `85.193.80.159` |
+| ~~`daibilet_staging_key`~~ | ~~`213.171.7.16`~~ (legacy; не ops) |
 
 ---
 
@@ -29,7 +29,7 @@
 
 1. Поднять **`85.193.80.159` как primary finance/supplier/checkout** (не «слепо перенести все роли 4 ГБ»).
 2. Держать **`201.24.125.184` как battle catalog** - только perf / DTO / SSR / DNS hygiene (AAAA уже снят owner).
-3. ~~Использовать `213.171.7.16` временно как staging/build~~ → **done/superseded 2026-08-01:** `.16` retired from pipeline; delete VM in Timeweb.
+3. ~~Использовать `213.171.7.16` временно как staging/build~~ → **труп / MIG.9.7 ✅ 2026-08-07:** снят из inventory; wipe VM в Timeweb = owner.
 4. Связь **catalog ↔ finance только через API** (без shared mess / shared money DB).
 5. YooKassa webhook → новый finance API; старый webhook держать до подтверждения, затем отключить.
 
@@ -61,7 +61,7 @@
 
 ---
 
-## 2. Inventory: что живёт на `213.171.7.16` сегодня (после MIG.8)
+## 2. Inventory: что жило на `213.171.7.16` после MIG.8 (historical; VM = труп 2026-08-07)
 
 Источник: [spb-finance-host.md](./spb-finance-host.md) + снимок MIG.8 в Diary 2026-07-30.
 
@@ -170,12 +170,12 @@ Host daibilet-spb8 spb8 daibilet-finance
 - [ ] На `.159` **нет** active TC/TEP **catalog** sync timers.
 - [ ] Apex `daibilet.ru` всё ещё `201.24.125.184`.
 
-### Phase 7 - Retire `.16`
+### Phase 7 - Retire `.16` ✅ 2026-08-07
 
-- [ ] Final backup с `213.171.7.16` (PG dump / volume / configs) → off-box или `/root/backups` на `.159`.
-- [ ] Stop services on `.16`; Timeweb snapshot retention **7–14 дней**.
-- [ ] Delete / power-off VM после retention (owner).
-- [ ] Docs: canonical SPB finance = `85.193.80.159`; `.16` только historical.
+- [x] Docs/scripts: `.16` снят из активного inventory (MSK-only).
+- [x] Owner confirmed: Intelligent Hoopoe - труп.
+- [ ] **Owner:** wipe/power-off VM в панели Timeweb, если ещё биллится (агент панель не трогает).
+- [x] Docs: canonical SPB finance = `85.193.80.159`; `.16` только historical / Diary.
 
 ---
 
@@ -186,7 +186,7 @@ Host daibilet-spb8 spb8 daibilet-finance
 | Phase 0–1 fail | Чинить `.159`; `.16` и `.184` не трогать |
 | Finance smoke fail | DNS finance hostname вернуть / оставить stub; webhook оставить на старом endpoint |
 | YooKassa dual period | Оба webhook до confirmed; затем только `.159` |
-| Build fail на `.159` | Временно build на `.16` или MSK/CI |
+| Build fail | Build на MSK или CI Deploy MSK web (не `.16`) |
 | Случайно сменили apex | Немедленно A → `201.24.125.184` |
 | Нужен откат retire | Не delete disk `.16` в день cutover |
 
@@ -203,7 +203,7 @@ Host daibilet-spb8 spb8 daibilet-finance
 - [ ] Phase 4 optional staging/build move
 - [ ] Phase 5 YooKassa new webhook + keep old until confirmed
 - [ ] Phase 6 smoke
-- [ ] Phase 7 backup + retire `.16`
+- [x] Phase 7 retire `.16` from inventory (VM wipe = owner Timeweb)
 - [x] Docs lock: `spb-finance-host.md` + MIG.9 tracker (TLS/DNS cutover ещё open)
 
 ---
@@ -218,7 +218,7 @@ Grep hitlist после retire: `spb-finance-host.md`, `current-state.md`, `depl
 
 ## 7. Рекомендация одной строкой
 
-**`.184` = battle catalog · `.159` = battle finance (checkout/supplier) · `.16` = temporary scaffolding → delete after smoke.**
+**`.184` = battle catalog · `.159` = battle finance (checkout/supplier) · `.16` = труп (MIG.9.7 ✅; wipe VM = owner Timeweb).**
 
 ## 8. Следующий физический шаг
 

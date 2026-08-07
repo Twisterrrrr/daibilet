@@ -1,8 +1,9 @@
 # Deploy: Staging на Timeweb Cloud
 
-Дата: 2026-07-09.
+Дата: 2026-07-09.  
+**Статус 2026-08-07:** исторический runbook. Хост staging тогда был SPB `.16` (Intelligent Hoopoe) - **труп**, не SSH. Актуальный catalog/build = MSK `201.24.125.184`. Staging DB name `daibilet_staging` в docker-compose - локальный/optional контур, не привязка к `.16`.
 
-Цель: проверить `integrate/mvp-launch` на staging **без затирания** prod `daibilet.ru`.
+Цель (историческая): проверить `integrate/mvp-launch` на staging **без затирания** prod `daibilet.ru`.
 
 ## Директории
 
@@ -13,10 +14,11 @@
 | Admin static | `/var/www/daibilet/staging-admin` |
 | Prod (не трогать) | `/opt/daibilet` |
 
-## Первичная установка на сервере
+## Первичная установка на сервере (historical - не выполнять на `.16`)
 
 ```bash
-ssh root@213.171.7.16
+# Канон сейчас: ssh daibilet-msk (201.24.125.184), не Intelligent Hoopoe.
+ssh daibilet-msk
 
 cd /opt
 git clone -b integrate/mvp-launch https://github.com/Twisterrrrr/daibilet.git daibilet-staging

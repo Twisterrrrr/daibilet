@@ -1,7 +1,7 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  // MSK prod ~8Gi / 4 CPU: allow parallel build. (SPB 3.8Gi used cpus:1 + workerThreads:false.)
+  // MSK prod ~8Gi / 4 CPU: allow parallel build. (Legacy SPB 3.8Gi used cpus:1 + workerThreads:false.)
   eslint: { ignoreDuringBuilds: true },
   typescript: { ignoreBuildErrors: true },
   productionBrowserSourceMaps: false,

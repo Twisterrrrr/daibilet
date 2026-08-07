@@ -2,8 +2,8 @@
 # F3 prod deploy (MSK-only canon 2026-08-01): feat/next-monorepo
 # → Next apps/web :3001 + legacy API :4000 on daibilet-msk (201.24.125.184).
 #
-# Run ON the catalog host (ssh daibilet-msk). Do NOT build on SPB .16 / Intelligent Hoopoe
-# (retired from pipeline; owner deletes that VM in Timeweb).
+# Run ON the catalog host (ssh daibilet-msk / 201.24.125.184). MSK-only build.
+# SPB Intelligent Hoopoe (.16) retired / труп - never build or scp .next from there.
 #
 # Deploy discipline (CPU/RAM):
 # - One controlled restart sequence only: stop web -> build -> restart api -> start web.

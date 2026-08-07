@@ -11,7 +11,7 @@
 Полные тексты новых статей: `content/blog/*.md` → `apps/web/src/data/blog-article-bodies.ts` (`npm run blog:sync-bodies`).
 
 ### Источник B — БД prod `Article`
-Запрос 2026-07-19 с `root@213.171.7.16` (`/opt/daibilet`, `NODE_PATH=apps/backend/node_modules`, скрипт `.cjs`): **13 строк, все `PUBLISHED`**.  
+Запрос 2026-07-19 с historical prod host `root@213.171.7.16` (`/opt/daibilet`, `NODE_PATH=apps/backend/node_modules`, скрипт `.cjs`): **13 строк, все `PUBLISHED`**. Live catalog сейчас MSK `.184`.
 Slug-набор **совпадает** со статикой 1:1 (заголовки в БД чуть длиннее SEO-варианты).
 
 | # | Slug | Статика (title) | БД (title, кратко) |

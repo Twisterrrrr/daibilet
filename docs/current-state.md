@@ -1,12 +1,12 @@
 # Текущее состояние Daibilet
 
-**Обновлено:** 2026-08-01  
+**Обновлено:** 2026-08-07  
 **Ветка:** `feat/next-monorepo`  
 **Prod live (DNS):** `201.24.125.184` (МСК `msk-1-vm-5a5i`) · Next `:3001` · API `:4000` · PG Docker `:5437` · TLS nginx · **catalog truth**  
-**Роли:** `.184` battle catalog (+ **единственный web build**) · `.159` battle finance · `.16` Intelligent Hoopoe **retired from pipeline** (owner delete VM) · [spb-finance-host.md](./spb-finance-host.md)  
-**Web deploy canon:** MSK-only - `BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh` на `daibilet-msk`  
+**Роли:** `.184` battle catalog (+ **единственный web build**) · `.159` battle finance · [spb-finance-host.md](./spb-finance-host.md)  
+**Web deploy canon:** MSK-only - `BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh` на `daibilet-msk` (или CI Deploy MSK web)  
 **Catalog ↔ finance projection:** [catalog-finance-projection.md](./catalog-finance-projection.md) · P0 PurchaseProjection · P1 public read client · P2 venue/city UI · no wide internal sales until P0  
-**СПб 4 ГБ:** `213.171.7.16` - MIG.8 off public; **не** builder; удаление VM = owner Timeweb  
+**СПб 4 ГБ Intelligent Hoopoe (`213.171.7.16`):** **труп** - снят из inventory (MIG.9.7 ✅); wipe VM в Timeweb = owner  
 **СПб 8 ГБ:** `85.193.80.159` Diligent Polydeuces - primary finance/checkout/supplier
 
 > Детальные чеклисты: [Tasktracker.md](./Tasktracker.md)  
@@ -14,12 +14,12 @@
 
 ---
 
-## Инфра-снимок перед переездом СПб → МСК (2026-07-29)
+## Инфра-снимок перед переездом СПб → МСК (2026-07-29) - historical
 
-| | СПб prod | МСК цель |
+| | СПб prod (тогда) | МСК цель |
 |--|----------|----------|
-| IP | `213.171.7.16` | `201.24.125.184` (бывш. `81.19.135.200` снят - TCP22 filtered) |
-| SSH | `daibilet_staging_key` | `daibilet_msk80_key` / alias `daibilet-msk` |
+| IP | `213.171.7.16` (ныне труп) | `201.24.125.184` (бывш. `81.19.135.200` снят - TCP22 filtered) |
+| SSH | `daibilet_staging_key` (legacy) | `daibilet_msk80_key` / alias `daibilet-msk` |
 | Git `/opt/daibilet` | `618fdd6` | `8588ccf` (отстаёт) |
 | RAM / disk | 3.8 Gi / 49G ~55% | 7.8 Gi / 77G ~8% |
 | web + api + nginx | ✅ | ✅ |
@@ -28,7 +28,7 @@
 | `https://daibilet.ru` | ✅ 200 (DNS сюда) | не в DNS |
 | API `/api/public/stats` local | OK | 500 (нет БД) |
 
-**Готовность к DNS-cutover:** нет. Нужны PG+restore, pull HEAD, TLS, nginx parity, smoke - см. чеклист в migration-doc.
+**Готовность к DNS-cutover (на дату снимка):** нет. Нужны PG+restore, pull HEAD, TLS, nginx parity, smoke - см. чеклист в migration-doc. **Cutover выполнен 2026-07-30; `.16` retired.**
 
 ---
 
@@ -84,7 +84,7 @@ pnpm deploy:preflight
 # prod Next на том же хосте (stop web → build → start)
 BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh
 # heap default 5120Mi (`apps/web/scripts/next-build.mjs` + NODE_OPTIONS).
-# Не использовать SPB `.16` как builder.
+# Не билдить с чужого хоста - только MSK / CI.
 
 # smoke
 PUBLIC_BASE=https://daibilet.ru API_BASE=http://127.0.0.1:4000 WEB_BASE=http://127.0.0.1:3001 \
