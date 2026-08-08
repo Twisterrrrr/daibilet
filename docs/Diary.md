@@ -21,15 +21,16 @@
 ### Наблюдения
 - Live `/locations/cerkov-svyatogo-apostola-ioanna-yaani-kirik` → HTTP 500 (репро). API origin `:4000` DTO 200; web journal digest **`DYNAMIC_SERVER_USAGE`**.
 - Тот же digest на missing slug (`zzz-missing`) и API-404 площадках (`petropavlovskaya-krepost`, `letniy-sad`) → стабильный **500 вместо 404**.
-- Корень: на ISR (`revalidate`) вызов `noStore()` перед `notFound()` бросает `DYNAMIC_SERVER_USAGE`; в prod это не ретраится как dynamic, а отдаётся как 500. Transient API 502/timeout шёл в тот же путь (miss).
+- Корень (уточнение после деплоя `safeNotFound`): на ISR (`revalidate`) любой `fetch(cache:'no-store')` (uncached retry, admission parallel, или bare no-store внутри `unstable_cache`) + затем `notFound()` → `Page changed from static to dynamic at runtime` / digest **DYNAMIC_SERVER_USAGE** → HTTP 500. Transient API 502/timeout шёл в тот же путь.
 
 ### Решения
-- `safeNotFound()` без `noStore` для true miss (HTTP 404). STALE-404 poison закрыт no-null DTO cache (v4/v5), не `noStore`+`notFound`.
-- Venue load: `ok | miss | unavailable`; unavailable → soft page «временно недоступна» (не 500 / не ложный 404).
-- Cities `[slug]`: тот же `safeNotFound` вместо `noStore`+`notFound`.
+- `safeNotFound()` без `noStore` для true miss (HTTP 404).
+- Venue/city DTO load: только `unstable_cache`; fetch внутри с `revalidateSeconds` (v6-isr-fetch), без bare no-store.
+- Venue/city page: DTO → miss/notFound **до** parallel no-store secondary (admission/articles).
+- Unavailable → soft page без `noStore`.
 
 ### Проблемы
-- Deploy MSK после commit+push (launch-blocker).
+- Deploy MSK после follow-up commit (launch-blocker).
 
 ---
 
@@ -101,7 +102,7 @@
 ### Проблемы
 - Dead hub cards без DTO остаются (после фикса будут 404, не 500) - нужна data cleanup.
 - Transient 502 under load - capacity, не slug.
-- После web deploy miss-pages ещё 500: `unstable_cache` wrap ломал instanceof/`dto_miss` catch → rethrow. Hotfix: cache catch → всегда soft-null + cache key v5.
+- Live miss 500 digests: `DYNAMIC_SERVER_USAGE` = (1) `noStore()+notFound` на ISR, (2) uncached `fetch cache:no-store` вне `unstable_cache`. Fix: `safeNotFound` + cache-only miss. Smoke: bastion/nocity **404**, samara/moskva **200**.
 
 ---
 
