@@ -1,3 +1,22 @@
+## 2026-08-09 - PR Stage 0 admission ticket core
+
+### Наблюдения
+
+- Код Stage 0 admission checkout/ticket уже в `d53cb1d` (см. запись в конце файла). Owner запросил PR в finance-контур.
+- Merge-base ветки = `codex/phase2-finance-supplier` (1 коммит ahead), не `feat/next-monorepo`.
+
+### Решения
+
+- Открыт PR `codex/stage0-admission-ticket-core` -> `codex/phase2-finance-supplier`.
+- В `qa.md` зафиксированы закрываемые gaps (issuance ticketNumbers, buyer DTO, Path A return_url, purchases-by-email) со статусом **в PR / code done, ждёт smoke на `.159`**.
+- Deploy/smoke finance `.159` не стартуем без явного «выкатывай на finance».
+
+### Проблемы
+
+- Нет: docs-only follow-up на PR-ветке. Live verification остаётся blocked на owner go.
+
+---
+
 ## 2026-08-07 — YooKassa Idempotence-Key ≤64
 
 ### Наблюдения

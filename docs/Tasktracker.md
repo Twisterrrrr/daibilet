@@ -1,6 +1,6 @@
 # Tasktracker — Daibilet
 
-**Обновлено:** 2026-08-07
+**Обновлено:** 2026-08-09
 **Источники:** [Project.md](./Project.md), [current-state.md](./current-state.md), [widget-etalon-slugs.md](./widget-etalon-slugs.md), [content-blog-plan.md](./content-blog-plan.md)
 
 **Легенда:** ✅ done · 🔄 in progress · ⏳ todo · 🚫 blocked · ⚠️ deferred
@@ -54,8 +54,8 @@
 | P.3e5 | **Supplier LC shell v1** — legacy-v2 inspired light shell: grouped nav, readiness, admissions/events/orders, finance/docs/settings | Высокий | ✅ `apps/supplier` UI shell |
 | P.3e6 | **Supplier LC auth bridge** — `SiteUser` + active `SupplierUser`, login/me/logout, dev-only supplier query fallback | Высокий | ✅ auth API + supplier login UI |
 | P.3e7 | **Supplier LC admission smoke** — тестовая продажа `AdmissionProduct` из ЛК поставщика → `CheckoutOrder`/ledger/orders projection | Высокий | ✅ supplier-scoped endpoint + UI action |
-| P.3e8 | **Stage 0 public buyer order DTO** - order-by-code + purchases-by-email expose issued ticket numbers and admission venue snapshot | High | ✅ backend + tests; `.159` sandbox smoke next |
-| P.3f | **YooKassa: venue admission** | Высокий | 🔄 public admission schema + catalog return URL + ticketNumber issuance; `.159` sandbox smoke next |
+| P.3e8 | **Stage 0 public buyer order DTO** - order-by-code + purchases-by-email expose issued ticket numbers and admission venue snapshot | High | 🔄 в PR `codex/stage0-admission-ticket-core` @ `d53cb1d` (code done); ждёт smoke `.159` |
+| P.3f | **YooKassa: venue admission** | Высокий | 🔄 в PR `codex/stage0-admission-ticket-core` (admission schema + Path A return_url + ticketNumber issuance; code done); ждёт smoke `.159` |
 | P.3f1 | **Supplier onboarding write-flow** — юрпрофиль + основной счет из ЛК, статус реквизитов на проверку | Высокий | ✅ backend PATCH + supplier UI forms |
 | P.3f2 | **YooKassa webhook hardening** — provider event id, replay dedupe, payment id mismatch guard | Высокий | ✅ backend + DB tests |
 | P.3f3 | **Admin legal approve/reject + Supplier LC polish** — модерация реквизитов, readiness callout, лаконичные заказы | Высокий | ✅ backend route + admin/supplier UI + tests |

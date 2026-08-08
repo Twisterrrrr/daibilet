@@ -1,5 +1,28 @@
 # qa.md — открытые вопросы
 
+## 2026-08-09 - Stage 0 admission ticket core (в PR / code done)
+
+**PR-ветка:** `codex/stage0-admission-ticket-core` @ `d53cb1d`
+**Base:** `codex/phase2-finance-supplier`
+**Статус:** код и тесты готовы; **ждёт smoke на finance `.159`** (create-payment sandbox -> confirmationUrl -> webhook/reconcile -> `CONFIRMED` + `ticketNumbers`). Деплой `.159` - только по явному go owner («выкатывай на finance»).
+
+### Закрывается этим PR (gaps -> code done)
+
+| Gap | Статус |
+|-----|--------|
+| Issuance `ticketNumbers` (`TKT-{publicCode}-NN`, != `publicCode`; только после successful webhook/reconcile) | в PR / code done, ждёт smoke `.159` |
+| Buyer enrichment public order DTO (buyer, venue title/address/coords, validity, items, totals, paidAt/confirmedAt, ticketNumbers, supplierSupportPhone) | в PR / code done, ждёт smoke `.159` |
+| Path A YooKassa `return_url` -> `https://daibilet.ru/checkout/result?order={publicCode}` | в PR / code done, ждёт smoke `.159` |
+| no-store buyer lookup: order-by-`publicCode` + purchases-by-email (`/api/public/checkout/orders|purchases`, `/api/checkout/orders`, `/api/public/purchases`) | в PR / code done, ждёт smoke `.159` |
+| Public `/api/checkout/yookassa` принимает `VENUE_ADMISSION` + `admissionProductSlug`/`admissionProductId` + `admissionOfferId` | в PR / code done, ждёт smoke `.159` |
+
+### Не закрыто этим PR
+
+- Live sandbox smoke на `.159` (нужен явный go owner).
+- Product Q Museum-1 (54-FZ схема, ownership внешнего scanner code до договора) - см. catalog `docs/qa.md` на `feat/next-monorepo`.
+- Wide CTA, Path B calc, session/schedule supplier, TC/TEP secrets - out of Stage 0.
+
+
 ## 2026-07-19 — Teplohod orders API — ЗАКРЫТО / отложено
 
 **Ответ партнёра:** у teplohod.info **нет** функционала API/выгрузки заказов для агента.
