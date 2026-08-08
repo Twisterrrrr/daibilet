@@ -238,6 +238,7 @@ BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh
 - **Header city change (2026-08-04, blog 2026-08-05):** смена города в шапке остаётся в текущей секции (`resolveCityChangeNav`): `/cities`→hub, catalogs/PDP→`?city=` той же секции, podborki intent→city segment, **blog→persist only** (лента кросс-городская; фильтр материалов на `/blog` через in-page `?city=`/`?author=`), my-day/home→persist (+confirm на my-day), multi-city landing→swap segment. **Не** дампить в `/events`, если пользователь не в каталоге событий.
 - **Flat URL:** `/events/{slug}`, `/venues/{slug}`, `/cities/{slug}` — без city-prefix в path (`/{city}/venues/...` и т.п. **отклонено**).
 - **SEO-фокус:** city hubs `/cities/{slug}` + **category×city landings** (`/rechnye-progulki/moscow`, `/stendap-i-yumor/kazan`, …) + intent `/podborki/{intent}`; sitemap + canonical.
+- **Lightweight + robots (2026-08-08):** канон [web-lightweight-seo.md](./web-lightweight-seo.md) / эпик `WEB.LIGHT.*` - HTML-first ISR, progressive shell, payload budgets, no soft-404/STALE-404; поверх venue SWR + home ISR.
 - **Meta (city listing):** обычные города - `[Категория] в [Городе] [Год] - купить билеты…`; Казань/Екатеринбург - `[Категория] в {City_Пр} [Год]: купить билеты…` (`seo-listing-meta.ts`, падежи в `city-declension.ts`).
 - **Meta (city hub Казань/Екб):** `Афиша {City_Род} [Год] - куда сходить…` (`city-hub-seo.ts`).
 - **Meta (event Казань/Екб):** `Билеты на {Title} в {City_Пр} - расписание, цены от {N} руб.` (+ graceful без цены) (`seo-event-meta.ts`).
