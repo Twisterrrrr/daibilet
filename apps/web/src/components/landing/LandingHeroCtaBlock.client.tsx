@@ -19,7 +19,7 @@ export function LandingHeroCtaBlock({
   sessionsReady,
   primaryLabel,
   secondaryLabel,
-  priceOnCta = 'from',
+  priceOnCta = 'range',
   leading,
   onPrimary,
   onSecondary,
@@ -33,7 +33,7 @@ export function LandingHeroCtaBlock({
   sessionsReady: boolean;
   primaryLabel: string;
   secondaryLabel?: string;
-  /** NY owner: range on CTA; others: «от min» */
+  /** Default: min-max on CTA; pass «from» only if product asks. */
   priceOnCta?: 'from' | 'range';
   leading?: ReactNode;
   onPrimary: () => void;

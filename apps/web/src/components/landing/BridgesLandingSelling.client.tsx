@@ -4,7 +4,7 @@ import { ArrowRight, Clock, Compass, Heart, MapPin, Sparkles, Star, Wallet } fro
 import * as React from 'react';
 
 import { BRIDGES_LANDING } from '@/data/bridges-landing';
-import { formatMoneyRange, formatNumber, formatPriceFrom } from '@/lib/format';
+import { formatMoneyRange, formatNumber, formatLandingBuyPrice } from '@/lib/format';
 import type { BridgesScheduleRow } from '@/lib/bridges-session-utils';
 
 const PALACE_BRIDGE_LIFT_HOUR = 1;
@@ -90,8 +90,8 @@ export function BridgesHeroBlock({
   onViewSchedule: () => void;
 }) {
   const countdown = usePalaceBridgeCountdown();
-  // CTA: «от min»; полный min–max - в 4-й ячейке «диапазон цен»
-  const priceCtaLabel = priceFrom ? formatPriceFrom(priceFrom) : null;
+  // CTA: min-max when known; exact price without «от» when single.
+  const priceCtaLabel = priceFrom ? formatLandingBuyPrice(priceFrom, priceTo) : null;
   const priceRangeLabel = priceFrom ? formatMoneyRange(priceFrom, priceTo) : null;
 
   return (
@@ -421,7 +421,7 @@ export function BridgesMobileStickyCta({
         className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground"
       >
         <Star className="h-4 w-4" />
-        {priceFrom ? `Показать рейсы ${formatPriceFrom(priceFrom)}` : 'Выбрать рейс'}
+        {priceFrom ? `Показать рейсы ${formatLandingBuyPrice(priceFrom, priceTo)}` : 'Выбрать рейс'}
       </a>
     </div>
   );

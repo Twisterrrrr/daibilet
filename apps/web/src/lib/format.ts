@@ -21,10 +21,19 @@ export function moneyRangeStatLabel(from?: number | null, to?: number | null): s
   return max > min ? 'диапазон цен' : 'цена от';
 }
 
-/** Primary buy / CTA: always «от min», never min–max. */
+/** Primary buy / CTA: always «от min», never min–max. Prefer formatLandingBuyPrice on landings. */
 export function formatPriceFrom(value?: number | null): string {
   if (typeof value !== 'number' || value < MIN_DISPLAY_PRICE_RUB) return 'Цена уточняется';
   return `от ${formatNumber(value)} ₽`;
+}
+
+/** Landing schedule / buy CTA: min-max when different, else exact price without «от». */
+export function formatLandingBuyPrice(from?: number | null, to?: number | null): string {
+  if (!from || from < MIN_DISPLAY_PRICE_RUB) return 'Цена уточняется';
+  const min = Math.round(from);
+  const max = to && to >= MIN_DISPLAY_PRICE_RUB ? Math.round(to) : min;
+  if (max > min) return `${formatNumber(min)}-${formatNumber(max)} ₽`;
+  return `${formatNumber(min)} ₽`;
 }
 
 export function pluralEvents(count: number): string {

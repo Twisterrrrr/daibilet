@@ -248,8 +248,8 @@ export function LandingsCatalogView({
                 aria-pressed={active}
                 className={
                   active
-                    ? 'inline-flex shrink-0 rounded-full bg-primary-600 px-3.5 py-2 text-sm font-semibold text-white shadow-sm transition'
-                    : 'inline-flex shrink-0 rounded-full bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-50 hover:text-primary-700'
+                    ? 'inline-flex shrink-0 items-center rounded-full bg-primary-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm transition'
+                    : 'inline-flex shrink-0 items-center rounded-full bg-white px-2.5 py-1.5 text-sm font-semibold text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-50 hover:text-primary-700'
                 }
               >
                 {mood.label}

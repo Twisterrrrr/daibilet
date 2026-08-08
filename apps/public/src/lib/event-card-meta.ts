@@ -258,13 +258,22 @@ export function formatShowcasePriceLabel(priceFrom?: number | null): string {
   return `от ${formatPriceRub(priceFrom)} ₽`;
 }
 
-export function collectSessionPrices(sessions: Array<{ priceFrom?: number | null }>): number[] {
-  return sessions
-    .map((session) => session.priceFrom)
-    .filter((price): price is number => typeof price === 'number' && Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
+export function collectSessionPrices(
+  sessions: Array<{ priceFrom?: number | null; priceTo?: number | null }>,
+): number[] {
+  const prices: number[] = [];
+  for (const session of sessions) {
+    if (typeof session.priceFrom === 'number' && Number.isFinite(session.priceFrom) && session.priceFrom >= MIN_DISPLAY_PRICE_RUB) {
+      prices.push(session.priceFrom);
+    }
+    if (typeof session.priceTo === 'number' && Number.isFinite(session.priceTo) && session.priceTo >= MIN_DISPLAY_PRICE_RUB) {
+      prices.push(session.priceTo);
+    }
+  }
+  return prices;
 }
 
-export function resolveSessionPriceRange(sessions: Array<{ priceFrom?: number | null }>) {
+export function resolveSessionPriceRange(sessions: Array<{ priceFrom?: number | null; priceTo?: number | null }>) {
   const prices = collectSessionPrices(sessions);
   if (!prices.length) return { priceFrom: null as number | null, priceTo: null as number | null };
   return { priceFrom: Math.min(...prices), priceTo: Math.max(...prices) };

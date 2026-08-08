@@ -6983,7 +6983,7 @@ async function publicCatalogSessionsFast(db) {
           count(*)::int as "groupedEventsCount",
           sum(coalesce("slotCount", 0))::int as "sessionCount",
           min("priceFrom")::int as "priceFrom",
-          max("priceFrom")::int as "priceTo",
+          max("priceTo")::int as "priceTo",
           nullif(sum(coalesce("ticketsVacant", 0)), 0)::int as vacant,
           jsonb_agg(
             jsonb_build_object(

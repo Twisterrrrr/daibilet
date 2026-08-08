@@ -95,7 +95,7 @@ import {
   riverCityGuideBySlug,
   type RiverCitySpot,
 } from '@/data/river-landings';
-import { formatMoney, formatMoneyRange, formatNumber } from '@/lib/format';
+import { formatMoney, formatMoneyRange, formatLandingBuyPrice, formatNumber } from '@/lib/format';
 import {
   collectSessionStartsAtTimes,
   getSessionHour,
@@ -1464,7 +1464,7 @@ function LandingHero({
       : isSeasonal && !citySlug
         ? 'К городам'
         : undefined;
-  const priceOnCta = countdownKind === 'new-year' ? 'range' : 'from';
+  const priceOnCta = 'range';
 
   return (
     <section className={`relative overflow-hidden ${heroTheme.className}`}>
@@ -2090,7 +2090,7 @@ function LandingDinnerScheduleRow({ group, isOptimal }: { group: EventGroup; isO
   const href = eventHref(session);
   const priceLabel =
     typeof group.priceFrom === 'number' && group.priceFrom >= MIN_DISPLAY_PRICE_RUB
-      ? formatMoneyRange(group.priceFrom, group.priceTo)
+      ? formatLandingBuyPrice(group.priceFrom, group.priceTo)
       : 'Купить';
   const vacant = session.vacant ?? group.vacant;
   const soldOut = typeof vacant === 'number' && vacant <= 0;
@@ -3297,7 +3297,7 @@ function LandingScheduleRow({ group, isOptimal, profile }: { group: EventGroup; 
   const href = eventHref(session);
   const priceLabel =
     typeof group.priceFrom === 'number' && group.priceFrom >= MIN_DISPLAY_PRICE_RUB
-      ? formatMoneyRange(group.priceFrom, group.priceTo)
+      ? formatLandingBuyPrice(group.priceFrom, group.priceTo)
       : 'Купить';
   const buyButtonClass =
     'inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 active:scale-[0.98]';
