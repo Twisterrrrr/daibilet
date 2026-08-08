@@ -84,20 +84,17 @@ export async function getCachedPublicCityDto(slug: string) {
 }
 
 /**
- * Prefer cached DTO; on soft miss retry uncached once.
- * Callers must safeNotFound() on null (never noStore()+notFound() on ISR - that is HTTP 500).
+ * Prefer cached DTO. Do not uncached-fetch on miss during ISR:
+ * `fetchPublicApiJson` uses `cache: 'no-store'` and outside `unstable_cache` that throws
+ * DYNAMIC_SERVER_USAGE → HTTP 500 on revalidate routes.
+ * Callers must safeNotFound() on null (never noStore()+notFound() on ISR).
  */
 export async function loadCityDtoOrNull(slug: string): Promise<PublicCityPagePayload | null> {
   const key = normalizeCitySlug(slug);
   if (!key) return null;
-  const cached = await getCachedPublicCityDto(key);
-  if (cached?.city) return cached;
   try {
-    const fresh = await fetchPublicApiJson<PublicCityPagePayload | null>(
-      `/api/public/cities/${encodeURIComponent(key)}`,
-      { timeoutMs: 5_000, notFoundAsNull: true },
-    );
-    return fresh?.city ? fresh : null;
+    const cached = await getCachedPublicCityDto(key);
+    return cached?.city ? cached : null;
   } catch {
     return null;
   }

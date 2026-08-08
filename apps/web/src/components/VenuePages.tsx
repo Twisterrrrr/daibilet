@@ -27,7 +27,6 @@ import { buildVenuePageJsonLd } from '@/lib/structured-data';
 import { resolveVenueSeoTitle } from '@/lib/venue-seo';
 import { resolveVenueHeroImage } from '@/lib/city-place-images';
 import type { PublicVenuePageDto } from '@daibilet/contracts/public';
-import { fetchPublicApiJson } from '@/server/public-api-client';
 
 /** Admission must not hang venue HTML when finance is slow. */
 const VENUE_ADMISSION_TIMEOUT_MS = 2500;
@@ -56,9 +55,10 @@ type VenueDtoLoad =
   | { kind: 'unavailable' };
 
 /**
- * Prefer cached DTO; on soft miss retry uncached once.
- * Distinguish API 404 (miss → HTTP 404) from transport/5xx (unavailable → soft page).
- * STALE-404 poison is prevented by unstable_cache no-null (v4), not by noStore()+notFound().
+ * Prefer cached DTO; do not uncached-fetch on miss during ISR.
+ * `fetchPublicApiJson` uses `cache: 'no-store'` - calling it outside `unstable_cache`
+ * on a `revalidate` route throws digest DYNAMIC_SERVER_USAGE → HTTP 500.
+ * Soft-misses already bypass Data Cache via throw-inside-cache (v5-no-null).
  */
 async function loadVenueDto(slug: string): Promise<VenueDtoLoad> {
   const key = String(slug || '').trim();
@@ -67,16 +67,6 @@ async function loadVenueDto(slug: string): Promise<VenueDtoLoad> {
   try {
     const cached = await getCachedPublicVenueDto(key);
     if (cached?.venue) return { kind: 'ok', payload: cached };
-  } catch {
-    // Cache/transport failure - still try uncached once below.
-  }
-
-  try {
-    const fresh = await fetchPublicApiJson<PublicVenuePageDto | null>(
-      `/api/public/venues/${encodeURIComponent(key)}`,
-      { timeoutMs: 5_000, notFoundAsNull: true },
-    );
-    if (fresh?.venue) return { kind: 'ok', payload: fresh };
     return { kind: 'miss' };
   } catch {
     return { kind: 'unavailable' };
