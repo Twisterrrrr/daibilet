@@ -85,7 +85,7 @@ export async function getCachedPublicCityDto(slug: string) {
 
 /**
  * Prefer cached DTO; on soft miss retry uncached once.
- * Callers must noStore()+notFound() on null so Full Route Cache never stores STALE 404 (~1y SWR).
+ * Callers must safeNotFound() on null (never noStore()+notFound() on ISR - that is HTTP 500).
  */
 export async function loadCityDtoOrNull(slug: string): Promise<PublicCityPagePayload | null> {
   const key = normalizeCitySlug(slug);

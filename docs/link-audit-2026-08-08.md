@@ -29,7 +29,7 @@ Owner trigger: «проверяй все линки по сайту». Samara hu
 - Smoke до фикса: `/venues/bastion-holl`, `/venues/definitely-missing-venue-xyz-999`, `/cities/no-city-here` → **500**.
 - Хабы (напр. Калининград) ссылаются на slug вроде `bastion-holl` без DTO → пользователь ловит 500 с карточки хаба.
 
-**Fix:** handlers → 404 `{error:not_found}`; web cache catch по `*_dto_miss`; `fetchPublicApiJson` трактует JSON `null` как miss; footer SPB rooftops; city/venue metadata try/catch.
+**Fix:** handlers → 404 `{error:not_found}`; web cache catch → always soft-null on miss/wrap (v5 keys); `fetchPublicApiJson` трактует JSON `null` как miss; footer SPB rooftops; city/venue metadata try/catch.
 
 ### 2. Soft / STALE city hub 404 (already mitigated, INC.CITY404)
 

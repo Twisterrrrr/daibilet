@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { unstable_noStore as noStore } from 'next/cache';
-import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
 import { LocationsCatalogView } from '@/components/LocationsCatalogView.client';
@@ -17,6 +16,7 @@ import {
 } from '@/lib/venue-catalog-feed';
 import { evaluateVenueIndexability, robotsForIndexability } from '@/lib/hub-indexability';
 import { venueHref } from '@/lib/routes';
+import { safeNotFound } from '@/lib/safe-not-found';
 import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
 import { getCachedVenuesCatalog } from '@/server/cached-public-surfaces';
 import { getCachedPublicVenueDto } from '@/server/cached-venue-data';
@@ -50,24 +50,50 @@ const EMPTY_FEED = mapVenueCatalogFeedPage({
   limit: VENUE_CATALOG_PAGE_SIZE,
 });
 
+type VenueDtoLoad =
+  | { kind: 'ok'; payload: PublicVenuePageDto }
+  | { kind: 'miss' }
+  | { kind: 'unavailable' };
+
 /**
  * Prefer cached DTO; on soft miss retry uncached once.
- * never cache notFound() - ISR STALE 404 can stick for stale-while-revalidate (~1y).
+ * Distinguish API 404 (miss → HTTP 404) from transport/5xx (unavailable → soft page).
+ * STALE-404 poison is prevented by unstable_cache no-null (v4), not by noStore()+notFound().
  */
-async function loadVenueDtoOrNull(slug: string): Promise<PublicVenuePageDto | null> {
+async function loadVenueDto(slug: string): Promise<VenueDtoLoad> {
   const key = String(slug || '').trim();
-  if (!key) return null;
-  const cached = await getCachedPublicVenueDto(key);
-  if (cached?.venue) return cached;
+  if (!key) return { kind: 'miss' };
+
+  try {
+    const cached = await getCachedPublicVenueDto(key);
+    if (cached?.venue) return { kind: 'ok', payload: cached };
+  } catch {
+    // Cache/transport failure - still try uncached once below.
+  }
+
   try {
     const fresh = await fetchPublicApiJson<PublicVenuePageDto | null>(
       `/api/public/venues/${encodeURIComponent(key)}`,
       { timeoutMs: 5_000, notFoundAsNull: true },
     );
-    return fresh?.venue ? fresh : null;
+    if (fresh?.venue) return { kind: 'ok', payload: fresh };
+    return { kind: 'miss' };
   } catch {
-    return null;
+    return { kind: 'unavailable' };
   }
+}
+
+function VenueUnavailablePage({ slug }: { slug: string }) {
+  return (
+    <SiteLayout>
+      <main style={{ maxWidth: 640, margin: '4rem auto', padding: '0 1.25rem' }}>
+        <h1 style={{ fontSize: '1.5rem', marginBottom: '0.75rem' }}>Площадка временно недоступна</h1>
+        <p style={{ color: '#444', lineHeight: 1.5 }}>
+          Не удалось загрузить данные для <code>{slug}</code>. Обновите страницу чуть позже.
+        </p>
+      </main>
+    </SiteLayout>
+  );
 }
 
 type PageProps = {
@@ -96,16 +122,15 @@ export async function generateVenueListMetadata(
 }
 
 export async function generateVenueDetailMetadata(slug: string): Promise<Metadata> {
-  let payload: PublicVenuePageDto | null = null;
-  try {
-    payload = await loadVenueDtoOrNull(decodeURIComponent(slug));
-  } catch {
-    payload = null;
+  const loaded = await loadVenueDto(decodeURIComponent(slug));
+  if (loaded.kind === 'miss') safeNotFound();
+  if (loaded.kind === 'unavailable') {
+    return {
+      title: pageTitle('Площадка временно недоступна'),
+      robots: { index: false, follow: false },
+    };
   }
-  if (!payload?.venue) {
-    noStore();
-    notFound();
-  }
+  const payload = loaded.payload;
   const venue = payload.venue;
   const heroForShare =
     resolveVenueHeroImage(venue.slug || slug, venue.heroImageUrl) || venue.heroImageUrl;
@@ -188,7 +213,7 @@ export async function VenueDetailPage({ slug }: { slug: string }) {
 
   // Parallel: DTO (ISR Data Cache + uncached miss retry) + finance admission (hard timeout).
   const [payloadResult, admissionResult] = await Promise.allSettled([
-    loadVenueDtoOrNull(decodedSlug),
+    loadVenueDto(decodedSlug),
     withSoftTimeout(
       fetchVenueAdmissionProducts(decodedSlug),
       VENUE_ADMISSION_TIMEOUT_MS,
@@ -197,19 +222,22 @@ export async function VenueDetailPage({ slug }: { slug: string }) {
     ),
   ]);
 
-  const payload = payloadResult.status === 'fulfilled' ? payloadResult.value : null;
-  if (!payload?.venue) {
-    // Do not let notFound() enter Full Route Cache as STALE 404 for ~1y.
+  const loaded: VenueDtoLoad =
+    payloadResult.status === 'fulfilled' ? payloadResult.value : { kind: 'unavailable' };
+  if (loaded.kind === 'miss') safeNotFound();
+  if (loaded.kind === 'unavailable') {
+    // Soft page must stay dynamic (do not ISR-cache the outage HTML as a hit).
     noStore();
-    notFound();
+    return <VenueUnavailablePage slug={decodedSlug} />;
   }
 
+  let payload = loaded.payload;
   const editorialHero = resolveVenueHeroImage(
     payload.venue.slug || decodedSlug,
     payload.venue.heroImageUrl,
   );
   if (editorialHero && editorialHero !== payload.venue.heroImageUrl) {
-    payload.venue = { ...payload.venue, heroImageUrl: editorialHero };
+    payload = { ...payload, venue: { ...payload.venue, heroImageUrl: editorialHero } };
   }
 
   const admission =

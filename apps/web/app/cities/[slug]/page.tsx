@@ -1,6 +1,4 @@
 import type { Metadata } from 'next';
-import { unstable_noStore as noStore } from 'next/cache';
-import { notFound } from 'next/navigation';
 
 import { CityPageView } from '@/components/CityPageView.client';
 import { CityPageViewEditorial } from '@/components/CityPageViewEditorial.client';
@@ -19,6 +17,7 @@ import { isSeoExpansionCity } from '@/lib/city-declension';
 import { resolveCityImage } from '@/lib/city-images';
 import { evaluateCityIndexability, robotsForIndexability } from '@/lib/hub-indexability';
 import { mergeBlogCards } from '@/lib/blog-utils';
+import { safeNotFound } from '@/lib/safe-not-found';
 import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
 import { buildCityPageJsonLd } from '@/lib/structured-data';
 import {
@@ -84,9 +83,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     payload = null;
   }
   if (!payload?.city) {
-    // Do not let notFound() enter Full Route Cache as STALE 404 for ~1y.
-    noStore();
-    notFound();
+    // noStore()+notFound() on ISR → DYNAMIC_SERVER_USAGE HTTP 500. Null DTO uncached (v5).
+    safeNotFound();
   }
 
   const city = payload.city;
@@ -174,9 +172,8 @@ export default async function CityPage({ params }: PageProps) {
   const articlesPayload = articlesResult.status === 'fulfilled' ? articlesResult.value : null;
   const admission = admissionResult.status === 'fulfilled' ? admissionResult.value : null;
   if (!payload?.city) {
-    // Do not let notFound() enter Full Route Cache / nginx as STALE 404 for ~1y.
-    noStore();
-    notFound();
+    // noStore()+notFound() on ISR → DYNAMIC_SERVER_USAGE HTTP 500. Null DTO uncached (v5).
+    safeNotFound();
   }
 
   const faqStartedAt = Date.now();
