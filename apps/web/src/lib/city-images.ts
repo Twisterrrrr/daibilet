@@ -57,7 +57,10 @@ const CITY_CARD_IMAGE_SLUGS = new Set([
   'sortavala',
 ]);
 
-/** Daytime landmark previews for `/cities` top tiles only (not full catalog). */
+/**
+ * Daytime landmark previews that pin a city into the `/cities` top-8 ranking.
+ * Keep this set at 8 so second-octet cities stay below the map.
+ */
 const CITY_TOP_PREVIEW_SLUGS = new Set([
   'saint-petersburg',
   'moscow',
@@ -67,6 +70,19 @@ const CITY_TOP_PREVIEW_SLUGS = new Set([
   'samara',
   'sochi',
   'kaliningrad',
+]);
+
+/** Daytime JPG assets under `/images/cities/top/` (top-8 + second octet). */
+const CITY_DAYTIME_PREVIEW_SLUGS = new Set([
+  ...CITY_TOP_PREVIEW_SLUGS,
+  'krasnodar',
+  'krasnoyarsk',
+  'novosibirsk',
+  'voronezh',
+  'ufa',
+  'perm',
+  'chelyabinsk',
+  'ryazan',
 ]);
 
 function isUsableRemoteImage(url: string): boolean {
@@ -87,10 +103,10 @@ export function cityHasTopPreview(city: CityImageSource): boolean {
   return CITY_TOP_PREVIEW_SLUGS.has(cityCardImageSlug(city));
 }
 
-/** Distinct daytime previews for popular top tiles on `/cities`. */
+/** Distinct daytime previews for `/cities` featured tiles (top + second octet). */
 export function resolveCityTopPreviewImage(city: CityImageSource): string | null {
   const imageSlug = cityCardImageSlug(city);
-  if (!CITY_TOP_PREVIEW_SLUGS.has(imageSlug)) return null;
+  if (!CITY_DAYTIME_PREVIEW_SLUGS.has(imageSlug)) return null;
   return `/images/cities/top/${imageSlug}.jpg`;
 }
 

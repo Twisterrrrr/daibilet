@@ -118,7 +118,7 @@ export function CityCard({
             sizes={IMAGE_SIZES.cityCard}
             style={{ objectPosition: imageFocus }}
             className={`object-cover transition-transform duration-500 group-hover:scale-105 ${
-              isLight ? 'brightness-[1.12] contrast-[0.96] saturate-[0.92]' : ''
+              isLight ? 'brightness-[1.05] contrast-[1.02] saturate-[1.05]' : ''
             }`}
             fallback={
               <div
@@ -131,7 +131,7 @@ export function CityCard({
           <div
             className={`pointer-events-none absolute inset-0 ${
               isLight
-                ? 'bg-gradient-to-t from-white via-white/75 to-white/15'
+                ? 'bg-gradient-to-t from-white/95 via-white/45 to-transparent'
                 : 'bg-gradient-to-t from-black/80 via-black/35 to-black/10'
             }`}
           />

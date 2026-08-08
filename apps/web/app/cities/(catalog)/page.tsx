@@ -81,7 +81,7 @@ export default async function CitiesIndexPage() {
             <ul className="grid w-full grid-cols-2 content-start gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
               {secondOctet.map((city) => (
                 <li key={city.slug || city.name} className="min-w-0">
-                  <CityCard city={city} compact tone="light" />
+                  <CityCard city={city} compact tone="light" imageVariant="top" />
                 </li>
               ))}
             </ul>
