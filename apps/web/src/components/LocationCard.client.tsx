@@ -87,7 +87,8 @@ export function LocationCard({
   const TypeIcon = venueTypeIcon(venue.type);
   const typeLabel = venueTypeLabel(venue.type);
   const gradient = TYPE_GRADIENT[venue.type] || 'from-sky-500 via-primary-600 to-indigo-600';
-  const street = formatStreetAddress(venue.address, { city: venue.city }) || venue.city;
+  const street = formatStreetAddress(venue.address, { city: venue.city });
+  const cityLabel = String(venue.city || '').trim() || null;
   const metro = nonEmptyLogisticsText(venue.metroStation);
   const stopCount = Number(venue.stopEventCount ?? 0);
   const activityCount = stopCount > 0 ? stopCount : Number(venue.events || 0);
@@ -163,6 +164,11 @@ export function LocationCard({
               <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-600">
                 {typeLabel}
               </span>
+              {cityLabel ? (
+                <span className="rounded bg-primary-50 px-1.5 py-0.5 text-[10px] font-semibold text-primary-700">
+                  {cityLabel}
+                </span>
+              ) : null}
               {eventsChip}
             </div>
             <div
@@ -219,7 +225,7 @@ export function LocationCard({
             </div>
           ) : null}
 
-          {isContentPlace ? (
+          {isContentPlace && street ? (
             <div className="mt-2 flex items-center gap-1.5 text-xs text-slate-400">
               <MapPin className="h-3 w-3 shrink-0" />
               <span className="truncate">{street}</span>
