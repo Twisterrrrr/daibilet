@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { unstable_noStore as noStore } from 'next/cache';
+import { permanentRedirect } from 'next/navigation';
 import { Suspense } from 'react';
 
 import { LocationsCatalogView } from '@/components/LocationsCatalogView.client';
@@ -15,7 +16,7 @@ import {
   VENUE_CATALOG_PAGE_SIZE,
 } from '@/lib/venue-catalog-feed';
 import { evaluateVenueIndexability, robotsForIndexability } from '@/lib/hub-indexability';
-import { venueHref } from '@/lib/routes';
+import { venueHref, venuePageTemplate } from '@/lib/routes';
 import { safeNotFound } from '@/lib/safe-not-found';
 import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
 import { getCachedVenuesCatalog } from '@/server/cached-public-surfaces';
@@ -58,7 +59,8 @@ type VenueDtoLoad =
 /**
  * Prefer cached DTO only. Miss → safeNotFound without any bare `cache:'no-store'`
  * fetch (that + notFound on ISR → DYNAMIC_SERVER_USAGE / static-to-dynamic 500).
- * Soft-misses already bypass Data Cache via throw-inside-cache (v6-isr-fetch).
+ * Soft-misses already bypass Data Cache via throw-inside-cache (v7-isr-fetch).
+ * Transient API errors throw from getCachedPublicVenueDto → unavailable (not HTML 404 poison).
  */
 async function loadVenueDto(slug: string): Promise<VenueDtoLoad> {
   const key = String(slug || '').trim();
@@ -71,6 +73,18 @@ async function loadVenueDto(slug: string): Promise<VenueDtoLoad> {
   } catch {
     return { kind: 'unavailable' };
   }
+}
+
+function resolveVenueRouteFamily(venue: PublicVenuePageDto['venue']): 'location' | 'institution' {
+  const explicit = String(
+    (venue as { template?: string | null }).template ||
+      (venue as { pageTemplate?: string | null }).pageTemplate ||
+      '',
+  )
+    .trim()
+    .toLowerCase();
+  if (explicit === 'location' || explicit === 'institution') return explicit;
+  return venuePageTemplate(venue.type);
 }
 
 function VenueUnavailablePage({ slug }: { slug: string }) {
@@ -199,7 +213,14 @@ export async function VenueListPage({ family }: Pick<PageProps, 'family'>) {
   );
 }
 
-export async function VenueDetailPage({ slug }: { slug: string }) {
+export async function VenueDetailPage({
+  slug,
+  routeFamily,
+}: {
+  slug: string;
+  /** Which public route rendered this page (`/locations` vs `/venues`). */
+  routeFamily: 'location' | 'institution';
+}) {
   const decodedSlug = decodeURIComponent(slug);
 
   // DTO first. Never start no-store admission in parallel before miss check:
@@ -213,6 +234,19 @@ export async function VenueDetailPage({ slug }: { slug: string }) {
   }
 
   let payload = loaded.payload;
+  const family = resolveVenueRouteFamily(payload.venue);
+  if (family !== routeFamily) {
+    const dest =
+      payload.venue.canonicalPath ||
+      venueHref({
+        id: payload.venue.id,
+        slug: payload.venue.slug || decodedSlug,
+        name: payload.venue.name,
+        type: family === 'location' ? 'location' : payload.venue.type,
+      });
+    permanentRedirect(dest);
+  }
+
   const editorialHero = resolveVenueHeroImage(
     payload.venue.slug || decodedSlug,
     payload.venue.heroImageUrl,

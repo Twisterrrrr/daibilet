@@ -79,8 +79,9 @@ export async function getCachedPublicCityDto(slug: string) {
     // loadCityDtoOrNull retry uncached once.
     const msg = error instanceof Error ? error.message : String(error);
     if (error instanceof CityDtoMissError || msg.includes('city_dto_miss:')) return null;
-    console.warn(`[city-dto-cache] soft-null after cache error for ${key}:`, msg);
-    return null;
+    // Transient errors must not become null→notFound HTML poison (same class as venues).
+    console.warn(`[city-dto-cache] unavailable after cache error for ${key}:`, msg);
+    throw error instanceof Error ? error : new Error(msg);
   }
 }
 

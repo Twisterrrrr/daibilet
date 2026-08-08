@@ -20,5 +20,5 @@ export function generateStaticParams() {
 
 export default async function VenuePage({ params }: PageProps) {
   const { slug } = await params;
-  return VenueDetailPage({ slug });
+  return VenueDetailPage({ slug, routeFamily: 'institution' });
 }
