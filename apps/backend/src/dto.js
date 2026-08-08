@@ -5698,12 +5698,31 @@ async function eventRows(db, limit, options = {}) {
   });
 }
 
+/** TicketsCloud widget page rejects `token=r:…` with HTTPForbidden/bad token. */
+function sanitizeTicketscloudPurchaseUrl(url) {
+  const raw = String(url || '').trim();
+  if (!raw) return null;
+  if (!/ticketscloud/i.test(raw)) return raw;
+  try {
+    const parsed = new URL(raw);
+    const token = parsed.searchParams.get('token');
+    if (token && token.startsWith('r:')) parsed.searchParams.set('token', token.slice(2));
+    if (parsed.hostname === 'ticketscloud.org') parsed.hostname = 'ticketscloud.com';
+    return parsed.toString();
+  } catch {
+    return raw;
+  }
+}
+
 function purchaseInfo(row = {}) {
   const sourceCode = row.sourceCode || row.offerSourceCode;
   const provider = providerWidgetProvider(sourceCode);
-  const fallbackUrl = buildProviderWidgetUrl({ ...row, offerSourceCode: sourceCode });
+  const fallbackUrl = sanitizeTicketscloudPurchaseUrl(
+    buildProviderWidgetUrl({ ...row, offerSourceCode: sourceCode }),
+  );
   // Prefer rebuilt TEP checkout: stored teplohod.info/event/* deeplinks currently 404.
-  const explicitUrl = provider === 'TEPLOHOD' ? null : row.offerWidgetUrl || row.offerDeeplinkUrl || null;
+  const explicitRaw = provider === 'TEPLOHOD' ? null : row.offerWidgetUrl || row.offerDeeplinkUrl || null;
+  const explicitUrl = sanitizeTicketscloudPurchaseUrl(explicitRaw);
   const url = explicitUrl || fallbackUrl || null;
   const mode = provider === 'TEPLOHOD' || provider === 'TICKETSCLOUD' ? 'widget' : url ? 'redirect' : null;
   const urlSource = explicitUrl ? 'offer' : fallbackUrl ? 'fallback' : null;

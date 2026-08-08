@@ -7,6 +7,22 @@ import { haversineMeters, isValidCoordinatePair } from './day-route-score';
 import { eventHref, venueHref } from './routes';
 import type { DayRouteVenueItem } from './day-route';
 
+/** TicketsCloud widget page rejects `token=r:…` with HTTPForbidden/bad token. */
+function sanitizeTicketscloudPurchaseUrl(url?: string | null): string | null {
+  const raw = String(url || '').trim();
+  if (!raw) return null;
+  if (!/ticketscloud/i.test(raw)) return raw;
+  try {
+    const parsed = new URL(raw);
+    const token = parsed.searchParams.get('token');
+    if (token?.startsWith('r:')) parsed.searchParams.set('token', token.slice(2));
+    if (parsed.hostname === 'ticketscloud.org') parsed.hostname = 'ticketscloud.com';
+    return parsed.toString();
+  } catch {
+    return raw;
+  }
+}
+
 /** Palace Embankment / central Neva - fallback when day-route has no coords. */
 export const SPB_WATER_CENTER = { latitude: 59.9398, longitude: 30.3146 } as const;
 
@@ -328,7 +344,7 @@ export function buildBoatRoutesFromSessions(
         startsAt,
         dateLabel: String(row.dateLabel || session.dateLabel || '').trim() || null,
         timeLabel: String(row.timeLabel || session.timeLabel || '').trim() || null,
-        purchaseUrl: String(row.purchaseUrl || session.purchaseUrl || '').trim() || null,
+        purchaseUrl: sanitizeTicketscloudPurchaseUrl(row.purchaseUrl || session.purchaseUrl),
         vacant: Number.isFinite(vacant as number) ? (vacant as number) : null,
         fitDeltaMin,
         fitsWindow,
@@ -397,7 +413,7 @@ export function dayRouteItemFromBoatSlot(input: {
     ? `${sessionParts.join(', ')} · ${route.title}`
     : route.title;
 
-  const ticketFromPurchase = String(slot.purchaseUrl || '').trim();
+  const ticketFromPurchase = sanitizeTicketscloudPurchaseUrl(slot.purchaseUrl);
   const ticketUrl =
     ticketFromPurchase ||
     eventHref({

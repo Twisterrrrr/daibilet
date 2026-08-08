@@ -2,6 +2,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
+| FIX.TC-BAD-TOKEN | my-day «Купить билет» → TC HTTPForbidden bad token (`r:` в URL) | Критический | 🔄 code; deploy MSK |
 | INC.VENUE-SOFT-ALL | API hang → soft-unavailable poison на всех venue PDP | Критический | ✅ ops restore; code soft≠ISR + catalog child mode |
 | INC.LOC404.VLAD | STALE 404 `/locations/saint-petersburg-vladimirskiy-sobor` | Критический | ✅ ops 200; code miss≠unavailable + canon redirect |
 | FIX.CITY-MULTI-LANDINGS | normalizeKnownCitySlug: все destination cities → концерты/стендап в hub/podborki | Критический | ✅ code; нужен web deploy |
@@ -980,6 +981,7 @@ Owner minimum: MSK→`.159` сеть ✅ · YooKassa `SHOP_ID`/`SECRET=<set>` �
 | VENUE.L4 | Soft-sign twin: при HIDDEN twin rematch `Event.venueId` на канонический PUBLISHED/CANDIDATE slug | Средний | ⏳ |
 | VENUE.L5 | Ops ensure `venue_68d4062e…` → `CANDIDATE` (kind уже `CLUB_BAR_RESTAURANT`) | Средний | ✅ `scripts/ensure-modnaya-sreda-venue.js` applied on MSK |
 | VENUE.FONTANKA-53 | Дубль причала Фонтанки 51-53: канон TC `prichal-na-fontanke-53`, twin `venue_tep_53` HIDDEN + rematch | Высокий | ✅ ensure + tep-import map; prod apply |
+| VENUE.DVORTSOVAYA-18 | Дубль причала Дворцовая 18: канон TC `venue_681d44a7…` PIER+89 events, twin `venue_tep_65` HIDDEN + rematch | Высокий | ✅ ensure + tep-import map place 65; prod apply |
 | VENUE.SINOP-10A | Синопская наб. дом 10→10А; pier display без `Причал —`; TEP 72→канон | Высокий | ✅ override+import rewrite+ensure; prod PG applied |
 
 ---
@@ -1925,4 +1927,6 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 ## Google Search Console verification
 - [x] **Критический** — файл `googleb3313872246ac993.html` в `apps/web/public/`, deploy prod, curl 200 (2026-07-19)
+
+13872246ac993.html` в `apps/web/public/`, deploy prod, curl 200 (2026-07-19)
 

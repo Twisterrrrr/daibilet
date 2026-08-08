@@ -543,8 +543,9 @@ async function ensureCategories(client) {
 function buildTicketscloudWidgetUrl(eventExternalId) {
   const token = process.env.TICKETSCLOUD_WIDGET_TOKEN || process.env.TC_WIDGET_TOKEN;
   if (!token || !eventExternalId) return null;
-  const normalizedToken = token.startsWith("r:") ? token : `r:${token}`;
-  const url = new URL(process.env.TICKETSCLOUD_WIDGET_BASE_URL || "https://ticketscloud.org/v1/widgets/common");
+  // Bare JWT in query - `r:` prefix → TicketsCloud HTTPForbidden/bad token on direct open.
+  const normalizedToken = token.startsWith("r:") ? token.slice(2) : token;
+  const url = new URL(process.env.TICKETSCLOUD_WIDGET_BASE_URL || "https://ticketscloud.com/v1/widgets/common");
   url.searchParams.set("token", normalizedToken);
   url.searchParams.set("event", eventExternalId);
   return url.toString();

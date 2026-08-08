@@ -1,5 +1,39 @@
 # Diary
 
+## 2026-08-09 - my-day TC buy: HTTPForbidden bad token
+
+### Наблюдения
+- Owner live: `/my-day` СПб → «Купить билет» на слоте «По рекам и каналам…» отдаёт сырой JSON `{"error":"HTTPForbidden","reason":"bad token","status":null}`.
+- URL покупки шёл на TicketsCloud widget с `token=r:…` (JWT с префиксом). Curl: `r:` → 403 bad token; без `r:` → 200 HTML виджета.
+- `provider-purchase.ts` / import добавляли `r:` в query; `dto.js` уже снимал. Event PDP часто работал через `normalizeTcPurchaseUrl`, boat wizard открывал raw `purchaseUrl`.
+
+### Решения
+- Backend: bare JWT в TC widget URL + sanitize stored offer URLs (`.org`→`.com`, strip `r:`).
+- Web my-day: normalize в boat wizard / day-route ticketUrl / catalog fallback open.
+- Launch-blocker: commit+push + MSK API restart + Deploy MSK web.
+
+### Проблемы
+- Disk catalog cache может ещё держать старые `r:` URL до rebuild - фронт-normalize закрывает UX сразу.
+
+---
+
+## 2026-08-09 - Dvortsovaya nab. 18: merge pier duplicates
+
+### Наблюдения
+- На `/locations` два причала по одному адресу: TC `venue_681d44a7…` (88 events, kind ошибочно CONCERT_HALL) и TEP `venue_tep_65` (1 event, shortDescription = «Москва»).
+- Скан других явных twins СПб: Университетская 13/17 и Английская - разные дома/типы, не мержили; Воскресенская угол - уже частично в overrides, без массового auto-merge.
+
+### Решения
+- Канон `venue_681d44a7fc03029d63123730`: title/address `Дворцовая набережная, 18`, kind `PIER`, `PUBLISHED`, shortDescription с причалом №4 (дефис вместо длинного тире).
+- Twin `venue_tep_65`: rematch 1 Event → канон (итого 89), `HIDDEN` + `isIndexable=false`, alias TEPLOHOD/65 → канон.
+- `scripts/ensure-spb-dvortsovaya-18-pier-merge.js`; tep-import map place `65` → канон; override в `venue-address-overrides.json`; `KNOWN_PIER_ADDRESS_PATTERNS` + `dvortsovaya-18`.
+- Prod MSK apply + API restart; web deploy не нужен.
+
+### Проблемы
+- Следующий TEP import без обновлённого `tep-import-fixtures.js` на MSK снова может создать twin - нужен pull ветки на host (или дождаться обычного deploy скриптов).
+
+---
+
 ## 2026-08-09 - INC.504.5c polish: async disk promote in API
 
 ### Наблюдения

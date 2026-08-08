@@ -27,6 +27,7 @@ const TEPL0HOD_SOURCE_ID = "src_teplohod";
 /** TEP place id → existing TicketsCloud / editorial Venue.id (hide twin, attach events to canon). */
 const TEP_PLACE_CANON_VENUE_IDS = new Map([
   ["53", "venue_60b602fed94a1fa681b69c1d"], // Fontanka 51-53 pier (owner 2026-08-08)
+  ["65", "venue_681d44a7fc03029d63123730"], // Dvortsovaya nab. 18 pier №4 (owner 2026-08-09)
   ["72", "venue_629f8f730fdb465f9b2c54d0"], // Sinopskaya nab. 10А pier (owner 2026-08-08)
 ]);
 

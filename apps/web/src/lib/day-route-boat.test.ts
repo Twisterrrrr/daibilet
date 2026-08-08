@@ -165,4 +165,39 @@ describe('day-route-boat', () => {
     assert.ok(String(item.sessionLabel).includes('15:00'));
     assert.ok(String(item.ticketUrl).includes('teplohod.info'));
   });
+
+  it('strips r: from TicketsCloud purchaseUrl on day-route ticket', () => {
+    const item = dayRouteItemFromBoatSlot({
+      pier: {
+        id: 'venue_pier',
+        slug: 'fontanka',
+        name: 'Фонтанка',
+        city: 'Санкт-Петербург',
+        cityId: null,
+        citySlug: 'saint-petersburg',
+        address: null,
+        latitude: 59.93,
+        longitude: 30.32,
+        heroImageUrl: null,
+      },
+      route: {
+        eventId: 'evt_tc_1',
+        eventSlug: 'tc-cruise',
+        title: 'По рекам и каналам',
+        imageUrl: null,
+      },
+      slot: {
+        eventId: 'evt_tc_1',
+        startsAt: '2026-08-02T12:00:00.000Z',
+        dateLabel: 'вс, 2 авг.',
+        timeLabel: '15:00',
+        purchaseUrl:
+          'https://ticketscloud.org/v1/widgets/common?token=r%3AeyJ.test&event=6a05dd8e',
+      },
+    });
+    assert.ok(item.ticketUrl);
+    const parsed = new URL(String(item.ticketUrl));
+    assert.equal(parsed.searchParams.get('token'), 'eyJ.test');
+    assert.equal(parsed.hostname, 'ticketscloud.com');
+  });
 });

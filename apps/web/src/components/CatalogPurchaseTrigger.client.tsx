@@ -4,6 +4,7 @@ import * as React from 'react';
 
 import {
   getTcWidgetIds,
+  normalizeTcPurchaseUrl,
   openTcWidget,
   resolveTcWidgetToken,
 } from '@/components/TcWidget.client';
@@ -74,7 +75,9 @@ export function useCatalogPurchase(session: PublicSessionDto) {
       }
 
       const eventId = extractTcEventIdFromSession(target) || getTcWidgetIds(target)?.tcEventId || '';
-      const purchaseUrl = targetPurchaseUrl || session.widgetUrl || session.purchaseUrl || session.deeplinkUrl || null;
+      const purchaseUrlRaw =
+        targetPurchaseUrl || session.widgetUrl || session.purchaseUrl || session.deeplinkUrl || null;
+      const purchaseUrl = normalizeTcPurchaseUrl(purchaseUrlRaw) || purchaseUrlRaw;
       const token = resolveTcWidgetToken(purchaseUrl);
 
       if (!eventId || !token) {

@@ -230,6 +230,7 @@ function inferCityNameFromText(...parts) {
 const KNOWN_PIER_ADDRESS_PATTERNS = [
   { key: 'sinopskaya-10', test: (text) => /синопск/.test(text) && /\b10\b/.test(text) },
   { key: 'fontanka-53', test: (text) => /фонтанк/.test(text) && /\b53\b/.test(text) },
+  { key: 'dvortsovaya-18', test: (text) => /дворцов/.test(text) && /\b18\b/.test(text) },
 ];
 
 export function canonicalPierLocationKey(name, address) {

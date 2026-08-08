@@ -1902,12 +1902,26 @@ export function sanitizeDayRouteTicketFields(venue: DayRouteVenueItem): DayRoute
  * Never invent `/events/{venueSlug}` or treat venue/location pages as buy CTAs.
  * External https (TEP widget etc.) stays.
  */
+/** TicketsCloud widget page rejects `token=r:…` with HTTPForbidden/bad token. */
+function sanitizeDayRouteExternalTicketUrl(url: string): string {
+  if (!/ticketscloud/i.test(url)) return url;
+  try {
+    const parsed = new URL(url);
+    const token = parsed.searchParams.get('token');
+    if (token?.startsWith('r:')) parsed.searchParams.set('token', token.slice(2));
+    if (parsed.hostname === 'ticketscloud.org') parsed.hostname = 'ticketscloud.com';
+    return parsed.toString();
+  } catch {
+    return url;
+  }
+}
+
 export function resolveDayRouteTicketUrl(
   venue: Pick<DayRouteVenueItem, 'ticketUrl' | 'eventId' | 'eventSlug' | 'title' | 'slug' | 'id' | 'href'>,
 ): string | null {
   const stored = String(venue.ticketUrl || '').trim();
   if (stored) {
-    if (/^https?:\/\//i.test(stored)) return stored;
+    if (/^https?:\/\//i.test(stored)) return sanitizeDayRouteExternalTicketUrl(stored);
     // Venue/location program is not a saleable event page - hide buy CTA.
     if (/^\/venues\//i.test(stored) || /^\/locations\//i.test(stored)) return null;
     if (isDayRouteVenueAsEventTicketUrl(stored, venue)) return null;

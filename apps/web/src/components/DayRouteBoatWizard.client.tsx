@@ -28,6 +28,7 @@ import {
   type DayRouteState,
   type DayRouteVenueItem,
 } from '@/lib/day-route';
+import { normalizeTcPurchaseUrl } from '@/components/TcWidget.client';
 import { flashDayRouteFeedback } from '@/lib/day-route-feedback';
 import { formatPriceFrom } from '@/lib/format';
 import { toVenueCatalogCard } from '@/lib/venue-catalog-card';
@@ -479,7 +480,7 @@ export function DayRouteBoatWizard({
                         </button>
                         {slot.purchaseUrl ? (
                           <a
-                            href={slot.purchaseUrl}
+                            href={normalizeTcPurchaseUrl(slot.purchaseUrl) || slot.purchaseUrl}
                             target="_blank"
                             rel="noopener noreferrer"
                             data-day-boat-buy
