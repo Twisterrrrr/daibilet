@@ -1,3 +1,23 @@
+## 2026-08-08 - Purchases CTA + venue slug fixes (TC ticket / Отзыв / Hermitage)
+
+### Наблюдения
+- Seed вёл на битые slug: `tretyakovskaya-galereya`, `gosudarstvennyy-ermitazh` (канон: `moscow-tret-yakovskaya-galereya`, `ermitazh`; `erarta` уже 200).
+- Ticketscloud №113184626 (KXM-494695) без Скачать/Открыть - только internal source показывал CTA.
+- Owner: «Отзыв» в том же ряду, что Скачать/Открыть, и только после старта; на билете - «Вернуться в покупки».
+- Owner: в номере билета не должно быть фамилии - internal `DB…`/`TKT-…` без ФИО; external = код партнёра as-is.
+
+### Решения
+- Seed + redirects на живые venue slug; cache key venue DTO `v3` (сброс возможного ISR null на `/venues/ermitazh`).
+- Rich widget import → свой BuyerTicketCard (партнёрский код в QR); sparse → «Билет отправлен на e-mail …».
+- «Отзыв» outline-кнопка в том же action-ряду; только если `startsAt` в прошлом.
+- Ticket page: ArrowLeft + «Вернуться в покупки».
+- Seed codes: `DB26-784501..03` / `TKT-784501..03` (без BUTIN). Format lock в museum-contract-readiness S0.TKT.1.
+
+### Проблемы
+- Ticket page для TC опирается на localStorage handoff с `/account/purchases`; deep-link без кэша остаётся soft. Полный server lookup ExternalOrder - follow-up.
+
+---
+
 ## 2026-08-08 - Restore v.butin@yandex.ru SiteUser password hash
 
 ### Наблюдения
@@ -58,7 +78,7 @@
 - Finance public purchases-by-email ещё soft/empty (UX.BUY-6). Internal compact list берётся из `/checkout/actions/internal-purchases`.
 
 ### Решения
-- Catalog fixture `apps/web/src/lib/buyer-purchases-seed.ts`: 3 музейных STUB заказа `DB26-BUTIN01..03` (Третьяковка / Эрмитаж / Эрарта) для email `v.butin@yandex.ru`.
+- Catalog fixture `apps/web/src/lib/buyer-purchases-seed.ts`: 3 музейных STUB заказа `DB26-784501..03` (Третьяковка / Эрмитаж / Эрарта) для email `v.butin@yandex.ru`.
 - Fan-in в `internal-purchases` + lookup в `checkout/actions/order` (билет `/checkout/ticket/{code}`).
 - Script `scripts/seed-buyer-purchases-profile.js` - ensure SiteUser; `--reset-password` пишет temp creds только в server file (не в git/chat).
 - Нужен web deploy (fixture в apps/web). Finance `.159` не трогали.

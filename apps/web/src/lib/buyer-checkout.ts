@@ -211,7 +211,7 @@ export function buildDemoBuyerTicketOrder(): BuyerInternalOrderRecord {
     eventTitle: 'Постоянная экспозиция',
     venueTitle: 'Третьяковская галерея',
     venueAddress: 'Лаврушинский переулок, 10, Москва',
-    venueSlug: 'tretyakovskaya-galereya',
+    venueSlug: 'moscow-tret-yakovskaya-galereya',
     // Main Tretyakov building (Lavrushinsky 10) - demo pin for ticket page map.
     venueLatitude: 55.7415,
     venueLongitude: 37.6201,

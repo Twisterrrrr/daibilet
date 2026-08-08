@@ -2,6 +2,10 @@
  * Catalog-side buyer purchases seed for owner QA of /account/purchases compact list.
  * Used until Codex m2m / public purchases-by-email (UX.BUY-6) is live.
  * Idempotent fixture - no finance secrets, no DB write from the web app.
+ *
+ * Numbering (owner lock 2026-08-08):
+ * - Internal: `DB…` order + `TKT-…` ticket, alphanumeric seq only (no personal-name fragments).
+ * - External/widget: keep partner codes as synced (e.g. KXM-494695) - not rewritten here.
  */
 
 import type { BuyerInternalOrderRecord } from './buyer-checkout';
@@ -17,8 +21,8 @@ function normalizeEmail(email: string | null | undefined): string {
 
 const SEED_ROWS: BuyerInternalOrderRecord[] = [
   {
-    publicCode: 'DB26-BUTIN01',
-    ticketNumber: 'TKT-BUTIN-784501',
+    publicCode: 'DB26-784501',
+    ticketNumber: 'TKT-784501',
     status: 'CONFIRMED',
     displayStatus: 'Оплачен',
     statusTone: 'live',
@@ -28,7 +32,7 @@ const SEED_ROWS: BuyerInternalOrderRecord[] = [
     eventTitle: 'Постоянная экспозиция',
     venueTitle: 'Третьяковская галерея',
     venueAddress: 'Лаврушинский переулок, 10, Москва',
-    venueSlug: 'tretyakovskaya-galereya',
+    venueSlug: 'moscow-tret-yakovskaya-galereya',
     venueLatitude: 55.7415,
     venueLongitude: 37.6201,
     sessionStartsAt: '2026-08-15T11:00:00.000Z',
@@ -45,8 +49,8 @@ const SEED_ROWS: BuyerInternalOrderRecord[] = [
     source: 'internal',
   },
   {
-    publicCode: 'DB26-BUTIN02',
-    ticketNumber: 'TKT-BUTIN-784502',
+    publicCode: 'DB26-784502',
+    ticketNumber: 'TKT-784502',
     status: 'CONFIRMED',
     displayStatus: 'Оплачен',
     statusTone: 'live',
@@ -56,7 +60,7 @@ const SEED_ROWS: BuyerInternalOrderRecord[] = [
     eventTitle: 'Главный музейный комплекс',
     venueTitle: 'Государственный Эрмитаж',
     venueAddress: 'Дворцовая площадь, 2, Санкт-Петербург',
-    venueSlug: 'gosudarstvennyy-ermitazh',
+    venueSlug: 'ermitazh',
     venueLatitude: 59.9398,
     venueLongitude: 30.3146,
     sessionStartsAt: null,
@@ -70,8 +74,8 @@ const SEED_ROWS: BuyerInternalOrderRecord[] = [
     source: 'internal',
   },
   {
-    publicCode: 'DB26-BUTIN03',
-    ticketNumber: 'TKT-BUTIN-784503',
+    publicCode: 'DB26-784503',
+    ticketNumber: 'TKT-784503',
     status: 'PENDING',
     displayStatus: 'Ожидает оплаты',
     statusTone: 'incomplete',

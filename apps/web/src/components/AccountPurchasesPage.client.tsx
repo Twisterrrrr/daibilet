@@ -212,7 +212,7 @@ export function AccountPurchasesPageView() {
 
             <div className="grid gap-2.5">
               {mergedRows.map((order) => (
-                <BuyerOrderCard key={order.id} order={order} />
+                <BuyerOrderCard key={order.id} order={order} accountEmail={user?.email} />
               ))}
             </div>
 

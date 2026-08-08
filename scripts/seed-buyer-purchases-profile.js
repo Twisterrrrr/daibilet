@@ -104,9 +104,9 @@ async function main() {
           : 'noop-exists'
       : 'create',
     secretsPath: resetPassword || !row ? secretsPath : null,
-    seedTicketCodes: ['DB26-BUTIN01', 'DB26-BUTIN02', 'DB26-BUTIN03'],
+    seedTicketCodes: ['DB26-784501', 'DB26-784502', 'DB26-784503'],
     note:
-      'Internal museum tickets are served from apps/web buyer-purchases-seed.ts after web deploy. This script only manages SiteUser login. Existing SiteUser passwords are never reset unless both --reset-password and --i-understand-destroys-existing-password are passed.',
+      'Internal museum tickets are served from apps/web buyer-purchases-seed.ts after web deploy (DB…/TKT-… codes, no personal-name fragments). This script only manages SiteUser login. Existing SiteUser passwords are never reset unless both --reset-password and --i-understand-destroys-existing-password are passed.',
   };
 
   if (!doApply) {
@@ -203,7 +203,7 @@ function writeSecretsFile(filePath, payload) {
     `userId=${payload.userId}`,
     `loginUrl=https://daibilet.ru/login?returnUrl=/account/purchases`,
     `purchasesUrl=https://daibilet.ru/account/purchases`,
-    `ticketCodes=DB26-BUTIN01,DB26-BUTIN02,DB26-BUTIN03`,
+    `ticketCodes=DB26-784501,DB26-784502,DB26-784503`,
     '',
   ].join('\n');
   fs.writeFileSync(filePath, body, { mode: 0o600 });

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { CheckCircle2, Clock3, Copy, Download } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Clock3, Copy, Download } from 'lucide-react';
 import { useCallback, useState, type ReactNode } from 'react';
 
 import {
@@ -75,7 +75,10 @@ export function BuyerTicketCard({ order, origin, emailHint = 'unknown', classNam
     typeof window !== 'undefined'
       ? buyerTicketAbsoluteUrl(order.publicCode, origin || window.location.origin)
       : buyerTicketAbsoluteUrl(order.publicCode, origin);
-  const qrUrl = buyerTicketQrImageUrl(ticketUrl, 180);
+  // Prefer real ticket/order code in QR when issued or imported; do not invent a fake barcode.
+  const qrPayload =
+    order.mode === 'WIDGET_IMPORT' || ticketIssuedSeparately ? ticketNumber : ticketUrl;
+  const qrUrl = buyerTicketQrImageUrl(qrPayload, 180);
   const [copied, setCopied] = useState(false);
 
   const openDate = isOpenDateOrder(order);
@@ -275,9 +278,10 @@ export function BuyerTicketCard({ order, origin, emailHint = 'unknown', classNam
       <div className="mt-3 flex flex-wrap gap-2 print:hidden" data-buyer-ticket-actions>
         <Link
           href="/account/purchases"
-          className="inline-flex min-h-10 items-center justify-center rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+          className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900"
         >
-          Мои покупки
+          <ArrowLeft className="h-4 w-4" />
+          Вернуться в покупки
         </Link>
       </div>
     </article>

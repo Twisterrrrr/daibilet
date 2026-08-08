@@ -34,7 +34,7 @@ export async function getCachedPublicVenueDto(slug: string) {
         timeoutMs: 5_000,
         notFoundAsNull: true,
       }),
-    ['public-venue-dto-v2-http', key],
+    ['public-venue-dto-v3-http', key],
     venueCacheOptions,
   );
   return cached();

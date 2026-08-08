@@ -1,9 +1,16 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, CheckCircle2, Clock3, Download, ExternalLink, HelpCircle, XCircle } from 'lucide-react';
+import type { MouseEvent } from 'react';
+import { ArrowRight, CheckCircle2, Clock3, Download, ExternalLink, HelpCircle, MessageSquarePlus, XCircle } from 'lucide-react';
 
 import { SITE_TIME_ZONE, parseSessionStartsAt } from '@/lib/datetime';
+import {
+  assessImportTicket,
+  mapBuyerOrderToImportTicketRecord,
+  orderEventHasStarted,
+} from '@/lib/buyer-import-ticket';
+import { upsertInternalOrderInStorage } from '@/lib/buyer-checkout';
 import { buyerTicketPath, openBuyerTicketDownload } from '@/lib/buyer-ticket';
 import { formatNumber } from '@/lib/format';
 
@@ -39,7 +46,13 @@ export type BuyerOrder = {
   }>;
 };
 
-export function BuyerOrderCard({ order }: { order: BuyerOrder }) {
+type Props = {
+  order: BuyerOrder;
+  /** Unmasked account email (API masks buyer.email on widget rows). */
+  accountEmail?: string | null;
+};
+
+export function BuyerOrderCard({ order, accountEmail }: Props) {
   const isInternal = order.sourceKind === 'internal';
   const title = order.eventTitle || (isInternal ? 'Входной билет' : 'Заказ');
   const purchaseLabel = formatPurchaseDateTime(order.purchasedAt);
@@ -57,6 +70,46 @@ export function BuyerOrderCard({ order }: { order: BuyerOrder }) {
           startsAt: null as string | null,
         },
       ];
+
+  const profileEmail = String(accountEmail || '').trim() || String(order.buyer.email || '').trim();
+  const importAssessment = !isInternal ? assessImportTicket(order) : null;
+  const showImportTicketActions = Boolean(importAssessment && importAssessment.richness === 'rich');
+  const showEmailFallback = Boolean(importAssessment && importAssessment.richness === 'sparse');
+  const showNativeTicketActions = isInternal;
+  const showTicketActions = showNativeTicketActions || showImportTicketActions;
+
+  const reviewHref = buildOrderReviewHref(order);
+  const showReview = Boolean(reviewHref && orderEventHasStarted(order));
+
+  const openImportTicket = () => {
+    const record = mapBuyerOrderToImportTicketRecord(order, profileEmail);
+    if (!record) return;
+    upsertInternalOrderInStorage(record);
+    return record.publicCode;
+  };
+
+  const onDownload = () => {
+    if (isInternal) {
+      openBuyerTicketDownload(order.number);
+      return;
+    }
+    const code = openImportTicket();
+    if (code) openBuyerTicketDownload(code);
+  };
+
+  const ticketOpenHref = (() => {
+    if (isInternal) return buyerTicketPath(order.number);
+    const record = mapBuyerOrderToImportTicketRecord(order, profileEmail);
+    return record ? buyerTicketPath(record.publicCode) : null;
+  })();
+
+  const onOpenImport = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (isInternal) return;
+    const code = openImportTicket();
+    if (!code) {
+      event.preventDefault();
+    }
+  };
 
   return (
     <article
@@ -97,23 +150,47 @@ export function BuyerOrderCard({ order }: { order: BuyerOrder }) {
           </div>
         </div>
 
-        {isInternal ? (
+        {showTicketActions || showEmailFallback || showReview ? (
           <div className="flex shrink-0 flex-wrap items-center gap-2">
-            <button
-              type="button"
-              onClick={() => openBuyerTicketDownload(order.number)}
-              className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg bg-primary-600 px-3.5 py-2 text-sm font-semibold text-white hover:bg-primary-700"
-            >
-              <Download className="h-3.5 w-3.5" />
-              Скачать
-            </button>
-            <Link
-              href={buyerTicketPath(order.number)}
-              className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
-            >
-              <ExternalLink className="h-3.5 w-3.5" />
-              Открыть
-            </Link>
+            {showTicketActions ? (
+              <>
+                <button
+                  type="button"
+                  onClick={onDownload}
+                  className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg bg-primary-600 px-3.5 py-2 text-sm font-semibold text-white hover:bg-primary-700"
+                >
+                  <Download className="h-3.5 w-3.5" />
+                  Скачать
+                </button>
+                {ticketOpenHref ? (
+                  <Link
+                    href={ticketOpenHref}
+                    onClick={onOpenImport}
+                    className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg border border-primary-200 bg-white px-3 py-2 text-sm font-semibold text-primary-700 hover:bg-primary-50"
+                  >
+                    <ExternalLink className="h-3.5 w-3.5" />
+                    Открыть
+                  </Link>
+                ) : null}
+              </>
+            ) : null}
+
+            {showEmailFallback ? (
+              <p className="max-w-[16rem] text-xs leading-5 text-slate-600 sm:text-right">
+                Билет отправлен на e-mail {profileEmail || 'указанный при покупке'}. Проверьте входящие и
+                папку «Спам».
+              </p>
+            ) : null}
+
+            {showReview && reviewHref ? (
+              <Link
+                href={reviewHref}
+                className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg border border-primary-200 bg-white px-3 py-2 text-sm font-semibold text-primary-700 hover:bg-primary-50"
+              >
+                <MessageSquarePlus className="h-3.5 w-3.5" />
+                Отзыв
+              </Link>
+            ) : null}
           </div>
         ) : null}
       </div>
@@ -121,51 +198,31 @@ export function BuyerOrderCard({ order }: { order: BuyerOrder }) {
       {ticketRows.length > 1 || (!isInternal && order.tickets.length > 0) ? (
         <div className="border-t border-slate-100 bg-slate-50/60 px-4 py-2">
           <ul className="divide-y divide-slate-100/80">
-            {ticketRows.map((ticket) => {
-              const reviewHref = buildReviewWriteHref({
-                eventId: ticket.eventId || order.eventId || '',
-                eventUrl: ticket.eventUrl || order.eventUrl || '',
-                eventTitle: ticket.eventTitle || order.eventTitle || '',
-                orderRef: ticket.number || order.number,
-                email: order.buyer.email || '',
-                name: order.buyer.name || '',
-              });
-              return (
-                <li
-                  key={ticket.id}
-                  className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 py-2 first:pt-0 last:pb-0"
-                >
-                  <div className="min-w-0">
-                    <p className="truncate text-xs font-semibold text-slate-800">
-                      {ticket.number || 'Билет без номера'}
-                      {ticket.startsAt ? (
-                        <span className="ml-2 font-normal text-slate-500">
-                          {formatSessionDateTime(ticket.startsAt)}
-                        </span>
-                      ) : null}
+            {ticketRows.map((ticket) => (
+              <li
+                key={ticket.id}
+                className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 py-2 first:pt-0 last:pb-0"
+              >
+                <div className="min-w-0">
+                  <p className="truncate text-xs font-semibold text-slate-800">
+                    {ticket.number || 'Билет без номера'}
+                    {ticket.startsAt ? (
+                      <span className="ml-2 font-normal text-slate-500">
+                        {formatSessionDateTime(ticket.startsAt)}
+                      </span>
+                    ) : null}
+                  </p>
+                  {(ticket.eventTitle || order.eventTitle) && ticket.eventTitle !== order.eventTitle ? (
+                    <p className="mt-0.5 truncate text-[11px] text-slate-500">
+                      {ticket.eventTitle || order.eventTitle}
                     </p>
-                    {(ticket.eventTitle || order.eventTitle) && ticket.eventTitle !== order.eventTitle ? (
-                      <p className="mt-0.5 truncate text-[11px] text-slate-500">
-                        {ticket.eventTitle || order.eventTitle}
-                      </p>
-                    ) : null}
-                  </div>
-                  <div className="flex flex-wrap items-center gap-1.5">
-                    <span className="rounded-full bg-white px-2 py-0.5 text-[11px] font-semibold text-slate-600 ring-1 ring-slate-200/80">
-                      {ticket.displayStatus}
-                    </span>
-                    {reviewHref ? (
-                      <Link
-                        href={reviewHref}
-                        className="rounded-full bg-primary-50 px-2.5 py-0.5 text-[11px] font-semibold text-primary-700 hover:bg-primary-100"
-                      >
-                        Отзыв
-                      </Link>
-                    ) : null}
-                  </div>
-                </li>
-              );
-            })}
+                  ) : null}
+                </div>
+                <span className="rounded-full bg-white px-2 py-0.5 text-[11px] font-semibold text-slate-600 ring-1 ring-slate-200/80">
+                  {ticket.displayStatus}
+                </span>
+              </li>
+            ))}
           </ul>
         </div>
       ) : null}
@@ -256,6 +313,19 @@ function extractSlugFromEventUrl(eventUrl: string): string {
   } catch {
     return '';
   }
+}
+
+function buildOrderReviewHref(order: BuyerOrder): string | null {
+  const primary =
+    order.tickets.find((ticket) => ticket.eventId || ticket.eventUrl) || order.tickets[0] || null;
+  return buildReviewWriteHref({
+    eventId: primary?.eventId || order.eventId || '',
+    eventUrl: primary?.eventUrl || order.eventUrl || '',
+    eventTitle: primary?.eventTitle || order.eventTitle || '',
+    orderRef: primary?.number || order.number,
+    email: order.buyer.email || '',
+    name: order.buyer.name || '',
+  });
 }
 
 function buildReviewWriteHref(input: {

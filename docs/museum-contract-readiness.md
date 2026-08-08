@@ -167,7 +167,7 @@
 
 | ID | Item | Status | Notes |
 |----|------|--------|-------|
-| S0.TKT.1 | Модель: `CheckoutOrder.publicCode` ≠ `ticketNumber` (issued) | TODO | qa LOCKED draft; UI already split |
+| S0.TKT.1 | Модель: `CheckoutOrder.publicCode` ≠ `ticketNumber` (issued) | TODO | qa LOCKED draft; UI already split. **Format lock:** internal = `DB…` + seq / `TKT-…` (без ФИО в коде); external/widget = код партнёра as-is (TC `KXM-…`, order `#…`) |
 | S0.TKT.2 | Issuance при SUCCEEDED: создать ticket row(s) с уникальным номером | TODO | Path A: 1+ tickets per qty |
 | S0.TKT.3 | Public order-by-code DTO: buyer, venue, address, validTo, items[], totals, paidAt, ticketNumber(s), supportPhone | TODO | Gaps в qa.md |
 | S0.TKT.4 | QR payload: URL страницы билета **или** venue scan payload - зафиксировать в DTO | TODO | Catalog QR = page URL сейчас |
@@ -382,7 +382,7 @@ park admission, wide internal sales CTA.
 ## Открытые вопросы для owner (коротко)
 
 1. **Fiscal / 54-ФЗ:** чек от Daibilet (SINGLE_MERCHANT) на Stage 0 - OK?  
-2. **Issuance:** кто «владеет» форматом `ticketNumber` (Daibilet uuid vs external code площадки)?  
+2. **Issuance:** LOCKED owner 2026-08-08 - internal Daibilet = `DB…`/`TKT-…` seq без ФИО; external/widget = код партнёра as-is при sync.  
 3. **Scanner day-1:** достаточно печатного номера + код заказа, или нужен scan API до договора?  
 4. **Email:** SMTP на MSK web vs mail с finance `.159` - что канон для production писем?  
 5. **Support phone:** единый Дайбилет vs телефон поставщика в DTO?  
