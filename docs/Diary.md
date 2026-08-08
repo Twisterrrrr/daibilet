@@ -1,3 +1,19 @@
+## 2026-08-08 - Architecture: lightweight web + robots (WEB.LIGHT)
+
+### Наблюдения
+- Owner (после UI/bug batch): длинный хвост при открытии страницы; сайт должен быть легковесным и хорошим для роботов.
+- Уже закрытый фундамент: home ISR (`5b15d6a1`), soft-404→HTTP 404, city/venue STALE 404 poison, venue hub SWR (`b7c39325`), progressive venues shell, locations без карты, suburbs без snap-carousel.
+- Открытый хвост: cold venue hub rebuild, HTML `/` ~730KB (PERF.WM4), client maps/hydrate, fonts, waterfalls, dual catalog SWR.
+
+### Решения
+- Канон-план: `docs/web-lightweight-seo.md` (ranked causes, target SSR/ISR + progressive, payload budgets, NEVER critical path, Phase A/B/C + acceptance).
+- Эпик Tasktracker `WEB.LIGHT.*`; не дублировать SWR/shell - наращивать поверх.
+
+### Проблемы
+- Runtime ещё не трогали (docs-only). Disk snapshot venue hub и lean home HTML - Phase A/B.
+
+---
+
 ## 2026-08-08 - /venues: «Показать ещё» + progressive loadMore
 
 ### Наблюдения
@@ -29,7 +45,7 @@
 - Docs: Project.md layout note; smoke SPB hub + my-day после MSK deploy.
 
 ### Проблемы
-- Нет (ожидаем deploy smoke).
+- Нет. Live: Deploy MSK `31252106157` **BUILD_ID=`s-owIkAGLosjNneQIvCtt`** (HEAD `18afa783`, includes `54c22b33`); SPB hub 200, `data-city-suburb-chips` + 12 chips + 1 panel, no `data-city-suburb-rail`; my-day 200 (suburbs client-side after city).
 
 ---
 

@@ -1,9 +1,35 @@
 # Tasktracker — Daibilet
 
 **Обновлено:** 2026-08-08
-**Источники:** [Project.md](./Project.md), [current-state.md](./current-state.md), [migration-spb-to-msk.md](./migration-spb-to-msk.md), [widget-etalon-slugs.md](./widget-etalon-slugs.md), [content-blog-plan.md](./content-blog-plan.md), [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brief.md), [mobile-templates.md](./mobile-templates.md), [catalog-location-venue-canon.md](./catalog-location-venue-canon.md), [museum-contract-readiness.md](./museum-contract-readiness.md)
+**Источники:** [Project.md](./Project.md), [current-state.md](./current-state.md), [migration-spb-to-msk.md](./migration-spb-to-msk.md), [widget-etalon-slugs.md](./widget-etalon-slugs.md), [content-blog-plan.md](./content-blog-plan.md), [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brief.md), [mobile-templates.md](./mobile-templates.md), [catalog-location-venue-canon.md](./catalog-location-venue-canon.md), [museum-contract-readiness.md](./museum-contract-readiness.md), [web-lightweight-seo.md](./web-lightweight-seo.md)
 
 **Легенда:** ✅ done · 🔄 in progress · ⏳ todo · 🚫 blocked · ⚠️ deferred
+
+---
+
+## Epic: WEB.LIGHT - lightweight HTML + robots (2026-08-08)
+
+**Канон:** [web-lightweight-seo.md](./web-lightweight-seo.md)  
+**Контекст:** после UI/bug batch; поверх SWR venue hub / progressive venues / soft-404 / home ISR (не дублировать).  
+**Deploy:** docs-only сейчас; runtime - batch / по запросу owner.
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| WEB.LIGHT.DOC | Architecture plan ranked causes + budgets + phases | Критический | ✅ `docs/web-lightweight-seo.md` |
+| WEB.LIGHT.A1 | Lean home HTML ≤350KB (PERF.WM4) | Высокий | ⏳ |
+| WEB.LIGHT.A2 | Home SSR single LCP hero frame; rotator client | Высокий | ⏳ |
+| WEB.LIGHT.A3 | Font weights / subset trim | Средний | ⏳ |
+| WEB.LIGHT.A4 | Single `priority` LCP audit | Средний | ⏳ |
+| WEB.LIGHT.A5 | Live blog `[slug]` ISR HIT (PERF.WM2) | Высокий | ⏳ |
+| WEB.LIGHT.A6 | CI guardrails: no soft-404 loading + no null DTO cache | Высокий | ⏳ |
+| WEB.LIGHT.A7 | Warm `/venues` `/locations` shell post-deploy | Высокий | ⏳ |
+| WEB.LIGHT.B1 | Venue hub disk snapshot / forever-SWR | Критический | ⏳ |
+| WEB.LIGHT.B2 | City hub SSR links + defer heavy client | Высокий | ⏳ |
+| WEB.LIGHT.B3 | Leaflet only on «Показать карту» | Высокий | ⏳ |
+| WEB.LIGHT.B4 | Hero banners via cached API (INC.504.15) | Высокий | ⏳ |
+| WEB.LIGHT.B5 | Payload telemetry in smoke | Средний | ⏳ |
+| WEB.LIGHT.B6 | Dead hub cards data cleanup (INC.LINK.5) | Высокий | ⏳ |
+| WEB.LIGHT.C* | RSC slim / dual SWR merge / PPR / AVIF / crawl report | Низкий | ⏳ later |
 
 ---
 
@@ -21,9 +47,9 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| UX.SUBURB.1 | Hub: chips + one detail panel (drop tall snap-carousel) | Высокий | 🔄 `SuburbsCarousel` rewrite |
-| UX.SUBURB.2 | My Day: horizontal accordion by suburb chip | Высокий | 🔄 compact mode |
-| UX.SUBURB.3 | Commit + push + MSK deploy + SPB smoke | Высокий | 🔄 |
+| UX.SUBURB.1 | Hub: chips + one detail panel (drop tall snap-carousel) | Высокий | ✅ `54c22b33` |
+| UX.SUBURB.2 | My Day: horizontal accordion by suburb chip | Высокий | ✅ compact accordion |
+| UX.SUBURB.3 | Commit + push + MSK deploy + SPB smoke | Высокий | ✅ Deploy `31252106157` BUILD_ID=`s-owIkAGLosjNneQIvCtt` (HEAD `18afa783` incl. suburbs); hub 200 + 12 chips / 1 panel; my-day 200 |
 
 ---
 
