@@ -13,7 +13,7 @@
 |----|--------|-----------|--------|
 | INC.CITY404.1 | Diagnose `/cities/samara` live 404 vs API/origin 200 | Критический | ✅ nginx STALE 404 poison; seed/slug OK |
 | INC.CITY404.2 | Hotfix: purge nginx proxy cache + warm Pack C hubs | Критический | ✅ MSK purge; live samara/Pack C **200** |
-| INC.CITY404.3 | Code: city DTO no-null cache + `noStore()` before `notFound()` | Критический | 🔄 commit+MSK deploy |
+| INC.CITY404.3 | Code: city DTO no-null cache + `noStore()` before `notFound()` | Критический | ✅ `afadaa2e` Deploy MSK web `31251047111` |
 | INC.CITY404.4 | Fix `POST /api/internal/revalidate` 500 (CI-baked `city-routing.ru.json` path) | Высокий | ⏳ |
 
 ---
