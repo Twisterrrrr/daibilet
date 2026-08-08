@@ -11,7 +11,7 @@ import {
 } from './catalog-availability.js';
 import { resolveCityTimeZone } from './city-timezone.js';
 import {
-  loadPublicCatalogDiskCache,
+  loadPublicCatalogDiskCacheWithStat,
   resolveCatalogRebuildLockPath,
   resolveCatalogRebuildMode,
   resolveCatalogRebuildScriptPath,
@@ -73,6 +73,7 @@ interface CatalogCache {
 let catalogCache: CatalogCache | null = null;
 let catalogBuildPromise: Promise<PublicSessionDto[]> | null = null;
 let catalogChildSpawnedAt = 0;
+let catalogDiskLoadedMtimeMs = 0;
 
 export function clearPublicCatalogDtoCache(): void {
   // Soft-invalidate for SWR: keep last sessions while rebuild runs.
@@ -81,6 +82,7 @@ export function clearPublicCatalogDtoCache(): void {
   } else {
     catalogCache = null;
   }
+  catalogDiskLoadedMtimeMs = 0;
   // Do not clear in-flight rebuild - callers may still await it.
 }
 
@@ -129,19 +131,25 @@ export async function getPublicCatalogSessions(
     return hydrateSlots ? hydrateCatalogUpcomingSlots(sessions) : sessions;
   }
 
-  promoteDiskCacheIfNewer();
   const cached = catalogCache;
 
   if (cached?.sessions && now < cached.expiresAt) {
     return hydrateSlots ? hydrateCatalogUpcomingSlots(cached.sessions) : cached.sessions;
   }
 
+  promoteDiskCacheIfNewer();
+  const promoted = catalogCache;
+
+  if (promoted?.sessions && now < promoted.expiresAt) {
+    return hydrateSlots ? hydrateCatalogUpcomingSlots(promoted.sessions) : promoted.sessions;
+  }
+
   // INC.504.4: if we have ANY previous sessions (even past staleUntil), never await rebuild
   // on the request path - serve stale and refresh in background (child/cron preferred).
-  if (cached?.sessions?.length) {
-    const reason = now < (cached.staleUntil || 0) ? 'swr' : 'soft-expire';
+  if (promoted?.sessions?.length) {
+    const reason = now < (promoted.staleUntil || 0) ? 'swr' : 'soft-expire';
     triggerBackgroundCatalogRebuild(reason);
-    return hydrateSlots ? hydrateCatalogUpcomingSlots(cached.sessions) : cached.sessions;
+    return hydrateSlots ? hydrateCatalogUpcomingSlots(promoted.sessions) : promoted.sessions;
   }
 
   const sessions = await awaitCatalogRebuild('cold');
@@ -149,9 +157,13 @@ export async function getPublicCatalogSessions(
 }
 
 function promoteDiskCacheIfNewer(): void {
-  const disk = loadPublicCatalogDiskCache();
-  if (!disk?.sessions?.length) return;
+  const diskRead = catalogCache?.sessions?.length
+    ? loadPublicCatalogDiskCacheWithStat({ modifiedAfterMs: catalogDiskLoadedMtimeMs })
+    : loadPublicCatalogDiskCacheWithStat();
+  if (!diskRead?.snapshot.sessions?.length) return;
+  const disk = diskRead.snapshot;
   const memBuiltAt = catalogCache?.builtAt || 0;
+  catalogDiskLoadedMtimeMs = diskRead.modifiedAtMs;
   if (disk.builtAt <= memBuiltAt && catalogCache?.sessions?.length) return;
   catalogCache = {
     expiresAt: disk.expiresAt,
@@ -184,7 +196,8 @@ async function awaitCatalogRebuild(reason: string): Promise<PublicSessionDto[]> 
   }
 
   if (mode === 'child') {
-    const beforeBuiltAt = catalogCache?.builtAt || loadPublicCatalogDiskCache()?.builtAt || 0;
+    promoteDiskCacheIfNewer();
+    const beforeBuiltAt = catalogCache?.builtAt || 0;
     spawnCatalogRebuildChild(reason);
     const waitMs = reason === 'force-refresh' ? PUBLIC_CATALOG_CHILD_WAIT_MS : PUBLIC_CATALOG_COLD_AWAIT_MS;
     const sessions = await pollDiskCatalogUntil(beforeBuiltAt, waitMs);
@@ -371,7 +384,7 @@ async function loadPinnedEventIds(): Promise<Set<string>> {
     from "LandingMatch"
     where coalesce(reasons->>'manualStatus', '') = 'PINNED'
   `);
-  return new Set(rows.map((row) => row.eventId));
+  return new Set(rows.map((row: { eventId: string }) => row.eventId));
 }
 
 async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
@@ -1005,7 +1018,7 @@ async function hydrateCatalogUpcomingSlots(
   ]);
 
   const providerByEventId = new Map<string, PurchaseProvider | null>(
-    eventRows.map((event) => [
+    eventRows.map((event: (typeof eventRows)[number]) => [
       event.id,
       providerForSource(event.providerLinks[0]?.source.code),
     ]),

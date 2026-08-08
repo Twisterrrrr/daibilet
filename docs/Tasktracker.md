@@ -608,6 +608,7 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 | INC.504.3 | Пересмотр daibilet-web MemoryMax/heap + OOMPolicy=continue (High 1.5G / Max 2G / heap 1280 на 7.8Gi) | Критический | done 2026-07-31 MSK live |
 | INC.504.4 | SWR catalog rebuild: non-blocking / async (не блокировать event loop 49-219с) | Критический | ✅ MSK live BUILD `GMlh5-uhf-R2iVlZbSFXY`: disk+child/cron+forever-SWR+reap |
 | INC.504.5 | Dual catalog SWR cache (`dto.js` + `public-catalog.dto.ts`) - merge/unify в F5.3b | Средний | ⏳ |
+| INC.504.5e | Public catalog disk promote stat-gate: memory-fresh request не парсит полный disk snapshot; parse только cold/mtime change | Критический | ✅ PR-sized fix 2026-08-09; local bench 16.33MB parse 46.79ms -> unchanged stat-gate 0.21ms |
 | INC.504.6 | nginx proxy_cache SWR: `background_update` + TTL 30m (browser clear ≠ cold Next) | Критический | ✅ |
 | INC.504.7 | City hub ISR: `unstable_cache` + `generateStaticParams` (было no-store / 20-30с) | Критический | ✅ |
 | INC.504.8 | Cron warm-hub: flock + timeout 90s + per-fetch 15s (anti pile-up) | Критический | done 2026-07-31 MSK live |
@@ -1690,4 +1691,3 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 ## Google Search Console verification
 - [x] **Критический** — файл `googleb3313872246ac993.html` в `apps/web/public/`, deploy prod, curl 200 (2026-07-19)
-

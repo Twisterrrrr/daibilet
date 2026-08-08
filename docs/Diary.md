@@ -11,6 +11,26 @@
 ### Проблемы
 - До первых secrets workflow только соберёт artifact при `skip_swap` или упадёт на SSH step.
 
+## 2026-08-09 - INC.504.5e public catalog disk promote stat-gate
+
+### Наблюдения
+- RCA по `feat/next-monorepo`: public list endpoints идут через `server-entry.ts` -> `buildPublicCatalogDto` / city DTO -> `getPublicCatalogSessions`.
+- В `getPublicCatalogSessions` disk promote вызывался до fresh-memory cache check. `loadPublicCatalogDiskCache` делал sync `stat/readFile/JSON.parse` полного snapshot на request path, даже когда memory cache был свежий.
+- При `DAIBILET_CATALOG_REBUILD_MODE=off` SQL rebuild на request path не найден; проблема была в синхронном promote, а не в fallback rebuild.
+
+### Решения
+- `loadPublicCatalogDiskCacheWithStat` возвращает snapshot вместе с `mtimeMs` и умеет пропускать чтение тела файла, если snapshot не изменился.
+- `getPublicCatalogSessions` сначала отдает свежую memory cache; disk promote теперь выполняется только после miss/expire и пропускает unchanged snapshot через stat-gate.
+- `clearPublicCatalogDtoCache` сбрасывает запомненный disk `mtimeMs`, чтобы ручная инвалидация могла заново подобрать snapshot.
+
+### Проверки
+- `pnpm --filter @daibilet/backend exec tsx --test src/public-catalog-disk-cache.test.ts` - pass, 3/3.
+- Synthetic snapshot 16.33 MB: cold parse 46.79 ms, unchanged stat-gate 0.21 ms.
+- `pnpm --filter @daibilet/backend test:ts` дошел до 84 pass / 7 fail; fail из-за отсутствующего `packages/db/src/generated/prisma/client.ts` в локальном worktree, не из-за catalog patch.
+
+### Проблемы
+- В текущем `origin/feat/next-monorepo` snapshot schema остается `version: 1`; заявленный v2+indexes из handoff не найден в этой базе. Если MSK уже живет на v2+indexes, нужен отдельный branch/live reconciliation перед 504.5d Redis.
+
 ---
 
 ## 2026-08-06 - My Day grid offers: compact shell + «Билеты от» + inline Поблизости

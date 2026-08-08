@@ -17,6 +17,11 @@ export interface PublicCatalogDiskSnapshot {
   sessions: PublicSessionDto[];
 }
 
+export interface PublicCatalogDiskSnapshotRead {
+  snapshot: PublicCatalogDiskSnapshot;
+  modifiedAtMs: number;
+}
+
 const PROJECT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 
 export function resolvePublicCatalogDiskCachePath(): string {
@@ -26,14 +31,30 @@ export function resolvePublicCatalogDiskCachePath(): string {
 }
 
 export function loadPublicCatalogDiskCache(): PublicCatalogDiskSnapshot | null {
+  return loadPublicCatalogDiskCacheWithStat()?.snapshot ?? null;
+}
+
+export function loadPublicCatalogDiskCacheWithStat(
+  options: { modifiedAfterMs?: number } = {},
+): PublicCatalogDiskSnapshotRead | null {
   const filePath = resolvePublicCatalogDiskCachePath();
   try {
-    if (!fs.existsSync(filePath)) return null;
+    const stat = fs.statSync(filePath);
+    if (
+      options.modifiedAfterMs != null &&
+      stat.mtimeMs <= options.modifiedAfterMs
+    ) {
+      return null;
+    }
     const raw = fs.readFileSync(filePath, 'utf8');
     const parsed = JSON.parse(raw) as PublicCatalogDiskSnapshot;
     if (parsed?.version !== 1 || !Array.isArray(parsed.sessions) || !parsed.builtAt) return null;
-    return parsed;
+    return {
+      snapshot: parsed,
+      modifiedAtMs: stat.mtimeMs,
+    };
   } catch (error) {
+    if ((error as NodeJS.ErrnoException)?.code === 'ENOENT') return null;
     console.warn(
       `Public catalog disk cache read failed: ${error instanceof Error ? error.message : String(error)}`,
     );

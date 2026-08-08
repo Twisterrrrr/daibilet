@@ -1,6 +1,10 @@
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import test from 'node:test';
 import {
+  loadPublicCatalogDiskCacheWithStat,
   resolveCatalogRebuildMode,
   resolvePublicCatalogDiskCachePath,
 } from './public-catalog-disk-cache.js';
@@ -43,6 +47,22 @@ test('resolvePublicCatalogDiskCachePath honors env override', () => {
     assert.equal(resolvePublicCatalogDiskCachePath(), '/tmp/daibilet-catalog-test.json');
   } finally {
     restoreEnv('DAIBILET_PUBLIC_CATALOG_DISK_CACHE', prev);
+  }
+});
+
+test('loadPublicCatalogDiskCacheWithStat skips unchanged snapshot without parsing body', () => {
+  const prev = process.env.DAIBILET_PUBLIC_CATALOG_DISK_CACHE;
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'daibilet-catalog-cache-'));
+  const filePath = path.join(dir, 'public-catalog-dto.json');
+  try {
+    fs.writeFileSync(filePath, '{not-json');
+    const mtimeMs = fs.statSync(filePath).mtimeMs;
+    process.env.DAIBILET_PUBLIC_CATALOG_DISK_CACHE = filePath;
+
+    assert.equal(loadPublicCatalogDiskCacheWithStat({ modifiedAfterMs: mtimeMs }), null);
+  } finally {
+    restoreEnv('DAIBILET_PUBLIC_CATALOG_DISK_CACHE', prev);
+    fs.rmSync(dir, { recursive: true, force: true });
   }
 });
 
