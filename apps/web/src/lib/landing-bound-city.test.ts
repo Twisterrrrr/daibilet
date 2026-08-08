@@ -5,7 +5,9 @@ import {
   landingMatchesBoundCity,
   landingMatchesCatalogCity,
   mergePodborkiCityCatalogItems,
+  normalizeKnownCitySlug,
   resolveLandingBoundCitySlug,
+  resolveLandingRouteFromLocation,
 } from './landing-routes.ts';
 
 test('resolveLandingBoundCitySlug: CITY-scoped landings', () => {
@@ -46,6 +48,28 @@ test('landingMatchesCatalogCity: city-bound + national with events', () => {
   assert.equal(landingMatchesCatalogCity('country-tours', 'moscow'), false);
   assert.equal(landingMatchesCatalogCity('country-tours', 'saint-petersburg'), true);
   assert.equal(landingMatchesCatalogCity('standup', 'all'), false);
+});
+
+test('landingMatchesCatalogCity: standalone cities outside old priority allowlist', () => {
+  assert.equal(landingMatchesCatalogCity('concerts-genre', 'krasnodar'), true);
+  assert.equal(landingMatchesCatalogCity('standup', 'ufa'), true);
+  assert.equal(landingMatchesCatalogCity('concerts-genre', 'chelyabinsk', { events: 13 }), true);
+  assert.equal(landingMatchesCatalogCity('concerts-genre', 'vladivostok'), true);
+  assert.equal(landingMatchesCatalogCity('country-tours', 'krasnodar'), false);
+});
+
+test('normalizeKnownCitySlug accepts destination slugs beyond priority list', () => {
+  assert.equal(normalizeKnownCitySlug('krasnodar'), 'krasnodar');
+  assert.equal(normalizeKnownCitySlug('ufa'), 'ufa');
+  assert.equal(normalizeKnownCitySlug('moskva'), 'moscow');
+  assert.equal(normalizeKnownCitySlug('kontserty'), null);
+  assert.equal(normalizeKnownCitySlug('events'), null);
+});
+
+test('resolveLandingRouteFromLocation keeps city for non-priority multi landings', () => {
+  const route = resolveLandingRouteFromLocation('/kontserty/krasnodar');
+  assert.equal(route?.landingSlug, 'concerts-genre');
+  assert.equal(route?.citySlug, 'krasnodar');
 });
 
 test('mergePodborkiCityCatalogItems: keeps city-bound and city-hit nationals', () => {

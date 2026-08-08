@@ -1,5 +1,42 @@
 # Diary
 
+## 2026-08-08 - INC.LOC404: STALE HTML 404 на must-see locations (Владимирский собор)
+
+### Наблюдения
+- Live `https://daibilet.ru/locations/saint-petersburg-vladimirskiy-sobor` → HTTP 404; owner launch-blocker.
+- Prod API `GET /api/public/venues/saint-petersburg-vladimirskiy-sobor` → 200, `pageStatus=PUBLISHED`, `template=location`, slug канон.
+- Origin `/venues/{slug}` был 200, `/locations/{slug}` - отравленный ISR HTML 404 (`x-nextjs-cache` HIT/STALE, SWR ~1y). Тот же класс: Исаакий / Казанский.
+- Root class: transient API miss/error в `getCachedPublicVenueDto` превращался в `null` → `safeNotFound()` → Full Route Cache 404; после восстановления API HTML 404 оставался.
+- Scan SPB `locationSlug` (177): после purge 175 OK; API-miss только пригороды Гатчина/Павловский дворец (нет Venue row) - не тот класс.
+
+### Решения
+- Ops: `revalidate` tags `venue-page` + paths трёх соборов; `rm -rf /var/cache/nginx/daibilet/*` + nginx reload; warm. Live Владимирский / Исаакий / Казанский → 200.
+- Code: true miss (`venue_dto_miss`) → null/404; прочие ошибки DTO → rethrow → `unavailable` (soft 200), не HTML 404 poison; cache key v7.
+- Canon: `/venues` vs `/locations` - `permanentRedirect` на `canonicalPath` / `venueHref` по template.
+- Web deploy (launch-blocker hardening) через GHA Deploy MSK web.
+
+### Проблемы
+- Suburb locationSlug без Venue (Гатчина/Павловск) остаются 404 до seed - отдельно.
+
+---
+
+## 2026-08-08 - City multi-collections hidden outside priority allowlist
+
+### Наблюдения
+- Owner: «а почему по городам мультиподборки не отдаются? концерты и тп».
+- API `/api/public/cities/{slug}` для Краснодара/Уфы/etc. отдавал `concerts-genre`/`standup`, но хаб «Топ-запросы» был пуст по CHPU-ссылкам.
+- `normalizeKnownCitySlug` знал только короткий priority allowlist (~15 городов). Остальные destination slug → `null` → `landingMatchesCatalogCity` false → hub/`podborki` резали мультиподборки; `/kontserty/krasnodar` парсился как subcategory, не city.
+
+### Решения
+- `normalizeKnownCitySlug`: принимать destination-like slug вне allowlist; reserved path segments (`kontserty`, `events`, `all`, …) отклонять.
+- `/podborki` city loading fallback: `landingMatchesCatalogCity` вместо bound-only.
+- Unit: Krasnodar hub + route `/kontserty/krasnodar`.
+
+### Проблемы
+- Нужен web deploy на MSK, чтобы owner увидел на live.
+
+---
+
 ## 2026-08-08 - Pier titles: no decorative dash + Sinopskaya 10А
 
 ### Наблюдения

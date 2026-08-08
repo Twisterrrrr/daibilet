@@ -2,6 +2,8 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
+| INC.LOC404.VLAD | STALE 404 `/locations/saint-petersburg-vladimirskiy-sobor` | Критический | ✅ ops 200; code miss≠unavailable + canon redirect |
+| FIX.CITY-MULTI-LANDINGS | normalizeKnownCitySlug: все destination cities → концерты/стендап в hub/podborki | Критический | ✅ code; нужен web deploy |
 | FIX.HERO-CTA-FROM | Hero CTA «от min»; stats min-max | Высокий | ✅ code; deploy пачкой |
 | FIX.PRICETo-REAL | Catalog SQL real priceTo (offers/sessions max) | Высокий | ✅ dto.js; нужен API restart |
 | OPS.DEPLOY-HEAD | Live на `7c5f2210` Deploy `31260953355` BUILD_ID=`dKXqka8q8BXEbdT7y7aRQ` | Критический | ✅ |

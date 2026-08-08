@@ -141,3 +141,22 @@ test('Perm hub hides SPB-only country-tours even with positive count', () => {
   assert.ok(rows.some((row) => row.slug === 'walking-tours'));
   assert.ok(rows.some((row) => row.slug === 'rooftops'));
 });
+
+test('Krasnodar hub surfaces multi-city concerts/standup (not only priority cities)', () => {
+  const rows = resolveFeaturedDirections({
+    config: null,
+    landings: [
+      { slug: 'concerts-genre', title: 'Концерты', events: 9 },
+      { slug: 'standup', title: 'Стендап', events: 17 },
+      { slug: 'unusual-theatres', title: 'Театр', events: 19 },
+    ],
+    categories: [],
+    citySlug: 'krasnodar',
+    limit: 6,
+  });
+
+  assert.ok(rows.some((row) => row.slug === 'concerts-genre'));
+  assert.ok(rows.some((row) => row.slug === 'standup'));
+  assert.ok(rows.some((row) => row.slug === 'unusual-theatres'));
+  assert.ok(rows.every((row) => row.href?.includes('/krasnodar')));
+});

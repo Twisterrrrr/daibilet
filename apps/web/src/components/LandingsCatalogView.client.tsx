@@ -18,7 +18,7 @@ import { formatNumber, formatPriceFrom, pluralEvents } from '@/lib/format';
 import { resolveLandingCardImage } from '@/lib/landing-images';
 import {
   landingCategoryHref,
-  landingMatchesBoundCity,
+  landingMatchesCatalogCity,
   mergePodborkiCityCatalogItems,
   resolveLandingBoundCitySlug,
 } from '@/lib/landing-routes';
@@ -164,7 +164,10 @@ export function LandingsCatalogView({
       )
       .catch((error: unknown) => {
         if (error instanceof DOMException && error.name === 'AbortError') return;
-        setCityScopedItems(initialItems.filter((item) => landingMatchesBoundCity(item.slug, citySlug)));
+        // Keep multi-city landings (concerts/standup/…) visible; do not collapse to city-bound only.
+        setCityScopedItems(
+          initialItems.filter((item) => landingMatchesCatalogCity(item.slug, citySlug, { events: item.events })),
+        );
       })
       .finally(() => {
         if (!controller.signal.aborted) setCityCatalogLoading(false);
@@ -176,7 +179,8 @@ export function LandingsCatalogView({
   const cityItems = useMemo(() => {
     if (!citySelected) return initialItems;
     if (cityScopedItems) return cityScopedItems;
-    return initialItems.filter((item) => landingMatchesBoundCity(item.slug, citySlug));
+    // While city catalog loads: show multi+bound landings allowed for this city (not bound-only).
+    return initialItems.filter((item) => landingMatchesCatalogCity(item.slug, citySlug, { events: item.events }));
   }, [cityScopedItems, citySelected, citySlug, initialItems]);
 
   const items = useMemo(() => filterPodborkiByMood(cityItems, activeMood), [activeMood, cityItems]);

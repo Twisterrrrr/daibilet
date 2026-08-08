@@ -104,7 +104,45 @@ const CITY_SLUG_ALIASES: Record<string, string> = {
   ekaterinburg: 'ekaterinburg',
 };
 
-const KNOWN_CITY_SLUGS = new Set<string>([...Object.values(CITY_SLUG_ALIASES), ...Object.keys(CITY_SLUG_ALIASES)]);
+/** App / landing path segments that must never be treated as a city slug. */
+const RESERVED_PATH_SEGMENTS = new Set<string>([
+  ...Object.values(LANDING_CATEGORY_PATH_BY_SLUG),
+  ...Object.values(CITY_LANDING_PATH_BY_SLUG),
+  ...Object.keys(LANDING_CATEGORY_PATH_BY_SLUG),
+  ...Object.keys(CITY_LANDING_PATH_BY_SLUG),
+  'events',
+  'cities',
+  'venues',
+  'locations',
+  'blog',
+  'podborki',
+  'admin',
+  'help',
+  'about',
+  'login',
+  'account',
+  'checkout',
+  'my-day',
+  'my-orders',
+  'offer',
+  'privacy',
+  'legal',
+  'contacts',
+  'reviews',
+  'requisites',
+  'landings',
+  'articles',
+  'api',
+  'images',
+  'sitemaps',
+  'sitemap.xml',
+  'robots.txt',
+  'favicon.ico',
+  '_next',
+  'all',
+]);
+
+const CITY_SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 const CITY_URL_SEGMENT: Record<string, string> = {
   moscow: 'moscow',
@@ -130,12 +168,19 @@ export function normalizeCitySlug(segment: string | null | undefined): string | 
   return CITY_SLUG_ALIASES[key] || key;
 }
 
+/**
+ * Resolve a city slug for multi-city landings / hub filters.
+ * Accepts all destination-like slugs (ufa, krasnodar, …), not only the old
+ * priority allowlist - otherwise city hubs hide concerts/standup and
+ * `/kontserty/{city}` is parsed as a subcategory instead of a city.
+ */
 export function normalizeKnownCitySlug(segment: string | null | undefined): string | null {
   const key = String(segment || '').trim().toLowerCase();
   if (!key) return null;
   if (key in CITY_SLUG_ALIASES) return CITY_SLUG_ALIASES[key];
-  if (KNOWN_CITY_SLUGS.has(key)) return key;
-  return null;
+  if (RESERVED_PATH_SEGMENTS.has(key)) return null;
+  if (!CITY_SLUG_PATTERN.test(key)) return null;
+  return key;
 }
 
 export function cityPathSegment(citySlug: string | null | undefined): string | null {
@@ -150,7 +195,9 @@ export function isCityScopedLanding(slug: string): boolean {
 
 export function isLandingCityAllowed(landingSlug: string, citySlug: string): boolean {
   const allowed = LANDING_ALLOWED_CITY_SLUGS[canonicalLandingSlug(landingSlug)];
-  return !allowed || allowed.includes(citySlug);
+  if (!allowed) return true;
+  const normalized = normalizeCitySlug(citySlug) || String(citySlug || '').trim().toLowerCase();
+  return allowed.includes(normalized) || allowed.includes(String(citySlug || '').trim().toLowerCase());
 }
 
 /**
