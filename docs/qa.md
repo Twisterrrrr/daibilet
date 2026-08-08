@@ -19,7 +19,7 @@
 **Alerts (proposed thresholds until measured - 2026-08-09):**
 - **P1 freshness:** disk mtime / `catalog:updated_at` older than **20–30 min** → critical (SLA до калибровки).
 - **P2 worker crash:** systemd unit/timer failed / consecutive oneshot non-zero exit.
-- **P3 empty/tiny artifact:** near-zero bytes **или** sessions count **<<** last-good (proposed: **&lt;50%** of last-good / near-empty).
+- **P3 empty/tiny artifact:** near-zero bytes **или** sessions count **<<** last-good (proposed: **<50%** of last-good / near-empty).
 
 **Read-only MSK check 2026-08-09:** Redis **нет** (`redis-cli` absent; no redis/valkey systemd units; no docker redis/valkey). Перед INC.504.5d: **новый isolated Redis** (reuse невозможен) - открытый ops-вопрос (кто ставит / sizing), не product fork.
 

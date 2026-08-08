@@ -11,7 +11,7 @@
 - Артефакты в репо (без apply на `.159`): `deploy/nginx/pay.daibilet.ru.split.conf.example`, `docs/checklists/yookassa-e2e-sandbox.md`.
 - `publicCode` Path A: маскированный токен example `KSD-8492-NX7`; result `?order={publicCode}`.
 - OPS.CI4 ✅; INC.504.5c канон = существующие deploy units; 504.5d Redis deferred (нужен новый isolated, не reuse).
-- Proposed alert thresholds P1 20–30m / P3 &lt;50% last-good - until measured.
+- Proposed alert thresholds P1 20–30m / P3 <50% last-good - until measured.
 - E2e sandbox остаётся ⏳ до прогона трёх сценариев.
 
 ### Проблемы

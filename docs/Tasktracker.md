@@ -836,7 +836,7 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 | INC.504.4 | SWR catalog rebuild: non-blocking / async (не блокировать event loop 49-219с) | Критический | ✅ MSK live BUILD `GMlh5-uhf-R2iVlZbSFXY`: disk+child/cron+forever-SWR+reap |
 | INC.504.5 | Dual catalog SWR cache (`dto.js` + `public-catalog.dto.ts`) - merge/unify (вынесено из F5.3b) | Средний | ✅ 2026-08-08: dto.js adopt-only; ✅ 504.5b stale-first + SQL cooldown 45м + chunked adopt |
 | INC.504.5c | Catalog Worker shared disk: systemd timer, API REBUILD_MODE=off, disk v2 indexes hydrate | Высокий | ✅ канон `deploy/systemd/daibilet-catalog-dto-rebuild.*` + `deploy/cron/rebuild-public-catalog-dto.sh`; MSK timer active; 🔧 2026-08-09 203/EXEC+stale-first |
-| INC.504.5d | Future: Catalog Worker + Redis gzip (`catalog:sessions/indexes/updated_at`) Soft-SWR; не streaming | Низкий | ⏳ deferred; MSK Redis **нет** (2026-08-09 RO check) → нужен новый isolated; proposed P1 20–30m / P3 &lt;50% last-good |
+| INC.504.5d | Future: Catalog Worker + Redis gzip (`catalog:sessions/indexes/updated_at`) Soft-SWR; не streaming | Низкий | ⏳ deferred; MSK Redis **нет** (2026-08-09 RO check) → нужен новый isolated; proposed P1 20–30m / P3 <50% last-good |
 | INC.504.5-codex | Brief Codex: медленный/нестабильный public API + catalog → [codex-api-catalog-latency-brief.md](./codex-api-catalog-latency-brief.md) | Критический | 📄 2026-08-09 handoff |
 | INC.504.6 | nginx proxy_cache SWR: `background_update` + TTL 30m (browser clear ≠ cold Next) | Критический | ✅ |
 | INC.504.7 | City hub ISR: `unstable_cache` + `generateStaticParams` (было no-store / 20-30с) | Критический | ✅ |
