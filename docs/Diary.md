@@ -12,6 +12,8 @@
 - «Отзыв» outline-кнопка в том же action-ряду; только если `startsAt` в прошлом.
 - Ticket page: ArrowLeft + «Вернуться в покупки».
 - Seed codes: `DB26-784501..03` / `TKT-784501..03` (без BUTIN). Format lock в museum-contract-readiness S0.TKT.1.
+- Print: `@page` 14mm + card `padding: 12mm` (не `p-0`), чтобы контент и разделители не липли к краю листа.
+- Print brand: сверху карточки строка с `DaibiletLogo` + «Электронный билет» (`print:flex`, на экране скрыта).
 
 ### Проблемы
 - Ticket page для TC опирается на localStorage handoff с `/account/purchases`; deep-link без кэша остаётся soft. Полный server lookup ExternalOrder - follow-up.

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { ArrowLeft, CheckCircle2, Clock3, Copy, Download } from 'lucide-react';
 import { useCallback, useState, type ReactNode } from 'react';
 
+import { DaibiletLogo } from '@/components/DaibiletLogo';
 import {
   formatBuyerDateTime,
   formatBuyerTicketWhen,
@@ -107,9 +108,20 @@ export function BuyerTicketCard({ order, origin, emailHint = 'unknown', classNam
 
   return (
     <article
-      className={`buyer-ticket w-full max-w-[650px] overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_4px_20px_rgba(0,0,0,0.05)] min-[500px]:mx-auto min-[500px]:p-6 min-[640px]:p-7 print:mx-0 print:max-w-none print:rounded-none print:border print:border-slate-300 print:p-0 print:shadow-none ${className}`}
+      className={`buyer-ticket w-full max-w-[650px] overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_4px_20px_rgba(0,0,0,0.05)] min-[500px]:mx-auto min-[500px]:p-6 min-[640px]:p-7 print:mx-0 print:max-w-none print:rounded-none print:border print:border-slate-300 print:p-[12mm] print:shadow-none ${className}`}
       data-buyer-ticket
     >
+      {/* Print brand row - hidden on screen so mobile QR stays uncrowded */}
+      <div
+        className="mb-4 hidden items-center justify-between border-b border-slate-200 pb-3 print:mb-[6mm] print:flex print:pb-[3mm]"
+        data-buyer-ticket-brand
+      >
+        <DaibiletLogo textClassName="text-xl tracking-tight" />
+        <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+          Электронный билет
+        </span>
+      </div>
+
       {/* Status chips - screen only */}
       <div className="mb-3 flex flex-wrap items-center gap-2 print:hidden min-[500px]:mb-4">
         <span
@@ -205,7 +217,7 @@ export function BuyerTicketCard({ order, origin, emailHint = 'unknown', classNam
       </div>
 
       {/* Details */}
-      <dl className="mb-5 rounded-xl bg-slate-50 px-3.5 py-3.5 min-[500px]:mb-6 min-[500px]:px-5 min-[500px]:py-4 print:mb-5 print:rounded-none print:bg-transparent print:px-0 print:py-0">
+      <dl className="mb-5 rounded-xl bg-slate-50 px-3.5 py-3.5 min-[500px]:mb-6 min-[500px]:px-5 min-[500px]:py-4 print:mb-5 print:rounded-none print:bg-transparent print:px-0 print:py-1">
         {buyerName ? <DetailRow label="Посетитель" value={buyerName} /> : null}
         {composition ? <DetailRow label="Состав заказа" value={composition} /> : null}
         {order.amountRub != null ? (

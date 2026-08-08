@@ -537,7 +537,8 @@ body > div:has(iframe[src*='ticketscloud']) {
 /* Мой день: чистый маршрутный лист для печати / Save as PDF */
 @media print {
   @page {
-    margin: 12mm;
+    /* Comfortable paper margin on all sides (~0.5in / 12–15mm) */
+    margin: 14mm;
   }
 
   html,
@@ -560,16 +561,29 @@ body > div:has(iframe[src*='ticketscloud']) {
     display: block !important;
   }
 
-  /* Buyer ticket: one A4 sheet, full usable width, no chrome/actions */
+  /* Buyer ticket: A4 sheet with page + card margins; hide chrome/actions/map */
   [data-buyer-ticket] {
     break-inside: avoid;
     page-break-inside: avoid;
     width: 100% !important;
     max-width: none !important;
     margin: 0 !important;
-    padding: 0 !important;
+    /* Inner card padding so text/separators are not flush to border or paper edge */
+    padding: 12mm !important;
+    border: 1px solid #cbd5e1 !important;
     border-radius: 0 !important;
     box-shadow: none !important;
+    box-sizing: border-box !important;
+  }
+
+  [data-buyer-ticket] header {
+    margin-bottom: 5mm !important;
+    padding-bottom: 4mm !important;
+  }
+
+  [data-buyer-ticket] dl {
+    margin-bottom: 5mm !important;
+    padding: 3mm 0 !important;
   }
 
   [data-buyer-ticket-actions],
@@ -584,7 +598,8 @@ body > div:has(iframe[src*='ticketscloud']) {
     display: grid !important;
     grid-template-columns: minmax(0, 1fr) 160px !important;
     align-items: start !important;
-    gap: 20px !important;
+    gap: 8mm !important;
+    margin-bottom: 5mm !important;
   }
 
   [data-buyer-ticket] .buyer-ticket-info {
@@ -594,6 +609,16 @@ body > div:has(iframe[src*='ticketscloud']) {
   [data-buyer-ticket] .buyer-ticket-qr {
     order: 0 !important;
     justify-self: end !important;
+  }
+
+  /* Brand wordmark row - force visible in print even if utility cascade fails */
+  [data-buyer-ticket-brand] {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    margin-bottom: 6mm !important;
+    padding-bottom: 3mm !important;
+    border-bottom: 1px solid #e2e8f0 !important;
   }
 }
 

@@ -135,7 +135,7 @@ export function CheckoutTicketView({ publicCode, demoOrder, demoBanner }: Props)
         </div>
       </section>
 
-      <section className="container-page py-5 min-[500px]:py-8 sm:py-10 print:max-w-none print:px-0 print:py-0">
+      <section className="container-page py-5 min-[500px]:py-8 sm:py-10 print:max-w-none print:px-[2mm] print:py-[2mm]">
         {demoBanner ? (
           <p className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-950 print:hidden">
             {demoBanner}
