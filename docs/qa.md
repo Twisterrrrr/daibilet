@@ -1,5 +1,17 @@
 # qa.md — открытые вопросы
 
+## 2026-08-08 - Buyer LK / refunds / Stage 2+ (открыто, future; не Stage 0)
+
+**Контекст:** Stage 0 buyer support = **только mailto** (`hello@daibilet.ru`), без self-serve refund. Self-refund UI и частичные операции - **после** появления модели единого ваучера.
+
+**Открыто к обсуждению (owner future product note, не implement сейчас):**
+1. Когда в ЛК когда-либо появится **единый ваучер**, разбивать его на **отдельные слоты**, чтобы покупатель мог:
+   - отменять **не весь** ваучер, а **конкретный слот**;
+   - либо **заменять** слот на другой **с доплатой**.
+2. Это отдельная тема product/UX + domain (voucher↔slot lifecycle, money/refund/surcharge, ops audit) - Stage **2+**, не Stage 0.
+
+См. также [museum-contract-readiness.md](./museum-contract-readiness.md) § Stage 2 outline / Out of scope Stage 0.
+
 ## 2026-08-08 - Supplier taxonomy / commercial modes (LOCKED draft, owner)
 
 Контекст: [museum-contract-readiness.md](./museum-contract-readiness.md).
@@ -23,7 +35,7 @@
 4. **Email production:** канон SMTP на MSK web (`SMTP_*`) или письма с finance `.159`?
 5. **Support phone на билете:** единый номер Дайбилет vs телефон конкретного поставщика в supplier DTO?
 6. **Первый open-date договор:** музей или арт-пространство? какой venue/город/slug для seed template (controlled, не wide CTA)?
-7. **Возвраты до Stage 2:** только ops manual - подтверждаем?
+7. **Возвраты до Stage 2:** только ops manual (+ Stage 0 buyer mailto) - подтверждаем? Self-refund / voucher→slot partial cancel-replace - **не** Stage 0; см. § Buyer LK / refunds / Stage 2+ выше.
 
 Связанные gaps (не новые product forks): order≠ticket issuance; webhook e2e; reconcile; supportPhone в public DTO; purchases-by-email - см. ниже и readiness Stage 0 checklist.
 

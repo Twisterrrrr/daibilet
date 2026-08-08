@@ -358,8 +358,9 @@ park admission, wide internal sales CTA.
 | Supplier LC full | Dashboard, balance, reports, team, requisites (read-first → limited write) |
 | Reviews / disputes | Только internal/owned; после продаж |
 | Admin | Legal/bank, payment settings, disputes block payouts |
+| Buyer voucher→slots (future) | После модели **единого ваучера**: разбиение на слоты; частичная отмена слота; замена слота с доплатой. Отдельное обсуждение - [qa.md](./qa.md) § Buyer LK / refunds / Stage 2+ |
 
-**Не путать:** Stage 0 supplier LC «вижу свои заказы» ≠ Stage 2 «полный кабинет + финчётность».
+**Не путать:** Stage 0 supplier LC «вижу свои заказы» ≠ Stage 2 «полный кабинет + финчётность». Stage 0 buyer = mailto support only, без self-refund.
 
 ---
 
@@ -373,6 +374,7 @@ park admission, wide internal sales CTA.
 - TC/TEP → YooKassa  
 - Real supplier payouts / ЭДО  
 - Buyer self-service refund UI  
+- Unified voucher → slot partial cancel / replace-with-surcharge (future Stage 2+; нужен единый ваучер сначала)  
 - Scanner mobile app площадки  
 - Force-merge Codex `pay.daibilet.ru` experiment поверх catalog Path A  
 - Secrets / правка `.159` env из посторонних агентов без owner  
@@ -387,9 +389,9 @@ park admission, wide internal sales CTA.
 4. **Email:** SMTP на MSK web vs mail с finance `.159` - что канон для production писем?  
 5. **Support phone:** единый Дайбилет vs телефон поставщика в DTO?  
 6. **Первый open-date договор:** музей или арт-пространство? какой venue/slug и город (для seed template, не wide)?  
-7. **Возвраты:** только ops manual до Stage 2?  
+7. **Возвраты:** только ops manual до Stage 2? (Stage 0 buyer = mailto only; voucher→slot partial cancel/replace = future Stage 2+)  
 
-Детали/статус - в [qa.md](./qa.md) § Museum-1 / Stage 0.
+Детали/статус - в [qa.md](./qa.md) § Museum-1 / Stage 0 и § Buyer LK / refunds / Stage 2+.
 
 ---
 

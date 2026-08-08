@@ -11,6 +11,26 @@
 ### Проблемы
 - Нет.
 
+### Future (не Stage 0)
+- Owner note: после единого ваучера в ЛК - слоты с частичной отменой / заменой с доплатой; см. qa § Buyer LK / refunds / Stage 2+.
+
+---
+
+## 2026-08-08 - CRITICAL: location/venue PDP `noStore`+`notFound` → HTTP 500
+
+### Наблюдения
+- Live `/locations/cerkov-svyatogo-apostola-ioanna-yaani-kirik` → HTTP 500 (репро). API origin `:4000` DTO 200; web journal digest **`DYNAMIC_SERVER_USAGE`**.
+- Тот же digest на missing slug (`zzz-missing`) и API-404 площадках (`petropavlovskaya-krepost`, `letniy-sad`) → стабильный **500 вместо 404**.
+- Корень: на ISR (`revalidate`) вызов `noStore()` перед `notFound()` бросает `DYNAMIC_SERVER_USAGE`; в prod это не ретраится как dynamic, а отдаётся как 500. Transient API 502/timeout шёл в тот же путь (miss).
+
+### Решения
+- `safeNotFound()` без `noStore` для true miss (HTTP 404). STALE-404 poison закрыт no-null DTO cache (v4/v5), не `noStore`+`notFound`.
+- Venue load: `ok | miss | unavailable`; unavailable → soft page «временно недоступна» (не 500 / не ложный 404).
+- Cities `[slug]`: тот же `safeNotFound` вместо `noStore`+`notFound`.
+
+### Проблемы
+- Deploy MSK после commit+push (launch-blocker).
+
 ---
 
 ## 2026-08-08 - Architecture: lightweight web + robots (WEB.LIGHT)
