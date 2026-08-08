@@ -1,3 +1,20 @@
+## 2026-08-08 - Почему «пляшут» цифры (owner report)
+
+### Наблюдения
+- Home trust strip («Событий») брал `catalogPayload.total` (`/api/public/events`), footer - sum `destination.events` → Δ≈30-40 при одинаковых 98 городах.
+- `/venues` «В афише = весь каталог» - уже починено `26047494`; live API отдаёт `venuesWithEvents` (smoke ~1101 / 1245).
+- `/locations` eyebrow `710+` - `formatCountFloorTenPlus`; exact в `7c5f2210`, на live Deploy `31260953355`.
+- Третий канон: `/api/public/stats.events` (~3031 saleable groups) - не для UI social proof.
+
+### Решения
+- Общий хелпер `catalogSocialStats` для home trust strip + SiteFooter (один formula).
+- Канон: eyebrow catalog size; «В афише» = venuesWithEvents; locations = exact N; global events/cities = destinations with events>0.
+
+### Проблемы
+- Home destinations cache vs layout destinations TTL могут чуть разъехаться по времени - формула одна.
+- Deploy web для alignment home/footer ещё не катили (commit+push only).
+
+---
 ## 2026-08-08 - Follow-up: deploy HEAD, priceTo hotfix, teplohod 404, locations eyebrow
 
 ### Наблюдения

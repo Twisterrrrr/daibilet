@@ -7,6 +7,7 @@
 | FIX.TEPLOHOD-404 | HIDE venue_6a4d0400... public teplohod-moskva-99 | Высокий | ✅ API/web 404 |
 | FIX.LOC-EYEBROW | Exact count вместо 710+ | Высокий | ✅ |
 | FIX.VENUES-AFISHA-LIVE | API venuesWithEvents после api restart | Высокий | ✅ 1101 |
+| FIX.HOME-FOOTER-EVENTS | Home trust strip = footer via `catalogSocialStats` | Высокий | ✅ code; deploy пачкой |
 
 ---
 # Tasktracker — Daibilet
