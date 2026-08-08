@@ -14,6 +14,7 @@
 
 ### Проблемы
 - Cold start без файла: oneshot `systemctl start daibilet-catalog-dto-rebuild.service` до трафика.
+- **MSK live `7b5c5e5b`:** timer enabled; disk v2 2943 sessions + indexes (~17MB); API `REBUILD_MODE=off`; health 200; venue 200; MemoryCurrent ~576MB; legacy cron.d catalog-dto отключён.
 
 ---
 

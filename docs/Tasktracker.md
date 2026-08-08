@@ -831,7 +831,7 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 | INC.504.3 | Пересмотр daibilet-web MemoryMax/heap + OOMPolicy=continue (High 1.5G / Max 2G / heap 1280 на 7.8Gi) | Критический | done 2026-07-31 MSK live |
 | INC.504.4 | SWR catalog rebuild: non-blocking / async (не блокировать event loop 49-219с) | Критический | ✅ MSK live BUILD `GMlh5-uhf-R2iVlZbSFXY`: disk+child/cron+forever-SWR+reap |
 | INC.504.5 | Dual catalog SWR cache (`dto.js` + `public-catalog.dto.ts`) - merge/unify (вынесено из F5.3b) | Средний | ✅ 2026-08-08: dto.js adopt-only; ✅ 504.5b stale-first + SQL cooldown 45м + chunked adopt |
-| INC.504.5c | Catalog Worker shared disk: systemd timer, API REBUILD_MODE=off, disk v2 indexes hydrate | Высокий | 🔄 2026-08-08 implement |
+| INC.504.5c | Catalog Worker shared disk: systemd timer, API REBUILD_MODE=off, disk v2 indexes hydrate | Высокий | ✅ 2026-08-08 MSK live `7b5c5e5b` timer+v2 |
 | INC.504.5d | Future: Catalog Worker + Redis gzip artifacts + `updated_at` P1 staleness; не streaming | Низкий | ⏳ после стабилизации 504.5c |
 | INC.504.6 | nginx proxy_cache SWR: `background_update` + TTL 30m (browser clear ≠ cold Next) | Критический | ✅ |
 | INC.504.7 | City hub ISR: `unstable_cache` + `generateStaticParams` (было no-store / 20-30с) | Критический | ✅ |
