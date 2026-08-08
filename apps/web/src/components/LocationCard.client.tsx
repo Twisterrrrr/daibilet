@@ -159,10 +159,31 @@ export function LocationCard({
         </div>
 
         <div className="flex min-w-0 flex-1 flex-col p-3.5 sm:p-4">
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-600">
-              {typeLabel}
-            </span>
+          {/* Type badge left + «В маршрут» top-right (owner: not under the card body). */}
+          <div className="flex items-center gap-2">
+            <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
+              <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-600">
+                {typeLabel}
+              </span>
+              {eventsChip}
+            </div>
+            <div
+              className="shrink-0"
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+              }}
+              onPointerDown={(event) => {
+                event.stopPropagation();
+              }}
+            >
+              <AddToDayRouteButton
+                key={venue.id}
+                compact
+                className="!min-h-8 !gap-1 !rounded-full !px-2.5 !py-1 !text-[11px] shadow-sm sm:!min-h-9 sm:!px-3 sm:!py-1.5"
+                venue={dayRouteVenue}
+              />
+            </div>
           </div>
           <h3 className="mt-1 line-clamp-2 text-base font-semibold text-slate-900 group-hover:text-primary-600">
             {displayName}
@@ -215,27 +236,6 @@ export function LocationCard({
           ) : null}
         </div>
       </Link>
-
-      <div
-        className="flex flex-wrap items-center gap-2 border-t border-slate-100 px-3.5 py-2.5 sm:px-4"
-        onClick={(event) => {
-          event.preventDefault();
-          event.stopPropagation();
-        }}
-        onPointerDown={(event) => {
-          event.stopPropagation();
-        }}
-      >
-        {eventsChip}
-        <div className="ml-auto">
-          <AddToDayRouteButton
-            key={venue.id}
-            compact
-            className="!min-h-9 !rounded-full !px-3 !py-1.5 !text-[11px] shadow-sm"
-            venue={dayRouteVenue}
-          />
-        </div>
-      </div>
     </div>
   );
 }
