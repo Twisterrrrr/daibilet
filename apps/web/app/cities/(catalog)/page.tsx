@@ -8,7 +8,7 @@ import { RussiaMap } from '@/components/RussiaMap.client';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
 import { withSoftTimeout } from '@/lib/soft-timeout';
-import { cityHasTopPreview, cityImageSlug } from '@/lib/city-images';
+import { cityHasDaytimePreview, cityHasTopPreview, cityImageSlug } from '@/lib/city-images';
 import { getCachedDestinations } from '@/server/cached-public-surfaces';
 
 export const metadata: Metadata = {
@@ -43,10 +43,13 @@ export default async function CitiesIndexPage() {
   const cities = destinations.filter((item) => item.type === 'city');
   const byPopularity = (a: (typeof cities)[number], b: (typeof cities)[number]) =>
     b.events - a.events || a.name.localeCompare(b.name, 'ru');
-  // Prefer cities with daytime `cities/top` previews, then fill by popularity.
+  // Top-8 pins → daytime second-octet JPGs → remaining by popularity.
   const withTop = [...cities].filter(cityHasTopPreview).sort(byPopularity);
-  const withoutTop = [...cities].filter((city) => !cityHasTopPreview(city)).sort(byPopularity);
-  const rankedCities = [...withTop, ...withoutTop];
+  const withDaytimeSecond = [...cities]
+    .filter((city) => !cityHasTopPreview(city) && cityHasDaytimePreview(city))
+    .sort(byPopularity);
+  const withoutDaytime = [...cities].filter((city) => !cityHasDaytimePreview(city)).sort(byPopularity);
+  const rankedCities = [...withTop, ...withDaytimeSecond, ...withoutDaytime];
   const topCities = rankedCities.slice(0, TOP_CITIES_COUNT);
   const secondOctet = rankedCities.slice(TOP_CITIES_COUNT, TOP_CITIES_COUNT + SECOND_OCTET_COUNT);
   const featuredSlugs = [...topCities, ...secondOctet]
@@ -81,7 +84,8 @@ export default async function CitiesIndexPage() {
             <ul className="grid w-full grid-cols-2 content-start gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
               {secondOctet.map((city) => (
                 <li key={city.slug || city.name} className="min-w-0">
-                  <CityCard city={city} compact tone="light" imageVariant="top" />
+                  {/* Same chrome as top-8: dark scrim + white title/stats on photo. */}
+                  <CityCard city={city} compact imageVariant="top" />
                 </li>
               ))}
             </ul>

@@ -103,6 +103,11 @@ export function cityHasTopPreview(city: CityImageSource): boolean {
   return CITY_TOP_PREVIEW_SLUGS.has(cityCardImageSlug(city));
 }
 
+/** Daytime JPG under `cities/top/` (top-8 pins + second-octet set). */
+export function cityHasDaytimePreview(city: CityImageSource): boolean {
+  return CITY_DAYTIME_PREVIEW_SLUGS.has(cityCardImageSlug(city));
+}
+
 /** Distinct daytime previews for `/cities` featured tiles (top + second octet). */
 export function resolveCityTopPreviewImage(city: CityImageSource): string | null {
   const imageSlug = cityCardImageSlug(city);

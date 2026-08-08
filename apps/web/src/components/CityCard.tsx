@@ -26,7 +26,7 @@ type CityCardProps = {
   imageVariant?: 'default' | 'top';
   /** Compact listing: bigger title, vibe tags, no text-heavy body. */
   compact?: boolean;
-  /** `light` - bright photo + light scrim + dark type (second `/cities` octet). */
+  /** Default `dark` = white type on photo (top `/cities` cards). `light` kept for other surfaces. */
   tone?: 'dark' | 'light';
 };
 

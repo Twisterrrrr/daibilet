@@ -1,5 +1,22 @@
 # Diary
 
+## 2026-08-08 - `/cities` second octet: same chrome as top-8
+
+### Наблюдения
+- Owner: «а ты сгенерировал картинки для следующих 8 городов в этом стиле? что-то не вижу где» - скрин top-8 (белый текст на фото).
+- JPG второго октета уже в git с `d842d70c` (`apps/public/public/images/cities/top/{krasnodar,krasnoyarsk,novosibirsk,voronezh,ufa,perm,chelyabinsk,ryazan}.jpg`) и на `origin/feat/next-monorepo`, но live не показывал тот же вид.
+- Причины: (1) карточки 9-16 шли с `tone="light"` (белый fog + тёмный текст) - другой chrome vs top-8; (2) GHA swap меняет только `.next`, nginx `/images/` → `apps/web/public/images` (gitignore) без `sync-public-assets` на MSK.
+
+### Решения
+- Второй октет: тот же `CityCard` chrome что top-8 (`imageVariant="top"`, default dark scrim / white type).
+- Ранжирование: top-8 pins → daytime second-octet set → остальное по popularity.
+- Deploy MSK web + `node apps/web/scripts/sync-public-assets.mjs` на MSK; warm `/cities`.
+
+### Проблемы
+- Нет (после sync ассетов на MSK).
+
+---
+
 ## 2026-08-08 - INC.LOC404: STALE HTML 404 на must-see locations (Владимирский собор)
 
 ### Наблюдения

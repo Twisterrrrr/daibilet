@@ -283,6 +283,7 @@ Alias `museum-1` = первый open-date контракт (не «музеи fo
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
 | UX.CITIES-DESKTOP | `/cities`: 8 top daytime + full-width map + remaining list; CTA row desktop; без «Все города (n)» | Высокий | ✅ `54a9ffd`; MSK BUILD_ID=`AF2liBH4Eu1LzXz8b0Yu2`; smoke 200 |
+| UX.CITIES-OCTET2 | `/cities` ranks 9-16: same dark/white chrome as top-8 + daytime JPG; MSK sync-public-assets | Высокий | 🔄 chrome fix + deploy |
 
 ## Suburb nested coords → day-route (2026-08-06)
 
