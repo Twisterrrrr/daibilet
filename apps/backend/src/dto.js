@@ -186,6 +186,15 @@ const PUBLIC_DESTINATION_MIN_EVENTS = 1;
 const PUBLIC_CATALOG_CACHE_MS = 5 * 60 * 1000;
 /** Stale-while-revalidate window: serve expired catalog instantly, rebuild in background. */
 const PUBLIC_CATALOG_STALE_MS = Number(process.env.PUBLIC_CATALOG_STALE_MS || 30 * 60 * 1000);
+/**
+ * INC.504.5 seam: emergency dto.js SQL must not re-enter under load.
+ * Alert P1 on log line containing `legacy inline SQL fallback`.
+ */
+const LEGACY_CATALOG_SQL_COOLDOWN_MS = Math.max(
+  60_000,
+  Number(process.env.DAIBILET_LEGACY_CATALOG_SQL_COOLDOWN_MS || 45 * 60 * 1000),
+);
+let lastLegacyCatalogSqlFallbackAt = 0;
 const CATALOG_TAG_DISPLAY_LIMIT = 4;
 
 function orderedEventTagsSql(eventIdSql = 'e.id') {
@@ -6754,7 +6763,7 @@ function schedulePublicCatalogRebuild(db, reason = 'refresh') {
     const startedAt = Date.now();
     try {
       const rows = await loadCanonicalPublicCatalogSessions(db, reason);
-      adoptCanonicalCatalogSessions(rows, reason);
+      await adoptCanonicalCatalogSessions(rows, reason);
       console.log(
         `Public catalog legacy cache adopted from DTO (${reason}): ${rows.length} sessions in ${Date.now() - startedAt}ms`,
       );
@@ -6779,32 +6788,78 @@ async function loadCanonicalPublicCatalogSessions(db, reason) {
     const { getPublicCatalogSessions } = await import('./public-catalog.dto.js');
     return await getPublicCatalogSessions(forceRefresh, { hydrateSlots: false });
   } catch (error) {
-    console.warn(
-      `Canonical catalog load failed (${reason}), legacy inline SQL fallback: ${
-        error instanceof Error ? error.message : String(error)
-      }`,
+    const detail = error instanceof Error ? error.message : String(error);
+    const stale = publicCatalogCache?.sessions;
+    // Prefer forever-stale over uncontrolled SQL on the API event loop.
+    if (stale?.length) {
+      console.warn(
+        `Canonical catalog load failed (${reason}), serving stale legacy cache (${stale.length} sessions): ${detail}`,
+      );
+      return stale;
+    }
+
+    const now = Date.now();
+    const since = now - lastLegacyCatalogSqlFallbackAt;
+    if (lastLegacyCatalogSqlFallbackAt && since < LEGACY_CATALOG_SQL_COOLDOWN_MS) {
+      const waitSec = Math.ceil((LEGACY_CATALOG_SQL_COOLDOWN_MS - since) / 1000);
+      console.error(
+        `CRITICAL P1: legacy inline SQL fallback SKIPPED (rate-limited ${waitSec}s left) after canonical failure (${reason}): ${detail}`,
+      );
+      throw error;
+    }
+
+    lastLegacyCatalogSqlFallbackAt = now;
+    // Alert string (P1): keep "legacy inline SQL fallback" verbatim for log monitors.
+    console.error(
+      `CRITICAL P1: Canonical catalog load failed (${reason}), legacy inline SQL fallback: ${detail}`,
     );
     return publicCatalogSessionsFast(db);
   }
 }
 
-function adoptCanonicalCatalogSessions(rows, _reason) {
+function yieldEventLoop() {
+  return new Promise((resolve) => setImmediate(resolve));
+}
+
+async function adoptCanonicalCatalogSessions(rows, _reason) {
   const now = Date.now();
   const prev = publicCatalogCache;
   const sameBlob = Boolean(prev?.sessions && rows === prev.sessions);
+
+  let destinationIndex;
+  let venueIndex;
+  let slugIndex;
+  let catalogFacets;
+  let builtAt;
+
+  if (sameBlob && prev?.destinationIndex && prev?.venueIndex && prev?.slugIndex && prev?.catalogFacets) {
+    destinationIndex = prev.destinationIndex;
+    venueIndex = prev.venueIndex;
+    slugIndex = prev.slugIndex;
+    catalogFacets = prev.catalogFacets;
+    builtAt = prev.builtAt || now;
+  } else {
+    // Yield between heavy index maps so health/HTTP can run mid-adopt.
+    await yieldEventLoop();
+    destinationIndex = buildDestinationSessionIndex(rows);
+    await yieldEventLoop();
+    venueIndex = buildVenueSessionIndex(rows);
+    await yieldEventLoop();
+    slugIndex = buildCatalogSlugIndex(rows);
+    await yieldEventLoop();
+    catalogFacets = buildCatalogFacets(rows.filter(sessionHasCoverImage));
+    builtAt = now;
+  }
+
   publicCatalogCache = {
     expiresAt: now + Math.max(30_000, PUBLIC_CATALOG_CACHE_MS),
     staleUntil: now + Math.max(60_000, PUBLIC_CATALOG_STALE_MS),
     sessions: rows,
-    destinationIndex:
-      sameBlob && prev?.destinationIndex ? prev.destinationIndex : buildDestinationSessionIndex(rows),
-    venueIndex: sameBlob && prev?.venueIndex ? prev.venueIndex : buildVenueSessionIndex(rows),
-    slugIndex: sameBlob && prev?.slugIndex ? prev.slugIndex : buildCatalogSlugIndex(rows),
-    catalogFacets:
-      sameBlob && prev?.catalogFacets
-        ? prev.catalogFacets
-        : buildCatalogFacets(rows.filter(sessionHasCoverImage)),
-    builtAt: sameBlob ? prev?.builtAt || now : now,
+    destinationIndex,
+    venueIndex,
+    slugIndex,
+    catalogFacets,
+    builtAt,
   };
 }
 

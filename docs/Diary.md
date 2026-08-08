@@ -1,5 +1,21 @@
 # Diary
 
+## 2026-08-08 - INC.504.5b: эксплуатация adopt-шва (fallback / event loop / RSS)
+
+### Наблюдения
+- Review шва: uncontrolled `legacy inline SQL fallback` под нагрузкой = мгновенный возврат к hang/swap; sync adopt индексов 200-400мс может подморозить event loop; dual in-memory (DTO blob + dto.js indexes) держит RSS высоким.
+
+### Решения
+- Fallback: сначала forever-stale sessions; SQL только cold+no-stale, cooldown 45м (`DAIBILET_LEGACY_CATALOG_SQL_COOLDOWN_MS`); лог `CRITICAL P1: ... legacy inline SQL fallback` для алерта.
+- Adopt: `setImmediate` между buildDestination/venue/slug/facets.
+- План мирного времени: аудит consumers dto.js → индексы в DTO/disk → выпил второго слоя (INC.504.5c).
+
+### Проблемы
+- Алерт в Sentry/ELK/Prometheus на строку `legacy inline SQL fallback` - ops, не в коде.
+- RSS dual-representation остаётся до INC.504.5c.
+
+---
+
 ## 2026-08-08 - INC.504.5: dual catalog Soft-SWR collapsed
 
 ### Наблюдения
