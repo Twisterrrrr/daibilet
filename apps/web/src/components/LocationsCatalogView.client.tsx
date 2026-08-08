@@ -12,7 +12,7 @@ import { HeroLayout } from '@/components/HeroLayout';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from '@/lib/catalog-url';
 import { cityToGenitive, cityToPrepositional } from '@/lib/city-declension';
-import { formatCountFloorTenPlus, formatNumber, pluralCities } from '@/lib/format';
+import { formatNumber, pluralCities } from '@/lib/format';
 import {
   catalogCityQueryValue,
   isAllCitiesQuery,
@@ -497,7 +497,7 @@ export function LocationsCatalogView({
         variant="minimal"
         dense
         breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Локации' }]}
-        eyebrow={`${formatCountFloorTenPlus(heroTotal)} локаций · ${pluralCities(cityCount)}`}
+        eyebrow={`${formatNumber(heroTotal)} локаций · ${pluralCities(cityCount)}`}
         title={heroTitle}
         description={cityName ? heroDescription : 'Места встречи и точки старта. Город - в шапке.'}
         tone="light"
