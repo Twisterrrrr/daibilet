@@ -6,6 +6,7 @@ import { isOpenDateValidity } from '@/lib/finance-projection';
 import { lookupCheckoutOrderByPublicCode } from '@/server/finance-checkout-client';
 import { fetchAdmissionProductBySlug } from '@/server/finance-projection-client';
 import { fetchPublicApiJson } from '@/server/public-api-client';
+import { resolveTicketOpeningHours } from '@/lib/venue-opening-hours';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -49,8 +50,9 @@ async function softEnrichTicketOrder(order: BuyerInternalOrderRecord): Promise<B
   );
   const needsAddress = !order.venueAddress;
   const needsCoords = order.venueLatitude == null || order.venueLongitude == null;
+  const needsHours = !String(order.venueOpeningHours || '').trim();
 
-  if (!needsProduct && !needsAddress && !needsCoords) return order;
+  if (!needsProduct && !needsAddress && !needsCoords && !needsHours) return order;
 
   const product = needsProduct && order.admissionProductSlug
     ? await fetchAdmissionProductBySlug(order.admissionProductSlug)
@@ -75,11 +77,16 @@ async function softEnrichTicketOrder(order: BuyerInternalOrderRecord): Promise<B
   }
 
   const openDate = isOpenDateValidity(product?.validityMode) || isOpenDateValidity(order.validityMode);
+  const venueOpeningHours =
+    String(order.venueOpeningHours || '').trim() ||
+    (openDate || needsHours ? resolveTicketOpeningHours({ venueSlug }) : null);
+
   const enrichment: BuyerInternalOrderRecord = {
     ...order,
     venueTitle,
     venueAddress,
     venueSlug,
+    venueOpeningHours,
     venueLatitude,
     venueLongitude,
     validityMode: order.validityMode || product?.validityMode || null,

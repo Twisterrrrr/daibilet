@@ -36,6 +36,11 @@ export type BuyerInternalOrderRecord = {
   venueTitle?: string | null;
   venueAddress?: string | null;
   venueSlug?: string | null;
+  /**
+   * Open-date venue hours for the ticket card (editorial overlay or future CMS).
+   * Multi-line OK (newline-separated). Absent → fallback copy on OPEN_DATE tickets.
+   */
+  venueOpeningHours?: string | null;
   /** Venue pin for ticket page map (catalog / finance enrich; soft-fail if absent). */
   venueLatitude?: number | null;
   venueLongitude?: number | null;
@@ -134,6 +139,7 @@ export function mergeBuyerInternalOrders(
     venueTitle: pickStr(primary.venueTitle, secondary.venueTitle),
     venueAddress: pickStr(primary.venueAddress, secondary.venueAddress),
     venueSlug: pickStr(primary.venueSlug, secondary.venueSlug),
+    venueOpeningHours: pickStr(primary.venueOpeningHours, secondary.venueOpeningHours),
     venueLatitude: pickNum(primary.venueLatitude, secondary.venueLatitude),
     venueLongitude: pickNum(primary.venueLongitude, secondary.venueLongitude),
     admissionProductSlug: pickStr(primary.admissionProductSlug, secondary.admissionProductSlug),
@@ -343,6 +349,7 @@ function normalizeInternalOrderRecord(raw: unknown): BuyerInternalOrderRecord | 
     venueTitle: asOptionalString(row.venueTitle),
     venueAddress: asOptionalString(row.venueAddress),
     venueSlug: asOptionalString(row.venueSlug),
+    venueOpeningHours: asOptionalString(row.venueOpeningHours),
     venueLatitude: asOptionalNumber(row.venueLatitude),
     venueLongitude: asOptionalNumber(row.venueLongitude),
     admissionProductSlug: asOptionalString(row.admissionProductSlug),

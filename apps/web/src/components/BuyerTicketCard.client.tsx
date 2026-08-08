@@ -15,6 +15,12 @@ import {
 } from '@/lib/buyer-checkout';
 import { buyerTicketAbsoluteUrl, buyerTicketQrImageUrl } from '@/lib/buyer-ticket';
 import { formatNumber } from '@/lib/format';
+import {
+  OPEN_DATE_HOURS_HOLIDAY_NOTE,
+  OPEN_DATE_HOURS_UNKNOWN_NOTE,
+  SESSION_ARRIVE_EARLY_NOTE,
+  resolveTicketOpeningHours,
+} from '@/lib/venue-opening-hours';
 
 type Props = {
   order: BuyerInternalOrderRecord;
@@ -95,6 +101,17 @@ export function BuyerTicketCard({ order, origin, emailHint = 'unknown', classNam
   const buyerName = (order.buyerName || '').trim();
   const supportPhone = (order.supplierSupportPhone || '').trim();
   const mainHeadline = eventTitle || (productTitle !== 'Входной билет' ? productTitle : '');
+  const openingHoursText = openDate
+    ? resolveTicketOpeningHours({
+        venueSlug: order.venueSlug,
+        venueOpeningHours: order.venueOpeningHours,
+      })
+    : null;
+  const openDateNotice = openDate
+    ? openingHoursText
+      ? OPEN_DATE_HOURS_HOLIDAY_NOTE
+      : OPEN_DATE_HOURS_UNKNOWN_NOTE
+    : SESSION_ARRIVE_EARLY_NOTE;
 
   const copyTicketCode = useCallback(async () => {
     try {
@@ -218,6 +235,14 @@ export function BuyerTicketCard({ order, origin, emailHint = 'unknown', classNam
 
       {/* Details */}
       <dl className="mb-5 rounded-xl bg-slate-50 px-3.5 py-3.5 min-[500px]:mb-6 min-[500px]:px-5 min-[500px]:py-4 print:mb-5 print:rounded-none print:bg-transparent print:px-0 print:py-1">
+        {openingHoursText ? (
+          <DetailRow
+            label="Часы работы"
+            value={
+              <span className="whitespace-pre-line text-left min-[500px]:text-right">{openingHoursText}</span>
+            }
+          />
+        ) : null}
         {buyerName ? <DetailRow label="Посетитель" value={buyerName} /> : null}
         {composition ? <DetailRow label="Состав заказа" value={composition} /> : null}
         {order.amountRub != null ? (
@@ -245,11 +270,7 @@ export function BuyerTicketCard({ order, origin, emailHint = 'unknown', classNam
       <div className="mb-5 rounded-r-lg border-l-4 border-amber-400 bg-amber-50 px-3.5 py-3 text-[13px] leading-5 text-amber-950 min-[500px]:mb-6 min-[500px]:px-4 min-[500px]:py-3.5 print:mb-0 print:border-l-2 print:border-slate-400 print:bg-transparent print:px-3 print:py-2">
         <p className="font-bold">Обратите внимание:</p>
         <ul className="mt-1.5 list-none space-y-1">
-          <li>
-            {openDate
-              ? '• Уточняйте график работы в планируемый день посещения.'
-              : '• Рекомендуем приходить за 15-20 минут до указанного времени. При опоздании билеты могут быть аннулированы.'}
-          </li>
+          <li>• {openDateNotice}</li>
           <li>• Не публикуйте фотографии билета с открытым QR-кодом в интернете.</li>
         </ul>
       </div>

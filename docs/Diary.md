@@ -15,10 +15,11 @@
 - Print: `@page` 14mm + card `padding: 12mm` (не `p-0`), чтобы контент и разделители не липли к краю листа.
 - Print brand: сверху карточки строка с `DaibiletLogo` + «Электронный билет» (`print:flex`, на экране скрыта).
 - Open-date warning: «Уточняйте график работы в планируемый день посещения» вместо «приходить за 15-20 минут».
-- Venue DTO cache: не кэшировать soft-miss (`null`); перед `notFound()` - `noStore()` + uncached retry (ISR STALE 404 на `/venues/ermitazh|erarta` при живом API /locations).
+- Open-date: часы с editorial overlay по `venueSlug` (`venue-opening-hours.ts`) - в Prisma Venue поля часов ещё нет; unknown slug → fallback copy. При часах: блок «Часы работы» + holiday caveat.
 
 ### Проблемы
 - Ticket page для TC опирается на localStorage handoff с `/account/purchases`; deep-link без кэша остаётся soft. Полный server lookup ExternalOrder - follow-up.
+- Venue.openingHours в schema отсутствует - до CMS/finance поля держим curated slug map (не выдумывать часы для неизвестных площадок).
 
 ---
 

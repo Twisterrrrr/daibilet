@@ -9,6 +9,7 @@
  */
 
 import type { BuyerInternalOrderRecord } from './buyer-checkout';
+import { formatVenueOpeningHoursLines, resolveVenueOpeningHours } from './venue-opening-hours';
 
 /** Owner profile used for live purchases list smoke. */
 export const BUYER_PURCHASES_SEED_EMAIL = 'v.butin@yandex.ru';
@@ -17,6 +18,10 @@ function normalizeEmail(email: string | null | undefined): string {
   return String(email || '')
     .trim()
     .toLowerCase();
+}
+
+function hoursForSlug(slug: string): string | null {
+  return formatVenueOpeningHoursLines(resolveVenueOpeningHours(slug));
 }
 
 const SEED_ROWS: BuyerInternalOrderRecord[] = [
@@ -33,6 +38,7 @@ const SEED_ROWS: BuyerInternalOrderRecord[] = [
     venueTitle: 'Третьяковская галерея',
     venueAddress: 'Лаврушинский переулок, 10, Москва',
     venueSlug: 'moscow-tret-yakovskaya-galereya',
+    venueOpeningHours: hoursForSlug('moscow-tret-yakovskaya-galereya'),
     venueLatitude: 55.7415,
     venueLongitude: 37.6201,
     sessionStartsAt: '2026-08-15T11:00:00.000Z',
@@ -61,6 +67,7 @@ const SEED_ROWS: BuyerInternalOrderRecord[] = [
     venueTitle: 'Государственный Эрмитаж',
     venueAddress: 'Дворцовая площадь, 2, Санкт-Петербург',
     venueSlug: 'ermitazh',
+    venueOpeningHours: hoursForSlug('ermitazh'),
     venueLatitude: 59.9398,
     venueLongitude: 30.3146,
     sessionStartsAt: null,
@@ -86,6 +93,7 @@ const SEED_ROWS: BuyerInternalOrderRecord[] = [
     venueTitle: 'Музей современного искусства Эрарта',
     venueAddress: '29-я линия В.О., 2, Санкт-Петербург',
     venueSlug: 'erarta',
+    venueOpeningHours: hoursForSlug('erarta'),
     venueLatitude: 59.9328,
     venueLongitude: 30.2536,
     sessionStartsAt: '2026-08-20T15:00:00.000Z',

@@ -34,5 +34,6 @@ test('buyer purchases seed: email filter + publicCode lookup', () => {
   assert.notEqual(one!.ticketNumber, one!.publicCode);
   assert.equal(lookupBuyerPurchasesSeedByPublicCode('missing'), null);
   assert.equal(lookupBuyerPurchasesSeedByPublicCode('DB26-784502')!.venueSlug, 'ermitazh');
+  assert.ok(lookupBuyerPurchasesSeedByPublicCode('DB26-784502')!.venueOpeningHours);
   assert.equal(lookupBuyerPurchasesSeedByPublicCode('DB26-784503')!.venueSlug, 'erarta');
 });
