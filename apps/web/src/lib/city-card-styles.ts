@@ -6,6 +6,17 @@ export const CITY_CARD_TITLE_CLASS = 'text-sm font-bold leading-snug text-white 
 export const CITY_CARD_TITLE_LARGE_CLASS =
   'text-base font-bold leading-tight text-white sm:text-lg';
 
-export function cityCardTitleClass(variant: 'compact' | 'large' = 'compact'): string {
+export const CITY_CARD_TITLE_LIGHT_CLASS =
+  'text-sm font-bold leading-snug text-slate-900 sm:text-base';
+export const CITY_CARD_TITLE_LIGHT_LARGE_CLASS =
+  'text-base font-bold leading-tight text-slate-900 sm:text-lg';
+
+export function cityCardTitleClass(
+  variant: 'compact' | 'large' = 'compact',
+  tone: 'dark' | 'light' = 'dark',
+): string {
+  if (tone === 'light') {
+    return variant === 'large' ? CITY_CARD_TITLE_LIGHT_LARGE_CLASS : CITY_CARD_TITLE_LIGHT_CLASS;
+  }
   return variant === 'large' ? CITY_CARD_TITLE_LARGE_CLASS : CITY_CARD_TITLE_CLASS;
 }

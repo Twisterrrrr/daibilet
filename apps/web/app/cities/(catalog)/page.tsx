@@ -23,6 +23,7 @@ export const revalidate = 86400;
 
 const CITIES_DESTINATIONS_TIMEOUT_MS = 2500;
 const TOP_CITIES_COUNT = 8;
+const SECOND_OCTET_COUNT = 8;
 
 export default async function CitiesIndexPage() {
   let destinations: Awaited<ReturnType<typeof getCachedDestinations>>['destinations'] = [];
@@ -45,8 +46,12 @@ export default async function CitiesIndexPage() {
   // Prefer cities with daytime `cities/top` previews, then fill by popularity.
   const withTop = [...cities].filter(cityHasTopPreview).sort(byPopularity);
   const withoutTop = [...cities].filter((city) => !cityHasTopPreview(city)).sort(byPopularity);
-  const topCities = [...withTop, ...withoutTop].slice(0, TOP_CITIES_COUNT);
-  const topSlugs = topCities.map((city) => cityImageSlug(city)).filter(Boolean);
+  const rankedCities = [...withTop, ...withoutTop];
+  const topCities = rankedCities.slice(0, TOP_CITIES_COUNT);
+  const secondOctet = rankedCities.slice(TOP_CITIES_COUNT, TOP_CITIES_COUNT + SECOND_OCTET_COUNT);
+  const featuredSlugs = [...topCities, ...secondOctet]
+    .map((city) => cityImageSlug(city))
+    .filter(Boolean);
 
   return (
     <SiteLayout>
@@ -71,7 +76,18 @@ export default async function CitiesIndexPage() {
         </div>
       </HeroLayout>
       <div id="cities-all" className="container-page scroll-mt-24 bg-slate-50 py-10">
-        <CitiesCatalogView destinations={destinations} hideIntro excludeSlugs={topSlugs} />
+        {secondOctet.length ? (
+          <section aria-label="Следующие города" className="mb-10 border-b border-slate-200/80 pb-10">
+            <ul className="grid w-full grid-cols-2 content-start gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
+              {secondOctet.map((city) => (
+                <li key={city.slug || city.name} className="min-w-0">
+                  <CityCard city={city} compact tone="light" />
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+        <CitiesCatalogView destinations={destinations} hideIntro excludeSlugs={featuredSlugs} />
       </div>
     </SiteLayout>
   );
