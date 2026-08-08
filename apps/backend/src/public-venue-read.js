@@ -1129,11 +1129,6 @@ export async function publicVenueHubRows(db, limit = 500, options = {}) {
   }
 
   const rows = await schedulePublicVenueHubRebuild(cacheKey, take, options);
-  // After shell cold build, warm the full hub in background (enrich / ISR stay accurate).
-  if (shell) {
-    const fullKey = `${take}:${options.requireEvents === false ? 'all' : 'hub'}`;
-    void schedulePublicVenueHubRebuild(fullKey, take, { ...options, shell: false });
-  }
   return rows;
 }
 
