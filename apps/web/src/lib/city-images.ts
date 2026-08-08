@@ -17,6 +17,11 @@ const CITY_CARD_IMAGE_ALIASES: Record<string, string> = {
   khabarovsk: 'habarovsk',
   lipetsk: 'lipeck',
   kirov: 'kirov-kirovskaya-oblast',
+  arkhangelsk: 'arhangelsk',
+  astrakhan: 'astrahan',
+  blagoveshchensk: 'blagoveschensk-amurskaya-oblast',
+  'blagoveshchensk-amurskaya-oblast': 'blagoveschensk-amurskaya-oblast',
+  'yuzhno-sakhalinsk': 'yuzhno-sahalinsk',
 };
 
 const CITY_CARD_IMAGE_SLUGS = new Set([
@@ -58,7 +63,7 @@ const CITY_CARD_IMAGE_SLUGS = new Set([
   'penza',
   'volgograd',
   'sortavala',
-  // Night covers batch (catalog order after existing)
+  // Daytime covers (replaced night batch + next catalog cities)
   'habarovsk',
   'barnaul',
   'cheboksary',
@@ -77,6 +82,17 @@ const CITY_CARD_IMAGE_SLUGS = new Set([
   'chita',
   'astrahan',
   'belgorod',
+  'syktyvkar',
+  'yuzhno-sahalinsk',
+  'arhangelsk',
+  'blagoveschensk-amurskaya-oblast',
+  'kaluga',
+  'kostroma',
+  'murmansk',
+  'pskov',
+  'abakan',
+  'sevastopol',
+  'simferopol',
 ]);
 
 /**
@@ -94,7 +110,7 @@ const CITY_TOP_PREVIEW_SLUGS = new Set([
   'kaliningrad',
 ]);
 
-/** Daytime JPG assets under `/images/cities/top/` (top-8 + second octet). */
+/** Daytime JPG assets under `/images/cities/top/`. */
 const CITY_DAYTIME_PREVIEW_SLUGS = new Set([
   ...CITY_TOP_PREVIEW_SLUGS,
   // Second octet (after map)
@@ -115,6 +131,36 @@ const CITY_DAYTIME_PREVIEW_SLUGS = new Set([
   'tula',
   'tver',
   'vladivostok',
+  // Fourth batch: replace night covers + remaining catalog without cover
+  'habarovsk',
+  'barnaul',
+  'cheboksary',
+  'lipeck',
+  'kurgan',
+  'ivanovo',
+  'kirov-kirovskaya-oblast',
+  'bryansk',
+  'kemerovo',
+  'smolensk',
+  'tambov',
+  'vladimir',
+  'yoshkar-ola',
+  'kursk',
+  'saransk',
+  'chita',
+  'astrahan',
+  'belgorod',
+  'syktyvkar',
+  'yuzhno-sahalinsk',
+  'arhangelsk',
+  'blagoveschensk-amurskaya-oblast',
+  'kaluga',
+  'kostroma',
+  'murmansk',
+  'pskov',
+  'abakan',
+  'sevastopol',
+  'simferopol',
 ]);
 
 function isUsableRemoteImage(url: string): boolean {
@@ -135,12 +181,12 @@ export function cityHasTopPreview(city: CityImageSource): boolean {
   return CITY_TOP_PREVIEW_SLUGS.has(cityCardImageSlug(city));
 }
 
-/** Daytime JPG under `cities/top/` (top-8 pins + second-octet set). */
+/** Daytime JPG under `cities/top/` (top-8 pins + later daytime sets). */
 export function cityHasDaytimePreview(city: CityImageSource): boolean {
   return CITY_DAYTIME_PREVIEW_SLUGS.has(cityCardImageSlug(city));
 }
 
-/** Distinct daytime previews for `/cities` featured tiles (top + second octet). */
+/** Distinct daytime previews for `/cities` featured tiles. */
 export function resolveCityTopPreviewImage(city: CityImageSource): string | null {
   const imageSlug = cityCardImageSlug(city);
   if (!CITY_DAYTIME_PREVIEW_SLUGS.has(imageSlug)) return null;
@@ -151,13 +197,14 @@ export function resolveCityCardImage(
   city: CityImageSource,
   options?: { variant?: 'default' | 'top' },
 ): string | null {
-  if (options?.variant === 'top') {
-    const top = resolveCityTopPreviewImage(city);
-    if (top) return top;
-  }
+  const daytime = resolveCityTopPreviewImage(city);
+  if (options?.variant === 'top' && daytime) return daytime;
 
   const fromApi = city.heroImageUrl?.trim();
   if (fromApi && isUsableRemoteImage(fromApi)) return fromApi;
+
+  // Prefer daytime JPG over legacy PNG so catalog never keeps night covers primary.
+  if (daytime) return daytime;
 
   const imageSlug = cityCardImageSlug(city);
   if (!CITY_CARD_IMAGE_SLUGS.has(imageSlug)) return null;

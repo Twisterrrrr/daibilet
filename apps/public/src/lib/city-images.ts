@@ -17,6 +17,11 @@ const CITY_CARD_IMAGE_ALIASES: Record<string, string> = {
   khabarovsk: 'habarovsk',
   lipetsk: 'lipeck',
   kirov: 'kirov-kirovskaya-oblast',
+  arkhangelsk: 'arhangelsk',
+  astrakhan: 'astrahan',
+  blagoveshchensk: 'blagoveschensk-amurskaya-oblast',
+  'blagoveshchensk-amurskaya-oblast': 'blagoveschensk-amurskaya-oblast',
+  'yuzhno-sakhalinsk': 'yuzhno-sahalinsk',
 };
 
 const CITY_CARD_IMAGE_SLUGS = new Set([
@@ -58,7 +63,7 @@ const CITY_CARD_IMAGE_SLUGS = new Set([
   'penza',
   'volgograd',
   'sortavala',
-  // Night covers batch (catalog order after existing)
+  // Daytime covers (replaced night batch + next catalog cities)
   'habarovsk',
   'barnaul',
   'cheboksary',
@@ -77,6 +82,74 @@ const CITY_CARD_IMAGE_SLUGS = new Set([
   'chita',
   'astrahan',
   'belgorod',
+  'syktyvkar',
+  'yuzhno-sahalinsk',
+  'arhangelsk',
+  'blagoveschensk-amurskaya-oblast',
+  'kaluga',
+  'kostroma',
+  'murmansk',
+  'pskov',
+  'abakan',
+  'sevastopol',
+  'simferopol',
+]);
+
+/** Daytime JPG under `/images/cities/top/` when available; else legacy PNG. */
+const CITY_DAYTIME_PREVIEW_SLUGS = new Set([
+  'habarovsk',
+  'barnaul',
+  'cheboksary',
+  'lipeck',
+  'kurgan',
+  'ivanovo',
+  'kirov-kirovskaya-oblast',
+  'bryansk',
+  'kemerovo',
+  'smolensk',
+  'tambov',
+  'vladimir',
+  'yoshkar-ola',
+  'kursk',
+  'saransk',
+  'chita',
+  'astrahan',
+  'belgorod',
+  'syktyvkar',
+  'yuzhno-sahalinsk',
+  'arhangelsk',
+  'blagoveschensk-amurskaya-oblast',
+  'kaluga',
+  'kostroma',
+  'murmansk',
+  'pskov',
+  'abakan',
+  'sevastopol',
+  'simferopol',
+  'saint-petersburg',
+  'moscow',
+  'kazan',
+  'ekaterinburg',
+  'nizhny-novgorod',
+  'samara',
+  'sochi',
+  'kaliningrad',
+  'krasnodar',
+  'krasnoyarsk',
+  'novosibirsk',
+  'voronezh',
+  'ufa',
+  'perm',
+  'chelyabinsk',
+  'ryazan',
+  'rostov-on-don',
+  'tyumen',
+  'omsk',
+  'penza',
+  'saratov',
+  'tula',
+  'tver',
+  'vladivostok',
 ]);
 
 export function resolveCityImage(city: CityImageSource): string | null {
@@ -85,6 +158,9 @@ export function resolveCityImage(city: CityImageSource): string | null {
 
   const slug = citySlug(city);
   const imageSlug = CITY_CARD_IMAGE_ALIASES[slug] || slug;
+  if (CITY_DAYTIME_PREVIEW_SLUGS.has(imageSlug)) {
+    return `/images/cities/top/${imageSlug}.jpg`;
+  }
   if (!CITY_CARD_IMAGE_SLUGS.has(imageSlug)) return null;
   return `/images/cities/${imageSlug}.png`;
 }

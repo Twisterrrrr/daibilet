@@ -1,3 +1,19 @@
+## 2026-08-09 - Daytime city covers for 29 catalog cities
+
+### Наблюдения
+- Owner: ошибочно выкатили night batch (18); нужен полный переход на дневные обложки как у top/second/third octet.
+- Оставались 11 городов каталога без cover (Сыктывкар…Симферополь).
+
+### Решения
+- GenerateImage ×29 sunny daytime landmark JPG; sharp → cities/top/{slug}.jpg (1200×750) + overwrite cities/{slug}.png daytime.
+- CITY_DAYTIME_PREVIEW_SLUGS + aliases; resolveCityCardImage предпочитает daytime JPG (не night PNG).
+- Commit+push + Deploy MSK web (swap уже зовёт sync-public-assets.mjs).
+
+### Проблемы
+- Нет.
+
+---
+
 # Diary
 
 ## 2026-08-09 - INC.504.5c: stat-gated disk promote (Codex)
