@@ -1,5 +1,18 @@
 # qa.md — открытые вопросы
 
+## 2026-08-08 - Catalog Worker + Redis transport (deferred after disk worker)
+
+**Disk worker (INC.504.5c) - implement сейчас** (systemd + shared disk v2).  
+**Redis (INC.504.5d) - всё ещё deferred** после стабилизации disk-worker.
+
+**Канон Redis (owner sketch, later):**
+1. Worker → gzip JSON в Redis (`catalog:sessions`, `catalog:indexes`) + `catalog:updated_at`.
+2. Main API: read Redis → in-memory Soft-SWR.
+3. Транспорт: Redis > shared disk (уже live) > streaming (отвергнут).
+4. Алерты: P1 freshness; P2 worker crash; P3 empty artifact.
+
+**Открыто перед Redis:** есть ли Redis на MSK / нужен ли новый сервис.
+
 ## 2026-08-08 - Buyer LK / refunds / Stage 2+ (открыто, future; не Stage 0)
 
 **Контекст:** Stage 0 buyer support = **только mailto** (`hello@daibilet.ru`), без self-serve refund. Self-refund UI и частичные операции - **после** появления модели единого ваучера.
