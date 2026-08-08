@@ -82,7 +82,7 @@
 
 ### R7. Прочее (ниже приоритет, но копит хвост)
 
-- Dual catalog SWR (`dto.js` + `public-catalog.dto.ts`) INC.504.5.
+- Dual catalog SWR (`dto.js` + `public-catalog.dto.ts`) INC.504.5 ✅ (dto.js adopt-only поверх DTO).
 - Blog list/article ещё могут тянуть лишний related/DTO.
 - Sitemap chunks `force-dynamic` + revalidate 3600 - ок, но freshness vs IndexNow при массовых seed.
 - Widget iframes (TC / Teplohod) - только по клику / ниже fold; **никогда** auto-load в SSR critical.
@@ -204,7 +204,7 @@ Humans (progressive enhancement)
 | ID | Задача | Owner acceptance |
 |----|--------|------------------|
 | WEB.LIGHT.C1 | RSC flight slim: меньше client boundaries на home/city (server components для static grids) | JS first-load budget table §2.3 |
-| WEB.LIGHT.C2 | Merge dual catalog SWR (INC.504.5) | один SoT; меньше RAM/CPU |
+| WEB.LIGHT.C2 | Merge dual catalog SWR (INC.504.5) | ✅ dto.js adopt-only / canonical DTO |
 | WEB.LIGHT.C3 | Partial Prerender / streaming без soft-404 регресса | TTFB↓ без HTTP 200 на missing |
 | WEB.LIGHT.C4 | Image CDN pipeline: AVIF/WebP + size presets для thumbs | LCP −20% на mobile |
 | WEB.LIGHT.C5 | Crawl budget report: sitemap vs indexable vs soft-404 weekly | Yandex Webmaster: время ответа + исключения ↓ |

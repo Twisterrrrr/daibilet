@@ -6733,8 +6733,8 @@ export async function publicCatalogSessions(db, forceRefresh = false) {
     return cached.sessions;
   }
 
-  // INC.504.4: serve ANY previous sessions immediately (even past staleUntil); never await
-  // hard-expire rebuild on the request path - refresh runs in background single-flight.
+  // INC.504.4 / INC.504.5: serve ANY previous sessions immediately; refresh only via
+  // canonical public-catalog.dto (child/disk/single-flight) - never a second SQL rebuild.
   if (cached?.sessions?.length) {
     void schedulePublicCatalogRebuild(db, now < (cached.staleUntil || 0) ? 'swr' : 'soft-expire');
     return cached.sessions;
@@ -6743,26 +6743,20 @@ export async function publicCatalogSessions(db, forceRefresh = false) {
   return schedulePublicCatalogRebuild(db, 'cold');
 }
 
+/**
+ * INC.504.5: legacy dto.js catalog is an adopt/index layer over public-catalog.dto.ts.
+ * Heavy rebuild (SQL + map) lives only in the DTO path / child process.
+ */
 function schedulePublicCatalogRebuild(db, reason = 'refresh') {
   if (publicCatalogBuildPromise) return publicCatalogBuildPromise;
 
   publicCatalogBuildPromise = (async () => {
     const startedAt = Date.now();
     try {
-      const rows = await publicCatalogSessionsFast(db);
-      const now = Date.now();
-      publicCatalogCache = {
-        expiresAt: now + Math.max(30_000, PUBLIC_CATALOG_CACHE_MS),
-        staleUntil: now + Math.max(60_000, PUBLIC_CATALOG_STALE_MS),
-        sessions: rows,
-        destinationIndex: buildDestinationSessionIndex(rows),
-        venueIndex: buildVenueSessionIndex(rows),
-        slugIndex: buildCatalogSlugIndex(rows),
-        catalogFacets: buildCatalogFacets(rows.filter(sessionHasCoverImage)),
-        builtAt: now,
-      };
+      const rows = await loadCanonicalPublicCatalogSessions(db, reason);
+      adoptCanonicalCatalogSessions(rows, reason);
       console.log(
-        `Public catalog cache rebuilt (${reason}): ${rows.length} sessions in ${now - startedAt}ms`,
+        `Public catalog legacy cache adopted from DTO (${reason}): ${rows.length} sessions in ${Date.now() - startedAt}ms`,
       );
       return rows;
     } finally {
@@ -6771,7 +6765,7 @@ function schedulePublicCatalogRebuild(db, reason = 'refresh') {
   })().catch((error) => {
     publicCatalogBuildPromise = null;
     console.warn(
-      `Public catalog cache rebuild failed (${reason}): ${error instanceof Error ? error.message : String(error)}`,
+      `Public catalog legacy cache adopt failed (${reason}): ${error instanceof Error ? error.message : String(error)}`,
     );
     throw error;
   });
@@ -6779,6 +6773,42 @@ function schedulePublicCatalogRebuild(db, reason = 'refresh') {
   return publicCatalogBuildPromise;
 }
 
+async function loadCanonicalPublicCatalogSessions(db, reason) {
+  const forceRefresh = reason === 'force-refresh';
+  try {
+    const { getPublicCatalogSessions } = await import('./public-catalog.dto.js');
+    return await getPublicCatalogSessions(forceRefresh, { hydrateSlots: false });
+  } catch (error) {
+    console.warn(
+      `Canonical catalog load failed (${reason}), legacy inline SQL fallback: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+    );
+    return publicCatalogSessionsFast(db);
+  }
+}
+
+function adoptCanonicalCatalogSessions(rows, _reason) {
+  const now = Date.now();
+  const prev = publicCatalogCache;
+  const sameBlob = Boolean(prev?.sessions && rows === prev.sessions);
+  publicCatalogCache = {
+    expiresAt: now + Math.max(30_000, PUBLIC_CATALOG_CACHE_MS),
+    staleUntil: now + Math.max(60_000, PUBLIC_CATALOG_STALE_MS),
+    sessions: rows,
+    destinationIndex:
+      sameBlob && prev?.destinationIndex ? prev.destinationIndex : buildDestinationSessionIndex(rows),
+    venueIndex: sameBlob && prev?.venueIndex ? prev.venueIndex : buildVenueSessionIndex(rows),
+    slugIndex: sameBlob && prev?.slugIndex ? prev.slugIndex : buildCatalogSlugIndex(rows),
+    catalogFacets:
+      sameBlob && prev?.catalogFacets
+        ? prev.catalogFacets
+        : buildCatalogFacets(rows.filter(sessionHasCoverImage)),
+    builtAt: sameBlob ? prev?.builtAt || now : now,
+  };
+}
+
+/** Emergency fallback only (INC.504.5): prefer public-catalog.dto / child / disk. */
 async function publicCatalogSessionsFast(db) {
   const [result, pinnedResult] = await Promise.all([
     db.query(

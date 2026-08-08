@@ -1,5 +1,22 @@
 # Diary
 
+## 2026-08-08 - INC.504.5: dual catalog Soft-SWR collapsed
+
+### Наблюдения
+- После INC.VENUE-SOFT: API hang / Recv-Q / swap ~1.9G связывали с dual Soft-SWR - два независимых rebuild (~2.6k sessions) каждые ~5-6 мин: `dto.js` (`schedulePublicCatalogRebuild` → SQL inline) + `public-catalog.dto.ts` (child/disk).
+- Venue/city/catalog DTO уже брали TS path; home/landing/legacy `buildCatalogSessions` и warmup всё ещё гоняли второй SQL rebuild в процессе API.
+
+### Решения
+- Канон rebuild: только `public-catalog.dto.ts` (+ `DAIBILET_CATALOG_REBUILD_MODE=child` / disk snapshot / flock cron).
+- `dto.js` `publicCatalogSessions`: adopt sessions из `getPublicCatalogSessions` + локальные indexes (slug/facets); shared array reference; SQL `publicCatalogSessionsFast` - только emergency fallback при падении import/DTO.
+- Journal: вместо `Public catalog cache rebuilt` → `Public catalog legacy cache adopted from DTO` (мс, не 12-22с).
+- API-only: git pull + `systemctl restart daibilet-api` на MSK; web deploy не нужен.
+
+### Проблемы
+- Steady-state indexes в dto.js остаются (дешёвые); полный F5 удаление legacy catalog path - отдельно.
+
+---
+
 ## 2026-08-08 - INC.VENUE-SOFT: все /locations|/venues «Площадка временно недоступна»
 
 ### Наблюдения
@@ -14,7 +31,7 @@
 - Code: soft-unavailable → `await connection()` (не кэшировать soft HTML); venue DTO timeout 5s→8s (cold race).
 
 ### Проблемы
-- Dual catalog SWR (dto.js + public-catalog.dto.ts) INC.504.5 всё ещё открыт - риск RAM/CPU рецидива.
+- Dual catalog SWR закрыт в отдельной записи INC.504.5 (тот же день).
 - Code soft-cache fix нужен web deploy пачкой; ops уже восстановил live.
 
 ---
