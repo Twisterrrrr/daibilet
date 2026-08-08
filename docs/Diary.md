@@ -11,6 +11,7 @@
 - `dto.js` `publicCatalogSessions`: adopt sessions из `getPublicCatalogSessions` + локальные indexes (slug/facets); shared array reference; SQL `publicCatalogSessionsFast` - только emergency fallback при падении import/DTO.
 - Journal: вместо `Public catalog cache rebuilt` → `Public catalog legacy cache adopted from DTO` (мс, не 12-22с).
 - API-only: git pull + `systemctl restart daibilet-api` на MSK; web deploy не нужен.
+- **MSK live `5c9d8d4e`:** `DAIBILET_CATALOG_REBUILD_MODE=child`; health 200 ~1мс; venue DTO 200 (`stage-standup-club-krasnyi-zal`); journal `legacy cache adopted from DTO (cold): 2938 sessions in 353ms` + `DTO rebuild spawned (force-refresh)` (child); нет второго SQL rebuild в API. Node RSS ~526MB после smoke; systemd MemoryCurrent ~1.25G (после force-refresh child).
 
 ### Проблемы
 - Steady-state indexes в dto.js остаются (дешёвые); полный F5 удаление legacy catalog path - отдельно.
