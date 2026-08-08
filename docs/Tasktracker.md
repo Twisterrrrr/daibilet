@@ -11,9 +11,9 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| UX.BUYER-SUPPORT.1 | «Вопрос по заказу» secondary в BuyerOrderCard + mailto hello@ | Высокий | 🔄 |
-| UX.BUYER-SUPPORT.2 | Hint: возврат по правилам площадки / ответ в рабочие часы | Высокий | 🔄 |
-| UX.BUYER-SUPPORT.3 | Commit+push+MSK deploy+smoke `/account/purchases` | Высокий | 🔄 |
+| UX.BUYER-SUPPORT.1 | «Вопрос по заказу» secondary в BuyerOrderCard + mailto hello@ | Высокий | ✅ `5d323f73` |
+| UX.BUYER-SUPPORT.2 | Hint: возврат по правилам площадки / ответ в рабочие часы | Высокий | ✅ |
+| UX.BUYER-SUPPORT.3 | Commit+push+MSK deploy+smoke `/account/purchases` | Высокий | ✅ Deploy `31252460479` **BUILD_ID=`d3ZmqQ12iG6KmwyJHlya3`** (SHA incl. `5d323f73`); chunk has mailto+hint; page 200 |
 
 ---
 
