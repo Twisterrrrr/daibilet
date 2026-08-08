@@ -17,6 +17,16 @@
 
 ---
 
+## Incident: location PDP DYNAMIC_SERVER_USAGE 500 (2026-08-08)
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| INC.LOC500.1 | Repro `/locations/cerkov-…-yaani-kirik` + MSK logs | Критический | ✅ digest `DYNAMIC_SERVER_USAGE`; API DTO 200 |
+| INC.LOC500.2 | Fix: `safeNotFound` + miss/unavailable split; cities same | Критический | 🔄 code |
+| INC.LOC500.3 | Smoke slug 200 + missing 404; spot-check PDPs; commit+push+MSK deploy | Критический | ⏳ |
+
+---
+
 ## Epic: WEB.LIGHT - lightweight HTML + robots (2026-08-08)
 
 **Канон:** [web-lightweight-seo.md](./web-lightweight-seo.md)  
@@ -47,9 +57,9 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| UX.VENUES-MORE.1 | Visible «Показать ещё» + progressive loadMore (shell+enrich) | Критический | 🔄 |
-| UX.VENUES-MORE.2 | Type chips keep server cursor (не null после client-filter) | Высокий | 🔄 |
-| UX.VENUES-MORE.3 | Same button on `/locations`; commit+push+MSK deploy+smoke | Высокий | 🔄 |
+| UX.VENUES-MORE.1 | Visible «Показать ещё» + progressive loadMore (shell+enrich) | Критический | ✅ `d6336346` MSK BUILD_ID=`bHSH2B7c6PCvterwiCo3W` |
+| UX.VENUES-MORE.2 | Type chips keep server cursor (не null после client-filter) | Высокий | ✅ |
+| UX.VENUES-MORE.3 | Same button on `/locations`; commit+push+MSK deploy+smoke | Высокий | ✅ deploy `31252274496` (SHA `ce7183ab` incl. fix); API page2 OK |
 
 ---
 
