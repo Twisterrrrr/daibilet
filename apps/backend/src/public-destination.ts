@@ -1,12 +1,9 @@
-import { readFileSync } from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { LANDING_RULES } from './landing-rules.js';
+import { loadCityRoutingConfig } from './city-routing-config.js';
 import type { DestinationType } from './types/common.js';
 import type { PublicDestinationDto, PublicSessionDto } from './types/public.js';
 
 const PUBLIC_DESTINATION_MIN_EVENTS = 1;
-const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 
 interface CityRoutingConfig {
   standaloneCities?: string[];
@@ -35,7 +32,7 @@ interface DestinationBucket {
   landings: Map<string, number>;
 }
 
-const cityRouting = loadCityRouting();
+const cityRouting = loadCityRoutingConfig(import.meta.url) as CityRoutingConfig;
 const standaloneCityNames = new Set(cityRouting.standaloneCities || []);
 const foreignCityNames = new Set(cityRouting.foreignCities || []);
 const publicRegionNames = new Set([
@@ -402,14 +399,4 @@ function publicCitySlug(value?: string | null): string {
 
 function cleanDisplayName(value?: string | null): string {
   return String(value || '').replace(/\s+/g, ' ').trim();
-}
-
-function loadCityRouting(): CityRoutingConfig {
-  try {
-    return JSON.parse(
-      readFileSync(path.join(projectRoot, 'data', 'geo', 'city-routing.ru.json'), 'utf8'),
-    ) as CityRoutingConfig;
-  } catch {
-    return {};
-  }
 }

@@ -1,5 +1,3 @@
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { prisma } from '@daibilet/db';
 import {
   publicVenueHubRows,
@@ -19,6 +17,7 @@ import { buildPublicLandings } from './public-city-landings.js';
 import { createDb } from './db.js';
 import { getPublicCatalogSessions } from './public-catalog.dto.js';
 import { toPublicCatalogListItem } from './public-catalog-list-item.js';
+import { resolveProjectRoot } from './project-root.js';
 import type { DestinationType } from './types/common.js';
 import type {
   PublicCityPageDto,
@@ -34,7 +33,7 @@ const PUBLIC_CITY_STALE_MS = Number(process.env.PUBLIC_CITY_STALE_MS || 30 * 60 
 const CITY_SSR_SESSION_LIMIT = 48;
 /** Venues/landings enrichment must not block city HTML for tens of seconds. */
 const CITY_SECONDARY_TIMEOUT_MS = Number(process.env.DAIBILET_CITY_SECONDARY_TIMEOUT_MS || 3000);
-const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
+const projectRoot = resolveProjectRoot(import.meta.url);
 
 function cityPerfEnabled() {
   return process.env.DAIBILET_PERF_LOG === '1';

@@ -1,10 +1,8 @@
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { loadCityRoutingConfig } from './city-routing-config.js';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const routingPath = path.join(__dirname, '..', '..', '..', 'data', 'geo', 'city-routing.ru.json');
-const routing = JSON.parse(fs.readFileSync(routingPath, 'utf8'));
+// INC.CITY404.4: do not read via import.meta.url alone - Next CI bakes
+// /home/runner/work/... which 500s revalidate on MSK after artifact swap.
+const routing = loadCityRoutingConfig(import.meta.url);
 
 export const DEFAULT_CITY_TIME_ZONE = 'Europe/Moscow';
 

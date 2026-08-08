@@ -1,3 +1,19 @@
+## 2026-08-08 - INC.CITY404.4: revalidate 500 (CI-baked city-routing path)
+
+### Наблюдения
+- После Samara hub fix (`afadaa2e`) live `/cities/samara` 200, но `POST /api/internal/revalidate` на MSK → 500.
+- journal: `ENOENT .../home/runner/work/.../city-routing.ru.json` - Next CI bake абсолютного `import.meta.url` в бандл; на VPS пути runner нет.
+- Цепочка: revalidate → `@daibilet/backend/public-read` → `city-timezone.js` читал JSON без try/catch.
+
+### Решения
+- `project-root.js` / `city-routing-config.js`: резолв корня через `DAIBILET_PROJECT_ROOT` → walk `cwd` → fallback `import.meta.url`; безопасный load.
+- Подключено в `city-timezone.js`, venue-read, destination, catalog.mapper, dto, public-city.dto.
+
+### Проблемы
+- Нужен MSK web deploy (CI artifact), иначе live revalidate остаётся на старом бандле.
+
+---
+
 ## 2026-08-08 - Sitewide hang: venues hub cold rebuild + catalog no-store
 
 ### Наблюдения

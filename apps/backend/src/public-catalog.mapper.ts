@@ -1,6 +1,3 @@
-import { readFileSync } from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { resolveCityTimeZone } from './city-timezone.js';
 import { matchingLandingSlugs } from './landing-rules.js';
 import { isFutureSlotStart, isOpenDateCatalogRow } from './catalog-availability.js';
@@ -13,6 +10,7 @@ import {
 } from './provider-purchase.js';
 import { prismaWallTimeToIso } from './public-datetime.js';
 import { formatPublicEventTitle } from './event-title-normalize.ts';
+import { loadCityRoutingConfig } from './city-routing-config.js';
 import type { DestinationType, TimeBucket } from './types/common.js';
 import type { PublicSessionDto } from './types/public.js';
 
@@ -93,8 +91,7 @@ interface PublicDestination {
   type: DestinationType;
 }
 
-const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
-const cityRouting = loadCityRouting();
+const cityRouting = loadCityRoutingConfig(import.meta.url) as CityRoutingConfig;
 const standaloneCityNames = new Set(cityRouting.standaloneCities || []);
 const cityToRegion = new Map(Object.entries(cityRouting.cityToRegion || {}));
 const foreignCityNames = new Set(cityRouting.foreignCities || []);
@@ -327,16 +324,6 @@ function isAmenityCatalogTag(tag: string): boolean {
   if (!lower) return false;
   return /^(ресторан[-\s]?бар|отопление|экскурсовод|аудиогид)$/i.test(lower) ||
     /тё?плые?\s+плед|^панорамн|детск(ие|ая)\s+стуль|^с\s+(обедом|ужином|питанием)|^ледовый\s+класс/i.test(lower);
-}
-
-function loadCityRouting(): CityRoutingConfig {
-  try {
-    return JSON.parse(
-      readFileSync(path.join(projectRoot, 'data', 'geo', 'city-routing.ru.json'), 'utf8'),
-    ) as CityRoutingConfig;
-  } catch {
-    return {};
-  }
 }
 
 function publicDestinationForCity(row: PublicCatalogMappingRow): PublicDestination | null {

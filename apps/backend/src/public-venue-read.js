@@ -27,11 +27,13 @@ import { formatTime, parseSessionStartsAt } from './public-datetime.ts';
 import { canonicalSessionPierKey } from './public-catalog-grouping.ts';
 import { dedupePublicVenueLinkedEvents } from './public-venue-linked-events.ts';
 import { pickFirstUsableEventImageUrl } from './event-image-url.ts';
+import { loadCityRoutingConfig } from './city-routing-config.js';
+import { resolveProjectRoot } from './project-root.js';
 
 const PUBLIC_CATALOG_CACHE_MS = 5 * 60 * 1000;
 /** Soft TTL: serve expired hub while single-flight rebuild runs (INC.504 venues hang). */
 const PUBLIC_VENUE_HUB_STALE_MS = Number(process.env.PUBLIC_VENUE_HUB_STALE_MS || 30 * 60 * 1000);
-const PROJECT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
+const PROJECT_ROOT = resolveProjectRoot(import.meta.url);
 
 let publicVenueHubCache = null;
 let publicVenueCatalogLists = null;
@@ -94,15 +96,7 @@ async function getCatalogSessions(db) {
   return getPublicCatalogSessions();
 }
 
-function loadCityRouting() {
-  try {
-    return JSON.parse(readFileSync(path.join(PROJECT_ROOT, 'data', 'geo', 'city-routing.ru.json'), 'utf8'));
-  } catch {
-    return { standaloneCities: [], cityToRegion: {}, foreignCities: [] };
-  }
-}
-
-const CITY_ROUTING = loadCityRouting();
+const CITY_ROUTING = loadCityRoutingConfig(import.meta.url);
 const STANDALONE_CITY_NAMES = new Set(CITY_ROUTING.standaloneCities || []);
 const CITY_TO_REGION = new Map(Object.entries(CITY_ROUTING.cityToRegion || {}));
 const FOREIGN_CITY_NAMES = new Set(CITY_ROUTING.foreignCities || []);

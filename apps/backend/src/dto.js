@@ -16,6 +16,8 @@ import {
   localHourFromInstant,
   DEFAULT_CITY_TIME_ZONE,
 } from './city-timezone.js';
+import { loadCityRoutingConfig } from './city-routing-config.js';
+import { resolveProjectRoot } from './project-root.js';
 import {
   resolveContextInstitutionForEvent,
   resolveContextInstitutionFromTitle,
@@ -258,8 +260,8 @@ const CITY_CARD_IMAGE_SLUGS = new Set([
   'volgograd',
   'sortavala',
 ]);
-const PROJECT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
-const CITY_ROUTING = loadCityRouting();
+const PROJECT_ROOT = resolveProjectRoot(import.meta.url);
+const CITY_ROUTING = loadCityRoutingConfig(import.meta.url);
 const STANDALONE_CITY_NAMES = new Set(CITY_ROUTING.standaloneCities || []);
 const CITY_TO_REGION = new Map(Object.entries(CITY_ROUTING.cityToRegion || {}));
 const FOREIGN_CITY_NAMES = new Set(CITY_ROUTING.foreignCities || []);
@@ -323,14 +325,6 @@ export async function warmPublicCatalogCache(db) {
   await warmPublicVenueCatalogCache(db);
 }
 
-
-function loadCityRouting() {
-  try {
-    return JSON.parse(readFileSync(path.join(PROJECT_ROOT, 'data', 'geo', 'city-routing.ru.json'), 'utf8'));
-  } catch {
-    return { standaloneCities: [], cityToRegion: {}, foreignCities: [] };
-  }
-}
 
 export async function buildAdminDashboard(db) {
   const [stats, categoryCountResult, destinationCountResult, launchSql] = await Promise.all([
