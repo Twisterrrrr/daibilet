@@ -249,6 +249,7 @@ export function VenuesCatalogView({
     const controller = new AbortController();
     const requestId = ++catalogRequestId.current;
     const cachedBase = cityBaseRef.current?.key === scopeKey ? cityBaseRef.current.page : null;
+    const scopeChanged = cityBaseRef.current != null && cityBaseRef.current.key !== scopeKey;
 
     // Instant type chip preview from city-scoped base (same city/sort/q); cursor comes from server page.
     if (typeFilter !== 'all' && cachedBase && cachedBase.venues.length > 0) {
@@ -259,7 +260,19 @@ export function VenuesCatalogView({
       setTotal(Number(cachedBase.stats.types?.[typeFilter]) || filtered.length);
       setStats(cachedBase.stats);
       setCatalogLoading(false);
-    } else if (!(cachedBase && typeFilter === 'all')) {
+    } else if (cachedBase && typeFilter === 'all') {
+      setVenues(cachedBase.venues);
+      setTotal(cachedBase.total);
+      setNextCursor(cachedBase.nextCursor);
+      setStats(cachedBase.stats);
+      setCatalogLoading(false);
+    } else {
+      // City/scope change: drop previous city cards immediately (not cold SSR - stale client list).
+      if (scopeChanged || !cachedBase) {
+        setVenues([]);
+        setNextCursor(null);
+        setTotal(0);
+      }
       setCatalogLoading(true);
     }
     loadMoreLock.current = false;
