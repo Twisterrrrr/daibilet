@@ -10,7 +10,7 @@
 - Подключено в `city-timezone.js`, venue-read, destination, catalog.mapper, dto, public-city.dto.
 
 ### Проблемы
-- Нужен MSK web deploy (CI artifact), иначе live revalidate остаётся на старом бандле.
+- Нет (smoke: revalidate HTTP 200 `ok:true`; `/cities/samara` origin+public 200; BUILD_ID=`_1j1yvH-SEeT_Wp_aEO77`).
 
 ---
 
