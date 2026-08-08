@@ -370,6 +370,8 @@ export interface PublicVenuesDto extends ApiEnvelope {
   pins?: PublicVenueMapPinDto[];
   stats?: {
     venues: number;
+    /** Distinct-product event total for the filtered universe (not page slice). */
+    events?: number;
     cities: Record<string, number>;
     types: Record<string, number>;
     scales?: Record<string, number>;

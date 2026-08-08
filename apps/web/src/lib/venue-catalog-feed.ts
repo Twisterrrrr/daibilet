@@ -25,6 +25,8 @@ export type VenueCatalogFeedQuery = {
 
 export type VenueCatalogFeedStats = {
   venues: number;
+  /** Filtered-universe event total (event≠slots); 0 while countsPending. */
+  events?: number;
   cities: Record<string, number>;
   types: Record<string, number>;
   scales?: Record<string, number>;
@@ -52,7 +54,14 @@ export type VenueCatalogMapPin = {
 };
 
 function emptyStats(): VenueCatalogFeedStats {
-  return { venues: 0, cities: {}, types: {}, scales: {}, logistics: {} };
+  return {
+    venues: 0,
+    events: 0,
+    cities: {},
+    types: {},
+    scales: {},
+    logistics: {},
+  };
 }
 
 export function buildVenueCatalogSearchParams(query: VenueCatalogFeedQuery): URLSearchParams {
@@ -112,6 +121,7 @@ export function mapVenueCatalogFeedPage(payload: PublicVenuesDto | null | undefi
     countsPending,
     stats: {
       venues: Number(stats?.venues) || Number(payload?.total) || venues.length,
+      events: Number(stats?.events) || 0,
       cities: stats?.cities || {},
       types: stats?.types || {},
       scales: stats?.scales || {},

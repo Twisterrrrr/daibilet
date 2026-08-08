@@ -471,14 +471,8 @@ export function VenuesCatalogView({
     ? `Музеи, театры и пространства ${cityToGenitive(cityName)}`
     : 'Музеи, театры и пространства';
   const heroTotal = stats.venues || total;
-  const scopedEvents = useMemo(
-    () =>
-      venues.reduce(
-        (sum, venue) => sum + (venue.eventsPending ? 0 : venue.events || 0),
-        0,
-      ),
-    [venues],
-  );
+  const heroEvents = Number(stats.events) || 0;
+  const showHeroEvents = heroEvents > 0 && !catalogLoading;
 
   return (
     <>
@@ -511,7 +505,7 @@ export function VenuesCatalogView({
         {!listPending && heroTotal ? (
           <p className="mx-auto mt-4 max-w-4xl text-sm font-medium text-white/85">
             В афише {pluralVenues(heroTotal)}
-            {scopedEvents > 0 ? ` · ${pluralEvents(scopedEvents)}` : ''}
+            {showHeroEvents ? ` · ${pluralEvents(heroEvents)}` : ''}
           </p>
         ) : null}
         <div className="mt-6 flex w-full max-w-5xl flex-col gap-3 rounded-2xl bg-white p-3 text-left text-slate-900 shadow-lg sm:flex-row sm:items-stretch">

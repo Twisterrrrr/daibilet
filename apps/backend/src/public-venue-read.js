@@ -2038,7 +2038,14 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
         nextCursor: null,
         hasMore: false,
         limit,
-        stats: { venues: filteredItems.length, cities, types, scales, logistics },
+        stats: {
+          venues: filteredItems.length,
+          events: filteredItems.reduce((sum, venue) => sum + (Number(venue.events) || 0), 0),
+          cities,
+          types,
+          scales,
+          logistics,
+        },
       };
     }
     return {
@@ -2051,6 +2058,10 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
       countsPending: Boolean(countsPending),
       stats: {
         venues: filteredItems.length,
+        // Sum over filtered universe (city/type/q), not the current page of 24.
+        events: countsPending
+          ? 0
+          : filteredItems.reduce((sum, venue) => sum + (Number(venue.events) || 0), 0),
         cities,
         types,
         scales,
