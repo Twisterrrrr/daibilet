@@ -538,7 +538,7 @@ Alias `museum-1` = первый open-date контракт (не «музеи fo
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| UX.MYDAY-SPLIT-DESK | Desktop ≥lg: list left + sticky map right (`data-day-split`) | Критический | ✅ restored 2026-08-08 - nearby under-stop chips removed |
+| UX.MYDAY-SPLIT-DESK | Desktop ≥lg: list left + sticky map right (`data-day-split`) | Критический | ⚠️ owner rollback 2026-08-08 - single column, map under list (`data-day-route-map-desktop`); nearby still removed |
 | UX.MYDAY-SPLIT-MOB | Mobile &lt;lg: sticky map ~38vh + list scroll; expand ~85vh | Критический | ⚠️ superseded by UX.MYDAY-LIST-MAP (list-first + map mode) |
 | UX.MYDAY-NEARBY-STOP | Under-stop «Поблизости» chips (grid+list) | Высокий | ✅ removed 2026-08-08 - keep free window + accordion matches |
 | UX.MYDAY-CARD-SIZE | Stop cards: compact dense row + full-width list (= summary bar); no multi-col stretch towels | Критический | ✅ `76bae1c`+`949bd78` MSK **BUILD_ID=`QRQxYfwR-Wy7iklNEOIwY`** |

@@ -2660,34 +2660,15 @@ function DayRoutePanelInner() {
     );
   }
 
-  const showDesktopSplit = route.venues.length > 0;
-
   return (
     <>
     <div
-      className="container-page px-4 py-5 pb-28 sm:px-6 sm:py-10 sm:pb-10 print:hidden lg:max-w-[90rem] lg:pb-10"
+      className="container-page px-4 py-5 pb-28 sm:px-6 sm:py-10 sm:pb-10 print:hidden lg:pb-10"
       data-day-mobile-list-first="1"
       data-day-section-width="full"
       data-day-mobile-view={mobileView}
     >
-      <div
-        className={
-          showDesktopSplit
-            ? 'lg:grid lg:grid-cols-[minmax(0,0.45fr)_minmax(0,0.55fr)] lg:items-start lg:gap-5'
-            : undefined
-        }
-        data-day-split={showDesktopSplit ? '1' : undefined}
-      >
-      <div
-        ref={listRootRef}
-        className={
-          showDesktopSplit
-            ? 'min-w-0 lg:max-h-[calc(100dvh-var(--site-header-height)-1rem)] lg:overflow-y-auto lg:overscroll-contain lg:pr-1'
-            : 'min-w-0'
-        }
-        data-day-list-root
-        data-day-split-left={showDesktopSplit ? '1' : undefined}
-      >
+      <div ref={listRootRef} className="min-w-0" data-day-list-root>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <h1 className="font-display text-[1.65rem] font-bold leading-tight text-slate-900 sm:text-3xl">
@@ -3064,7 +3045,7 @@ function DayRoutePanelInner() {
               <ul
                 className={
                   effectiveStopViewMode === 'grid'
-                    ? 'grid w-full grid-cols-1 items-start gap-1.5 sm:grid-cols-2'
+                    ? 'grid w-full grid-cols-1 items-start gap-1.5 sm:grid-cols-2 lg:grid-cols-3'
                     : 'grid w-full grid-cols-1 items-start gap-0'
                 }
                 data-day-plan-list="purchased"
@@ -3117,7 +3098,7 @@ function DayRoutePanelInner() {
             <ul
               className={
                 effectiveStopViewMode === 'grid'
-                  ? 'grid w-full grid-cols-1 items-start gap-1.5 sm:grid-cols-2'
+                  ? 'grid w-full grid-cols-1 items-start gap-1.5 sm:grid-cols-2 lg:grid-cols-3'
                   : 'grid w-full grid-cols-1 items-start gap-0'
               }
               data-day-plan-list="plans"
@@ -3227,7 +3208,7 @@ function DayRoutePanelInner() {
               <ul
                 className={
                   effectiveStopViewMode === 'grid'
-                    ? 'grid w-full grid-cols-1 items-start gap-1.5 sm:grid-cols-2'
+                    ? 'grid w-full grid-cols-1 items-start gap-1.5 sm:grid-cols-2 lg:grid-cols-3'
                     : 'grid w-full grid-cols-1 items-start gap-0'
                 }
                 data-day-plan-list="overflow"
@@ -3267,6 +3248,35 @@ function DayRoutePanelInner() {
                   />
                 ))}
               </ul>
+            </div>
+          ) : null}
+
+          {mapStops.length > 0 ? (
+            <div
+              className="mt-4 hidden rounded-2xl border border-slate-200 bg-white p-3 sm:p-4 lg:block"
+              data-day-route-map-wrap
+              data-day-route-map-desktop
+            >
+              <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm font-bold text-slate-900">Карта дня</p>
+                  <p className="mt-0.5 text-xs text-slate-500">
+                    Точки с координатами · порядок как в списке
+                  </p>
+                </div>
+                {renderMapToolbar()}
+              </div>
+              <div className="relative isolate">
+                <div className="relative z-0 overflow-hidden rounded-xl">
+                  <DayRouteOsmMap
+                    stops={mapStops}
+                    selectedStopId={focusedStopId}
+                    onStopClick={(stopId) => focusStopFromMap(stopId, { scrollList: false })}
+                    className="h-64 w-full bg-slate-100 sm:h-80"
+                  />
+                </div>
+                {renderMapFocusCard('desktop')}
+              </div>
             </div>
           ) : null}
         </section>
@@ -3327,7 +3337,7 @@ function DayRoutePanelInner() {
                   />
                   <div
                     id="day-must-see-list"
-                    className="mt-3 grid grid-cols-1 gap-2.5 sm:grid-cols-2"
+                    className="mt-3 grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3"
                     data-day-must-see-list
                     data-day-must-see-expanded="1"
                   >
@@ -3847,48 +3857,6 @@ function DayRoutePanelInner() {
         )}
       </section>
 
-      </div>
-
-      {showDesktopSplit ? (
-        <aside
-          className="mt-4 hidden min-h-0 lg:sticky lg:top-[calc(var(--site-header-height)+0.75rem)] lg:mt-0 lg:flex lg:h-[calc(100dvh-var(--site-header-height)-1.5rem)] lg:flex-col lg:overflow-hidden lg:rounded-2xl lg:border lg:border-slate-200 lg:bg-white"
-          data-day-split-map
-        >
-          <div className="flex shrink-0 flex-col gap-2 border-b border-slate-100 px-3 py-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="min-w-0">
-              <p className="text-sm font-bold text-slate-900">Карта дня</p>
-              <p className="mt-0.5 text-xs text-slate-500">
-                {mapStops.length
-                  ? `${mapStops.length} ${
-                      mapStops.length === 1 ? 'точка' : mapStops.length < 5 ? 'точки' : 'точек'
-                    } на карте`
-                  : 'Добавьте места с координатами'}
-              </p>
-            </div>
-            {renderMapToolbar()}
-          </div>
-          <div className="relative isolate min-h-0 flex-1 bg-slate-100">
-            {mapStops.length > 0 ? (
-              <>
-                <div className="absolute inset-0 z-0 overflow-hidden">
-                  <DayRouteOsmMap
-                    stops={mapStops}
-                    selectedStopId={focusedStopId}
-                    onStopClick={(stopId) => focusStopFromMap(stopId, { scrollList: true })}
-                    layoutKey="desktop-split"
-                    className="h-full w-full"
-                  />
-                </div>
-                {renderMapFocusCard('desktop')}
-              </>
-            ) : (
-              <div className="flex h-full min-h-[20rem] items-center justify-center px-6 text-center text-sm text-slate-500">
-                Карта появится, когда у точек будут координаты
-              </div>
-            )}
-          </div>
-        </aside>
-      ) : null}
       </div>
 
       {mobileView === 'map' && hasMapStops ? (

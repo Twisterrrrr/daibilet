@@ -21,7 +21,7 @@ Venue-bound (площадка + прикреплённое событие, да�
 
 Карточка компактная (белый фон) + chip только для commerce + CTA «Купить билет от {цена}» при наличии URL/цены (event-as-stop).
 
-Under-stop: nearby event chips («Поблизости») убраны из grid/list - на desktop есть sticky map split, upsell остаётся в «Свободное окно» и accordion matches. Venue-bound: ссылка на площадку + «от N ₽».
+Under-stop: nearby event chips («Поблизости») убраны из grid/list - upsell остаётся в «Свободное окно» и accordion matches. Desktop map: under list (`data-day-route-map-desktop`), не sticky split. Venue-bound: ссылка на площадку + «от N ₽».
 Handoff-модалка «Оформили билет?» - off (`SHOW_DAY_TICKET_HANDOFF_MODAL=false`).
 Trip tickets: блок «Ваши билеты в этой поездке» для `ticketBought` (QR из orders API - open, см. qa.md).
 

@@ -1,5 +1,34 @@
 # Diary
 
+## 2026-08-08 - /my-day: map back under list (no desktop split)
+
+### Наблюдения
+- Owner: «карту на my-day верни обратно как было» - отказ от sticky aside split из `18136002`.
+- Nearby under-stop chips оставляем убранными.
+
+### Решения
+- Desktop снова одноколоночный: карта под списком (`data-day-route-map-desktop`), без `data-day-split` / sticky aside.
+- Mobile fullscreen map mode без изменений.
+- Under-stop «Поблизости» по-прежнему removed.
+
+### Проблемы
+- Без live deploy - проверка локально / preview.
+
+---
+
+## 2026-08-08 - Suburbs panel: vector inline after title
+
+### Наблюдения
+- Подзаголовок вектора/вокзала («Юго-Западный и Морской вектор - Балтийский вокзал») сидел отдельной строкой под названием пригорода.
+
+### Решения
+- Hub + compact: vector `span` inline после title с `ml-2.5`; body с `mt-3` как у gap gastro → numbered places.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-08 - /my-day: desktop split + no nearby under stops
 
 ### Наблюдения
@@ -11,6 +40,7 @@
 - Desktop ≥lg: `data-day-split` ~45/55, left scroll, sticky `data-day-split-map` справа; container `lg:max-w-[90rem]`.
 - Убраны under-stop nearby chips (grid+list); venue/ticket CTA и free window сохранены.
 - Accordion «События поблизости» не трогали.
+- **Update:** split снова откатан owner-ом в пользу карты под списком; nearby removal остаётся.
 
 ### Проблемы
 - Без live deploy в этой итерации - проверка локально / preview.

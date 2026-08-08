@@ -244,33 +244,60 @@ export function SuburbsCarousel({
           <div className="min-w-0">
             <h3 className={`${hubNameClass} break-words`} data-city-suburb-title>
               {nameHeading}
+              {vectorTitle ? (
+                <span
+                  className={`ml-2.5 text-sm font-normal leading-snug ${softClass}`}
+                  data-city-suburb-vector
+                >
+                  {vectorTitle}
+                </span>
+              ) : null}
             </h3>
-            {vectorTitle ? (
-              <p className={`mt-1.5 text-sm leading-snug ${softClass}`} data-city-suburb-vector>
-                {vectorTitle}
-              </p>
-            ) : null}
-            {place.stationName ? (
-              <p className={`mt-2 text-sm leading-snug ${softClass}`} data-city-suburb-exit>
-                <span className={`font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-900'}`}>
-                  Где выходить
-                </span>
-                <span className={mutedClass}>: {place.stationName}</span>
-              </p>
-            ) : null}
-            {place.travelVectorBlurb ? (
-              <p className={`mt-1.5 text-sm leading-relaxed ${mutedClass}`}>{place.travelVectorBlurb}</p>
-            ) : null}
-            {blurb ? (
-              <p className={`mt-2 text-sm leading-relaxed break-words ${mutedClass}`}>{blurb}</p>
-            ) : null}
-            {place.gastroHint ? (
-              <p className={`mt-2 text-sm leading-snug ${softClass}`} data-city-suburb-gastro>
-                <span className={`font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-900'}`}>
-                  Гастро-остановка
-                </span>
-                <span className={mutedClass}>: {place.gastroHint}</span>
-              </p>
+            {/* mt-3 matches nested places gap after gastro (ol mt-3 / pt-3) */}
+            {place.stationName || place.travelVectorBlurb || blurb || place.gastroHint ? (
+              <div className="mt-3">
+                {place.stationName ? (
+                  <p className={`text-sm leading-snug ${softClass}`} data-city-suburb-exit>
+                    <span
+                      className={`font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-900'}`}
+                    >
+                      Где выходить
+                    </span>
+                    <span className={mutedClass}>: {place.stationName}</span>
+                  </p>
+                ) : null}
+                {place.travelVectorBlurb ? (
+                  <p
+                    className={`${place.stationName ? 'mt-1.5' : ''} text-sm leading-relaxed ${mutedClass}`}
+                  >
+                    {place.travelVectorBlurb}
+                  </p>
+                ) : null}
+                {blurb ? (
+                  <p
+                    className={`${
+                      place.stationName || place.travelVectorBlurb ? 'mt-2' : ''
+                    } text-sm leading-relaxed break-words ${mutedClass}`}
+                  >
+                    {blurb}
+                  </p>
+                ) : null}
+                {place.gastroHint ? (
+                  <p
+                    className={`${
+                      place.stationName || place.travelVectorBlurb || blurb ? 'mt-2' : ''
+                    } text-sm leading-snug ${softClass}`}
+                    data-city-suburb-gastro
+                  >
+                    <span
+                      className={`font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-900'}`}
+                    >
+                      Гастро-остановка
+                    </span>
+                    <span className={mutedClass}>: {place.gastroHint}</span>
+                  </p>
+                ) : null}
+              </div>
             ) : null}
           </div>
 
@@ -334,7 +361,7 @@ export function SuburbsCarousel({
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-50 text-sm font-bold leading-none text-primary-700">
             {index + 1}
           </span>
-          <div className="min-w-0 space-y-1.5">
+          <div className="min-w-0">
             <h3
               className="break-words text-lg font-bold leading-snug tracking-tight text-slate-950 sm:text-xl"
               data-city-suburb-title
@@ -349,34 +376,47 @@ export function SuburbsCarousel({
               ) : (
                 place.name
               )}
+              {vectorTitle ? (
+                <span
+                  className="ml-2.5 text-sm font-normal leading-snug text-slate-500"
+                  data-city-suburb-vector
+                >
+                  {vectorTitle}
+                </span>
+              ) : null}
             </h3>
-            {miniAnno ? (
-              <p
-                className="line-clamp-3 text-sm leading-relaxed text-slate-600"
-                data-city-suburb-anno
-              >
-                {miniAnno}
-              </p>
-            ) : null}
-            {vectorTitle ? (
-              <p className="text-sm leading-snug text-slate-500" data-city-suburb-vector>
-                {vectorTitle}
-              </p>
-            ) : null}
-            {place.stationName ? (
-              <p className="text-sm leading-snug text-slate-600" data-city-suburb-exit>
-                <span className="font-semibold text-slate-900">Где выходить</span>
-                <span className="text-slate-500">: {place.stationName}</span>
-              </p>
-            ) : null}
-            {place.travelVectorBlurb ? (
-              <p className="text-sm leading-relaxed text-slate-500">{place.travelVectorBlurb}</p>
-            ) : null}
-            {place.gastroHint ? (
-              <p className="text-sm leading-snug text-slate-600" data-city-suburb-gastro>
-                <span className="font-semibold text-slate-900">Гастро-остановка</span>
-                <span className="text-slate-500">: {place.gastroHint}</span>
-              </p>
+            {/* mt-3 matches nested places gap after gastro (ol mt-3 / pt-3) */}
+            {miniAnno ||
+            place.stationName ||
+            place.travelVectorBlurb ||
+            place.gastroHint ? (
+              <div className="mt-3 space-y-1.5">
+                {miniAnno ? (
+                  <p
+                    className="line-clamp-3 text-sm leading-relaxed text-slate-600"
+                    data-city-suburb-anno
+                  >
+                    {miniAnno}
+                  </p>
+                ) : null}
+                {place.stationName ? (
+                  <p className="text-sm leading-snug text-slate-600" data-city-suburb-exit>
+                    <span className="font-semibold text-slate-900">Где выходить</span>
+                    <span className="text-slate-500">: {place.stationName}</span>
+                  </p>
+                ) : null}
+                {place.travelVectorBlurb ? (
+                  <p className="text-sm leading-relaxed text-slate-500">
+                    {place.travelVectorBlurb}
+                  </p>
+                ) : null}
+                {place.gastroHint ? (
+                  <p className="text-sm leading-snug text-slate-600" data-city-suburb-gastro>
+                    <span className="font-semibold text-slate-900">Гастро-остановка</span>
+                    <span className="text-slate-500">: {place.gastroHint}</span>
+                  </p>
+                ) : null}
+              </div>
             ) : null}
           </div>
           {nested.length ? (
