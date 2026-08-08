@@ -19,10 +19,13 @@ function SuburbPlaceLabel({
   name,
   href,
   desc,
+  /** Compact my-day: show desc only from md+ (mobile stays name-only). */
+  descFromMd = false,
 }: {
   name: string;
   href: string | null;
   desc: string;
+  descFromMd?: boolean;
 }) {
   const nameNode = href ? (
     <Link
@@ -38,7 +41,7 @@ function SuburbPlaceLabel({
   return (
     <>
       {nameNode}
-      <span className="font-normal">{` - ${desc}`}</span>
+      <span className={`font-normal ${descFromMd ? 'hidden md:inline' : ''}`}>{` - ${desc}`}</span>
     </>
   );
 }
@@ -83,8 +86,8 @@ export type SuburbsCarouselProps = {
   /** Hub editorial typography; my-day keeps default slate. */
   editorial?: boolean;
   /**
-   * My-day: truncated panel - name (+ optional vector) + numbered point names + bulk CTA.
-   * Hide travel essays, gastro, station tips, and per-POI descriptions (hub keeps full).
+   * My-day: truncated panel - name (+ optional vector) + numbered points + bulk CTA.
+   * Hide travel essays, gastro, station tips. Per-POI desc: md+ inline; mobile name-only.
    */
   compact?: boolean;
   /** Skip outer h2/intro when parent accordion provides the chrome. */
@@ -396,13 +399,14 @@ export function SuburbsCarousel({
             >
               {nested.map((poi, poiIndex) => {
                 const poiHref = resolveCityPlaceTitleHref(poi, venues);
+                const poiDesc = String(poi.desc || '').trim();
                 return (
                   <li key={`${poi.name}:${poiIndex}`} className="contents" data-city-suburb-place>
                     <span className="pt-0.5 text-center text-xs font-medium leading-5 tabular-nums text-slate-400">
                       {poiIndex + 1}.
                     </span>
                     <span className="min-w-0 text-sm leading-snug text-slate-700">
-                      <SuburbPlaceLabel name={poi.name} href={poiHref} desc="" />
+                      <SuburbPlaceLabel name={poi.name} href={poiHref} desc={poiDesc} descFromMd />
                     </span>
                   </li>
                 );

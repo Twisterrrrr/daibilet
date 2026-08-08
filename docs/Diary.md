@@ -1,6 +1,22 @@
 # Diary
 
-## 2026-08-08 - `/cities` second octet: same chrome as top-8
+## 2026-08-08 - /my-day: scenarios mobile + must-see above suburbs + POI desc md+
+
+### Наблюдения
+- После `ab4d01f7` «Готовые сценарии» были `hidden lg:block` - на mobile пропали (старый mobile stack после Hot Picks не оставили).
+- Порядок: scenarios → suburbs → must-see → custom; owner хочет must-see выше пригородов.
+- Compact Петергоф: справа пустое место у numbered POI - на desktop нужны короткие desc как на хабе.
+
+### Решения
+- Accordion stack на всех брейкпоинтах: **сценарии → главные места → пригороды → своё место**.
+- Embedded scenarios: chips + одна detail-панель (как suburbs accordion).
+- Compact suburbs: POI `desc` через `hidden md:inline`; mobile name-only.
+- Без live deploy.
+
+### Проблемы
+- Нет.
+
+---
 
 ### Наблюдения
 - Owner: «а ты сгенерировал картинки для следующих 8 городов в этом стиле? что-то не вижу где» - скрин top-8 (белый текст на фото).

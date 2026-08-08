@@ -627,7 +627,8 @@ Canon: [inc-504-ssr-hardening.md](./inc-504-ssr-hardening.md).
 | UX.MYDAY-SOFT | /my-day soft-warn SOFT=10 HARD=15; copy плотный день; bulk stop at soft; readiness→SOFT | Критический | ✅ `bd794f2` MSK **BUILD_ID=`Yqcz6aa-14QvDHs30n306`** `/my-day` 200 |
 | UX.MYDAY-MAX10 | `/my-day` DAY_ROUTE_MAX 8→10; drop redundant intro copy; must-see chip without «в дне» | Критический | ✅ `8499c92` MSK **BUILD_ID=`q-1BAwZ65koVjH3CunDvi`** smoke `/my-day` 200 |
 | UX.MYDAY-FILTERS | Must-see tabs: Главные / Гастро / Музеи / Парки / Храмы (hide empty); bulk respects filter | Критический | ✅ `5ba3e56` MSK **BUILD_ID=`FpLvs9SkQ6VpTMNXw-7ES`** smoke hub NN 5 tabs |
-| UX.MYDAY-ACCORDION | `/my-day` compact: route always open; other sections exclusive accordion; «Своё место» under route | Критический | ✅ 2026-08-08 - 4 collapsed rows: scenarios / suburbs / must-see / custom (+ matches) |
+| UX.MYDAY-ACCORDION | `/my-day` compact: route always open; other sections exclusive accordion; «Своё место» under route | Критический | ✅ 2026-08-08 - order: scenarios → must-see → suburbs → custom; scenarios all breakpoints + chips |
+| UX.MYDAY-SUBURB-DESC | Compact suburbs: POI short desc on md+ (mobile name-only) | Высокий | ✅ 2026-08-08 |
 | UX.MYDAY-SHARE | Viral share `?city=&items=id:HHMM\|free`; menu Copy/TG/WA/**Макс**; buy+bought; DnD/print/distance MVP | Критический | ✅ `42421d4` |
 | UX.MYDAY-SHARE-UX | Убран friend-landing баннер; share-текст в мессенджере; print «Сохранить»; hydrate без gate | Критический | ✅ `a4ce4e7`+ MSK **BUILD_ID=`jZmbBH9ZIxyREVMEnwmal`** `/my-day` 200 |
 | UX.MYDAY-SHORT | Short share URL `/d/{code}` → redirect `/my-day?city=&items=`; POST `/api/day-route/share`; fallback long URL | Критический | ✅ `102443d` MSK **BUILD_ID=`jZmbBH9ZIxyREVMEnwmal`** smoke create+307 |

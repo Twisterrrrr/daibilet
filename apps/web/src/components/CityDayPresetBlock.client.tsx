@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowUpRight, Sparkles } from 'lucide-react';
+import { ArrowUpRight, ChevronDown, Sparkles } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 import type { CityDayRoutePreset, CityMustSeeItem } from '@/lib/cityInfo';
@@ -28,8 +28,15 @@ type Props = {
   inMyDay?: boolean;
   /**
    * Inside DayRoutePanel accordion: no outer card/title (chrome is the accordion row).
+   * Named presets use suburb-like chips + one detail panel.
    */
   embedded?: boolean;
+};
+
+type NamedRow = {
+  preset: CityDayRoutePreset;
+  items: ReturnType<typeof buildCityDayRoutePreset>;
+  available: boolean;
 };
 
 /** Russian plural for «N главных мест(а/о)» in preset copy. */
@@ -55,6 +62,8 @@ export function CityDayPresetBlock({
 }: Props) {
   const router = useRouter();
   const [busyId, setBusyId] = useState<string | null>(null);
+  /** My-day embedded: first scenario open by default (like suburbs chips). */
+  const [activeIndex, setActiveIndex] = useState<number | null>(0);
 
   const namedResolved = useMemo(() => {
     return (namedPresets || [])
@@ -101,86 +110,157 @@ export function CityDayPresetBlock({
         editorial ? 'border-zinc-200 bg-white' : 'border-slate-200 bg-slate-50'
       }`;
 
-  if (namedResolved.length > 0) {
+  const borderClass = editorial ? 'border-zinc-200' : 'border-slate-200';
+  const titleClass = editorial ? 'text-zinc-950' : 'text-slate-950';
+  const softClass = editorial ? 'text-zinc-600' : 'text-slate-600';
+  const mutedClass = editorial ? 'text-zinc-500' : 'text-slate-500';
+  const chipIdle = editorial
+    ? 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-400'
+    : 'border-slate-200 bg-white text-slate-700 hover:border-slate-400';
+  const chipActive = editorial
+    ? 'border-zinc-900 bg-zinc-900 text-white'
+    : 'border-slate-900 bg-slate-900 text-white';
+
+  const renderScenarioCard = (row: NamedRow, opts?: { panel?: boolean }) => {
+    const { preset, items, available } = row;
+    const titles = items.map((item) => item.title).join(' · ');
+    const panel = Boolean(opts?.panel);
     return (
-      <div className={shellClass || undefined} data-day-presets={inMyDay ? 'my-day' : 'hub'}>
-        {embedded ? null : (
-          <>
-            <p className={`text-sm font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-950'}`}>
-              Готовые сценарии
-            </p>
-            <p className={`mt-1 text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-              {namedLead}
-            </p>
-          </>
-        )}
-        <ul className={`${embedded ? '' : 'mt-4 '}grid gap-3`}>
-          {namedResolved.map(({ preset, items, available }) => {
-            const titles = items.map((item) => item.title).join(' · ');
-            return (
-              <li
-                key={preset.id}
-                className={`flex flex-col gap-3 rounded-xl border bg-white px-4 py-3.5 max-md:gap-3.5 md:flex-row md:items-center md:justify-between md:gap-4 md:p-3 ${
-                  editorial ? 'border-zinc-200' : 'border-slate-200'
+      <div
+        className={`flex flex-col gap-3 rounded-xl border bg-white px-4 py-3.5 max-md:gap-3.5 md:flex-row md:items-center md:justify-between md:gap-4 md:p-3 ${borderClass} ${
+          panel ? 'mt-3' : ''
+        }`}
+        data-day-preset-card={preset.id}
+        {...(panel
+          ? {
+              id: `day-preset-panel-${preset.id}`,
+              role: 'tabpanel' as const,
+              'aria-label': preset.title,
+            }
+          : {})}
+      >
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-col items-start gap-0.5 md:flex-row md:flex-wrap md:items-baseline md:gap-x-2 md:gap-y-0.5">
+            <p className={`text-sm font-semibold ${titleClass}`}>{preset.title}</p>
+            {preset.blogSlug ? (
+              <Link
+                href={`/blog/${preset.blogSlug}`}
+                className={`inline-flex items-center gap-0.5 text-xs font-medium underline underline-offset-2 transition-colors max-md:mt-0.5 ${
+                  editorial
+                    ? 'text-sky-700 hover:text-sky-800'
+                    : 'text-primary-600 hover:text-primary-700'
                 }`}
               >
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-col items-start gap-0.5 md:flex-row md:flex-wrap md:items-baseline md:gap-x-2 md:gap-y-0.5">
-                    <p className={`text-sm font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-950'}`}>
-                      {preset.title}
-                    </p>
-                    {preset.blogSlug ? (
-                      <Link
-                        href={`/blog/${preset.blogSlug}`}
-                        className={`inline-flex items-center gap-0.5 text-xs font-medium underline underline-offset-2 transition-colors max-md:mt-0.5 ${
-                          editorial
-                            ? 'text-sky-700 hover:text-sky-800'
-                            : 'text-primary-600 hover:text-primary-700'
-                        }`}
-                      >
-                        Читать об этом в блоге
-                        <ArrowUpRight className="h-3 w-3 shrink-0 opacity-80" aria-hidden />
-                      </Link>
-                    ) : null}
-                  </div>
-                  {preset.description ? (
-                    <p
-                      className={`mt-1.5 text-[13px] leading-5 max-md:pr-0.5 md:mt-0.5 md:text-xs ${
-                        editorial ? 'text-zinc-600' : 'text-slate-600'
-                      }`}
-                    >
-                      {preset.description}
-                    </p>
-                  ) : null}
-                  {available ? (
-                    <p
-                      className={`mt-1.5 line-clamp-3 text-[13px] leading-5 max-md:pr-0.5 md:mt-1 md:line-clamp-2 md:text-xs md:leading-4 ${
-                        editorial ? 'text-zinc-500' : 'text-slate-500'
-                      }`}
-                      title={titles}
-                    >
-                      {items.length} {dayRoutePointsWord(items.length)}: {titles}
-                    </p>
-                  ) : null}
-                </div>
-                {available ? (
-                  <button
-                    type="button"
-                    disabled={busyId != null}
-                    onClick={() => apply(preset.id, items)}
-                    className={`inline-flex min-h-11 w-full shrink-0 items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition disabled:opacity-60 md:w-auto ${
-                      editorial
-                        ? 'bg-zinc-900 text-white hover:bg-zinc-800'
-                        : 'bg-primary-600 text-white hover:bg-primary-700'
+                Читать об этом в блоге
+                <ArrowUpRight className="h-3 w-3 shrink-0 opacity-80" aria-hidden />
+              </Link>
+            ) : null}
+          </div>
+          {preset.description ? (
+            <p className={`mt-1.5 text-[13px] leading-5 max-md:pr-0.5 md:mt-0.5 md:text-xs ${softClass}`}>
+              {preset.description}
+            </p>
+          ) : null}
+          {available ? (
+            <p
+              className={`mt-1.5 line-clamp-3 text-[13px] leading-5 max-md:pr-0.5 md:mt-1 md:line-clamp-2 md:text-xs md:leading-4 ${mutedClass}`}
+              title={titles}
+            >
+              {items.length} {dayRoutePointsWord(items.length)}: {titles}
+            </p>
+          ) : null}
+        </div>
+        {available ? (
+          <button
+            type="button"
+            disabled={busyId != null}
+            onClick={() => apply(preset.id, items)}
+            className={`inline-flex min-h-11 w-full shrink-0 items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition disabled:opacity-60 md:w-auto ${
+              editorial
+                ? 'bg-zinc-900 text-white hover:bg-zinc-800'
+                : 'bg-primary-600 text-white hover:bg-primary-700'
+            }`}
+          >
+            <Sparkles className="h-4 w-4" />
+            {namedCta(busyId === preset.id)}
+          </button>
+        ) : null}
+      </div>
+    );
+  };
+
+  if (namedResolved.length > 0) {
+    if (embedded) {
+      const selectedIndex =
+        activeIndex == null || activeIndex < 0 || activeIndex >= namedResolved.length
+          ? null
+          : activeIndex;
+      const selected = selectedIndex == null ? null : namedResolved[selectedIndex];
+
+      return (
+        <div data-day-presets={inMyDay ? 'my-day' : 'hub'} data-day-presets-mode="chips">
+          <div
+            className="flex flex-nowrap gap-2 overflow-x-auto overscroll-x-contain pb-0.5 [scrollbar-width:thin]"
+            role="tablist"
+            aria-label="Готовые сценарии"
+            data-day-preset-chips
+          >
+            {namedResolved.map((row, index) => {
+              const active = selectedIndex === index;
+              return (
+                <button
+                  key={row.preset.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  aria-controls={active ? `day-preset-panel-${row.preset.id}` : undefined}
+                  data-day-preset-chip={row.preset.id}
+                  data-active={active ? '1' : '0'}
+                  onClick={() => setActiveIndex((prev) => (prev === index ? null : index))}
+                  className={`inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                    active ? chipActive : chipIdle
+                  }`}
+                >
+                  <span
+                    className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold tabular-nums ${
+                      active
+                        ? 'bg-white/20 text-white'
+                        : editorial
+                          ? 'bg-zinc-100 text-zinc-700'
+                          : 'bg-primary-50 text-primary-700'
                     }`}
                   >
-                    <Sparkles className="h-4 w-4" />
-                    {namedCta(busyId === preset.id)}
-                  </button>
-                ) : null}
-              </li>
-            );
-          })}
+                    {index + 1}
+                  </span>
+                  <span className="max-w-[14rem] truncate">{row.preset.title}</span>
+                  <ChevronDown
+                    className={`h-3.5 w-3.5 opacity-70 transition-transform ${active ? 'rotate-180' : ''}`}
+                    aria-hidden
+                  />
+                </button>
+              );
+            })}
+          </div>
+          {selected ? renderScenarioCard(selected, { panel: true }) : null}
+          {selectedIndex == null ? (
+            <p className="mt-3 text-sm text-slate-500" data-day-preset-hint>
+              Нажмите на сценарий, чтобы открыть точки и собрать день.
+            </p>
+          ) : null}
+        </div>
+      );
+    }
+
+    return (
+      <div className={shellClass || undefined} data-day-presets={inMyDay ? 'my-day' : 'hub'}>
+        <>
+          <p className={`text-sm font-semibold ${titleClass}`}>Готовые сценарии</p>
+          <p className={`mt-1 text-sm leading-6 ${softClass}`}>{namedLead}</p>
+        </>
+        <ul className="mt-4 grid gap-3">
+          {namedResolved.map((row) => (
+            <li key={row.preset.id}>{renderScenarioCard(row)}</li>
+          ))}
         </ul>
       </div>
     );
@@ -195,21 +275,11 @@ export function CityDayPresetBlock({
       <div className="flex flex-col gap-3.5 md:flex-row md:items-center md:justify-between md:gap-4">
         <div className="min-w-0 flex-1">
           {embedded ? null : (
-            <p className={`text-sm font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-950'}`}>
-              Готовый сценарий
-            </p>
+            <p className={`text-sm font-semibold ${titleClass}`}>Готовый сценарий</p>
           )}
+          <p className={`${embedded ? '' : 'mt-1 '}text-sm leading-6 ${softClass}`}>{fallbackLead}</p>
           <p
-            className={`${embedded ? '' : 'mt-1 '}text-sm leading-6 ${
-              editorial ? 'text-zinc-600' : 'text-slate-600'
-            }`}
-          >
-            {fallbackLead}
-          </p>
-          <p
-            className={`mt-1.5 line-clamp-3 text-[13px] leading-5 md:mt-1 md:line-clamp-2 md:text-xs md:leading-4 ${
-              editorial ? 'text-zinc-500' : 'text-slate-500'
-            }`}
+            className={`mt-1.5 line-clamp-3 text-[13px] leading-5 md:mt-1 md:line-clamp-2 md:text-xs md:leading-4 ${mutedClass}`}
             title={titles}
           >
             {titles}

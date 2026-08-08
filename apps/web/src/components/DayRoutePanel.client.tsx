@@ -3291,11 +3291,10 @@ function DayRoutePanelInner() {
         </section>
       )}
 
-      {/* Desktop ≥lg: scenarios + suburbs as collapsed accordions above must-see/custom.
-          Mobile keeps card/compact stack after Hot Picks (see below). */}
+      {/* Accordion stack (all breakpoints): scenarios → must-see → suburbs → custom. */}
       {showScenariosAccordion ? (
         <div
-          className="mt-3 hidden rounded-2xl border border-slate-200 bg-white lg:block"
+          className="mt-3 rounded-2xl border border-slate-200 bg-white"
           data-day-accordion="scenarios"
         >
           <button
@@ -3334,43 +3333,7 @@ function DayRoutePanelInner() {
         </div>
       ) : null}
 
-      {showSuburbsAccordion ? (
-        <div className="mt-3 rounded-2xl border border-slate-200 bg-white" data-day-accordion="suburbs">
-          <button
-            type="button"
-            aria-expanded={suburbsOpen}
-            aria-controls="day-suburbs-body"
-            data-day-suburbs-accordion
-            onClick={() => togglePanel('suburbs')}
-            className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left sm:px-5"
-          >
-            <span>
-              <span className="block text-sm font-semibold text-slate-900">Значимые пригороды</span>
-              <span className="mt-0.5 block text-xs text-slate-500">
-                Поездка на день рядом с городом
-              </span>
-            </span>
-            <ChevronDown
-              className={`h-5 w-5 shrink-0 text-slate-400 transition ${suburbsOpen ? 'rotate-180' : ''}`}
-            />
-          </button>
-          {suburbsOpen ? (
-            <div id="day-suburbs-body" className="border-t border-slate-100 px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
-              <SuburbsCarousel
-                places={significantSuburbs}
-                venues={matchSources}
-                city={dayPresetCityCtx}
-                cityGenitive={cityToGenitive(pageCityName)}
-                compact
-                hideHeader
-                className="mt-0"
-              />
-            </div>
-          ) : null}
-        </div>
-      ) : null}
-
-      {/* Accordion: must-see chips */}
+      {/* Accordion: must-see chips (above suburbs) */}
       {showMustSeeAccordion ? (
         <div className="mt-3 rounded-2xl border border-slate-200 bg-white" data-day-accordion="mustSee">
           <button
@@ -3500,6 +3463,42 @@ function DayRoutePanelInner() {
                   Для этого города пока нет списка главных мест - добавьте точки через поиск в «Из каталога».
                 </p>
               )}
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+
+      {showSuburbsAccordion ? (
+        <div className="mt-3 rounded-2xl border border-slate-200 bg-white" data-day-accordion="suburbs">
+          <button
+            type="button"
+            aria-expanded={suburbsOpen}
+            aria-controls="day-suburbs-body"
+            data-day-suburbs-accordion
+            onClick={() => togglePanel('suburbs')}
+            className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left sm:px-5"
+          >
+            <span>
+              <span className="block text-sm font-semibold text-slate-900">Значимые пригороды</span>
+              <span className="mt-0.5 block text-xs text-slate-500">
+                Поездка на день рядом с городом
+              </span>
+            </span>
+            <ChevronDown
+              className={`h-5 w-5 shrink-0 text-slate-400 transition ${suburbsOpen ? 'rotate-180' : ''}`}
+            />
+          </button>
+          {suburbsOpen ? (
+            <div id="day-suburbs-body" className="border-t border-slate-100 px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
+              <SuburbsCarousel
+                places={significantSuburbs}
+                venues={matchSources}
+                city={dayPresetCityCtx}
+                cityGenitive={cityToGenitive(pageCityName)}
+                compact
+                hideHeader
+                className="mt-0"
+              />
             </div>
           ) : null}
         </div>
