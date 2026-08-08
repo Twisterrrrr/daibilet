@@ -26,6 +26,8 @@ import { withSoftTimeout } from '@/lib/soft-timeout';
 import { buildVenuePageJsonLd } from '@/lib/structured-data';
 import { resolveVenueSeoTitle } from '@/lib/venue-seo';
 import { resolveVenueHeroImage } from '@/lib/city-place-images';
+import type { PublicVenuePageDto } from '@daibilet/contracts/public';
+import { fetchPublicApiJson } from '@/server/public-api-client';
 
 /** Admission must not hang venue HTML when finance is slow. */
 const VENUE_ADMISSION_TIMEOUT_MS = 2500;
@@ -46,6 +48,26 @@ const EMPTY_FEED = mapVenueCatalogFeedPage({
   hasMore: false,
   limit: VENUE_CATALOG_PAGE_SIZE,
 });
+
+/**
+ * Prefer cached DTO; on soft miss retry uncached once.
+ * never cache notFound() - ISR STALE 404 can stick for stale-while-revalidate (~1y).
+ */
+async function loadVenueDtoOrNull(slug: string): Promise<PublicVenuePageDto | null> {
+  const key = String(slug || '').trim();
+  if (!key) return null;
+  const cached = await getCachedPublicVenueDto(key);
+  if (cached?.venue) return cached;
+  try {
+    const fresh = await fetchPublicApiJson<PublicVenuePageDto | null>(
+      `/api/public/venues/${encodeURIComponent(key)}`,
+      { timeoutMs: 5_000, notFoundAsNull: true },
+    );
+    return fresh?.venue ? fresh : null;
+  } catch {
+    return null;
+  }
+}
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -73,8 +95,11 @@ export async function generateVenueListMetadata(
 }
 
 export async function generateVenueDetailMetadata(slug: string): Promise<Metadata> {
-  const payload = await getCachedPublicVenueDto(decodeURIComponent(slug));
-  if (!payload?.venue) notFound();
+  const payload = await loadVenueDtoOrNull(decodeURIComponent(slug));
+  if (!payload?.venue) {
+    noStore();
+    notFound();
+  }
   const venue = payload.venue;
   const heroForShare =
     resolveVenueHeroImage(venue.slug || slug, venue.heroImageUrl) || venue.heroImageUrl;
@@ -148,10 +173,9 @@ export async function VenueListPage({ family }: Pick<PageProps, 'family'>) {
 export async function VenueDetailPage({ slug }: { slug: string }) {
   const decodedSlug = decodeURIComponent(slug);
 
-  // Parallel: DTO (ISR Data Cache) + finance admission (hard timeout, fail-soft).
-  // Finance keyed by URL slug - same join key as catalog Venue.slug.
+  // Parallel: DTO (ISR Data Cache + uncached miss retry) + finance admission (hard timeout).
   const [payloadResult, admissionResult] = await Promise.allSettled([
-    getCachedPublicVenueDto(decodedSlug),
+    loadVenueDtoOrNull(decodedSlug),
     withSoftTimeout(
       fetchVenueAdmissionProducts(decodedSlug),
       VENUE_ADMISSION_TIMEOUT_MS,
@@ -161,7 +185,11 @@ export async function VenueDetailPage({ slug }: { slug: string }) {
   ]);
 
   const payload = payloadResult.status === 'fulfilled' ? payloadResult.value : null;
-  if (!payload?.venue) notFound();
+  if (!payload?.venue) {
+    // Do not let notFound() enter Full Route Cache as STALE 404 for ~1y.
+    noStore();
+    notFound();
+  }
 
   const editorialHero = resolveVenueHeroImage(
     payload.venue.slug || decodedSlug,
