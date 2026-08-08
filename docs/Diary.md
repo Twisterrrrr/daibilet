@@ -1,3 +1,23 @@
+## 2026-08-08 - Follow-up: deploy HEAD, priceTo hotfix, teplohod 404, locations eyebrow
+
+### Наблюдения
+- Deploy `31260330696` был на `8ac8a706`; live дотянули до HEAD через `31260471862` / `31260953355`.
+- API без рестарта после git pull не отдавал `venuesWithEvents`; после рестарта catalog SQL с `max("priceTo")` упал (колонки нет в CTE) - public stats/catalog cache fail.
+- `/locations/teplohod-moskva-99` (public slug) = `Venue` `теплоход-москва-99-...` / id `venue_6a4d0400...`.
+- Footer events (sum destinations with events>0) != `/api/public/stats.events` (saleable groups) - разные каноны.
+
+### Решения
+- Hotfix: `max("priceFrom") as priceTo` в `publicCatalogSessionsFast` (`7c5f2210`); API pull+restart.
+- Locations eyebrow: exact `formatNumber` вместо `formatCountFloorTenPlus`.
+- Venue HIDDEN + `isIndexable=false` для teplohod junk slug; API 404, web 404 после swap.
+- `venuesWithEvents` снова в institution list stats (1101 / 1245).
+
+### Проблемы
+- Настоящий min-max `priceTo` по сессиям ещё не в SQL - сейчас alias от `priceFrom`.
+- Sync/import может снова выставить pageStatus не HIDDEN - мониторить teplohod slug.
+- Hero «В афише» client-only: в curl SSR строки может не быть, данные `venuesWithEvents` в payload есть.
+
+---
 ## 2026-08-08 - /venues hero: «В афише» ≠ весь каталог
 
 ### Наблюдения

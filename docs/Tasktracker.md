@@ -1,3 +1,14 @@
+## Follow-up deploy/smoke (2026-08-08)
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| OPS.DEPLOY-HEAD | Live на `7c5f2210` Deploy `31260953355` BUILD_ID=`dKXqka8q8BXEbdT7y7aRQ` | Критический | ✅ |
+| FIX.PRICETo-CTE | Catalog SQL priceTo -> max(priceFrom) | Критический | ✅ `7c5f2210` |
+| FIX.TEPLOHOD-404 | HIDE venue_6a4d0400... public teplohod-moskva-99 | Высокий | ✅ API/web 404 |
+| FIX.LOC-EYEBROW | Exact count вместо 710+ | Высокий | ✅ |
+| FIX.VENUES-AFISHA-LIVE | API venuesWithEvents после api restart | Высокий | ✅ 1101 |
+
+---
 # Tasktracker — Daibilet
 
 **Обновлено:** 2026-08-08
