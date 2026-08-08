@@ -1,3 +1,23 @@
+## 2026-08-08 - Full-site link audit: missing DTO → HTTP 500
+
+### Наблюдения
+- Owner: «проверяй все линки»; Samara hub уже 200 (INC.CITY404).
+- Crawl ~485 URL: массовые venue/location 500 при нагрузке; slow retry - живые DTO 200.
+- **Systemic:** `/api/public/{cities,venues,events}/{missing}` → **200 + `null`**; web `generateMetadata`/`unstable_cache` miss → **page HTTP 500** (не 404). Пример: `/venues/bastion-holl` с хаба Калининграда.
+- Footer СПб «Смотровые» → `/progulki-po-krysham/moscow/`.
+- Samara article HIDDEN (owner); rostov/novosibirsk future `publishedAt`.
+
+### Решения
+- Handlers city/venue/event: miss → **404** `{error:not_found}`.
+- Web: cache catch `*_dto_miss` (includes), JSON null as miss, metadata try/catch; footer rooftops → saint-petersburg.
+- Report: `docs/link-audit-2026-08-08.md`.
+
+### Проблемы
+- Dead hub cards без DTO остаются (после фикса будут 404, не 500) - нужна data cleanup.
+- Transient 502 under load - capacity, не slug.
+
+---
+
 ## 2026-08-08 - INC.CITY404.4: revalidate 500 (CI-baked city-routing path)
 
 ### Наблюдения

@@ -257,7 +257,7 @@ export function getFooterPopularDirections(): FooterPopularCityBlock[] {
       citySlug: 'saint-petersburg',
       links: [
         { label: 'Речные прогулки', href: landingCategoryHref('river-cruises', 'saint-petersburg') },
-        { label: 'Смотровые площадки', href: landingCategoryHref('rooftops', 'moscow') },
+        { label: 'Смотровые площадки', href: landingCategoryHref('rooftops', 'saint-petersburg') },
         { label: 'Стендап', href: landingCategoryHref('standup', 'saint-petersburg') },
         { label: 'Выходные в Питере', href: catalogIntentPath('na-vyhodnye', 'saint-petersburg') },
       ],

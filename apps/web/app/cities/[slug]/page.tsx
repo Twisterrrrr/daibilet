@@ -77,7 +77,12 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const payload = await loadCityDtoOrNull(decodeURIComponent(slug));
+  let payload: Awaited<ReturnType<typeof loadCityDtoOrNull>> = null;
+  try {
+    payload = await loadCityDtoOrNull(decodeURIComponent(slug));
+  } catch {
+    payload = null;
+  }
   if (!payload?.city) {
     // Do not let notFound() enter Full Route Cache as STALE 404 for ~1y.
     noStore();

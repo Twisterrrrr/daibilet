@@ -7,6 +7,19 @@
 
 ---
 
+## Incident: link audit missing-DTO → HTTP 500 (2026-08-08)
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| INC.LINK.1 | Crawl daibilet.ru hubs/venues/blog/footer (~485 checks) | Высокий | ✅ `docs/link-audit-2026-08-08.md` |
+| INC.LINK.2 | Fix API city/venue/event miss `200 null` → 404 | Критический | ✅ handlers |
+| INC.LINK.3 | Fix web miss → 404 not 500 (cache/metadata) | Критический | ✅ cached-*-data + VenuePages/city metadata |
+| INC.LINK.4 | Footer SPB rooftops → saint-petersburg | Высокий | ✅ `seo-internal-links.ts` |
+| INC.LINK.5 | Dead hub venue cards without DTO (data) | Высокий | ⏳ |
+| INC.LINK.6 | MSK deploy API+web for live 500→404 | Критический | 🔄 |
+
+---
+
 ## Incident: city hub nginx/ISR STALE 404 (2026-08-08)
 
 | ID | Задача | Приоритет | Статус |

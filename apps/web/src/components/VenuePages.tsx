@@ -96,7 +96,12 @@ export async function generateVenueListMetadata(
 }
 
 export async function generateVenueDetailMetadata(slug: string): Promise<Metadata> {
-  const payload = await loadVenueDtoOrNull(decodeURIComponent(slug));
+  let payload: PublicVenuePageDto | null = null;
+  try {
+    payload = await loadVenueDtoOrNull(decodeURIComponent(slug));
+  } catch {
+    payload = null;
+  }
   if (!payload?.venue) {
     noStore();
     notFound();

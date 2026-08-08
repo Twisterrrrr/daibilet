@@ -132,7 +132,12 @@ export async function fetchPublicApiJson<T>(
         throw new Error(`Public API ${apiPath} failed: HTTP ${response.status}`);
       }
 
-      return (await response.json()) as T;
+      const payload = (await response.json()) as T;
+      // Legacy handlers sometimes replied 200 + JSON null for misses.
+      if (options.notFoundAsNull && (payload == null || payload === undefined)) {
+        return null as T;
+      }
+      return payload;
     } catch (error) {
       lastError = error;
       if (isTimeoutError(error) && attempt < retries) {

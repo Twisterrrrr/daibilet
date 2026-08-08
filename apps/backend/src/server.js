@@ -531,7 +531,9 @@ export async function handleRequest(request, response) {
     const publicCityMatch = request.method === 'GET' ? url.pathname.match(/^\/api\/public\/cities\/([^/]+)$/) : null;
     if (publicCityMatch) {
       const citySlug = decodeURIComponent(publicCityMatch[1]);
-      sendPublicJson(response, await withPublicResponseCache(`city:${citySlug}`, () => buildPublicCityPage(db, citySlug)));
+      const payload = await withPublicResponseCache(`city:${citySlug}`, () => buildPublicCityPage(db, citySlug));
+      // Never 200+null: web generateMetadata treats miss as HTTP 500.
+      sendPublicJson(response, payload || { error: 'city_not_found' }, payload ? 200 : 404);
       return;
     }
 
@@ -550,7 +552,9 @@ export async function handleRequest(request, response) {
     const publicEventMatch = request.method === 'GET' ? url.pathname.match(/^\/api\/public\/events\/([^/]+)$/) : null;
     if (publicEventMatch) {
       const eventSlug = decodeURIComponent(publicEventMatch[1]);
-      sendPublicJson(response, await withPublicResponseCache(`event:${eventSlug}`, () => buildPublicEventPage(db, eventSlug)));
+      const payload = await withPublicResponseCache(`event:${eventSlug}`, () => buildPublicEventPage(db, eventSlug));
+      // Never 200+null: web generateMetadata treats miss as HTTP 500.
+      sendPublicJson(response, payload || { error: 'event_not_found' }, payload ? 200 : 404);
       return;
     }
 

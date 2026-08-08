@@ -73,8 +73,9 @@ export async function getCachedPublicCityDto(slug: string) {
   try {
     return await cached();
   } catch (error) {
-    if (error instanceof CityDtoMissError) return null;
-    if (error instanceof Error && error.message.startsWith('city_dto_miss:')) return null;
+    // unstable_cache may wrap/rehydrate the throw - match by message, not only instanceof.
+    const msg = error instanceof Error ? error.message : String(error);
+    if (error instanceof CityDtoMissError || msg.includes('city_dto_miss:')) return null;
     throw error;
   }
 }

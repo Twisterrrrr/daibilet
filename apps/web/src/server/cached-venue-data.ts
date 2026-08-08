@@ -58,8 +58,9 @@ export async function getCachedPublicVenueDto(slug: string) {
   try {
     return await cached();
   } catch (error) {
-    if (error instanceof VenueDtoMissError) return null;
-    if (error instanceof Error && error.message.startsWith('venue_dto_miss:')) return null;
+    // unstable_cache may wrap/rehydrate the throw - match by message, not only instanceof.
+    const msg = error instanceof Error ? error.message : String(error);
+    if (error instanceof VenueDtoMissError || msg.includes('venue_dto_miss:')) return null;
     throw error;
   }
 }
