@@ -16,6 +16,23 @@
 
 ---
 
+## 2026-08-08 - Buyer purchases seed for v.butin@yandex.ru
+
+### Наблюдения
+- Owner не видел список билетов в «Мои покупки». На MSK catalog уже есть `SiteUser` v.butin@yandex.ru и 1 widget ExternalOrder (TC open mic) - без кнопок Скачать/Открыть.
+- Finance public purchases-by-email ещё soft/empty (UX.BUY-6). Internal compact list берётся из `/checkout/actions/internal-purchases`.
+
+### Решения
+- Catalog fixture `apps/web/src/lib/buyer-purchases-seed.ts`: 3 музейных STUB заказа `DB26-BUTIN01..03` (Третьяковка / Эрмитаж / Эрарта) для email `v.butin@yandex.ru`.
+- Fan-in в `internal-purchases` + lookup в `checkout/actions/order` (билет `/checkout/ticket/{code}`).
+- Script `scripts/seed-buyer-purchases-profile.js` - ensure SiteUser; `--reset-password` пишет temp creds только в server file (не в git/chat).
+- Нужен web deploy (fixture в apps/web). Finance `.159` не трогали.
+
+### Проблемы
+- Пока нет m2m purchases-by-email, seed живёт в catalog web; после UX.BUY-6 можно сузить/убрать.
+
+---
+
 ## 2026-08-07 - Account purchases: compact list + download
 
 ### Наблюдения

@@ -22,6 +22,13 @@ function formatCount(count: number, forms: [string, string, string]): string {
 }
 
 function internalToBuyerOrder(row: BuyerInternalOrderRecord): BuyerOrder {
+  const title = row.eventTitle || row.venueTitle || row.title || 'Входной билет';
+  const ticketCount = Array.isArray(row.lineItems)
+    ? Math.max(
+        1,
+        row.lineItems.reduce((sum, item) => sum + Math.max(1, Math.round(Number(item.quantity) || 1)), 0),
+      )
+    : 1;
   return {
     id: `internal:${row.publicCode}`,
     number: row.publicCode,
@@ -32,14 +39,14 @@ function internalToBuyerOrder(row: BuyerInternalOrderRecord): BuyerOrder {
     sourceKind: 'internal',
     buyer: {
       email: row.email,
-      name: null,
+      name: row.buyerName || null,
       phone: null,
     },
-    eventTitle: row.title,
-    eventUrl: null,
+    eventTitle: title,
+    eventUrl: row.venueSlug ? `/venues/${encodeURIComponent(row.venueSlug)}` : null,
     purchasedAt: row.purchasedAt,
     amountRub: row.amountRub,
-    ticketCount: 1,
+    ticketCount,
     message:
       row.mode === 'STUB'
         ? 'Тестовый заказ (STUB). Скачайте билет из списка - письмо уходит только если настроен SMTP каталога.'
@@ -47,10 +54,10 @@ function internalToBuyerOrder(row: BuyerInternalOrderRecord): BuyerOrder {
     tickets: [
       {
         id: `internal-ticket:${row.publicCode}`,
-        number: row.publicCode,
+        number: row.ticketNumber || row.publicCode,
         displayStatus: row.displayStatus,
-        eventTitle: row.title,
-        startsAt: null,
+        eventTitle: title,
+        startsAt: row.sessionStartsAt || null,
       },
     ],
   };

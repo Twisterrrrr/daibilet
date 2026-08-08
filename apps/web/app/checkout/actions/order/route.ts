@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { mergeBuyerInternalOrders, type BuyerInternalOrderRecord } from '@/lib/buyer-checkout';
+import { lookupBuyerPurchasesSeedByPublicCode } from '@/lib/buyer-purchases-seed';
 import { isOpenDateValidity } from '@/lib/finance-projection';
 import { lookupCheckoutOrderByPublicCode } from '@/server/finance-checkout-client';
 import { fetchAdmissionProductBySlug } from '@/server/finance-projection-client';
@@ -97,7 +98,9 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'publicCode_required' }, { status: 400 });
   }
 
-  const order = await lookupCheckoutOrderByPublicCode(publicCode);
+  const financeOrder = await lookupCheckoutOrderByPublicCode(publicCode);
+  const seedOrder = lookupBuyerPurchasesSeedByPublicCode(publicCode);
+  const order = financeOrder || seedOrder;
   if (!order) {
     // Soft empty: UI still shows thank-you from query/local cache.
     return NextResponse.json({
@@ -108,7 +111,9 @@ export async function GET(request: Request) {
     });
   }
 
-  const enriched = await softEnrichTicketOrder(order);
+  const enriched = await softEnrichTicketOrder(
+    financeOrder && seedOrder ? mergeBuyerInternalOrders(financeOrder, seedOrder) : order,
+  );
 
   return NextResponse.json({
     ok: true,
