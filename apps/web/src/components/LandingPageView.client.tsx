@@ -60,6 +60,7 @@ import {
   resolveConcertGenreTag,
   riverLandingHref,
 } from '@/lib/landing-routes';
+import { LANDING_CITY_SLUGS } from '@/lib/landing-city';
 import {
   filterUpcomingBridgeGroups,
   mapBridgesGroups,
@@ -125,31 +126,6 @@ type DinnerTimeFilter = 'all' | 'sunset' | 'night';
 type DinnerBadgeFilter = LandingCardBadgeId | 'all';
 type TimeSlotFilter = '' | 'morning' | 'day' | 'evening' | 'night';
 const MIN_DISPLAY_PRICE_RUB = 100;
-
-const LANDING_CITY_SLUGS: Record<string, string> = {
-  moscow: 'Москва',
-  moskva: 'Москва',
-  msk: 'Москва',
-  spb: 'Санкт-Петербург',
-  'saint-petersburg': 'Санкт-Петербург',
-  'sankt-peterburg': 'Санкт-Петербург',
-  kazan: 'Казань',
-  'nizhny-novgorod': 'Нижний Новгород',
-  'nizhniy-novgorod': 'Нижний Новгород',
-  samara: 'Самара',
-  volgograd: 'Волгоград',
-  yaroslavl: 'Ярославль',
-  krasnoyarsk: 'Красноярск',
-  perm: 'Пермь',
-  novosibirsk: 'Новосибирск',
-  tver: 'Тверь',
-  rostov: 'Ростов-на-Дону',
-  'rostov-on-don': 'Ростов-на-Дону',
-  sochi: 'Сочи',
-  kaliningrad: 'Калининград',
-  ekaterinburg: 'Екатеринбург',
-  'rostov-na-donu': 'Ростов-на-Дону',
-};
 
 const BUS_CITY_META: Record<string, { slug: string; duration: string; prepositional: string }> = {
   Москва: { slug: 'moscow', duration: '1.5–3 часа', prepositional: 'Москве' },
