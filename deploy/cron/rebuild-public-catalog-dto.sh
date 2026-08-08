@@ -34,9 +34,19 @@ if ! flock -n 9; then
 fi
 
 echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) start catalog-dto-rebuild reason=${REASON} nice=${NICE_N}"
+TSX_BIN="${APP_DIR}/apps/backend/node_modules/.bin/tsx"
+if [[ ! -x "$TSX_BIN" ]]; then
+  TSX_BIN="${APP_DIR}/node_modules/.bin/tsx"
+fi
+if [[ ! -x "$TSX_BIN" ]]; then
+  echo "tsx not found under apps/backend or root node_modules" >&2
+  exit 1
+fi
+
+RUN=(timeout --kill-after=15s 180s "$TSX_BIN" scripts/rebuild-public-catalog-dto-cache.mjs --reason="$REASON")
 if command -v nice >/dev/null 2>&1 && [[ "$NICE_N" =~ ^[0-9]+$ ]] && (( NICE_N > 0 )); then
-  nice -n "$NICE_N" timeout --kill-after=15s 180s node scripts/rebuild-public-catalog-dto-cache.mjs --reason="$REASON"
+  nice -n "$NICE_N" "${RUN[@]}"
 else
-  timeout --kill-after=15s 180s node scripts/rebuild-public-catalog-dto-cache.mjs --reason="$REASON"
+  "${RUN[@]}"
 fi
 echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) done catalog-dto-rebuild reason=${REASON}"
