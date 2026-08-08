@@ -53,16 +53,29 @@ export function InstitutionList({
   hrefFor,
   className = '',
 }: {
-  venues: Array<Pick<VenueCatalogCard, 'id' | 'name' | 'city' | 'events' | 'type' | 'address' | 'slug'>>;
-  hrefFor: (venue: Pick<VenueCatalogCard, 'id' | 'name' | 'city' | 'events' | 'type' | 'address' | 'slug'>) => string;
+  venues: Array<
+    Pick<VenueCatalogCard, 'id' | 'name' | 'city' | 'events' | 'type' | 'address' | 'slug'> & {
+      eventsPending?: boolean;
+    }
+  >;
+  hrefFor: (
+    venue: Pick<VenueCatalogCard, 'id' | 'name' | 'city' | 'events' | 'type' | 'address' | 'slug'> & {
+      eventsPending?: boolean;
+    },
+  ) => string;
   className?: string;
 }) {
   if (!venues.length) return null;
 
   return (
-    <div className={`overflow-hidden rounded-card bg-white shadow-card divide-y divide-slate-100 ${className}`}>
+    <div className={`grid grid-cols-1 gap-3 md:grid-cols-2 ${className}`}>
       {venues.map((venue) => (
-        <InstitutionListRow key={venue.id} venue={venue} href={hrefFor(venue)} />
+        <div
+          key={venue.id}
+          className="overflow-hidden rounded-card bg-white shadow-card"
+        >
+          <InstitutionListRow venue={venue} href={hrefFor(venue)} />
+        </div>
       ))}
     </div>
   );
