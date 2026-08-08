@@ -164,11 +164,6 @@ export function LocationCard({
               <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-600">
                 {typeLabel}
               </span>
-              {cityLabel ? (
-                <span className="rounded bg-primary-50 px-1.5 py-0.5 text-[10px] font-semibold text-primary-700">
-                  {cityLabel}
-                </span>
-              ) : null}
               {eventsChip}
             </div>
             <div
@@ -231,6 +226,8 @@ export function LocationCard({
               <span className="truncate">{street}</span>
             </div>
           ) : null}
+
+          {cityLabel ? <div className="mt-auto pt-2 text-xs text-graphite-muted">{cityLabel}</div> : null}
         </div>
       </Link>
     </div>
