@@ -48,7 +48,8 @@ export async function getCachedPublicVenueDto(slug: string) {
       const payload = await fetchPublicApiJson<PublicVenuePageDto | null>(
         `/api/public/venues/${encodeURIComponent(key)}`,
         {
-          timeoutMs: 5_000,
+          // Cold venue DTO after API restart can be ~6-8s; 5s raced soft-unavailable poison.
+          timeoutMs: 8_000,
           notFoundAsNull: true,
           revalidateSeconds: PUBLIC_PAGE_REVALIDATE,
         },

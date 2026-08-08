@@ -1,5 +1,24 @@
 # Diary
 
+## 2026-08-08 - INC.VENUE-SOFT: все /locations|/venues «Площадка временно недоступна»
+
+### Наблюдения
+- Owner: soft screen на всех площадках + «жесткие тормоза»; усталость от рецидивов после 78701d3b.
+- API systemd `active`, но `GET :4000/api/health` timeout 5-20с; listen Recv-Q=39; node RSS ~1.1G / swap peak ~1.9G.
+- Next `[venue-dto-cache] unavailable ... timeout` → soft 200; Full Route Cache: **43/45** prerender HTML были soft-poison (`x-nextjs-cache` STALE + nginx HIT).
+- Prod API venue DTO при живом процессе был OK раньше; slug канон (`nizhniy`, не typo). Catalog SWR в journal каждые ~6 мин по 12-22с (dto.js dual cache, INC.504.5).
+
+### Решения
+- Ops: `systemctl restart daibilet-api`; удалить soft prerender `.html/.rsc/.meta`; `revalidateTag(venue-page)` + nginx purge + warm. Live smoke: health/venues/locations/home 200, soft=false, ~50-80мс.
+- Ops: `DAIBILET_CATALOG_REBUILD_MODE=child` в MSK `.env` - тяжёлый rebuild не на request event loop API.
+- Code: soft-unavailable → `await connection()` (не кэшировать soft HTML); venue DTO timeout 5s→8s (cold race).
+
+### Проблемы
+- Dual catalog SWR (dto.js + public-catalog.dto.ts) INC.504.5 всё ещё открыт - риск RAM/CPU рецидива.
+- Code soft-cache fix нужен web deploy пачкой; ops уже восстановил live.
+
+---
+
 ## 2026-08-08 - /my-day: scenarios mobile + must-see above suburbs + POI desc md+
 
 ### Наблюдения

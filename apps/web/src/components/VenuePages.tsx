@@ -129,6 +129,9 @@ export async function generateVenueDetailMetadata(slug: string): Promise<Metadat
   const loaded = await loadVenueDto(decodeURIComponent(slug));
   if (loaded.kind === 'miss') safeNotFound();
   if (loaded.kind === 'unavailable') {
+    // Keep soft metadata out of long-lived Full Route Cache (same class as HTML soft poison).
+    const { connection } = await import('next/server');
+    await connection();
     return {
       title: pageTitle('Площадка временно недоступна'),
       robots: { index: false, follow: false },
@@ -228,8 +231,12 @@ export async function VenueDetailPage({
   const loaded = await loadVenueDto(decodedSlug);
   if (loaded.kind === 'miss') safeNotFound();
   if (loaded.kind === 'unavailable') {
-    // Soft page without noStore(): noStore/fetch(no-store) on ISR → static-to-dynamic 500.
-    // Short ISR TTL (revalidate) is an acceptable outage cache window.
+    // Soft UI without noStore()+notFound (that → DYNAMIC_SERVER_USAGE 500 on ISR).
+    // BUT do NOT let soft HTML enter Full Route Cache / nginx SWR (~1y STALE): after API
+    // recovers, every /locations|/venues stays «временно недоступна» until purge
+    // (INC.LOC404 / 2026-08-08 all-venues outage). connection() → dynamic for this render only.
+    const { connection } = await import('next/server');
+    await connection();
     return <VenueUnavailablePage slug={decodedSlug} />;
   }
 
