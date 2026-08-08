@@ -130,10 +130,10 @@ export function LocationCard({
 
   return (
     <div className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lg">
-      <Link href={href} className="flex min-w-0 items-start no-underline">
-        {/* Locked square (size-*), never a flex-stretched skinny rail. */}
+      <Link href={href} className="flex min-h-[8.5rem] min-w-0 items-stretch no-underline sm:min-h-[9.5rem]">
+        {/* Fixed width, full card height; overflow on parent clips bottom-left radius. */}
         <div
-          className={`relative size-32 shrink-0 overflow-hidden text-white sm:size-36 ${
+          className={`relative w-32 shrink-0 self-stretch overflow-hidden text-white sm:w-36 ${
             showPhoto
               ? 'bg-slate-900'
               : `flex flex-col items-center justify-center bg-gradient-to-br p-2.5 ${gradient}`
