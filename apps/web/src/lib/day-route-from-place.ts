@@ -5,7 +5,7 @@
 import { resolveCityPlaceHref, type CityMustSeeItem, type CityPlaceLinkFields } from './cityInfo';
 import { namesLooselyMatch } from './city-place-href';
 import { lookupEditorialPlaceCoords } from './city-place-coords';
-import { lookupEditorialPlaceImage } from './city-place-images';
+import { resolveVenueHeroImage } from './city-place-images';
 import {
   DAY_ROUTE_SOFT,
   formatDayRouteStartsAtLabel,
@@ -209,10 +209,8 @@ export function dayRouteItemFromMustSee(
         ? `/locations/${slug}`
         : null);
 
-  const editorialImage = lookupEditorialPlaceImage(slug);
-  const hubImage = String(matched?.heroImageUrl || '').trim() || null;
   // Hub often stores dark /venues/generated stubs; curated /images/venues/{city}/ wins.
-  const imageUrl = editorialImage || hubImage;
+  const imageUrl = resolveVenueHeroImage(slug, matched?.heroImageUrl);
   return {
     id,
     slug,
@@ -293,6 +291,10 @@ export function dayRouteItemFromEvent(event: DayRouteEventSource): DayRouteVenue
 
   const sessionLabel = formatEventSessionLabel(event);
   const startsAt = String(event.startsAt || '').trim() || null;
+  const imageUrl =
+    resolveVenueHeroImage(venueSlug, event.imageUrl) ||
+    String(event.imageUrl || '').trim() ||
+    null;
 
   let ticketUrl: string | null = null;
   if (eventSlug || eventId) {
@@ -337,7 +339,7 @@ export function dayRouteItemFromEvent(event: DayRouteEventSource): DayRouteVenue
     cityId: event.cityId || null,
     citySlug: event.citySlug || null,
     href,
-    imageUrl: event.imageUrl || null,
+    imageUrl,
     address: String(event.venueAddress || '').trim() || null,
     ...coordsFromVenue({
       latitude: event.venueLatitude,

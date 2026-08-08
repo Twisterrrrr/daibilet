@@ -1,3 +1,19 @@
+# Diary
+
+## 2026-08-08 - GASTRO covers + My Day editorial images
+
+### Наблюдения
+- 51 PUBLISHED GASTRO на MSK: все со stub /venues/generated/ (СПб 43, KGD 5, Мск 1, Астрахань 1, Ростов 1).
+- Outdoor/monument covers уже в city-place-images, но My Day (match hydrate / enrich / share stub) брал raw hub hero без resolveVenueHeroImage.
+
+### Решения
+- 15 GenerateImage (топ СПб + ключевые рынки) + 26 sharp pack + 10 уже на диске → map GASTRO_PACK_IMAGES + SPB markets.
+- My Day: resolveVenueHeroImage в day-route-from-place, enrichDayRouteFromMatchVenues, DayRoutePanel match/card/share hydrate.
+- Commit+push без live deploy (batch).
+
+### Проблемы
+- Postgres MCP недоступен; inventory через SSH MSK psql.
+
 ## 2026-08-08 - Fontanka 51-53: merge pier duplicates
 
 ### Наблюдения

@@ -194,6 +194,10 @@ const SAINT_PETERSBURG_IMAGES: Record<string, string> = {
     '/images/venues/saint-petersburg/pyshechnaya-na-bolshoy-konyushennoy.jpg',
   'saint-petersburg-spikizi-bar-el-copitas':
     '/images/venues/saint-petersburg/spikizi-bar-el-copitas.jpg',
+  'saint-petersburg-vasileostrovskiy-rynok':
+    '/images/venues/saint-petersburg/vasileostrovskiy-rynok.jpg',
+  'saint-petersburg-moskovskiy-rynok':
+    '/images/venues/saint-petersburg/moskovskiy-rynok.jpg',
   // Outdoor / monument / embankment covers (GenerateImage 2026-08-08)
   'saint-petersburg-bankovskiy-most':
     '/images/venues/saint-petersburg/bankovskiy-most.jpg',
@@ -587,6 +591,52 @@ const LOCATION_PACK_IMAGES: Record<string, string> = {
   'rostov-na-donu-paramonovskie-sklady': '/images/venues/rostov-na-donu/paramonovskie-sklady.jpg',
 };
 
+// GASTRO_PACK_IMAGES_START
+const GASTRO_PACK_IMAGES: Record<string, string> = {
+  'astrahan-rybnyy-rynok-selenskie-isady': '/images/venues/astrahan/rybnyy-rynok-selenskie-isady.jpg',
+  'rostov-na-donu-tsentral-nyy-rynok-staryy-bazar': '/images/venues/rostov-na-donu/tsentral-nyy-rynok-staryy-bazar.jpg',
+  'saint-petersburg-art-kafe-brodyachaya-sobaka': '/images/venues/saint-petersburg/art-kafe-brodyachaya-sobaka.jpg',
+  'saint-petersburg-bar-dead-poets': '/images/venues/saint-petersburg/bar-dead-poets.jpg',
+  'saint-petersburg-bar-imbibe': '/images/venues/saint-petersburg/bar-imbibe.jpg',
+  'saint-petersburg-bar-mishka': '/images/venues/saint-petersburg/bar-mishka.jpg',
+  'saint-petersburg-bar-orthodox': '/images/venues/saint-petersburg/bar-orthodox.jpg',
+  'saint-petersburg-bar-balans-belogo': '/images/venues/saint-petersburg/bar-balans-belogo.jpg',
+  'saint-petersburg-bar-zhan-zhak': '/images/venues/saint-petersburg/bar-zhan-zhak.jpg',
+  'saint-petersburg-bar-zaliv': '/images/venues/saint-petersburg/bar-zaliv.jpg',
+  'saint-petersburg-bar-kollektiv': '/images/venues/saint-petersburg/bar-kollektiv.jpg',
+  'saint-petersburg-bar-hroniki': '/images/venues/saint-petersburg/bar-hroniki.jpg',
+  'saint-petersburg-bulochnaya-f-volcheka': '/images/venues/saint-petersburg/bulochnaya-f-volcheka.jpg',
+  'saint-petersburg-vegetarianskoe-kafe-rada-k': '/images/venues/saint-petersburg/vegetarianskoe-kafe-rada-k.jpg',
+  'saint-petersburg-gastrobar-harvest': '/images/venues/saint-petersburg/gastrobar-harvest.jpg',
+  'saint-petersburg-grand-otel-evropa-lobbi-bar': '/images/venues/saint-petersburg/grand-otel-evropa-lobbi-bar.jpg',
+  'saint-petersburg-kafe-zoom': '/images/venues/saint-petersburg/kafe-zoom.jpg',
+  'saint-petersburg-kafe-rubinshteyn': '/images/venues/saint-petersburg/kafe-rubinshteyn.jpg',
+  'saint-petersburg-kokteylnyy-bar-xander': '/images/venues/saint-petersburg/kokteylnyy-bar-xander.jpg',
+  'saint-petersburg-konditerskaya-sever-metropol': '/images/venues/saint-petersburg/konditerskaya-sever-metropol.jpg',
+  'saint-petersburg-konditerskaya-troyka': '/images/venues/saint-petersburg/konditerskaya-troyka.jpg',
+  'saint-petersburg-kofeynya-tchk': '/images/venues/saint-petersburg/kofeynya-tchk.jpg',
+  'saint-petersburg-literaturnoe-kafe-volf-i-beranzhe': '/images/venues/saint-petersburg/literaturnoe-kafe-volf-i-beranzhe.jpg',
+  'saint-petersburg-pivnoy-bar-dikkens': '/images/venues/saint-petersburg/pivnoy-bar-dikkens.jpg',
+  'saint-petersburg-restoran-animals': '/images/venues/saint-petersburg/restoran-animals.jpg',
+  'saint-petersburg-restoran-birch': '/images/venues/saint-petersburg/restoran-birch.jpg',
+  'saint-petersburg-restoran-il-lago-dei-cigni': '/images/venues/saint-petersburg/restoran-il-lago-dei-cigni.jpg',
+  'saint-petersburg-restoran-percorso': '/images/venues/saint-petersburg/restoran-percorso.jpg',
+  'saint-petersburg-restoran-blok': '/images/venues/saint-petersburg/restoran-blok.jpg',
+  'saint-petersburg-restoran-kokoko': '/images/venues/saint-petersburg/restoran-kokoko.jpg',
+  'saint-petersburg-restoran-koryushka': '/images/venues/saint-petersburg/restoran-koryushka.jpg',
+  'saint-petersburg-restoran-mama-tuta': '/images/venues/saint-petersburg/restoran-mama-tuta.jpg',
+  'saint-petersburg-restoran-mansarda': '/images/venues/saint-petersburg/restoran-mansarda.jpg',
+  'saint-petersburg-restoran-metropol': '/images/venues/saint-petersburg/restoran-metropol.jpg',
+  'saint-petersburg-restoran-palkin': '/images/venues/saint-petersburg/restoran-palkin.jpg',
+  'saint-petersburg-restoran-sintez': '/images/venues/saint-petersburg/restoran-sintez.jpg',
+  'saint-petersburg-restoran-stroganov-steyk-haus': '/images/venues/saint-petersburg/restoran-stroganov-steyk-haus.jpg',
+  'saint-petersburg-restoran-teplo': '/images/venues/saint-petersburg/restoran-teplo.jpg',
+  'saint-petersburg-ryumochnaya-mayak': '/images/venues/saint-petersburg/ryumochnaya-mayak.jpg',
+  'saint-petersburg-fudmoll-vokzal-1853': '/images/venues/saint-petersburg/fudmoll-vokzal-1853.jpg',
+  'saint-petersburg-cheburechnaya-salhino': '/images/venues/saint-petersburg/cheburechnaya-salhino.jpg',
+};
+// GASTRO_PACK_IMAGES_END
+
 const EDITORIAL_IMAGES_BY_SLUG: Record<string, string> = {
   ...NIZHNY_NOVGOROD_IMAGES,
   ...SAINT_PETERSBURG_IMAGES,
@@ -595,6 +645,7 @@ const EDITORIAL_IMAGES_BY_SLUG: Record<string, string> = {
   ...MOSCOW_IMAGES,
   ...EXTRA_AI_LOCATION_IMAGES,
   ...LOCATION_PACK_IMAGES,
+  ...GASTRO_PACK_IMAGES,
 };
 
 export function lookupEditorialPlaceImage(

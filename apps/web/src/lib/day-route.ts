@@ -4,6 +4,7 @@
 
 import { haversineMeters, isValidCoordinatePair } from './day-route-score';
 import { eventHref, venueHref } from './routes';
+import { isGeneratedVenueStub, resolveVenueHeroImage } from './city-place-images';
 
 /** Display clock for session labels (catalog sessions are Europe/Moscow wall-clock). */
 const DAY_ROUTE_SESSION_TZ = 'Europe/Moscow';
@@ -1672,8 +1673,14 @@ export function enrichDayRouteFromMatchVenues(payloadVenues: DayRouteCoordSource
     if (match.title && stubTitle) next.title = match.title;
     if (match.eventId && !item.eventId) next.eventId = match.eventId;
     if (match.eventSlug && !item.eventSlug) next.eventSlug = match.eventSlug;
-    const matchImage = String(match.heroImageUrl || match.imageUrl || '').trim();
-    if (matchImage && !String(item.imageUrl || '').trim()) next.imageUrl = matchImage;
+    const matchImage = resolveVenueHeroImage(
+      next.slug || match.slug,
+      match.heroImageUrl || match.imageUrl,
+    );
+    const existingImage = String(item.imageUrl || '').trim();
+    if (matchImage && (!existingImage || isGeneratedVenueStub(existingImage))) {
+      next.imageUrl = matchImage;
+    }
     // Rebuild ticket CTA when event meta arrived (drop stub /events/{id} leftovers).
     if (match.eventId || match.eventSlug || stubTitle) {
       next.ticketUrl = null;

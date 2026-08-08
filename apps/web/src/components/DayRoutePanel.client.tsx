@@ -115,6 +115,7 @@ import {
   type DayRouteVenueItem,
 } from '@/lib/day-route';
 import { lookupEditorialPlaceCoords } from '@/lib/city-place-coords';
+import { isGeneratedVenueStub, resolveVenueHeroImage } from '@/lib/city-place-images';
 import {
   buildCityDayRoutePreset,
   dayRouteHookLine,
@@ -244,7 +245,7 @@ function matchVenueToDayRouteItem(venue: MatchVenueStub): DayRouteVenueItem {
     cityId: venue.cityId,
     citySlug: venue.citySlug ?? null,
     address: venue.address ?? null,
-    imageUrl: venue.heroImageUrl,
+    imageUrl: resolveVenueHeroImage(venue.slug, venue.heroImageUrl),
     latitude: venue.latitude ?? null,
     longitude: venue.longitude ?? null,
     href: venue.slug
@@ -266,7 +267,7 @@ function venueCardToDayRouteItem(venue: VenueCatalogCard): DayRouteVenueItem {
     cityId: venue.cityId ?? null,
     citySlug: venue.citySlug ?? null,
     address: venue.address ?? null,
-    imageUrl: venue.heroImageUrl ?? null,
+    imageUrl: resolveVenueHeroImage(venue.slug, venue.heroImageUrl),
     latitude: venue.latitude ?? null,
     longitude: venue.longitude ?? null,
     href: venueHref({
@@ -615,6 +616,9 @@ function DayRoutePanelInner() {
               );
               const priorTitle =
                 local && !isDayRoutePlaceholderTitle(local.title) ? local.title : null;
+              const resolvedImage =
+                resolveVenueHeroImage(token.id, local?.imageUrl) ||
+                (local?.imageUrl && !isGeneratedVenueStub(local.imageUrl) ? local.imageUrl : null);
               resolved.push({
                 id: token.id,
                 slug: token.id,
@@ -622,7 +626,7 @@ function DayRoutePanelInner() {
                 href: `/venues/${encodeURIComponent(token.id)}`,
                 latitude: editorial?.latitude ?? local?.latitude ?? null,
                 longitude: editorial?.longitude ?? local?.longitude ?? null,
-                imageUrl: local?.imageUrl ?? null,
+                imageUrl: resolvedImage,
                 address: local?.address ?? null,
                 city: local?.city ?? null,
                 cityId: local?.cityId ?? null,
