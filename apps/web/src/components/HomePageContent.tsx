@@ -15,6 +15,7 @@ import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { ScrollRail } from '@/components/ScrollRail.client';
 import { mergeBlogCards } from '@/lib/blog-utils';
 import '@/lib/env';
+import { catalogSocialStats } from '@/lib/catalog-social-stats';
 import { formatMoney, formatNumber, pluralEvents } from '@/lib/format';
 import { resolveHomePromoImage } from '@/lib/home-scenarios';
 import { podborkiBentoCellClass, podborkiBentoSpan, PODBORKI_BENTO_GRID_CLASS } from '@/lib/podborki-bento';
@@ -52,8 +53,8 @@ async function HomePageBody() {
   const topCities = [...cities]
     .sort((a, b) => b.events - a.events || a.name.localeCompare(b.name, 'ru'))
     .slice(0, 8);
-  const liveCities = destinations.filter((item) => (item.events || 0) > 0).length;
-  const liveEvents = catalogPayload?.total ?? catalogPayload?.items?.length ?? 0;
+  // Same canon as SiteFooter (not catalogPayload.total — that under/over-counts vs destinations).
+  const { places: liveCities, events: liveEvents } = catalogSocialStats(destinations);
 
   const sessions = catalogPayload?.items ?? [];
   const sparseCatalog = sessions.length < 12;

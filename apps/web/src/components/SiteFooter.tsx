@@ -2,6 +2,7 @@ import Link from 'next/link';
 
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
 import { DaibiletLogo } from '@/components/DaibiletLogo';
+import { catalogSocialStats } from '@/lib/catalog-social-stats';
 import { formatNumber } from '@/lib/format';
 import { cityHref } from '@/lib/routes';
 import { landingCategoryHref } from '@/lib/landing-routes';
@@ -99,12 +100,9 @@ export function SiteFooter({ destinations, variant = 'default' }: SiteFooterProp
     }));
 
   // Catalog social proof = public destinations with events (cities + regions).
-  // type==='city' alone is only standaloneCities (~65) and undercounts cityToRegion hubs
-  // that marketing («более чем в 100 городах» / PublicStatsDto.destinations) includes.
-  const catalogDestinations = destinations.filter((item) => (item.events || 0) > 0);
-  const eventsCount = catalogDestinations.reduce((sum, item) => sum + (item.events || 0), 0);
-  const venuesCount = catalogDestinations.reduce((sum, item) => sum + (item.venues || 0), 0);
-  const placesCount = catalogDestinations.length;
+  // Shared with home trust strip via catalogSocialStats (not /events.total / stats.events).
+  const { events: eventsCount, venues: venuesCount, places: placesCount } =
+    catalogSocialStats(destinations);
   const catalogStatsLine =
     eventsCount > 0 || venuesCount > 0 || placesCount > 0
       ? `${formatNumber(eventsCount)} событий · ${formatNumber(venuesCount)} площадок · ${formatNumber(placesCount)} городов`
