@@ -11,29 +11,31 @@ Finance PR-ветка `codex/stage0-admission-ticket-core` может держа
 
 ## Открыто (техника)
 
-### 1. Stage 0 issuance + buyer DTO + Path A YooKassa (smoke `.159`)
+### 1. Stage 0 closeout - e2e/smoke на live `.159` (единственный runtime gate)
 
-**Что открыто:** live/sandbox прогон на finance `.159`, не «дописать код с нуля». Issuance `ticketNumbers` (`TKT-{publicCode}-NN`, ≠ `publicCode`, только после successful webhook/reconcile), enrichment public order DTO (buyer, venue title/address/coords, validity, items, totals, paidAt/confirmedAt, ticketNumbers, supplierSupportPhone), Path A `return_url` → `https://daibilet.ru/checkout/result?order={publicCode}`, no-store lookup order-by-`publicCode` + purchases-by-email, public `/api/checkout/yookassa` для `VENUE_ADMISSION` + admission product/offer ids - **в PR / code done** на ветке `codex/stage0-admission-ticket-core` (base `codex/phase2-finance-supplier`).
+**Где мы сейчас (owner 2026-08-09):** Stage 0 **по коду закрыт** и **уже live on finance `.159`**: внутренний admission checkout, Path A `return_url` → `/checkout/result?order=...`, public order lookup, выдача `TKT-{publicCode}-NN`, buyer/supplier/admin projection. PR/code done → **live on `.159`** (не «ждёт деплой»).
 
-**Статус кода:** готово + тесты на PR-ветке; catalog/finance contract частично пересекается с buyer enrichment из PR #5 / Stage 0 pack. **Блокер:** явный go owner на деплой/smoke `.159` («выкатывай на finance»). Без этого нельзя честно закрыть issuance/DTO в qa.
+**Что ещё открыто (runtime only):** один шаг closeout - **доплатить sandbox order** → webhook/reconcile → order `CONFIRMED` + непустые `ticketNumbers` + public lookup по `publicCode`. Checklist: [yookassa-e2e-sandbox.md](./checklists/yookassa-e2e-sandbox.md).
 
-**Следующий техшаг:** по go owner - deploy finance artifact → checklist create-payment sandbox → `confirmationUrl` → webhook/reconcile → `CONFIRMED` + непустые `ticketNumbers` → reopen buyer card по `publicCode` без localStorage. Не трогать secrets / не force-push. Wide CTA и Path B calc **не** входят в этот шаг.
+**Блокер:** ручная sandbox-оплата / доставка confirm (агент **не** трогает `.159` / secrets). Wide CTA и Path B calc **не** входят в closeout.
 
-### 2. YooKassa e2e sandbox (PENDING → SUCCEEDED)
+**Следующий техшаг:** завершить sandbox payment на уже задеплоенном коде → подтвердить `CONFIRMED` + ticketNumbers + reopen buyer card без localStorage → закрыть Stage 0 closeout в Tasktracker/Diary.
 
-**Что открыто:** полный e2e по [yookassa-e2e-sandbox.md](./checklists/yookassa-e2e-sandbox.md) после webhook delivery. Кабинет webhook URL уже LOCKED на `https://finance-api.daibilet.ru/api/checkout/yookassa/webhook`; create-payment sandbox и флаги на `.159` в целом готовы (см. Owner minimum в истории ниже).
+### 2. YooKassa webhook canon - register / verify (owner gate)
 
-**Статус кода / ops:** FIN.LC3 / cabinet webhook ✅; e2e pay verify ещё ⏳. **Блокер:** тот же smoke-контур `.159` + успешная доставка webhook в sandbox (не product fork).
+**Canon URL (LOCKED):** `https://finance-api.daibilet.ru/api/checkout/yookassa/webhook`. **`pay.daibilet.ru`** - только return/user surface, **не** webhook endpoint.
 
-**Следующий техшаг:** прогнать checklist до `payment.succeeded` / order `CONFIRMED`; зафиксировать результат в Diary/Tasktracker; при fail - логи webhook verify + reconcile, без смены canon URL.
+**Свёртка статуса:** ранее в docs фигурировало «ручная регистрация cabinet DONE» (FIN.W1 / MIG.9.5). **Owner wording 2026-08-09:** webhook ещё нужно **зарегистрировать** (или явно verify/confirm в кабинете ЮKassa). Текущий gate = owner register/verify, не смена canon URL.
+
+**Следующий техшаг:** owner регистрирует/подтверждает webhook на `finance-api…/webhook` (events: succeeded / waiting_for_capture / canceled) → e2e delivery в связке с п.1; при fail - логи verify + reconcile, без перевода webhook на `pay.`.
 
 ### 3. PurchaseProjection fan-in + purchases-by-email (m2m)
 
 **Что открыто:** buyer/admin должны видеть оба контура заказов после split DB: `CheckoutOrder` на finance, `ExternalOrder` на catalog. Канон MVP: catalog account мержит widget ExternalOrder + soft finance/internal cache; **полный fan-in** ждёт стабильный public/m2m `purchases-by-email` с finance. Identity projection LOCKED: `publicCode` + buyer email/phone (`siteUserId` bridge не обязателен до первых внутренних продаж).
 
-**Статус кода:** Stage 0 PR закрывает no-store endpoints на finance стороне (orders/purchases paths); catalog fan-in и стабильный m2m consume - ещё не «зелёный e2e». **Блокер:** m2m token в env catalog→finance (см. п.4) + smoke `.159`.
+**Статус кода:** Stage 0 code **live on `.159`** закрывает no-store endpoints на finance стороне (orders/purchases paths); catalog fan-in и стабильный m2m consume - ещё не «зелёный e2e». **Блокер:** m2m token в env catalog→finance (см. п.4) + Stage 0 closeout (§ п.1).
 
-**Следующий техшаг:** после smoke - проверить purchases-by-email с service auth; на catalog довести merge в account/purchases без dual-write External на finance.
+**Следующий техшаг:** после closeout - проверить purchases-by-email с service auth; на catalog довести merge в account/purchases без dual-write External на finance.
 
 ### 4. Projection routes + sync policy + m2m token в env
 
@@ -105,6 +107,20 @@ Product targets (~200 MSK/SPB, ~50 other top-8) **LOCKED**. **Открыто:** 
 
 ---
 
+## Roadmap финконтура (план, не open-QA dump)
+
+Порядок после Stage 0 code-live. Это **план этапов**, не список «всё ещё открытый QA». Текущие runtime-гейты - только § Открыто п.1–2.
+
+1. **Stage 0 closeout:** доплатить sandbox order → `CONFIRMED` → public order lookup + `ticketNumbers`.
+2. **Webhook canon:** зарегистрировать `https://finance-api.daibilet.ru/api/checkout/yookassa/webhook`; `pay.daibilet.ru` только return/user URL (см. § Открыто п.2).
+3. **Buyer contour:** связать public `/checkout/result?order=...` с finance projection; показать билет / номер / статус / поддержку.
+4. **Operator contour:** admin orders search по `publicCode`, email, ticket number; audit trail; ручной retry webhook/reconcile.
+5. **Supplier LK MVP:** supplier-scoped orders, admissions, ticket numbers, buyer contact по правилам, support entry.
+6. **Refunds light:** заявка, operator decision, supplier visibility read-only. **Не** путать со Stage 2+ voucher (DEFERRED D7) - это light track.
+7. **Finance live gates:** 54-ФЗ/чеки, live YooKassa creds, webhook verification, оферта/возвраты/ПДн → **только потом** широкий buyer CTA.
+
+---
+
 ## Отложено (продукт) — DEFERRED
 
 Не удалять. Не требовать ответа для текущего tech-трека Stage 0 / catalog execution. Когда вернёмся - снять `DEFERRED` и перенести в фокус.
@@ -148,7 +164,7 @@ Wide catalog CTA без явного запроса owner - запрещено. 
 
 ### D7. Buyer LK / auto-refunds / Stage 2+ voucher — DEFERRED
 
-Auto refunds / self-serve refund UI out of Stage 0. Stage 2+ note: единый ваучер, partial refund by slot, replace + surcharge - не implement сейчас.
+Auto refunds / self-serve refund UI out of Stage 0. **Refunds light** (заявка + operator decision + supplier read-only) - отдельный план в § Roadmap финконтура п.6, не этот блок. Stage 2+ note: единый ваучер, partial refund by slot, replace + surcharge - не implement сейчас.
 
 ---
 
@@ -201,25 +217,25 @@ Auto refunds / self-serve refund UI out of Stage 0. Stage 2+ note: единый 
 
 ## 2026-08-07 - Museum-1 / Stage 0 first open-date contract
 
-**Статус 2026-08-09:** продуктовые пункты перенесены в **DEFERRED D1**. Tech issuance/DTO/smoke - в § Открыто (техника) п.1–2. Не считать отсутствие ответов по 54-ФЗ / scanner day-1 блокером текущего PR-smoke.
+**Статус 2026-08-09:** продуктовые пункты перенесены в **DEFERRED D1**. Tech issuance/DTO **code live on `.159`**; runtime closeout/e2e - в § Открыто (техника) п.1–2 + Roadmap. Не считать отсутствие ответов по 54-ФЗ / scanner day-1 блокером текущего sandbox closeout.
 
 ## 2026-08-07 - Order code ≠ ticket number (LOCKED draft)
 
 **LOCKED draft (owner 2026-08-07):** `CheckoutOrder.publicCode` = **код заказа** (buyer support / payment). **Номер билета** музея / площадки - отдельная сущность; UI временно мог показывать тот же `publicCode` с подписью до issuance.
 
-**Не** считать collapse к одному числу product end-state. Issuance path в Stage 0 PR (`ticketNumbers`) - tech follow-up/smoke, см. § Открыто п.1. Внешний scanner code ownership - DEFERRED D1.
+**Не** считать collapse к одному числу product end-state. Issuance path Stage 0 (`ticketNumbers`) - **code live on `.159`**; runtime confirm после sandbox pay - § Открыто п.1. Внешний scanner code ownership - DEFERRED D1.
 
 ## 2026-08-07 - Buyer ticket fields / finance enrichment gaps
 
-Историческая таблица gaps; **целевой статус** - закрытие кодом в Stage 0 PR + smoke `.159` (§ Открыто п.1). До smoke не помечать «prod done».
+Историческая таблица gaps; **код enrichment / issuance live on `.159`** (2026-08-09). До зелёного sandbox closeout (`CONFIRMED` + ticketNumbers в public lookup) не помечать Stage 0 «prod done» - см. § Открыто п.1.
 
-| Field | Create STUB historically | Public order lookup target |
-|-------|--------------------------|----------------------------|
-| buyer.name | ✅ | enrich in PR |
-| venueTitle | ✅ subject | enrich in PR |
-| venueAddress | catalog interim | enrich in PR |
-| validTo / validityMode | product ✅; order snapshot needed | enrich in PR |
-| item(s) title+qty | ✅ single `item` | multi-line later ok |
+| Field | Create STUB historically | Public order lookup |
+|-------|--------------------------|---------------------|
+| buyer.name | ✅ | ✅ code live; ⏳ e2e |
+| venueTitle | ✅ subject | ✅ code live; ⏳ e2e |
+| venueAddress | catalog interim | ✅ code live; ⏳ e2e |
+| validTo / validityMode | product ✅; order snapshot | ✅ code live; ⏳ e2e |
+| item(s) title+qty | ✅ single `item` | ✅ code live; multi-line later ok |
 | supplierSupportPhone | hide until present | DTO field tech; display policy = DEFERRED D1 |
 | session startsAt | null open-date | n/a Stage 0 |
 
@@ -314,18 +330,19 @@ E2e checklist: [yookassa-e2e-sandbox.md](./checklists/yookassa-e2e-sandbox.md).
 | `finance-api.daibilet.ru` | API (Projection, Webhooks) | A → `.159` | |
 | `supplier.daibilet.ru` | ЛК Партнёров | A → `.159` | |
 
-- YooKassa webhook: `https://finance-api.daibilet.ru/api/checkout/yookassa/webhook` (events: succeeded / waiting_for_capture / canceled). Dual-webhook SKIP.
+- YooKassa webhook canon: `https://finance-api.daibilet.ru/api/checkout/yookassa/webhook` (events: succeeded / waiting_for_capture / canceled). Dual-webhook SKIP. **`pay.` = return/user only.**
 - **Path A:** `daibilet.ru/checkout/admissions/{slug}` → result `?order={publicCode}` → `daibilet.ru/account/purchases`. `publicCode` = masked token, не DB id.
 - **Path B calc:** DEFERRED D6 / forbidden for museum CTA.
-- Webhook registration API → 401: обход ручной кабинет; e2e sandbox - § Открыто п.2.
+- Webhook registration API → 401 historically; **owner 2026-08-09:** register/verify в кабинете ещё gate - § Открыто п.2 (свёртка «cabinet DONE»).
 
-### Owner minimum (снимок)
+### Owner minimum (снимок 2026-08-09)
 
 - Timeweb allow **MSK `.184` → finance `.159`** ✅
 - YooKassa secrets на `.159` ✅ (never chat/git). Flags checkout/stub/verify как на хосте.
 - Egress `.159` outbound 443+DNS ✅
-- FIN.LC3 ✅; webhook cabinet ✅
-- **Open tech:** e2e + Stage 0 smoke - § Открыто п.1–2
+- FIN.LC3 ✅ create-payment; **Stage 0 code live on `.159`** ✅
+- Webhook: canon URL LOCKED; **register/verify cabinet = open** (owner wording) - § Открыто п.2
+- **Open runtime:** Stage 0 closeout e2e (sandbox pay → CONFIRMED + ticketNumbers) - § Открыто п.1; дальше Roadmap финконтура
 - `.16` wipe если биллится - § Открыто п.11
 
 ### PurchaseProjection / dual order sources / sync / auth

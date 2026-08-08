@@ -138,19 +138,19 @@ Alias `museum-1` = первый open-date контракт (не «музеи fo
 | ID | Задача | Приоритет | Статус | Owner |
 |----|--------|-----------|--------|-------|
 | M1.DOC | Docs: readiness matrix Stage 0/1/2 + Codex brief + supplier taxonomy | Критический | ✅ `docs/museum-contract-readiness.md` (taxonomy 2026-08-08) | Cursor arch |
-| M1.PAY | Public admission create-payment + `return_url` catalog `?order=` | Критический | ⏳ | Codex (UX.BUY-5) |
-| M1.WH | Webhook e2e sandbox PENDING→SUCCEEDED + verify + idempotency | Критический | ⏳ cabinet ✅; e2e open ([checklist](./checklists/yookassa-e2e-sandbox.md)) | Codex (FIN.W1 / MIG.9.5) |
-| M1.REC | Reconcile path (manual + timer draft) если webhook lost | Критический | ⏳ | Codex |
-| M1.TKT | Issuance: `ticketNumber` ≠ `publicCode`; order-by-code DTO полный | Критический | ⏳ | Codex |
-| M1.BUY | purchases-by-email / m2m для account fan-in | Высокий | ⏳ | Codex (UX.BUY-6 / CF.P1c) |
-| M1.SUP | Open-date supplier template (музей/арт) + LC orders + legal/bank approve + supportPhone DTO | Критический | ⏳ | Codex (FIN.W2) |
-| M1.OPS | Runbook: reconcile + manual refund/cancel + support search | Высокий | ⏳ | Codex |
+| M1.PAY | Public admission create-payment + `return_url` catalog `?order=` | Критический | ✅ code **live on `.159`** (2026-08-09); closeout = sandbox pay confirm | Codex (UX.BUY-5) |
+| M1.WH | Webhook e2e sandbox PENDING→SUCCEEDED + verify + idempotency | Критический | 🔄 canon URL LOCKED; **owner: register/verify cabinet** (свёртка «cabinet DONE»); e2e open ([checklist](./checklists/yookassa-e2e-sandbox.md)) | Owner + Codex (FIN.W1 / MIG.9.5) |
+| M1.REC | Reconcile path (manual + timer draft) если webhook lost | Критический | 🔄 timer/ops ✅; runtime confirm в связке с closeout | Codex |
+| M1.TKT | Issuance: `ticketNumber` ≠ `publicCode`; order-by-code DTO полный | Критический | ✅ code **live on `.159`**; ⏳ e2e `CONFIRMED` + `ticketNumbers` | Codex |
+| M1.BUY | purchases-by-email / m2m для account fan-in | Высокий | 🔄 finance endpoints live; catalog fan-in / m2m consume open | Codex (UX.BUY-6 / CF.P1c) |
+| M1.SUP | Open-date supplier template (музей/арт) + LC orders + legal/bank approve + supportPhone DTO | Критический | ⏳ Roadmap §5 Supplier LK MVP | Codex (FIN.W2) |
+| M1.OPS | Runbook: reconcile + manual refund/cancel + support search | Высокий | ⏳ Roadmap §4 Operator contour | Codex |
 | M1.MAIL | Buyer email link (finance mail или SMTP) / documented fallback | Высокий | ⏳ | Codex + owner SMTP |
-| M1.E2E | E2e matrix T1-T8 из readiness doc перед договором | Критический | ⏳ | Codex + Cursor smoke |
+| M1.E2E | E2e matrix T1-T8 из readiness doc перед договором | Критический | ⏳ после Stage 0 closeout | Codex + Cursor smoke |
 | M1.S1 | Stage 1 outline: events/sessions supplier (one-off + recurring; categories/prices) | Средний | ⚠️ deferred after M1 | - |
 | M1.S2 | Stage 2 outline: full LK clients/orders/fin reporting | Средний | ⚠️ deferred after S1 | - |
 
-**Acceptance Stage 0:** см. блок «Задача для Codex» в readiness doc. Catalog buyer ticket UX (Path A UI) = ✅ Cursor; блокер = finance fulfillment.
+**Acceptance Stage 0:** код live на `.159`; **остался runtime closeout** - sandbox pay → `CONFIRMED` + `ticketNumbers` + public lookup. Catalog buyer ticket UX (Path A UI) = ✅ Cursor. План дальше: [qa.md](./qa.md) § Roadmap финконтура (buyer/operator/supplier/refunds light/live gates).
 
 ---
 
@@ -188,7 +188,7 @@ Alias `museum-1` = первый open-date контракт (не «музеи fo
 | UX.BUY-2 | Result / thank-you `/checkout/result?order=publicCode` + ticket card | Критический | ✅ ticket UX |
 | UX.BUY-3 | Account purchases: internal (publicCode/status/title + link to ticket) + widget ExternalOrder | Высокий | ✅ |
 | UX.BUY-4 | URL canon: Path A vs Path B + pay parallel | Высокий | ✅ |
-| UX.BUY-5 | Codex: public admission create-payment → confirmationUrl (+ return `?order=`) | Критический | ⏳ finance handoff (return_url) |
+| UX.BUY-5 | Codex: public admission create-payment → confirmationUrl (+ return `?order=`) | Критический | ✅ code live on `.159`; ⏳ sandbox pay closeout |
 | UX.BUY-6 | Codex: m2m / public purchases-by-email для fan-in в account | Высокий | ⏳ Codex / soft localStorage+soft API |
 | UX.BUY-7 | Path A polish: offer qty>1, phone, resume unpaid confirmationUrl | Средний | ⏳ thin only |
 | UX.BUY-8 | Path B complex calc (cart/multi-offer) — future internal pricing; не museum | Низкий | ⚠️ deferred (allowed later) |
@@ -772,7 +772,7 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 | FIN.LC4 | Owner: SG Diligent Polydeuces outbound 443 (+ DNS) | Критический | ✅ PASS (egress green; sandbox create-payment OK 2026-08-07) |
 | FIN.LC5 | YOOKASSA_SECRET_KEY на `.159` + CHECKOUT=1 after egress | Критический | ✅ key `<set>`; CHECKOUT=1; VERIFY_WEBHOOK=1; STUB=1 (2026-08-07) |
 | FIN.LC6 | Codex SSH access (daibilet_spb_finance / pubkey) | Критический | ⏳ owner: Cursor has key; Codex needs same |
-| FIN.W1 | Week1: YooKassa+webhook/reconcile+runbook (4-5d after D0) | Критический | 🔄 cabinet ✅ (`finance-api…/webhook`, dual SKIP); create-payment/STUB ✅; **open:** e2e PENDING→SUCCEEDED ([checklist](./checklists/yookassa-e2e-sandbox.md)) |
+| FIN.W1 | Week1: YooKassa+webhook/reconcile+runbook (4-5d after D0) | Критический | 🔄 Stage 0 code **live on `.159`**; canon webhook URL LOCKED (`finance-api…/webhook`, dual SKIP; `pay.` = return only); **owner gate:** register/verify cabinet; **open runtime:** e2e PENDING→CONFIRMED + ticketNumbers ([checklist](./checklists/yookassa-e2e-sandbox.md)) |
 | FIN.W2 | Week2: supplier LC + admin legal/bank approve + capacity reaper | Высокий | ⏳ |
 | FIN.W3 | Week3: controlled catalog path + ledger MVP + m2m Bearer | Высокий | ⏳ wide CTA still out |
 | FIN.W4 | Week4: harden, scheduled reconcile, docs, smoke matrix | Средний | ⏳ |
@@ -891,14 +891,14 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 | MIG.9.2 | Phase 2: fresh finance PG на `.159` (не catalog dump) | Критический | ✅ PG `:5437` + migrations/seed smoke 2026-07-30 |
 | MIG.9.3 | Phase 3: finance app + HTTP/TLS `pay`/`supplier`/`finance-api` | Критический | 🔄 API `:4100` + nginx · TLS ✅ LE SAN pay/supplier/finance-api · STUB on / YooKassa off |
 | MIG.9.4 | Phase 4: optional staging/build scaffolding на `.159` (не justification для `.16`) | Средний | ✅ N/A - SPB `.16` retired from build; staging на `.159` optional later |
-| MIG.9.5 | Phase 5: YooKassa webhook → finance-api canon; dual only if prior live | Критический | ✅ cabinet URL = canon `https://finance-api.daibilet.ru/api/checkout/yookassa/webhook` (owner 2026-08-07; dual **SKIP**); VERIFY=1; next ⏳ e2e sandbox PENDING→SUCCEEDED ([checklist](./checklists/yookassa-e2e-sandbox.md)) |
+| MIG.9.5 | Phase 5: YooKassa webhook → finance-api canon; dual only if prior live | Критический | 🔄 canon URL LOCKED `https://finance-api.daibilet.ru/api/checkout/yookassa/webhook` (dual **SKIP**; `pay.` ≠ webhook); VERIFY=1; **owner 2026-08-09:** register/verify cabinet ещё gate (свёртка «cabinet DONE»); next ⏳ e2e + closeout ([checklist](./checklists/yookassa-e2e-sandbox.md)) |
 | MIG.9.6 | Phase 6: smoke `pay`/`supplier`/webhook; catalog `.184` без cutover | Критический | ⏳ |
 | MIG.9.7 | Phase 7: retire Intelligent Hoopoe `.16` from repo/ops + **wipe VM in Timeweb** | Высокий | ✅ repo/docs/scripts 2026-08-07 (owner confirmed «труп»); **VM wipe в панели Timeweb = owner**, если ещё биллится |
 | PERF.OOM4 | MSK: снять `cpus:1`/`workerThreads:false`, heap build 5120Mi | Высокий | ✅ |
 
 План: [migration-spb-to-msk.md](./migration-spb-to-msk.md) · roles/MIG.9: [spb-migrate-4gb-to-8gb.md](./spb-migrate-4gb-to-8gb.md) · [spb-finance-host.md](./spb-finance-host.md)  
 Домены finance (**канон**): **`pay.daibilet.ru`** (buyer) · `supplier.daibilet.ru` · `finance-api.daibilet.ru` - DNS+TLS ✅. Alias `checkout.` / `finance.` не обязательны ([qa.md](./qa.md)).  
-Owner minimum: MSK→`.159` сеть ✅ · YooKassa `SHOP_ID`/`SECRET=<set>` ✅ · egress `.159` ✅ · FIN.LC3 smoke ✅ · **webhook cabinet** ✅ canon finance-api (не pay) · next ⏳ e2e sandbox PENDING→SUCCEEDED · Codex SSH.  
+Owner minimum: MSK→`.159` сеть ✅ · YooKassa `SHOP_ID`/`SECRET=<set>` ✅ · egress `.159` ✅ · FIN.LC3 + Stage 0 code **live** ✅ · webhook canon = finance-api (не pay) · **owner: register/verify cabinet** ⏳ · next ⏳ sandbox closeout CONFIRMED+ticketNumbers · Codex SSH.  
 **Web deploy canon:** MSK-only (`deploy-prod-next.sh` / CI Deploy MSK web) на `.184`. SPB `.16` Intelligent Hoopoe = труп (MIG.9.7 ✅ docs; wipe VM = owner Timeweb).
 
 ---
@@ -1861,6 +1861,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | Дата | Изменение |
 |------|-----------|
+| 2026-08-09 | **Finance contour status (owner):** Stage 0 code **live on `.159`**; единственный runtime gate = sandbox pay → CONFIRMED + ticketNumbers; webhook canon URL LOCKED, register/verify cabinet reopen (свёртка «cabinet DONE»); roadmap buyer/operator/supplier/refunds light/live gates в qa; M1.*/FIN.W1/MIG.9.5 sync; **без** finance/MSK deploy |
 | 2026-08-09 | **QA locks docs:** editorial/route/finance/publicCode/CI secrets; Catalog Worker 504.5c canon in deploy/ + Redis 504.5d deferred (MSK Redis нет); Buyer refunds Stage 2+ LOCKED out of Stage 0; nginx split example + yookassa e2e checklist; FIN.W1/M1.WH e2e ⏳; **без** MSK/finance/Redis deploy |
 | 2026-08-08 | **M1 taxonomy ✅ docs** - owner lock: Supplier ≠ museum-only; Stage 0 = OPEN_DATE (музей/арт); Stage 1 = events/sessions; readiness + M1.* + qa + Diary + Project one-liner; Codex brief updated; docs-only no web deploy |
 | 2026-08-07 | **M1.* epic ✅ docs** - [museum-contract-readiness.md](./museum-contract-readiness.md): роли/функции, Stage 0 Codex brief (pay/webhook/reconcile/ticket issuance/supplier LC), Stage 1 schedule + Stage 2 full LK outlines; Tasktracker M1.*; qa Museum-1 questions; docs-only no web deploy |

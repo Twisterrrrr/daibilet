@@ -14,6 +14,23 @@
 
 ---
 
+## 2026-08-09 - Finance contour: Stage 0 live + roadmap
+
+### Наблюдения
+- Owner: Stage 0 admission ticket core **по коду закрыт** и уже **live on `.159`** (checkout, return URL, public lookup, `TKT-*`, projections).
+- Открыт один runtime-шаг: доплатить sandbox → `CONFIRMED` + `ticketNumbers` + public lookup.
+- Ранее в docs «webhook cabinet DONE» расходится с owner wording: webhook на `finance-api…/webhook` ещё нужно зарегистрировать/verify; `pay.` только return/user.
+
+### Решения
+- Канон полного `docs/qa.md` на `feat/next-monorepo`: § Открыто п.1–2 обновлены; добавлен § Roadmap финконтура (closeout → webhook → buyer → operator → supplier LK → refunds light → live gates).
+- Tasktracker: M1.*/FIN.W1/MIG.9.5 sync под live code + register/verify gate.
+- Docs-only commit+push; **без** finance `.159` / MSK web deploy / secrets.
+
+### Проблемы
+- Нет. Runtime closeout и cabinet register - owner/ops, не агентский deploy.
+
+---
+
 # Diary
 
 ## 2026-08-09 - INC.504.5c: stat-gated disk promote (Codex)
