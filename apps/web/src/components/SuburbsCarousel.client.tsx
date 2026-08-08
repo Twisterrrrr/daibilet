@@ -108,8 +108,11 @@ export function SuburbsCarousel({
   titleClass,
   className = 'mt-10',
 }: SuburbsCarouselProps) {
-  /** Hub: always one selected panel. My-day: null until user opens a chip. */
-  const [activeIndex, setActiveIndex] = React.useState<number | null>(compact ? null : 0);
+  /**
+   * Hub: always one selected panel (index 0).
+   * My-day compact: first suburb open by default; tap chip to switch/collapse.
+   */
+  const [activeIndex, setActiveIndex] = React.useState<number | null>(0);
 
   const resolvedTitleClass =
     titleClass ||

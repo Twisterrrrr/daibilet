@@ -374,8 +374,8 @@ function DayRoutePanelInner() {
   const [formError, setFormError] = useState<string | null>(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
   /** Exclusive accordion: route list stays outside; all other sections collapse. */
-  /** Must-see open by default so the grid is visible without an extra expand click. */
-  const [openPanel, setOpenPanel] = useState<DayRouteAccordionId | null>('mustSee');
+  /** Must-see starts collapsed; suburbs block expands the first chip by default. */
+  const [openPanel, setOpenPanel] = useState<DayRouteAccordionId | null>(null);
   const [locationsCatalog, setLocationsCatalog] = useState<VenueCatalogCard[]>([]);
   const [venuesCatalog, setVenuesCatalog] = useState<VenueCatalogCard[]>([]);
   const [eventsCatalog, setEventsCatalog] = useState<PublicCatalogListItemDto[]>([]);
