@@ -1,3 +1,18 @@
+## 2026-08-08 - Hide Samara Pack C guide (owner)
+
+### Наблюдения
+- Owner: Самара `samara-vykhodnye-dva-dnya-bez-gonki` - «вообще скрывай»; без конкретики, толку нет. Retitle/anglicism polish отменены.
+
+### Решения
+- MD: `status: HIDDEN` + `isIndexable: false` (как moscow companions `05ca3238`).
+- Hub: `blogSlug` на Самаре не стоял - чистка cityInfo не нужна.
+- MSK `blog:upsert --slug=…` + revalidate `/blog` + article path; web deploy не требуется.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-08 - /venues: city=all + type chips + event≠slots
 
 ### Наблюдения
