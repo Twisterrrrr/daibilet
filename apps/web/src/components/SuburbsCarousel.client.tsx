@@ -95,7 +95,7 @@ export type SuburbsCarouselProps = {
 /**
  * Significant-suburbs block.
  * Hub: wrap chips of suburb names + one detail panel (no horizontal card rail).
- * Compact (my-day): horizontal accordion - tap suburb chip to expand details.
+ * Compact (my-day): horizontal accordion - first suburb expanded; tap chip to switch.
  * Bulk «В маршрут» adds all nested points of the active suburb.
  */
 export function SuburbsCarousel({
