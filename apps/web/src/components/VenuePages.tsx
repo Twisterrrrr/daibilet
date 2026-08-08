@@ -31,8 +31,9 @@ import { fetchPublicApiJson } from '@/server/public-api-client';
 
 /** Admission must not hang venue HTML when finance is slow. */
 const VENUE_ADMISSION_TIMEOUT_MS = 2500;
-/** Catalog list soft budget; empty fallback must not be cacheable (nginx 30m HIT). */
-const VENUE_LIST_TIMEOUT_MS = 4000;
+/** Catalog list soft budget; with API hub SWR warm hits stay <<1s. */
+const VENUE_LIST_TIMEOUT_MS = 6000;
+const VENUE_LIST_RETRY_TIMEOUT_MS = 2500;
 
 const EMPTY_ADMISSION: FinanceAdmissionListResult = {
   items: [],
@@ -129,24 +130,30 @@ export async function generateVenueDetailMetadata(slug: string): Promise<Metadat
 export async function VenueListPage({ family }: Pick<PageProps, 'family'>) {
   let initialPage = EMPTY_FEED;
   try {
+    const emptyPayload = {
+      generatedAt: new Date(0).toISOString(),
+      total: 0,
+      venues: [] as never[],
+      nextCursor: null,
+      hasMore: false,
+      limit: VENUE_CATALOG_PAGE_SIZE,
+    };
     const payload = await withSoftTimeout(
       getCachedVenuesCatalog(family, { limit: VENUE_CATALOG_PAGE_SIZE }),
       VENUE_LIST_TIMEOUT_MS,
-      {
-        generatedAt: new Date(0).toISOString(),
-        total: 0,
-        venues: [],
-        nextCursor: null,
-        hasMore: false,
-        limit: VENUE_CATALOG_PAGE_SIZE,
-      },
+      emptyPayload,
       `venue-list-${family}`,
     );
     initialPage = mapVenueCatalogFeedPage(payload);
-    // Soft-timeout empty HTML was poisoning nginx proxy_cache (30m HIT, 0 venues for every city).
+    // Soft-timeout / miss: bounded retry. noStore ONLY when final HTML has 0 venues
+    // (do not call it before retry - that forced permanent private/no-store on /locations|/venues).
     if (!initialPage.venues.length) {
-      noStore();
-      const retry = await getCachedVenuesCatalog(family, { limit: VENUE_CATALOG_PAGE_SIZE });
+      const retry = await withSoftTimeout(
+        getCachedVenuesCatalog(family, { limit: VENUE_CATALOG_PAGE_SIZE }),
+        VENUE_LIST_RETRY_TIMEOUT_MS,
+        emptyPayload,
+        `venue-list-retry-${family}`,
+      );
       initialPage = mapVenueCatalogFeedPage(retry);
       if (!initialPage.venues.length) noStore();
     }

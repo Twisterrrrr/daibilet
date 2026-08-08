@@ -82,6 +82,17 @@ const venueListSelect = {
 
 type VenueListRecord = Prisma.VenueGetPayload<{ select: typeof venueListSelect }>;
 
+/** Catalog hub must load the full eligible set - take(500) made hero/chips stuck at 500. */
+export const VENUE_LEAN_HUB_MAX = 10_000;
+/** Keep IN(...) lists bounded so cold hub rebuild does not monopolize Postgres for 20s+. */
+const VENUE_ID_QUERY_CHUNK = 400;
+
+function chunkIds(ids: string[], size = VENUE_ID_QUERY_CHUNK): string[][] {
+  const out: string[][] = [];
+  for (let i = 0; i < ids.length; i += size) out.push(ids.slice(i, i + size));
+  return out;
+}
+
 /**
  * Count logical products per venue (not EventSession rows / dated TC twins).
  * Prefer EventOverride.mergeGroupKey, else normalized title.
@@ -94,28 +105,30 @@ export async function fetchVenueDistinctEventCounts(
   if (!ids.length) return counts;
 
   const titleExpr = sqlNormalizedEventTitle(`coalesce(nullif(trim(o.title), ''), e.title)`);
-  const placeholders = ids.map((_, i) => `$${i + 1}`).join(', ');
-  const distinctRows = await prisma.$queryRawUnsafe<Array<{ venueId: string; events: number }>>(
-    `
-      select
-        e."venueId" as "venueId",
-        count(distinct coalesce(
-          nullif(trim(o."mergeGroupKey"), ''),
-          nullif(${titleExpr}, ''),
-          e.id
-        ))::int as events
-      from "Event" e
-      left join "EventOverride" o on o."eventId" = e.id
-      where e."venueId" in (${placeholders})
-        and e.status not in ('HIDDEN', 'DRAFT')
-      group by e."venueId"
-    `,
-    ...ids,
-  );
+  for (const batch of chunkIds(ids)) {
+    const placeholders = batch.map((_, i) => `$${i + 1}`).join(', ');
+    const distinctRows = await prisma.$queryRawUnsafe<Array<{ venueId: string; events: number }>>(
+      `
+        select
+          e."venueId" as "venueId",
+          count(distinct coalesce(
+            nullif(trim(o."mergeGroupKey"), ''),
+            nullif(${titleExpr}, ''),
+            e.id
+          ))::int as events
+        from "Event" e
+        left join "EventOverride" o on o."eventId" = e.id
+        where e."venueId" in (${placeholders})
+          and e.status not in ('HIDDEN', 'DRAFT')
+        group by e."venueId"
+      `,
+      ...batch,
+    );
 
-  for (const row of distinctRows) {
-    if (!row.venueId) continue;
-    counts.set(row.venueId, Number(row.events) || 0);
+    for (const row of distinctRows) {
+      if (!row.venueId) continue;
+      counts.set(row.venueId, Number(row.events) || 0);
+    }
   }
   return counts;
 }
@@ -126,9 +139,6 @@ export async function fetchVenueDistinctEventCounts(
  * Also unions content places (park/monument/museum/…) with PUBLISHED|CANDIDATE
  * so zero-event must-see entities are not dropped by the top-N event sort.
  */
-/** Catalog hub must load the full eligible set - take(500) made hero/chips stuck at 500. */
-export const VENUE_LEAN_HUB_MAX = 10_000;
-
 export async function fetchLeanPublicVenueRows(
   limit = VENUE_LEAN_HUB_MAX,
   options: { leanText?: boolean; q?: string } = {},
@@ -228,42 +238,45 @@ export type VenueEventFacetCounts = {
 export async function fetchVenueEventFacetCounts(venueIds: string[]): Promise<VenueEventFacetCounts> {
   const waterCounts = new Map<string, number>();
   const busCounts = new Map<string, number>();
-  if (!venueIds.length) return { waterCounts, busCounts };
+  const ids = [...new Set((venueIds || []).map((id) => String(id || '').trim()).filter(Boolean))];
+  if (!ids.length) return { waterCounts, busCounts };
 
-  const rows = await prisma.$queryRaw<Array<{ venueId: string; waterEvents: number; busEvents: number }>>`
-    select
-      e."venueId" as "venueId",
-      count(*) filter (
-        where
-          coalesce(cat.title, '') ~* 'водн|речн|теплоход|катер'
-          or coalesce(sub.title, '') ~* 'водн|речн|теплоход|катер'
-          or coalesce(e.title, '') ~* 'теплоход|катер|яхт|корабл|судн|лодк|речн|река|канал|круиз|развод.*мост|мост.*развод|прогулк'
-          or exists (
-            select 1
-            from "EventOffer" o
-            where o."eventId" = e.id
-              and o.active = true
-              and o."sourceCode"::text = 'TEPLOHOD'
-          )
-      )::int as "waterEvents",
-      count(*) filter (
-        where
-          coalesce(cat.title, '') ~* 'автобус|hop.?on|hop.?off|city.?sightseeing|сити.?тур'
-          or coalesce(sub.title, '') ~* 'автобус|hop.?on|hop.?off|city.?tour'
-          or coalesce(e.title, '') ~* 'автобус|hop.?on|hop.?off|city.?sightseeing|сити.?тур|двухэтажн|садись.?руляй'
-      )::int as "busEvents"
-    from "Event" e
-    left join "Category" cat on cat.id = e."categoryId"
-    left join "Subcategory" sub on sub.id = e."primarySubcategoryId"
-    where e."venueId" in (${join(venueIds)})
-      and e.status not in ('HIDDEN', 'DRAFT')
-    group by e."venueId"
-  `;
+  for (const batch of chunkIds(ids)) {
+    const rows = await prisma.$queryRaw<Array<{ venueId: string; waterEvents: number; busEvents: number }>>`
+      select
+        e."venueId" as "venueId",
+        count(*) filter (
+          where
+            coalesce(cat.title, '') ~* 'водн|речн|теплоход|катер'
+            or coalesce(sub.title, '') ~* 'водн|речн|теплоход|катер'
+            or coalesce(e.title, '') ~* 'теплоход|катер|яхт|корабл|судн|лодк|речн|река|канал|круиз|развод.*мост|мост.*развод|прогулк'
+            or exists (
+              select 1
+              from "EventOffer" o
+              where o."eventId" = e.id
+                and o.active = true
+                and o."sourceCode"::text = 'TEPLOHOD'
+            )
+        )::int as "waterEvents",
+        count(*) filter (
+          where
+            coalesce(cat.title, '') ~* 'автобус|hop.?on|hop.?off|city.?sightseeing|сити.?тур'
+            or coalesce(sub.title, '') ~* 'автобус|hop.?on|hop.?off|city.?tour'
+            or coalesce(e.title, '') ~* 'автобус|hop.?on|hop.?off|city.?sightseeing|сити.?тур|двухэтажн|садись.?руляй'
+        )::int as "busEvents"
+      from "Event" e
+      left join "Category" cat on cat.id = e."categoryId"
+      left join "Subcategory" sub on sub.id = e."primarySubcategoryId"
+      where e."venueId" in (${join(batch)})
+        and e.status not in ('HIDDEN', 'DRAFT')
+      group by e."venueId"
+    `;
 
-  for (const row of rows) {
-    if (!row.venueId) continue;
-    waterCounts.set(row.venueId, Number(row.waterEvents) || 0);
-    busCounts.set(row.venueId, Number(row.busEvents) || 0);
+    for (const row of rows) {
+      if (!row.venueId) continue;
+      waterCounts.set(row.venueId, Number(row.waterEvents) || 0);
+      busCounts.set(row.venueId, Number(row.busEvents) || 0);
+    }
   }
   return { waterCounts, busCounts };
 }

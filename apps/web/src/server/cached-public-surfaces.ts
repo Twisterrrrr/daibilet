@@ -144,7 +144,7 @@ export async function getCachedVenuesCatalog(
   const q = options.q?.trim() || '';
   // Cache key: city+kind+cursor(+scale/logistics[+sort/q]).
   const cacheKeyParts = [
-    'public-venues-catalog-v4-http',
+    'public-venues-catalog-v5-http',
     family,
     String(limit),
     city || 'all',

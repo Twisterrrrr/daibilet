@@ -1,3 +1,22 @@
+## 2026-08-08 - Sitewide hang: venues hub cold rebuild + catalog no-store
+
+### Наблюдения
+- Owner: «всё висит»; `/locations` total ~9с при TTFB ~0.2с (soft-timeout 4с + unbounded retry).
+- Live API cold: `/api/public/venues?family=location&limit=24` **~21с**; destinations cold ~8с; warm после прогрева ~0.18с.
+- `/venues`+`/locations` HTML: `Cache-Control: private, no-store` - `noStore()` вызывался **до** успешного retry пустого soft-timeout.
+- City hubs Pack C: parallel STALE 404 (см. запись выше) - API 200, nginx/Next держали 404.
+
+### Решения
+- Backend: forever soft-SWR + single-flight для `publicVenueHubRows` и `buildPublicVenuesDto` (как catalog INC.504.4).
+- Lean SQL: chunk IN(venueId) по 400 для distinct counts / water-bus facets.
+- Web: `VenueListPage` - `noStore` только при финальном empty; bounded retry; cache key `v5`.
+- City miss cache + deploy revalidate paths (parallel agent) + `/venues` `/locations` в post-deploy tags `public-surfaces`.
+
+### Проблемы
+- Cold first miss после API restart всё ещё дорогой (~rebuild hub); SWR спасает последующие запросы. Disk snapshot для venue hub - follow-up.
+
+---
+
 ## 2026-08-08 - CRITICAL: city hubs STALE 404 (Samara / Pack C)
 
 ### Наблюдения

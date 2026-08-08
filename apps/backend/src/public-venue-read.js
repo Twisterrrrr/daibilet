@@ -29,10 +29,14 @@ import { dedupePublicVenueLinkedEvents } from './public-venue-linked-events.ts';
 import { pickFirstUsableEventImageUrl } from './event-image-url.ts';
 
 const PUBLIC_CATALOG_CACHE_MS = 5 * 60 * 1000;
+/** Soft TTL: serve expired hub while single-flight rebuild runs (INC.504 venues hang). */
+const PUBLIC_VENUE_HUB_STALE_MS = Number(process.env.PUBLIC_VENUE_HUB_STALE_MS || 30 * 60 * 1000);
 const PROJECT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 
 let publicVenueHubCache = null;
 let publicVenueCatalogLists = null;
+/** @type {Map<string, Promise<any[]>>} */
+const publicVenueHubBuilds = new Map();
 
 /** Optional override for catalog sessions (tests / legacy inject). */
 let catalogSessionsProvider = null;
@@ -42,14 +46,26 @@ export function setPublicVenueCatalogSessionsProvider(fn) {
 }
 
 export function clearPublicVenueReadCache() {
-  publicVenueHubCache = null;
-  publicVenueCatalogLists = null;
+  // Soft-invalidate: keep last hub for SWR so /locations|/venues never await 20s cold rebuild.
+  if (publicVenueHubCache?.rows?.length) {
+    publicVenueHubCache = { ...publicVenueHubCache, expiresAt: 0 };
+  } else {
+    publicVenueHubCache = null;
+  }
+  if (publicVenueCatalogLists?.institution || publicVenueCatalogLists?.location) {
+    publicVenueCatalogLists = { ...publicVenueCatalogLists, expiresAt: 0 };
+  } else {
+    publicVenueCatalogLists = null;
+  }
 }
 
 export async function warmPublicVenueCatalogCache(db) {
-  const rows = await publicVenueHubRows(db, 500);
+  // Full eligible hub (not take 500) so chips/totals match live catalog.
+  const rows = await publicVenueHubRows(db, VENUE_CATALOG_HUB_MAX, { requireEvents: false });
+  const now = Date.now();
   publicVenueCatalogLists = {
-    expiresAt: Date.now() + PUBLIC_CATALOG_CACHE_MS,
+    expiresAt: now + PUBLIC_CATALOG_CACHE_MS,
+    staleUntil: now + PUBLIC_VENUE_HUB_STALE_MS,
     institution: [],
     location: [],
   };
@@ -61,7 +77,12 @@ export async function warmPublicVenueCatalogCache(db) {
 }
 
 export function warmVenueCatalogList(family) {
-  if (!publicVenueCatalogLists || publicVenueCatalogLists.expiresAt <= Date.now()) return null;
+  if (!publicVenueCatalogLists) return null;
+  const now = Date.now();
+  if (publicVenueCatalogLists.expiresAt <= now) {
+    // Past soft TTL still OK for callers that only need a hint; hard miss after staleUntil.
+    if (now > (publicVenueCatalogLists.staleUntil || 0)) return null;
+  }
   if (family === 'institution') return publicVenueCatalogLists.institution;
   if (family === 'location') return publicVenueCatalogLists.location;
   return null;
@@ -1011,15 +1032,8 @@ function venueGroupsOverlap(a, b) {
   return (b?.mergedVenueIds || (b?.id ? [b.id] : [])).some((id) => left.has(id));
 }
 
-export async function publicVenueHubRows(db, limit = 500, options = {}) {
-  const now = Date.now();
-  const take = Math.max(1, Math.min(Number(limit) || 500, 10000));
-  const cacheKey = `${take}:${options.requireEvents === false ? 'all' : 'hub'}`;
-  if (publicVenueHubCache?.cacheKey === cacheKey && publicVenueHubCache.expiresAt > now) {
-    return publicVenueHubCache.rows;
-  }
-
-  // Lean Prisma select + `_count` (active events) - no full catalog session hydrate for tiles.
+async function rebuildPublicVenueHubRows(take, options = {}) {
+  // Lean Prisma select + distinct product counts - no full catalog session hydrate for tiles.
   // Hero covers still need event/override fallbacks when Venue.heroImageUrl is empty.
   const leanRows = await fetchLeanPublicVenueRows(take, { leanText: false });
   const venueIds = leanRows.map((row) => row.id);
@@ -1040,27 +1054,63 @@ export async function publicVenueHubRows(db, limit = 500, options = {}) {
     mapped.city = resolvePublicVenueCity(mapped);
     return applyPublicVenueNormalization(mapped);
   });
-  const merged = mergePublicVenueHubRows(enriched.filter((row) => isPublicVenueHub(row, options)));
-  publicVenueHubCache = {
-    cacheKey,
-    expiresAt: now + PUBLIC_CATALOG_CACHE_MS,
-    rows: merged,
-  };
-  if (!publicVenueCatalogLists || publicVenueCatalogLists.expiresAt <= now) {
-    if (options.requireEvents !== false) {
-      publicVenueCatalogLists = {
-        expiresAt: now + PUBLIC_CATALOG_CACHE_MS,
-        institution: [],
-        location: [],
+  return mergePublicVenueHubRows(enriched.filter((row) => isPublicVenueHub(row, options)));
+}
+
+function schedulePublicVenueHubRebuild(cacheKey, take, options = {}) {
+  const inflight = publicVenueHubBuilds.get(cacheKey);
+  if (inflight) return inflight;
+
+  const build = rebuildPublicVenueHubRows(take, options)
+    .then((merged) => {
+      const builtAt = Date.now();
+      publicVenueHubCache = {
+        cacheKey,
+        expiresAt: builtAt + PUBLIC_CATALOG_CACHE_MS,
+        staleUntil: builtAt + PUBLIC_VENUE_HUB_STALE_MS,
+        rows: merged,
       };
-      for (const row of merged) {
-        const item = mapPublicVenueListItem(row);
-        if (item.template === 'institution') publicVenueCatalogLists.institution.push(item);
-        else publicVenueCatalogLists.location.push(item);
+      // Keep family lists in sync with full hub (requireEvents:false path used by /locations).
+      if (options.requireEvents === false || !publicVenueCatalogLists) {
+        publicVenueCatalogLists = {
+          expiresAt: builtAt + PUBLIC_CATALOG_CACHE_MS,
+          staleUntil: builtAt + PUBLIC_VENUE_HUB_STALE_MS,
+          institution: [],
+          location: [],
+        };
+        for (const row of merged) {
+          const item = mapPublicVenueListItem(row);
+          if (item.template === 'institution') publicVenueCatalogLists.institution.push(item);
+          else publicVenueCatalogLists.location.push(item);
+        }
       }
-    }
+      return merged;
+    })
+    .finally(() => {
+      if (publicVenueHubBuilds.get(cacheKey) === build) publicVenueHubBuilds.delete(cacheKey);
+    });
+
+  publicVenueHubBuilds.set(cacheKey, build);
+  return build;
+}
+
+export async function publicVenueHubRows(db, limit = 500, options = {}) {
+  const now = Date.now();
+  const take = Math.max(1, Math.min(Number(limit) || 500, 10000));
+  const cacheKey = `${take}:${options.requireEvents === false ? 'all' : 'hub'}`;
+  const cached = publicVenueHubCache?.cacheKey === cacheKey ? publicVenueHubCache : null;
+
+  if (cached?.rows?.length && cached.expiresAt > now) {
+    return cached.rows;
   }
-  return merged;
+
+  // Forever soft-SWR: any previous hub beats a 15-30s cold rebuild on the request path.
+  if (cached?.rows?.length) {
+    void schedulePublicVenueHubRebuild(cacheKey, take, options);
+    return cached.rows;
+  }
+
+  return schedulePublicVenueHubRebuild(cacheKey, take, options);
 }
 
 const PUBLIC_VENUE_ROW_SELECT = `
