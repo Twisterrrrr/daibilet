@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import type { MouseEvent } from 'react';
-import { ArrowRight, CheckCircle2, Clock3, Download, ExternalLink, HelpCircle, MessageSquarePlus, XCircle } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Clock3, Download, ExternalLink, HelpCircle, Mail, MessageSquarePlus, XCircle } from 'lucide-react';
 
 import { SITE_TIME_ZONE, parseSessionStartsAt } from '@/lib/datetime';
 import {
@@ -13,6 +13,12 @@ import {
 import { upsertInternalOrderInStorage } from '@/lib/buyer-checkout';
 import { buyerTicketPath, openBuyerTicketDownload } from '@/lib/buyer-ticket';
 import { formatNumber } from '@/lib/format';
+
+/** Product support inbox (ContactForm + empty-state mailto). */
+export const BUYER_SUPPORT_EMAIL = 'hello@daibilet.ru';
+
+export const ORDER_SUPPORT_HINT =
+  'Возврат по правилам площадки. Ответим в рабочие часы.';
 
 export type BuyerOrder = {
   id: string;
@@ -80,6 +86,8 @@ export function BuyerOrderCard({ order, accountEmail }: Props) {
 
   const reviewHref = buildOrderReviewHref(order);
   const showReview = Boolean(reviewHref && orderEventHasStarted(order));
+  const supportMailto = buildOrderSupportMailto(order, profileEmail);
+  const showActions = showTicketActions || showEmailFallback || showReview || Boolean(supportMailto);
 
   const openImportTicket = () => {
     const record = mapBuyerOrderToImportTicketRecord(order, profileEmail);
@@ -150,46 +158,61 @@ export function BuyerOrderCard({ order, accountEmail }: Props) {
           </div>
         </div>
 
-        {showTicketActions || showEmailFallback || showReview ? (
-          <div className="flex shrink-0 flex-wrap items-center gap-2">
-            {showTicketActions ? (
-              <>
-                <button
-                  type="button"
-                  onClick={onDownload}
-                  className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg bg-primary-600 px-3.5 py-2 text-sm font-semibold text-white hover:bg-primary-700"
-                >
-                  <Download className="h-3.5 w-3.5" />
-                  Скачать
-                </button>
-                {ticketOpenHref ? (
-                  <Link
-                    href={ticketOpenHref}
-                    onClick={onOpenImport}
-                    className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg border border-primary-200 bg-white px-3 py-2 text-sm font-semibold text-primary-700 hover:bg-primary-50"
+        {showActions ? (
+          <div className="flex shrink-0 flex-col items-stretch gap-1.5 sm:items-end">
+            <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+              {showTicketActions ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={onDownload}
+                    className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg bg-primary-600 px-3.5 py-2 text-sm font-semibold text-white hover:bg-primary-700"
                   >
-                    <ExternalLink className="h-3.5 w-3.5" />
-                    Открыть
-                  </Link>
-                ) : null}
-              </>
-            ) : null}
+                    <Download className="h-3.5 w-3.5" />
+                    Скачать
+                  </button>
+                  {ticketOpenHref ? (
+                    <Link
+                      href={ticketOpenHref}
+                      onClick={onOpenImport}
+                      className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg border border-primary-200 bg-white px-3 py-2 text-sm font-semibold text-primary-700 hover:bg-primary-50"
+                    >
+                      <ExternalLink className="h-3.5 w-3.5" />
+                      Открыть
+                    </Link>
+                  ) : null}
+                </>
+              ) : null}
 
-            {showEmailFallback ? (
-              <p className="max-w-[16rem] text-xs leading-5 text-slate-600 sm:text-right">
-                Билет отправлен на e-mail {profileEmail || 'указанный при покупке'}. Проверьте входящие и
-                папку «Спам».
-              </p>
-            ) : null}
+              {showEmailFallback ? (
+                <p className="max-w-[16rem] text-xs leading-5 text-slate-600 sm:text-right">
+                  Билет отправлен на e-mail {profileEmail || 'указанный при покупке'}. Проверьте входящие и
+                  папку «Спам».
+                </p>
+              ) : null}
 
-            {showReview && reviewHref ? (
-              <Link
-                href={reviewHref}
-                className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg border border-primary-200 bg-white px-3 py-2 text-sm font-semibold text-primary-700 hover:bg-primary-50"
-              >
-                <MessageSquarePlus className="h-3.5 w-3.5" />
-                Отзыв
-              </Link>
+              {showReview && reviewHref ? (
+                <Link
+                  href={reviewHref}
+                  className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg border border-primary-200 bg-white px-3 py-2 text-sm font-semibold text-primary-700 hover:bg-primary-50"
+                >
+                  <MessageSquarePlus className="h-3.5 w-3.5" />
+                  Отзыв
+                </Link>
+              ) : null}
+
+              {supportMailto ? (
+                <a
+                  href={supportMailto}
+                  className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-800"
+                >
+                  <Mail className="h-3.5 w-3.5" />
+                  Вопрос по заказу
+                </a>
+              ) : null}
+            </div>
+            {supportMailto ? (
+              <p className="max-w-[18rem] text-[11px] leading-4 text-slate-400 sm:text-right">{ORDER_SUPPORT_HINT}</p>
             ) : null}
           </div>
         ) : null}
@@ -245,7 +268,7 @@ export function BuyerOrdersEmptyState({ lookup }: { lookup: string }) {
         По email «{lookup}» заказов не найдено. Убедитесь, что при покупке (виджет или Дайбилет) указан тот же email, что и в
         аккаунте.
       </p>
-      <a href="mailto:hello@daibilet.ru" className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-primary-700 hover:text-primary-800">
+      <a href={`mailto:${BUYER_SUPPORT_EMAIL}`} className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-primary-700 hover:text-primary-800">
         Написать в поддержку <ArrowRight className="h-4 w-4" />
       </a>
     </div>
@@ -313,6 +336,43 @@ function extractSlugFromEventUrl(eventUrl: string): string {
   } catch {
     return '';
   }
+}
+
+function buildOrderSupportMailto(order: BuyerOrder, accountEmail?: string | null): string {
+  const orderCode = String(order.number || '').trim();
+  const eventTitle = String(order.eventTitle || '').trim() || (order.sourceKind === 'internal' ? 'Входной билет' : 'Заказ');
+  const email = String(accountEmail || order.buyer.email || '').trim();
+  const ticketCodes = Array.from(
+    new Set(
+      order.tickets
+        .map((ticket) => String(ticket.number || '').trim())
+        .filter((code) => Boolean(code) && code !== orderCode),
+    ),
+  );
+  if (!ticketCodes.length) {
+    const fallback = String(order.tickets[0]?.number || '').trim();
+    if (fallback && fallback !== orderCode) ticketCodes.push(fallback);
+  }
+
+  const subject = `[Вопрос по заказу] ${orderCode || 'без кода'}`;
+  const body = [
+    'Здравствуйте!',
+    '',
+    'У меня вопрос по заказу.',
+    '',
+    orderCode ? `Код заказа: ${orderCode}` : null,
+    ticketCodes.length ? `Коды билетов: ${ticketCodes.join(', ')}` : null,
+    `Событие: ${eventTitle}`,
+    email ? `Email покупателя: ${email}` : null,
+    order.providerName ? `Площадка / провайдер: ${order.providerName}` : null,
+    '',
+    'Суть вопроса:',
+    '',
+  ]
+    .filter((line) => line != null)
+    .join('\n');
+
+  return `mailto:${BUYER_SUPPORT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
 function buildOrderReviewHref(order: BuyerOrder): string | null {

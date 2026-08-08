@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Loader2, LogOut, Receipt, Ticket } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
-import { BuyerOrderCard, BuyerOrdersEmptyState, type BuyerOrder } from '@/components/BuyerOrderCard.client';
+import { BuyerOrderCard, BuyerOrdersEmptyState, ORDER_SUPPORT_HINT, type BuyerOrder } from '@/components/BuyerOrderCard.client';
 import {
   filterInternalOrdersForEmail,
   readInternalOrdersFromStorage,
@@ -207,6 +207,7 @@ export function AccountPurchasesPageView() {
                   Привязаны к email {user?.email}
                   {internalCount || widgetCount ? ` · Дайбилет ${internalCount} · виджеты ${widgetCount}` : null}
                 </p>
+                <p className="mt-1.5 text-xs text-slate-400">{ORDER_SUPPORT_HINT}</p>
               </div>
             </div>
 

@@ -7,6 +7,16 @@
 
 ---
 
+## UX: Buyer LK order support mailto (2026-08-08)
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| UX.BUYER-SUPPORT.1 | «Вопрос по заказу» secondary в BuyerOrderCard + mailto hello@ | Высокий | 🔄 |
+| UX.BUYER-SUPPORT.2 | Hint: возврат по правилам площадки / ответ в рабочие часы | Высокий | 🔄 |
+| UX.BUYER-SUPPORT.3 | Commit+push+MSK deploy+smoke `/account/purchases` | Высокий | 🔄 |
+
+---
+
 ## Epic: WEB.LIGHT - lightweight HTML + robots (2026-08-08)
 
 **Канон:** [web-lightweight-seo.md](./web-lightweight-seo.md)  

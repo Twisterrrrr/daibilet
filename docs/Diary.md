@@ -1,3 +1,18 @@
+## 2026-08-08 - Buyer LK: «Вопрос по заказу» (mailto, no self-serve refund)
+
+### Наблюдения
+- Owner UX: в ряду действий покупки secondary «Вопрос по заказу»; возврат только по правилам площадки; без self-serve refund.
+- Support inbox уже в продукте: `hello@daibilet.ru` (`ContactForm`, empty-state LK).
+
+### Решения
+- `BuyerOrderCard`: mailto с `publicCode`/номером заказа, кодами билетов (если есть), событием, email; hint «Возврат по правилам площадки. Ответим в рабочие часы.»
+- Список `/account/purchases`: тот же hint у заголовка; Daibilet + widget/TC rows.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-08 - Architecture: lightweight web + robots (WEB.LIGHT)
 
 ### Наблюдения
