@@ -24,7 +24,10 @@ export type VenueCatalogFeedQuery = {
 };
 
 export type VenueCatalogFeedStats = {
+  /** Filtered catalog size (includes 0-event content places). */
   venues: number;
+  /** Venues with at least one distinct product; 0 while countsPending. */
+  venuesWithEvents?: number;
   /** Filtered-universe event total (event≠slots); 0 while countsPending. */
   events?: number;
   cities: Record<string, number>;
@@ -56,6 +59,7 @@ export type VenueCatalogMapPin = {
 function emptyStats(): VenueCatalogFeedStats {
   return {
     venues: 0,
+    venuesWithEvents: 0,
     events: 0,
     cities: {},
     types: {},
@@ -121,6 +125,7 @@ export function mapVenueCatalogFeedPage(payload: PublicVenuesDto | null | undefi
     countsPending,
     stats: {
       venues: Number(stats?.venues) || Number(payload?.total) || venues.length,
+      venuesWithEvents: Number(stats?.venuesWithEvents) || 0,
       events: Number(stats?.events) || 0,
       cities: stats?.cities || {},
       types: stats?.types || {},

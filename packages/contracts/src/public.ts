@@ -369,7 +369,10 @@ export interface PublicVenuesDto extends ApiEnvelope {
   /** Lazy map pins (`mode=pins`) - slug/name/lat/lng/kind only. */
   pins?: PublicVenueMapPinDto[];
   stats?: {
+    /** Filtered catalog size (includes 0-event content places). */
     venues: number;
+    /** Venues in filtered universe with at least one distinct product (event≠slots). */
+    venuesWithEvents?: number;
     /** Distinct-product event total for the filtered universe (not page slice). */
     events?: number;
     cities: Record<string, number>;

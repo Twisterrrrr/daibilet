@@ -337,9 +337,12 @@ export function VenuesCatalogView({
         setNextCursor(typedShell.nextCursor);
         setStats({
           ...typedShell.stats,
+          // Keep city-scoped catalog + afisha totals on hero while type chips filter the list.
           types: basePage.stats.types,
           cities: basePage.stats.cities,
           venues: basePage.stats.venues,
+          venuesWithEvents: basePage.stats.venuesWithEvents,
+          events: basePage.stats.events,
         });
         if (typedShell.countsPending && typedShell.venues.length) {
           const typedIds = typedShell.venues.map((venue) => venue.id);
@@ -483,9 +486,12 @@ export function VenuesCatalogView({
   const heroTitle = cityName
     ? `Музеи, театры и пространства ${cityToGenitive(cityName)}`
     : 'Музеи, театры и пространства';
+  // Eyebrow = catalog size; «В афише» = venues with real products (not 0-event content places).
   const heroTotal = stats.venues || total;
+  const heroAfishaVenues = Number(stats.venuesWithEvents) || 0;
   const heroEvents = Number(stats.events) || 0;
-  const showHeroEvents = heroEvents > 0 && !catalogLoading;
+  const showHeroAfisha =
+    !listPending && !catalogLoading && (heroAfishaVenues > 0 || heroEvents > 0);
 
   return (
     <>
@@ -515,10 +521,12 @@ export function VenuesCatalogView({
           />
         }
       >
-        {!listPending && heroTotal ? (
+        {showHeroAfisha ? (
           <p className="mx-auto mt-4 max-w-4xl text-sm font-medium text-white/85">
-            В афише {pluralVenues(heroTotal)}
-            {showHeroEvents ? ` · ${pluralEvents(heroEvents)}` : ''}
+            В афише{' '}
+            {heroAfishaVenues > 0 ? pluralVenues(heroAfishaVenues) : null}
+            {heroAfishaVenues > 0 && heroEvents > 0 ? ' · ' : null}
+            {heroEvents > 0 ? pluralEvents(heroEvents) : null}
           </p>
         ) : null}
         <div className="mt-6 flex w-full max-w-5xl flex-col gap-3 rounded-2xl bg-white p-3 text-left text-slate-900 shadow-lg sm:flex-row sm:items-stretch">

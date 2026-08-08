@@ -7,6 +7,16 @@
 
 ---
 
+## UX: /venues hero «В афише» vs catalog total (2026-08-08)
+
+**Контекст:** owner - subtitle «В афише 1 245 площадок» врал (это размер каталога, не afisha).
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| FIX.VENUES-HERO-AFISHA | Hero: `venuesWithEvents` + events (event≠slots); eyebrow = catalog size | Критический | ✅ code; deploy пачкой |
+
+---
+
 ## UX: Buyer LK order support mailto (2026-08-08)
 
 | ID | Задача | Приоритет | Статус |

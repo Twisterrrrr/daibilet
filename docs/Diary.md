@@ -1,4 +1,19 @@
-## 2026-08-08 - Buyer LK: «Вопрос по заказу» (mailto, no self-serve refund)
+## 2026-08-08 - /venues hero: «В афише» ≠ весь каталог
+
+### Наблюдения
+- Hero subtitle «В афише 1 245 площадок · 1 139 событий» врал: `stats.venues` = весь family `institution` (вкл. 0-event content places), а формулировка «В афише» читается как площадки с событиями.
+- Eyebrow «1 245 площадок · N городов» для размера каталога корректен; chips типов суммируются в тот же total.
+- `stats.events` после `1f510b3e` уже sum distinct products over filtered universe (не page/slots) - на скрине 1 139 выглядит согласованно с event≠slots.
+
+### Решения
+- API `stats.venuesWithEvents`: count venues с `events > 0` в filtered universe; `stats.venues` остаётся catalog size.
+- Hero: eyebrow = `stats.venues`; «В афише X площадок · Y событий» = `venuesWithEvents` + `events`.
+- Type-chip path сохраняет city-scoped afisha stats на hero (не подменяет type-slice).
+
+### Проблемы
+- Postgres MCP в сессии недоступен - точный X не сверен SQL; логика по коду. Live deploy batch/по запросу.
+
+---
 
 ### Наблюдения
 - Owner UX: в ряду действий покупки secondary «Вопрос по заказу»; возврат только по правилам площадки; без self-serve refund.

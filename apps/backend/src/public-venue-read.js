@@ -2029,6 +2029,24 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
         .map((venue) => resolveLocationLogisticsFromKind(venue.type, venue.name))
         .filter((value) => value !== 'other'),
     );
+    // Catalog size (incl. 0-event content places) vs afisha metrics (event≠slots).
+    const catalogVenues = filteredItems.length;
+    const eventsTotal = countsPending
+      ? 0
+      : filteredItems.reduce((sum, venue) => sum + (Number(venue.events) || 0), 0);
+    const venuesWithEvents = countsPending
+      ? 0
+      : filteredItems.reduce((sum, venue) => sum + (Number(venue.events) > 0 ? 1 : 0), 0);
+    const catalogStats = {
+      venues: catalogVenues,
+      venuesWithEvents,
+      // Sum over filtered universe (city/type/q), not the current page of 24.
+      events: eventsTotal,
+      cities,
+      types,
+      scales,
+      logistics,
+    };
     if (isPins) {
       return {
         generatedAt: new Date().toISOString(),
@@ -2038,14 +2056,7 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
         nextCursor: null,
         hasMore: false,
         limit,
-        stats: {
-          venues: filteredItems.length,
-          events: filteredItems.reduce((sum, venue) => sum + (Number(venue.events) || 0), 0),
-          cities,
-          types,
-          scales,
-          logistics,
-        },
+        stats: catalogStats,
       };
     }
     return {
@@ -2056,17 +2067,7 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
       hasMore,
       limit,
       countsPending: Boolean(countsPending),
-      stats: {
-        venues: filteredItems.length,
-        // Sum over filtered universe (city/type/q), not the current page of 24.
-        events: countsPending
-          ? 0
-          : filteredItems.reduce((sum, venue) => sum + (Number(venue.events) || 0), 0),
-        cities,
-        types,
-        scales,
-        logistics,
-      },
+      stats: catalogStats,
     };
   };
 
