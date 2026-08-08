@@ -1,3 +1,20 @@
+## 2026-08-08 - Fontanka 51-53: merge pier duplicates
+
+### Наблюдения
+- На `/locations` два причала: `prichal-na-fontanke-53` (TC `venue_60b602…`, хорошее shortDescription) и TEP `venue_tep_53` (shortDescription = список теплоходов «Адель»…).
+- Адрес канона был «д. 53»; TEP - «51-53». Оба в каталоге с ~5 saleable; у TC сотни Event.venueId.
+- cityInfo blurbs на эти slug не ссылаются.
+
+### Решения
+- Канон: `venue_60b602fed94a1fa681b69c1d` / `prichal-na-fontanke-53` → title/address 51-53, editorial description, `PUBLISHED`.
+- Twin `venue_tep_53`: rematch 5 `evt_tep_*` → канон, `HIDDEN` + `isIndexable=false`, alias TEPLOHOD/53 → канон.
+- `scripts/ensure-spb-fontanka-51-53-pier-merge.js`; tep-import: preserve HIDDEN + map place `53` → канон; override в `venue-address-overrides.json`.
+
+### Проблемы
+- Без API restart public cache может ещё отдавать twin; web deploy не нужен (контент в DB).
+- Следующий TEP import без обновлённого скрипта снова приклеит события к twin - нужен pull скрипта на MSK.
+
+---
 ## 2026-08-08 - Почему «пляшут» цифры (owner report)
 
 ### Наблюдения

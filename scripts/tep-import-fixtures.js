@@ -23,6 +23,11 @@ const pool = new Pool({ connectionString, max: 3 });
 const MIN_DISPLAY_PRICE_RUB = 100;
 const TEPL0HOD_SOURCE_ID = "src_teplohod";
 
+/** TEP place id → existing TicketsCloud / editorial Venue.id (hide twin, attach events to canon). */
+const TEP_PLACE_CANON_VENUE_IDS = new Map([
+  ["53", "venue_60b602fed94a1fa681b69c1d"], // Fontanka 51-53 pier (owner 2026-08-08)
+]);
+
 const CATEGORY_MAP = new Map([
   ["Речные прогулки", { categoryId: "cat_excursions", subcategoryId: "sub_excursions_water" }],
   ["Экскурсии", { categoryId: "cat_excursions", subcategoryId: "sub_excursions_tours" }],
@@ -367,6 +372,7 @@ async function upsertVenue(client, event, place, cityId) {
   const slug = slugify(`${venueTitle}-${externalPlaceId}`);
   const latitude = floatOrNull(place.lat);
   const longitude = floatOrNull(place.lng);
+  const canonVenueId = TEP_PLACE_CANON_VENUE_IDS.get(String(externalPlaceId)) || null;
   const result = await client.query(
     `
       insert into "Venue" (id, slug, title, description, "shortDescription", "heroImageUrl", "cityId", address, latitude, longitude, kind, "pageStatus", "createdAt", "updatedAt")
@@ -381,7 +387,10 @@ async function upsertVenue(client, event, place, cityId) {
         latitude = excluded.latitude,
         longitude = excluded.longitude,
         kind = excluded.kind,
-        "pageStatus" = case when "Venue"."pageStatus" = 'PUBLISHED' then "Venue"."pageStatus" else excluded."pageStatus" end,
+        "pageStatus" = case
+          when "Venue"."pageStatus" in ('PUBLISHED', 'HIDDEN') then "Venue"."pageStatus"
+          else excluded."pageStatus"
+        end,
         "updatedAt" = now()
       returning id
     `,
@@ -399,7 +408,20 @@ async function upsertVenue(client, event, place, cityId) {
     ],
   );
 
-  const venueId = result.rows[0].id;
+  const tepVenueId = result.rows[0].id;
+  const attachVenueId = canonVenueId || tepVenueId;
+
+  if (canonVenueId && canonVenueId !== tepVenueId) {
+    await client.query(
+      `
+        update "Venue"
+        set "pageStatus" = 'HIDDEN', "isIndexable" = false, "updatedAt" = now()
+        where id = $1
+      `,
+      [tepVenueId],
+    );
+  }
+
   await client.query(
     `
       insert into "VenueAlias" (id, "venueId", "sourceCode", "externalId", title, address)
@@ -409,9 +431,15 @@ async function upsertVenue(client, event, place, cityId) {
         title = excluded.title,
         address = excluded.address
     `,
-    [`venue_alias_tep_${externalPlaceId}`, venueId, String(externalPlaceId), venueTitle, place.address || null],
+    [
+      `venue_alias_tep_${externalPlaceId}`,
+      attachVenueId,
+      String(externalPlaceId),
+      venueTitle,
+      place.address || null,
+    ],
   );
-  return venueId;
+  return attachVenueId;
 }
 
 async function upsertEvent(client, event) {
