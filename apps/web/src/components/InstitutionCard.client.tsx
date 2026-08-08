@@ -53,7 +53,7 @@ export function InstitutionCard({ venue, href }: { venue: InstitutionCardVenue; 
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-card bg-white shadow-card transition duration-300 hover:-translate-y-0.5 hover:shadow-card-hover">
       <Link href={href} className="flex flex-1 flex-col no-underline">
-        <div className="relative aspect-[3/4] overflow-hidden bg-surface-muted sm:aspect-[2/3]">
+        <div className="relative aspect-video overflow-hidden bg-surface-muted">
           <SafeImage
             src={venue.heroImageUrl}
             alt=""

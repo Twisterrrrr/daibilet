@@ -19,7 +19,7 @@ export function LocationCardSkeleton() {
 export function InstitutionCardSkeleton() {
   return (
     <div className="flex animate-pulse flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white">
-      <div className="aspect-[3/4] bg-slate-200 sm:aspect-[2/3]" />
+      <div className="aspect-video bg-slate-200" />
       <div className="flex flex-1 flex-col gap-3 p-4">
         <div className="h-5 w-4/5 rounded bg-slate-200" />
         <div className="h-4 w-1/2 rounded bg-slate-100" />
