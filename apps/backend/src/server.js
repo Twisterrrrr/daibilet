@@ -132,6 +132,8 @@ const PUBLIC_RESPONSE_CACHE_MS = 5 * 60 * 1000;
 const PUBLIC_HTTP_CACHE_CONTROL = 'public, max-age=60, s-maxage=300, stale-while-revalidate=600';
 const MAX_PUBLIC_RESPONSE_CACHE_ENTRIES = 80;
 const publicResponseCache = new Map();
+/** @type {Map<string, Promise<unknown>>} */
+const publicResponseCacheBuilds = new Map();
 const publicCacheInvalidators = new Set();
 const publicCacheWarmers = new Set();
 let activeCorsRequest = null;
@@ -1312,13 +1314,25 @@ async function withPublicResponseCache(key, factory) {
   const cached = publicResponseCache.get(key);
   if (cached && cached.expiresAt > now) return cached.payload;
 
-  const payload = await factory();
-  publicResponseCache.set(key, {
-    expiresAt: now + PUBLIC_RESPONSE_CACHE_MS,
-    payload,
-  });
-  trimPublicResponseCache();
-  return payload;
+  const inflight = publicResponseCacheBuilds.get(key);
+  if (inflight) return inflight;
+
+  const build = Promise.resolve()
+    .then(() => factory())
+    .then((payload) => {
+      publicResponseCache.set(key, {
+        expiresAt: Date.now() + PUBLIC_RESPONSE_CACHE_MS,
+        payload,
+      });
+      trimPublicResponseCache();
+      return payload;
+    })
+    .finally(() => {
+      if (publicResponseCacheBuilds.get(key) === build) publicResponseCacheBuilds.delete(key);
+    });
+
+  publicResponseCacheBuilds.set(key, build);
+  return build;
 }
 
 function trimPublicResponseCache() {

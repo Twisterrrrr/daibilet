@@ -1034,20 +1034,21 @@ function venueGroupsOverlap(a, b) {
 
 async function rebuildPublicVenueHubRows(take, options = {}) {
   const shell = options.shell === true;
-  // Shell: skip distinct product SQL (+ optional facets) so /venues can paint cards first.
+  // Shell: skip distinct product SQL (+ facets + hero SQL) so /venues loadMore can paginate
+  // without waiting on a multi-second hub rebuild (cold miss after API restart).
   const leanRows = await fetchLeanPublicVenueRows(take, {
     leanText: false,
     skipEventCounts: shell,
   });
   const venueIds = leanRows.map((row) => row.id);
-  const missingHeroIds = leanRows
-    .filter((row) => !pickRealPublicImageUrl(row.heroImageUrl))
-    .map((row) => row.id);
+  const missingHeroIds = shell
+    ? []
+    : leanRows.filter((row) => !pickRealPublicImageUrl(row.heroImageUrl)).map((row) => row.id);
   const [facets, heroImageFallbacks] = await Promise.all([
     shell
       ? Promise.resolve({ waterCounts: new Map(), busCounts: new Map() })
       : fetchVenueEventFacetCounts(venueIds),
-    fetchVenueHeroImageFallbacks(missingHeroIds),
+    shell ? Promise.resolve(new Map()) : fetchVenueHeroImageFallbacks(missingHeroIds),
   ]);
   const enriched = applyVenueEventFacetCounts(leanRows, facets).map((row) => {
     const mapped = {
@@ -1102,11 +1103,31 @@ function schedulePublicVenueHubRebuild(cacheKey, take, options = {}) {
   return build;
 }
 
+function venueHubCacheBaseKey(take, options = {}) {
+  return `${take}:${options.requireEvents === false ? 'all' : 'hub'}`;
+}
+
+/**
+ * Soft rows without awaiting cold SQL.
+ * Shell may reuse full OR shell; full must not reuse shell (events would be 0).
+ */
+function findSoftVenueHubRows(take, options = {}) {
+  const base = venueHubCacheBaseKey(take, options);
+  const shell = options.shell === true;
+  const keys = shell ? [base, `${base}:shell`] : [base];
+  for (const key of keys) {
+    const cached = publicVenueHubCaches.get(key);
+    if (cached?.rows?.length) return { key, cached };
+  }
+  return null;
+}
+
 export async function publicVenueHubRows(db, limit = 500, options = {}) {
   const now = Date.now();
   const take = Math.max(1, Math.min(Number(limit) || 500, 10000));
   const shell = options.shell === true;
-  const cacheKey = `${take}:${options.requireEvents === false ? 'all' : 'hub'}${shell ? ':shell' : ''}`;
+  const baseKey = venueHubCacheBaseKey(take, options);
+  const cacheKey = `${baseKey}${shell ? ':shell' : ''}`;
   const cached = publicVenueHubCaches.get(cacheKey) || null;
 
   if (cached?.rows?.length && cached.expiresAt > now) {
@@ -1115,17 +1136,19 @@ export async function publicVenueHubRows(db, limit = 500, options = {}) {
 
   // Prefer a warm FULL hub over building a shell (already has accurate event≠slots counts).
   if (shell) {
-    const fullKey = `${take}:${options.requireEvents === false ? 'all' : 'hub'}`;
-    const full = publicVenueHubCaches.get(fullKey) || null;
-    if (full?.rows?.length) {
+    const full = publicVenueHubCaches.get(baseKey) || null;
+    if (full?.rows?.length && full.expiresAt > now) {
       return full.rows;
     }
   }
 
-  // Forever soft-SWR: any previous hub beats a 15-30s cold rebuild on the request path.
-  if (cached?.rows?.length) {
+  // Forever soft-SWR: any previous eligible hub beats a 15-30s cold rebuild on the request path.
+  // Critical for /venues «Показать ещё»: Next ISR can paint page-1 while API hub is empty after
+  // restart - but once shell/full exists (even soft-expired), page-2 must not wait on lean SQL.
+  const soft = findSoftVenueHubRows(take, options);
+  if (soft?.cached?.rows?.length) {
     void schedulePublicVenueHubRebuild(cacheKey, take, options);
-    return cached.rows;
+    return soft.cached.rows;
   }
 
   const rows = await schedulePublicVenueHubRebuild(cacheKey, take, options);

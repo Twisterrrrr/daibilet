@@ -19,7 +19,6 @@ import {
   resolveCatalogCityFilter,
 } from '@/lib/selected-city';
 import {
-  applyVenueCatalogEventCounts,
   fetchVenueCatalogEventCounts,
   fetchVenueCatalogPage,
   venueCatalogCacheKey,
@@ -176,29 +175,46 @@ export function LocationsCatalogView({
     loadMoreLock.current = true;
     setLoadingMore(true);
     const cursor = nextCursor;
-    // Shell page first - full counts on every «ещё» hang the list the same way as /venues.
-    fetchVenueCatalogPage({ ...feedQuery, cursor, counts: false })
-      .then(async (page) => {
-        let nextPage = page;
-        if (page.countsPending && page.venues.length) {
-          try {
-            const counts = await fetchVenueCatalogEventCounts(page.venues.map((venue) => venue.id));
-            nextPage = applyVenueCatalogEventCounts(page, counts);
-          } catch {
-            nextPage = {
-              ...page,
-              countsPending: false,
-              venues: page.venues.map((v) => ({ ...v, eventsPending: false })),
-            };
-          }
-        }
+    const requestId = catalogRequestId.current;
+    // Append shell first; enrich counts in background (same hang class as /venues loadMore).
+    void fetchVenueCatalogPage({ ...feedQuery, cursor, counts: false })
+      .then((page) => {
+        if (requestId !== catalogRequestId.current) return;
+        if (!page.venues.length) return;
         setVenues((prev) => {
           const seen = new Set(prev.map((item) => item.id));
-          return [...prev, ...nextPage.venues.filter((item) => !seen.has(item.id))];
+          return [...prev, ...page.venues.filter((item) => !seen.has(item.id))];
         });
-        setNextCursor(nextPage.nextCursor);
-        setTotal(nextPage.total);
-        if (nextPage.stats.venues) setStats(nextPage.stats);
+        setNextCursor(page.nextCursor);
+        setTotal(page.total);
+        if (page.stats.venues) setStats(page.stats);
+        loadMoreLock.current = false;
+        setLoadingMore(false);
+
+        if (!page.countsPending || !page.venues.length) return;
+        const pageIds = new Set(page.venues.map((venue) => venue.id));
+        void fetchVenueCatalogEventCounts(page.venues.map((venue) => venue.id))
+          .then((counts) => {
+            if (requestId !== catalogRequestId.current) return;
+            setVenues((prev) =>
+              prev.map((venue) => {
+                if (!pageIds.has(venue.id)) return venue;
+                return {
+                  ...venue,
+                  events: counts[venue.id] ?? venue.events ?? 0,
+                  eventsPending: false,
+                };
+              }),
+            );
+          })
+          .catch(() => {
+            if (requestId !== catalogRequestId.current) return;
+            setVenues((prev) =>
+              prev.map((venue) =>
+                pageIds.has(venue.id) ? { ...venue, eventsPending: false } : venue,
+              ),
+            );
+          });
       })
       .catch(() => undefined)
       .finally(() => {

@@ -50,6 +50,26 @@
 
 ---
 
+---
+
+## 2026-08-08 - /venues loadMore hang «Загружаем...»
+
+### Наблюдения
+- Owner: после 24 из ~1250 кнопка «Показать ещё» висит на «Загружаем...» N секунд.
+- `d6336346` уже звал shell `counts=0`, но `fetchVenuePageProgressive` / locations loadMore **ждали event-counts до append**.
+- Live: cold `/api/public/venues?counts=0` → nginx **504 ~60s**; warm page2 shell ~365ms + event-counts ~257ms.
+- Shell hub cold rebuild всё ещё делал `fetchVenueHeroImageFallbacks` по тысячам venue без hero - дорого; SSR/ISR мог отдать page-1 из Next cache без прогрева API.
+
+### Решения
+- Client `/venues`+`/locations`: append shell сразу, снять loadingMore, enrich counts в фоне; пустой envelope не сбрасывает cursor (retry после 504).
+- Backend shell rebuild: skip hero-fallback SQL; soft-SWR across full/shell keys so page-2 не ждёт cold lean SQL если sibling hub уже есть.
+- `withPublicResponseCache`: single-flight per key (анти-stampede на cursor pages).
+
+### Проблемы
+- Полный cold miss после API restart всё ещё строит lean hub (без counts/heroes) - быстрее, но не мгновенно; warm/SWR закрывает типичный loadMore path.
+
+---
+
 ## 2026-08-08 - /venues: «Показать ещё» + progressive loadMore
 
 ### Наблюдения

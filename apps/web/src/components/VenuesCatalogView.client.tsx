@@ -113,6 +113,23 @@ function mergeVenuePages(
   return [...prev, ...next.filter((item) => !seen.has(item.id))];
 }
 
+/** Patch event≠slots counts onto already-rendered cards (loadMore enrich). */
+function patchVenueEventCounts(
+  prev: VenueCatalogFeedPage['venues'],
+  counts: Record<string, number>,
+  pageIds: Set<string>,
+): VenueCatalogFeedPage['venues'] {
+  if (!pageIds.size) return prev;
+  return prev.map((venue) => {
+    if (!pageIds.has(venue.id)) return venue;
+    return {
+      ...venue,
+      events: counts[venue.id] ?? venue.events ?? 0,
+      eventsPending: false,
+    };
+  });
+}
+
 /** City scope for type-chip cache (type excluded). */
 function cityScopeKey(query: {
   family: string;
@@ -358,16 +375,38 @@ export function VenuesCatalogView({
     loadMoreLock.current = true;
     setLoadingMore(true);
     const cursor = nextCursor;
-    const controller = new AbortController();
-    // Shell + enrich: full counts on every page hang /venues (same as first paint).
-    void fetchVenuePageProgressive({ ...feedQuery, cursor }, controller.signal)
+    const requestId = catalogRequestId.current;
+    // Append shell cards ASAP; never block the button on event-counts or full hub SQL.
+    void fetchVenueCatalogPage({ ...feedQuery, cursor, counts: false })
       .then((page) => {
+        if (requestId !== catalogRequestId.current) return;
+        // Transient API miss/504 → empty envelope; keep cursor so user can retry.
+        if (!page.venues.length) return;
         setVenues((prev) => mergeVenuePages(prev, page.venues));
         setNextCursor(page.nextCursor);
         setTotal(page.total);
+        loadMoreLock.current = false;
+        setLoadingMore(false);
+
+        if (!page.countsPending || !page.venues.length) return;
+        const pageIds = new Set(page.venues.map((venue) => venue.id));
+        void fetchVenueCatalogEventCounts(page.venues.map((venue) => venue.id))
+          .then((counts) => {
+            if (requestId !== catalogRequestId.current) return;
+            setVenues((prev) => patchVenueEventCounts(prev, counts, pageIds));
+          })
+          .catch(() => {
+            if (requestId !== catalogRequestId.current) return;
+            setVenues((prev) =>
+              prev.map((venue) =>
+                pageIds.has(venue.id) ? { ...venue, eventsPending: false } : venue,
+              ),
+            );
+          });
       })
       .catch(() => undefined)
       .finally(() => {
+        // If shell failed before unlock above, still release the button.
         loadMoreLock.current = false;
         setLoadingMore(false);
       });
