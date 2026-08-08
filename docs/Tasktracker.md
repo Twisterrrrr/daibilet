@@ -2,7 +2,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| FIX.TC-BAD-TOKEN | my-day «Купить билет» → TC HTTPForbidden bad token (`r:` в URL) | Критический | 🔄 code; deploy MSK |
+| FIX.TC-BAD-TOKEN | my-day «Купить билет» → TC HTTPForbidden bad token (`r:` в URL) | Критический | ✅ `89abc556` API live; web Deploy MSK |
 | INC.VENUE-SOFT-ALL | API hang → soft-unavailable poison на всех venue PDP | Критический | ✅ ops restore; code soft≠ISR + catalog child mode |
 | INC.LOC404.VLAD | STALE 404 `/locations/saint-petersburg-vladimirskiy-sobor` | Критический | ✅ ops 200; code miss≠unavailable + canon redirect |
 | FIX.CITY-MULTI-LANDINGS | normalizeKnownCitySlug: все destination cities → концерты/стендап в hub/podborki | Критический | ✅ code; нужен web deploy |
