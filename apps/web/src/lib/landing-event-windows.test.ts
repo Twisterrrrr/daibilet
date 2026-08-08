@@ -44,6 +44,22 @@ test('moscow-city-day uses first Saturday of September ±1 day', () => {
   assert.ok(window);
   assert.equal(window!.singleDay, false);
   assert.ok(isDateInsideLandingWindow(saturday, window!));
+  assert.match(window!.label, /\d+-\d+ сентября/); // Fri–Sun range for filters
+  assert.ok(window!.titleLabel);
+  assert.match(window!.titleLabel!, /^\d+ сентября$/);
+  assert.equal(window!.titleLabel!.includes('-'), false);
+});
+
+test('moscow-city-day title uses peak Saturday, not Fri–Sun range', () => {
+  const title = resolveLandingTitleDateShort(
+    'moscow-city-day',
+    new Date('2026-08-06T12:00:00+03:00'),
+  );
+  assert.equal(title.useTodayWord, false);
+  assert.match(title.short, /^\d+ сентября$/);
+  assert.equal(title.short.includes('-'), false);
+  assert.match(title.window?.label || '', /\d+-\d+ сентября/);
+  assert.equal(title.short, title.window?.titleLabel);
 });
 
 test('session outside salute window is rejected', () => {

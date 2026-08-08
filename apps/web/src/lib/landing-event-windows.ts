@@ -6,8 +6,13 @@ export type LandingEventWindow = {
   start: Date;
   /** Inclusive end (local calendar day). */
   end: Date;
-  /** Short label for UI chips / titles, e.g. «9 мая». */
+  /** Short label for UI chips / filters, e.g. «4-6 сентября». */
   label: string;
+  /**
+   * SEO/H1 date phrase when the holiday has a peak day inside a multi-day window.
+   * Filters keep `label`; titles prefer this (e.g. City Day → «5 сентября»).
+   */
+  titleLabel?: string;
   /** True when the window is a single calendar day. */
   singleDay: boolean;
 };
@@ -144,6 +149,7 @@ export function resolveMoscowCityDayWindow(from = new Date()): LandingEventWindo
     start,
     end,
     label: formatRuRangeLabel(start, end),
+    titleLabel: formatRuDayMonth(saturday),
     singleDay: false,
   };
 }
@@ -230,6 +236,14 @@ export function resolveLandingTitleDateShort(
       timeZone,
     }).format(referenceDate);
     return { short, useTodayWord: true, window: null };
+  }
+  // Peak-day title (City Day Saturday) - keep Fri–Sun range only in filters.
+  if (window.titleLabel) {
+    return {
+      short: window.titleLabel,
+      useTodayWord: false,
+      window,
+    };
   }
   if (isDateInsideLandingWindow(referenceDate, window)) {
     return {
