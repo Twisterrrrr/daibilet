@@ -2,7 +2,7 @@ export function LocationCardSkeleton() {
   return (
     <div className="animate-pulse overflow-hidden rounded-2xl border border-slate-200 bg-white">
       <div className="flex items-stretch">
-        <div className="aspect-square w-24 shrink-0 bg-slate-200 sm:w-28" />
+        <div className="size-32 shrink-0 bg-slate-200 sm:size-36" />
         <div className="flex min-w-0 flex-1 flex-col gap-3 p-3.5 sm:p-4">
           <div className="h-3 w-24 rounded bg-slate-100" />
           <div className="h-5 w-3/4 rounded bg-slate-200" />

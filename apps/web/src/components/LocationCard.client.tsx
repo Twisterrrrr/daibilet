@@ -22,9 +22,8 @@ const TYPE_GRADIENT: Record<string, string> = {
   venue: 'from-indigo-600 via-primary-600 to-indigo-800',
 };
 
+/** Content places: editorial copy + activity chips. */
 const CONTENT_KINDS = new Set(['park', 'monument', 'outdoor_location', 'attraction']);
-/** Logistics points: icon rail instead of large hero photo. */
-const LOGISTICS_ICON_KINDS = new Set(['pier', 'pier_water', 'bus', 'meeting_point', 'venue', 'other']);
 
 /** Strip legacy «Место посадки - / — » prefix from bus boarding titles. */
 function stripBoardingPlacePrefix(name: string): string {
@@ -84,7 +83,8 @@ export function LocationCard({
 }) {
   const kind = normalizeVenueKind(venue.type);
   const isContentPlace = CONTENT_KINDS.has(kind);
-  const preferIconRail = LOGISTICS_ICON_KINDS.has(kind) || !venue.heroImageUrl;
+  const heroUrl = String(venue.heroImageUrl || '').trim();
+  const showPhoto = Boolean(heroUrl);
   const TypeIcon = venueTypeIcon(venue.type);
   const typeLabel = venueTypeLabel(venue.type);
   const gradient = TYPE_GRADIENT[venue.type] || 'from-sky-500 via-primary-600 to-indigo-600';
@@ -132,25 +132,26 @@ export function LocationCard({
   return (
     <div className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lg">
       <Link href={href} className="flex min-w-0 items-start no-underline">
+        {/* Locked square (size-*), never a flex-stretched skinny rail. */}
         <div
-          className={`relative aspect-square w-24 shrink-0 overflow-hidden text-white sm:w-28 ${
-            !preferIconRail && isContentPlace && venue.heroImageUrl
+          className={`relative size-32 shrink-0 overflow-hidden text-white sm:size-36 ${
+            showPhoto
               ? 'bg-slate-900'
               : `flex flex-col items-center justify-center bg-gradient-to-br p-2.5 ${gradient}`
           }`}
         >
-          {!preferIconRail && isContentPlace && venue.heroImageUrl ? (
+          {showPhoto ? (
             <SafeImage
-              src={venue.heroImageUrl}
+              src={heroUrl}
               alt=""
               fill
               sizes={IMAGE_SIZES.searchThumb}
-              className="object-cover opacity-90 transition group-hover:scale-105"
+              className="object-cover object-center opacity-90 transition group-hover:scale-105"
             />
           ) : (
             <>
-              <TypeIcon className="h-7 w-7 sm:h-8 sm:w-8" strokeWidth={1.75} />
-              <div className="mt-1.5 text-center text-[9px] font-semibold uppercase tracking-wider opacity-90 sm:text-[10px]">
+              <TypeIcon className="h-8 w-8 sm:h-9 sm:w-9" strokeWidth={1.75} />
+              <div className="mt-1.5 line-clamp-2 px-1 text-center text-[9px] font-semibold uppercase tracking-wider opacity-90 sm:text-[10px]">
                 {typeLabel}
               </div>
             </>
