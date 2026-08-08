@@ -3,7 +3,7 @@ import type { PublicVenuesDto } from '@daibilet/contracts/public';
 import { toVenueCatalogCard } from '@/lib/venue-catalog-card';
 import type { VenueCatalogCard } from '@/lib/venue-map-types';
 
-/** First screen + infinite-scroll page size (24–48 band). Trimmed for faster first paint. */
+/** Catalog page size (24–48 band). Same chunk for SSR + ?page= navigation. */
 export const VENUE_CATALOG_PAGE_SIZE = 24;
 
 export type VenueCatalogFamily = 'institution' | 'location';
@@ -17,6 +17,9 @@ export type VenueCatalogFeedQuery = {
   logistics?: string;
   sort?: VenueCatalogSort;
   q?: string;
+  /** 1-based page (preferred). */
+  page?: number;
+  /** Legacy cursor; ignored when page is set by clients that moved to pagination. */
   cursor?: string | null;
   limit?: number;
   /** Progressive /venues: skip waiting for distinct product counts. */
@@ -39,6 +42,7 @@ export type VenueCatalogFeedStats = {
 export type VenueCatalogFeedPage = {
   venues: VenueCatalogCard[];
   total: number;
+  page: number;
   nextCursor: string | null;
   hasMore: boolean;
   limit: number;
@@ -68,6 +72,12 @@ function emptyStats(): VenueCatalogFeedStats {
   };
 }
 
+export function parseVenueCatalogPageParam(raw: string | null | undefined): number {
+  const n = Number.parseInt(String(raw || '').trim(), 10);
+  if (!Number.isFinite(n) || n < 1) return 1;
+  return Math.min(n, 10_000);
+}
+
 export function buildVenueCatalogSearchParams(query: VenueCatalogFeedQuery): URLSearchParams {
   const params = new URLSearchParams();
   params.set('family', query.family);
@@ -78,13 +88,17 @@ export function buildVenueCatalogSearchParams(query: VenueCatalogFeedQuery): URL
   if (query.logistics && query.logistics !== 'all') params.set('logistics', query.logistics);
   if (query.sort && query.sort !== 'events') params.set('sort', query.sort);
   if (query.q?.trim()) params.set('q', query.q.trim());
-  if (query.cursor) params.set('cursor', query.cursor);
+  const page = query.page && query.page > 1 ? query.page : 1;
+  if (page > 1) params.set('page', String(page));
+  // Prefer page over cursor for classic pagination clients.
+  if (page <= 1 && query.cursor) params.set('cursor', query.cursor);
   if (query.counts === false) params.set('counts', '0');
   return params;
 }
 
-/** Cache key for list API: city+kind+cursor(+scale/logistics[+sort/q]). */
+/** Cache key for list API: city+kind+page(+scale/logistics[+sort/q]). */
 export function venueCatalogCacheKey(query: VenueCatalogFeedQuery): string {
+  const page = query.page && query.page > 1 ? query.page : 1;
   return [
     query.family,
     query.city || 'all',
@@ -93,17 +107,18 @@ export function venueCatalogCacheKey(query: VenueCatalogFeedQuery): string {
     query.logistics || 'all',
     query.sort || 'events',
     query.q?.trim() || '',
-    query.cursor || '',
+    page > 1 ? `p${page}` : query.cursor || '',
     String(query.limit || VENUE_CATALOG_PAGE_SIZE),
     query.counts === false ? 'shell' : 'full',
   ].join('|');
 }
 
-/** SSR default feed key: unfiltered «all cities», sort by events. */
+/** SSR default feed key: unfiltered «all cities», sort by events, page 1. */
 export function venueCatalogDefaultQueryKey(family: VenueCatalogFamily): string {
   return venueCatalogCacheKey({
     family,
     sort: 'events',
+    page: 1,
     limit: VENUE_CATALOG_PAGE_SIZE,
   });
 }
@@ -116,12 +131,14 @@ export function mapVenueCatalogFeedPage(payload: PublicVenuesDto | null | undefi
     return card;
   });
   const stats = payload?.stats;
+  const limit = Number(payload?.limit) || VENUE_CATALOG_PAGE_SIZE;
   return {
     venues,
     total: Number(payload?.total) || venues.length,
+    page: Number(payload?.page) || 1,
     nextCursor: payload?.nextCursor ?? null,
     hasMore: Boolean(payload?.hasMore ?? payload?.nextCursor),
-    limit: Number(payload?.limit) || VENUE_CATALOG_PAGE_SIZE,
+    limit,
     countsPending,
     stats: {
       venues: Number(stats?.venues) || Number(payload?.total) || venues.length,
@@ -145,6 +162,7 @@ export async function fetchVenueCatalogPage(
     return {
       venues: [],
       total: 0,
+      page: query.page || 1,
       nextCursor: null,
       hasMore: false,
       limit: query.limit || VENUE_CATALOG_PAGE_SIZE,
@@ -187,10 +205,10 @@ export function applyVenueCatalogEventCounts(
 }
 
 export async function fetchVenueCatalogPins(
-  query: Omit<VenueCatalogFeedQuery, 'cursor' | 'limit'>,
+  query: Omit<VenueCatalogFeedQuery, 'cursor' | 'limit' | 'page'>,
   init?: RequestInit,
 ): Promise<VenueCatalogMapPin[]> {
-  const params = buildVenueCatalogSearchParams({ ...query, limit: 10000 });
+  const params = buildVenueCatalogSearchParams({ ...query, limit: 10000, page: 1 });
   params.set('mode', 'pins');
   const response = await fetch(`/api/public/venues?${params.toString()}`, init);
   if (!response.ok) return [];

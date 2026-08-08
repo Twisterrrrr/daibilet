@@ -299,6 +299,8 @@ export interface PublicVenuePageDto extends ApiEnvelope {
 export interface PublicVenuesDto extends ApiEnvelope {
   total: number;
   venues: PublicVenueDto[];
+  /** 1-based page index when using ?page= pagination. */
+  page?: number;
   nextCursor?: string | null;
   hasMore?: boolean;
   limit?: number;

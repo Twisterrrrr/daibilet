@@ -1832,9 +1832,10 @@ function applyPublicVenueDisplayName(row, type) {
   return name;
 }
 
-/** Catalog first paint / infinite scroll page size (24–48 band). */
+/** Catalog first paint / page size (24–48 band). */
 const VENUE_CATALOG_PAGE_DEFAULT = 36;
 const VENUE_CATALOG_PAGE_MAX = 100;
+const VENUE_CATALOG_PAGE_INDEX_MAX = 10_000;
 /** Explicit dump requests (DayRoute) - not used as catalog universe cap. */
 const VENUE_CATALOG_DUMP_MAX = 2000;
 /**
@@ -1911,18 +1912,23 @@ function sortVenueCatalogItems(items, sortMode) {
   });
 }
 
-function paginateVenueCatalogItems(items, { cursor, limit }) {
+function paginateVenueCatalogItems(items, { cursor, limit, page: pageIndex }) {
   const decoded = decodeVenueCatalogCursor(cursor);
   let start = 0;
+  // Cursor wins when both are present (legacy infinite-scroll clients).
   if (decoded) {
     const idx = items.findIndex((item) => String(item.slug || '') === decoded);
     start = idx >= 0 ? idx + 1 : items.length;
+  } else if (pageIndex > 1) {
+    start = (pageIndex - 1) * limit;
   }
   const page = items.slice(start, start + limit);
   const last = page[page.length - 1];
   const hasMore = start + page.length < items.length;
+  const currentPage = limit > 0 ? Math.floor(start / limit) + 1 : 1;
   return {
     page,
+    pageIndex: currentPage,
     hasMore,
     nextCursor: hasMore && last?.slug ? encodeVenueCatalogCursor(last.slug) : null,
   };
@@ -2003,6 +2009,7 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
     ? clampNumber(searchParams.get('limit'), 1, VENUE_CATALOG_HUB_MAX, VENUE_CATALOG_HUB_MAX)
     : clampNumber(searchParams.get('limit'), 1, listLimitMax, VENUE_CATALOG_PAGE_DEFAULT);
   const cursorRaw = String(searchParams.get('cursor') || '').trim();
+  const pageIndex = clampNumber(searchParams.get('page'), 1, VENUE_CATALOG_PAGE_INDEX_MAX, 1);
   const query = String(searchParams.get('q') || '').trim().toLowerCase();
   const cityFilter = String(searchParams.get('city') || '').trim().toLowerCase();
   const typeFilter = String(searchParams.get('type') || '').trim().toLowerCase();
@@ -2011,7 +2018,7 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
   const logisticsFilter = String(searchParams.get('logistics') || '').trim().toLowerCase();
   const sortMode = String(searchParams.get('sort') || 'events').trim().toLowerCase();
 
-  const buildEnvelope = (filteredItems, pageItems, nextCursor, hasMore, facetSource, countsPending) => {
+  const buildEnvelope = (filteredItems, pageItems, nextCursor, hasMore, facetSource, countsPending, envelopePage) => {
     const citySource = facetSource?.cityUniverse || filteredItems;
     const typeSource = facetSource?.typeUniverse || filteredItems;
     const scaleSource = facetSource?.scaleUniverse || filteredItems;
@@ -2056,6 +2063,7 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
         nextCursor: null,
         hasMore: false,
         limit,
+        page: 1,
         stats: catalogStats,
       };
     }
@@ -2066,6 +2074,7 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
       nextCursor,
       hasMore,
       limit,
+      page: envelopePage || 1,
       countsPending: Boolean(countsPending),
       stats: catalogStats,
     };
@@ -2111,7 +2120,7 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
   // Do NOT short-circuit on warmVenueCatalogList: it was built from hub take(500)
   // and pinned hero/chips at exactly 500. Always load full catalog hub + paginate.
 
-  // Full eligible hub for accurate total/stats; page size is applied via cursor below.
+  // Full eligible hub for accurate total/stats; page size via ?page= or legacy cursor.
   // requireEvents:false keeps 0-event editorial must-see in /locations and /venues.
   // shellCounts: skip distinct product SQL on cold miss (progressive /venues city switch).
   const rows = await publicVenueHubRows(db, VENUE_CATALOG_HUB_MAX, {
@@ -2132,14 +2141,15 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
   const facetSource = { cityUniverse, typeUniverse, scaleUniverse };
 
   if (isPins) {
-    return buildEnvelope(sorted.filter(hasValidVenueCatalogCoords), [], null, false, facetSource, false);
+    return buildEnvelope(sorted.filter(hasValidVenueCatalogCoords), [], null, false, facetSource, false, 1);
   }
 
-  const { page, hasMore, nextCursor } = paginateVenueCatalogItems(sorted, {
+  const { page, pageIndex: resolvedPage, hasMore, nextCursor } = paginateVenueCatalogItems(sorted, {
     cursor: cursorRaw,
     limit,
+    page: pageIndex,
   });
-  return buildEnvelope(sorted, page, nextCursor, hasMore, facetSource, countsPending);
+  return buildEnvelope(sorted, page, nextCursor, hasMore, facetSource, countsPending, resolvedPage);
 }
 
 /**

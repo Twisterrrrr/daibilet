@@ -37,17 +37,26 @@ export function CatalogPaginationLinks({
   total,
   limit,
   searchParams,
+  basePath = '/events',
+  summarySuffix,
 }: {
   page: number;
   total: number;
   limit: number;
   searchParams: Record<string, string | string[] | undefined>;
+  /** Catalog index path (`/events`, `/venues`, `/locations`). */
+  basePath?: string;
+  /** Extra label after «Показано X из Y», e.g. pluralEvents(total). */
+  summarySuffix?: string;
 }) {
   const totalPages = Math.max(1, Math.ceil(total / limit));
   if (totalPages <= 1) return null;
 
   const shown = Math.min(page * limit, total);
   const remaining = Math.max(total - shown, 0);
+  const suffix =
+    summarySuffix ??
+    (basePath === '/events' ? pluralEvents(total) : undefined);
 
   const buildHref = (targetPage: number) => {
     const params = new URLSearchParams();
@@ -58,7 +67,7 @@ export function CatalogPaginationLinks({
     }
     if (targetPage > 1) params.set('page', String(targetPage));
     const query = params.toString();
-    return query ? `/events?${query}` : '/events';
+    return query ? `${basePath}?${query}` : basePath;
   };
 
   const prevPage = page > 1 ? page - 1 : null;
@@ -75,22 +84,25 @@ export function CatalogPaginationLinks({
   return (
     <nav aria-label="Пагинация каталога" className="mt-10 flex flex-col gap-4">
       <p className="text-center text-sm text-slate-500 sm:text-left">
-        Показано {shown} из {total} · {pluralEvents(total)}
+        Показано {shown} из {total}
+        {suffix ? ` · ${suffix}` : ''}
       </p>
 
-      {/* Mobile: load-more style CTA without infinite scroll risk */}
+      {/* Mobile: next-page CTA (replaces list; not infinite append) */}
       <div className="flex flex-col items-center gap-3 sm:hidden">
         {nextPage ? (
           <Link
             href={buildHref(nextPage)}
             rel="next"
+            scroll
             className="inline-flex min-h-11 w-full max-w-sm items-center justify-center rounded-full bg-primary-600 px-8 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700"
           >
-            Показать ещё{remaining > 0 ? ` ${Math.min(limit, remaining)}` : ''}
+            Страница {nextPage}
+            {remaining > 0 ? ` · ещё ${Math.min(limit, remaining)}` : ''}
           </Link>
         ) : null}
         {prevPage ? (
-          <Link href={buildHref(prevPage)} rel="prev" className="text-sm font-medium text-slate-500 hover:text-slate-800">
+          <Link href={buildHref(prevPage)} rel="prev" scroll className="text-sm font-medium text-slate-500 hover:text-slate-800">
             ← Назад
           </Link>
         ) : null}
@@ -99,7 +111,7 @@ export function CatalogPaginationLinks({
       {/* Desktop: classic page strip */}
       <div className="hidden flex-wrap items-center justify-between gap-2 sm:flex">
         {prevPage ? (
-          <Link href={buildHref(prevPage)} rel="prev" className={navBtn} aria-label="Предыдущая страница">
+          <Link href={buildHref(prevPage)} rel="prev" scroll className={navBtn} aria-label="Предыдущая страница">
             ← Назад
           </Link>
         ) : (
@@ -125,7 +137,7 @@ export function CatalogPaginationLinks({
                     {item}
                   </span>
                 ) : (
-                  <Link href={buildHref(item)} className={pageBtnIdle} aria-label={`Страница ${item}`}>
+                  <Link href={buildHref(item)} scroll className={pageBtnIdle} aria-label={`Страница ${item}`}>
                     {item}
                   </Link>
                 )}
@@ -138,6 +150,7 @@ export function CatalogPaginationLinks({
           <Link
             href={buildHref(nextPage)}
             rel="next"
+            scroll
             className={`${navBtn} border-slate-900 bg-slate-900 text-white hover:bg-slate-800`}
             aria-label="Следующая страница"
           >

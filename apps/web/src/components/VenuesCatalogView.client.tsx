@@ -2,10 +2,10 @@
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
+import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { Grid3X3, List, Search } from 'lucide-react';
 
-import { CatalogInfiniteSentinel } from '@/components/CatalogInfiniteSentinel.client';
+import { CatalogPaginationLinks } from '@/components/CatalogPaginationLinks';
 import { InstitutionCard } from '@/components/InstitutionCard.client';
 import { InstitutionList } from '@/components/InstitutionListRow.client';
 import { VenuesCatalogSkeleton } from '@/components/VenueCatalogSkeletons';
@@ -25,6 +25,7 @@ import {
   applyVenueCatalogEventCounts,
   fetchVenueCatalogEventCounts,
   fetchVenueCatalogPage,
+  parseVenueCatalogPageParam,
   venueCatalogCacheKey,
   VENUE_CATALOG_PAGE_SIZE,
   type VenueCatalogFeedPage,
@@ -72,31 +73,20 @@ function cityOptionsFromStats(cities: Record<string, number>): Array<[string, nu
   return [...Object.entries(cities)].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'ru'));
 }
 
-function applyInitialPage(
+function applyListPage(
   page: VenueCatalogFeedPage,
   setters: {
     setVenues: (v: VenueCatalogFeedPage['venues']) => void;
     setTotal: (n: number) => void;
-    setNextCursor: (c: string | null) => void;
     setStats: (s: VenueCatalogFeedPage['stats']) => void;
   },
 ) {
   setters.setVenues(page.venues);
   setters.setTotal(page.total);
-  setters.setNextCursor(page.nextCursor);
   setters.setStats(page.stats);
 }
 
-/** City-scoped shell first (cards ASAP); counts enrich is fire-and-forget at call sites. */
-function mergeVenuePages(
-  prev: VenueCatalogFeedPage['venues'],
-  next: VenueCatalogFeedPage['venues'],
-): VenueCatalogFeedPage['venues'] {
-  const seen = new Set(prev.map((item) => item.id));
-  return [...prev, ...next.filter((item) => !seen.has(item.id))];
-}
-
-/** Patch event≠slots counts onto already-rendered cards (loadMore enrich). */
+/** Patch event≠slots counts onto already-rendered cards. */
 function patchVenueEventCounts(
   prev: VenueCatalogFeedPage['venues'],
   counts: Record<string, number>,
@@ -113,7 +103,7 @@ function patchVenueEventCounts(
   });
 }
 
-/** City scope for type-chip cache (type excluded). */
+/** City scope for type-chip cache (type + page excluded). */
 function cityScopeKey(query: {
   family: string;
   city?: string;
@@ -122,6 +112,14 @@ function cityScopeKey(query: {
   limit?: number;
 }): string {
   return [query.family, query.city || 'all', query.sort || 'events', query.q || '', String(query.limit || '')].join('|');
+}
+
+function searchParamsRecord(sp: URLSearchParams): Record<string, string> {
+  const out: Record<string, string> = {};
+  sp.forEach((value, key) => {
+    out[key] = value;
+  });
+  return out;
 }
 
 export function VenuesCatalogView({
@@ -141,11 +139,8 @@ export function VenuesCatalogView({
   const [, startTransition] = useTransition();
   const [venues, setVenues] = useState(initialPage.venues);
   const [total, setTotal] = useState(initialPage.total);
-  const [nextCursor, setNextCursor] = useState<string | null>(initialPage.nextCursor);
   const [stats, setStats] = useState(initialPage.stats);
   const [catalogLoading, setCatalogLoading] = useState(false);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const loadMoreLock = useRef(false);
   const catalogRequestId = useRef(0);
   const cityBaseRef = useRef<{ key: string; page: VenueCatalogFeedPage } | null>(null);
 
@@ -154,8 +149,8 @@ export function VenuesCatalogView({
   const urlCity = urlCityAll ? '' : rawUrlCity;
   const rawType = searchParams.get('type')?.trim() || '';
   const typeFilter = rawType ? normalizeVenueKind(rawType) : 'all';
+  const urlPage = parseVenueCatalogPageParam(searchParams.get('page'));
   const cityReady = selectedCity?.cityReady ?? true;
-  // `city=all` is resolved - do not wait for storage inject.
   const cityPending = !rawUrlCity && Boolean(selectedCity) && !cityReady;
 
   const cityOptions = useMemo(() => cityOptionsFromStats(stats.cities || {}), [stats.cities]);
@@ -169,7 +164,6 @@ export function VenuesCatalogView({
     return resolveCatalogCityFilter(selectedCity.cityValue, cityOptions, selectedCity.cityLabel);
   }, [urlCity, urlCityAll, cityReady, selectedCity, cityOptions]);
 
-  // Prefer ASCII slug - Cyrillic soft-nav hangs catalog fetch.
   const cityFetchKey = useMemo(() => {
     if (urlCityAll) return '';
     if (urlCity) return urlCity;
@@ -186,6 +180,32 @@ export function VenuesCatalogView({
     return () => window.clearTimeout(timer);
   }, [query]);
 
+  const replaceCatalogUrl = (mutate: (params: URLSearchParams) => void) => {
+    const params = new URLSearchParams(searchParams.toString());
+    mutate(params);
+    const qs = params.toString();
+    startTransition(() => {
+      router.replace(qs ? `/venues?${qs}` : '/venues', { scroll: false });
+    });
+  };
+
+  const resetPageInUrl = () => {
+    if (!searchParams.get('page')) return;
+    replaceCatalogUrl((params) => {
+      params.delete('page');
+    });
+  };
+
+  const prevFiltersRef = useRef({ q: debouncedQuery, sort: sortMode });
+  useEffect(() => {
+    const prev = prevFiltersRef.current;
+    const changed = prev.q !== debouncedQuery || prev.sort !== sortMode;
+    prevFiltersRef.current = { q: debouncedQuery, sort: sortMode };
+    if (!changed || urlPage <= 1) return;
+    resetPageInUrl();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional filter-drift reset
+  }, [debouncedQuery, sortMode, urlPage]);
+
   const feedQuery = useMemo(
     () => ({
       family: 'institution' as const,
@@ -193,15 +213,15 @@ export function VenuesCatalogView({
       type: typeFilter !== 'all' ? typeFilter : undefined,
       sort: sortMode,
       q: debouncedQuery || undefined,
+      page: urlPage,
       limit: VENUE_CATALOG_PAGE_SIZE,
     }),
-    [cityFetchKey, typeFilter, sortMode, debouncedQuery],
+    [cityFetchKey, typeFilter, sortMode, debouncedQuery, urlPage],
   );
 
   const feedQueryKey = useMemo(() => venueCatalogCacheKey(feedQuery), [feedQuery]);
   const scopeKey = useMemo(() => cityScopeKey(feedQuery), [feedQuery]);
 
-  // Filters reset cursor and refetch first page. Type-only changes prefer client filter.
   useEffect(() => {
     if (!cityReady && !rawUrlCity) {
       setCatalogLoading(false);
@@ -209,23 +229,21 @@ export function VenuesCatalogView({
     }
 
     const isAllCitiesScope = !cityFetchKey && (urlCityAll || cityFilter === 'all');
-
-    // SSR unfiltered page only when truly «all cities» / default sort.
-    if (
+    const isDefaultFirstPage =
       isAllCitiesScope &&
       typeFilter === 'all' &&
+      urlPage === 1 &&
       !debouncedQuery &&
       sortMode === 'events' &&
       initialQueryKey &&
       feedQueryKey === initialQueryKey &&
-      initialPage.venues.length > 0
-    ) {
+      initialPage.venues.length > 0;
+
+    if (isDefaultFirstPage) {
       catalogRequestId.current += 1;
-      applyInitialPage(initialPage, { setVenues, setTotal, setNextCursor, setStats });
+      applyListPage(initialPage, { setVenues, setTotal, setStats });
       cityBaseRef.current = { key: scopeKey, page: initialPage };
       setCatalogLoading(false);
-      loadMoreLock.current = false;
-      // SSR shell may omit event≠slots counts - enrich without blocking first paint.
       if (initialPage.countsPending) {
         const requestId = catalogRequestId.current;
         const controller = new AbortController();
@@ -252,8 +270,7 @@ export function VenuesCatalogView({
     const cachedBase = cityBaseRef.current?.key === scopeKey ? cityBaseRef.current.page : null;
     const scopeChanged = cityBaseRef.current != null && cityBaseRef.current.key !== scopeKey;
 
-    // Instant type chip preview from city-scoped base (same city/sort/q); cursor comes from server page.
-    if (typeFilter !== 'all' && cachedBase && cachedBase.venues.length > 0) {
+    if (urlPage === 1 && typeFilter !== 'all' && cachedBase && cachedBase.venues.length > 0) {
       const filtered = cachedBase.venues
         .filter((venue) => normalizeVenueKind(venue.type) === typeFilter)
         .slice(0, VENUE_CATALOG_PAGE_SIZE);
@@ -261,39 +278,52 @@ export function VenuesCatalogView({
       setTotal(Number(cachedBase.stats.types?.[typeFilter]) || filtered.length);
       setStats(cachedBase.stats);
       setCatalogLoading(false);
-    } else if (cachedBase && typeFilter === 'all') {
+    } else if (urlPage === 1 && cachedBase && typeFilter === 'all') {
       setVenues(cachedBase.venues);
       setTotal(cachedBase.total);
-      setNextCursor(cachedBase.nextCursor);
       setStats(cachedBase.stats);
       setCatalogLoading(false);
     } else {
-      // City/scope change: drop previous city cards immediately (not cold SSR - stale client list).
-      if (scopeChanged || !cachedBase) {
+      if (scopeChanged || !cachedBase || urlPage > 1) {
         setVenues([]);
-        setNextCursor(null);
         setTotal(0);
       }
       setCatalogLoading(true);
     }
-    loadMoreLock.current = false;
+
+    const enrichPage = (page: VenueCatalogFeedPage) => {
+      if (!page.countsPending || !page.venues.length) return;
+      const pageIds = new Set(page.venues.map((venue) => venue.id));
+      void fetchVenueCatalogEventCounts(page.venues.map((venue) => venue.id), {
+        signal: controller.signal,
+      })
+        .then((counts) => {
+          if (requestId !== catalogRequestId.current) return;
+          setVenues((prev) => patchVenueEventCounts(prev, counts, pageIds));
+        })
+        .catch(() => undefined);
+    };
 
     const run = async () => {
       try {
         let basePage = cachedBase;
         if (!basePage) {
-          // 1) Shell paint: venues + type chips without waiting on distinct product SQL.
-          const shellQuery = { ...feedQuery, type: undefined, counts: false as const };
+          const shellQuery = {
+            ...feedQuery,
+            type: undefined,
+            page: 1,
+            counts: false as const,
+          };
           const shellPage = await fetchVenueCatalogPage(shellQuery, { signal: controller.signal });
           if (requestId !== catalogRequestId.current) return;
           cityBaseRef.current = { key: scopeKey, page: shellPage };
           setStats(shellPage.stats);
-          if (typeFilter === 'all') {
+          if (typeFilter === 'all' && urlPage === 1) {
             setVenues(shellPage.venues);
             setTotal(shellPage.total);
-            setNextCursor(shellPage.nextCursor);
             setCatalogLoading(false);
-          } else {
+            enrichPage(shellPage);
+          } else if (typeFilter !== 'all' && urlPage === 1) {
             const filtered = shellPage.venues
               .filter((venue) => normalizeVenueKind(venue.type) === typeFilter)
               .slice(0, VENUE_CATALOG_PAGE_SIZE);
@@ -301,59 +331,34 @@ export function VenuesCatalogView({
             setTotal(Number(shellPage.stats.types?.[typeFilter]) || filtered.length);
             setCatalogLoading(false);
           }
-
-          // 2) Enrich event≠slots in background - never block city paint / type preview.
-          if (shellPage.countsPending && shellPage.venues.length) {
-            const enrichIds = shellPage.venues.map((venue) => venue.id);
-            void fetchVenueCatalogEventCounts(enrichIds, { signal: controller.signal })
-              .then((counts) => {
-                if (requestId !== catalogRequestId.current) return;
-                const enriched = applyVenueCatalogEventCounts(shellPage, counts);
-                cityBaseRef.current = { key: scopeKey, page: enriched };
-                setStats(enriched.stats);
-                setVenues((prev) => patchVenueEventCounts(prev, counts, new Set(enrichIds)));
-              })
-              .catch(() => undefined);
-          }
           basePage = shellPage;
         } else {
           setStats(basePage.stats);
         }
 
-        if (typeFilter === 'all') {
+        if (typeFilter === 'all' && urlPage === 1) {
           setVenues(basePage.venues);
           setTotal(basePage.total);
-          setNextCursor(basePage.nextCursor);
           return;
         }
 
-        // Type filter: server shell page for cursor; enrich counts in background.
-        const typedShell = await fetchVenueCatalogPage(
+        const listPage = await fetchVenueCatalogPage(
           { ...feedQuery, counts: false },
           { signal: controller.signal },
         );
         if (requestId !== catalogRequestId.current) return;
-        setVenues(typedShell.venues);
-        setTotal(typedShell.total);
-        setNextCursor(typedShell.nextCursor);
+        setVenues(listPage.venues);
+        setTotal(listPage.total);
         setStats({
-          ...typedShell.stats,
-          // Keep city-scoped catalog + afisha totals on hero while type chips filter the list.
+          ...listPage.stats,
           types: basePage.stats.types,
           cities: basePage.stats.cities,
           venues: basePage.stats.venues,
           venuesWithEvents: basePage.stats.venuesWithEvents,
           events: basePage.stats.events,
         });
-        if (typedShell.countsPending && typedShell.venues.length) {
-          const typedIds = typedShell.venues.map((venue) => venue.id);
-          void fetchVenueCatalogEventCounts(typedIds, { signal: controller.signal })
-            .then((counts) => {
-              if (requestId !== catalogRequestId.current) return;
-              setVenues((prev) => patchVenueEventCounts(prev, counts, new Set(typedIds)));
-            })
-            .catch(() => undefined);
-        }
+        setCatalogLoading(false);
+        enrichPage(listPage);
       } catch (error: unknown) {
         if (requestId !== catalogRequestId.current) return;
         if (error instanceof DOMException && error.name === 'AbortError') return;
@@ -378,51 +383,10 @@ export function VenuesCatalogView({
     typeFilter,
     debouncedQuery,
     sortMode,
+    urlPage,
     initialQueryKey,
     initialPage,
   ]);
-
-  const loadMore = useCallback(() => {
-    if (!nextCursor || loadingMore || catalogLoading || loadMoreLock.current) return;
-    loadMoreLock.current = true;
-    setLoadingMore(true);
-    const cursor = nextCursor;
-    const requestId = catalogRequestId.current;
-    // Append shell cards ASAP; never block the button on event-counts or full hub SQL.
-    void fetchVenueCatalogPage({ ...feedQuery, cursor, counts: false })
-      .then((page) => {
-        if (requestId !== catalogRequestId.current) return;
-        // Transient API miss/504 → empty envelope; keep cursor so user can retry.
-        if (!page.venues.length) return;
-        setVenues((prev) => mergeVenuePages(prev, page.venues));
-        setNextCursor(page.nextCursor);
-        setTotal(page.total);
-        loadMoreLock.current = false;
-        setLoadingMore(false);
-
-        if (!page.countsPending || !page.venues.length) return;
-        const pageIds = new Set(page.venues.map((venue) => venue.id));
-        void fetchVenueCatalogEventCounts(page.venues.map((venue) => venue.id))
-          .then((counts) => {
-            if (requestId !== catalogRequestId.current) return;
-            setVenues((prev) => patchVenueEventCounts(prev, counts, pageIds));
-          })
-          .catch(() => {
-            if (requestId !== catalogRequestId.current) return;
-            setVenues((prev) =>
-              prev.map((venue) =>
-                pageIds.has(venue.id) ? { ...venue, eventsPending: false } : venue,
-              ),
-            );
-          });
-      })
-      .catch(() => undefined)
-      .finally(() => {
-        // If shell failed before unlock above, still release the button.
-        loadMoreLock.current = false;
-        setLoadingMore(false);
-      });
-  }, [nextCursor, loadingMore, catalogLoading, feedQuery]);
 
   const setViewModePersisted = (value: ViewMode) => {
     setViewMode(value);
@@ -434,39 +398,32 @@ export function VenuesCatalogView({
   };
 
   const setCityFilter = (next: string) => {
-    // Prefer provider - resolveCityChangeNav writes `city=all` so storage inject cannot bounce.
     if (selectedCity?.setCity) {
       selectedCity.setCity(next === 'all' ? 'all' : next);
       return;
     }
     persistSelectedCity(next === 'all' ? 'all' : next);
-    const params = new URLSearchParams(searchParams.toString());
-    if (next === 'all') params.set('city', 'all');
-    else params.set('city', catalogCityQueryValue([], next));
-    params.delete('scale');
-    const qs = params.toString();
-    startTransition(() => {
-      router.replace(qs ? `/venues?${qs}` : '/venues', { scroll: false });
+    replaceCatalogUrl((params) => {
+      if (next === 'all') params.set('city', 'all');
+      else params.set('city', catalogCityQueryValue([], next));
+      params.delete('scale');
+      params.delete('page');
     });
   };
 
   const setTypeFilter = (next: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (next === 'all') params.delete('type');
-    else params.set('type', next);
-    params.delete('scale');
-    // Keep explicit city=all so storage inject cannot bounce back.
-    if (urlCityAll && !params.get('city')) params.set('city', 'all');
-    const qs = params.toString();
-    startTransition(() => {
-      router.replace(qs ? `/venues?${qs}` : '/venues', { scroll: false });
+    replaceCatalogUrl((params) => {
+      if (next === 'all') params.delete('type');
+      else params.set('type', next);
+      params.delete('scale');
+      params.delete('page');
+      if (urlCityAll && !params.get('city')) params.set('city', 'all');
     });
   };
 
   const listPending = (cityPending || catalogLoading) && venues.length === 0;
   const listRefreshing = (cityPending || catalogLoading) && venues.length > 0;
 
-  // Type chips use city-scoped stats (untyped base), never global SSR leftovers.
   const typeOptions = useMemo(() => {
     const counts = stats.types || {};
     return INSTITUTION_CATALOG_TYPE_OPTIONS.filter((option) => counts[option.value]).map((option) => ({
@@ -487,12 +444,12 @@ export function VenuesCatalogView({
   const heroTitle = cityName
     ? `Музеи, театры и пространства ${cityToGenitive(cityName)}`
     : 'Музеи, театры и пространства';
-  // Eyebrow = catalog size; «В афише» = venues with real products (not 0-event content places).
   const heroTotal = stats.venues || total;
   const heroAfishaVenues = Number(stats.venuesWithEvents) || 0;
   const heroEvents = Number(stats.events) || 0;
   const showHeroAfisha =
     !listPending && !catalogLoading && (heroAfishaVenues > 0 || heroEvents > 0);
+  const paginationParams = useMemo(() => searchParamsRecord(searchParams), [searchParams]);
 
   return (
     <>
@@ -642,8 +599,11 @@ export function VenuesCatalogView({
             ) : (
               <>
                 Найдено: {formatNumber(total)}
-                {venues.length && venues.length < total ? (
-                  <span className="font-normal text-slate-500"> · показано {formatNumber(venues.length)}</span>
+                {total > VENUE_CATALOG_PAGE_SIZE ? (
+                  <span className="font-normal text-slate-500">
+                    {' '}
+                    · стр. {urlPage} из {Math.max(1, Math.ceil(total / VENUE_CATALOG_PAGE_SIZE))}
+                  </span>
                 ) : null}
               </>
             )}
@@ -666,25 +626,14 @@ export function VenuesCatalogView({
                 ))}
               </div>
             )}
-            {loadingMore ? <div className="mt-6"><VenuesCatalogSkeleton count={3} /></div> : null}
-            {nextCursor ? (
-              <div className="mt-8 flex flex-col items-center gap-3">
-                <button
-                  type="button"
-                  onClick={loadMore}
-                  disabled={loadingMore || catalogLoading}
-                  className="inline-flex min-h-11 w-full max-w-sm items-center justify-center rounded-full bg-primary-600 px-8 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700 disabled:opacity-60"
-                >
-                  {loadingMore
-                    ? 'Загружаем…'
-                    : `Показать ещё ${Math.min(VENUE_CATALOG_PAGE_SIZE, Math.max(total - venues.length, 0)) || VENUE_CATALOG_PAGE_SIZE}`}
-                </button>
-                <p className="text-xs text-slate-500">
-                  Показано {formatNumber(venues.length)} из {formatNumber(total)}
-                </p>
-              </div>
-            ) : null}
-            <CatalogInfiniteSentinel enabled={Boolean(nextCursor) && !loadingMore} onIntersect={loadMore} />
+            <CatalogPaginationLinks
+              page={urlPage}
+              total={total}
+              limit={VENUE_CATALOG_PAGE_SIZE}
+              searchParams={paginationParams}
+              basePath="/venues"
+              summarySuffix={pluralVenues(total)}
+            />
           </>
         ) : (
           <div className="rounded-2xl border border-dashed border-slate-300 bg-white py-16 text-center text-slate-500">

@@ -1,6 +1,21 @@
 # Diary
 
-## 2026-08-08 - /my-day: 4 collapsed add-content accordions
+## 2026-08-08 - /locations + /venues: infinite scroll → classic pagination
+
+### Наблюдения
+- Owner: «может нам от lazy load перейти к пагинации? очень долго грузит страницы».
+- `/locations` и `/venues` копилили карточки через cursor + IntersectionObserver (`CatalogInfiniteSentinel`) + «Показать ещё» - DOM и сеть росли без верхней границы.
+- `/events` уже на classic `?page=` (`CatalogPaginationLinks`); блог и legacy `apps/public` CatalogPage ещё на load-more.
+
+### Решения
+- API `buildPublicVenuesCatalog`: `?page=` (1-based offset); cursor оставлен для совместимости.
+- Клиент: page size **24**, URL `?page=N`, сброс page на смене city/type/search/sort; progressive shell + type chips + event-counts enrich сохранены.
+- SSR page 1 без изменений (SEO first paint). Live deploy - пачкой / по запросу owner.
+
+### Проблемы
+- Нет. Оставшийся lazy: `/blog` cursor feed, city hub IO (не catalog list), legacy public CatalogPage.
+
+---
 
 ### Наблюдения
 - Owner desktop: scenarios + suburbs должны быть такими же collapsed rows, как «Главные места» / «Добавить своё место».
