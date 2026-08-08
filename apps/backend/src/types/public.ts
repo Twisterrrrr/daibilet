@@ -302,6 +302,8 @@ export interface PublicVenuesDto extends ApiEnvelope {
   nextCursor?: string | null;
   hasMore?: boolean;
   limit?: number;
+  /** Progressive /venues: shell omitted distinct product counts. */
+  countsPending?: boolean;
   pins?: PublicVenueMapPinDto[];
   stats?: {
     venues: number;

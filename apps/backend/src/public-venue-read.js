@@ -15,6 +15,7 @@ import { formatPublicEventTitle } from './event-title-normalize.ts';
 import {
   applyVenueEventFacetCounts,
   fetchLeanPublicVenueRows,
+  fetchVenueDistinctEventCounts,
   fetchVenueEventFacetCounts,
   fetchVenueHeroImageFallbacks,
 } from './public-venue-lean.ts';
@@ -36,6 +37,8 @@ const PUBLIC_VENUE_HUB_STALE_MS = Number(process.env.PUBLIC_VENUE_HUB_STALE_MS |
 const PROJECT_ROOT = resolveProjectRoot(import.meta.url);
 
 let publicVenueHubCache = null;
+/** @type {Map<string, { cacheKey: string, expiresAt: number, staleUntil: number, rows: any[], shell?: boolean }>} */
+const publicVenueHubCaches = new Map();
 let publicVenueCatalogLists = null;
 /** @type {Map<string, Promise<any[]>>} */
 const publicVenueHubBuilds = new Map();
@@ -49,11 +52,14 @@ export function setPublicVenueCatalogSessionsProvider(fn) {
 
 export function clearPublicVenueReadCache() {
   // Soft-invalidate: keep last hub for SWR so /locations|/venues never await 20s cold rebuild.
-  if (publicVenueHubCache?.rows?.length) {
-    publicVenueHubCache = { ...publicVenueHubCache, expiresAt: 0 };
-  } else {
-    publicVenueHubCache = null;
+  for (const [key, cached] of publicVenueHubCaches) {
+    if (cached?.rows?.length) {
+      publicVenueHubCaches.set(key, { ...cached, expiresAt: 0 });
+    } else {
+      publicVenueHubCaches.delete(key);
+    }
   }
+  publicVenueHubCache = null;
   if (publicVenueCatalogLists?.institution || publicVenueCatalogLists?.location) {
     publicVenueCatalogLists = { ...publicVenueCatalogLists, expiresAt: 0 };
   } else {
@@ -1027,15 +1033,20 @@ function venueGroupsOverlap(a, b) {
 }
 
 async function rebuildPublicVenueHubRows(take, options = {}) {
-  // Lean Prisma select + distinct product counts - no full catalog session hydrate for tiles.
-  // Hero covers still need event/override fallbacks when Venue.heroImageUrl is empty.
-  const leanRows = await fetchLeanPublicVenueRows(take, { leanText: false });
+  const shell = options.shell === true;
+  // Shell: skip distinct product SQL (+ optional facets) so /venues can paint cards first.
+  const leanRows = await fetchLeanPublicVenueRows(take, {
+    leanText: false,
+    skipEventCounts: shell,
+  });
   const venueIds = leanRows.map((row) => row.id);
   const missingHeroIds = leanRows
     .filter((row) => !pickRealPublicImageUrl(row.heroImageUrl))
     .map((row) => row.id);
   const [facets, heroImageFallbacks] = await Promise.all([
-    fetchVenueEventFacetCounts(venueIds),
+    shell
+      ? Promise.resolve({ waterCounts: new Map(), busCounts: new Map() })
+      : fetchVenueEventFacetCounts(venueIds),
     fetchVenueHeroImageFallbacks(missingHeroIds),
   ]);
   const enriched = applyVenueEventFacetCounts(leanRows, facets).map((row) => {
@@ -1058,14 +1069,17 @@ function schedulePublicVenueHubRebuild(cacheKey, take, options = {}) {
   const build = rebuildPublicVenueHubRows(take, options)
     .then((merged) => {
       const builtAt = Date.now();
-      publicVenueHubCache = {
+      const entry = {
         cacheKey,
         expiresAt: builtAt + PUBLIC_CATALOG_CACHE_MS,
         staleUntil: builtAt + PUBLIC_VENUE_HUB_STALE_MS,
         rows: merged,
+        shell: options.shell === true,
       };
+      publicVenueHubCaches.set(cacheKey, entry);
+      publicVenueHubCache = entry;
       // Keep family lists in sync with full hub (requireEvents:false path used by /locations).
-      if (options.requireEvents === false || !publicVenueCatalogLists) {
+      if (!options.shell && (options.requireEvents === false || !publicVenueCatalogLists)) {
         publicVenueCatalogLists = {
           expiresAt: builtAt + PUBLIC_CATALOG_CACHE_MS,
           staleUntil: builtAt + PUBLIC_VENUE_HUB_STALE_MS,
@@ -1091,11 +1105,21 @@ function schedulePublicVenueHubRebuild(cacheKey, take, options = {}) {
 export async function publicVenueHubRows(db, limit = 500, options = {}) {
   const now = Date.now();
   const take = Math.max(1, Math.min(Number(limit) || 500, 10000));
-  const cacheKey = `${take}:${options.requireEvents === false ? 'all' : 'hub'}`;
-  const cached = publicVenueHubCache?.cacheKey === cacheKey ? publicVenueHubCache : null;
+  const shell = options.shell === true;
+  const cacheKey = `${take}:${options.requireEvents === false ? 'all' : 'hub'}${shell ? ':shell' : ''}`;
+  const cached = publicVenueHubCaches.get(cacheKey) || null;
 
   if (cached?.rows?.length && cached.expiresAt > now) {
     return cached.rows;
+  }
+
+  // Prefer a warm FULL hub over building a shell (already has accurate event≠slots counts).
+  if (shell) {
+    const fullKey = `${take}:${options.requireEvents === false ? 'all' : 'hub'}`;
+    const full = publicVenueHubCaches.get(fullKey) || null;
+    if (full?.rows?.length) {
+      return full.rows;
+    }
   }
 
   // Forever soft-SWR: any previous hub beats a 15-30s cold rebuild on the request path.
@@ -1104,7 +1128,13 @@ export async function publicVenueHubRows(db, limit = 500, options = {}) {
     return cached.rows;
   }
 
-  return schedulePublicVenueHubRebuild(cacheKey, take, options);
+  const rows = await schedulePublicVenueHubRebuild(cacheKey, take, options);
+  // After shell cold build, warm the full hub in background (enrich / ISR stay accurate).
+  if (shell) {
+    const fullKey = `${take}:${options.requireEvents === false ? 'all' : 'hub'}`;
+    void schedulePublicVenueHubRebuild(fullKey, take, { ...options, shell: false });
+  }
+  return rows;
 }
 
 const PUBLIC_VENUE_ROW_SELECT = `
@@ -1941,6 +1971,11 @@ function hasValidVenueCatalogCoords(venue) {
 export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchParams()) {
   const mode = String(searchParams.get('mode') || 'list').trim().toLowerCase();
   const isPins = mode === 'pins';
+  const shellCounts =
+    !isPins &&
+    (searchParams.get('counts') === '0' ||
+      searchParams.get('phase') === 'shell' ||
+      searchParams.get('shell') === '1');
   const requestedLimit = Number(searchParams.get('limit'));
   const listLimitMax =
     Number.isFinite(requestedLimit) && requestedLimit > VENUE_CATALOG_PAGE_MAX
@@ -1958,7 +1993,7 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
   const logisticsFilter = String(searchParams.get('logistics') || '').trim().toLowerCase();
   const sortMode = String(searchParams.get('sort') || 'events').trim().toLowerCase();
 
-  const buildEnvelope = (filteredItems, pageItems, nextCursor, hasMore, facetSource) => {
+  const buildEnvelope = (filteredItems, pageItems, nextCursor, hasMore, facetSource, countsPending) => {
     const citySource = facetSource?.cityUniverse || filteredItems;
     const typeSource = facetSource?.typeUniverse || filteredItems;
     const scaleSource = facetSource?.scaleUniverse || filteredItems;
@@ -1995,6 +2030,7 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
       nextCursor,
       hasMore,
       limit,
+      countsPending: Boolean(countsPending),
       stats: {
         venues: filteredItems.length,
         cities,
@@ -2047,21 +2083,49 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
 
   // Full eligible hub for accurate total/stats; page size is applied via cursor below.
   // requireEvents:false keeps 0-event editorial must-see in /locations and /venues.
-  const rows = await publicVenueHubRows(db, VENUE_CATALOG_HUB_MAX, { requireEvents: false });
-  const mapped = rows.map(mapPublicVenueListItem);
+  // shellCounts: skip distinct product SQL on cold miss (progressive /venues city switch).
+  const rows = await publicVenueHubRows(db, VENUE_CATALOG_HUB_MAX, {
+    requireEvents: false,
+    shell: shellCounts,
+  });
+  const fullWarm = publicVenueHubCaches.get(`${VENUE_CATALOG_HUB_MAX}:all`);
+  // Warm full hub reused for shell request → counts already accurate (event≠slots).
+  const servedFromFullHub = Boolean(fullWarm?.rows?.length && rows === fullWarm.rows);
+  const countsPending = Boolean(shellCounts && !servedFromFullHub);
+
+  let mapped = rows.map(mapPublicVenueListItem);
+  if (countsPending) {
+    mapped = mapped.map((item) => ({ ...item, events: 0, nextSlot: null }));
+  }
   const { filtered, cityUniverse, typeUniverse, scaleUniverse } = applyListFilters(mapped);
   const sorted = sortVenueCatalogItems(filtered, sortMode);
   const facetSource = { cityUniverse, typeUniverse, scaleUniverse };
 
   if (isPins) {
-    return buildEnvelope(sorted.filter(hasValidVenueCatalogCoords), [], null, false, facetSource);
+    return buildEnvelope(sorted.filter(hasValidVenueCatalogCoords), [], null, false, facetSource, false);
   }
 
   const { page, hasMore, nextCursor } = paginateVenueCatalogItems(sorted, {
     cursor: cursorRaw,
     limit,
   });
-  return buildEnvelope(sorted, page, nextCursor, hasMore, facetSource);
+  return buildEnvelope(sorted, page, nextCursor, hasMore, facetSource, countsPending);
+}
+
+/**
+ * Distinct product counts for progressive /venues enrich (event≠slots).
+ * @param {string[]} venueIds
+ */
+export async function buildPublicVenueEventCounts(venueIds = []) {
+  const countsMap = await fetchVenueDistinctEventCounts(venueIds);
+  const counts = {};
+  for (const [id, value] of countsMap) {
+    counts[id] = Number(value) || 0;
+  }
+  return {
+    generatedAt: new Date().toISOString(),
+    counts,
+  };
 }
 
 function collectVenueSessionLookupContexts(venue, mergedGroup, hubRows = []) {

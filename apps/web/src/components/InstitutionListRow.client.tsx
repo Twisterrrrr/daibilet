@@ -12,7 +12,7 @@ export function InstitutionListRow({
   venue,
   href,
 }: {
-  venue: Pick<VenueCatalogCard, 'name' | 'city' | 'events' | 'type' | 'address'>;
+  venue: Pick<VenueCatalogCard, 'name' | 'city' | 'events' | 'type' | 'address' | 'eventsPending'>;
   href: string;
 }) {
   const street = formatStreetAddress(venue.address, { city: venue.city });
@@ -36,7 +36,9 @@ export function InstitutionListRow({
 
       <div className="hidden shrink-0 text-right sm:block">
         <div className="text-xs text-slate-400">{typeLabel}</div>
-        {venue.events > 0 ? (
+        {venue.eventsPending ? (
+          <div className="mt-0.5 ml-auto h-4 w-16 animate-pulse rounded bg-slate-100" aria-hidden />
+        ) : venue.events > 0 ? (
           <div className="text-sm font-semibold text-slate-700">{pluralEvents(venue.events)}</div>
         ) : null}
       </div>

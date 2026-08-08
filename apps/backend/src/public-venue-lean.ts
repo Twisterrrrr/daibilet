@@ -141,10 +141,11 @@ export async function fetchVenueDistinctEventCounts(
  */
 export async function fetchLeanPublicVenueRows(
   limit = VENUE_LEAN_HUB_MAX,
-  options: { leanText?: boolean; q?: string } = {},
+  options: { leanText?: boolean; q?: string; skipEventCounts?: boolean } = {},
 ): Promise<LeanPublicVenueRow[]> {
   const take = Math.max(1, Math.min(Number(limit) || VENUE_LEAN_HUB_MAX, VENUE_LEAN_HUB_MAX));
   const q = String(options.q || '').trim();
+  const skipEventCounts = options.skipEventCounts === true;
   const where: Prisma.VenueWhereInput = {
     pageStatus: { not: 'HIDDEN' },
   };
@@ -164,6 +165,7 @@ export async function fetchLeanPublicVenueRows(
     prisma.venue.findMany({
       where,
       select: venueListSelect,
+      // Shell keeps _count order for «по афише» ranking; distinct products fill later.
       orderBy: [{ events: { _count: 'desc' } }, { title: 'asc' }],
       take,
     }),
@@ -192,6 +194,10 @@ export async function fetchLeanPublicVenueRows(
   }
 
   const merged = [...byId.values()];
+  if (skipEventCounts) {
+    // Progressive /venues paint: cards first, distinct product counts via enrich.
+    return merged.map((row) => mapLeanVenueRow(row, options.leanText === true, 0));
+  }
   const eventCounts = await fetchVenueDistinctEventCounts(merged.map((row) => row.id));
   return merged.map((row) => mapLeanVenueRow(row, options.leanText === true, eventCounts.get(row.id) || 0));
 }

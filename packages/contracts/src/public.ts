@@ -361,6 +361,11 @@ export interface PublicVenuesDto extends ApiEnvelope {
   nextCursor?: string | null;
   hasMore?: boolean;
   limit?: number;
+  /**
+   * Progressive /venues: shell list omitted distinct product counts.
+   * Client should call `/api/public/venues/event-counts?ids=` and patch cards.
+   */
+  countsPending?: boolean;
   /** Lazy map pins (`mode=pins`) - slug/name/lat/lng/kind only. */
   pins?: PublicVenueMapPinDto[];
   stats?: {

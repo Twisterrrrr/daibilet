@@ -30,6 +30,8 @@ export type VenueCatalogCard = {
   longitude?: number | null;
   type: string;
   events: number;
+  /** Progressive /venues: counts still loading (hide badge / show pulse). */
+  eventsPending?: boolean;
   /** Editorial hook for picker cards («зачем сюда»). */
   hookFact?: string | null;
   shortDescription?: string | null;

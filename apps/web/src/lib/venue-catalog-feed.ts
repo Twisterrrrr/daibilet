@@ -19,6 +19,8 @@ export type VenueCatalogFeedQuery = {
   q?: string;
   cursor?: string | null;
   limit?: number;
+  /** Progressive /venues: skip waiting for distinct product counts. */
+  counts?: boolean;
 };
 
 export type VenueCatalogFeedStats = {
@@ -36,6 +38,8 @@ export type VenueCatalogFeedPage = {
   hasMore: boolean;
   limit: number;
   stats: VenueCatalogFeedStats;
+  /** Shell response: client should enrich event counts. */
+  countsPending?: boolean;
 };
 
 export type VenueCatalogMapPin = {
@@ -62,6 +66,7 @@ export function buildVenueCatalogSearchParams(query: VenueCatalogFeedQuery): URL
   if (query.sort && query.sort !== 'events') params.set('sort', query.sort);
   if (query.q?.trim()) params.set('q', query.q.trim());
   if (query.cursor) params.set('cursor', query.cursor);
+  if (query.counts === false) params.set('counts', '0');
   return params;
 }
 
@@ -77,6 +82,7 @@ export function venueCatalogCacheKey(query: VenueCatalogFeedQuery): string {
     query.q?.trim() || '',
     query.cursor || '',
     String(query.limit || VENUE_CATALOG_PAGE_SIZE),
+    query.counts === false ? 'shell' : 'full',
   ].join('|');
 }
 
@@ -90,7 +96,12 @@ export function venueCatalogDefaultQueryKey(family: VenueCatalogFamily): string 
 }
 
 export function mapVenueCatalogFeedPage(payload: PublicVenuesDto | null | undefined): VenueCatalogFeedPage {
-  const venues = (payload?.venues ?? []).map((item) => toVenueCatalogCard(item));
+  const countsPending = Boolean(payload?.countsPending);
+  const venues = (payload?.venues ?? []).map((item) => {
+    const card = toVenueCatalogCard(item);
+    if (countsPending) return { ...card, events: 0, eventsPending: true };
+    return card;
+  });
   const stats = payload?.stats;
   return {
     venues,
@@ -98,6 +109,7 @@ export function mapVenueCatalogFeedPage(payload: PublicVenuesDto | null | undefi
     nextCursor: payload?.nextCursor ?? null,
     hasMore: Boolean(payload?.hasMore ?? payload?.nextCursor),
     limit: Number(payload?.limit) || VENUE_CATALOG_PAGE_SIZE,
+    countsPending,
     stats: {
       venues: Number(stats?.venues) || Number(payload?.total) || venues.length,
       cities: stats?.cities || {},
@@ -126,6 +138,37 @@ export async function fetchVenueCatalogPage(
   }
   const payload = (await response.json()) as PublicVenuesDto;
   return mapVenueCatalogFeedPage(payload);
+}
+
+/** Distinct product counts (event≠slots) for progressive card enrich. */
+export async function fetchVenueCatalogEventCounts(
+  venueIds: string[],
+  init?: RequestInit,
+): Promise<Record<string, number>> {
+  const ids = [...new Set(venueIds.map((id) => String(id || '').trim()).filter(Boolean))].slice(0, 100);
+  if (!ids.length) return {};
+  const response = await fetch(`/api/public/venues/event-counts?ids=${encodeURIComponent(ids.join(','))}`, init);
+  if (!response.ok) return {};
+  const payload = (await response.json()) as { counts?: Record<string, number> };
+  const counts = payload.counts || {};
+  const out: Record<string, number> = {};
+  for (const [id, value] of Object.entries(counts)) {
+    out[id] = Number(value) || 0;
+  }
+  return out;
+}
+
+export function applyVenueCatalogEventCounts(
+  page: VenueCatalogFeedPage,
+  counts: Record<string, number>,
+): VenueCatalogFeedPage {
+  if (!page.venues.length) return { ...page, countsPending: false };
+  const venues = page.venues.map((venue) => ({
+    ...venue,
+    events: counts[venue.id] ?? venue.events ?? 0,
+    eventsPending: false,
+  }));
+  return { ...page, venues, countsPending: false };
 }
 
 export async function fetchVenueCatalogPins(

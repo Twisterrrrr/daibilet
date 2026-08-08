@@ -14,6 +14,23 @@
 
 ---
 
+## 2026-08-08 - /venues progressive: shell cards → event counts
+
+### Наблюдения
+- Owner: при смене города сначала отдавать площадки, счётчики событий - следом.
+- Distinct product SQL на cold hub всё ещё дорогой; type chips зависят только от `venue.type`.
+
+### Решения
+- API `?counts=0`: shell hub без distinct counts/facets; `countsPending` в envelope.
+- `GET /api/public/venues/event-counts?ids=` - event≠slots через `fetchVenueDistinctEventCounts`.
+- Client `/venues`: city switch paints shell + type chips, затем enrich; pulse на badge.
+- Warm full hub переиспользуется для shell (без лишнего pending); после shell cold - background full rebuild.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-08 - Sitewide hang: venues hub cold rebuild + catalog no-store
 
 ### Наблюдения

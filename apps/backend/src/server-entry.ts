@@ -20,7 +20,7 @@ import { buildPublicCityDto, buildPublicDestinationsDto, clearPublicCityDtoCache
 import { createPublicCityRouteHandler } from './public-city-handler.js';
 import { buildPublicEventDto, clearPublicEventDtoCache } from './public-event.dto.js';
 import { createPublicEventRouteHandler } from './public-event-handler.js';
-import { buildPublicVenueDto, buildPublicVenuesDto, clearPublicVenueDtoCache } from './public-venue.dto.js';
+import { buildPublicVenueDto, buildPublicVenuesDto, buildPublicVenueEventCountsDto, clearPublicVenueDtoCache } from './public-venue.dto.js';
 import { createPublicVenueRouteHandler } from './public-venue-handler.js';
 import { createPublicReadStackWarmer } from './public-warmup.js';
 import {
@@ -84,6 +84,7 @@ const server = startServer({
         enabled: publicFlags.venue,
         buildVenues: buildPublicVenuesDto,
         buildVenue: buildPublicVenueDto,
+        buildVenueEventCounts: buildPublicVenueEventCountsDto,
       }),
       createAdminOrdersReadRouteHandler({
         enabled: adminFlags.orders,

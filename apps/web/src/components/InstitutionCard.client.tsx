@@ -107,7 +107,9 @@ export function InstitutionCard({ venue, href }: { venue: InstitutionCardVenue; 
           <div className="mt-auto flex items-end justify-between gap-3 pt-1">
             <div>
               <div className="text-xs text-graphite-muted">{venue.city}</div>
-              {venue.events > 0 ? (
+              {venue.eventsPending ? (
+                <div className="mt-0.5 h-4 w-20 animate-pulse rounded bg-slate-100" aria-hidden />
+              ) : venue.events > 0 ? (
                 <div className="text-sm font-semibold text-graphite">{pluralEvents(venue.events)}</div>
               ) : null}
             </div>

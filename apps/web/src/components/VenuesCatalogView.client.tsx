@@ -22,10 +22,13 @@ import {
   resolveCatalogCityFilter,
 } from '@/lib/selected-city';
 import {
+  applyVenueCatalogEventCounts,
+  fetchVenueCatalogEventCounts,
   fetchVenueCatalogPage,
   venueCatalogCacheKey,
   VENUE_CATALOG_PAGE_SIZE,
   type VenueCatalogFeedPage,
+  type VenueCatalogFeedQuery,
   type VenueCatalogSort,
 } from '@/lib/venue-catalog-feed';
 import {
@@ -82,6 +85,24 @@ function applyInitialPage(
   setters.setTotal(page.total);
   setters.setNextCursor(page.nextCursor);
   setters.setStats(page.stats);
+}
+
+/** City-scoped shell first (cards ASAP), then distinct product counts. */
+async function fetchVenuePageProgressive(
+  query: VenueCatalogFeedQuery,
+  signal: AbortSignal,
+): Promise<VenueCatalogFeedPage> {
+  const shell = await fetchVenueCatalogPage({ ...query, counts: false }, { signal });
+  if (!shell.countsPending || !shell.venues.length) return shell;
+  try {
+    const counts = await fetchVenueCatalogEventCounts(
+      shell.venues.map((venue) => venue.id),
+      { signal },
+    );
+    return applyVenueCatalogEventCounts(shell, counts);
+  } catch {
+    return { ...shell, countsPending: false, venues: shell.venues.map((v) => ({ ...v, eventsPending: false })) };
+  }
 }
 
 /** City scope for type-chip cache (type excluded). */
@@ -224,13 +245,40 @@ export function VenuesCatalogView({
       try {
         let basePage = cachedBase;
         if (!basePage) {
-          basePage = await fetchVenueCatalogPage(
-            { ...feedQuery, type: undefined },
-            { signal: controller.signal },
-          );
+          // 1) Shell paint: venues + type chips without waiting on distinct product SQL.
+          const shellQuery = { ...feedQuery, type: undefined, counts: false as const };
+          const shellPage = await fetchVenueCatalogPage(shellQuery, { signal: controller.signal });
           if (requestId !== catalogRequestId.current) return;
-          cityBaseRef.current = { key: scopeKey, page: basePage };
-          setStats(basePage.stats);
+          cityBaseRef.current = { key: scopeKey, page: shellPage };
+          setStats(shellPage.stats);
+          if (typeFilter === 'all') {
+            setVenues(shellPage.venues);
+            setTotal(shellPage.total);
+            setNextCursor(shellPage.nextCursor);
+            setCatalogLoading(false);
+          } else {
+            const filtered = shellPage.venues.filter(
+              (venue) => normalizeVenueKind(venue.type) === typeFilter,
+            );
+            setVenues(filtered);
+            setTotal(Number(shellPage.stats.types?.[typeFilter]) || filtered.length);
+            setNextCursor(null);
+            setCatalogLoading(false);
+          }
+
+          // 2) Enrich event≠slots counts for visible page (and city-scoped base).
+          if (shellPage.countsPending && shellPage.venues.length) {
+            const counts = await fetchVenueCatalogEventCounts(
+              shellPage.venues.map((venue) => venue.id),
+              { signal: controller.signal },
+            );
+            if (requestId !== catalogRequestId.current) return;
+            basePage = applyVenueCatalogEventCounts(shellPage, counts);
+            cityBaseRef.current = { key: scopeKey, page: basePage };
+            setStats(basePage.stats);
+          } else {
+            basePage = shellPage;
+          }
         } else {
           setStats(basePage.stats);
         }
@@ -242,7 +290,18 @@ export function VenuesCatalogView({
           return;
         }
 
-        const typed = await fetchVenueCatalogPage(feedQuery, { signal: controller.signal });
+        // Type filter: prefer client filter on enriched base; server page if base was truncated.
+        const localFiltered = basePage.venues.filter(
+          (venue) => normalizeVenueKind(venue.type) === typeFilter,
+        );
+        if (!basePage.hasMore || localFiltered.length >= VENUE_CATALOG_PAGE_SIZE) {
+          setVenues(localFiltered.slice(0, VENUE_CATALOG_PAGE_SIZE));
+          setTotal(Number(basePage.stats.types?.[typeFilter]) || localFiltered.length);
+          setNextCursor(null);
+          return;
+        }
+
+        const typed = await fetchVenuePageProgressive(feedQuery, controller.signal);
         if (requestId !== catalogRequestId.current) return;
         setVenues(typed.venues);
         setTotal(typed.total);
@@ -367,7 +426,11 @@ export function VenuesCatalogView({
     : 'Музеи, театры и пространства';
   const heroTotal = stats.venues || total;
   const scopedEvents = useMemo(
-    () => venues.reduce((sum, venue) => sum + (venue.events || 0), 0),
+    () =>
+      venues.reduce(
+        (sum, venue) => sum + (venue.eventsPending ? 0 : venue.events || 0),
+        0,
+      ),
     [venues],
   );
 

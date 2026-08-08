@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { buildPublicVenuePage, buildPublicVenuesCatalog } from './public-venue-read.js';
+import { buildPublicVenuePage, buildPublicVenuesCatalog, buildPublicVenueEventCounts } from './public-venue-read.js';
 import { createDb } from './db.js';
 import type {
   PublicVenueDto,
@@ -125,6 +125,10 @@ function withTypedVenueSeoFallbacks(payload: PublicVenuePageDto): PublicVenuePag
       canonicalPath: venue.canonicalPath ?? `/venues/${venue.slug}`,
     },
   };
+}
+
+export async function buildPublicVenueEventCountsDto(venueIds: string[]) {
+  return buildPublicVenueEventCounts(venueIds);
 }
 
 function venueCatalogCore(venue: PublicVenueDto) {
