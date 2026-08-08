@@ -1,10 +1,9 @@
 'use client';
 
-import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
-import { Map as MapIcon, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 
 import { CatalogInfiniteSentinel } from '@/components/CatalogInfiniteSentinel.client';
 import { LocationCard } from '@/components/LocationCard.client';
@@ -21,11 +20,9 @@ import {
 } from '@/lib/selected-city';
 import {
   fetchVenueCatalogPage,
-  fetchVenueCatalogPins,
   venueCatalogCacheKey,
   VENUE_CATALOG_PAGE_SIZE,
   type VenueCatalogFeedPage,
-  type VenueCatalogMapPin,
   type VenueCatalogSort,
 } from '@/lib/venue-catalog-feed';
 import {
@@ -34,21 +31,6 @@ import {
   venueTypeLabel,
 } from '@/lib/venue-meta';
 import { venueHref } from '@/lib/routes';
-
-const LocationsCatalogMap = dynamic(
-  () =>
-    import('@/components/LocationsCatalogMap.client').then((mod) => ({
-      default: mod.LocationsCatalogMap,
-    })),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-6 text-sm text-slate-500">
-        Загружаем карту…
-      </div>
-    ),
-  },
-);
 
 const SORT_OPTIONS: Array<[VenueCatalogSort, string]> = [
   ['events', 'По афише'],
@@ -95,15 +77,8 @@ export function LocationsCatalogView({
   const [stats, setStats] = useState(initialPage.stats);
   const [catalogLoading, setCatalogLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [showMap, setShowMap] = useState(false);
-  const [mapPins, setMapPins] = useState<VenueCatalogMapPin[]>([]);
-  const [mapLoading, setMapLoading] = useState(false);
-  const [selectedPinId, setSelectedPinId] = useState<string | null>(null);
-  const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const loadMoreLock = useRef(false);
   const catalogRequestId = useRef(0);
-  const mapRequestId = useRef(0);
-  const mapUserToggled = useRef(false);
 
   const rawUrlCity = searchParams.get('city')?.trim() || '';
   const urlCityAll = rawUrlCity.toLowerCase() === 'all';
@@ -136,34 +111,6 @@ export function LocationsCatalogView({
     const timer = window.setTimeout(() => setDebouncedQuery(query.trim()), 250);
     return () => window.clearTimeout(timer);
   }, [query]);
-
-  // Desktop: open map after idle so first useful list paints without Leaflet/pins.
-  // Mobile stays off until user taps «Показать картой».
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    if (!window.matchMedia('(min-width: 1024px)').matches) return;
-
-    let cancelled = false;
-    const openIfUntouched = () => {
-      if (cancelled || mapUserToggled.current) return;
-      setShowMap(true);
-    };
-
-    let idleId: number | undefined;
-    let timeoutId: number | undefined;
-    const ric = window.requestIdleCallback?.bind(window);
-    if (ric) {
-      idleId = ric(openIfUntouched, { timeout: 2500 });
-    } else {
-      timeoutId = window.setTimeout(openIfUntouched, 1500);
-    }
-
-    return () => {
-      cancelled = true;
-      if (idleId != null) window.cancelIdleCallback?.(idleId);
-      if (timeoutId != null) window.clearTimeout(timeoutId);
-    };
-  }, []);
 
   const feedQuery = useMemo(
     () => ({
@@ -222,41 +169,6 @@ export function LocationsCatalogView({
     };
   }, [feedQuery, feedQueryKey, cityReady, rawUrlCity, initialQueryKey, initialPage]);
 
-  // Map pins: only when showMap - separate lean mode=pins request.
-  useEffect(() => {
-    if (!showMap) return;
-    if (!cityReady && !rawUrlCity) {
-      setMapLoading(false);
-      return;
-    }
-    const controller = new AbortController();
-    const requestId = ++mapRequestId.current;
-    setMapLoading(true);
-    fetchVenueCatalogPins(
-      {
-        family: 'location',
-        city: cityFetchKey || undefined,
-        type: typeFilter !== 'all' ? typeFilter : undefined,
-        q: debouncedQuery || undefined,
-      },
-      { signal: controller.signal },
-    )
-      .then((pins) => {
-        if (requestId !== mapRequestId.current) return;
-        setMapPins(pins);
-      })
-      .catch((error: unknown) => {
-        if (requestId !== mapRequestId.current) return;
-        if (error instanceof DOMException && error.name === 'AbortError') return;
-      })
-      .finally(() => {
-        if (requestId === mapRequestId.current) setMapLoading(false);
-      });
-    return () => {
-      controller.abort();
-    };
-  }, [showMap, cityFetchKey, typeFilter, debouncedQuery, cityReady, rawUrlCity]);
-
   const loadMore = useCallback(() => {
     if (!nextCursor || loadingMore || catalogLoading || loadMoreLock.current) return;
     loadMoreLock.current = true;
@@ -281,11 +193,6 @@ export function LocationsCatalogView({
   const cityPending = !rawUrlCity && Boolean(selectedCity) && !cityReady;
   const listPending = (cityPending || catalogLoading) && venues.length === 0;
   const listRefreshing = (cityPending || catalogLoading) && venues.length > 0;
-
-  const toggleMap = () => {
-    mapUserToggled.current = true;
-    setShowMap((value) => !value);
-  };
 
   const setCityFilter = (next: string) => {
     persistSelectedCity(next === 'all' ? 'all' : next);
@@ -336,25 +243,6 @@ export function LocationsCatalogView({
     return [...known, ...extras];
   }, [stats.types]);
 
-  const mapPinsForUi = useMemo(
-    () =>
-      mapPins.map((pin) => ({
-        id: pin.id,
-        title: pin.name,
-        href: venueHref({ id: pin.id, slug: pin.slug, name: pin.name, type: pin.kind }),
-        latitude: pin.latitude,
-        longitude: pin.longitude,
-        typeLabel: venueTypeLabel(pin.kind, pin.name),
-      })),
-    [mapPins],
-  );
-
-  const onPinClick = (id: string) => {
-    setSelectedPinId(id);
-    const node = cardRefs.current.get(id);
-    node?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  };
-
   const cityCount = cityOptions.length;
   const eventsHref = catalogHrefWithSelectedCity(
     selectedCity?.selectedDestination?.slug || selectedCity?.cityValue,
@@ -376,21 +264,12 @@ export function LocationsCatalogView({
     <LocationsCatalogSkeleton />
   ) : venues.length > 0 ? (
     <>
-      <div className="grid grid-cols-1 gap-3">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
         {venues.map((venue) => (
-          <div
-            key={venue.id}
-            ref={(node) => {
-              if (node) cardRefs.current.set(venue.id, node);
-              else cardRefs.current.delete(venue.id);
-            }}
-            className={selectedPinId === venue.id ? 'ring-2 ring-primary-500/40 rounded-2xl' : undefined}
-          >
-            <LocationCard venue={venue} href={venueHref(venue)} nextSlot={venue.nextSlot} />
-          </div>
+          <LocationCard key={venue.id} venue={venue} href={venueHref(venue)} nextSlot={venue.nextSlot} />
         ))}
       </div>
-      {loadingMore ? <div className="mt-4"><LocationsCatalogSkeleton count={3} /></div> : null}
+      {loadingMore ? <div className="mt-4"><LocationsCatalogSkeleton count={2} /></div> : null}
       <CatalogInfiniteSentinel enabled={Boolean(nextCursor) && !loadingMore} onIntersect={loadMore} />
     </>
   ) : (
@@ -492,19 +371,6 @@ export function LocationsCatalogView({
             )}
           </h2>
           <div className="flex flex-wrap items-center gap-3">
-            <button
-              type="button"
-              onClick={toggleMap}
-              className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-semibold transition ${
-                showMap
-                  ? 'bg-primary-600 text-white'
-                  : 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
-              }`}
-              aria-pressed={showMap}
-            >
-              <MapIcon className="h-4 w-4" />
-              {showMap ? 'Скрыть карту' : 'Показать картой'}
-            </button>
             <select
               value={sortMode}
               onChange={(event) => setSortMode(event.target.value as VenueCatalogSort)}
@@ -522,59 +388,7 @@ export function LocationsCatalogView({
           </div>
         </div>
 
-        {showMap ? (
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(320px,42%)] lg:items-start">
-            <div className="min-w-0">{listBlock}</div>
-            <aside className="sticky top-[calc(var(--site-header-height)+1rem)] hidden self-start lg:block">
-              {mapLoading ? (
-                <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-6 text-sm text-slate-500">
-                  Загружаем точки карты…
-                </div>
-              ) : mapPinsForUi.length > 0 ? (
-                <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-                  <LocationsCatalogMap
-                    pins={mapPinsForUi}
-                    selectedId={selectedPinId}
-                    onPinClick={onPinClick}
-                    layoutKey={`${showMap}-${mapPinsForUi.length}-${cityFilter}-${typeFilter}`}
-                    className="h-[min(70vh,640px)] w-full"
-                  />
-                  <p className="border-t border-slate-100 px-3 py-2 text-xs text-slate-500">
-                    {formatNumber(mapPinsForUi.length)} точек с координатами на карте
-                  </p>
-                </div>
-              ) : (
-                <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-6 text-sm text-slate-500">
-                  У отфильтрованных точек пока нет координат для карты.
-                </div>
-              )}
-            </aside>
-            {/* Mobile map panel when toggle on */}
-            <div className="lg:hidden">
-              {mapLoading ? (
-                <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-500">
-                  Загружаем карту…
-                </div>
-              ) : mapPinsForUi.length > 0 ? (
-                <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-                  <LocationsCatalogMap
-                    pins={mapPinsForUi}
-                    selectedId={selectedPinId}
-                    onPinClick={onPinClick}
-                    layoutKey={`m-${showMap}-${mapPinsForUi.length}`}
-                    className="h-72 w-full"
-                  />
-                </div>
-              ) : (
-                <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-500">
-                  Нет координат для карты.
-                </div>
-              )}
-            </div>
-          </div>
-        ) : (
-          listBlock
-        )}
+        {listBlock}
 
         <nav className="mt-8 flex flex-wrap gap-4 text-sm text-slate-500">
           <Link href="/cities" className="font-medium text-primary hover:underline">

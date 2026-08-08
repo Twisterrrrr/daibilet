@@ -131,12 +131,12 @@ export function LocationCard({
 
   return (
     <div className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lg">
-      <Link href={href} className="flex min-w-0 items-stretch no-underline">
+      <Link href={href} className="flex min-w-0 items-start no-underline">
         <div
-          className={`relative flex w-16 shrink-0 flex-col items-center justify-center overflow-hidden p-2.5 text-white sm:w-20 ${
+          className={`relative aspect-square w-24 shrink-0 overflow-hidden text-white sm:w-28 ${
             !preferIconRail && isContentPlace && venue.heroImageUrl
               ? 'bg-slate-900'
-              : `bg-gradient-to-br ${gradient}`
+              : `flex flex-col items-center justify-center bg-gradient-to-br p-2.5 ${gradient}`
           }`}
         >
           {!preferIconRail && isContentPlace && venue.heroImageUrl ? (
