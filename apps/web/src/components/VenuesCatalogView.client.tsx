@@ -88,6 +88,7 @@ function applyInitialPage(
 }
 
 /** City-scoped shell first (cards ASAP); counts enrich is fire-and-forget at call sites. */
+function mergeVenuePages(
   prev: VenueCatalogFeedPage['venues'],
   next: VenueCatalogFeedPage['venues'],
 ): VenueCatalogFeedPage['venues'] {
