@@ -51,16 +51,19 @@ export async function getCachedPublicVenueDto(slug: string) {
       if (!payload?.venue) throw new VenueDtoMissError(key);
       return payload;
     },
-    ['public-venue-dto-v4-no-null', key],
+    ['public-venue-dto-v5-no-null', key],
     venueCacheOptions,
   );
 
   try {
     return await cached();
   } catch (error) {
-    // unstable_cache may wrap/rehydrate the throw - match by message, not only instanceof.
+    // Soft-miss must NEVER become HTTP 500. Next unstable_cache often wraps the throw so
+    // instanceof / exact message checks fail - treat any cache-fn failure as miss and let
+    // loadVenueDtoOrNull retry uncached once.
     const msg = error instanceof Error ? error.message : String(error);
     if (error instanceof VenueDtoMissError || msg.includes('venue_dto_miss:')) return null;
-    throw error;
+    console.warn(`[venue-dto-cache] soft-null after cache error for ${key}:`, msg);
+    return null;
   }
 }

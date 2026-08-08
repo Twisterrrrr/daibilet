@@ -50,6 +50,7 @@
 ### Проблемы
 - Dead hub cards без DTO остаются (после фикса будут 404, не 500) - нужна data cleanup.
 - Transient 502 under load - capacity, не slug.
+- После web deploy miss-pages ещё 500: `unstable_cache` wrap ломал instanceof/`dto_miss` catch → rethrow. Hotfix: cache catch → всегда soft-null + cache key v5.
 
 ---
 

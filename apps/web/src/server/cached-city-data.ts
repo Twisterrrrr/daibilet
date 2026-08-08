@@ -66,17 +66,20 @@ export async function getCachedPublicCityDto(slug: string) {
       if (!payload?.city) throw new CityDtoMissError(key);
       return payload;
     },
-    ['public-city-dto-v4-no-null', key],
+    ['public-city-dto-v5-no-null', key],
     cityCacheOptions,
   );
 
   try {
     return await cached();
   } catch (error) {
-    // unstable_cache may wrap/rehydrate the throw - match by message, not only instanceof.
+    // Soft-miss must NEVER become HTTP 500. Next unstable_cache often wraps the throw so
+    // instanceof / exact message checks fail - treat any cache-fn failure as miss and let
+    // loadCityDtoOrNull retry uncached once.
     const msg = error instanceof Error ? error.message : String(error);
     if (error instanceof CityDtoMissError || msg.includes('city_dto_miss:')) return null;
-    throw error;
+    console.warn(`[city-dto-cache] soft-null after cache error for ${key}:`, msg);
+    return null;
   }
 }
 
