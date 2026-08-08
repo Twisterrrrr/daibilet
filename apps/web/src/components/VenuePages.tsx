@@ -144,7 +144,8 @@ export async function VenueListPage({ family }: Pick<PageProps, 'family'>) {
       limit: VENUE_CATALOG_PAGE_SIZE,
     };
     const payload = await withSoftTimeout(
-      getCachedVenuesCatalog(family, { limit: VENUE_CATALOG_PAGE_SIZE }),
+      // Shell first: SSR HTML must not await cold distinct-product hub (~8-20s).
+      getCachedVenuesCatalog(family, { limit: VENUE_CATALOG_PAGE_SIZE, counts: false }),
       VENUE_LIST_TIMEOUT_MS,
       emptyPayload,
       `venue-list-${family}`,
@@ -154,7 +155,7 @@ export async function VenueListPage({ family }: Pick<PageProps, 'family'>) {
     // (do not call it before retry - that forced permanent private/no-store on /locations|/venues).
     if (!initialPage.venues.length) {
       const retry = await withSoftTimeout(
-        getCachedVenuesCatalog(family, { limit: VENUE_CATALOG_PAGE_SIZE }),
+        getCachedVenuesCatalog(family, { limit: VENUE_CATALOG_PAGE_SIZE, counts: false }),
         VENUE_LIST_RETRY_TIMEOUT_MS,
         emptyPayload,
         `venue-list-retry-${family}`,

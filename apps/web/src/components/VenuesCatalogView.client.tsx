@@ -217,6 +217,25 @@ export function VenuesCatalogView({
       cityBaseRef.current = { key: scopeKey, page: initialPage };
       setCatalogLoading(false);
       loadMoreLock.current = false;
+      // SSR shell may omit event≠slots counts - enrich without blocking first paint.
+      if (initialPage.countsPending) {
+        const requestId = catalogRequestId.current;
+        const controller = new AbortController();
+        void fetchVenueCatalogEventCounts(
+          initialPage.venues.map((venue) => venue.id),
+          { signal: controller.signal },
+        )
+          .then((counts) => {
+            if (requestId !== catalogRequestId.current) return;
+            const enriched = applyVenueCatalogEventCounts(initialPage, counts);
+            cityBaseRef.current = { key: scopeKey, page: enriched };
+            setVenues(enriched.venues);
+          })
+          .catch(() => undefined);
+        return () => {
+          controller.abort();
+        };
+      }
       return;
     }
 

@@ -132,6 +132,8 @@ export async function getCachedVenuesCatalog(
     sort?: string;
     cursor?: string;
     q?: string;
+    /** Progressive SSR/client shell: skip distinct product counts wait. */
+    counts?: boolean;
   } = {},
 ) {
   const limit = options.limit ?? 24;
@@ -142,9 +144,10 @@ export async function getCachedVenuesCatalog(
   const sort = options.sort?.trim() || 'events';
   const cursor = options.cursor?.trim() || '';
   const q = options.q?.trim() || '';
-  // Cache key: city+kind+cursor(+scale/logistics[+sort/q]).
+  const shell = options.counts === false;
+  // Cache key: city+kind+cursor(+scale/logistics[+sort/q]) + shell/full.
   const cacheKeyParts = [
-    'public-venues-catalog-v5-http',
+    'public-venues-catalog-v6-http',
     family,
     String(limit),
     city || 'all',
@@ -154,6 +157,7 @@ export async function getCachedVenuesCatalog(
     sort,
     cursor || '',
     q,
+    shell ? 'shell' : 'full',
   ];
   const cached = unstable_cache(
     () => {
@@ -165,9 +169,10 @@ export async function getCachedVenuesCatalog(
       if (sort && sort !== 'events') searchParams.sort = sort;
       if (cursor) searchParams.cursor = cursor;
       if (q) searchParams.q = q;
+      if (shell) searchParams.counts = 0;
       return fetchPublicApiJson<PublicVenuesDto>('/api/public/venues', {
         searchParams,
-        timeoutMs: 5_000,
+        timeoutMs: shell ? 3_000 : 5_000,
       });
     },
     cacheKeyParts,
