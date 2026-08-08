@@ -17,6 +17,7 @@ import { cityToGenitive } from '@/lib/city-declension';
 import { formatNumber, pluralCities, pluralEvents, pluralVenues } from '@/lib/format';
 import {
   catalogCityQueryValue,
+  isAllCitiesQuery,
   persistSelectedCity,
   resolveCatalogCityFilter,
 } from '@/lib/selected-city';
@@ -83,6 +84,17 @@ function applyInitialPage(
   setters.setStats(page.stats);
 }
 
+/** City scope for type-chip cache (type excluded). */
+function cityScopeKey(query: {
+  family: string;
+  city?: string;
+  sort?: string;
+  q?: string;
+  limit?: number;
+}): string {
+  return [query.family, query.city || 'all', query.sort || 'events', query.q || '', String(query.limit || '')].join('|');
+}
+
 export function VenuesCatalogView({
   initialPage,
   initialQueryKey = '',
@@ -106,38 +118,35 @@ export function VenuesCatalogView({
   const [loadingMore, setLoadingMore] = useState(false);
   const loadMoreLock = useRef(false);
   const catalogRequestId = useRef(0);
+  const cityBaseRef = useRef<{ key: string; page: VenueCatalogFeedPage } | null>(null);
 
-  const urlCity = searchParams.get('city')?.trim() || '';
+  const rawUrlCity = searchParams.get('city')?.trim() || '';
+  const urlCityAll = isAllCitiesQuery(rawUrlCity);
+  const urlCity = urlCityAll ? '' : rawUrlCity;
   const rawType = searchParams.get('type')?.trim() || '';
   const typeFilter = rawType ? normalizeVenueKind(rawType) : 'all';
-  // ?scale= ignored: secondary scale chips removed until product asks again.
   const cityReady = selectedCity?.cityReady ?? true;
-  const cityPending = !urlCity && Boolean(selectedCity) && !cityReady;
+  // `city=all` is resolved - do not wait for storage inject.
+  const cityPending = !rawUrlCity && Boolean(selectedCity) && !cityReady;
 
   const cityOptions = useMemo(() => cityOptionsFromStats(stats.cities || {}), [stats.cities]);
 
   const cityFilter = useMemo(() => {
+    if (urlCityAll) return 'all';
     if (urlCity) {
       return resolveCatalogCityFilter(urlCity, cityOptions, selectedCity?.cityLabel);
     }
     if (!cityReady || !selectedCity || selectedCity.cityValue === 'all') return 'all';
     return resolveCatalogCityFilter(selectedCity.cityValue, cityOptions, selectedCity.cityLabel);
-  }, [urlCity, cityReady, selectedCity, cityOptions]);
+  }, [urlCity, urlCityAll, cityReady, selectedCity, cityOptions]);
 
-  // Prefer URL token when present so slug pages do not refetch as display title when label hydrates.
+  // Prefer ASCII slug - Cyrillic soft-nav hangs catalog fetch.
   const cityFetchKey = useMemo(() => {
-    if (urlCity && urlCity !== 'all') return urlCity;
-    if (cityFilter !== 'all') return cityFilter;
-    const dest = selectedCity?.selectedDestination;
-    if (!dest || selectedCity?.cityValue === 'all') return '';
-    return dest.name || selectedCity.cityLabel || dest.slug || '';
-  }, [
-    urlCity,
-    cityFilter,
-    selectedCity?.cityValue,
-    selectedCity?.cityLabel,
-    selectedCity?.selectedDestination,
-  ]);
+    if (urlCityAll) return '';
+    if (urlCity) return urlCity;
+    if (cityFilter === 'all') return '';
+    return catalogCityQueryValue(selectedCity?.destinations || [], cityFilter);
+  }, [urlCity, urlCityAll, cityFilter, selectedCity?.destinations]);
 
   useEffect(() => {
     setViewMode(readStoredViewMode());
@@ -161,23 +170,30 @@ export function VenuesCatalogView({
   );
 
   const feedQueryKey = useMemo(() => venueCatalogCacheKey(feedQuery), [feedQuery]);
+  const scopeKey = useMemo(() => cityScopeKey(feedQuery), [feedQuery]);
 
-  // Filters reset cursor and refetch first page server-side.
+  // Filters reset cursor and refetch first page. Type-only changes prefer client filter.
   useEffect(() => {
-    if (!cityReady && !urlCity) {
-      // Keep SSR list while SelectedCity hydrates - do not skeleton useful cards.
+    if (!cityReady && !rawUrlCity) {
       setCatalogLoading(false);
       return;
     }
 
-    // SSR unfiltered page already matches current filters (all cities / default sort).
+    const isAllCitiesScope = !cityFetchKey && (urlCityAll || cityFilter === 'all');
+
+    // SSR unfiltered page only when truly «all cities» / default sort.
     if (
+      isAllCitiesScope &&
+      typeFilter === 'all' &&
+      !debouncedQuery &&
+      sortMode === 'events' &&
       initialQueryKey &&
       feedQueryKey === initialQueryKey &&
       initialPage.venues.length > 0
     ) {
       catalogRequestId.current += 1;
       applyInitialPage(initialPage, { setVenues, setTotal, setNextCursor, setStats });
+      cityBaseRef.current = { key: scopeKey, page: initialPage };
       setCatalogLoading(false);
       loadMoreLock.current = false;
       return;
@@ -185,29 +201,85 @@ export function VenuesCatalogView({
 
     const controller = new AbortController();
     const requestId = ++catalogRequestId.current;
-    // Stale-while-revalidate: keep prior cards visible; skeleton only when empty.
-    setCatalogLoading(true);
+    const cachedBase = cityBaseRef.current?.key === scopeKey ? cityBaseRef.current.page : null;
+
+    // Instant type chip switch from city-scoped base (same city/sort/q).
+    if (typeFilter !== 'all' && cachedBase && cachedBase.venues.length > 0) {
+      const filtered = cachedBase.venues.filter((venue) => normalizeVenueKind(venue.type) === typeFilter);
+      setVenues(filtered);
+      setTotal(
+        typeFilter === 'all'
+          ? cachedBase.total
+          : Number(cachedBase.stats.types?.[typeFilter]) || filtered.length,
+      );
+      setNextCursor(null);
+      setStats(cachedBase.stats);
+      setCatalogLoading(false);
+    } else if (!(cachedBase && typeFilter === 'all')) {
+      setCatalogLoading(true);
+    }
     loadMoreLock.current = false;
-    fetchVenueCatalogPage(feedQuery, { signal: controller.signal })
-      .then((page) => {
+
+    const run = async () => {
+      try {
+        let basePage = cachedBase;
+        if (!basePage) {
+          basePage = await fetchVenueCatalogPage(
+            { ...feedQuery, type: undefined },
+            { signal: controller.signal },
+          );
+          if (requestId !== catalogRequestId.current) return;
+          cityBaseRef.current = { key: scopeKey, page: basePage };
+          setStats(basePage.stats);
+        } else {
+          setStats(basePage.stats);
+        }
+
+        if (typeFilter === 'all') {
+          setVenues(basePage.venues);
+          setTotal(basePage.total);
+          setNextCursor(basePage.nextCursor);
+          return;
+        }
+
+        const typed = await fetchVenueCatalogPage(feedQuery, { signal: controller.signal });
         if (requestId !== catalogRequestId.current) return;
-        setVenues(page.venues);
-        setTotal(page.total);
-        setNextCursor(page.nextCursor);
-        setStats(page.stats);
-      })
-      .catch((error: unknown) => {
+        setVenues(typed.venues);
+        setTotal(typed.total);
+        setNextCursor(typed.nextCursor);
+        setStats({
+          ...typed.stats,
+          types: basePage.stats.types,
+          cities: basePage.stats.cities,
+          venues: typed.stats.venues,
+        });
+      } catch (error: unknown) {
         if (requestId !== catalogRequestId.current) return;
         if (error instanceof DOMException && error.name === 'AbortError') return;
-        // Fail soft: empty list / keep prior cards, but always leave pending.
-      })
-      .finally(() => {
+      } finally {
         if (requestId === catalogRequestId.current) setCatalogLoading(false);
-      });
+      }
+    };
+
+    void run();
     return () => {
       controller.abort();
     };
-  }, [feedQuery, feedQueryKey, cityReady, urlCity, initialQueryKey, initialPage]);
+  }, [
+    feedQuery,
+    feedQueryKey,
+    scopeKey,
+    cityReady,
+    rawUrlCity,
+    urlCityAll,
+    cityFilter,
+    cityFetchKey,
+    typeFilter,
+    debouncedQuery,
+    sortMode,
+    initialQueryKey,
+    initialPage,
+  ]);
 
   const loadMore = useCallback(() => {
     if (!nextCursor || loadingMore || catalogLoading || loadMoreLock.current) return;
@@ -222,7 +294,6 @@ export function VenuesCatalogView({
         });
         setNextCursor(page.nextCursor);
         setTotal(page.total);
-        if (page.stats.venues) setStats(page.stats);
       })
       .catch(() => undefined)
       .finally(() => {
@@ -241,15 +312,15 @@ export function VenuesCatalogView({
   };
 
   const setCityFilter = (next: string) => {
+    // Prefer provider - resolveCityChangeNav writes `city=all` so storage inject cannot bounce.
+    if (selectedCity?.setCity) {
+      selectedCity.setCity(next === 'all' ? 'all' : next);
+      return;
+    }
     persistSelectedCity(next === 'all' ? 'all' : next);
     const params = new URLSearchParams(searchParams.toString());
-    if (next === 'all') params.delete('city');
-    else {
-      params.set(
-        'city',
-        catalogCityQueryValue(selectedCity?.destinations || [], next),
-      );
-    }
+    if (next === 'all') params.set('city', 'all');
+    else params.set('city', catalogCityQueryValue([], next));
     params.delete('scale');
     const qs = params.toString();
     startTransition(() => {
@@ -262,16 +333,18 @@ export function VenuesCatalogView({
     if (next === 'all') params.delete('type');
     else params.set('type', next);
     params.delete('scale');
+    // Keep explicit city=all so storage inject cannot bounce back.
+    if (urlCityAll && !params.get('city')) params.set('city', 'all');
     const qs = params.toString();
     startTransition(() => {
       router.replace(qs ? `/venues?${qs}` : '/venues', { scroll: false });
     });
   };
 
-  // Skeleton only when we have nothing useful to show (SSR empty / first load).
   const listPending = (cityPending || catalogLoading) && venues.length === 0;
   const listRefreshing = (cityPending || catalogLoading) && venues.length > 0;
 
+  // Type chips use city-scoped stats (untyped base), never global SSR leftovers.
   const typeOptions = useMemo(() => {
     const counts = stats.types || {};
     return INSTITUTION_CATALOG_TYPE_OPTIONS.filter((option) => counts[option.value]).map((option) => ({

@@ -105,7 +105,9 @@ export function LocationsCatalogView({
   const mapRequestId = useRef(0);
   const mapUserToggled = useRef(false);
 
-  const urlCity = searchParams.get('city')?.trim() || '';
+  const rawUrlCity = searchParams.get('city')?.trim() || '';
+  const urlCityAll = rawUrlCity.toLowerCase() === 'all';
+  const urlCity = urlCityAll ? '' : rawUrlCity;
   // ?logistics= ignored: secondary logistics chips removed until product asks again.
   const rawType = searchParams.get('type')?.trim() || '';
   const typeFilter = rawType ? normalizeVenueKind(rawType) : 'all';
@@ -114,27 +116,21 @@ export function LocationsCatalogView({
   const cityOptions = useMemo(() => cityOptionsFromStats(stats.cities || {}), [stats.cities]);
 
   const cityFilter = useMemo(() => {
+    if (urlCityAll) return 'all';
     if (urlCity) {
       return resolveCatalogCityFilter(urlCity, cityOptions, selectedCity?.cityLabel);
     }
     if (!cityReady || !selectedCity || selectedCity.cityValue === 'all') return 'all';
     return resolveCatalogCityFilter(selectedCity.cityValue, cityOptions, selectedCity.cityLabel);
-  }, [urlCity, cityReady, selectedCity, cityOptions]);
+  }, [urlCity, urlCityAll, cityReady, selectedCity, cityOptions]);
 
-  // Prefer URL token when present so slug pages do not refetch as display title when label hydrates.
+  // Prefer ASCII slug - Cyrillic soft-nav hangs catalog fetch.
   const cityFetchKey = useMemo(() => {
-    if (urlCity && urlCity !== 'all') return urlCity;
-    if (cityFilter !== 'all') return cityFilter;
-    const dest = selectedCity?.selectedDestination;
-    if (!dest || selectedCity?.cityValue === 'all') return '';
-    return dest.name || selectedCity.cityLabel || dest.slug || '';
-  }, [
-    urlCity,
-    cityFilter,
-    selectedCity?.cityValue,
-    selectedCity?.cityLabel,
-    selectedCity?.selectedDestination,
-  ]);
+    if (urlCityAll) return '';
+    if (urlCity) return urlCity;
+    if (cityFilter === 'all') return '';
+    return catalogCityQueryValue(selectedCity?.destinations || [], cityFilter);
+  }, [urlCity, urlCityAll, cityFilter, selectedCity?.destinations]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => setDebouncedQuery(query.trim()), 250);
@@ -185,7 +181,7 @@ export function LocationsCatalogView({
 
   // Filters reset cursor and refetch first page server-side (not client filter on 5k).
   useEffect(() => {
-    if (!cityReady && !urlCity) {
+    if (!cityReady && !rawUrlCity) {
       setCatalogLoading(false);
       return;
     }
@@ -224,12 +220,12 @@ export function LocationsCatalogView({
     return () => {
       controller.abort();
     };
-  }, [feedQuery, feedQueryKey, cityReady, urlCity, initialQueryKey, initialPage]);
+  }, [feedQuery, feedQueryKey, cityReady, rawUrlCity, initialQueryKey, initialPage]);
 
   // Map pins: only when showMap - separate lean mode=pins request.
   useEffect(() => {
     if (!showMap) return;
-    if (!cityReady && !urlCity) {
+    if (!cityReady && !rawUrlCity) {
       setMapLoading(false);
       return;
     }
@@ -259,7 +255,7 @@ export function LocationsCatalogView({
     return () => {
       controller.abort();
     };
-  }, [showMap, cityFetchKey, typeFilter, debouncedQuery, cityReady, urlCity]);
+  }, [showMap, cityFetchKey, typeFilter, debouncedQuery, cityReady, rawUrlCity]);
 
   const loadMore = useCallback(() => {
     if (!nextCursor || loadingMore || catalogLoading || loadMoreLock.current) return;
@@ -282,7 +278,7 @@ export function LocationsCatalogView({
       });
   }, [nextCursor, loadingMore, catalogLoading, feedQuery]);
 
-  const cityPending = !urlCity && Boolean(selectedCity) && !cityReady;
+  const cityPending = !rawUrlCity && Boolean(selectedCity) && !cityReady;
   const listPending = (cityPending || catalogLoading) && venues.length === 0;
   const listRefreshing = (cityPending || catalogLoading) && venues.length > 0;
 
@@ -294,7 +290,7 @@ export function LocationsCatalogView({
   const setCityFilter = (next: string) => {
     persistSelectedCity(next === 'all' ? 'all' : next);
     const params = new URLSearchParams(searchParams.toString());
-    if (next === 'all') params.delete('city');
+    if (next === 'all') params.set('city', 'all');
     else {
       params.set(
         'city',

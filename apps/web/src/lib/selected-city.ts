@@ -42,7 +42,15 @@ export function readStoredSelectedCity(destinations: PublicDestinationDto[]): st
   }
 }
 
+/** Explicit `?city=all` («Все города»). Empty/missing is not the same - storage may still inject. */
+export function isAllCitiesQuery(city?: string | null): boolean {
+  return String(city || '').trim().toLowerCase() === 'all';
+}
+
 export function resolveCityLabel(destinations: PublicDestinationDto[], urlCity?: string | null): string {
+  const raw = String(urlCity || '').trim();
+  if (raw.toLowerCase() === 'all') return 'Все города';
+
   const fromUrl = matchDestination(destinations, urlCity);
   if (fromUrl) return fromUrl.name;
 
@@ -75,12 +83,14 @@ export function catalogCityQueryValue(
 /**
  * If a city-filter page has no explicit `city` query, inject the stored header city.
  * Preserves deep-links that already set `city`.
+ * `city=all` is an explicit «Все города» choice - never overwrite it with storage.
  */
 export function mergeStoredCityIntoSearchParams(
   destinations: PublicDestinationDto[],
   searchParams: URLSearchParams,
 ): URLSearchParams | null {
   const explicit = searchParams.get('city')?.trim();
+  // Any explicit token (including `all`) blocks storage inject.
   if (explicit) return null;
 
   const stored = readStoredSelectedCity(destinations);

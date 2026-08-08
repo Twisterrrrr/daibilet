@@ -1,4 +1,23 @@
-## 2026-08-08 - Purchases CTA + venue slug fixes (TC ticket / Отзыв / Hermitage)
+## 2026-08-08 - /venues: city=all + type chips + event≠slots
+
+### Наблюдения
+- «Все города» на /venues не держалось: bare URL без `?city=` снова получал город из localStorage через `mergeStoredCityIntoSearchParams`.
+- Чипы типов (Музеи N…) и «Найдено» могли оставаться глобальными, пока в поиске уже выбран город.
+- Счётчики «7 985 событий» на карточках считали строки `Event` / слоты TC, а не логические продукты.
+- Афиша на PDP пустела: сессии в каталоге висели на child-slug (`…-hogvarts-holl-…`), карточка - на parent.
+
+### Решения
+- Явный sentinel `?city=all` в city-change-nav / Venues+Locations / SelectedCityProvider; storage очищается; inject storage не трогает `city=all`.
+- VenuesCatalogView: city-scoped base cache для чипов типов + мгновенный type switch; fetch key только ASCII slug.
+- Lean hub: `fetchVenueDistinctEventCounts` (mergeGroupKey || нормализованный title), не raw `_count.events`.
+- Venue PDP session lookup: prefix slug + shared title + related hub contexts.
+- CITY_SLUG_CANONICAL: `spb` / `peterburg` → `sankt-peterburg` (header filter).
+
+### Проблемы
+- Distinct-by-title эвристика; идеал - стабильный product id от поставщика. Child/parent merge по-прежнему title/slug-based.
+
+---
+
 
 ### Наблюдения
 - Seed вёл на битые slug: `tretyakovskaya-galereya`, `gosudarstvennyy-ermitazh` (канон: `moscow-tret-yakovskaya-galereya`, `ermitazh`; `erarta` уже 200).

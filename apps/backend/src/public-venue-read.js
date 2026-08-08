@@ -127,6 +127,9 @@ const CITY_SLUG_CANONICAL = {
   moskva: 'moskva',
   'saint-petersburg': 'sankt-peterburg',
   'sankt-peterburg': 'sankt-peterburg',
+  spb: 'sankt-peterburg',
+  peterburg: 'sankt-peterburg',
+  petersburg: 'sankt-peterburg',
   // latin SEO slug, destination slug, and Cyrillic DB slug (и→i → nizhnii-…)
   'nizhny-novgorod': 'nizhniy-novgorod',
   'nizhniy-novgorod': 'nizhniy-novgorod',
@@ -389,8 +392,13 @@ export async function buildPublicVenuePage(db, venueSlugOrId) {
   ]);
   const venueHeroImageFallbacks = buildActiveVenueEventCounts(catalogSessions).heroImageFallbacks;
   const mergedGroup = findMergedVenueGroup(hubRows, venue.id);
-  const venueIds = mergedGroup?.mergedVenueIds || [venue.id];
-  const venueContexts = collectVenueSessionLookupContexts(venue, mergedGroup);
+  const venueContexts = collectVenueSessionLookupContexts(venue, mergedGroup, hubRows);
+  const venueIds = [
+    ...new Set([
+      ...(mergedGroup?.mergedVenueIds || [venue.id]),
+      ...venueContexts.map((row) => row.id).filter(Boolean),
+    ]),
+  ];
   const sessions = lookupVenueCatalogSessions(venueIds, catalogSessions, venueContexts).slice(0, 120);
   if (!sessions.length) {
     const status = String(venue.pageStatus || '').toUpperCase();
@@ -2012,12 +2020,12 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
   return buildEnvelope(sorted, page, nextCursor, hasMore, facetSource);
 }
 
-function collectVenueSessionLookupContexts(venue, mergedGroup) {
+function collectVenueSessionLookupContexts(venue, mergedGroup, hubRows = []) {
   const contexts = [];
   const seen = new Set();
   const add = (row) => {
     if (!row) return;
-    const key = `${row.name || row.title || ''}|${row.address || ''}`;
+    const key = `${row.id || ''}|${row.slug || ''}|${row.name || row.title || ''}|${row.address || ''}`;
     if (seen.has(key)) return;
     seen.add(key);
     contexts.push(row);
@@ -2025,6 +2033,22 @@ function collectVenueSessionLookupContexts(venue, mergedGroup) {
 
   add(venue);
   add(mergedGroup);
+
+  const baseSlug = normalizePublicVenueSlugKey(venue?.slug || '');
+  const baseName = normalizeVenueTextKey(formatPublicVenueTitle(venue?.name || venue?.title || ''));
+  if (baseSlug || baseName) {
+    for (const row of hubRows || []) {
+      const rowSlug = normalizePublicVenueSlugKey(row?.slug || '');
+      const rowName = normalizeVenueTextKey(formatPublicVenueTitle(row?.name || row?.title || ''));
+      const slugHit =
+        baseSlug && rowSlug && (rowSlug === baseSlug || rowSlug.startsWith(`${baseSlug}-`));
+      const nameHit =
+        baseName.length >= 6 &&
+        rowName &&
+        (rowName === baseName || rowName.startsWith(`${baseName} `) || baseName.startsWith(rowName));
+      if (slugHit || nameHit) add(row);
+    }
+  }
   return contexts;
 }
 
@@ -2049,13 +2073,42 @@ function lookupVenueCatalogSessions(venueIds, catalogSessions, venueContexts = [
   if (!venueIds?.length && !venueContexts.length) return [];
 
   const pierKeys = pierKeysForVenueContexts(venueContexts);
-  // venueIndex lives in legacy dto catalog cache; filter sessions directly.
-
   const idSet = new Set(venueIds || []);
+  const slugPrefixes = new Set();
+  const nameKeys = new Set();
+  for (const ctx of venueContexts || []) {
+    const slug = normalizePublicVenueSlugKey(ctx?.slug || '');
+    if (slug) slugPrefixes.add(slug);
+    const nameKey = normalizeVenueTextKey(formatPublicVenueTitle(ctx?.name || ctx?.title || ''));
+    if (nameKey.length >= 6) nameKeys.add(nameKey);
+  }
+
   const matched = catalogSessions.filter((session) => {
     if (idSet.has(session.venueId)) return true;
     const pierKey = canonicalSessionPierKey(session);
-    return pierKey && pierKeys.has(pierKey);
+    if (pierKey && pierKeys.has(pierKey)) return true;
+
+    // TC often links tickets to a hall child slug (muzei-…-hogvarts-holl-…) while the
+    // public card is the parent muzei-…. Match prefix / shared title so afisha returns.
+    const sessionSlug = normalizePublicVenueSlugKey(session?.venueSlug || '');
+    if (sessionSlug) {
+      for (const prefix of slugPrefixes) {
+        if (sessionSlug === prefix || sessionSlug.startsWith(`${prefix}-`)) return true;
+      }
+    }
+    const sessionName = normalizeVenueTextKey(formatPublicVenueTitle(session?.venue || ''));
+    if (sessionName) {
+      for (const nameKey of nameKeys) {
+        if (
+          sessionName === nameKey ||
+          sessionName.startsWith(`${nameKey} `) ||
+          nameKey.startsWith(sessionName)
+        ) {
+          return true;
+        }
+      }
+    }
+    return false;
   });
   return sortVenueCatalogSessions(matched);
 }

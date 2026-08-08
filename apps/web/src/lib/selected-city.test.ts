@@ -4,6 +4,7 @@ import test from 'node:test';
 import { buildCatalogHref, catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from './catalog-url.ts';
 import {
   catalogCityQueryValue,
+  isAllCitiesQuery,
   isCityFilterPath,
   matchDestination,
   mergeStoredCityIntoEventsParams,
@@ -11,6 +12,7 @@ import {
   pathHrefWithSelectedCity,
   resolveCatalogCityFilter,
   resolveCityHubDestination,
+  resolveCityLabel,
   SELECTED_CITY_STORAGE_KEY,
 } from './selected-city.ts';
 
@@ -87,12 +89,27 @@ test('mergeStoredCityIntoSearchParams injects storage city only when city missin
     const kept = mergeStoredCityIntoEventsParams([...destinations], new URLSearchParams('city=Москва&date=today'));
     assert.equal(kept, null);
 
+    // Explicit «Все города» must stick - do not re-inject storage city.
+    const allCities = mergeStoredCityIntoSearchParams(
+      [...destinations],
+      new URLSearchParams('city=all&type=museum'),
+    );
+    assert.equal(allCities, null);
+
     storage.clear();
     const empty = mergeStoredCityIntoSearchParams([...destinations], new URLSearchParams(''));
     assert.equal(empty, null);
   } finally {
     Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: original });
   }
+});
+
+test('resolveCityLabel and isAllCitiesQuery honor city=all', () => {
+  assert.equal(isAllCitiesQuery('all'), true);
+  assert.equal(isAllCitiesQuery('ALL'), true);
+  assert.equal(isAllCitiesQuery(''), false);
+  assert.equal(isAllCitiesQuery('ufa'), false);
+  assert.equal(resolveCityLabel([...destinations], 'all'), 'Все города');
 });
 
 test('matchDestination resolves by name and slug', () => {

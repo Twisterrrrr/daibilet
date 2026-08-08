@@ -5,10 +5,33 @@ import { join } from '@daibilet/db/sql';
 import { isUsableCatalogImageUrl, pickFirstUsableEventImageUrl } from './event-image-url.js';
 import { CONTENT_PLACE_DB_KINDS } from './public-venue-hub-gate.js';
 
-/** Non-draft / non-hidden events count for venue list tiles (no session hydrate). */
+/** Non-draft / non-hidden events for venue list tiles (no session hydrate). */
 export const ACTIVE_VENUE_EVENT_WHERE = {
   status: { notIn: ['HIDDEN', 'DRAFT'] },
 } as const satisfies Prisma.EventWhereInput;
+
+/**
+ * Strip TC date/time prefixes so recurring slots collapse to one product title.
+ * Mirrors catalog group-title normalization used for afisha cards.
+ */
+function sqlNormalizedEventTitle(column = 'e.title'): string {
+  return `lower(trim(regexp_replace(
+    regexp_replace(
+      regexp_replace(
+        coalesce(${column}, ''),
+        '^\\d{1,2}[./]\\d{1,2}(?:[./]\\d{2,4})?(?:\\s*(?:,\\s*|\\s+в\\s+))?\\d{1,2}:\\d{2}[^\\n]*',
+        '',
+        'i'
+      ),
+      '\\s*\\([^)]{2,40}\\)\\s*$',
+      '',
+      'i'
+    ),
+    '\\s+',
+    ' ',
+    'g'
+  )))`;
+}
 
 export type LeanPublicVenueRow = {
   id: string;
@@ -55,14 +78,47 @@ const venueListSelect = {
   pageStatus: true,
   cityId: true,
   city: { select: { id: true, title: true, slug: true } },
-  _count: {
-    select: {
-      events: { where: ACTIVE_VENUE_EVENT_WHERE },
-    },
-  },
 } as const satisfies Prisma.VenueSelect;
 
 type VenueListRecord = Prisma.VenueGetPayload<{ select: typeof venueListSelect }>;
+
+/**
+ * Count logical products per venue (not EventSession rows / dated TC twins).
+ * Prefer EventOverride.mergeGroupKey, else normalized title.
+ */
+export async function fetchVenueDistinctEventCounts(
+  venueIds: string[],
+): Promise<Map<string, number>> {
+  const counts = new Map<string, number>();
+  const ids = [...new Set((venueIds || []).map((id) => String(id || '').trim()).filter(Boolean))];
+  if (!ids.length) return counts;
+
+  const titleExpr = sqlNormalizedEventTitle(`coalesce(nullif(trim(o.title), ''), e.title)`);
+  const placeholders = ids.map((_, i) => `$${i + 1}`).join(', ');
+  const distinctRows = await prisma.$queryRawUnsafe<Array<{ venueId: string; events: number }>>(
+    `
+      select
+        e."venueId" as "venueId",
+        count(distinct coalesce(
+          nullif(trim(o."mergeGroupKey"), ''),
+          nullif(${titleExpr}, ''),
+          e.id
+        ))::int as events
+      from "Event" e
+      left join "EventOverride" o on o."eventId" = e.id
+      where e."venueId" in (${placeholders})
+        and e.status not in ('HIDDEN', 'DRAFT')
+      group by e."venueId"
+    `,
+    ...ids,
+  );
+
+  for (const row of distinctRows) {
+    if (!row.venueId) continue;
+    counts.set(row.venueId, Number(row.events) || 0);
+  }
+  return counts;
+}
 
 /**
  * Lean venue rows for /venues + /locations catalog tiles.
@@ -125,10 +181,12 @@ export async function fetchLeanPublicVenueRows(
     if (!byId.has(row.id)) byId.set(row.id, row);
   }
 
-  return [...byId.values()].map((row) => mapLeanVenueRow(row, options.leanText === true));
+  const merged = [...byId.values()];
+  const eventCounts = await fetchVenueDistinctEventCounts(merged.map((row) => row.id));
+  return merged.map((row) => mapLeanVenueRow(row, options.leanText === true, eventCounts.get(row.id) || 0));
 }
 
-function mapLeanVenueRow(row: VenueListRecord, leanText: boolean): LeanPublicVenueRow {
+function mapLeanVenueRow(row: VenueListRecord, leanText: boolean, eventCount: number): LeanPublicVenueRow {
   const pageStatus = String(row.pageStatus || 'NONE').toLowerCase();
   const kind = row.kind;
   return {
@@ -152,7 +210,7 @@ function mapLeanVenueRow(row: VenueListRecord, leanText: boolean): LeanPublicVen
     kind,
     proposedKind: String(kind || 'OTHER').toLowerCase(),
     pageStatus,
-    events: row._count.events,
+    events: eventCount,
     waterEvents: 0,
     busEvents: 0,
     reason: pageStatus === 'candidate' ? 'кандидат на public-страницу' : 'пока только локация',

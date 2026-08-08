@@ -61,7 +61,7 @@ test('catalog section indexes keep filters and update city', () => {
       destinations,
       searchParams: new URLSearchParams('city=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0&q=театр'),
     }),
-    '/venues?q=%D1%82%D0%B5%D0%B0%D1%82%D1%80',
+    '/venues?city=all&q=%D1%82%D0%B5%D0%B0%D1%82%D1%80',
   );
 });
 

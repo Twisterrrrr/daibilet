@@ -155,7 +155,12 @@ export function SelectedCityProvider({
   // `/{intent}/{city}/` from localStorage made the all-cities chip unreachable.
 
   // Keep storage aligned with an explicit catalog city (including deep-links).
+  // `city=all` clears storage so mergeStoredCityIntoSearchParams cannot bounce back.
   useLayoutEffect(() => {
+    if (isCityFilterPath(pathname) && String(urlCity || '').trim().toLowerCase() === 'all') {
+      persistSelectedCity('all');
+      return;
+    }
     const matched = isCityFilterPath(pathname) && urlCity
       ? matchDestination(destinations, urlCity)
       : resolveCityHubDestination(destinations, pathname);

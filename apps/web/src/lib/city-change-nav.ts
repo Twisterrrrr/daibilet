@@ -97,11 +97,13 @@ export function resolveCityChangeNav(input: CityChangeNavInput): CityChangeNavRe
 
       // Leaving a PDP: drop deep-link noise; keep filters when already on the index.
       // Prefer ASCII slug in ?city= (Cyrillic names thrash App Router soft-nav / catalog fetch).
+      // `city=all` is required so SelectedCityProvider does not re-inject storage city
+      // when the user explicitly picks «Все города» (bare `/venues` was overwritten).
       const params =
         path === root
           ? new URLSearchParams(input.searchParams?.toString() || '')
           : new URLSearchParams();
-      if (name === 'all') params.delete('city');
+      if (name === 'all') params.set('city', 'all');
       else params.set('city', citySlug || name);
       params.delete('page');
       const query = params.toString();

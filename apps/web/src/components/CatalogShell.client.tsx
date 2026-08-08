@@ -37,7 +37,9 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
   const router = useRouter();
   const urlSearchParams = useSearchParams();
   const selectedCity = useSelectedCityOptional();
-  const urlHasCity = Boolean(urlSearchParams.get('city')?.trim());
+  const rawUrlCity = urlSearchParams.get('city')?.trim() || '';
+  const urlCityIsAll = rawUrlCity.toLowerCase() === 'all';
+  const urlHasCity = Boolean(rawUrlCity) && !urlCityIsAll;
   // Keep SSR catalog visible during city bootstrap; only refetch when injected city differs.
   const [catalog, setCatalog] = useState<PublicCatalogDto | null>(() => initialCatalog);
   const [loading, setLoading] = useState(() => !initialCatalog);
@@ -46,7 +48,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
 
   const cityReady = selectedCity?.cityReady ?? true;
   /** Wait for storage resolve when URL has no city — avoids «Все города» then Уфа. */
-  const cityBootstrapPending = !urlHasCity && Boolean(selectedCity) && !cityReady;
+  const cityBootstrapPending = !rawUrlCity && Boolean(selectedCity) && !cityReady;
 
   const searchParamsRecord = useMemo(
     () => searchParamsToRecord(Object.fromEntries(urlSearchParams.entries())),
@@ -79,9 +81,9 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
     });
     // Header city picker is source of truth once resolved — URL catches up via router.replace.
     if (!cityReady || !selectedCity) return base;
-    if (selectedCity.cityValue === 'all') return { ...base, city: undefined };
+    if (urlCityIsAll || selectedCity.cityValue === 'all') return { ...base, city: undefined };
     return { ...base, city: selectedCity.cityValue };
-  }, [query, cityReady, selectedCity]);
+  }, [query, cityReady, selectedCity, urlCityIsAll]);
 
   /** Effective query key from resolved filters (header city may lead URL by one frame). */
   const effectiveQueryKey = useMemo(
