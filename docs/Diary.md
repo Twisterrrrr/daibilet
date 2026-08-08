@@ -1,6 +1,20 @@
 # Diary
 
-## 2026-08-08 - INC.504.5c: Catalog Worker on shared disk
+## 2026-08-09 - INC.504.5c polish: async disk promote in API
+
+### Наблюдения
+- Sync `readFileSync`+`JSON.parse` 17MB на warm path / health давал риск 150-300мс event-loop stall каждые ~8 мин.
+
+### Решения
+- API: `loadPublicCatalogDiskCacheAsync` + `promoteDiskCacheIfNewerAsync` (coalesced); warm path отдаёт memory сразу, promote в фоне; cold await async.
+- Atomic swap `catalogCache = {...}`.
+- Health staleness: только `stat` mtime, без parse JSON.
+- Sync load остаётся для Catalog Worker write-guards.
+
+### Проблемы
+- `JSON.parse` всё ещё sync на promote; worker_thread - если p99 всё ещё пикает.
+
+---
 
 ### Наблюдения
 - Owner: Redis sketch «на потом», но «если за пару дней - скорее за». Redis на MSK не канон; уже есть disk snapshot + child spawn.

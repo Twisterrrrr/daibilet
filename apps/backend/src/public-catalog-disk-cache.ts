@@ -4,6 +4,7 @@
  * (INC.504.4 / INC.504.5c: never block the API event loop on ~3k session rebuild).
  */
 import fs from 'node:fs';
+import fsp from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -54,17 +55,40 @@ export function loadPublicCatalogDiskCache(): PublicCatalogDiskSnapshot | null {
   try {
     if (!fs.existsSync(filePath)) return null;
     const raw = fs.readFileSync(filePath, 'utf8');
-    const parsed = JSON.parse(raw) as PublicCatalogDiskSnapshot;
-    if ((parsed?.version !== 1 && parsed?.version !== 2) || !Array.isArray(parsed.sessions) || !parsed.builtAt) {
-      return null;
-    }
-    return parsed;
+    return parsePublicCatalogDiskSnapshot(raw);
   } catch (error) {
     console.warn(
       `Public catalog disk cache read failed: ${error instanceof Error ? error.message : String(error)}`,
     );
     return null;
   }
+}
+
+/**
+ * Async disk read for Main API Soft-SWR promote (INC.504.5c polish).
+ * Prefer this on the API event loop - sync load is OK only in Catalog Worker.
+ */
+export async function loadPublicCatalogDiskCacheAsync(): Promise<PublicCatalogDiskSnapshot | null> {
+  const filePath = resolvePublicCatalogDiskCachePath();
+  try {
+    const raw = await fsp.readFile(filePath, 'utf8');
+    return parsePublicCatalogDiskSnapshot(raw);
+  } catch (error) {
+    const code = error && typeof error === 'object' && 'code' in error ? String((error as { code?: string }).code) : '';
+    if (code === 'ENOENT') return null;
+    console.warn(
+      `Public catalog disk cache async read failed: ${error instanceof Error ? error.message : String(error)}`,
+    );
+    return null;
+  }
+}
+
+function parsePublicCatalogDiskSnapshot(raw: string): PublicCatalogDiskSnapshot | null {
+  const parsed = JSON.parse(raw) as PublicCatalogDiskSnapshot;
+  if ((parsed?.version !== 1 && parsed?.version !== 2) || !Array.isArray(parsed.sessions) || !parsed.builtAt) {
+    return null;
+  }
+  return parsed;
 }
 
 /**
@@ -141,24 +165,32 @@ export function resolveCatalogRebuildScriptPath(): string {
   return path.join(PROJECT_ROOT, 'scripts', 'rebuild-public-catalog-dto-cache.mjs');
 }
 
-/** Journal P1 when disk catalog is older than 2× worker interval (rate-limited). */
+/** Journal P1 when disk catalog is older than 2× worker interval (rate-limited).
+ * Uses file mtime only - never sync-parses the 17MB JSON on health. */
 let lastCatalogStalenessLogAt = 0;
 
 export function logCatalogDiskStalenessIfNeeded(now = Date.now()): void {
-  const disk = loadPublicCatalogDiskCache();
-  if (!disk?.builtAt) {
-    if (now - lastCatalogStalenessLogAt > 60_000) {
+  if (now - lastCatalogStalenessLogAt < 5 * 60_000 && lastCatalogStalenessLogAt > 0) return;
+  const filePath = resolvePublicCatalogDiskCachePath();
+  try {
+    if (!fs.existsSync(filePath)) {
       lastCatalogStalenessLogAt = now;
       console.error('CRITICAL P1: catalog disk staleness - missing public-catalog-dto.json');
+      return;
     }
-    return;
-  }
-  const age = now - disk.builtAt;
-  if (age > PUBLIC_CATALOG_STALE_ALERT_MS) {
-    if (now - lastCatalogStalenessLogAt < 5 * 60_000) return;
+    const age = now - fs.statSync(filePath).mtimeMs;
+    if (age > PUBLIC_CATALOG_STALE_ALERT_MS) {
+      lastCatalogStalenessLogAt = now;
+      console.error(
+        `CRITICAL P1: catalog disk staleness ageMs=${Math.round(age)} mtimeThresholdMs=${PUBLIC_CATALOG_STALE_ALERT_MS}`,
+      );
+    }
+  } catch (error) {
     lastCatalogStalenessLogAt = now;
     console.error(
-      `CRITICAL P1: catalog disk staleness ageMs=${age} builtAt=${disk.builtAt} thresholdMs=${PUBLIC_CATALOG_STALE_ALERT_MS} sessions=${disk.sessions?.length || 0}`,
+      `CRITICAL P1: catalog disk staleness check failed: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
     );
   }
 }

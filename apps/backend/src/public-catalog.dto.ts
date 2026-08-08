@@ -11,7 +11,7 @@ import {
 } from './catalog-availability.js';
 import { resolveCityTimeZone } from './city-timezone.js';
 import {
-  loadPublicCatalogDiskCache,
+  loadPublicCatalogDiskCacheAsync,
   resolveCatalogRebuildLockPath,
   resolveCatalogRebuildMode,
   resolveCatalogRebuildScriptPath,
@@ -73,6 +73,8 @@ interface CatalogCache {
 let catalogCache: CatalogCache | null = null;
 let catalogBuildPromise: Promise<PublicSessionDto[]> | null = null;
 let catalogChildSpawnedAt = 0;
+/** Coalesce concurrent async disk promotes (INC.504.5c polish). */
+let catalogDiskPromotePromise: Promise<void> | null = null;
 
 export function clearPublicCatalogDtoCache(): void {
   // Soft-invalidate for SWR: keep last sessions while rebuild runs.
@@ -129,18 +131,29 @@ export async function getPublicCatalogSessions(
     return hydrateSlots ? hydrateCatalogUpcomingSlots(sessions) : sessions;
   }
 
-  promoteDiskCacheIfNewer();
-  const cached = catalogCache;
-
-  if (cached?.sessions && now < cached.expiresAt) {
-    return hydrateSlots ? hydrateCatalogUpcomingSlots(cached.sessions) : cached.sessions;
+  // Warm path: never sync-read 17MB on the request event loop - promote async in background.
+  if (catalogCache?.sessions?.length) {
+    void promoteDiskCacheIfNewerAsync();
+    const cached = catalogCache;
+    if (cached?.sessions && now < cached.expiresAt) {
+      return hydrateSlots ? hydrateCatalogUpcomingSlots(cached.sessions) : cached.sessions;
+    }
+    // INC.504.4: serve ANY previous sessions; refresh via worker/child, not request-path SQL.
+    if (cached?.sessions?.length) {
+      const reason = now < (cached.staleUntil || 0) ? 'swr' : 'soft-expire';
+      triggerBackgroundCatalogRebuild(reason);
+      return hydrateSlots ? hydrateCatalogUpcomingSlots(cached.sessions) : cached.sessions;
+    }
   }
 
-  // INC.504.4: if we have ANY previous sessions (even past staleUntil), never await rebuild
-  // on the request path - serve stale and refresh in background (child/cron preferred).
-  if (cached?.sessions?.length) {
-    const reason = now < (cached.staleUntil || 0) ? 'swr' : 'soft-expire';
-    triggerBackgroundCatalogRebuild(reason);
+  // Cold: await async disk promote once, then rebuild if still empty.
+  await promoteDiskCacheIfNewerAsync();
+  if (catalogCache?.sessions?.length) {
+    const cached = catalogCache;
+    if (now < (cached.expiresAt || 0)) {
+      return hydrateSlots ? hydrateCatalogUpcomingSlots(cached.sessions) : cached.sessions;
+    }
+    triggerBackgroundCatalogRebuild(now < (cached.staleUntil || 0) ? 'swr' : 'soft-expire');
     return hydrateSlots ? hydrateCatalogUpcomingSlots(cached.sessions) : cached.sessions;
   }
 
@@ -148,17 +161,36 @@ export async function getPublicCatalogSessions(
   return hydrateSlots ? hydrateCatalogUpcomingSlots(sessions) : sessions;
 }
 
-function promoteDiskCacheIfNewer(): void {
-  const disk = loadPublicCatalogDiskCache();
-  if (!disk?.sessions?.length) return;
-  const memBuiltAt = catalogCache?.builtAt || 0;
-  if (disk.builtAt <= memBuiltAt && catalogCache?.sessions?.length) return;
-  catalogCache = {
-    expiresAt: disk.expiresAt,
-    staleUntil: disk.staleUntil,
-    sessions: disk.sessions,
-    builtAt: disk.builtAt,
-  };
+/**
+ * Async disk → memory Soft-SWR promote with atomic pointer swap.
+ * JSON.parse remains sync (short); optional worker_thread later if p99 spikes.
+ */
+async function promoteDiskCacheIfNewerAsync(): Promise<void> {
+  if (catalogDiskPromotePromise) return catalogDiskPromotePromise;
+
+  catalogDiskPromotePromise = (async () => {
+    try {
+      const disk = await loadPublicCatalogDiskCacheAsync();
+      if (!disk?.sessions?.length) return;
+      const memBuiltAt = catalogCache?.builtAt || 0;
+      if (disk.builtAt <= memBuiltAt && catalogCache?.sessions?.length) return;
+      // Atomic swap of the in-memory reference (nanoseconds); old blob → GC.
+      catalogCache = {
+        expiresAt: disk.expiresAt,
+        staleUntil: disk.staleUntil,
+        sessions: disk.sessions,
+        builtAt: disk.builtAt,
+      };
+    } catch (error) {
+      console.error(
+        `Failed to promote catalog from disk: ${error instanceof Error ? error.message : String(error)}`,
+      );
+    } finally {
+      catalogDiskPromotePromise = null;
+    }
+  })();
+
+  return catalogDiskPromotePromise;
 }
 
 function triggerBackgroundCatalogRebuild(reason: string): void {
@@ -178,13 +210,13 @@ async function awaitCatalogRebuild(reason: string): Promise<PublicSessionDto[]> 
   const mode = resolveCatalogRebuildMode();
 
   if (mode === 'off') {
-    promoteDiskCacheIfNewer();
+    await promoteDiskCacheIfNewerAsync();
     if (catalogCache?.sessions?.length) return catalogCache.sessions;
     throw new Error(`Public catalog rebuild mode=off and no disk/memory cache (${reason})`);
   }
 
   if (mode === 'child') {
-    const beforeBuiltAt = catalogCache?.builtAt || loadPublicCatalogDiskCache()?.builtAt || 0;
+    const beforeBuiltAt = catalogCache?.builtAt || 0;
     spawnCatalogRebuildChild(reason);
     const waitMs = reason === 'force-refresh' ? PUBLIC_CATALOG_CHILD_WAIT_MS : PUBLIC_CATALOG_COLD_AWAIT_MS;
     const sessions = await pollDiskCatalogUntil(beforeBuiltAt, waitMs);
@@ -288,13 +320,13 @@ function spawnCatalogRebuildChild(reason: string): void {
 async function pollDiskCatalogUntil(beforeBuiltAt: number, waitMs: number): Promise<PublicSessionDto[] | null> {
   const deadline = Date.now() + Math.max(0, waitMs);
   while (Date.now() <= deadline) {
-    promoteDiskCacheIfNewer();
+    await promoteDiskCacheIfNewerAsync();
     if (catalogCache?.builtAt && catalogCache.builtAt > beforeBuiltAt && catalogCache.sessions?.length) {
       return catalogCache.sessions;
     }
     await sleep(250);
   }
-  promoteDiskCacheIfNewer();
+  await promoteDiskCacheIfNewerAsync();
   if (catalogCache?.builtAt && catalogCache.builtAt > beforeBuiltAt && catalogCache.sessions?.length) {
     return catalogCache.sessions;
   }
