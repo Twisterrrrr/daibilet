@@ -172,7 +172,7 @@ import { eventHref, venueHref } from '@/lib/routes';
 import { toVenueCatalogCard } from '@/lib/venue-catalog-card';
 import type { VenueCatalogCard } from '@/lib/venue-map-types';
 
-type DayRouteAccordionId = 'mustSee' | 'text' | 'matches';
+type DayRouteAccordionId = 'scenarios' | 'suburbs' | 'mustSee' | 'text' | 'matches';
 type DayRouteStopViewMode = 'grid' | 'list';
 
 const DAY_ROUTE_STOP_VIEW_KEY = 'daibilet:dayRouteStopView';
@@ -1649,8 +1649,11 @@ function DayRoutePanelInner() {
   }
 
   function scrollToDayPresets() {
+    setOpenPanel('scenarios');
     window.setTimeout(() => {
-      const el = document.querySelector('[data-day-presets]');
+      const el =
+        document.querySelector('[data-day-accordion="scenarios"]') ||
+        document.querySelector('[data-day-presets]');
       if (el instanceof HTMLElement) {
         el.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
@@ -2077,7 +2080,13 @@ function DayRoutePanelInner() {
   const textFormOpen = openPanel === 'text';
   const mustSeeOpen = openPanel === 'mustSee';
   const matchesOpen = openPanel === 'matches';
+  const scenariosOpen = openPanel === 'scenarios';
+  const suburbsOpen = openPanel === 'suburbs';
   const showMustSeeAccordion = Boolean(hasPageCity && (mustSeeResolved.length > 0 || (!catalogLoading && pageCitySlug)));
+  const showScenariosAccordion = Boolean(
+    hasPageCity && (hasNamedPresets || mustSeePlaces.length >= 3),
+  );
+  const showSuburbsAccordion = Boolean(hasPageCity && significantSuburbs.length > 0);
   const showHotPicks = Boolean(hasPageCity && (hotPickCards.length > 0 || hotPickTabIds.length > 0));
   const isEmptyRoute = route.venues.length === 0;
   const hasMapStops = mapStops.length > 0;
@@ -3282,6 +3291,85 @@ function DayRoutePanelInner() {
         </section>
       )}
 
+      {/* Desktop ≥lg: scenarios + suburbs as collapsed accordions above must-see/custom.
+          Mobile keeps card/compact stack after Hot Picks (see below). */}
+      {showScenariosAccordion ? (
+        <div
+          className="mt-3 hidden rounded-2xl border border-slate-200 bg-white lg:block"
+          data-day-accordion="scenarios"
+        >
+          <button
+            type="button"
+            aria-expanded={scenariosOpen}
+            aria-controls="day-scenarios-body"
+            data-day-scenarios-accordion
+            onClick={() => togglePanel('scenarios')}
+            className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left sm:px-5"
+          >
+            <span>
+              <span className="block text-sm font-semibold text-slate-900">Готовые сценарии</span>
+              <span className="mt-0.5 block text-xs text-slate-500">
+                {hasNamedPresets
+                  ? 'Готовые маршруты на день'
+                  : 'Собрать день из главных мест'}
+              </span>
+            </span>
+            <ChevronDown
+              className={`h-5 w-5 shrink-0 text-slate-400 transition ${scenariosOpen ? 'rotate-180' : ''}`}
+            />
+          </button>
+          {scenariosOpen ? (
+            <div id="day-scenarios-body" className="border-t border-slate-100 px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
+              <CityDayPresetBlock
+                places={mustSeePlaces}
+                venues={matchSources}
+                city={dayPresetCityCtx}
+                namedPresets={dayRoutePresets}
+                navigateToMyDay={false}
+                inMyDay
+                embedded
+              />
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+
+      {showSuburbsAccordion ? (
+        <div className="mt-3 rounded-2xl border border-slate-200 bg-white" data-day-accordion="suburbs">
+          <button
+            type="button"
+            aria-expanded={suburbsOpen}
+            aria-controls="day-suburbs-body"
+            data-day-suburbs-accordion
+            onClick={() => togglePanel('suburbs')}
+            className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left sm:px-5"
+          >
+            <span>
+              <span className="block text-sm font-semibold text-slate-900">Значимые пригороды</span>
+              <span className="mt-0.5 block text-xs text-slate-500">
+                Поездка на день рядом с городом
+              </span>
+            </span>
+            <ChevronDown
+              className={`h-5 w-5 shrink-0 text-slate-400 transition ${suburbsOpen ? 'rotate-180' : ''}`}
+            />
+          </button>
+          {suburbsOpen ? (
+            <div id="day-suburbs-body" className="border-t border-slate-100 px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
+              <SuburbsCarousel
+                places={significantSuburbs}
+                venues={matchSources}
+                city={dayPresetCityCtx}
+                cityGenitive={cityToGenitive(pageCityName)}
+                compact
+                hideHeader
+                className="mt-0"
+              />
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+
       {/* Accordion: must-see chips */}
       {showMustSeeAccordion ? (
         <div className="mt-3 rounded-2xl border border-slate-200 bg-white" data-day-accordion="mustSee">
@@ -3412,135 +3500,6 @@ function DayRoutePanelInner() {
                   Для этого города пока нет списка главных мест - добавьте точки через поиск в «Из каталога».
                 </p>
               )}
-            </div>
-          ) : null}
-        </div>
-      ) : null}
-
-      {/* Accordion: nearby events / matches */}
-      {showMatches ? (
-        <div
-          id="day-route-matches"
-          className="mt-3 rounded-2xl border border-slate-200 bg-white"
-          data-day-accordion="matches"
-        >
-          <button
-            type="button"
-            aria-expanded={matchesOpen}
-            aria-controls="day-route-matches-body"
-            data-day-matches-accordion
-            onClick={() => togglePanel('matches')}
-            className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left sm:px-5"
-          >
-            <span>
-              <span className="block text-sm font-semibold text-slate-900">События поблизости</span>
-              <span className="mt-0.5 block text-xs text-slate-500">
-                {loading
-                  ? 'Ищем покрытие…'
-                  : payload
-                    ? `Найдено: ${uniqueMatches.length}`
-                    : 'По покрытию точек'}
-              </span>
-            </span>
-            <ChevronDown
-              className={`h-5 w-5 shrink-0 text-slate-400 transition ${matchesOpen ? 'rotate-180' : ''}`}
-            />
-          </button>
-          {matchesOpen ? (
-            <div id="day-route-matches-body" className="border-t border-slate-100 px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
-              {loading ? <p className="text-sm text-slate-500">Ищем покрытие…</p> : null}
-              {!loading && payload && uniqueMatches.length === 0 ? (
-                <div className="rounded-xl border border-slate-100 bg-slate-50 px-4 py-5 text-sm text-slate-600">
-                  <p className="font-semibold text-slate-800">Пока нет экскурсии, покрывающей набор</p>
-                  <p className="mt-1.5 leading-relaxed">
-                    Посмотрите афишу города или экскурсии «рядом» на карточке точки. Когда появятся STOP-связи,
-                    покрытие станет точнее.
-                  </p>
-                  <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-                    <Link
-                      href={afishaHref}
-                      className="inline-flex min-h-10 items-center justify-center rounded-full bg-slate-900 px-4 py-2 text-xs font-bold text-white hover:bg-primary-600"
-                    >
-                      Афиша города
-                    </Link>
-                    <Link
-                      href={locationsHref}
-                      className="inline-flex min-h-10 items-center justify-center rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
-                    >
-                      Другие точки
-                    </Link>
-                  </div>
-                </div>
-              ) : null}
-              <ul className="mt-3 grid grid-cols-1 items-start gap-3 md:grid-cols-2" data-day-matches-deduped>
-                {uniqueMatches.map((match) => {
-                  const fullCovered = dayRouteFullCoveredCount(match.covered);
-                  const nearCount = match.covered.nearby.length;
-                  return (
-                    <li
-                      key={match.eventId}
-                      className="rounded-2xl border border-slate-200 bg-white p-3 sm:p-4"
-                    >
-                      <div className="flex gap-3">
-                        <Link
-                          href={eventHref({ slug: match.slug, id: match.eventId })}
-                          className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-slate-100 sm:h-20 sm:w-20"
-                        >
-                          <SafeImage
-                            src={match.imageUrl}
-                            alt=""
-                            fill
-                            sizes={IMAGE_SIZES.favoritesThumb}
-                            className="object-cover"
-                          />
-                        </Link>
-                        <div className="min-w-0 flex-1">
-                          <Link
-                            href={eventHref({ slug: match.slug, id: match.eventId })}
-                            className="line-clamp-2 text-sm font-semibold text-slate-900 hover:text-primary-700"
-                          >
-                            {match.title}
-                          </Link>
-                          <p className="mt-1 text-xs text-slate-500">
-                            {fullCovered} из {route.venues.length} точек
-                            {nearCount ? ` · ещё ${nearCount} рядом` : ''}
-                            {match.priceFromRub != null ? ` · ${formatPriceFrom(match.priceFromRub)}` : ''}
-                          </p>
-                          <div className="mt-2 flex flex-wrap gap-1.5">
-                            {match.covered.stop.map((id) => (
-                              <span
-                                key={`stop-${id}`}
-                                className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-800"
-                                title={titleById.get(id) || id}
-                              >
-                                в маршруте · {titleById.get(id) || 'точка'}
-                              </span>
-                            ))}
-                            {match.covered.start.map((id) => (
-                              <span
-                                key={`start-${id}`}
-                                className="rounded-full bg-sky-50 px-2 py-0.5 text-[11px] font-semibold text-sky-800"
-                                title={titleById.get(id) || id}
-                              >
-                                старт · {titleById.get(id) || 'точка'}
-                              </span>
-                            ))}
-                            {match.covered.nearby.map((id) => (
-                              <span
-                                key={`near-${id}`}
-                                className="rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-800"
-                                title={titleById.get(id) || id}
-                              >
-                                рядом · {titleById.get(id) || 'точка'}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
             </div>
           ) : null}
         </div>
@@ -3679,6 +3638,135 @@ function DayRoutePanelInner() {
         ) : null}
       </div>
 
+      {/* Accordion: nearby events / matches */}
+      {showMatches ? (
+        <div
+          id="day-route-matches"
+          className="mt-3 rounded-2xl border border-slate-200 bg-white"
+          data-day-accordion="matches"
+        >
+          <button
+            type="button"
+            aria-expanded={matchesOpen}
+            aria-controls="day-route-matches-body"
+            data-day-matches-accordion
+            onClick={() => togglePanel('matches')}
+            className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left sm:px-5"
+          >
+            <span>
+              <span className="block text-sm font-semibold text-slate-900">События поблизости</span>
+              <span className="mt-0.5 block text-xs text-slate-500">
+                {loading
+                  ? 'Ищем покрытие…'
+                  : payload
+                    ? `Найдено: ${uniqueMatches.length}`
+                    : 'По покрытию точек'}
+              </span>
+            </span>
+            <ChevronDown
+              className={`h-5 w-5 shrink-0 text-slate-400 transition ${matchesOpen ? 'rotate-180' : ''}`}
+            />
+          </button>
+          {matchesOpen ? (
+            <div id="day-route-matches-body" className="border-t border-slate-100 px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
+              {loading ? <p className="text-sm text-slate-500">Ищем покрытие…</p> : null}
+              {!loading && payload && uniqueMatches.length === 0 ? (
+                <div className="rounded-xl border border-slate-100 bg-slate-50 px-4 py-5 text-sm text-slate-600">
+                  <p className="font-semibold text-slate-800">Пока нет экскурсии, покрывающей набор</p>
+                  <p className="mt-1.5 leading-relaxed">
+                    Посмотрите афишу города или экскурсии «рядом» на карточке точки. Когда появятся STOP-связи,
+                    покрытие станет точнее.
+                  </p>
+                  <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+                    <Link
+                      href={afishaHref}
+                      className="inline-flex min-h-10 items-center justify-center rounded-full bg-slate-900 px-4 py-2 text-xs font-bold text-white hover:bg-primary-600"
+                    >
+                      Афиша города
+                    </Link>
+                    <Link
+                      href={locationsHref}
+                      className="inline-flex min-h-10 items-center justify-center rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                    >
+                      Другие точки
+                    </Link>
+                  </div>
+                </div>
+              ) : null}
+              <ul className="mt-3 grid grid-cols-1 items-start gap-3 md:grid-cols-2" data-day-matches-deduped>
+                {uniqueMatches.map((match) => {
+                  const fullCovered = dayRouteFullCoveredCount(match.covered);
+                  const nearCount = match.covered.nearby.length;
+                  return (
+                    <li
+                      key={match.eventId}
+                      className="rounded-2xl border border-slate-200 bg-white p-3 sm:p-4"
+                    >
+                      <div className="flex gap-3">
+                        <Link
+                          href={eventHref({ slug: match.slug, id: match.eventId })}
+                          className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-slate-100 sm:h-20 sm:w-20"
+                        >
+                          <SafeImage
+                            src={match.imageUrl}
+                            alt=""
+                            fill
+                            sizes={IMAGE_SIZES.favoritesThumb}
+                            className="object-cover"
+                          />
+                        </Link>
+                        <div className="min-w-0 flex-1">
+                          <Link
+                            href={eventHref({ slug: match.slug, id: match.eventId })}
+                            className="line-clamp-2 text-sm font-semibold text-slate-900 hover:text-primary-700"
+                          >
+                            {match.title}
+                          </Link>
+                          <p className="mt-1 text-xs text-slate-500">
+                            {fullCovered} из {route.venues.length} точек
+                            {nearCount ? ` · ещё ${nearCount} рядом` : ''}
+                            {match.priceFromRub != null ? ` · ${formatPriceFrom(match.priceFromRub)}` : ''}
+                          </p>
+                          <div className="mt-2 flex flex-wrap gap-1.5">
+                            {match.covered.stop.map((id) => (
+                              <span
+                                key={`stop-${id}`}
+                                className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-800"
+                                title={titleById.get(id) || id}
+                              >
+                                в маршруте · {titleById.get(id) || 'точка'}
+                              </span>
+                            ))}
+                            {match.covered.start.map((id) => (
+                              <span
+                                key={`start-${id}`}
+                                className="rounded-full bg-sky-50 px-2 py-0.5 text-[11px] font-semibold text-sky-800"
+                                title={titleById.get(id) || id}
+                              >
+                                старт · {titleById.get(id) || 'точка'}
+                              </span>
+                            ))}
+                            {match.covered.nearby.map((id) => (
+                              <span
+                                key={`near-${id}`}
+                                className="rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-800"
+                                title={titleById.get(id) || id}
+                              >
+                                рядом · {titleById.get(id) || 'точка'}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+
       {/* Hot Picks - always expanded (no accordion chrome) */}
       {showHotPicks ? (
         <section
@@ -3799,28 +3887,6 @@ function DayRoutePanelInner() {
             )}
           </div>
         </section>
-      ) : null}
-
-      {hasPageCity ? (
-        <CityDayPresetBlock
-          places={mustSeePlaces}
-          venues={matchSources}
-          city={dayPresetCityCtx}
-          namedPresets={dayRoutePresets}
-          navigateToMyDay={false}
-          inMyDay
-        />
-      ) : null}
-
-      {hasPageCity && significantSuburbs.length ? (
-        <SuburbsCarousel
-          places={significantSuburbs}
-          venues={matchSources}
-          city={dayPresetCityCtx}
-          cityGenitive={cityToGenitive(pageCityName)}
-          compact
-          className="mt-5"
-        />
       ) : null}
 
       {/* Always-open catalog trio + boat (no accordion / no card border) */}

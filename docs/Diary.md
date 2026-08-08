@@ -1,5 +1,21 @@
 # Diary
 
+## 2026-08-08 - /my-day: 4 collapsed add-content accordions
+
+### Наблюдения
+- Owner desktop: scenarios + suburbs должны быть такими же collapsed rows, как «Главные места» / «Добавить своё место».
+- Map split уже откатан (`9c800f50`); compact suburbs (`259d4605`).
+
+### Решения
+- DayRoutePanel accordion stack (все collapsed by default, exclusive open): сценарии → пригороды → главные места → своё место; затем matches / hot picks / catalog.
+- `CityDayPresetBlock embedded` + `SuburbsCarousel hideHeader` без дубля заголовка/карточки.
+- Suburbs на my-day: compact truncated.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-08 - /my-day suburbs: restore truncated compact panel
 
 ### Наблюдения

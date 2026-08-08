@@ -87,6 +87,8 @@ export type SuburbsCarouselProps = {
    * Hide travel essays, gastro, station tips, and per-POI descriptions (hub keeps full).
    */
   compact?: boolean;
+  /** Skip outer h2/intro when parent accordion provides the chrome. */
+  hideHeader?: boolean;
   titleClass?: string;
   /** Outer wrapper class (hub `mt-10`, my-day `mt-5`). */
   className?: string;
@@ -105,6 +107,7 @@ export function SuburbsCarousel({
   cityGenitive,
   editorial = false,
   compact = false,
+  hideHeader = false,
   titleClass,
   className = 'mt-10',
 }: SuburbsCarouselProps) {
@@ -425,22 +428,26 @@ export function SuburbsCarousel({
 
   return (
     <div className={className} data-city-significant-suburbs>
-      <h2
-        className={
-          editorial
-            ? 'font-serif text-2xl font-semibold text-zinc-950 sm:text-3xl'
-            : 'text-xl font-bold text-slate-950 sm:text-2xl'
-        }
-      >
-        Значимые пригороды {cityGenitive}
-      </h2>
-      {!compact ? (
-        <p className={`mt-1.5 text-sm ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-          Поездка на день рядом с городом - отдельные мини-локации и точки внутри них.
-        </p>
-      ) : null}
+      {hideHeader ? null : (
+        <>
+          <h2
+            className={
+              editorial
+                ? 'font-serif text-2xl font-semibold text-zinc-950 sm:text-3xl'
+                : 'text-xl font-bold text-slate-950 sm:text-2xl'
+            }
+          >
+            Значимые пригороды {cityGenitive}
+          </h2>
+          {!compact ? (
+            <p className={`mt-1.5 text-sm ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+              Поездка на день рядом с городом - отдельные мини-локации и точки внутри них.
+            </p>
+          ) : null}
+        </>
+      )}
 
-      <div className={compact ? 'mt-4' : 'mt-5'}>
+      <div className={hideHeader ? undefined : compact ? 'mt-4' : 'mt-5'}>
         {compact ? renderChipRow('accordion') : renderChipRow('tabs')}
         {selected && selectedIndex != null
           ? compact

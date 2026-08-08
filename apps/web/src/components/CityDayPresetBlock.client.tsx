@@ -26,6 +26,10 @@ type Props = {
   navigateToMyDay?: boolean;
   /** Copy when block is already on /my-day. */
   inMyDay?: boolean;
+  /**
+   * Inside DayRoutePanel accordion: no outer card/title (chrome is the accordion row).
+   */
+  embedded?: boolean;
 };
 
 /** Russian plural for «N главных мест(а/о)» in preset copy. */
@@ -47,6 +51,7 @@ export function CityDayPresetBlock({
   namedPresets = [],
   navigateToMyDay = true,
   inMyDay = false,
+  embedded = false,
 }: Props) {
   const router = useRouter();
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -90,27 +95,32 @@ export function CityDayPresetBlock({
     : `Собрать за минуту: ${mainPlacesPhrase(fallbackPreset.length)} в «Собери свой день».`;
   const namedCta = (busy: boolean) => (busy ? 'Собираем…' : inMyDay ? 'Собрать день' : 'В мой день');
 
+  const shellClass = embedded
+    ? ''
+    : `mt-5 rounded-2xl border p-4 sm:p-5 ${
+        editorial ? 'border-zinc-200 bg-white' : 'border-slate-200 bg-slate-50'
+      }`;
+
   if (namedResolved.length > 0) {
     return (
-      <div
-        className={`mt-5 rounded-2xl border p-4 sm:p-5 ${
-          editorial ? 'border-zinc-200 bg-white' : 'border-slate-200 bg-slate-50'
-        }`}
-        data-day-presets={inMyDay ? 'my-day' : 'hub'}
-      >
-        <p className={`text-sm font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-950'}`}>
-          Готовые сценарии
-        </p>
-        <p className={`mt-1 text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-          {namedLead}
-        </p>
-        <ul className="mt-4 grid gap-3">
+      <div className={shellClass || undefined} data-day-presets={inMyDay ? 'my-day' : 'hub'}>
+        {embedded ? null : (
+          <>
+            <p className={`text-sm font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-950'}`}>
+              Готовые сценарии
+            </p>
+            <p className={`mt-1 text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+              {namedLead}
+            </p>
+          </>
+        )}
+        <ul className={`${embedded ? '' : 'mt-4 '}grid gap-3`}>
           {namedResolved.map(({ preset, items, available }) => {
             const titles = items.map((item) => item.title).join(' · ');
             return (
               <li
                 key={preset.id}
-                className={`flex flex-col gap-3 rounded-xl border px-4 py-3.5 max-md:gap-3.5 md:flex-row md:items-center md:justify-between md:gap-4 md:p-3 ${
+                className={`flex flex-col gap-3 rounded-xl border bg-white px-4 py-3.5 max-md:gap-3.5 md:flex-row md:items-center md:justify-between md:gap-4 md:p-3 ${
                   editorial ? 'border-zinc-200' : 'border-slate-200'
                 }`}
               >
@@ -181,18 +191,19 @@ export function CityDayPresetBlock({
   const titles = fallbackPreset.map((item) => item.title).join(' · ');
 
   return (
-    <div
-      className={`mt-5 rounded-2xl border p-4 sm:p-5 ${
-        editorial ? 'border-zinc-200 bg-white' : 'border-slate-200 bg-slate-50'
-      }`}
-      data-day-presets={inMyDay ? 'my-day' : 'hub'}
-    >
+    <div className={shellClass || undefined} data-day-presets={inMyDay ? 'my-day' : 'hub'}>
       <div className="flex flex-col gap-3.5 md:flex-row md:items-center md:justify-between md:gap-4">
         <div className="min-w-0 flex-1">
-          <p className={`text-sm font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-950'}`}>
-            Готовый сценарий
-          </p>
-          <p className={`mt-1 text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+          {embedded ? null : (
+            <p className={`text-sm font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-950'}`}>
+              Готовый сценарий
+            </p>
+          )}
+          <p
+            className={`${embedded ? '' : 'mt-1 '}text-sm leading-6 ${
+              editorial ? 'text-zinc-600' : 'text-slate-600'
+            }`}
+          >
             {fallbackLead}
           </p>
           <p
