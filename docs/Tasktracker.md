@@ -16,7 +16,7 @@
 | INC.LINK.3 | Fix web miss → 404 not 500 (cache/metadata) | Критический | ✅ cached-*-data + VenuePages/city metadata |
 | INC.LINK.4 | Footer SPB rooftops → saint-petersburg | Высокий | ✅ `seo-internal-links.ts` |
 | INC.LINK.5 | Dead hub venue cards without DTO (data) | Высокий | ⏳ |
-| INC.LINK.6 | MSK deploy API+web for live 500→404 | Критический | 🔄 |
+| INC.LINK.6 | MSK deploy API+web for live 500→404 | Критический | 🔄 web workflow `31251719250` (+ prior `31251617132`); API restart for server.js 404 |
 
 ---
 
