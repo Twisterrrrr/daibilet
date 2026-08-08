@@ -14,6 +14,8 @@
 - Seed codes: `DB26-784501..03` / `TKT-784501..03` (без BUTIN). Format lock в museum-contract-readiness S0.TKT.1.
 - Print: `@page` 14mm + card `padding: 12mm` (не `p-0`), чтобы контент и разделители не липли к краю листа.
 - Print brand: сверху карточки строка с `DaibiletLogo` + «Электронный билет» (`print:flex`, на экране скрыта).
+- Open-date warning: «Уточняйте график работы в планируемый день посещения» вместо «приходить за 15-20 минут».
+- Venue DTO cache: не кэшировать soft-miss (`null`) - иначе `/venues/ermitazh` держал Next 404 STALE при живом API.
 
 ### Проблемы
 - Ticket page для TC опирается на localStorage handoff с `/account/purchases`; deep-link без кэша остаётся soft. Полный server lookup ExternalOrder - follow-up.
