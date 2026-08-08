@@ -1,5 +1,22 @@
 # Diary
 
+## 2026-08-09 - INC.504.5c: stat-gated disk promote (Codex)
+
+### Наблюдения
+- Hot path API перед fresh memory hit всё ещё мог трогать disk promote и парсить ~17MB JSON (v1/v2) - блокировка event loop даже на «быстрых» request.
+- Коммит Codex `313a745f` (`codex/inc-504-public-catalog-stat-gate`) был только в owner worktree `D:/coding/tours-feat-next-monorepo`, на origin не запушен - интегрировали эквивалент в `feat/next-monorepo` с reconcile под disk **v2+indexes**.
+
+### Решения
+- Memory cache check **до** любого disk promote.
+- `loadPublicCatalogDiskCacheWithStat`: при совпадении mtime - `unchanged`, без `readFile`/`JSON.parse` (v1 и v2).
+- Promote в `public-catalog.dto.ts` держит `catalogDiskKnownMtimeMs`; в memory кладём sessions, indexes остаются на disk для dto.js hydrate.
+- `DAIBILET_CATALOG_REBUILD_MODE=off` без SQL fallback на request (как было).
+- MSK: pull + restart `daibilet-api` (web deploy не нужен).
+
+### Проблемы
+- Redis INC.504.5d по-прежнему deferred.
+- Нужен live smoke latency после restart API.
+
 ## 2026-08-09 - QA locks: editorial seed, route linking, finance hosts, CI secrets
 
 ### Наблюдения

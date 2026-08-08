@@ -5,6 +5,7 @@ import path from 'node:path';
 import test from 'node:test';
 import {
   loadPublicCatalogDiskCache,
+  loadPublicCatalogDiskCacheWithStat,
   resolveCatalogRebuildMode,
   resolvePublicCatalogDiskCachePath,
   writePublicCatalogDiskCache,
@@ -82,6 +83,55 @@ test('writePublicCatalogDiskCache blocks empty sessions and keeps previous', () 
     assert.equal(loaded?.sessions?.length, 1);
     assert.equal(loaded?.sessions?.[0]?.id, 'a');
   } finally {
+    restoreEnv('DAIBILET_PUBLIC_CATALOG_DISK_CACHE', prevEnv);
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('loadPublicCatalogDiskCacheWithStat skips parse when mtime unchanged', async () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'daibilet-catalog-stat-'));
+  const filePath = path.join(dir, 'public-catalog-dto.json');
+  const prevEnv = process.env.DAIBILET_PUBLIC_CATALOG_DISK_CACHE;
+  const prevParse = JSON.parse;
+  let parseCount = 0;
+  try {
+    process.env.DAIBILET_PUBLIC_CATALOG_DISK_CACHE = filePath;
+    const now = Date.now();
+    assert.equal(
+      writePublicCatalogDiskCache({
+        version: 2,
+        builtAt: now,
+        expiresAt: now + 60_000,
+        staleUntil: now + 120_000,
+        sessions: [{ id: 'a' } as never],
+        indexes: {
+          destinationIndex: {},
+          venueIndex: {},
+          slugIndex: {},
+          catalogFacets: null,
+        },
+      }),
+      true,
+    );
+
+    JSON.parse = ((...args: Parameters<typeof JSON.parse>) => {
+      parseCount += 1;
+      return prevParse(...args);
+    }) as typeof JSON.parse;
+
+    const first = await loadPublicCatalogDiskCacheWithStat(null);
+    assert.equal(first.status, 'loaded');
+    if (first.status !== 'loaded') throw new Error('expected loaded');
+    assert.equal(first.snapshot.version, 2);
+    assert.equal(first.snapshot.sessions.length, 1);
+    const parsesAfterCold = parseCount;
+    assert.ok(parsesAfterCold >= 1);
+
+    const second = await loadPublicCatalogDiskCacheWithStat(first.mtimeMs);
+    assert.equal(second.status, 'unchanged');
+    assert.equal(parseCount, parsesAfterCold, 'unchanged mtime must not JSON.parse again');
+  } finally {
+    JSON.parse = prevParse;
     restoreEnv('DAIBILET_PUBLIC_CATALOG_DISK_CACHE', prevEnv);
     fs.rmSync(dir, { recursive: true, force: true });
   }

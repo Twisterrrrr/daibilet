@@ -69,17 +69,46 @@ export function loadPublicCatalogDiskCache(): PublicCatalogDiskSnapshot | null {
  * Prefer this on the API event loop - sync load is OK only in Catalog Worker.
  */
 export async function loadPublicCatalogDiskCacheAsync(): Promise<PublicCatalogDiskSnapshot | null> {
+  const loaded = await loadPublicCatalogDiskCacheWithStat(null);
+  return loaded.status === 'loaded' ? loaded.snapshot : null;
+}
+
+/** Result of a stat-gated disk load (INC.504.5c / Codex stat-gate). */
+export type PublicCatalogDiskStatLoad =
+  | { status: 'missing' }
+  | { status: 'unchanged'; mtimeMs: number }
+  | { status: 'loaded'; mtimeMs: number; snapshot: PublicCatalogDiskSnapshot };
+
+/**
+ * Stat-gated async disk read for API Soft-SWR promote.
+ * When knownMtimeMs matches file mtime, skips readFile + JSON.parse of the ~17MB snapshot
+ * (v1 sessions-only and v2 sessions+indexes).
+ */
+export async function loadPublicCatalogDiskCacheWithStat(
+  knownMtimeMs?: number | null,
+): Promise<PublicCatalogDiskStatLoad> {
   const filePath = resolvePublicCatalogDiskCachePath();
   try {
+    const st = await fsp.stat(filePath);
+    const mtimeMs = st.mtimeMs;
+    if (
+      knownMtimeMs != null &&
+      Number.isFinite(knownMtimeMs) &&
+      Math.abs(mtimeMs - knownMtimeMs) < 0.5
+    ) {
+      return { status: 'unchanged', mtimeMs };
+    }
     const raw = await fsp.readFile(filePath, 'utf8');
-    return parsePublicCatalogDiskSnapshot(raw);
+    const snapshot = parsePublicCatalogDiskSnapshot(raw);
+    if (!snapshot) return { status: 'missing' };
+    return { status: 'loaded', mtimeMs, snapshot };
   } catch (error) {
     const code = error && typeof error === 'object' && 'code' in error ? String((error as { code?: string }).code) : '';
-    if (code === 'ENOENT') return null;
+    if (code === 'ENOENT') return { status: 'missing' };
     console.warn(
-      `Public catalog disk cache async read failed: ${error instanceof Error ? error.message : String(error)}`,
+      `Public catalog disk cache stat-load failed: ${error instanceof Error ? error.message : String(error)}`,
     );
-    return null;
+    return { status: 'missing' };
   }
 }
 

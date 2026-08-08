@@ -11,7 +11,7 @@ import {
 } from './catalog-availability.js';
 import { resolveCityTimeZone } from './city-timezone.js';
 import {
-  loadPublicCatalogDiskCacheAsync,
+  loadPublicCatalogDiskCacheWithStat,
   resolveCatalogRebuildLockPath,
   resolveCatalogRebuildMode,
   resolveCatalogRebuildScriptPath,
@@ -75,6 +75,8 @@ let catalogBuildPromise: Promise<PublicSessionDto[]> | null = null;
 let catalogChildSpawnedAt = 0;
 /** Coalesce concurrent async disk promotes (INC.504.5c polish). */
 let catalogDiskPromotePromise: Promise<void> | null = null;
+/** Last disk mtime successfully considered by promote (stat-gate; skip re-parse). */
+let catalogDiskKnownMtimeMs: number | null = null;
 
 export function clearPublicCatalogDtoCache(): void {
   // Soft-invalidate for SWR: keep last sessions while rebuild runs.
@@ -131,19 +133,17 @@ export async function getPublicCatalogSessions(
     return hydrateSlots ? hydrateCatalogUpcomingSlots(sessions) : sessions;
   }
 
-  // Warm path: never sync-read 17MB on the request event loop - promote async in background.
+  // Warm path: fresh memory hit returns before any disk promote (Codex / INC.504.5c stat-gate).
   if (catalogCache?.sessions?.length) {
-    void promoteDiskCacheIfNewerAsync();
     const cached = catalogCache;
-    if (cached?.sessions && now < cached.expiresAt) {
+    if (now < cached.expiresAt) {
       return hydrateSlots ? hydrateCatalogUpcomingSlots(cached.sessions) : cached.sessions;
     }
-    // INC.504.4: serve ANY previous sessions; refresh via worker/child, not request-path SQL.
-    if (cached?.sessions?.length) {
-      const reason = now < (cached.staleUntil || 0) ? 'swr' : 'soft-expire';
-      triggerBackgroundCatalogRebuild(reason);
-      return hydrateSlots ? hydrateCatalogUpcomingSlots(cached.sessions) : cached.sessions;
-    }
+    // Soft-SWR: serve stale immediately; cheap mtime-gated promote may refresh memory if worker wrote newer file.
+    void promoteDiskCacheIfNewerAsync();
+    const reason = now < (cached.staleUntil || 0) ? 'swr' : 'soft-expire';
+    triggerBackgroundCatalogRebuild(reason);
+    return hydrateSlots ? hydrateCatalogUpcomingSlots(cached.sessions) : cached.sessions;
   }
 
   // Cold: await async disk promote once, then rebuild if still empty.
@@ -162,19 +162,24 @@ export async function getPublicCatalogSessions(
 }
 
 /**
- * Async disk → memory Soft-SWR promote with atomic pointer swap.
- * JSON.parse remains sync (short); optional worker_thread later if p99 spikes.
+ * Async disk -> memory Soft-SWR promote with atomic pointer swap.
+ * Stat-gated: unchanged mtime skips readFile + JSON.parse of v1/v2 snapshot.
  */
 async function promoteDiskCacheIfNewerAsync(): Promise<void> {
   if (catalogDiskPromotePromise) return catalogDiskPromotePromise;
 
   catalogDiskPromotePromise = (async () => {
     try {
-      const disk = await loadPublicCatalogDiskCacheAsync();
+      const loaded = await loadPublicCatalogDiskCacheWithStat(catalogDiskKnownMtimeMs);
+      if (loaded.status === 'missing') return;
+      catalogDiskKnownMtimeMs = loaded.mtimeMs;
+      if (loaded.status === 'unchanged') return;
+      const disk = loaded.snapshot;
       if (!disk?.sessions?.length) return;
       const memBuiltAt = catalogCache?.builtAt || 0;
       if (disk.builtAt <= memBuiltAt && catalogCache?.sessions?.length) return;
-      // Atomic swap of the in-memory reference (nanoseconds); old blob → GC.
+      // Atomic swap of the in-memory reference; old blob -> GC.
+      // v2 indexes stay on disk for dto.js hydrate; memory Soft-SWR keeps sessions only.
       catalogCache = {
         expiresAt: disk.expiresAt,
         staleUntil: disk.staleUntil,
