@@ -54,7 +54,7 @@ export default async function CitiesIndexPage() {
         variant="minimal"
         breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Города' }]}
         title="Города России"
-        description="Выберите город - покажем афишу, площадки и подборки с актуальными билетами."
+        description="Выберите город - покажем афишу, площадки и подборки с актуальными событиями и билетами на них."
       >
         <CitiesHeroSearch destinations={cities} />
         {topCities.length ? (
