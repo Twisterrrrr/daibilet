@@ -7,6 +7,16 @@
 
 ---
 
+## UX: significant suburbs layout (2026-08-08)
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| UX.SUBURB.1 | Hub: chips + one detail panel (drop tall snap-carousel) | Высокий | 🔄 `SuburbsCarousel` rewrite |
+| UX.SUBURB.2 | My Day: horizontal accordion by suburb chip | Высокий | 🔄 compact mode |
+| UX.SUBURB.3 | Commit + push + MSK deploy + SPB smoke | Высокий | 🔄 |
+
+---
+
 ## Incident: link audit missing-DTO → HTTP 500 (2026-08-08)
 
 | ID | Задача | Приоритет | Статус |

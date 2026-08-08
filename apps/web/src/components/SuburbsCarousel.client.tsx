@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight, ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 
 import { AddManyToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import { resolveCityPlaceTitleHref } from '@/lib/city-place-href';
@@ -43,6 +43,38 @@ function SuburbPlaceLabel({
   );
 }
 
+function buildBulkVenues(
+  place: CitySuburbItem,
+  venues: DayRouteVenueMatchSource[],
+  city: DayRouteCityContext,
+) {
+  const nested = Array.isArray(place.places) ? place.places.filter((p) => p?.name) : [];
+  const nestedRouteItems = nested
+    .map((poi) => {
+      const poiAsMustSee: CityMustSeeItem = {
+        name: poi.name,
+        desc: String(poi.desc || ''),
+        href: poi.href,
+        venueSlug: poi.venueSlug,
+        locationSlug: poi.locationSlug,
+        dayRouteId: poi.dayRouteId,
+        latitude: poi.latitude,
+        longitude: poi.longitude,
+      };
+      return dayRouteItemFromMustSee(poiAsMustSee, venues, city, { isSuburb: true });
+    })
+    .filter((item): item is NonNullable<typeof item> => Boolean(item));
+  if (nestedRouteItems.length > 0) return nestedRouteItems;
+  const root = dayRouteItemFromMustSee(place, venues, city, { isSuburb: true });
+  return root ? [root] : [];
+}
+
+function suburbVectorTitle(place: CitySuburbItem): string {
+  return place.travelVector
+    ? `${place.travelVector}${place.stationHub ? ` - ${place.stationHub}` : ''}`
+    : '';
+}
+
 export type SuburbsCarouselProps = {
   places: CitySuburbItem[];
   venues: DayRouteVenueMatchSource[];
@@ -51,8 +83,8 @@ export type SuburbsCarouselProps = {
   /** Hub editorial typography; my-day keeps default slate. */
   editorial?: boolean;
   /**
-   * My-day: large suburb name + numbered points only.
-   * Hide travel essays, gastro blurbs, station tips, and per-POI descriptions.
+   * My-day: horizontal accordion triggers + expand on tap.
+   * Hub: name chips + one detail panel (no tall-card carousel).
    */
   compact?: boolean;
   titleClass?: string;
@@ -61,12 +93,10 @@ export type SuburbsCarouselProps = {
 };
 
 /**
- * Significant-suburbs rail.
- * Hub: desktop arrows; mobile swipe + dots; title = name, subtitle = vector;
- * mobile collapses essay/gastro/POI descs behind «Ещё».
- * Compact (my-day): arrows (loop), no pager; mini `desc` under title;
- * hanging POI nums under badge; text+CTA on title left edge; desktop up to 3 cards.
- * Bulk «В маршрут» adds all nested points of the active slide.
+ * Significant-suburbs block.
+ * Hub: wrap chips of suburb names + one detail panel (no horizontal card rail).
+ * Compact (my-day): horizontal accordion - tap suburb chip to expand details.
+ * Bulk «В маршрут» adds all nested points of the active suburb.
  */
 export function SuburbsCarousel({
   places,
@@ -78,15 +108,8 @@ export function SuburbsCarousel({
   titleClass,
   className = 'mt-10',
 }: SuburbsCarouselProps) {
-  const railRef = React.useRef<HTMLDivElement>(null);
-  const [canPrev, setCanPrev] = React.useState(false);
-  const [canNext, setCanNext] = React.useState(false);
-  const [hasOverflow, setHasOverflow] = React.useState(false);
-  const [activeIndex, setActiveIndex] = React.useState(0);
-  /** Hub rich cards: mobile collapses essay/gastro/POI descs behind «Ещё». */
-  const [expandedByIndex, setExpandedByIndex] = React.useState<Record<number, boolean>>({});
-  /** Compact my-day: loop arrows; hub keeps edge-disabled prev/next. */
-  const loopNav = compact && places.length > 1;
+  /** Hub: always one selected panel. My-day: null until user opens a chip. */
+  const [activeIndex, setActiveIndex] = React.useState<number | null>(compact ? null : 0);
 
   const resolvedTitleClass =
     titleClass ||
@@ -95,91 +118,276 @@ export function SuburbsCarousel({
   const mutedClass = editorial ? 'text-zinc-500' : 'text-slate-500';
   const softClass = editorial ? 'text-zinc-600' : 'text-slate-600';
   const borderSoft = editorial ? 'border-zinc-100' : 'border-slate-100';
-
-  const syncRail = React.useCallback(() => {
-    const el = railRef.current;
-    if (!el) return;
-    const { scrollLeft, scrollWidth, clientWidth } = el;
-    const overflow = scrollWidth > clientWidth + 4;
-    setHasOverflow(overflow);
-    if (loopNav) {
-      setCanPrev(overflow);
-      setCanNext(overflow);
-    } else {
-      setCanPrev(overflow && scrollLeft > 4);
-      setCanNext(overflow && scrollLeft + clientWidth < scrollWidth - 4);
-    }
-    if (places.length > 1) {
-      const cards = el.querySelectorAll<HTMLElement>('[data-city-suburb-card]');
-      let best = 0;
-      let bestDist = Number.POSITIVE_INFINITY;
-      cards.forEach((card, i) => {
-        const dist = Math.abs(card.offsetLeft - scrollLeft);
-        if (dist < bestDist) {
-          bestDist = dist;
-          best = i;
-        }
-      });
-      setActiveIndex(best);
-    }
-  }, [loopNav, places.length]);
-
-  React.useEffect(() => {
-    const el = railRef.current;
-    if (!el) return;
-    syncRail();
-    el.addEventListener('scroll', syncRail, { passive: true });
-    window.addEventListener('resize', syncRail, { passive: true });
-    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(syncRail) : null;
-    ro?.observe(el);
-    return () => {
-      el.removeEventListener('scroll', syncRail);
-      window.removeEventListener('resize', syncRail);
-      ro?.disconnect();
-    };
-  }, [syncRail, places.length]);
-
-  const scrollPage = (dir: -1 | 1) => {
-    const el = railRef.current;
-    if (!el) return;
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const next = loopNav
-      ? (activeIndex + dir + places.length) % places.length
-      : Math.max(0, Math.min(places.length - 1, activeIndex + dir));
-    const card = el.querySelectorAll<HTMLElement>('[data-city-suburb-card]')[next];
-    if (card) {
-      el.scrollTo({
-        left: card.offsetLeft,
-        behavior: reduceMotion ? 'auto' : 'smooth',
-      });
-      return;
-    }
-    el.scrollBy({
-      left: dir * el.clientWidth,
-      behavior: reduceMotion ? 'auto' : 'smooth',
-    });
-  };
-
-  const goToIndex = (index: number) => {
-    const el = railRef.current;
-    if (!el) return;
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const card = el.querySelectorAll<HTMLElement>('[data-city-suburb-card]')[index];
-    if (!card) return;
-    el.scrollTo({
-      left: card.offsetLeft,
-      behavior: reduceMotion ? 'auto' : 'smooth',
-    });
-  };
+  const panelBorder = editorial ? 'border-zinc-200 bg-white' : 'border-slate-200 bg-white';
 
   if (!places.length) return null;
 
-  // Compact (my-day): arrows on all breakpoints. Hub: md+ only.
-  // Gutters = 3rem; arrow w-10 at inset 0.25rem → equal 0.25rem gap content↔arrow each side.
-  const arrowClass = compact
-    ? 'absolute top-1/2 z-10 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200/90 bg-white/95 text-slate-700 shadow-md backdrop-blur transition-[opacity,colors] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:ring-offset-2'
-    : 'absolute top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200/90 bg-white/95 text-slate-700 shadow-md backdrop-blur transition-[opacity,colors] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:ring-offset-2 md:inline-flex';
-  const railGutterClass = compact ? 'px-12' : 'md:px-12';
+  const selectedIndex =
+    activeIndex == null || activeIndex < 0 || activeIndex >= places.length ? null : activeIndex;
+  const selected = selectedIndex == null ? null : places[selectedIndex];
+
+  const chipIdle = editorial
+    ? 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-400'
+    : 'border-slate-200 bg-white text-slate-700 hover:border-slate-400';
+  const chipActive = editorial
+    ? 'border-zinc-900 bg-zinc-900 text-white'
+    : 'border-slate-900 bg-slate-900 text-white';
+
+  const renderChipRow = (mode: 'tabs' | 'accordion') => (
+    <div
+      className={
+        mode === 'accordion'
+          ? 'flex flex-nowrap gap-2 overflow-x-auto overscroll-x-contain pb-0.5 [scrollbar-width:thin]'
+          : 'flex flex-wrap gap-2'
+      }
+      role="tablist"
+      aria-label={`Пригороды ${cityGenitive}`}
+      data-city-suburb-chips
+    >
+      {places.map((place, index) => {
+        const active = selectedIndex === index;
+        return (
+          <button
+            key={`chip:${place.name}:${index}`}
+            type="button"
+            role="tab"
+            aria-selected={active}
+            aria-controls={
+              mode === 'tabs' || active ? `city-suburb-panel-${index}` : undefined
+            }
+            data-city-suburb-chip
+            data-active={active ? '1' : '0'}
+            onClick={() => {
+              if (mode === 'accordion') {
+                setActiveIndex((prev) => (prev === index ? null : index));
+                return;
+              }
+              setActiveIndex(index);
+            }}
+            className={`inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+              active ? chipActive : chipIdle
+            }`}
+          >
+            <span
+              className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold tabular-nums ${
+                active
+                  ? 'bg-white/20 text-white'
+                  : editorial
+                    ? 'bg-zinc-100 text-zinc-700'
+                    : 'bg-primary-50 text-primary-700'
+              }`}
+            >
+              {index + 1}
+            </span>
+            <span>{place.name}</span>
+            {mode === 'accordion' ? (
+              <ChevronDown
+                className={`h-3.5 w-3.5 opacity-70 transition-transform ${active ? 'rotate-180' : ''}`}
+                aria-hidden
+              />
+            ) : null}
+          </button>
+        );
+      })}
+    </div>
+  );
+
+  const renderHubPanel = (place: CitySuburbItem, index: number) => {
+    const placeHref = resolveCityPlaceTitleHref(place, venues);
+    const matchedVenue = venues.find((venue) => {
+      const slug = String(place.venueSlug || place.locationSlug || '').trim();
+      return slug && String(venue.slug || '').trim() === slug;
+    });
+    const blurb =
+      dayRouteHookLine({
+        hookFact: matchedVenue?.hookFact,
+        shortDescription: matchedVenue?.shortDescription,
+        desc: place.desc,
+        preferEditorial: true,
+      }) || '';
+    const nested = Array.isArray(place.places) ? place.places.filter((p) => p?.name) : [];
+    const bulkVenues = buildBulkVenues(place, venues, city);
+    const vectorTitle = suburbVectorTitle(place);
+    const nameHeading = placeHref ? (
+      <Link
+        href={placeHref}
+        className="underline decoration-slate-300 underline-offset-2 hover:decoration-current"
+      >
+        {place.name}
+      </Link>
+    ) : (
+      place.name
+    );
+    const numClass = editorial ? 'text-zinc-400' : 'text-slate-400';
+    const poiTextClass = editorial ? 'text-zinc-600' : 'text-slate-600';
+
+    return (
+      <article
+        id={`city-suburb-panel-${index}`}
+        role="tabpanel"
+        className={`mt-4 rounded-2xl border p-4 sm:p-5 ${panelBorder}`}
+        data-city-suburb-card
+        data-city-suburb-expanded="1"
+        aria-label={`${index + 1} из ${places.length}: ${place.name}`}
+      >
+        <div className="grid grid-cols-[2rem_minmax(0,1fr)] gap-x-3">
+          <span
+            className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold ${
+              editorial ? 'bg-zinc-100 text-zinc-800' : 'bg-primary-50 text-primary-700'
+            }`}
+          >
+            {index + 1}
+          </span>
+          <div className="min-w-0">
+            <h3 className={`${hubNameClass} break-words`} data-city-suburb-title>
+              {nameHeading}
+            </h3>
+            {vectorTitle ? (
+              <p className={`mt-1 text-sm leading-5 ${softClass}`} data-city-suburb-vector>
+                {vectorTitle}
+              </p>
+            ) : null}
+            {place.stationName ? (
+              <p className={`mt-1 text-xs ${softClass}`}>Где выходить: {place.stationName}</p>
+            ) : null}
+            {place.travelVectorBlurb ? (
+              <p className={`mt-1.5 text-xs leading-5 ${mutedClass}`}>{place.travelVectorBlurb}</p>
+            ) : null}
+            {blurb ? (
+              <p className={`mt-1.5 text-sm leading-6 break-words ${mutedClass}`}>{blurb}</p>
+            ) : null}
+            {place.gastroHint ? (
+              <p className={`mt-2 text-xs ${softClass}`}>Гастро-остановка: {place.gastroHint}</p>
+            ) : null}
+          </div>
+
+          {nested.length ? (
+            <ol
+              className={`col-span-2 mt-3 grid grid-cols-[2rem_minmax(0,1fr)] gap-x-3 gap-y-1.5 border-t pt-3 ${borderSoft}`}
+              data-city-suburb-places
+            >
+              {nested.map((poi, poiIndex) => {
+                const poiHref = resolveCityPlaceTitleHref(poi, venues);
+                const poiDesc = String(poi.desc || '').trim();
+                return (
+                  <li key={`${poi.name}:${poiIndex}`} className="contents" data-city-suburb-place>
+                    <span className={`text-center text-sm leading-5 tabular-nums ${numClass}`}>
+                      {poiIndex + 1}.
+                    </span>
+                    <span className={`min-w-0 text-sm leading-5 ${poiTextClass}`}>
+                      <SuburbPlaceLabel name={poi.name} href={poiHref} desc={poiDesc} />
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
+          ) : null}
+
+          {bulkVenues.length > 0 ? (
+            <div
+              className={`col-start-2 mt-3 border-t pt-3 ${borderSoft}`}
+              data-city-suburb-cta-footer
+            >
+              <AddManyToDayRouteButton
+                compact
+                className="!min-h-8 !px-2.5 !py-1.5 !text-[11px]"
+                venues={bulkVenues}
+              />
+            </div>
+          ) : null}
+        </div>
+      </article>
+    );
+  };
+
+  const renderCompactPanel = (place: CitySuburbItem, index: number) => {
+    const placeHref = resolveCityPlaceTitleHref(place, venues);
+    const nested = Array.isArray(place.places) ? place.places.filter((p) => p?.name) : [];
+    const bulkVenues = buildBulkVenues(place, venues, city);
+    const vectorTitle = suburbVectorTitle(place);
+    const miniAnno = String(place.desc || '').trim();
+
+    return (
+      <article
+        id={`city-suburb-panel-${index}`}
+        role="tabpanel"
+        className="mt-3 rounded-2xl border border-slate-200 bg-white p-4 sm:p-5"
+        data-city-suburb-card
+        data-city-suburb-compact
+        data-city-suburb-expanded="1"
+        aria-label={`${index + 1} из ${places.length}: ${place.name}`}
+      >
+        <div className="grid grid-cols-[2.25rem_minmax(0,1fr)] gap-x-2.5 sm:gap-x-3">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-50 text-sm font-bold leading-none text-primary-700">
+            {index + 1}
+          </span>
+          <div className="min-w-0">
+            <h3
+              className="break-words text-xl font-bold leading-snug text-slate-950 sm:text-2xl"
+              data-city-suburb-title
+            >
+              {placeHref ? (
+                <Link
+                  href={placeHref}
+                  className="underline decoration-slate-300 underline-offset-2 hover:decoration-current"
+                >
+                  {place.name}
+                </Link>
+              ) : (
+                place.name
+              )}
+            </h3>
+            {miniAnno ? (
+              <p
+                className="mt-1.5 line-clamp-3 text-sm leading-5 text-slate-600"
+                data-city-suburb-anno
+              >
+                {miniAnno}
+              </p>
+            ) : null}
+            {vectorTitle ? (
+              <p className="mt-1 text-xs leading-5 text-slate-500" data-city-suburb-vector>
+                {vectorTitle}
+              </p>
+            ) : null}
+          </div>
+          {nested.length ? (
+            <ol
+              className="col-span-2 mt-3 grid grid-cols-[2.25rem_minmax(0,1fr)] gap-x-2.5 gap-y-1.5 border-t border-slate-100 pt-3 sm:gap-x-3"
+              data-city-suburb-places
+            >
+              {nested.map((poi, poiIndex) => {
+                const poiHref = resolveCityPlaceTitleHref(poi, venues);
+                const poiDesc = String(poi.desc || '').trim();
+                return (
+                  <li key={`${poi.name}:${poiIndex}`} className="contents" data-city-suburb-place>
+                    <span className="text-center text-sm leading-5 tabular-nums text-slate-400">
+                      {poiIndex + 1}.
+                    </span>
+                    <span className="min-w-0 text-sm leading-5 text-slate-600">
+                      <SuburbPlaceLabel name={poi.name} href={poiHref} desc={poiDesc} />
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
+          ) : null}
+          {bulkVenues.length > 0 ? (
+            <div
+              className="col-start-2 mt-3 border-t border-slate-100 pt-3"
+              data-city-suburb-cta-footer
+            >
+              <AddManyToDayRouteButton
+                compact
+                className="!min-h-8 !px-2.5 !py-1.5 !text-[11px]"
+                venues={bulkVenues}
+              />
+            </div>
+          ) : null}
+        </div>
+      </article>
+    );
+  };
 
   return (
     <div className={className} data-city-significant-suburbs>
@@ -197,361 +405,20 @@ export function SuburbsCarousel({
           Поездка на день рядом с городом - отдельные мини-локации и точки внутри них.
         </p>
       ) : null}
-      {/* Symmetric side gutters for arrows; rail is full width inside gutter. */}
-      <div className={compact ? 'relative mt-4' : 'relative mt-5'}>
-        <div className={railGutterClass}>
-          <div
-            ref={railRef}
-            className={
-              compact
-                ? 'horizontal-snap-row flex flex-nowrap gap-3 touch-pan-x snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:gap-4'
-                : 'horizontal-snap-row flex flex-nowrap gap-3 touch-pan-x snap-x snap-mandatory md:gap-4 md:[scrollbar-width:none] md:[&::-webkit-scrollbar]:hidden'
-            }
-            data-city-suburb-rail
-            aria-label={`Значимые пригороды ${cityGenitive}`}
-            tabIndex={0}
-          >
-          {places.map((place, index) => {
-            const placeHref = resolveCityPlaceTitleHref(place, venues);
-            const dayRouteItem = dayRouteItemFromMustSee(place, venues, city, { isSuburb: true });
-            const matchedVenue = venues.find((venue) => {
-              const slug = String(place.venueSlug || place.locationSlug || '').trim();
-              return slug && String(venue.slug || '').trim() === slug;
-            });
-            const blurb =
-              dayRouteHookLine({
-                hookFact: matchedVenue?.hookFact,
-                shortDescription: matchedVenue?.shortDescription,
-                desc: place.desc,
-                preferEditorial: true,
-              }) || '';
-            const nested = Array.isArray(place.places) ? place.places.filter((p) => p?.name) : [];
-            const nestedRouteItems = nested
-              .map((poi) => {
-                const poiAsMustSee: CityMustSeeItem = {
-                  name: poi.name,
-                  desc: String(poi.desc || ''),
-                  href: poi.href,
-                  venueSlug: poi.venueSlug,
-                  locationSlug: poi.locationSlug,
-                  dayRouteId: poi.dayRouteId,
-                  latitude: poi.latitude,
-                  longitude: poi.longitude,
-                };
-                return dayRouteItemFromMustSee(poiAsMustSee, venues, city, { isSuburb: true });
-              })
-              .filter((item): item is NonNullable<typeof item> => Boolean(item));
-            // Bulk CTA: all nested points of the slide; fallback to suburb root if no list.
-            const bulkVenues =
-              nestedRouteItems.length > 0
-                ? nestedRouteItems
-                : dayRouteItem
-                  ? [dayRouteItem]
-                  : [];
-            const vectorTitle = place.travelVector
-              ? `${place.travelVector}${place.stationHub ? ` - ${place.stationHub}` : ''}`
-              : '';
-            const renderBulkCta = () =>
-              bulkVenues.length > 0 ? (
-                <AddManyToDayRouteButton
-                  compact
-                  className="!min-h-8 !px-2.5 !py-1.5 !text-[11px]"
-                  venues={bulkVenues}
-                />
-              ) : null;
-            const hasBulkCta = bulkVenues.length > 0;
 
-            if (compact) {
-              const miniAnno = String(place.desc || '').trim();
-              return (
-                <article
-                  key={`${place.name}:${index}`}
-                  className="flex w-full shrink-0 snap-start flex-col rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 md:w-[calc((100%-1rem)/2)] lg:w-[calc((100%-2rem)/3)]"
-                  data-city-suburb-card
-                  data-city-suburb-compact
-                  aria-label={`${index + 1} из ${places.length}: ${place.name}`}
-                >
-                  {/* Col1 = badge / hanging nums; col2 = title, anno, point text, CTA. */}
-                  <div className="grid grid-cols-[2.25rem_minmax(0,1fr)] gap-x-2.5 sm:gap-x-3">
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-50 text-sm font-bold leading-none text-primary-700">
-                      {index + 1}
-                    </span>
-                    <div className="min-w-0">
-                      <h3
-                        className="break-words text-xl font-bold leading-snug text-slate-950 sm:text-2xl"
-                        data-city-suburb-title
-                      >
-                        {placeHref ? (
-                          <Link
-                            href={placeHref}
-                            className="underline decoration-slate-300 underline-offset-2 hover:decoration-current"
-                          >
-                            {place.name}
-                          </Link>
-                        ) : (
-                          place.name
-                        )}
-                      </h3>
-                      {miniAnno ? (
-                        <p
-                          className="mt-1.5 line-clamp-3 text-sm leading-5 text-slate-600"
-                          data-city-suburb-anno
-                        >
-                          {miniAnno}
-                        </p>
-                      ) : null}
-                      {vectorTitle ? (
-                        <p
-                          className="mt-1 text-xs leading-5 text-slate-500"
-                          data-city-suburb-vector
-                        >
-                          {vectorTitle}
-                        </p>
-                      ) : null}
-                    </div>
-                    {nested.length ? (
-                      <ol
-                        className="col-span-2 mt-3 grid grid-cols-[2.25rem_minmax(0,1fr)] gap-x-2.5 gap-y-1.5 border-t border-slate-100 pt-3 sm:gap-x-3"
-                        data-city-suburb-places
-                      >
-                        {nested.map((poi, poiIndex) => {
-                          const poiHref = resolveCityPlaceTitleHref(poi, venues);
-                          const poiDesc = String(poi.desc || '').trim();
-                          return (
-                            <li
-                              key={`${poi.name}:${poiIndex}`}
-                              className="contents"
-                              data-city-suburb-place
-                            >
-                              <span className="text-center text-sm leading-5 tabular-nums text-slate-400">
-                                {poiIndex + 1}.
-                              </span>
-                              <span className="min-w-0 text-sm leading-5 text-slate-600">
-                                <SuburbPlaceLabel name={poi.name} href={poiHref} desc={poiDesc} />
-                              </span>
-                            </li>
-                          );
-                        })}
-                      </ol>
-                    ) : null}
-                    {hasBulkCta ? (
-                      <div
-                        className="col-start-2 mt-3 border-t border-slate-100 pt-3"
-                        data-city-suburb-cta-footer
-                      >
-                        {renderBulkCta()}
-                      </div>
-                    ) : null}
-                  </div>
-                </article>
-              );
-            }
-
-            const expanded = Boolean(expandedByIndex[index]);
-            const hasRichExtras = Boolean(
-              blurb || place.travelVectorBlurb || place.gastroHint || nested.some((p) => p.desc),
-            );
-            const nameHeading = placeHref ? (
-              <Link
-                href={placeHref}
-                className="underline decoration-slate-300 underline-offset-2 hover:decoration-current"
-              >
-                {place.name}
-              </Link>
-            ) : (
-              place.name
-            );
-            const numClass = editorial ? 'text-zinc-400' : 'text-slate-400';
-            const poiTextClass = editorial ? 'text-zinc-600' : 'text-slate-600';
-            const renderHubPoints = (withDesc: boolean) =>
-              nested.length ? (
-                <ol
-                  className={`col-span-2 mt-3 grid grid-cols-[2rem_minmax(0,1fr)] gap-x-3 gap-y-1.5 border-t pt-3 ${borderSoft}`}
-                  data-city-suburb-places
-                  data-city-suburb-places-compact={withDesc ? undefined : '1'}
-                >
-                  {nested.map((poi, poiIndex) => {
-                    const poiHref = resolveCityPlaceTitleHref(poi, venues);
-                    const poiDesc = withDesc ? String(poi.desc || '').trim() : '';
-                    return (
-                      <li
-                        key={`${poi.name}:${poiIndex}`}
-                        className="contents"
-                        data-city-suburb-place
-                      >
-                        <span className={`text-center text-sm leading-5 tabular-nums ${numClass}`}>
-                          {poiIndex + 1}.
-                        </span>
-                        <span className={`min-w-0 text-sm leading-5 ${poiTextClass}`}>
-                          <SuburbPlaceLabel name={poi.name} href={poiHref} desc={poiDesc} />
-                        </span>
-                      </li>
-                    );
-                  })}
-                </ol>
-              ) : null;
-            const richEssay = (
-              <>
-                {place.travelVectorBlurb ? (
-                  <p className={`mt-1.5 text-xs leading-5 ${mutedClass}`}>{place.travelVectorBlurb}</p>
-                ) : null}
-                {blurb ? (
-                  <p className={`mt-1.5 text-sm leading-6 break-words ${mutedClass}`}>{blurb}</p>
-                ) : null}
-                {place.gastroHint ? (
-                  <p className={`mt-2 text-xs ${softClass}`}>Гастро-остановка: {place.gastroHint}</p>
-                ) : null}
-              </>
-            );
-
-            return (
-              <article
-                key={`${place.name}:${index}`}
-                className={`flex w-[min(92%,22rem)] shrink-0 snap-start flex-col rounded-2xl border p-4 sm:p-5 md:w-[calc((100%-1rem)/2)] lg:w-[calc((100%-2rem)/3)] ${
-                  editorial ? 'border-zinc-200 bg-white' : 'border-slate-200 bg-white'
-                }`}
-                data-city-suburb-card
-                data-city-suburb-expanded={expanded ? '1' : undefined}
-                aria-label={`${index + 1} из ${places.length}: ${place.name}`}
-              >
-                {/* Col1 = badge / hanging nums; col2 = title + copy + CTA. */}
-                <div className="grid grid-cols-[2rem_minmax(0,1fr)] gap-x-3">
-                  <span
-                    className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold ${
-                      editorial ? 'bg-zinc-100 text-zinc-800' : 'bg-primary-50 text-primary-700'
-                    }`}
-                  >
-                    {index + 1}
-                  </span>
-                  <div className="min-w-0">
-                    <h3 className={`${hubNameClass} break-words`} data-city-suburb-title>
-                      {nameHeading}
-                    </h3>
-                    {vectorTitle ? (
-                      <p
-                        className={`mt-1 text-sm leading-5 ${softClass}`}
-                        data-city-suburb-vector
-                      >
-                        {vectorTitle}
-                      </p>
-                    ) : null}
-                    {place.stationName ? (
-                      <p className={`mt-1 text-xs ${softClass}`}>Где выходить: {place.stationName}</p>
-                    ) : null}
-                    <div className="hidden md:block">{richEssay}</div>
-                    {expanded ? <div className="md:hidden">{richEssay}</div> : null}
-                  </div>
-
-                  <div className="hidden md:contents">{renderHubPoints(true)}</div>
-                  <div className="contents md:hidden">
-                    {expanded ? renderHubPoints(true) : renderHubPoints(false)}
-                  </div>
-
-                  {hasRichExtras ? (
-                    <div className="col-start-2 mt-2 md:hidden">
-                      <button
-                        type="button"
-                        className={`inline-flex min-h-8 items-center gap-1 text-xs font-medium ${softClass} transition hover:opacity-80`}
-                        aria-expanded={expanded}
-                        data-city-suburb-expand
-                        onClick={() =>
-                          setExpandedByIndex((prev) => ({
-                            ...prev,
-                            [index]: !prev[index],
-                          }))
-                        }
-                      >
-                        {expanded ? (
-                          <>
-                            <ChevronUp className="h-3.5 w-3.5" aria-hidden />
-                            Свернуть
-                          </>
-                        ) : (
-                          <>
-                            <ChevronDown className="h-3.5 w-3.5" aria-hidden />
-                            Ещё
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  ) : null}
-
-                  {hasBulkCta ? (
-                    <div
-                      className={`col-start-2 mt-3 border-t pt-3 ${borderSoft}`}
-                      data-city-suburb-cta-footer
-                    >
-                      {renderBulkCta()}
-                    </div>
-                  ) : null}
-                </div>
-              </article>
-            );
-          })}
-          </div>
-        </div>
-        <button
-          type="button"
-          data-city-suburb-prev
-          aria-label="Предыдущий пригород"
-          aria-disabled={!canPrev}
-          tabIndex={canPrev ? 0 : -1}
-          disabled={!canPrev}
-          onClick={() => scrollPage(-1)}
-          className={`${arrowClass} left-1 ${
-            hasOverflow
-              ? canPrev
-                ? 'opacity-100 hover:bg-white hover:text-slate-950'
-                : 'pointer-events-none opacity-40'
-              : 'pointer-events-none opacity-0'
-          }`}
-        >
-          <ArrowLeft className="h-5 w-5" aria-hidden />
-        </button>
-        <button
-          type="button"
-          data-city-suburb-next
-          aria-label="Следующий пригород"
-          aria-disabled={!canNext}
-          tabIndex={canNext ? 0 : -1}
-          disabled={!canNext}
-          onClick={() => scrollPage(1)}
-          className={`${arrowClass} right-1 ${
-            hasOverflow
-              ? canNext
-                ? 'opacity-100 hover:bg-white hover:text-slate-950'
-                : 'pointer-events-none opacity-40'
-              : 'pointer-events-none opacity-0'
-          }`}
-        >
-          <ArrowRight className="h-5 w-5" aria-hidden />
-        </button>
+      <div className={compact ? 'mt-4' : 'mt-5'}>
+        {compact ? renderChipRow('accordion') : renderChipRow('tabs')}
+        {selected && selectedIndex != null
+          ? compact
+            ? renderCompactPanel(selected, selectedIndex)
+            : renderHubPanel(selected, selectedIndex)
+          : null}
+        {compact && selectedIndex == null ? (
+          <p className="mt-3 text-sm text-slate-500" data-city-suburb-hint>
+            Нажмите на пригород, чтобы открыть точки и добавить в маршрут.
+          </p>
+        ) : null}
       </div>
-      {/* Compact: arrows on all breakpoints - no pager. Hub: mobile-only (no arrows below md). */}
-      {!compact && places.length > 1 ? (
-        <div
-          className="mt-3 flex items-center justify-center gap-1.5 md:hidden"
-          data-city-suburb-dots
-          role="tablist"
-          aria-label="Страницы пригородов"
-        >
-          {places.map((place, index) => (
-            <button
-              key={`dot:${place.name}:${index}`}
-              type="button"
-              role="tab"
-              aria-selected={activeIndex === index}
-              aria-label={`${place.name} (${index + 1} из ${places.length})`}
-              onClick={() => goToIndex(index)}
-              className={`h-2 rounded-full transition-[width,background-color] ${
-                activeIndex === index
-                  ? `${editorial ? 'bg-zinc-800' : 'bg-primary-600'} w-5`
-                  : `${editorial ? 'bg-zinc-300 hover:bg-zinc-400' : 'bg-slate-300 hover:bg-slate-400'} w-2`
-              }`}
-            />
-          ))}
-        </div>
-      ) : null}
     </div>
   );
 }

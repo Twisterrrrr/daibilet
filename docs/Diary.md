@@ -1,3 +1,20 @@
+## 2026-08-08 - Suburbs UX: hub chips + My Day accordion (no heavy carousel)
+
+### Наблюдения
+- Owner скрин «Значимые пригороды» СПб: tall-card snap-carousel тяжело скроллится вбок.
+- Причины: `snap-x snap-mandatory` + `scroll-smooth`, высокие плотные карточки (5 POI с desc), arrow gutters / скрытый scrollbar, nested horizontal vs vertical page scroll, ResizeObserver/scroll sync на каждый тик.
+- Ask: хаб - горизонтально без «листания»; my-day - горизонтальный аккордеон по тапу на пригород.
+
+### Решения
+- `SuburbsCarousel`: хаб = wrap-chips имён + одна detail-панель; my-day (`compact`) = horizontal chip accordion (tap toggle) + одна expanded-панель.
+- Убран card-rail (`horizontal-snap-row` / arrows / dots / mandatory snap) из suburbs.
+- Docs: Project.md layout note; smoke SPB hub + my-day после MSK deploy.
+
+### Проблемы
+- Нет (ожидаем deploy smoke).
+
+---
+
 ## 2026-08-08 - Full-site link audit: missing DTO → HTTP 500
 
 ### Наблюдения
