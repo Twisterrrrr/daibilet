@@ -333,15 +333,29 @@ function scheduleInlineCatalogRebuild(reason: string): Promise<PublicSessionDto[
         sessions,
         builtAt: now,
       };
+      let indexes: import('./public-catalog-disk-cache.js').PublicCatalogDiskIndexes | undefined;
+      try {
+        const dto = await import('./dto.js');
+        if (typeof dto.serializePublicCatalogLegacyIndexes === 'function') {
+          indexes = dto.serializePublicCatalogLegacyIndexes(sessions);
+        }
+      } catch (error) {
+        console.warn(
+          `Public catalog disk indexes serialize skipped: ${
+            error instanceof Error ? error.message : String(error)
+          }`,
+        );
+      }
       writePublicCatalogDiskCache({
-        version: 1,
+        version: indexes ? 2 : 1,
         builtAt: now,
         expiresAt,
         staleUntil,
         sessions,
+        ...(indexes ? { indexes } : {}),
       });
       console.log(
-        `Public catalog DTO cache rebuilt (${reason}): ${sessions.length} sessions in ${now - startedAt}ms`,
+        `Public catalog DTO cache rebuilt (${reason}): ${sessions.length} sessions in ${now - startedAt}ms indexes=${indexes ? 'v2' : 'none'}`,
       );
       return sessions;
     } finally {

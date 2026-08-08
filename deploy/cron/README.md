@@ -192,7 +192,30 @@ In-process fallback (only if cron/timer off): TEP_AUTO_SYNC_ENABLED=1 with 45min
 | Startup delay | 45 min + skip if last SUCCESS <6h |
 | Import nice | TEP_SYNC_NICE=15 |
 
-	c-orders cron */10 must stay unchanged (flock preserved).
+### Public catalog DTO rebuild (Catalog Worker, shared disk) — INC.504.5c
+
+Prefer systemd timer over API child-spawn. API should use `DAIBILET_CATALOG_REBUILD_MODE=off`.
+
+```bash
+chmod +x /opt/daibilet/deploy/cron/rebuild-public-catalog-dto.sh
+cp /opt/daibilet/deploy/systemd/daibilet-catalog-dto-rebuild.service /etc/systemd/system/
+cp /opt/daibilet/deploy/systemd/daibilet-catalog-dto-rebuild.timer /etc/systemd/system/
+systemctl daemon-reload && systemctl enable --now daibilet-catalog-dto-rebuild.timer
+# In /opt/daibilet/.env:
+#   DAIBILET_CATALOG_REBUILD_MODE=off
+systemctl restart daibilet-api
+# Oneshoot first warm before traffic if disk empty:
+systemctl start daibilet-catalog-dto-rebuild.service
+```
+
+| Setting | Value |
+|---------|-------|
+| Interval | 8 min (`OnUnitActiveSec`) |
+| MemoryMax | 900M |
+| Artifact | `var/cache/public-catalog-dto.json` (v2 + indexes) |
+| P1 alert strings | `catalog disk staleness`, `legacy inline SQL fallback` |
+
+tc-orders cron */10 must stay unchanged (flock preserved).
 
 ## Prod: SSR warm + healthcheck (`daibilet-tasks`)
 

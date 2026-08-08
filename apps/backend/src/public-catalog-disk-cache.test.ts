@@ -1,8 +1,13 @@
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import test from 'node:test';
 import {
+  loadPublicCatalogDiskCache,
   resolveCatalogRebuildMode,
   resolvePublicCatalogDiskCachePath,
+  writePublicCatalogDiskCache,
 } from './public-catalog-disk-cache.js';
 
 test('resolveCatalogRebuildMode defaults to child for Next/web heuristics', () => {
@@ -43,6 +48,42 @@ test('resolvePublicCatalogDiskCachePath honors env override', () => {
     assert.equal(resolvePublicCatalogDiskCachePath(), '/tmp/daibilet-catalog-test.json');
   } finally {
     restoreEnv('DAIBILET_PUBLIC_CATALOG_DISK_CACHE', prev);
+  }
+});
+
+test('writePublicCatalogDiskCache blocks empty sessions and keeps previous', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'daibilet-catalog-disk-'));
+  const filePath = path.join(dir, 'public-catalog-dto.json');
+  const prevEnv = process.env.DAIBILET_PUBLIC_CATALOG_DISK_CACHE;
+  try {
+    process.env.DAIBILET_PUBLIC_CATALOG_DISK_CACHE = filePath;
+    const now = Date.now();
+    assert.equal(
+      writePublicCatalogDiskCache({
+        version: 1,
+        builtAt: now,
+        expiresAt: now + 60_000,
+        staleUntil: now + 120_000,
+        sessions: [{ id: 'a' } as never],
+      }),
+      true,
+    );
+    assert.equal(
+      writePublicCatalogDiskCache({
+        version: 1,
+        builtAt: now + 1,
+        expiresAt: now + 60_000,
+        staleUntil: now + 120_000,
+        sessions: [],
+      }),
+      false,
+    );
+    const loaded = loadPublicCatalogDiskCache();
+    assert.equal(loaded?.sessions?.length, 1);
+    assert.equal(loaded?.sessions?.[0]?.id, 'a');
+  } finally {
+    restoreEnv('DAIBILET_PUBLIC_CATALOG_DISK_CACHE', prevEnv);
+    fs.rmSync(dir, { recursive: true, force: true });
   }
 });
 

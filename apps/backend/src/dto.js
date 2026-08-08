@@ -6821,6 +6821,66 @@ function yieldEventLoop() {
   return new Promise((resolve) => setImmediate(resolve));
 }
 
+function mapIndexListsToIds(index) {
+  const out = Object.create(null);
+  for (const [key, list] of index.entries()) {
+    out[key] = (list || []).map((session) => session?.id).filter(Boolean);
+  }
+  return out;
+}
+
+function mapIndexOneToId(index) {
+  const out = Object.create(null);
+  for (const [key, session] of index.entries()) {
+    if (session?.id) out[key] = session.id;
+  }
+  return out;
+}
+
+/** INC.504.5c: serialize Maps → id pointers for disk artifact v2 (built in Catalog Worker). */
+export function serializePublicCatalogLegacyIndexes(sessions) {
+  const destinationIndex = buildDestinationSessionIndex(sessions);
+  const venueIndex = buildVenueSessionIndex(sessions);
+  const slugIndex = buildCatalogSlugIndex(sessions);
+  const catalogFacets = buildCatalogFacets(sessions.filter(sessionHasCoverImage));
+  return {
+    destinationIndex: mapIndexListsToIds(destinationIndex),
+    venueIndex: mapIndexListsToIds(venueIndex),
+    slugIndex: mapIndexOneToId(slugIndex),
+    catalogFacets,
+  };
+}
+
+/** Hydrate id-pointer indexes back to Maps of session object refs. */
+export function hydratePublicCatalogLegacyIndexes(sessions, serialized) {
+  if (!serialized || typeof serialized !== 'object') return null;
+  const byId = new Map((sessions || []).map((session) => [String(session.id), session]));
+  const hydrateList = (record) => {
+    const map = new Map();
+    for (const [key, ids] of Object.entries(record || {})) {
+      const list = (Array.isArray(ids) ? ids : [])
+        .map((id) => byId.get(String(id)))
+        .filter(Boolean);
+      if (list.length) map.set(key, list);
+    }
+    return map;
+  };
+  const hydrateOne = (record) => {
+    const map = new Map();
+    for (const [key, id] of Object.entries(record || {})) {
+      const session = byId.get(String(id));
+      if (session) map.set(key, session);
+    }
+    return map;
+  };
+  return {
+    destinationIndex: hydrateList(serialized.destinationIndex),
+    venueIndex: hydrateList(serialized.venueIndex),
+    slugIndex: hydrateOne(serialized.slugIndex),
+    catalogFacets: serialized.catalogFacets || buildCatalogFacets(sessions.filter(sessionHasCoverImage)),
+  };
+}
+
 async function adoptCanonicalCatalogSessions(rows, _reason) {
   const now = Date.now();
   const prev = publicCatalogCache;
@@ -6839,16 +6899,39 @@ async function adoptCanonicalCatalogSessions(rows, _reason) {
     catalogFacets = prev.catalogFacets;
     builtAt = prev.builtAt || now;
   } else {
-    // Yield between heavy index maps so health/HTTP can run mid-adopt.
-    await yieldEventLoop();
-    destinationIndex = buildDestinationSessionIndex(rows);
-    await yieldEventLoop();
-    venueIndex = buildVenueSessionIndex(rows);
-    await yieldEventLoop();
-    slugIndex = buildCatalogSlugIndex(rows);
-    await yieldEventLoop();
-    catalogFacets = buildCatalogFacets(rows.filter(sessionHasCoverImage));
-    builtAt = now;
+    // Prefer prebuilt indexes from disk v2 (Catalog Worker) - no Map rebuild on API.
+    let hydrated = null;
+    try {
+      const { loadPublicCatalogDiskCache } = await import('./public-catalog-disk-cache.js');
+      const disk = loadPublicCatalogDiskCache();
+      if (disk?.version === 2 && disk.indexes && (disk.sessions === rows || disk.sessions?.length === rows.length)) {
+        hydrated = hydratePublicCatalogLegacyIndexes(rows, disk.indexes);
+      }
+    } catch {
+      hydrated = null;
+    }
+
+    if (hydrated?.destinationIndex && hydrated?.venueIndex && hydrated?.slugIndex) {
+      destinationIndex = hydrated.destinationIndex;
+      venueIndex = hydrated.venueIndex;
+      slugIndex = hydrated.slugIndex;
+      catalogFacets = hydrated.catalogFacets;
+      builtAt = now;
+      console.log(
+        `Public catalog legacy indexes hydrated from disk v2 (${rows.length} sessions)`,
+      );
+    } else {
+      // Yield between heavy index maps so health/HTTP can run mid-adopt.
+      await yieldEventLoop();
+      destinationIndex = buildDestinationSessionIndex(rows);
+      await yieldEventLoop();
+      venueIndex = buildVenueSessionIndex(rows);
+      await yieldEventLoop();
+      slugIndex = buildCatalogSlugIndex(rows);
+      await yieldEventLoop();
+      catalogFacets = buildCatalogFacets(rows.filter(sessionHasCoverImage));
+      builtAt = now;
+    }
   }
 
   publicCatalogCache = {

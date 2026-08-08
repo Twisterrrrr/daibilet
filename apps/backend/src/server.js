@@ -239,6 +239,12 @@ export async function handleRequest(request, response) {
     }
 
     if (route === 'GET /api/health') {
+      try {
+        const { logCatalogDiskStalenessIfNeeded } = await import('./public-catalog-disk-cache.js');
+        logCatalogDiskStalenessIfNeeded();
+      } catch {
+        /* ignore health side-checks */
+      }
       sendJson(response, {
         ok: true,
         service: 'daibilet-backend',

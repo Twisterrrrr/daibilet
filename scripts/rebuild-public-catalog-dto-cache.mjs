@@ -1,6 +1,7 @@
 /**
- * INC.504.4: rebuild public catalog DTO cache in a dedicated process (flock'd cron / child spawn).
- * Writes var/cache/public-catalog-dto.json for Next to serve without in-process rebuild.
+ * INC.504.4 / INC.504.5c: rebuild public catalog DTO cache in Catalog Worker
+ * (systemd timer / flock'd cron / optional child spawn).
+ * Writes var/cache/public-catalog-dto.json (+ v2 indexes) for API Soft-SWR.
  *
  * Usage:
  *   node scripts/rebuild-public-catalog-dto-cache.mjs
@@ -9,6 +10,7 @@
  * Env:
  *   DAIBILET_PUBLIC_CATALOG_DISK_CACHE - snapshot path
  *   DATABASE_URL / .env as usual
+ *   Pair API with DAIBILET_CATALOG_REBUILD_MODE=off
  */
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -29,13 +31,14 @@ async function main() {
   const { getPublicCatalogSessions, clearPublicCatalogDtoCache } = await import(
     '../apps/backend/src/public-catalog.dto.ts'
   );
-  const { resolvePublicCatalogDiskCachePath } = await import(
+  const { loadPublicCatalogDiskCache, resolvePublicCatalogDiskCachePath } = await import(
     '../apps/backend/src/public-catalog-disk-cache.ts'
   );
 
   clearPublicCatalogDtoCache();
   const sessions = await getPublicCatalogSessions(true, { hydrateSlots: false });
   const diskPath = resolvePublicCatalogDiskCachePath();
+  const disk = loadPublicCatalogDiskCache();
   console.log(
     JSON.stringify({
       ok: true,
@@ -43,6 +46,8 @@ async function main() {
       sessions: sessions.length,
       elapsedMs: Date.now() - startedAt,
       diskCache: diskPath,
+      diskVersion: disk?.version ?? null,
+      hasIndexes: Boolean(disk?.indexes),
     }),
   );
 }

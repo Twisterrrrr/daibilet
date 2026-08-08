@@ -1,5 +1,22 @@
 # Diary
 
+## 2026-08-08 - INC.504.5c: Catalog Worker on shared disk
+
+### Наблюдения
+- Owner: Redis sketch «на потом», но «если за пару дней - скорее за». Redis на MSK не канон; уже есть disk snapshot + child spawn.
+
+### Решения
+- Транспорт: **shared disk** (не Redis). systemd `daibilet-catalog-dto-rebuild.timer` каждые 8 мин → `deploy/cron/rebuild-public-catalog-dto.sh`.
+- API: `DAIBILET_CATALOG_REBUILD_MODE=off` (не spawn/inline). Soft-SWR только memory+disk.
+- Artifact **v2**: sessions + serialized legacy indexes; dto.js hydrate Maps без пересчёта на API.
+- Guards: empty/anomaly write block; health rate-limited `CRITICAL P1: catalog disk staleness`.
+- Redis/gzip = INC.504.5d deferred.
+
+### Проблемы
+- Cold start без файла: oneshot `systemctl start daibilet-catalog-dto-rebuild.service` до трафика.
+
+---
+
 ## 2026-08-08 - Future: Catalog Worker + Redis (после INC.504.5c)
 
 ### Наблюдения
