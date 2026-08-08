@@ -4591,7 +4591,9 @@ export async function buildPublicLandingPage(db, landingSlug, cityFilter = '') {
   );
   // Lean SSR: city-scoped first, then card budget - avoid national top-N starving city URLs.
   const sessions = pageSessions.map((session) => toPublicCatalogListItem(session));
-  const prices = matchedSessions.map((session) => session.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
+  const prices = matchedSessions
+    .flatMap((session) => [session.priceFrom, session.priceTo])
+    .filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
   const cities = countBy(matchedSessions.map((event) => event.destination || event.city).filter(Boolean));
   const categories = countBy(matchedSessions.map((event) => event.category).filter(Boolean));
   const venues = countBy(matchedSessions.map((event) => event.venue).filter(Boolean));
@@ -4696,7 +4698,9 @@ export async function buildPublicLandingPageManaged(db, landingSlug, cityFilter 
         manualLandingStatus: base.manualLandingStatus,
       };
     });
-  const prices = matchedSessions.map((session) => session.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
+  const prices = matchedSessions
+    .flatMap((session) => [session.priceFrom, session.priceTo])
+    .filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
   const cities = countBy(matchedSessions.map((event) => event.destination || event.city).filter(Boolean));
   const categories = countBy(matchedSessions.map((event) => event.category).filter(Boolean));
   const venues = countBy(matchedSessions.map((event) => event.venue).filter(Boolean));
@@ -6864,6 +6868,14 @@ async function publicCatalogSessionsFast(db) {
           primary_offer."deeplinkUrl" as "offerDeeplinkUrl",
           min(session."startsAt") filter (where ${ACTIVE_SESSION_SQL}) as "startsAt",
           min(session."priceFromRub") filter (where ${ACTIVE_SESSION_SQL} and session."priceFromRub" >= $1) as "sessionPriceFromRub",
+          max(session."priceFromRub") filter (where ${ACTIVE_SESSION_SQL} and session."priceFromRub" >= $1) as "sessionPriceToRub",
+          (
+            select max(offer."priceRub")
+            from "EventOffer" offer
+            where offer."eventId" = e.id
+              and offer.active = true
+              and offer."priceRub" >= $1
+          ) as "offerPriceMaxRub",
           count(distinct session.id) filter (where ${ACTIVE_SESSION_SQL})::int as "slotCount",
           ${orderedEventTagsSql('e.id')} as tags,
           (
@@ -6926,6 +6938,13 @@ async function publicCatalogSessionsFast(db) {
             where price is not null and price >= $1
           ) as "priceFrom",
           (
+            select max(price)
+            from (
+              values ("priceFromRub"), ("sessionPriceFromRub"), ("sessionPriceToRub"), ("offerPriceRub"), ("offerPriceMaxRub")
+            ) as prices(price)
+            where price is not null and price >= $1
+          ) as "priceTo",
+          (
             (
               "offerWidgetUrl" is not null
               or "offerDeeplinkUrl" is not null
@@ -6983,7 +7002,7 @@ async function publicCatalogSessionsFast(db) {
           count(*)::int as "groupedEventsCount",
           sum(coalesce("slotCount", 0))::int as "sessionCount",
           min("priceFrom")::int as "priceFrom",
-          max("priceFrom")::int as "priceTo",
+          max("priceTo")::int as "priceTo",
           nullif(sum(coalesce("ticketsVacant", 0)), 0)::int as vacant,
           jsonb_agg(
             jsonb_build_object(

@@ -1,5 +1,23 @@
 # Diary
 
+## 2026-08-08 - Landing hero CTA «от» + real schedule priceTo
+
+### Наблюдения
+- Hero primary CTA на non-NY лендингах показывал min-max (`299-5 500 ₽`) после `9e80bc91` (`priceOnCta='range'`).
+- Кнопки строк расписания честно давали одну цену: в `publicCatalogSessionsFast` не было `priceTo` в CTE, hotfix `7c5f2210` оставил `max("priceFrom") as priceTo`.
+- UI уже вызывал `formatLandingBuyPrice(from, to)` - данных range не было.
+
+### Решения
+- Hero CTA: default/`from` (NY остаётся `range`); stats «диапазон цен» без изменений.
+- Bridges hero CTA: снова `formatPriceFrom`.
+- dto.js catalog SQL: `sessionPriceToRub` + `offerPriceMaxRub` → normalized `priceTo`; group `max("priceTo")`.
+- Landing stats prices: min/max по `priceFrom`+`priceTo`.
+- Commit+push, без live deploy (нужен API restart + catalog rebuild на MSK).
+
+### Проблемы
+- Live range на кнопках появится только после API pull/restart и пересборки catalog cache.
+
+---
 ## 2026-08-08 - GASTRO covers + My Day editorial images
 
 ### Наблюдения

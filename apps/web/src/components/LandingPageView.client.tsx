@@ -1464,7 +1464,7 @@ function LandingHero({
       : isSeasonal && !citySlug
         ? 'К городам'
         : undefined;
-  const priceOnCta = 'range';
+  const priceOnCta = countdownKind === 'new-year' ? 'range' : 'from';
 
   return (
     <section className={`relative overflow-hidden ${heroTheme.className}`}>

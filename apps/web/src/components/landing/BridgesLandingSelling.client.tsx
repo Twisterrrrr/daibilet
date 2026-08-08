@@ -4,7 +4,7 @@ import { ArrowRight, Clock, Compass, Heart, MapPin, Sparkles, Star, Wallet } fro
 import * as React from 'react';
 
 import { BRIDGES_LANDING } from '@/data/bridges-landing';
-import { formatMoneyRange, formatNumber, formatLandingBuyPrice } from '@/lib/format';
+import { formatMoneyRange, formatNumber, formatLandingBuyPrice, formatPriceFrom } from '@/lib/format';
 import type { BridgesScheduleRow } from '@/lib/bridges-session-utils';
 
 const PALACE_BRIDGE_LIFT_HOUR = 1;
@@ -90,8 +90,8 @@ export function BridgesHeroBlock({
   onViewSchedule: () => void;
 }) {
   const countdown = usePalaceBridgeCountdown();
-  // CTA: min-max when known; exact price without «от» when single.
-  const priceCtaLabel = priceFrom ? formatLandingBuyPrice(priceFrom, priceTo) : null;
+  // Hero CTA: «от min»; stats cell keeps min-max.
+  const priceCtaLabel = priceFrom ? formatPriceFrom(priceFrom) : null;
   const priceRangeLabel = priceFrom ? formatMoneyRange(priceFrom, priceTo) : null;
 
   return (
