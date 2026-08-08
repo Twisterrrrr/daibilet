@@ -73,7 +73,7 @@ async function main() {
        set title = $2,
            address = $3,
            kind = $4::"VenueKind",
-           "pageStatus" = 'PUBLISHED'::"PageStatus",
+           "pageStatus" = 'PUBLISHED',
            "isIndexable" = true,
            "updatedAt" = now()
        where id = $1`,
