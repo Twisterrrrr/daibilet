@@ -1,5 +1,25 @@
 # Diary
 
+## 2026-08-09 - INC.504.5c: catalog worker 203/EXEC + catalog stale-first
+
+### Наблюдения
+- Owner: «всё ещё долго тянем события, локации и площадки».
+- HTML `/locations|/venues|/events` warm TTFB ~0.16-0.20s (снаружи); API localhost warm venues ~1-2ms / events ~50ms.
+- Cold `/api/public/venues?limit=24` без family: **6.8s** (совпало с journal adopt 6580ms под swap).
+- Catalog Worker: с 21:23 UTC `daibilet-catalog-dto-rebuild.service` **203/EXEC** (script без +x / ExecStart прямой path) → disk mtime застыл на 21:15; `CRITICAL P1: catalog disk staleness`.
+- UX: `/locations|/venues` после SelectedCity bootstrap **сбрасывали SSR-карточки в []** и ждали city fetch - ощущение «висит».
+
+### Решения
+- systemd: `ExecStart=/bin/bash …/rebuild-public-catalog-dto.sh` (не зависит от +x).
+- Web: stale-first в `LocationsCatalogView` / `VenuesCatalogView` - не wipe списка на city-hydrate.
+- Live: chmod +x + unit reload + oneshot rebuild; web deploy для stale-first.
+
+### Проблемы
+- WEB.LIGHT.B1 (venue hub disk snapshot) ещё открыт - cold hub после API restart всё ещё SQL await.
+- Redis INC.504.5d по-прежнему deferred.
+
+---
+
 ## 2026-08-09 - my-day TC buy: HTTPForbidden bad token
 
 ### Наблюдения

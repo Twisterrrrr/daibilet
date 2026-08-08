@@ -233,7 +233,6 @@ export function LocationsCatalogView({
     const controller = new AbortController();
     const requestId = ++catalogRequestId.current;
     const cachedBase = cityBaseRef.current?.key === scopeKey ? cityBaseRef.current.page : null;
-    const scopeChanged = cityBaseRef.current != null && cityBaseRef.current.key !== scopeKey;
 
     // Instant type chip preview only on page 1 from city-scoped base.
     if (urlPage === 1 && typeFilter !== 'all' && cachedBase && cachedBase.venues.length > 0) {
@@ -250,10 +249,8 @@ export function LocationsCatalogView({
       setStats(cachedBase.stats);
       setCatalogLoading(false);
     } else {
-      if (scopeChanged || !cachedBase || urlPage > 1) {
-        setVenues([]);
-        setTotal(0);
-      }
+      // Stale-first: keep SSR / previous cards while city-hydrate or page fetch runs.
+      // Clearing to [] made /locations feel «hung» after SelectedCity bootstrap.
       setCatalogLoading(true);
     }
 

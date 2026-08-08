@@ -268,7 +268,6 @@ export function VenuesCatalogView({
     const controller = new AbortController();
     const requestId = ++catalogRequestId.current;
     const cachedBase = cityBaseRef.current?.key === scopeKey ? cityBaseRef.current.page : null;
-    const scopeChanged = cityBaseRef.current != null && cityBaseRef.current.key !== scopeKey;
 
     if (urlPage === 1 && typeFilter !== 'all' && cachedBase && cachedBase.venues.length > 0) {
       const filtered = cachedBase.venues
@@ -284,10 +283,8 @@ export function VenuesCatalogView({
       setStats(cachedBase.stats);
       setCatalogLoading(false);
     } else {
-      if (scopeChanged || !cachedBase || urlPage > 1) {
-        setVenues([]);
-        setTotal(0);
-      }
+      // Stale-first: keep SSR / previous cards while city-hydrate or page fetch runs.
+      // Clearing to [] made /venues feel «hung» after SelectedCity bootstrap.
       setCatalogLoading(true);
     }
 
