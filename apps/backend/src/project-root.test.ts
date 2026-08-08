@@ -25,7 +25,7 @@ test('resolveProjectRoot prefers DAIBILET_PROJECT_ROOT when marker exists', () =
   const prev = process.env.DAIBILET_PROJECT_ROOT;
   process.env.DAIBILET_PROJECT_ROOT = expectedRoot;
   try {
-    assert.equal(resolveProjectRoot(), expectedRoot);
+    assert.equal(resolveProjectRoot(undefined), expectedRoot);
   } finally {
     if (prev === undefined) delete process.env.DAIBILET_PROJECT_ROOT;
     else process.env.DAIBILET_PROJECT_ROOT = prev;
