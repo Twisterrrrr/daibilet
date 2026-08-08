@@ -7,9 +7,14 @@
  * Usage:
  *   node scripts/seed-buyer-purchases-profile.js --dry-run
  *   node scripts/seed-buyer-purchases-profile.js --apply
- *   node scripts/seed-buyer-purchases-profile.js --apply --reset-password
+ *   node scripts/seed-buyer-purchases-profile.js --apply --reset-password --i-understand-destroys-existing-password
  *
- * With --reset-password: writes temp credentials to SECRETS_PATH (default
+ * IMPORTANT: never reset password for an existing SiteUser unless explicitly forced.
+ * Personal / owner test profiles must keep their password. --reset-password alone is ignored
+ * when the user already exists; both flags are required, and the previous hash is backed up
+ * to SECRETS_PATH.before-reset.bak first.
+ *
+ * With forced reset: writes temp credentials to SECRETS_PATH (default
  * /opt/daibilet/secrets/buyer-seed-v-butin.txt) - never prints password to stdout.
  */
 const path = require('path');
@@ -50,7 +55,11 @@ const DISPLAY_NAME = 'Василий Бутин';
 const USER_ID_PREFIX = 'usr_buyer_seed_butin';
 const dryRun = process.argv.includes('--dry-run');
 const doApply = process.argv.includes('--apply');
-const resetPassword = process.argv.includes('--reset-password');
+const resetPasswordFlag = process.argv.includes('--reset-password');
+const forceResetExisting = process.argv.includes(
+  '--i-understand-destroys-existing-password',
+);
+const resetPassword = resetPasswordFlag && forceResetExisting;
 const secretsPath =
   process.env.BUYER_SEED_SECRETS_PATH ||
   (fs.existsSync('/opt/daibilet')
@@ -76,7 +85,7 @@ async function main() {
   }
 
   const existing = await pool.query(
-    `select id, email, name, "isActive", "createdAt" from "SiteUser" where lower(email) = $1 limit 1`,
+    `select id, email, name, "isActive", "createdAt", "passwordHash" from "SiteUser" where lower(email) = $1 limit 1`,
     [EMAIL],
   );
   const row = existing.rows[0] || null;
@@ -87,11 +96,17 @@ async function main() {
     before: row
       ? { id: row.id, email: row.email, name: row.name, isActive: row.isActive }
       : null,
-    action: row ? (resetPassword ? 'reset-password' : 'noop-exists') : 'create',
+    action: row
+      ? resetPassword
+        ? 'reset-password'
+        : resetPasswordFlag && !forceResetExisting
+          ? 'refused-reset-existing-needs-force-flag'
+          : 'noop-exists'
+      : 'create',
     secretsPath: resetPassword || !row ? secretsPath : null,
     seedTicketCodes: ['DB26-BUTIN01', 'DB26-BUTIN02', 'DB26-BUTIN03'],
     note:
-      'Internal museum tickets are served from apps/web buyer-purchases-seed.ts after web deploy. This script only manages SiteUser login.',
+      'Internal museum tickets are served from apps/web buyer-purchases-seed.ts after web deploy. This script only manages SiteUser login. Existing SiteUser passwords are never reset unless both --reset-password and --i-understand-destroys-existing-password are passed.',
   };
 
   if (!doApply) {
@@ -118,7 +133,30 @@ async function main() {
     writeSecretsFile(secretsPath, { email: EMAIL, password, userId, created: true });
     passwordWritten = true;
     report.action = 'created';
+  } else if (resetPasswordFlag && !forceResetExisting) {
+    report.action = 'refused-reset-existing-needs-force-flag';
+    report.warning =
+      'Refusing to reset password for existing SiteUser. Pass --i-understand-destroys-existing-password to force (backs up old hash first).';
   } else if (resetPassword) {
+    const backupPath = `${secretsPath}.before-reset.bak`;
+    fs.mkdirSync(path.dirname(backupPath), { recursive: true });
+    fs.writeFileSync(
+      backupPath,
+      [
+        `# SiteUser passwordHash backup before forced seed reset - DO NOT COMMIT`,
+        `# generatedAt=${new Date().toISOString()}`,
+        `email=${EMAIL}`,
+        `userId=${row.id}`,
+        `passwordHash=${row.passwordHash}`,
+        '',
+      ].join('\n'),
+      { mode: 0o600 },
+    );
+    try {
+      fs.chmodSync(backupPath, 0o600);
+    } catch {
+      // Windows may ignore chmod
+    }
     const password = generateTempPassword();
     const passwordHash = await hashPassword(password);
     await pool.query(
@@ -128,6 +166,7 @@ async function main() {
     writeSecretsFile(secretsPath, { email: EMAIL, password, userId: row.id, created: false });
     passwordWritten = true;
     report.action = 'password-reset';
+    report.hashBackupPath = backupPath;
   } else {
     report.action = 'noop-exists';
   }

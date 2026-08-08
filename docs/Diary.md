@@ -1,3 +1,21 @@
+## 2026-08-08 - Restore v.butin@yandex.ru SiteUser password hash
+
+### Наблюдения
+- Seed UX.BUY-14 ошибочно прогнал `scripts/seed-buyer-purchases-profile.js --apply --reset-password` на уже существующий личный тестовый `SiteUser` `v.butin@yandex.ru` (создан 2026-07-12).
+- Temp password попал только в `/opt/daibilet/secrets/buyer-seed-v-butin.txt`; plaintext старого пароля нигде не бэкапился (ни secrets, ни transcripts, ни docs).
+- Postgres archive_mode=off, SQL dumps с SiteUser нет; но `SiteUser` не вакуумился (`n_dead_tup=9`) - старый `passwordHash` остался в heap dead tuples.
+
+### Решения
+- Восстановлен **точный** pre-reset scrypt hash из heap (`scrypt:c072082f86c9494fbd5533f058b67cab:…`) в live MSK `SiteUser`. Temp seed login теперь 401.
+- Plaintext старого пароля **не** найден (кандидаты из project probes / admin не совпали) - owner входит своим запомненным паролем; если не вспомнит - сказать какой поставить.
+- Аудит на MSK: `/opt/daibilet/secrets/buyer-password-restore-v-butin.txt` (не в git). Seed-файл помечен INVALIDATED.
+- Guard в `scripts/seed-buyer-purchases-profile.js`: для existing SiteUser `--reset-password` без `--i-understand-destroys-existing-password` отказывается; при force сначала пишет `.before-reset.bak` с old hash.
+
+### Проблемы
+- Без plaintext нельзя e2e-подтвердить login от имени агента - только восстановление hash + отказ temp. Нужен smoke от owner.
+
+---
+
 ## 2026-08-08 - Supplier taxonomy: open-date vs events (owner lock)
 
 ### Наблюдения
@@ -46,6 +64,7 @@
 - Нужен web deploy (fixture в apps/web). Finance `.159` не трогали.
 - Ship: `90ac5cc7` · Deploy **31247448301** · MSK **BUILD_ID=`FSLIUs463XJKQZkOL_njJ`** · `internal-purchases` source=`catalog-seed` total=3 · ticket pages HTTP 200.
 - SiteUser уже был; temp password сброшен в `/opt/daibilet/secrets/buyer-seed-v-butin.txt` (не в git/chat).
+- **Инцидент:** сброс пароля существующего личного профиля недопустим. См. запись «Restore v.butin…» выше - hash восстановлен из heap; seed script ужесточён.
 
 ### Проблемы
 - Пока нет m2m purchases-by-email, seed живёт в catalog web; после UX.BUY-6 можно сузить/убрать.
