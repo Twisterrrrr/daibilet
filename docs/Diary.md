@@ -1,5 +1,22 @@
 # Diary
 
+## 2026-08-08 - Future: Catalog Worker + Redis (после INC.504.5c)
+
+### Наблюдения
+- Owner: «на потом» - вынести тяжёлый SQL/map/indexes из Main API в Catalog Worker; транспорт датасета ~3k sessions с мин. network/CPU на парсинг.
+
+### Решения (не implement сейчас)
+- **Транспорт:** Shared Redis (gzip JSON `catalog:sessions` + `catalog:indexes`) - победитель vs S3/disk vs HTTP/gRPC streaming (streaming = overkill для 5-15MB).
+- **Схема:** DB → Worker (SQL+blob+indexes) → Redis → Pub/Sub `catalog:updated` / poll → Main API in-memory Soft-SWR → Next.
+- **Алерты:** P1 staleness (`catalog:updated_at` > 2×TTL); P2 worker OOM/crash (API деградирует на Redis/stale); P3 пустой/аномальный размер артефакта - блок записи, оставить старый кэш.
+- Предпосылка: сначала INC.504.5c (индексы в DTO/disk, выпил второго слоя dto.js), потом отдельный worker+Redis если RSS/CPU всё ещё жмут.
+
+### Проблемы
+- Redis на MSK сейчас может отсутствовать / не быть каноном - оценить infra до старта.
+- Не смешивать с текущим child-mode disk snapshot без явного owner go.
+
+---
+
 ## 2026-08-08 - INC.504.5b: эксплуатация adopt-шва (fallback / event loop / RSS)
 
 ### Наблюдения
