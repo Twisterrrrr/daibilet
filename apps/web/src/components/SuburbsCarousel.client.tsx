@@ -83,8 +83,8 @@ export type SuburbsCarouselProps = {
   /** Hub editorial typography; my-day keeps default slate. */
   editorial?: boolean;
   /**
-   * My-day: horizontal accordion triggers + expand on tap.
-   * Hub: name chips + one detail panel (no tall-card carousel).
+   * My-day: truncated panel - name (+ optional vector) + numbered point names + bulk CTA.
+   * Hide travel essays, gastro, station tips, and per-POI descriptions (hub keeps full).
    */
   compact?: boolean;
   titleClass?: string;
@@ -95,7 +95,7 @@ export type SuburbsCarouselProps = {
 /**
  * Significant-suburbs block.
  * Hub: wrap chips of suburb names + one detail panel (no horizontal card rail).
- * Compact (my-day): horizontal accordion - first suburb expanded; tap chip to switch.
+ * Compact (my-day): horizontal accordion - truncated panel (name + points + CTA).
  * Bulk «В маршрут» adds all nested points of the active suburb.
  */
 export function SuburbsCarousel({
@@ -345,7 +345,6 @@ export function SuburbsCarousel({
     const nested = Array.isArray(place.places) ? place.places.filter((p) => p?.name) : [];
     const bulkVenues = buildBulkVenues(place, venues, city);
     const vectorTitle = suburbVectorTitle(place);
-    const miniAnno = String(place.desc || '').trim();
 
     return (
       <article
@@ -385,55 +384,22 @@ export function SuburbsCarousel({
                 </span>
               ) : null}
             </h3>
-            {/* mt-3 matches nested places gap after gastro (ol mt-3 / pt-3) */}
-            {miniAnno ||
-            place.stationName ||
-            place.travelVectorBlurb ||
-            place.gastroHint ? (
-              <div className="mt-3 space-y-1.5">
-                {miniAnno ? (
-                  <p
-                    className="line-clamp-3 text-sm leading-relaxed text-slate-600"
-                    data-city-suburb-anno
-                  >
-                    {miniAnno}
-                  </p>
-                ) : null}
-                {place.stationName ? (
-                  <p className="text-sm leading-snug text-slate-600" data-city-suburb-exit>
-                    <span className="font-semibold text-slate-900">Где выходить</span>
-                    <span className="text-slate-500">: {place.stationName}</span>
-                  </p>
-                ) : null}
-                {place.travelVectorBlurb ? (
-                  <p className="text-sm leading-relaxed text-slate-500">
-                    {place.travelVectorBlurb}
-                  </p>
-                ) : null}
-                {place.gastroHint ? (
-                  <p className="text-sm leading-snug text-slate-600" data-city-suburb-gastro>
-                    <span className="font-semibold text-slate-900">Гастро-остановка</span>
-                    <span className="text-slate-500">: {place.gastroHint}</span>
-                  </p>
-                ) : null}
-              </div>
-            ) : null}
           </div>
           {nested.length ? (
             <ol
-              className="col-span-2 mt-3 grid grid-cols-[2.25rem_minmax(0,1fr)] gap-x-2.5 gap-y-2 border-t border-slate-100 pt-3 sm:gap-x-3"
+              className="col-span-2 mt-3 grid grid-cols-[2.25rem_minmax(0,1fr)] gap-x-2.5 gap-y-1.5 border-t border-slate-100 pt-3 sm:gap-x-3"
               data-city-suburb-places
+              data-city-suburb-places-compact="1"
             >
               {nested.map((poi, poiIndex) => {
                 const poiHref = resolveCityPlaceTitleHref(poi, venues);
-                const poiDesc = String(poi.desc || '').trim();
                 return (
                   <li key={`${poi.name}:${poiIndex}`} className="contents" data-city-suburb-place>
                     <span className="pt-0.5 text-center text-xs font-medium leading-5 tabular-nums text-slate-400">
                       {poiIndex + 1}.
                     </span>
                     <span className="min-w-0 text-sm leading-snug text-slate-700">
-                      <SuburbPlaceLabel name={poi.name} href={poiHref} desc={poiDesc} />
+                      <SuburbPlaceLabel name={poi.name} href={poiHref} desc="" />
                     </span>
                   </li>
                 );

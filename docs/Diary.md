@@ -1,5 +1,21 @@
 # Diary
 
+## 2026-08-08 - /my-day suburbs: restore truncated compact panel
+
+### Наблюдения
+- Owner: на мобиле my-day снова большой hub-like блок пригородов («Где выходить», гастро, длинные точки) - нужен усеченный compact.
+- `compact` prop уже передавался из DayRoutePanel; раздулся сам `renderCompactPanel`.
+
+### Решения
+- Compact снова: title (+ vector inline) + numbered names + bulk CTA; без station/gastro/essay/POI desc.
+- Hub (`CityPageView`, без `compact`) без изменений - полный panel.
+- Map split уже откатан в `9c800f50`; nearby under-stops остаются removed.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-08 - /my-day: map back under list (no desktop split)
 
 ### Наблюдения
