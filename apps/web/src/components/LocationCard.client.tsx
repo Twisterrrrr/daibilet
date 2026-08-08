@@ -22,9 +22,6 @@ const TYPE_GRADIENT: Record<string, string> = {
   venue: 'from-indigo-600 via-primary-600 to-indigo-800',
 };
 
-/** Content places: editorial copy + activity chips. */
-const CONTENT_KINDS = new Set(['park', 'monument', 'outdoor_location', 'attraction']);
-
 /** Strip legacy «Место посадки - / — » prefix from bus boarding titles. */
 function stripBoardingPlacePrefix(name: string): string {
   const trimmed = String(name || '').trim();
@@ -42,13 +39,26 @@ function sameAddressLabel(a: string, b: string): boolean {
   return Boolean(a && b && norm(a) === norm(b));
 }
 
-function contentActivityLabel(count: number): string | null {
-  if (count <= 0) return null;
-  const mod10 = count % 10;
-  const mod100 = count % 100;
-  if (mod10 === 1 && mod100 !== 11) return `${count} экскурсия проходит здесь`;
-  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return `${count} экскурсии проходят здесь`;
-  return `${count} экскурсий проходят здесь`;
+/** Minimal technical line when editorial hook/shortDescription is empty. */
+function technicalLocationBlurb(kind: string, typeLabel: string): string {
+  switch (kind) {
+    case 'bus':
+      return 'Точка сбора для автобусных туров и трансферов';
+    case 'pier':
+    case 'pier_water':
+      return 'Причал - место посадки на водные прогулки';
+    case 'park':
+      return 'Парк и открытое пространство для прогулок';
+    case 'monument':
+    case 'attraction':
+      return 'Точка на маршруте и ориентир в городе';
+    case 'outdoor_location':
+      return 'Открытая локация для прогулок и событий';
+    case 'sport_activity_space':
+      return 'Площадка для активного отдыха и событий';
+    default:
+      return `${typeLabel} на карте города`;
+  }
 }
 
 export function LocationCard({
@@ -81,7 +91,6 @@ export function LocationCard({
   nextSlot?: string | null;
 }) {
   const kind = normalizeVenueKind(venue.type);
-  const isContentPlace = CONTENT_KINDS.has(kind);
   const heroUrl = String(venue.heroImageUrl || '').trim();
   const showPhoto = Boolean(heroUrl);
   const TypeIcon = venueTypeIcon(venue.type);
@@ -92,27 +101,20 @@ export function LocationCard({
   const metro = nonEmptyLogisticsText(venue.metroStation);
   const stopCount = Number(venue.stopEventCount ?? 0);
   const activityCount = stopCount > 0 ? stopCount : Number(venue.events || 0);
-  // Same strip as hub/my-day: cut address crumbs («. Нева», «. пл. …») from Venue blurbs.
-  const hook = dayRouteHookLine({
+  const editorialHook = dayRouteHookLine({
     hookFact: venue.hookFact,
     shortDescription: venue.shortDescription,
   });
+  const blurb = editorialHook || technicalLocationBlurb(kind, typeLabel);
   const displayName = stripBoardingPlacePrefix(venue.name);
   const routeTitle = stripBoardingPlacePrefix(venue.title || venue.name);
   const showStreet = Boolean(street) && !sameAddressLabel(street, displayName);
-  const activityLabel = isContentPlace ? contentActivityLabel(activityCount) : null;
-  const eventsChipLabel = isContentPlace
-    ? activityLabel
-      ? activityLabel.split(' ').slice(0, 2).join(' ')
-      : null
-    : venue.events > 0
-      ? pluralEvents(venue.events)
-      : null;
-  const eventsChip = eventsChipLabel ? (
-    <span className="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">
-      {eventsChipLabel}
-    </span>
-  ) : null;
+  const eventsChip =
+    activityCount > 0 ? (
+      <span className="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">
+        {pluralEvents(activityCount)}
+      </span>
+    ) : null;
 
   const dayRouteVenue = {
     id: venue.id,
@@ -188,42 +190,25 @@ export function LocationCard({
             {displayName}
           </h3>
 
-          {isContentPlace && hook ? (
-            <p className="mt-1.5 line-clamp-2 text-sm text-slate-600">{hook}</p>
+          {blurb ? <p className="mt-1.5 line-clamp-2 text-sm text-slate-600">{blurb}</p> : null}
+
+          {showStreet ? (
+            <div className="mt-2 flex items-center gap-1.5 text-sm text-slate-500">
+              <MapPin className="h-3.5 w-3.5 shrink-0" />
+              <span className="truncate">{street}</span>
+            </div>
           ) : null}
-
-          {isContentPlace ? (
-            activityLabel ? (
-              <p className="mt-2 text-xs font-semibold text-emerald-700">{activityLabel}</p>
-            ) : null
-          ) : (
-            <>
-              {showStreet ? (
-                <div className="mt-2 flex items-center gap-1.5 text-sm text-slate-500">
-                  <MapPin className="h-3.5 w-3.5 shrink-0" />
-                  <span className="truncate">{street}</span>
-                </div>
-              ) : null}
-              {metro ? (
-                <div className="mt-1 flex items-center gap-1.5 text-sm text-slate-500">
-                  <Train className="h-3.5 w-3.5 shrink-0" />
-                  <span className="truncate">{metro}</span>
-                </div>
-              ) : null}
-            </>
-          )}
-
-          {!isContentPlace && nextSlot ? (
-            <div className="mt-3 inline-flex w-fit items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
-              <Clock className="h-3 w-3" />
-              Ближайший старт: {nextSlot}
+          {metro ? (
+            <div className="mt-1 flex items-center gap-1.5 text-sm text-slate-500">
+              <Train className="h-3.5 w-3.5 shrink-0" />
+              <span className="truncate">{metro}</span>
             </div>
           ) : null}
 
-          {isContentPlace && street ? (
-            <div className="mt-2 flex items-center gap-1.5 text-xs text-slate-400">
-              <MapPin className="h-3 w-3 shrink-0" />
-              <span className="truncate">{street}</span>
+          {nextSlot ? (
+            <div className="mt-3 inline-flex w-fit items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+              <Clock className="h-3 w-3" />
+              Ближайший старт: {nextSlot}
             </div>
           ) : null}
 
