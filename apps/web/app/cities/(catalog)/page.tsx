@@ -24,6 +24,7 @@ export const revalidate = 86400;
 const CITIES_DESTINATIONS_TIMEOUT_MS = 2500;
 const TOP_CITIES_COUNT = 8;
 const SECOND_OCTET_COUNT = 8;
+const THIRD_OCTET_COUNT = 8;
 
 export default async function CitiesIndexPage() {
   let destinations: Awaited<ReturnType<typeof getCachedDestinations>>['destinations'] = [];
@@ -52,7 +53,11 @@ export default async function CitiesIndexPage() {
   const rankedCities = [...withTop, ...withDaytimeSecond, ...withoutDaytime];
   const topCities = rankedCities.slice(0, TOP_CITIES_COUNT);
   const secondOctet = rankedCities.slice(TOP_CITIES_COUNT, TOP_CITIES_COUNT + SECOND_OCTET_COUNT);
-  const featuredSlugs = [...topCities, ...secondOctet]
+  const thirdOctet = rankedCities.slice(
+    TOP_CITIES_COUNT + SECOND_OCTET_COUNT,
+    TOP_CITIES_COUNT + SECOND_OCTET_COUNT + THIRD_OCTET_COUNT,
+  );
+  const featuredSlugs = [...topCities, ...secondOctet, ...thirdOctet]
     .map((city) => cityImageSlug(city))
     .filter(Boolean);
 
@@ -85,6 +90,17 @@ export default async function CitiesIndexPage() {
               {secondOctet.map((city) => (
                 <li key={city.slug || city.name} className="min-w-0">
                   {/* Same chrome as top-8: dark scrim + white title/stats on photo. */}
+                  <CityCard city={city} compact imageVariant="top" />
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+        {thirdOctet.length ? (
+          <section aria-label="Ещё города" className="mb-10 border-b border-slate-200/80 pb-10">
+            <ul className="grid w-full grid-cols-2 content-start gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
+              {thirdOctet.map((city) => (
+                <li key={city.slug || city.name} className="min-w-0">
                   <CityCard city={city} compact imageVariant="top" />
                 </li>
               ))}

@@ -75,6 +75,7 @@ const CITY_TOP_PREVIEW_SLUGS = new Set([
 /** Daytime JPG assets under `/images/cities/top/` (top-8 + second octet). */
 const CITY_DAYTIME_PREVIEW_SLUGS = new Set([
   ...CITY_TOP_PREVIEW_SLUGS,
+  // Second octet (after map)
   'krasnodar',
   'krasnoyarsk',
   'novosibirsk',
@@ -83,6 +84,15 @@ const CITY_DAYTIME_PREVIEW_SLUGS = new Set([
   'perm',
   'chelyabinsk',
   'ryazan',
+  // Third octet
+  'rostov-on-don',
+  'tyumen',
+  'omsk',
+  'penza',
+  'saratov',
+  'tula',
+  'tver',
+  'vladivostok',
 ]);
 
 function isUsableRemoteImage(url: string): boolean {
