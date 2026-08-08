@@ -246,21 +246,31 @@ export function SuburbsCarousel({
               {nameHeading}
             </h3>
             {vectorTitle ? (
-              <p className={`mt-1 text-sm leading-5 ${softClass}`} data-city-suburb-vector>
+              <p className={`mt-1.5 text-sm leading-snug ${softClass}`} data-city-suburb-vector>
                 {vectorTitle}
               </p>
             ) : null}
             {place.stationName ? (
-              <p className={`mt-1 text-xs ${softClass}`}>Где выходить: {place.stationName}</p>
+              <p className={`mt-2 text-sm leading-snug ${softClass}`} data-city-suburb-exit>
+                <span className={`font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-900'}`}>
+                  Где выходить
+                </span>
+                <span className={mutedClass}>: {place.stationName}</span>
+              </p>
             ) : null}
             {place.travelVectorBlurb ? (
-              <p className={`mt-1.5 text-xs leading-5 ${mutedClass}`}>{place.travelVectorBlurb}</p>
+              <p className={`mt-1.5 text-sm leading-relaxed ${mutedClass}`}>{place.travelVectorBlurb}</p>
             ) : null}
             {blurb ? (
-              <p className={`mt-1.5 text-sm leading-6 break-words ${mutedClass}`}>{blurb}</p>
+              <p className={`mt-2 text-sm leading-relaxed break-words ${mutedClass}`}>{blurb}</p>
             ) : null}
             {place.gastroHint ? (
-              <p className={`mt-2 text-xs ${softClass}`}>Гастро-остановка: {place.gastroHint}</p>
+              <p className={`mt-2 text-sm leading-snug ${softClass}`} data-city-suburb-gastro>
+                <span className={`font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-900'}`}>
+                  Гастро-остановка
+                </span>
+                <span className={mutedClass}>: {place.gastroHint}</span>
+              </p>
             ) : null}
           </div>
 
@@ -324,9 +334,9 @@ export function SuburbsCarousel({
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-50 text-sm font-bold leading-none text-primary-700">
             {index + 1}
           </span>
-          <div className="min-w-0">
+          <div className="min-w-0 space-y-1.5">
             <h3
-              className="break-words text-xl font-bold leading-snug text-slate-950 sm:text-2xl"
+              className="break-words text-lg font-bold leading-snug tracking-tight text-slate-950 sm:text-xl"
               data-city-suburb-title
             >
               {placeHref ? (
@@ -342,21 +352,36 @@ export function SuburbsCarousel({
             </h3>
             {miniAnno ? (
               <p
-                className="mt-1.5 line-clamp-3 text-sm leading-5 text-slate-600"
+                className="line-clamp-3 text-sm leading-relaxed text-slate-600"
                 data-city-suburb-anno
               >
                 {miniAnno}
               </p>
             ) : null}
             {vectorTitle ? (
-              <p className="mt-1 text-xs leading-5 text-slate-500" data-city-suburb-vector>
+              <p className="text-sm leading-snug text-slate-500" data-city-suburb-vector>
                 {vectorTitle}
+              </p>
+            ) : null}
+            {place.stationName ? (
+              <p className="text-sm leading-snug text-slate-600" data-city-suburb-exit>
+                <span className="font-semibold text-slate-900">Где выходить</span>
+                <span className="text-slate-500">: {place.stationName}</span>
+              </p>
+            ) : null}
+            {place.travelVectorBlurb ? (
+              <p className="text-sm leading-relaxed text-slate-500">{place.travelVectorBlurb}</p>
+            ) : null}
+            {place.gastroHint ? (
+              <p className="text-sm leading-snug text-slate-600" data-city-suburb-gastro>
+                <span className="font-semibold text-slate-900">Гастро-остановка</span>
+                <span className="text-slate-500">: {place.gastroHint}</span>
               </p>
             ) : null}
           </div>
           {nested.length ? (
             <ol
-              className="col-span-2 mt-3 grid grid-cols-[2.25rem_minmax(0,1fr)] gap-x-2.5 gap-y-1.5 border-t border-slate-100 pt-3 sm:gap-x-3"
+              className="col-span-2 mt-3 grid grid-cols-[2.25rem_minmax(0,1fr)] gap-x-2.5 gap-y-2 border-t border-slate-100 pt-3 sm:gap-x-3"
               data-city-suburb-places
             >
               {nested.map((poi, poiIndex) => {
@@ -364,10 +389,10 @@ export function SuburbsCarousel({
                 const poiDesc = String(poi.desc || '').trim();
                 return (
                   <li key={`${poi.name}:${poiIndex}`} className="contents" data-city-suburb-place>
-                    <span className="text-center text-sm leading-5 tabular-nums text-slate-400">
+                    <span className="pt-0.5 text-center text-xs font-medium leading-5 tabular-nums text-slate-400">
                       {poiIndex + 1}.
                     </span>
-                    <span className="min-w-0 text-sm leading-5 text-slate-600">
+                    <span className="min-w-0 text-sm leading-snug text-slate-700">
                       <SuburbPlaceLabel name={poi.name} href={poiHref} desc={poiDesc} />
                     </span>
                   </li>
