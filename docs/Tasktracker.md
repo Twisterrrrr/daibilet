@@ -7,6 +7,17 @@
 
 ---
 
+## Incident: city hub nginx/ISR STALE 404 (2026-08-08)
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| INC.CITY404.1 | Diagnose `/cities/samara` live 404 vs API/origin 200 | Критический | ✅ nginx STALE 404 poison; seed/slug OK |
+| INC.CITY404.2 | Hotfix: purge nginx proxy cache + warm Pack C hubs | Критический | ✅ MSK purge; live samara/Pack C **200** |
+| INC.CITY404.3 | Code: city DTO no-null cache + `noStore()` before `notFound()` | Критический | 🔄 commit+MSK deploy |
+| INC.CITY404.4 | Fix `POST /api/internal/revalidate` 500 (CI-baked `city-routing.ru.json` path) | Высокий | ⏳ |
+
+---
+
 ## Epic: First open-date supplier contract (Stage 0) → Codex (2026-08-07; taxonomy 2026-08-08)
 
 **Канон / brief:** [museum-contract-readiness.md](./museum-contract-readiness.md) (таксономия supplier + 2 режима, матрица ролей, copy-paste Codex, e2e).  

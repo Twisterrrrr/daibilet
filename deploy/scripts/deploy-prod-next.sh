@@ -373,7 +373,7 @@ if [[ -n "$REVALIDATE_SECRET" ]]; then
   curl -fsS -X POST "http://127.0.0.1:${WEB_PORT}/api/internal/revalidate" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${REVALIDATE_SECRET}" \
-    -d '{"tags":["home-page","catalog-page","event-page","city-page"],"paths":["/","/events","/cities/sankt-peterburg","/cities/moscow","/rechnye-progulki","/avtobusnye-ekskursii","/api/public/stats"]}' \
+    -d '{"tags":["home-page","catalog-page","event-page","city-page","public-surfaces"],"paths":["/","/events","/venues","/locations","/cities","/cities/sankt-peterburg","/cities/saint-petersburg","/cities/moscow","/cities/samara","/cities/ufa","/cities/rostov","/cities/novosibirsk","/cities/sochi","/cities/kaliningrad","/cities/krasnoyarsk","/cities/yaroslavl","/rechnye-progulki","/avtobusnye-ekskursii","/api/public/stats"],"skipIndexNow":true}' \
     && echo "Post-deploy revalidate OK" \
     || echo "Warning: post-deploy revalidate failed"
 

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { unstable_noStore as noStore } from 'next/cache';
 import { notFound } from 'next/navigation';
 
 import { CityPageView } from '@/components/CityPageView.client';
@@ -22,8 +23,8 @@ import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
 import { buildCityPageJsonLd } from '@/lib/structured-data';
 import {
   getCachedCityHubArticles,
-  getCachedPublicCityDto,
   listTopCitySlugsForSsg,
+  loadCityDtoOrNull,
 } from '@/server/cached-city-data';
 import { loadCityAdmissionBlock } from '@/server/finance-projection-client';
 
@@ -76,8 +77,12 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const payload = await getCachedPublicCityDto(decodeURIComponent(slug));
-  if (!payload?.city) notFound();
+  const payload = await loadCityDtoOrNull(decodeURIComponent(slug));
+  if (!payload?.city) {
+    // Do not let notFound() enter Full Route Cache as STALE 404 for ~1y.
+    noStore();
+    notFound();
+  }
 
   const city = payload.city;
   const path = city.canonicalPath || `/cities/${city.slug}`;
@@ -132,7 +137,7 @@ export default async function CityPage({ params }: PageProps) {
   const articlesStartedAt = Date.now();
   const admissionStartedAt = Date.now();
   const [payloadResult, articlesResult, admissionResult] = await Promise.allSettled([
-    getCachedPublicCityDto(decodedSlug).then((value) => {
+    loadCityDtoOrNull(decodedSlug).then((value) => {
       cityPerfMark('city-dto', cityStartedAt, {
         sessions: value?.sessions?.length ?? 0,
         venues: value?.venues?.length ?? 0,
@@ -163,7 +168,11 @@ export default async function CityPage({ params }: PageProps) {
   const payload = payloadResult.status === 'fulfilled' ? payloadResult.value : null;
   const articlesPayload = articlesResult.status === 'fulfilled' ? articlesResult.value : null;
   const admission = admissionResult.status === 'fulfilled' ? admissionResult.value : null;
-  if (!payload?.city) notFound();
+  if (!payload?.city) {
+    // Do not let notFound() enter Full Route Cache / nginx as STALE 404 for ~1y.
+    noStore();
+    notFound();
+  }
 
   const faqStartedAt = Date.now();
   const faqItems = buildCityFaqItems(payload);

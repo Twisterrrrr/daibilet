@@ -1,3 +1,20 @@
+## 2026-08-08 - CRITICAL: city hubs STALE 404 (Samara / Pack C)
+
+### Наблюдения
+- Owner: `https://daibilet.ru/cities/samara` → 404. Диагностика: API `/api/public/cities/samara` и origin `:3001` стабильно **200**; seed/slug/cityInfo на месте.
+- Публичный nginx держал **STALE 404** (`x-nextjs-cache: STALE`, `stale-while-revalidate` ~1y) после transient miss во время деплоя/API hiccup. Тот же класс бага, что venue DTO miss (`b0d3e290` / `36105314`).
+- В пике отравы также мелькали `/cities/moscow`, `/cities/sochi`, `/cities/kaliningrad`. Pack C после purge: ufa/rostov/novosibirsk/sochi/kaliningrad/krasnoyarsk/yaroslavl → **200**.
+
+### Решения
+- Hotfix live: `rm -rf /var/cache/nginx/daibilet/*` + nginx reload на MSK; warm hubs.
+- Code (как venues): `cached-city-data` v4 не кэширует soft-null; `loadCityDtoOrNull` + uncached retry; `noStore()` перед `notFound()` на `/cities/[slug]`.
+- `deploy-prod-next.sh`: post-deploy paths включают Pack C hubs + `skipIndexNow:true` (revalidate route на live 500 из-за baked CI path `city-routing.ru.json` - отдельно).
+
+### Проблемы
+- `POST /api/internal/revalidate` на MSK → 500 (`ENOENT .../home/runner/work/.../city-routing.ru.json`). Nginx purge/warm обходит; нужен follow-up на geo path / IndexNow import.
+
+---
+
 ## 2026-08-08 - Hide Samara Pack C guide (owner)
 
 ### Наблюдения

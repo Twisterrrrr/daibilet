@@ -35,24 +35,68 @@ function normalizeCitySlug(slug: string): string {
   }
 }
 
+class CityDtoMissError extends Error {
+  constructor(slug: string) {
+    super(`city_dto_miss:${slug}`);
+    this.name = 'CityDtoMissError';
+  }
+}
+
 /**
  * Shared cached city DTO for generateMetadata + page (avoids double cold build).
  * Next Data Cache is required for ISR HIT on `/cities/[slug]` (Prisma alone stays dynamic).
+ *
+ * Soft-misses (API 404 / empty) must NOT be cached: a cached `null` poisons HTML as persistent
+ * Next/nginx STALE 404 even after the city DTO is healthy again. Throw inside the cache fn so
+ * Next does not store the miss; re-fetch on the next request. Same pattern as venues (v4).
  */
 export async function getCachedPublicCityDto(slug: string) {
   const key = normalizeCitySlug(slug);
   if (!key) return null;
 
   const cached = unstable_cache(
-    () =>
-      fetchPublicApiJson<PublicCityPagePayload | null>(`/api/public/cities/${encodeURIComponent(key)}`, {
-        timeoutMs: 5_000,
-        notFoundAsNull: true,
-      }),
-    ['public-city-dto-v3-http', key],
+    async () => {
+      const payload = await fetchPublicApiJson<PublicCityPagePayload | null>(
+        `/api/public/cities/${encodeURIComponent(key)}`,
+        {
+          timeoutMs: 5_000,
+          notFoundAsNull: true,
+        },
+      );
+      if (!payload?.city) throw new CityDtoMissError(key);
+      return payload;
+    },
+    ['public-city-dto-v4-no-null', key],
     cityCacheOptions,
   );
-  return cached();
+
+  try {
+    return await cached();
+  } catch (error) {
+    if (error instanceof CityDtoMissError) return null;
+    if (error instanceof Error && error.message.startsWith('city_dto_miss:')) return null;
+    throw error;
+  }
+}
+
+/**
+ * Prefer cached DTO; on soft miss retry uncached once.
+ * Callers must noStore()+notFound() on null so Full Route Cache never stores STALE 404 (~1y SWR).
+ */
+export async function loadCityDtoOrNull(slug: string): Promise<PublicCityPagePayload | null> {
+  const key = normalizeCitySlug(slug);
+  if (!key) return null;
+  const cached = await getCachedPublicCityDto(key);
+  if (cached?.city) return cached;
+  try {
+    const fresh = await fetchPublicApiJson<PublicCityPagePayload | null>(
+      `/api/public/cities/${encodeURIComponent(key)}`,
+      { timeoutMs: 5_000, notFoundAsNull: true },
+    );
+    return fresh?.city ? fresh : null;
+  } catch {
+    return null;
+  }
 }
 
 /** City-hub related articles; same TTL/tag as city DTO. */
