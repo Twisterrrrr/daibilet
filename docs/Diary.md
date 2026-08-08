@@ -30,7 +30,8 @@
 ### Решения
 - `normalizeKnownCitySlug`: принимать destination-like slug вне allowlist; reserved path segments (`kontserty`, `events`, `all`, …) отклонять.
 - `/podborki` city loading fallback: `landingMatchesCatalogCity` вместо bound-only.
-- Unit: Krasnodar hub + route `/kontserty/krasnodar`.
+- `LANDING_CITY_SLUGS` / `resolveLandingCityName`: полный список destination cities (иначе `/kontserty/krasnodar` без city SEO).
+- Unit: Krasnodar hub + route `/kontserty/krasnodar` + city name map.
 
 ### Проблемы
 - Нужен web deploy на MSK, чтобы owner увидел на live.
