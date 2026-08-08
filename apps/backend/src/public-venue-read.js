@@ -2132,16 +2132,42 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
 
 /**
  * Distinct product counts for progressive /venues enrich (event≠slots).
+ * Short in-memory cache: first hit after hub miss is ~0.5–1s SQL; warm <50ms.
  * @param {string[]} venueIds
  */
+const venueEventCountsCache = new Map();
+const VENUE_EVENT_COUNTS_CACHE_MS = 60_000;
+
 export async function buildPublicVenueEventCounts(venueIds = []) {
-  const countsMap = await fetchVenueDistinctEventCounts(venueIds);
+  const ids = [...new Set((venueIds || []).map((id) => String(id || '').trim()).filter(Boolean))].slice(0, 100);
+  const sortedKey = ids.slice().sort().join(',');
+  const now = Date.now();
+  if (sortedKey) {
+    const hit = venueEventCountsCache.get(sortedKey);
+    if (hit && hit.expiresAt > now) {
+      return { generatedAt: hit.generatedAt, counts: hit.counts };
+    }
+  }
+  const countsMap = await fetchVenueDistinctEventCounts(ids);
   const counts = {};
   for (const [id, value] of countsMap) {
     counts[id] = Number(value) || 0;
   }
+  const generatedAt = new Date().toISOString();
+  if (sortedKey) {
+    venueEventCountsCache.set(sortedKey, {
+      expiresAt: now + VENUE_EVENT_COUNTS_CACHE_MS,
+      generatedAt,
+      counts,
+    });
+    // Bound map size (simple FIFO drop).
+    if (venueEventCountsCache.size > 200) {
+      const first = venueEventCountsCache.keys().next().value;
+      if (first) venueEventCountsCache.delete(first);
+    }
+  }
   return {
-    generatedAt: new Date().toISOString(),
+    generatedAt,
     counts,
   };
 }

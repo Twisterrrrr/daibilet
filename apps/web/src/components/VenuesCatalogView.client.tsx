@@ -87,25 +87,7 @@ function applyInitialPage(
   setters.setStats(page.stats);
 }
 
-/** City-scoped shell first (cards ASAP), then distinct product counts. */
-async function fetchVenuePageProgressive(
-  query: VenueCatalogFeedQuery,
-  signal?: AbortSignal,
-): Promise<VenueCatalogFeedPage> {
-  const shell = await fetchVenueCatalogPage({ ...query, counts: false }, signal ? { signal } : undefined);
-  if (!shell.countsPending || !shell.venues.length) return shell;
-  try {
-    const counts = await fetchVenueCatalogEventCounts(
-      shell.venues.map((venue) => venue.id),
-      signal ? { signal } : undefined,
-    );
-    return applyVenueCatalogEventCounts(shell, counts);
-  } catch {
-    return { ...shell, countsPending: false, venues: shell.venues.map((v) => ({ ...v, eventsPending: false })) };
-  }
-}
-
-function mergeVenuePages(
+/** City-scoped shell first (cards ASAP); counts enrich is fire-and-forget at call sites. */
   prev: VenueCatalogFeedPage['venues'],
   next: VenueCatalogFeedPage['venues'],
 ): VenueCatalogFeedPage['venues'] {
@@ -306,19 +288,20 @@ export function VenuesCatalogView({
             setCatalogLoading(false);
           }
 
-          // 2) Enrich event≠slots counts for visible page (and city-scoped base).
+          // 2) Enrich event≠slots in background - never block city paint / type preview.
           if (shellPage.countsPending && shellPage.venues.length) {
-            const counts = await fetchVenueCatalogEventCounts(
-              shellPage.venues.map((venue) => venue.id),
-              { signal: controller.signal },
-            );
-            if (requestId !== catalogRequestId.current) return;
-            basePage = applyVenueCatalogEventCounts(shellPage, counts);
-            cityBaseRef.current = { key: scopeKey, page: basePage };
-            setStats(basePage.stats);
-          } else {
-            basePage = shellPage;
+            const enrichIds = shellPage.venues.map((venue) => venue.id);
+            void fetchVenueCatalogEventCounts(enrichIds, { signal: controller.signal })
+              .then((counts) => {
+                if (requestId !== catalogRequestId.current) return;
+                const enriched = applyVenueCatalogEventCounts(shellPage, counts);
+                cityBaseRef.current = { key: scopeKey, page: enriched };
+                setStats(enriched.stats);
+                setVenues((prev) => patchVenueEventCounts(prev, counts, new Set(enrichIds)));
+              })
+              .catch(() => undefined);
           }
+          basePage = shellPage;
         } else {
           setStats(basePage.stats);
         }
@@ -330,18 +313,30 @@ export function VenuesCatalogView({
           return;
         }
 
-        // Type filter: server page keeps cursor so «Показать ещё» works beyond first 24.
-        const typed = await fetchVenuePageProgressive(feedQuery, controller.signal);
+        // Type filter: server shell page for cursor; enrich counts in background.
+        const typedShell = await fetchVenueCatalogPage(
+          { ...feedQuery, counts: false },
+          { signal: controller.signal },
+        );
         if (requestId !== catalogRequestId.current) return;
-        setVenues(typed.venues);
-        setTotal(typed.total);
-        setNextCursor(typed.nextCursor);
+        setVenues(typedShell.venues);
+        setTotal(typedShell.total);
+        setNextCursor(typedShell.nextCursor);
         setStats({
-          ...typed.stats,
+          ...typedShell.stats,
           types: basePage.stats.types,
           cities: basePage.stats.cities,
           venues: basePage.stats.venues,
         });
+        if (typedShell.countsPending && typedShell.venues.length) {
+          const typedIds = typedShell.venues.map((venue) => venue.id);
+          void fetchVenueCatalogEventCounts(typedIds, { signal: controller.signal })
+            .then((counts) => {
+              if (requestId !== catalogRequestId.current) return;
+              setVenues((prev) => patchVenueEventCounts(prev, counts, new Set(typedIds)));
+            })
+            .catch(() => undefined);
+        }
       } catch (error: unknown) {
         if (requestId !== catalogRequestId.current) return;
         if (error instanceof DOMException && error.name === 'AbortError') return;
