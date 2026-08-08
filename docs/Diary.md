@@ -1,5 +1,22 @@
 # Diary
 
+## 2026-08-08 - /my-day: desktop split + no nearby under stops
+
+### Наблюдения
+- Owner: под стопами дубль «Поблизости» лишний при наличии карты и «Свободное окно».
+- Desktop был одноколоночный (карта под списком после rollback `8f8c69f`); нужен снова Wanderlog-style split ≥lg.
+- Mobile fullscreen map mode (`data-day-mobile-map-mode`) оставить.
+
+### Решения
+- Desktop ≥lg: `data-day-split` ~45/55, left scroll, sticky `data-day-split-map` справа; container `lg:max-w-[90rem]`.
+- Убраны under-stop nearby chips (grid+list); venue/ticket CTA и free window сохранены.
+- Accordion «События поблизости» не трогали.
+
+### Проблемы
+- Без live deploy в этой итерации - проверка локально / preview.
+
+---
+
 ## 2026-08-08 - Landing hero CTA «от» + real schedule priceTo
 
 ### Наблюдения
