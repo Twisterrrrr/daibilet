@@ -16,8 +16,9 @@ WorkingDirectory=/opt/daibilet
 Environment=APP_DIR=/opt/daibilet
 Environment=CATALOG_DTO_REBUILD_NICE=15
 Nice=15
-MemoryHigh=700M
-MemoryMax=900M
+# Headroom for tsx/esbuild transpile spike + ~17MB JSON map (INC.504.5c).
+MemoryHigh=900M
+MemoryMax=1200M
 ExecStart=/opt/daibilet/deploy/cron/rebuild-public-catalog-dto.sh timer
 StandardOutput=append:/var/log/daibilet/catalog-dto-rebuild.log
 StandardError=append:/var/log/daibilet/catalog-dto-rebuild.log

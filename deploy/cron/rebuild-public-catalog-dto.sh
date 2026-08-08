@@ -33,7 +33,7 @@ if ! flock -n 9; then
   exit 0
 fi
 
-echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) start catalog-dto-rebuild reason=${REASON} nice=${NICE_N}"
+echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) start catalog-dto-rebuild reason=${REASON} nice=${NICE_N} git=$(git -C "$APP_DIR" rev-parse --short HEAD 2>/dev/null || echo unknown)"
 TSX_BIN="${APP_DIR}/apps/backend/node_modules/.bin/tsx"
 if [[ ! -x "$TSX_BIN" ]]; then
   TSX_BIN="${APP_DIR}/node_modules/.bin/tsx"
@@ -49,4 +49,4 @@ if command -v nice >/dev/null 2>&1 && [[ "$NICE_N" =~ ^[0-9]+$ ]] && (( NICE_N >
 else
   "${RUN[@]}"
 fi
-echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) done catalog-dto-rebuild reason=${REASON}"
+echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) done catalog-dto-rebuild reason=${REASON} git=$(git -C "$APP_DIR" rev-parse --short HEAD 2>/dev/null || echo unknown)"

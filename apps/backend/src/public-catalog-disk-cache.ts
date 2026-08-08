@@ -100,6 +100,8 @@ export function writePublicCatalogDiskCache(snapshot: PublicCatalogDiskSnapshot)
     sessionsBytes: Buffer.byteLength(JSON.stringify(snapshot.sessions), 'utf8'),
   };
 
+  // Atomic write: write tmp then rename so readers never see a partial JSON
+  // (API Soft-SWR promote must not hit SyntaxError mid-write).
   const tmp = path.join(dir, `.${path.basename(filePath)}.${process.pid}.${Date.now()}.tmp`);
   try {
     fs.writeFileSync(tmp, JSON.stringify(payload));
