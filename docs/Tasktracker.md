@@ -7,6 +7,16 @@
 
 ---
 
+## UX: /venues pagination beyond 24 (2026-08-08)
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| UX.VENUES-MORE.1 | Visible «Показать ещё» + progressive loadMore (shell+enrich) | Критический | 🔄 |
+| UX.VENUES-MORE.2 | Type chips keep server cursor (не null после client-filter) | Высокий | 🔄 |
+| UX.VENUES-MORE.3 | Same button on `/locations`; commit+push+MSK deploy+smoke | Высокий | 🔄 |
+
+---
+
 ## UX: significant suburbs layout (2026-08-08)
 
 | ID | Задача | Приоритет | Статус |

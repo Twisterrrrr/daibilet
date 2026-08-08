@@ -1,3 +1,21 @@
+## 2026-08-08 - /venues: «Показать ещё» + progressive loadMore
+
+### Наблюдения
+- Owner: «Найдено: 1 245 · показано 24» / «а остальные как смотреть??»
+- Cursor API (`nextCursor`/`hasMore`) уже был; UI держал только невидимый `CatalogInfiniteSentinel`.
+- `loadMore` ждал full event-counts на каждой странице → hang/тихий fail.
+- Type chips обнуляли `nextCursor` после client-filter первых 24.
+
+### Решения
+- Явная кнопка «Показать ещё N» на `/venues` и `/locations` + sentinel как secondary.
+- `loadMore` = shell `counts=0` + enrich event≠slots (как progressive first paint).
+- Type filter всегда догружает server page с cursor (city-scoped chips/stats сохранены).
+
+### Проблемы
+- Нет (ожидаем MSK deploy smoke).
+
+---
+
 ## 2026-08-08 - Suburbs UX: hub chips + My Day accordion (no heavy carousel)
 
 ### Наблюдения

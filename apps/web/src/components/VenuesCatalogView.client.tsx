@@ -90,19 +90,27 @@ function applyInitialPage(
 /** City-scoped shell first (cards ASAP), then distinct product counts. */
 async function fetchVenuePageProgressive(
   query: VenueCatalogFeedQuery,
-  signal: AbortSignal,
+  signal?: AbortSignal,
 ): Promise<VenueCatalogFeedPage> {
-  const shell = await fetchVenueCatalogPage({ ...query, counts: false }, { signal });
+  const shell = await fetchVenueCatalogPage({ ...query, counts: false }, signal ? { signal } : undefined);
   if (!shell.countsPending || !shell.venues.length) return shell;
   try {
     const counts = await fetchVenueCatalogEventCounts(
       shell.venues.map((venue) => venue.id),
-      { signal },
+      signal ? { signal } : undefined,
     );
     return applyVenueCatalogEventCounts(shell, counts);
   } catch {
     return { ...shell, countsPending: false, venues: shell.venues.map((v) => ({ ...v, eventsPending: false })) };
   }
+}
+
+function mergeVenuePages(
+  prev: VenueCatalogFeedPage['venues'],
+  next: VenueCatalogFeedPage['venues'],
+): VenueCatalogFeedPage['venues'] {
+  const seen = new Set(prev.map((item) => item.id));
+  return [...prev, ...next.filter((item) => !seen.has(item.id))];
 }
 
 /** City scope for type-chip cache (type excluded). */
@@ -243,16 +251,13 @@ export function VenuesCatalogView({
     const requestId = ++catalogRequestId.current;
     const cachedBase = cityBaseRef.current?.key === scopeKey ? cityBaseRef.current.page : null;
 
-    // Instant type chip switch from city-scoped base (same city/sort/q).
+    // Instant type chip preview from city-scoped base (same city/sort/q); cursor comes from server page.
     if (typeFilter !== 'all' && cachedBase && cachedBase.venues.length > 0) {
-      const filtered = cachedBase.venues.filter((venue) => normalizeVenueKind(venue.type) === typeFilter);
+      const filtered = cachedBase.venues
+        .filter((venue) => normalizeVenueKind(venue.type) === typeFilter)
+        .slice(0, VENUE_CATALOG_PAGE_SIZE);
       setVenues(filtered);
-      setTotal(
-        typeFilter === 'all'
-          ? cachedBase.total
-          : Number(cachedBase.stats.types?.[typeFilter]) || filtered.length,
-      );
-      setNextCursor(null);
+      setTotal(Number(cachedBase.stats.types?.[typeFilter]) || filtered.length);
       setStats(cachedBase.stats);
       setCatalogLoading(false);
     } else if (!(cachedBase && typeFilter === 'all')) {
@@ -276,12 +281,11 @@ export function VenuesCatalogView({
             setNextCursor(shellPage.nextCursor);
             setCatalogLoading(false);
           } else {
-            const filtered = shellPage.venues.filter(
-              (venue) => normalizeVenueKind(venue.type) === typeFilter,
-            );
+            const filtered = shellPage.venues
+              .filter((venue) => normalizeVenueKind(venue.type) === typeFilter)
+              .slice(0, VENUE_CATALOG_PAGE_SIZE);
             setVenues(filtered);
             setTotal(Number(shellPage.stats.types?.[typeFilter]) || filtered.length);
-            setNextCursor(null);
             setCatalogLoading(false);
           }
 
@@ -309,17 +313,7 @@ export function VenuesCatalogView({
           return;
         }
 
-        // Type filter: prefer client filter on enriched base; server page if base was truncated.
-        const localFiltered = basePage.venues.filter(
-          (venue) => normalizeVenueKind(venue.type) === typeFilter,
-        );
-        if (!basePage.hasMore || localFiltered.length >= VENUE_CATALOG_PAGE_SIZE) {
-          setVenues(localFiltered.slice(0, VENUE_CATALOG_PAGE_SIZE));
-          setTotal(Number(basePage.stats.types?.[typeFilter]) || localFiltered.length);
-          setNextCursor(null);
-          return;
-        }
-
+        // Type filter: server page keeps cursor so «Показать ещё» works beyond first 24.
         const typed = await fetchVenuePageProgressive(feedQuery, controller.signal);
         if (requestId !== catalogRequestId.current) return;
         setVenues(typed.venues);
@@ -329,7 +323,7 @@ export function VenuesCatalogView({
           ...typed.stats,
           types: basePage.stats.types,
           cities: basePage.stats.cities,
-          venues: typed.stats.venues,
+          venues: basePage.stats.venues,
         });
       } catch (error: unknown) {
         if (requestId !== catalogRequestId.current) return;
@@ -363,13 +357,12 @@ export function VenuesCatalogView({
     if (!nextCursor || loadingMore || catalogLoading || loadMoreLock.current) return;
     loadMoreLock.current = true;
     setLoadingMore(true);
+    const cursor = nextCursor;
     const controller = new AbortController();
-    fetchVenueCatalogPage({ ...feedQuery, cursor: nextCursor }, { signal: controller.signal })
+    // Shell + enrich: full counts on every page hang /venues (same as first paint).
+    void fetchVenuePageProgressive({ ...feedQuery, cursor }, controller.signal)
       .then((page) => {
-        setVenues((prev) => {
-          const seen = new Set(prev.map((item) => item.id));
-          return [...prev, ...page.venues.filter((item) => !seen.has(item.id))];
-        });
+        setVenues((prev) => mergeVenuePages(prev, page.venues));
         setNextCursor(page.nextCursor);
         setTotal(page.total);
       })
@@ -624,6 +617,23 @@ export function VenuesCatalogView({
               </div>
             )}
             {loadingMore ? <div className="mt-6"><VenuesCatalogSkeleton count={3} /></div> : null}
+            {nextCursor ? (
+              <div className="mt-8 flex flex-col items-center gap-3">
+                <button
+                  type="button"
+                  onClick={loadMore}
+                  disabled={loadingMore || catalogLoading}
+                  className="inline-flex min-h-11 w-full max-w-sm items-center justify-center rounded-full bg-primary-600 px-8 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700 disabled:opacity-60"
+                >
+                  {loadingMore
+                    ? 'Загружаем…'
+                    : `Показать ещё ${Math.min(VENUE_CATALOG_PAGE_SIZE, Math.max(total - venues.length, 0)) || VENUE_CATALOG_PAGE_SIZE}`}
+                </button>
+                <p className="text-xs text-slate-500">
+                  Показано {formatNumber(venues.length)} из {formatNumber(total)}
+                </p>
+              </div>
+            ) : null}
             <CatalogInfiniteSentinel enabled={Boolean(nextCursor) && !loadingMore} onIntersect={loadMore} />
           </>
         ) : (

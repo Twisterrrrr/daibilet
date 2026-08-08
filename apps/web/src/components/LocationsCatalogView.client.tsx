@@ -19,6 +19,8 @@ import {
   resolveCatalogCityFilter,
 } from '@/lib/selected-city';
 import {
+  applyVenueCatalogEventCounts,
+  fetchVenueCatalogEventCounts,
   fetchVenueCatalogPage,
   venueCatalogCacheKey,
   VENUE_CATALOG_PAGE_SIZE,
@@ -173,15 +175,30 @@ export function LocationsCatalogView({
     if (!nextCursor || loadingMore || catalogLoading || loadMoreLock.current) return;
     loadMoreLock.current = true;
     setLoadingMore(true);
-    fetchVenueCatalogPage({ ...feedQuery, cursor: nextCursor })
-      .then((page) => {
+    const cursor = nextCursor;
+    // Shell page first - full counts on every «ещё» hang the list the same way as /venues.
+    fetchVenueCatalogPage({ ...feedQuery, cursor, counts: false })
+      .then(async (page) => {
+        let nextPage = page;
+        if (page.countsPending && page.venues.length) {
+          try {
+            const counts = await fetchVenueCatalogEventCounts(page.venues.map((venue) => venue.id));
+            nextPage = applyVenueCatalogEventCounts(page, counts);
+          } catch {
+            nextPage = {
+              ...page,
+              countsPending: false,
+              venues: page.venues.map((v) => ({ ...v, eventsPending: false })),
+            };
+          }
+        }
         setVenues((prev) => {
           const seen = new Set(prev.map((item) => item.id));
-          return [...prev, ...page.venues.filter((item) => !seen.has(item.id))];
+          return [...prev, ...nextPage.venues.filter((item) => !seen.has(item.id))];
         });
-        setNextCursor(page.nextCursor);
-        setTotal(page.total);
-        if (page.stats.venues) setStats(page.stats);
+        setNextCursor(nextPage.nextCursor);
+        setTotal(nextPage.total);
+        if (nextPage.stats.venues) setStats(nextPage.stats);
       })
       .catch(() => undefined)
       .finally(() => {
@@ -270,6 +287,23 @@ export function LocationsCatalogView({
         ))}
       </div>
       {loadingMore ? <div className="mt-4"><LocationsCatalogSkeleton count={2} /></div> : null}
+      {nextCursor ? (
+        <div className="mt-8 flex flex-col items-center gap-3">
+          <button
+            type="button"
+            onClick={loadMore}
+            disabled={loadingMore || catalogLoading}
+            className="inline-flex min-h-11 w-full max-w-sm items-center justify-center rounded-full bg-primary-600 px-8 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700 disabled:opacity-60"
+          >
+            {loadingMore
+              ? 'Загружаем…'
+              : `Показать ещё ${Math.min(VENUE_CATALOG_PAGE_SIZE, Math.max(total - venues.length, 0)) || VENUE_CATALOG_PAGE_SIZE}`}
+          </button>
+          <p className="text-xs text-slate-500">
+            Показано {formatNumber(venues.length)} из {formatNumber(total)}
+          </p>
+        </div>
+      ) : null}
       <CatalogInfiniteSentinel enabled={Boolean(nextCursor) && !loadingMore} onIntersect={loadMore} />
     </>
   ) : (
