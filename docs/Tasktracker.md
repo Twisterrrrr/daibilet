@@ -22,8 +22,8 @@
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
 | INC.LOC500.1 | Repro `/locations/cerkov-…-yaani-kirik` + MSK logs | Критический | ✅ digest `DYNAMIC_SERVER_USAGE`; API DTO 200 |
-| INC.LOC500.2 | Fix: `safeNotFound` + miss/unavailable split; cities same | Критический | 🔄 code |
-| INC.LOC500.3 | Smoke slug 200 + missing 404; spot-check PDPs; commit+push+MSK deploy | Критический | ⏳ |
+| INC.LOC500.2 | Fix: `safeNotFound` + ISR-safe fetch + DTO-before-secondary | Критический | ✅ `5c41eaaa` (+ `75a340c5`/`4263ed0c`) |
+| INC.LOC500.3 | Smoke slug 200 + missing 404; spot-check PDPs; commit+push+MSK deploy | Критический | ✅ Deploy `31252808574`; cerkov/osobnyak 200; miss/petropavlovskaya/ermitage 404; 0 DYNAMIC digests |
 
 ---
 
