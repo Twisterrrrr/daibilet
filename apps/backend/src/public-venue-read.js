@@ -1498,6 +1498,8 @@ function hasActiveBusCatalogEvents(busEvents) {
 
 function hasBusLikeText(name, address) {
   const text = venueNameAddressText(name, address);
+  // Brand boarding desks for bus tours (owner: not museums).
+  if (/якарели|yakareli/i.test(text)) return true;
   if (
     /автобус|bus[\s-]?stop|авт\.?\s*остан|автобусн(?:ая|ой)?\s+останов|остановк.*автобус|hop[\s-]?on|hop[\s-]?off|city[\s-]?sightseeing|city[\s-]?tour|сити[\s-]?тур|двухэтажн|маршрут.*автобус|садись[\s-]?руляй|^автобус$/i.test(
       text,
@@ -1788,6 +1790,7 @@ function resolvePublicVenueKindFromRow(row) {
     id: row.id,
     title: row.name || row.title,
     name: row.name || row.title,
+    slug: row.slug,
   });
   const forced = resolveForcedPublicVenueKind(override);
   if (forced) return forced;

@@ -79,7 +79,7 @@ function loadOverrideMap() {
 
 export function findVenueOverride(input = {}) {
   const overrides = loadOverrideMap();
-  const keys = [input.id, input.title, input.name].filter(Boolean).map(normalizeKey);
+  const keys = [input.id, input.title, input.name, input.slug].filter(Boolean).map(normalizeKey);
   for (const key of keys) {
     if (overrides.has(key)) return overrides.get(key);
   }
