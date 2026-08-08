@@ -60,7 +60,7 @@
 | UX.VENUES-MORE.1 | Visible «Показать ещё» + progressive loadMore (shell+enrich) | Критический | ✅ `d6336346` MSK BUILD_ID=`bHSH2B7c6PCvterwiCo3W` |
 | UX.VENUES-MORE.2 | Type chips keep server cursor (не null после client-filter) | Высокий | ✅ |
 | UX.VENUES-MORE.3 | Same button on `/locations`; commit+push+MSK deploy+smoke | Высокий | ✅ deploy `31252274496` (SHA `ce7183ab` incl. fix); API page2 OK |
-| UX.VENUES-MORE.4 | loadMore hang: append shell before enrich; shell hub skip hero SQL + soft-SWR | Критический | 🔄 |
+| UX.VENUES-MORE.4 | loadMore hang: append shell before enrich; shell hub skip hero SQL + soft-SWR | Критический | ✅ `572ad9ed` Deploy `31254097972` **BUILD_ID=`iOB3OzsLHCu1asqWB4o15`**; API restart; cold shell ~1.9s (было 504/60s), page2 ~0.2–0.4s |
 
 ---
 
