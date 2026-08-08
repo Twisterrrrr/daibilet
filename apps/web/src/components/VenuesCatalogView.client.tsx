@@ -332,9 +332,9 @@ export function VenuesCatalogView({
             {scopedEvents > 0 ? ` · ${pluralEvents(scopedEvents)}` : ''}
           </p>
         ) : null}
-        <div className="mx-auto mt-6 flex max-w-5xl flex-col gap-3 rounded-2xl bg-white p-3 text-left text-slate-900 shadow-lg sm:flex-row">
-          <div className="flex flex-1 items-center gap-2 rounded-xl bg-slate-100 px-3">
-            <Search className="h-4 w-4 text-slate-400" />
+        <div className="mt-6 flex w-full max-w-5xl flex-col gap-3 rounded-2xl bg-white p-3 text-left text-slate-900 shadow-lg sm:flex-row sm:items-stretch">
+          <div className="flex min-w-0 flex-1 items-center gap-2 rounded-xl bg-slate-100 px-3">
+            <Search className="h-4 w-4 shrink-0 text-slate-400" />
             <input
               type="search"
               value={query}
@@ -347,7 +347,7 @@ export function VenuesCatalogView({
             value={cityPending ? '' : cityFilter}
             disabled={cityPending}
             onChange={(event) => setCityFilter(event.target.value)}
-            className="rounded-xl bg-slate-100 px-3 py-2.5 text-sm outline-none disabled:opacity-70"
+            className="rounded-xl bg-slate-100 px-3 py-2.5 text-sm outline-none disabled:opacity-70 sm:shrink-0"
           >
             {cityPending ? <option value="">Город…</option> : null}
             <option value="all">Все города</option>
@@ -360,7 +360,7 @@ export function VenuesCatalogView({
           <select
             value={sortMode}
             onChange={(event) => setSortMode(event.target.value as VenueCatalogSort)}
-            className="rounded-xl bg-slate-100 px-3 py-2.5 text-sm outline-none"
+            className="rounded-xl bg-slate-100 px-3 py-2.5 text-sm outline-none sm:shrink-0"
           >
             {SORT_OPTIONS.map(([value, label]) => (
               <option key={value} value={value}>
@@ -371,7 +371,7 @@ export function VenuesCatalogView({
         </div>
 
         {typeOptions.length ? (
-          <div className="mx-auto mt-4 flex max-w-5xl flex-wrap justify-center gap-1.5 px-1">
+          <div className="mt-4 flex w-full max-w-5xl flex-wrap justify-center gap-1.5 px-1">
             <button
               type="button"
               onClick={() => setTypeFilter('all')}
