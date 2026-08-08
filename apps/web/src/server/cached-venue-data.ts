@@ -46,12 +46,13 @@ export async function getCachedPublicVenueDto(slug: string) {
         {
           timeoutMs: 5_000,
           notFoundAsNull: true,
+          revalidateSeconds: PUBLIC_PAGE_REVALIDATE,
         },
       );
       if (!payload?.venue) throw new VenueDtoMissError(key);
       return payload;
     },
-    ['public-venue-dto-v5-no-null', key],
+    ['public-venue-dto-v6-isr-fetch', key],
     venueCacheOptions,
   );
 

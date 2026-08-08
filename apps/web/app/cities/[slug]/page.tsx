@@ -137,17 +137,26 @@ export default async function CityPage({ params }: PageProps) {
   const decodedSlug = decodeURIComponent(slug);
 
   const cityStartedAt = Date.now();
+  // City DTO first - never start no-store secondary fetches before miss→notFound
+  // (static-to-dynamic + notFound → HTTP 500 on ISR).
+  let payload: Awaited<ReturnType<typeof loadCityDtoOrNull>> = null;
+  try {
+    payload = await loadCityDtoOrNull(decodedSlug);
+  } catch {
+    payload = null;
+  }
+  cityPerfMark('city-dto', cityStartedAt, {
+    sessions: payload?.sessions?.length ?? 0,
+    venues: payload?.venues?.length ?? 0,
+    landings: payload?.landings?.length ?? 0,
+  });
+  if (!payload?.city) {
+    safeNotFound();
+  }
+
   const articlesStartedAt = Date.now();
   const admissionStartedAt = Date.now();
-  const [payloadResult, articlesResult, admissionResult] = await Promise.allSettled([
-    loadCityDtoOrNull(decodedSlug).then((value) => {
-      cityPerfMark('city-dto', cityStartedAt, {
-        sessions: value?.sessions?.length ?? 0,
-        venues: value?.venues?.length ?? 0,
-        landings: value?.landings?.length ?? 0,
-      });
-      return value;
-    }),
+  const [articlesResult, admissionResult] = await Promise.allSettled([
     withTimeout(
       getCachedCityHubArticles(decodedSlug).catch(() => null),
       CITY_SECONDARY_TIMEOUT_MS,
@@ -168,13 +177,8 @@ export default async function CityPage({ params }: PageProps) {
     }),
   ]);
 
-  const payload = payloadResult.status === 'fulfilled' ? payloadResult.value : null;
   const articlesPayload = articlesResult.status === 'fulfilled' ? articlesResult.value : null;
   const admission = admissionResult.status === 'fulfilled' ? admissionResult.value : null;
-  if (!payload?.city) {
-    // noStore()+notFound() on ISR → DYNAMIC_SERVER_USAGE HTTP 500. Null DTO uncached (v5).
-    safeNotFound();
-  }
 
   const faqStartedAt = Date.now();
   const faqItems = buildCityFaqItems(payload);

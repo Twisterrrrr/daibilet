@@ -55,10 +55,9 @@ type VenueDtoLoad =
   | { kind: 'unavailable' };
 
 /**
- * Prefer cached DTO; do not uncached-fetch on miss during ISR.
- * `fetchPublicApiJson` uses `cache: 'no-store'` - calling it outside `unstable_cache`
- * on a `revalidate` route throws digest DYNAMIC_SERVER_USAGE → HTTP 500.
- * Soft-misses already bypass Data Cache via throw-inside-cache (v5-no-null).
+ * Prefer cached DTO only. Miss → safeNotFound without any bare `cache:'no-store'`
+ * fetch (that + notFound on ISR → DYNAMIC_SERVER_USAGE / static-to-dynamic 500).
+ * Soft-misses already bypass Data Cache via throw-inside-cache (v6-isr-fetch).
  */
 async function loadVenueDto(slug: string): Promise<VenueDtoLoad> {
   const key = String(slug || '').trim();
@@ -201,23 +200,13 @@ export async function VenueListPage({ family }: Pick<PageProps, 'family'>) {
 export async function VenueDetailPage({ slug }: { slug: string }) {
   const decodedSlug = decodeURIComponent(slug);
 
-  // Parallel: DTO (ISR Data Cache + uncached miss retry) + finance admission (hard timeout).
-  const [payloadResult, admissionResult] = await Promise.allSettled([
-    loadVenueDto(decodedSlug),
-    withSoftTimeout(
-      fetchVenueAdmissionProducts(decodedSlug),
-      VENUE_ADMISSION_TIMEOUT_MS,
-      EMPTY_ADMISSION,
-      'venue-admission',
-    ),
-  ]);
-
-  const loaded: VenueDtoLoad =
-    payloadResult.status === 'fulfilled' ? payloadResult.value : { kind: 'unavailable' };
+  // DTO first. Never start no-store admission in parallel before miss check:
+  // no-store fetch + notFound() on ISR → static-to-dynamic HTTP 500.
+  const loaded = await loadVenueDto(decodedSlug);
   if (loaded.kind === 'miss') safeNotFound();
   if (loaded.kind === 'unavailable') {
-    // Soft page must stay dynamic (do not ISR-cache the outage HTML as a hit).
-    noStore();
+    // Soft page without noStore(): noStore/fetch(no-store) on ISR → static-to-dynamic 500.
+    // Short ISR TTL (revalidate) is an acceptable outage cache window.
     return <VenueUnavailablePage slug={decodedSlug} />;
   }
 
@@ -230,8 +219,12 @@ export async function VenueDetailPage({ slug }: { slug: string }) {
     payload = { ...payload, venue: { ...payload.venue, heroImageUrl: editorialHero } };
   }
 
-  const admission =
-    admissionResult.status === 'fulfilled' ? admissionResult.value : EMPTY_ADMISSION;
+  const admission = await withSoftTimeout(
+    fetchVenueAdmissionProducts(decodedSlug),
+    VENUE_ADMISSION_TIMEOUT_MS,
+    EMPTY_ADMISSION,
+    'venue-admission',
+  );
   const jsonLdBlocks = buildVenuePageJsonLd(payload);
 
   return (

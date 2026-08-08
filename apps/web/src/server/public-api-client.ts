@@ -105,12 +105,23 @@ export async function fetchPublicApiJson<T>(
     /** Build-only retries (default 3 in production build, 0 at runtime). */
     retries?: number;
     retryDelayMs?: number;
+    /**
+     * When set, use `next.revalidate` instead of `cache: 'no-store'`.
+     * Required for fetches inside `unstable_cache` on ISR pages: a bare no-store
+     * fetch during static generation + later `notFound()` → HTTP 500
+     * (digest DYNAMIC_SERVER_USAGE / app-static-to-dynamic-error).
+     */
+    revalidateSeconds?: number;
   } = {},
 ): Promise<T> {
   const timeoutMs = Math.max(250, options.timeoutMs ?? DEFAULT_TIMEOUT_MS);
   const retries = options.retries ?? (isProductionBuildPhase() ? 3 : 0);
   const retryDelayMs = Math.max(0, options.retryDelayMs ?? 500);
   const url = buildPublicApiUrl(apiPath, options.searchParams);
+  const revalidateSeconds =
+    typeof options.revalidateSeconds === 'number' && options.revalidateSeconds >= 0
+      ? options.revalidateSeconds
+      : null;
 
   let lastError: unknown;
   for (let attempt = 0; attempt <= retries; attempt++) {
@@ -123,7 +134,9 @@ export async function fetchPublicApiJson<T>(
           Accept: 'application/json',
           'User-Agent': 'daibilet-web-ssr',
         },
-        cache: 'no-store',
+        ...(revalidateSeconds != null
+          ? { next: { revalidate: revalidateSeconds } }
+          : { cache: 'no-store' as const }),
         signal: AbortSignal.timeout(timeoutMs),
       });
 
