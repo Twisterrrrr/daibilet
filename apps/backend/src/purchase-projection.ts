@@ -94,6 +94,59 @@ export interface BuyerPurchasesListDto {
   };
 }
 
+export interface PublicCheckoutOrderDto {
+  publicCode: string;
+  status: string;
+  buyer: {
+    email: string;
+    name: string | null;
+    phone: string | null;
+  };
+  title: string;
+  venueTitle: string | null;
+  venueAddress: string | null;
+  venueSlug: string | null;
+  venueLatitude: number | null;
+  venueLongitude: number | null;
+  admissionProductSlug: string | null;
+  validityMode: string | null;
+  validTo: string | null;
+  paidAt: string | null;
+  confirmedAt: string | null;
+  purchasedAt: string | null;
+  ticketNumber: string | null;
+  ticketNumbers: string[];
+  supplierSupportPhone: string | null;
+  items: Array<{
+    id: string;
+    title: string;
+    ticketTitle: string | null;
+    quantity: number;
+    unitPriceKopecks: number;
+    totalKopecks: number;
+    ticketNumbers: string[];
+  }>;
+  totals: {
+    currency: string;
+    subtotalKopecks: number;
+    discountKopecks: number;
+    totalKopecks: number;
+    commissionKopecks: number;
+  };
+  payment: {
+    provider: string | null;
+    status: string | null;
+    confirmationUrl: string | null;
+    paidAt: string | null;
+  };
+}
+
+export interface PublicCheckoutPurchasesDto {
+  generatedAt: string;
+  total: number;
+  items: PublicCheckoutOrderDto[];
+}
+
 export interface BuyerPurchaseRowDto {
   id: string;
   number: string;
@@ -138,9 +191,44 @@ const checkoutOrderInclude = {
       event: { select: { id: true, slug: true, title: true } },
       session: { select: { id: true, startsAt: true } },
       offer: { select: { id: true, title: true } },
-      admissionProduct: { select: { id: true, slug: true, title: true } },
+      admissionProduct: {
+        select: {
+          id: true,
+          slug: true,
+          title: true,
+          validityMode: true,
+          validTo: true,
+          venue: {
+            select: {
+              id: true,
+              slug: true,
+              title: true,
+              address: true,
+              latitude: true,
+              longitude: true,
+            },
+          },
+          supplier: {
+            select: {
+              id: true,
+              slug: true,
+              title: true,
+              phone: true,
+            },
+          },
+        },
+      },
       admissionOffer: { select: { id: true, title: true } },
-      fulfillmentItem: { select: { id: true, status: true, provider: true, externalOrderId: true, externalPaymentUrl: true } },
+      fulfillmentItem: {
+        select: {
+          id: true,
+          status: true,
+          provider: true,
+          externalOrderId: true,
+          externalPaymentUrl: true,
+          providerData: true,
+        },
+      },
     },
   },
   payments: {
@@ -166,6 +254,7 @@ const checkoutOrderInclude = {
       status: true,
       externalOrderId: true,
       lastError: true,
+      providerData: true,
     },
   },
   siteUser: { select: { id: true, email: true, name: true, phone: true } },
@@ -276,6 +365,37 @@ export async function buildBuyerPurchasesListDto(input: {
       tickets: rows.reduce((sum, row) => sum + row.ticketCount, 0),
       active: rows.filter((row) => !row.isFinal).length,
     },
+  };
+}
+
+export async function buildPublicCheckoutOrderByCodeDto(publicCodeInput: string): Promise<PublicCheckoutOrderDto | null> {
+  const publicCode = cleanString(publicCodeInput);
+  if (!publicCode) return null;
+  const row = await prisma.checkoutOrder.findUnique({
+    where: { publicCode },
+    include: checkoutOrderInclude,
+  });
+  return row ? mapCheckoutOrderToPublicDto(row) : null;
+}
+
+export async function buildPublicCheckoutPurchasesByEmailDto(
+  searchParams: URLSearchParams = new URLSearchParams(),
+): Promise<PublicCheckoutPurchasesDto> {
+  const email = normalizeEmail(searchParams.get('email'));
+  if (!email) {
+    return { generatedAt: new Date().toISOString(), total: 0, items: [] };
+  }
+  const limit = clampInt(searchParams.get('limit'), 20, 1, MAX_BUYER_LIMIT);
+  const rows = await prisma.checkoutOrder.findMany({
+    where: { buyerEmail: { equals: email, mode: 'insensitive' } },
+    orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+    take: limit,
+    include: checkoutOrderInclude,
+  });
+  return {
+    generatedAt: new Date().toISOString(),
+    total: rows.length,
+    items: rows.map(mapCheckoutOrderToPublicDto),
   };
 }
 
@@ -581,6 +701,68 @@ function mapBuyerPurchaseRow(row: AdminPurchaseRowDto): BuyerPurchaseRowDto {
   };
 }
 
+function mapCheckoutOrderToPublicDto(row: CheckoutOrderRow): PublicCheckoutOrderDto {
+  const primaryItem = row.items[0] || null;
+  const primaryAdmission = primaryItem?.admissionProduct || null;
+  const primaryVenue = primaryAdmission?.venue || null;
+  const supplierSupportPhone = primaryAdmission?.supplier?.phone || null;
+  const payment = row.payments[0] || null;
+  const fulfillmentNumbers = row.fulfillmentItems.flatMap((item) => ticketNumbersFromProviderData(item.providerData));
+  const itemNumbers = new Map<string, string[]>();
+  for (const item of row.items) {
+    if (!item.fulfillmentItem) continue;
+    itemNumbers.set(item.id, ticketNumbersFromProviderData(item.fulfillmentItem.providerData));
+  }
+  const title = checkoutItemTitle(primaryItem) || primaryAdmission?.title || 'Входной билет';
+
+  return {
+    publicCode: row.publicCode || shortCode(row.id),
+    status: String(row.status),
+    buyer: {
+      email: row.buyerEmail || row.siteUser?.email || '',
+      name: row.buyerName || row.siteUser?.name || null,
+      phone: row.buyerPhone || row.siteUser?.phone || null,
+    },
+    title,
+    venueTitle: primaryVenue?.title || null,
+    venueAddress: primaryVenue?.address || null,
+    venueSlug: primaryVenue?.slug || null,
+    venueLatitude: primaryVenue?.latitude ?? null,
+    venueLongitude: primaryVenue?.longitude ?? null,
+    admissionProductSlug: primaryAdmission?.slug || null,
+    validityMode: primaryAdmission ? String(primaryAdmission.validityMode) : null,
+    validTo: toIso(primaryAdmission?.validTo),
+    paidAt: toIso(row.paidAt),
+    confirmedAt: toIso(row.confirmedAt),
+    purchasedAt: toIso(row.paidAt || row.confirmedAt || row.createdAt),
+    ticketNumber: fulfillmentNumbers[0] || null,
+    ticketNumbers: fulfillmentNumbers,
+    supplierSupportPhone,
+    items: row.items.map((item) => ({
+      id: item.id,
+      title: item.title,
+      ticketTitle: item.ticketTitle || item.offer?.title || item.admissionOffer?.title || null,
+      quantity: item.quantity,
+      unitPriceKopecks: item.unitPriceKopecks,
+      totalKopecks: item.totalKopecks,
+      ticketNumbers: itemNumbers.get(item.id) || [],
+    })),
+    totals: {
+      currency: row.currency,
+      subtotalKopecks: row.subtotalKopecks,
+      discountKopecks: row.discountKopecks,
+      totalKopecks: row.totalKopecks,
+      commissionKopecks: row.commissionKopecks,
+    },
+    payment: {
+      provider: payment ? String(payment.provider) : null,
+      status: payment ? String(payment.status) : null,
+      confirmationUrl: payment?.confirmationUrl || null,
+      paidAt: toIso(payment?.paidAt),
+    },
+  };
+}
+
 function mapSupplierCheckoutPurchaseItem(row: Prisma.CheckoutItemGetPayload<{
   include: {
     order: {
@@ -834,6 +1016,15 @@ function cleanString(value: string | null | undefined): string | null {
 
 function normalizeEmail(value: string | null | undefined): string {
   return String(value || '').trim().toLowerCase();
+}
+
+function ticketNumbersFromProviderData(value: Prisma.JsonValue | null | undefined): string[] {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return [];
+  const payload = value as Record<string, unknown>;
+  const rawList = Array.isArray(payload.ticketNumbers) ? payload.ticketNumbers : [];
+  const list = rawList.map((item) => cleanString(String(item || ''))).filter((item): item is string => Boolean(item));
+  const single = cleanString(typeof payload.ticketNumber === 'string' ? payload.ticketNumber : null);
+  return list.length ? list : single ? [single] : [];
 }
 
 function maskEmail(value: string | null | undefined): string | null {

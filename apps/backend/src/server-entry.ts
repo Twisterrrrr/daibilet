@@ -31,6 +31,7 @@ import { buildPublicCatalogDto, clearPublicCatalogDtoCache, getPublicCatalogSess
 import { createPublicCatalogRouteHandler } from './public-catalog-handler.js';
 import { buildPublicCityDto, buildPublicDestinationsDto, clearPublicCityDtoCache } from './public-city.dto.js';
 import { createPublicCityRouteHandler } from './public-city-handler.js';
+import { createPublicCheckoutOrdersRouteHandler } from './public-checkout-orders-handler.js';
 import { buildPublicEventDto, clearPublicEventDtoCache } from './public-event.dto.js';
 import { createPublicEventRouteHandler } from './public-event-handler.js';
 import {
@@ -43,6 +44,7 @@ import { createPublicFinanceProjectionRouteHandler } from './public-finance-proj
 import { buildPublicVenueDto, buildPublicVenuesDto, clearPublicVenueDtoCache } from './public-venue.dto.js';
 import { createPublicVenueRouteHandler } from './public-venue-handler.js';
 import { createPublicReadStackWarmer } from './public-warmup.js';
+import { buildPublicCheckoutOrderByCodeDto, buildPublicCheckoutPurchasesByEmailDto } from './purchase-projection.js';
 import { createSupplierAdmissionYooKassaPurchaseRouteHandler } from './supplier-admission-yookassa-purchase-handler.js';
 import { createSupplierAdmissionStubPurchaseRouteHandler } from './supplier-admission-stub-purchase-handler.js';
 import { createSupplierAuthRouteHandler, resolveSupplierPortalSearchParams } from './supplier-auth-handler.js';
@@ -125,6 +127,11 @@ const server = startServer({
         buildAdmissionProductDetail: buildPublicAdmissionProductDetailDto,
         buildVenueAdmissionProducts: buildPublicVenueAdmissionProductsDto,
         buildSupplierProjection: buildPublicSupplierProjectionDto,
+      }),
+      createPublicCheckoutOrdersRouteHandler({
+        projectionToken: env.DAIBILET_FINANCE_PROJECTION_TOKEN || env.FINANCE_PROJECTION_TOKEN || null,
+        buildOrderByCode: buildPublicCheckoutOrderByCodeDto,
+        buildPurchasesByEmail: buildPublicCheckoutPurchasesByEmailDto,
       }),
       createAdminOrdersReadRouteHandler({
         enabled: adminFlags.orders,

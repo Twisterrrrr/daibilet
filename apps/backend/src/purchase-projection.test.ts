@@ -4,6 +4,8 @@ import { prisma } from '@daibilet/db';
 import {
   buildAdminPurchasesListDto,
   buildBuyerPurchasesListDto,
+  buildPublicCheckoutOrderByCodeDto,
+  buildPublicCheckoutPurchasesByEmailDto,
   loadSupplierCheckoutPurchaseRows,
 } from './purchase-projection.js';
 
@@ -20,6 +22,7 @@ test('projects internal checkout and external orders into admin, buyer and suppl
     order: `checkout_${suffix}`,
     item: `checkout_item_${suffix}`,
     payment: `payment_${suffix}`,
+    fulfillment: `fulfillment_${suffix}`,
     event: `event_${suffix}`,
     externalOrder: `external_order_${suffix}`,
     externalTicket: `external_ticket_${suffix}`,
@@ -47,6 +50,9 @@ test('projects internal checkout and external orders into admin, buyer and suppl
         id: ids.venue,
         slug: `venue-${suffix}`,
         title: 'Projection Museum',
+        address: 'Projection street, 10',
+        latitude: 55.75,
+        longitude: 37.61,
         cityId: ids.city,
         kind: 'MUSEUM_ART_SPACE',
         pageStatus: 'PUBLISHED',
@@ -62,6 +68,7 @@ test('projects internal checkout and external orders into admin, buyer and suppl
         defaultCatalogMode: 'INTERNAL_CHECKOUT',
         paymentMode: 'SINGLE_MERCHANT',
         defaultCommissionBps: 1000,
+        phone: '+7 999 000-00-00',
       },
     });
     await prisma.admissionProduct.create({
@@ -75,6 +82,8 @@ test('projects internal checkout and external orders into admin, buyer and suppl
         managementMode: 'DAIBILET_MANAGED',
         sourceCode: 'MANUAL',
         priceFromRub: 900,
+        validityMode: 'OPEN_DATE',
+        validTo: new Date('2026-12-31T20:59:59.000Z'),
         cityId: ids.city,
         venueId: ids.venue,
         supplierId: ids.supplier,
@@ -130,6 +139,25 @@ test('projects internal checkout and external orders into admin, buyer and suppl
         status: 'SUCCEEDED',
         amountKopecks: 90_000,
         paidAt: new Date('2026-07-30T10:00:00.000Z'),
+      },
+    });
+    await prisma.fulfillmentItem.create({
+      data: {
+        id: ids.fulfillment,
+        checkoutOrderId: ids.order,
+        checkoutItemId: ids.item,
+        lineItemIndex: 0,
+        admissionOfferId: ids.offer,
+        purchaseFlow: 'PLATFORM',
+        provider: 'INTERNAL',
+        status: 'CONFIRMED',
+        amountKopecks: 90_000,
+        providerData: {
+          mode: 'YOOKASSA',
+          publicCode: '9100001',
+          ticketNumber: 'TKT-9100001-01',
+          ticketNumbers: ['TKT-9100001-01'],
+        },
       },
     });
 
@@ -191,9 +219,27 @@ test('projects internal checkout and external orders into admin, buyer and suppl
     assert.equal(supplier.total, 1);
     assert.equal(supplier.items[0]?.publicCode, '9100001');
     assert.equal(supplier.items[0]?.subjectType, 'VENUE_ADMISSION');
+
+    const publicOrder = await buildPublicCheckoutOrderByCodeDto('9100001');
+    assert.equal(publicOrder?.publicCode, '9100001');
+    assert.equal(publicOrder?.buyer.email, email);
+    assert.equal(publicOrder?.venueTitle, 'Projection Museum');
+    assert.equal(publicOrder?.venueAddress, 'Projection street, 10');
+    assert.equal(publicOrder?.validityMode, 'OPEN_DATE');
+    assert.equal(publicOrder?.validTo, '2026-12-31T20:59:59.000Z');
+    assert.equal(publicOrder?.supplierSupportPhone, '+7 999 000-00-00');
+    assert.equal(publicOrder?.ticketNumber, 'TKT-9100001-01');
+    assert.deepEqual(publicOrder?.ticketNumbers, ['TKT-9100001-01']);
+    assert.equal(publicOrder?.items[0]?.ticketTitle, 'Adult');
+    assert.deepEqual(publicOrder?.items[0]?.ticketNumbers, ['TKT-9100001-01']);
+
+    const publicPurchases = await buildPublicCheckoutPurchasesByEmailDto(new URLSearchParams({ email, limit: '10' }));
+    assert.equal(publicPurchases.total, 1);
+    assert.equal(publicPurchases.items[0]?.publicCode, '9100001');
   } finally {
     await prisma.externalTicket.deleteMany({ where: { id: ids.externalTicket } });
     await prisma.externalOrder.deleteMany({ where: { id: ids.externalOrder } });
+    await prisma.fulfillmentItem.deleteMany({ where: { id: ids.fulfillment } });
     await prisma.payment.deleteMany({ where: { id: ids.payment } });
     await prisma.checkoutItem.deleteMany({ where: { id: ids.item } });
     await prisma.checkoutOrder.deleteMany({ where: { id: ids.order } });

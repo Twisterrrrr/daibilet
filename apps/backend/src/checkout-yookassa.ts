@@ -46,6 +46,7 @@ import {
 const YOOKASSA_CREATE_SCOPE = 'PAYMENT_CREATE';
 const DEFAULT_YOOKASSA_API_URL = 'https://api.yookassa.ru/v3';
 const DEFAULT_RETURN_BASE_URL = 'http://localhost:5178';
+const DEFAULT_ADMISSION_RETURN_URL = 'https://daibilet.ru/checkout/result';
 const PAYMENT_CONFIRMATION_TTL_MINUTES = 30;
 
 export interface YooKassaRuntimeConfig {
@@ -529,7 +530,10 @@ async function createYooKassaAdmissionCheckoutOrder(
         product,
         offer,
         totals,
-        returnUrl: buildYooKassaReturnUrl(config.returnBaseUrl, created.order.publicCode),
+        returnUrl: buildYooKassaCatalogResultReturnUrl(
+          normalizedPayload.returnUrl || DEFAULT_ADMISSION_RETURN_URL,
+          created.order.publicCode,
+        ),
       }),
     });
     const persisted = await persistCreatedYooKassaAdmissionPayment({
@@ -1346,7 +1350,12 @@ async function applyYooKassaPaymentObject(
         select: yookassaOrderResultSelect,
       });
       const item = await confirmFirstCheckoutItem(tx, orderId, options.now);
-      const fulfillment = await confirmFirstFulfillment(tx, orderId);
+      const fulfillment = await confirmFirstFulfillment(tx, {
+        orderId,
+        publicCode: order.publicCode || publicCode,
+        quantity: item.quantity,
+        now: options.now,
+      });
       const saleAlreadyLogged = await tx.supplierLedgerEntry.count({
         where: { paymentId: payment.id, type: 'SALE' },
       });
@@ -1441,10 +1450,16 @@ async function finalizeYooKassaPaidCheckout(input: {
       },
       select: yookassaItemResultSelect,
     });
+    const ticketNumbers = buildInternalTicketNumbers({
+      publicCode: input.created.order.publicCode,
+      orderId: input.created.order.id,
+      quantity: item.quantity,
+    });
     const fulfillment = await tx.fulfillmentItem.update({
       where: { id: input.created.fulfillment.id },
       data: {
         status: 'CONFIRMED',
+        providerData: withIssuedTicketNumbers(input.created.fulfillment.providerData, ticketNumbers, new Date()),
       },
       select: yookassaFulfillmentResultSelect,
     });
@@ -1611,18 +1626,34 @@ async function confirmFirstCheckoutItem(tx: Prisma.TransactionClient, orderId: s
   });
 }
 
-async function confirmFirstFulfillment(tx: Prisma.TransactionClient, orderId: string) {
+async function confirmFirstFulfillment(
+  tx: Prisma.TransactionClient,
+  input: {
+    orderId: string;
+    publicCode: string | null;
+    quantity: number;
+    now: Date;
+  },
+) {
   const fulfillment = await tx.fulfillmentItem.findFirst({
-    where: { checkoutOrderId: orderId },
+    where: { checkoutOrderId: input.orderId },
     orderBy: { createdAt: 'asc' },
     select: yookassaFulfillmentResultSelect,
   });
   if (!fulfillment) {
     throw new YooKassaCheckoutError('YOOKASSA_WEBHOOK_PAYMENT_NOT_FOUND', 404, [], 'Fulfillment item not found');
   }
+  const ticketNumbers = buildInternalTicketNumbers({
+    publicCode: input.publicCode,
+    orderId: input.orderId,
+    quantity: input.quantity,
+  });
   return tx.fulfillmentItem.update({
     where: { id: fulfillment.id },
-    data: { status: 'CONFIRMED' },
+    data: {
+      status: 'CONFIRMED',
+      providerData: withIssuedTicketNumbers(fulfillment.providerData, ticketNumbers, input.now),
+    },
     select: yookassaFulfillmentResultSelect,
   });
 }
@@ -1638,6 +1669,7 @@ function mapYooKassaCheckoutResult(input: {
   warnings: StubCheckoutIssueDto[];
 }): YooKassaCheckoutResultDto {
   const publicCode = input.created.order.publicCode || input.created.order.id.slice(-7);
+  const ticketNumbers = ticketNumbersFromFulfillment(input.created.fulfillment);
   return {
     generatedAt: new Date().toISOString(),
     mode: 'YOOKASSA',
@@ -1650,6 +1682,8 @@ function mapYooKassaCheckoutResult(input: {
       confirmedAt: toIso(input.created.order.confirmedAt),
       checkoutUrl: input.created.order.checkoutUrl,
       expiresAt: toIso(input.created.order.expiresAt),
+      ticketNumber: ticketNumbers[0] || null,
+      ticketNumbers,
       buyer: {
         email: input.created.order.buyerEmail || '',
         name: input.created.order.buyerName || null,
@@ -1715,6 +1749,7 @@ function mapYooKassaAdmissionCheckoutResult(input: {
 }): YooKassaCheckoutResultDto {
   const publicCode = input.created.order.publicCode || input.created.order.id.slice(-7);
   const city = input.product.city || input.product.venue.city || null;
+  const ticketNumbers = ticketNumbersFromFulfillment(input.created.fulfillment);
   return {
     generatedAt: new Date().toISOString(),
     mode: 'YOOKASSA',
@@ -1727,6 +1762,8 @@ function mapYooKassaAdmissionCheckoutResult(input: {
       confirmedAt: toIso(input.created.order.confirmedAt),
       checkoutUrl: input.created.order.checkoutUrl,
       expiresAt: toIso(input.created.order.expiresAt),
+      ticketNumber: ticketNumbers[0] || null,
+      ticketNumbers,
       buyer: {
         email: input.created.order.buyerEmail || '',
         name: input.created.order.buyerName || null,
@@ -1821,6 +1858,57 @@ function assertYooKassaWebhookPaymentMatches(
 function buildYooKassaReturnUrl(baseUrl: string, publicCode: string | null): string {
   const code = encodeURIComponent(publicCode || '');
   return `${baseUrl}/purchases/${code}?payment=yookassa`;
+}
+
+export function buildYooKassaCatalogResultReturnUrl(returnUrlOrBase: string, publicCode: string | null): string {
+  const raw = cleanString(returnUrlOrBase) || DEFAULT_RETURN_BASE_URL;
+  const fallbackBase = DEFAULT_RETURN_BASE_URL.replace(/\/+$/, '');
+  const target = raw.includes('://')
+    ? raw
+    : `${fallbackBase}${raw.startsWith('/') ? raw : `/${raw}`}`;
+  const url = new URL(target);
+  if (!url.pathname || url.pathname === '/') url.pathname = '/checkout/result';
+  url.searchParams.set('order', publicCode || '');
+  return url.toString();
+}
+
+function buildInternalTicketNumbers(input: {
+  publicCode: string | null;
+  orderId: string;
+  quantity: number;
+}): string[] {
+  const base = (cleanString(input.publicCode) || input.orderId.slice(-8)).replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+  const quantity = Math.max(1, Math.min(50, Math.trunc(input.quantity || 1)));
+  return Array.from({ length: quantity }, (_, index) => `TKT-${base}-${String(index + 1).padStart(2, '0')}`);
+}
+
+function withIssuedTicketNumbers(
+  providerData: Prisma.JsonValue,
+  ticketNumbers: string[],
+  issuedAt: Date,
+): Prisma.InputJsonObject {
+  const existing = asRecord(providerData);
+  const current = ticketNumbersFromProviderData(existing);
+  const numbers = current.length ? current : ticketNumbers;
+  return {
+    ...existing,
+    ticketNumber: numbers[0] || null,
+    ticketNumbers: numbers,
+    issuedAt: issuedAt.toISOString(),
+  };
+}
+
+function ticketNumbersFromFulfillment(
+  fulfillment: Pick<CreatedYooKassaCheckoutRows['fulfillment'], 'providerData'>,
+): string[] {
+  return ticketNumbersFromProviderData(asRecord(fulfillment.providerData));
+}
+
+function ticketNumbersFromProviderData(providerData: Record<string, unknown>): string[] {
+  const rawList = Array.isArray(providerData.ticketNumbers) ? providerData.ticketNumbers : [];
+  const list = rawList.map((value) => cleanString(value)).filter((value): value is string => Boolean(value));
+  const single = cleanString(providerData.ticketNumber);
+  return list.length ? list : single ? [single] : [];
 }
 
 function hashYooKassaCheckoutPayload(payload: YooKassaCheckoutCreateDto): string {
@@ -2155,6 +2243,7 @@ const yookassaPaymentResultSelect = {
 
 const yookassaFulfillmentResultSelect = {
   ...fulfillmentResultSelect,
+  providerData: true,
 } satisfies Prisma.FulfillmentItemSelect;
 
 const yookassaReconcileCandidateSelect = {

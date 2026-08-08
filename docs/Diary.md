@@ -3149,3 +3149,34 @@
 
 - Full `CONFIRMED` smoke still needs the YooMoney sandbox payment page to be completed manually. Codex in-app browser is blocked from visiting `yoomoney.ru` by browser policy.
 - After manual sandbox payment, run webhook/reconcile and verify the same public code becomes confirmed in admin and supplier LC.
+## 2026-08-09 - Stage 0 admission payment/ticket core
+
+### Observations
+
+- `feat/next-monorepo` catalog buyer flow sends admission fields to finance `/api/checkout/yookassa`, but finance handler schema was still event-first and required `eventId`/`eventSlug`.
+- Admission YooKassa create-payment ignored the caller `returnUrl` and used the old base path builder, so it could return to supplier/purchases instead of catalog `https://daibilet.ru/checkout/result?order={publicCode}`.
+- YooKassa success confirmed `CheckoutItem`/`FulfillmentItem`, but did not expose a separate buyer-visible ticket number; catalog had a fallback where `ticketNumber` could collapse to `publicCode`.
+
+### Changes
+
+- Public YooKassa checkout schema now accepts `VENUE_ADMISSION` with `admissionProductId|admissionProductSlug` + `admissionOfferId`.
+- Admission YooKassa return URL is normalized to catalog result and appends the finance-assigned `publicCode` as `order`.
+- Successful YooKassa webhook/reconcile confirmation issues stable `TKT-{publicCode}-NN` numbers in `FulfillmentItem.providerData`; pending/failed/canceled orders do not get ticket numbers.
+- Added no-store public buyer read APIs for catalog: `GET /api/public/checkout/orders/:publicCode`, `GET /api/checkout/orders/:publicCode`, `GET /api/public/purchases?email=...`, `GET /api/public/checkout/purchases?email=...`.
+- Public order DTO now includes buyer, venue title/address/coords, validity, items, totals, paidAt/confirmedAt, `ticketNumber`, `ticketNumbers`, and `supplierSupportPhone`.
+
+### Checks
+
+- `pnpm --filter @daibilet/db db:generate` - OK.
+- `pnpm --filter @daibilet/backend typecheck` - OK.
+- `pnpm --filter @daibilet/backend exec tsx --test src/checkout-yookassa.test.ts` - OK, 15 tests.
+- `pnpm --filter @daibilet/backend exec tsx --test src/purchase-projection.test.ts` - OK.
+- `pnpm --filter @daibilet/backend test:ts` - OK, 125 pass / 11 skip / 0 fail.
+
+### Next
+
+- Deploy/smoke on finance `.159`: public admission create-payment -> YooKassa sandbox confirmationUrl -> webhook or reconcile -> order CONFIRMED with ticketNumbers.
+- Register/verify canonical webhook only after green create-payment smoke.
+- Keep wide catalog CTA, TC/TEP secrets, Path B calc, and session/schedule supplier out of Stage 0.
+
+---
