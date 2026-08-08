@@ -52,21 +52,8 @@ export function CityPicker({
       variant === 'compact' ? Math.max(rect.width, 256) : Math.max(rect.width, 256);
     const pad = 8;
     const left = Math.min(Math.max(pad, rect.left), Math.max(pad, window.innerWidth - menuWidth - pad));
-    const spaceBelow = window.innerHeight - rect.bottom - pad;
-    const spaceAbove = rect.top - pad;
-    const openUp = spaceBelow < 220 && spaceAbove > spaceBelow;
-
-    if (openUp) {
-      setMenuStyle({
-        position: 'fixed',
-        left,
-        width: menuWidth,
-        bottom: window.innerHeight - rect.top + 4,
-        maxHeight: Math.min(MENU_MAX_HEIGHT, spaceAbove),
-        visibility: 'visible',
-      });
-      return;
-    }
+    // Always open downward (owner: no flip-up). Scroll inside menu if viewport is short.
+    const spaceBelow = Math.max(120, window.innerHeight - rect.bottom - pad);
 
     setMenuStyle({
       position: 'fixed',
