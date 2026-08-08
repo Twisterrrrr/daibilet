@@ -27,7 +27,7 @@ SPB `.16` **retired**.
 | 1 | **F4 admin → Next** — перенос admin SPA в Next route group | ✅ F4.6; `/legacy` retired |
 | 2 | **Landing matching quality** — правила, аудит выдачи и актуальность событий всех посадок | активный |
 | 3 | **AI / статьи и city hubs** — редакционный контент и SEO-якоря | поддерживающий поток |
-| — | **Finance contour / ЛК поставщиков** | ⚠️ продукт staged: **Stage 0 museum-1 Path A** (launch-blocker) → Stage 1 schedule → Stage 2 full LK; канон [museum-contract-readiness.md](./museum-contract-readiness.md); host roles → `.159` ([spb-finance-host.md](./spb-finance-host.md)) |
+| — | **Finance contour / ЛК поставщиков** | ⚠️ продукт staged: **Stage 0 open-date Path A** (музей/арт; launch-blocker) → **Stage 1** events/sessions → Stage 2 full LK; supplier ≠ museum-only; канон [museum-contract-readiness.md](./museum-contract-readiness.md); host roles → `.159` ([spb-finance-host.md](./spb-finance-host.md)) |
 | — | **Реклама / paid** | ⚠️ отложена до готовности витрины (хабы + контент + базовый финконтур) |
 
 ### Conversion surfaces (фаза 2026-08-04)

@@ -1,15 +1,28 @@
 # qa.md — открытые вопросы
 
-## 2026-08-07 - Museum-1 / first contract (открыто, owner)
+## 2026-08-08 - Supplier taxonomy / commercial modes (LOCKED draft, owner)
 
-Контекст: [museum-contract-readiness.md](./museum-contract-readiness.md). Stage 0 = Path A linear admissions до первого договора.
+Контекст: [museum-contract-readiness.md](./museum-contract-readiness.md).
 
-1. **54-ФЗ / fiscal:** на museum-1 чек от Daibilet в режиме SINGLE_MERCHANT - OK, или нужна другая схема до live money?
-2. **Формат `ticketNumber`:** генерирует Daibilet (наш id) или музей задаёт/импортирует внешний код до сканера?
+**LOCKED draft (owner 2026-08-08):**
+1. **Supplier ≠ только музей** - площадка/организатор разных типов (музеи, арт-пространства, театры, фестивали и др.).
+2. Два коммерческих режима:
+   - **Линейная / открытая дата** (`OPEN_DATE` / open-date / admission) - вход без фиксированного сеанса; в первую очередь музеи и арт. = **Stage 0**.
+   - **События / сеансы** (`EVENTS` / scheduled-events) - разовые или recurring (regular/irregular) в периоде; категории+цены per session/event. = **Stage 1**.
+3. Stage 0 формулировка: «первый договор с open-date поставщиком (музей/арт)», не «только музей forever». Scope Stage 0 **не** расширять в event scheduling.
+
+Открыто: какой именно первый open-date контрагент (музей vs арт) - см. § ниже п.6.
+
+## 2026-08-07 - Museum-1 / Stage 0 first open-date contract (открыто, owner)
+
+Контекст: [museum-contract-readiness.md](./museum-contract-readiness.md). Stage 0 = Path A open-date / linear admissions до первого договора (музей или арт; не events).
+
+1. **54-ФЗ / fiscal:** на Stage 0 чек от Daibilet в режиме SINGLE_MERCHANT - OK, или нужна другая схема до live money?
+2. **Формат `ticketNumber`:** генерирует Daibilet (наш id) или площадка задаёт/импортирует внешний код до сканера?
 3. **Scanner day-1:** достаточно печатного номера + кода заказа для ручного контроля на входе, или scan API обязателен до подписания?
 4. **Email production:** канон SMTP на MSK web (`SMTP_*`) или письма с finance `.159`?
-5. **Support phone на билете:** единый номер Дайбилет vs телефон конкретного музея в supplier DTO?
-6. **Первый музей:** какой venue/город/slug для seed template (controlled, не wide CTA)?
+5. **Support phone на билете:** единый номер Дайбилет vs телефон конкретного поставщика в supplier DTO?
+6. **Первый open-date договор:** музей или арт-пространство? какой venue/город/slug для seed template (controlled, не wide CTA)?
 7. **Возвраты до Stage 2:** только ops manual - подтверждаем?
 
 Связанные gaps (не новые product forks): order≠ticket issuance; webhook e2e; reconcile; supportPhone в public DTO; purchases-by-email - см. ниже и readiness Stage 0 checklist.

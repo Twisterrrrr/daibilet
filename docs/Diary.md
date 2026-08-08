@@ -1,3 +1,20 @@
+## 2026-08-08 - Supplier taxonomy: open-date vs events (owner lock)
+
+### Наблюдения
+- Owner clarification к Stage 0 / Codex museum readiness brief: поставщик - не обязательно музей; типы площадок разные.
+- Есть продавцы по открытой цене (в первую очередь музеи и арт-пространства) и продавцы событий - разовых или повторяющихся (regular/irregular) в периоде с категориями билетов и ценой.
+
+### Решения
+- Канон в [museum-contract-readiness.md](./museum-contract-readiness.md): **Supplier ≠ museum-only**; два режима - **линейная/открытая дата (`OPEN_DATE`)** = Stage 0; **события/сеансы (`EVENTS`)** = Stage 1.
+- Stage 0 формулировка: «первый договор с open-date поставщиком (музей/арт)», не «только музей». Scope Stage 0 не расширять в event scheduling.
+- Обновлены Codex copy-paste, Tasktracker `M1.*`, qa (taxonomy LOCKED + вопрос музей vs арт), Project.md one-liner.
+- Docs-only: commit+push, без web deploy / runtime.
+
+### Проблемы
+- Нет. Открыто только: какой именно первый open-date контрагент (музей vs арт / slug).
+
+---
+
 ## 2026-08-07 - Museum-1 readiness: roles matrix + Codex Stage 0 brief
 
 ### Наблюдения
