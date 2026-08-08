@@ -1,29 +1,36 @@
 # qa.md — открытые вопросы
 
-## 2026-08-08 - Catalog Worker + Redis transport (deferred after disk worker)
+## 2026-08-08 - Catalog Worker + Redis transport — LOCKED scope (Redis deferred)
 
-**Disk worker (INC.504.5c) - implement сейчас** (systemd + shared disk v2).  
-**Redis (INC.504.5d) - всё ещё deferred** после стабилизации disk-worker.
+**LOCKED owner (sync 2026-08-09):**
 
-**Канон Redis (owner sketch, later):**
-1. Worker → gzip JSON в Redis (`catalog:sessions`, `catalog:indexes`) + `catalog:updated_at`.
+| Слой | Статус |
+|------|--------|
+| **Disk worker INC.504.5c** | **сейчас** = systemd + shared disk v2. Канон **уже в репо** (не «с нуля»): `deploy/systemd/daibilet-catalog-dto-rebuild.service` + `.timer`, `deploy/cron/rebuild-public-catalog-dto.sh`. Live MSK: timer **active**, unit files under `/opt/daibilet/deploy/systemd/` (oneshot service idle между тиками - норма). |
+| **Redis INC.504.5d** | **deferred** до стабилизации disk-worker. **Не** деплоить Redis сейчас. |
+
+**Приоритет транспорта:** Redis (target) > Shared Disk (**live**) > Streaming (**rejected**).
+
+**Future Redis canon sketch (later):**
+1. Worker → gzip JSON в Redis: keys `catalog:sessions`, `catalog:indexes` + `catalog:updated_at`.
 2. Main API: read Redis → in-memory Soft-SWR.
-3. Транспорт: Redis > shared disk (уже live) > streaming (отвергнут).
-4. Алерты: P1 freshness; P2 worker crash; P3 empty artifact.
+3. Алерты (см. thresholds ниже).
 
-**Открыто перед Redis:** есть ли Redis на MSK / нужен ли новый сервис.
+**Alerts (proposed thresholds until measured - 2026-08-09):**
+- **P1 freshness:** disk mtime / `catalog:updated_at` older than **20–30 min** → critical (SLA до калибровки).
+- **P2 worker crash:** systemd unit/timer failed / consecutive oneshot non-zero exit.
+- **P3 empty/tiny artifact:** near-zero bytes **или** sessions count **<<** last-good (proposed: **&lt;50%** of last-good / near-empty).
 
-## 2026-08-08 - Buyer LK / refunds / Stage 2+ (открыто, future; не Stage 0)
+**Read-only MSK check 2026-08-09:** Redis **нет** (`redis-cli` absent; no redis/valkey systemd units; no docker redis/valkey). Перед INC.504.5d: **новый isolated Redis** (reuse невозможен) - открытый ops-вопрос (кто ставит / sizing), не product fork.
 
-**Контекст:** Stage 0 buyer support = **только mailto** (`hello@daibilet.ru`), без self-serve refund. Self-refund UI и частичные операции - **после** появления модели единого ваучера.
+## 2026-08-08 - Buyer LK / refunds / Stage 2+ — LOCKED out of Stage 0
 
-**Открыто к обсуждению (owner future product note, не implement сейчас):**
-1. Когда в ЛК когда-либо появится **единый ваучер**, разбивать его на **отдельные слоты**, чтобы покупатель мог:
-   - отменять **не весь** ваучер, а **конкретный слот**;
-   - либо **заменять** слот на другой **с доплатой**.
-2. Это отдельная тема product/UX + domain (voucher↔slot lifecycle, money/refund/surcharge, ops audit) - Stage **2+**, не Stage 0.
+**LOCKED owner 2026-08-09:**
+- Auto refunds / self-serve refund UI - **out of scope Stage 0**.
+- Stage 0 buyer support = **только mailto** `hello@daibilet.ru` (manual ops).
+- Stage **2+** product note (**не implement сейчас**): когда появится модель единого ваучера - partial refund by **slot**, slot replace + surcharge; нужны voucher↔slot lifecycle, money/refund/surcharge, ops audit.
 
-См. также [museum-contract-readiness.md](./museum-contract-readiness.md) § Stage 2 outline / Out of scope Stage 0.
+См. [museum-contract-readiness.md](./museum-contract-readiness.md) § Stage 2 outline / Out of scope Stage 0.
 
 ## 2026-08-08 - Supplier taxonomy / commercial modes (LOCKED draft, owner)
 
@@ -48,7 +55,7 @@
 4. **Email production:** канон SMTP на MSK web (`SMTP_*`) или письма с finance `.159`?
 5. **Support phone на билете:** единый номер Дайбилет vs телефон конкретного поставщика в supplier DTO?
 6. **Первый open-date договор:** музей или арт-пространство? какой venue/город/slug для seed template (controlled, не wide CTA)?
-7. **Возвраты до Stage 2:** только ops manual (+ Stage 0 buyer mailto) - подтверждаем? Self-refund / voucher→slot partial cancel-replace - **не** Stage 0; см. § Buyer LK / refunds / Stage 2+ выше.
+7. **Возвраты до Stage 2:** ✅ **LOCKED** - только ops manual + Stage 0 buyer mailto; Self-refund / voucher→slot - **не** Stage 0 (см. § Buyer LK / refunds выше).
 
 Связанные gaps (не новые product forks): order≠ticket issuance; webhook e2e; reconcile; supportPhone в public DTO; purchases-by-email - см. ниже и readiness Stage 0 checklist.
 
@@ -87,29 +94,40 @@ Catalog ticket card soft-fail показывает поля из create response
 
 Открыто только execution: список/batch для MSK grow и top-8 →50; seed/apply prod - по запросу.
 
-## 2026-08-06 - CI deploy secrets (открыто)
+## 2026-08-06 - CI deploy secrets — ЗАКРЫТО (✅ 2026-08-09)
 
-Workflow `Deploy MSK web` в репо. Нужно в GitHub repo secrets:
-1. `MSK_SSH_HOST` (IP или `daibilet-msk`)
-2. `MSK_SSH_USER`
-3. `MSK_SSH_KEY` (deploy key с правом `git` + `systemctl` daibilet-web)
-4. Опционально `NEXT_PUBLIC_TC_WIDGET_TOKEN`, `NEXT_PUBLIC_TEP_WIDGET_ID` (parity с prod `.env`)
+**LOCKED owner 2026-08-09:** GitHub repo secrets для workflow `Deploy MSK web` **уже настроены** (`MSK_SSH_HOST`, `MSK_SSH_USER`, `MSK_SSH_KEY`; опц. widget tokens). Значения secrets в git/chat **не** дублировать.
 
-После этого «выкатывай» = Actions → Deploy MSK web → Run workflow.
+«Выкатывай» = Actions → Deploy MSK web → Run workflow.
 
 ## 2026-08-05 - Deploy cadence (закрыто)
 
 Owner: основная работа локально / preview; агенты **commit + push** после итерации; **MSK web deploy** - пачкой раз в сутки или по явному запросу («выкатывай»). Исключения сразу: live 500, критичный хаб-редирект, security, launch-blocker без локальной проверки. Seed/apply prod DB - по запросу или в batch. Зафиксировано в `.cursorrules` + [Project.md](./Project.md).
 
-## 2026-08-05 - Editorial places → catalog (открыто)
+## 2026-08-05 - Editorial places → catalog — ЗАКРЫТО (LOCKED 2026-08-09)
 
-`cityInfo.mustSee`, nested POI пригородов, stops пресетов и упоминания в статьях сейчас не имеют единого обязательного identity/seed-flow с `Venue`. Для широкого СПб это привело к тому, что только первоначально засеянные точки имеют public entity, а новые editorial-точки остаются inline.
+Контекст: `cityInfo.mustSee`, nested POI пригородов, stops пресетов и упоминания в статьях раньше могли оставаться inline без системного `Venue` (широкий СПб: только ранний seed имел public entity).
 
-Нужно подтвердить контентный контракт:
+**LOCKED owner 2026-08-09** (контракт подтверждён; pointer: [Project.md](./Project.md) § City hub / editorial seed):
 
-1. Обязателен ли для каждой публикуемой самостоятельной точки `catalogSlug` + `family/kind`, а запись `Venue` создаётся/обновляется единым idempotent seed?
-2. Какой минимальный набор редакция подтверждает до publish: адрес, координаты, canonical name, тип сущности и статус точки? Разрешён ли `CANDIDATE` без координат, но без CTA «В маршрут»?
-3. Нужны ли nested POI пригородов как самостоятельные `Venue`, или только мини-destination верхнего уровня получает карточку?
+1. **Единый identity/seed-flow:** каждая публикуемая самостоятельная точка в открытом catalog обязана иметь валидную пару **`catalogSlug` + `family/kind`**. Создание/обновление `Venue` - **только** через единый **idempotent seed**. Если точка в статье / пресете (stops) / mustSee - редакторский интерфейс сначала сидит Venue, получает UUID/ID, потом линкует. Публикация «сырого» инлайна без системного Venue **запрещена** (цель: исключить inline-точки).
+
+2. **Минимальный набор до Publish:** до `published` редакция обязана заполнить:
+   - Canonical Name (локализованное официальное название);
+   - Coordinates (lat/lng) - строго обязательны для стандартных точек (исключения - п.3);
+   - Address (текст и/или геокодер; для природных - описание локации);
+   - `family/kind` (иконка + фильтры);
+   - lifecycle точки: **Active** / **Temporarily Closed** / **Permanently Closed**.
+
+3. **`CANDIDATE` без координат:** на черновике/парсинге - можно. Публикация на прод в таком виде **ограничена**. Если сущность всё же выводится: **авто-off** CTA «В маршрут» и любых навигационных действий (без координат трек невозможен).
+
+4. **Nested POI пригородов (гибрид; СПб: Петергоф, Пушкин, Кронштадт…):**
+   - мини-destination верхнего уровня → полноценная Venue (`Region`/`District` или Park Complex);
+   - nested POI (mustSee / статьи / пресеты) → самостоятельный Venue;
+   - связь: **`parent_venue_id`** к родителю;
+   - мелкие объекты без ценности для маршрутов → только текст в родительской карточке.
+
+**Открыто по теме:** только execution (enforcement в admin/seed UX, backfill legacy inline, schema `parent_venue_id` / lifecycle labels если ещё нет в Prisma) - не product fork.
 
 ## 2026-08-02 - My-day: QR билетов в поездке
 
@@ -134,46 +152,85 @@ Owner: основная работа локально / preview; агенты **
 5. **Список `/locations`:** ✅ SEO-контентные без афиши **да** (VK.8); family ≠ ticket gate. Institution без tickets остаётся `/venues`.
 6. **Единый `/places`:** ✅ **рано / deferred** (UX.LOC9 / PH2.PLC1).
 
-## 2026-07-31 - Location↔Excursion linking (открыто)
+## 2026-07-31 - Location↔Excursion linking — ЗАКРЫТО (LOCKED 2026-08-09)
 
-1. **NEARBY_HUB / START:** enum `RouteItemRole` есть; MVP пишет только `STOP`. Нужен ли отдельный контент-флоу для хабов рядом / explicit START, или достаточно geo «Рядом» + `Event.venueId`?
-2. **Порог geo:** 300м - ок для центра Перми/СПб? Нужен ли city-specific radius?
-3. **Счётчик на карточке:** `stopEventCount` vs sessions/`events` - показывать ли оба, если у парка есть и STOP, и собственные сессии?
-4. **Контент:** кто заполняет STOP-связи для топ-экскурсий (admin form vs seed script vs import)?
+**LOCKED owner 2026-08-09** (см. канон ниже + [Project.md](./Project.md) § Location↔Excursion):
+
+1. **NEARBY_HUB / START:** отдельный сложный контент-флоу **не нужен**. MVP-расширение:
+   - модель: явный линк `Event.venueId` (или `RouteItem.venueId`);
+   - **START:** первой точке пресета (`index: 0`) автоматически логическая роль START; отдельный контентный флаг не нужен;
+   - **NEARBY_HUB:** не хардкод в админке; динамический расчёт client/backend: geo «Рядом» (координаты Venue) + `Event.venueId`. Если `family: transport` (вокзал, причал, метро) и в радиусе доступности от старта/финиша - подтягивается динамически.
+
+2. **Гео-пороги:** default **300м** для плотного центра. Нужен **city-specific** radius в конфиге города (`cityInfo` словарь радиусов). Default: 300м. Мегаполисы / распределённые: **СПб 400м**, пригороды СПб **600м** (парки/набережные/Пушкин/Петергоф: хаб/парковка часто 500–700м).
+
+3. **Счётчик на карточке:** два отдельных счётчика на превью **нельзя** (UI overload). Агрегат: один «индекс активности» или вкладки внутри карточки. Превью: суммарно, с акцентом на тип (парк-дестинация: «Включает X событий и входит в Y маршрутов»). Если только одно число: **`stopEventCount`** (маршрутная включённость ценнее для каталога).
+
+4. **Заполнение STOP для топ-экскурсий (гибрид):**
+   - seed script: авто geo-match (остановка экскурсии ↔ Venue в радиусе **100м**) при миграции/новом городе;
+   - admin form: редакторы валидируют; для **новых** экскурсий связь строго вручную (плотные POI → ложные матчи);
+   - external import: поля `venueId` в API/файле партнёра; если передан - валидация ID, **без** авто-матчинга.
+
+**Открыто по теме:** только execution (`cityInfo` radii dict, copy агрегата, LE.7 контент STOP) - не product fork.
 
 ## 2026-07-31 - Venue kinds: park / monument + park admission (открыто)
 
 1. **Типы локаций `PARK` / `MONUMENT`:** ✅ добавлены в Prisma `VenueKind` + public slugs `park` / `monument` (каталог `/locations`, admin, infer). Секция city hub: предпочтение **«Важные места»** (не «Важные локации») - UX copy отдельно, не блокер kinds.
 2. **Платный вход в парк (admission):** ⏳ **осознанно НЕ в MVP catalog mix.** Пример: Монрепо (Выборг) - вход опционально платный. Не добавлять park admission в catalog/finance/projection, пока нет отдельного product decision. Future: admission product kind / supplier LC для park entry - после museum admission стабилизации.
 
-## 2026-07-31 - Location↔Excursion linking (канон)
+## 2026-07-31 - Location↔Excursion linking (канон; sync LOCKED 2026-08-09)
 
 1. **MVP источник правды:** явные `EventVenueRouteItem` (`role=STOP`, таблица `event_venue_route_items`) в admin. SEO-программа и витрина «включают это место» - только из pivot.
-2. **`Event.venueId`:** только точка старта / primary venue. Не заливать stops в `venueId`.
-3. **Гео-fallback (~300 м):** только если явных STOP нет; UI-лейбл **«Рядом»**, не «включают». Схема БД не меняется.
+2. **`Event.venueId`:** только точка старта / primary venue. Не заливать stops в `venueId`. Логический **START** пресета = `index: 0` (без отдельного контент-флага). **NEARBY_HUB** - динамика geo + transport family, не admin hardcode.
+3. **Гео-fallback:** UI-лейбл **«Рядом»**, не «включают»; только если явных STOP нет. Радиус: default **300м**; city-specific в `cityInfo` (СПб **400м**, пригороды СПб **600м**). Схема БД не меняется.
 4. **Пермь must-see:** slug-таблица в Project.md; seed `scripts/seed-perm-must-see-venues.js`; migrate PARK/MONUMENT + `EventVenueRouteItem` на catalog DB перед записью.
-5. **Контент stops:** кто заполняет STOP на популярных речных/пеших турах МСК/СПб/Пермь - editorial backlog.
+5. **Контент stops (гибрид):** seed geo-match ≤**100м** на миграции/новом городе → admin validate; **новые** экскурсии - только вручную; partner import с `venueId` - validate ID, без auto-match.
 
-## 2026-07-30 - Catalog ↔ finance projection / checkout domain (открыто)
+## 2026-07-30 - Catalog ↔ finance projection / checkout domain — LOCKED hosts + Path A/B (open: fan-in / e2e)
 
-Контекст: граница **locked** в [catalog-finance-projection.md](./catalog-finance-projection.md). Hosts: [spb-finance-host.md](./spb-finance-host.md).
+Контекст: граница **locked** в [catalog-finance-projection.md](./catalog-finance-projection.md). Hosts: [spb-finance-host.md](./spb-finance-host.md).  
+Draft nginx split (репо only, **не** apply на `.159`): [pay.daibilet.ru.split.conf.example](../deploy/nginx/pay.daibilet.ru.split.conf.example).  
+E2e checklist: [yookassa-e2e-sandbox.md](./checklists/yookassa-e2e-sandbox.md).
 
-### Checkout domain & DNS
+### Checkout domain & DNS — LOCKED (целевая карта)
 
-1. **Checkout hostname:** **`pay.daibilet.ru`** - канон ✅ (A → `.159`, TLS+nginx на finance). Alias **`checkout.daibilet.ru`** не обязателен / не создан.
-2. **`finance-api.daibilet.ru`:** ✅ отдельный hostname для API/projection/webhooks (DNS+TLS). Path на `pay` не обязателен.
-3. **`supplier.daibilet.ru`:** ✅ DNS + TLS (вместе с `pay` / `finance-api`). Alias partners/cabinet не нужен.
-4. **YooKassa webhook URL:** ✅ **LOCKED 2026-07-31 (Codex).** Canon: `https://finance-api.daibilet.ru/api/checkout/yookassa/webhook`. Dual-webhook 3-7d **только** если были живые платежи/вебхуки на старом endpoint; иначе skip.
-4b. **Buyer checkout URL canon (2026-08-07):** два параллельных host-трека + Path A/B product, без force-merge.
-   - **Catalog / Cursor Path A:** `daibilet.ru/checkout/admissions/{slug}`, result `…/checkout/result?order={publicCode}`, account `…/account/purchases`.
-   - **Catalog Path B (future calc):** scaffold `daibilet.ru/checkout/calc` - не для museum CTA.
-   - **Codex experiment:** thin buyer UI на `pay.daibilet.ru` (`.159`). Supplier LC на pay не ломать.
-   - Return URL для ЮKassa: активный buyer surface (catalog Path A или pay); webhook на `finance-api`.
-4c. **Buyer checkout — два пути LOCKED 2026-08-07 (owner):**
+Сетевой контур catalog ↔ finance **полностью разделён**. Alias `checkout.daibilet.ru` / partners / cabinet **не** создаются.
+
+| Hostname | Назначение | Status/IP | Примечание |
+|----------|------------|-----------|------------|
+| `pay.daibilet.ru` | Buyer Checkout UI + Supplier LC | A → `.159` (TLS+nginx finance) | Алиас `checkout.daibilet.ru` **не** создаётся |
+| `finance-api.daibilet.ru` | API (Projection, Webhooks) | A → `.159` (DNS+TLS) | Проксирование путей на `pay` не требуется |
+| `supplier.daibilet.ru` | ЛК Партнёров | A → `.159` (DNS+TLS) | Алиасы partners/cabinet не нужны |
+
+1. **Checkout hostname:** **`pay.daibilet.ru`** - канон ✅ (см. таблицу).
+2. **`finance-api.daibilet.ru`:** ✅ отдельно для API/projection/webhooks.
+3. **`supplier.daibilet.ru`:** ✅ DNS + TLS вместе с `pay` / `finance-api`.
+4. **YooKassa webhook URL:** ✅ **LOCKED 2026-07-31 (Codex) / cabinet 2026-08-07.**
+   - Canon: `https://finance-api.daibilet.ru/api/checkout/yookassa/webhook`
+   - Events: `payment.succeeded`, `payment.waiting_for_capture`, `payment.canceled`
+   - Ошибочный endpoint на `pay.daibilet.ru` **упразднён**
+   - Dual-webhook 3-7d: **SKIP** (живого трафика на старом не было)
+4b. **Buyer checkout URL tracks — LOCKED 2026-08-07:** два параллельных трека; **force-merge запрещён**.
+   - **Path A (Catalog / Cursor):** entry `daibilet.ru/checkout/admissions/{slug}` → result `https://daibilet.ru/checkout/result?order={publicCode}` → purchases `daibilet.ru/account/purchases`
+   - **`publicCode` (LOCKED Path A):** маскированный токен, **не** incremental DB id. Format example: `KSD-8492-NX7` (crypto-safe random at checkout session create). Result URL всегда `https://daibilet.ru/checkout/result?order={publicCode}` (не internal UUID, не ticketNumber).
+   - **JSON status shape (Path A lookup):**
+     ```json
+     {
+       "order": {
+         "publicCode": "KSD-8492-NX7",
+         "status": "PAID",
+         "amount": { "value": "1500.00", "currency": "RUB" },
+         "items": []
+       }
+     }
+     ```
+   - **Path B (future calc):** scaffold `daibilet.ru/checkout/calc` - **запрещено** для музейных CTA
+   - **Codex thin Buyer UI:** на `pay.daibilet.ru` (`.159`); Supplier LC на том же хосте **изолирован** (см. draft nginx split)
+   - YooKassa **return URL** динамически → активная buyer surface (Path A catalog **или** `pay.daibilet.ru`); **webhook всегда** → `finance-api.daibilet.ru`
+4c. **Buyer checkout — два пути продукта LOCKED 2026-08-07 (owner):**
    1. **Path A / простой музей:** только `create-payment` → redirect YooKassa (`confirmationUrl`). **Без** complex checkout UI.
-   2. **Path B / complex calc:** можно строить **на будущее**, когда появится внутренний сложный pricing (корзина / multi-offer / custom calc). **Не** подключать к simple museum flow.
+   2. **Path B / complex calc:** можно строить **на будущее** (корзина / multi-offer / custom calc). **Не** подключать к simple museum flow.
    Thin entry + result + account остаются на Path A. STUB = soft-fallback/admin-dev; webhook на `finance-api` без изменений.
-5. **Webhook registration (2026-08-07):** API register → 401 auth type (webhook-mgmt недоступен для текущих credentials) - обход: **ручная регистрация в кабинете**. Owner ✅ URL = canon `https://finance-api.daibilet.ru/api/checkout/yookassa/webhook` (events succeeded / waiting_for_capture / canceled; ранее ошибочно было `pay.daibilet.ru`). FIN.LC3 ✅; MIG.9.5 / FIN.W1 cabinet ✅; next ⏳ e2e sandbox PENDING→SUCCEEDED.
+5. **Webhook registration (2026-08-07):** API register → 401 auth type - обход: **ручная** регистрация в ЛК ЮKassa. **Статус:** FIN.LC3 ✅ · MIG.9.5 / FIN.W1 cabinet ✅ · e2e sandbox PENDING→SUCCEEDED ⏳ (см. checklist).
 
 ### Owner minimum (обновлено 2026-08-07)
 
@@ -182,8 +239,8 @@ Owner: основная работа локально / preview; агенты **
 - Egress `.159` outbound 443+DNS ✅ (sandbox create-payment OK)
 - FIN.LC3 ✅ confirmationUrl / STUB smoke
 - SSH для Codex: ключ `daibilet_spb_finance` / pubkey в `authorized_keys`
-- Webhook cabinet ✅ canon finance-api (см. п.5)
-- **Open:** e2e sandbox pay verify PENDING→SUCCEEDED после webhook delivery
+- Webhook cabinet ✅ canon finance-api (см. п.5); dual-webhook SKIP
+- **Open:** e2e sandbox pay verify PENDING→SUCCEEDED после webhook delivery ([checklist](./checklists/yookassa-e2e-sandbox.md))
 
 `.16` (Intelligent Hoopoe) **труп** (MIG.9.7 ✅ 2026-08-07): снят из docs/scripts inventory. Wipe VM в Timeweb = owner, если ещё биллится. Apex DNS / web build = MSK `.184` only. Teplohod allowlist = `.184`, не `.16`.
 

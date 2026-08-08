@@ -139,7 +139,7 @@ Alias `museum-1` = первый open-date контракт (не «музеи fo
 |----|--------|-----------|--------|-------|
 | M1.DOC | Docs: readiness matrix Stage 0/1/2 + Codex brief + supplier taxonomy | Критический | ✅ `docs/museum-contract-readiness.md` (taxonomy 2026-08-08) | Cursor arch |
 | M1.PAY | Public admission create-payment + `return_url` catalog `?order=` | Критический | ⏳ | Codex (UX.BUY-5) |
-| M1.WH | Webhook e2e sandbox PENDING→SUCCEEDED + verify + idempotency | Критический | ⏳ | Codex (FIN.W1 / MIG.9.5) |
+| M1.WH | Webhook e2e sandbox PENDING→SUCCEEDED + verify + idempotency | Критический | ⏳ cabinet ✅; e2e open ([checklist](./checklists/yookassa-e2e-sandbox.md)) | Codex (FIN.W1 / MIG.9.5) |
 | M1.REC | Reconcile path (manual + timer draft) если webhook lost | Критический | ⏳ | Codex |
 | M1.TKT | Issuance: `ticketNumber` ≠ `publicCode`; order-by-code DTO полный | Критический | ⏳ | Codex |
 | M1.BUY | purchases-by-email / m2m для account fan-in | Высокий | ⏳ | Codex (UX.BUY-6 / CF.P1c) |
@@ -478,6 +478,7 @@ Alias `museum-1` = первый open-date контракт (не «музеи fo
 | OPS.CI1 | SSH tunnel CI→MSK API :4000 for SSG (no public Postgres) | Критический | ✅ |
 | OPS.CI2 | `EVENT_SSG_TOP_N=0` on CI (skip Prisma event prebuild) | Критический | ✅ |
 | OPS.CI3 | Soft-fail home/podborki/landings/`withSoftTimeout` on API down | Критический | ✅ |
+| OPS.CI4 | GitHub secrets `MSK_SSH_HOST`/`USER`/`KEY` (+ опц. widget tokens) для Deploy MSK web | Критический | ✅ owner 2026-08-09: secrets в repo настроены; «выкатывай» = Actions → Run workflow |
 
 ## City hub hookFact + IA (2026-08-03)
 
@@ -705,9 +706,11 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 | LE.5c | LocationCard: chip+«В маршрут» vertical right stack; strip «Место посадки» title prefix | Высокий | ✅ `4f5b675` MSK **BUILD_ID=`B_7ZDd8i_WZurwdjJhMhl`** |
 | LE.5b | Hide empty excursion UI on location page (hero 0 + empty block) | Высокий | ✅ `3271bfcb` BUILD `slptXB74NiKJwSUqiCO7t` |
 | LE.6 | Seed Пермь must-see (6 slugs) + cityInfo slug | Средний | ✅ DB MSK 6 rows; cityInfo slug; listing 🚫 без hub-gate deploy |
-| LE.7 | Deploy migrate + контент STOP-связей экскурсий | Высокий | ⏳ |
-| LE.8 | Geo autolink ТЗ → CLI dry-run/apply (пороги 150/300/500, merge STOP, `Event.venueId` не трогать) | Высокий | ✅ CLI + unit + MSK dry-run perm |
+| LE.7 | Deploy migrate + контент STOP-связей экскурсий | Высокий | ⏳ гибрид LOCKED 2026-08-09: seed ≤100м + admin validate; new = manual; import venueId validate-only |
+| LE.8 | Geo autolink ТЗ → CLI dry-run/apply (пороги 150/300/500, merge STOP, `Event.venueId` не трогать) | Высокий | ✅ CLI + unit + MSK dry-run perm; radii follow-up: cityInfo dict (default 300 / SPB 400 / suburbs 600) |
 | LE.9 | Admin «Подобрать рядом» + merge apply endpoint (suggest UI) | Средний | ✅ GET suggestions + POST `venue-links:apply` merge + UI чекбоксы; Event.venueId не трогаем |
+| LE.10 | START/NEARBY_HUB MVP: START=`index:0`; NEARBY_HUB dynamic geo+transport (no admin hardcode) | Высокий | ⏳ docs LOCKED 2026-08-09; implement |
+| LE.11 | Card activity preview: один агрегат / вкладки; single-number = `stopEventCount` | Средний | ⏳ docs LOCKED 2026-08-09 |
 | DR.1 | «Собери свой день» MVP: кнопка + localStorage + match API (STOP>start>nearby), noindex, без комбо | Высокий | ✅ button/storage/match/`/my-day`; STOP-наполнение городов ещё слабо |
 | DR.1b | Day-route polish: empty states, mobile badge, STOP/start/nearby badges, limit/multi-city warnings, copy toast | Высокий | ✅ `56bbb237` BUILD `Mt5-YY9GU-T83jOIjxN0Q` |
 | DR.2 | Day-route Phase 1.5 share `?day=` noindex + Phase 2 auth sync | Средний | ✅ share hydrate + copy link; Phase 2 auth sync ⚠️ skip (нет user favorites day-route API) |
@@ -764,11 +767,11 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 |---|--------|-----------|--------|
 | FIN.LC1 | Deploy Codex supplier series (>=147eb436 content) на `.159` | Критический | done `c105264` (patch am; origin tip still 0c1e464) |
 | FIN.LC2 | STUB admission purchase smoke (supplier + /api/checkout/stub) | Критический | done 201 CONFIRMED |
-| FIN.LC3 | YooKassa sandbox purchase smoke (confirmationUrl) | Критический | ✅ 2026-08-07: confirmationUrl OK, mode YOOKASSA, PENDING, publicCode 6037662; STUB OK 9032330; no YOOKASSA_PAYMENT_FAILED |
+| FIN.LC3 | YooKassa sandbox purchase smoke (confirmationUrl) | Критический | ✅ 2026-08-07 SUCCESS |
 | FIN.LC4 | Owner: SG Diligent Polydeuces outbound 443 (+ DNS) | Критический | ✅ PASS (egress green; sandbox create-payment OK 2026-08-07) |
 | FIN.LC5 | YOOKASSA_SECRET_KEY на `.159` + CHECKOUT=1 after egress | Критический | ✅ key `<set>`; CHECKOUT=1; VERIFY_WEBHOOK=1; STUB=1 (2026-08-07) |
 | FIN.LC6 | Codex SSH access (daibilet_spb_finance / pubkey) | Критический | ⏳ owner: Cursor has key; Codex needs same |
-| FIN.W1 | Week1: YooKassa+webhook/reconcile+runbook (4-5d after D0) | Критический | 🔄 create-payment/STUB ✅; webhook cabinet ✅ canon `finance-api…/webhook` (events succeeded/waiting_for_capture/canceled; было ошибочно `pay.`); next ⏳ e2e sandbox pay PENDING→SUCCEEDED |
+| FIN.W1 | Week1: YooKassa+webhook/reconcile+runbook (4-5d after D0) | Критический | 🔄 cabinet ✅ (`finance-api…/webhook`, dual SKIP); create-payment/STUB ✅; **open:** e2e PENDING→SUCCEEDED ([checklist](./checklists/yookassa-e2e-sandbox.md)) |
 | FIN.W2 | Week2: supplier LC + admin legal/bank approve + capacity reaper | Высокий | ⏳ |
 | FIN.W3 | Week3: controlled catalog path + ledger MVP + m2m Bearer | Высокий | ⏳ wide CTA still out |
 | FIN.W4 | Week4: harden, scheduled reconcile, docs, smoke matrix | Средний | ⏳ |
@@ -832,8 +835,8 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 | INC.504.3 | Пересмотр daibilet-web MemoryMax/heap + OOMPolicy=continue (High 1.5G / Max 2G / heap 1280 на 7.8Gi) | Критический | done 2026-07-31 MSK live |
 | INC.504.4 | SWR catalog rebuild: non-blocking / async (не блокировать event loop 49-219с) | Критический | ✅ MSK live BUILD `GMlh5-uhf-R2iVlZbSFXY`: disk+child/cron+forever-SWR+reap |
 | INC.504.5 | Dual catalog SWR cache (`dto.js` + `public-catalog.dto.ts`) - merge/unify (вынесено из F5.3b) | Средний | ✅ 2026-08-08: dto.js adopt-only; ✅ 504.5b stale-first + SQL cooldown 45м + chunked adopt |
-| INC.504.5c | Catalog Worker shared disk: systemd timer, API REBUILD_MODE=off, disk v2 indexes hydrate | Высокий | ✅ 2026-08-08; 🔧 2026-08-09: 203/EXEC (bash ExecStart) + catalog stale-first UI |
-| INC.504.5d | Future: Catalog Worker + Redis gzip artifacts + `updated_at` P1 staleness; не streaming | Низкий | ⏳ после стабилизации 504.5c |
+| INC.504.5c | Catalog Worker shared disk: systemd timer, API REBUILD_MODE=off, disk v2 indexes hydrate | Высокий | ✅ канон `deploy/systemd/daibilet-catalog-dto-rebuild.*` + `deploy/cron/rebuild-public-catalog-dto.sh`; MSK timer active; 🔧 2026-08-09 203/EXEC+stale-first |
+| INC.504.5d | Future: Catalog Worker + Redis gzip (`catalog:sessions/indexes/updated_at`) Soft-SWR; не streaming | Низкий | ⏳ deferred; MSK Redis **нет** (2026-08-09 RO check) → нужен новый isolated; proposed P1 20–30m / P3 &lt;50% last-good |
 | INC.504.5-codex | Brief Codex: медленный/нестабильный public API + catalog → [codex-api-catalog-latency-brief.md](./codex-api-catalog-latency-brief.md) | Критический | 📄 2026-08-09 handoff |
 | INC.504.6 | nginx proxy_cache SWR: `background_update` + TTL 30m (browser clear ≠ cold Next) | Критический | ✅ |
 | INC.504.7 | City hub ISR: `unstable_cache` + `generateStaticParams` (было no-store / 20-30с) | Критический | ✅ |
@@ -887,7 +890,7 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 | MIG.9.2 | Phase 2: fresh finance PG на `.159` (не catalog dump) | Критический | ✅ PG `:5437` + migrations/seed smoke 2026-07-30 |
 | MIG.9.3 | Phase 3: finance app + HTTP/TLS `pay`/`supplier`/`finance-api` | Критический | 🔄 API `:4100` + nginx · TLS ✅ LE SAN pay/supplier/finance-api · STUB on / YooKassa off |
 | MIG.9.4 | Phase 4: optional staging/build scaffolding на `.159` (не justification для `.16`) | Средний | ✅ N/A - SPB `.16` retired from build; staging на `.159` optional later |
-| MIG.9.5 | Phase 5: YooKassa webhook → finance-api canon; dual only if prior live | Критический | ✅ cabinet URL = canon `https://finance-api.daibilet.ru/api/checkout/yookassa/webhook` (owner 2026-08-07; было `pay.`); VERIFY=1; next ⏳ e2e sandbox PENDING→SUCCEEDED |
+| MIG.9.5 | Phase 5: YooKassa webhook → finance-api canon; dual only if prior live | Критический | ✅ cabinet URL = canon `https://finance-api.daibilet.ru/api/checkout/yookassa/webhook` (owner 2026-08-07; dual **SKIP**); VERIFY=1; next ⏳ e2e sandbox PENDING→SUCCEEDED ([checklist](./checklists/yookassa-e2e-sandbox.md)) |
 | MIG.9.6 | Phase 6: smoke `pay`/`supplier`/webhook; catalog `.184` без cutover | Критический | ⏳ |
 | MIG.9.7 | Phase 7: retire Intelligent Hoopoe `.16` from repo/ops + **wipe VM in Timeweb** | Высокий | ✅ repo/docs/scripts 2026-08-07 (owner confirmed «труп»); **VM wipe в панели Timeweb = owner**, если ещё биллится |
 | PERF.OOM4 | MSK: снять `cpus:1`/`workerThreads:false`, heap build 5120Mi | Высокий | ✅ |
@@ -1857,6 +1860,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | Дата | Изменение |
 |------|-----------|
+| 2026-08-09 | **QA locks docs:** editorial/route/finance/publicCode/CI secrets; Catalog Worker 504.5c canon in deploy/ + Redis 504.5d deferred (MSK Redis нет); Buyer refunds Stage 2+ LOCKED out of Stage 0; nginx split example + yookassa e2e checklist; FIN.W1/M1.WH e2e ⏳; **без** MSK/finance/Redis deploy |
 | 2026-08-08 | **M1 taxonomy ✅ docs** - owner lock: Supplier ≠ museum-only; Stage 0 = OPEN_DATE (музей/арт); Stage 1 = events/sessions; readiness + M1.* + qa + Diary + Project one-liner; Codex brief updated; docs-only no web deploy |
 | 2026-08-07 | **M1.* epic ✅ docs** - [museum-contract-readiness.md](./museum-contract-readiness.md): роли/функции, Stage 0 Codex brief (pay/webhook/reconcile/ticket issuance/supplier LC), Stage 1 schedule + Stage 2 full LK outlines; Tasktracker M1.*; qa Museum-1 questions; docs-only no web deploy |
 | 2026-08-07 | **FIN.W1/MIG.9.5 webhook cabinet ✅** - owner: URL = `finance-api…/yookassa/webhook` (events succeeded/waiting_for_capture/canceled; было ошибочно `pay.`); next = e2e sandbox PENDING→SUCCEEDED; no web deploy |

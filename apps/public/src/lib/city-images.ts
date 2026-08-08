@@ -14,6 +14,9 @@ const CITY_CARD_IMAGE_ALIASES: Record<string, string> = {
   'velikiy-novgorod': 'veliky-novgorod',
   'rostov-na-donu': 'rostov-on-don',
   rostov: 'rostov-on-don',
+  khabarovsk: 'habarovsk',
+  lipetsk: 'lipeck',
+  kirov: 'kirov-kirovskaya-oblast',
 };
 
 const CITY_CARD_IMAGE_SLUGS = new Set([
@@ -55,6 +58,25 @@ const CITY_CARD_IMAGE_SLUGS = new Set([
   'penza',
   'volgograd',
   'sortavala',
+  // Night covers batch (catalog order after existing)
+  'habarovsk',
+  'barnaul',
+  'cheboksary',
+  'lipeck',
+  'kurgan',
+  'ivanovo',
+  'kirov-kirovskaya-oblast',
+  'bryansk',
+  'kemerovo',
+  'smolensk',
+  'tambov',
+  'vladimir',
+  'yoshkar-ola',
+  'kursk',
+  'saransk',
+  'chita',
+  'astrahan',
+  'belgorod',
 ]);
 
 export function resolveCityImage(city: CityImageSource): string | null {

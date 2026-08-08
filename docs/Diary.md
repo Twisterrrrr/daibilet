@@ -1,5 +1,24 @@
 # Diary
 
+## 2026-08-09 - QA locks: editorial seed, route linking, finance hosts, CI secrets
+
+### Наблюдения
+- Owner утвердил пакет архитектурных ответов в qa: identity/seed, CANDIDATE, nested POI, Location↔Excursion, DNS/webhook/Path A-B, `publicCode` format, CI Deploy MSK web secrets уже в GitHub; Catalog Worker Redis deferred; Buyer refunds Stage 2+.
+- Read-only MSK: **Redis отсутствует** (нет redis-cli / units / docker). Catalog disk-worker timer **active**; канон unit уже в `deploy/systemd/` + cron script.
+
+### Решения
+- `docs/qa.md`: блоки закрыты LOCKED (2026-08-09 / ранее 2026-07-31 и 2026-08-07 для finance). Buyer LK refunds - out of Stage 0.
+- Артефакты в репо (без apply на `.159`): `deploy/nginx/pay.daibilet.ru.split.conf.example`, `docs/checklists/yookassa-e2e-sandbox.md`.
+- `publicCode` Path A: маскированный токен example `KSD-8492-NX7`; result `?order={publicCode}`.
+- OPS.CI4 ✅; INC.504.5c канон = существующие deploy units; 504.5d Redis deferred (нужен новый isolated, не reuse).
+- Proposed alert thresholds P1 20–30m / P3 &lt;50% last-good - until measured.
+- E2e sandbox остаётся ⏳ до прогона трёх сценариев.
+
+### Проблемы
+- Execution backlog: enforcement seed UX, `cityInfo` radii, LE.10–11, FIN.W1 e2e; Redis install decision перед 504.5d.
+
+---
+
 ## 2026-08-09 - INC.504.5c: catalog worker 203/EXEC + catalog stale-first
 
 ### Наблюдения
