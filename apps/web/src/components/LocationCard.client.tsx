@@ -76,7 +76,6 @@ export function LocationCard({
     | 'longitude'
   > & {
     cityId?: string | null;
-    wayToFind?: string | null;
   };
   href: string;
   nextSlot?: string | null;
@@ -90,7 +89,6 @@ export function LocationCard({
   const gradient = TYPE_GRADIENT[venue.type] || 'from-sky-500 via-primary-600 to-indigo-600';
   const street = formatStreetAddress(venue.address, { city: venue.city }) || venue.city;
   const metro = nonEmptyLogisticsText(venue.metroStation);
-  const wayToFind = nonEmptyLogisticsText(venue.wayToFind);
   const stopCount = Number(venue.stopEventCount ?? 0);
   const activityCount = stopCount > 0 ? stopCount : Number(venue.events || 0);
   // Same strip as hub/my-day: cut address crumbs («. Нева», «. пл. …») from Venue blurbs.
@@ -191,13 +189,6 @@ export function LocationCard({
 
           {isContentPlace && hook ? (
             <p className="mt-1.5 line-clamp-2 text-sm text-slate-600">{hook}</p>
-          ) : null}
-
-          {wayToFind ? (
-            <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-slate-500">
-              <span className="font-semibold text-slate-600">Как найти: </span>
-              {wayToFind}
-            </p>
           ) : null}
 
           {isContentPlace ? (
