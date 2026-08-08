@@ -81,7 +81,7 @@
 | UX.BUY-11 | Best-effort buyer email (SMTP_* on web; else save-code copy) | Высокий | ✅ (MSK SMTP unset → `smtp_not_configured` + UI copy) |
 | UX.BUY-12 | YooKassa return → catalog result/ticket (`?order=`); localStorage recovery | Высокий | ✅ catalog; finance must set return_url |
 | UX.BUY-13 | Account purchases: compact list + in-place download (`?print=1` / Save as PDF) + secondary open ticket | Высокий | ✅ `60a783b4` MSK **BUILD_ID=`lr_2kHu4E71Ae91U5LXfw`** |
-| UX.BUY-14 | Seed purchases for `v.butin@yandex.ru` (3 museum STUB internal + SiteUser ensure) | Высокий | 🔄 catalog fixture + script; web deploy |
+| UX.BUY-14 | Seed purchases for `v.butin@yandex.ru` (3 museum STUB internal + SiteUser ensure) | Высокий | ✅ `90ac5cc7` MSK **BUILD_ID=`FSLIUs463XJKQZkOL_njJ`** Deploy **31247448301** |
 
 ---
 

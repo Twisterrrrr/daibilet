@@ -27,6 +27,8 @@
 - Fan-in в `internal-purchases` + lookup в `checkout/actions/order` (билет `/checkout/ticket/{code}`).
 - Script `scripts/seed-buyer-purchases-profile.js` - ensure SiteUser; `--reset-password` пишет temp creds только в server file (не в git/chat).
 - Нужен web deploy (fixture в apps/web). Finance `.159` не трогали.
+- Ship: `90ac5cc7` · Deploy **31247448301** · MSK **BUILD_ID=`FSLIUs463XJKQZkOL_njJ`** · `internal-purchases` source=`catalog-seed` total=3 · ticket pages HTTP 200.
+- SiteUser уже был; temp password сброшен в `/opt/daibilet/secrets/buyer-seed-v-butin.txt` (не в git/chat).
 
 ### Проблемы
 - Пока нет m2m purchases-by-email, seed живёт в catalog web; после UX.BUY-6 можно сузить/убрать.
