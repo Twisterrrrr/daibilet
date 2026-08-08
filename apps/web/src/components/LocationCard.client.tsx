@@ -22,10 +22,17 @@ const TYPE_GRADIENT: Record<string, string> = {
   venue: 'from-primary-600 via-primary-700 to-slate-900',
 };
 
-/** Strip legacy «Место посадки - / — » prefix from bus boarding titles. */
+/**
+ * Strip legacy decorative prefixes from boarding/pier titles.
+ * «Место посадки — …» (bus) and «Причал — …» (pier address rename).
+ * Keeps descriptive «Причал на …» titles intact.
+ */
 function stripBoardingPlacePrefix(name: string): string {
   const trimmed = String(name || '').trim();
-  const stripped = trimmed.replace(/^Место посадки\s*[—–-]\s*/u, '').trim();
+  const stripped = trimmed
+    .replace(/^Место посадки\s*[—–-]\s*/u, '')
+    .replace(/^Причал\s*[—–-]\s*/u, '')
+    .trim();
   return stripped || trimmed;
 }
 

@@ -1,5 +1,24 @@
 # Diary
 
+## 2026-08-08 - Pier titles: no decorative dash + Sinopskaya 10А
+
+### Наблюдения
+- Owner: «Причал — Адмиралтейская наб., 10 / а зачем тире в названиях причалов??»
+- Owner: «Причал Синопская наб., 10 поправь на 10А - и всегда после импорта исправляй на 10А!»
+- Display rename в `formatPierLocationDisplayName` собирал `Причал — {address}` (em dash).
+- Prod: канон `venue_629f8f730fdb465f9b2c54d0` (`prichal-na-sinopskoi-nab-10-…`) title/address с домом **10**; twin TEP `venue_tep_72` (2 события).
+
+### Решения
+- Pier display rename как у bus: только shortAddress, без префикса `Причал —` (бейдж уже «Причал»).
+- `LocationCard`: strip legacy `Причал —/–/-`.
+- Канон Синопская **10А** (кириллическая А): override + `rewriteSinopskayaHouseNumber` в `venue-normalize`; import hooks `scripts/lib/venue-address-overrides.js` в TC/TEP; TEP place `72` → канон; ensure `scripts/ensure-spb-sinopskaya-10a-pier.js`.
+- Prod MSK PG applied: canon 10А, twin HIDDEN + rematch 2 events. Web deploy не гоняли (DB already live; dash-fix в API после следующего batch deploy).
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-08 - /locations + /venues: infinite scroll → classic pagination
 
 ### Наблюдения

@@ -10,6 +10,7 @@ const { syncProviderLinksForSource } = require("./lib/provider-link-sync");
 const { EVENT_UPSERT_STATUS, EVENT_UPSERT_SLUG } = require("./lib/event-import-guard");
 const { normalizeImportEventTitle } = require("./lib/event-title-normalize");
 const { ENTERTAINMENT_DISCO_TAXONOMY, isDiscoOrPartyEvent } = require("./lib/event-taxonomy");
+const { applyVenueAddressCanon } = require("./lib/venue-address-overrides");
 
 const requireFromDbPackage = createRequire(path.join(rootDir, "packages", "db", "package.json"));
 const { Pool } = requireFromDbPackage("pg");
@@ -230,6 +231,14 @@ async function importCatalogEvent(client, event, summary) {
     const venueSlug = slugify(`${venue.name || "venue"}-${venue.id}`);
     const existingBySlug = await client.query(`select id from "Venue" where slug = $1 limit 1`, [venueSlug]);
     const targetVenueId = existingBySlug.rows[0]?.id || venueId;
+    const canon = applyVenueAddressCanon({
+      id: targetVenueId,
+      title: venue.name || "Площадка без названия",
+      name: venue.name || "Площадка без названия",
+      address: venue.address || null,
+      city: city?.name || null,
+      slug: venueSlug,
+    });
     const venueResult = await client.query(
       `
         insert into "Venue" (
@@ -255,10 +264,10 @@ async function importCatalogEvent(client, event, summary) {
       [
         targetVenueId,
         venueSlug,
-        venue.name || "Площадка без названия",
+        canon.title || "Площадка без названия",
         venue.description || null,
         resolvedCityId,
-        venue.address || null,
+        canon.address || null,
         venue.coordinates?.latitude ?? null,
         venue.coordinates?.longitude ?? null,
         venueKind(venue.typeGuess),

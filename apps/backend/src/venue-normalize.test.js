@@ -78,8 +78,28 @@ test('formatPierLocationDisplayName replaces vessel hull title with pier address
   const { formatPierLocationDisplayName } = await import('./venue-normalize.js');
   assert.equal(
     formatPierLocationDisplayName('Теплоход «РИО-1»', 'Ленинградское шоссе, 51А', 'Москва'),
-    'Причал — Ленинградское шоссе, 51А',
+    'Ленинградское шоссе, 51А',
   );
+});
+
+test('normalizePublicVenueRecord rewrites Sinopskaya pier house 10 to 10А', async () => {
+  const byTitle = normalizePublicVenueRecord({
+    title: 'Причал на Синопской наб., 10',
+    address: 'Синопская наб., 10, Санкт-Петербург',
+    city: 'Санкт-Петербург',
+  });
+  assert.equal(byTitle.title, 'Причал на Синопской наб., 10А');
+  assert.equal(byTitle.address, 'Синопская наб., 10А');
+  assert.equal(byTitle.city, 'Санкт-Петербург');
+
+  const byId = normalizePublicVenueRecord({
+    id: 'venue_629f8f730fdb465f9b2c54d0',
+    title: 'Причал на Синопской наб., 10',
+    address: 'Синопская наб., 10',
+    city: 'Санкт-Петербург',
+  });
+  assert.equal(byId.title, 'Причал на Синопской наб., 10А');
+  assert.equal(byId.address, 'Синопская наб., 10А');
 });
 
 test('inferCityFromAddressText prefers SPB embankment over ship Moskva-N', () => {

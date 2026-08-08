@@ -972,6 +972,7 @@ Owner minimum: MSK→`.159` сеть ✅ · YooKassa `SHOP_ID`/`SECRET=<set>` �
 | VENUE.L4 | Soft-sign twin: при HIDDEN twin rematch `Event.venueId` на канонический PUBLISHED/CANDIDATE slug | Средний | ⏳ |
 | VENUE.L5 | Ops ensure `venue_68d4062e…` → `CANDIDATE` (kind уже `CLUB_BAR_RESTAURANT`) | Средний | ✅ `scripts/ensure-modnaya-sreda-venue.js` applied on MSK |
 | VENUE.FONTANKA-53 | Дубль причала Фонтанки 51-53: канон TC `prichal-na-fontanke-53`, twin `venue_tep_53` HIDDEN + rematch | Высокий | ✅ ensure + tep-import map; prod apply |
+| VENUE.SINOP-10A | Синопская наб. дом 10→10А; pier display без `Причал —`; TEP 72→канон | Высокий | ✅ override+import rewrite+ensure; prod PG applied |
 
 ---
 

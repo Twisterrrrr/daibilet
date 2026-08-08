@@ -12,6 +12,7 @@ const { syncProviderLinksForSource } = require("./lib/provider-link-sync");
 const { EVENT_UPSERT_STATUS, EVENT_UPSERT_SLUG } = require("./lib/event-import-guard");
 const { normalizeImportEventTitle } = require("./lib/event-title-normalize");
 const { ENTERTAINMENT_DISCO_TAXONOMY, isDiscoOrPartyEvent } = require("./lib/event-taxonomy");
+const { applyVenueAddressCanon } = require("./lib/venue-address-overrides");
 
 const fixturesDir = path.resolve(process.env.TEP_FIXTURES_DIR || path.join(rootDir, "data", "teplohod", "fixtures"));
 const eventsPath = path.join(fixturesDir, "events-compact.json");
@@ -26,6 +27,7 @@ const TEPL0HOD_SOURCE_ID = "src_teplohod";
 /** TEP place id → existing TicketsCloud / editorial Venue.id (hide twin, attach events to canon). */
 const TEP_PLACE_CANON_VENUE_IDS = new Map([
   ["53", "venue_60b602fed94a1fa681b69c1d"], // Fontanka 51-53 pier (owner 2026-08-08)
+  ["72", "venue_629f8f730fdb465f9b2c54d0"], // Sinopskaya nab. 10А pier (owner 2026-08-08)
 ]);
 
 const CATEGORY_MAP = new Map([
@@ -367,12 +369,21 @@ async function upsertCity(client, cityName, sourceCityId) {
 }
 
 async function upsertVenue(client, event, place, cityId) {
-  const venueTitle = cleanTitle(place.name) || cleanTitle(event.place) || "Место отправления Teplohod";
+  const rawTitle = cleanTitle(place.name) || cleanTitle(event.place) || "Место отправления Teplohod";
   const externalPlaceId = place.id || event.id;
-  const slug = slugify(`${venueTitle}-${externalPlaceId}`);
+  const slug = slugify(`${rawTitle}-${externalPlaceId}`);
   const latitude = floatOrNull(place.lat);
   const longitude = floatOrNull(place.lng);
   const canonVenueId = TEP_PLACE_CANON_VENUE_IDS.get(String(externalPlaceId)) || null;
+  const canon = applyVenueAddressCanon({
+    id: canonVenueId || `venue_tep_${externalPlaceId}`,
+    title: rawTitle,
+    name: rawTitle,
+    address: place.address || null,
+    slug,
+  });
+  const venueTitle = canon.title || rawTitle;
+  const venueAddress = canon.address || place.address || null;
   const result = await client.query(
     `
       insert into "Venue" (id, slug, title, description, "shortDescription", "heroImageUrl", "cityId", address, latitude, longitude, kind, "pageStatus", "createdAt", "updatedAt")
@@ -402,7 +413,7 @@ async function upsertVenue(client, event, place, cityId) {
       cleanTitle(event.place) || null,
       firstImage(event.images),
       cityId,
-      place.address || null,
+      venueAddress,
       latitude,
       longitude,
     ],
@@ -420,6 +431,15 @@ async function upsertVenue(client, event, place, cityId) {
       `,
       [tepVenueId],
     );
+    // Keep canon title/address on every TEP import (supplier may send bare house 10).
+    await client.query(
+      `
+        update "Venue"
+        set title = $2, address = $3, kind = 'PIER', "updatedAt" = now()
+        where id = $1
+      `,
+      [canonVenueId, venueTitle, venueAddress],
+    );
   }
 
   await client.query(
@@ -436,7 +456,7 @@ async function upsertVenue(client, event, place, cityId) {
       attachVenueId,
       String(externalPlaceId),
       venueTitle,
-      place.address || null,
+      venueAddress,
     ],
   );
   return attachVenueId;

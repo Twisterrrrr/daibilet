@@ -429,7 +429,16 @@ function normalizePierVenueAddress(address, city) {
   if (stripped && stripped !== text) {
     text = normalizePublicVenueAddress(stripped, city) || stripped;
   }
-  return text;
+  return rewriteSinopskayaHouseNumber(text);
+}
+
+/** Owner canon: Синопская наб. house is 10А (Cyrillic А), never bare 10 after import. */
+function rewriteSinopskayaHouseNumber(value) {
+  const text = String(value || '');
+  if (!text || !/синопск/iu.test(text)) return text;
+  return text
+    .replace(/,\s*10(?![АаAa\d])(?=\s*(?:,|$))/gu, ', 10А')
+    .replace(/(\s)10(?![АаAa\d])(?=\s*(?:,|$))/gu, '$110А');
 }
 
 function normalizeComparableStreet(value) {
@@ -488,7 +497,8 @@ export function formatPierLocationDisplayName(name, address, city) {
     return title;
   }
 
-  return shortAddress ? `Причал — ${shortAddress}` : 'Причал';
+  // Like bus boarding points: badge already says «Причал», no decorative dash prefix.
+  return shortAddress || 'Причал';
 }
 
 export function formatBusLocationDisplayName(name, address, city) {
@@ -575,6 +585,9 @@ export function normalizePublicVenueRecord(input = {}) {
   if (isPierLikeVenueText(title, address)) {
     address = normalizePierVenueAddress(address, city);
   }
+
+  title = rewriteSinopskayaHouseNumber(title);
+  address = rewriteSinopskayaHouseNumber(address);
 
   if (override?.title) title = override.title;
   if (override?.address) address = override.address;
