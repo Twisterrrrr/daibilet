@@ -56,12 +56,11 @@ function mainPlacesPhrase(count: number): string {
 }
 
 /**
- * Same gutter/text vertical as DayTripCanonCard (owner red line):
- * nums hang in left gutter; title / stop names / CTA share one text column.
+ * Scenarios have no hanging title number (unlike DayTripCanonCard).
+ * Stops stay flush with the title column - no empty gutter on the left.
  */
-const PRESET_GRID =
-  'grid grid-cols-[2rem_minmax(0,1fr)] gap-x-2.5 sm:grid-cols-[2.25rem_minmax(0,1fr)] sm:gap-x-3';
-const PRESET_GUTTER = 'flex justify-center';
+const STOP_ROW = 'flex items-start gap-1.5 text-sm leading-snug';
+const STOP_NUM = 'w-[1.25rem] shrink-0 tabular-nums';
 
 export function CityDayPresetBlock({
   places,
@@ -190,7 +189,7 @@ export function CityDayPresetBlock({
           panel ? 'mt-3 min-h-[11rem] sm:min-h-[12.5rem]' : ''
         }`}
         data-day-preset-card={preset.id}
-        data-day-preset-align="gutter-text"
+        data-day-preset-align="title-flush"
         {...(panel
           ? {
               id: `day-preset-panel-${preset.id}`,
@@ -200,11 +199,22 @@ export function CityDayPresetBlock({
           : {})}
       >
         <div className="flex w-full min-w-0 flex-col justify-center gap-3">
-        <div className={`${PRESET_GRID} w-full min-w-0`} data-day-preset-head>
-          <div aria-hidden className={PRESET_GUTTER} />
-          <div className="min-w-0">
-            <div className="flex items-center justify-between gap-3">
-              <p className={`min-w-0 flex-1 text-sm font-semibold leading-snug ${titleClass}`}>{preset.title}</p>
+          <div className="min-w-0" data-day-preset-head>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+              <p className={`min-w-0 text-sm font-semibold leading-snug ${titleClass}`}>{preset.title}</p>
+              {preset.blogSlug ? (
+                <Link
+                  href={`/blog/${preset.blogSlug}`}
+                  className={`inline-flex items-center gap-0.5 text-xs font-medium underline underline-offset-2 transition-colors ${
+                    editorial
+                      ? 'text-sky-700 hover:text-sky-800'
+                      : 'text-primary-600 hover:text-primary-700'
+                  }`}
+                >
+                  Читать об этом в блоге
+                  <ArrowUpRight className="h-3 w-3 shrink-0 opacity-80" aria-hidden />
+                </Link>
+              ) : null}
               {available ? (
                 <button
                   type="button"
@@ -218,71 +228,51 @@ export function CityDayPresetBlock({
                 </button>
               ) : null}
             </div>
-            {preset.blogSlug ? (
-              <Link
-                href={`/blog/${preset.blogSlug}`}
-                className={`mt-1 inline-flex items-center gap-0.5 text-xs font-medium underline underline-offset-2 transition-colors ${
-                  editorial
-                    ? 'text-sky-700 hover:text-sky-800'
-                    : 'text-primary-600 hover:text-primary-700'
-                }`}
-              >
-                Читать об этом в блоге
-                <ArrowUpRight className="h-3 w-3 shrink-0 opacity-80" aria-hidden />
-              </Link>
-            ) : null}
             {preset.timingNote?.trim() ? (
-              <p className={`mt-1 text-[12px] leading-4 ${mutedClass}`} data-day-preset-timing>
+              <p className={`mt-1.5 text-[12px] leading-4 ${mutedClass}`} data-day-preset-timing>
                 {preset.timingNote.trim()}
               </p>
             ) : null}
           </div>
-        </div>
-        {available ? (
-          <ol
-            className={`mt-0 list-none p-0 ${
-              useTwoCol
-                ? 'columns-1 gap-y-0 md:columns-2 md:gap-x-8 lg:gap-x-10'
-                : ''
-            }`}
-            data-day-preset-stops
-            data-day-preset-stops-layout={useTwoCol ? 'two-col' : 'one-col'}
-          >
-            {items.map((item, stopIndex) => {
-              const tip = formatDayRouteTransitTipLine(
-                item.transitTip || preset.stops?.[stopIndex]?.transitTip,
-              );
-              return (
-                <li
-                  key={`${item.id}:${stopIndex}`}
-                  className="mb-2 list-none break-inside-avoid last:mb-0 md:mb-2.5"
-                  data-day-preset-stop
-                >
-                  {tip ? (
-                    <div className={`mb-0.5 ${PRESET_GRID}`}>
-                      <span aria-hidden />
+          {available ? (
+            <ol
+              className={`mt-0 list-none p-0 ${
+                useTwoCol
+                  ? 'columns-1 gap-y-0 md:columns-2 md:gap-x-8 lg:gap-x-10'
+                  : ''
+              }`}
+              data-day-preset-stops
+              data-day-preset-stops-layout={useTwoCol ? 'two-col' : 'one-col'}
+            >
+              {items.map((item, stopIndex) => {
+                const tip = formatDayRouteTransitTipLine(
+                  item.transitTip || preset.stops?.[stopIndex]?.transitTip,
+                );
+                return (
+                  <li
+                    key={`${item.id}:${stopIndex}`}
+                    className="mb-2 list-none break-inside-avoid last:mb-0 md:mb-2.5"
+                    data-day-preset-stop
+                  >
+                    {tip ? (
                       <p
-                        className={`min-w-0 text-[11px] leading-snug ${mutedClass}`}
+                        className={`mb-0.5 min-w-0 pl-[calc(1.25rem+0.375rem)] text-[11px] leading-snug ${mutedClass}`}
                         data-day-preset-transit-tip
                       >
                         {tip}
                       </p>
+                    ) : null}
+                    <div className={STOP_ROW}>
+                      <span className={`${STOP_NUM} ${numClass}`} data-day-preset-stop-num>
+                        {stopIndex + 1}.
+                      </span>
+                      <span className={`min-w-0 ${softClass}`}>{item.title}</span>
                     </div>
-                  ) : null}
-                  <div className={`${PRESET_GRID} text-sm leading-snug`}>
-                    <span
-                      className={`${PRESET_GUTTER} tabular-nums ${numClass}`}
-                      data-day-preset-stop-num
-                    >
-                      {stopIndex + 1}.
-                    </span>
-                    <span className={`min-w-0 ${softClass}`}>{item.title}</span>
-                  </div>
-                </li>
-              );
-            })}
-          </ol>
-        ) : null}
+                  </li>
+                );
+              })}
+            </ol>
+          ) : null}
         </div>
       </div>
     );

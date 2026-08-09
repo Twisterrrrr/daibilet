@@ -1,3 +1,17 @@
+## 2026-08-10 - Scenarios panel: title-flush, blog+CTA one row
+
+### Наблюдения
+- Owner: пустой gutter слева от заголовка (нет цифры сценария); «Читать в блоге» под title; «В маршрут» справа отдельно.
+
+### Решения
+- `CityDayPresetBlock`: drop hanging num grid (`title-flush`); stops `1. Name` с левого края title.
+- Head row: title + blog link + «В маршрут» в одной wrap-строке; timing ниже.
+
+### Проблемы
+- Deploy по «выкатывай».
+
+---
+
 ## 2026-08-09 - `/events` mobile: search + date/type selects
 
 ### Наблюдения
