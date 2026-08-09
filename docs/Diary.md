@@ -28,7 +28,7 @@
 - Coords: +16 в `suburb-nested-coords.json`; web + public `cityInfo`.
 
 ### Проблемы
-- Deploy/BUILD_ID - ниже после ship.
+- Ship: `088cfe71` · Deploy MSK web **31301708432** · **BUILD_ID=`f1YPffw6I_wxfeh3iRANZ`**; SPB hub 200 + «Большой дворец Петергофа» в HTML.
 
 ---
 
