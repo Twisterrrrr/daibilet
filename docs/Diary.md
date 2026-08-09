@@ -13,6 +13,21 @@
 
 ---
 
+## 2026-08-09 - `/cities` clean first screen + card tags
+
+### Наблюдения
+- Owner: без серого lead; placeholder в поиске; vibe без эмодзи (hover md+); region как chip рядом с hub tags.
+
+### Решения
+- Hero: drop description; placeholder Scenario 1; Lucky CTA «Куда поехать?»; sort `?sort=popular|name` для `#cities-all`.
+- CityCard: hubTags + region chip; vibe Lucide muted, hidden mobile / opacity on desktop hover.
+- `city-vibe-tags`: emoji → Lucide icon keys.
+
+### Проблемы
+- Deploy по «выкатывай».
+
+---
+
 ## 2026-08-09 - scenarios CTA beside title + batch MSK web deploy
 
 ### Наблюдения

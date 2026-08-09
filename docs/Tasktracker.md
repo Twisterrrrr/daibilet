@@ -2,6 +2,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
+| UX.CITIES-CATALOG-CLEAN | `/cities` clean hero + hub/region chips; vibe Lucide hover (no emoji) | Высокий | 🔄 ship |
 | UX.SCENARIOS-TWO-COL | Hub/my-day scenarios: 2-col stops; CTA beside title + panel v-center | Высокий | ✅ `07dcb587` Deploy `31334844554` |
 | UX.EVENTS-YANDEX-LITE | `/events` P1-P4: date rail, category Ещё, search hints, real live rail (no P5) | Высокий | ✅ `d59fd28e` Deploy `31334844554` |
 | UX.EVENTS-CATALOG-REDESIGN | `/events` mobile-first: compact hero, filters FAB, modern cards 1/2/3/4 | Высокий | ✅ `d51eb4a2` / live `910faa55` |

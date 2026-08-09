@@ -15,14 +15,36 @@ function pluralEvents(n: number): string {
   return `${n} событий`;
 }
 
+function shortRegionLabel(name: string): string {
+  const trimmed = name.trim();
+  if (trimmed.length <= 22) return trimmed;
+  return `${trimmed.slice(0, 20)}…`;
+}
+
 export function RegionDestinationLink({
   region,
   className = '',
+  variant = 'row',
 }: {
   region: Pick<PublicDestinationDto, 'slug' | 'name' | 'events'>;
   className?: string;
+  /** `chip` - compact gray pill for city cards; `row` - legacy full-width link. */
+  variant?: 'row' | 'chip';
 }) {
   if (!region.events) return null;
+
+  if (variant === 'chip') {
+    return (
+      <Link
+        href={cityHref(region)}
+        title={`${region.name}: ${pluralEvents(region.events)}`}
+        className={`inline-flex max-w-full items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600 transition hover:bg-slate-200 hover:text-slate-800 sm:text-xs ${className}`.trim()}
+      >
+        <span className="truncate">+ {shortRegionLabel(region.name)}</span>
+        <span className="shrink-0 tabular-nums text-slate-400">{region.events}</span>
+      </Link>
+    );
+  }
 
   return (
     <Link

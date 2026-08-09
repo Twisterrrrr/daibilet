@@ -1,7 +1,40 @@
 'use client';
 
 import Link from 'next/link';
-import { Landmark, MapPin } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import {
+  Anchor,
+  Bridge,
+  Building2,
+  Cake,
+  Church,
+  Clapperboard,
+  Droplets,
+  Factory,
+  Fish,
+  Flame,
+  Gem,
+  GraduationCap,
+  Landmark,
+  MapPin,
+  Microscope,
+  Moon,
+  Mountain,
+  Music,
+  Palette,
+  Rocket,
+  Shield,
+  Ship,
+  Snowflake,
+  Sparkles,
+  Sunrise,
+  Sun,
+  Swords,
+  Train,
+  Trees,
+  Umbrella,
+  Waves,
+} from 'lucide-react';
 
 import { CountUp } from '@/components/CountUp.client';
 import { RegionDestinationLink } from '@/components/RegionDestinationLink';
@@ -11,7 +44,7 @@ import { CITY_CARD_ASPECT_CLASS, cityCardTitleClass } from '@/lib/city-card-styl
 import { resolveCityImageObjectPosition } from '@/lib/city-image-focus';
 import { resolveCityCardImage } from '@/lib/city-images';
 import type { CityCardRegion } from '@/lib/cityRegionHub';
-import { resolveCityVibeTags } from '@/lib/city-vibe-tags';
+import { resolveCityVibeTags, type CityVibeIconName } from '@/lib/city-vibe-tags';
 import { landingCategoryHref } from '@/lib/landing-routes';
 import { cityHref } from '@/lib/routes';
 import { pluralEvents, pluralVenues } from '@/lib/format';
@@ -30,14 +63,55 @@ type CityCardProps = {
   tone?: 'dark' | 'light';
 };
 
-function CityHubTags({ city }: { city: PublicDestinationDto }) {
+const VIBE_ICONS: Record<CityVibeIconName, LucideIcon> = {
+  Building2,
+  Clapperboard,
+  Train,
+  Moon,
+  Bridge,
+  Landmark,
+  Waves,
+  Sun,
+  Mountain,
+  Trees,
+  Factory,
+  Palette,
+  Ship,
+  Sunrise,
+  Umbrella,
+  Rocket,
+  Microscope,
+  Gem,
+  Church,
+  Swords,
+  Flame,
+  Music,
+  Snowflake,
+  Cake,
+  Fish,
+  Anchor,
+  Droplets,
+  GraduationCap,
+  Shield,
+  Sparkles,
+  MapPin,
+};
+
+function CityHubTags({
+  city,
+  region,
+}: {
+  city: PublicDestinationDto;
+  region?: CityCardRegion | null;
+}) {
   const tags = (city.hubTags || []).slice(0, 3);
-  if (!tags.length) return null;
+  const showRegion = Boolean(region && region.eventCount > 0);
+  if (!tags.length && !showRegion) return null;
   const citySlug = city.slug || city.sourceSlug || undefined;
 
   return (
     <ul
-      className="mt-2 flex min-w-0 flex-wrap gap-x-1.5 gap-y-1"
+      className="mt-2 flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-1"
       aria-label={`Популярные направления: ${city.name}`}
     >
       {tags.map((tag) => {
@@ -58,6 +132,14 @@ function CityHubTags({ city }: { city: PublicDestinationDto }) {
           </li>
         );
       })}
+      {showRegion && region ? (
+        <li className="min-w-0">
+          <RegionDestinationLink
+            region={{ slug: region.slug, name: region.name, events: region.eventCount }}
+            variant="chip"
+          />
+        </li>
+      ) : null}
     </ul>
   );
 }
@@ -67,15 +149,21 @@ function CityVibeRow({ city }: { city: PublicDestinationDto }) {
   if (!vibes.length) return null;
 
   return (
-    <ul className="mt-2 flex min-w-0 flex-wrap gap-1" aria-label={`Вайб: ${city.name}`}>
-      {vibes.map((tag) => (
-        <li key={tag.label}>
-          <span className="inline-flex items-center gap-1 rounded-md bg-slate-100/90 px-1.5 py-0.5 text-xs font-medium text-slate-700">
-            <span aria-hidden>{tag.emoji}</span>
-            {tag.label}
-          </span>
-        </li>
-      ))}
+    <ul
+      className="mt-2 hidden min-w-0 flex-wrap gap-1 opacity-0 transition-opacity duration-200 md:flex md:group-hover/city:opacity-100"
+      aria-label={`Вайб: ${city.name}`}
+    >
+      {vibes.map((tag) => {
+        const Icon = VIBE_ICONS[tag.icon] || MapPin;
+        return (
+          <li key={tag.label}>
+            <span className="inline-flex items-center gap-1 rounded-md bg-slate-100/90 px-1.5 py-0.5 text-xs font-medium text-slate-600">
+              <Icon className="h-3 w-3 shrink-0 text-slate-500" strokeWidth={1.75} aria-hidden />
+              {tag.label}
+            </span>
+          </li>
+        );
+      })}
     </ul>
   );
 }
@@ -101,7 +189,7 @@ export function CityCard({
   const isLight = tone === 'light';
 
   return (
-    <div className="flex min-w-0 flex-col">
+    <div className="group/city flex min-w-0 flex-col">
       <Link
         href={href}
         className={`card group relative block overflow-hidden transition-all duration-300 hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 ${
@@ -154,7 +242,7 @@ export function CityCard({
               } ${compact ? 'text-[11px] sm:text-xs' : 'text-xs sm:text-sm'}`}
             >
               <span className="flex min-w-0 items-center gap-1.5">
-                <MapPin className="h-3.5 w-3.5 shrink-0" />
+                <MapPin className="h-3.5 w-3.5 shrink-0 opacity-90" strokeWidth={1.75} />
                 {city.events > 0 ? (
                   <CountUp
                     value={city.events}
@@ -171,7 +259,7 @@ export function CityCard({
                     isLight ? 'text-slate-500' : 'text-white/75'
                   }`}
                 >
-                  <Landmark className="h-3.5 w-3.5 shrink-0" />
+                  <Landmark className="h-3.5 w-3.5 shrink-0 opacity-90" strokeWidth={1.75} />
                   <span className="truncate">{pluralVenues(city.venues)}</span>
                 </span>
               ) : null}
@@ -180,15 +268,8 @@ export function CityCard({
         </div>
       </Link>
 
+      <CityHubTags city={city} region={region} />
       <CityVibeRow city={city} />
-      <CityHubTags city={city} />
-
-      {region && region.eventCount > 0 ? (
-        <RegionDestinationLink
-          region={{ slug: region.slug, name: region.name, events: region.eventCount }}
-          className="mt-2"
-        />
-      ) : null}
     </div>
   );
 }

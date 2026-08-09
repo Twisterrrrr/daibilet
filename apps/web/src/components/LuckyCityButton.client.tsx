@@ -171,7 +171,7 @@ export function LuckyCityButton({ cities, className = '', variant = 'hero' }: Lu
     <>
       <button type="button" onClick={spin} disabled={spinning} className={`${buttonClass} ${className}`.trim()}>
         <Dices className="h-3.5 w-3.5" aria-hidden />
-        Куда поехать? Выбрать случайно
+        Куда поехать?
       </button>
       {modal}
     </>

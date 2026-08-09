@@ -1,222 +1,256 @@
 /**
  * Static vibe tags for `/cities` cards - mood/place hooks, not landing chips.
  * Keys = canonical city slugs (+ common aliases). Copy uses regular hyphen `-`.
+ * `icon` = Lucide icon name rendered by CityCard (muted line icons, no emoji).
  */
 
+export type CityVibeIconName =
+  | 'Building2'
+  | 'Clapperboard'
+  | 'Train'
+  | 'Moon'
+  | 'Bridge'
+  | 'Landmark'
+  | 'Waves'
+  | 'Sun'
+  | 'Mountain'
+  | 'Trees'
+  | 'Factory'
+  | 'Palette'
+  | 'Ship'
+  | 'Sunrise'
+  | 'Umbrella'
+  | 'Rocket'
+  | 'Microscope'
+  | 'Gem'
+  | 'Church'
+  | 'Swords'
+  | 'Flame'
+  | 'Music'
+  | 'Snowflake'
+  | 'Cake'
+  | 'Fish'
+  | 'Anchor'
+  | 'Droplets'
+  | 'GraduationCap'
+  | 'Shield'
+  | 'Sparkles'
+  | 'MapPin';
+
 export type CityVibeTag = {
-  emoji: string;
+  icon: CityVibeIconName;
   label: string;
 };
 
 const CITY_VIBE_TAGS: Record<string, CityVibeTag[]> = {
   moscow: [
-    { emoji: '🏙', label: 'Столица' },
-    { emoji: '🎭', label: 'Театры' },
-    { emoji: '🚇', label: 'Метро' },
-    { emoji: '🌃', label: 'Ночная жизнь' },
+    { icon: 'Building2', label: 'Столица' },
+    { icon: 'Clapperboard', label: 'Театры' },
+    { icon: 'Train', label: 'Метро' },
+    { icon: 'Moon', label: 'Ночная жизнь' },
   ],
   'saint-petersburg': [
-    { emoji: '🌉', label: 'Мосты' },
-    { emoji: '🏛', label: 'Эрмитаж' },
-    { emoji: '🌊', label: 'Нева' },
-    { emoji: '🤍', label: 'Белые ночи' },
+    { icon: 'Bridge', label: 'Мосты' },
+    { icon: 'Landmark', label: 'Эрмитаж' },
+    { icon: 'Waves', label: 'Нева' },
+    { icon: 'Sun', label: 'Белые ночи' },
   ],
   kazan: [
-    { emoji: '🏰', label: 'Кремль' },
-    { emoji: '🏙', label: 'Третья столица' },
-    { emoji: '🥟', label: 'Эчпочмак' },
-    { emoji: '🕌', label: 'Кул-Шариф' },
+    { icon: 'Landmark', label: 'Кремль' },
+    { icon: 'Building2', label: 'Третья столица' },
+    { icon: 'Cake', label: 'Эчпочмак' },
+    { icon: 'Church', label: 'Кул-Шариф' },
   ],
   sochi: [
-    { emoji: '🌊', label: 'Море' },
-    { emoji: '🏔', label: 'Горы' },
-    { emoji: '☀️', label: 'Курорт' },
-    { emoji: '🏞', label: 'Олимпийский парк' },
+    { icon: 'Waves', label: 'Море' },
+    { icon: 'Mountain', label: 'Горы' },
+    { icon: 'Sun', label: 'Курорт' },
+    { icon: 'Trees', label: 'Олимпийский парк' },
   ],
   ekaterinburg: [
-    { emoji: '🏭', label: 'Урал' },
-    { emoji: '🎨', label: 'Стрит-арт' },
-    { emoji: '🏙', label: 'Ельцин Центр' },
+    { icon: 'Factory', label: 'Урал' },
+    { icon: 'Palette', label: 'Стрит-арт' },
+    { icon: 'Building2', label: 'Ельцин Центр' },
   ],
   'nizhny-novgorod': [
-    { emoji: '🛳', label: 'Стрелка' },
-    { emoji: '🏰', label: 'Кремль' },
-    { emoji: '🌅', label: 'Закаты' },
+    { icon: 'Ship', label: 'Стрелка' },
+    { icon: 'Landmark', label: 'Кремль' },
+    { icon: 'Sunrise', label: 'Закаты' },
   ],
   kaliningrad: [
-    { emoji: '🌊', label: 'Балтика' },
-    { emoji: '🏰', label: 'Форты' },
-    { emoji: '🏖', label: 'Янтарный берег' },
+    { icon: 'Waves', label: 'Балтика' },
+    { icon: 'Landmark', label: 'Форты' },
+    { icon: 'Umbrella', label: 'Янтарный берег' },
   ],
   samara: [
-    { emoji: '🛳', label: 'Волга' },
-    { emoji: '🏖', label: 'Набережная' },
-    { emoji: '🚀', label: 'Космос' },
+    { icon: 'Ship', label: 'Волга' },
+    { icon: 'Umbrella', label: 'Набережная' },
+    { icon: 'Rocket', label: 'Космос' },
   ],
   novosibirsk: [
-    { emoji: '🌲', label: 'Сибирь' },
-    { emoji: '🎭', label: 'Опера' },
-    { emoji: '🔬', label: 'Академгородок' },
+    { icon: 'Trees', label: 'Сибирь' },
+    { icon: 'Clapperboard', label: 'Опера' },
+    { icon: 'Microscope', label: 'Академгородок' },
   ],
   krasnodar: [
-    { emoji: '🌳', label: 'Юг' },
-    { emoji: '🏛', label: 'Парк Галицкого' },
-    { emoji: '☀️', label: 'Солнечно' },
+    { icon: 'Trees', label: 'Юг' },
+    { icon: 'Landmark', label: 'Парк Галицкого' },
+    { icon: 'Sun', label: 'Солнечно' },
   ],
   vladivostok: [
-    { emoji: '🌉', label: 'Мосты' },
-    { emoji: '🌊', label: 'Океан' },
-    { emoji: '🦀', label: 'Дальний Восток' },
+    { icon: 'Bridge', label: 'Мосты' },
+    { icon: 'Waves', label: 'Океан' },
+    { icon: 'MapPin', label: 'Дальний Восток' },
   ],
   irkutsk: [
-    { emoji: '💎', label: 'Байкал' },
-    { emoji: '🪵', label: 'Деревянный' },
-    { emoji: '🏞', label: 'Сибирь' },
+    { icon: 'Gem', label: 'Байкал' },
+    { icon: 'Trees', label: 'Деревянный' },
+    { icon: 'Mountain', label: 'Сибирь' },
   ],
   yaroslavl: [
-    { emoji: '🛳', label: 'Золотое кольцо' },
-    { emoji: '🏛', label: 'Храмы' },
-    { emoji: '🌊', label: 'Волга' },
+    { icon: 'Ship', label: 'Золотое кольцо' },
+    { icon: 'Church', label: 'Храмы' },
+    { icon: 'Waves', label: 'Волга' },
   ],
   vladimir: [
-    { emoji: '💍', label: 'Золотое кольцо' },
-    { emoji: '🏛', label: 'Белый камень' },
-    { emoji: '⛪', label: 'Успенский собор' },
+    { icon: 'Gem', label: 'Золотое кольцо' },
+    { icon: 'Landmark', label: 'Белый камень' },
+    { icon: 'Church', label: 'Успенский собор' },
   ],
   'veliky-novgorod': [
-    { emoji: '⚔', label: 'Древняя Русь' },
-    { emoji: '🏛', label: 'Кремль' },
-    { emoji: '🌊', label: 'Волхов' },
+    { icon: 'Swords', label: 'Древняя Русь' },
+    { icon: 'Landmark', label: 'Кремль' },
+    { icon: 'Waves', label: 'Волхов' },
   ],
   volgograd: [
-    { emoji: '🕯', label: 'Мамаев курган' },
-    { emoji: '🛳', label: 'Волга' },
-    { emoji: '🏛', label: 'Память' },
+    { icon: 'Flame', label: 'Мамаев курган' },
+    { icon: 'Ship', label: 'Волга' },
+    { icon: 'Landmark', label: 'Память' },
   ],
   'rostov-na-donu': [
-    { emoji: '🎭', label: 'Южная столица' },
-    { emoji: '🌊', label: 'Дон' },
-    { emoji: '🎷', label: 'Джаз' },
+    { icon: 'Clapperboard', label: 'Южная столица' },
+    { icon: 'Waves', label: 'Дон' },
+    { icon: 'Music', label: 'Джаз' },
   ],
   'rostov-on-don': [
-    { emoji: '🎭', label: 'Южная столица' },
-    { emoji: '🌊', label: 'Дон' },
-    { emoji: '🎷', label: 'Джаз' },
+    { icon: 'Clapperboard', label: 'Южная столица' },
+    { icon: 'Waves', label: 'Дон' },
+    { icon: 'Music', label: 'Джаз' },
   ],
   perm: [
-    { emoji: '🎭', label: 'Театр' },
-    { emoji: '🏔', label: 'Урал' },
-    { emoji: '🎨', label: 'Пермский стиль' },
+    { icon: 'Clapperboard', label: 'Театр' },
+    { icon: 'Mountain', label: 'Урал' },
+    { icon: 'Palette', label: 'Пермский стиль' },
   ],
   ufa: [
-    { emoji: '🍯', label: 'Башкирия' },
-    { emoji: '🏔', label: 'Урал' },
-    { emoji: '🎭', label: 'Театр' },
+    { icon: 'Sparkles', label: 'Башкирия' },
+    { icon: 'Mountain', label: 'Урал' },
+    { icon: 'Clapperboard', label: 'Театр' },
   ],
   chelyabinsk: [
-    { emoji: '🏔', label: 'Урал' },
-    { emoji: '🏭', label: 'Металлургия' },
-    { emoji: '❄️', label: 'Зима' },
+    { icon: 'Mountain', label: 'Урал' },
+    { icon: 'Factory', label: 'Металлургия' },
+    { icon: 'Snowflake', label: 'Зима' },
   ],
   tula: [
-    { emoji: '🍞', label: 'Пряник' },
-    { emoji: '⚔', label: 'Оружие' },
-    { emoji: '🏰', label: 'Кремль' },
+    { icon: 'Cake', label: 'Пряник' },
+    { icon: 'Swords', label: 'Оружие' },
+    { icon: 'Landmark', label: 'Кремль' },
   ],
   kostroma: [
-    { emoji: '💍', label: 'Золотое кольцо' },
-    { emoji: '🏛', label: 'Ипатьевский' },
-    { emoji: '🛳', label: 'Волга' },
+    { icon: 'Gem', label: 'Золотое кольцо' },
+    { icon: 'Landmark', label: 'Ипатьевский' },
+    { icon: 'Ship', label: 'Волга' },
   ],
   astrahan: [
-    { emoji: '🐟', label: 'Волга-дельта' },
-    { emoji: '🏰', label: 'Кремль' },
-    { emoji: '🍉', label: 'Арбузы' },
+    { icon: 'Fish', label: 'Волга-дельта' },
+    { icon: 'Landmark', label: 'Кремль' },
+    { icon: 'Sun', label: 'Арбузы' },
   ],
   murmansk: [
-    { emoji: '❄️', label: 'Заполярье' },
-    { emoji: '🚢', label: 'Порт' },
-    { emoji: '🌌', label: 'Северное сияние' },
+    { icon: 'Snowflake', label: 'Заполярье' },
+    { icon: 'Ship', label: 'Порт' },
+    { icon: 'Sparkles', label: 'Северное сияние' },
   ],
   sevastopol: [
-    { emoji: '🌊', label: 'Чёрное море' },
-    { emoji: '⚓', label: 'Флот' },
-    { emoji: '🏛', label: 'История' },
+    { icon: 'Waves', label: 'Чёрное море' },
+    { icon: 'Anchor', label: 'Флот' },
+    { icon: 'Landmark', label: 'История' },
   ],
   tyumen: [
-    { emoji: '🛁', label: 'Термы' },
-    { emoji: '🛢', label: 'Нефть' },
-    { emoji: '🏙', label: 'Сибирь' },
+    { icon: 'Droplets', label: 'Термы' },
+    { icon: 'Flame', label: 'Нефть' },
+    { icon: 'Building2', label: 'Сибирь' },
   ],
   krasnoyarsk: [
-    { emoji: '🏔', label: 'Столбы' },
-    { emoji: '🌊', label: 'Енисей' },
-    { emoji: '🌲', label: 'Сибирь' },
+    { icon: 'Mountain', label: 'Столбы' },
+    { icon: 'Waves', label: 'Енисей' },
+    { icon: 'Trees', label: 'Сибирь' },
   ],
   voronezh: [
-    { emoji: '🛳', label: 'Корабль' },
-    { emoji: '🌳', label: 'Черноземье' },
-    { emoji: '🎭', label: 'Театр' },
+    { icon: 'Ship', label: 'Корабль' },
+    { icon: 'Trees', label: 'Черноземье' },
+    { icon: 'Clapperboard', label: 'Театр' },
   ],
   omsk: [
-    { emoji: '🛳', label: 'Иртыш' },
-    { emoji: '🏙', label: 'Сибирь' },
-    { emoji: '🎭', label: 'Театр' },
+    { icon: 'Ship', label: 'Иртыш' },
+    { icon: 'Building2', label: 'Сибирь' },
+    { icon: 'Clapperboard', label: 'Театр' },
   ],
   tomsk: [
-    { emoji: '🎓', label: 'Студенческий' },
-    { emoji: '🪵', label: 'Деревянный' },
-    { emoji: '🌲', label: 'Сибирь' },
+    { icon: 'GraduationCap', label: 'Студенческий' },
+    { icon: 'Trees', label: 'Деревянный' },
+    { icon: 'Trees', label: 'Сибирь' },
   ],
   habarovsk: [
-    { emoji: '🌊', label: 'Амур' },
-    { emoji: '🦀', label: 'Дальний Восток' },
-    { emoji: '🌅', label: 'Набережная' },
+    { icon: 'Waves', label: 'Амур' },
+    { icon: 'MapPin', label: 'Дальний Восток' },
+    { icon: 'Sunrise', label: 'Набережная' },
   ],
   'yuzhno-sahalinsk': [
-    { emoji: '🏔', label: 'Сахалин' },
-    { emoji: '🌊', label: 'Океан' },
-    { emoji: '🦀', label: 'Остров' },
+    { icon: 'Mountain', label: 'Сахалин' },
+    { icon: 'Waves', label: 'Океан' },
+    { icon: 'MapPin', label: 'Остров' },
   ],
   sortavala: [
-    { emoji: '🏞', label: 'Ладога' },
-    { emoji: '⛰', label: 'Карелия' },
-    { emoji: '🌲', label: 'Север' },
+    { icon: 'Waves', label: 'Ладога' },
+    { icon: 'Mountain', label: 'Карелия' },
+    { icon: 'Trees', label: 'Север' },
   ],
   pskov: [
-    { emoji: '🏰', label: 'Кремль' },
-    { emoji: '⚔', label: 'Древняя Русь' },
-    { emoji: '🏛', label: 'Храмы' },
+    { icon: 'Landmark', label: 'Кремль' },
+    { icon: 'Swords', label: 'Древняя Русь' },
+    { icon: 'Church', label: 'Храмы' },
   ],
   smolensk: [
-    { emoji: '🏰', label: 'Крепость' },
-    { emoji: '🛡', label: 'Щит России' },
-    { emoji: '🏛', label: 'История' },
+    { icon: 'Landmark', label: 'Крепость' },
+    { icon: 'Shield', label: 'Щит России' },
+    { icon: 'Landmark', label: 'История' },
   ],
   kaluga: [
-    { emoji: '🚀', label: 'Космос' },
-    { emoji: '🏛', label: 'Циолковский' },
-    { emoji: '🌳', label: 'Центр' },
+    { icon: 'Rocket', label: 'Космос' },
+    { icon: 'Landmark', label: 'Циолковский' },
+    { icon: 'Trees', label: 'Центр' },
   ],
   tver: [
-    { emoji: '🛳', label: 'Волга' },
-    { emoji: '🏙', label: 'Между столицами' },
-    { emoji: '🌳', label: 'Прогулки' },
+    { icon: 'Ship', label: 'Волга' },
+    { icon: 'Building2', label: 'Между столицами' },
+    { icon: 'Trees', label: 'Прогулки' },
   ],
   saratov: [
-    { emoji: '🛳', label: 'Волга' },
-    { emoji: '🏙', label: 'Набережная' },
-    { emoji: '🎭', label: 'Театр' },
+    { icon: 'Ship', label: 'Волга' },
+    { icon: 'Building2', label: 'Набережная' },
+    { icon: 'Clapperboard', label: 'Театр' },
   ],
   vologda: [
-    { emoji: '🧈', label: 'Масло' },
-    { emoji: '🪵', label: 'Деревянный' },
-    { emoji: '❄', label: 'Север' },
+    { icon: 'Cake', label: 'Масло' },
+    { icon: 'Trees', label: 'Деревянный' },
+    { icon: 'Snowflake', label: 'Север' },
   ],
   arhangelsk: [
-    { emoji: '🚢', label: 'Белое море' },
-    { emoji: '🪵', label: 'Малые Корелы' },
-    { emoji: '❄', label: 'Север' },
+    { icon: 'Ship', label: 'Белое море' },
+    { icon: 'Trees', label: 'Малые Корелы' },
+    { icon: 'Snowflake', label: 'Север' },
   ],
 };
 

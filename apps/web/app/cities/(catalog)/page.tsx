@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 
 import { CitiesCatalogView } from '@/components/CitiesCatalogView.client';
 import { CitiesHeroSearch } from '@/components/CitiesHeroSearch.client';
@@ -68,9 +69,14 @@ export default async function CitiesIndexPage() {
         variant="minimal"
         breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Города' }]}
         title="Города России"
-        description="Выберите город - покажем афишу, площадки и подборки с актуальными событиями и билетами на них."
       >
-        <CitiesHeroSearch destinations={cities} />
+        <Suspense
+          fallback={
+            <div className="mt-5 h-24 max-w-xl animate-pulse rounded-2xl bg-slate-100" aria-hidden />
+          }
+        >
+          <CitiesHeroSearch destinations={cities} />
+        </Suspense>
         {topCities.length ? (
           <ul className="mt-6 grid w-full grid-cols-2 content-start gap-2.5 sm:grid-cols-3 lg:grid-cols-4">
             {topCities.map((city) => (
@@ -123,7 +129,9 @@ export default async function CitiesIndexPage() {
             </ul>
           </section>
         ) : null}
-        <CitiesCatalogView destinations={destinations} hideIntro excludeSlugs={featuredSlugs} />
+        <Suspense fallback={null}>
+          <CitiesCatalogView destinations={destinations} hideIntro excludeSlugs={featuredSlugs} />
+        </Suspense>
       </div>
     </SiteLayout>
   );

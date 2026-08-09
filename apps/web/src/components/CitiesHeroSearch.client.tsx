@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { Search } from 'lucide-react';
 
@@ -9,7 +10,16 @@ import type { PublicDestinationDto } from '@daibilet/contracts/public';
 import { pluralEvents } from '@/lib/format';
 import { cityHref } from '@/lib/routes';
 
+export type CitiesCatalogSort = 'popular' | 'name';
+
+export function parseCitiesCatalogSort(raw: string | null | undefined): CitiesCatalogSort {
+  return raw === 'name' ? 'name' : 'popular';
+}
+
 export function CitiesHeroSearch({ destinations }: { destinations: PublicDestinationDto[] }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const sort = parseCitiesCatalogSort(searchParams.get('sort'));
   const [query, setQuery] = useState('');
   const [focused, setFocused] = useState(false);
 
@@ -25,6 +35,17 @@ export function CitiesHeroSearch({ destinations }: { destinations: PublicDestina
 
   const showSuggestions = focused && suggestions.length > 0;
 
+  const setSort = (next: CitiesCatalogSort) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (next === 'popular') params.delete('sort');
+    else params.set('sort', next);
+    const qs = params.toString();
+    router.replace(qs ? `/cities?${qs}#cities-all` : '/cities#cities-all', { scroll: false });
+    window.requestAnimationFrame(() => {
+      document.getElementById('cities-all')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  };
+
   return (
     <div className="relative mt-5 max-w-xl">
       <label className="relative block">
@@ -36,7 +57,7 @@ export function CitiesHeroSearch({ destinations }: { destinations: PublicDestina
           onChange={(event) => setQuery(event.target.value)}
           onFocus={() => setFocused(true)}
           onBlur={() => window.setTimeout(() => setFocused(false), 150)}
-          placeholder="Найти город"
+          placeholder="Выберите город - покажем афишу, площадки и подборки..."
           className="w-full rounded-2xl border border-slate-200 bg-white py-3 pl-10 pr-4 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-primary-400 focus:ring-2 focus:ring-primary-100"
           aria-autocomplete="list"
           aria-expanded={showSuggestions}
@@ -61,22 +82,35 @@ export function CitiesHeroSearch({ destinations }: { destinations: PublicDestina
         </ul>
       ) : null}
 
-      {/* Mobile: random alone, sorts together. Desktop: all three in one row. */}
       <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2" role="group" aria-label="Быстрый переход">
         <LuckyCityButton cities={destinations} variant="hero" className="w-full sm:w-auto" />
-        <div className="flex flex-wrap items-center gap-2">
-          <a
-            href="#cities-all"
-            className="rounded-full bg-slate-900 px-3.5 py-1.5 text-xs font-semibold text-white"
+        <div className="flex flex-wrap items-center gap-2" role="radiogroup" aria-label="Сортировка списка городов">
+          <button
+            type="button"
+            role="radio"
+            aria-checked={sort === 'popular'}
+            onClick={() => setSort('popular')}
+            className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition ${
+              sort === 'popular'
+                ? 'bg-slate-900 text-white'
+                : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50'
+            }`}
           >
             Популярные
-          </a>
-          <a
-            href="#cities-all"
-            className="rounded-full bg-white px-3.5 py-1.5 text-xs font-semibold text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50"
+          </button>
+          <button
+            type="button"
+            role="radio"
+            aria-checked={sort === 'name'}
+            onClick={() => setSort('name')}
+            className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition ${
+              sort === 'name'
+                ? 'bg-slate-900 text-white'
+                : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50'
+            }`}
           >
             По алфавиту
-          </a>
+          </button>
         </div>
       </div>
     </div>

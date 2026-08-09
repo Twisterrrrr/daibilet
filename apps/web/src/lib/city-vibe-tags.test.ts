@@ -7,7 +7,7 @@ test('vibe tags: major cities return 2-4 tags', () => {
   for (const slug of ['moscow', 'saint-petersburg', 'kazan', 'sochi', 'kaliningrad']) {
     const tags = resolveCityVibeTags(slug);
     assert.ok(tags.length >= 2 && tags.length <= 4, slug);
-    assert.ok(tags.every((t) => t.emoji && t.label));
+    assert.ok(tags.every((t) => t.icon && t.label));
   }
 });
 
