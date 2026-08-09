@@ -21,16 +21,6 @@ const TYPE_GRADIENT: Record<string, string> = {
   club_bar_restaurant: 'from-teal-700 via-slate-800 to-slate-950',
 };
 
-const TYPE_TAG_CLASS: Record<string, string> = {
-  museum: 'bg-amber-500 text-white',
-  art_space: 'bg-fuchsia-600 text-white',
-  museum_art_space: 'bg-amber-500 text-white',
-  theater: 'bg-rose-600 text-white',
-  concert_hall: 'bg-indigo-600 text-white',
-  bar: 'bg-amber-700 text-white',
-  club_bar_restaurant: 'bg-teal-600 text-white',
-};
-
 type InstitutionCardVenue = VenueCatalogCard;
 
 function realRating(value: unknown): number | null {
@@ -39,11 +29,19 @@ function realRating(value: unknown): number | null {
   return Math.round(n * 10) / 10;
 }
 
-export function InstitutionCard({ venue, href }: { venue: InstitutionCardVenue; href: string }) {
+export function InstitutionCard({
+  venue,
+  href,
+  hideCity = false,
+}: {
+  venue: InstitutionCardVenue;
+  href: string;
+  /** When catalog is already city-scoped, omit city from the meta line. */
+  hideCity?: boolean;
+}) {
   const publicType = resolvePublicVenueType(venue.type, venue.name);
   const typeLabel = venueTypeLabel(publicType, venue.name);
   const gradient = TYPE_GRADIENT[publicType] || 'from-slate-700 via-slate-800 to-slate-950';
-  const tagClass = TYPE_TAG_CLASS[publicType] || 'bg-primary-600 text-white';
   const street = formatStreetAddress(venue.address, { city: venue.city });
   const blurb = dayRouteHookLine({ shortDescription: venue.shortDescription });
   const rating = realRating(venue.rating);
@@ -58,6 +56,11 @@ export function InstitutionCard({ venue, href }: { venue: InstitutionCardVenue; 
       : ownEvents > 0
         ? pluralEvents(ownEvents)
         : null;
+  const cityLabel = String(venue.city || '').trim();
+  const metaLine = [typeLabel, hideCity ? null : cityLabel || null]
+    .filter(Boolean)
+    .join(' · ')
+    .toUpperCase();
   const dayRouteVenue = {
     id: venue.id,
     slug: venue.slug,
@@ -73,8 +76,8 @@ export function InstitutionCard({ venue, href }: { venue: InstitutionCardVenue; 
   };
 
   return (
-    <div className="group relative flex flex-col overflow-hidden rounded-card bg-white shadow-card transition duration-300 hover:-translate-y-0.5 hover:shadow-card-hover">
-      <div className="relative aspect-video overflow-hidden bg-surface-muted">
+    <div className="group relative flex h-full flex-col overflow-hidden rounded-card bg-white shadow-card transition duration-300 hover:-translate-y-0.5 hover:shadow-card-hover">
+      <div className="relative aspect-video shrink-0 overflow-hidden bg-surface-muted">
         <Link href={href} className="absolute inset-0 no-underline" aria-label={venue.name}>
           <SafeImage
             src={venue.heroImageUrl}
@@ -84,23 +87,11 @@ export function InstitutionCard({ venue, href }: { venue: InstitutionCardVenue; 
             className="object-cover transition duration-500 group-hover:scale-[1.03]"
             fallback={<div className={`h-full w-full bg-gradient-to-br ${gradient}`} />}
           />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/55 via-transparent to-transparent" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent" />
         </Link>
 
-        <div className="pointer-events-none absolute left-3 top-3 z-[1] flex flex-wrap gap-1.5">
-          <span className={`rounded-md px-2.5 py-1 text-xs font-bold tracking-wide shadow-sm ${tagClass}`}>
-            {typeLabel}
-          </span>
-          {rating != null ? (
-            <span className="inline-flex items-center gap-1 rounded-md bg-white/95 px-2 py-1 text-xs font-semibold text-graphite shadow-sm backdrop-blur">
-              <Star className="h-3 w-3 fill-amber-400 text-amber-400" strokeWidth={0} />
-              {rating}
-            </span>
-          ) : null}
-        </div>
-
         <div
-          className="absolute bottom-2 right-2 z-[2]"
+          className="absolute right-2 top-2 z-[2]"
           onClick={(event) => {
             event.preventDefault();
             event.stopPropagation();
@@ -112,24 +103,35 @@ export function InstitutionCard({ venue, href }: { venue: InstitutionCardVenue; 
           <AddToDayRouteButton
             key={venue.id}
             compact
+            iconOnly
             variant="overlay"
-            className="!min-h-8 !rounded-lg !px-2.5 !py-1.5 !text-[11px]"
+            className="!min-h-8 !w-8 !rounded-full !p-0 !text-slate-700"
             venue={dayRouteVenue}
           />
         </div>
       </div>
 
-      <Link href={href} className="flex flex-1 flex-col no-underline">
+      <Link href={href} className="flex min-h-0 flex-1 flex-col no-underline">
         <div className="flex flex-1 flex-col gap-2.5 p-4 sm:p-5">
+          {metaLine ? (
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-graphite-muted sm:text-[11px]">
+              {metaLine}
+            </p>
+          ) : null}
+
           <h3 className="line-clamp-2 font-display text-base font-semibold leading-snug text-graphite group-hover:text-primary-600">
             {venue.name}
           </h3>
 
-          <div className="space-y-1 text-sm text-graphite-muted">
-            <div className="flex items-center gap-1.5">
-              <MapPin className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
-              <span className="truncate">{street || venue.city}</span>
-            </div>
+          <div className="flex min-w-0 items-center gap-1.5 text-sm text-graphite-muted">
+            <MapPin className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
+            <span className="truncate">{street || (hideCity ? null : venue.city) || 'Адрес уточняется'}</span>
+            {rating != null ? (
+              <span className="ml-auto inline-flex shrink-0 items-center gap-0.5 text-xs font-medium text-graphite-muted">
+                <Star className="h-3 w-3" strokeWidth={1.75} />
+                {rating}
+              </span>
+            ) : null}
           </div>
 
           {blurb ? (
@@ -149,15 +151,14 @@ export function InstitutionCard({ venue, href }: { venue: InstitutionCardVenue; 
 
           <div className="mt-auto flex items-end justify-between gap-3 pt-1">
             <div>
-              <div className="text-xs text-graphite-muted">{venue.city}</div>
               {venue.eventsPending ? (
                 <div className="mt-0.5 h-4 w-20 animate-pulse rounded bg-slate-100" aria-hidden />
               ) : stopOrEventsLabel ? (
                 <div className="text-sm font-semibold text-graphite">{stopOrEventsLabel}</div>
               ) : null}
             </div>
-            <span className="inline-flex items-center gap-1 rounded-lg bg-primary-600 px-3 py-1.5 text-xs font-semibold text-white transition group-hover:bg-primary-700">
-              <Ticket className="h-3.5 w-3.5" strokeWidth={1.75} />
+            <span className="inline-flex items-center gap-1.5 rounded-lg bg-primary-600 px-3 py-1.5 text-xs font-semibold text-white transition group-hover:bg-primary-700">
+              <Ticket className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden />
               Афиша
             </span>
           </div>

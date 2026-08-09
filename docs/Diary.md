@@ -16,6 +16,23 @@
 
 ---
 
+## 2026-08-10 - `/venues` quiet catalog redesign
+
+### Наблюдения
+- Owner: `/venues` тёмный full-bleed hero + marketing copy, чёрные bordered chips, «Найдено · стр.», цветные pills и крупный «В маршрут» на фото - вне sitewide UX-канона.
+
+### Решения
+- Убран dark hero / HeroMedia / copy «Электронные билеты…»; белый `HeroLayout` minimal: breadcrumbs + H1 «Театры и музеи {город}».
+- Search + city + sort в одной строке (`#F5F5F7`); категории - один horizontal swipe `catalog-chip` rail без счётчиков на pills.
+- Meta junk: вместо «Найдено · стр.» - subtle `pluralVenues(total)` + toggle вид.
+- `InstitutionCard`: чистое фото; iconOnly «В маршрут» top-right; meta `ТИП · ГОРОД` над названием (`hideCity` при city filter); blurb `line-clamp-2`; equal-height + `mt-auto` на ряд афиши; Ticket + «Афиша».
+- Commit+push; deploy по «выкатывай».
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-10 - Sitewide UX recipe (owner canon)
 
 ### Наблюдения

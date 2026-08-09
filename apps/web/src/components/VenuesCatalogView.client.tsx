@@ -10,11 +10,10 @@ import { InstitutionCard } from '@/components/InstitutionCard.client';
 import { InstitutionList } from '@/components/InstitutionListRow.client';
 import { VenuesCatalogSkeleton } from '@/components/VenueCatalogSkeletons';
 import { HeroLayout } from '@/components/HeroLayout';
-import { HeroMedia } from '@/components/HeroMedia.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from '@/lib/catalog-url';
 import { cityToGenitive } from '@/lib/city-declension';
-import { formatNumber, pluralCities, pluralEvents, pluralVenues } from '@/lib/format';
+import { pluralVenues } from '@/lib/format';
 import {
   catalogCityQueryValue,
   isAllCitiesQuery,
@@ -29,7 +28,6 @@ import {
   venueCatalogCacheKey,
   VENUE_CATALOG_PAGE_SIZE,
   type VenueCatalogFeedPage,
-  type VenueCatalogFeedQuery,
   type VenueCatalogSort,
 } from '@/lib/venue-catalog-feed';
 import {
@@ -37,17 +35,6 @@ import {
   normalizeVenueKind,
 } from '@/lib/venue-meta';
 import { venueHref } from '@/lib/routes';
-
-const VENUES_HERO_FRAMES = [
-  {
-    src: '/images/hero/hero-slavic-03.png',
-    alt: 'Музей или театр',
-  },
-  {
-    src: '/images/hero/hero-slavic-05.png',
-    alt: 'Городская площадка',
-  },
-];
 
 type ViewMode = 'cards' | 'list';
 
@@ -478,7 +465,6 @@ export function VenuesCatalogView({
     }));
   }, [stats.types]);
 
-  const cityCount = cityOptions.length;
   const eventsHref = catalogHrefWithSelectedCity(
     selectedCity?.selectedDestination?.slug || selectedCity?.cityValue,
   );
@@ -487,14 +473,8 @@ export function VenuesCatalogView({
     selectedCity?.selectedDestination?.slug || selectedCity?.cityValue,
   );
   const cityName = cityFilter !== 'all' ? cityFilter : null;
-  const heroTitle = cityName
-    ? `Музеи, театры и пространства ${cityToGenitive(cityName)}`
-    : 'Музеи, театры и пространства';
-  const heroTotal = stats.venues || total;
-  const heroAfishaVenues = Number(stats.venuesWithEvents) || 0;
-  const heroEvents = Number(stats.events) || 0;
-  const showHeroAfisha =
-    !listPending && !catalogLoading && (heroAfishaVenues > 0 || heroEvents > 0);
+  const pageTitle = cityName ? `Театры и музеи ${cityToGenitive(cityName)}` : 'Театры и музеи';
+  const hideCityOnCards = cityFilter !== 'all';
   const paginationParams = useMemo(() => {
     const params = searchParamsRecord(searchParams);
     if (listPage > 1) params.page = String(listPage);
@@ -505,47 +485,21 @@ export function VenuesCatalogView({
   return (
     <>
       <HeroLayout
-        variant="imageOverlay"
+        variant="minimal"
+        dense
         breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Площадки' }]}
-        eyebrow={
-          heroTotal
-            ? cityCount
-              ? `${pluralVenues(heroTotal)} · ${pluralCities(cityCount)}`
-              : pluralVenues(heroTotal)
-            : 'Площадки'
-        }
-        title={heroTitle}
-        description={
-          <>
-            Постоянные экспозиции, временные выставки, вечерние программы.
-            <br />
-            Электронные билеты без очередей.
-          </>
-        }
-        tone="dark"
-        media={
-          <HeroMedia
-            frames={VENUES_HERO_FRAMES}
-            overlayClassName="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/70 to-slate-900/50"
-          />
-        }
+        title={pageTitle}
+        tone="light"
+        className="bg-white"
       >
-        {showHeroAfisha ? (
-          <p className="mx-auto mt-4 max-w-4xl text-sm font-medium text-white/85">
-            В афише{' '}
-            {heroAfishaVenues > 0 ? pluralVenues(heroAfishaVenues) : null}
-            {heroAfishaVenues > 0 && heroEvents > 0 ? ' · ' : null}
-            {heroEvents > 0 ? pluralEvents(heroEvents) : null}
-          </p>
-        ) : null}
-        <div className="mt-6 flex w-full max-w-5xl flex-col gap-3 rounded-2xl bg-white p-3 text-left text-slate-900 shadow-lg sm:flex-row sm:items-stretch">
-          <div className="flex min-w-0 flex-1 items-center gap-2 rounded-xl bg-slate-100 px-3">
-            <Search className="h-4 w-4 shrink-0 text-slate-400" />
+        <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-stretch sm:gap-3">
+          <div className="flex min-w-0 flex-1 items-center gap-2 rounded-xl bg-[#F5F5F7] px-3">
+            <Search className="h-4 w-4 shrink-0 text-slate-400" strokeWidth={1.75} />
             <input
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Театр или клуб"
+              placeholder="Театр или клуб…"
               className="w-full bg-transparent py-2.5 text-sm outline-none placeholder:text-slate-400"
             />
           </div>
@@ -553,20 +507,22 @@ export function VenuesCatalogView({
             value={cityPending ? '' : cityFilter}
             disabled={cityPending}
             onChange={(event) => setCityFilter(event.target.value)}
-            className="rounded-xl bg-slate-100 px-3 py-2.5 text-sm outline-none disabled:opacity-70 sm:shrink-0"
+            className="rounded-xl bg-[#F5F5F7] px-3 py-2.5 text-sm outline-none disabled:opacity-70 sm:max-w-[12rem] sm:shrink-0"
+            aria-label="Город"
           >
             {cityPending ? <option value="">Город…</option> : null}
             <option value="all">Все города</option>
-            {cityOptions.map(([city, count]) => (
+            {cityOptions.map(([city]) => (
               <option key={city} value={city}>
-                {city} ({count})
+                {city}
               </option>
             ))}
           </select>
           <select
             value={sortMode}
             onChange={(event) => setSortMode(event.target.value as VenueCatalogSort)}
-            className="rounded-xl bg-slate-100 px-3 py-2.5 text-sm outline-none sm:shrink-0"
+            className="rounded-xl bg-[#F5F5F7] px-3 py-2.5 text-sm outline-none sm:max-w-[10rem] sm:shrink-0"
+            aria-label="Сортировка"
           >
             {SORT_OPTIONS.map(([value, label]) => (
               <option key={value} value={value}>
@@ -577,17 +533,15 @@ export function VenuesCatalogView({
         </div>
 
         {typeOptions.length ? (
-          <div className="mt-4 flex w-full max-w-5xl flex-wrap justify-center gap-1.5 px-1">
+          <div className="mt-4 horizontal-snap-row flex flex-nowrap gap-1.5 overflow-x-auto pb-0.5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             <button
               type="button"
               onClick={() => setTypeFilter('all')}
-              className={`inline-flex h-10 items-center rounded-full px-4 text-sm font-semibold transition ${
-                typeFilter === 'all'
-                  ? 'bg-white text-slate-900'
-                  : 'bg-white/15 text-white ring-1 ring-white/25 hover:bg-white/25'
+              className={`catalog-chip snap-start ${
+                typeFilter === 'all' ? 'catalog-chip-on' : 'catalog-chip-idle'
               }`}
             >
-              Все места
+              <span className="whitespace-nowrap">Все места</span>
             </button>
             {typeOptions.map((option) => {
               const active = typeFilter === option.value;
@@ -596,24 +550,33 @@ export function VenuesCatalogView({
                   key={option.value}
                   type="button"
                   onClick={() => setTypeFilter(active ? 'all' : option.value)}
-                  className={`inline-flex h-10 items-center gap-1 rounded-full px-4 text-sm font-semibold transition ${
-                    active
-                      ? 'bg-white text-slate-900'
-                      : 'bg-white/15 text-white ring-1 ring-white/25 hover:bg-white/25'
-                  }`}
+                  className={`catalog-chip snap-start ${active ? 'catalog-chip-on' : 'catalog-chip-idle'}`}
                 >
-                  {option.label}
-                  <span className="text-xs opacity-75">({option.count})</span>
+                  <span className="whitespace-nowrap">{option.label}</span>
                 </button>
               );
             })}
           </div>
         ) : null}
+
+        <Link
+          href={locationsHref}
+          className="mt-3 inline-block text-sm text-slate-500 transition hover:text-slate-700"
+        >
+          Локации: причалы, парки, точки старта →
+        </Link>
       </HeroLayout>
 
-      <div className="sticky top-[var(--site-header-height)] z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
-        <div className="container-page flex items-center justify-end gap-3 py-3">
-          <div className="flex shrink-0 overflow-hidden rounded-xl bg-slate-100 p-1" role="radiogroup" aria-label="Вид каталога">
+      <div className="container-page py-6 sm:py-8">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm text-slate-500">
+            {listPending || listRefreshing
+              ? 'Обновляем список…'
+              : total > 0
+                ? pluralVenues(total)
+                : null}
+          </p>
+          <div className="flex shrink-0 overflow-hidden rounded-xl bg-[#F5F5F7] p-1" role="radiogroup" aria-label="Вид каталога">
             <button
               type="button"
               role="radio"
@@ -624,7 +587,7 @@ export function VenuesCatalogView({
                 viewMode === 'cards' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'
               }`}
             >
-              <Grid3X3 className="h-4 w-4" />
+              <Grid3X3 className="h-4 w-4" strokeWidth={1.75} />
             </button>
             <button
               type="button"
@@ -636,32 +599,9 @@ export function VenuesCatalogView({
                 viewMode === 'list' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'
               }`}
             >
-              <List className="h-4 w-4" />
+              <List className="h-4 w-4" strokeWidth={1.75} />
             </button>
           </div>
-        </div>
-      </div>
-
-      <div className="container-page py-8">
-        <div className="mb-4 flex items-baseline justify-between gap-3">
-          <h2 className="text-lg font-semibold text-slate-900">
-            {listPending || listRefreshing ? (
-              'Обновляем список…'
-            ) : (
-              <>
-                Найдено: {formatNumber(total)}
-                {total > VENUE_CATALOG_PAGE_SIZE ? (
-                  <span className="font-normal text-slate-500">
-                    {' '}
-                    · стр. {listPage} из {Math.max(1, Math.ceil(total / VENUE_CATALOG_PAGE_SIZE))}
-                  </span>
-                ) : null}
-              </>
-            )}
-          </h2>
-          <Link href={locationsHref} className="text-sm font-semibold text-primary-600 hover:underline">
-            Локации: причалы, парки, точки старта →
-          </Link>
         </div>
 
         {listPending ? (
@@ -673,7 +613,12 @@ export function VenuesCatalogView({
             ) : (
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
                 {venues.map((venue) => (
-                  <InstitutionCard key={venue.id} venue={venue} href={venueHref(venue)} />
+                  <InstitutionCard
+                    key={venue.id}
+                    venue={venue}
+                    href={venueHref(venue)}
+                    hideCity={hideCityOnCards}
+                  />
                 ))}
               </div>
             )}
