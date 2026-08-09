@@ -29,6 +29,7 @@ import { CITY_NIGHT_HERO } from '@/lib/city-night-hero';
 import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import { CityDayPresetBlock } from '@/components/CityDayPresetBlock.client';
 import { MustSeeFilterTabs } from '@/components/MustSeeFilterTabs.client';
+import { ScrollRail } from '@/components/ScrollRail.client';
 import { SuburbsCarousel } from '@/components/SuburbsCarousel.client';
 import {
   resolveCityInfo,
@@ -1848,23 +1849,38 @@ function CityEventsGrid({
   sessions: PublicSessionDto[];
   editorial?: boolean;
 }) {
-  if (editorial) {
-    return (
-      <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
-        {sessions.slice(0, 48).map((session) => (
-          <AffichePosterCard key={session.id} session={session} />
-        ))}
-        {!sessions.length ? <EmptyState /> : null}
-      </div>
-    );
+  const items = sessions.slice(0, 48);
+  if (!items.length) {
+    return <EmptyState />;
   }
 
+  // Mobile: horizontal swipe carousel. Desktop: same rail with prev/next (no tall grid sheet).
   return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-      {sessions.slice(0, 48).map((session) => (
-        <EventCard key={session.id} session={session} compact />
-      ))}
-      {!sessions.length ? <EmptyState /> : null}
+    <div data-city-events-rail>
+      <ScrollRail
+        className="mt-1"
+        viewportClassName="flex flex-nowrap gap-3 snap-x snap-mandatory pb-1"
+        aria-label="Ближайшие события"
+      >
+        {items.map((session) => (
+          <div
+            key={session.id}
+            className={
+              editorial
+                ? 'w-[min(78%,18rem)] shrink-0 snap-start sm:w-[min(42%,16rem)] md:w-[15.5rem] lg:w-[16.5rem]'
+                : 'w-[min(88%,20rem)] shrink-0 snap-start sm:w-[min(46%,18rem)] md:w-[17.5rem] lg:w-[19rem]'
+            }
+            data-rail-item
+            data-city-events-card
+          >
+            {editorial ? (
+              <AffichePosterCard session={session} />
+            ) : (
+              <EventCard session={session} showcaseRail />
+            )}
+          </div>
+        ))}
+      </ScrollRail>
     </div>
   );
 }

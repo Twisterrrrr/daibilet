@@ -33,7 +33,7 @@ type Props = {
   inMyDay?: boolean;
   /**
    * Inside DayRoutePanel accordion: no outer card/title (chrome is the accordion row).
-   * Named presets use suburb-like chips + one detail panel.
+   * Named presets always use suburb-like chips + one detail panel (hub + my-day).
    */
   embedded?: boolean;
 };
@@ -68,7 +68,7 @@ export function CityDayPresetBlock({
 }: Props) {
   const router = useRouter();
   const [busyId, setBusyId] = useState<string | null>(null);
-  /** My-day embedded: first scenario open by default (like suburbs chips). */
+  /** First scenario open by default (like suburbs chips). */
   const [activeIndex, setActiveIndex] = useState<number | null>(0);
 
   const namedResolved = useMemo(() => {
@@ -130,55 +130,40 @@ export function CityDayPresetBlock({
 
   // Named presets that still need catalog name-match must wait for match sources;
   // otherwise editorial-ready chips paint first and the rest «pop in» later (SPB).
+  // Hub + my-day share the same chips skeleton (no hub card-list path).
   if ((namedPresets || []).length > 0 && catalogPending) {
     const skeletonCount = Math.max(3, Math.min(8, namedPresets.length));
-    if (embedded) {
-      return (
-        <div
-          data-day-presets={inMyDay ? 'my-day' : 'hub'}
-          data-day-presets-mode="chips"
-          data-day-presets-pending="1"
-          aria-busy="true"
-          aria-label="Загружаем готовые сценарии"
-        >
-          <div
-            className="flex flex-nowrap gap-2 overflow-x-auto overscroll-x-contain pb-0.5 [scrollbar-width:thin]"
-            data-day-preset-chips
-          >
-            {Array.from({ length: skeletonCount }, (_, index) => (
-              <div
-                key={`preset-skel-chip-${index}`}
-                className={`inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full border px-3 ${borderClass} ${skeletonTone} animate-pulse`}
-                style={{ width: `${9.5 + (index % 3) * 1.25}rem` }}
-              />
-            ))}
-          </div>
-          <div
-            className={`mt-3 h-[5.5rem] animate-pulse rounded-xl border ${borderClass} ${skeletonTone}`}
-            data-day-preset-panel-skeleton
-          />
-        </div>
-      );
-    }
     return (
       <div
         className={shellClass || undefined}
         data-day-presets={inMyDay ? 'my-day' : 'hub'}
+        data-day-presets-mode="chips"
         data-day-presets-pending="1"
         aria-busy="true"
         aria-label="Загружаем готовые сценарии"
       >
-        <p className={`text-sm font-semibold ${titleClass}`}>Готовые сценарии</p>
-        <p className={`mt-1 text-sm leading-6 ${softClass}`}>Подбираем маршруты по каталогу города…</p>
-        <ul className="mt-4 grid gap-3">
+        {embedded ? null : (
+          <>
+            <p className={`text-sm font-semibold ${titleClass}`}>Готовые сценарии</p>
+            <p className={`mt-1 text-sm leading-6 ${softClass}`}>Подбираем маршруты по каталогу города…</p>
+          </>
+        )}
+        <div
+          className={`${embedded ? '' : 'mt-4 '}flex flex-nowrap gap-2 overflow-x-auto overscroll-x-contain pb-0.5 [scrollbar-width:thin]`}
+          data-day-preset-chips
+        >
           {Array.from({ length: skeletonCount }, (_, index) => (
-            <li key={`preset-skel-card-${index}`}>
-              <div
-                className={`h-[4.75rem] animate-pulse rounded-xl border ${borderClass} ${skeletonTone}`}
-              />
-            </li>
+            <div
+              key={`preset-skel-chip-${index}`}
+              className={`inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full border px-3 ${borderClass} ${skeletonTone} animate-pulse`}
+              style={{ width: `${9.5 + (index % 3) * 1.25}rem` }}
+            />
           ))}
-        </ul>
+        </div>
+        <div
+          className={`mt-3 h-[5.5rem] animate-pulse rounded-xl border ${borderClass} ${skeletonTone}`}
+          data-day-preset-panel-skeleton
+        />
       </div>
     );
   }
@@ -252,78 +237,73 @@ export function CityDayPresetBlock({
   };
 
   if (namedResolved.length > 0) {
-    if (embedded) {
-      const selectedIndex =
-        activeIndex == null || activeIndex < 0 || activeIndex >= namedResolved.length
-          ? null
-          : activeIndex;
-      const selected = selectedIndex == null ? null : namedResolved[selectedIndex];
-
-      return (
-        <div data-day-presets={inMyDay ? 'my-day' : 'hub'} data-day-presets-mode="chips">
-          <div
-            className="flex flex-nowrap gap-2 overflow-x-auto overscroll-x-contain pb-0.5 [scrollbar-width:thin]"
-            role="tablist"
-            aria-label="Готовые сценарии"
-            data-day-preset-chips
-          >
-            {namedResolved.map((row, index) => {
-              const active = selectedIndex === index;
-              return (
-                <button
-                  key={row.preset.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={active}
-                  aria-controls={active ? `day-preset-panel-${row.preset.id}` : undefined}
-                  data-day-preset-chip={row.preset.id}
-                  data-active={active ? '1' : '0'}
-                  onClick={() => setActiveIndex((prev) => (prev === index ? null : index))}
-                  className={`inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
-                    active ? chipActive : chipIdle
-                  }`}
-                >
-                  <span
-                    className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold tabular-nums ${
-                      active
-                        ? 'bg-white/20 text-white'
-                        : editorial
-                          ? 'bg-zinc-100 text-zinc-700'
-                          : 'bg-primary-50 text-primary-700'
-                    }`}
-                  >
-                    {index + 1}
-                  </span>
-                  <span className="max-w-[14rem] truncate">{row.preset.title}</span>
-                  <ChevronDown
-                    className={`h-3.5 w-3.5 opacity-70 transition-transform ${active ? 'rotate-180' : ''}`}
-                    aria-hidden
-                  />
-                </button>
-              );
-            })}
-          </div>
-          {selected ? renderScenarioCard(selected, { panel: true }) : null}
-          {selectedIndex == null ? (
-            <p className="mt-3 text-sm text-slate-500" data-day-preset-hint>
-              Нажмите на сценарий, чтобы открыть точки и собрать день.
-            </p>
-          ) : null}
-        </div>
-      );
-    }
+    // Same chips + one detail panel on hub and my-day (all breakpoints).
+    const selectedIndex =
+      activeIndex == null || activeIndex < 0 || activeIndex >= namedResolved.length
+        ? null
+        : activeIndex;
+    const selected = selectedIndex == null ? null : namedResolved[selectedIndex];
 
     return (
-      <div className={shellClass || undefined} data-day-presets={inMyDay ? 'my-day' : 'hub'}>
-        <>
-          <p className={`text-sm font-semibold ${titleClass}`}>Готовые сценарии</p>
-          <p className={`mt-1 text-sm leading-6 ${softClass}`}>{namedLead}</p>
-        </>
-        <ul className="mt-4 grid gap-3">
-          {namedResolved.map((row) => (
-            <li key={row.preset.id}>{renderScenarioCard(row)}</li>
-          ))}
-        </ul>
+      <div
+        className={shellClass || undefined}
+        data-day-presets={inMyDay ? 'my-day' : 'hub'}
+        data-day-presets-mode="chips"
+      >
+        {embedded ? null : (
+          <>
+            <p className={`text-sm font-semibold ${titleClass}`}>Готовые сценарии</p>
+            <p className={`mt-1 text-sm leading-6 ${softClass}`}>{namedLead}</p>
+          </>
+        )}
+        <div
+          className={`${embedded ? '' : 'mt-4 '}flex flex-nowrap gap-2 overflow-x-auto overscroll-x-contain pb-0.5 [scrollbar-width:thin]`}
+          role="tablist"
+          aria-label="Готовые сценарии"
+          data-day-preset-chips
+        >
+          {namedResolved.map((row, index) => {
+            const active = selectedIndex === index;
+            return (
+              <button
+                key={row.preset.id}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                aria-controls={active ? `day-preset-panel-${row.preset.id}` : undefined}
+                data-day-preset-chip={row.preset.id}
+                data-active={active ? '1' : '0'}
+                onClick={() => setActiveIndex((prev) => (prev === index ? null : index))}
+                className={`inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                  active ? chipActive : chipIdle
+                }`}
+              >
+                <span
+                  className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold tabular-nums ${
+                    active
+                      ? 'bg-white/20 text-white'
+                      : editorial
+                        ? 'bg-zinc-100 text-zinc-700'
+                        : 'bg-primary-50 text-primary-700'
+                  }`}
+                >
+                  {index + 1}
+                </span>
+                <span className="max-w-[14rem] truncate">{row.preset.title}</span>
+                <ChevronDown
+                  className={`h-3.5 w-3.5 opacity-70 transition-transform ${active ? 'rotate-180' : ''}`}
+                  aria-hidden
+                />
+              </button>
+            );
+          })}
+        </div>
+        {selected ? renderScenarioCard(selected, { panel: true }) : null}
+        {selectedIndex == null ? (
+          <p className={`mt-3 text-sm ${mutedClass}`} data-day-preset-hint>
+            Нажмите на сценарий, чтобы открыть точки и собрать день.
+          </p>
+        ) : null}
       </div>
     );
   }
