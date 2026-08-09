@@ -88,7 +88,7 @@ SPB `.16` **retired**.
 
 ### Москва и Санкт-Петербург - capitals ~200
 
-**Факт (2026-08-07):** Санкт-Петербург - near target (`mustSee` ~**184** + suburbs + 6 presets; gap к ~200 небольшой). Москва - Phase C live: **58** mustSee с фильтрами, **8** пригородов / 40 POI + travel vectors, **5** `dayRoutePresets` (`msk-1`…`msk-5`); prod seed MSK (52 insert / 6 skip) + coords 58/58; place images `/images/venues/moscow/` (58: 12 GenerateImage main + sharp pack) + `MOSCOW_IMAGES` в `city-place-images.ts`. Companion live: `moscow-2-dnya-…` (`msk-1`); msk-2…5 - blogSlug CTA wired, статьи в плане. Гастро-бренды MSK - ждут owner list.
+**Факт (2026-08-09):** Санкт-Петербург - near target (`mustSee` ~**184** + suburbs + 6 presets; gap к ~200 небольшой). Москва - deep pack: **144** mustSee (main/museum/park/science/views/street/temple/houses/mansions/secret/creative/gastro), **8** пригородов (Сергиев Посад / Истра / Коломна / Звенигород углублены: logistics + gastro + nested POI), **10** `dayRoutePresets` (`msk-1`…`msk-10`; `msk-1` → `moscow-2-dnya-…`). Новые `locationSlug` без seed/images - editorial на хабе; prod seed + `MOSCOW_IMAGES` - follow-up.
 
 **Цель (LOCKED):** тир **Capitals** - curated hub ~**200** (must-see / places layer). Москва: gap **~142** (200−58) - наращивать curated pack, не путать с ростом `CANDIDATE` sync. Filter tabs обязательны. **Не** ограничивать столицы тиром other-cities ~50. NN - референс deep pack + gastro + named presets, не модель объёма.
 

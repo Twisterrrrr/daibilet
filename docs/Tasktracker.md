@@ -459,7 +459,7 @@ Alias `museum-1` = первый open-date контракт (не «музеи fo
 | MS.TIER2 | Capitals target **~200** (не 12-18, не 30-50+); other cities **~50** start (не capitals-wide) | Высокий | ✅ docs lock 2026-08-07 |
 | PH2.CITY2 | Capitals must-see hub pack: SPB ~184 near ~200; MSK **58 → ~200** (gap ~142 curated, не sync dump) | Высокий | 🔄 SPB near; MSK grow open |
 | PH2.CITY3 | Other / top-8 hubs → **~50** curated mustSee на старте (снять ориентир 12-18); не клонировать 200 | Высокий | ⏳ после MSK grow / owner batch |
-| MS.MSK-GROW200 | Москва: curated mustSee/places layer с 58 до ~200 (quality slug/coords/hook/filters) | Высокий | ⏳ gap ~142 |
+| MS.MSK-GROW200 | Москва: curated mustSee/places layer с 58 до ~200 (quality slug/coords/hook/filters) | Высокий | 🔄 **144** mustSee + 10 presets + deep suburbs (2026-08-09); gap ~56; seed/images follow-up |
 
 ## Must-see count tiers + MSK/SPB (2026-08-04 → corr. 2026-08-07)
 
@@ -475,7 +475,7 @@ Alias `museum-1` = первый open-date контракт (не «музеи fo
 | MS.SPB-KGD-SEED | Owner-verified SPB + KGD must-see, gastro и suburb POI: idempotent catalog dual-write, verified address/coords, slug wiring | Критический | ✅ MSK seed: 67 inserted, 20 updated, no missing city; 67 cityInfo links; deploy 2026-08-05 BUILD_ID=`htTqoT7UE2NcJBJevr_3v` |
 | LOC.SPB-MUSTSEE | SPB editorial locations missing from `/locations` despite DB seed (content take 400 A→Z + warm short-circuit) | Критический | ✅ `a8b106e`+follow-ups MSK; catalog shows Петропавловская/Дворцовая/Спас; BUILD_ID=`8Fo0L9-oGyooggq9uzfYC` |
 | MS.TIER4 | Phase C: Москва baseline hub ship (не финальный ~200) | Средний | ✅ baseline **58**; coords/images/presets/companions; grow → MS.MSK-GROW200 |
-| MS.TIER5 | Phase 2 optional: `dayRoutePresets` / multi-day для MSK/SPB после стабильного широкого каталога | Низкий | ✅ СПб 6; Москва 5 presets + companions msk-1…5 (cover+inline+my-day CTA) |
+| MS.TIER5 | Phase 2 optional: `dayRoutePresets` / multi-day для MSK/SPB после стабильного широкого каталога | Низкий | ✅ СПб 6; Москва **10** presets msk-1…10 (`msk-1` blog CTA) |
 | MS.TIER7 | Сценарии hub: не показывать preset без минимум 3 разрешимых точек и «Собрать день»; склонять «N точка/точки/точек» через общий formatter | Критический | ✅ 2026-08-05 |
 | MS.TIER6 | Гастро-пакет отдельно от landmarks (если нужно) - не смешивать в «Главные» | Низкий | ✅ СПб: 20 точек во вкладке «Гастрономические точки» |
 | MS.SPB-BRIDGES | Хаб СПб: справочный блок о разводе мостов с сезонным ориентиром, ссылкой на night-bridges и «Мой день» | Средний | ✅ `3c87de0`, MSK BUILD_ID=`IH8INbeVzpCW8pHY46i6b`; smoke 200 |

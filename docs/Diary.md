@@ -1,3 +1,19 @@
+## 2026-08-09 - Москва deep pack (mustSee 144 + 10 presets + suburbs)
+
+### Наблюдения
+- Owner передал «золотой» путеводитель Москвы: топ-локации по категориям (адрес + coords), 10 дневных сценариев и углублённые пригороды (Сергиев Посад, Истра, Коломна, Звенигород) + ещё 4 day-trip.
+- Phase C baseline был 58 mustSee / 5 presets - далеко от capital target ~200.
+
+### Решения
+- web+public `cityInfo.moscow`: **144** mustSee с фильтрами (вкл. houses/mansions/secret/gastro/creative), **10** `dayRoutePresets` (msk-1…10; blog CTA на msk-1), suburbs с logistics/gastro/nested POI.
+- Кремль и Красная площадь разведены (новые slug); дефис `-` в copy; тире ИИ вычищены.
+- Docs: Project факт, Tasktracker MS.MSK-GROW200 / MS.TIER5.
+
+### Проблемы
+- Новые `locationSlug` без prod seed / `MOSCOW_IMAGES` - на хабе editorial ok, карточки каталога и фото - follow-up по запросу owner.
+
+---
+
 ## 2026-08-09 - TC cancelled events («Мероприятие отменено организатором»)
 
 ### Наблюдения
