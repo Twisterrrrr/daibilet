@@ -1208,7 +1208,7 @@ function CitySightsSection({
           city={city}
           cityGenitive={cityGenitive}
           editorial={editorial}
-          titleClass={titleClass}
+          className="mt-10"
         />
       ) : null}
       {articles.length ? (

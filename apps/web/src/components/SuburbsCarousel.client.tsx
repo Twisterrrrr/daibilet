@@ -236,8 +236,8 @@ export function SuburbsCarousel({
             className={
               titleClass ||
               (editorial
-                ? 'font-serif text-2xl font-semibold text-zinc-950 sm:text-3xl'
-                : 'text-xl font-bold text-slate-950 sm:text-2xl')
+                ? 'font-serif text-3xl font-semibold text-zinc-950 sm:text-4xl'
+                : 'text-2xl font-bold text-slate-950')
             }
           >
             Значимые пригороды {cityGenitive}
