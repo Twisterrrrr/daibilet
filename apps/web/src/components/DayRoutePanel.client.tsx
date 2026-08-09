@@ -929,7 +929,7 @@ function DayRoutePanelInner() {
 
     void loadFamily('events', async () => {
       const response = await fetch(
-        `/api/public/events?city=${eventsCityQ}&limit=100&sort=popular`,
+        `/api/public/events?city=${eventsCityQ}&limit=48&sort=popular`,
         { signal: controller.signal },
       );
       if (!response.ok) {

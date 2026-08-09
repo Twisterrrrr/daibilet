@@ -537,8 +537,8 @@ Alias `museum-1` = первый open-date контракт (не «музеи fo
 | UX.MYDAY-CATALOG-OPEN | «Ещё из каталога»: always open, no card border | Высокий | ✅ `902fb3b` MSK **BUILD_ID=`sgVL2jxb2mwH2VaNjj3fm`** `/my-day` 200 |
 | UX.MYDAY-SEARCH-PROG | Progressive catalog load - search not gated on Promise.all | Высокий | ✅ `33e9ca8` MSK **BUILD_ID=`blIpyGTrMYrwYoh4jkBws`** `/my-day` 200 |
 | UX.MYDAY-PRESETS | «Готовые сценарии» under Hot Picks (cityInfo presets) | Высокий | ✅ `f280018` MSK **BUILD_ID=`cM9j1lcFbpgHSogY-npKs`** `/my-day` 200 |
-| UX.MYDAY-PRESET-GATE | SPB/my-day: skeleton до settle locations+venues - без pop-in 4→6 сценариев | Критический | ✅ code on `feat/next-monorepo`; ⏳ verify after web deploy |
-| UX.MYDAY-BOAT-MODAL | Boat wizard (причал/маршрут/время): modal overlay вместо inline full-bleed panel | Критический | ⏳ commit+MSK deploy |
+| UX.MYDAY-PRESET-GATE | SPB/my-day: skeleton до settle locations+venues - без pop-in 4→6 сценариев | Критический | ✅ `c0d61b6d`; ⏳ MSK with boat modal deploy |
+| UX.MYDAY-BOAT-MODAL | Boat wizard (причал/маршрут/время): modal overlay вместо inline full-bleed panel | Критический | ✅ `81d740a6`; ⏳ GHA [31298547370](https://github.com/Twisterrrrr/daibilet/actions/runs/31298547370) |
 | UX.MYDAY-PRESET-BLOG | Preset cards: «Читать об этом в блоге» via `blogSlug` - blue + underline + arrow; desktop inline after title (flex-wrap) | Высокий | ✅ `06625e0` MSK **BUILD_ID=`2NIdFliuqHg4lCRrEYYxP`** `/my-day` 200 |
 | SEO.MYDAY-META | /my-day title+desc+OG package; keep noindex until crawlable content | Высокий | ✅ `31a0dc0` MSK **BUILD_ID=`qZnQ6TqtoJkKtvxVB9mtI`** |
 | UX.MYDAY-LIST-MAP | Mobile list-first + Список/Карта toggle (no sticky 38vh); compact footer | Критический | ✅ `4ffb251` MSK **BUILD_ID=`0Fnc1S9ndw3dPSeEmy2Za`** `/my-day` 200 |
@@ -862,8 +862,9 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 | INC.504.21 | 2026-08-02 ~07:19 UTC: SSR hang 0B TTFB again (~11h next RSS~1.6G); SIGKILL+start; healthcheck silent - script **644 not +x** → Permission denied; chmod 755 + cron via `/bin/bash` | Критический | ✅ mitigated live MSK; auto-net fixed; root still INC.504.15 |
 | INC.504.22 | **Codex handoff:** независимый RCA + PR-sized фикс SSR hang (event-loop / Prisma in Next). Brief: [codex-ssr-hang-brief.md](./codex-ssr-hang-brief.md); canon [inc-504-ssr-hardening.md](./inc-504-ssr-hardening.md) | Критический | ✅ merge `f93b770` MSK BUILD `3zmDWHpY7rXAJgqu0-pnR` |
 | INC.504.25 | Owner 502 `/my-day` 2026-08-04: не SSR my-day; minutely healthcheck SIGKILL+start mid-deploy (curl=7) → ENOENT prerender-manifest crash-loop; cold-start curl=28 kill. Fix: deploy flock+active marker; healthcheck SKIP; start-web refuse incomplete `.next` | Критический | ✅ `59aba2f` MSK **BUILD_ID=`3VxNvT0CDvcI3jB-BMvpP`**; health SKIP mid-deploy; NRestarts=0; `/my-day` `/` 200 |
+| INC.504.26 | 2026-08-09: API hang (health/events TTFB timeout); swap.peak~4G + MemorySwapMax=max; venue/city PDP still full-catalog. Fix: index-scoped+soft PDP/city; API healthcheck; MemorySwapMax=512M; docs [catalog-full-json-consumers.md](./catalog-full-json-consumers.md) | Критический | 🔄 code+ops |
 
-См. Diary 2026-07-30 «Prod 504: daibilet-web hang», «2026-08-01 INC.504.13», «INC.504.17», «INC.504.18», «INC.504.19», «INC.504.20», «INC.504.21»; brief Codex `INC.504.22`; deploy race `INC.504.25`.
+См. Diary 2026-07-30 «Prod 504: daibilet-web hang», «2026-08-01 INC.504.13», «INC.504.17», «INC.504.18», «INC.504.19», «INC.504.20», «INC.504.21»; brief Codex `INC.504.22`; deploy race `INC.504.25`; full-JSON consumers `INC.504.26`.
 
 ---
 

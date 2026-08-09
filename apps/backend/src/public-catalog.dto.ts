@@ -16,6 +16,7 @@ import {
   resolveCatalogRebuildMode,
   resolveCatalogRebuildScriptPath,
   writePublicCatalogDiskCache,
+  type PublicCatalogDiskIndexes,
 } from './public-catalog-disk-cache.js';
 import {
   dedupeCrossSourceCatalogSessions,
@@ -68,6 +69,10 @@ interface CatalogCache {
   staleUntil: number;
   sessions: PublicSessionDto[];
   builtAt?: number;
+  /** Disk v2 id-pointer indexes (venue/destination/slug). Kept in memory so PDP/city avoid full scans. */
+  indexes?: PublicCatalogDiskIndexes;
+  /** Lazy session.id → row map for index hydration. */
+  byId?: Map<string, PublicSessionDto>;
 }
 
 let catalogCache: CatalogCache | null = null;
@@ -77,6 +82,89 @@ let catalogChildSpawnedAt = 0;
 let catalogDiskPromotePromise: Promise<void> | null = null;
 /** Last disk mtime successfully considered by promote (stat-gate; skip re-parse). */
 let catalogDiskKnownMtimeMs: number | null = null;
+
+function catalogSessionsById(cache: CatalogCache): Map<string, PublicSessionDto> {
+  if (cache.byId && cache.byId.size === cache.sessions.length) return cache.byId;
+  cache.byId = new Map(cache.sessions.map((session) => [String(session.id), session]));
+  return cache.byId;
+}
+
+function adoptCatalogCache(next: {
+  sessions: PublicSessionDto[];
+  expiresAt: number;
+  staleUntil: number;
+  builtAt: number;
+  indexes?: PublicCatalogDiskIndexes;
+}): PublicSessionDto[] {
+  catalogCache = {
+    expiresAt: next.expiresAt,
+    staleUntil: next.staleUntil,
+    sessions: next.sessions,
+    builtAt: next.builtAt,
+    indexes: next.indexes,
+    byId: undefined,
+  };
+  return next.sessions;
+}
+
+function resolveSessionsFromIdIndex(
+  index: Record<string, string[]> | undefined,
+  keys: string[],
+): PublicSessionDto[] {
+  if (!catalogCache?.sessions?.length || !index || !keys.length) return [];
+  const byId = catalogSessionsById(catalogCache);
+  const out: PublicSessionDto[] = [];
+  const seen = new Set<string>();
+  for (const rawKey of keys) {
+    const key = String(rawKey || '')
+      .trim()
+      .toLowerCase();
+    if (!key) continue;
+    const ids = index[key];
+    if (!ids?.length) continue;
+    for (const id of ids) {
+      const session = byId.get(String(id));
+      if (!session || seen.has(session.id)) continue;
+      seen.add(session.id);
+      out.push(session);
+    }
+  }
+  return out;
+}
+
+/**
+ * Index-scoped venue lookup (disk v2 venueIndex). Prefer over filtering ~3k sessions.
+ * Keys: venueId, venueSlug, pier:{key} (same as dto.js buildVenueSessionIndex).
+ */
+export function resolveCatalogSessionsByVenueKeys(keys: string[]): PublicSessionDto[] {
+  return resolveSessionsFromIdIndex(catalogCache?.indexes?.venueIndex, keys);
+}
+
+/**
+ * Index-scoped destination/city lookup (disk v2 destinationIndex).
+ */
+export function resolveCatalogSessionsByDestinationKeys(keys: string[]): PublicSessionDto[] {
+  return resolveSessionsFromIdIndex(catalogCache?.indexes?.destinationIndex, keys);
+}
+
+/** Soft-timeout wrapper for request paths that must not wait on cold catalog promote/parse. */
+export async function getPublicCatalogSessionsSoft(
+  timeoutMs = 2_500,
+  options: { hydrateSlots?: boolean } = {},
+): Promise<PublicSessionDto[] | null> {
+  const hydrateSlots = options.hydrateSlots === true;
+  try {
+    const sessions = await Promise.race([
+      getPublicCatalogSessions(false, { hydrateSlots }),
+      new Promise<null>((resolve) => {
+        setTimeout(() => resolve(null), Math.max(250, timeoutMs));
+      }),
+    ]);
+    return sessions;
+  } catch {
+    return null;
+  }
+}
 
 export function clearPublicCatalogDtoCache(): void {
   // Soft-invalidate for SWR: keep last sessions while rebuild runs.
@@ -179,13 +267,14 @@ async function promoteDiskCacheIfNewerAsync(): Promise<void> {
       const memBuiltAt = catalogCache?.builtAt || 0;
       if (disk.builtAt <= memBuiltAt && catalogCache?.sessions?.length) return;
       // Atomic swap of the in-memory reference; old blob -> GC.
-      // v2 indexes stay on disk for dto.js hydrate; memory Soft-SWR keeps sessions only.
-      catalogCache = {
+      // Keep v2 indexes in memory so venue/city PDP can resolve without full-array filter.
+      adoptCatalogCache({
         expiresAt: disk.expiresAt,
         staleUntil: disk.staleUntil,
         sessions: disk.sessions,
         builtAt: disk.builtAt,
-      };
+        indexes: disk.indexes,
+      });
     } catch (error) {
       console.error(
         `Failed to promote catalog from disk: ${error instanceof Error ? error.message : String(error)}`,
@@ -364,13 +453,7 @@ function scheduleInlineCatalogRebuild(reason: string): Promise<PublicSessionDto[
       const now = Date.now();
       const expiresAt = now + Math.max(30_000, PUBLIC_CATALOG_CACHE_MS);
       const staleUntil = now + Math.max(60_000, PUBLIC_CATALOG_STALE_MS);
-      catalogCache = {
-        expiresAt,
-        staleUntil,
-        sessions,
-        builtAt: now,
-      };
-      let indexes: import('./public-catalog-disk-cache.js').PublicCatalogDiskIndexes | undefined;
+      let indexes: PublicCatalogDiskIndexes | undefined;
       try {
         const dto = await import('./dto.js');
         if (typeof dto.serializePublicCatalogLegacyIndexes === 'function') {
@@ -383,6 +466,13 @@ function scheduleInlineCatalogRebuild(reason: string): Promise<PublicSessionDto[
           }`,
         );
       }
+      adoptCatalogCache({
+        expiresAt,
+        staleUntil,
+        sessions,
+        builtAt: now,
+        indexes,
+      });
       writePublicCatalogDiskCache({
         version: indexes ? 2 : 1,
         builtAt: now,

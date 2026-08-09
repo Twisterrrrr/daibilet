@@ -1,3 +1,20 @@
+## 2026-08-09 - INC.504.26: full-JSON consumers + API hang guard
+
+### Наблюдения
+- Owner: «мы же уже чинили API/SSR (504.5c) — что ещё не так?» + гипотеза «любая страница грузит весь JSON».
+- Live: API hung ~06:17–06:21 (health/events TTFB timeout); web ISR ещё 200. `memory.swap.max=max`, swap_used → **4014Mi**, API MemoryCurrent у потолка High; restart в 06:21:48 (тот же инцидент, что location PDP 500).
+- Disk catalog **16MB**; location PDP warm ~1.55s тянул `getPublicCatalogSessions()` + full scan. List `/venues|/locations` уже lean+`counts=0` — гипотеза для list **нет**, для PDP/city **да**.
+
+### Решения
+- Memory Soft-SWR **держит v2 indexes**; `resolveCatalogSessionsByVenueKeys` / `ByDestinationKeys`; venue PDP: SQL hero + index/soft 2.5s; city soft+index.
+- Ops: `api-healthcheck.sh` + cron; `MemorySwapMax=512M`. Canon: [catalog-full-json-consumers.md](./catalog-full-json-consumers.md).
+- my-day events fetch `limit=100` → `48`.
+
+### Проблемы
+- `/api/public/events` всё ещё держит full sessions в памяти для filter (page slice out) — 504.5d Redis deferred.
+
+---
+
 ## 2026-08-09 - CRITICAL: location PDP soft-unavailable `connection()` → HTTP 500
 
 ### Наблюдения
@@ -11,7 +28,7 @@
 - Code: убрать `connection()` / `noStore()` с soft-unavailable в `VenuePages` + metadata; soft 200 HTML (≤ `revalidate` 300s) вместо 500. Обновить `safe-not-found` комментарий.
 
 ### Проблемы
-- API swap-pressure может повториться (catalog dual SWR / memory high) - следить отдельно; web больше не должен 500-ить soft branch.
+- API swap-pressure может повториться (catalog dual SWR / memory high) - следить отдельно; web больше не должен 500-ить soft branch. Mitigated further in INC.504.26.
 
 ---
 

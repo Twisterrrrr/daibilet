@@ -2,6 +2,9 @@ export {
   buildPublicCatalogDto,
   clearPublicCatalogDtoCache,
   getPublicCatalogSessions,
+  getPublicCatalogSessionsSoft,
+  resolveCatalogSessionsByDestinationKeys,
+  resolveCatalogSessionsByVenueKeys,
 } from './public-catalog.dto.js';
 export { buildPublicEventDto, clearPublicEventDtoCache } from './public-event.dto.js';
 export {

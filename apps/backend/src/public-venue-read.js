@@ -102,6 +102,44 @@ async function getCatalogSessions(db) {
   return getPublicCatalogSessions();
 }
 
+/**
+ * Venue/location PDP: prefer disk v2 venueIndex + soft timeout.
+ * Must not await a hung full-catalog promote/parse on every /locations|/venues slug.
+ */
+const VENUE_PAGE_CATALOG_SOFT_MS = Number(process.env.DAIBILET_VENUE_PAGE_CATALOG_SOFT_MS || 2_500);
+
+async function loadVenuePageCatalogSessions(venueIds, venueContexts = []) {
+  const keys = new Set();
+  for (const id of venueIds || []) {
+    const key = String(id || '').trim().toLowerCase();
+    if (key) keys.add(key);
+  }
+  for (const ctx of venueContexts || []) {
+    const slug = normalizePublicVenueSlugKey(ctx?.slug || '');
+    if (slug) keys.add(slug);
+  }
+  for (const pierKey of pierKeysForVenueContexts(venueContexts)) {
+    if (pierKey) keys.add(`pier:${pierKey}`);
+  }
+
+  try {
+    const catalog = await import('./public-catalog.dto.js');
+    const soft = await catalog.getPublicCatalogSessionsSoft(VENUE_PAGE_CATALOG_SOFT_MS, {
+      hydrateSlots: false,
+    });
+    if (!soft?.length) return [];
+
+    const indexed = catalog.resolveCatalogSessionsByVenueKeys([...keys]);
+    if (indexed.length) {
+      return sortVenueCatalogSessions(indexed).slice(0, 120);
+    }
+    // Index miss (v1 disk / name-only fuzzy): fall back to scoped filter, still no extra promote.
+    return lookupVenueCatalogSessions(venueIds, soft, venueContexts).slice(0, 120);
+  } catch {
+    return [];
+  }
+}
+
 const CITY_ROUTING = loadCityRoutingConfig(import.meta.url);
 const STANDALONE_CITY_NAMES = new Set(CITY_ROUTING.standaloneCities || []);
 const CITY_TO_REGION = new Map(Object.entries(CITY_ROUTING.cityToRegion || {}));
@@ -408,11 +446,8 @@ export async function buildPublicVenuePage(db, venueSlugOrId) {
   const venue = await resolvePublicVenueRow(db, venueSlugOrId);
   if (!venue || venue.pageStatus === 'HIDDEN') return null;
 
-  const [catalogSessions, hubRows] = await Promise.all([
-    getCatalogSessions(db),
-    publicVenueHubRows(db, 500, { requireEvents: false }),
-  ]);
-  const venueHeroImageFallbacks = buildActiveVenueEventCounts(catalogSessions).heroImageFallbacks;
+  // Hub first (lean SQL) — do not block PDP on full catalog JSON promote/parse.
+  const hubRows = await publicVenueHubRows(db, 500, { requireEvents: false });
   const mergedGroup = findMergedVenueGroup(hubRows, venue.id);
   const venueContexts = collectVenueSessionLookupContexts(venue, mergedGroup, hubRows);
   const venueIds = [
@@ -421,7 +456,11 @@ export async function buildPublicVenuePage(db, venueSlugOrId) {
       ...venueContexts.map((row) => row.id).filter(Boolean),
     ]),
   ];
-  const sessions = lookupVenueCatalogSessions(venueIds, catalogSessions, venueContexts).slice(0, 120);
+
+  const [venueHeroImageFallbacks, sessions] = await Promise.all([
+    fetchVenueHeroImageFallbacks(venueIds),
+    loadVenuePageCatalogSessions(venueIds, venueContexts),
+  ]);
   if (!sessions.length) {
     const status = String(venue.pageStatus || '').toUpperCase();
     const resolvedKind = resolvePublicVenueKindFromRow(venue);

@@ -15,7 +15,7 @@ import {
 } from './public-destination.js';
 import { buildPublicLandings } from './public-city-landings.js';
 import { createDb } from './db.js';
-import { getPublicCatalogSessions } from './public-catalog.dto.js';
+import { getPublicCatalogSessions, getPublicCatalogSessionsSoft, resolveCatalogSessionsByDestinationKeys } from './public-catalog.dto.js';
 import { toPublicCatalogListItem } from './public-catalog-list-item.js';
 import { resolveProjectRoot } from './project-root.js';
 import type { DestinationType } from './types/common.js';
@@ -123,7 +123,15 @@ function scheduleDestinationsRebuild(forceRefresh: boolean): Promise<PublicDesti
       : null;
   }
 
-  const build = getPublicCatalogSessions(forceRefresh, { hydrateSlots: false }).then((sessions) => {
+  const build = (forceRefresh
+    ? getPublicCatalogSessions(true, { hydrateSlots: false })
+    : getPublicCatalogSessionsSoft(CITY_SECONDARY_TIMEOUT_MS, { hydrateSlots: false })
+  ).then((sessions) => {
+    // Soft timeout with null: keep previous destinations payload when possible.
+    if (!sessions) {
+      if (destinationsCache?.payload) return destinationsCache.payload;
+      return { generatedAt: new Date().toISOString(), destinations: [] };
+    }
     const payload = {
       generatedAt: new Date().toISOString(),
       destinations: buildPublicDestinationRowsFromSessions(sessions),
@@ -170,18 +178,25 @@ function scheduleCityPageRebuild(
     const requestedSlug = String(citySlugOrId || '').toLowerCase();
     const legacyDb = getLegacyDb();
     const catalogStartedAt = Date.now();
+    const catalogPromise = forceRefresh
+      ? getPublicCatalogSessions(true, { hydrateSlots: false })
+      : getPublicCatalogSessionsSoft(CITY_SECONDARY_TIMEOUT_MS, { hydrateSlots: false }).then(
+          (rows) => rows || [],
+        );
     const [catalogSessions, venueHubRows] = await Promise.all([
-      getPublicCatalogSessions(forceRefresh, { hydrateSlots: false }),
+      catalogPromise,
       withTimeout(publicVenueHubRows(legacyDb, 500), CITY_SECONDARY_TIMEOUT_MS, [], 'venue-hubs'),
     ]);
     cityPerfMark('catalog+venues-hub', catalogStartedAt, {
       sessions: catalogSessions.length,
       venueHubs: venueHubRows.length,
     });
-    const matchedSessions = lookupDestinationCatalogSessions(
-      citySlugOrId,
-      requestedSlug,
-      catalogSessions,
+    const indexKeys = [citySlugOrId, requestedSlug].filter(Boolean);
+    const indexed = resolveCatalogSessionsByDestinationKeys(indexKeys);
+    const matchedSessions = (
+      indexed.length
+        ? indexed
+        : lookupDestinationCatalogSessions(citySlugOrId, requestedSlug, catalogSessions)
     ) as PublicSessionDto[];
     const builtAt = Date.now();
     if (!matchedSessions.length) {
