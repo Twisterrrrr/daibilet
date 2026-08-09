@@ -1,3 +1,18 @@
+## 2026-08-09 - Perm: Губаха / Усьва one card
+
+### Наблюдения
+- Owner: chips «Усьва (день 1)» + «Губаха (день 2)» - снова одна карточка; дни обозначать внутри.
+
+### Решения
+- web+public `cityInfo`: одна suburb «Губаха / Усьва» (`perm-gubakha-usva`); `dayLabel` на places; preset `perm-gubakha-usva`.
+- `DayTripCanonCard` + `SuburbsCarousel`: рендер заголовков «День 1 - Усьва» / «День 2 - Губаха», нумерация POI внутри дням.
+- Остальные Perm suburbs (Хохловка, Кунгур, Православный Урал, Кунгурский экстрим) без изменений.
+
+### Проблемы
+- Deploy MSK web (статика cityInfo в apps/web).
+
+---
+
 ## 2026-08-09 - Public: hide closed/suspended sale slots
 
 ### Наблюдения

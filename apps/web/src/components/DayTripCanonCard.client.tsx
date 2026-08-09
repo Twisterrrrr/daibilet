@@ -11,6 +11,8 @@ export type DayTripCanonSight = {
   href?: string | null;
   /** Совет по перемещению к этой точке (серая строка между пунктами). */
   transitTip?: string;
+  /** Заголовок дня над пунктом (multi-day suburb: «День 1 - Усьва»). */
+  dayLabel?: string;
 };
 
 export type DayTripCanonCardProps = {
@@ -127,6 +129,15 @@ export function DayTripCanonCard({
   const hasGastro = Boolean(gastro?.name);
   const showMetaGrid = hasLogistics || hasGastro;
   const nested = sights.filter((s) => s?.name);
+  const poiDayNumbers: number[] = [];
+  {
+    let dayPlaceNum = 0;
+    for (const poi of nested) {
+      if (String(poi.dayLabel || '').trim()) dayPlaceNum = 0;
+      dayPlaceNum += 1;
+      poiDayNumbers.push(dayPlaceNum);
+    }
+  }
 
   const dataProps: Record<string, string> = {};
   if (dataAttrs) {
@@ -239,9 +250,23 @@ export function DayTripCanonCard({
           </div>
           <ol className="mt-2.5 list-none space-y-2 p-0 sm:mt-3 sm:space-y-2.5" data-day-trip-places>
             {nested.map((poi, poiIndex) => {
+              const dayLabel = String(poi.dayLabel || '').trim();
               const tip = formatCanonTransitTip(String(poi.transitTip || ''));
               return (
                 <li key={`${poi.name}:${poiIndex}`} className="list-none" data-day-trip-place>
+                  {dayLabel ? (
+                    <div
+                      className={`${
+                        poiIndex > 0
+                          ? `mt-3 border-t pt-3 sm:mt-3.5 sm:pt-3.5 ${borderSoft}`
+                          : ''
+                      } mb-1.5 sm:mb-2 ${GRID}`}
+                      data-day-trip-day-label
+                    >
+                      <span aria-hidden />
+                      <h5 className={`min-w-0 text-sm font-semibold ${inkClass}`}>{dayLabel}</h5>
+                    </div>
+                  ) : null}
                   {tip ? (
                     <div className={`mb-0.5 sm:mb-1 ${GRID}`}>
                       <span aria-hidden />
@@ -258,7 +283,7 @@ export function DayTripCanonCard({
                       className={`${GUTTER} tabular-nums ${numClass}`}
                       data-day-trip-place-num
                     >
-                      {poiIndex + 1}.
+                      {poiDayNumbers[poiIndex]}.
                     </span>
                     <span className={`min-w-0 ${poiTextClass}`}>
                       <SightLabel
