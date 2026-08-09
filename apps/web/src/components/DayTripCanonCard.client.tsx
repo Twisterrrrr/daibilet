@@ -121,7 +121,7 @@ export function DayTripCanonCard({
         ariaLabel ||
         (total != null ? `${index + 1} из ${total}` : undefined)
       }
-      className={`mt-4 w-full max-w-none rounded-2xl border bg-white p-5 shadow-sm sm:p-6 ${
+      className={`mt-4 w-full rounded-2xl border bg-white p-5 shadow-sm sm:p-6 ${
         editorial ? 'border-zinc-200' : 'border-slate-200'
       } ${className}`}
       data-day-trip-canon="1"
