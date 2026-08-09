@@ -2,8 +2,8 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| UX.SCENARIOS-TWO-COL | Hub/my-day scenarios stops: desktop 2-col + hanging nums; CTA beside title + panel v-center | Высокий | 🔄 ship+Deploy MSK web |
-| UX.EVENTS-YANDEX-LITE | `/events` P1-P4: date rail, category Ещё, search hints, real live rail (no P5) | Высокий | 🔄 ship+Deploy MSK web |
+| UX.SCENARIOS-TWO-COL | Hub/my-day scenarios: 2-col stops; CTA beside title + panel v-center | Высокий | ✅ `07dcb587` Deploy `31334844554` |
+| UX.EVENTS-YANDEX-LITE | `/events` P1-P4: date rail, category Ещё, search hints, real live rail (no P5) | Высокий | ✅ `d59fd28e` Deploy `31334844554` |
 | UX.EVENTS-CATALOG-REDESIGN | `/events` mobile-first: compact hero, filters FAB, modern cards 1/2/3/4 | Высокий | ✅ `d51eb4a2` / live `910faa55` |
 | FIX.CANON-PATH-FAMILY | Venue canonicalPath locations↔venues mismatch bulk fix (796) | Высокий | ✅ MSK apply 796; dry-run 0 |
 | FIX.LOC-REDIR-LOOP | location↔venues permanentRedirect loop via mismatched canonicalPath (Yaani Kirik) | Критический | ✅ `f3885fe2` Deploy `31317278952`; DB ATTRACTION; smoke 200 |
