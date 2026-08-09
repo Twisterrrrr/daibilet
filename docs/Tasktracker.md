@@ -2,6 +2,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
+| UX.SCENARIOS-TWO-COL | Hub/my-day scenarios stops: desktop 2-col + hanging nums (DayTripCanon gutter) | Высокий | 🔄 ship; deploy по «выкатывай» |
 | UX.EVENTS-CATALOG-REDESIGN | `/events` mobile-first: compact hero, filters FAB, modern cards 1/2/3/4 | Высокий | 🔄 ship; deploy по «выкатывай» |
 | FIX.CANON-PATH-FAMILY | Venue canonicalPath locations↔venues mismatch bulk fix (796) | Высокий | ✅ MSK apply 796; dry-run 0 |
 | FIX.LOC-REDIR-LOOP | location↔venues permanentRedirect loop via mismatched canonicalPath (Yaani Kirik) | Критический | ✅ `f3885fe2` Deploy `31317278952`; DB ATTRACTION; smoke 200 |
