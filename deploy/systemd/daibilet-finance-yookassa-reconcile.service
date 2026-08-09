@@ -1,16 +1,15 @@
 [Unit]
 Description=Daibilet finance YooKassa checkout reconcile
-Documentation=file:/opt/daibilet/docs/finance-159-smoke-runbook.md
-After=network-online.target daibilet-api.service
+Documentation=file:/opt/daibilet-finance/app/docs/finance-159-smoke-runbook.md
+After=network-online.target daibilet-finance-api.service
 Wants=network-online.target
 
 [Service]
 Type=oneshot
-WorkingDirectory=/opt/daibilet
-EnvironmentFile=/opt/daibilet/.env
+WorkingDirectory=/opt/daibilet-finance/app
+EnvironmentFile=/opt/daibilet-finance/app/.env
 Environment=NODE_ENV=production
 Nice=10
 CPUQuota=50%
 MemoryMax=512M
-ExecStart=/usr/bin/env npm run backend:checkout:yookassa:reconcile -- --apply --limit=100 --grace-minutes=10
-
+ExecStart=/usr/bin/env bash -lc 'COREPACK_ENABLE_STRICT=0 PNPM_CONFIG_ENGINE_STRICT=false corepack pnpm --filter @daibilet/backend checkout:yookassa:reconcile -- --apply --limit=100 --grace-minutes=10'

@@ -133,26 +133,28 @@ DAIBILET_YOOKASSA_CHECKOUT=1
 Ручной dry-run:
 
 ```bash
-cd /opt/daibilet
-npm run backend:checkout:yookassa:reconcile -- --limit=20 --grace-minutes=10
+cd /opt/daibilet-finance/app
+COREPACK_ENABLE_STRICT=0 PNPM_CONFIG_ENGINE_STRICT=false corepack pnpm backend:checkout:yookassa:reconcile -- --limit=20 --grace-minutes=10
 ```
 
 Применить изменения:
 
 ```bash
-cd /opt/daibilet
-npm run backend:checkout:yookassa:reconcile -- --apply --limit=100 --grace-minutes=10
+cd /opt/daibilet-finance/app
+COREPACK_ENABLE_STRICT=0 PNPM_CONFIG_ENGINE_STRICT=false corepack pnpm backend:checkout:yookassa:reconcile -- --apply --limit=100 --grace-minutes=10
 ```
 
 Установить timer на `.159`:
 
 ```bash
-cp /opt/daibilet/deploy/systemd/daibilet-finance-yookassa-reconcile.service /etc/systemd/system/
-cp /opt/daibilet/deploy/systemd/daibilet-finance-yookassa-reconcile.timer /etc/systemd/system/
+cp /opt/daibilet-finance/app/deploy/systemd/daibilet-finance-yookassa-reconcile.service /etc/systemd/system/
+cp /opt/daibilet-finance/app/deploy/systemd/daibilet-finance-yookassa-reconcile.timer /etc/systemd/system/
 systemctl daemon-reload
 systemctl enable --now daibilet-finance-yookassa-reconcile.timer
 systemctl list-timers daibilet-finance-yookassa-reconcile.timer
 ```
+
+Unit file is scoped to finance `.159`: `WorkingDirectory=/opt/daibilet-finance/app`, `EnvironmentFile=/opt/daibilet-finance/app/.env`, `After=daibilet-finance-api.service`.
 
 Ожидания:
 

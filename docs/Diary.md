@@ -1,3 +1,23 @@
+## 2026-08-09 - Finance `.159`: YooKassa reconcile timer guard
+
+### Наблюдения
+
+- Read-only check на `.159`: `daibilet-finance-yookassa-reconcile.{service,timer}` не установлены (`not-found`), timer inactive.
+- Unit в репо был опасно устаревшим для finance host: `/opt/daibilet`, `.env` из старого root и dependency на `daibilet-api.service`, тогда как live finance app живет в `/opt/daibilet-finance/app` под `daibilet-finance-api`.
+- При включении такого unit reconcile мог бы не стартовать или стартовать против неправильного контура.
+
+### Решения
+
+- `deploy/systemd/daibilet-finance-yookassa-reconcile.service` переведен на finance `.159` layout: `/opt/daibilet-finance/app`, `/opt/daibilet-finance/app/.env`, `After=daibilet-finance-api.service`.
+- ExecStart переведен на `corepack pnpm --filter @daibilet/backend checkout:yookassa:reconcile` с production-safe env flags.
+- `docs/finance-159-smoke-runbook.md` синхронизирован с теми же путями и командами.
+
+### Проблемы
+
+- Live enable timer не делаем без явного go owner: `включай reconcile timer`.
+
+---
+
 ## 2026-08-09 - Supplier LC: «Backend недоступен» на Заказах / Заявках
 
 ### Наблюдения
