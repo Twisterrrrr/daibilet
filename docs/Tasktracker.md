@@ -543,7 +543,7 @@ Alias `museum-1` = первый open-date контракт (не «музеи fo
 | UX.MYDAY-PRESETS | «Готовые сценарии» under Hot Picks (cityInfo presets) | Высокий | ✅ `f280018` MSK **BUILD_ID=`cM9j1lcFbpgHSogY-npKs`** `/my-day` 200 |
 | UX.MYDAY-PRESET-GATE | SPB/my-day: skeleton до settle locations+venues - без pop-in 4→6 сценариев | Критический | ✅ `c0d61b6d`; MSK **BUILD_ID=`tBAB7m9Y6YW8i3yukypOC`** |
 | UX.MYDAY-BOAT-MODAL | 🚫 superseded: wizard-as-modal (`81d740a6`) был неверным прочтением; owner имел в виду purchase modal | Критический | 🚫 rollback inline wizard |
-| UX.MYDAY-BUY-MODAL | «Купить билет» → TC native / CheckoutModal overlay (не new tab; не wizard portal) | Критический | 🔄 `b3d841a3` push; Deploy MSK web |
+| UX.MYDAY-BUY-MODAL | «Купить билет» → TC native / CheckoutModal overlay (не new tab; не wizard portal) | Критический | ✅ `b3d841a3`; MSK **BUILD_ID=`9BpSEnRcVf3lhoksHGMJ6`** [GHA](https://github.com/Twisterrrrr/daibilet/actions/runs/31299812672) |
 | UX.MYDAY-PRESET-BLOG | Preset cards: «Читать об этом в блоге» via `blogSlug` - blue + underline + arrow; desktop inline after title (flex-wrap) | Высокий | ✅ `06625e0` MSK **BUILD_ID=`2NIdFliuqHg4lCRrEYYxP`** `/my-day` 200 |
 | SEO.MYDAY-META | /my-day title+desc+OG package; keep noindex until crawlable content | Высокий | ✅ `31a0dc0` MSK **BUILD_ID=`qZnQ6TqtoJkKtvxVB9mtI`** |
 | UX.MYDAY-LIST-MAP | Mobile list-first + Список/Карта toggle (no sticky 38vh); compact footer | Критический | ✅ `4ffb251` MSK **BUILD_ID=`0Fnc1S9ndw3dPSeEmy2Za`** `/my-day` 200 |
