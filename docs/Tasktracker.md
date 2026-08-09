@@ -2,18 +2,18 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| UX.MYDAY-TRAVEL-PRODUCT | `/my-day`: magazine suburb, stops timeline, scenario snap cards, must-see carousel, mobile shelf tabs | Критический | ✅ `af70051d`; deploy по «выкатывай» |
-| UX.PODBORKI-ONE-FILTER | `/podborki`: один filter-system (black tabs + soft tags); kill «Каталог подборок»/дубль city; clean covers (meta under photo); dedupe featured | Высокий | ✅ `eb68f461`; deploy по «выкатывай» |
+| UX.MYDAY-TRAVEL-PRODUCT | `/my-day`: magazine suburb, stops timeline, scenario snap cards, must-see carousel, mobile shelf tabs | Критический | ✅ `af70051d` Deploy `31342186797` BUILD_ID=`RWJuTMEW-R707-yh7VQwJ` |
+| UX.PODBORKI-ONE-FILTER | `/podborki`: один filter-system (black tabs + soft tags); kill «Каталог подборок»/дубль city; clean covers (meta under photo); dedupe featured | Высокий | ✅ `eb68f461` Deploy `31342186797` BUILD_ID=`RWJuTMEW-R707-yh7VQwJ` |
 | UX.SITEWIDE-MINIMALISM | Sitewide UX: 1 mobile filter rail; no system junk; clean covers (meta under photo); one monochrome line icon pack. Canon LOCKED in Project/Diary | Высокий | ✅ docs locked; 🔄 page polishes ongoing (venues done; locations/podborki/blog) |
-| UX.VENUES-CATALOG-QUIET | `/venues`: kill dark hero; white H1; soft chip rail; no Найдено/стр.; clean InstitutionCard (+ icon, meta above title) | Высокий | ✅ `e78f905b`; deploy по «выкатывай» |
+| UX.VENUES-CATALOG-QUIET | `/venues`: kill dark hero; white H1; soft chip rail; no Найдено/стр.; clean InstitutionCard (+ icon, meta above title) | Высокий | ✅ `e78f905b` Deploy `31342186797` BUILD_ID=`RWJuTMEW-R707-yh7VQwJ` |
 | UX.BLOG-INDEX-POLISH | `/blog`: soft toolbar/chips; quiet fresh meta; simplify afisha promo; drop count+view toggle | Высокий | 🔄 ship; deploy по «выкатывай» |
 | UX.LOCATIONS-CATALOG-QUIET | `/locations`: quieter hero/filters; vertical premium cards; no overlay route pill; strip city on address | Высокий | 🔄 ship; deploy по «выкатывай» |
 | UX.EVENTS-CHIPS-SIMPLIFY | `/events`: date rail в hero; quick+categories один ряд под search; drop mobile date/type selects | Высокий | ✅ `ad5f3dc0`; deploy по «выкатывай» |
 | UX.CITIES-SORT-ONE-LIST | `/cities`: один список (без top/octet); sort popular/name на весь набор; toolbar search+controls в одной строке | Высокий | ✅ `2965a338`; deploy по «выкатывай» | Deploy `31336541746` BUILD_ID=`SR08A3UaBJ4IlLsjQcK4n`
 | UX.VENUE-AFISHA-ORDER | Venue/location: афиша выше; хабы/похожие ниже | Высокий | ✅ `28795f43`; deploy по «выкатывай» | Deploy `31336541746` BUILD_ID=`SR08A3UaBJ4IlLsjQcK4n`
 | UX.VENUE-SCHEDULE-RAIL | Venue «Расписание и билеты»: date rail + calendar; drop table/tabs/stats/subtitle | Высокий | ✅ `28795f43`+`97b27739`; deploy по «выкатывай» | Deploy `31336541746` BUILD_ID=`SR08A3UaBJ4IlLsjQcK4n`
-| CONT.VENUE-LOCATION-PREVIEWS | Audit+GenerateImage covers для locations/institutions без превью; wire LOCATION_PACK | Высокий | ✅ 94 gaps closed (1 loc + 93 inst; skip test); deploy batch | |
-| FIX.VENUE-DATE-RAIL-SLOTS | Pier/location date rail: hydrate upcomingSlots на venue-scoped slice (не только nearest/today) | Высокий | ✅ 2f0b8099; deploy по «выкатывай» (API+web) | |
+| CONT.VENUE-LOCATION-PREVIEWS | Audit+GenerateImage covers для locations/institutions без превью; wire LOCATION_PACK | Высокий | ✅ `88708eac` Deploy web `31342186797` BUILD_ID=`RWJuTMEW-R707-yh7VQwJ` | |
+| FIX.VENUE-DATE-RAIL-SLOTS | Pier/location date rail: hydrate upcomingSlots на venue-scoped slice (не только nearest/today) | Высокий | ✅ `2f0b8099` API restart MSK 23:34Z + web `31342186797` | |
 | UX.SCENARIOS-TITLE-FLUSH | Scenarios panel: no empty gutter; blog+CTA on title row | Высокий | ✅ `06b1db6b` Deploy `31335835810` BUILD_ID=`Mby7MP2KiGFvNEWzY_qC4` |
 | UX.EVENTS-MOBILE-SELECTS | `/events` mobile: Find in search; date+type dropdowns; chip rails md+ only | Высокий | ✅ `c68d010e` Deploy `31335835810` BUILD_ID=`Mby7MP2KiGFvNEWzY_qC4` |
 | UX.EVENTS-FILTERS-AIR | `/events` mobile: sticky search-only (chips visible); filter sheet air + quick evening chip | Высокий | ✅ `f0880cb1` Deploy `31335835810` BUILD_ID=`Mby7MP2KiGFvNEWzY_qC4` |
