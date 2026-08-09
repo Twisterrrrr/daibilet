@@ -9,6 +9,8 @@ export type DayTripCanonSight = {
   name: string;
   desc?: string;
   href?: string | null;
+  /** Совет по перемещению к этой точке (серая строка над пунктом). */
+  transitTip?: string;
 };
 
 export type DayTripCanonCardProps = {
@@ -202,23 +204,32 @@ export function DayTripCanonCard({
         <section className={`mt-5 border-t pt-4 ${borderSoft}`} data-day-trip-sights>
           <h4 className={`text-sm font-semibold ${inkClass}`}>Что посмотреть</h4>
           <ol className="mt-3 list-none space-y-2 p-0" data-day-trip-places>
-            {nested.map((poi, poiIndex) => (
-              <li
-                key={`${poi.name}:${poiIndex}`}
-                className="flex items-start gap-2 text-sm leading-snug"
-                data-day-trip-place
-              >
-                <span className={`shrink-0 tabular-nums ${numClass}`}>{poiIndex + 1}.</span>
-                <span className={`min-w-0 flex-1 ${poiTextClass}`}>
-                  <SightLabel
-                    name={poi.name}
-                    href={poi.href}
-                    desc={poi.desc}
-                    descFromMd={sightDescFromMd}
-                  />
-                </span>
-              </li>
-            ))}
+            {nested.map((poi, poiIndex) => {
+              const tip = String(poi.transitTip || '').trim();
+              return (
+                <li key={`${poi.name}:${poiIndex}`} className="list-none" data-day-trip-place>
+                  {tip ? (
+                    <p
+                      className={`mb-1 pl-6 text-[12px] leading-snug ${mutedClass}`}
+                      data-day-trip-transit-tip
+                    >
+                      {tip}
+                    </p>
+                  ) : null}
+                  <div className="flex items-start gap-2 text-sm leading-snug">
+                    <span className={`shrink-0 tabular-nums ${numClass}`}>{poiIndex + 1}.</span>
+                    <span className={`min-w-0 flex-1 ${poiTextClass}`}>
+                      <SightLabel
+                        name={poi.name}
+                        href={poi.href}
+                        desc={poi.desc}
+                        descFromMd={sightDescFromMd}
+                      />
+                    </span>
+                  </div>
+                </li>
+              );
+            })}
           </ol>
         </section>
       ) : null}

@@ -1,3 +1,19 @@
+## 2026-08-09 - transitTip + logistics pack (NN / SPB / Perm / KGD)
+
+### Наблюдения
+- Owner: между точками suburb/preset нужен короткий совет по перемещению; плюс оптимальные порядки НН, СПБ (треугольник / Петроградка / Бертгольд / барный) и tips к уже переставленным Perm/KGD.
+
+### Решения
+- Schema: `transitTip?: string` на `CityMustSeeItem` / `CitySuburbPlace`; UI - серая строка над пунктом в `DayTripCanonCard` («Что посмотреть»); scenarios light panel не трогали.
+- NN: Городец / Семёнов / Дивеево / Макарьево - порядок + timingNote + tips; presets `nn-semenov-day` / `nn-makaryev-day`.
+- SPB presets: Золотой треугольник, Петроградка (по часовой от Авроры), Бертгольд→Новая Голландия, Барный (без Гражданки/поп-дискотек).
+- Perm/KGD: tips на places к логистике гида; UI copy только дефис `-`.
+
+### Проблемы
+- Ship+Deploy MSK web - ниже после GHA.
+
+---
+
 ## 2026-08-09 - KGD suburbs logistics (гид)
 
 ### Наблюдения

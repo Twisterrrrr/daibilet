@@ -183,6 +183,16 @@ Auto refunds / self-serve refund UI out of Stage 0. **Refunds light** (заяв�
 
 **Примеры СПб (seed):** `spb-petergof`, `spb-tsarskoe-selo`.
 
+## 2026-08-09 - transitTip между точками day-trip (LOCKED)
+
+**LOCKED owner (гид 2026-08-09):** в таймлайн «Что посмотреть» / suburb places имеет смысл вставлять короткие советы по транспорту между точками.
+
+| Слой | Правило |
+|------|---------|
+| **Schema** | Опционально `transitTip?: string` на stop/place (`CityMustSeeItem` / `CitySuburbPlace`) - совет **к этой точке** от предыдущей (или от станции для первой). |
+| **UI** | В `DayTripCanonCard` - серая строка над пунктом (`data-day-trip-transit-tip`). Scenarios light panel не обязаны показывать tips. |
+| **Copy** | Коротко: «7-10 мин пешком», «такси 15 км», «паром ~30 мин». Дефис `-` в UI. |
+
 ## 2026-08-09 - Suburb nested POI count by density (LOCKED)
 
 **LOCKED owner (2026-08-09):** пригороды СПб не обязаны укладываться в ровно 5 nested точек.

@@ -204,6 +204,7 @@ export function SuburbsCarousel({
           name: poi.name,
           desc: String(poi.desc || '').trim() || undefined,
           href: resolveCityPlaceTitleHref(poi, venues),
+          transitTip: String(poi.transitTip || '').trim() || undefined,
         }))}
         cta={
           bulkVenues.length > 0 ? (
