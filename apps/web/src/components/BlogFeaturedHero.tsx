@@ -1,20 +1,16 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, Ticket } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 import { BlogAfishaPromo } from '@/components/BlogAfishaPromo.client';
-import { resolveBlogCityEventsHref, resolveBlogCityHref } from '@/lib/blog-article-city';
 import {
   authorLabel,
-  blogCityBadgeClassName,
   blogTagBadgeClassName,
   cityFilterLabel,
   normalizeBlogTagLabel,
 } from '@/lib/blog-meta';
 import { resolveBlogListingCta } from '@/lib/blog-listing-links';
 import type { BlogSidebarPromoDto } from '@/lib/blog-sidebar-promo';
-import { cityToPrepositional } from '@/lib/city-declension';
-import { formatNumber } from '@/lib/format';
 import {
   expandLargeListingCopy,
   resolveBlogCardDateLabel,
@@ -28,36 +24,28 @@ const HOT_THUMB_SIZES = '(max-width: 768px) 112px, 80px';
 type BlogFeaturedHeroProps = {
   featured: BlogCardDto;
   hotPosts: BlogCardDto[];
-  /** slug → min price (city hub or related CHPU). */
+  /** slug → min price (city hub or related CHPU). Kept for callers; not shown in fresh previews. */
   hotMinPrices?: Record<string, number>;
   afishaPromos?: Record<string, BlogSidebarPromoDto>;
   afishaFallbackCityName?: string | null;
   afishaFallbackCitySlug?: string | null;
 };
 
-function resolveTicketsLine(post: BlogCardDto, minPrice?: number) {
-  if (typeof minPrice !== 'number' || !Number.isFinite(minPrice) || minPrice < 100) {
-    return null;
-  }
+function freshMetaLine(post: BlogCardDto): string | null {
   const cityLabel = cityFilterLabel(post.citySlug, post.city);
-  if (!cityLabel || cityLabel === 'Регионы' || cityLabel === 'Несколько городов' || cityLabel === 'Без города') {
-    return null;
-  }
-  const href =
-    resolveBlogCityEventsHref(post.city, post.citySlug) ||
-    resolveBlogCityHref(post.city, post.citySlug);
-  if (!href) return null;
-
-  return {
-    href,
-    label: `Билеты в ${cityToPrepositional(cityLabel)} от ${formatNumber(minPrice)} ₽`,
-  };
+  const showCity =
+    Boolean(post.citySlug || post.city) &&
+    cityLabel !== 'Без города' &&
+    cityLabel !== 'Регионы' &&
+    cityLabel !== 'Несколько городов';
+  const read = post.readMin ? `${post.readMin} мин` : null;
+  const parts = [showCity ? cityLabel : null, read].filter(Boolean);
+  return parts.length ? parts.join(' · ').toUpperCase() : null;
 }
 
 export function BlogFeaturedHero({
   featured,
   hotPosts,
-  hotMinPrices = {},
   afishaPromos = {},
   afishaFallbackCityName,
   afishaFallbackCitySlug,
@@ -172,10 +160,7 @@ export function BlogFeaturedHero({
             <ul className="divide-y divide-slate-200/80 overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
               {hotPosts.map((post) => {
                 const href = `/blog/${post.slug}`;
-                const cityLabel = cityFilterLabel(post.citySlug, post.city);
-                const showCity =
-                  Boolean(post.citySlug || post.city) && cityLabel !== 'Без города';
-                const tickets = resolveTicketsLine(post, hotMinPrices[post.slug]);
+                const meta = freshMetaLine(post);
 
                 return (
                   <li key={post.slug}>
@@ -194,13 +179,11 @@ export function BlogFeaturedHero({
                           className="object-cover transition-transform duration-500 hover:scale-105"
                         />
                       </Link>
-                      <div className="flex min-w-0 flex-1 flex-col justify-center gap-1.5 md:gap-1">
-                        {showCity ? (
-                          <span
-                            className={`inline-flex w-fit max-w-full truncate rounded-md px-1.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide ring-1 md:text-[10px] ${blogCityBadgeClassName(post.citySlug)}`}
-                          >
-                            {cityLabel}
-                          </span>
+                      <div className="flex min-w-0 flex-1 flex-col justify-center">
+                        {meta ? (
+                          <p className="mb-2 text-[10px] font-medium uppercase tracking-[0.12em] text-slate-400 md:mb-1.5 md:text-[10px]">
+                            {meta}
+                          </p>
                         ) : null}
                         <Link
                           href={href}
@@ -208,15 +191,6 @@ export function BlogFeaturedHero({
                         >
                           {post.title}
                         </Link>
-                        {tickets ? (
-                          <Link
-                            href={tickets.href}
-                            className="inline-flex items-center gap-1 text-xs font-medium text-primary-700 hover:text-primary-800 md:text-[11px]"
-                          >
-                            <Ticket className="h-3.5 w-3.5 shrink-0 md:h-3 md:w-3" aria-hidden />
-                            <span className="line-clamp-1">{tickets.label}</span>
-                          </Link>
-                        ) : null}
                       </div>
                     </div>
                   </li>

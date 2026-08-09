@@ -2,7 +2,9 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
+| UX.PODBORKI-ONE-FILTER | `/podborki`: один filter-system (black tabs + soft tags); kill «Каталог подборок»/дубль city; clean covers (meta under photo); dedupe featured | Высокий | ✅ code; deploy по «выкатывай» |
 | UX.SITEWIDE-MINIMALISM | Sitewide UX: 1 mobile filter rail; no system junk; clean covers (meta under photo); one monochrome line icon pack. Canon LOCKED in Project/Diary | Высокий | ✅ docs locked; 🔄 page polishes ongoing (locations/podborki/blog/events cards; pier dates) |
+| UX.BLOG-INDEX-POLISH | `/blog`: soft toolbar/chips; quiet fresh meta; simplify afisha promo; drop count+view toggle | Высокий | 🔄 ship; deploy по «выкатывай» |
 | UX.LOCATIONS-CATALOG-QUIET | `/locations`: quieter hero/filters; vertical premium cards; no overlay route pill; strip city on address | Высокий | 🔄 ship; deploy по «выкатывай» |
 | UX.EVENTS-CHIPS-SIMPLIFY | `/events`: date rail в hero; quick+categories один ряд под search; drop mobile date/type selects | Высокий | ✅ `ad5f3dc0`; deploy по «выкатывай» |
 | UX.CITIES-SORT-ONE-LIST | `/cities`: один список (без top/octet); sort popular/name на весь набор; toolbar search+controls в одной строке | Высокий | ✅ `2965a338`; deploy по «выкатывай» | Deploy `31336541746` BUILD_ID=`SR08A3UaBJ4IlLsjQcK4n`

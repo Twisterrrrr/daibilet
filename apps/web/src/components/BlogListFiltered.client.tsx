@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { LayoutGrid, List } from 'lucide-react';
+import { ChevronDown, Search } from 'lucide-react';
 
 import { BlogListRows } from '@/components/BlogListRows.client';
 import { BlogMagazineGrid } from '@/components/BlogMagazineGrid.client';
@@ -15,7 +15,6 @@ import { parseBlogTopicParam, postMatchesTopic } from '@/lib/blog-topics';
 import {
   parseBlogViewMode,
   readStoredBlogViewMode,
-  storeBlogViewMode,
   type BlogViewMode,
 } from '@/lib/blog-view-mode';
 
@@ -53,60 +52,32 @@ function matchesQuery(post: BlogCardDto, query: string): boolean {
   return tokens.every((token) => haystack.includes(token));
 }
 
-function BlogViewModeToggle({
-  mode,
+function SoftSelect({
+  value,
   onChange,
-}: {
-  mode: BlogViewMode;
-  onChange: (mode: BlogViewMode) => void;
-}) {
-  return (
-    <div
-      className="hidden h-10 shrink-0 items-center overflow-hidden rounded-xl bg-slate-100 p-1 ring-1 ring-slate-200/80 md:inline-flex"
-      role="radiogroup"
-      aria-label="Вид списка статей"
-    >
-      <ViewModeButton
-        active={mode === 'magazine'}
-        label="Сетка"
-        onClick={() => onChange('magazine')}
-      >
-        <LayoutGrid className="h-4 w-4" aria-hidden />
-      </ViewModeButton>
-      <ViewModeButton active={mode === 'list'} label="Список" onClick={() => onChange('list')}>
-        <List className="h-4 w-4" aria-hidden />
-      </ViewModeButton>
-    </div>
-  );
-}
-
-function ViewModeButton({
-  active,
-  label,
-  onClick,
+  ariaLabel,
   children,
 }: {
-  active: boolean;
-  label: string;
-  onClick: () => void;
-  children: React.ReactNode;
+  value: string;
+  onChange: (value: string) => void;
+  ariaLabel: string;
+  children: ReactNode;
 }) {
   return (
-    <button
-      type="button"
-      role="radio"
-      aria-checked={active}
-      aria-label={label}
-      title={label}
-      onClick={onClick}
-      className={`grid h-8 w-8 place-items-center rounded-lg transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 ${
-        active
-          ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200'
-          : 'text-slate-500 hover:bg-white/70 hover:text-slate-800'
-      }`}
-    >
-      {children}
-    </button>
+    <label className="relative inline-flex min-w-0 items-center">
+      <select
+        className="appearance-none bg-transparent py-1.5 pr-6 text-sm font-medium text-slate-700 outline-none transition hover:text-slate-900 focus-visible:text-slate-900"
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        aria-label={ariaLabel}
+      >
+        {children}
+      </select>
+      <ChevronDown
+        className="pointer-events-none absolute right-0 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400"
+        aria-hidden
+      />
+    </label>
   );
 }
 
@@ -134,7 +105,7 @@ export function BlogListFiltered({
   const searchParams = useSearchParams();
   const cityOptionsSource = allPosts?.length ? allPosts : posts;
   const [viewMode, setViewModeState] = useState<BlogViewMode>('magazine');
-  /** Below md toggle is hidden - always magazine so user is not stuck in list. */
+  /** Below md always magazine - filter/view controls are desktop-only. */
   const [isMdUp, setIsMdUp] = useState(false);
   const [cursor, setCursor] = useState<string | null>(null);
   const [visiblePosts, setVisiblePosts] = useState<BlogCardDto[]>([]);
@@ -205,19 +176,6 @@ export function BlogListFiltered({
     setNextCursor(page.nextCursor);
   }, [filtered, effectiveViewMode]);
 
-  const setViewMode = useCallback(
-    (next: BlogViewMode) => {
-      setViewModeState(next);
-      storeBlogViewMode(next);
-      const params = new URLSearchParams(searchParams.toString());
-      if (next === 'magazine') params.delete('view');
-      else params.set('view', next);
-      const qs = params.toString();
-      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-    },
-    [pathname, router, searchParams],
-  );
-
   const setFilter = useCallback(
     (key: 'city' | 'author', value: string) => {
       const next = new URLSearchParams(searchParams.toString());
@@ -267,63 +225,44 @@ export function BlogListFiltered({
   const bannerLabel = emptyCheckSlug ? cityFilterLabel(urlCity) : null;
   const showEmptyCityBanner = Boolean(emptyCheckSlug && bannerLabel && emptyCheckCount === 0);
 
-  const selectClass =
-    'min-h-14 min-w-[10rem] flex-1 rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-base text-slate-800 outline-none transition focus:border-primary-400 focus:ring-2 focus:ring-primary-100 md:min-h-11 md:px-3 md:py-2.5 md:text-sm sm:max-w-[16rem] sm:flex-none';
-
   const filtersBar = (
-    <div className="mb-8 border-b border-slate-200 pb-5">
-      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-        <select
-          className={selectClass}
+    <div className="mb-8 hidden border-b border-slate-200/70 pb-4 md:block">
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+        <SoftSelect
           value={urlCity}
-          onChange={(event) => setFilter('city', event.target.value)}
-          aria-label="Фильтр материалов по городу"
+          onChange={(value) => setFilter('city', value)}
+          ariaLabel="Фильтр материалов по городу"
         >
           <option value="all">Все города</option>
           {cityOptions.map((option) => (
             <option key={option.value} value={option.value}>
-              {option.label} ({option.count})
+              {option.label}
             </option>
           ))}
-        </select>
+        </SoftSelect>
 
-        <select
-          className={selectClass}
+        <SoftSelect
           value={author}
-          onChange={(event) => setFilter('author', event.target.value)}
-          aria-label="Фильтр по автору"
+          onChange={(value) => setFilter('author', value)}
+          ariaLabel="Фильтр по автору"
         >
           <option value="all">Все авторы</option>
           {authorOptions.map((option) => (
             <option key={option.value} value={option.value}>
-              {option.label} ({option.count})
+              {option.label}
             </option>
           ))}
-        </select>
+        </SoftSelect>
 
         {hasActive ? (
           <button
             type="button"
             onClick={resetFilters}
-            className="py-2.5 text-sm font-medium text-primary-600 hover:text-primary-700"
+            className="text-sm font-medium text-primary-600 hover:text-primary-700"
           >
             Сбросить
           </button>
         ) : null}
-
-        <div className="flex w-full flex-wrap items-center justify-between gap-x-3 gap-y-2 sm:ml-auto sm:w-auto sm:justify-end">
-          <p className="text-sm text-slate-500">
-            Найдено: <span className="font-semibold text-slate-800">{filtered.length}</span>
-            {posts.length ? <span> из {posts.length}</span> : null}
-            {filtered.length > 0 ? (
-              <span className="text-slate-400">
-                {' '}
-                (показано {displayPosts.length})
-              </span>
-            ) : null}
-          </p>
-          <BlogViewModeToggle mode={viewMode} onChange={setViewMode} />
-        </div>
       </div>
     </div>
   );
@@ -384,7 +323,7 @@ export function BlogListFiltered({
     <div>
       {/*
         Materials filter MUST sit immediately under BlogListHero, before featured/feed.
-        Root cause of owner complaint: «Найдено» lived inside feedBody after featuredSlot.
+        City/author row is desktop-only; mobile keeps search + topic chips in hero.
       */}
       {filtersBar}
 

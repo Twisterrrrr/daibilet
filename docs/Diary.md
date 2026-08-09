@@ -1,3 +1,59 @@
+## 2026-08-10 - `/podborki`: один filter-system + clean covers
+
+### Наблюдения
+- Owner: сильная идея контента, но страница перегружена тройным слоем фильтров (mood chips + black category tabs + «Быстрые подборки») и «вторым экраном» (`Каталог подборок` + дубль city picker).
+- На карточках city badge и цветные pill («N событий» / цена) накрывали фото.
+
+### Решения
+- Один filter-system: primary black tabs (`По типу` / `Для кого` / `Сезонное`) + один ряд soft gray tags под активным табом; moods/quick intents сложены в `PODBORKI_CATEGORY_TAGS`.
+- Убраны блоки «Быстрые подборки», «Каталог подборок», дубль CityPicker и popular rail; flow: H1 → filters → featured+тренды → grid.
+- Tile/featured: на фото только title + «Смотреть»; meta `N событий · от X ₽` под картинкой; featured slug дедупится из grid.
+- Deploy не трогаем - commit+push ветки.
+
+### Проблемы
+- Нет.
+
+
+---
+
+## 2026-08-10 - Sitewide UX recipe (owner canon)
+
+### Наблюдения
+- Owner зафиксировал sitewide UX-рецепт для каталогов и карточек (минимализм, mobile-first). Параллельные page polish идут по этому канону.
+
+### Решения
+- Канон (LOCKED в `docs/Project.md` → UI standards):
+  1. **One filter row on mobile** - категории / даты / теги = один horizontal swipe-rail.
+  2. **No system junk** - убрать «Найдено N», «стр. 1 из 10», instructional copy, disabled-дубли кнопок.
+  3. **Clean covers** - фото продаёт эмоцию; цена / места / даты / meta под картинкой, не цветные pill на фото.
+  4. **One icon pack** - тонкие монохромные line-иконки; без смеси цветных emoji в chrome UI.
+- Статус сессии (без выдумок):
+  - **Live** (~`964c4567` batch): `/cities` list+toolbar; venue schedule rail + afisha order; scenarios padding.
+  - **В ветке / не обязательно live:** `/events` dates in hero (`ad5f3dc0`); restore ширины schedule cards; pier dates investigate/fix; `/locations` polish; `/podborki` polish; `/blog` polish - часть может ещё идти у агентов → **in progress / pending**.
+- Tasktracker: `UX.SITEWIDE-MINIMALISM`. Docs-only commit+push; deploy не трогаем.
+
+### Проблемы
+- Нет (канон docs); runtime polish страниц - ongoing.
+
+---
+
+## 2026-08-10 - `/blog` magazine polish (toolbar / fresh / afisha)
+
+### Наблюдения
+- Owner: технический шум на индексе блога - счётчик «Найдено», тяжёлые selects, toggle вида, синие city pills + ticket CTA в «Свежее», перегруженная afisha-карточка.
+
+### Решения
+- Toolbar: убран счётчик; city/author = borderless text + thin chevron; строка фильтров `hidden md:block`; view toggle убран (magazine default).
+- Hero: search + soft topic chips (`#F5F5F7`, radius ~20) на всех breakpoints.
+- Fresh mini-cards: muted caps `ГОРОД · N МИН`; без commercial ticket line.
+- Afisha promo: atmospheric photo + «Гид по лучшим событиям {город}» + один CTA; без списка событий / genre chips / цен.
+- Deploy по «выкатывай».
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-10 - `/locations` quieter catalog + vertical cards
 
 ### Наблюдения

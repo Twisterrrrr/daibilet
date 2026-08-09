@@ -108,12 +108,7 @@ export function BlogListHero({ breadcrumbs, cityName = null }: BlogListHeroProps
 
   return (
     <HeroLayout variant="minimal" breadcrumbs={breadcrumbs} title={title} description={description}>
-      {/* Desktop search only - on mobile articles matter more than the search field. */}
-      <form
-        className="relative mt-5 hidden max-w-xl md:block"
-        onSubmit={submitSearch}
-        role="search"
-      >
+      <form className="relative mt-5 max-w-xl" onSubmit={submitSearch} role="search">
         <label className="relative block">
           <span className="sr-only">Поиск по статьям</span>
           <Search
@@ -131,12 +126,7 @@ export function BlogListHero({ breadcrumbs, cityName = null }: BlogListHeroProps
         </label>
       </form>
 
-      {/* Topic chips: desktop only (owner mobile markup). */}
-      <div
-        className="mt-3 hidden flex-wrap gap-2 md:flex"
-        role="group"
-        aria-label="Быстрые темы"
-      >
+      <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="Быстрые темы">
         {topicChips.map((id) => {
           const active = topic === id;
           return (
@@ -145,10 +135,10 @@ export function BlogListHero({ breadcrumbs, cityName = null }: BlogListHeroProps
               type="button"
               aria-pressed={active}
               onClick={() => setTopic(active ? 'all' : id)}
-              className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${
+              className={`rounded-[20px] px-3.5 py-1.5 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${
                 active
-                  ? 'bg-slate-900 text-white'
-                  : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50'
+                  ? 'bg-primary text-white hover:bg-primary/90'
+                  : 'bg-[#F5F5F7] text-[#6E6E73] hover:bg-[#EBEBED] hover:text-graphite'
               }`}
             >
               {HERO_TOPIC_LABELS[id] || blogTopicLabel(id)}
