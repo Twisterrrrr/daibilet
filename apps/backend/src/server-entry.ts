@@ -12,6 +12,8 @@ import { createAdminEventScheduleRouteHandler } from './admin-event-schedule-han
 import { createAdminEventsRouteHandler } from './admin-events-handler.js';
 import { createAdminEventsReadRouteHandler } from './admin-events-read-handler.js';
 import { buildAdminEventDetailDto, buildAdminEventsListDto } from './admin-events.dto.js';
+import { buildAdminFinanceLedgerDto } from './admin-finance.dto.js';
+import { createAdminFinanceRouteHandler } from './admin-finance-handler.js';
 import { applyApprovedEventChangeRequest } from './event-change-request-applier.js';
 import { reviewEventChangeRequest } from './event-change-request-review.js';
 import { createAdminLandingsRouteHandler } from './admin-landings-handler.js';
@@ -19,7 +21,7 @@ import { buildAdminListingHealthOverviewDto } from './admin-listing-health.dto.j
 import { createAdminListingHealthRouteHandler } from './admin-listing-health-handler.js';
 import { createAdminOrdersRouteHandler } from './admin-orders-handler.js';
 import { createAdminOrdersReadRouteHandler } from './admin-orders-read-handler.js';
-import { buildAdminOrderDetailDto, buildAdminOrdersListDto } from './admin-orders.dto.js';
+import { buildAdminOrderDetailDto, buildAdminOrdersListDto, createAdminOrderRefundRequestDto } from './admin-orders.dto.js';
 import { createAdminSuppliersRouteHandler } from './admin-suppliers-handler.js';
 import { buildAdminSupplierDetailDto, buildAdminSuppliersListDto } from './admin-suppliers.dto.js';
 import { createAdminAuthConfig } from './auth.js';
@@ -138,6 +140,10 @@ const server = startServer({
         buildOrdersList: buildAdminOrdersListDto,
         buildOrderDetail: buildAdminOrderDetailDto,
       }),
+      createAdminFinanceRouteHandler({
+        enabled: adminFlags.orders,
+        buildLedger: buildAdminFinanceLedgerDto,
+      }),
       createAdminEventsReadRouteHandler({
         enabled: adminFlags.events,
         buildEventsList: buildAdminEventsListDto,
@@ -161,6 +167,7 @@ const server = startServer({
       createAdminOrdersRouteHandler({
         db,
         upsertAdminOrderTicket,
+        createRefundRequest: createAdminOrderRefundRequestDto,
       }),
       createAdminEventsRouteHandler({
         db,

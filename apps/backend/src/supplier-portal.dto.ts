@@ -338,7 +338,7 @@ export async function buildSupplierPortalFinanceDto(
 ): Promise<SupplierPortalFinanceDto> {
   const supplier = await resolveSupplierPortal(searchParams);
   const aggregates = await loadSupplierPortalAggregates(supplier.id);
-  const [ledger, payouts] = await prisma.$transaction([
+  const [ledger, payouts, refunds, reports, settlements, documents] = await prisma.$transaction([
     prisma.supplierLedgerEntry.findMany({
       where: { supplierId: supplier.id },
       orderBy: { createdAt: 'desc' },
@@ -370,6 +370,69 @@ export async function buildSupplierPortalFinanceDto(
         createdAt: true,
       },
     }),
+    prisma.refundRequest.findMany({
+      where: { supplierId: supplier.id },
+      orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+      take: 30,
+      select: {
+        id: true,
+        status: true,
+        amountKopecks: true,
+        currency: true,
+        reason: true,
+        reasonNote: true,
+        adminComment: true,
+        createdAt: true,
+      },
+    }),
+    prisma.supplierReport.findMany({
+      where: { supplierId: supplier.id },
+      orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+      take: 30,
+      select: {
+        id: true,
+        periodStart: true,
+        periodEnd: true,
+        basis: true,
+        status: true,
+        hasConflict: true,
+        grossKopecks: true,
+        commissionKopecks: true,
+        refundKopecks: true,
+        netKopecks: true,
+        createdAt: true,
+      },
+    }),
+    prisma.supplierSettlement.findMany({
+      where: { supplierId: supplier.id },
+      orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+      take: 30,
+      select: {
+        id: true,
+        periodStart: true,
+        periodEnd: true,
+        status: true,
+        grossKopecks: true,
+        commissionKopecks: true,
+        adjustmentKopecks: true,
+        netKopecks: true,
+        paidAt: true,
+        createdAt: true,
+      },
+    }),
+    prisma.supplierDocument.findMany({
+      where: { supplierId: supplier.id },
+      orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+      take: 30,
+      select: {
+        id: true,
+        type: true,
+        status: true,
+        title: true,
+        createdAt: true,
+        _count: { select: { files: true } },
+      },
+    }),
   ]);
 
   return {
@@ -396,6 +459,49 @@ export async function buildSupplierPortalFinanceDto(
       paidAt: toIso(payout.paidAt),
       comment: payout.comment || null,
       createdAt: toIso(payout.createdAt) || new Date(0).toISOString(),
+    })),
+    refunds: refunds.map((refund) => ({
+      id: refund.id,
+      status: String(refund.status),
+      amountKopecks: refund.amountKopecks,
+      currency: refund.currency,
+      reason: String(refund.reason),
+      reasonNote: refund.reasonNote || null,
+      adminComment: refund.adminComment || null,
+      createdAt: toIso(refund.createdAt) || new Date(0).toISOString(),
+    })),
+    reports: reports.map((report) => ({
+      id: report.id,
+      periodStart: toIso(report.periodStart) || new Date(0).toISOString(),
+      periodEnd: toIso(report.periodEnd) || new Date(0).toISOString(),
+      basis: String(report.basis),
+      status: String(report.status),
+      hasConflict: report.hasConflict,
+      grossKopecks: report.grossKopecks,
+      commissionKopecks: report.commissionKopecks,
+      refundKopecks: report.refundKopecks,
+      netKopecks: report.netKopecks,
+      createdAt: toIso(report.createdAt) || new Date(0).toISOString(),
+    })),
+    settlements: settlements.map((settlement) => ({
+      id: settlement.id,
+      periodStart: toIso(settlement.periodStart) || new Date(0).toISOString(),
+      periodEnd: toIso(settlement.periodEnd) || new Date(0).toISOString(),
+      status: String(settlement.status),
+      grossKopecks: settlement.grossKopecks,
+      commissionKopecks: settlement.commissionKopecks,
+      adjustmentKopecks: settlement.adjustmentKopecks,
+      netKopecks: settlement.netKopecks,
+      paidAt: toIso(settlement.paidAt),
+      createdAt: toIso(settlement.createdAt) || new Date(0).toISOString(),
+    })),
+    documents: documents.map((document) => ({
+      id: document.id,
+      type: String(document.type),
+      status: String(document.status),
+      title: document.title,
+      filesCount: document._count.files,
+      createdAt: toIso(document.createdAt) || new Date(0).toISOString(),
     })),
   };
 }

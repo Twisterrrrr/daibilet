@@ -7,6 +7,7 @@ import { DashboardPage } from '@/pages/DashboardPage';
 import { EventChangeRequestsPage } from '@/pages/EventChangeRequestsPage';
 import { EventsPage } from '@/pages/EventsPage';
 import { ExternalOrdersPage } from '@/pages/ExternalOrdersPage';
+import { FinancePage } from '@/pages/FinancePage';
 import { LandingsPage } from '@/pages/LandingsPage';
 import { ReviewsPage } from '@/pages/ReviewsPage';
 import { SettingsPage } from '@/pages/SettingsPage';
@@ -25,6 +26,7 @@ export function App() {
           <Route path="change-requests" element={<EventChangeRequestsPage />} />
         ) : null}
         <Route path="orders" element={<ExternalOrdersPage />} />
+        <Route path="finance" element={<FinancePage />} />
         <Route path="suppliers" element={<SuppliersPage />} />
         <Route path="reviews" element={<ReviewsPage />} />
         <Route path="buyers" element={<BuyersPage />} />

@@ -5,6 +5,7 @@ import { sendAuthRequired, sendJson } from './http.js';
 import { createRouteContext, type RouteContext } from './routing.js';
 import {
   adminEventsQuerySchema,
+  adminFinanceQuerySchema,
   adminOrdersQuerySchema,
   lookupQuerySchema,
   paginationQuerySchema,
@@ -112,6 +113,11 @@ function validateSafeRouteQuery(context: RouteContext): void {
 
   if (route === 'GET /api/admin/orders') {
     parseSearchParams(adminOrdersQuerySchema, context.searchParams);
+    return;
+  }
+
+  if (route === 'GET /api/admin/finance/ledger' || route === 'GET /api/admin/finance/reconcile') {
+    parseSearchParams(adminFinanceQuerySchema, context.searchParams);
     return;
   }
 

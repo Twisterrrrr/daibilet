@@ -58,6 +58,7 @@
 | P.3e9 | **Checkout result page** - `/checkout/result?order={publicCode}` reads finance public order projection, polls pending payments, shows ticketNumbers when confirmed | High | 🔄 code done; waits catalog/web deploy after finance smoke |
 | P.3e10 | **Admission buyer checkout page** - `/checkout/admissions/:slug` reads finance admission projection, creates YooKassa payment through web proxy, redirects to result page | High | 🔄 code done; pilot-only, wide catalog CTA still off |
 | P.3e11 | **Admin finance order detail foundation** - typed internal order detail with payments, fulfillment ticketNumbers, supplier ledger, refunds, fiscal receipts and operation blockers | High | 🔄 code done; backend/admin typecheck + projection test green |
+| P.3e12 | **Admin refund foundation** - create `RefundRequest` from order detail with hard payment/fulfillment/ledger blockers | High | 🔄 code done; projection test + admin build green |
 | P.3f | **YooKassa: venue admission** | Высокий | 🔄 в PR `codex/stage0-admission-ticket-core` (admission schema + Path A return_url + ticketNumber issuance; code done); ждёт smoke `.159` |
 | P.3f1 | **Supplier onboarding write-flow** — юрпрофиль + основной счет из ЛК, статус реквизитов на проверку | Высокий | ✅ backend PATCH + supplier UI forms |
 | P.3f2 | **YooKassa webhook hardening** — provider event id, replay dedupe, payment id mismatch guard | Высокий | ✅ backend + DB tests |
@@ -66,7 +67,8 @@
 | P.3f5 | **Supplier LC order operations** — фильтры заказов, очередь обработки, сумма к выплате без технических id | Высокий | ✅ supplier UI + typecheck/build |
 | P.3g | **Supplier write flows** — создание/редактирование admission и событий через заявки | Средний | ✅ admission create/update admin apply + DB smoke; event create apply deferred |
 | P.3h | **YooKassa reconcile ops** — service/timer на `.159`, runbook и ручной dry-run/apply | Высокий | ✅ live `.159` installed/enabled; scheduled tick green 2026-08-09 |
-| P.3i | **Finance E2E foundation roadmap** - admin finance contour, supplier LC money views, refunds, reports, settlements, closing docs and supplier reviews | High | 🔄 foundation doc + first admin read-model slice |
+| P.3i | **Finance E2E foundation roadmap** - admin finance contour, supplier LC money views, refunds, reports, settlements, closing docs and supplier reviews | High | 🔄 refund foundation + admin ledger/reconcile + supplier finance/docs read views |
+| P.3j | **Reports/settlements/documents write flow** - draft `SupplierReport`, close `SupplierSettlement`, issue `SupplierDocument` from reconciled ledger | High | ⏳ next PR-sized finance mutation |
 | P.4 | **Реклама / paid acquisition** — до готовности витрины | — | ⚠️ deferred |
 | P.5 | **Allowlist городов** — адмцентры с saleable → standalone; остальные → cityToRegion (не «дыра») | Высокий | ✅ 2026-07-19 geo policy |
 

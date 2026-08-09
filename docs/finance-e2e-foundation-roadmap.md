@@ -8,8 +8,8 @@ Scope: MVP finance contour for first art-object pilot, without supplier payouts 
 - Finance runtime `.159`: YooKassa create-payment smoke reached `confirmationUrl`; reconcile timer installed and active.
 - Buyer path: admission checkout page and result page are code-ready; full browser payment depends on YooKassa webhook delivery or reconcile fallback.
 - Admin orders: unified list has external TC/Teplohod mirror plus internal Daibilet checkout orders.
-- Supplier LC: shell, auth bridge, admissions, orders, readiness and requests are present; supplier order filters are fixed.
-- This slice adds the missing admin order detail foundation for internal finance state: payments, fulfillment, ledger, refunds, receipts and operation readiness.
+- Supplier LC: shell, auth bridge, admissions, orders, readiness, requests, finance, documents and reviews are present; supplier order filters are fixed.
+- This slice adds admin refund foundation, admin ledger/reconcile screen and supplier finance/docs read views for refunds, reports, settlements and documents.
 
 ## MVP end-to-end contour
 
@@ -36,24 +36,24 @@ Scope: MVP finance contour for first art-object pilot, without supplier payouts 
 
 ## Next PR-sized steps
 
-1. Admin refund foundation
-   - Create/list `RefundRequest` from internal order detail.
-   - Keep refund action gated by payment status, fulfillment status and existing refund state.
-   - Store provider ids/statuses but do not expose secrets or raw provider payloads in UI.
-
-2. Admin sales ledger and reconcile screen
-   - Period filters by supplier, product, status and payout readiness.
-   - Show gross, commission, refund, payout and net from `SupplierLedgerEntry`.
-   - Add a dry-run reconcile endpoint before any mutating close action.
-
-3. Supplier finance read views
-   - Supplier sees orders, period totals, pending refunds, upcoming payout estimate and documents.
-   - No manual payout controls in supplier LC for MVP.
-
-4. Supplier reports and settlements
-   - Generate `SupplierReport` snapshots from ledger for a period.
+1. Reports, settlements and documents write flow
+   - Draft `SupplierReport` snapshots from reconciled ledger.
    - Close `SupplierSettlement` only when blockers are empty.
-   - Add `SupplierDocument` draft/issued/accepted statuses for agent report and closing docs.
+   - Issue `SupplierDocument` records for agent report, service act and payout statement.
+
+2. Refund execution
+   - Move `RefundRequest` from CREATED/APPROVED to PROCESSING/COMPLETED.
+   - Integrate provider refund only after YooKassa refund policy and receipt rules are fixed.
+   - Write `SupplierLedgerEntry` REFUND and `FiscalReceipt` REFUND records from the same operation.
+
+3. Admin sales ledger enhancements
+   - Add product/status filters and CSV export.
+   - Add conflict markers for missing receipts, negative net, unclosed refunds and duplicate reports.
+   - Keep reconcile actions dry-run first.
+
+4. Supplier finance actions
+   - Supplier acknowledges reports and sees document delivery/signature status.
+   - No manual payout controls in supplier LC for MVP.
 
 5. Fiscal receipts
    - Show `FiscalReceipt` status in admin order detail and period report.

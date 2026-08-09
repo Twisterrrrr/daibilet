@@ -95,6 +95,13 @@ export const adminOrdersQuerySchema = paginationQuerySchema.extend({
   refresh: optionalFlag,
 });
 
+export const adminFinanceQuerySchema = paginationQuerySchema.extend({
+  supplier: optionalString,
+  from: optionalString,
+  to: optionalString,
+  refresh: optionalFlag,
+});
+
 export const lookupQuerySchema = z.object({
   lookup: optionalString,
 });
@@ -213,10 +220,19 @@ export const orderTicketPayloadSchema = z.object({
   holderName: nullableString,
 });
 
+export const adminOrderRefundRequestPayloadSchema = z.object({
+  amountKopecks: z.coerce.number().int().positive().max(100_000_000).optional(),
+  reason: z.enum(['USER_REQUEST', 'EVENT_CANCELLED', 'SUPPORT', 'OTHER']).optional(),
+  reasonNote: nullableString,
+  adminComment: nullableString,
+  fulfillmentItemId: nullableString,
+}).strict();
+
 export type PublicCatalogQuery = z.infer<typeof publicCatalogQuerySchema>;
 export type PublicFinanceProjectionQuery = z.infer<typeof publicFinanceProjectionQuerySchema>;
 export type AdminEventsQuery = z.infer<typeof adminEventsQuerySchema>;
 export type AdminOrdersQuery = z.infer<typeof adminOrdersQuerySchema>;
+export type AdminFinanceQuery = z.infer<typeof adminFinanceQuerySchema>;
 export type LookupQuery = z.infer<typeof lookupQuerySchema>;
 export type SearchQuery = z.infer<typeof searchQuerySchema>;
 export type EventOverridePayload = z.infer<typeof eventOverridePayloadSchema>;
@@ -227,3 +243,4 @@ export type AdminEventScheduleSessionPatchPayload = z.infer<typeof adminEventSch
 export type AdminEventScheduleSessionCancelPayload = z.infer<typeof adminEventScheduleSessionCancelPayloadSchema>;
 export type LandingMatchPayload = z.infer<typeof landingMatchPayloadSchema>;
 export type OrderTicketPayload = z.infer<typeof orderTicketPayloadSchema>;
+export type AdminOrderRefundRequestPayload = z.infer<typeof adminOrderRefundRequestPayloadSchema>;

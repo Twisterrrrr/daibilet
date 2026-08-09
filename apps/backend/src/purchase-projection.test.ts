@@ -9,6 +9,7 @@ import {
   buildBuyerPurchasesListDto,
   buildPublicCheckoutOrderByCodeDto,
   buildPublicCheckoutPurchasesByEmailDto,
+  createAdminPurchaseRefundRequest,
   loadSupplierCheckoutPurchaseRows,
 } from './purchase-projection.js';
 
@@ -263,6 +264,19 @@ test('projects internal checkout and external orders into admin, buyer and suppl
     assert.equal(adminDetail?.finance?.operations.canRefund, true);
     assert.equal(adminDetail?.finance?.operations.canCloseSettlement, true);
 
+    const refundedDetail = await createAdminPurchaseRefundRequest('9100001', {
+      amountKopecks: 45_000,
+      reason: 'USER_REQUEST',
+      adminComment: 'test refund request',
+    });
+    assert.equal(refundedDetail.finance?.refunds.length, 1);
+    assert.equal(refundedDetail.finance?.refunds[0]?.amountKopecks, 45_000);
+    assert.equal(refundedDetail.finance?.operations.canRefund, false);
+    await assert.rejects(
+      () => createAdminPurchaseRefundRequest('9100001', { amountKopecks: 1_000, reason: 'OTHER' }),
+      /refund_request_blocked/,
+    );
+
     const buyer = await buildBuyerPurchasesListDto({
       siteUserId: ids.user,
       email,
@@ -295,6 +309,7 @@ test('projects internal checkout and external orders into admin, buyer and suppl
   } finally {
     await prisma.externalTicket.deleteMany({ where: { id: ids.externalTicket } });
     await prisma.externalOrder.deleteMany({ where: { id: ids.externalOrder } });
+    await prisma.refundRequest.deleteMany({ where: { checkoutOrderId: ids.order } });
     await prisma.supplierLedgerEntry.deleteMany({ where: { id: { in: [ids.ledgerSale, ids.ledgerCommission] } } });
     await prisma.fulfillmentItem.deleteMany({ where: { id: ids.fulfillment } });
     await prisma.payment.deleteMany({ where: { id: ids.payment } });

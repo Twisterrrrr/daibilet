@@ -1,3 +1,27 @@
+## 2026-08-09 - Finance E2E foundation: refunds, ledger, supplier views
+
+### Наблюдения
+
+- После admin order detail foundation оператор видел finance snapshot, но не мог начать возврат из заказа.
+- Supplier LC уже имел `/finance` и `/documents`, но API отдавал только ledger/payouts; reports, settlements, documents и refund requests не доходили до поставщика.
+- Для MVP нужен read/write минимум: создать RefundRequest с hard blockers, увидеть ledger/reconcile в админке, показать поставщику деньги/возвраты/документы read-only.
+
+### Решения
+
+- Добавлен `POST /api/admin/orders/:id/refunds`: создает `RefundRequest` только для внутреннего checkout order с `SUCCEEDED` payment, финальным fulfillment, sales ledger и доступной суммой к возврату.
+- Повторный открытый возврат, pending/failed payment, non-final fulfillment, missing ledger и слишком большая сумма возвращают `refund_request_blocked` с blocker codes.
+- Admin order detail получил форму "Заявка на возврат"; после успешного POST detail обновляется и повторный refund блокируется.
+- Добавлен admin `/finance`: ledger, open refunds, reports, settlements, documents и reconcile dry-run blockers по supplier/period filters.
+- Supplier `/api/supplier/finance` расширен refunds/reports/settlements/documents; LC finance/docs показывают эти данные read-only.
+
+### Проблемы
+
+- Это не provider refund execution: денег в YooKassa пока не возвращаем из UI.
+- Следующий mutating шаг: draft `SupplierReport`, close `SupplierSettlement`, issue `SupplierDocument` из reconciled ledger.
+- Отзывы в ЛК поставщика остаются отдельной дорожкой; вкладка уже есть, write/response flows позже.
+
+---
+
 ## 2026-08-09 - Finance E2E foundation: admin order detail
 
 ### Наблюдения

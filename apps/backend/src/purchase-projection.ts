@@ -412,6 +412,7 @@ const externalOrderInclude = {
 type CheckoutOrderRow = Prisma.CheckoutOrderGetPayload<{ include: typeof checkoutOrderInclude }>;
 type CheckoutItemRow = CheckoutOrderRow['items'][number];
 type ExternalOrderRow = Prisma.ExternalOrderGetPayload<{ include: typeof externalOrderInclude }>;
+type LedgerEntryWithSupplier = Prisma.SupplierLedgerEntryGetPayload<{ include: { supplier: { select: { id: true; title: true } } } }>;
 
 interface EventLookupRow {
   id: string;
@@ -459,7 +460,7 @@ export async function buildAdminPurchasesListDto(
     quickFilters: [
       { id: 'all', count: includeArchived ? activeRows.length : allRows.filter((row) => !row.isArchived).length },
       { id: 'attention', count: allRows.filter((row) => row.needsAttention).length },
-      { id: 'pending_refunds', count: allRows.filter((row) => isRefundStatus(row.status)).length },
+      { id: 'pending_refunds', count: allRows.filter((row) => row.hasPendingRefundRequests || isRefundStatus(row.status)).length },
       { id: 'missing_artifact', count: allRows.filter((row) => row.artifactStatus === 'missing').length },
       { id: 'failed_integration', count: allRows.filter((row) => isProblemOrderStatus(row.status)).length },
       { id: 'unlinked', count: allRows.filter((row) => row.unlinkedTickets > 0).length },
@@ -486,23 +487,9 @@ export async function buildAdminPurchaseDetailDto(orderKeyInput: string): Promis
   const orderKey = cleanString(orderKeyInput);
   if (!orderKey) return null;
 
-  const checkoutRow = await prisma.checkoutOrder.findFirst({
-    where: {
-      OR: [
-        { id: orderKey },
-        { publicCode: orderKey },
-        { externalOrderId: orderKey },
-      ],
-    },
-    include: checkoutOrderInclude,
-  });
+  const checkoutRow = await loadCheckoutOrderForAdminDetail(orderKey);
   if (checkoutRow) {
-    const ledgerRows = await prisma.supplierLedgerEntry.findMany({
-      where: { checkoutOrderId: checkoutRow.id },
-      orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
-      include: { supplier: { select: { id: true, title: true } } },
-    });
-    return mapCheckoutOrderToAdminPurchaseDetail(checkoutRow, ledgerRows);
+    return mapCheckoutOrderToAdminPurchaseDetail(checkoutRow, await loadCheckoutOrderLedger(checkoutRow.id));
   }
 
   const externalRow = await prisma.externalOrder.findFirst({
@@ -521,6 +508,75 @@ export async function buildAdminPurchaseDetailDto(orderKeyInput: string): Promis
     ...mapExternalOrderToAdminPurchaseRow(externalRow, lookup),
     finance: null,
   };
+}
+
+export interface AdminCreateRefundRequestInput {
+  amountKopecks?: number | null | undefined;
+  reason?: string | null | undefined;
+  reasonNote?: string | null | undefined;
+  adminComment?: string | null | undefined;
+  fulfillmentItemId?: string | null | undefined;
+}
+
+export async function createAdminPurchaseRefundRequest(
+  orderKeyInput: string,
+  input: AdminCreateRefundRequestInput = {},
+): Promise<AdminPurchaseDetailDto> {
+  const orderKey = cleanString(orderKeyInput);
+  if (!orderKey) throw statusError(400, 'order_key_required');
+
+  const checkoutRow = await loadCheckoutOrderForAdminDetail(orderKey);
+  if (!checkoutRow) throw statusError(404, 'checkout_order_not_found');
+
+  const ledgerRows = await loadCheckoutOrderLedger(checkoutRow.id);
+  const decision = resolveRefundRequestDecision(checkoutRow, ledgerRows, input);
+  if (decision.blockers.length) {
+    const error = statusError(409, 'refund_request_blocked');
+    (error as Error & { blockers?: string[] }).blockers = decision.blockers;
+    throw error;
+  }
+
+  await prisma.refundRequest.create({
+    data: {
+      checkoutOrderId: checkoutRow.id,
+      fulfillmentItemId: decision.fulfillmentItemId,
+      paymentId: decision.paymentId,
+      supplierId: decision.supplierId,
+      amountKopecks: decision.amountKopecks,
+      currency: checkoutRow.currency,
+      reason: decision.reason as never,
+      reasonNote: cleanString(input.reasonNote) || null,
+      adminComment: cleanString(input.adminComment) || null,
+      createdByType: 'ADMIN',
+      status: 'CREATED',
+    },
+  });
+
+  const updated = await loadCheckoutOrderForAdminDetail(checkoutRow.id);
+  if (!updated) throw statusError(500, 'checkout_order_reload_failed');
+  return mapCheckoutOrderToAdminPurchaseDetail(updated, await loadCheckoutOrderLedger(updated.id));
+}
+
+async function loadCheckoutOrderForAdminDetail(orderKey: string): Promise<CheckoutOrderRow | null> {
+  const checkoutRow = await prisma.checkoutOrder.findFirst({
+    where: {
+      OR: [
+        { id: orderKey },
+        { publicCode: orderKey },
+        { externalOrderId: orderKey },
+      ],
+    },
+    include: checkoutOrderInclude,
+  });
+  return checkoutRow;
+}
+
+async function loadCheckoutOrderLedger(checkoutOrderId: string): Promise<LedgerEntryWithSupplier[]> {
+  return prisma.supplierLedgerEntry.findMany({
+    where: { checkoutOrderId },
+    orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
+    include: { supplier: { select: { id: true, title: true } } },
+  });
 }
 
 export async function buildBuyerPurchasesListDto(input: {
@@ -779,8 +835,8 @@ function mapCheckoutOrderToAdminPurchaseRow(row: CheckoutOrderRow): AdminPurchas
     eventDateLabel: toIso(primaryItem?.session?.startsAt),
     amountRub: kopecksToRub(row.totalKopecks),
     artifactStatus: ticketCount > 0 ? 'tickets' : 'not_required',
-    refundRequestsCount: 0,
-    hasPendingRefundRequests: isRefundStatus(String(row.status)),
+    refundRequestsCount: row.refundRequests.length,
+    hasPendingRefundRequests: row.refundRequests.some((refund) => !['REJECTED', 'FAILED', 'COMPLETED'].includes(String(refund.status))) || isRefundStatus(String(row.status)),
     needsAttention: problemStatus || processing,
     problems: [
       ...(problemStatus ? ['Проверить внутренний checkout'] : []),
@@ -792,7 +848,7 @@ function mapCheckoutOrderToAdminPurchaseRow(row: CheckoutOrderRow): AdminPurchas
 
 function mapCheckoutOrderToAdminPurchaseDetail(
   row: CheckoutOrderRow,
-  ledgerRows: Array<Prisma.SupplierLedgerEntryGetPayload<{ include: { supplier: { select: { id: true; title: true } } } }>>,
+  ledgerRows: LedgerEntryWithSupplier[],
 ): AdminPurchaseDetailDto {
   const base = mapCheckoutOrderToAdminPurchaseRow(row);
   const ledger = ledgerRows.map((entry) => ({
@@ -910,6 +966,65 @@ function mapCheckoutOrderToAdminPurchaseDetail(
         }),
       },
     },
+  };
+}
+
+function resolveRefundRequestDecision(
+  row: CheckoutOrderRow,
+  ledgerRows: LedgerEntryWithSupplier[],
+  input: AdminCreateRefundRequestInput,
+): {
+  blockers: string[];
+  amountKopecks: number;
+  paymentId: string | null;
+  supplierId: string | null;
+  fulfillmentItemId: string | null;
+  reason: string;
+} {
+  const succeededPayment = row.payments.find((payment) => String(payment.status) === 'SUCCEEDED');
+  const failedPayment = row.payments.find((payment) => isProblemOrderStatus(String(payment.status)) || payment.error);
+  const finalFulfillment = row.fulfillmentItems.filter((item) => ['CONFIRMED', 'FULFILLED', 'REFUNDED'].includes(String(item.status)));
+  const pendingFulfillment = row.fulfillmentItems.filter((item) => !['CONFIRMED', 'FULFILLED', 'REFUNDED'].includes(String(item.status)));
+  const activeRefunds = row.refundRequests.filter((refund) => !['REJECTED', 'FAILED', 'COMPLETED'].includes(String(refund.status)));
+  const countedRefunds = row.refundRequests.filter((refund) => !['REJECTED', 'FAILED'].includes(String(refund.status)));
+  const supplierIds = uniqueSorted(row.items.map((item) => item.supplierId).filter(Boolean));
+  const requestedFulfillmentId = cleanString(input.fulfillmentItemId);
+  const requestedFulfillment = requestedFulfillmentId
+    ? row.fulfillmentItems.find((item) => item.id === requestedFulfillmentId)
+    : null;
+  const requestedItem = requestedFulfillment?.checkoutItemId
+    ? row.items.find((item) => item.id === requestedFulfillment.checkoutItemId)
+    : null;
+  const supplierId = requestedItem?.supplierId || (supplierIds.length === 1 ? supplierIds[0] || null : null);
+  const paidKopecks = succeededPayment?.amountKopecks || 0;
+  const alreadyRequestedKopecks = countedRefunds.reduce((sum, refund) => sum + refund.amountKopecks, 0);
+  const maxRefundableKopecks = Math.max(0, paidKopecks - alreadyRequestedKopecks);
+  const amountKopecks = Math.min(input.amountKopecks || maxRefundableKopecks, maxRefundableKopecks);
+  const reason = normalizeRefundReason(input.reason);
+  const blockers = [
+    ...(!succeededPayment ? ['payment_not_confirmed'] : []),
+    ...(failedPayment ? ['payment_has_error'] : []),
+    ...(!['CONFIRMED', 'FULFILLED'].includes(String(row.status)) ? ['order_not_refundable_status'] : []),
+    ...(row.fulfillmentItems.length === 0 ? ['fulfillment_missing'] : []),
+    ...(pendingFulfillment.length > 0 ? ['fulfillment_not_final'] : []),
+    ...(finalFulfillment.length === 0 && row.fulfillmentItems.length > 0 ? ['fulfillment_not_final'] : []),
+    ...(ledgerRows.length === 0 ? ['ledger_missing'] : []),
+    ...(sumLedger(ledgerRows, 'SALE') <= 0 ? ['ledger_sale_missing'] : []),
+    ...(supplierIds.length !== 1 && !requestedFulfillment ? ['multi_supplier_refund_requires_item'] : []),
+    ...(requestedFulfillmentId && !requestedFulfillment ? ['fulfillment_item_not_found'] : []),
+    ...(activeRefunds.length > 0 ? ['refund_already_open'] : []),
+    ...(maxRefundableKopecks <= 0 ? ['refund_amount_exhausted'] : []),
+    ...(input.amountKopecks !== undefined && input.amountKopecks !== null && input.amountKopecks > maxRefundableKopecks ? ['refund_amount_too_high'] : []),
+    ...(amountKopecks <= 0 ? ['refund_amount_required'] : []),
+  ];
+
+  return {
+    blockers: uniqueSorted(blockers),
+    amountKopecks,
+    paymentId: succeededPayment?.id || null,
+    supplierId,
+    fulfillmentItemId: requestedFulfillment?.id || null,
+    reason,
   };
 }
 
@@ -1197,7 +1312,7 @@ function matchesAdminPurchaseFilters(
   if (filters.view === 'missing_artifact' && row.artifactStatus !== 'missing') return false;
   if (filters.view === 'failed_integration' && !isProblemOrderStatus(row.status)) return false;
   if (filters.view === 'unlinked' && !(row.unlinkedTickets > 0)) return false;
-  if (filters.view === 'pending_refunds' && !isRefundStatus(row.status)) return false;
+  if (filters.view === 'pending_refunds' && !row.hasPendingRefundRequests && !isRefundStatus(row.status)) return false;
   if (filters.view === 'archivable' && !row.canArchive) return false;
   if (filters.provider !== 'ALL' && row.sourceCode !== filters.provider) return false;
   if (filters.status !== 'all' && String(row.status || '').toLowerCase() !== filters.status) return false;
@@ -1373,10 +1488,22 @@ function ticketNumbersFromProviderData(value: Prisma.JsonValue | null | undefine
   return list.length ? list : single ? [single] : [];
 }
 
-function sumLedger(entries: AdminPurchaseLedgerEntryDto[], type: string): number {
+function sumLedger(entries: Array<{ type: string; amountKopecks: number }>, type: string): number {
   return entries
-    .filter((entry) => entry.type === type)
+    .filter((entry) => String(entry.type) === type)
     .reduce((sum, entry) => sum + entry.amountKopecks, 0);
+}
+
+function normalizeRefundReason(value: string | null | undefined): string {
+  const normalized = String(value || '').toUpperCase();
+  if (['USER_REQUEST', 'EVENT_CANCELLED', 'SUPPORT', 'OTHER'].includes(normalized)) return normalized;
+  return 'OTHER';
+}
+
+function statusError(statusCode: number, message: string): Error & { statusCode: number } {
+  const error = new Error(message) as Error & { statusCode: number };
+  error.statusCode = statusCode;
+  return error;
 }
 
 function buildInternalOrderNextActions(input: {

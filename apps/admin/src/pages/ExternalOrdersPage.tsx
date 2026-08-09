@@ -204,6 +204,8 @@ export function ExternalOrdersPage() {
   const [selectedOrder, setSelectedOrder] = React.useState<AdminOrderRow | null>(null);
   const [isSavingTicket, setIsSavingTicket] = React.useState(false);
   const [ticketSaveError, setTicketSaveError] = React.useState<string | null>(null);
+  const [isCreatingRefund, setIsCreatingRefund] = React.useState(false);
+  const [refundCreateError, setRefundCreateError] = React.useState<string | null>(null);
 
   const view = params.get('view') ?? 'all';
   const q = params.get('q') ?? '';
@@ -236,6 +238,7 @@ export function ExternalOrdersPage() {
   const openOrder = React.useCallback((order: AdminOrderRow) => {
     setSelectedOrder(order);
     setTicketSaveError(null);
+    setRefundCreateError(null);
     adminFetch(`/api/admin/orders/${encodeURIComponent(order.id)}`, { cache: 'no-store' })
       .then(async (response) => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -267,6 +270,35 @@ export function ExternalOrdersPage() {
           setTicketSaveError(error instanceof Error ? error.message : String(error));
         })
         .finally(() => setIsSavingTicket(false));
+    },
+    [refresh],
+  );
+
+  const createRefundRequest = React.useCallback(
+    (order: AdminOrderRow, payload: { amountKopecks?: number; reason: string; reasonNote?: string | null; adminComment?: string | null }) => {
+      setIsCreatingRefund(true);
+      setRefundCreateError(null);
+      return adminFetch(`/api/admin/orders/${encodeURIComponent(order.id)}/refunds`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+        .then(async (response) => {
+          const body = await response.json().catch(() => null);
+          if (!response.ok) {
+            const blockers = Array.isArray(body?.blockers) ? body.blockers.map(financeBlockerLabel).join(', ') : null;
+            throw new Error(blockers || body?.message || body?.error || `HTTP ${response.status}`);
+          }
+          return body as AdminOrderRow;
+        })
+        .then((detail) => {
+          setSelectedOrder(detail);
+          refresh();
+        })
+        .catch((error) => {
+          setRefundCreateError(error instanceof Error ? error.message : String(error));
+        })
+        .finally(() => setIsCreatingRefund(false));
     },
     [refresh],
   );
@@ -603,8 +635,11 @@ export function ExternalOrdersPage() {
         order={selectedOrder}
         isSaving={isSavingTicket}
         saveError={ticketSaveError}
+        isCreatingRefund={isCreatingRefund}
+        refundError={refundCreateError}
         onOpenChange={(open) => !open && setSelectedOrder(null)}
         onSaveTicket={saveTicket}
+        onCreateRefund={createRefundRequest}
       />
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
@@ -641,14 +676,20 @@ function OrderDetailSheet({
   order,
   isSaving,
   saveError,
+  isCreatingRefund,
+  refundError,
   onOpenChange,
   onSaveTicket,
+  onCreateRefund,
 }: {
   order: AdminOrderRow | null;
   isSaving: boolean;
   saveError: string | null;
+  isCreatingRefund: boolean;
+  refundError: string | null;
   onOpenChange: (open: boolean) => void;
   onSaveTicket: (order: AdminOrderRow, patch: { id?: string; externalTicketId: string; status: string; eventId?: string | null; sessionId?: string | null }) => Promise<void>;
+  onCreateRefund: (order: AdminOrderRow, payload: { amountKopecks?: number; reason: string; reasonNote?: string | null; adminComment?: string | null }) => Promise<void>;
 }) {
   const [editingTicket, setEditingTicket] = React.useState<AdminOrderRow['tickets'][number] | null>(null);
   const [ticketNumber, setTicketNumber] = React.useState('');
@@ -795,7 +836,12 @@ function OrderDetailSheet({
               </Card>
 
               {isInternalOrder && order.finance ? (
-                <FinanceOperationsCard finance={order.finance} />
+                <FinanceOperationsCard
+                  finance={order.finance}
+                  isCreatingRefund={isCreatingRefund}
+                  refundError={refundError}
+                  onCreateRefund={(payload) => onCreateRefund(order, payload)}
+                />
               ) : (
               <Card className="border-border p-4">
                 <h3 className="text-sm font-semibold">{editingTicket ? 'Редактировать билет' : 'Добавить билет'}</h3>
@@ -898,7 +944,7 @@ function OrderDetailSheet({
 
 function FinanceOrderSummary({ finance }: { finance: AdminOrderFinance }) {
   const payment = finance.payments[0] || null;
-  const pendingRefunds = finance.refunds.filter((refund) => !['SUCCEEDED', 'CANCELLED', 'REJECTED'].includes(refund.status));
+  const pendingRefunds = finance.refunds.filter((refund) => !['COMPLETED', 'FAILED', 'REJECTED'].includes(refund.status));
 
   return (
     <div className="mt-5 grid gap-3 lg:grid-cols-4">
@@ -926,8 +972,42 @@ function FinanceOrderSummary({ finance }: { finance: AdminOrderFinance }) {
   );
 }
 
-function FinanceOperationsCard({ finance }: { finance: AdminOrderFinance }) {
+function FinanceOperationsCard({
+  finance,
+  isCreatingRefund,
+  refundError,
+  onCreateRefund,
+}: {
+  finance: AdminOrderFinance;
+  isCreatingRefund: boolean;
+  refundError: string | null;
+  onCreateRefund: (payload: { amountKopecks?: number; reason: string; reasonNote?: string | null; adminComment?: string | null }) => Promise<void>;
+}) {
   const actions = finance.operations.nextActions.length ? finance.operations.nextActions : ['Контроль заказа'];
+  const [amountRub, setAmountRub] = React.useState('');
+  const [reason, setReason] = React.useState('USER_REQUEST');
+  const [comment, setComment] = React.useState('');
+  const [localError, setLocalError] = React.useState<string | null>(null);
+  const refundableKopecks = Math.max(0, finance.totals.totalKopecks - finance.refunds.filter((refund) => !['REJECTED', 'FAILED'].includes(refund.status)).reduce((sum, refund) => sum + refund.amountKopecks, 0));
+
+  const submitRefund = (event: React.FormEvent) => {
+    event.preventDefault();
+    setLocalError(null);
+    const parsedAmount = amountRub.trim() ? Number(amountRub.replace(',', '.')) : null;
+    if (parsedAmount !== null && (!Number.isFinite(parsedAmount) || parsedAmount <= 0)) {
+      setLocalError('Укажите корректную сумму возврата');
+      return;
+    }
+    const amountKopecks = parsedAmount !== null ? Math.round(parsedAmount * 100) : undefined;
+    void onCreateRefund({
+      amountKopecks,
+      reason,
+      adminComment: comment.trim() || null,
+    }).then(() => {
+      setAmountRub('');
+      setComment('');
+    });
+  };
 
   return (
     <Card className="border-border p-4">
@@ -959,6 +1039,46 @@ function FinanceOperationsCard({ finance }: { finance: AdminOrderFinance }) {
             {actions.map((action) => <li key={action}>{action}</li>)}
           </ul>
         </div>
+
+        <form className="rounded-md border border-border p-3" onSubmit={submitRefund}>
+          <div className="text-xs font-semibold text-foreground">Заявка на возврат</div>
+          <div className="mt-2 text-xs text-muted-foreground">
+            Доступно к заявке: {formatMoneyKopecks(refundableKopecks, finance.totals.currency)}
+          </div>
+          <div className="mt-3 grid gap-2">
+            <Input
+              value={amountRub}
+              onChange={(event) => setAmountRub(event.target.value)}
+              placeholder="Сумма, пусто - полный возврат"
+              className="h-9 bg-background text-xs"
+              disabled={!finance.operations.canRefund || isCreatingRefund}
+            />
+            <select
+              value={reason}
+              onChange={(event) => setReason(event.target.value)}
+              className="h-9 rounded-md border border-input bg-background px-3 text-xs text-foreground"
+              disabled={!finance.operations.canRefund || isCreatingRefund}
+            >
+              <option value="USER_REQUEST">Запрос покупателя</option>
+              <option value="EVENT_CANCELLED">Отмена события</option>
+              <option value="SUPPORT">Поддержка</option>
+              <option value="OTHER">Другое</option>
+            </select>
+            <Input
+              value={comment}
+              onChange={(event) => setComment(event.target.value)}
+              placeholder="Комментарий оператора"
+              className="h-9 bg-background text-xs"
+              disabled={!finance.operations.canRefund || isCreatingRefund}
+            />
+          </div>
+          {localError || refundError ? (
+            <div className="mt-2 rounded-md border border-destructive/20 bg-destructive/10 px-3 py-2 text-xs text-destructive">{localError || refundError}</div>
+          ) : null}
+          <Button type="submit" size="sm" className="mt-3 w-full" disabled={!finance.operations.canRefund || isCreatingRefund || refundableKopecks <= 0}>
+            {isCreatingRefund ? 'Создаем...' : 'Создать RefundRequest'}
+          </Button>
+        </form>
 
         <FinanceSection title="Платежи" empty="Платежей нет">
           {finance.payments.map((payment) => (
@@ -1124,8 +1244,17 @@ function financeBlockerLabel(code: string) {
   const value = String(code);
   if (value === 'payment_not_confirmed') return 'Платеж еще не подтвержден';
   if (value === 'payment_has_error') return 'Есть ошибка платежа';
+  if (value === 'order_not_refundable_status') return 'Статус заказа не допускает возврат';
+  if (value === 'fulfillment_missing') return 'Нет fulfillment-позиции';
   if (value === 'fulfillment_not_final') return 'Выдача билетов еще не финальна';
   if (value === 'ledger_missing') return 'Нет ledger-записей для расчета';
+  if (value === 'ledger_sale_missing') return 'Нет продажи в ledger';
+  if (value === 'multi_supplier_refund_requires_item') return 'Нужно выбрать позицию для мультипоставщика';
+  if (value === 'fulfillment_item_not_found') return 'Fulfillment-позиция не найдена';
+  if (value === 'refund_already_open') return 'Уже есть открытая заявка на возврат';
+  if (value === 'refund_amount_exhausted') return 'Сумма к возврату исчерпана';
+  if (value === 'refund_amount_too_high') return 'Сумма больше доступной к возврату';
+  if (value === 'refund_amount_required') return 'Нужна положительная сумма возврата';
   return value;
 }
 
