@@ -5,12 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ArrowUpRight, Route } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
-import {
-  DayTripCanonCard,
-  resolveCanonGastroStop,
-} from '@/components/DayTripCanonCard.client';
 import type { CityDayRoutePreset, CityMustSeeItem } from '@/lib/cityInfo';
-import { resolveCityPlaceTitleHref } from '@/lib/city-place-href';
 import {
   buildCityDayRoutePreset,
   cityDayRoutePresetAvailable,
@@ -18,7 +13,7 @@ import {
   type DayRouteVenueMatchSource,
 } from '@/lib/day-route-from-place';
 import { mustSeePlacesForDefaultPreset } from '@/lib/must-see-filters';
-import { replaceDayRouteFromVenues } from '@/lib/day-route';
+import { formatDayRouteTransitTipLine, replaceDayRouteFromVenues } from '@/lib/day-route';
 
 type Props = {
   places: CityMustSeeItem[];
@@ -179,70 +174,86 @@ export function CityDayPresetBlock({
   const renderScenarioCard = (row: NamedRow, opts?: { panel?: boolean }) => {
     const { preset, items, available } = row;
     const panel = Boolean(opts?.panel);
-    const stops = Array.isArray(preset.stops) ? preset.stops.filter((s) => s?.name) : [];
-    const vectorLine = [
-      String(preset.travelVector || '').trim(),
-      String(preset.stationHub || '').trim(),
-    ]
-      .filter(Boolean)
-      .join(' - ');
-    const subtitle = [vectorLine, String(preset.description || '').trim()].filter(Boolean).join(' · ');
-    const blogLink = preset.blogSlug ? (
-      <Link
-        href={`/blog/${preset.blogSlug}`}
-        className={`inline-flex items-center gap-0.5 text-xs font-medium underline underline-offset-2 transition-colors ${
-          editorial
-            ? 'text-sky-700 hover:text-sky-800'
-            : 'text-primary-600 hover:text-primary-700'
-        }`}
-      >
-        Читать об этом в блоге
-        <ArrowUpRight className="h-3 w-3 shrink-0 opacity-80" aria-hidden />
-      </Link>
-    ) : null;
-
     return (
-      <div className={panel ? 'mt-3' : undefined} data-day-preset-card={preset.id}>
-        <DayTripCanonCard
-          id={panel ? `day-preset-panel-${preset.id}` : undefined}
-          role={panel ? 'tabpanel' : undefined}
-          aria-label={preset.title}
-          index={0}
-          total={1}
-          editorial={editorial}
-          title={preset.title}
-          subtitle={subtitle || undefined}
-          titleExtra={blogLink}
-          logisticsExit={
-            String(preset.logisticsExit || preset.stationName || '').trim() || undefined
-          }
-          logisticsText={String(preset.travelVectorBlurb || '').trim() || undefined}
-          logisticsExtra={String(preset.timingNote || '').trim() || undefined}
-          gastro={resolveCanonGastroStop(preset)}
-          sights={stops.map((stop) => ({
-            name: stop.name,
-            desc: String(stop.desc || '').trim() || undefined,
-            href: resolveCityPlaceTitleHref(stop, venues),
-            transitTip: String(stop.transitTip || '').trim() || undefined,
-          }))}
-          cta={
-            available && items.length > 0 ? (
-              <button
-                type="button"
-                disabled={busyId != null}
-                onClick={() => apply(preset.id, items)}
-                className={routeCtaClass}
+      <div
+        className={`flex flex-col gap-3 rounded-xl border bg-white px-4 py-3.5 ${borderClass} ${
+          panel ? 'mt-3' : ''
+        }`}
+        data-day-preset-card={preset.id}
+        {...(panel
+          ? {
+              id: `day-preset-panel-${preset.id}`,
+              role: 'tabpanel' as const,
+              'aria-label': preset.title,
+            }
+          : {})}
+      >
+        <div className="min-w-0 w-full">
+          <div className="flex flex-col items-start gap-0.5 sm:flex-row sm:flex-wrap sm:items-baseline sm:gap-x-2 sm:gap-y-0.5">
+            <p className={`text-sm font-semibold ${titleClass}`}>{preset.title}</p>
+            {preset.blogSlug ? (
+              <Link
+                href={`/blog/${preset.blogSlug}`}
+                className={`inline-flex items-center gap-0.5 text-xs font-medium underline underline-offset-2 transition-colors ${
+                  editorial
+                    ? 'text-sky-700 hover:text-sky-800'
+                    : 'text-primary-600 hover:text-primary-700'
+                }`}
               >
-                <Route className="h-3.5 w-3.5 shrink-0" aria-hidden />
-                <span>{namedCta(busyId === preset.id)}</span>
-              </button>
-            ) : null
-          }
-          dataAttrs={{
-            'data-day-preset-canon': '1',
-            'data-day-preset-id': preset.id,
-          }}
-        />
+                Читать об этом в блоге
+                <ArrowUpRight className="h-3 w-3 shrink-0 opacity-80" aria-hidden />
+              </Link>
+            ) : null}
+          </div>
+          {preset.timingNote?.trim() ? (
+            <p className={`mt-1 text-[12px] leading-4 ${mutedClass}`} data-day-preset-timing>
+              {preset.timingNote.trim()}
+            </p>
+          ) : null}
+          {available ? (
+            <ol className="mt-3 list-none space-y-2 p-0" data-day-preset-stops>
+              {items.map((item, stopIndex) => {
+                const tip = formatDayRouteTransitTipLine(
+                  item.transitTip || preset.stops?.[stopIndex]?.transitTip,
+                );
+                return (
+                  <li key={`${item.id}:${stopIndex}`} className="list-none" data-day-preset-stop>
+                    {tip ? (
+                      <div className="mb-0.5 flex items-start gap-3">
+                        <span className="w-6 shrink-0" aria-hidden />
+                        <p
+                          className={`min-w-0 flex-1 text-[11px] leading-snug ${mutedClass}`}
+                          data-day-preset-transit-tip
+                        >
+                          {tip}
+                        </p>
+                      </div>
+                    ) : null}
+                    <div className="flex items-start gap-3 text-sm leading-snug">
+                      <span className={`w-6 shrink-0 text-left tabular-nums ${mutedClass}`}>
+                        {stopIndex + 1}.
+                      </span>
+                      <span className={`min-w-0 flex-1 ${softClass}`}>{item.title}</span>
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
+          ) : null}
+        </div>
+        {available ? (
+          <div className="flex justify-start">
+            <button
+              type="button"
+              disabled={busyId != null}
+              onClick={() => apply(preset.id, items)}
+              className={routeCtaClass}
+            >
+              <Route className="h-3.5 w-3.5 shrink-0" aria-hidden />
+              <span>{namedCta(busyId === preset.id)}</span>
+            </button>
+          </div>
+        ) : null}
       </div>
     );
   };
