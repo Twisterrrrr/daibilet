@@ -46,6 +46,11 @@ const PUBLIC_CATALOG_MAP_CHUNK = Math.max(20, Number(process.env.PUBLIC_CATALOG_
 /** Hydrate enough slots for EventCard 2×2 chips after primary is excluded from chips. */
 const CATALOG_CARD_SLOT_TARGET = 5;
 const CATALOG_HYDRATED_SLOT_LIMIT = 8;
+/**
+ * Venue/location PDP date rail needs many calendar days of departures, not card previews.
+ * Dense piers can have 10+ slots/day; 96 covers ~1-2 weeks for typical water schedules.
+ */
+export const VENUE_PAGE_SLOT_LIMIT = 96;
 const PROJECT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 
 /** Keep in sync with catalogGroupTitleSqlExpression() in dto.js */
@@ -1098,11 +1103,19 @@ function filterCatalogSessions(sessions: PublicSessionDto[]): PublicSessionDto[]
   );
 }
 
-async function hydrateCatalogUpcomingSlots(
+/**
+ * Expand upcomingSlots from EventSession rows for TC/Teplohod groups.
+ * Catalog cards keep a small limit; venue PDP passes {@link VENUE_PAGE_SLOT_LIMIT}.
+ */
+export async function hydrateCatalogUpcomingSlots(
   sessions: PublicSessionDto[],
   slotLimit = CATALOG_HYDRATED_SLOT_LIMIT,
 ): Promise<PublicSessionDto[]> {
-  const targetSlotCount = Math.min(CATALOG_CARD_SLOT_TARGET, Math.max(1, slotLimit));
+  // Small limits (list/card): stop once we have enough chips. Higher venue limits: fill to cap.
+  const targetSlotCount =
+    slotLimit > CATALOG_HYDRATED_SLOT_LIMIT
+      ? slotLimit
+      : Math.min(CATALOG_CARD_SLOT_TARGET, Math.max(1, slotLimit));
   const targets = sessions.filter((session) => {
     const provider = session.purchaseProvider;
     if (provider !== 'TEPLOHOD' && provider !== 'TICKETSCLOUD') return false;

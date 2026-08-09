@@ -1,3 +1,19 @@
+## 2026-08-10 - Pier date rail: only today
+
+### Наблюдения
+- Owner: `/locations/admiralteiskaya-nab-10-45` date rail показывает только сегодняшнюю дату, хотя у рейсов `sessionCount` 22-240.
+- Live API: 4 grouped sessions, у каждой `upcomingSlots.length === 1` (nearest), `hydrateSlots: false` на venue PDP.
+
+### Решения
+- `loadVenuePageCatalogSessions`: после venue-scoped slice hydrate `upcomingSlots` через `hydrateCatalogUpcomingSlots(..., VENUE_PAGE_SLOT_LIMIT=96)`.
+- Полный catalog soft-load по-прежнему без hydrate (perf); гидратятся только 1-120 сессий площадки.
+- Date rail/`availableDates` снова видят все дни с отправлениями; default = nearest day.
+
+### Проблемы
+- Deploy по «выкатывай» (нужен API + web, hydrate на backend).
+
+---
+
 ## 2026-08-10 - Venue schedule cards: restore width
 
 ### Наблюдения

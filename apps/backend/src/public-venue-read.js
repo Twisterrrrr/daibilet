@@ -106,6 +106,8 @@ async function getCatalogSessions(db) {
 /**
  * Venue/location PDP: prefer disk v2 venueIndex + soft timeout.
  * Must not await a hung full-catalog promote/parse on every /locations|/venues slug.
+ * Slot hydrate runs only on the venue-scoped slice (not the full catalog) so the
+ * schedule date rail sees multi-day Teplohod/TC departures instead of one nearest slot.
  */
 const VENUE_PAGE_CATALOG_SOFT_MS = Number(process.env.DAIBILET_VENUE_PAGE_CATALOG_SOFT_MS || 2_500);
 
@@ -131,11 +133,19 @@ async function loadVenuePageCatalogSessions(venueIds, venueContexts = []) {
     if (!soft?.length) return [];
 
     const indexed = catalog.resolveCatalogSessionsByVenueKeys([...keys]);
-    if (indexed.length) {
-      return sortVenueCatalogSessions(indexed).slice(0, 120);
+    const scoped = indexed.length
+      ? sortVenueCatalogSessions(indexed).slice(0, 120)
+      : // Index miss (v1 disk / name-only fuzzy): fall back to scoped filter, still no extra promote.
+        lookupVenueCatalogSessions(venueIds, soft, venueContexts).slice(0, 120);
+    if (!scoped.length) return [];
+
+    try {
+      const slotLimit = catalog.VENUE_PAGE_SLOT_LIMIT || 96;
+      return await catalog.hydrateCatalogUpcomingSlots(scoped, slotLimit);
+    } catch {
+      // Keep nearest-slot schedule if EventSession hydrate fails (date rail degrades, PDP stays up).
+      return scoped;
     }
-    // Index miss (v1 disk / name-only fuzzy): fall back to scoped filter, still no extra promote.
-    return lookupVenueCatalogSessions(venueIds, soft, venueContexts).slice(0, 120);
   } catch {
     return [];
   }
