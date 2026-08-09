@@ -1,3 +1,20 @@
+## 2026-08-09 - Canon gutter align + tips + scenarios carousel
+
+### Наблюдения
+- Owner №3 (Выборг desktop): текст должен сидеть на одной вертикали с «В» заголовка; цифры badge+1.2.3 - в gutter слева, центрированы под кружком.
+- Mobile: шире блоки; scenarios chips wrap раздражает - нужна карусель как у пригородов.
+- Tips между точками обещаны в my-day после «В маршрут».
+
+### Решения
+- `DayTripCanonCard`: CSS grid gutter (`2.25rem`) + text column; nums `justify-center` под badge; panel `sm:pl-0`; mobile meta full-width + tighter padding.
+- my-day: `transitTip` между stop-карточками (`data-day-transit-between`), merge сохраняет tip; demo tips Петергоф/бар короче.
+- Scenarios chips: mobile `flex-nowrap overflow-x-auto`, sm+ wrap.
+
+### Проблемы
+- Deploy MSK web ASAP; смоук Выборг + Петергоф + /my-day.
+
+---
+
 ## 2026-08-09 - Bridges/my-day boat times: TZ −3ч + slot dedupe
 
 ### Наблюдения

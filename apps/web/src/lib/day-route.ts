@@ -127,6 +127,14 @@ export type DayRouteVenueItem = {
   ticketQrKind?: 'qr' | 'barcode' | 'image' | null;
 };
 
+/** Compact between-stop line for my-day / suburb lists: «↓ 5-8 мин пешком». */
+export function formatDayRouteTransitTipLine(raw: string | null | undefined): string {
+  const tip = String(raw || '').trim();
+  if (!tip) return '';
+  if (/^[↓▾▼]/.test(tip)) return tip;
+  return `↓ ${tip}`;
+}
+
 /** Synthetic planner stops (typed on /my-day) - no catalog venue id required. */
 export const DAY_ROUTE_TEXT_ID_PREFIX = 'text_';
 export const DAY_ROUTE_SHARE_TEXT_PREFIX = 't:';
@@ -657,6 +665,10 @@ function mergeDayRouteVenueFields(
     next.latitude = coords.latitude;
     next.longitude = coords.longitude;
   }
+  const incomingTip = String(incoming.transitTip || '').trim();
+  const existingTip = String(existing.transitTip || '').trim();
+  if (incomingTip) next.transitTip = incomingTip;
+  else if (existingTip) next.transitTip = existingTip;
   if (incoming.eventId) next.eventId = incoming.eventId;
   if (incoming.eventSlug) next.eventSlug = incoming.eventSlug;
   if (incoming.sessionLabel) next.sessionLabel = incoming.sessionLabel;
@@ -716,7 +728,8 @@ export function addToDayRoute(item: DayRouteVenueItem): DayRouteState {
       merged.ticketUrl === existing.ticketUrl &&
       merged.ticketBought === existing.ticketBought &&
       merged.href === existing.href &&
-      merged.imageUrl === existing.imageUrl;
+      merged.imageUrl === existing.imageUrl &&
+      String(merged.transitTip || '') === String(existing.transitTip || '');
     if (unchanged) return current;
     const venues = [...current.venues];
     venues[existingIdx] = merged;

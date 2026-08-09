@@ -13,7 +13,7 @@ import {
   type DayRouteVenueMatchSource,
 } from '@/lib/day-route-from-place';
 import { mustSeePlacesForDefaultPreset } from '@/lib/must-see-filters';
-import { replaceDayRouteFromVenues } from '@/lib/day-route';
+import { formatDayRouteTransitTipLine, replaceDayRouteFromVenues } from '@/lib/day-route';
 
 type Props = {
   places: CityMustSeeItem[];
@@ -216,8 +216,9 @@ export function CityDayPresetBlock({
           {available ? (
             <ol className="mt-3 list-none space-y-2 p-0" data-day-preset-stops>
               {items.map((item, stopIndex) => {
-                const tip =
-                  String(item.transitTip || preset.stops?.[stopIndex]?.transitTip || '').trim();
+                const tip = formatDayRouteTransitTipLine(
+                  item.transitTip || preset.stops?.[stopIndex]?.transitTip,
+                );
                 return (
                   <li key={`${item.id}:${stopIndex}`} className="list-none" data-day-preset-stop>
                     {tip ? (
@@ -277,11 +278,13 @@ export function CityDayPresetBlock({
             <p className={`mt-1 text-sm leading-6 ${softClass}`}>{namedLead}</p>
           </>
         )}
+        {/* Mobile: horizontal chip carousel (как пригороды compact). sm+: wrap как hub suburbs. */}
         <div
-          className={`${embedded ? '' : 'mt-4 '}flex flex-wrap gap-2`}
+          className={`${embedded ? '' : 'mt-4 '}flex flex-nowrap gap-2 overflow-x-auto overscroll-x-contain pb-0.5 [scrollbar-width:thin] sm:flex-wrap sm:overflow-x-visible sm:pb-0`}
           role="tablist"
           aria-label="Готовые сценарии"
           data-day-preset-chips
+          data-day-preset-chips-scroll="mobile"
         >
           {namedResolved.map((row, index) => {
             const active = selectedIndex === index;
@@ -310,7 +313,9 @@ export function CityDayPresetBlock({
                 >
                   {index + 1}
                 </span>
-                <span>{row.preset.title}</span>
+                <span className="max-w-[14rem] truncate sm:max-w-none sm:whitespace-normal">
+                  {row.preset.title}
+                </span>
               </button>
             );
           })}

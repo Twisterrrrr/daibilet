@@ -71,14 +71,24 @@ function SightLabel({
   );
 }
 
-/** Fixed number column wide enough for «8.» / «10.» with tabular-nums. */
-const NUM_COL = 'w-6 shrink-0 text-left tabular-nums';
-
 /**
- * Suburb day-trip card.
- * Layout: [badge] [content column: title → meta → sights → CTA] [mirror spacer]
- * so title / «Логистика» / «Что посмотреть» / list / CTA share one left edge.
+ * Desktop (owner red line):
+ * - Left gutter = badge width; badge + list nums centered in gutter.
+ * - Right column = ALL text flush to one vertical (title / headings / panel copy / POI names).
+ * Mobile: same grid, tighter card padding for usable width.
  */
+const GRID =
+  'grid grid-cols-[2rem_minmax(0,1fr)] gap-x-2.5 sm:grid-cols-[2.25rem_minmax(0,1fr)] sm:gap-x-3';
+const GUTTER = 'flex justify-center';
+
+/** Compact between-stop tip: «↓ 5-8 мин пешком» (hyphen only). */
+function formatCanonTransitTip(raw: string): string {
+  const tip = raw.trim();
+  if (!tip) return '';
+  if (/^[↓▾▼]/.test(tip)) return tip;
+  return `↓ ${tip}`;
+}
+
 export function DayTripCanonCard({
   index,
   total,
@@ -133,21 +143,24 @@ export function DayTripCanonCard({
         ariaLabel ||
         (total != null ? `${index + 1} из ${total}` : undefined)
       }
-      className={`mt-4 w-full rounded-2xl border bg-white p-5 shadow-sm sm:p-6 ${
+      className={`mt-4 w-full rounded-2xl border bg-white px-3.5 py-4 shadow-sm sm:p-5 md:p-6 ${
         editorial ? 'border-zinc-200' : 'border-slate-200'
       } ${className}`}
       data-day-trip-canon="1"
+      data-day-trip-align="gutter-text"
       {...dataProps}
     >
-      <div className="flex items-start gap-3">
-        <span
-          className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold tabular-nums ${badgeClass}`}
-          data-day-trip-badge
-        >
-          {index + 1}
-        </span>
-
-        <div className="min-w-0 flex-1" data-day-trip-content>
+      {/* Title row: badge in gutter, title on text vertical. */}
+      <div className={GRID} data-day-trip-head>
+        <div className={`${GUTTER} pt-0.5`} data-day-trip-gutter>
+          <span
+            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold tabular-nums sm:h-9 sm:w-9 ${badgeClass}`}
+            data-day-trip-badge
+          >
+            {index + 1}
+          </span>
+        </div>
+        <div className="min-w-0" data-day-trip-content>
           <header>
             <h3
               className={`text-xl font-semibold leading-snug tracking-tight sm:text-2xl ${titleClass}`}
@@ -162,105 +175,115 @@ export function DayTripCanonCard({
             ) : null}
             {titleExtra ? <div className="mt-1.5">{titleExtra}</div> : null}
           </header>
-
-          {showMetaGrid ? (
-            <div
-              className={`mt-5 grid gap-4 ${
-                hasLogistics && hasGastro ? 'sm:grid-cols-2' : 'grid-cols-1'
-              }`}
-              data-day-trip-meta
-            >
-              {hasLogistics ? (
-                <section data-day-trip-logistics>
-                  {/* Heading flush with title (same content-column left edge). */}
-                  <h4 className={`text-sm font-semibold ${inkClass}`}>Логистика</h4>
-                  <div className={`mt-2 ${panelClass} px-3.5 py-3 sm:px-4 sm:py-3.5`}>
-                    {logisticsExit ? (
-                      <p className={`text-sm leading-snug ${softClass}`} data-day-trip-exit>
-                        <span className={`font-semibold ${inkClass}`}>Где выходить</span>
-                        <span className={mutedClass}>: {logisticsExit}</span>
-                      </p>
-                    ) : null}
-                    {logisticsText ? (
-                      <p
-                        className={`${logisticsExit ? 'mt-1.5' : ''} text-sm leading-relaxed ${mutedClass}`}
-                      >
-                        {logisticsText}
-                      </p>
-                    ) : null}
-                    {logisticsExtra ? (
-                      <p className={`mt-1.5 text-sm leading-relaxed ${mutedClass}`}>
-                        {logisticsExtra}
-                      </p>
-                    ) : null}
-                  </div>
-                </section>
-              ) : null}
-
-              {hasGastro && gastro ? (
-                <section data-day-trip-gastro>
-                  <h4 className={`text-sm font-semibold ${inkClass}`}>Гастро-остановка</h4>
-                  <div className="mt-2 rounded-xl border border-amber-100 bg-amber-50/80 px-3.5 py-3 sm:px-4 sm:py-3.5">
-                    <p className={`text-sm font-semibold leading-snug ${inkClass}`}>{gastro.name}</p>
-                    {gastro.blurb ? (
-                      <p className={`mt-1 text-sm leading-relaxed ${softClass}`}>{gastro.blurb}</p>
-                    ) : null}
-                  </div>
-                </section>
-              ) : null}
-            </div>
-          ) : null}
-
-          {nested.length ? (
-            <section className={`mt-5 border-t pt-4 ${borderSoft}`} data-day-trip-sights>
-              <h4 className={`text-sm font-semibold ${inkClass}`}>Что посмотреть</h4>
-              <ol className="mt-3 list-none space-y-2.5 p-0" data-day-trip-places>
-                {nested.map((poi, poiIndex) => {
-                  const tip = String(poi.transitTip || '').trim();
-                  return (
-                    <li key={`${poi.name}:${poiIndex}`} className="list-none" data-day-trip-place>
-                      {/* Tip BETWEEN points: above destination row (1→2→…). */}
-                      {tip ? (
-                        <div className="mb-1 flex items-start gap-3">
-                          <span className={NUM_COL} aria-hidden />
-                          <p
-                            className={`min-w-0 flex-1 text-[12px] leading-snug ${mutedClass}`}
-                            data-day-trip-transit-tip
-                          >
-                            {tip}
-                          </p>
-                        </div>
-                      ) : null}
-                      <div className="flex items-start gap-3 text-sm leading-snug">
-                        <span className={`${NUM_COL} ${numClass}`} data-day-trip-place-num>
-                          {poiIndex + 1}.
-                        </span>
-                        <span className={`min-w-0 flex-1 ${poiTextClass}`}>
-                          <SightLabel
-                            name={poi.name}
-                            href={poi.href}
-                            desc={poi.desc}
-                            descFromMd={sightDescFromMd}
-                          />
-                        </span>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ol>
-            </section>
-          ) : null}
-
-          {cta ? (
-            <div className={`mt-5 border-t pt-4 ${borderSoft}`} data-day-trip-cta>
-              {cta}
-            </div>
-          ) : null}
         </div>
-
-        {/* Mirror badge width so right inset ≈ left (badge + gap). */}
-        <span className="hidden w-9 shrink-0 sm:block" aria-hidden data-day-trip-mirror />
       </div>
+
+      {showMetaGrid ? (
+        <div
+          className="mt-4 sm:mt-5 sm:grid sm:grid-cols-[2.25rem_minmax(0,1fr)] sm:gap-x-3"
+          data-day-trip-meta
+        >
+          <div aria-hidden className="hidden sm:block" />
+          <div
+            className={`min-w-0 grid gap-3 sm:gap-4 ${
+              hasLogistics && hasGastro ? 'sm:grid-cols-2' : 'grid-cols-1'
+            }`}
+          >
+            {hasLogistics ? (
+              <section data-day-trip-logistics>
+                <h4 className={`text-sm font-semibold ${inkClass}`}>Логистика</h4>
+                {/* pl-0 desktop: panel copy on the same vertical as title. */}
+                <div className={`mt-1.5 ${panelClass} px-2.5 py-2.5 sm:mt-2 sm:py-3.5 sm:pr-4 sm:pl-0`}>
+                  {logisticsExit ? (
+                    <p className={`text-sm leading-snug ${softClass}`} data-day-trip-exit>
+                      <span className={`font-semibold ${inkClass}`}>Где выходить</span>
+                      <span className={mutedClass}>: {logisticsExit}</span>
+                    </p>
+                  ) : null}
+                  {logisticsText ? (
+                    <p
+                      className={`${logisticsExit ? 'mt-1.5' : ''} text-sm leading-relaxed ${mutedClass}`}
+                    >
+                      {logisticsText}
+                    </p>
+                  ) : null}
+                  {logisticsExtra ? (
+                    <p className={`mt-1.5 text-sm leading-relaxed ${mutedClass}`}>
+                      {logisticsExtra}
+                    </p>
+                  ) : null}
+                </div>
+              </section>
+            ) : null}
+
+            {hasGastro && gastro ? (
+              <section data-day-trip-gastro>
+                <h4 className={`text-sm font-semibold ${inkClass}`}>Гастро-остановка</h4>
+                <div className="mt-1.5 rounded-xl border border-amber-100 bg-amber-50/80 px-2.5 py-2.5 sm:mt-2 sm:py-3.5 sm:pr-4 sm:pl-0">
+                  <p className={`text-sm font-semibold leading-snug ${inkClass}`}>{gastro.name}</p>
+                  {gastro.blurb ? (
+                    <p className={`mt-1 text-sm leading-relaxed ${softClass}`}>{gastro.blurb}</p>
+                  ) : null}
+                </div>
+              </section>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
+
+      {nested.length ? (
+        <section className={`mt-4 border-t pt-3.5 sm:mt-5 sm:pt-4 ${borderSoft}`} data-day-trip-sights>
+          <div className="sm:grid sm:grid-cols-[2.25rem_minmax(0,1fr)] sm:gap-x-3">
+            <div aria-hidden className="hidden sm:block" />
+            <h4 className={`text-sm font-semibold ${inkClass}`}>Что посмотреть</h4>
+          </div>
+          <ol className="mt-2.5 list-none space-y-2 p-0 sm:mt-3 sm:space-y-2.5" data-day-trip-places>
+            {nested.map((poi, poiIndex) => {
+              const tip = formatCanonTransitTip(String(poi.transitTip || ''));
+              return (
+                <li key={`${poi.name}:${poiIndex}`} className="list-none" data-day-trip-place>
+                  {tip ? (
+                    <div className={`mb-0.5 sm:mb-1 ${GRID}`}>
+                      <span aria-hidden />
+                      <p
+                        className={`min-w-0 text-[11px] leading-snug sm:text-[12px] ${mutedClass}`}
+                        data-day-trip-transit-tip
+                      >
+                        {tip}
+                      </p>
+                    </div>
+                  ) : null}
+                  <div className={`${GRID} text-sm leading-snug`}>
+                    <span
+                      className={`${GUTTER} tabular-nums ${numClass}`}
+                      data-day-trip-place-num
+                    >
+                      {poiIndex + 1}.
+                    </span>
+                    <span className={`min-w-0 ${poiTextClass}`}>
+                      <SightLabel
+                        name={poi.name}
+                        href={poi.href}
+                        desc={poi.desc}
+                        descFromMd={sightDescFromMd}
+                      />
+                    </span>
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        </section>
+      ) : null}
+
+      {cta ? (
+        <div className={`mt-5 border-t pt-4 ${borderSoft}`} data-day-trip-cta>
+          <div className="sm:grid sm:grid-cols-[2.25rem_minmax(0,1fr)] sm:gap-x-3">
+            <div aria-hidden className="hidden sm:block" />
+            <div className="min-w-0">{cta}</div>
+          </div>
+        </div>
+      ) : null}
     </article>
   );
 }

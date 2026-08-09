@@ -94,6 +94,7 @@ import {
   formatDayRouteDistance,
   formatDayRouteSegmentHint,
   formatDayRouteSessionDisplay,
+  formatDayRouteTransitTipLine,
   formatDayRouteTravelMinutes,
   hydrateTextStopsFromShareTokens,
   isDayRouteAtSoft,
@@ -3139,6 +3140,14 @@ function DayRoutePanelInner() {
             >
               {planStops.map((venue, index) => {
                 const globalIndex = route.venues.findIndex((v) => v.id === venue.id);
+                const nextTipRaw =
+                  globalIndex >= 0
+                    ? route.venues[globalIndex + 1]?.transitTip
+                    : planStops[index + 1]?.transitTip;
+                const betweenTip =
+                  index < planStops.length - 1
+                    ? formatDayRouteTransitTipLine(nextTipRaw)
+                    : '';
                 return (
                   <Fragment key={venue.id}>
                     <DayRouteVenueCard
@@ -3156,11 +3165,7 @@ function DayRoutePanelInner() {
                       segmentToNext={
                         globalIndex >= 0 ? segmentMeters[globalIndex] ?? null : null
                       }
-                      nextTransitTip={
-                        globalIndex >= 0
-                          ? String(route.venues[globalIndex + 1]?.transitTip || '').trim() || null
-                          : String(planStops[index + 1]?.transitTip || '').trim() || null
-                      }
+                      hideGeoSegment={Boolean(betweenTip)}
                       travelMode={travelMode}
                       focused={focusedStopId === venue.id}
                       onMoveUp={() => setRoute(moveDayRoutePlanVenue(venue.id, -1))}
@@ -3179,6 +3184,19 @@ function DayRoutePanelInner() {
                         setRoute(updateDayRouteVenue(venue.id, { note: note || null }))
                       }
                     />
+                    {betweenTip ? (
+                      <li
+                        className={`list-none px-1 py-0.5 ${
+                          effectiveStopViewMode === 'grid' ? 'col-span-full' : ''
+                        }`}
+                        data-day-transit-between
+                        aria-label={betweenTip}
+                      >
+                        <p className="m-0 truncate text-[11px] leading-snug text-slate-400">
+                          {betweenTip}
+                        </p>
+                      </li>
+                    ) : null}
                     {primaryFreeWindow &&
                     globalIndex >= 0 &&
                     primaryFreeWindow.afterIndex === globalIndex &&
@@ -4383,7 +4401,7 @@ function DayRouteVenueCard({
   hasCoords,
   mapsUrl = null,
   segmentToNext,
-  nextTransitTip = null,
+  hideGeoSegment = false,
   travelMode,
   focused = false,
   onMoveUp,
@@ -4403,8 +4421,8 @@ function DayRouteVenueCard({
   hasCoords: boolean;
   mapsUrl?: string | null;
   segmentToNext: number | null;
-  /** Editorial tip for the next stop (shown between cards). */
-  nextTransitTip?: string | null;
+  /** When editorial between-card tip is shown, skip geo «далее ~» noise. */
+  hideGeoSegment?: boolean;
   travelMode: DayRouteTravelMode;
   focused?: boolean;
   onMoveUp: () => void;
@@ -4452,15 +4470,17 @@ function DayRouteVenueCard({
       ? addressLine
       : String(venue.city || '').trim() || '';
   const segmentHint =
-    segmentToNext != null && index < total - 1
+    !hideGeoSegment && segmentToNext != null && index < total - 1
       ? formatDayRouteSegmentHint(segmentToNext, travelMode)
       : '';
   const segmentMinutes =
-    segmentToNext != null && index < total - 1
+    !hideGeoSegment && segmentToNext != null && index < total - 1
       ? estimateDayRouteTravelMinutes(segmentToNext, travelMode)
       : 0;
   const segmentDistanceLabel =
-    segmentToNext != null && index < total - 1 ? formatDayRouteDistance(segmentToNext) : '';
+    !hideGeoSegment && segmentToNext != null && index < total - 1
+      ? formatDayRouteDistance(segmentToNext)
+      : '';
   const segmentTimeLabel =
     segmentMinutes > 0 ? `~${formatDayRouteTravelMinutes(segmentMinutes)}` : '';
   const sessionDisplay = formatDayRouteSessionDisplay(venue);
@@ -4472,12 +4492,7 @@ function DayRouteVenueCard({
     !hasCoords ? 'Нет координат' : null,
   ].filter(Boolean) as string[];
   const metaLine = metaParts.join(' · ');
-  const editorialNext = String(nextTransitTip || '').trim();
-  const segmentLine = editorialNext
-    ? editorialNext
-    : segmentHint
-      ? `далее ~ ${segmentHint}`
-      : '';
+  const segmentLine = segmentHint ? `далее ~ ${segmentHint}` : '';
 
   const titleClass = 'font-semibold leading-tight text-slate-900';
   const titleNode = href ? (
@@ -4862,7 +4877,6 @@ function DayRouteVenueCard({
               <p
                 className="mt-0.5 mb-0 line-clamp-2 text-[11px] leading-snug text-slate-500"
                 data-day-segment-hint="1"
-                data-day-transit-tip={editorialNext ? '1' : undefined}
               >
                 {segmentLine}
               </p>
