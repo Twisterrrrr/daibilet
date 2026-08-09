@@ -1,6 +1,11 @@
 import { resolveCityTimeZone } from './city-timezone.js';
 import { matchingLandingSlugs } from './landing-rules.js';
-import { isFutureSlotStart, isOpenDateCatalogRow } from './catalog-availability.js';
+import {
+  isFutureSlotStart,
+  isOpenDateCatalogRow,
+  isPublicSalesStatusBlocked,
+  isPublicSessionRowOnSale,
+} from './catalog-availability.js';
 import { pickFirstUsableEventImageUrl } from './event-image-url.js';
 import {
   buildProviderWidgetUrl,
@@ -18,6 +23,7 @@ export interface PublicCatalogSlotRow {
   id?: string | null;
   eventId?: string | null;
   startsAt?: string | Date | null;
+  sourceStatus?: string | null;
   sourceCode?: string | null;
   offerSourceCode?: string | null;
   offerWidgetUrl?: string | null;
@@ -135,12 +141,14 @@ export function mapGroupedPublicSession(
   if (!destination) return null;
   const timeZone = resolveCityTimeZone(cityName, destination.name);
   const fallbackWidgetUrl = buildProviderWidgetUrl(row);
+  if (!isPublicSessionRowOnSale({ sourceStatus: row.sourceStatus })) return null;
   const purchase = purchaseInfo(row);
   const purchaseUrl = purchase.url || fallbackWidgetUrl;
   const upcomingSlots = dedupeCatalogSlotsByClock(
     parseUpcomingSlots(row.upcomingSlots)
       .filter(hasSlotStart)
       .filter((slot) => isFutureSlotStart(slot.startsAt))
+      .filter((slot) => !isPublicSalesStatusBlocked(slot.sourceStatus))
       .map((slot) => {
         const sourceCode = slot.sourceCode || slot.offerSourceCode || row.sourceCode || row.offerSourceCode;
         const slotExternalId = resolveSessionPurchaseExternalId({

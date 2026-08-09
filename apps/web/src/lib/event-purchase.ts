@@ -67,7 +67,9 @@ export function isSessionPurchaseBlocked(session: PurchaseSession): boolean {
   const statuses = [session.sourceStatus, session.eventSourceStatus].map((value) =>
     String(value || '').toLowerCase(),
   );
-  if (statuses.some((status) => ['paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden'].includes(status))) {
+  if (statuses.some((status) =>
+    ['paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden', 'stand_by', 'closed', 'sales_closed', 'sale_closed', 'not_for_sale', 'widget_blocked'].includes(status),
+  )) {
     return true;
   }
   if (session.purchaseReady === false) return true;

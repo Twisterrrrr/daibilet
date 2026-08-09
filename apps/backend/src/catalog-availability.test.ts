@@ -3,6 +3,8 @@ import test from 'node:test';
 import {
   hasUpcomingOrOpenSchedule,
   isOpenDateCatalogRow,
+  isPublicSalesStatusBlocked,
+  isPublicSessionRowOnSale,
   isSaleableEventForPublic,
   isSaleableForPublicCatalog,
 } from './catalog-availability.js';
@@ -37,7 +39,24 @@ test('hasUpcomingOrOpenSchedule rejects stale wide-lifetime rows', () => {
   assert.equal(hasUpcomingOrOpenSchedule({ kind: 'SINGLE', startsAt: started, endsAt: ends }), false);
 });
 
-test('isSaleableForPublicCatalog requires widget-ready schedule; price optional', () => {
+test('isPublicSalesStatusBlocked covers TC STAND_BY and closed sales', () => {
+  assert.equal(isPublicSalesStatusBlocked('STAND_BY'), true);
+  assert.equal(isPublicSalesStatusBlocked('stand_by'), true);
+  assert.equal(isPublicSalesStatusBlocked('closed'), true);
+  assert.equal(isPublicSalesStatusBlocked('sales_closed'), true);
+  assert.equal(isPublicSalesStatusBlocked('paused'), true);
+  assert.equal(isPublicSalesStatusBlocked('PUBLIC'), false);
+  assert.equal(isPublicSalesStatusBlocked(null), false);
+});
+
+test('isPublicSessionRowOnSale hides inactive and cancelled sessions', () => {
+  assert.equal(isPublicSessionRowOnSale({ isActive: true, sourceStatus: 'PUBLIC' }), true);
+  assert.equal(isPublicSessionRowOnSale({ isActive: false, sourceStatus: 'PUBLIC' }), false);
+  assert.equal(isPublicSessionRowOnSale({ isActive: true, cancelledAt: new Date(), sourceStatus: 'PUBLIC' }), false);
+  assert.equal(isPublicSessionRowOnSale({ isActive: true, sourceStatus: 'STAND_BY' }), false);
+});
+
+test('isSaleableForPublicCatalog requires widget-ready schedule; price optional; blocks closed sales', () => {
   const future = new Date(Date.now() + 3_600_000).toISOString();
   assert.equal(
     isSaleableForPublicCatalog({ kind: 'SINGLE', startsAt: future, purchaseReady: true, priceFrom: 500 }),
@@ -53,6 +72,16 @@ test('isSaleableForPublicCatalog requires widget-ready schedule; price optional'
   );
   assert.equal(
     isSaleableForPublicCatalog({ kind: 'SINGLE', startsAt: future, purchaseReady: false, priceFrom: 500 }),
+    false,
+  );
+  assert.equal(
+    isSaleableForPublicCatalog({
+      kind: 'SINGLE',
+      startsAt: future,
+      purchaseReady: true,
+      priceFrom: 500,
+      sourceStatus: 'STAND_BY',
+    }),
     false,
   );
   assert.equal(isSaleableEventForPublic, isSaleableForPublicCatalog);

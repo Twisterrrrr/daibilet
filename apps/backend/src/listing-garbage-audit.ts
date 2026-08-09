@@ -4,23 +4,12 @@
  */
 import { prisma } from '@daibilet/db';
 import { raw, sql } from '@daibilet/db/sql';
-import { ACTIVE_SESSION_SQL, MIN_DISPLAY_PRICE_RUB } from './catalog-availability.js';
+import { ACTIVE_SESSION_SQL, MIN_DISPLAY_PRICE_RUB, PUBLIC_SALES_BLOCKED_STATUS_SQL } from './catalog-availability.js';
 import {
   findListingGarbageHits,
   type ListingGarbageHit,
 } from './listing-garbage-config.js';
 import { escapeTelegramHtml, sendTelegramMessage } from './telegram.js';
-
-const BLOCKED_SOURCE_STATUSES = [
-  'widget_blocked',
-  'paused',
-  'suspended',
-  'stopped',
-  'cancelled',
-  'canceled',
-  'draft',
-  'hidden',
-] as const;
 
 export interface ListingAuditEventRow {
   id: string;
@@ -69,7 +58,7 @@ function resolvePublicBaseUrl(explicit?: string): string {
  * Title/description prefer EventOverride when set (what editors / public see).
  */
 export async function fetchSaleablePublicListingRows(): Promise<ListingAuditEventRow[]> {
-  const blocked = BLOCKED_SOURCE_STATUSES.map((s) => `'${s}'`).join(', ');
+  const blocked = PUBLIC_SALES_BLOCKED_STATUS_SQL;
   const rows = await prisma.$queryRaw<ListingAuditEventRow[]>(sql`
     with event_base as (
       select
