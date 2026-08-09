@@ -1,3 +1,19 @@
+## 2026-08-10 - MSK web deploy (cities/venue/scenarios batch)
+
+### Наблюдения
+- Owner: «выкатывай» после cities sort/toolbar, venue schedule rail, venue section order, scenarios padding.
+- Previous live tip `a271a78e` BUILD_ID=`Mby7MP2KiGFvNEWzY_qC4`.
+
+### Решения
+- Deploy MSK web `31336541746` success; tip `964c4567`; BUILD_ID=`SR08A3UaBJ4IlLsjQcK4n`.
+- Live since `a271a78e`: cities one-list+toolbar (`2965a338`), venue date-rail schedule (`28795f43`+`97b27739`), location admission+rail nest (`f71de42c`), scenario outer padding (`8f4a0967`), venue afisha section order.
+
+### Проблемы
+- Нет.
+
+
+---
+
 ## 2026-08-10 - `/events`: даты в hero, один ряд чипов
 
 ### Наблюдения
