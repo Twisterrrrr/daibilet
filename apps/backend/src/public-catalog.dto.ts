@@ -274,7 +274,7 @@ async function promoteDiskCacheIfNewerAsync(): Promise<void> {
         staleUntil: disk.staleUntil,
         sessions: disk.sessions,
         builtAt: disk.builtAt,
-        indexes: disk.indexes,
+        ...(disk.indexes ? { indexes: disk.indexes } : {}),
       });
     } catch (error) {
       console.error(
@@ -472,7 +472,7 @@ function scheduleInlineCatalogRebuild(reason: string): Promise<PublicSessionDto[
         staleUntil,
         sessions,
         builtAt: now,
-        indexes,
+        ...(indexes ? { indexes } : {}),
       });
       writePublicCatalogDiskCache({
         version: indexes ? 2 : 1,
