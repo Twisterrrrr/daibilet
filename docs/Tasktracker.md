@@ -2,6 +2,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
+| UX.EVENTS-MOBILE-SELECTS | `/events` mobile: Find in search; date+type dropdowns; chip rails md+ only | Высокий | 🔄 ship; deploy по «выкатывай» |
 | UX.EVENTS-FILTERS-AIR | `/events` mobile: sticky search-only (chips visible); filter sheet air + quick evening chip | Высокий | ✅ `f0880cb1`; deploy по «выкатывай» |
 | UX.CITIES-CATALOG-CLEAN | `/cities` clean hero + hub/region chips; vibe Lucide hover (no emoji) | Высокий | ✅ `b02bccab`; deploy по «выкатывай» |
 | UX.SCENARIOS-TWO-COL | Hub/my-day scenarios: 2-col stops; CTA beside title + panel v-center | Высокий | ✅ `07dcb587` Deploy `31334844554` |

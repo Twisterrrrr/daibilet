@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Baby, Gift, Moon, MoreHorizontal, Search, SlidersHorizontal, X } from 'lucide-react';
+import { Baby, ChevronDown, Gift, Moon, MoreHorizontal, Search, SlidersHorizontal, X } from 'lucide-react';
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -131,7 +131,7 @@ export function CatalogToolbar({
     });
   };
 
-  const setDatePreset = (nextDate: 'all' | 'today' | 'tomorrow' | 'weekend') => {
+  const setDatePreset = (nextDate: 'all' | 'today' | 'tomorrow' | 'weekend' | 'evening') => {
     navigate({
       ...filters,
       q: qDraft.trim() || undefined,
@@ -139,7 +139,7 @@ export function CatalogToolbar({
       from: undefined,
       to: undefined,
       page: undefined,
-      sort: nextDate === 'today' || nextDate === 'tomorrow' ? 'time' : filters.sort,
+      sort: nextDate === 'today' || nextDate === 'tomorrow' || nextDate === 'evening' ? 'time' : filters.sort,
     });
   };
 
@@ -238,131 +238,148 @@ export function CatalogToolbar({
 
   return (
     <div className="space-y-2.5 sm:space-y-3">
-      {/* Mobile: only search sticks - date/categories stay in document flow so they don't vanish under the fold. */}
+      {/* Mobile: compact sticky (search + date/type selects). Rails stay desktop-only. */}
       <div className="catalog-toolbar sticky top-[var(--site-header-height)] z-30 -mx-4 border-b border-slate-200/60 bg-white/95 px-4 py-2 backdrop-blur-md supports-[backdrop-filter]:bg-white/90 sm:-mx-6 sm:px-6 md:static md:z-auto md:mx-0 md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none">
         <form
           onSubmit={onSubmit}
-          className="flex flex-col gap-1.5 rounded-2xl border border-slate-100 bg-white p-1.5 sm:flex-row sm:items-center sm:gap-1 sm:p-1"
+          className="flex flex-col gap-1.5 rounded-2xl border border-slate-100 bg-white p-1.5 sm:gap-1 md:flex-row md:items-center md:p-1"
         >
-        <div ref={searchWrapRef} className="relative min-w-0 flex-1">
-          <label className="relative block min-w-0">
-            <span className="sr-only">Поиск по событиям</span>
-            <Search
-              aria-hidden
-              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-graphite-muted"
-              strokeWidth={1.75}
-            />
-            <input
-              ref={searchInputRef}
-              type="search"
-              name="q"
-              value={qDraft}
-              onChange={(event) => setQDraft(event.target.value)}
-              onFocus={() => setSearchFocused(true)}
-              placeholder="Название, место или артист"
-              aria-label="Поиск по событиям"
-              aria-expanded={showSearchHints}
-              aria-controls={showSearchHints ? 'catalog-search-hints' : undefined}
-              disabled={disabled}
-              autoComplete="off"
-              className="inline-btn h-10 w-full rounded-xl bg-transparent pl-10 pr-9 text-sm text-graphite outline-none transition placeholder:text-graphite-muted focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-60 sm:h-9"
-            />
-            {qDraft ? (
-              <button
-                type="button"
-                aria-label="Очистить поиск"
+          <div ref={searchWrapRef} className="relative flex min-w-0 flex-1 items-center gap-1">
+            <label className="relative block min-w-0 flex-1">
+              <span className="sr-only">Поиск по событиям</span>
+              <Search
+                aria-hidden
+                className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-graphite-muted"
+                strokeWidth={1.75}
+              />
+              <input
+                ref={searchInputRef}
+                type="search"
+                name="q"
+                value={qDraft}
+                onChange={(event) => setQDraft(event.target.value)}
+                onFocus={() => setSearchFocused(true)}
+                placeholder="Название, место или артист"
+                aria-label="Поиск по событиям"
+                aria-expanded={showSearchHints}
+                aria-controls={showSearchHints ? 'catalog-search-hints' : undefined}
                 disabled={disabled}
-                onClick={() => {
-                  setQDraft('');
-                  navigate({ ...filters, q: undefined, page: undefined });
-                }}
-                className="inline-btn absolute right-2 top-1/2 grid h-6 w-6 -translate-y-1/2 place-items-center rounded-lg text-graphite-muted hover:bg-surface-muted hover:text-graphite disabled:opacity-60"
-              >
-                <X aria-hidden className="h-3.5 w-3.5" strokeWidth={1.75} />
-              </button>
-            ) : null}
-          </label>
-
-          {showSearchHints ? (
-            <div
-              id="catalog-search-hints"
-              role="listbox"
-              aria-label="Популярные запросы"
-              className="absolute left-0 right-0 top-[calc(100%+0.35rem)] z-50 overflow-hidden rounded-2xl border border-slate-100 bg-white py-1.5 shadow-lg"
-            >
-              <p className="px-3 pb-1 pt-0.5 text-[11px] font-semibold uppercase tracking-wider text-graphite-muted">
-                Часто ищут
-              </p>
-              {searchHints.map((hint) => (
+                autoComplete="off"
+                className="inline-btn h-10 w-full rounded-xl bg-transparent pl-10 pr-9 text-sm text-graphite outline-none transition placeholder:text-graphite-muted focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-60 md:h-9"
+              />
+              {qDraft ? (
                 <button
-                  key={`${hint.kind}:${hint.category || hint.q || hint.label}`}
                   type="button"
-                  role="option"
-                  className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm text-graphite transition hover:bg-surface-muted"
+                  aria-label="Очистить поиск"
+                  disabled={disabled}
                   onClick={() => {
-                    setSearchFocused(false);
-                    if (hint.kind === 'q' && hint.q) {
-                      setQDraft(hint.q);
+                    setQDraft('');
+                    navigate({ ...filters, q: undefined, page: undefined });
+                  }}
+                  className="inline-btn absolute right-2 top-1/2 grid h-6 w-6 -translate-y-1/2 place-items-center rounded-lg text-graphite-muted hover:bg-surface-muted hover:text-graphite disabled:opacity-60"
+                >
+                  <X aria-hidden className="h-3.5 w-3.5" strokeWidth={1.75} />
+                </button>
+              ) : null}
+            </label>
+
+            <button
+              type="submit"
+              disabled={disabled}
+              className="inline-btn btn-primary h-10 shrink-0 rounded-xl px-3.5 text-sm disabled:opacity-60 md:h-9"
+            >
+              Найти
+            </button>
+
+            {showSearchHints ? (
+              <div
+                id="catalog-search-hints"
+                role="listbox"
+                aria-label="Популярные запросы"
+                className="absolute left-0 right-0 top-[calc(100%+0.35rem)] z-50 overflow-hidden rounded-2xl border border-slate-100 bg-white py-1.5 shadow-lg"
+              >
+                <p className="px-3 pb-1 pt-0.5 text-[11px] font-semibold uppercase tracking-wider text-graphite-muted">
+                  Часто ищут
+                </p>
+                {searchHints.map((hint) => (
+                  <button
+                    key={`${hint.kind}:${hint.category || hint.q || hint.label}`}
+                    type="button"
+                    role="option"
+                    className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm text-graphite transition hover:bg-surface-muted"
+                    onClick={() => {
+                      setSearchFocused(false);
+                      if (hint.kind === 'q' && hint.q) {
+                        setQDraft(hint.q);
+                        navigate({
+                          ...filters,
+                          q: hint.q,
+                          category: undefined,
+                          page: undefined,
+                        });
+                        return;
+                      }
                       navigate({
                         ...filters,
-                        q: hint.q,
-                        category: undefined,
+                        q: undefined,
+                        category: hint.category,
                         page: undefined,
                       });
-                      return;
-                    }
-                    navigate({
-                      ...filters,
-                      q: undefined,
-                      category: hint.category,
-                      page: undefined,
-                    });
-                  }}
-                >
-                  <Search aria-hidden className="h-3.5 w-3.5 shrink-0 text-graphite-muted" strokeWidth={1.75} />
-                  <span className="truncate">{hint.label}</span>
-                </button>
-              ))}
-            </div>
-          ) : null}
-        </div>
+                    }}
+                  >
+                    <Search aria-hidden className="h-3.5 w-3.5 shrink-0 text-graphite-muted" strokeWidth={1.75} />
+                    <span className="truncate">{hint.label}</span>
+                  </button>
+                ))}
+              </div>
+            ) : null}
+          </div>
 
-        <div className="flex items-center gap-1.5 sm:contents">
-          {/* Exact calendar: desktop only; mobile uses date rail. */}
-          <label className="relative hidden min-w-[9.5rem] flex-none md:block md:w-36">
-            <span className="sr-only">Точная дата</span>
-            <input
-              type="date"
-              value={singleDay}
+          {/* Mobile: date + type as compact selects (no chip rails). */}
+          <div className="grid grid-cols-2 gap-1.5 md:hidden">
+            <MobileDateSelect
+              chips={dateRailChips}
+              filters={filters}
               disabled={disabled}
-              onChange={(event) => setExactDay(event.target.value)}
-              aria-label="Выбрать дату в календаре"
-              className="h-10 w-full rounded-xl bg-surface-muted px-2.5 text-sm font-medium text-graphite outline-none transition hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-70 md:h-9"
+              onPreset={setDatePreset}
+              onExactDay={setExactDay}
             />
-          </label>
+            <MobileCategorySelect
+              filters={filters}
+              categories={facets.categories}
+              disabled={disabled}
+              onNavigate={navigate}
+              qDraft={qDraft}
+            />
+          </div>
 
-          <FiltersButton
-            open={filtersOpen}
-            count={advancedCount}
-            disabled={disabled}
-            onClick={() => setFiltersOpen(true)}
-            className="max-md:hidden"
-          />
+          <div className="hidden items-center gap-1.5 md:flex">
+            <label className="relative hidden min-w-[9.5rem] flex-none md:block md:w-36">
+              <span className="sr-only">Точная дата</span>
+              <input
+                type="date"
+                value={singleDay}
+                disabled={disabled}
+                onChange={(event) => setExactDay(event.target.value)}
+                aria-label="Выбрать дату в календаре"
+                className="h-9 w-full rounded-xl bg-surface-muted px-2.5 text-sm font-medium text-graphite outline-none transition hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-70"
+              />
+            </label>
 
-          <button
-            type="submit"
-            disabled={disabled}
-            className="inline-btn btn-primary h-10 shrink-0 px-3.5 text-sm disabled:opacity-60 sm:h-9"
-          >
-            Найти
-          </button>
-        </div>
+            <FiltersButton
+              open={filtersOpen}
+              count={advancedCount}
+              disabled={disabled}
+              onClick={() => setFiltersOpen(true)}
+            />
+          </div>
         </form>
       </div>
 
       {advancedPanel}
 
-      <div className="-mx-4 space-y-2 px-4 sm:mx-0 sm:px-0">
+      {/* Desktop discovery rails */}
+      <div className="hidden space-y-2 md:block">
         <CatalogDateRail
           chips={dateRailChips}
           filters={filters}
@@ -411,6 +428,138 @@ export function CatalogToolbar({
           </button>
         </div>
       </div>
+    </div>
+  );
+}
+
+const mobileSelectCls =
+  'h-10 w-full appearance-none truncate rounded-xl border-0 bg-[#F5F5F7] py-2 pl-3 pr-8 text-sm font-medium text-[#1A1A1A] outline-none transition hover:bg-[#EBEBED] focus-visible:ring-2 focus-visible:ring-primary/40 disabled:opacity-60';
+
+function formatSelectDay(iso: string): string {
+  const day = Number(iso.slice(8));
+  const date = new Date(`${iso}T12:00:00`);
+  const weekday = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'][date.getDay()] || '';
+  return `${weekday} ${day}`;
+}
+
+function resolveMobileDateValue(filters: CatalogFilterValues): string {
+  if (filters.date) return filters.date;
+  if (filters.from && filters.to === filters.from) return `day:${filters.from}`;
+  if (filters.from || filters.to) return 'custom';
+  return 'all';
+}
+
+function MobileDateSelect({
+  chips,
+  filters,
+  disabled,
+  onPreset,
+  onExactDay,
+}: {
+  chips: CatalogDateRailChip[];
+  filters: CatalogFilterValues;
+  disabled?: boolean;
+  onPreset: (value: 'all' | 'today' | 'tomorrow' | 'weekend' | 'evening') => void;
+  onExactDay: (iso: string) => void;
+}) {
+  const value = resolveMobileDateValue(filters);
+  const customLabel =
+    filters.from && filters.to && filters.from !== filters.to
+      ? `${filters.from.slice(8)}.${filters.from.slice(5, 7)} - ${filters.to.slice(8)}.${filters.to.slice(5, 7)}`
+      : filters.from
+        ? formatSelectDay(filters.from)
+        : 'Диапазон дат';
+
+  return (
+    <div className="relative min-w-0">
+      <label className="sr-only" htmlFor="catalog-mobile-date">
+        Дата
+      </label>
+      <select
+        id="catalog-mobile-date"
+        disabled={disabled}
+        value={value === 'custom' ? 'custom' : value}
+        onChange={(event) => {
+          const next = event.target.value;
+          if (next === 'custom') return;
+          if (next === 'all' || next === 'today' || next === 'tomorrow' || next === 'weekend' || next === 'evening') {
+            onPreset(next);
+            return;
+          }
+          if (next.startsWith('day:')) onExactDay(next.slice(4));
+        }}
+        className={mobileSelectCls}
+      >
+        <option value="all">Любая дата</option>
+        <option value="today">Сегодня</option>
+        <option value="tomorrow">Завтра</option>
+        <option value="weekend">Выходные</option>
+        <option value="evening">Сегодня вечером</option>
+        {chips
+          .filter((chip): chip is Extract<CatalogDateRailChip, { kind: 'day' }> => chip.kind === 'day')
+          .map((chip) => (
+            <option key={chip.iso} value={`day:${chip.iso}`}>
+              {formatSelectDay(chip.iso)}
+            </option>
+          ))}
+        {value === 'custom' ? <option value="custom">{customLabel}</option> : null}
+      </select>
+      <ChevronDown
+        aria-hidden
+        className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6E6E73]"
+        strokeWidth={1.75}
+      />
+    </div>
+  );
+}
+
+function MobileCategorySelect({
+  filters,
+  categories,
+  disabled,
+  onNavigate,
+  qDraft,
+}: {
+  filters: CatalogFilterValues;
+  categories: CatalogCategoryFacet[];
+  disabled?: boolean;
+  onNavigate: (next: CatalogFilterValues) => void;
+  qDraft: string;
+}) {
+  const value = filters.category || 'all';
+
+  return (
+    <div className="relative min-w-0">
+      <label className="sr-only" htmlFor="catalog-mobile-category">
+        Тип
+      </label>
+      <select
+        id="catalog-mobile-category"
+        disabled={disabled}
+        value={value}
+        onChange={(event) => {
+          const next = event.target.value;
+          onNavigate({
+            ...filters,
+            q: qDraft.trim() || filters.q,
+            category: next === 'all' ? undefined : next,
+            page: undefined,
+          });
+        }}
+        className={mobileSelectCls}
+      >
+        <option value="all">Все типы</option>
+        {categories.map((item) => (
+          <option key={item.name} value={item.name} disabled={item.events <= 0 && filters.category !== item.name}>
+            {displayCatalogLabel(item.name)}
+          </option>
+        ))}
+      </select>
+      <ChevronDown
+        aria-hidden
+        className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6E6E73]"
+        strokeWidth={1.75}
+      />
     </div>
   );
 }
