@@ -20,9 +20,13 @@ const nullableString = z.preprocess(
 );
 
 const yookassaCheckoutCreatePayloadSchema = z.object({
+  subjectType: z.enum(['EVENT', 'VENUE_ADMISSION']).nullable().optional(),
   eventId: nullableString,
   eventSlug: nullableString,
-  offerId: z.string().trim().min(1),
+  admissionProductId: nullableString,
+  admissionProductSlug: nullableString,
+  offerId: nullableString,
+  admissionOfferId: nullableString,
   sessionId: nullableString,
   quantity: z.coerce.number().int().min(1).max(10),
   buyer: z.object({
@@ -36,9 +40,19 @@ const yookassaCheckoutCreatePayloadSchema = z.object({
   }).nullable().optional(),
   idempotencyKey: nullableString,
   returnUrl: nullableString,
-}).refine((payload) => Boolean(payload.eventId || payload.eventSlug), {
+}).refine((payload) => {
+  if (
+    payload.subjectType === 'VENUE_ADMISSION' ||
+    payload.admissionProductId ||
+    payload.admissionProductSlug ||
+    payload.admissionOfferId
+  ) {
+    return Boolean((payload.admissionProductId || payload.admissionProductSlug) && payload.admissionOfferId);
+  }
+  return Boolean((payload.eventId || payload.eventSlug) && payload.offerId);
+}, {
   path: ['eventId'],
-  message: 'eventId or eventSlug is required',
+  message: 'event/admission product and offer are required',
 });
 
 const yookassaWebhookPayloadSchema = z.record(z.string(), z.unknown());

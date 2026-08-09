@@ -55,6 +55,109 @@ export interface AdminPurchaseTicketDto {
   startsAt: string | null;
 }
 
+export interface AdminPurchasePaymentDto {
+  id: string;
+  provider: string;
+  status: string;
+  amountKopecks: number;
+  currency: string;
+  providerPaymentId: string | null;
+  confirmationUrl: string | null;
+  paidAt: string | null;
+  capturedAt: string | null;
+  cancelledAt: string | null;
+  error: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+
+export interface AdminPurchaseFulfillmentDto {
+  id: string;
+  checkoutItemId: string | null;
+  provider: string;
+  status: string;
+  purchaseFlow: string;
+  amountKopecks: number;
+  refundedKopecks: number;
+  externalOrderId: string | null;
+  externalPaymentUrl: string | null;
+  ticketNumbers: string[];
+  lastError: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+
+export interface AdminPurchaseLedgerEntryDto {
+  id: string;
+  supplierId: string;
+  supplierTitle: string | null;
+  type: string;
+  amountKopecks: number;
+  currency: string;
+  referenceType: string | null;
+  referenceId: string | null;
+  checkoutItemId: string | null;
+  paymentId: string | null;
+  note: string | null;
+  createdAt: string | null;
+}
+
+export interface AdminPurchaseRefundDto {
+  id: string;
+  status: string;
+  amountKopecks: number;
+  currency: string;
+  reason: string;
+  reasonNote: string | null;
+  providerRefundId: string | null;
+  adminComment: string | null;
+  processedAt: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+
+export interface AdminPurchaseFiscalReceiptDto {
+  id: string;
+  type: string;
+  status: string;
+  amountKopecks: number;
+  providerReceiptId: string | null;
+  receiptUrl: string | null;
+  error: string | null;
+  sentAt: string | null;
+  createdAt: string | null;
+}
+
+export interface AdminPurchaseDetailDto extends AdminPurchaseRowDto {
+  finance: {
+    payments: AdminPurchasePaymentDto[];
+    fulfillment: AdminPurchaseFulfillmentDto[];
+    ledger: AdminPurchaseLedgerEntryDto[];
+    refunds: AdminPurchaseRefundDto[];
+    fiscalReceipts: AdminPurchaseFiscalReceiptDto[];
+    totals: {
+      currency: string;
+      subtotalKopecks: number;
+      discountKopecks: number;
+      totalKopecks: number;
+      commissionKopecks: number;
+      ledgerGrossKopecks: number;
+      ledgerCommissionKopecks: number;
+      ledgerRefundKopecks: number;
+      ledgerPayoutKopecks: number;
+      ledgerNetKopecks: number;
+    };
+    operations: {
+      canReconcile: boolean;
+      canRefund: boolean;
+      canIssueDocuments: boolean;
+      canCloseSettlement: boolean;
+      blockers: string[];
+      nextActions: string[];
+    };
+  } | null;
+}
+
 export interface AdminPurchasesListDto {
   generatedAt: string;
   page: number;
@@ -92,6 +195,59 @@ export interface BuyerPurchasesListDto {
     tickets: number;
     active: number;
   };
+}
+
+export interface PublicCheckoutOrderDto {
+  publicCode: string;
+  status: string;
+  buyer: {
+    email: string;
+    name: string | null;
+    phone: string | null;
+  };
+  title: string;
+  venueTitle: string | null;
+  venueAddress: string | null;
+  venueSlug: string | null;
+  venueLatitude: number | null;
+  venueLongitude: number | null;
+  admissionProductSlug: string | null;
+  validityMode: string | null;
+  validTo: string | null;
+  paidAt: string | null;
+  confirmedAt: string | null;
+  purchasedAt: string | null;
+  ticketNumber: string | null;
+  ticketNumbers: string[];
+  supplierSupportPhone: string | null;
+  items: Array<{
+    id: string;
+    title: string;
+    ticketTitle: string | null;
+    quantity: number;
+    unitPriceKopecks: number;
+    totalKopecks: number;
+    ticketNumbers: string[];
+  }>;
+  totals: {
+    currency: string;
+    subtotalKopecks: number;
+    discountKopecks: number;
+    totalKopecks: number;
+    commissionKopecks: number;
+  };
+  payment: {
+    provider: string | null;
+    status: string | null;
+    confirmationUrl: string | null;
+    paidAt: string | null;
+  };
+}
+
+export interface PublicCheckoutPurchasesDto {
+  generatedAt: string;
+  total: number;
+  items: PublicCheckoutOrderDto[];
 }
 
 export interface BuyerPurchaseRowDto {
@@ -138,9 +294,44 @@ const checkoutOrderInclude = {
       event: { select: { id: true, slug: true, title: true } },
       session: { select: { id: true, startsAt: true } },
       offer: { select: { id: true, title: true } },
-      admissionProduct: { select: { id: true, slug: true, title: true } },
+      admissionProduct: {
+        select: {
+          id: true,
+          slug: true,
+          title: true,
+          validityMode: true,
+          validTo: true,
+          venue: {
+            select: {
+              id: true,
+              slug: true,
+              title: true,
+              address: true,
+              latitude: true,
+              longitude: true,
+            },
+          },
+          supplier: {
+            select: {
+              id: true,
+              slug: true,
+              title: true,
+              phone: true,
+            },
+          },
+        },
+      },
       admissionOffer: { select: { id: true, title: true } },
-      fulfillmentItem: { select: { id: true, status: true, provider: true, externalOrderId: true, externalPaymentUrl: true } },
+      fulfillmentItem: {
+        select: {
+          id: true,
+          status: true,
+          provider: true,
+          externalOrderId: true,
+          externalPaymentUrl: true,
+          providerData: true,
+        },
+      },
     },
   },
   payments: {
@@ -150,11 +341,15 @@ const checkoutOrderInclude = {
       provider: true,
       status: true,
       amountKopecks: true,
+      currency: true,
       providerPaymentId: true,
       confirmationUrl: true,
       paidAt: true,
+      capturedAt: true,
       cancelledAt: true,
       error: true,
+      createdAt: true,
+      updatedAt: true,
     },
   },
   fulfillmentItems: {
@@ -164,8 +359,45 @@ const checkoutOrderInclude = {
       checkoutItemId: true,
       provider: true,
       status: true,
+      purchaseFlow: true,
       externalOrderId: true,
+      externalPaymentUrl: true,
       lastError: true,
+      providerData: true,
+      amountKopecks: true,
+      refundedKopecks: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  },
+  refundRequests: {
+    orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+    select: {
+      id: true,
+      status: true,
+      amountKopecks: true,
+      currency: true,
+      reason: true,
+      reasonNote: true,
+      providerRefundId: true,
+      adminComment: true,
+      processedAt: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  },
+  fiscalReceipts: {
+    orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+    select: {
+      id: true,
+      type: true,
+      status: true,
+      amountKopecks: true,
+      providerReceiptId: true,
+      receiptUrl: true,
+      error: true,
+      sentAt: true,
+      createdAt: true,
     },
   },
   siteUser: { select: { id: true, email: true, name: true, phone: true } },
@@ -180,6 +412,7 @@ const externalOrderInclude = {
 type CheckoutOrderRow = Prisma.CheckoutOrderGetPayload<{ include: typeof checkoutOrderInclude }>;
 type CheckoutItemRow = CheckoutOrderRow['items'][number];
 type ExternalOrderRow = Prisma.ExternalOrderGetPayload<{ include: typeof externalOrderInclude }>;
+type LedgerEntryWithSupplier = Prisma.SupplierLedgerEntryGetPayload<{ include: { supplier: { select: { id: true; title: true } } } }>;
 
 interface EventLookupRow {
   id: string;
@@ -227,7 +460,7 @@ export async function buildAdminPurchasesListDto(
     quickFilters: [
       { id: 'all', count: includeArchived ? activeRows.length : allRows.filter((row) => !row.isArchived).length },
       { id: 'attention', count: allRows.filter((row) => row.needsAttention).length },
-      { id: 'pending_refunds', count: allRows.filter((row) => isRefundStatus(row.status)).length },
+      { id: 'pending_refunds', count: allRows.filter((row) => row.hasPendingRefundRequests || isRefundStatus(row.status)).length },
       { id: 'missing_artifact', count: allRows.filter((row) => row.artifactStatus === 'missing').length },
       { id: 'failed_integration', count: allRows.filter((row) => isProblemOrderStatus(row.status)).length },
       { id: 'unlinked', count: allRows.filter((row) => row.unlinkedTickets > 0).length },
@@ -248,6 +481,102 @@ export async function buildAdminPurchasesListDto(
       needsAttention: allRows.filter((row) => row.needsAttention).length,
     },
   };
+}
+
+export async function buildAdminPurchaseDetailDto(orderKeyInput: string): Promise<AdminPurchaseDetailDto | null> {
+  const orderKey = cleanString(orderKeyInput);
+  if (!orderKey) return null;
+
+  const checkoutRow = await loadCheckoutOrderForAdminDetail(orderKey);
+  if (checkoutRow) {
+    return mapCheckoutOrderToAdminPurchaseDetail(checkoutRow, await loadCheckoutOrderLedger(checkoutRow.id));
+  }
+
+  const externalRow = await prisma.externalOrder.findFirst({
+    where: {
+      OR: [
+        { id: orderKey },
+        { externalOrderId: orderKey },
+        { publicCode: orderKey },
+      ],
+    },
+    include: externalOrderInclude,
+  });
+  if (!externalRow) return null;
+  const lookup = await loadExternalTicketLookups([externalRow]);
+  return {
+    ...mapExternalOrderToAdminPurchaseRow(externalRow, lookup),
+    finance: null,
+  };
+}
+
+export interface AdminCreateRefundRequestInput {
+  amountKopecks?: number | null | undefined;
+  reason?: string | null | undefined;
+  reasonNote?: string | null | undefined;
+  adminComment?: string | null | undefined;
+  fulfillmentItemId?: string | null | undefined;
+}
+
+export async function createAdminPurchaseRefundRequest(
+  orderKeyInput: string,
+  input: AdminCreateRefundRequestInput = {},
+): Promise<AdminPurchaseDetailDto> {
+  const orderKey = cleanString(orderKeyInput);
+  if (!orderKey) throw statusError(400, 'order_key_required');
+
+  const checkoutRow = await loadCheckoutOrderForAdminDetail(orderKey);
+  if (!checkoutRow) throw statusError(404, 'checkout_order_not_found');
+
+  const ledgerRows = await loadCheckoutOrderLedger(checkoutRow.id);
+  const decision = resolveRefundRequestDecision(checkoutRow, ledgerRows, input);
+  if (decision.blockers.length) {
+    const error = statusError(409, 'refund_request_blocked');
+    (error as Error & { blockers?: string[] }).blockers = decision.blockers;
+    throw error;
+  }
+
+  await prisma.refundRequest.create({
+    data: {
+      checkoutOrderId: checkoutRow.id,
+      fulfillmentItemId: decision.fulfillmentItemId,
+      paymentId: decision.paymentId,
+      supplierId: decision.supplierId,
+      amountKopecks: decision.amountKopecks,
+      currency: checkoutRow.currency,
+      reason: decision.reason as never,
+      reasonNote: cleanString(input.reasonNote) || null,
+      adminComment: cleanString(input.adminComment) || null,
+      createdByType: 'ADMIN',
+      status: 'CREATED',
+    },
+  });
+
+  const updated = await loadCheckoutOrderForAdminDetail(checkoutRow.id);
+  if (!updated) throw statusError(500, 'checkout_order_reload_failed');
+  return mapCheckoutOrderToAdminPurchaseDetail(updated, await loadCheckoutOrderLedger(updated.id));
+}
+
+async function loadCheckoutOrderForAdminDetail(orderKey: string): Promise<CheckoutOrderRow | null> {
+  const checkoutRow = await prisma.checkoutOrder.findFirst({
+    where: {
+      OR: [
+        { id: orderKey },
+        { publicCode: orderKey },
+        { externalOrderId: orderKey },
+      ],
+    },
+    include: checkoutOrderInclude,
+  });
+  return checkoutRow;
+}
+
+async function loadCheckoutOrderLedger(checkoutOrderId: string): Promise<LedgerEntryWithSupplier[]> {
+  return prisma.supplierLedgerEntry.findMany({
+    where: { checkoutOrderId },
+    orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
+    include: { supplier: { select: { id: true, title: true } } },
+  });
 }
 
 export async function buildBuyerPurchasesListDto(input: {
@@ -279,6 +608,37 @@ export async function buildBuyerPurchasesListDto(input: {
   };
 }
 
+export async function buildPublicCheckoutOrderByCodeDto(publicCodeInput: string): Promise<PublicCheckoutOrderDto | null> {
+  const publicCode = cleanString(publicCodeInput);
+  if (!publicCode) return null;
+  const row = await prisma.checkoutOrder.findUnique({
+    where: { publicCode },
+    include: checkoutOrderInclude,
+  });
+  return row ? mapCheckoutOrderToPublicDto(row) : null;
+}
+
+export async function buildPublicCheckoutPurchasesByEmailDto(
+  searchParams: URLSearchParams = new URLSearchParams(),
+): Promise<PublicCheckoutPurchasesDto> {
+  const email = normalizeEmail(searchParams.get('email'));
+  if (!email) {
+    return { generatedAt: new Date().toISOString(), total: 0, items: [] };
+  }
+  const limit = clampInt(searchParams.get('limit'), 20, 1, MAX_BUYER_LIMIT);
+  const rows = await prisma.checkoutOrder.findMany({
+    where: { buyerEmail: { equals: email, mode: 'insensitive' } },
+    orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+    take: limit,
+    include: checkoutOrderInclude,
+  });
+  return {
+    generatedAt: new Date().toISOString(),
+    total: rows.length,
+    items: rows.map(mapCheckoutOrderToPublicDto),
+  };
+}
+
 export async function loadSupplierCheckoutPurchaseRows(
   supplierId: string,
   searchParams: URLSearchParams = new URLSearchParams(),
@@ -295,7 +655,7 @@ export async function loadSupplierCheckoutPurchaseRows(
   const offset = clampInt(searchParams.get('offset'), 0, 0, Number.MAX_SAFE_INTEGER);
   const status = normalizeStatusFilter(searchParams.get('status'));
   const where: Prisma.CheckoutItemWhereInput = { supplierId };
-  if (status) where.status = status as never;
+  applySupplierCheckoutItemStatusFilter(where, status);
 
   const [rows, total] = await prisma.$transaction([
     prisma.checkoutItem.findMany({
@@ -335,6 +695,43 @@ export async function loadSupplierCheckoutPurchaseRows(
     filters: { status },
     items: rows.slice(0, limit).map(mapSupplierCheckoutPurchaseItem),
   };
+}
+
+/**
+ * Supplier LC tabs mix CheckoutOrderStatus and CheckoutItemStatus.
+ * DTO exposes `status` from the parent order; only RESERVED is item-scoped.
+ */
+export function applySupplierCheckoutItemStatusFilter(
+  where: Prisma.CheckoutItemWhereInput,
+  status: string | null,
+): void {
+  if (!status) return;
+
+  if (status === 'RESERVED') {
+    where.status = 'RESERVED';
+    return;
+  }
+
+  const orderStatuses = new Set([
+    'DRAFT',
+    'PENDING_PAYMENT',
+    'PAID',
+    'CONFIRMED',
+    'FULFILLED',
+    'CANCELLED',
+    'REFUNDED',
+    'EXPIRED',
+    'FAILED',
+  ]);
+  if (orderStatuses.has(status)) {
+    const existing = where.order && typeof where.order === 'object' && !Array.isArray(where.order)
+      ? where.order as Prisma.CheckoutOrderWhereInput
+      : {};
+    where.order = { ...existing, status: status as never };
+    return;
+  }
+
+  where.status = status as never;
 }
 
 async function loadAdminPurchaseRows(options: { includeArchived: boolean }): Promise<AdminPurchaseRowDto[]> {
@@ -438,8 +835,8 @@ function mapCheckoutOrderToAdminPurchaseRow(row: CheckoutOrderRow): AdminPurchas
     eventDateLabel: toIso(primaryItem?.session?.startsAt),
     amountRub: kopecksToRub(row.totalKopecks),
     artifactStatus: ticketCount > 0 ? 'tickets' : 'not_required',
-    refundRequestsCount: 0,
-    hasPendingRefundRequests: isRefundStatus(String(row.status)),
+    refundRequestsCount: row.refundRequests.length,
+    hasPendingRefundRequests: row.refundRequests.some((refund) => !['REJECTED', 'FAILED', 'COMPLETED'].includes(String(refund.status))) || isRefundStatus(String(row.status)),
     needsAttention: problemStatus || processing,
     problems: [
       ...(problemStatus ? ['Проверить внутренний checkout'] : []),
@@ -449,13 +846,197 @@ function mapCheckoutOrderToAdminPurchaseRow(row: CheckoutOrderRow): AdminPurchas
   };
 }
 
+function mapCheckoutOrderToAdminPurchaseDetail(
+  row: CheckoutOrderRow,
+  ledgerRows: LedgerEntryWithSupplier[],
+): AdminPurchaseDetailDto {
+  const base = mapCheckoutOrderToAdminPurchaseRow(row);
+  const ledger = ledgerRows.map((entry) => ({
+    id: entry.id,
+    supplierId: entry.supplierId,
+    supplierTitle: entry.supplier?.title || null,
+    type: String(entry.type),
+    amountKopecks: entry.amountKopecks,
+    currency: entry.currency,
+    referenceType: entry.referenceType || null,
+    referenceId: entry.referenceId || null,
+    checkoutItemId: entry.checkoutItemId || null,
+    paymentId: entry.paymentId || null,
+    note: entry.note || null,
+    createdAt: toIso(entry.createdAt),
+  }));
+  const ledgerGrossKopecks = sumLedger(ledger, 'SALE');
+  const ledgerCommissionKopecks = Math.abs(sumLedger(ledger, 'COMMISSION'));
+  const ledgerRefundKopecks = Math.abs(sumLedger(ledger, 'REFUND'));
+  const ledgerPayoutKopecks = Math.abs(sumLedger(ledger, 'PAYOUT'));
+  const succeededPayment = row.payments.some((payment) => String(payment.status) === 'SUCCEEDED');
+  const hasRefund = row.refundRequests.length > 0 || String(row.status) === 'REFUNDED';
+  const hasFailedPayment = row.payments.some((payment) => isProblemOrderStatus(String(payment.status)) || payment.error);
+  const fulfillmentPending = row.fulfillmentItems.some((item) => ['PENDING', 'RESERVING', 'RESERVED'].includes(String(item.status)));
+  const blockers = [
+    ...(!succeededPayment && !['CONFIRMED', 'FULFILLED', 'REFUNDED'].includes(String(row.status)) ? ['payment_not_confirmed'] : []),
+    ...(hasFailedPayment ? ['payment_has_error'] : []),
+    ...(fulfillmentPending ? ['fulfillment_not_final'] : []),
+    ...(ledger.length === 0 && succeededPayment ? ['ledger_missing'] : []),
+  ];
+
+  return {
+    ...base,
+    finance: {
+      payments: row.payments.map((payment) => ({
+        id: payment.id,
+        provider: String(payment.provider),
+        status: String(payment.status),
+        amountKopecks: payment.amountKopecks,
+        currency: payment.currency,
+        providerPaymentId: payment.providerPaymentId || null,
+        confirmationUrl: payment.confirmationUrl || null,
+        paidAt: toIso(payment.paidAt),
+        capturedAt: toIso(payment.capturedAt),
+        cancelledAt: toIso(payment.cancelledAt),
+        error: payment.error || null,
+        createdAt: toIso(payment.createdAt),
+        updatedAt: toIso(payment.updatedAt),
+      })),
+      fulfillment: row.fulfillmentItems.map((item) => ({
+        id: item.id,
+        checkoutItemId: item.checkoutItemId || null,
+        provider: item.provider,
+        status: String(item.status),
+        purchaseFlow: String(item.purchaseFlow),
+        amountKopecks: item.amountKopecks,
+        refundedKopecks: item.refundedKopecks,
+        externalOrderId: item.externalOrderId || null,
+        externalPaymentUrl: item.externalPaymentUrl || null,
+        ticketNumbers: ticketNumbersFromProviderData(item.providerData),
+        lastError: item.lastError || null,
+        createdAt: toIso(item.createdAt),
+        updatedAt: toIso(item.updatedAt),
+      })),
+      ledger,
+      refunds: row.refundRequests.map((refund) => ({
+        id: refund.id,
+        status: String(refund.status),
+        amountKopecks: refund.amountKopecks,
+        currency: refund.currency,
+        reason: String(refund.reason),
+        reasonNote: refund.reasonNote || null,
+        providerRefundId: refund.providerRefundId || null,
+        adminComment: refund.adminComment || null,
+        processedAt: toIso(refund.processedAt),
+        createdAt: toIso(refund.createdAt),
+        updatedAt: toIso(refund.updatedAt),
+      })),
+      fiscalReceipts: row.fiscalReceipts.map((receipt) => ({
+        id: receipt.id,
+        type: String(receipt.type),
+        status: String(receipt.status),
+        amountKopecks: receipt.amountKopecks,
+        providerReceiptId: receipt.providerReceiptId || null,
+        receiptUrl: receipt.receiptUrl || null,
+        error: receipt.error || null,
+        sentAt: toIso(receipt.sentAt),
+        createdAt: toIso(receipt.createdAt),
+      })),
+      totals: {
+        currency: row.currency,
+        subtotalKopecks: row.subtotalKopecks,
+        discountKopecks: row.discountKopecks,
+        totalKopecks: row.totalKopecks,
+        commissionKopecks: row.commissionKopecks,
+        ledgerGrossKopecks,
+        ledgerCommissionKopecks,
+        ledgerRefundKopecks,
+        ledgerPayoutKopecks,
+        ledgerNetKopecks: ledgerGrossKopecks - ledgerCommissionKopecks - ledgerRefundKopecks - ledgerPayoutKopecks,
+      },
+      operations: {
+        canReconcile: ['PENDING_PAYMENT', 'PAID'].includes(String(row.status)) || hasFailedPayment,
+        canRefund: succeededPayment && ['CONFIRMED', 'FULFILLED'].includes(String(row.status)) && !hasRefund,
+        canIssueDocuments: ledger.length > 0 && !blockers.length,
+        canCloseSettlement: ledger.length > 0 && !blockers.length && !hasRefund,
+        blockers,
+        nextActions: buildInternalOrderNextActions({
+          status: String(row.status),
+          succeededPayment,
+          hasFailedPayment,
+          fulfillmentPending,
+          ledgerMissing: ledger.length === 0 && succeededPayment,
+          hasRefund,
+        }),
+      },
+    },
+  };
+}
+
+function resolveRefundRequestDecision(
+  row: CheckoutOrderRow,
+  ledgerRows: LedgerEntryWithSupplier[],
+  input: AdminCreateRefundRequestInput,
+): {
+  blockers: string[];
+  amountKopecks: number;
+  paymentId: string | null;
+  supplierId: string | null;
+  fulfillmentItemId: string | null;
+  reason: string;
+} {
+  const succeededPayment = row.payments.find((payment) => String(payment.status) === 'SUCCEEDED');
+  const failedPayment = row.payments.find((payment) => isProblemOrderStatus(String(payment.status)) || payment.error);
+  const finalFulfillment = row.fulfillmentItems.filter((item) => ['CONFIRMED', 'FULFILLED', 'REFUNDED'].includes(String(item.status)));
+  const pendingFulfillment = row.fulfillmentItems.filter((item) => !['CONFIRMED', 'FULFILLED', 'REFUNDED'].includes(String(item.status)));
+  const activeRefunds = row.refundRequests.filter((refund) => !['REJECTED', 'FAILED', 'COMPLETED'].includes(String(refund.status)));
+  const countedRefunds = row.refundRequests.filter((refund) => !['REJECTED', 'FAILED'].includes(String(refund.status)));
+  const supplierIds = uniqueSorted(row.items.map((item) => item.supplierId).filter(Boolean));
+  const requestedFulfillmentId = cleanString(input.fulfillmentItemId);
+  const requestedFulfillment = requestedFulfillmentId
+    ? row.fulfillmentItems.find((item) => item.id === requestedFulfillmentId)
+    : null;
+  const requestedItem = requestedFulfillment?.checkoutItemId
+    ? row.items.find((item) => item.id === requestedFulfillment.checkoutItemId)
+    : null;
+  const supplierId = requestedItem?.supplierId || (supplierIds.length === 1 ? supplierIds[0] || null : null);
+  const paidKopecks = succeededPayment?.amountKopecks || 0;
+  const alreadyRequestedKopecks = countedRefunds.reduce((sum, refund) => sum + refund.amountKopecks, 0);
+  const maxRefundableKopecks = Math.max(0, paidKopecks - alreadyRequestedKopecks);
+  const amountKopecks = Math.min(input.amountKopecks || maxRefundableKopecks, maxRefundableKopecks);
+  const reason = normalizeRefundReason(input.reason);
+  const blockers = [
+    ...(!succeededPayment ? ['payment_not_confirmed'] : []),
+    ...(failedPayment ? ['payment_has_error'] : []),
+    ...(!['CONFIRMED', 'FULFILLED'].includes(String(row.status)) ? ['order_not_refundable_status'] : []),
+    ...(row.fulfillmentItems.length === 0 ? ['fulfillment_missing'] : []),
+    ...(pendingFulfillment.length > 0 ? ['fulfillment_not_final'] : []),
+    ...(finalFulfillment.length === 0 && row.fulfillmentItems.length > 0 ? ['fulfillment_not_final'] : []),
+    ...(ledgerRows.length === 0 ? ['ledger_missing'] : []),
+    ...(sumLedger(ledgerRows, 'SALE') <= 0 ? ['ledger_sale_missing'] : []),
+    ...(supplierIds.length !== 1 && !requestedFulfillment ? ['multi_supplier_refund_requires_item'] : []),
+    ...(requestedFulfillmentId && !requestedFulfillment ? ['fulfillment_item_not_found'] : []),
+    ...(activeRefunds.length > 0 ? ['refund_already_open'] : []),
+    ...(maxRefundableKopecks <= 0 ? ['refund_amount_exhausted'] : []),
+    ...(input.amountKopecks !== undefined && input.amountKopecks !== null && input.amountKopecks > maxRefundableKopecks ? ['refund_amount_too_high'] : []),
+    ...(amountKopecks <= 0 ? ['refund_amount_required'] : []),
+  ];
+
+  return {
+    blockers: uniqueSorted(blockers),
+    amountKopecks,
+    paymentId: succeededPayment?.id || null,
+    supplierId,
+    fulfillmentItemId: requestedFulfillment?.id || null,
+    reason,
+  };
+}
+
 function mapCheckoutItemToTicket(row: CheckoutOrderRow, item: CheckoutItemRow, index: number): AdminPurchaseTicketDto {
-  const number = `${row.publicCode || shortCode(row.id)}-${index + 1}`;
+  const fulfillmentNumbers = item.fulfillmentItem ? ticketNumbersFromProviderData(item.fulfillmentItem.providerData) : [];
+  const number = fulfillmentNumbers.join(', ') || `${row.publicCode || shortCode(row.id)}-${index + 1}`;
+  const status = item.fulfillmentItem?.status ? String(item.fulfillmentItem.status) : String(item.status);
   return {
     id: item.id,
     externalTicketId: number,
-    status: String(item.status),
-    displayStatus: orderStatusLabel(String(item.status)),
+    status,
+    displayStatus: orderStatusLabel(status),
     origin: 'daibilet',
     eventId: item.event?.id || null,
     sessionId: item.session?.id || null,
@@ -581,6 +1162,68 @@ function mapBuyerPurchaseRow(row: AdminPurchaseRowDto): BuyerPurchaseRowDto {
   };
 }
 
+function mapCheckoutOrderToPublicDto(row: CheckoutOrderRow): PublicCheckoutOrderDto {
+  const primaryItem = row.items[0] || null;
+  const primaryAdmission = primaryItem?.admissionProduct || null;
+  const primaryVenue = primaryAdmission?.venue || null;
+  const supplierSupportPhone = primaryAdmission?.supplier?.phone || null;
+  const payment = row.payments[0] || null;
+  const fulfillmentNumbers = row.fulfillmentItems.flatMap((item) => ticketNumbersFromProviderData(item.providerData));
+  const itemNumbers = new Map<string, string[]>();
+  for (const item of row.items) {
+    if (!item.fulfillmentItem) continue;
+    itemNumbers.set(item.id, ticketNumbersFromProviderData(item.fulfillmentItem.providerData));
+  }
+  const title = checkoutItemTitle(primaryItem) || primaryAdmission?.title || 'Входной билет';
+
+  return {
+    publicCode: row.publicCode || shortCode(row.id),
+    status: String(row.status),
+    buyer: {
+      email: row.buyerEmail || row.siteUser?.email || '',
+      name: row.buyerName || row.siteUser?.name || null,
+      phone: row.buyerPhone || row.siteUser?.phone || null,
+    },
+    title,
+    venueTitle: primaryVenue?.title || null,
+    venueAddress: primaryVenue?.address || null,
+    venueSlug: primaryVenue?.slug || null,
+    venueLatitude: primaryVenue?.latitude ?? null,
+    venueLongitude: primaryVenue?.longitude ?? null,
+    admissionProductSlug: primaryAdmission?.slug || null,
+    validityMode: primaryAdmission ? String(primaryAdmission.validityMode) : null,
+    validTo: toIso(primaryAdmission?.validTo),
+    paidAt: toIso(row.paidAt),
+    confirmedAt: toIso(row.confirmedAt),
+    purchasedAt: toIso(row.paidAt || row.confirmedAt || row.createdAt),
+    ticketNumber: fulfillmentNumbers[0] || null,
+    ticketNumbers: fulfillmentNumbers,
+    supplierSupportPhone,
+    items: row.items.map((item) => ({
+      id: item.id,
+      title: item.title,
+      ticketTitle: item.ticketTitle || item.offer?.title || item.admissionOffer?.title || null,
+      quantity: item.quantity,
+      unitPriceKopecks: item.unitPriceKopecks,
+      totalKopecks: item.totalKopecks,
+      ticketNumbers: itemNumbers.get(item.id) || [],
+    })),
+    totals: {
+      currency: row.currency,
+      subtotalKopecks: row.subtotalKopecks,
+      discountKopecks: row.discountKopecks,
+      totalKopecks: row.totalKopecks,
+      commissionKopecks: row.commissionKopecks,
+    },
+    payment: {
+      provider: payment ? String(payment.provider) : null,
+      status: payment ? String(payment.status) : null,
+      confirmationUrl: payment?.confirmationUrl || null,
+      paidAt: toIso(payment?.paidAt),
+    },
+  };
+}
+
 function mapSupplierCheckoutPurchaseItem(row: Prisma.CheckoutItemGetPayload<{
   include: {
     order: {
@@ -669,7 +1312,7 @@ function matchesAdminPurchaseFilters(
   if (filters.view === 'missing_artifact' && row.artifactStatus !== 'missing') return false;
   if (filters.view === 'failed_integration' && !isProblemOrderStatus(row.status)) return false;
   if (filters.view === 'unlinked' && !(row.unlinkedTickets > 0)) return false;
-  if (filters.view === 'pending_refunds' && !isRefundStatus(row.status)) return false;
+  if (filters.view === 'pending_refunds' && !row.hasPendingRefundRequests && !isRefundStatus(row.status)) return false;
   if (filters.view === 'archivable' && !row.canArchive) return false;
   if (filters.provider !== 'ALL' && row.sourceCode !== filters.provider) return false;
   if (filters.status !== 'all' && String(row.status || '').toLowerCase() !== filters.status) return false;
@@ -834,6 +1477,53 @@ function cleanString(value: string | null | undefined): string | null {
 
 function normalizeEmail(value: string | null | undefined): string {
   return String(value || '').trim().toLowerCase();
+}
+
+function ticketNumbersFromProviderData(value: Prisma.JsonValue | null | undefined): string[] {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return [];
+  const payload = value as Record<string, unknown>;
+  const rawList = Array.isArray(payload.ticketNumbers) ? payload.ticketNumbers : [];
+  const list = rawList.map((item) => cleanString(String(item || ''))).filter((item): item is string => Boolean(item));
+  const single = cleanString(typeof payload.ticketNumber === 'string' ? payload.ticketNumber : null);
+  return list.length ? list : single ? [single] : [];
+}
+
+function sumLedger(entries: Array<{ type: string; amountKopecks: number }>, type: string): number {
+  return entries
+    .filter((entry) => String(entry.type) === type)
+    .reduce((sum, entry) => sum + entry.amountKopecks, 0);
+}
+
+function normalizeRefundReason(value: string | null | undefined): string {
+  const normalized = String(value || '').toUpperCase();
+  if (['USER_REQUEST', 'EVENT_CANCELLED', 'SUPPORT', 'OTHER'].includes(normalized)) return normalized;
+  return 'OTHER';
+}
+
+function statusError(statusCode: number, message: string): Error & { statusCode: number } {
+  const error = new Error(message) as Error & { statusCode: number };
+  error.statusCode = statusCode;
+  return error;
+}
+
+function buildInternalOrderNextActions(input: {
+  status: string;
+  succeededPayment: boolean;
+  hasFailedPayment: boolean;
+  fulfillmentPending: boolean;
+  ledgerMissing: boolean;
+  hasRefund: boolean;
+}): string[] {
+  if (input.hasFailedPayment) return ['Проверить ошибку платежа и запустить сверку YooKassa'];
+  if (input.status === 'PENDING_PAYMENT') return ['Ждать webhook YooKassa или reconcile timer'];
+  if (input.status === 'PAID') return ['Проверить fulfillment и выпуск билетов'];
+  if (input.fulfillmentPending) return ['Проверить выпуск билетов'];
+  if (input.ledgerMissing) return ['Проверить ledger entries по успешной оплате'];
+  if (input.hasRefund) return ['Проверить возврат и отражение в ledger'];
+  if (input.succeededPayment && ['CONFIRMED', 'FULFILLED'].includes(input.status)) {
+    return ['Готово к включению в сверку и расчет с поставщиком'];
+  }
+  return ['Контроль статуса заказа'];
 }
 
 function maskEmail(value: string | null | undefined): string | null {

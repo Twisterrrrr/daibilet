@@ -378,6 +378,49 @@ export interface SupplierPortalFinanceDto {
     comment: string | null;
     createdAt: string;
   }>;
+  refunds: Array<{
+    id: string;
+    status: string;
+    amountKopecks: number;
+    currency: string;
+    reason: string;
+    reasonNote: string | null;
+    adminComment: string | null;
+    createdAt: string;
+  }>;
+  reports: Array<{
+    id: string;
+    periodStart: string;
+    periodEnd: string;
+    basis: string;
+    status: string;
+    hasConflict: boolean;
+    grossKopecks: number;
+    commissionKopecks: number;
+    refundKopecks: number;
+    netKopecks: number;
+    createdAt: string;
+  }>;
+  settlements: Array<{
+    id: string;
+    periodStart: string;
+    periodEnd: string;
+    status: string;
+    grossKopecks: number;
+    commissionKopecks: number;
+    adjustmentKopecks: number;
+    netKopecks: number;
+    paidAt: string | null;
+    createdAt: string;
+  }>;
+  documents: Array<{
+    id: string;
+    type: string;
+    status: string;
+    title: string;
+    filesCount: number;
+    createdAt: string;
+  }>;
 }
 
 export interface SupplierPortalReviewRowDto {

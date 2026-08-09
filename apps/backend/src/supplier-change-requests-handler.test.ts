@@ -9,7 +9,28 @@ import {
   buildSupplierChangeRequestsList,
   createSupplierAdmissionChangeRequest,
   createSupplierEventChangeRequest,
+  parseSupplierChangeRequestsListQuery,
 } from './supplier-change-requests-handler.js';
+import { RequestValidationError } from './validation.js';
+
+test('supplier change requests list query accepts SPA supplier routing keys', () => {
+  const spaQuery = parseSupplierChangeRequestsListQuery(new URLSearchParams({
+    limit: '50',
+    supplier: 'test-museum-supplier',
+  }));
+  assert.equal(spaQuery.limit, 50);
+
+  const resolvedQuery = parseSupplierChangeRequestsListQuery(new URLSearchParams({
+    limit: '50',
+    supplierId: 'sup_test',
+  }));
+  assert.equal(resolvedQuery.limit, 50);
+
+  assert.throws(
+    () => parseSupplierChangeRequestsListQuery(new URLSearchParams({ limit: '50', unexpected: '1' })),
+    RequestValidationError,
+  );
+});
 
 test('supplier change request write-flow creates admission and event requests', async (t) => {
   if (!await canReachDatabase()) {

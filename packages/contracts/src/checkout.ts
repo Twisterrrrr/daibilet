@@ -146,6 +146,8 @@ export interface StubCheckoutResultDto {
 export interface YooKassaCheckoutOrderDto extends Omit<StubCheckoutOrderDto, 'payment' | 'fulfillment'> {
   checkoutUrl: string | null;
   expiresAt: string | null;
+  ticketNumber: string | null;
+  ticketNumbers: string[];
   payment: {
     id: string;
     provider: 'YOOKASSA';

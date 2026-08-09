@@ -4,6 +4,7 @@ import { prisma } from '@daibilet/db';
 import {
   applyYooKassaWebhookPayload,
   buildYooKassaAdmissionPaymentCreatePayload,
+  buildYooKassaCatalogResultReturnUrl,
   buildYooKassaPaymentCreatePayload,
   classifyYooKassaReconcileAction,
   createYooKassaCheckoutOrder,
@@ -158,6 +159,21 @@ test('builds admission redirect payment payload with venue admission metadata', 
     venueId: 'venue_1',
     cityId: 'city_1',
   });
+});
+
+test('builds catalog result return_url with assigned publicCode', () => {
+  assert.equal(
+    buildYooKassaCatalogResultReturnUrl('https://daibilet.ru/checkout/result', '7654321'),
+    'https://daibilet.ru/checkout/result?order=7654321',
+  );
+  assert.equal(
+    buildYooKassaCatalogResultReturnUrl('https://daibilet.ru', '7654321'),
+    'https://daibilet.ru/checkout/result?order=7654321',
+  );
+  assert.equal(
+    buildYooKassaCatalogResultReturnUrl('', '7654321'),
+    'http://localhost:5178/checkout/result?order=7654321',
+  );
 });
 
 test('maps YooKassa statuses into local payment statuses', () => {
@@ -404,7 +420,10 @@ test('YooKassa admission checkout creates pending payment and preserves idempote
       },
     });
 
-    const fakeFetch = async () => new Response(JSON.stringify({
+    let createPaymentRequestBody: Record<string, unknown> | null = null;
+    const fakeFetch = async (_input: string, init?: RequestInit) => {
+      createPaymentRequestBody = init?.body ? JSON.parse(String(init.body)) as Record<string, unknown> : null;
+      return new Response(JSON.stringify({
       id: `pay_${suffix}`,
       status: 'pending',
       amount: { value: '700.00', currency: 'RUB' },
@@ -416,6 +435,7 @@ test('YooKassa admission checkout creates pending payment and preserves idempote
       status: 200,
       headers: { 'content-type': 'application/json' },
     });
+    };
 
     const result = await createYooKassaCheckoutOrder({
       subjectType: 'VENUE_ADMISSION',
@@ -427,6 +447,7 @@ test('YooKassa admission checkout creates pending payment and preserves idempote
         name: 'Buyer',
         phone: '+79990000000',
       },
+      returnUrl: 'https://daibilet.ru/checkout/result',
       idempotencyKey,
     }, {
       config: readYooKassaRuntimeConfig({
@@ -447,6 +468,13 @@ test('YooKassa admission checkout creates pending payment and preserves idempote
     assert.equal(result.order.payment.status, 'PENDING');
     assert.equal(result.order.payment.providerPaymentId, `pay_${suffix}`);
     assert.equal(result.order.payment.confirmationUrl, `https://yookassa.test/pay/${suffix}`);
+    assert.ok(createPaymentRequestBody);
+    assert.deepEqual((createPaymentRequestBody as Record<string, unknown>).confirmation, {
+      type: 'redirect',
+      return_url: `https://daibilet.ru/checkout/result?order=${result.order.publicCode}`,
+    });
+    assert.equal(result.order.ticketNumber, null);
+    assert.deepEqual(result.order.ticketNumbers, []);
 
     const afterFirst = await prisma.admissionProduct.findUnique({
       where: { id: productId },
@@ -464,6 +492,7 @@ test('YooKassa admission checkout creates pending payment and preserves idempote
         name: 'Buyer',
         phone: '+79990000000',
       },
+      returnUrl: 'https://daibilet.ru/checkout/result',
       idempotencyKey,
     }, {
       config: readYooKassaRuntimeConfig({
@@ -484,7 +513,51 @@ test('YooKassa admission checkout creates pending payment and preserves idempote
       select: { ticketsVacant: true },
     });
     assert.equal(afterReplay?.ticketsVacant, 4);
+
+    const webhook = await applyYooKassaWebhookPayload({
+      id: `notif_${suffix}`,
+      event: 'payment.succeeded',
+      object: {
+        id: `pay_${suffix}`,
+        status: 'succeeded',
+      },
+    }, {
+      config: readYooKassaRuntimeConfig({
+        NODE_ENV: 'test',
+        DAIBILET_YOOKASSA_VERIFY_WEBHOOK: '0',
+      } as NodeJS.ProcessEnv),
+      now,
+    });
+    assert.equal(webhook.result, 'processed');
+    assert.equal(webhook.publicCode, result.order.publicCode);
+
+    const confirmed = await prisma.fulfillmentItem.findFirst({
+      where: { checkoutOrderId: result.order.id },
+      select: { status: true, providerData: true },
+    });
+    assert.equal(confirmed?.status, 'CONFIRMED');
+    const providerData = confirmed?.providerData as { ticketNumber?: string; ticketNumbers?: string[] } | null;
+    assert.match(providerData?.ticketNumber || '', /^TKT-/);
+    assert.notEqual(providerData?.ticketNumber, result.order.publicCode);
+    assert.deepEqual(providerData?.ticketNumbers, [providerData?.ticketNumber]);
+
+    const replayWebhook = await applyYooKassaWebhookPayload({
+      id: `notif_${suffix}`,
+      event: 'payment.succeeded',
+      object: {
+        id: `pay_${suffix}`,
+        status: 'succeeded',
+      },
+    }, {
+      config: readYooKassaRuntimeConfig({
+        NODE_ENV: 'test',
+        DAIBILET_YOOKASSA_VERIFY_WEBHOOK: '0',
+      } as NodeJS.ProcessEnv),
+      now,
+    });
+    assert.equal(replayWebhook.result, 'duplicate');
   } finally {
+    await prisma.processedWebhookEvent.deleteMany({ where: { providerEventId: `notif_${suffix}` } });
     await prisma.supplierLedgerEntry.deleteMany({ where: { supplierId } });
     await prisma.fulfillmentItem.deleteMany({
       where: { order: { items: { some: { admissionProductId: productId } } } },

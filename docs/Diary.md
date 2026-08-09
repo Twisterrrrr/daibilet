@@ -1,3 +1,151 @@
+## 2026-08-09 - Finance E2E foundation: close period mutation
+
+### Наблюдения
+
+- Admin `/finance` уже показывал ledger/reconcile dry-run, но период нельзя было провести в системе.
+- Для MVP нужен один безопасный операторский action, который не оставляет период в полузакрытом состоянии.
+
+### Решения
+
+- Добавлен `POST /api/admin/finance/close-period`: по выбранному supplier/period создает или обновляет draft `SupplierReport`, пересобирает `SupplierReportLine` из ledger, закрывает `SupplierSettlement` в `FINALIZED` и выпускает `SupplierDocument` в `ISSUED`.
+- Mutation блокируется при open refund requests, failed fiscal receipts, пустом ledger или отсутствии sales ledger.
+- Повторный запуск по тому же supplier/period idempotent: report lines пересобираются, settlement/documents обновляются без дублей.
+- Admin `/finance` получил кнопку "Закрыть период и выпустить документы" только для одного поставщика, выбранного периода и green dry-run.
+- Добавлен `admin-finance.test.ts`: happy path close-period + blocker по открытому refund.
+
+### Проблемы
+
+- Это закрытие учетного периода, не банковская выплата и не provider refund execution.
+- Следующий шаг: статусы acceptance/signature для документов и supplier acknowledgement в ЛК.
+
+---
+
+## 2026-08-09 - Finance E2E foundation: refunds, ledger, supplier views
+
+### Наблюдения
+
+- После admin order detail foundation оператор видел finance snapshot, но не мог начать возврат из заказа.
+- Supplier LC уже имел `/finance` и `/documents`, но API отдавал только ledger/payouts; reports, settlements, documents и refund requests не доходили до поставщика.
+- Для MVP нужен read/write минимум: создать RefundRequest с hard blockers, увидеть ledger/reconcile в админке, показать поставщику деньги/возвраты/документы read-only.
+
+### Решения
+
+- Добавлен `POST /api/admin/orders/:id/refunds`: создает `RefundRequest` только для внутреннего checkout order с `SUCCEEDED` payment, финальным fulfillment, sales ledger и доступной суммой к возврату.
+- Повторный открытый возврат, pending/failed payment, non-final fulfillment, missing ledger и слишком большая сумма возвращают `refund_request_blocked` с blocker codes.
+- Admin order detail получил форму "Заявка на возврат"; после успешного POST detail обновляется и повторный refund блокируется.
+- Добавлен admin `/finance`: ledger, open refunds, reports, settlements, documents и reconcile dry-run blockers по supplier/period filters.
+- Supplier `/api/supplier/finance` расширен refunds/reports/settlements/documents; LC finance/docs показывают эти данные read-only.
+
+### Проблемы
+
+- Это не provider refund execution: денег в YooKassa пока не возвращаем из UI.
+- Следующий mutating шаг: draft `SupplierReport`, close `SupplierSettlement`, issue `SupplierDocument` из reconciled ledger.
+- Отзывы в ЛК поставщика остаются отдельной дорожкой; вкладка уже есть, write/response flows позже.
+
+---
+
+## 2026-08-09 - Finance E2E foundation: admin order detail
+
+### Наблюдения
+
+- Админка уже показывала общий список `CheckoutOrder` + `ExternalOrder`, но detail endpoint был неполным для внутреннего checkout: оператор не видел рядом оплату, fulfillment, ledger, возвраты, чеки и готовность к сверке.
+- В Prisma уже есть базовые сущности следующего финконтура: `RefundRequest`, `FiscalReceipt`, `Payout`, `SupplierLedgerEntry`, `SupplierReport`, `SupplierSettlement`, `SupplierDocument`.
+- Значит следующий безопасный MVP-шаг - не новая финансовая архитектура, а typed read foundation для заказа, вокруг которого потом включаются действия.
+
+### Решения
+
+- `GET /api/admin/orders/:id` и `/api/admin/external-orders/:id` теперь обслуживаются typed read handler: internal orders получают finance snapshot, external orders остаются зеркалом источника.
+- Internal order detail включает payments, fulfillment ticketNumbers, supplier ledger, refund requests, fiscal receipts, totals и operation blockers/nextActions.
+- Admin orders sheet показывает finance summary и блок "Финансовый контроль" для внутренних заказов; для TC/Teplohod сохраняется ручная привязка билетов.
+- Добавлен regression-test purchase projection: internal order detail проверяет payment, ticketNumbers, ledger net, refund/settlement readiness.
+
+### Проблемы
+
+- Это read foundation. Actions для create refund, issue receipt/report, close settlement и supplier-facing finance views остаются следующими PR-sized шагами.
+
+---
+
+## 2026-08-09 - Finance pilot: admission buyer checkout page
+
+### Наблюдения
+
+- Public finance projection уже отдаёт `checkoutPath: /checkout/admissions/{slug}` для saleable `AdmissionProduct`, но web-приложение не имело этой страницы.
+- До этого buyer path был доступен в основном через supplier LC smoke-кнопку, что не подходит для тестового подключения первого арт-объекта.
+
+### Решения
+
+- Добавлена web-страница `/checkout/admissions/[slug]`: читает finance admission projection, показывает продукт, категории билетов, форму покупателя и количество.
+- Добавлены Next proxy routes: `GET /api/public/finance/admission-products/[slug]` и `POST /api/public/checkout/yookassa`.
+- Create-payment уходит в finance API server-side, возвращает YooKassa confirmation URL, а return ведёт в существующий `/checkout/result?order={publicCode}`.
+
+### Проблемы
+
+- Это pilot-only точка входа. Wide catalog CTA на `.184` не включаем до финального smoke и решения по витринным блокам.
+
+---
+
+## 2026-08-09 - Finance `.159`: YooKassa reconcile timer guard
+
+### Наблюдения
+
+- Read-only check на `.159`: `daibilet-finance-yookassa-reconcile.{service,timer}` не установлены (`not-found`), timer inactive.
+- Unit в репо был опасно устаревшим для finance host: `/opt/daibilet`, `.env` из старого root и dependency на `daibilet-api.service`, тогда как live finance app живет в `/opt/daibilet-finance/app` под `daibilet-finance-api`.
+- При включении такого unit reconcile мог бы не стартовать или стартовать против неправильного контура.
+
+### Решения
+
+- `deploy/systemd/daibilet-finance-yookassa-reconcile.service` переведен на finance `.159` layout: `/opt/daibilet-finance/app`, `/opt/daibilet-finance/app/.env`, `After=daibilet-finance-api.service`.
+- ExecStart переведен на `corepack pnpm --filter @daibilet/backend checkout:yookassa:reconcile` с production-safe env flags.
+- `docs/finance-159-smoke-runbook.md` синхронизирован с теми же путями и командами.
+- Live `.159`: branch fast-forward to `2a75da1`, corrected unit installed, manual reconcile success.
+- Manual reconcile applied remote statuses: `7706713`, `4824308`, `2253137` -> `CONFIRMED`; `4187716` -> `CANCELLED`; failed `0`.
+- Scheduled timer tick at `2026-08-09T08:19:53Z`: checked `0`, failed `0`; timer remains `enabled` + `active`.
+
+### Проблемы
+
+- Public HTTPS health from Codex desktop had intermittent timeout, but `.159` local and host HTTPS health both returned `ok=true`.
+
+---
+
+## 2026-08-09 - Supplier LC: «Backend недоступен» на Заказах / Заявках
+
+### Наблюдения
+
+- Вкладка Заказы, фильтр «Ждут оплату»: UI показывал «Backend недоступен», в теле — Prisma `Invalid value for argument status` на `checkoutItem.status = PENDING_PAYMENT`.
+- `PENDING_PAYMENT` есть только у `CheckoutOrder`, не у `CheckoutItem`. DTO отдаёт `status` с заказа, а list-API клал query `status` в item.
+- На Заявках тот же mislabel: GET `/api/supplier/change-requests?limit=50&supplier=…` падал `validation_error` из‑за `.strict()` query schema без routing-ключей `supplier`/`supplierId`.
+
+### Решения
+
+- `applySupplierCheckoutItemStatusFilter`: order-level статусы (в т.ч. `PENDING_PAYMENT`) → `where.order.status`; `RESERVED` → item.status.
+- Change-requests list: принимать routing keys / парсить resolved searchParams.
+- Supplier UI: «Backend недоступен» только для transport; иначе «Не удалось загрузить данные» + реальный message/`issues`.
+
+### Проблемы
+
+- Deploy `.159` не делаем без явного «выкатывай на finance».
+
+---
+
+## 2026-08-09 - PR Stage 0 admission ticket core
+
+### Наблюдения
+
+- Код Stage 0 admission checkout/ticket уже в `d53cb1d` (см. запись в конце файла). Owner запросил PR в finance-контур.
+- Merge-base ветки = `codex/phase2-finance-supplier` (1 коммит ahead), не `feat/next-monorepo`.
+
+### Решения
+
+- Открыт PR `codex/stage0-admission-ticket-core` -> `codex/phase2-finance-supplier`.
+- В `qa.md` зафиксированы закрываемые gaps (issuance ticketNumbers, buyer DTO, Path A return_url, purchases-by-email) со статусом **в PR / code done, ждёт smoke на `.159`**.
+- Deploy/smoke finance `.159` не стартуем без явного «выкатывай на finance».
+
+### Проблемы
+
+- Нет: docs-only follow-up на PR-ветке. Live verification остаётся blocked на owner go.
+
+---
+
 ## 2026-08-07 — YooKassa Idempotence-Key ≤64
 
 ### Наблюдения
@@ -3149,3 +3297,52 @@
 
 - Full `CONFIRMED` smoke still needs the YooMoney sandbox payment page to be completed manually. Codex in-app browser is blocked from visiting `yoomoney.ru` by browser policy.
 - After manual sandbox payment, run webhook/reconcile and verify the same public code becomes confirmed in admin and supplier LC.
+## 2026-08-09 - Stage 0 admission payment/ticket core
+
+### Observations
+
+- `feat/next-monorepo` catalog buyer flow sends admission fields to finance `/api/checkout/yookassa`, but finance handler schema was still event-first and required `eventId`/`eventSlug`.
+- Admission YooKassa create-payment ignored the caller `returnUrl` and used the old base path builder, so it could return to supplier/purchases instead of catalog `https://daibilet.ru/checkout/result?order={publicCode}`.
+- YooKassa success confirmed `CheckoutItem`/`FulfillmentItem`, but did not expose a separate buyer-visible ticket number; catalog had a fallback where `ticketNumber` could collapse to `publicCode`.
+
+### Changes
+
+- Public YooKassa checkout schema now accepts `VENUE_ADMISSION` with `admissionProductId|admissionProductSlug` + `admissionOfferId`.
+- Admission YooKassa return URL is normalized to catalog result and appends the finance-assigned `publicCode` as `order`.
+- Successful YooKassa webhook/reconcile confirmation issues stable `TKT-{publicCode}-NN` numbers in `FulfillmentItem.providerData`; pending/failed/canceled orders do not get ticket numbers.
+- Added no-store public buyer read APIs for catalog: `GET /api/public/checkout/orders/:publicCode`, `GET /api/checkout/orders/:publicCode`, `GET /api/public/purchases?email=...`, `GET /api/public/checkout/purchases?email=...`.
+- Public order DTO now includes buyer, venue title/address/coords, validity, items, totals, paidAt/confirmedAt, `ticketNumber`, `ticketNumbers`, and `supplierSupportPhone`.
+
+### Checks
+
+- `pnpm --filter @daibilet/db db:generate` - OK.
+- `pnpm --filter @daibilet/backend typecheck` - OK.
+- `pnpm --filter @daibilet/backend exec tsx --test src/checkout-yookassa.test.ts` - OK, 15 tests.
+- `pnpm --filter @daibilet/backend exec tsx --test src/purchase-projection.test.ts` - OK.
+- `pnpm --filter @daibilet/backend test:ts` - OK, 125 pass / 11 skip / 0 fail.
+
+### Next
+
+- Deploy/smoke on finance `.159`: public admission create-payment -> YooKassa sandbox confirmationUrl -> webhook or reconcile -> order CONFIRMED with ticketNumbers.
+- Register/verify canonical webhook only after green create-payment smoke.
+- Keep wide catalog CTA, TC/TEP secrets, Path B calc, and session/schedule supplier out of Stage 0.
+
+---
+
+## 2026-08-09 - Checkout result page
+
+### Changes
+
+- Added web route `/checkout/result?order={publicCode}` for YooKassa return_url.
+- Added no-store Next proxy `GET /api/public/checkout/orders/:publicCode` to read finance public order projection through `FINANCE_API_BASE_URL` / `DAIBILET_FINANCE_API_BASE_URL` with optional projection token.
+- The page is read-only: it polls pending orders, offers a return-to-payment link when finance exposes `confirmationUrl`, and shows `ticketNumbers` after webhook/reconcile confirms the order.
+
+### Checks
+
+- `pnpm --filter @daibilet/backend typecheck` - OK.
+- `pnpm --filter @daibilet/web build` - OK; build includes `/checkout/result` and `/api/public/checkout/orders/[publicCode]`.
+- `pnpm --filter @daibilet/web typecheck` still has pre-existing unrelated failures in `selected-city.test.ts` and `sitemap-data.ts`; no new checkout-result files are reported.
+
+### Next
+
+- After owner completes YooKassa sandbox payment smoke, deploy catalog/web and verify `/checkout/result?order=...` moves from pending to ticket numbers without relying on return_url as confirmation.

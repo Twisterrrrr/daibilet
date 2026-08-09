@@ -12,6 +12,8 @@ import { createAdminEventScheduleRouteHandler } from './admin-event-schedule-han
 import { createAdminEventsRouteHandler } from './admin-events-handler.js';
 import { createAdminEventsReadRouteHandler } from './admin-events-read-handler.js';
 import { buildAdminEventDetailDto, buildAdminEventsListDto } from './admin-events.dto.js';
+import { buildAdminFinanceLedgerDto, closeAdminFinancePeriod } from './admin-finance.dto.js';
+import { createAdminFinanceRouteHandler } from './admin-finance-handler.js';
 import { applyApprovedEventChangeRequest } from './event-change-request-applier.js';
 import { reviewEventChangeRequest } from './event-change-request-review.js';
 import { createAdminLandingsRouteHandler } from './admin-landings-handler.js';
@@ -19,7 +21,7 @@ import { buildAdminListingHealthOverviewDto } from './admin-listing-health.dto.j
 import { createAdminListingHealthRouteHandler } from './admin-listing-health-handler.js';
 import { createAdminOrdersRouteHandler } from './admin-orders-handler.js';
 import { createAdminOrdersReadRouteHandler } from './admin-orders-read-handler.js';
-import { buildAdminOrdersListDto } from './admin-orders.dto.js';
+import { buildAdminOrderDetailDto, buildAdminOrdersListDto, createAdminOrderRefundRequestDto } from './admin-orders.dto.js';
 import { createAdminSuppliersRouteHandler } from './admin-suppliers-handler.js';
 import { buildAdminSupplierDetailDto, buildAdminSuppliersListDto } from './admin-suppliers.dto.js';
 import { createAdminAuthConfig } from './auth.js';
@@ -31,6 +33,7 @@ import { buildPublicCatalogDto, clearPublicCatalogDtoCache, getPublicCatalogSess
 import { createPublicCatalogRouteHandler } from './public-catalog-handler.js';
 import { buildPublicCityDto, buildPublicDestinationsDto, clearPublicCityDtoCache } from './public-city.dto.js';
 import { createPublicCityRouteHandler } from './public-city-handler.js';
+import { createPublicCheckoutOrdersRouteHandler } from './public-checkout-orders-handler.js';
 import { buildPublicEventDto, clearPublicEventDtoCache } from './public-event.dto.js';
 import { createPublicEventRouteHandler } from './public-event-handler.js';
 import {
@@ -43,6 +46,7 @@ import { createPublicFinanceProjectionRouteHandler } from './public-finance-proj
 import { buildPublicVenueDto, buildPublicVenuesDto, clearPublicVenueDtoCache } from './public-venue.dto.js';
 import { createPublicVenueRouteHandler } from './public-venue-handler.js';
 import { createPublicReadStackWarmer } from './public-warmup.js';
+import { buildPublicCheckoutOrderByCodeDto, buildPublicCheckoutPurchasesByEmailDto } from './purchase-projection.js';
 import { createSupplierAdmissionYooKassaPurchaseRouteHandler } from './supplier-admission-yookassa-purchase-handler.js';
 import { createSupplierAdmissionStubPurchaseRouteHandler } from './supplier-admission-stub-purchase-handler.js';
 import { createSupplierAuthRouteHandler, resolveSupplierPortalSearchParams } from './supplier-auth-handler.js';
@@ -126,9 +130,20 @@ const server = startServer({
         buildVenueAdmissionProducts: buildPublicVenueAdmissionProductsDto,
         buildSupplierProjection: buildPublicSupplierProjectionDto,
       }),
+      createPublicCheckoutOrdersRouteHandler({
+        projectionToken: env.DAIBILET_FINANCE_PROJECTION_TOKEN || env.FINANCE_PROJECTION_TOKEN || null,
+        buildOrderByCode: buildPublicCheckoutOrderByCodeDto,
+        buildPurchasesByEmail: buildPublicCheckoutPurchasesByEmailDto,
+      }),
       createAdminOrdersReadRouteHandler({
         enabled: adminFlags.orders,
         buildOrdersList: buildAdminOrdersListDto,
+        buildOrderDetail: buildAdminOrderDetailDto,
+      }),
+      createAdminFinanceRouteHandler({
+        enabled: adminFlags.orders,
+        buildLedger: buildAdminFinanceLedgerDto,
+        closePeriod: closeAdminFinancePeriod,
       }),
       createAdminEventsReadRouteHandler({
         enabled: adminFlags.events,
@@ -153,6 +168,7 @@ const server = startServer({
       createAdminOrdersRouteHandler({
         db,
         upsertAdminOrderTicket,
+        createRefundRequest: createAdminOrderRefundRequestDto,
       }),
       createAdminEventsRouteHandler({
         db,

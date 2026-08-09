@@ -187,6 +187,7 @@ Venue page может иметь admission **независимо** от афи�
 | CF.P1 public supplier projection | ✅ `GET /api/public/suppliers/:slug` |
 | CF.P1 finance-prefix aliases | ✅ `/api/public/finance/admission-products*`, `/api/public/finance/venues/:slug/admission-products`, `/api/public/finance/suppliers/:slug` |
 | CF.P1 m2m auth | ✅ optional `DAIBILET_FINANCE_PROJECTION_TOKEN` / `FINANCE_PROJECTION_TOKEN`; dev remains open when token is empty |
+| CF.P1d buyer order projection | ✅ `GET /api/public/checkout/orders/:publicCode` + `/api/public/purchases?email=`; no-store; ticketNumbers only after successful fulfillment |
 | CF.P1b catalog client/UI | ⏳ Cursor after contract freeze |
 
 ---

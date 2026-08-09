@@ -1178,6 +1178,7 @@ function FinancePage({ supplierKey }: { supplierKey: string }) {
           <StatCard label="Продажи" value={formatMoney(data.summary.saleKopecks)} hint="до комиссии" />
           <StatCard label="Комиссия" value={formatMoney(data.summary.commissionKopecks)} hint="Daibilet" />
           <StatCard label="Выплачено" value={formatMoney(data.summary.paidPayoutsKopecks)} hint="по выплатам" />
+          <StatCard label="Возвраты" value={String(data.summary.openRefundRequests)} hint={formatMoney(data.summary.refundKopecks)} />
         </div>
       ) : null}
       <DataState loading={loading} error={error} onRetry={reload} hasData={Boolean(data?.ledger.length)}>
@@ -1194,6 +1195,41 @@ function FinancePage({ supplierKey }: { supplierKey: string }) {
           />
         ) : null}
       </DataState>
+      {data ? (
+        <div className="two-column">
+          <section className="panel">
+            <div className="panel-header"><h2>Открытые возвраты</h2></div>
+            {data.refunds.length ? (
+              <Table
+                columns={['Дата', 'Сумма', 'Причина', 'Статус']}
+                rows={data.refunds.slice(0, 8).map((refund) => [
+                  formatDateTime(refund.createdAt),
+                  formatMoney(refund.amountKopecks),
+                  refundReasonLabel(refund.reason),
+                  <StatusPill key="status" tone={refund.status === 'FAILED' ? 'danger' : refund.status === 'COMPLETED' ? 'success' : 'warning'}>{refundStatusLabel(refund.status)}</StatusPill>,
+                ])}
+              />
+            ) : (
+              <EmptyInline text="Открытых возвратов нет." />
+            )}
+          </section>
+          <section className="panel">
+            <div className="panel-header"><h2>Отчеты</h2></div>
+            {data.reports.length ? (
+              <Table
+                columns={['Период', 'К выплате', 'Статус']}
+                rows={data.reports.slice(0, 8).map((report) => [
+                  `${formatDateTime(report.periodStart)} - ${formatDateTime(report.periodEnd)}`,
+                  formatMoney(report.netKopecks),
+                  <StatusPill key="status" tone={report.status === 'FINAL' ? 'success' : 'neutral'}>{reportStatusLabel(report.status)}</StatusPill>,
+                ])}
+              />
+            ) : (
+              <EmptyInline text="Отчеты агента появятся после закрытия периода." />
+            )}
+          </section>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -1213,6 +1249,9 @@ function DocumentsPage({ supplierKey }: { supplierKey: string }) {
   const supplier = profile.data?.supplier || finance.data?.supplier;
   const legal = profile.data?.legal;
   const payouts = finance.data?.payouts ?? [];
+  const documents = finance.data?.documents ?? [];
+  const reports = finance.data?.reports ?? [];
+  const settlements = finance.data?.settlements ?? [];
 
   return (
     <div className="page-stack">
@@ -1242,12 +1281,49 @@ function DocumentsPage({ supplierKey }: { supplierKey: string }) {
         <section className="panel">
           <div className="panel-header"><h2>Ближайшие документы</h2></div>
           <div className="compact-list">
-            <DocumentRow title="Отчет агента" status="После включения агентской схемы" />
-            <DocumentRow title="Акт сверки" status="После первых выплат" />
-            <DocumentRow title="Выплатная ведомость" status={payouts.length ? `${payouts.length} выплат в истории` : 'Выплат пока нет'} />
+            {documents.length ? (
+              documents.slice(0, 5).map((document) => (
+                <DocumentRow
+                  key={document.id}
+                  title={document.title}
+                  status={`${documentTypeLabel(document.type)} - ${documentStatusLabel(document.status)} - файлов ${document.filesCount}`}
+                />
+              ))
+            ) : (
+              <>
+                <DocumentRow title="Отчет агента" status={reports.length ? `${reports.length} отчетов в истории` : 'После закрытия периода'} />
+                <DocumentRow title="Акт сверки" status={settlements.length ? `${settlements.length} сверок в истории` : 'После первых расчетов'} />
+                <DocumentRow title="Выплатная ведомость" status={payouts.length ? `${payouts.length} выплат в истории` : 'Выплат пока нет'} />
+              </>
+            )}
           </div>
         </section>
       </div>
+
+      <section className="panel">
+        <div className="panel-header"><h2>Отчеты и сверки</h2></div>
+        {reports.length || settlements.length ? (
+          <Table
+            columns={['Тип', 'Период', 'Сумма', 'Статус']}
+            rows={[
+              ...reports.map((report) => [
+                'Отчет агента',
+                `${formatDateTime(report.periodStart)} - ${formatDateTime(report.periodEnd)}`,
+                formatMoney(report.netKopecks),
+                <StatusPill key="status" tone={report.status === 'FINAL' ? 'success' : 'neutral'}>{reportStatusLabel(report.status)}</StatusPill>,
+              ]),
+              ...settlements.map((settlement) => [
+                'Сверка',
+                `${formatDateTime(settlement.periodStart)} - ${formatDateTime(settlement.periodEnd)}`,
+                formatMoney(settlement.netKopecks),
+                <StatusPill key="status" tone={settlement.status === 'PAID' ? 'success' : 'neutral'}>{settlementStatusLabel(settlement.status)}</StatusPill>,
+              ]),
+            ].slice(0, 12)}
+          />
+        ) : (
+          <EmptyInline text="Отчеты и сверки появятся после закрытия первого расчетного периода." />
+        )}
+      </section>
 
       <section className="panel">
         <div className="panel-header"><h2>Выплаты</h2></div>
@@ -1707,9 +1783,17 @@ function RefreshButton({ onClick }: { onClick: () => void }) {
 
 function DataState({ loading, error, hasData, onRetry, children }: { loading: boolean; error: string | null; hasData: boolean; onRetry: () => void; children: React.ReactNode }) {
   if (loading && !hasData) return <LoadingState label="Загружаем данные..." />;
-  if (error && !hasData) return <ErrorState title="Backend недоступен" error={error} onRetry={onRetry} />;
+  if (error && !hasData) {
+    const title = looksLikeTransportError(error) ? 'Backend недоступен' : 'Не удалось загрузить данные';
+    return <ErrorState title={title} error={error} onRetry={onRetry} />;
+  }
   if (!hasData) return <EmptyInline text="Данных пока нет." />;
   return <>{children}</>;
+}
+
+function looksLikeTransportError(error: string): boolean {
+  if (/invalid prisma|validation_error|request validation|unrecognized key/i.test(error)) return false;
+  return /failed to fetch|networkerror|load failed|econnrefused|etimedout|http 5\d\d/i.test(error);
 }
 
 function LoadingState({ label }: { label: string }) {
@@ -2220,6 +2304,75 @@ function payoutStatusLabel(value: string): string {
   return labels[value] || value;
 }
 
+function refundReasonLabel(value: string): string {
+  const labels: Record<string, string> = {
+    USER_REQUEST: 'запрос покупателя',
+    EVENT_CANCELLED: 'отмена события',
+    SUPPORT: 'поддержка',
+    OTHER: 'другое',
+  };
+  return labels[value] || value;
+}
+
+function refundStatusLabel(value: string): string {
+  const labels: Record<string, string> = {
+    CREATED: 'создан',
+    APPROVED: 'одобрен',
+    REJECTED: 'отклонен',
+    PROCESSING: 'в обработке',
+    COMPLETED: 'завершен',
+    FAILED: 'ошибка',
+  };
+  return labels[value] || value;
+}
+
+function reportStatusLabel(value: string): string {
+  const labels: Record<string, string> = {
+    DRAFT: 'черновик',
+    FINAL: 'финальный',
+  };
+  return labels[value] || value;
+}
+
+function settlementStatusLabel(value: string): string {
+  const labels: Record<string, string> = {
+    DRAFT: 'черновик',
+    CALCULATED: 'рассчитан',
+    APPROVED: 'одобрен',
+    FINALIZED: 'закрыт',
+    PAID: 'оплачен',
+    CANCELLED: 'отменен',
+  };
+  return labels[value] || value;
+}
+
+function documentTypeLabel(value: string): string {
+  const labels: Record<string, string> = {
+    AGENT_REPORT: 'отчет агента',
+    SERVICE_ACT: 'акт услуг',
+    UPD: 'УПД',
+    INVOICE: 'счет',
+    VAT_INVOICE: 'счет-фактура',
+    COMMISSION_ACT: 'акт комиссии',
+    PAYOUT_STATEMENT: 'реестр выплат',
+  };
+  return labels[value] || value;
+}
+
+function documentStatusLabel(value: string): string {
+  const labels: Record<string, string> = {
+    DRAFT: 'черновик',
+    GENERATED: 'сформирован',
+    ISSUED: 'выставлен',
+    SENT: 'отправлен',
+    DELIVERED: 'доставлен',
+    SIGNED: 'подписан',
+    FAILED: 'ошибка',
+    CANCELLED: 'отменен',
+  };
+  return labels[value] || value;
+}
+
 function legalStatusLabel(value?: string | null): string {
   const labels: Record<string, string> = {
     DRAFT: 'черновик',
@@ -2319,7 +2472,7 @@ function validityPeriod(product: {
   if (product.validDaysAfterPurchase) return `${product.validDaysAfterPurchase} дн. после покупки`;
   const from = product.validFrom ? formatDateTime(product.validFrom) : null;
   const to = product.validTo ? formatDateTime(product.validTo) : null;
-  if (from && to) return `${from} — ${to}`;
+  if (from && to) return `${from} - ${to}`;
   if (from) return `с ${from}`;
   if (to) return `до ${to}`;
   return 'без ограничения';

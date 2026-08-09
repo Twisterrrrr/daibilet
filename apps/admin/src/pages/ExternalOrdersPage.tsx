@@ -28,6 +28,7 @@ type OrderStatusTone = 'draft' | 'ready' | 'live' | 'paused' | 'archived' | 'inc
 
 type AdminOrderRow = {
   id: string;
+  sourceKind?: 'internal' | 'external';
   externalOrderId: string;
   publicCode?: string | null;
   status: string;
@@ -70,6 +71,76 @@ type AdminOrderRow = {
     eventSlug?: string | null;
     startsAt?: string | null;
   }>;
+  finance?: AdminOrderFinance | null;
+};
+
+type AdminOrderFinance = {
+  payments: Array<{
+    id: string;
+    provider: string;
+    status: string;
+    amountKopecks: number;
+    currency: string;
+    providerPaymentId?: string | null;
+    paidAt?: string | null;
+    cancelledAt?: string | null;
+    error?: string | null;
+  }>;
+  fulfillment: Array<{
+    id: string;
+    checkoutItemId?: string | null;
+    provider: string;
+    status: string;
+    amountKopecks: number;
+    refundedKopecks: number;
+    ticketNumbers: string[];
+    lastError?: string | null;
+  }>;
+  ledger: Array<{
+    id: string;
+    supplierId: string;
+    supplierTitle?: string | null;
+    type: string;
+    amountKopecks: number;
+    currency: string;
+    referenceType?: string | null;
+    note?: string | null;
+    createdAt?: string | null;
+  }>;
+  refunds: Array<{
+    id: string;
+    status: string;
+    amountKopecks: number;
+    currency: string;
+    reason: string;
+    createdAt?: string | null;
+  }>;
+  fiscalReceipts: Array<{
+    id: string;
+    type: string;
+    status: string;
+    amountKopecks: number;
+    receiptUrl?: string | null;
+    error?: string | null;
+  }>;
+  totals: {
+    currency: string;
+    totalKopecks: number;
+    commissionKopecks: number;
+    ledgerGrossKopecks: number;
+    ledgerCommissionKopecks: number;
+    ledgerRefundKopecks: number;
+    ledgerPayoutKopecks: number;
+    ledgerNetKopecks: number;
+  };
+  operations: {
+    canReconcile: boolean;
+    canRefund: boolean;
+    canIssueDocuments: boolean;
+    canCloseSettlement: boolean;
+    blockers: string[];
+    nextActions: string[];
+  };
 };
 
 type AdminOrderEventCandidate = {
@@ -108,6 +179,8 @@ type AdminOrdersPayload = {
   quickFilters: Array<{ id: string; count: number }>;
   metrics: {
     imported: number;
+    internal?: number;
+    external?: number;
     confirmed: number;
     processing: number;
     canceled: number;
@@ -131,6 +204,8 @@ export function ExternalOrdersPage() {
   const [selectedOrder, setSelectedOrder] = React.useState<AdminOrderRow | null>(null);
   const [isSavingTicket, setIsSavingTicket] = React.useState(false);
   const [ticketSaveError, setTicketSaveError] = React.useState<string | null>(null);
+  const [isCreatingRefund, setIsCreatingRefund] = React.useState(false);
+  const [refundCreateError, setRefundCreateError] = React.useState<string | null>(null);
 
   const view = params.get('view') ?? 'all';
   const q = params.get('q') ?? '';
@@ -163,6 +238,7 @@ export function ExternalOrdersPage() {
   const openOrder = React.useCallback((order: AdminOrderRow) => {
     setSelectedOrder(order);
     setTicketSaveError(null);
+    setRefundCreateError(null);
     adminFetch(`/api/admin/orders/${encodeURIComponent(order.id)}`, { cache: 'no-store' })
       .then(async (response) => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -194,6 +270,35 @@ export function ExternalOrdersPage() {
           setTicketSaveError(error instanceof Error ? error.message : String(error));
         })
         .finally(() => setIsSavingTicket(false));
+    },
+    [refresh],
+  );
+
+  const createRefundRequest = React.useCallback(
+    (order: AdminOrderRow, payload: { amountKopecks?: number; reason: string; reasonNote?: string | null; adminComment?: string | null }) => {
+      setIsCreatingRefund(true);
+      setRefundCreateError(null);
+      return adminFetch(`/api/admin/orders/${encodeURIComponent(order.id)}/refunds`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+        .then(async (response) => {
+          const body = await response.json().catch(() => null);
+          if (!response.ok) {
+            const blockers = Array.isArray(body?.blockers) ? body.blockers.map(financeBlockerLabel).join(', ') : null;
+            throw new Error(blockers || body?.message || body?.error || `HTTP ${response.status}`);
+          }
+          return body as AdminOrderRow;
+        })
+        .then((detail) => {
+          setSelectedOrder(detail);
+          refresh();
+        })
+        .catch((error) => {
+          setRefundCreateError(error instanceof Error ? error.message : String(error));
+        })
+        .finally(() => setIsCreatingRefund(false));
     },
     [refresh],
   );
@@ -331,12 +436,12 @@ export function ExternalOrdersPage() {
     <div>
       <PageHeader
         title="Заказы"
-        description="Заказы из билетных систем: факт покупки, статус билета, покупатель и связь с событием. Деньги, чеки и основной возврат остаются у источника."
+        description="Единая очередь заказов: TC/Teplohod и внутренние продажи Daibilet. Для внутренних заказов показываем оплату, билеты, ledger и готовность к сверке."
         meta={
           <>
             <SourceBadge source="ticketscloud" />
             <SourceBadge source="teplohod" />
-            <Badge variant="outline">оплата у источника</Badge>
+            <Badge variant="outline">Daibilet checkout</Badge>
           </>
         }
         actions={
@@ -358,8 +463,8 @@ export function ExternalOrdersPage() {
       />
 
       <InfoNote>
-        Активные заказы — рабочие. Отменённые, истёкшие и удалённые старше 30 дней уходят в архив автоматически
-        (и вместе с ними пропадают из активных покупателей). Кнопка «В архив отменённые» архивирует сразу, без ожидания.
+        Активные заказы - рабочие. Внешние TC/Teplohod остаются зеркалом источника, внутренние Daibilet проходят через оплату,
+        выдачу билетов, ledger и сверку. Отмененные, истекшие и удаленные старше 30 дней уходят в архив автоматически.
       </InfoNote>
 
       <div className="mt-4 grid grid-cols-2 gap-2 lg:grid-cols-4">
@@ -530,8 +635,11 @@ export function ExternalOrdersPage() {
         order={selectedOrder}
         isSaving={isSavingTicket}
         saveError={ticketSaveError}
+        isCreatingRefund={isCreatingRefund}
+        refundError={refundCreateError}
         onOpenChange={(open) => !open && setSelectedOrder(null)}
         onSaveTicket={saveTicket}
+        onCreateRefund={createRefundRequest}
       />
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
@@ -558,7 +666,7 @@ function OrdersEmptyState() {
       <EmptyState
         icon={Ticket}
         title="Заказы пока не загружены"
-        description="Нужно запустить импорт заказов от Ticketscloud и Teplohod.info. Вручную выдуманные продажи здесь не показываем."
+        description="Здесь появятся импортированные заказы TC/Teplohod и внутренние продажи Daibilet после первого checkout."
       />
     </div>
   );
@@ -568,14 +676,20 @@ function OrderDetailSheet({
   order,
   isSaving,
   saveError,
+  isCreatingRefund,
+  refundError,
   onOpenChange,
   onSaveTicket,
+  onCreateRefund,
 }: {
   order: AdminOrderRow | null;
   isSaving: boolean;
   saveError: string | null;
+  isCreatingRefund: boolean;
+  refundError: string | null;
   onOpenChange: (open: boolean) => void;
   onSaveTicket: (order: AdminOrderRow, patch: { id?: string; externalTicketId: string; status: string; eventId?: string | null; sessionId?: string | null }) => Promise<void>;
+  onCreateRefund: (order: AdminOrderRow, payload: { amountKopecks?: number; reason: string; reasonNote?: string | null; adminComment?: string | null }) => Promise<void>;
 }) {
   const [editingTicket, setEditingTicket] = React.useState<AdminOrderRow['tickets'][number] | null>(null);
   const [ticketNumber, setTicketNumber] = React.useState('');
@@ -674,6 +788,7 @@ function OrderDetailSheet({
       sessionId: sessionId.trim() || null,
     }).then(resetForm);
   };
+  const isInternalOrder = order?.sourceKind === 'internal';
 
   return (
     <Sheet open={Boolean(order)} onOpenChange={onOpenChange}>
@@ -686,6 +801,8 @@ function OrderDetailSheet({
             </div>
             <h2 className="mt-3 text-xl font-semibold leading-snug">Заказ №{order.publicCode || order.externalOrderId}</h2>
             <p className="mt-1 text-sm text-muted-foreground">{order.eventTitle || 'Событие не связано'} · {formatDate(order.purchasedAt || order.updatedAt)}</p>
+
+            {order.finance ? <FinanceOrderSummary finance={order.finance} /> : null}
 
             <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
               <Card className="border-border p-4">
@@ -718,6 +835,14 @@ function OrderDetailSheet({
                 </div>
               </Card>
 
+              {isInternalOrder && order.finance ? (
+                <FinanceOperationsCard
+                  finance={order.finance}
+                  isCreatingRefund={isCreatingRefund}
+                  refundError={refundError}
+                  onCreateRefund={(payload) => onCreateRefund(order, payload)}
+                />
+              ) : (
               <Card className="border-border p-4">
                 <h3 className="text-sm font-semibold">{editingTicket ? 'Редактировать билет' : 'Добавить билет'}</h3>
                 <form className="mt-3 space-y-3" onSubmit={submit}>
@@ -808,11 +933,209 @@ function OrderDetailSheet({
                   </div>
                 </form>
               </Card>
+              )}
             </div>
           </div>
         ) : null}
       </SheetContent>
     </Sheet>
+  );
+}
+
+function FinanceOrderSummary({ finance }: { finance: AdminOrderFinance }) {
+  const payment = finance.payments[0] || null;
+  const pendingRefunds = finance.refunds.filter((refund) => !['COMPLETED', 'FAILED', 'REJECTED'].includes(refund.status));
+
+  return (
+    <div className="mt-5 grid gap-3 lg:grid-cols-4">
+      <Card className="border-border p-3">
+        <div className="text-xs text-muted-foreground">Оплата</div>
+        <div className="mt-1 text-sm font-semibold">{payment ? paymentStatusLabel(payment.status) : 'нет платежа'}</div>
+        <div className="mt-1 text-xs text-muted-foreground">{formatMoneyKopecks(finance.totals.totalKopecks, finance.totals.currency)}</div>
+      </Card>
+      <Card className="border-border p-3">
+        <div className="text-xs text-muted-foreground">Билеты</div>
+        <div className="mt-1 text-sm font-semibold">{finance.fulfillment.length ? `${formatNumber(finance.fulfillment.length)} поз.` : 'нет позиций'}</div>
+        <div className="mt-1 text-xs text-muted-foreground">{finance.fulfillment.some((item) => item.lastError) ? 'есть ошибка' : 'без ошибок'}</div>
+      </Card>
+      <Card className="border-border p-3">
+        <div className="text-xs text-muted-foreground">К расчету</div>
+        <div className="mt-1 text-sm font-semibold">{formatMoneyKopecks(finance.totals.ledgerNetKopecks, finance.totals.currency)}</div>
+        <div className="mt-1 text-xs text-muted-foreground">комиссия {formatMoneyKopecks(finance.totals.ledgerCommissionKopecks, finance.totals.currency)}</div>
+      </Card>
+      <Card className="border-border p-3">
+        <div className="text-xs text-muted-foreground">Возвраты</div>
+        <div className="mt-1 text-sm font-semibold">{pendingRefunds.length ? `${formatNumber(pendingRefunds.length)} в работе` : 'нет активных'}</div>
+        <div className="mt-1 text-xs text-muted-foreground">{finance.refunds.length ? `${formatNumber(finance.refunds.length)} всего` : 'история пустая'}</div>
+      </Card>
+    </div>
+  );
+}
+
+function FinanceOperationsCard({
+  finance,
+  isCreatingRefund,
+  refundError,
+  onCreateRefund,
+}: {
+  finance: AdminOrderFinance;
+  isCreatingRefund: boolean;
+  refundError: string | null;
+  onCreateRefund: (payload: { amountKopecks?: number; reason: string; reasonNote?: string | null; adminComment?: string | null }) => Promise<void>;
+}) {
+  const actions = finance.operations.nextActions.length ? finance.operations.nextActions : ['Контроль заказа'];
+  const [amountRub, setAmountRub] = React.useState('');
+  const [reason, setReason] = React.useState('USER_REQUEST');
+  const [comment, setComment] = React.useState('');
+  const [localError, setLocalError] = React.useState<string | null>(null);
+  const refundableKopecks = Math.max(0, finance.totals.totalKopecks - finance.refunds.filter((refund) => !['REJECTED', 'FAILED'].includes(refund.status)).reduce((sum, refund) => sum + refund.amountKopecks, 0));
+
+  const submitRefund = (event: React.FormEvent) => {
+    event.preventDefault();
+    setLocalError(null);
+    const parsedAmount = amountRub.trim() ? Number(amountRub.replace(',', '.')) : null;
+    if (parsedAmount !== null && (!Number.isFinite(parsedAmount) || parsedAmount <= 0)) {
+      setLocalError('Укажите корректную сумму возврата');
+      return;
+    }
+    const amountKopecks = parsedAmount !== null ? Math.round(parsedAmount * 100) : undefined;
+    void onCreateRefund({
+      amountKopecks,
+      reason,
+      adminComment: comment.trim() || null,
+    }).then(() => {
+      setAmountRub('');
+      setComment('');
+    });
+  };
+
+  return (
+    <Card className="border-border p-4">
+      <h3 className="text-sm font-semibold">Финансовый контроль</h3>
+      <div className="mt-3 space-y-3">
+        <div className="flex flex-wrap gap-1.5">
+          <Badge variant={finance.operations.canReconcile ? 'default' : 'outline'}>сверка</Badge>
+          <Badge variant={finance.operations.canRefund ? 'default' : 'outline'}>возврат</Badge>
+          <Badge variant={finance.operations.canCloseSettlement ? 'default' : 'outline'}>расчет</Badge>
+          <Badge variant={finance.operations.canIssueDocuments ? 'default' : 'outline'}>документы</Badge>
+        </div>
+
+        {finance.operations.blockers.length ? (
+          <div className="rounded-md border border-warning/30 bg-warning/10 p-3 text-xs text-warning-foreground">
+            <div className="font-semibold">Что мешает закрытию</div>
+            <ul className="mt-2 list-disc space-y-1 pl-4">
+              {finance.operations.blockers.map((blocker) => <li key={blocker}>{financeBlockerLabel(blocker)}</li>)}
+            </ul>
+          </div>
+        ) : (
+          <div className="rounded-md border border-success/20 bg-success/10 p-3 text-xs text-success">
+            Заказ готов к сверке и расчетному периоду.
+          </div>
+        )}
+
+        <div className="rounded-md bg-secondary p-3 text-xs text-muted-foreground">
+          <div className="font-semibold text-foreground">Следующее действие</div>
+          <ul className="mt-2 list-disc space-y-1 pl-4">
+            {actions.map((action) => <li key={action}>{action}</li>)}
+          </ul>
+        </div>
+
+        <form className="rounded-md border border-border p-3" onSubmit={submitRefund}>
+          <div className="text-xs font-semibold text-foreground">Заявка на возврат</div>
+          <div className="mt-2 text-xs text-muted-foreground">
+            Доступно к заявке: {formatMoneyKopecks(refundableKopecks, finance.totals.currency)}
+          </div>
+          <div className="mt-3 grid gap-2">
+            <Input
+              value={amountRub}
+              onChange={(event) => setAmountRub(event.target.value)}
+              placeholder="Сумма, пусто - полный возврат"
+              className="h-9 bg-background text-xs"
+              disabled={!finance.operations.canRefund || isCreatingRefund}
+            />
+            <select
+              value={reason}
+              onChange={(event) => setReason(event.target.value)}
+              className="h-9 rounded-md border border-input bg-background px-3 text-xs text-foreground"
+              disabled={!finance.operations.canRefund || isCreatingRefund}
+            >
+              <option value="USER_REQUEST">Запрос покупателя</option>
+              <option value="EVENT_CANCELLED">Отмена события</option>
+              <option value="SUPPORT">Поддержка</option>
+              <option value="OTHER">Другое</option>
+            </select>
+            <Input
+              value={comment}
+              onChange={(event) => setComment(event.target.value)}
+              placeholder="Комментарий оператора"
+              className="h-9 bg-background text-xs"
+              disabled={!finance.operations.canRefund || isCreatingRefund}
+            />
+          </div>
+          {localError || refundError ? (
+            <div className="mt-2 rounded-md border border-destructive/20 bg-destructive/10 px-3 py-2 text-xs text-destructive">{localError || refundError}</div>
+          ) : null}
+          <Button type="submit" size="sm" className="mt-3 w-full" disabled={!finance.operations.canRefund || isCreatingRefund || refundableKopecks <= 0}>
+            {isCreatingRefund ? 'Создаем...' : 'Создать RefundRequest'}
+          </Button>
+        </form>
+
+        <FinanceSection title="Платежи" empty="Платежей нет">
+          {finance.payments.map((payment) => (
+            <FinanceRow
+              key={payment.id}
+              title={`${payment.provider} - ${paymentStatusLabel(payment.status)}`}
+              value={formatMoneyKopecks(payment.amountKopecks, payment.currency)}
+              meta={[payment.providerPaymentId ? `provider ${payment.providerPaymentId}` : null, payment.error].filter(Boolean).join(' - ')}
+            />
+          ))}
+        </FinanceSection>
+
+        <FinanceSection title="Ledger" empty="Ledger пуст">
+          {finance.ledger.map((entry) => (
+            <FinanceRow
+              key={entry.id}
+              title={`${ledgerTypeLabel(entry.type)}${entry.supplierTitle ? ` - ${entry.supplierTitle}` : ''}`}
+              value={formatMoneyKopecks(entry.amountKopecks, entry.currency)}
+              meta={[entry.referenceType, formatDate(entry.createdAt)].filter(Boolean).join(' - ')}
+            />
+          ))}
+        </FinanceSection>
+
+        <FinanceSection title="Чеки" empty="Чеков нет">
+          {finance.fiscalReceipts.map((receipt) => (
+            <FinanceRow
+              key={receipt.id}
+              title={`${receipt.type} - ${receipt.status}`}
+              value={formatMoneyKopecks(receipt.amountKopecks)}
+              meta={receipt.error || receipt.receiptUrl || ''}
+            />
+          ))}
+        </FinanceSection>
+      </div>
+    </Card>
+  );
+}
+
+function FinanceSection({ title, empty, children }: { title: string; empty: string; children: React.ReactNode }) {
+  const items = React.Children.toArray(children).filter(Boolean);
+  return (
+    <div>
+      <div className="mb-2 text-xs font-semibold text-foreground">{title}</div>
+      {items.length ? <div className="space-y-2">{items}</div> : <div className="rounded-md bg-secondary p-3 text-xs text-muted-foreground">{empty}</div>}
+    </div>
+  );
+}
+
+function FinanceRow({ title, value, meta }: { title: string; value: string; meta?: string }) {
+  return (
+    <div className="rounded-md border border-border p-2 text-xs">
+      <div className="flex items-start justify-between gap-2">
+        <span className="font-medium text-foreground">{title}</span>
+        <span className="shrink-0 font-mono">{value}</span>
+      </div>
+      {meta ? <div className="mt-1 break-words text-muted-foreground">{meta}</div> : null}
+    </div>
   );
 }
 
@@ -906,6 +1229,45 @@ function ticketStatusLabel(status?: string | null) {
   return status || 'Неизвестно';
 }
 
+function paymentStatusLabel(status?: string | null) {
+  const value = String(status || '').toUpperCase();
+  if (value === 'SUCCEEDED' || value === 'PAID' || value === 'CONFIRMED') return 'оплачен';
+  if (value === 'WAITING_FOR_CAPTURE') return 'ждет подтверждения';
+  if (value === 'PENDING' || value === 'CREATED' || value === 'PENDING_PAYMENT') return 'ждет оплату';
+  if (value === 'CANCELLED' || value === 'CANCELED') return 'отменен';
+  if (value === 'FAILED' || value === 'ERROR') return 'ошибка';
+  if (value === 'REFUNDED') return 'возвращен';
+  return status || 'нет статуса';
+}
+
+function financeBlockerLabel(code: string) {
+  const value = String(code);
+  if (value === 'payment_not_confirmed') return 'Платеж еще не подтвержден';
+  if (value === 'payment_has_error') return 'Есть ошибка платежа';
+  if (value === 'order_not_refundable_status') return 'Статус заказа не допускает возврат';
+  if (value === 'fulfillment_missing') return 'Нет fulfillment-позиции';
+  if (value === 'fulfillment_not_final') return 'Выдача билетов еще не финальна';
+  if (value === 'ledger_missing') return 'Нет ledger-записей для расчета';
+  if (value === 'ledger_sale_missing') return 'Нет продажи в ledger';
+  if (value === 'multi_supplier_refund_requires_item') return 'Нужно выбрать позицию для мультипоставщика';
+  if (value === 'fulfillment_item_not_found') return 'Fulfillment-позиция не найдена';
+  if (value === 'refund_already_open') return 'Уже есть открытая заявка на возврат';
+  if (value === 'refund_amount_exhausted') return 'Сумма к возврату исчерпана';
+  if (value === 'refund_amount_too_high') return 'Сумма больше доступной к возврату';
+  if (value === 'refund_amount_required') return 'Нужна положительная сумма возврата';
+  return value;
+}
+
+function ledgerTypeLabel(type?: string | null) {
+  const value = String(type || '').toUpperCase();
+  if (value === 'SALE') return 'продажа';
+  if (value === 'COMMISSION') return 'комиссия';
+  if (value === 'REFUND') return 'возврат';
+  if (value === 'PAYOUT') return 'выплата';
+  if (value === 'ADJUSTMENT') return 'корректировка';
+  return type || 'операция';
+}
+
 function formatDate(value?: string | null) {
   if (!value) return '-';
   const date = new Date(value);
@@ -916,6 +1278,16 @@ function formatDate(value?: string | null) {
     hour: '2-digit',
     minute: '2-digit',
   }).format(date);
+}
+
+function formatMoneyKopecks(value?: number | null, currency = 'RUB') {
+  const amount = typeof value === 'number' && Number.isFinite(value) ? value : 0;
+  const rub = amount / 100;
+  const formatted = new Intl.NumberFormat('ru-RU', {
+    minimumFractionDigits: amount % 100 === 0 ? 0 : 2,
+    maximumFractionDigits: 2,
+  }).format(rub);
+  return `${formatted} ${currency === 'RUB' ? 'руб.' : currency}`;
 }
 
 function formatMoneyRub(value?: number | null) {

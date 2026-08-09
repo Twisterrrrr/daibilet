@@ -39,7 +39,7 @@ export async function supplierGet<T>(
   });
   const body = await response.json().catch(() => null);
   if (!response.ok) {
-    throw new Error(body?.message || body?.error || `HTTP ${response.status}`);
+    throw new Error(formatSupplierApiError(body, response.status));
   }
   return body as T;
 }
@@ -63,7 +63,7 @@ export async function supplierPost<T>(
   });
   const payload = await response.json().catch(() => null);
   if (!response.ok) {
-    throw new Error(payload?.message || payload?.error || `HTTP ${response.status}`);
+    throw new Error(formatSupplierApiError(payload, response.status));
   }
   return payload as T;
 }
@@ -87,9 +87,32 @@ export async function supplierPatch<T>(
   });
   const payload = await response.json().catch(() => null);
   if (!response.ok) {
-    throw new Error(payload?.message || payload?.error || `HTTP ${response.status}`);
+    throw new Error(formatSupplierApiError(payload, response.status));
   }
   return payload as T;
+}
+
+function formatSupplierApiError(body: unknown, status: number): string {
+  if (!body || typeof body !== 'object') return `HTTP ${status}`;
+  const record = body as {
+    message?: unknown;
+    error?: unknown;
+    issues?: Array<{ path?: unknown; message?: unknown }>;
+  };
+  if (typeof record.message === 'string' && record.message.trim()) return record.message.trim();
+  if (record.error === 'validation_error' && Array.isArray(record.issues) && record.issues.length) {
+    return record.issues
+      .map((issue) => {
+        const path = typeof issue.path === 'string' && issue.path ? issue.path : '?';
+        const message = typeof issue.message === 'string' ? issue.message : 'invalid';
+        return `${path}: ${message}`;
+      })
+      .join('; ');
+  }
+  if (typeof record.error === 'string' && record.error.trim() && record.error !== 'internal_error') {
+    return record.error.trim();
+  }
+  return `HTTP ${status}`;
 }
 
 function readStoredAccessToken(): string {
