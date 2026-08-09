@@ -326,33 +326,33 @@
       "city": "saint-petersburg",
       "suburb": "Курортный район / Побережье",
       "name": "Сестрорецкий Рубеж",
-      "latitude": 60.0925,
-      "longitude": 29.9595,
-      "source": "landmark Sestroretsk Rubezh"
+      "latitude": 60.11295,
+      "longitude": 29.9712,
+      "source": "OSM museum node Sestroretsk Rubezh"
     },
     {
       "city": "saint-petersburg",
       "suburb": "Курортный район / Побережье",
       "name": "Экотропа «Комаровский берег»",
-      "latitude": 60.1865,
-      "longitude": 29.7965,
-      "source": "landmark Komarovo shore"
+      "latitude": 60.1825,
+      "longitude": 29.7855,
+      "source": "OSM trailhead / forest board Komarovsky bereg"
     },
     {
       "city": "saint-petersburg",
       "suburb": "Курортный район / Побережье",
       "name": "Музей-усадьба И. Е. Репина «Пенаты»",
-      "latitude": 60.1565,
-      "longitude": 29.8625,
-      "source": "landmark Penaty"
+      "latitude": 60.15586,
+      "longitude": 29.89661,
+      "source": "OSM tourism museum Primorskoe sh. 411 (was water/wrong «Moi Penaty»)"
     },
     {
       "city": "saint-petersburg",
       "suburb": "Курортный район / Побережье",
       "name": "Комаровский некрополь",
-      "latitude": 60.1845,
-      "longitude": 29.8085,
-      "source": "landmark Komarovo necropolis"
+      "latitude": 60.20462,
+      "longitude": 29.79991,
+      "source": "OSM cemetery Komarovskoe kladbishche"
     },
     {
       "city": "saint-petersburg",
