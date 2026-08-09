@@ -10,7 +10,7 @@
 - Это static significantSuburbs nested POI (не Venue/DB) → нужен web deploy.
 
 ### Проблемы
-- Ship: `40dfb39a` · Deploy/BUILD_ID - ниже после MSK web.
+- Ship: `40dfb39a` (+ docs `4ef0fd33`) · Deploy MSK web **31301794203** · **BUILD_ID=`Ii06dV4RMXS8xzEZiQuiy`**.
 
 ---
 
