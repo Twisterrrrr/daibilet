@@ -60,9 +60,9 @@ export function podborkiBentoSpan(item: PodborkiBentoItem): PodborkiBentoSpan {
 
 export function podborkiBentoCellClass(span: PodborkiBentoSpan): string {
   if (span === 2) {
-    return 'col-span-1 row-span-1 min-h-[12.5rem] md:col-span-2 md:min-h-[14rem]';
+    return 'col-span-1 row-span-1 md:col-span-2';
   }
-  return 'col-span-1 row-span-1 min-h-[11rem] md:min-h-[12.5rem]';
+  return 'col-span-1 row-span-1';
 }
 
 /** Tailwind grid shell for bento sections (home + /podborki). */

@@ -21,23 +21,6 @@ export type LandingDirectionCardItem = {
   priceFrom?: number | null;
 };
 
-const LANDING_EMOJI: Record<string, string> = {
-  'river-cruises': '🚢',
-  'bus-tours': '🚌',
-  'river-party': '🎉',
-  'bridges-night': '🌉',
-  'moscow-dinner-boat': '🍽',
-  'moscow-city-day': '🎆',
-  'moscow-museums': '🏛',
-  'spb-yards': '🏛',
-  standup: '🎤',
-  'new-year': '🎄',
-  'salute-9-may': '🎆',
-  'family-kids': '🎪',
-  'concerts-genre': '🎸',
-  'active-sport': '🏎',
-};
-
 /** Brand primary / sky / cyan - no purple-neon / orange-glow. */
 function landingGradient(slug: string): string {
   if (slug.includes('river') || slug.includes('bridge') || slug.includes('boat')) {
@@ -131,6 +114,13 @@ function CardStatBadges({
   );
 }
 
+function quietMetaLine(landing: LandingDirectionCardItem): string {
+  const parts = [pluralEvents(landing.events)];
+  const price = formatLandingPriceBadge(landing.priceFrom);
+  if (price) parts.push(price);
+  return parts.join(' · ');
+}
+
 /** Та же сущность, что в «Подборки» (`/podborki`): плитка или широкий баннер для city hub. */
 export function LandingDirectionCard({
   landing,
@@ -150,12 +140,9 @@ export function LandingDirectionCard({
   /** Taller tile for bento wide cells. */
   featured?: boolean;
 }) {
-  const emoji = LANDING_EMOJI[landing.slug] || '✨';
   const contextCity = citySlug && citySlug !== 'all' ? citySlug : undefined;
   const imageUrl = resolveLandingCardImage(landing.slug, contextCity);
   const href = landingCategoryHref(landing.slug, contextCity);
-  const hasPrice = typeof landing.priceFrom === 'number' && landing.priceFrom > 0;
-  const priceLabel = hasPrice ? formatPriceFrom(landing.priceFrom) : formatLandingPriceBadge(landing.priceFrom);
   const cityBadge = (
     <LandingCityBadge
       slug={landing.slug}
@@ -213,54 +200,44 @@ export function LandingDirectionCard({
     );
   }
 
-  const heightClass = featured
-    ? 'h-full min-h-[12.5rem] sm:min-h-[14rem]'
-    : 'h-full min-h-[11rem] sm:min-h-[12.5rem]';
+  const coverHeight = featured
+    ? 'min-h-[11.5rem] sm:min-h-[13rem]'
+    : 'min-h-[10rem] sm:min-h-[11.5rem]';
 
   return (
     <Link
       href={href}
-      className={`group relative flex ${heightClass} flex-col justify-end overflow-hidden rounded-2xl bg-slate-900 shadow-sm ring-1 ring-slate-900/10 transition duration-300 hover:-translate-y-0.5 hover:shadow-md`}
+      className="group flex h-full flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-900/8 transition duration-300 hover:-translate-y-0.5 hover:shadow-md"
     >
-      {imageUrl ? (
-        <SafeImage
-          src={imageUrl}
-          alt=""
-          fill
-          loading="lazy"
-          sizes={IMAGE_SIZES.landingCard}
-          className="object-cover transition-transform duration-500 group-hover:scale-[1.08]"
-        />
-      ) : (
-        <div className={`absolute inset-0 bg-gradient-to-br ${landingGradient(landing.slug)}`} />
-      )}
-      <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/45 to-transparent" />
-      <div className="absolute left-2 top-2 z-[2] flex max-w-[calc(100%-1rem)] flex-wrap gap-1.5 sm:left-3 sm:top-3">
-        {cityBadge}
-        <span className="inline-flex items-center rounded-full bg-white/85 px-2 py-0.5 text-[10px] font-semibold text-slate-900 shadow-sm backdrop-blur-md sm:text-[11px]">
-          {pluralEvents(landing.events)}
-        </span>
-        {priceLabel ? (
-          <span className="inline-flex items-center rounded-full bg-sky-500/90 px-2 py-0.5 text-[10px] font-semibold text-white shadow-sm backdrop-blur-md sm:text-[11px]">
-            {priceLabel}
-          </span>
-        ) : null}
+      <div className={`relative flex ${coverHeight} flex-col justify-end overflow-hidden bg-slate-900`}>
+        {imageUrl ? (
+          <SafeImage
+            src={imageUrl}
+            alt=""
+            fill
+            loading="lazy"
+            sizes={IMAGE_SIZES.landingCard}
+            className="object-cover transition-transform duration-500 group-hover:scale-[1.08]"
+          />
+        ) : (
+          <div className={`absolute inset-0 bg-gradient-to-br ${landingGradient(landing.slug)}`} />
+        )}
+        <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/40 to-transparent" />
+        <div className="relative z-[1] p-4 text-white sm:p-5">
+          <h3
+            className={`font-display font-bold leading-tight text-white ${
+              featured ? 'text-xl sm:text-2xl' : 'text-lg sm:text-xl'
+            }`}
+          >
+            <span className="underline-offset-4 group-hover:underline">{landing.title}</span>
+          </h3>
+          <p className="mt-2.5 inline-flex items-center gap-1 text-sm font-semibold text-white/95">
+            Смотреть
+            <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" aria-hidden />
+          </p>
+        </div>
       </div>
-      <div className="relative z-[1] p-4 text-white sm:p-5">
-        <span className="text-xl" aria-hidden>
-          {emoji}
-        </span>
-        <h3 className={`font-display mt-1 font-bold text-white ${featured ? 'text-xl sm:text-2xl' : 'text-lg sm:text-xl'}`}>
-          <span className="underline-offset-4 group-hover:underline">{landing.title}</span>
-        </h3>
-        {landing.subtitle ? (
-          <p className="mt-1 line-clamp-2 text-xs text-white/80 sm:text-sm">{landing.subtitle}</p>
-        ) : null}
-        <p className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-white/90 group-hover:text-white sm:text-sm">
-          Смотреть
-          <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
-        </p>
-      </div>
+      <p className="px-4 py-2.5 text-xs text-slate-500 sm:px-5">{quietMetaLine(landing)}</p>
     </Link>
   );
 }
