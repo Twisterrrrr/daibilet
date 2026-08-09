@@ -1105,6 +1105,134 @@
       "latitude": 55.1175,
       "longitude": 37.648,
       "source": "msk-hub-draft-2026-08-07"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Петергоф",
+      "name": "Большой дворец Петергофа",
+      "latitude": 59.89055,
+      "longitude": 29.90785,
+      "source": "editorial expand 2026-08-09"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Петергоф",
+      "name": "Верхний сад",
+      "latitude": 59.89185,
+      "longitude": 29.90845,
+      "source": "editorial expand 2026-08-09"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Петергоф",
+      "name": "Павильон Марли",
+      "latitude": 59.88685,
+      "longitude": 29.89655,
+      "source": "editorial expand 2026-08-09"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Царское Село / Пушкин",
+      "name": "Екатерининский парк",
+      "latitude": 59.71455,
+      "longitude": 30.39685,
+      "source": "editorial expand 2026-08-09"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Царское Село / Пушкин",
+      "name": "Камеронова галерея",
+      "latitude": 59.71415,
+      "longitude": 30.39455,
+      "source": "editorial expand 2026-08-09"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Царское Село / Пушкин",
+      "name": "Китайская деревня",
+      "latitude": 59.71985,
+      "longitude": 30.38565,
+      "source": "editorial expand 2026-08-09"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Кронштадт",
+      "name": "Форт «Константин»",
+      "latitude": 59.99555,
+      "longitude": 29.70125,
+      "source": "editorial expand 2026-08-09"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Кронштадт",
+      "name": "Петровский парк",
+      "latitude": 59.98955,
+      "longitude": 29.76785,
+      "source": "editorial expand 2026-08-09"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Гатчина",
+      "name": "Серебряное озеро",
+      "latitude": 59.56685,
+      "longitude": 30.10555,
+      "source": "editorial expand 2026-08-09"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Павловск",
+      "name": "Храм Дружбы",
+      "latitude": 59.68455,
+      "longitude": 30.44585,
+      "source": "editorial expand 2026-08-09"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Павловск",
+      "name": "Колоннада Аполлона",
+      "latitude": 59.68295,
+      "longitude": 30.44955,
+      "source": "editorial expand 2026-08-09"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Ораниенбаум / Ломоносов",
+      "name": "Кавалерский корпус",
+      "latitude": 59.90955,
+      "longitude": 29.74985,
+      "source": "editorial expand 2026-08-09"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Ораниенбаум / Ломоносов",
+      "name": "Нижний сад Ораниенбаума",
+      "latitude": 59.91555,
+      "longitude": 29.75485,
+      "source": "editorial expand 2026-08-09"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Выборг",
+      "name": "Круглая башня",
+      "latitude": 60.71355,
+      "longitude": 28.73285,
+      "source": "editorial expand 2026-08-09"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Выборг",
+      "name": "Анненские укрепления",
+      "latitude": 60.71785,
+      "longitude": 28.72655,
+      "source": "editorial expand 2026-08-09"
+    },
+    {
+      "city": "saint-petersburg",
+      "suburb": "Выборг",
+      "name": "Ратуша (Старая ратуша)",
+      "latitude": 60.71235,
+      "longitude": 28.73055,
+      "source": "editorial expand 2026-08-09"
     }
   ]
 }

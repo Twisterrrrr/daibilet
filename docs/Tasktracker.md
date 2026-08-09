@@ -2,6 +2,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
+| CONT.SPB-SUBURB-DENSITY | SPB suburbs nested POI по насыщенности (не жёсткие 5); presets+timingNote; docs LOCKED | Высокий | 🔄 code; commit+MSK deploy |
 | UX.DAY-TIMING-NOTE | Day presets: `timingNote` в head chips panel; СПб Петергоф+Царское; docs LOCKED | Высокий | ✅ `cde2a697` Deploy MSK web `31301074864` BUILD_ID=`lwjCDA2vbaW1gDR3CzMg2` |
 | FIX.EVENTS-PAGE-HANG | `/events` `?page=` soft-nav hang → listPage + pushState + buttons + stale-first | Критический | ✅ `22f9c4ab` Deploy MSK web `31300245196` BUILD_ID=`2QPP1b_Ed-1ffhxo3VXFw` |
 | FIX.VENUE-PAGE-HANG | `/locations`/`/venues` `?page=` soft-nav hang → client slice | Критический | ✅ `3a968000` Deploy MSK web BUILD_ID=`9BpSEnRcVf3lhoksHGMJ6` |

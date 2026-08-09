@@ -183,6 +183,18 @@ Auto refunds / self-serve refund UI out of Stage 0. **Refunds light** (заяв�
 
 **Примеры СПб (seed):** `spb-petergof`, `spb-tsarskoe-selo`.
 
+## 2026-08-09 - Suburb nested POI count by density (LOCKED)
+
+**LOCKED owner (2026-08-09):** пригороды СПб не обязаны укладываться в ровно 5 nested точек.
+
+| Правило | Деталь |
+|---------|--------|
+| **Не жёсткие 5** | Объём `significantSuburbs[].places` = по насыщенности пригорода, не единый cap. |
+| **Плотные** | Дворец + парк + несколько must-see якорей → **7–9** (Петергоф, Царское / Пушкин, Выборг, Павловск, Ораниенбаум, Кронштадт…). |
+| **Компактные** | Короткие day-trip / россыпь точек → **4–6** (Стрельна, Шлиссельбург, Курортный район, Сосновый Бор…). |
+| **Пресеты / timing** | Companion `dayRoutePresets` синхронизировать с расширенным списком; при удлинении дня обновить `timingNote`. |
+| **Код** | Hard-limit в UI на 5 нет; лимит маршрута my-day остаётся общим (15). |
+
 ---
 
 ## 2026-08-08 - Catalog Worker + Redis transport — LOCKED scope (Redis deferred)
