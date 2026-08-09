@@ -26,7 +26,7 @@
 - Perm/KGD: tips на places к логистике гида; UI copy только дефис `-`.
 
 ### Проблемы
-- Ship+Deploy MSK web - ниже после GHA.
+- Ship: `c5d644d8` · Deploy MSK web **31305337295** · **BUILD_ID=`gOTUGQNTVuIsCS_1DvAT_`**.
 
 ---
 

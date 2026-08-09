@@ -2,7 +2,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| CONT.TRANSIT-TIPS | Schema `transitTip` + UI suburb timeline; NN logistics; SPB triangle/Petrograd/Bertgold/bar; Perm/KGD tips | Высокий | 🔄 ship+Deploy MSK web |
+| CONT.TRANSIT-TIPS | Schema `transitTip` + UI suburb timeline; NN logistics; SPB triangle/Petrograd/Bertgold/bar; Perm/KGD tips | Высокий | ✅ `c5d644d8` Deploy MSK web `31305337295` BUILD_ID=`gOTUGQNTVuIsCS_1DvAT_` |
 | CONT.KGD-LOGISTICS | KGD suburbs/presets: коса углубление+Фрингилла возврат, Зел/Свет/Балт/Янт порядок+timingNote | Высокий | ✅ `7644445c` Deploy MSK web `31304947725` |
 | CONT.PERM-LOGISTICS | Perm suburbs/presets: Хохловка CCW, Кунгур центр+пещера, Белая гора split, Усьва/Губаха 2 дня | Высокий | ✅ `7644445c` Deploy MSK web `31304947725` BUILD_ID=`mi3IHPRLphsEf9IgHXj9a` |
 | UX.SCENARIOS-WRAP | Scenarios chips = suburbs wrap (flex-wrap full width); SPB drop suburb dupes from presets | Критический | 🔄 ship+Deploy MSK web |
