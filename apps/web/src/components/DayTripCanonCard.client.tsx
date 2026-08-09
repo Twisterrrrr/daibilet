@@ -82,6 +82,14 @@ function SightLabel({
 const GRID =
   'grid grid-cols-[2rem_minmax(0,1fr)] gap-x-2.5 sm:grid-cols-[2.25rem_minmax(0,1fr)] sm:gap-x-3';
 const GUTTER = 'flex justify-center';
+/**
+ * Desktop: text stays on title vertical; panel bg needs breathing room.
+ * Logistics: extend gray bg left (-ml) + matching pl so copy does not move.
+ * Gastro: same pl so yellow inset matches logistics after the extend.
+ * Mobile: keep px-2.5 (wider content).
+ */
+const PANEL_INSET_SM = 'sm:pl-4';
+const LOGISTICS_BG_EXTEND_SM = 'sm:-ml-4';
 
 /** Compact between-stop tip: «↓ 5-8 мин пешком» (hyphen only). */
 function formatCanonTransitTip(raw: string): string {
@@ -203,8 +211,10 @@ export function DayTripCanonCard({
             {hasLogistics ? (
               <section data-day-trip-logistics>
                 <h4 className={`text-sm font-semibold ${inkClass}`}>Логистика</h4>
-                {/* pl-0 desktop: panel copy on the same vertical as title. */}
-                <div className={`mt-1.5 ${panelClass} px-2.5 py-2.5 sm:mt-2 sm:py-3.5 sm:pr-4 sm:pl-0`}>
+                {/* Desktop: bg bleeds left; copy stays on title vertical. */}
+                <div
+                  className={`mt-1.5 ${panelClass} px-2.5 py-2.5 sm:mt-2 sm:py-3.5 sm:pr-4 ${PANEL_INSET_SM} ${LOGISTICS_BG_EXTEND_SM}`}
+                >
                   {logisticsExit ? (
                     <p className={`text-sm leading-snug ${softClass}`} data-day-trip-exit>
                       <span className={`font-semibold ${inkClass}`}>Где выходить</span>
@@ -230,7 +240,9 @@ export function DayTripCanonCard({
             {hasGastro && gastro ? (
               <section data-day-trip-gastro>
                 <h4 className={`text-sm font-semibold ${inkClass}`}>Гастро-остановка</h4>
-                <div className="mt-1.5 rounded-xl border border-amber-100 bg-amber-50/80 px-2.5 py-2.5 sm:mt-2 sm:py-3.5 sm:pr-4 sm:pl-0">
+                <div
+                  className={`mt-1.5 rounded-xl border border-amber-100 bg-amber-50/80 px-2.5 py-2.5 sm:mt-2 sm:py-3.5 sm:pr-4 ${PANEL_INSET_SM}`}
+                >
                   <p className={`text-sm font-semibold leading-snug ${inkClass}`}>{gastro.name}</p>
                   {gastro.blurb ? (
                     <p className={`mt-1 text-sm leading-relaxed ${softClass}`}>{gastro.blurb}</p>
