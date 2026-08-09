@@ -198,6 +198,7 @@ export function VenuePageView({
                 nearbyEvents={contentReady ? matchedPayload.nearbyEvents || [] : []}
                 pagePayload={matchedPayload}
               >
+                {admissionProducts.length > 0 ? <VenueAdmissionBlock products={admissionProducts} /> : null}
                 {baseSessions.length > 0 ? (
                   <VenueProgramBlock
                     title="Расписание и билеты"
@@ -232,9 +233,7 @@ export function VenuePageView({
                   />
                 ) : null}
               </InstitutionVenueLayout>
-            ) : null}
-
-            {!isInstitutionPage && !isLocationPage && admissionProducts.length > 0 ? (
+            ) : admissionProducts.length > 0 ? (
               <div className="container-page py-6">
                 <VenueAdmissionBlock products={admissionProducts} />
               </div>
