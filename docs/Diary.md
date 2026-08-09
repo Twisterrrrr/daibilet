@@ -9,7 +9,8 @@
 
 ### Решения
 - GenerateImage ×217 → overwrite stubs в `apps/public/public/images/venues/…`; `LOCATION_PACK_IMAGES` 171→388.
-- Commit+push + Deploy MSK web (sync-public-assets в swap). Prod DB `heroImageUrl` не трогали: карточки берут editorial overlay.
+- Commit `fac18e4c` + Deploy MSK web **31309867002** (sync-public-assets в swap). Prod DB `heroImageUrl` не трогали: карточки берут editorial overlay.
+- Post-deploy audit: focusGaps **0/615**; sample JPG live 200 ~2.8–4.1MB (не stub ~15KB).
 
 ### Проблемы
 - ISR `revalidate=300` у `/locations` — после deploy возможен короткий stale window.

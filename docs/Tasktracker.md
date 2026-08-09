@@ -353,7 +353,7 @@ Alias `museum-1` = первый open-date контракт (не «музеи fo
 |---|--------|-----------|--------|
 | FIX.GASTRO-COVERS-MYDAY | Covers для всех PUBLISHED GASTRO + editorial images в My Day (resolveVenueHeroImage) | Высокий | ✅ AI 15 + sharp 26 + reuse 10; map + DayRoute wiring; deploy batch |
 | CONT.LOC-PREVIEWS-MASS | Превью основной массы `/locations` (monument/outdoor/park/attraction) без unique cover | Критический | ✅ 171/171 GenerateImage + LOCATION_PACK_IMAGES; deploy batch |
-| CONT.LOC-PREVIEWS-TAIL | Хвост `/locations`: 217 outdoor/attraction/monument без editorial (после mass-171; live всё ещё градиенты) | Критический | 🔄 GenerateImage+wire 217; commit/push/Deploy MSK |
+| CONT.LOC-PREVIEWS-TAIL | Хвост `/locations`: 217 outdoor/attraction/monument без editorial (после mass-171; live всё ещё градиенты) | Критический | ✅ `fac18e4c`; Deploy MSK **31309867002**; LOCATION_PACK 171→388 |
 | CONT.GASTRO-PREVIEWS-AI | Gastro stub sharp (~27) → уникальные GenerateImage (family=location) | Высокий | ✅ 27/27 overwrite GASTRO_PACK paths; deploy batch |
 | FIX.LOC-EDITORIAL-IMG | `/locations` city refetch без `toVenueCatalogCard` → editorial covers не на карточках; soft-nav PDP тоже | Высокий | ✅ overlay на client fetch; map scope = NN + SPB top-12 (не mass Top-100) |
 | MS.KGD-CITY-CATALOG | KGD city mustSee (не только owner 11): seed 24 catalog places + cityInfo slugs; биржа hub-only | Критический | ✅ `22f6f4f`+`7b18498`; MSK insert 22/update 2 + repair sobor/ostrov/monuments; live location ~23→25+, institution ~24 |
