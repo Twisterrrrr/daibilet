@@ -1,3 +1,21 @@
+## 2026-08-09 - Top cities suburbs: density expand (NN / Perm / KGD)
+
+### Наблюдения
+- Owner: «пробегись по НН, Перми, Калининграду по пригородам» - лимит ~5 был шаблоном, как у СПб.
+- KGD/Perm: все suburbs ровно 4–5; NN: `significantSuburbs` отсутствовали (только in-city presets).
+
+### Решения
+- Правило density (7–9 / 4–6) явно распространено на top cities suburbs в Project/qa.
+- KGD: коса/Зеленоградск/Светлогорск 5→7, Янтарный 4→5, Балтийск 5; timingNote на coast presets.
+- Perm: Хохловка/Кунгур/Губаха 5→7, Белая гора 5; presets `perm-hohlovka-day` / `perm-kungur-day` + timingNote.
+- NN: seed 4 suburbs (Городец 7 / Семёнов 5 / Дивеево 7 / Макарьев 5) + day presets с timingNote.
+- Coords: `suburb-nested-coords.json`; web+public twin sync. UI layout redesign не трогали.
+
+### Проблемы
+- Ship/deploy: см. Tasktracker CONT.TOP-SUBURB-DENSITY.
+
+---
+
 ## 2026-08-09 - DayTripCanonCard: сценарии = пригороды
 
 ### Наблюдения
