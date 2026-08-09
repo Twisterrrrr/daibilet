@@ -201,11 +201,11 @@ html[data-nav-pending='1'] {
   }
 
   .catalog-chip-idle {
-    @apply bg-slate-100 text-graphite-muted;
+    @apply border-0 bg-[#F5F5F7] text-[#6E6E73] hover:bg-[#EBEBED] hover:text-graphite;
   }
 
   .catalog-chip-on {
-    @apply bg-graphite text-white hover:bg-slate-800 hover:text-white;
+    @apply border-0 bg-primary text-white hover:bg-primary/90 hover:text-white;
   }
 
   .catalog-quick-chip {
@@ -213,11 +213,11 @@ html[data-nav-pending='1'] {
   }
 
   .catalog-quick-chip-idle {
-    @apply bg-white text-graphite-muted ring-1 ring-slate-200/70 hover:bg-surface-muted hover:text-graphite;
+    @apply border-0 bg-[#F5F5F7] text-[#6E6E73] hover:bg-[#EBEBED] hover:text-graphite;
   }
 
   .catalog-quick-chip-on {
-    @apply bg-primary-600 text-white ring-1 ring-primary-600 hover:bg-primary-700;
+    @apply border-0 bg-primary text-white hover:bg-primary/90;
   }
 
   .catalog-date-chip {
@@ -225,11 +225,11 @@ html[data-nav-pending='1'] {
   }
 
   .catalog-date-chip-idle {
-    @apply bg-white text-graphite-muted ring-1 ring-slate-200/70 hover:bg-surface-muted hover:text-graphite;
+    @apply border-0 bg-[#F5F5F7] text-[#6E6E73] hover:bg-[#EBEBED] hover:text-graphite;
   }
 
   .catalog-date-chip-on {
-    @apply bg-graphite text-white ring-1 ring-graphite hover:bg-slate-800;
+    @apply border-0 bg-primary text-white hover:bg-primary/90;
   }
 
   .horizontal-snap-row {

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Baby, Gift, MoreHorizontal, Search, SlidersHorizontal, X } from 'lucide-react';
+import { Baby, Gift, Moon, MoreHorizontal, Search, SlidersHorizontal, X } from 'lucide-react';
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -238,10 +238,12 @@ export function CatalogToolbar({
 
   return (
     <div className="space-y-2.5 sm:space-y-3">
-      <form
-        onSubmit={onSubmit}
-        className="flex flex-col gap-1.5 rounded-2xl border border-slate-100 bg-white p-1.5 sm:flex-row sm:items-center sm:gap-1 sm:p-1"
-      >
+      {/* Mobile: only search sticks - date/categories stay in document flow so they don't vanish under the fold. */}
+      <div className="catalog-toolbar sticky top-[var(--site-header-height)] z-30 -mx-4 border-b border-slate-200/60 bg-white/95 px-4 py-2 backdrop-blur-md supports-[backdrop-filter]:bg-white/90 sm:-mx-6 sm:px-6 md:static md:z-auto md:mx-0 md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none">
+        <form
+          onSubmit={onSubmit}
+          className="flex flex-col gap-1.5 rounded-2xl border border-slate-100 bg-white p-1.5 sm:flex-row sm:items-center sm:gap-1 sm:p-1"
+        >
         <div ref={searchWrapRef} className="relative min-w-0 flex-1">
           <label className="relative block min-w-0">
             <span className="sr-only">Поиск по событиям</span>
@@ -355,7 +357,8 @@ export function CatalogToolbar({
             Найти
           </button>
         </div>
-      </form>
+        </form>
+      </div>
 
       {advancedPanel}
 
@@ -399,8 +402,8 @@ export function CatalogToolbar({
             onClick={() => setFiltersOpen(true)}
             className={`inline-btn flex h-11 w-full items-center justify-center gap-2 rounded-full text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 disabled:opacity-60 ${
               filtersOpen || advancedCount > 0
-                ? 'bg-primary-600 text-white hover:bg-primary-700'
-                : 'bg-graphite text-white hover:bg-slate-800'
+                ? 'bg-primary text-white hover:bg-primary/90'
+                : 'bg-[#1A1A1A] text-white hover:bg-slate-800'
             }`}
           >
             <SlidersHorizontal aria-hidden className="h-4 w-4" strokeWidth={1.75} />
@@ -471,6 +474,7 @@ function QuickFilterToggles({
 }) {
   const freeOn = filters.minPrice === 0 && filters.maxPrice === 0;
   const kidsOn = filters.ageMax === KIDS_AGE_MAX;
+  const eveningOn = filters.date === 'evening' && !filters.from && !filters.to;
 
   const withQ = (next: CatalogFilterValues): CatalogFilterValues => ({
     ...next,
@@ -484,6 +488,27 @@ function QuickFilterToggles({
       aria-label="Быстрые фильтры"
       className="horizontal-snap-row flex flex-nowrap gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
     >
+      <button
+        type="button"
+        disabled={disabled}
+        aria-pressed={eveningOn}
+        onClick={() =>
+          onNavigate(
+            withQ({
+              ...filters,
+              date: eveningOn ? undefined : 'evening',
+              from: undefined,
+              to: undefined,
+            }),
+          )
+        }
+        className={`catalog-quick-chip snap-start disabled:opacity-60 ${
+          eveningOn ? 'catalog-quick-chip-on' : 'catalog-quick-chip-idle'
+        }`}
+      >
+        <Moon aria-hidden className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
+        <span className="whitespace-nowrap">Сегодня вечером</span>
+      </button>
       <button
         type="button"
         disabled={disabled}

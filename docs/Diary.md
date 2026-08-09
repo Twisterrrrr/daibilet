@@ -1,3 +1,19 @@
+## 2026-08-09 - `/events` mobile chips + filter sheet air
+
+### Наблюдения
+- Категории («Все», «Экскурсии»…) пропадали на мобилке: весь toolbar (search+rail+quick+categories) был sticky и выше viewport.
+- Advanced filters sheet: двойные date inputs, рамки у чипов, чёрный active, «до 0+», «1-3К».
+
+### Решения
+- Sticky только search-ряд; date rail / quick / categories в document flow.
+- Sheet: одно поле «Любая дата» → раскрытие range; soft chips `#F5F5F7` без ring; active `primary`; цена RU-лейблы; возраст `0+` без «до»; select с шевроном.
+- «Сегодня вечером» вынесено в quick-ленту каталога; блок «Быстрые» убран из sheet.
+
+### Проблемы
+- Deploy MSK web - по «выкатывай».
+
+---
+
 ## 2026-08-09 - Hub scenarios: two-col + hanging nums
 
 ### Наблюдения

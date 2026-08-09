@@ -243,14 +243,13 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
 
   return (
     <>
-      <div className="catalog-toolbar sticky top-[var(--site-header-height)] z-30 -mx-4 border-b border-slate-200/60 px-4 py-2 sm:-mx-6 sm:px-6 sm:py-2.5">
-        <CatalogToolbar
-          facets={facets}
-          values={filterValues}
-          disabled={(loading && !catalog) || cityBootstrapPending}
-          cityReady={cityReady || urlHasCity}
-        />
-      </div>
+      {/* Sticky owned by CatalogToolbar (search-only on mobile) so category chips stay in flow. */}
+      <CatalogToolbar
+        facets={facets}
+        values={filterValues}
+        disabled={(loading && !catalog) || cityBootstrapPending}
+        cityReady={cityReady || urlHasCity}
+      />
 
       <CatalogActiveFilters values={filterValues} />
 
