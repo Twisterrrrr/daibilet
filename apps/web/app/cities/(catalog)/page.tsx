@@ -9,6 +9,7 @@ import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
 import { withSoftTimeout } from '@/lib/soft-timeout';
 import { cityHasDaytimePreview, cityHasTopPreview, cityImageSlug } from '@/lib/city-images';
+import { resolveCityRegion } from '@/lib/cityRegionHub';
 import { getCachedDestinations } from '@/server/cached-public-surfaces';
 
 export const metadata: Metadata = {
@@ -74,7 +75,12 @@ export default async function CitiesIndexPage() {
           <ul className="mt-6 grid w-full grid-cols-2 content-start gap-2.5 sm:grid-cols-3 lg:grid-cols-4">
             {topCities.map((city) => (
               <li key={city.slug || city.name} className="min-w-0">
-                <CityCard city={city} imageVariant="top" compact />
+                <CityCard
+                  city={city}
+                  imageVariant="top"
+                  compact
+                  region={resolveCityRegion(city, destinations)}
+                />
               </li>
             ))}
           </ul>
@@ -90,7 +96,12 @@ export default async function CitiesIndexPage() {
               {secondOctet.map((city) => (
                 <li key={city.slug || city.name} className="min-w-0">
                   {/* Same chrome as top-8: dark scrim + white title/stats on photo. */}
-                  <CityCard city={city} compact imageVariant="top" />
+                  <CityCard
+                    city={city}
+                    compact
+                    imageVariant="top"
+                    region={resolveCityRegion(city, destinations)}
+                  />
                 </li>
               ))}
             </ul>
@@ -101,7 +112,12 @@ export default async function CitiesIndexPage() {
             <ul className="grid w-full grid-cols-2 content-start gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
               {thirdOctet.map((city) => (
                 <li key={city.slug || city.name} className="min-w-0">
-                  <CityCard city={city} compact imageVariant="top" />
+                  <CityCard
+                    city={city}
+                    compact
+                    imageVariant="top"
+                    region={resolveCityRegion(city, destinations)}
+                  />
                 </li>
               ))}
             </ul>
