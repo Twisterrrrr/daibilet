@@ -395,6 +395,9 @@ export function resolveSlugBlogMeta(slug: string): {
   } else if (lower.startsWith('kazan-')) {
     citySlug = 'kazan';
     city = 'Казань';
+  } else if (lower.startsWith('perm-') || lower.includes('-perm')) {
+    citySlug = 'perm';
+    city = 'Пермь';
   } else if (lower.startsWith('ekb-') || lower.includes('ekaterinburg') || lower.includes('ural')) {
     citySlug = 'ekaterinburg';
     city = 'Екатеринбург';
