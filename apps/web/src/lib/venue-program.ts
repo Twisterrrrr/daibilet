@@ -6,7 +6,12 @@ import {
 } from '@/lib/event-purchase';
 import type { PublicSessionDto } from '@daibilet/contracts/public';
 
-export type VenueDateFilter = 'smart' | 'today' | 'tomorrow' | 'all';
+/** `'all'` or local calendar day `YYYY-MM-DD`. */
+export type VenueDateFilter = 'all' | (string & {});
+
+export type VenueDateRailChip =
+  | { kind: 'all'; label: string; shortLabel: string }
+  | { kind: 'day'; iso: string; weekday: string; dayNum: string; label: string };
 
 export type VenueEventGroup = {
   key: string;
@@ -22,6 +27,8 @@ export type VenueEventGroup = {
   hasSlotsOnSelectedDate: boolean;
 };
 
+const WEEKDAY_SHORT = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'] as const;
+
 export function buildVenueDateOptions(sessions: PublicSessionDto[]) {
   const today = startOfDay(new Date());
   const tomorrow = addDays(today, 1);
@@ -33,12 +40,13 @@ export function buildVenueDateOptions(sessions: PublicSessionDto[]) {
     .filter((key): key is string => Boolean(key))
     .sort();
   const uniqueKeys = Array.from(new Set(keys));
-  const futureKey = uniqueKeys.find((key) => key >= todayKey);
+  const availableDates = uniqueKeys.filter((key) => key >= todayKey);
+  const futureKey = availableDates[0] || uniqueKeys[0] || null;
   const smartDate = uniqueKeys.includes(todayKey)
     ? todayKey
     : uniqueKeys.includes(tomorrowKey)
       ? tomorrowKey
-      : futureKey || uniqueKeys[0] || null;
+      : futureKey;
 
   return {
     todayKey,
@@ -46,7 +54,37 @@ export function buildVenueDateOptions(sessions: PublicSessionDto[]) {
     smartDate,
     hasToday: uniqueKeys.includes(todayKey),
     hasTomorrow: uniqueKeys.includes(tomorrowKey),
+    /** Upcoming (incl. today) days that actually have purchasable departures. */
+    availableDates,
+    allAvailableDates: uniqueKeys,
   };
+}
+
+/** Compact rail chips: optional «Любая» + days with tickets (catalog-date-chip shape). */
+export function buildVenueDateRailChips(
+  availableDates: string[],
+  options?: { includeAll?: boolean; maxDays?: number },
+): VenueDateRailChip[] {
+  const includeAll = options?.includeAll !== false;
+  const maxDays = options?.maxDays ?? 21;
+  const chips: VenueDateRailChip[] = [];
+  if (includeAll) {
+    chips.push({ kind: 'all', label: 'Любая дата', shortLabel: 'Любая' });
+  }
+  for (const iso of availableDates.slice(0, maxDays)) {
+    const date = new Date(`${iso}T12:00:00`);
+    if (!Number.isFinite(date.getTime())) continue;
+    const weekday = WEEKDAY_SHORT[date.getDay()] || '';
+    const dayNum = String(date.getDate());
+    chips.push({
+      kind: 'day',
+      iso,
+      weekday,
+      dayNum,
+      label: `${weekday} ${dayNum}`,
+    });
+  }
+  return chips;
 }
 
 export function buildVenueProgramGroups(
@@ -59,10 +97,7 @@ export function buildVenueProgramGroups(
     return allGroups.map((group) => applyDateFilterToGroup(group, null));
   }
 
-  const options = buildVenueDateOptions(sessions);
-  const target =
-    dateFilter === 'today' ? options.todayKey : dateFilter === 'tomorrow' ? options.tomorrowKey : smartDate;
-
+  const target = /^\d{4}-\d{2}-\d{2}$/.test(dateFilter) ? dateFilter : smartDate;
   return allGroups.map((group) => applyDateFilterToGroup(group, target));
 }
 
