@@ -282,6 +282,12 @@ Alias `museum-1` = первый open-date контракт (не «музеи fo
 |---|--------|-----------|--------|
 | FIX.VENUES-CITY-PENDING | `/venues` Пермь: infinite «Обновляем список…» (Cyrillic `?city=` + abort/isPending) | Критический | ✅ `2c23d1d`+`84076fd`; MSK BUILD_ID=`e-XzQltin9RuCjX0zo1VU`; smoke Найдено:23 |
 
+## Perm unusual museums blog pack (2026-08-09)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| CONT.PERM-NEOBYCH-5 | Статья `perm-neobychnye-muzei`: seed/mustSee все 5 музеев + blog `/venues` links + heroes | Высокий | 🔄 cityInfo+images+blog; MSK seed pending |
+
 ## Perm must-see pack + my-day (2026-08-06)
 
 | # | Задача | Приоритет | Статус |

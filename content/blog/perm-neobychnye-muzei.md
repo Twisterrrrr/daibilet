@@ -32,7 +32,7 @@ status: PUBLISHED
 
 [image side=left src="/images/blog/perm-neobychnye-muzei-retro.jpg" alt="Экспозиция советских автомобилей в «Ретро-гараже»"]
 
-**Адрес:** Пермь, ул. Дружбы, 34А ([официальный сайт](https://avtoretro59.ru/))
+**Адрес:** Пермь, ул. Дружбы, 34А ([«Ретро-гараж»](/venues/perm-muzey-retro-garazh), [сайт](https://avtoretro59.ru/))
 
 ## 2. Музей пермской артиллерии в Мотовилихе
 
@@ -52,7 +52,7 @@ status: PUBLISHED
 
 [image side=left src="/images/blog/perm-neobychnye-muzei-dolls.jpg" alt="Фарфоровые и авторские куклы в пермском музее кукол"]
 
-**Адрес:** Пермь, ул. Пермская, 82А ([Пермский музей кукол](https://permkukla.ru/))
+**Адрес:** Пермь, ул. Пермская, 82А ([Пермский музей кукол](/venues/perm-muzey-kukol), [сайт](https://permkukla.ru/))
 
 ## 4. Музей истории связи
 
@@ -62,7 +62,7 @@ status: PUBLISHED
 
 [image side=right src="/images/blog/perm-neobychnye-muzei-svyaz.jpg" alt="Дисковые телефоны и коммутатор в музее истории связи"]
 
-**Адрес:** Пермь, ул. Крупской, 2
+**Адрес:** Пермь, ул. Крупской, 2 ([Музей истории связи](/venues/perm-muzey-istorii-svyazi))
 
 ## 5. Музей истории Пермского университета
 
@@ -70,7 +70,7 @@ status: PUBLISHED
 
 [image side=left src="/images/blog/perm-neobychnye-muzei-university.jpg" alt="Экспозиция Музея истории Пермского университета"]
 
-**Адрес:** Пермь, ул. Букирева, 15 (корпус 2 ПГНИУ)
+**Адрес:** Пермь, ул. Букирева, 15, корпус 2 ПГНИУ ([Музей истории Пермского университета](/venues/perm-muzey-istorii-pgniu))
 
 ## Как всё это уместить в один визит
 

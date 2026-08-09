@@ -1,3 +1,21 @@
+## 2026-08-09 - Perm: editorial seed pack «5 необычных музеев» (all five)
+
+### Наблюдения
+- Owner: seed на все пять точек из `perm-neobychnye-muzei`, не 1-2.
+- Мотовилиха уже PUBLISHED как `perm-muzey-motovilihinskih-zavodov` - без дубля.
+
+### Решения
+- cityInfo (web+public): +4 mustSee museum + upsert desc Мотовилихи; slugs `perm-muzey-retro-garazh`, `perm-muzey-motovilihinskih-zavodov`, `perm-muzey-kukol`, `perm-muzey-istorii-svyazi`, `perm-muzey-istorii-pgniu`.
+- Heroes: blog inline → `apps/*/public/images/venues/perm/muzey-*.jpg` + `PERM_IMAGES`.
+- Blog: адресные ссылки → `/venues/{slug}` (внешние сайты сохранены где были).
+- Prod MSK: `seed-perm-must-see-pack.js --apply` (insert-missing).
+
+### Проблемы
+- Hub/covers на live - после web deploy batch (cityInfo + city-place-images).
+- Если fuzzy «Музей»→Sortavala ещё не на API - ghost events до restart/deploy фикса.
+
+---
+
 ## 2026-08-09 - venue afisha: bare «Музей» no longer hijacks Perm cards
 
 ### Наблюдения

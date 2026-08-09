@@ -331,8 +331,12 @@ const PERM_IMAGES: Record<string, string> = {
   'perm-permm': '/images/venues/perm/permm.jpg',
   'perm-teatr-opery-i-baleta': '/images/venues/perm/teatr-opery-i-baleta.jpg',
   'teatr-teatr': '/images/venues/perm/teatr-teatr.jpg',
+  'perm-muzey-retro-garazh': '/images/venues/perm/muzey-retro-garazh.jpg',
   'perm-muzey-motovilihinskih-zavodov':
     '/images/venues/perm/muzey-motovilihinskih-zavodov.jpg',
+  'perm-muzey-kukol': '/images/venues/perm/muzey-kukol.jpg',
+  'perm-muzey-istorii-svyazi': '/images/venues/perm/muzey-istorii-svyazi.jpg',
+  'perm-muzey-istorii-pgniu': '/images/venues/perm/muzey-istorii-pgniu.jpg',
   'perm-muzey-diorama-vyshka': '/images/venues/perm/muzey-diorama-vyshka.jpg',
   'perm-cgk': '/images/venues/perm/cgk.jpg',
   'perm-maris-art': '/images/venues/perm/maris-art.jpg',
