@@ -3,6 +3,8 @@
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
 | FIX.VENUE-PAGE-HANG | `/locations`/`/venues` `?page=` soft-nav hang → client slice | Критический | 🔄 code; deploy MSK web |
+| UX.HUB-SCENARIOS-CHIPS | Hub «Готовые сценарии»: chips+panel как my-day на всех breakpoints (не card list) | Высокий | 🔄 code; deploy MSK web |
+| UX.HUB-AFFICHE-RAIL | Hub «Ближайшие события»: mobile swipe carousel + desktop prev/next (не вертикальная простыня) | Высокий | 🔄 code; deploy MSK web |
 | INC.LOC500.SOFTCONN | soft-unavailable `connection()` → DYNAMIC_SERVER_USAGE 500 на location PDP | Критический | ✅ `5221afcd` Deploy MSK web BUILD_ID=`XA_SZgY9mVm0tjISGf6pI` |
 | FIX.TC-BAD-TOKEN | my-day «Купить билет» → TC HTTPForbidden bad token (`r:` в URL) | Критический | ✅ `89abc556` API live; web Deploy MSK |
 | INC.VENUE-SOFT-ALL | API hang → soft-unavailable poison на всех venue PDP | Критический | ✅ ops restore; code soft≠ISR + catalog child mode |

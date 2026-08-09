@@ -1,3 +1,20 @@
+## 2026-08-09 - Hub: сценарии как my-day + афиша rail
+
+### Наблюдения
+- Owner: «готовые сценарии в хабе города как в my-day» — **mobile и desktop**.
+- Hub `CityDayPresetBlock` без `embedded` рисовал вертикальный card list; my-day — chips + один detail panel.
+- «Ближайшие события» — вертикальная сетка до 48 карточек («полотенце»).
+
+### Решения
+- `CityDayPresetBlock`: named presets всегда chips+panel (hub и my-day); card-list path убран; skeleton тоже chips.
+- Hub афиша (`CityEventsGrid`): `ScrollRail` — mobile swipe, md+ prev/next; `showcaseRail` / poster cards в горизонтальном ряду.
+- Day routes / preset availability / boat wizard / purchase modal не трогали.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-09 - Owner: «Купить билет» = purchase modal, не wizard modal
 
 ### Наблюдения
