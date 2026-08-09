@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import type { MouseEvent, ReactNode } from 'react';
 
 import { pluralEvents } from '@/lib/format';
 
@@ -32,6 +35,46 @@ export function buildPaginationItems(
   return items;
 }
 
+function PaginationNavLink({
+  href,
+  className,
+  rel,
+  'aria-label': ariaLabel,
+  children,
+  targetPage,
+  onPageChange,
+}: {
+  href: string;
+  className: string;
+  rel?: string;
+  'aria-label'?: string;
+  children: ReactNode;
+  targetPage: number;
+  onPageChange?: (page: number) => void;
+}) {
+  if (!onPageChange) {
+    return (
+      <Link href={href} rel={rel} scroll className={className} aria-label={ariaLabel}>
+        {children}
+      </Link>
+    );
+  }
+
+  const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (event.defaultPrevented) return;
+    if (event.button !== 0) return;
+    if (event.metaKey || event.altKey || event.ctrlKey || event.shiftKey) return;
+    event.preventDefault();
+    onPageChange(targetPage);
+  };
+
+  return (
+    <a href={href} rel={rel} className={className} aria-label={ariaLabel} onClick={handleClick}>
+      {children}
+    </a>
+  );
+}
+
 export function CatalogPaginationLinks({
   page,
   total,
@@ -39,6 +82,7 @@ export function CatalogPaginationLinks({
   searchParams,
   basePath = '/events',
   summarySuffix,
+  onPageChange,
 }: {
   page: number;
   total: number;
@@ -48,6 +92,11 @@ export function CatalogPaginationLinks({
   basePath?: string;
   /** Extra label after «Показано X из Y», e.g. pluralEvents(total). */
   summarySuffix?: string;
+  /**
+   * Client page switch (venues/locations): update list without App Router soft-nav.
+   * Keeps shareable `?page=` via history; omit for default `<Link>` (events).
+   */
+  onPageChange?: (page: number) => void;
 }) {
   const totalPages = Math.max(1, Math.ceil(total / limit));
   if (totalPages <= 1) return null;
@@ -91,29 +140,43 @@ export function CatalogPaginationLinks({
       {/* Mobile: next-page CTA (replaces list; not infinite append) */}
       <div className="flex flex-col items-center gap-3 sm:hidden">
         {nextPage ? (
-          <Link
+          <PaginationNavLink
             href={buildHref(nextPage)}
             rel="next"
-            scroll
+            targetPage={nextPage}
+            onPageChange={onPageChange}
             className="inline-flex min-h-11 w-full max-w-sm items-center justify-center rounded-full bg-primary-600 px-8 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700"
           >
             Страница {nextPage}
             {remaining > 0 ? ` · ещё ${Math.min(limit, remaining)}` : ''}
-          </Link>
+          </PaginationNavLink>
         ) : null}
         {prevPage ? (
-          <Link href={buildHref(prevPage)} rel="prev" scroll className="text-sm font-medium text-slate-500 hover:text-slate-800">
+          <PaginationNavLink
+            href={buildHref(prevPage)}
+            rel="prev"
+            targetPage={prevPage}
+            onPageChange={onPageChange}
+            className="text-sm font-medium text-slate-500 hover:text-slate-800"
+          >
             ← Назад
-          </Link>
+          </PaginationNavLink>
         ) : null}
       </div>
 
       {/* Desktop: classic page strip */}
       <div className="hidden flex-wrap items-center justify-between gap-2 sm:flex">
         {prevPage ? (
-          <Link href={buildHref(prevPage)} rel="prev" scroll className={navBtn} aria-label="Предыдущая страница">
+          <PaginationNavLink
+            href={buildHref(prevPage)}
+            rel="prev"
+            targetPage={prevPage}
+            onPageChange={onPageChange}
+            className={navBtn}
+            aria-label="Предыдущая страница"
+          >
             ← Назад
-          </Link>
+          </PaginationNavLink>
         ) : (
           <span className={navBtn} aria-disabled="true">
             ← Назад
@@ -137,9 +200,15 @@ export function CatalogPaginationLinks({
                     {item}
                   </span>
                 ) : (
-                  <Link href={buildHref(item)} scroll className={pageBtnIdle} aria-label={`Страница ${item}`}>
+                  <PaginationNavLink
+                    href={buildHref(item)}
+                    targetPage={item}
+                    onPageChange={onPageChange}
+                    className={pageBtnIdle}
+                    aria-label={`Страница ${item}`}
+                  >
                     {item}
-                  </Link>
+                  </PaginationNavLink>
                 )}
               </li>
             ),
@@ -147,15 +216,16 @@ export function CatalogPaginationLinks({
         </ol>
 
         {nextPage ? (
-          <Link
+          <PaginationNavLink
             href={buildHref(nextPage)}
             rel="next"
-            scroll
+            targetPage={nextPage}
+            onPageChange={onPageChange}
             className={`${navBtn} border-slate-900 bg-slate-900 text-white hover:bg-slate-800`}
             aria-label="Следующая страница"
           >
             Дальше →
-          </Link>
+          </PaginationNavLink>
         ) : (
           <span className={navBtn} aria-disabled="true">
             Дальше →

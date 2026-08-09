@@ -1,3 +1,37 @@
+## 2026-08-09 - Owner: «Купить билет» = purchase modal, не wizard modal
+
+### Наблюдения
+- Owner обвёл «Купить билет» и сказал: должно открываться в модалке, не на весь экран.
+- Имелось в виду: **checkout TicketsCloud / виджет покупки** в overlay.
+- Коммит `81d740a6` ошибочно сделал portal-modal из шагов boat wizard (причал/маршрут/время).
+
+### Решения
+- Откат wizard UI к inline panel (как до `81d740a6`).
+- Новый `DayRoutePurchaseCta`: TC → native `tcwidget.js` modal; иначе `CheckoutModal` iframe.
+- Stop CTA / sticky «Купить билеты» / Hot Pick: vendor checkout URL → modal, не `window.open`.
+
+### Проблемы
+- Извинение owner: неверно поняли задачу; wizard-as-modal выкатывали зря.
+
+---
+
+## 2026-08-09 - /locations|/venues `?page=` soft-nav hang
+
+### Наблюдения
+- Owner: пагинация на `/locations` и `/venues` «висит» при смене страницы.
+- HTML TTFB и API `?page=N&counts=0` тёплые (~0.1–0.5s); зависание UX.
+- `<Link ?page=>` → App Router soft-nav → `(catalog)/loading.tsx` (SiteChromeSkeleton wipe) + повторный SSR `VenueListPage` (page1 shell) + после remount клиент ждал city-shell **до** slice page N.
+
+### Решения
+- `CatalogPaginationLinks`: optional `onPageChange` (history.pushState, без RSC soft-nav).
+- Locations/Venues: local `listPage` + popstate; page>1/typed — сначала API slice (`counts=0`), shell в фоне.
+- Stale cards остаются на экране на время fetch.
+
+### Проблемы
+- Deep-link `?page=N` по-прежнему SSR page1 + client hydrate slice (приемлемо).
+
+---
+
 ## 2026-08-09 - INC.504.26: full-JSON consumers + API hang guard
 
 ### Наблюдения

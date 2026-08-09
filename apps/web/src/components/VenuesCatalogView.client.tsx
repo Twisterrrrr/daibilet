@@ -150,8 +150,22 @@ export function VenuesCatalogView({
   const rawType = searchParams.get('type')?.trim() || '';
   const typeFilter = rawType ? normalizeVenueKind(rawType) : 'all';
   const urlPage = parseVenueCatalogPageParam(searchParams.get('page'));
+  // Local page drives the list; soft-nav <Link ?page=> remounts via loading.tsx and feels hung.
+  const [listPage, setListPage] = useState(urlPage);
   const cityReady = selectedCity?.cityReady ?? true;
   const cityPending = !rawUrlCity && Boolean(selectedCity) && !cityReady;
+
+  useEffect(() => {
+    setListPage(urlPage);
+  }, [urlPage]);
+
+  useEffect(() => {
+    const onPopState = () => {
+      setListPage(parseVenueCatalogPageParam(new URLSearchParams(window.location.search).get('page')));
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
 
   const cityOptions = useMemo(() => cityOptionsFromStats(stats.cities || {}), [stats.cities]);
 
@@ -189,11 +203,20 @@ export function VenuesCatalogView({
     });
   };
 
-  const resetPageInUrl = () => {
-    if (!searchParams.get('page')) return;
-    replaceCatalogUrl((params) => {
-      params.delete('page');
-    });
+  const writePageToUrl = (page: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (page <= 1) params.delete('page');
+    else params.set('page', String(page));
+    const qs = params.toString();
+    const href = qs ? `/venues?${qs}` : '/venues';
+    window.history.pushState(null, '', href);
+  };
+
+  const goToListPage = (page: number) => {
+    const next = Math.max(1, page);
+    setListPage(next);
+    writePageToUrl(next);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const prevFiltersRef = useRef({ q: debouncedQuery, sort: sortMode });
@@ -201,10 +224,11 @@ export function VenuesCatalogView({
     const prev = prevFiltersRef.current;
     const changed = prev.q !== debouncedQuery || prev.sort !== sortMode;
     prevFiltersRef.current = { q: debouncedQuery, sort: sortMode };
-    if (!changed || urlPage <= 1) return;
-    resetPageInUrl();
+    if (!changed || listPage <= 1) return;
+    setListPage(1);
+    writePageToUrl(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional filter-drift reset
-  }, [debouncedQuery, sortMode, urlPage]);
+  }, [debouncedQuery, sortMode, listPage]);
 
   const feedQuery = useMemo(
     () => ({
@@ -213,10 +237,10 @@ export function VenuesCatalogView({
       type: typeFilter !== 'all' ? typeFilter : undefined,
       sort: sortMode,
       q: debouncedQuery || undefined,
-      page: urlPage,
+      page: listPage,
       limit: VENUE_CATALOG_PAGE_SIZE,
     }),
-    [cityFetchKey, typeFilter, sortMode, debouncedQuery, urlPage],
+    [cityFetchKey, typeFilter, sortMode, debouncedQuery, listPage],
   );
 
   const feedQueryKey = useMemo(() => venueCatalogCacheKey(feedQuery), [feedQuery]);
@@ -232,7 +256,7 @@ export function VenuesCatalogView({
     const isDefaultFirstPage =
       isAllCitiesScope &&
       typeFilter === 'all' &&
-      urlPage === 1 &&
+      listPage === 1 &&
       !debouncedQuery &&
       sortMode === 'events' &&
       initialQueryKey &&
@@ -269,7 +293,7 @@ export function VenuesCatalogView({
     const requestId = ++catalogRequestId.current;
     const cachedBase = cityBaseRef.current?.key === scopeKey ? cityBaseRef.current.page : null;
 
-    if (urlPage === 1 && typeFilter !== 'all' && cachedBase && cachedBase.venues.length > 0) {
+    if (listPage === 1 && typeFilter !== 'all' && cachedBase && cachedBase.venues.length > 0) {
       const filtered = cachedBase.venues
         .filter((venue) => normalizeVenueKind(venue.type) === typeFilter)
         .slice(0, VENUE_CATALOG_PAGE_SIZE);
@@ -277,7 +301,7 @@ export function VenuesCatalogView({
       setTotal(Number(cachedBase.stats.types?.[typeFilter]) || filtered.length);
       setStats(cachedBase.stats);
       setCatalogLoading(false);
-    } else if (urlPage === 1 && cachedBase && typeFilter === 'all') {
+    } else if (listPage === 1 && cachedBase && typeFilter === 'all') {
       setVenues(cachedBase.venues);
       setTotal(cachedBase.total);
       setStats(cachedBase.stats);
@@ -304,6 +328,57 @@ export function VenuesCatalogView({
     const run = async () => {
       try {
         let basePage = cachedBase;
+        const needsExactSlice = typeFilter !== 'all' || listPage > 1;
+
+        // Page>1 / typed: fetch the slice first. Do not block on city shell (was sequential hang).
+        if (needsExactSlice) {
+          const slice = await fetchVenueCatalogPage(
+            { ...feedQuery, counts: false },
+            { signal: controller.signal },
+          );
+          if (requestId !== catalogRequestId.current) return;
+          setVenues(slice.venues);
+          setTotal(slice.total);
+          if (basePage) {
+            setStats({
+              ...slice.stats,
+              types: basePage.stats.types,
+              cities: basePage.stats.cities,
+              venues: basePage.stats.venues,
+              venuesWithEvents: basePage.stats.venuesWithEvents,
+              events: basePage.stats.events,
+            });
+          } else {
+            setStats(slice.stats);
+          }
+          setCatalogLoading(false);
+          enrichPage(slice);
+
+          if (!basePage) {
+            const shellQuery = {
+              ...feedQuery,
+              type: undefined,
+              page: 1,
+              counts: false as const,
+            };
+            void fetchVenueCatalogPage(shellQuery, { signal: controller.signal })
+              .then((shellPage) => {
+                if (requestId !== catalogRequestId.current) return;
+                cityBaseRef.current = { key: scopeKey, page: shellPage };
+                setStats((prev) => ({
+                  ...prev,
+                  types: shellPage.stats.types,
+                  cities: shellPage.stats.cities,
+                  venues: shellPage.stats.venues,
+                  venuesWithEvents: shellPage.stats.venuesWithEvents,
+                  events: shellPage.stats.events,
+                }));
+              })
+              .catch(() => undefined);
+          }
+          return;
+        }
+
         if (!basePage) {
           const shellQuery = {
             ...feedQuery,
@@ -315,47 +390,16 @@ export function VenuesCatalogView({
           if (requestId !== catalogRequestId.current) return;
           cityBaseRef.current = { key: scopeKey, page: shellPage };
           setStats(shellPage.stats);
-          if (typeFilter === 'all' && urlPage === 1) {
-            setVenues(shellPage.venues);
-            setTotal(shellPage.total);
-            setCatalogLoading(false);
-            enrichPage(shellPage);
-          } else if (typeFilter !== 'all' && urlPage === 1) {
-            const filtered = shellPage.venues
-              .filter((venue) => normalizeVenueKind(venue.type) === typeFilter)
-              .slice(0, VENUE_CATALOG_PAGE_SIZE);
-            setVenues(filtered);
-            setTotal(Number(shellPage.stats.types?.[typeFilter]) || filtered.length);
-            setCatalogLoading(false);
-          }
-          basePage = shellPage;
-        } else {
-          setStats(basePage.stats);
-        }
-
-        if (typeFilter === 'all' && urlPage === 1) {
-          setVenues(basePage.venues);
-          setTotal(basePage.total);
+          setVenues(shellPage.venues);
+          setTotal(shellPage.total);
+          setCatalogLoading(false);
+          enrichPage(shellPage);
           return;
         }
 
-        const listPage = await fetchVenueCatalogPage(
-          { ...feedQuery, counts: false },
-          { signal: controller.signal },
-        );
-        if (requestId !== catalogRequestId.current) return;
-        setVenues(listPage.venues);
-        setTotal(listPage.total);
-        setStats({
-          ...listPage.stats,
-          types: basePage.stats.types,
-          cities: basePage.stats.cities,
-          venues: basePage.stats.venues,
-          venuesWithEvents: basePage.stats.venuesWithEvents,
-          events: basePage.stats.events,
-        });
-        setCatalogLoading(false);
-        enrichPage(listPage);
+        setStats(basePage.stats);
+        setVenues(basePage.venues);
+        setTotal(basePage.total);
       } catch (error: unknown) {
         if (requestId !== catalogRequestId.current) return;
         if (error instanceof DOMException && error.name === 'AbortError') return;
@@ -380,7 +424,7 @@ export function VenuesCatalogView({
     typeFilter,
     debouncedQuery,
     sortMode,
-    urlPage,
+    listPage,
     initialQueryKey,
     initialPage,
   ]);
@@ -395,6 +439,7 @@ export function VenuesCatalogView({
   };
 
   const setCityFilter = (next: string) => {
+    setListPage(1);
     if (selectedCity?.setCity) {
       selectedCity.setCity(next === 'all' ? 'all' : next);
       return;
@@ -409,6 +454,7 @@ export function VenuesCatalogView({
   };
 
   const setTypeFilter = (next: string) => {
+    setListPage(1);
     replaceCatalogUrl((params) => {
       if (next === 'all') params.delete('type');
       else params.set('type', next);
@@ -446,7 +492,12 @@ export function VenuesCatalogView({
   const heroEvents = Number(stats.events) || 0;
   const showHeroAfisha =
     !listPending && !catalogLoading && (heroAfishaVenues > 0 || heroEvents > 0);
-  const paginationParams = useMemo(() => searchParamsRecord(searchParams), [searchParams]);
+  const paginationParams = useMemo(() => {
+    const params = searchParamsRecord(searchParams);
+    if (listPage > 1) params.page = String(listPage);
+    else delete params.page;
+    return params;
+  }, [searchParams, listPage]);
 
   return (
     <>
@@ -599,7 +650,7 @@ export function VenuesCatalogView({
                 {total > VENUE_CATALOG_PAGE_SIZE ? (
                   <span className="font-normal text-slate-500">
                     {' '}
-                    · стр. {urlPage} из {Math.max(1, Math.ceil(total / VENUE_CATALOG_PAGE_SIZE))}
+                    · стр. {listPage} из {Math.max(1, Math.ceil(total / VENUE_CATALOG_PAGE_SIZE))}
                   </span>
                 ) : null}
               </>
@@ -624,12 +675,13 @@ export function VenuesCatalogView({
               </div>
             )}
             <CatalogPaginationLinks
-              page={urlPage}
+              page={listPage}
               total={total}
               limit={VENUE_CATALOG_PAGE_SIZE}
               searchParams={paginationParams}
               basePath="/venues"
               summarySuffix={pluralVenues(total)}
+              onPageChange={goToListPage}
             />
           </>
         ) : (

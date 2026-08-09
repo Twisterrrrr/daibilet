@@ -1,8 +1,7 @@
 'use client';
 
-import { Anchor, ChevronLeft, Ship, Ticket, X } from 'lucide-react';
+import { Anchor, ChevronLeft, Ship, Ticket } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import { createPortal } from 'react-dom';
 
 import {
   BOAT_PIER_NEAR_M,
@@ -139,7 +138,6 @@ export function DayRouteBoatWizard({
   });
 
   const [open, setOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const [step, setStep] = useState<WizardStep>('pier');
   const [loadingPiers, setLoadingPiers] = useState(false);
   const [loadingRoutes, setLoadingRoutes] = useState(false);
@@ -148,30 +146,6 @@ export function DayRouteBoatWizard({
   const [selectedPier, setSelectedPier] = useState<BoatPierCandidate | null>(null);
   const [selectedRoute, setSelectedRoute] = useState<BoatRouteCandidate | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!open) return;
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape') return;
-      setOpen(false);
-      setStep('pier');
-      setSelectedPier(null);
-      setSelectedRoute(null);
-      setRoutes([]);
-      setError(null);
-    };
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    window.addEventListener('keydown', onKeyDown);
-    return () => {
-      document.body.style.overflow = prevOverflow;
-      window.removeEventListener('keydown', onKeyDown);
-    };
-  }, [open]);
 
   const origin = useMemo(
     () => resolveBoatRankingOrigin(route.venues, { cityIsSpb }),
@@ -328,211 +302,6 @@ export function DayRouteBoatWizard({
   const nearbyPiers = piers.filter((p) => p.distanceM == null || p.distanceM <= BOAT_PIER_NEAR_M);
   const pierList = nearbyPiers.length ? nearbyPiers : piers.slice(0, 12);
 
-  const stepTitle = step === 'pier' ? '1. Причал' : step === 'route' ? '2. Маршрут' : '3. Время';
-
-  const wizardDialog =
-    mounted && open && typeof document !== 'undefined'
-      ? createPortal(
-          <div
-            className="fixed inset-0 z-[60] flex items-end justify-center bg-slate-900/40 p-0 sm:items-center sm:p-4 print:hidden"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="day-boat-wizard-title"
-            data-day-boat-wizard-overlay
-            onClick={closeWizard}
-          >
-            <div
-              className="flex max-h-[min(92vh,40rem)] w-full max-w-lg flex-col overflow-hidden rounded-t-2xl border border-slate-200 bg-white shadow-xl sm:max-h-[min(85vh,36rem)] sm:rounded-2xl"
-              data-day-boat-steps
-              onClick={(event) => event.stopPropagation()}
-            >
-              <div className="mx-auto mt-2 h-1 w-10 shrink-0 rounded-full bg-slate-200 sm:hidden" aria-hidden />
-              <div className="flex shrink-0 items-start justify-between gap-3 border-b border-slate-100 px-4 py-3 sm:px-5">
-                <div className="min-w-0">
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-sky-800">
-                    {stepTitle}
-                  </p>
-                  <p id="day-boat-wizard-title" className="mt-0.5 text-base font-semibold text-slate-900">
-                    Теплоход по Неве и каналам
-                  </p>
-                  <p className="mt-0.5 text-xs text-slate-500">
-                    Причал - маршрут - время. В день попадает только закреплённый слот.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={closeWizard}
-                  aria-label="Закрыть"
-                  className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-
-              <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-3 sm:px-5 sm:py-4">
-                {step !== 'pier' ? (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (step === 'slot') {
-                        setStep('route');
-                        setSelectedRoute(null);
-                      } else {
-                        setStep('pier');
-                        setSelectedPier(null);
-                        setRoutes([]);
-                      }
-                      setError(null);
-                    }}
-                    className="mb-3 inline-flex items-center gap-1 text-xs font-semibold text-sky-800 hover:text-sky-950"
-                  >
-                    <ChevronLeft className="h-3.5 w-3.5" />
-                    Назад
-                  </button>
-                ) : null}
-
-                {error ? (
-                  <p className="mb-3 rounded-lg border border-amber-200 bg-amber-50 px-2.5 py-2 text-xs text-amber-900">
-                    {error}
-                  </p>
-                ) : null}
-
-                {step === 'pier' ? (
-                  <div className="space-y-2" data-day-boat-piers>
-                    {loadingPiers && !pierList.length ? (
-                      <p className="text-xs text-slate-500">Загружаем причалы…</p>
-                    ) : null}
-                    {!loadingPiers && !pierList.length ? (
-                      <p className="text-xs text-slate-600">
-                        Причалы для этого города пока не найдены. Можно добавить место текстом или из
-                        локаций.
-                      </p>
-                    ) : null}
-                    {pierList.map((pier) => {
-                      const dist = formatBoatDistance(pier.distanceM);
-                      return (
-                        <button
-                          key={pier.id}
-                          type="button"
-                          onClick={() => void pickPier(pier)}
-                          className="flex w-full items-start gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left shadow-sm hover:border-sky-300"
-                        >
-                          <Anchor className="mt-0.5 h-4 w-4 shrink-0 text-sky-700" />
-                          <span className="min-w-0 flex-1">
-                            <span className="block text-sm font-semibold text-slate-900">{pier.name}</span>
-                            <span className="mt-0.5 block text-xs text-slate-500">
-                              {[pier.address, dist ? `~${dist} от маршрута` : null]
-                                .filter(Boolean)
-                                .join(' · ') || 'Причал'}
-                            </span>
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                ) : null}
-
-                {step === 'route' ? (
-                  <div className="space-y-2" data-day-boat-routes>
-                    {selectedPier ? (
-                      <p className="text-xs text-slate-600">
-                        С причала:{' '}
-                        <span className="font-semibold text-slate-800">{selectedPier.name}</span>
-                      </p>
-                    ) : null}
-                    {loadingRoutes ? <p className="text-xs text-slate-500">Ищем маршруты…</p> : null}
-                    {!loadingRoutes &&
-                      routes.map((boatRoute) => (
-                        <button
-                          key={boatRoute.eventId}
-                          type="button"
-                          onClick={() => pickRoute(boatRoute)}
-                          className="flex w-full flex-col gap-0.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left shadow-sm hover:border-sky-300"
-                        >
-                          <span className="text-sm font-semibold text-slate-900">{boatRoute.title}</span>
-                          <span className="text-xs text-slate-500">
-                            {[
-                              boatRoute.slots.length
-                                ? `${boatRoute.slots.length} слот${boatRoute.slots.length === 1 ? '' : boatRoute.slots.length < 5 ? 'а' : 'ов'}`
-                                : null,
-                              boatRoute.priceFrom != null ? formatPriceFrom(boatRoute.priceFrom) : null,
-                              boatRoute.slots.some((s) => s.fitsWindow) ? 'в окно дня' : null,
-                            ]
-                              .filter(Boolean)
-                              .join(' · ')}
-                          </span>
-                        </button>
-                      ))}
-                  </div>
-                ) : null}
-
-                {step === 'slot' && selectedRoute ? (
-                  <div className="space-y-2" data-day-boat-slots>
-                    <p className="text-xs text-slate-600">
-                      Маршрут:{' '}
-                      <span className="font-semibold text-slate-800">{selectedRoute.title}</span>
-                    </p>
-                    {selectedRoute.slots.map((slot) => {
-                      const label =
-                        [slot.dateLabel, slot.timeLabel].filter(Boolean).join(', ') || 'Сеанс';
-                      return (
-                        <div
-                          key={`${slot.eventId}:${slot.startsAt}`}
-                          className="rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-2.5"
-                        >
-                          <div className="flex flex-wrap items-center justify-between gap-2">
-                            <div>
-                              <p className="text-sm font-semibold text-slate-900">{label}</p>
-                              <p className="mt-0.5 text-xs text-slate-500">
-                                {slot.fitsWindow ? 'Подходит по времени соседей' : 'Вне окна соседей'}
-                                {slot.vacant != null ? ` · мест ${slot.vacant}` : ''}
-                              </p>
-                            </div>
-                            <div className="flex flex-wrap gap-2">
-                              <button
-                                type="button"
-                                onClick={() => pinSlot(slot)}
-                                data-day-boat-pin
-                                className="inline-flex min-h-9 items-center justify-center rounded-full bg-slate-900 px-3 py-1.5 text-xs font-bold text-white hover:bg-primary-600"
-                              >
-                                В маршрут
-                              </button>
-                              {slot.purchaseUrl ? (
-                                <a
-                                  href={normalizeTcPurchaseUrl(slot.purchaseUrl) || slot.purchaseUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  data-day-boat-buy
-                                  className="inline-flex min-h-9 items-center justify-center gap-1 rounded-full bg-amber-500 px-3 py-1.5 text-xs font-bold text-white hover:bg-amber-600"
-                                >
-                                  <Ticket className="h-3.5 w-3.5" />
-                                  Купить билет
-                                </a>
-                              ) : null}
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : null}
-              </div>
-
-              <div className="shrink-0 border-t border-slate-100 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-5">
-                <button
-                  type="button"
-                  onClick={closeWizard}
-                  className="inline-flex min-h-10 w-full items-center justify-center rounded-full border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50"
-                >
-                  Закрыть
-                </button>
-              </div>
-            </div>
-          </div>,
-          document.body,
-        )
-      : null;
-
   return (
     <div className="mt-4" data-day-boat-wizard>
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -566,7 +335,170 @@ export function DayRouteBoatWizard({
         </button>
       ) : null}
 
-      {wizardDialog}
+      {open ? (
+        <div
+          className="mt-3 rounded-xl border border-sky-200 bg-sky-50/60 p-3 sm:p-4"
+          data-day-boat-steps
+        >
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-sky-800">
+              {step === 'pier' ? '1. Причал' : step === 'route' ? '2. Маршрут' : '3. Время'}
+            </p>
+            <button
+              type="button"
+              onClick={closeWizard}
+              className="text-xs font-semibold text-slate-500 hover:text-slate-800"
+            >
+              Закрыть
+            </button>
+          </div>
+
+          {step !== 'pier' ? (
+            <button
+              type="button"
+              onClick={() => {
+                if (step === 'slot') {
+                  setStep('route');
+                  setSelectedRoute(null);
+                } else {
+                  setStep('pier');
+                  setSelectedPier(null);
+                  setRoutes([]);
+                }
+                setError(null);
+              }}
+              className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-sky-800 hover:text-sky-950"
+            >
+              <ChevronLeft className="h-3.5 w-3.5" />
+              Назад
+            </button>
+          ) : null}
+
+          {error ? (
+            <p className="mt-2 rounded-lg border border-amber-200 bg-amber-50 px-2.5 py-2 text-xs text-amber-900">
+              {error}
+            </p>
+          ) : null}
+
+          {step === 'pier' ? (
+            <div className="mt-3 space-y-2" data-day-boat-piers>
+              {loadingPiers && !pierList.length ? (
+                <p className="text-xs text-slate-500">Загружаем причалы…</p>
+              ) : null}
+              {!loadingPiers && !pierList.length ? (
+                <p className="text-xs text-slate-600">
+                  Причалы для этого города пока не найдены. Можно добавить место текстом или из
+                  локаций.
+                </p>
+              ) : null}
+              {pierList.map((pier) => {
+                const dist = formatBoatDistance(pier.distanceM);
+                return (
+                  <button
+                    key={pier.id}
+                    type="button"
+                    onClick={() => void pickPier(pier)}
+                    className="flex w-full items-start gap-2 rounded-xl border border-white bg-white px-3 py-2.5 text-left shadow-sm hover:border-sky-300"
+                  >
+                    <Anchor className="mt-0.5 h-4 w-4 shrink-0 text-sky-700" />
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-sm font-semibold text-slate-900">{pier.name}</span>
+                      <span className="mt-0.5 block text-xs text-slate-500">
+                        {[pier.address, dist ? `~${dist} от маршрута` : null]
+                          .filter(Boolean)
+                          .join(' · ') || 'Причал'}
+                      </span>
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          ) : null}
+
+          {step === 'route' ? (
+            <div className="mt-3 space-y-2" data-day-boat-routes>
+              {selectedPier ? (
+                <p className="text-xs text-slate-600">
+                  С причала: <span className="font-semibold text-slate-800">{selectedPier.name}</span>
+                </p>
+              ) : null}
+              {loadingRoutes ? <p className="text-xs text-slate-500">Ищем маршруты…</p> : null}
+              {!loadingRoutes &&
+                routes.map((boatRoute) => (
+                  <button
+                    key={boatRoute.eventId}
+                    type="button"
+                    onClick={() => pickRoute(boatRoute)}
+                    className="flex w-full flex-col gap-0.5 rounded-xl border border-white bg-white px-3 py-2.5 text-left shadow-sm hover:border-sky-300"
+                  >
+                    <span className="text-sm font-semibold text-slate-900">{boatRoute.title}</span>
+                    <span className="text-xs text-slate-500">
+                      {[
+                        boatRoute.slots.length
+                          ? `${boatRoute.slots.length} слот${boatRoute.slots.length === 1 ? '' : boatRoute.slots.length < 5 ? 'а' : 'ов'}`
+                          : null,
+                        boatRoute.priceFrom != null ? formatPriceFrom(boatRoute.priceFrom) : null,
+                        boatRoute.slots.some((s) => s.fitsWindow) ? 'в окно дня' : null,
+                      ]
+                        .filter(Boolean)
+                        .join(' · ')}
+                    </span>
+                  </button>
+                ))}
+            </div>
+          ) : null}
+
+          {step === 'slot' && selectedRoute ? (
+            <div className="mt-3 space-y-2" data-day-boat-slots>
+              <p className="text-xs text-slate-600">
+                Маршрут:{' '}
+                <span className="font-semibold text-slate-800">{selectedRoute.title}</span>
+              </p>
+              {selectedRoute.slots.map((slot) => {
+                const label = [slot.dateLabel, slot.timeLabel].filter(Boolean).join(', ') || 'Сеанс';
+                return (
+                  <div
+                    key={`${slot.eventId}:${slot.startsAt}`}
+                    className="rounded-xl border border-white bg-white px-3 py-2.5 shadow-sm"
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div>
+                        <p className="text-sm font-semibold text-slate-900">{label}</p>
+                        <p className="mt-0.5 text-xs text-slate-500">
+                          {slot.fitsWindow ? 'Подходит по времени соседей' : 'Вне окна соседей'}
+                          {slot.vacant != null ? ` · мест ${slot.vacant}` : ''}
+                        </p>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={() => pinSlot(slot)}
+                          data-day-boat-pin
+                          className="inline-flex min-h-9 items-center justify-center rounded-full bg-slate-900 px-3 py-1.5 text-xs font-bold text-white hover:bg-primary-600"
+                        >
+                          В маршрут
+                        </button>
+                        {slot.purchaseUrl ? (
+                          <a
+                            href={normalizeTcPurchaseUrl(slot.purchaseUrl) || slot.purchaseUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            data-day-boat-buy
+                            className="inline-flex min-h-9 items-center justify-center gap-1 rounded-full bg-amber-500 px-3 py-1.5 text-xs font-bold text-white hover:bg-amber-600"
+                          >
+                            <Ticket className="h-3.5 w-3.5" />
+                            Купить билет
+                          </a>
+                        ) : null}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : null}
+        </div>
+      ) : null}
     </div>
   );
 }
