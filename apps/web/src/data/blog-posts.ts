@@ -21,6 +21,38 @@ export type BlogPost = {
 /** Обложки - уникальная статика на статью: /images/blog/{slug}.jpg */
 export const BLOG_POSTS: BlogPost[] = [
   // SPB Top-100 / Beyond-Top-100 скрыты с публичного сайта (правятся в админке как DRAFT).
+  {
+    slug: 'perm-neobychnye-muzei',
+    title: 'Не только Пермские боги: 5 необычных музеев Перми, о которых вы не знали',
+    excerpt:
+      'Ретро-гараж, артиллерия в Мотовилихе, музей кукол, история связи и университетские мумии - пять неочевидных музеев Перми сверх «пермских богов».',
+    date: '9 авг 2026',
+    readMin: 8,
+    tag: 'Город',
+    city: 'Пермь',
+    citySlug: 'perm',
+    authorId: 'editorial',
+    authorName: 'Редакция',
+    articleType: 'gid',
+    imageUrl: blogCoverUrl('perm-neobychnye-muzei'),
+    imageAlt: 'Необычные музеи Перми: ретро-авто, артиллерия и камерные экспозиции',
+  },
+  {
+    slug: 'perm-za-2-dnya',
+    title: 'Пермь за 2 дня: идеальный маршрут на выходные с ценами и картой',
+    excerpt:
+      'Сити-брейк в Перми за выходные: музеи и набережная в первый день, Хохловка или центр во второй - с ориентиром по бюджету ~10-12 тысяч ₽.',
+    date: '9 авг 2026',
+    readMin: 9,
+    tag: 'Выходные',
+    city: 'Пермь',
+    citySlug: 'perm',
+    authorId: 'editorial',
+    authorName: 'Редакция',
+    articleType: 'gid',
+    imageUrl: blogCoverUrl('perm-za-2-dnya'),
+    imageAlt: 'Набережная Камы и красная надпись Счастье не за горами в Перми',
+  },
 
   {
     slug: 'instagramnyi-nizhnii',
