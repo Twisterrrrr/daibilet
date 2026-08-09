@@ -1,3 +1,16 @@
+## 2026-08-10 - Scenarios panel: outer card padding
+
+### Наблюдения
+- После title-flush контент панели сценария («Золотой треугольник» и т.п.) визуально лип к левому/правому краю белой карточки: убрали hanging gutter, но outer inset остался слабым (`px-4`).
+
+### Решения
+- `CityDayPresetBlock` `SCENARIO_CARD_PAD`: `px-5 sm:px-6` (+ прежний vertical). Title-flush только для выравнивания номеров остановок с title, не для снятия card padding.
+
+### Проблемы
+- Deploy по «выкатывай».
+
+---
+
 ## 2026-08-10 - Venue/location: афиша выше discovery
 
 ### Наблюдения

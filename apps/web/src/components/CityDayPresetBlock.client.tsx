@@ -58,7 +58,10 @@ function mainPlacesPhrase(count: number): string {
 /**
  * Scenarios have no hanging title number (unlike DayTripCanonCard).
  * Stops stay flush with the title column - no empty gutter on the left.
+ * Outer card inset (SCENARIO_CARD_PAD) is separate: title-flush must never
+ * remove horizontal padding from the white rounded panel.
  */
+const SCENARIO_CARD_PAD = 'px-5 py-5 sm:px-6 sm:py-6';
 const STOP_ROW = 'flex items-start gap-1.5 text-sm leading-snug';
 const STOP_NUM = 'w-[1.25rem] shrink-0 tabular-nums';
 
@@ -185,7 +188,7 @@ export function CityDayPresetBlock({
     const useTwoCol = items.length >= 4;
     return (
       <div
-        className={`flex flex-col justify-center rounded-xl border bg-white px-4 py-5 sm:py-6 ${borderClass} ${
+        className={`flex flex-col justify-center rounded-xl border bg-white ${SCENARIO_CARD_PAD} ${borderClass} ${
           panel ? 'mt-3 min-h-[11rem] sm:min-h-[12.5rem]' : ''
         }`}
         data-day-preset-card={preset.id}
