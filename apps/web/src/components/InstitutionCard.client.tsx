@@ -49,6 +49,13 @@ export function InstitutionCard({ venue, href }: { venue: InstitutionCardVenue; 
   const rating = realRating(venue.rating);
   const upcoming = venue.upcomingTitles?.filter(Boolean).slice(0, 3) || [];
   const showMiniAfisha = upcoming.length > 0;
+  const stopCount = Number(venue.stopEventCount ?? 0);
+  const stopOrEventsLabel =
+    Number(venue.events || 0) > 0
+      ? pluralEvents(Number(venue.events))
+      : stopCount > 0
+        ? `${stopCount} в маршрутах`
+        : null;
   const dayRouteVenue = {
     id: venue.id,
     slug: venue.slug,
@@ -143,8 +150,8 @@ export function InstitutionCard({ venue, href }: { venue: InstitutionCardVenue; 
               <div className="text-xs text-graphite-muted">{venue.city}</div>
               {venue.eventsPending ? (
                 <div className="mt-0.5 h-4 w-20 animate-pulse rounded bg-slate-100" aria-hidden />
-              ) : venue.events > 0 ? (
-                <div className="text-sm font-semibold text-graphite">{pluralEvents(venue.events)}</div>
+              ) : stopOrEventsLabel ? (
+                <div className="text-sm font-semibold text-graphite">{stopOrEventsLabel}</div>
               ) : null}
             </div>
             <span className="inline-flex items-center gap-1 rounded-lg bg-primary-600 px-3 py-1.5 text-xs font-semibold text-white transition group-hover:bg-primary-700">

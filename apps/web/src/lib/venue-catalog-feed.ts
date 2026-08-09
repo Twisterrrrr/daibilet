@@ -177,30 +177,41 @@ export async function fetchVenueCatalogPage(
 export async function fetchVenueCatalogEventCounts(
   venueIds: string[],
   init?: RequestInit,
-): Promise<Record<string, number>> {
+): Promise<{ counts: Record<string, number>; stopCounts: Record<string, number> }> {
   const ids = [...new Set(venueIds.map((id) => String(id || '').trim()).filter(Boolean))].slice(0, 100);
-  if (!ids.length) return {};
+  if (!ids.length) return { counts: {}, stopCounts: {} };
   const response = await fetch(`/api/public/venues/event-counts?ids=${encodeURIComponent(ids.join(','))}`, init);
-  if (!response.ok) return {};
-  const payload = (await response.json()) as { counts?: Record<string, number> };
-  const counts = payload.counts || {};
-  const out: Record<string, number> = {};
-  for (const [id, value] of Object.entries(counts)) {
-    out[id] = Number(value) || 0;
+  if (!response.ok) return { counts: {}, stopCounts: {} };
+  const payload = (await response.json()) as {
+    counts?: Record<string, number>;
+    stopCounts?: Record<string, number>;
+  };
+  const counts: Record<string, number> = {};
+  const stopCounts: Record<string, number> = {};
+  for (const [id, value] of Object.entries(payload.counts || {})) {
+    counts[id] = Number(value) || 0;
   }
-  return out;
+  for (const [id, value] of Object.entries(payload.stopCounts || {})) {
+    stopCounts[id] = Number(value) || 0;
+  }
+  return { counts, stopCounts };
 }
 
 export function applyVenueCatalogEventCounts(
   page: VenueCatalogFeedPage,
   counts: Record<string, number>,
+  stopCounts: Record<string, number> = {},
 ): VenueCatalogFeedPage {
   if (!page.venues.length) return { ...page, countsPending: false };
-  const venues = page.venues.map((venue) => ({
-    ...venue,
-    events: counts[venue.id] ?? venue.events ?? 0,
-    eventsPending: false,
-  }));
+  const venues = page.venues.map((venue) => {
+    const stops = Number(stopCounts[venue.id] ?? venue.stopEventCount ?? 0) || 0;
+    return {
+      ...venue,
+      events: counts[venue.id] ?? venue.events ?? 0,
+      stopEventCount: stops > 0 ? stops : undefined,
+      eventsPending: false,
+    };
+  });
   return { ...page, venues, countsPending: false };
 }
 

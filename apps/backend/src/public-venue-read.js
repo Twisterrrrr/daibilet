@@ -18,6 +18,7 @@ import {
   fetchVenueDistinctEventCounts,
   fetchVenueEventFacetCounts,
   fetchVenueHeroImageFallbacks,
+  fetchVenueStopEventCounts,
 } from './public-venue-lean.ts';
 import {
   isContentPlaceHubEligible,
@@ -2229,13 +2230,20 @@ export async function buildPublicVenueEventCounts(venueIds = []) {
   if (sortedKey) {
     const hit = venueEventCountsCache.get(sortedKey);
     if (hit && hit.expiresAt > now) {
-      return { generatedAt: hit.generatedAt, counts: hit.counts };
+      return { generatedAt: hit.generatedAt, counts: hit.counts, stopCounts: hit.stopCounts || {} };
     }
   }
-  const countsMap = await fetchVenueDistinctEventCounts(ids);
+  const [countsMap, stopCountsMap] = await Promise.all([
+    fetchVenueDistinctEventCounts(ids),
+    fetchVenueStopEventCounts(ids),
+  ]);
   const counts = {};
+  const stopCounts = {};
   for (const [id, value] of countsMap) {
     counts[id] = Number(value) || 0;
+  }
+  for (const [id, value] of stopCountsMap) {
+    stopCounts[id] = Number(value) || 0;
   }
   const generatedAt = new Date().toISOString();
   if (sortedKey) {
@@ -2243,6 +2251,7 @@ export async function buildPublicVenueEventCounts(venueIds = []) {
       expiresAt: now + VENUE_EVENT_COUNTS_CACHE_MS,
       generatedAt,
       counts,
+      stopCounts,
     });
     // Bound map size (simple FIFO drop).
     if (venueEventCountsCache.size > 200) {
@@ -2253,6 +2262,7 @@ export async function buildPublicVenueEventCounts(venueIds = []) {
   return {
     generatedAt,
     counts,
+    stopCounts,
   };
 }
 

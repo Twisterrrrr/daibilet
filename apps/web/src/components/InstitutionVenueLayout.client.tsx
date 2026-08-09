@@ -22,11 +22,17 @@ import { VenueLogisticsBlock, hasVenueLogisticsContent } from '@/components/Venu
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { formatMoney, formatNumber } from '@/lib/format';
 import { formatStreetAddress } from '@/lib/address';
+import { dedupeVenueLinkedEvents } from '@/lib/day-route-score';
 import type { FinanceAdmissionProduct } from '@/lib/finance-projection';
 import { build2gisRouteUrl } from '@/lib/maps';
 import { institutionTypeEmoji, normalizeVenueKind, venueTypeLabel } from '@/lib/venue-meta';
 import { eventHref, venueHref } from '@/lib/routes';
-import type { PublicSessionDto, PublicVenueDto, PublicVenuePageDto } from '@daibilet/contracts/public';
+import type {
+  PublicSessionDto,
+  PublicVenueDto,
+  PublicVenueLinkedEventDto,
+  PublicVenuePageDto,
+} from '@daibilet/contracts/public';
 
 const FAQ_ITEMS = [
   {
@@ -48,6 +54,8 @@ export function InstitutionVenueLayout({
   stats,
   sessions,
   relatedVenues,
+  stopEvents = [],
+  nearbyEvents = [],
   pagePayload,
   admissionProducts = [],
 }: {
@@ -55,6 +63,8 @@ export function InstitutionVenueLayout({
   stats: PublicVenuePageDto['stats'];
   sessions: PublicSessionDto[];
   relatedVenues: PublicVenueDto[];
+  stopEvents?: PublicVenueLinkedEventDto[];
+  nearbyEvents?: PublicVenueLinkedEventDto[];
   pagePayload: PublicVenuePageDto;
   admissionProducts?: FinanceAdmissionProduct[];
 }) {
@@ -67,9 +77,19 @@ export function InstitutionVenueLayout({
   const intro =
     venue.shortDescription ||
     venue.description ||
-    `${venue.name} — ${typeLabel.toLowerCase()} в ${venue.city}. Афиша, билеты и ближайшие сеансы.`;
+    `${venue.name} - ${typeLabel.toLowerCase()} в ${venue.city}. Афиша, билеты и ближайшие сеансы.`;
   const categories = Object.entries(venue.categories || {}).sort((a, b) => b[1] - a[1]);
   const nextSessions = sessions.slice(0, 4);
+  const uniqueStopEvents = React.useMemo(() => dedupeVenueLinkedEvents(stopEvents), [stopEvents]);
+  const uniqueNearbyEvents = React.useMemo(
+    () => dedupeVenueLinkedEvents(nearbyEvents),
+    [nearbyEvents],
+  );
+  const stopExcursionCount =
+    uniqueStopEvents.length > 0 ? uniqueStopEvents.length : Number(venue.stopEventCount ?? 0);
+  const hasStopExcursions = stopExcursionCount > 0;
+  const hasNearbyExcursions = uniqueNearbyEvents.length > 0;
+  const linkedExcursions = hasStopExcursions ? uniqueStopEvents : uniqueNearbyEvents;
   // An institution can be a useful editorial place without an active sale.
   // In that case it must not imitate a ticket page.
   const hasTicketSales = sessions.length > 0 || admissionProducts.length > 0;
@@ -119,6 +139,14 @@ export function InstitutionVenueLayout({
                 {hasAfisha ? (
                   <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur">
                     {formatNumber(stats.events)} в афише
+                  </span>
+                ) : hasStopExcursions ? (
+                  <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur">
+                    {formatNumber(stopExcursionCount)} в маршрутах
+                  </span>
+                ) : hasNearbyExcursions ? (
+                  <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur">
+                    {formatNumber(uniqueNearbyEvents.length)} рядом
                   </span>
                 ) : null}
               </div>
@@ -194,6 +222,9 @@ export function InstitutionVenueLayout({
           {[
             ...(admissionProducts.length ? [['#venue-admission', 'Входные билеты'] as const] : []),
             ...(hasAfisha ? [['#venue-program', 'Афиша и билеты'] as const] : []),
+            ...(linkedExcursions.length
+              ? [['#venue-linked-events', hasStopExcursions ? 'В маршрутах' : 'Рядом'] as const]
+              : []),
             ['#about', 'О месте'] as const,
             ['#practical', 'Адрес и карта'] as const,
             ...(hasTicketSales ? [['#faq', 'Вопросы'] as const] : []),
@@ -235,6 +266,44 @@ export function InstitutionVenueLayout({
                   </a>
                 ))}
               </div>
+            </section>
+          ) : null}
+
+          {linkedExcursions.length > 0 ? (
+            <section
+              id="venue-linked-events"
+              className="scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-6"
+            >
+              <h2 className="text-xl font-bold text-slate-900">
+                {hasStopExcursions ? 'Экскурсии, которые включают это место' : 'Рядом'}
+              </h2>
+              <p className="mt-1 text-sm text-slate-500">
+                {hasStopExcursions
+                  ? 'Маршруты с явной остановкой у этой площадки - отдельно от афиши самого музея.'
+                  : 'Явных остановок пока нет - показываем события со стартом в радиусе 300 м. Это не афиша площадки.'}
+              </p>
+              <ul className="mt-4 space-y-3" data-venue-linked-events-deduped>
+                {linkedExcursions.map((event) => (
+                  <li key={event.id}>
+                    <a
+                      href={`/events/${encodeURIComponent(event.slug)}`}
+                      className="flex flex-col gap-1 rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 transition hover:border-primary/30 hover:bg-white sm:flex-row sm:items-center sm:justify-between"
+                    >
+                      <span className="min-w-0">
+                        <span className="font-semibold text-slate-900 hover:text-primary-700">
+                          {event.title}
+                        </span>
+                        {!hasStopExcursions && event.venue ? (
+                          <span className="mt-0.5 block text-xs text-slate-500">{event.venue}</span>
+                        ) : null}
+                      </span>
+                      <span className="text-sm font-medium text-slate-600">
+                        {event.priceFrom != null ? formatMoney(event.priceFrom) : 'Смотреть'}
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
             </section>
           ) : null}
 

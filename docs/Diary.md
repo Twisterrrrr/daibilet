@@ -1,4 +1,22 @@
-## 2026-08-09 - palace cards: wrong kind + leftover concert poster
+## 2026-08-09 - museum twin rematch + STOP «с посещением» + institution nearby
+
+### Наблюдения
+- Каноны must-see (`ermitazh`, Русский музей…) показывали 0 афиши: события на TC-twin / `tochka-sbora`.
+- Institution PDP не рендерил `nearbyEvents` / STOP - только `sessions`.
+
+### Решения
+- Prod MSK: `rematch-museum-twins.js` - on-site (без «посещени*») twin→канон, twin HIDDEN; туровые title не трогаем `Event.venueId`.
+- Prod MSK: `seed-museum-stop-links-by-title.js` - STOP для Эрмитаж (291), Исаакий (153), Петропавловка (92).
+- Web: Institution PDP блок «В маршрутах» / «Рядом»; карточки показывают `stopEventCount` как «N в маршрутах».
+- API lean: `fetchVenueStopEventCounts` + enrich `stopCounts` в `/venues/event-counts`.
+
+### Проблемы
+- Live UI/lean counts - после API+web deploy batch; DB STOP уже на MSK.
+- Deduped stopEvents на PDP режет до уникальных title (лимит 48) - на карточке нужен raw stop count из lean.
+
+---
+
+
 
 ### Наблюдения
 - Екатерининский дворец (`saint-petersburg-ekaterininskiy-dvorets`) отдавался как `monument`.

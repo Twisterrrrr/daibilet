@@ -218,6 +218,8 @@ export function VenuePageView({
                 stats={matchedPayload.stats}
                 sessions={contentReady ? matchedPayload.sessions : []}
                 relatedVenues={contentReady ? matchedPayload.relatedVenues : []}
+                stopEvents={contentReady ? matchedPayload.stopEvents || [] : []}
+                nearbyEvents={contentReady ? matchedPayload.nearbyEvents || [] : []}
                 pagePayload={matchedPayload}
                 admissionProducts={admissionProducts}
               />

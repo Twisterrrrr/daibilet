@@ -742,7 +742,7 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 | LE.5c | LocationCard: chip+«В маршрут» vertical right stack; strip «Место посадки» title prefix | Высокий | ✅ `4f5b675` MSK **BUILD_ID=`B_7ZDd8i_WZurwdjJhMhl`** |
 | LE.5b | Hide empty excursion UI on location page (hero 0 + empty block) | Высокий | ✅ `3271bfcb` BUILD `slptXB74NiKJwSUqiCO7t` |
 | LE.6 | Seed Пермь must-see (6 slugs) + cityInfo slug | Средний | ✅ DB MSK 6 rows; cityInfo slug; listing 🚫 без hub-gate deploy |
-| LE.7 | Deploy migrate + контент STOP-связей экскурсий | Высокий | ⏳ гибрид LOCKED 2026-08-09: seed ≤100м + admin validate; new = manual; import venueId validate-only |
+| LE.7 | Deploy migrate + контент STOP-связей экскурсий | Высокий | ⚠️ title-seed MSK: Эрмитаж 291 / Исаакий 153 / Петропавловка 92; geo ≤100м + admin validate ещё |
 | LE.8 | Geo autolink ТЗ → CLI dry-run/apply (пороги 150/300/500, merge STOP, `Event.venueId` не трогать) | Высокий | ✅ CLI + unit + MSK dry-run perm; radii follow-up: cityInfo dict (default 300 / SPB 400 / suburbs 600) |
 | LE.9 | Admin «Подобрать рядом» + merge apply endpoint (suggest UI) | Средний | ✅ GET suggestions + POST `venue-links:apply` merge + UI чекбоксы; Event.venueId не трогаем |
 | LE.10 | START/NEARBY_HUB MVP: START=`index:0`; NEARBY_HUB dynamic geo+transport (no admin hardcode) | Высокий | ⏳ docs LOCKED 2026-08-09; implement |
@@ -1018,7 +1018,7 @@ Owner minimum: MSK→`.159` сеть ✅ · YooKassa `SHOP_ID`/`SECRET=<set>` �
 |---|--------|-----------|--------|
 | VENUE.L2 | Event→venue 404 «Модная среда 1823»: fleet-junk false positive + MEETING_POINT gate | Критический | ✅ `61f1116` gate + `921abe4` junk regex; MSK in-place web **BUILD_ID=`YYuWaKq2MGFkUSNVioLJp`**; live HTML/API 200 |
 | VENUE.L3 | Event/session DTO: не отдавать `venueSlug` (или `venueHasPublicPage=false`) для HIDDEN / non-resolvable hub rows - UI не линкует в 404 | Высокий | ⏳ |
-| VENUE.L4 | Soft-sign twin: при HIDDEN twin rematch `Event.venueId` на канонический PUBLISHED/CANDIDATE slug | Средний | ⏳ |
+| VENUE.L4 | Soft-sign twin: при HIDDEN twin rematch `Event.venueId` на канонический PUBLISHED/CANDIDATE slug | Средний | ⚠️ museum batch: on-site rematch; туры посещени* → STOP, не venueId |
 | VENUE.L5 | Ops ensure `venue_68d4062e…` → `CANDIDATE` (kind уже `CLUB_BAR_RESTAURANT`) | Средний | ✅ `scripts/ensure-modnaya-sreda-venue.js` applied on MSK |
 | VENUE.FONTANKA-53 | Дубль причала Фонтанки 51-53: канон TC `prichal-na-fontanke-53`, twin `venue_tep_53` HIDDEN + rematch | Высокий | ✅ ensure + tep-import map; prod apply |
 | VENUE.DVORTSOVAYA-18 | Дубль причала Дворцовая 18: канон TC `venue_681d44a7…` PIER+89 events, twin `venue_tep_65` HIDDEN + rematch | Высокий | ✅ ensure + tep-import map place 65; prod apply |

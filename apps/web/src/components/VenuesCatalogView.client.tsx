@@ -91,13 +91,16 @@ function patchVenueEventCounts(
   prev: VenueCatalogFeedPage['venues'],
   counts: Record<string, number>,
   pageIds: Set<string>,
+  stopCounts: Record<string, number> = {},
 ): VenueCatalogFeedPage['venues'] {
   if (!pageIds.size) return prev;
   return prev.map((venue) => {
     if (!pageIds.has(venue.id)) return venue;
+    const stops = Number(stopCounts[venue.id] ?? venue.stopEventCount ?? 0) || 0;
     return {
       ...venue,
       events: counts[venue.id] ?? venue.events ?? 0,
+      stopEventCount: stops > 0 ? stops : undefined,
       eventsPending: false,
     };
   });
@@ -275,9 +278,9 @@ export function VenuesCatalogView({
           initialPage.venues.map((venue) => venue.id),
           { signal: controller.signal },
         )
-          .then((counts) => {
+          .then(({ counts, stopCounts }) => {
             if (requestId !== catalogRequestId.current) return;
-            const enriched = applyVenueCatalogEventCounts(initialPage, counts);
+            const enriched = applyVenueCatalogEventCounts(initialPage, counts, stopCounts);
             cityBaseRef.current = { key: scopeKey, page: enriched };
             setVenues(enriched.venues);
           })
@@ -318,9 +321,9 @@ export function VenuesCatalogView({
       void fetchVenueCatalogEventCounts(page.venues.map((venue) => venue.id), {
         signal: controller.signal,
       })
-        .then((counts) => {
+        .then(({ counts, stopCounts }) => {
           if (requestId !== catalogRequestId.current) return;
-          setVenues((prev) => patchVenueEventCounts(prev, counts, pageIds));
+          setVenues((prev) => patchVenueEventCounts(prev, counts, pageIds, stopCounts));
         })
         .catch(() => undefined);
     };

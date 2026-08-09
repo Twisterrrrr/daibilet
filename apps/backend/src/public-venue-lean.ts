@@ -55,6 +55,7 @@ export type LeanPublicVenueRow = {
   pageStatus: string;
   hookFact: string | null;
   events: number;
+  stopEventCount?: number;
   waterEvents: number;
   busEvents: number;
   reason: string;
@@ -133,6 +134,38 @@ export async function fetchVenueDistinctEventCounts(
   return counts;
 }
 
+/** Distinct STOP-linked events per venue (EventVenueRouteItem role=STOP). */
+export async function fetchVenueStopEventCounts(
+  venueIds: string[],
+): Promise<Map<string, number>> {
+  const counts = new Map<string, number>();
+  const ids = [...new Set((venueIds || []).map((id) => String(id || '').trim()).filter(Boolean))];
+  if (!ids.length) return counts;
+
+  for (const batch of chunkIds(ids)) {
+    const placeholders = batch.map((_, i) => `$${i + 1}`).join(', ');
+    const rows = await prisma.$queryRawUnsafe<Array<{ venueId: string; stops: number }>>(
+      `
+        select
+          link."venueId" as "venueId",
+          count(distinct link."eventId")::int as stops
+        from event_venue_route_items link
+        join "Event" e on e.id = link."eventId"
+        where link."venueId" in (${placeholders})
+          and link.role = 'STOP'::"RouteItemRole"
+          and e.status not in ('HIDDEN', 'DRAFT')
+        group by link."venueId"
+      `,
+      ...batch,
+    );
+    for (const row of rows) {
+      if (!row.venueId) continue;
+      counts.set(row.venueId, Number(row.stops) || 0);
+    }
+  }
+  return counts;
+}
+
 /**
  * Lean venue rows for /venues + /locations catalog tiles.
  * Uses Prisma `select` + `_count` instead of include(events/offers/sessions).
@@ -196,13 +229,29 @@ export async function fetchLeanPublicVenueRows(
   const merged = [...byId.values()];
   if (skipEventCounts) {
     // Progressive /venues paint: cards first, distinct product counts via enrich.
-    return merged.map((row) => mapLeanVenueRow(row, options.leanText === true, 0));
+    return merged.map((row) => mapLeanVenueRow(row, options.leanText === true, 0, 0));
   }
-  const eventCounts = await fetchVenueDistinctEventCounts(merged.map((row) => row.id));
-  return merged.map((row) => mapLeanVenueRow(row, options.leanText === true, eventCounts.get(row.id) || 0));
+  const ids = merged.map((row) => row.id);
+  const [eventCounts, stopCounts] = await Promise.all([
+    fetchVenueDistinctEventCounts(ids),
+    fetchVenueStopEventCounts(ids),
+  ]);
+  return merged.map((row) =>
+    mapLeanVenueRow(
+      row,
+      options.leanText === true,
+      eventCounts.get(row.id) || 0,
+      stopCounts.get(row.id) || 0,
+    ),
+  );
 }
 
-function mapLeanVenueRow(row: VenueListRecord, leanText: boolean, eventCount: number): LeanPublicVenueRow {
+function mapLeanVenueRow(
+  row: VenueListRecord,
+  leanText: boolean,
+  eventCount: number,
+  stopEventCount = 0,
+): LeanPublicVenueRow {
   const pageStatus = String(row.pageStatus || 'NONE').toLowerCase();
   const kind = row.kind;
   return {
@@ -227,6 +276,7 @@ function mapLeanVenueRow(row: VenueListRecord, leanText: boolean, eventCount: nu
     proposedKind: String(kind || 'OTHER').toLowerCase(),
     pageStatus,
     events: eventCount,
+    stopEventCount: stopEventCount > 0 ? stopEventCount : undefined,
     waterEvents: 0,
     busEvents: 0,
     reason: pageStatus === 'candidate' ? 'кандидат на public-страницу' : 'пока только локация',
