@@ -1,10 +1,12 @@
 'use client';
 
+import { useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 
 import { PageBreadcrumbBar } from '@/components/PageBreadcrumbs';
-import { useCity } from '@/components/CityProvider';
-import { getCityLabelGenitive } from '@/lib/cities';
+import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
+import { catalogFiltersFromQuery, type CatalogFilterValues } from '@/lib/catalog-url';
+import { cityToPrepositional } from '@/lib/city-declension';
 
 /**
  * Compact catalog header: breadcrumbs + H1 + short subtitle.
@@ -12,22 +14,47 @@ import { getCityLabelGenitive } from '@/lib/cities';
  */
 export function EventsCatalogHero() {
   const searchParams = useSearchParams();
-  const { city } = useCity();
-  const cityLabel = getCityLabelGenitive(city);
+  const selectedCity = useSelectedCityOptional();
   const q = (searchParams.get('q') || '').trim();
   const category = (searchParams.get('category') || '').trim();
+
+  const filters = useMemo(() => {
+    return catalogFiltersFromQuery({
+      city: searchParams.get('city') || undefined,
+      sort: (searchParams.get('sort') as CatalogFilterValues['sort']) || undefined,
+    });
+  }, [searchParams]);
+
+  const cityReady = selectedCity?.cityReady ?? true;
+  const cityName =
+    cityReady && (filters.city || (selectedCity && selectedCity.cityValue !== 'all'))
+      ? selectedCity?.selectedDestination?.name ||
+        (selectedCity?.cityLabel !== 'Все города' ? selectedCity?.cityLabel : null) ||
+        filters.city ||
+        null
+      : null;
+
+  const cityPrep = cityName ? cityToPrepositional(cityName) : null;
 
   const title = q
     ? `Результаты поиска: «${q}»`
     : category
       ? `События: ${category}`
-      : `Афиша событий в ${cityLabel}`;
+      : cityPrep
+        ? `Афиша событий в ${cityPrep}`
+        : 'Афиша событий';
 
   const subtitle = q
-    ? `Подборка по запросу в ${cityLabel}`
+    ? cityPrep
+      ? `Подборка по запросу в ${cityPrep}`
+      : 'Подборка по запросу'
     : category
-      ? `Афиша в категории «${category}» - ${cityLabel}`
-      : `Билеты и расписание - выбирайте по дате и интересам`;
+      ? cityPrep
+        ? `Афиша в категории «${category}» - ${cityPrep}`
+        : `Афиша в категории «${category}»`
+      : cityPrep
+        ? `Билеты и расписание - выбирайте по дате и интересам`
+        : 'Билеты на экскурсии, концерты и музеи более чем в 100 городах России.';
 
   return (
     <>
