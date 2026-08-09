@@ -15,6 +15,10 @@ test('resolveVenueOpeningHours: known seed museums', () => {
   assert.ok(hermitage!.lines.some((line) => /11:00-18:00/.test(line)));
   assert.ok(resolveVenueOpeningHours('moscow-tret-yakovskaya-galereya'));
   assert.ok(resolveVenueOpeningHours('erarta')!.lines[0]!.includes('10:00-22:00'));
+  assert.ok(resolveVenueOpeningHours('gmii-im-pushkina-672f34b6ebf4808956f1474a'));
+  assert.ok(
+    resolveVenueOpeningHours('muzei-sovremennogo-iskusstva-permm-5e4423fcaadb42a1889abee3'),
+  );
 });
 
 test('resolveVenueOpeningHours: unknown slug stays null (no invented hours)', () => {

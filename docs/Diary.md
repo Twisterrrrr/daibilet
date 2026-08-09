@@ -1,3 +1,21 @@
+## 2026-08-09 - publish candidate museums + opening hours overlay
+
+### Наблюдения
+- В CANDIDATE `MUSEUM_ART_SPACE` ~70 записей: ~половина мусор/коммерция, ~15-20 нормальные музеи.
+- Owner: опубликовать нормальные, затем проставить график.
+
+### Решения
+- Prod MSK: **19** venue → `PUBLISHED` + `isIndexable`; missing `canonicalPath` → `/venues/{slug}`.
+- Пропуск: дубль Третьяковки (Lavrushinsky), Царицыно/Кусково как «зал/комната».
+- Editorial overlay `venue-opening-hours.ts`: +14 slug с официальными часами (ГМИИ, Пушкин Пречистенка, Гоголь, Вернадский, Скрябин, Островский, Глазунов, PERMM, Державин, Верхняя Пышма, Площадь Мира, Покровский, Петровский экскурсии).
+- Без часов пока (нет надёжного источника): Бенуа, Булла, Самойловы, Планетарий 1, Новодевичий, галерея Паршин.
+
+### Проблемы
+- Cyrillic slug хвосты Ticketland остаются; отдельный rename не делали.
+- Часы на live билетах появятся после web deploy batch.
+
+---
+
 ## 2026-08-09 - bulk fix canonicalPath locations↔venues mismatch
 
 ### Наблюдения
