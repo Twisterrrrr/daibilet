@@ -6,6 +6,7 @@
 | CONT.TRANSIT-TIPS | Schema `transitTip` + UI suburb timeline; NN logistics; SPB triangle/Petrograd/Bertgold/bar; Perm/KGD tips | Высокий | ✅ `c5d644d8` Deploy MSK web `31305337295` BUILD_ID=`gOTUGQNTVuIsCS_1DvAT_` |
 | CONT.KGD-LOGISTICS | KGD suburbs/presets: коса углубление+Фрингилла возврат, Зел/Свет/Балт/Янт порядок+timingNote | Высокий | ✅ `7644445c` Deploy MSK web `31304947725` |
 | CONT.PERM-LOGISTICS | Perm suburbs/presets: Хохловка CCW, Кунгур центр+пещера, Белая гора split, Усьва/Губаха 2 дня | Высокий | ✅ `7644445c` Deploy MSK web `31304947725` BUILD_ID=`mi3IHPRLphsEf9IgHXj9a` |
+| UX.MUSTSEE-CHIPS-2ROW | Hub must-see filter chips: mobile 2-row horizontal scroll; sm+ wrap | Критический | 🔄 ship+Deploy MSK web |
 | UX.CANON-ALIGN | DayTripCanonCard desktop: gutter nums + text vertical = title; mobile wider; tips; scenarios carousel | Критический | 🔄 ship+Deploy MSK web |
 | UX.SCENARIOS-WRAP | Scenarios chips: mobile carousel (nowrap scroll), sm+ wrap; SPB drop suburb dupes | Критический | 🔄 ship+Deploy MSK web |
 | UX.MYDAY-TRANSIT | Between-stop `↓ tip` in my-day list; merge keeps transitTip; Peterhof/bar tips | Высокий | 🔄 ship+Deploy MSK web |

@@ -1,3 +1,17 @@
+## 2026-08-09 - Must-see filter chips: 2-row mobile scroll
+
+### Наблюдения
+- Owner (СПб hub): чипы «Главные места / Музеи / …» под «Зачем ехать» wrap на 5+ строк на mobile.
+
+### Решения
+- `MustSeeFilterTabs`: mobile `grid-flow-col grid-rows-2` + horizontal scroll; sm+ `flex-wrap`.
+- Не трогали scenarios/suburbs chips (отдельные блоки).
+
+### Проблемы
+- Deploy вместе с canon gutter / tips / scenarios carousel.
+
+---
+
 ## 2026-08-09 - Canon gutter align + tips + scenarios carousel
 
 ### Наблюдения
