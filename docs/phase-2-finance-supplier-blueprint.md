@@ -462,8 +462,10 @@ YOOKASSA_RETURN_BASE_URL=https://daibilet.ru
 Webhook to register in YooKassa LC:
 
 ```text
-https://api.daibilet.ru/api/checkout/yookassa/webhook
+https://finance-api.daibilet.ru/api/checkout/yookassa/webhook
 ```
+
+Do not use `https://api.daibilet.ru/api/checkout/yookassa/webhook` for finance checkout webhooks: that host is the catalog API surface, not the finance API on `.159`.
 
 Venue admission note:
 

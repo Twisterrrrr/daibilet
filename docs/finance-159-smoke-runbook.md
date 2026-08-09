@@ -120,7 +120,7 @@ DAIBILET_YOOKASSA_CHECKOUT=1
 пока не выполнены все условия:
 
 - sandbox `YOOKASSA_SHOP_ID` и `YOOKASSA_SECRET_KEY` стоят на `.159`;
-- webhook URL зарегистрирован в LC YooKassa;
+- webhook URL `https://finance-api.daibilet.ru/api/checkout/yookassa/webhook` зарегистрирован в LC YooKassa (`api.daibilet.ru` не использовать для finance checkout);
 - STUB order виден в admin, supplier LC и buyer account;
 - projection contract smoke зелёный;
 - catalog CTA всё ещё gated по `canSell && checkoutPath`;
