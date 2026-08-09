@@ -234,10 +234,11 @@ function inferMustSeeKindAndFamily(name, item = null) {
     return { kind: 'MEETING_POINT', family: 'location', confident: true };
   }
 
-  if (PARK_RE.test(n) && !/парковк/i.test(n)) {
+  // «Петергоф» is in PARK_RE for the ensemble hub, but «…Петергофский дворец» is a building.
+  if (PARK_RE.test(n) && !/парковк/i.test(n) && !BUILDING_ATTRACTION_RE.test(n)) {
     return { kind: 'PARK', family: 'location', confident: true };
   }
-  if (MONUMENT_RE.test(n)) {
+  if (MONUMENT_RE.test(n) && !BUILDING_ATTRACTION_RE.test(n)) {
     return { kind: 'MONUMENT', family: 'location', confident: true };
   }
   if (THEATER_RE.test(n)) {

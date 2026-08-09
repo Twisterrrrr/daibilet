@@ -1,3 +1,21 @@
+## 2026-08-09 - palace cards: wrong kind + leftover concert poster
+
+### Наблюдения
+- Екатерининский дворец (`saint-petersburg-ekaterininskiy-dvorets`) отдавался как `monument`.
+- Большой Петергофский дворец: бейдж `park`, hero - портрет пианиста с HIDDEN-концерта Pianissimo; события скрыты, постер остался на Venue.heroImageUrl.
+- Причина PARK: в `PARK_RE` голый токен `петергоф` срабатывал раньше `дворец` → ATTRACTION.
+
+### Решения
+- Prod: оба kind → `ATTRACTION`; hero → editorial jpg (Екатерининский / petergof.jpg).
+- Heuristics: PARK/MONUMENT не перебивают `BUILDING_ATTRACTION_RE` (дворец/собор…).
+- `city-place-images`: map для slug Петергофского дворца.
+- API restart; web deploy для image map - batch / по запросу (DB hero уже чинит каталог).
+
+### Проблемы
+- HIDDEN события (Pianissimo / экскурсии) не возвращаем в каталог - это ожидаемо.
+
+---
+
 ## 2026-08-09 - opening hours overlay: 122 published museums
 
 ### Наблюдения

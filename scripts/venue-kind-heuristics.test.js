@@ -44,6 +44,10 @@ expectInfer('Севкабель Порт', 'OUTDOOR_LOCATION');
 
 // Park / monument / museum / gastro
 expectInfer('Летний сад', 'PARK');
+expectInfer('Петергоф', 'PARK');
+expectInfer('Нижний парк Петергофа', 'PARK');
+expectInfer('Большой Петергофский дворец', 'ATTRACTION');
+expectInfer('Екатерининский дворец', 'ATTRACTION');
 expectInfer('Медный всадник', 'MONUMENT');
 expectInfer('Кунсткамера', 'MUSEUM_ART_SPACE');
 expectInfer('Ресторан «Корюшка»', 'GASTRO');
