@@ -9,7 +9,6 @@ import {
   Clock,
   Copy,
   ExternalLink,
-  LayoutGrid,
   List,
   MapPin,
   Navigation,
@@ -42,6 +41,7 @@ import { CityDayPresetBlock } from '@/components/CityDayPresetBlock.client';
 import { CityPicker } from '@/components/CityPicker.client';
 import { DayRouteBoatWizard } from '@/components/DayRouteBoatWizard.client';
 import { DayRouteOsmMap } from '@/components/DayRouteOsmMap.client';
+import { DayRouteStopsTimeline } from '@/components/DayRouteStopsTimeline.client';
 import {
   DayRoutePurchaseCta,
   isDayRouteVendorCheckoutUrl,
@@ -179,19 +179,23 @@ import { toVenueCatalogCard } from '@/lib/venue-catalog-card';
 import type { VenueCatalogCard } from '@/lib/venue-map-types';
 
 type DayRouteAccordionId = 'mustSee' | 'text' | 'matches';
-type DayRouteStopViewMode = 'grid' | 'list';
+/** `timeline` replaces legacy dense grid «fence»; `list` keeps editable stop cards. */
+type DayRouteStopViewMode = 'timeline' | 'list';
+type DayRouteMobileShelf = 'route' | 'add';
 
 const DAY_ROUTE_STOP_VIEW_KEY = 'daibilet:dayRouteStopView';
 /** Owner 2026-08-06: post-buy modal «Оформили билет?» off until UX revisit. Buy links still open. */
 const SHOW_DAY_TICKET_HANDOFF_MODAL = false;
 
 function readStopViewMode(): DayRouteStopViewMode {
-  if (typeof window === 'undefined') return 'grid';
+  if (typeof window === 'undefined') return 'timeline';
   try {
     const raw = window.localStorage.getItem(DAY_ROUTE_STOP_VIEW_KEY);
-    return raw === 'list' ? 'list' : 'grid';
+    if (raw === 'list') return 'list';
+    // Migrate legacy «grid» fence → timeline.
+    return 'timeline';
   } catch {
-    return 'grid';
+    return 'timeline';
   }
 }
 
@@ -408,9 +412,11 @@ function DayRoutePanelInner() {
   const [focusedStopId, setFocusedStopId] = useState<string | null>(null);
   /** Mobile (&lt;lg): list-first; map is a separate fullscreen mode (Wanderlog-style). */
   const [mobileView, setMobileView] = useState<'list' | 'map'>('list');
-  /** Route stops layout: grid (default) or dense text list. */
-  const [stopViewMode, setStopViewMode] = useState<DayRouteStopViewMode>('grid');
-  /** Desktop (≥lg) can pick grid/list; mobile always dense list (no density toggle). */
+  /** Mobile shelf: route steps/map vs catalog add tools. */
+  const [mobileShelf, setMobileShelf] = useState<DayRouteMobileShelf>('route');
+  /** Route stops layout: timeline (default) or dense editable list. */
+  const [stopViewMode, setStopViewMode] = useState<DayRouteStopViewMode>('timeline');
+  /** Desktop (≥lg) can pick timeline/list; mobile always list cards under timeline. */
   const [isLgUp, setIsLgUp] = useState(false);
   const listRootRef = useRef<HTMLDivElement | null>(null);
   /** After external «Купить билет» - ask guest to mark bought (gated by SHOW_DAY_TICKET_HANDOFF_MODAL). */
@@ -512,6 +518,10 @@ function DayRoutePanelInner() {
   }, []);
 
   useEffect(() => {
+    if (route.venues.length === 0) setMobileShelf('add');
+  }, [route.venues.length]);
+
+  useEffect(() => {
     if (typeof window === 'undefined') return;
     const mq = window.matchMedia('(min-width: 1024px)');
     const sync = () => setIsLgUp(mq.matches);
@@ -521,10 +531,29 @@ function DayRoutePanelInner() {
   }, []);
 
   const effectiveStopViewMode: DayRouteStopViewMode = isLgUp ? stopViewMode : 'list';
+  /** Cards always use list variant; timeline mode keeps fence-free overview. */
+  const stopCardVariant: 'list' = 'list';
+  const timelineStops = useMemo(
+    () =>
+      route.venues.map((venue) => ({
+        id: venue.id,
+        title: venue.title,
+        imageUrl: venue.imageUrl || null,
+      })),
+    [route.venues],
+  );
+  const timelineActiveId =
+    focusedStopId && route.venues.some((v) => v.id === focusedStopId)
+      ? focusedStopId
+      : route.venues[0]?.id || null;
 
   function changeStopViewMode(mode: DayRouteStopViewMode) {
     setStopViewMode(mode);
     writeStopViewMode(mode);
+  }
+
+  function focusStopFromTimeline(stopId: string) {
+    focusStopFromMap(stopId);
   }
 
   // Destinations for on-page city picker (prefer layout context).
@@ -2902,6 +2931,52 @@ function DayRoutePanelInner() {
       {/* Empty plan: city+search starter is the first content block under H1 */}
       {isEmptyRoute ? renderEmptyStarter() : null}
 
+      {/* Mobile: route steps vs add places */}
+      <div
+        className="sticky top-[var(--site-header-height)] z-20 -mx-4 mt-4 border-b border-slate-200/80 bg-white/95 px-4 py-2 backdrop-blur lg:hidden"
+        data-day-mobile-shelf-tabs
+        role="tablist"
+        aria-label="Разделы моего дня"
+      >
+        <div className="flex gap-1 rounded-xl bg-[#F5F5F7] p-1">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mobileShelf === 'route'}
+            onClick={() => {
+              setMobileShelf('route');
+              setMobileView('list');
+            }}
+            className={`inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-lg px-2 text-xs font-semibold transition ${
+              mobileShelf === 'route'
+                ? 'bg-white text-slate-900 shadow-sm'
+                : 'text-slate-500'
+            }`}
+          >
+            <Route className="h-3.5 w-3.5 shrink-0" aria-hidden />
+            Карта и шаги{route.venues.length ? ` (${route.venues.length})` : ''}
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mobileShelf === 'add'}
+            onClick={() => setMobileShelf('add')}
+            className={`inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-lg px-2 text-xs font-semibold transition ${
+              mobileShelf === 'add'
+                ? 'bg-white text-slate-900 shadow-sm'
+                : 'text-slate-500'
+            }`}
+          >
+            <Plus className="h-3.5 w-3.5 shrink-0" aria-hidden />
+            Добавить места
+          </button>
+        </div>
+      </div>
+
+      <div
+        className={mobileShelf === 'route' ? 'lg:contents' : 'hidden lg:contents'}
+        data-day-mobile-shelf-panel="route"
+      >
       {/* 1. Route list - always expanded */}
       {!route.venues.length ? null : (
         <section className="mt-5 w-full sm:mt-8" data-day-route-list>
@@ -2934,16 +3009,16 @@ function DayRoutePanelInner() {
               >
                 <button
                   type="button"
-                  aria-pressed={stopViewMode === 'grid'}
-                  onClick={() => changeStopViewMode('grid')}
+                  aria-pressed={stopViewMode === 'timeline'}
+                  onClick={() => changeStopViewMode('timeline')}
                   className={`inline-flex min-h-7 items-center gap-1 rounded-full px-2.5 text-[11px] font-semibold transition ${
-                    stopViewMode === 'grid'
+                    stopViewMode === 'timeline'
                       ? 'bg-white text-slate-800 shadow-sm'
                       : 'text-slate-500 hover:text-slate-700'
                   }`}
                 >
-                  <LayoutGrid className="h-3.5 w-3.5" />
-                  Сетка
+                  <Route className="h-3.5 w-3.5" />
+                  Шаги
                 </button>
                 <button
                   type="button"
@@ -3068,17 +3143,23 @@ function DayRoutePanelInner() {
             </p>
           ) : null}
 
+          {timelineStops.length > 0 ? (
+            <div className="mt-3" data-day-route-timeline-wrap>
+              <DayRouteStopsTimeline
+                stops={timelineStops}
+                activeId={timelineActiveId}
+                onSelect={focusStopFromTimeline}
+              />
+            </div>
+          ) : null}
+
           {purchasedStops.length ? (
             <div className="mt-3" data-day-group="purchased">
               <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wide text-primary-700">
                 Купленные билеты
               </p>
               <ul
-                className={
-                  effectiveStopViewMode === 'grid'
-                    ? 'grid w-full grid-cols-1 items-start gap-1.5 sm:grid-cols-2 lg:grid-cols-3'
-                    : 'grid w-full grid-cols-1 items-start gap-0'
-                }
+                className="grid w-full grid-cols-1 items-start gap-0"
                 data-day-plan-list="purchased"
                 data-day-stop-view={effectiveStopViewMode}
               >
@@ -3088,7 +3169,7 @@ function DayRoutePanelInner() {
                     index={index}
                     total={purchasedStops.length}
                     venue={venue}
-                    variant={effectiveStopViewMode}
+                    variant={stopCardVariant}
                     group="purchased"
                     softTimeLabel={hourPlan?.byId[venue.id]?.label || null}
                     hasCoords={Boolean(lookupDayRouteCoords(venue, coordsById))}
@@ -3127,11 +3208,7 @@ function DayRoutePanelInner() {
               </p>
             ) : null}
             <ul
-              className={
-                effectiveStopViewMode === 'grid'
-                  ? 'grid w-full grid-cols-1 items-start gap-1.5 sm:grid-cols-2 lg:grid-cols-3'
-                  : 'grid w-full grid-cols-1 items-start gap-0'
-              }
+              className="grid w-full grid-cols-1 items-start gap-0"
               data-day-plan-list="plans"
               data-day-stop-view={effectiveStopViewMode}
             >
@@ -3151,7 +3228,7 @@ function DayRoutePanelInner() {
                       index={index}
                       total={planStops.length}
                       venue={venue}
-                      variant={effectiveStopViewMode}
+                      variant={stopCardVariant}
                       group="plans"
                       softTimeLabel={hourPlan?.byId[venue.id]?.label || null}
                       hasCoords={Boolean(lookupDayRouteCoords(venue, coordsById))}
@@ -3183,9 +3260,7 @@ function DayRoutePanelInner() {
                     />
                     {betweenTip ? (
                       <li
-                        className={`list-none px-1 py-0.5 ${
-                          effectiveStopViewMode === 'grid' ? 'col-span-full' : ''
-                        }`}
+                        className="list-none px-1 py-0.5"
                         data-day-transit-between
                         aria-label={betweenTip}
                       >
@@ -3200,7 +3275,6 @@ function DayRoutePanelInner() {
                     freeWindowUpsells.length > 0 &&
                     !atMax ? (
                       <li
-                        className={effectiveStopViewMode === 'grid' ? 'col-span-full' : undefined}
                         data-day-free-window-upsell
                         data-day-free-window
                       >
@@ -3259,11 +3333,7 @@ function DayRoutePanelInner() {
                 Не поместилось в график (запасные планы)
               </p>
               <ul
-                className={
-                  effectiveStopViewMode === 'grid'
-                    ? 'grid w-full grid-cols-1 items-start gap-1.5 sm:grid-cols-2 lg:grid-cols-3'
-                    : 'grid w-full grid-cols-1 items-start gap-0'
-                }
+                className="grid w-full grid-cols-1 items-start gap-0"
                 data-day-plan-list="overflow"
               >
                 {overflowStops.map((venue, index) => (
@@ -3272,7 +3342,7 @@ function DayRoutePanelInner() {
                     index={index}
                     total={overflowStops.length}
                     venue={venue}
-                    variant={effectiveStopViewMode}
+                    variant={stopCardVariant}
                     group="overflow"
                     softTimeLabel={null}
                     hasCoords={Boolean(lookupDayRouteCoords(venue, coordsById))}
@@ -3335,6 +3405,12 @@ function DayRoutePanelInner() {
         </section>
       )}
 
+      </div>
+
+      <div
+        className={mobileShelf === 'add' ? 'lg:contents' : 'hidden lg:contents'}
+        data-day-mobile-shelf-panel="add"
+      >
       {/* Day-plan guides: always open (логистика / гастро / Что посмотреть). Accordion = route tools only. */}
       {showScenariosGuide ? (
         <section
@@ -3441,9 +3517,10 @@ function DayRoutePanelInner() {
                   />
                   <div
                     id="day-must-see-list"
-                    className="mt-3 grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3"
+                    className="mt-3 horizontal-snap-row flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain pb-1"
                     data-day-must-see-list
                     data-day-must-see-expanded="1"
+                    data-day-must-see-layout="carousel"
                   >
                     {mustSeeFiltered.map(({ place, item, hook }) => {
                       const inRoute =
@@ -3467,44 +3544,45 @@ function DayRoutePanelInner() {
                                   : hook || 'Добавить в день'
                           }
                           onClick={() => addMustSeeItem(item)}
-                          className={`flex w-full min-w-0 items-center gap-3 rounded-xl border px-2.5 py-1.5 text-left transition disabled:cursor-not-allowed ${
+                          className={`relative h-52 w-[72vw] max-w-[16.5rem] shrink-0 snap-start overflow-hidden rounded-2xl border text-left transition disabled:cursor-not-allowed sm:w-60 ${
                             inRoute
-                              ? 'border-emerald-400 bg-emerald-50 text-emerald-900'
-                              : 'border-slate-200 bg-white text-slate-800 hover:border-emerald-300 hover:bg-emerald-50/50'
+                              ? 'border-emerald-400 ring-2 ring-emerald-200'
+                              : 'border-slate-200 hover:border-primary-300'
                           }`}
                         >
-                          <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-lg bg-slate-100">
+                          <div className="absolute inset-0 bg-[#F5F5F7]">
                             {item.imageUrl ? (
                               <SafeImage
                                 src={item.imageUrl}
                                 alt=""
                                 fill
-                                sizes="6rem"
+                                sizes="16.5rem"
                                 className="object-cover"
                               />
                             ) : (
                               <div className="flex h-full w-full items-center justify-center text-slate-400">
-                                <MapPin className="h-5 w-5" />
+                                <MapPin className="h-7 w-7" />
                               </div>
                             )}
                           </div>
-                          <span className="min-w-0 flex-1 py-0.5">
-                            <span className="block line-clamp-2 text-sm font-semibold leading-snug">
-                              {place.name}
-                            </span>
-                            {hook ? (
-                              <span className="mt-0.5 block line-clamp-2 text-[11px] leading-snug text-slate-500">
-                                {hook}
-                              </span>
-                            ) : null}
-                          </span>
+                          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/25 to-transparent" />
                           <span
-                            className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
-                              inRoute ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-900 text-white'
+                            className={`absolute right-2.5 top-2.5 inline-flex h-9 w-9 items-center justify-center rounded-full shadow-sm ${
+                              inRoute ? 'bg-emerald-500 text-white' : 'bg-white/95 text-slate-900'
                             }`}
                             aria-hidden
                           >
                             {inRoute ? <Check className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+                          </span>
+                          <span className="absolute inset-x-0 bottom-0 p-3.5">
+                            <span className="block line-clamp-2 text-sm font-bold leading-snug text-white drop-shadow">
+                              {place.name}
+                            </span>
+                            {hook ? (
+                              <span className="mt-1 block line-clamp-2 text-[11px] leading-snug text-white/80">
+                                {hook}
+                              </span>
+                            ) : null}
                           </span>
                         </button>
                       );
@@ -3939,6 +4017,8 @@ function DayRoutePanelInner() {
 
       </div>
 
+      </div>
+
       {mobileView === 'map' && hasMapStops ? (
         <div
           className="fixed inset-x-0 bottom-0 top-[var(--site-header-height)] z-30 flex flex-col bg-white lg:hidden print:hidden"
@@ -4040,52 +4120,51 @@ function DayRoutePanelInner() {
             type="button"
             onClick={openFirstUnpaidTicket}
             data-day-buy-sticky
-            className="inline-flex h-11 flex-1 items-center justify-center gap-1.5 rounded-full bg-amber-500 px-3 text-sm font-bold text-white hover:bg-amber-600"
+            className="inline-flex h-12 flex-1 items-center justify-center gap-1.5 rounded-full bg-amber-500 px-4 text-sm font-bold text-white hover:bg-amber-600"
           >
             <Ticket className="h-4 w-4" />
-            Купить билеты
+            Купить билеты на маршрут
           </button>
-        ) : null}
-        {hasMapStops ? (
+        ) : route.venues.length >= DAY_ROUTE_MIN ? (
           <button
             type="button"
-            onClick={() => setMobileView('map')}
-            aria-pressed={mobileView === 'map'}
-            data-day-sticky-map
-            className="inline-flex h-11 flex-1 items-center justify-center gap-1.5 rounded-full bg-sky-600 px-3 text-sm font-bold text-white hover:bg-sky-700"
+            onClick={() => {
+              setMobileShelf('route');
+              if (hasMapStops) setMobileView('map');
+              else {
+                const el = document.querySelector('[data-day-route-list]');
+                if (el instanceof HTMLElement) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
+            }}
+            data-day-view-ready-sticky
+            className="inline-flex h-12 flex-1 items-center justify-center gap-1.5 rounded-full bg-primary-600 px-4 text-sm font-bold text-white hover:bg-primary-700"
           >
-            <MapPin className="h-4 w-4" />
-            Карта
+            <Route className="h-4 w-4" />
+            Посмотреть готовый день
           </button>
         ) : (
           <button
             type="button"
-            disabled
-            className="inline-flex h-11 flex-1 cursor-not-allowed items-center justify-center gap-1.5 rounded-full bg-slate-200 px-3 text-sm font-bold text-slate-500"
-          >
-            <MapPin className="h-4 w-4" />
-            Карта
-          </button>
-        )}
-        {!atMax ? (
-          <button
-            type="button"
-            onClick={focusUnifiedSearch}
-            className="inline-flex h-11 flex-1 items-center justify-center gap-1.5 rounded-full bg-slate-900 px-3 text-sm font-bold text-white hover:bg-primary-600"
+            onClick={() => {
+              setMobileShelf('add');
+              focusUnifiedSearch();
+            }}
+            data-day-add-sticky
+            className="inline-flex h-12 flex-1 items-center justify-center gap-1.5 rounded-full bg-primary-600 px-4 text-sm font-bold text-white hover:bg-primary-700"
           >
             <Plus className="h-4 w-4" />
-            Добавить
+            Добавить места
           </button>
-        ) : null}
+        )}
         {route.venues.length ? (
           <button
             type="button"
             onClick={() => setShareMenuOpen(true)}
             data-day-share-sticky
-            className="inline-flex h-11 flex-1 items-center justify-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 text-sm font-bold text-emerald-900"
+            className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700"
+            aria-label="Поделиться"
           >
             <Share2 className="h-4 w-4" />
-            Поделиться
           </button>
         ) : null}
       </MobileStickyActionBar>
@@ -4364,7 +4443,7 @@ function DayRouteVenueCard({
   venue,
   index,
   total,
-  variant = 'grid',
+  variant = 'list',
   group = 'plans',
   softTimeLabel = null,
   hasCoords,
@@ -4384,7 +4463,7 @@ function DayRouteVenueCard({
   venue: DayRouteVenueItem;
   index: number;
   total: number;
-  variant?: DayRouteStopViewMode;
+  variant?: 'list' | 'grid';
   group?: 'purchased' | 'plans' | 'overflow';
   softTimeLabel?: string | null;
   hasCoords: boolean;

@@ -10,7 +10,8 @@ import {
   resolveCanonGastroStop,
 } from '@/components/DayTripCanonCard.client';
 import { resolveCityPlaceTitleHref } from '@/lib/city-place-href';
-import type { CityMustSeeItem, CitySuburbItem } from '@/lib/cityInfo';
+import { resolveVenueHeroImage } from '@/lib/city-place-images';
+import type { CityMustSeeItem, CitySuburbItem, CitySuburbPlace } from '@/lib/cityInfo';
 import {
   dayRouteHookLine,
   dayRouteItemFromMustSee,
@@ -50,6 +51,28 @@ function suburbVectorTitle(place: CitySuburbItem): string {
     : '';
 }
 
+function suburbHeroImage(
+  place: CitySuburbItem,
+  venues: DayRouteVenueMatchSource[],
+): string | null {
+  const candidates: Array<string | null | undefined> = [
+    place.venueSlug,
+    place.locationSlug,
+    ...(Array.isArray(place.places) ? place.places : []).flatMap((poi: CitySuburbPlace) => [
+      poi.venueSlug,
+      poi.locationSlug,
+    ]),
+  ];
+  for (const raw of candidates) {
+    const slug = String(raw || '').trim();
+    if (!slug) continue;
+    const matched = venues.find((venue) => String(venue.slug || '').trim() === slug);
+    const resolved = resolveVenueHeroImage(slug, matched?.heroImageUrl);
+    if (resolved) return resolved;
+  }
+  return null;
+}
+
 export type SuburbsCarouselProps = {
   places: CitySuburbItem[];
   venues: DayRouteVenueMatchSource[];
@@ -58,7 +81,7 @@ export type SuburbsCarouselProps = {
   /** Hub editorial typography; my-day keeps default slate. */
   editorial?: boolean;
   /**
-   * My-day: same card canon as hub; POI desc from md+ (mobile name-only).
+   * My-day: magazine DayTripCanonCard (cover + short sights + primary CTA).
    */
   compact?: boolean;
   /** Skip outer h2/intro when parent accordion provides the chrome. */
@@ -174,6 +197,7 @@ export function SuburbsCarousel({
         : '';
     const nested = Array.isArray(place.places) ? place.places.filter((p) => p?.name) : [];
     const bulkVenues = buildBulkVenues(place, venues, city);
+    const heroImageUrl = suburbHeroImage(place, venues);
     const titleNode = placeHref ? (
       <Link
         href={placeHref}
@@ -192,6 +216,9 @@ export function SuburbsCarousel({
         index={index}
         total={places.length}
         editorial={editorial}
+        magazine={compact}
+        heroImageUrl={heroImageUrl}
+        lead={compact ? String(place.desc || '').trim() || undefined : undefined}
         title={titleNode}
         subtitle={suburbVectorTitle(place) || undefined}
         logisticsExit={String(place.logisticsExit || place.stationName || '').trim() || undefined}
@@ -200,7 +227,7 @@ export function SuburbsCarousel({
         logisticsExtra={
           [String(place.timingNote || '').trim(), blurb].filter(Boolean).join(' ') || undefined
         }
-        gastro={resolveCanonGastroStop(place)}
+        gastro={compact ? null : resolveCanonGastroStop(place)}
         sightDescFromMd={compact}
         sights={nested.map((poi) => ({
           name: poi.name,
@@ -213,7 +240,12 @@ export function SuburbsCarousel({
           bulkVenues.length > 0 ? (
             <AddManyToDayRouteButton
               compact
-              className="!min-h-9 !px-3.5 !py-2 !text-xs"
+              variant={compact ? 'primary' : 'light'}
+              className={
+                compact
+                  ? 'w-full !min-h-11 !rounded-xl !px-4 !py-2.5 !text-sm'
+                  : '!min-h-9 !px-3.5 !py-2 !text-xs'
+              }
               venues={bulkVenues}
             />
           ) : null

@@ -1,3 +1,21 @@
+## 2026-08-10 - `/my-day`: travel product visuals (P0-P2)
+
+### Наблюдения
+- Owner: «Мой день в Москве» выглядел как admin/Excel - серые chip walls сценариев, text-only пригород (Архангельское), сетка-забор stop cards, плотный must-see grid vs живой «Выбор Дайбилет».
+
+### Решения
+- **P0 suburb magazine:** `DayTripCanonCard` `magazine` + cover (`heroImageUrl` / gradient), lead, max 4 «Что посмотреть», primary «В маршрут» (`AddMany` variant `primary`). `SuburbsCarousel` compact → magazine.
+- **P0 stops timeline:** `DayRouteStopsTimeline` (numbered circles + connector + thumb); grid fence → list + timeline; toggle «Шаги / Список».
+- **P0 scenarios:** `CityDayPresetBlock` snap-cards (фото/gradient + bold title) вместо gray pills; primary CTA в detail.
+- **P1 must-see:** горизонтальная карусель крупных cover-карточек (+ в углу), как hot picks.
+- **P2 mobile:** sticky tabs `[Карта и шаги (N)] | [+ Добавить места]`; sticky primary «Посмотреть готовый день» / buy / add.
+- Commit+push; **без** web deploy.
+
+### Проблемы
+- Нет cover-файла для Архангельского в editorial map - magazine fallback gradient до появления asset.
+
+---
+
 ## 2026-08-10 - `/podborki`: один filter-system + clean covers
 
 ### Наблюдения

@@ -2,6 +2,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
+| UX.MYDAY-TRAVEL-PRODUCT | `/my-day`: magazine suburb, stops timeline, scenario snap cards, must-see carousel, mobile shelf tabs | Критический | ✅ ship; deploy по «выкатывай» |
 | UX.PODBORKI-ONE-FILTER | `/podborki`: один filter-system (black tabs + soft tags); kill «Каталог подборок»/дубль city; clean covers (meta under photo); dedupe featured | Высокий | ✅ `eb68f461`; deploy по «выкатывай» |
 | UX.SITEWIDE-MINIMALISM | Sitewide UX: 1 mobile filter rail; no system junk; clean covers (meta under photo); one monochrome line icon pack. Canon LOCKED in Project/Diary | Высокий | ✅ docs locked; 🔄 page polishes ongoing (venues done; locations/podborki/blog) |
 | UX.VENUES-CATALOG-QUIET | `/venues`: kill dark hero; white H1; soft chip rail; no Найдено/стр.; clean InstitutionCard (+ icon, meta above title) | Высокий | ✅ `e78f905b`; deploy по «выкатывай» |

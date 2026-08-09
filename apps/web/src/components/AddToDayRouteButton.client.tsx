@@ -210,7 +210,7 @@ export function AddToDayRouteButton({
 type ManyProps = {
   venues: DayRouteVenueItem[];
   className?: string;
-  variant?: 'light' | 'dark' | 'overlay';
+  variant?: 'light' | 'dark' | 'overlay' | 'primary';
   compact?: boolean;
 };
 
@@ -248,9 +248,13 @@ export function AddManyToDayRouteButton({
         ? allActive
           ? 'bg-emerald-600/95 text-white shadow-sm backdrop-blur-sm hover:bg-emerald-700'
           : 'bg-white/90 text-slate-800 shadow-sm backdrop-blur-sm hover:bg-white'
-        : allActive
-          ? 'bg-emerald-600 text-white hover:bg-emerald-700'
-          : 'bg-slate-100 text-slate-800 hover:bg-slate-200';
+        : variant === 'primary'
+          ? allActive
+            ? 'bg-emerald-600 text-white hover:bg-emerald-700'
+            : 'bg-primary-600 text-white hover:bg-primary-700'
+          : allActive
+            ? 'bg-emerald-600 text-white hover:bg-emerald-700'
+            : 'bg-slate-100 text-slate-800 hover:bg-slate-200';
 
   const label = allActive ? 'В маршруте' : compact ? 'В маршрут' : 'В мой маршрут';
 

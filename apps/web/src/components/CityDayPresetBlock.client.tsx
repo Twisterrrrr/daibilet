@@ -2,9 +2,10 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowUpRight, Route } from 'lucide-react';
+import { ArrowUpRight, MapPin, Route } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
+import { SafeImage } from '@/components/SafeImage.client';
 import type { CityDayRoutePreset, CityMustSeeItem } from '@/lib/cityInfo';
 import {
   buildCityDayRoutePreset,
@@ -33,7 +34,7 @@ type Props = {
   inMyDay?: boolean;
   /**
    * Inside DayRoutePanel accordion: no outer card/title (chrome is the accordion row).
-   * Named presets always use suburb-like chips + one detail panel (hub + my-day).
+   * Named presets always use snap cards + one detail panel (hub + my-day).
    */
   embedded?: boolean;
 };
@@ -64,6 +65,22 @@ function mainPlacesPhrase(count: number): string {
 const SCENARIO_CARD_PAD = 'px-5 py-5 sm:px-6 sm:py-6';
 const STOP_ROW = 'flex items-start gap-1.5 text-sm leading-snug';
 const STOP_NUM = 'w-[1.25rem] shrink-0 tabular-nums';
+
+const SCENARIO_GRADIENTS = [
+  'from-slate-700 via-slate-500 to-primary-400',
+  'from-sky-800 via-sky-600 to-cyan-400',
+  'from-emerald-800 via-teal-600 to-lime-400',
+  'from-indigo-800 via-violet-600 to-fuchsia-400',
+  'from-amber-800 via-orange-600 to-rose-400',
+] as const;
+
+function presetCoverUrl(items: NamedRow['items']): string | null {
+  for (const item of items) {
+    const url = String(item.imageUrl || '').trim();
+    if (url) return url;
+  }
+  return null;
+}
 
 export function CityDayPresetBlock({
   places,
@@ -131,27 +148,20 @@ export function CityDayPresetBlock({
   const softClass = editorial ? 'text-zinc-600' : 'text-slate-600';
   const mutedClass = editorial ? 'text-zinc-500' : 'text-slate-500';
   const numClass = editorial ? 'text-zinc-400' : 'text-slate-400';
-  const chipIdle = editorial
-    ? 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-400'
-    : 'border-slate-200 bg-white text-slate-700 hover:border-slate-400';
-  const chipActive = editorial
-    ? 'border-zinc-900 bg-zinc-900 text-white'
-    : 'border-slate-900 bg-slate-900 text-white';
   const skeletonTone = editorial ? 'bg-zinc-200/80' : 'bg-slate-200/90';
-  /** Match suburb AddManyToDayRouteButton compact look (Route + slate chip). */
-  const routeCtaClass =
-    'inline-flex min-h-9 min-w-[2.75rem] shrink-0 items-center justify-center gap-1.5 rounded-full bg-slate-100 px-3.5 py-2 text-xs font-semibold text-slate-800 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50';
+  const routeCtaClass = inMyDay
+    ? 'inline-flex min-h-11 w-full shrink-0 items-center justify-center gap-1.5 rounded-xl bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50'
+    : 'inline-flex min-h-9 min-w-[2.75rem] shrink-0 items-center justify-center gap-1.5 rounded-full bg-slate-100 px-3.5 py-2 text-xs font-semibold text-slate-800 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50';
 
   // Named presets that still need catalog name-match must wait for match sources;
   // otherwise editorial-ready chips paint first and the rest «pop in» later (SPB).
-  // Hub + my-day share the same chips skeleton (no hub card-list path).
   if ((namedPresets || []).length > 0 && catalogPending) {
     const skeletonCount = Math.max(3, Math.min(8, namedPresets.length));
     return (
       <div
         className={shellClass || undefined}
         data-day-presets={inMyDay ? 'my-day' : 'hub'}
-        data-day-presets-mode="chips"
+        data-day-presets-mode="snap-cards"
         data-day-presets-pending="1"
         aria-busy="true"
         aria-label="Загружаем готовые сценарии"
@@ -163,14 +173,13 @@ export function CityDayPresetBlock({
           </>
         )}
         <div
-          className={`${embedded ? '' : 'mt-4 '}flex flex-wrap gap-2`}
+          className={`${embedded ? '' : 'mt-4 '}horizontal-snap-row flex snap-x snap-mandatory gap-2.5 overflow-x-auto pb-0.5`}
           data-day-preset-chips
         >
           {Array.from({ length: skeletonCount }, (_, index) => (
             <div
               key={`preset-skel-chip-${index}`}
-              className={`inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full border px-3 ${borderClass} ${skeletonTone} animate-pulse`}
-              style={{ width: `${9.5 + (index % 3) * 1.25}rem` }}
+              className={`h-[7.5rem] w-[9.75rem] shrink-0 animate-pulse rounded-2xl ${skeletonTone}`}
             />
           ))}
         </div>
@@ -218,7 +227,7 @@ export function CityDayPresetBlock({
                   <ArrowUpRight className="h-3 w-3 shrink-0 opacity-80" aria-hidden />
                 </Link>
               ) : null}
-              {available ? (
+              {available && !inMyDay ? (
                 <button
                   type="button"
                   disabled={busyId != null}
@@ -276,13 +285,24 @@ export function CityDayPresetBlock({
               })}
             </ol>
           ) : null}
+          {available && inMyDay ? (
+            <button
+              type="button"
+              disabled={busyId != null}
+              onClick={() => apply(preset.id, items)}
+              className={routeCtaClass}
+              data-day-preset-cta
+            >
+              <Route className="h-4 w-4 shrink-0" aria-hidden />
+              <span>{namedCta(busyId === preset.id)}</span>
+            </button>
+          ) : null}
         </div>
       </div>
     );
   };
 
   if (namedResolved.length > 0) {
-    // Chips + light detail (stops line); not suburb canon card.
     const selectedIndex =
       activeIndex == null || activeIndex < 0 || activeIndex >= namedResolved.length
         ? null
@@ -293,7 +313,7 @@ export function CityDayPresetBlock({
       <div
         className={shellClass || undefined}
         data-day-presets={inMyDay ? 'my-day' : 'hub'}
-        data-day-presets-mode="chips"
+        data-day-presets-mode="snap-cards"
       >
         {embedded ? null : (
           <>
@@ -301,16 +321,17 @@ export function CityDayPresetBlock({
             <p className={`mt-1 text-sm leading-6 ${softClass}`}>{namedLead}</p>
           </>
         )}
-        {/* Mobile: horizontal chip carousel (как пригороды compact). sm+: wrap как hub suburbs. */}
         <div
-          className={`${embedded ? '' : 'mt-4 '}flex flex-nowrap gap-2 overflow-x-auto overscroll-x-contain pb-0.5 [scrollbar-width:thin] sm:flex-wrap sm:overflow-x-visible sm:pb-0`}
+          className={`${embedded ? '' : 'mt-4 '}horizontal-snap-row flex snap-x snap-mandatory gap-2.5 overflow-x-auto overscroll-x-contain pb-0.5`}
           role="tablist"
           aria-label="Готовые сценарии"
           data-day-preset-chips
-          data-day-preset-chips-scroll="mobile"
+          data-day-preset-chips-scroll="1"
         >
           {namedResolved.map((row, index) => {
             const active = selectedIndex === index;
+            const cover = presetCoverUrl(row.items);
+            const gradient = SCENARIO_GRADIENTS[index % SCENARIO_GRADIENTS.length];
             return (
               <button
                 key={row.preset.id}
@@ -321,24 +342,41 @@ export function CityDayPresetBlock({
                 data-day-preset-chip={row.preset.id}
                 data-active={active ? '1' : '0'}
                 onClick={() => setActiveIndex((prev) => (prev === index ? null : index))}
-                className={`inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
-                  active ? chipActive : chipIdle
+                className={`relative h-[7.75rem] w-[10rem] shrink-0 snap-start overflow-hidden rounded-2xl text-left transition sm:h-[8.25rem] sm:w-[11rem] ${
+                  active
+                    ? 'ring-2 ring-primary-600 ring-offset-2'
+                    : 'ring-1 ring-black/5 hover:ring-slate-300'
                 }`}
               >
-                <span
-                  className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold tabular-nums ${
-                    active
-                      ? 'bg-white/20 text-white'
-                      : editorial
-                        ? 'bg-zinc-100 text-zinc-700'
-                        : 'bg-primary-50 text-primary-700'
-                  }`}
-                >
-                  {index + 1}
+                {cover ? (
+                  <SafeImage
+                    src={cover}
+                    alt=""
+                    fill
+                    sizes="11rem"
+                    className="object-cover"
+                  />
+                ) : (
+                  <span
+                    className={`absolute inset-0 bg-gradient-to-br ${gradient}`}
+                    aria-hidden
+                  />
+                )}
+                <span className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/35 to-slate-950/5" />
+                <span className="absolute inset-x-0 bottom-0 p-2.5">
+                  <span className="line-clamp-2 text-sm font-bold leading-snug text-white drop-shadow">
+                    {row.preset.title}
+                  </span>
+                  <span className="mt-0.5 block text-[10px] font-medium text-white/75">
+                    {row.items.length} точек
+                  </span>
                 </span>
-                <span className="max-w-[14rem] truncate sm:max-w-none sm:whitespace-normal">
-                  {row.preset.title}
-                </span>
+                {!cover ? (
+                  <MapPin
+                    className="absolute right-2 top-2 h-4 w-4 text-white/50"
+                    aria-hidden
+                  />
+                ) : null}
               </button>
             );
           })}
