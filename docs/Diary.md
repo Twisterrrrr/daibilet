@@ -1,3 +1,18 @@
+## 2026-08-09 - Hotfix: suburb card width + POI row layout
+
+### Наблюдения
+- Live (KGD Куршская коса): max-w-2xl белые поля; номера POI «над» текстом с огромными дырами (grid на `li` без list-none).
+- Сценарии не должны быть полным DayTripCanonCard.
+
+### Решения
+- Canon card: `w-full max-w-none`; POI `ol list-none` + `li flex items-start gap-2` (номер shrink-0 слева).
+- Scenarios: лёгкий chips+panel + CTA «В маршрут» как suburb compact (уже в `f7d4c478`).
+
+### Проблемы
+- Ship+Deploy MSK web — ниже после GHA.
+
+---
+
 ## 2026-08-09 - Scenarios ≠ suburb canon card; full width
 
 ### Наблюдения

@@ -69,11 +69,7 @@ function SightLabel({
   );
 }
 
-/**
- * Visual canon for suburb day-trip cards (owner Peterhof mockup).
- * Scenarios keep a lighter chips+detail panel — do not reuse this for presets.
- * No SVG icons in logistics / gastro / sights - text section titles only.
- */
+/** Suburb day-trip card: logistics / gastro / sights / CTA. Full section width. */
 export function DayTripCanonCard({
   index,
   total,
@@ -125,19 +121,19 @@ export function DayTripCanonCard({
         ariaLabel ||
         (total != null ? `${index + 1} из ${total}` : undefined)
       }
-      className={`mt-4 w-full rounded-2xl border bg-white p-5 shadow-sm sm:p-6 ${
+      className={`mt-4 w-full max-w-none rounded-2xl border bg-white p-5 shadow-sm sm:p-6 ${
         editorial ? 'border-zinc-200' : 'border-slate-200'
       } ${className}`}
       data-day-trip-canon="1"
       {...dataProps}
     >
-      <header className="flex gap-3">
+      <header className="flex items-start gap-3">
         <span
           className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold tabular-nums ${badgeClass}`}
         >
           {index + 1}
         </span>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <h3
             className={`text-xl font-semibold leading-snug tracking-tight sm:text-2xl ${titleClass}`}
             data-day-trip-title
@@ -205,17 +201,15 @@ export function DayTripCanonCard({
       {nested.length ? (
         <section className={`mt-5 border-t pt-4 ${borderSoft}`} data-day-trip-sights>
           <h4 className={`text-sm font-semibold ${inkClass}`}>Что посмотреть</h4>
-          <ol className="mt-3 space-y-2" data-day-trip-places>
+          <ol className="mt-3 list-none space-y-2 p-0" data-day-trip-places>
             {nested.map((poi, poiIndex) => (
               <li
                 key={`${poi.name}:${poiIndex}`}
-                className="grid grid-cols-[1.75rem_minmax(0,1fr)] gap-x-2 text-sm leading-snug"
+                className="flex items-start gap-2 text-sm leading-snug"
                 data-day-trip-place
               >
-                <span className={`pt-0.5 text-center tabular-nums ${numClass}`}>
-                  {poiIndex + 1}.
-                </span>
-                <span className={`min-w-0 ${poiTextClass}`}>
+                <span className={`shrink-0 tabular-nums ${numClass}`}>{poiIndex + 1}.</span>
+                <span className={`min-w-0 flex-1 ${poiTextClass}`}>
                   <SightLabel
                     name={poi.name}
                     href={poi.href}

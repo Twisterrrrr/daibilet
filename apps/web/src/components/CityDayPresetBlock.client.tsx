@@ -244,7 +244,7 @@ export function CityDayPresetBlock({
   };
 
   if (namedResolved.length > 0) {
-    // Chips like suburbs + light detail panel (not DayTripCanonCard / logistics/gastro/sights).
+    // Chips + light detail (stops line); not suburb canon card.
     const selectedIndex =
       activeIndex == null || activeIndex < 0 || activeIndex >= namedResolved.length
         ? null
