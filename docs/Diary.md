@@ -11,6 +11,21 @@
 
 ---
 
+## 2026-08-09 - Guide day-plan open (not my-day accordion)
+
+### Наблюдения
+- Owner (КГД коса): логистика/гастро/«Что посмотреть» с ↓ tips казались спрятанными в accordion «Собери свой день».
+
+### Решения
+- `/my-day`: scenarios + suburbs вынесены из accordion в always-open `data-day-guide` секции с DayTripCanonCard.
+- Accordion оставили только для сборки маршрута (must-see / своё место / matches).
+- Hub city page не дублировали - там guide уже открыт.
+
+### Проблемы
+- Deploy MSK web ASAP.
+
+---
+
 ## 2026-08-09 - Must-see filter chips: 2-row mobile scroll
 
 ### Наблюдения

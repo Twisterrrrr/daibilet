@@ -178,7 +178,7 @@ import { eventHref, venueHref } from '@/lib/routes';
 import { toVenueCatalogCard } from '@/lib/venue-catalog-card';
 import type { VenueCatalogCard } from '@/lib/venue-map-types';
 
-type DayRouteAccordionId = 'scenarios' | 'suburbs' | 'mustSee' | 'text' | 'matches';
+type DayRouteAccordionId = 'mustSee' | 'text' | 'matches';
 type DayRouteStopViewMode = 'grid' | 'list';
 
 const DAY_ROUTE_STOP_VIEW_KEY = 'daibilet:dayRouteStopView';
@@ -378,8 +378,8 @@ function DayRoutePanelInner() {
   const [cityInput, setCityInput] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
-  /** Exclusive accordion: route list stays outside; all other sections collapse. */
-  /** Must-see starts collapsed; suburbs block expands the first chip by default. */
+  /** Exclusive accordion for route-building tools only (must-see / custom / matches). */
+  /** Guidebook (scenarios + suburbs DayTripCanonCard) stays always open as day-plan cards. */
   const [openPanel, setOpenPanel] = useState<DayRouteAccordionId | null>(null);
   const [locationsCatalog, setLocationsCatalog] = useState<VenueCatalogCard[]>([]);
   const [venuesCatalog, setVenuesCatalog] = useState<VenueCatalogCard[]>([]);
@@ -1673,10 +1673,9 @@ function DayRoutePanelInner() {
   }
 
   function scrollToDayPresets() {
-    setOpenPanel('scenarios');
     window.setTimeout(() => {
       const el =
-        document.querySelector('[data-day-accordion="scenarios"]') ||
+        document.querySelector('[data-day-guide="scenarios"]') ||
         document.querySelector('[data-day-presets]');
       if (el instanceof HTMLElement) {
         el.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -2105,13 +2104,11 @@ function DayRoutePanelInner() {
   const textFormOpen = openPanel === 'text';
   const mustSeeOpen = openPanel === 'mustSee';
   const matchesOpen = openPanel === 'matches';
-  const scenariosOpen = openPanel === 'scenarios';
-  const suburbsOpen = openPanel === 'suburbs';
   const showMustSeeAccordion = Boolean(hasPageCity && (mustSeeResolved.length > 0 || (!catalogLoading && pageCitySlug)));
-  const showScenariosAccordion = Boolean(
+  const showScenariosGuide = Boolean(
     hasPageCity && (hasNamedPresets || mustSeePlaces.length >= 3),
   );
-  const showSuburbsAccordion = Boolean(hasPageCity && significantSuburbs.length > 0);
+  const showSuburbsGuide = Boolean(hasPageCity && significantSuburbs.length > 0);
   const showHotPicks = Boolean(hasPageCity && (hotPickCards.length > 0 || hotPickTabIds.length > 0));
   const isEmptyRoute = route.venues.length === 0;
   const hasMapStops = mapStops.length > 0;
@@ -3338,50 +3335,58 @@ function DayRoutePanelInner() {
         </section>
       )}
 
-      {/* Accordion stack: scenarios → must-see → suburbs → custom → boat → matches → hot picks → catalog. */}
-      {showScenariosAccordion ? (
-        <div
-          className="mt-3 rounded-2xl border border-slate-200 bg-white"
-          data-day-accordion="scenarios"
+      {/* Day-plan guides: always open (логистика / гастро / Что посмотреть). Accordion = route tools only. */}
+      {showScenariosGuide ? (
+        <section
+          className="mt-3 rounded-2xl border border-slate-200 bg-white px-4 py-4 sm:px-5 sm:py-5"
+          data-day-guide="scenarios"
         >
-          <button
-            type="button"
-            aria-expanded={scenariosOpen}
-            aria-controls="day-scenarios-body"
-            data-day-scenarios-accordion
-            onClick={() => togglePanel('scenarios')}
-            className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left sm:px-5"
-          >
-            <span>
-              <span className="block text-sm font-semibold text-slate-900">Готовые сценарии</span>
-              <span className="mt-0.5 block text-xs text-slate-500">
-                {hasNamedPresets
-                  ? 'Готовые маршруты на день'
-                  : 'Собрать день из главных мест'}
-              </span>
-            </span>
-            <ChevronDown
-              className={`h-5 w-5 shrink-0 text-slate-400 transition ${scenariosOpen ? 'rotate-180' : ''}`}
+          <p className="text-sm font-semibold text-slate-900">Готовые сценарии</p>
+          <p className="mt-0.5 text-xs text-slate-500">
+            {hasNamedPresets
+              ? 'Готовые маршруты на день - план с логистикой и точками'
+              : 'Собрать день из главных мест'}
+          </p>
+          <div className="mt-3">
+            <CityDayPresetBlock
+              places={mustSeePlaces}
+              venues={matchSources}
+              city={dayPresetCityCtx}
+              namedPresets={dayRoutePresets}
+              catalogPending={presetsCatalogPending}
+              navigateToMyDay={false}
+              inMyDay
+              embedded
             />
-          </button>
-          {scenariosOpen ? (
-            <div id="day-scenarios-body" className="border-t border-slate-100 px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
-              <CityDayPresetBlock
-                places={mustSeePlaces}
-                venues={matchSources}
-                city={dayPresetCityCtx}
-                namedPresets={dayRoutePresets}
-                catalogPending={presetsCatalogPending}
-                navigateToMyDay={false}
-                inMyDay
-                embedded
-              />
-            </div>
-          ) : null}
-        </div>
+          </div>
+        </section>
       ) : null}
 
-      {/* Accordion: must-see chips (above suburbs) */}
+      {showSuburbsGuide ? (
+        <section
+          className="mt-3 rounded-2xl border border-slate-200 bg-white px-4 py-4 sm:px-5 sm:py-5"
+          data-day-guide="suburbs"
+        >
+          <p className="text-sm font-semibold text-slate-900">Значимые пригороды</p>
+          <p className="mt-0.5 text-xs text-slate-500">
+            Поездка на день рядом с городом - логистика, гастро и точки
+          </p>
+          <div className="mt-3">
+            <SuburbsCarousel
+              places={significantSuburbs}
+              venues={matchSources}
+              city={dayPresetCityCtx}
+              cityGenitive={cityToGenitive(pageCityName)}
+              compact
+              hideHeader
+              className="mt-0"
+            />
+          </div>
+        </section>
+      ) : null}
+
+      {/* Accordion stack: must-see → custom → boat → matches → hot picks → catalog. */}
+      {/* Accordion: must-see chips (route builder) */}
       {showMustSeeAccordion ? (
         <div className="mt-3 rounded-2xl border border-slate-200 bg-white" data-day-accordion="mustSee">
           <button
@@ -3511,42 +3516,6 @@ function DayRoutePanelInner() {
                   Для этого города пока нет списка главных мест - добавьте точки через поиск в «Из каталога».
                 </p>
               )}
-            </div>
-          ) : null}
-        </div>
-      ) : null}
-
-      {showSuburbsAccordion ? (
-        <div className="mt-3 rounded-2xl border border-slate-200 bg-white" data-day-accordion="suburbs">
-          <button
-            type="button"
-            aria-expanded={suburbsOpen}
-            aria-controls="day-suburbs-body"
-            data-day-suburbs-accordion
-            onClick={() => togglePanel('suburbs')}
-            className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left sm:px-5"
-          >
-            <span>
-              <span className="block text-sm font-semibold text-slate-900">Значимые пригороды</span>
-              <span className="mt-0.5 block text-xs text-slate-500">
-                Поездка на день рядом с городом
-              </span>
-            </span>
-            <ChevronDown
-              className={`h-5 w-5 shrink-0 text-slate-400 transition ${suburbsOpen ? 'rotate-180' : ''}`}
-            />
-          </button>
-          {suburbsOpen ? (
-            <div id="day-suburbs-body" className="border-t border-slate-100 px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
-              <SuburbsCarousel
-                places={significantSuburbs}
-                venues={matchSources}
-                city={dayPresetCityCtx}
-                cityGenitive={cityToGenitive(pageCityName)}
-                compact
-                hideHeader
-                className="mt-0"
-              />
             </div>
           ) : null}
         </div>
