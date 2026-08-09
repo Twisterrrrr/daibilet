@@ -1,3 +1,20 @@
+## 2026-08-09 - Location + gastro previews: основная масса
+
+### Наблюдения
+- Owner: долг по превью открытых локаций (`/locations`: monuments/landmarks/embankments/bridges/parks + gastro); «нехорошо обманывать».
+- Аудит live API family=location: focus kinds monument/outdoor/park/attraction = **171** PUBLISHED без уникального cover (stub/city/empty); gastro **51/51** уже в editorial map, но **27** sharp-градиентов (~18–22KB) вместо реальных фото.
+- Gastro живёт в family=`location` (kind/`type=gastro`), карточки `/locations` (+ My Day через `resolveVenueHeroImage`), не `/venues` institution.
+
+### Решения
+- GenerateImage уникальные дневные/атмосферные JPG → `apps/public/public/images/venues/{city}/` (не трогали `images/cities/*`).
+- Закрыто: **171/171** location gaps + **27** gastro stub→AI; `LOCATION_PACK_IMAGES` (171) в `city-place-images.ts`; gastro paths в `GASTRO_PACK_IMAGES` перезаписаны теми же URL.
+- Приоритет: СПб → NN/топ-дыры → rest регионов.
+
+### Проблемы
+- Hub `heroImageUrl` у gastro по-прежнему может быть `/venues/generated/*`; карточки берут editorial через `resolveVenueHeroImage` / client overlay.
+
+---
+
 ## 2026-08-09 - Replace remaining night city covers with daytime
 
 ### Наблюдения
