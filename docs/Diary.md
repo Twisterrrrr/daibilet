@@ -27,7 +27,7 @@
 - Day routes / preset availability / boat wizard / purchase modal не трогали.
 
 ### Проблемы
-- Нет.
+- GHA run `31299644782` в UI помечен cancelled (concurrency), но Swap on MSK успел завершиться; live `/cities/moscow` отдаёт `data-day-presets-mode=chips` + `data-city-events-rail`, BUILD_ID=`XmUXa_zhYAnUPDqEPpQYP`.
 
 ---
 

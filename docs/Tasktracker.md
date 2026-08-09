@@ -3,8 +3,8 @@
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
 | FIX.VENUE-PAGE-HANG | `/locations`/`/venues` `?page=` soft-nav hang → client slice | Критический | ✅ `3a968000` Deploy MSK web BUILD_ID=`9BpSEnRcVf3lhoksHGMJ6` |
-| UX.HUB-SCENARIOS-CHIPS | Hub «Готовые сценарии»: chips+panel как my-day на всех breakpoints (не card list) | Высокий | 🔄 code; deploy MSK web |
-| UX.HUB-AFFICHE-RAIL | Hub «Ближайшие события»: mobile swipe carousel + desktop prev/next (не вертикальная простыня) | Высокий | 🔄 code; deploy MSK web |
+| UX.HUB-SCENARIOS-CHIPS | Hub «Готовые сценарии»: chips+panel как my-day на всех breakpoints (не card list) | Высокий | ✅ `eaf4a164` Deploy MSK web `31299644782` BUILD_ID=`XmUXa_zhYAnUPDqEPpQYP` |
+| UX.HUB-AFFICHE-RAIL | Hub «Ближайшие события»: mobile swipe carousel + desktop prev/next (не вертикальная простыня) | Высокий | ✅ `eaf4a164` Deploy MSK web `31299644782` BUILD_ID=`XmUXa_zhYAnUPDqEPpQYP` |
 | INC.LOC500.SOFTCONN | soft-unavailable `connection()` → DYNAMIC_SERVER_USAGE 500 на location PDP | Критический | ✅ `5221afcd` Deploy MSK web BUILD_ID=`XA_SZgY9mVm0tjISGf6pI` |
 | FIX.TC-BAD-TOKEN | my-day «Купить билет» → TC HTTPForbidden bad token (`r:` в URL) | Критический | ✅ `89abc556` API live; web Deploy MSK |
 | INC.VENUE-SOFT-ALL | API hang → soft-unavailable poison на всех venue PDP | Критический | ✅ ops restore; code soft≠ISR + catalog child mode |
@@ -291,7 +291,7 @@ Alias `museum-1` = первый open-date контракт (не «музеи fo
 | UX.CITIES-DESKTOP | `/cities`: 8 top daytime + full-width map + remaining list; CTA row desktop; без «Все города (n)» | Высокий | ✅ `54a9ffd`; MSK BUILD_ID=`AF2liBH4Eu1LzXz8b0Yu2`; smoke 200 |
 | UX.CITIES-OCTET2 | `/cities` ranks 9-16: same dark/white chrome as top-8 + daytime JPG; MSK sync-public-assets | Высокий | ✅ `2db4ee62` Deploy `31276301334` BUILD_ID=`aXcB-Mia_CNSVUQEECgh6` |
 | UX.CITIES-DAY-NIGHTFIX | Replace remaining night city covers (12 red-V + suzdal/sortavala + sync dark PNGs) | Высокий | ✅ 780ac4c Deploy 31286030403 |
-| UX.CITIES-HUB-NIGHT | Scope fix: catalog/home daytime; hub hero night from `cities/night/` (56 restored) | Высокий | 🔄 commit+deploy |
+| UX.CITIES-HUB-NIGHT | Scope fix: catalog/home daytime; hub hero night from `cities/night/` (56 restored) | Высокий | ✅ `21e8d092` Deploy `31299826751` tip `85144f97`; smoke hub night + catalog day |
 
 ## Suburb nested coords → day-route (2026-08-06)
 
