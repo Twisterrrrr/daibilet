@@ -44,8 +44,10 @@ export type CityMustSeeItem = CityPlaceLinkFields & {
   stationHub?: string;
   /** @deprecated Prefer logisticsExit; kept as fallback for «Где выходить». */
   stationName?: string;
-  /** Станция / причал выхода (блок «Логистика»). */
+  /** Станция / причал / локация (блок «Логистика»). */
   logisticsExit?: string;
+  /** Подпись к logisticsExit. По умолчанию «Где выходить». */
+  logisticsExitLabel?: string;
   /**
    * Legacy one-line gastro («Название - текст»).
    * Prefer structured gastroStop for suburb cards.
@@ -741,11 +743,13 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           { name: 'Форт «Константин»', desc: 'исторический береговой форт на южном берегу Кронштадта с панорамой на фарватер и музейной экспозицией.', latitude: 59.99555, longitude: 29.70125 },
           { name: 'Петровский парк', desc: 'городской парк у Петровского дока с памятником Петру I и видом на гавань Кронштадта.', latitude: 59.98955, longitude: 29.76785 },
         ],
-        travelVector: 'Островной и Ладожский вектор',
-        travelVectorBlurb: 'Водная логистика, катера от Невы или КАД/Дамба.',
-        stationHub: 'Дамба / Водный транспорт',
-        stationName: 'Котлин / Дамба или Метеоры',
-        logisticsExit: 'Котлин / Дамба или Метеоры',
+        travelVector: 'Финский залив и Балтийский вектор',
+        travelVectorBlurb:
+          'Как добраться: метеоры/катамараны из центра СПб, на авто или автобусе по КАД',
+        stationHub: 'Дамба/к западу от СПБ',
+        stationName: 'остров Котлин',
+        logisticsExit: 'остров Котлин',
+        logisticsExitLabel: 'Где расположен',
         gastroStop: { name: '«Голландская кухня»', blurb: 'Кухня в духе голландских мастеров верфей Петра у Петровского дока.' },
         gastroHint: '«Голландская кухня» (Кронштадт, у Петровского дока) - Историческое заведение, переосмыслившее кулинарные традиции голландских мастеров верфей Петра.',
       },

@@ -22,6 +22,8 @@ export type DayTripCanonCardProps = {
   /** Subtitle under title (vector / timingNote / description). */
   subtitle?: string;
   logisticsExit?: string;
+  /** Label before logisticsExit (default «Где выходить»). */
+  logisticsExitLabel?: string;
   logisticsText?: string;
   /** Extra prose under logistics (hub blurb). */
   logisticsExtra?: string;
@@ -105,6 +107,7 @@ export function DayTripCanonCard({
   title,
   subtitle,
   logisticsExit,
+  logisticsExitLabel = 'Где выходить',
   logisticsText,
   logisticsExtra,
   gastro,
@@ -217,7 +220,7 @@ export function DayTripCanonCard({
                 >
                   {logisticsExit ? (
                     <p className={`text-sm leading-snug ${softClass}`} data-day-trip-exit>
-                      <span className={`font-semibold ${inkClass}`}>Где выходить</span>
+                      <span className={`font-semibold ${inkClass}`}>{logisticsExitLabel}</span>
                       <span className={mutedClass}>: {logisticsExit}</span>
                     </p>
                   ) : null}

@@ -195,6 +195,7 @@ export function SuburbsCarousel({
         title={titleNode}
         subtitle={suburbVectorTitle(place) || undefined}
         logisticsExit={String(place.logisticsExit || place.stationName || '').trim() || undefined}
+        logisticsExitLabel={String(place.logisticsExitLabel || '').trim() || undefined}
         logisticsText={String(place.travelVectorBlurb || '').trim() || undefined}
         logisticsExtra={
           [String(place.timingNote || '').trim(), blurb].filter(Boolean).join(' ') || undefined
