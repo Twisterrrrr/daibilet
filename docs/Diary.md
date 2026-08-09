@@ -11,8 +11,11 @@
 - Prod MSK: `seed-perm-must-see-pack.js --apply` (insert-missing).
 
 ### Проблемы
-- Hub/covers на live - после web deploy batch (cityInfo + city-place-images).
-- Если fuzzy «Музей»→Sortavala ещё не на API - ghost events до restart/deploy фикса.
+- Hub mustSee chips / editorial map в бандле - после web deploy batch (cityInfo + city-place-images уже в ветке).
+- Fuzzy bare «Музей»→Sortavala: фикс `d6437672` уже на MSK + API restart вместе с этим seed.
+
+### Live
+- Commit `64b4ddfa`; MSK seed insert **4** / Motovilikha upsert desc; smoke `/venues/{5}` + `/api/public/venues/{5}` + heroes **200**.
 
 ---
 

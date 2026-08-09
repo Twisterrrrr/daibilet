@@ -286,7 +286,7 @@ Alias `museum-1` = первый open-date контракт (не «музеи fo
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| CONT.PERM-NEOBYCH-5 | Статья `perm-neobychnye-muzei`: seed/mustSee все 5 музеев + blog `/venues` links + heroes | Высокий | 🔄 cityInfo+images+blog; MSK seed pending |
+| CONT.PERM-NEOBYCH-5 | Статья `perm-neobychnye-muzei`: seed/mustSee все 5 музеев + blog `/venues` links + heroes | Высокий | ✅ `64b4ddfa`; MSK seed +4 PUBLISHED; smoke `/venues`×5 + images 200; hub/covers map - next web deploy |
 
 ## Perm must-see pack + my-day (2026-08-06)
 
