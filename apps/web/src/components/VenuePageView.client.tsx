@@ -397,8 +397,9 @@ function isVenueDateRailChipActive(chip: VenueDateRailChip, selected: VenueDateF
 }
 
 function VenueEventsGrid({ groups }: { groups: VenueEventGroup[] }) {
+  // Nested in location/institution main column (lg:col-span-2): 3 cols make a single card skinny.
   return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
       {groups.slice(0, 36).map((group) => (
         <EventCard key={group.key} session={group.representative} compact />
       ))}

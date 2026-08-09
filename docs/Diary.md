@@ -1,3 +1,17 @@
+## 2026-08-10 - Venue schedule cards: restore width
+
+### Наблюдения
+- После nest date-rail в location/institution (`lg:col-span-2`) сетка `sm:grid-cols-2 xl:grid-cols-3` оставляла одну карточку узкой колонкой справа от пустоты.
+
+### Решения
+- `VenueEventsGrid`: `grid-cols-1 sm:grid-cols-2` (без xl:3). Table mode не возвращали.
+
+### Проблемы
+- Нет.
+
+
+---
+
 ## 2026-08-10 - MSK web deploy (cities/venue/scenarios batch)
 
 ### Наблюдения
