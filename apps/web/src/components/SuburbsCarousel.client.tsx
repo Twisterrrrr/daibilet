@@ -163,12 +163,12 @@ export function SuburbsCarousel({
       const slug = String(place.venueSlug || place.locationSlug || '').trim();
       return slug && String(venue.slug || '').trim() === slug;
     });
+    // Venue hook only - do not dump suburb `desc` into logistics (it belongs under the title).
     const blurb =
       !compact
         ? dayRouteHookLine({
             hookFact: matchedVenue?.hookFact,
             shortDescription: matchedVenue?.shortDescription,
-            desc: place.desc,
             preferEditorial: true,
           }) || ''
         : '';
