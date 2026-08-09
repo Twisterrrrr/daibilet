@@ -23,22 +23,6 @@ export const BLOG_POSTS: BlogPost[] = [
   // SPB Top-100 / Beyond-Top-100 скрыты с публичного сайта (правятся в админке как DRAFT).
 
   {
-    slug: 'perm-gorod-i-prigorody',
-    title: 'Пермь: день на Каме и пригороды, которые реально успеть',
-    excerpt:
-      'Городской день по набережной и центру плюс выезды: Хохловка, Кунгур с Ермаком, Белая гора и два дня Усьва / Губаха.',
-    date: '9 августа 2026',
-    readMin: 8,
-    tag: 'Город',
-    city: 'Пермь',
-    citySlug: 'perm',
-    authorId: 'editorial',
-    authorName: 'Редакция',
-    articleType: 'gid',
-    imageUrl: blogCoverUrl('perm-gorod-i-prigorody'),
-    imageAlt: 'Набережная Камы и панорама Перми',
-  },
-  {
     slug: 'instagramnyi-nizhnii',
     title: 'Инстаграмный Нижний: гид по самым фотогеничным точкам города',
     excerpt:

@@ -250,12 +250,6 @@ const SLUG_META: Record<
     citySlug: 'moscow',
     city: 'Москва',
   },
-  'perm-gorod-i-prigorody': {
-    authorId: 'editorial',
-    articleType: 'gid',
-    citySlug: 'perm',
-    city: 'Пермь',
-  },
   'moskva-rechnye-progulki-kak-vybrat': {
     authorId: 'editorial',
     articleType: 'gid',
