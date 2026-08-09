@@ -103,8 +103,7 @@ function adoptCatalogCache(next: {
     staleUntil: next.staleUntil,
     sessions: next.sessions,
     builtAt: next.builtAt,
-    indexes: next.indexes,
-    byId: undefined,
+    ...(next.indexes ? { indexes: next.indexes } : {}),
   };
   return next.sessions;
 }
