@@ -1,3 +1,20 @@
+## 2026-08-10 - Venue/location previews: institution gaps closed
+
+### Наблюдения
+- Live audit: locations focus gaps **1/719** (Мурманск «Алёша»); institutions without editorial/hub hero **94/1277** (museums/theaters/art_space на `/venues/generated/*` stubs). Bars/concert halls в основном с реальными hub-фото.
+- Editorial map на диске был полный для прошлых location packs; institution family почти не покрыта.
+
+### Решения
+- GenerateImage ×92 + wire already-on-disk Erarta/Эрмитаж → `apps/public/public/images/venues/{city}/` + `LOCATION_PACK_IMAGES` (+94 slug).
+- Prod DB `heroImageUrl` не трогали: карточки берут editorial overlay через `resolveVenueHeroImage`.
+- Moscow sharp-stubs ~15–25KB в must-see pack оставлены как quality debt (карта есть, кадр слабый) - не блокер catalog empty.
+
+### Проблемы
+- JPG без sharp compress в agent env - тяжёлые файлы; при необходимости отдельный compress-pass.
+- Deploy MSK web (+ API restart для pier slot hydrate `2f0b8099`) по owner «выкатывай всё».
+
+---
+
 ## 2026-08-10 - `/my-day`: travel product visuals (P0-P2)
 
 ### Наблюдения
