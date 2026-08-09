@@ -1,3 +1,20 @@
+## 2026-08-09 - CRITICAL: location PDP soft-unavailable `connection()` → HTTP 500
+
+### Наблюдения
+- Live `/locations/saint-petersburg-bar-hroniki` (и другие location/gastro PDP) → **500**.
+- API `daibilet-api`: memory high 1.1G / available ~124K / swap ~3.2G → venue DTO timeout; journal `[venue-dto-cache] unavailable ... timeout`.
+- После timeout soft-branch вызывал `await connection()` → digest **`DYNAMIC_SERVER_USAGE`** → HTTP 500 (не soft 200).
+- Cover path для bar-hroniki в editorial map есть; root cause не missing image.
+
+### Решения
+- Ops: `systemctl restart daibilet-api` → DTO 200 (~6.5s cold); PDP снова 200 пока API жив.
+- Code: убрать `connection()` / `noStore()` с soft-unavailable в `VenuePages` + metadata; soft 200 HTML (≤ `revalidate` 300s) вместо 500. Обновить `safe-not-found` комментарий.
+
+### Проблемы
+- API swap-pressure может повториться (catalog dual SWR / memory high) - следить отдельно; web больше не должен 500-ить soft branch.
+
+---
+
 ## 2026-08-09 - Boat wizard: step «Время» в модалке
 
 ### Наблюдения

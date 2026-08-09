@@ -129,9 +129,9 @@ export async function generateVenueDetailMetadata(slug: string): Promise<Metadat
   const loaded = await loadVenueDto(decodeURIComponent(slug));
   if (loaded.kind === 'miss') safeNotFound();
   if (loaded.kind === 'unavailable') {
-    // Keep soft metadata out of long-lived Full Route Cache (same class as HTML soft poison).
-    const { connection } = await import('next/server');
-    await connection();
+    // Do NOT await connection()/noStore() here: on ISR (`revalidate`) that digest
+    // DYNAMIC_SERVER_USAGE surfaces as HTTP 500 (2026-08-09 bar-hroniki / gastro PDP).
+    // Soft metadata may live ≤ revalidate (300s) - acceptable vs crashing the PDP.
     return {
       title: pageTitle('Площадка временно недоступна'),
       robots: { index: false, follow: false },
@@ -231,12 +231,11 @@ export async function VenueDetailPage({
   const loaded = await loadVenueDto(decodedSlug);
   if (loaded.kind === 'miss') safeNotFound();
   if (loaded.kind === 'unavailable') {
-    // Soft UI without noStore()+notFound (that → DYNAMIC_SERVER_USAGE 500 on ISR).
-    // BUT do NOT let soft HTML enter Full Route Cache / nginx SWR (~1y STALE): after API
-    // recovers, every /locations|/venues stays «временно недоступна» until purge
-    // (INC.LOC404 / 2026-08-08 all-venues outage). connection() → dynamic for this render only.
-    const { connection } = await import('next/server');
-    await connection();
+    // Soft 200 UI. Never call connection()/noStore() on this branch: on ISR routes
+    // (`revalidate=300`) those APIs throw digest DYNAMIC_SERVER_USAGE which Next
+    // surfaces as HTTP 500 instead of a dynamic bailout (live 2026-08-09:
+    // /locations/saint-petersburg-bar-hroniki while API was swap-starved).
+    // Soft HTML may be ISR-cached ≤ revalidate - far better than 500; ops purge if needed.
     return <VenueUnavailablePage slug={decodedSlug} />;
   }
 

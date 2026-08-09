@@ -11,8 +11,10 @@ import { notFound } from 'next/navigation';
  * that is the real STALE-404 poison fix for true misses. Transient API errors must map to
  * "unavailable" (soft 200), never `notFound()` - otherwise ISR caches HTML 404 with
  * year-long stale-while-revalidate and live URLs stay broken after API recovers.
- * Soft-unavailable itself must also stay out of Full Route Cache (await `connection()`
- * on that branch) - otherwise STALE soft HTML poisons all venue PDPs the same way.
+ *
+ * Soft-unavailable must NOT call `connection()` / `noStore()` either: on ISR those
+ * digests DYNAMIC_SERVER_USAGE and become HTTP 500 (2026-08-09 bar-hroniki). Prefer soft
+ * 200 HTML that may live ≤ `revalidate` over a hard 500; purge if soft poison lingers.
  * A short ISR HTML 404 TTL (`revalidate`) is OK for genuine misses.
  */
 export function safeNotFound(): never {
