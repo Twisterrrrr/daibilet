@@ -42,7 +42,7 @@
 - CTA «В маршрут» / «Купить билет» без изменений логики; `data-day-boat-*` сохранены.
 
 ### Проблемы
-- Нет.
+- Первый GHA run упал на «SSH tunnel up but MSK API :4000 not healthy»; rerun `--failed` → success, **BUILD_ID=`tBAB7m9Y6YW8i3yukypOC`** (вместе с `c0d61b6d` scenarios gate).
 
 ---
 
