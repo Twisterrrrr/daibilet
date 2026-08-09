@@ -1,3 +1,18 @@
+## 2026-08-09 - venue afisha: bare «Музей» no longer hijacks Perm cards
+
+### Наблюдения
+- `/venues/perm-muzey-motovilihinskih-zavodov` и `/venues/perm-muzey-permskikh-drevnostey` показывали экскурсию Сортавалы (venue title в каталоге = «Музей»).
+- `lookupVenueCatalogSessions` / `collectVenueSessionLookupContexts`: `nameKey.startsWith(sessionName)` без порога длины.
+
+### Решения
+- `venueTextKeysFuzzyMatch`: exact OK; prefix только если shorter ≥ 12 символов.
+- Регрессионные тесты на оба Perm slug + bare «Музей».
+
+### Проблемы
+- Нужен restart `daibilet-api` на MSK (tsx читает src).
+
+---
+
 ## 2026-08-09 - museum twin rematch + STOP «с посещением» + institution nearby
 
 ### Наблюдения
