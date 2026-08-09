@@ -7,7 +7,7 @@
 - Убрали secondary Link «Выбрать сеанс» из футера `EventCard`; остались цена слева и один CTA «Купить билет».
 
 ### Проблемы
-- Нужен Deploy MSK web, чтобы live совпал с HEAD.
+- Нет. Live: Deploy MSK web **31308004380** @`95b7d2a8` BUILD_ID=`HR7QZofnxFLxEIb8loJVL`; смотреть футер карточки на `/events`.
 
 ---
 
