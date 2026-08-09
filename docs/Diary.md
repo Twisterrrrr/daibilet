@@ -54,9 +54,10 @@
 - Owner: пагинация на `/locations` и `/venues` «висит» при смене страницы.
 - HTML TTFB и API `?page=N&counts=0` тёплые (~0.1–0.5s); зависание UX.
 - `<Link ?page=>` → App Router soft-nav → `(catalog)/loading.tsx` (SiteChromeSkeleton wipe) + повторный SSR `VenueListPage` (page1 shell) + после remount клиент ждал city-shell **до** slice page N.
+- Даже raw `<a onClick=preventDefault>` не спасал: App Router перехватывает same-origin anchors.
 
 ### Решения
-- `CatalogPaginationLinks`: optional `onPageChange` (history.pushState, без RSC soft-nav).
+- `CatalogPaginationLinks`: optional `onPageChange` через **`<button>`** + `history.pushState` (без RSC soft-nav).
 - Locations/Venues: local `listPage` + popstate; page>1/typed — сначала API slice (`counts=0`), shell в фоне.
 - Stale cards остаются на экране на время fetch.
 
