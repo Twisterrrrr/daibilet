@@ -28,7 +28,7 @@
 - Preset schema: optional `logisticsExit` / `travelVector*` / `gastroStop`; Петергоф+Царское заполнены.
 
 ### Проблемы
-- Ship/deploy: см. Tasktracker UX.DAY-TRIP-CANON.
+- Ship: `c5629984` · Deploy MSK web **31302281791** · **BUILD_ID=`6JBH32eZcthpObBsPUpA0`**.
 
 ---
 
@@ -45,7 +45,7 @@
 - SPB 11 suburbs: structured meta в web+public; Гатчина - свой blurb (не копия Петергофа).
 
 ### Проблемы
-- Ship/deploy: см. Tasktracker UX.DAY-TRIP-CANON.
+- Ship: `c5629984` · Deploy MSK web **31302281791** · **BUILD_ID=`6JBH32eZcthpObBsPUpA0`** (общий пакет с scenarios).
 
 ---
 
