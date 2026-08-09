@@ -118,14 +118,18 @@ export function getTicketPriceRange(payload: PublicEventPageDto): TicketPriceRan
 }
 
 export function formatBuyCardPrice(range: TicketPriceRange): string {
-  return `от ${formatNumber(Math.round(range.min))} ₽`;
+  const min = Math.round(range.min);
+  const max = Math.round(range.max);
+  if (min === max) return `${formatNumber(min)} ₽`;
+  return `${formatNumber(min)} - ${formatNumber(max)} ₽`;
 }
 
+/** Secondary line under the buy-card price when categories are not listed yet. */
 export function formatBuyCardPriceHint(range: TicketPriceRange): string | null {
   const min = Math.round(range.min);
   const max = Math.round(range.max);
   if (min === max) return null;
-  return `до ${formatNumber(max)} ₽ в зависимости от категории`;
+  return 'Вилка по категориям билетов';
 }
 
 /** Hero CTA intentionally advertises only the minimum available price. */

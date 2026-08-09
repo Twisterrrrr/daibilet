@@ -40,7 +40,7 @@ test('hero CTA shows only the lowest ticket price', () => {
   assert.equal(formatHeroBuyButtonPrice(range!), `от 1${nbsp}000 ₽`);
 });
 
-test('buy card emphasizes от min price, range is secondary hint', () => {
+test('buy card shows min-max fork when categories differ', () => {
   const range = getTicketPriceRange(eventPayload({
     ticketPrices: [
       { key: 'adult', title: 'Взрослый', priceRub: 1_300 },
@@ -49,17 +49,17 @@ test('buy card emphasizes от min price, range is secondary hint', () => {
   }));
 
   assert.deepEqual(range, { min: 1_300, max: 2_300 });
-  assert.equal(formatBuyCardPrice(range!), `от 1${nbsp}300 ₽`);
-  assert.equal(formatBuyCardPriceHint(range!), `до 2${nbsp}300 ₽ в зависимости от категории`);
+  assert.equal(formatBuyCardPrice(range!), `1${nbsp}300 - 2${nbsp}300 ₽`);
+  assert.equal(formatBuyCardPriceHint(range!), 'Вилка по категориям билетов');
 });
 
-test('single exact ticket price uses от label without hint', () => {
+test('single exact ticket price has no fork or hint', () => {
   const range = getTicketPriceRange(eventPayload({
     ticketPrices: [{ key: 'adult', title: 'Взрослый', priceRub: 1_000 }],
   }));
 
   assert.deepEqual(range, { min: 1_000, max: 1_000 });
-  assert.equal(formatBuyCardPrice(range!), `от 1${nbsp}000 ₽`);
+  assert.equal(formatBuyCardPrice(range!), `1${nbsp}000 ₽`);
   assert.equal(formatBuyCardPriceHint(range!), null);
 });
 
@@ -74,7 +74,7 @@ test('oldPrice above min is returned for strikethrough', () => {
   assert.equal(getTicketOldPrice(payload, range), 2_800);
 });
 
-test('open_date eventType is detected for stepper', () => {
+test('open_date eventType is detected', () => {
   assert.equal(
     isOpenDateEvent(
       eventPayload({

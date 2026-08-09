@@ -1,3 +1,19 @@
+## 2026-08-09 - Event buy-card: убрали open-date how-it-works из блока цен
+
+### Наблюдения
+- Owner: зелёная полоска «1 Покупаете / 2 Код на email / 3 Приходите…» в блоке цен — «ужас», убрать целиком (не чинить overlap).
+- Нужны категории тарифов + вилка min–max; без how-it-works в price UI.
+
+### Решения
+- Удалён `OpenDateStepper` и hero-строка how-it-works из `EventPage.client.tsx`.
+- Buy-card: `formatBuyCardPrice` снова показывает вилку `min - max ₽`; список «Категории билетов» из `ticketPrices` / offers; empty state «Цена уточняется» без stepper.
+- Источник цен: `payload.ticketPrices` (канон) → иначе `offers.priceRub` → sessions/stats fallback (`getTicketPriceRange` / `buildGroupedTicketCategories`).
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-09 - /events `?page=` soft-nav hang (same as venues)
 
 ### Наблюдения

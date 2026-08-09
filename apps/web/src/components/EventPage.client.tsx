@@ -26,7 +26,6 @@ import {
   buildGroupedTicketCategories,
   FLEXIBLE_SCHEDULE_LABEL,
   isFlexibleScheduleSession,
-  isOpenDateEvent,
   scrollToBuyCard,
 } from '@/lib/event-page-utils';
 import { extractDurationLabel } from '@/lib/catalog-labels';
@@ -62,11 +61,13 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
   const primaryOffer = offers.find((offer) => offer.active !== false) || offers[0] || null;
   const priceRange = getTicketPriceRange(payload);
   const oldPrice = getTicketOldPrice(payload, priceRange);
-  const priceHint = priceRange ? formatBuyCardPriceHint(priceRange) : null;
   const ticketCategories = buildGroupedTicketCategories(payload);
   const purchaseOptions = payload.purchaseOptions ?? [];
   const showMultiPurchase = purchaseOptions.length >= 2;
-  const openDateTicket = isOpenDateEvent(payload);
+  const priceHint =
+    priceRange && !showMultiPurchase && ticketCategories.length === 0
+      ? formatBuyCardPriceHint(priceRange)
+      : null;
   const visibleSessions = listPurchasableSessionVariants(sessions as EventSession[]).slice(0, 5);
   const allFlexible =
     visibleSessions.length > 0 && visibleSessions.every((session) => isFlexibleScheduleSession(session));
@@ -127,10 +128,14 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
           {priceHint ? <p className="mt-1 text-xs text-graphite-muted">{priceHint}</p> : null}
         </div>
       ) : (
-        <p className="text-lg font-semibold text-graphite-muted">Цена уточняется</p>
+        <div>
+          <p className="text-lg font-semibold text-graphite-muted">Цена уточняется</p>
+          <p className="mt-1 text-sm leading-relaxed text-graphite-muted">
+            Актуальные тарифы появятся при покупке в виджете организатора.
+          </p>
+        </div>
       )}
 
-      {openDateTicket ? <OpenDateStepper className="mt-5" /> : null}
       {showMultiPurchase ? (
         <div className="mt-6">
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-graphite-muted">
@@ -170,6 +175,9 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
         <>
           {ticketCategories.length > 0 ? (
             <div className="mt-6">
+              <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-graphite-muted">
+                Категории билетов
+              </h2>
               <ul className="space-y-2.5">
                 {ticketCategories.map((row) => (
                   <li key={row.key}>
@@ -268,37 +276,6 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
         </span>
       </div>
     </div>
-  );
-}
-
-function OpenDateStepper({ className = '' }: { className?: string }) {
-  const steps = [
-    { n: '1', label: 'Покупаете' },
-    { n: '2', label: 'Код на email' },
-    { n: '3', label: 'Приходите в любой день' },
-  ] as const;
-
-  return (
-    <ol
-      className={`grid gap-2 rounded-xl bg-emerald-50/80 px-3.5 py-3 ring-1 ring-emerald-100/80 sm:grid-cols-3 ${className}`}
-      aria-label="Как работает билет с открытой датой"
-    >
-      {steps.map((step, index) => (
-        <li key={step.n} className="flex items-start gap-2 text-sm text-emerald-950">
-          <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-emerald-600 text-[11px] font-bold text-white">
-            {step.n}
-          </span>
-          <span className="leading-snug">
-            {step.label}
-            {index < steps.length - 1 ? (
-              <span className="ml-1 hidden text-emerald-700/50 sm:inline" aria-hidden>
-                →
-              </span>
-            ) : null}
-          </span>
-        </li>
-      ))}
-    </ol>
   );
 }
 
@@ -546,7 +523,6 @@ export function EventHero({
   const oldPrice = getTicketOldPrice(payload, priceRange);
   const fallbackPrice = formatPriceRub(stats.priceFrom ?? event.priceFrom);
   const priceLabel = priceRange ? formatHeroBuyButtonPrice(priceRange) : fallbackPrice ? `от ${fallbackPrice}` : '';
-  const openDateTicket = isOpenDateEvent(payload);
   const heroImage = String(event.imageUrl || '').trim();
   const heroObjectPosition = resolveEventHeroObjectPosition({
     slug: event.slug,
@@ -661,12 +637,6 @@ export function EventHero({
                 </span>
               ) : null}
             </div>
-
-            {openDateTicket ? (
-              <p className="mt-3 text-sm font-medium text-emerald-200/95">
-                1. Покупаете → 2. Код на email → 3. Приходите в любой день
-              </p>
-            ) : null}
 
             {priceRange || fallbackPrice ? (
               <div className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
