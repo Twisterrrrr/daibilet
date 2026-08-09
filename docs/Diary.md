@@ -1,3 +1,18 @@
+## 2026-08-10 - `/events`: даты в hero, один ряд чипов
+
+### Наблюдения
+- Под поиском было 3 ряда чипов (даты / quick / категории); owner хотел упростить.
+
+### Решения
+- Date rail перенесён в `EventsCatalogHero` (под H1/subtitle) на всех breakpoints.
+- Под поиском один horizontal row: quick (`Сегодня вечером` / `Бесплатные` / `С детьми`) + категории; mobile date/type selects убраны (без дублей).
+- Search row: поиск + Найти + календарь/фильтры (desktop) / FAB фильтры (mobile).
+
+### Проблемы
+- Deploy по «выкатывай» (MSK deploy может идти параллельно - не трогаем).
+
+---
+
 ## 2026-08-10 - Scenarios panel: outer card padding
 
 ### Наблюдения

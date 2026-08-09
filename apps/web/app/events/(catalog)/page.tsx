@@ -45,6 +45,7 @@ export default async function EventsCatalogPage() {
             <div className="container-page py-4 sm:py-5">
               <div className="h-7 w-2/3 max-w-md animate-pulse rounded bg-slate-200 sm:h-8" />
               <div className="mt-1.5 h-3.5 w-1/2 max-w-sm animate-pulse rounded bg-slate-100" />
+              <div className="mt-3 h-11 w-full max-w-xl animate-pulse rounded-2xl bg-slate-100" />
               <p className="sr-only">{EVENTS_SUPPORT}</p>
             </div>
           </div>

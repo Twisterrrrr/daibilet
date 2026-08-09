@@ -2,6 +2,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
+| UX.EVENTS-CHIPS-SIMPLIFY | `/events`: date rail в hero; quick+categories один ряд под search; drop mobile date/type selects | Высокий | 🔄 ship; deploy по «выкатывай» |
 | UX.CITIES-SORT-ONE-LIST | `/cities`: один список (без top/octet); sort popular/name на весь набор; toolbar search+controls в одной строке | Высокий | ✅ `2965a338`; deploy по «выкатывай» |
 | UX.VENUE-AFISHA-ORDER | Venue/location: афиша выше; хабы/похожие ниже | Высокий | ✅ `28795f43`; deploy по «выкатывай» |
 | UX.VENUE-SCHEDULE-RAIL | Venue «Расписание и билеты»: date rail + calendar; drop table/tabs/stats/subtitle | Высокий | ✅ `28795f43`+`97b27739`; deploy по «выкатывай» |

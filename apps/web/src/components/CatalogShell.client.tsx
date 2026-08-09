@@ -243,7 +243,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
 
   return (
     <>
-      {/* Sticky owned by CatalogToolbar (search-only on mobile) so category chips stay in flow. */}
+      {/* Sticky search in CatalogToolbar; date rail in EventsCatalogHero; chips under search. */}
       <CatalogToolbar
         facets={facets}
         values={filterValues}

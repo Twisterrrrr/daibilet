@@ -3,14 +3,15 @@
 import { useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 
+import { CatalogDateRail } from '@/components/CatalogDateRail.client';
 import { PageBreadcrumbBar } from '@/components/PageBreadcrumbs';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { catalogFiltersFromQuery, type CatalogFilterValues } from '@/lib/catalog-url';
 import { cityToPrepositional } from '@/lib/city-declension';
 
 /**
- * Compact catalog header: breadcrumbs + H1 + short subtitle.
- * Search/filters live in CatalogToolbar below - keep first viewport dense.
+ * Compact catalog header: breadcrumbs + H1 + subtitle + date rail.
+ * Search + quick/category chips live in CatalogToolbar below.
  */
 export function EventsCatalogHero() {
   const searchParams = useSearchParams();
@@ -69,6 +70,7 @@ export function EventsCatalogHero() {
         <div className="container-page py-4 sm:py-5">
           <h1 className="font-display text-2xl font-extrabold tracking-tight text-graphite sm:text-3xl">{title}</h1>
           <p className="mt-1 max-w-2xl text-sm leading-snug text-graphite-muted sm:text-[15px]">{subtitle}</p>
+          <CatalogDateRail className="mt-3 sm:mt-3.5" />
         </div>
       </header>
     </>

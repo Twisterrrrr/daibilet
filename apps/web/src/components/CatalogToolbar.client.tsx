@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Baby, ChevronDown, Gift, Moon, MoreHorizontal, Search, SlidersHorizontal, X } from 'lucide-react';
+import { Baby, Gift, Moon, MoreHorizontal, Search, SlidersHorizontal, X } from 'lucide-react';
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -14,11 +14,6 @@ import {
   splitCatalogCategories,
   type CatalogCategoryFacet,
 } from '@/lib/catalog-category-rail';
-import {
-  buildCatalogDateRailChips,
-  isDateRailChipActive,
-  type CatalogDateRailChip,
-} from '@/lib/catalog-date-rail';
 
 import type { PublicCatalogDto } from '@daibilet/contracts/public';
 import {
@@ -59,7 +54,6 @@ export function CatalogToolbar({
   const searchWrapRef = useRef<HTMLDivElement>(null);
   const advancedCount = countAdvancedFilters(filters);
   const singleDay = filters.from && (!filters.to || filters.to === filters.from) ? filters.from : '';
-  const dateRailChips = useMemo(() => buildCatalogDateRailChips(), []);
   const categorySplit = useMemo(
     () => splitCatalogCategories(facets.categories, filters.category),
     [facets.categories, filters.category],
@@ -131,18 +125,6 @@ export function CatalogToolbar({
     });
   };
 
-  const setDatePreset = (nextDate: 'all' | 'today' | 'tomorrow' | 'weekend' | 'evening') => {
-    navigate({
-      ...filters,
-      q: qDraft.trim() || undefined,
-      date: nextDate === 'all' ? undefined : nextDate,
-      from: undefined,
-      to: undefined,
-      page: undefined,
-      sort: nextDate === 'today' || nextDate === 'tomorrow' || nextDate === 'evening' ? 'time' : filters.sort,
-    });
-  };
-
   const setExactDay = (isoDay: string) => {
     if (!isoDay) {
       navigate({
@@ -166,13 +148,22 @@ export function CatalogToolbar({
     });
   };
 
-  const applyDateRailChip = (chip: CatalogDateRailChip) => {
-    if (chip.kind === 'preset') {
-      setDatePreset(chip.value);
-      return;
-    }
-    setExactDay(chip.iso);
-  };
+  const discoveryRow = (
+    <div
+      role="group"
+      aria-label="Быстрые фильтры и категории"
+      className="horizontal-snap-row flex flex-nowrap items-center gap-1.5 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+    >
+      <QuickFilterToggles filters={filters} qDraft={qDraft} disabled={disabled} onNavigate={navigate} />
+      <span aria-hidden className="mx-0.5 h-5 w-px shrink-0 bg-slate-200" />
+      <CategoryTabs
+        filters={filters}
+        primary={categorySplit.primary}
+        overflow={categorySplit.overflow}
+        onOpenMore={() => setCategoriesMoreOpen(true)}
+      />
+    </div>
+  );
 
   const advancedPanel = (
     <CatalogAdvancedFiltersPanel
@@ -209,14 +200,7 @@ export function CatalogToolbar({
     return (
       <div className="space-y-2">
         <div className="flex items-center gap-2">
-          <div className="horizontal-snap-row flex min-w-0 flex-1 gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            <CategoryTabs
-              filters={filters}
-              primary={categorySplit.primary}
-              overflow={categorySplit.overflow}
-              onOpenMore={() => setCategoriesMoreOpen(true)}
-            />
-          </div>
+          <div className="min-w-0 flex-1">{discoveryRow}</div>
           <FiltersButton
             open={filtersOpen}
             count={advancedCount}
@@ -224,7 +208,6 @@ export function CatalogToolbar({
             onClick={() => setFiltersOpen(true)}
           />
         </div>
-        <QuickFilterToggles filters={filters} qDraft={qDraft} disabled={disabled} onNavigate={navigate} />
         {advancedPanel}
         <MoreCategoriesSheet
           open={categoriesMoreOpen}
@@ -238,7 +221,7 @@ export function CatalogToolbar({
 
   return (
     <div className="space-y-2.5 sm:space-y-3">
-      {/* Mobile: compact sticky (search + date/type selects). Rails stay desktop-only. */}
+      {/* Sticky search; date rail lives in EventsCatalogHero. */}
       <div className="catalog-toolbar sticky top-[var(--site-header-height)] z-30 -mx-4 border-b border-slate-200/60 bg-white/95 px-4 py-2 backdrop-blur-md supports-[backdrop-filter]:bg-white/90 sm:-mx-6 sm:px-6 md:static md:z-auto md:mx-0 md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none">
         <form
           onSubmit={onSubmit}
@@ -335,24 +318,6 @@ export function CatalogToolbar({
             ) : null}
           </div>
 
-          {/* Mobile: date + type as compact selects (no chip rails). */}
-          <div className="grid grid-cols-2 gap-1.5 md:hidden">
-            <MobileDateSelect
-              chips={dateRailChips}
-              filters={filters}
-              disabled={disabled}
-              onPreset={setDatePreset}
-              onExactDay={setExactDay}
-            />
-            <MobileCategorySelect
-              filters={filters}
-              categories={facets.categories}
-              disabled={disabled}
-              onNavigate={navigate}
-              qDraft={qDraft}
-            />
-          </div>
-
           <div className="hidden items-center gap-1.5 md:flex">
             <label className="relative hidden min-w-[9.5rem] flex-none md:block md:w-36">
               <span className="sr-only">Точная дата</span>
@@ -378,28 +343,8 @@ export function CatalogToolbar({
 
       {advancedPanel}
 
-      {/* Desktop discovery rails */}
-      <div className="hidden space-y-2 md:block">
-        <CatalogDateRail
-          chips={dateRailChips}
-          filters={filters}
-          disabled={disabled}
-          onSelect={applyDateRailChip}
-        />
-        <QuickFilterToggles filters={filters} qDraft={qDraft} disabled={disabled} onNavigate={navigate} />
-        <div
-          role="tablist"
-          aria-label="Категории"
-          className="horizontal-snap-row flex flex-nowrap gap-1.5 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        >
-          <CategoryTabs
-            filters={filters}
-            primary={categorySplit.primary}
-            overflow={categorySplit.overflow}
-            onOpenMore={() => setCategoriesMoreOpen(true)}
-          />
-        </div>
-      </div>
+      {/* One discovery row: quick chips + categories (all breakpoints). */}
+      {discoveryRow}
 
       <MoreCategoriesSheet
         open={categoriesMoreOpen}
@@ -432,184 +377,6 @@ export function CatalogToolbar({
   );
 }
 
-const mobileSelectCls =
-  'h-10 w-full appearance-none truncate rounded-xl border-0 bg-[#F5F5F7] py-2 pl-3 pr-8 text-sm font-medium text-[#1A1A1A] outline-none transition hover:bg-[#EBEBED] focus-visible:ring-2 focus-visible:ring-primary/40 disabled:opacity-60';
-
-function formatSelectDay(iso: string): string {
-  const day = Number(iso.slice(8));
-  const date = new Date(`${iso}T12:00:00`);
-  const weekday = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'][date.getDay()] || '';
-  return `${weekday} ${day}`;
-}
-
-function resolveMobileDateValue(filters: CatalogFilterValues): string {
-  if (filters.date) return filters.date;
-  if (filters.from && filters.to === filters.from) return `day:${filters.from}`;
-  if (filters.from || filters.to) return 'custom';
-  return 'all';
-}
-
-function MobileDateSelect({
-  chips,
-  filters,
-  disabled,
-  onPreset,
-  onExactDay,
-}: {
-  chips: CatalogDateRailChip[];
-  filters: CatalogFilterValues;
-  disabled?: boolean;
-  onPreset: (value: 'all' | 'today' | 'tomorrow' | 'weekend' | 'evening') => void;
-  onExactDay: (iso: string) => void;
-}) {
-  const value = resolveMobileDateValue(filters);
-  const customLabel =
-    filters.from && filters.to && filters.from !== filters.to
-      ? `${filters.from.slice(8)}.${filters.from.slice(5, 7)} - ${filters.to.slice(8)}.${filters.to.slice(5, 7)}`
-      : filters.from
-        ? formatSelectDay(filters.from)
-        : 'Диапазон дат';
-
-  return (
-    <div className="relative min-w-0">
-      <label className="sr-only" htmlFor="catalog-mobile-date">
-        Дата
-      </label>
-      <select
-        id="catalog-mobile-date"
-        disabled={disabled}
-        value={value === 'custom' ? 'custom' : value}
-        onChange={(event) => {
-          const next = event.target.value;
-          if (next === 'custom') return;
-          if (next === 'all' || next === 'today' || next === 'tomorrow' || next === 'weekend' || next === 'evening') {
-            onPreset(next);
-            return;
-          }
-          if (next.startsWith('day:')) onExactDay(next.slice(4));
-        }}
-        className={mobileSelectCls}
-      >
-        <option value="all">Любая дата</option>
-        <option value="today">Сегодня</option>
-        <option value="tomorrow">Завтра</option>
-        <option value="weekend">Выходные</option>
-        <option value="evening">Сегодня вечером</option>
-        {chips
-          .filter((chip): chip is Extract<CatalogDateRailChip, { kind: 'day' }> => chip.kind === 'day')
-          .map((chip) => (
-            <option key={chip.iso} value={`day:${chip.iso}`}>
-              {formatSelectDay(chip.iso)}
-            </option>
-          ))}
-        {value === 'custom' ? <option value="custom">{customLabel}</option> : null}
-      </select>
-      <ChevronDown
-        aria-hidden
-        className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6E6E73]"
-        strokeWidth={1.75}
-      />
-    </div>
-  );
-}
-
-function MobileCategorySelect({
-  filters,
-  categories,
-  disabled,
-  onNavigate,
-  qDraft,
-}: {
-  filters: CatalogFilterValues;
-  categories: CatalogCategoryFacet[];
-  disabled?: boolean;
-  onNavigate: (next: CatalogFilterValues) => void;
-  qDraft: string;
-}) {
-  const value = filters.category || 'all';
-
-  return (
-    <div className="relative min-w-0">
-      <label className="sr-only" htmlFor="catalog-mobile-category">
-        Тип
-      </label>
-      <select
-        id="catalog-mobile-category"
-        disabled={disabled}
-        value={value}
-        onChange={(event) => {
-          const next = event.target.value;
-          onNavigate({
-            ...filters,
-            q: qDraft.trim() || filters.q,
-            category: next === 'all' ? undefined : next,
-            page: undefined,
-          });
-        }}
-        className={mobileSelectCls}
-      >
-        <option value="all">Все типы</option>
-        {categories.map((item) => (
-          <option key={item.name} value={item.name} disabled={item.events <= 0 && filters.category !== item.name}>
-            {displayCatalogLabel(item.name)}
-          </option>
-        ))}
-      </select>
-      <ChevronDown
-        aria-hidden
-        className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6E6E73]"
-        strokeWidth={1.75}
-      />
-    </div>
-  );
-}
-
-function CatalogDateRail({
-  chips,
-  filters,
-  disabled,
-  onSelect,
-}: {
-  chips: CatalogDateRailChip[];
-  filters: CatalogFilterValues;
-  disabled?: boolean;
-  onSelect: (chip: CatalogDateRailChip) => void;
-}) {
-  return (
-    <div
-      role="group"
-      aria-label="Дата"
-      className="horizontal-snap-row flex flex-nowrap gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-    >
-      {chips.map((chip) => {
-        const active = isDateRailChipActive(chip, filters);
-        const key = chip.kind === 'preset' ? chip.value : chip.iso;
-        return (
-          <button
-            key={key}
-            type="button"
-            disabled={disabled}
-            aria-pressed={active}
-            onClick={() => onSelect(chip)}
-            className={`catalog-date-chip snap-start disabled:opacity-60 ${
-              active ? 'catalog-date-chip-on' : 'catalog-date-chip-idle'
-            }`}
-          >
-            {chip.kind === 'day' ? (
-              <span className="flex flex-col items-center leading-none">
-                <span className="text-[10px] font-semibold uppercase tracking-wide opacity-80">{chip.weekday}</span>
-                <span className="mt-0.5 text-sm font-bold">{chip.iso.slice(8)}</span>
-              </span>
-            ) : (
-              <span className="whitespace-nowrap">{chip.shortLabel}</span>
-            )}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
 function QuickFilterToggles({
   filters,
   qDraft,
@@ -632,11 +399,7 @@ function QuickFilterToggles({
   });
 
   return (
-    <div
-      role="group"
-      aria-label="Быстрые фильтры"
-      className="horizontal-snap-row flex flex-nowrap gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-    >
+    <>
       <button
         type="button"
         disabled={disabled}
@@ -697,7 +460,7 @@ function QuickFilterToggles({
         <Baby aria-hidden className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
         <span className="whitespace-nowrap">С детьми</span>
       </button>
-    </div>
+    </>
   );
 }
 
