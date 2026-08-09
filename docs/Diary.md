@@ -1,3 +1,17 @@
+## 2026-08-09 - Boat wizard: step «Время» в модалке
+
+### Наблюдения
+- Owner: шаг «3. ВРЕМЯ» в `DayRouteBoatWizard` (маршрут вроде MORNING CLUB CRUISE, CTA «В маршрут» / «Купить билет») открывался как full-bleed inline panel на всю ширину страницы, а не как overlay.
+
+### Решения
+- Все шаги wizard (причал → маршрут → время) переведены в portal-модалку: dimmed backdrop, bottom sheet на mobile / centered `max-w-lg` на sm+, `max-height` + scroll body, Escape/backdrop/«Закрыть».
+- CTA «В маршрут» / «Купить билет» без изменений логики; `data-day-boat-*` сохранены.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-09 - Location + gastro previews: основная масса
 
 ### Наблюдения
