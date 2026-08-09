@@ -203,6 +203,14 @@ export function CityDayPresetBlock({
               </Link>
             ) : null}
           </div>
+          {preset.timingNote?.trim() ? (
+            <p
+              className={`mt-1 text-[12px] leading-4 max-md:pr-0.5 md:text-[11px] md:leading-4 ${mutedClass}`}
+              data-day-preset-timing
+            >
+              {preset.timingNote.trim()}
+            </p>
+          ) : null}
           {preset.description ? (
             <p className={`mt-1.5 text-[13px] leading-5 max-md:pr-0.5 md:mt-0.5 md:text-xs ${softClass}`}>
               {preset.description}

@@ -82,6 +82,12 @@ export type CityDayRoutePreset = {
   id: string;
   title: string;
   description?: string;
+  /**
+   * Краткое примечание по времени: когда выезжать / быть на первой точке.
+   * Особенно для пригородов и длинных дней. Подробности - в статье (`blogSlug`).
+   * Пустое / отсутствует → UI не рендерит блок.
+   */
+  timingNote?: string;
   /** Slug статьи блога (`/blog/{blogSlug}`), если есть companion-гайд. */
   blogSlug?: string;
   stops: CityMustSeeItem[];
@@ -951,6 +957,75 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           spbPresetStop('Синий Пушкин', { dayRouteId: 'spb-sinii-pushkin', latitude: 59.936511, longitude: 30.351214, venueSlug: 'sinii-pushkin-bar-shnurova' }),
           spbPresetStop('Руки Вверх Бар', { dayRouteId: 'spb-ruki-vverh', latitude: 59.946614, longitude: 30.375112, venueSlug: 'saint-petersburg-ruki-vverh-bar' }),
           spbPresetStop('Феромон Гражданка', { dayRouteId: 'spb-feromon-grazhdanka', latitude: 59.979811, longitude: 30.389142, venueSlug: 'saint-petersburg-feromon-grazhdanka' }),
+        ],
+      },
+      {
+        id: 'spb-petergof',
+        title: 'Петергоф: парк и фонтаны',
+        description: 'День в Нижнем парке: каскады, Монплезир и Александрия.',
+        timingNote: 'К 10:00 будьте у входа в Нижний парк - иначе не успеть фонтаны и дворцы.',
+        stops: [
+          spbPresetStop('Нижний парк Петергофа', {
+            dayRouteId: 'spb-nizhniy-park-petergofa',
+            locationSlug: 'saint-petersburg-nizhniy-park-petergofa',
+            latitude: 59.885112,
+            longitude: 29.908214,
+          }),
+          spbPresetStop('Большой каскад', {
+            dayRouteId: 'spb-bolshoy-kaskad',
+            latitude: 59.88935,
+            longitude: 29.90855,
+          }),
+          spbPresetStop('Дворец Монплезир', {
+            dayRouteId: 'spb-monplezir',
+            latitude: 59.8879,
+            longitude: 29.9184,
+          }),
+          spbPresetStop('Парк Александрия', {
+            dayRouteId: 'spb-park-aleksandriya',
+            latitude: 59.8808,
+            longitude: 29.9212,
+          }),
+          spbPresetStop('Готическая капелла', {
+            dayRouteId: 'spb-goticheskaya-kapella',
+            latitude: 59.8786,
+            longitude: 29.9261,
+          }),
+        ],
+      },
+      {
+        id: 'spb-tsarskoe-selo',
+        title: 'Царское Село / Пушкин',
+        description: 'Екатерининский дворец, лицей и парковые павильоны за один день.',
+        timingNote: 'Выезжайте к 9:00 с Витебского - дворец и парки займут весь день.',
+        stops: [
+          spbPresetStop('Екатерининский дворец', {
+            dayRouteId: 'spb-ekaterininskiy-dvorets',
+            locationSlug: 'saint-petersburg-ekaterininskiy-dvorets',
+            latitude: 59.715911,
+            longitude: 30.395812,
+          }),
+          spbPresetStop('Царскосельский лицей', {
+            dayRouteId: 'spb-tsarskoselskiy-litsey',
+            locationSlug: 'saint-petersburg-tsarskoselskiy-litsey',
+            latitude: 59.716912,
+            longitude: 30.397114,
+          }),
+          spbPresetStop('Александровский дворец', {
+            dayRouteId: 'spb-aleksandrovskiy-dvorets',
+            latitude: 59.71855,
+            longitude: 30.39135,
+          }),
+          spbPresetStop('Павильон «Эрмитаж»', {
+            dayRouteId: 'spb-pavilon-ermitazh',
+            latitude: 59.71345,
+            longitude: 30.39865,
+          }),
+          spbPresetStop('Ратная палата', {
+            dayRouteId: 'spb-ratnaya-palata',
+            latitude: 59.71235,
+            longitude: 30.40585,
+          }),
         ],
       },
     ],

@@ -1,3 +1,20 @@
+## 2026-08-09 - Day routes: timingNote в head пресета
+
+### Наблюдения
+- Гид / owner: отдельные сценарии нужно привязывать ко времени или рекомендовать, когда быть на первой точке - особенно пригороды, иначе не успеть.
+- Подробности ок в статье; в продукте - краткое примечание в head маршрута.
+
+### Решения
+- LOCKED в `docs/qa.md`: UX-правило day routes / presets + поле `timingNote`.
+- `CityDayRoutePreset.timingNote?` в `cityInfo` (web + public); рендер в `CityDayPresetBlock` под title chips panel; пустое → не показывать.
+- СПб примеры: `spb-petergof`, `spb-tsarskoe-selo` (осмысленный copy, дефис `-`).
+- Boat / purchase / ticket handoff не трогали.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-09 - Event buy-card: убрали open-date how-it-works из блока цен
 
 ### Наблюдения
