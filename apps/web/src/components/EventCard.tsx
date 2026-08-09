@@ -51,10 +51,10 @@ const SLOT_CHIP_PURCHASE_CLASS =
   'transition hover:bg-primary/10 hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40';
 
 const DETAILS_LINK_CLASS =
-  'relative z-[2] inline-flex items-center gap-1 rounded-lg bg-primary-600 px-3 py-1.5 text-ui-xs font-semibold text-white transition hover:bg-primary-700 sm:text-ui-sm';
+  'relative z-[2] inline-flex items-center gap-1 rounded-lg bg-primary-600 px-2.5 py-1.5 text-ui-xs font-semibold text-white transition hover:bg-primary-700 sm:px-3 sm:text-ui-sm';
 
 const TITLE_LINK_CLASS =
-  'relative z-[2] line-clamp-3 font-display text-ui-sm font-bold leading-snug text-graphite transition-colors hover:text-primary-600 sm:text-base';
+  'relative z-[2] line-clamp-2 font-display text-ui-sm font-bold leading-snug text-graphite transition-colors hover:text-primary-600 sm:text-base';
 
 const SLOT_MORE_CHIP_CLASS = `${SLOT_CHIP_CLASS} text-graphite-muted`;
 
@@ -140,7 +140,7 @@ export function EventCard({
 
   const cardBody = (
     <>
-      <div className="relative aspect-[16/9] w-full overflow-hidden bg-surface-muted">
+      <div className="relative aspect-[16/10] w-full overflow-hidden bg-surface-muted">
         {landingActions ? (
           <Link
             href={href}
@@ -180,7 +180,7 @@ export function EventCard({
 
         <EventImageBadges event={session} showSoonBadge={showSoonBadge} />
         {coverDateBadge ? (
-          <span className="absolute bottom-2 left-2 z-[2] rounded-lg bg-slate-950/80 px-2 py-1 text-[11px] font-semibold tracking-wide text-white backdrop-blur-sm sm:bottom-3 sm:left-3 sm:text-xs">
+          <span className="absolute bottom-2 left-2 z-[2] rounded-xl border border-white/25 bg-white/20 px-2.5 py-1 text-[11px] font-semibold tracking-wide text-white shadow-sm backdrop-blur-md sm:bottom-3 sm:left-3 sm:text-xs">
             {coverDateBadge}
           </span>
         ) : null}
@@ -196,10 +196,16 @@ export function EventCard({
         ) : null}
       </div>
 
-      <div className={`flex flex-1 flex-col ${compact ? 'gap-2.5 p-3.5 sm:gap-3 sm:p-4' : 'gap-3 p-4 sm:p-5'}`}>
+      <div className={`flex flex-1 flex-col ${compact ? 'gap-2 p-3.5 sm:gap-2.5 sm:p-4' : 'gap-2.5 p-4'}`}>
+        {session.category && !landingActions ? (
+          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-graphite-muted sm:text-[11px]">
+            {session.category}
+          </p>
+        ) : null}
+
         {/* Meta сразу под фото, над названием (как ожидает owner / как в list-карточке). */}
         {destinationLabel || durationLabel || ageLabel ? (
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+          <div className={`flex flex-wrap items-center gap-x-3 gap-y-1.5 ${session.category && !landingActions ? '-mt-1' : ''}`}>
             {durationLabel ? (
               <span className="event-card-meta hidden sm:inline-flex">
                 <Clock className="event-card-meta-icon" />
@@ -239,13 +245,13 @@ export function EventCard({
 
         {landingBadges.length > 0 ? (
           <LandingCardBadgeRow badges={landingBadges} />
-        ) : (session.category || highlights.length > 0) ? (
+        ) : highlights.length > 0 || (landingActions && session.category) ? (
           <div
             className={`flex flex-wrap items-center gap-1.5 ${
               compact && !landingActions ? 'hidden sm:flex' : ''
             }`}
           >
-            {session.category ? (
+            {landingActions && session.category ? (
               <span className="rounded-md bg-surface-muted px-2 py-0.5 text-ui-xs font-medium text-graphite-muted">
                 {session.category}
               </span>
@@ -323,7 +329,7 @@ export function EventCard({
           ) : (
             <>
               {priceFooterLabel ? (
-                <span className="relative z-[2] text-base font-extrabold tracking-tight text-graphite sm:text-base sm:font-bold">
+                <span className="relative z-[2] text-base font-bold tracking-tight text-primary-700 sm:text-lg">
                   {priceFooterLabel}
                 </span>
               ) : (
@@ -367,7 +373,7 @@ export function EventCard({
     <article className="group event-card">
       <Link
         href={href}
-        className="absolute inset-0 z-[1] rounded-card"
+        className="absolute inset-0 z-[1] rounded-2xl"
         aria-label={`Событие: ${session.title}`}
         onClick={onCardNavigate}
       />
@@ -510,7 +516,7 @@ function ShowcaseEventCard({
     <article className="group event-card">
       <Link
         href={href}
-        className="absolute inset-0 z-[1] rounded-card"
+        className="absolute inset-0 z-[1] rounded-2xl"
         aria-label={`Событие: ${session.title}`}
         onClick={() =>
           trackProductCardClick({

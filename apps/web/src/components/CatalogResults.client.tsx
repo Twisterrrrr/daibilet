@@ -132,7 +132,7 @@ export function CatalogResults({
       ) : viewMode === 'table' ? (
         <CatalogTable items={items} />
       ) : (
-        <ul className="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 xl:grid-cols-4">
+        <ul className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
           {gridEntries!.map((entry) =>
             entry.kind === 'banner' ? (
               <CatalogInterstitialBanner key={`banner-${entry.banner.id}`} banner={entry.banner} />

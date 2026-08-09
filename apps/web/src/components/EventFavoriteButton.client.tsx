@@ -58,7 +58,7 @@ export function EventFavoriteButton({ eventId, className = '' }: { eventId: stri
 }
 
 const CARD_BADGE_CLASS =
-  'inline-flex w-fit items-center rounded-full px-2 py-0.5 text-[10px] font-semibold leading-none shadow-sm backdrop-blur-sm sm:px-2.5 sm:py-1 sm:text-[11px]';
+  'inline-flex w-fit items-center rounded-full px-2 py-0.5 text-[10px] font-bold leading-none shadow-sm backdrop-blur-sm sm:px-2.5 sm:py-1 sm:text-[11px]';
 
 export function EventCardBadge({
   children,

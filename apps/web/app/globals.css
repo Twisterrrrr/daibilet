@@ -197,23 +197,23 @@ html[data-nav-pending='1'] {
   }
 
   .catalog-chip {
-    @apply inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl px-3.5 py-2 text-sm font-medium text-graphite-muted transition hover:bg-surface-muted hover:text-graphite focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50;
+    @apply inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium text-graphite-muted transition hover:bg-surface-muted hover:text-graphite focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 sm:min-h-8;
   }
 
   .catalog-chip-idle {
-    @apply bg-surface-muted text-graphite-muted;
+    @apply bg-slate-100 text-graphite-muted;
   }
 
   .catalog-chip-on {
-    @apply bg-primary-600 text-white hover:bg-primary-700 hover:text-white;
+    @apply bg-graphite text-white hover:bg-slate-800 hover:text-white;
   }
 
   .catalog-quick-chip {
-    @apply inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 sm:min-h-8 sm:text-sm;
+    @apply inline-flex min-h-8 shrink-0 items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 sm:min-h-8 sm:text-sm;
   }
 
   .catalog-quick-chip-idle {
-    @apply bg-white text-graphite-muted ring-1 ring-slate-200/80 hover:bg-surface-muted hover:text-graphite;
+    @apply bg-white text-graphite-muted ring-1 ring-slate-200/70 hover:bg-surface-muted hover:text-graphite;
   }
 
   .catalog-quick-chip-on {
@@ -278,7 +278,13 @@ html[data-nav-pending='1'] {
   }
 
   .event-card {
-    @apply relative flex h-full flex-col overflow-hidden rounded-card bg-white shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:shadow-card-hover;
+    @apply relative flex h-full flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition-all duration-300;
+  }
+
+  @media (hover: hover) {
+    .event-card:hover {
+      @apply -translate-y-1 border-slate-200/80 shadow-card-hover;
+    }
   }
 
   .event-card-meta {

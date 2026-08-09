@@ -1,3 +1,20 @@
+## 2026-08-09 - `/events` catalog mobile-first redesign
+
+### Наблюдения
+- HeroLayout на афише съедал first viewport; нужен denser path к карточкам.
+- List DTO без рейтинга - ★ не добавляли.
+
+### Решения
+- `EventsCatalogHero`: compact breadcrumbs + H1 + subtitle (без HeroLayout).
+- `CatalogToolbar`: легче search bar, pill chips; mobile sticky FAB «Фильтры (N)» → тот же advanced bottom sheet; кнопка в баре с `md+`.
+- `EventCard` + `.event-card`: rounded-2xl, border, hover lift (hover:hover), aspect 16/10, glass date, category uppercase, price primary, line-clamp-2; бейджи сохранены.
+- Сетка: 1 / sm:2 / lg:3 / xl:4.
+
+### Проблемы
+- Deploy MSK web - по запросу «выкатывай».
+
+---
+
 ## 2026-08-09 - Perm: editorial seed pack «5 необычных музеев» (all five)
 
 ### Наблюдения

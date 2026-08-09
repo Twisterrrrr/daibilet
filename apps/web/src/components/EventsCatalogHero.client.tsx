@@ -1,50 +1,49 @@
 'use client';
 
-import { useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-import { HeroLayout } from '@/components/HeroLayout';
-import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
-import { catalogFiltersFromQuery, type CatalogFilterValues } from '@/lib/catalog-url';
-import { cityToPrepositional } from '@/lib/city-declension';
+import { PageBreadcrumbBar } from '@/components/PageBreadcrumbs';
+import { useCity } from '@/components/CityProvider';
+import { getCityLabelGenitive } from '@/lib/cities';
 
 /**
- * Events hero: geo H1 + short subtitle only.
- * Search / date / categories live in CatalogToolbar - no matrix, no trust chips.
+ * Compact catalog header: breadcrumbs + H1 + short subtitle.
+ * Search/filters live in CatalogToolbar below - keep first viewport dense.
  */
 export function EventsCatalogHero() {
   const searchParams = useSearchParams();
-  const selectedCity = useSelectedCityOptional();
+  const { city } = useCity();
+  const cityLabel = getCityLabelGenitive(city);
+  const q = (searchParams.get('q') || '').trim();
+  const category = (searchParams.get('category') || '').trim();
 
-  const filters = useMemo(() => {
-    return catalogFiltersFromQuery({
-      city: searchParams.get('city') || undefined,
-      sort: (searchParams.get('sort') as CatalogFilterValues['sort']) || undefined,
-    });
-  }, [searchParams]);
+  const title = q
+    ? `Результаты поиска: «${q}»`
+    : category
+      ? `События: ${category}`
+      : `Афиша событий в ${cityLabel}`;
 
-  const cityReady = selectedCity?.cityReady ?? true;
-  const cityName =
-    cityReady && (filters.city || (selectedCity && selectedCity.cityValue !== 'all'))
-      ? selectedCity?.selectedDestination?.name ||
-        (selectedCity?.cityLabel !== 'Все города' ? selectedCity?.cityLabel : null) ||
-        filters.city ||
-        null
-      : null;
-
-  const title = cityName ? <>Афиша событий в {cityToPrepositional(cityName)}</> : <>Афиша событий</>;
-
-  const description = cityName
-    ? `Билеты на экскурсии, концерты и музеи в ${cityToPrepositional(cityName)}.`
-    : 'Билеты на экскурсии, концерты и музеи более чем в 100 городах России.';
+  const subtitle = q
+    ? `Подборка по запросу в ${cityLabel}`
+    : category
+      ? `Афиша в категории «${category}» - ${cityLabel}`
+      : `Билеты и расписание - выбирайте по дате и интересам`;
 
   return (
-    <HeroLayout
-      variant="minimal"
-      dense
-      breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'События' }]}
-      title={title}
-      description={description}
-    />
+    <>
+      <PageBreadcrumbBar
+        items={[
+          { label: 'Главная', href: '/' },
+          { label: 'События', href: '/events' },
+          ...(category ? [{ label: category }] : []),
+        ]}
+      />
+      <header className="border-b border-slate-100 bg-white">
+        <div className="container-page py-4 sm:py-5">
+          <h1 className="font-display text-2xl font-extrabold tracking-tight text-graphite sm:text-3xl">{title}</h1>
+          <p className="mt-1 max-w-2xl text-sm leading-snug text-graphite-muted sm:text-[15px]">{subtitle}</p>
+        </div>
+      </header>
+    </>
   );
 }

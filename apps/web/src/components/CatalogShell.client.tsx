@@ -243,7 +243,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
 
   return (
     <>
-      <div className="catalog-toolbar sticky top-[var(--site-header-height)] z-30 -mx-4 border-b border-slate-200/60 px-4 py-3 sm:-mx-6 sm:px-6 sm:py-3.5">
+      <div className="catalog-toolbar sticky top-[var(--site-header-height)] z-30 -mx-4 border-b border-slate-200/60 px-4 py-2 sm:-mx-6 sm:px-6 sm:py-2.5">
         <CatalogToolbar
           facets={facets}
           values={filterValues}
@@ -255,7 +255,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
       <CatalogActiveFilters values={filterValues} />
 
       {/* Meta слева; sort + view справа (без дубля сортировки) */}
-      <div className="mt-5 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 sm:mt-6">
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 sm:mt-5">
         <p className="min-w-0 text-sm text-graphite-muted">
           {loading && !catalog ? 'Загрузка…' : null}
           {loading && catalog ? 'Обновляем… · ' : null}
@@ -364,7 +364,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
         />
       ) : null}
 
-      <nav className="mt-10 flex flex-wrap gap-4 border-t border-slate-200 pt-8 text-sm text-slate-600">
+      <nav className="mt-10 flex flex-wrap gap-4 border-t border-slate-200 pb-20 pt-8 text-sm text-slate-600 md:pb-0">
         <Link href="/cities" className="font-medium hover:text-primary">
           Города
         </Link>
@@ -391,13 +391,13 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
 function CatalogCardSkeletonGrid() {
   return (
     <div
-      className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4"
+      className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4"
       aria-busy="true"
       aria-label="Загрузка каталога"
     >
       {Array.from({ length: 8 }).map((_, index) => (
-        <div key={index} className="overflow-hidden rounded-card bg-white shadow-card">
-          <div className="aspect-[16/9] animate-pulse bg-slate-200/80" />
+        <div key={index} className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
+          <div className="aspect-[16/10] animate-pulse bg-slate-200/80" />
           <div className="space-y-3 p-4">
             <div className="h-3 w-24 animate-pulse rounded bg-slate-200/80" />
             <div className="h-4 w-full animate-pulse rounded bg-slate-200/80" />

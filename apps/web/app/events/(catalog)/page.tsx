@@ -41,11 +41,10 @@ export default async function EventsCatalogPage() {
     <SiteLayout>
       <Suspense
         fallback={
-          <div className="border-b border-slate-200 bg-slate-50">
-            <div className="container-page space-y-4 py-8 sm:py-10">
-              <div className="h-10 w-72 max-w-full animate-pulse rounded-lg bg-slate-200" />
-              <div className="h-5 w-full max-w-xl animate-pulse rounded bg-slate-200" />
-              <div className="h-10 w-full max-w-2xl animate-pulse rounded-full bg-slate-200" />
+          <div className="border-b border-slate-100 bg-white">
+            <div className="container-page py-4 sm:py-5">
+              <div className="h-7 w-2/3 max-w-md animate-pulse rounded bg-slate-200 sm:h-8" />
+              <div className="mt-1.5 h-3.5 w-1/2 max-w-sm animate-pulse rounded bg-slate-100" />
               <p className="sr-only">{EVENTS_SUPPORT}</p>
             </div>
           </div>
@@ -59,10 +58,10 @@ export default async function EventsCatalogPage() {
             <div className="space-y-5">
               <div className="h-11 w-full animate-pulse rounded-xl bg-surface-muted" />
               <div className="h-8 w-full max-w-xl animate-pulse rounded-xl bg-surface-muted" />
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 xl:grid-cols-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
                 {Array.from({ length: 8 }).map((_, index) => (
-                  <div key={index} className="overflow-hidden rounded-card bg-white shadow-card">
-                    <div className="aspect-[16/9] animate-pulse bg-slate-200/80" />
+                  <div key={index} className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
+                    <div className="aspect-[16/10] animate-pulse bg-slate-200/80" />
                     <div className="space-y-3 p-4">
                       <div className="h-3 w-24 animate-pulse rounded bg-slate-200/80" />
                       <div className="h-4 w-full animate-pulse rounded bg-slate-200/80" />

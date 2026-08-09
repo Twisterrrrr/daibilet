@@ -181,12 +181,43 @@ export function CatalogToolbar({
     );
   }
 
+  const advancedPanel = (
+    <CatalogAdvancedFiltersPanel
+      open={filtersOpen}
+      filters={{
+        dateFrom: filters.from || '',
+        dateTo: filters.to || '',
+        date: filters.date || '',
+        minPrice: filters.minPrice != null ? String(filters.minPrice) : 'all',
+        maxPrice: filters.maxPrice != null ? String(filters.maxPrice) : 'all',
+        ageMax: filters.ageMax != null && filters.ageMax >= 0 ? filters.ageMax : -1,
+        landing: filters.landing || 'all',
+      }}
+      landings={facets.landings}
+      previewContext={previewContext}
+      onApply={(next) => {
+        applyAdvanced(navigate, filters, qDraft, next);
+        setFiltersOpen(false);
+      }}
+      onClose={() => setFiltersOpen(false)}
+      onReset={() => {
+        navigate({
+          q: filters.q,
+          city: filters.city,
+          category: filters.category,
+          sort: filters.sort,
+          limit: filters.limit,
+        });
+      }}
+    />
+  );
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-2.5 sm:space-y-3">
       {/* Единая search bar: Поиск → Дата → Фильтры → Найти */}
       <form
         onSubmit={onSubmit}
-        className="flex flex-col gap-2 rounded-card border border-slate-200 bg-white p-2 shadow-sm sm:flex-row sm:items-center sm:gap-1.5 sm:p-1.5"
+        className="flex flex-col gap-1.5 rounded-2xl border border-slate-100 bg-white p-1.5 sm:flex-row sm:items-center sm:gap-1 sm:p-1"
       >
         <label className="relative min-w-0 flex-1">
           <span className="sr-only">Поиск по событиям</span>
@@ -200,7 +231,7 @@ export function CatalogToolbar({
             placeholder="Название, место или артист"
             aria-label="Поиск по событиям"
             disabled={disabled}
-            className="inline-btn h-11 w-full rounded-xl bg-transparent pl-10 pr-9 text-sm text-graphite outline-none transition placeholder:text-graphite-muted focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-60 sm:h-10"
+            className="inline-btn h-10 w-full rounded-xl bg-transparent pl-10 pr-9 text-sm text-graphite outline-none transition placeholder:text-graphite-muted focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-60 sm:h-9"
           />
           {qDraft ? (
             <button
@@ -232,7 +263,7 @@ export function CatalogToolbar({
                 if (event.target.value === 'custom') return;
                 setDate(event.target.value);
               }}
-              className="h-11 w-full min-w-0 appearance-none rounded-xl bg-surface-muted pl-3 pr-9 text-sm font-medium text-graphite outline-none transition hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-70 sm:h-10 sm:bg-transparent sm:hover:bg-surface-muted"
+              className="h-10 w-full min-w-0 appearance-none rounded-xl bg-surface-muted pl-3 pr-9 text-sm font-medium text-graphite outline-none transition hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-70 sm:h-9 sm:bg-transparent sm:hover:bg-surface-muted"
             >
               {CATALOG_DATE_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -263,59 +294,33 @@ export function CatalogToolbar({
               disabled={disabled}
               onChange={(event) => setExactDay(event.target.value)}
               aria-label="Выбрать дату в календаре"
-              className="h-11 w-full rounded-xl bg-surface-muted px-2.5 text-sm font-medium text-graphite outline-none transition hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-70 sm:h-10"
+              className="h-10 w-full rounded-xl bg-surface-muted px-2.5 text-sm font-medium text-graphite outline-none transition hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-70 sm:h-9"
             />
           </label>
 
+          {/* Desktop/tablet: filters in bar. Mobile uses sticky FAB below. */}
           <FiltersButton
             open={filtersOpen}
             count={advancedCount}
             disabled={disabled}
             onClick={() => setFiltersOpen(true)}
-            className="sm:ml-0"
+            className="max-md:hidden"
           />
 
           <button
             type="submit"
             disabled={disabled}
-            className="inline-btn btn-primary h-11 shrink-0 px-4 text-sm disabled:opacity-60 sm:h-10"
+            className="inline-btn btn-primary h-10 shrink-0 px-3.5 text-sm disabled:opacity-60 sm:h-9"
           >
             Найти
           </button>
         </div>
       </form>
 
-      <CatalogAdvancedFiltersPanel
-        open={filtersOpen}
-        filters={{
-          dateFrom: filters.from || '',
-          dateTo: filters.to || '',
-          date: filters.date || '',
-          minPrice: filters.minPrice != null ? String(filters.minPrice) : 'all',
-          maxPrice: filters.maxPrice != null ? String(filters.maxPrice) : 'all',
-          ageMax: filters.ageMax != null && filters.ageMax >= 0 ? filters.ageMax : -1,
-          landing: filters.landing || 'all',
-        }}
-        landings={facets.landings}
-        previewContext={previewContext}
-        onApply={(next) => {
-          applyAdvanced(navigate, filters, qDraft, next);
-          setFiltersOpen(false);
-        }}
-        onClose={() => setFiltersOpen(false)}
-        onReset={() => {
-          navigate({
-            q: filters.q,
-            city: filters.city,
-            category: filters.category,
-            sort: filters.sort,
-            limit: filters.limit,
-          });
-        }}
-      />
+      {advancedPanel}
 
       {/* Быстрые тогглы + категории в sticky-зоне */}
-      <div className="-mx-4 space-y-3 px-4 pt-1 sm:mx-0 sm:px-0">
+      <div className="-mx-4 space-y-2 px-4 sm:mx-0 sm:px-0">
         <QuickFilterToggles
           filters={filters}
           qDraft={qDraft}
@@ -325,9 +330,31 @@ export function CatalogToolbar({
         <div
           role="tablist"
           aria-label="Категории"
-          className="horizontal-snap-row flex flex-nowrap gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="horizontal-snap-row flex flex-nowrap gap-1.5 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           <CategoryTabs filters={filters} categories={facets.categories} />
+        </div>
+      </div>
+
+      {/* Mobile sticky filters CTA */}
+      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 md:hidden">
+        <div className="pointer-events-auto border-t border-slate-200/80 bg-white/95 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2.5 shadow-[0_-8px_24px_rgba(15,23,42,0.08)] backdrop-blur-md supports-[backdrop-filter]:bg-white/90">
+          <button
+            type="button"
+            disabled={disabled}
+            aria-expanded={filtersOpen}
+            aria-haspopup="dialog"
+            aria-controls="advanced-filters-panel"
+            onClick={() => setFiltersOpen(true)}
+            className={`inline-btn flex h-11 w-full items-center justify-center gap-2 rounded-full text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 disabled:opacity-60 ${
+              filtersOpen || advancedCount > 0
+                ? 'bg-primary-600 text-white hover:bg-primary-700'
+                : 'bg-graphite text-white hover:bg-slate-800'
+            }`}
+          >
+            <SlidersHorizontal aria-hidden className="h-4 w-4" strokeWidth={1.75} />
+            {advancedCount > 0 ? `Фильтры (${advancedCount})` : 'Фильтры'}
+          </button>
         </div>
       </div>
     </div>
