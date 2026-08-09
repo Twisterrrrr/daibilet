@@ -2,10 +2,10 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| UX.SCENARIOS-TITLE-FLUSH | Scenarios panel: no empty gutter; blog+CTA on title row | Высокий | ✅ `06b1db6b`; deploy по «выкатывай» |
-| UX.EVENTS-MOBILE-SELECTS | `/events` mobile: Find in search; date+type dropdowns; chip rails md+ only | Высокий | ✅ `c68d010e`; deploy по «выкатывай» |
-| UX.EVENTS-FILTERS-AIR | `/events` mobile: sticky search-only (chips visible); filter sheet air + quick evening chip | Высокий | ✅ `f0880cb1`; deploy по «выкатывай» |
-| UX.CITIES-CATALOG-CLEAN | `/cities` clean hero + hub/region chips; vibe Lucide hover (no emoji) | Высокий | ✅ `b02bccab`; deploy по «выкатывай» |
+| UX.SCENARIOS-TITLE-FLUSH | Scenarios panel: no empty gutter; blog+CTA on title row | Высокий | ✅ `06b1db6b` Deploy `31335835810` BUILD_ID=`Mby7MP2KiGFvNEWzY_qC4` |
+| UX.EVENTS-MOBILE-SELECTS | `/events` mobile: Find in search; date+type dropdowns; chip rails md+ only | Высокий | ✅ `c68d010e` Deploy `31335835810` BUILD_ID=`Mby7MP2KiGFvNEWzY_qC4` |
+| UX.EVENTS-FILTERS-AIR | `/events` mobile: sticky search-only (chips visible); filter sheet air + quick evening chip | Высокий | ✅ `f0880cb1` Deploy `31335835810` BUILD_ID=`Mby7MP2KiGFvNEWzY_qC4` |
+| UX.CITIES-CATALOG-CLEAN | `/cities` clean hero + hub/region chips; vibe Lucide hover (no emoji) | Высокий | ✅ `b02bccab` Deploy `31335835810` BUILD_ID=`Mby7MP2KiGFvNEWzY_qC4` |
 | UX.SCENARIOS-TWO-COL | Hub/my-day scenarios: 2-col stops; CTA beside title + panel v-center | Высокий | ✅ `07dcb587` Deploy `31334844554` |
 | UX.EVENTS-YANDEX-LITE | `/events` P1-P4: date rail, category Ещё, search hints, real live rail (no P5) | Высокий | ✅ `d59fd28e` Deploy `31334844554` |
 | UX.EVENTS-CATALOG-REDESIGN | `/events` mobile-first: compact hero, filters FAB, modern cards 1/2/3/4 | Высокий | ✅ `d51eb4a2` / live `910faa55` |

@@ -1,3 +1,16 @@
+## 2026-08-10 - MSK web batch deploy (events+cities+scenarios)
+
+### Наблюдения
+- Owner: «выкатывай» - batch после filter sheet / mobile selects / scenarios title-flush / cities clean.
+
+### Решения
+- Deploy MSK web `31335835810` success; tip `a271a78e`; BUILD_ID=`Mby7MP2KiGFvNEWzY_qC4`.
+
+### Проблемы
+- нет.
+
+---
+
 ## 2026-08-10 - Scenarios panel: title-flush, blog+CTA one row
 
 ### Наблюдения
