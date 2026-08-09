@@ -146,6 +146,29 @@ test('catalog mapper keeps Date and ISO string startsAt on the same UTC clock', 
   assert.equal(fromDate.upcomingSlots?.[0]?.timeLabel, '23:55');
 });
 
+test('catalog mapper drops same-event −3h phantom next to real MSK slot', () => {
+  const result = mapGroupedPublicSession(
+    catalogRow({
+      id: 'evt_bridges',
+      city: 'Санкт-Петербург',
+      citySlug: 'sankt-peterburg',
+      startsAt: new Date('2026-08-09T17:55:00.000Z'),
+      upcomingSlots: [
+        { eventId: 'evt_bridges', startsAt: '2026-08-09T17:55:00.000Z' },
+        { eventId: 'evt_bridges', startsAt: '2026-08-09T20:55:00.000Z' },
+        { eventId: 'evt_bridges_next', startsAt: '2026-08-10T20:55:00.000Z' },
+      ],
+    }),
+  );
+  assert.ok(result);
+  assert.equal(result.startsAt, '2026-08-09T20:55:00.000Z');
+  assert.equal(result.timeLabel, '23:55');
+  assert.deepEqual(
+    result.upcomingSlots?.map((slot) => slot.timeLabel),
+    ['23:55', '23:55'],
+  );
+});
+
 test('drops bus subcategory labels from river cruise cards', () => {
   const labels = pickCatalogSubcategories({
     category: 'Экскурсии',

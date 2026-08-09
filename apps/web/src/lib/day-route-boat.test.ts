@@ -71,12 +71,12 @@ describe('day-route-boat', () => {
               timeLabel: '20:55',
             },
             {
-              eventId: 'evt_bridges_b',
+              eventId: 'evt_bridges',
               startsAt: '2026-08-09T20:55:00.000Z',
               timeLabel: '20:55',
             },
             {
-              eventId: 'evt_bridges_c',
+              eventId: 'evt_bridges',
               startsAt: '2026-08-09T20:55:00.000Z',
               timeLabel: '23:55',
             },
@@ -92,9 +92,9 @@ describe('day-route-boat', () => {
     );
     assert.equal(routes.length, 1);
     const times = routes[0]!.slots.map((s) => s.timeLabel);
-    assert.deepEqual(times, ['20:55', '23:55', '23:55']);
-    assert.equal(routes[0]!.slots[1]!.timeLabel, '23:55');
-    assert.equal(routes[0]!.slots[1]!.startsAt, '2026-08-09T20:55:00.000Z');
+    assert.deepEqual(times, ['23:55', '23:55']);
+    assert.equal(routes[0]!.slots[0]!.startsAt, '2026-08-09T20:55:00.000Z');
+    assert.equal(routes[0]!.slots[0]!.timeLabel, '23:55');
   });
 
   it('builds routes and prefers slot inside time window', () => {

@@ -514,13 +514,44 @@ function catalogSlotClockKey(startsAt: string, timeZone: string): string {
   return `${day}|${time}`;
 }
 
+const MSK_OFFSET_MS = 3 * 60 * 60 * 1000;
+
+/**
+ * Drop same-eventId sessions that are exactly −3h before another session
+ * (legacy wall-shift duplicate: 17:55Z phantom next to real 20:55Z = 23:55 MSK).
+ * Different eventIds 3h apart (real 12:00 / 15:00 sailings) are kept.
+ */
+function dropMinus3hSameEventPhantoms<T extends { startsAt: string; eventId?: string | null }>(
+  slots: T[],
+): T[] {
+  const byEvent = new Map<string, number[]>();
+  for (const slot of slots) {
+    const eventId = String(slot.eventId || '').trim();
+    if (!eventId) continue;
+    const ms = parseSessionStartsAt(slot.startsAt).getTime();
+    if (!Number.isFinite(ms)) continue;
+    const bucket = byEvent.get(eventId) || [];
+    bucket.push(ms);
+    byEvent.set(eventId, bucket);
+  }
+  return slots.filter((slot) => {
+    const eventId = String(slot.eventId || '').trim();
+    if (!eventId) return true;
+    const ms = parseSessionStartsAt(slot.startsAt).getTime();
+    if (!Number.isFinite(ms)) return true;
+    const siblings = byEvent.get(eventId) || [];
+    return !siblings.some((other) => other === ms + MSK_OFFSET_MS);
+  });
+}
+
 function dedupeCatalogSlotsByClock<T extends { startsAt: string; eventId?: string | null }>(
   slots: T[],
   timeZone: string,
 ): T[] {
+  const cleaned = dropMinus3hSameEventPhantoms(slots);
   const seen = new Set<string>();
   const out: T[] = [];
-  for (const slot of slots) {
+  for (const slot of cleaned) {
     const key = catalogSlotClockKey(slot.startsAt, timeZone);
     if (!key || seen.has(key)) continue;
     seen.add(key);

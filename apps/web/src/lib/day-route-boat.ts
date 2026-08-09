@@ -36,6 +36,24 @@ function boatSlotClockKey(startsAt: string): string | null {
   return time ? `${day}|${time}` : null;
 }
 
+const BOAT_MSK_OFFSET_MS = 3 * 60 * 60 * 1000;
+
+function isMinus3hSameEventPhantom(
+  candidateStartsAt: string,
+  candidateEventId: string,
+  existing: Array<Pick<BoatSlotCandidate, 'startsAt' | 'eventId'>>,
+): boolean {
+  const eventId = String(candidateEventId || '').trim();
+  if (!eventId) return false;
+  const ms = Date.parse(candidateStartsAt);
+  if (!Number.isFinite(ms)) return false;
+  return existing.some((slot) => {
+    if (String(slot.eventId || '').trim() !== eventId) return false;
+    const other = Date.parse(slot.startsAt);
+    return Number.isFinite(other) && (other === ms + BOAT_MSK_OFFSET_MS || ms === other + BOAT_MSK_OFFSET_MS);
+  });
+}
+
 /** TicketsCloud widget page rejects `token=r:…` with HTTPForbidden/bad token. */
 function sanitizeTicketscloudPurchaseUrl(url?: string | null): string | null {
   const raw = String(url || '').trim();
@@ -356,6 +374,24 @@ export function buildBoatRoutesFromSessions(
         )
       ) {
         continue;
+      }
+      if (isMinus3hSameEventPhantom(startsAt, String(row.eventId || eventId), route.slots)) {
+        const ms = startsMs;
+        // Drop earlier −3h twin if we are the real later slot.
+        route.slots = route.slots.filter((slot) => {
+          if (String(slot.eventId || '').trim() !== String(row.eventId || eventId).trim()) return true;
+          return Date.parse(slot.startsAt) !== ms - BOAT_MSK_OFFSET_MS;
+        });
+        // Skip if a later twin already exists (we are the phantom).
+        if (
+          route.slots.some(
+            (slot) =>
+              String(slot.eventId || '').trim() === String(row.eventId || eventId).trim() &&
+              Date.parse(slot.startsAt) === ms + BOAT_MSK_OFFSET_MS,
+          )
+        ) {
+          continue;
+        }
       }
 
       const fitsEarliest = window.earliestMs == null || startsMs >= window.earliestMs;
