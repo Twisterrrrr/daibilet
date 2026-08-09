@@ -537,8 +537,8 @@ Alias `museum-1` = первый open-date контракт (не «музеи fo
 | UX.MYDAY-CATALOG-OPEN | «Ещё из каталога»: always open, no card border | Высокий | ✅ `902fb3b` MSK **BUILD_ID=`sgVL2jxb2mwH2VaNjj3fm`** `/my-day` 200 |
 | UX.MYDAY-SEARCH-PROG | Progressive catalog load - search not gated on Promise.all | Высокий | ✅ `33e9ca8` MSK **BUILD_ID=`blIpyGTrMYrwYoh4jkBws`** `/my-day` 200 |
 | UX.MYDAY-PRESETS | «Готовые сценарии» under Hot Picks (cityInfo presets) | Высокий | ✅ `f280018` MSK **BUILD_ID=`cM9j1lcFbpgHSogY-npKs`** `/my-day` 200 |
-| UX.MYDAY-PRESET-GATE | SPB/my-day: skeleton до settle locations+venues - без pop-in 4→6 сценариев | Критический | ✅ `c0d61b6d`; ⏳ MSK with boat modal deploy |
-| UX.MYDAY-BOAT-MODAL | Boat wizard (причал/маршрут/время): modal overlay вместо inline full-bleed panel | Критический | ✅ `81d740a6`; ⏳ GHA [31298547370](https://github.com/Twisterrrrr/daibilet/actions/runs/31298547370) |
+| UX.MYDAY-PRESET-GATE | SPB/my-day: skeleton до settle locations+venues - без pop-in 4→6 сценариев | Критический | ✅ `c0d61b6d`; MSK **BUILD_ID=`tBAB7m9Y6YW8i3yukypOC`** with boat modal |
+| UX.MYDAY-BOAT-MODAL | Boat wizard (причал/маршрут/время): modal overlay вместо inline full-bleed panel | Критический | ✅ `81d740a6`; MSK **BUILD_ID=`tBAB7m9Y6YW8i3yukypOC`** [GHA](https://github.com/Twisterrrrr/daibilet/actions/runs/31298547370) |
 | UX.MYDAY-PRESET-BLOG | Preset cards: «Читать об этом в блоге» via `blogSlug` - blue + underline + arrow; desktop inline after title (flex-wrap) | Высокий | ✅ `06625e0` MSK **BUILD_ID=`2NIdFliuqHg4lCRrEYYxP`** `/my-day` 200 |
 | SEO.MYDAY-META | /my-day title+desc+OG package; keep noindex until crawlable content | Высокий | ✅ `31a0dc0` MSK **BUILD_ID=`qZnQ6TqtoJkKtvxVB9mtI`** |
 | UX.MYDAY-LIST-MAP | Mobile list-first + Список/Карта toggle (no sticky 38vh); compact footer | Критический | ✅ `4ffb251` MSK **BUILD_ID=`0Fnc1S9ndw3dPSeEmy2Za`** `/my-day` 200 |
