@@ -97,16 +97,17 @@ export function SuburbsCarousel({
     ? 'border-zinc-900 bg-zinc-900 text-white'
     : 'border-slate-900 bg-slate-900 text-white';
 
+  // Mobile: one-row horizontal carousel (fit-content chips). sm+: wrap.
+  const chipRowClass =
+    'flex flex-nowrap gap-2 overflow-x-auto overscroll-x-contain pb-0.5 [scrollbar-width:thin] sm:flex-wrap sm:overflow-x-visible sm:pb-0';
+
   const renderChipRow = (mode: 'tabs' | 'accordion') => (
     <div
-      className={
-        mode === 'accordion'
-          ? 'flex flex-nowrap gap-2 overflow-x-auto overscroll-x-contain pb-0.5 [scrollbar-width:thin]'
-          : 'flex flex-wrap gap-2'
-      }
+      className={chipRowClass}
       role="tablist"
       aria-label={`Пригороды ${cityGenitive}`}
       data-city-suburb-chips
+      data-city-suburb-chips-scroll="mobile"
     >
       {places.map((place, index) => {
         const active = selectedIndex === index;
