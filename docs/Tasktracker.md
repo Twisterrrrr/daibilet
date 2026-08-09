@@ -68,7 +68,7 @@
 | P.3g | **Supplier write flows** — создание/редактирование admission и событий через заявки | Средний | ✅ admission create/update admin apply + DB smoke; event create apply deferred |
 | P.3h | **YooKassa reconcile ops** — service/timer на `.159`, runbook и ручной dry-run/apply | Высокий | ✅ live `.159` installed/enabled; scheduled tick green 2026-08-09 |
 | P.3i | **Finance E2E foundation roadmap** - admin finance contour, supplier LC money views, refunds, reports, settlements, closing docs and supplier reviews | High | 🔄 refund foundation + admin ledger/reconcile + supplier finance/docs read views |
-| P.3j | **Reports/settlements/documents write flow** - draft `SupplierReport`, close `SupplierSettlement`, issue `SupplierDocument` from reconciled ledger | High | ⏳ next PR-sized finance mutation |
+| P.3j | **Reports/settlements/documents write flow** - draft `SupplierReport`, close `SupplierSettlement`, issue `SupplierDocument` from reconciled ledger | High | 🔄 code done; close-period mutation + admin UI + backend test green |
 | P.4 | **Реклама / paid acquisition** — до готовности витрины | — | ⚠️ deferred |
 | P.5 | **Allowlist городов** — адмцентры с saleable → standalone; остальные → cityToRegion (не «дыра») | Высокий | ✅ 2026-07-19 geo policy |
 

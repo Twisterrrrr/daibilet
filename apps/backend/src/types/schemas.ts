@@ -102,6 +102,18 @@ export const adminFinanceQuerySchema = paginationQuerySchema.extend({
   refresh: optionalFlag,
 });
 
+export const adminFinanceClosePeriodPayloadSchema = z.object({
+  supplierId: z.string().trim().min(1),
+  periodStart: requiredIsoDateTime,
+  periodEnd: requiredIsoDateTime,
+  basis: z.enum(['SOLD', 'COMPLETED']).optional(),
+  issueDocuments: z.boolean().optional(),
+}).strict().superRefine((payload, ctx) => {
+  if (Date.parse(payload.periodEnd) <= Date.parse(payload.periodStart)) {
+    ctx.addIssue({ code: 'custom', path: ['periodEnd'], message: 'Period end must be after period start' });
+  }
+});
+
 export const lookupQuerySchema = z.object({
   lookup: optionalString,
 });
@@ -233,6 +245,7 @@ export type PublicFinanceProjectionQuery = z.infer<typeof publicFinanceProjectio
 export type AdminEventsQuery = z.infer<typeof adminEventsQuerySchema>;
 export type AdminOrdersQuery = z.infer<typeof adminOrdersQuerySchema>;
 export type AdminFinanceQuery = z.infer<typeof adminFinanceQuerySchema>;
+export type AdminFinanceClosePeriodPayload = z.infer<typeof adminFinanceClosePeriodPayloadSchema>;
 export type LookupQuery = z.infer<typeof lookupQuerySchema>;
 export type SearchQuery = z.infer<typeof searchQuerySchema>;
 export type EventOverridePayload = z.infer<typeof eventOverridePayloadSchema>;

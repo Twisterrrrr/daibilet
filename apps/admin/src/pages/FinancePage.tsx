@@ -93,6 +93,14 @@ type AdminFinanceLedgerDto = {
   reconcile: { readyToDraftReport: boolean; blockers: string[]; nextActions: string[] };
 };
 
+type AdminFinanceClosePeriodDto = {
+  generatedAt: string;
+  report: AdminFinanceLedgerDto['reports'][number];
+  settlement: AdminFinanceLedgerDto['settlements'][number];
+  documents: AdminFinanceLedgerDto['documents'];
+  actions: string[];
+};
+
 function emptyPayload(): AdminFinanceLedgerDto {
   return {
     generatedAt: new Date().toISOString(),
@@ -125,6 +133,9 @@ export function FinancePage() {
   const [payload, setPayload] = React.useState<AdminFinanceLedgerDto>(emptyPayload);
   const [loading, setLoading] = React.useState(true);
   const [loadError, setLoadError] = React.useState<string | null>(null);
+  const [closing, setClosing] = React.useState(false);
+  const [closeError, setCloseError] = React.useState<string | null>(null);
+  const [closeResult, setCloseResult] = React.useState<AdminFinanceClosePeriodDto | null>(null);
   const [reloadTick, setReloadTick] = React.useState(0);
 
   const supplier = params.get('supplier') ?? 'all';
@@ -141,6 +152,48 @@ export function FinancePage() {
     [params, setParams],
   );
   const refresh = React.useCallback(() => setReloadTick((value) => value + 1), []);
+  const canClosePeriod = Boolean(
+    payload.reconcile.readyToDraftReport &&
+    payload.filters.supplier &&
+    from &&
+    to &&
+    !closing,
+  );
+
+  const closePeriod = React.useCallback(() => {
+    if (!payload.filters.supplier || !from || !to) {
+      setCloseError('Выберите поставщика и период');
+      return;
+    }
+    setClosing(true);
+    setCloseError(null);
+    setCloseResult(null);
+    adminFetch('/api/admin/finance/close-period', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        supplierId: payload.filters.supplier,
+        periodStart: `${from}T00:00:00.000Z`,
+        periodEnd: `${to}T23:59:59.999Z`,
+        basis: 'SOLD',
+        issueDocuments: true,
+      }),
+    })
+      .then(async (response) => {
+        const body = await response.json().catch(() => null);
+        if (!response.ok) {
+          const blockers = Array.isArray(body?.blockers) ? body.blockers.map(financeBlockerLabel).join(', ') : null;
+          throw new Error(blockers || body?.message || body?.error || `HTTP ${response.status}`);
+        }
+        return body as AdminFinanceClosePeriodDto;
+      })
+      .then((result) => {
+        setCloseResult(result);
+        refresh();
+      })
+      .catch((error) => setCloseError(error instanceof Error ? error.message : String(error)))
+      .finally(() => setClosing(false));
+  }, [from, payload.filters.supplier, refresh, to]);
 
   React.useEffect(() => {
     const controller = new AbortController();
@@ -185,7 +238,7 @@ export function FinancePage() {
         description="Ledger, возвраты, сверка, отчеты агента, расчеты и документы по внутренним продажам Daibilet."
         meta={
           <>
-            <Badge variant="outline">read foundation</Badge>
+            <Badge variant="outline">close-period</Badge>
             <Badge variant={payload.reconcile.readyToDraftReport ? 'default' : 'outline'}>{payload.reconcile.readyToDraftReport ? 'готово к сверке' : 'есть blockers'}</Badge>
           </>
         }
@@ -255,6 +308,9 @@ export function FinancePage() {
         <div className="space-y-4">
           <Card className="border-border p-4">
             <h2 className="text-sm font-semibold">Reconcile dry-run</h2>
+            {!payload.filters.supplier ? (
+              <div className="mt-3 rounded-md bg-secondary p-3 text-xs text-muted-foreground">Для закрытия периода выберите одного поставщика.</div>
+            ) : null}
             {payload.reconcile.blockers.length ? (
               <div className="mt-3 rounded-md border border-warning/30 bg-warning/10 p-3 text-xs text-warning-foreground">
                 <div className="font-semibold">Blockers</div>
@@ -268,6 +324,18 @@ export function FinancePage() {
             <ul className="mt-3 list-disc space-y-1 pl-4 text-xs text-muted-foreground">
               {payload.reconcile.nextActions.map((action) => <li key={action}>{action}</li>)}
             </ul>
+            {closeError ? <div className="mt-3 rounded-md border border-destructive/20 bg-destructive/10 px-3 py-2 text-xs text-destructive">{closeError}</div> : null}
+            {closeResult ? (
+              <div className="mt-3 rounded-md border border-success/20 bg-success/10 p-3 text-xs text-success">
+                <div className="font-semibold">Период закрыт</div>
+                <ul className="mt-2 list-disc space-y-1 pl-4">
+                  {closeResult.actions.map((action) => <li key={action}>{action}</li>)}
+                </ul>
+              </div>
+            ) : null}
+            <Button type="button" className="mt-3 w-full" size="sm" disabled={!canClosePeriod} onClick={closePeriod}>
+              {closing ? 'Закрываем...' : 'Закрыть период и выпустить документы'}
+            </Button>
           </Card>
 
           <SideList title="Открытые возвраты" empty="Открытых возвратов нет">

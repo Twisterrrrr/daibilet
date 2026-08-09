@@ -101,13 +101,30 @@ export interface AdminFinanceLedgerDto {
   };
 }
 
+export interface AdminFinanceClosePeriodInput {
+  supplierId: string;
+  periodStart: string;
+  periodEnd: string;
+  basis?: string | undefined;
+  issueDocuments?: boolean | undefined;
+}
+
+export interface AdminFinanceClosePeriodDto {
+  generatedAt: string;
+  report: AdminFinanceLedgerDto['reports'][number];
+  settlement: AdminFinanceLedgerDto['settlements'][number];
+  documents: AdminFinanceLedgerDto['documents'];
+  metrics: AdminFinanceLedgerDto['metrics'];
+  actions: string[];
+}
+
 export async function buildAdminFinanceLedgerDto(
   searchParams: URLSearchParams = new URLSearchParams(),
 ): Promise<AdminFinanceLedgerDto> {
   const limit = clampInt(searchParams.get('limit'), DEFAULT_LIMIT, 1, MAX_LIMIT);
   const supplierKey = cleanString(searchParams.get('supplier'));
-  const from = parseDate(searchParams.get('from'));
-  const to = parseDate(searchParams.get('to'));
+  const from = parseDateStart(searchParams.get('from'));
+  const to = parseDateEnd(searchParams.get('to'));
 
   const suppliers = await prisma.supplier.findMany({
     orderBy: [{ title: 'asc' }, { id: 'asc' }],
@@ -302,6 +319,222 @@ export async function buildAdminFinanceLedgerDto(
   };
 }
 
+export async function closeAdminFinancePeriod(input: AdminFinanceClosePeriodInput): Promise<AdminFinanceClosePeriodDto> {
+  const supplierId = cleanString(input.supplierId);
+  const periodStart = parseRequiredDate(input.periodStart, 'period_start_required');
+  const periodEnd = parseRequiredDate(input.periodEnd, 'period_end_required');
+  const basis = normalizeReportBasis(input.basis);
+  const issueDocuments = input.issueDocuments !== false;
+  if (!supplierId) throw statusError(400, 'supplier_required');
+  if (periodEnd.getTime() <= periodStart.getTime()) throw statusError(400, 'invalid_period');
+
+  const supplier = await prisma.supplier.findUnique({
+    where: { id: supplierId },
+    select: { id: true, slug: true, title: true, legalName: true, inn: true, kpp: true, legalProfile: true },
+  });
+  if (!supplier) throw statusError(404, 'supplier_not_found');
+
+  const ledgerWhere: Prisma.SupplierLedgerEntryWhereInput = {
+    supplierId,
+    createdAt: { gte: periodStart, lte: periodEnd },
+  };
+  const [ledgerRows, ledgerGroups, openRefundRequests, failedReceipts] = await Promise.all([
+    prisma.supplierLedgerEntry.findMany({
+      where: ledgerWhere,
+      orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
+      select: {
+        id: true,
+        type: true,
+        amountKopecks: true,
+        currency: true,
+        referenceType: true,
+        referenceId: true,
+        checkoutOrderId: true,
+        checkoutItemId: true,
+        paymentId: true,
+        note: true,
+        metaJson: true,
+        createdAt: true,
+      },
+    }),
+    prisma.supplierLedgerEntry.groupBy({
+      by: ['type'],
+      where: ledgerWhere,
+      _sum: { amountKopecks: true },
+    }),
+    prisma.refundRequest.count({
+      where: {
+        supplierId,
+        status: { in: ['CREATED', 'APPROVED', 'PROCESSING'] },
+        createdAt: { gte: periodStart, lte: periodEnd },
+      },
+    }),
+    prisma.fiscalReceipt.count({
+      where: {
+        supplierId,
+        status: 'FAILED',
+        createdAt: { gte: periodStart, lte: periodEnd },
+      },
+    }),
+  ]);
+  const totals = summarizeLedgerGroups(ledgerGroups);
+  const blockers = [
+    ...(openRefundRequests ? ['open_refund_requests'] : []),
+    ...(failedReceipts ? ['failed_fiscal_receipts'] : []),
+    ...(totals.saleKopecks <= 0 ? ['no_sales_ledger'] : []),
+    ...(ledgerRows.length === 0 ? ['no_ledger_entries'] : []),
+  ];
+  if (blockers.length) {
+    const error = statusError(409, 'finance_period_blocked');
+    (error as Error & { blockers?: string[] }).blockers = blockers;
+    throw error;
+  }
+
+  const result = await prisma.$transaction(async (tx) => {
+    const existingReport = await tx.supplierReport.findUnique({
+      where: {
+        supplierId_periodStart_periodEnd_basis: {
+          supplierId,
+          periodStart,
+          periodEnd,
+          basis: basis as never,
+        },
+      },
+    });
+    if (existingReport && String(existingReport.status) === 'FINAL') {
+      throw statusError(409, 'supplier_report_already_final');
+    }
+
+    const report = existingReport
+      ? await tx.supplierReport.update({
+          where: { id: existingReport.id },
+          data: {
+            status: 'DRAFT',
+            hasConflict: false,
+            grossKopecks: totals.saleKopecks,
+            commissionKopecks: totals.commissionKopecks,
+            refundKopecks: totals.refundKopecks,
+            netKopecks: totals.netKopecks,
+            snapshotJson: buildReportSnapshotJson(ledgerRows, totals),
+            legalProfileSnapshot: buildLegalSnapshot(supplier),
+            metaJson: { source: 'admin_finance_close_period', refreshedAt: new Date().toISOString() },
+          },
+          include: { supplier: { select: { id: true, title: true } } },
+        })
+      : await tx.supplierReport.create({
+          data: {
+            supplierId,
+            periodStart,
+            periodEnd,
+            basis: basis as never,
+            status: 'DRAFT',
+            hasConflict: false,
+            grossKopecks: totals.saleKopecks,
+            commissionKopecks: totals.commissionKopecks,
+            refundKopecks: totals.refundKopecks,
+            netKopecks: totals.netKopecks,
+            snapshotJson: buildReportSnapshotJson(ledgerRows, totals),
+            legalProfileSnapshot: buildLegalSnapshot(supplier),
+            metaJson: { source: 'admin_finance_close_period', createdAt: new Date().toISOString() },
+          },
+          include: { supplier: { select: { id: true, title: true } } },
+        });
+
+    await tx.supplierReportLine.deleteMany({ where: { supplierReportId: report.id } });
+    await tx.supplierReportLine.createMany({
+      data: ledgerRows.map((entry) => ({
+        supplierReportId: report.id,
+        ledgerEntryId: entry.id,
+        type: mapLedgerTypeToReportLineType(String(entry.type)) as never,
+        referenceType: entry.referenceType || null,
+        referenceId: entry.referenceId || entry.checkoutOrderId || entry.paymentId || null,
+        amountKopecks: entry.amountKopecks,
+        netKopecks: entry.amountKopecks,
+        metaJson: {
+          checkoutOrderId: entry.checkoutOrderId,
+          checkoutItemId: entry.checkoutItemId,
+          paymentId: entry.paymentId,
+          note: entry.note,
+          createdAt: entry.createdAt.toISOString(),
+        },
+      })),
+    });
+
+    const existingSettlement = await tx.supplierSettlement.findFirst({
+      where: {
+        supplierId,
+        periodStart,
+        periodEnd,
+        status: { notIn: ['PAID', 'CANCELLED'] },
+      },
+      include: { supplier: { select: { id: true, title: true } } },
+    });
+    const settlement = existingSettlement
+      ? await tx.supplierSettlement.update({
+          where: { id: existingSettlement.id },
+          data: {
+            status: 'FINALIZED',
+            grossKopecks: totals.saleKopecks,
+            commissionKopecks: totals.commissionKopecks,
+            adjustmentKopecks: totals.adjustmentKopecks,
+            netKopecks: totals.netKopecks,
+            finalizedAt: new Date(),
+            metaJson: { source: 'admin_finance_close_period', reportId: report.id },
+          },
+          include: { supplier: { select: { id: true, title: true } } },
+        })
+      : await tx.supplierSettlement.create({
+          data: {
+            supplierId,
+            periodStart,
+            periodEnd,
+            status: 'FINALIZED',
+            grossKopecks: totals.saleKopecks,
+            commissionKopecks: totals.commissionKopecks,
+            adjustmentKopecks: totals.adjustmentKopecks,
+            netKopecks: totals.netKopecks,
+            finalizedAt: new Date(),
+            metaJson: { source: 'admin_finance_close_period', reportId: report.id },
+          },
+          include: { supplier: { select: { id: true, title: true } } },
+        });
+
+    const documents = issueDocuments
+      ? await issueSupplierDocuments(tx, {
+          supplierId,
+          supplierTitle: supplier.title,
+          reportId: report.id,
+          settlementId: settlement.id,
+          periodStart,
+          periodEnd,
+          totals,
+        })
+      : [];
+
+    return { report, settlement, documents };
+  });
+
+  return {
+    generatedAt: new Date().toISOString(),
+    report: mapReport(result.report),
+    settlement: mapSettlement(result.settlement),
+    documents: result.documents.map(mapDocument),
+    metrics: {
+      ...totals,
+      openRefundRequests,
+      failedReceipts,
+      draftReports: 1,
+      openSettlements: 1,
+      pendingDocuments: result.documents.length,
+    },
+    actions: [
+      'Создан или обновлен черновик отчета агента',
+      'Settlement закрыт в статусе FINALIZED',
+      ...(issueDocuments ? ['Документы выпущены в статусе ISSUED'] : []),
+    ],
+  };
+}
+
 function summarizeLedgerGroups(groups: Array<{ type: string; _sum: { amountKopecks: number | null } }>) {
   const byType = new Map(groups.map((group) => [String(group.type), group._sum.amountKopecks || 0]));
   const saleKopecks = byType.get('SALE') || 0;
@@ -319,6 +552,211 @@ function summarizeLedgerGroups(groups: Array<{ type: string; _sum: { amountKopec
   };
 }
 
+function mapReport(report: Prisma.SupplierReportGetPayload<{ include: { supplier: { select: { id: true; title: true } } } }>): AdminFinanceLedgerDto['reports'][number] {
+  return {
+    id: report.id,
+    supplierId: report.supplierId,
+    supplierTitle: report.supplier.title,
+    periodStart: report.periodStart.toISOString(),
+    periodEnd: report.periodEnd.toISOString(),
+    basis: String(report.basis),
+    status: String(report.status),
+    hasConflict: report.hasConflict,
+    grossKopecks: report.grossKopecks,
+    commissionKopecks: report.commissionKopecks,
+    refundKopecks: report.refundKopecks,
+    netKopecks: report.netKopecks,
+    createdAt: report.createdAt.toISOString(),
+  };
+}
+
+function mapSettlement(settlement: Prisma.SupplierSettlementGetPayload<{ include: { supplier: { select: { id: true; title: true } } } }>): AdminFinanceLedgerDto['settlements'][number] {
+  return {
+    id: settlement.id,
+    supplierId: settlement.supplierId,
+    supplierTitle: settlement.supplier.title,
+    periodStart: settlement.periodStart.toISOString(),
+    periodEnd: settlement.periodEnd.toISOString(),
+    status: String(settlement.status),
+    grossKopecks: settlement.grossKopecks,
+    commissionKopecks: settlement.commissionKopecks,
+    adjustmentKopecks: settlement.adjustmentKopecks,
+    netKopecks: settlement.netKopecks,
+    paidAt: settlement.paidAt ? settlement.paidAt.toISOString() : null,
+    createdAt: settlement.createdAt.toISOString(),
+  };
+}
+
+function mapDocument(document: Prisma.SupplierDocumentGetPayload<{ include: { supplier: { select: { id: true; title: true } }; files: { select: { id: true } } } }>): AdminFinanceLedgerDto['documents'][number] {
+  return {
+    id: document.id,
+    supplierId: document.supplierId,
+    supplierTitle: document.supplier.title,
+    type: String(document.type),
+    status: String(document.status),
+    title: document.title,
+    reportId: document.reportId || null,
+    settlementId: document.settlementId || null,
+    filesCount: document.files.length,
+    createdAt: document.createdAt.toISOString(),
+  };
+}
+
+async function issueSupplierDocuments(
+  tx: Prisma.TransactionClient,
+  input: {
+    supplierId: string;
+    supplierTitle: string;
+    reportId: string;
+    settlementId: string;
+    periodStart: Date;
+    periodEnd: Date;
+    totals: ReturnType<typeof summarizeLedgerGroups>;
+  },
+): Promise<Array<Prisma.SupplierDocumentGetPayload<{ include: { supplier: { select: { id: true; title: true } }; files: { select: { id: true } } } }>>> {
+  const specs = [
+    { type: 'AGENT_REPORT', title: `Отчет агента - ${input.supplierTitle}` },
+    { type: 'SERVICE_ACT', title: `Акт услуг - ${input.supplierTitle}` },
+    { type: 'PAYOUT_STATEMENT', title: `Реестр выплат - ${input.supplierTitle}` },
+  ];
+  const documents = [];
+  for (const spec of specs) {
+    const existing = await tx.supplierDocument.findFirst({
+      where: {
+        supplierId: input.supplierId,
+        reportId: input.reportId,
+        settlementId: input.settlementId,
+        type: spec.type as never,
+        status: { not: 'CANCELLED' },
+      },
+      include: {
+        supplier: { select: { id: true, title: true } },
+        files: { select: { id: true } },
+      },
+    });
+    const payloadJson = {
+      source: 'admin_finance_close_period',
+      periodStart: input.periodStart.toISOString(),
+      periodEnd: input.periodEnd.toISOString(),
+      totals: input.totals,
+    };
+    const document = existing
+      ? await tx.supplierDocument.update({
+          where: { id: existing.id },
+          data: {
+            status: 'ISSUED',
+            title: spec.title,
+            payloadJson,
+          },
+          include: {
+            supplier: { select: { id: true, title: true } },
+            files: { select: { id: true } },
+          },
+        })
+      : await tx.supplierDocument.create({
+          data: {
+            supplierId: input.supplierId,
+            reportId: input.reportId,
+            settlementId: input.settlementId,
+            type: spec.type as never,
+            status: 'ISSUED',
+            title: spec.title,
+            payloadJson,
+          },
+          include: {
+            supplier: { select: { id: true, title: true } },
+            files: { select: { id: true } },
+          },
+        });
+    documents.push(document);
+  }
+  return documents;
+}
+
+function buildReportSnapshotJson(
+  ledgerRows: Array<{ id: string; type: unknown; amountKopecks: number; currency: string; referenceType: string | null; referenceId: string | null; checkoutOrderId: string | null; checkoutItemId: string | null; createdAt: Date }>,
+  totals: ReturnType<typeof summarizeLedgerGroups>,
+) {
+  return {
+    source: 'admin_finance_close_period',
+    totals,
+    ledgerCount: ledgerRows.length,
+    ledgerEntries: ledgerRows.map((entry) => ({
+      id: entry.id,
+      type: String(entry.type),
+      amountKopecks: entry.amountKopecks,
+      currency: entry.currency,
+      referenceType: entry.referenceType,
+      referenceId: entry.referenceId,
+      checkoutOrderId: entry.checkoutOrderId,
+      checkoutItemId: entry.checkoutItemId,
+      createdAt: entry.createdAt.toISOString(),
+    })),
+  };
+}
+
+function buildLegalSnapshot(supplier: {
+  id: string;
+  slug: string;
+  title: string;
+  legalName: string | null;
+  inn: string | null;
+  kpp: string | null;
+  legalProfile: {
+    status?: unknown;
+    legalName?: unknown;
+    inn?: unknown;
+    kpp?: unknown;
+    taxMode?: unknown;
+    isVatPayer?: unknown;
+    defaultVatRate?: unknown;
+    signerFullName?: unknown;
+    signerPosition?: unknown;
+    financeEmail?: unknown;
+    docsEmail?: unknown;
+  } | null;
+}) {
+  return {
+    supplierId: supplier.id,
+    slug: supplier.slug,
+    title: supplier.title,
+    legalName: supplier.legalName,
+    inn: supplier.inn,
+    kpp: supplier.kpp,
+    legalProfile: supplier.legalProfile ? {
+      status: String(supplier.legalProfile.status || ''),
+      legalName: nullableSnapshotString(supplier.legalProfile.legalName),
+      inn: nullableSnapshotString(supplier.legalProfile.inn),
+      kpp: nullableSnapshotString(supplier.legalProfile.kpp),
+      taxMode: nullableSnapshotString(supplier.legalProfile.taxMode),
+      isVatPayer: typeof supplier.legalProfile.isVatPayer === 'boolean' ? supplier.legalProfile.isVatPayer : null,
+      defaultVatRate: typeof supplier.legalProfile.defaultVatRate === 'string' ? supplier.legalProfile.defaultVatRate : null,
+      signerFullName: nullableSnapshotString(supplier.legalProfile.signerFullName),
+      signerPosition: nullableSnapshotString(supplier.legalProfile.signerPosition),
+      financeEmail: nullableSnapshotString(supplier.legalProfile.financeEmail),
+      docsEmail: nullableSnapshotString(supplier.legalProfile.docsEmail),
+    } : null,
+  };
+}
+
+function nullableSnapshotString(value: unknown): string | null {
+  return typeof value === 'string' && value.trim() ? value.trim() : null;
+}
+
+function mapLedgerTypeToReportLineType(type: string): string {
+  if (type === 'SALE') return 'SALE';
+  if (type === 'COMMISSION') return 'COMMISSION';
+  if (type === 'REFUND') return 'REFUND';
+  if (type === 'PAYOUT') return 'PAYOUT';
+  return 'ADJUSTMENT';
+}
+
+function normalizeReportBasis(value: string | null | undefined): string {
+  const normalized = String(value || '').toUpperCase();
+  if (normalized === 'COMPLETED') return 'COMPLETED';
+  return 'SOLD';
+}
+
 function buildReconcileNextActions(blockers: string[]): string[] {
   if (blockers.includes('open_refund_requests')) return ['Разобрать открытые заявки на возврат'];
   if (blockers.includes('failed_fiscal_receipts')) return ['Проверить ошибки чеков перед закрытием периода'];
@@ -326,11 +764,28 @@ function buildReconcileNextActions(blockers: string[]): string[] {
   return ['Можно готовить черновик отчета агента и сверку с поставщиком'];
 }
 
-function parseDate(value: string | null): Date | null {
+function parseDateStart(value: string | null): Date | null {
   const cleaned = cleanString(value);
   if (!cleaned) return null;
   const date = new Date(cleaned);
   return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function parseDateEnd(value: string | null): Date | null {
+  const cleaned = cleanString(value);
+  if (!cleaned) return null;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(cleaned)) {
+    const date = new Date(`${cleaned}T23:59:59.999Z`);
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+  const date = new Date(cleaned);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function parseRequiredDate(value: string, errorMessage: string): Date {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) throw statusError(400, errorMessage);
+  return date;
 }
 
 function cleanString(value: string | null | undefined): string | null {
@@ -342,4 +797,10 @@ function clampInt(value: string | null, fallback: number, min: number, max: numb
   const parsed = Number(value);
   if (!Number.isFinite(parsed)) return fallback;
   return Math.max(min, Math.min(max, Math.trunc(parsed)));
+}
+
+function statusError(statusCode: number, message: string): Error & { statusCode: number } {
+  const error = new Error(message) as Error & { statusCode: number };
+  error.statusCode = statusCode;
+  return error;
 }

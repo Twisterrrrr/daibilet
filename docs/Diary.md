@@ -1,3 +1,25 @@
+## 2026-08-09 - Finance E2E foundation: close period mutation
+
+### Наблюдения
+
+- Admin `/finance` уже показывал ledger/reconcile dry-run, но период нельзя было провести в системе.
+- Для MVP нужен один безопасный операторский action, который не оставляет период в полузакрытом состоянии.
+
+### Решения
+
+- Добавлен `POST /api/admin/finance/close-period`: по выбранному supplier/period создает или обновляет draft `SupplierReport`, пересобирает `SupplierReportLine` из ledger, закрывает `SupplierSettlement` в `FINALIZED` и выпускает `SupplierDocument` в `ISSUED`.
+- Mutation блокируется при open refund requests, failed fiscal receipts, пустом ledger или отсутствии sales ledger.
+- Повторный запуск по тому же supplier/period idempotent: report lines пересобираются, settlement/documents обновляются без дублей.
+- Admin `/finance` получил кнопку "Закрыть период и выпустить документы" только для одного поставщика, выбранного периода и green dry-run.
+- Добавлен `admin-finance.test.ts`: happy path close-period + blocker по открытому refund.
+
+### Проблемы
+
+- Это закрытие учетного периода, не банковская выплата и не provider refund execution.
+- Следующий шаг: статусы acceptance/signature для документов и supplier acknowledgement в ЛК.
+
+---
+
 ## 2026-08-09 - Finance E2E foundation: refunds, ledger, supplier views
 
 ### Наблюдения

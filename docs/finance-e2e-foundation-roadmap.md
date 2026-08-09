@@ -36,10 +36,10 @@ Scope: MVP finance contour for first art-object pilot, without supplier payouts 
 
 ## Next PR-sized steps
 
-1. Reports, settlements and documents write flow
-   - Draft `SupplierReport` snapshots from reconciled ledger.
-   - Close `SupplierSettlement` only when blockers are empty.
-   - Issue `SupplierDocument` records for agent report, service act and payout statement.
+1. Document acknowledgement and signature status
+   - Supplier sees issued documents and can acknowledge receipt.
+   - Admin tracks delivered/signed/failed states.
+   - File generation/storage remains separate from record issuance.
 
 2. Refund execution
    - Move `RefundRequest` from CREATED/APPROVED to PROCESSING/COMPLETED.

@@ -12,7 +12,7 @@ import { createAdminEventScheduleRouteHandler } from './admin-event-schedule-han
 import { createAdminEventsRouteHandler } from './admin-events-handler.js';
 import { createAdminEventsReadRouteHandler } from './admin-events-read-handler.js';
 import { buildAdminEventDetailDto, buildAdminEventsListDto } from './admin-events.dto.js';
-import { buildAdminFinanceLedgerDto } from './admin-finance.dto.js';
+import { buildAdminFinanceLedgerDto, closeAdminFinancePeriod } from './admin-finance.dto.js';
 import { createAdminFinanceRouteHandler } from './admin-finance-handler.js';
 import { applyApprovedEventChangeRequest } from './event-change-request-applier.js';
 import { reviewEventChangeRequest } from './event-change-request-review.js';
@@ -143,6 +143,7 @@ const server = startServer({
       createAdminFinanceRouteHandler({
         enabled: adminFlags.orders,
         buildLedger: buildAdminFinanceLedgerDto,
+        closePeriod: closeAdminFinancePeriod,
       }),
       createAdminEventsReadRouteHandler({
         enabled: adminFlags.events,
