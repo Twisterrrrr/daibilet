@@ -3219,3 +3219,21 @@
 - Keep wide catalog CTA, TC/TEP secrets, Path B calc, and session/schedule supplier out of Stage 0.
 
 ---
+
+## 2026-08-09 - Checkout result page
+
+### Changes
+
+- Added web route `/checkout/result?order={publicCode}` for YooKassa return_url.
+- Added no-store Next proxy `GET /api/public/checkout/orders/:publicCode` to read finance public order projection through `FINANCE_API_BASE_URL` / `DAIBILET_FINANCE_API_BASE_URL` with optional projection token.
+- The page is read-only: it polls pending orders, offers a return-to-payment link when finance exposes `confirmationUrl`, and shows `ticketNumbers` after webhook/reconcile confirms the order.
+
+### Checks
+
+- `pnpm --filter @daibilet/backend typecheck` - OK.
+- `pnpm --filter @daibilet/web build` - OK; build includes `/checkout/result` and `/api/public/checkout/orders/[publicCode]`.
+- `pnpm --filter @daibilet/web typecheck` still has pre-existing unrelated failures in `selected-city.test.ts` and `sitemap-data.ts`; no new checkout-result files are reported.
+
+### Next
+
+- After owner completes YooKassa sandbox payment smoke, deploy catalog/web and verify `/checkout/result?order=...` moves from pending to ticket numbers without relying on return_url as confirmation.
