@@ -2,7 +2,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| UX.SCENARIOS-TITLE-FLUSH | Scenarios panel: no empty gutter; blog+CTA on title row | Высокий | 🔄 ship; deploy по «выкатывай» |
+| UX.SCENARIOS-TITLE-FLUSH | Scenarios panel: no empty gutter; blog+CTA on title row | Высокий | ✅ `06b1db6b`; deploy по «выкатывай» |
 | UX.EVENTS-MOBILE-SELECTS | `/events` mobile: Find in search; date+type dropdowns; chip rails md+ only | Высокий | ✅ `c68d010e`; deploy по «выкатывай» |
 | UX.EVENTS-FILTERS-AIR | `/events` mobile: sticky search-only (chips visible); filter sheet air + quick evening chip | Высокий | ✅ `f0880cb1`; deploy по «выкатывай» |
 | UX.CITIES-CATALOG-CLEAN | `/cities` clean hero + hub/region chips; vibe Lucide hover (no emoji) | Высокий | ✅ `b02bccab`; deploy по «выкатывай» |
