@@ -3,6 +3,7 @@ import test from 'node:test';
 import { prisma } from '@daibilet/db';
 import type { Prisma } from '@daibilet/db';
 import {
+  buildAdminPurchaseDetailDto,
   applySupplierCheckoutItemStatusFilter,
   buildAdminPurchasesListDto,
   buildBuyerPurchasesListDto,
@@ -41,6 +42,8 @@ test('projects internal checkout and external orders into admin, buyer and suppl
     item: `checkout_item_${suffix}`,
     payment: `payment_${suffix}`,
     fulfillment: `fulfillment_${suffix}`,
+    ledgerSale: `ledger_sale_${suffix}`,
+    ledgerCommission: `ledger_commission_${suffix}`,
     event: `event_${suffix}`,
     externalOrder: `external_order_${suffix}`,
     externalTicket: `external_ticket_${suffix}`,
@@ -178,6 +181,32 @@ test('projects internal checkout and external orders into admin, buyer and suppl
         },
       },
     });
+    await prisma.supplierLedgerEntry.createMany({
+      data: [
+        {
+          id: ids.ledgerSale,
+          supplierId: ids.supplier,
+          type: 'SALE',
+          amountKopecks: 90_000,
+          checkoutOrderId: ids.order,
+          checkoutItemId: ids.item,
+          paymentId: ids.payment,
+          referenceType: 'checkout_order',
+          referenceId: ids.order,
+        },
+        {
+          id: ids.ledgerCommission,
+          supplierId: ids.supplier,
+          type: 'COMMISSION',
+          amountKopecks: -9_000,
+          checkoutOrderId: ids.order,
+          checkoutItemId: ids.item,
+          paymentId: ids.payment,
+          referenceType: 'checkout_order',
+          referenceId: ids.order,
+        },
+      ],
+    });
 
     const source = await prisma.source.upsert({
       where: { code: 'TICKETSCLOUD' },
@@ -225,6 +254,15 @@ test('projects internal checkout and external orders into admin, buyer and suppl
     assert.equal(admin.rows.some((row) => row.sourceKind === 'internal' && row.publicCode === '9100001'), true);
     assert.equal(admin.rows.some((row) => row.sourceKind === 'external' && row.publicCode === '9200001'), true);
 
+    const adminDetail = await buildAdminPurchaseDetailDto('9100001');
+    assert.equal(adminDetail?.sourceKind, 'internal');
+    assert.equal(adminDetail?.finance?.payments[0]?.status, 'SUCCEEDED');
+    assert.equal(adminDetail?.finance?.fulfillment[0]?.ticketNumbers[0], 'TKT-9100001-01');
+    assert.equal(adminDetail?.finance?.ledger.length, 2);
+    assert.equal(adminDetail?.finance?.totals.ledgerNetKopecks, 81_000);
+    assert.equal(adminDetail?.finance?.operations.canRefund, true);
+    assert.equal(adminDetail?.finance?.operations.canCloseSettlement, true);
+
     const buyer = await buildBuyerPurchasesListDto({
       siteUserId: ids.user,
       email,
@@ -257,6 +295,7 @@ test('projects internal checkout and external orders into admin, buyer and suppl
   } finally {
     await prisma.externalTicket.deleteMany({ where: { id: ids.externalTicket } });
     await prisma.externalOrder.deleteMany({ where: { id: ids.externalOrder } });
+    await prisma.supplierLedgerEntry.deleteMany({ where: { id: { in: [ids.ledgerSale, ids.ledgerCommission] } } });
     await prisma.fulfillmentItem.deleteMany({ where: { id: ids.fulfillment } });
     await prisma.payment.deleteMany({ where: { id: ids.payment } });
     await prisma.checkoutItem.deleteMany({ where: { id: ids.item } });

@@ -1,3 +1,24 @@
+## 2026-08-09 - Finance E2E foundation: admin order detail
+
+### Наблюдения
+
+- Админка уже показывала общий список `CheckoutOrder` + `ExternalOrder`, но detail endpoint был неполным для внутреннего checkout: оператор не видел рядом оплату, fulfillment, ledger, возвраты, чеки и готовность к сверке.
+- В Prisma уже есть базовые сущности следующего финконтура: `RefundRequest`, `FiscalReceipt`, `Payout`, `SupplierLedgerEntry`, `SupplierReport`, `SupplierSettlement`, `SupplierDocument`.
+- Значит следующий безопасный MVP-шаг - не новая финансовая архитектура, а typed read foundation для заказа, вокруг которого потом включаются действия.
+
+### Решения
+
+- `GET /api/admin/orders/:id` и `/api/admin/external-orders/:id` теперь обслуживаются typed read handler: internal orders получают finance snapshot, external orders остаются зеркалом источника.
+- Internal order detail включает payments, fulfillment ticketNumbers, supplier ledger, refund requests, fiscal receipts, totals и operation blockers/nextActions.
+- Admin orders sheet показывает finance summary и блок "Финансовый контроль" для внутренних заказов; для TC/Teplohod сохраняется ручная привязка билетов.
+- Добавлен regression-test purchase projection: internal order detail проверяет payment, ticketNumbers, ledger net, refund/settlement readiness.
+
+### Проблемы
+
+- Это read foundation. Actions для create refund, issue receipt/report, close settlement и supplier-facing finance views остаются следующими PR-sized шагами.
+
+---
+
 ## 2026-08-09 - Finance pilot: admission buyer checkout page
 
 ### Наблюдения

@@ -19,7 +19,7 @@ import { buildAdminListingHealthOverviewDto } from './admin-listing-health.dto.j
 import { createAdminListingHealthRouteHandler } from './admin-listing-health-handler.js';
 import { createAdminOrdersRouteHandler } from './admin-orders-handler.js';
 import { createAdminOrdersReadRouteHandler } from './admin-orders-read-handler.js';
-import { buildAdminOrdersListDto } from './admin-orders.dto.js';
+import { buildAdminOrderDetailDto, buildAdminOrdersListDto } from './admin-orders.dto.js';
 import { createAdminSuppliersRouteHandler } from './admin-suppliers-handler.js';
 import { buildAdminSupplierDetailDto, buildAdminSuppliersListDto } from './admin-suppliers.dto.js';
 import { createAdminAuthConfig } from './auth.js';
@@ -136,6 +136,7 @@ const server = startServer({
       createAdminOrdersReadRouteHandler({
         enabled: adminFlags.orders,
         buildOrdersList: buildAdminOrdersListDto,
+        buildOrderDetail: buildAdminOrderDetailDto,
       }),
       createAdminEventsReadRouteHandler({
         enabled: adminFlags.events,

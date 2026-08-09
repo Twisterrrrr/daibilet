@@ -55,6 +55,109 @@ export interface AdminPurchaseTicketDto {
   startsAt: string | null;
 }
 
+export interface AdminPurchasePaymentDto {
+  id: string;
+  provider: string;
+  status: string;
+  amountKopecks: number;
+  currency: string;
+  providerPaymentId: string | null;
+  confirmationUrl: string | null;
+  paidAt: string | null;
+  capturedAt: string | null;
+  cancelledAt: string | null;
+  error: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+
+export interface AdminPurchaseFulfillmentDto {
+  id: string;
+  checkoutItemId: string | null;
+  provider: string;
+  status: string;
+  purchaseFlow: string;
+  amountKopecks: number;
+  refundedKopecks: number;
+  externalOrderId: string | null;
+  externalPaymentUrl: string | null;
+  ticketNumbers: string[];
+  lastError: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+
+export interface AdminPurchaseLedgerEntryDto {
+  id: string;
+  supplierId: string;
+  supplierTitle: string | null;
+  type: string;
+  amountKopecks: number;
+  currency: string;
+  referenceType: string | null;
+  referenceId: string | null;
+  checkoutItemId: string | null;
+  paymentId: string | null;
+  note: string | null;
+  createdAt: string | null;
+}
+
+export interface AdminPurchaseRefundDto {
+  id: string;
+  status: string;
+  amountKopecks: number;
+  currency: string;
+  reason: string;
+  reasonNote: string | null;
+  providerRefundId: string | null;
+  adminComment: string | null;
+  processedAt: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+
+export interface AdminPurchaseFiscalReceiptDto {
+  id: string;
+  type: string;
+  status: string;
+  amountKopecks: number;
+  providerReceiptId: string | null;
+  receiptUrl: string | null;
+  error: string | null;
+  sentAt: string | null;
+  createdAt: string | null;
+}
+
+export interface AdminPurchaseDetailDto extends AdminPurchaseRowDto {
+  finance: {
+    payments: AdminPurchasePaymentDto[];
+    fulfillment: AdminPurchaseFulfillmentDto[];
+    ledger: AdminPurchaseLedgerEntryDto[];
+    refunds: AdminPurchaseRefundDto[];
+    fiscalReceipts: AdminPurchaseFiscalReceiptDto[];
+    totals: {
+      currency: string;
+      subtotalKopecks: number;
+      discountKopecks: number;
+      totalKopecks: number;
+      commissionKopecks: number;
+      ledgerGrossKopecks: number;
+      ledgerCommissionKopecks: number;
+      ledgerRefundKopecks: number;
+      ledgerPayoutKopecks: number;
+      ledgerNetKopecks: number;
+    };
+    operations: {
+      canReconcile: boolean;
+      canRefund: boolean;
+      canIssueDocuments: boolean;
+      canCloseSettlement: boolean;
+      blockers: string[];
+      nextActions: string[];
+    };
+  } | null;
+}
+
 export interface AdminPurchasesListDto {
   generatedAt: string;
   page: number;
@@ -238,11 +341,15 @@ const checkoutOrderInclude = {
       provider: true,
       status: true,
       amountKopecks: true,
+      currency: true,
       providerPaymentId: true,
       confirmationUrl: true,
       paidAt: true,
+      capturedAt: true,
       cancelledAt: true,
       error: true,
+      createdAt: true,
+      updatedAt: true,
     },
   },
   fulfillmentItems: {
@@ -252,9 +359,45 @@ const checkoutOrderInclude = {
       checkoutItemId: true,
       provider: true,
       status: true,
+      purchaseFlow: true,
       externalOrderId: true,
+      externalPaymentUrl: true,
       lastError: true,
       providerData: true,
+      amountKopecks: true,
+      refundedKopecks: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  },
+  refundRequests: {
+    orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+    select: {
+      id: true,
+      status: true,
+      amountKopecks: true,
+      currency: true,
+      reason: true,
+      reasonNote: true,
+      providerRefundId: true,
+      adminComment: true,
+      processedAt: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  },
+  fiscalReceipts: {
+    orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+    select: {
+      id: true,
+      type: true,
+      status: true,
+      amountKopecks: true,
+      providerReceiptId: true,
+      receiptUrl: true,
+      error: true,
+      sentAt: true,
+      createdAt: true,
     },
   },
   siteUser: { select: { id: true, email: true, name: true, phone: true } },
@@ -336,6 +479,47 @@ export async function buildAdminPurchasesListDto(
       failedIntegration: allRows.filter((row) => isProblemOrderStatus(row.status)).length,
       needsAttention: allRows.filter((row) => row.needsAttention).length,
     },
+  };
+}
+
+export async function buildAdminPurchaseDetailDto(orderKeyInput: string): Promise<AdminPurchaseDetailDto | null> {
+  const orderKey = cleanString(orderKeyInput);
+  if (!orderKey) return null;
+
+  const checkoutRow = await prisma.checkoutOrder.findFirst({
+    where: {
+      OR: [
+        { id: orderKey },
+        { publicCode: orderKey },
+        { externalOrderId: orderKey },
+      ],
+    },
+    include: checkoutOrderInclude,
+  });
+  if (checkoutRow) {
+    const ledgerRows = await prisma.supplierLedgerEntry.findMany({
+      where: { checkoutOrderId: checkoutRow.id },
+      orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
+      include: { supplier: { select: { id: true, title: true } } },
+    });
+    return mapCheckoutOrderToAdminPurchaseDetail(checkoutRow, ledgerRows);
+  }
+
+  const externalRow = await prisma.externalOrder.findFirst({
+    where: {
+      OR: [
+        { id: orderKey },
+        { externalOrderId: orderKey },
+        { publicCode: orderKey },
+      ],
+    },
+    include: externalOrderInclude,
+  });
+  if (!externalRow) return null;
+  const lookup = await loadExternalTicketLookups([externalRow]);
+  return {
+    ...mapExternalOrderToAdminPurchaseRow(externalRow, lookup),
+    finance: null,
   };
 }
 
@@ -606,13 +790,138 @@ function mapCheckoutOrderToAdminPurchaseRow(row: CheckoutOrderRow): AdminPurchas
   };
 }
 
+function mapCheckoutOrderToAdminPurchaseDetail(
+  row: CheckoutOrderRow,
+  ledgerRows: Array<Prisma.SupplierLedgerEntryGetPayload<{ include: { supplier: { select: { id: true; title: true } } } }>>,
+): AdminPurchaseDetailDto {
+  const base = mapCheckoutOrderToAdminPurchaseRow(row);
+  const ledger = ledgerRows.map((entry) => ({
+    id: entry.id,
+    supplierId: entry.supplierId,
+    supplierTitle: entry.supplier?.title || null,
+    type: String(entry.type),
+    amountKopecks: entry.amountKopecks,
+    currency: entry.currency,
+    referenceType: entry.referenceType || null,
+    referenceId: entry.referenceId || null,
+    checkoutItemId: entry.checkoutItemId || null,
+    paymentId: entry.paymentId || null,
+    note: entry.note || null,
+    createdAt: toIso(entry.createdAt),
+  }));
+  const ledgerGrossKopecks = sumLedger(ledger, 'SALE');
+  const ledgerCommissionKopecks = Math.abs(sumLedger(ledger, 'COMMISSION'));
+  const ledgerRefundKopecks = Math.abs(sumLedger(ledger, 'REFUND'));
+  const ledgerPayoutKopecks = Math.abs(sumLedger(ledger, 'PAYOUT'));
+  const succeededPayment = row.payments.some((payment) => String(payment.status) === 'SUCCEEDED');
+  const hasRefund = row.refundRequests.length > 0 || String(row.status) === 'REFUNDED';
+  const hasFailedPayment = row.payments.some((payment) => isProblemOrderStatus(String(payment.status)) || payment.error);
+  const fulfillmentPending = row.fulfillmentItems.some((item) => ['PENDING', 'RESERVING', 'RESERVED'].includes(String(item.status)));
+  const blockers = [
+    ...(!succeededPayment && !['CONFIRMED', 'FULFILLED', 'REFUNDED'].includes(String(row.status)) ? ['payment_not_confirmed'] : []),
+    ...(hasFailedPayment ? ['payment_has_error'] : []),
+    ...(fulfillmentPending ? ['fulfillment_not_final'] : []),
+    ...(ledger.length === 0 && succeededPayment ? ['ledger_missing'] : []),
+  ];
+
+  return {
+    ...base,
+    finance: {
+      payments: row.payments.map((payment) => ({
+        id: payment.id,
+        provider: String(payment.provider),
+        status: String(payment.status),
+        amountKopecks: payment.amountKopecks,
+        currency: payment.currency,
+        providerPaymentId: payment.providerPaymentId || null,
+        confirmationUrl: payment.confirmationUrl || null,
+        paidAt: toIso(payment.paidAt),
+        capturedAt: toIso(payment.capturedAt),
+        cancelledAt: toIso(payment.cancelledAt),
+        error: payment.error || null,
+        createdAt: toIso(payment.createdAt),
+        updatedAt: toIso(payment.updatedAt),
+      })),
+      fulfillment: row.fulfillmentItems.map((item) => ({
+        id: item.id,
+        checkoutItemId: item.checkoutItemId || null,
+        provider: item.provider,
+        status: String(item.status),
+        purchaseFlow: String(item.purchaseFlow),
+        amountKopecks: item.amountKopecks,
+        refundedKopecks: item.refundedKopecks,
+        externalOrderId: item.externalOrderId || null,
+        externalPaymentUrl: item.externalPaymentUrl || null,
+        ticketNumbers: ticketNumbersFromProviderData(item.providerData),
+        lastError: item.lastError || null,
+        createdAt: toIso(item.createdAt),
+        updatedAt: toIso(item.updatedAt),
+      })),
+      ledger,
+      refunds: row.refundRequests.map((refund) => ({
+        id: refund.id,
+        status: String(refund.status),
+        amountKopecks: refund.amountKopecks,
+        currency: refund.currency,
+        reason: String(refund.reason),
+        reasonNote: refund.reasonNote || null,
+        providerRefundId: refund.providerRefundId || null,
+        adminComment: refund.adminComment || null,
+        processedAt: toIso(refund.processedAt),
+        createdAt: toIso(refund.createdAt),
+        updatedAt: toIso(refund.updatedAt),
+      })),
+      fiscalReceipts: row.fiscalReceipts.map((receipt) => ({
+        id: receipt.id,
+        type: String(receipt.type),
+        status: String(receipt.status),
+        amountKopecks: receipt.amountKopecks,
+        providerReceiptId: receipt.providerReceiptId || null,
+        receiptUrl: receipt.receiptUrl || null,
+        error: receipt.error || null,
+        sentAt: toIso(receipt.sentAt),
+        createdAt: toIso(receipt.createdAt),
+      })),
+      totals: {
+        currency: row.currency,
+        subtotalKopecks: row.subtotalKopecks,
+        discountKopecks: row.discountKopecks,
+        totalKopecks: row.totalKopecks,
+        commissionKopecks: row.commissionKopecks,
+        ledgerGrossKopecks,
+        ledgerCommissionKopecks,
+        ledgerRefundKopecks,
+        ledgerPayoutKopecks,
+        ledgerNetKopecks: ledgerGrossKopecks - ledgerCommissionKopecks - ledgerRefundKopecks - ledgerPayoutKopecks,
+      },
+      operations: {
+        canReconcile: ['PENDING_PAYMENT', 'PAID'].includes(String(row.status)) || hasFailedPayment,
+        canRefund: succeededPayment && ['CONFIRMED', 'FULFILLED'].includes(String(row.status)) && !hasRefund,
+        canIssueDocuments: ledger.length > 0 && !blockers.length,
+        canCloseSettlement: ledger.length > 0 && !blockers.length && !hasRefund,
+        blockers,
+        nextActions: buildInternalOrderNextActions({
+          status: String(row.status),
+          succeededPayment,
+          hasFailedPayment,
+          fulfillmentPending,
+          ledgerMissing: ledger.length === 0 && succeededPayment,
+          hasRefund,
+        }),
+      },
+    },
+  };
+}
+
 function mapCheckoutItemToTicket(row: CheckoutOrderRow, item: CheckoutItemRow, index: number): AdminPurchaseTicketDto {
-  const number = `${row.publicCode || shortCode(row.id)}-${index + 1}`;
+  const fulfillmentNumbers = item.fulfillmentItem ? ticketNumbersFromProviderData(item.fulfillmentItem.providerData) : [];
+  const number = fulfillmentNumbers.join(', ') || `${row.publicCode || shortCode(row.id)}-${index + 1}`;
+  const status = item.fulfillmentItem?.status ? String(item.fulfillmentItem.status) : String(item.status);
   return {
     id: item.id,
     externalTicketId: number,
-    status: String(item.status),
-    displayStatus: orderStatusLabel(String(item.status)),
+    status,
+    displayStatus: orderStatusLabel(status),
     origin: 'daibilet',
     eventId: item.event?.id || null,
     sessionId: item.session?.id || null,
@@ -1062,6 +1371,32 @@ function ticketNumbersFromProviderData(value: Prisma.JsonValue | null | undefine
   const list = rawList.map((item) => cleanString(String(item || ''))).filter((item): item is string => Boolean(item));
   const single = cleanString(typeof payload.ticketNumber === 'string' ? payload.ticketNumber : null);
   return list.length ? list : single ? [single] : [];
+}
+
+function sumLedger(entries: AdminPurchaseLedgerEntryDto[], type: string): number {
+  return entries
+    .filter((entry) => entry.type === type)
+    .reduce((sum, entry) => sum + entry.amountKopecks, 0);
+}
+
+function buildInternalOrderNextActions(input: {
+  status: string;
+  succeededPayment: boolean;
+  hasFailedPayment: boolean;
+  fulfillmentPending: boolean;
+  ledgerMissing: boolean;
+  hasRefund: boolean;
+}): string[] {
+  if (input.hasFailedPayment) return ['Проверить ошибку платежа и запустить сверку YooKassa'];
+  if (input.status === 'PENDING_PAYMENT') return ['Ждать webhook YooKassa или reconcile timer'];
+  if (input.status === 'PAID') return ['Проверить fulfillment и выпуск билетов'];
+  if (input.fulfillmentPending) return ['Проверить выпуск билетов'];
+  if (input.ledgerMissing) return ['Проверить ledger entries по успешной оплате'];
+  if (input.hasRefund) return ['Проверить возврат и отражение в ledger'];
+  if (input.succeededPayment && ['CONFIRMED', 'FULFILLED'].includes(input.status)) {
+    return ['Готово к включению в сверку и расчет с поставщиком'];
+  }
+  return ['Контроль статуса заказа'];
 }
 
 function maskEmail(value: string | null | undefined): string | null {
