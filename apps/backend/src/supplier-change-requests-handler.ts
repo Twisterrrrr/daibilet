@@ -48,12 +48,20 @@ type AdmissionProductLookup = {
   status: string;
 };
 
+/** Routing keys come from SPA (`supplier`) or auth resolve (`supplierId`); must not fail .strict(). */
 const listQuerySchema = z.object({
+  supplier: z.string().trim().optional(),
+  supplierId: z.string().trim().optional(),
+  slug: z.string().trim().optional(),
   status: z.string().trim().optional(),
   subject: z.enum(['EVENT', 'ADMISSION_PRODUCT']).optional(),
   limit: z.coerce.number().int().min(1).max(100).optional(),
   offset: z.coerce.number().int().min(0).optional(),
 }).strict();
+
+export function parseSupplierChangeRequestsListQuery(searchParams: URLSearchParams) {
+  return parseSearchParams(listQuerySchema, searchParams);
+}
 
 const nullableString = z.preprocess(
   (value) => (typeof value === 'string' ? value.trim() || null : value),
@@ -186,7 +194,8 @@ export function createSupplierChangeRequestsRouteHandler(
 
     const searchParams = await deps.resolveSearchParams(context);
     if (context.method === 'GET' && context.pathname === '/api/supplier/change-requests') {
-      const query = parseSearchParams(listQuerySchema, context.searchParams);
+      // Parse resolved params (supplierId after auth), not raw URL — SPA always sends ?supplier=.
+      const query = parseSupplierChangeRequestsListQuery(searchParams);
       sendJson(context.response, await buildSupplierChangeRequestsList(searchParams, query));
       return true;
     }

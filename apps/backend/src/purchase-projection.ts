@@ -415,7 +415,7 @@ export async function loadSupplierCheckoutPurchaseRows(
   const offset = clampInt(searchParams.get('offset'), 0, 0, Number.MAX_SAFE_INTEGER);
   const status = normalizeStatusFilter(searchParams.get('status'));
   const where: Prisma.CheckoutItemWhereInput = { supplierId };
-  if (status) where.status = status as never;
+  applySupplierCheckoutItemStatusFilter(where, status);
 
   const [rows, total] = await prisma.$transaction([
     prisma.checkoutItem.findMany({
@@ -455,6 +455,43 @@ export async function loadSupplierCheckoutPurchaseRows(
     filters: { status },
     items: rows.slice(0, limit).map(mapSupplierCheckoutPurchaseItem),
   };
+}
+
+/**
+ * Supplier LC tabs mix CheckoutOrderStatus and CheckoutItemStatus.
+ * DTO exposes `status` from the parent order; only RESERVED is item-scoped.
+ */
+export function applySupplierCheckoutItemStatusFilter(
+  where: Prisma.CheckoutItemWhereInput,
+  status: string | null,
+): void {
+  if (!status) return;
+
+  if (status === 'RESERVED') {
+    where.status = 'RESERVED';
+    return;
+  }
+
+  const orderStatuses = new Set([
+    'DRAFT',
+    'PENDING_PAYMENT',
+    'PAID',
+    'CONFIRMED',
+    'FULFILLED',
+    'CANCELLED',
+    'REFUNDED',
+    'EXPIRED',
+    'FAILED',
+  ]);
+  if (orderStatuses.has(status)) {
+    const existing = where.order && typeof where.order === 'object' && !Array.isArray(where.order)
+      ? where.order as Prisma.CheckoutOrderWhereInput
+      : {};
+    where.order = { ...existing, status: status as never };
+    return;
+  }
+
+  where.status = status as never;
 }
 
 async function loadAdminPurchaseRows(options: { includeArchived: boolean }): Promise<AdminPurchaseRowDto[]> {

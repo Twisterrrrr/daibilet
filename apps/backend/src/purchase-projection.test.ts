@@ -1,13 +1,31 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { prisma } from '@daibilet/db';
+import type { Prisma } from '@daibilet/db';
 import {
+  applySupplierCheckoutItemStatusFilter,
   buildAdminPurchasesListDto,
   buildBuyerPurchasesListDto,
   buildPublicCheckoutOrderByCodeDto,
   buildPublicCheckoutPurchasesByEmailDto,
   loadSupplierCheckoutPurchaseRows,
 } from './purchase-projection.js';
+
+test('supplier order status filter maps PENDING_PAYMENT to order relation', () => {
+  const pending: Prisma.CheckoutItemWhereInput = { supplierId: 'sup_1' };
+  applySupplierCheckoutItemStatusFilter(pending, 'PENDING_PAYMENT');
+  assert.deepEqual(pending.order, { status: 'PENDING_PAYMENT' });
+  assert.equal(pending.status, undefined);
+
+  const reserved: Prisma.CheckoutItemWhereInput = { supplierId: 'sup_1' };
+  applySupplierCheckoutItemStatusFilter(reserved, 'RESERVED');
+  assert.equal(reserved.status, 'RESERVED');
+  assert.equal(reserved.order, undefined);
+
+  const confirmed: Prisma.CheckoutItemWhereInput = { supplierId: 'sup_1' };
+  applySupplierCheckoutItemStatusFilter(confirmed, 'CONFIRMED');
+  assert.deepEqual(confirmed.order, { status: 'CONFIRMED' });
+});
 
 test('projects internal checkout and external orders into admin, buyer and supplier reads', async () => {
   const suffix = `projection-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;

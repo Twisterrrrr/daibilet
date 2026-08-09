@@ -1707,9 +1707,17 @@ function RefreshButton({ onClick }: { onClick: () => void }) {
 
 function DataState({ loading, error, hasData, onRetry, children }: { loading: boolean; error: string | null; hasData: boolean; onRetry: () => void; children: React.ReactNode }) {
   if (loading && !hasData) return <LoadingState label="Загружаем данные..." />;
-  if (error && !hasData) return <ErrorState title="Backend недоступен" error={error} onRetry={onRetry} />;
+  if (error && !hasData) {
+    const title = looksLikeTransportError(error) ? 'Backend недоступен' : 'Не удалось загрузить данные';
+    return <ErrorState title={title} error={error} onRetry={onRetry} />;
+  }
   if (!hasData) return <EmptyInline text="Данных пока нет." />;
   return <>{children}</>;
+}
+
+function looksLikeTransportError(error: string): boolean {
+  if (/invalid prisma|validation_error|request validation|unrecognized key/i.test(error)) return false;
+  return /failed to fetch|networkerror|load failed|econnrefused|etimedout|http 5\d\d/i.test(error);
 }
 
 function LoadingState({ label }: { label: string }) {

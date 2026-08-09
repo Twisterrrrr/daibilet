@@ -16,7 +16,7 @@ import type {
 import { prisma, type Prisma } from '@daibilet/db';
 import { loadAdmissionProductsList } from './admission-products.dto.js';
 import { resolveSupplierCheckoutReadiness } from './admin-suppliers.dto.js';
-import { loadSupplierCheckoutPurchaseRows } from './purchase-projection.js';
+import { applySupplierCheckoutItemStatusFilter, loadSupplierCheckoutPurchaseRows } from './purchase-projection.js';
 
 const DEFAULT_LIMIT = 50;
 const MAX_LIMIT = 100;
@@ -728,7 +728,7 @@ async function loadSupplierOrderRows(
   const offset = clampInt(searchParams.get('offset'), 0, 0, Number.MAX_SAFE_INTEGER);
   const status = normalizeStatusFilter(searchParams.get('status'));
   const where: Prisma.CheckoutItemWhereInput = { supplierId };
-  if (status) where.status = status as never;
+  applySupplierCheckoutItemStatusFilter(where, status);
 
   const [rows, total] = await prisma.$transaction([
     prisma.checkoutItem.findMany({

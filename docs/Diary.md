@@ -1,3 +1,23 @@
+## 2026-08-09 - Supplier LC: «Backend недоступен» на Заказах / Заявках
+
+### Наблюдения
+
+- Вкладка Заказы, фильтр «Ждут оплату»: UI показывал «Backend недоступен», в теле — Prisma `Invalid value for argument status` на `checkoutItem.status = PENDING_PAYMENT`.
+- `PENDING_PAYMENT` есть только у `CheckoutOrder`, не у `CheckoutItem`. DTO отдаёт `status` с заказа, а list-API клал query `status` в item.
+- На Заявках тот же mislabel: GET `/api/supplier/change-requests?limit=50&supplier=…` падал `validation_error` из‑за `.strict()` query schema без routing-ключей `supplier`/`supplierId`.
+
+### Решения
+
+- `applySupplierCheckoutItemStatusFilter`: order-level статусы (в т.ч. `PENDING_PAYMENT`) → `where.order.status`; `RESERVED` → item.status.
+- Change-requests list: принимать routing keys / парсить resolved searchParams.
+- Supplier UI: «Backend недоступен» только для transport; иначе «Не удалось загрузить данные» + реальный message/`issues`.
+
+### Проблемы
+
+- Deploy `.159` не делаем без явного «выкатывай на finance».
+
+---
+
 ## 2026-08-09 - PR Stage 0 admission ticket core
 
 ### Наблюдения
