@@ -186,7 +186,7 @@ export function CityDayPresetBlock({
     const useTwoCol = items.length >= 4;
     return (
       <div
-        className={`flex flex-col justify-center gap-3 rounded-xl border bg-white px-4 py-5 sm:py-6 ${borderClass} ${
+        className={`flex flex-col justify-center rounded-xl border bg-white px-4 py-5 sm:py-6 ${borderClass} ${
           panel ? 'mt-3 min-h-[11rem] sm:min-h-[12.5rem]' : ''
         }`}
         data-day-preset-card={preset.id}
@@ -199,43 +199,42 @@ export function CityDayPresetBlock({
             }
           : {})}
       >
+        <div className="flex w-full min-w-0 flex-col justify-center gap-3">
         <div className={`${PRESET_GRID} w-full min-w-0`} data-day-preset-head>
           <div aria-hidden className={PRESET_GUTTER} />
-          <div className="flex min-w-0 items-start justify-between gap-3">
-            <div className="min-w-0 flex-1">
-              <div className="flex flex-col items-start gap-0.5 sm:flex-row sm:flex-wrap sm:items-baseline sm:gap-x-2 sm:gap-y-0.5">
-                <p className={`text-sm font-semibold ${titleClass}`}>{preset.title}</p>
-                {preset.blogSlug ? (
-                  <Link
-                    href={`/blog/${preset.blogSlug}`}
-                    className={`inline-flex items-center gap-0.5 text-xs font-medium underline underline-offset-2 transition-colors ${
-                      editorial
-                        ? 'text-sky-700 hover:text-sky-800'
-                        : 'text-primary-600 hover:text-primary-700'
-                    }`}
-                  >
-                    Читать об этом в блоге
-                    <ArrowUpRight className="h-3 w-3 shrink-0 opacity-80" aria-hidden />
-                  </Link>
-                ) : null}
-              </div>
-              {preset.timingNote?.trim() ? (
-                <p className={`mt-1 text-[12px] leading-4 ${mutedClass}`} data-day-preset-timing>
-                  {preset.timingNote.trim()}
-                </p>
+          <div className="min-w-0">
+            <div className="flex items-center justify-between gap-3">
+              <p className={`min-w-0 flex-1 text-sm font-semibold leading-snug ${titleClass}`}>{preset.title}</p>
+              {available ? (
+                <button
+                  type="button"
+                  disabled={busyId != null}
+                  onClick={() => apply(preset.id, items)}
+                  className={routeCtaClass}
+                  data-day-preset-cta
+                >
+                  <Route className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                  <span>{namedCta(busyId === preset.id)}</span>
+                </button>
               ) : null}
             </div>
-            {available ? (
-              <button
-                type="button"
-                disabled={busyId != null}
-                onClick={() => apply(preset.id, items)}
-                className={`${routeCtaClass} self-center`}
-                data-day-preset-cta
+            {preset.blogSlug ? (
+              <Link
+                href={`/blog/${preset.blogSlug}`}
+                className={`mt-1 inline-flex items-center gap-0.5 text-xs font-medium underline underline-offset-2 transition-colors ${
+                  editorial
+                    ? 'text-sky-700 hover:text-sky-800'
+                    : 'text-primary-600 hover:text-primary-700'
+                }`}
               >
-                <Route className="h-3.5 w-3.5 shrink-0" aria-hidden />
-                <span>{namedCta(busyId === preset.id)}</span>
-              </button>
+                Читать об этом в блоге
+                <ArrowUpRight className="h-3 w-3 shrink-0 opacity-80" aria-hidden />
+              </Link>
+            ) : null}
+            {preset.timingNote?.trim() ? (
+              <p className={`mt-1 text-[12px] leading-4 ${mutedClass}`} data-day-preset-timing>
+                {preset.timingNote.trim()}
+              </p>
             ) : null}
           </div>
         </div>
@@ -284,6 +283,7 @@ export function CityDayPresetBlock({
             })}
           </ol>
         ) : null}
+        </div>
       </div>
     );
   };

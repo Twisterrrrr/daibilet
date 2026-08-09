@@ -13,6 +13,20 @@
 
 ---
 
+## 2026-08-09 - scenarios CTA beside title + batch MSK web deploy
+
+### Наблюдения
+- Owner: «В маршрут» сбоку от названия; весь блок панели по центру высоты; выкатить вместе с events UX P1-P4.
+
+### Решения
+- `CityDayPresetBlock`: title+CTA one row; content cluster `justify-center` in panel.
+- Deploy MSK web tip `feat/next-monorepo` (events Yandex-lite + scenarios).
+
+### Проблемы
+- -
+
+---
+
 ## 2026-08-09 - `/events` UX P1-P4 (no Quick buy)
 
 ### Наблюдения
