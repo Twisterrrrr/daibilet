@@ -2,8 +2,8 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| UX.EVENTCARD-DROP-SESSION-CTA | EventCard: убрать дубль «Выбрать сеанс» (overlap с ценой); один CTA «Купить билет» | Высокий | ✅ `95b7d2a8` Deploy MSK web `31308004380` BUILD_ID=`HR7QZofnxFLxEIb8loJVL` |
-| FIX.BOAT-TZ-20:55 | Bridges/my-day: primary −3ч vs slots; dedupe HH:mm MSK | Критический | ✅ `a905d477`/`038ea511`; API+catalog rebuild; Deploy MSK web `31306448807` BUILD_ID=`Cw8DFKoqPUl8GZ-NI-yc_` |
+| FIX.HIDE-CLOSED-SLOTS | Public: скрыть слоты с closed/STAND_BY/paused/isActive=false (catalog layer) | Критический | 🔄 code; Deploy MSK API |
+| UX.EVENTCARD-DROP-SESSION-CTA | EventCard: убрать дубль «Выбрать сеанс» (overlap с ценой); один CTA «Купить билет» | Высокий | ✅ `95b7d2a8` Deploy MSK web `31308004380` BUILD_ID=`HR7QZofnxFLxEIb8loJVL` | FIX.BOAT-TZ-20:55 | Bridges/my-day: primary −3ч vs slots; dedupe HH:mm MSK | Критический | ✅ `a905d477`/`038ea511`; API+catalog rebuild; Deploy MSK web `31306448807` BUILD_ID=`Cw8DFKoqPUl8GZ-NI-yc_` |
 | CONT.TRANSIT-TIPS | Schema `transitTip` + UI suburb timeline; NN logistics; SPB triangle/Petrograd/Bertgold/bar; Perm/KGD tips | Высокий | ✅ `c5d644d8` Deploy MSK web `31305337295` BUILD_ID=`gOTUGQNTVuIsCS_1DvAT_` |
 | CONT.KGD-LOGISTICS | KGD suburbs/presets: коса углубление+Фрингилла возврат, Зел/Свет/Балт/Янт порядок+timingNote | Высокий | ✅ `7644445c` Deploy MSK web `31304947725` |
 | CONT.PERM-LOGISTICS | Perm suburbs/presets: Хохловка CCW, Кунгур центр+пещера, Белая гора split, Усьва/Губаха 2 дня | Высокий | ✅ `7644445c` Deploy MSK web `31304947725` BUILD_ID=`mi3IHPRLphsEf9IgHXj9a` |

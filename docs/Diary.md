@@ -1,4 +1,21 @@
+## 2026-08-09 - Public: hide closed/suspended sale slots
+
+### Наблюдения
+- Owner: в публичной выдаче видны слоты с закрытыми/приостановленными продажами.
+- TC `STAND_BY` (= продажи остановлены) не входил в blocklist `sourceStatus`; `isActive=false` / `cancelledAt` не фильтровались на event page и hydrate slots.
+
+### Решения
+- Канон в `catalog-availability`: `PUBLIC_SALES_BLOCKED_STATUSES` (+ `stand_by`, `closed`, …), `isPublicSalesStatusBlocked` / `isPublicSessionRowOnSale`.
+- `ACTIVE_SESSION_SQL` + catalog saleable SQL / mapper / event DTO / hydrate / grouping / dto.js / listing audit - один список.
+- Данные в БД не трогаем; admin/supplier views без изменений.
+
+### Проблемы
+- Нужен Deploy MSK API (+ catalog rebuild если кеш), чтобы live совпал.
+
+---
+
 ## 2026-08-09 - EventCard: drop «Выбрать сеанс»
+
 
 ### Наблюдения
 - Owner: на карточке каталога hover-кнопка «Выбрать сеанс» наезжает на цену «от … ₽» рядом с «Купить билет» - дубль одного действия.

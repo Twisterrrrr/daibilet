@@ -107,6 +107,59 @@ test('keeps open-date events saleable without a fake schedule', () => {
   assert.equal(result.timeLabel, 'В виджете');
 });
 
+test('drops closed and STAND_BY slots from public upcomingSlots', () => {
+  const openIso = futureSlotIso(24);
+  const closedIso = futureSlotIso(30);
+  const standByIso = futureSlotIso(36);
+  const result = mapGroupedPublicSession(catalogRow({
+    sourceStatus: 'PUBLIC',
+    upcomingSlots: [
+      {
+        id: 'sess-open',
+        eventId: 'evt-open',
+        startsAt: openIso,
+        sourceCode: 'TICKETSCLOUD',
+        sourceStatus: 'PUBLIC',
+        providerSessionId: 'tc-open',
+      },
+      {
+        id: 'sess-closed',
+        eventId: 'evt-closed',
+        startsAt: closedIso,
+        sourceCode: 'TICKETSCLOUD',
+        sourceStatus: 'closed',
+        providerSessionId: 'tc-closed',
+      },
+      {
+        id: 'sess-standby',
+        eventId: 'evt-standby',
+        startsAt: standByIso,
+        sourceCode: 'TICKETSCLOUD',
+        sourceStatus: 'STAND_BY',
+        providerSessionId: 'tc-standby',
+      },
+    ],
+  }));
+  assert.ok(result);
+  assert.equal(result.upcomingSlots?.length, 1);
+  assert.equal(result.upcomingSlots?.[0]?.id, 'sess-open');
+});
+
+test('hides whole card when event sourceStatus means sales stopped', () => {
+  const result = mapGroupedPublicSession(catalogRow({
+    sourceStatus: 'STAND_BY',
+    upcomingSlots: [{
+      id: 'sess-1',
+      eventId: 'evt-1',
+      startsAt: futureSlotIso(24),
+      sourceCode: 'TICKETSCLOUD',
+      sourceStatus: 'PUBLIC',
+      providerSessionId: 'tc-1',
+    }],
+  }));
+  assert.equal(result, null);
+});
+
 test('dated TicketsCloud without schedule does not get fake open-date labels', () => {
   const result = mapGroupedPublicSession(catalogRow({
     kind: 'RECURRING',

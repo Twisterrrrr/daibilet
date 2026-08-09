@@ -4,6 +4,7 @@ import { join } from '@daibilet/db/sql';
 import {
   hasUpcomingOrOpenSchedule,
   isOpenDateCatalogRow,
+  isPublicSessionRowOnSale,
   isSaleableEventForPublic,
   isWideLifetimeSession,
 } from './catalog-availability.js';
@@ -169,6 +170,8 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
     prisma.eventSession.findMany({
       where: {
         eventId: { in: offerScopeEventIds },
+        isActive: true,
+        cancelledAt: null,
         OR: [
           { endsAt: { gte: now } },
           { startsAt: { gte: now } },
@@ -179,7 +182,9 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
       take: 12,
     }).then((rows) =>
       rows.filter((session) => {
+        if (!isPublicSessionRowOnSale(session)) return false;
         const event = eventsById.get(session.eventId) || requestedEvent;
+        if (!isPublicSessionRowOnSale({ sourceStatus: event.sourceStatus })) return false;
         return hasUpcomingOrOpenSchedule({
           kind: event.kind,
           sourceStatus: session.sourceStatus,

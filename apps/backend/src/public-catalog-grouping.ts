@@ -1,4 +1,4 @@
-import { MIN_DISPLAY_PRICE_RUB, isOpenDateCatalogRow } from './catalog-availability.js';
+import { MIN_DISPLAY_PRICE_RUB, isOpenDateCatalogRow, isPublicSalesStatusBlocked } from './catalog-availability.js';
 import { formatPublicEventTitle } from './event-title-normalize.ts';
 import type { PublicSessionDto } from './types/public.js';
 
@@ -185,9 +185,7 @@ export function shouldPromoteGroupedRepresentative(
 export function isPublicSessionPurchaseBlocked(session: PublicSessionDto): boolean {
   const statuses = [session.sourceStatus].map((value) => String(value || '').toLowerCase());
   if (!session.startsAt && !isOpenDateCatalogRow(session)) return true;
-  if (statuses.some((status) =>
-    ['paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden'].includes(status),
-  )) {
+  if (statuses.some((status) => isPublicSalesStatusBlocked(status))) {
     return true;
   }
   if (session.purchaseReady === false) return true;

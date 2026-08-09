@@ -50,6 +50,7 @@ import {
 import {
   ACTIVE_SESSION_SQL,
   MIN_DISPLAY_PRICE_RUB,
+  PUBLIC_SALES_BLOCKED_STATUS_SQL,
   hasDisplayPrice,
   hasUpcomingOrOpenSchedule,
   isOpenDateCatalogRow,
@@ -6457,7 +6458,7 @@ async function destinationSummaryRowsFast(db) {
           ) as "groupKey"
         from normalized
         where "purchaseReady" = true
-          and lower(coalesce("sourceStatus", '')) not in ('widget_blocked', 'paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden')
+          and lower(coalesce("sourceStatus", '')) not in (${PUBLIC_SALES_BLOCKED_STATUS_SQL})
           and (
             "startsAt" is not null
             or kind = 'OPEN_DATE'
@@ -7163,7 +7164,7 @@ async function publicCatalogSessionsFast(db) {
           ) as "groupKey"
         from normalized
         where "purchaseReady" = true
-          and lower(coalesce("sourceStatus", '')) not in ('widget_blocked', 'paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden')
+          and lower(coalesce("sourceStatus", '')) not in (${PUBLIC_SALES_BLOCKED_STATUS_SQL})
           and (
             "startsAt" is not null
             or kind = 'OPEN_DATE'
@@ -7175,7 +7176,7 @@ async function publicCatalogSessionsFast(db) {
           *,
           row_number() over (
             partition by "groupKey"
-            order by case when lower(coalesce("sourceStatus", '')) in ('paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden') then 1 else 0 end,
+            order by case when lower(coalesce("sourceStatus", '')) in (${PUBLIC_SALES_BLOCKED_STATUS_SQL}) then 1 else 0 end,
               case when kind = 'OPEN_DATE' or "sourceStatus" = 'open_date' then 1 else 0 end desc,
               "startsAt" asc nulls last,
               title asc
@@ -7203,7 +7204,7 @@ async function publicCatalogSessionsFast(db) {
               'offerDeeplinkUrl', "offerDeeplinkUrl",
               'vacant', "ticketsVacant"
             )
-            order by case when lower(coalesce("sourceStatus", '')) in ('paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden') then 1 else 0 end,
+            order by case when lower(coalesce("sourceStatus", '')) in (${PUBLIC_SALES_BLOCKED_STATUS_SQL}) then 1 else 0 end,
               "startsAt" asc nulls last
           ) as "upcomingSlots"
         from ranked

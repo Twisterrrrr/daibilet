@@ -7,6 +7,8 @@ import { prisma } from '@daibilet/db';
 import { raw, sql } from '@daibilet/db/sql';
 import {
   ACTIVE_SESSION_SQL,
+  PUBLIC_SALES_BLOCKED_STATUS_SQL,
+  isPublicSessionRowOnSale,
   isSaleableForPublicCatalog,
 } from './catalog-availability.js';
 import { resolveCityTimeZone } from './city-timezone.js';
@@ -755,7 +757,7 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
         end as "groupKey"
       from normalized
       where "purchaseReady" = true
-        and lower(coalesce("sourceStatus", '')) not in ('widget_blocked', 'paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden')
+        and lower(coalesce("sourceStatus", '')) not in (${raw(PUBLIC_SALES_BLOCKED_STATUS_SQL)})
         and (
           "startsAt" is not null
           or kind = 'OPEN_DATE'
@@ -767,7 +769,7 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
         *,
         row_number() over (
           partition by "groupKey"
-          order by case when lower(coalesce("sourceStatus", '')) in ('paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden') then 1 else 0 end,
+          order by case when lower(coalesce("sourceStatus", '')) in (${raw(PUBLIC_SALES_BLOCKED_STATUS_SQL)}) then 1 else 0 end,
             case when kind = 'OPEN_DATE' or "sourceStatus" = 'open_date' then 1 else 0 end desc,
             "startsAt" asc nulls last,
             title asc
@@ -795,7 +797,7 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
             'offerDeeplinkUrl', "offerDeeplinkUrl",
             'vacant', "ticketsVacant"
           )
-          order by case when lower(coalesce("sourceStatus", '')) in ('paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden') then 1 else 0 end,
+          order by case when lower(coalesce("sourceStatus", '')) in (${raw(PUBLIC_SALES_BLOCKED_STATUS_SQL)}) then 1 else 0 end,
             "startsAt" asc nulls last
         ) as "upcomingSlots"
       from ranked
@@ -1130,6 +1132,8 @@ async function hydrateCatalogUpcomingSlots(
     prisma.eventSession.findMany({
       where: {
         eventId: { in: eventIds },
+        isActive: true,
+        cancelledAt: null,
         OR: [
           { endsAt: { gte: new Date() } },
           { startsAt: { gte: new Date() } },
@@ -1140,6 +1144,9 @@ async function hydrateCatalogUpcomingSlots(
         eventId: true,
         startsAt: true,
         endsAt: true,
+        sourceStatus: true,
+        isActive: true,
+        cancelledAt: true,
       },
       orderBy: [{ startsAt: 'asc' }, { id: 'asc' }],
     }),
@@ -1155,6 +1162,7 @@ async function hydrateCatalogUpcomingSlots(
   const rowsByEventId = new Map<string, typeof sessionRows>();
   for (const row of sessionRows) {
     if (!row.startsAt) continue;
+    if (!isPublicSessionRowOnSale(row)) continue;
     const bucket = rowsByEventId.get(row.eventId) || [];
     if (bucket.length >= slotLimit) continue;
     bucket.push(row);
