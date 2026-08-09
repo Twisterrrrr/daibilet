@@ -191,7 +191,7 @@ const SLUG_ALIASES: Record<string, string> = {
   'yuzhno-sakhalinsk': 'yuzhno-sahalinsk',
   kirov: 'kirov-kirovskaya-oblast',
   lipetsk: 'lipeck',
-  khabarovsk: 'habarovsk',
+  khabarovsk: 'habarovsk'
 };
 
 /** Компактная editorial-точка для preset. Основной mustSee остаётся источником ссылок и координат. */
@@ -211,7 +211,7 @@ const spbPresetStop = (
 ): CityMustSeeItem => ({
   name,
   desc: route?.desc || 'Точка маршрута по Санкт-Петербургу.',
-  ...route,
+  ...route
 });
 
 /** Компактная editorial-точка для preset Москвы. */
@@ -224,7 +224,7 @@ const mskPresetStop = (
 ): CityMustSeeItem => ({
   name,
   desc: 'Точка маршрута по Москве.',
-  ...route,
+  ...route
 });
 
 export const CITY_INFO: Record<string, CityInfoEntry> = {
@@ -248,16 +248,16 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       { name: 'Михайловский замок', desc: 'Мрачный розовый дворец-крепость, окруженный оборонительными рвами, который не смог спасти своего параноидального создателя императора Павла I, задушенного заговорщиками в собственной спальне спустя сорок дней после новоселья.', mustSeeFilter: 'main', locationSlug: 'saint-petersburg-mihaylovskiy-zamok' },
       { name: 'Аничков мост', desc: 'Историческая переправа через реку Фонтанку, получившая мировую известность благодаря четырем бронзовым скульптурным группам Петра Клодта, наглядно показывающим последовательные стадии укрощения дикого коня человеком.', mustSeeFilter: 'main', locationSlug: 'saint-petersburg-anichkov-most' },
       { name: 'Русский музей', desc: 'Главное собрание русского искусства в Михайловском дворце.', mustSeeFilter: 'museum',
-        venueSlug: 'saint-petersburg-russkiy-muzey',
+        venueSlug: 'saint-petersburg-russkiy-muzey'
       },
       { name: 'Главный штаб (Эрмитаж)', desc: 'Импрессионисты и панорама площади через арку.', mustSeeFilter: 'museum', venueSlug: 'saint-petersburg-glavnyy-shtab-ermitazh' },
       { name: 'Кунсткамера', desc: 'Петровский кабинет редкостей и глобус.', mustSeeFilter: 'museum',
-        venueSlug: 'saint-petersburg-kunstkamera',
+        venueSlug: 'saint-petersburg-kunstkamera'
       },
       { name: 'Музей Фаберже', desc: 'Яйца и ювелирка в Шуваловском дворце.', mustSeeFilter: 'museum', venueSlug: 'saint-petersburg-muzey-faberzhe' },
       { name: 'Эрарта', desc: 'Крупный частный музей современного искусства.', mustSeeFilter: 'museum', venueSlug: 'erarta' },
       { name: 'Юсуповский дворец', desc: 'Один из самых пышных частных дворцов Петербурга, известный парадными интерьерами и легендой о Распутине.', mustSeeFilter: 'museum',
-        locationSlug: 'saint-petersburg-yusupovskiy-dvorets',
+        locationSlug: 'saint-petersburg-yusupovskiy-dvorets'
       },
       { name: 'Центральный военно-морской музей', desc: 'Флотская история у Синего моста / новый корпус.', mustSeeFilter: 'museum', venueSlug: 'saint-petersburg-tsentralnyy-voenno-morskoy-muzey' },
       { name: 'Музей обороны и блокады Ленинграда', desc: 'Блокадная память без прикрас.', mustSeeFilter: 'museum', venueSlug: 'saint-petersburg-muzey-oborony-i-blokady-leningrada' },
@@ -277,84 +277,84 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       { name: 'Набережная Фонтанки', desc: 'Длинный городской променад вдоль реки.', mustSeeFilter: 'views', locationSlug: 'saint-petersburg-naberezhnaya-fontanki' },
       { name: 'Петроградская набережная', desc: 'Аврора и вид на Петропавловку.', mustSeeFilter: 'views', locationSlug: 'saint-petersburg-petrogradskaya-naberezhnaya' },
       { name: 'Колоннада Исаакия', desc: 'Платная смотровая, лучший обзор крыш центра.', mustSeeFilter: 'views',
-        locationSlug: 'saint-petersburg-kolonnada-isaakiya',
+        locationSlug: 'saint-petersburg-kolonnada-isaakiya'
       },
       { name: 'Смотровая Лахта Центра', desc: 'Современная высота и Финский залив.', mustSeeFilter: 'views', locationSlug: 'saint-petersburg-smotrovaya-lahta-tsentra' },
       { name: 'Приморский проспект / парк 300-летия', desc: 'Залив, закаты, небоскрёб в кадре.', mustSeeFilter: 'views',
-        locationSlug: 'saint-petersburg-primorskiy-prospekt-park-300-letiya',
+        locationSlug: 'saint-petersburg-primorskiy-prospekt-park-300-letiya'
       },
       { name: 'Троицкий мост', desc: 'Классический ракурс на Петропавловскую крепость и ростральные колонны со стороны Троицкой площади.', mustSeeFilter: 'views', locationSlug: 'saint-petersburg-troitskiy-most' },
       { name: 'Улица Зодчего Росси', desc: 'Идеальная театральная перспектива к Александринскому театру, эталон петербургской регулярной застройки.', mustSeeFilter: 'street', locationSlug: 'saint-petersburg-ulitsa-zodchego-rossi' },
       { name: 'Малая Садовая', desc: 'Короткий пешеходный карман у Невского.', mustSeeFilter: 'street', locationSlug: 'saint-petersburg-malaya-sadovaya-ulitsa' },
       { name: 'Большая Морская', desc: 'Банки, особняки, тише Невского.', mustSeeFilter: 'street',
-        locationSlug: 'saint-petersburg-bolshaya-morskaya',
+        locationSlug: 'saint-petersburg-bolshaya-morskaya'
       },
       { name: 'Улица Рубинштейна', desc: 'Вечерняя жизнь центра: бары, рестораны и старый доходный фонд между Владимирским и Фонтанкой.', mustSeeFilter: 'street', locationSlug: 'saint-petersburg-ulitsa-rubinshteyna' },
       { name: 'Коломна', desc: 'Тихие каналы и литературный маршрут «Пиковой дамы».', mustSeeFilter: 'street',
-        locationSlug: 'saint-petersburg-kolomna',
+        locationSlug: 'saint-petersburg-kolomna'
       },
       { name: 'Линии Васильевского острова', desc: 'Сетка дворов и повседневная жизнь острова.', mustSeeFilter: 'street', locationSlug: 'saint-petersburg-linii-vasilevskogo-ostrova' },
       { name: 'Открытые дворы-колодцы (экскурсии по дворам)', desc: 'Классический петербургский код.', mustSeeFilter: 'secret',
-        locationSlug: 'saint-petersburg-otkrytye-dvory-kolodtsy-ekskursii-po-dvoram',
+        locationSlug: 'saint-petersburg-otkrytye-dvory-kolodtsy-ekskursii-po-dvoram'
       },
       { name: 'Гостиный двор / Пассаж', desc: 'Торговые пассажи XIX века.', mustSeeFilter: 'street',
-        locationSlug: 'saint-petersburg-gostinyy-dvor-passazh',
+        locationSlug: 'saint-petersburg-gostinyy-dvor-passazh'
       },
       { name: 'Каменноостровский проспект', desc: 'Модерн и зелень Петроградской стороны.', mustSeeFilter: 'street' , themeTags: ['Северный модерн'],
-        locationSlug: 'saint-petersburg-kamennoostrovskiy-prospekt',
+        locationSlug: 'saint-petersburg-kamennoostrovskiy-prospekt'
       },
       { name: 'Пешеходная Малая Конюшенная', desc: 'Церковь св. Анны и камерный центр.', mustSeeFilter: 'street',
-        locationSlug: 'saint-petersburg-peshehodnaya-malaya-konyushennaya',
+        locationSlug: 'saint-petersburg-peshehodnaya-malaya-konyushennaya'
       },
       { name: 'Лофт Проект Этажи', desc: 'Дворик, крыша и независимая культура.', mustSeeFilter: 'street', locationSlug: 'saint-petersburg-loft-proekt-etazhi' },
       { name: 'Летний сад', desc: 'Старейший регулярный ансамбль города, заложенный Петром I, со знаменитой кованой решеткой Фельтена, фонтанами и венецианскими мраморными статуями.', mustSeeFilter: 'park',
-        locationSlug: 'saint-petersburg-letniy-sad',
+        locationSlug: 'saint-petersburg-letniy-sad'
       },
       { name: 'Михайловский сад', desc: 'Уникальный парк-трансформер, сочетающий черты строгого французского и пейзажного английского садоводства.', mustSeeFilter: 'park',
-        locationSlug: 'saint-petersburg-mihaylovskiy-sad',
+        locationSlug: 'saint-petersburg-mihaylovskiy-sad'
       },
       { name: 'Новая Голландия', desc: 'Рукотворный остров-парк внутри бывших складов корабельного леса, превращенный в самое стильное общественное пространство города.', mustSeeFilter: 'park' , themeTags: ['Ленинградский рок и андеграунд'], seasonLabel: 'Зимний эксклюзив: каток в Новой Голландии', locationSlug: 'saint-petersburg-novaya-gollandiya'},
       { name: 'Таврический сад', desc: 'Исторический парк вокруг резиденции Потемкина со знаменитой кирпичной теплой оранжереей.', mustSeeFilter: 'park',
-        locationSlug: 'saint-petersburg-tavricheskiy-sad',
+        locationSlug: 'saint-petersburg-tavricheskiy-sad'
       },
       { name: 'ЦПКиО им. Кирова (Елагин остров)', desc: 'Бывшая царская резиденция, превращенная в зеленый остров-заповедник с ручными белками.', mustSeeFilter: 'park',
-        locationSlug: 'saint-petersburg-tspkio-im-kirova-elagin-ostrov',
+        locationSlug: 'saint-petersburg-tspkio-im-kirova-elagin-ostrov'
       },
       { name: 'Приморский парк Победы (Крестовский остров)', desc: 'Огромный зеленый массив с центральной двухкилометровой аллеей, ведущей к суперсовременному стадиону, и парком аттракционов «Диво-Остров».', mustSeeFilter: 'park',
-        locationSlug: 'saint-petersburg-primorskiy-park-pobedy-krestovskiy-ostrov',
+        locationSlug: 'saint-petersburg-primorskiy-park-pobedy-krestovskiy-ostrov'
       },
       { name: 'Марсово поле', desc: 'Бывший военный плац, превращенный в сквер с сиренью и одним из первых мемориалов с Вечным огнем.', mustSeeFilter: 'park',
-        locationSlug: 'saint-petersburg-marsovo-pole',
+        locationSlug: 'saint-petersburg-marsovo-pole'
       },
       { name: 'Юсуповский сад', desc: 'Небольшой парк с извилистыми прудами, ставший колыбелью и школой советского фигурного катания.', mustSeeFilter: 'park',
-        locationSlug: 'saint-petersburg-yusupovskiy-sad',
+        locationSlug: 'saint-petersburg-yusupovskiy-sad'
       },
       { name: 'Ботанический сад Петра Великого', desc: 'Старейшие высотные оранжереи Аптекарского острова с уникальной коллекцией тропических пальм.', mustSeeFilter: 'park',
-        locationSlug: 'saint-petersburg-botanicheskiy-sad-petra-velikogo',
+        locationSlug: 'saint-petersburg-botanicheskiy-sad-petra-velikogo'
       },
       { name: 'Каменный остров', desc: 'Тихий парковый архипелаг, исторически застроенный номенклатурными государственными и купеческими дачами.', mustSeeFilter: 'park',
-        locationSlug: 'saint-petersburg-kamennyy-ostrov',
+        locationSlug: 'saint-petersburg-kamennyy-ostrov'
       },
       { name: 'Александровский парк', desc: 'Первый публичный парк города, проложенный на месте гласиса Петропавловской крепости.', mustSeeFilter: 'park',
-        locationSlug: 'saint-petersburg-aleksandrovskiy-park',
+        locationSlug: 'saint-petersburg-aleksandrovskiy-park'
       },
       { name: 'Смольный собор', desc: 'Праздничный бело-голубой шедевр барокко работы Франческо Бартоломео Растрелли с колокольней, служащей самой высокой обзорной точкой центра.', mustSeeFilter: 'temple',
-        locationSlug: 'saint-petersburg-smolnyy-sobor',
+        locationSlug: 'saint-petersburg-smolnyy-sobor'
       },
       { name: 'Александро-Невская лавра', desc: 'Первый и крупнейший мужской монастырь города, основанный Петром Великим, с историческими некрополями мастеров искусств.', mustSeeFilter: 'temple',
-        locationSlug: 'saint-petersburg-aleksandro-nevskaya-lavra',
+        locationSlug: 'saint-petersburg-aleksandro-nevskaya-lavra'
       },
       { name: 'Николо-Богоявленский морской собор', desc: 'Изящный двухэтажный барочный храм в Коломне, традиционное место молебнов и памяти российских моряков.', mustSeeFilter: 'temple',
-        locationSlug: 'saint-petersburg-nikolo-bogoyavlenskiy-morskoy-sobor',
+        locationSlug: 'saint-petersburg-nikolo-bogoyavlenskiy-morskoy-sobor'
       },
       { name: 'Владимирский собор', desc: 'Барочно-классический собор, постоянным прихожанином которого в конце жизни был Ф. М. Достоевский.', mustSeeFilter: 'temple',
-        locationSlug: 'saint-petersburg-vladimirskiy-sobor',
+        locationSlug: 'saint-petersburg-vladimirskiy-sobor'
       },
       { name: 'Чесменская церковь', desc: 'Уникальный розовый «пряничный» храм в стиле ложной готики, построенный в честь морской победы над турками.', mustSeeFilter: 'temple' , themeTags: ['Неоготика и псевдоготика'],
-        locationSlug: 'saint-petersburg-chesmenskaya-tserkov',
+        locationSlug: 'saint-petersburg-chesmenskaya-tserkov'
       },
       { name: 'Буддийский дацан Гунзэчойнэй', desc: 'Самый северный буддийский храм в Европе, построенный из колотого гранита с витражами Рериха.', mustSeeFilter: 'temple',
-        venueSlug: 'saint-petersburg-buddiyskiy-datsan-gunzechoyney',
+        venueSlug: 'saint-petersburg-buddiyskiy-datsan-gunzechoyney'
       },
       {
         name: 'Санкт-Петербургская соборная мечеть',
@@ -362,329 +362,329 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         mustSeeFilter: 'temple',
         locationSlug: 'saint-petersburg-sobornaya-mechet',
         latitude: 59.9552,
-        longitude: 30.3239,
+        longitude: 30.3239
       },
       { name: 'Анненкирхе (Церковь Святой Анны)', desc: 'Старинная лютеранская кирха на Кирочной, чьи опаленные после разрушительного пожара интерьеры стали культовой арт-площадкой города.', mustSeeFilter: 'temple',
-        locationSlug: 'saint-petersburg-annenkirhe-tserkov-svyatoy-anny',
+        locationSlug: 'saint-petersburg-annenkirhe-tserkov-svyatoy-anny'
       },
       { name: 'Гранд Макет Россия', desc: 'Гигантский интерактивный шоу-макет всей страны в масштабе 1:87, где на площади 800 кв. м живут тысячи крошечных персонажей и циклично меняются день и ночь.', mustSeeFilter: 'science',
-        locationSlug: 'saint-petersburg-grand-maket-rossiya',
+        locationSlug: 'saint-petersburg-grand-maket-rossiya'
       },
       { name: 'Петровская Акватория', desc: 'Большой исторический макет Петербурга и его пригородов XVIII века, воссозданный по архивным чертежам, с настоящей водной системой, по которой ходят миниатюрные корабли.', mustSeeFilter: 'science',
-        locationSlug: 'saint-petersburg-petrovskaya-akvatoriya',
+        locationSlug: 'saint-petersburg-petrovskaya-akvatoriya'
       },
       { name: 'Музей Железных Дорог России', desc: 'Масштабный европейский хаб с поворотным кругом и подлинными дореволюционными паровозами.', mustSeeFilter: 'science',
-        venueSlug: 'saint-petersburg-muzey-zheleznyh-dorog-rossii',
+        venueSlug: 'saint-petersburg-muzey-zheleznyh-dorog-rossii'
       },
       { name: 'Планетарий №1', desc: 'Проекционный купол диаметром 37 метров, вмонтированный внутрь огромного кирпичного газгольдера XIX века.', mustSeeFilter: 'science', venueSlug: 'planetarii-1' },
       { name: 'Океанариум', desc: 'Подземный научно-развлекательный комплекс с 35-метровым движущимся тоннелем внутри главного аквариума с акулами.', mustSeeFilter: 'science',
-        locationSlug: 'saint-petersburg-okeanarium',
+        locationSlug: 'saint-petersburg-okeanarium'
       },
       { name: 'Ленинградский зоопарк', desc: 'Один из старейших зоосадов страны, непрерывно работавший даже в годы блокады.', mustSeeFilter: 'science',
-        locationSlug: 'saint-petersburg-leningradskiy-zoopark',
+        locationSlug: 'saint-petersburg-leningradskiy-zoopark'
       },
       { name: 'Диво-Остров', desc: 'Парк экстремальных аттракционов на Крестовском острове с высотными горками у залива.', mustSeeFilter: 'science',
-        locationSlug: 'saint-petersburg-divo-ostrov',
+        locationSlug: 'saint-petersburg-divo-ostrov'
       },
       { name: 'Музей советских игровых автоматов', desc: 'Интерактивное пространство, где можно поиграть на оригинальных действующих советских автоматах по 15-копеечным монетам.', mustSeeFilter: 'science',
-        venueSlug: 'saint-petersburg-muzey-sovetskih-igrovyh-avtomatov',
+        venueSlug: 'saint-petersburg-muzey-sovetskih-igrovyh-avtomatov'
       },
       { name: 'Цирк Чинизелли', desc: 'Первый в России стационарный каменный цирк, открытый в 1877 году, сохранивший царское оформление лож.', mustSeeFilter: 'science',
-        locationSlug: 'saint-petersburg-tsirk-chinizelli',
+        locationSlug: 'saint-petersburg-tsirk-chinizelli'
       },
       { name: 'Музей магии', desc: 'Интерактивное пространство на Невском проспекте, раскрывающее секреты знаменитых трюков и иллюзий Гудини.', mustSeeFilter: 'science',
-        venueSlug: 'saint-petersburg-muzey-magii',
+        venueSlug: 'saint-petersburg-muzey-magii'
       },
       { name: 'Севкабель Порт', desc: 'Главное культурное пространство на Васильевском острове, развернувшееся в цехах исторического кабельного завода Siemens & Halske прямо у кромки Финского залива.', mustSeeFilter: 'creative', locationSlug: 'saint-petersburg-sevkabel-port' },
       { name: 'Бертгольд Центр', desc: 'Творческий квартал в зданиях бывшей словолитни, знаменитый своим внутренним двориком с подвесными зонтиками и винтовой металлической лестницей на крышу.', mustSeeFilter: 'creative', locationSlug: 'saint-petersburg-bertgold-tsentr' },
       { name: 'Третье место', desc: 'Исторический особняк Гурьевых с концептуальным неотреставрированным двором и современным искусством.', mustSeeFilter: 'creative',
-        locationSlug: 'saint-petersburg-trete-mesto',
+        locationSlug: 'saint-petersburg-trete-mesto'
       },
       { name: 'Ротонда на Гороховой', desc: 'Мистический круглый подъезд доходного дома конца XVIII века с шестью колоннами и винтовой лестницей, ставший центром питерского рок-андеграунда 1980-х.', mustSeeFilter: 'creative' , themeTags: ['Ленинградский рок и андеграунд'], locationSlug: 'saint-petersburg-rotonda-na-gorohovoy' },
       { name: 'Мозаичный дворик', desc: 'Сказочная уличная инсталляция на Фонтанке, где стены, поребрики и скульптуры вручную покрыты цветной смальтовой мозаикой художником Владимиром Лубенко.', mustSeeFilter: 'creative', locationSlug: 'saint-petersburg-mozaichnyy-dvorik' },
       { name: 'Витебский вокзал', desc: 'Шедевр стиля модерн с коваными дебаркадерами и старинными интерьерами, полностью сохранивший атмосферу вокзалов начала XX века.', mustSeeFilter: 'creative' , themeTags: ['Северный модерн'],
-        locationSlug: 'saint-petersburg-vitebskiy-vokzal',
+        locationSlug: 'saint-petersburg-vitebskiy-vokzal'
       },
       { name: 'Смоленское лютеранское кладбище', desc: 'Исторический немецкий некрополь на Васильевском острове, известный старинными склепами и беседой из культового фильма «Брат».', mustSeeFilter: 'creative' , themeTags: ['Ленинградский рок и андеграунд'],
-        locationSlug: 'saint-petersburg-smolenskoe-lyuteranskoe-kladbische',
+        locationSlug: 'saint-petersburg-smolenskoe-lyuteranskoe-kladbische'
       },
 
       { name: 'Чижик-Пыжик', desc: 'Самый маленький городской памятник, всего 11 см, установленный на гранитном выступе набережной у Фонтанки.', mustSeeFilter: 'creative',
-        locationSlug: 'saint-petersburg-chizhik-pyzhik',
+        locationSlug: 'saint-petersburg-chizhik-pyzhik'
       },
       { name: 'Доходный дом Бака', desc: 'Знаменитое здание на Кирочной улице, скрывающее внутри двора-колодца уникальные сквозные подвесные галереи-переходы, соединяющие лицевой и дворовый флигели на уровне второго и четвертого этажей.', mustSeeFilter: 'houses', locationSlug: 'saint-petersburg-dohodnyy-dom-baka' },
       { name: 'Толстовский дом', desc: 'Монументальный жилой комплекс работы Федора Лидваля, визитной карточкой которого стали три последовательные ренессансные арки, образующие внутреннюю проходную улицу от Рубинштейна до Фонтанки.', mustSeeFilter: 'houses', locationSlug: 'saint-petersburg-tolstovskiy-dom' },
       { name: 'Доходный дом Мурузи', desc: 'Шедевр неомавританского стиля, украшенный арабской вязью, терракотовыми изразцами и подковами арок, ставший главным литературным адресом города, где жили Гиппиус, Гумилев и Иосиф Бродский.', mustSeeFilter: 'houses', locationSlug: 'saint-petersburg-dohodnyy-dom-muruzi' },
       { name: 'Доходный дом Ратькова-Рожнова (на Пестеля)', desc: 'Грандиозное здание, поражающее колоссальной четырехэтажной парадной аркой, которая раскрывает перспективу вытянутого двора-улицы со стеклянной крышей.', mustSeeFilter: 'houses',
-        locationSlug: 'saint-petersburg-dohodnyy-dom-ratkova-rozhnova-na-pestelya',
+        locationSlug: 'saint-petersburg-dohodnyy-dom-ratkova-rozhnova-na-pestelya'
       },
       { name: 'Доходный дом Бубыря', desc: 'Эталонный образец сурового северного модерна, фасад которого облицован грубым финским гранитом и украшен загадочными барельефами сказочных птиц, рыб и лесных существ.', mustSeeFilter: 'houses' , themeTags: ['Северный модерн'],
-        locationSlug: 'saint-petersburg-dohodnyy-dom-bubyrya',
+        locationSlug: 'saint-petersburg-dohodnyy-dom-bubyrya'
       },
       { name: 'Дом с совами', desc: 'Здание на Карповке, привлекающее внимание массивным угловым эркером и огромными скульптурами полярных сов, которые словно охраняют покой жильцов Петроградской стороны.', mustSeeFilter: 'houses' , themeTags: ['Северный модерн'],
-        locationSlug: 'saint-petersburg-dom-s-sovami',
+        locationSlug: 'saint-petersburg-dom-s-sovami'
       },
       { name: 'Доходный дом Иоффа (Пять углов)', desc: 'Архитектурная доминанта знаменитого перекрестка, чей узкий, похожий на нос корабля фасад увенчан изящной круглой башней с куполом.', mustSeeFilter: 'houses',
-        locationSlug: 'saint-petersburg-dohodnyy-dom-ioffa-pyat-uglov',
+        locationSlug: 'saint-petersburg-dohodnyy-dom-ioffa-pyat-uglov'
       },
       { name: 'Доходный дом Полежаева', desc: 'Огромный замок в стиле неовизантийского модерна со множеством башенок и шпилей, ставший декорациями квартиры Воланда в экранизации «Мастера и Маргариты» Владимира Бортко.', mustSeeFilter: 'houses',
-        locationSlug: 'saint-petersburg-dohodnyy-dom-polezhaeva',
+        locationSlug: 'saint-petersburg-dohodnyy-dom-polezhaeva'
       },
       { name: 'Доходный дом Елисеевых (на Фонтанке)', desc: 'Здание, скрывающее одну из самых красивых парадных города - «Ромашковую», названную так за уникальную форму желтых оконных рам и изящную винтовую лестницу.', mustSeeFilter: 'houses',
-        locationSlug: 'saint-petersburg-dohodnyy-dom-eliseevyh-na-fontanke',
+        locationSlug: 'saint-petersburg-dohodnyy-dom-eliseevyh-na-fontanke'
       },
       { name: 'Египетский дом (Дом Захарова)', desc: 'Доходный дом на Захарьевской, чей фасад и парадный въезд полностью декорированы монументальными скульптурами бога Ра, пилястрами в виде папирусов и ликами богини Хатхор.', mustSeeFilter: 'houses',
-        locationSlug: 'saint-petersburg-egipetskiy-dom-dom-zaharova',
+        locationSlug: 'saint-petersburg-egipetskiy-dom-dom-zaharova'
       },
       { name: 'Доходный дом Станового', desc: 'Яркий пример неорусского стиля с башенками-теремами, чьи парадные двери и фасады украшены барельефами с изображением русских крестьян в традиционных рубахах.', mustSeeFilter: 'houses',
-        locationSlug: 'saint-petersburg-dohodnyy-dom-stanovogo',
+        locationSlug: 'saint-petersburg-dohodnyy-dom-stanovogo'
       },
       { name: 'Доходный дом Розенштейна (Дом с башнями)', desc: 'Величественное здание на площади Льва Толстого, стилизованное под английский средневековый замок с двумя мощными шестигранными башнями и элементами готики.', mustSeeFilter: 'houses',
-        locationSlug: 'saint-petersburg-dohodnyy-dom-rozenshteyna-dom-s-bashnyami',
+        locationSlug: 'saint-petersburg-dohodnyy-dom-rozenshteyna-dom-s-bashnyami'
       },
       { name: 'Доходный дом Веге', desc: 'Монументальный неоклассический дом у Крюкова канала, парадный въезд во двор которого охраняют колоссальные атланты из темного гранита.', mustSeeFilter: 'houses',
-        locationSlug: 'saint-petersburg-dohodnyy-dom-vege',
+        locationSlug: 'saint-petersburg-dohodnyy-dom-vege'
       },
       { name: 'Доходный дом Дернова (Дом с башней)', desc: 'Знаменитое здание на углу Таврической, в круглой башне которого в начале XX века находилась квартира поэта Вячеслава Иванова, служившая главным салоном для символистов Серебряного века.', mustSeeFilter: 'houses',
-        locationSlug: 'saint-petersburg-dohodnyy-dom-dernova-dom-s-bashney',
+        locationSlug: 'saint-petersburg-dohodnyy-dom-dernova-dom-s-bashney'
       },
       { name: 'Доходный дом Кирилловых', desc: 'Малоизвестный шедевр эклектики на Большой Пушкарской, фасад которого буквально усыпан лепниной, кариатидами и фигурами ангелов.', mustSeeFilter: 'houses',
-        locationSlug: 'saint-petersburg-dohodnyy-dom-kirillovyh',
+        locationSlug: 'saint-petersburg-dohodnyy-dom-kirillovyh'
       },
       { name: 'Доходный дом Бернштейна', desc: 'Здание на 3-й Советской, примечательное парадным вестибюлем, полностью облицованным подлинной старинной метлахской плиткой и изразцами изумрудного цвета.', mustSeeFilter: 'houses',
-        locationSlug: 'saint-petersburg-dohodnyy-dom-bernshteyna',
+        locationSlug: 'saint-petersburg-dohodnyy-dom-bernshteyna'
       },
       { name: 'Доходный дом Лялевича', desc: 'Элегантный неоклассический дом на улице Розенштейна с огромной въездной аркой и сохранившимися барельефами римских воинов на фасаде.', mustSeeFilter: 'houses',
-        locationSlug: 'saint-petersburg-dohodnyy-dom-lyalevicha',
+        locationSlug: 'saint-petersburg-dohodnyy-dom-lyalevicha'
       },
       { name: 'Доходный дом Мельцера', desc: 'Архитектурный комплекс на Большой Конюшенной, сочетающий элементы модерна и классицизма, построенный владельцем знаменитой мебельной фабрики.', mustSeeFilter: 'houses',
-        locationSlug: 'saint-petersburg-dohodnyy-dom-meltsera',
+        locationSlug: 'saint-petersburg-dohodnyy-dom-meltsera'
       },
       { name: 'Доходный дом герцога Лейхтенбергского', desc: 'Здание на Большой Зелениной, верхний этаж которого украшен масштабными мозаичными панно с изображением индустриальных пейзажей, пашен и морских портов.', mustSeeFilter: 'houses',
-        locationSlug: 'saint-petersburg-dohodnyy-dom-gertsoga-leyhtenbergskogo',
+        locationSlug: 'saint-petersburg-dohodnyy-dom-gertsoga-leyhtenbergskogo'
       },
       { name: 'Доходный дом Колобовых', desc: 'Огромный жилой квартал на Петроградской стороне с глубоким парадным двором-курдонером, отделенным от улицы изящной гранитной колоннадой.', mustSeeFilter: 'houses',
-        locationSlug: 'saint-petersburg-dohodnyy-dom-kolobovyh',
+        locationSlug: 'saint-petersburg-dohodnyy-dom-kolobovyh'
       },
       { name: 'Доходный дом Никонова', desc: 'Сказочный дом-терем на Коломенской улице, сплошь покрытый разноцветными изразцами, майоликой и сложной кирпичной кладкой в русском стиле.', mustSeeFilter: 'houses',
-        locationSlug: 'saint-petersburg-dohodnyy-dom-nikonova',
+        locationSlug: 'saint-petersburg-dohodnyy-dom-nikonova'
       },
       { name: 'Доходный дом Бадаева', desc: 'Здание на углу Восстания, знаменитое угловым эркером, который венчает барельеф крылатой нимфы, прозванной горожанами «печальным ангелом».', mustSeeFilter: 'houses',
-        locationSlug: 'saint-petersburg-dohodnyy-dom-badaeva',
+        locationSlug: 'saint-petersburg-dohodnyy-dom-badaeva'
       },
       { name: 'Доходный дом Клейнмихель', desc: 'Изящное здание на Каменном острове, перестроенное из старого особняка и напоминающее романтическую готическую виллу с элементами фахверка.', mustSeeFilter: 'houses',
-        locationSlug: 'saint-petersburg-dohodnyy-dom-kleynmihel',
+        locationSlug: 'saint-petersburg-dohodnyy-dom-kleynmihel'
       },
       { name: 'Доходный дом Степнова', desc: 'Дом на 11-й линии Васильевского острова, скрывающий круглую парадную-ротонду с радиально расходящимися ступенями лестницы.', mustSeeFilter: 'houses',
-        locationSlug: 'saint-petersburg-dohodnyy-dom-stepnova',
+        locationSlug: 'saint-petersburg-dohodnyy-dom-stepnova'
       },
       { name: 'Доходный дом Танского', desc: 'Здание на улице Куйбышева, известное своей парадной с камином, лепными грифонами и огромным световым фонарем в потолке.', mustSeeFilter: 'houses',
-        locationSlug: 'saint-petersburg-dohodnyy-dom-tanskogo',
+        locationSlug: 'saint-petersburg-dohodnyy-dom-tanskogo'
       },
       { name: 'Доходный дом Хренова', desc: 'Дом на Таврической улице, фасад которого украшен редким для Петербурга лепным декором в виде гигантских чертополохов.', mustSeeFilter: 'houses',
-        locationSlug: 'saint-petersburg-dohodnyy-dom-hrenova',
+        locationSlug: 'saint-petersburg-dohodnyy-dom-hrenova'
       },
       { name: 'Доходный дом Шрейбера', desc: 'Здание на Захарьевской улице с роскошной парадной, где сохранились подлинные кариатиды, поддерживающие марши дубовой лестницы.', mustSeeFilter: 'houses',
-        locationSlug: 'saint-petersburg-dohodnyy-dom-shreybera',
+        locationSlug: 'saint-petersburg-dohodnyy-dom-shreybera'
       },
       { name: 'Доходный дом Граббе', desc: 'Элегантное здание в стиле модерн на Лесном проспекте, построенное для управляющего пороховыми заводами.', mustSeeFilter: 'houses',
-        locationSlug: 'saint-petersburg-dohodnyy-dom-grabbe',
+        locationSlug: 'saint-petersburg-dohodnyy-dom-grabbe'
       },
       { name: 'Доходный дом Смирнова', desc: 'Здание на Пяти углах с редкой круглой лестничной клеткой и сохранившимися коваными лифтовыми шахтами начала XX века.', mustSeeFilter: 'houses',
-        locationSlug: 'saint-petersburg-dohodnyy-dom-smirnova',
+        locationSlug: 'saint-petersburg-dohodnyy-dom-smirnova'
       },
       { name: 'Парадная «Ромашка» (Дом Елисеева)', desc: 'Круглый вестибюль на улице Ломоносова: центральный пилон и радиальные рамы окон складываются в образ раскрытого цветка.', mustSeeFilter: 'houses',
-        locationSlug: 'saint-petersburg-paradnaya-romashka-dom-eliseeva',
+        locationSlug: 'saint-petersburg-paradnaya-romashka-dom-eliseeva'
       },
       { name: 'Дворец Великого князя Владимира Александровича (Дом ученых)', desc: 'Великолепное палаццо на Дворцовой набережной в стиле флорентийского ренессанса, полностью сохранившее аутентичные царские залы и дубовую гостиную.', mustSeeFilter: 'mansions',
-        locationSlug: 'saint-petersburg-dvorets-velikogo-knyazya-vladimira-aleksandrovicha-dom-',
+        locationSlug: 'saint-petersburg-dvorets-velikogo-knyazya-vladimira-aleksandrovicha-dom-'
       },
       { name: 'Особняк Кельха', desc: 'Один из самых дорогих частных домов города на улице Чайковского, скрывающий во дворе готический павильон, а внутри - потрясающий Белый зал с гигантским камином.', mustSeeFilter: 'mansions', locationSlug: 'saint-petersburg-osobnyak-kelha' },
       { name: 'Особняк Брусницыных', desc: 'Особняк на Кожевенной линии: за сдержанным фасадом - парадные залы в духе ренессанса и богатая история дома.', mustSeeFilter: 'mansions',
-        locationSlug: 'saint-petersburg-osobnyak-brusnitsynyh',
+        locationSlug: 'saint-petersburg-osobnyak-brusnitsynyh'
       },
       { name: 'Шереметевский дворец (Фонтанный дом)', desc: 'Старинная дворянская усадьба, бывшее родовое гнездо графов Шереметевых, ставшее крупным музеем музыки с колоссальной коллекцией инструментов.', mustSeeFilter: 'mansions',
-        locationSlug: 'saint-petersburg-sheremetevskiy-dvorets-fontannyy-dom',
+        locationSlug: 'saint-petersburg-sheremetevskiy-dvorets-fontannyy-dom'
       },
       { name: 'Строгановский дворец', desc: 'Барочный шедевр Франческо Растрелли на углу Невского и Мойки, уцелевший в советские годы и сохранивший уникальный плафон «Минерва» работы Торелли.', mustSeeFilter: 'mansions',
-        locationSlug: 'saint-petersburg-stroganovskiy-dvorets',
+        locationSlug: 'saint-petersburg-stroganovskiy-dvorets'
       },
       { name: 'Особняк Половцова (Дом архитектора)', desc: 'Строгое снаружи здание на Большой Морской, поражающее своими скрытыми интерьерами: Бронзовым залом без окон со световым фонарем и Белым залом в стиле Людовика XVI.', mustSeeFilter: 'mansions',
-        locationSlug: 'saint-petersburg-osobnyak-polovtsova-dom-arhitektora',
+        locationSlug: 'saint-petersburg-osobnyak-polovtsova-dom-arhitektora'
       },
       { name: 'Дворец Белосельских-Белозерских', desc: 'Роскошный розовый дворец на углу Невского проспекта и Фонтанки, построенный Штакеншнейдером в стиле необарокко и украшенный мощными фигурами атлантов.', mustSeeFilter: 'mansions', locationSlug: 'saint-petersburg-dvorets-beloselskih-belozerskih' },
       { name: 'Особняк Кочубея (Дом с маврами)', desc: 'Здание на Конногвардейском бульваре, знаменитое своей оградой с четырьмя бюстами мавров, выполненными из редкого черного и белого мрамора.', mustSeeFilter: 'mansions',
-        locationSlug: 'saint-petersburg-osobnyak-kochubeya-dom-s-mavrami',
+        locationSlug: 'saint-petersburg-osobnyak-kochubeya-dom-s-mavrami'
       },
       { name: 'Особняк Румянцева', desc: 'Историческое здание на Английской набережной с мощным портиком, внутри которого был открыт первый в России частный публичный музей древностей.', mustSeeFilter: 'mansions',
-        locationSlug: 'saint-petersburg-osobnyak-rumyantseva',
+        locationSlug: 'saint-petersburg-osobnyak-rumyantseva'
       },
       { name: 'Усадьба Демидовых', desc: 'Скрытый жилой комплекс в переулке Гривцова, знаменитый своим уникальным внутренним садом с чугунной верандой на яблоневых столбах и первым в городе частным манежем.', mustSeeFilter: 'mansions',
-        locationSlug: 'saint-petersburg-usadba-demidovyh',
+        locationSlug: 'saint-petersburg-usadba-demidovyh'
       },
       { name: 'Николаевский дворец (Дворец Труда)', desc: 'Грандиозная резиденция сына Николая I, построенная Штакеншнейдером, монументальная парадная лестница которой повторяет контуры лестниц Зимнего дворца.', mustSeeFilter: 'mansions',
-        locationSlug: 'saint-petersburg-nikolaevskiy-dvorets-dvorets-truda',
+        locationSlug: 'saint-petersburg-nikolaevskiy-dvorets-dvorets-truda'
       },
       { name: 'Особняк Форша (Дача Гаусвальд)', desc: 'Первое в России здание в стиле деревянного модерна на Каменном острове, послужившее домом Ирен Адлер в советском фильме о Шерлоке Холмсе.', mustSeeFilter: 'mansions',
-        locationSlug: 'saint-petersburg-osobnyak-forsha-dacha-gausvald',
+        locationSlug: 'saint-petersburg-osobnyak-forsha-dacha-gausvald'
       },
       { name: 'Елагиноостровский дворец', desc: 'Изящная летняя императорская резиденция на Елагином острове, возведенная Карлом Росси для матери Александра I среди регулярного парка.', mustSeeFilter: 'mansions',
-        locationSlug: 'saint-petersburg-elaginoostrovskiy-dvorets',
+        locationSlug: 'saint-petersburg-elaginoostrovskiy-dvorets'
       },
       { name: 'Ново-Михайловский дворец', desc: 'Величественное здание на Дворцовой набережной, построенное для великого князя Михаила Николаевича с использованием передовых для XIX века металлических балок.', mustSeeFilter: 'mansions',
-        locationSlug: 'saint-petersburg-novo-mihaylovskiy-dvorets',
+        locationSlug: 'saint-petersburg-novo-mihaylovskiy-dvorets'
       },
       { name: 'Особняк Мясникова', desc: 'Отреставрированный необарокко-особняк на Восстания с нарядным белым фасадом, ставший популярным частным культурным пространством.', mustSeeFilter: 'mansions',
-        locationSlug: 'saint-petersburg-osobnyak-myasnikova',
+        locationSlug: 'saint-petersburg-osobnyak-myasnikova'
       },
       { name: 'Особняк Зива', desc: 'Образец раннего модерна на Рижском проспекте, построенный для крупного суконного магната архитектором Барановским.', mustSeeFilter: 'mansions',
-        locationSlug: 'saint-petersburg-osobnyak-ziva',
+        locationSlug: 'saint-petersburg-osobnyak-ziva'
       },
       { name: 'Усадьба Е. Р. Дашковой (Кирьяново)', desc: 'Историческая подковообразная дача сподвижницы Екатерины II на старой Петергофской дороге, построенная в стиле строгого классицизма.', mustSeeFilter: 'mansions',
-        locationSlug: 'saint-petersburg-usadba-e-r-dashkovoy-kiryanovo',
+        locationSlug: 'saint-petersburg-usadba-e-r-dashkovoy-kiryanovo'
       },
       { name: 'Особняк Чаева', desc: 'Необычный дом на Петроградской стороне с асимметричным фасадом и цилиндрическим объемом зимнего сада, шедевр позднего модерна.', mustSeeFilter: 'mansions',
-        locationSlug: 'saint-petersburg-osobnyak-chaeva',
+        locationSlug: 'saint-petersburg-osobnyak-chaeva'
       },
       { name: 'Особняк Трубецких-Нарышкиных', desc: 'Здание на улице Чайковского, где во время реставрации в 2012 году был найден крупнейший в истории города клад из нескольких тысяч предметов царского серебра.', mustSeeFilter: 'mansions',
-        locationSlug: 'saint-petersburg-osobnyak-trubetskih-naryshkinyh',
+        locationSlug: 'saint-petersburg-osobnyak-trubetskih-naryshkinyh'
       },
       { name: 'Особняк Новинских', desc: 'Элегантное классическое здание на 4-й линии Васильевского острова с сохранившимися резными дубовыми потолками в библиотеке.', mustSeeFilter: 'mansions',
-        locationSlug: 'saint-petersburg-osobnyak-novinskih',
+        locationSlug: 'saint-petersburg-osobnyak-novinskih'
       },
       { name: 'Особняк Форостовского', desc: 'Один из первых чистых образцов модерна в городе на 1-й линии Васильевского острова с гранитным цоколем и асимметричными окнами.', mustSeeFilter: 'mansions',
-        locationSlug: 'saint-petersburg-osobnyak-forostovskogo',
+        locationSlug: 'saint-petersburg-osobnyak-forostovskogo'
       },
       { name: 'Мариинский дворец', desc: 'Подарок Николая I своей дочери Марии Николаевне, ставший «дворцом трех императоров» и резиденцией Государственного совета империи.', mustSeeFilter: 'mansions',
-        locationSlug: 'saint-petersburg-mariinskiy-dvorets',
+        locationSlug: 'saint-petersburg-mariinskiy-dvorets'
       },
       { name: 'Пышечная на Большой Конюшенной', desc: 'Старейшая непрерывно действующая пышечная города (с 1958 года), занесенная в Красную книгу Петербурга, где пышки до сих пор жарят на советских автоматах по неизменному ГОСТу.', mustSeeFilter: 'gastro', locationSlug: 'saint-petersburg-pyshechnaya-na-bolshoy-konyushennoy' },
       { name: 'Литературное кафе (Вольф и Беранже)', desc: 'Историческая кондитерская на Невском проспекте, где Александр Пушкин встретился со своим секундантом Данзасом перед роковой дуэлью на Черной речке.', mustSeeFilter: 'gastro', locationSlug: 'saint-petersburg-literaturnoe-kafe-volf-i-beranzhe' },
       { name: 'Василеостровский рынок', desc: 'Масштабное гастрономическое пространство в реконструированных каменных корпусах Андреевского рынка XVIII века, объединившее кухни со всего мира.', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-vasileostrovskiy-rynok',
+        locationSlug: 'saint-petersburg-vasileostrovskiy-rynok'
       },
       { name: 'Фудмолл «Vokzal 1853»', desc: 'Крупнейший фудмолл в Европе, развернувшийся на трех этажах исторического здания Варшавского вокзала и оформленный в эстетике грандиозного вокзала XIX века.', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-fudmoll-vokzal-1853',
+        locationSlug: 'saint-petersburg-fudmoll-vokzal-1853'
       },
       { name: 'Арт-кафе «Бродячая собака»', desc: 'Исторический подвал на площади Искусств, бывший в начале XX века главным ночным клубом и трибуной для поэтов Серебряного века.', mustSeeFilter: 'gastro', locationSlug: 'saint-petersburg-art-kafe-brodyachaya-sobaka' },
       { name: 'Кондитерская «Север-Метрополь»', desc: 'Главный сладкий бренд города на Невском проспекте, чьи пирожные «Буше» и торты ручной работы являлись главным сувениром из Ленинграда.', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-konditerskaya-sever-metropol',
+        locationSlug: 'saint-petersburg-konditerskaya-sever-metropol'
       },
       { name: 'Ресторан «Корюшка»', desc: 'Панорамный ресторан холдинга Ginza Project прямо у стен Петропавловской крепости, специализирующийся на приготовлении главного гастросимвола города круглый год.', mustSeeFilter: 'gastro', locationSlug: 'saint-petersburg-restoran-koryushka' },
       { name: 'Спикизи-бар «El Copitas»', desc: 'Скрытый во дворах Владимирской площади мексиканский бар без вывески, ставший легендой благодаря многократному попаданию в топ-50 лучших баров мира.', mustSeeFilter: 'gastro', locationSlug: 'saint-petersburg-spikizi-bar-el-copitas' },
       { name: 'Ресторан «Блок»', desc: 'Главный мясной ресторан города от Александра Раппопорта, расположенный на крыше «Ленинград Центра» в Таврическом саду и оформленный в стиле русского авангарда.', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-restoran-blok',
+        locationSlug: 'saint-petersburg-restoran-blok'
       },
       { name: 'Бар «Хроники»', desc: 'Интеллектуальная рюмочная на улице Некрасова, возродившая культуру ленинградских питейных заведений для новой творческой интеллигенции.', mustSeeFilter: 'gastro' , themeTags: ['Ленинградский рок и андеграунд'],
-        locationSlug: 'saint-petersburg-bar-hroniki',
+        locationSlug: 'saint-petersburg-bar-hroniki'
       },
       { name: 'Ресторан «Палкинъ»', desc: 'Историческое заведение на Невском проспекте, возродившее традиции дореволюционной русской высокой кухни с подачей блюд в формате фламбе.', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-restoran-palkin',
+        locationSlug: 'saint-petersburg-restoran-palkin'
       },
       { name: 'Гастробар «Harvest»', desc: 'Проект Дмитрия Блинова, признанный одним из лучших ресторанов страны за уникальный фокус на высокую кухню из локальных овощей и экологичное потребление.', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-gastrobar-harvest',
+        locationSlug: 'saint-petersburg-gastrobar-harvest'
       },
       { name: 'Ресторан «Метрополь»', desc: 'Исторический ресторан на Садовой, открытый в XIX веке, где проходили официальные банкеты во время визитов Жака Ширака и королевы Маргрете II.', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-restoran-metropol',
+        locationSlug: 'saint-petersburg-restoran-metropol'
       },
       { name: 'Коктейльный бар «Xander»', desc: 'Изысканный бар в отеле Four Seasons в здании Дома со львами, знаменитый своей каминной зоной и сложной картой концептуальных миксов.', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-kokteylnyy-bar-xander',
+        locationSlug: 'saint-petersburg-kokteylnyy-bar-xander'
       },
       { name: 'Гранд Отель Европа (Лобби-бар)', desc: 'Аристократичный бар со старинными витражами в стиле модерн, помнящий визиты Петра Чайковского, Игоря Стравинского и сэра Элтона Джона.', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-grand-otel-evropa-lobbi-bar',
+        locationSlug: 'saint-petersburg-grand-otel-evropa-lobbi-bar'
       },
       { name: 'Ресторан «Строганов Стейк Хаус»', desc: 'Огромный стейк-хаус в здании бывших казарм Конногвардейского полка со столетней кирпичной кладкой и массивной дубовой мебелью.', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-restoran-stroganov-steyk-haus',
+        locationSlug: 'saint-petersburg-restoran-stroganov-steyk-haus'
       },
       { name: 'Бар «Жан-Жак»', desc: 'Уютное французское бистро на Петроградской стороне, ставшее главным местом встреч петербургских художников, журналистов и критиков.', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-bar-zhan-zhak',
+        locationSlug: 'saint-petersburg-bar-zhan-zhak'
       },
       { name: 'Рюмочная «Маяк»', desc: 'Культовое заведение на улице Маяковского, сохранившее аутентичную советскую атмосферу с бюстами Ленина и бутербродами со шпротами.', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-ryumochnaya-mayak',
+        locationSlug: 'saint-petersburg-ryumochnaya-mayak'
       },
       { name: 'Ресторан «Percorso»', desc: 'Премиальный итальянский ресторан во дворце Лобанова-Ростовского, разделенный на пять залов с открытой кухней и винным погребом.', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-restoran-percorso',
+        locationSlug: 'saint-petersburg-restoran-percorso'
       },
       { name: 'Кафе «Рубинштейн»', desc: 'Интеллектуальное заведение на набережной Фонтанки, тесно связанное с театральной жизнью города и Малым драматическим театром Льва Додина.', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-kafe-rubinshteyn',
+        locationSlug: 'saint-petersburg-kafe-rubinshteyn'
       },
       { name: 'Кафе «Zoom»', desc: 'Одно из первых концептуальных арт-кафе города на Гороховой улице, объединившее библиотеку, выставочное пространство и домашнюю кухню.', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-kafe-zoom',
+        locationSlug: 'saint-petersburg-kafe-zoom'
       },
       { name: 'Бар «Orthodox»', desc: 'Концептуальный бар на улице Рубинштейна, где все коктейли создаются исключительно на основе российских дистиллятов и названы в честь произведений русских классиков.', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-bar-orthodox',
+        locationSlug: 'saint-petersburg-bar-orthodox'
       },
       { name: 'Ресторан «Кококо»', desc: 'Знаменитый проект Матильды Шнуровой, ставший пионером русского нью-вейва в кулинарии благодаря переосмыслению фермерских продуктов региона.', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-restoran-kokoko',
+        locationSlug: 'saint-petersburg-restoran-kokoko'
       },
       { name: 'Булочная Ф. Вольчека', desc: 'Самая масштабная народная сеть пекарен города, сформировавшая современную культуру доступного петербургского стрит-фуда и вечерних скидок на выпечку.', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-bulochnaya-f-volcheka',
+        locationSlug: 'saint-petersburg-bulochnaya-f-volcheka'
       },
       { name: 'Общественное пространство «Двор Гостинки»', desc: 'Внутренний двор Большого Гостиного двора - летнее открытое пространство с кафе и зонами отдыха.', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-obschestvennoe-prostranstvo-dvor-gostinki',
+        locationSlug: 'saint-petersburg-obschestvennoe-prostranstvo-dvor-gostinki'
       },
       { name: 'Ресторан «Il Lago dei Cigni»', desc: 'Роскошный ресторан высокой итальянской кухни на берегу Лебяжьего пруда Крестовского острова с люстрой из селенита и панорамными окнами.', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-restoran-il-lago-dei-cigni',
+        locationSlug: 'saint-petersburg-restoran-il-lago-dei-cigni'
       },
       { name: 'Сидрерия «Сидр и Нэнси»', desc: 'Главная точка концентрации любителей локальных и импортных сидров на улице Некрасова с огромной коллекцией редких сортов.', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-sidreriya-sidr-i-nensi',
+        locationSlug: 'saint-petersburg-sidreriya-sidr-i-nensi'
       },
       { name: 'Бар «Mishka»', desc: 'Легендарный хипстерский бар музыканта Кирилла Иванова (СБПЧ), сформировавший ночную жизнь набережной реки Фонтанки в 2010-х годах.', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-bar-mishka',
+        locationSlug: 'saint-petersburg-bar-mishka'
       },
       { name: 'Московский рынок', desc: 'Модернизированный по образцу Даниловского исторический рынок у метро «Электросила» под массивным сталинским неоклассическим куполом.', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-moskovskiy-rynok',
+        locationSlug: 'saint-petersburg-moskovskiy-rynok'
       },
       { name: 'Ресторан «Тепло»', desc: 'Уютный семейный ресторан-гостиная в Большой Морской улице со внутренним тихим двориком, настольными играми и домашней выпечкой.', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-restoran-teplo',
+        locationSlug: 'saint-petersburg-restoran-teplo'
       },
       { name: 'Бар «Imbibe»', desc: 'Известный коктейльный бар на Жуковского, славящийся своими экспериментальными подачами и авторскими шотами со сложными вкусовыми профилями.', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-bar-imbibe',
+        locationSlug: 'saint-petersburg-bar-imbibe'
       },
       { name: 'Кофейня «Тчк»', desc: 'Миниатюрная скрытая во дворах Петроградской стороны кофейня в старинном кирпичном гараже, ставшая культовым местом среди любителей альтернативного кофе.', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-kofeynya-tchk',
+        locationSlug: 'saint-petersburg-kofeynya-tchk'
       },
       { name: 'Ресторан «Мансарда»', desc: 'Видовой ресторан холдинга Ginza Project, с террасы которого открывается один из самых близких и монументальных ракурсов на купол Исаакиевского собора.', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-restoran-mansarda',
+        locationSlug: 'saint-petersburg-restoran-mansarda'
       },
       { name: 'Чебуречная «Салхино»', desc: 'Историческое заведение на Кронверкском проспекте, работающее с 1962 года и знаменитое своими легендарными чебуреками «по-чегемски».', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-cheburechnaya-salhino',
+        locationSlug: 'saint-petersburg-cheburechnaya-salhino'
       },
       { name: 'Бар «Dead Poets»', desc: 'Строгий бар-вискитека на Жуковского, оформленный в стиле классического европейского паба для писателей и журналистов.', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-bar-dead-poets',
+        locationSlug: 'saint-petersburg-bar-dead-poets'
       },
       { name: 'Кондитерская «Тройка»', desc: 'Легендарное советское кафе на Загородном проспекте, прославившееся на весь город своими огромными фирменными пирожными со взбитыми сливками.', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-konditerskaya-troyka',
+        locationSlug: 'saint-petersburg-konditerskaya-troyka'
       },
       { name: 'Ресторан «Мама Тута»', desc: 'Концептуальный ресторан грузинской кухни Арама Мнацаканова на Петроградской стороне с утонченным дизайном и современным прочтением классических блюд.', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-restoran-mama-tuta',
+        locationSlug: 'saint-petersburg-restoran-mama-tuta'
       },
       { name: 'Бар «Залив»', desc: 'Уютная стильная рюмочная на острове Новая Голландия, воссоздающая атмосферу советского приморского дачного буфета в курортных Комарово.', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-bar-zaliv',
+        locationSlug: 'saint-petersburg-bar-zaliv'
       },
       { name: 'Ресторан «Синтез»', desc: 'Экспериментальная гастрономическая лаборатория на Васильевском острове, совмещающая блюда молекулярной кухни с арт-перформансами.', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-restoran-sintez',
+        locationSlug: 'saint-petersburg-restoran-sintez'
       },
       { name: 'Пивной бар «Диккенс»', desc: 'Огромный двухэтажный классический английский паб на набережной Фонтанки с антикварной мебелью и огромной коллекцией британского эля.', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-pivnoy-bar-dikkens',
+        locationSlug: 'saint-petersburg-pivnoy-bar-dikkens'
       },
       { name: 'Пушкинская 10', desc: 'Культовый арт-центр и музыкальный адрес ленинградского андеграунда.', mustSeeFilter: 'creative', themeTags: ['Ленинградский рок и андеграунд'],
-        locationSlug: 'saint-petersburg-pushkinskaya-10',
+        locationSlug: 'saint-petersburg-pushkinskaya-10'
       },
       { name: 'Ресторан «Birch»', desc: 'Абсолютный хит петербургской гастрономической сцены, предлагающий авторские сеты мирового уровня в формате лаконичного гастротеатра.', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-restoran-birch',
+        locationSlug: 'saint-petersburg-restoran-birch'
       },
       { name: 'Бар «Коллектив»', desc: 'Скрытый спикизи-бар на улице Некрасова с винтажным интерьером банковского хранилища и сложнейшими историческими коктейлями.', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-bar-kollektiv',
+        locationSlug: 'saint-petersburg-bar-kollektiv'
       },
       { name: 'Ресторан «Animals»', desc: 'Концептуальное заведение на Суворовском проспекте, работающее по принципу «от фермы до стола» и закупающее продукты с собственного огорода в Ленобласти.', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-restoran-animals',
+        locationSlug: 'saint-petersburg-restoran-animals'
       },
       { name: 'Бар «Баланс Белого»', desc: 'Популярный крафтовый бар в креативном кластере «Севкабель Порт» с видом на залив и огромной ротацией локальных пивоварен.', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-bar-balans-belogo',
+        locationSlug: 'saint-petersburg-bar-balans-belogo'
       },
       { name: 'Вегетарианское кафе «Рада & К»', desc: 'Старейшее концептуальное вегетарианское заведение города на Гороховой улице, ставшее отправной точкой для развития эко-кухни в Петербурге.', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-vegetarianskoe-kafe-rada-k',
+        locationSlug: 'saint-petersburg-vegetarianskoe-kafe-rada-k'
       }
     ],
     significantSuburbs: [
@@ -693,7 +693,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         desc: '',
         mustSeeFilter: 'main',
         places: [
-          { name: 'Нижний парк Петергофа', seasonLabel: 'Летняя навигация - май-октябрь', desc: 'регулярный парадный сад Петра I на берегу Финского залива со знаменитой системой фонтанов, работающей вообще без насосов.', locationSlug: 'saint-petersburg-nizhniy-park-petergofa', latitude: 59.885112, longitude: 29.908214, transitTip: 'От ст. Новый Петергоф ~15-20 мин пешком / автобус' },
+          { name: 'Нижний парк Петергофа', seasonLabel: 'Летняя навигация - май-октябрь', desc: 'регулярный парадный сад Петра I на берегу Финского залива со знаменитой системой фонтанов, работающей вообще без насосов.', locationSlug: 'saint-petersburg-nizhniy-park-petergofa', latitude: 59.885112, longitude: 29.908214, transitTip: 'От ст. Новый Петергоф автобус' },
           { name: 'Большой каскад', seasonLabel: 'Летняя навигация - май-октябрь', desc: 'монументальное фонтанное сооружение с гротами и позолоченной фигурой Самсона, разрывающего пасть льва, символизирующей победу над Швецией.', latitude: 59.88935, longitude: 29.90855},
           { name: 'Большой дворец Петергофа', desc: 'парадная барочная резиденция Петра I и Елизаветы над каскадом, с тронным залом и анфиладой парадных покоев.', locationSlug: 'saint-petersburg-bolshoy-dvorets-petergofa', latitude: 59.89055, longitude: 29.90785},
           { name: 'Верхний сад', desc: 'регулярный партер перед фасадом Большого дворца с тремя главными фонтанами и видом на Морской канал.', latitude: 59.89185, longitude: 29.90845},
@@ -918,7 +918,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           'Сенатская - Нева/Адмиралтейство - сад - Исаакий - Синий мост - Большая Морская - Дворцовая - дворы Капеллы - Конюшенная - Невский у Зингера.',
         gastroStop: {
           name: 'Литературное кафе (Вольф и Беранже)',
-          blurb: 'Гастро-пауза на Большой Морской - кофе/перекус перед Дворцовой.',
+          blurb: 'Гастро-пауза на Большой Морской - кофе/перекус перед Дворцовой.'
         },
         stops: [
           spbPresetStop('Медный всадник / Сенатская площадь', {
@@ -926,67 +926,62 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
             latitude: 59.9364,
             longitude: 30.3023,
             desc: 'Главный символ города, запечатленный в поэме Пушкина. Памятник Петру I установлен на гигантском «Гром-камне» прямо у берега Невы.',
-            transitTip: 'Старт у Невы - Сенатская площадь',
+            transitTip: 'Старт у Невы - Сенатская площадь'
           }),
           spbPresetStop('Адмиралтейство', {
-            desc: 'Колыбель российского флота со знаменитым позолоченным шпилем-иглой и корабликом-флюгером. Фасад украшен монументальной классической скульптурой.',
-            transitTip: 'Пешком вдоль Невы',
+            desc: 'Колыбель российского флота со знаменитым позолоченным шпилем-иглой и корабликом-флюгером. Фасад украшен монументальной классической скульптурой.'
           }),
           spbPresetStop('Александровский сад', {
             desc: 'Сквозь тенистый сад вдоль фасада Адмиралтейства - плавный подход к куполу Исаакия.',
-            transitTip: 'Сквозь сад - без возврата на Неву',
+            transitTip: 'Сквозь сад - без возврата на Неву'
           }),
           spbPresetStop('Исаакиевский собор', {
             dayRouteId: 'spb-isaakievskiy-sobor',
             latitude: 59.9343,
             longitude: 30.3061,
-            desc: 'Крупнейший православный храм Петербурга, на возведение которого ушло 40 лет. Внутри поражает отделкой из малахита, лазурита и мозаик.',
-            transitTip: 'Пешком из сада к собору',
+            desc: 'Крупнейший православный храм Петербурга, на возведение которого ушло 40 лет. Внутри поражает отделкой из малахита, лазурита и мозаик.'
           }),
           spbPresetStop('Колоннада Исаакия', {
             desc: 'Лучшая смотровая в центре на высоте 43 метров - круговая панорама на 360 градусов. Поднимайтесь сейчас, если ясно и без длинной очереди.',
-            transitTip: 'Колоннада при хорошей видимости - иначе в другой день',
+            transitTip: 'Колоннада при хорошей видимости - иначе в другой день'
           }),
           spbPresetStop('Синий мост', {
             desc: 'У Мариинского дворца - один из самых широких мостов города (~100 м). Удобный разворот с Исаакиевской площади к Большой Морской.',
-            transitTip: 'Коротко к Синему мосту',
+            transitTip: 'Коротко к Синему мосту'
           }),
           spbPresetStop('Большая Морская', {
             desc: 'Фешенебельная историческая улица, где селились ювелиры и банкиры. Здесь дом Фаберже и старейшие кондитерские; гастро-пауза у Литературного кафе.',
-            transitTip: 'По Большой Морской; гастро у Литературного кафе',
+            transitTip: 'По Большой Морской; гастро у Литературного кафе'
           }),
           spbPresetStop('Дворцовая площадь', {
             dayRouteId: 'spb-dvortsovaya-ploschad',
             latitude: 59.939,
             longitude: 30.3158,
-            desc: 'Главная площадь города, превосходящая по размерам Красную площадь в Москве. В центре - 600-тонная Александровская колонна, удерживаемая только собственным весом.',
-            transitTip: 'Пешком к арке / Дворцовой',
+            desc: 'Главная площадь города, превосходящая по размерам Красную площадь в Москве. В центре - 600-тонная Александровская колонна, удерживаемая только собственным весом.'
           }),
           spbPresetStop('Эрмитаж', {
             desc: 'Один из величайших художественных музеев мира в Зимнем дворце. Хранит миллионы шедевров от античности до Леонардо. Один музейный блок 2-3 часа - второй день для другого крыла.',
-            transitTip: 'Один музей 2-3 часа - второй день для Зимнего',
+            transitTip: 'Один музей 2-3 часа - второй день для Зимнего'
           }),
           spbPresetStop('Главный штаб (Эрмитаж)', {
             desc: 'Арка и восточное крыло - альтернатива Зимнему, если Эрмитаж оставляете на другой день.',
-            transitTip: 'Через арку - если Эрмитаж пропускаете',
+            transitTip: 'Через арку - если Эрмитаж пропускаете'
           }),
           spbPresetStop('Двор Капеллы', {
-            desc: 'Тихий поворот с парадной оси к Мойке и Конюшенным - передышка после площадей.',
-            transitTip: 'Пешком к Мойке / дворы Капеллы',
+            desc: 'Тихий поворот с парадной оси к Мойке и Конюшенным - передышка после площадей.'
           }),
           spbPresetStop('Пышечная на Большой Конюшенной', {
             desc: 'Легендарное советское кафе с 1958 года. Пышки по ГОСТу, кофе из ведерного титана - простая пауза после дворцов.',
-            transitTip: 'К Большой Конюшенной - пышка и кофе',
+            transitTip: 'К Большой Конюшенной - пышка и кофе'
           }),
           spbPresetStop('Храм Святой Екатерины', {
-            desc: 'На Большой Конюшенной к Невскому - католический храм на пути к финалу дуги.',
-            transitTip: 'Пешком к Невскому',
+            desc: 'На Большой Конюшенной к Невскому - католический храм на пути к финалу дуги.'
           }),
           spbPresetStop('Дом компании «Зингер»', {
             desc: 'Дом книги на Невском - финал пешеходной дуги. Дальше канал Грибоедова по желанию.',
-            transitTip: 'Финал у Зингера - дальше канал по желанию',
+            transitTip: 'Финал у Зингера - дальше канал по желанию'
           }),
-        ],
+        ]
       },
       {
         id: 'spb-2',
@@ -997,13 +992,13 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           spbPresetStop('Стрелка Васильевского острова', {
             dayRouteId: 'spb-strelka-vasilevskogo-ostrova',
             latitude: 59.944,
-            longitude: 30.303,
+            longitude: 30.303
           }),
           spbPresetStop('Зоологический музей РАН'),
           spbPresetStop('Кунсткамера', {
             dayRouteId: 'spb-kunstkamera',
             latitude: 59.941,
-            longitude: 30.304,
+            longitude: 30.304
           }),
           spbPresetStop('Университетская набережная'),
           spbPresetStop('Академия художеств'),
@@ -1012,13 +1007,13 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           spbPresetStop('Василеостровский рынок', {
             dayRouteId: 'spb-vasileostrovskiy-rynok',
             latitude: 59.9469,
-            longitude: 30.2761,
+            longitude: 30.2761
           }),
           spbPresetStop('Набережная Макарова'),
           spbPresetStop('Эрарта'),
           spbPresetStop('Севкабель Порт'),
           spbPresetStop('Брусницын'),
-        ],
+        ]
       },
       {
         id: 'spb-3',
@@ -1033,72 +1028,64 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           'Троицкий мост - Петроградская набережная / Аврора - мечеть и Кшесинская (~10 мин по Куйбышева) - Каменноостровский - парк/зоопарк - Артиллерия - крепость - Корюшка у пляжа.',
         gastroStop: {
           name: 'Ресторан «Корюшка»',
-          blurb: 'Гастро-финал у пляжа крепости - вечер у воды.',
+          blurb: 'Гастро-финал у пляжа крепости - вечер у воды.'
         },
         stops: [
           spbPresetStop('Троицкий мост', {
             desc: 'Старт / панорама Невы',
-            transitTip: 'Старт у Троицкого моста - панорама Невы',
+            transitTip: 'Старт у Троицкого моста - панорама Невы'
           }),
           spbPresetStop('Петроградская набережная', {
-            desc: 'Утро у Невы к Авроре',
-            transitTip: 'Пешком по Петроградской набережной',
+            desc: 'Утро у Невы к Авроре'
           }),
           spbPresetStop('Крейсер «Аврора»', {
             desc: 'Утренний якорь маршрута',
-            transitTip: 'Утро у Авроры - дальше внутрь Петроградки',
+            transitTip: 'Утро у Авроры - дальше внутрь Петроградки'
           }),
           spbPresetStop('Санкт-Петербургская соборная мечеть', {
             dayRouteId: 'spb-sobornaya-mechet',
             locationSlug: 'saint-petersburg-sobornaya-mechet',
             latitude: 59.9552,
             longitude: 30.3239,
-            desc: 'Мечеть на Куйбышева',
-            transitTip: '~10 мин пешком по Куйбышева к мечети',
+            desc: 'Мечеть на Куйбышева'
           }),
           spbPresetStop('Музей политической истории (особняк Кшесинской)', {
-            desc: 'Особняк рядом с мечетью',
-            transitTip: 'Пешком рядом - особняк Кшесинской / политдоистория',
+            desc: 'Особняк рядом с мечетью'
           }),
           spbPresetStop('Каменноостровский проспект', {
-            desc: 'Проспект внутрь острова',
-            transitTip: 'Пешком на Каменноостровский',
+            desc: 'Проспект внутрь острова'
           }),
           spbPresetStop('Павловский дом-музей', {
-            desc: 'Дом-музей на линии проспекта',
-            transitTip: 'Пешком по Каменноостровскому к Павловскому',
+            desc: 'Дом-музей на линии проспекта'
           }),
           spbPresetStop('Александровский парк', {
             dayRouteId: 'spb-aleksandrovskiy-park',
             latitude: 59.9528,
             longitude: 30.3131,
-            desc: 'Тень середины дня',
-            transitTip: 'Пешком в Александровский парк - тень середины дня',
+            desc: 'Тень середины дня'
           }),
           spbPresetStop('Ленинградский зоопарк', {
             desc: 'Опционально в парковой зоне',
-            transitTip: 'Рядом с парком - зоопарк по желанию',
+            transitTip: 'Рядом с парком - зоопарк по желанию'
           }),
           spbPresetStop('Артиллерийский музей', {
-            desc: 'Кронверк; двор техники бесплатно',
-            transitTip: 'Пешком к Кронверку / Артиллерии; двор техники бесплатно',
+            desc: 'Кронверк; двор техники бесплатно'
           }),
           spbPresetStop('Петропавловская крепость', {
             dayRouteId: 'spb-petropavlovskaya-krepost',
             latitude: 59.9502,
             longitude: 30.3164,
             desc: 'Вечерний финал ансамбля',
-            transitTip: 'Через Иоанновский мост в крепость; Невские ворота',
+            transitTip: 'Через Иоанновский мост в крепость; Невские ворота'
           }),
           spbPresetStop('Петропавловский собор', {
-            desc: 'Собор внутри крепости',
-            transitTip: 'Пешком внутри крепости к собору',
+            desc: 'Собор внутри крепости'
           }),
           spbPresetStop('Ресторан «Корюшка»', {
             desc: 'Гастро-финал у пляжа крепости',
-            transitTip: 'Ужин у воды / пляж крепости - Корюшка',
+            transitTip: 'Ужин у воды / пляж крепости - Корюшка'
           }),
-        ],
+        ]
       },
       {
         id: 'spb-4',
@@ -1113,58 +1100,51 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           'Бертгольд у Сенной/Садовой - Грибоедова / Львиный - Никольский / Семимостье / Коломна - Крюков / ВММ - Поцелуев / Юсуповский - Новая Голландия на закат; El Copitas - такси ~15 мин к Владимирской.',
         gastroStop: {
           name: 'Коктейльный бар «El Copitas»',
-          blurb: 'Секретный двор у Владимирской - такси ~15 мин к 20:00-21:00.',
+          blurb: 'Секретный двор у Владимирской - такси ~15 мин к 20:00-21:00.'
         },
         stops: [
           spbPresetStop('Бертгольд-центр', {
             desc: 'Старт у Сенной/Садовой - кофе/крыша утром',
-            transitTip: 'Старт у Сенной / Садовой - Бертгольд утром',
+            transitTip: 'Старт у Сенной / Садовой - Бертгольд утром'
           }),
           spbPresetStop('Набережная канала Грибоедова', {
-            desc: 'Канал к Львиному мосту',
-            transitTip: 'Пешком на наб. канала Грибоедова',
+            desc: 'Канал к Львиному мосту'
           }),
           spbPresetStop('Львиный мост', {
-            desc: 'Мост на линии Грибоедова',
-            transitTip: 'Пешком к Львиному мосту',
+            desc: 'Мост на линии Грибоедова'
           }),
           spbPresetStop('Никольский морской собор', {
-            desc: 'Никольский ансамбль',
-            transitTip: 'Пешком к Никольскому; у Семимостья - Пикалов мост / 7 мостов',
+            desc: 'Никольский ансамбль'
           }),
           spbPresetStop('Семимостье', {
             desc: 'Семь мостов у слияния каналов',
-            transitTip: 'Пикалов мост / Семимостье - ракурс на 7 мостов',
+            transitTip: 'Пикалов мост / Семимостье - ракурс на 7 мостов'
           }),
           spbPresetStop('Коломна', {
-            desc: 'Квартал между каналами',
-            transitTip: 'Пешком по Коломне между каналами',
+            desc: 'Квартал между каналами'
           }),
           spbPresetStop('Крюков канал', {
             desc: 'Канал мимо Мариинки',
-            transitTip: 'По Крюкову каналу мимо Мариинки',
+            transitTip: 'По Крюкову каналу мимо Мариинки'
           }),
           spbPresetStop('Центральный военно-морской музей', {
-            desc: 'ВММ на линии канала',
-            transitTip: 'Пешком к Военно-морскому музею',
+            desc: 'ВММ на линии канала'
           }),
           spbPresetStop('Поцелуев мост', {
-            desc: 'К Юсуповскому',
-            transitTip: 'Пешком к Поцелуеву мосту',
+            desc: 'К Юсуповскому'
           }),
           spbPresetStop('Юсуповский дворец', {
             desc: 'Дворец; внутри лучше с аудиоэкскурсией',
-            transitTip: 'Внутри Юсуповского - аудиоэкскурсия',
+            transitTip: 'Внутри Юсуповского - аудиоэкскурсия'
           }),
           spbPresetStop('Новая Голландия (парк-остров)', {
-            desc: 'Закат / предвечерний отдых',
-            transitTip: 'Пешком к Новой Голландии - закат / предвечерний отдых',
+            desc: 'Закат / предвечерний отдых'
           }),
           spbPresetStop('Коктейльный бар «El Copitas»', {
             desc: 'Секретный двор у Владимирской',
-            transitTip: 'Такси ~15 мин к Владимирской ~20:00-21:00 - секретный двор',
+            transitTip: 'Такси ~15 мин к Владимирской ~20:00-21:00 - секретный двор'
           }),
-        ],
+        ]
       },
       {
         id: 'spb-5',
@@ -1179,7 +1159,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           'Кузнечный - Владимирский - Пять углов - Рубинштейна (Довлатов) - Толстовский дом на Фонтанку - Ахматова - Итальянская к «Бродячей собаке».',
         gastroStop: {
           name: 'Кафе «Рубинштейн»',
-          blurb: 'Экватор маршрута - кофе и лёгкий обед перед арками Толстовского дома.',
+          blurb: 'Экватор маршрута - кофе и лёгкий обед перед арками Толстовского дома.'
         },
         stops: [
           spbPresetStop('Литературно-мемориальный музей Достоевского', {
@@ -1187,66 +1167,65 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
             latitude: 59.927611,
             longitude: 30.350312,
             desc: 'Кузнечный пер., 5 - старт у квартиры «Карамазовых»',
-            transitTip: 'Старт у метро «Владимирская» / «Достоевская» - Кузнечный 5',
+            transitTip: 'Старт у метро «Владимирская» / «Достоевская» - Кузнечный 5'
           }),
           spbPresetStop('Владимирский собор', {
             locationSlug: 'saint-petersburg-vladimirskiy-sobor',
-            desc: 'Приход Достоевского - ~2 мин от музея',
-            transitTip: '~2 мин пешком от музея к собору',
+            desc: 'Приход Достоевского - ~2 мин от музея'
           }),
           spbPresetStop('Пять углов', {
             locationSlug: 'saint-petersburg-dohodnyy-dom-ioffa-pyat-uglov',
             desc: 'По Б. Московской; дом Иоффа - Чуковская / Ахматова',
-            transitTip: 'По Большой Московской к Пяти углам - дом Иоффа с башенкой',
+            transitTip: 'По Большой Московской к Пяти углам - дом Иоффа с башенкой'
           }),
           spbPresetStop('Улица Рубинштейна', {
             locationSlug: 'saint-petersburg-ulitsa-rubinshteyna',
             latitude: 59.931211,
             longitude: 30.342914,
             desc: 'Памятник Довлатову у дома 23 - не Гумилёв',
-            transitTip: 'На Рубинштейна к дому 23 - памятник Сергею Довлатову',
+            transitTip: 'На Рубинштейна к дому 23 - памятник Сергею Довлатову'
           }),
           spbPresetStop('Кафе «Рубинштейн»', {
             locationSlug: 'saint-petersburg-kafe-rubinshteyn',
             desc: 'Гастро-пауза - экватор литературного дня',
-            transitTip: 'Гастро-пауза в кафе «Рубинштейн» - кофе / лёгкий обед',
+            transitTip: 'Гастро-пауза в кафе «Рубинштейн» - кофе / лёгкий обед'
           }),
           spbPresetStop('Толстовский дом', {
             locationSlug: 'saint-petersburg-tolstovskiy-dom',
             latitude: 59.931114,
             longitude: 30.340912,
             desc: 'Арки Лидваля - Куприн / Булгаков; выход на Фонтанку',
-            transitTip: 'Сквозь три арки Толстовского дома - выход на набережную',
+            transitTip: 'Сквозь три арки Толстовского дома - выход на набережную'
           }),
           spbPresetStop('Набережная Фонтанки', {
             locationSlug: 'saint-petersburg-naberezhnaya-fontanki',
             latitude: 59.931241,
             longitude: 30.338914,
             desc: 'Влево по Фонтанке к Невскому',
-            transitTip: 'Влево по Фонтанке к Невскому / Аничкову',
+            transitTip: 'Влево по Фонтанке к Невскому / Аничкову'
           }),
           spbPresetStop('Аничков мост', {
             locationSlug: 'saint-petersburg-anichkov-most',
             latitude: 59.932912,
             longitude: 30.342931,
             desc: 'Клодт - «Укрощение коня»',
-            transitTip: 'Через Аничков мост - скульптуры Клодта',
+            transitTip: 'Через Аничков мост - скульптуры Клодта'
           }),
           spbPresetStop('Музей Анны Ахматовой в Фонтанном доме', {
             venueSlug: 'saint-petersburg-muzey-anny-ahmatovoy-v-fontannom-dome',
             latitude: 59.936122,
             longitude: 30.347514,
             desc: 'Шереметевский / Южный флигель - сад Фонтанного дома',
-            transitTip: 'Дальше по Фонтанке до д. 34 - арка в Южный флигель',
+            transitTip: 'Дальше по Фонтанке до д. 34 - арка в Южный флигель'
           }),
           spbPresetStop('Арт-кафе «Бродячая собака»', {
             locationSlug: 'saint-petersburg-art-kafe-brodyachaya-sobaka',
             latitude: 59.937142,
             longitude: 30.331411,
             desc: 'Итальянская 4 - финал Серебряного века',
-            transitTip: '~10 мин через Итальянские к пл. Искусств - вечерний финал',
+            transitTip: '~10 мин через Итальянские к пл. Искусств - вечерний финал'
           }),
-        ],
+        ]
       },
       {
         id: 'spb-barnyy-peterburg',
@@ -1261,36 +1240,33 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           'Рюмочные на Некрасова - Синий Пушкин (~5 мин) - El Copitas (бронь ~20:00) - Рубинштейна/Евгенич (~10 мин) - такси ~15 мин к Новой Голландии ~23:00; финал «Кабинет» или «Полторы комнаты» вместо далекой Гражданки.',
         gastroStop: {
           name: 'Рюмочные «Залив» / «Хроники»',
-          blurb: 'Некрасова 26 - настойки и бутерброды; якорь вечера.',
+          blurb: 'Некрасова 26 - настойки и бутерброды; якорь вечера.'
         },
         stops: [
           spbPresetStop('Улица Некрасова / рюмочные «Залив» и «Хроники»', {
             desc: 'Некрасова 26 - настойки и бутерброды',
-            transitTip: 'Старт на Некрасова',
+            transitTip: 'Старт на Некрасова'
           }),
           spbPresetStop('Синий Пушкин', {
             dayRouteId: 'spb-sinii-pushkin',
             latitude: 59.936511,
             longitude: 30.351214,
             venueSlug: 'sinii-pushkin-bar-shnurova',
-            desc: 'Жуковского 3',
-            transitTip: '~5 мин пешком',
+            desc: 'Жуковского 3'
           }),
           spbPresetStop('El Copitas', {
             dayRouteId: 'spb-el-copitas',
             latitude: 59.927114,
             longitude: 30.347112,
             locationSlug: 'saint-petersburg-spikizi-bar-el-copitas',
-            desc: 'Достоевского / Владимирская - секретный двор',
-            transitTip: '~10 мин пешком к Владимирской',
+            desc: 'Достоевского / Владимирская - секретный двор'
           }),
           spbPresetStop('Улица Рубинштейна', {
             dayRouteId: 'spb-rubinshteyna',
             latitude: 59.931211,
             longitude: 30.342914,
             locationSlug: 'saint-petersburg-ulitsa-rubinshteyna',
-            desc: 'Барная улица',
-            transitTip: '~10 мин пешком к Рубинштейна',
+            desc: 'Барная улица'
           }),
           spbPresetStop('Евгенич', {
             dayRouteId: 'spb-evgenich',
@@ -1298,7 +1274,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
             longitude: 30.342112,
             venueSlug: 'evgenich-na-rubinshteina-6930909cfc27bb700696490f',
             desc: 'Рубинштейна 23',
-            transitTip: 'Рядом - Рубинштейна 23',
+            transitTip: 'Рядом - Рубинштейна 23'
           }),
           spbPresetStop('Новая Голландия', {
             dayRouteId: 'spb-novaya-gollandiya',
@@ -1306,13 +1282,12 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
             longitude: 30.289214,
             locationSlug: 'saint-petersburg-novaya-gollandiya',
             desc: 'Вечер у острова / Коломны',
-            transitTip: 'такси ~15 мин',
+            transitTip: 'такси ~15 мин'
           }),
           spbPresetStop('«Кабинет» (Малая Морская) / «Полторы комнаты»', {
-            desc: 'Финал у центра / Коломны - вместо далекой Гражданки',
-            transitTip: 'Пешком / коротко - финал у центра',
+            desc: 'Финал у центра / Коломны - вместо далекой Гражданки'
           }),
-        ],
+        ]
       },
     ],
     travel:
@@ -1322,13 +1297,13 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       description:
         'Основной сезон - с мая по октябрь. Дворцовый мост удобно смотреть с Дворцовой или Университетской набережной, а время разводки каждый год уточняйте по актуальному графику. Для ночного маршрута с несколькими мостами выберите прогулку по Неве.',
       href: '/saint-petersburg/night-bridges',
-      linkLabel: 'Развод мостов',
+      linkLabel: 'Развод мостов'
     },
     faq: [
     { q: "Как выгоднее всего оплачивать проезд в общественном транспорте Петербурга?", a: "Для экономии на метро и наземном транспорте туристам рекомендуется сразу приобрести в кассе метрополитена пополняемую карту «Подорожник»." },
     { q: "В какое время ночью разводят мосты на Неве?", a: "График разводки мостов меняется каждый год. В основной сезон с мая по октябрь Дворцовый и Благовещенский мосты обычно разводят после часа ночи, поэтому время стоит проверить перед поездкой." },
     { q: "Нужно ли покупать билеты в Эрмитаж заранее?", a: "Чтобы гарантированно попасть в музей в высокий летний сезон и не стоять часами в кассах, билеты с фиксированным временем входа необходимо приобретать онлайн на официальном сайте." },
-    ],
+    ]
   },
   moscow: {
     brief:
@@ -1547,7 +1522,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           mskPresetStop('Парк Зарядье', { locationSlug: 'moscow-park-zaryad-e', latitude: 55.7512, longitude: 37.629 }),
           mskPresetStop('Парящий мост в Зарядье', { locationSlug: 'moscow-paryaschiy-most-zaryadya', latitude: 55.7498, longitude: 37.6285 }),
           mskPresetStop('Казанский собор на Красной площади', { locationSlug: 'moscow-kazanskiy-sobor-krasnaya', latitude: 55.7553, longitude: 37.619 }),
-        ],
+        ]
       },
       {
         id: 'msk-2',
@@ -1562,7 +1537,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           mskPresetStop('ГМИИ имени Пушкина', { venueSlug: 'moscow-gmii-imeni-pushkina', latitude: 55.7473, longitude: 37.6051 }),
           mskPresetStop('Музеон', { locationSlug: 'moscow-muzeon', latitude: 55.7348, longitude: 37.6065 }),
           mskPresetStop('Новая Третьяковка', { venueSlug: 'moscow-novaya-tretyakovka', latitude: 55.7345, longitude: 37.6059 }),
-        ],
+        ]
       },
       {
         id: 'msk-3',
@@ -1575,7 +1550,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           mskPresetStop('Останкинская телебашня', { locationSlug: 'moscow-ostankinskaya-telebashnya', latitude: 55.8197, longitude: 37.6117 }),
           mskPresetStop('Смотровая Останкинской башни', { locationSlug: 'moscow-smotrovaya-ostankino', latitude: 55.8197, longitude: 37.6117 }),
           mskPresetStop('Аптекарский огород', { locationSlug: 'moscow-aptekarskiy-ogorod', latitude: 55.7785, longitude: 37.6355 }),
-        ],
+        ]
       },
       {
         id: 'msk-4',
@@ -1589,7 +1564,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           mskPresetStop('Музей современного искусства «Гараж»', { venueSlug: 'moscow-muzey-garazh', latitude: 55.7278, longitude: 37.6014 }),
           mskPresetStop('Москва-Сити', { locationSlug: 'moscow-moskva-siti', latitude: 55.7494, longitude: 37.5377 }),
           mskPresetStop('Смотровая Москва-Сити', { locationSlug: 'moscow-smotrovaya-moskva-siti', latitude: 55.7497, longitude: 37.5372 }),
-        ],
+        ]
       },
       {
         id: 'msk-5',
@@ -1600,7 +1575,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           mskPresetStop('Храм Вознесения в Коломенском', { locationSlug: 'moscow-hram-vozneseniya-kolomenskoe', latitude: 55.667, longitude: 37.6705 }),
           mskPresetStop('Царицыно', { locationSlug: 'moscow-tsaritsyno', latitude: 55.6156, longitude: 37.682 }),
           mskPresetStop('Даниловский рынок', { locationSlug: 'moscow-danilovskiy-rynok', latitude: 55.7105, longitude: 37.6215 }),
-        ],
+        ]
       },
     ],
     travel:
@@ -1610,13 +1585,13 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       description:
         'Главный городской праздник столицы - с водой, музыкой и салютом. В подборке уже собраны теплоходы и программы к Дню города, чтобы не искать их по всей афише.',
       href: '/moscow/den-goroda',
-      linkLabel: 'Открыть День города',
+      linkLabel: 'Открыть День города'
     },
     faq: [
       { q: 'Как выгоднее всего перемещаться по Москве туристу?', a: 'Самый быстрый и экономный способ - московское метро, МЦК и МЦД; для оплаты поездок лучше сразу приобрести транспортную карту «Тройка» и записать на нее безлимитный тариф на 1 или 3 суток.' },
       { q: 'Правда ли, что вход на Красную площадь бесплатный?', a: 'Да, вход на главную площадь страны бесплатный для всех, однако её могут временно закрывать во время масштабных государственных мероприятий или репетиций парадов.' },
       { q: 'Где найти лучшие смотровые площадки с панорамой города?', a: 'Виды на столицу открываются со смотровой на Воробьевых горах (бесплатно), с парящего моста в парке «Зарядье» и с высотных площадок в башнях «Москва-Сити».' },
-    ],
+    ]
   },
   kazan: {
     brief:
@@ -1624,22 +1599,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'А вы знали, что Казанский кремль - это единственная крепость в мире, где практически бок о бок стоят действующий православный Благовещенский собор и монументальная мусульманская мечеть Кул-Шариф?',
     mustSee: [
       { name: 'Казанский Кремль', desc: 'Объект ЮНЕСКО - белокаменная крепость с мечетью Кул-Шариф',
-        locationSlug: 'kazan-kazanskiy-kreml',
+        locationSlug: 'kazan-kazanskiy-kreml'
       },
       { name: 'Мечеть Кул-Шариф', desc: 'Главная мечеть Татарстана - символ возрождения культуры',
-        locationSlug: 'kazan-mechet-kul-sharif',
+        locationSlug: 'kazan-mechet-kul-sharif'
       },
       { name: 'Улица Баумана', desc: 'Пешеходная улица - «Казанский Арбат» с магазинами и кафе',
-        locationSlug: 'kazan-ulitsa-baumana',
+        locationSlug: 'kazan-ulitsa-baumana'
       },
       { name: 'Остров-град Свияжск', desc: 'Древний город-крепость на острове в устье Свияги',
-        locationSlug: 'kazan-ostrov-grad-sviyazhsk',
+        locationSlug: 'kazan-ostrov-grad-sviyazhsk'
       },
       { name: 'Храм всех религий', desc: 'Уникальный архитектурный комплекс - 16 конфессий под одной крышей',
-        locationSlug: 'kazan-hram-vseh-religiy',
+        locationSlug: 'kazan-hram-vseh-religiy'
       },
       { name: 'Кремлёвская набережная', desc: 'Благоустроенный променад у стен Кремля с видами на Казанку',
-        locationSlug: 'kazan-kremlevskaya-naberezhnaya',
+        locationSlug: 'kazan-kremlevskaya-naberezhnaya'
       },
     ],
     travel:
@@ -1648,7 +1623,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "Нужно ли покупать билет для входа в Казанский Кремль?", a: "Проход на саму территорию Кремля, в мечеть Кул-Шариф и Благовещенский собор абсолютно бесплатный круглые сутки, билеты требуются только в музеи (например, филиал Эрмитажа)." },
     { q: "Как добраться из Казани до Вселенского Храма (Храма всех религий)?", a: "Необычный архитектурный комплекс расположен в поселке Старое Аракчино; туда проще всего доехать на пригородной электричке за 15 минут или на городском автобусе №2." },
     { q: "Где купить самый свежий и вкусный чак-чак?", a: "Самый аутентичный чак-чак продается в магазинах при Казанском хлебозаводе №3, в Музее чак-чака в Старо-Татарской слободе или в фирменной сети супермаркетов «Бахетле»." },
-    ],
+    ]
   },
   kaliningrad: {
     brief:
@@ -1657,142 +1632,142 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     mustSee: [
       { name: 'Кафедральный собор', desc: 'Главный готический храм города XIV века на острове Канта, где находится самый большой органный комплекс в России',
         locationSlug: 'kaliningrad-kafedral-nyy-sobor',
-        mustSeeFilter: 'main',
+        mustSeeFilter: 'main'
       },
       { name: 'Музей Мирового океана', desc: 'Масштабный маринистический центр с аквариумами, глубоководными аппаратами и научно-исследовательским судном «Витязь»',
         venueSlug: 'kaliningrad-muzey-mirovogo-okeana',
-        mustSeeFilter: 'museum',
+        mustSeeFilter: 'museum'
       },
       { name: 'Музей янтаря', desc: 'Уникальная экспозиция в крепостной башне Дона, хранящая многотонные самородки и шедевры ювелирного искусства',
         venueSlug: 'kaliningrad-muzey-yantarya',
-        mustSeeFilter: 'museum',
+        mustSeeFilter: 'museum'
       },
       { name: 'Калининградский музей изобразительных искусств', desc: 'Расположен в величественном здании бывшей Кёнигсбергской биржи, напоминающей флорентийское палаццо',
         venueSlug: 'kaliningrad-muzey-izobrazitelnyh-iskusstv',
-        mustSeeFilter: 'museum',
+        mustSeeFilter: 'museum'
         },
       { name: 'Музей «Бункер»', desc: 'Подземное бомбоубежище, в котором в апреле 1945 года немецкое командование подписало акт о капитуляции Кёнигсберга',
         venueSlug: 'kaliningrad-muzey-bunker',
-        mustSeeFilter: 'museum',
+        mustSeeFilter: 'museum'
         },
       { name: 'Форт № 5 «Король Фридрих Вильгельм III»', desc: 'Массивное оборонительное сооружение, принявшее на себя один из самых яростных ударов во время штурма города',
         venueSlug: 'kaliningrad-fort-5',
-        mustSeeFilter: 'museum',
+        mustSeeFilter: 'museum'
         },
       { name: 'Историко-художественный музей', desc: 'Главный архив памяти региона, расположенный в отреставрированном здании городского концертного зала Штадтхалле',
         venueSlug: 'kaliningrad-istoriko-hudozhestvennyy-muzey',
-        mustSeeFilter: 'museum',
+        mustSeeFilter: 'museum'
         },
       { name: 'Арт-пространство «Ворота»', desc: 'Креативный кластер в Закхаймских воротах, объединяющий выставки современных художников и кофейню',
         venueSlug: 'kaliningrad-art-prostranstvo-vorota',
-        mustSeeFilter: 'museum',
+        mustSeeFilter: 'museum'
         },
       { name: 'Музей-квартира «Альтес Хаус» (Altes Haus)', desc: 'Аутентичный музей-квартира в старинном доме, воссоздающий быт кёнигсбергского купца рубежа XIX-XX веков',
         venueSlug: 'kaliningrad-muzey-kvartira-altes-haus',
-        mustSeeFilter: 'museum',
+        mustSeeFilter: 'museum'
         },
       { name: 'Музей «Водоканал»', desc: 'Атмосферный музей в водонапорной башне 1879 года, рассказывающий об эволюции городских инженерных систем',
         venueSlug: 'kaliningrad-muzey-vodokanal',
-        mustSeeFilter: 'museum',
+        mustSeeFilter: 'museum'
         },
       { name: 'Рыбная деревня', desc: 'Современный этнографический и ремесленный комплекс на набережной, стилизованный под старинный квартал в немецком стиле',
         locationSlug: 'kaliningrad-rybnaya-derevnya',
-        mustSeeFilter: 'main',
+        mustSeeFilter: 'main'
       },
       { name: 'Район Амалиенау', desc: 'Чудом уцелевший в войну престижный немецкий квартал роскошных вилл эпохи модерна, построенный по концепции «город-сад»',
         locationSlug: 'kaliningrad-rayon-vill-amalienau',
-        mustSeeFilter: 'main',
+        mustSeeFilter: 'main'
       },
       { name: 'Район Марауненхоф', desc: 'Еще один старинный жилой квартал у Верхнего озера с самобытной немецкой застройкой начала XX века',
         locationSlug: 'kaliningrad-rayon-maraunenhof',
-        mustSeeFilter: 'main',
+        mustSeeFilter: 'main'
         },
       { name: 'Королевские ворота', desc: 'Самые нарядные городские ворота Кёнигсберга в стиле неоготики, украшенные горельефами великих правителей',
         locationSlug: 'kaliningrad-korolevskie-vorota',
-        mustSeeFilter: 'main',
+        mustSeeFilter: 'main'
         },
       { name: 'Бранденбургские ворота', desc: 'Единственные из семи сохранившихся городских ворот, которые до сих пор используются по прямому назначению - через них ездят машины и трамваи',
         locationSlug: 'kaliningrad-brandenburgskie-vorota',
-        mustSeeFilter: 'main',
+        mustSeeFilter: 'main'
         },
       { name: 'Фридландские ворота', desc: 'Готические ворота, внутри которых работает интерактивный музей с виртуальной прогулкой по улицам старого Кёнигсберга',
         locationSlug: 'kaliningrad-fridlandskie-vorota',
-        mustSeeFilter: 'main',
+        mustSeeFilter: 'main'
         },
       { name: 'Росгартенские ворота', desc: 'Исторические ворота с оборонительным рвом, в которых сегодня открыт знаменитый рыбный ресторан',
         locationSlug: 'kaliningrad-rosgartenskie-vorota',
-        mustSeeFilter: 'main',
+        mustSeeFilter: 'main'
         },
       { name: 'Здание Кёнигсбергской биржи', desc: 'Шедевр неоренессанса на берегу Преголи, построенный по проекту знаменитого архитектора Генриха Мюллера',
-        mustSeeFilter: 'main',
+        mustSeeFilter: 'main'
       },
       { name: 'Дом Советов', desc: 'Легендарный и монументальный долгострой в стиле брутализма, возведенный на месте разрушенного Королевского замка (главный символ советского периода)',
         locationSlug: 'kaliningrad-dom-sovetov',
-        mustSeeFilter: 'main',
+        mustSeeFilter: 'main'
         },
       { name: 'Остров Канта (Кнайпхоф)', desc: 'Зеленый остров-парк посреди реки Преголи, где похоронен великий философ Иммануил Кант',
         locationSlug: 'kaliningrad-ostrov-kanta',
-        mustSeeFilter: 'park',
+        mustSeeFilter: 'park'
         },
       { name: 'Верхнее озеро', desc: 'Благоустроенная рекреационная зона с многокилометровыми велодорожками, фонтанами и детскими площадками',
         locationSlug: 'kaliningrad-verhnee-ozero',
-        mustSeeFilter: 'park',
+        mustSeeFilter: 'park'
         },
       { name: 'Нижнее озеро', desc: 'Старейший искусственный водоем города, созданный рыцарями Тевтонского ордена еще в XIII веке',
         locationSlug: 'kaliningrad-nizhnee-ozero',
-        mustSeeFilter: 'park',
+        mustSeeFilter: 'park'
         },
       { name: 'Центральный парк культуры и отдыха', desc: 'Бывший парк Луизанваль, где находится необычная кирха памяти королевы Луизы (ныне кукольный театр)',
         locationSlug: 'kaliningrad-tsentralnyy-park',
-        mustSeeFilter: 'park',
+        mustSeeFilter: 'park'
         },
       { name: 'Калининградский зоопарк', desc: 'Один из старейших и крупнейших зоопарков в России, основанный немецким предпринимателем Германом Клаассом в 1896 году',
         locationSlug: 'kaliningrad-zoopark',
-        mustSeeFilter: 'park',
+        mustSeeFilter: 'park'
         },
       { name: 'Памятник «Борющиеся зубры»', desc: 'Знаменитая скульптурная композиция работы Августа Гауля, ставшая любимым местом встреч студентов',
         locationSlug: 'kaliningrad-pamyatnik-boruschiesya-zubry',
-        mustSeeFilter: 'park',
+        mustSeeFilter: 'park'
         },
       { name: 'Памятник Иммануилу Канту', desc: 'Отреставрированный бронзовый монумент мыслителю, расположенный возле здания Балтийского федерального университета',
         locationSlug: 'kaliningrad-pamyatnik-immanuilu-kantu',
-        mustSeeFilter: 'park',
+        mustSeeFilter: 'park'
         },
       { name: 'Крестовоздвиженский собор (Кирха Креста)', desc: 'Величественный храм начала XX века с уникальным иконостасом из местного янтаря',
         locationSlug: 'kaliningrad-krestovozdvizhenskiy-sobor',
-        mustSeeFilter: 'temple',
+        mustSeeFilter: 'temple'
         },
       { name: 'Храм Христа Спасителя', desc: 'Главный православный собор города на площади Победы, построенный в традициях владимиро-суздальского зодчества',
         locationSlug: 'kaliningrad-hram-hrista-spasitelya',
-        mustSeeFilter: 'temple',
+        mustSeeFilter: 'temple'
         },
       { name: 'Кирха Святой Семейства', desc: 'Неоготический шедевр архитектора Фридриха Хайтманна, в здании которого сейчас работает концертный зал филармонии',
         venueSlug: 'kaliningrad-kirkha-svyatogo-semeystva',
-        mustSeeFilter: 'temple',
+        mustSeeFilter: 'temple'
         },
       { name: 'Юдиттен-кирха', desc: 'Самая старая постройка в Калининграде (XIII век), дошедшая до нас из эпохи рыцарей Тевтонского ордена (ныне Свято-Никольский храм)',
         locationSlug: 'kaliningrad-yuditten-kirkha',
-        mustSeeFilter: 'temple',
+        mustSeeFilter: 'temple'
         },
       { name: 'Ресторан «Штайндамм 99»', desc: 'Гастрономическое место в старинном доме, специализирующееся на локальной балтийской кухне (оленина, клопсы, местная рыба)',
         locationSlug: 'kaliningrad-shtayndamm-99',
-        mustSeeFilter: 'gastro',
+        mustSeeFilter: 'gastro'
       },
       { name: 'Гастробар «Соль»', desc: 'Стильное заведение с современной авторской кухней и сильным акцентом на локальные морепродукты',
         locationSlug: 'kaliningrad-gastrobar-sol',
-        mustSeeFilter: 'gastro',
+        mustSeeFilter: 'gastro'
       },
       { name: 'Zotler Bier', desc: 'Классический пивной ресторан с баварскими традициями и огромным выбором импортного и крафтового пива',
         locationSlug: 'kaliningrad-zotler-bier',
-        mustSeeFilter: 'gastro',
+        mustSeeFilter: 'gastro'
       },
       { name: 'Ресторан «Редюит»', desc: 'Ресторан-пивоварня, расположенный в аутентичном оборонительном редюите XIX века',
         locationSlug: 'kaliningrad-redyuit',
-        mustSeeFilter: 'gastro',
+        mustSeeFilter: 'gastro'
       },
       { name: 'Магазин-музей «Кёнигсбергский марципан»', desc: 'Бранденбургские ворота стали домом для сладкого бренда города, где можно попробовать марципановый кофе и купить сувениры',
         locationSlug: 'kaliningrad-kenigsbergskiy-martsipan',
-        mustSeeFilter: 'gastro',
+        mustSeeFilter: 'gastro'
       },
     ],
     significantSuburbs: [
@@ -1894,13 +1869,13 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         description: 'Рыбная деревня, остров Канта, немецкий квартал, музейная флотилия, Амалиенау и ужин.',
         stops: [
           { name: 'Рыбная деревня', desc: 'Старт у Преголи', locationSlug: 'kaliningrad-rybnaya-derevnya', transitTip: 'Старт у Преголи / Рыбной деревни' },
-          { name: 'Кафедральный собор', desc: 'Готика и орган на острове Канта', locationSlug: 'kaliningrad-kafedral-nyy-sobor', transitTip: 'Пешком через Медовый мост на остров Канта ~5-7 мин' },
-          { name: 'Остров Канта (Кнайпхоф)', desc: 'Парк и могила философа', locationSlug: 'kaliningrad-ostrov-kanta', transitTip: 'Пешком по острову от собора' },
-          { name: 'Ресторан «Штайндамм 99»', desc: 'Обед в историческом квартале', locationSlug: 'kaliningrad-shtayndamm-99', transitTip: 'Пешком в немецкий квартал / обед ~10 мин' },
-          { name: 'Музей Мирового океана', desc: 'Флотилия и Б-413', venueSlug: 'kaliningrad-muzey-mirovogo-okeana', transitTip: 'Пешком вдоль Преголи к флотилии ~10-12 мин' },
+          { name: 'Кафедральный собор', desc: 'Готика и орган на острове Канта', locationSlug: 'kaliningrad-kafedral-nyy-sobor'},
+          { name: 'Остров Канта (Кнайпхоф)', desc: 'Парк и могила философа', locationSlug: 'kaliningrad-ostrov-kanta'},
+          { name: 'Ресторан «Штайндамм 99»', desc: 'Обед в историческом квартале', locationSlug: 'kaliningrad-shtayndamm-99'},
+          { name: 'Музей Мирового океана', desc: 'Флотилия и Б-413', venueSlug: 'kaliningrad-muzey-mirovogo-okeana'},
           { name: 'Район Амалиенау', desc: 'Прогулка среди вилл', locationSlug: 'kaliningrad-rayon-vill-amalienau', transitTip: 'Авто / такси ~10-15 мин к виллам Амалиенау' },
-          { name: 'Гастробар «Соль»', desc: 'Вечерняя гастро-пауза', locationSlug: 'kaliningrad-gastrobar-sol', transitTip: 'Такси / пешком к ужину в центре ~15 мин' },
-        ],
+          { name: 'Гастробар «Соль»', desc: 'Вечерняя гастро-пауза', locationSlug: 'kaliningrad-gastrobar-sol', transitTip: 'Такси к ужину в центре ~15 мин'},
+        ]
       },
       {
         id: 'kaliningrad-coast-curonian-zelenogradsk',
@@ -1913,7 +1888,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           { name: 'Дюна Эфа', desc: '42 км, дальняя точка', locationSlug: 'kaliningrad-dyuna-efa' },
           { name: 'Орнитологическая станция «Фрингилла»', desc: 'На возврате к 15:00-16:00' },
           { name: 'Зеленоградск (Кранц)', desc: 'Курортный проспект - Мурариум - променад' },
-        ],
+        ]
       },
       {
         id: 'kaliningrad-coast-svetlogorsk-yantarny',
@@ -1924,7 +1899,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           { name: 'Светлогорск (Раушен)', desc: 'Башня - вилла Порр - Зодиак - канатка' },
           { name: 'Янтарный (Пальмикен)', desc: 'Комбинат - замок - парк - пляж' },
           { name: 'Смотровая площадка Янтарного комбината', desc: 'Авто к открытию', locationSlug: 'kaliningrad-yantarnyy-kombinat' },
-        ],
+        ]
       },
     ],
     travel:
@@ -1933,7 +1908,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "Где в Калининграде послушать знаменитый органный концерт?", a: "Самые масштабные органные концерты на крупнейшем в России органном комплексе проходят ежедневно в Кафедральном соборе на острове Канта." },
     { q: "Как найти всех хомлинов в городе?", a: "Хомлины - это забавные крошечные бронзовые фигурки мифических существ, спрятанные на главных достопримечательностях города (у Музея янтаря, зоопарка, на Медовом мосту), их поиск превращается в увлекательный квест." },
     { q: "Что такое клопсы и где их попробовать?", a: "Калининградские клопсы - это традиционное восточнопрусское блюдо в виде нежных мясных тефтелей в белом соусе с каперсами, которое подают практически во всех ресторанах немецкой и балтийской кухни города." },
-    ],
+    ]
   },
   vladimir: {
     brief:
@@ -1941,22 +1916,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'Знаете ли вы, что знаменитые Золотые ворота во Владимире - это единственный сохранившийся элемент древнерусских городских крепостных укреплений в мире?',
     mustSee: [
       { name: 'Золотые ворота', desc: 'Триумфальная арка 1164 года - символ города',
-        locationSlug: 'vladimir-zolotye-vorota',
+        locationSlug: 'vladimir-zolotye-vorota'
       },
       { name: 'Успенский собор', desc: 'Шедевр XII века с фресками Андрея Рублёва (ЮНЕСКО)',
-        locationSlug: 'vladimir-uspenskiy-sobor',
+        locationSlug: 'vladimir-uspenskiy-sobor'
       },
       { name: 'Дмитриевский собор', desc: 'Белокаменная резьба XII века - 600 рельефов (ЮНЕСКО)',
-        locationSlug: 'vladimir-dmitrievskiy-sobor',
+        locationSlug: 'vladimir-dmitrievskiy-sobor'
       },
       { name: 'Патриаршие сады', desc: 'Живописный сад XVI века с видом на Клязьму',
-        locationSlug: 'vladimir-patriarshie-sady',
+        locationSlug: 'vladimir-patriarshie-sady'
       },
       { name: 'Водонапорная башня', desc: 'Музей «Старый Владимир» с панорамной площадкой',
-        locationSlug: 'vladimir-vodonapornaya-bashnya',
+        locationSlug: 'vladimir-vodonapornaya-bashnya'
       },
       { name: 'Георгиевская улица', desc: 'Пешеходный «владимирский Арбат» с ремесленными двориками',
-        locationSlug: 'vladimir-georgievskaya-ulitsa',
+        locationSlug: 'vladimir-georgievskaya-ulitsa'
       },
     ],
     travel:
@@ -1965,7 +1940,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "Далеко ли от Владимира находится знаменитый храм Покрова на Нерли?", a: "Шедевр древнерусского зодчества расположен в 12 км от города в поселке Боголюбово; от ж/д станции до храма нужно пройти пешком около 1,5 км по живописному лугу." },
     { q: "Можно ли зайти внутрь Золотых ворот?", a: "Да, внутри этой уникальной оборонительной арки XII века сегодня открыта военно-историческая экспозиция с масштабной диорамой штурма города Батыем." },
     { q: "Что привезти из Владимира в качестве сувенира?", a: "Популярностью пользуются традиционная владимирская вишня (в виде варенья или наливок), изделия из суздальской глины и местный печатный пряник." },
-    ],
+    ]
   },
   yaroslavl: {
     brief:
@@ -1973,22 +1948,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'А вы знали, что Ярославль - это родина первого в мире коммерческого синтетического каучука? Именно на местном заводе в 1932 году ученый Сергей Лебедев впервые в истории запустил массовое производство искусственной резины, полностью изменив мировую автоиндустрию.',
     mustSee: [
       { name: 'Ярославский кремль (Спасо-Преображенский монастырь)', desc: 'Древнее укреплённое ядро города, где было найдено «Слово о полку Игореве»',
-        locationSlug: 'yaroslavl-yaroslavskiy-kreml-spaso-preobrazhenskiy-monastyr',
+        locationSlug: 'yaroslavl-yaroslavskiy-kreml-spaso-preobrazhenskiy-monastyr'
       },
       { name: 'Стрелка рек Волги и Которосли', desc: 'Место основания города с ландшафтными садами, светомузыкальными фонтанами и памятником тысячелетия',
-        locationSlug: 'yaroslavl-strelka-rek-volgi-i-kotorosli',
+        locationSlug: 'yaroslavl-strelka-rek-volgi-i-kotorosli'
       },
       { name: 'Волжская набережная', desc: 'Одна из красивейших прибрежных улиц на Волге с беседками-ротондами и старинными усадьбами',
-        locationSlug: 'yaroslavl-volzhskaya-naberezhnaya',
+        locationSlug: 'yaroslavl-volzhskaya-naberezhnaya'
       },
       { name: 'Церковь Ильи Пророка', desc: 'Шедевр русской архитектуры XVII века в самом центре города, знаменитый своими уникальными фресками',
-        locationSlug: 'yaroslavl-tserkov-il-i-proroka',
+        locationSlug: 'yaroslavl-tserkov-il-i-proroka'
       },
       { name: 'Губернаторский сад', desc: 'Уютный регулярный парк при усадьбе с выставкой современной скульптуры под открытым небом',
-        locationSlug: 'yaroslavl-gubernatorskiy-sad',
+        locationSlug: 'yaroslavl-gubernatorskiy-sad'
       },
       { name: 'Ярославский художественный музей', desc: 'Крупнейшая галерея провинциальной России с богатой коллекцией икон и русского авангарда',
-        venueSlug: 'yaroslavl-yaroslavskiy-hudozhestvennyy-muzey',
+        venueSlug: 'yaroslavl-yaroslavskiy-hudozhestvennyy-muzey'
       },
     ],
     travel:
@@ -1997,7 +1972,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "Правда ли, что весь исторический центр Ярославля находится под защитой ЮНЕСКО?", a: "Да, центральная часть города с уникальной регулярной радиальной планировкой XVIII века и десятками старинных каменных храмов официально включена в список Всемирного наследия ЮНЕСКО." },
     { q: "Какие достопримечательности Ярославля запечатлены на тысячерублевой купюре?", a: "На банкноте изображены знаменитый памятник Ярославу Мудрому на площади Богоявления, часовня Казанской иконы Божией Матери на набережной и величественная церковь Иоанна Предтечи в Толчкове." },
     { q: "Где находится знаменитая Стрелка и как до нее дойти?", a: "Стрелка — это живописный мыс у слияния рек Волги и Которосли с масштабным партером фонтанов и памятником 1000-летию города; до нее можно дойти пешком, двигаясь по Которосльной или Волжской набережной от Кремля." },
-    ],
+    ]
   },
   ekaterinburg: {
     brief:
@@ -2005,22 +1980,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'Знаете ли вы, что знаменитая американская Статуя Свободы в Нью-Йорке покрыта медью, которая была выплавлена именно на уральских заводах в окрестностях Екатеринбурга?',
     mustSee: [
       { name: 'Храм на Крови', desc: 'Величественный собор, построенный на месте дома Ипатьева, где была расстреляна царская семья',
-        locationSlug: 'ekaterinburg-hram-na-krovi',
+        locationSlug: 'ekaterinburg-hram-na-krovi'
       },
       { name: 'Плотинка (Исторический сквер)', desc: 'Сердце города на реке Исеть с сохранившимися постройками старинного завода',
-        locationSlug: 'ekaterinburg-plotinka-istoricheskiy-skver',
+        locationSlug: 'ekaterinburg-plotinka-istoricheskiy-skver'
       },
       { name: 'Ельцин Центр', desc: 'Масштабный интерактивный музей современной истории России и крупное культурное пространство',
-        locationSlug: 'ekaterinburg-el-tsin-tsentr',
+        locationSlug: 'ekaterinburg-el-tsin-tsentr'
       },
       { name: 'Смотровая площадка БЦ «Высоцкий»', desc: 'Открытая панорамная площадка на 52-м этаже небоскрёба с видом на весь город',
-        locationSlug: 'ekaterinburg-smotrovaya-ploschadka-bts-vysotskiy',
+        locationSlug: 'ekaterinburg-smotrovaya-ploschadka-bts-vysotskiy'
       },
       { name: 'Городок чекистов', desc: 'Уникальный жилой комплекс 1930-х годов, ярчайший памятник советского конструктивизма',
-        locationSlug: 'ekaterinburg-gorodok-chekistov',
+        locationSlug: 'ekaterinburg-gorodok-chekistov'
       },
       { name: 'Улица Вайнера', desc: 'Пешеходный центр города со множеством бронзовых скульптур, старинных усадеб и магазинов',
-        locationSlug: 'ekaterinburg-ulitsa-vaynera',
+        locationSlug: 'ekaterinburg-ulitsa-vaynera'
       },
     ],
     travel:
@@ -2029,7 +2004,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "Что за «Красная линия» нарисована на тротуарах в центре?", a: "Это специальный пешеходный маршрут длиной около 9 км, который самостоятельно ведет туристов мимо 35 главных достопримечательностей исторического центра." },
     { q: "Где проходит официальная граница между Европой и Азией?", a: "Масштабный мемориальный комплекс «Европа-Азия» расположен на 17-м километре Ново-Московского тракта, туда можно доехать на пригородном автобусе или такси за 20 минут." },
     { q: "Далеко ли от Храма на Крови до Ганиной Ямы?", a: "Монастырь на Ганиной Яме, связанный с трагической историей царской семьи, находится в 15 км от города; туда ходят автобусы от Северного автовокзала." },
-    ],
+    ]
   },
   'nizhny-novgorod': {
     brief:
@@ -2037,22 +2012,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'Знаете ли вы, что местная Чкаловская лестница построена в виде математической восьмерки, а её 560 ступеней - это почти в три раза больше, чем на знаменитой Потемкинской лестнице в Одессе? Отсюда открывается один из лучших панорамных видов в европейской части России.',
     mustSee: [
       { name: 'Нижегородский Кремль', desc: 'Древняя кирпичная крепость с 13 башнями и прогулочной зоной прямо по крепостной стене',
-        locationSlug: 'nizhny-novgorod-nizhegorodskiy-kreml',
+        locationSlug: 'nizhny-novgorod-nizhegorodskiy-kreml'
       },
       { name: 'Чкаловская лестница', desc: 'Монументальная лестница в виде восьмёрки, спускающаяся от Кремля к самой Волге',
-        locationSlug: 'nizhny-novgorod-chkalovskaya-lestnitsa',
+        locationSlug: 'nizhny-novgorod-chkalovskaya-lestnitsa'
       },
       { name: 'Большая Покровская улица', desc: 'Пешеходный маршрут через исторический центр с купеческой архитектурой и уличными театрами',
-        locationSlug: 'nizhny-novgorod-bol-shaya-pokrovskaya-ulitsa',
+        locationSlug: 'nizhny-novgorod-bol-shaya-pokrovskaya-ulitsa'
       },
       { name: 'Нижегородская канатная дорога', desc: 'Воздушная переправа через Волгу до города Бор с живописными видами на речные просторы',
-        locationSlug: 'nizhny-novgorod-nizhegorodskaya-kanatnaya-doroga',
+        locationSlug: 'nizhny-novgorod-nizhegorodskaya-kanatnaya-doroga'
       },
       { name: 'Стрелка рек Волги и Оки', desc: 'Место слияния двух великих рек, где расположены собор Александра Невского и современные пакгаузы',
-        locationSlug: 'nizhny-novgorod-strelka-rek-volgi-i-oki',
+        locationSlug: 'nizhny-novgorod-strelka-rek-volgi-i-oki'
       },
       { name: 'Набережная Фёдоровского', desc: 'Лучшая смотровая площадка города с благоустроенными террасами для встречи закатов',
-        locationSlug: 'nizhny-novgorod-naberezhnaya-fedorovskogo',
+        locationSlug: 'nizhny-novgorod-naberezhnaya-fedorovskogo'
       },
       { name: 'Нижегородская ярмарка', desc: 'Главный ярмарочный дом - символ купеческого Нижнего', locationSlug: 'nizhny-novgorod-nizhegorodskaya-yarmarka' },
       { name: 'Усадьба Рукавишниковых', desc: 'Купеческий дворец-музей на Верхне-Волжской', locationSlug: 'nizhny-novgorod-usadba-rukavishnikovyh' },
@@ -2176,7 +2151,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
             desc: 'действующее производство с экскурсиями; сувениры рядом',
             latitude: 56.7875,
             longitude: 44.4955,
-            transitTip: 'От вокзала пешком / короткое такси к фабрике'
+            transitTip: 'От вокзала короткое такси к фабрике'
           },
           {
             name: 'Хохломские ряды / сувениры',
@@ -2281,7 +2256,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
             desc: 'укреплённый ансамбль и главный храм на берегу Волги',
             latitude: 56.0835,
             longitude: 45.0615,
-            transitTip: 'Паром из Лыскова (~30 мин)',
+            transitTip: 'Паром из Лыскова (~30 мин)'
           },
           {
             name: 'Крепостные стены / волжская смотровая',
@@ -2313,7 +2288,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           { name: 'Чкаловская лестница', desc: 'Спуск к Волге', locationSlug: 'nizhny-novgorod-chkalovskaya-lestnitsa' },
           { name: 'Нижне-Волжская набережная', desc: 'Променад у воды', locationSlug: 'nizhny-novgorod-nizhne-volzhskaya-naberezhnaya' },
           { name: 'Катер «Герой»', desc: 'Финал у воды', locationSlug: 'nizhny-novgorod-kater-geroy' },
-        ],
+        ]
       },
       {
         id: 'nn-instagram',
@@ -2329,7 +2304,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           { name: 'Почаинский бульвар', desc: 'Ракурс на Кремль', locationSlug: 'nizhny-novgorod-pochainskiy-bulvar' },
           { name: 'Государственный банк', desc: 'Сказочный терем', locationSlug: 'nizhny-novgorod-gosudarstvennyy-bank' },
           { name: 'Юла Pizza', desc: 'Опциональная гастро-пауза', venueSlug: 'nizhny-novgorod-yula-pizza' },
-        ],
+        ]
       },
       {
         id: 'nn-history-gastro',
@@ -2344,7 +2319,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           { name: 'Домик Петра I', desc: 'Допетровские палаты', locationSlug: 'nizhny-novgorod-domik-petra-i' },
           { name: 'Yale', desc: 'Ужин в усадьбе', venueSlug: 'nizhny-novgorod-yale-restaurant' },
           { name: 'Фонотека', desc: 'Вечерняя точка', venueSlug: 'nizhny-novgorod-fonoteca-bar' },
-        ],
+        ]
       },
       {
         id: 'nn-gorodets-day',
@@ -2355,18 +2330,18 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           'Выезд к 8:30-9:00 - дорога ~1,5 часа. Финал у причала; такси ~5 мин обратно на автостанцию.',
         travelVector: 'Автостанция - монастырь - музейный квартал - Волга',
         stops: [
-          { name: 'Феодоровский монастырь', desc: 'Старт после автостанции', transitTip: '7-10 мин пешком от автостанции' },
-          { name: 'Торговая площадь / центр', desc: 'Историческое ядро', transitTip: 'Пешком вниз к центру' },
-          { name: 'Музей городецкого пряника', desc: 'Пряничная традиция', transitTip: 'Пешком в музейный квартал' },
-          { name: 'Музей самоваров', desc: 'Коллекция самоваров', transitTip: '2-5 мин пешком между музеями' },
-          { name: 'Музей городецкой росписи', desc: 'Промысел', transitTip: 'Пешком в том же квартале' },
-          { name: 'Набережная Волги / Революции', desc: 'Променад', transitTip: 'Пешком к Волге' },
+          { name: 'Феодоровский монастырь', desc: 'Старт после автостанции'},
+          { name: 'Торговая площадь / центр', desc: 'Историческое ядро'},
+          { name: 'Музей городецкого пряника', desc: 'Пряничная традиция'},
+          { name: 'Музей самоваров', desc: 'Коллекция самоваров'},
+          { name: 'Музей городецкой росписи', desc: 'Промысел'},
+          { name: 'Набережная Волги / Революции', desc: 'Променад'},
           {
             name: 'Детский музейный центр «Город мастеров»',
             desc: 'Финал у причала',
-            transitTip: 'Финал у причала; такси ~5 мин на автостанцию',
+            transitTip: 'Финал у причала; такси ~5 мин на автостанцию'
           },
-        ],
+        ]
       },
       {
         id: 'nn-semenov-day',
@@ -2378,17 +2353,15 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         stops: [
           {
             name: 'Фабрика «Хохломская роспись»',
-            desc: 'Производство и сувениры рядом',
-            transitTip: 'От вокзала пешком / короткое такси',
+            desc: 'Производство и сувениры рядом', transitTip: 'Короткое такси от вокзала'
           },
-          { name: 'Музейно-туристический центр «Золотая хохлома»', desc: 'Экспозиция промысла', transitTip: 'Пешком к МТЦ' },
-          { name: 'Исторический центр / пл. Ленина', desc: 'Центр города', transitTip: 'Пешком в центр' },
+          { name: 'Музейно-туристический центр «Золотая хохлома»', desc: 'Экспозиция промысла'},
+          { name: 'Исторический центр / пл. Ленина', desc: 'Центр города'},
           {
             name: 'Парк Победы',
-            desc: 'Зелёная пауза',
-            transitTip: 'Пешком в парк; к вокзалу - бонус музей Шарыгина',
+            desc: 'Зелёная пауза'
           },
-        ],
+        ]
       },
       {
         id: 'nn-diveevo-day',
@@ -2401,18 +2374,18 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           {
             name: 'Источник Серафима в Цыгановке',
             desc: 'Утренний дальний источник',
-            transitTip: 'Такси ~15 км утром',
+            transitTip: 'Такси ~15 км утром'
           },
           { name: 'Музей истории Дивеевской обители', desc: 'Контекст обители', transitTip: 'Возврат в монастырь' },
-          { name: 'Троицкий собор', desc: 'Мощи Серафима', transitTip: 'Пешком по обители' },
-          { name: 'Преображенский собор', desc: 'Второй собор', transitTip: 'Пешком между соборами' },
-          { name: 'Благовещенский собор', desc: 'Новый храм ансамбля', transitTip: 'Пешком по ансамблю' },
+          { name: 'Троицкий собор', desc: 'Мощи Серафима'},
+          { name: 'Преображенский собор', desc: 'Второй собор'},
+          { name: 'Благовещенский собор', desc: 'Новый храм ансамбля'},
           {
             name: 'Канавка Божьей Матери',
             desc: 'Обход после обеда',
-            transitTip: 'Вторая половина дня; ближние источники у обители',
+            transitTip: 'Вторая половина дня; ближние источники у обители'
           },
-        ],
+        ]
       },
       {
         id: 'nn-makaryev-day',
@@ -2425,19 +2398,17 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           {
             name: 'Желтоводский Макариев монастырь / Троицкий собор',
             desc: 'Ансамбль на Волге',
-            transitTip: 'Паром из Лыскова ~30 мин',
+            transitTip: 'Паром из Лыскова ~30 мин'
           },
           {
             name: 'Крепостные стены / волжская смотровая',
-            desc: 'Стены и вид на Волгу',
-            transitTip: 'Пешком по двору к смотровой',
+            desc: 'Стены и вид на Волгу'
           },
           {
             name: 'Посёлок Макарьево',
-            desc: 'Посад у стен',
-            transitTip: 'Пешком в посёлок; ферма - бонус',
+            desc: 'Посад у стен'
           },
-        ],
+        ]
       },
 
     ],
@@ -2447,7 +2418,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "Правда ли, что Нижегородский кремль можно обойти целиком по стене?", a: "Да, это единственный кремль в России, у которого полностью сохранился и доступен для туристов сквозной круговой пешеходный маршрут по боевому ходу стены протяженностью более 2 километров." },
     { q: "Как работает знаменитая Нижегородская канатная дорога?", a: "Она связывает Нижний Новгород с городом-спутником Бор через Волгу, выполняя роль общественного транспорта, и одновременно служит популярным аттракционом с потрясающими панорамными видами." },
     { q: "Сколько ступеней на Чкаловской лестнице и сложно ли по ней подняться?", a: "Лестница насчитывает 560 ступеней, выполненных в виде гигантской восьмерки; неспешный подъем от набережной к памятнику Чкалову занимает около 10-15 минут и требует базовой физической формы." },
-    ],
+    ]
   },
   novosibirsk: {
     brief:
@@ -2455,22 +2426,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'А вы знали, что местный Новосибирский театр оперы и балета - самый большой театральный комплекс в России? Под его гигантским куполом мог бы полностью поместиться московский Большой театр вместе со всей прилегающей площадью.',
     mustSee: [
       { name: 'Новосибирский театр оперы и балета (НОВАТ)', desc: 'Крупнейшее театральное здание России с грандиозным серебристым куполом',
-        venueSlug: 'novosibirsk-novosibirskiy-teatr-opery-i-baleta-novat',
+        venueSlug: 'novosibirsk-novosibirskiy-teatr-opery-i-baleta-novat'
       },
       { name: 'Новосибирский зоопарк имени Р. А. Шило', desc: 'Один из самых больших зоопарков страны, расположенный прямо в естественном сосновом бору',
-        locationSlug: 'novosibirsk-novosibirskiy-zoopark-imeni-r-a-shilo',
+        locationSlug: 'novosibirsk-novosibirskiy-zoopark-imeni-r-a-shilo'
       },
       { name: 'Музей мировой погребальной культуры', desc: 'Единственный в России уникальный музей, посвящённый траурным традициям разных эпох',
-        venueSlug: 'novosibirsk-muzey-mirovoy-pogrebal-noy-kul-tury',
+        venueSlug: 'novosibirsk-muzey-mirovoy-pogrebal-noy-kul-tury'
       },
       { name: 'Академгородок', desc: 'Знаменитый научный центр среди леса, Центральный сибирский ботанический сад и Обское море',
-        locationSlug: 'novosibirsk-akademgorodok',
+        locationSlug: 'novosibirsk-akademgorodok'
       },
       { name: 'Михайловская набережная', desc: 'Отреставрированная современная зона отдыха у реки Обь с аттракционами и сценой',
-        locationSlug: 'novosibirsk-mihaylovskaya-naberezhnaya',
+        locationSlug: 'novosibirsk-mihaylovskaya-naberezhnaya'
       },
       { name: 'Новосибирский художественный музей', desc: 'Галерея с богатым собранием русской живописи и постоянной выставкой картин Николая Рериха',
-        venueSlug: 'novosibirsk-novosibirskiy-hudozhestvennyy-muzey',
+        venueSlug: 'novosibirsk-novosibirskiy-hudozhestvennyy-muzey'
       },
     ],
     travel:
@@ -2479,7 +2450,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "Правда ли, что Новосибирский театр оперы и балета — самый большой в России?", a: "Да, здание НОВАТ является крупнейшим театральным зданием страны, его грандиозный купол под своей крышей мог бы полностью вместить московский Большой театр." },
     { q: "Как добраться из центра до Новосибирского Академгородка?", a: "Научный городок расположен в 30 км от центра; быстрее всего туда доехать на пригородной электричке до станции «Сеятель» или «Обское Море», либо на маршрутном такси №35 от станции метро «Речной вокзал»." },
     { q: "Чем знаменит Новосибирский зоопарк имени Р. А. Шило?", a: "Это один из крупнейших зоопарков России, расположенный в настоящем сосновом бору, который всемирно известен успешным разведением редких кошачьих, включая уникальных лигров." },
-    ],
+    ]
   },
   krasnoyarsk: {
     brief:
@@ -2487,22 +2458,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'А вы знали, что виды Красноярска буквально каждый россиянин держит в руках почти каждый день? Именно местный Коммунальный мост, часовня Параскевы Пятницы и знаменитая Красноярская ГЭС изображены на десятирублевой купюре.',
     mustSee: [
       { name: 'Национальный парк «Красноярские Столбы»', desc: 'Визитная карточка Сибири, знаменитые скалы-останцы среди бескрайней тайги',
-        locationSlug: 'krasnoyarsk-natsional-nyy-park-krasnoyarskie-stolby',
+        locationSlug: 'krasnoyarsk-natsional-nyy-park-krasnoyarskie-stolby'
       },
       { name: 'Караульная гора и часовня Параскевы Пятницы', desc: 'Исторический символ города, изображённый на 10-рублёвой купюре',
-        locationSlug: 'krasnoyarsk-karaul-naya-gora-i-chasovnya-paraskevy-pyatnitsy',
+        locationSlug: 'krasnoyarsk-karaul-naya-gora-i-chasovnya-paraskevy-pyatnitsy'
       },
       { name: 'Центральная набережная Енисея', desc: 'Многоуровневое современное пространство для прогулок вдоль могучей сибирской реки',
-        locationSlug: 'krasnoyarsk-tsentral-naya-naberezhnaya-eniseya',
+        locationSlug: 'krasnoyarsk-tsentral-naya-naberezhnaya-eniseya'
       },
       { name: 'Пешеходный мост на остров Татышев', desc: 'Вантовый мост, ведущий в огромный зелёный остров-парк посреди Енисея',
-        locationSlug: 'krasnoyarsk-peshehodnyy-most-na-ostrov-tatyshev',
+        locationSlug: 'krasnoyarsk-peshehodnyy-most-na-ostrov-tatyshev'
       },
       { name: 'Музей-усадьба В. И. Сурикова', desc: 'Старинная казачья усадьба XIX века, где родился и вырос великий русский художник',
-        venueSlug: 'krasnoyarsk-muzey-usad-ba-v-i-surikova',
+        venueSlug: 'krasnoyarsk-muzey-usad-ba-v-i-surikova'
       },
       { name: 'Пароход-музей «Святитель Николай»', desc: 'Историческое судно на вечной стоянке, связанное с именами Николая II и Ленина',
-        venueSlug: 'krasnoyarsk-parohod-muzey-svyatitel-nikolay',
+        venueSlug: 'krasnoyarsk-parohod-muzey-svyatitel-nikolay'
       },
     ],
     travel:
@@ -2511,7 +2482,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "Далеко ли от центра города находится национальный парк «Красноярские Столбы»?", a: "Центральный вход в нацпарк расположен фактически на окраине города, туда можно легко доехать на обычном городском автобусе №50 от ж/д вокзала за 40 минут." },
     { q: "Какая достопримечательность Красноярска изображена на десятирублевой купюре?", a: "На банкноте запечатлены знаменитый Коммунальный мост через Енисей, грандиозная Красноярская ГЭС и небольшая часовня Параскевы Пятницы на Караульной горе." },
     { q: "Где в городе попробовать блюда аутентичной сибирской кухни?", a: "Высокая сибирская кухня с блюдами из строганины, оленины, сугудая из северной рыбы и десертами с таежными ягодами широко представлена в знаменитых красноярских ресторанах «Тунгуска» и «Чешуя»." },
-    ],
+    ]
   },
   tula: {
     brief:
@@ -2519,22 +2490,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'Знаете ли вы, что в Туле выпекают самый большой печатный пряник в мире? Местные кондитеры попали в Книгу рекордов, создав пряничного гиганта весом рекордные 143 килограмма и длиной почти три метра.',
     mustSee: [
       { name: 'Тульский Кремль', desc: 'Старинная каменная крепость XVI века в низине, полностью сохранившая свои стены и башни',
-        locationSlug: 'tula-tul-skiy-kreml',
+        locationSlug: 'tula-tul-skiy-kreml'
       },
       { name: 'Музей оружия («Шлем»)', desc: 'Ультрасовременное здание в виде богатырского шлема с богатейшей интерактивной экспозицией',
-        venueSlug: 'tula-muzey-oruzhiya-shlem',
+        venueSlug: 'tula-muzey-oruzhiya-shlem'
       },
       { name: 'Казанская набережная', desc: 'Благоустроенная пешеходная зона вдоль стен Кремля с мостиками, качелями и зонами отдыха',
-        locationSlug: 'tula-kazanskaya-naberezhnaya',
+        locationSlug: 'tula-kazanskaya-naberezhnaya'
       },
       { name: 'Творческий индустриальный кластер «Октава»', desc: 'Современное креативное пространство на территории действующего завода микрофонов',
-        locationSlug: 'tula-tvorcheskiy-industrial-nyy-klaster-oktava',
+        locationSlug: 'tula-tvorcheskiy-industrial-nyy-klaster-oktava'
       },
       { name: 'Музей «Тульский пряник»', desc: 'Небольшая уютная экспозиция об истории главного сладкого промысла города с дегустацией',
-        venueSlug: 'tula-muzey-tul-skiy-pryanik',
+        venueSlug: 'tula-muzey-tul-skiy-pryanik'
       },
       { name: 'Музей-усадьба Л. Н. Толстого «Ясная Поляна»', desc: 'Родовое имение писателя с сохранившейся обстановкой, парками и прудами (в пригороде)',
-        venueSlug: 'tula-muzey-usad-ba-l-n-tolstogo-yasnaya-polyana',
+        venueSlug: 'tula-muzey-usad-ba-l-n-tolstogo-yasnaya-polyana'
       },
     ],
     travel:
@@ -2543,7 +2514,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "Нужно ли покупать билет для входа на территорию Тульского кремля?", a: "Вход на саму историческую территорию кремля абсолютно бесплатный и открыт до позднего вечера, билеты требуются только для подъема на стены и в музеи внутри башен." },
     { q: "Далеко ли от Тулы находится усадьба Льва Толстого «Ясная Поляна»?", a: "Родовое имение великого писателя расположено в 15 км к югу от города; туда от автовокзала Тулы регулярно ходят пригородные маршрутные такси №114 и №280 (ехать около 30 минут)." },
     { q: "Где в Туле купить настоящий печатный пряник, который не зачерствеет на следующий день?", a: "Покупать знаменитые сувенирные пряники лучше всего в фирменных магазинах фабрик «Ясная Поляна» или «Старая Тула» прямо в центре города, обращая внимание на дату производства." },
-    ],
+    ]
   },
   samara: {
     brief:
@@ -2551,22 +2522,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'Знаете ли вы, что в Самаре находится самый глубокий из рассекреченных бункеров мира - Бункер Сталина? Он уходит под землю на 37 метров (высота 12-этажного дома), был построен в режиме строжайшей тайны за 9 месяцев и способен выдержать прямое попадание авиабомбы.',
     mustSee: [
       { name: 'Самарская набережная', desc: 'Самая длинная и благоустроенная речная прогулочная зона в России с песчаными пляжами',
-        locationSlug: 'samara-samarskaya-naberezhnaya',
+        locationSlug: 'samara-samarskaya-naberezhnaya'
       },
       { name: 'Бункер Сталина', desc: 'Секретный подземный объект глубиной 37 метров, построенный в годы Великой Отечественной войны',
-        locationSlug: 'samara-bunker-stalina',
+        locationSlug: 'samara-bunker-stalina'
       },
       { name: 'Площадь Славы', desc: 'Смотровая площадка на высоком берегу Волги с Монументом Славы и Вечным огнём',
-        locationSlug: 'samara-ploschad-slavy',
+        locationSlug: 'samara-ploschad-slavy'
       },
       { name: 'Музей «Самара Космическая»', desc: 'Фасад здания украшает настоящая ракета-носитель «Союз», внутри — экспозиция о космонавтике',
-        venueSlug: 'samara-muzey-samara-kosmicheskaya',
+        venueSlug: 'samara-muzey-samara-kosmicheskaya'
       },
       { name: 'Жигулёвский пивоваренный завод', desc: 'Один из старейших пивзаводов России (1881 год) с исторической кирпичной архитектурой',
-        locationSlug: 'samara-zhigulevskiy-pivovarennyy-zavod',
+        locationSlug: 'samara-zhigulevskiy-pivovarennyy-zavod'
       },
       { name: 'Католический костёл Пресвятого Сердца Иисуса', desc: 'Неоготический собор со шпилями, выделяющийся на фоне купеческой застройки',
-        locationSlug: 'samara-katolicheskiy-kostel-presvyatogo-serdtsa-iisusa',
+        locationSlug: 'samara-katolicheskiy-kostel-presvyatogo-serdtsa-iisusa'
       },
     ],
     travel:
@@ -2575,7 +2546,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "Правда ли, что Самарская набережная — самая длинная в России?", a: "Да, благоустроенная самарская набережная с песчаными пляжами, велодорожками и тенистыми аллеями протянулась вдоль Волги почти на 5 километров и считается одной из красивейших в стране." },
     { q: "Что такое Бункер Сталина и как туда попасть на экскурсию?", a: "Это уникальное секретное оборонительное сооружение глубиной 37 метров, построенное в годы войны на случай эвакуации правительства; музей расположен под зданием Академии культуры, и посещать его рекомендуется по предварительной записи." },
     { q: "Где попробовать то самое легендарное Жигулевское пиво?", a: "Попробовать свежайший культовый напиток, сваренный по традиционным рецептам, лучше всего в историческом баре «На дне» прямо у стен старинного Жигулевского пивоваренного завода." },
-    ],
+    ]
   },
   omsk: {
     brief:
@@ -2583,22 +2554,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'Знаете ли вы, что Федор Достоевский провел в Омском остроге четыре года каторги? Именно этот суровый сибирский опыт лег в основу его знаменитого романа «Записки из Мертвого дома», полностью изменив писателя.',
     mustSee: [
       { name: 'Омская крепость', desc: 'Историко-культурный комплекс на месте основания города, где отбывал каторгу Фёдор Достоевский',
-        locationSlug: 'omsk-omskaya-krepost',
+        locationSlug: 'omsk-omskaya-krepost'
       },
       { name: 'Улица Чокана Валиханова', desc: 'Современный технологичный пешеходный бульвар со стеклянными кристаллами-информационными киосками',
-        locationSlug: 'omsk-ulitsa-chokana-valihanova',
+        locationSlug: 'omsk-ulitsa-chokana-valihanova'
       },
       { name: 'Любинский проспект (улица Ленина)', desc: 'Архитектурная жемчужина Сибири с цельным ансамблем купеческих зданий конца XIX века',
-        locationSlug: 'omsk-lyubinskiy-prospekt-ulitsa-lenina',
+        locationSlug: 'omsk-lyubinskiy-prospekt-ulitsa-lenina'
       },
       { name: 'Памятник «Слесарь Степаныч»', desc: 'Один из самых известных сантехнических памятников в мире, выглядывающий из люка',
-        locationSlug: 'omsk-pamyatnik-slesar-stepanych',
+        locationSlug: 'omsk-pamyatnik-slesar-stepanych'
       },
       { name: 'Успенский кафедральный собор', desc: 'Величественный пятиглавый храм в самом центре города, входящий в число главных святынь Сибири',
-        locationSlug: 'omsk-uspenskiy-kafedral-nyy-sobor',
+        locationSlug: 'omsk-uspenskiy-kafedral-nyy-sobor'
       },
       { name: 'Иртышская набережная', desc: 'Длинная прогулочная зона вдоль могучей реки, популярное место для пробежек и закатов',
-        locationSlug: 'omsk-irtyshskaya-naberezhnaya',
+        locationSlug: 'omsk-irtyshskaya-naberezhnaya'
       },
     ],
     travel:
@@ -2607,7 +2578,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "Где в Омске находится знаменитый памятник «Степаныч»?", a: "Бронзовая скульптура сантехника, добродушно выглядывающего из канализационного люка, расположена на Любинском проспекте (улица Ленина) и является неофициальным символом города." },
     { q: "Связана ли история Омска с писателем Федором Достоевским?", a: "Да, великий писатель провел в Омском остроге четыре года каторги; сегодня в городе открыт Литературный музей его имени, а на месте крепости сохранились подлинные Тобольские ворота." },
     { q: "Правда ли, что в Омске есть метро из одной станции?", a: "Официально омский метрополитен так и не был запущен, но построенная подземная станция «Библиотека имени Пушкина» сейчас работает как пешеходный переход и является популярным городским арт-объектом." },
-    ],
+    ]
   },
   ufa: {
     brief:
@@ -2615,22 +2586,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'Знаете ли вы, что уфимский памятник Салавату Юлаеву - это самая большая конная статуя в России и всей Европе? Этот уникальный 10-метровый бронзовый всадник весом 40 тонн уникален тем, что имеет всего три опорные точки на скале, нависающей над рекой Белой.',
     mustSee: [
       { name: 'Памятник Салавату Юлаеву', desc: 'Самая большая конная статуя в России, возвышающаяся на скалистом берегу реки Белой',
-        locationSlug: 'ufa-pamyatnik-salavatu-yulaevu',
+        locationSlug: 'ufa-pamyatnik-salavatu-yulaevu'
       },
       { name: 'Мечеть-медресе «Ляля-Тюльпан»', desc: 'Визитная карточка города, современный исламский центр с минаретами в виде бутонов тюльпанов',
-        locationSlug: 'ufa-mechet-medrese-lyalya-tyul-pan',
+        locationSlug: 'ufa-mechet-medrese-lyalya-tyul-pan'
       },
       { name: 'Фонтан «Семь девушек»', desc: 'Изящный музыкальный фонтан в Театральном сквере, созданный по мотивам башкирской легенды',
-        locationSlug: 'ufa-fontan-sem-devushek',
+        locationSlug: 'ufa-fontan-sem-devushek'
       },
       { name: 'Арт-Квадрат', desc: 'Оживлённый городской творческий кластер в историческом центре с галереями, кафе и стрит-артом',
-        locationSlug: 'ufa-art-kvadrat',
+        locationSlug: 'ufa-art-kvadrat'
       },
       { name: 'Гостиный двор', desc: 'Отреставрированный торговый комплекс XIX века, исторический и общественный центр Уфы',
-        locationSlug: 'ufa-gostinyy-dvor',
+        locationSlug: 'ufa-gostinyy-dvor'
       },
       { name: 'Монумент Дружбы', desc: 'Величественная стела на холме, заложенная в честь 400-летия добровольного вхождения Башкирии в состав России',
-        locationSlug: 'ufa-monument-druzhby',
+        locationSlug: 'ufa-monument-druzhby'
       },
     ],
     travel:
@@ -2639,7 +2610,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "Где находится знаменитый памятник Салавату Юлаеву?", a: "Самая большая конная статуя в России установлена на высоком утесе над рекой Белой на площади имени Салавата Юлаева и является главной визитной карточкой города." },
     { q: "Что такое уфимская куница и где её искать?", a: "Куница — исторический символ города, изображенный на гербе Уфы; забавный бронзовый арт-объект «Дом куницы» установлен на площади перед Гостиным двором." },
     { q: "Какой башкирский мед самый лучший и где его купить?", a: "Самым ценным считается дикий бортевой мед (бурзянский капский); покупать сладкий сувенир рекомендуется в специализированных фирменных магазинах «Башкирская пасека» или «Мед Башкирии»." },
-    ],
+    ]
   },
   'veliky-novgorod': {
     brief:
@@ -2647,22 +2618,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'Знаете ли вы, что Великий Новгород - единственный город древней Руси, который вообще не пострадал от монголо-татарского нашествия? Благодаря этому здесь полностью уцелела уникальная домонгольская архитектура XI века.',
     mustSee: [
       { name: 'Новгородский Детинец (Кремль)', desc: 'Один из старейших кремлей России, полностью сложенный из красного кирпича на берегу Волхова',
-        locationSlug: 'veliky-novgorod-novgorodskiy-detinets-kreml',
+        locationSlug: 'veliky-novgorod-novgorodskiy-detinets-kreml'
       },
       { name: 'Памятник «Тысячелетие России»', desc: 'Монументальный бронзовый памятник в Кремле, на котором отлиты 129 главных фигур русской истории',
-        locationSlug: 'veliky-novgorod-pamyatnik-tysyacheletie-rossii',
+        locationSlug: 'veliky-novgorod-pamyatnik-tysyacheletie-rossii'
       },
       { name: 'Софийский собор', desc: 'Древнейший сохранившийся славянский храм на территории России, построенный в XI веке',
-        locationSlug: 'veliky-novgorod-sofiyskiy-sobor',
+        locationSlug: 'veliky-novgorod-sofiyskiy-sobor'
       },
       { name: 'Ярославово Дворище', desc: 'Исторический торговый квартал на противоположном берегу от Кремля с уникальной высокой концентрацией старинных церквей',
-        locationSlug: 'veliky-novgorod-yaroslavovo-dvorische',
+        locationSlug: 'veliky-novgorod-yaroslavovo-dvorische'
       },
       { name: 'Музей деревянного зодчества «Витославлицы»', desc: 'Масштабный этнографический парк под открытым небом с избами, церквями и мельницами',
-        locationSlug: 'veliky-novgorod-muzey-derevyannogo-zodchestva-vitoslavlitsy',
+        locationSlug: 'veliky-novgorod-muzey-derevyannogo-zodchestva-vitoslavlitsy'
       },
       { name: 'Рюриково Городище', desc: 'Археологический памятник на истоке Волхова, бывшая резиденция первых новгородских князей',
-        locationSlug: 'veliky-novgorod-ryurikovo-gorodische',
+        locationSlug: 'veliky-novgorod-ryurikovo-gorodische'
       },
     ],
     travel:
@@ -2671,7 +2642,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "Где находится Ярославово Дворище относительно Кремля?", a: "Оно расположено прямо напротив Кремля, на противоположном (Торговом) берегу Волхова, соединенном пешеходным Горбатым мостом." },
     { q: "Правда ли, что новгородская София — старейший храм России?", a: "Да, Софийский собор, построенный в середине XI века, официально признан самым древним из сохранившихся славянских храмов на территории РФ." },
     { q: "Какое фирменное блюдо стоит попробовать?", a: "Обязательно отведайте новгородские серые щи (крошево), запеченного ильменского судака и аутентичный местный мёд-ставлень." },
-    ],
+    ]
   },
   tver: {
     brief:
@@ -2679,22 +2650,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'Знаете ли вы, что именно тверской купец Афанасий Никитин совершил свое легендарное «хождение за три моря» и открыл для европейцев Индию за 25 лет до того, как туда доплыл знаменитый португальский мореплаватель Васко да Гама?',
     mustSee: [
       { name: 'Императорский путевой дворец', desc: 'Роскошное барочное здание XVIII века, построенное для отдыха Екатерины II по пути из Петербурга в Москву',
-        locationSlug: 'tver-imperatorskiy-putevoy-dvorets',
+        locationSlug: 'tver-imperatorskiy-putevoy-dvorets'
       },
       { name: 'Староволжский мост', desc: 'Визитная карточка города, ажурный консольный мост через Волгу, напоминающий мосты Будапешта',
-        locationSlug: 'tver-starovolzhskiy-most',
+        locationSlug: 'tver-starovolzhskiy-most'
       },
       { name: 'Набережная Степана Разина', desc: 'Парадный фасад города, застроенный по принципу «единой фасады» в стиле петербургской архитектуры',
-        locationSlug: 'tver-naberezhnaya-stepana-razina',
+        locationSlug: 'tver-naberezhnaya-stepana-razina'
       },
       { name: 'Памятник Афанасию Никитину', desc: 'Монумент знаменитому тверскому купцу-путешественнику, открывшему Индию задолго до Васко да Гамы',
-        locationSlug: 'tver-pamyatnik-afanasiyu-nikitinu',
+        locationSlug: 'tver-pamyatnik-afanasiyu-nikitinu'
       },
       { name: 'Памятник Михаилу Кругу', desc: 'Бронзовая скульптура знаменитого шансонье, сидящего с гитарой на скамейке на бульваре Радищева',
-        locationSlug: 'tver-pamyatnik-mihailu-krugu',
+        locationSlug: 'tver-pamyatnik-mihailu-krugu'
       },
       { name: 'Морозовский городок (Двор Пролетарки)', desc: 'Уникальный исторический комплекс фабричной краснокирпичной архитектуры рубежа XIX–XX веков',
-        locationSlug: 'tver-morozovskiy-gorodok-dvor-proletarki',
+        locationSlug: 'tver-morozovskiy-gorodok-dvor-proletarki'
       },
     ],
     travel:
@@ -2703,7 +2674,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "Правда ли, что Тверь застраивали по принципу Санкт-Петербурга?", a: "Да, после грандиозного пожара XVIII века по указу Екатерины II город получил уникальную радиально-лучевую планировку («трезубец»), копирующую застройку парадного Петербурга." },
     { q: "Где находится знаменитый памятник Михаилу Кругу?", a: "Бронзовый монумент известному шансонье, родившемуся в Твери, установлен на скамейке в самом центре города на бульваре Радищева и является культовым местом у его поклонников." },
     { q: "Как попасть на экскурсию в Императорский путевой дворец?", a: "Грандиозный дворцово-парковый комплекс расположен на Советской улице; внутри работает Тверская картинная галерея, билеты в которую можно приобрести прямо в кассе дворца." },
-    ],
+    ]
   },
   krasnodar: {
     brief:
@@ -2711,22 +2682,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'Знаете ли вы, что краснодарский Парк Галицкого признан одним из лучших современных парков в Европе? Его ландшафтная архитектура и уникальные арт-объекты спроектированы немецким бюро, создававшим стадионы для чемпионатов мира.',
     mustSee: [
       { name: 'Парк Галицкого (парк «Краснодар»)', desc: 'Один из лучших современных парков Европы с футуристичной архитектурой, амфитеатром и редкими растениями',
-        locationSlug: 'krasnodar-park-galitskogo-park-krasnodar',
+        locationSlug: 'krasnodar-park-galitskogo-park-krasnodar'
       },
       { name: 'Улица Красная', desc: 'Главная артерия города, которая по выходным становится полностью пешеходной зоной',
-        locationSlug: 'krasnodar-ulitsa-krasnaya',
+        locationSlug: 'krasnodar-ulitsa-krasnaya'
       },
       { name: 'Александровская триумфальная арка', desc: 'Царские ворота, возведённые в честь визита императора Александра III',
-        locationSlug: 'krasnodar-aleksandrovskaya-triumfal-naya-arka',
+        locationSlug: 'krasnodar-aleksandrovskaya-triumfal-naya-arka'
       },
       { name: 'Городской сад (парк Горького)', desc: 'Старейший парк города с вековыми дубами-великанами и ярким колесом обозрения',
-        locationSlug: 'krasnodar-gorodskoy-sad-park-gor-kogo',
+        locationSlug: 'krasnodar-gorodskoy-sad-park-gor-kogo'
       },
       { name: 'Мост Поцелуев', desc: 'Изящный пешеходный мост через затон реки Кубань, ведущий к тихой парковой зоне',
-        locationSlug: 'krasnodar-most-potseluev',
+        locationSlug: 'krasnodar-most-potseluev'
       },
       { name: 'Памятник Екатерине II', desc: 'Величественный монумент в Екатерининском сквере, посвящённый основательнице города кубанских казаков',
-        locationSlug: 'krasnodar-pamyatnik-ekaterine-ii',
+        locationSlug: 'krasnodar-pamyatnik-ekaterine-ii'
       },
     ],
     travel:
@@ -2735,7 +2706,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "Как попасть в знаменитый Парк Галицкого (парк «Краснодар»)?", a: "Парк расположен на улице Восточно-Кругликовская рядом со стадионом ФК «Краснодар», вход на его территорию абсолютно бесплатный для всех желающих в любое время суток (билеты нужны только в Японский сад, которые выдаются через инфоматы)." },
     { q: "Правда ли, что главную улицу города перекрывают для пешеходов?", a: "Да, историческая улица Красная в выходные и праздничные дни традиционно становится полностью пешеходной, превращаясь в площадку для уличных музыкантов, художников и масштабного променада." },
     { q: "Что привезти из Краснодара в подарок?", a: "Популярными сувенирами являются знаменитый краснодарский чай (самый северный чай в мире), кубанские вина от местных виноделен, каштановый мед и свежие южные фрукты." },
-    ],
+    ]
   },
   sochi: {
     brief:
@@ -2743,22 +2714,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'А вы знали, что Сочи - это самый длинный город в России и второй по длине в мире после Мехико? Он растянулся вдоль береговой линии Черного моря на рекордные 145 километров, вмещая в себя четыре огромных курортных района.',
     mustSee: [
       { name: 'Парк «Ривьера»', desc: 'Старейший курортный парк с вековыми платанами, розарием, аттракционами и дельфинарием',
-        locationSlug: 'sochi-park-riv-era',
+        locationSlug: 'sochi-park-riv-era'
       },
       { name: 'Морской вокзал Сочи', desc: 'Шедевр сталинского ампира со шпилем, главная прогулочная зона у причалов с яхтами',
-        locationSlug: 'sochi-morskoy-vokzal-sochi',
+        locationSlug: 'sochi-morskoy-vokzal-sochi'
       },
       { name: 'Олимпийский парк', desc: 'Грандиозный комплекс прибрежного кластера Игр-2014 с поющим фонтаном в Сириусе',
-        locationSlug: 'sochi-olimpiyskiy-park',
+        locationSlug: 'sochi-olimpiyskiy-park'
       },
       { name: 'Курорт Роза Хутор', desc: 'Горнолыжный и туристический комплекс в горах Красной Поляны с канатной дорогой до пика Роза',
-        locationSlug: 'sochi-kurort-roza-hutor',
+        locationSlug: 'sochi-kurort-roza-hutor'
       },
       { name: 'Тисо-самшитовая роща', desc: 'Реликтовый первобытный лес с карстовыми каньонами и древними растениями в Хосте',
-        locationSlug: 'sochi-tiso-samshitovaya-roscha',
+        locationSlug: 'sochi-tiso-samshitovaya-roscha'
       },
       { name: 'Дендрарий', desc: 'Уникальное собрание субтропической флоры и фауны на склоне горы с канатной дорогой',
-        locationSlug: 'sochi-dendrariy',
+        locationSlug: 'sochi-dendrariy'
       },
     ],
     travel:
@@ -2767,7 +2738,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "Далеко ли от центра Сочи находится Олимпийский парк?", a: "Олимпийский парк и трасса Формулы-1 расположены в Адлерском районе (Имеретинская низменность) примерно в 30 км от центра; быстрее всего туда доехать на скоростной «Ласточке» за 40 минут." },
     { q: "Где в городе увидеть уникальные субтропические растения?", a: "Главной зеленой сокровищницей Сочи является знаменитый парк «Дендрарий», где на огромной территории собраны тысячи редких экзотических растений со всего мира и работает канатная дорога." },
     { q: "Как подняться на смотровую башню горы Ахун?", a: "На самую высокую точку прибрежной части Сочи можно доехать на автомобиле, такси или в составе экскурсионных групп по извилистому шоссе; пешком подниматься от подножия слишком долго и тяжело." },
-    ],
+    ]
   },
   tyumen: {
     brief:
@@ -2775,22 +2746,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'А вы знали, что в годы Великой Отечественной войны Тюмень стала самым секретным городом СССР? Именно сюда, в здание местной сельскохозяйственной академии, в обстановке строжайшей тайны было эвакуировано забальзамированное тело В. И. Ленина, которое охраняли лучшие ученые страны.',
     mustSee: [
       { name: 'Четырёхуровневая набережная', desc: 'Единственная в России многоуровневая гранитная набережная, главный символ современной Тюмени',
-        locationSlug: 'tyumen-chetyrehurovnevaya-naberezhnaya',
+        locationSlug: 'tyumen-chetyrehurovnevaya-naberezhnaya'
       },
       { name: 'Мост Влюблённых', desc: 'Изящный вантовый пешеходный мост через реку Туру, ярко подсвечиваемый по вечерам',
-        locationSlug: 'tyumen-most-vlyublennyh',
+        locationSlug: 'tyumen-most-vlyublennyh'
       },
       { name: 'Пешеходная улица Дзержинского', desc: 'Старинный квартал в центре, превращённый в уютный променад с деревянным зодчеством и ремесленниками',
-        locationSlug: 'tyumen-peshehodnaya-ulitsa-dzerzhinskogo',
+        locationSlug: 'tyumen-peshehodnaya-ulitsa-dzerzhinskogo'
       },
       { name: 'Термальные источники', desc: 'Многочисленные загородные базы отдыха с открытыми бассейнами с горячей минеральной водой',
-        locationSlug: 'tyumen-termal-nye-istochniki',
+        locationSlug: 'tyumen-termal-nye-istochniki'
       },
       { name: 'Сквер сибирских кошек', desc: 'Небольшой сквер с золочеными тумбами-скульптурами кошек, спасших после блокады Эрмитаж от крыс',
-        locationSlug: 'tyumen-skver-sibirskih-koshek',
+        locationSlug: 'tyumen-skver-sibirskih-koshek'
       },
       { name: 'Знаменский кафедральный собор', desc: 'Яркий памятник сибирского барокко с необычной ярусной архитектурой',
-        locationSlug: 'tyumen-znamenskiy-kafedral-nyy-sobor',
+        locationSlug: 'tyumen-znamenskiy-kafedral-nyy-sobor'
       },
     ],
     travel:
@@ -2799,7 +2770,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "Правда ли, что Тюменская набережная — единственная четырехъярусная в России?", a: "Да, это уникальное масштабное инженерное сооружение на берегу реки Туры, аналогов которому по высоте и количеству гранитных уровней со скульптурами в стране нет." },
     { q: "Где в Тюмени находятся знаменитые горячие источники?", a: "В черте города и ближайшем пригороде открыто более десятка современных благоустроенных термальных комплексов (например, «ЛетоЛето», «Верхний Бор», «Волна»), до которых можно доехать на городском автобусе или такси." },
     { q: "Что за необычный Сквер сибирских кошек открыт в центре?", a: "Это уютный сквер на улице Первомайской, где на пилонах установлены золоченые скульптуры кошек в память о тюменских мурлыках, которых после блокады отправили поездом для спасения залов Эрмитажа в Ленинграде от крыс." },
-    ],
+    ]
   },
   voronezh: {
     brief:
@@ -2807,22 +2778,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'А вы знали, что именно в сухопутном Воронеже по приказу Петра I был построен и спущен на воду первый российский линейный корабль «Гото Предестинация»? Его точную копию сейчас можно посетить на городской набережной.',
     mustSee: [
       { name: 'Адмиралтейская площадь', desc: 'Место на берегу водохранилища, где зарождался регулярный военно-морской флот России',
-        locationSlug: 'voronezh-admiralteyskaya-ploschad',
+        locationSlug: 'voronezh-admiralteyskaya-ploschad'
       },
       { name: 'Корабль-музей «Гото Предестинация»', desc: 'Точная действующая копия первого российского линейного корабля времён Петра I',
-        venueSlug: 'voronezh-korabl-muzey-goto-predestinatsiya',
+        venueSlug: 'voronezh-korabl-muzey-goto-predestinatsiya'
       },
       { name: 'Проспект Революции', desc: 'Главная историческая улица города с красивой архитектурой, театрами и ресторанами',
-        locationSlug: 'voronezh-prospekt-revolyutsii',
+        locationSlug: 'voronezh-prospekt-revolyutsii'
       },
       { name: 'Памятник Белому Биму', desc: 'Трогательный бронзовый монумент знаменитой литературной собаке у театра кукол «Шут»',
-        locationSlug: 'voronezh-pamyatnik-belomu-bimu',
+        locationSlug: 'voronezh-pamyatnik-belomu-bimu'
       },
       { name: 'Дивногорье', desc: 'Уникальный природный музей-заповедник с меловыми столбами-дивами и пещерными храмами (в области)',
-        locationSlug: 'voronezh-divnogor-e',
+        locationSlug: 'voronezh-divnogor-e'
       },
       { name: 'Парк «Алые паруса»', desc: 'Благоустроенный сосновый парк на берегу с пляжной зоной и отличными видами на воду',
-        locationSlug: 'voronezh-park-alye-parusa',
+        locationSlug: 'voronezh-park-alye-parusa'
       },
     ],
     travel:
@@ -2831,7 +2802,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "Где в городе сидит знаменитый Котёнок с улицы Лизюкова?", a: "Бронзовый памятник герою известного советского мультфильма установлен на одноименной улице Лизюкова, прямо напротив кинотеатра «Мир»." },
     { q: "Правда ли, что Воронеж — родина русского военно-морского флота?", a: "Да, именно здесь на местных верфях в конце XVII века Петр I начал масштабное строительство первых регулярных боевых кораблей для Азовских походов." },
     { q: "Как добраться из Воронежа до замка принцессы Ольденбургской?", a: "Уникальный краснокирпичный замок в викторианском стиле расположен в поселке Рамонь в 40 км от города, туда регулярно ходят пригородные автобусы от Центрального автовокзала." },
-    ],
+    ]
   },
   'rostov-na-donu': {
     brief:
@@ -2839,22 +2810,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'Знаете ли вы, что ростовский Театр драмы имени Горького построен в виде гигантского трактора? Это шедевр мирового конструктивизма, макет которого до сих пор хранится в Британском музее в Лондоне как эталон авангарда.',
     mustSee: [
       { name: 'Набережная реки Дон (Береговая улица)', desc: 'Оживлённое сердце Ростова с памятниками героям шолоховских книг и речными причалами',
-        locationSlug: 'rostov-na-donu-naberezhnaya-reki-don-beregovaya-ulitsa',
+        locationSlug: 'rostov-na-donu-naberezhnaya-reki-don-beregovaya-ulitsa'
       },
       { name: 'Большая Садовая улица', desc: 'Главная улица города, украшенная парадными старинными зданиями и купеческими особняками',
-        locationSlug: 'rostov-na-donu-bol-shaya-sadovaya-ulitsa',
+        locationSlug: 'rostov-na-donu-bol-shaya-sadovaya-ulitsa'
       },
       { name: 'Театральная площадь', desc: 'Центральная площадь, где находится Театр драмы им. Горького, построенный в виде трактора',
-        venueSlug: 'rostov-na-donu-teatral-naya-ploschad',
+        venueSlug: 'rostov-na-donu-teatral-naya-ploschad'
       },
       { name: 'Парамоновские склады', desc: 'Живописные руины купеческих складов XIX века с бьющими из-под земли природными родниками',
-        locationSlug: 'rostov-na-donu-paramonovskie-sklady',
+        locationSlug: 'rostov-na-donu-paramonovskie-sklady'
       },
       { name: 'Парк Революции', desc: 'Популярный парк отдыха с колесом обозрения «Одно небо» и вольерами со стаями розовых фламинго',
-        locationSlug: 'rostov-na-donu-park-revolyutsii',
+        locationSlug: 'rostov-na-donu-park-revolyutsii'
       },
       { name: 'Центральный рынок (Старый базар)', desc: 'Колоритное гастрономическое место, где можно прочувствовать дух и вкусы южного города',
-        locationSlug: 'rostov-na-donu-tsentral-nyy-rynok-staryy-bazar',
+        locationSlug: 'rostov-na-donu-tsentral-nyy-rynok-staryy-bazar'
       },
     ],
     travel:
@@ -2863,7 +2834,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "Почему Ростов-на-Дону называют «портом пяти морей»?", a: "Благодаря развитой системе рек и каналов из городского порта речные суда имеют прямой водный выход к Азовскому, Черному, Каспийскому, Балтийскому и Белому морям." },
     { q: "Где в городе попробовать настоящие донские раки?", a: "Самые свежие раки, сваренные по старинным казачьим рецептам, подают в многочисленных ресторанах на левом берегу Дона (Левбердон) и на знаменитом Центральном рынке (Старый базар)." },
     { q: "Как устроен знаменитый ростовский подземный переход с мозаиками?", a: "На пересечении Большой Садовой улицы и Будённовского проспекта стены подземных переходов украшены уникальными панно из обычной советской кафельной плитки, детально изображающими жизнь донских казаков и сюжеты Шолохова." },
-    ],
+    ]
   },
   vladivostok: {
     brief:
@@ -2871,22 +2842,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'А вы знали, что Владивосток находится на той же географической широте, что и курортный Сочи, но из-за холодного дыхания океана здесь можно за один день застать и тропический ливень, и плотный морской туман?',
     mustSee: [
       { name: 'Русский мост', desc: 'Самый длинный вантовый мост в мире - символ города',
-        locationSlug: 'vladivostok-russkiy-most',
+        locationSlug: 'vladivostok-russkiy-most'
       },
       { name: 'Океанариум', desc: 'Крупнейший океанариум страны с туннелем среди акул',
-        locationSlug: 'vladivostok-okeanarium',
+        locationSlug: 'vladivostok-okeanarium'
       },
       { name: 'Остров Русский', desc: 'Остров с фортами, пляжами и панорамами залива',
-        locationSlug: 'vladivostok-ostrov-russkiy',
+        locationSlug: 'vladivostok-ostrov-russkiy'
       },
       { name: 'Маяк на Токаревской кошке', desc: 'Живописный мыс с видом на залив и мосты',
-        locationSlug: 'vladivostok-mayak-na-tokarevskoy-koshke',
+        locationSlug: 'vladivostok-mayak-na-tokarevskoy-koshke'
       },
       { name: 'Набережная Цесаревича', desc: 'Прогулочная зона с морским бризом и ресторанами',
-        locationSlug: 'vladivostok-naberezhnaya-tsesarevicha',
+        locationSlug: 'vladivostok-naberezhnaya-tsesarevicha'
       },
       { name: 'Фуникулёр и Орлиная сопка', desc: 'Короткий подъём на лучшую смотровую над бухтой Золотой Рог',
-        locationSlug: 'vladivostok-funikulyor',
+        locationSlug: 'vladivostok-funikulyor'
       },
     ],
     travel:
@@ -2895,7 +2866,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "Нужен ли пропуск для посещения острова Русский?", a: "Нет, после открытия знаменитого Русского моста остров стал общедоступным районом города, куда ходят обычные городские автобусы." },
     { q: "Где во Владивостоке попробовать недорогие морепродукты?", a: "Свежих крабов, гребешков и креветок можно выгодно купить на Спортивной набережной или заказать в многочисленных кафе китайской и корейской кухни." },
     { q: "Как работает знаменитый владивостокский фуникулер?", a: "Он расположен на склоне Орлиной сопки, связывает улицу Суханова с Пушкинской и позволяет быстро подняться на лучшую смотровую площадку города." },
-    ],
+    ]
   },
   vologda: {
     brief:
@@ -2903,22 +2874,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'Знаете ли вы, что Иван Грозный планировал сделать Вологду столицей опричнины и всей Руси? Легенда гласит, что царь передумал из-за упавшего ему на голову кирпича в строящемся Софийском соборе.',
     mustSee: [
       { name: 'Вологодский кремль (Архиерейский двор)', desc: 'Мощный историко-архитектурный комплекс с величественным Софийским собором',
-        locationSlug: 'vologda-vologodskiy-kreml-arhiereyskiy-dvor',
+        locationSlug: 'vologda-vologodskiy-kreml-arhiereyskiy-dvor'
       },
       { name: 'Колокольня Софийского собора', desc: 'Высотная доминанта центра, на которую можно подняться ради круговой панорамы города и реки',
-        locationSlug: 'vologda-kolokol-nya-sofiyskogo-sobora',
+        locationSlug: 'vologda-kolokol-nya-sofiyskogo-sobora'
       },
       { name: 'Музей кружева', desc: 'Уникальная экспозиция, посвящённая главному вологодскому промыслу, признанная одной из лучших в Европе',
-        venueSlug: 'vologda-muzey-kruzheva',
+        venueSlug: 'vologda-muzey-kruzheva'
       },
       { name: 'Памятник букве «О»', desc: 'Кованый арт-объект в сквере, иронично обыгрывающий знаменитый вологодский говор («оканье»)',
-        locationSlug: 'vologda-pamyatnik-bukve-o',
+        locationSlug: 'vologda-pamyatnik-bukve-o'
       },
       { name: 'Музей «Мир забытых вещей»', desc: 'Старинный деревянный особняк, воссоздающий быт и атмосферу дореволюционной городской усадьбы',
-        venueSlug: 'vologda-muzey-mir-zabytyh-veschey',
+        venueSlug: 'vologda-muzey-mir-zabytyh-veschey'
       },
       { name: 'Центр народных промыслов «Резной палисад»', desc: 'Культурное пространство, окружённое тем самым знаменитым вологодским деревянным зодчеством',
-        locationSlug: 'vologda-tsentr-narodnyh-promyslov-reznoy-palisad',
+        locationSlug: 'vologda-tsentr-narodnyh-promyslov-reznoy-palisad'
       },
     ],
     travel:
@@ -2927,7 +2898,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "Где искать то самое вологодское кружево?", a: "Главная коллекция собрана в уникальном Музее кружева на Кремлевской площади, а приобрести сертифицированные изделия можно в фирменных магазинах «Снежинка»." },
     { q: "Правда ли, что в Вологде сохранился «резной палисад»?", a: "Да, в городе много отреставрированных деревянных купеческих особняков с резными наличниками и оградами, самый известный памятник находится на улице Благовещенской." },
     { q: "Чем отличается знаменитое вологодское масло от обычного?", a: "Настоящее вологодское масло изготавливается по особой технологии пастеризации сливок, что придается ему неповторимый ореховый привкус; покупать его лучше в фирменных точках местных учхозов." },
-    ],
+    ]
   },
   irkutsk: {
     brief:
@@ -2935,22 +2906,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'А вы знали, что в XIX веке Иркутск уважительно величали «Сибирским Парижем»? Всё из-за богатых купцов, которые выписывали модную одежду, вина и мебель напрямую из Франции.',
     mustSee: [
       { name: '130-й квартал', desc: 'Квартал деревянного зодчества - визитная карточка города',
-        locationSlug: 'irkutsk-130-y-kvartal',
+        locationSlug: 'irkutsk-130-y-kvartal'
       },
       { name: 'Набережная Ангары', desc: 'Прогулочная зона с видами на реку и мосты',
-        locationSlug: 'irkutsk-naberezhnaya-angary',
+        locationSlug: 'irkutsk-naberezhnaya-angary'
       },
       { name: 'Музей «Декабристы»', desc: 'История ссыльных декабристов в Сибири',
-        venueSlug: 'irkutsk-muzey-dekabristy',
+        venueSlug: 'irkutsk-muzey-dekabristy'
       },
       { name: 'Казанская церковь', desc: 'Яркий храм сибирского барокко - символ Иркутска',
-        locationSlug: 'irkutsk-kazanskaya-tserkov',
+        locationSlug: 'irkutsk-kazanskaya-tserkov'
       },
       { name: 'Листвянка', desc: 'Посёлок у Байкала - ворота к озеру и музею Байкала',
-        locationSlug: 'irkutsk-listvyanka',
+        locationSlug: 'irkutsk-listvyanka'
       },
       { name: 'Усадьба В. П. Сукачева', desc: 'Деревянный особняк мецената с садом и музеем быта',
-        venueSlug: 'irkutsk-usadba-sukacheva',
+        venueSlug: 'irkutsk-usadba-sukacheva'
       },
     ],
     travel:
@@ -2959,7 +2930,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "Сколько ехать от Иркутска до озера Байкал?", a: "Ближайшая точка к озеру — поселок Листвянка — находится всего в 65 км от города, туда можно доехать на маршрутке или такси по живописному Байкальскому тракту за 1 час." },
     { q: "Что такое «Иркутская слобода» (130-й квартал)?", a: "Это специально отреставрированный к юбилею города исторический квартал в центре, где собраны десятки деревянных усадеб, превращенных в уютные рестораны, музеи и сувенирные лавки." },
     { q: "Какую рыбу обязательно нужно попробовать в Иркутске?", a: "Гастрономическим символом региона является байкальский омуль (копченый или соленый), а также местная сочная рыба сиг и традиционные бурятские буузы." },
-    ],
+    ]
   },
   perm: {
     brief:
@@ -3038,8 +3009,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         longitude: 56.95,
         travelVector: 'Город купечества и ледяной пещеры в 90 км от Перми.',
         travelVectorBlurb:
-          'Сначала старый центр, затем авто к ледяной пещере. По желанию - Камень Ермак на Сылве (не совмещать с Белой горой).',
-        timingNote: 'Вязовская пряничная - удобная остановка на обратном пути в Пермь.',
+          'Пешком по центру Кунгура, затем на авто к ледяной пещере, на обратном пути - Вязовская пряничная.',
         places: [
           { name: 'Пуп Земли', desc: 'символический «центр» Кунгура и точка сбора для прогулок по старому городу.', latitude: 57.43121, longitude: 56.9428 },
           { name: 'Набережная Сылвы', desc: 'прогулка вдоль реки в центре - часть пешеходного круга до авто-блока.', latitude: 57.4295, longitude: 56.9485 },
@@ -3049,7 +3019,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           { name: 'Кунгурская ледяная пещера', desc: 'одна из самых известных карстовых пещер Урала с ледяными гротами.', locationSlug: 'perm-kungurskaya-ledyanaya-peshchera', latitude: 57.4409, longitude: 57.006, transitTip: 'Авто к пещере после центра (~15-20 мин)' },
           { name: 'Камень Ермак', desc: 'скальный останец на Сылве, связанный с маршрутами Ермака - экстра к кунгурскому дню.', latitude: 57.3736, longitude: 57.0667, transitTip: 'Авто к Сылве; не совмещать с Белой горой и Плакуном' },
           { name: 'Вязовская пряничная', desc: 'местная пряничная традиция - сладкий сувенир на выезде обратно в Пермь.', latitude: 57.4322, longitude: 56.9442, transitTip: 'На выезде обратно в Пермь - остановка у пряничной' },
-        ],
+        ]
       },
       {
         name: 'Православный Урал',
@@ -3068,7 +3038,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           { name: 'Царский крест', desc: 'крупный поклонный крест с видом на округу.', latitude: 57.3914, longitude: 56.2306 },
           { name: 'Купель / источник', desc: 'святой источник и купель у подножия монастырской горы - в связке с обителью.', latitude: 57.3906, longitude: 56.2278, transitTip: 'Спуск к купели у подножия - в связке с монастырём' },
           { name: 'Водопад Плакун', desc: 'живописный известняковый водопад в Суксунском районе - финал православного дня.', latitude: 57.3481, longitude: 57.0506, transitTip: 'Авто к Плакуну (Суксун); Ермак - в день Кунгура' },
-        ],
+        ]
       },
       {
         name: 'Губаха / Усьва',
@@ -3143,7 +3113,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           { name: 'Пермские посикунчики', desc: 'Обед', locationSlug: 'perm-permskie-posikunchiki' },
           { name: 'Городская эспланада', desc: 'Центр и фонтаны', locationSlug: 'permskaya-esplanada' },
           { name: 'Театр-Театр', desc: 'Вечерняя культура', venueSlug: 'teatr-teatr' },
-        ],
+        ]
       },
       {
         id: 'perm-art-cluster',
@@ -3155,7 +3125,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           { name: 'Центр городской культуры (ЦГК)', desc: 'Независимая сцена', venueSlug: 'perm-cgk' },
           { name: 'Галерея «25\'17»', desc: 'Выставки', venueSlug: 'perm-galereya-2517' },
           { name: 'Набережная Камы', desc: 'Финал у воды', locationSlug: 'naberezhnaya-kamy' },
-        ],
+        ]
       },
       {
         id: 'perm-hohlovka-day',
@@ -3175,16 +3145,15 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           { name: 'Охотничий дом / Заимка', desc: 'Промысловый быт' },
           { name: 'Усть-Боровский сользавод', desc: 'Солеварня - к финалу' },
           { name: 'Смотровая над заливом', desc: 'Панорама Камы' },
-        ],
+        ]
       },
       {
         id: 'perm-kungur-day',
         title: 'Кунгур: центр, пещера и Ермак',
         description: 'Город купечества и ледяной пещеры в 90 км от Перми.',
-        timingNote: 'Вязовская пряничная - удобная остановка на обратном пути в Пермь.',
         travelVector: 'Город купечества и ледяной пещеры в 90 км от Перми.',
         travelVectorBlurb:
-          'Сначала старый центр, затем авто к ледяной пещере. По желанию - Камень Ермак на Сылве (не совмещать с Белой горой).',
+          'Пешком по центру Кунгура, затем на авто к ледяной пещере, на обратном пути - Вязовская пряничная.',
         stops: [
           { name: 'Пуп Земли', desc: 'Точка сбора в центре' },
           { name: 'Набережная Сылвы', desc: 'Прогулка у реки' },
@@ -3194,7 +3163,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           { name: 'Кунгурская ледяная пещера', desc: 'Ледяные гроты', locationSlug: 'perm-kungurskaya-ledyanaya-peshchera', transitTip: 'Авто к пещере после центра (~15-20 мин)' },
           { name: 'Камень Ермак', desc: 'Скала на Сылве - экстра к дню', transitTip: 'Авто к Сылве; не совмещать с Белой горой' },
           { name: 'Вязовская пряничная', desc: 'Сувенир на выезде в Пермь', transitTip: 'На выезде обратно в Пермь' },
-        ],
+        ]
       },
       {
         id: 'perm-orthodox-ural-day',
@@ -3210,7 +3179,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           { name: 'Царский крест', desc: 'Поклонный крест' },
           { name: 'Купель / источник', desc: 'У подножия горы' },
           { name: 'Водопад Плакун', desc: 'Финал дня' },
-        ],
+        ]
       },
       {
         id: 'perm-gubakha-usva',
@@ -3229,7 +3198,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           { name: 'Каменный город', desc: 'День 2 - скальный город', locationSlug: 'perm-kamennyy-gorod' },
           { name: 'Пещера Российская', desc: 'День 2 - осторожно / вход' },
           { name: 'Гора Крестовая', desc: 'День 2 - закат' },
-        ],
+        ]
       },
     ],
     travel:
@@ -3238,7 +3207,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       { q: 'Где находится тот самый знаменитый арт-объект «Счастье не за горами»?', a: 'Легендарные огромные красные буквы установлены на парапете городской набережной Камы у здания бывшего Речного вокзала.' },
       { q: 'Что такое пермский деревянный бог и где его увидеть?', a: 'Это уникальная коллекция старинной сакральной деревянной скульптуры XVII-XIX веков, в которой христианские сюжеты переплелись с языческими традициями; она хранится в Пермской государственной художественной галерее.' },
       { q: 'Как добраться из Перми до знаменитой Кунгурской ледяной пещеры?', a: 'Одна из главных природных достопримечательностей Урала расположена в 90 км от города в Кунгуре; туда удобнее всего доехать на утренней пригородной электричке за 1,5 часа.' },
-    ],
+    ]
   },
   sortavala: {
     brief:
@@ -3246,24 +3215,24 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'Знаете ли вы, что Сортавала - единственный город в России, где можно сесть на настоящий, полностью аутентичный паровоз на паровой тяге? Исторический «Рускеальский экспресс» ежедневно отправляется отсюда, погружая туристов в атмосферу конца XIX века.',
     mustSee: [
       { name: 'Горный парк «Рускеала»', desc: 'Затопленный изумрудный мраморный каньон со скалами и экологическими тропами',
-        locationSlug: 'sortavala-gornyy-park-ruskeala',
+        locationSlug: 'sortavala-gornyy-park-ruskeala'
       },
       { name: 'Остров Валаам', desc: 'Древний действующий мужской монастырь на Ладожском озере',
-        locationSlug: 'sortavala-ostrov-valaam',
+        locationSlug: 'sortavala-ostrov-valaam'
       },
       { name: 'Парк Ваккосалми и гора Кухавуори', desc: 'Природный парк в черте города с видовой площадкой на скалистой вершине',
-        locationSlug: 'sortavala-park-vakkosalmi-i-gora-kuhavuori',
+        locationSlug: 'sortavala-park-vakkosalmi-i-gora-kuhavuori'
       },
       { name: 'Ладожские шхеры', desc: 'Живописные скалистые необитаемые острова, куда организуют прогулки на катерах',
-        locationSlug: 'sortavala-ladozhskie-shhery',
+        locationSlug: 'sortavala-ladozhskie-shhery'
       },
       { name: 'Исторический парк «Бастионъ»', desc: 'Большой интерактивный музей живой истории эпохи викингов на берегу Ладоги',
-        locationSlug: 'sortavala-istoricheskiy-park-bastion',
+        locationSlug: 'sortavala-istoricheskiy-park-bastion'
       },
       { name: 'Гора Паасонвуори (Паасо)', desc: 'Древнее городище на вершине скалы с панорамным видом на тайгу и проходящий внизу ретропоезд',
-        locationSlug: 'sortavala-gora-paasonvuori-paaso',
+        locationSlug: 'sortavala-gora-paasonvuori-paaso'
       },
-    ],
+    ]
   },
   saratov: {
     brief:
@@ -3271,22 +3240,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'А вы знали, что именно в Саратове началась космическая судьба Юрия Гагарина? Здесь он учился в индустриальном техникуме, впервые поднялся в небо на самолете в местном аэроклубе, и именно на саратовскую землю приземлился его спускаемый аппарат после полета вокруг Земли.',
     mustSee: [
       { name: 'Проспект Столыпина', desc: 'Старейшая пешеходная улица России (бывший проспект Кирова) с фонтанами и купеческими особняками',
-        locationSlug: 'saratov-prospekt-stolypina',
+        locationSlug: 'saratov-prospekt-stolypina'
       },
       { name: 'Парк Победы на Соколовой горе', desc: 'Огромный мемориальный комплекс со знаменитым монументом «Журавли» и выставкой военной техники',
-        locationSlug: 'saratov-park-pobedy-na-sokolovoy-gore',
+        locationSlug: 'saratov-park-pobedy-na-sokolovoy-gore'
       },
       { name: 'Набережная Космонавтов', desc: 'Многоярусная старинная набережная, ведущая к знаменитому мосту через Волгу',
-        locationSlug: 'saratov-naberezhnaya-kosmonavtov',
+        locationSlug: 'saratov-naberezhnaya-kosmonavtov'
       },
       { name: 'Автодорожный мост Саратов — Энгельс', desc: 'Грандиозный мост длиной почти 3 км, бывший на момент постройки самым длинным в Европе',
-        locationSlug: 'saratov-avtodorozhnyy-most-saratov-engel-s',
+        locationSlug: 'saratov-avtodorozhnyy-most-saratov-engel-s'
       },
       { name: 'Храм «Утоли моя печали»', desc: 'Удивительная шатровая церковь, напоминающая московский собор Василия Блаженного в миниатюре',
-        locationSlug: 'saratov-hram-utoli-moya-pechali',
+        locationSlug: 'saratov-hram-utoli-moya-pechali'
       },
       { name: 'Саратовский художественный музей имени А. Н. Радищева', desc: 'Первый общедоступный художественный музей в Российской империи',
-        venueSlug: 'saratov-saratovskiy-hudozhestvennyy-muzey-imeni-a-n-radischeva',
+        venueSlug: 'saratov-saratovskiy-hudozhestvennyy-muzey-imeni-a-n-radischeva'
       },
     ],
     travel:
@@ -3295,7 +3264,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "Где находится то самое место приземления Юрия Гагарина?", a: "Историческое поле, где в 1961 году приземлился первый космонавт планеты, расположено в 40 км от Саратова под Энгельсом; сейчас там открыт масштабный Парк покорителей космоса." },
     { q: "Правда ли, что в Саратове находится старейший общедоступный музей России?", a: "Да, Радищевский музей, открытый в 1885 году, стал первым художественным музеем в провинции, его богатейшую коллекцию часто называют «поволжским Эрмитажем»." },
     { q: "Что за знаменитая Саратовская гармошка и где ее увидеть?", a: "Это уникальный музыкальный инструмент с колокольчиками; послушать её звучание и увидеть редкие экземпляры можно в музее гармоники на пешеходном проспекте Столыпина." },
-    ],
+    ]
   },
   'ulan-ude': {
     brief:
@@ -3303,22 +3272,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'Знаете ли вы, что на главной площади Улан-Удэ установлен самый большой памятник-голова в мире? Гигантская бронзовая голова Ленина весит рекордные 42 тонны, имеет высоту почти 8 метров и занесена в Книгу рекордов Гиннесса.',
     mustSee: [
       { name: 'Голова Ленина', desc: 'Самый большой бюст Ленина в мире - символ города',
-        locationSlug: 'ulan-ude-golova-lenina',
+        locationSlug: 'ulan-ude-golova-lenina'
       },
       { name: 'Иволгинский дацан', desc: 'Главный буддийский храм России в окрестностях города',
-        venueSlug: 'ulan-ude-ivolginskiy-datsan',
+        venueSlug: 'ulan-ude-ivolginskiy-datsan'
       },
       { name: 'Этнографический музей', desc: 'Под открытым небом - традиции народов Забайкалья',
-        venueSlug: 'ulan-ude-etnograficheskiy-muzey',
+        venueSlug: 'ulan-ude-etnograficheskiy-muzey'
       },
       { name: 'Площадь Советов', desc: 'Центральная площадь с театром и исторической застройкой',
-        locationSlug: 'ulan-ude-ploschad-sovetov',
+        locationSlug: 'ulan-ude-ploschad-sovetov'
       },
       { name: 'Набережная Селенги', desc: 'Прогулочная зона вдоль главной реки Бурятии',
-        locationSlug: 'ulan-ude-naberezhnaya-selengi',
+        locationSlug: 'ulan-ude-naberezhnaya-selengi'
       },
       { name: 'Улица Ленина', desc: 'Пешеходный арбат столицы Бурятии с купеческими фасадами',
-        locationSlug: 'ulan-ude-ulitsa-lenina',
+        locationSlug: 'ulan-ude-ulitsa-lenina'
       },
     ],
     travel:
@@ -3327,7 +3296,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "Где находится та самая гигантская голова Ленина?", a: "Самый большой в мире монументальный памятник-голова В. И. Ленина высотой почти 8 метров установлен в самом центре города на площади Советов и является главным ориентиром для туристов." },
     { q: "Далеко ли от города находится Иволгинский дацан?", a: "Главный буддийский монастырский комплекс России и резиденция Хамбо-ламы расположены в 35 км от Улан-Удэ в селе Верхняя Иволга; туда регулярно ходят маршрутные такси №130 от площади Банзарова." },
     { q: "Что попробовать из традиционной бурятской кухни?", a: "Гастрономическим символом являются буузы (позы) — крупные мясные мешочки из теста с сочным бульоном внутри; также стоит заказать суп со шулэном и нежный творожный десерт хурууд." },
-    ],
+    ]
   },
   chelyabinsk: {
     brief:
@@ -3335,22 +3304,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'Знаете ли вы, что в 2013 году Челябинск стал единственным мегаполисом в современной истории планеты, который принял на себя удар настоящего космического пришельца? Знаменитый челябинский метеорит взорвался в небе над регионом, а его крупнейший осколок весом более 500 кг теперь хранится в местном музее.',
     mustSee: [
       { name: 'Кировка (Челябинский Арбат)', desc: 'Пешеходная улица с историческими зданиями XIX века и многочисленными бронзовыми фигурами',
-        locationSlug: 'chelyabinsk-kirovka-chelyabinskiy-arbat',
+        locationSlug: 'chelyabinsk-kirovka-chelyabinskiy-arbat'
       },
       { name: 'Государственный исторический музей Южного Урала', desc: 'Современное здание на набережной, где хранится знаменитый Челябинский метеорит',
-        venueSlug: 'chelyabinsk-gosudarstvennyy-istoricheskiy-muzey-yuzhnogo-urala',
+        venueSlug: 'chelyabinsk-gosudarstvennyy-istoricheskiy-muzey-yuzhnogo-urala'
       },
       { name: 'Парк культуры и отдыха им. Ю. А. Гагарина', desc: 'Огромный лесной массив с сосновым бором и карьерами прямо посреди мегаполиса',
-        locationSlug: 'chelyabinsk-park-kul-tury-i-otdyha-im-yu-a-gagarina',
+        locationSlug: 'chelyabinsk-park-kul-tury-i-otdyha-im-yu-a-gagarina'
       },
       { name: 'Алое поле', desc: 'Исторический парк в центре города со старинным храмом Александра Невского и живописными аллеями',
-        locationSlug: 'chelyabinsk-aloe-pole',
+        locationSlug: 'chelyabinsk-aloe-pole'
       },
       { name: 'Сфера любви', desc: 'Необычное романтичное архитектурное сооружение из стекла и металла, популярное место встреч',
-        locationSlug: 'chelyabinsk-sfera-lyubvi',
+        locationSlug: 'chelyabinsk-sfera-lyubvi'
       },
       { name: 'Набережная реки Миасс', desc: 'Новая благоустроенная пешеходная зона возле Филармонии и креативного кластера',
-        locationSlug: 'chelyabinsk-naberezhnaya-reki-miass',
+        locationSlug: 'chelyabinsk-naberezhnaya-reki-miass'
       },
     ],
     travel:
@@ -3359,7 +3328,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "Где в городе можно вживую увидеть знаменитый Челябинский метеорит?", a: "Самый крупный осколок космического суперболида, взорвавшегося над областью в 2013 году, хранится под специальным стеклянным куполом в Государственном историческом музее Южного Урала на набережной реки Миасс." },
     { q: "Что за пешеходная улица Кировка и чем она интересна?", a: "Это челябинский Арбат — полностью пешеходный благоустроенный участок улицы Кирова, украшенный десятками оригинальных бронзовых скульптур (Левша, нищий, городовой, купец) и старинными купеческими особняками." },
     { q: "Правда ли, что в Челябинске прямо в центре города растет вековой лес?", a: "Да, уникальный Челябинский городской бор площадью более 1000 гектаров является реликтовым сосновым лесом естественного происхождения, который граничит с центральными жилыми кварталами." },
-    ],
+    ]
   },
   ryazan: {
     brief:
@@ -3367,22 +3336,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'А вы знали, откуда пошла знаменитая поговорка «А в Рязани - грибы с глазами: их едят, они глядят»?',
     mustSee: [
       { name: 'Рязанский Кремль', desc: 'Историческое сердце города с величественным Успенским собором',
-        locationSlug: 'ryazan-ryazanskiy-kreml',
+        locationSlug: 'ryazan-ryazanskiy-kreml'
       },
       { name: 'Улица Почтовая', desc: 'Пешеходный «рязанский Арбат» со старинными зданиями и кафе',
-        locationSlug: 'ryazan-ulitsa-pochtovaya',
+        locationSlug: 'ryazan-ulitsa-pochtovaya'
       },
       { name: 'Музей-заповедник С. А. Есенина в Константиново', desc: 'Живописная родина поэта на высоком берегу Оки',
-        venueSlug: 'ryazan-muzey-zapovednik-s-a-esenina-v-konstantinovo',
+        venueSlug: 'ryazan-muzey-zapovednik-s-a-esenina-v-konstantinovo'
       },
       { name: 'Музей истории рязанского леденца', desc: 'Интерактивное пространство о сахароварении на Руси',
-        venueSlug: 'ryazan-muzey-istorii-ryazanskogo-ledentsa',
+        venueSlug: 'ryazan-muzey-istorii-ryazanskogo-ledentsa'
       },
       { name: 'Памятник «Грибы с глазами»', desc: 'Забавный мини-символ города по мотивам известной поговорки',
-        locationSlug: 'ryazan-pamyatnik-griby-s-glazami',
+        locationSlug: 'ryazan-pamyatnik-griby-s-glazami'
       },
       { name: 'Музей-усадьба академика И. П. Павлова', desc: 'Сохранившийся деревянный усадебный комплекс первого русского нобелевского лауреата',
-        venueSlug: 'ryazan-muzey-usad-ba-akademika-i-p-pavlova',
+        venueSlug: 'ryazan-muzey-usad-ba-akademika-i-p-pavlova'
       },
     ],
     travel:
@@ -3391,7 +3360,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "Откуда пошла знаменитая поговорка «А в Рязани — грибы с глазами»?", a: "Исторически поговорка связана с приграничным статусом Рязанского княжества: по подрезанным или сбитым чужаками грибам в суровых местных лесах рязанские дозорные вычисляли продвижение вражеских татарских лазутчиков." },
     { q: "Где в городе искать те самые фигурки грибов с глазами?", a: "Маленькие забавные бронзовые фигурки грибов (гриб-бородавик, грибная команда, гриб-путешественник) спрятаны в знаковых местах центра города (в Нижнем городском саду, у филармонии), создавая увлекательный пешеходный квест." },
     { q: "Далеко ли от Рязани до родины Сергея Есенина в селе Константиново?", a: "Государственный музей-заповедник С. А. Есенина с потрясающими панорамами на Оку расположен в 45 км от Рязани, туда ежедневно ходят рейсовые автобусы и маршрутные такси с автовокзала «Центральный»." },
-    ],
+    ]
   },
   stavropol: {
     brief:
@@ -3399,22 +3368,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'А вы знали, что Ставрополь расположен ровно на 45-й параллели северной широты? Это значит, что город находится на идеальном географическом экваторе - на одинаковом расстоянии как от Северного полюса, так и от экватора Земли, что дарит ему уникальный климат.',
     mustSee: [
       { name: 'Тифлисские ворота', desc: 'Монументальная триумфальная арка XIX века, исторический въезд в город',
-        locationSlug: 'stavropol-tiflisskie-vorota',
+        locationSlug: 'stavropol-tiflisskie-vorota'
       },
       { name: 'Татарское городище', desc: 'Крупнейший археологический музей-заповедник под открытым небом среди леса',
-        locationSlug: 'stavropol-tatarskoe-gorodische',
+        locationSlug: 'stavropol-tatarskoe-gorodische'
       },
       { name: 'Крепостная гора', desc: 'Место основания города с остатками крепостной стены и панорамным видом',
-        locationSlug: 'stavropol-krepostnaya-gora',
+        locationSlug: 'stavropol-krepostnaya-gora'
       },
       { name: 'Комсомольский пруд', desc: 'Благоустроенный водоём в самом центре города, окружённый густым лесом',
-        locationSlug: 'stavropol-komsomol-skiy-prud',
+        locationSlug: 'stavropol-komsomol-skiy-prud'
       },
       { name: 'Ставропольский ботанический сад', desc: 'Огромная зелёная зона со старинной липовой аллеей и редкими растениями',
-        locationSlug: 'stavropol-stavropol-skiy-botanicheskiy-sad',
+        locationSlug: 'stavropol-stavropol-skiy-botanicheskiy-sad'
       },
       { name: 'Александровская площадь', desc: 'Центральная площадь с фонтанами и массивным монументом «Ангел-хранитель»',
-        locationSlug: 'stavropol-aleksandrovskaya-ploschad',
+        locationSlug: 'stavropol-aleksandrovskaya-ploschad'
       },
     ],
     travel:
@@ -3423,7 +3392,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "Правда ли, что Ставрополь называют «вратами Кавказа»?", a: "Да, это исторический статус города, который в XVIII веке был ключевой оборонительной крепостью Азово-Моздокской линии, откуда начиналось освоение южных рубежей империи." },
     { q: "Где находится знаменитый Немецкий мост?", a: "Уникальный высотный каменный виадук начала XX века, построенный немецкими инженерами для Туапсинской железной дороги, спрятан в живописном Мамайском лесу на окраине города и популярен у скалолазов." },
     { q: "Что посмотреть в Ставропольском краеведческом музее?", a: "Главная гордость музея — два единственных в мире полных скелета южных слонов, живших миллионы лет назад, которые были найдены археологами на территории региона." },
-    ],
+    ]
   },
   tomsk: {
     brief:
@@ -3431,22 +3400,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'А вы знали, что Томск стал неофициальным прототипом Изумрудного города из сказки Александра Волкова? Писатель долгое время жил и работал здесь, и именно зеленые крыши старинных томских деревянных усадеб вдохновили его на создание знаменитой детской повести.',
     mustSee: [
       { name: 'Лагерный сад', desc: 'Огромный парк на высоком берегу Томи с мемориалом и потрясающими панорамными видами',
-        locationSlug: 'tomsk-lagernyy-sad',
+        locationSlug: 'tomsk-lagernyy-sad'
       },
       { name: 'Российско-немецкий дом (Дом купца Голованова)', desc: 'Шедевр деревянного зодчества с шатровой башней',
-        locationSlug: 'tomsk-rossiysko-nemetskiy-dom-dom-kuptsa-golovanova',
+        locationSlug: 'tomsk-rossiysko-nemetskiy-dom-dom-kuptsa-golovanova'
       },
       { name: 'Воскресенская гора', desc: 'Место основания города, где восстановлена деревянная Спасская башня',
-        locationSlug: 'tomsk-voskresenskaya-gora',
+        locationSlug: 'tomsk-voskresenskaya-gora'
       },
       { name: 'Музей славянской мифологии', desc: 'Интерактивный музей с редкими экспонатами народного искусства',
-        venueSlug: 'tomsk-muzey-slavyanskoy-mifologii',
+        venueSlug: 'tomsk-muzey-slavyanskoy-mifologii'
       },
       { name: 'Музей истории Томска', desc: 'Бывшая пожарная каланча на горе с лучшей смотровой площадкой в городе',
-        venueSlug: 'tomsk-muzey-istorii-tomska',
+        venueSlug: 'tomsk-muzey-istorii-tomska'
       },
       { name: 'Памятник А. П. Чехову', desc: 'Гротескний ироничный памятник писателю на набережной Томи',
-        locationSlug: 'tomsk-pamyatnik-a-p-chehovu',
+        locationSlug: 'tomsk-pamyatnik-a-p-chehovu'
       },
     ],
     travel:
@@ -3455,7 +3424,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "Почему Томск называют «сибирским Афинами»?", a: "Это связано с огромным количеством старейших за Уралом университетов и колоссальным количеством студентов, которые составляют почти пятую часть всего населения города." },
     { q: "Где искать знаменитый памятник Чехову, который возмутил местных жителей?", a: "Ироничный памятник писателю «глазами пьяного мужика, лежащего в канаве» установлен на набережной реки Томи у ресторана «Славянский базар» — так скульптор ответил на нелестные отзывы Чехова о городе." },
     { q: "В каком районе города сохранилось больше всего деревянных домов с кружевной резьбой?", a: "Самые красивые шедевры деревянного зодчества (Дом с шатром, Дом с драконами) сосредоточены в исторических районах Татарская слобода (Елань) и в районе Воскресенской горы." },
-    ],
+    ]
   },
   ulyanovsk: {
     brief:
@@ -3463,22 +3432,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'А вы знали, что именно в Ульяновске находится единственный в мире Головной отраслевой музей гражданской авиации под открытым небом? На его летном поле собрано более 40 уникальных советских самолетов и вертолетов, включая легендарный сверхзвуковой Ту-144.',
     mustSee: [
       { name: 'Бульвар Новый Венец', desc: 'Живописная пешеходная набережная на высоком холме с панорамой Волги',
-        locationSlug: 'ulyanovsk-bul-var-novyy-venets',
+        locationSlug: 'ulyanovsk-bul-var-novyy-venets'
       },
       { name: 'Музей-заповедник «Родина В.И. Ленина»', desc: 'Целый старинный квартал с деревянными домами Симбирска XIX века',
-        venueSlug: 'ulyanovsk-muzey-zapovednik-rodina-v-i-lenina',
+        venueSlug: 'ulyanovsk-muzey-zapovednik-rodina-v-i-lenina'
       },
       { name: 'Головной музей истории гражданской авиации', desc: 'Уникальная выставка под открытым небом из 40 советских самолётов',
-        venueSlug: 'ulyanovsk-golovnoy-muzey-istorii-grazhdanskoy-aviatsii',
+        venueSlug: 'ulyanovsk-golovnoy-muzey-istorii-grazhdanskoy-aviatsii'
       },
       { name: 'Императорский мост', desc: 'Грандиозный старинный мост через Волгу длиной более двух километров',
-        locationSlug: 'ulyanovsk-imperatorskiy-most',
+        locationSlug: 'ulyanovsk-imperatorskiy-most'
       },
       { name: 'Памятник букве «Ё»', desc: 'Оригинальный гранитный монумент, посвящённый самой молодой букве русского алфавита',
-        locationSlug: 'ulyanovsk-pamyatnik-bukve-e',
+        locationSlug: 'ulyanovsk-pamyatnik-bukve-e'
       },
       { name: 'Ленинский мемориал', desc: 'Масштабное модернистское здание советской эпохи, главный исторический комплекс города',
-        locationSlug: 'ulyanovsk-leninskiy-memorial',
+        locationSlug: 'ulyanovsk-leninskiy-memorial'
       },
     ],
     travel:
@@ -3487,7 +3456,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "Правда ли, что Волга в Ульяновске имеет рекордную ширину?", a: "Да, в районе города разлив Куйбышевского водохранилища достигает ширины почти в 40 километров, из-за чего противоположный берег реки в дымке часто кажется морским горизонтом." },
     { q: "Где находится знаменитый памятник букве «Ё»?", a: "Оригинальный гранитный монумент, посвященный седьмой букве русского алфавита, которую активно использовал в печати ульяновский земляк Николай Карамзин, установлен на бульваре Новый Венец." },
     { q: "Можно ли зайти внутрь дома, где родился Владимир Ленин?", a: "Да, подлинный деревянный флигель усадьбы Ульяновых бережно сохранен и накрыт защитным стеклянно-бетонным куполом грандиозного здания Ленинского мемориала в центре города." },
-    ],
+    ]
   },
   izhevsk: {
     brief:
@@ -3495,22 +3464,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'Знаете ли вы, что Ижевский пруд - это самый большой искусственный несудоходный водоем в Европе? Его заложили еще в 1760 году для нужд железоделательного завода.',
     mustSee: [
       { name: 'Музей стрелкового оружия имени М. Т. Калашникова', desc: 'Главный музей города с возможностью посетить тир',
-        venueSlug: 'izhevsk-muzey-strelkovogo-oruzhiya-imeni-m-t-kalashnikova',
+        venueSlug: 'izhevsk-muzey-strelkovogo-oruzhiya-imeni-m-t-kalashnikova'
       },
       { name: 'Ижевский пруд и набережная зодчего Дудина', desc: 'Один из крупнейших искусственных водоёмов Европы с красивой променадой',
-        locationSlug: 'izhevsk-izhevskiy-prud-i-naberezhnaya-zodchego-dudina',
+        locationSlug: 'izhevsk-izhevskiy-prud-i-naberezhnaya-zodchego-dudina'
       },
       { name: 'Свято-Михайловский собор', desc: 'Величественный белокаменный храм с золотыми куполами на самой высокой точке города',
-        locationSlug: 'izhevsk-svyato-mihaylovskiy-sobor',
+        locationSlug: 'izhevsk-svyato-mihaylovskiy-sobor'
       },
       { name: 'Зоопарк Удмуртии', desc: 'Один из лучших, самых просторных и современных зоопарков в России',
-        locationSlug: 'izhevsk-zoopark-udmurtii',
+        locationSlug: 'izhevsk-zoopark-udmurtii'
       },
       { name: 'Михайловская колонна', desc: 'Единственный в России уменьшенный аналог Александровской колонны в Петербурге',
-        locationSlug: 'izhevsk-mihaylovskaya-kolonna',
+        locationSlug: 'izhevsk-mihaylovskaya-kolonna'
       },
       { name: 'Памятник Ижику', desc: 'Забавный талисман города, отлитый из старых ключей, собранных горожанами',
-        locationSlug: 'izhevsk-pamyatnik-izhiku',
+        locationSlug: 'izhevsk-pamyatnik-izhiku'
       },
     ],
     travel:
@@ -3519,7 +3488,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "Где в Ижевске находится знаменитый памятник Ижику?", a: "Бронзовый талисман города в виде кафтанщика в высоком цилиндре установлен на Центральной площади; его отлили из тысяч ключей, собранных жителями города." },
     { q: "Можно ли туристам попасть на заводы концерна «Калашников»?", a: "Действующие цеха закрыты для свободного посещения из-за секретности, но полная история знаменитого оружия представлена в ультрасовременном Музейно-выставочном комплексе стрелкового оружия имени М. Т. Калашникова в центре города." },
     { q: "Что такое удмуртские перепечи и где их попробовать?", a: "Это старинное национальное блюдо в виде открытых тарталеток из ржаного теста с сочной мясной, грибной или яичной начинкой, которые запекаются перед подачей в печи и продаются во многих городских кафе." },
-    ],
+    ]
   },
   orel: {
     brief:
@@ -3527,22 +3496,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'Знаете ли вы, что Орел был основан Иваном Грозным как секретная крепость для защиты южных границ, а свое имя город получил в честь реальной птицы, которая, по легенде, слетела с вершины векового дуба, когда строители начали рубить первые бревна?',
     mustSee: [
       { name: 'Слияние рек Оки и Орлика', desc: 'Историческое место основания Орловской крепости, украшенное высокой памятной стелой',
-        locationSlug: 'orel-sliyanie-rek-oki-i-orlika',
+        locationSlug: 'orel-sliyanie-rek-oki-i-orlika'
       },
       { name: 'Музей И. С. Тургенева', desc: 'Один из старейших литературных музеев России с богатейшей экспозицией',
-        venueSlug: 'orel-muzey-i-s-turgeneva',
+        venueSlug: 'orel-muzey-i-s-turgeneva'
       },
       { name: 'Парк «Дворянское гнездо»', desc: 'Литературно-мемориальный парк на обрывистом берегу, вдохновивший Тургенева на одноименный роман',
-        locationSlug: 'orel-park-dvoryanskoe-gnezdo',
+        locationSlug: 'orel-park-dvoryanskoe-gnezdo'
       },
       { name: 'Улица Ленина', desc: 'Главная пешеходная артерия города, полностью застроенная купеческими домами XIX столетия',
-        locationSlug: 'orel-ulitsa-lenina',
+        locationSlug: 'orel-ulitsa-lenina'
       },
       { name: 'Памятник Ивану Грозному', desc: 'Первый в истории России памятник царю-основателю города Орла',
-        locationSlug: 'orel-pamyatnik-ivanu-groznomu',
+        locationSlug: 'orel-pamyatnik-ivanu-groznomu'
       },
       { name: 'Богоявленский собор', desc: 'Старейшее каменное здание города, сохранившее барочные элементы архитектуры',
-        locationSlug: 'orel-bogoyavlenskiy-sobor',
+        locationSlug: 'orel-bogoyavlenskiy-sobor'
       },
     ],
     travel:
@@ -3551,7 +3520,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "Почему Орёл официально называют «литературной столицей»?", a: "Здесь родились, жили или творили великие русские писатели: И. Тургенев, Н. Лесков, И. Бунин, А. Фет и Л. Андреев, чьи уникальные музеи сегодня объединены в большой заповедник." },
     { q: "Где находится визитная карточка города — скульптура Орла?", a: "Главный бронзовый монумент величественной птицы, свившей гнездо из колосьев, установлен на площади перед железнодорожным вокзалом и встречает всех гостей города." },
     { q: "Далеко ли от Орла находится усадьба Спасское-Лутовиново?", a: "Родовое имение Ивана Тургенева расположено в 65 км от Орла рядом со Мценском; туда можно легко добраться на пригородном автобусе или автомобиле за 1 час." },
-    ],
+    ]
   },
   orenburg: {
     brief:
@@ -3559,22 +3528,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'А вы знали, что знаменитый оренбургский пуховый платок настолько тонкий, что настоящее, качественное изделие ручной работы размером два на два метра можно без труда протянуть сквозь обычное обручальное кольцо?',
     mustSee: [
       { name: 'Пешеходный мост «Европа — Азия»', desc: 'Знаменитый мост через реку Урал, условно соединяющий две части света',
-        locationSlug: 'orenburg-peshehodnyy-most-evropa-aziya',
+        locationSlug: 'orenburg-peshehodnyy-most-evropa-aziya'
       },
       { name: 'Оренбургская детская железная дорога', desc: 'Одна из старейших действующих узкоколеек в стране вдоль реки',
-        locationSlug: 'orenburg-orenburgskaya-detskaya-zheleznaya-doroga',
+        locationSlug: 'orenburg-orenburgskaya-detskaya-zheleznaya-doroga'
       },
       { name: 'Музейный комплекс «Национальная деревня»', desc: 'Этнографический парк с подворьями разных народов края',
-        venueSlug: 'orenburg-muzeynyy-kompleks-natsional-naya-derevnya',
+        venueSlug: 'orenburg-muzeynyy-kompleks-natsional-naya-derevnya'
       },
       { name: 'Культурный комплекс «Караван-Сарай»', desc: 'Памятник архитектуры XIX века, стилизованный под традиционный башкирский аул',
-        locationSlug: 'orenburg-kul-turnyy-kompleks-karavan-saray',
+        locationSlug: 'orenburg-kul-turnyy-kompleks-karavan-saray'
       },
       { name: 'Оренбургская набережная и станция «Комсомольская»', desc: 'Отреставрированная прогулочная зона с исторической деревянной станцией',
-        locationSlug: 'orenburg-orenburgskaya-naberezhnaya-i-stantsiya-komsomol-skaya',
+        locationSlug: 'orenburg-orenburgskaya-naberezhnaya-i-stantsiya-komsomol-skaya'
       },
       { name: 'Музей космонавтики', desc: 'Экспозиция, посвящённая Юрию Гагарину, который учился в местном лётном училище',
-        venueSlug: 'orenburg-muzey-kosmonavtiki',
+        venueSlug: 'orenburg-muzey-kosmonavtiki'
       },
     ],
     travel:
@@ -3583,7 +3552,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "Где проходит знаменитая граница между Европой и Азией?", a: "Символическая граница двух частей света проходит прямо по реке Урал; через нее перекинут красивый пешеходный мост с памятными стелами на обоих берегах, по которому можно перейти за пару минут." },
     { q: "Где купить настоящий оренбургский пуховый платок?", a: "Покупать легендарную «паутинку» лучше всего в фирменных магазинах фабрики «Оренбургский пуховый платок» или в магазине при областном музее изобразительных искусств, чтобы гарантированно избежать подделок." },
     { q: "Можно ли из Оренбурга доехать до соленого озера Развал в Соль-Илецке?", a: "Да, знаменитый курорт с целебными грязями и аналогом Мертвого моря находится всего в 70 км к югу от города, туда в летний сезон каждые полчаса ходят рейсовые автобусы и маршрутки." },
-    ],
+    ]
   },
   abakan: {
     brief:
@@ -3591,22 +3560,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'А вы знали, что Абакан называют «воротами в сибирскую Долину Царей»? Всего в часе езды от города находятся Салбыкские курганы - гигантские каменные мегалиты, которые старше знаменитого Стоунхенджа.',
     mustSee: [
       { name: 'Национальный музей Республики Хакасия', desc: 'Главный музей региона с археологией, этнографией и историей Хакасии',
-        venueSlug: 'abakan-natsional-nyy-muzey-respubliki-hakasiya',
+        venueSlug: 'abakan-natsional-nyy-muzey-respubliki-hakasiya'
       },
       { name: 'Салбыкский курган', desc: 'Монументальный степной курган — одна из главных достопримечательностей Хакасии',
-        locationSlug: 'abakan-salbykskiy-kurgan',
+        locationSlug: 'abakan-salbykskiy-kurgan'
       },
       { name: 'Археологический комплекс «Сундуки»', desc: 'Древние наскальные рисунки и священные скалы в степи под Абаканом',
-        locationSlug: 'abakan-arheologicheskiy-kompleks-sunduki',
+        locationSlug: 'abakan-arheologicheskiy-kompleks-sunduki'
       },
       { name: 'Петроглифы на скале Казанковка', desc: 'Наскальные изображения на берегу Енисея — важный памятник древней культуры',
-        locationSlug: 'abakan-petroglify-na-skale-kazankovka',
+        locationSlug: 'abakan-petroglify-na-skale-kazankovka'
       },
       { name: 'Саяно-Шушенская ГЭС', desc: 'Крупнейшая гидроэлектростанция России с впечатляющей плотиной и смотровыми площадками',
-        locationSlug: 'abakan-sayano-shushenskaya-ges',
+        locationSlug: 'abakan-sayano-shushenskaya-ges'
       },
       { name: 'Ботанический сад СО РАН', desc: 'Один из старейших ботанических садов Сибири с редкими растениями и прогулочными аллеями',
-        locationSlug: 'abakan-botanicheskiy-sad-so-ran',
+        locationSlug: 'abakan-botanicheskiy-sad-so-ran'
       },
     ],
     travel:
@@ -3615,7 +3584,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "Сколько времени нужно на осмотр самого Абакана?", a: "Для прогулки по центру, посещения парков и великолепного Краеведческого музея вполне достаточно одного полного дня." },
     { q: "Далеко ли от города находится Саяно-Шушенская ГЭС?", a: "Грандиозная плотина расположена примерно в 120 км к югу от Абакана рядом с Саяногорском, туда можно доехать на машине за 1,5–2 часа." },
     { q: "Что такое хакасский талкан и где его попробовать?", a: "Это традиционный продукт из обжаренного ячменя или пшеницы; его подают в виде сытных десертных шариков с медом и маслом в этно-кафе города." },
-    ],
+    ]
   },
   pskov: {
     brief:
@@ -3623,22 +3592,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'А вы знали, что псковские средневековые храмы внесены в список всемирного наследия ЮНЕСКО? Их уникальная архитектура из белого известняка с приземистыми звонницами не имеет аналогов в мире.',
     mustSee: [
       { name: 'Псковский Кром (Кремль)', desc: 'Средневековая крепость на слиянии Великой и Псковы с Троицким собором',
-        locationSlug: 'pskov-pskovskiy-krom-kreml',
+        locationSlug: 'pskov-pskovskiy-krom-kreml'
       },
       { name: 'Довмонтов город', desc: 'Археологический музей под открытым небом у стен Крома с фундаментами древних храмов',
-        locationSlug: 'pskov-dovmontov-gorod',
+        locationSlug: 'pskov-dovmontov-gorod'
       },
       { name: 'Храмы псковской архитектурной школы', desc: 'Памятники ЮНЕСКО: церковь Василия на Горке, Спасо-Преображенский собор Мирожского монастыря',
-        locationSlug: 'pskov-hramy-pskovskoy-arhitekturnoy-shkoly',
+        locationSlug: 'pskov-hramy-pskovskoy-arhitekturnoy-shkoly'
       },
       { name: 'Гремячая башня', desc: 'Самая высокая оборонительная башня Пскова на крутом берегу реки',
-        locationSlug: 'pskov-gremyachaya-bashnya',
+        locationSlug: 'pskov-gremyachaya-bashnya'
       },
       { name: 'Изборская крепость', desc: 'Древний форпост в 30 км от города с башней Луковка и Словенскими ключами',
-        locationSlug: 'pskov-izborskaya-krepost',
+        locationSlug: 'pskov-izborskaya-krepost'
       },
       { name: 'Псково-Печерский монастырь', desc: 'Крупный монастырь с карстовыми пещерами — одна из главных святынь Северо-Запада',
-        locationSlug: 'pskov-pskovo-pecherskiy-monastyr',
+        locationSlug: 'pskov-pskovo-pecherskiy-monastyr'
       },
     ],
     travel:
@@ -3647,7 +3616,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "Нужно ли покупать билет для входа на территорию Псковского Кремля (Крома)?", a: "Проход на саму историческую территорию крепости абсолютно бесплатный для всех, билеты требуются только для подъема на смотровую площадку Власьевской башни и в музеи Приказных палат." },
     { q: "Что за необычная надпись «Россия начинается здесь» установлена у стен крепости?", a: "Это огромный светящийся арт-объект, смонтированный из букв старой культовой вывески гостиницы «Россия» в Москве, который расположен на набережной у подножия Крома и стал любимой фотозоной туристов." },
     { q: "Далеко ли от Пскова находятся Изборск и Печоры?", a: "Древняя Изборская крепость с ключами и Псково-Печерский Свято-Успенский монастырь находятся в одном направлении в 30 и 50 км от Пскова соответственно; туда ежедневно ходят рейсовые автобусы №207 от автовокзала." },
-    ],
+    ]
   },
   sevastopol: {
     brief:
@@ -3655,22 +3624,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'Знаете ли вы, что прямо в черте Севастополя находятся руины античного города Херсонес Таврический, который старше самого Рима? Именно здесь более тысячи лет назад принял крещение киевский князь Владимир, положив начало крещению всей Руси.',
     mustSee: [
       { name: 'Памятник затопленным кораблям и Графская пристань', desc: 'Главный символ города на Приморском бульваре, установленный прямо в воде',
-        locationSlug: 'sevastopol-pamyatnik-zatoplennym-korablyam-i-grafskaya-pristan',
+        locationSlug: 'sevastopol-pamyatnik-zatoplennym-korablyam-i-grafskaya-pristan'
       },
       { name: 'Музей-заповедник «Херсонес Таврический»', desc: 'Руины древнегреческого и византийского полиса, место крещения князя Владимира',
-        venueSlug: 'sevastopol-muzey-zapovednik-hersones-tavricheskiy',
+        venueSlug: 'sevastopol-muzey-zapovednik-hersones-tavricheskiy'
       },
       { name: 'Малахов курган и Сапун-гора', desc: 'Мемориалы двух героических оборон города с панорамами и военной техникой',
-        locationSlug: 'sevastopol-malahov-kurgan-i-sapun-gora',
+        locationSlug: 'sevastopol-malahov-kurgan-i-sapun-gora'
       },
       { name: 'Балаклавская бухта', desc: 'Живописный фьорд с генуэзской крепостью Чембало и подземным музеем подлодок',
-        locationSlug: 'sevastopol-balaklavskaya-buhta',
+        locationSlug: 'sevastopol-balaklavskaya-buhta'
       },
       { name: 'Мыс Фиолент', desc: 'Отвесные скалы, бирюзовая вода и Свято-Георгиевский монастырь на обрыве',
-        locationSlug: 'sevastopol-mys-fiolent',
+        locationSlug: 'sevastopol-mys-fiolent'
       },
       { name: 'Музей Черноморского флота', desc: 'Один из старейших морских музеев мира в историческом здании в центре города',
-        venueSlug: 'sevastopol-muzey-chernomorskogo-flota',
+        venueSlug: 'sevastopol-muzey-chernomorskogo-flota'
       },
     ],
     travel:
@@ -3679,7 +3648,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "Нужно ли платить за вход на территорию древнего Херсонеса?", a: "Территория музея-заповедника «Херсонес Таврический» является платной для туристов, однако для жителей города Севастополя при предъявлении паспорта действует бесплатный вход." },
     { q: "Как добраться из центра города до знаменитой Балаклавской бухты?", a: "Балаклава является частью Севастополя; доехать туда из центра можно на городских автобусах или маршрутках №94 и №9 от транспортного узла «5-й километр» за 20–30 минут." },
     { q: "Как работает морской общественный транспорт в Севастополе?", a: "Из-за уникального рельефа бухты катера и паромы являются обычным городским транспортом, на котором можно по цене автобусного билета быстро переправиться с Графской пристани на Северную сторону." },
-    ],
+    ]
   },
   simferopol: {
     brief:
@@ -3687,22 +3656,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'А вы знали, что из Симферополя в Ялту идет самый длинный в мире троллейбусный маршрут? Его протяженность составляет рекордные 86 километров, а сама трасса проходит через живописные горные перевалы и панорамы черноморского побережья.',
     mustSee: [
       { name: 'Археологический заповедник «Скифский Неаполь»', desc: 'Остатки древней столицы позднескифского государства с панорамой на город',
-        locationSlug: 'simferopol-arheologicheskiy-zapovednik-skifskiy-neapol',
+        locationSlug: 'simferopol-arheologicheskiy-zapovednik-skifskiy-neapol'
       },
       { name: 'Караимская кенасса', desc: 'Редкий памятник культовой архитектуры караимов с восточными мотивами',
-        locationSlug: 'simferopol-karaimskaya-kenassa',
+        locationSlug: 'simferopol-karaimskaya-kenassa'
       },
       { name: 'Улицы Пушкина и Карла Маркса', desc: 'Исторический центр «Старого города» с купеческими особняками и кафе',
-        locationSlug: 'simferopol-ulitsy-pushkina-i-karla-marksa',
+        locationSlug: 'simferopol-ulitsy-pushkina-i-karla-marksa'
       },
       { name: 'Гагаринский парк', desc: 'Крупнейший городской парк Крыма с прудами, аллеями и колесом обозрения',
-        locationSlug: 'simferopol-gagarinskiy-park',
+        locationSlug: 'simferopol-gagarinskiy-park'
       },
       { name: 'Симферопольское водохранилище', desc: 'Искусственное водохранилище на окраине с видами на Чатыр-Даг',
-        locationSlug: 'simferopol-simferopol-skoe-vodohranilische',
+        locationSlug: 'simferopol-simferopol-skoe-vodohranilische'
       },
       { name: 'Мраморная и Красная пещеры', desc: 'Оборудованные пещерные комплексы в окрестностях — одни из красивейших в Европе',
-        locationSlug: 'simferopol-mramornaya-i-krasnaya-peschery',
+        locationSlug: 'simferopol-mramornaya-i-krasnaya-peschery'
       },
     ],
     travel:
@@ -3711,7 +3680,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "Есть ли в Симферополе море?", a: "Прямого выхода к морю у города нет, ближайшие пляжи Каламитского залива (Николаевка) расположены примерно в 40 км, куда можно доехать на автобусе за 40 минут." },
     { q: "Что такое Неаполь Скифский и где его искать?", a: "Это уникальный археологический заповедник на месте древней столицы позднескифского государства, расположенный на Петровских высотах прямо в черте города." },
     { q: "Правда ли, что из Симферополя в Ялту ходит троллейбус?", a: "Да, это уникальный и самый длинный в мире междугородний троллейбусный маршрут (протяженность — 86 км), который идет от ж/д вокзала Симферополя через Ангарский перевал прямо к Южному берегу Крыма." },
-    ],
+    ]
   },
   penza: {
     brief:
@@ -3719,22 +3688,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'А вы знали, что Пенза - это официальная родина русского цирка? Именно здесь в 1873 году братья Никитины открыли первый в Российской империи стационарный цирк, нарушив монополию иностранных бродячих трупп.',
     mustSee: [
       { name: 'Музей одной картины им. Г. В. Мясникова', desc: 'Уникальный формат, где зрителям показывают фильм об одном шедевре, а затем саму картину',
-        venueSlug: 'penza-muzey-odnoy-kartiny-im-g-v-myasnikova',
+        venueSlug: 'penza-muzey-odnoy-kartiny-im-g-v-myasnikova'
       },
       { name: 'Пензенская пешеходная улица (Московская)', desc: 'Старейшая улица города с фонтанной площадью и часами с кукушкой',
-        locationSlug: 'penza-penzenskaya-peshehodnaya-ulitsa-moskovskaya',
+        locationSlug: 'penza-penzenskaya-peshehodnaya-ulitsa-moskovskaya'
       },
       { name: 'Парк имени В. Г. Белинского', desc: 'Старинный тенистый парк на горе с вековыми дубами и планетарием',
-        locationSlug: 'penza-park-imeni-v-g-belinskogo',
+        locationSlug: 'penza-park-imeni-v-g-belinskogo'
       },
       { name: 'Музей-заповедник «Тарханы»', desc: 'Загородное имение, где провёл детство поэт Михаил Лермонтов (в области)',
-        venueSlug: 'penza-muzey-zapovednik-tarhany',
+        venueSlug: 'penza-muzey-zapovednik-tarhany'
       },
       { name: 'Светозвуковой фонтан', desc: 'Современный светомузыкальный комплекс, излюбленное место вечерних встреч',
-        locationSlug: 'penza-svetozvukovoy-fontan',
+        locationSlug: 'penza-svetozvukovoy-fontan'
       },
       { name: 'Памятник Первопоселенцу', desc: 'Монумент на смотровой площадке старой крепости, ставший визитной карточкой Пензы',
-        locationSlug: 'penza-pamyatnik-pervoposelentsu',
+        locationSlug: 'penza-pamyatnik-pervoposelentsu'
       },
     ],
     travel:
@@ -3743,7 +3712,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "Правда ли, что в Пензе находится единственный в мире музей Мейерхольда?", a: "Да, уникальный Центр театрального искусства «Дом Мейерхольда» расположен в подлинном деревянном особняке купеческой усадьбы, где великий режиссер провел детство и юность." },
     { q: "Как работает знаменитый пензенский Светомузыкальный фонтан?", a: "Масштабный фонтан на одноименной площади в центре города работает ежедневно, а красочные лазерные и музыкальные шоу запускаются в вечернее время по выходным и праздникам." },
     { q: "Далеко ли от города находится музей-заповедник «Тарханы»?", a: "Родина Михаила Лермонтова расположена в 100 км от Пензы в селе Лермонтово, доехать туда можно на регулярных проходящих автобусах в сторону Тамбова за 1,5 часа." },
-    ],
+    ]
   },
   volgograd: {
     brief:
@@ -3751,22 +3720,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'А вы знали, что волгоградская статуя «Родина-мать зовёт!» при строительстве была занесена в Книгу рекордов Гиннесса как самая высокая скульптура-статуя в мире? Её общая высота - 85 метров.',
     mustSee: [
       { name: 'Мамаев курган', desc: 'Грандиозный мемориальный комплекс, увенчанный знаменитой 85-метровой статуей «Родина-мать зовёт!»',
-        locationSlug: 'volgograd-mamaev-kurgan',
+        locationSlug: 'volgograd-mamaev-kurgan'
       },
       { name: 'Музей-панорама «Сталинградская битва»', desc: 'Крупнейшее художественное полотно-панорама России',
-        venueSlug: 'volgograd-muzey-panorama-stalingradskaya-bitva',
+        venueSlug: 'volgograd-muzey-panorama-stalingradskaya-bitva'
       },
       { name: 'Центральная набережная имени 62-й Армии', desc: 'Парадные ворота города со сталинской архитектурой и променадами у Волги',
-        locationSlug: 'volgograd-tsentral-naya-naberezhnaya-imeni-62-y-armii',
+        locationSlug: 'volgograd-tsentral-naya-naberezhnaya-imeni-62-y-armii'
       },
       { name: 'Волгоградский метротрам', desc: 'Уникальный скоростной трамвай, который часть пути идёт под землёй как метро',
-        locationSlug: 'volgograd-volgogradskiy-metrotram',
+        locationSlug: 'volgograd-volgogradskiy-metrotram'
       },
       { name: 'Мельница Гергардта', desc: 'Разрушенное кирпичное здание, оставленное как немой свидетель ожесточенности боёв',
-        locationSlug: 'volgograd-mel-nitsa-gergardta',
+        locationSlug: 'volgograd-mel-nitsa-gergardta'
       },
       { name: 'Дом Павлова', desc: 'Легендарный жилой дом, который героически обороняла группа советских бойцов в течение 58 дней',
-        locationSlug: 'volgograd-dom-pavlova',
+        locationSlug: 'volgograd-dom-pavlova'
       },
     ],
     travel:
@@ -3775,7 +3744,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "Сколько времени нужно, чтобы подняться на Мамаев курган?", a: "Пеший подъем от подножия холма до подножия монумента «Родина-мать зовет!» с осмотром всех площадей занимает около 1–1,5 часов." },
     { q: "Что такое метротрам и где на него прокатиться?", a: "Это уникальная для России система скоростного трамвая, линии которой в центре города проходят под землей по принципу обычного метро; сесть на него можно на станциях «Площадь Ленина» или «Комсомольская»." },
     { q: "Какое гастрономическое чудо попробовать в Волгограде?", a: "Обязательно попробуйте знаменитое местное горчичное масло сарептского производства и блюда из донской рыбы." },
-    ],
+    ]
   },
   smolensk: {
     brief:
@@ -3783,22 +3752,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'Знаете ли вы, что Смоленская крепостная стена - это самая большая кирпичная крепость в мире, сохранившаяся до наших дней? Борис Годунов ласково называл её «ожерельем всея Руси», а её стены протяженностью изначально 6,5 км строила буквально вся страна.',
         mustSee: [
       { name: 'Смоленская крепостная стена', desc: 'Главная каменная крепость России рубежа XVI-XVII веков',
-        locationSlug: 'smolensk-smolenskaya-krepostnaya-stena',
+        locationSlug: 'smolensk-smolenskaya-krepostnaya-stena'
       },
       { name: 'Свято-Успенский кафедральный собор', desc: 'Бело-бирюзовый барочный собор на Соборной горе',
-        venueSlug: 'smolensk-svyato-uspenskiy-kafedralnyy-sobor',
+        venueSlug: 'smolensk-svyato-uspenskiy-kafedralnyy-sobor'
       },
       { name: 'Громовая башня', desc: 'Музеефицированная башня крепости с экспозицией XVII века',
-        locationSlug: 'smolensk-gromovaya-bashnya',
+        locationSlug: 'smolensk-gromovaya-bashnya'
       },
       { name: 'Лопатинский сад', desc: 'Старейший парк Смоленска внутри оборонительного рва',
-        locationSlug: 'smolensk-lopatinskiy-sad',
+        locationSlug: 'smolensk-lopatinskiy-sad'
       },
       { name: 'Памятник «Благодарная Россия героям 1812 года» (Памятник с орлами)', desc: 'Монумент 1812 года с бронзовыми орлами в сквере Памяти Героев',
-        locationSlug: 'smolensk-pamyatnik-blagodarnaya-rossiya-geroyam-1812-goda-pamyatnik-s-orlami',
+        locationSlug: 'smolensk-pamyatnik-blagodarnaya-rossiya-geroyam-1812-goda-pamyatnik-s-orlami'
       },
       { name: 'Историко-архитектурный комплекс «Теремок» (Флёново)', desc: 'Неорусская усадьба Тенишевой в 15 километрах от Смоленска',
-        venueSlug: 'smolensk-istoriko-arhitekturnyy-kompleks-teremok-flenovo',
+        venueSlug: 'smolensk-istoriko-arhitekturnyy-kompleks-teremok-flenovo'
       },
     ],
     sights: [
@@ -3815,7 +3784,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       { q: "Сколько дней нужно на осмотр Смоленска?", a: "Для первого знакомства и неспешного осмотра крепости, соборов и центральных парков вполне достаточно 2 полных дней (стандартные выходные)." },
       { q: "Можно ли подняться на Смоленскую крепостную стену?", a: "Официально подниматься на необорудованные прясла стены запрещено из соображений безопасности, но можно посетить отреставрированные башни с музеями внутри." },
       { q: "Что привезти из Смоленска в подарок?", a: "Самые популярные гастрономические сувениры — это знаменитый смоленский кустарный вяленый сахар (эко-сладость по старинным рецептам) и бальзам «Смоленский»." },
-    ],
+    ]
   },
   syktyvkar: {
     brief:
@@ -3823,22 +3792,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'Знаете ли вы, что в Сыктывкаре находится одна из самых узких улиц в мире? Грибной переулок имеет ширину в самом узком месте всего 10 сантиметров - пройти по нему невозможно, но это культовый арт-объект, у которого обожают фотографироваться туристы.',
         mustSee: [
       { name: 'Свято-Стефановский кафедральный собор', desc: 'Главный храм Коми с 64-метровым золоченым крестом',
-        venueSlug: 'syktyvkar-svyato-stefanovskiy-kafedralnyy-sobor',
+        venueSlug: 'syktyvkar-svyato-stefanovskiy-kafedralnyy-sobor'
       },
       { name: 'Национальная галерея Республики Коми', desc: 'Главное собрание искусства Коми в здании духовного училища',
-        venueSlug: 'syktyvkar-natsionalnaya-galereya-respubliki-komi',
+        venueSlug: 'syktyvkar-natsionalnaya-galereya-respubliki-komi'
       },
       { name: 'Улица Куратова и купеческие дома', desc: 'Историческая улица Усть-Сысольска с купеческой застройкой',
-        locationSlug: 'syktyvkar-ulitsa-kuratova-i-kupecheskie-doma',
+        locationSlug: 'syktyvkar-ulitsa-kuratova-i-kupecheskie-doma'
       },
       { name: 'Пожарная каланча', desc: 'Краснокирпичная часовая башня действующей пожарной части',
-        locationSlug: 'syktyvkar-pozharnaya-kalancha',
+        locationSlug: 'syktyvkar-pozharnaya-kalancha'
       },
       { name: 'Памятник купеческому сундуку', desc: 'Бронзовый сундук-талисман купеческого успеха в центре города',
-        locationSlug: 'syktyvkar-pamyatnik-kupecheskomu-sunduku',
+        locationSlug: 'syktyvkar-pamyatnik-kupecheskomu-sunduku'
       },
       { name: 'Арт-объект «Коми пасы»', desc: 'Этно-футуристическая стела с древними знаками Коми',
-        locationSlug: 'syktyvkar-art-obekt-komi-pasy',
+        locationSlug: 'syktyvkar-art-obekt-komi-pasy'
       },
     ],
     sights: [
@@ -3855,7 +3824,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       { q: "Правда ли, что в Сыктывкаре есть самая узкая улица в мире?", a: "Да, Грибной переулок шириной всего около 10 сантиметров неофициально считается самым узким, это популярный у туристов арт-объект." },
       { q: "Далеко ли от Сыктывкара до плато Маньпупунёр?", a: "Пешком или на машине добраться туда напрямую нельзя; туры на знаменитые столбы выветривания из Сыктывкара организуются в основном на вертолетах." },
       { q: "Какое национальное блюдо стоит попробовать?", a: "Обязательно отведайте коми шаньги (круглые открытые пирожки с картошкой или ягодами) и блюда из свежей оленины." },
-    ],
+    ]
   },
   'yuzhno-sahalinsk': {
     brief:
@@ -3863,22 +3832,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'Знаете ли вы, что Южно-Сахалинск - это мировая столица гигантского лопуха? Местные растения из-за уникального климата и состава почвы вырастают в высоту до трех метров, а их листья туристы часто используют вместо полноценных зонтов во время дождя.',
         mustSee: [
       { name: 'Сахалинский областной краеведческий музей', desc: 'Подлинное японское здание 1937 года с садом и историей острова',
-        venueSlug: 'yuzhno-sahalinsk-sahalinskiy-oblastnoy-kraevedcheskiy-muzey',
+        venueSlug: 'yuzhno-sahalinsk-sahalinskiy-oblastnoy-kraevedcheskiy-muzey'
       },
       { name: 'Горнолыжный комплекс «Горный воздух»', desc: 'Круглогодичный курорт на городских склонах с гондолами и панорамой долины',
-        locationSlug: 'yuzhno-sahalinsk-gornolyzhnyy-kompleks-gornyy-vozduh',
+        locationSlug: 'yuzhno-sahalinsk-gornolyzhnyy-kompleks-gornyy-vozduh'
       },
       { name: 'Музейно-мемориальный комплекс «Победа»', desc: 'Интерактивный военно-исторический комплекс о событиях 1945 года на Сахалине',
-        venueSlug: 'yuzhno-sahalinsk-muzeyno-memorialnyy-kompleks-pobeda',
+        venueSlug: 'yuzhno-sahalinsk-muzeyno-memorialnyy-kompleks-pobeda'
       },
       { name: 'Кафедральный собор Рождества Христова', desc: '77-метровый белокаменный собор с мозаиками на площади Победы',
-        venueSlug: 'yuzhno-sahalinsk-kafedralnyy-sobor-rozhdestva-hristova',
+        venueSlug: 'yuzhno-sahalinsk-kafedralnyy-sobor-rozhdestva-hristova'
       },
       { name: 'Сахалинский зооботанический парк', desc: 'Островной зоопарк и ботанический сад с дальневосточными животными',
-        venueSlug: 'yuzhno-sahalinsk-sahalinskiy-zoobotanicheskiy-park',
+        venueSlug: 'yuzhno-sahalinsk-sahalinskiy-zoobotanicheskiy-park'
       },
       { name: 'Грязевой вулкан Южно-Сахалинский', desc: 'Геологический памятник с булькающими грязевыми конусами среди тайги',
-        locationSlug: 'yuzhno-sahalinsk-gryazevoy-vulkan-yuzhno-sahalinskiy',
+        locationSlug: 'yuzhno-sahalinsk-gryazevoy-vulkan-yuzhno-sahalinskiy'
       },
     ],
     sights: [
@@ -3895,7 +3864,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       { q: "Нужен ли пропуск для въезда в Южно-Сахалинск?", a: "Нет, для посещения самого города и большинства популярных туристических мест острова специальный пограничный пропуск гражданам РФ не требуется." },
       { q: "Можно ли бюджетно поесть морепродукты в городе?", a: "На местных рынках («Успенский», «Техник») можно выгодно купить свежего краба, креветки и икру, которые вам там же бесплатно приготовят." },
       { q: "Как работает канатная дорога «Горный воздух»?", a: "Нижняя станция подъемника расположена прямо в центре города, до нее можно дойти пешком или доехать на городском автобусе за 10 минут." },
-    ],
+    ]
   },
   kaluga: {
     brief:
@@ -3903,22 +3872,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'Знаете ли вы, что первый камень в фундамент калужского Музея космонавтики заложил лично Юрий Гагарин всего через два месяца после своего легендарного полета в космос, забросив в раствор пять копеек «на удачу»?',
     mustSee: [
       { name: 'Государственный музей истории космонавтики им. К. Э. Циолковского', desc: 'Первый в мире космический музей с ракетой «Восток» у Яченского водохранилища.',
-        venueSlug: 'kaluga-gosudarstvennyy-muzey-istorii-kosmonavtiki-im-k-e-tsiolkovskogo',
+        venueSlug: 'kaluga-gosudarstvennyy-muzey-istorii-kosmonavtiki-im-k-e-tsiolkovskogo'
       },
       { name: 'Дом-музей К. Э. Циолковского', desc: 'Деревянная усадьба ученого с подлинной мастерской и аэродинамической трубой.',
-        venueSlug: 'kaluga-dom-muzey-k-e-tsiolkovskogo',
+        venueSlug: 'kaluga-dom-muzey-k-e-tsiolkovskogo'
       },
       { name: 'Калужские Гостиные ряды', desc: 'Красно-белый торговый квартал XVIII века с аркадами на Старом Торге.',
-        locationSlug: 'kaluga-kaluzhskie-gostinye-ryady',
+        locationSlug: 'kaluga-kaluzhskie-gostinye-ryady'
       },
       { name: 'Каменный мост', desc: 'Старейший каменный виадук России 1785 года над Березуйским оврагом.',
-        locationSlug: 'kaluga-kamennyy-most',
+        locationSlug: 'kaluga-kamennyy-most'
       },
       { name: 'Улица Театральная (Калужский Арбат)', desc: 'Пешеходная артерия с бронзовым Циолковским у велосипеда и купеческими домами.',
-        locationSlug: 'kaluga-ulitsa-teatral-naya-kaluzhskiy-arbat',
+        locationSlug: 'kaluga-ulitsa-teatral-naya-kaluzhskiy-arbat'
       },
       { name: 'Калужский областной драматический театр', desc: 'Драмтеатр 1777 года в сталинском ампире на Театральной площади.',
-        venueSlug: 'kaluga-kaluzhskiy-oblastnoy-dramaticheskiy-teatr',
+        venueSlug: 'kaluga-kaluzhskiy-oblastnoy-dramaticheskiy-teatr'
       },
     ],
     sights: [
@@ -3935,7 +3904,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       { q: "Как добраться из Калуги до арт-парка Никола-Ленивец?", a: "Проще всего доехать на автомобиле или такси (около 80 км от города), также по выходным ходят прямые туристические автобусы." },
       { q: "Нужно ли покупать билет в Музей космонавтики заранее?", a: "В выходные и праздничные дни на входе бывают очереди, поэтому билеты в музей и особенно в планетарий лучше бронировать онлайн на официальном сайте." },
       { q: "Что такое «Калужское тесто» и где его купить?", a: "Это знаменитый старинный десерт из сухарей, меда и специй, напоминающий мягкое пирожное; продается в фирменных сувенирных лавках центра." },
-    ],
+    ]
   },
   kostroma: {
     brief:
@@ -3943,22 +3912,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'А вы знали, что Кострома - это официальная родина сразу двух культовых сказочных персонажей? Именно в костромских лесах совершил свой подвиг Иван Сусанин, и здесь же находится единственный в России терем Снегурочки.',
         mustSee: [
       { name: 'Свято-Троицкий Ипатьевский монастырь', desc: 'Главная святыня Костромы и колыбель дома Романовых у слияния Костромы и Волги.',
-        venueSlug: 'kostroma-svyato-troitskiy-ipatevskiy-monastyr',
+        venueSlug: 'kostroma-svyato-troitskiy-ipatevskiy-monastyr'
       },
       { name: 'Костромские Торговые ряды', desc: 'Грандиозный комплекс купеческих рядов XVIII века, который до сих пор остается живым торговым сердцем Костромы.',
-        locationSlug: 'kostroma-kostromskie-torgovye-ryady',
+        locationSlug: 'kostroma-kostromskie-torgovye-ryady'
       },
       { name: 'Сусанинская площадь («Сковородка»)', desc: 'Круглая парадная площадь Костромы с радиальной планировкой и памятником Ивану Сусанину.',
-        locationSlug: 'kostroma-susaninskaya-ploschad-skovorodka',
+        locationSlug: 'kostroma-susaninskaya-ploschad-skovorodka'
       },
       { name: 'Пожарная каланча на Сусанинской площади', desc: 'Главный архитектурный символ Костромы и изящная пожарная башня позднего классицизма.',
-        locationSlug: 'kostroma-pozharnaya-kalancha-na-susaninskoy-ploschadi',
+        locationSlug: 'kostroma-pozharnaya-kalancha-na-susaninskoy-ploschadi'
       },
       { name: 'Терем Снегурочки', desc: 'Сказочный терем и ледяная комната Снегурочки на высоком берегу Волги.',
-        venueSlug: 'kostroma-terem-snegurochki',
+        venueSlug: 'kostroma-terem-snegurochki'
       },
       { name: 'Музей сыра', desc: 'Интерактивный музей сыроварения с дегустациями и крафтовыми сортами в центре Костромы.',
-        venueSlug: 'kostroma-muzey-syra',
+        venueSlug: 'kostroma-muzey-syra'
       },
     ],
     sights: [
@@ -3975,7 +3944,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       { q: "Где в Костроме раскинулись те самые Торговые ряды?", a: "Грандиозный комплекс находится в самом центре города на Сусанинской площади, пропустить его невозможно." },
       { q: "Правда ли, что в Костроме есть лосиная ферма?", a: "Да, знаменитая Сумароковская лосеферма расположена всего в 25 км от города, туда круглый год пускают туристов покормить лосей." },
       { q: "Какой сыр привезти из Костромы?", a: "Ищите аутентичные сорта «Костромской» и «Сусанинский» в старинной Сырной бирже, расположенной прямо внутри Красных рядов." },
-    ],
+    ]
   },
   murmansk: {
     brief:
@@ -3983,22 +3952,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'Знаете ли вы, что в Мурманске находится на вечной стоянке «Ленин» - самый первый в мире атомный ледокол? Сейчас этот легендарный стальной гигант превращен в уникальный музей Арктики.',
         mustSee: [
       { name: 'Атомный ледокол «Ленин»', desc: 'Первый в мире атомный ледокол, превращенный в интерактивный музей',
-        venueSlug: 'murmansk-atomnyy-ledokol-lenin',
+        venueSlug: 'murmansk-atomnyy-ledokol-lenin'
       },
       { name: 'Мемориал «Защитникам Советского Заполярья в годы Великой Отечественной войны» («Алёша»)', desc: '35-метровый воин на сопке с панорамой Кольского залива',
-        locationSlug: 'murmansk-memorial-zaschitnikam-sovetskogo-zapolyarya-v-gody-velikoy-otechestvenno',
+        locationSlug: 'murmansk-memorial-zaschitnikam-sovetskogo-zapolyarya-v-gody-velikoy-otechestvenno'
       },
       { name: 'Мемориальный комплекс «Морякам, погибшим в мирное время»', desc: 'Маяк памяти и рубка подлодки «Курск» на городском холме',
-        locationSlug: 'murmansk-memorialnyy-kompleks-moryakam-pogibshim-v-mirnoe-vremya',
+        locationSlug: 'murmansk-memorialnyy-kompleks-moryakam-pogibshim-v-mirnoe-vremya'
       },
       { name: 'Мурманский областной краеведческий музей', desc: 'Главная коллекция природы, истории и геологии Кольского Севера',
-        venueSlug: 'murmansk-murmanskiy-oblastnoy-kraevedcheskiy-muzey',
+        venueSlug: 'murmansk-murmanskiy-oblastnoy-kraevedcheskiy-muzey'
       },
       { name: 'Памятник «Ждущая»', desc: 'Бронзовая девушка, встречающая моряков над Кольским заливом',
-        locationSlug: 'murmansk-pamyatnik-zhduschaya',
+        locationSlug: 'murmansk-pamyatnik-zhduschaya'
       },
       { name: 'Мост через Кольский залив', desc: 'Самый протяженный автомобильный мост мирового Заполярья',
-        locationSlug: 'murmansk-most-cherez-kolskiy-zaliv',
+        locationSlug: 'murmansk-most-cherez-kolskiy-zaliv'
       },
     ],
     sights: [
@@ -4015,7 +3984,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "В какие месяцы в Мурманске можно гарантированно увидеть Северное сияние?", a: "Сезон охоты за сиянием длится с конца августа по начало апреля, но самые высокие шансы — в морозные и ясные ночи с декабря по февраль." },
     { q: "Нужно ли покупать экскурсию на атомный ледокол «Ленин» заранее?", a: "Билеты продаются строго в кассе на причале в день посещения, поэтому в выходные дни рекомендуется приходить за 30–40 минут до начала сеанса из-за очередей." },
     { q: "Как одеваться для поездки в Мурманск зимой?", a: "Обязательно берите с собой термобелье, непродуваемый пуховик, теплую обувь на толстой подошве и ветрозащитную маску — близость океана создает сильные ветры и высокую влажность." },
-    ],
+    ]
   },
   kursk: {
     brief:
@@ -4023,22 +3992,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'А вы знали, что курский соловей - это не просто метафора, а настоящий природный бренд? Местные птицы поют уникальным «курским напевом», который насчитывает до 40 различных колен (звуковых элементов), чего не умеет больше ни один соловей в мире.',
         mustSee: [
       { name: 'Мемориальный комплекс «Курская дуга»', desc: 'Крупный военно-исторический мемориал с Триумфальной аркой и выставкой боевой техники.',
-        locationSlug: 'kursk-memorialnyy-kompleks-kurskaya-duga',
+        locationSlug: 'kursk-memorialnyy-kompleks-kurskaya-duga'
       },
       { name: 'Знаменский кафедральный собор', desc: 'Главный ампирный собор Курска на Красной площади с огромным куполом.',
-        venueSlug: 'kursk-znamenskiy-kafedralnyy-sobor',
+        venueSlug: 'kursk-znamenskiy-kafedralnyy-sobor'
       },
       { name: 'Курский государственный областной краеведческий музей', desc: 'Крупнейший музей Курского края в бывшем Архиерейском доме со старинными коллекциями.',
-        venueSlug: 'kursk-kurskiy-gosudarstvennyy-oblastnoy-kraevedcheskiy-muzey',
+        venueSlug: 'kursk-kurskiy-gosudarstvennyy-oblastnoy-kraevedcheskiy-muzey'
       },
       { name: 'Сергиево-Казанский собор', desc: 'Барочный собор XVIII века с уникальным резным иконостасом и легендой о Серафиме Саровском.',
-        venueSlug: 'kursk-sergievo-kazanskiy-sobor',
+        venueSlug: 'kursk-sergievo-kazanskiy-sobor'
       },
       { name: 'Историко-культурный комплекс «Коренная пустынь»', desc: 'Знаменитый монастырский комплекс «Курский Афон» со святыми источниками у реки Тускарь.',
-        locationSlug: 'kursk-istoriko-kulturnyy-kompleks-korennaya-pustyn',
+        locationSlug: 'kursk-istoriko-kulturnyy-kompleks-korennaya-pustyn'
       },
       { name: 'Музей-усадьба А. А. Фета', desc: 'Мемориальная поэтическая усадьба Афанасия Фета с парком, прудом и личными вещами поэта.',
-        venueSlug: 'kursk-muzey-usadba-a-a-feta',
+        venueSlug: 'kursk-muzey-usadba-a-a-feta'
       },
     ],
     sights: [
@@ -4055,7 +4024,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       { q: "Далеко ли от Курска до музея «Курская дуга»?", a: "Основной мемориальный комплекс находится прямо в черте города на проспекте Победы, до него легко доехать на городском транспорте." },
       { q: "Правда ли, что курские соловьи поют по-особенному?", a: "Да, орнитологи подтверждают, что местная популяция птиц обладает уникальным многоколенным набором звуков, не встречающимся в других регионах." },
       { q: "Как попасть в усадьбу Афанасия Фета?", a: "Воробьевка находится в 30 км от Курска; туда ходят экскурсионные автобусы, а сам музей работает со среды по воскресенье." },
-    ],
+    ]
   },
   'yoshkar-ola': {
     brief:
@@ -4063,22 +4032,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'Знаете ли вы, что в Йошкар-Оле можно увидеть кусочек Бельгии и Италии одновременно? Здесь построены точные копии венецианского Дворца дожей и набережной Брюгге.',
     mustSee: [
       { name: 'Набережная Брюгге', desc: 'Фламандский променад на Малой Кокшаге с фахверковыми дворцами.',
-        locationSlug: 'yoshkar-ola-naberezhnaya-bryugge',
+        locationSlug: 'yoshkar-ola-naberezhnaya-bryugge'
       },
       { name: 'Архитектурный комплекс «12 апостолов»', desc: 'Механическая процессия Христа и апостолов каждые три часа на Патриаршей площади.',
-        locationSlug: 'yoshkar-ola-arhitekturnyy-kompleks-12-apostolov',
+        locationSlug: 'yoshkar-ola-arhitekturnyy-kompleks-12-apostolov'
       },
       { name: 'Скульптурная композиция «Йошкин кот»', desc: 'Бронзовый талисман города на скамейке у МарГУ.',
-        locationSlug: 'yoshkar-ola-skul-pturnaya-kompozitsiya-yoshkin-kot',
+        locationSlug: 'yoshkar-ola-skul-pturnaya-kompozitsiya-yoshkin-kot'
       },
       { name: 'Республиканский театр кукол', desc: 'Театр в облике замка Нойшванштайн на Патриаршей площади.',
-        venueSlug: 'yoshkar-ola-respublikanskiy-teatr-kukol',
+        venueSlug: 'yoshkar-ola-respublikanskiy-teatr-kukol'
       },
       { name: 'Царевококшайский Кремль', desc: 'Самый молодой кремль мира (2009) с копиями пушек и ярмарками.',
-        locationSlug: 'yoshkar-ola-tsarevokokshayskiy-kreml',
+        locationSlug: 'yoshkar-ola-tsarevokokshayskiy-kreml'
       },
       { name: 'Благовещенская башня', desc: '55-метровая башня с курантами - копией часов Спасской башни.',
-        locationSlug: 'yoshkar-ola-blagoveschenskaya-bashnya',
+        locationSlug: 'yoshkar-ola-blagoveschenskaya-bashnya'
       },
     ],
     sights: [
@@ -4095,7 +4064,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       { q: "Где сидит знаменитый Йошкин кот?", a: "Бронзовый памятник коту установлен на Ленинском проспекте, прямо у главного входа в Марийский государственный университет." },
       { q: "В какое время выходят 12 апостолов на часах?", a: "Уникальное представление с подвижными фигурами повторяется на площади каждые три часа, начиная со значения в 09:00 и до 21:00." },
       { q: "Что попробовать из традиционной марийской кухни?", a: "Обязательно закажите подкогыли (крупные национальные вареники с мясом или сыром) и многослойные блины команмел." },
-    ],
+    ]
   },
   bryansk: {
     brief:
@@ -4103,22 +4072,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'А вы знали, что Брянск на целый год старше Москвы? Город был основан в 985 году как оборонительная крепость среди непроходимых брянских дебрей.',
     mustSee: [
       { name: 'Курган Бессмертия', desc: 'Центральный мемориал в парке «Соловьи» с 18-метровой бетонной звездой.',
-        locationSlug: 'bryansk-kurgan-bessmertiya',
+        locationSlug: 'bryansk-kurgan-bessmertiya'
       },
       { name: 'Мемориальный комплекс «Партизанская поляна»', desc: 'Мемориал в 12 км от города с землянками, Стеной скорби и техникой.',
-        locationSlug: 'bryansk-memorial-nyy-kompleks-partizanskaya-polyana',
+        locationSlug: 'bryansk-memorial-nyy-kompleks-partizanskaya-polyana'
       },
       { name: 'Свенский Свято-Успенский монастырь', desc: 'Древняя обитель на мысу над Десной с барочным Успенским собором.',
-        locationSlug: 'bryansk-svenskiy-svyato-uspenskiy-monastyr',
+        locationSlug: 'bryansk-svenskiy-svyato-uspenskiy-monastyr'
       },
       { name: 'Парк-музей имени А. К. Толстого', desc: 'Парк деревянных скульптур из стволов деревьев в топ-12 уникальных парков мира.',
-        venueSlug: 'bryansk-park-muzey-imeni-a-k-tolstogo',
+        venueSlug: 'bryansk-park-muzey-imeni-a-k-tolstogo'
       },
       { name: 'Покровский собор', desc: 'Старейшее каменное здание города на Покровской горе в нарышкинском барокко.',
-        locationSlug: 'bryansk-pokrovskiy-sobor',
+        locationSlug: 'bryansk-pokrovskiy-sobor'
       },
       { name: 'Площадь Партизан', desc: 'Парадный центр в сталинском ампире с пилоном и капсулой времени.',
-        locationSlug: 'bryansk-ploschad-partizan',
+        locationSlug: 'bryansk-ploschad-partizan'
       },
     ],
     sights: [
@@ -4135,7 +4104,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       { q: "Как доехать до знаменитого мемориала «Партизанская поляна»?", a: "Комплекс расположен в 12 км от черты города, туда регулярно ходят пригородные автобусы от автовокзала Брянска." },
       { q: "Чем уникален парк имени Толстого?", a: "Это единственный в своем роде парк-музей, где старые засохшие деревья не спилили, а превратили в уникальные скульптуры сказочных персонажей." },
       { q: "Какую святыню хранят в Свенском монастыре?", a: "Монастырь знаменит Свенской иконой Божией Матери, которая по преданиям исцелила черниговского князя Романа, основавшего эту обитель." },
-    ],
+    ]
   },
   'blagoveschensk-amurskaya-oblast': {
     brief:
@@ -4143,22 +4112,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'Знаете ли вы, что Благовещенск - единственный областной центр в России, расположенный на государственной границе? Китайский мегаполис Хэйхэ находится на другом берегу реки Амур всего в 500 метрах, и его небоскребы отлично видны с городской набережной.',
     mustSee: [
       { name: 'Набережная реки Амур', desc: 'Многоуровневый гранитный променад с видом на китайский Хэйхэ в 750 метрах.',
-        locationSlug: 'blagoveschensk-amurskaya-oblast-naberezhnaya-reki-amur',
+        locationSlug: 'blagoveschensk-amurskaya-oblast-naberezhnaya-reki-amur'
       },
       { name: 'Триумфальная арка', desc: '20-метровые царские ворота в псевдорусском стиле, восстановленные по старым открыткам.',
-        locationSlug: 'blagoveschensk-amurskaya-oblast-triumfal-naya-arka',
+        locationSlug: 'blagoveschensk-amurskaya-oblast-triumfal-naya-arka'
       },
       { name: 'Амурский областной краеведческий музей им. Г. С. Новикова-Даурского', desc: 'Один из старейших музеев Дальнего Востока в здании «Кунст и Альберс».',
-        venueSlug: 'blagoveschensk-amurskaya-oblast-amurskiy-oblastnoy-kraevedcheskiy-muzey-im-g-s-novikova-daurskogo',
+        venueSlug: 'blagoveschensk-amurskaya-oblast-amurskiy-oblastnoy-kraevedcheskiy-muzey-im-g-s-novikova-daurskogo'
       },
       { name: 'Памятник Н. Н. Муравьеву-Амурскому', desc: 'Монумент на месте подписания Айгунского договора со смотровой на Хэйхэ.',
-        locationSlug: 'blagoveschensk-amurskaya-oblast-pamyatnik-n-n-murav-evu-amurskomu',
+        locationSlug: 'blagoveschensk-amurskaya-oblast-pamyatnik-n-n-murav-evu-amurskomu'
       },
       { name: 'Кафедральный собор Благовещения Пресвятой Богородицы', desc: 'Белокаменный семиглавый храм с Албазинской иконой Божией Матери.',
-        locationSlug: 'blagoveschensk-amurskaya-oblast-kafedral-nyy-sobor-blagovescheniya-presvyatoy-bogoroditsy',
+        locationSlug: 'blagoveschensk-amurskaya-oblast-kafedral-nyy-sobor-blagovescheniya-presvyatoy-bogoroditsy'
       },
       { name: 'Благовещенское кладбище динозавров', desc: 'Палеонтологический раскоп в черте города с костями амурозавра.',
-        locationSlug: 'blagoveschensk-amurskaya-oblast-blagoveschenskoe-kladbische-dinozavrov',
+        locationSlug: 'blagoveschensk-amurskaya-oblast-blagoveschenskoe-kladbische-dinozavrov'
       },
     ],
     sights: [
@@ -4175,7 +4144,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       { q: "Нужна ли виза, чтобы посмотреть на Китай с набережной?", a: "Нет, чтобы просто гулять по российской набережной и фотографировать китайские небоскребы Хэйхэ, никакие пропуска и визы не требуются." },
       { q: "Можно ли сейчас съездить в Китай из Благовещенска на один день?", a: "Да, между городами курсируют теплоходы (летом) и автобусы по мосту (зимой), для россиян действует упрощенный безвизовый въезд в составе тургрупп." },
       { q: "Где искать кости динозавров?", a: "Настоящие находки с Благовещенского раскопа можно увидеть в палеонтологическом музее Института геологии и природопользования ДВО РАН в центре города." },
-    ],
+    ]
   },
   belgorod: {
     brief:
@@ -4183,22 +4152,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'А вы знали, что Белгород официально признан первым в России «Городом воинской славы»? А еще прямо под улицами города залегают миллиарды тонн чистейшего писчего мела.',
     mustSee: [
       { name: 'Музей-диорама «Курская битва. Белгородское направление»', desc: 'Самая большая цельнотканая военная диорама в Европе о Прохоровском сражении.',
-        venueSlug: 'belgorod-muzey-diorama-kurskaya-bitva-belgorodskoe-napravlenie',
+        venueSlug: 'belgorod-muzey-diorama-kurskaya-bitva-belgorodskoe-napravlenie'
       },
       { name: 'Соборная площадь', desc: 'Парадный центр города с драмтеатром Щепкина, Вечным огнем и медным кругом желаний.',
-        locationSlug: 'belgorod-sobornaya-ploschad',
+        locationSlug: 'belgorod-sobornaya-ploschad'
       },
       { name: 'Памятник «Смотритель дорог» (Памятник честному автоинспектору Гречихину)', desc: 'Жанровый памятник гаишнику Павлу Гречихину с мотоциклом «Урал».',
-        locationSlug: 'belgorod-pamyatnik-smotritel-dorog-pamyatnik-chestnomu-avtoinspektoru-grechihinu',
+        locationSlug: 'belgorod-pamyatnik-smotritel-dorog-pamyatnik-chestnomu-avtoinspektoru-grechihinu'
       },
       { name: 'Марфо-Мариинский монастырь', desc: 'Старейший духовный ансамбль с Успенско-Николаевским собором Петра I и розариями.',
-        locationSlug: 'belgorod-marfo-mariinskiy-monastyr',
+        locationSlug: 'belgorod-marfo-mariinskiy-monastyr'
       },
       { name: 'Центральный парк культуры и отдыха имени В. И. Ленина', desc: 'Главный зеленый оазис города с вековыми дубами, террасами и зонами воркаута.',
-        locationSlug: 'belgorod-tsentral-nyy-park-kul-tury-i-otdyha-imeni-v-i-lenina',
+        locationSlug: 'belgorod-tsentral-nyy-park-kul-tury-i-otdyha-imeni-v-i-lenina'
       },
       { name: 'Памятник князю Владимиру (Крестителю Руси)', desc: 'Крупнейший в мире монумент князю Владимиру на Харьковской горе со смотровой.',
-        locationSlug: 'belgorod-pamyatnik-knyazyu-vladimiru-krestitelyu-rusi',
+        locationSlug: 'belgorod-pamyatnik-knyazyu-vladimiru-krestitelyu-rusi'
       },
     ],
     sights: [
@@ -4215,7 +4184,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       { q: "Далеко ли от Белгорода находится Прохоровское поле?", a: "Военно-исторический музей-заповедник «Прохоровское поле» расположен примерно в 60 км от Белгорода, туда можно доехать на пригородном поезде или автобусе." },
       { q: "Правда ли, что Белгород называют «белым городом»?", a: "Да, это связано с огромными запасами мела в регионе; прямо в черте города до сих пор видны живописные белые меловые горы." },
       { q: "Что интересного посмотреть в музее-диораме?", a: "Главный экспонат — гигантская холщовая картина длиной 67 метров, которая с поразительной точностью воссоздает события танкового сражения 1943 года." },
-    ],
+    ]
   },
   astrahan: {
     brief:
@@ -4223,22 +4192,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'А вы знали, что Астрахань - это самая близкая к Европе точка, где можно увидеть цветущие лотосы? В конце лета Каспийская дельта превращается в бескрайнее розовое море площадью в тысячи гектаров.',
     mustSee: [
       { name: 'Астраханский кремль', desc: 'Сердце и главная цитадель Нижнего Поволжья на Заячьем холме с Успенским собором и Пречистенской колокольней.',
-        locationSlug: 'astrahan-astrahanskiy-kreml',
+        locationSlug: 'astrahan-astrahanskiy-kreml'
       },
       { name: 'Астраханский государственный театр оперы и балета', desc: 'Грандиозный театральный комплекс в неорусском стиле, крупнейшее культурное сооружение на Юге России.',
-        venueSlug: 'astrahan-astrahanskiy-gosudarstvennyy-teatr-opery-i-baleta',
+        venueSlug: 'astrahan-astrahanskiy-gosudarstvennyy-teatr-opery-i-baleta'
       },
       { name: 'Купеческое подворье и набережная Волги', desc: 'Пешеходный променад вдоль Волги с Персидским, Индийским и Армянским купеческими подворьями.',
-        locationSlug: 'astrahan-kupecheskoe-podvor-e-i-naberezhnaya-volgi',
+        locationSlug: 'astrahan-kupecheskoe-podvor-e-i-naberezhnaya-volgi'
       },
       { name: 'Дом-музей Бориса Кустодиева', desc: 'Камерный музей в деревянном усадебном флигеле, где художник провел детские и юношеские годы.',
-        venueSlug: 'astrahan-dom-muzey-borisa-kustodieva',
+        venueSlug: 'astrahan-dom-muzey-borisa-kustodieva'
       },
       { name: 'Астраханский биосферный заповедник', desc: 'Природный резерват в дельте Волги с долиной каспийского лотоса и эко-тропами над водой.',
-        locationSlug: 'astrahan-astrahanskiy-biosfernyy-zapovednik',
+        locationSlug: 'astrahan-astrahanskiy-biosfernyy-zapovednik'
       },
       { name: 'Рыбный рынок «Селенские Исады»', desc: 'Старейший рыбный базар Поволжья с икрой, балыками и вяленой воблой.',
-        locationSlug: 'astrahan-rybnyy-rynok-selenskie-isady',
+        locationSlug: 'astrahan-rybnyy-rynok-selenskie-isady'
       },
     ],
     sights: [
@@ -4255,7 +4224,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       { q: "В каком месяце цветут лотосы в Астрахани?", a: "Массовое цветение каспийского лотоса начинается строго с середины июля и продолжается до начала сентября." },
       { q: "Сколько стоит вход в Астраханский кремль?", a: "Проход на саму территорию кремля абсолютно бесплатный, билеты нужны только для посещения музейных экспозиций внутри башен." },
       { q: "Где лучше всего покупать черную икру?", a: "Самый надежный способ — специализированные рыбные магазины или легендарный рынок «Селенские Исады», где обязательно нужно просить сертификат качества." },
-    ],
+    ]
   },
   arhangelsk: {
     brief:
@@ -4263,22 +4232,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'Знаете ли вы, что Архангельск - это официальная родина первого российского торгового порта и колыбель государственного флага? Именно здесь Петр I впервые поднял над своим кораблем триколор.',
     mustSee: [
       { name: 'Музей деревянного зодчества «Малые Корелы»', desc: 'Огромный музей под открытым небом в окрестностях города, где собрано около сотни аутентичных старинных изб, мельниц и церквей со всего Поморья.',
-        venueSlug: 'arhangelsk-muzey-derevyannogo-zodchestva-malye-korely',
+        venueSlug: 'arhangelsk-muzey-derevyannogo-zodchestva-malye-korely'
       },
       { name: 'Новодвинская крепость', desc: 'Первая в России регулярная приморская бастионная крепость, построенная на рубеже XVII-XVIII веков по личному указу Петра I для защиты от шведов.',
-        locationSlug: 'arhangelsk-novodvinskaya-krepost',
+        locationSlug: 'arhangelsk-novodvinskaya-krepost'
       },
       { name: 'Набережная Северной Двины', desc: 'Многокилометровый променад, где сосредоточены главные памятники города, старинный Гостиный двор и открываются потрясающие виды на широкую реку и морские суда.',
-        locationSlug: 'arhangelsk-naberezhnaya-severnoy-dviny',
+        locationSlug: 'arhangelsk-naberezhnaya-severnoy-dviny'
       },
       { name: 'Памятник Петру I', desc: 'Знаменитый монумент работы скульптора Антокольского, установленный на набережной и увековеченный на современной российской пятисотрублевой купюре.',
-        locationSlug: 'arhangelsk-pamyatnik-petru-i',
+        locationSlug: 'arhangelsk-pamyatnik-petru-i'
       },
       { name: 'Проспект Чумбарова-Лучинского', desc: 'Пешеходная улица-музей в центре Архангельска, куда были бережно перенесены и отреставрированы красивейшие деревянные особняки старого города.',
-        locationSlug: 'arhangelsk-prospekt-chumbarova-luchinskogo',
+        locationSlug: 'arhangelsk-prospekt-chumbarova-luchinskogo'
       },
       { name: 'Архангельский Гостиный двор', desc: 'Старейшее сохранившееся здание города, представляющее собой мощную каменную крепость-торговые ряды XVII века на берегу реки.',
-        locationSlug: 'arhangelsk-arhangelskiy-gostinyy-dvor',
+        locationSlug: 'arhangelsk-arhangelskiy-gostinyy-dvor'
       },
     ],
     sights: [
@@ -4295,7 +4264,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       { q: "Далеко ли от города находится музей «Малые Корелы»?", a: "Музей деревянного зодчества расположен всего в 25 км от центра Архангельска, туда каждые 20–30 минут ходят пригородные автобусы." },
       { q: "Можно ли летом купаться в Северной Двине?", a: "Официально купание в черте города чаще всего запрещено из-за сильного течения, но городские песчаные пляжи идеальны для прогулок и солнечных ванн." },
       { q: "Что такое поморский козуль?", a: "Это традиционные архангельские пряники из ржаного теста, украшенные цветной глазурью, которые веками считались оберегом и главным местным сувениром." },
-    ],
+    ]
   },
   tambov: {
     brief:
@@ -4303,22 +4272,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'А вы знали, откуда пошло выражение «тамбовский волк тебе товарищ»? В старину тамбовскими волками называли местных ярмарочных купцов, которые торговали великолепными, невероятно теплыми и прочными волчьими шкурами, бравшими первые призы на международных выставках.',
         mustSee: [
       { name: 'Музей-усадьба Асеевых', desc: 'Белокаменный дворец фабриканта Асеева с восстановленными интерьерами и ландшафтным парком',
-        venueSlug: 'tambov-muzey-usadba-aseevyh',
+        venueSlug: 'tambov-muzey-usadba-aseevyh'
       },
       { name: 'Набережная реки Цны', desc: 'Двухъярусный речной променад с фонтанами, мостами и видами на Цну',
-        locationSlug: 'tambov-naberezhnaya-reki-tsny',
+        locationSlug: 'tambov-naberezhnaya-reki-tsny'
       },
       { name: 'Спасо-Преображенский кафедральный собор', desc: 'Старейший каменный храм области с восстановленной 84-метровой колокольней',
-        venueSlug: 'tambov-spaso-preobrazhenskiy-kafedralnyy-sobor',
+        venueSlug: 'tambov-spaso-preobrazhenskiy-kafedralnyy-sobor'
       },
       { name: 'Казанский мужской монастырь', desc: 'Монастырский ансамбль с розовым Казанским собором и 107-метровой звонницей',
-        venueSlug: 'tambov-kazanskiy-muzhskoy-monastyr',
+        venueSlug: 'tambov-kazanskiy-muzhskoy-monastyr'
       },
       { name: 'Памятник Тамбовскому мужику', desc: 'Бронзовый образ крестьянина-пахаря и символ памяти об Антоновском мятеже',
-        locationSlug: 'tambov-pamyatnik-tambovskomu-muzhiku',
+        locationSlug: 'tambov-pamyatnik-tambovskomu-muzhiku'
       },
       { name: 'Тамбовский областной краеведческий музей', desc: 'Старейший музей региона с коллекциями живописи, археологии и истории края',
-        venueSlug: 'tambov-tambovskiy-oblastnoy-kraevedcheskiy-muzey',
+        venueSlug: 'tambov-tambovskiy-oblastnoy-kraevedcheskiy-muzey'
       },
     ],
     sights: [
@@ -4335,7 +4304,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       { q: "Где находится тот самый памятник Тамбовскому волку?", a: "В городе есть несколько таких скульптур, но самая популярная деревянная фигура с надписью «Тамбовский волк — товарищ» установлена на въезде в город со стороны Пензы." },
       { q: "Можно ли зайти внутрь усадьбы Асеева?", a: "Да, сейчас там располагается действующий филиал музея «Петергоф», интерьеры полностью отреставрированы, и туда водят регулярные экскурсии." },
       { q: "Чем знаменита тамбовская картошка?", a: "Местная почва идеальна для корнеплодов, поэтому тамбовский картофель считается эталоном вкуса и рассыпчатости — его обязательно стоит попробовать в местных ресторанах." },
-    ],
+    ]
   },
   chita: {
     brief:
@@ -4343,22 +4312,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'А вы знали, что именно в Чите находится знаменитая Михайло-Архангельская церковь - единственный в Сибири уцелевший старинный деревянный двухпрестольный храм XVIII века, который вручную без единого гвоздя построили из прибайкальской лиственницы?',
         mustSee: [
       { name: 'Музей декабристов (Михайло-Архангельская церковь)', desc: 'Деревянная церковь XVIII века и мемориал декабристам Забайкалья',
-        venueSlug: 'chita-muzey-dekabristov-mihaylo-arhangelskaya-tserkov',
+        venueSlug: 'chita-muzey-dekabristov-mihaylo-arhangelskaya-tserkov'
       },
       { name: 'Читинский дацан «Дамба Брейбулинг»', desc: 'Буддийский комплекс с тибетской архитектурой и молитвенными барабанами',
-        venueSlug: 'chita-chitinskiy-datsan-damba-breybuling',
+        venueSlug: 'chita-chitinskiy-datsan-damba-breybuling'
       },
       { name: 'Кафедральный собор Казанской иконы Божией Матери', desc: 'Крупный лазурно-белый собор Забайкалья с девятью золочеными куполами',
-        venueSlug: 'chita-kafedralnyy-sobor-kazanskoy-ikony-bozhiey-materi',
+        venueSlug: 'chita-kafedralnyy-sobor-kazanskoy-ikony-bozhiey-materi'
       },
       { name: 'Титовская сопка', desc: 'Природная доминанта Читы с панорамой Ингоды, тайги и города',
-        locationSlug: 'chita-titovskaya-sopka',
+        locationSlug: 'chita-titovskaya-sopka'
       },
       { name: 'Дворец Шумовых', desc: 'Роскошный особняк золотопромышленников в стиле купеческого модерна',
-        venueSlug: 'chita-dvorets-shumovyh',
+        venueSlug: 'chita-dvorets-shumovyh'
       },
       { name: 'Ивано-Арахлейские озера', desc: 'Каскад чистых озер Забайкалья для пляжного отдыха, рыбалки и кемпинга',
-        locationSlug: 'chita-ivano-arahleyskie-ozera',
+        locationSlug: 'chita-ivano-arahleyskie-ozera'
       },
     ],
     sights: [
@@ -4375,7 +4344,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       { q: "Почему Музей декабристов находится в церкви?", a: "Музей расположен в уникальном деревянном здании Михайло-Архангельской церкви XVIII века, где венчались и молились сосланные в Сибирь декабристы." },
       { q: "Можно ли туристам посещать Читинский дацан?", a: "Да, буддийский монастырь открыт для посещения, на его территории можно познакомиться с восточной культурой, но важно соблюдать правила поведения (ходить по часовой стрелке)." },
       { q: "Какое фирменное блюдо попробовать в Чите?", a: "Обязательно попробуйте забайкальские буузы (позы) — сочное национальное блюдо из теста и мяса, приготовленное на пару." },
-    ],
+    ]
   },
   'kirov-kirovskaya-oblast': {
     brief:
@@ -4383,22 +4352,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'Знаете ли вы, что Киров - это официальная резиденция Кикиморы Вятской? По славянским легендам, именно здесь находится Кикиморская гора, где сказочная проказница поселилась еще в древние времена.',
     mustSee: [
       { name: 'Набережная Грина', desc: 'Видовой променад на крутом берегу Вятки с ротондами XIX века.',
-        locationSlug: 'kirov-kirovskaya-oblast-naberezhnaya-grina',
+        locationSlug: 'kirov-kirovskaya-oblast-naberezhnaya-grina'
       },
       { name: 'Улица Спасская (Вятский Арбат)', desc: 'Пешеходная ось с Музеем дымковской игрушки и памятником «Место встречи».',
-        locationSlug: 'kirov-kirovskaya-oblast-ulitsa-spasskaya-vyatskiy-arbat',
+        locationSlug: 'kirov-kirovskaya-oblast-ulitsa-spasskaya-vyatskiy-arbat'
       },
       { name: 'Александровский сад', desc: 'Старейший парк 1835 года с ротондой Витберга без гвоздей и мостом вздохов.',
-        locationSlug: 'kirov-kirovskaya-oblast-aleksandrovskiy-sad',
+        locationSlug: 'kirov-kirovskaya-oblast-aleksandrovskiy-sad'
       },
       { name: 'Вятский палеонтологический музей', desc: 'Музей парейазавров с Котельничского местонахождения.',
-        venueSlug: 'kirov-kirovskaya-oblast-vyatskiy-paleontologicheskiy-muzey',
+        venueSlug: 'kirov-kirovskaya-oblast-vyatskiy-paleontologicheskiy-muzey'
       },
       { name: 'Свято-Успенский Трифонов мужской монастырь', desc: 'Главная обитель Вятки XVI века с Успенским собором и святым источником.',
-        locationSlug: 'kirov-kirovskaya-oblast-svyato-uspenskiy-trifonov-muzhskoy-monastyr',
+        locationSlug: 'kirov-kirovskaya-oblast-svyato-uspenskiy-trifonov-muzhskoy-monastyr'
       },
       { name: '«Заповедник сказок» (Интерактивный парк «Резиденция Кикиморы Вятской»)', desc: 'Тематический парк-родина Кикиморы на Сказочной карте России.',
-        locationSlug: 'kirov-kirovskaya-oblast-zapovednik-skazok-interaktivnyy-park-rezidentsiya-kikimory-vyatskoy',
+        locationSlug: 'kirov-kirovskaya-oblast-zapovednik-skazok-interaktivnyy-park-rezidentsiya-kikimory-vyatskoy'
       },
     ],
     sights: [
@@ -4415,7 +4384,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       { q: "Где в Кирове купить настоящую дымковскую игрушку?", a: "Покупать знаменитый глиняный сувенир лучше всего в музее «Дымковская игрушка» или фирменных художественных салонах в центре, чтобы не наткнуться на подделку." },
       { q: "Правда ли, что в Кирове жили динозавры?", a: "В области находится Котельничское местонахождение парейазавров, а в самом городе открыт потрясающий Палеонтологический музей с уникальными скелетами древних ящеров." },
       { q: "Кто такая Кикимора Вятская?", a: "Согласно местным легендам, Киров — это историческая родина Кикиморы; сейчас в городе открыта ее интерактивная резиденция с развлекательными программами для детей." },
-    ],
+    ]
   },
   kurgan: {
     brief:
@@ -4423,22 +4392,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'Знаете ли вы, что именно в Кургане доктор Гавриил Илизаров изобрел свой знаменитый аппарат для сращивания костей, который перевернул мировую медицину и вернул возможность ходить миллионам людей по всему свету?',
         mustSee: [
       { name: 'Центр «Восстановительная травматология и ортопедия» имени академика Г. А. Илизарова', desc: 'Мирово известный медицинский центр Илизарова с музеем ортопедии и парком.',
-        venueSlug: 'kurgan-tsentr-vosstanovitelnaya-travmatologiya-i-ortopediya-imeni-akademika-g-a',
+        venueSlug: 'kurgan-tsentr-vosstanovitelnaya-travmatologiya-i-ortopediya-imeni-akademika-g-a'
       },
       { name: 'Курганский авиационный музей', desc: 'Открытый музей у аэропорта с коллекцией самолетов и возможностью заглянуть в кабину пилота.',
-        venueSlug: 'kurgan-kurganskiy-aviatsionnyy-muzey',
+        venueSlug: 'kurgan-kurganskiy-aviatsionnyy-muzey'
       },
       { name: 'Музей истории города Кургана (Усадьба купца Березина)', desc: 'Купеческая усадьба XIX века с экспозицией о быте слободы Царёво Городище.',
-        venueSlug: 'kurgan-muzey-istorii-goroda-kurgana-usadba-kuptsa-berezina',
+        venueSlug: 'kurgan-muzey-istorii-goroda-kurgana-usadba-kuptsa-berezina'
       },
       { name: 'Пожарная каланча', desc: 'Краснокирпичная пожарная башня 1882 года, которая до сих пор остается действующей частью города.',
-        locationSlug: 'kurgan-pozharnaya-kalancha',
+        locationSlug: 'kurgan-pozharnaya-kalancha'
       },
       { name: 'Курганский областной культурно-выставочный центр (КВЦ)', desc: 'Главная культурная сцена Зауралья в здании советского модернизма с крупными выставками.',
-        venueSlug: 'kurgan-kurganskiy-oblastnoy-kulturno-vystavochnyy-tsentr-kvts',
+        venueSlug: 'kurgan-kurganskiy-oblastnoy-kulturno-vystavochnyy-tsentr-kvts'
       },
       { name: 'Свято-Троицкий собор', desc: 'Главный православный собор Кургана у набережной Тобола в русско-византийском стиле.',
-        venueSlug: 'kurgan-svyato-troitskiy-sobor',
+        venueSlug: 'kurgan-svyato-troitskiy-sobor'
       },
     ],
     sights: [
@@ -4455,7 +4424,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       { q: "Чем знаменит Курган в плане медицины?", a: "Город всемирно известен Центром Илизарова — уникальной клиникой ортопедии и травматологии, куда приезжают пациенты со всего земного шара." },
       { q: "Далеко ли от вокзала до исторического центра?", a: "Железнодорожный вокзал находится практически в самом центре города, до главных музеев и набережной можно дойти пешком за 15–20 минут." },
       { q: "Что посмотреть в Курганском авиационном музее?", a: "Это масштабная экспозиция под открытым небом, где собрано более десятка подлинных советских военных и гражданских самолетов и вертолетов." },
-    ],
+    ]
   },
   lipeck: {
     brief:
@@ -4463,22 +4432,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'Знаете ли вы, что местный Липецкий бювет был заложен по прямому указу Петра I? Царь лично обнаружил здесь целебную воду, целебные свойства которой врачи позже признали равными знаменитым водам немецкого Баден-Бадена.',
         mustSee: [
       { name: 'Нижний парк и Липецкий бювет', desc: 'Старейший курортный парк Липецка у подножия Соборной горы с футуристическим стеклянным бюветом и обновленными прогулочными террасами.',
-        locationSlug: 'lipeck-nizhniy-park-i-lipetskiy-byuvet',
+        locationSlug: 'lipeck-nizhniy-park-i-lipetskiy-byuvet'
       },
       { name: 'Академический театр драмы им. Л. Н. Толстого', desc: 'Главный театральный флагман Липецка в монументальном здании советского модернизма на высоком Театральном спуске.',
-        venueSlug: 'lipeck-akademicheskiy-teatr-dramy-im-l-n-tolstogo',
+        venueSlug: 'lipeck-akademicheskiy-teatr-dramy-im-l-n-tolstogo'
       },
       { name: 'Музей народного и декоративно-прикладного искусства', desc: 'Самый душевный этнографический музей Липецкой области в бывшем купеческом особняке с мастерскими ремесел.',
-        venueSlug: 'lipeck-muzey-narodnogo-i-dekorativno-prikladnogo-iskusstva',
+        venueSlug: 'lipeck-muzey-narodnogo-i-dekorativno-prikladnogo-iskusstva'
       },
       { name: 'Соборная площадь и Христорождественский кафедральный собор', desc: 'Парадный центр Липецка на вершине Соборной горы с белоснежным классицистическим собором и каскадами фонтанов.',
-        venueSlug: 'lipeck-sobornaya-ploschad-i-hristorozhdestvenskiy-kafedralnyy-sobor',
+        venueSlug: 'lipeck-sobornaya-ploschad-i-hristorozhdestvenskiy-kafedralnyy-sobor'
       },
       { name: 'Памятник Петру I на площади Петра Великого', desc: 'Главный исторический символ Липецка - динамичный монумент Петру I на просторной площади с сухими фонтанами.',
-        locationSlug: 'lipeck-pamyatnik-petru-i-na-ploschadi-petra-velikogo',
+        locationSlug: 'lipeck-pamyatnik-petru-i-na-ploschadi-petra-velikogo'
       },
       { name: 'Природный парк чудес «Кудыкина гора»', desc: 'Грандиозный семейный парк развлечений на берегу Дона с деревянной крепостью, скульптурами и огненным Змеем Горынычем.',
-        locationSlug: 'lipeck-prirodnyy-park-chudes-kudykina-gora',
+        locationSlug: 'lipeck-prirodnyy-park-chudes-kudykina-gora'
       },
     ],
     sights: [
@@ -4495,7 +4464,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       { q: "Какую воду пьют в Липецком бювете?", a: "Липецкая минеральная вода — это знаменитая хлоридно-сульфатная натриевая вода, открытая еще при Петре I, которая полезна для пищеварения." },
       { q: "Далеко ли от Липецка находится парк «Кудыкина гора»?", a: "Популярный семейный парк с гигантским извергающим пламя Змеем Горынычем расположен в 75 км от города, туда удобнее ехать на машине или экскурсионном автобусе." },
       { q: "Что интересного в музее народного искусства?", a: "Музей знаменит коллекциями романовской игрушки — старинного местного промысла глиняных свистулек, известного по всей России." },
-    ],
+    ]
   },
   ivanovo: {
     brief:
@@ -4503,22 +4472,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'А вы знали, что Иваново - это Мекка для любителей конструктивизма? Только здесь можно увидеть уникальные дома-метафоры: Дом-корабль, Дом-подкову и даже Дом-коллектив со столовой на крыше.',
     mustSee: [
       { name: 'Музей ивановского ситца', desc: 'Музей в особняке Бурылина с крупнейшей коллекцией текстильных паттернов.',
-        venueSlug: 'ivanovo-muzey-ivanovskogo-sittsa',
+        venueSlug: 'ivanovo-muzey-ivanovskogo-sittsa'
       },
       { name: 'Дом-корабль', desc: 'Эталон конструктивизма 1930-х: жилой дом в форме океанского лайнера.',
-        locationSlug: 'ivanovo-dom-korabl',
+        locationSlug: 'ivanovo-dom-korabl'
       },
       { name: 'Дом-подкова', desc: 'Конструктивистский жилой комбинат ОГПУ в форме подковы.',
-        locationSlug: 'ivanovo-dom-podkova',
+        locationSlug: 'ivanovo-dom-podkova'
       },
       { name: 'Щудровская палатка', desc: 'Старейшее каменное здание XVII века - бывшая приказная изба.',
-        locationSlug: 'ivanovo-schudrovskaya-palatka',
+        locationSlug: 'ivanovo-schudrovskaya-palatka'
       },
       { name: 'Музей промышленности и искусства (Музей Д. Г. Бурылина)', desc: '«Ивановский Эрмитаж» с астрономическими часами и египетскими мумиями.',
-        venueSlug: 'ivanovo-muzey-promyshlennosti-i-iskusstva-muzey-d-g-burylina',
+        venueSlug: 'ivanovo-muzey-promyshlennosti-i-iskusstva-muzey-d-g-burylina'
       },
       { name: 'Ивановский областной драматический театр', desc: 'Конструктивистский Дворец искусств на площади Пушкина с тремя труппами.',
-        venueSlug: 'ivanovo-ivanovskiy-oblastnoy-dramaticheskiy-teatr',
+        venueSlug: 'ivanovo-ivanovskiy-oblastnoy-dramaticheskiy-teatr'
       },
     ],
     sights: [
@@ -4535,7 +4504,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     { q: "Где лучше всего покупать знаменитый ивановский текстиль?", a: "В городе открыто несколько огромных специализированных торговых комплексов (например, «Текстиль-Профи» или «Рио»), куда организованы даже бесплатные автобусные туры." },
     { q: "Правда ли, что Иваново называют «городом невест»?", a: "Да, этот устойчивый бренд закрепился за городом в советские годы из-за огромного количества текстильных фабрик, где трудились преимущественно женщины." },
     { q: "Что уникального в местной архитектуре?", a: "Иваново официально считается заповедником советского авангарда и конструктивизма 1920–1930-х годов; здесь сохранились уникальные дома в форме корабля, подковы и птицы." },
-    ],
+    ]
   },
   kemerovo: {
     brief:
@@ -4543,22 +4512,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'А вы знали, что прямо в черте Кемерово находится уникальный Красный бор - настоящий кусок дикой сибирской тайги площадью более 400 гектаров, который чудом сохранился нетронутым посреди крупного промышленного мегаполиса?',
     mustSee: [
       { name: 'Музей-заповедник «Красная Горка»', desc: 'Индустриальный музей на месте открытия кузбасского угля с техникой и штольней.',
-        venueSlug: 'kemerovo-muzey-zapovednik-krasnaya-gorka',
+        venueSlug: 'kemerovo-muzey-zapovednik-krasnaya-gorka'
       },
       { name: 'Монумент «Память шахтерам Кузбасса» Эрнста Неизвестного', desc: 'Бронзовый шахтер с неоновым сердцем работы Эрнста Неизвестного.',
-        locationSlug: 'kemerovo-monument-pamyat-shahteram-kuzbassa-ernsta-neizvestnogo',
+        locationSlug: 'kemerovo-monument-pamyat-shahteram-kuzbassa-ernsta-neizvestnogo'
       },
       { name: 'Рудничный сосновый бор', desc: 'Реликтовый бор 400 га в центре города с буквами «КУЗБАСС» и ручными белками.',
-        locationSlug: 'kemerovo-rudnichnyy-sosnovyy-bor',
+        locationSlug: 'kemerovo-rudnichnyy-sosnovyy-bor'
       },
       { name: 'Кемеровский областной краеведческий музей', desc: 'Музей со скелетом пситтакозавра сибирского на площади Советов.',
-        venueSlug: 'kemerovo-kemerovskiy-oblastnoy-kraevedcheskiy-muzey',
+        venueSlug: 'kemerovo-kemerovskiy-oblastnoy-kraevedcheskiy-muzey'
       },
       { name: 'Набережная реки Томи', desc: 'Двухъярусный променад с памятником Бездомной собаке и сталинским ампиром.',
-        locationSlug: 'kemerovo-naberezhnaya-reki-tomi',
+        locationSlug: 'kemerovo-naberezhnaya-reki-tomi'
       },
       { name: 'Музей-заповедник «Томская Писаница»', desc: 'Заповедник петроглифов неолита в 50 км от города у реки Томи.',
-        venueSlug: 'kemerovo-muzey-zapovednik-tomskaya-pisanitsa',
+        venueSlug: 'kemerovo-muzey-zapovednik-tomskaya-pisanitsa'
       },
     ],
     sights: [
@@ -4575,7 +4544,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       { q: "Что такое «Красная Горка» и почему туда нужно сходить?", a: "Это уникальный музей-заповедник на месте основания Кузбасса, где сохранились постройки старинного рудника и открывается лучший панорамный вид на город и реку Томь." },
       { q: "Есть ли в Кемерово настоящий сосновый бор в черте города?", a: "Да, прямо на правом берегу реки раскинулся реликтовый Рудничный бор — огромный естественный лес с прогулочными тропами и эко-маршрутами." },
       { q: "Как добраться из Кемерово до знаменитой Писаницы?", a: "Историко-культурный музей-заповедник «Томская Писаница» с древними наскальными рисунками находится в 50 км от города, туда ходят регулярные пригородные автобусы." },
-    ],
+    ]
   },
   cheboksary: {
     brief:
@@ -4583,22 +4552,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'А вы знали, что Чебоксары - это официальная родина легендарного героя Гражданской войны Василия Чапаева? Здесь сохранился его подлинный деревянный дом-пятистенок, превращенный в уникальный мемориальный музей.',
         mustSee: [
       { name: 'Монумент «Мать-Покровительница»', desc: '46-метровый символ Чувашии на холме над Чебоксарским заливом',
-        locationSlug: 'cheboksary-monument-mat-pokrovitelnitsa',
+        locationSlug: 'cheboksary-monument-mat-pokrovitelnitsa'
       },
       { name: 'Чебоксарский залив и Красная площадь', desc: 'Главное общественное пространство города с мостами, фонтанами и видом на Волгу',
-        locationSlug: 'cheboksary-cheboksarskiy-zaliv-i-krasnaya-ploschad',
+        locationSlug: 'cheboksary-cheboksarskiy-zaliv-i-krasnaya-ploschad'
       },
       { name: 'Бульвар Купца Ефремова', desc: 'Чувашский Арбат с купеческими особняками, музеями и уличной жизнью',
-        locationSlug: 'cheboksary-bulvar-kuptsa-efremova',
+        locationSlug: 'cheboksary-bulvar-kuptsa-efremova'
       },
       { name: 'Научно-технический музей истории трактора', desc: 'Интерактивный музей с десятками действующих тракторов со всего мира',
-        venueSlug: 'cheboksary-nauchno-tehnicheskiy-muzey-istorii-traktora',
+        venueSlug: 'cheboksary-nauchno-tehnicheskiy-muzey-istorii-traktora'
       },
       { name: 'Чувашский национальный музей', desc: 'Сокровищница истории и культуры чувашского народа на Красной площади',
-        venueSlug: 'cheboksary-chuvashskiy-natsionalnyy-muzey',
+        venueSlug: 'cheboksary-chuvashskiy-natsionalnyy-muzey'
       },
       { name: 'Введенский кафедральный собор', desc: 'Древнейший каменный храм Чувашии с фресками и Казанской иконой',
-        venueSlug: 'cheboksary-vvedenskiy-kafedralnyy-sobor',
+        venueSlug: 'cheboksary-vvedenskiy-kafedralnyy-sobor'
       },
     ],
     sights: [
@@ -4615,7 +4584,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       { q: "Правда ли, что Чебоксары называют одним из самых чистых городов России?", a: "Да, город регулярно занимает призовые места во всероссийских рейтингах по благоустройству, поражая туристов ухоженными набережными и обилием зелени." },
       { q: "Где находится знаменитый памятник Остапу Бендеру и Кисе Воробьянинову?", a: "Скульптурная композиция, посвященная героям «12 стульев», расположена в самом начале пешеходного бульвара Купца Ефремова в историческом центре." },
       { q: "Что такое шурпе и где его попробовать?", a: "Это традиционный и очень сытный чувашский национальный суп из субпродуктов и мяса со специями; его подают практически во всех ресторанах национальной кухни вокруг залива." },
-    ],
+    ]
   },
   barnaul: {
     brief:
@@ -4623,22 +4592,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'Знаете ли вы, что в XIX веке Барнаул называли «Сибирским Эльдорадо»? На местном заводе выплавляли 90% всего серебра Российской империи, из которого чеканили монеты для царской казны.',
     mustSee: [
       { name: 'Нагорный парк и буквы «БАРНАУЛ»', desc: 'Смотровая доминанта на холме у слияния Оби и Барнаулки с буквами «БАРНАУЛ» и храмом Иоанна Предтечи.',
-        locationSlug: 'barnaul-nagornyy-park-i-bukvy-barnaul',
+        locationSlug: 'barnaul-nagornyy-park-i-bukvy-barnaul'
       },
       { name: 'Мало-Тобольская улица (Барнаульский Арбат)', desc: 'Первая полностью пешеходная улица города с купеческими торговыми рядами и кованым Медведем.',
-        locationSlug: 'barnaul-malo-tobol-skaya-ulitsa-barnaul-skiy-arbat',
+        locationSlug: 'barnaul-malo-tobol-skaya-ulitsa-barnaul-skiy-arbat'
       },
       { name: 'Барнаульский сереброплавильный завод («Спичка»)', desc: 'Памятник промышленной архитектуры Демидова XVIII века, в советские годы - спичечная фабрика.',
-        locationSlug: 'barnaul-barnaul-skiy-serebroplavil-nyy-zavod-spichka',
+        locationSlug: 'barnaul-barnaul-skiy-serebroplavil-nyy-zavod-spichka'
       },
       { name: 'Музей автоугона имени Юрия Деточкина', desc: 'Частный музей при службе спасения с вещественными доказательствами и интерактивными стендами взлома.',
-        venueSlug: 'barnaul-muzey-avtougona-imeni-yuriya-detochkina',
+        venueSlug: 'barnaul-muzey-avtougona-imeni-yuriya-detochkina'
       },
       { name: 'Государственный художественный музей Алтайского края (ГХМАК)', desc: 'Крупнейшая сокровищница изобразительного искусства региона со строгановскими иконами и классикой.',
-        venueSlug: 'barnaul-gosudarstvennyy-hudozhestvennyy-muzey-altayskogo-kraya-ghmak',
+        venueSlug: 'barnaul-gosudarstvennyy-hudozhestvennyy-muzey-altayskogo-kraya-ghmak'
       },
       { name: 'Музей «Мир времени»', desc: 'Интерактивный частный музей в бывшей аптеке Крюгера, где экспонаты можно брать в руки.',
-        venueSlug: 'barnaul-muzey-mir-vremeni',
+        venueSlug: 'barnaul-muzey-mir-vremeni'
       },
     ],
     sights: [
@@ -4655,7 +4624,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       { q: "Где в Барнауле сделать знаменитое фото на фоне букв «БАРНАУЛ»?", a: "Огромные белые буквы в стиле Hollywood установлены в Нагорном парке на склоне холма, откуда открывается лучший вид на Обь." },
       { q: "Сохранился ли старинный сереброплавильный завод?", a: "Исторический комплекс находится на реставрации, но его старинные кирпичные корпуса можно увидеть в рамках специальных экскурсий по историческому центру." },
       { q: "Правда ли, что в Барнауле есть музей автоугона?", a: "Да, это уникальный и очень ироничный Музей автоугона имени Юрия Деточкина, где собраны необычные приспособления для защиты машин и курьезные экспонаты." },
-    ],
+    ]
   },
   saransk: {
     brief:
@@ -4663,22 +4632,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'Знаете ли вы, что Саранск - мировая столица уникальной деревянной игрушки? Местные мастера из села Подлесная Тавла вырезают из липы знаменитых тавлинских коней, которые благодаря своей уникальной экспрессивной резьбе внесены в список семи чудес финно-угорского мира.',
         mustSee: [
       { name: 'Кафедральный собор святого праведного воина Феодора Ушакова', desc: 'Главный храм Мордовии с 62-метровым куполом',
-        venueSlug: 'saransk-kafedralnyy-sobor-svyatogo-pravednogo-voina-feodora-ushakova',
+        venueSlug: 'saransk-kafedralnyy-sobor-svyatogo-pravednogo-voina-feodora-ushakova'
       },
       { name: 'Музей изобразительных искусств им. С. Д. Эрьзи', desc: 'Главный музей Мордовии с крупнейшей коллекцией Степана Эрьзи',
-        venueSlug: 'saransk-muzey-izobrazitelnyh-iskusstv-im-s-d-erzi',
+        venueSlug: 'saransk-muzey-izobrazitelnyh-iskusstv-im-s-d-erzi'
       },
       { name: 'Площадь Тысячелетия и фонтан «Звезда Мордовии»', desc: 'Современная площадь со светомузыкальным сухим фонтаном',
-        locationSlug: 'saransk-ploschad-tysyacheletiya-i-fontan-zvezda-mordovii',
+        locationSlug: 'saransk-ploschad-tysyacheletiya-i-fontan-zvezda-mordovii'
       },
       { name: 'Этнографический комплекс «Мордовское подворье»', desc: 'Деревянная усадьба и ремесла на берегу реки Саранки',
-        locationSlug: 'saransk-etnograficheskiy-kompleks-mordovskoe-podvore',
+        locationSlug: 'saransk-etnograficheskiy-kompleks-mordovskoe-podvore'
       },
       { name: 'Музей мордовской народной культуры', desc: 'Эрзянские и мокшанские традиции в купеческом особняке',
-        venueSlug: 'saransk-muzey-mordovskoy-narodnoy-kultury',
+        venueSlug: 'saransk-muzey-mordovskoy-narodnoy-kultury'
       },
       { name: 'Стадион «Мордовия Арена»', desc: 'Ярко-оранжевый стадион чемпионата мира в пойме Инсара',
-        venueSlug: 'saransk-stadion-mordoviya-arena',
+        venueSlug: 'saransk-stadion-mordoviya-arena'
       },
     ],
     sights: [
@@ -4695,7 +4664,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       { q: "Кто такой Степан Эрьзя, чьим именем назван музей?", a: "Это великий российский и советский скульптор, работавший в уникальной технике с редкими породами южноамериканского дерева, чьи работы признаны шедеврами мирового искусства." },
       { q: "На каком языке говорят в Саранске?", a: "Основной язык общения — русский, но на вывесках и в госучреждениях дублируются названия на двух официальных местных языках: эрзянском и мокшанском." },
       { q: "Где попробовать настоящие мордовские блины?", a: "Знаменитые толстые дрожжевые блины «пачат» подают в этнокомплексе «Мордовское подворье» прямо в центре города." },
-    ],
+    ]
   },
   habarovsk: {
     brief:
@@ -4703,22 +4672,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'Знаете ли вы, что Хабаровск признан одним из самых солнечных городов России? Солнце светит здесь около 300 дней в году - это гораздо больше, чем в курортном Сочи или на побережье Южного Крыма.',
         mustSee: [
       { name: 'Набережная Адмирала Невельского и Хабаровский утес', desc: 'Парадная набережная Амура со смотровой площадкой на знаменитом утесе',
-        locationSlug: 'habarovsk-naberezhnaya-admirala-nevelskogo-i-habarovskiy-utes',
+        locationSlug: 'habarovsk-naberezhnaya-admirala-nevelskogo-i-habarovskiy-utes'
       },
       { name: 'Амурский мост (Музей истории Амурского моста)', desc: 'Легендарный совмещенный мост и музей с царской стальной фермой',
-        venueSlug: 'habarovsk-amurskiy-most-muzey-istorii-amurskogo-mosta',
+        venueSlug: 'habarovsk-amurskiy-most-muzey-istorii-amurskogo-mosta'
       },
       { name: 'Площадь имени Ленина', desc: 'Главная площадь города с каскадом фонтанов и сталинской архитектурой',
-        locationSlug: 'habarovsk-ploschad-imeni-lenina',
+        locationSlug: 'habarovsk-ploschad-imeni-lenina'
       },
       { name: 'Хабаровский краевой музей имени Н. И. Гродекова', desc: 'Крупнейший музей Дальнего Востока с этнографией, природой и 3D-панорамой',
-        venueSlug: 'habarovsk-habarovskiy-kraevoy-muzey-imeni-n-i-grodekova',
+        venueSlug: 'habarovsk-habarovskiy-kraevoy-muzey-imeni-n-i-grodekova'
       },
       { name: 'Градо-Хабаровский собор Успения Божией Матери', desc: 'Красно-белый неорусский собор на Комсомольской площади у Амура',
-        venueSlug: 'habarovsk-grado-habarovskiy-sobor-uspeniya-bozhiey-materi',
+        venueSlug: 'habarovsk-grado-habarovskiy-sobor-uspeniya-bozhiey-materi'
       },
       { name: 'Городские пруды и парк «Динамо»', desc: 'Парк с каскадом прудов, мостками и вечерними светомузыкальными фонтанами',
-        locationSlug: 'habarovsk-gorodskie-prudy-i-park-dinamo',
+        locationSlug: 'habarovsk-gorodskie-prudy-i-park-dinamo'
       },
     ],
     sights: [
@@ -4735,8 +4704,8 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       { q: "Где можно сфотографировать вид с пятитысячной купюры?", a: "Легендарная панорама Амурского моста открывается со смотровой площадки на Хабаровском утесе в ЦПКиО им. Муравьева-Амурского." },
       { q: "Далеко ли от города до границы с Китаем?", a: "Хабаровск расположен очень близко к границе — всего в нескольких десятках километров находится большой остров Большой Уссурийский, разделенный между РФ и КНР." },
       { q: "Что интересного посмотреть в музее имени Гродекова?", a: "Главная гордость музея — гигантская круговая панорама, детально воссоздающая Волочаевское сражение Гражданской войны на Дальнем Востоке." },
-    ],
-  },
+    ]
+  }
 };
 
 function normalizeLookupKey(value?: string | null) {
