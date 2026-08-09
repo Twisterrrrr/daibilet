@@ -2,7 +2,8 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| CONT.PERM-GUBAHA-USVA | Perm: одна chip «Губаха / Усьва» с День 1/2 внутри; не две карточки | Высокий | 🔄 ship+Deploy MSK web |
+| UX.CANON-PANEL-INSET | DayTripCanonCard: logistics bg extend left; gastro pl same inset; keep text vertical | Высокий | 🔄 ship+Deploy MSK web |
+| CONT.PERM-GUBAHA-USVA | Perm: одна chip «Губаха / Усьва» с День 1/2 внутри; не две карточки | Высокий | ✅ `0f7363b9` Deploy MSK web `31308285355` BUILD_ID=`rcEaipEqElKkWcTQI1VD2` |
 | FIX.HIDE-CLOSED-SLOTS | Public: скрыть слоты с closed/STAND_BY/paused/isActive=false (catalog layer) | Критический | 🔄 code; Deploy MSK API |
 | UX.EVENTCARD-DROP-SESSION-CTA | EventCard: убрать дубль «Выбрать сеанс» (overlap с ценой); один CTA «Купить билет» | Высокий | ✅ `95b7d2a8` Deploy MSK web `31308004380` BUILD_ID=`HR7QZofnxFLxEIb8loJVL` |
 | FIX.BOAT-TZ-20:55 | Bridges/my-day: primary −3ч vs slots; dedupe HH:mm MSK | Критический | ✅ `a905d477`/`038ea511`; API+catalog rebuild; Deploy MSK web `31306448807` BUILD_ID=`Cw8DFKoqPUl8GZ-NI-yc_` |

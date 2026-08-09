@@ -1,3 +1,16 @@
+## 2026-08-09 - Canon panels: bg inset breathing room
+
+### Наблюдения
+- Owner (Логистика | Гастро): после выравнивания текста по «Выборг» серый/жёлтый фон «короткий» слева - текст у края панели.
+
+### Решения
+- `DayTripCanonCard` desktop: logistics `sm:-ml-4` + `sm:pl-4` (фон влево, текст на title vertical); gastro `sm:pl-4` (тот же inset). Mobile `px-2.5` без изменений.
+
+### Проблемы
+- Deploy MSK web; смотреть Выборг / Куршская коса.
+
+---
+
 ## 2026-08-09 - Perm: Губаха / Усьва one card
 
 ### Наблюдения
@@ -9,7 +22,7 @@
 - Остальные Perm suburbs (Хохловка, Кунгур, Православный Урал, Кунгурский экстрим) без изменений.
 
 ### Проблемы
-- Deploy MSK web (статика cityInfo в apps/web).
+- Deploy MSK web **31308285355** @`0f7363b9` BUILD_ID=`rcEaipEqElKkWcTQI1VD2`.
 
 ---
 
