@@ -35,27 +35,27 @@ export function EventImageBadges({
   const secondary: ReactNode[] = [];
   if (showLowTickets) {
     secondary.push(
-      <EventCardBadge key="vacant" className="bg-rose-500/95 text-white">
+      <EventCardBadge key="vacant" className="bg-rose-600 text-white shadow-md ring-1 ring-white/30">
         {formatVacantSeats(event.vacant ?? 0)}
       </EventCardBadge>,
     );
   } else if (hit) {
     secondary.push(
-      <EventCardBadge key="hit" className="bg-primary-600 text-white">
+      <EventCardBadge key="hit" className="bg-primary-600 text-white shadow-md ring-1 ring-white/25">
         Хит
       </EventCardBadge>,
     );
   }
   if (ageBadge && secondary.length < maxSecondary) {
     secondary.push(
-      <EventCardBadge key="age" className="bg-white/90 text-slate-900">
+      <EventCardBadge key="age" className="bg-white/95 text-slate-900 ring-1 ring-slate-200/80">
         {ageBadge}
       </EventCardBadge>,
     );
   }
   if (showSoonBadge && secondary.length < maxSecondary) {
     secondary.push(
-      <EventCardBadge key="soon" className="bg-slate-900/85 text-white">
+      <EventCardBadge key="soon" className="bg-slate-900/90 text-white">
         Скоро в продаже
       </EventCardBadge>,
     );
@@ -67,4 +67,11 @@ export function EventImageBadges({
       {secondary}
     </div>
   );
+}
+
+/** True when card has a real social/urgency signal (no invented counts). */
+export function catalogItemHasLiveSignal(event: PublicSessionDto): boolean {
+  const lowTickets =
+    typeof event.vacant === 'number' && event.vacant > 0 && event.vacant <= LOW_TICKETS_THRESHOLD;
+  return lowTickets || isRecommendBadgeEvent(event) || isHitEvent(event);
 }

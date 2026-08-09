@@ -343,6 +343,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
           viewMode={viewMode}
           onViewModeChange={setViewMode}
           city={filterValues.city}
+          sort={filterValues.sort}
           clearHref={buildCatalogHref({
             city: filterValues.city,
             sort: filterValues.sort,

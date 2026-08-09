@@ -220,6 +220,18 @@ html[data-nav-pending='1'] {
     @apply bg-primary-600 text-white ring-1 ring-primary-600 hover:bg-primary-700;
   }
 
+  .catalog-date-chip {
+    @apply inline-flex min-h-11 min-w-[3.25rem] shrink-0 items-center justify-center rounded-2xl px-3 py-1.5 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50;
+  }
+
+  .catalog-date-chip-idle {
+    @apply bg-white text-graphite-muted ring-1 ring-slate-200/70 hover:bg-surface-muted hover:text-graphite;
+  }
+
+  .catalog-date-chip-on {
+    @apply bg-graphite text-white ring-1 ring-graphite hover:bg-slate-800;
+  }
+
   .horizontal-snap-row {
     @apply w-full min-w-0 max-w-full overflow-x-auto overscroll-x-contain scroll-smooth pb-2;
     -webkit-overflow-scrolling: touch;

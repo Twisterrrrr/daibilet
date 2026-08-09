@@ -2,17 +2,27 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Baby, ChevronDown, Gift, Search, SlidersHorizontal, Sun, Sunrise, X } from 'lucide-react';
+import { Baby, Gift, MoreHorizontal, Search, SlidersHorizontal, X } from 'lucide-react';
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 import { CatalogAdvancedFiltersPanel } from '@/components/CatalogAdvancedFiltersPanel.client';
 import { CategoryTabIcon } from '@/components/CategoryTabIcon';
 import { displayCatalogLabel } from '@/lib/catalog-labels';
+import {
+  catalogSearchHintsFromFacets,
+  splitCatalogCategories,
+  type CatalogCategoryFacet,
+} from '@/lib/catalog-category-rail';
+import {
+  buildCatalogDateRailChips,
+  isDateRailChipActive,
+  type CatalogDateRailChip,
+} from '@/lib/catalog-date-rail';
 
 import type { PublicCatalogDto } from '@daibilet/contracts/public';
 import {
   buildCatalogHref,
-  CATALOG_DATE_OPTIONS,
   catalogFiltersFromQuery,
   countAdvancedFilters,
   type CatalogFilterValues,
@@ -42,12 +52,23 @@ export function CatalogToolbar({
   const filtersRef = useRef(filters);
   filtersRef.current = filters;
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [categoriesMoreOpen, setCategoriesMoreOpen] = useState(false);
   const [qDraft, setQDraft] = useState(filters.q || '');
+  const [searchFocused, setSearchFocused] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const searchWrapRef = useRef<HTMLDivElement>(null);
   const advancedCount = countAdvancedFilters(filters);
-  const activeDate = filters.from || filters.to ? '' : filters.date || 'all';
-  const hasCustomRange = Boolean(filters.from || filters.to);
   const singleDay = filters.from && (!filters.to || filters.to === filters.from) ? filters.from : '';
+  const dateRailChips = useMemo(() => buildCatalogDateRailChips(), []);
+  const categorySplit = useMemo(
+    () => splitCatalogCategories(facets.categories, filters.category),
+    [facets.categories, filters.category],
+  );
+  const searchHints = useMemo(
+    () => catalogSearchHintsFromFacets(facets.categories, 5),
+    [facets.categories],
+  );
+  const showSearchHints = searchFocused && !qDraft.trim() && searchHints.length > 0 && !disabled;
   const previewContext = useMemo(
     () => ({
       q: qDraft.trim() || filters.q,
@@ -61,6 +82,21 @@ export function CatalogToolbar({
   useEffect(() => {
     setQDraft(filters.q || '');
   }, [filters.q]);
+
+  useEffect(() => {
+    if (!showSearchHints) return;
+    const onPointerDown = (event: MouseEvent | TouchEvent) => {
+      const target = event.target as Node | null;
+      if (target && searchWrapRef.current?.contains(target)) return;
+      setSearchFocused(false);
+    };
+    document.addEventListener('mousedown', onPointerDown);
+    document.addEventListener('touchstart', onPointerDown);
+    return () => {
+      document.removeEventListener('mousedown', onPointerDown);
+      document.removeEventListener('touchstart', onPointerDown);
+    };
+  }, [showSearchHints]);
 
   const navigate = (next: CatalogFilterValues) => {
     router.push(buildCatalogHref(next));
@@ -87,6 +123,7 @@ export function CatalogToolbar({
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setSearchFocused(false);
     navigate({
       ...filters,
       q: qDraft.trim() || undefined,
@@ -94,7 +131,7 @@ export function CatalogToolbar({
     });
   };
 
-  const setDate = (nextDate: string) => {
+  const setDatePreset = (nextDate: 'all' | 'today' | 'tomorrow' | 'weekend') => {
     navigate({
       ...filters,
       q: qDraft.trim() || undefined,
@@ -102,7 +139,7 @@ export function CatalogToolbar({
       from: undefined,
       to: undefined,
       page: undefined,
-      sort: nextDate === 'today' || nextDate === 'tomorrow' || nextDate === 'evening' ? 'time' : filters.sort,
+      sort: nextDate === 'today' || nextDate === 'tomorrow' ? 'time' : filters.sort,
     });
   };
 
@@ -129,57 +166,13 @@ export function CatalogToolbar({
     });
   };
 
-  if (compact) {
-    return (
-      <div className="space-y-2">
-        <div className="flex items-center gap-2">
-          <div className="horizontal-snap-row flex min-w-0 flex-1 gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            <CategoryTabs filters={filters} categories={facets.categories} />
-          </div>
-          <FiltersButton
-            open={filtersOpen}
-            count={advancedCount}
-            disabled={disabled}
-            onClick={() => setFiltersOpen(true)}
-          />
-        </div>
-        <QuickFilterToggles
-          filters={filters}
-          qDraft={qDraft}
-          disabled={disabled}
-          onNavigate={navigate}
-        />
-        <CatalogAdvancedFiltersPanel
-          open={filtersOpen}
-          filters={{
-            dateFrom: filters.from || '',
-            dateTo: filters.to || '',
-            date: filters.date || '',
-            minPrice: filters.minPrice != null ? String(filters.minPrice) : 'all',
-            maxPrice: filters.maxPrice != null ? String(filters.maxPrice) : 'all',
-            ageMax: filters.ageMax != null && filters.ageMax >= 0 ? filters.ageMax : -1,
-            landing: filters.landing || 'all',
-          }}
-          landings={facets.landings}
-          previewContext={previewContext}
-          onApply={(next) => {
-            applyAdvanced(navigate, filters, qDraft, next);
-            setFiltersOpen(false);
-          }}
-          onClose={() => setFiltersOpen(false)}
-          onReset={() => {
-            navigate({
-              q: filters.q,
-              city: filters.city,
-              category: filters.category,
-              sort: filters.sort,
-              limit: filters.limit,
-            });
-          }}
-        />
-      </div>
-    );
-  }
+  const applyDateRailChip = (chip: CatalogDateRailChip) => {
+    if (chip.kind === 'preset') {
+      setDatePreset(chip.value);
+      return;
+    }
+    setExactDay(chip.iso);
+  };
 
   const advancedPanel = (
     <CatalogAdvancedFiltersPanel
@@ -212,81 +205,129 @@ export function CatalogToolbar({
     />
   );
 
+  if (compact) {
+    return (
+      <div className="space-y-2">
+        <div className="flex items-center gap-2">
+          <div className="horizontal-snap-row flex min-w-0 flex-1 gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <CategoryTabs
+              filters={filters}
+              primary={categorySplit.primary}
+              overflow={categorySplit.overflow}
+              onOpenMore={() => setCategoriesMoreOpen(true)}
+            />
+          </div>
+          <FiltersButton
+            open={filtersOpen}
+            count={advancedCount}
+            disabled={disabled}
+            onClick={() => setFiltersOpen(true)}
+          />
+        </div>
+        <QuickFilterToggles filters={filters} qDraft={qDraft} disabled={disabled} onNavigate={navigate} />
+        {advancedPanel}
+        <MoreCategoriesSheet
+          open={categoriesMoreOpen}
+          filters={filters}
+          overflow={categorySplit.overflow}
+          onClose={() => setCategoriesMoreOpen(false)}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-2.5 sm:space-y-3">
-      {/* Единая search bar: Поиск → Дата → Фильтры → Найти */}
       <form
         onSubmit={onSubmit}
         className="flex flex-col gap-1.5 rounded-2xl border border-slate-100 bg-white p-1.5 sm:flex-row sm:items-center sm:gap-1 sm:p-1"
       >
-        <label className="relative min-w-0 flex-1">
-          <span className="sr-only">Поиск по событиям</span>
-          <Search aria-hidden className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-graphite-muted" strokeWidth={1.75} />
-          <input
-            ref={searchInputRef}
-            type="search"
-            name="q"
-            value={qDraft}
-            onChange={(event) => setQDraft(event.target.value)}
-            placeholder="Название, место или артист"
-            aria-label="Поиск по событиям"
-            disabled={disabled}
-            className="inline-btn h-10 w-full rounded-xl bg-transparent pl-10 pr-9 text-sm text-graphite outline-none transition placeholder:text-graphite-muted focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-60 sm:h-9"
-          />
-          {qDraft ? (
-            <button
-              type="button"
-              aria-label="Очистить поиск"
-              disabled={disabled}
-              onClick={() => {
-                setQDraft('');
-                navigate({ ...filters, q: undefined, page: undefined });
-              }}
-              className="inline-btn absolute right-2 top-1/2 grid h-6 w-6 -translate-y-1/2 place-items-center rounded-lg text-graphite-muted hover:bg-surface-muted hover:text-graphite disabled:opacity-60"
-            >
-              <X aria-hidden className="h-3.5 w-3.5" strokeWidth={1.75} />
-            </button>
-          ) : null}
-        </label>
-
-        <div className="flex items-center gap-1.5 sm:contents">
-          <div className="relative min-w-[7.25rem] flex-1 sm:w-44 sm:flex-none sm:min-w-[10rem]">
-            <label htmlFor="catalog-date" className="sr-only">
-              Когда
-            </label>
-            <select
-              id="catalog-date"
-              name="date"
-              value={hasCustomRange ? 'custom' : activeDate || 'all'}
-              disabled={disabled}
-              onChange={(event) => {
-                if (event.target.value === 'custom') return;
-                setDate(event.target.value);
-              }}
-              className="h-10 w-full min-w-0 appearance-none rounded-xl bg-surface-muted pl-3 pr-9 text-sm font-medium text-graphite outline-none transition hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-70 sm:h-9 sm:bg-transparent sm:hover:bg-surface-muted"
-            >
-              {CATALOG_DATE_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-              {hasCustomRange ? (
-                <option value="custom">
-                  {filters.from && filters.to && filters.from !== filters.to
-                    ? `${filters.from} - ${filters.to}`
-                    : filters.from || filters.to}
-                </option>
-              ) : null}
-            </select>
-            <ChevronDown
+        <div ref={searchWrapRef} className="relative min-w-0 flex-1">
+          <label className="relative block min-w-0">
+            <span className="sr-only">Поиск по событиям</span>
+            <Search
               aria-hidden
-              className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-graphite-muted"
+              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-graphite-muted"
               strokeWidth={1.75}
             />
-          </div>
+            <input
+              ref={searchInputRef}
+              type="search"
+              name="q"
+              value={qDraft}
+              onChange={(event) => setQDraft(event.target.value)}
+              onFocus={() => setSearchFocused(true)}
+              placeholder="Название, место или артист"
+              aria-label="Поиск по событиям"
+              aria-expanded={showSearchHints}
+              aria-controls={showSearchHints ? 'catalog-search-hints' : undefined}
+              disabled={disabled}
+              autoComplete="off"
+              className="inline-btn h-10 w-full rounded-xl bg-transparent pl-10 pr-9 text-sm text-graphite outline-none transition placeholder:text-graphite-muted focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-60 sm:h-9"
+            />
+            {qDraft ? (
+              <button
+                type="button"
+                aria-label="Очистить поиск"
+                disabled={disabled}
+                onClick={() => {
+                  setQDraft('');
+                  navigate({ ...filters, q: undefined, page: undefined });
+                }}
+                className="inline-btn absolute right-2 top-1/2 grid h-6 w-6 -translate-y-1/2 place-items-center rounded-lg text-graphite-muted hover:bg-surface-muted hover:text-graphite disabled:opacity-60"
+              >
+                <X aria-hidden className="h-3.5 w-3.5" strokeWidth={1.75} />
+              </button>
+            ) : null}
+          </label>
 
-          {/* Exact calendar: desktop only; mobile uses date select + advanced filters. */}
-          <label className="relative hidden min-w-[9.5rem] flex-none sm:block sm:w-36">
+          {showSearchHints ? (
+            <div
+              id="catalog-search-hints"
+              role="listbox"
+              aria-label="Популярные запросы"
+              className="absolute left-0 right-0 top-[calc(100%+0.35rem)] z-50 overflow-hidden rounded-2xl border border-slate-100 bg-white py-1.5 shadow-lg"
+            >
+              <p className="px-3 pb-1 pt-0.5 text-[11px] font-semibold uppercase tracking-wider text-graphite-muted">
+                Часто ищут
+              </p>
+              {searchHints.map((hint) => (
+                <button
+                  key={`${hint.kind}:${hint.category || hint.q || hint.label}`}
+                  type="button"
+                  role="option"
+                  className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm text-graphite transition hover:bg-surface-muted"
+                  onClick={() => {
+                    setSearchFocused(false);
+                    if (hint.kind === 'q' && hint.q) {
+                      setQDraft(hint.q);
+                      navigate({
+                        ...filters,
+                        q: hint.q,
+                        category: undefined,
+                        page: undefined,
+                      });
+                      return;
+                    }
+                    navigate({
+                      ...filters,
+                      q: undefined,
+                      category: hint.category,
+                      page: undefined,
+                    });
+                  }}
+                >
+                  <Search aria-hidden className="h-3.5 w-3.5 shrink-0 text-graphite-muted" strokeWidth={1.75} />
+                  <span className="truncate">{hint.label}</span>
+                </button>
+              ))}
+            </div>
+          ) : null}
+        </div>
+
+        <div className="flex items-center gap-1.5 sm:contents">
+          {/* Exact calendar: desktop only; mobile uses date rail. */}
+          <label className="relative hidden min-w-[9.5rem] flex-none md:block md:w-36">
             <span className="sr-only">Точная дата</span>
             <input
               type="date"
@@ -294,11 +335,10 @@ export function CatalogToolbar({
               disabled={disabled}
               onChange={(event) => setExactDay(event.target.value)}
               aria-label="Выбрать дату в календаре"
-              className="h-10 w-full rounded-xl bg-surface-muted px-2.5 text-sm font-medium text-graphite outline-none transition hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-70 sm:h-9"
+              className="h-10 w-full rounded-xl bg-surface-muted px-2.5 text-sm font-medium text-graphite outline-none transition hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-70 md:h-9"
             />
           </label>
 
-          {/* Desktop/tablet: filters in bar. Mobile uses sticky FAB below. */}
           <FiltersButton
             open={filtersOpen}
             count={advancedCount}
@@ -319,24 +359,35 @@ export function CatalogToolbar({
 
       {advancedPanel}
 
-      {/* Быстрые тогглы + категории в sticky-зоне */}
       <div className="-mx-4 space-y-2 px-4 sm:mx-0 sm:px-0">
-        <QuickFilterToggles
+        <CatalogDateRail
+          chips={dateRailChips}
           filters={filters}
-          qDraft={qDraft}
           disabled={disabled}
-          onNavigate={navigate}
+          onSelect={applyDateRailChip}
         />
+        <QuickFilterToggles filters={filters} qDraft={qDraft} disabled={disabled} onNavigate={navigate} />
         <div
           role="tablist"
           aria-label="Категории"
           className="horizontal-snap-row flex flex-nowrap gap-1.5 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
-          <CategoryTabs filters={filters} categories={facets.categories} />
+          <CategoryTabs
+            filters={filters}
+            primary={categorySplit.primary}
+            overflow={categorySplit.overflow}
+            onOpenMore={() => setCategoriesMoreOpen(true)}
+          />
         </div>
       </div>
 
-      {/* Mobile sticky filters CTA */}
+      <MoreCategoriesSheet
+        open={categoriesMoreOpen}
+        filters={filters}
+        overflow={categorySplit.overflow}
+        onClose={() => setCategoriesMoreOpen(false)}
+      />
+
       <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 md:hidden">
         <div className="pointer-events-auto border-t border-slate-200/80 bg-white/95 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2.5 shadow-[0_-8px_24px_rgba(15,23,42,0.08)] backdrop-blur-md supports-[backdrop-filter]:bg-white/90">
           <button
@@ -361,6 +412,52 @@ export function CatalogToolbar({
   );
 }
 
+function CatalogDateRail({
+  chips,
+  filters,
+  disabled,
+  onSelect,
+}: {
+  chips: CatalogDateRailChip[];
+  filters: CatalogFilterValues;
+  disabled?: boolean;
+  onSelect: (chip: CatalogDateRailChip) => void;
+}) {
+  return (
+    <div
+      role="group"
+      aria-label="Дата"
+      className="horizontal-snap-row flex flex-nowrap gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+    >
+      {chips.map((chip) => {
+        const active = isDateRailChipActive(chip, filters);
+        const key = chip.kind === 'preset' ? chip.value : chip.iso;
+        return (
+          <button
+            key={key}
+            type="button"
+            disabled={disabled}
+            aria-pressed={active}
+            onClick={() => onSelect(chip)}
+            className={`catalog-date-chip snap-start disabled:opacity-60 ${
+              active ? 'catalog-date-chip-on' : 'catalog-date-chip-idle'
+            }`}
+          >
+            {chip.kind === 'day' ? (
+              <span className="flex flex-col items-center leading-none">
+                <span className="text-[10px] font-semibold uppercase tracking-wide opacity-80">{chip.weekday}</span>
+                <span className="mt-0.5 text-sm font-bold">{chip.iso.slice(8)}</span>
+              </span>
+            ) : (
+              <span className="whitespace-nowrap">{chip.shortLabel}</span>
+            )}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 function QuickFilterToggles({
   filters,
   qDraft,
@@ -372,9 +469,6 @@ function QuickFilterToggles({
   disabled?: boolean;
   onNavigate: (next: CatalogFilterValues) => void;
 }) {
-  const hasCustomRange = Boolean(filters.from || filters.to);
-  const todayOn = !hasCustomRange && filters.date === 'today';
-  const tomorrowOn = !hasCustomRange && filters.date === 'tomorrow';
   const freeOn = filters.minPrice === 0 && filters.maxPrice === 0;
   const kidsOn = filters.ageMax === KIDS_AGE_MAX;
 
@@ -384,92 +478,66 @@ function QuickFilterToggles({
     page: undefined,
   });
 
-  const toggleDate = (value: 'today' | 'tomorrow') => {
-    const active = value === 'today' ? todayOn : tomorrowOn;
-    onNavigate(
-      withQ({
-        ...filters,
-        date: active ? undefined : value,
-        from: undefined,
-        to: undefined,
-        sort: active ? filters.sort : 'time',
-      }),
-    );
-  };
-
-  const toggleFree = () => {
-    onNavigate(
-      withQ({
-        ...filters,
-        minPrice: freeOn ? undefined : 0,
-        maxPrice: freeOn ? undefined : 0,
-      }),
-    );
-  };
-
-  const toggleKids = () => {
-    onNavigate(
-      withQ({
-        ...filters,
-        ageMax: kidsOn ? undefined : KIDS_AGE_MAX,
-      }),
-    );
-  };
-
-  const chips: Array<{
-    key: string;
-    label: string;
-    active: boolean;
-    icon: typeof Sun;
-    onClick: () => void;
-  }> = [
-    { key: 'today', label: 'Сегодня', active: todayOn, icon: Sun, onClick: () => toggleDate('today') },
-    { key: 'tomorrow', label: 'Завтра', active: tomorrowOn, icon: Sunrise, onClick: () => toggleDate('tomorrow') },
-    { key: 'free', label: 'Бесплатные', active: freeOn, icon: Gift, onClick: toggleFree },
-    { key: 'kids', label: 'С детьми', active: kidsOn, icon: Baby, onClick: toggleKids },
-  ];
-
   return (
     <div
       role="group"
       aria-label="Быстрые фильтры"
       className="horizontal-snap-row flex flex-nowrap gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
     >
-      {chips.map((chip) => {
-        const Icon = chip.icon;
-        return (
-          <button
-            key={chip.key}
-            type="button"
-            disabled={disabled}
-            aria-pressed={chip.active}
-            onClick={chip.onClick}
-            className={`catalog-quick-chip snap-start disabled:opacity-60 ${
-              chip.active ? 'catalog-quick-chip-on' : 'catalog-quick-chip-idle'
-            }`}
-          >
-            <Icon aria-hidden className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
-            <span className="whitespace-nowrap">{chip.label}</span>
-          </button>
-        );
-      })}
+      <button
+        type="button"
+        disabled={disabled}
+        aria-pressed={freeOn}
+        onClick={() =>
+          onNavigate(
+            withQ({
+              ...filters,
+              minPrice: freeOn ? undefined : 0,
+              maxPrice: freeOn ? undefined : 0,
+            }),
+          )
+        }
+        className={`catalog-quick-chip snap-start disabled:opacity-60 ${
+          freeOn ? 'catalog-quick-chip-on' : 'catalog-quick-chip-idle'
+        }`}
+      >
+        <Gift aria-hidden className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
+        <span className="whitespace-nowrap">Бесплатные</span>
+      </button>
+      <button
+        type="button"
+        disabled={disabled}
+        aria-pressed={kidsOn}
+        onClick={() =>
+          onNavigate(
+            withQ({
+              ...filters,
+              ageMax: kidsOn ? undefined : KIDS_AGE_MAX,
+            }),
+          )
+        }
+        className={`catalog-quick-chip snap-start disabled:opacity-60 ${
+          kidsOn ? 'catalog-quick-chip-on' : 'catalog-quick-chip-idle'
+        }`}
+      >
+        <Baby aria-hidden className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
+        <span className="whitespace-nowrap">С детьми</span>
+      </button>
     </div>
   );
 }
 
 function CategoryTabs({
   filters,
-  categories,
+  primary,
+  overflow,
+  onOpenMore,
 }: {
   filters: CatalogFilterValues;
-  categories: Array<{ name: string; events: number }>;
+  primary: CatalogCategoryFacet[];
+  overflow: CatalogCategoryFacet[];
+  onOpenMore: () => void;
 }) {
-  const byName = new Map(categories.map((item) => [item.name, item]));
-  if (filters.category && !byName.has(filters.category)) {
-    byName.set(filters.category, { name: filters.category, events: 0 });
-  }
-  const visible = [...byName.values()].filter((item) => item.events > 0 || filters.category === item.name);
-
   return (
     <>
       <Link
@@ -480,7 +548,7 @@ function CategoryTabs({
       >
         Все
       </Link>
-      {visible.map((item) => {
+      {primary.map((item) => {
         const active = filters.category === item.name;
         const empty = item.events <= 0;
         const label = displayCatalogLabel(item.name);
@@ -519,7 +587,108 @@ function CategoryTabs({
           </Link>
         );
       })}
+      {overflow.length > 0 ? (
+        <button
+          type="button"
+          role="tab"
+          aria-haspopup="dialog"
+          aria-expanded={false}
+          onClick={onOpenMore}
+          className="catalog-chip catalog-chip-idle snap-start"
+        >
+          <MoreHorizontal aria-hidden className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
+          <span className="whitespace-nowrap">Ещё</span>
+          <span className="rounded-full bg-white/70 px-1.5 text-[10px] font-semibold text-graphite-muted">
+            {overflow.length}
+          </span>
+        </button>
+      ) : null}
     </>
+  );
+}
+
+function MoreCategoriesSheet({
+  open,
+  filters,
+  overflow,
+  onClose,
+}: {
+  open: boolean;
+  filters: CatalogFilterValues;
+  overflow: CatalogCategoryFacet[];
+  onClose: () => void;
+}) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [open, onClose]);
+
+  if (!mounted || !open) return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center sm:p-4">
+      <button type="button" aria-label="Закрыть" className="absolute inset-0 bg-slate-950/40" onClick={onClose} />
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Другие категории"
+        className="relative z-[1] flex max-h-[min(80vh,32rem)] w-full flex-col overflow-hidden rounded-t-2xl bg-white shadow-xl sm:max-w-md sm:rounded-2xl"
+      >
+        <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
+          <h2 className="font-display text-base font-bold text-graphite">Ещё категории</h2>
+          <button
+            type="button"
+            onClick={onClose}
+            className="inline-btn grid h-9 w-9 place-items-center rounded-xl text-graphite-muted hover:bg-surface-muted"
+            aria-label="Закрыть"
+          >
+            <X className="h-4 w-4" strokeWidth={1.75} />
+          </button>
+        </div>
+        <ul className="min-h-0 flex-1 overflow-y-auto p-2">
+          {overflow.map((item) => {
+            const label = displayCatalogLabel(item.name);
+            const active = filters.category === item.name;
+            return (
+              <li key={item.name}>
+                <Link
+                  href={buildCatalogHref({
+                    ...filters,
+                    category: active ? undefined : item.name,
+                    page: undefined,
+                  })}
+                  onClick={onClose}
+                  className={`flex items-center justify-between gap-3 rounded-xl px-3 py-3 text-sm transition ${
+                    active ? 'bg-graphite text-white' : 'text-graphite hover:bg-surface-muted'
+                  }`}
+                >
+                  <span className="inline-flex min-w-0 items-center gap-2">
+                    <CategoryTabIcon name={label} className={active ? 'text-white/85' : 'text-graphite-muted'} />
+                    <span className="truncate font-medium">{label}</span>
+                  </span>
+                  <span className={`shrink-0 text-xs ${active ? 'text-white/70' : 'text-graphite-muted'}`}>
+                    {item.events}
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </div>,
+    document.body,
   );
 }
 

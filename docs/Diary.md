@@ -13,6 +13,22 @@
 
 ---
 
+## 2026-08-09 - `/events` UX P1-P4 (no Quick buy)
+
+### Наблюдения
+- Owner: Яндекс-принципы (свайп дат, disclosure, hints, живые сигналы); P5 quick buy рано / грузит сервер.
+
+### Решения
+- Date rail: Любая / Сегодня / Завтра / Выходные + 7 дней; mobile без date select.
+- Categories: pin топ facets + «Ещё» sheet; quick chips только Бесплатные / С детьми.
+- Search focus hints из facets (без extra API).
+- Live rail «Сейчас выбирают» / «Популярное сейчас» только из текущего page payload; усилены реальные бейджи.
+
+### Проблемы
+- Deploy - по «выкатывай».
+
+---
+
 ## 2026-08-09 - `/events` catalog mobile-first redesign
 
 ### Наблюдения

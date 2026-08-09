@@ -7,6 +7,7 @@ import { EventCard } from '@/components/EventCard';
 import { EventCardHorizontal } from '@/components/EventCardHorizontal';
 import type { PublicCatalogListItemDto } from '@daibilet/contracts/public';
 import { trackCatalogBannerClick } from '@/lib/catalog-analytics';
+import { catalogItemHasLiveSignal } from '@/lib/event-card-badges';
 import { formatPriceFrom } from '@/lib/format';
 import { formatShowcaseSessionDate, MIN_DISPLAY_PRICE_RUB } from '@/lib/event-card-meta';
 import { resolveEventCardDestinationLabel } from '@/lib/event-location';
@@ -17,6 +18,7 @@ import {
   catalogInterstitialsForCity,
   type CatalogInterstitial,
 } from '@/lib/catalog-interstitials';
+import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 
 type CatalogResultsProps = {
   items: PublicCatalogListItemDto[];
@@ -24,6 +26,8 @@ type CatalogResultsProps = {
   onViewModeChange: (mode: CatalogViewMode) => void;
   clearHref?: string;
   city?: string | null;
+  /** Current catalog sort - used for zero-fetch «Сейчас в городе» strip. */
+  sort?: string | null;
 };
 
 type CatalogGridEntry =
@@ -53,7 +57,7 @@ function buildCatalogGridEntries(
 
 function CatalogInterstitialBanner({ banner }: { banner: CatalogInterstitial }) {
   return (
-    <li className="sm:col-span-2 xl:col-span-4">
+    <li className="sm:col-span-2 lg:col-span-3 xl:col-span-4">
       <Link
         href={banner.href}
         onClick={() => trackCatalogBannerClick(banner.id)}
@@ -85,6 +89,7 @@ export function CatalogResults({
   onViewModeChange: _onViewModeChange,
   clearHref = '/events',
   city,
+  sort,
 }: CatalogResultsProps) {
   if (!items.length) {
     return (
@@ -118,9 +123,13 @@ export function CatalogResults({
   }
 
   const gridEntries = viewMode === 'cards' ? buildCatalogGridEntries(items, city) : null;
+  const liveRailItems = pickLiveRailItems(items, sort);
 
   return (
     <>
+      {liveRailItems.length >= 3 && viewMode === 'cards' ? (
+        <CatalogLiveRail items={liveRailItems} popularSort={sort === 'popular'} />
+      ) : null}
       {viewMode === 'list' ? (
         <ul className="mt-4 space-y-4 sm:space-y-5">
           {items.map((session) => (
@@ -145,6 +154,75 @@ export function CatalogResults({
         </ul>
       )}
     </>
+  );
+}
+
+function pickLiveRailItems(
+  items: PublicCatalogListItemDto[],
+  sort?: string | null,
+): PublicCatalogListItemDto[] {
+  if (sort === 'popular') {
+    return items.slice(0, 6);
+  }
+  return items.filter((item) => catalogItemHasLiveSignal(item)).slice(0, 6);
+}
+
+function CatalogLiveRail({
+  items,
+  popularSort,
+}: {
+  items: PublicCatalogListItemDto[];
+  popularSort: boolean;
+}) {
+  return (
+    <section className="mt-4" aria-label={popularSort ? 'Популярное сейчас' : 'Сейчас выбирают'}>
+      <div className="mb-2 flex items-baseline justify-between gap-3">
+        <h2 className="font-display text-sm font-bold text-graphite sm:text-base">
+          {popularSort ? 'Популярное сейчас' : 'Сейчас выбирают'}
+        </h2>
+        <p className="text-[11px] text-graphite-muted sm:text-xs">По афише города</p>
+      </div>
+      <ul className="horizontal-snap-row flex gap-3 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {items.map((session) => {
+          const href = eventHref(session);
+          const hasPrice =
+            typeof session.priceFrom === 'number' && session.priceFrom >= MIN_DISPLAY_PRICE_RUB;
+          return (
+            <li key={`live-${session.id}-${session.startsAt}`} className="w-[9.5rem] shrink-0 snap-start sm:w-44">
+              <Link
+                href={href}
+                className="group block overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition hover:border-slate-200 hover:shadow-md"
+              >
+                <div className="relative aspect-[16/10] overflow-hidden bg-surface-muted">
+                  <SafeImage
+                    src={session.imageUrl}
+                    alt={session.title}
+                    fill
+                    sizes={IMAGE_SIZES.eventCard}
+                    className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                    fallback={
+                      <div className="flex h-full w-full items-center justify-center bg-surface-muted text-graphite-muted">
+                        ·
+                      </div>
+                    }
+                  />
+                </div>
+                <div className="space-y-1 p-2.5">
+                  <p className="line-clamp-2 text-xs font-semibold leading-snug text-graphite sm:text-sm">
+                    {session.title}
+                  </p>
+                  {hasPrice ? (
+                    <p className="text-[11px] font-bold text-primary-700 sm:text-xs">
+                      {formatPriceFrom(session.priceFrom)}
+                    </p>
+                  ) : null}
+                </div>
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
   );
 }
 
