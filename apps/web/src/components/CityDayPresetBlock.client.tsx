@@ -22,6 +22,11 @@ type Props = {
   editorial?: boolean;
   /** Именованные шаблоны из cityInfo.dayRoutePresets */
   namedPresets?: CityDayRoutePreset[];
+  /**
+   * /my-day progressive catalog: keep a single skeleton until locations+venues settle,
+   * so name-matched presets do not «pop in» after editorial-only ones.
+   */
+  catalogPending?: boolean;
   /** Hub CTA navigates to /my-day; on /my-day keep false (event sync updates panel). */
   navigateToMyDay?: boolean;
   /** Copy when block is already on /my-day. */
@@ -56,6 +61,7 @@ export function CityDayPresetBlock({
   city,
   editorial = false,
   namedPresets = [],
+  catalogPending = false,
   navigateToMyDay = true,
   inMyDay = false,
   embedded = false,
@@ -120,6 +126,62 @@ export function CityDayPresetBlock({
   const chipActive = editorial
     ? 'border-zinc-900 bg-zinc-900 text-white'
     : 'border-slate-900 bg-slate-900 text-white';
+  const skeletonTone = editorial ? 'bg-zinc-200/80' : 'bg-slate-200/90';
+
+  // Named presets that still need catalog name-match must wait for match sources;
+  // otherwise editorial-ready chips paint first and the rest «pop in» later (SPB).
+  if ((namedPresets || []).length > 0 && catalogPending) {
+    const skeletonCount = Math.max(3, Math.min(8, namedPresets.length));
+    if (embedded) {
+      return (
+        <div
+          data-day-presets={inMyDay ? 'my-day' : 'hub'}
+          data-day-presets-mode="chips"
+          data-day-presets-pending="1"
+          aria-busy="true"
+          aria-label="Загружаем готовые сценарии"
+        >
+          <div
+            className="flex flex-nowrap gap-2 overflow-x-auto overscroll-x-contain pb-0.5 [scrollbar-width:thin]"
+            data-day-preset-chips
+          >
+            {Array.from({ length: skeletonCount }, (_, index) => (
+              <div
+                key={`preset-skel-chip-${index}`}
+                className={`inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full border px-3 ${borderClass} ${skeletonTone} animate-pulse`}
+                style={{ width: `${9.5 + (index % 3) * 1.25}rem` }}
+              />
+            ))}
+          </div>
+          <div
+            className={`mt-3 h-[5.5rem] animate-pulse rounded-xl border ${borderClass} ${skeletonTone}`}
+            data-day-preset-panel-skeleton
+          />
+        </div>
+      );
+    }
+    return (
+      <div
+        className={shellClass || undefined}
+        data-day-presets={inMyDay ? 'my-day' : 'hub'}
+        data-day-presets-pending="1"
+        aria-busy="true"
+        aria-label="Загружаем готовые сценарии"
+      >
+        <p className={`text-sm font-semibold ${titleClass}`}>Готовые сценарии</p>
+        <p className={`mt-1 text-sm leading-6 ${softClass}`}>Подбираем маршруты по каталогу города…</p>
+        <ul className="mt-4 grid gap-3">
+          {Array.from({ length: skeletonCount }, (_, index) => (
+            <li key={`preset-skel-card-${index}`}>
+              <div
+                className={`h-[4.75rem] animate-pulse rounded-xl border ${borderClass} ${skeletonTone}`}
+              />
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  }
 
   const renderScenarioCard = (row: NamedRow, opts?: { panel?: boolean }) => {
     const { preset, items, available } = row;

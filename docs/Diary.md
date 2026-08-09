@@ -15,6 +15,23 @@
 
 ---
 
+## 2026-08-09 - /my-day SPB: сценарии не «доплывают»
+
+### Наблюдения
+- Owner: на `/my-day` по СПб сначала ~4 готовых сценария, затем ещё появляются.
+- В `CITY_INFO` у СПб **6** named presets; часть (`spb-1…3`, барный) резолвится по `dayRouteId`/slug без каталога (≥3 точки), `spb-4`/`spb-5` (Коломна, Литературный) - почти name-only и ждут matchSources.
+- `/my-day` грузит locations/venues progressive (поиск не ждёт Promise.all) → `CityDayPresetBlock` фильтрует `available` на каждом апдейте → chips pop-in.
+
+### Решения
+- `venueMatchCatalogReady` в `DayRoutePanel`: ready только после settle locations+venues (events не блокируют).
+- `CityDayPresetBlock.catalogPending`: единый skeleton chips+panel до готовности; потом полный отфильтрованный набор сразу.
+- Hub (`CityPageView`) без изменений: venues уже SSR, `catalogPending` default false.
+
+### Проблемы
+- Live web deploy не делали - проверить после следующего deploy MSK web.
+
+---
+
 ## 2026-08-09 - Replace remaining night city covers with daytime
 
 ### Наблюдения

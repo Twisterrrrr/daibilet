@@ -386,6 +386,11 @@ function DayRoutePanelInner() {
     venues: false,
     events: false,
   });
+  /**
+   * Locations+venues settled for current city (events may still load).
+   * Named presets that need catalog name-match wait on this gate.
+   */
+  const [venueMatchCatalogReady, setVenueMatchCatalogReady] = useState(false);
   const catalogLoading =
     catalogLoadingParts.locations || catalogLoadingParts.venues || catalogLoadingParts.events;
   const [catalogError, setCatalogError] = useState<string | null>(null);
@@ -822,6 +827,7 @@ function DayRoutePanelInner() {
 
   // Progressive city catalog: locations / venues / events settle independently.
   // Search stays usable as soon as the first family arrives (no Promise.all gate).
+  // Named day-route presets still wait for locations+venues (see venueMatchCatalogReady).
   useEffect(() => {
     if (!pageCityName) {
       setLocationsCatalog([]);
@@ -829,6 +835,7 @@ function DayRoutePanelInner() {
       setEventsCatalog([]);
       setEventsSearchExtra([]);
       setCatalogLoadingParts({ locations: false, venues: false, events: false });
+      setVenueMatchCatalogReady(false);
       setCatalogError(null);
       return;
     }
@@ -838,6 +845,7 @@ function DayRoutePanelInner() {
     setEventsCatalog([]);
     setEventsSearchExtra([]);
     setCatalogLoadingParts({ locations: true, venues: true, events: true });
+    setVenueMatchCatalogReady(false);
     setCatalogError(null);
 
     const venuesCityFilter = pageCitySlug || pageCitySourceSlug || pageCityName;
@@ -854,6 +862,9 @@ function DayRoutePanelInner() {
       settledOk[part] = ok;
       setCatalogLoadingParts((prev) => {
         const next = { ...prev, [part]: false };
+        if (!next.locations && !next.venues) {
+          setVenueMatchCatalogReady(true);
+        }
         if (!next.locations && !next.venues && !next.events) {
           if (!settledOk.locations && !settledOk.venues && !settledOk.events) {
             setCatalogError(
@@ -999,6 +1010,10 @@ function DayRoutePanelInner() {
     return info?.dayRoutePresets || [];
   }, [pageCitySlug, selectedCity?.selectedDestination?.sourceSlug]);
   const hasNamedPresets = dayRoutePresets.length > 0;
+  /** Gate chips until match sources settle - avoids SPB 4→6 preset pop-in. */
+  const presetsCatalogPending = Boolean(
+    hasNamedPresets && hasPageCity && !venueMatchCatalogReady,
+  );
 
   const dayPresetCityCtx = useMemo(
     () => ({
@@ -3324,6 +3339,7 @@ function DayRoutePanelInner() {
                 venues={matchSources}
                 city={dayPresetCityCtx}
                 namedPresets={dayRoutePresets}
+                catalogPending={presetsCatalogPending}
                 navigateToMyDay={false}
                 inMyDay
                 embedded
