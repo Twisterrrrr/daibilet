@@ -7,11 +7,7 @@
 - `DayTripCanonCard` desktop: logistics `sm:-ml-4` + `sm:pl-4` (фон влево, текст на title vertical); gastro `sm:pl-4` (тот же inset). Mobile `px-2.5` без изменений.
 
 ### Проблемы
-- Deploy MSK web; смотреть Выборг / Куршская коса.
-
----
-
-## 2026-08-09 - Perm: Губаха / Усьва one card
+- Нет. Live: Deploy MSK web **31308732076** @`73509693` (tip `67aeff5f`) BUILD_ID=`SH7xtIXBki0ZEfrBkwYe3`; смотреть Выборг / Куршская коса.
 
 ### Наблюдения
 - Owner: chips «Усьва (день 1)» + «Губаха (день 2)» - снова одна карточка; дни обозначать внутри.
