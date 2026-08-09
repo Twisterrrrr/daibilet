@@ -1,3 +1,36 @@
+## 2026-08-09 - DayTripCanonCard: сценарии = пригороды
+
+### Наблюдения
+- Owner: «ой, может и готовые сценарии в хабе сделать как Пригороды? красиво выглядит».
+- Нужен один visual language, не два разных «красивых» стиля.
+
+### Решения
+- Общий `DayTripCanonCard` - шапка / logistics|gastro / «Что посмотреть» / CTA, без SVG icons.
+- `SuburbsCarousel` + `CityDayPresetBlock` на одном компоненте (chips + выбранная карточка).
+- Preset schema: optional `logisticsExit` / `travelVector*` / `gastroStop`; Петергоф+Царское заполнены.
+
+### Проблемы
+- Ship/deploy: см. Tasktracker UX.DAY-TRIP-CANON.
+
+---
+
+## 2026-08-09 - Suburb cards: канон вёрстки (Петергоф-макет)
+
+### Наблюдения
+- Owner дал HTML-макет карточки пригорода: шапка (номер+название+вектор), grid Логистика|Гастро, «Что посмотреть» ol, CTA «В маршрут».
+- Уточнение: без SVG-пиктограмм в секциях - текстовые заголовки достаточны.
+- Compact my-day раньше прятал logistics/gastro - канон нужен и на hub, и на my-day.
+
+### Решения
+- Единый panel → вынесен в `DayTripCanonCard` (shared с scenarios).
+- Schema: `logisticsExit`, `gastroStop{name,blurb}`; fallback `stationName` / `gastroHint`.
+- SPB 11 suburbs: structured meta в web+public; Гатчина - свой blurb (не копия Петергофа).
+
+### Проблемы
+- Ship/deploy: см. Tasktracker UX.DAY-TRIP-CANON.
+
+---
+
 ## 2026-08-09 - Пенаты: маркер уехал в Финский залив
 
 ### Наблюдения

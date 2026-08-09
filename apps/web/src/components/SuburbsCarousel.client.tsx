@@ -5,6 +5,10 @@ import Link from 'next/link';
 import { ChevronDown } from 'lucide-react';
 
 import { AddManyToDayRouteButton } from '@/components/AddToDayRouteButton.client';
+import {
+  DayTripCanonCard,
+  resolveCanonGastroStop,
+} from '@/components/DayTripCanonCard.client';
 import { resolveCityPlaceTitleHref } from '@/lib/city-place-href';
 import type { CityMustSeeItem, CitySuburbItem } from '@/lib/cityInfo';
 import {
@@ -13,38 +17,6 @@ import {
   type DayRouteCityContext,
   type DayRouteVenueMatchSource,
 } from '@/lib/day-route-from-place';
-
-/** Nested POI line: bold place name + plain continuation after ` - `. */
-function SuburbPlaceLabel({
-  name,
-  href,
-  desc,
-  /** Compact my-day: show desc only from md+ (mobile stays name-only). */
-  descFromMd = false,
-}: {
-  name: string;
-  href: string | null;
-  desc: string;
-  descFromMd?: boolean;
-}) {
-  const nameNode = href ? (
-    <Link
-      href={href}
-      className="font-semibold underline decoration-slate-300 underline-offset-2 hover:decoration-current"
-    >
-      {name}
-    </Link>
-  ) : (
-    <span className="font-semibold">{name}</span>
-  );
-  if (!desc) return <>{nameNode}</>;
-  return (
-    <>
-      {nameNode}
-      <span className={`font-normal ${descFromMd ? 'hidden md:inline' : ''}`}>{` - ${desc}`}</span>
-    </>
-  );
-}
 
 function buildBulkVenues(
   place: CitySuburbItem,
@@ -86,8 +58,7 @@ export type SuburbsCarouselProps = {
   /** Hub editorial typography; my-day keeps default slate. */
   editorial?: boolean;
   /**
-   * My-day: truncated panel - name (+ optional vector) + numbered points + bulk CTA.
-   * Hide travel essays, gastro, station tips. Per-POI desc: md+ inline; mobile name-only.
+   * My-day: same card canon as hub; POI desc from md+ (mobile name-only).
    */
   compact?: boolean;
   /** Skip outer h2/intro when parent accordion provides the chrome. */
@@ -99,8 +70,7 @@ export type SuburbsCarouselProps = {
 
 /**
  * Significant-suburbs block.
- * Hub: wrap chips of suburb names + one detail panel (no horizontal card rail).
- * Compact (my-day): horizontal accordion - truncated panel (name + points + CTA).
+ * Hub + my-day: chips + one DayTripCanonCard panel (shared with scenarios).
  * Bulk «В маршрут» adds all nested points of the active suburb.
  */
 export function SuburbsCarousel({
@@ -114,20 +84,7 @@ export function SuburbsCarousel({
   titleClass,
   className = 'mt-10',
 }: SuburbsCarouselProps) {
-  /**
-   * Hub: always one selected panel (index 0).
-   * My-day compact: first suburb open by default; tap chip to switch/collapse.
-   */
   const [activeIndex, setActiveIndex] = React.useState<number | null>(0);
-
-  const resolvedTitleClass =
-    titleClass ||
-    `font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-950'}`;
-  const hubNameClass = `${resolvedTitleClass} text-xl leading-snug sm:text-2xl`;
-  const mutedClass = editorial ? 'text-zinc-500' : 'text-slate-500';
-  const softClass = editorial ? 'text-zinc-600' : 'text-slate-600';
-  const borderSoft = editorial ? 'border-zinc-100' : 'border-slate-100';
-  const panelBorder = editorial ? 'border-zinc-200 bg-white' : 'border-slate-200 bg-white';
 
   if (!places.length) return null;
 
@@ -201,23 +158,24 @@ export function SuburbsCarousel({
     </div>
   );
 
-  const renderHubPanel = (place: CitySuburbItem, index: number) => {
+  const renderSuburbPanel = (place: CitySuburbItem, index: number) => {
     const placeHref = resolveCityPlaceTitleHref(place, venues);
     const matchedVenue = venues.find((venue) => {
       const slug = String(place.venueSlug || place.locationSlug || '').trim();
       return slug && String(venue.slug || '').trim() === slug;
     });
     const blurb =
-      dayRouteHookLine({
-        hookFact: matchedVenue?.hookFact,
-        shortDescription: matchedVenue?.shortDescription,
-        desc: place.desc,
-        preferEditorial: true,
-      }) || '';
+      !compact
+        ? dayRouteHookLine({
+            hookFact: matchedVenue?.hookFact,
+            shortDescription: matchedVenue?.shortDescription,
+            desc: place.desc,
+            preferEditorial: true,
+          }) || ''
+        : '';
     const nested = Array.isArray(place.places) ? place.places.filter((p) => p?.name) : [];
     const bulkVenues = buildBulkVenues(place, venues, city);
-    const vectorTitle = suburbVectorTitle(place);
-    const nameHeading = placeHref ? (
+    const titleNode = placeHref ? (
       <Link
         href={placeHref}
         className="underline decoration-slate-300 underline-offset-2 hover:decoration-current"
@@ -227,206 +185,42 @@ export function SuburbsCarousel({
     ) : (
       place.name
     );
-    const numClass = editorial ? 'text-zinc-400' : 'text-slate-400';
-    const poiTextClass = editorial ? 'text-zinc-600' : 'text-slate-600';
 
     return (
-      <article
+      <DayTripCanonCard
         id={`city-suburb-panel-${index}`}
         role="tabpanel"
-        className={`mt-4 rounded-2xl border p-4 sm:p-5 ${panelBorder}`}
-        data-city-suburb-card
-        data-city-suburb-expanded="1"
-        aria-label={`${index + 1} из ${places.length}: ${place.name}`}
-      >
-        <div className="grid grid-cols-[2rem_minmax(0,1fr)] gap-x-3">
-          <span
-            className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold ${
-              editorial ? 'bg-zinc-100 text-zinc-800' : 'bg-primary-50 text-primary-700'
-            }`}
-          >
-            {index + 1}
-          </span>
-          <div className="min-w-0">
-            <h3 className={`${hubNameClass} break-words`} data-city-suburb-title>
-              {nameHeading}
-              {vectorTitle ? (
-                <span
-                  className={`ml-2.5 text-sm font-normal leading-snug ${softClass}`}
-                  data-city-suburb-vector
-                >
-                  {vectorTitle}
-                </span>
-              ) : null}
-            </h3>
-            {/* mt-3 matches nested places gap after gastro (ol mt-3 / pt-3) */}
-            {place.stationName || place.travelVectorBlurb || blurb || place.gastroHint ? (
-              <div className="mt-3">
-                {place.stationName ? (
-                  <p className={`text-sm leading-snug ${softClass}`} data-city-suburb-exit>
-                    <span
-                      className={`font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-900'}`}
-                    >
-                      Где выходить
-                    </span>
-                    <span className={mutedClass}>: {place.stationName}</span>
-                  </p>
-                ) : null}
-                {place.travelVectorBlurb ? (
-                  <p
-                    className={`${place.stationName ? 'mt-1.5' : ''} text-sm leading-relaxed ${mutedClass}`}
-                  >
-                    {place.travelVectorBlurb}
-                  </p>
-                ) : null}
-                {blurb ? (
-                  <p
-                    className={`${
-                      place.stationName || place.travelVectorBlurb ? 'mt-2' : ''
-                    } text-sm leading-relaxed break-words ${mutedClass}`}
-                  >
-                    {blurb}
-                  </p>
-                ) : null}
-                {place.gastroHint ? (
-                  <p
-                    className={`${
-                      place.stationName || place.travelVectorBlurb || blurb ? 'mt-2' : ''
-                    } text-sm leading-snug ${softClass}`}
-                    data-city-suburb-gastro
-                  >
-                    <span
-                      className={`font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-900'}`}
-                    >
-                      Гастро-остановка
-                    </span>
-                    <span className={mutedClass}>: {place.gastroHint}</span>
-                  </p>
-                ) : null}
-              </div>
-            ) : null}
-          </div>
-
-          {nested.length ? (
-            <ol
-              className={`col-span-2 mt-3 grid grid-cols-[2rem_minmax(0,1fr)] gap-x-3 gap-y-1.5 border-t pt-3 ${borderSoft}`}
-              data-city-suburb-places
-            >
-              {nested.map((poi, poiIndex) => {
-                const poiHref = resolveCityPlaceTitleHref(poi, venues);
-                const poiDesc = String(poi.desc || '').trim();
-                return (
-                  <li key={`${poi.name}:${poiIndex}`} className="contents" data-city-suburb-place>
-                    <span className={`text-center text-sm leading-5 tabular-nums ${numClass}`}>
-                      {poiIndex + 1}.
-                    </span>
-                    <span className={`min-w-0 text-sm leading-5 ${poiTextClass}`}>
-                      <SuburbPlaceLabel name={poi.name} href={poiHref} desc={poiDesc} />
-                    </span>
-                  </li>
-                );
-              })}
-            </ol>
-          ) : null}
-
-          {bulkVenues.length > 0 ? (
-            <div
-              className={`col-start-2 mt-3 border-t pt-3 ${borderSoft}`}
-              data-city-suburb-cta-footer
-            >
-              <AddManyToDayRouteButton
-                compact
-                className="!min-h-8 !px-2.5 !py-1.5 !text-[11px]"
-                venues={bulkVenues}
-              />
-            </div>
-          ) : null}
-        </div>
-      </article>
-    );
-  };
-
-  const renderCompactPanel = (place: CitySuburbItem, index: number) => {
-    const placeHref = resolveCityPlaceTitleHref(place, venues);
-    const nested = Array.isArray(place.places) ? place.places.filter((p) => p?.name) : [];
-    const bulkVenues = buildBulkVenues(place, venues, city);
-    const vectorTitle = suburbVectorTitle(place);
-
-    return (
-      <article
-        id={`city-suburb-panel-${index}`}
-        role="tabpanel"
-        className="mt-3 rounded-2xl border border-slate-200 bg-white p-4 sm:p-5"
-        data-city-suburb-card
-        data-city-suburb-compact
-        data-city-suburb-expanded="1"
-        aria-label={`${index + 1} из ${places.length}: ${place.name}`}
-      >
-        <div className="grid grid-cols-[2.25rem_minmax(0,1fr)] gap-x-2.5 sm:gap-x-3">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-50 text-sm font-bold leading-none text-primary-700">
-            {index + 1}
-          </span>
-          <div className="min-w-0">
-            <h3
-              className="break-words text-lg font-bold leading-snug tracking-tight text-slate-950 sm:text-xl"
-              data-city-suburb-title
-            >
-              {placeHref ? (
-                <Link
-                  href={placeHref}
-                  className="underline decoration-slate-300 underline-offset-2 hover:decoration-current"
-                >
-                  {place.name}
-                </Link>
-              ) : (
-                place.name
-              )}
-              {vectorTitle ? (
-                <span
-                  className="ml-2.5 text-sm font-normal leading-snug text-slate-500"
-                  data-city-suburb-vector
-                >
-                  {vectorTitle}
-                </span>
-              ) : null}
-            </h3>
-          </div>
-          {nested.length ? (
-            <ol
-              className="col-span-2 mt-3 grid grid-cols-[2.25rem_minmax(0,1fr)] gap-x-2.5 gap-y-1.5 border-t border-slate-100 pt-3 sm:gap-x-3"
-              data-city-suburb-places
-              data-city-suburb-places-compact="1"
-            >
-              {nested.map((poi, poiIndex) => {
-                const poiHref = resolveCityPlaceTitleHref(poi, venues);
-                const poiDesc = String(poi.desc || '').trim();
-                return (
-                  <li key={`${poi.name}:${poiIndex}`} className="contents" data-city-suburb-place>
-                    <span className="pt-0.5 text-center text-xs font-medium leading-5 tabular-nums text-slate-400">
-                      {poiIndex + 1}.
-                    </span>
-                    <span className="min-w-0 text-sm leading-snug text-slate-700">
-                      <SuburbPlaceLabel name={poi.name} href={poiHref} desc={poiDesc} descFromMd />
-                    </span>
-                  </li>
-                );
-              })}
-            </ol>
-          ) : null}
-          {bulkVenues.length > 0 ? (
-            <div
-              className="col-start-2 mt-3 border-t border-slate-100 pt-3"
-              data-city-suburb-cta-footer
-            >
-              <AddManyToDayRouteButton
-                compact
-                className="!min-h-8 !px-2.5 !py-1.5 !text-[11px]"
-                venues={bulkVenues}
-              />
-            </div>
-          ) : null}
-        </div>
-      </article>
+        index={index}
+        total={places.length}
+        editorial={editorial}
+        title={titleNode}
+        subtitle={suburbVectorTitle(place) || undefined}
+        logisticsExit={String(place.logisticsExit || place.stationName || '').trim() || undefined}
+        logisticsText={String(place.travelVectorBlurb || '').trim() || undefined}
+        logisticsExtra={blurb || undefined}
+        gastro={resolveCanonGastroStop(place)}
+        sightDescFromMd={compact}
+        sights={nested.map((poi) => ({
+          name: poi.name,
+          desc: String(poi.desc || '').trim() || undefined,
+          href: resolveCityPlaceTitleHref(poi, venues),
+        }))}
+        cta={
+          bulkVenues.length > 0 ? (
+            <AddManyToDayRouteButton
+              compact
+              className="!min-h-9 !px-3.5 !py-2 !text-xs"
+              venues={bulkVenues}
+            />
+          ) : null
+        }
+        dataAttrs={{
+          'data-city-suburb-card': '1',
+          'data-city-suburb-canon': '1',
+          'data-city-suburb-compact': compact ? '1' : undefined,
+          'data-city-suburb-expanded': '1',
+        }}
+      />
     );
   };
 
@@ -436,9 +230,10 @@ export function SuburbsCarousel({
         <>
           <h2
             className={
-              editorial
+              titleClass ||
+              (editorial
                 ? 'font-serif text-2xl font-semibold text-zinc-950 sm:text-3xl'
-                : 'text-xl font-bold text-slate-950 sm:text-2xl'
+                : 'text-xl font-bold text-slate-950 sm:text-2xl')
             }
           >
             Значимые пригороды {cityGenitive}
@@ -453,11 +248,7 @@ export function SuburbsCarousel({
 
       <div className={hideHeader ? undefined : compact ? 'mt-4' : 'mt-5'}>
         {compact ? renderChipRow('accordion') : renderChipRow('tabs')}
-        {selected && selectedIndex != null
-          ? compact
-            ? renderCompactPanel(selected, selectedIndex)
-            : renderHubPanel(selected, selectedIndex)
-          : null}
+        {selected && selectedIndex != null ? renderSuburbPanel(selected, selectedIndex) : null}
         {compact && selectedIndex == null ? (
           <p className="mt-3 text-sm text-slate-500" data-city-suburb-hint>
             Нажмите на пригород, чтобы открыть точки и добавить в маршрут.
