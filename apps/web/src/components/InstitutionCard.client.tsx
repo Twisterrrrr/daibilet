@@ -49,11 +49,24 @@ export function InstitutionCard({ venue, href }: { venue: InstitutionCardVenue; 
   const rating = realRating(venue.rating);
   const upcoming = venue.upcomingTitles?.filter(Boolean).slice(0, 3) || [];
   const showMiniAfisha = upcoming.length > 0;
+  const dayRouteVenue = {
+    id: venue.id,
+    slug: venue.slug,
+    title: venue.name,
+    city: venue.city,
+    cityId: venue.cityId,
+    citySlug: venue.citySlug,
+    href,
+    imageUrl: venue.heroImageUrl,
+    address: venue.address,
+    latitude: venue.latitude,
+    longitude: venue.longitude,
+  };
 
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-card bg-white shadow-card transition duration-300 hover:-translate-y-0.5 hover:shadow-card-hover">
-      <Link href={href} className="flex flex-1 flex-col no-underline">
-        <div className="relative aspect-video overflow-hidden bg-surface-muted">
+      <div className="relative aspect-video overflow-hidden bg-surface-muted">
+        <Link href={href} className="absolute inset-0 no-underline" aria-label={venue.name}>
           <SafeImage
             src={venue.heroImageUrl}
             alt=""
@@ -63,20 +76,41 @@ export function InstitutionCard({ venue, href }: { venue: InstitutionCardVenue; 
             fallback={<div className={`h-full w-full bg-gradient-to-br ${gradient}`} />}
           />
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/55 via-transparent to-transparent" />
+        </Link>
 
-          <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
-            <span className={`rounded-md px-2.5 py-1 text-xs font-bold tracking-wide shadow-sm ${tagClass}`}>
-              {typeLabel}
+        <div className="pointer-events-none absolute left-3 top-3 z-[1] flex flex-wrap gap-1.5">
+          <span className={`rounded-md px-2.5 py-1 text-xs font-bold tracking-wide shadow-sm ${tagClass}`}>
+            {typeLabel}
+          </span>
+          {rating != null ? (
+            <span className="inline-flex items-center gap-1 rounded-md bg-white/95 px-2 py-1 text-xs font-semibold text-graphite shadow-sm backdrop-blur">
+              <Star className="h-3 w-3 fill-amber-400 text-amber-400" strokeWidth={0} />
+              {rating}
             </span>
-            {rating != null ? (
-              <span className="inline-flex items-center gap-1 rounded-md bg-white/95 px-2 py-1 text-xs font-semibold text-graphite shadow-sm backdrop-blur">
-                <Star className="h-3 w-3 fill-amber-400 text-amber-400" strokeWidth={0} />
-                {rating}
-              </span>
-            ) : null}
-          </div>
+          ) : null}
         </div>
 
+        <div
+          className="absolute bottom-2 right-2 z-[2]"
+          onClick={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+          }}
+          onPointerDown={(event) => {
+            event.stopPropagation();
+          }}
+        >
+          <AddToDayRouteButton
+            key={venue.id}
+            compact
+            variant="overlay"
+            className="!min-h-8 !rounded-lg !px-2.5 !py-1.5 !text-[11px]"
+            venue={dayRouteVenue}
+          />
+        </div>
+      </div>
+
+      <Link href={href} className="flex flex-1 flex-col no-underline">
         <div className="flex flex-1 flex-col gap-2.5 p-4 sm:p-5">
           <h3 className="line-clamp-2 font-display text-base font-semibold leading-snug text-graphite group-hover:text-primary-600">
             {venue.name}
@@ -120,36 +154,6 @@ export function InstitutionCard({ venue, href }: { venue: InstitutionCardVenue; 
           </div>
         </div>
       </Link>
-
-      <div
-        className="absolute right-2 top-2 z-20"
-        onClick={(event) => {
-          event.preventDefault();
-          event.stopPropagation();
-        }}
-        onPointerDown={(event) => {
-          event.stopPropagation();
-        }}
-      >
-        <AddToDayRouteButton
-          key={venue.id}
-          compact
-          className="!min-h-9 !rounded-lg !px-2.5 !py-1.5 !text-[11px] shadow-sm"
-          venue={{
-            id: venue.id,
-            slug: venue.slug,
-            title: venue.name,
-            city: venue.city,
-            cityId: venue.cityId,
-            citySlug: venue.citySlug,
-            href,
-            imageUrl: venue.heroImageUrl,
-            address: venue.address,
-            latitude: venue.latitude,
-            longitude: venue.longitude,
-          }}
-        />
-      </div>
     </div>
   );
 }

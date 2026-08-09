@@ -153,55 +153,60 @@ export function LocationCard({
 
   return (
     <article className="group relative flex min-h-[10.5rem] overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition-shadow duration-300 hover:shadow-md sm:min-h-[11rem]">
-      <Link
-        href={href}
-        className={`relative w-36 shrink-0 self-stretch overflow-hidden text-white no-underline sm:w-44 ${
-          showPhoto ? 'bg-slate-900' : `flex flex-col items-center justify-center bg-gradient-to-br p-3 ${gradient}`
+      <div
+        className={`relative w-36 shrink-0 self-stretch overflow-hidden sm:w-44 ${
+          showPhoto ? 'bg-slate-900' : `bg-gradient-to-br ${gradient}`
         }`}
-        aria-label={displayName}
       >
-        {showPhoto ? (
-          <SafeImage
-            src={heroUrl}
-            alt=""
-            fill
-            sizes={IMAGE_SIZES.searchThumb}
-            className="object-cover object-center transition duration-300 group-hover:scale-[1.03]"
-          />
-        ) : (
-          <TypeIcon className="h-9 w-9 opacity-95" strokeWidth={1.75} />
-        )}
-        <span className="absolute left-2.5 top-2.5 rounded-md bg-black/55 px-2 py-1 text-[11px] font-medium tracking-wide text-white backdrop-blur-sm">
+        <Link
+          href={href}
+          className={`absolute inset-0 text-white no-underline ${
+            showPhoto ? '' : 'flex flex-col items-center justify-center p-3'
+          }`}
+          aria-label={displayName}
+        >
+          {showPhoto ? (
+            <SafeImage
+              src={heroUrl}
+              alt=""
+              fill
+              sizes={IMAGE_SIZES.searchThumb}
+              className="object-cover object-center transition duration-300 group-hover:scale-[1.03]"
+            />
+          ) : (
+            <TypeIcon className="h-9 w-9 opacity-95" strokeWidth={1.75} />
+          )}
+        </Link>
+        <span className="pointer-events-none absolute left-2 top-2 z-[1] rounded-md bg-black/55 px-2 py-1 text-[11px] font-medium tracking-wide text-white backdrop-blur-sm">
           {typeLabel}
         </span>
-      </Link>
+        <div
+          className="absolute bottom-2 left-2 right-2 z-[2]"
+          onClick={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+          }}
+          onPointerDown={(event) => {
+            event.stopPropagation();
+          }}
+        >
+          <AddToDayRouteButton
+            key={venue.id}
+            compact
+            variant="overlay"
+            className="!min-h-8 !w-full !justify-center !gap-1 !px-2 !py-1.5 !text-[11px]"
+            venue={dayRouteVenue}
+          />
+        </div>
+      </div>
 
       <div className="flex min-w-0 flex-1 flex-col justify-between gap-3 p-4 sm:p-5">
         <div>
-          <div className="flex items-start justify-between gap-3">
-            <h3 className="min-w-0 flex-1 text-lg font-bold leading-snug tracking-tight text-slate-900">
-              <Link href={href} className="no-underline transition-colors hover:text-primary-700">
-                {displayName}
-              </Link>
-            </h3>
-            <div
-              className="shrink-0"
-              onClick={(event) => {
-                event.preventDefault();
-                event.stopPropagation();
-              }}
-              onPointerDown={(event) => {
-                event.stopPropagation();
-              }}
-            >
-              <AddToDayRouteButton
-                key={venue.id}
-                compact
-                className="!min-h-0 !gap-1.5 !rounded-lg !bg-primary-50 !px-2.5 !py-1.5 !text-xs !font-semibold !text-primary-700 !shadow-none hover:!bg-primary-100"
-                venue={dayRouteVenue}
-              />
-            </div>
-          </div>
+          <h3 className="min-w-0 text-lg font-bold leading-snug tracking-tight text-slate-900">
+            <Link href={href} className="no-underline transition-colors hover:text-primary-700">
+              {displayName}
+            </Link>
+          </h3>
 
           {blurb ? <p className="mt-2 text-sm leading-relaxed text-slate-600">{blurb}</p> : null}
 
