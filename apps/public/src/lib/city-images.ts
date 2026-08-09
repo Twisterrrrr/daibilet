@@ -150,6 +150,20 @@ const CITY_DAYTIME_PREVIEW_SLUGS = new Set([
   'tula',
   'tver',
   'vladivostok',
+  'irkutsk',
+  'yaroslavl',
+  'volgograd',
+  'tomsk',
+  'ulyanovsk',
+  'stavropol',
+  'izhevsk',
+  'orenburg',
+  'veliky-novgorod',
+  'ulan-ude',
+  'orel',
+  'vologda',
+  'suzdal',
+  'sortavala',
 ]);
 
 export function resolveCityImage(city: CityImageSource): string | null {

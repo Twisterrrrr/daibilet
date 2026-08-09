@@ -161,6 +161,21 @@ const CITY_DAYTIME_PREVIEW_SLUGS = new Set([
   'abakan',
   'sevastopol',
   'simferopol',
+  // Fifth batch: remaining night PNGs shown on /cities (owner red-V + suzdal/sortavala)
+  'irkutsk',
+  'yaroslavl',
+  'volgograd',
+  'tomsk',
+  'ulyanovsk',
+  'stavropol',
+  'izhevsk',
+  'orenburg',
+  'veliky-novgorod',
+  'ulan-ude',
+  'orel',
+  'vologda',
+  'suzdal',
+  'sortavala',
 ]);
 
 function isUsableRemoteImage(url: string): boolean {

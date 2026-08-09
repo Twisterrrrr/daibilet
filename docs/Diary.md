@@ -1,3 +1,18 @@
+## 2026-08-09 - Replace remaining night city covers with daytime
+
+### Наблюдения
+- Owner: на /cities всё ещё тёмные карточки (Иркутск…Вологда + Suzdal/Sortavala); legacy root PNG у top-октетов тоже были night.
+
+### Решения
+- GenerateImage ×14 для red-V + suzdal/sortavala → cities/top/*.jpg + overwrite PNG; CITY_DAYTIME_PREVIEW_SLUGS.
+- Тёмные PNG городов с уже светлым top/*.jpg пересобраны из JPG (без повторной генерации).
+- Deploy MSK web + sync-public-assets.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-09 - Daytime city covers for 29 catalog cities
 
 ### Наблюдения

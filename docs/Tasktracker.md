@@ -286,7 +286,7 @@ Alias `museum-1` = первый open-date контракт (не «музеи fo
 |---|--------|-----------|--------|
 | UX.CITIES-DESKTOP | `/cities`: 8 top daytime + full-width map + remaining list; CTA row desktop; без «Все города (n)» | Высокий | ✅ `54a9ffd`; MSK BUILD_ID=`AF2liBH4Eu1LzXz8b0Yu2`; smoke 200 |
 | UX.CITIES-OCTET2 | `/cities` ranks 9-16: same dark/white chrome as top-8 + daytime JPG; MSK sync-public-assets | Высокий | ✅ `2db4ee62` Deploy `31276301334` BUILD_ID=`aXcB-Mia_CNSVUQEECgh6` |
-| UX.CITIES-DAY29 | Daytime covers 29 catalog cities (replace night 18 + 11 new); top JPG primary | Высокий | ✅ 23bd42a Deploy 31284829444 |
+| UX.CITIES-DAY-NIGHTFIX | Replace remaining night city covers (12 red-V + suzdal/sortavala + sync dark PNGs) | Высокий | 🔄 |
 
 ## Suburb nested coords → day-route (2026-08-06)
 
