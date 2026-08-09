@@ -14,6 +14,7 @@
 
 ### Проблемы
 - Filter/sort по-прежнему `router.push` (могут задевать loading.tsx) — вне scope пагинации.
+- Ship: `22f9c4ab` · Deploy MSK web **31300245196** · **BUILD_ID=`2QPP1b_Ed-1ffhxo3VXFw`**.
 
 ---
 
