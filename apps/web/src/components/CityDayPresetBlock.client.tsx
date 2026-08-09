@@ -55,6 +55,14 @@ function mainPlacesPhrase(count: number): string {
   return `${count} главных мест`;
 }
 
+/**
+ * Same gutter/text vertical as DayTripCanonCard (owner red line):
+ * nums hang in left gutter; title / stop names / CTA share one text column.
+ */
+const PRESET_GRID =
+  'grid grid-cols-[2rem_minmax(0,1fr)] gap-x-2.5 sm:grid-cols-[2.25rem_minmax(0,1fr)] sm:gap-x-3';
+const PRESET_GUTTER = 'flex justify-center';
+
 export function CityDayPresetBlock({
   places,
   venues,
@@ -120,6 +128,7 @@ export function CityDayPresetBlock({
   const titleClass = editorial ? 'text-zinc-950' : 'text-slate-950';
   const softClass = editorial ? 'text-zinc-600' : 'text-slate-600';
   const mutedClass = editorial ? 'text-zinc-500' : 'text-slate-500';
+  const numClass = editorial ? 'text-zinc-400' : 'text-slate-400';
   const chipIdle = editorial
     ? 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-400'
     : 'border-slate-200 bg-white text-slate-700 hover:border-slate-400';
@@ -174,12 +183,14 @@ export function CityDayPresetBlock({
   const renderScenarioCard = (row: NamedRow, opts?: { panel?: boolean }) => {
     const { preset, items, available } = row;
     const panel = Boolean(opts?.panel);
+    const useTwoCol = items.length >= 4;
     return (
       <div
         className={`flex flex-col gap-3 rounded-xl border bg-white px-4 py-3.5 ${borderClass} ${
           panel ? 'mt-3' : ''
         }`}
         data-day-preset-card={preset.id}
+        data-day-preset-align="gutter-text"
         {...(panel
           ? {
               id: `day-preset-panel-${preset.id}`,
@@ -188,70 +199,91 @@ export function CityDayPresetBlock({
             }
           : {})}
       >
-        <div className="min-w-0 w-full">
-          <div className="flex flex-col items-start gap-0.5 sm:flex-row sm:flex-wrap sm:items-baseline sm:gap-x-2 sm:gap-y-0.5">
-            <p className={`text-sm font-semibold ${titleClass}`}>{preset.title}</p>
-            {preset.blogSlug ? (
-              <Link
-                href={`/blog/${preset.blogSlug}`}
-                className={`inline-flex items-center gap-0.5 text-xs font-medium underline underline-offset-2 transition-colors ${
-                  editorial
-                    ? 'text-sky-700 hover:text-sky-800'
-                    : 'text-primary-600 hover:text-primary-700'
-                }`}
-              >
-                Читать об этом в блоге
-                <ArrowUpRight className="h-3 w-3 shrink-0 opacity-80" aria-hidden />
-              </Link>
+        <div className={`${PRESET_GRID} w-full min-w-0`} data-day-preset-head>
+          <div aria-hidden className={PRESET_GUTTER} />
+          <div className="min-w-0">
+            <div className="flex flex-col items-start gap-0.5 sm:flex-row sm:flex-wrap sm:items-baseline sm:gap-x-2 sm:gap-y-0.5">
+              <p className={`text-sm font-semibold ${titleClass}`}>{preset.title}</p>
+              {preset.blogSlug ? (
+                <Link
+                  href={`/blog/${preset.blogSlug}`}
+                  className={`inline-flex items-center gap-0.5 text-xs font-medium underline underline-offset-2 transition-colors ${
+                    editorial
+                      ? 'text-sky-700 hover:text-sky-800'
+                      : 'text-primary-600 hover:text-primary-700'
+                  }`}
+                >
+                  Читать об этом в блоге
+                  <ArrowUpRight className="h-3 w-3 shrink-0 opacity-80" aria-hidden />
+                </Link>
+              ) : null}
+            </div>
+            {preset.timingNote?.trim() ? (
+              <p className={`mt-1 text-[12px] leading-4 ${mutedClass}`} data-day-preset-timing>
+                {preset.timingNote.trim()}
+              </p>
             ) : null}
           </div>
-          {preset.timingNote?.trim() ? (
-            <p className={`mt-1 text-[12px] leading-4 ${mutedClass}`} data-day-preset-timing>
-              {preset.timingNote.trim()}
-            </p>
-          ) : null}
-          {available ? (
-            <ol className="mt-3 list-none space-y-2 p-0" data-day-preset-stops>
-              {items.map((item, stopIndex) => {
-                const tip = formatDayRouteTransitTipLine(
-                  item.transitTip || preset.stops?.[stopIndex]?.transitTip,
-                );
-                return (
-                  <li key={`${item.id}:${stopIndex}`} className="list-none" data-day-preset-stop>
-                    {tip ? (
-                      <div className="mb-0.5 flex items-start gap-3">
-                        <span className="w-6 shrink-0" aria-hidden />
-                        <p
-                          className={`min-w-0 flex-1 text-[11px] leading-snug ${mutedClass}`}
-                          data-day-preset-transit-tip
-                        >
-                          {tip}
-                        </p>
-                      </div>
-                    ) : null}
-                    <div className="flex items-start gap-3 text-sm leading-snug">
-                      <span className={`w-6 shrink-0 text-left tabular-nums ${mutedClass}`}>
-                        {stopIndex + 1}.
-                      </span>
-                      <span className={`min-w-0 flex-1 ${softClass}`}>{item.title}</span>
-                    </div>
-                  </li>
-                );
-              })}
-            </ol>
-          ) : null}
         </div>
         {available ? (
-          <div className="flex justify-start">
-            <button
-              type="button"
-              disabled={busyId != null}
-              onClick={() => apply(preset.id, items)}
-              className={routeCtaClass}
-            >
-              <Route className="h-3.5 w-3.5 shrink-0" aria-hidden />
-              <span>{namedCta(busyId === preset.id)}</span>
-            </button>
+          <ol
+            className={`mt-0 list-none p-0 ${
+              useTwoCol
+                ? 'columns-1 gap-y-0 md:columns-2 md:gap-x-8 lg:gap-x-10'
+                : ''
+            }`}
+            data-day-preset-stops
+            data-day-preset-stops-layout={useTwoCol ? 'two-col' : 'one-col'}
+          >
+            {items.map((item, stopIndex) => {
+              const tip = formatDayRouteTransitTipLine(
+                item.transitTip || preset.stops?.[stopIndex]?.transitTip,
+              );
+              return (
+                <li
+                  key={`${item.id}:${stopIndex}`}
+                  className="mb-2 list-none break-inside-avoid last:mb-0 md:mb-2.5"
+                  data-day-preset-stop
+                >
+                  {tip ? (
+                    <div className={`mb-0.5 ${PRESET_GRID}`}>
+                      <span aria-hidden />
+                      <p
+                        className={`min-w-0 text-[11px] leading-snug ${mutedClass}`}
+                        data-day-preset-transit-tip
+                      >
+                        {tip}
+                      </p>
+                    </div>
+                  ) : null}
+                  <div className={`${PRESET_GRID} text-sm leading-snug`}>
+                    <span
+                      className={`${PRESET_GUTTER} tabular-nums ${numClass}`}
+                      data-day-preset-stop-num
+                    >
+                      {stopIndex + 1}.
+                    </span>
+                    <span className={`min-w-0 ${softClass}`}>{item.title}</span>
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        ) : null}
+        {available ? (
+          <div className={PRESET_GRID} data-day-preset-cta>
+            <div aria-hidden className={PRESET_GUTTER} />
+            <div className="min-w-0">
+              <button
+                type="button"
+                disabled={busyId != null}
+                onClick={() => apply(preset.id, items)}
+                className={routeCtaClass}
+              >
+                <Route className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                <span>{namedCta(busyId === preset.id)}</span>
+              </button>
+            </div>
           </div>
         ) : null}
       </div>

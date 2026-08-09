@@ -1,3 +1,18 @@
+## 2026-08-09 - Hub scenarios: two-col + hanging nums
+
+### Наблюдения
+- Owner (скрин «Классическая Пермь за 1 день»): список стопов одноколоночный слева, справа пусто; нет согласованных margins / вынесенных цифр.
+
+### Решения
+- `CityDayPresetBlock` light panel: тот же gutter/text vertical, что `DayTripCanonCard` (`2rem`/`2.25rem` + centered nums).
+- Title / timing / CTA на text-колонке; stops `md:columns-2` при ≥4 пунктах (mobile одна колонка).
+- Markers: `data-day-preset-align=gutter-text`, `data-day-preset-stops-layout=two-col|one-col`.
+
+### Проблемы
+- Deploy MSK web - batch / по запросу.
+
+---
+
 ## 2026-08-09 - `/events` catalog mobile-first redesign
 
 ### Наблюдения
