@@ -7,8 +7,8 @@
 Для finance-сервера `.159` использовать systemd timer, а не crontab. Он раз в 5 минут закрывает зависшие `CheckoutOrder(PENDING_PAYMENT)` после grace window и освобождает capacity, если webhook не пришел.
 
 ```bash
-cp /opt/daibilet/deploy/systemd/daibilet-finance-yookassa-reconcile.service /etc/systemd/system/
-cp /opt/daibilet/deploy/systemd/daibilet-finance-yookassa-reconcile.timer /etc/systemd/system/
+cp /opt/daibilet-finance/app/deploy/systemd/daibilet-finance-yookassa-reconcile.service /etc/systemd/system/
+cp /opt/daibilet-finance/app/deploy/systemd/daibilet-finance-yookassa-reconcile.timer /etc/systemd/system/
 systemctl daemon-reload
 systemctl enable --now daibilet-finance-yookassa-reconcile.timer
 ```
@@ -16,8 +16,8 @@ systemctl enable --now daibilet-finance-yookassa-reconcile.timer
 Ручная проверка:
 
 ```bash
-cd /opt/daibilet
-npm run backend:checkout:yookassa:reconcile -- --limit=20 --grace-minutes=10
+cd /opt/daibilet-finance/app
+COREPACK_ENABLE_STRICT=0 PNPM_CONFIG_ENGINE_STRICT=false corepack pnpm backend:checkout:yookassa:reconcile -- --limit=20 --grace-minutes=10
 ```
 
 См. [docs/finance-159-smoke-runbook.md](../../docs/finance-159-smoke-runbook.md).

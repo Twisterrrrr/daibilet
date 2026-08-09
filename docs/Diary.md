@@ -1,3 +1,22 @@
+## 2026-08-09 - Finance pilot: admission buyer checkout page
+
+### Наблюдения
+
+- Public finance projection уже отдаёт `checkoutPath: /checkout/admissions/{slug}` для saleable `AdmissionProduct`, но web-приложение не имело этой страницы.
+- До этого buyer path был доступен в основном через supplier LC smoke-кнопку, что не подходит для тестового подключения первого арт-объекта.
+
+### Решения
+
+- Добавлена web-страница `/checkout/admissions/[slug]`: читает finance admission projection, показывает продукт, категории билетов, форму покупателя и количество.
+- Добавлены Next proxy routes: `GET /api/public/finance/admission-products/[slug]` и `POST /api/public/checkout/yookassa`.
+- Create-payment уходит в finance API server-side, возвращает YooKassa confirmation URL, а return ведёт в существующий `/checkout/result?order={publicCode}`.
+
+### Проблемы
+
+- Это pilot-only точка входа. Wide catalog CTA на `.184` не включаем до финального smoke и решения по витринным блокам.
+
+---
+
 ## 2026-08-09 - Finance `.159`: YooKassa reconcile timer guard
 
 ### Наблюдения

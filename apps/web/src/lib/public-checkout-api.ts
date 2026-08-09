@@ -1,3 +1,6 @@
+import type { PublicAdmissionProductDto } from '@daibilet/contracts/admission';
+import type { YooKassaCheckoutCreateDto, YooKassaCheckoutResultDto } from '@daibilet/contracts/checkout';
+
 export type PublicCheckoutOrder = {
   publicCode: string;
   status: string;
@@ -42,6 +45,49 @@ export type PublicCheckoutOrder = {
     paidAt: string | null;
   };
 };
+
+export async function fetchPublicAdmissionProduct(
+  slug: string,
+  signal?: AbortSignal,
+): Promise<PublicAdmissionProductDto> {
+  const response = await fetch(`/api/public/finance/admission-products/${encodeURIComponent(slug)}`, {
+    cache: 'no-store',
+    credentials: 'same-origin',
+    signal,
+    headers: { accept: 'application/json' },
+  });
+  const payload = (await response.json().catch(() => ({}))) as PublicAdmissionProductDto & { error?: string };
+  if (!response.ok) {
+    throw new Error(payload.error || `HTTP ${response.status}`);
+  }
+  return payload;
+}
+
+export async function createPublicYooKassaCheckout(
+  payload: YooKassaCheckoutCreateDto,
+  idempotencyKey: string,
+): Promise<YooKassaCheckoutResultDto> {
+  const response = await fetch('/api/public/checkout/yookassa', {
+    method: 'POST',
+    cache: 'no-store',
+    credentials: 'same-origin',
+    headers: {
+      accept: 'application/json',
+      'content-type': 'application/json',
+      'idempotency-key': idempotencyKey,
+    },
+    body: JSON.stringify(payload),
+  });
+  const result = (await response.json().catch(() => ({}))) as YooKassaCheckoutResultDto & {
+    error?: string;
+    code?: string;
+    message?: string;
+  };
+  if (!response.ok) {
+    throw new Error(result.message || result.code || result.error || `HTTP ${response.status}`);
+  }
+  return result;
+}
 
 export async function fetchPublicCheckoutOrder(
   publicCode: string,
