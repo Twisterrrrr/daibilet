@@ -65,6 +65,7 @@ export const LANDING_RULES: LandingRule[] = [
     keywordScope: 'content',
     requiredAnySubcategories: ['Водные экскурсии', 'Речные прогулки'],
     // Concerts/pubs/standup are not river trips; «катер» inside «Екатеринбург» is blocked by word-start match.
+    // Charter/yacht rental is not a river stroll - TC often opens «продажи остановлены» for these.
     excludeKeywords: [
       'автобус',
       'пешеход',
@@ -84,6 +85,13 @@ export const LANDING_RULES: LandingRule[] = [
       'хит',
       'анимаци',
       'ben hall',
+      'индивидуальная аренда',
+      'аренда яхт',
+      'аренда яхты',
+      'аренда катер',
+      'аренда катера',
+      'yacht charter',
+      'private yacht',
     ],
     excludeKeywordFields: ['title', 'category', 'sourceCategory', 'venue', 'subcategory', 'tag'],
   },

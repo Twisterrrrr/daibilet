@@ -7,7 +7,7 @@ import {
   resolveTeplohodCheckoutUrl,
 } from '@/components/TeplohodWidget.client';
 import { trackSelectTickets } from '@/lib/catalog-analytics';
-import { extractTcEventIdFromSession } from '@/lib/event-purchase';
+import { extractTcEventIdFromSession, isSessionPurchaseBlocked } from '@/lib/event-purchase';
 import type { PublicSessionDto } from '@daibilet/contracts/public';
 
 const DEFAULT_BUTTON_CLASS =
@@ -42,10 +42,11 @@ export function LandingPurchaseButton({
       ? className
       : `relative z-[2] ${className}`;
 
-  if (disabled) {
+  // Do not open TC/TEP for closed/STAND_BY slots - TC modal «Продажи временно остановлены…».
+  if (disabled || isSessionPurchaseBlocked(session)) {
     return (
       <button type="button" disabled className={SOLD_OUT_CLASS}>
-        Распродано
+        {disabled ? 'Распродано' : 'Продажи остановлены'}
       </button>
     );
   }

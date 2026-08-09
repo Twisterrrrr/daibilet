@@ -62,6 +62,41 @@ test('rejects Ben Hall concert false-positive via Екатеринбург→к�
   }, river), true);
 });
 
+test('river-cruises excludes yacht and boat charter rentals', () => {
+  const river = findLandingRule('river-cruises');
+  assert.ok(river);
+
+  assert.equal(matchesLandingRule({
+    title: 'Индивидуальная аренда яхты до 12 персон',
+    category: 'Экскурсии',
+    tags: ['Водные экскурсии'],
+    subcategories: ['Водные экскурсии'],
+    city: 'Санкт-Петербург',
+  }, river), false);
+
+  assert.equal(matchesLandingRule({
+    title: 'Индивидуальная аренда большой яхты Sunseeker Pallada 70',
+    category: 'Экскурсии',
+    tags: ['Водные экскурсии'],
+    city: 'Санкт-Петербург',
+  }, river), false);
+
+  assert.equal(matchesLandingRule({
+    title: 'Индивидуальная аренда катера до 11 персон',
+    category: 'Экскурсии',
+    tags: ['Речные прогулки'],
+    city: 'Санкт-Петербург',
+  }, river), false);
+
+  // Shared river cruise (not charter) still matches.
+  assert.equal(matchesLandingRule({
+    title: 'Круиз на парусной яхте по Финскому заливу',
+    category: 'Экскурсии',
+    tags: ['Водные экскурсии'],
+    city: 'Санкт-Петербург',
+  }, river), true);
+});
+
 test('keeps city and venue landing constraints strict', () => {
   assert.deepEqual(
     matchingLandingSlugs({
