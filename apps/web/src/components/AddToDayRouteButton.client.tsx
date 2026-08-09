@@ -28,6 +28,8 @@ type Props = {
   variant?: 'light' | 'dark' | 'overlay';
   /** Компактный вид для карточек каталога (иконка + короткий лейбл). */
   compact?: boolean;
+  /** Только иконка; лейбл уходит в aria-label / title. */
+  iconOnly?: boolean;
   /**
    * `route` - «В мой маршрут» (must-see / venue).
    * `day` - «В мой день» (с события, с временем сессии).
@@ -40,6 +42,7 @@ export function AddToDayRouteButton({
   className = '',
   variant = 'light',
   compact = false,
+  iconOnly = false,
   intent = 'route',
 }: Props) {
   // SSR HTML used to paint an enabled <button> before hydration; clicks silently no-op'd
@@ -67,13 +70,15 @@ export function AddToDayRouteButton({
           ? 'bg-emerald-600 text-white hover:bg-emerald-700'
           : 'bg-slate-100 text-slate-800 hover:bg-slate-200';
 
-  const idleLabel = intent === 'day' ? 'В мой день' : compact ? 'В маршрут' : 'В мой маршрут';
+  const idleLabel = intent === 'day' ? 'В мой день' : compact || iconOnly ? 'В маршрут' : 'В мой маршрут';
   const activeLabel = intent === 'day' ? 'Добавлено' : 'В маршруте';
   const label = active ? activeLabel : idleLabel;
-  const idleTitle = intent === 'day' ? 'В мой день' : 'В мой маршрут';
+  const idleTitle = intent === 'day' ? 'В мой день' : iconOnly ? 'В маршрут' : 'В мой маршрут';
   const activeTitle = intent === 'day' ? 'Убрать из моего дня' : 'Убрать из маршрута';
-  const idleAria = intent === 'day' ? 'Добавить место события в мой день' : 'Добавить в маршрут дня';
-  const activeAria = intent === 'day' ? 'Убрать место из моего дня' : 'Убрать из маршрута дня';
+  const idleAria =
+    intent === 'day' ? 'Добавить место события в мой день' : iconOnly ? 'В маршрут' : 'Добавить в маршрут дня';
+  const activeAria =
+    intent === 'day' ? 'Убрать место из моего дня' : iconOnly ? 'В маршруте' : 'Убрать из маршрута дня';
 
   function feedbackAfter(beforeCount: number, payload: DayRouteVenueItem) {
     // Bust cache so toast reflects LS truth (not a stale snapshot after failed write).
@@ -138,7 +143,7 @@ export function AddToDayRouteButton({
 
     // Catalog compact: ADD ONLY. Accidental second tap on a green chip must not
     // remove the only point (owner symptom «не добавляется более 1»).
-    if (compact) {
+    if (compact || iconOnly) {
       const before = readDayRouteFresh();
       if (before.venues.some((item) => sameDayRouteVenue(item, payload))) {
         // Merge coords / canonical id when slug-as-id alias already stored.
@@ -179,7 +184,7 @@ export function AddToDayRouteButton({
                   : idleTitle
       }
       aria-pressed={active}
-      aria-label={active ? (compact ? 'Уже в маршруте дня' : activeAria) : idleAria}
+      aria-label={active ? (iconOnly ? activeAria : compact ? 'Уже в маршруте дня' : activeAria) : idleAria}
       data-venue-id={venueKey || undefined}
       data-day-route-intent={intent}
       data-day-route-live={live ? '1' : '0'}
@@ -192,11 +197,12 @@ export function AddToDayRouteButton({
         event.stopPropagation();
         applyToggle();
       }}
-      className={`inline-flex min-h-10 min-w-[2.75rem] items-center justify-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${base} ${className}`}
+      className={`inline-flex min-h-10 min-w-[2.75rem] items-center justify-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${
+        iconOnly ? '!min-w-8 !px-2' : ''
+      } ${base} ${className}`}
     >
       {active ? <Check className="h-3.5 w-3.5 shrink-0" /> : <Route className="h-3.5 w-3.5 shrink-0" />}
-      {/* Always show label - icon-only on mobile was easy to miss vs card Link. */}
-      <span>{label}</span>
+      {iconOnly ? <span className="sr-only">{label}</span> : <span>{label}</span>}
     </button>
   );
 }

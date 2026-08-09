@@ -11,7 +11,7 @@ import { LocationsCatalogSkeleton } from '@/components/VenueCatalogSkeletons';
 import { HeroLayout } from '@/components/HeroLayout';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from '@/lib/catalog-url';
-import { cityToGenitive, cityToPrepositional } from '@/lib/city-declension';
+import { cityToPrepositional } from '@/lib/city-declension';
 import { formatNumber, pluralCities } from '@/lib/format';
 import {
   catalogCityQueryValue,
@@ -442,9 +442,8 @@ export function LocationsCatalogView({
         label: venueTypeLabel(value),
         template: 'location' as const,
         count,
-      }))
-      .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label, 'ru'));
-    return [...known, ...extras];
+      }));
+    return [...known, ...extras].sort((a, b) => b.count - a.count || a.label.localeCompare(b.label, 'ru'));
   }, [stats.types]);
 
   const cityCount = cityOptions.length;
@@ -456,13 +455,9 @@ export function LocationsCatalogView({
     selectedCity?.selectedDestination?.slug || selectedCity?.cityValue,
   );
   const cityName = cityFilter !== 'all' ? cityFilter : null;
-  const heroTitle = cityName
-    ? `Локации и точки сбора в ${cityToPrepositional(cityName)}`
-    : 'Локации и точки сбора';
-  const heroDescription = cityName
-    ? `Причалы, парки и места встречи ${cityToGenitive(cityName)}.`
-    : 'Причалы, парки и места встречи для экскурсий и событий.';
+  const heroTitle = cityName ? `Локации в ${cityToPrepositional(cityName)}` : 'Локации и точки сбора';
   const heroTotal = stats.venues || total;
+  const hideCityOnCards = cityFilter !== 'all';
   const paginationParams = useMemo(() => {
     const params = searchParamsRecord(searchParams);
     if (listPage > 1) params.page = String(listPage);
@@ -474,9 +469,15 @@ export function LocationsCatalogView({
     <LocationsCatalogSkeleton />
   ) : venues.length > 0 ? (
     <>
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {venues.map((venue) => (
-          <LocationCard key={venue.id} venue={venue} href={venueHref(venue)} nextSlot={venue.nextSlot} />
+          <LocationCard
+            key={venue.id}
+            venue={venue}
+            href={venueHref(venue)}
+            nextSlot={venue.nextSlot}
+            hideCity={hideCityOnCards}
+          />
         ))}
       </div>
       <CatalogPaginationLinks
@@ -504,22 +505,18 @@ export function LocationsCatalogView({
         breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Локации' }]}
         eyebrow={`${formatNumber(heroTotal)} локаций · ${pluralCities(cityCount)}`}
         title={heroTitle}
-        description={cityName ? heroDescription : 'Места встречи и точки старта. Город - в шапке.'}
         tone="light"
         className="bg-slate-50"
       >
-        {/* Mobile: one horizontal chip rail (not a tall wrap stack). Desktop: wrap as before. */}
-        <div className="mt-4 flex gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden md:flex-wrap md:overflow-visible">
+        <div className="mt-4 horizontal-snap-row flex flex-nowrap gap-1.5 overflow-x-auto pb-0.5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
           <button
             type="button"
             onClick={() => setTypeFilter('all')}
-            className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition ${
-              typeFilter === 'all'
-                ? 'bg-primary-600 text-white'
-                : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50'
+            className={`catalog-chip snap-start ${
+              typeFilter === 'all' ? 'catalog-chip-on' : 'catalog-chip-idle'
             }`}
           >
-            Все точки
+            <span className="whitespace-nowrap">Все точки</span>
             <span className="text-xs opacity-75">({heroTotal})</span>
           </button>
           {typeOptions.map((option) => {
@@ -529,21 +526,17 @@ export function LocationsCatalogView({
                 key={option.value}
                 type="button"
                 onClick={() => setTypeFilter(active ? 'all' : option.value)}
-                className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition ${
-                  active
-                    ? 'bg-primary-600 text-white'
-                    : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50'
-                }`}
+                className={`catalog-chip snap-start ${active ? 'catalog-chip-on' : 'catalog-chip-idle'}`}
               >
-                {option.label}
+                <span className="whitespace-nowrap">{option.label}</span>
                 <span className="text-xs opacity-75">({option.count})</span>
               </button>
             );
           })}
         </div>
 
-        <div className="mt-4 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-3 text-slate-900 shadow-sm sm:flex-row">
-          <div className="flex flex-1 items-center gap-2 rounded-xl bg-slate-100 px-3">
+        <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-stretch sm:gap-3">
+          <div className="flex min-w-0 flex-1 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 shadow-sm">
             <Search className="h-4 w-4 shrink-0 text-slate-400" />
             <input
               type="search"
@@ -558,7 +551,7 @@ export function LocationsCatalogView({
             value={cityPending ? '' : cityFilter}
             disabled={cityPending}
             onChange={(event) => setCityFilter(event.target.value)}
-            className="hidden rounded-xl bg-slate-100 px-3 py-2.5 text-sm outline-none disabled:opacity-70 sm:block"
+            className="hidden rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm shadow-sm outline-none disabled:opacity-70 sm:block"
             aria-label="Город"
           >
             {cityPending ? <option value="">Город…</option> : null}
@@ -570,41 +563,36 @@ export function LocationsCatalogView({
             ))}
           </select>
         </div>
+
+        <Link
+          href={venuesHref}
+          className="mt-3 inline-block text-sm text-slate-500 transition hover:text-slate-700"
+        >
+          Площадки: музеи и театры →
+        </Link>
       </HeroLayout>
 
       <div className="container-page py-6 sm:py-8">
-        <div className="mb-4 flex flex-wrap items-baseline justify-between gap-3">
-          <h2 className="text-lg font-semibold text-slate-900">
-            {listPending || listRefreshing ? (
-              'Обновляем список…'
-            ) : (
-              <>
-                Найдено: {formatNumber(total)}
-                {total > VENUE_CATALOG_PAGE_SIZE ? (
-                  <span className="font-normal text-slate-500">
-                    {' '}
-                    · стр. {listPage} из {Math.max(1, Math.ceil(total / VENUE_CATALOG_PAGE_SIZE))}
-                  </span>
-                ) : null}
-              </>
-            )}
-          </h2>
-          <div className="flex flex-wrap items-center gap-3">
-            <select
-              value={sortMode}
-              onChange={(event) => setSortMode(event.target.value as VenueCatalogSort)}
-              className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none"
-            >
-              {SORT_OPTIONS.map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
-            <Link href={venuesHref} className="text-sm font-semibold text-primary-600 hover:underline">
-              Площадки: музеи и театры →
-            </Link>
-          </div>
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm text-slate-500">
+            {listPending || listRefreshing
+              ? 'Обновляем список…'
+              : total > 0
+                ? `${formatNumber(total)} локаций`
+                : null}
+          </p>
+          <select
+            value={sortMode}
+            onChange={(event) => setSortMode(event.target.value as VenueCatalogSort)}
+            className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none"
+            aria-label="Сортировка"
+          >
+            {SORT_OPTIONS.map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
         </div>
 
         {listBlock}

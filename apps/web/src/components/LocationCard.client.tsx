@@ -91,6 +91,7 @@ export function LocationCard({
   venue,
   href,
   nextSlot,
+  hideCity = false,
 }: {
   venue: Pick<
     PublicVenueDto,
@@ -115,6 +116,8 @@ export function LocationCard({
   };
   href: string;
   nextSlot?: string | null;
+  /** When catalog is already city-scoped, omit city from the address line. */
+  hideCity?: boolean;
 }) {
   const kind = normalizeVenueKind(venue.type);
   const heroUrl = String(venue.heroImageUrl || '').trim();
@@ -135,7 +138,11 @@ export function LocationCard({
   const displayName = stripBoardingPlacePrefix(venue.name);
   const routeTitle = stripBoardingPlacePrefix(venue.title || venue.name);
   const showStreet = Boolean(street) && !sameAddressLabel(street, displayName);
-  const placeLine = [showStreet ? street : null, cityLabel].filter(Boolean).join(' · ');
+  const placeLine = hideCity
+    ? showStreet
+      ? street
+      : null
+    : [showStreet ? street : null, cityLabel].filter(Boolean).join(' · ') || null;
 
   const dayRouteVenue = {
     id: venue.id,
@@ -152,63 +159,44 @@ export function LocationCard({
   };
 
   return (
-    <article className="group relative flex min-h-[10.5rem] overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition-shadow duration-300 hover:shadow-md sm:min-h-[11rem]">
+    <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition-shadow duration-300 hover:shadow-md">
       <div
-        className={`relative w-36 shrink-0 self-stretch overflow-hidden sm:w-44 ${
+        className={`relative aspect-[16/10] w-full shrink-0 overflow-hidden ${
           showPhoto ? 'bg-slate-900' : `bg-gradient-to-br ${gradient}`
         }`}
       >
-        <Link
-          href={href}
-          className={`absolute inset-0 text-white no-underline ${
-            showPhoto ? '' : 'flex flex-col items-center justify-center p-3'
-          }`}
-          aria-label={displayName}
-        >
+        <Link href={href} className="absolute inset-0 no-underline" aria-label={displayName}>
           {showPhoto ? (
             <SafeImage
               src={heroUrl}
               alt=""
               fill
-              sizes={IMAGE_SIZES.searchThumb}
+              sizes={IMAGE_SIZES.institutionCard}
               className="object-cover object-center transition duration-300 group-hover:scale-[1.03]"
             />
           ) : (
-            <TypeIcon className="h-9 w-9 opacity-95" strokeWidth={1.75} />
+            <div className="flex h-full w-full items-center justify-center text-white">
+              <TypeIcon className="h-10 w-10 opacity-95" strokeWidth={1.75} />
+            </div>
           )}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent" />
         </Link>
-        <span className="pointer-events-none absolute left-2 top-2 z-[1] rounded-md bg-black/55 px-2 py-1 text-[11px] font-medium tracking-wide text-white backdrop-blur-sm">
+        <span className="pointer-events-none absolute left-2.5 top-2.5 z-[1] rounded-md border border-white/20 bg-black/35 px-2 py-0.5 text-[11px] font-medium tracking-wide text-white/95 backdrop-blur-md">
           {typeLabel}
         </span>
-        <div
-          className="absolute bottom-2 left-2 right-2 z-[2]"
-          onClick={(event) => {
-            event.preventDefault();
-            event.stopPropagation();
-          }}
-          onPointerDown={(event) => {
-            event.stopPropagation();
-          }}
-        >
-          <AddToDayRouteButton
-            key={venue.id}
-            compact
-            variant="overlay"
-            className="!min-h-8 !w-full !justify-center !gap-1 !px-2 !py-1.5 !text-[11px]"
-            venue={dayRouteVenue}
-          />
-        </div>
       </div>
 
-      <div className="flex min-w-0 flex-1 flex-col justify-between gap-3 p-4 sm:p-5">
-        <div>
-          <h3 className="min-w-0 text-lg font-bold leading-snug tracking-tight text-slate-900">
+      <div className="flex min-h-0 flex-1 flex-col gap-3 p-4 sm:p-5">
+        <div className="min-w-0 flex-1">
+          <h3 className="line-clamp-2 font-display text-base font-semibold leading-snug tracking-tight text-slate-900">
             <Link href={href} className="no-underline transition-colors hover:text-primary-700">
               {displayName}
             </Link>
           </h3>
 
-          {blurb ? <p className="mt-2 text-sm leading-relaxed text-slate-600">{blurb}</p> : null}
+          {blurb ? (
+            <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-slate-600">{blurb}</p>
+          ) : null}
 
           {metro ? (
             <div className="mt-2 flex items-center gap-1.5 text-xs text-slate-500">
@@ -225,24 +213,41 @@ export function LocationCard({
           ) : null}
         </div>
 
-        <div className="flex items-center justify-between gap-3 border-t border-slate-100 pt-3 text-xs text-slate-500">
+        <div className="mt-auto space-y-3 border-t border-slate-100 pt-3">
           {placeLine ? (
-            <div className="flex min-w-0 items-center gap-1">
+            <div className="flex min-w-0 items-center gap-1 text-xs text-slate-500">
               <MapPin className="h-3.5 w-3.5 shrink-0 text-slate-400" />
               <span className="truncate">{placeLine}</span>
             </div>
-          ) : (
-            <span />
-          )}
-          {activityCount > 0 ? (
-            <Link
-              href={href}
-              className="inline-flex shrink-0 items-center gap-0.5 font-medium text-primary-700 no-underline hover:text-primary-800 hover:underline"
-            >
-              {pluralEvents(activityCount)}
-              <ArrowRight className="h-3 w-3" aria-hidden />
-            </Link>
           ) : null}
+
+          <div className="flex items-center justify-between gap-2">
+            <div
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+              }}
+              onPointerDown={(event) => {
+                event.stopPropagation();
+              }}
+            >
+              <AddToDayRouteButton
+                key={venue.id}
+                compact
+                className="!min-h-8 !gap-1 !rounded-lg !px-2.5 !py-1.5 !text-[11px] !font-medium"
+                venue={dayRouteVenue}
+              />
+            </div>
+            {activityCount > 0 ? (
+              <Link
+                href={href}
+                className="inline-flex shrink-0 items-center gap-0.5 text-xs font-medium text-primary-700 no-underline hover:text-primary-800 hover:underline"
+              >
+                {pluralEvents(activityCount)}
+                <ArrowRight className="h-3 w-3" aria-hidden />
+              </Link>
+            ) : null}
+          </div>
         </div>
       </div>
     </article>

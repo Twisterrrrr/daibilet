@@ -1,3 +1,19 @@
+## 2026-08-10 - `/locations` quieter catalog + vertical cards
+
+### Наблюдения
+- Owner: city-scoped `/locations` шумный (subtitle, wrap chips, «Найдено · стр.», heavy «В маршрут» на фото, horizontal cards).
+
+### Решения
+- Hero: title «Локации в {city}»; subtitle убран; chips = один horizontal scroll (catalog-chip), popular first; search+city одна строка; link «Площадки…» тихий под search.
+- Meta: вместо «Найдено / стр. N из M» - subtle `{N} локаций` рядом с sort.
+- `LocationCard`: vertical equal-height grid (1/2/3/4); type tag translucent; blurb `line-clamp-2`; «В маршрут» в тексте (compact); `hideCity` при city filter.
+- Skeletons / related / landing grids под vertical cards. Deploy по «выкатывай».
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-10 - Pier date rail: only today
 
 ### Наблюдения
