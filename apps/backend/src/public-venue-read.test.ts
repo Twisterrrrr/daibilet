@@ -2,10 +2,12 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
   isPublicVenueHub,
+  lookupVenueCatalogSessionsForTest,
   mergeCityPageVenues,
   publicVenueRowMatchesCityFilter,
   publicVenuesForSessionsFromHub,
   resolvePublicVenueCanonicalPath,
+  venueTextKeysFuzzyMatch,
 } from './public-venue-read.js';
 
 test('mergeCityPageVenues prefers content/editorial then appends session venues', () => {
@@ -121,4 +123,72 @@ test('resolvePublicVenueCanonicalPath drops mismatched location/venues family', 
     resolvePublicVenueCanonicalPath(null, 'location', 'park-a'),
     '/locations/park-a',
   );
+});
+
+test('venueTextKeysFuzzyMatch rejects bare Музей against longer museum titles', () => {
+  assert.equal(venueTextKeysFuzzyMatch('музей', 'музей истории мотовилихинских заводов'), false);
+  assert.equal(venueTextKeysFuzzyMatch('музей', 'музей пермских древностей'), false);
+  assert.equal(
+    venueTextKeysFuzzyMatch(
+      'музей истории мотовилихинских заводов',
+      'музей истории мотовилихинских заводов',
+    ),
+    true,
+  );
+  assert.equal(
+    venueTextKeysFuzzyMatch(
+      'музей живописца бориса семенова',
+      'музей живописца бориса семенова зал 1',
+    ),
+    true,
+  );
+});
+
+test('lookupVenueCatalogSessions does not attach Sortavala Музей session to Perm museums', () => {
+  const sortavalaSession = {
+    id: 'sess-sortavala',
+    title: 'Экскурсия в галерею «Золотой век СССР»',
+    venue: 'Музей',
+    venueSlug: 'muzei-6a3c4d6383b8d636bb8567dd',
+    venueId: 'venue_6a3c4d6383b8d636bb8567dd',
+    city: 'Сортавала',
+    startsAt: '2026-08-10T06:00:00.000Z',
+  };
+  const childHallSession = {
+    id: 'sess-child',
+    title: 'Local tour',
+    venue: 'Музей истории Мотовилихинских заводов Холл',
+    venueSlug: 'perm-muzey-motovilihinskih-zavodov-holl',
+    venueId: 'venue_child',
+    city: 'Пермь',
+    startsAt: '2026-08-11T06:00:00.000Z',
+  };
+  const matched = lookupVenueCatalogSessionsForTest(
+    ['venue_perm_motov'],
+    [sortavalaSession, childHallSession],
+    [
+      {
+        id: 'venue_perm_motov',
+        slug: 'perm-muzey-motovilihinskih-zavodov',
+        title: 'Музей истории Мотовилихинских заводов',
+        name: 'Музей истории Мотовилихинских заводов',
+      },
+    ],
+  );
+  assert.equal(matched.some((s) => s.id === 'sess-sortavala'), false);
+  assert.equal(matched.some((s) => s.id === 'sess-child'), true);
+
+  const drevnosti = lookupVenueCatalogSessionsForTest(
+    ['venue_perm_drev'],
+    [sortavalaSession],
+    [
+      {
+        id: 'venue_perm_drev',
+        slug: 'perm-muzey-permskikh-drevnostey',
+        title: 'Музей пермских древностей',
+        name: 'Музей пермских древностей',
+      },
+    ],
+  );
+  assert.equal(drevnosti.length, 0);
 });

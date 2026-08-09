@@ -854,6 +854,25 @@ function normalizeVenueTextKey(value) {
     .trim();
 }
 
+/**
+ * Fuzzy venue-title match for catalog/session attach.
+ * Exact equality always wins. Prefix ("parent" / "parent hall") only when the
+ * shorter side is long enough - bare "Музей"/"Театр" must not stick to every
+ * "Музей …" card (Sortavala TC hall → Perm museums).
+ */
+export const MIN_FUZZY_VENUE_NAME_LEN = 12;
+
+export function venueTextKeysFuzzyMatch(a, b) {
+  const left = String(a || '').trim();
+  const right = String(b || '').trim();
+  if (!left || !right) return false;
+  if (left === right) return true;
+  const shorter = left.length <= right.length ? left : right;
+  const longer = left.length <= right.length ? right : left;
+  if (shorter.length < MIN_FUZZY_VENUE_NAME_LEN) return false;
+  return longer.startsWith(`${shorter} `);
+}
+
 /** Collapse "24 27 б" / "24/27 Б" → stable house token for venue merge keys. */
 function normalizeVenueAddressMergeKey(value) {
   return normalizeVenueTextKey(value)
@@ -2288,10 +2307,7 @@ function collectVenueSessionLookupContexts(venue, mergedGroup, hubRows = []) {
       const rowName = normalizeVenueTextKey(formatPublicVenueTitle(row?.name || row?.title || ''));
       const slugHit =
         baseSlug && rowSlug && (rowSlug === baseSlug || rowSlug.startsWith(`${baseSlug}-`));
-      const nameHit =
-        baseName.length >= 6 &&
-        rowName &&
-        (rowName === baseName || rowName.startsWith(`${baseName} `) || baseName.startsWith(rowName));
+      const nameHit = venueTextKeysFuzzyMatch(baseName, rowName);
       if (slugHit || nameHit) add(row);
     }
   }
@@ -2326,7 +2342,7 @@ function lookupVenueCatalogSessions(venueIds, catalogSessions, venueContexts = [
     const slug = normalizePublicVenueSlugKey(ctx?.slug || '');
     if (slug) slugPrefixes.add(slug);
     const nameKey = normalizeVenueTextKey(formatPublicVenueTitle(ctx?.name || ctx?.title || ''));
-    if (nameKey.length >= 6) nameKeys.add(nameKey);
+    if (nameKey.length >= MIN_FUZZY_VENUE_NAME_LEN) nameKeys.add(nameKey);
   }
 
   const matched = catalogSessions.filter((session) => {
@@ -2345,18 +2361,17 @@ function lookupVenueCatalogSessions(venueIds, catalogSessions, venueContexts = [
     const sessionName = normalizeVenueTextKey(formatPublicVenueTitle(session?.venue || ''));
     if (sessionName) {
       for (const nameKey of nameKeys) {
-        if (
-          sessionName === nameKey ||
-          sessionName.startsWith(`${nameKey} `) ||
-          nameKey.startsWith(sessionName)
-        ) {
-          return true;
-        }
+        if (venueTextKeysFuzzyMatch(sessionName, nameKey)) return true;
       }
     }
     return false;
   });
   return sortVenueCatalogSessions(matched);
+}
+
+/** @visibleForTesting catalog session attach by venue id / slug / distinctive title */
+export function lookupVenueCatalogSessionsForTest(venueIds, catalogSessions, venueContexts = []) {
+  return lookupVenueCatalogSessions(venueIds, catalogSessions, venueContexts);
 }
 
 function sessionVenueIds(sessions) {
