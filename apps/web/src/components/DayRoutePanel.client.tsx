@@ -43,6 +43,11 @@ import { CityPicker } from '@/components/CityPicker.client';
 import { DayRouteBoatWizard } from '@/components/DayRouteBoatWizard.client';
 import { DayRouteOsmMap } from '@/components/DayRouteOsmMap.client';
 import {
+  DayRoutePurchaseCta,
+  isDayRouteVendorCheckoutUrl,
+} from '@/components/DayRoutePurchaseCta.client';
+import { CheckoutModal } from '@/components/CheckoutModal.client';
+import {
   DayRouteSearchSelect,
   type DayRouteSearchOption,
 } from '@/components/DayRouteSearchSelect.client';
@@ -431,6 +436,8 @@ function DayRoutePanelInner() {
     qrData: string | null;
     qrKind: 'qr' | 'barcode' | 'image' | null;
   } | null>(null);
+  /** Vendor checkout overlay for sticky/hot-pick «Купить» (iframe; CTA buttons use native TC). */
+  const [guestCheckoutUrl, setGuestCheckoutUrl] = useState<string | null>(null);
   /** Soft hour-plan mode: text hints only (no timeline UI). */
   const [hourPlanOn, setHourPlanOn] = useState(false);
   const [hourSheetOpen, setHourSheetOpen] = useState(false);
@@ -1278,7 +1285,8 @@ function DayRoutePanelInner() {
     const url = card.offer.ticketUrl;
     if (url && (card.offer.kind === 'affiche' || card.offer.kind === 'open_date')) {
       if (typeof window !== 'undefined') {
-        window.open(url, '_blank', 'noopener,noreferrer');
+        if (isDayRouteVendorCheckoutUrl(url)) setGuestCheckoutUrl(url);
+        else window.open(url, '_blank', 'noopener,noreferrer');
       }
       setTicketHandoff({
         venueId: nextItem.id,
@@ -1748,7 +1756,8 @@ function DayRoutePanelInner() {
     if (!first) return;
     const url = resolveDayRouteTicketUrl(first);
     if (!url || typeof window === 'undefined') return;
-    window.open(url, '_blank', 'noopener,noreferrer');
+    if (isDayRouteVendorCheckoutUrl(url)) setGuestCheckoutUrl(url);
+    else window.open(url, '_blank', 'noopener,noreferrer');
     setTicketHandoff({ venueId: first.id, ticketUrl: url, title: first.title });
   }
 
@@ -4115,6 +4124,14 @@ function DayRoutePanelInner() {
           document.body,
         )
       : null}
+    {guestCheckoutUrl ? (
+      <CheckoutModal
+        open
+        onClose={() => setGuestCheckoutUrl(null)}
+        checkoutUrl={guestCheckoutUrl}
+        title="Покупка билета"
+      />
+    ) : null}
     {SHOW_DAY_TICKET_HANDOFF_MODAL && ticketHandoff ? (
       <div
         className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 p-4 sm:items-center print:hidden"
@@ -4537,24 +4554,45 @@ function DayRouteVenueCard({
           </Link>
         ) : null}
         {showTicketBuy && ticketUrl ? (
-          <a
-            href={ticketUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            data-day-buy-ticket
-            aria-label={`${buyCtaLabel}: ${buyOfferChip.title}`}
-            title={buyOfferChip.label}
-            onClick={() => onBuyClick(ticketUrl)}
-            className="inline-flex w-auto max-w-full items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-900 hover:bg-amber-100"
-          >
-            <Ticket className="h-3.5 w-3.5 shrink-0" aria-hidden />
-            <span className="min-w-0 truncate leading-snug">{buyOfferChip.title}</span>
-            {buyOfferChip.price ? (
-              <span className="shrink-0 whitespace-nowrap tabular-nums text-amber-800">
-                · {buyOfferChip.price}
-              </span>
-            ) : null}
-          </a>
+          isDayRouteVendorCheckoutUrl(ticketUrl) ? (
+            <DayRoutePurchaseCta
+              purchaseUrl={ticketUrl}
+              eventId={venue.eventId}
+              label={buyOfferChip.title}
+              onOpen={onBuyClick}
+              aria-label={`${buyCtaLabel}: ${buyOfferChip.title}`}
+              title={buyOfferChip.label}
+              data-day-buy-ticket
+              className="inline-flex w-auto max-w-full items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-900 hover:bg-amber-100"
+            >
+              <Ticket className="h-3.5 w-3.5 shrink-0" aria-hidden />
+              <span className="min-w-0 truncate leading-snug">{buyOfferChip.title}</span>
+              {buyOfferChip.price ? (
+                <span className="shrink-0 whitespace-nowrap tabular-nums text-amber-800">
+                  · {buyOfferChip.price}
+                </span>
+              ) : null}
+            </DayRoutePurchaseCta>
+          ) : (
+            <a
+              href={ticketUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-day-buy-ticket
+              aria-label={`${buyCtaLabel}: ${buyOfferChip.title}`}
+              title={buyOfferChip.label}
+              onClick={() => onBuyClick(ticketUrl)}
+              className="inline-flex w-auto max-w-full items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-900 hover:bg-amber-100"
+            >
+              <Ticket className="h-3.5 w-3.5 shrink-0" aria-hidden />
+              <span className="min-w-0 truncate leading-snug">{buyOfferChip.title}</span>
+              {buyOfferChip.price ? (
+                <span className="shrink-0 whitespace-nowrap tabular-nums text-amber-800">
+                  · {buyOfferChip.price}
+                </span>
+              ) : null}
+            </a>
+          )
         ) : null}
       </div>
     ) : null;

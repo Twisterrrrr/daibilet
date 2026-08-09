@@ -1,8 +1,9 @@
 'use client';
 
-import { Anchor, ChevronLeft, Ship, Ticket } from 'lucide-react';
+import { Anchor, ChevronLeft, Ship } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
+import { DayRoutePurchaseCta } from '@/components/DayRoutePurchaseCta.client';
 import {
   BOAT_PIER_NEAR_M,
   buildBoatRoutesFromSessions,
@@ -28,11 +29,13 @@ import {
   type DayRouteState,
   type DayRouteVenueItem,
 } from '@/lib/day-route';
-import { normalizeTcPurchaseUrl } from '@/components/TcWidget.client';
 import { flashDayRouteFeedback } from '@/lib/day-route-feedback';
 import { formatPriceFrom } from '@/lib/format';
 import { toVenueCatalogCard } from '@/lib/venue-catalog-card';
 import type { VenueCatalogCard } from '@/lib/venue-map-types';
+
+const BOAT_BUY_CLASS =
+  'inline-flex min-h-9 items-center justify-center gap-1 rounded-full bg-amber-500 px-3 py-1.5 text-xs font-bold text-white hover:bg-amber-600 disabled:opacity-80';
 
 type WizardStep = 'pier' | 'route' | 'slot';
 
@@ -479,16 +482,11 @@ export function DayRouteBoatWizard({
                           В маршрут
                         </button>
                         {slot.purchaseUrl ? (
-                          <a
-                            href={normalizeTcPurchaseUrl(slot.purchaseUrl) || slot.purchaseUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            data-day-boat-buy
-                            className="inline-flex min-h-9 items-center justify-center gap-1 rounded-full bg-amber-500 px-3 py-1.5 text-xs font-bold text-white hover:bg-amber-600"
-                          >
-                            <Ticket className="h-3.5 w-3.5" />
-                            Купить билет
-                          </a>
+                          <DayRoutePurchaseCta
+                            purchaseUrl={slot.purchaseUrl}
+                            eventId={slot.eventId}
+                            className={BOAT_BUY_CLASS}
+                          />
                         ) : null}
                       </div>
                     </div>
