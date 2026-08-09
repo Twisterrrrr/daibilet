@@ -32,9 +32,10 @@ type SlotLabelSource = {
 /** Компактная дата чипа: `30 июл, 13:20` без дня недели. */
 export function formatCatalogSlotChipLabel(event: PublicSessionDto, slot: SlotLabelSource): string {
   const timeZone = resolveSessionTimeZoneForSession(event);
+  // Prefer startsAt → city TZ; timeLabel alone can be UTC clock (−3ч vs MSK).
   const time =
-    slot.timeLabel?.trim() ||
     (slot.startsAt ? formatSessionTime(slot.startsAt, null, timeZone) : '') ||
+    slot.timeLabel?.trim() ||
     '';
 
   let datePart = '';

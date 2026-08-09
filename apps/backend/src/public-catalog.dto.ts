@@ -23,7 +23,7 @@ import {
   regroupMappedPublicCatalogSessions,
   sessionHasCoverImage,
 } from './public-catalog-grouping.js';
-import { formatDate, formatTime, timeBucket } from './public-datetime.js';
+import { formatDate, formatTime, normalizeStartsAt, timeBucket } from './public-datetime.js';
 import { mapGroupedPublicSession, pickCatalogSubcategories } from './public-catalog.mapper.js';
 import { findLandingRule } from './landing-rules.js';
 import { LIST_SLOT_PREVIEW_LIMIT, toPublicCatalogListItem } from './public-catalog-list-item.js';
@@ -1171,17 +1171,21 @@ async function hydrateCatalogUpcomingSlots(
 
     for (const eventId of hydrationEventIds) {
       for (const row of rowsByEventId.get(eventId) || []) {
-        const startsAt = row.startsAt?.toISOString();
+        const startsAt = normalizeStartsAt(row.startsAt);
         if (!startsAt || seenStartsAt.has(startsAt)) continue;
         seenStartsAt.add(startsAt);
         const timeZone = session.timeZone || resolveCityTimeZone(session.city, session.destination);
+        const timeLabel = formatTime(startsAt, timeZone);
+        const clockKey = `${startsAt.slice(0, 10)}|${timeLabel}`;
+        if (seenStartsAt.has(`clock:${clockKey}`)) continue;
+        seenStartsAt.add(`clock:${clockKey}`);
         hydratedSlots.push({
           id: row.id,
           eventId: row.eventId,
           startsAt,
-          endsAt: row.endsAt?.toISOString() || null,
+          endsAt: normalizeStartsAt(row.endsAt),
           dateLabel: formatDate(startsAt, timeZone),
-          timeLabel: formatTime(startsAt, timeZone),
+          timeLabel,
           timeBucket: timeBucket(startsAt, timeZone),
           timeZone,
           // List consumers strip purchaseUrl; keep for event-level hydrate callers.
@@ -1194,17 +1198,19 @@ async function hydrateCatalogUpcomingSlots(
 
     if (hydratedSlots.length <= (session.upcomingSlots?.length || 0)) return session;
 
+    const primary = hydratedSlots[0];
     return {
       ...session,
       upcomingSlots: hydratedSlots,
       sessionCount: Math.max(session.sessionCount || 0, hydratedSlots.length),
-      ...(session.startsAt || !hydratedSlots[0]?.startsAt
-        ? {}
-        : {
-            startsAt: hydratedSlots[0].startsAt,
-            dateLabel: hydratedSlots[0].dateLabel,
-            timeLabel: hydratedSlots[0].timeLabel,
-          }),
+      ...(primary?.startsAt
+        ? {
+            startsAt: primary.startsAt,
+            dateLabel: primary.dateLabel,
+            timeLabel: primary.timeLabel,
+            timeBucket: primary.timeBucket,
+          }
+        : {}),
     };
   });
 }

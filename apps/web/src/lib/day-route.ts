@@ -896,11 +896,17 @@ function startsAtToHHMM(startsAt: string | null | undefined): string | null {
   if (!raw) return null;
   // Already HHMM
   if (/^\d{3,4}$/.test(raw)) return raw.padStart(4, '0');
-  const date = new Date(raw);
+  const date = parseDayRouteStartsAt(raw);
   if (!Number.isNaN(date.getTime())) {
-    const hh = String(date.getHours()).padStart(2, '0');
-    const mm = String(date.getMinutes()).padStart(2, '0');
-    return `${hh}${mm}`;
+    const parts = new Intl.DateTimeFormat('en-GB', {
+      timeZone: DAY_ROUTE_SESSION_TZ,
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    }).formatToParts(date);
+    const hh = parts.find((part) => part.type === 'hour')?.value || '00';
+    const mm = parts.find((part) => part.type === 'minute')?.value || '00';
+    return `${hh.padStart(2, '0')}${mm.padStart(2, '0')}`;
   }
   return sessionLabelToHHMM(raw);
 }

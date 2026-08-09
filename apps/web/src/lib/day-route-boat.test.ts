@@ -58,6 +58,45 @@ describe('day-route-boat', () => {
     assert.equal(guessBoatDurationMinutes('Прогулка 1 час с гидом'), 60);
   });
 
+  it('formats boat slots in Europe/Moscow and dedupes same HH:mm', () => {
+    const routes = buildBoatRoutesFromSessions(
+      [
+        {
+          id: 'evt_bridges',
+          title: 'Разводные мосты Петербурга с борта теплохода',
+          upcomingSlots: [
+            {
+              eventId: 'evt_bridges',
+              startsAt: '2026-08-09T17:55:00.000Z',
+              timeLabel: '20:55',
+            },
+            {
+              eventId: 'evt_bridges_b',
+              startsAt: '2026-08-09T20:55:00.000Z',
+              timeLabel: '20:55',
+            },
+            {
+              eventId: 'evt_bridges_c',
+              startsAt: '2026-08-09T20:55:00.000Z',
+              timeLabel: '23:55',
+            },
+            {
+              eventId: 'evt_bridges_d',
+              startsAt: '2026-08-10T20:55:00.000Z',
+              timeLabel: '23:55',
+            },
+          ],
+        },
+      ],
+      { earliestMs: null, latestMs: null },
+    );
+    assert.equal(routes.length, 1);
+    const times = routes[0]!.slots.map((s) => s.timeLabel);
+    assert.deepEqual(times, ['20:55', '23:55', '23:55']);
+    assert.equal(routes[0]!.slots[1]!.timeLabel, '23:55');
+    assert.equal(routes[0]!.slots[1]!.startsAt, '2026-08-09T20:55:00.000Z');
+  });
+
   it('builds routes and prefers slot inside time window', () => {
     const window = {
       earliestMs: Date.parse('2026-08-02T10:00:00.000Z'),

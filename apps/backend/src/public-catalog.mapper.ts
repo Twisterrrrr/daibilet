@@ -8,7 +8,7 @@ import {
   purchaseInfo,
   resolveSessionPurchaseExternalId,
 } from './provider-purchase.js';
-import { prismaWallTimeToIso } from './public-datetime.js';
+import { normalizeStartsAt, parseSessionStartsAt } from './public-datetime.js';
 import { formatPublicEventTitle } from './event-title-normalize.ts';
 import { loadCityRoutingConfig } from './city-routing-config.js';
 import type { DestinationType, TimeBucket } from './types/common.js';
@@ -137,40 +137,52 @@ export function mapGroupedPublicSession(
   const fallbackWidgetUrl = buildProviderWidgetUrl(row);
   const purchase = purchaseInfo(row);
   const purchaseUrl = purchase.url || fallbackWidgetUrl;
-  const upcomingSlots = parseUpcomingSlots(row.upcomingSlots)
-    .filter(hasSlotStart)
-    .filter((slot) => isFutureSlotStart(slot.startsAt))
-    .slice(0, 8)
-    .map((slot) => {
-      const sourceCode = slot.sourceCode || slot.offerSourceCode || row.sourceCode || row.offerSourceCode;
-      const slotExternalId = resolveSessionPurchaseExternalId({
-        sourceCode,
-        providerSessionId: slot.providerSessionId || slot.externalId,
-        providerEventId: slot.providerEventId,
-        fallbackEventId: row.externalId,
-      });
-      const slotPurchase = purchaseInfo({
-        sourceCode,
-        offerSourceCode: slot.offerSourceCode || row.offerSourceCode,
-        offerWidgetUrl: slot.offerWidgetUrl,
-        offerDeeplinkUrl: slot.offerDeeplinkUrl,
-        externalId: slotExternalId,
-      });
-      const startsAt = toIsoString(slot.startsAt);
-      return {
-        ...(slot.id ? { id: slot.id } : {}),
-        ...(slot.eventId ? { eventId: slot.eventId } : {}),
-        startsAt,
-        dateLabel: formatDate(startsAt, timeZone),
-        timeLabel: formatTime(startsAt, timeZone),
-        timeBucket: timeBucket(startsAt, timeZone),
-        timeZone,
-        purchaseUrl: slotPurchase.url || purchaseUrl,
-      };
-    });
+  const upcomingSlots = dedupeCatalogSlotsByClock(
+    parseUpcomingSlots(row.upcomingSlots)
+      .filter(hasSlotStart)
+      .filter((slot) => isFutureSlotStart(slot.startsAt))
+      .map((slot) => {
+        const sourceCode = slot.sourceCode || slot.offerSourceCode || row.sourceCode || row.offerSourceCode;
+        const slotExternalId = resolveSessionPurchaseExternalId({
+          sourceCode,
+          providerSessionId: slot.providerSessionId || slot.externalId,
+          providerEventId: slot.providerEventId,
+          fallbackEventId: row.externalId,
+        });
+        const slotPurchase = purchaseInfo({
+          sourceCode,
+          offerSourceCode: slot.offerSourceCode || row.offerSourceCode,
+          offerWidgetUrl: slot.offerWidgetUrl,
+          offerDeeplinkUrl: slot.offerDeeplinkUrl,
+          externalId: slotExternalId,
+        });
+        const startsAt = toIsoString(slot.startsAt);
+        return {
+          ...(slot.id ? { id: slot.id } : {}),
+          ...(slot.eventId ? { eventId: slot.eventId } : {}),
+          startsAt,
+          dateLabel: formatDate(startsAt, timeZone),
+          timeLabel: formatTime(startsAt, timeZone),
+          timeBucket: timeBucket(startsAt, timeZone),
+          timeZone,
+          purchaseUrl: slotPurchase.url || purchaseUrl,
+        };
+      })
+      .sort(
+        (left, right) =>
+          parseSessionStartsAt(left.startsAt).getTime() - parseSessionStartsAt(right.startsAt).getTime(),
+      ),
+    timeZone,
+  ).slice(0, 8);
 
   const openDate = isOpenDateCatalogRow(row);
-  const startsAt = openDate || !row.startsAt ? '' : toIsoString(row.startsAt);
+  // Primary must share the same instant path as upcomingSlots (jsonb strings vs SQL Date
+  // used to diverge when Date-only got prismaWallTime −3h). Prefer earliest unique slot.
+  const primarySlot = upcomingSlots[0];
+  const startsAt =
+    openDate || !row.startsAt
+      ? ''
+      : primarySlot?.startsAt || toIsoString(row.startsAt);
   const groupEventIds = (row.groupEventIds || [row.id]).slice(0, 12);
   const manualLandingStatus = groupEventIds.some((id) => pinnedEventIds.has(id)) ? 'PINNED' : null;
   const session: PublicSessionDto = {
@@ -212,9 +224,15 @@ export function mapGroupedPublicSession(
     ageLimit: row.ageLimit ?? null,
     description: cleanImportedDescription(row.overrideDescription || row.description || row.overrideShortDescription),
     startsAt,
-    dateLabel: openDate ? 'Открытая дата' : formatDate(startsAt, timeZone),
-    timeLabel: openDate ? 'В виджете' : formatTime(startsAt, timeZone),
-    timeBucket: openDate ? 'day' : timeBucket(startsAt, timeZone),
+    dateLabel: openDate
+      ? 'Открытая дата'
+      : primarySlot?.dateLabel || formatDate(startsAt, timeZone),
+    timeLabel: openDate
+      ? 'В виджете'
+      : primarySlot?.timeLabel || formatTime(startsAt, timeZone),
+    timeBucket: openDate
+      ? 'day'
+      : primarySlot?.timeBucket || timeBucket(startsAt, timeZone),
     priceFrom: row.priceFrom,
     priceTo: row.priceTo ?? row.priceFrom,
     vacant: row.vacant,
@@ -437,7 +455,7 @@ function cleanDisplayName(value?: string | null): string {
 }
 
 function formatDate(value: string | Date, timeZone: string): string {
-  const date = new Date(value);
+  const date = parseSessionStartsAt(value);
   if (!Number.isFinite(date.getTime())) return '';
   return new Intl.DateTimeFormat('ru-RU', {
     day: 'numeric',
@@ -448,7 +466,7 @@ function formatDate(value: string | Date, timeZone: string): string {
 }
 
 function formatTime(value: string | Date, timeZone: string): string {
-  const date = new Date(value);
+  const date = parseSessionStartsAt(value);
   if (!Number.isFinite(date.getTime())) return '';
   return new Intl.DateTimeFormat('ru-RU', {
     hour: '2-digit',
@@ -458,7 +476,7 @@ function formatTime(value: string | Date, timeZone: string): string {
 }
 
 function timeBucket(value: string | Date, timeZone: string): TimeBucket {
-  const date = new Date(value);
+  const date = parseSessionStartsAt(value);
   if (!Number.isFinite(date.getTime())) return 'day';
   const hourPart = new Intl.DateTimeFormat('en-GB', {
     timeZone,
@@ -474,10 +492,41 @@ function timeBucket(value: string | Date, timeZone: string): TimeBucket {
   return 'night';
 }
 
+/**
+ * One clock for SQL Date and jsonb string slots.
+ * Do NOT apply prismaWallTime only to Date: that made primary −3h vs upcomingSlots
+ * (e.g. bridges main 20:55 / chips 23:55 for the same sailing).
+ */
 function toIsoString(value: string | Date): string {
-  if (value instanceof Date) return prismaWallTimeToIso(value) || '';
-  const date = new Date(value);
-  return Number.isFinite(date.getTime()) ? date.toISOString() : '';
+  return normalizeStartsAt(value) || '';
+}
+
+function catalogSlotClockKey(startsAt: string, timeZone: string): string {
+  const date = parseSessionStartsAt(startsAt);
+  if (!Number.isFinite(date.getTime())) return startsAt;
+  const day = new Intl.DateTimeFormat('en-CA', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(date);
+  const time = formatTime(startsAt, timeZone);
+  return `${day}|${time}`;
+}
+
+function dedupeCatalogSlotsByClock<T extends { startsAt: string; eventId?: string | null }>(
+  slots: T[],
+  timeZone: string,
+): T[] {
+  const seen = new Set<string>();
+  const out: T[] = [];
+  for (const slot of slots) {
+    const key = catalogSlotClockKey(slot.startsAt, timeZone);
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    out.push(slot);
+  }
+  return out;
 }
 
 function publicSlug(value?: string | null): string {

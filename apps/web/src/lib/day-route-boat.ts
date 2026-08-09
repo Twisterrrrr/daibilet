@@ -7,6 +7,35 @@ import { haversineMeters, isValidCoordinatePair } from './day-route-score';
 import { eventHref, venueHref } from './routes';
 import type { DayRouteVenueItem } from './day-route';
 
+/** Display / dedupe clock for boat slots (SPB catalog = Europe/Moscow). */
+const BOAT_SESSION_TZ = 'Europe/Moscow';
+
+function formatBoatSlotClock(startsAt: string, fallback?: string | null): string | null {
+  const date = new Date(startsAt);
+  if (!Number.isFinite(date.getTime())) {
+    const raw = String(fallback || '').trim();
+    return raw || null;
+  }
+  return new Intl.DateTimeFormat('ru-RU', {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: BOAT_SESSION_TZ,
+  }).format(date);
+}
+
+function boatSlotClockKey(startsAt: string): string | null {
+  const date = new Date(startsAt);
+  if (!Number.isFinite(date.getTime())) return null;
+  const day = new Intl.DateTimeFormat('en-CA', {
+    timeZone: BOAT_SESSION_TZ,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(date);
+  const time = formatBoatSlotClock(startsAt);
+  return time ? `${day}|${time}` : null;
+}
+
 /** TicketsCloud widget page rejects `token=r:…` with HTTPForbidden/bad token. */
 function sanitizeTicketscloudPurchaseUrl(url?: string | null): string | null {
   const raw = String(url || '').trim();
@@ -320,7 +349,14 @@ export function buildBoatRoutesFromSessions(
       if (!startsAt) continue;
       const startsMs = parseStartsAtMs(startsAt);
       if (startsMs == null) continue;
-      if (route.slots.some((s) => s.startsAt === startsAt)) continue;
+      const clockKey = boatSlotClockKey(startsAt);
+      if (
+        route.slots.some(
+          (s) => s.startsAt === startsAt || (clockKey != null && boatSlotClockKey(s.startsAt) === clockKey),
+        )
+      ) {
+        continue;
+      }
 
       const fitsEarliest = window.earliestMs == null || startsMs >= window.earliestMs;
       const fitsLatest = window.latestMs == null || startsMs <= window.latestMs;
@@ -339,11 +375,17 @@ export function buildBoatRoutesFromSessions(
       const vacant = row.vacant == null ? null : Number(row.vacant);
       if (vacant != null && vacant > 0) rankScore += Math.min(50, vacant);
 
+      // Always derive HH:mm from startsAt in Europe/Moscow — never trust mismatched timeLabel (UTC−3 noise).
+      const timeLabel =
+        formatBoatSlotClock(startsAt, row.timeLabel || session.timeLabel) ||
+        String(row.timeLabel || session.timeLabel || '').trim() ||
+        null;
+
       route.slots.push({
         eventId: String(row.eventId || eventId),
         startsAt,
         dateLabel: String(row.dateLabel || session.dateLabel || '').trim() || null,
-        timeLabel: String(row.timeLabel || session.timeLabel || '').trim() || null,
+        timeLabel,
         purchaseUrl: sanitizeTicketscloudPurchaseUrl(row.purchaseUrl || session.purchaseUrl),
         vacant: Number.isFinite(vacant as number) ? (vacant as number) : null,
         fitDeltaMin,
@@ -408,7 +450,10 @@ export function dayRouteItemFromBoatSlot(input: {
   const slot = input.slot;
   const pierId = String(pier.id || '').trim();
   const pierSlug = String(pier.slug || '').trim() || null;
-  const sessionParts = [slot.dateLabel, slot.timeLabel].filter(Boolean);
+  const sessionParts = [
+    slot.dateLabel,
+    formatBoatSlotClock(slot.startsAt, slot.timeLabel) || slot.timeLabel,
+  ].filter(Boolean);
   const sessionLabel = sessionParts.length
     ? `${sessionParts.join(', ')} · ${route.title}`
     : route.title;

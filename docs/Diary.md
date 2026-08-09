@@ -1,3 +1,18 @@
+## 2026-08-09 - Bridges/my-day boat times: TZ −3ч + slot dedupe
+
+### Наблюдения
+- Owner: развод мостов не бывает в 20:55; на карточке main `20:55`, chips `23:55` (и тройной дубль).
+- Live `landing=bridges-night`: `startsAt=…T17:55Z`/`timeLabel=20:55`, slots `…T20:55Z`/`23:55`.
+
+### Решения
+- Root cause: в `public-catalog.mapper` `toIsoString(Date)` делал `prismaWallTimeToIso` (−3ч), а jsonb `upcomingSlots` (string) — нет → primary −3ч vs chips.
+- Фикс: один `normalizeStartsAt` для Date/string; primary = earliest unique slot; dedupe по MSK HH:mm; hydrate всегда sync primary; boat wizard format+dedupe Europe/Moscow; `startsAtToHHMM`/soft-timing без `getHours()`.
+
+### Проблемы
+- Нужен Deploy MSK web + restart `daibilet-api` (mapper в backend).
+
+---
+
 ## 2026-08-09 - DayTripCanonCard align + transitTip visible
 
 ### Наблюдения

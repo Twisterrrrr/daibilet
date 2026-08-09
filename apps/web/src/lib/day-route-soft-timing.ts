@@ -91,8 +91,17 @@ export function anchorMinutes(venue: DayRouteVenueItem): number | null {
   if (!raw) return null;
   const d = new Date(raw);
   if (Number.isNaN(d.getTime())) return null;
-  // Use local wall-clock of the parsed instant (sessions stored as MSK-ish ISO).
-  return d.getHours() * 60 + d.getMinutes();
+  // Europe/Moscow wall-clock (catalog sessions), never browser/server local getHours().
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Europe/Moscow',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).formatToParts(d);
+  const hh = Number(parts.find((part) => part.type === 'hour')?.value || NaN);
+  const mm = Number(parts.find((part) => part.type === 'minute')?.value || NaN);
+  if (!Number.isFinite(hh) || !Number.isFinite(mm)) return null;
+  return hh * 60 + mm;
 }
 
 function rangeLabel(startMin: number, endMin: number): string {

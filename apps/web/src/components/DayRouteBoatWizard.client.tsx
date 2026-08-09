@@ -427,7 +427,18 @@ export function DayRouteBoatWizard({
               ) : null}
               {loadingRoutes ? <p className="text-xs text-slate-500">Ищем маршруты…</p> : null}
               {!loadingRoutes &&
-                routes.map((boatRoute) => (
+                routes.map((boatRoute) => {
+                  const primary = boatRoute.slots[0];
+                  const primaryTime = primary?.timeLabel || null;
+                  const altTimes = [
+                    ...new Set(
+                      boatRoute.slots
+                        .slice(1)
+                        .map((s) => s.timeLabel)
+                        .filter((t): t is string => Boolean(t && t !== primaryTime)),
+                    ),
+                  ].slice(0, 3);
+                  return (
                   <button
                     key={boatRoute.eventId}
                     type="button"
@@ -435,6 +446,19 @@ export function DayRouteBoatWizard({
                     className="flex w-full flex-col gap-0.5 rounded-xl border border-white bg-white px-3 py-2.5 text-left shadow-sm hover:border-sky-300"
                   >
                     <span className="text-sm font-semibold text-slate-900">{boatRoute.title}</span>
+                    {primaryTime ? (
+                      <span className="mt-0.5 flex flex-wrap items-center gap-1.5">
+                        <span className="text-sm font-bold tabular-nums text-slate-900">{primaryTime}</span>
+                        {altTimes.map((time) => (
+                          <span
+                            key={time}
+                            className="rounded-md bg-slate-100 px-1.5 py-0.5 text-[11px] font-semibold tabular-nums text-slate-700"
+                          >
+                            {time}
+                          </span>
+                        ))}
+                      </span>
+                    ) : null}
                     <span className="text-xs text-slate-500">
                       {[
                         boatRoute.slots.length
@@ -447,7 +471,8 @@ export function DayRouteBoatWizard({
                         .join(' · ')}
                     </span>
                   </button>
-                ))}
+                  );
+                })}
             </div>
           ) : null}
 

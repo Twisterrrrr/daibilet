@@ -125,6 +125,27 @@ test('converts imported Moscow wall time to the real UTC instant', () => {
   assert.equal(prismaWallTimeToIso(prismaTimestamp), '2026-07-10T13:30:00.000Z');
 });
 
+test('catalog mapper keeps Date and ISO string startsAt on the same UTC clock', () => {
+  const iso = '2026-08-09T20:55:00.000Z';
+  const fromDate = mapGroupedPublicSession(
+    catalogRow({
+      city: 'Санкт-Петербург',
+      citySlug: 'sankt-peterburg',
+      startsAt: new Date(iso),
+      upcomingSlots: [
+        { eventId: 'evt-a', startsAt: iso },
+        { eventId: 'evt-b', startsAt: new Date(iso) },
+        { eventId: 'evt-c', startsAt: '2026-08-09T20:55:00.000Z' },
+      ],
+    }),
+  );
+  assert.ok(fromDate);
+  assert.equal(fromDate.startsAt, iso);
+  assert.equal(fromDate.timeLabel, '23:55');
+  assert.equal(fromDate.upcomingSlots?.length, 1);
+  assert.equal(fromDate.upcomingSlots?.[0]?.timeLabel, '23:55');
+});
+
 test('drops bus subcategory labels from river cruise cards', () => {
   const labels = pickCatalogSubcategories({
     category: 'Экскурсии',
