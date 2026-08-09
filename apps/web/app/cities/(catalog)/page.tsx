@@ -3,14 +3,11 @@ import { Suspense } from 'react';
 
 import { CitiesCatalogView } from '@/components/CitiesCatalogView.client';
 import { CitiesHeroSearch } from '@/components/CitiesHeroSearch.client';
-import { CityCard } from '@/components/CityCard';
 import { HeroLayout } from '@/components/HeroLayout';
 import { RussiaMap } from '@/components/RussiaMap.client';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
 import { withSoftTimeout } from '@/lib/soft-timeout';
-import { cityHasDaytimePreview, cityHasTopPreview, cityImageSlug } from '@/lib/city-images';
-import { resolveCityRegion } from '@/lib/cityRegionHub';
 import { getCachedDestinations } from '@/server/cached-public-surfaces';
 
 export const metadata: Metadata = {
@@ -24,9 +21,6 @@ export const metadata: Metadata = {
 export const revalidate = 86400;
 
 const CITIES_DESTINATIONS_TIMEOUT_MS = 2500;
-const TOP_CITIES_COUNT = 8;
-const SECOND_OCTET_COUNT = 8;
-const THIRD_OCTET_COUNT = 8;
 
 export default async function CitiesIndexPage() {
   let destinations: Awaited<ReturnType<typeof getCachedDestinations>>['destinations'] = [];
@@ -44,24 +38,6 @@ export default async function CitiesIndexPage() {
   }
 
   const cities = destinations.filter((item) => item.type === 'city');
-  const byPopularity = (a: (typeof cities)[number], b: (typeof cities)[number]) =>
-    b.events - a.events || a.name.localeCompare(b.name, 'ru');
-  // Top-8 pins → daytime second-octet JPGs → remaining by popularity.
-  const withTop = [...cities].filter(cityHasTopPreview).sort(byPopularity);
-  const withDaytimeSecond = [...cities]
-    .filter((city) => !cityHasTopPreview(city) && cityHasDaytimePreview(city))
-    .sort(byPopularity);
-  const withoutDaytime = [...cities].filter((city) => !cityHasDaytimePreview(city)).sort(byPopularity);
-  const rankedCities = [...withTop, ...withDaytimeSecond, ...withoutDaytime];
-  const topCities = rankedCities.slice(0, TOP_CITIES_COUNT);
-  const secondOctet = rankedCities.slice(TOP_CITIES_COUNT, TOP_CITIES_COUNT + SECOND_OCTET_COUNT);
-  const thirdOctet = rankedCities.slice(
-    TOP_CITIES_COUNT + SECOND_OCTET_COUNT,
-    TOP_CITIES_COUNT + SECOND_OCTET_COUNT + THIRD_OCTET_COUNT,
-  );
-  const featuredSlugs = [...topCities, ...secondOctet, ...thirdOctet]
-    .map((city) => cityImageSlug(city))
-    .filter(Boolean);
 
   return (
     <SiteLayout>
@@ -72,65 +48,18 @@ export default async function CitiesIndexPage() {
       >
         <Suspense
           fallback={
-            <div className="mt-5 h-24 max-w-xl animate-pulse rounded-2xl bg-slate-100" aria-hidden />
+            <div className="mt-5 h-12 w-full animate-pulse rounded-2xl bg-slate-100" aria-hidden />
           }
         >
           <CitiesHeroSearch destinations={cities} />
         </Suspense>
-        {topCities.length ? (
-          <ul className="mt-6 grid w-full grid-cols-2 content-start gap-2.5 sm:grid-cols-3 lg:grid-cols-4">
-            {topCities.map((city) => (
-              <li key={city.slug || city.name} className="min-w-0">
-                <CityCard
-                  city={city}
-                  imageVariant="top"
-                  compact
-                  region={resolveCityRegion(city, destinations)}
-                />
-              </li>
-            ))}
-          </ul>
-        ) : null}
         <div className="mt-4 w-full lg:mt-5">
           <RussiaMap className="min-h-[16rem] w-full sm:min-h-[18rem] lg:min-h-[22rem]" destinations={cities} />
         </div>
       </HeroLayout>
       <div id="cities-all" className="container-page scroll-mt-24 bg-slate-50 py-10">
-        {secondOctet.length ? (
-          <section aria-label="Следующие города" className="mb-10 border-b border-slate-200/80 pb-10">
-            <ul className="grid w-full grid-cols-2 content-start gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
-              {secondOctet.map((city) => (
-                <li key={city.slug || city.name} className="min-w-0">
-                  {/* Same chrome as top-8: dark scrim + white title/stats on photo. */}
-                  <CityCard
-                    city={city}
-                    compact
-                    imageVariant="top"
-                    region={resolveCityRegion(city, destinations)}
-                  />
-                </li>
-              ))}
-            </ul>
-          </section>
-        ) : null}
-        {thirdOctet.length ? (
-          <section aria-label="Ещё города" className="mb-10 border-b border-slate-200/80 pb-10">
-            <ul className="grid w-full grid-cols-2 content-start gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
-              {thirdOctet.map((city) => (
-                <li key={city.slug || city.name} className="min-w-0">
-                  <CityCard
-                    city={city}
-                    compact
-                    imageVariant="top"
-                    region={resolveCityRegion(city, destinations)}
-                  />
-                </li>
-              ))}
-            </ul>
-          </section>
-        ) : null}
         <Suspense fallback={null}>
-          <CitiesCatalogView destinations={destinations} hideIntro excludeSlugs={featuredSlugs} />
+          <CitiesCatalogView destinations={destinations} hideIntro />
         </Suspense>
       </div>
     </SiteLayout>

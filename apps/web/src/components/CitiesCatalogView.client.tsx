@@ -7,36 +7,22 @@ import { CityCard } from '@/components/CityCard';
 import { parseCitiesCatalogSort } from '@/components/CitiesHeroSearch.client';
 import { RegionDestinationLink } from '@/components/RegionDestinationLink';
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
-import { cityImageSlug } from '@/lib/city-images';
 import { filterOrphanRegions, resolveCityRegion } from '@/lib/cityRegionHub';
 import { pluralCities } from '@/lib/format';
 
 export function CitiesCatalogView({
   destinations,
   hideIntro = false,
-  excludeSlugs,
 }: {
   destinations: PublicDestinationDto[];
   /** When parent already rendered HeroLayout H1. */
   hideIntro?: boolean;
-  /** Featured tiles already shown above - omit from the list below. */
-  excludeSlugs?: string[];
 }) {
   const searchParams = useSearchParams();
   const sort = parseCitiesCatalogSort(searchParams.get('sort'));
 
-  const excluded = useMemo(() => {
-    if (!excludeSlugs?.length) return null;
-    return new Set(excludeSlugs);
-  }, [excludeSlugs]);
-
   const cities = useMemo(() => {
-    const filtered = destinations
-      .filter((item) => item.type === 'city')
-      .filter((item) => {
-        if (!excluded || excluded.size === 0) return true;
-        return !excluded.has(cityImageSlug(item));
-      });
+    const filtered = destinations.filter((item) => item.type === 'city');
 
     return [...filtered].sort((a, b) => {
       if (sort === 'name') {
@@ -44,7 +30,7 @@ export function CitiesCatalogView({
       }
       return b.events - a.events || a.name.localeCompare(b.name, 'ru');
     });
-  }, [destinations, excluded, sort]);
+  }, [destinations, sort]);
 
   const allCities = useMemo(
     () => destinations.filter((item) => item.type === 'city'),

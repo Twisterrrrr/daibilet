@@ -1,3 +1,32 @@
+## 2026-08-10 - Venue/location: афиша выше discovery
+
+### Наблюдения
+- На `/venues` и `/locations` блок `#venue-program` рендерился после всего layout - ниже «Связанные хабы» / «Похожие площадки».
+
+### Решения
+- Афиша передаётся `children` в `LocationVenueLayout` / `InstitutionVenueLayout` сразу после primary-контента.
+- «Связанные хабы» и «Похожие площадки» остаются внизу основной колонки.
+
+### Проблемы
+- Deploy по «выкатывай».
+
+---
+
+## 2026-08-10 - `/cities` sort + toolbar row
+
+### Наблюдения
+- «По алфавиту» выглядело сломанным: top-8 + 2 октета рендерились отдельно и вырезались из `CitiesCatalogView` через `excludeSlugs`, поэтому sort трогал только хвост.
+- Кнопки «Куда поехать?» / «Популярные» / «По алфавиту» стояли под поиском; owner хотел одну строку (search left, controls right).
+
+### Решения
+- Убраны featured slices (hero top-8, second/third octet); один `#cities-all` список сортируется целиком.
+- `CitiesHeroSearch`: flex row sm+ - input `flex-1`, controls справа; на узких экранах controls wrap под поиск.
+
+### Проблемы
+- Deploy по «выкатывай».
+
+---
+
 ## 2026-08-10 - MSK web batch deploy (events+cities+scenarios)
 
 ### Наблюдения
