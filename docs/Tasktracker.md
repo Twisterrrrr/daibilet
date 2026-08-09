@@ -2,7 +2,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| FIX.VENUE-PAGE-HANG | `/locations`/`/venues` `?page=` soft-nav hang → client slice | Критический | 🔄 code; deploy MSK web |
+| FIX.VENUE-PAGE-HANG | `/locations`/`/venues` `?page=` soft-nav hang → client slice | Критический | ✅ `3a968000` Deploy MSK web BUILD_ID=`9BpSEnRcVf3lhoksHGMJ6` |
 | UX.HUB-SCENARIOS-CHIPS | Hub «Готовые сценарии»: chips+panel как my-day на всех breakpoints (не card list) | Высокий | 🔄 code; deploy MSK web |
 | UX.HUB-AFFICHE-RAIL | Hub «Ближайшие события»: mobile swipe carousel + desktop prev/next (не вертикальная простыня) | Высокий | 🔄 code; deploy MSK web |
 | INC.LOC500.SOFTCONN | soft-unavailable `connection()` → DYNAMIC_SERVER_USAGE 500 на location PDP | Критический | ✅ `5221afcd` Deploy MSK web BUILD_ID=`XA_SZgY9mVm0tjISGf6pI` |
