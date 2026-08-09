@@ -3315,7 +3315,7 @@ function DayRoutePanelInner() {
         </section>
       )}
 
-      {/* Accordion stack (all breakpoints): scenarios → must-see → suburbs → custom. */}
+      {/* Accordion stack: scenarios → must-see → suburbs → custom → boat → matches → hot picks → catalog. */}
       {showScenariosAccordion ? (
         <div
           className="mt-3 rounded-2xl border border-slate-200 bg-white"
@@ -3662,6 +3662,18 @@ function DayRoutePanelInner() {
         ) : null}
       </div>
 
+      {/* Boat: immediately under «Добавить своё место» (SPB-only inside wizard). */}
+      <DayRouteBoatWizard
+        cityName={pageCityName}
+        citySlug={pageCitySlug}
+        cityId={pageCityId}
+        citySourceSlug={selectedCity?.selectedDestination?.sourceSlug || null}
+        route={route}
+        atMax={atMax}
+        onRouteChange={setRoute}
+        locationsCatalog={locationsCatalog}
+      />
+
       {/* Accordion: nearby events / matches */}
       {showMatches ? (
         <div
@@ -3913,7 +3925,7 @@ function DayRoutePanelInner() {
         </section>
       ) : null}
 
-      {/* Always-open catalog trio + boat (no accordion / no card border) */}
+      {/* Always-open catalog trio (no accordion / no card border); boat lives under custom place. */}
       <section
         className="mt-5"
         id="day-catalog-add"
@@ -3929,21 +3941,7 @@ function DayRoutePanelInner() {
             Сначала выберите город выше.
           </p>
         ) : (
-          <>
-            {renderCatalogTrio()}
-            <div className="mt-4">
-              <DayRouteBoatWizard
-                cityName={pageCityName}
-                citySlug={pageCitySlug}
-                cityId={pageCityId}
-                citySourceSlug={selectedCity?.selectedDestination?.sourceSlug || null}
-                route={route}
-                atMax={atMax}
-                onRouteChange={setRoute}
-                locationsCatalog={locationsCatalog}
-              />
-            </div>
-          </>
+          renderCatalogTrio()
         )}
       </section>
 
