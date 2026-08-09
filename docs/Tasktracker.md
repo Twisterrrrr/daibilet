@@ -3,7 +3,7 @@
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
 | CONT.KGD-LOGISTICS | KGD suburbs/presets: коса углубление+Фрингилла возврат, Зел/Свет/Балт/Янт порядок+timingNote | Высокий | ✅ `7644445c` Deploy MSK web `31304947725` |
-| CONT.PERM-LOGISTICS | Perm suburbs/presets: Хохловка CCW, Кунгур центр+пещера, Белая гора split, Усьва/Губаха 2 дня | Высокий | 🔄 ship+Deploy MSK web |
+| CONT.PERM-LOGISTICS | Perm suburbs/presets: Хохловка CCW, Кунгур центр+пещера, Белая гора split, Усьва/Губаха 2 дня | Высокий | ✅ `7644445c` Deploy MSK web `31304947725` BUILD_ID=`mi3IHPRLphsEf9IgHXj9a` |
 | UX.SCENARIOS-LIGHT | Сценарии light panel; suburb canon full-width; POI row flex; CTA match | Критический | 🔄 ship+Deploy MSK web |
 | UX.DAY-TRIP-CANON | DayTripCanonCard для suburbs (full width); scenarios откатили с shared canon | Высокий | ✅ partial `c5629984`; scenarios split → UX.SCENARIOS-LIGHT |
 | UX.SUBURB-CARD-CANON | Suburb cards hub/my-day: канон Петергоф-макета (логистика/гастро/что посмотреть/CTA), schema logisticsExit+gastroStop, без SVG icons | Высокий | ✅ superseded by UX.DAY-TRIP-CANON |

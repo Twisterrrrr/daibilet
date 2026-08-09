@@ -40,7 +40,7 @@
 - Layout/UX scenarios vs suburbs не трогали (параллельный агент).
 
 ### Проблемы
-- Ship+Deploy MSK web - после commit/push.
+- Ship: `7644445c` · Deploy MSK web **31304947725** · **BUILD_ID=`mi3IHPRLphsEf9IgHXj9a`**.
 
 ---
 
