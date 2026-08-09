@@ -330,7 +330,9 @@ export function resolveSessionPriceRange(sessions: Array<{ priceFrom?: number | 
 }
 
 export function resolveAgeBadge(tags?: string[] | null, ageLimit?: string | null): string | null {
-  const fromLimit = String(ageLimit || '').match(/\b(\d{1,2})\+\b/);
+  const limit = String(ageLimit || '').trim();
+  if (/^\d{1,2}$/.test(limit)) return `${limit}+`;
+  const fromLimit = limit.match(/\b(\d{1,2})\+\b/);
   if (fromLimit) return `${fromLimit[1]}+`;
 
   for (const tag of tags || []) {

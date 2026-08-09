@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Clock, MapPin, Ticket, Users } from 'lucide-react';
+import { Clock, MapPin, Ticket } from 'lucide-react';
 
 import { EventFavoriteButton } from '@/components/EventFavoriteButton.client';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
@@ -26,6 +26,7 @@ import {
   resolveEventCardPinLines,
 } from '@/lib/event-location';
 import { formatPriceFrom } from '@/lib/format';
+import { formatAgeLimit } from '@/lib/event-page-utils';
 import { trackProductCardClick } from '@/lib/catalog-analytics';
 import { eventHref, sessionVenueHref } from '@/lib/routes';
 
@@ -57,7 +58,7 @@ export function EventCardHorizontal({ session }: { session: PublicCatalogListIte
   const pinLines = resolveEventCardPinLines(session);
   const pinPrimary = pinLines.primary || locationLabel;
   const durationLabel = extractDurationLabel(session.tags);
-  const ageLabel = session.ageLimit?.trim() || null;
+  const ageLabel = formatAgeLimit(session.ageLimit);
   const priceFooterLabel = hasPrice ? formatPriceFrom(session.priceFrom) : null;
   const coverDateBadge = formatCoverDateBadge(session);
   const venueHref = sessionVenueHref(session);
@@ -117,9 +118,8 @@ export function EventCardHorizontal({ session }: { session: PublicCatalogListIte
             </span>
           ) : null}
           {ageLabel ? (
-            <span className="event-card-meta">
-              <Users className="event-card-meta-icon" />
-              <span className="truncate">{ageLabel}</span>
+            <span className="event-card-meta text-graphite-muted" title="Возрастное ограничение">
+              <span className="font-semibold tabular-nums">{ageLabel}</span>
             </span>
           ) : null}
           {destinationLabel ? (

@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react';
 import Link from 'next/link';
-import { Clock, MapPin, Ticket, Users } from 'lucide-react';
+import { Clock, MapPin, Ticket } from 'lucide-react';
 
 import { EventFavoriteButton } from '@/components/EventFavoriteButton.client';
 import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
@@ -41,6 +41,7 @@ import {
 } from '@/lib/event-location';
 import { dayRouteItemFromEvent } from '@/lib/day-route-from-place';
 import { formatPriceFrom } from '@/lib/format';
+import { formatAgeLimit } from '@/lib/event-page-utils';
 import { trackProductCardClick } from '@/lib/catalog-analytics';
 import { eventHref } from '@/lib/routes';
 
@@ -109,7 +110,7 @@ export function EventCard({
   const landingBadges = landingActions ? deriveLandingCardBadges(session) : [];
   const locationLabel = resolveEventCardLocationLabel(session);
   const durationLabel = extractDurationLabel(session.tags);
-  const ageLabel = session.ageLimit?.trim() || null;
+  const ageLabel = formatAgeLimit(session.ageLimit);
   // Missing display price (<100 / null) is not "soon" - event can still be on sale.
   const showSoonBadge = false;
   const priceFooterLabel = hasPrice ? formatPriceFrom(session.priceFrom) : null;
@@ -213,9 +214,8 @@ export function EventCard({
               </span>
             ) : null}
             {ageLabel ? (
-              <span className="event-card-meta hidden sm:inline-flex">
-                <Users className="event-card-meta-icon" />
-                <span className="truncate">{ageLabel}</span>
+              <span className="event-card-meta text-graphite-muted" title="Возрастное ограничение">
+                <span className="font-semibold tabular-nums">{ageLabel}</span>
               </span>
             ) : null}
             {destinationLabel ? (
