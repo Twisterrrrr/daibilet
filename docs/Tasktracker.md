@@ -2,6 +2,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
+| FIX.EVENTS-PAGE-HANG | `/events` `?page=` soft-nav hang → listPage + pushState + buttons + stale-first | Критический | 🔄 code; deploy MSK web |
 | FIX.VENUE-PAGE-HANG | `/locations`/`/venues` `?page=` soft-nav hang → client slice | Критический | ✅ `3a968000` Deploy MSK web BUILD_ID=`9BpSEnRcVf3lhoksHGMJ6` |
 | UX.HUB-SCENARIOS-CHIPS | Hub «Готовые сценарии»: chips+panel как my-day на всех breakpoints (не card list) | Высокий | ✅ `eaf4a164` Deploy MSK web `31299644782` BUILD_ID=`XmUXa_zhYAnUPDqEPpQYP` |
 | UX.HUB-AFFICHE-RAIL | Hub «Ближайшие события»: mobile swipe carousel + desktop prev/next (не вертикальная простыня) | Высокий | ✅ `eaf4a164` Deploy MSK web `31299644782` BUILD_ID=`XmUXa_zhYAnUPDqEPpQYP` |

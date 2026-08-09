@@ -95,8 +95,8 @@ export function CatalogPaginationLinks({
   /** Extra label after «Показано X из Y», e.g. pluralEvents(total). */
   summarySuffix?: string;
   /**
-   * Client page switch (venues/locations): update list without App Router soft-nav.
-   * Keeps shareable `?page=` via history; omit for default `<Link>` (events).
+   * Client page switch: update list without App Router soft-nav.
+   * Keeps shareable `?page=` via history; omit to fall back to `<Link>`.
    */
   onPageChange?: (page: number) => void;
 }) {

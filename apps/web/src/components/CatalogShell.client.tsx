@@ -33,6 +33,12 @@ type CatalogShellProps = {
   initialQueryKey?: string;
 };
 
+function parseEventsCatalogPageParam(raw: string | null): number {
+  const parsed = Number.parseInt(raw || '1', 10);
+  if (!Number.isFinite(parsed) || parsed < 1) return 1;
+  return parsed;
+}
+
 export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: CatalogShellProps) {
   const router = useRouter();
   const urlSearchParams = useSearchParams();
@@ -63,6 +69,41 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
     }
   }, [searchParamsRecord]);
 
+  // Local page drives the list; soft-nav <Link ?page=> remounts via loading.tsx and feels hung.
+  const urlPage = query.page;
+  const [listPage, setListPage] = useState(urlPage);
+
+  useEffect(() => {
+    setListPage(urlPage);
+  }, [urlPage]);
+
+  useEffect(() => {
+    const onPopState = () => {
+      setListPage(parseEventsCatalogPageParam(new URLSearchParams(window.location.search).get('page')));
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
+
+  const writePageToUrl = useCallback((page: number) => {
+    const params = new URLSearchParams(window.location.search);
+    if (page <= 1) params.delete('page');
+    else params.set('page', String(page));
+    const qs = params.toString();
+    const href = qs ? `/events?${qs}` : '/events';
+    window.history.pushState(null, '', href);
+  }, []);
+
+  const goToListPage = useCallback(
+    (page: number) => {
+      const next = Math.max(1, page);
+      setListPage(next);
+      writePageToUrl(next);
+      window.scrollTo(0, 0);
+    },
+    [writePageToUrl],
+  );
+
   const filterValues = useMemo(() => {
     const base = catalogFiltersFromQuery({
       q: query.q,
@@ -77,19 +118,26 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
       minPrice: query.minPrice,
       maxPrice: query.maxPrice ?? query.priceMax,
       ageMax: query.ageMax,
-      page: query.page,
+      page: listPage,
     });
     // Header city picker is source of truth once resolved — URL catches up via router.replace.
     if (!cityReady || !selectedCity) return base;
     if (urlCityIsAll || selectedCity.cityValue === 'all') return { ...base, city: undefined };
     return { ...base, city: selectedCity.cityValue };
-  }, [query, cityReady, selectedCity, urlCityIsAll]);
+  }, [query, cityReady, selectedCity, urlCityIsAll, listPage]);
 
   /** Effective query key from resolved filters (header city may lead URL by one frame). */
   const effectiveQueryKey = useMemo(
-    () => catalogQueryCacheKey({ ...query, city: filterValues.city }),
-    [query, filterValues.city],
+    () => catalogQueryCacheKey({ ...query, city: filterValues.city, page: listPage }),
+    [query, filterValues.city, listPage],
   );
+
+  const paginationSearchParams = useMemo(() => {
+    const next = { ...searchParamsRecord };
+    if (listPage > 1) next.page = String(listPage);
+    else delete next.page;
+    return next;
+  }, [searchParamsRecord, listPage]);
 
   useEffect(() => {
     const fromUrl = urlSearchParams.get('view');
@@ -124,12 +172,16 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
     }
 
     const controller = new AbortController();
+    // Stale-first: keep previous cards while page/filter fetch runs (avoid skeleton wipe).
     setLoading(true);
     setError(null);
 
     const params = new URLSearchParams(urlSearchParams.toString());
     if (filterValues.city) params.set('city', filterValues.city);
     else params.delete('city');
+    // pushState does not update Next searchParams — listPage is source of truth for paging.
+    if (listPage <= 1) params.delete('page');
+    else params.set('page', String(listPage));
     const qs = params.toString();
     fetch(`/api/public/events${qs ? `?${qs}` : ''}`, { signal: controller.signal })
       .then(async (response) => {
@@ -155,6 +207,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
     cityBootstrapPending,
     urlHasCity,
     filterValues.city,
+    listPage,
   ]);
 
   const setViewMode = useCallback(
@@ -174,15 +227,11 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
     if (!catalog || loading) return;
     const limit = Math.max(catalog.limit || CATALOG_PAGE_SIZE_DEFAULT, 1);
     const totalPages = Math.max(1, Math.ceil(catalog.total / limit));
-    if (query.page <= totalPages) return;
-    router.replace(
-      buildCatalogHref({
-        ...filterValues,
-        page: totalPages > 1 ? totalPages : undefined,
-      }),
-      { scroll: false },
-    );
-  }, [catalog, loading, query.page, filterValues, router]);
+    if (listPage <= totalPages) return;
+    const clamped = totalPages > 1 ? totalPages : 1;
+    setListPage(clamped);
+    writePageToUrl(clamped);
+  }, [catalog, loading, listPage, writePageToUrl]);
 
   const facets = catalog?.facets ?? {
     cities: [],
@@ -208,8 +257,9 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
       {/* Meta слева; sort + view справа (без дубля сортировки) */}
       <div className="mt-5 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 sm:mt-6">
         <p className="min-w-0 text-sm text-graphite-muted">
-          {loading ? 'Загрузка…' : null}
-          {!loading && catalog ? (
+          {loading && !catalog ? 'Загрузка…' : null}
+          {loading && catalog ? 'Обновляем… · ' : null}
+          {catalog ? (
             <>
               {pluralEvents(catalog.total)}
               {catalog.items.length < catalog.total ? ` · показано ${catalog.items.length}` : ''}
@@ -230,7 +280,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
                 type="button"
                 role="radio"
                 aria-checked={filterValues.sort === option.value}
-                disabled={loading || cityBootstrapPending}
+                disabled={(loading && !catalog) || cityBootstrapPending}
                 onClick={() => {
                   router.push(
                     buildCatalogHref({
@@ -258,7 +308,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
             <select
               id="catalog-page-size"
               value={filterValues.limit ?? CATALOG_PAGE_SIZE_DEFAULT}
-              disabled={loading || cityBootstrapPending}
+              disabled={(loading && !catalog) || cityBootstrapPending}
               onChange={(event) => {
                 router.push(
                   buildCatalogHref({
@@ -285,7 +335,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
         </div>
       </div>
 
-      {loading || (cityBootstrapPending && !catalog) ? (
+      {(loading && !catalog) || (cityBootstrapPending && !catalog) ? (
         <CatalogCardSkeletonGrid />
       ) : (
         <CatalogResults
@@ -301,15 +351,16 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
         />
       )}
 
-      {catalog && !loading ? (
+      {catalog ? (
         <CatalogPaginationLinks
           page={Math.min(
-            query.page,
+            listPage,
             Math.max(1, Math.ceil((catalog.total || 0) / Math.max(catalog.limit || CATALOG_PAGE_SIZE_DEFAULT, 1))),
           )}
           total={catalog.total}
           limit={catalog.limit}
-          searchParams={searchParamsRecord}
+          searchParams={paginationSearchParams}
+          onPageChange={goToListPage}
         />
       ) : null}
 

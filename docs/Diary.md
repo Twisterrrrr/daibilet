@@ -1,3 +1,22 @@
+## 2026-08-09 - /events `?page=` soft-nav hang (same as venues)
+
+### Наблюдения
+- Owner после FIX.VENUE-PAGE-HANG: «а в events?»
+- `/events` пагинация шла через `CatalogPaginationLinks` **без** `onPageChange` → `<Link ?page=>`.
+- App Router soft-nav → `events/(catalog)/loading.tsx` (SiteChromeSkeleton wipe) + remount `CatalogShell`.
+- Дополнительно клиент при любом refetch ставил `loading` и подменял сетку skeleton'ом (`loading || …`).
+
+### Решения
+- `CatalogShell`: local `listPage` + `popstate` + `history.pushState`; `onPageChange` → buttons (как venues/locations).
+- Fetch `/api/public/events` берёт `page` из `listPage` (pushState не обновляет Next `searchParams`).
+- Stale-first: skeleton только если `!catalog`; при page switch остаются старые карточки + «Обновляем…».
+- Server page slice API уже был (не client-slice всего каталога) — меняли только navigation/UX path.
+
+### Проблемы
+- Filter/sort по-прежнему `router.push` (могут задевать loading.tsx) — вне scope пагинации.
+
+---
+
 ## 2026-08-09 - Hub night vs catalog daytime city covers
 
 ### Наблюдения
