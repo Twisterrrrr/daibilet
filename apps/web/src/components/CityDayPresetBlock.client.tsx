@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowUpRight, ChevronDown, Route } from 'lucide-react';
+import { ArrowUpRight, Route } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 import type { CityDayRoutePreset, CityMustSeeItem } from '@/lib/cityInfo';
@@ -152,7 +152,7 @@ export function CityDayPresetBlock({
           </>
         )}
         <div
-          className={`${embedded ? '' : 'mt-4 '}flex flex-nowrap gap-2 overflow-x-auto overscroll-x-contain pb-0.5 [scrollbar-width:thin]`}
+          className={`${embedded ? '' : 'mt-4 '}flex flex-wrap gap-2`}
           data-day-preset-chips
         >
           {Array.from({ length: skeletonCount }, (_, index) => (
@@ -264,7 +264,7 @@ export function CityDayPresetBlock({
           </>
         )}
         <div
-          className={`${embedded ? '' : 'mt-4 '}flex flex-nowrap gap-2 overflow-x-auto overscroll-x-contain pb-0.5 [scrollbar-width:thin]`}
+          className={`${embedded ? '' : 'mt-4 '}flex flex-wrap gap-2`}
           role="tablist"
           aria-label="Готовые сценарии"
           data-day-preset-chips
@@ -296,11 +296,7 @@ export function CityDayPresetBlock({
                 >
                   {index + 1}
                 </span>
-                <span className="max-w-[14rem] truncate">{row.preset.title}</span>
-                <ChevronDown
-                  className={`h-3.5 w-3.5 opacity-70 transition-transform ${active ? 'rotate-180' : ''}`}
-                  aria-hidden
-                />
+                <span>{row.preset.title}</span>
               </button>
             );
           })}

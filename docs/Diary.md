@@ -1,3 +1,19 @@
+## 2026-08-09 - scenarios chips = suburbs wrap + SPB dedupe
+
+### Наблюдения
+- Owner: «почему нельзя так вывести сценарии для десктопа???» — скрин пригородов: numbered chips `flex-wrap` на всю ширину, selected dark pill.
+- Дубли в СПб scenarios: «Петергоф: парк и фонтаны» и «Царское Село / Пушкин» уже в significantSuburbs.
+
+### Решения
+- `CityDayPresetBlock`: chips как hub-suburbs — `flex flex-wrap gap-2`, без horizontal scroll / ChevronDown / truncate.
+- Удалены presets `spb-petergof` и `spb-tsarskoe-selo` из web+public `cityInfo` (остались только в пригородах).
+- DayTripCanonCard уже `w-full` без max-w-2xl (`07f55d7e`).
+
+### Проблемы
+- Нужен Deploy MSK web, чтобы live совпал с HEAD.
+
+---
+
 ## 2026-08-09 - transitTip + logistics pack (NN / SPB / Perm / KGD)
 
 ### Наблюдения

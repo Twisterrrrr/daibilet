@@ -678,7 +678,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       },
       { name: 'Вегетарианское кафе «Рада & К»', desc: 'Старейшее концептуальное вегетарианское заведение города на Гороховой улице, ставшее отправной точкой для развития эко-кухни в Петербурге.', mustSeeFilter: 'gastro',
         locationSlug: 'saint-petersburg-vegetarianskoe-kafe-rada-k',
-      },
+      }
     ],
     significantSuburbs: [
       {
@@ -1160,20 +1160,83 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       {
         id: 'spb-5',
         title: 'Литературный Петербург',
-        description: 'Литературные адреса, Фонтанка и две исторические гастрономические остановки.',
+        description:
+          'Достоевский и Пять углов утром - Рубинштейна и Фонтанка днём - Ахматова и «Бродячая собака» вечером.',
+        timingNote:
+          'Достоевский утром - Рубинштейна / Фонтанка днём - «Бродячая собака» вечером.',
         blogSlug: 'spb-vladimirskaya-gastro',
+        travelVector: 'Владимирская - Рубинштейна - Фонтанка - пл. Искусств',
+        travelVectorBlurb:
+          'Кузнечный - Владимирский - Пять углов - Рубинштейна (Довлатов) - Толстовский дом на Фонтанку - Ахматова - Итальянская к «Бродячей собаке».',
+        gastroStop: {
+          name: 'Кафе «Рубинштейн»',
+          blurb: 'Экватор маршрута - кофе и лёгкий обед перед арками Толстовского дома.',
+        },
         stops: [
-          spbPresetStop('Литературно-мемориальный музей Достоевского'),
-          spbPresetStop('Владимирский собор'),
-          spbPresetStop('Памятник Гумилеву'),
-          spbPresetStop('Пять углов'),
-          spbPresetStop('Толстовский дом'),
-          spbPresetStop('Улица Рубинштейна'),
-          spbPresetStop('Кафе «Рубинштейн»'),
-          spbPresetStop('Набережная Фонтанки'),
-          spbPresetStop('Аничков мост'),
-          spbPresetStop('Музей Фаберже'),
-          spbPresetStop('Кафе «Бродячая собака»'),
+          spbPresetStop('Литературно-мемориальный музей Достоевского', {
+            venueSlug: 'saint-petersburg-literaturno-memorialnyy-muzey-dostoevskogo',
+            latitude: 59.927611,
+            longitude: 30.350312,
+            desc: 'Кузнечный пер., 5 - старт у квартиры «Карамазовых»',
+            transitTip: 'Старт у метро «Владимирская» / «Достоевская» - Кузнечный 5',
+          }),
+          spbPresetStop('Владимирский собор', {
+            locationSlug: 'saint-petersburg-vladimirskiy-sobor',
+            desc: 'Приход Достоевского - ~2 мин от музея',
+            transitTip: '~2 мин пешком от музея к собору',
+          }),
+          spbPresetStop('Пять углов', {
+            locationSlug: 'saint-petersburg-dohodnyy-dom-ioffa-pyat-uglov',
+            desc: 'По Б. Московской; дом Иоффа - Чуковская / Ахматова',
+            transitTip: 'По Большой Московской к Пяти углам - дом Иоффа с башенкой',
+          }),
+          spbPresetStop('Улица Рубинштейна', {
+            locationSlug: 'saint-petersburg-ulitsa-rubinshteyna',
+            latitude: 59.931211,
+            longitude: 30.342914,
+            desc: 'Памятник Довлатову у дома 23 - не Гумилёв',
+            transitTip: 'На Рубинштейна к дому 23 - памятник Сергею Довлатову',
+          }),
+          spbPresetStop('Кафе «Рубинштейн»', {
+            locationSlug: 'saint-petersburg-kafe-rubinshteyn',
+            desc: 'Гастро-пауза - экватор литературного дня',
+            transitTip: 'Гастро-пауза в кафе «Рубинштейн» - кофе / лёгкий обед',
+          }),
+          spbPresetStop('Толстовский дом', {
+            locationSlug: 'saint-petersburg-tolstovskiy-dom',
+            latitude: 59.931114,
+            longitude: 30.340912,
+            desc: 'Арки Лидваля - Куприн / Булгаков; выход на Фонтанку',
+            transitTip: 'Сквозь три арки Толстовского дома - выход на набережную',
+          }),
+          spbPresetStop('Набережная Фонтанки', {
+            locationSlug: 'saint-petersburg-naberezhnaya-fontanki',
+            latitude: 59.931241,
+            longitude: 30.338914,
+            desc: 'Влево по Фонтанке к Невскому',
+            transitTip: 'Влево по Фонтанке к Невскому / Аничкову',
+          }),
+          spbPresetStop('Аничков мост', {
+            locationSlug: 'saint-petersburg-anichkov-most',
+            latitude: 59.932912,
+            longitude: 30.342931,
+            desc: 'Клодт - «Укрощение коня»',
+            transitTip: 'Через Аничков мост - скульптуры Клодта',
+          }),
+          spbPresetStop('Музей Анны Ахматовой в Фонтанном доме', {
+            venueSlug: 'saint-petersburg-muzey-anny-ahmatovoy-v-fontannom-dome',
+            latitude: 59.936122,
+            longitude: 30.347514,
+            desc: 'Шереметевский / Южный флигель - сад Фонтанного дома',
+            transitTip: 'Дальше по Фонтанке до д. 34 - арка в Южный флигель',
+          }),
+          spbPresetStop('Арт-кафе «Бродячая собака»', {
+            locationSlug: 'saint-petersburg-art-kafe-brodyachaya-sobaka',
+            latitude: 59.937142,
+            longitude: 30.331411,
+            desc: 'Итальянская 4 - финал Серебряного века',
+            transitTip: '~10 мин через Итальянские к пл. Искусств - вечерний финал',
+          }),
         ],
       },
       {
@@ -1239,120 +1302,6 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           spbPresetStop('«Кабинет» (Малая Морская) / «Полторы комнаты»', {
             desc: 'Финал у центра / Коломны - вместо далекой Гражданки',
             transitTip: 'Финал пешком/коротко у Малой Морской или Полторы комнаты - без Гражданки',
-          }),
-        ],
-      },
-      {
-        id: 'spb-petergof',
-        title: 'Петергоф: парк и фонтаны',
-        description: 'Нижний парк, Большой дворец, каскады, Монплезир и Александрия - полный день.',
-        timingNote: 'К 9:30-10:00 будьте у входа в Нижний парк - на 8 точек нужен ранний старт, иначе не успеть дворцы и Александрию.',
-        travelVector: 'Юго-Западный и Морской вектор',
-        stationHub: 'Балтийский вокзал',
-        logisticsExit: 'Станция Новый Петергоф',
-        travelVectorBlurb:
-          'Направление вдоль южного побережья Финского залива. Доступно на электричках от метро «Балтийская» или на скоростных водных судах «Метеор» от причалов Эрмитажа.',
-        gastroStop: {
-          name: 'Кафе-кондитерская «Оранжерея»',
-          blurb: 'Десерты ручной работы и кофе с видом на императорские конюшни.',
-        },
-        stops: [
-          spbPresetStop('Нижний парк Петергофа', {
-            dayRouteId: 'spb-nizhniy-park-petergofa',
-            locationSlug: 'saint-petersburg-nizhniy-park-petergofa',
-            latitude: 59.885112,
-            longitude: 29.908214,
-          }),
-          spbPresetStop('Большой каскад', {
-            dayRouteId: 'spb-bolshoy-kaskad',
-            latitude: 59.88935,
-            longitude: 29.90855,
-          }),
-          spbPresetStop('Большой дворец Петергофа', {
-            dayRouteId: 'spb-bolshoy-dvorets-petergofa',
-            locationSlug: 'saint-petersburg-bolshoy-dvorets-petergofa',
-            latitude: 59.89055,
-            longitude: 29.90785,
-          }),
-          spbPresetStop('Верхний сад', {
-            dayRouteId: 'spb-verhniy-sad-petergofa',
-            latitude: 59.89185,
-            longitude: 29.90845,
-          }),
-          spbPresetStop('Дворец Монплезир', {
-            dayRouteId: 'spb-monplezir',
-            latitude: 59.8879,
-            longitude: 29.9184,
-          }),
-          spbPresetStop('Павильон Марли', {
-            dayRouteId: 'spb-pavilon-marli',
-            latitude: 59.88685,
-            longitude: 29.89655,
-          }),
-          spbPresetStop('Парк Александрия', {
-            dayRouteId: 'spb-park-aleksandriya',
-            latitude: 59.8808,
-            longitude: 29.9212,
-          }),
-          spbPresetStop('Готическая капелла', {
-            dayRouteId: 'spb-goticheskaya-kapella',
-            latitude: 59.8786,
-            longitude: 29.9261,
-          }),
-        ],
-      },
-      {
-        id: 'spb-tsarskoe-selo',
-        title: 'Царское Село / Пушкин',
-        description: 'Екатерининский дворец и парк, лицей, Камеронова галерея и Александровский дворец.',
-        timingNote: 'Выезжайте к 8:30-9:00 с Витебского - на 8 точек дворцов и парков нужен весь день без опозданий.',
-        travelVector: 'Южный вектор',
-        stationHub: 'Витебский вокзал / метро «Пушкинская»',
-        logisticsExit: 'Станция Царское Село',
-        travelVectorBlurb:
-          'Базовый узел для классических дворцово-пейзажных маршрутов. Электрички «Ласточки» и стандартные пригородные поезда отходят от Витебского вокзала у метро «Пушкинская».',
-        stops: [
-          spbPresetStop('Екатерининский дворец', {
-            dayRouteId: 'spb-ekaterininskiy-dvorets',
-            locationSlug: 'saint-petersburg-ekaterininskiy-dvorets',
-            latitude: 59.715911,
-            longitude: 30.395812,
-          }),
-          spbPresetStop('Екатерининский парк', {
-            dayRouteId: 'spb-ekaterininskiy-park',
-            latitude: 59.71455,
-            longitude: 30.39685,
-          }),
-          spbPresetStop('Царскосельский лицей', {
-            dayRouteId: 'spb-tsarskoselskiy-litsey',
-            locationSlug: 'saint-petersburg-tsarskoselskiy-litsey',
-            latitude: 59.716912,
-            longitude: 30.397114,
-          }),
-          spbPresetStop('Камеронова галерея', {
-            dayRouteId: 'spb-kameronova-galereya',
-            latitude: 59.71415,
-            longitude: 30.39455,
-          }),
-          spbPresetStop('Александровский дворец', {
-            dayRouteId: 'spb-aleksandrovskiy-dvorets',
-            latitude: 59.71855,
-            longitude: 30.39135,
-          }),
-          spbPresetStop('Китайская деревня', {
-            dayRouteId: 'spb-kitayskaya-derevnya',
-            latitude: 59.71985,
-            longitude: 30.38565,
-          }),
-          spbPresetStop('Павильон «Эрмитаж»', {
-            dayRouteId: 'spb-pavilon-ermitazh',
-            latitude: 59.71345,
-            longitude: 30.39865,
-          }),
-          spbPresetStop('Ратная палата', {
-            dayRouteId: 'spb-ratnaya-palata',
-            latitude: 59.71235,
-            longitude: 30.40585,
           }),
         ],
       },

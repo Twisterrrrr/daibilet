@@ -678,7 +678,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       },
       { name: 'Вегетарианское кафе «Рада & К»', desc: 'Старейшее концептуальное вегетарианское заведение города на Гороховой улице, ставшее отправной точкой для развития эко-кухни в Петербурге.', mustSeeFilter: 'gastro',
         locationSlug: 'saint-petersburg-vegetarianskoe-kafe-rada-k',
-      },
+      }
     ],
     significantSuburbs: [
       {
@@ -1239,120 +1239,6 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           spbPresetStop('«Кабинет» (Малая Морская) / «Полторы комнаты»', {
             desc: 'Финал у центра / Коломны - вместо далекой Гражданки',
             transitTip: 'Финал пешком/коротко у Малой Морской или Полторы комнаты - без Гражданки',
-          }),
-        ],
-      },
-      {
-        id: 'spb-petergof',
-        title: 'Петергоф: парк и фонтаны',
-        description: 'Нижний парк, Большой дворец, каскады, Монплезир и Александрия - полный день.',
-        timingNote: 'К 9:30-10:00 будьте у входа в Нижний парк - на 8 точек нужен ранний старт, иначе не успеть дворцы и Александрию.',
-        travelVector: 'Юго-Западный и Морской вектор',
-        stationHub: 'Балтийский вокзал',
-        logisticsExit: 'Станция Новый Петергоф',
-        travelVectorBlurb:
-          'Направление вдоль южного побережья Финского залива. Доступно на электричках от метро «Балтийская» или на скоростных водных судах «Метеор» от причалов Эрмитажа.',
-        gastroStop: {
-          name: 'Кафе-кондитерская «Оранжерея»',
-          blurb: 'Десерты ручной работы и кофе с видом на императорские конюшни.',
-        },
-        stops: [
-          spbPresetStop('Нижний парк Петергофа', {
-            dayRouteId: 'spb-nizhniy-park-petergofa',
-            locationSlug: 'saint-petersburg-nizhniy-park-petergofa',
-            latitude: 59.885112,
-            longitude: 29.908214,
-          }),
-          spbPresetStop('Большой каскад', {
-            dayRouteId: 'spb-bolshoy-kaskad',
-            latitude: 59.88935,
-            longitude: 29.90855,
-          }),
-          spbPresetStop('Большой дворец Петергофа', {
-            dayRouteId: 'spb-bolshoy-dvorets-petergofa',
-            locationSlug: 'saint-petersburg-bolshoy-dvorets-petergofa',
-            latitude: 59.89055,
-            longitude: 29.90785,
-          }),
-          spbPresetStop('Верхний сад', {
-            dayRouteId: 'spb-verhniy-sad-petergofa',
-            latitude: 59.89185,
-            longitude: 29.90845,
-          }),
-          spbPresetStop('Дворец Монплезир', {
-            dayRouteId: 'spb-monplezir',
-            latitude: 59.8879,
-            longitude: 29.9184,
-          }),
-          spbPresetStop('Павильон Марли', {
-            dayRouteId: 'spb-pavilon-marli',
-            latitude: 59.88685,
-            longitude: 29.89655,
-          }),
-          spbPresetStop('Парк Александрия', {
-            dayRouteId: 'spb-park-aleksandriya',
-            latitude: 59.8808,
-            longitude: 29.9212,
-          }),
-          spbPresetStop('Готическая капелла', {
-            dayRouteId: 'spb-goticheskaya-kapella',
-            latitude: 59.8786,
-            longitude: 29.9261,
-          }),
-        ],
-      },
-      {
-        id: 'spb-tsarskoe-selo',
-        title: 'Царское Село / Пушкин',
-        description: 'Екатерининский дворец и парк, лицей, Камеронова галерея и Александровский дворец.',
-        timingNote: 'Выезжайте к 8:30-9:00 с Витебского - на 8 точек дворцов и парков нужен весь день без опозданий.',
-        travelVector: 'Южный вектор',
-        stationHub: 'Витебский вокзал / метро «Пушкинская»',
-        logisticsExit: 'Станция Царское Село',
-        travelVectorBlurb:
-          'Базовый узел для классических дворцово-пейзажных маршрутов. Электрички «Ласточки» и стандартные пригородные поезда отходят от Витебского вокзала у метро «Пушкинская».',
-        stops: [
-          spbPresetStop('Екатерининский дворец', {
-            dayRouteId: 'spb-ekaterininskiy-dvorets',
-            locationSlug: 'saint-petersburg-ekaterininskiy-dvorets',
-            latitude: 59.715911,
-            longitude: 30.395812,
-          }),
-          spbPresetStop('Екатерининский парк', {
-            dayRouteId: 'spb-ekaterininskiy-park',
-            latitude: 59.71455,
-            longitude: 30.39685,
-          }),
-          spbPresetStop('Царскосельский лицей', {
-            dayRouteId: 'spb-tsarskoselskiy-litsey',
-            locationSlug: 'saint-petersburg-tsarskoselskiy-litsey',
-            latitude: 59.716912,
-            longitude: 30.397114,
-          }),
-          spbPresetStop('Камеронова галерея', {
-            dayRouteId: 'spb-kameronova-galereya',
-            latitude: 59.71415,
-            longitude: 30.39455,
-          }),
-          spbPresetStop('Александровский дворец', {
-            dayRouteId: 'spb-aleksandrovskiy-dvorets',
-            latitude: 59.71855,
-            longitude: 30.39135,
-          }),
-          spbPresetStop('Китайская деревня', {
-            dayRouteId: 'spb-kitayskaya-derevnya',
-            latitude: 59.71985,
-            longitude: 30.38565,
-          }),
-          spbPresetStop('Павильон «Эрмитаж»', {
-            dayRouteId: 'spb-pavilon-ermitazh',
-            latitude: 59.71345,
-            longitude: 30.39865,
-          }),
-          spbPresetStop('Ратная палата', {
-            dayRouteId: 'spb-ratnaya-palata',
-            latitude: 59.71235,
-            longitude: 30.40585,
           }),
         ],
       },
