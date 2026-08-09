@@ -11,7 +11,7 @@
 - Boat / purchase / ticket handoff не трогали.
 
 ### Проблемы
-- Нет.
+- Ship: `cde2a697` · Deploy MSK web **31301074864** · **BUILD_ID=`lwjCDA2vbaW1gDR3CzMg2`**; SPB hub HTML содержит «Петергоф: парк».
 
 ---
 
