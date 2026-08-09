@@ -1,4 +1,21 @@
+## 2026-08-09 - bulk fix canonicalPath locations↔venues mismatch
+
+### Наблюдения
+- После Яани Кирик: **796** venue с `canonicalPath` не из того семейства (kind institution → `/locations`, или наоборот).
+- Из них PUBLISHED **11**, CANDIDATE **728**, NONE **57**.
+
+### Решения
+- MSK SQL: для всех non-HIDDEN поменять префикс `/locations`↔`/venues` по `INSTITUTION_VENUE_KINDS` (slug хвост сохранён). Applied **796**.
+- CANDIDATE тоже правим: иначе при publish снова мина; код redirect-loop уже защищает, но SEO/canonical остаются кривыми.
+- API restart после apply; dry-run повторно → **0**.
+
+### Проблемы
+- `resolvePublicVenueKindFromRow` может ещё сдвигать public type vs DB kind - отдельный аудит по DTO при необходимости.
+
+---
+
 ## 2026-08-09 - location PDP redirect loop (Yaani Kirik)
+
 
 ### Наблюдения
 - Owner: `https://daibilet.ru/locations/cerkov-svyatogo-apostola-ioanna-yaani-kirik-691e1ef…` «лежит сайт».
