@@ -306,7 +306,7 @@ export function DayRouteBoatWizard({
   const pierList = nearbyPiers.length ? nearbyPiers : piers.slice(0, 12);
 
   return (
-    <div className="mt-4" data-day-boat-wizard>
+    <div className="mt-4 px-4 sm:px-5" data-day-boat-wizard>
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
           <p className="text-sm font-semibold text-slate-900">Теплоход по Неве и каналам</p>
