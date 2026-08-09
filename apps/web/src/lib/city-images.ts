@@ -178,6 +178,69 @@ const CITY_DAYTIME_PREVIEW_SLUGS = new Set([
   'sortavala',
 ]);
 
+/**
+ * Night hub heroes restored under `/images/cities/night/` (git history before night→day overwrite).
+ * Catalog/home keep daytime; hubs without a night asset fall back to day.
+ */
+const CITY_NIGHT_HUB_SLUGS = new Set([
+  'astrahan',
+  'barnaul',
+  'belgorod',
+  'bryansk',
+  'cheboksary',
+  'chelyabinsk',
+  'chita',
+  'ekaterinburg',
+  'habarovsk',
+  'irkutsk',
+  'ivanovo',
+  'izhevsk',
+  'kaliningrad',
+  'kazan',
+  'kemerovo',
+  'kirov-kirovskaya-oblast',
+  'krasnodar',
+  'krasnoyarsk',
+  'kurgan',
+  'kursk',
+  'lipeck',
+  'moscow',
+  'nizhny-novgorod',
+  'novosibirsk',
+  'omsk',
+  'orel',
+  'orenburg',
+  'penza',
+  'perm',
+  'rostov-on-don',
+  'ryazan',
+  'saint-petersburg',
+  'samara',
+  'saransk',
+  'saratov',
+  'smolensk',
+  'sochi',
+  'sortavala',
+  'stavropol',
+  'suzdal',
+  'tambov',
+  'tomsk',
+  'tula',
+  'tver',
+  'tyumen',
+  'ufa',
+  'ulan-ude',
+  'ulyanovsk',
+  'veliky-novgorod',
+  'vladimir',
+  'vladivostok',
+  'volgograd',
+  'vologda',
+  'voronezh',
+  'yaroslavl',
+  'yoshkar-ola',
+]);
+
 function isUsableRemoteImage(url: string): boolean {
   return /^https?:\/\//i.test(url) && !url.startsWith('/images/cities/');
 }
@@ -201,11 +264,22 @@ export function cityHasDaytimePreview(city: CityImageSource): boolean {
   return CITY_DAYTIME_PREVIEW_SLUGS.has(cityCardImageSlug(city));
 }
 
-/** Distinct daytime previews for `/cities` featured tiles. */
+export function cityHasNightHubImage(city: CityImageSource): boolean {
+  return CITY_NIGHT_HUB_SLUGS.has(cityCardImageSlug(city));
+}
+
+/** Distinct daytime previews for `/cities` featured tiles + home destinations. */
 export function resolveCityTopPreviewImage(city: CityImageSource): string | null {
   const imageSlug = cityCardImageSlug(city);
   if (!CITY_DAYTIME_PREVIEW_SLUGS.has(imageSlug)) return null;
   return `/images/cities/top/${imageSlug}.jpg`;
+}
+
+/** Night hero for city hub (`/cities/[slug]`). */
+export function resolveCityNightImage(city: CityImageSource): string | null {
+  const imageSlug = cityCardImageSlug(city);
+  if (!CITY_NIGHT_HUB_SLUGS.has(imageSlug)) return null;
+  return `/images/cities/night/${imageSlug}.png`;
 }
 
 export function resolveCityCardImage(
@@ -218,7 +292,7 @@ export function resolveCityCardImage(
   const fromApi = city.heroImageUrl?.trim();
   if (fromApi && isUsableRemoteImage(fromApi)) return fromApi;
 
-  // Prefer daytime JPG over legacy PNG so catalog never keeps night covers primary.
+  // Prefer daytime JPG over legacy PNG so catalog/home never keep night covers primary.
   if (daytime) return daytime;
 
   const imageSlug = cityCardImageSlug(city);
@@ -226,7 +300,18 @@ export function resolveCityCardImage(
   return `/images/cities/${imageSlug}.png`;
 }
 
-/** Hero / full-width city image (same sources as card). */
+/** Hero / OG for city hub: night when restored, else daytime, else remote/root. */
 export function resolveCityImage(city: CityImageSource): string | null {
-  return resolveCityCardImage(city);
+  const night = resolveCityNightImage(city);
+  if (night) return night;
+
+  const daytime = resolveCityTopPreviewImage(city);
+  if (daytime) return daytime;
+
+  const fromApi = city.heroImageUrl?.trim();
+  if (fromApi && isUsableRemoteImage(fromApi)) return fromApi;
+
+  const imageSlug = cityCardImageSlug(city);
+  if (!CITY_CARD_IMAGE_SLUGS.has(imageSlug)) return null;
+  return `/images/cities/${imageSlug}.png`;
 }

@@ -1,3 +1,19 @@
+## 2026-08-09 - Hub night vs catalog daytime city covers
+
+### Наблюдения
+- Owner: night→day замена должна была затронуть только `/cities` catalog + главную, не hero хаба `/cities/[slug]`.
+- `resolveCityImage` (hub) звал тот же путь, что catalog, и после overwrite night PNG в `cities/{slug}.png` хаб тоже стал дневным.
+
+### Решения
+- Восстановили 56 night covers из git (`31fe061a` / `f780ac4c^`) в `apps/public/public/images/cities/night/{slug}.png`.
+- `resolveCityCardImage` — daytime (`cities/top/*.jpg`); `resolveCityImage` — night если есть, иначе day fallback.
+- Города без исторической ночи (абакан и др. day-only batch) остаются дневными в хабе.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-09 - Hub: сценарии как my-day + афиша rail
 
 ### Наблюдения
