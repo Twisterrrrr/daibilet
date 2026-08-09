@@ -9,7 +9,7 @@ export type DayTripCanonSight = {
   name: string;
   desc?: string;
   href?: string | null;
-  /** Совет по перемещению к этой точке (серая строка над пунктом). */
+  /** Совет по перемещению к этой точке (серая строка между пунктами). */
   transitTip?: string;
 };
 
@@ -71,7 +71,14 @@ function SightLabel({
   );
 }
 
-/** Suburb day-trip card: logistics / gastro / sights / CTA. Full section width. */
+/** Fixed number column wide enough for «8.» / «10.» with tabular-nums. */
+const NUM_COL = 'w-6 shrink-0 text-left tabular-nums';
+
+/**
+ * Suburb day-trip card.
+ * Layout: [badge] [content column: title → meta → sights → CTA] [mirror spacer]
+ * so title / «Логистика» / «Что посмотреть» / list / CTA share one left edge.
+ */
 export function DayTripCanonCard({
   index,
   total,
@@ -102,6 +109,9 @@ export function DayTripCanonCard({
   const badgeClass = editorial
     ? 'bg-zinc-100 text-zinc-800'
     : 'bg-primary-50 text-primary-700';
+  const panelClass = editorial
+    ? 'rounded-xl border border-zinc-100 bg-zinc-50/60'
+    : 'rounded-xl border border-slate-100 bg-slate-50/70';
 
   const hasLogistics = Boolean(logisticsExit || logisticsText || logisticsExtra);
   const hasGastro = Boolean(gastro?.name);
@@ -129,13 +139,14 @@ export function DayTripCanonCard({
       data-day-trip-canon="1"
       {...dataProps}
     >
-      {/* Badge | content column — body aligns with title, not under badge. */}
       <div className="flex items-start gap-3">
         <span
-          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold tabular-nums ${badgeClass}`}
+          className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold tabular-nums ${badgeClass}`}
+          data-day-trip-badge
         >
           {index + 1}
         </span>
+
         <div className="min-w-0 flex-1" data-day-trip-content>
           <header>
             <h3
@@ -154,48 +165,47 @@ export function DayTripCanonCard({
 
           {showMetaGrid ? (
             <div
-              className={`mt-5 grid gap-3 ${
+              className={`mt-5 grid gap-4 ${
                 hasLogistics && hasGastro ? 'sm:grid-cols-2' : 'grid-cols-1'
               }`}
               data-day-trip-meta
             >
               {hasLogistics ? (
-                <section
-                  className={`rounded-xl border px-4 py-3.5 sm:px-4 sm:py-4 ${
-                    editorial ? 'border-zinc-100 bg-zinc-50/60' : 'border-slate-100 bg-slate-50/70'
-                  }`}
-                  data-day-trip-logistics
-                >
+                <section data-day-trip-logistics>
+                  {/* Heading flush with title (same content-column left edge). */}
                   <h4 className={`text-sm font-semibold ${inkClass}`}>Логистика</h4>
-                  {logisticsExit ? (
-                    <p className={`mt-2 text-sm leading-snug ${softClass}`} data-day-trip-exit>
-                      <span className={`font-semibold ${inkClass}`}>Где выходить</span>
-                      <span className={mutedClass}>: {logisticsExit}</span>
-                    </p>
-                  ) : null}
-                  {logisticsText ? (
-                    <p
-                      className={`${logisticsExit ? 'mt-1.5' : 'mt-2'} text-sm leading-relaxed ${mutedClass}`}
-                    >
-                      {logisticsText}
-                    </p>
-                  ) : null}
-                  {logisticsExtra ? (
-                    <p className={`mt-2 text-sm leading-relaxed ${mutedClass}`}>{logisticsExtra}</p>
-                  ) : null}
+                  <div className={`mt-2 ${panelClass} px-3.5 py-3 sm:px-4 sm:py-3.5`}>
+                    {logisticsExit ? (
+                      <p className={`text-sm leading-snug ${softClass}`} data-day-trip-exit>
+                        <span className={`font-semibold ${inkClass}`}>Где выходить</span>
+                        <span className={mutedClass}>: {logisticsExit}</span>
+                      </p>
+                    ) : null}
+                    {logisticsText ? (
+                      <p
+                        className={`${logisticsExit ? 'mt-1.5' : ''} text-sm leading-relaxed ${mutedClass}`}
+                      >
+                        {logisticsText}
+                      </p>
+                    ) : null}
+                    {logisticsExtra ? (
+                      <p className={`mt-1.5 text-sm leading-relaxed ${mutedClass}`}>
+                        {logisticsExtra}
+                      </p>
+                    ) : null}
+                  </div>
                 </section>
               ) : null}
 
               {hasGastro && gastro ? (
-                <section
-                  className="rounded-xl border border-amber-100 bg-amber-50/80 px-4 py-3.5 sm:px-4 sm:py-4"
-                  data-day-trip-gastro
-                >
+                <section data-day-trip-gastro>
                   <h4 className={`text-sm font-semibold ${inkClass}`}>Гастро-остановка</h4>
-                  <p className={`mt-2 text-sm font-semibold leading-snug ${inkClass}`}>{gastro.name}</p>
-                  {gastro.blurb ? (
-                    <p className={`mt-1 text-sm leading-relaxed ${softClass}`}>{gastro.blurb}</p>
-                  ) : null}
+                  <div className="mt-2 rounded-xl border border-amber-100 bg-amber-50/80 px-3.5 py-3 sm:px-4 sm:py-3.5">
+                    <p className={`text-sm font-semibold leading-snug ${inkClass}`}>{gastro.name}</p>
+                    {gastro.blurb ? (
+                      <p className={`mt-1 text-sm leading-relaxed ${softClass}`}>{gastro.blurb}</p>
+                    ) : null}
+                  </div>
                 </section>
               ) : null}
             </div>
@@ -204,14 +214,15 @@ export function DayTripCanonCard({
           {nested.length ? (
             <section className={`mt-5 border-t pt-4 ${borderSoft}`} data-day-trip-sights>
               <h4 className={`text-sm font-semibold ${inkClass}`}>Что посмотреть</h4>
-              <ol className="mt-3 list-none space-y-2 p-0" data-day-trip-places>
+              <ol className="mt-3 list-none space-y-2.5 p-0" data-day-trip-places>
                 {nested.map((poi, poiIndex) => {
                   const tip = String(poi.transitTip || '').trim();
                   return (
                     <li key={`${poi.name}:${poiIndex}`} className="list-none" data-day-trip-place>
+                      {/* Tip BETWEEN points: above destination row (1→2→…). */}
                       {tip ? (
-                        <div className="mb-1 flex items-start gap-2">
-                          <span className="w-5 shrink-0" aria-hidden />
+                        <div className="mb-1 flex items-start gap-3">
+                          <span className={NUM_COL} aria-hidden />
                           <p
                             className={`min-w-0 flex-1 text-[12px] leading-snug ${mutedClass}`}
                             data-day-trip-transit-tip
@@ -220,11 +231,8 @@ export function DayTripCanonCard({
                           </p>
                         </div>
                       ) : null}
-                      <div className="flex items-start gap-2 text-sm leading-snug">
-                        <span
-                          className={`w-5 shrink-0 text-right tabular-nums ${numClass}`}
-                          data-day-trip-place-num
-                        >
+                      <div className="flex items-start gap-3 text-sm leading-snug">
+                        <span className={`${NUM_COL} ${numClass}`} data-day-trip-place-num>
                           {poiIndex + 1}.
                         </span>
                         <span className={`min-w-0 flex-1 ${poiTextClass}`}>
@@ -249,6 +257,9 @@ export function DayTripCanonCard({
             </div>
           ) : null}
         </div>
+
+        {/* Mirror badge width so right inset ≈ left (badge + gap). */}
+        <span className="hidden w-9 shrink-0 sm:block" aria-hidden data-day-trip-mirror />
       </div>
     </article>
   );

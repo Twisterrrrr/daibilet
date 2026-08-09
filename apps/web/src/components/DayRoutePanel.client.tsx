@@ -3156,6 +3156,11 @@ function DayRoutePanelInner() {
                       segmentToNext={
                         globalIndex >= 0 ? segmentMeters[globalIndex] ?? null : null
                       }
+                      nextTransitTip={
+                        globalIndex >= 0
+                          ? String(route.venues[globalIndex + 1]?.transitTip || '').trim() || null
+                          : String(planStops[index + 1]?.transitTip || '').trim() || null
+                      }
                       travelMode={travelMode}
                       focused={focusedStopId === venue.id}
                       onMoveUp={() => setRoute(moveDayRoutePlanVenue(venue.id, -1))}
@@ -4378,6 +4383,7 @@ function DayRouteVenueCard({
   hasCoords,
   mapsUrl = null,
   segmentToNext,
+  nextTransitTip = null,
   travelMode,
   focused = false,
   onMoveUp,
@@ -4397,6 +4403,8 @@ function DayRouteVenueCard({
   hasCoords: boolean;
   mapsUrl?: string | null;
   segmentToNext: number | null;
+  /** Editorial tip for the next stop (shown between cards). */
+  nextTransitTip?: string | null;
   travelMode: DayRouteTravelMode;
   focused?: boolean;
   onMoveUp: () => void;
@@ -4464,7 +4472,12 @@ function DayRouteVenueCard({
     !hasCoords ? 'Нет координат' : null,
   ].filter(Boolean) as string[];
   const metaLine = metaParts.join(' · ');
-  const segmentLine = segmentHint ? `далее ~ ${segmentHint}` : '';
+  const editorialNext = String(nextTransitTip || '').trim();
+  const segmentLine = editorialNext
+    ? editorialNext
+    : segmentHint
+      ? `далее ~ ${segmentHint}`
+      : '';
 
   const titleClass = 'font-semibold leading-tight text-slate-900';
   const titleNode = href ? (
@@ -4843,6 +4856,15 @@ function DayRouteVenueCard({
               >
                 {placeLine || 'Нет координат'}
                 {placeLine && !hasCoords ? ' · Нет координат' : ''}
+              </p>
+            ) : null}
+            {segmentLine ? (
+              <p
+                className="mt-0.5 mb-0 line-clamp-2 text-[11px] leading-snug text-slate-500"
+                data-day-segment-hint="1"
+                data-day-transit-tip={editorialNext ? '1' : undefined}
+              >
+                {segmentLine}
               </p>
             ) : null}
 

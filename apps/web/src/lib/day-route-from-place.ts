@@ -211,6 +211,7 @@ export function dayRouteItemFromMustSee(
 
   // Hub often stores dark /venues/generated stubs; curated /images/venues/{city}/ wins.
   const imageUrl = resolveVenueHeroImage(slug, matched?.heroImageUrl);
+  const transitTip = String(place.transitTip || '').trim() || null;
   return {
     id,
     slug,
@@ -222,6 +223,7 @@ export function dayRouteItemFromMustSee(
     href,
     imageUrl,
     address: String(matched?.address || place.address || '').trim() || null,
+    transitTip,
     ...coordsFromPlace(place, matched, slug),
   };
 }

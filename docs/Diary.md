@@ -1,3 +1,18 @@
+## 2026-08-09 - DayTripCanonCard align + transitTip visible
+
+### Наблюдения
+- Owner: Петергоф - logistics/list глубже title; цифры съехали; tips не видно; scenarios numbers.
+
+### Решения
+- Canon: `[badge][content][mirror spacer]`; headings flush с title; meta body в padded panel под heading.
+- List: `w-6 tabular-nums` слева; tips между пунктами; Петергоф + KGD classic tips заполнены.
+- Scenarios light: numbered stops + tips, CTA под списком; day-route хранит `transitTip`, between-card tip в my-day.
+
+### Проблемы
+- Deploy MSK web ASAP.
+
+---
+
 ## 2026-08-09 - DayTripCanonCard title-column align
 
 ### Наблюдения

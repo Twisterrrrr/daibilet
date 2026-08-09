@@ -114,6 +114,8 @@ export type DayRouteVenueItem = {
   planDone?: boolean;
   /** Added from a significant suburb, so route cards can show compact context. */
   isSuburb?: boolean;
+  /** Editorial how-to-get tip (cityInfo transitTip) - shown between stops in my-day. */
+  transitTip?: string | null;
   /** Lowest known ticket price (rub) from matches / catalog - for «Купить билет от X». */
   priceFromRub?: number | null;
   /**
