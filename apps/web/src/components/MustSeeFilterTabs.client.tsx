@@ -15,7 +15,9 @@ type Props = {
 /**
  * Must-see category chips.
  * Mobile: exactly 2 rows + horizontal scroll (grid-flow-col).
- * sm+: classic wrap.
+ * Chips stay content-width (no equal-column stretch) - short labels like «Музеи 14»
+ * must not inherit the width of a longer neighbor in the same grid column.
+ * sm+: classic wrap, also fit-content.
  */
 export function MustSeeFilterTabs({
   tabs,
@@ -32,7 +34,7 @@ export function MustSeeFilterTabs({
       data-must-see-filters-scroll
     >
       <div
-        className="grid w-max grid-flow-col grid-rows-2 gap-2 sm:flex sm:w-auto sm:flex-wrap"
+        className="grid w-max auto-cols-max grid-flow-col grid-rows-2 items-start justify-items-start gap-2 sm:flex sm:w-auto sm:flex-wrap"
         role="tablist"
         aria-label="Фильтр главных мест"
         data-must-see-filters
@@ -49,7 +51,7 @@ export function MustSeeFilterTabs({
               data-must-see-filter={tab.id}
               data-active={active ? '1' : '0'}
               onClick={() => onChange(tab.id)}
-              className={`inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+              className={`inline-flex w-auto min-h-9 shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
                 active
                   ? editorial
                     ? 'border-zinc-900 bg-zinc-900 text-white'
