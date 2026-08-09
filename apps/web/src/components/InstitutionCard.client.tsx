@@ -50,11 +50,13 @@ export function InstitutionCard({ venue, href }: { venue: InstitutionCardVenue; 
   const upcoming = venue.upcomingTitles?.filter(Boolean).slice(0, 3) || [];
   const showMiniAfisha = upcoming.length > 0;
   const stopCount = Number(venue.stopEventCount ?? 0);
+  const ownEvents = Number(venue.events || 0);
+  // Prefer STOP tours when they dominate (must-see museums with sparse own afisha).
   const stopOrEventsLabel =
-    Number(venue.events || 0) > 0
-      ? pluralEvents(Number(venue.events))
-      : stopCount > 0
-        ? `${stopCount} в маршрутах`
+    stopCount > 0 && stopCount >= ownEvents
+      ? `${stopCount} в маршрутах`
+      : ownEvents > 0
+        ? pluralEvents(ownEvents)
         : null;
   const dayRouteVenue = {
     id: venue.id,
