@@ -11,7 +11,8 @@
 
 ### Проблемы
 - JPG без sharp compress в agent env - тяжёлые файлы; при необходимости отдельный compress-pass.
-- Deploy MSK web (+ API restart для pier slot hydrate `2f0b8099`) по owner «выкатывай всё».
+- ~55 Moscow must-see sharp-stubs (~15–25KB) - quality debt, не empty.
+- Deploy: web **31342186797** tip `88708eac` BUILD_ID=`RWJuTMEW-R707-yh7VQwJ`; API restart MSK 23:34Z (pier `2f0b8099`).
 
 ---
 
