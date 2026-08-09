@@ -1,3 +1,18 @@
+## 2026-08-09 - DayTripCanonCard title-column align
+
+### Наблюдения
+- Owner «проблемы со вкусом»: Царское — body не по левому краю title; цифры списка не колонкой.
+
+### Решения
+- Контент (логистика / sights / CTA) в колонке title справа от badge (`flex gap-3` + `flex-1`).
+- Список: `w-5 shrink-0 text-right tabular-nums` + текст справа; transitTip в той же сетке.
+- Meta-боксы: симметричный `px-4`.
+
+### Проблемы
+- Deploy MSK web ASAP.
+
+---
+
 ## 2026-08-09 - scenarios chips = suburbs wrap + SPB dedupe
 
 ### Наблюдения
