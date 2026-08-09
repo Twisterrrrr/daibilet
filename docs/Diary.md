@@ -1,3 +1,20 @@
+## 2026-08-09 - TC STAND_BY reconcile (sales stopped vs visible cards)
+
+### Наблюдения
+- Owner: TC виджет «Продажи временно остановлены организатором», а карточка у нас ещё видна.
+- Корневая причина: `tc-full-sync` тянул только `status=PUBLIC`. Событие, ушедшее в `STAND_BY` на TC, больше не попадало в fetch → в БД оставался stale `sourceStatus` (PUBLIC/active/open_date).
+
+### Решения
+- `fetchNormalizedCatalog`: `statuses[]` - merge PUBLIC + STAND_BY.
+- `tc-full-sync` пишет оба статуса в `catalog.public.json`.
+- `npm run tc:reconcile-standby` - быстрый upsert только STAND_BY (skipMissing).
+- Public filter по `STAND_BY` уже был (`abb583f6`); после reconcile карточки пропадают без открытия TC.
+
+### Проблемы
+- Полный PUBLIC+STAND_BY nightly дольше по gRPC; reconcile-standby - оперативный патч без full sync.
+
+---
+
 ## 2026-08-09 - Location previews: хвост 217 (не «0»)
 
 ### Наблюдения

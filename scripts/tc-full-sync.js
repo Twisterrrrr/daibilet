@@ -18,8 +18,10 @@ async function main() {
   const startedAt = Date.now();
   fs.mkdirSync(outDir, { recursive: true });
 
-  const { catalog, endpoint, dictionaries } = await fetchNormalizedCatalog({
-    status: "PUBLIC",
+  const { catalog, endpoint, dictionaries, byStatus } = await fetchNormalizedCatalog({
+    // PUBLIC alone leaves stale cards when TC moves an event to STAND_BY
+    // (sales stopped) - we never re-fetched those ids. Import both.
+    statuses: ["PUBLIC", "STAND_BY"],
     progressEvery: 1000,
   });
 
@@ -29,6 +31,7 @@ async function main() {
     startedAt,
     catalog,
     dictionaries,
+    byStatus,
   });
 
   fs.writeFileSync(catalogPath, JSON.stringify({ events: catalog }, null, 2));
@@ -39,7 +42,7 @@ async function main() {
   console.log(`Saved summary to ${summaryPath}`);
 }
 
-function buildSummary({ endpoint, startedAt, catalog, dictionaries }) {
+function buildSummary({ endpoint, startedAt, catalog, dictionaries, byStatus }) {
   const venues = groupBy(catalog, (event) => event.venue.id || "unknown");
   const venueStats = Object.entries(venues)
     .map(([id, events]) => {
@@ -77,6 +80,10 @@ function buildSummary({ endpoint, startedAt, catalog, dictionaries }) {
     }))
     .sort((a, b) => b.events - a.events || a.type.localeCompare(b.type));
 
+  const statusStats = Object.entries(countBy(catalog, (event) => String(event.status || "unknown").toUpperCase()))
+    .map(([status, events]) => ({ status, events }))
+    .sort((a, b) => b.events - a.events || a.status.localeCompare(b.status));
+
   return {
     endpoint,
     requestedAt: new Date().toISOString(),
@@ -88,7 +95,9 @@ function buildSummary({ endpoint, startedAt, catalog, dictionaries }) {
       cities: dictionaries.cities.length,
       tags: dictionaries.tags.length,
       metaEvents: dictionaries.metaEvents.length,
+      byFetchStatus: byStatus || null,
     },
+    statusStats,
     categoryStats,
     cityStats,
     publicCityPages: cityStats.filter((city) => city.events >= 2),
@@ -103,6 +112,7 @@ function buildSummary({ endpoint, startedAt, catalog, dictionaries }) {
 function printSummary(summary) {
   console.log(JSON.stringify({
     counts: summary.counts,
+    statusStats: summary.statusStats,
     categoryStats: summary.categoryStats,
     topCities: summary.cityStats.slice(0, 20),
     eventTypeStats: summary.eventTypeStats,

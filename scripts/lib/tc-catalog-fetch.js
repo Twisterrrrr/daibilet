@@ -67,27 +67,48 @@ function streamAll(client, metadata, method, request, options = {}) {
 }
 
 /**
- * @param {{ ids?: string[], status?: string, progressEvery?: number, timeoutMs?: number }} options
- * @returns {Promise<{ catalog: object[], endpoint: string, requestedIds: string[], missingIds: string[] }>}
+ * @param {{ ids?: string[], status?: string, statuses?: string[], progressEvery?: number, timeoutMs?: number }} options
+ * @returns {Promise<{ catalog: object[], endpoint: string, requestedIds: string[], missingIds: string[], dictionaries: object, byStatus: Record<string, number> }>}
  */
 async function fetchNormalizedCatalog(options = {}) {
   const { client, metadata, endpoint } = createTicketscloudClient();
   const requestedIds = unique((options.ids || []).map(String).filter(Boolean));
-  const status = options.status || "PUBLIC";
+  const statuses = unique(
+    (options.statuses && options.statuses.length
+      ? options.statuses
+      : [options.status || "PUBLIC"]
+    ).map((value) => String(value || "").trim().toUpperCase()).filter(Boolean),
+  );
 
-  const eventsRequest = requestedIds.length ? { ids: requestedIds } : { status };
-  const progressEvery = options.progressEvery ?? (requestedIds.length ? 0 : 1000);
+  let events = [];
+  const byStatus = {};
 
-  const label = requestedIds.length
-    ? `Loading events by ids (${requestedIds.length})...`
-    : `Loading ${status} events...`;
-  console.log(label);
-
-  const events = await streamAll(client, metadata, "Events", eventsRequest, {
-    progressEvery,
-    timeoutMs: options.timeoutMs,
-  });
-  console.log(`Loaded ${events.length} events`);
+  if (requestedIds.length) {
+    console.log(`Loading events by ids (${requestedIds.length})...`);
+    events = await streamAll(client, metadata, "Events", { ids: requestedIds }, {
+      progressEvery: options.progressEvery ?? 0,
+      timeoutMs: options.timeoutMs,
+    });
+    console.log(`Loaded ${events.length} events`);
+  } else {
+    const seen = new Set();
+    for (const status of statuses) {
+      console.log(`Loading ${status} events...`);
+      const batch = await streamAll(client, metadata, "Events", { status }, {
+        progressEvery: options.progressEvery ?? 1000,
+        timeoutMs: options.timeoutMs,
+      });
+      byStatus[status] = batch.length;
+      console.log(`Loaded ${batch.length} ${status} events`);
+      for (const event of batch) {
+        const id = String(event.id || "");
+        if (!id || seen.has(id)) continue;
+        seen.add(id);
+        events.push(event);
+      }
+    }
+    console.log(`Merged unique events: ${events.length}`);
+  }
 
   const categoryIds = unique(events.map((event) => event.category).filter(Boolean));
   const venueIds = unique(events.map((event) => event.venue).filter(Boolean));
@@ -131,6 +152,7 @@ async function fetchNormalizedCatalog(options = {}) {
     dictionaries: { categories, venues, cities, tags, metaEvents },
     requestedIds,
     missingIds,
+    byStatus,
   };
 }
 
