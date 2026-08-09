@@ -5,7 +5,7 @@
 | UX.DAY-TRIP-CANON | Shared DayTripCanonCard: suburbs + готовые сценарии (hub/my-day), schema logistics/gastro на presets, без SVG icons | Высокий | ✅ `c5629984` Deploy MSK web `31302281791` BUILD_ID=`6JBH32eZcthpObBsPUpA0` |
 | UX.SUBURB-CARD-CANON | Suburb cards hub/my-day: канон Петергоф-макета (логистика/гастро/что посмотреть/CTA), schema logisticsExit+gastroStop, без SVG icons | Высокий | ✅ superseded by UX.DAY-TRIP-CANON |
 | CONT.SPB-SUBURB-DENSITY | SPB suburbs nested POI по насыщенности (не жёсткие 5); presets+timingNote; docs LOCKED | Высокий | ✅ `088cfe71` Deploy MSK web `31301708432` BUILD_ID=`f1YPffw6I_wxfeh3iRANZ` |
-| CONT.TOP-SUBURB-DENSITY | NN/Perm/KGD suburbs по насыщенности (+ NN seed); timingNote; docs top-cities rule | Высокий | 🔄 code; commit/push + Deploy MSK web |
+| CONT.TOP-SUBURB-DENSITY | NN/Perm/KGD suburbs по насыщенности (+ NN seed); timingNote; docs top-cities rule | Высокий | ✅ `a21bd869` Deploy MSK web `31302449342` BUILD_ID=`2Z1zYZAF8wT1dGb3O9h2i` |
 | UX.DAY-TIMING-NOTE | Day presets: `timingNote` в head chips panel; СПб Петергоф+Царское; docs LOCKED | Высокий | ✅ `cde2a697` Deploy MSK web `31301074864` BUILD_ID=`lwjCDA2vbaW1gDR3CzMg2` |
 | FIX.EVENTS-PAGE-HANG | `/events` `?page=` soft-nav hang → listPage + pushState + buttons + stale-first | Критический | ✅ `22f9c4ab` Deploy MSK web `31300245196` BUILD_ID=`2QPP1b_Ed-1ffhxo3VXFw` |
 | FIX.VENUE-PAGE-HANG | `/locations`/`/venues` `?page=` soft-nav hang → client slice | Критический | ✅ `3a968000` Deploy MSK web BUILD_ID=`9BpSEnRcVf3lhoksHGMJ6` |

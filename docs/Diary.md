@@ -12,7 +12,7 @@
 - Coords: `suburb-nested-coords.json`; web+public twin sync. UI layout redesign не трогали.
 
 ### Проблемы
-- Ship/deploy: см. Tasktracker CONT.TOP-SUBURB-DENSITY.
+- Ship: `a21bd869` · Deploy MSK web **31302449342** · **BUILD_ID=`2Z1zYZAF8wT1dGb3O9h2i`**; smoke hub: KGD «Лебединое озеро», Perm «Смотровая над заливом», NN «Городец»/«Дивеево».
 
 ---
 
