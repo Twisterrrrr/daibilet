@@ -10,11 +10,9 @@
 - Источник цен: `payload.ticketPrices` (канон) → иначе `offers.priceRub` → sessions/stats fallback (`getTicketPriceRange` / `buildGroupedTicketCategories`).
 
 ### Проблемы
-- Нет.
+- Ship: `b6648ae7` · Deploy MSK web **31300726933** · **BUILD_ID=`7Epi1rGECNBCNmjEXaPiF`**.
 
 ---
-
-## 2026-08-09 - /events `?page=` soft-nav hang (same as venues)
 
 ### Наблюдения
 - Owner после FIX.VENUE-PAGE-HANG: «а в events?»
