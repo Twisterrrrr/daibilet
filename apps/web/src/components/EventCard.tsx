@@ -329,36 +329,21 @@ export function EventCard({
               ) : (
                 <span />
               )}
-              <div className="relative z-[2] flex items-center gap-2">
-                <Link
-                  href={href}
-                  className="pointer-events-none absolute right-full mr-2 hidden items-center whitespace-nowrap rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-ui-xs font-semibold text-primary-700 opacity-0 shadow-sm transition group-hover:pointer-events-auto group-hover:opacity-100 hover:border-primary/30 hover:bg-primary/5 focus-visible:pointer-events-auto focus-visible:opacity-100 sm:inline-flex sm:text-ui-sm"
-                  onClick={() =>
-                    trackProductCardClick({
-                      eventId: session.id,
-                      slug: session.slug,
-                      source: 'event_card_sessions',
-                    })
-                  }
-                >
-                  Выбрать сеанс
-                </Link>
-                <Link
-                  href={href}
-                  className={DETAILS_LINK_CLASS}
-                  onClick={() =>
-                    trackProductCardClick({
-                      eventId: session.id,
-                      slug: session.slug,
-                      source: 'event_card_cta',
-                    })
-                  }
-                >
-                  <Ticket className="hidden h-3.5 w-3.5 sm:inline" strokeWidth={1.75} />
-                  <span className="sm:hidden">Купить</span>
-                  <span className="hidden sm:inline">Купить билет</span>
-                </Link>
-              </div>
+              <Link
+                href={href}
+                className={DETAILS_LINK_CLASS}
+                onClick={() =>
+                  trackProductCardClick({
+                    eventId: session.id,
+                    slug: session.slug,
+                    source: 'event_card_cta',
+                  })
+                }
+              >
+                <Ticket className="hidden h-3.5 w-3.5 sm:inline" strokeWidth={1.75} />
+                <span className="sm:hidden">Купить</span>
+                <span className="hidden sm:inline">Купить билет</span>
+              </Link>
             </>
           )}
         </div>
