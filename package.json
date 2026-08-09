@@ -51,6 +51,7 @@
     "tc:sync": "node scripts/tc-sync.js",
     "tc:sync:help": "node scripts/tc-sync.js --help",
     "tc:reconcile-standby": "node scripts/tc-reconcile-standby.js",
+    "tc:reconcile-missing": "node scripts/tc-reconcile-missing.js",
     "check:widgets": "node scripts/widget-readiness-check.mjs",
     "check:sync-invariants": "node scripts/sync-invariants-check.js",
     "check:post-deploy": "bash scripts/post-deploy-check.sh",

@@ -2,6 +2,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
+| FIX.TC-CANCELLED-MISSING | TC: deactivate events missing from PUBLIC∪STAND_BY; block widget on cancelled; `tc:reconcile-missing` | Критический | 🔄 ship + MSK reconcile |
 | FIX.TC-STANDBY-RECONCILE | TC sync: fetch STAND_BY + reconcile; hide sales-stopped cards catalog-wide | Критический | ✅ `11af2419` MSK reconcile 7658 STAND_BY; API restart + catalog rebuild |
 | UX.CANON-PANEL-INSET | DayTripCanonCard: logistics bg extend left; gastro pl same inset; keep text vertical | Высокий | ✅ `73509693` Deploy MSK web `31308732076` BUILD_ID=`SH7xtIXBki0ZEfrBkwYe3` |
 | CONT.PERM-GUBAHA-USVA | Perm: одна chip «Губаха / Усьва» с День 1/2 внутри; не две карточки | Высокий | ✅ `0f7363b9` Deploy MSK web `31308285355` BUILD_ID=`rcEaipEqElKkWcTQI1VD2` |

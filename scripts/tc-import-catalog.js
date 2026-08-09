@@ -11,6 +11,7 @@ const { EVENT_UPSERT_STATUS, EVENT_UPSERT_SLUG } = require("./lib/event-import-g
 const { normalizeImportEventTitle } = require("./lib/event-title-normalize");
 const { ENTERTAINMENT_DISCO_TAXONOMY, isDiscoOrPartyEvent } = require("./lib/event-taxonomy");
 const { applyVenueAddressCanon } = require("./lib/venue-address-overrides");
+const { deactivateMissingTicketscloudEvents } = require("./lib/tc-deactivate-missing");
 
 const requireFromDbPackage = createRequire(path.join(rootDir, "packages", "db", "package.json"));
 const { Pool } = requireFromDbPackage("pg");
@@ -83,6 +84,8 @@ async function importCatalogEvents(catalog, options = {}) {
     offersWithWidgetUrl: 0,
     eventsWithoutWidgetUrl: 0,
     missingFromCatalog: 0,
+    missingDeactivatedEvents: 0,
+    missingDeactivatedSessions: 0,
     providerLinks: 0,
   };
 
@@ -137,6 +140,10 @@ async function importCatalogEvents(catalog, options = {}) {
         [TICKETSCLOUD_SOURCE_ID, [...importedExternalIds]],
       );
       stats.missingFromCatalog = missingResult.rows[0]?.count ?? 0;
+
+      const deactivated = await deactivateMissingTicketscloudEvents(client, importedExternalIds);
+      stats.missingDeactivatedEvents = deactivated.eventsMarked;
+      stats.missingDeactivatedSessions = deactivated.sessionsMarked;
     }
 
     const providerLinkStats = await syncProviderLinksForSource(

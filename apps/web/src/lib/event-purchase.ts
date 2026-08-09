@@ -160,6 +160,32 @@ export function pickRepresentativeSession<T extends PurchaseSession>(sessions: T
   return pickPurchasableTcSession(ranked) || ranked[0] || sessions[0];
 }
 
+/** Event-level cancel / all sessions unsaleable → do not open TC widget. */
+export function isEventPurchaseBlocked(
+  event: {
+    sourceStatus?: string | null;
+    purchaseReady?: boolean;
+    purchaseUrl?: string | null;
+    widgetUrl?: string | null;
+  },
+  sessions: PurchaseSession[],
+): boolean {
+  if (
+    isSessionPurchaseBlocked({
+      sourceStatus: event.sourceStatus,
+      eventSourceStatus: event.sourceStatus,
+      purchaseReady: event.purchaseReady,
+      purchaseUrl: event.purchaseUrl || event.widgetUrl,
+    })
+  ) {
+    return true;
+  }
+
+  const expanded = sessions.flatMap((session) => expandSessionPurchaseVariants(session));
+  if (!expanded.length) return false;
+  return !expanded.some((session) => !isSessionPurchaseBlocked(session));
+}
+
 export function resolveTcPurchaseTarget(
   event: {
     externalId?: string | number | null;
@@ -167,6 +193,8 @@ export function resolveTcPurchaseTarget(
     widgetUrl?: string | null;
     deeplinkUrl?: string | null;
     widgetProvider?: string | null;
+    sourceStatus?: string | null;
+    purchaseReady?: boolean;
     widgetPayload?: { provider?: string | null; tcEventId?: string | number | null } | null;
   },
   sessions: PurchaseSession[],
@@ -177,36 +205,44 @@ export function resolveTcPurchaseTarget(
   isTcWidget: boolean;
   purchaseTargets: TcPurchaseTarget[];
 } {
+  // Stale event-level widget URL must not open TC when sales are gone/cancelled.
+  if (isEventPurchaseBlocked(event, sessions)) {
+    return {
+      tcEventId: null,
+      purchaseUrl: null,
+      isTcWidget: false,
+      purchaseTargets: [],
+    };
+  }
+
   const purchaseTargets = buildTcPurchaseTargets(sessions);
   const primaryTarget = purchaseTargets[0] || null;
-  const purchasableSession = pickPurchasableTcSession(sessions.flatMap((session) => expandSessionPurchaseVariants(session)));
+  const purchasableSession = pickPurchasableTcSession(
+    sessions.flatMap((session) => expandSessionPurchaseVariants(session)),
+  );
   const ticketscloud = resolveTcWidgetIds(event);
   const tcEventId =
     primaryTarget?.tcEventId ||
     (purchasableSession ? extractTcEventIdFromSession(purchasableSession) : null) ||
-    ticketscloud?.tcEventId ||
-    extractTcEventIdFromSession(sessions[0] || {}) ||
+    (purchasableSession ? ticketscloud?.tcEventId : null) ||
     null;
   const purchaseUrl =
     primaryTarget?.purchaseUrl ||
     purchasableSession?.purchaseUrl ||
-    primaryOffer?.widgetUrl ||
-    primaryOffer?.deeplinkUrl ||
-    event.purchaseUrl ||
-    event.widgetUrl ||
-    event.deeplinkUrl ||
-    sessions[0]?.purchaseUrl ||
+    (purchasableSession
+      ? primaryOffer?.widgetUrl ||
+        primaryOffer?.deeplinkUrl ||
+        event.purchaseUrl ||
+        event.widgetUrl ||
+        event.deeplinkUrl
+      : null) ||
     null;
 
   return {
     tcEventId,
     purchaseUrl,
     isTcWidget: Boolean(ticketscloud && tcEventId),
-    purchaseTargets: purchaseTargets.length
-      ? purchaseTargets
-      : tcEventId
-        ? [{ tcEventId, purchaseUrl }]
-        : [],
+    purchaseTargets,
   };
 }
 

@@ -1,3 +1,19 @@
+## 2026-08-09 - TC cancelled events («Мероприятие отменено организатором»)
+
+### Наблюдения
+- Owner: `/events/tc-…-stendap-na-letnike` открывает виджет TC с модалкой «Мероприятие отменено организатором».
+- У TC в gRPC только `PUBLIC` / `STAND_BY`. Полная отмена убирает событие из обоих фидов, а у нас оставался stale PUBLIC + event-level widget URL.
+
+### Решения
+- `deactivateMissingTicketscloudEvents`: missing из PUBLIC∪STAND_BY → `Event.sourceStatus=cancelled`, `HIDDEN`, sessions `isActive=false`.
+- Full import вызывает deactivation; `npm run tc:reconcile-missing` - оперативный reconcile.
+- `resolveTcPurchaseTarget` / `isEventPurchaseBlocked`: не открывать TC, если event/sessions sales-blocked.
+
+### Проблемы
+- Нужен прогон `tc:reconcile-missing` на MSK (тяжёлый PUBLIC+STAND_BY fetch), иначе live URL останется до nightly full-sync.
+
+---
+
 ## 2026-08-09 - TC STAND_BY reconcile (sales stopped vs visible cards)
 
 ### Наблюдения
