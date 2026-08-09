@@ -30,10 +30,13 @@
 - `deploy/systemd/daibilet-finance-yookassa-reconcile.service` переведен на finance `.159` layout: `/opt/daibilet-finance/app`, `/opt/daibilet-finance/app/.env`, `After=daibilet-finance-api.service`.
 - ExecStart переведен на `corepack pnpm --filter @daibilet/backend checkout:yookassa:reconcile` с production-safe env flags.
 - `docs/finance-159-smoke-runbook.md` синхронизирован с теми же путями и командами.
+- Live `.159`: branch fast-forward to `2a75da1`, corrected unit installed, manual reconcile success.
+- Manual reconcile applied remote statuses: `7706713`, `4824308`, `2253137` -> `CONFIRMED`; `4187716` -> `CANCELLED`; failed `0`.
+- Scheduled timer tick at `2026-08-09T08:19:53Z`: checked `0`, failed `0`; timer remains `enabled` + `active`.
 
 ### Проблемы
 
-- Live enable timer не делаем без явного go owner: `включай reconcile timer`.
+- Public HTTPS health from Codex desktop had intermittent timeout, but `.159` local and host HTTPS health both returned `ok=true`.
 
 ---
 

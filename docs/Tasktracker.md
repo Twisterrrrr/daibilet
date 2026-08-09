@@ -64,7 +64,7 @@
 | P.3f4 | **Supplier LC actionable readiness** — чеклист запуска продаж + CTA по readiness-кодам | Высокий | ✅ supplier UI + typecheck/build |
 | P.3f5 | **Supplier LC order operations** — фильтры заказов, очередь обработки, сумма к выплате без технических id | Высокий | ✅ supplier UI + typecheck/build |
 | P.3g | **Supplier write flows** — создание/редактирование admission и событий через заявки | Средний | ✅ admission create/update admin apply + DB smoke; event create apply deferred |
-| P.3h | **YooKassa reconcile ops** — service/timer на `.159`, runbook и ручной dry-run/apply | Высокий | 🔄 code fixed; live timer install/enable ждёт явный go owner |
+| P.3h | **YooKassa reconcile ops** — service/timer на `.159`, runbook и ручной dry-run/apply | Высокий | ✅ live `.159` installed/enabled; scheduled tick green 2026-08-09 |
 | P.4 | **Реклама / paid acquisition** — до готовности витрины | — | ⚠️ deferred |
 | P.5 | **Allowlist городов** — адмцентры с saleable → standalone; остальные → cityToRegion (не «дыра») | Высокий | ✅ 2026-07-19 geo policy |
 
