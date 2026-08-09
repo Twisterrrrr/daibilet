@@ -3102,6 +3102,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         id: 'perm-classic-one-day',
         title: 'Классическая Пермь за 1 день',
         description: 'Набережная, Счастье, центр, галерея, эспланада и гастро-пауза.',
+        blogSlug: 'perm-gorod-i-prigorody',
         stops: [
           { name: 'Набережная Камы', desc: 'Старт у Камы', locationSlug: 'naberezhnaya-kamy' },
           { name: 'Арт-объект «Счастье не за горами»', desc: 'Фото-символ города', locationSlug: 'perm-schaste-ne-za-gorami' },
