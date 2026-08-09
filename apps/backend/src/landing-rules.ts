@@ -66,6 +66,7 @@ export const LANDING_RULES: LandingRule[] = [
     requiredAnySubcategories: ['Водные экскурсии', 'Речные прогулки'],
     // Concerts/pubs/standup are not river trips; «катер» inside «Екатеринбург» is blocked by word-start match.
     // Charter/yacht rental is not a river stroll - TC often opens «продажи остановлены» for these.
+    // Day trips to Karelia / Ladoga skerries: bus from SPB + boat there, not city river cruise.
     excludeKeywords: [
       'автобус',
       'пешеход',
@@ -92,6 +93,14 @@ export const LANDING_RULES: LandingRule[] = [
       'аренда катера',
       'yacht charter',
       'private yacht',
+      'карели',
+      'ладож',
+      'шхер',
+      'валаам',
+      'кижи',
+      'рускеал',
+      'сортавал',
+      'приозерск',
     ],
     excludeKeywordFields: ['title', 'category', 'sourceCategory', 'venue', 'subcategory', 'tag'],
   },

@@ -97,6 +97,44 @@ test('river-cruises excludes yacht and boat charter rentals', () => {
   }, river), true);
 });
 
+test('river-cruises excludes Karelia / Ladoga day trips (bus + boat there)', () => {
+  const river = findLandingRule('river-cruises');
+  assert.ok(river);
+
+  assert.equal(matchesLandingRule({
+    title: 'Водная прогулка на катерах по Ладожским Шхерам',
+    category: 'Экскурсии',
+    tags: ['Водные экскурсии'],
+    subcategories: ['Водные экскурсии'],
+    venue: 'пл.Восстания',
+    city: 'Санкт-Петербург',
+  }, river), false);
+
+  assert.equal(matchesLandingRule({
+    title: 'Карелия. Ладожским Шхерам',
+    category: 'Экскурсии',
+    tags: ['Водные экскурсии'],
+    subcategories: ['Водные экскурсии'],
+    city: 'Санкт-Петербург',
+  }, river), false);
+
+  assert.equal(matchesLandingRule({
+    title: 'Экскурсия на Валаам из Санкт-Петербурга',
+    category: 'Экскурсии',
+    tags: ['Водные экскурсии'],
+    city: 'Санкт-Петербург',
+  }, river), false);
+
+  // City Neva cruise still matches.
+  assert.equal(matchesLandingRule({
+    title: 'Прогулка на теплоходе по Неве и каналам',
+    category: 'Экскурсии',
+    tags: ['Водные экскурсии'],
+    subcategories: ['Водные экскурсии'],
+    city: 'Санкт-Петербург',
+  }, river), true);
+});
+
 test('keeps city and venue landing constraints strict', () => {
   assert.deepEqual(
     matchingLandingSlugs({
