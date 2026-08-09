@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import type { MouseEvent, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 import { pluralEvents } from '@/lib/format';
 
@@ -60,18 +60,20 @@ function PaginationNavLink({
     );
   }
 
-  const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
-    if (event.defaultPrevented) return;
-    if (event.button !== 0) return;
-    if (event.metaKey || event.altKey || event.ctrlKey || event.shiftKey) return;
-    event.preventDefault();
-    onPageChange(targetPage);
-  };
-
+  // App Router listens for same-origin <a> clicks (often capture). A bubble-only
+  // preventDefault still starts soft-nav + (catalog)/loading.tsx wipe. Use a button
+  // for client paging; keep href on data attribute for copy/debug.
   return (
-    <a href={href} rel={rel} className={className} aria-label={ariaLabel} onClick={handleClick}>
+    <button
+      type="button"
+      className={className}
+      aria-label={ariaLabel}
+      data-pagination-href={href}
+      data-pagination-rel={rel}
+      onClick={() => onPageChange(targetPage)}
+    >
       {children}
-    </a>
+    </button>
   );
 }
 

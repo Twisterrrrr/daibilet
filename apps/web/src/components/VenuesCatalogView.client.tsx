@@ -216,7 +216,7 @@ export function VenuesCatalogView({
     const next = Math.max(1, page);
     setListPage(next);
     writePageToUrl(next);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo(0, 0);
   };
 
   const prevFiltersRef = useRef({ q: debouncedQuery, sort: sortMode });
