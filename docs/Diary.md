@@ -1,3 +1,18 @@
+## 2026-08-09 - Scenarios ≠ suburb canon card; full width
+
+### Наблюдения
+- Owner: зря сузили Пригороды/Сценарии (`max-w-2xl mx-auto`); сценариям не нужен полный DayTripCanonCard (логистика/гастро/«Что посмотреть» с desc) — только chips как у пригородов + лёгкий detail; CTA «В маршрут» должна совпадать с пригородами.
+
+### Решения
+- `DayTripCanonCard`: убран `mx-auto max-w-2xl` → `w-full` (только suburbs).
+- `CityDayPresetBlock`: откат detail к прежнему лёгкому panel (title/timing/description/stops list); chips сохранены; CTA = compact Route+slate как у `AddManyToDayRouteButton`.
+- Scenarios больше не импортируют canon card.
+
+### Проблемы
+- Ship+Deploy MSK web — см. Tasktracker UX.SCENARIOS-LIGHT / commit после push.
+
+---
+
 ## 2026-08-09 - Top cities suburbs: density expand (NN / Perm / KGD)
 
 ### Наблюдения

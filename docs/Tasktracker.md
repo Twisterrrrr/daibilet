@@ -2,7 +2,8 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| UX.DAY-TRIP-CANON | Shared DayTripCanonCard: suburbs + готовые сценарии (hub/my-day), schema logistics/gastro на presets, без SVG icons | Высокий | ✅ `c5629984` Deploy MSK web `31302281791` BUILD_ID=`6JBH32eZcthpObBsPUpA0` |
+| UX.SCENARIOS-LIGHT | Сценарии: chips + лёгкий detail (не DayTripCanonCard); full-width suburb card; CTA «В маршрут» = suburb compact | Высокий | 🔄 ship+Deploy MSK web |
+| UX.DAY-TRIP-CANON | DayTripCanonCard для suburbs (full width); scenarios откатили с shared canon | Высокий | ✅ partial `c5629984`; scenarios split → UX.SCENARIOS-LIGHT |
 | UX.SUBURB-CARD-CANON | Suburb cards hub/my-day: канон Петергоф-макета (логистика/гастро/что посмотреть/CTA), schema logisticsExit+gastroStop, без SVG icons | Высокий | ✅ superseded by UX.DAY-TRIP-CANON |
 | CONT.SPB-SUBURB-DENSITY | SPB suburbs nested POI по насыщенности (не жёсткие 5); presets+timingNote; docs LOCKED | Высокий | ✅ `088cfe71` Deploy MSK web `31301708432` BUILD_ID=`f1YPffw6I_wxfeh3iRANZ` |
 | CONT.TOP-SUBURB-DENSITY | NN/Perm/KGD suburbs по насыщенности (+ NN seed); timingNote; docs top-cities rule | Высокий | ✅ `a21bd869` Deploy MSK web `31302449342` BUILD_ID=`2Z1zYZAF8wT1dGb3O9h2i` |

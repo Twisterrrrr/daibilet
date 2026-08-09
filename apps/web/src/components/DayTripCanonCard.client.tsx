@@ -70,7 +70,8 @@ function SightLabel({
 }
 
 /**
- * Shared visual canon for suburb + day-preset cards (owner Peterhof mockup).
+ * Visual canon for suburb day-trip cards (owner Peterhof mockup).
+ * Scenarios keep a lighter chips+detail panel — do not reuse this for presets.
  * No SVG icons in logistics / gastro / sights - text section titles only.
  */
 export function DayTripCanonCard({
@@ -124,7 +125,7 @@ export function DayTripCanonCard({
         ariaLabel ||
         (total != null ? `${index + 1} из ${total}` : undefined)
       }
-      className={`mx-auto mt-4 max-w-2xl rounded-2xl border bg-white p-5 shadow-sm sm:p-6 ${
+      className={`mt-4 w-full rounded-2xl border bg-white p-5 shadow-sm sm:p-6 ${
         editorial ? 'border-zinc-200' : 'border-slate-200'
       } ${className}`}
       data-day-trip-canon="1"

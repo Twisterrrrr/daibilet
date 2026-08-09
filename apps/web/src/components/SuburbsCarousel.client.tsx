@@ -70,7 +70,8 @@ export type SuburbsCarouselProps = {
 
 /**
  * Significant-suburbs block.
- * Hub + my-day: chips + one DayTripCanonCard panel (shared with scenarios).
+ * Hub + my-day: chips + one full-width DayTripCanonCard (logistics/gastro/sights).
+ * Scenarios stay on a lighter chips+detail panel in CityDayPresetBlock.
  * Bulk «В маршрут» adds all nested points of the active suburb.
  */
 export function SuburbsCarousel({

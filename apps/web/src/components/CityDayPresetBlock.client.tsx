@@ -2,12 +2,10 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ChevronDown } from 'lucide-react';
+import { ArrowUpRight, ChevronDown, Route } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
-import { DayTripCanonCard, resolveCanonGastroStop } from '@/components/DayTripCanonCard.client';
 import type { CityDayRoutePreset, CityMustSeeItem } from '@/lib/cityInfo';
-import { resolveCityPlaceTitleHref } from '@/lib/city-place-href';
 import {
   buildCityDayRoutePreset,
   cityDayRoutePresetAvailable,
@@ -15,7 +13,7 @@ import {
   type DayRouteVenueMatchSource,
 } from '@/lib/day-route-from-place';
 import { mustSeePlacesForDefaultPreset } from '@/lib/must-see-filters';
-import { replaceDayRouteFromVenues } from '@/lib/day-route';
+import { dayRoutePointsWord, replaceDayRouteFromVenues } from '@/lib/day-route';
 
 type Props = {
   places: CityMustSeeItem[];
@@ -55,17 +53,6 @@ function mainPlacesPhrase(count: number): string {
     return `${count} главных места`;
   }
   return `${count} главных мест`;
-}
-
-function presetSubtitle(preset: CityDayRoutePreset): string | undefined {
-  const timing = String(preset.timingNote || '').trim();
-  if (timing) return timing;
-  const vector = String(preset.travelVector || '').trim();
-  if (vector) {
-    const hub = String(preset.stationHub || '').trim();
-    return hub ? `${vector} - ${hub}` : vector;
-  }
-  return String(preset.description || '').trim() || undefined;
 }
 
 export function CityDayPresetBlock({
@@ -121,7 +108,7 @@ export function CityDayPresetBlock({
   const fallbackLead = inMyDay
     ? `Собрать за минуту: ${mainPlacesPhrase(fallbackPreset.length)} в маршруте.`
     : `Собрать за минуту: ${mainPlacesPhrase(fallbackPreset.length)} в «Собери свой день».`;
-  const namedCta = (busy: boolean) => (busy ? 'Собираем…' : inMyDay ? 'В маршрут' : 'В маршрут');
+  const namedCta = (busy: boolean) => (busy ? 'Собираем…' : 'В маршрут');
 
   const shellClass = embedded
     ? ''
@@ -140,6 +127,9 @@ export function CityDayPresetBlock({
     ? 'border-zinc-900 bg-zinc-900 text-white'
     : 'border-slate-900 bg-slate-900 text-white';
   const skeletonTone = editorial ? 'bg-zinc-200/80' : 'bg-slate-200/90';
+  /** Match suburb AddManyToDayRouteButton compact look (Route + slate chip). */
+  const routeCtaClass =
+    'inline-flex min-h-9 min-w-[2.75rem] shrink-0 items-center justify-center gap-1.5 rounded-full bg-slate-100 px-3.5 py-2 text-xs font-semibold text-slate-800 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50';
 
   // Named presets that still need catalog name-match must wait for match sources;
   // otherwise editorial-ready chips paint first and the rest «pop in» later (SPB).
@@ -174,92 +164,87 @@ export function CityDayPresetBlock({
           ))}
         </div>
         <div
-          className={`mt-3 h-[12rem] animate-pulse rounded-2xl border ${borderClass} ${skeletonTone}`}
+          className={`mt-3 h-[5.5rem] animate-pulse rounded-xl border ${borderClass} ${skeletonTone}`}
           data-day-preset-panel-skeleton
         />
       </div>
     );
   }
 
-  const renderScenarioCard = (row: NamedRow, index: number) => {
+  const renderScenarioCard = (row: NamedRow, opts?: { panel?: boolean }) => {
     const { preset, items, available } = row;
-    const stops = Array.isArray(preset.stops) ? preset.stops.filter((s) => s?.name) : [];
-    const logisticsExit = String(preset.logisticsExit || preset.stationName || '').trim();
-    const logisticsText = String(preset.travelVectorBlurb || '').trim();
-    // If no dedicated logistics fields, show description in logistics when timing is already subtitle.
-    const logisticsExtra =
-      !logisticsExit && !logisticsText && preset.timingNote?.trim() && preset.description?.trim()
-        ? preset.description.trim()
-        : '';
-
+    const titles = items.map((item) => item.title).join(' · ');
+    const panel = Boolean(opts?.panel);
     return (
-      <DayTripCanonCard
-        id={`day-preset-panel-${preset.id}`}
-        role="tabpanel"
-        index={index}
-        total={namedResolved.length}
-        editorial={editorial}
-        title={preset.title}
-        subtitle={presetSubtitle(preset)}
-        logisticsExit={logisticsExit || undefined}
-        logisticsText={logisticsText || undefined}
-        logisticsExtra={logisticsExtra || undefined}
-        gastro={
-          preset.gastroStop?.name
-            ? preset.gastroStop
-            : resolveCanonGastroStop({ gastroHint: preset.gastroHint })
-        }
-        sightDescFromMd={inMyDay}
-        sights={stops.map((stop) => {
-          const raw = String(stop.desc || '').trim();
-          const desc =
-            !raw || /^Точка маршрута по\b/i.test(raw) ? undefined : raw;
-          return {
-            name: stop.name,
-            desc,
-            href: resolveCityPlaceTitleHref(stop, venues),
-          };
-        })}
-        titleExtra={
-          preset.blogSlug ? (
-            <Link
-              href={`/blog/${preset.blogSlug}`}
-              className={`text-xs font-medium underline underline-offset-2 transition-colors ${
-                editorial
-                  ? 'text-sky-700 hover:text-sky-800'
-                  : 'text-primary-600 hover:text-primary-700'
-              }`}
+      <div
+        className={`flex flex-col gap-3 rounded-xl border bg-white px-4 py-3.5 max-md:gap-3.5 md:flex-row md:items-center md:justify-between md:gap-4 md:p-3 ${borderClass} ${
+          panel ? 'mt-3' : ''
+        }`}
+        data-day-preset-card={preset.id}
+        {...(panel
+          ? {
+              id: `day-preset-panel-${preset.id}`,
+              role: 'tabpanel' as const,
+              'aria-label': preset.title,
+            }
+          : {})}
+      >
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-col items-start gap-0.5 md:flex-row md:flex-wrap md:items-baseline md:gap-x-2 md:gap-y-0.5">
+            <p className={`text-sm font-semibold ${titleClass}`}>{preset.title}</p>
+            {preset.blogSlug ? (
+              <Link
+                href={`/blog/${preset.blogSlug}`}
+                className={`inline-flex items-center gap-0.5 text-xs font-medium underline underline-offset-2 transition-colors max-md:mt-0.5 ${
+                  editorial
+                    ? 'text-sky-700 hover:text-sky-800'
+                    : 'text-primary-600 hover:text-primary-700'
+                }`}
+              >
+                Читать об этом в блоге
+                <ArrowUpRight className="h-3 w-3 shrink-0 opacity-80" aria-hidden />
+              </Link>
+            ) : null}
+          </div>
+          {preset.timingNote?.trim() ? (
+            <p
+              className={`mt-1 text-[12px] leading-4 max-md:pr-0.5 md:text-[11px] md:leading-4 ${mutedClass}`}
+              data-day-preset-timing
             >
-              Читать об этом в блоге
-            </Link>
-          ) : null
-        }
-        cta={
-          available ? (
-            <button
-              type="button"
-              disabled={busyId != null}
-              onClick={() => apply(preset.id, items)}
-              className={`inline-flex min-h-9 items-center justify-center rounded-full px-3.5 py-2 text-xs font-semibold transition disabled:opacity-60 ${
-                editorial
-                  ? 'bg-zinc-900 text-white hover:bg-zinc-800'
-                  : 'bg-primary-600 text-white hover:bg-primary-700'
-              }`}
+              {preset.timingNote.trim()}
+            </p>
+          ) : null}
+          {preset.description ? (
+            <p className={`mt-1.5 text-[13px] leading-5 max-md:pr-0.5 md:mt-0.5 md:text-xs ${softClass}`}>
+              {preset.description}
+            </p>
+          ) : null}
+          {available ? (
+            <p
+              className={`mt-1.5 line-clamp-3 text-[13px] leading-5 max-md:pr-0.5 md:mt-1 md:line-clamp-2 md:text-xs md:leading-4 ${mutedClass}`}
+              title={titles}
             >
-              {namedCta(busyId === preset.id)}
-            </button>
-          ) : null
-        }
-        dataAttrs={{
-          'data-day-preset-card': preset.id,
-          'data-day-preset-canon': '1',
-        }}
-      />
+              {items.length} {dayRoutePointsWord(items.length)}: {titles}
+            </p>
+          ) : null}
+        </div>
+        {available ? (
+          <button
+            type="button"
+            disabled={busyId != null}
+            onClick={() => apply(preset.id, items)}
+            className={routeCtaClass}
+          >
+            <Route className="h-3.5 w-3.5 shrink-0" aria-hidden />
+            <span>{namedCta(busyId === preset.id)}</span>
+          </button>
+        ) : null}
+      </div>
     );
   };
 
   if (namedResolved.length > 0) {
-    // Same chips + one canon detail panel on hub and my-day (all breakpoints).
+    // Chips like suburbs + light detail panel (not DayTripCanonCard / logistics/gastro/sights).
     const selectedIndex =
       activeIndex == null || activeIndex < 0 || activeIndex >= namedResolved.length
         ? null
@@ -320,7 +305,7 @@ export function CityDayPresetBlock({
             );
           })}
         </div>
-        {selected && selectedIndex != null ? renderScenarioCard(selected, selectedIndex) : null}
+        {selected ? renderScenarioCard(selected, { panel: true }) : null}
         {selectedIndex == null ? (
           <p className={`mt-3 text-sm ${mutedClass}`} data-day-preset-hint>
             Нажмите на сценарий, чтобы открыть точки и собрать день.
