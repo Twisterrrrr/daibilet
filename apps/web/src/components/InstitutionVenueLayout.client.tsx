@@ -58,6 +58,7 @@ export function InstitutionVenueLayout({
   nearbyEvents = [],
   pagePayload,
   admissionProducts = [],
+  children,
 }: {
   venue: PublicVenueDto;
   stats: PublicVenuePageDto['stats'];
@@ -67,6 +68,7 @@ export function InstitutionVenueLayout({
   nearbyEvents?: PublicVenueLinkedEventDto[];
   pagePayload: PublicVenuePageDto;
   admissionProducts?: FinanceAdmissionProduct[];
+  children?: React.ReactNode;
 }) {
   const title = venue.seoH1 || venue.title || venue.name;
   const streetAddress = formatStreetAddress(venue.address, { city: venue.city });
@@ -268,6 +270,8 @@ export function InstitutionVenueLayout({
               </div>
             </section>
           ) : null}
+
+          {children}
 
           {linkedExcursions.length > 0 ? (
             <section

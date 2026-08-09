@@ -44,6 +44,7 @@ export function LocationVenueLayout({
   stopEvents = [],
   nearbyEvents = [],
   pagePayload,
+  children,
 }: {
   venue: PublicVenueDto;
   stats: PublicVenuePageDto['stats'];
@@ -53,6 +54,7 @@ export function LocationVenueLayout({
   stopEvents?: PublicVenueLinkedEventDto[];
   nearbyEvents?: PublicVenueLinkedEventDto[];
   pagePayload: PublicVenuePageDto;
+  children?: React.ReactNode;
 }) {
   const title = venue.seoH1 || venue.title || venue.name;
   const streetAddress = formatStreetAddress(venue.address, { city: venue.city });
@@ -405,18 +407,6 @@ export function LocationVenueLayout({
             ) : null}
           </section>
 
-          {relatedVenues.length > 0 && isParkLike ? (
-            <section className="rounded-2xl border border-slate-200 bg-white p-6">
-              <h2 className="text-xl font-bold text-slate-900">Связанные хабы</h2>
-              <p className="mt-1 text-sm text-slate-500">Ближайшие площадки и точки отправления в городе.</p>
-              <div className="mt-4 grid gap-3">
-                {relatedVenues.slice(0, 4).map((related) => (
-                  <LocationCard key={related.id} venue={related} href={venueHref(related)} />
-                ))}
-              </div>
-            </section>
-          ) : null}
-
           {todaySlots.length > 0 ? (
             <section className="rounded-2xl border border-slate-200 bg-white p-6">
               <div className="flex items-baseline justify-between">
@@ -440,6 +430,8 @@ export function LocationVenueLayout({
             </section>
           ) : null}
 
+          {children}
+
           {hasVenueLogisticsContent(venue) ? (
             <section className="rounded-2xl border border-slate-200 bg-white p-6">
               <h2 className="text-xl font-bold text-slate-900">Как добраться</h2>
@@ -456,6 +448,18 @@ export function LocationVenueLayout({
               Позвоните организатору по номеру в билете. На причалах и точках сбора обычно ждут 5-10 минут; на автобусных сборах - по расписанию, без задержек.
             </div>
           </details>
+
+          {relatedVenues.length > 0 && isParkLike ? (
+            <section className="rounded-2xl border border-slate-200 bg-white p-6">
+              <h2 className="text-xl font-bold text-slate-900">Связанные хабы</h2>
+              <p className="mt-1 text-sm text-slate-500">Ближайшие площадки и точки отправления в городе.</p>
+              <div className="mt-4 grid gap-3">
+                {relatedVenues.slice(0, 4).map((related) => (
+                  <LocationCard key={related.id} venue={related} href={venueHref(related)} />
+                ))}
+              </div>
+            </section>
+          ) : null}
         </div>
 
         <LocationVenueSidebar venue={venue} relatedVenues={relatedVenues} />

@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { useParams, usePathname } from 'next/navigation';
-import { ArrowLeft, Grid3X3, ListFilter } from 'lucide-react';
+import { ArrowLeft, Calendar as CalendarIcon } from 'lucide-react';
 
 import { EventCard } from '@/components/EventCard';
 import { InstitutionVenueLayout } from '@/components/InstitutionVenueLayout.client';
@@ -17,15 +17,13 @@ import { formatStreetAddress } from '@/lib/address';
 import type { FinanceAdmissionProduct } from '@/lib/finance-projection';
 import {
   buildVenueDateOptions,
+  buildVenueDateRailChips,
   buildVenueProgramGroups,
-  countVisibleVenueSlots,
-  formatHumanDate,
-  formatShortDate,
   type VenueDateFilter,
+  type VenueDateRailChip,
   type VenueEventGroup,
 } from '@/lib/venue-program';
 import { venuePageTemplate } from '@/lib/venue-meta';
-import { eventHref } from '@/lib/routes';
 
 /** Match SSR VenueDetailPage: curated cover wins over hub stub / supplier thumb. */
 function withEditorialHero(payload: PublicVenuePageDto): PublicVenuePageDto {
@@ -92,9 +90,8 @@ export function VenuePageView({
   const [payload, setPayload] = React.useState<PublicVenuePageDto | null>(matchedInitial);
   const [contentReady, setContentReady] = React.useState(() => Boolean(matchedInitial?.venue));
   const [error, setError] = React.useState<string | null>(null);
-  const [category, setCategory] = React.useState('all');
-  const [dateFilter, setDateFilter] = React.useState<VenueDateFilter>('smart');
-  const [mode, setMode] = React.useState<'cards' | 'table'>('cards');
+  /** null = follow smartDate until user picks a chip/calendar day. */
+  const [dateFilter, setDateFilter] = React.useState<VenueDateFilter | null>(null);
   const [activeSlug, setActiveSlug] = React.useState(routeSlug);
 
   // Soft-nav can keep this client tree without remounting. Prefer pathname slug over lagging
@@ -104,8 +101,7 @@ export function VenuePageView({
     setPayload(matchedInitial);
     setContentReady(Boolean(matchedInitial?.venue));
     setError(null);
-    setCategory('all');
-    setDateFilter('smart');
+    setDateFilter(null);
   }
 
   React.useEffect(() => {
@@ -142,22 +138,14 @@ export function VenuePageView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [routeSlug, matchedInitialVenueId]);
 
-  const baseSessions = React.useMemo(() => {
-    if (!payload) return [];
-    if (category === 'all') return payload.sessions;
-    return payload.sessions.filter((session) => session.category === category);
-  }, [category, payload]);
-
+  const baseSessions = payload?.sessions ?? [];
   const dateOptions = React.useMemo(() => buildVenueDateOptions(baseSessions), [baseSessions]);
-  const groups = React.useMemo(
-    () => buildVenueProgramGroups(baseSessions, dateFilter, dateOptions.smartDate),
-    [baseSessions, dateFilter, dateOptions.smartDate],
-  );
-  const visibleSlotCount = React.useMemo(() => countVisibleVenueSlots(groups), [groups]);
-  const routeCount = React.useMemo(
-    () => buildVenueProgramGroups(baseSessions, 'all', null).length,
-    [baseSessions],
-  );
+  const resolvedDateFilter: VenueDateFilter = dateFilter ?? dateOptions.smartDate ?? 'all';
+  const groups = React.useMemo(() => {
+    const built = buildVenueProgramGroups(baseSessions, resolvedDateFilter, dateOptions.smartDate);
+    if (resolvedDateFilter === 'all') return built;
+    return built.filter((group) => group.hasSlotsOnSelectedDate);
+  }, [baseSessions, resolvedDateFilter, dateOptions.smartDate]);
   const allRouteGroups = React.useMemo(
     () => buildVenueProgramGroups(baseSessions, 'all', null),
     [baseSessions],
@@ -165,7 +153,6 @@ export function VenuePageView({
   const venue = resolveVenueForRouteSlug(routeSlug, initialPayload, payload);
   const matchedPayload =
     payload?.venue && venueMatchesRouteSlug(payload.venue, routeSlug) ? payload : matchedInitial;
-  const categories = venue ? Object.entries(venue.categories).sort((a, b) => b[1] - a[1]) : [];
   const pageTemplate = venue ? venuePageTemplate(venue.type) : 'location';
   const isLocationPage = pageTemplate === 'location';
   const isInstitutionPage = pageTemplate === 'institution';
@@ -210,7 +197,18 @@ export function VenuePageView({
                 stopEvents={contentReady ? matchedPayload.stopEvents || [] : []}
                 nearbyEvents={contentReady ? matchedPayload.nearbyEvents || [] : []}
                 pagePayload={matchedPayload}
-              />
+              >
+                {baseSessions.length > 0 ? (
+                  <VenueProgramBlock
+                    title="Расписание и билеты"
+                    selected={resolvedDateFilter}
+                    availableDates={dateOptions.availableDates}
+                    onDateChange={setDateFilter}
+                    groups={groups}
+                    framed
+                  />
+                ) : null}
+              </LocationVenueLayout>
             ) : isInstitutionPage ? (
               <InstitutionVenueLayout
                 key={venue.id}
@@ -222,65 +220,35 @@ export function VenuePageView({
                 nearbyEvents={contentReady ? matchedPayload.nearbyEvents || [] : []}
                 pagePayload={matchedPayload}
                 admissionProducts={admissionProducts}
-              />
+              >
+                {baseSessions.length > 0 ? (
+                  <VenueProgramBlock
+                    title="Афиша и билеты"
+                    selected={resolvedDateFilter}
+                    availableDates={dateOptions.availableDates}
+                    onDateChange={setDateFilter}
+                    groups={groups}
+                    framed
+                  />
+                ) : null}
+              </InstitutionVenueLayout>
             ) : null}
 
-            {!isInstitutionPage && admissionProducts.length > 0 ? (
+            {!isInstitutionPage && !isLocationPage && admissionProducts.length > 0 ? (
               <div className="container-page py-6">
                 <VenueAdmissionBlock products={admissionProducts} />
               </div>
             ) : null}
 
-            {contentReady && baseSessions.length > 0 ? (
-            <section id="venue-program" className={`container-page py-8 ${useLovableLayout ? '' : 'grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]'}`}>
-              <div className={useLovableLayout ? 'rounded-2xl border border-slate-200 bg-white p-6' : ''}>
-                <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-                  <div>
-                    <h2 className="text-2xl font-bold tracking-tight text-slate-950">
-                      {isInstitutionPage ? 'Афиша и билеты' : 'Расписание и билеты'}
-                    </h2>
-                    <p className="mt-1 text-sm leading-6 text-slate-600">
-                      {isInstitutionPage
-                        ? 'События площадки - выберите категорию, дату и сеанс для покупки.'
-                        : 'По одному маршруту в строке; в колонке слотов - ближайшие отправления на выбранную дату.'}
-                    </p>
-                  </div>
-                  <div className="inline-flex overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-                    <button type="button" onClick={() => setMode('table')} className={`inline-flex items-center gap-2 px-4 text-sm font-medium ${mode === 'table' ? 'bg-primary-600 text-white' : 'text-slate-600 hover:bg-slate-50'}`}>
-                      <ListFilter className="h-4 w-4" />
-                      Таблица
-                    </button>
-                    <button type="button" onClick={() => setMode('cards')} className={`inline-flex items-center gap-2 border-l border-slate-200 px-4 text-sm font-medium ${mode === 'cards' ? 'bg-primary-600 text-white' : 'text-slate-600 hover:bg-slate-50'}`}>
-                      <Grid3X3 className="h-4 w-4" />
-                      Карточки
-                    </button>
-                  </div>
-                </div>
-
-                <div className="mb-4 flex flex-wrap gap-2">
-                  <button type="button" onClick={() => setCategory('all')} className={`rounded-full px-3 py-1.5 text-xs font-semibold ${category === 'all' ? 'bg-primary-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>
-                    Все {formatNumber(routeCount)}
-                  </button>
-                  {categories.map(([name, count]) => (
-                    <button key={name} type="button" onClick={() => setCategory(name)} className={`rounded-full px-3 py-1.5 text-xs font-semibold ${category === name ? 'bg-primary-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>
-                      {name} {formatNumber(count)}
-                    </button>
-                  ))}
-                </div>
-
-                <VenueDateFilters
-                  dateFilter={dateFilter}
-                  options={dateOptions}
-                  onChange={setDateFilter}
-                  visibleGroups={groups.length}
-                  visibleSessions={visibleSlotCount}
-                  variant={isInstitutionPage ? 'institution' : 'location'}
+            {!useLovableLayout && baseSessions.length > 0 ? (
+              <section className="container-page grid gap-6 py-8 lg:grid-cols-[minmax(0,1fr)_320px]">
+                <VenueProgramBlock
+                  title="Расписание и билеты"
+                  selected={resolvedDateFilter}
+                  availableDates={dateOptions.availableDates}
+                  onDateChange={setDateFilter}
+                  groups={groups}
                 />
-
-                {mode === 'table' ? <VenueEventsTable groups={groups} /> : <VenueEventsGrid groups={groups} />}
-              </div>
-
-              {!useLovableLayout ? (
                 <aside className="space-y-4">
                   <section className="rounded-xl bg-white p-4 shadow-[0_10px_28px_rgba(15,23,42,0.06)]">
                     <h3 className="text-sm font-semibold text-slate-950">Кратко</h3>
@@ -292,77 +260,141 @@ export function VenuePageView({
                     </dl>
                   </section>
                 </aside>
-              ) : null}
-            </section>
-            ) : contentReady ? null : (
-              <div className="container-page py-8">
-                <div className="rounded-2xl border border-slate-200 bg-white p-8 text-sm text-slate-500">
-                  Загружаем расписание и билеты...
-                </div>
-              </div>
-            )}
+              </section>
+            ) : null}
           </>
         ) : null}
       </div>
     </div>
   );
 }
-function VenueDateFilters({
-  dateFilter,
-  options,
-  onChange,
-  visibleGroups,
-  visibleSessions,
-  variant = 'location',
+
+function VenueProgramBlock({
+  title,
+  selected,
+  availableDates,
+  onDateChange,
+  groups,
+  framed = false,
 }: {
-  dateFilter: VenueDateFilter;
-  options: ReturnType<typeof buildVenueDateOptions>;
-  onChange: (value: VenueDateFilter) => void;
-  visibleGroups: number;
-  visibleSessions: number;
-  variant?: 'location' | 'institution';
+  title: string;
+  selected: VenueDateFilter;
+  availableDates: string[];
+  onDateChange: (value: VenueDateFilter) => void;
+  groups: VenueEventGroup[];
+  framed?: boolean;
 }) {
-  const groupLabel = variant === 'institution' ? 'событий' : 'маршрутов';
-  const sessionLabel = variant === 'institution' ? 'сеансов' : 'отправлений';
+  return (
+    <section
+      id="venue-program"
+      className={`scroll-mt-24 ${framed ? 'rounded-2xl border border-slate-200 bg-white p-5 sm:p-6' : ''}`}
+    >
+      <h2 className="mb-3 text-xl font-bold tracking-tight text-slate-950 sm:text-2xl">{title}</h2>
+      <VenueDateRail selected={selected} availableDates={availableDates} onChange={onDateChange} />
+      <VenueEventsGrid groups={groups} />
+    </section>
+  );
+}
+
+function VenueDateRail({
+  selected,
+  availableDates,
+  onChange,
+}: {
+  selected: VenueDateFilter;
+  availableDates: string[];
+  onChange: (value: VenueDateFilter) => void;
+}) {
+  const calendarRef = React.useRef<HTMLInputElement>(null);
+  const chips = React.useMemo(() => buildVenueDateRailChips(availableDates), [availableDates]);
+  const minDate = availableDates[0] || undefined;
+  const maxDate = availableDates[availableDates.length - 1] || undefined;
+  const calendarValue = selected !== 'all' && /^\d{4}-\d{2}-\d{2}$/.test(selected) ? selected : '';
+  const calendarOffRail =
+    Boolean(calendarValue) && !availableDates.slice(0, 21).includes(calendarValue);
+
+  const openCalendar = () => {
+    const input = calendarRef.current;
+    if (!input) return;
+    try {
+      if (typeof input.showPicker === 'function') {
+        input.showPicker();
+        return;
+      }
+    } catch {
+      // fall through to click
+    }
+    input.click();
+  };
 
   return (
-    <div className="mb-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-      <div className="mb-3 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <div className="text-sm font-semibold text-slate-950">Дата</div>
-          <div className="text-xs text-slate-500">
-            Показано {formatNumber(visibleGroups)} {groupLabel}, {formatNumber(visibleSessions)} {sessionLabel} на выбранную дату.
-          </div>
+    <div className="mb-4 flex items-center gap-2">
+      <div
+        role="group"
+        aria-label="Дата"
+        className="horizontal-snap-row flex min-w-0 flex-1 flex-nowrap gap-1.5 overflow-x-auto pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      >
+        {chips.map((chip) => {
+          const active = isVenueDateRailChipActive(chip, selected);
+          const key = chip.kind === 'all' ? 'all' : chip.iso;
+          return (
+            <button
+              key={key}
+              type="button"
+              aria-pressed={active}
+              onClick={() => onChange(chip.kind === 'all' ? 'all' : chip.iso)}
+              className={`catalog-date-chip snap-start ${active ? 'catalog-date-chip-on' : 'catalog-date-chip-idle'}`}
+            >
+              {chip.kind === 'day' ? (
+                <span className="flex flex-col items-center leading-none">
+                  <span className="text-[10px] font-semibold uppercase tracking-wide opacity-80">{chip.weekday}</span>
+                  <span className="mt-0.5 text-sm font-bold">{chip.dayNum}</span>
+                </span>
+              ) : (
+                <span className="whitespace-nowrap">{chip.shortLabel}</span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {availableDates.length > 0 ? (
+        <div className="relative shrink-0">
+          <button
+            type="button"
+            onClick={openCalendar}
+            aria-label="Выбрать другую дату"
+            aria-pressed={calendarOffRail}
+            className={`catalog-date-chip inline-flex h-11 w-11 items-center justify-center px-0 ${
+              calendarOffRail ? 'catalog-date-chip-on' : 'catalog-date-chip-idle'
+            }`}
+          >
+            <CalendarIcon className="h-4 w-4" strokeWidth={1.75} aria-hidden />
+          </button>
+          <input
+            ref={calendarRef}
+            type="date"
+            value={calendarValue}
+            min={minDate}
+            max={maxDate}
+            onChange={(event) => {
+              const next = event.target.value;
+              if (!next) return;
+              onChange(next);
+            }}
+            aria-label="Календарь дат с билетами"
+            className="pointer-events-none absolute inset-0 h-full w-full opacity-0"
+            tabIndex={-1}
+          />
         </div>
-        {options.smartDate ? <div className="text-xs font-medium text-slate-500">Ближайшая дата: {formatHumanDate(options.smartDate)}</div> : null}
-      </div>
-      <div className="flex flex-wrap gap-2">
-        <DateChip active={dateFilter === 'smart'} disabled={!options.smartDate} onClick={() => onChange('smart')} label={options.smartDate ? `Ближайшая · ${formatShortDate(options.smartDate)}` : 'Ближайшая'} />
-        <DateChip active={dateFilter === 'today'} disabled={!options.hasToday} onClick={() => onChange('today')} label="Сегодня" />
-        <DateChip active={dateFilter === 'tomorrow'} disabled={!options.hasTomorrow} onClick={() => onChange('tomorrow')} label="Завтра" />
-        <DateChip active={dateFilter === 'all'} disabled={false} onClick={() => onChange('all')} label="Все даты" />
-      </div>
+      ) : null}
     </div>
   );
 }
 
-function DateChip({ active, disabled, label, onClick }: { active: boolean; disabled: boolean; label: string; onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      disabled={disabled}
-      onClick={onClick}
-      className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
-        active
-          ? 'bg-primary-600 text-white'
-          : disabled
-            ? 'bg-slate-100 text-slate-300'
-            : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-      }`}
-    >
-      {label}
-    </button>
-  );
+function isVenueDateRailChipActive(chip: VenueDateRailChip, selected: VenueDateFilter): boolean {
+  if (chip.kind === 'all') return selected === 'all';
+  return selected === chip.iso;
 }
 
 function VenueEventsGrid({ groups }: { groups: VenueEventGroup[] }) {
@@ -373,71 +405,6 @@ function VenueEventsGrid({ groups }: { groups: VenueEventGroup[] }) {
       ))}
       {!groups.length ? <EmptyState /> : null}
     </div>
-  );
-}
-
-function VenueEventsTable({ groups }: { groups: VenueEventGroup[] }) {
-  return (
-    <div className="overflow-auto rounded-xl border border-slate-200 bg-white shadow-sm">
-      <table className="w-full min-w-[900px] border-collapse text-sm">
-        <thead>
-          <tr className="border-b border-slate-200 bg-slate-50 text-left text-xs uppercase text-slate-500">
-            <th className="px-4 py-3 font-semibold">Ближайшие слоты</th>
-            <th className="px-4 py-3 font-semibold">Событие</th>
-            <th className="px-4 py-3 font-semibold">Категория</th>
-            <th className="px-4 py-3 font-semibold">Цена</th>
-            <th className="px-4 py-3 font-semibold">Остаток</th>
-            <th className="px-4 py-3" />
-          </tr>
-        </thead>
-        <tbody>
-          {groups.slice(0, 120).map((group) => (
-            <tr key={group.key} className="border-b border-slate-100 last:border-0 hover:bg-slate-50">
-              <td className="whitespace-nowrap px-4 py-3 align-top">
-                <div className="flex flex-wrap gap-1.5">
-                  {group.visibleSlots.length ? (
-                    group.visibleSlots.map((session) => (
-                      <span
-                        key={`${session.id}:${session.startsAt}`}
-                        className={`rounded-lg px-2 py-1 text-xs font-medium ${
-                          group.hasSlotsOnSelectedDate ? 'bg-slate-100 text-slate-700' : 'bg-amber-50 text-amber-800'
-                        }`}
-                      >
-                        {session.dateLabel} · {session.timeLabel}
-                      </span>
-                    ))
-                  ) : (
-                    <span className="text-xs text-slate-400">Нет рейсов</span>
-                  )}
-                </div>
-                {!group.hasSlotsOnSelectedDate && group.visibleSlots.length ? (
-                  <p className="mt-1 text-[11px] text-amber-700">Ближайшее отправление</p>
-                ) : null}
-              </td>
-              <td className="min-w-[320px] px-4 py-3">
-                <a href={eventHref(group.representative)} className="font-medium text-slate-950 hover:text-primary-700">{group.title}</a>
-                <div className="mt-1 text-xs text-slate-500">{group.tags.slice(0, 2).join(' · ')}</div>
-              </td>
-              <td className="px-4 py-3 text-slate-600">{group.category}</td>
-              <td className="whitespace-nowrap px-4 py-3 font-semibold text-slate-950">{formatMoney(group.priceFrom)}</td>
-              <td className="px-4 py-3 text-slate-600">{group.vacant ?? '-'}</td>
-              <td className="px-4 py-3">
-                <BuyLink group={group} />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      {!groups.length ? <EmptyState /> : null}
-    </div>
-  );
-}
-
-function BuyLink({ group }: { group: VenueEventGroup }) {
-  return (
-    <a href={eventHref(group.representative)} className="inline-flex min-h-9 items-center justify-center rounded-full bg-primary-600 px-4 text-sm font-semibold text-white hover:bg-primary-700">
-      Купить
-    </a>
   );
 }
 

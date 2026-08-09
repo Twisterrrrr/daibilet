@@ -11,6 +11,20 @@
 
 ---
 
+## 2026-08-10 - Venue «Расписание и билеты»: compact date rail
+
+### Наблюдения
+- Owner: над карточками событий на location/venue - технический subtitle, stats «Показано N», category tabs, toggle Таблица/Карточки, шум «Ближайшая дата» + disabled Сегодня/Завтра.
+
+### Решения
+- `VenuePageView`: только заголовок + горизонтальный date rail (дни с отправлениями, стили `catalog-date-chip`) + compact calendar; cards-only; table/category/stats removed.
+- `venue-program`: filter = `all` | ISO day; `buildVenueDateRailChips` / `availableDates`; при выбранной дате - только группы с слотами на этот день.
+
+### Проблемы
+- Deploy по «выкатывай».
+
+---
+
 ## 2026-08-10 - Scenarios panel: title-flush, blog+CTA one row
 
 ### Наблюдения

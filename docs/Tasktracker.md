@@ -2,6 +2,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
+| UX.VENUE-SCHEDULE-RAIL | Venue «Расписание и билеты»: date rail + calendar; drop table/tabs/stats/subtitle | Высокий | 🔄 ship; deploy по «выкатывай» |
 | UX.SCENARIOS-TITLE-FLUSH | Scenarios panel: no empty gutter; blog+CTA on title row | Высокий | ✅ `06b1db6b` Deploy `31335835810` BUILD_ID=`Mby7MP2KiGFvNEWzY_qC4` |
 | UX.EVENTS-MOBILE-SELECTS | `/events` mobile: Find in search; date+type dropdowns; chip rails md+ only | Высокий | ✅ `c68d010e` Deploy `31335835810` BUILD_ID=`Mby7MP2KiGFvNEWzY_qC4` |
 | UX.EVENTS-FILTERS-AIR | `/events` mobile: sticky search-only (chips visible); filter sheet air + quick evening chip | Высокий | ✅ `f0880cb1` Deploy `31335835810` BUILD_ID=`Mby7MP2KiGFvNEWzY_qC4` |
