@@ -2,6 +2,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
+| CONT.PERM-LOGISTICS | Perm suburbs/presets: Хохловка CCW, Кунгур центр+пещера, Белая гора split, Усьва/Губаха 2 дня | Высокий | 🔄 ship+Deploy MSK web |
 | UX.SCENARIOS-LIGHT | Сценарии light panel; suburb canon full-width; POI row flex; CTA match | Критический | 🔄 ship+Deploy MSK web |
 | UX.DAY-TRIP-CANON | DayTripCanonCard для suburbs (full width); scenarios откатили с shared canon | Высокий | ✅ partial `c5629984`; scenarios split → UX.SCENARIOS-LIGHT |
 | UX.SUBURB-CARD-CANON | Suburb cards hub/my-day: канон Петергоф-макета (логистика/гастро/что посмотреть/CTA), schema logisticsExit+gastroStop, без SVG icons | Высокий | ✅ superseded by UX.DAY-TRIP-CANON |

@@ -195,7 +195,9 @@ export function SuburbsCarousel({
         subtitle={suburbVectorTitle(place) || undefined}
         logisticsExit={String(place.logisticsExit || place.stationName || '').trim() || undefined}
         logisticsText={String(place.travelVectorBlurb || '').trim() || undefined}
-        logisticsExtra={blurb || undefined}
+        logisticsExtra={
+          [String(place.timingNote || '').trim(), blurb].filter(Boolean).join(' ') || undefined
+        }
         gastro={resolveCanonGastroStop(place)}
         sightDescFromMd={compact}
         sights={nested.map((poi) => ({

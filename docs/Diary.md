@@ -1,3 +1,17 @@
+## 2026-08-09 - KGD suburbs logistics (гид)
+
+### Наблюдения
+- Owner: порядок точек в пригородах Калининграда не совпадал с реальной day-trip логистикой (коса «вглубь», Зеленоградск сквозной, Светлогорск спуск/канатка, Балтийск утро/паром, Янтарный авто→пешком).
+
+### Решения
+- Данные only (web+public `cityInfo` significantSuburbs + coast presets): новый порядок places, `travelVector`/`timingNote`/`gastroStop` где нужно; `timingNote` на suburb → `logisticsExtra` в SuburbsCarousel (layout DayTripCanonCard не трогали).
+- Вилла Порт → Порр; маяк + Пётр I; променад Янтарного в desc парка.
+
+### Проблемы
+- Ship+Deploy MSK web - ниже после GHA.
+
+---
+
 ## 2026-08-09 - Hotfix: suburb card width + POI row layout
 
 ### Наблюдения
@@ -10,6 +24,23 @@
 
 ### Проблемы
 - Ship+Deploy MSK web — ниже после GHA.
+
+---
+
+## 2026-08-09 - Perm suburbs logistics (гид)
+
+### Наблюдения
+- Owner: невозможные «один день» планы в Perm suburbs - Белая гора+Ермак+Плакун (Сылва без моста, крюк 80-100+ км); Губаха/Усьва+Полюд в один день.
+- Хохловка: комфортнее против часовой, финал - сользавод и панорама. Кунгур: сначала центр пешком, пещера авто, пряники на выезде в Пермь.
+
+### Решения
+- Данные only (web+public `cityInfo`): переставлены stops Хохловки/Кунгура; `travelVectorBlurb` + suburb/preset `timingNote`.
+- «Белая гора» разбита на **Православный Урал** (монастырь-крест-купель-Плакун) и **Кунгурский экстрим** (Ермак, стык с Кунгуром).
+- «Губаха / Усьва» разбита на **Усьва (день 1)** + **Губаха (день 2)**; Полюд убран. Presets: `perm-orthodox-ural-day`, `perm-kungur-extrem-day`, `perm-usva-day1`, `perm-gubakha-day2`.
+- Layout/UX scenarios vs suburbs не трогали (параллельный агент).
+
+### Проблемы
+- Ship+Deploy MSK web - после commit/push.
 
 ---
 
