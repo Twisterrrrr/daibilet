@@ -1,3 +1,22 @@
+## 2026-08-09 - Location previews: хвост 217 (не «0»)
+
+### Наблюдения
+- Owner: после батча `a4b642d7` (171) на `/locations` всё ещё карточки без фото.
+- Live критерий карточки: `toVenueCatalogCard` → `resolveVenueHeroImage(slug, hub)`. Фото есть только если slug в editorial map **или** hub не stub (`/venues/generated/*`).
+- Аудит family=location (715): focus monument/outdoor/attraction без resolved hero = **217** (park 72 и gastro 51 уже закрыты; pier/bus/sport — hub/editorial ок). СПб = 56–57.
+- На диске у многих gaps уже лежали sharp-stub JPG ~15KB по path `/images/venues/{city}/…`, но **без** записи в `LOCATION_PACK_IMAGES`, а hub в API = generated stub → UI = градиент+иконка (не 404, не city image).
+- Предыдущий отчёт «0» считал только свой scoped batch 171, не весь каталог.
+
+### Решения
+- GenerateImage ×217 → overwrite stubs в `apps/public/public/images/venues/…`; `LOCATION_PACK_IMAGES` 171→388.
+- Commit+push + Deploy MSK web (sync-public-assets в swap). Prod DB `heroImageUrl` не трогали: карточки берут editorial overlay.
+
+### Проблемы
+- ISR `revalidate=300` у `/locations` — после deploy возможен короткий stale window.
+- Часть JPG тяжёлые (без sharp в agent env); при необходимости отдельный compress-pass.
+
+---
+
 ## 2026-08-09 - Canon panels: bg inset breathing room
 
 ### Наблюдения
