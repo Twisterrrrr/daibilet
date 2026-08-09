@@ -4,6 +4,7 @@ import test from 'node:test';
 import {
   OPEN_DATE_HOURS_HOLIDAY_NOTE,
   OPEN_DATE_HOURS_UNKNOWN_NOTE,
+  __editorialOpeningHoursCountForTests,
   formatVenueOpeningHoursLines,
   resolveTicketOpeningHours,
   resolveVenueOpeningHours,
@@ -19,6 +20,9 @@ test('resolveVenueOpeningHours: known seed museums', () => {
   assert.ok(
     resolveVenueOpeningHours('muzei-sovremennogo-iskusstva-permm-5e4423fcaadb42a1889abee3'),
   );
+  assert.ok(resolveVenueOpeningHours('saint-petersburg-russkiy-muzey'));
+  assert.ok(resolveVenueOpeningHours('moscow-muzey-garazh'));
+  assert.equal(__editorialOpeningHoursCountForTests() >= 130, true);
 });
 
 test('resolveVenueOpeningHours: unknown slug stays null (no invented hours)', () => {
