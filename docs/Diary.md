@@ -9,7 +9,7 @@
 - Фикс: один `normalizeStartsAt` для Date/string; primary = earliest unique slot; dedupe по MSK HH:mm; hydrate всегда sync primary; boat wizard format+dedupe Europe/Moscow; `startsAtToHHMM`/soft-timing без `getHours()`.
 
 ### Проблемы
-- Нужен Deploy MSK web + restart `daibilet-api` (mapper в backend).
+- Нет. Live: API `a905d477` + catalog rebuild; Deploy MSK web **31306448807** BUILD_ID=`Cw8DFKoqPUl8GZ-NI-yc_`; bridges main `23:55` (was `20:55`).
 
 ---
 

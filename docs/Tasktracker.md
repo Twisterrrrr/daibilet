@@ -2,7 +2,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| FIX.BOAT-TZ-20:55 | Bridges/my-day: primary −3ч vs slots; dedupe HH:mm MSK | Критический | 🔄 ship+API restart+Deploy MSK web |
+| FIX.BOAT-TZ-20:55 | Bridges/my-day: primary −3ч vs slots; dedupe HH:mm MSK | Критический | ✅ `a905d477`/`038ea511`; API+catalog rebuild; Deploy MSK web `31306448807` BUILD_ID=`Cw8DFKoqPUl8GZ-NI-yc_` |
 | CONT.TRANSIT-TIPS | Schema `transitTip` + UI suburb timeline; NN logistics; SPB triangle/Petrograd/Bertgold/bar; Perm/KGD tips | Высокий | ✅ `c5d644d8` Deploy MSK web `31305337295` BUILD_ID=`gOTUGQNTVuIsCS_1DvAT_` |
 | CONT.KGD-LOGISTICS | KGD suburbs/presets: коса углубление+Фрингилла возврат, Зел/Свет/Балт/Янт порядок+timingNote | Высокий | ✅ `7644445c` Deploy MSK web `31304947725` |
 | CONT.PERM-LOGISTICS | Perm suburbs/presets: Хохловка CCW, Кунгур центр+пещера, Белая гора split, Усьва/Губаха 2 дня | Высокий | ✅ `7644445c` Deploy MSK web `31304947725` BUILD_ID=`mi3IHPRLphsEf9IgHXj9a` |
