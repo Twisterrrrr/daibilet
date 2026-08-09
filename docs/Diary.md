@@ -1,4 +1,23 @@
+## 2026-08-09 - location PDP redirect loop (Yaani Kirik)
+
+### Наблюдения
+- Owner: `https://daibilet.ru/locations/cerkov-svyatogo-apostola-ioanna-yaani-kirik-691e1ef…` «лежит сайт».
+- API 200; Next отдавал **308** ~86KB `__next_error__`.
+- Venue type ошибочно `club_bar_restaurant` → `template=institution`, а stored `canonicalPath` = `/locations/…`.
+- `VenueDetailPage` при family mismatch делал `permanentRedirect(canonicalPath)` → петля `/locations`→`/locations`.
+
+### Решения
+- Web: cross-family redirect только через `venueHref` (не canonicalPath); `venueCanonicalPath()` отбрасывает чужое семейство.
+- API: `resolvePublicVenueCanonicalPath` в `public-venue-read.js`.
+- Prod data: kind церкви → `ATTRACTION`, canonicalPath → `/locations/…` без id-хвоста (когда SSH доступен).
+
+### Проблемы
+- ISR может держать 308 до revalidate/purge; после web deploy проверить оба URL.
+
+---
+
 ## 2026-08-09 - river-cruises: Карелия / Ладожские шхеры
+
 
 ### Наблюдения
 - На `/rechnye-progulki/saint-petersburg` два почти одинаковых оффера (~6980₽, 07:00): «Водная прогулка на катерах по Ладожским Шхерам» (пл. Восстания, «Хит») и «Карелия. Ладожским Шхерам».

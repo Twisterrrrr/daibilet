@@ -2,7 +2,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| FIX.RIVER-KARELIA | river-cruises: exclude Карелия/Ладога/шхеры/Валаам day-trips | Высокий | ✅ `9b257769` MSK API restart; smoke 0 hits |
+| FIX.LOC-REDIR-LOOP | location↔venues permanentRedirect loop via mismatched canonicalPath (Yaani Kirik) | Критический | 🔄 ship web+API; DB kind ATTRACTION |
 | FIX.TC-CANCELLED-MISSING | TC: deactivate events missing from PUBLIC∪STAND_BY; block widget on cancelled; `tc:reconcile-missing` | Критический | 🔄 ship + MSK reconcile |
 | FIX.TC-STANDBY-RECONCILE | TC sync: fetch STAND_BY + reconcile; hide sales-stopped cards catalog-wide | Критический | ✅ `11af2419` MSK reconcile 7658 STAND_BY; API restart + catalog rebuild |
 | UX.CANON-PANEL-INSET | DayTripCanonCard: logistics bg extend left; gastro pl same inset; keep text vertical | Высокий | ✅ `73509693` Deploy MSK web `31308732076` BUILD_ID=`SH7xtIXBki0ZEfrBkwYe3` |

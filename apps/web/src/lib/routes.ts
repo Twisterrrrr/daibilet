@@ -45,6 +45,26 @@ export function venueHref(venue: VenueRouteSource): string {
   return `${base}/${venueSlug(venue)}`;
 }
 
+/**
+ * Prefer stored canonicalPath only when its route family matches venue type.
+ * Mismatched `/locations` vs `/venues` paths caused permanentRedirect loops.
+ */
+export function venueCanonicalPath(
+  venue: VenueRouteSource & { canonicalPath?: string | null },
+): string {
+  const href = venueHref(venue);
+  const stored = String(venue.canonicalPath || '').trim();
+  if (!stored) return href;
+  const storedFamily = stored.startsWith('/locations/')
+    ? 'location'
+    : stored.startsWith('/venues/')
+      ? 'institution'
+      : null;
+  if (!storedFamily) return href;
+  if (storedFamily !== venuePageTemplate(venue.type)) return href;
+  return stored.startsWith('/') ? stored : `/${stored}`;
+}
+
 export function venueSlug(venue: VenueRouteSource): string {
   const rawSlug = String(venue.slug || '').trim();
   if (rawSlug) {

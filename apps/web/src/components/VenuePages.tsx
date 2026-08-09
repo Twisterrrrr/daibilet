@@ -16,7 +16,7 @@ import {
   VENUE_CATALOG_PAGE_SIZE,
 } from '@/lib/venue-catalog-feed';
 import { evaluateVenueIndexability, robotsForIndexability } from '@/lib/hub-indexability';
-import { venueHref, venuePageTemplate } from '@/lib/routes';
+import { venueHref, venueCanonicalPath, venuePageTemplate } from '@/lib/routes';
 import { safeNotFound } from '@/lib/safe-not-found';
 import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
 import { getCachedVenuesCatalog } from '@/server/cached-public-surfaces';
@@ -148,7 +148,7 @@ export async function generateVenueDetailMetadata(slug: string): Promise<Metadat
   const { core: title, full: shareTitle } = resolveVenueSeoTitle(venue);
   const description =
     venue.seoDescription || venue.shortDescription || venue.description || undefined;
-  const canonicalPath = venue.canonicalPath || venueHref(venue);
+  const canonicalPath = venueCanonicalPath(venue);
 
   return {
     title: pageTitle(title),
@@ -242,15 +242,17 @@ export async function VenueDetailPage({
   let payload = loaded.payload;
   const family = resolveVenueRouteFamily(payload.venue);
   if (family !== routeFamily) {
-    const dest =
-      payload.venue.canonicalPath ||
+    // Never trust stored canonicalPath here: if it still points at the wrong
+    // family (e.g. /locations/… while template=institution) Next 308-loops and
+    // the PDP hangs the tab (live 2026-08-09 Yaani Kirik church).
+    permanentRedirect(
       venueHref({
         id: payload.venue.id,
         slug: payload.venue.slug || decodedSlug,
         name: payload.venue.name,
         type: family === 'location' ? 'location' : payload.venue.type,
-      });
-    permanentRedirect(dest);
+      }),
+    );
   }
 
   const editorialHero = resolveVenueHeroImage(

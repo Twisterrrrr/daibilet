@@ -624,7 +624,11 @@ export async function buildPublicVenuePage(db, venueSlugOrId) {
       seoH1: canonicalVenue.seoH1,
       seoTitle: canonicalVenue.seoTitle,
       seoDescription: canonicalVenue.seoDescription,
-      canonicalPath: canonicalVenue.canonicalPath || `/${publicVenuePageTemplate(resolvedType) === 'location' ? 'locations' : 'venues'}/${publicVenueSlug(canonicalVenue.slug, normalizedVenue.name, canonicalVenue.id)}`,
+      canonicalPath: resolvePublicVenueCanonicalPath(
+        canonicalVenue.canonicalPath,
+        pageTemplate,
+        publicVenueSlug(canonicalVenue.slug, normalizedVenue.name, canonicalVenue.id),
+      ),
       isIndexable,
       events: displayEventCount,
       stopEventCount,
@@ -1451,6 +1455,21 @@ export function normalizeVenueKindValue(value) {
 export function publicVenuePageTemplate(kind) {
   const normalized = normalizeVenueKindValue(kind);
   return INSTITUTION_VENUE_KINDS.has(normalized) ? 'institution' : 'location';
+}
+
+/** Drop stored canonicalPath when it points at the wrong /locations|/venues family. */
+export function resolvePublicVenueCanonicalPath(storedPath, pageTemplate, slug) {
+  const fallback = `/${pageTemplate === 'location' ? 'locations' : 'venues'}/${slug}`;
+  const stored = String(storedPath || '').trim();
+  if (!stored) return fallback;
+  const normalized = stored.startsWith('/') ? stored : `/${stored}`;
+  const storedFamily = normalized.startsWith('/locations/')
+    ? 'location'
+    : normalized.startsWith('/venues/')
+      ? 'institution'
+      : null;
+  if (!storedFamily || storedFamily !== pageTemplate) return fallback;
+  return normalized;
 }
 
 const MEETING_POINT_TEXT_RE =

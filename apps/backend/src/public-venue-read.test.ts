@@ -5,6 +5,7 @@ import {
   mergeCityPageVenues,
   publicVenueRowMatchesCityFilter,
   publicVenuesForSessionsFromHub,
+  resolvePublicVenueCanonicalPath,
 } from './public-venue-read.js';
 
 test('mergeCityPageVenues prefers content/editorial then appends session venues', () => {
@@ -96,5 +97,28 @@ test('isPublicVenueHub basic gate', () => {
       busEvents: 0,
     }),
     false,
+  );
+});
+
+test('resolvePublicVenueCanonicalPath drops mismatched location/venues family', () => {
+  assert.equal(
+    resolvePublicVenueCanonicalPath(
+      '/locations/cerkov-svyatogo-apostola-ioanna-yaani-kirik',
+      'institution',
+      'cerkov-svyatogo-apostola-ioanna-yaani-kirik',
+    ),
+    '/venues/cerkov-svyatogo-apostola-ioanna-yaani-kirik',
+  );
+  assert.equal(
+    resolvePublicVenueCanonicalPath(
+      '/locations/cerkov-svyatogo-apostola-ioanna-yaani-kirik',
+      'location',
+      'cerkov-svyatogo-apostola-ioanna-yaani-kirik',
+    ),
+    '/locations/cerkov-svyatogo-apostola-ioanna-yaani-kirik',
+  );
+  assert.equal(
+    resolvePublicVenueCanonicalPath(null, 'location', 'park-a'),
+    '/locations/park-a',
   );
 });
