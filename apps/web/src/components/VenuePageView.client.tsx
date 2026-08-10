@@ -229,7 +229,7 @@ export function VenuePageView({
               >
                 {baseSessions.length > 0 ? (
                   <VenueProgramBlock
-                    title="Афиша и билеты"
+                    title="Афиша"
                     selected={resolvedDateFilter}
                     availableDates={dateOptions.availableDates}
                     onDateChange={setDateFilter}

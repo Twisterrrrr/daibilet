@@ -648,6 +648,170 @@ export function resolveTicketOpeningHours(input: {
   return formatVenueOpeningHoursLines(resolveVenueOpeningHours(input.venueSlug));
 }
 
+/** JS getDay(): 0=Sun … 6=Sat. Russian short weekday → index. */
+const WEEKDAY_TO_JS: Record<string, number> = {
+  вс: 0,
+  пн: 1,
+  вт: 2,
+  ср: 3,
+  чт: 4,
+  пт: 5,
+  сб: 6,
+};
+
+const WEEKDAY_ORDER = ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'] as const;
+
+const SEASONAL_OR_VAGUE_RE =
+  /\b(янв|фев|мар|апр|мая|май|июн|июл|авг|сен|окт|ноя|дек|лето|зима|весна|осень|ежедн?\.?\s+будн|только по|по расписанию|запись)\b/i;
+
+function parseClockToMinutes(raw: string): number | null {
+  const m = String(raw || '')
+    .trim()
+    .match(/^(\d{1,2}):(\d{2})$/);
+  if (!m) return null;
+  const h = Number(m[1]);
+  const min = Number(m[2]);
+  if (!Number.isFinite(h) || !Number.isFinite(min) || h > 23 || min > 59) return null;
+  return h * 60 + min;
+}
+
+function expandWeekdayToken(token: string): number[] {
+  const cleaned = token
+    .trim()
+    .toLowerCase()
+    .replace(/\./g, '')
+    .replace(/\s+/g, '');
+  if (!cleaned) return [];
+  if (cleaned === 'ежедневно' || cleaned === 'ежедн') {
+    return [0, 1, 2, 3, 4, 5, 6];
+  }
+  const range = cleaned.match(/^([а-яё]+)-([а-яё]+)$/i);
+  if (range) {
+    const a = WEEKDAY_TO_JS[range[1]!];
+    const b = WEEKDAY_TO_JS[range[2]!];
+    if (a == null || b == null) return [];
+    const startIdx = WEEKDAY_ORDER.indexOf(range[1] as (typeof WEEKDAY_ORDER)[number]);
+    const endIdx = WEEKDAY_ORDER.indexOf(range[2] as (typeof WEEKDAY_ORDER)[number]);
+    if (startIdx < 0 || endIdx < 0) return [];
+    const out: number[] = [];
+    for (let i = startIdx; i <= endIdx; i += 1) {
+      const key = WEEKDAY_ORDER[i]!;
+      out.push(WEEKDAY_TO_JS[key]!);
+    }
+    return out;
+  }
+  const single = WEEKDAY_TO_JS[cleaned];
+  return single == null ? [] : [single];
+}
+
+function parseWeekdaysFromPrefix(prefix: string): number[] {
+  const text = prefix.trim().toLowerCase();
+  if (!text) return [];
+  if (/ежедневн/i.test(text)) return [0, 1, 2, 3, 4, 5, 6];
+  const parts = text.split(/[,\s]+/).filter(Boolean);
+  const days = new Set<number>();
+  for (const part of parts) {
+    for (const d of expandWeekdayToken(part)) days.add(d);
+  }
+  return [...days];
+}
+
+type DayIntervals = Map<number, Array<[number, number]>>;
+
+/**
+ * Build weekday → open intervals from editorial Russian lines.
+ * Returns null when schedule is seasonal/vague or has no parseable weekday hours.
+ */
+export function parseVenueOpeningSchedule(
+  lines: readonly string[] | null | undefined,
+): DayIntervals | null {
+  if (!lines?.length) return null;
+  const schedule: DayIntervals = new Map();
+  let sawHours = false;
+
+  for (const rawLine of lines) {
+    const line = String(rawLine || '').trim();
+    if (!line) continue;
+    if (SEASONAL_OR_VAGUE_RE.test(line)) continue;
+
+    const closedMatch = line.match(
+      /^(.+?)\s*[-–—:]\s*выходн/i,
+    );
+    if (closedMatch) {
+      const days = parseWeekdaysFromPrefix(closedMatch[1]!);
+      for (const d of days) schedule.set(d, []);
+      continue;
+    }
+
+    const timeMatch = line.match(/(\d{1,2}:\d{2})\s*[-–—]\s*(\d{1,2}:\d{2})/);
+    if (!timeMatch) continue;
+    const openMin = parseClockToMinutes(timeMatch[1]!);
+    const closeMin = parseClockToMinutes(timeMatch[2]!);
+    if (openMin == null || closeMin == null || closeMin <= openMin) continue;
+
+    const beforeTime = line.slice(0, timeMatch.index ?? 0).replace(/:\s*$/, '').trim();
+    const days = parseWeekdaysFromPrefix(beforeTime || 'ежедневно');
+    if (!days.length) continue;
+
+    sawHours = true;
+    for (const d of days) {
+      const prev = schedule.get(d) || [];
+      prev.push([openMin, closeMin]);
+      schedule.set(d, prev);
+    }
+  }
+
+  return sawHours ? schedule : null;
+}
+
+function zonedParts(now: Date, timeZone: string): { weekday: number; minutes: number } {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    weekday: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(now);
+  const weekdayRaw = parts.find((p) => p.type === 'weekday')?.value || '';
+  const hour = Number(parts.find((p) => p.type === 'hour')?.value);
+  const minute = Number(parts.find((p) => p.type === 'minute')?.value);
+  const map: Record<string, number> = {
+    Sun: 0,
+    Mon: 1,
+    Tue: 2,
+    Wed: 3,
+    Thu: 4,
+    Fri: 5,
+    Sat: 6,
+  };
+  return {
+    weekday: map[weekdayRaw] ?? now.getDay(),
+    minutes: (Number.isFinite(hour) ? hour : 0) * 60 + (Number.isFinite(minute) ? minute : 0),
+  };
+}
+
+export type VenueOpenNowStatus = 'open' | 'closed' | 'unknown';
+
+/**
+ * Whether the venue is open right now from editorial hours + IANA timezone.
+ * `unknown` when hours missing/unparseable - UI should hide the badge.
+ */
+export function resolveVenueOpenNowStatus(input: {
+  lines?: readonly string[] | null;
+  timeZone?: string | null;
+  now?: Date;
+}): VenueOpenNowStatus {
+  const schedule = parseVenueOpeningSchedule(input.lines);
+  if (!schedule) return 'unknown';
+  const tz = String(input.timeZone || 'Europe/Moscow').trim() || 'Europe/Moscow';
+  const { weekday, minutes } = zonedParts(input.now || new Date(), tz);
+  if (!schedule.has(weekday)) return 'closed';
+  const intervals = schedule.get(weekday) || [];
+  if (!intervals.length) return 'closed';
+  const open = intervals.some(([start, end]) => minutes >= start && minutes < end);
+  return open ? 'open' : 'closed';
+}
+
 /** Open-date warning when concrete hours are shown. */
 export const OPEN_DATE_HOURS_HOLIDAY_NOTE =
   'В праздники график может отличаться - сверяйте с официальным сайтом площадки.';

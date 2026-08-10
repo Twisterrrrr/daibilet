@@ -25,7 +25,9 @@ import { formatMoney, formatNumber } from '@/lib/format';
 import { formatStreetAddress } from '@/lib/address';
 import { build2gisRouteUrl } from '@/lib/maps';
 import { dedupeVenueLinkedEvents } from '@/lib/day-route-score';
+import { resolveNearestMetroStationName } from '@/lib/nearest-metro';
 import type { VenueEventGroup } from '@/lib/venue-program';
+import { formatVenueMetroLabel } from '@/lib/venue-editorial-content';
 import { normalizeVenueKind, resolveLocationVenueCopy, venueTypeIcon, venueTypeLabel } from '@/lib/venue-meta';
 import { eventHref, venueHref } from '@/lib/routes';
 import type {
@@ -58,6 +60,17 @@ export function LocationVenueLayout({
 }) {
   const title = venue.seoH1 || venue.title || venue.name;
   const streetAddress = formatStreetAddress(venue.address, { city: venue.city });
+  const metroLabel = React.useMemo(() => {
+    const name = resolveNearestMetroStationName({
+      latitude: venue.latitude,
+      longitude: venue.longitude,
+      city: venue.city,
+      citySlug: venue.citySlug,
+      metroStation: venue.metroStation,
+    });
+    return formatVenueMetroLabel(name);
+  }, [venue.latitude, venue.longitude, venue.city, venue.citySlug, venue.metroStation]);
+  const heroAddressLine = [streetAddress, metroLabel].filter(Boolean).join(' • ');
   const hasMap = Boolean(venue.latitude && venue.longitude);
   const isPier = normalizeVenueKind(venue.type) === 'pier' || normalizeVenueKind(venue.type) === 'pier_water';
   const isBus = normalizeVenueKind(venue.type) === 'bus';
@@ -116,9 +129,9 @@ export function LocationVenueLayout({
               <h1 className="mt-4 font-display text-3xl font-extrabold text-white sm:text-4xl md:text-5xl">{title}</h1>
               {heroLead ? <p className="mt-3 max-w-3xl text-sm text-white/85 sm:text-base">{heroLead}</p> : null}
               <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-sm text-white/85">
-                {streetAddress ? (
+                {heroAddressLine ? (
                   <span className="inline-flex items-center gap-1.5">
-                    <MapPin className="h-4 w-4" /> {streetAddress}
+                    <MapPin className="h-4 w-4" /> {heroAddressLine}
                   </span>
                 ) : null}
                 <span className="inline-flex items-center gap-1.5">
@@ -152,9 +165,9 @@ export function LocationVenueLayout({
               <span className="inline-flex items-center gap-1.5">
                 <Ticket className="h-4 w-4" /> {formatNumber(stats.events)} {isBus ? 'рейсов' : 'событий'}
               </span>
-              {streetAddress ? (
+              {heroAddressLine ? (
                 <span className="inline-flex items-center gap-1.5">
-                  <MapPin className="h-4 w-4" /> {streetAddress}
+                  <MapPin className="h-4 w-4" /> {heroAddressLine}
                 </span>
               ) : null}
             </div>
@@ -181,7 +194,7 @@ export function LocationVenueLayout({
             <h1 className="mt-4 font-display text-3xl font-extrabold text-white sm:text-4xl md:text-5xl">{title}</h1>
             <p className="mt-3 max-w-2xl text-white/85">{heroLead}</p>
             {venue.hookFact ? <p className="mt-2 max-w-2xl text-sm text-emerald-100/95">{venue.hookFact}</p> : null}
-            {hasStopExcursions || streetAddress ? (
+            {hasStopExcursions || heroAddressLine ? (
               <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/85">
                 {hasStopExcursions ? (
                   <span className="inline-flex items-center gap-1.5">
@@ -194,9 +207,9 @@ export function LocationVenueLayout({
                         : 'экскурсий'}
                   </span>
                 ) : null}
-                {streetAddress ? (
+                {heroAddressLine ? (
                   <span className="inline-flex items-center gap-1.5">
-                    <MapPin className="h-4 w-4" /> {streetAddress}
+                    <MapPin className="h-4 w-4" /> {heroAddressLine}
                   </span>
                 ) : null}
               </div>
@@ -254,17 +267,12 @@ export function LocationVenueLayout({
                   <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
                     <h1 className="font-display text-2xl font-extrabold text-white sm:text-3xl lg:text-4xl">{title}</h1>
                     <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-white/85">
-                      {streetAddress ? (
+                      {heroAddressLine || venue.city ? (
                         <span className="inline-flex items-center gap-1">
                           <MapPin className="h-3.5 w-3.5" />
-                          {streetAddress}
+                          {heroAddressLine || venue.city}
                         </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1">
-                          <MapPin className="h-3.5 w-3.5" />
-                          {venue.city}
-                        </span>
-                      )}
+                      ) : null}
                     </div>
                   </div>
                 </div>
@@ -364,7 +372,7 @@ export function LocationVenueLayout({
               <p className="mt-1 text-sm text-slate-500">
                 {hasStopExcursions
                   ? 'Маршруты с явной остановкой у этой локации.'
-                  : 'Явных остановок пока нет - показываем события со стартом в радиусе 300 м.'}
+                  : 'События в радиусе 300 м. Это не афиша площадки!'}
               </p>
               <ul className="mt-4 space-y-3" data-venue-linked-events-deduped>
                 {(hasStopExcursions ? uniqueStopEvents : uniqueNearbyEvents).map((event) => (
@@ -462,7 +470,7 @@ export function LocationVenueLayout({
           ) : null}
         </div>
 
-        <LocationVenueSidebar venue={venue} relatedVenues={relatedVenues} />
+        <LocationVenueSidebar venue={venue} relatedVenues={relatedVenues} metroLabel={metroLabel} />
       </div>
 
       <MobileStickyActionBar>
@@ -502,8 +510,17 @@ export function LocationVenueLayout({
   );
 }
 
-function LocationVenueSidebar({ venue, relatedVenues }: { venue: PublicVenueDto; relatedVenues: PublicVenueDto[] }) {
+function LocationVenueSidebar({
+  venue,
+  relatedVenues,
+  metroLabel,
+}: {
+  venue: PublicVenueDto;
+  relatedVenues: PublicVenueDto[];
+  metroLabel: string | null;
+}) {
   const hasCoords = Boolean(venue.latitude && venue.longitude);
+  const streetAddress = formatStreetAddress(venue.address, { city: venue.city });
 
   const copyCoords = () => {
     if (!hasCoords) return;
@@ -513,6 +530,35 @@ function LocationVenueSidebar({ venue, relatedVenues }: { venue: PublicVenueDto;
   return (
     <aside className="lg:sticky lg:top-24 lg:self-start">
       <div className="space-y-4">
+        {streetAddress || metroLabel || venue.city ? (
+          <div id="contacts" className="rounded-2xl border border-slate-200 bg-white p-5">
+            <div className="text-sm font-semibold text-slate-900">Контакты</div>
+            <ul className="mt-3 space-y-3 text-sm text-slate-700">
+              {streetAddress || venue.city ? (
+                <li className="flex items-start gap-2">
+                  <span className="shrink-0" aria-hidden="true">
+                    📍
+                  </span>
+                  <span>
+                    {streetAddress || venue.city}
+                    {streetAddress && venue.city && !streetAddress.includes(venue.city)
+                      ? `, ${venue.city}`
+                      : ''}
+                  </span>
+                </li>
+              ) : null}
+              {metroLabel ? (
+                <li className="flex items-start gap-2">
+                  <span className="shrink-0" aria-hidden="true">
+                    🚇
+                  </span>
+                  <span>{metroLabel}</span>
+                </li>
+              ) : null}
+            </ul>
+          </div>
+        ) : null}
+
         {hasCoords ? (
           <div className="rounded-2xl border border-slate-200 bg-white p-5">
             <div className="text-sm font-semibold text-slate-900">Координаты</div>

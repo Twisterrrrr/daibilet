@@ -45,6 +45,10 @@ export type VenueEditorialContent = {
   displayTitle?: string;
   /** Interesting fact above «О месте» (city-hub style). */
   hookFact?: string;
+  /**
+   * Extra gallery URLs (real assets only). Combined with hero when ≥2 unique images.
+   */
+  galleryUrls?: string[];
   highlights: string[];
   features: VenueFeatureCode[];
   faq: VenueEditorialFaqItem[];
@@ -74,6 +78,11 @@ const EDITORIAL_BY_SLUG: Record<string, VenueEditorialContent> = {
     displayTitle: 'Государственный Эрмитаж',
     hookFact:
       'Если вы решите задержаться у каждого экспоната музея хотя бы на одну минуту, вам придется провести здесь без сна и еды целых 8 лет.',
+    // Real local covers only (main complex + General Staff) - no stock Unsplash fillers.
+    galleryUrls: [
+      '/images/venues/saint-petersburg/ermitazh.jpg',
+      '/images/venues/saint-petersburg/glavnyy-shtab-ermitazh.jpg',
+    ],
     highlights: [
       '3 миллиона экспонатов',
       'Зимний дворец - объект ЮНЕСКО',
@@ -182,6 +191,28 @@ export function formatVenueMetroLabel(metro: string | null | undefined): string 
   if (!text || text === '-' || text === '—' || text === '–') return null;
   if (/^м[\.\s]/i.test(text)) return text;
   return `м. ${text}`;
+}
+
+/**
+ * Gallery for institution PDP: editorial URLs + hero, deduped.
+ * Returns [] unless there are at least 2 real images (never invent fillers).
+ */
+export function resolveVenueGalleryImages(input: {
+  slug?: string | null;
+  heroImageUrl?: string | null;
+}): string[] {
+  const editorial = resolveVenueEditorialContent(input.slug);
+  const seen = new Set<string>();
+  const out: string[] = [];
+  const push = (raw: string | null | undefined) => {
+    const url = String(raw || '').trim();
+    if (!url || seen.has(url)) return;
+    seen.add(url);
+    out.push(url);
+  };
+  for (const url of editorial?.galleryUrls || []) push(url);
+  push(input.heroImageUrl);
+  return out.length >= 2 ? out : [];
 }
 
 /** @internal test helper */

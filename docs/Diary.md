@@ -1,3 +1,20 @@
+## 2026-08-10 - Venue PDP: metro + Hermitage batch v3
+
+### Наблюдения
+- В репо не было nearest-metro; только ручной `metroStation` / editorial.
+- Owner: hero/contacts метро для MSK/SPB; Hermitage UX (tabs/fact/gallery/open-now/copy).
+
+### Решения
+- Data: `metro-stations-msk-spb.ts` из nextgis/metro4all (182 MSK + 64 SPB), haversine ≤2.5 км.
+- `resolveNearestMetroStationName`: DB/editorial first, else nearest; silent omit.
+- Institution + Location layouts: адрес ` • ` м. … в hero; 🚇 в контактах.
+- Hermitage: gallery (2 real covers), «Открыто сейчас», thumbs в «Ближайшие события», Афиша tab if sessions, copy «Также можно посетить» + nearby disclaimer.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-10 - Hermitage PDP UX v3 (tabs / факт / hide tickets)
 
 ### Наблюдения

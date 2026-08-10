@@ -6,6 +6,7 @@ import {
   applyVenueEditorialOverlay,
   formatVenueMetroLabel,
   resolveVenueEditorialContent,
+  resolveVenueGalleryImages,
   venueFeatureChips,
   venueFeatureLabels,
 } from './venue-editorial-content.ts';
@@ -15,6 +16,7 @@ test('ermitazh has highlights, features, FAQ without em dash', () => {
   assert.ok(content);
   assert.equal(content!.displayTitle, 'Государственный Эрмитаж');
   assert.ok(content!.hookFact && content!.hookFact.includes('8 лет'));
+  assert.ok((content!.galleryUrls || []).length >= 2);
   assert.equal(content!.tickets?.priceFromRub, 500);
   assert.ok(content!.phone);
   assert.ok(content!.website);
@@ -35,6 +37,18 @@ test('ermitazh has highlights, features, FAQ without em dash', () => {
   ].join('\n');
   assert.equal(blob.includes('—'), false);
   assert.equal(blob.includes('–'), false);
+});
+
+test('resolveVenueGalleryImages needs ≥2 real urls', () => {
+  const images = resolveVenueGalleryImages({
+    slug: 'ermitazh',
+    heroImageUrl: '/images/venues/saint-petersburg/ermitazh.jpg',
+  });
+  assert.ok(images.length >= 2);
+  assert.equal(
+    resolveVenueGalleryImages({ slug: 'erarta', heroImageUrl: '/only-one.jpg' }).length,
+    0,
+  );
 });
 
 test('applyVenueEditorialOverlay patches legacy Hermitage title', () => {

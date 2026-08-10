@@ -7,6 +7,7 @@ import {
   __editorialOpeningHoursCountForTests,
   formatVenueOpeningHoursLines,
   resolveTicketOpeningHours,
+  resolveVenueOpenNowStatus,
   resolveVenueOpeningHours,
 } from './venue-opening-hours.ts';
 
@@ -51,4 +52,29 @@ test('format + copy constants use hyphen only', () => {
   assert.equal(text!.includes('–'), false);
   assert.equal(OPEN_DATE_HOURS_HOLIDAY_NOTE.includes('—'), false);
   assert.equal(OPEN_DATE_HOURS_UNKNOWN_NOTE.includes('—'), false);
+});
+
+test('resolveVenueOpenNowStatus: hermitage weekday hours', () => {
+  const lines = resolveVenueOpeningHours('ermitazh')!.lines;
+  // Wednesday 2026-08-12 14:00 MSK - open 11-18
+  const wedOpen = resolveVenueOpenNowStatus({
+    lines,
+    timeZone: 'Europe/Moscow',
+    now: new Date('2026-08-12T11:00:00.000Z'), // 14:00 MSK
+  });
+  assert.equal(wedOpen, 'open');
+  // Monday closed
+  const mon = resolveVenueOpenNowStatus({
+    lines,
+    timeZone: 'Europe/Moscow',
+    now: new Date('2026-08-10T12:00:00.000Z'),
+  });
+  assert.equal(mon, 'closed');
+  // Tuesday evening after 20:00 closed
+  const tueLate = resolveVenueOpenNowStatus({
+    lines,
+    timeZone: 'Europe/Moscow',
+    now: new Date('2026-08-11T18:30:00.000Z'), // 21:30 MSK
+  });
+  assert.equal(tueLate, 'closed');
 });

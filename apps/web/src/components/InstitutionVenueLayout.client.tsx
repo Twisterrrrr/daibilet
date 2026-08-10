@@ -23,26 +23,36 @@ import { VenueAdmissionBlock } from '@/components/VenueAdmissionBlock';
 import { VenueBreadcrumbsNav } from '@/components/VenueBreadcrumbsNav.client';
 import { VenueLogisticsBlock, hasVenueLogisticsContent, nonEmptyLogisticsText } from '@/components/VenueLogisticsBlock';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
+import { resolveCityTimeZone } from '@/lib/city-timezone';
+import { resolveVenueHeroImage } from '@/lib/city-place-images';
+import { dedupeVenueLinkedEvents } from '@/lib/day-route-score';
+import {
+  resolveEventCardFallbackImage,
+  resolveEventCardPrimaryImage,
+} from '@/lib/event-card-image';
 import { formatMoney } from '@/lib/format';
 import { formatStreetAddress } from '@/lib/address';
 import type { FinanceAdmissionProduct } from '@/lib/finance-projection';
 import { build2gisRouteUrl } from '@/lib/maps';
+import { resolveNearestMetroStationName } from '@/lib/nearest-metro';
 import {
   applyVenueEditorialOverlay,
   formatVenueMetroLabel,
   resolveVenueEditorialContent,
+  resolveVenueGalleryImages,
 } from '@/lib/venue-editorial-content';
 import {
   OPEN_DATE_HOURS_HOLIDAY_NOTE,
+  resolveVenueOpenNowStatus,
   resolveVenueOpeningHours,
 } from '@/lib/venue-opening-hours';
 import {
   filterSimilarInstitutionVenues,
   normalizeVenueKind,
+  resolvePublicVenueType,
   venueTypeLabel,
 } from '@/lib/venue-meta';
-import { venueHref } from '@/lib/routes';
-import { dedupeVenueLinkedEvents } from '@/lib/day-route-score';
+import { eventHref, venueHref } from '@/lib/routes';
 import type {
   PublicSessionDto,
   PublicVenueDto,
@@ -66,10 +76,12 @@ const GENERIC_FAQ_ITEMS = [
   },
 ];
 
+const MUSEUM_ART_KINDS = new Set(['museum', 'art_space', 'museum_art_space']);
+
 export function InstitutionVenueLayout({
   venue: venueProp,
   stats: _stats,
-  sessions: _sessions,
+  sessions = [],
   relatedVenues,
   stopEvents = [],
   nearbyEvents = [],
@@ -88,12 +100,13 @@ export function InstitutionVenueLayout({
   children?: React.ReactNode;
 }) {
   void _stats;
-  void _sessions;
   const venue = React.useMemo(() => applyVenueEditorialOverlay(venueProp), [venueProp]);
   const title = venue.seoH1 || venue.title || venue.name;
   const streetAddress = formatStreetAddress(venue.address, { city: venue.city });
   const hasMap = Boolean(venue.latitude && venue.longitude);
   const isTheatre = normalizeVenueKind(venue.type) === 'theater';
+  const publicType = resolvePublicVenueType(venue.type, venue.name);
+  const isMuseumOrArt = MUSEUM_ART_KINDS.has(publicType);
   const typeLabel = venueTypeLabel(venue.type);
   const intro =
     venue.shortDescription ||
@@ -108,19 +121,28 @@ export function InstitutionVenueLayout({
     () => resolveVenueOpeningHours(venue.slug),
     [venue.slug],
   );
-  const metroLabel = React.useMemo(
+  const resolvedMetroName = React.useMemo(
     () =>
-      formatVenueMetroLabel(
-        nonEmptyLogisticsText(venue.metroStation) || editorial?.metroStation || null,
-      ),
-    [venue.metroStation, editorial?.metroStation],
+      resolveNearestMetroStationName({
+        latitude: venue.latitude,
+        longitude: venue.longitude,
+        city: venue.city,
+        citySlug: venue.citySlug,
+        metroStation:
+          nonEmptyLogisticsText(venue.metroStation) || editorial?.metroStation || null,
+      }),
+    [venue.latitude, venue.longitude, venue.city, venue.citySlug, venue.metroStation, editorial?.metroStation],
+  );
+  const metroLabel = React.useMemo(
+    () => formatVenueMetroLabel(resolvedMetroName),
+    [resolvedMetroName],
   );
   const logisticsVenue = React.useMemo(
     () =>
-      metroLabel && !nonEmptyLogisticsText(venue.metroStation)
-        ? { ...venue, metroStation: editorial?.metroStation || venue.metroStation }
+      resolvedMetroName && !nonEmptyLogisticsText(venue.metroStation)
+        ? { ...venue, metroStation: resolvedMetroName }
         : venue,
-    [venue, metroLabel, editorial?.metroStation],
+    [venue, resolvedMetroName],
   );
   const faqItems = editorial?.faq?.length ? editorial.faq : GENERIC_FAQ_ITEMS;
   const uniqueStopEvents = React.useMemo(() => dedupeVenueLinkedEvents(stopEvents), [stopEvents]);
@@ -132,8 +154,9 @@ export function InstitutionVenueLayout({
     uniqueStopEvents.length > 0 ? uniqueStopEvents.length : Number(venue.stopEventCount ?? 0);
   const hasStopExcursions = stopExcursionCount > 0;
   const linkedExcursions = hasStopExcursions ? uniqueStopEvents : uniqueNearbyEvents;
-  /** Internal LC / own ticket inventory only - not external official-site CTA. */
   const hasInternalLcTickets = admissionProducts.length > 0;
+  const hasAfisha = sessions.length > 0;
+  const nextSessions = sessions.slice(0, 4);
   const showFaq = true;
   const showVisitSection =
     Boolean(openingHours?.lines?.length) || hasVenueLogisticsContent(logisticsVenue);
@@ -141,13 +164,39 @@ export function InstitutionVenueLayout({
     () => filterSimilarInstitutionVenues(venue, relatedVenues, 4),
     [venue, relatedVenues],
   );
-  const showSimilar =
-    linkedExcursions.length > 0 || similarVenues.length > 0;
+  const showSimilar = linkedExcursions.length > 0 || similarVenues.length > 0;
   const hookFactText = String(venue.hookFact || editorial?.hookFact || '').trim();
+  const heroImage = resolveVenueHeroImage(venue.slug, venue.heroImageUrl) || venue.heroImageUrl;
+  const galleryImages = React.useMemo(
+    () =>
+      resolveVenueGalleryImages({
+        slug: venue.slug,
+        heroImageUrl: heroImage,
+      }),
+    [venue.slug, heroImage],
+  );
   const phone = nonEmptyLogisticsText(editorial?.phone);
   const website = nonEmptyLogisticsText(editorial?.website);
   const websiteLabel = editorial?.websiteLabel || 'Официальный сайт';
   const heroAddressLine = [streetAddress || venue.city, metroLabel].filter(Boolean).join(' • ');
+
+  const cityTz = React.useMemo(
+    () => resolveCityTimeZone(venue.city, venue.citySlug),
+    [venue.city, venue.citySlug],
+  );
+  const [openNowStatus, setOpenNowStatus] = React.useState<'open' | 'closed' | 'unknown'>('unknown');
+  React.useEffect(() => {
+    if (!isMuseumOrArt || !openingHours?.lines?.length) {
+      setOpenNowStatus('unknown');
+      return;
+    }
+    setOpenNowStatus(
+      resolveVenueOpenNowStatus({
+        lines: openingHours.lines,
+        timeZone: cityTz,
+      }),
+    );
+  }, [isMuseumOrArt, openingHours?.lines, cityTz]);
 
   const heroGradient = isTheatre
     ? 'bg-gradient-to-r from-rose-900/95 via-slate-900/80 to-slate-900/50'
@@ -156,12 +205,13 @@ export function InstitutionVenueLayout({
   const stickyTabs = React.useMemo(() => {
     const tabs: Array<readonly [string, string]> = [['#about', 'О месте']];
     if (hasInternalLcTickets) tabs.push(['#venue-admission', 'Билеты']);
+    if (hasAfisha) tabs.push(['#venue-program', 'Афиша']);
     if (showVisitSection) tabs.push(['#visit', 'Как посетить']);
     if (showFaq) tabs.push(['#faq', 'Вопросы']);
     tabs.push(['#reviews', 'Отзывы']);
     if (showSimilar) tabs.push(['#similar', 'Похожие']);
     return tabs;
-  }, [hasInternalLcTickets, showVisitSection, showFaq, showSimilar]);
+  }, [hasInternalLcTickets, hasAfisha, showVisitSection, showFaq, showSimilar]);
 
   const share = () => {
     if (navigator.share) {
@@ -179,9 +229,9 @@ export function InstitutionVenueLayout({
 
       <section className="relative overflow-hidden bg-slate-900 text-white">
         <div className="absolute inset-0">
-          {venue.heroImageUrl ? (
+          {heroImage ? (
             <SafeImage
-              src={venue.heroImageUrl}
+              src={heroImage}
               alt=""
               fill
               sizes={IMAGE_SIZES.eventHero}
@@ -196,6 +246,15 @@ export function InstitutionVenueLayout({
         <div className="container-page relative py-10 md:py-14">
           <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-end">
             <div className="max-w-2xl">
+              {openNowStatus === 'open' ? (
+                <div className="mb-3" data-venue-open-now>
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/90 px-3 py-1 text-xs font-semibold text-white shadow-sm">
+                    <span className="h-1.5 w-1.5 rounded-full bg-white" aria-hidden="true" />
+                    Открыто сейчас
+                  </span>
+                </div>
+              ) : null}
+
               <h1 className="font-display text-3xl font-extrabold leading-tight text-white sm:text-4xl md:text-5xl">{title}</h1>
 
               {heroAddressLine ? (
@@ -230,7 +289,7 @@ export function InstitutionVenueLayout({
                   cityId: venue.cityId,
                   citySlug: venue.citySlug,
                   href: venueHref(venue),
-                  imageUrl: venue.heroImageUrl,
+                  imageUrl: heroImage,
                   address: venue.address,
                   latitude: venue.latitude,
                   longitude: venue.longitude,
@@ -275,6 +334,31 @@ export function InstitutionVenueLayout({
             </div>
           ) : null}
 
+          {galleryImages.length >= 2 ? (
+            <section
+              className="scroll-mt-24 overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 sm:p-5"
+              data-venue-gallery
+              aria-label="Фотогалерея"
+            >
+              <div className="flex gap-3 overflow-x-auto pb-1 [scrollbar-width:thin]">
+                {galleryImages.map((src) => (
+                  <div
+                    key={src}
+                    className="relative h-36 w-56 shrink-0 overflow-hidden rounded-xl bg-slate-100 sm:h-44 sm:w-72"
+                  >
+                    <SafeImage
+                      src={src}
+                      alt=""
+                      fill
+                      sizes="(max-width: 640px) 14rem, 18rem"
+                      className="object-cover"
+                    />
+                  </div>
+                ))}
+              </div>
+            </section>
+          ) : null}
+
           <section id="about" className="scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-6">
             <h2 className="text-xl font-bold text-slate-900">О месте</h2>
             {editorial?.highlights?.length ? (
@@ -305,6 +389,51 @@ export function InstitutionVenueLayout({
           </section>
 
           {hasInternalLcTickets ? <VenueAdmissionBlock products={admissionProducts} /> : null}
+
+          {nextSessions.length > 0 ? (
+            <section className="rounded-2xl border border-slate-200 bg-white p-6" data-venue-upcoming-events>
+              <div className="flex items-baseline justify-between gap-3">
+                <h2 className="text-xl font-bold text-slate-900">Ближайшие события</h2>
+                <a href="#venue-program" className="text-sm font-semibold text-primary-600 hover:underline">
+                  Вся афиша →
+                </a>
+              </div>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                {nextSessions.map((session) => {
+                  const thumb =
+                    resolveEventCardPrimaryImage(session) || resolveEventCardFallbackImage(session);
+                  return (
+                    <a
+                      key={session.id}
+                      href={eventHref(session)}
+                      className="flex items-start gap-3 rounded-xl border border-slate-100 bg-slate-50 p-3 transition hover:border-primary/30 hover:bg-primary-50/30"
+                    >
+                      <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-slate-200">
+                        {thumb ? (
+                          <SafeImage
+                            src={thumb}
+                            alt=""
+                            fill
+                            sizes="56px"
+                            className="object-cover"
+                            fallback={<div className="h-full w-full bg-slate-200" />}
+                          />
+                        ) : (
+                          <div className="h-full w-full bg-slate-200" aria-hidden="true" />
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="font-semibold text-slate-900">{session.title}</div>
+                        <div className="mt-1 text-xs text-slate-500">
+                          {session.dateLabel} · {session.timeLabel} · {formatMoney(session.priceFrom)}
+                        </div>
+                      </div>
+                    </a>
+                  );
+                })}
+              </div>
+            </section>
+          ) : null}
 
           {children}
 
@@ -378,12 +507,12 @@ export function InstitutionVenueLayout({
               <h2 className="text-xl font-bold text-slate-900">Похожие</h2>
               {linkedExcursions.length > 0 ? (
                 <div data-venue-linked-events-deduped>
-                  <h3 className="text-sm font-semibold text-slate-800">Экскурсии рядом</h3>
-                  <p className="mt-1 text-sm text-slate-500">
-                    {hasStopExcursions
-                      ? 'Маршруты, где это место - остановка. Не заменяют входной билет в музей.'
-                      : 'Явных остановок пока нет - показываем события со стартом в радиусе 300 м.'}
-                  </p>
+                  <h3 className="text-sm font-semibold text-slate-800">Также можно посетить</h3>
+                  {!hasStopExcursions ? (
+                    <p className="mt-1 text-sm text-slate-500">
+                      События в радиусе 300 м. Это не афиша площадки!
+                    </p>
+                  ) : null}
                   <ul className="mt-4 space-y-3">
                     {linkedExcursions.map((event) => (
                       <li key={event.id}>
@@ -552,7 +681,7 @@ export function InstitutionVenueLayout({
               cityId: venue.cityId,
               citySlug: venue.citySlug,
               href: venueHref(venue),
-              imageUrl: venue.heroImageUrl,
+              imageUrl: heroImage,
               address: venue.address,
               latitude: venue.latitude,
               longitude: venue.longitude,
