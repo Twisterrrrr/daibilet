@@ -42,3 +42,8 @@
   fill: var(--logo-blue);
   opacity: 1;
 }
+
+/* Breve over «и»: larger + brand dark for readability against blue arcs. */
+.point1 {
+  fill: var(--logo-dark);
+}
