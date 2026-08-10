@@ -14,6 +14,25 @@
 
 ---
 
+## 2026-08-10 - Homepage visual rhythm (P0-P2)
+
+### Наблюдения
+- Owner: city hub / daibilet.ru home без ритма - тяжёлый hero (subtitle + 3 dropdowns + wrap chips), два конфликтующих event-блока подряд («Куда сходить сейчас» tabs + «Популярное сейчас» grid), статичный синий My Day banner, полные grids городов/подборок на first paint.
+- Badge pile на rail covers расходился с sitewide clean-cover каноном.
+
+### Решения
+- **P0 Hero:** убран marketing description; hint в форме; mobile = city+find (без category dropdown); один soft swipe-ряд (даты mobile + quick chips).
+- **P0 Выбор редакции:** showcase rail ~1.5 / 3-3.5 visible; rail covers без multi-color badges; EventCard footer `mt-auto`, radius 16px.
+- **P1:** слияние now+popular → одна секция «Популярно на этой неделе» (фото-carousel + date tabs); убита вторая сетка.
+- **P1 My Day:** вместо ad-banner - preview конструктора (3 шага с + → `/my-day`).
+- **P2:** города и подборки - горизонтальные swipe rails (не endless grids).
+- Commit+push; **без** web deploy.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-10 - `/events`: date rail in title band + one soft chip row
 
 ### Наблюдения

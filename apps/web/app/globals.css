@@ -250,10 +250,10 @@ html[data-nav-pending='1'] {
     @apply flex w-max flex-nowrap gap-5 snap-x snap-mandatory sm:gap-6;
   }
 
-  /* ~14px peek of the next card on narrow viewports; fixed width from sm. */
+  /* ~1.5 cards mobile peek; ~3-3.5 desktop (rest scroll). */
   .horizontal-snap-card,
   .showcase-rail-card {
-    @apply w-[min(300px,calc(100%-0.875rem))] shrink-0 snap-start sm:w-[320px];
+    @apply w-[min(68vw,260px)] shrink-0 snap-start sm:w-[280px] lg:w-[300px];
   }
 
   .section-y {

@@ -1,16 +1,14 @@
 'use client';
 
-import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
 import { useMemo, type ReactNode } from 'react';
 
-import { EventCard } from '@/components/EventCard';
 import { HomeEventRail, HomeNowSection } from '@/components/HomeNowSection.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import type { PublicCatalogListItemDto, PublicSessionDto } from '@daibilet/contracts/public';
 import { catalogHrefWithSelectedCity } from '@/lib/catalog-url';
 import { filterSessionsByCity } from '@/lib/landing-city';
 import { buildHomePageSectionsSync } from '@/lib/home-page-sections-sync';
+import { sessionHasCoverImage } from '@/lib/session-cover-image';
 
 type PublicSession = PublicSessionDto | PublicCatalogListItemDto;
 
@@ -53,9 +51,30 @@ export function HomeCityAwareSections({
     [scopedSessions, cityName, fingerprintMap],
   );
 
-  const catalogPopularHref = catalogHrefWithSelectedCity(cityReady ? cityValue : 'all', {
-    sort: 'popular',
-  });
+  // Merge «Куда сходить» + «Популярное»: one photo carousel; seed empty tabs from popular covers.
+  const mergedTabs = useMemo(() => {
+    const coverPopular = popular.filter((session) => sessionHasCoverImage(session));
+    if (!homeNowTabs.length && coverPopular.length) {
+      return [
+        {
+          key: 'nearest' as const,
+          label: 'Сейчас',
+          title: sparseCatalog ? 'Рекомендуем начать с этого' : 'Популярно на этой неделе',
+          subtitle: sparseCatalog
+            ? 'Сильные предложения из текущего каталога'
+            : 'События с фото и ближайшими датами',
+          events: coverPopular,
+          catalogQuery: { sort: 'popular' },
+          usedFallback: true,
+        },
+      ];
+    }
+    return homeNowTabs.map((tab) => ({
+      ...tab,
+      events: tab.events.filter((session) => sessionHasCoverImage(session)),
+    })).filter((tab) => tab.events.length > 0);
+  }, [homeNowTabs, popular, sparseCatalog]);
+
   const editorsHref = catalogHrefWithSelectedCity(cityReady ? cityValue : 'all', {
     sort: 'popular',
   });
@@ -76,38 +95,12 @@ export function HomeCityAwareSections({
 
       {children}
 
-      {homeNowTabs.length ? <HomeNowSection tabs={homeNowTabs} /> : null}
-
-      {popular.length ? (
-        <section className="section-y">
-          <div className="container-page">
-            <div className="flex flex-wrap items-end justify-between gap-3">
-              <div>
-                <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-                  {sparseCatalog ? 'Рекомендуем начать с этого' : 'Популярное сейчас'}
-                </h2>
-                <p className="mt-1 text-sm text-slate-500">
-                  {sparseCatalog
-                    ? `Сильные предложения из текущего каталога${cityHint}`
-                    : `Конкретные события с ближайшими датами${cityHint}`}
-                </p>
-              </div>
-              <Link
-                href={catalogPopularHref}
-                className="inline-flex items-center gap-1 text-sm font-semibold text-primary-600 hover:text-primary-700"
-              >
-                Открыть каталог <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
-            <ul className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
-              {popular.map((session) => (
-                <li key={session.id}>
-                  <EventCard session={session} />
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
+      {mergedTabs.length ? (
+        <HomeNowSection
+          tabs={mergedTabs}
+          sectionTitle={sparseCatalog ? 'Рекомендуем начать с этого' : 'Популярно на этой неделе'}
+          sectionSubtitle={`События с фото и ближайшими датами${cityHint}`}
+        />
       ) : null}
     </>
   );

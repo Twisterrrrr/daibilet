@@ -177,7 +177,7 @@ export function buildHomeNowTabs(sessions: PublicSession[], options: BuildHomeNo
       key: 'weekend',
       label: 'На выходных',
       title: `На выходных${inCity}`,
-      subtitle: 'Сб и вс — семейные и вечерние форматы',
+      subtitle: 'Сб и вс - семейные и вечерние форматы',
       slotFilter: (iso, timeZone) => isSessionWeekend(iso, timeZone),
       catalogQuery: { date: 'weekend', sort: 'popular' },
       fallbackTitle: 'Лучшие предложения сезона',

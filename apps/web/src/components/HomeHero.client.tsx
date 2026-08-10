@@ -1,6 +1,6 @@
 'use client';
 
-import { CalendarDays, Search, Tags } from 'lucide-react';
+import { CalendarDays, Search } from 'lucide-react';
 import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -20,16 +20,6 @@ const HERO_DATE_OPTIONS = [
   { value: 'weekend', label: 'Выходные' },
 ] as const;
 
-const HERO_CATEGORY_OPTIONS = [
-  { value: 'all', label: 'Все категории' },
-  { value: 'Экскурсии', label: 'Экскурсии' },
-  { value: 'Музеи и арт', label: 'Музеи и арт' },
-  { value: 'Концерты', label: 'Концерты' },
-  { value: 'Театр', label: 'Театр' },
-  { value: 'Стендап', label: 'Стендап' },
-  { value: 'Речные прогулки', label: 'Речные прогулки' },
-] as const;
-
 export type HomeHeroFrame = { src: string; alt: string; objectPosition?: string };
 
 type HomeHeroProps = {
@@ -45,16 +35,18 @@ export function HomeHero({ destinations, frames, videoSrc }: HomeHeroProps) {
   const setDestination = selectedCity?.setCity ?? (() => {});
   const selectedDestination = selectedCity?.selectedDestination ?? null;
   const [heroDate, setHeroDate] = useState('all');
-  const [heroCategory, setHeroCategory] = useState('all');
 
   const selectedCityName = selectedDestination?.name || null;
+  const searchHint = selectedCityName
+    ? `Куда сходить сегодня, завтра или на выходных в ${cityToPrepositional(selectedCityName)}`
+    : 'Куда сходить сегодня, завтра или на выходных - музеи, концерты, экскурсии';
 
-  const openCatalog = () => {
+  const openCatalog = (category?: string) => {
     router.push(
       buildCatalogHref({
         city: destination !== 'all' ? destination : undefined,
         date: heroDate !== 'all' ? heroDate : undefined,
-        category: heroCategory !== 'all' ? heroCategory : undefined,
+        category: category || undefined,
         sort: 'popular',
       }),
     );
@@ -87,7 +79,6 @@ export function HomeHero({ destinations, frames, videoSrc }: HomeHeroProps) {
       variant={videoSrc ? 'video' : 'imageOverlay'}
       brand="Дайбилет"
       title={title}
-      description="Найдите, куда сходить сегодня, завтра или на выходных - от речных прогулок и музеев до концертов и авторских экскурсий."
       tone="dark"
       // Base layer under images (legacy navy placeholder while frames load) - not a blue wash on top of photos.
       className="!bg-[#122868]"
@@ -96,8 +87,10 @@ export function HomeHero({ destinations, frames, videoSrc }: HomeHeroProps) {
       <form
         onSubmit={onSubmit}
         className="mt-8 w-full max-w-5xl rounded-2xl bg-white p-2 text-left shadow-2xl shadow-slate-950/30"
+        aria-label={searchHint}
       >
-        <div className="grid w-full grid-cols-1 gap-2 md:grid-cols-[minmax(140px,1.1fr)_minmax(120px,0.85fr)_minmax(140px,1.1fr)_auto]">
+        {/* Mobile: city + find. Desktop: city + date + find. Category lives in soft chip rail. */}
+        <div className="grid w-full grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1.4fr)_minmax(120px,0.9fr)_auto]">
           <CityPicker
             cities={destinations}
             value={destination}
@@ -105,7 +98,7 @@ export function HomeHero({ destinations, frames, videoSrc }: HomeHeroProps) {
             allLabel="Город"
             variant="hero"
           />
-          <div className="relative">
+          <div className="relative hidden sm:block">
             <CalendarDays className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <select
               value={heroDate}
@@ -120,21 +113,6 @@ export function HomeHero({ destinations, frames, videoSrc }: HomeHeroProps) {
               ))}
             </select>
           </div>
-          <div className="relative">
-            <Tags className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <select
-              value={heroCategory}
-              onChange={(event) => setHeroCategory(event.target.value)}
-              aria-label="Категория"
-              className="h-11 w-full appearance-none rounded-xl bg-slate-50 pl-10 pr-8 text-sm font-medium text-slate-800 outline-none hover:bg-slate-100 focus:ring-2 focus:ring-primary/25"
-            >
-              {HERO_CATEGORY_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
           <button
             type="submit"
             className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-slate-900 px-6 text-sm font-semibold text-white transition hover:bg-slate-800 active:scale-[0.98]"
@@ -143,31 +121,57 @@ export function HomeHero({ destinations, frames, videoSrc }: HomeHeroProps) {
             Найти билеты
           </button>
         </div>
+        <p className="mt-2 px-2 pb-1 text-[11px] leading-snug text-slate-400 sm:text-xs">{searchHint}</p>
       </form>
 
-      <div className="mt-4 flex w-full max-w-5xl flex-wrap items-center justify-center gap-2" data-home-hero-chips>
-        {HERO_QUICK_CHIPS.map((chip) => {
-          let href = chip.href;
-          if (chip.href.startsWith('/events')) {
-            const params = new URLSearchParams(chip.href.includes('?') ? chip.href.slice(chip.href.indexOf('?') + 1) : '');
-            href = catalogHrefWithSelectedCity(destination, {
-              q: params.get('q') || undefined,
-              city: params.get('city') || undefined,
-              category: params.get('category') || undefined,
-              date: params.get('date') || undefined,
-              sort: (params.get('sort') as 'popular' | 'time' | undefined) || undefined,
-            });
-          }
-          return (
-            <a
-              key={chip.label}
-              href={href}
-              className="rounded-full border border-slate-200/80 bg-white/95 px-3.5 py-1.5 text-xs font-semibold text-slate-800 shadow-sm backdrop-blur-sm transition hover:bg-white hover:text-primary-700"
-            >
-              {chip.label}
-            </a>
-          );
-        })}
+      {/* One soft swipe row: dates (mobile) + quick intents */}
+      <div
+        className="mt-4 w-full max-w-5xl overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        data-home-hero-chips
+      >
+        <div className="flex w-max flex-nowrap items-center gap-2 px-0.5 pb-0.5">
+          {HERO_DATE_OPTIONS.filter((d) => d.value !== 'all').map((option) => {
+            const active = heroDate === option.value;
+            return (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => setHeroDate(option.value)}
+                className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-semibold transition sm:hidden ${
+                  active
+                    ? 'bg-white text-slate-900 shadow-sm'
+                    : 'bg-white/20 text-white/95 ring-1 ring-white/35 backdrop-blur-sm hover:bg-white/30'
+                }`}
+              >
+                {option.label}
+              </button>
+            );
+          })}
+          {HERO_QUICK_CHIPS.map((chip) => {
+            let href = chip.href;
+            if (chip.href.startsWith('/events')) {
+              const params = new URLSearchParams(
+                chip.href.includes('?') ? chip.href.slice(chip.href.indexOf('?') + 1) : '',
+              );
+              href = catalogHrefWithSelectedCity(destination, {
+                q: params.get('q') || undefined,
+                city: params.get('city') || undefined,
+                category: params.get('category') || undefined,
+                date: heroDate !== 'all' ? heroDate : params.get('date') || undefined,
+                sort: (params.get('sort') as 'popular' | 'time' | undefined) || undefined,
+              });
+            }
+            return (
+              <a
+                key={chip.label}
+                href={href}
+                className="shrink-0 rounded-full bg-white/20 px-3.5 py-1.5 text-xs font-semibold text-white/95 ring-1 ring-white/35 backdrop-blur-sm transition hover:bg-white/35"
+              >
+                {chip.label}
+              </a>
+            );
+          })}
+        </div>
       </div>
     </HeroLayout>
   );

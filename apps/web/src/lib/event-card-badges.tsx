@@ -22,6 +22,9 @@ export function EventImageBadges({
   rail = false,
   editorsPick = false,
 }: EventImageBadgesProps) {
+  // Home/catalog rails: clean cover - section title carries context; no multi-color badge pile.
+  if (rail) return null;
+
   const showLowTickets =
     typeof event.vacant === 'number' && event.vacant > 0 && event.vacant <= LOW_TICKETS_THRESHOLD;
   const recommend = editorsPick || isRecommendBadgeEvent(event);
@@ -30,7 +33,7 @@ export function EventImageBadges({
     ? (event.sessionCount || 0) >= 4 || (event.landingSlugs?.length || 0) > 0
     : isHitEvent(event);
   const ageBadge = resolveAgeBadge(event.tags || [], event.ageLimit);
-  const maxSecondary = rail ? 2 : 4;
+  const maxSecondary = 4;
 
   const secondary: ReactNode[] = [];
   if (showLowTickets) {
@@ -62,7 +65,7 @@ export function EventImageBadges({
   }
 
   return (
-    <div className={`absolute left-2 top-2 z-[2] flex max-w-[70%] flex-col items-start gap-1 ${rail ? '' : 'sm:left-3 sm:top-3'}`}>
+    <div className="absolute left-2 top-2 z-[2] flex max-w-[70%] flex-col items-start gap-1 sm:left-3 sm:top-3">
       {recommend ? <EditorsPickBadge label={recommendLabel} /> : null}
       {secondary}
     </div>

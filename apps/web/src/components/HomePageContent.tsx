@@ -18,7 +18,6 @@ import '@/lib/env';
 import { catalogSocialStats } from '@/lib/catalog-social-stats';
 import { formatMoney, formatNumber, pluralEvents } from '@/lib/format';
 import { resolveHomePromoImage } from '@/lib/home-scenarios';
-import { podborkiBentoCellClass, podborkiBentoSpan, PODBORKI_BENTO_GRID_CLASS } from '@/lib/podborki-bento';
 import { landingCategoryHref } from '@/lib/landing-routes';
 import { withSoftTimeout } from '@/lib/soft-timeout';
 import { getHomeArticles, getHomeCoverFingerprints, getHomePageData } from '@/server/cached-home-data';
@@ -52,14 +51,14 @@ async function HomePageBody() {
   const cities = destinations.filter((item) => item.type === 'city');
   const topCities = [...cities]
     .sort((a, b) => b.events - a.events || a.name.localeCompare(b.name, 'ru'))
-    .slice(0, 8);
+    .slice(0, 12);
   // Same canon as SiteFooter (not catalogPayload.total — that under/over-counts vs destinations).
   const { places: liveCities, events: liveEvents } = catalogSocialStats(destinations);
 
   const sessions = catalogPayload?.items ?? [];
   const sparseCatalog = sessions.length < 12;
 
-  const promoLandings = (landingsCatalog?.items || []).filter((item) => item.events > 0).slice(0, 4);
+  const promoLandings = (landingsCatalog?.items || []).filter((item) => item.events > 0).slice(0, 8);
   const blogCards = mergeBlogCards(
     (articlesPayload?.articles as BlogApiArticles | undefined) ?? null,
   );
@@ -103,29 +102,22 @@ async function HomePageBody() {
                   Все города →
                 </Link>
               </div>
-              {/* Mobile: compact horizontal carousel (dark city covers). Desktop: 3/6 grid. */}
+              {/* Swipe rail: first few visible, rest scroll (not a full grid on first paint). */}
               <ScrollRail
-                className="mt-6 md:hidden"
-                viewportClassName="flex flex-nowrap gap-2.5 snap-x snap-mandatory"
+                className="mt-6"
+                viewportClassName="flex flex-nowrap gap-2.5 snap-x snap-mandatory sm:gap-3"
                 aria-label="Популярные города"
               >
                 {topCities.map((city) => (
                   <div
                     key={city.slug || city.name}
-                    className="w-[min(52vw,196px)] shrink-0 snap-start"
+                    className="w-[min(52vw,196px)] shrink-0 snap-start sm:w-[160px] lg:w-[168px]"
                     data-rail-item
                   >
-                    <CityCard city={city} />
+                    <CityCard city={city} compact />
                   </div>
                 ))}
               </ScrollRail>
-              <ul className="mt-6 hidden gap-4 overflow-x-visible md:grid md:grid-cols-3 lg:grid-cols-6">
-                {topCities.slice(0, 6).map((city) => (
-                  <li key={city.slug || city.name} className="min-w-0">
-                    <CityCard city={city} compact />
-                  </li>
-                ))}
-              </ul>
             </div>
           </section>
         ) : null}
@@ -179,54 +171,49 @@ async function HomePageBody() {
                 Смотреть все <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
-            <ul className={`mt-6 ${PODBORKI_BENTO_GRID_CLASS}`}>
-              {promoLandings.map((landing) => {
-                const span = podborkiBentoSpan(landing);
-                const imageUrl = resolveHomePromoImage(landing.slug, landing.title);
-                return (
-                  <li key={landing.slug} className={podborkiBentoCellClass(span)}>
-                    <Link
-                      href={landingCategoryHref(landing.slug)}
-                      className="group relative flex h-full min-h-[inherit] overflow-hidden rounded-card bg-gradient-to-br from-slate-900 to-neutral-800 text-left text-white shadow-card transition duration-300 hover:-translate-y-0.5 hover:shadow-card-hover"
+            <ScrollRail className="mt-6" aria-label="Подборки">
+              <div className="flex w-max flex-nowrap gap-3 snap-x snap-mandatory sm:gap-4">
+                {promoLandings.map((landing) => {
+                  const imageUrl = resolveHomePromoImage(landing.slug, landing.title);
+                  return (
+                    <div
+                      key={landing.slug}
+                      className="w-[min(72vw,260px)] shrink-0 snap-start sm:w-[280px] lg:w-[300px]"
+                      data-rail-item
                     >
-                      <SafeImage
-                        src={imageUrl}
-                        alt=""
-                        fill
-                        sizes={span === 2 ? '(max-width: 1024px) 100vw, 50vw' : '(max-width: 1024px) 50vw, 25vw'}
-                        className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-                        fallback={<div className="absolute inset-0 bg-gradient-to-br from-slate-900 to-neutral-800" />}
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-transparent" />
-                      <div
-                        className={
-                          span === 2
-                            ? 'relative z-[1] flex h-full w-full flex-col justify-end p-5 sm:p-6 md:justify-center md:px-8'
-                            : 'relative z-[1] flex h-full w-full flex-col justify-end p-4 sm:p-5'
-                        }
+                      <Link
+                        href={landingCategoryHref(landing.slug)}
+                        className="group relative flex aspect-[4/5] overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 to-neutral-800 text-left text-white shadow-card transition duration-300 hover:-translate-y-0.5 hover:shadow-card-hover sm:aspect-[3/4]"
                       >
-                        <h3
-                          className={
-                            span === 2
-                              ? 'font-display text-xl font-bold leading-snug text-white sm:text-2xl lg:text-[1.65rem]'
-                              : 'font-display text-lg font-bold leading-snug text-white sm:text-xl'
+                        <SafeImage
+                          src={imageUrl}
+                          alt=""
+                          fill
+                          sizes="(max-width: 640px) 72vw, 300px"
+                          className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                          fallback={
+                            <div className="absolute inset-0 bg-gradient-to-br from-slate-900 to-neutral-800" />
                           }
-                        >
-                          {landing.title}
-                        </h3>
-                        {landing.subtitle ? (
-                          <p className="mt-1.5 line-clamp-2 text-sm text-white/90 sm:text-[15px]">{landing.subtitle}</p>
-                        ) : null}
-                        <div className="mt-3 text-sm font-semibold text-white/95">
-                          {pluralEvents(landing.events)}
-                          {landing.priceFrom != null ? ` · ${formatMoney(landing.priceFrom)}` : ''}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                        <div className="relative z-[1] mt-auto flex w-full flex-col justify-end p-4 sm:p-5">
+                          <h3 className="font-display text-lg font-bold leading-snug text-white sm:text-xl">
+                            {landing.title}
+                          </h3>
+                          {landing.subtitle ? (
+                            <p className="mt-1.5 line-clamp-2 text-sm text-white/90">{landing.subtitle}</p>
+                          ) : null}
+                          <div className="mt-3 text-sm font-semibold text-white/95">
+                            {pluralEvents(landing.events)}
+                            {landing.priceFrom != null ? ` · ${formatMoney(landing.priceFrom)}` : ''}
+                          </div>
                         </div>
-                      </div>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
+                      </Link>
+                    </div>
+                  );
+                })}
+              </div>
+            </ScrollRail>
           </div>
         </section>
       ) : null}
