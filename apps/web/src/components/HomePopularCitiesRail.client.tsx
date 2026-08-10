@@ -29,7 +29,26 @@ function measureStep(scroller: HTMLElement): number {
 }
 
 /**
- * Full-bleed infinite city cards: left+right peeks from the loop; MSK+SPB centered on load.
+ * Left edge of title content (`.container-page` text column) in viewport coords.
+ * Rail is full-bleed; MSK should sit under «Популярные города», not mid-viewport.
+ */
+function measureTitleAnchorLeft(scroller: HTMLElement): number {
+  const section = scroller.closest('section');
+  const container = section?.querySelector<HTMLElement>('.container-page');
+  if (container) {
+    const paddingLeft = Number.parseFloat(getComputedStyle(container).paddingLeft) || 0;
+    return container.getBoundingClientRect().left + paddingLeft;
+  }
+  // Mirror .container-page: max-w-7xl + px-4 / sm:px-6 / lg:px-8
+  const vw = window.innerWidth;
+  const gutter = vw >= 1024 ? 32 : vw >= 640 ? 24 : 16;
+  const maxW = 80 * 16;
+  return Math.max(gutter, (vw - maxW) / 2 + gutter);
+}
+
+/**
+ * Full-bleed infinite city cards. On load/resize: Moscow left-aligned under the H2
+ * (SPB immediately after); secondary cities may slight-peek left of the gutter.
  */
 export function HomePopularCitiesRail({ cities, className = '' }: HomePopularCitiesRailProps) {
   const scrollerRef = useRef<HTMLDivElement>(null);
@@ -71,26 +90,21 @@ export function HomePopularCitiesRail({ cities, className = '' }: HomePopularCit
 
     const items = el.querySelectorAll<HTMLElement>('[data-rail-item]');
     const base = cities.length; // middle loop copy
-    const focusInSet = [cities.findIndex(isPopularRailMoscow), cities.findIndex(isPopularRailSpb)]
-      .filter((index) => index >= 0)
-      .sort((a, b) => a - b);
+    const moscowIdx = cities.findIndex(isPopularRailMoscow);
+    const spbIdx = cities.findIndex(isPopularRailSpb);
+    // Anchor card = Moscow when present, else SPB, else first card of the set.
+    const anchorInSet = moscowIdx >= 0 ? moscowIdx : spbIdx >= 0 ? spbIdx : 0;
 
     loopingRef.current = true;
 
-    if (focusInSet.length === 0 || items.length < base + focusInSet[focusInSet.length - 1] + 1) {
-      // Fallback: modest left overhang from the previous loop copy.
+    if (items.length < base + anchorInSet + 1) {
       const peek = Math.min(measureStep(el) * 0.44, 90);
       el.scrollLeft = setWidth - peek;
     } else {
-      const first = items[base + focusInSet[0]];
-      const last = items[base + focusInSet[focusInSet.length - 1]];
-      const elRect = el.getBoundingClientRect();
-      const firstRect = first.getBoundingClientRect();
-      const lastRect = last.getBoundingClientRect();
-      // Midpoint of MSK+SPB (or whichever focus cards exist) in scroll content coords.
-      const focusCenter =
-        (firstRect.left + lastRect.right) / 2 - elRect.left + el.scrollLeft;
-      el.scrollLeft = Math.max(0, focusCenter - el.clientWidth / 2);
+      const anchor = items[base + anchorInSet];
+      const anchorLeft = measureTitleAnchorLeft(el);
+      // Put Moscow (or fallback) flush under the title column; left loop peeks stay in the gutter.
+      el.scrollLeft += anchor.getBoundingClientRect().left - anchorLeft;
     }
 
     loopingRef.current = false;

@@ -244,7 +244,7 @@ html[data-nav-pending='1'] {
 
   /**
    * Popular cities rail: full-bleed track; peeks past both edges; seamless loop.
-   * Initial scroll centers Moscow + SPB (see HomePopularCitiesRail).
+   * Initial scroll left-aligns Moscow under the H2 (see HomePopularCitiesRail).
    */
   .home-edge-cities-rail {
     width: 100%;

@@ -1,3 +1,17 @@
+## 2026-08-10 - Popular cities: MSK under title (adaptive)
+
+### Наблюдения
+- Order MSK→SPB уже верный, но initial scroll центрировал пару: слева под H2 торчали Краснодар и др.
+
+### Решения
+- `HomePopularCitiesRail.jumpToFocus`: left-align Москвы к gutter `.container-page` под «Популярные города»; SPB сразу справа; left infinite peek остаётся в gutter; resize/RO пересчитывают якорь. Loop normalize без изменений.
+- Deploy MSK web tip (вместе с logo breve-line + city hero CTAs).
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-10 - Logo breve-line + city hub hero CTAs
 
 ### Наблюдения

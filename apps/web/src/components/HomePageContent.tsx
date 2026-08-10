@@ -111,7 +111,7 @@ async function HomePageBody() {
                 </Link>
               </div>
             </div>
-            {/* Infinite rail: MSK+SPB centered, left+right loop peeks. */}
+            {/* Infinite rail: MSK left under title, SPB next; left loop may slight-peek. */}
             <HomePopularCitiesRail cities={topCities} className="mt-6" />
           </section>
         ) : null}

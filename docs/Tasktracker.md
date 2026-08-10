@@ -2,6 +2,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
+| UX.HOME-CITIES-MSK-ANCHOR | Popular cities rail: MSK left under H2 (adaptive); SPB next; keep infinite loop | Критический | 🔄 ship + Deploy MSK web |
 | UX.LOGO-BREVE-LINE | Logo: solid breve-stroke over «и» → dashed route (replace black point-1) | Критический | 🔄 ship + Deploy MSK web |
 | UX.CITY-HUB-HERO-CTAS | City hub hero: remove search; restore Афиша + Подборки событий buttons | Критический | 🔄 ship + Deploy MSK web |
 | UX.CITY-HUB-HERO-BRIEF | City hub: brief in hero; first submenu «Зачем ехать» (не body Описание) | Критический | 🔄 ship |
