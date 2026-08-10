@@ -95,10 +95,10 @@ async function HomePageBody() {
         {topCities.length ? (
           <section
             id="destinations"
-            className="section-y bg-[#F5F5F7]"
+            className="breakout section-y bg-[#F5F5F7]"
             data-home-band="full-bleed"
           >
-            <div className="container-page">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
               <div className="flex items-end justify-between gap-4">
                 <div>
                   <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
@@ -248,8 +248,8 @@ async function HomePageBody() {
             </div>
           </div>
 
-          <div className="mt-8 grid lg:grid-cols-2 lg:items-stretch">
-            <div className="flex flex-col justify-center bg-[#F8F9FB] px-4 py-10 sm:px-6 sm:py-12 lg:py-16 lg:pl-[max(2rem,calc((100vw-80rem)/2+2rem))] lg:pr-10">
+          <div className="mt-8 grid bg-[#F8F9FB] lg:grid-cols-2 lg:items-stretch">
+            <div className="flex flex-col justify-center px-4 py-10 sm:px-6 sm:py-12 lg:py-16 lg:pl-[max(2rem,calc((100vw-80rem)/2+2rem))] lg:pr-10">
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary-600">
                 Материал недели
               </p>
@@ -274,7 +274,7 @@ async function HomePageBody() {
             </div>
             <Link
               href={`/blog/${featuredBlog.slug}`}
-              className="group relative min-h-[260px] overflow-hidden bg-slate-900 sm:min-h-[320px] lg:min-h-full"
+              className="group relative aspect-[16/11] overflow-hidden bg-slate-200 sm:aspect-[16/10] lg:aspect-auto lg:min-h-[22rem]"
               aria-label={featuredBlog.title}
             >
               <SafeImage
@@ -283,8 +283,8 @@ async function HomePageBody() {
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover transition duration-700 group-hover:scale-[1.03]"
+                fallback={<div className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-300" />}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent lg:bg-gradient-to-l lg:from-transparent lg:via-transparent lg:to-black/10" />
             </Link>
           </div>
 
