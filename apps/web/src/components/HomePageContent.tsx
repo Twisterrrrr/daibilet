@@ -86,7 +86,7 @@ async function HomePageBody() {
 
       <HomeStoriesStrip />
 
-      {/* Rhythm: editors boxed → cities full-bleed rail → My Day boxed card → popular boxed */}
+      {/* Rhythm: editors → cities rail (plain) → My Day map-band → trips band */}
       <HomeCityAwareSections
         sessions={sessions}
         fingerprints={fingerprintsRecord}
@@ -95,7 +95,7 @@ async function HomePageBody() {
         {topCities.length ? (
           <section
             id="destinations"
-            className="home-cities-map-band section-y pb-6 sm:pb-8"
+            className="section-y pb-6 sm:pb-8"
             data-home-band="full-bleed"
           >
             <div className="container-page">
@@ -116,7 +116,7 @@ async function HomePageBody() {
           </section>
         ) : null}
 
-        {/* My Day CTA - boxed promo after cities (not full-bleed band) */}
+        {/* My Day CTA - constructor card on soft map-band */}
         <HomeMyDayBanner />
       </HomeCityAwareSections>
 

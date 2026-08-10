@@ -30,7 +30,7 @@ const STEPS = [
 
 /**
  * Mid-page My Day promo: interactive constructor preview (not a static ad banner).
- * Contained white card in page container - not full-bleed graphite/blue band.
+ * Soft map-band behind a contained white card.
  */
 export function HomeMyDayBanner() {
   const selectedCity = useSelectedCityOptional();
@@ -52,12 +52,12 @@ export function HomeMyDayBanner() {
 
   return (
     <section
-      className="section-y border-b border-slate-200/70"
+      className="home-myday-map-band section-y"
       aria-label="Мой день"
-      data-home-band="boxed"
+      data-home-band="full-bleed"
     >
       <div className="container-page">
-        <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-card sm:p-6">
+        <div className="rounded-2xl border border-slate-200/80 bg-white/95 p-5 shadow-card backdrop-blur-[2px] sm:p-6">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div className="min-w-0 max-w-xl">
               <p className="text-xs font-semibold uppercase tracking-wide text-primary-600">Конструктор дня</p>
