@@ -56,14 +56,6 @@ const PODBORKI_ALL_TAB_TAGS: readonly PodborkiTagMeta[] = PODBORKI_MOODS.map((mo
 
 const TRENDING_LIMIT = 5;
 
-function seasonalBannerText(month = new Date().getMonth()): string | null {
-  if (month === 11 || month === 0) return 'Зимой удобнее брать готовые планы: каток, музеи и вечерние программы без долгого выбора.';
-  if (month >= 5 && month <= 7) return 'Летом в приоритете речные прогулки, крыши и длинные вечерние маршруты.';
-  if (month === 4) return 'Май - сезон салютов, прогулок и коротких городских маршрутов на выходные.';
-  if (month >= 8 && month <= 9) return 'Осенью хорошо заходят музеи, театры и камерные вечерние подборки.';
-  return 'Готовые планы под повод: вечер, выходные или поездка в новый город.';
-}
-
 function resolveCitySlug(cities: PublicDestinationDto[], filter: string): string {
   if (!filter || filter === 'all') return 'all';
   const bySlug = cities.find((item) => item.slug === filter || item.sourceSlug === filter);
@@ -122,7 +114,6 @@ export function LandingsCatalogView({
   const cityRaw = urlCity && urlCity !== 'all' ? urlCity : headerCityFilter || initialCity || 'all';
   const citySlug = resolveCitySlug(cities, cityRaw === 'all' ? 'all' : cityRaw);
   const cityName = resolveCityName(cities, cityRaw === 'all' ? 'all' : cityRaw);
-  const seasonText = seasonalBannerText();
   const citySelected = citySlug !== 'all';
   const apiCityParam = citySelected
     ? (cityName !== 'all' ? cityName : citySlug)
@@ -267,12 +258,6 @@ export function LandingsCatalogView({
         title="Готовые планы на вечер и выходные"
         description="Подборки под настроение: для двоих, с детьми, бюджетно или культурно - сразу к билетам."
       >
-        {seasonText ? (
-          <p className="mt-4 hidden max-w-2xl text-sm leading-relaxed text-slate-600 md:block">
-            {seasonText}
-          </p>
-        ) : null}
-
         {sections.length ? (
           <div className="mt-5 space-y-3">
             <ScrollRail
