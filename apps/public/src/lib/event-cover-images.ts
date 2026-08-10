@@ -141,6 +141,10 @@ export const EVENT_PACK_IMAGES: Record<string, string> = {
     '/images/events/generated/evt-cover-snegiri-zaryade-1107.jpg',
   evt_tep_1373: '/images/events/generated/evt-cover-central-dusk-1373.jpg',
   evt_tep_1475: '/images/events/generated/evt-cover-gorky-city-view-1475.jpg',
+  evt_tep_1478: '/images/events/generated/evt-cover-central-loop-1478.jpg',
+  'centralnaya-krugovaya-rechnaya-progulka-ot-parka-gorkogo-ves-centr-za-chas-1478':
+    '/images/events/generated/evt-cover-central-loop-1478.jpg',
+  evt_tep_683: '/images/events/generated/evt-cover-zaryade-circle-683.jpg',
 
   // --- Exact content dupes: leave one sibling on original photo, rest get distinct covers ---
   evt_tep_1112: '/images/events/generated/evt-cover-river-express-a.jpg',
