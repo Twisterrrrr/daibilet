@@ -13,7 +13,7 @@ import { HeroLayout } from '@/components/HeroLayout';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from '@/lib/catalog-url';
 import { cityToGenitive } from '@/lib/city-declension';
-import { pluralVenues } from '@/lib/format';
+import { pluralCities, pluralVenues } from '@/lib/format';
 import {
   catalogCityQueryValue,
   isAllCitiesQuery,
@@ -472,8 +472,10 @@ export function VenuesCatalogView({
     '/locations',
     selectedCity?.selectedDestination?.slug || selectedCity?.cityValue,
   );
+  const cityCount = cityOptions.length;
   const cityName = cityFilter !== 'all' ? cityFilter : null;
   const pageTitle = cityName ? `Театры и музеи ${cityToGenitive(cityName)}` : 'Театры и музеи';
+  const heroTotal = stats.venues || total;
   const hideCityOnCards = cityFilter !== 'all';
   const paginationParams = useMemo(() => {
     const params = searchParamsRecord(searchParams);
@@ -488,6 +490,7 @@ export function VenuesCatalogView({
         variant="minimal"
         dense
         breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Площадки' }]}
+        eyebrow={`${pluralVenues(heroTotal)} · ${pluralCities(cityCount)}`}
         title={pageTitle}
         tone="light"
         className="bg-white"
