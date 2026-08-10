@@ -14,6 +14,7 @@ test('ermitazh has highlights, features, FAQ without em dash', () => {
   const content = resolveVenueEditorialContent('ermitazh');
   assert.ok(content);
   assert.equal(content!.displayTitle, 'Государственный Эрмитаж');
+  assert.ok(content!.hookFact && content!.hookFact.includes('8 лет'));
   assert.equal(content!.tickets?.priceFromRub, 500);
   assert.ok(content!.phone);
   assert.ok(content!.website);
@@ -27,9 +28,11 @@ test('ermitazh has highlights, features, FAQ without em dash', () => {
   ]);
   const chips = venueFeatureChips(content!.features);
   assert.equal(chips[0]?.icon, '⚡');
-  const blob = [...content!.highlights, ...content!.faq.flatMap((f) => [f.question, f.answer])].join(
-    '\n',
-  );
+  const blob = [
+    content!.hookFact || '',
+    ...content!.highlights,
+    ...content!.faq.flatMap((f) => [f.question, f.answer]),
+  ].join('\n');
   assert.equal(blob.includes('—'), false);
   assert.equal(blob.includes('–'), false);
 });
@@ -46,10 +49,12 @@ test('applyVenueEditorialOverlay patches legacy Hermitage title', () => {
     events: 0,
     categories: {},
     metroStation: null,
+    hookFact: null,
   });
   assert.equal(patched.name, 'Государственный Эрмитаж');
   assert.equal(patched.seoH1, 'Государственный Эрмитаж');
   assert.equal(patched.metroStation, 'Адмиралтейская');
+  assert.ok(patched.hookFact && patched.hookFact.includes('8 лет'));
 });
 
 test('formatVenueMetroLabel prefixes м.', () => {

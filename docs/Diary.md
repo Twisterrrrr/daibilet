@@ -1,3 +1,21 @@
+## 2026-08-10 - Hermitage PDP UX v3 (tabs / факт / hide tickets)
+
+### Наблюдения
+- Owner: коммерческий блок «Билеты» + hero chips лишние; часы в sidebar ниже карты; нет hookFact как на city hub; табы шумные (афиша / экскурсии / контакты).
+
+### Решения
+- `InstitutionVenueLayout`: без hero badges/chips; без editorial commercial tickets / CTA «Купить билет».
+- Билеты (tab + `VenueAdmissionBlock`) только при `admissionProducts` (внутренний ЛК).
+- Sticky tabs: О месте → Билеты(LC) → Как посетить → Вопросы → Отзывы → Похожие.
+- Секции: Факт → О месте → …; экскурсии+similar в одном «Похожие»; sidebar часы над картой.
+- Editorial `hookFact` для `ermitazh` (+ overlay если DB пуст).
+
+### Проблемы
+- Venue reviews API нет - секция «Отзывы» placeholder.
+- External `tickets` в editorial сохранены на будущее, UI не рендерит.
+
+---
+
 ## 2026-08-10 - Hermitage PDP: SPBBOATS commercial UX
 
 ### Наблюдения

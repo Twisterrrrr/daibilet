@@ -43,6 +43,8 @@ export type VenueEditorialTickets = {
 export type VenueEditorialContent = {
   /** Overrides H1 / name / seoH1 when DB still has legacy title. */
   displayTitle?: string;
+  /** Interesting fact above «О месте» (city-hub style). */
+  hookFact?: string;
   highlights: string[];
   features: VenueFeatureCode[];
   faq: VenueEditorialFaqItem[];
@@ -51,7 +53,10 @@ export type VenueEditorialContent = {
   phone?: string;
   website?: string;
   websiteLabel?: string;
-  /** Commercial hero + «Билеты» when catalog sessions / finance admission are empty. */
+  /**
+   * External official tickets CTA (not internal LC inventory).
+   * Kept in overlay for future use; institution PDP hides commercial blocks for now.
+   */
   tickets?: VenueEditorialTickets;
 };
 
@@ -67,6 +72,8 @@ const FEATURE_CHIPS: Record<VenueFeatureCode, VenueFeatureChip> = {
 const EDITORIAL_BY_SLUG: Record<string, VenueEditorialContent> = {
   ermitazh: {
     displayTitle: 'Государственный Эрмитаж',
+    hookFact:
+      'Если вы решите задержаться у каждого экспоната музея хотя бы на одну минуту, вам придется провести здесь без сна и еды целых 8 лет.',
     highlights: [
       '3 миллиона экспонатов',
       'Зимний дворец - объект ЮНЕСКО',
@@ -145,6 +152,10 @@ export function applyVenueEditorialOverlay<T extends PublicVenueDto>(venue: T): 
   const metro = String(next.metroStation || '').trim();
   if ((!metro || metro === '-' || metro === '—' || metro === '–') && editorial.metroStation) {
     next = { ...next, metroStation: editorial.metroStation };
+  }
+  const existingHook = String(next.hookFact || '').trim();
+  if (!existingHook && editorial.hookFact) {
+    next = { ...next, hookFact: editorial.hookFact };
   }
   return next;
 }
