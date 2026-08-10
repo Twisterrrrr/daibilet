@@ -1113,8 +1113,11 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           spbPresetStop('Львиный мост', {
             desc: 'Мост на линии Грибоедова'
           }),
-          spbPresetStop('Никольский морской собор', {
-            desc: 'Никольский ансамбль'
+          spbPresetStop('Николо-Богоявленский морской собор', {
+            desc: 'Никольский ансамбль у Крюкова канала / Никольской площади',
+            locationSlug: 'saint-petersburg-nikolo-bogoyavlenskiy-morskoy-sobor',
+            latitude: 59.9225,
+            longitude: 30.3005,
           }),
           spbPresetStop('Семимостье', {
             desc: 'Семь мостов у слияния каналов',
