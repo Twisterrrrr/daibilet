@@ -22,26 +22,27 @@
 .logoRoute {
   position: absolute;
   left: 0;
-  /* Overlay lowered so the solid й-кратка sits on top of «и». */
-  top: -18%;
+  /* Overlay so the solid й-кратка sits just above «и» as the diacritic. */
+  top: -28%;
   width: 100%;
   height: auto;
   overflow: visible;
   pointer-events: none;
+  z-index: 1;
 }
 
 /* Solid first dash of the journey (й-кратка); dashed arc continues from its tip. */
 .breve {
   fill: none;
   stroke: var(--logo-blue);
-  stroke-width: 3.5;
+  stroke-width: 4;
   stroke-linecap: round;
   opacity: 1;
 }
 
 /*
- * Dashed continuation. dashoffset stays 0 so the first dash paints AT the
- * breve tip (same join point) — never start with a gap in empty air.
+ * Dashed continuation. dashoffset 0 = first dash paints AT the breve tip
+ * (same join point). Never start with a gap in empty air.
  */
 .route {
   fill: none;
@@ -49,7 +50,7 @@
   stroke-width: 3.5;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-dasharray: 8 11;
+  stroke-dasharray: 9 8;
   stroke-dashoffset: 0;
   opacity: 1;
 }

@@ -6,27 +6,22 @@ export const DAIBILET_LOGO_DARK = '#000000';
 /**
  * Owner-approved geometry (annotated sketch with red !!):
  * 1. Short SOLID slanted blue stroke ON «и» = й-кратка AND first dash of the route.
- * 2. Blue dashed arc begins at the RIGHT TIP of that stroke (same point, no gap)
- *    and continues as one journey → mid blue dot → dashed → blue X over «т».
+ * 2. Blue dashed arc begins at the RIGHT TIP of that stroke (exact same point)
+ *    → mid blue filled circle → dashed → blue X over «т».
  *
- * Implementation: two path segments joined at the exact tip coordinates.
- * The dashed segment uses dashoffset 0 so the first dash paints AT the tip
- * (not after a gap / floating in empty air).
+ * Two path segments joined at the tip. Dashed segment: dashoffset 0 so the first
+ * dash paints AT the tip (never start with a gap floating in empty air).
  *
- * viewBox 0 0 500 95; «и» near x≈155–180.
+ * viewBox 0 0 500 95; «и» near x≈155–185.
  */
-/** Solid й-кратка (first dash), slanted up-right, sits on «и». */
 const BREVE_X1 = 156;
-const BREVE_Y1 = 66;
-const BREVE_X2 = 180;
-const BREVE_Y2 = 56;
+const BREVE_Y1 = 54;
+const BREVE_X2 = 182;
+const BREVE_Y2 = 44;
 const BREVE_D = `M${BREVE_X1} ${BREVE_Y1} L${BREVE_X2} ${BREVE_Y2}`;
 
-/**
- * Dashed continuation from the breve tip. First cubic control follows the
- * breve up-right tangent so the arc leaves the tip without a kink.
- */
-const ROUTE_1 = `M${BREVE_X2} ${BREVE_Y2} C216 32 270 -2 315 31`;
+/** Dashed continuation from the breve tip; cubic follows up-right breve tangent. */
+const ROUTE_1 = `M${BREVE_X2} ${BREVE_Y2} C214 26 268 -2 315 31`;
 const ROUTE_2 = 'M315 31 C365 -3 430 -3 475 31';
 
 const MID_X = 315;
@@ -67,9 +62,7 @@ export function DaibiletLogo({
         Да<span>и</span>билет
       </span>
       <svg className={styles.logoRoute} viewBox="0 0 500 95" aria-hidden="true">
-        {/* Solid first dash (й-кратка) — ends at join tip */}
         <path className={styles.breve} d={BREVE_D} />
-        {/* Dashed arcs — start at the SAME tip, first dash paints immediately */}
         <path className={styles.route} d={ROUTE_1} />
         <path className={styles.route} d={ROUTE_2} />
         <circle className={styles.point} cx={MID_X} cy={MID_Y} r="7" />
