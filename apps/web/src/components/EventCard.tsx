@@ -53,7 +53,11 @@ const SLOT_CHIP_PURCHASE_CLASS =
   'transition hover:bg-primary/10 hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40';
 
 const DETAILS_LINK_CLASS =
-  'relative z-[2] inline-flex items-center gap-1 rounded-lg bg-primary-600 px-2.5 py-1.5 text-ui-xs font-semibold text-white transition hover:bg-primary-700 sm:px-3 sm:text-ui-sm';
+  'relative z-[2] inline-flex shrink-0 items-center justify-center gap-0.5 whitespace-nowrap rounded-lg bg-primary-600 px-2 py-1.5 text-ui-xs font-semibold text-white transition hover:bg-primary-700 sm:text-ui-sm';
+
+/** Narrow rail / city-hub cards: tighter pill so price stays on one line. */
+const SHOWCASE_BUY_CTA_CLASS =
+  'inline-flex shrink-0 items-center justify-center gap-0.5 whitespace-nowrap rounded-lg bg-primary-600 px-1.5 py-1 text-[11px] font-semibold leading-none text-white';
 
 const TITLE_LINK_CLASS =
   'relative z-[2] line-clamp-2 font-display text-ui-sm font-bold leading-snug text-graphite transition-colors hover:text-primary-600 sm:text-base';
@@ -325,7 +329,7 @@ export function EventCard({
           />
         ) : null}
 
-        <div className="mt-auto flex items-center justify-between gap-3 pt-1">
+        <div className="mt-auto flex items-center justify-between gap-2 pt-1">
           {landingActions ? (
             <LandingPurchaseButton
               session={session}
@@ -335,7 +339,7 @@ export function EventCard({
           ) : (
             <>
               {priceFooterLabel ? (
-                <span className="relative z-[2] text-base font-bold tracking-tight text-primary-700 sm:text-lg">
+                <span className="relative z-[2] min-w-0 flex-1 whitespace-nowrap text-base font-bold tracking-tight text-primary-700 sm:text-lg">
                   {priceFooterLabel}
                 </span>
               ) : (
@@ -352,7 +356,7 @@ export function EventCard({
                   })
                 }
               >
-                <Ticket className="hidden h-3.5 w-3.5 sm:inline" strokeWidth={1.75} />
+                <Ticket className="hidden h-3.5 w-3.5 shrink-0 sm:inline" strokeWidth={1.75} />
                 <span className="sm:hidden">Купить</span>
                 <span className="hidden sm:inline">Купить билет</span>
               </Link>
@@ -631,18 +635,17 @@ function ShowcaseEventCard({
           ) : null}
         </div>
 
-        <div className="mt-auto flex items-center justify-between gap-3 pt-1">
+        <div className="mt-auto flex items-center justify-between gap-1.5 pt-1">
           {priceLabel ? (
-            <span className="text-base font-extrabold tracking-tight text-graphite sm:text-ui-sm sm:font-bold">
+            <span className="min-w-0 flex-1 whitespace-nowrap text-ui-sm font-extrabold tracking-tight text-graphite">
               {priceLabel}
             </span>
           ) : (
             <span />
           )}
-          <span className="inline-flex items-center gap-1 rounded-lg bg-primary-600 px-3 py-1.5 text-ui-xs font-semibold text-white sm:text-ui-sm">
-            <Ticket className="hidden h-3.5 w-3.5 sm:inline" strokeWidth={1.75} />
-            <span className="sm:hidden">Купить</span>
-            <span className="hidden sm:inline">Купить билет</span>
+          <span className={SHOWCASE_BUY_CTA_CLASS}>
+            <Ticket className="h-3 w-3 shrink-0" strokeWidth={1.75} />
+            Купить билет
           </span>
         </div>
       </div>

@@ -196,17 +196,19 @@ export function EventCardHorizontal({ session }: { session: PublicCatalogListIte
           </div>
         ) : null}
 
-        <div className="mt-auto flex items-center justify-between gap-4 pt-1">
+        <div className="mt-auto flex items-center justify-between gap-2 pt-1">
           {priceFooterLabel ? (
-            <span className="shrink-0 text-ui-sm font-bold text-graphite sm:text-base">{priceFooterLabel}</span>
+            <span className="min-w-0 flex-1 whitespace-nowrap text-ui-sm font-bold text-graphite sm:text-base">
+              {priceFooterLabel}
+            </span>
           ) : (
             <span />
           )}
           <Link
             href={href}
-            className="relative z-[2] inline-flex items-center gap-1 rounded-lg bg-primary-600 px-3 py-1.5 text-ui-xs font-semibold text-white transition hover:bg-primary-700 sm:text-ui-sm"
+            className="relative z-[2] inline-flex shrink-0 items-center justify-center gap-0.5 whitespace-nowrap rounded-lg bg-primary-600 px-2 py-1.5 text-ui-xs font-semibold text-white transition hover:bg-primary-700 sm:text-ui-sm"
           >
-            <Ticket className="h-3.5 w-3.5" strokeWidth={1.75} />
+            <Ticket className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
             Купить билет
           </Link>
         </div>
