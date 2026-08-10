@@ -216,6 +216,8 @@ export type TextDayRouteStopInput = {
   coordsText?: string | null;
   latitude?: number | string | null;
   longitude?: number | string | null;
+  /** Insert after this venue id; omit / null = append. */
+  afterVenueId?: string | null;
 };
 
 /**
@@ -251,10 +253,19 @@ export function addTextStopToDayRoute(input: TextDayRouteStopInput): DayRouteSta
     longitude: coords?.longitude ?? null,
   };
 
+  const venues = [...current.venues];
+  const afterId = String(input.afterVenueId || '').trim();
+  const afterIdx = afterId ? venues.findIndex((v) => v.id === afterId) : -1;
+  if (afterIdx >= 0) {
+    venues.splice(afterIdx + 1, 0, item);
+  } else {
+    venues.push(item);
+  }
+
   const next: DayRouteState = {
     // Keep prior cityId if set; text stops do not force a city switch.
     cityId: current.cityId || cityId || null,
-    venues: [...current.venues, item].slice(0, DAY_ROUTE_MAX),
+    venues: venues.slice(0, DAY_ROUTE_MAX),
   };
   return writeDayRoute(next) ? readDayRouteFresh() : current;
 }
@@ -706,6 +717,17 @@ export function updateDayRouteVenue(
 }
 
 export function addToDayRoute(item: DayRouteVenueItem): DayRouteState {
+  return insertIntoDayRoute(item, null);
+}
+
+/**
+ * Add (or merge) a stop. When `afterVenueId` is set, place the new stop
+ * immediately after that venue; otherwise append at the end.
+ */
+export function insertIntoDayRoute(
+  item: DayRouteVenueItem,
+  afterVenueId?: string | null,
+): DayRouteState {
   // Always mutate from LS truth, not a possibly-stale snapshotCache identity.
   const current = readDayRouteFresh();
   const id = normalizeDayRouteVenueId(item);
@@ -744,9 +766,18 @@ export function addToDayRoute(item: DayRouteVenueItem): DayRouteState {
 
   if (current.venues.length >= DAY_ROUTE_MAX) return current;
 
+  const venues = [...current.venues];
+  const afterId = String(afterVenueId || '').trim();
+  const afterIdx = afterId ? venues.findIndex((v) => v.id === afterId) : -1;
+  if (afterIdx >= 0) {
+    venues.splice(afterIdx + 1, 0, normalized);
+  } else {
+    venues.push(normalized);
+  }
+
   const next: DayRouteState = {
     cityId: nextCityId || current.cityId,
-    venues: [...current.venues, normalized].slice(0, DAY_ROUTE_MAX),
+    venues: venues.slice(0, DAY_ROUTE_MAX),
   };
   // Keep first city as dominant; still allow add but UI warns on mixed.
   // Same city TITLE with null vs city_* ids must NEVER block append.
