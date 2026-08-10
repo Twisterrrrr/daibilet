@@ -69,7 +69,7 @@ export function SiteFooter({ destinations, variant = 'default' }: SiteFooterProp
         <div className="container-page py-6 sm:py-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
-              <Link href="/" className="inline-flex">
+              <Link href="/" className="inline-flex" aria-label="Дайбилет">
                 <DaibiletLogo textClassName="text-lg" />
               </Link>
               <div className="mt-3 text-sm font-medium text-graphite">
@@ -115,7 +115,7 @@ export function SiteFooter({ destinations, variant = 'default' }: SiteFooterProp
       <div className="container-page py-14 sm:py-16">
         <div className="grid grid-cols-2 gap-10 md:grid-cols-4 md:gap-12">
           <div className="col-span-2 md:col-span-1">
-            <Link href="/" className="inline-flex">
+            <Link href="/" className="inline-flex" aria-label="Дайбилет">
               <DaibiletLogo textClassName="text-lg" />
             </Link>
             <p className="mt-4 max-w-xs text-sm leading-6 text-graphite-muted" data-nosnippet>

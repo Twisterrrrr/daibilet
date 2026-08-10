@@ -117,7 +117,7 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
               <Menu className="h-5 w-5" strokeWidth={1.75} />
             </button>
 
-            <Link href="/" className="inline-flex shrink-0 items-center">
+            <Link href="/" className="inline-flex shrink-0 items-center" aria-label="Дайбилет">
               <DaibiletLogo textClassName="text-lg sm:text-xl lg:text-2xl" />
             </Link>
 
@@ -349,7 +349,9 @@ function MobileNavSheet({
       <button type="button" aria-label="Закрыть меню" className="absolute inset-0 bg-slate-900/45 backdrop-blur-[2px]" onClick={onClose} />
       <aside className="relative flex h-full w-[min(20rem,88vw)] flex-col bg-white shadow-card-hover">
         <div className="flex items-center justify-between px-4 py-4">
-          <DaibiletLogo textClassName="text-xl" />
+          <Link href="/" className="inline-flex items-center" aria-label="Дайбилет" onClick={onClose}>
+            <DaibiletLogo textClassName="text-xl" />
+          </Link>
           <button type="button" aria-label="Закрыть" onClick={onClose} className="rounded-lg p-2 text-graphite-muted hover:bg-surface-muted hover:text-graphite">
             <X className="h-5 w-5" strokeWidth={1.75} />
           </button>

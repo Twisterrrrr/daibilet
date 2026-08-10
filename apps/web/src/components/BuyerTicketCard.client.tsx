@@ -133,7 +133,7 @@ export function BuyerTicketCard({ order, origin, emailHint = 'unknown', classNam
         className="mb-4 hidden items-center justify-between border-b border-slate-200 pb-3 print:mb-[6mm] print:flex print:pb-[3mm]"
         data-buyer-ticket-brand
       >
-        <DaibiletLogo textClassName="text-xl tracking-tight" />
+        <DaibiletLogo textClassName="text-xl tracking-tight" animated={false} />
         <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
           Электронный билет
         </span>
