@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Research: Эрмитаж + Гараж - Daibilet</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <nav class="site-nav" aria-label="Разделы пакета">
+    <a href="./index.html" aria-current="page">Обзор</a>
+    <a href="./comparison.html">Сравнение</a>
+    <a href="./ermitazh.html">Эрмитаж</a>
+    <a href="./garazh.html">Гараж</a>
+    <a href="./block-layout/daibilet.html">Блоки Daibilet</a>
+    <a href="./block-layout/spbboats.html">Блоки SPBBOATS</a>
+  </nav>
+
+  <main class="wrap">
+    <p class="eyebrow">Research pack / Codex</p>
+    <h1>Выгрузка сидов: Эрмитаж + Гараж</h1>
+    <p class="lead">
+      Материал для ревью: extract из SPBBOATS и сравнение с Daibilet.
+      HTML-версия рядом с markdown в
+      <code>docs/research/venue-seeds-hermitage-garage/</code>.
+    </p>
+
+    <div class="note">
+      Live PDP уже на месте:
+      <a href="https://daibilet.ru/venues/ermitazh">/venues/ermitazh</a>
+      и
+      <a href="https://daibilet.ru/venues/moscow-muzey-garazh">/venues/moscow-muzey-garazh</a>.
+      Этот пакет - контент сидов и выводы, не прод-CMS.
+    </div>
+
+    <h2>Что нашли</h2>
+    <div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr>
+            <th>Venue</th>
+            <th>SPBBOATS slug</th>
+            <th>Daibilet slug</th>
+            <th>Полнота сида</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Государственный Эрмитаж</td>
+            <td><code>ermitazh</code></td>
+            <td><code>ermitazh</code></td>
+            <td>Полный: highlights, faq, features, hours</td>
+          </tr>
+          <tr>
+            <td>Музей «Гараж»</td>
+            <td><code>garazh</code></td>
+            <td><code>moscow-muzey-garazh</code></td>
+            <td>Slim: без highlights/faq; images в links на <code>muzej-garazh</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="meta">Дополнительно: демо <code>garage-moscow-demo</code> в seed-scenarios (не продакшен).</p>
+
+    <h2>Страницы пакета</h2>
+    <ul class="card-list">
+      <li class="card">
+        <a class="title" href="./comparison.html">Сравнение SPBBOATS vs Daibilet</a>
+        <p class="meta">Контент блоков, UX, сиды, практические выводы. Начать отсюда.</p>
+      </li>
+      <li class="card">
+        <a class="title" href="./ermitazh.html">Сид Эрмитажа</a>
+        <p class="meta">Нормализованный seed + notes: highlights, FAQ, features, часы.</p>
+      </li>
+      <li class="card">
+        <a class="title" href="./garazh.html">Сид Гаража</a>
+        <p class="meta">Slim seed + alias-slug'и (garazh / muzej-garazh / moscow-muzey-garazh).</p>
+      </li>
+      <li class="card">
+        <a class="title" href="./block-layout/daibilet.html">Блоки PDP Daibilet</a>
+        <p class="meta">InstitutionVenueLayout: порядок секций и поля Venue.</p>
+      </li>
+      <li class="card">
+        <a class="title" href="./block-layout/spbboats.html">Блоки PDP SPBBOATS</a>
+        <p class="meta">VenuePageView + template sections / legacy-колонки.</p>
+      </li>
+    </ul>
+
+    <h2>Исходники в репо</h2>
+    <ul>
+      <li><code>docs/research/venue-seeds-hermitage-garage/*.md</code> / <code>*.json</code></li>
+      <li><code>sources/</code> - фрагменты seed-venues, links, demo scenario</li>
+      <li>Daibilet: ensure-скрипт, InstitutionVenueLayout, must-see editorial</li>
+    </ul>
+
+    <p class="footer">
+      noindex research HTML · host <a href="https://daibilet.ru/">daibilet.ru</a>
+    </p>
+  </main>
+</body>
+</html>

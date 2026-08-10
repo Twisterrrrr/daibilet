@@ -41,3 +41,16 @@
 ## Для Codex
 
 Начать с `COMPARISON-spbboats-vs-daibilet.md`, затем `ermitazh.venue-seed.json` / `garazh.venue-seed.json` и `block-layout/`.
+
+## Browseable HTML (live)
+
+Статика на MSK web (`apps/web/public/research/...`), host `https://daibilet.ru`:
+
+- https://daibilet.ru/research/venue-seeds-hermitage-garage/
+- https://daibilet.ru/research/venue-seeds-hermitage-garage/comparison.html
+- https://daibilet.ru/research/venue-seeds-hermitage-garage/ermitazh.html
+- https://daibilet.ru/research/venue-seeds-hermitage-garage/garazh.html
+- https://daibilet.ru/research/venue-seeds-hermitage-garage/block-layout/daibilet.html
+- https://daibilet.ru/research/venue-seeds-hermitage-garage/block-layout/spbboats.html
+
+Live PDP: https://daibilet.ru/venues/ermitazh · https://daibilet.ru/venues/moscow-muzey-garazh
