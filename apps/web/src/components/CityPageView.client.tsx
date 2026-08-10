@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { ArrowLeft, ArrowRight, Grid3X3, ListFilter, MapPin, Ticket } from 'lucide-react';
+import { ArrowLeft, ArrowRight, MapPin, Ticket } from 'lucide-react';
 
 import { CityHubArticlesGrid } from '@/components/CityHubArticleTeaser.client';
 import { CityAdmissionBlock } from '@/components/CityAdmissionBlock';
@@ -11,14 +11,14 @@ import { PageBreadcrumbBar } from '@/components/PageBreadcrumbs';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import Link from 'next/link';
 import { formatStreetAddress } from '@/lib/address';
-import { formatMoney, formatNumber, formatPriceFrom, pluralEvents, pluralVenues } from '@/lib/format';
+import { formatNumber, formatPriceFrom, pluralEvents, pluralVenues } from '@/lib/format';
 import type { CityFaqItem } from '@/lib/city-faq';
 import type { CityHubArticlesBuckets } from '@/lib/city-hub-articles';
 import type { CityHubTemplate } from '@/lib/city-hub-template';
 import type { BlogCardDto } from '@/lib/blog-utils';
 import type { FinanceAdmissionListResult } from '@/lib/finance-projection';
 import { venuePageTemplate } from '@/lib/venue-meta';
-import { eventHref, sessionVenueHref, venueHref } from '@/lib/routes';
+import { eventHref, venueHref } from '@/lib/routes';
 import { inCityAccusative, inCityPrepositional, cityToGenitive } from '@/lib/city-declension';
 import { buildCityHubSeoPhrase } from '@/lib/city-hub-seo';
 import { isCityHubSectionHidden, resolveCityHubConfig } from '@/lib/city-hub-config';
@@ -47,13 +47,6 @@ import {
   type MustSeeFilterId,
 } from '@/lib/must-see-filters';
 import { isOpenDate, MIN_DISPLAY_PRICE_RUB } from '@/lib/event-card-meta';
-import {
-  collectSessionStartsAtTimes,
-  isSameSessionDay,
-  isSessionTomorrow,
-  isSessionWeekend,
-  resolveSessionTimeZoneForSession,
-} from '@/lib/datetime';
 import type {
   PublicCityDto,
   PublicCityPageDto,
@@ -61,9 +54,6 @@ import type {
   PublicSessionDto,
   PublicVenueDto,
 } from '@daibilet/contracts/public';
-
-type ViewMode = 'cards' | 'table';
-type DateFilter = 'all' | 'today' | 'tomorrow' | 'weekend';
 
 const CITY_HASH_ALIASES: Record<string, string> = {
   'city-schedule': 'affiche',
@@ -105,8 +95,6 @@ export function CityPageView({
   const [contentReady, setContentReady] = React.useState(() => Boolean(initialPayload?.sessions?.length));
   const [error, setError] = React.useState<string | null>(null);
   const [category, setCategory] = React.useState('all');
-  const [dateFilter, setDateFilter] = React.useState<DateFilter>('all');
-  const [mode, setMode] = React.useState<ViewMode>('cards');
 
   React.useEffect(() => {
     if (initialPayload?.sessions?.length) return;
@@ -149,11 +137,11 @@ export function CityPageView({
     if (!payload) return [];
     const filtered = payload.sessions.filter((session) => {
       if (category !== 'all' && session.category !== category) return false;
-      if (!matchesCityDateFilter(session, dateFilter)) return false;
       return true;
     });
-    return [...filtered].sort((a, b) => sessionHitScore(b) - sessionHitScore(a));
-  }, [category, dateFilter, payload]);
+    const ranked = [...filtered].sort((a, b) => sessionHitScore(b) - sessionHitScore(a));
+    return dedupeHubSessions(ranked);
+  }, [category, payload]);
 
   const city = payload?.city;
   // Chip facets = hub feed only (same universe as the list / «Все»), not full-city catalog.
@@ -288,38 +276,21 @@ export function CityPageView({
               className={`border-b ${editorial ? 'border-zinc-200' : 'border-slate-100'} ${SECTION_SCROLL_MT}`}
             >
               <div className={`container-page ${editorial ? 'py-12 sm:py-14' : 'py-8'}`}>
-                <CityCatalogHeader
-                  mode={mode}
-                  setMode={setMode}
-                  editorial={editorial}
-                />
-                <h3 className={`mb-3 text-lg font-semibold ${editorial ? 'text-zinc-900' : 'text-slate-900'}`}>
-                  Что купить сейчас
-                </h3>
-                <div className="mb-5 flex flex-wrap items-center gap-x-4 gap-y-1.5 md:flex-nowrap md:overflow-x-auto md:pb-0.5">
-                  <DateFilterChips active={dateFilter} onSelect={setDateFilter} editorial={editorial} />
-                  {contentReady ? (
+                <CityCatalogHeader editorial={editorial} />
+                {contentReady ? (
+                  <div className="mb-5 flex flex-nowrap gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                     <CategoryFilter
                       categories={categories}
                       active={category}
                       filteredCount={sessions.length}
                       editorial={editorial}
                       onCategory={setCategory}
-                      onReset={() => {
-                        setCategory('all');
-                        setDateFilter('all');
-                      }}
+                      onReset={() => setCategory('all')}
                     />
-                  ) : null}
-                </div>
+                  </div>
+                ) : null}
                 {contentReady ? (
-                  <>
-                    {mode === 'table' ? (
-                      <CityEventsTable sessions={sessions} />
-                    ) : (
-                      <CityEventsGrid sessions={sessions} editorial={editorial} />
-                    )}
-                  </>
+                  <CityEventsGrid sessions={sessions} editorial={editorial} />
                 ) : (
                   <CityScheduleLoadingState />
                 )}
@@ -379,7 +350,6 @@ export function CityPageView({
                       nested
                       onCategory={(value) => {
                         setCategory(value);
-                        setDateFilter('all');
                         scrollToSection('affiche');
                       }}
                     />
@@ -833,54 +803,19 @@ function CityStickyTabs({
 
 function hubFilterChipClass(isActive: boolean, editorial = false) {
   const base =
-    'inline-flex items-center rounded-md border px-2.5 py-1 text-[11px] font-medium tracking-wide transition';
+    'inline-flex shrink-0 items-center rounded-full px-3.5 py-1.5 text-xs font-semibold transition';
   if (editorial) {
     return `${base} ${
       isActive
-        ? 'border-zinc-900 bg-zinc-900 text-white'
-        : 'border-zinc-200/90 bg-transparent text-zinc-600 hover:border-zinc-300 hover:text-zinc-900'
+        ? 'bg-zinc-900 text-white'
+        : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200/80 hover:text-zinc-900'
     }`;
   }
   return `${base} ${
     isActive
-      ? 'border-slate-800 bg-slate-800 text-white'
-      : 'border-slate-200/90 bg-transparent text-slate-600 hover:border-slate-300 hover:text-slate-900'
+      ? 'bg-slate-900 text-white'
+      : 'bg-slate-100 text-slate-600 hover:bg-slate-200/80 hover:text-slate-800'
   }`;
-}
-
-function DateFilterChips({
-  active,
-  onSelect,
-  editorial = false,
-}: {
-  active: DateFilter;
-  onSelect: (value: DateFilter) => void;
-  editorial?: boolean;
-}) {
-  const chips: Array<{ value: DateFilter; label: string }> = [
-    { value: 'all', label: 'Все даты' },
-    { value: 'today', label: 'Сегодня' },
-    { value: 'tomorrow', label: 'Завтра' },
-    { value: 'weekend', label: 'Выходные' },
-  ];
-
-  return (
-    <div className="flex shrink-0 flex-wrap gap-1.5 md:flex-nowrap">
-      {chips.map((chip) => {
-        const isActive = active === chip.value;
-        return (
-          <button
-            key={chip.value}
-            type="button"
-            onClick={() => onSelect(chip.value)}
-            className={hubFilterChipClass(isActive, editorial)}
-          >
-            {chip.label}
-          </button>
-        );
-      })}
-    </div>
-  );
 }
 
 function CityWhyGoSection({
@@ -1734,68 +1669,18 @@ function VenueHighlights({
   );
 }
 
-function CityCatalogHeader({
-  mode,
-  setMode,
-  editorial = false,
-}: {
-  mode: ViewMode;
-  setMode: (mode: ViewMode) => void;
-  editorial?: boolean;
-}) {
+function CityCatalogHeader({ editorial = false }: { editorial?: boolean }) {
   return (
-    <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-      <div>
-        <h2
-          className={
-            editorial
-              ? 'font-serif text-3xl font-semibold text-balance text-zinc-950 sm:text-4xl'
-              : 'font-display text-2xl font-bold tracking-tight text-slate-950'
-          }
-        >
-          Ближайшие события
-        </h2>
-      </div>
-      <div
-        className={`hidden overflow-hidden rounded-lg shadow-sm sm:inline-flex ${
-          editorial ? 'bg-white ring-1 ring-black/5' : 'border border-slate-200 bg-white'
-        }`}
+    <div className="mb-4">
+      <h2
+        className={
+          editorial
+            ? 'font-serif text-3xl font-semibold text-balance text-zinc-950 sm:text-4xl'
+            : 'font-display text-2xl font-bold tracking-tight text-slate-950'
+        }
       >
-        <button
-          type="button"
-          onClick={() => setMode('cards')}
-          className={`inline-flex min-h-10 items-center gap-2 px-4 text-sm font-medium ${
-            mode === 'cards'
-              ? editorial
-                ? 'bg-zinc-900 text-white'
-                : 'bg-primary-600 text-white'
-              : editorial
-                ? 'text-zinc-600 hover:bg-zinc-50'
-                : 'text-slate-600 hover:bg-slate-50'
-          }`}
-        >
-          <Grid3X3 className="h-4 w-4" />
-          Карточки
-        </button>
-        <button
-          type="button"
-          onClick={() => setMode('table')}
-          className={`inline-flex min-h-10 items-center gap-2 border-l px-4 text-sm font-medium ${
-            editorial ? 'border-zinc-200' : 'border-slate-200'
-          } ${
-            mode === 'table'
-              ? editorial
-                ? 'bg-zinc-900 text-white'
-                : 'bg-primary-600 text-white'
-              : editorial
-                ? 'text-zinc-600 hover:bg-zinc-50'
-                : 'text-slate-600 hover:bg-slate-50'
-          }`}
-        >
-          <ListFilter className="h-4 w-4" />
-          Таблица
-        </button>
-      </div>
+        Ближайшие события
+      </h2>
     </div>
   );
 }
@@ -1811,9 +1696,11 @@ function CategoryFilter(props: {
   const editorial = props.editorial;
   const activeAll = props.active === 'all';
   return (
-    <div className="flex min-w-0 flex-wrap gap-1.5 md:flex-nowrap">
+    <div className="flex w-max flex-nowrap items-center gap-2" role="tablist" aria-label="Категории событий">
       <button
         type="button"
+        role="tab"
+        aria-selected={activeAll}
         onClick={props.onReset}
         className={hubFilterChipClass(activeAll, editorial)}
       >
@@ -1828,8 +1715,10 @@ function CategoryFilter(props: {
           <button
             key={name}
             type="button"
+            role="tab"
+            aria-selected={isActive}
             onClick={() => props.onCategory(name)}
-            className={`shrink-0 ${hubFilterChipClass(isActive, editorial)}`}
+            className={hubFilterChipClass(isActive, editorial)}
           >
             {name}
             {isActive ? (
@@ -1854,29 +1743,26 @@ function CityEventsGrid({
     return <EmptyState />;
   }
 
-  // Mobile: horizontal swipe carousel. Desktop: same rail with prev/next (no tall grid sheet).
+  // Compact photo carousel (~1.5 mobile / ~4-5 desktop); scrollbar hidden, snap + desktop arrows.
   return (
     <div data-city-events-rail>
       <ScrollRail
         className="mt-1"
-        viewportClassName="flex flex-nowrap gap-3 snap-x snap-mandatory pb-1"
+        hideScrollbar
+        viewportClassName="flex flex-nowrap gap-2.5 snap-x snap-mandatory pb-0.5"
         aria-label="Ближайшие события"
       >
         {items.map((session) => (
           <div
             key={session.id}
-            className={
-              editorial
-                ? 'w-[min(78%,18rem)] shrink-0 snap-start sm:w-[min(42%,16rem)] md:w-[15.5rem] lg:w-[16.5rem]'
-                : 'w-[min(88%,20rem)] shrink-0 snap-start sm:w-[min(46%,18rem)] md:w-[17.5rem] lg:w-[19rem]'
-            }
+            className="w-[min(62%,11.5rem)] shrink-0 snap-start sm:w-[12rem] md:w-[12.5rem] lg:w-[13rem]"
             data-rail-item
             data-city-events-card
           >
             {editorial ? (
               <AffichePosterCard session={session} />
             ) : (
-              <EventCard session={session} showcaseRail />
+              <EventCard session={session} showcaseRail cityHub />
             )}
           </div>
         ))}
@@ -1891,7 +1777,7 @@ function AffichePosterCard({ session }: { session: PublicSessionDto }) {
   const dateBadge = [session.dateLabel, session.timeLabel].filter(Boolean).join(' · ') || session.category;
 
   return (
-    <article className="group relative flex flex-col">
+    <article className="group relative flex h-full flex-col">
       <Link href={href} className="absolute inset-0 z-[1] rounded-xl" aria-label={`Событие: ${session.title}`} />
       <div className="relative mb-4 aspect-[4/5] overflow-hidden rounded-xl bg-zinc-100">
         <SafeImage
@@ -1914,10 +1800,12 @@ function AffichePosterCard({ session }: { session: PublicSessionDto }) {
           </div>
         ) : null}
       </div>
-      <div className="flex flex-1 flex-col">
-        <h3 className="mb-1 text-lg font-medium leading-tight text-balance text-zinc-900">{session.title}</h3>
-        {session.venue ? <p className="mb-3 line-clamp-2 text-sm text-zinc-500">{session.venue}</p> : null}
-        <div className="mt-auto flex items-center justify-between gap-3">
+      <div className="flex min-h-0 flex-1 flex-col">
+        <h3 className="mb-1 line-clamp-2 text-lg font-medium leading-tight text-balance text-zinc-900">
+          {session.title}
+        </h3>
+        {session.venue ? <p className="mb-3 line-clamp-1 text-sm text-zinc-500">{session.venue}</p> : null}
+        <div className="mt-auto flex items-center justify-between gap-3 pt-1">
           {hasPrice ? (
             <span className="text-sm font-medium text-zinc-900">{formatPriceFrom(session.priceFrom)}</span>
           ) : (
@@ -1929,59 +1817,6 @@ function AffichePosterCard({ session }: { session: PublicSessionDto }) {
         </div>
       </div>
     </article>
-  );
-}
-
-function CityEventsTable({ sessions }: { sessions: PublicSessionDto[] }) {
-  return (
-    <div className="overflow-auto rounded-lg border border-slate-200 bg-white shadow-sm">
-      <table className="w-full min-w-[920px] border-collapse text-sm">
-        <thead>
-          <tr className="border-b border-slate-200 bg-slate-50 text-left text-xs uppercase text-slate-500">
-            <th className="px-4 py-3 font-semibold">Дата</th>
-            <th className="px-4 py-3 font-semibold">Событие</th>
-            <th className="px-4 py-3 font-semibold">Место</th>
-            <th className="px-4 py-3 font-semibold">Категория</th>
-            <th className="px-4 py-3 font-semibold">Цена</th>
-            <th className="px-4 py-3" />
-          </tr>
-        </thead>
-        <tbody>
-          {sessions.slice(0, 160).map((session) => (
-            <tr key={session.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50">
-              <td className="whitespace-nowrap px-4 py-3 align-middle">
-                <div className="font-medium text-slate-900">{session.dateLabel}</div>
-                <div className="text-xs text-slate-500">{session.timeLabel}</div>
-              </td>
-              <td className="min-w-[320px] px-4 py-3">
-                <a href={eventHref(session)} className="font-medium text-slate-950 hover:text-primary-700">
-                  {session.title}
-                </a>
-                <div className="mt-1 text-xs text-slate-500">{session.tags.slice(0, 2).join(' · ')}</div>
-              </td>
-              <td className="max-w-[240px] px-4 py-3 text-slate-600">
-                {(() => {
-                  const venueLink = sessionVenueHref(session);
-                  return venueLink ? (
-                    <a className="font-medium text-primary-600 hover:text-primary-700" href={venueLink}>
-                      {session.venue}
-                    </a>
-                  ) : (
-                    session.venue
-                  );
-                })()}
-              </td>
-              <td className="px-4 py-3 text-slate-600">{session.category}</td>
-              <td className="whitespace-nowrap px-4 py-3 font-semibold text-slate-950">{formatMoney(session.priceFrom)}</td>
-              <td className="px-4 py-3">
-                <BuyLink session={session} />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      {!sessions.length ? <EmptyState /> : null}
-    </div>
   );
 }
 
@@ -2100,17 +1935,6 @@ function CityFaqSection({
   );
 }
 
-function BuyLink({ session }: { session: PublicSessionDto }) {
-  return (
-    <Link
-      href={eventHref(session)}
-      className="inline-flex min-h-9 items-center justify-center rounded-full bg-slate-900 px-4 text-sm font-semibold text-white hover:bg-slate-800"
-    >
-      Купить
-    </Link>
-  );
-}
-
 function EmptyState() {
   return <div className="p-8 text-sm text-slate-500">Событий по выбранному фильтру пока нет.</div>;
 }
@@ -2146,18 +1970,22 @@ function mergeCityFaqItems(
   return items;
 }
 
-function matchesCityDateFilter(session: PublicSessionDto, filter: DateFilter): boolean {
-  if (filter === 'all') return true;
-  if (isOpenDate(session)) return true;
-  const timeZone = resolveSessionTimeZoneForSession(session);
-  const times = collectSessionStartsAtTimes(session);
-  if (!times.length) return false;
-  return times.some((startsAt) => {
-    if (filter === 'today') return isSameSessionDay(startsAt, new Date(), timeZone);
-    if (filter === 'tomorrow') return isSessionTomorrow(startsAt, timeZone);
-    if (filter === 'weekend') return isSessionWeekend(startsAt, timeZone);
-    return true;
-  });
+function dedupeHubSessions(sessions: PublicSessionDto[]): PublicSessionDto[] {
+  const seen = new Set<string>();
+  const out: PublicSessionDto[] = [];
+  for (const session of sessions) {
+    const groupKey = String((session as { groupKey?: string }).groupKey || '')
+      .trim()
+      .toLowerCase();
+    const slug = String(session.slug || '')
+      .trim()
+      .toLowerCase();
+    const key = groupKey ? `group:${groupKey}` : slug ? `slug:${slug}` : `id:${session.id}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(session);
+  }
+  return out;
 }
 
 function sessionHaystack(session: PublicSessionDto): string {

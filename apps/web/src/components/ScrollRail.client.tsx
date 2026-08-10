@@ -15,11 +15,15 @@ type ScrollRailProps = {
   className?: string;
   /** Extra classes on the scroll viewport (merged with horizontal-snap-row). */
   viewportClassName?: string;
+  /** Hide native scrollbar (keep swipe + md arrows). */
+  hideScrollbar?: boolean;
   style?: CSSProperties;
   'aria-label'?: string;
 };
 
 const EDGE_EPS = 4;
+const HIDE_SCROLLBAR_CLASS =
+  '![scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:!hidden';
 
 function measureStep(scroller: HTMLElement): number {
   const card =
@@ -39,7 +43,7 @@ function measureStep(scroller: HTMLElement): number {
 
 /**
  * Horizontal row with md+ prev/next controls when content overflows.
- * Mobile keeps swipe + thin scrollbar from `.horizontal-snap-row`.
+ * Mobile keeps swipe; optional hideScrollbar (city hub rail).
  * Both arrows stay visible while overflowing (edge buttons muted/disabled).
  * Arrow Y sits in the photo band (~1/3), not over bottom card titles.
  */
@@ -47,6 +51,7 @@ export function ScrollRail({
   children,
   className = '',
   viewportClassName = '',
+  hideScrollbar = false,
   style,
   'aria-label': ariaLabel = 'Горизонтальный список',
 }: ScrollRailProps) {
@@ -109,7 +114,7 @@ export function ScrollRail({
     <div className={`relative min-w-0 overflow-visible ${className}`.trim()} style={style}>
       <div
         ref={scrollerRef}
-        className={`horizontal-snap-row touch-pan-x ${viewportClassName}`.trim()}
+        className={`horizontal-snap-row touch-pan-x ${hideScrollbar ? HIDE_SCROLLBAR_CLASS : ''} ${viewportClassName}`.trim()}
         aria-label={ariaLabel}
         role="region"
         tabIndex={0}

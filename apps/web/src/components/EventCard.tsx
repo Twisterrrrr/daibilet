@@ -38,6 +38,7 @@ import { resolveEventCardFallbackImage, resolveEventCardPrimaryImage } from '@/l
 import {
   resolveEventCardDestinationLabel,
   resolveEventCardLocationLabel,
+  resolveEventVenueDisplayLabel,
 } from '@/lib/event-location';
 import { dayRouteItemFromEvent } from '@/lib/day-route-from-place';
 import { formatPriceFrom } from '@/lib/format';
@@ -65,6 +66,8 @@ type EventCardProps = {
   session: CatalogCardSession;
   compact?: boolean;
   showcaseRail?: boolean;
+  /** City hub context: city already known - drop category·city and address noise. */
+  cityHub?: boolean;
   editorsPickBadge?: boolean;
   landingActions?: boolean;
   /** Скрыть скрытые anchor-виджеты (каталог-слоты) — на странице события в related. */
@@ -75,12 +78,20 @@ export function EventCard({
   session,
   compact = false,
   showcaseRail = false,
+  cityHub = false,
   editorsPickBadge = false,
   landingActions = false,
   suppressPurchaseAnchors = true,
 }: EventCardProps) {
   if (showcaseRail || editorsPickBadge) {
-    return <ShowcaseEventCard session={session} rail={showcaseRail} editorsPickBadge={editorsPickBadge} />;
+    return (
+      <ShowcaseEventCard
+        session={session}
+        rail={showcaseRail}
+        cityHub={cityHub}
+        editorsPickBadge={editorsPickBadge}
+      />
+    );
   }
 
   const href = eventHref(session);
@@ -487,10 +498,12 @@ function resolveShowcaseLocationLine(session: CatalogCardSession, cityLabel: str
 function ShowcaseEventCard({
   session,
   rail = false,
+  cityHub = false,
   editorsPickBadge = false,
 }: {
   session: CatalogCardSession;
   rail?: boolean;
+  cityHub?: boolean;
   editorsPickBadge?: boolean;
 }) {
   const href = eventHref(session);
@@ -509,8 +522,12 @@ function ShowcaseEventCard({
   const hasPrice = typeof session.priceFrom === 'number' && session.priceFrom >= MIN_DISPLAY_PRICE_RUB;
   const dateLabel = rail ? formatShowcaseSessionDateCompact(session) : formatShowcaseSessionDate(session);
   const cityLabel = resolveEventCardDestinationLabel(session) || null;
-  const locationLine = resolveShowcaseLocationLine(session, cityLabel);
-  const categoryLabel = session.category?.trim() || null;
+  const venueName = resolveEventVenueDisplayLabel(session);
+  const locationLine = cityHub
+    ? venueName
+    : resolveShowcaseLocationLine(session, cityLabel);
+  const categoryLabel = cityHub ? null : session.category?.trim() || null;
+  const showCityMeta = !cityHub && Boolean(categoryLabel || cityLabel);
   const priceLabel = hasPrice ? formatShowcasePriceLabel(session.priceFrom) : null;
   const coverDateBadge = formatCoverDateBadge(session);
 
@@ -528,7 +545,11 @@ function ShowcaseEventCard({
           })
         }
       />
-      <div className="relative aspect-[16/9] w-full shrink-0 overflow-hidden bg-surface-muted">
+      <div
+        className={`relative w-full shrink-0 overflow-hidden bg-surface-muted ${
+          cityHub ? 'aspect-[3/4]' : 'aspect-[16/9]'
+        }`}
+      >
         <SafeImage
           src={imagePrimarySrc}
           alt={session.title}
@@ -552,23 +573,29 @@ function ShowcaseEventCard({
           }
         />
 
-        <EventImageBadges event={session} rail={rail} editorsPick={editorsPickBadge} />
+        {cityHub ? null : <EventImageBadges event={session} rail={rail} editorsPick={editorsPickBadge} />}
         {coverDateBadge ? (
-          <span className="absolute bottom-2 left-2 z-[2] rounded-lg bg-slate-950/80 px-2 py-1 text-[11px] font-semibold tracking-wide text-white backdrop-blur-sm sm:left-3 sm:text-xs">
+          <span
+            className={`absolute z-[2] rounded-lg bg-slate-950/80 px-2 py-1 text-[11px] font-semibold tracking-wide text-white backdrop-blur-sm ${
+              cityHub ? 'bottom-2 left-2 sm:text-xs' : 'bottom-2 left-2 sm:left-3 sm:text-xs'
+            }`}
+          >
             {coverDateBadge}
           </span>
         ) : null}
-        <EventFavoriteButton eventId={session.id} className="right-2 top-2 sm:right-3 sm:top-3" />
+        {cityHub ? null : (
+          <EventFavoriteButton eventId={session.id} className="right-2 top-2 sm:right-3 sm:top-3" />
+        )}
       </div>
 
       <div
         className={`flex min-h-0 flex-1 flex-col text-left ${
-          rail ? 'gap-1.5 p-3.5' : 'gap-2 p-4 sm:p-5'
+          cityHub || rail ? 'gap-1.5 p-3' : 'gap-2 p-4 sm:p-5'
         }`}
       >
         <h3
           className={`font-display font-bold leading-snug text-graphite ${
-            rail ? 'line-clamp-2 text-ui-sm' : 'line-clamp-3 text-ui-sm sm:text-base'
+            rail || cityHub ? 'line-clamp-2 text-ui-sm' : 'line-clamp-3 text-ui-sm sm:text-base'
           }`}
         >
           <Link
@@ -579,7 +606,7 @@ function ShowcaseEventCard({
           </Link>
         </h3>
 
-        {(categoryLabel || cityLabel) ? (
+        {showCityMeta ? (
           <div className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-1">
             {categoryLabel ? (
               <span className="rounded-md bg-surface-muted px-2 py-0.5 text-ui-xs font-medium text-graphite-muted">
@@ -600,13 +627,15 @@ function ShowcaseEventCard({
         ) : null}
 
         <div className="flex min-w-0 flex-col gap-0.5">
-          <p className="event-card-meta">
-            <Clock className="event-card-meta-icon" />
-            <span className="truncate font-medium text-graphite">{dateLabel}</span>
-          </p>
-          {locationLine ? (
+          {!cityHub || !coverDateBadge ? (
             <p className="event-card-meta">
-              <MapPin className="event-card-meta-icon shrink-0" />
+              <Clock className="event-card-meta-icon" />
+              <span className="truncate font-medium text-graphite">{dateLabel}</span>
+            </p>
+          ) : null}
+          {locationLine ? (
+            <p className={`event-card-meta ${cityHub ? 'text-graphite-muted' : ''}`}>
+              {cityHub ? null : <MapPin className="event-card-meta-icon shrink-0" />}
               <span className="truncate">{locationLine}</span>
             </p>
           ) : null}

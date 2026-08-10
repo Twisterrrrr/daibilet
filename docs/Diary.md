@@ -1,3 +1,20 @@
+## 2026-08-10 - City hub «Ближайшие события»: cleanup + compact rail
+
+### Наблюдения
+- Блок афиши на city hub: Cards/Table toggle, subtitle «Что купить сейчас», два этажа чипов (даты + категории), шумные category·city / address на карточках.
+- Параллельный agent `7d0ca73a` начал тот же cleanup; institution text-grid Variant A не трогали, чтобы не драться.
+
+### Решения
+- Убраны toggle и subtitle; один soft-pill ряд категорий (без date chips).
+- `EventCard` `cityHub`: venue name only, `line-clamp-2`, tall cover `3/4`, без badge pile; price+CTA `mt-auto`.
+- Compact snap carousel (~1.5 / 4-5), scrollbar hidden; `dedupeHubSessions` по groupKey/slug.
+- Commit+push; **без** web deploy.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-10 - `/my-day`: thumbs + suburb dead space + must-see dense
 
 ### Наблюдения
