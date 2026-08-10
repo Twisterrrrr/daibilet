@@ -110,11 +110,38 @@ test('pickPodborkiFeatured prefers Moscow City Day over museums and river', () =
       { slug: 'moscow-museums', title: 'Музеи', events: 61 },
       { slug: 'standup', title: 'Стендап', events: 40 },
       { slug: 'bus-tours', title: 'Автобус', events: 20 },
+      { slug: 'family-kids', title: 'Семьям', events: 15 },
+      { slug: 'moscow-dinner-boat', title: 'Ужин', events: 10 },
+      { slug: 'new-year', title: 'НГ', events: 8 },
     ],
     'moscow-city-day',
-    3,
+    5,
   );
   assert.equal(trending.some((item) => item.slug === 'moscow-museums'), false);
+  assert.ok(trending.length >= 3 && trending.length <= 5);
+});
+
+test('seasonal-first category must not starve hero: full city pool still yields multi trend', () => {
+  const cityItems = [
+    { slug: 'moscow-city-day', title: 'День города', events: 13, categorySlug: 'seasonal' },
+    { slug: 'new-year', title: 'Новый год', events: 5, categorySlug: 'seasonal' },
+    { slug: 'river-cruises', title: 'Речные', events: 80, categorySlug: 'by-type' },
+    { slug: 'standup', title: 'Стендап', events: 40, categorySlug: 'by-type' },
+    { slug: 'bus-tours', title: 'Автобус', events: 20, categorySlug: 'by-type' },
+    { slug: 'family-kids', title: 'Семьям', events: 15, categorySlug: 'for-whom' },
+  ];
+  const sections = groupPodborkiByCategory(cityItems);
+  assert.equal(sections[0]?.slug, 'seasonal');
+  // Bug repro: filtering hero to seasonal alone left 1 trend + empty grid.
+  const seasonalOnly = cityItems.filter((item) => item.categorySlug === 'seasonal');
+  assert.equal(pickPodborkiTrending(seasonalOnly, 'moscow-city-day', 5).length, 1);
+  // Fix: hero from full city catalog.
+  const featured = pickPodborkiFeatured(cityItems);
+  const trending = pickPodborkiTrending(cityItems, featured?.slug, 5);
+  assert.equal(featured?.slug, 'moscow-city-day');
+  assert.ok(trending.length >= 3);
+  const gridAll = cityItems.filter((item) => item.slug !== featured?.slug);
+  assert.ok(gridAll.length >= 4);
 });
 
 test('podborkiBentoSpan: river/city-day wide, standup narrow', () => {

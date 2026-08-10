@@ -34,7 +34,9 @@ import { pickPodborkiFeatured, pickPodborkiTrending } from '@/lib/podborki-hero'
 import {
   filterPodborkiByTag,
   PODBORKI_CATEGORY_TAGS,
+  PODBORKI_MOODS,
   type PodborkiTagId,
+  type PodborkiTagMeta,
 } from '@/lib/podborki-moods';
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
 
@@ -45,6 +47,14 @@ const EMPTY_CITY_COPY = {
   title: 'Пока готовых подборок по выбранному городу еще нет',
   hint: 'Город уже в афише, а подборка еще на разогреве - загляните позже или смените город в шапке.',
 } as const;
+
+/** Soft tags on the default «Все» tab (moods across the whole city catalog). */
+const PODBORKI_ALL_TAB_TAGS: readonly PodborkiTagMeta[] = PODBORKI_MOODS.map((mood) => ({
+  id: mood.id,
+  label: mood.label,
+}));
+
+const TRENDING_LIMIT = 5;
 
 function seasonalBannerText(month = new Date().getMonth()): string | null {
   if (month === 11 || month === 0) return 'Зимой удобнее брать готовые планы: каток, музеи и вечерние программы без долгого выбора.';
@@ -192,22 +202,23 @@ export function LandingsCatalogView({
     [categoryMeta, cityItems],
   );
 
+  // Default tab is «Все» (null). Never auto-pick the first sense-block:
+  // with Moscow City Day, «Сезонное» floats first and only has 1-3 landings,
+  // which emptied the grid and left «В тренде» with a single row.
   useEffect(() => {
-    if (!sections.length) {
-      setActiveCategory(null);
-      return;
-    }
     setActiveCategory((prev) => {
-      if (prev && sections.some((section) => section.slug === prev)) return prev;
-      return sections[0].slug;
+      if (prev == null) return null;
+      if (sections.some((section) => section.slug === prev)) return prev;
+      return null;
     });
   }, [sections]);
 
-  const resolvedCategory = activeCategory && sections.some((s) => s.slug === activeCategory)
-    ? activeCategory
-    : sections[0]?.slug ?? null;
+  const resolvedCategory =
+    activeCategory && sections.some((s) => s.slug === activeCategory) ? activeCategory : null;
 
-  const categoryTags = resolvedCategory ? PODBORKI_CATEGORY_TAGS[resolvedCategory] : [];
+  const categoryTags: readonly PodborkiTagMeta[] = resolvedCategory
+    ? PODBORKI_CATEGORY_TAGS[resolvedCategory]
+    : PODBORKI_ALL_TAB_TAGS;
 
   useEffect(() => {
     setActiveTag(null);
@@ -225,19 +236,24 @@ export function LandingsCatalogView({
     [activeTag, categoryItems],
   );
 
-  const featured = pickPodborkiFeatured(items);
-  const trending = pickPodborkiTrending(items, featured?.slug, 3);
+  // Hero roles always come from the full city catalog so «В тренде» stays 3-5
+  // even when a narrow tab (e.g. Сезонное) is selected. Grid still follows tab+tag.
+  const featured = pickPodborkiFeatured(cityItems);
+  const trending = pickPodborkiTrending(cityItems, featured?.slug, TRENDING_LIMIT);
   const featuredImage = featured ? resolveLandingCardImage(featured.slug, citySelected ? citySlug : null) : null;
   const featuredHref = featured
     ? landingCategoryHref(featured.slug, citySelected ? citySlug : undefined)
     : '/events';
 
   const gridItems = useMemo(() => {
+    // Only drop the featured tile (already huge above). Trending stays in the grid
+    // so the catalog still lists every landing for the city / active tab.
     if (!featured) return items;
     return items.filter((item) => item.slug !== featured.slug);
   }, [featured, items]);
 
   const activeSection = sections.find((section) => section.slug === resolvedCategory) ?? null;
+  const allTabCount = cityItems.length;
 
   const toggleTag = (id: PodborkiTagId) => {
     setActiveTag((prev) => (prev === id ? null : id));
@@ -263,6 +279,28 @@ export function LandingsCatalogView({
               viewportClassName="flex flex-nowrap gap-2 pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
               aria-label="Категории подборок"
             >
+              <button
+                type="button"
+                data-rail-item
+                onClick={() => setActiveCategory(null)}
+                aria-pressed={resolvedCategory == null}
+                className={
+                  resolvedCategory == null
+                    ? 'inline-flex shrink-0 items-center rounded-full bg-slate-900 px-3.5 py-2 text-sm font-semibold text-white shadow-sm transition'
+                    : 'inline-flex shrink-0 items-center rounded-full bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-50'
+                }
+              >
+                Все
+                <span
+                  className={
+                    resolvedCategory == null
+                      ? 'ml-1.5 text-xs font-medium text-white/70'
+                      : 'ml-1.5 text-xs font-medium text-slate-400'
+                  }
+                >
+                  {allTabCount}
+                </span>
+              </button>
               {sections.map((section) => {
                 const active = section.slug === resolvedCategory;
                 return (
@@ -424,28 +462,35 @@ export function LandingsCatalogView({
             <p className="text-lg text-slate-600">
               {cityCatalogLoading
                 ? 'Подбираем подборки по городу…'
-                : citySelected
-                  ? EMPTY_CITY_COPY.title
-                  : activeTag
-                    ? 'Нет подборок под этот фильтр'
-                    : 'Популярные запросы скоро появятся'}
+                : activeTag
+                  ? 'Нет подборок под этот фильтр'
+                  : resolvedCategory && items.length > 0
+                    ? 'Подборки этой категории уже в блоке выше'
+                    : citySelected && !cityItems.length
+                      ? EMPTY_CITY_COPY.title
+                      : 'Популярные запросы скоро появятся'}
             </p>
             <p className="mt-1 text-sm text-slate-400">
               {cityCatalogLoading
                 ? 'Считаем события в выбранном городе'
-                : citySelected
-                  ? EMPTY_CITY_COPY.hint
-                  : activeTag
-                    ? 'Снимите тег или выберите другой'
-                    : 'Пока доступны фильтры выше'}
+                : activeTag
+                  ? 'Снимите тег или выберите другой'
+                  : resolvedCategory && items.length > 0
+                    ? 'Или откройте вкладку «Все», чтобы увидеть полный каталог'
+                    : citySelected && !cityItems.length
+                      ? EMPTY_CITY_COPY.hint
+                      : 'Пока доступны фильтры выше'}
             </p>
-            {activeTag ? (
+            {activeTag || resolvedCategory ? (
               <button
                 type="button"
-                onClick={() => setActiveTag(null)}
+                onClick={() => {
+                  setActiveTag(null);
+                  setActiveCategory(null);
+                }}
                 className="mt-4 inline-flex rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white"
               >
-                Сбросить фильтр
+                {activeTag ? 'Сбросить фильтр' : 'Показать все подборки'}
               </button>
             ) : null}
           </div>

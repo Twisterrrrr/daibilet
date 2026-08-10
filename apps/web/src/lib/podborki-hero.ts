@@ -56,7 +56,7 @@ export function pickPodborkiFeatured(items: PodborkiHeroItem[]): PodborkiHeroIte
   );
 }
 
-export function pickPodborkiTrending(items: PodborkiHeroItem[], featuredSlug?: string | null, limit = 3): PodborkiHeroItem[] {
+export function pickPodborkiTrending(items: PodborkiHeroItem[], featuredSlug?: string | null, limit = 5): PodborkiHeroItem[] {
   const rest = items.filter((item) => item.slug !== featuredSlug);
   const flagged = rest.filter((item) => item.layoutVariant === PODBORKI_HERO_TRENDING);
   if (flagged.length) return flagged.slice(0, limit);
