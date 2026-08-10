@@ -20,6 +20,7 @@ import {
   resolveSessionPurchaseExternalId,
 } from './provider-purchase.js';
 import type { PurchaseProvider } from './types/common.js';
+import { resolveEditorialEventImage } from './event-cover-images.js';
 import { pickFirstUsableEventImageUrl } from './event-image-url.js';
 import {
   pickPrimarySessionPurchase,
@@ -285,12 +286,14 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
     }),
     title,
     description: cleanImportedDescription(requestedEvent.override?.description || requestedEvent.description),
-    imageUrl: pickFirstUsableEventImageUrl(
-      requestedEvent.override?.imageUrl,
-      requestedEvent.imageUrl,
-      requestedEvent.venue?.heroImageUrl,
-      requestedEvent.primaryCity?.heroImageUrl,
-    ),
+    imageUrl:
+      resolveEditorialEventImage(requestedEvent.id, requestedEvent.slug, null) ||
+      pickFirstUsableEventImageUrl(
+        requestedEvent.override?.imageUrl,
+        requestedEvent.imageUrl,
+        requestedEvent.venue?.heroImageUrl,
+        requestedEvent.primaryCity?.heroImageUrl,
+      ),
     category: requestedEvent.category?.title || 'События',
     tags,
     subcategories,
@@ -1153,7 +1156,9 @@ async function loadRelatedSessionsFromDb(
       timeZone,
       priceFrom: displayPriceFrom(row.priceFromRub, next.priceFromRub),
       vacant: next.ticketsVacant ?? row.ticketsVacant,
-      imageUrl: pickFirstUsableEventImageUrl(row.override?.imageUrl, row.imageUrl, row.venue?.heroImageUrl),
+      imageUrl:
+        resolveEditorialEventImage(row.id, row.slug, null) ||
+        pickFirstUsableEventImageUrl(row.override?.imageUrl, row.imageUrl, row.venue?.heroImageUrl),
       purchaseReady: true,
     });
     if (related.length >= limit) break;

@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Clock, MapPin, Star, Ticket } from 'lucide-react';
 
 import { collectCatalogLabels } from '@/lib/catalog-labels';
+import { resolveEditorialEventImage } from '@/lib/event-cover-images';
 import { resolveEventCardDestinationLabel, resolveEventCardLocationLabel } from '@/lib/event-location';
 import { EventFavoriteButton } from '@/components/EventFavoriteButton';
 import { LandingPurchaseButton } from '@/components/landing/LandingPurchaseButton';
@@ -46,7 +47,9 @@ export function EventCard({
     return <ShowcaseEventCard event={event} rail={showcaseRail} editorsPickBadge={editorsPickBadge} />;
   }
   const [hasImageError, setHasImageError] = React.useState(false);
-  const showImage = Boolean(event.imageUrl && !hasImageError);
+  const coverImageUrl =
+    resolveEditorialEventImage(event.id, event.slug, event.imageUrl) || event.imageUrl || '';
+  const showImage = Boolean(coverImageUrl && !hasImageError);
   const detailsHref = eventHref(event);
   const hasPrice = typeof event.priceFrom === 'number' && event.priceFrom >= MIN_DISPLAY_PRICE_RUB;
   const destinationLabel = resolveEventCardDestinationLabel(event);
@@ -81,7 +84,7 @@ export function EventCard({
 
         {showImage ? (
           <img
-            src={event.imageUrl || ''}
+            src={coverImageUrl}
             alt={event.title}
             loading="lazy"
             onError={() => setHasImageError(true)}
@@ -216,7 +219,9 @@ function ShowcaseEventCard({
   editorsPickBadge?: boolean;
 }) {
   const [hasImageError, setHasImageError] = React.useState(false);
-  const showImage = Boolean(event.imageUrl && !hasImageError);
+  const coverImageUrl =
+    resolveEditorialEventImage(event.id, event.slug, event.imageUrl) || event.imageUrl || '';
+  const showImage = Boolean(coverImageUrl && !hasImageError);
   const detailsHref = eventHref(event);
   const hasPrice = typeof event.priceFrom === 'number' && event.priceFrom >= MIN_DISPLAY_PRICE_RUB;
   const pseudoRating = resolvePseudoRating(event.groupKey || event.id);
@@ -249,7 +254,7 @@ function ShowcaseEventCard({
         </div>
         {showImage ? (
           <img
-            src={event.imageUrl || ''}
+            src={coverImageUrl}
             alt={event.title}
             loading="lazy"
             onError={() => setHasImageError(true)}

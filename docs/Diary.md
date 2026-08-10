@@ -1,3 +1,19 @@
+## 2026-08-10 - Event covers: убрать плашки/текст + развести дубли
+
+### Наблюдения
+- На popular rails (MSK/SPB/EKB/Kazan) много supplier CDN PNG с baked-in текстом (Комбо HP, «Лето в Москве», CityTour QR, music lotto/bingo, EKB terrace flyer) - дешевят карточки.
+- Exact content-dupes: речные маршруты (4/3/2 siblings), вечерний SPB pair, EKB open-mic / «Больно смотреть», matryoshka logo twin, Kazan kaleidoscope stubs ~23-30KB.
+
+### Решения
+- GenerateImage ×46 атмосферных JPG без текста/лого → `apps/public|web/public/images/events/generated/evt-cover-*.jpg`.
+- `EVENT_PACK_IMAGES` + `resolveEditorialEventImage` (LOCATION_PACK-style): wire web `event-card-image`, public EventCard(s), backend `public-catalog.mapper` (57 event id keys).
+- Prod DB `Event.imageUrl` не трогали; editorial overlay на чтении. Commit+push; **без** web deploy.
+
+### Проблемы
+- Долг: ещё десятки standup/афишных PNG по MSK/SPB (Fat/PRO variants частично закрыты одной парой кадров); artvibes×3 делят один cover; полный каталог не регенерировали.
+
+---
+
 ## 2026-08-10 - City hub «Ближайшие события»: cleanup + compact rail
 
 ### Наблюдения
