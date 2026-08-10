@@ -53,11 +53,11 @@ const SLOT_CHIP_PURCHASE_CLASS =
   'transition hover:bg-primary/10 hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40';
 
 const DETAILS_LINK_CLASS =
-  'relative z-[2] inline-flex shrink-0 items-center justify-center gap-0.5 whitespace-nowrap rounded-lg bg-primary-600 p-[5px] text-ui-xs font-semibold text-white transition hover:bg-primary-700 sm:text-ui-sm';
+  'relative z-[2] inline-flex shrink-0 items-center justify-center gap-0.5 whitespace-nowrap rounded-lg bg-primary-600 px-2.5 py-[5px] text-ui-xs font-semibold text-white transition hover:bg-primary-700 sm:text-ui-sm';
 
-/** Rail / city-hub cards: padding 5px around label so CTA reads thicker. */
+/** Rail / city-hub cards: wider horizontal padding so label is not flush to pill edges. */
 const SHOWCASE_BUY_CTA_CLASS =
-  'inline-flex shrink-0 items-center justify-center gap-0.5 whitespace-nowrap rounded-lg bg-primary-600 p-[5px] text-[11px] font-semibold leading-none text-white';
+  'inline-flex shrink-0 items-center justify-center gap-0.5 whitespace-nowrap rounded-lg bg-primary-600 px-2.5 py-[5px] text-[11px] font-semibold leading-none text-white';
 
 const TITLE_LINK_CLASS =
   'relative z-[2] line-clamp-2 font-display text-ui-sm font-bold leading-snug text-graphite transition-colors hover:text-primary-600 sm:text-base';
