@@ -3,10 +3,15 @@ import styles from './DaibiletLogo.module.css';
 export const DAIBILET_LOGO_BLUE = '#4267e9';
 export const DAIBILET_LOGO_DARK = '#101729';
 
-/** Point-1 (breve over «и») sits lower than the mid/end waypoints. */
-const POINT1_Y = 48;
-const ROUTE_1 = `M170 ${POINT1_Y} C215 -4 270 -4 315 31`;
+/** Point-1 (breve over «и») sits lower than the mid waypoint / destination. */
+const POINT1_Y = 60;
+const ROUTE_1 = `M170 ${POINT1_Y} C215 10 270 -2 315 31`;
 const ROUTE_2 = 'M315 31 C365 -3 430 -3 475 31';
+
+/** Destination mark (point-3): half-arm of the blue X at (475, 31). */
+const DEST_X = 475;
+const DEST_Y = 31;
+const DEST_ARM = 9;
 
 type DaibiletLogoProps = {
   className?: string;
@@ -18,7 +23,8 @@ type DaibiletLogoProps = {
 
 /**
  * Brand mark: HTML «Даибилет» + SVG route overlay.
- * Point-1 (black) is the breve of «й»; other points and arcs stay blue. Aria / sr-only: «Дайбилет».
+ * Point-1 (black) is the breve of «й»; mid is a blue circle; end is a blue X.
+ * Arcs stay blue dashed. Aria / sr-only: «Дайбилет».
  */
 export function DaibiletLogo({
   className = '',
@@ -43,7 +49,20 @@ export function DaibiletLogo({
         <path className={`${styles.route} ${styles.route2}`} d={ROUTE_2} />
         <circle className={`${styles.point} ${styles.point1}`} cx="170" cy={POINT1_Y} r="7" />
         <circle className={`${styles.point} ${styles.point2}`} cx="315" cy="31" r="7" />
-        <circle className={`${styles.point} ${styles.point3}`} cx="475" cy="31" r="10" />
+        <g className={styles.point3} aria-hidden="true">
+          <line
+            x1={DEST_X - DEST_ARM}
+            y1={DEST_Y - DEST_ARM}
+            x2={DEST_X + DEST_ARM}
+            y2={DEST_Y + DEST_ARM}
+          />
+          <line
+            x1={DEST_X + DEST_ARM}
+            y1={DEST_Y - DEST_ARM}
+            x2={DEST_X - DEST_ARM}
+            y2={DEST_Y + DEST_ARM}
+          />
+        </g>
       </svg>
     </span>
   );

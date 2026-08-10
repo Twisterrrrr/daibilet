@@ -21,8 +21,8 @@
 .logoRoute {
   position: absolute;
   left: 0;
-  /* Nudged down from -42% so the breve sits closer to «и». */
-  top: -34%;
+  /* Lower overlay so the breve sits tight over «и». */
+  top: -22%;
   width: 100%;
   height: auto;
   overflow: visible;
@@ -43,7 +43,16 @@
   opacity: 1;
 }
 
-/* Breve over «и»: brand dark; mid/end points stay blue. */
+/* Breve over «и»: brand dark; mid point stays blue circle. */
 .point1 {
   fill: var(--logo-dark);
+}
+
+/* Destination: blue X (not a circle). */
+.point3 {
+  fill: none;
+  stroke: var(--logo-blue);
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  opacity: 1;
 }
