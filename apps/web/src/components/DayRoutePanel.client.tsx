@@ -3148,7 +3148,7 @@ function DayRoutePanelInner() {
             </p>
           ) : null}
 
-          {timelineStops.length > 0 ? (
+          {timelineStops.length > 0 && effectiveStopViewMode === 'timeline' ? (
             <div className="mt-3" data-day-route-timeline-wrap>
               <DayRouteStopsTimeline
                 stops={timelineStops}
