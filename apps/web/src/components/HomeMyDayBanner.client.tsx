@@ -51,7 +51,11 @@ export function HomeMyDayBanner() {
   const href = buildMyDayHref(citySlug);
 
   return (
-    <section className="section-y border-b border-slate-200/70 pt-0" aria-label="Мой день">
+    <section
+      className="section-y border-b border-slate-200/70"
+      aria-label="Мой день"
+      data-home-band="boxed"
+    >
       <div className="container-page">
         <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-card sm:p-6">
           <div className="flex flex-wrap items-end justify-between gap-3">

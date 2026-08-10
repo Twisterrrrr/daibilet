@@ -203,8 +203,7 @@ html[data-nav-pending='1'] {
   }
 
   /**
-   * Home city rail (legacy): left aligns with container; right bleeds.
-   * Prefer `.home-edge-cities-rail` for true both-edge infinite peek.
+   * Home city rail: left aligns with container-page gutter; right bleeds to edge.
    */
   .home-bleed-rail {
     padding-left: max(1rem, calc((100vw - 80rem) / 2 + 1rem));
@@ -222,7 +221,21 @@ html[data-nav-pending='1'] {
     }
   }
 
-  /** Popular cities: full-bleed horizontal track, peek past both edges. */
+  /**
+   * Popular cities band: soft map-like field (light blue dots + pins).
+   * Motif from former My Day dashed-route overlay, adapted for light surfaces.
+   */
+  .home-cities-map-band {
+    background-color: #e8f1f8;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='280' viewBox='0 0 640 280' fill='none'%3E%3Cpath d='M48 210 C120 70, 200 240, 280 110 C340 40, 400 190, 480 90 C540 35, 580 150, 620 115' stroke='%237dd3fc' stroke-width='1.5' stroke-dasharray='5 7' stroke-linecap='round' opacity='0.55'/%3E%3Cpath d='M20 120 C90 185, 150 45, 230 155 C300 230, 370 55, 450 140 C520 200, 570 70, 630 175' stroke='%2338bdf8' stroke-width='1.25' stroke-dasharray='4 8' stroke-linecap='round' opacity='0.4'/%3E%3Cpath d='M100 40 C180 100, 260 20, 340 90 C420 160, 500 50, 580 100' stroke='%23bae6fd' stroke-width='1.1' stroke-dasharray='3 9' stroke-linecap='round' opacity='0.45'/%3E%3Cg fill='%230ea5e9' opacity='0.42'%3E%3Cpath d='M48 198c-4.4 0-8 3.5-8 7.8 0 5.9 8 14.2 8 14.2s8-8.3 8-14.2c0-4.3-3.6-7.8-8-7.8zm0 11.2a3.4 3.4 0 1 1 0-6.8 3.4 3.4 0 0 1 0 6.8z'/%3E%3Cpath d='M280 98c-4.4 0-8 3.5-8 7.8 0 5.9 8 14.2 8 14.2s8-8.3 8-14.2c0-4.3-3.6-7.8-8-7.8zm0 11.2a3.4 3.4 0 1 1 0-6.8 3.4 3.4 0 0 1 0 6.8z'/%3E%3Cpath d='M480 78c-4.4 0-8 3.5-8 7.8 0 5.9 8 14.2 8 14.2s8-8.3 8-14.2c0-4.3-3.6-7.8-8-7.8zm0 11.2a3.4 3.4 0 1 1 0-6.8 3.4 3.4 0 0 1 0 6.8z'/%3E%3Cpath d='M230 143c-3.6 0-6.5 2.8-6.5 6.3 0 4.8 6.5 11.5 6.5 11.5s6.5-6.7 6.5-11.5c0-3.5-2.9-6.3-6.5-6.3zm0 9a2.7 2.7 0 1 1 0-5.4 2.7 2.7 0 0 1 0 5.4z'/%3E%3Cpath d='M450 128c-3.6 0-6.5 2.8-6.5 6.3 0 4.8 6.5 11.5 6.5 11.5s6.5-6.7 6.5-11.5c0-3.5-2.9-6.3-6.5-6.3zm0 9a2.7 2.7 0 1 1 0-5.4 2.7 2.7 0 0 1 0 5.4z'/%3E%3Cpath d='M340 78c-3.3 0-6 2.6-6 5.8 0 4.4 6 10.6 6 10.6s6-6.2 6-10.6c0-3.2-2.7-5.8-6-5.8zm0 8.3a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: 640px 280px;
+    background-repeat: repeat;
+  }
+
+  /**
+   * Popular cities rail: horizontal track; left gutter via `.home-bleed-rail`,
+   * right-edge peek OK; initial card flush under H2 (no left overhang).
+   */
   .home-edge-cities-rail {
     width: 100%;
     overflow-x: auto;

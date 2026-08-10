@@ -95,7 +95,7 @@ async function HomePageBody() {
         {topCities.length ? (
           <section
             id="destinations"
-            className="breakout section-y bg-[#F5F5F7]"
+            className="home-cities-map-band section-y pb-6 sm:pb-8"
             data-home-band="full-bleed"
           >
             <div className="container-page">
@@ -111,7 +111,7 @@ async function HomePageBody() {
                 </Link>
               </div>
             </div>
-            {/* Infinite loop rail: cards peek past both viewport edges. */}
+            {/* Infinite rail: first card flush under H2; right-edge peek OK. */}
             <HomePopularCitiesRail cities={topCities} className="mt-6" />
           </section>
         ) : null}
