@@ -30,7 +30,7 @@
   pointer-events: none;
 }
 
-/* Solid й-breve: short slanted stroke from «и»; dashed arcs continue from its end. */
+/* Solid first dash of the journey (й-breve bar); dashed arcs continue from its tip. */
 .breve {
   fill: none;
   stroke: var(--logo-blue);
@@ -46,6 +46,11 @@
   stroke-linecap: round;
   stroke-dasharray: 8 11;
   opacity: 1;
+}
+
+/* After the solid bar, start with a gap so punctir continues as one journey. */
+.route1 {
+  stroke-dashoffset: 8;
 }
 
 .point {

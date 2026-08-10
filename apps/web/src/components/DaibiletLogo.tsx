@@ -4,21 +4,25 @@ export const DAIBILET_LOGO_BLUE = '#4267e9';
 export const DAIBILET_LOGO_DARK = '#000000';
 
 /**
- * Й-breve: short solid slanted stroke that originates above «и» (not a bar
- * between waypoints), then the dashed route continues from its right end.
- * viewBox 0 0 500 95; letter «и» centered near x≈170.
+ * Owner sketch: slanted solid bar over «й» is the first dash of the journey.
+ * Dashed blue arc starts at the right tip of that bar and continues as one path
+ * → mid blue dot → dashed → blue X over «т».
+ * viewBox 0 0 500 95; «й»/«и» near x≈165–175.
  */
-const BREVE_X1 = 158;
-const BREVE_Y1 = 62;
-const BREVE_X2 = 182;
-const BREVE_Y2 = 50;
-/** Short slanted breve over «и», feeding up-right into the dashed arc. */
-const BREVE_PATH = `M${BREVE_X1} ${BREVE_Y1} Q170 54 ${BREVE_X2} ${BREVE_Y2}`;
-/** Dashed travel arc starts at breve end → mid waypoint. */
-const ROUTE_1 = `M${BREVE_X2} ${BREVE_Y2} C225 8 270 -2 315 31`;
+/** Short solid slanted dash (first segment of the route), over «й». */
+const BREVE_X1 = 154;
+const BREVE_Y1 = 58;
+const BREVE_X2 = 178;
+const BREVE_Y2 = 49;
+const BREVE_PATH = `M${BREVE_X1} ${BREVE_Y1} L${BREVE_X2} ${BREVE_Y2}`;
+/**
+ * Dashed arc originates at breve right tip with matching up-right tangent,
+ * then rises and lands on the mid waypoint.
+ */
+const ROUTE_1 = `M${BREVE_X2} ${BREVE_Y2} C208 30 265 -2 315 31`;
 const ROUTE_2 = 'M315 31 C365 -3 430 -3 475 31';
 
-/** Destination mark (point-3): half-arm of the blue X at (475, 31). */
+/** Destination mark (point-3): half-arm of the blue X at (475, 31) over «т». */
 const DEST_X = 475;
 const DEST_Y = 31;
 const DEST_ARM = 9;
@@ -33,8 +37,8 @@ type DaibiletLogoProps = {
 
 /**
  * Brand mark: HTML «Даибилет» + SVG route overlay.
- * Black wordmark; blue solid breve over «и» → dashed blue arc → mid circle → dashed → blue X.
- * Aria / sr-only: «Дайбилет».
+ * Black bold wordmark; blue solid first-dash over «й» → dashed blue arc → mid
+ * circle → dashed → blue X. Aria / sr-only: «Дайбилет».
  */
 export function DaibiletLogo({
   className = '',
