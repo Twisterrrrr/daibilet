@@ -1,6 +1,7 @@
 .logo {
-  /* Full mark mono black; solid breve → dashed route. */
+  /* Wordmark ink; route elements (breve, dashed arcs, mid dot, X) use brand blue. */
   --logo-ink: #000000;
+  --logo-blue: #4267e9;
 
   position: relative;
   display: inline-block;
@@ -29,10 +30,10 @@
   pointer-events: none;
 }
 
-/* Solid й-breve (short dash) over «и»; dashed arcs continue from its right end. */
+/* Solid й-breve: short slanted stroke from «и»; dashed arcs continue from its end. */
 .breve {
   fill: none;
-  stroke: var(--logo-ink);
+  stroke: var(--logo-blue);
   stroke-width: 3.5;
   stroke-linecap: round;
   opacity: 1;
@@ -40,7 +41,7 @@
 
 .route {
   fill: none;
-  stroke: var(--logo-ink);
+  stroke: var(--logo-blue);
   stroke-width: 3.5;
   stroke-linecap: round;
   stroke-dasharray: 8 11;
@@ -48,14 +49,14 @@
 }
 
 .point {
-  fill: var(--logo-ink);
+  fill: var(--logo-blue);
   opacity: 1;
 }
 
-/* Destination: black X (not a circle). */
+/* Destination: blue X (not a circle). */
 .point3 {
   fill: none;
-  stroke: var(--logo-ink);
+  stroke: var(--logo-blue);
   stroke-width: 3.5;
   stroke-linecap: round;
   opacity: 1;
