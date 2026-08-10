@@ -1,3 +1,33 @@
+## 2026-08-10 - /events mobile: restore date + type selects; batch deploy
+
+### Наблюдения
+- Live mobile `/events` снова показывал date chips + type chips + calendar (после `ad5f3dc0`), хотя owner-договорённость: search + два dropdown (Дата / Тип события).
+- Desktop date rail оставляем; «Сейчас выбирают» дублировал первую страницу карточек 1:1.
+
+### Решения
+- Mobile: `CatalogToolbar` - search + `MobileDateSelect` / `MobileCategorySelect`; chip rails и hero date rail только `md+`.
+- Dedupe live rail IDs из сетки; calendar chip baseline `h-9` + `pb-0` на snap-row; disco cover с людьми/руками; city hub `#about` facts; Kievsky cruise remap.
+- Commit+push + Deploy MSK web; restart `daibilet-api` ради EVENT_PACK remap.
+
+### Проблемы
+- Нет.
+
+---
+
+
+
+### Наблюдения
+- После `b3b52684` на city hub первый body-блок после tabs стал «Готовые сценарии»; `CityWhyGoSection` (brief + hookFact) сняли, places rail прятали при named presets, H2 «Зачем ехать» заменили на сценарии.
+
+### Решения
+- Общий шаблон `CityPageView`: после tabs снова `#about` - Описание (`brief`) и Факты (`hookFact`) из `cityInfo`.
+- `#sights`: H2 «Зачем ехать {город}» + must-see places, затем H3 «Готовые сценарии» + magazine presets. Commit+push; **без** web deploy.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-10 - Hermitage PDP: SPBBOATS content layer (editorial)
 
 ### Наблюдения

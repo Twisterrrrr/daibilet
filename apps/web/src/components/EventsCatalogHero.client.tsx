@@ -10,8 +10,8 @@ import { catalogFiltersFromQuery, type CatalogFilterValues } from '@/lib/catalog
 import { cityToPrepositional } from '@/lib/city-declension';
 
 /**
- * Compact catalog header: breadcrumbs + H1/subtitle + date rail in the title band.
- * Search + one discovery chip row live in CatalogToolbar below.
+ * Compact catalog header: breadcrumbs + H1/subtitle.
+ * Desktop: date rail in the title band. Mobile: date/type selects live in CatalogToolbar.
  */
 export function EventsCatalogHero() {
   const searchParams = useSearchParams();
@@ -68,7 +68,7 @@ export function EventsCatalogHero() {
       />
       <header className="border-b border-slate-100 bg-white">
         <div className="container-page py-4 sm:py-5">
-          {/* Desktop: title band + date rail on one line; mobile: date directly under subtitle. */}
+          {/* Desktop: title band + date rail; mobile keeps date/type as selects under search. */}
           <div className="flex flex-col gap-2.5 md:flex-row md:items-end md:gap-5">
             <div className="min-w-0 shrink-0 md:max-w-md lg:max-w-lg">
               <h1 className="font-display text-2xl font-extrabold tracking-tight text-graphite sm:text-3xl">
@@ -84,7 +84,9 @@ export function EventsCatalogHero() {
                 )}
               </p>
             </div>
-            <CatalogDateRail className="min-w-0 w-full md:flex-1" />
+            <div className="hidden min-w-0 w-full md:block md:flex-1">
+              <CatalogDateRail className="min-w-0 w-full" />
+            </div>
           </div>
         </div>
       </header>
