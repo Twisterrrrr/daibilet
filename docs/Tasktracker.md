@@ -3,7 +3,7 @@
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
 | UX.EVENTS-MOBILE-SELECTS | `/events` mobile: search + Дата/Тип dropdowns (не chip rails); desktop date rail | Критический | 🔄 ship |
-| UX.CITY-HUB-EDITORIAL-ORDER | City hub: Описание + Факты + Зачем ехать before «Готовые сценарии» (restore CityWhyGo / places rail) | Критический | 🔄 ship |
+| UX.CITY-HUB-EDITORIAL-ORDER | City hub: Описание + Факты + Зачем ехать before «Готовые сценарии» (restore CityWhyGo / places rail) | Критический | ✅ `b113a927` push; deploy по «выкатывай» |
 | UX.EVENTS-CALENDAR-COVERS | `/events`: calendar corner in date rail; remap center-cruise text flyers; live rail full container width | Высокий | ✅ `1c0fd42f` push; deploy по «выкатывай» |
 | UX.CITY-HUB-SEARCH-SCENARIOS | City hub: search hero; scenarios magazine merge; collections grid; editorial blog cards; mobile jump chips | Высокий | ✅ `b3b52684` push; deploy по «выкатывай» |
 | UX.HOME-BLEED-BOX | Homepage rhythm: cities gray full-bleed rail; My Day graphite band; blog magazine feature; editors/popular/podborki boxed | Высокий | ✅ `0a906fe6` push; deploy по «выкатывай» |
