@@ -1,3 +1,34 @@
+## 2026-08-10 - Logo breve-line + city hub hero CTAs
+
+### Наблюдения
+- Owner: вместо чёрной точки над «и» - короткая сплошная черта (й-breve), от правого конца которой продолжается синий пунктир маршрута.
+- City hub hero: убрать search «Найти экскурсию…»; вернуть кнопки Афиша + Подборки событий.
+
+### Решения
+- `DaibiletLogo`: убран `point-1` circle; solid blue quadratic breve `M152 58 Q170 52 188 58`; dashed `ROUTE_1` стартует с `(188,58)` → mid `(315,31)`; mid circle + X без изменений; static.
+- `CityHeroStrip`: без search form; button CTAs Афиша → events?city=, Подборки событий → podborki?city=; H1/brief/badge/stats сохранены.
+- Commit+push + Deploy MSK web.
+
+### Проблемы
+- Нет.
+
+---
+
+## 2026-08-10 - City hub: brief in hero; first submenu «Зачем ехать»
+
+### Наблюдения
+- Owner: description back IN HERO; first submenu = «Зачем ехать» (не body «Описание» первым). Предыдущий about-блок с «Описание» ломал IA.
+
+### Решения
+- `brief` снова в `CityHeroStrip`; sticky/jump первый пункт → `#sights` «Зачем ехать».
+- `hookFact` callout внутри `#sights` после H2; отдельный body «О городе» снят.
+- Batch deploy вместе с mobile selects / dedupe rail / covers.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-10 - /events mobile: restore date + type selects; batch deploy
 
 ### Наблюдения
@@ -109,6 +140,20 @@
 
 ---
 
+## 2026-08-10 - City hub hero: remove search, restore CTA buttons
+
+### Наблюдения
+- Owner screenshot SPB hub: search bar «Найти экскурсию…» + «Подобрать» лишний; текстовые links «Афиша · Подборки событий →» вместо кнопок.
+
+### Решения
+- Shared `CityHeroStrip` (`CityPageView`): убран search form; возвращены button CTAs Афиша → `/events?city=` и Подборки событий → `/podborki?city=`; brief/badge/stats/H1 без изменений; postcard night-hero shell снова без forced min-h под search.
+- Commit+push + Deploy MSK web (owner iterating live).
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-10 - City hub UX: search hero + scenarios merge + collections grid
 
 ### Наблюдения
@@ -119,6 +164,7 @@
 - «Готовые сценарии дня»: magazine cover carousel (`CityDayPresetBlock` hub mode); click → load в day-route + scroll к `#day-constructor`; places rail скрыт при named presets. «Ближайшие события» не трогали.
 - Подборки: 3-4 col tile grid, без city badge на cover, meta под фото. Blog hub cards: cover + title + reading time only.
 - Commit+push; **без** web deploy.
+- **Superseded (hero search):** 2026-08-10 entry «City hub hero: remove search, restore CTA buttons».
 
 ### Проблемы
 - Нет.

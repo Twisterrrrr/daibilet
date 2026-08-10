@@ -1,9 +1,8 @@
 'use client';
 
 import * as React from 'react';
-import { ArrowLeft, ArrowRight, MapPin, Search, Ticket } from 'lucide-react';
+import { ArrowLeft, ArrowRight, MapPin, Ticket } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 
 import { CityHubArticlesGrid } from '@/components/CityHubArticleTeaser.client';
 import { CityAdmissionBlock } from '@/components/CityAdmissionBlock';
@@ -494,11 +493,8 @@ function CityHeroStrip({
   hubConfig?: ReturnType<typeof resolveCityHubConfig>;
   editorial?: boolean;
 }) {
-  const router = useRouter();
   const [heroImageFailed, setHeroImageFailed] = React.useState(false);
-  const [searchQuery, setSearchQuery] = React.useState('');
   const cityIn = cityInPrepositional(city);
-  const searchIn = cityHeroSearchInForm(city);
   const citySlug = city.slug || city.sourceSlug || undefined;
   // Short lead always in hero; hookFact lives in «Зачем ехать» below.
   const brief =
@@ -565,28 +561,29 @@ function CityHeroStrip({
       ? 'mt-3 max-w-2xl text-base leading-relaxed text-zinc-600 sm:text-lg'
       : 'mt-3 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg';
 
-  const heroNavLinkClass = nightShell
-    ? 'text-sm font-semibold text-white/85 underline-offset-4 hover:text-white hover:underline'
+  const primaryCtaClass = nightShell
+    ? editorial
+      ? 'inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-white px-5 text-sm font-medium text-zinc-950 ring-1 ring-white transition hover:bg-white/90'
+      : 'inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-white px-5 text-sm font-semibold text-slate-900 hover:bg-white/90'
     : editorial
-      ? 'text-sm font-medium text-zinc-700 underline-offset-4 hover:underline'
-      : 'text-sm font-semibold text-primary-700 hover:text-primary-800';
+      ? 'inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-zinc-950 px-5 text-sm font-medium text-white ring-1 ring-zinc-950 transition hover:bg-zinc-800'
+      : 'inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-primary-600 px-5 text-sm font-semibold text-white hover:bg-primary-700';
 
-  const afficheButtonClass = nightShell
-    ? 'inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-white/15 px-4 text-sm font-semibold text-white ring-1 ring-white/30 backdrop-blur-sm transition hover:bg-white/25'
+  const secondaryCtaClass = nightShell
+    ? editorial
+      ? 'inline-flex min-h-11 items-center justify-center rounded-full border border-white/35 bg-white/10 px-5 text-sm font-medium text-white backdrop-blur-sm hover:bg-white/15'
+      : 'inline-flex min-h-11 items-center justify-center rounded-lg border border-white/35 bg-white/10 px-5 text-sm font-semibold text-white backdrop-blur-sm hover:bg-white/15'
     : editorial
-      ? 'inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white px-4 text-sm font-medium text-zinc-800 hover:border-zinc-400'
-      : 'inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 hover:border-slate-300';
+      ? 'inline-flex min-h-11 items-center justify-center rounded-full border border-zinc-300 bg-white px-5 text-sm font-medium text-zinc-700 hover:border-zinc-400'
+      : 'inline-flex min-h-11 items-center justify-center rounded-lg border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-700 hover:border-slate-300';
 
-  // Search needs a taller shell than postcard letterbox.
   const sectionClass = nightShell
-    ? `${CITY_NIGHT_HERO.section} md:!h-auto md:!min-h-[400px]`
+    ? CITY_NIGHT_HERO.section
     : editorial
       ? 'border-b border-zinc-200 bg-zinc-50'
       : 'border-b border-slate-200 bg-slate-50';
 
-  const contentClass = nightShell
-    ? `${CITY_NIGHT_HERO.content} md:!min-h-[400px] md:!justify-center md:!py-12`
-    : 'container-page py-8 sm:py-10';
+  const contentClass = nightShell ? CITY_NIGHT_HERO.content : 'container-page py-8 sm:py-10';
 
   const jumpChips = [
     { id: 'sights', label: 'Зачем ехать' },
@@ -595,18 +592,7 @@ function CityHeroStrip({
     { id: 'blog', label: 'Блог' },
   ] as const;
 
-  const onSearchSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-    router.push(
-      buildCatalogHref({
-        city: citySlug,
-        q: searchQuery.trim() || undefined,
-        sort: 'popular',
-      }),
-    );
-  };
-
-  // hasTravel kept for caller parity; travel CTA removed from search hero.
+  // hasTravel kept for caller parity; hero CTAs are Афиша + Подборки событий.
   void hasTravel;
 
   return (
@@ -678,58 +664,17 @@ function CityHeroStrip({
                 <span className={statsStrongClass}>{pluralVenues(stats.venues)}</span>
               </p>
 
-              <form
-                onSubmit={onSearchSubmit}
-                className="mt-5 flex w-full flex-col gap-2 rounded-2xl bg-white p-1.5 shadow-2xl shadow-slate-950/25 sm:flex-row sm:items-center"
-                aria-label={`Поиск в ${city.name}`}
-              >
-                <label className="relative min-w-0 flex-1">
-                  <span className="sr-only">Что ищем</span>
-                  <Search
-                    className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
-                    aria-hidden
-                  />
-                  <input
-                    type="search"
-                    value={searchQuery}
-                    onChange={(event) => setSearchQuery(event.target.value)}
-                    placeholder={`Найти экскурсию, стендап или театр в ${searchIn}...`}
-                    className="h-12 w-full rounded-xl bg-transparent pl-10 pr-3 text-sm font-medium text-slate-900 outline-none placeholder:text-slate-400"
-                  />
-                </label>
-                <div className="flex shrink-0 gap-2">
-                  <button
-                    type="submit"
-                    className="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 text-sm font-semibold text-white transition hover:bg-slate-800 sm:flex-none"
-                  >
-                    <Search className="h-4 w-4" aria-hidden />
-                    Подобрать
-                  </button>
-                  <Link href={afficheHref} className={`${afficheButtonClass} sm:hidden`}>
-                    <Ticket className="h-4 w-4 shrink-0" aria-hidden />
-                    <span>Афиша</span>
-                  </Link>
-                </div>
-              </form>
-
-              <p className="mt-3 hidden sm:block">
-                <Link href={afficheHref} className={heroNavLinkClass}>
-                  Афиша
+              <div className="mt-5 flex flex-wrap gap-3">
+                <Link href={afficheHref} className={primaryCtaClass}>
+                  <Ticket className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  <span>Афиша</span>
                 </Link>
-                <span
-                  aria-hidden="true"
-                  className={
-                    nightShell ? 'mx-2 text-white/40' : editorial ? 'mx-2 text-zinc-300' : 'mx-2 text-slate-300'
-                  }
-                >
-                  ·
-                </span>
-                <Link href={collectionsHref} className={heroNavLinkClass}>
-                  Подборки событий →
+                <Link href={collectionsHref} className={secondaryCtaClass}>
+                  Подборки событий
                 </Link>
-              </p>
+              </div>
 
-              {/* Mobile quick-jump under search; desktop keeps sticky tabs. */}
+              {/* Mobile quick-jump under CTAs; desktop keeps sticky tabs. */}
               <div
                 className="mt-4 flex gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:hidden"
                 data-city-hero-jump
@@ -885,7 +830,7 @@ function CityHookFactCallout({
 }) {
   return (
     <div
-      className={`mb-6 rounded-2xl px-5 py-4 sm:px-6 sm:py-5 ${
+      className={`rounded-2xl px-5 py-4 sm:px-6 sm:py-5 ${
         editorial
           ? 'bg-amber-50 ring-1 ring-amber-200/80'
           : 'bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 ring-1 ring-amber-200/70'
@@ -1172,7 +1117,6 @@ function CitySightsSection({
         editorial ? 'border-zinc-200' : 'border-slate-100'
       }`}
     >
-      {hookFact ? <CityHookFactCallout hook={hookFact} editorial={editorial} /> : null}
       <h2
         className={
           editorial
@@ -1182,6 +1126,11 @@ function CitySightsSection({
       >
         {sectionTitle}
       </h2>
+      {hookFact ? (
+        <div className="mt-4">
+          <CityHookFactCallout hook={hookFact} editorial={editorial} />
+        </div>
+      ) : null}
       {places.length || hasNamedScenarios ? (
         <CitySightsMustSeeList
           places={places}
@@ -2109,22 +2058,6 @@ function buildFallbackMustSee(
     href: venueHref(venue),
   }));
   return [...categoryPlaces, ...venuePlaces];
-}
-
-function cityHeroSearchInForm(city: PublicCityDto): string {
-  const slug = String(city.slug || city.sourceSlug || '').toLowerCase();
-  if (
-    slug === 'saint-petersburg' ||
-    slug === 'sankt-peterburg' ||
-    slug === 'spb' ||
-    city.name === 'Санкт-Петербург'
-  ) {
-    return 'СПб';
-  }
-  if (slug === 'moscow' || slug === 'moskva' || city.name === 'Москва') {
-    return 'Москве';
-  }
-  return cityInPrepositional(city).replace(/^в\s+/i, '');
 }
 
 function cityInPrepositional(city: PublicCityDto) {

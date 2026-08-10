@@ -3,9 +3,17 @@ import styles from './DaibiletLogo.module.css';
 export const DAIBILET_LOGO_BLUE = '#4267e9';
 export const DAIBILET_LOGO_DARK = '#101729';
 
-/** Point-1 (breve over «и») sits lower than the mid waypoint / destination. */
-const POINT1_Y = 60;
-const ROUTE_1 = `M170 ${POINT1_Y} C215 10 270 -2 315 31`;
+/**
+ * Й-breve as a short solid stroke over «и», then dashed route continues from its right end.
+ * viewBox 0 0 500 95; breve centered near x≈170 (letter «и»).
+ */
+const BREVE_Y = 58;
+const BREVE_X1 = 152;
+const BREVE_X2 = 188;
+/** Slight upward arc (breve), not a flat bar. */
+const BREVE_PATH = `M${BREVE_X1} ${BREVE_Y} Q170 52 ${BREVE_X2} ${BREVE_Y}`;
+/** Dashed travel arc starts at breve right endpoint → mid waypoint. */
+const ROUTE_1 = `M${BREVE_X2} ${BREVE_Y} C220 10 270 -2 315 31`;
 const ROUTE_2 = 'M315 31 C365 -3 430 -3 475 31';
 
 /** Destination mark (point-3): half-arm of the blue X at (475, 31). */
@@ -23,8 +31,8 @@ type DaibiletLogoProps = {
 
 /**
  * Brand mark: HTML «Даибилет» + SVG route overlay.
- * Point-1 (black) is the breve of «й»; mid is a blue circle; end is a blue X.
- * Arcs stay blue dashed. Aria / sr-only: «Дайбилет».
+ * Solid blue breve-stroke over «и» → dashed blue arc → mid circle → dashed → blue X.
+ * Aria / sr-only: «Дайбилет».
  */
 export function DaibiletLogo({
   className = '',
@@ -45,9 +53,9 @@ export function DaibiletLogo({
         Да<span>и</span>билет
       </span>
       <svg className={styles.logoRoute} viewBox="0 0 500 95" aria-hidden="true">
+        <path className={styles.breve} d={BREVE_PATH} />
         <path className={`${styles.route} ${styles.route1}`} d={ROUTE_1} />
         <path className={`${styles.route} ${styles.route2}`} d={ROUTE_2} />
-        <circle className={`${styles.point} ${styles.point1}`} cx="170" cy={POINT1_Y} r="7" />
         <circle className={`${styles.point} ${styles.point2}`} cx="315" cy="31" r="7" />
         <g className={styles.point3} aria-hidden="true">
           <line

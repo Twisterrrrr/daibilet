@@ -2,10 +2,13 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
+| UX.LOGO-BREVE-LINE | Logo: solid breve-stroke over «и» → dashed route (replace black point-1) | Критический | 🔄 ship + Deploy MSK web |
+| UX.CITY-HUB-HERO-CTAS | City hub hero: remove search; restore Афиша + Подборки событий buttons | Критический | 🔄 ship + Deploy MSK web |
+| UX.CITY-HUB-HERO-BRIEF | City hub: brief in hero; first submenu «Зачем ехать» (не body Описание) | Критический | 🔄 ship |
 | UX.EVENTS-MOBILE-SELECTS | `/events` mobile: search + Дата/Тип dropdowns (не chip rails); desktop date rail | Критический | 🔄 ship |
 | UX.CITY-HUB-EDITORIAL-ORDER | City hub: Описание + Факты + Зачем ехать before «Готовые сценарии» (restore CityWhyGo / places rail) | Критический | ✅ `b113a927` push; deploy по «выкатывай» |
 | UX.EVENTS-CALENDAR-COVERS | `/events`: calendar corner in date rail; remap center-cruise text flyers; live rail full container width | Высокий | ✅ `1c0fd42f` push; deploy по «выкатывай» |
-| UX.CITY-HUB-SEARCH-SCENARIOS | City hub: search hero; scenarios magazine merge; collections grid; editorial blog cards; mobile jump chips | Высокий | ✅ `b3b52684` push; deploy по «выкатывай» |
+| UX.CITY-HUB-SEARCH-SCENARIOS | City hub: search hero; scenarios magazine merge; collections grid; editorial blog cards; mobile jump chips | Высокий | ✅ `b3b52684` (hero search superseded by UX.CITY-HUB-HERO-CTAS) |
 | UX.HOME-BLEED-BOX | Homepage rhythm: cities gray full-bleed rail; My Day graphite band; blog magazine feature; editors/popular/podborki boxed | Высокий | ✅ `0a906fe6` push; deploy по «выкатывай» |
 | UX.HOME-RHYTHM | Homepage P0-P2: clean hero+swipe chips; editors rail; merge now/popular; My Day constructor preview; cities/podborki rails | Высокий | ✅ `b48ea8cb` push; deploy по «выкатывай» |
 | UX.MYDAY-TRAVEL-PRODUCT | `/my-day`: magazine suburb, stops timeline, scenario snap cards, must-see carousel, mobile shelf tabs | Критический | ✅ `af70051d` Deploy `31342186797` BUILD_ID=`RWJuTMEW-R707-yh7VQwJ` |

@@ -29,6 +29,15 @@
   pointer-events: none;
 }
 
+/* Solid й-breve over «и»; dashed arcs continue from its right end. */
+.breve {
+  fill: none;
+  stroke: var(--logo-blue);
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  opacity: 1;
+}
+
 .route {
   fill: none;
   stroke: var(--logo-blue);
@@ -41,11 +50,6 @@
 .point {
   fill: var(--logo-blue);
   opacity: 1;
-}
-
-/* Breve over «и»: brand dark; mid point stays blue circle. */
-.point1 {
-  fill: var(--logo-dark);
 }
 
 /* Destination: blue X (not a circle). */
