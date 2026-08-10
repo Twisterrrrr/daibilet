@@ -222,23 +222,22 @@ html[data-nav-pending='1'] {
   }
 
   /**
-   * My Day band: map field (arcs + pins) behind the constructor card.
-   * Strong sky tint + high-opacity motifs (owner: must read without squinting).
+   * My Day band: dashed route arcs only (no map pins / markers).
+   * Strong sky tint + high-opacity lines so the section reads decorated.
    */
   .home-myday-map-band {
     background-color: #c5e4f6;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='280' viewBox='0 0 640 280' fill='none'%3E%3Cpath d='M48 210 C120 70, 200 240, 280 110 C340 40, 400 190, 480 90 C540 35, 580 150, 620 115' stroke='%230ea5e9' stroke-width='2' stroke-dasharray='5 7' stroke-linecap='round' opacity='0.92'/%3E%3Cpath d='M20 120 C90 185, 150 45, 230 155 C300 230, 370 55, 450 140 C520 200, 570 70, 630 175' stroke='%230284c7' stroke-width='1.75' stroke-dasharray='4 8' stroke-linecap='round' opacity='0.78'/%3E%3Cpath d='M100 40 C180 100, 260 20, 340 90 C420 160, 500 50, 580 100' stroke='%2338bdf8' stroke-width='1.6' stroke-dasharray='3 9' stroke-linecap='round' opacity='0.88'/%3E%3Cg fill='%230369a1' opacity='0.85'%3E%3Cpath d='M48 198c-4.4 0-8 3.5-8 7.8 0 5.9 8 14.2 8 14.2s8-8.3 8-14.2c0-4.3-3.6-7.8-8-7.8zm0 11.2a3.4 3.4 0 1 1 0-6.8 3.4 3.4 0 0 1 0 6.8z'/%3E%3Cpath d='M280 98c-4.4 0-8 3.5-8 7.8 0 5.9 8 14.2 8 14.2s8-8.3 8-14.2c0-4.3-3.6-7.8-8-7.8zm0 11.2a3.4 3.4 0 1 1 0-6.8 3.4 3.4 0 0 1 0 6.8z'/%3E%3Cpath d='M480 78c-4.4 0-8 3.5-8 7.8 0 5.9 8 14.2 8 14.2s8-8.3 8-14.2c0-4.3-3.6-7.8-8-7.8zm0 11.2a3.4 3.4 0 1 1 0-6.8 3.4 3.4 0 0 1 0 6.8z'/%3E%3Cpath d='M230 143c-3.6 0-6.5 2.8-6.5 6.3 0 4.8 6.5 11.5 6.5 11.5s6.5-6.7 6.5-11.5c0-3.5-2.9-6.3-6.5-6.3zm0 9a2.7 2.7 0 1 1 0-5.4 2.7 2.7 0 0 1 0 5.4z'/%3E%3Cpath d='M450 128c-3.6 0-6.5 2.8-6.5 6.3 0 4.8 6.5 11.5 6.5 11.5s6.5-6.7 6.5-11.5c0-3.5-2.9-6.3-6.5-6.3zm0 9a2.7 2.7 0 1 1 0-5.4 2.7 2.7 0 0 1 0 5.4z'/%3E%3Cpath d='M340 78c-3.3 0-6 2.6-6 5.8 0 4.4 6 10.6 6 10.6s6-6.2 6-10.6c0-3.2-2.7-5.8-6-5.8zm0 8.3a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z'/%3E%3C/g%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='280' viewBox='0 0 640 280' fill='none'%3E%3Cpath d='M48 210 C120 70, 200 240, 280 110 C340 40, 400 190, 480 90 C540 35, 580 150, 620 115' stroke='%230ea5e9' stroke-width='2' stroke-dasharray='5 7' stroke-linecap='round' opacity='0.92'/%3E%3Cpath d='M20 120 C90 185, 150 45, 230 155 C300 230, 370 55, 450 140 C520 200, 570 70, 630 175' stroke='%230284c7' stroke-width='1.75' stroke-dasharray='4 8' stroke-linecap='round' opacity='0.78'/%3E%3Cpath d='M100 40 C180 100, 260 20, 340 90 C420 160, 500 50, 580 100' stroke='%2338bdf8' stroke-width='1.6' stroke-dasharray='3 9' stroke-linecap='round' opacity='0.88'/%3E%3C/svg%3E");
     background-size: 640px 280px;
     background-repeat: repeat;
   }
 
   /**
-   * «Куда поехать» band: saturated sky wash + travel motif (waves, roads, compass, skyline).
-   * Motif opacity high so the section reads as decorated, not almost-white.
+   * «Куда поехать» band: dashed/wavy route lines only (no pins, compass, skyline).
    */
   .home-trips-map-band {
     background-color: #c5e4f6;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='720' height='320' viewBox='0 0 720 320' fill='none'%3E%3Cpath d='M0 72 Q90 48 180 78 T360 68 T540 88 T720 60' stroke='%230ea5e9' stroke-width='1.9' stroke-dasharray='2 11' stroke-linecap='round' opacity='0.9'/%3E%3Cpath d='M0 168 Q110 198 220 160 T440 178 T720 150' stroke='%230284c7' stroke-width='1.7' stroke-dasharray='10 5 2 7' stroke-linecap='round' opacity='0.8'/%3E%3Cpath d='M0 248 Q140 220 280 255 T560 240 T720 268' stroke='%2338bdf8' stroke-width='1.55' stroke-dasharray='1 9' stroke-linecap='round' opacity='0.86'/%3E%3Cg fill='%230369a1' opacity='0.82'%3E%3Ccircle cx='96' cy='168' r='3.2'/%3E%3Ccircle cx='220' cy='160' r='2.6'/%3E%3Ccircle cx='330' cy='172' r='3'/%3E%3Ccircle cx='440' cy='178' r='2.4'/%3E%3Ccircle cx='560' cy='162' r='3.1'/%3E%3Ccircle cx='650' cy='154' r='2.5'/%3E%3C/g%3E%3Cg stroke='%230284c7' stroke-width='1.45' opacity='0.88'%3E%3Cpath d='M120 110 L120 92 M111 101 L129 101' stroke-linecap='round'/%3E%3Ccircle cx='120' cy='101' r='7' fill='none'/%3E%3Cpath d='M520 54 L520 38 M512 46 L528 46' stroke-linecap='round'/%3E%3Ccircle cx='520' cy='46' r='6' fill='none'/%3E%3C/g%3E%3Cg fill='%230369a1' opacity='0.72'%3E%3Cpath d='M48 290h14v-18h8v-12h10v-22h8v22h9v12h7v18h12v10H48z'/%3E%3Cpath d='M280 300h10v-14h7v-10h9v-18h6v18h8v10h6v14h11v8H280z'/%3E%3Cpath d='M600 292h12v-16h6v-9h8v-20h7v20h8v9h5v16h10v9H600z'/%3E%3C/g%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='720' height='320' viewBox='0 0 720 320' fill='none'%3E%3Cpath d='M0 72 Q90 48 180 78 T360 68 T540 88 T720 60' stroke='%230ea5e9' stroke-width='1.9' stroke-dasharray='2 11' stroke-linecap='round' opacity='0.9'/%3E%3Cpath d='M0 168 Q110 198 220 160 T440 178 T720 150' stroke='%230284c7' stroke-width='1.7' stroke-dasharray='10 5 2 7' stroke-linecap='round' opacity='0.8'/%3E%3Cpath d='M0 248 Q140 220 280 255 T560 240 T720 268' stroke='%2338bdf8' stroke-width='1.55' stroke-dasharray='1 9' stroke-linecap='round' opacity='0.86'/%3E%3C/svg%3E");
     background-size: 720px 320px;
     background-repeat: repeat;
   }

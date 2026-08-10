@@ -18,7 +18,7 @@ type DaibiletLogoProps = {
 
 /**
  * Brand mark: HTML «Даибилет» + SVG route overlay.
- * Point-1 (black) is the breve of «й»; other points stay blue. Aria / sr-only: «Дайбилет».
+ * First blue point is the breve of «й»; aria / sr-only stay «Дайбилет».
  */
 export function DaibiletLogo({
   className = '',
@@ -41,7 +41,7 @@ export function DaibiletLogo({
       <svg className={styles.logoRoute} viewBox="0 0 500 95" aria-hidden="true">
         <path className={`${styles.route} ${styles.route1}`} d={ROUTE_1} />
         <path className={`${styles.route} ${styles.route2}`} d={ROUTE_2} />
-        <circle className={`${styles.point} ${styles.point1}`} cx="170" cy={POINT1_Y} r="11" />
+        <circle className={`${styles.point} ${styles.point1}`} cx="170" cy={POINT1_Y} r="7" />
         <circle className={`${styles.point} ${styles.point2}`} cx="315" cy="31" r="7" />
         <circle className={`${styles.point} ${styles.point3}`} cx="475" cy="31" r="10" />
       </svg>
