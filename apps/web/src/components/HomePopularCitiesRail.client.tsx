@@ -64,8 +64,9 @@ export function HomePopularCitiesRail({ cities, className = '' }: HomePopularCit
     if (!el || cities.length === 0) return;
     const setWidth = el.scrollWidth / LOOP_COPIES;
     if (setWidth < 1) return;
-    // Left tail peek: start mid-set offset so previous cities enter from the left edge.
-    const peek = Math.min(measureStep(el) * 0.35, 72);
+    // Left-weighted dual-edge peek: ~25% more left overhang than the prior 0.35/72 pass
+    // so the rail reads less centered while the infinite loop stays seamless.
+    const peek = Math.min(measureStep(el) * 0.44, 90);
     loopingRef.current = true;
     el.scrollLeft = setWidth - peek;
     loopingRef.current = false;
