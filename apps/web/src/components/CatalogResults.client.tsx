@@ -8,6 +8,7 @@ import { EventCardHorizontal } from '@/components/EventCardHorizontal';
 import type { PublicCatalogListItemDto } from '@daibilet/contracts/public';
 import { trackCatalogBannerClick } from '@/lib/catalog-analytics';
 import { catalogItemHasLiveSignal } from '@/lib/event-card-badges';
+import { resolveEventCardFallbackImage, resolveEventCardPrimaryImage } from '@/lib/event-card-image';
 import { formatPriceFrom } from '@/lib/format';
 import { formatShowcaseSessionDate, MIN_DISPLAY_PRICE_RUB } from '@/lib/event-card-meta';
 import { resolveEventCardDestinationLabel } from '@/lib/event-location';
@@ -175,27 +176,34 @@ function CatalogLiveRail({
   popularSort: boolean;
 }) {
   return (
-    <section className="mt-4" aria-label={popularSort ? 'Популярное сейчас' : 'Сейчас выбирают'}>
-      <div className="mb-2 flex items-baseline justify-between gap-3">
+    <section className="mt-4 w-full" aria-label={popularSort ? 'Популярное сейчас' : 'Сейчас выбирают'}>
+      <div className="mb-2 flex w-full items-baseline justify-between gap-3">
         <h2 className="font-display text-sm font-bold text-graphite sm:text-base">
           {popularSort ? 'Популярное сейчас' : 'Сейчас выбирают'}
         </h2>
         <p className="text-[11px] text-graphite-muted sm:text-xs">По афише города</p>
       </div>
-      <ul className="horizontal-snap-row flex gap-3 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <ul className="flex w-full gap-3 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:gap-3.5 md:overflow-visible">
         {items.map((session) => {
           const href = eventHref(session);
+          const coverSrc =
+            resolveEventCardPrimaryImage(session) ||
+            resolveEventCardFallbackImage(session) ||
+            session.imageUrl;
           const hasPrice =
             typeof session.priceFrom === 'number' && session.priceFrom >= MIN_DISPLAY_PRICE_RUB;
           return (
-            <li key={`live-${session.id}-${session.startsAt}`} className="w-[9.5rem] shrink-0 snap-start sm:w-44">
+            <li
+              key={`live-${session.id}-${session.startsAt}`}
+              className="w-[9.5rem] shrink-0 snap-start sm:w-44 md:min-w-0 md:w-auto md:flex-1"
+            >
               <Link
                 href={href}
-                className="group block overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition hover:border-slate-200 hover:shadow-md"
+                className="group block h-full overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition hover:border-slate-200 hover:shadow-md"
               >
                 <div className="relative aspect-[16/10] overflow-hidden bg-surface-muted">
                   <SafeImage
-                    src={session.imageUrl}
+                    src={coverSrc}
                     alt={session.title}
                     fill
                     sizes={IMAGE_SIZES.eventCard}

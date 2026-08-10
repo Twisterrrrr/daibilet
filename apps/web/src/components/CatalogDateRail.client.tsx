@@ -1,11 +1,13 @@
 'use client';
 
-import { useMemo } from 'react';
+import { Calendar as CalendarIcon } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import {
   buildCatalogDateRailChips,
   isDateRailChipActive,
+  toLocalIsoDay,
   type CatalogDateRailChip,
 } from '@/lib/catalog-date-rail';
 import {
@@ -20,13 +22,18 @@ type CatalogDateRailProps = {
 };
 
 /**
- * Horizontal date presets + upcoming days.
+ * Horizontal date presets + upcoming days + corner calendar (range).
  * Owned by EventsCatalogHero (not CatalogToolbar) so search stays one row below.
  */
 export function CatalogDateRail({ disabled = false, className = '' }: CatalogDateRailProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const chips = useMemo(() => buildCatalogDateRailChips(), []);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [draftFrom, setDraftFrom] = useState('');
+  const [draftTo, setDraftTo] = useState('');
+  const pickerRef = useRef<HTMLDivElement>(null);
+  const fromInputRef = useRef<HTMLInputElement>(null);
 
   const filters = useMemo(() => {
     const minRaw = searchParams.get('minPrice');
@@ -53,11 +60,46 @@ export function CatalogDateRail({ disabled = false, className = '' }: CatalogDat
     });
   }, [searchParams]);
 
+  const calendarActive = Boolean(filters.from || filters.to) && !filters.date;
+  const calendarOffRail =
+    calendarActive &&
+    Boolean(filters.from) &&
+    !chips.some((chip) => chip.kind === 'day' && chip.iso === filters.from && filters.to === filters.from);
+
+  useEffect(() => {
+    if (!pickerOpen) return;
+    setDraftFrom(filters.from || '');
+    setDraftTo(filters.to || filters.from || '');
+    const timer = window.setTimeout(() => fromInputRef.current?.focus(), 0);
+    return () => window.clearTimeout(timer);
+  }, [pickerOpen, filters.from, filters.to]);
+
+  useEffect(() => {
+    if (!pickerOpen) return;
+    const onPointerDown = (event: MouseEvent | TouchEvent) => {
+      const target = event.target as Node | null;
+      if (target && pickerRef.current?.contains(target)) return;
+      setPickerOpen(false);
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setPickerOpen(false);
+    };
+    document.addEventListener('mousedown', onPointerDown);
+    document.addEventListener('touchstart', onPointerDown);
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', onPointerDown);
+      document.removeEventListener('touchstart', onPointerDown);
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [pickerOpen]);
+
   const navigate = (next: CatalogFilterValues) => {
     router.push(buildCatalogHref(next));
   };
 
   const onSelect = (chip: CatalogDateRailChip) => {
+    setPickerOpen(false);
     if (chip.kind === 'preset') {
       const nextDate = chip.value;
       navigate({
@@ -83,37 +125,154 @@ export function CatalogDateRail({ disabled = false, className = '' }: CatalogDat
     });
   };
 
+  const applyRange = () => {
+    const from = draftFrom.trim();
+    const to = (draftTo.trim() || draftFrom.trim()).trim();
+    if (!from) {
+      navigate({
+        ...filters,
+        date: undefined,
+        from: undefined,
+        to: undefined,
+        page: undefined,
+      });
+      setPickerOpen(false);
+      return;
+    }
+    const orderedFrom = to && to < from ? to : from;
+    const orderedTo = to && to < from ? from : to || from;
+    navigate({
+      ...filters,
+      date: undefined,
+      from: orderedFrom,
+      to: orderedTo,
+      page: undefined,
+      sort: orderedFrom === orderedTo ? 'time' : filters.sort,
+    });
+    setPickerOpen(false);
+  };
+
+  const clearRange = () => {
+    setDraftFrom('');
+    setDraftTo('');
+    navigate({
+      ...filters,
+      date: undefined,
+      from: undefined,
+      to: undefined,
+      page: undefined,
+    });
+    setPickerOpen(false);
+  };
+
+  const minDay = toLocalIsoDay(new Date());
+
   return (
-    <div
-      role="group"
-      aria-label="Дата"
-      className={`horizontal-snap-row flex flex-nowrap gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${className}`}
-    >
-      {chips.map((chip) => {
-        const active = isDateRailChipActive(chip, filters);
-        const key = chip.kind === 'preset' ? chip.value : chip.iso;
-        return (
-          <button
-            key={key}
-            type="button"
-            disabled={disabled}
-            aria-pressed={active}
-            onClick={() => onSelect(chip)}
-            className={`catalog-date-chip snap-start disabled:opacity-60 ${
-              active ? 'catalog-date-chip-on' : 'catalog-date-chip-idle'
-            }`}
+    <div className={`flex min-w-0 items-center gap-2 ${className}`}>
+      <div
+        role="group"
+        aria-label="Дата"
+        className="horizontal-snap-row flex min-w-0 flex-1 flex-nowrap gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      >
+        {chips.map((chip) => {
+          const active = isDateRailChipActive(chip, filters);
+          const key = chip.kind === 'preset' ? chip.value : chip.iso;
+          return (
+            <button
+              key={key}
+              type="button"
+              disabled={disabled}
+              aria-pressed={active}
+              onClick={() => onSelect(chip)}
+              className={`catalog-date-chip snap-start disabled:opacity-60 ${
+                active ? 'catalog-date-chip-on' : 'catalog-date-chip-idle'
+              }`}
+            >
+              {chip.kind === 'day' ? (
+                <span className="whitespace-nowrap">
+                  <span className="text-[11px] font-semibold uppercase tracking-wide opacity-80">
+                    {chip.weekday}
+                  </span>
+                  <span className="ml-1 font-semibold">{chip.iso.slice(8)}</span>
+                </span>
+              ) : (
+                <span className="whitespace-nowrap">{chip.shortLabel}</span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      <div ref={pickerRef} className="relative shrink-0">
+        <button
+          type="button"
+          disabled={disabled}
+          aria-label="Выбрать даты в календаре"
+          aria-expanded={pickerOpen}
+          aria-haspopup="dialog"
+          aria-pressed={calendarOffRail || pickerOpen}
+          onClick={() => setPickerOpen((open) => !open)}
+          className={`catalog-date-chip inline-flex h-11 w-11 items-center justify-center px-0 disabled:opacity-60 ${
+            calendarOffRail || pickerOpen ? 'catalog-date-chip-on' : 'catalog-date-chip-idle'
+          }`}
+        >
+          <CalendarIcon className="h-4 w-4" strokeWidth={1.75} aria-hidden />
+        </button>
+
+        {pickerOpen ? (
+          <div
+            role="dialog"
+            aria-label="Период дат"
+            className="absolute right-0 top-[calc(100%+0.4rem)] z-40 w-[min(18.5rem,calc(100vw-2rem))] rounded-2xl border border-slate-200/80 bg-white p-3 shadow-lg"
           >
-            {chip.kind === 'day' ? (
-              <span className="whitespace-nowrap">
-                <span className="text-[11px] font-semibold uppercase tracking-wide opacity-80">{chip.weekday}</span>
-                <span className="ml-1 font-semibold">{chip.iso.slice(8)}</span>
-              </span>
-            ) : (
-              <span className="whitespace-nowrap">{chip.shortLabel}</span>
-            )}
-          </button>
-        );
-      })}
+            <div className="grid grid-cols-2 gap-2">
+              <label className="block min-w-0">
+                <span className="mb-1 block text-[11px] font-medium text-graphite-muted">Начало</span>
+                <input
+                  ref={fromInputRef}
+                  type="date"
+                  value={draftFrom}
+                  min={minDay}
+                  aria-label="Дата начала"
+                  onChange={(event) => {
+                    const next = event.target.value;
+                    setDraftFrom(next);
+                    if (draftTo && next && draftTo < next) setDraftTo(next);
+                  }}
+                  className="h-10 w-full rounded-xl border border-transparent bg-[#F5F5F7] px-2.5 text-sm text-graphite outline-none focus:border-primary focus-visible:ring-2 focus-visible:ring-primary/30"
+                />
+              </label>
+              <label className="block min-w-0">
+                <span className="mb-1 block text-[11px] font-medium text-graphite-muted">Конец</span>
+                <input
+                  type="date"
+                  value={draftTo}
+                  min={draftFrom || minDay}
+                  aria-label="Дата конца"
+                  onChange={(event) => setDraftTo(event.target.value)}
+                  className="h-10 w-full rounded-xl border border-transparent bg-[#F5F5F7] px-2.5 text-sm text-graphite outline-none focus:border-primary focus-visible:ring-2 focus-visible:ring-primary/30"
+                />
+              </label>
+            </div>
+            <div className="mt-2.5 flex items-center justify-between gap-2">
+              <button
+                type="button"
+                onClick={clearRange}
+                className="text-xs font-medium text-graphite-muted hover:text-graphite hover:underline"
+              >
+                Сбросить
+              </button>
+              <button
+                type="button"
+                onClick={applyRange}
+                className="inline-btn h-8 rounded-lg bg-primary-600 px-3 text-xs font-semibold text-white hover:bg-primary-700"
+              >
+                Применить
+              </button>
+            </div>
+          </div>
+        ) : null}
+      </div>
     </div>
   );
 }

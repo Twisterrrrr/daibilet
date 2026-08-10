@@ -2,6 +2,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
+| UX.EVENTS-CALENDAR-COVERS | `/events`: calendar corner in date rail; remap center-cruise text flyers; live rail full container width | Высокий | 🔄 ship; deploy по «выкатывай» |
 | UX.CITY-HUB-SEARCH-SCENARIOS | City hub: search hero; scenarios magazine merge; collections grid; editorial blog cards; mobile jump chips | Высокий | ✅ `b3b52684` push; deploy по «выкатывай» |
 | UX.HOME-BLEED-BOX | Homepage rhythm: cities gray full-bleed rail; My Day graphite band; blog magazine feature; editors/popular/podborki boxed | Высокий | ✅ `0a906fe6` push; deploy по «выкатывай» |
 | UX.HOME-RHYTHM | Homepage P0-P2: clean hero+swipe chips; editors rail; merge now/popular; My Day constructor preview; cities/podborki rails | Высокий | ✅ `b48ea8cb` push; deploy по «выкатывай» |

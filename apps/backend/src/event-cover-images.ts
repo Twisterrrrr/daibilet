@@ -94,6 +94,17 @@ export const EVENT_PACK_IMAGES: Record<string, string> = {
   evt_6a26b332a49aa45bd55b1266: '/images/events/generated/evt-cover-kazan-kaleidoscope-1.jpg',
   evt_6a26b88263540bf6b05b1252: '/images/events/generated/evt-cover-kazan-kaleidoscope-2.jpg',
 
+  // --- Moscow center cruises: supplier flyers with baked-in «РЕЧНАЯ ПРОГУЛКА…» text ---
+  evt_tep_186: '/images/events/generated/evt-cover-leto-moskva-kievsky.jpg',
+  'rechnaya-progulka-po-centru-moskvy-ot-prichala-kievskii-do-parka-zaryade-186':
+    '/images/events/generated/evt-cover-leto-moskva-kievsky.jpg',
+  evt_tep_187: '/images/events/generated/evt-cover-leto-moskva-zaryade.jpg',
+  'rechnaya-progulka-po-centru-moskvy-ot-parka-zaryade-do-prichala-kievskii-vokzal-187':
+    '/images/events/generated/evt-cover-leto-moskva-zaryade.jpg',
+  evt_tep_1222: '/images/events/generated/evt-cover-moscow-center-loop.jpg',
+  'rechnaya-progulka-po-centru-moskvy-ot-parka-zaryade-krugovaya-1222':
+    '/images/events/generated/evt-cover-moscow-center-loop.jpg',
+
   // --- Exact content dupes: leave one sibling on original photo, rest get distinct covers ---
   evt_tep_1112: '/images/events/generated/evt-cover-river-express-a.jpg',
   evt_tep_1111: '/images/events/generated/evt-cover-river-express-b.jpg',

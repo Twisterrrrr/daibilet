@@ -1,3 +1,20 @@
+## 2026-08-10 - /events: calendar corner + cruise covers + live rail width
+
+### Наблюдения
+- В title band date rail справа пустое место - owner ждал calendar/range (после `221e37ab` system date input сняли из toolbar).
+- «Сейчас выбирают»: flyer PNG `evt_tep_186/187/1222` с baked-in «РЕЧНАЯ ПРОГУЛКА ПО ЦЕНТРУ МОСКВЫ» дублировали title.
+- Live rail узже search/toolbar: фиксированные `w-44` карточки оставляли пустые поля по краям контейнера.
+
+### Решения
+- `CatalogDateRail`: chip-кнопка календаря справа + popover from/to → `from`/`to` catalog URL (как advanced filters).
+- EVENT_PACK remap 186→leto-kievsky, 187→leto-zaryade, 1222→moscow-center-loop; live rail через `resolveEventCardPrimaryImage`.
+- `CatalogLiveRail`: `w-full` + `md:flex-1` карточки на ширину `container-page`. Commit+push; **без** web deploy.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-10 - Homepage: full-bleed vs boxed rhythm
 
 ### Наблюдения
