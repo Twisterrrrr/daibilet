@@ -190,18 +190,20 @@ import { toVenueCatalogCard } from '@/lib/venue-catalog-card';
 import type { VenueCatalogCard } from '@/lib/venue-map-types';
 
 type DayRouteAccordionId = 'mustSee' | 'text' | 'matches';
-/** Detail cards (Сетка/Список); optional «Шаги» timeline via SHOW_DAY_ROUTE_STEPS. */
+/** Detail cards: Сетка = Steps + swipe carousel; Список = Wanderlog vertical. */
 type DayRouteStopViewMode = 'grid' | 'list';
 type DayRouteMobileShelf = 'route' | 'add';
 
 const DAY_ROUTE_STOP_VIEW_KEY = 'daibilet:dayRouteStopView';
 /** Owner 2026-08-06: post-buy modal «Оформили билет?» off until UX revisit. Buy links still open. */
 const SHOW_DAY_TICKET_HANDOFF_MODAL = false;
-/**
- * Owner 2026-08-10: hide horizontal «Шаги» stepper timeline (cards Сетка/Список stay).
- * Restore: set `SHOW_DAY_ROUTE_STEPS = true`.
- */
-const SHOW_DAY_ROUTE_STEPS = false;
+
+/** Horizontal stop cards rail (Сетка): snap + peek next card, touch swipe. */
+const DAY_ROUTE_STOPS_GRID_RAIL =
+  'horizontal-snap-row flex w-full snap-x snap-mandatory flex-nowrap items-stretch gap-2.5 overflow-x-auto overscroll-x-contain touch-pan-x pb-1';
+/** Card width in Сетка carousel - peeks next stop (~home rails). */
+const DAY_ROUTE_STOPS_GRID_CARD =
+  'w-[min(72vw,17.5rem)] shrink-0 snap-start sm:w-[18rem] lg:w-[19rem]';
 
 function readStopViewMode(): DayRouteStopViewMode {
   if (typeof window === 'undefined') return 'grid';
@@ -433,9 +435,9 @@ function DayRoutePanelInner() {
   const [mobileView, setMobileView] = useState<'list' | 'map'>('list');
   /** Mobile shelf: route steps/map vs catalog add tools. */
   const [mobileShelf, setMobileShelf] = useState<DayRouteMobileShelf>('route');
-  /** Route stops detail: grid fence (default) or Wanderlog list; «Шаги» timeline gated by SHOW_DAY_ROUTE_STEPS. */
+  /** Route stops detail: Сетка (Steps + carousel) or Wanderlog Список. */
   const [stopViewMode, setStopViewMode] = useState<DayRouteStopViewMode>('grid');
-  /** Desktop (≥lg) can pick grid/list; mobile always list cards. */
+  /** Desktop (≥lg) can pick grid/list; mobile always Wanderlog list. */
   const [isLgUp, setIsLgUp] = useState(false);
   /** Session dismiss for «Свободное окно» upsell (resets on reload). */
   const [freeWindowDismissed, setFreeWindowDismissed] = useState(false);
@@ -3250,7 +3252,8 @@ function DayRoutePanelInner() {
             </p>
           ) : null}
 
-          {SHOW_DAY_ROUTE_STEPS && timelineStops.length > 0 ? (
+          {/* Сетка pairs with «Шаги»; Список keeps Wanderlog itinerary only. */}
+          {effectiveStopViewMode === 'grid' && timelineStops.length > 0 ? (
             <div className="mt-3" data-day-route-timeline-wrap>
               <DayRouteStopsTimeline
                 stops={timelineStops}
@@ -3268,7 +3271,7 @@ function DayRoutePanelInner() {
               <ul
                 className={
                   effectiveStopViewMode === 'grid'
-                    ? 'grid w-full grid-cols-1 items-start gap-1.5 sm:grid-cols-2 lg:grid-cols-3'
+                    ? DAY_ROUTE_STOPS_GRID_RAIL
                     : 'grid w-full grid-cols-1 items-start gap-0'
                 }
                 data-day-plan-list="purchased"
@@ -3321,7 +3324,7 @@ function DayRoutePanelInner() {
             <ul
               className={
                 effectiveStopViewMode === 'grid'
-                  ? 'grid w-full grid-cols-1 items-start gap-1.5 sm:grid-cols-2 lg:grid-cols-3'
+                  ? DAY_ROUTE_STOPS_GRID_RAIL
                   : 'flex w-full flex-col items-stretch gap-0'
               }
               data-day-plan-list="plans"
@@ -3356,7 +3359,7 @@ function DayRoutePanelInner() {
                         return c ? stopExternalMapsUrl(c.latitude, c.longitude) : null;
                       })()}
                       segmentToNext={segmentToNext}
-                      hideGeoSegment={listMode || Boolean(betweenTip)}
+                      hideGeoSegment={listMode}
                       travelMode={travelMode}
                       focused={focusedStopId === venue.id}
                       dragging={dragVenueId === venue.id}
@@ -3414,18 +3417,6 @@ function DayRoutePanelInner() {
                           flashDayRouteFeedback('Скоро');
                         }}
                       />
-                    ) : betweenTip ? (
-                      <li
-                        className={`list-none px-1 py-0.5 ${
-                          effectiveStopViewMode === 'grid' ? 'col-span-full' : ''
-                        }`}
-                        data-day-transit-between
-                        aria-label={betweenTip}
-                      >
-                        <p className="m-0 truncate text-[11px] leading-snug text-slate-400">
-                          {betweenTip}
-                        </p>
-                      </li>
                     ) : null}
                     {primaryFreeWindow &&
                     globalIndex >= 0 &&
@@ -3434,7 +3425,11 @@ function DayRoutePanelInner() {
                     !atMax &&
                     !freeWindowDismissed ? (
                       <li
-                        className={effectiveStopViewMode === 'grid' ? 'col-span-full' : undefined}
+                        className={
+                          effectiveStopViewMode === 'grid'
+                            ? `${DAY_ROUTE_STOPS_GRID_CARD} list-none`
+                            : undefined
+                        }
                         data-day-free-window-upsell
                         data-day-free-window
                       >
@@ -3504,7 +3499,7 @@ function DayRoutePanelInner() {
               <ul
                 className={
                   effectiveStopViewMode === 'grid'
-                    ? 'grid w-full grid-cols-1 items-start gap-1.5 sm:grid-cols-2 lg:grid-cols-3'
+                    ? DAY_ROUTE_STOPS_GRID_RAIL
                     : 'grid w-full grid-cols-1 items-start gap-0'
                 }
                 data-day-plan-list="overflow"
@@ -5284,7 +5279,7 @@ function DayRouteVenueCard({
 
   return (
     <li
-      className="flex w-full flex-col scroll-mt-4"
+      className={`flex flex-col scroll-mt-4 ${DAY_ROUTE_STOPS_GRID_CARD}`}
       data-day-plan-stop={venue.id}
       data-day-stop-variant="grid"
       data-day-stop-layout="place-then-offers"

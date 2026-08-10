@@ -21,7 +21,7 @@ type Props = {
 
 /**
  * Horizontal route steps: numbered circles + connector + optional thumb + short title.
- * Always shown above grid/list stop cards on /my-day.
+ * Paired with Сетка (swipe carousel) on /my-day; hidden in Wanderlog Список.
  */
 export function DayRouteStopsTimeline({
   stops,
