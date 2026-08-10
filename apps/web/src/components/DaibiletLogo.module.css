@@ -1,21 +1,21 @@
 .logo {
-  --logo-blue: #4267e9;
-  --logo-dark: #101729;
+  /* Full mark mono black; solid breve → dashed route. */
+  --logo-ink: #000000;
 
   position: relative;
   display: inline-block;
   line-height: 1;
-  color: var(--logo-dark);
+  color: var(--logo-ink);
   text-decoration: none;
   overflow: visible;
 }
 
 .logoText {
   font-family: var(--font-display);
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: -0.043em;
   line-height: 1;
-  color: var(--logo-dark);
+  color: var(--logo-ink);
 }
 
 .logoRoute {
@@ -29,10 +29,10 @@
   pointer-events: none;
 }
 
-/* Solid й-breve over «и»; dashed arcs continue from its right end. */
+/* Solid й-breve (short dash) over «и»; dashed arcs continue from its right end. */
 .breve {
   fill: none;
-  stroke: var(--logo-blue);
+  stroke: var(--logo-ink);
   stroke-width: 3.5;
   stroke-linecap: round;
   opacity: 1;
@@ -40,7 +40,7 @@
 
 .route {
   fill: none;
-  stroke: var(--logo-blue);
+  stroke: var(--logo-ink);
   stroke-width: 3.5;
   stroke-linecap: round;
   stroke-dasharray: 8 11;
@@ -48,14 +48,14 @@
 }
 
 .point {
-  fill: var(--logo-blue);
+  fill: var(--logo-ink);
   opacity: 1;
 }
 
-/* Destination: blue X (not a circle). */
+/* Destination: black X (not a circle). */
 .point3 {
   fill: none;
-  stroke: var(--logo-blue);
+  stroke: var(--logo-ink);
   stroke-width: 3.5;
   stroke-linecap: round;
   opacity: 1;

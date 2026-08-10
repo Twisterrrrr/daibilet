@@ -1,7 +1,8 @@
 import styles from './DaibiletLogo.module.css';
 
-export const DAIBILET_LOGO_BLUE = '#4267e9';
-export const DAIBILET_LOGO_DARK = '#101729';
+/** Legacy export kept for callers; mark is mono black. */
+export const DAIBILET_LOGO_BLUE = '#000000';
+export const DAIBILET_LOGO_DARK = '#000000';
 
 /**
  * Й-breve as a short solid stroke over «и», then dashed route continues from its right end.
@@ -31,7 +32,7 @@ type DaibiletLogoProps = {
 
 /**
  * Brand mark: HTML «Даибилет» + SVG route overlay.
- * Solid blue breve-stroke over «и» → dashed blue arc → mid circle → dashed → blue X.
+ * Solid black breve-stroke over «и» → dashed arc → mid circle → dashed → X (all black, bolder wordmark).
  * Aria / sr-only: «Дайбилет».
  */
 export function DaibiletLogo({
