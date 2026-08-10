@@ -5,12 +5,12 @@
  */
 export const EVENT_PACK_IMAGES: Record<string, string> = {
   // --- Moscow: graphic / branded covers ---
-  evt_tep_539: '/images/events/generated/evt-cover-leto-moskva-kievsky.jpg',
+  evt_tep_539: '/images/events/generated/evt-cover-leto-moskva-summer-539.jpg',
   'rechnaya-progulka-leto-v-moskve-ot-kievskogo-vokzala-do-parka-zaryade-539':
-    '/images/events/generated/evt-cover-leto-moskva-kievsky.jpg',
-  evt_tep_538: '/images/events/generated/evt-cover-leto-moskva-zaryade.jpg',
+    '/images/events/generated/evt-cover-leto-moskva-summer-539.jpg',
+  evt_tep_538: '/images/events/generated/evt-cover-leto-moskva-zaryade-out-538.jpg',
   'rechnaya-progulka-leto-v-moskve-ot-parka-zaryade-do-kievskogo-vokzala-538':
-    '/images/events/generated/evt-cover-leto-moskva-zaryade.jpg',
+    '/images/events/generated/evt-cover-leto-moskva-zaryade-out-538.jpg',
   evt_tep_661: '/images/events/generated/evt-cover-moscow-bus-tour.jpg',
   'obzornaya-ekskursiya-po-moskve-na-avtobuse-ot-krasnoi-ploschadi-661':
     '/images/events/generated/evt-cover-moscow-bus-tour.jpg',
