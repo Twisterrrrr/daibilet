@@ -243,8 +243,8 @@ html[data-nav-pending='1'] {
   }
 
   /**
-   * Popular cities rail: horizontal track; left gutter via `.home-bleed-rail`,
-   * right-edge peek OK; initial card flush under H2 (no left overhang).
+   * Popular cities rail: full-bleed track; peeks past both edges; seamless loop.
+   * Initial scroll centers Moscow + SPB (see HomePopularCitiesRail).
    */
   .home-edge-cities-rail {
     width: 100%;

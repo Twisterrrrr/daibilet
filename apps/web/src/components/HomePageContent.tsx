@@ -19,6 +19,7 @@ import { catalogSocialStats } from '@/lib/catalog-social-stats';
 import { formatMoney, formatNumber, pluralEvents } from '@/lib/format';
 import { resolveHomePromoImage } from '@/lib/home-scenarios';
 import { landingCategoryHref } from '@/lib/landing-routes';
+import { orderPopularRailCities } from '@/lib/popular-cities-rail';
 import { withSoftTimeout } from '@/lib/soft-timeout';
 import { getHomeArticles, getHomeCoverFingerprints, getHomePageData } from '@/server/cached-home-data';
 import { getActiveHeroBanners, heroFramesFromBanners } from '@/server/hero-banners';
@@ -49,9 +50,8 @@ async function HomePageBody() {
 
   const destinations = destinationsPayload?.destinations ?? [];
   const cities = destinations.filter((item) => item.type === 'city');
-  const topCities = [...cities]
-    .sort((a, b) => b.events - a.events || a.name.localeCompare(b.name, 'ru'))
-    .slice(0, 12);
+  // Top by events, then pin Moscow + SPB first so the rail can center that pair on load.
+  const topCities = orderPopularRailCities(cities, 12);
   // Same canon as SiteFooter (not catalogPayload.total — that under/over-counts vs destinations).
   const { places: liveCities, events: liveEvents } = catalogSocialStats(destinations);
 
@@ -111,7 +111,7 @@ async function HomePageBody() {
                 </Link>
               </div>
             </div>
-            {/* Infinite rail: title-aligned start, right edge peek, cyclic loop. */}
+            {/* Infinite rail: MSK+SPB centered, left+right loop peeks. */}
             <HomePopularCitiesRail cities={topCities} className="mt-6" />
           </section>
         ) : null}
