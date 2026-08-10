@@ -25,7 +25,7 @@ function measureStep(scroller: HTMLElement): number {
 }
 
 /**
- * Edge-to-edge infinite city cards: peeks past both viewport edges, loops seamlessly.
+ * Infinite city cards: first card flush with title gutter; peeks on the right; loops seamlessly.
  */
 export function HomePopularCitiesRail({ cities, className = '' }: HomePopularCitiesRailProps) {
   const scrollerRef = useRef<HTMLDivElement>(null);
@@ -64,10 +64,9 @@ export function HomePopularCitiesRail({ cities, className = '' }: HomePopularCit
     if (!el || cities.length === 0) return;
     const setWidth = el.scrollWidth / LOOP_COPIES;
     if (setWidth < 1) return;
-    // Dual-edge peek: title-aligned start with a modest left overhang (pre-left-weight).
-    const peek = Math.min(measureStep(el) * 0.35, 72);
+    // Flush under H2 gutter (via .home-bleed-rail); peek only on the right / after scroll.
     loopingRef.current = true;
-    el.scrollLeft = setWidth - peek;
+    el.scrollLeft = setWidth;
     loopingRef.current = false;
     setReady(true);
   }, [cities.length]);
@@ -113,24 +112,27 @@ export function HomePopularCitiesRail({ cities, className = '' }: HomePopularCit
 
   return (
     <div className={`relative min-w-0 ${className}`.trim()}>
-      <div
-        ref={scrollerRef}
-        className={`home-edge-cities-rail horizontal-snap-row touch-pan-x flex flex-nowrap gap-3 snap-x snap-mandatory sm:gap-3.5 ${HIDE_SCROLLBAR_CLASS} ${
-          ready ? 'opacity-100' : 'opacity-0'
-        } transition-opacity duration-200`}
-        aria-label="Популярные города"
-        role="region"
-        tabIndex={0}
-      >
-        {loopItems.map(({ city, key }) => (
-          <div
-            key={key}
-            className="w-[min(68vw,255px)] shrink-0 snap-start sm:w-[218px] lg:w-[229px]"
-            data-rail-item
-          >
-            <CityCard city={city} compact />
-          </div>
-        ))}
+      {/* Left padding = container-page gutter so card 1 aligns under H2; right bleeds. */}
+      <div className="home-bleed-rail">
+        <div
+          ref={scrollerRef}
+          className={`home-edge-cities-rail horizontal-snap-row touch-pan-x flex flex-nowrap gap-3 snap-x snap-mandatory pr-4 sm:gap-3.5 sm:pr-6 lg:pr-8 ${HIDE_SCROLLBAR_CLASS} ${
+            ready ? 'opacity-100' : 'opacity-0'
+          } transition-opacity duration-200`}
+          aria-label="Популярные города"
+          role="region"
+          tabIndex={0}
+        >
+          {loopItems.map(({ city, key }) => (
+            <div
+              key={key}
+              className="w-[min(68vw,255px)] shrink-0 snap-start sm:w-[218px] lg:w-[229px]"
+              data-rail-item
+            >
+              <CityCard city={city} compact />
+            </div>
+          ))}
+        </div>
       </div>
 
       {cities.length > 1 ? (
@@ -139,7 +141,7 @@ export function HomePopularCitiesRail({ cities, className = '' }: HomePopularCit
             type="button"
             aria-label="Прокрутить влево"
             onClick={() => scrollByDir(-1)}
-            className={`${arrowBase} left-3`}
+            className={`${arrowBase} left-[max(0.75rem,calc((100vw-80rem)/2+1rem))]`}
           >
             <ChevronLeft className="h-5 w-5" aria-hidden />
           </button>

@@ -111,7 +111,7 @@ async function HomePageBody() {
                 </Link>
               </div>
             </div>
-            {/* Infinite rail: left + right edge peek, cyclic loop. */}
+            {/* Infinite rail: title-aligned start, right edge peek, cyclic loop. */}
             <HomePopularCitiesRail cities={topCities} className="mt-6" />
           </section>
         ) : null}
