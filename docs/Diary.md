@@ -15,6 +15,22 @@
 
 ---
 
+## 2026-08-10 - City hub UX: search hero + scenarios merge + collections grid
+
+### Наблюдения
+- City hub (`/cities/[slug]`) читался как длинный search-report: postcard brief + weak CTAs, amber «Интересный факт», три фрагмента маршрутов/мест/конструктора, тонкие banner-strips подборок, blog cards с ценами и «Смотреть афишу».
+
+### Решения
+- Hero: убран brief и dual CTA; крупный city-aware search (`Подобрать` → `/events?city=&q=`); один тихий link на афишу; mobile jump chips Афиша/Маршруты/Площадки/Блог. Amber about-блок снят.
+- «Готовые сценарии дня»: magazine cover carousel (`CityDayPresetBlock` hub mode); click → load в day-route + scroll к `#day-constructor`; places rail скрыт при named presets. «Ближайшие события» не трогали.
+- Подборки: 3-4 col tile grid, без city badge на cover, meta под фото. Blog hub cards: cover + title + reading time only.
+- Commit+push; **без** web deploy.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-10 - `/my-day`: thumbs + suburb dead space + must-see dense
 
 ### Наблюдения

@@ -1,81 +1,79 @@
 'use client';
 
-import * as React from 'react';
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
 
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
-import { matchArticleSessions } from '@/lib/city-hub-articles';
 import type { BlogCardDto } from '@/lib/blog-utils';
-import { formatPriceFrom } from '@/lib/format';
-import { eventHref } from '@/lib/routes';
 import type { PublicSessionDto } from '@daibilet/contracts/public';
 
+function readTimeLabel(readMin: number): string {
+  const n = Math.max(1, Math.round(Number(readMin) || 1));
+  const mod10 = n % 10;
+  const mod100 = n % 100;
+  if (mod10 === 1 && mod100 !== 11) return `${n} минута чтения`;
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return `${n} минуты чтения`;
+  return `${n} минут чтения`;
+}
+
+/** City hub blog teaser: cover + title + reading time only (commerce stays inside the article). */
 export function CityHubArticleTeaser({
   article,
   editorial = false,
-  sessions = [],
   variant = 'default',
 }: {
   article: BlogCardDto;
   editorial?: boolean;
+  /** Kept for callers; hub cards no longer attach commerce sessions. */
   sessions?: PublicSessionDto[];
   variant?: 'large' | 'small' | 'default';
 }) {
-  const excerpt = String(article.excerpt || '').trim();
   const articleHref = `/blog/${article.slug}`;
   const isLarge = variant === 'large';
   const isSmall = variant === 'small';
-  const relatedSessions = React.useMemo(
-    () => matchArticleSessions(article, sessions, isSmall ? 2 : isLarge ? 4 : 3),
-    [article, sessions, isLarge, isSmall],
-  );
 
   return (
     <article
       className={
         editorial
-          ? `flex flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white ${
-              isLarge ? '' : 'h-full'
-            }`
-          : `flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm ${
-              isLarge ? '' : 'h-full'
-            }`
+          ? `flex h-full flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white`
+          : `flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm`
       }
     >
       <Link
         href={articleHref}
         aria-label={article.title}
-        className={`relative block shrink-0 overflow-hidden ${
-          isLarge ? 'aspect-[16/10] min-h-[11rem] lg:min-h-[16rem]' : 'aspect-[16/10]'
-        } ${editorial ? 'bg-zinc-100' : 'bg-slate-100'}`}
+        className="group flex h-full flex-col"
       >
-        <SafeImage
-          src={article.coverImageUrl}
-          alt=""
-          fill
-          sizes={isLarge ? IMAGE_SIZES.blogFeatured : IMAGE_SIZES.blogCard}
-          className="object-cover object-center transition duration-300 hover:scale-[1.02]"
-          fallback={
-            <div
-              className={`flex h-full w-full items-center justify-center text-sm ${
-                editorial ? 'bg-zinc-200 text-zinc-500' : 'bg-slate-200 text-slate-500'
-              }`}
-            >
-              Материал
-            </div>
-          }
-        />
-      </Link>
+        <span
+          className={`relative block shrink-0 overflow-hidden ${
+            isLarge ? 'aspect-[16/10] min-h-[11rem] lg:min-h-[16rem]' : 'aspect-[16/10]'
+          } ${editorial ? 'bg-zinc-100' : 'bg-slate-100'}`}
+        >
+          <SafeImage
+            src={article.coverImageUrl}
+            alt=""
+            fill
+            sizes={isLarge ? IMAGE_SIZES.blogFeatured : IMAGE_SIZES.blogCard}
+            className="object-cover object-center transition duration-300 group-hover:scale-[1.02]"
+            fallback={
+              <div
+                className={`flex h-full w-full items-center justify-center text-sm ${
+                  editorial ? 'bg-zinc-200 text-zinc-500' : 'bg-slate-200 text-slate-500'
+                }`}
+              >
+                Материал
+              </div>
+            }
+          />
+        </span>
 
-      <div
-        className={`flex min-w-0 flex-col ${
-          isLarge ? 'p-4 sm:p-5' : isSmall ? 'p-3 sm:p-3.5' : 'p-3.5 sm:p-4'
-        } ${isLarge ? '' : 'h-full flex-1'}`}
-      >
-        <div className="min-w-0">
+        <span
+          className={`flex min-w-0 flex-1 flex-col ${
+            isLarge ? 'p-4 sm:p-5' : isSmall ? 'p-3 sm:p-3.5' : 'p-3.5 sm:p-4'
+          }`}
+        >
           <h3
-            className={`font-semibold leading-snug ${
+            className={`font-semibold leading-snug transition group-hover:text-primary-700 ${
               isLarge
                 ? 'line-clamp-3 text-base sm:text-lg'
                 : isSmall
@@ -83,84 +81,17 @@ export function CityHubArticleTeaser({
                   : 'line-clamp-2 text-sm sm:text-base'
             } ${editorial ? 'text-zinc-950' : 'text-slate-950'}`}
           >
-            <Link href={articleHref} className="hover:text-primary-700">
-              {article.title}
-            </Link>
+            {article.title}
           </h3>
-
-          {excerpt ? (
-            <p
-              className={`mt-1.5 leading-relaxed ${
-                isLarge
-                  ? 'line-clamp-3 text-sm'
-                  : isSmall
-                    ? 'line-clamp-2 text-xs'
-                    : 'line-clamp-3 text-xs sm:text-sm'
-              } ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}
-            >
-              {excerpt}
-            </p>
-          ) : null}
-
-          {relatedSessions.length ? (
-            <div
-              className={`mt-3 grid gap-1.5 border-t pt-3 ${
-                editorial ? 'border-zinc-100' : 'border-slate-100'
-              }`}
-            >
-              {relatedSessions.map((session) => (
-                <Link
-                  key={session.id}
-                  href={eventHref(session)}
-                  className={`grid grid-cols-[1fr_auto] gap-2 rounded-md px-2.5 py-1.5 text-xs sm:text-sm ${
-                    editorial
-                      ? 'bg-zinc-50 hover:bg-zinc-100'
-                      : 'bg-slate-50 hover:bg-primary-50/70'
-                  }`}
-                >
-                  <span className="min-w-0">
-                    <span
-                      className={`block truncate font-semibold ${
-                        editorial ? 'text-zinc-900' : 'text-slate-900'
-                      }`}
-                    >
-                      {session.title}
-                    </span>
-                    <span
-                      className={`mt-0.5 block truncate text-[11px] ${
-                        editorial ? 'text-zinc-500' : 'text-slate-500'
-                      }`}
-                    >
-                      {[session.dateLabel, session.venue].filter(Boolean).join(' · ')}
-                    </span>
-                  </span>
-                  <span
-                    className={`self-center whitespace-nowrap text-[11px] font-semibold sm:text-xs ${
-                      editorial ? 'text-zinc-700' : 'text-primary-700'
-                    }`}
-                  >
-                    {formatPriceFrom(session.priceFrom)}
-                  </span>
-                </Link>
-              ))}
-            </div>
-          ) : null}
-        </div>
-
-        <div className={isLarge ? 'mt-4' : 'mt-auto pt-4'}>
-          <Link
-            href={articleHref}
-            className={
-              editorial
-                ? 'inline-flex min-h-9 items-center gap-1 rounded-full border border-zinc-300 px-3.5 text-sm font-medium text-zinc-800 hover:border-zinc-400'
-                : 'inline-flex min-h-9 items-center gap-1 rounded-lg border border-slate-200 px-3.5 text-sm font-semibold text-slate-700 hover:border-primary-300 hover:text-primary-700'
-            }
+          <p
+            className={`mt-2 text-xs font-medium ${
+              editorial ? 'text-zinc-500' : 'text-slate-500'
+            }`}
           >
-            Открыть материал
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
-      </div>
+            {readTimeLabel(article.readMin)}
+          </p>
+        </span>
+      </Link>
     </article>
   );
 }
@@ -168,10 +99,10 @@ export function CityHubArticleTeaser({
 export function CityHubArticlesGrid({
   articles,
   editorial = false,
-  sessions = [],
 }: {
   articles: BlogCardDto[];
   editorial?: boolean;
+  /** Kept for callers; unused after commerce strip. */
   sessions?: PublicSessionDto[];
 }) {
   if (!articles.length) return null;
@@ -180,13 +111,12 @@ export function CityHubArticlesGrid({
   if (items.length === 3) {
     const [lead, sideA, sideB] = items;
     return (
-      <div className="mt-4 grid grid-cols-1 items-start gap-4 lg:grid-cols-3 lg:grid-rows-2 lg:gap-5">
-        <div className="lg:col-span-2 lg:row-span-2 lg:self-start">
+      <div className="mt-4 grid grid-cols-1 items-stretch gap-4 lg:grid-cols-3 lg:grid-rows-2 lg:gap-5">
+        <div className="lg:col-span-2 lg:row-span-2">
           <CityHubArticleTeaser
             key={lead!.slug}
             article={lead!}
             editorial={editorial}
-            sessions={sessions}
             variant="large"
           />
         </div>
@@ -194,14 +124,12 @@ export function CityHubArticlesGrid({
           key={sideA!.slug}
           article={sideA!}
           editorial={editorial}
-          sessions={sessions}
           variant="small"
         />
         <CityHubArticleTeaser
           key={sideB!.slug}
           article={sideB!}
           editorial={editorial}
-          sessions={sessions}
           variant="small"
         />
       </div>
@@ -215,7 +143,6 @@ export function CityHubArticlesGrid({
           key={article.slug}
           article={article}
           editorial={editorial}
-          sessions={sessions}
           variant={items.length === 1 ? 'large' : 'default'}
         />
       ))}

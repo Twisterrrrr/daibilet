@@ -2,6 +2,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
+| UX.CITY-HUB-SEARCH-SCENARIOS | City hub: search hero; scenarios magazine merge; collections grid; editorial blog cards; mobile jump chips | Высокий | 🔄 ship; deploy по «выкатывай» |
 | UX.HOME-RHYTHM | Homepage P0-P2: clean hero+swipe chips; editors rail; merge now/popular; My Day constructor preview; cities/podborki rails | Высокий | ✅ `b48ea8cb` push; deploy по «выкатывай» |
 | UX.MYDAY-TRAVEL-PRODUCT | `/my-day`: magazine suburb, stops timeline, scenario snap cards, must-see carousel, mobile shelf tabs | Критический | ✅ `af70051d` Deploy `31342186797` BUILD_ID=`RWJuTMEW-R707-yh7VQwJ` |
 | UX.MYDAY-TRAVEL-FOLLOWUP | `/my-day` after af70051d: stop thumbs from editorial maps; suburb no empty cover band; must-see dense+desc (≠ hot picks) | Критический | ✅ `d8451dc5` push; deploy по «выкатывай» |

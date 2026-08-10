@@ -82,6 +82,16 @@ function presetCoverUrl(items: NamedRow['items']): string | null {
   return null;
 }
 
+function scrollToDayConstructor() {
+  if (typeof window === 'undefined') return;
+  const el = document.getElementById('day-constructor');
+  if (!el) return;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  window.setTimeout(() => {
+    el.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'nearest' });
+  }, 40);
+}
+
 export function CityDayPresetBlock({
   places,
   venues,
@@ -119,6 +129,9 @@ export function CityDayPresetBlock({
     return cityDayRoutePresetAvailable(source, venues, city);
   }, [places, venues, city]);
 
+  /** Hub magazine covers: large cards (not tiny chips). My-day / embedded keep compact chips. */
+  const hubMagazine = !inMyDay && !embedded;
+
   const apply = (id: string, items: ReturnType<typeof buildCityDayRoutePreset>) => {
     setBusyId(id);
     replaceDayRouteFromVenues(items, city.id || null);
@@ -129,19 +142,28 @@ export function CityDayPresetBlock({
     window.setTimeout(() => setBusyId(null), 400);
   };
 
+  const selectNamed = (index: number, row: NamedRow) => {
+    setActiveIndex(index);
+    // Load scenario into guest day-route bucket so constructor timeline matches the card.
+    replaceDayRouteFromVenues(row.items, city.id || null);
+    if (hubMagazine) scrollToDayConstructor();
+  };
+
   const namedLead = inMyDay
     ? 'Выберите готовый маршрут или откройте подробный гид.'
-    : 'Откройте подробный гид или соберите доступные точки в «Собери свой день».';
+    : 'Выберите сценарий - точки откроются ниже, маршрут сразу в конструкторе.';
   const fallbackLead = inMyDay
     ? `Собрать за минуту: ${mainPlacesPhrase(fallbackPreset.length)} в маршруте.`
     : `Собрать за минуту: ${mainPlacesPhrase(fallbackPreset.length)} в «Собери свой день».`;
-  const namedCta = (busy: boolean) => (busy ? 'Собираем…' : 'В маршрут');
+  const namedCta = (busy: boolean) => (busy ? 'Собираем…' : inMyDay ? 'В маршрут' : 'Открыть в Мой день');
 
   const shellClass = embedded
     ? ''
-    : `mt-5 rounded-2xl border p-4 sm:p-5 ${
-        editorial ? 'border-zinc-200 bg-white' : 'border-slate-200 bg-slate-50'
-      }`;
+    : hubMagazine
+      ? ''
+      : `mt-5 rounded-2xl border p-4 sm:p-5 ${
+          editorial ? 'border-zinc-200 bg-white' : 'border-slate-200 bg-slate-50'
+        }`;
 
   const borderClass = editorial ? 'border-zinc-200' : 'border-slate-200';
   const titleClass = editorial ? 'text-zinc-950' : 'text-slate-950';
@@ -161,25 +183,31 @@ export function CityDayPresetBlock({
       <div
         className={shellClass || undefined}
         data-day-presets={inMyDay ? 'my-day' : 'hub'}
-        data-day-presets-mode="snap-cards"
+        data-day-presets-mode={hubMagazine ? 'magazine' : 'snap-cards'}
         data-day-presets-pending="1"
         aria-busy="true"
         aria-label="Загружаем готовые сценарии"
       >
         {embedded ? null : (
           <>
-            <p className={`text-sm font-semibold ${titleClass}`}>Готовые сценарии</p>
+            <p className={`text-sm font-semibold ${titleClass}`}>
+              {hubMagazine ? 'Готовые сценарии дня' : 'Готовые сценарии'}
+            </p>
             <p className={`mt-1 text-sm leading-6 ${softClass}`}>Подбираем маршруты по каталогу города…</p>
           </>
         )}
         <div
-          className={`${embedded ? '' : 'mt-4 '}horizontal-snap-row flex snap-x snap-mandatory gap-2.5 overflow-x-auto pb-0.5`}
+          className={`${embedded || hubMagazine ? '' : 'mt-4 '}horizontal-snap-row flex snap-x snap-mandatory gap-3 overflow-x-auto pb-0.5`}
           data-day-preset-chips
         >
           {Array.from({ length: skeletonCount }, (_, index) => (
             <div
               key={`preset-skel-chip-${index}`}
-              className={`h-[7.5rem] w-[9.75rem] shrink-0 animate-pulse rounded-2xl ${skeletonTone}`}
+              className={
+                hubMagazine
+                  ? `h-[17.5rem] w-[13rem] shrink-0 animate-pulse rounded-2xl sm:h-[19rem] sm:w-[15rem] ${skeletonTone}`
+                  : `h-[7.5rem] w-[9.75rem] shrink-0 animate-pulse rounded-2xl ${skeletonTone}`
+              }
             />
           ))}
         </div>
@@ -227,7 +255,7 @@ export function CityDayPresetBlock({
                   <ArrowUpRight className="h-3 w-3 shrink-0 opacity-80" aria-hidden />
                 </Link>
               ) : null}
-              {available && !inMyDay ? (
+              {available ? (
                 <button
                   type="button"
                   disabled={busyId != null}
@@ -285,18 +313,6 @@ export function CityDayPresetBlock({
               })}
             </ol>
           ) : null}
-          {available && inMyDay ? (
-            <button
-              type="button"
-              disabled={busyId != null}
-              onClick={() => apply(preset.id, items)}
-              className={routeCtaClass}
-              data-day-preset-cta
-            >
-              <Route className="h-4 w-4 shrink-0" aria-hidden />
-              <span>{namedCta(busyId === preset.id)}</span>
-            </button>
-          ) : null}
         </div>
       </div>
     );
@@ -313,18 +329,21 @@ export function CityDayPresetBlock({
       <div
         className={shellClass || undefined}
         data-day-presets={inMyDay ? 'my-day' : 'hub'}
-        data-day-presets-mode="snap-cards"
+        data-day-presets-mode={hubMagazine ? 'magazine' : 'snap-cards'}
       >
-        {embedded ? null : (
+        {embedded ? null : hubMagazine ? null : (
           <>
             <p className={`text-sm font-semibold ${titleClass}`}>Готовые сценарии</p>
             <p className={`mt-1 text-sm leading-6 ${softClass}`}>{namedLead}</p>
           </>
         )}
+        {hubMagazine && !embedded ? (
+          <p className={`mb-4 max-w-2xl text-sm leading-6 ${softClass}`}>{namedLead}</p>
+        ) : null}
         <div
-          className={`${embedded ? '' : 'mt-4 '}horizontal-snap-row flex snap-x snap-mandatory gap-2.5 overflow-x-auto overscroll-x-contain pb-0.5`}
+          className={`${embedded || hubMagazine ? '' : 'mt-4 '}horizontal-snap-row flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain pb-1`}
           role="tablist"
-          aria-label="Готовые сценарии"
+          aria-label="Готовые сценарии дня"
           data-day-preset-chips
           data-day-preset-chips-scroll="1"
         >
@@ -341,19 +360,27 @@ export function CityDayPresetBlock({
                 aria-controls={active ? `day-preset-panel-${row.preset.id}` : undefined}
                 data-day-preset-chip={row.preset.id}
                 data-active={active ? '1' : '0'}
-                onClick={() => setActiveIndex((prev) => (prev === index ? null : index))}
-                className={`relative h-[7.75rem] w-[10rem] shrink-0 snap-start overflow-hidden rounded-2xl text-left transition sm:h-[8.25rem] sm:w-[11rem] ${
-                  active
-                    ? 'ring-2 ring-primary-600 ring-offset-2'
-                    : 'ring-1 ring-black/5 hover:ring-slate-300'
-                }`}
+                onClick={() => selectNamed(index, row)}
+                className={
+                  hubMagazine
+                    ? `relative h-[17.5rem] w-[13rem] shrink-0 snap-start overflow-hidden rounded-2xl text-left transition sm:h-[19rem] sm:w-[15rem] ${
+                        active
+                          ? 'ring-2 ring-primary-600 ring-offset-2'
+                          : 'ring-1 ring-black/10 hover:ring-slate-300'
+                      }`
+                    : `relative h-[7.75rem] w-[10rem] shrink-0 snap-start overflow-hidden rounded-2xl text-left transition sm:h-[8.25rem] sm:w-[11rem] ${
+                        active
+                          ? 'ring-2 ring-primary-600 ring-offset-2'
+                          : 'ring-1 ring-black/5 hover:ring-slate-300'
+                      }`
+                }
               >
                 {cover ? (
                   <SafeImage
                     src={cover}
                     alt=""
                     fill
-                    sizes="11rem"
+                    sizes={hubMagazine ? '15rem' : '11rem'}
                     className="object-cover"
                   />
                 ) : (
@@ -362,18 +389,22 @@ export function CityDayPresetBlock({
                     aria-hidden
                   />
                 )}
-                <span className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/35 to-slate-950/5" />
-                <span className="absolute inset-x-0 bottom-0 p-2.5">
-                  <span className="line-clamp-2 text-sm font-bold leading-snug text-white drop-shadow">
+                <span className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/35 to-slate-950/5" />
+                <span className="absolute inset-x-0 bottom-0 p-3 sm:p-3.5">
+                  <span
+                    className={`line-clamp-3 font-bold leading-snug text-white drop-shadow ${
+                      hubMagazine ? 'text-base sm:text-lg' : 'text-sm'
+                    }`}
+                  >
                     {row.preset.title}
                   </span>
-                  <span className="mt-0.5 block text-[10px] font-medium text-white/75">
+                  <span className="mt-1 block text-[11px] font-medium text-white/75">
                     {row.items.length} точек
                   </span>
                 </span>
                 {!cover ? (
                   <MapPin
-                    className="absolute right-2 top-2 h-4 w-4 text-white/50"
+                    className="absolute right-2.5 top-2.5 h-4 w-4 text-white/50"
                     aria-hidden
                   />
                 ) : null}
@@ -381,12 +412,14 @@ export function CityDayPresetBlock({
             );
           })}
         </div>
-        {selected ? renderScenarioCard(selected, { panel: true }) : null}
-        {selectedIndex == null ? (
-          <p className={`mt-3 text-sm ${mutedClass}`} data-day-preset-hint>
-            Нажмите на сценарий, чтобы открыть точки и собрать день.
-          </p>
-        ) : null}
+        <div id="day-constructor" className="scroll-mt-[calc(var(--site-header-height)+3.25rem)]">
+          {selected ? renderScenarioCard(selected, { panel: true }) : null}
+          {selectedIndex == null ? (
+            <p className={`mt-3 text-sm ${mutedClass}`} data-day-preset-hint>
+              Нажмите на сценарий, чтобы открыть точки и собрать день.
+            </p>
+          ) : null}
+        </div>
       </div>
     );
   }
