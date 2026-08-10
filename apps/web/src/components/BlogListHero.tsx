@@ -4,15 +4,14 @@ import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Search } from 'lucide-react';
 
-import { HeroLayout } from '@/components/HeroLayout';
+import { PageBreadcrumbBar, type BreadcrumbItem } from '@/components/PageBreadcrumbs';
 import {
   BLOG_TOPIC_ORDER,
   blogTopicLabel,
   parseBlogTopicParam,
   type BlogTopicId,
 } from '@/lib/blog-topics';
-import { cityToGenitive, cityToPrepositional } from '@/lib/city-declension';
-import type { BreadcrumbItem } from '@/components/PageBreadcrumbs';
+import { cityToPrepositional } from '@/lib/city-declension';
 
 /** Короткие ярлыки для hero-чипов (владелец: Детям). */
 const HERO_TOPIC_LABELS: Partial<Record<BlogTopicId, string>> = {
@@ -100,19 +99,15 @@ export function BlogListHero({ breadcrumbs, cityName = null }: BlogListHeroProps
     ? `Статьи, обзоры и советы по событиям в ${cityToPrepositional(cityName)}`
     : 'Статьи, обзоры и советы по событиям';
 
-  const description = cityName
-    ? `Подборки и статьи для ${cityToGenitive(cityName)}: куда сходить, как выбрать билет и что посмотреть в городе.`
-    : 'Как выбирать события, где сидеть, куда идти с детьми и что послушать в этом сезоне.';
-
   const topicChips = HERO_TOPIC_IDS.filter((id) => BLOG_TOPIC_ORDER.includes(id));
 
-  return (
-    <HeroLayout variant="minimal" breadcrumbs={breadcrumbs} title={title} description={description}>
-      <form className="relative mt-5 max-w-xl" onSubmit={submitSearch} role="search">
+  const searchAndChips = (
+    <div className="w-full min-w-0 lg:max-w-sm xl:max-w-md">
+      <form className="relative" onSubmit={submitSearch} role="search">
         <label className="relative block">
           <span className="sr-only">Поиск по статьям</span>
           <Search
-            className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
             aria-hidden
           />
           <input
@@ -120,13 +115,17 @@ export function BlogListHero({ breadcrumbs, cityName = null }: BlogListHeroProps
             value={searchDraft}
             onChange={(event) => setSearchDraft(event.target.value)}
             placeholder="Найти статью: стендап, маршрут, концерт…"
-            className="h-11 w-full rounded-2xl border border-slate-200 bg-white py-3 pl-10 pr-4 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-primary-400 focus:ring-2 focus:ring-primary-100"
+            className="h-10 w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-primary-400 focus:ring-2 focus:ring-primary-100"
             aria-label="Поиск по статьям блога"
           />
         </label>
       </form>
 
-      <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="Быстрые темы">
+      <div
+        className="mt-2.5 flex flex-nowrap gap-1.5 overflow-x-auto pb-0.5 [scrollbar-width:none] lg:flex-wrap lg:overflow-visible lg:pb-0 [&::-webkit-scrollbar]:hidden"
+        role="group"
+        aria-label="Быстрые темы"
+      >
         {topicChips.map((id) => {
           const active = topic === id;
           return (
@@ -135,7 +134,7 @@ export function BlogListHero({ breadcrumbs, cityName = null }: BlogListHeroProps
               type="button"
               aria-pressed={active}
               onClick={() => setTopic(active ? 'all' : id)}
-              className={`rounded-[20px] px-3.5 py-1.5 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${
+              className={`shrink-0 rounded-[18px] px-3 py-1 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${
                 active
                   ? 'bg-primary text-white hover:bg-primary/90'
                   : 'bg-[#F5F5F7] text-[#6E6E73] hover:bg-[#EBEBED] hover:text-graphite'
@@ -146,6 +145,23 @@ export function BlogListHero({ breadcrumbs, cityName = null }: BlogListHeroProps
           );
         })}
       </div>
-    </HeroLayout>
+    </div>
+  );
+
+  return (
+    <>
+      <PageBreadcrumbBar items={breadcrumbs} />
+      <section className="border-b border-slate-200 bg-slate-50">
+        {/* Explicit px (same as .container-page) so gutter never depends only on @apply. */}
+        <div className="mx-auto w-full max-w-7xl px-4 py-5 sm:px-6 sm:py-6 lg:px-8">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between lg:gap-8">
+            <h1 className="min-w-0 flex-1 font-display text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+              {title}
+            </h1>
+            {searchAndChips}
+          </div>
+        </div>
+      </section>
+    </>
   );
 }

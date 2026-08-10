@@ -66,7 +66,7 @@ function SoftSelect({
   return (
     <label className="relative inline-flex min-w-0 items-center">
       <select
-        className="appearance-none bg-transparent py-1.5 pr-6 text-sm font-medium text-slate-700 outline-none transition hover:text-slate-900 focus-visible:text-slate-900"
+        className="appearance-none bg-transparent py-1.5 pl-0.5 pr-6 text-sm font-medium text-slate-700 outline-none transition hover:text-slate-900 focus-visible:text-slate-900"
         value={value}
         onChange={(event) => onChange(event.target.value)}
         aria-label={ariaLabel}

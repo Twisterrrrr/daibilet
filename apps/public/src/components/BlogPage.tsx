@@ -115,7 +115,6 @@ export function BlogPage() {
           </p>
         }
         title="Статьи, обзоры и советы"
-        description="Как выбирать события, где сидеть, куда идти с детьми и что послушать в этом сезоне."
       />
 
       <main className="container-page py-10 sm:py-12">

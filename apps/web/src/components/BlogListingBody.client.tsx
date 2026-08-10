@@ -66,12 +66,17 @@ export function BlogListingBody({
     <>
       <Suspense
         fallback={
-          <div className="border-b border-slate-200/70 bg-gradient-to-br from-sky-50 via-white to-primary-50/40">
-            <div className="container-page space-y-4 py-8 sm:py-10">
-              <div className="h-4 w-32 animate-pulse rounded bg-sky-100/80" />
-              <div className="h-10 w-full max-w-2xl animate-pulse rounded-lg bg-gradient-to-r from-sky-100/90 to-primary-100/70" />
-              <div className="h-5 w-full max-w-xl animate-pulse rounded bg-sky-100/70" />
-              <div className="h-11 w-full max-w-xl animate-pulse rounded-2xl bg-primary-100/60" />
+          <div className="border-b border-slate-200 bg-slate-50">
+            <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-5 sm:px-6 sm:py-6 lg:flex-row lg:items-end lg:justify-between lg:gap-8 lg:px-8">
+              <div className="h-10 w-full max-w-xl animate-pulse rounded-lg bg-slate-200/80" />
+              <div className="w-full space-y-2.5 lg:max-w-sm">
+                <div className="h-10 w-full animate-pulse rounded-xl bg-slate-200/70" />
+                <div className="flex gap-1.5">
+                  <div className="h-7 w-16 animate-pulse rounded-full bg-slate-200/60" />
+                  <div className="h-7 w-20 animate-pulse rounded-full bg-slate-200/60" />
+                  <div className="h-7 w-14 animate-pulse rounded-full bg-slate-200/60" />
+                </div>
+              </div>
             </div>
           </div>
         }
@@ -79,7 +84,8 @@ export function BlogListingBody({
         <BlogListHero breadcrumbs={breadcrumbs} />
       </Suspense>
 
-      <div className="container-page pt-6 pb-10 sm:pt-8 sm:pb-14">
+      {/* Explicit max-w + px gutter (not only .container-page) so filters/Свежее never hug viewport. */}
+      <div className="mx-auto w-full max-w-7xl px-4 pt-6 pb-10 sm:px-6 sm:pt-8 sm:pb-14 lg:px-8">
         <Suspense
           fallback={
             <div className="space-y-4">
