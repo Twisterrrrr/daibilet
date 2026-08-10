@@ -5,6 +5,7 @@ import {
   Car,
   CheckCircle2,
   ChevronDown,
+  Clock,
   HelpCircle,
   MapPin,
   Navigation as NavigationIcon,
@@ -25,6 +26,14 @@ import { formatStreetAddress } from '@/lib/address';
 import { dedupeVenueLinkedEvents } from '@/lib/day-route-score';
 import type { FinanceAdmissionProduct } from '@/lib/finance-projection';
 import { build2gisRouteUrl } from '@/lib/maps';
+import {
+  resolveVenueEditorialContent,
+  venueFeatureLabels,
+} from '@/lib/venue-editorial-content';
+import {
+  OPEN_DATE_HOURS_HOLIDAY_NOTE,
+  resolveVenueOpeningHours,
+} from '@/lib/venue-opening-hours';
 import { institutionTypeEmoji, normalizeVenueKind, venueTypeLabel } from '@/lib/venue-meta';
 import { eventHref, venueHref } from '@/lib/routes';
 import type {
@@ -34,14 +43,15 @@ import type {
   PublicVenuePageDto,
 } from '@daibilet/contracts/public';
 
-const FAQ_ITEMS = [
+const GENERIC_FAQ_ITEMS = [
   {
     question: 'Есть ли билеты с открытой датой?',
     answer: 'У многих музеев и выставок бывают билеты без фиксированного сеанса. Это будет указано в карточке события.',
   },
   {
     question: 'Где проходит оплата?',
-    answer: 'Покупка — в виджете билетной системы или на сайте организатора. Дайбилет помогает выбрать событие и хранит статус заказа.',
+    answer:
+      'Покупка - в виджете билетной системы или на сайте организатора. Дайбилет помогает выбрать событие и хранит статус заказа.',
   },
   {
     question: 'Актуальны ли часы работы?',
@@ -82,6 +92,19 @@ export function InstitutionVenueLayout({
     `${venue.name} - ${typeLabel.toLowerCase()} в ${venue.city}. Афиша, билеты и ближайшие сеансы.`;
   const categories = Object.entries(venue.categories || {}).sort((a, b) => b[1] - a[1]);
   const nextSessions = sessions.slice(0, 4);
+  const editorial = React.useMemo(
+    () => resolveVenueEditorialContent(venue.slug),
+    [venue.slug],
+  );
+  const featureLabels = React.useMemo(
+    () => venueFeatureLabels(editorial?.features),
+    [editorial],
+  );
+  const openingHours = React.useMemo(
+    () => resolveVenueOpeningHours(venue.slug),
+    [venue.slug],
+  );
+  const faqItems = editorial?.faq?.length ? editorial.faq : GENERIC_FAQ_ITEMS;
   const uniqueStopEvents = React.useMemo(() => dedupeVenueLinkedEvents(stopEvents), [stopEvents]);
   const uniqueNearbyEvents = React.useMemo(
     () => dedupeVenueLinkedEvents(nearbyEvents),
@@ -96,6 +119,7 @@ export function InstitutionVenueLayout({
   // In that case it must not imitate a ticket page.
   const hasTicketSales = sessions.length > 0 || admissionProducts.length > 0;
   const hasAfisha = sessions.length > 0;
+  const showFaq = hasTicketSales || Boolean(editorial?.faq?.length);
 
   const heroGradient = isTheatre
     ? 'bg-gradient-to-r from-rose-900/95 via-slate-900/80 to-slate-900/50'
@@ -170,6 +194,19 @@ export function InstitutionVenueLayout({
               </div>
 
               <p className="mt-4 max-w-xl text-white/90">{intro}</p>
+
+              {featureLabels.length > 0 ? (
+                <div className="mt-5 flex flex-wrap gap-2" data-venue-feature-chips>
+                  {featureLabels.map((label) => (
+                    <span
+                      key={label}
+                      className="rounded-full border border-white/25 bg-white/10 px-3 py-1 text-xs font-medium text-white/95 backdrop-blur"
+                    >
+                      {label}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
             </div>
 
             <div className="flex flex-col items-start gap-2 md:items-end">
@@ -229,7 +266,7 @@ export function InstitutionVenueLayout({
               : []),
             ['#about', 'О месте'] as const,
             ['#practical', 'Адрес и карта'] as const,
-            ...(hasTicketSales ? [['#faq', 'Вопросы'] as const] : []),
+            ...(showFaq ? [['#faq', 'Вопросы'] as const] : []),
           ].map(([href, label]) => (
             <a
               key={href}
@@ -313,7 +350,19 @@ export function InstitutionVenueLayout({
 
           <section id="about" className="rounded-2xl border border-slate-200 bg-white p-6">
             <h2 className="text-xl font-bold text-slate-900">О месте</h2>
-            {categories.length > 0 ? (
+            {editorial?.highlights?.length ? (
+              <ul className="mt-4 grid gap-2 sm:grid-cols-2" data-venue-highlights>
+                {editorial.highlights.map((item) => (
+                  <li
+                    key={item}
+                    className="flex items-start gap-2 rounded-xl border border-slate-100 bg-slate-50 p-3"
+                  >
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
+                    <span className="text-sm text-slate-800">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : categories.length > 0 ? (
               <div className="mt-4 grid gap-2 sm:grid-cols-2">
                 {categories.slice(0, 6).map(([name]) => (
                   <div key={name} className="flex items-start gap-2 rounded-xl border border-slate-100 bg-slate-50 p-3">
@@ -328,11 +377,11 @@ export function InstitutionVenueLayout({
             ) : null}
           </section>
 
-          {hasTicketSales ? (
+          {showFaq ? (
             <section id="faq">
               <h2 className="text-xl font-bold text-slate-900">Частые вопросы</h2>
               <div className="mt-4 space-y-2">
-                {FAQ_ITEMS.map((item) => (
+                {faqItems.map((item) => (
                   <details key={item.question} className="group rounded-xl border border-slate-200 bg-white">
                     <summary className="flex cursor-pointer list-none items-center justify-between p-4">
                       <span className="flex items-center gap-2 font-medium text-slate-900">
@@ -422,9 +471,24 @@ export function InstitutionVenueLayout({
               </div>
             ) : null}
 
-            <div className="rounded-2xl border border-sky-100 bg-sky-50 p-5 text-sm text-slate-700">
-              Режим работы учреждения и правила посещения уточняйте на официальном сайте площадки, особенно в праздники.
-            </div>
+            {openingHours?.lines?.length ? (
+              <div className="rounded-2xl border border-slate-200 bg-white p-5" data-venue-opening-hours>
+                <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
+                  <Clock className="h-4 w-4 text-primary-600" />
+                  Часы работы
+                </div>
+                <ul className="mt-3 space-y-1 text-sm text-slate-700">
+                  {openingHours.lines.map((line) => (
+                    <li key={line}>{line}</li>
+                  ))}
+                </ul>
+                <p className="mt-3 text-xs leading-5 text-slate-500">{OPEN_DATE_HOURS_HOLIDAY_NOTE}</p>
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-sky-100 bg-sky-50 p-5 text-sm text-slate-700">
+                Режим работы учреждения и правила посещения уточняйте на официальном сайте площадки, особенно в праздники.
+              </div>
+            )}
           </div>
         </aside>
       </div>

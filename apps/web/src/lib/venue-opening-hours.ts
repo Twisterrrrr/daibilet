@@ -114,10 +114,12 @@ const EDITORIAL_OPENING_HOURS_BY_SLUG: Record<string, string[]> = {
   "erarta": [
     "Ежедневно: 10:00-22:00",
   ],
+  // Official Main Museum Complex (hermitagemuseum.org visitus): Mon closed;
+  // Wed/Thu/Sun 11-18; Tue/Fri/Sat 11-20. Session-based entry - holiday caveat in UI.
   "ermitazh": [
-    "Ср, Пт, Вс: 11:00-18:00",
-    "Чт, Сб: 11:00-21:00",
-    "Вт - выходной",
+    "Ср, Чт, Вс: 11:00-18:00",
+    "Вт, Пт, Сб: 11:00-20:00",
+    "Пн - выходной",
   ],
   "galereya-ili-glazunova-6225a53df0a5daf0e7ce8b21": [
     "Вт, Ср, Пт, Сб, Вс: 11:00-19:00",
@@ -443,9 +445,9 @@ const EDITORIAL_OPENING_HOURS_BY_SLUG: Record<string, string[]> = {
     "Ср - выходной",
   ],
   "saint-petersburg-glavnyy-shtab-ermitazh": [
-    "Ср, Пт, Вс: 11:00-18:00",
-    "Чт, Сб: 11:00-21:00",
-    "Вт - выходной",
+    "Ср, Чт, Вс: 11:00-18:00",
+    "Вт, Пт, Сб: 11:00-20:00",
+    "Пн - выходной",
   ],
   "saint-petersburg-kunstkamera": [
     "Вт-Вс: 10:00-18:00",

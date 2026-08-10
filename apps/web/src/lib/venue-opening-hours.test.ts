@@ -14,6 +14,8 @@ test('resolveVenueOpeningHours: known seed museums', () => {
   const hermitage = resolveVenueOpeningHours('ermitazh');
   assert.ok(hermitage);
   assert.ok(hermitage!.lines.some((line) => /11:00-18:00/.test(line)));
+  assert.ok(hermitage!.lines.some((line) => /11:00-20:00/.test(line)));
+  assert.ok(hermitage!.lines.some((line) => /Пн - выходной/.test(line)));
   assert.ok(resolveVenueOpeningHours('moscow-tret-yakovskaya-galereya'));
   assert.ok(resolveVenueOpeningHours('erarta')!.lines[0]!.includes('10:00-22:00'));
   assert.ok(resolveVenueOpeningHours('gmii-im-pushkina-672f34b6ebf4808956f1474a'));

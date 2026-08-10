@@ -1,3 +1,20 @@
+## 2026-08-10 - Hermitage PDP: SPBBOATS content layer (editorial)
+
+### Наблюдения
+- Research pack `venue-seeds-hermitage-garage`: у SPBBOATS per-venue highlights/FAQ/features; у Daibilet FAQ был generic, chips не было, часы только в ticket overlay.
+- В БД нет колонок highlights/faq/features/openingHours - prod seed write не нужен для показа на live.
+
+### Решения
+- `venue-editorial-content.ts`: slug overlay для `ermitazh` (highlights, feature chips, FAQ) - hyphen-only, без CMS template.
+- `InstitutionVenueLayout`: chips в hero, highlights в «О месте», per-venue FAQ, sidebar «Часы работы» через `resolveVenueOpeningHours`.
+- Часы `ermitazh` / Главный штаб выровнены с официальным графиком (Пн выходной; Ср/Чт/Вс 11-18; Вт/Пт/Сб 11-20).
+- Garage skip. Commit+push + Deploy MSK web.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-10 - /events: calendar corner + cruise covers + live rail width
 
 ### Наблюдения
