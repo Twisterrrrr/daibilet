@@ -14,14 +14,14 @@
 
 ---
 
-
+## 2026-08-10 - City hub: restore Описание / Факты / Зачем ехать before scenarios
 
 ### Наблюдения
 - После `b3b52684` на city hub первый body-блок после tabs стал «Готовые сценарии»; `CityWhyGoSection` (brief + hookFact) сняли, places rail прятали при named presets, H2 «Зачем ехать» заменили на сценарии.
 
 ### Решения
 - Общий шаблон `CityPageView`: после tabs снова `#about` - Описание (`brief`) и Факты (`hookFact`) из `cityInfo`.
-- `#sights`: H2 «Зачем ехать {город}» + must-see places, затем H3 «Готовые сценарии» + magazine presets. Commit+push; **без** web deploy.
+- `#sights`: H2 «Зачем ехать {город}» + must-see places, затем H3 «Готовые сценарии» + magazine presets. Code in `b113a927`; docs `ba4ff652`+; **без** web deploy.
 
 ### Проблемы
 - Нет.
