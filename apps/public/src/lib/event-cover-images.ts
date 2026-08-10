@@ -94,7 +94,7 @@ export const EVENT_PACK_IMAGES: Record<string, string> = {
   evt_6a26b332a49aa45bd55b1266: '/images/events/generated/evt-cover-kazan-kaleidoscope-1.jpg',
   evt_6a26b88263540bf6b05b1252: '/images/events/generated/evt-cover-kazan-kaleidoscope-2.jpg',
 
-  // --- Moscow center cruises: supplier flyers with baked-in «РЕЧНАЯ ПРОГУЛКА…» text ---
+  // --- Moscow river cruises: unique clean covers (no supplier flyer text / no shared twins) ---
   evt_tep_186: '/images/events/generated/evt-cover-leto-moskva-kievsky.jpg',
   'rechnaya-progulka-po-centru-moskvy-ot-prichala-kievskii-do-parka-zaryade-186':
     '/images/events/generated/evt-cover-leto-moskva-kievsky.jpg',
@@ -104,9 +104,43 @@ export const EVENT_PACK_IMAGES: Record<string, string> = {
   evt_tep_1222: '/images/events/generated/evt-cover-moscow-center-loop.jpg',
   'rechnaya-progulka-po-centru-moskvy-ot-parka-zaryade-krugovaya-1222':
     '/images/events/generated/evt-cover-moscow-center-loop.jpg',
-  evt_tep_1431: '/images/events/generated/evt-cover-leto-moskva-kievsky.jpg',
+  evt_tep_1431: '/images/events/generated/evt-cover-kievsky-gorky-1431.jpg',
   'rechnoi-kruiz-ot-prichala-kievskii-do-parka-gorkogo-1431':
-    '/images/events/generated/evt-cover-leto-moskva-kievsky.jpg',
+    '/images/events/generated/evt-cover-kievsky-gorky-1431.jpg',
+  evt_tep_601: '/images/events/generated/evt-cover-vorobyovy-zaryade-601.jpg',
+  'rechnaya-progulka-ot-prichala-vorobevy-gory-do-parka-zaryade-601':
+    '/images/events/generated/evt-cover-vorobyovy-zaryade-601.jpg',
+  evt_tep_1249: '/images/events/generated/evt-cover-flagman-all-moscow-1249.jpg',
+  'vsya-moskva-na-flagmane-ot-prichala-kievskii-za-2-chasa-45-min-1249':
+    '/images/events/generated/evt-cover-flagman-all-moscow-1249.jpg',
+  evt_tep_1264: '/images/events/generated/evt-cover-flagman-route-1264.jpg',
+  'flagmanskii-marshrut-ot-kievskogo-do-kitai-goroda-za-1-chas-20-minut-1264':
+    '/images/events/generated/evt-cover-flagman-route-1264.jpg',
+  evt_tep_1250: '/images/events/generated/evt-cover-flagman-kitay-1250.jpg',
+  'vsya-moskva-na-flagmane-ot-prichala-kitai-gorod-ustinskii-most-za-2-chasa-45-min-1250':
+    '/images/events/generated/evt-cover-flagman-kitay-1250.jpg',
+  evt_tep_1216: '/images/events/generated/evt-cover-flagman-reverse-1216.jpg',
+  'flagmanskii-marshrut-ot-kitai-goroda-do-kievskogo-vokzala-za-1-chas-20-minut-1216':
+    '/images/events/generated/evt-cover-flagman-reverse-1216.jpg',
+  evt_tep_1286: '/images/events/generated/evt-cover-flagman-night-1286.jpg',
+  'super-puteshestvie-na-flagmane-kitai-gorod-neskuchnyi-sad-30-min-1286':
+    '/images/events/generated/evt-cover-flagman-night-1286.jpg',
+  evt_tep_1292: '/images/events/generated/evt-cover-flagman-short-1292.jpg',
+  'super-puteshestvie-na-flagmane-neskuchnyi-sad-kitai-gorod-30-min-1292':
+    '/images/events/generated/evt-cover-flagman-short-1292.jpg',
+  evt_tep_1299: '/images/events/generated/evt-cover-park-gorky-zaryade-route.jpg',
+  'super-puteshestvie-na-retro-locmane-30-minut-ot-parka-gorkogo-do-zaryadya-1299':
+    '/images/events/generated/evt-cover-park-gorky-zaryade-route.jpg',
+  evt_tep_1297: '/images/events/generated/evt-cover-gorky-zaryade-boat.jpg',
+  'super-puteshestvie-na-retro-locmane-30-minut-ot-parka-zaryade-do-parka-gorkogo-1297':
+    '/images/events/generated/evt-cover-gorky-zaryade-boat.jpg',
+  evt_tep_174: '/images/events/generated/evt-cover-zolotoi-marshrut-174.jpg',
+  evt_tep_498: '/images/events/generated/evt-cover-severnyi-express-498.jpg',
+  evt_tep_1107: '/images/events/generated/evt-cover-snegiri-zaryade-1107.jpg',
+  'kremlevskaya-obzornaya-progulka-po-centru-moskvy-ot-parka-zaryade-1107':
+    '/images/events/generated/evt-cover-snegiri-zaryade-1107.jpg',
+  evt_tep_1373: '/images/events/generated/evt-cover-central-dusk-1373.jpg',
+  evt_tep_1475: '/images/events/generated/evt-cover-gorky-city-view-1475.jpg',
 
   // --- Exact content dupes: leave one sibling on original photo, rest get distinct covers ---
   evt_tep_1112: '/images/events/generated/evt-cover-river-express-a.jpg',
@@ -115,7 +149,7 @@ export const EVENT_PACK_IMAGES: Record<string, string> = {
   evt_tep_1294: '/images/events/generated/evt-cover-retro-locman-a.jpg',
   evt_tep_1217: '/images/events/generated/evt-cover-retro-locman-b.jpg',
   evt_tep_827: '/images/events/generated/evt-cover-kitay-gorod-cruise.jpg',
-  evt_tep_256: '/images/events/generated/evt-cover-moscow-center-loop.jpg',
+  evt_tep_256: '/images/events/generated/evt-cover-obzor-kreml-256.jpg',
   evt_tep_1383: '/images/events/generated/evt-cover-zaryade-m88.jpg',
   evt_6a42770b65a592a5d04b0ea9: '/images/events/generated/evt-cover-spb-evening-canal.jpg',
   'tc-6a42770b65a592a5d04b0ea9-vechernyaya-simfoniya-peterburga-na-avtobuse':
