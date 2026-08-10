@@ -64,9 +64,8 @@ export function HomePopularCitiesRail({ cities, className = '' }: HomePopularCit
     if (!el || cities.length === 0) return;
     const setWidth = el.scrollWidth / LOOP_COPIES;
     if (setWidth < 1) return;
-    // Left-weighted dual-edge peek: ~25% more left overhang than the prior 0.35/72 pass
-    // so the rail reads less centered while the infinite loop stays seamless.
-    const peek = Math.min(measureStep(el) * 0.44, 90);
+    // Dual-edge peek: title-aligned start with a modest left overhang (pre-left-weight).
+    const peek = Math.min(measureStep(el) * 0.35, 72);
     loopingRef.current = true;
     el.scrollLeft = setWidth - peek;
     loopingRef.current = false;
