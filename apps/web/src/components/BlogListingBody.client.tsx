@@ -67,14 +67,15 @@ export function BlogListingBody({
       <Suspense
         fallback={
           <div className="border-b border-slate-200 bg-slate-50">
-            <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-5 sm:px-6 sm:py-6 lg:flex-row lg:items-end lg:justify-between lg:gap-8 lg:px-8">
-              <div className="h-10 w-full max-w-xl animate-pulse rounded-lg bg-slate-200/80" />
-              <div className="w-full space-y-2.5 lg:max-w-sm">
-                <div className="h-10 w-full animate-pulse rounded-xl bg-slate-200/70" />
-                <div className="flex gap-1.5">
-                  <div className="h-7 w-16 animate-pulse rounded-full bg-slate-200/60" />
-                  <div className="h-7 w-20 animate-pulse rounded-full bg-slate-200/60" />
-                  <div className="h-7 w-14 animate-pulse rounded-full bg-slate-200/60" />
+            <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-5 sm:px-6 sm:py-6 lg:px-8">
+              <div className="h-10 w-full max-w-3xl animate-pulse rounded-lg bg-slate-200/80" />
+              <div className="flex w-full flex-col gap-2.5 md:flex-row md:items-center md:gap-3">
+                <div className="h-10 w-full animate-pulse rounded-xl bg-slate-200/70 md:w-72 md:max-w-[18rem]" />
+                <div className="flex min-w-0 flex-1 gap-1.5 overflow-hidden">
+                  <div className="h-7 w-16 shrink-0 animate-pulse rounded-full bg-slate-200/60" />
+                  <div className="h-7 w-20 shrink-0 animate-pulse rounded-full bg-slate-200/60" />
+                  <div className="h-7 w-14 shrink-0 animate-pulse rounded-full bg-slate-200/60" />
+                  <div className="h-7 w-16 shrink-0 animate-pulse rounded-full bg-slate-200/60" />
                 </div>
               </div>
             </div>
