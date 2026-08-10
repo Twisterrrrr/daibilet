@@ -43,6 +43,7 @@ export default async function CitiesIndexPage() {
     <SiteLayout>
       <HeroLayout
         variant="minimal"
+        dense
         breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Города' }]}
         title="Города России"
       >
