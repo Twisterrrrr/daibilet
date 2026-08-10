@@ -127,7 +127,7 @@ async function HomePageBody() {
       {cities.some((c) => c.events > 0) ? (
         <section className="home-trips-map-band section-y" data-home-band="full-bleed">
           <div className="container-page">
-            <div className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-primary-100/80 bg-white/95 p-5 shadow-card backdrop-blur-[2px] sm:flex-row sm:items-center sm:p-6">
+            <div className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-primary-100/80 bg-white/95 p-5 shadow-card backdrop-blur-[2px] sm:flex-row sm:items-center sm:py-6 sm:pl-6 sm:pr-3">
               <div className="flex items-start gap-3">
                 <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-500 to-sky-500 text-white shadow-sm">
                   <Dices className="h-5 w-5" aria-hidden />
