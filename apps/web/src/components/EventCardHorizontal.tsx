@@ -206,7 +206,7 @@ export function EventCardHorizontal({ session }: { session: PublicCatalogListIte
           )}
           <Link
             href={href}
-            className="relative z-[2] inline-flex shrink-0 items-center justify-center gap-0.5 whitespace-nowrap rounded-lg bg-primary-600 px-2 py-1.5 text-ui-xs font-semibold text-white transition hover:bg-primary-700 sm:text-ui-sm"
+            className="relative z-[2] inline-flex shrink-0 items-center justify-center gap-0.5 whitespace-nowrap rounded-lg bg-primary-600 p-[5px] text-ui-xs font-semibold text-white transition hover:bg-primary-700 sm:text-ui-sm"
           >
             <Ticket className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
             Купить билет
