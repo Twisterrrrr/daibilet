@@ -12,7 +12,7 @@ export const IMAGE_SIZES = {
   eventCardHorizontal: '(max-width: 640px) 100vw, 20rem',
   /** Editorial city hub poster 4:5 */
   affichePoster: '(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw',
-  cityCard: '(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw',
+  cityCard: '(max-width: 640px) 68vw, (max-width: 1024px) 218px, 229px',
   institutionCard: '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw',
   landingCard: '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw',
   /** Full-width city-hub / catalog landing banners */

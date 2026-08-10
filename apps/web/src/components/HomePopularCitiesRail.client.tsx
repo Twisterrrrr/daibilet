@@ -125,7 +125,7 @@ export function HomePopularCitiesRail({ cities, className = '' }: HomePopularCit
         {loopItems.map(({ city, key }) => (
           <div
             key={key}
-            className="w-[min(52vw,196px)] shrink-0 snap-start sm:w-[168px] lg:w-[176px]"
+            className="w-[min(68vw,255px)] shrink-0 snap-start sm:w-[218px] lg:w-[229px]"
             data-rail-item
           >
             <CityCard city={city} compact />
