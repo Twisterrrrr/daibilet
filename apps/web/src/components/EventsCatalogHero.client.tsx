@@ -10,8 +10,8 @@ import { catalogFiltersFromQuery, type CatalogFilterValues } from '@/lib/catalog
 import { cityToPrepositional } from '@/lib/city-declension';
 
 /**
- * Compact catalog header: breadcrumbs + H1 + subtitle + date rail.
- * Search + quick/category chips live in CatalogToolbar below.
+ * Compact catalog header: breadcrumbs + H1/subtitle + date rail in the title band.
+ * Search + one discovery chip row live in CatalogToolbar below.
  */
 export function EventsCatalogHero() {
   const searchParams = useSearchParams();
@@ -68,9 +68,18 @@ export function EventsCatalogHero() {
       />
       <header className="border-b border-slate-100 bg-white">
         <div className="container-page py-4 sm:py-5">
-          <h1 className="font-display text-2xl font-extrabold tracking-tight text-graphite sm:text-3xl">{title}</h1>
-          <p className="mt-1 max-w-2xl text-sm leading-snug text-graphite-muted sm:text-[15px]">{subtitle}</p>
-          <CatalogDateRail className="mt-3 sm:mt-3.5" />
+          {/* Desktop: title band + date rail on one line; mobile: date directly under subtitle. */}
+          <div className="flex flex-col gap-2.5 md:flex-row md:items-end md:justify-between md:gap-5">
+            <div className="min-w-0 flex-1">
+              <h1 className="font-display text-2xl font-extrabold tracking-tight text-graphite sm:text-3xl">
+                {title}
+              </h1>
+              <p className="mt-1 max-w-2xl text-sm leading-snug text-graphite-muted sm:text-[15px]">
+                {subtitle}
+              </p>
+            </div>
+            <CatalogDateRail className="md:max-w-[min(100%,32rem)] md:shrink-0" />
+          </div>
         </div>
       </header>
     </>

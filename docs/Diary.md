@@ -1,3 +1,19 @@
+## 2026-08-10 - `/events`: date rail in title band + one soft chip row
+
+### Наблюдения
+- Owner empty screenshot: date rail still felt like a separate floor; quick + category looked like two systems under search; system `input[type=date]` рядом с поиском.
+- `ad5f3dc0` уже перенёс даты в hero и слил ряды, но визуально не дотягивало до «в полосе заголовка» / одной soft-ленты.
+
+### Решения
+- `EventsCatalogHero`: date rail в title band (mobile под subtitle; `md+` в одну линию с H1/subtitle).
+- `CatalogToolbar`: один soft scroll (quick+categories) сразу под search в sticky-блоке; убран native date input; FAB/advanced sheet без изменений.
+- Soft date chips (`rounded-full`, компактнее).
+
+### Проблемы
+- Deploy MSK web - по «выкатывай» (этот месседж - только push).
+
+---
+
 ## 2026-08-10 - Venue/location previews: institution gaps closed
 
 ### Наблюдения

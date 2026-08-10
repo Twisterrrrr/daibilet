@@ -8,7 +8,7 @@
 | UX.VENUES-CATALOG-QUIET | `/venues`: kill dark hero; white H1; soft chip rail; no Найдено/стр.; clean InstitutionCard (+ icon, meta above title) | Высокий | ✅ `e78f905b` Deploy `31342186797` BUILD_ID=`RWJuTMEW-R707-yh7VQwJ` |
 | UX.BLOG-INDEX-POLISH | `/blog`: soft toolbar/chips; quiet fresh meta; simplify afisha promo; drop count+view toggle | Высокий | 🔄 ship; deploy по «выкатывай» |
 | UX.LOCATIONS-CATALOG-QUIET | `/locations`: quieter hero/filters; vertical premium cards; no overlay route pill; strip city on address | Высокий | 🔄 ship; deploy по «выкатывай» |
-| UX.EVENTS-CHIPS-SIMPLIFY | `/events`: date rail в hero; quick+categories один ряд под search; drop mobile date/type selects | Высокий | ✅ `ad5f3dc0`; deploy по «выкатывай» |
+| UX.EVENTS-CHIPS-SIMPLIFY | `/events`: date rail в title band; quick+categories один soft-ряд под search; без system date input | Высокий | ✅ follow-up после `ad5f3dc0`; deploy по «выкатывай» |
 | UX.CITIES-SORT-ONE-LIST | `/cities`: один список (без top/octet); sort popular/name на весь набор; toolbar search+controls в одной строке | Высокий | ✅ `2965a338`; deploy по «выкатывай» | Deploy `31336541746` BUILD_ID=`SR08A3UaBJ4IlLsjQcK4n`
 | UX.VENUE-AFISHA-ORDER | Venue/location: афиша выше; хабы/похожие ниже | Высокий | ✅ `28795f43`; deploy по «выкатывай» | Deploy `31336541746` BUILD_ID=`SR08A3UaBJ4IlLsjQcK4n`
 | UX.VENUE-SCHEDULE-RAIL | Venue «Расписание и билеты»: date rail + calendar; drop table/tabs/stats/subtitle | Высокий | ✅ `28795f43`+`97b27739`; deploy по «выкатывай» | Deploy `31336541746` BUILD_ID=`SR08A3UaBJ4IlLsjQcK4n`

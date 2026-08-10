@@ -104,9 +104,9 @@ export function CatalogDateRail({ disabled = false, className = '' }: CatalogDat
             }`}
           >
             {chip.kind === 'day' ? (
-              <span className="flex flex-col items-center leading-none">
-                <span className="text-[10px] font-semibold uppercase tracking-wide opacity-80">{chip.weekday}</span>
-                <span className="mt-0.5 text-sm font-bold">{chip.iso.slice(8)}</span>
+              <span className="whitespace-nowrap">
+                <span className="text-[11px] font-semibold uppercase tracking-wide opacity-80">{chip.weekday}</span>
+                <span className="ml-1 font-semibold">{chip.iso.slice(8)}</span>
               </span>
             ) : (
               <span className="whitespace-nowrap">{chip.shortLabel}</span>

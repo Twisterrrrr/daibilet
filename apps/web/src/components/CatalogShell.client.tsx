@@ -243,7 +243,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
 
   return (
     <>
-      {/* Sticky search in CatalogToolbar; date rail in EventsCatalogHero; chips under search. */}
+      {/* Sticky search + one chip row in CatalogToolbar; date rail in EventsCatalogHero title band. */}
       <CatalogToolbar
         facets={facets}
         values={filterValues}

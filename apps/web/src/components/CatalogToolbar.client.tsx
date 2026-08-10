@@ -53,7 +53,6 @@ export function CatalogToolbar({
   const searchInputRef = useRef<HTMLInputElement>(null);
   const searchWrapRef = useRef<HTMLDivElement>(null);
   const advancedCount = countAdvancedFilters(filters);
-  const singleDay = filters.from && (!filters.to || filters.to === filters.from) ? filters.from : '';
   const categorySplit = useMemo(
     () => splitCatalogCategories(facets.categories, filters.category),
     [facets.categories, filters.category],
@@ -125,37 +124,13 @@ export function CatalogToolbar({
     });
   };
 
-  const setExactDay = (isoDay: string) => {
-    if (!isoDay) {
-      navigate({
-        ...filters,
-        q: qDraft.trim() || undefined,
-        date: undefined,
-        from: undefined,
-        to: undefined,
-        page: undefined,
-      });
-      return;
-    }
-    navigate({
-      ...filters,
-      q: qDraft.trim() || undefined,
-      date: undefined,
-      from: isoDay,
-      to: isoDay,
-      page: undefined,
-      sort: 'time',
-    });
-  };
-
   const discoveryRow = (
     <div
       role="group"
       aria-label="Быстрые фильтры и категории"
-      className="horizontal-snap-row flex flex-nowrap items-center gap-1.5 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      className="flex w-full min-w-0 flex-nowrap items-center gap-1.5 overflow-x-auto overscroll-x-contain pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
     >
       <QuickFilterToggles filters={filters} qDraft={qDraft} disabled={disabled} onNavigate={navigate} />
-      <span aria-hidden className="mx-0.5 h-5 w-px shrink-0 bg-slate-200" />
       <CategoryTabs
         filters={filters}
         primary={categorySplit.primary}
@@ -221,11 +196,11 @@ export function CatalogToolbar({
 
   return (
     <div className="space-y-2.5 sm:space-y-3">
-      {/* Sticky search; date rail lives in EventsCatalogHero. */}
-      <div className="catalog-toolbar sticky top-[var(--site-header-height)] z-30 -mx-4 border-b border-slate-200/60 bg-white/95 px-4 py-2 backdrop-blur-md supports-[backdrop-filter]:bg-white/90 sm:-mx-6 sm:px-6 md:static md:z-auto md:mx-0 md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none">
+      {/* Sticky search + one discovery row; date rail lives in EventsCatalogHero. */}
+      <div className="catalog-toolbar sticky top-[var(--site-header-height)] z-30 -mx-4 space-y-2 border-b border-slate-200/60 bg-white/95 px-4 py-2 backdrop-blur-md supports-[backdrop-filter]:bg-white/90 sm:-mx-6 sm:px-6 md:static md:z-auto md:mx-0 md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none">
         <form
           onSubmit={onSubmit}
-          className="flex flex-col gap-1.5 rounded-2xl border border-slate-100 bg-white p-1.5 sm:gap-1 md:flex-row md:items-center md:p-1"
+          className="flex items-center gap-1.5 rounded-2xl border border-slate-100 bg-white p-1.5 md:p-1"
         >
           <div ref={searchWrapRef} className="relative flex min-w-0 flex-1 items-center gap-1">
             <label className="relative block min-w-0 flex-1">
@@ -318,33 +293,20 @@ export function CatalogToolbar({
             ) : null}
           </div>
 
-          <div className="hidden items-center gap-1.5 md:flex">
-            <label className="relative hidden min-w-[9.5rem] flex-none md:block md:w-36">
-              <span className="sr-only">Точная дата</span>
-              <input
-                type="date"
-                value={singleDay}
-                disabled={disabled}
-                onChange={(event) => setExactDay(event.target.value)}
-                aria-label="Выбрать дату в календаре"
-                className="h-9 w-full rounded-xl bg-surface-muted px-2.5 text-sm font-medium text-graphite outline-none transition hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-70"
-              />
-            </label>
-
-            <FiltersButton
-              open={filtersOpen}
-              count={advancedCount}
-              disabled={disabled}
-              onClick={() => setFiltersOpen(true)}
-            />
-          </div>
+          <FiltersButton
+            open={filtersOpen}
+            count={advancedCount}
+            disabled={disabled}
+            onClick={() => setFiltersOpen(true)}
+            className="max-md:hidden"
+          />
         </form>
+
+        {/* One discovery row under search: quick + categories. */}
+        {discoveryRow}
       </div>
 
       {advancedPanel}
-
-      {/* One discovery row: quick chips + categories (all breakpoints). */}
-      {discoveryRow}
 
       <MoreCategoriesSheet
         open={categoriesMoreOpen}
@@ -414,8 +376,8 @@ function QuickFilterToggles({
             }),
           )
         }
-        className={`catalog-quick-chip snap-start disabled:opacity-60 ${
-          eveningOn ? 'catalog-quick-chip-on' : 'catalog-quick-chip-idle'
+        className={`catalog-chip snap-start disabled:opacity-60 ${
+          eveningOn ? 'catalog-chip-on' : 'catalog-chip-idle'
         }`}
       >
         <Moon aria-hidden className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
@@ -434,8 +396,8 @@ function QuickFilterToggles({
             }),
           )
         }
-        className={`catalog-quick-chip snap-start disabled:opacity-60 ${
-          freeOn ? 'catalog-quick-chip-on' : 'catalog-quick-chip-idle'
+        className={`catalog-chip snap-start disabled:opacity-60 ${
+          freeOn ? 'catalog-chip-on' : 'catalog-chip-idle'
         }`}
       >
         <Gift aria-hidden className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
@@ -453,8 +415,8 @@ function QuickFilterToggles({
             }),
           )
         }
-        className={`catalog-quick-chip snap-start disabled:opacity-60 ${
-          kidsOn ? 'catalog-quick-chip-on' : 'catalog-quick-chip-idle'
+        className={`catalog-chip snap-start disabled:opacity-60 ${
+          kidsOn ? 'catalog-chip-on' : 'catalog-chip-idle'
         }`}
       >
         <Baby aria-hidden className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
