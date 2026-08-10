@@ -78,7 +78,11 @@ async function HomePageBody() {
   return (
     <div className="bg-neutral-50 pb-24 lg:pb-0">
       {/* Classic search-hero: rotating emotion photos + city/date/category find form */}
-      <HomeHero destinations={destinations} frames={heroFrames} />
+      <HomeHero
+        destinations={destinations}
+        frames={heroFrames}
+        landings={landingsCatalog?.items || []}
+      />
 
       <HomeStoriesStrip />
 
@@ -105,13 +109,13 @@ async function HomePageBody() {
               {/* Swipe rail: first few visible, rest scroll (not a full grid on first paint). */}
               <ScrollRail
                 className="mt-6"
-                viewportClassName="flex flex-nowrap gap-2.5 snap-x snap-mandatory sm:gap-3"
+                viewportClassName="flex flex-nowrap gap-3 snap-x snap-mandatory sm:gap-3.5"
                 aria-label="Популярные города"
               >
                 {topCities.map((city) => (
                   <div
                     key={city.slug || city.name}
-                    className="w-[min(52vw,196px)] shrink-0 snap-start sm:w-[160px] lg:w-[168px]"
+                    className="w-[min(52vw,196px)] shrink-0 snap-start sm:w-[168px] lg:w-[176px]"
                     data-rail-item
                   >
                     <CityCard city={city} compact />
