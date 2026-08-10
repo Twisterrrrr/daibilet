@@ -123,24 +123,29 @@ export function CatalogResults({
     );
   }
 
-  const gridEntries = viewMode === 'cards' ? buildCatalogGridEntries(items, city) : null;
   const liveRailItems = pickLiveRailItems(items, sort);
+  const showLiveRail = liveRailItems.length >= 3 && viewMode === 'cards';
+  // Keep «Сейчас выбирают» / «Популярное сейчас» from mirroring the first page of cards 1:1.
+  const listItems = showLiveRail
+    ? items.filter((item) => !liveRailItems.some((rail) => rail.id === item.id))
+    : items;
+  const gridEntries = viewMode === 'cards' ? buildCatalogGridEntries(listItems, city) : null;
 
   return (
     <>
-      {liveRailItems.length >= 3 && viewMode === 'cards' ? (
+      {showLiveRail ? (
         <CatalogLiveRail items={liveRailItems} popularSort={sort === 'popular'} />
       ) : null}
       {viewMode === 'list' ? (
         <ul className="mt-4 space-y-4 sm:space-y-5">
-          {items.map((session) => (
+          {listItems.map((session) => (
             <li key={`${session.id}-${session.startsAt}`}>
               <EventCardHorizontal session={session} />
             </li>
           ))}
         </ul>
       ) : viewMode === 'table' ? (
-        <CatalogTable items={items} />
+        <CatalogTable items={listItems} />
       ) : (
         <ul className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
           {gridEntries!.map((entry) =>

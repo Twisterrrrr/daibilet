@@ -104,6 +104,9 @@ export const EVENT_PACK_IMAGES: Record<string, string> = {
   evt_tep_1222: '/images/events/generated/evt-cover-moscow-center-loop.jpg',
   'rechnaya-progulka-po-centru-moskvy-ot-parka-zaryade-krugovaya-1222':
     '/images/events/generated/evt-cover-moscow-center-loop.jpg',
+  evt_tep_1431: '/images/events/generated/evt-cover-leto-moskva-kievsky.jpg',
+  'rechnoi-kruiz-ot-prichala-kievskii-do-parka-gorkogo-1431':
+    '/images/events/generated/evt-cover-leto-moskva-kievsky.jpg',
 
   // --- Exact content dupes: leave one sibling on original photo, rest get distinct covers ---
   evt_tep_1112: '/images/events/generated/evt-cover-river-express-a.jpg',

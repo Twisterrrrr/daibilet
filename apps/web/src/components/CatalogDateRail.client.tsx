@@ -172,7 +172,7 @@ export function CatalogDateRail({ disabled = false, className = '' }: CatalogDat
       <div
         role="group"
         aria-label="Дата"
-        className="horizontal-snap-row flex min-w-0 flex-1 flex-nowrap gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="horizontal-snap-row flex min-w-0 flex-1 flex-nowrap items-center gap-1.5 overflow-x-auto pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {chips.map((chip) => {
           const active = isDateRailChipActive(chip, filters);
@@ -184,7 +184,7 @@ export function CatalogDateRail({ disabled = false, className = '' }: CatalogDat
               disabled={disabled}
               aria-pressed={active}
               onClick={() => onSelect(chip)}
-              className={`catalog-date-chip snap-start disabled:opacity-60 ${
+              className={`catalog-date-chip h-9 snap-start disabled:opacity-60 ${
                 active ? 'catalog-date-chip-on' : 'catalog-date-chip-idle'
               }`}
             >
@@ -203,7 +203,7 @@ export function CatalogDateRail({ disabled = false, className = '' }: CatalogDat
         })}
       </div>
 
-      <div ref={pickerRef} className="relative shrink-0">
+      <div ref={pickerRef} className="relative shrink-0 self-center">
         <button
           type="button"
           disabled={disabled}
@@ -212,7 +212,7 @@ export function CatalogDateRail({ disabled = false, className = '' }: CatalogDat
           aria-haspopup="dialog"
           aria-pressed={calendarOffRail || pickerOpen}
           onClick={() => setPickerOpen((open) => !open)}
-          className={`catalog-date-chip inline-flex h-11 w-11 items-center justify-center px-0 disabled:opacity-60 ${
+          className={`catalog-date-chip inline-flex h-9 w-9 shrink-0 items-center justify-center px-0 py-0 disabled:opacity-60 ${
             calendarOffRail || pickerOpen ? 'catalog-date-chip-on' : 'catalog-date-chip-idle'
           }`}
         >

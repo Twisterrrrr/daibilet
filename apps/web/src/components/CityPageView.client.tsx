@@ -64,9 +64,9 @@ const CITY_HASH_ALIASES: Record<string, string> = {
   'city-travel': 'practice',
   'city-guide-faq': 'practice',
   'city-seo': 'seo',
-  'why-go': 'sights',
-  'zachem-ehat': 'sights',
-  about: 'sights',
+  'why-go': 'about',
+  'zachem-ehat': 'about',
+  about: 'about',
   directions: 'more',
   venues: 'more',
   travel: 'practice',
@@ -209,7 +209,7 @@ export function CityPageView({
       return true;
     });
   }, [aboutArticles, afficheArticles, sightsArticles, practiceArticles, moreArticles]);
-  // Amber «Интересный факт» removed from hub first screen (UX 2026-08-10).
+  const hasAbout = Boolean(guide?.brief?.trim() || guide?.hookFact?.trim());
   const hasPractice = hasTravel || hasFaq || practiceArticles.length > 0;
   const hasMore = hasDirections || hasVenues || moreArticles.length > 0;
   const showSightsBlock = hasSights;
@@ -219,6 +219,7 @@ export function CityPageView({
   const tabs = React.useMemo(
     () =>
       [
+        { id: 'about', label: 'О городе', show: hasAbout },
         {
           id: 'sights',
           label: hasNamedDayScenarios ? 'Маршруты' : 'Главные места',
@@ -229,7 +230,7 @@ export function CityPageView({
         { id: 'more', label: 'Подборки', show: hasMore },
         { id: 'blog', label: 'Из блога', show: footerArticles.length > 0 },
       ].filter((tab) => tab.show),
-    [footerArticles.length, hasMore, hasNamedDayScenarios, hasPractice, showSightsBlock],
+    [footerArticles.length, hasAbout, hasMore, hasNamedDayScenarios, hasPractice, showSightsBlock],
   );
 
   return (
@@ -259,6 +260,8 @@ export function CityPageView({
               editorial={editorial}
             />
             <CityStickyTabs tabs={tabs} editorial={editorial} />
+
+            {hasAbout ? <CityWhyGoSection guide={guide} editorial={editorial} /> : null}
 
             {showSightsBlock ? (
               <CitySightsSection
@@ -574,6 +577,7 @@ function CityHeroStrip({
     : 'container-page py-8 sm:py-10';
 
   const jumpChips = [
+    { id: 'about', label: 'О городе' },
     { id: 'affiche', label: 'Афиша' },
     { id: 'sights', label: 'Маршруты' },
     { id: 'more', label: 'Площадки' },
@@ -892,6 +896,66 @@ function hubFilterChipClass(isActive: boolean, editorial = false) {
   }`;
 }
 
+/** Описание + факты из cityInfo; идут сразу после tabs, до «Зачем ехать» / сценариев. */
+function CityWhyGoSection({
+  guide,
+  editorial = false,
+}: {
+  guide: CityInfoEntry | null;
+  editorial?: boolean;
+}) {
+  const brief = guide?.brief?.trim();
+  const hook = guide?.hookFact?.trim();
+  if (!brief && !hook) return null;
+
+  return (
+    <section
+      id="about"
+      className={`border-b ${editorial ? 'border-zinc-200' : 'border-slate-100'} ${SECTION_SCROLL_MT}`}
+    >
+      <div className={`container-page ${editorial ? 'py-12 sm:py-14' : 'py-8'}`}>
+        {brief ? (
+          <div className="max-w-3xl">
+            <p
+              className={`text-xs font-semibold uppercase tracking-wide ${
+                editorial ? 'text-zinc-500' : 'text-slate-500'
+              }`}
+            >
+              Описание
+            </p>
+            <p
+              className={`mt-2 text-sm leading-7 sm:text-base ${
+                editorial ? 'text-zinc-600' : 'text-slate-600'
+              }`}
+            >
+              {brief}
+            </p>
+          </div>
+        ) : null}
+
+        {hook ? (
+          <div
+            className={`${brief ? 'mt-6' : ''} rounded-2xl px-5 py-4 sm:px-6 sm:py-5 ${
+              editorial
+                ? 'bg-amber-50 ring-1 ring-amber-200/80'
+                : 'bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 ring-1 ring-amber-200/70'
+            }`}
+          >
+            <p className="text-xs font-semibold uppercase tracking-wide text-amber-800">Факты</p>
+            <p
+              className={`mt-2 max-w-3xl text-sm leading-6 ${
+                editorial ? 'text-zinc-700' : 'text-slate-700'
+              }`}
+            >
+              {hook}
+            </p>
+          </div>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
 function CityContentLoadingState() {
   return (
     <section className="container-page py-10">
@@ -1146,6 +1210,11 @@ function CitySightsSection({
   const suburbs = guide?.significantSuburbs?.length ? guide.significantSuburbs : [];
   const namedPresets = guide?.dayRoutePresets;
   const hasNamedScenarios = Boolean(namedPresets?.length);
+  // Editorial «Зачем ехать» (places) always owns the section H2; scenarios follow below.
+  const sectionTitle =
+    places.length || !hasNamedScenarios
+      ? `Зачем ехать ${cityInto}`
+      : 'Готовые сценарии дня';
 
   return (
     <section
@@ -1161,7 +1230,7 @@ function CitySightsSection({
             : 'text-2xl font-bold text-slate-950'
         }
       >
-        {hasNamedScenarios ? 'Готовые сценарии дня' : `Зачем ехать ${cityInto}`}
+        {sectionTitle}
       </h2>
       {places.length || hasNamedScenarios ? (
         <CitySightsMustSeeList
@@ -1174,7 +1243,6 @@ function CitySightsSection({
           categories={categories}
           citySlug={citySlug}
           titleClass={titleClass}
-          hidePlacesRail={hasNamedScenarios}
         />
       ) : null}
       {suburbs.length ? (
@@ -1212,7 +1280,6 @@ function CitySightsMustSeeList({
   categories,
   citySlug,
   titleClass,
-  hidePlacesRail = false,
 }: {
   places: CityMustSeeItem[];
   venues: PublicVenueDto[];
@@ -1229,9 +1296,9 @@ function CitySightsMustSeeList({
   categories: Array<[string, number]>;
   citySlug?: string;
   titleClass: string;
-  /** When named day scenarios exist, drop fragmented places rail - scenarios own the block. */
-  hidePlacesRail?: boolean;
 }) {
+  const hasNamedScenarios = Boolean(namedPresets?.length);
+  const showPlacesRail = places.length > 0;
   const classifiedPlaces = React.useMemo(() => {
     return places.map((place) => {
       const matched = venues.find((venue) => {
@@ -1287,7 +1354,7 @@ function CitySightsMustSeeList({
   }, []);
 
   React.useEffect(() => {
-    if (hidePlacesRail) return;
+    if (!showPlacesRail) return;
     const el = railRef.current;
     if (!el) return;
     syncRail();
@@ -1300,7 +1367,7 @@ function CitySightsMustSeeList({
       window.removeEventListener('resize', syncRail);
       ro?.disconnect();
     };
-  }, [syncRail, activeId, visiblePlaces.length, sparseGrid, hidePlacesRail]);
+  }, [syncRail, activeId, visiblePlaces.length, sparseGrid, showPlacesRail]);
 
   const scrollPage = (dir: -1 | 1) => {
     const el = railRef.current;
@@ -1316,22 +1383,10 @@ function CitySightsMustSeeList({
     'absolute top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200/90 bg-white/95 text-slate-700 shadow-md backdrop-blur transition-[opacity,colors] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:ring-offset-2 md:inline-flex';
   const showRailArrows = !sparseGrid && hasOverflow;
 
-  if (hidePlacesRail) {
-    return (
-      <div className="mt-6">
-        <CityDayPresetBlock
-          places={places}
-          venues={venues}
-          city={city}
-          editorial={editorial}
-          namedPresets={namedPresets}
-        />
-      </div>
-    );
-  }
-
   return (
     <>
+      {showPlacesRail ? (
+        <>
       <MustSeeFilterTabs
         tabs={filterMeta.tabs}
         activeId={activeId}
@@ -1518,13 +1573,28 @@ function CitySightsMustSeeList({
           <ArrowRight className="h-5 w-5" aria-hidden />
         </button>
       </div>
-      <CityDayPresetBlock
-        places={places}
-        venues={venues}
-        city={city}
-        editorial={editorial}
-        namedPresets={namedPresets}
-      />
+        </>
+      ) : null}
+      <div className={showPlacesRail ? 'mt-10' : 'mt-6'}>
+        {hasNamedScenarios && showPlacesRail ? (
+          <h3
+            className={
+              editorial
+                ? 'mb-4 font-serif text-2xl font-semibold text-zinc-950 sm:text-3xl'
+                : 'mb-4 text-xl font-bold text-slate-950 sm:text-2xl'
+            }
+          >
+            Готовые сценарии
+          </h3>
+        ) : null}
+        <CityDayPresetBlock
+          places={places}
+          venues={venues}
+          city={city}
+          editorial={editorial}
+          namedPresets={namedPresets}
+        />
+      </div>
     </>
   );
 }

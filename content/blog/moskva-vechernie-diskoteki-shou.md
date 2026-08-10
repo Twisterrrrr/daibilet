@@ -12,7 +12,7 @@ tag: Город
 citySlug: moscow
 date: "19 июля 2026"
 readMin: 8
-imageAlt: "Танцпол и огни вечерней дискотеки в Москве"
+imageAlt: "Гости танцуют на вечерней дискотеке в Москве"
 coverImageUrl: "/images/blog/moskva-vechernie-diskoteki-shou.jpg"
 status: PUBLISHED
 ---

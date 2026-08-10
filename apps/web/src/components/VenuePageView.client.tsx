@@ -364,7 +364,7 @@ function VenueDateRail({
             onClick={openCalendar}
             aria-label="Выбрать другую дату"
             aria-pressed={calendarOffRail}
-            className={`catalog-date-chip inline-flex h-11 w-11 items-center justify-center px-0 ${
+            className={`catalog-date-chip inline-flex h-9 w-9 shrink-0 items-center justify-center self-center px-0 py-0 ${
               calendarOffRail ? 'catalog-date-chip-on' : 'catalog-date-chip-idle'
             }`}
           >
