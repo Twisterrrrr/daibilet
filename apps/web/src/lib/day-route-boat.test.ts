@@ -6,9 +6,13 @@ import {
   buildBoatRoutesFromSessions,
   dayRouteItemFromBoatSlot,
   dayRouteSuggestsBoat,
+  dedupeBoatPiers,
+  enrichBoatPierCoords,
+  formatBoatDistance,
   guessBoatDurationMinutes,
   inferBoatTimeWindow,
   isSpbDayRouteCity,
+  pierHasBoatRoutes,
   rankBoatPiers,
   resolveBoatRankingOrigin,
   SPB_WATER_CENTER,
@@ -48,6 +52,116 @@ describe('day-route-boat', () => {
     );
     assert.equal(ranked[0]!.id, 'near');
     assert.ok((ranked[0]!.distanceM ?? 99999) < (ranked[1]!.distanceM ?? 0));
+  });
+
+  it('dedupes Universitetskaya nab. 13 punctuation twins', () => {
+    const ranked = rankBoatPiers(
+      [
+        {
+          id: 'venue_a',
+          slug: 'a',
+          name: 'Университетская наб. 13',
+          city: 'Санкт-Петербург',
+          address: 'Университетская наб. 13',
+          latitude: 59.938357,
+          longitude: 30.299509,
+          events: 3,
+        },
+        {
+          id: 'venue_b',
+          slug: 'b',
+          name: 'Университетская наб., 13',
+          city: 'Санкт-Петербург',
+          address: 'Университетская наб., 13',
+          latitude: 59.938655,
+          longitude: 30.29912,
+          events: 2,
+        },
+      ],
+      SPB_WATER_CENTER,
+    );
+    assert.equal(ranked.length, 1);
+    assert.equal(ranked[0]!.id, 'venue_a');
+  });
+
+  it('fills Dvortsovaya 18 coords so distance is computable', () => {
+    const enriched = enrichBoatPierCoords({
+      id: 'venue_681d44a7fc03029d63123730',
+      slug: 'dvorcovaya-naberezhnaya-18-prichal-no4-681d44a7fc03029d63123730',
+      name: 'Дворцовая набережная, 18',
+      address: 'Дворцовая набережная, 18',
+      latitude: null,
+      longitude: null,
+    });
+    assert.ok(enriched.latitude != null && enriched.longitude != null);
+    const ranked = rankBoatPiers(
+      [
+        {
+          id: 'venue_681d44a7fc03029d63123730',
+          slug: 'dvorcovaya-naberezhnaya-18-prichal-no4-681d44a7fc03029d63123730',
+          name: 'Дворцовая набережная, 18',
+          city: 'Санкт-Петербург',
+          address: 'Дворцовая набережная, 18',
+          latitude: null,
+          longitude: null,
+          events: 3,
+        },
+      ],
+      SPB_WATER_CENTER,
+    );
+    assert.equal(ranked.length, 1);
+    assert.ok(ranked[0]!.distanceM != null);
+    assert.ok(formatBoatDistance(ranked[0]!.distanceM));
+  });
+
+  it('hides piers without routes and junk placeholders', () => {
+    assert.equal(
+      pierHasBoatRoutes({ name: 'Воскресенская наб., 10', address: null, events: 0 }),
+      false,
+    );
+    assert.equal(
+      pierHasBoatRoutes({
+        name: 'Набережная и причал будут известны позже, всем купившим билеты будет сделана рассылка.',
+        address: null,
+        events: 2,
+      }),
+      false,
+    );
+    assert.equal(
+      pierHasBoatRoutes({ name: 'Дворцовая набережная, 18', address: null, events: 3 }),
+      true,
+    );
+  });
+
+  it('dedupeBoatPiers prefers more events', () => {
+    const out = dedupeBoatPiers([
+      {
+        id: 'low',
+        slug: 'low',
+        name: 'Университетская наб., 13',
+        city: 'Санкт-Петербург',
+        address: 'Университетская наб., 13',
+        latitude: 59.93,
+        longitude: 30.3,
+        events: 1,
+        distanceM: 100,
+        rankScore: 10,
+      },
+      {
+        id: 'high',
+        slug: 'high',
+        name: 'Университетская наб. 13',
+        city: 'Санкт-Петербург',
+        address: 'Университетская наб. 13',
+        latitude: 59.93,
+        longitude: 30.3,
+        events: 5,
+        distanceM: 120,
+        rankScore: 5,
+      },
+    ]);
+    assert.equal(out.length, 1);
+    assert.equal(out[0]!.id, 'high');
   });
 
   it('prefers short sightseeing titles', () => {

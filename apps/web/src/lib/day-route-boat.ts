@@ -76,6 +76,138 @@ export const SPB_WATER_CENTER = { latitude: 59.9398, longitude: 30.3146 } as con
 export const BOAT_PIER_NEAR_M = 2500;
 export const BOAT_WATERFRONT_HINT_M = 900;
 
+/** Coords for published piers that still lack DB lat/lng (distance «~N м от маршрута»). */
+const KNOWN_BOAT_PIER_COORDS: Array<{
+  id?: string;
+  slugIncludes?: string;
+  textTest: (text: string) => boolean;
+  latitude: number;
+  longitude: number;
+}> = [
+  // scripts/backfill-missing-venue-coords.js - pier №4 / venue_681d44a7…
+  {
+    id: 'venue_681d44a7fc03029d63123730',
+    slugIncludes: 'dvorcovaya-naberezhnaya-18',
+    textTest: (text) => /дворцов/.test(text) && /\b18\b/.test(text),
+    latitude: 59.9415,
+    longitude: 30.3155,
+  },
+];
+
+const BOAT_PIER_JUNK_NAME_RE =
+  /будут известны позже|всем купившим|банкетн(?:ый|ого)\s+зал|arbat\s*hall|космос/i;
+
+/** Normalize pier name/address for twin collapse (наб. vs наб, comma glue). */
+export function normalizeBoatPierLabel(value: string | null | undefined): string {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/ё/g, 'е')
+    .replace(/[—–]/gu, '-')
+    .replace(/\bнаб\.?\b/gi, 'набережная')
+    .replace(/\bул\.?\b/gi, 'улица')
+    .replace(/\bпр\.?\b/gi, 'проспект')
+    .replace(/[^a-z0-9а-я]+/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
+ * Dedupe key: known pier patterns → normalized address/name → rounded coords → id.
+ * Collapses «Университетская наб. 13» vs «Университетская наб., 13».
+ */
+export function boatPierDedupeKey(
+  pier: Pick<BoatPierCandidate, 'id' | 'slug' | 'name' | 'address' | 'latitude' | 'longitude'>,
+): string {
+  const blob = normalizeBoatPierLabel(`${pier.name || ''} ${pier.address || ''}`);
+  if (/дворцов/.test(blob) && /\b18\b/.test(blob)) return 'pier:dvortsovaya-18';
+  if (/синопск/.test(blob) && /\b10\b/.test(blob)) return 'pier:sinopskaya-10';
+  if (/фонтанк/.test(blob) && /\b53\b/.test(blob)) return 'pier:fontanka-53';
+  if (/университетск/.test(blob) && /\b13\b/.test(blob)) return 'pier:universitetskaya-13';
+  if (/университетск/.test(blob) && /\b17\b/.test(blob)) return 'pier:universitetskaya-17';
+
+  const addressKey = normalizeBoatPierLabel(pier.address);
+  const nameKey = normalizeBoatPierLabel(pier.name);
+  if (addressKey.length >= 8) return `addr:${addressKey}`;
+  if (nameKey.length >= 8) return `name:${nameKey}`;
+
+  const lat = Number(pier.latitude);
+  const lng = Number(pier.longitude);
+  if (isValidCoordinatePair(lat, lng)) {
+    return `geo:${lat.toFixed(4)},${lng.toFixed(4)}`;
+  }
+  const slug = String(pier.slug || '').trim().toLowerCase();
+  if (slug) return `slug:${slug}`;
+  return `id:${String(pier.id || '').trim()}`;
+}
+
+/** Fill missing lat/lng from known SPB pier stubs so distance always computes when we know the place. */
+export function enrichBoatPierCoords<
+  T extends { id?: string | null; slug?: string | null; name?: string | null; address?: string | null; latitude?: number | null; longitude?: number | null },
+>(pier: T): T {
+  const lat = Number(pier.latitude);
+  const lng = Number(pier.longitude);
+  if (isValidCoordinatePair(lat, lng)) return pier;
+
+  const id = String(pier.id || '').trim();
+  const slug = String(pier.slug || '').trim().toLowerCase();
+  const text = normalizeBoatPierLabel(`${pier.name || ''} ${pier.address || ''}`);
+
+  for (const known of KNOWN_BOAT_PIER_COORDS) {
+    if (known.id && id === known.id) {
+      return { ...pier, latitude: known.latitude, longitude: known.longitude };
+    }
+    if (known.slugIncludes && slug.includes(known.slugIncludes)) {
+      return { ...pier, latitude: known.latitude, longitude: known.longitude };
+    }
+    if (known.textTest(text)) {
+      return { ...pier, latitude: known.latitude, longitude: known.longitude };
+    }
+  }
+  return pier;
+}
+
+/** Keep the richer twin: more events → has coords → higher rank → stable id. */
+export function dedupeBoatPiers(piers: BoatPierCandidate[]): BoatPierCandidate[] {
+  const best = new Map<string, BoatPierCandidate>();
+  for (const pier of piers) {
+    const key = boatPierDedupeKey(pier);
+    const prev = best.get(key);
+    if (!prev) {
+      best.set(key, pier);
+      continue;
+    }
+    const prevEvents = Number(prev.events) || 0;
+    const nextEvents = Number(pier.events) || 0;
+    if (nextEvents !== prevEvents) {
+      if (nextEvents > prevEvents) best.set(key, pier);
+      continue;
+    }
+    const prevCoords = isValidCoordinatePair(Number(prev.latitude), Number(prev.longitude));
+    const nextCoords = isValidCoordinatePair(Number(pier.latitude), Number(pier.longitude));
+    if (nextCoords !== prevCoords) {
+      if (nextCoords) best.set(key, pier);
+      continue;
+    }
+    if ((pier.rankScore || 0) !== (prev.rankScore || 0)) {
+      if ((pier.rankScore || 0) > (prev.rankScore || 0)) best.set(key, pier);
+      continue;
+    }
+    if (String(pier.id).localeCompare(String(prev.id)) < 0) best.set(key, pier);
+  }
+  return [...best.values()];
+}
+
+/** Pier card is useful only when catalog reports routes/events to open. */
+export function pierHasBoatRoutes(
+  pier: Pick<BoatPierCandidate, 'name' | 'address' | 'events'>,
+): boolean {
+  const events = Number(pier.events) || 0;
+  if (events <= 0) return false;
+  const blob = `${pier.name || ''} ${pier.address || ''}`;
+  if (BOAT_PIER_JUNK_NAME_RE.test(blob)) return false;
+  return true;
+}
+
 export type BoatPierCandidate = {
   id: string;
   slug: string | null;
@@ -224,7 +356,8 @@ export function rankBoatPiers(
   const hasOrigin =
     origin && isValidCoordinatePair(origin.latitude, origin.longitude) ? origin : null;
 
-  const ranked = piers.map((pier) => {
+  const ranked = piers.map((raw) => {
+    const pier = enrichBoatPierCoords(raw);
     const lat = Number(pier.latitude);
     const lng = Number(pier.longitude);
     const hasCoords = isValidCoordinatePair(lat, lng);
@@ -248,7 +381,7 @@ export function rankBoatPiers(
     if (b.rankScore !== a.rankScore) return b.rankScore - a.rankScore;
     return a.name.localeCompare(b.name, 'ru');
   });
-  return ranked;
+  return dedupeBoatPiers(ranked);
 }
 
 export function inferBoatTimeWindow(

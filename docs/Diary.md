@@ -1,3 +1,20 @@
+## 2026-08-10 - my-day boat piers: dedupe / routes / distance
+
+### Наблюдения
+- Wizard «Добавить теплоход»: дубли «Университетская наб. 13» vs «наб., 13» (TC + TEP).
+- Карточки с `events=0` и junk-placeholder («причал будут известны позже…») всё ещё кликабельны.
+- «Дворцовая набережная, 18» (`venue_681d44a7…`) без lat/lng в API → нет «~N м от маршрута».
+
+### Решения
+- `day-route-boat`: `normalizeBoatPierLabel` / `boatPierDedupeKey` / `dedupeBoatPiers` / `pierHasBoatRoutes`; known coords fallback для Дворцовой 18; `rankBoatPiers` enrich+dedupe.
+- Wizard: только bookable piers; не дублировать address=name в subtitle.
+- `ensure-spb-dvortsovaya-18-pier-merge.js`: пишет latitude/longitude при --apply (DB backfill отдельно).
+
+### Проблемы
+- Prod DB coords для Дворцовой 18 всё ещё null до backfill/apply; UI уже считает дистанцию через fallback.
+
+---
+
 ## 2026-08-10 - Venue PDP: metro + Hermitage batch v3
 
 ### Наблюдения

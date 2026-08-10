@@ -41,6 +41,9 @@ const CANON = {
   pageStatus: 'PUBLISHED',
   kind: 'PIER',
   isIndexable: true,
+  /** Same as scripts/backfill-missing-venue-coords.js - required for «~N м от маршрута». */
+  latitude: 59.9415,
+  longitude: 30.3155,
 };
 
 const dryRun = process.argv.includes('--dry-run') || !process.argv.includes('--apply');
@@ -130,6 +133,8 @@ async function main() {
             kind = 'PIER',
             "pageStatus" = 'PUBLISHED',
             "isIndexable" = true,
+            latitude = $6,
+            longitude = $7,
             "updatedAt" = now()
           where id = $1
         `,
@@ -139,6 +144,8 @@ async function main() {
           CANON.address,
           CANON.shortDescription,
           CANON.description,
+          CANON.latitude,
+          CANON.longitude,
         ],
       );
       report.actions.push({ action: 'updated-canon', id: canonBefore.rows[0].id });

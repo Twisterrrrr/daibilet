@@ -13,6 +13,7 @@ import {
   inferBoatTimeWindow,
   isBoatPierType,
   isSpbDayRouteCity,
+  pierHasBoatRoutes,
   rankBoatPiers,
   resolveBoatRankingOrigin,
   type BoatPierCandidate,
@@ -302,8 +303,9 @@ export function DayRouteBoatWizard({
     closeWizard();
   }
 
-  const nearbyPiers = piers.filter((p) => p.distanceM == null || p.distanceM <= BOAT_PIER_NEAR_M);
-  const pierList = nearbyPiers.length ? nearbyPiers : piers.slice(0, 12);
+  const bookablePiers = piers.filter(pierHasBoatRoutes);
+  const nearbyPiers = bookablePiers.filter((p) => p.distanceM == null || p.distanceM <= BOAT_PIER_NEAR_M);
+  const pierList = nearbyPiers.length ? nearbyPiers : bookablePiers.slice(0, 12);
 
   return (
     <div className="mt-4 px-4 sm:px-5" data-day-boat-wizard>
@@ -396,6 +398,18 @@ export function DayRouteBoatWizard({
               ) : null}
               {pierList.map((pier) => {
                 const dist = formatBoatDistance(pier.distanceM);
+                const nameKey = String(pier.name || '')
+                  .toLowerCase()
+                  .replace(/\s+/g, ' ')
+                  .replace(/[—–]/g, '-')
+                  .trim();
+                const addrKey = String(pier.address || '')
+                  .toLowerCase()
+                  .replace(/\s+/g, ' ')
+                  .replace(/[—–]/g, '-')
+                  .trim();
+                const addressLine =
+                  pier.address && addrKey && addrKey !== nameKey ? pier.address : null;
                 return (
                   <button
                     key={pier.id}
@@ -407,7 +421,7 @@ export function DayRouteBoatWizard({
                     <span className="min-w-0 flex-1">
                       <span className="block text-sm font-semibold text-slate-900">{pier.name}</span>
                       <span className="mt-0.5 block text-xs text-slate-500">
-                        {[pier.address, dist ? `~${dist} от маршрута` : null]
+                        {[addressLine, dist ? `~${dist} от маршрута` : null]
                           .filter(Boolean)
                           .join(' · ') || 'Причал'}
                       </span>
