@@ -224,19 +224,19 @@ export function CityCard({
             className={`pointer-events-none absolute inset-0 ${
               isLight
                 ? 'bg-gradient-to-t from-white/95 via-white/45 to-transparent'
-                : 'bg-gradient-to-t from-black/90 via-black/55 to-black/25'
+                : 'bg-gradient-to-t from-black/95 via-black/65 to-black/35'
             }`}
           />
           {/* Extra bottom band so white type stays readable on bright daytime covers (NN, SPB). */}
           {!isLight ? (
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-black/70 via-black/25 to-transparent" />
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[65%] bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
           ) : null}
           <div
             className={`absolute inset-x-0 bottom-0 ${compact ? 'p-2.5 sm:p-3' : 'p-3 sm:p-3.5'} ${
-              isLight ? '' : '[text-shadow:0_1px_2px_rgba(0,0,0,0.55)]'
+              isLight ? '' : '[text-shadow:0_1px_3px_rgba(0,0,0,0.75),0_0_12px_rgba(0,0,0,0.35)]'
             }`}
           >
-            <h3 className={`${cityCardTitleClass(titleVariant, tone)} line-clamp-2`}>{city.name}</h3>
+            <h3 className={cityCardTitleClass(titleVariant, tone)}>{city.name}</h3>
             {showBrief ? (
               <p
                 className={`mt-1 line-clamp-1 text-xs opacity-0 transition-opacity duration-200 group-hover:opacity-100 sm:text-sm ${
