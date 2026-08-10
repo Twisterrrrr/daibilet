@@ -1,5 +1,11 @@
-import { landingCategoryHref } from '@/lib/landing-routes';
-import { CANONICAL_LANDING_SLUGS } from '@/lib/landing-constants';
+import { resolveCityHubConfig } from './city-hub-config.ts';
+import {
+  isWaterLandingAllowedForCity,
+  resolveFeaturedDirections,
+  type LandingLike,
+} from './city-hub-directions.ts';
+import { CANONICAL_LANDING_SLUGS } from './landing-constants.ts';
+import { landingCategoryHref, landingMatchesCatalogCity } from './landing-routes.ts';
 
 export type HomeQuickChip = {
   label: string;
@@ -15,14 +21,170 @@ export type HomeFormatTile = {
   fallbackGradient: string;
 };
 
-/** Популярно сейчас - реальные CHPU / фильтры каталога, без emoji. */
-export const HERO_QUICK_CHIPS: HomeQuickChip[] = [
-  { label: 'Речные прогулки', href: landingCategoryHref(CANONICAL_LANDING_SLUGS.river) },
+export type HomeHeroChipHubTag = {
+  slug?: string | null;
+  label: string;
+  kind: 'landing' | 'category' | string;
+};
+
+export type HomeHeroChipCategory = {
+  name: string;
+  events: number;
+};
+
+/** Cap soft pill rail: one swipe row, not a wall. */
+export const HERO_QUICK_CHIP_LIMIT = 10;
+
+type BaselineChip = HomeQuickChip & { landingSlug?: string };
+
+/** National / fill chips - CHPU landings + category shortcuts, without emoji. */
+const HERO_BASELINE_CHIPS: BaselineChip[] = [
+  { label: 'Речные прогулки', href: landingCategoryHref(CANONICAL_LANDING_SLUGS.river), landingSlug: CANONICAL_LANDING_SLUGS.river },
   { label: 'Музеи', href: '/events?category=Музеи+и+арт&sort=popular' },
-  { label: 'Roof-туры', href: landingCategoryHref('rooftops') },
-  { label: 'Стендап', href: '/events?q=стендап&sort=popular' },
+  { label: 'Roof-туры', href: landingCategoryHref('rooftops'), landingSlug: 'rooftops' },
+  { label: 'Стендап', href: '/events?q=стендап&sort=popular', landingSlug: 'standup' },
+  { label: 'Экскурсии', href: '/events?category=Экскурсии&sort=popular' },
+  { label: 'Концерты', href: landingCategoryHref('concerts-genre'), landingSlug: 'concerts-genre' },
+  { label: 'Семейные', href: landingCategoryHref('family-kids'), landingSlug: 'family-kids' },
+  { label: 'Автобусные', href: landingCategoryHref(CANONICAL_LANDING_SLUGS.bus), landingSlug: CANONICAL_LANDING_SLUGS.bus },
   { label: 'Топ недели', href: '/events?sort=popular' },
 ];
+
+/** Fallback when builder has no landings/city context. */
+export const HERO_QUICK_CHIPS: HomeQuickChip[] = HERO_BASELINE_CHIPS.map(({ label, href }) => ({
+  label,
+  href,
+}));
+
+function chipKey(label: string): string {
+  return label.trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
+function pushChip(
+  out: HomeQuickChip[],
+  used: Set<string>,
+  chip: HomeQuickChip | null | undefined,
+  limit: number,
+): void {
+  if (!chip?.label || !chip.href || out.length >= limit) return;
+  const key = chipKey(chip.label);
+  if (used.has(key)) return;
+  used.add(key);
+  out.push({ label: chip.label, href: chip.href });
+}
+
+function baselineChipForCity(chip: BaselineChip, citySlug?: string | null): HomeQuickChip | null {
+  if (!chip.landingSlug) return { label: chip.label, href: chip.href };
+  const slug = chip.landingSlug;
+  if (citySlug) {
+    if (!isWaterLandingAllowedForCity(slug, citySlug)) return null;
+    if (!landingMatchesCatalogCity(slug, citySlug)) return null;
+    return { label: chip.label, href: landingCategoryHref(slug, citySlug) };
+  }
+  return { label: chip.label, href: landingCategoryHref(slug) };
+}
+
+/**
+ * Soft pill row under home search: city hub landings/подборки + category shortcuts.
+ * One horizontal swipe; prefers curated hub directions when a city is selected.
+ */
+export function buildHomeHeroQuickChips(input: {
+  citySlug?: string | null;
+  landings?: LandingLike[];
+  hubTags?: HomeHeroChipHubTag[] | null;
+  categories?: HomeHeroChipCategory[] | null;
+  limit?: number;
+}): HomeQuickChip[] {
+  const limit = Math.min(Math.max(input.limit ?? HERO_QUICK_CHIP_LIMIT, 8), 12);
+  const citySlug = input.citySlug?.trim() || null;
+  const landings = input.landings || [];
+  const out: HomeQuickChip[] = [];
+  const used = new Set<string>();
+
+  if (citySlug) {
+    const directions = resolveFeaturedDirections({
+      config: resolveCityHubConfig(citySlug),
+      landings,
+      categories: (input.categories || [])
+        .filter((row) => row.events > 0)
+        .map((row) => [row.name, row.events] as [string, number]),
+      citySlug,
+      limit,
+    });
+
+    for (const row of directions) {
+      if (row.slug && row.href) {
+        pushChip(out, used, { label: row.label || row.title, href: row.href }, limit);
+        continue;
+      }
+      if (row.categoryKey) {
+        pushChip(
+          out,
+          used,
+          {
+            label: row.label || row.categoryKey,
+            href: `/events?category=${encodeURIComponent(row.categoryKey)}&sort=popular`,
+          },
+          limit,
+        );
+      }
+    }
+
+    for (const tag of input.hubTags || []) {
+      if (out.length >= limit) break;
+      if (tag.kind === 'landing' && tag.slug) {
+        if (!isWaterLandingAllowedForCity(tag.slug, citySlug)) continue;
+        if (!landingMatchesCatalogCity(tag.slug, citySlug)) continue;
+        pushChip(
+          out,
+          used,
+          { label: tag.label, href: landingCategoryHref(tag.slug, citySlug) },
+          limit,
+        );
+      } else if (tag.kind === 'category' && tag.label) {
+        pushChip(
+          out,
+          used,
+          {
+            label: tag.label,
+            href: `/events?category=${encodeURIComponent(tag.label)}&sort=popular`,
+          },
+          limit,
+        );
+      }
+    }
+
+    for (const cat of (input.categories || []).filter((row) => row.events > 0)) {
+      if (out.length >= limit) break;
+      pushChip(
+        out,
+        used,
+        {
+          label: cat.name,
+          href: `/events?category=${encodeURIComponent(cat.name)}&sort=popular`,
+        },
+        limit,
+      );
+    }
+  } else {
+    for (const landing of landings.filter((item) => Number(item.events) > 0)) {
+      if (out.length >= Math.min(6, limit)) break;
+      pushChip(
+        out,
+        used,
+        { label: landing.title, href: landingCategoryHref(landing.slug) },
+        limit,
+      );
+    }
+  }
+
+  for (const chip of HERO_BASELINE_CHIPS) {
+    if (out.length >= limit) break;
+    pushChip(out, used, baselineChipForCity(chip, citySlug), limit);
+  }
+
+  return out.slice(0, limit);
+}
 
 export const HOME_FORMAT_TILES: HomeFormatTile[] = [
   {

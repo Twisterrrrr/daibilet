@@ -1,17 +1,18 @@
 'use client';
 
 import { CalendarDays, Search } from 'lucide-react';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { CityPicker } from '@/components/CityPicker.client';
 import { HeroLayout } from '@/components/HeroLayout';
 import { HeroMedia } from '@/components/HeroMedia.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
-import type { PublicDestinationDto } from '@daibilet/contracts/public';
+import type { PublicDestinationDto, PublicLandingDto } from '@daibilet/contracts/public';
 import { buildCatalogHref, catalogHrefWithSelectedCity } from '@/lib/catalog-url';
 import { cityToPrepositional } from '@/lib/city-declension';
-import { HERO_QUICK_CHIPS } from '@/lib/home-scenarios';
+import { buildHomeHeroQuickChips } from '@/lib/home-scenarios';
+import { normalizeKnownCitySlug } from '@/lib/landing-routes';
 
 const HERO_DATE_OPTIONS = [
   { value: 'all', label: 'Любая дата' },
@@ -25,10 +26,11 @@ export type HomeHeroFrame = { src: string; alt: string; objectPosition?: string 
 type HomeHeroProps = {
   destinations: PublicDestinationDto[];
   frames: HomeHeroFrame[];
+  landings?: Array<Pick<PublicLandingDto, 'slug' | 'title' | 'subtitle' | 'events' | 'priceFrom'>>;
   videoSrc?: string | null;
 };
 
-export function HomeHero({ destinations, frames, videoSrc }: HomeHeroProps) {
+export function HomeHero({ destinations, frames, landings = [], videoSrc }: HomeHeroProps) {
   const router = useRouter();
   const selectedCity = useSelectedCityOptional();
   const destination = selectedCity?.cityValue ?? 'all';
@@ -37,9 +39,21 @@ export function HomeHero({ destinations, frames, videoSrc }: HomeHeroProps) {
   const [heroDate, setHeroDate] = useState('all');
 
   const selectedCityName = selectedDestination?.name || null;
-  const searchHint = selectedCityName
-    ? `Куда сходить сегодня, завтра или на выходных в ${cityToPrepositional(selectedCityName)}`
-    : 'Куда сходить сегодня, завтра или на выходных - музеи, концерты, экскурсии';
+  const citySlug =
+    normalizeKnownCitySlug(selectedDestination?.slug) ||
+    normalizeKnownCitySlug(selectedDestination?.sourceSlug) ||
+    (destination !== 'all' ? normalizeKnownCitySlug(destination) || destination : null);
+
+  const quickChips = useMemo(
+    () =>
+      buildHomeHeroQuickChips({
+        citySlug,
+        landings,
+        hubTags: selectedDestination?.hubTags,
+        categories: selectedDestination?.categories,
+      }),
+    [citySlug, landings, selectedDestination?.categories, selectedDestination?.hubTags],
+  );
 
   const openCatalog = (category?: string) => {
     router.push(
@@ -87,7 +101,7 @@ export function HomeHero({ destinations, frames, videoSrc }: HomeHeroProps) {
       <form
         onSubmit={onSubmit}
         className="mt-8 w-full max-w-5xl rounded-2xl bg-white p-2 text-left shadow-2xl shadow-slate-950/30"
-        aria-label={searchHint}
+        aria-label="Поиск билетов"
       >
         {/* Mobile: city + find. Desktop: city + date + find. Category lives in soft chip rail. */}
         <div className="grid w-full grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1.4fr)_minmax(120px,0.9fr)_auto]">
@@ -121,10 +135,9 @@ export function HomeHero({ destinations, frames, videoSrc }: HomeHeroProps) {
             Найти билеты
           </button>
         </div>
-        <p className="mt-2 px-2 pb-1 text-[11px] leading-snug text-slate-400 sm:text-xs">{searchHint}</p>
       </form>
 
-      {/* One soft swipe row: dates (mobile) + quick intents */}
+      {/* One soft swipe row: dates (mobile) + city landings / category shortcuts */}
       <div
         className="mt-4 w-full max-w-5xl overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         data-home-hero-chips
@@ -147,7 +160,7 @@ export function HomeHero({ destinations, frames, videoSrc }: HomeHeroProps) {
               </button>
             );
           })}
-          {HERO_QUICK_CHIPS.map((chip) => {
+          {quickChips.map((chip) => {
             let href = chip.href;
             if (chip.href.startsWith('/events')) {
               const params = new URLSearchParams(
