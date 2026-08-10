@@ -226,7 +226,7 @@ export function LandingDirectionCard({
           <div className={`absolute inset-0 bg-gradient-to-br ${landingGradient(landing.slug)}`} />
         )}
         <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/40 to-transparent" />
-        <div className="relative z-[1] p-4 text-white sm:p-5">
+        <div className="relative z-[1] flex flex-col gap-2.5 p-4 text-white sm:p-5">
           <h3
             className={`font-display font-bold leading-tight text-white ${
               featured ? 'text-xl sm:text-2xl' : 'text-lg sm:text-xl'
@@ -234,7 +234,7 @@ export function LandingDirectionCard({
           >
             <span className="underline-offset-4 group-hover:underline">{landing.title}</span>
           </h3>
-          <p className="mt-2.5 inline-flex items-center gap-1 text-sm font-semibold text-white/95">
+          <p className="inline-flex items-center gap-1 text-sm font-semibold text-white/95">
             Смотреть
             <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" aria-hidden />
           </p>

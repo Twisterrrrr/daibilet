@@ -386,11 +386,11 @@ export function LandingsCatalogView({
                   <div className="absolute inset-0 bg-gradient-to-br from-primary-700 via-sky-700 to-cyan-950" />
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-900/35 to-transparent" />
-                <div className="relative z-10 p-5">
+                <div className="relative z-10 flex flex-col gap-3 p-5">
                   <span className="font-display text-2xl font-extrabold leading-tight text-white sm:text-3xl">
                     {featured.title}
                   </span>
-                  <span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-white">
+                  <span className="inline-flex items-center gap-1 text-sm font-semibold text-white">
                     Смотреть
                     <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
                   </span>
