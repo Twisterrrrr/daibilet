@@ -184,13 +184,18 @@ import { toVenueCatalogCard } from '@/lib/venue-catalog-card';
 import type { VenueCatalogCard } from '@/lib/venue-map-types';
 
 type DayRouteAccordionId = 'mustSee' | 'text' | 'matches';
-/** Detail cards under always-on «Шаги» timeline: grid fence or dense list. */
+/** Detail cards (Сетка/Список); optional «Шаги» timeline via SHOW_DAY_ROUTE_STEPS. */
 type DayRouteStopViewMode = 'grid' | 'list';
 type DayRouteMobileShelf = 'route' | 'add';
 
 const DAY_ROUTE_STOP_VIEW_KEY = 'daibilet:dayRouteStopView';
 /** Owner 2026-08-06: post-buy modal «Оформили билет?» off until UX revisit. Buy links still open. */
 const SHOW_DAY_TICKET_HANDOFF_MODAL = false;
+/**
+ * Owner 2026-08-10: hide horizontal «Шаги» stepper timeline (cards Сетка/Список stay).
+ * Restore: set `SHOW_DAY_ROUTE_STEPS = true`.
+ */
+const SHOW_DAY_ROUTE_STEPS = false;
 
 function readStopViewMode(): DayRouteStopViewMode {
   if (typeof window === 'undefined') return 'grid';
@@ -419,10 +424,12 @@ function DayRoutePanelInner() {
   const [mobileView, setMobileView] = useState<'list' | 'map'>('list');
   /** Mobile shelf: route steps/map vs catalog add tools. */
   const [mobileShelf, setMobileShelf] = useState<DayRouteMobileShelf>('route');
-  /** Route stops detail: grid fence (default) or dense list; «Шаги» timeline always above. */
+  /** Route stops detail: grid fence (default) or dense list; «Шаги» timeline gated by SHOW_DAY_ROUTE_STEPS. */
   const [stopViewMode, setStopViewMode] = useState<DayRouteStopViewMode>('grid');
-  /** Desktop (≥lg) can pick grid/list; mobile always dense list under timeline. */
+  /** Desktop (≥lg) can pick grid/list; mobile always dense list. */
   const [isLgUp, setIsLgUp] = useState(false);
+  /** Session dismiss for «Свободное окно» upsell (resets on reload). */
+  const [freeWindowDismissed, setFreeWindowDismissed] = useState(false);
   const listRootRef = useRef<HTMLDivElement | null>(null);
   /** After external «Купить билет» - ask guest to mark bought (gated by SHOW_DAY_TICKET_HANDOFF_MODAL). */
   const [ticketHandoff, setTicketHandoffState] = useState<{
@@ -3147,7 +3154,7 @@ function DayRoutePanelInner() {
             </p>
           ) : null}
 
-          {timelineStops.length > 0 ? (
+          {SHOW_DAY_ROUTE_STEPS && timelineStops.length > 0 ? (
             <div className="mt-3" data-day-route-timeline-wrap>
               <DayRouteStopsTimeline
                 stops={timelineStops}
@@ -3287,14 +3294,24 @@ function DayRoutePanelInner() {
                     globalIndex >= 0 &&
                     primaryFreeWindow.afterIndex === globalIndex &&
                     freeWindowUpsells.length > 0 &&
-                    !atMax ? (
+                    !atMax &&
+                    !freeWindowDismissed ? (
                       <li
                         className={effectiveStopViewMode === 'grid' ? 'col-span-full' : undefined}
                         data-day-free-window-upsell
                         data-day-free-window
                       >
-                        <div className="rounded-2xl border border-dashed border-sky-200 bg-sky-50/60 p-3 sm:p-4">
-                          <p className="text-sm font-semibold text-slate-900">Свободное окно</p>
+                        <div className="relative rounded-2xl border border-dashed border-sky-200 bg-sky-50/60 p-3 sm:p-4">
+                          <button
+                            type="button"
+                            onClick={() => setFreeWindowDismissed(true)}
+                            className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full text-slate-500 transition hover:bg-white/80 hover:text-slate-800"
+                            aria-label="Скрыть свободное окно"
+                            data-day-free-window-dismiss
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                          <p className="pr-9 text-sm font-semibold text-slate-900">Свободное окно</p>
                           <p className="mt-0.5 text-[13px] text-slate-600">
                             Между точками около {formatDayRouteDistance(primaryFreeWindow.meters)} - можно добавить ещё
                             одну остановку.

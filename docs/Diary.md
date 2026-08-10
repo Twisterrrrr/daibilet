@@ -1,3 +1,18 @@
+## 2026-08-10 - my-day: hide Шаги + dismiss free window
+
+### Наблюдения
+- Owner screenshot: горизонтальный stepper «Шаги» мешает; карточки Сетка/Список оставляем.
+- «Свободное окно» без dismiss - нельзя убрать подсказку.
+
+### Решения
+- `SHOW_DAY_ROUTE_STEPS = false` в `DayRoutePanel.client.tsx` (вернуть `true` для restore).
+- Dismiss X на блоке «Свободное окно» - React state на сессию (`freeWindowDismissed`).
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-10 - my-day: Шаги always + restore Сетка
 
 ### Наблюдения
