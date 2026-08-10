@@ -130,13 +130,15 @@ export function CatalogToolbar({
       aria-label="Быстрые фильтры и категории"
       className="flex w-full min-w-0 flex-nowrap items-center gap-1.5 overflow-x-auto overscroll-x-contain pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
     >
-      <QuickFilterToggles filters={filters} qDraft={qDraft} disabled={disabled} onNavigate={navigate} />
       <CategoryTabs
         filters={filters}
         primary={categorySplit.primary}
         overflow={categorySplit.overflow}
         onOpenMore={() => setCategoriesMoreOpen(true)}
       />
+      <div className="ml-auto flex shrink-0 flex-nowrap items-center gap-1.5">
+        <QuickFilterToggles filters={filters} qDraft={qDraft} disabled={disabled} onNavigate={navigate} />
+      </div>
     </div>
   );
 

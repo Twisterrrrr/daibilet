@@ -55,7 +55,7 @@ export function EventsCatalogHero() {
         : `Афиша в категории «${category}»`
       : cityPrep
         ? `Билеты и расписание - выбирайте по дате и интересам`
-        : 'Билеты на экскурсии, концерты и музеи более чем в 100 городах России.';
+        : null;
 
   return (
     <>
@@ -69,16 +69,22 @@ export function EventsCatalogHero() {
       <header className="border-b border-slate-100 bg-white">
         <div className="container-page py-4 sm:py-5">
           {/* Desktop: title band + date rail on one line; mobile: date directly under subtitle. */}
-          <div className="flex flex-col gap-2.5 md:flex-row md:items-end md:justify-between md:gap-5">
-            <div className="min-w-0 flex-1">
+          <div className="flex flex-col gap-2.5 md:flex-row md:items-end md:gap-5">
+            <div className="min-w-0 shrink-0 md:max-w-md lg:max-w-lg">
               <h1 className="font-display text-2xl font-extrabold tracking-tight text-graphite sm:text-3xl">
                 {title}
               </h1>
-              <p className="mt-1 max-w-2xl text-sm leading-snug text-graphite-muted sm:text-[15px]">
-                {subtitle}
+              <p className="mt-1 text-sm leading-snug text-graphite-muted sm:text-[15px]">
+                {subtitle ?? (
+                  <>
+                    Билеты на экскурсии, концерты и музеи
+                    <br />
+                    более чем в 100 городах России.
+                  </>
+                )}
               </p>
             </div>
-            <CatalogDateRail className="md:max-w-[min(100%,32rem)] md:shrink-0" />
+            <CatalogDateRail className="min-w-0 w-full md:flex-1" />
           </div>
         </div>
       </header>
