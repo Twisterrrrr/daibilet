@@ -330,3 +330,47 @@ export const LOCATION_LOGISTICS_OPTIONS: Array<{ value: LocationLogisticsGroup |
   { value: 'bus', label: 'Автобусы' },
   { value: 'walking', label: 'Пешеходные' },
 ];
+
+/**
+ * Cultural attractions that can sit next to museums on institution PDP
+ * (Исаакий, Кунсткамера) - never bars / standup clubs.
+ */
+const CULTURAL_ATTRACTION_NAME_RE =
+  /музей|собор|кунсткамер|галере|эрмитаж|дворец|храм|крепост|петропавл|исаак|фаберже|эрарта|штаб|арсенал|монастыр/iu;
+
+function isCulturalAttractionLike(type: string, name?: string | null): boolean {
+  return (type === 'attraction' || type === 'monument') && CULTURAL_ATTRACTION_NAME_RE.test(String(name || ''));
+}
+
+/**
+ * Related venues for institution PDP: same commercial family only.
+ * Museums → museums / art spaces / cultural attractions; never bars/clubs/standup.
+ * Empty result → caller hides the block.
+ */
+export function filterSimilarInstitutionVenues<
+  T extends { type?: string | null; name?: string | null; title?: string | null; events?: number | null },
+>(current: { type?: string | null; name?: string | null; title?: string | null }, related: T[], limit = 4): T[] {
+  const currentType = resolvePublicVenueType(current.type, current.name || current.title);
+  const currentName = current.name || current.title || '';
+  const scored = related
+    .map((item) => {
+      const type = resolvePublicVenueType(item.type, item.name || item.title);
+      const name = item.name || item.title || '';
+      let score = -1;
+      if (MUSEUM_SCALE_KINDS.has(currentType) || isCulturalAttractionLike(currentType, currentName)) {
+        if (MUSEUM_SCALE_KINDS.has(type)) score = type === 'museum' || type === 'museum_art_space' ? 100 : 90;
+        else if (isCulturalAttractionLike(type, name)) score = 70;
+      } else if (LARGE_HALL_KINDS.has(currentType)) {
+        if (LARGE_HALL_KINDS.has(type)) score = type === currentType ? 100 : 80;
+      } else if (INTIMATE_KINDS.has(currentType)) {
+        if (INTIMATE_KINDS.has(type)) score = type === currentType ? 100 : 80;
+      } else if (type === currentType) {
+        score = 50;
+      }
+      if (score < 0) return null;
+      return { item, score: score + Math.min(20, Number(item.events) || 0) };
+    })
+    .filter((row): row is { item: T; score: number } => Boolean(row))
+    .sort((a, b) => b.score - a.score);
+  return scored.slice(0, limit).map((row) => row.item);
+}

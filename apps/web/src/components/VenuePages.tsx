@@ -27,6 +27,7 @@ import { withSoftTimeout } from '@/lib/soft-timeout';
 import { buildVenuePageJsonLd } from '@/lib/structured-data';
 import { resolveVenueSeoTitle } from '@/lib/venue-seo';
 import { resolveVenueHeroImage } from '@/lib/city-place-images';
+import { applyVenueEditorialOverlay } from '@/lib/venue-editorial-content';
 import type { PublicVenuePageDto } from '@daibilet/contracts/public';
 
 /** Admission must not hang venue HTML when finance is slow. */
@@ -138,7 +139,7 @@ export async function generateVenueDetailMetadata(slug: string): Promise<Metadat
     };
   }
   const payload = loaded.payload;
-  const venue = payload.venue;
+  const venue = applyVenueEditorialOverlay(payload.venue);
   const heroForShare =
     resolveVenueHeroImage(venue.slug || slug, venue.heroImageUrl) || venue.heroImageUrl;
   const decision = evaluateVenueIndexability({
@@ -259,8 +260,12 @@ export async function VenueDetailPage({
     payload.venue.slug || decodedSlug,
     payload.venue.heroImageUrl,
   );
-  if (editorialHero && editorialHero !== payload.venue.heroImageUrl) {
-    payload = { ...payload, venue: { ...payload.venue, heroImageUrl: editorialHero } };
+  let venue = applyVenueEditorialOverlay(payload.venue);
+  if (editorialHero && editorialHero !== venue.heroImageUrl) {
+    venue = { ...venue, heroImageUrl: editorialHero };
+  }
+  if (venue !== payload.venue) {
+    payload = { ...payload, venue };
   }
 
   const admission = await withSoftTimeout(

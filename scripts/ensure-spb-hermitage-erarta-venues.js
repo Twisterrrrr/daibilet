@@ -158,8 +158,8 @@ async function main() {
               kind = 'MUSEUM_ART_SPACE',
               "pageStatus" = 'PUBLISHED',
               "isIndexable" = $10,
-              "seoH1" = coalesce(nullif(trim("seoH1"), ''), $11),
-              "seoTitle" = coalesce(nullif(trim("seoTitle"), ''), $12),
+              "seoH1" = $11,
+              "seoTitle" = $12,
               "seoDescription" = coalesce(nullif(trim("seoDescription"), ''), $13),
               "canonicalPath" = coalesce(nullif(trim("canonicalPath"), ''), $14),
               "updatedAt" = now()

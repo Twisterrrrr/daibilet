@@ -6,10 +6,17 @@ import type { FinanceAdmissionProduct } from '@/lib/finance-projection';
 type Props = {
   products: FinanceAdmissionProduct[];
   className?: string;
+  title?: string;
+  description?: string;
 };
 
-/** Venue page block «Входные билеты» - separate from event programme slots. */
-export function VenueAdmissionBlock({ products, className = '' }: Props) {
+/** Venue page block «Билеты» - separate from event programme slots. */
+export function VenueAdmissionBlock({
+  products,
+  className = '',
+  title = 'Билеты',
+  description = 'Билет без сеанса в афише - покупка на Дайбилет.',
+}: Props) {
   if (!products.length) return null;
 
   return (
@@ -23,10 +30,8 @@ export function VenueAdmissionBlock({ products, className = '' }: Props) {
           <Ticket className="h-4 w-4" />
         </div>
         <div>
-          <h2 className="text-xl font-bold text-slate-900">Входные билеты</h2>
-          <p className="mt-1 text-sm text-slate-600">
-            Билет без сеанса в афише - покупка на Дайбилет.
-          </p>
+          <h2 className="text-xl font-bold text-slate-900">{title}</h2>
+          <p className="mt-1 text-sm text-slate-600">{description}</p>
         </div>
       </div>
       <div className="mt-5 grid gap-4 sm:grid-cols-2">

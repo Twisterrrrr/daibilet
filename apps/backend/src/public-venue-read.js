@@ -2654,16 +2654,80 @@ async function publicVenues(db, limit) {
   return (await publicVenueHubRows(db, 500)).slice(0, limit).map(mapPublicVenueListItem);
 }
 
+/**
+ * Cultural attractions that can sit next to museums (Исаакий, Кунсткамера).
+ * Bars / standup / pubs must never appear next to museum institution PDP.
+ */
+const CULTURAL_ATTRACTION_NAME_RE =
+  /музей|собор|кунсткамер|галере|эрмитаж|дворец|храм|крепост|петропавл|исаак|фаберже|эрарта|штаб|арсенал|монастыр/iu;
+
+function isCulturalAttractionLikeKind(kind, name) {
+  const key = String(kind || '')
+    .trim()
+    .toLowerCase()
+    .replace(/-/g, '_');
+  return (key === 'attraction' || key === 'monument') && CULTURAL_ATTRACTION_NAME_RE.test(String(name || ''));
+}
+
+/** @internal exported for unit tests */
+export function scoreRelatedVenueCandidate(currentKind, currentName, candidateKind, candidateName, events = 0) {
+  const current = String(currentKind || '')
+    .trim()
+    .toLowerCase()
+    .replace(/-/g, '_');
+  const candidate = String(candidateKind || '')
+    .trim()
+    .toLowerCase()
+    .replace(/-/g, '_');
+  let score = -1;
+  if (MUSEUM_SCALE_KINDS.has(current) || isCulturalAttractionLikeKind(current, currentName)) {
+    if (MUSEUM_SCALE_KINDS.has(candidate)) {
+      score = candidate === 'museum' || candidate === 'museum_art_space' ? 100 : 90;
+    } else if (isCulturalAttractionLikeKind(candidate, candidateName)) {
+      score = 70;
+    }
+  } else if (LARGE_HALL_KINDS.has(current)) {
+    if (LARGE_HALL_KINDS.has(candidate)) score = candidate === current ? 100 : 80;
+  } else if (INTIMATE_KINDS.has(current)) {
+    if (INTIMATE_KINDS.has(candidate)) score = candidate === current ? 100 : 80;
+  } else if (candidate === current) {
+    score = 50;
+  } else if (
+    publicVenuePageTemplate(current) === 'institution' &&
+    publicVenuePageTemplate(candidate) === 'institution' &&
+    !INTIMATE_KINDS.has(candidate) &&
+    !INTIMATE_KINDS.has(current)
+  ) {
+    // Same institution family without nightlife cross-talk (e.g. theater↔concert already covered).
+    score = -1;
+  }
+  if (score < 0) return -1;
+  return score + Math.min(20, Number(events) || 0);
+}
+
 async function publicRelatedVenues(db, venueId, city, limit, hubRows = null) {
   if (!city) return [];
   const rows = hubRows || (await publicVenueHubRows(db, 500));
   const current = findMergedVenueGroup(rows, venueId);
-  const currentTemplate = publicVenuePageTemplate(resolvePublicVenueKindFromRow(current || {}));
+  const currentKind = resolvePublicVenueKindFromRow(current || {});
+  const currentName = current?.name || current?.title || '';
+  const currentTemplate = publicVenuePageTemplate(currentKind);
   return rows
     .filter((row) => row.city === city && isPublicVenueHub(row) && !venueGroupsOverlap(current, row))
-    .filter((row) => publicVenuePageTemplate(resolvePublicVenueKindFromRow(row)) === currentTemplate)
+    .map((row) => {
+      const kind = resolvePublicVenueKindFromRow(row);
+      const name = row.name || row.title || '';
+      // Location pages keep same-template related; museums may also pull cultural attractions.
+      let score = scoreRelatedVenueCandidate(currentKind, currentName, kind, name, row.events);
+      if (score < 0 && currentTemplate === 'location' && publicVenuePageTemplate(kind) === 'location') {
+        score = 40 + Math.min(20, Number(row.events) || 0);
+      }
+      return score < 0 ? null : { row, score };
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.score - a.score)
     .slice(0, limit)
-    .map(mapPublicVenueListItem);
+    .map((entry) => mapPublicVenueListItem(entry.row));
 }
 
 async function publicVenuesForCity(db, city, limit) {

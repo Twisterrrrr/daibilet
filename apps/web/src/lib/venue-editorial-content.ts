@@ -1,13 +1,16 @@
 /**
- * Per-venue editorial content overlay (highlights / FAQ / feature chips).
+ * Per-venue editorial content overlay (highlights / FAQ / feature chips / contacts).
  *
  * Catalog Venue has no highlights/faq/features columns yet. Until CMS ships them,
  * keep a curated slug map so institution PDP can show SPBBOATS-class content
  * without a prod DB write. Other venues stay on generic FAQ / no chips.
  *
  * Source for ermitazh: docs/research/venue-seeds-hermitage-garage/ermitazh.venue-seed.json
- * (hyphen-only copy; hours live in venue-opening-hours.ts).
+ * (hyphen-only copy). Hours live in venue-opening-hours.ts (official hermitagemuseum.org
+ * Main Museum Complex: 11:00 starts - SPBBOATS seed 10:30 is superseded).
  */
+
+import type { PublicVenueDto } from '@daibilet/contracts/public';
 
 export type VenueEditorialFaqItem = {
   question: string;
@@ -22,25 +25,48 @@ export type VenueFeatureCode =
   | 'cafe'
   | 'gift_shop';
 
+export type VenueFeatureChip = {
+  code: VenueFeatureCode;
+  label: string;
+  icon: string;
+};
+
+export type VenueEditorialTickets = {
+  /** Display price in rubles (seed priceFrom is kopecks / 100). */
+  priceFromRub: number;
+  /** Primary purchase URL (official / redirect). */
+  href: string;
+  /** Short badge under CTA, e.g. «Официальный сайт». */
+  badge?: string;
+};
+
 export type VenueEditorialContent = {
+  /** Overrides H1 / name / seoH1 when DB still has legacy title. */
+  displayTitle?: string;
   highlights: string[];
   features: VenueFeatureCode[];
   faq: VenueEditorialFaqItem[];
   /** Hero/logistics fallback when Venue.metroStation is empty in DB. */
   metroStation?: string;
+  phone?: string;
+  website?: string;
+  websiteLabel?: string;
+  /** Commercial hero + «Билеты» when catalog sessions / finance admission are empty. */
+  tickets?: VenueEditorialTickets;
 };
 
-const FEATURE_LABELS: Record<VenueFeatureCode, string> = {
-  no_queue: 'Без очереди',
-  audio_guide: 'Аудиогид',
-  kids_friendly: 'С детьми',
-  wheelchair: 'Доступность',
-  cafe: 'Кафе',
-  gift_shop: 'Магазин',
+const FEATURE_CHIPS: Record<VenueFeatureCode, VenueFeatureChip> = {
+  no_queue: { code: 'no_queue', label: 'Без очереди', icon: '⚡' },
+  audio_guide: { code: 'audio_guide', label: 'Аудиогид', icon: '🎧' },
+  kids_friendly: { code: 'kids_friendly', label: 'С детьми', icon: '👶' },
+  wheelchair: { code: 'wheelchair', label: 'Доступность', icon: '♿' },
+  cafe: { code: 'cafe', label: 'Кафе', icon: '☕' },
+  gift_shop: { code: 'gift_shop', label: 'Магазин', icon: '🎁' },
 };
 
 const EDITORIAL_BY_SLUG: Record<string, VenueEditorialContent> = {
   ermitazh: {
+    displayTitle: 'Государственный Эрмитаж',
     highlights: [
       '3 миллиона экспонатов',
       'Зимний дворец - объект ЮНЕСКО',
@@ -50,6 +76,14 @@ const EDITORIAL_BY_SLUG: Record<string, VenueEditorialContent> = {
     ],
     features: ['no_queue', 'audio_guide', 'kids_friendly', 'wheelchair', 'cafe', 'gift_shop'],
     metroStation: 'Адмиралтейская',
+    phone: '+7 (812) 710-90-79',
+    website: 'https://hermitagemuseum.org',
+    websiteLabel: 'Официальный сайт',
+    tickets: {
+      priceFromRub: 500,
+      href: 'https://www.hermitagemuseum.org/wps/portal/hermitage/tickets',
+      badge: 'Официальный сайт',
+    },
     faq: [
       {
         question: 'Можно ли вернуть билет?',
@@ -71,7 +105,7 @@ const EDITORIAL_BY_SLUG: Record<string, VenueEditorialContent> = {
       {
         question: 'Актуальны ли часы работы?',
         answer:
-          'На странице показываем редакционный график главного комплекса. В праздники и при сеансовой системе сверяйте с hermitagemuseum.org.',
+          'На странице показываем официальный график главного комплекса (hermitagemuseum.org / visitus): вход с 11:00. В праздники и при сеансовой системе сверяйте с сайтом музея.',
       },
     ],
   },
@@ -92,13 +126,41 @@ export function resolveVenueEditorialContent(
   return EDITORIAL_BY_SLUG[key] ?? null;
 }
 
+/**
+ * Patch public venue DTO with curated title / metro when DB lags.
+ * Used by venue PDP SSR + client so H1 and SEO stay aligned.
+ */
+export function applyVenueEditorialOverlay<T extends PublicVenueDto>(venue: T): T {
+  const editorial = resolveVenueEditorialContent(venue.slug);
+  if (!editorial) return venue;
+  let next: T = venue;
+  if (editorial.displayTitle) {
+    next = {
+      ...next,
+      name: editorial.displayTitle,
+      title: editorial.displayTitle,
+      seoH1: editorial.displayTitle,
+    };
+  }
+  const metro = String(next.metroStation || '').trim();
+  if ((!metro || metro === '-' || metro === '—' || metro === '–') && editorial.metroStation) {
+    next = { ...next, metroStation: editorial.metroStation };
+  }
+  return next;
+}
+
 /** Human labels for feature codes (unknown codes skipped). */
 export function venueFeatureLabels(codes: readonly string[] | null | undefined): string[] {
+  return venueFeatureChips(codes).map((chip) => chip.label);
+}
+
+/** Icon chips for hero / «О месте» (SPBBOATS-style). */
+export function venueFeatureChips(codes: readonly string[] | null | undefined): VenueFeatureChip[] {
   if (!codes?.length) return [];
-  const out: string[] = [];
+  const out: VenueFeatureChip[] = [];
   for (const code of codes) {
-    const label = FEATURE_LABELS[code as VenueFeatureCode];
-    if (label) out.push(label);
+    const chip = FEATURE_CHIPS[code as VenueFeatureCode];
+    if (chip) out.push(chip);
   }
   return out;
 }

@@ -7,6 +7,7 @@ import {
   publicVenueRowMatchesCityFilter,
   publicVenuesForSessionsFromHub,
   resolvePublicVenueCanonicalPath,
+  scoreRelatedVenueCandidate,
   venueTextKeysFuzzyMatch,
 } from './public-venue-read.js';
 
@@ -191,4 +192,15 @@ test('lookupVenueCatalogSessions does not attach Sortavala Музей session to
     ],
   );
   assert.equal(drevnosti.length, 0);
+});
+
+test('scoreRelatedVenueCandidate keeps museums away from standup clubs', () => {
+  assert.ok(
+    scoreRelatedVenueCandidate('museum', 'Эрмитаж', 'museum', 'Русский музей', 3) >
+      scoreRelatedVenueCandidate('museum', 'Эрмитаж', 'attraction', 'Исаакиевский собор', 1),
+  );
+  assert.ok(scoreRelatedVenueCandidate('museum', 'Эрмитаж', 'attraction', 'Кунсткамера', 0) > 0);
+  assert.equal(scoreRelatedVenueCandidate('museum', 'Эрмитаж', 'club_bar_restaurant', 'Stage StandUp Club', 40), -1);
+  assert.equal(scoreRelatedVenueCandidate('museum', 'Эрмитаж', 'bar', 'POPRAVKA BAR', 10), -1);
+  assert.equal(scoreRelatedVenueCandidate('museum', 'Эрмитаж', 'theater', 'Дом Шрёдера', 5), -1);
 });

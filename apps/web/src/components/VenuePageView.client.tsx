@@ -11,6 +11,7 @@ import { useSelectedCityOptional } from '@/components/SelectedCityProvider.clien
 import { VenueAdmissionBlock } from '@/components/VenueAdmissionBlock';
 import type { PublicVenueDto, PublicVenuePageDto } from '@daibilet/contracts/public';
 import { resolveVenueHeroImage } from '@/lib/city-place-images';
+import { applyVenueEditorialOverlay } from '@/lib/venue-editorial-content';
 import { venueMatchesRouteSlug } from '@/lib/day-route';
 import { formatMoney, formatNumber } from '@/lib/format';
 import { formatStreetAddress } from '@/lib/address';
@@ -25,13 +26,17 @@ import {
 } from '@/lib/venue-program';
 import { venuePageTemplate } from '@/lib/venue-meta';
 
-/** Match SSR VenueDetailPage: curated cover wins over hub stub / supplier thumb. */
-function withEditorialHero(payload: PublicVenuePageDto): PublicVenuePageDto {
+/** Match SSR VenueDetailPage: curated cover + title/metro overlays. */
+function withEditorialVenue(payload: PublicVenuePageDto): PublicVenuePageDto {
   const venue = payload.venue;
   if (!venue) return payload;
-  const editorialHero = resolveVenueHeroImage(venue.slug, venue.heroImageUrl);
-  if (!editorialHero || editorialHero === venue.heroImageUrl) return payload;
-  return { ...payload, venue: { ...venue, heroImageUrl: editorialHero } };
+  let next = applyVenueEditorialOverlay(venue);
+  const editorialHero = resolveVenueHeroImage(next.slug, next.heroImageUrl);
+  if (editorialHero && editorialHero !== next.heroImageUrl) {
+    next = { ...next, heroImageUrl: editorialHero };
+  }
+  if (next === venue) return payload;
+  return { ...payload, venue: next };
 }
 
 function slugFromPathname(pathname: string | null | undefined): string {
@@ -122,7 +127,7 @@ export function VenuePageView({
         if (!venueMatchesRouteSlug(data.venue, routeSlug)) {
           throw new Error('Страница не найдена');
         }
-        return withEditorialHero(data);
+        return withEditorialVenue(data);
       })
       .then((data) => {
         setPayload(data);

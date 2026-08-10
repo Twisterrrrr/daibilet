@@ -114,8 +114,9 @@ const EDITORIAL_OPENING_HOURS_BY_SLUG: Record<string, string[]> = {
   "erarta": [
     "Ежедневно: 10:00-22:00",
   ],
-  // Official Main Museum Complex (hermitagemuseum.org visitus): Mon closed;
+  // Official Main Museum Complex (hermitagemuseum.org / visitus): Mon closed;
   // Wed/Thu/Sun 11-18; Tue/Fri/Sat 11-20. Session-based entry - holiday caveat in UI.
+  // SPBBOATS seed used 10:30 starts - superseded by official visitus schedule (2026-08).
   "ermitazh": [
     "Ср, Чт, Вс: 11:00-18:00",
     "Вт, Пт, Сб: 11:00-20:00",

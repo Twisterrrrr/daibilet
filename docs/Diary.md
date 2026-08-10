@@ -1,3 +1,22 @@
+## 2026-08-10 - Hermitage PDP: SPBBOATS commercial UX
+
+### Наблюдения
+- Live H1/SEO: «Эрмитаж (Зимний дворец)» вместо канона «Государственный Эрмитаж»; metro null; related = standup/бары.
+- Own tickets пусты (нет sessions/admission); только STOP-экскурсия конкурировала в hero.
+- SPBBOATS seed hours 10:30 vs editorial/official visitus 11:00.
+
+### Решения
+- Editorial overlay `ermitazh`: displayTitle, tickets от 500 ₽ → hermitage tickets URL, phone/site, feature icon chips в hero.
+- `InstitutionVenueLayout`: коммерческий hero (цена + «Купить билет»), адрес `•` метро, блок «Билеты» первым, STOP под «Также можно посетить с экскурсией», контакты в sidebar, similar только museums/cultural.
+- `publicRelatedVenues`: affinity ranking (museum≠nightlife); client `filterSimilarInstitutionVenues` hide-if-empty.
+- Часы: оставляем official hermitagemuseum.org visitus (11:00); seed 10:30 documented as superseded.
+
+### Проблемы
+- Prod DB title/seoH1 ещё legacy до ensure-скрипта / admin write; UI+metadata уже через overlay.
+- API restart на MSK нужен для relatedVenues в JSON; UI уже фильтрует client-side.
+
+---
+
 ## 2026-08-10 - Hermitage PDP: layout + alias redirect
 
 ### Наблюдения

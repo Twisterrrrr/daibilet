@@ -6,6 +6,7 @@ import {
   CheckCircle2,
   ChevronDown,
   Clock,
+  ExternalLink,
   HelpCircle,
   MapPin,
   Navigation as NavigationIcon,
@@ -27,15 +28,21 @@ import { dedupeVenueLinkedEvents } from '@/lib/day-route-score';
 import type { FinanceAdmissionProduct } from '@/lib/finance-projection';
 import { build2gisRouteUrl } from '@/lib/maps';
 import {
+  applyVenueEditorialOverlay,
   formatVenueMetroLabel,
   resolveVenueEditorialContent,
-  venueFeatureLabels,
+  venueFeatureChips,
 } from '@/lib/venue-editorial-content';
 import {
   OPEN_DATE_HOURS_HOLIDAY_NOTE,
   resolveVenueOpeningHours,
 } from '@/lib/venue-opening-hours';
-import { institutionTypeEmoji, normalizeVenueKind, venueTypeLabel } from '@/lib/venue-meta';
+import {
+  filterSimilarInstitutionVenues,
+  institutionTypeEmoji,
+  normalizeVenueKind,
+  venueTypeLabel,
+} from '@/lib/venue-meta';
 import { eventHref, venueHref } from '@/lib/routes';
 import type {
   PublicSessionDto,
@@ -61,7 +68,7 @@ const GENERIC_FAQ_ITEMS = [
 ];
 
 export function InstitutionVenueLayout({
-  venue,
+  venue: venueProp,
   stats,
   sessions,
   relatedVenues,
@@ -81,6 +88,7 @@ export function InstitutionVenueLayout({
   admissionProducts?: FinanceAdmissionProduct[];
   children?: React.ReactNode;
 }) {
+  const venue = React.useMemo(() => applyVenueEditorialOverlay(venueProp), [venueProp]);
   const title = venue.seoH1 || venue.title || venue.name;
   const streetAddress = formatStreetAddress(venue.address, { city: venue.city });
   const hasMap = Boolean(venue.latitude && venue.longitude);
@@ -97,8 +105,8 @@ export function InstitutionVenueLayout({
     () => resolveVenueEditorialContent(venue.slug),
     [venue.slug],
   );
-  const featureLabels = React.useMemo(
-    () => venueFeatureLabels(editorial?.features),
+  const featureChips = React.useMemo(
+    () => venueFeatureChips(editorial?.features),
     [editorial],
   );
   const openingHours = React.useMemo(
@@ -130,13 +138,35 @@ export function InstitutionVenueLayout({
   const hasStopExcursions = stopExcursionCount > 0;
   const hasNearbyExcursions = uniqueNearbyEvents.length > 0;
   const linkedExcursions = hasStopExcursions ? uniqueStopEvents : uniqueNearbyEvents;
-  // An institution can be a useful editorial place without an active sale.
-  // In that case it must not imitate a ticket page.
-  const hasTicketSales = sessions.length > 0 || admissionProducts.length > 0;
+  const editorialTickets = editorial?.tickets;
+  const priceFromRub =
+    (Number.isFinite(stats.priceFrom) && (stats.priceFrom as number) > 0
+      ? (stats.priceFrom as number)
+      : null) ??
+    (admissionProducts[0]?.priceFromRub && admissionProducts[0].priceFromRub > 0
+      ? admissionProducts[0].priceFromRub
+      : null) ??
+    editorialTickets?.priceFromRub ??
+    null;
+  const hasOwnTickets = admissionProducts.length > 0 || Boolean(editorialTickets);
+  const hasTicketSales = sessions.length > 0 || hasOwnTickets;
   const hasAfisha = sessions.length > 0;
   const showFaq = hasTicketSales || Boolean(editorial?.faq?.length);
   const showVisitSection =
     Boolean(openingHours?.lines?.length) || hasVenueLogisticsContent(logisticsVenue);
+  const similarVenues = React.useMemo(
+    () => filterSimilarInstitutionVenues(venue, relatedVenues, 4),
+    [venue, relatedVenues],
+  );
+  const ticketHref = hasOwnTickets
+    ? '#venue-admission'
+    : hasAfisha
+      ? '#venue-program'
+      : '#venue-admission';
+  const phone = nonEmptyLogisticsText(editorial?.phone);
+  const website = nonEmptyLogisticsText(editorial?.website);
+  const websiteLabel = editorial?.websiteLabel || 'Официальный сайт';
+  const heroAddressLine = [streetAddress || venue.city, metroLabel].filter(Boolean).join(' • ');
 
   const heroGradient = isTheatre
     ? 'bg-gradient-to-r from-rose-900/95 via-slate-900/80 to-slate-900/50'
@@ -183,46 +213,44 @@ export function InstitutionVenueLayout({
                   <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur">
                     {formatNumber(stats.events)} в афише
                   </span>
-                ) : hasStopExcursions ? (
-                  <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur">
-                    {formatNumber(stopExcursionCount)} в маршрутах
-                  </span>
-                ) : hasNearbyExcursions ? (
-                  <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur">
-                    {formatNumber(uniqueNearbyEvents.length)} рядом
-                  </span>
                 ) : null}
               </div>
 
               <h1 className="mt-4 font-display text-3xl font-extrabold leading-tight text-white sm:text-4xl md:text-5xl">{title}</h1>
 
-              <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-white/90">
-                {streetAddress ? (
-                  <span className="inline-flex items-center gap-1.5">
-                    <MapPin className="h-4 w-4" />
-                    {streetAddress}
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center gap-1.5">
-                    <MapPin className="h-4 w-4" />
-                    {venue.city}
-                  </span>
-                )}
-                {metroLabel ? <span className="text-white/80">{metroLabel}</span> : null}
-              </div>
+              {heroAddressLine ? (
+                <div className="mt-4 inline-flex items-start gap-1.5 text-sm text-white/90">
+                  <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
+                  <span>{heroAddressLine}</span>
+                </div>
+              ) : null}
+
+              {featureChips.length > 0 ? (
+                <div className="mt-4 flex flex-wrap gap-2" data-venue-feature-chips-hero>
+                  {featureChips.map((chip) => (
+                    <span
+                      key={chip.code}
+                      className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur"
+                    >
+                      <span aria-hidden="true">{chip.icon}</span>
+                      {chip.label}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
 
               <p className="mt-4 max-w-xl text-white/90">{intro}</p>
             </div>
 
             <div className="flex flex-col items-start gap-2 md:items-end">
-              {hasTicketSales ? (
+              {hasTicketSales && priceFromRub ? (
                 <>
                   <div className="md:text-right">
                     <div className="text-sm text-white/70">Билет от</div>
-                    <div className="text-3xl font-extrabold">{formatMoney(stats.priceFrom)}</div>
+                    <div className="text-3xl font-extrabold">{formatNumber(priceFromRub)}&nbsp;₽</div>
                   </div>
                   <a
-                    href={admissionProducts.length ? '#venue-admission' : '#venue-program'}
+                    href={ticketHref}
                     className={`inline-flex items-center gap-2 rounded-full px-6 py-3 font-bold shadow-lg transition hover:opacity-95 ${
                       isTheatre ? 'bg-rose-500 text-white hover:bg-rose-600' : 'bg-white text-slate-900 hover:bg-slate-100'
                     }`}
@@ -231,6 +259,16 @@ export function InstitutionVenueLayout({
                     {isTheatre ? 'К афише' : 'Купить билет'}
                   </a>
                 </>
+              ) : hasTicketSales ? (
+                <a
+                  href={ticketHref}
+                  className={`inline-flex items-center gap-2 rounded-full px-6 py-3 font-bold shadow-lg transition hover:opacity-95 ${
+                    isTheatre ? 'bg-rose-500 text-white hover:bg-rose-600' : 'bg-white text-slate-900 hover:bg-slate-100'
+                  }`}
+                >
+                  <Ticket className="h-4 w-4" />
+                  {isTheatre ? 'К афише' : 'Купить билет'}
+                </a>
               ) : null}
               <AddToDayRouteButton
                 variant="dark"
@@ -264,14 +302,15 @@ export function InstitutionVenueLayout({
       <nav className="sticky top-[var(--site-header-height)] z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
         <div className="container-page flex gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {[
-            ...(admissionProducts.length ? [['#venue-admission', 'Входные билеты'] as const] : []),
-            ...(hasAfisha ? [['#venue-program', 'Афиша и билеты'] as const] : []),
+            ...(hasOwnTickets ? [['#venue-admission', 'Билеты'] as const] : []),
+            ...(hasAfisha ? [['#venue-program', 'Афиша'] as const] : []),
             ['#about', 'О месте'] as const,
             ...(showVisitSection ? [['#visit', 'Как посетить'] as const] : []),
             ...(linkedExcursions.length
-              ? [['#venue-linked-events', hasStopExcursions ? 'В маршрутах' : 'Рядом'] as const]
+              ? [['#venue-linked-events', 'С экскурсией'] as const]
               : []),
-            ['#practical', 'Карта'] as const,
+            ['#contacts', 'Контакты'] as const,
+            ...(similarVenues.length ? [['#similar', 'Похожие'] as const] : []),
             ...(showFaq ? [['#faq', 'Вопросы'] as const] : []),
           ].map(([href, label]) => (
             <a
@@ -288,6 +327,47 @@ export function InstitutionVenueLayout({
       <div className="container-page grid grid-cols-[minmax(0,1fr)] gap-8 py-8 lg:grid-cols-3">
         <div className="space-y-8 lg:col-span-2">
           {admissionProducts.length > 0 ? <VenueAdmissionBlock products={admissionProducts} /> : null}
+
+          {!admissionProducts.length && editorialTickets ? (
+            <section
+              id="venue-admission"
+              className="scroll-mt-24 rounded-2xl border border-emerald-100 bg-white p-6"
+              data-block="venue-admission-official"
+            >
+              <div className="flex items-start gap-3">
+                <div className="mt-0.5 rounded-full bg-emerald-50 p-2 text-emerald-700">
+                  <Ticket className="h-4 w-4" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h2 className="text-xl font-bold text-slate-900">Билеты</h2>
+                  <p className="mt-1 text-sm text-slate-600">
+                    Входной билет в главный комплекс - покупка на официальном сайте музея.
+                  </p>
+                  <div className="mt-5 flex flex-col gap-3 rounded-xl border border-slate-100 bg-slate-50 p-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <div className="text-sm text-slate-500">Билет от</div>
+                      <div className="text-2xl font-extrabold text-slate-900">
+                        {formatNumber(editorialTickets.priceFromRub)}&nbsp;₽
+                      </div>
+                      {editorialTickets.badge ? (
+                        <div className="mt-1 text-xs font-medium text-emerald-700">{editorialTickets.badge}</div>
+                      ) : null}
+                    </div>
+                    <a
+                      href={editorialTickets.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center justify-center gap-2 rounded-full bg-primary-600 px-5 py-3 text-sm font-bold text-white hover:bg-primary-700"
+                    >
+                      <Ticket className="h-4 w-4" />
+                      Купить билет
+                      <ExternalLink className="h-3.5 w-3.5 opacity-80" />
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </section>
+          ) : null}
 
           {nextSessions.length > 0 ? (
             <section className="rounded-2xl border border-slate-200 bg-white p-6">
@@ -340,18 +420,6 @@ export function InstitutionVenueLayout({
                 ))}
               </div>
             ) : null}
-            {featureLabels.length > 0 ? (
-              <div className="mt-4 flex flex-wrap gap-2" data-venue-feature-chips>
-                {featureLabels.map((label) => (
-                  <span
-                    key={label}
-                    className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-700"
-                  >
-                    {label}
-                  </span>
-                ))}
-              </div>
-            ) : null}
             {venue.description && venue.description !== intro ? (
               <p className="mt-4 text-sm leading-7 text-slate-600">{venue.description}</p>
             ) : null}
@@ -397,12 +465,10 @@ export function InstitutionVenueLayout({
               id="venue-linked-events"
               className="scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-6"
             >
-              <h2 className="text-xl font-bold text-slate-900">
-                {hasStopExcursions ? 'Экскурсии, которые включают это место' : 'Рядом'}
-              </h2>
+              <h2 className="text-xl font-bold text-slate-900">Также можно посетить с экскурсией</h2>
               <p className="mt-1 text-sm text-slate-500">
                 {hasStopExcursions
-                  ? 'Маршруты с явной остановкой у этой площадки - отдельно от афиши самого музея.'
+                  ? 'Маршруты, где это место - остановка. Не заменяют входной билет в музей.'
                   : 'Явных остановок пока нет - показываем события со стартом в радиусе 300 м. Это не афиша площадки.'}
               </p>
               <ul className="mt-4 space-y-3" data-venue-linked-events-deduped>
@@ -430,11 +496,11 @@ export function InstitutionVenueLayout({
             </section>
           ) : null}
 
-          {relatedVenues.length > 0 ? (
-            <section>
+          {similarVenues.length > 0 ? (
+            <section id="similar" className="scroll-mt-24">
               <h2 className="text-xl font-bold text-slate-900">Похожие площадки</h2>
               <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                {relatedVenues.slice(0, 4).map((related) => (
+                {similarVenues.map((related) => (
                   <InstitutionCard key={related.id} venue={related} href={venueHref(related)} />
                 ))}
               </div>
@@ -462,24 +528,75 @@ export function InstitutionVenueLayout({
           ) : null}
         </div>
 
-        <aside id="practical" className="scroll-mt-24 lg:sticky lg:top-32 lg:self-start">
+        <aside className="scroll-mt-24 lg:sticky lg:top-32 lg:self-start">
           <div className="space-y-4">
-            <div className="rounded-2xl border border-slate-200 bg-white p-5">
-              <div className="text-sm font-semibold text-slate-900">Как добраться</div>
-              {hasVenueLogisticsContent(logisticsVenue) ? (
-                <VenueLogisticsBlock venue={logisticsVenue} showName={false} className="mt-3" />
-              ) : (
-                <div className="mt-3 flex items-start gap-2 text-sm text-slate-700">
-                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary-600" />
-                  {streetAddress || `${venue.city} - адрес уточняется`}
+            {hasTicketSales && priceFromRub ? (
+              <div className="rounded-2xl border border-slate-200 bg-white p-5">
+                <div className="text-sm text-slate-500">Билет от</div>
+                <div className="text-2xl font-extrabold text-slate-900">
+                  {formatNumber(priceFromRub)}&nbsp;₽
                 </div>
-              )}
-              {hasTicketSales ? (
-                <div className="mt-3 flex items-start gap-2 text-sm text-slate-700">
-                  <Ticket className="mt-0.5 h-4 w-4 shrink-0 text-primary-600" />
-                  {formatNumber(stats.events)} событий · от {formatMoney(stats.priceFrom)}
-                </div>
-              ) : null}
+                <a
+                  href={ticketHref}
+                  className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-primary-700"
+                >
+                  <Ticket className="h-4 w-4" />
+                  Купить билет
+                </a>
+              </div>
+            ) : null}
+
+            <div id="contacts" className="scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-5">
+              <div className="text-sm font-semibold text-slate-900">Контакты</div>
+              <ul className="mt-3 space-y-3 text-sm text-slate-700">
+                {streetAddress || venue.city ? (
+                  <li className="flex items-start gap-2">
+                    <span className="shrink-0" aria-hidden="true">
+                      📍
+                    </span>
+                    <span>
+                      {streetAddress || venue.city}
+                      {streetAddress && venue.city && !streetAddress.includes(venue.city)
+                        ? `, ${venue.city}`
+                        : ''}
+                    </span>
+                  </li>
+                ) : null}
+                {metroLabel ? (
+                  <li className="flex items-start gap-2">
+                    <span className="shrink-0" aria-hidden="true">
+                      🚇
+                    </span>
+                    <span>{metroLabel}</span>
+                  </li>
+                ) : null}
+                {phone ? (
+                  <li className="flex items-start gap-2">
+                    <span className="shrink-0" aria-hidden="true">
+                      ☎
+                    </span>
+                    <a href={`tel:${phone.replace(/[^\d+]/g, '')}`} className="hover:text-primary-700">
+                      {phone}
+                    </a>
+                  </li>
+                ) : null}
+                {website ? (
+                  <li className="flex items-start gap-2">
+                    <span className="shrink-0" aria-hidden="true">
+                      🌐
+                    </span>
+                    <a
+                      href={website}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 font-medium text-primary-700 hover:underline"
+                    >
+                      {websiteLabel}
+                      <ExternalLink className="h-3.5 w-3.5" />
+                    </a>
+                  </li>
+                ) : null}
+              </ul>
             </div>
 
             {hasMap ? (
@@ -540,16 +657,18 @@ export function InstitutionVenueLayout({
           <>
             <div>
               <div className="text-[10px] uppercase tracking-wider text-slate-500">Билет от</div>
-              <div className="text-lg font-extrabold text-slate-900">{formatMoney(stats.priceFrom)}</div>
+              <div className="text-lg font-extrabold text-slate-900">
+                {priceFromRub ? `${formatNumber(priceFromRub)}\u00a0₽` : '—'}
+              </div>
             </div>
             <a
-              href={admissionProducts.length ? '#venue-admission' : '#venue-program'}
+              href={ticketHref}
               className={`inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-full px-5 text-sm font-bold text-white shadow-lg ${
                 isTheatre ? 'bg-rose-600 hover:bg-rose-700' : 'bg-primary-600 hover:bg-primary-700'
               }`}
             >
               <Ticket className="h-4 w-4" />
-              К афише
+              Купить билет
             </a>
           </>
         ) : (
