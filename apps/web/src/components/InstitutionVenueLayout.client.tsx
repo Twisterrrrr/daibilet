@@ -19,7 +19,7 @@ import { MobileStickyActionBar } from '@/components/MobileStickyActionBar';
 import { OsmMapEmbed } from '@/components/OsmMapEmbed';
 import { VenueAdmissionBlock } from '@/components/VenueAdmissionBlock';
 import { VenueBreadcrumbsNav } from '@/components/VenueBreadcrumbsNav.client';
-import { VenueLogisticsBlock, hasVenueLogisticsContent } from '@/components/VenueLogisticsBlock';
+import { VenueLogisticsBlock, hasVenueLogisticsContent, nonEmptyLogisticsText } from '@/components/VenueLogisticsBlock';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { formatMoney, formatNumber } from '@/lib/format';
 import { formatStreetAddress } from '@/lib/address';
@@ -27,6 +27,7 @@ import { dedupeVenueLinkedEvents } from '@/lib/day-route-score';
 import type { FinanceAdmissionProduct } from '@/lib/finance-projection';
 import { build2gisRouteUrl } from '@/lib/maps';
 import {
+  formatVenueMetroLabel,
   resolveVenueEditorialContent,
   venueFeatureLabels,
 } from '@/lib/venue-editorial-content';
@@ -104,6 +105,20 @@ export function InstitutionVenueLayout({
     () => resolveVenueOpeningHours(venue.slug),
     [venue.slug],
   );
+  const metroLabel = React.useMemo(
+    () =>
+      formatVenueMetroLabel(
+        nonEmptyLogisticsText(venue.metroStation) || editorial?.metroStation || null,
+      ),
+    [venue.metroStation, editorial?.metroStation],
+  );
+  const logisticsVenue = React.useMemo(
+    () =>
+      metroLabel && !nonEmptyLogisticsText(venue.metroStation)
+        ? { ...venue, metroStation: editorial?.metroStation || venue.metroStation }
+        : venue,
+    [venue, metroLabel, editorial?.metroStation],
+  );
   const faqItems = editorial?.faq?.length ? editorial.faq : GENERIC_FAQ_ITEMS;
   const uniqueStopEvents = React.useMemo(() => dedupeVenueLinkedEvents(stopEvents), [stopEvents]);
   const uniqueNearbyEvents = React.useMemo(
@@ -120,6 +135,8 @@ export function InstitutionVenueLayout({
   const hasTicketSales = sessions.length > 0 || admissionProducts.length > 0;
   const hasAfisha = sessions.length > 0;
   const showFaq = hasTicketSales || Boolean(editorial?.faq?.length);
+  const showVisitSection =
+    Boolean(openingHours?.lines?.length) || hasVenueLogisticsContent(logisticsVenue);
 
   const heroGradient = isTheatre
     ? 'bg-gradient-to-r from-rose-900/95 via-slate-900/80 to-slate-900/50'
@@ -191,22 +208,10 @@ export function InstitutionVenueLayout({
                     {venue.city}
                   </span>
                 )}
+                {metroLabel ? <span className="text-white/80">{metroLabel}</span> : null}
               </div>
 
               <p className="mt-4 max-w-xl text-white/90">{intro}</p>
-
-              {featureLabels.length > 0 ? (
-                <div className="mt-5 flex flex-wrap gap-2" data-venue-feature-chips>
-                  {featureLabels.map((label) => (
-                    <span
-                      key={label}
-                      className="rounded-full border border-white/25 bg-white/10 px-3 py-1 text-xs font-medium text-white/95 backdrop-blur"
-                    >
-                      {label}
-                    </span>
-                  ))}
-                </div>
-              ) : null}
             </div>
 
             <div className="flex flex-col items-start gap-2 md:items-end">
@@ -261,11 +266,12 @@ export function InstitutionVenueLayout({
           {[
             ...(admissionProducts.length ? [['#venue-admission', 'Входные билеты'] as const] : []),
             ...(hasAfisha ? [['#venue-program', 'Афиша и билеты'] as const] : []),
+            ['#about', 'О месте'] as const,
+            ...(showVisitSection ? [['#visit', 'Как посетить'] as const] : []),
             ...(linkedExcursions.length
               ? [['#venue-linked-events', hasStopExcursions ? 'В маршрутах' : 'Рядом'] as const]
               : []),
-            ['#about', 'О месте'] as const,
-            ['#practical', 'Адрес и карта'] as const,
+            ['#practical', 'Карта'] as const,
             ...(showFaq ? [['#faq', 'Вопросы'] as const] : []),
           ].map(([href, label]) => (
             <a
@@ -310,6 +316,82 @@ export function InstitutionVenueLayout({
 
           {children}
 
+          <section id="about" className="scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-6">
+            <h2 className="text-xl font-bold text-slate-900">О месте</h2>
+            {editorial?.highlights?.length ? (
+              <ul className="mt-4 grid gap-2 sm:grid-cols-2" data-venue-highlights>
+                {editorial.highlights.map((item) => (
+                  <li
+                    key={item}
+                    className="flex items-start gap-2 rounded-xl border border-slate-100 bg-slate-50 p-3"
+                  >
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
+                    <span className="text-sm text-slate-800">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : categories.length > 0 ? (
+              <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                {categories.slice(0, 6).map(([name]) => (
+                  <div key={name} className="flex items-start gap-2 rounded-xl border border-slate-100 bg-slate-50 p-3">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
+                    <span className="text-sm text-slate-800">{name}</span>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+            {featureLabels.length > 0 ? (
+              <div className="mt-4 flex flex-wrap gap-2" data-venue-feature-chips>
+                {featureLabels.map((label) => (
+                  <span
+                    key={label}
+                    className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-700"
+                  >
+                    {label}
+                  </span>
+                ))}
+              </div>
+            ) : null}
+            {venue.description && venue.description !== intro ? (
+              <p className="mt-4 text-sm leading-7 text-slate-600">{venue.description}</p>
+            ) : null}
+          </section>
+
+          {showVisitSection ? (
+            <section id="visit" className="scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-6">
+              <h2 className="text-xl font-bold text-slate-900">Как посетить</h2>
+              <div className="mt-4 grid gap-6 sm:grid-cols-2">
+                {openingHours?.lines?.length ? (
+                  <div data-venue-opening-hours>
+                    <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
+                      <Clock className="h-4 w-4 text-primary-600" />
+                      Часы работы
+                    </div>
+                    <ul className="mt-3 space-y-1 text-sm text-slate-700">
+                      {openingHours.lines.map((line) => (
+                        <li key={line}>{line}</li>
+                      ))}
+                    </ul>
+                    <p className="mt-3 text-xs leading-5 text-slate-500">{OPEN_DATE_HOURS_HOLIDAY_NOTE}</p>
+                  </div>
+                ) : null}
+                <div>
+                  <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
+                    <MapPin className="h-4 w-4 text-primary-600" />
+                    Как добраться
+                  </div>
+                  {hasVenueLogisticsContent(logisticsVenue) ? (
+                    <VenueLogisticsBlock venue={logisticsVenue} showName={false} className="mt-3" />
+                  ) : (
+                    <div className="mt-3 text-sm text-slate-700">
+                      {streetAddress || `${venue.city} - адрес уточняется`}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </section>
+          ) : null}
+
           {linkedExcursions.length > 0 ? (
             <section
               id="venue-linked-events"
@@ -348,37 +430,19 @@ export function InstitutionVenueLayout({
             </section>
           ) : null}
 
-          <section id="about" className="rounded-2xl border border-slate-200 bg-white p-6">
-            <h2 className="text-xl font-bold text-slate-900">О месте</h2>
-            {editorial?.highlights?.length ? (
-              <ul className="mt-4 grid gap-2 sm:grid-cols-2" data-venue-highlights>
-                {editorial.highlights.map((item) => (
-                  <li
-                    key={item}
-                    className="flex items-start gap-2 rounded-xl border border-slate-100 bg-slate-50 p-3"
-                  >
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
-                    <span className="text-sm text-slate-800">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            ) : categories.length > 0 ? (
-              <div className="mt-4 grid gap-2 sm:grid-cols-2">
-                {categories.slice(0, 6).map(([name]) => (
-                  <div key={name} className="flex items-start gap-2 rounded-xl border border-slate-100 bg-slate-50 p-3">
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
-                    <span className="text-sm text-slate-800">{name}</span>
-                  </div>
+          {relatedVenues.length > 0 ? (
+            <section>
+              <h2 className="text-xl font-bold text-slate-900">Похожие площадки</h2>
+              <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                {relatedVenues.slice(0, 4).map((related) => (
+                  <InstitutionCard key={related.id} venue={related} href={venueHref(related)} />
                 ))}
               </div>
-            ) : null}
-            {venue.description && venue.description !== intro ? (
-              <p className="mt-4 text-sm leading-7 text-slate-600">{venue.description}</p>
-            ) : null}
-          </section>
+            </section>
+          ) : null}
 
           {showFaq ? (
-            <section id="faq">
+            <section id="faq" className="scroll-mt-24">
               <h2 className="text-xl font-bold text-slate-900">Частые вопросы</h2>
               <div className="mt-4 space-y-2">
                 {faqItems.map((item) => (
@@ -396,25 +460,14 @@ export function InstitutionVenueLayout({
               </div>
             </section>
           ) : null}
-
-          {relatedVenues.length > 0 ? (
-            <section>
-              <h2 className="text-xl font-bold text-slate-900">Похожие площадки</h2>
-              <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                {relatedVenues.slice(0, 4).map((related) => (
-                  <InstitutionCard key={related.id} venue={related} href={venueHref(related)} />
-                ))}
-              </div>
-            </section>
-          ) : null}
         </div>
 
-        <aside id="practical" className="lg:sticky lg:top-32 lg:self-start">
+        <aside id="practical" className="scroll-mt-24 lg:sticky lg:top-32 lg:self-start">
           <div className="space-y-4">
             <div className="rounded-2xl border border-slate-200 bg-white p-5">
               <div className="text-sm font-semibold text-slate-900">Как добраться</div>
-              {hasVenueLogisticsContent(venue) ? (
-                <VenueLogisticsBlock venue={venue} showName={false} className="mt-3" />
+              {hasVenueLogisticsContent(logisticsVenue) ? (
+                <VenueLogisticsBlock venue={logisticsVenue} showName={false} className="mt-3" />
               ) : (
                 <div className="mt-3 flex items-start gap-2 text-sm text-slate-700">
                   <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary-600" />
@@ -426,17 +479,6 @@ export function InstitutionVenueLayout({
                   <Ticket className="mt-0.5 h-4 w-4 shrink-0 text-primary-600" />
                   {formatNumber(stats.events)} событий · от {formatMoney(stats.priceFrom)}
                 </div>
-              ) : null}
-              {hasMap ? (
-                <a
-                  href={`https://yandex.ru/maps/?pt=${venue.longitude},${venue.latitude}&z=17&l=map`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-primary-600 hover:underline"
-                >
-                  <NavigationIcon className="h-4 w-4" />
-                  Открыть на карте
-                </a>
               ) : null}
             </div>
 
@@ -472,7 +514,7 @@ export function InstitutionVenueLayout({
             ) : null}
 
             {openingHours?.lines?.length ? (
-              <div className="rounded-2xl border border-slate-200 bg-white p-5" data-venue-opening-hours>
+              <div className="rounded-2xl border border-slate-200 bg-white p-5" data-venue-opening-hours-sidebar>
                 <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
                   <Clock className="h-4 w-4 text-primary-600" />
                   Часы работы

@@ -1,4 +1,17 @@
-## 2026-08-10 - Popular cities: MSK under title (adaptive)
+## 2026-08-10 - Hermitage PDP: layout + alias redirect
+
+### Наблюдения
+- Owner 404 на `/venues/gosudarstvennyi-ermitazh` (TC twin / alternate translit); в `next.config` был только `gosudarstvennyy-ermitazh` → `ermitazh`. Канон `/venues/ermitazh` уже 200.
+- Institution PDP: feature chips в hero лишние; нет метро в hero (`metroStation` null в prod API); «В маршрутах» выше «О месте»; text link «Открыть на карте» дублирует кнопки карты.
+
+### Решения
+- Permanent redirect `gosudarstvennyi-ermitazh` → `/venues/ermitazh` (рядом с yy-вариантом).
+- `InstitutionVenueLayout`: без hero chips; metro в hero (`м. …`, editorial fallback `Адмиралтейская`); секции О месте → Как посетить → экскурсии → похожие → FAQ; табы в том же порядке; features chips в «О месте»; убран «Открыть на карте».
+
+### Проблемы
+- Venue reviews API на institution PDP нет (ReviewSection event-only) - FAQ внизу; блок отзывов не добавляли.
+
+---
 
 ### Наблюдения
 - Order MSK→SPB уже верный, но initial scroll центрировал пару: слева под H2 торчали Краснодар и др.

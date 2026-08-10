@@ -26,6 +26,8 @@ export type VenueEditorialContent = {
   highlights: string[];
   features: VenueFeatureCode[];
   faq: VenueEditorialFaqItem[];
+  /** Hero/logistics fallback when Venue.metroStation is empty in DB. */
+  metroStation?: string;
 };
 
 const FEATURE_LABELS: Record<VenueFeatureCode, string> = {
@@ -47,6 +49,7 @@ const EDITORIAL_BY_SLUG: Record<string, VenueEditorialContent> = {
       'Входит в топ-5 музеев мира',
     ],
     features: ['no_queue', 'audio_guide', 'kids_friendly', 'wheelchair', 'cafe', 'gift_shop'],
+    metroStation: 'Адмиралтейская',
     faq: [
       {
         question: 'Можно ли вернуть билет?',
@@ -98,6 +101,14 @@ export function venueFeatureLabels(codes: readonly string[] | null | undefined):
     if (label) out.push(label);
   }
   return out;
+}
+
+/** Hero metro line: «м. Адмиралтейская». Empty input → null. */
+export function formatVenueMetroLabel(metro: string | null | undefined): string | null {
+  const text = String(metro ?? '').trim();
+  if (!text || text === '-' || text === '—' || text === '–') return null;
+  if (/^м[\.\s]/i.test(text)) return text;
+  return `м. ${text}`;
 }
 
 /** @internal test helper */

@@ -2,9 +2,10 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| UX.HOME-CITIES-MSK-ANCHOR | Popular cities rail: MSK left under H2 (adaptive); SPB next; keep infinite loop | Критический | 🔄 ship + Deploy MSK web |
-| UX.LOGO-BREVE-LINE | Logo: solid breve-stroke over «и» → dashed route (replace black point-1) | Критический | 🔄 ship + Deploy MSK web |
-| UX.CITY-HUB-HERO-CTAS | City hub hero: remove search; restore Афиша + Подборки событий buttons | Критический | 🔄 ship + Deploy MSK web |
+| FIX.HERMITAGE-ALIAS-PDP | Redirect `gosudarstvennyi-ermitazh`→`ermitazh`; institution PDP: no hero chips, metro, about/visit before routes, FAQ bottom | Критический | 🔄 ship |
+| UX.HOME-CITIES-MSK-ANCHOR | Popular cities rail: MSK left under H2 (adaptive); SPB next; keep infinite loop | Критический | ✅ `5d995893` tip `65276de6` Deploy `31410582677` |
+| UX.LOGO-BREVE-LINE | Logo: solid breve-stroke over «и» → dashed route (replace black point-1) | Критический | ✅ `47fcad03` tip `65276de6` Deploy `31410582677` |
+| UX.CITY-HUB-HERO-CTAS | City hub hero: remove search; restore Афиша + Подборки событий buttons | Критический | ✅ `47fcad03` tip `65276de6` Deploy `31410582677` |
 | UX.CITY-HUB-HERO-BRIEF | City hub: brief in hero; first submenu «Зачем ехать» (не body Описание) | Критический | 🔄 ship |
 | UX.EVENTS-MOBILE-SELECTS | `/events` mobile: search + Дата/Тип dropdowns (не chip rails); desktop date rail | Критический | 🔄 ship |
 | UX.CITY-HUB-EDITORIAL-ORDER | City hub: Описание + Факты + Зачем ехать before «Готовые сценарии» (restore CityWhyGo / places rail) | Критический | ✅ `b113a927` push; deploy по «выкатывай» |

@@ -44,9 +44,14 @@ const nextConfig: NextConfig = {
       { source: '/river-cruises/:city', destination: '/rechnye-progulki/:city', permanent: true },
       { source: '/bus-tours', destination: '/avtobusnye-ekskursii', permanent: true },
       { source: '/bus-tours/:city', destination: '/avtobusnye-ekskursii/:city', permanent: true },
-      // Buyer seed / editorial typos → live venue slugs
+      // Buyer seed / editorial typos / TC twin → live venue slugs
       {
         source: '/venues/gosudarstvennyy-ermitazh',
+        destination: '/venues/ermitazh',
+        permanent: true,
+      },
+      {
+        source: '/venues/gosudarstvennyi-ermitazh',
         destination: '/venues/ermitazh',
         permanent: true,
       },
