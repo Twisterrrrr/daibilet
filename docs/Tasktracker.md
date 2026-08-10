@@ -2,6 +2,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
+| UX.MYDAY-STOPS-GRID | `/my-day`: Шаги timeline always on; toggle Сетка\|Список (restore fence) | Критический | 🔄 ship+Deploy MSK web |
 | FIX.EVENT-STANDBY-TEP-TWIN | `/events/…-6a1ef2c…` 404: STAND_BY TC → soft title-twin TEP + permanentRedirect | Критический | 🔄 ship+API+Deploy MSK web |
 | FIX.MYDAY-BOAT-PIERS | my-day boat wizard: dedupe pier twins; hide 0-route cards; Dvortsovaya 18 distance via coords fallback | Критический | ✅ `813160fa` Deploy `31428529388` |
 | UX.HERMITAGE-PDP-V3 | Hermitage PDP: hide commercial tickets; no hero chips; hours above map; Факт; sticky tabs; gallery; open-now; event thumbs; MSK/SPB nearest metro | Критический | 🔄 `896578ab` Deploy `31428001571` |

@@ -9,6 +9,7 @@ import {
   Clock,
   Copy,
   ExternalLink,
+  LayoutGrid,
   List,
   MapPin,
   Navigation,
@@ -183,8 +184,8 @@ import { toVenueCatalogCard } from '@/lib/venue-catalog-card';
 import type { VenueCatalogCard } from '@/lib/venue-map-types';
 
 type DayRouteAccordionId = 'mustSee' | 'text' | 'matches';
-/** `timeline` replaces legacy dense grid «fence»; `list` keeps editable stop cards. */
-type DayRouteStopViewMode = 'timeline' | 'list';
+/** Detail cards under always-on «Шаги» timeline: grid fence or dense list. */
+type DayRouteStopViewMode = 'grid' | 'list';
 type DayRouteMobileShelf = 'route' | 'add';
 
 const DAY_ROUTE_STOP_VIEW_KEY = 'daibilet:dayRouteStopView';
@@ -192,14 +193,14 @@ const DAY_ROUTE_STOP_VIEW_KEY = 'daibilet:dayRouteStopView';
 const SHOW_DAY_TICKET_HANDOFF_MODAL = false;
 
 function readStopViewMode(): DayRouteStopViewMode {
-  if (typeof window === 'undefined') return 'timeline';
+  if (typeof window === 'undefined') return 'grid';
   try {
     const raw = window.localStorage.getItem(DAY_ROUTE_STOP_VIEW_KEY);
     if (raw === 'list') return 'list';
-    // Migrate legacy «grid» fence → timeline.
-    return 'timeline';
+    // Migrate brief «timeline» toggle value back to grid fence.
+    return 'grid';
   } catch {
-    return 'timeline';
+    return 'grid';
   }
 }
 
@@ -418,9 +419,9 @@ function DayRoutePanelInner() {
   const [mobileView, setMobileView] = useState<'list' | 'map'>('list');
   /** Mobile shelf: route steps/map vs catalog add tools. */
   const [mobileShelf, setMobileShelf] = useState<DayRouteMobileShelf>('route');
-  /** Route stops layout: timeline (default) or dense editable list. */
-  const [stopViewMode, setStopViewMode] = useState<DayRouteStopViewMode>('timeline');
-  /** Desktop (≥lg) can pick timeline/list; mobile always list cards under timeline. */
+  /** Route stops detail: grid fence (default) or dense list; «Шаги» timeline always above. */
+  const [stopViewMode, setStopViewMode] = useState<DayRouteStopViewMode>('grid');
+  /** Desktop (≥lg) can pick grid/list; mobile always dense list under timeline. */
   const [isLgUp, setIsLgUp] = useState(false);
   const listRootRef = useRef<HTMLDivElement | null>(null);
   /** After external «Купить билет» - ask guest to mark bought (gated by SHOW_DAY_TICKET_HANDOFF_MODAL). */
@@ -535,8 +536,6 @@ function DayRoutePanelInner() {
   }, []);
 
   const effectiveStopViewMode: DayRouteStopViewMode = isLgUp ? stopViewMode : 'list';
-  /** Cards always use list variant; timeline mode keeps fence-free overview. */
-  const stopCardVariant: 'list' = 'list';
   const timelineStops = useMemo(
     () =>
       route.venues.map((venue) => ({
@@ -3014,16 +3013,16 @@ function DayRoutePanelInner() {
               >
                 <button
                   type="button"
-                  aria-pressed={stopViewMode === 'timeline'}
-                  onClick={() => changeStopViewMode('timeline')}
+                  aria-pressed={stopViewMode === 'grid'}
+                  onClick={() => changeStopViewMode('grid')}
                   className={`inline-flex min-h-7 items-center gap-1 rounded-full px-2.5 text-[11px] font-semibold transition ${
-                    stopViewMode === 'timeline'
+                    stopViewMode === 'grid'
                       ? 'bg-white text-slate-800 shadow-sm'
                       : 'text-slate-500 hover:text-slate-700'
                   }`}
                 >
-                  <Route className="h-3.5 w-3.5" />
-                  Шаги
+                  <LayoutGrid className="h-3.5 w-3.5" />
+                  Сетка
                 </button>
                 <button
                   type="button"
@@ -3148,7 +3147,7 @@ function DayRoutePanelInner() {
             </p>
           ) : null}
 
-          {timelineStops.length > 0 && effectiveStopViewMode === 'timeline' ? (
+          {timelineStops.length > 0 ? (
             <div className="mt-3" data-day-route-timeline-wrap>
               <DayRouteStopsTimeline
                 stops={timelineStops}
@@ -3164,7 +3163,11 @@ function DayRoutePanelInner() {
                 Купленные билеты
               </p>
               <ul
-                className="grid w-full grid-cols-1 items-start gap-0"
+                className={
+                  effectiveStopViewMode === 'grid'
+                    ? 'grid w-full grid-cols-1 items-start gap-1.5 sm:grid-cols-2 lg:grid-cols-3'
+                    : 'grid w-full grid-cols-1 items-start gap-0'
+                }
                 data-day-plan-list="purchased"
                 data-day-stop-view={effectiveStopViewMode}
               >
@@ -3174,7 +3177,7 @@ function DayRoutePanelInner() {
                     index={index}
                     total={purchasedStops.length}
                     venue={venue}
-                    variant={stopCardVariant}
+                    variant={effectiveStopViewMode}
                     group="purchased"
                     softTimeLabel={hourPlan?.byId[venue.id]?.label || null}
                     hasCoords={Boolean(lookupDayRouteCoords(venue, coordsById))}
@@ -3213,7 +3216,11 @@ function DayRoutePanelInner() {
               </p>
             ) : null}
             <ul
-              className="grid w-full grid-cols-1 items-start gap-0"
+              className={
+                effectiveStopViewMode === 'grid'
+                  ? 'grid w-full grid-cols-1 items-start gap-1.5 sm:grid-cols-2 lg:grid-cols-3'
+                  : 'grid w-full grid-cols-1 items-start gap-0'
+              }
               data-day-plan-list="plans"
               data-day-stop-view={effectiveStopViewMode}
             >
@@ -3233,7 +3240,7 @@ function DayRoutePanelInner() {
                       index={index}
                       total={planStops.length}
                       venue={venue}
-                      variant={stopCardVariant}
+                      variant={effectiveStopViewMode}
                       group="plans"
                       softTimeLabel={hourPlan?.byId[venue.id]?.label || null}
                       hasCoords={Boolean(lookupDayRouteCoords(venue, coordsById))}
@@ -3265,7 +3272,9 @@ function DayRoutePanelInner() {
                     />
                     {betweenTip ? (
                       <li
-                        className="list-none px-1 py-0.5"
+                        className={`list-none px-1 py-0.5 ${
+                          effectiveStopViewMode === 'grid' ? 'col-span-full' : ''
+                        }`}
                         data-day-transit-between
                         aria-label={betweenTip}
                       >
@@ -3280,6 +3289,7 @@ function DayRoutePanelInner() {
                     freeWindowUpsells.length > 0 &&
                     !atMax ? (
                       <li
+                        className={effectiveStopViewMode === 'grid' ? 'col-span-full' : undefined}
                         data-day-free-window-upsell
                         data-day-free-window
                       >
@@ -3338,8 +3348,13 @@ function DayRoutePanelInner() {
                 Не поместилось в график (запасные планы)
               </p>
               <ul
-                className="grid w-full grid-cols-1 items-start gap-0"
+                className={
+                  effectiveStopViewMode === 'grid'
+                    ? 'grid w-full grid-cols-1 items-start gap-1.5 sm:grid-cols-2 lg:grid-cols-3'
+                    : 'grid w-full grid-cols-1 items-start gap-0'
+                }
                 data-day-plan-list="overflow"
+                data-day-stop-view={effectiveStopViewMode}
               >
                 {overflowStops.map((venue, index) => (
                   <DayRouteVenueCard
@@ -3347,7 +3362,7 @@ function DayRoutePanelInner() {
                     index={index}
                     total={overflowStops.length}
                     venue={venue}
-                    variant={stopCardVariant}
+                    variant={effectiveStopViewMode}
                     group="overflow"
                     softTimeLabel={null}
                     hasCoords={Boolean(lookupDayRouteCoords(venue, coordsById))}

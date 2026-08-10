@@ -1,3 +1,19 @@
+## 2026-08-10 - my-day: Шаги always + restore Сетка
+
+### Наблюдения
+- После travel-product pass toggle стал «Шаги | Список» и timeline прятался в list mode (`6000b9d9`).
+- Owner: горизонтальные «Шаги» всегда над точками; тоггл только детали снизу - «Сетка | Список».
+
+### Решения
+- `DayRouteStopViewMode` снова `grid | list`; default/migrate `timeline`→`grid`.
+- `DayRouteStopsTimeline` всегда при ≥1 stop; toggle меняет `variant` карточек + CSS fence/list.
+- Persist key `daibilet:dayRouteStopView` без смены.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-10 - Event 404: TC STAND_BY → TEP twin redirect
 
 ### Наблюдения

@@ -21,7 +21,7 @@ type Props = {
 
 /**
  * Horizontal route steps: numbered circles + connector + optional thumb + short title.
- * Replaces dense rectangular stop «fence» on /my-day.
+ * Always shown above grid/list stop cards on /my-day.
  */
 export function DayRouteStopsTimeline({
   stops,
