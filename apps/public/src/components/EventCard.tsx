@@ -17,6 +17,7 @@ import {
   getDepartingSoonMinutes,
   isOpenDate,
   MIN_DISPLAY_PRICE_RUB,
+  resolveAgeBadge,
   resolvePseudoRating,
 } from '@/lib/event-card-meta';
 import { eventHref } from '@/routes';
@@ -63,6 +64,7 @@ export function EventCard({
   const pseudoRating = resolvePseudoRating(event.groupKey || event.id);
   const locationLabel = resolveEventCardLocationLabel(event);
   const showSoonBadge = !hasPrice && !openDate && !departingSoonMinutes;
+  const ageLabel = resolveAgeBadge(event.tags, event.ageLimit);
   const cardClassName =
     'group flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-lg hover:shadow-slate-200/60';
 
@@ -116,6 +118,11 @@ export function EventCard({
           {event.category ? (
             <span className="truncate rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-normal text-slate-600 sm:text-xs">
               {event.category}
+            </span>
+          ) : null}
+          {ageLabel ? (
+            <span className="font-semibold tabular-nums text-slate-600" title="Возрастное ограничение">
+              {ageLabel}
             </span>
           ) : null}
           {destinationLabel ? (

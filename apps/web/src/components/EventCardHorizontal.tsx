@@ -10,7 +10,6 @@ import { collectCatalogLabels, extractDurationLabel } from '@/lib/catalog-labels
 import { EventImageBadges } from '@/lib/event-card-badges';
 import {
   collectAllDisplaySlotLabels,
-  formatCoverDateBadge,
   formatEventNextSession,
   formatListDescription,
   getDepartingSoonMinutes,
@@ -61,7 +60,6 @@ export function EventCardHorizontal({ session }: { session: PublicCatalogListIte
   const durationLabel = extractDurationLabel(session.tags);
   const ageLabel = formatAgeLimit(session.ageLimit);
   const priceFooterLabel = hasPrice ? formatPriceFrom(session.priceFrom) : null;
-  const coverDateBadge = formatCoverDateBadge(session);
   const venueHref = sessionVenueHref(session);
 
   return (
@@ -102,11 +100,6 @@ export function EventCardHorizontal({ session }: { session: PublicCatalogListIte
           }
         />
         <EventImageBadges event={session} rail recommendVariant="compact" />
-        {coverDateBadge ? (
-          <span className="absolute bottom-2 left-2 z-[2] rounded-lg bg-slate-950/80 px-2 py-1 text-[11px] font-semibold tracking-wide text-white backdrop-blur-sm sm:text-xs">
-            {coverDateBadge}
-          </span>
-        ) : null}
         <EventFavoriteButton eventId={session.id} className="right-2 top-2 sm:right-3 sm:top-3" />
       </div>
 

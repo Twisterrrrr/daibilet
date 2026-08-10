@@ -14,6 +14,7 @@ import {
   getDepartingSoonMinutes,
   isOpenDate,
   MIN_DISPLAY_PRICE_RUB,
+  resolveAgeBadge,
   resolvePseudoRating,
 } from '@/lib/event-card-meta';
 import { eventHref } from '@/routes';
@@ -41,6 +42,7 @@ export function EventCardHorizontal({ event }: EventCardHorizontalProps) {
   const descriptionText = formatListDescription(event.description);
   const pseudoRating = resolvePseudoRating(event.groupKey || event.id);
   const locationLabel = resolveEventCardLocationLabel(event);
+  const ageLabel = resolveAgeBadge(event.tags, event.ageLimit);
 
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-slate-200/60 sm:flex-row">
@@ -88,6 +90,11 @@ export function EventCardHorizontal({ event }: EventCardHorizontalProps) {
             <span className="font-medium text-slate-700">{pseudoRating.toFixed(1)}</span>
           </span>
           {event.category ? <span className="font-normal text-slate-600">{event.category}</span> : null}
+          {ageLabel ? (
+            <span className="font-semibold tabular-nums text-slate-600" title="Возрастное ограничение">
+              {ageLabel}
+            </span>
+          ) : null}
           {destinationLabel ? (
             <span className="inline-flex min-w-0 items-center gap-0.5 text-slate-500">
               <MapPin className="h-3 w-3 shrink-0" />

@@ -5,7 +5,7 @@ import type { ReactNode } from 'react';
 import { EditorsPickBadge, EventCardBadge } from '@/components/EventFavoriteButton.client';
 import type { PublicSessionDto } from '@daibilet/contracts/public';
 import { isHitEvent, isRecommendBadgeEvent } from '@/lib/home-showcase-sections';
-import { LOW_TICKETS_THRESHOLD, resolveAgeBadge } from '@/lib/event-card-meta';
+import { formatCoverDateBadge, LOW_TICKETS_THRESHOLD } from '@/lib/event-card-meta';
 import { formatVacantSeats } from '@/lib/event-page-utils';
 
 type EventImageBadgesProps = {
@@ -14,16 +14,33 @@ type EventImageBadgesProps = {
   rail?: boolean;
   recommendVariant?: 'text' | 'compact';
   editorsPick?: boolean;
+  /** Cover: only compact date (city hub / cleaned rails). */
+  dateOnly?: boolean;
 };
+
+const DATE_BADGE_CLASS =
+  'bg-slate-950/80 text-white shadow-md ring-1 ring-white/20 backdrop-blur-sm';
 
 export function EventImageBadges({
   event,
   showSoonBadge = false,
   rail = false,
   editorsPick = false,
+  dateOnly = false,
 }: EventImageBadgesProps) {
-  // Home/catalog rails: clean cover - section title carries context; no multi-color badge pile.
-  if (rail) return null;
+  const dateBadge = formatCoverDateBadge(event);
+
+  // Rails / date-only: clean cover - date in top-left, no Hit/FOMO/age pile.
+  if (rail || dateOnly) {
+    if (!dateBadge) return null;
+    return (
+      <div className="absolute left-2 top-2 z-[2] flex max-w-[70%] flex-col items-start gap-1 sm:left-3 sm:top-3">
+        <EventCardBadge key="date" className={DATE_BADGE_CLASS}>
+          {dateBadge}
+        </EventCardBadge>
+      </div>
+    );
+  }
 
   const showLowTickets =
     typeof event.vacant === 'number' && event.vacant > 0 && event.vacant <= LOW_TICKETS_THRESHOLD;
@@ -32,27 +49,27 @@ export function EventImageBadges({
   const hit = editorsPick
     ? (event.sessionCount || 0) >= 4 || (event.landingSlugs?.length || 0) > 0
     : isHitEvent(event);
-  const ageBadge = resolveAgeBadge(event.tags || [], event.ageLimit);
   const maxSecondary = 4;
 
   const secondary: ReactNode[] = [];
-  if (showLowTickets) {
+  // Age stays in text meta only - date takes the former age slot on cover.
+  if (dateBadge) {
+    secondary.push(
+      <EventCardBadge key="date" className={DATE_BADGE_CLASS}>
+        {dateBadge}
+      </EventCardBadge>,
+    );
+  }
+  if (showLowTickets && secondary.length < maxSecondary) {
     secondary.push(
       <EventCardBadge key="vacant" className="bg-rose-600 text-white shadow-md ring-1 ring-white/30">
         {formatVacantSeats(event.vacant ?? 0)}
       </EventCardBadge>,
     );
-  } else if (hit) {
+  } else if (hit && secondary.length < maxSecondary) {
     secondary.push(
       <EventCardBadge key="hit" className="bg-primary-600 text-white shadow-md ring-1 ring-white/25">
         Хит
-      </EventCardBadge>,
-    );
-  }
-  if (ageBadge && secondary.length < maxSecondary) {
-    secondary.push(
-      <EventCardBadge key="age" className="bg-white/95 text-slate-900 ring-1 ring-slate-200/80">
-        {ageBadge}
       </EventCardBadge>,
     );
   }
@@ -63,6 +80,8 @@ export function EventImageBadges({
       </EventCardBadge>,
     );
   }
+
+  if (!recommend && secondary.length === 0) return null;
 
   return (
     <div className="absolute left-2 top-2 z-[2] flex max-w-[70%] flex-col items-start gap-1 sm:left-3 sm:top-3">

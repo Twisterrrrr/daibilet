@@ -126,7 +126,6 @@ export function EventCard({
   // Missing display price (<100 / null) is not "soon" - event can still be on sale.
   const showSoonBadge = false;
   const priceFooterLabel = hasPrice ? formatPriceFrom(session.priceFrom) : null;
-  const coverDateBadge = formatCoverDateBadge(session);
   const purchase = useCatalogPurchase(session);
   // Catalog list: no hidden widget DOM. Purchase UX lives on event page / landing CTA.
   const showPurchaseWidgets = landingActions && !suppressPurchaseAnchors && purchase.purchaseEnabled;
@@ -192,11 +191,6 @@ export function EventCard({
         />
 
         <EventImageBadges event={session} showSoonBadge={showSoonBadge} />
-        {coverDateBadge ? (
-          <span className="absolute bottom-2 left-2 z-[2] rounded-xl border border-white/25 bg-white/20 px-2.5 py-1 text-[11px] font-semibold tracking-wide text-white shadow-sm backdrop-blur-md sm:bottom-3 sm:left-3 sm:text-xs">
-            {coverDateBadge}
-          </span>
-        ) : null}
         <EventFavoriteButton eventId={session.id} className="right-2 top-2 sm:right-3 sm:top-3" />
         {!landingActions && dayRouteVenue ? (
           <AddToDayRouteButton
@@ -573,16 +567,12 @@ function ShowcaseEventCard({
           }
         />
 
-        {cityHub ? null : <EventImageBadges event={session} rail={rail} editorsPick={editorsPickBadge} />}
-        {coverDateBadge ? (
-          <span
-            className={`absolute z-[2] rounded-lg bg-slate-950/80 px-2 py-1 text-[11px] font-semibold tracking-wide text-white backdrop-blur-sm ${
-              cityHub ? 'bottom-2 left-2 sm:text-xs' : 'bottom-2 left-2 sm:left-3 sm:text-xs'
-            }`}
-          >
-            {coverDateBadge}
-          </span>
-        ) : null}
+        <EventImageBadges
+          event={session}
+          rail={rail || cityHub}
+          editorsPick={cityHub ? false : editorsPickBadge}
+          dateOnly={cityHub}
+        />
         {cityHub ? null : (
           <EventFavoriteButton eventId={session.id} className="right-2 top-2 sm:right-3 sm:top-3" />
         )}
