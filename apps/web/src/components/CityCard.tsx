@@ -100,9 +100,11 @@ const VIBE_ICONS: Record<CityVibeIconName, LucideIcon> = {
 function CityHubTags({
   city,
   region,
+  compact = false,
 }: {
   city: PublicDestinationDto;
   region?: CityCardRegion | null;
+  compact?: boolean;
 }) {
   const tags = (city.hubTags || []).slice(0, 3);
   const showRegion = Boolean(region && region.eventCount > 0);
@@ -111,7 +113,9 @@ function CityHubTags({
 
   return (
     <ul
-      className="mt-2 flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-1"
+      className={`mt-2.5 flex min-w-0 flex-wrap content-start items-center gap-x-2 gap-y-1.5 ${
+        compact ? 'min-h-[1.75rem]' : ''
+      }`}
       aria-label={`Популярные направления: ${city.name}`}
     >
       {tags.map((tag) => {
@@ -125,7 +129,7 @@ function CityHubTags({
           <li key={`${tag.kind}:${tag.slug || tag.label}`} className="min-w-0">
             <Link
               href={href}
-              className="inline-flex rounded-md bg-primary-50 px-1.5 py-0.5 text-[12px] font-semibold leading-4 text-primary-800 transition hover:bg-primary-100 sm:px-2 sm:text-[13px]"
+              className="inline-flex max-w-full truncate rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-medium leading-none text-slate-700 transition hover:bg-slate-200/90 hover:text-slate-900 sm:text-xs"
             >
               {tag.label}
             </Link>
@@ -220,17 +224,23 @@ export function CityCard({
             className={`pointer-events-none absolute inset-0 ${
               isLight
                 ? 'bg-gradient-to-t from-white/95 via-white/45 to-transparent'
-                : 'bg-gradient-to-t from-black/80 via-black/35 to-black/10'
+                : 'bg-gradient-to-t from-black/90 via-black/55 to-black/25'
             }`}
           />
+          {/* Extra bottom band so white type stays readable on bright daytime covers (NN, SPB). */}
+          {!isLight ? (
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-black/70 via-black/25 to-transparent" />
+          ) : null}
           <div
-            className={`absolute inset-x-0 bottom-0 ${compact ? 'p-2.5 sm:p-3' : 'p-3 sm:p-3.5'}`}
+            className={`absolute inset-x-0 bottom-0 ${compact ? 'p-2.5 sm:p-3' : 'p-3 sm:p-3.5'} ${
+              isLight ? '' : '[text-shadow:0_1px_2px_rgba(0,0,0,0.55)]'
+            }`}
           >
             <h3 className={`${cityCardTitleClass(titleVariant, tone)} line-clamp-2`}>{city.name}</h3>
             {showBrief ? (
               <p
                 className={`mt-1 line-clamp-1 text-xs opacity-0 transition-opacity duration-200 group-hover:opacity-100 sm:text-sm ${
-                  isLight ? 'text-slate-600' : 'text-white/65'
+                  isLight ? 'text-slate-600' : 'text-white/80'
                 }`}
               >
                 {brief}
@@ -238,7 +248,7 @@ export function CityCard({
             ) : null}
             <div
               className={`mt-1.5 flex flex-col gap-0.5 ${
-                isLight ? 'text-slate-700' : 'text-white/90'
+                isLight ? 'text-slate-700' : 'text-white'
               } ${compact ? 'text-[11px] sm:text-xs' : 'text-xs sm:text-sm'}`}
             >
               <span className="flex min-w-0 items-center gap-1.5">
@@ -256,7 +266,7 @@ export function CityCard({
               {city.venues != null && city.venues > 0 ? (
                 <span
                   className={`flex min-w-0 items-center gap-1.5 ${
-                    isLight ? 'text-slate-500' : 'text-white/75'
+                    isLight ? 'text-slate-500' : 'text-white/85'
                   }`}
                 >
                   <Landmark className="h-3.5 w-3.5 shrink-0 opacity-90" strokeWidth={1.75} />
@@ -268,7 +278,7 @@ export function CityCard({
         </div>
       </Link>
 
-      <CityHubTags city={city} region={region} />
+      <CityHubTags city={city} region={region} compact={compact} />
       <CityVibeRow city={city} />
     </div>
   );

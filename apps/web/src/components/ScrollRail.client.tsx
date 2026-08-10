@@ -106,7 +106,7 @@ export function ScrollRail({
     'absolute z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200/90 bg-white/95 text-slate-700 shadow-md backdrop-blur transition-[opacity,transform,colors] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:ring-offset-2 md:inline-flex top-[33%]';
 
   return (
-    <div className={`relative min-w-0 ${className}`.trim()} style={style}>
+    <div className={`relative min-w-0 overflow-visible ${className}`.trim()} style={style}>
       <div
         ref={scrollerRef}
         className={`horizontal-snap-row touch-pan-x ${viewportClassName}`.trim()}
@@ -126,7 +126,7 @@ export function ScrollRail({
             tabIndex={canPrev ? 0 : -1}
             disabled={!canPrev}
             onClick={() => scrollByDir(-1)}
-            className={`${arrowBase} left-1 ${
+            className={`${arrowBase} left-3 ${
               canPrev
                 ? 'pointer-events-auto opacity-100 hover:bg-white hover:text-slate-950'
                 : 'pointer-events-none opacity-40'
@@ -141,7 +141,7 @@ export function ScrollRail({
             tabIndex={canNext ? 0 : -1}
             disabled={!canNext}
             onClick={() => scrollByDir(1)}
-            className={`${arrowBase} right-1 ${
+            className={`${arrowBase} right-3 ${
               canNext
                 ? 'pointer-events-auto opacity-100 hover:bg-white hover:text-slate-950'
                 : 'pointer-events-none opacity-40'

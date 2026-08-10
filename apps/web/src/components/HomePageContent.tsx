@@ -78,11 +78,7 @@ async function HomePageBody() {
   return (
     <div className="bg-neutral-50 pb-24 lg:pb-0">
       {/* Classic search-hero: rotating emotion photos + city/date/category find form */}
-      <HomeHero
-        destinations={destinations}
-        frames={heroFrames}
-        landings={landingsCatalog?.items || []}
-      />
+      <HomeHero destinations={destinations} frames={heroFrames} />
 
       <HomeStoriesStrip />
 
