@@ -64,9 +64,9 @@ const CITY_HASH_ALIASES: Record<string, string> = {
   'city-travel': 'practice',
   'city-guide-faq': 'practice',
   'city-seo': 'seo',
-  'why-go': 'about',
-  'zachem-ehat': 'about',
-  about: 'about',
+  'why-go': 'sights',
+  'zachem-ehat': 'sights',
+  about: 'sights',
   directions: 'more',
   venues: 'more',
   travel: 'practice',
@@ -209,28 +209,23 @@ export function CityPageView({
       return true;
     });
   }, [aboutArticles, afficheArticles, sightsArticles, practiceArticles, moreArticles]);
-  const hasAbout = Boolean(guide?.brief?.trim() || guide?.hookFact?.trim());
+  // Brief lives in hero; hookFact stays near must-see («Зачем ехать»), not a separate «Описание» block.
+  const hasHookFact = Boolean(guide?.hookFact?.trim());
   const hasPractice = hasTravel || hasFaq || practiceArticles.length > 0;
   const hasMore = hasDirections || hasVenues || moreArticles.length > 0;
-  const showSightsBlock = hasSights;
-  const hasNamedDayScenarios = Boolean(guide?.dayRoutePresets?.length);
+  const showSightsBlock = hasSights || hasHookFact;
   // Story cards UI hidden (owner 2026-08-03); keep build helper for later - do not render.
 
   const tabs = React.useMemo(
     () =>
       [
-        { id: 'about', label: 'О городе', show: hasAbout },
-        {
-          id: 'sights',
-          label: hasNamedDayScenarios ? 'Маршруты' : 'Главные места',
-          show: showSightsBlock,
-        },
+        { id: 'sights', label: 'Зачем ехать', show: showSightsBlock },
         { id: 'affiche', label: 'Афиша', show: true },
         { id: 'practice', label: 'Советы', show: hasPractice },
         { id: 'more', label: 'Подборки', show: hasMore },
         { id: 'blog', label: 'Из блога', show: footerArticles.length > 0 },
       ].filter((tab) => tab.show),
-    [footerArticles.length, hasAbout, hasMore, hasNamedDayScenarios, hasPractice, showSightsBlock],
+    [footerArticles.length, hasMore, hasPractice, showSightsBlock],
   );
 
   return (
@@ -260,8 +255,6 @@ export function CityPageView({
               editorial={editorial}
             />
             <CityStickyTabs tabs={tabs} editorial={editorial} />
-
-            {hasAbout ? <CityWhyGoSection guide={guide} editorial={editorial} /> : null}
 
             {showSightsBlock ? (
               <CitySightsSection
@@ -507,9 +500,16 @@ function CityHeroStrip({
   const cityIn = cityInPrepositional(city);
   const searchIn = cityHeroSearchInForm(city);
   const citySlug = city.slug || city.sourceSlug || undefined;
-  const primaryCta = hubConfig?.primaryCta;
-  const primaryTarget = primaryCta?.target || '#affiche';
-  const primaryLabel = primaryCta?.label || 'Афиша';
+  // Short lead always in hero; hookFact lives in «Зачем ехать» below.
+  const brief =
+    guide?.brief?.trim() ||
+    `Экскурсии, музеи, мероприятия и активный отдых ${cityIn}. Выбирайте формат и дату - и покупайте билет онлайн на Дайбилете.`;
+  const afficheHref = citySlug
+    ? buildCatalogHref({ city: citySlug, sort: 'popular' })
+    : '#affiche';
+  const collectionsHref = citySlug
+    ? `/podborki?city=${encodeURIComponent(citySlug)}`
+    : '/podborki';
   const seasonChip = hubConfig?.highlightSeason;
   const heroImage = resolveCityImage({
     slug: city.slug,
@@ -559,7 +559,19 @@ function CityHeroStrip({
 
   const statsDotClass = nightShell ? 'text-white/35' : editorial ? 'text-zinc-300' : 'text-slate-300';
 
-  const afficheLinkClass = nightShell
+  const briefClass = nightShell
+    ? 'mt-3 max-w-2xl text-base leading-relaxed text-white/85 sm:text-lg'
+    : editorial
+      ? 'mt-3 max-w-2xl text-base leading-relaxed text-zinc-600 sm:text-lg'
+      : 'mt-3 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg';
+
+  const heroNavLinkClass = nightShell
+    ? 'text-sm font-semibold text-white/85 underline-offset-4 hover:text-white hover:underline'
+    : editorial
+      ? 'text-sm font-medium text-zinc-700 underline-offset-4 hover:underline'
+      : 'text-sm font-semibold text-primary-700 hover:text-primary-800';
+
+  const afficheButtonClass = nightShell
     ? 'inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-white/15 px-4 text-sm font-semibold text-white ring-1 ring-white/30 backdrop-blur-sm transition hover:bg-white/25'
     : editorial
       ? 'inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white px-4 text-sm font-medium text-zinc-800 hover:border-zinc-400'
@@ -577,10 +589,9 @@ function CityHeroStrip({
     : 'container-page py-8 sm:py-10';
 
   const jumpChips = [
-    { id: 'about', label: 'О городе' },
+    { id: 'sights', label: 'Зачем ехать' },
     { id: 'affiche', label: 'Афиша' },
-    { id: 'sights', label: 'Маршруты' },
-    { id: 'more', label: 'Площадки' },
+    { id: 'more', label: 'Подборки' },
     { id: 'blog', label: 'Блог' },
   ] as const;
 
@@ -595,10 +606,8 @@ function CityHeroStrip({
     );
   };
 
-  // hasTravel / guide kept for caller parity; postcard brief + «Как добраться» CTA removed.
+  // hasTravel kept for caller parity; travel CTA removed from search hero.
   void hasTravel;
-  void guide;
-  void cityIn;
 
   return (
     <div id="top">
@@ -651,6 +660,7 @@ function CityHeroStrip({
         <div className={contentClass}>
           <div className={nightShell ? 'w-full max-w-3xl md:max-w-[72%]' : 'max-w-3xl'}>
             <h1 className={titleClass}>{city.name}</h1>
+            {brief ? <p className={briefClass}>{brief}</p> : null}
             <div className="mt-4 md:mt-5">
               {seasonChip ? (
                 <p className={`mb-3 text-sm ${nightShell ? 'text-white/70' : editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
@@ -695,60 +705,29 @@ function CityHeroStrip({
                     <Search className="h-4 w-4" aria-hidden />
                     Подобрать
                   </button>
-                  {primaryTarget.startsWith('#') ? (
-                    <a
-                      href={primaryTarget}
-                      onClick={(event) => {
-                        event.preventDefault();
-                        scrollToSection(primaryTarget.replace(/^#/, ''));
-                      }}
-                      className={`${afficheLinkClass} sm:hidden`}
-                    >
-                      <Ticket className="h-4 w-4 shrink-0" aria-hidden />
-                      <span>{primaryLabel}</span>
-                    </a>
-                  ) : (
-                    <Link href={primaryTarget} className={`${afficheLinkClass} sm:hidden`}>
-                      <Ticket className="h-4 w-4 shrink-0" aria-hidden />
-                      <span>{primaryLabel}</span>
-                    </Link>
-                  )}
+                  <Link href={afficheHref} className={`${afficheButtonClass} sm:hidden`}>
+                    <Ticket className="h-4 w-4 shrink-0" aria-hidden />
+                    <span>Афиша</span>
+                  </Link>
                 </div>
               </form>
 
-              <div className="mt-3 hidden sm:block">
-                {primaryTarget.startsWith('#') ? (
-                  <a
-                    href={primaryTarget}
-                    onClick={(event) => {
-                      event.preventDefault();
-                      scrollToSection(primaryTarget.replace(/^#/, ''));
-                    }}
-                    className={
-                      nightShell
-                        ? 'text-sm font-semibold text-white/85 underline-offset-4 hover:text-white hover:underline'
-                        : editorial
-                          ? 'text-sm font-medium text-zinc-700 underline-offset-4 hover:underline'
-                          : 'text-sm font-semibold text-primary-700 hover:text-primary-800'
-                    }
-                  >
-                    {primaryLabel} →
-                  </a>
-                ) : (
-                  <Link
-                    href={primaryTarget}
-                    className={
-                      nightShell
-                        ? 'text-sm font-semibold text-white/85 underline-offset-4 hover:text-white hover:underline'
-                        : editorial
-                          ? 'text-sm font-medium text-zinc-700 underline-offset-4 hover:underline'
-                          : 'text-sm font-semibold text-primary-700 hover:text-primary-800'
-                    }
-                  >
-                    {primaryLabel} →
-                  </Link>
-                )}
-              </div>
+              <p className="mt-3 hidden sm:block">
+                <Link href={afficheHref} className={heroNavLinkClass}>
+                  Афиша
+                </Link>
+                <span
+                  aria-hidden="true"
+                  className={
+                    nightShell ? 'mx-2 text-white/40' : editorial ? 'mx-2 text-zinc-300' : 'mx-2 text-slate-300'
+                  }
+                >
+                  ·
+                </span>
+                <Link href={collectionsHref} className={heroNavLinkClass}>
+                  Подборки событий →
+                </Link>
+              </p>
 
               {/* Mobile quick-jump under search; desktop keeps sticky tabs. */}
               <div
@@ -896,63 +875,31 @@ function hubFilterChipClass(isActive: boolean, editorial = false) {
   }`;
 }
 
-/** Описание + факты из cityInfo; идут сразу после tabs, до «Зачем ехать» / сценариев. */
-function CityWhyGoSection({
-  guide,
+/** hookFact near «Зачем ехать»; brief stays in hero. */
+function CityHookFactCallout({
+  hook,
   editorial = false,
 }: {
-  guide: CityInfoEntry | null;
+  hook: string;
   editorial?: boolean;
 }) {
-  const brief = guide?.brief?.trim();
-  const hook = guide?.hookFact?.trim();
-  if (!brief && !hook) return null;
-
   return (
-    <section
-      id="about"
-      className={`border-b ${editorial ? 'border-zinc-200' : 'border-slate-100'} ${SECTION_SCROLL_MT}`}
+    <div
+      className={`mb-6 rounded-2xl px-5 py-4 sm:px-6 sm:py-5 ${
+        editorial
+          ? 'bg-amber-50 ring-1 ring-amber-200/80'
+          : 'bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 ring-1 ring-amber-200/70'
+      }`}
     >
-      <div className={`container-page ${editorial ? 'py-12 sm:py-14' : 'py-8'}`}>
-        {brief ? (
-          <div className="max-w-3xl">
-            <p
-              className={`text-xs font-semibold uppercase tracking-wide ${
-                editorial ? 'text-zinc-500' : 'text-slate-500'
-              }`}
-            >
-              Описание
-            </p>
-            <p
-              className={`mt-2 text-sm leading-7 sm:text-base ${
-                editorial ? 'text-zinc-600' : 'text-slate-600'
-              }`}
-            >
-              {brief}
-            </p>
-          </div>
-        ) : null}
-
-        {hook ? (
-          <div
-            className={`${brief ? 'mt-6' : ''} rounded-2xl px-5 py-4 sm:px-6 sm:py-5 ${
-              editorial
-                ? 'bg-amber-50 ring-1 ring-amber-200/80'
-                : 'bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 ring-1 ring-amber-200/70'
-            }`}
-          >
-            <p className="text-xs font-semibold uppercase tracking-wide text-amber-800">Факты</p>
-            <p
-              className={`mt-2 max-w-3xl text-sm leading-6 ${
-                editorial ? 'text-zinc-700' : 'text-slate-700'
-              }`}
-            >
-              {hook}
-            </p>
-          </div>
-        ) : null}
-      </div>
-    </section>
+      <p className="text-xs font-semibold uppercase tracking-wide text-amber-800">Интересный факт</p>
+      <p
+        className={`mt-2 max-w-3xl text-sm leading-6 ${
+          editorial ? 'text-zinc-600' : 'text-slate-600'
+        }`}
+      >
+        {hook}
+      </p>
+    </div>
   );
 }
 
@@ -1191,7 +1138,8 @@ function CitySightsSection({
     !places.length &&
     !articles.length &&
     !(guide?.significantSuburbs?.length) &&
-    !(guide?.dayRoutePresets?.length)
+    !(guide?.dayRoutePresets?.length) &&
+    !guide?.hookFact?.trim()
   ) {
     return null;
   }
@@ -1210,6 +1158,7 @@ function CitySightsSection({
   const suburbs = guide?.significantSuburbs?.length ? guide.significantSuburbs : [];
   const namedPresets = guide?.dayRoutePresets;
   const hasNamedScenarios = Boolean(namedPresets?.length);
+  const hookFact = guide?.hookFact?.trim() || '';
   // Editorial «Зачем ехать» (places) always owns the section H2; scenarios follow below.
   const sectionTitle =
     places.length || !hasNamedScenarios
@@ -1223,6 +1172,7 @@ function CitySightsSection({
         editorial ? 'border-zinc-200' : 'border-slate-100'
       }`}
     >
+      {hookFact ? <CityHookFactCallout hook={hookFact} editorial={editorial} /> : null}
       <h2
         className={
           editorial
