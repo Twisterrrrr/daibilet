@@ -372,7 +372,7 @@ export function LandingsCatalogView({
               href={featuredHref}
               className="group flex h-full flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-900/10"
             >
-              <div className="relative flex min-h-[14rem] flex-col justify-end overflow-hidden bg-slate-900 sm:min-h-[16rem]">
+              <div className="relative flex min-h-[14rem] flex-1 flex-col justify-end overflow-hidden bg-slate-900 sm:min-h-[16rem]">
                 {featuredImage ? (
                   <SafeImage
                     src={featuredImage}
@@ -396,7 +396,9 @@ export function LandingsCatalogView({
                   </span>
                 </div>
               </div>
-              <p className="px-5 py-2.5 text-xs text-slate-500">{featuredMetaLine(featured)}</p>
+              <p className="mt-auto shrink-0 px-3 py-2 text-xs text-slate-500">
+                {featuredMetaLine(featured)}
+              </p>
             </Link>
           ) : (
             <div className="flex min-h-[12rem] h-full items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white px-6 text-center text-sm text-slate-500">

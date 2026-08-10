@@ -59,10 +59,11 @@ export function podborkiBentoSpan(item: PodborkiBentoItem): PodborkiBentoSpan {
 }
 
 export function podborkiBentoCellClass(span: PodborkiBentoSpan): string {
+  // h-full: карточка заполняет ячейку; meta прилипает к низу через mt-auto в LandingDirectionCard
   if (span === 2) {
-    return 'col-span-1 row-span-1 md:col-span-2';
+    return 'col-span-1 row-span-1 h-full md:col-span-2';
   }
-  return 'col-span-1 row-span-1';
+  return 'col-span-1 row-span-1 h-full';
 }
 
 /** Tailwind grid shell for bento sections (home + /podborki). */

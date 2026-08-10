@@ -209,7 +209,10 @@ export function LandingDirectionCard({
       href={href}
       className="group flex h-full flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-900/8 transition duration-300 hover:-translate-y-0.5 hover:shadow-md"
     >
-      <div className={`relative flex ${coverHeight} flex-col justify-end overflow-hidden bg-slate-900`}>
+      {/* flex-1: лишняя высота bento-ряда уходит в фото, не в белый хвост под meta */}
+      <div
+        className={`relative flex flex-1 ${coverHeight} flex-col justify-end overflow-hidden bg-slate-900`}
+      >
         {imageUrl ? (
           <SafeImage
             src={imageUrl}
@@ -237,7 +240,9 @@ export function LandingDirectionCard({
           </p>
         </div>
       </div>
-      <p className="px-4 py-2.5 text-xs text-slate-500 sm:px-5">{quietMetaLine(landing)}</p>
+      <p className="mt-auto shrink-0 px-3 py-2 text-xs text-slate-500">
+        {quietMetaLine(landing)}
+      </p>
     </Link>
   );
 }
