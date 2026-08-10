@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, MapPinned, Route, Sparkles } from 'lucide-react';
+import { ArrowRight, MapPinned, Plus, Route, Sparkles } from 'lucide-react';
 
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { inCityPrepositional } from '@/lib/city-declension';
@@ -29,7 +29,8 @@ const STEPS = [
 ] as const;
 
 /**
- * Full-bleed My Day band: brand blue stopper + centered 1→2→3 preview + CTA below.
+ * Mid-page My Day promo: interactive constructor preview (not a static ad banner).
+ * Contained white card in page container - not full-bleed graphite/blue band.
  */
 export function HomeMyDayBanner() {
   const selectedCity = useSelectedCityOptional();
@@ -50,57 +51,64 @@ export function HomeMyDayBanner() {
   const href = buildMyDayHref(citySlug);
 
   return (
-    <section
-      className="section-y bg-primary-600 text-white"
-      aria-label="Мой день"
-      data-home-band="full-bleed"
-    >
-      <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/80">
-            Конструктор дня
-          </p>
-          <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            {headline}
-          </h2>
-          <p className="mt-3 text-base leading-relaxed text-white/90">
-            Три шага - и готовый маршрут с местами и билетами
-          </p>
-        </div>
+    <section className="section-y border-b border-slate-200/70 pt-0" aria-label="Мой день">
+      <div className="container-page">
+        <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-card sm:p-6">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div className="min-w-0 max-w-xl">
+              <p className="text-xs font-semibold uppercase tracking-wide text-primary-600">Конструктор дня</p>
+              <h2 className="mt-1.5 font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-[1.75rem]">
+                {headline}
+              </h2>
+              <p className="mt-1.5 text-sm text-slate-500">
+                Три шага - и готовый маршрут с местами и билетами
+              </p>
+            </div>
+            <Link
+              href={href}
+              className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800"
+            >
+              Открыть конструктор
+              <ArrowRight className="h-4 w-4" aria-hidden />
+            </Link>
+          </div>
 
-        <ul className="mt-10 grid gap-4 sm:mt-12 sm:grid-cols-3 sm:gap-5 lg:gap-6">
-          {STEPS.map((step, index) => {
-            const Icon = step.icon;
-            return (
-              <li key={step.id}>
-                <Link
-                  href={href}
-                  className="group flex h-full items-start gap-4 rounded-2xl border border-white/20 bg-white/10 p-5 transition hover:bg-white/[0.16] sm:p-6"
-                >
-                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/15 text-white ring-1 ring-white/25 transition group-hover:bg-white/25">
-                    <Icon className="h-5 w-5" strokeWidth={1.75} aria-hidden />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-white/70">
-                      Шаг {index + 1}
-                    </p>
-                    <h3 className="mt-1.5 text-base font-bold text-white">{step.title}</h3>
-                    <p className="mt-1 text-sm leading-relaxed text-white/80">{step.hint}</p>
-                  </div>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-
-        <div className="mt-8 flex justify-center sm:mt-10">
-          <Link
-            href={href}
-            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-semibold text-primary-700 shadow-sm transition hover:bg-white/95"
-          >
-            Открыть конструктор
-            <ArrowRight className="h-4 w-4" aria-hidden />
-          </Link>
+          <ul className="mt-5 grid gap-3 sm:grid-cols-3">
+            {STEPS.map((step, index) => {
+              const Icon = step.icon;
+              return (
+                <li key={step.id}>
+                  <Link
+                    href={href}
+                    className="group flex h-full items-start gap-3 rounded-2xl border border-slate-200/90 bg-slate-50/80 p-4 transition hover:border-primary-200 hover:bg-primary-50/40"
+                  >
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-slate-700 shadow-sm ring-1 ring-slate-200/80 transition group-hover:text-primary-700">
+                      <Icon className="h-5 w-5" strokeWidth={1.75} aria-hidden />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+                            Шаг {index + 1}
+                          </p>
+                          <h3 className="mt-0.5 text-sm font-bold text-slate-900 group-hover:text-primary-800">
+                            {step.title}
+                          </h3>
+                          <p className="mt-0.5 text-xs text-slate-500">{step.hint}</p>
+                        </div>
+                        <span
+                          className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-slate-700 shadow-sm ring-1 ring-slate-200/80 transition group-hover:bg-primary-600 group-hover:text-white group-hover:ring-primary-600"
+                          aria-hidden
+                        >
+                          <Plus className="h-4 w-4" strokeWidth={2} />
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
         </div>
       </div>
     </section>

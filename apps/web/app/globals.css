@@ -203,8 +203,8 @@ html[data-nav-pending='1'] {
   }
 
   /**
-   * Home city rail: left edge aligns with container-page content start;
-   * right side bleeds to the viewport (infinite gallery feel).
+   * Home city rail (legacy): left aligns with container; right bleeds.
+   * Prefer `.home-edge-cities-rail` for true both-edge infinite peek.
    */
   .home-bleed-rail {
     padding-left: max(1rem, calc((100vw - 80rem) / 2 + 1rem));
@@ -220,6 +220,15 @@ html[data-nav-pending='1'] {
     .home-bleed-rail {
       padding-left: max(2rem, calc((100vw - 80rem) / 2 + 2rem));
     }
+  }
+
+  /** Popular cities: full-bleed horizontal track, peek past both edges. */
+  .home-edge-cities-rail {
+    width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    /* Instant reposition for seamless infinite loop (override horizontal-snap-row). */
+    scroll-behavior: auto;
   }
 
   .catalog-chip-active {

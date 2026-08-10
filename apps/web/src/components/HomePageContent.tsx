@@ -2,13 +2,13 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 import { ArrowRight, Dices } from 'lucide-react';
 
-import { CityCard } from '@/components/CityCard';
 import { HomeBottomNav } from '@/components/HomeBottomNav.client';
 import { HomeCategoryStack } from '@/components/HomeCategoryStack.client';
 import { HomeCityAwareSections } from '@/components/HomeCityAwareSections.client';
 import { HomeHero } from '@/components/HomeHero.client';
 import { HomeMyDayBanner } from '@/components/HomeMyDayBanner.client';
 import { HomePageSkeleton } from '@/components/HomePageSkeleton';
+import { HomePopularCitiesRail } from '@/components/HomePopularCitiesRail.client';
 import { HomeStoriesStrip } from '@/components/HomeStoriesStrip.client';
 import { LuckyCityButton } from '@/components/LuckyCityButton.client';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
@@ -86,7 +86,7 @@ async function HomePageBody() {
 
       <HomeStoriesStrip />
 
-      {/* Rhythm: hero full → editors boxed → cities full → My Day full → popular boxed → … */}
+      {/* Rhythm: editors boxed → cities full-bleed rail → My Day boxed card → popular boxed */}
       <HomeCityAwareSections
         sessions={sessions}
         fingerprints={fingerprintsRecord}
@@ -98,7 +98,7 @@ async function HomePageBody() {
             className="breakout section-y bg-[#F5F5F7]"
             data-home-band="full-bleed"
           >
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="container-page">
               <div className="flex items-end justify-between gap-4">
                 <div>
                   <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
@@ -111,28 +111,12 @@ async function HomePageBody() {
                 </Link>
               </div>
             </div>
-            {/* Left aligns with content gutter; right bleeds to viewport edge. */}
-            <div className="home-bleed-rail mt-6">
-              <ScrollRail
-                hideScrollbar
-                viewportClassName="flex flex-nowrap gap-3 snap-x snap-mandatory pr-4 sm:gap-3.5 sm:pr-6 lg:pr-8"
-                aria-label="Популярные города"
-              >
-                {topCities.map((city) => (
-                  <div
-                    key={city.slug || city.name}
-                    className="w-[min(52vw,196px)] shrink-0 snap-start sm:w-[168px] lg:w-[176px]"
-                    data-rail-item
-                  >
-                    <CityCard city={city} compact />
-                  </div>
-                ))}
-              </ScrollRail>
-            </div>
+            {/* Infinite loop rail: cards peek past both viewport edges. */}
+            <HomePopularCitiesRail cities={topCities} className="mt-6" />
           </section>
         ) : null}
 
-        {/* My Day CTA - after cities, not in hero */}
+        {/* My Day CTA - boxed promo after cities (not full-bleed band) */}
         <HomeMyDayBanner />
       </HomeCityAwareSections>
 
