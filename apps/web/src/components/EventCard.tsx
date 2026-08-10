@@ -34,7 +34,7 @@ import {
   WIDE_DISPLAY_SLOT_LIMIT,
 } from '@/lib/event-card-meta';
 import { resolveEventCardObjectPosition } from '@/lib/event-image-focus';
-import { resolveEventCardFallbackImage } from '@/lib/event-card-image';
+import { resolveEventCardFallbackImage, resolveEventCardPrimaryImage } from '@/lib/event-card-image';
 import {
   resolveEventCardDestinationLabel,
   resolveEventCardLocationLabel,
@@ -89,6 +89,7 @@ export function EventCard({
     sourceSlug: 'sourceSlug' in session ? session.sourceSlug : undefined,
     id: session.id,
   });
+  const imagePrimarySrc = resolveEventCardPrimaryImage(session);
   const imageFallbackSrc = resolveEventCardFallbackImage(session);
   const emptyImageFallback = (
     <div className="flex h-full w-full items-center justify-center bg-surface-muted">
@@ -157,14 +158,14 @@ export function EventCard({
           />
         ) : null}
         <SafeImage
-          src={session.imageUrl}
+          src={imagePrimarySrc}
           alt={session.title}
           fill
           sizes={IMAGE_SIZES.eventCard}
           style={{ objectPosition: imageObjectPosition }}
           className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
           fallback={
-            imageFallbackSrc && imageFallbackSrc !== session.imageUrl ? (
+            imageFallbackSrc && imageFallbackSrc !== imagePrimarySrc ? (
               <SafeImage
                 src={imageFallbackSrc}
                 alt={session.title}
@@ -498,6 +499,7 @@ function ShowcaseEventCard({
     sourceSlug: 'sourceSlug' in session ? session.sourceSlug : undefined,
     id: session.id,
   });
+  const imagePrimarySrc = resolveEventCardPrimaryImage(session);
   const imageFallbackSrc = resolveEventCardFallbackImage(session);
   const emptyImageFallback = (
     <div className="flex h-full w-full items-center justify-center bg-surface-muted text-3xl text-graphite-muted">
@@ -528,14 +530,14 @@ function ShowcaseEventCard({
       />
       <div className="relative aspect-[16/9] w-full shrink-0 overflow-hidden bg-surface-muted">
         <SafeImage
-          src={session.imageUrl}
+          src={imagePrimarySrc}
           alt={session.title}
           fill
           sizes={IMAGE_SIZES.eventCard}
           style={{ objectPosition: imageObjectPosition }}
           className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
           fallback={
-            imageFallbackSrc && imageFallbackSrc !== session.imageUrl ? (
+            imageFallbackSrc && imageFallbackSrc !== imagePrimarySrc ? (
               <SafeImage
                 src={imageFallbackSrc}
                 alt={session.title}

@@ -34,6 +34,17 @@ test('sessionHasCoverImage rejects city placeholders', () => {
   assert.equal(sessionHasCoverImage({ imageUrl: 'https://cdn.example/cover.jpg' }), true);
 });
 
+test('sessionHasCoverImage rejects sharp evt-auto category gradients', () => {
+  assert.equal(
+    sessionHasCoverImage({ imageUrl: '/images/events/generated/evt-auto-34e6ebcbf9bd.jpg' }),
+    false,
+  );
+  assert.equal(
+    sessionHasCoverImage({ imageUrl: '/images/venues/generated/venue-auto-abc123.jpg' }),
+    false,
+  );
+});
+
 test('regroupMappedPublicCatalogSessions merges slots by groupKey', () => {
   const grouped = regroupMappedPublicCatalogSessions([
     session({

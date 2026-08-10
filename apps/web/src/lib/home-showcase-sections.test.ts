@@ -2,8 +2,12 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { isHomeRailTabooSession } from './home-rail-taboos';
-import { buildEditorsPickEvents, createHomePickState } from './home-showcase-sections';
-import { collectSessionImageDedupeKeys, normalizeSessionImageKey } from './session-cover-image';
+import { buildEditorsPickEvents, buildPopularEvents, createHomePickState } from './home-showcase-sections';
+import {
+  collectSessionImageDedupeKeys,
+  normalizeSessionImageKey,
+  sessionHasCoverImage,
+} from './session-cover-image';
 
 function session(partial: Record<string, unknown>) {
   return {
@@ -185,4 +189,47 @@ test('editors pick: skip identical binaries under different basenames via ETag f
   assert.equal(picked.filter((s) => ['boat1', 'boat2', 'boat3'].includes(s.id)).length, 1);
   assert.ok(picked.some((s) => s.id === 'ok1'));
   assert.ok(picked.some((s) => s.id === 'ok2'));
+});
+
+test('sessionHasCoverImage rejects evt-auto category gradients', () => {
+  assert.equal(
+    sessionHasCoverImage({ imageUrl: '/images/events/generated/evt-auto-34e6ebcbf9bd.jpg' }),
+    false,
+  );
+  assert.equal(sessionHasCoverImage({ imageUrl: 'https://cdn.example/real.jpg' }), true);
+});
+
+test('popular / editors pick: skip evt-auto stubs so photo rails stay photographic', () => {
+  const sessions = [
+    session({
+      id: 'stub1',
+      title: 'Квест без фото',
+      slug: 'quest-stub',
+      imageUrl: '/images/events/generated/evt-auto-34e6ebcbf9bd.jpg',
+      sessionCount: 160,
+      manualLandingStatus: 'PINNED',
+    }),
+    session({
+      id: 'photo1',
+      title: 'Речная прогулка',
+      slug: 'boat-photo',
+      imageUrl: 'https://cdn.example/boat-real.jpg',
+      sessionCount: 20,
+    }),
+    session({
+      id: 'photo2',
+      title: 'Музей',
+      slug: 'museum-photo',
+      imageUrl: 'https://cdn.example/museum-real.jpg',
+      sessionCount: 15,
+    }),
+  ];
+
+  const popular = buildPopularEvents(sessions, 4, createHomePickState());
+  assert.equal(popular.some((s) => s.id === 'stub1'), false);
+  assert.ok(popular.some((s) => s.id === 'photo1'));
+
+  const editors = buildEditorsPickEvents(sessions, 4, createHomePickState());
+  assert.equal(editors.some((s) => s.id === 'stub1'), false);
+  assert.ok(editors.some((s) => s.id === 'photo1'));
 });

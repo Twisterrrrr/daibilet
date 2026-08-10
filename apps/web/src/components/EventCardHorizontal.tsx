@@ -19,7 +19,7 @@ import {
   WIDE_DISPLAY_SLOT_LIMIT,
 } from '@/lib/event-card-meta';
 import { resolveEventCardObjectPosition } from '@/lib/event-image-focus';
-import { resolveEventCardFallbackImage } from '@/lib/event-card-image';
+import { resolveEventCardFallbackImage, resolveEventCardPrimaryImage } from '@/lib/event-card-image';
 import {
   resolveEventCardDestinationLabel,
   resolveEventCardLocationLabel,
@@ -40,6 +40,7 @@ export function EventCardHorizontal({ session }: { session: PublicCatalogListIte
     sourceSlug: 'sourceSlug' in session ? session.sourceSlug : undefined,
     id: session.id,
   });
+  const imagePrimarySrc = resolveEventCardPrimaryImage(session);
   const imageFallbackSrc = resolveEventCardFallbackImage(session);
   const emptyImageFallback = <div className="flex h-full w-full items-center justify-center bg-surface-muted" />;
   const hasPrice = typeof session.priceFrom === 'number' && session.priceFrom >= MIN_DISPLAY_PRICE_RUB;
@@ -79,14 +80,14 @@ export function EventCardHorizontal({ session }: { session: PublicCatalogListIte
       />
       <div className="relative aspect-video w-full shrink-0 overflow-hidden bg-surface-muted sm:min-w-[20rem] sm:w-80 sm:aspect-auto sm:self-stretch">
         <SafeImage
-          src={session.imageUrl}
+          src={imagePrimarySrc}
           alt={session.title}
           fill
           sizes={IMAGE_SIZES.eventCardHorizontal}
           style={{ objectPosition: imageObjectPosition }}
           className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
           fallback={
-            imageFallbackSrc && imageFallbackSrc !== session.imageUrl ? (
+            imageFallbackSrc && imageFallbackSrc !== imagePrimarySrc ? (
               <SafeImage
                 src={imageFallbackSrc}
                 alt={session.title}
