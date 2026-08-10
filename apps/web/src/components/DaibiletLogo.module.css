@@ -42,3 +42,8 @@
   fill: var(--logo-blue);
   opacity: 1;
 }
+
+/* Breve over «и»: brand dark; mid/end points stay blue. */
+.point1 {
+  fill: var(--logo-dark);
+}

@@ -18,7 +18,7 @@ type DaibiletLogoProps = {
 
 /**
  * Brand mark: HTML «Даибилет» + SVG route overlay.
- * First blue point is the breve of «й»; aria / sr-only stay «Дайбилет».
+ * Point-1 (black) is the breve of «й»; other points and arcs stay blue. Aria / sr-only: «Дайбилет».
  */
 export function DaibiletLogo({
   className = '',
