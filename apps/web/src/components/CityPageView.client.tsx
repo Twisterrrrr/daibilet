@@ -208,8 +208,9 @@ export function CityPageView({
       return true;
     });
   }, [aboutArticles, afficheArticles, sightsArticles, practiceArticles, moreArticles]);
-  // Brief lives in hero; hookFact stays near must-see («Зачем ехать»), not a separate «Описание» block.
+  // Brief lives in hero; hookFact is its own block between tabs and «Зачем ехать».
   const hasHookFact = Boolean(guide?.hookFact?.trim());
+  const hookFactText = guide?.hookFact?.trim() || '';
   const hasPractice = hasTravel || hasFaq || practiceArticles.length > 0;
   const hasMore = hasDirections || hasVenues || moreArticles.length > 0;
   const showSightsBlock = hasSights || hasHookFact;
@@ -256,17 +257,34 @@ export function CityPageView({
             <CityStickyTabs tabs={tabs} editorial={editorial} />
 
             {showSightsBlock ? (
-              <CitySightsSection
-                city={city}
-                guide={guide}
-                categories={categories}
-                venues={payload.venues}
-                landings={payload.landings}
-                allowFallback={contentReady}
-                editorial={editorial}
-                articles={[]}
-                sessions={payload.sessions}
-              />
+              <div
+                id="sights"
+                className={`border-b ${SECTION_SCROLL_MT} ${
+                  editorial ? 'border-zinc-200' : 'border-slate-100'
+                }`}
+              >
+                {hasHookFact ? (
+                  <div
+                    className={`container-page pt-8 sm:pt-10 ${
+                      hasSights ? 'pb-2 sm:pb-3' : 'pb-8 sm:pb-10'
+                    }`}
+                  >
+                    <CityHookFactCallout hook={hookFactText} editorial={editorial} />
+                  </div>
+                ) : null}
+                <CitySightsSection
+                  city={city}
+                  guide={guide}
+                  categories={categories}
+                  venues={payload.venues}
+                  landings={payload.landings}
+                  allowFallback={contentReady}
+                  editorial={editorial}
+                  articles={[]}
+                  sessions={payload.sessions}
+                  compactTop={hasHookFact}
+                />
+              </div>
             ) : null}
 
             <section
@@ -496,7 +514,7 @@ function CityHeroStrip({
   const [heroImageFailed, setHeroImageFailed] = React.useState(false);
   const cityIn = cityInPrepositional(city);
   const citySlug = city.slug || city.sourceSlug || undefined;
-  // Short lead always in hero; hookFact lives in «Зачем ехать» below.
+  // Short lead always in hero; hookFact sits above «Зачем ехать».
   const brief =
     guide?.brief?.trim() ||
     `Экскурсии, музеи, мероприятия и активный отдых ${cityIn}. Выбирайте формат и дату - и покупайте билет онлайн на Дайбилете.`;
@@ -820,7 +838,7 @@ function hubFilterChipClass(isActive: boolean, editorial = false) {
   }`;
 }
 
-/** hookFact near «Зачем ехать»; brief stays in hero. */
+/** hookFact above «Зачем ехать»; brief stays in hero. */
 function CityHookFactCallout({
   hook,
   editorial = false,
@@ -1050,6 +1068,7 @@ function CitySightsSection({
   editorial = false,
   articles = [],
   sessions = [],
+  compactTop = false,
 }: {
   city: PublicCityDto;
   guide: CityInfoEntry | null;
@@ -1060,6 +1079,8 @@ function CitySightsSection({
   editorial?: boolean;
   articles?: BlogCardDto[];
   sessions?: PublicSessionDto[];
+  /** True when hookFact already sits above this section. */
+  compactTop?: boolean;
 }) {
   const fromSights: CityMustSeeItem[] =
     guide?.sights?.map((item) => ({
@@ -1083,8 +1104,7 @@ function CitySightsSection({
     !places.length &&
     !articles.length &&
     !(guide?.significantSuburbs?.length) &&
-    !(guide?.dayRoutePresets?.length) &&
-    !guide?.hookFact?.trim()
+    !(guide?.dayRoutePresets?.length)
   ) {
     return null;
   }
@@ -1103,8 +1123,8 @@ function CitySightsSection({
   const suburbs = guide?.significantSuburbs?.length ? guide.significantSuburbs : [];
   const namedPresets = guide?.dayRoutePresets;
   const hasNamedScenarios = Boolean(namedPresets?.length);
-  const hookFact = guide?.hookFact?.trim() || '';
   // Editorial «Зачем ехать» (places) always owns the section H2; scenarios follow below.
+  // hookFact renders above this section (between tabs and H2).
   const sectionTitle =
     places.length || !hasNamedScenarios
       ? `Зачем ехать ${cityInto}`
@@ -1112,10 +1132,7 @@ function CitySightsSection({
 
   return (
     <section
-      id="sights"
-      className={`container-page border-b py-10 ${SECTION_SCROLL_MT} ${
-        editorial ? 'border-zinc-200' : 'border-slate-100'
-      }`}
+      className={`container-page ${compactTop ? 'pt-6 pb-10' : 'py-10'}`}
     >
       <h2
         className={
@@ -1126,11 +1143,6 @@ function CitySightsSection({
       >
         {sectionTitle}
       </h2>
-      {hookFact ? (
-        <div className="mt-4">
-          <CityHookFactCallout hook={hookFact} editorial={editorial} />
-        </div>
-      ) : null}
       {places.length || hasNamedScenarios ? (
         <CitySightsMustSeeList
           places={places}
