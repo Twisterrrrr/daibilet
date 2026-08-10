@@ -2,8 +2,9 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
+| UX.HOME-RHYTHM | Homepage P0-P2: clean hero+swipe chips; editors rail; merge now/popular; My Day constructor preview; cities/podborki rails | Высокий | 🔄 ship; deploy по «выкатывай» |
 | UX.MYDAY-TRAVEL-PRODUCT | `/my-day`: magazine suburb, stops timeline, scenario snap cards, must-see carousel, mobile shelf tabs | Критический | ✅ `af70051d` Deploy `31342186797` BUILD_ID=`RWJuTMEW-R707-yh7VQwJ` |
-| UX.MYDAY-TRAVEL-FOLLOWUP | `/my-day` after af70051d: stop thumbs from editorial maps; suburb no empty cover band; must-see dense+desc (≠ hot picks) | Критический | 🔄 commit+push; deploy по «выкатывай» |
+| UX.MYDAY-TRAVEL-FOLLOWUP | `/my-day` after af70051d: stop thumbs from editorial maps; suburb no empty cover band; must-see dense+desc (≠ hot picks) | Критический | ✅ `d8451dc5` push; deploy по «выкатывай» |
 | UX.PODBORKI-ONE-FILTER | `/podborki`: один filter-system (black tabs + soft tags); kill «Каталог подборок»/дубль city; clean covers (meta under photo); dedupe featured | Высокий | ✅ `eb68f461` Deploy `31342186797` BUILD_ID=`RWJuTMEW-R707-yh7VQwJ` |
 | UX.SITEWIDE-MINIMALISM | Sitewide UX: 1 mobile filter rail; no system junk; clean covers (meta under photo); one monochrome line icon pack. Canon LOCKED in Project/Diary | Высокий | ✅ docs locked; 🔄 page polishes ongoing (venues done; locations/podborki/blog) |
 | UX.VENUES-CATALOG-QUIET | `/venues`: kill dark hero; white H1; soft chip rail; no Найдено/стр.; clean InstitutionCard (+ icon, meta above title) | Высокий | ✅ `e78f905b` Deploy `31342186797` BUILD_ID=`RWJuTMEW-R707-yh7VQwJ` |
