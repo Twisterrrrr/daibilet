@@ -121,7 +121,11 @@ import {
   type DayRouteVenueItem,
 } from '@/lib/day-route';
 import { lookupEditorialPlaceCoords } from '@/lib/city-place-coords';
-import { isGeneratedVenueStub, resolveVenueHeroImage } from '@/lib/city-place-images';
+import {
+  isGeneratedVenueStub,
+  resolveDayRouteStopImage,
+  resolveVenueHeroImage,
+} from '@/lib/city-place-images';
 import {
   buildCityDayRoutePreset,
   dayRouteHookLine,
@@ -538,7 +542,8 @@ function DayRoutePanelInner() {
       route.venues.map((venue) => ({
         id: venue.id,
         title: venue.title,
-        imageUrl: venue.imageUrl || null,
+        // LS may drop imageUrl under quota slim - rebuild from editorial slug maps.
+        imageUrl: resolveDayRouteStopImage(venue),
       })),
     [route.venues],
   );
@@ -3517,10 +3522,10 @@ function DayRoutePanelInner() {
                   />
                   <div
                     id="day-must-see-list"
-                    className="mt-3 horizontal-snap-row flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain pb-1"
+                    className="mt-3 grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3"
                     data-day-must-see-list
                     data-day-must-see-expanded="1"
-                    data-day-must-see-layout="carousel"
+                    data-day-must-see-layout="dense"
                   >
                     {mustSeeFiltered.map(({ place, item, hook }) => {
                       const inRoute =
@@ -3528,6 +3533,8 @@ function DayRoutePanelInner() {
                       const hasItemCoords = Boolean(
                         lookupDayRouteCoords(item, buildDayRouteCoordsMap([item])),
                       );
+                      const thumb =
+                        resolveDayRouteStopImage(item) || item.imageUrl || null;
                       return (
                         <button
                           key={item.id}
@@ -3544,45 +3551,44 @@ function DayRoutePanelInner() {
                                   : hook || 'Добавить в день'
                           }
                           onClick={() => addMustSeeItem(item)}
-                          className={`relative h-52 w-[72vw] max-w-[16.5rem] shrink-0 snap-start overflow-hidden rounded-2xl border text-left transition disabled:cursor-not-allowed sm:w-60 ${
+                          className={`flex w-full min-w-0 items-center gap-3 rounded-xl border px-2.5 py-2 text-left transition disabled:cursor-not-allowed ${
                             inRoute
-                              ? 'border-emerald-400 ring-2 ring-emerald-200'
-                              : 'border-slate-200 hover:border-primary-300'
+                              ? 'border-emerald-400 bg-emerald-50 text-emerald-900'
+                              : 'border-slate-200 bg-white text-slate-800 hover:border-emerald-300 hover:bg-emerald-50/50'
                           }`}
                         >
-                          <div className="absolute inset-0 bg-[#F5F5F7]">
-                            {item.imageUrl ? (
+                          <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-slate-100 sm:h-24 sm:w-24">
+                            {thumb ? (
                               <SafeImage
-                                src={item.imageUrl}
+                                src={thumb}
                                 alt=""
                                 fill
-                                sizes="16.5rem"
+                                sizes="6rem"
                                 className="object-cover"
                               />
                             ) : (
-                              <div className="flex h-full w-full items-center justify-center text-slate-400">
-                                <MapPin className="h-7 w-7" />
+                              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-200 via-slate-100 to-primary-100 text-slate-400">
+                                <MapPin className="h-5 w-5" />
                               </div>
                             )}
                           </div>
-                          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/25 to-transparent" />
+                          <span className="min-w-0 flex-1 py-0.5">
+                            <span className="block line-clamp-2 text-sm font-semibold leading-snug">
+                              {place.name}
+                            </span>
+                            {hook ? (
+                              <span className="mt-0.5 block line-clamp-2 text-[11px] leading-snug text-slate-500">
+                                {hook}
+                              </span>
+                            ) : null}
+                          </span>
                           <span
-                            className={`absolute right-2.5 top-2.5 inline-flex h-9 w-9 items-center justify-center rounded-full shadow-sm ${
-                              inRoute ? 'bg-emerald-500 text-white' : 'bg-white/95 text-slate-900'
+                            className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
+                              inRoute ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-900 text-white'
                             }`}
                             aria-hidden
                           >
                             {inRoute ? <Check className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-                          </span>
-                          <span className="absolute inset-x-0 bottom-0 p-3.5">
-                            <span className="block line-clamp-2 text-sm font-bold leading-snug text-white drop-shadow">
-                              {place.name}
-                            </span>
-                            {hook ? (
-                              <span className="mt-1 block line-clamp-2 text-[11px] leading-snug text-white/80">
-                                {hook}
-                              </span>
-                            ) : null}
                           </span>
                         </button>
                       );
@@ -4497,6 +4503,7 @@ function DayRouteVenueCard({
       : null);
   const ticketUrl = resolveDayRouteTicketUrl(venue);
   const bought = Boolean(venue.ticketBought);
+  const thumbUrl = resolveDayRouteStopImage(venue);
   const chip = classifyDayRouteCommercialChip(venue);
   const showStatusChip = chip.kind !== 'free';
   const buyCtaLabel = formatDayRouteBuyCtaLabel(venue);
@@ -4886,10 +4893,10 @@ function DayRouteVenueCard({
               {index + 1}
             </span>
             <div className="relative h-full w-full overflow-hidden rounded-xl bg-slate-100">
-              {venue.imageUrl ? (
-                <SafeImage src={venue.imageUrl} alt="" fill sizes="4rem" className="object-cover" />
+              {thumbUrl ? (
+                <SafeImage src={thumbUrl} alt="" fill sizes="4rem" className="object-cover" />
               ) : (
-                <div className="flex h-full w-full items-center justify-center text-slate-400">
+                <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-200 via-slate-100 to-primary-100 text-slate-400">
                   <MapPin className="h-5 w-5" />
                 </div>
               )}

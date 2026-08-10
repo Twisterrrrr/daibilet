@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { MapPin } from 'lucide-react';
 
 import { SafeImage } from '@/components/SafeImage.client';
 import type { CitySuburbGastroStop } from '@/lib/cityInfo';
@@ -192,97 +191,110 @@ export function DayTripCanonCard({
         } ${className}`}
         data-day-trip-canon="1"
         data-day-trip-magazine="1"
+        data-day-trip-has-cover={cover ? '1' : '0'}
         {...dataProps}
       >
-        <div className="relative aspect-[16/10] w-full bg-[#F5F5F7]" data-day-trip-cover>
+        <div
+          className={
+            cover
+              ? 'flex flex-col sm:grid sm:grid-cols-[minmax(11rem,36%)_minmax(0,1fr)] sm:items-stretch'
+              : undefined
+          }
+        >
           {cover ? (
-            <SafeImage
-              src={cover}
-              alt=""
-              fill
-              sizes="(max-width: 768px) 100vw, 640px"
-              className="object-cover"
-            />
-          ) : (
             <div
-              className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-primary-100"
-              aria-hidden
-            />
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/55 via-slate-950/10 to-transparent" />
-          <span
-            className="absolute left-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/95 text-sm font-bold tabular-nums text-slate-900 shadow-sm"
-            data-day-trip-badge
-          >
-            {index + 1}
-          </span>
-          {!cover ? (
-            <MapPin
-              className="absolute bottom-3 right-3 h-6 w-6 text-slate-400/80"
-              aria-hidden
-            />
-          ) : null}
-        </div>
-
-        <div className="px-4 py-4 sm:px-5 sm:py-5">
-          <header>
-            <h3
-              className={`text-xl font-semibold leading-snug tracking-tight sm:text-2xl ${titleClass}`}
-              data-day-trip-title
+              className="relative h-36 w-full shrink-0 bg-[#F5F5F7] sm:h-auto sm:min-h-[10.5rem] sm:max-h-[14rem]"
+              data-day-trip-cover
             >
-              {title}
-            </h3>
-            {subtitle ? (
-              <p className={`mt-1 text-sm leading-snug ${softClass}`} data-day-trip-subtitle>
-                {subtitle}
-              </p>
-            ) : null}
-            {leadText ? (
-              <p className={`mt-2 text-sm leading-relaxed ${softClass}`} data-day-trip-lead>
-                {leadText}
-              </p>
-            ) : null}
-            {titleExtra ? <div className="mt-1.5">{titleExtra}</div> : null}
-            {logisticsOneLiner ? (
-              <p className={`mt-2 text-xs leading-snug ${mutedClass}`} data-day-trip-logistics-line>
-                {logisticsExitLabel}: {logisticsOneLiner}
-              </p>
-            ) : null}
-          </header>
-
-          {nested.length ? (
-            <section className="mt-4" data-day-trip-sights>
-              <h4 className={`text-sm font-semibold ${inkClass}`}>Что посмотреть</h4>
-              <ul className="mt-2 list-none space-y-1.5 p-0" data-day-trip-places>
-                {nested.map((poi, poiIndex) => (
-                  <li
-                    key={`${poi.name}:${poiIndex}`}
-                    className="flex items-start gap-2 text-sm leading-snug"
-                    data-day-trip-place
-                  >
-                    <span
-                      className={`mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary-500 ${numClass}`}
-                      aria-hidden
-                    />
-                    <span className={`min-w-0 ${poiTextClass}`}>
-                      <SightLabel
-                        name={poi.name}
-                        href={poi.href}
-                        desc={poi.desc}
-                        descFromMd={sightDescFromMd}
-                      />
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ) : null}
-
-          {cta ? (
-            <div className="mt-5" data-day-trip-cta>
-              {cta}
+              <SafeImage
+                src={cover}
+                alt=""
+                fill
+                sizes="(max-width: 640px) 100vw, 280px"
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/35 via-transparent to-transparent sm:bg-gradient-to-r sm:from-transparent sm:via-transparent sm:to-slate-950/10" />
+              <span
+                className="absolute left-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/95 text-sm font-bold tabular-nums text-slate-900 shadow-sm"
+                data-day-trip-badge
+              >
+                {index + 1}
+              </span>
             </div>
           ) : null}
+
+          <div className="px-4 py-4 sm:px-5 sm:py-5">
+            <header>
+              <div className="flex items-start gap-2.5">
+                {!cover ? (
+                  <span
+                    className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold tabular-nums ${badgeClass}`}
+                    data-day-trip-badge
+                  >
+                    {index + 1}
+                  </span>
+                ) : null}
+                <div className="min-w-0 flex-1">
+                  <h3
+                    className={`text-xl font-semibold leading-snug tracking-tight sm:text-2xl ${titleClass}`}
+                    data-day-trip-title
+                  >
+                    {title}
+                  </h3>
+                  {subtitle ? (
+                    <p className={`mt-1 text-sm leading-snug ${softClass}`} data-day-trip-subtitle>
+                      {subtitle}
+                    </p>
+                  ) : null}
+                </div>
+              </div>
+              {leadText ? (
+                <p className={`mt-2 text-sm leading-relaxed ${softClass}`} data-day-trip-lead>
+                  {leadText}
+                </p>
+              ) : null}
+              {titleExtra ? <div className="mt-1.5">{titleExtra}</div> : null}
+              {logisticsOneLiner ? (
+                <p className={`mt-2 text-xs leading-snug ${mutedClass}`} data-day-trip-logistics-line>
+                  {logisticsExitLabel}: {logisticsOneLiner}
+                </p>
+              ) : null}
+            </header>
+
+            {nested.length ? (
+              <section className="mt-4" data-day-trip-sights>
+                <h4 className={`text-sm font-semibold ${inkClass}`}>Что посмотреть</h4>
+                <ul className="mt-2 list-none space-y-1.5 p-0" data-day-trip-places>
+                  {nested.map((poi, poiIndex) => (
+                    <li
+                      key={`${poi.name}:${poiIndex}`}
+                      className="flex items-start gap-2 text-sm leading-snug"
+                      data-day-trip-place
+                    >
+                      <span
+                        className={`mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary-500 ${numClass}`}
+                        aria-hidden
+                      />
+                      <span className={`min-w-0 ${poiTextClass}`}>
+                        <SightLabel
+                          name={poi.name}
+                          href={poi.href}
+                          desc={poi.desc}
+                          descFromMd={sightDescFromMd}
+                        />
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ) : null}
+
+            {cta ? (
+              <div className="mt-5" data-day-trip-cta>
+                {cta}
+              </div>
+            ) : null}
+          </div>
         </div>
       </article>
     );

@@ -1,3 +1,19 @@
+## 2026-08-10 - `/my-day`: thumbs + suburb dead space + must-see dense
+
+### Наблюдения
+- После `af70051d`: у многих шагов маршрута пустые thumbs (LS slim дропает `imageUrl`); magazine suburb (Архангельское) давал огромную серую полосу `aspect-[16/10]` без cover; «Главные места» стали клоном cover-карусели «Выбор Дайбилет».
+
+### Решения
+- `resolveDayRouteStopImage` + timeline/list thumbs: пересборка cover из editorial slug maps (LOCATION_PACK / must-see), gradient fallback вместо пустого круга.
+- Magazine suburb: без cover - без media-панели (badge у title); с cover - photo left/top, `max-h ~14rem`, не full-bleed empty band. Gen новых suburb covers не делали (8/8 MSK suburbs без asset - gap не small).
+- «Главные места»: вернули dense grid title+desc+thumb+`+` (`layout=dense`); «Выбор Дайбилет» остаётся large cover carousel.
+
+### Проблемы
+- Cover-файлы значимых пригородов Москвы (Архангельское и др.) по-прежнему отсутствуют в editorial map - отдельный asset batch.
+- Deploy MSK web - по «выкатывай» (этот месседж - только push).
+
+---
+
 ## 2026-08-10 - `/events`: date rail in title band + one soft chip row
 
 ### Наблюдения

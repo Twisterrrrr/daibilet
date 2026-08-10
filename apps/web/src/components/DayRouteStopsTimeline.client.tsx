@@ -88,7 +88,7 @@ export function DayRouteStopsTimeline({
                     />
                   </span>
                 ) : (
-                  <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white text-slate-400 ring-1 ring-black/5 sm:h-10 sm:w-10">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-slate-200 via-slate-100 to-primary-100 text-slate-500 ring-1 ring-black/5 sm:h-10 sm:w-10">
                     <MapPin className="h-3.5 w-3.5" aria-hidden />
                   </span>
                 )}

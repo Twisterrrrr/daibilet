@@ -956,3 +956,21 @@ export function resolveVenueHeroImage(
   if (!hub || isGeneratedVenueStub(hub)) return null;
   return hub;
 }
+
+/**
+ * Timeline / stop thumbs: LS may slim away imageUrl on quota pressure.
+ * Re-resolve from slug/id + any remaining hub URL so circles are not empty
+ * when editorial LOCATION_PACK / must-see maps already have a cover.
+ */
+export function resolveDayRouteStopImage(item: {
+  id?: string | null;
+  slug?: string | null;
+  imageUrl?: string | null;
+}): string | null {
+  const hub = String(item.imageUrl || '').trim() || null;
+  return (
+    resolveVenueHeroImage(item.slug, hub) ||
+    resolveVenueHeroImage(item.id, hub) ||
+    (hub && !isGeneratedVenueStub(hub) ? hub : null)
+  );
+}
