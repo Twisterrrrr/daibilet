@@ -40,7 +40,7 @@ export function HomeNowSection({
   );
 
   return (
-    <section id="events" className="section-y bg-surface-muted">
+    <section id="events" className="section-y" data-home-band="boxed">
       <div className="container-page min-w-0">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
@@ -111,7 +111,7 @@ export function HomeEventRail({
   if (!events.length) return null;
 
   return (
-    <section id={id} className="section-y">
+    <section id={id} className="section-y" data-home-band="boxed">
       <div className="container-page min-w-0">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>

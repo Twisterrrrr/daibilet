@@ -188,6 +188,40 @@ html[data-nav-pending='1'] {
     @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
   }
 
+  /**
+   * Full-bleed breakout: stretch a nested band to viewport width without
+   * horizontal page scroll (pair with overflow-x-hidden on a page shell).
+   * Prefer section-level bg on already-full-width siblings when possible.
+   */
+  .breakout {
+    position: relative;
+    left: 50%;
+    right: 50%;
+    width: 100vw;
+    margin-left: -50vw;
+    margin-right: -50vw;
+  }
+
+  /**
+   * Home city rail: left edge aligns with container-page content start;
+   * right side bleeds to the viewport (infinite gallery feel).
+   */
+  .home-bleed-rail {
+    padding-left: max(1rem, calc((100vw - 80rem) / 2 + 1rem));
+  }
+
+  @media (min-width: 640px) {
+    .home-bleed-rail {
+      padding-left: max(1.5rem, calc((100vw - 80rem) / 2 + 1.5rem));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .home-bleed-rail {
+      padding-left: max(2rem, calc((100vw - 80rem) / 2 + 2rem));
+    }
+  }
+
   .catalog-chip-active {
     @apply bg-primary-600 text-white;
   }

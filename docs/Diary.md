@@ -1,3 +1,17 @@
+## 2026-08-10 - Homepage: full-bleed vs boxed rhythm
+
+### Наблюдения
+- После P0-P2 секции всё ещё читались как одинаковые `container-page` блоки: города без серой полосы, My Day как сжатый white-card баннер, блог как boxed magazine grid.
+
+### Решения
+- Канон ритма: hero full → editors boxed → cities full `#F5F5F7` (rail left=gutter, right bleed, scrollbar hidden) → My Day full graphite `#0F172A` → popular/collections boxed → blog full magazine (copy + «Читать гайд», фото к краю).
+- CSS: `.breakout`, `.home-bleed-rail`; shell `overflow-x-hidden`. Commit+push; **без** web deploy.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-10 - Event covers: убрать плашки/текст + развести дубли
 
 ### Наблюдения
