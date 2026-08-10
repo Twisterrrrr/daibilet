@@ -382,7 +382,9 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
     priceFrom: event.priceFrom,
   })) {
     if (allowSoftRedirect) {
-      const nearestSibling = await findNearestSaleableSiblingSlug(requestedEvent, metaGroupMembers, mergeGroupMembers);
+      const nearestSibling =
+        (await findNearestSaleableSiblingSlug(requestedEvent, metaGroupMembers, mergeGroupMembers)) ||
+        (await findSaleableTitleTwinSlug(requestedEvent));
       if (nearestSibling && publicSlug(nearestSibling) !== requestedSlug) {
         return loadPublicEventDto(nearestSibling, false);
       }
@@ -784,24 +786,30 @@ async function loadMetaGroupMembers(requestedEvent: EventRecord): Promise<EventR
 }
 
 /**
- * Past dated / unsaleable slug → nearest meta/merge sibling that still has a future session.
- * Used as soft-404 recovery so order deep-links stay useful.
+ * Past dated / unsaleable slug → nearest meta/merge sibling that still has a future
+ * on-sale session. Used as soft-404 recovery so order deep-links stay useful.
+ * Skip STAND_BY / closed siblings - they would soft-404 again under allowSoftRedirect=false.
  */
 async function findNearestSaleableSiblingSlug(
   requestedEvent: EventRecord,
   metaMembers: EventRecord[],
   mergeMembers: EventRecord[],
 ): Promise<string | null> {
-  const candidates = [...metaMembers, ...mergeMembers].filter((event) => event.id !== requestedEvent.id);
+  const candidates = [...metaMembers, ...mergeMembers].filter((event) => {
+    if (event.id === requestedEvent.id) return false;
+    return isPublicSessionRowOnSale({ sourceStatus: event.sourceStatus });
+  });
   if (!candidates.length) return null;
 
   const now = new Date();
   const sessions = await prisma.eventSession.findMany({
     where: {
       eventId: { in: candidates.map((event) => event.id) },
+      isActive: true,
+      cancelledAt: null,
       OR: [{ startsAt: { gte: now } }, { endsAt: { gte: now } }],
     },
-    select: { eventId: true, startsAt: true },
+    select: { eventId: true, startsAt: true, sourceStatus: true },
     orderBy: { startsAt: 'asc' },
     take: 50,
   });
@@ -809,10 +817,86 @@ async function findNearestSaleableSiblingSlug(
 
   const byId = new Map(candidates.map((event) => [event.id, event]));
   for (const session of sessions) {
+    if (!isPublicSessionRowOnSale(session)) continue;
     const event = byId.get(session.eventId);
     if (event?.slug) return event.slug;
   }
   return null;
+}
+
+/**
+ * TC STAND_BY (or cancelled) product with a live Teplohod twin of the same title
+ * (token-set equal, word order may differ). Same-city only.
+ * Prod case: evt_6a1ef2c… STAND_BY → evt_tep_910.
+ */
+async function findSaleableTitleTwinSlug(requestedEvent: EventRecord): Promise<string | null> {
+  const fingerprint = eventTitleTokenFingerprint(
+    requestedEvent.override?.title || requestedEvent.title,
+  );
+  const tokens = fingerprint.split(' ').filter((token) => token.length >= 4);
+  if (tokens.length < 4 || !requestedEvent.primaryCityId) return null;
+
+  const keyTokens = [...tokens].sort((left, right) => right.length - left.length).slice(0, 5);
+  const candidates = await prisma.event.findMany({
+    where: {
+      id: { not: requestedEvent.id },
+      primaryCityId: requestedEvent.primaryCityId,
+      status: { notIn: ['HIDDEN', 'DRAFT'] },
+      AND: keyTokens.map((token) => ({
+        title: { contains: token, mode: 'insensitive' as const },
+      })),
+    },
+    select: {
+      id: true,
+      slug: true,
+      title: true,
+      sourceStatus: true,
+    },
+    take: 48,
+  });
+
+  const twins = candidates.filter(
+    (row) =>
+      eventTitleTokenFingerprint(row.title) === fingerprint &&
+      isPublicSessionRowOnSale({ sourceStatus: row.sourceStatus }),
+  );
+  if (!twins.length) return null;
+
+  const now = new Date();
+  const sessions = await prisma.eventSession.findMany({
+    where: {
+      eventId: { in: twins.map((twin) => twin.id) },
+      isActive: true,
+      cancelledAt: null,
+      startsAt: { gte: now },
+    },
+    select: { eventId: true, startsAt: true, sourceStatus: true },
+    orderBy: { startsAt: 'asc' },
+    take: 30,
+  });
+
+  const byId = new Map(twins.map((twin) => [twin.id, twin]));
+  for (const session of sessions) {
+    if (!isPublicSessionRowOnSale(session)) continue;
+    const twin = byId.get(session.eventId);
+    if (twin?.slug) return twin.slug;
+  }
+  return null;
+}
+
+/** Order-insensitive title key so TC/TEP twins with shuffled phrases still match. */
+export function eventTitleTokenFingerprint(title: string): string {
+  return String(title || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[«»""„']/g, '')
+    .replace(/[^a-zа-яё0-9\s]+/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .split(' ')
+    .filter((token) => token.length >= 2)
+    .sort()
+    .join(' ');
 }
 
 function resolveMultiPurchasePeers(groupEvents: EventRecord[], requestedEvent: EventRecord): EventRecord[] {

@@ -2,6 +2,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
+| FIX.EVENT-STANDBY-TEP-TWIN | `/events/…-6a1ef2c…` 404: STAND_BY TC → soft title-twin TEP + permanentRedirect | Критический | 🔄 ship+API+Deploy MSK web |
 | FIX.MYDAY-BOAT-PIERS | my-day boat wizard: dedupe pier twins; hide 0-route cards; Dvortsovaya 18 distance via coords fallback | Критический | 🔄 ship+Deploy MSK web |
 | UX.HERMITAGE-PDP-V3 | Hermitage PDP: hide commercial tickets; no hero chips; hours above map; Факт; sticky tabs; gallery; open-now; event thumbs; MSK/SPB nearest metro | Критический | 🔄 `896578ab` Deploy `31428001571` |
 | UX.HERMITAGE-SPBBOATS | Hermitage PDP: commercial hero/tickets/contacts; similar museums only; title Государственный Эрмитаж | Критический | ✅ `454b315c` Deploy `31419097355` + API restart MSK |

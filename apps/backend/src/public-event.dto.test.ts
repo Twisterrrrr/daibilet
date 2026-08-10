@@ -3,6 +3,7 @@ import test from 'node:test';
 
 import {
   buildTepEventIdFromTrailingToken,
+  eventTitleTokenFingerprint,
   extractEventTrailingLookupToken,
   matchesPublicEventSlug,
   publicSlug,
@@ -33,5 +34,17 @@ test('matchesPublicEventSlug links latin URL to Cyrillic DB slug for TEP event',
   assert.equal(
     buildTepEventIdFromTrailingToken(extractEventTrailingLookupToken(LATIN_PUBLIC_SLUG) || ''),
     'evt_tep_1294',
+  );
+});
+
+test('eventTitleTokenFingerprint matches TC/TEP twins with shuffled phrases', () => {
+  const tc =
+    'Ночной круиз на разводные мосты с путешествием к Финскому заливу и дискотекой';
+  const tep =
+    'Ночной круиз на разводные мосты с дискотекой и путешествием к Финскому заливу';
+  assert.equal(eventTitleTokenFingerprint(tc), eventTitleTokenFingerprint(tep));
+  assert.notEqual(
+    eventTitleTokenFingerprint(tc),
+    eventTitleTokenFingerprint('Дискотека на теплоходе с разводом мостов'),
   );
 });

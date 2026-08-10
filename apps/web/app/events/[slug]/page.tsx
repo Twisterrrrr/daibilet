@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 
 import { EventCard } from '@/components/EventCard';
 import { EventBuyCard, EventHero } from '@/components/EventPage.client';
@@ -131,6 +131,16 @@ export default async function EventDetailPage({ params }: PageProps) {
   if (!payload?.event) notFound();
 
   const { event, related } = payload;
+  // Soft-404 recovery (STAND_BY TC → live TEP twin etc.): land on canonical slug.
+  const canonicalPath = String(event.canonicalPath || '').trim();
+  const canonicalSlug = String(event.slug || '').trim();
+  if (
+    canonicalSlug &&
+    canonicalSlug !== slug &&
+    canonicalPath.startsWith('/events/')
+  ) {
+    permanentRedirect(canonicalPath);
+  }
   const clientPayload = toEventPageClientPayload(payload);
   let aggregate = null;
   try {

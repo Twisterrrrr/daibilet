@@ -1,3 +1,21 @@
+## 2026-08-10 - Event 404: TC STAND_BY → TEP twin redirect
+
+### Наблюдения
+- URL `/events/nochnoi-kruiz-…-6a1ef2c0422ee8677bad10e3` → HTTP 404 (Next ISR HIT + API `not_found`).
+- Event `evt_6a1ef2c0422ee8677bad10e3` есть в БД (READY, sessions+offers), но `sourceStatus=STAND_BY` (TC sales stopped). Вся meta-семья (~45) тоже STAND_BY.
+- Suffix resolve по hex id уже работал; soft-sibling redirect упирался в STAND_BY siblings.
+- Живой twin: Teplohod `evt_tep_910` (`…-diskotekoi-i-puteshestviem-…-910`), тот же набор слов в title.
+
+### Решения
+- `findNearestSaleableSiblingSlug`: фильтр on-sale (не STAND_BY/closed).
+- Soft-404 fallback `findSaleableTitleTwinSlug` (token-set fingerprint, same city).
+- Event page: `permanentRedirect` на `canonicalPath`, если requested slug ≠ live slug.
+
+### Проблемы
+- Нужен deploy API + Deploy MSK web (ISR 404 cache HIT). Catalog listing STAND_BY по-прежнему скрыт - ок.
+
+---
+
 ## 2026-08-10 - my-day boat piers: dedupe / routes / distance
 
 ### Наблюдения
