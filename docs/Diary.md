@@ -1,3 +1,17 @@
+## 2026-08-10 - my-day: Wanderlog list between-leg + insert
+
+### Наблюдения
+- Owner: список «Мой день» как Wanderlog - teal pin, thumb справа, между карточками leg `10 мин • 810 м` + «Маршруты», hover `+` на пунктире (место / заметка / список).
+
+### Решения
+- `DayRoutePanel`: list cards pin+meta+thumb; HTML5 DnD reorder планов; `DayRouteBetweenInsert` (connector, walk/auto stats из haversine+mode, «Маршруты» switcher walk/auto); `+` → insertAfter + поиск; заметка/список - toast «Скоро».
+- Stats реальные из `segmentMeters` / `estimateDayRouteTravelMinutes`; без координат - stub «маршрут». Мультимодалка - UI stub.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-10 - my-day: hide Шаги + dismiss free window
 
 ### Наблюдения

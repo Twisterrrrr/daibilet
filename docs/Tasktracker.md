@@ -2,6 +2,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
+| UX.MYDAY-LIST-WANDERLOG | `/my-day` Список: pin+thumb cards, between-leg `пешком • м` + «Маршруты», hover `+` insert (место/заметка/список), HTML5 DnD | Критический | 🔄 ship (push; deploy по «выкатывай») |
 | UX.MYDAY-HIDE-STEPS | `/my-day`: временно скрыть «Шаги» timeline (`SHOW_DAY_ROUTE_STEPS=false`); dismiss X на «Свободное окно» (session state) | Критический | 🔄 `de54fbc6` Deploy `31430742242` |
 | UX.MYDAY-STOPS-GRID | `/my-day`: Шаги timeline always on; toggle Сетка\|Список (restore fence) | Критический | ✅ `77debf04` tip `502dcace` Deploy `31429446266` BUILD_ID=`CbfydAWBpi_OYVn2yFIJt` |
 | FIX.EVENT-STANDBY-TEP-TWIN | `/events/…-6a1ef2c…` 404: STAND_BY TC → soft title-twin TEP + permanentRedirect | Критический | ✅ `71a0ccaa` API restart + Deploy `31428772500` |

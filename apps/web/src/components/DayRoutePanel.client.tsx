@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import {
+  Car,
   Check,
   ChevronDown,
   ChevronUp,
@@ -14,6 +15,7 @@ import {
   ListChecks,
   MapPin,
   Navigation,
+  PersonStanding,
   Plus,
   Printer,
   QrCode,
@@ -3399,6 +3401,7 @@ function DayRoutePanelInner() {
                         }
                         segmentMeters={segmentToNext}
                         travelMode={travelMode}
+                        onTravelModeChange={setTravelMode}
                         transitTip={betweenTip}
                         disabled={atMax}
                         onAddPlace={() => openInsertPlaceAfter(venue.id)}
@@ -4611,20 +4614,23 @@ function DayRoutePanelInner() {
   );
 }
 
+/** Wanderlog-style teal pin with stop number (list mode). */
+const DAY_ROUTE_LIST_PIN_FILL = '#14B8A6';
+
 function DayRouteListPin({ n }: { n: number }) {
-  const label = String(n);
-  const fontSize = label.length > 1 ? 11 : 13;
+  const label = String(Math.max(1, Math.floor(n)));
+  const fontSize = label.length > 2 ? 9 : label.length > 1 ? 11 : 13;
   return (
     <span
       className="relative z-10 inline-flex h-9 w-7 shrink-0 items-center justify-center"
-      aria-label={`Точка ${n}`}
+      aria-label={`Точка ${label}`}
       data-day-stop-pin
       data-day-stop-number
     >
       <svg viewBox="0 0 28 36" className="h-9 w-7 drop-shadow-sm" aria-hidden>
         <path
           d="M14 1.5C7.096 1.5 1.5 7.096 1.5 14c0 9.75 12.5 20 12.5 20S26.5 23.75 26.5 14C26.5 7.096 20.904 1.5 14 1.5z"
-          fill="#3B82F6"
+          fill={DAY_ROUTE_LIST_PIN_FILL}
         />
         <text
           x="14"
@@ -4643,12 +4649,17 @@ function DayRouteListPin({ n }: { n: number }) {
   );
 }
 
+/**
+ * Between list stops: dashed pin connector + walk stats + «Маршруты» switcher,
+ * hover/tap circular «+» insert menu (place / note / list).
+ */
 function DayRouteBetweenInsert({
   afterVenueId,
   menuOpen,
   onMenuOpenChange,
   segmentMeters,
   travelMode,
+  onTravelModeChange,
   transitTip,
   disabled = false,
   onAddPlace,
@@ -4660,6 +4671,7 @@ function DayRouteBetweenInsert({
   onMenuOpenChange: (open: boolean) => void;
   segmentMeters: number | null;
   travelMode: DayRouteTravelMode;
+  onTravelModeChange: (mode: DayRouteTravelMode) => void;
   transitTip?: string;
   disabled?: boolean;
   onAddPlace: () => void;
@@ -4667,24 +4679,35 @@ function DayRouteBetweenInsert({
   onAddList: () => void;
 }) {
   const rootRef = useRef<HTMLLIElement | null>(null);
+  const [routesOpen, setRoutesOpen] = useState(false);
   const segmentMinutes =
-    segmentMeters != null ? estimateDayRouteTravelMinutes(segmentMeters, travelMode) : 0;
-  const distanceLabel = segmentMeters != null ? formatDayRouteDistance(segmentMeters) : '';
-  const timeLabel =
-    segmentMinutes > 0 ? `${formatDayRouteTravelMinutes(segmentMinutes)}` : '';
-  const modeLabel = travelMode === 'auto' ? 'на авто' : 'пешком';
+    segmentMeters != null && segmentMeters > 0
+      ? estimateDayRouteTravelMinutes(segmentMeters, travelMode)
+      : 0;
+  const distanceLabel =
+    segmentMeters != null && segmentMeters > 0 ? formatDayRouteDistance(segmentMeters) : '';
+  const timeLabel = segmentMinutes > 0 ? formatDayRouteTravelMinutes(segmentMinutes) : '';
+  const statsLabel =
+    timeLabel && distanceLabel
+      ? `${timeLabel} • ${distanceLabel}`
+      : timeLabel || distanceLabel || '';
+  const ModeIcon = travelMode === 'auto' ? Car : PersonStanding;
 
   useEffect(() => {
-    if (!menuOpen) return;
+    if (!menuOpen && !routesOpen) return;
     function onDocPointer(event: MouseEvent) {
       const el = rootRef.current;
       if (!el) return;
       if (event.target instanceof Node && !el.contains(event.target)) {
         onMenuOpenChange(false);
+        setRoutesOpen(false);
       }
     }
     function onKey(event: KeyboardEvent) {
-      if (event.key === 'Escape') onMenuOpenChange(false);
+      if (event.key === 'Escape') {
+        onMenuOpenChange(false);
+        setRoutesOpen(false);
+      }
     }
     document.addEventListener('mousedown', onDocPointer);
     document.addEventListener('keydown', onKey);
@@ -4692,97 +4715,168 @@ function DayRouteBetweenInsert({
       document.removeEventListener('mousedown', onDocPointer);
       document.removeEventListener('keydown', onKey);
     };
-  }, [menuOpen, onMenuOpenChange]);
+  }, [menuOpen, routesOpen, onMenuOpenChange]);
 
   return (
     <li
       ref={rootRef}
-      className="group/between relative list-none py-1"
+      className="group/between relative list-none py-0.5"
       data-day-between-insert
       data-day-between-after={afterVenueId}
     >
-      <div className="relative flex min-h-[2.75rem] flex-col items-center justify-center px-2">
-        <div
-          className="pointer-events-none absolute left-[1.35rem] top-0 bottom-0 w-px border-l border-dashed border-slate-300 sm:left-[1.6rem]"
-          aria-hidden
-        />
-        <div
-          className={`relative z-10 transition ${
-            menuOpen
-              ? 'opacity-100'
-              : 'opacity-100 max-lg:opacity-100 lg:opacity-0 lg:group-hover/between:opacity-100'
-          }`}
-        >
-          <button
-            type="button"
-            aria-label="Добавить между точками"
-            aria-expanded={menuOpen}
-            aria-haspopup="menu"
-            disabled={disabled}
-            data-day-between-plus
-            onClick={() => onMenuOpenChange(!menuOpen)}
-            className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-sky-300 hover:text-sky-600 disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            <Plus className="h-4 w-4" />
-          </button>
-          {menuOpen ? (
-            <div
-              role="menu"
-              data-day-between-menu
-              className="absolute left-1/2 top-[calc(100%+6px)] z-30 w-56 -translate-x-1/2 overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-lg"
-            >
-              <button
-                type="button"
-                role="menuitem"
-                data-day-between-add-place
-                onClick={onAddPlace}
-                className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-sm font-medium text-slate-800 hover:bg-slate-50"
-              >
-                <MapPin className="h-4 w-4 shrink-0 text-sky-600" aria-hidden />
-                Добавить место
-              </button>
-              <button
-                type="button"
-                role="menuitem"
-                data-day-between-add-note
-                onClick={onAddNote}
-                className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-sm font-medium text-slate-800 hover:bg-slate-50"
-              >
-                <StickyNote className="h-4 w-4 shrink-0 text-slate-500" aria-hidden />
-                Добавить заметку
-              </button>
-              <button
-                type="button"
-                role="menuitem"
-                data-day-between-add-list
-                onClick={onAddList}
-                className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-sm font-medium text-slate-800 hover:bg-slate-50"
-              >
-                <ListChecks className="h-4 w-4 shrink-0 text-slate-500" aria-hidden />
-                Добавить список
-              </button>
-            </div>
-          ) : null}
-        </div>
-        {timeLabel || distanceLabel || transitTip ? (
+      <div className="relative flex min-h-[2.5rem] items-center gap-2 pl-2 pr-2 sm:gap-2.5">
+        <div className="relative flex h-full w-7 shrink-0 flex-col items-center justify-center self-stretch">
+          <span
+            className="pointer-events-none absolute inset-y-0 left-1/2 w-0 -translate-x-1/2 border-l border-dashed border-slate-300"
+            aria-hidden
+            data-day-between-connector
+          />
           <div
-            className="relative z-10 mt-1.5 flex max-w-full flex-wrap items-center justify-center gap-x-2 gap-y-0.5 px-8 text-[11px] text-slate-500"
-            data-day-between-meta
+            className={`relative z-10 transition ${
+              menuOpen
+                ? 'opacity-100'
+                : 'opacity-100 max-lg:opacity-100 lg:opacity-0 lg:group-hover/between:opacity-100'
+            }`}
           >
-            {timeLabel ? (
-              <span className="inline-flex items-center gap-1 whitespace-nowrap">
-                <Clock className="h-3 w-3 shrink-0" aria-hidden />
-                {timeLabel} {modeLabel}
-              </span>
-            ) : null}
-            {distanceLabel ? <span className="whitespace-nowrap">{distanceLabel}</span> : null}
-            {transitTip ? (
-              <span className="line-clamp-1 max-w-[14rem]" data-day-transit-between>
-                {transitTip}
-              </span>
+            <button
+              type="button"
+              aria-label="Добавить между точками"
+              aria-expanded={menuOpen}
+              aria-haspopup="menu"
+              disabled={disabled}
+              data-day-between-plus
+              onClick={() => {
+                setRoutesOpen(false);
+                onMenuOpenChange(!menuOpen);
+              }}
+              className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-teal-300 hover:text-teal-700 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <Plus className="h-3.5 w-3.5" />
+            </button>
+            {menuOpen ? (
+              <div
+                role="menu"
+                data-day-between-menu
+                className="absolute left-1/2 top-[calc(100%+6px)] z-30 w-56 -translate-x-1/2 overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-lg sm:left-0 sm:translate-x-0"
+              >
+                <button
+                  type="button"
+                  role="menuitem"
+                  data-day-between-add-place
+                  onClick={onAddPlace}
+                  className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-sm font-medium text-slate-800 hover:bg-slate-50"
+                >
+                  <MapPin className="h-4 w-4 shrink-0 text-teal-600" aria-hidden />
+                  Добавьте место
+                </button>
+                <button
+                  type="button"
+                  role="menuitem"
+                  data-day-between-add-note
+                  onClick={onAddNote}
+                  className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-sm font-medium text-slate-800 hover:bg-slate-50"
+                >
+                  <StickyNote className="h-4 w-4 shrink-0 text-slate-500" aria-hidden />
+                  Добавить заметку
+                </button>
+                <button
+                  type="button"
+                  role="menuitem"
+                  data-day-between-add-list
+                  onClick={onAddList}
+                  className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-sm font-medium text-slate-800 hover:bg-slate-50"
+                >
+                  <ListChecks className="h-4 w-4 shrink-0 text-slate-500" aria-hidden />
+                  Добавить список
+                </button>
+              </div>
             ) : null}
           </div>
-        ) : null}
+        </div>
+
+        <div
+          className="relative z-[1] flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1 text-[12px] text-slate-500"
+          data-day-between-meta
+        >
+          <ModeIcon className="h-3.5 w-3.5 shrink-0 text-slate-400" aria-hidden />
+          {statsLabel ? (
+            <span className="whitespace-nowrap tabular-nums" data-day-between-stats>
+              {statsLabel}
+            </span>
+          ) : (
+            <span className="whitespace-nowrap text-slate-400" data-day-between-stats="stub">
+              маршрут
+            </span>
+          )}
+          <div className="relative">
+            <button
+              type="button"
+              data-day-between-routes
+              aria-expanded={routesOpen}
+              aria-haspopup="menu"
+              onClick={() => {
+                onMenuOpenChange(false);
+                setRoutesOpen((v) => !v);
+              }}
+              className="inline-flex items-center gap-0.5 rounded-md px-1 py-0.5 font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
+            >
+              Маршруты
+              <ChevronDown className="h-3.5 w-3.5 shrink-0 opacity-70" aria-hidden />
+            </button>
+            {routesOpen ? (
+              <div
+                role="menu"
+                data-day-between-routes-menu
+                className="absolute left-0 top-[calc(100%+4px)] z-30 min-w-[10.5rem] overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-lg"
+              >
+                <button
+                  type="button"
+                  role="menuitem"
+                  data-day-between-mode="walk"
+                  aria-pressed={travelMode === 'walk'}
+                  onClick={() => {
+                    onTravelModeChange('walk');
+                    setRoutesOpen(false);
+                  }}
+                  className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm ${
+                    travelMode === 'walk'
+                      ? 'bg-teal-50 font-semibold text-teal-900'
+                      : 'font-medium text-slate-800 hover:bg-slate-50'
+                  }`}
+                >
+                  <PersonStanding className="h-4 w-4 shrink-0" aria-hidden />
+                  Пешком
+                </button>
+                <button
+                  type="button"
+                  role="menuitem"
+                  data-day-between-mode="auto"
+                  aria-pressed={travelMode === 'auto'}
+                  onClick={() => {
+                    onTravelModeChange('auto');
+                    setRoutesOpen(false);
+                  }}
+                  className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm ${
+                    travelMode === 'auto'
+                      ? 'bg-teal-50 font-semibold text-teal-900'
+                      : 'font-medium text-slate-800 hover:bg-slate-50'
+                  }`}
+                >
+                  <Car className="h-4 w-4 shrink-0" aria-hidden />
+                  На авто
+                </button>
+                <p className="border-t border-slate-100 px-3 py-2 text-[11px] leading-snug text-slate-400">
+                  Мультимодальные маршруты - скоро
+                </p>
+              </div>
+            ) : null}
+          </div>
+          {transitTip ? (
+            <span className="line-clamp-1 w-full text-[11px] text-slate-400" data-day-transit-between>
+              {transitTip}
+            </span>
+          ) : null}
+        </div>
       </div>
     </li>
   );
