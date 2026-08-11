@@ -1,3 +1,19 @@
+## 2026-08-11 - Колонка Макса: «Как перестать гулять по кругу» (материал недели)
+
+### Наблюдения
+- Owner текст 5 сценариев Москвы; срочный вырез куска `словах «черно-белые дни», «сентябрь горит» или` → стык `Если при треках Linkin Park и МакSим…`.
+- Нужны адреса, рабочие `/events`, cover+2 inline+og, `isFeatured` как материал недели.
+
+### Решения
+- MD `kak-perestat-gulyat-po-krugu-moskva` (`authorId=max`, column); blog-posts web+public; `blog:sync-bodies`.
+- Commit `5e703d2c`; MSK upsert PUBLISHED + SQL `isFeatured` swap; sync-public-assets; revalidate `/blog`+article; Deploy MSK web `31525508276`.
+- Smoke: lyric fix OK, badge «От автора», 6 event links 200, cover/og 200, slug на `/blog`.
+
+### Проблемы
+- `blog-upsert` не пишет `isFeatured` - только SQL/admin.
+
+---
+
 ## 2026-08-11 - Closed 17:30 slot stuck in ISR/nginx
 
 ### Наблюдения
