@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  resolveSeoListingText,
   sanitizeSeoListingBody,
   splitSeoListingParagraphs,
 } from '../data/seo-listing-texts.ts';
@@ -33,4 +34,18 @@ test('splitSeoListingParagraphs auto-splits wall of text', () => {
   const paras = splitSeoListingParagraphs(wall);
   assert.ok(paras.length >= 3 && paras.length <= 4);
   assert.equal(paras.join(' ').replace(/\s+/g, ' '), wall);
+});
+
+test('resolveSeoListingText returns Kaliningrad standup editorial', () => {
+  const entry = resolveSeoListingText('standup', 'kaliningrad');
+  assert.ok(entry);
+  assert.match(entry!.heading, /Калининграде/);
+  assert.match(entry!.body, /Stand Up Kaliningrad/);
+  assert.match(entry!.body, /Дайбилет/);
+  assert.equal(entry!.body.includes('ДайБилет'), false);
+  assert.equal(/[—–]/.test(entry!.body), false);
+});
+
+test('resolveSeoListingText returns null for unknown city×category without national fallback', () => {
+  assert.equal(resolveSeoListingText('standup', 'tyumen'), null);
 });
