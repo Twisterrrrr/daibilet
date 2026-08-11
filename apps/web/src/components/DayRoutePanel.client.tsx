@@ -2862,7 +2862,7 @@ function DayRoutePanelInner() {
     );
   }
 
-  /** Empty starter: city pick («Собери свой день») or scenario/map when city known. */
+  /** Empty: pre-city «Собери свой день»; post-city Lovable «Шаг 1 из 2» + map (leave as-is). */
   function renderEmptyStarter() {
     const cityLabel = scopeCityName || pageCityName || '';
     const cityInCase = cityLabel ? inCityPrepositional(cityLabel) : '';
@@ -2926,7 +2926,10 @@ function DayRoutePanelInner() {
         data-day-starter-variant="lovable-step"
       >
         <div className="min-w-0">
-          <h2 className="font-display text-xl font-extrabold text-slate-900 sm:text-2xl">
+          <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-primary-600">
+            Шаг 1 из 2
+          </p>
+          <h2 className="mt-1 font-display text-xl font-extrabold text-slate-900 sm:text-2xl">
             Начните день с готового сценария
           </h2>
           <p className="mt-1 max-w-xl text-sm leading-relaxed text-slate-600">
