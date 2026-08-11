@@ -118,6 +118,7 @@ import {
   resolvePublicVenuesForSessions,
   publicPublishedVenuesByCityId,
   mergeCityPageVenues,
+  publicVenues,
   publicVenuesForSessionsFromHub,
   publicVenueRowMatchesCityFilter,
   isPublicVenueHub,
@@ -143,6 +144,7 @@ export {
   resolvePublicVenuesForSessions,
   publicPublishedVenuesByCityId,
   mergeCityPageVenues,
+  publicVenues,
   publicVenuesForSessionsFromHub,
   publicVenueRowMatchesCityFilter,
   isPublicVenueHub,
@@ -3911,12 +3913,13 @@ export async function buildPublicHome(db) {
     return publicHomeCache.payload;
   }
 
-  const [stats, destinations, catalogSessions, venues] = await Promise.all([
+  // One catalog load: destinations derive from sessions (avoid destinationRows → 2nd full scan).
+  const [stats, catalogSessions, venues] = await Promise.all([
     db.stats(),
-    destinationRows(db),
     publicCatalogSessions(db),
     publicVenues(db, 36),
   ]);
+  const destinations = buildPublicDestinationRowsFromSessions(catalogSessions);
   // Compact card DTO only - full session blobs made /api/public/home ~1.2MB.
   const sessions = catalogSessions
     .filter(sessionHasCoverImage)

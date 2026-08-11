@@ -2650,7 +2650,7 @@ export function mergeCityPageVenues(sessionVenues, contentVenues, limit = 250) {
   return out;
 }
 
-async function publicVenues(db, limit) {
+export async function publicVenues(db, limit) {
   return (await publicVenueHubRows(db, 500)).slice(0, limit).map(mapPublicVenueListItem);
 }
 
