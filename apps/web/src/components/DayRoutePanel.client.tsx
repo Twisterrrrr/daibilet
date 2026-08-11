@@ -2725,38 +2725,61 @@ function DayRoutePanelInner() {
     );
   }
 
-  /** Mobile mid-block: Распланировать primary; Optimize ghost; no Yandex (sticky/map). */
+  /**
+   * Mobile: demote Plan/Optimize to compact icon buttons so they do not stack
+   * against sticky primary «Посмотреть готовый день».
+   */
   function renderMobileRouteActions() {
     const canHourPlan = route.venues.length >= DAY_ROUTE_MIN;
+    if (!canHourPlan && !canOptimize) return null;
     return (
-      <div className="flex w-full flex-col gap-1 lg:hidden" data-day-route-toolbar-inner data-day-mobile-route-actions>
+      <div
+        className="flex w-full items-center justify-end gap-1.5 lg:hidden"
+        data-day-route-toolbar-inner
+        data-day-mobile-route-actions
+        role="group"
+        aria-label="Действия с маршрутом"
+      >
         {canHourPlan ? (
           hourPlanOn ? (
             <button
               type="button"
               data-day-hour-reset
+              aria-label="Сбросить время"
+              title="Сбросить время"
               onClick={() => {
                 setHourPlanOn(false);
                 setHourSheetOpen(false);
               }}
-              className="inline-flex min-h-10 w-full items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
             >
-              <Clock className="h-3.5 w-3.5 shrink-0" />
-              Сбросить время
+              <Clock className="h-4 w-4 shrink-0" aria-hidden />
             </button>
           ) : (
             <button
               type="button"
               data-day-hour-plan
+              aria-label="Распланировать"
+              title="Распланировать"
               onClick={() => setHourSheetOpen(true)}
-              className="inline-flex min-h-10 w-full items-center justify-center gap-1.5 rounded-full bg-sky-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-sky-700"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100"
             >
-              <Clock className="h-3.5 w-3.5 shrink-0" />
-              Распланировать
+              <Clock className="h-4 w-4 shrink-0" aria-hidden />
             </button>
           )
         ) : null}
-        {renderOptimizeGhost()}
+        {canOptimize ? (
+          <button
+            type="button"
+            onClick={optimizeOrder}
+            data-day-map-optimize
+            aria-label="Оптимизировать маршрут"
+            title="Оптимизировать маршрут"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+          >
+            <Sparkles className="h-4 w-4 shrink-0" aria-hidden />
+          </button>
+        ) : null}
       </div>
     );
   }
@@ -2839,7 +2862,7 @@ function DayRoutePanelInner() {
   return (
     <>
     <div
-      className="container-page px-4 py-5 pb-28 sm:px-6 sm:py-10 sm:pb-10 print:hidden lg:pb-10"
+      className="container-page px-4 py-5 pb-[calc(8rem+env(safe-area-inset-bottom,0px))] sm:px-6 sm:py-10 sm:pb-10 print:hidden lg:pb-10"
       data-day-mobile-list-first="1"
       data-day-section-width="full"
       data-day-mobile-view={mobileView}
@@ -3231,8 +3254,8 @@ function DayRoutePanelInner() {
             </div>
           ) : null}
 
-          {/* Row 3: mobile = Распланировать primary + Optimize; desktop CTAs on distance row */}
-          <div data-day-route-toolbar className="mt-3 w-full shrink-0 lg:hidden">
+          {/* Row 3: mobile = compact Plan/Optimize icons (sticky keeps primary CTA) */}
+          <div data-day-route-toolbar className="mt-2 w-full shrink-0 lg:hidden">
             {renderMobileRouteActions()}
           </div>
 
@@ -4647,7 +4670,7 @@ function DayRouteListPin({ n }: { n: number }) {
 }
 
 /**
- * Between list stops: dashed pin connector + walk stats + «Маршруты» switcher,
+ * Between list stops: dashed pin connector + walk stats + mode icons,
  * hover/tap circular «+» insert menu (place / note).
  */
 function DayRouteBetweenInsert({
@@ -4674,7 +4697,6 @@ function DayRouteBetweenInsert({
   onAddNote: () => void;
 }) {
   const rootRef = useRef<HTMLLIElement | null>(null);
-  const [routesOpen, setRoutesOpen] = useState(false);
   const segmentMinutes =
     segmentMeters != null && segmentMeters > 0
       ? estimateDayRouteTravelMinutes(segmentMeters, travelMode)
@@ -4686,22 +4708,19 @@ function DayRouteBetweenInsert({
     timeLabel && distanceLabel
       ? `${timeLabel} • ${distanceLabel}`
       : timeLabel || distanceLabel || '';
-  const ModeIcon = travelMode === 'auto' ? Car : PersonStanding;
 
   useEffect(() => {
-    if (!menuOpen && !routesOpen) return;
+    if (!menuOpen) return;
     function onDocPointer(event: MouseEvent) {
       const el = rootRef.current;
       if (!el) return;
       if (event.target instanceof Node && !el.contains(event.target)) {
         onMenuOpenChange(false);
-        setRoutesOpen(false);
       }
     }
     function onKey(event: KeyboardEvent) {
       if (event.key === 'Escape') {
         onMenuOpenChange(false);
-        setRoutesOpen(false);
       }
     }
     document.addEventListener('mousedown', onDocPointer);
@@ -4710,7 +4729,7 @@ function DayRouteBetweenInsert({
       document.removeEventListener('mousedown', onDocPointer);
       document.removeEventListener('keydown', onKey);
     };
-  }, [menuOpen, routesOpen, onMenuOpenChange]);
+  }, [menuOpen, onMenuOpenChange]);
 
   return (
     <li
@@ -4741,7 +4760,6 @@ function DayRouteBetweenInsert({
               disabled={disabled}
               data-day-between-plus
               onClick={() => {
-                setRoutesOpen(false);
                 onMenuOpenChange(!menuOpen);
               }}
               className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-teal-300 hover:text-teal-700 disabled:cursor-not-allowed disabled:opacity-40"
@@ -4780,12 +4798,11 @@ function DayRouteBetweenInsert({
         </div>
 
         <div
-          className="relative z-[1] flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1 text-[12px] text-slate-500"
+          className="relative z-[1] flex min-w-0 flex-1 items-center gap-2 text-[12px] text-slate-500"
           data-day-between-meta
         >
-          <ModeIcon className="h-3.5 w-3.5 shrink-0 text-slate-400" aria-hidden />
           {statsLabel ? (
-            <span className="whitespace-nowrap tabular-nums" data-day-between-stats>
+            <span className="min-w-0 truncate whitespace-nowrap tabular-nums" data-day-between-stats>
               {statsLabel}
             </span>
           ) : (
@@ -4793,71 +4810,45 @@ function DayRouteBetweenInsert({
               маршрут
             </span>
           )}
-          <div className="relative">
+          <div
+            className="ml-auto inline-flex shrink-0 items-center gap-0.5 rounded-full border border-slate-200/80 bg-white p-0.5"
+            role="group"
+            aria-label="Способ перемещения между точками"
+            data-day-between-routes
+          >
             <button
               type="button"
-              data-day-between-routes
-              aria-expanded={routesOpen}
-              aria-haspopup="menu"
-              onClick={() => {
-                onMenuOpenChange(false);
-                setRoutesOpen((v) => !v);
-              }}
-              className="inline-flex items-center gap-0.5 rounded-md px-1 py-0.5 font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
+              data-day-between-mode="walk"
+              aria-label="Пешком"
+              aria-pressed={travelMode === 'walk'}
+              title="Пешком"
+              onClick={() => onTravelModeChange('walk')}
+              className={`inline-flex h-7 w-7 items-center justify-center rounded-full transition ${
+                travelMode === 'walk'
+                  ? 'bg-teal-50 text-teal-800'
+                  : 'text-slate-400 hover:bg-slate-50 hover:text-slate-600'
+              }`}
             >
-              Маршруты
-              <ChevronDown className="h-3.5 w-3.5 shrink-0 opacity-70" aria-hidden />
+              <PersonStanding className="h-3.5 w-3.5" aria-hidden />
             </button>
-            {routesOpen ? (
-              <div
-                role="menu"
-                data-day-between-routes-menu
-                className="absolute left-0 top-[calc(100%+4px)] z-30 min-w-[10.5rem] overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-lg"
-              >
-                <button
-                  type="button"
-                  role="menuitem"
-                  data-day-between-mode="walk"
-                  aria-pressed={travelMode === 'walk'}
-                  onClick={() => {
-                    onTravelModeChange('walk');
-                    setRoutesOpen(false);
-                  }}
-                  className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm ${
-                    travelMode === 'walk'
-                      ? 'bg-teal-50 font-semibold text-teal-900'
-                      : 'font-medium text-slate-800 hover:bg-slate-50'
-                  }`}
-                >
-                  <PersonStanding className="h-4 w-4 shrink-0" aria-hidden />
-                  Пешком
-                </button>
-                <button
-                  type="button"
-                  role="menuitem"
-                  data-day-between-mode="auto"
-                  aria-pressed={travelMode === 'auto'}
-                  onClick={() => {
-                    onTravelModeChange('auto');
-                    setRoutesOpen(false);
-                  }}
-                  className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm ${
-                    travelMode === 'auto'
-                      ? 'bg-teal-50 font-semibold text-teal-900'
-                      : 'font-medium text-slate-800 hover:bg-slate-50'
-                  }`}
-                >
-                  <Car className="h-4 w-4 shrink-0" aria-hidden />
-                  На авто
-                </button>
-                <p className="border-t border-slate-100 px-3 py-2 text-[11px] leading-snug text-slate-400">
-                  Мультимодальные маршруты - скоро
-                </p>
-              </div>
-            ) : null}
+            <button
+              type="button"
+              data-day-between-mode="auto"
+              aria-label="На авто"
+              aria-pressed={travelMode === 'auto'}
+              title="На авто"
+              onClick={() => onTravelModeChange('auto')}
+              className={`inline-flex h-7 w-7 items-center justify-center rounded-full transition ${
+                travelMode === 'auto'
+                  ? 'bg-teal-50 text-teal-800'
+                  : 'text-slate-400 hover:bg-slate-50 hover:text-slate-600'
+              }`}
+            >
+              <Car className="h-3.5 w-3.5" aria-hidden />
+            </button>
           </div>
           {transitTip ? (
-            <span className="line-clamp-1 w-full text-[11px] text-slate-400" data-day-transit-between>
+            <span className="line-clamp-1 w-full basis-full text-[11px] text-slate-400" data-day-transit-between>
               {transitTip}
             </span>
           ) : null}
@@ -4985,7 +4976,7 @@ function DayRouteVenueCard({
   const metaLine = metaParts.join(' · ');
   const segmentLine = segmentHint ? `далее ~ ${segmentHint}` : '';
 
-  const titleClass = 'font-semibold leading-tight text-slate-900';
+  const titleClass = 'font-semibold leading-snug text-slate-900';
   const titleNode = href ? (
     <Link href={href} className={`${titleClass} hover:text-primary-700`}>
       {venue.title}
@@ -5216,14 +5207,14 @@ function DayRouteVenueCard({
             <DayRouteListPin n={pinNumber} />
           </div>
 
-          <div className="min-w-0 max-w-[min(100%,18rem)] self-center py-0.5 sm:max-w-xs lg:max-w-sm">
+          <div className="min-w-0 flex-1 self-center py-0.5 pr-1">
             {softTimeNode}
             {purchased ? (
               <p className="m-0 text-[11px] font-bold uppercase tracking-wide text-primary-700">
                 Оплачено
               </p>
             ) : null}
-            <p className="m-0 text-[15px] font-bold leading-snug text-slate-900 sm:text-base">
+            <p className="m-0 line-clamp-2 text-[15px] font-bold leading-snug text-slate-900 sm:text-base">
               {titleNode}
               {suburbBadge}
             </p>
@@ -5280,8 +5271,8 @@ function DayRouteVenueCard({
             {commerceRail ? <div className="mt-2">{commerceRail}</div> : null}
           </div>
 
-          <div className="ml-0 flex shrink-0 flex-col items-end gap-1">
-            <div className="flex items-center gap-0.5">
+          <div className="ml-auto flex shrink-0 flex-col items-end gap-1.5" data-day-stop-actions-thumb>
+            <div className="flex items-center gap-2.5" data-day-stop-top-right>
               {mapsUrl ? (
                 <a
                   href={mapsUrl}
@@ -5290,26 +5281,26 @@ function DayRouteVenueCard({
                   aria-label="Открыть в Яндекс.Картах"
                   title="Открыть в Яндекс.Картах"
                   data-day-stop-maps
-                  className="inline-flex h-7 w-7 items-center justify-center rounded-full text-sky-600 hover:bg-white/80"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-full text-sky-600 hover:bg-white/80"
                 >
-                  <Navigation className="h-3.5 w-3.5" />
+                  <Navigation className="h-4 w-4" />
                 </a>
               ) : null}
               <button
                 type="button"
                 aria-label="Удалить точку"
                 onClick={onRemove}
-                className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-slate-400 hover:bg-white/80 hover:text-slate-700"
+                className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-slate-400 hover:bg-white/80 hover:text-slate-700"
               >
-                <X className="h-3.5 w-3.5" />
+                <X className="h-4 w-4" />
               </button>
             </div>
             <div
-              className="relative h-[4.25rem] w-[5.25rem] overflow-hidden rounded-lg bg-slate-200 sm:h-[4.75rem] sm:w-28"
+              className="relative h-[5.25rem] w-[6.5rem] overflow-hidden rounded-lg bg-slate-200 sm:h-[5.5rem] sm:w-32"
               data-day-stop-thumb
             >
               {thumbUrl ? (
-                <SafeImage src={thumbUrl} alt="" fill sizes="7rem" className="object-cover" />
+                <SafeImage src={thumbUrl} alt="" fill sizes="8rem" className="object-cover" />
               ) : (
                 <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-200 via-slate-100 to-sky-100 text-slate-400">
                   <MapPin className="h-5 w-5" />
@@ -5485,7 +5476,7 @@ function DayRouteVenueCard({
             ) : null}
           </div>
 
-          <div className="flex shrink-0 items-center gap-1" data-day-stop-top-right>
+          <div className="flex shrink-0 items-center gap-2.5" data-day-stop-top-right>
             {mapsUrl ? (
               <a
                 href={mapsUrl}
@@ -5494,7 +5485,7 @@ function DayRouteVenueCard({
                 aria-label="Открыть в Яндекс.Картах"
                 title="Открыть в Яндекс.Картах"
                 data-day-stop-maps
-                className="inline-flex items-center justify-center rounded-lg p-2 text-sky-600 hover:bg-sky-50"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-sky-600 hover:bg-sky-50"
               >
                 <Navigation className="h-4 w-4" />
               </a>
@@ -5503,7 +5494,7 @@ function DayRouteVenueCard({
               type="button"
               aria-label="Удалить точку"
               onClick={onRemove}
-              className="inline-flex items-center justify-center rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700"
             >
               <X className="h-4 w-4" />
             </button>
