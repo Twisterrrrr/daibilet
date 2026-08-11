@@ -22,6 +22,54 @@ export type BlogPost = {
 export const BLOG_POSTS: BlogPost[] = [
   // SPB Top-100 / Beyond-Top-100 скрыты с публичного сайта (правятся в админке как DRAFT).
   {
+    slug: 'kaliningrad-za-2-dnya-vyhodnye',
+    title: 'Калининград за 2 дня: идеальный маршрут на выходные с ценами и лайфхаками',
+    excerpt:
+      'Готовый уикенд в Калининграде: остров Канта и орган, Музей Мирового океана, Амалиенау и день на Куршской косе - с адресами, бюджетом и рабочими ссылками.',
+    date: '11 авг 2026',
+    readMin: 11,
+    tag: 'Выходные',
+    city: 'Калининград',
+    citySlug: 'kaliningrad',
+    authorId: 'editorial',
+    authorName: 'Редакция',
+    articleType: 'gid',
+    imageUrl: blogCoverUrl('kaliningrad-za-2-dnya-vyhodnye'),
+    imageAlt: 'Кафедральный собор на острове Канта и набережная Преголи в Калининграде',
+  },
+  {
+    slug: 'kaliningrad-vecher-organ-stendap-dzhaz',
+    title: 'Органные концерты, стендап и джаз при свечах: вечерний гид по культуре Калининграда',
+    excerpt:
+      'Три сценария вечера в Калининграде: орган на острове Канта, джаз и театр Николая Захарова, стендап в клубе «Локация» - с адресами и ссылками на билеты.',
+    date: '11 авг 2026',
+    readMin: 8,
+    tag: 'Концерты',
+    city: 'Калининград',
+    citySlug: 'kaliningrad',
+    authorId: 'editorial',
+    authorName: 'Редакция',
+    articleType: 'gid',
+    imageUrl: blogCoverUrl('kaliningrad-vecher-organ-stendap-dzhaz'),
+    imageAlt: 'Вечерний Кафедральный собор на острове Канта в Калининграде',
+  },
+  {
+    slug: 'kaliningrad-gastro-kenigsberg',
+    title: 'Гид по гастрономическому Кёнигсбергу: что попробовать в Калининграде и где искать',
+    excerpt:
+      'Клопсы в «Штайндамм 99», запеченный марципан у Бранденбургских ворот и гастротеатр «История в тарелке» - три главных вкуса Калининграда с адресами.',
+    date: '12 авг 2026',
+    readMin: 8,
+    tag: 'Город',
+    city: 'Калининград',
+    citySlug: 'kaliningrad',
+    authorId: 'editorial',
+    authorName: 'Редакция',
+    articleType: 'gid',
+    imageUrl: blogCoverUrl('kaliningrad-gastro-kenigsberg'),
+    imageAlt: 'Кёнигсбергские клопсы, марципан и балтийская рыба на столе в Калининграде',
+  },
+  {
     slug: 'perm-neobychnye-muzei',
     title: 'Не только Пермские боги: 5 необычных музеев Перми, о которых вы не знали',
     excerpt:
