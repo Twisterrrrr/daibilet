@@ -2,11 +2,13 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| P.2r | Region Hub IA v1: DTO + `RegionPageView` + SEO/robots по live tier | Высокий | 🔄 code on `feat/region-hubs` (не закоммичено) |
-| P.2r1 | Live tier C↔B↔A (`resolveRegionLiveTier`); strip на центре только Tier C | Высокий | 🔄 integrated on HEAD + SWR city DTO |
-| P.2r2 | Sitemap: indexable regions (A/B ≥3); Tier C вне карты | Средний | 🔄 |
+| P.2r | Region Hub IA v1: DTO + `RegionPageView` + SEO/robots по live tier | Высокий | ✅ shipped (`feat/region-hubs` → `feat/next-monorepo`) |
+| P.2r1 | Live tier C↔B↔A (`resolveRegionLiveTier`); strip на центре только Tier C | Высокий | ✅ |
+| P.2r2 | Sitemap: indexable regions (A/B ≥3); Tier C вне карты | Средний | ✅ |
 | P.2r3 | `region-info` seed + AI pipeline draft | Средний | ⏳ seed JSON есть; LLM script ⏳ |
-| P.2r4 | Smoke `region-hub.test.ts` + MSK deploy | Высокий | ⏳ после commit |
+| P.2r4 | Smoke `region-hub.test.ts` + MSK deploy | Высокий | ✅ test; deploy batch / по запросу |
+| UX.REGION-A1 | Tier A UX Phase A: lean cards, city avatar rail, sticky date+genre, venue series collapse | Критический | ✅ code |
+| UX.REGION-A2 | Tier A UX Phase B: `region-city-belts` (MSK oblast) + logistics chip + orient map | Высокий | ✅ code (пилот `moskovskaya-oblast`) |
 
 ## Follow-up deploy/smoke (2026-08-08)
 

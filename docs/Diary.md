@@ -1,3 +1,20 @@
+## 2026-08-11 - Region Hub Tier A UX (Подмосковье → шаблон)
+
+### Наблюдения
+- Region hub читался как простыня однотипных EventCard: дубли CTA, слабая ось «далеко ли ехать?», доминирование одной площадки в ленте.
+
+### Решения
+- Lean `RegionEventCard` (фото-доминанта, дата, город, один genre bubble, один CTA).
+- City avatar rail + sticky date rail / genre chips; пояса МКАД из `data/geo/region-city-belts.ru.json` (пилот `moskovskaya-oblast`).
+- `groupRegionAfficheSessions`: схлопывание серий venue (≥3 или ≥40% ленты).
+- Compact OSM orient map (клик = city filter). Section banding white / slate-50.
+
+### Проблемы
+- Шоссе-коридоры и cluster map - out of v1.
+- Остальные Tier A без belt JSON получают UI каркас без поясов.
+
+---
+
 ## 2026-08-11 - MSK: accelerate /api/public/home cold rebuild
 
 ### Наблюдения
