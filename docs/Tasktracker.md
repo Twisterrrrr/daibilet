@@ -15,6 +15,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
+| B.ANNA-SOCHI-NIGHT | Колонка Анны: ночной Сочи без глянца (рок/стендап/джаз) | Высокий | 🔄 ship+Deploy MSK web |
 | B.ARTUR-VII-CHEL | Колонка Артура: гастроспектакль «Вий» в Челябинске (Horse Head) | Высокий | ✅ `8c77f77f` Deploy MSK web `31528362734` |
 | B.MAX-MSK-CIRCLE | Колонка Макса «Как перестать гулять по кругу» + `isFeatured` материал недели | Высокий | ✅ `5e703d2c` upsert+featured; Deploy `31525508276` |
 | UX.MUSTSEE-DROP-BULK | my-day «Главные места»: убрать bulk «Добавить главные места»; chips + list остаются | Высокий | ✅ `8b889e85` Deploy MSK web `31473922071` BUILD_ID=`FZI5gnbEMamJmDZd6NqvN` |

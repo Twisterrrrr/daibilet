@@ -1,3 +1,17 @@
+## 2026-08-11 - Колонка Анны: ночной Сочи без глянца
+
+### Наблюдения
+- Owner дайджест Сочи (рок/стендап/джаз); стиль «Полевая правда» → `articleType=column`, автор Анна; Макс уже материал недели → `isFeatured=false`.
+- Live 6 event URL = 200; адреса: Треугольник Кирова 56, Грот Островского 19, Hosta Spot пирс №330, Федина дача Черноморская 12.
+
+### Решения
+- MD `sochi-noch-bez-glyanca-rok-stendap-dzhaz` PUBLISHED now; cover+2 inline+og; blog-posts web+public; `blog:sync-bodies`.
+- Commit+push; MSK upsert + sync-public-assets + revalidate; Deploy MSK web.
+
+### Проблемы
+- Нет.
+
+---
 ## 2026-08-11 - Колонка Артура: гастроспектакль «Вий» (Челябинск)
 
 ### Наблюдения

@@ -22,6 +22,22 @@ export type BlogPost = {
 export const BLOG_POSTS: BlogPost[] = [
   // SPB Top-100 / Beyond-Top-100 скрыты с публичного сайта (правятся в админке как DRAFT).
   {
+    slug: 'sochi-noch-bez-glyanca-rok-stendap-dzhaz',
+    title: 'Ночной Сочи без глянца: рок-угары, дерзкий стендап и джаз на самом краю пирса',
+    excerpt:
+      'Рок в «Треугольнике», камерный стендап в «Гроте» и джаз на пирсе в Хосте - три сценария ночи в Сочи без курортного глянца.',
+    date: '11 авг 2026',
+    readMin: 6,
+    tag: 'От автора',
+    city: 'Сочи',
+    citySlug: 'sochi',
+    authorId: 'anna',
+    authorName: 'Анна',
+    articleType: 'column',
+    imageUrl: blogCoverUrl('sochi-noch-bez-glyanca-rok-stendap-dzhaz'),
+    imageAlt: 'Ночная набережная Сочи: огни, пирс и живая клубная атмосфера без глянца',
+  },
+  {
     slug: 'chelyabinsk-vii-gastro-spektakl',
     title: 'Гастрономический хоррор на Урале: почему весь Челябинск обсуждает ужин-спектакль «Вий»',
     excerpt:
