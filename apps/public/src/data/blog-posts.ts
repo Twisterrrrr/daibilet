@@ -19,6 +19,22 @@ export type BlogPost = {
 /** Обложки - уникальная статика на статью: /images/blog/{slug}.jpg */
 export const BLOG_POSTS: BlogPost[] = [
   {
+    slug: 'spb-barnyy-peterburg-ryumochnye-spikizi',
+    title: 'В Питере - пить интеллигентно: гид по рюмочным, секретным спикизи и барному стендапу',
+    excerpt:
+      'Честный гид по барному коду Петербурга: интеллигентные рюмочные, секретные спикизи и стендап в культовых барах.',
+    date: '5 авг 2026',
+    readMin: 7,
+    tag: 'Город',
+    city: 'Санкт-Петербург',
+    citySlug: 'saint-petersburg',
+    authorId: 'editorial',
+    authorName: 'Редакция',
+    articleType: 'gid',
+    imageUrl: blogCoverUrl('spb-barnyy-peterburg-ryumochnye-spikizi'),
+    imageAlt: 'Компания друзей за столиком в баре Петербурга вечером',
+  },
+  {
     slug: 'sochi-noch-bez-glyanca-rok-stendap-dzhaz',
     title: 'Ночной Сочи без глянца: рок-угары, дерзкий стендап и джаз на самом краю пирса',
     excerpt:
@@ -600,8 +616,8 @@ export const BLOG_POSTS: BlogPost[] = [
   },
   {
     slug: 'afisha-regionalnye-goroda',
-    title: 'Куда сходить в Екатеринбурге, Уфе и Нижнем Новгороде',
-    excerpt: 'Стендап, иммерсив и театр за пределами двух столиц - ориентиры по текущей афише регионов.',
+    title: 'Жизнь за МКАДом есть: три региональные столицы, где вечерняя афиша утрет нос Москве',
+    excerpt: 'Честный гид по суперсилам Екатеринбурга, Нижнего Новгорода и Уфы: стендап, импров, иммерсив и авторский театр.',
     date: '15 июля 2026',
     readMin: 7,
     tag: 'Гид',
