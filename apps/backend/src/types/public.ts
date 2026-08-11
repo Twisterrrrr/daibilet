@@ -299,6 +299,7 @@ export interface PublicCityPageDto extends ApiEnvelope {
       name: string;
       desc: string;
       cityNames?: string[] | null;
+      imageUrl?: string | null;
     }> | null;
     faq?: Array<{ q: string; a: string }> | null;
   } | null;

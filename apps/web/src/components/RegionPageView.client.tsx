@@ -11,7 +11,11 @@ import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { formatNumber } from '@/lib/format';
 import { buildRegionSystemBrief } from '@/lib/region-hub-seo';
 import { cityHref } from '@/lib/routes';
-import { resolveCityImage } from '@/lib/city-images';
+import {
+  buildCitySessionCoverIndex,
+  resolveCityRailPreview,
+  resolveTopPlacePreview,
+} from '@/lib/region-place-preview';
 import {
   buildCatalogDateRailChips,
   type CatalogDateRailChip,
@@ -64,7 +68,7 @@ export function RegionPageView({
   const [beltFilter, setBeltFilter] = React.useState<'all' | RegionCityBelt>('all');
   const [categoryFilter, setCategoryFilter] = React.useState<string | null>(null);
   const [showAllCities, setShowAllCities] = React.useState(false);
-  const [mapOpen, setMapOpen] = React.useState(false);
+  const [mapOpen, setMapOpen] = React.useState(true);
   const [expandedSeries, setExpandedSeries] = React.useState<Record<string, boolean>>({});
 
   const dateChips = React.useMemo(() => buildCatalogDateRailChips(new Date(), 10), []);
@@ -155,6 +159,11 @@ export function RegionPageView({
       return sessionMatchesDate(session, dateSelection);
     });
   }, [payload?.sessions, cityFilter, dateSelection, beltFilter, categoryFilter, hasBelts, slug]);
+
+  const cityCoverIndex = React.useMemo(
+    () => buildCitySessionCoverIndex(payload?.sessions || []),
+    [payload?.sessions],
+  );
 
   const categoryChips = React.useMemo(() => {
     const counts = new Map<string, number>();
@@ -401,6 +410,11 @@ export function RegionPageView({
                       city={item}
                       active={isCityFilterActive([item.name])}
                       logistics={formatLogisticsParts(resolveCityBeltEntry(slug, item))}
+                      imageUrl={resolveCityRailPreview({
+                        slug: item.slug,
+                        name: item.name,
+                        coverIndex: cityCoverIndex,
+                      })}
                       onSelect={() => applyCityFilter([item.name])}
                     />
                   ))}
@@ -455,6 +469,12 @@ export function RegionPageView({
                 {topPlaces.map((place) => {
                   const names = (place.cityNames || []).map((n) => n.trim()).filter(Boolean);
                   const active = names.length ? isCityFilterActive(names) : false;
+                  const preview = resolveTopPlacePreview({
+                    imageUrl: place.imageUrl,
+                    cityNames: names,
+                    childCities,
+                    coverIndex: cityCoverIndex,
+                  });
                   return (
                     <li key={place.name}>
                       <article
@@ -462,25 +482,42 @@ export function RegionPageView({
                         itemType="https://schema.org/Place"
                         className={
                           active
-                            ? 'h-full rounded-2xl border border-emerald-400 bg-emerald-50/70 px-4 py-4'
-                            : 'h-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4'
+                            ? 'flex h-full flex-col overflow-hidden rounded-2xl border border-emerald-400 bg-emerald-50/70'
+                            : 'flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-slate-50'
                         }
                       >
-                        <h3 itemProp="name" className="font-semibold text-slate-950">
-                          {place.name}
-                        </h3>
-                        <p itemProp="description" className="mt-1 text-sm leading-6 text-slate-600">
-                          {place.desc}
-                        </p>
-                        {names.length ? (
-                          <button
-                            type="button"
-                            className="mt-3 text-sm font-medium text-emerald-900 underline-offset-4 hover:underline"
-                            onClick={() => applyCityFilter(names)}
-                          >
-                            {active ? 'Сбросить фильтр афиши' : 'Показать события в афише'}
-                          </button>
-                        ) : null}
+                        <div className="relative aspect-[16/10] bg-gradient-to-br from-slate-200 to-emerald-100">
+                          {preview ? (
+                            <SafeImage
+                              src={preview}
+                              alt=""
+                              fill
+                              sizes={IMAGE_SIZES.cityCard}
+                              className="object-cover"
+                            />
+                          ) : (
+                            <span className="absolute inset-0 flex items-center justify-center text-slate-400">
+                              <MapPin className="h-8 w-8" aria-hidden />
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex flex-1 flex-col px-4 py-4">
+                          <h3 itemProp="name" className="font-semibold text-slate-950">
+                            {place.name}
+                          </h3>
+                          <p itemProp="description" className="mt-1 text-sm leading-6 text-slate-600">
+                            {place.desc}
+                          </p>
+                          {names.length ? (
+                            <button
+                              type="button"
+                              className="mt-3 self-start text-sm font-medium text-emerald-900 underline-offset-4 hover:underline"
+                              onClick={() => applyCityFilter(names)}
+                            >
+                              {active ? 'Сбросить фильтр афиши' : 'Показать события в афише'}
+                            </button>
+                          ) : null}
+                        </div>
                       </article>
                     </li>
                   );
@@ -666,14 +703,15 @@ function ChildCityAvatar({
   city,
   active,
   logistics,
+  imageUrl,
   onSelect,
 }: {
   city: PublicRegionChildCityDto;
   active: boolean;
   logistics: { transit: string | null; km: string | null } | null;
+  imageUrl: string | null;
   onSelect: () => void;
 }) {
-  const image = resolveCityImage({ slug: city.slug, name: city.name });
   const label = shortCityRailName(city.name);
   return (
     <button
@@ -693,8 +731,8 @@ function ChildCityAvatar({
             : 'relative mx-auto block h-16 w-16 overflow-hidden rounded-full ring-1 ring-slate-200 sm:h-[4.5rem] sm:w-[4.5rem]'
         }
       >
-        {image ? (
-          <SafeImage src={image} alt="" fill sizes={IMAGE_SIZES.cityCard} className="object-cover" />
+        {imageUrl ? (
+          <SafeImage src={imageUrl} alt="" fill sizes={IMAGE_SIZES.cityCard} className="object-cover" />
         ) : (
           <span className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-200 to-emerald-100 text-slate-500">
             <MapPin className="h-5 w-5" aria-hidden />

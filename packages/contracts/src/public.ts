@@ -222,6 +222,8 @@ export interface PublicRegionInfoDto {
     desc: string;
     /** Города каталога для фильтра афиши (сквозная связь Place → sessions). */
     cityNames?: string[] | null;
+    /** Опциональная редакционная обложка; иначе web берёт city/session cover. */
+    imageUrl?: string | null;
   }> | null;
   faq?: Array<{ q: string; a: string }> | null;
 }

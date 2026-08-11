@@ -9,6 +9,7 @@
 | P.2r4 | Smoke `region-hub.test.ts` + MSK deploy | Высокий | ✅ test; deploy batch / по запросу |
 | UX.REGION-A1 | Tier A UX Phase A: lean cards, city avatar rail, sticky date+genre, venue series collapse | Критический | ✅ code |
 | UX.REGION-A2 | Tier A UX Phase B: `region-city-belts` (MSK oblast) + logistics chip + orient map | Высокий | ✅ code (пилот `moskovskaya-oblast`) |
+| UX.REGION-A3 | Tier A previews: topPlaces photo-first + city rail session covers; map open by default | Высокий | 🔄 push; deploy по «выкатывай» |
 
 ## Follow-up deploy/smoke (2026-08-08)
 

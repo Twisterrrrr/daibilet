@@ -46,8 +46,8 @@ regionTier?: 'A' | 'B' | 'C' | null;
 
 1. **Hero** - H1 региона, brief (`regionInfo` или системный); без дубля seo-строки.
 2. **Мост в центр** - CTA на `/cities/{centerSlug}` + count.
-3. **Города региона** (`bg-slate-50`) - горизонтальный avatar-rail (фото/градиент + count + logistics chip) → фильтр афиши; опционально свёрнутая OSM-карта точек.
-4. **Куда съездить** (Tier A, `bg-white`) - `topPlaces` плитки.
+3. **Города региона** (`bg-slate-50`) - горизонтальный avatar-rail (превью: city asset → session cover → pin; count + logistics) → фильтр афиши; OSM-карта точек **развёрнута по умолчанию**.
+4. **Куда съездить** (Tier A, `bg-white`) - `topPlaces` плитки **photo-first** (editorial `imageUrl` → обложка города → постер события).
 5. **Афиша** (`bg-slate-50`) - sticky бар: date rail (неделя) + пояса (если JSON) + жанры; lean `RegionEventCard`; схлопывание серий одной площадки (`RegionVenueSeriesCard`).
 6. **FAQ** (`bg-white`).
 
@@ -58,7 +58,7 @@ regionTier?: 'A' | 'B' | 'C' | null;
 - **Не** shared `EventCard`: region-only photo-first card, один CTA «Билет», один genre bubble, logistics chip (`МЦД · ~N км`).
 - **Серии:** ≥3 события на venue **или** ≥40% видимой ленты → карусель дат + «Показать все».
 - **Пояса v1:** `near` / `mid` / `far` от МКАД (пилот `moskovskaya-oblast`). Шоссе-коридоры - v2.
-- **Карта v1:** ориентация + клик = city filter; без cluster SDK.
+- **Карта v1:** ориентация + клик = city filter; без cluster SDK; open by default.
 
 ---
 

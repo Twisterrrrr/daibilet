@@ -94,6 +94,7 @@ export type PublicRegionInfoDto = {
     name: string;
     desc: string;
     cityNames?: string[] | null;
+    imageUrl?: string | null;
   }> | null;
   faq?: Array<{ q: string; a: string }> | null;
 };
@@ -341,6 +342,7 @@ function normalizeRegionInfo(raw: PublicRegionInfoDto): PublicRegionInfoDto {
         name: String(place.name || '').trim(),
         desc: String(place.desc || '').trim(),
         cityNames: (place.cityNames || []).map((name) => String(name || '').trim()).filter(Boolean),
+        imageUrl: String(place.imageUrl || '').trim() || null,
       }))
       .filter((place) => place.name && place.desc),
     faq: (raw.faq || [])
