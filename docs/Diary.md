@@ -1,3 +1,20 @@
+## 2026-08-11 - My Day: horizontal main places + Lovable stop cards
+
+### Наблюдения
+- В drawer «Главные места» карточки снова выглядели как узкие портреты: `sm:grid-cols-2` в узком sheet сжимал thumb+текст.
+- Stop-cards itinerary отставали от Lovable (шевроны, пустой pin-tile, слабые типы).
+
+### Решения
+- Must-see в picker: одна колонка, `flex-row`, крупный thumb слева (`h-24 w-28`), title+desc справа, `+` справа (`data-day-must-see-layout=horizontal-row`).
+- List stop cards: number+grip only, type tag, soft time `12:25-14:25`, chips «Можно купить билет» / «Вход свободный» / dwell, thumb справа; keyboard DnD (Space/Enter/arrows/Escape).
+- Типы: must-see + `venueTypeLabel` из каталога; Gantt strip при «По часам»; PDF с картой (canvas+print); «Сохранить как сценарий» (localStorage).
+
+### Проблемы
+- GPX/KML ещё deferred; jspdf не ставили (workspace install) - PDF через print dialog.
+- Live MSK - batch / «выкатывай».
+
+---
+
 ## 2026-08-11 - My Day: Lovable sticky route toolbar
 
 ### Наблюдения

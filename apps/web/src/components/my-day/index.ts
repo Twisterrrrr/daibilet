@@ -3,6 +3,7 @@ export { MyDayToolbar } from './MyDayToolbar';
 export { MyDayMapAside } from './MyDayMapAside';
 export { MyDayMobileMapSheet, MyDayMapFullScreen } from './MyDayMobileMapSheet';
 export { MyDayItinerary, MyDayScheduleBanner } from './MyDayItinerary';
+export { MyDayHourGantt } from './MyDayHourGantt';
 export { MyDayAddShelf } from './MyDayAddShelf';
 export { MyDayPickerSheet, MyDayPickerLaunch } from './MyDayPickerSheet';
 export type { MyDayPickerSection, MyDayPickerTab } from './MyDayPickerSheet';

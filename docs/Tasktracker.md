@@ -19,6 +19,8 @@
 | UX.MYDAY-LOVABLE-W1 | `/my-day` Wave 1 Lovable shell: MyDayShell split+collapse map, sticky toolbar, mobile map sheet 85vh, schedule banner, default Список | Критический | 🔄 `9fff7e7e` Deploy `31480928724` |
 | UX.MYDAY-LOVABLE-W1.5 | `/my-day` visual parity: Lovable stop cards + dense toolbar; list-only; commerce secondary | Критический | 🔄 `9fb3754f` Deploy `31482332163` |
 | UX.MYDAY-PICKER-SHEET | `/my-day` подбор точек: side drawer (сценарии/места/пригороды/picks/своё), launch bar | Критический | 🔄 in progress |
+| UX.MYDAY-MUSTSEE-HROW | Picker «Главные места»: горизонтальные row-cards (thumb left + desc), не 2-col portrait | Критический | 🔄 ship |
+| UX.MYDAY-STOP-LOVABLE | Stop cards 1:1 Lovable + types/Gantt/kbd DnD/PDF map/save scenario | Критический | 🔄 ship |
 
 | UX.MYDAY-NOTES-NIKOLSKY | `/my-day`: between-stop notes; drop list insert; Kryukov Nikolo (not Kronstadt); Berthold coords; heading «Маршрут из N точек» | Критический | 🔄 `d9f25963` Deploy `31462262773` (prev `31461921550` build fail JSX) |
 | UX.MYDAY-LIST-WANDERLOG | `/my-day` Список: pin+thumb cards, between-leg `пешком • м` + «Маршруты», hover `+` insert (место/заметка/список), HTML5 DnD | Критический | 🔄 `e82aaf0e` push; deploy по «выкатывай» |

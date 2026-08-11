@@ -43,6 +43,10 @@ type MyDayToolbarProps = {
   onHourEndChange?: (v: string) => void;
   onClear: () => void;
   onPrintPdf: () => void;
+  printPdfLabel?: string;
+  printPdfBusy?: boolean;
+  onSaveScenario?: () => void;
+  saveScenarioBusy?: boolean;
   onShare?: () => void;
   shareLabel?: string;
   typeCounts?: MyDayStopTypeCount[];
@@ -79,6 +83,10 @@ export function MyDayToolbar({
   onHourEndChange,
   onClear,
   onPrintPdf,
+  printPdfLabel = 'PDF с картой',
+  printPdfBusy = false,
+  onSaveScenario,
+  saveScenarioBusy = false,
   onShare,
   shareLabel = 'Поделиться',
   typeCounts = [],
@@ -250,13 +258,24 @@ export function MyDayToolbar({
             <button
               type="button"
               onClick={onPrintPdf}
-              disabled={stopsCount <= 0}
+              disabled={stopsCount <= 0 || printPdfBusy}
               data-day-print
               className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-40"
             >
               <FileDown className="h-3.5 w-3.5" aria-hidden />
-              PDF / печать
+              {printPdfBusy ? 'Готовим PDF…' : printPdfLabel}
             </button>
+            {onSaveScenario ? (
+              <button
+                type="button"
+                onClick={onSaveScenario}
+                disabled={stopsCount <= 0 || saveScenarioBusy}
+                data-day-save-scenario
+                className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-40"
+              >
+                Сохранить как сценарий
+              </button>
+            ) : null}
             {onShare ? (
               <button
                 type="button"
@@ -324,8 +343,8 @@ export function MyDayToolbar({
       ) : null}
 
       <p id="dnd-hint" className="mt-4 text-xs text-slate-500" data-my-day-dnd-hint>
-        Порядок можно менять мышью или с клавиатуры: наведите фокус на ручку перетаскивания и
-        используйте стрелки вверх / вниз.
+        Порядок можно менять мышью или с клавиатуры: фокус на ручке перетаскивания, стрелки вверх /
+        вниз, пробел - взять и отпустить, Escape - отменить.
       </p>
     </div>
   );

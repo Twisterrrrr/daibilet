@@ -105,7 +105,8 @@ export function anchorMinutes(venue: DayRouteVenueItem): number | null {
 }
 
 function rangeLabel(startMin: number, endMin: number): string {
-  return `${formatDayRouteHHMMFromMinutes(startMin)} - ${formatDayRouteHHMMFromMinutes(endMin)}`;
+  // Lovable screenshot style: 12:25-14:25 (hyphen, no en-dash).
+  return `${formatDayRouteHHMMFromMinutes(startMin)}-${formatDayRouteHHMMFromMinutes(endMin)}`;
 }
 
 function pointLabel(startMin: number): string {

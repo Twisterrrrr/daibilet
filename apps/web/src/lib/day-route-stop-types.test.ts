@@ -3,8 +3,11 @@ import test from 'node:test';
 
 import {
   buildDayRouteTypeCounts,
+  dayRouteStopDwellChipLabel,
+  dayRouteStopPriceChipLabel,
   dayRouteStopTypeTag,
   estimateDayRouteDwellMinutes,
+  formatDayRouteSoftMinutes,
 } from './day-route-stop-types.ts';
 
 test('dayRouteStopTypeTag classifies custom / suburb / event', () => {
@@ -16,6 +19,19 @@ test('dayRouteStopTypeTag classifies custom / suburb / event', () => {
   );
   assert.equal(dayRouteStopTypeTag({ id: 'v3', title: 'Площадь' }), 'Место');
   assert.equal(dayRouteStopTypeTag({ id: 'v4', title: 'Эрмитаж' }, 'Музей'), 'Музей');
+});
+
+test('dayRouteStopPriceChipLabel matches Lovable soft copy', () => {
+  assert.equal(dayRouteStopPriceChipLabel({ id: 'v1', title: 'Парк' }), 'Вход свободный');
+  assert.equal(
+    dayRouteStopPriceChipLabel({ id: 'v2', title: 'Театр', ticketUrl: 'https://t.example/1' }),
+    'Можно купить билет',
+  );
+});
+
+test('formatDayRouteSoftMinutes and dwell chip', () => {
+  assert.equal(formatDayRouteSoftMinutes(120), '2 ч');
+  assert.equal(dayRouteStopDwellChipLabel({ id: 'v1', title: 'X' }, 'Театр'), '~2 ч на месте');
 });
 
 test('buildDayRouteTypeCounts sorts by count', () => {

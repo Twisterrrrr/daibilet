@@ -208,9 +208,22 @@ import {
 import { MustSeeFilterTabs } from '@/components/MustSeeFilterTabs.client';
 import {
   buildDayRouteTypeCounts,
+  dayRouteStopDwellChipLabel,
+  dayRouteStopPriceChipLabel,
   dayRouteStopTypeTag,
   estimateDayRouteDwellMinutes,
 } from '@/lib/day-route-stop-types';
+import { venueTypeLabel } from '@/lib/venue-meta';
+import { resolveCityCardImage } from '@/lib/city-images';
+import { MyDayHourGantt } from '@/components/my-day/MyDayHourGantt';
+import { exportDayRoutePdfWithMap } from '@/lib/day-route-pdf';
+import {
+  applyDayRouteScenario,
+  readDayRouteScenarios,
+  removeDayRouteScenario,
+  saveDayRouteScenario,
+  type DayRouteSavedScenario,
+} from '@/lib/day-route-scenarios';
 import { formatStreetAddress } from '@/lib/address';
 import {
   softGeocodeAddress,
@@ -461,6 +474,16 @@ function DayRoutePanelInner() {
   const [freeWindowDismissed, setFreeWindowDismissed] = useState(false);
   /** HTML5 DnD: venue id currently dragged (plan stops). */
   const [dragVenueId, setDragVenueId] = useState<string | null>(null);
+  const [grabbedKey, setGrabbedKey] = useState<string | null>(null);
+  const [dndAnnounce, setDndAnnounce] = useState('');
+  const [pdfBusy, setPdfBusy] = useState(false);
+  const [savedScenarios, setSavedScenarios] = useState<DayRouteSavedScenario[]>([]);
+  const [scenarioBusy, setScenarioBusy] = useState(false);
+
+  useEffect(() => {
+    setSavedScenarios(readDayRouteScenarios());
+  }, []);
+
   /** Next catalog/text add inserts after this stop (from between-card «+»). */
   const [insertAfterVenueId, setInsertAfterVenueId] = useState<string | null>(null);
   /** Open between-card «+» popover for this afterVenueId. */
@@ -1481,12 +1504,32 @@ function DayRoutePanelInner() {
     }
     return map;
   }, [mustSeeResolved]);
+  const catalogTypeByKey = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const venue of [...locationsCatalog, ...venuesCatalog]) {
+      const label = venueTypeLabel(venue.type, venue.name);
+      if (!label || label === 'Другое') continue;
+      if (venue.id) map.set(venue.id, label);
+      if (venue.slug) map.set(String(venue.slug), label);
+    }
+    return map;
+  }, [locationsCatalog, venuesCatalog]);
+  const cityFallbackImage = useMemo(
+    () =>
+      resolveCityCardImage({
+        slug: pageCitySlug || pageCitySourceSlug || undefined,
+        name: pageCityName || undefined,
+      }),
+    [pageCitySlug, pageCitySourceSlug, pageCityName],
+  );
   const resolveStopTag = useCallback(
     (venue: DayRouteVenueItem) =>
       mustSeeTagByKey.get(venue.id) ||
       (venue.slug ? mustSeeTagByKey.get(String(venue.slug)) : null) ||
+      catalogTypeByKey.get(venue.id) ||
+      (venue.slug ? catalogTypeByKey.get(String(venue.slug)) : null) ||
       null,
-    [mustSeeTagByKey],
+    [mustSeeTagByKey, catalogTypeByKey],
   );
   const stopTypeCounts = useMemo(
     () => buildDayRouteTypeCounts(route.venues, resolveStopTag),
@@ -2273,6 +2316,145 @@ function DayRoutePanelInner() {
 
   function onPlanStopDragEnd() {
     setDragVenueId(null);
+  }
+
+  function onPlanGripKeyDown(
+    event: React.KeyboardEvent<HTMLButtonElement>,
+    venueId: string,
+  ) {
+    const planIds = displayPlanStops.map((v) => v.id);
+    const index = planIds.indexOf(venueId);
+    if (index < 0) return;
+    const title = displayPlanStops[index]?.title || 'Точка';
+    if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+      event.preventDefault();
+      setRoute(moveDayRoutePlanVenue(venueId, event.key === 'ArrowUp' ? -1 : 1));
+      return;
+    }
+    if (event.key === ' ' || event.key === 'Enter') {
+      event.preventDefault();
+      if (grabbedKey === venueId) {
+        setGrabbedKey(null);
+        setDndAnnounce(`${title} отпущен на позиции ${index + 1}.`);
+      } else {
+        setGrabbedKey(venueId);
+        setDndAnnounce(
+          `${title} захвачен, позиция ${index + 1} из ${planIds.length}. Стрелки вверх и вниз меняют порядок, Escape - отпустить.`,
+        );
+      }
+      return;
+    }
+    if (event.key === 'Escape' && grabbedKey === venueId) {
+      event.preventDefault();
+      setGrabbedKey(null);
+      setDndAnnounce('Перемещение отменено.');
+    }
+  }
+
+  async function exportPdfWithMap() {
+    if (pdfBusy || !route.venues.length) return;
+    setPdfBusy(true);
+    try {
+      const stops = route.venues
+        .filter((v) => !isNoteDayRouteStop(v))
+        .map((venue) => {
+          const coords = lookupDayRouteCoords(venue, coordsById);
+          const tag = dayRouteStopTypeTag(venue, resolveStopTag(venue));
+          return {
+            id: venue.id,
+            title: venue.title,
+            latitude: coords?.latitude ?? 0,
+            longitude: coords?.longitude ?? 0,
+            address: venue.address || venue.city || null,
+            tag,
+            timeLabel: hourPlan?.byId[venue.id]?.label || null,
+            dwellLabel: dayRouteStopDwellChipLabel(venue, tag),
+          };
+        })
+        .filter((s) => s.latitude && s.longitude);
+      const rows = route.venues.flatMap((venue, index) => {
+        if (isNoteDayRouteStop(venue)) {
+          return [{ kind: 'note' as const, text: String(venue.note || venue.title || 'Заметка') }];
+        }
+        const stop = {
+          id: venue.id,
+          title: venue.title,
+          latitude: lookupDayRouteCoords(venue, coordsById)?.latitude ?? 0,
+          longitude: lookupDayRouteCoords(venue, coordsById)?.longitude ?? 0,
+          address: venue.address || venue.city || null,
+          tag: dayRouteStopTypeTag(venue, resolveStopTag(venue)),
+          timeLabel: hourPlan?.byId[venue.id]?.label || null,
+        };
+        const out: Array<
+          | { kind: 'stop'; index: number; stop: typeof stop }
+          | { kind: 'leg'; text: string }
+        > = [{ kind: 'stop', index: index + 1, stop }];
+        const meters = segmentMeters[index];
+        if (meters != null && meters > 0) {
+          out.push({
+            kind: 'leg',
+            text: formatDayRouteSegmentHint(meters, travelMode) || '',
+          });
+        }
+        return out;
+      });
+      await exportDayRoutePdfWithMap({
+        title: `Маршрут - ${scopeCityName || 'город'}`,
+        subtitle: stopsCountLabel,
+        summary: [
+          totalDistanceMeters > 0
+            ? `Дистанция ${formatDayRouteDistance(totalDistanceMeters)}`
+            : '',
+          travelMinutes > 0
+            ? `В пути ~${formatDayRouteTravelMinutes(travelMinutes)}`
+            : '',
+        ].filter(Boolean),
+        stops,
+        rows,
+      });
+    } finally {
+      setPdfBusy(false);
+    }
+  }
+
+  function refreshScenarios() {
+    setSavedScenarios(readDayRouteScenarios());
+  }
+
+  function saveCurrentAsScenario() {
+    if (scenarioBusy || !route.venues.length) return;
+    const name = window.prompt('Название сценария', scopeCityName || 'Мой день');
+    if (!name) return;
+    setScenarioBusy(true);
+    try {
+      const saved = saveDayRouteScenario({
+        name,
+        citySlug: scopeCitySlug || null,
+        cityName: scopeCityName || null,
+        venues: route.venues,
+        travelMode,
+        hourStart,
+        hourEnd,
+        hourPlanOn,
+      });
+      if (saved) {
+        refreshScenarios();
+        setDndAnnounce(`Сценарий «${saved.name}» сохранён.`);
+      }
+    } finally {
+      setScenarioBusy(false);
+    }
+  }
+
+  function loadScenario(scenario: DayRouteSavedScenario) {
+    const n = applyDayRouteScenario(scenario);
+    if (!n) return;
+    setRoute(readDayRouteFresh());
+    setTravelMode(scenario.travelMode);
+    setHourStart(scenario.hourStart);
+    setHourEnd(scenario.hourEnd);
+    setHourPlanOn(scenario.hourPlanOn);
+    setDndAnnounce(`Сценарий «${scenario.name}» загружен.`);
   }
 
   function openInsertPlaceAfter(afterVenueId: string) {
@@ -3324,7 +3506,13 @@ function DayRoutePanelInner() {
               setRoute(readDayRoute());
               replaceMyDayUrl('/my-day');
             }}
-            onPrintPdf={printItinerary}
+            onPrintPdf={() => {
+              void exportPdfWithMap();
+            }}
+            printPdfBusy={pdfBusy}
+            printPdfLabel="PDF с картой"
+            onSaveScenario={saveCurrentAsScenario}
+            saveScenarioBusy={scenarioBusy}
             onShare={() => setShareMenuOpen(true)}
             shareLabel={copyStatus === 'ok' ? 'Скопировано!' : 'Поделиться'}
             typeCounts={stopTypeCounts}
@@ -3337,7 +3525,21 @@ function DayRoutePanelInner() {
             }}
             onShowAllTags={() => setHiddenStopTags([])}
             scheduleSlot={
-              <MyDayScheduleBanner
+              <>
+                <div className="sr-only" aria-live="polite">
+                  {dndAnnounce}
+                </div>
+                {hourPlanOn && hourPlan ? (
+                  <MyDayHourGantt
+                    venues={route.venues}
+                    plan={hourPlan}
+                    dayStartHHMM={hourStart}
+                    dayEndHHMM={hourEnd}
+                    onFocusStop={(id) => setFocusedStopId(id)}
+                    className="mb-3"
+                  />
+                ) : null}
+                <MyDayScheduleBanner
                 overflowCount={overflowStops.length}
                 totalLabel={hourPlan?.totalLabel || null}
                 lunchLabel={hourPlan?.lunchHint?.label || null}
@@ -3356,6 +3558,7 @@ function DayRoutePanelInner() {
                     : undefined
                 }
               />
+              </>
             }
           />
 
@@ -3487,6 +3690,8 @@ function DayRoutePanelInner() {
                       variant={effectiveStopViewMode}
                       group="plans"
                       softTimeLabel={hourPlan?.byId[venue.id]?.label || null}
+                      typeTag={dayRouteStopTypeTag(venue, resolveStopTag(venue))}
+                      fallbackImageUrl={cityFallbackImage}
                       hasCoords={Boolean(lookupDayRouteCoords(venue, coordsById))}
                       mapsUrl={(() => {
                         const c = lookupDayRouteCoords(venue, coordsById);
@@ -3497,6 +3702,7 @@ function DayRoutePanelInner() {
                       travelMode={travelMode}
                       focused={focusedStopId === venue.id}
                       dragging={dragVenueId === venue.id}
+                      grabbed={grabbedKey === venue.id}
                       onDragStart={
                         dayRouteStopReorderLocked(venue)
                           ? undefined
@@ -3513,6 +3719,10 @@ function DayRoutePanelInner() {
                           : () => onPlanStopDrop(venue.id)
                       }
                       onDragEnd={onPlanStopDragEnd}
+                      onGripKeyDown={(event) => onPlanGripKeyDown(event, venue.id)}
+                      onGripBlur={() => {
+                        if (grabbedKey === venue.id) setGrabbedKey(null);
+                      }}
                       onMoveUp={() => setRoute(moveDayRoutePlanVenue(venue.id, -1))}
                       onMoveDown={() => setRoute(moveDayRoutePlanVenue(venue.id, 1))}
                       onRemove={() => setRoute(removeFromDayRoute(venue.id))}
@@ -3794,6 +4004,40 @@ function DayRoutePanelInner() {
               embedded
             />
           </div>
+          {savedScenarios.length ? (
+            <div className="mt-4 border-t border-slate-100 pt-3" data-day-saved-scenarios>
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                Мои сценарии
+              </p>
+              <ul className="mt-2 space-y-1.5">
+                {savedScenarios.slice(0, 8).map((scenario) => (
+                  <li
+                    key={scenario.id}
+                    className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-2"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => loadScenario(scenario)}
+                      className="min-w-0 flex-1 truncate text-left text-sm font-semibold text-slate-800 hover:text-primary-700"
+                    >
+                      {scenario.name}
+                    </button>
+                    <button
+                      type="button"
+                      aria-label={`Удалить сценарий ${scenario.name}`}
+                      onClick={() => {
+                        removeDayRouteScenario(scenario.id);
+                        refreshScenarios();
+                      }}
+                      className="grid h-7 w-7 place-items-center rounded-full text-slate-400 hover:bg-white hover:text-slate-700"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
         </section>
       ) : null}
 
@@ -3837,10 +4081,10 @@ function DayRoutePanelInner() {
           {mustSeeResolved.length > 0 ? (
             <div
               id="day-must-see-list"
-              className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 sm:items-start"
+              className="mt-3 flex flex-col gap-2.5"
               data-day-must-see-list
               data-day-must-see-expanded="1"
-              data-day-must-see-layout="horizontal"
+              data-day-must-see-layout="horizontal-row"
             >
               {mustSeeFiltered.map(({ place, item, hook }) => {
                 const inRoute =
@@ -3865,19 +4109,19 @@ function DayRoutePanelInner() {
                             : hook || 'Добавить в день'
                     }
                     onClick={() => addMustSeeItem(item)}
-                    className={`flex min-h-[84px] w-full min-w-0 items-center gap-3 self-start rounded-xl border p-3 text-left transition disabled:cursor-not-allowed ${
+                    className={`flex w-full min-w-0 flex-row items-stretch gap-3 rounded-xl border p-2.5 text-left transition disabled:cursor-not-allowed sm:gap-3.5 sm:p-3 ${
                       inRoute
                         ? 'border-emerald-400 bg-emerald-50 text-emerald-900'
                         : 'border-slate-200 bg-white text-slate-800 hover:border-primary-300 hover:bg-slate-50'
                     }`}
                   >
-                    <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-slate-100">
+                    <div className="relative h-[4.5rem] w-[4.5rem] shrink-0 overflow-hidden rounded-lg bg-slate-100 sm:h-24 sm:w-28">
                       {thumb ? (
                         <SafeImage
                           src={thumb}
                           alt=""
                           fill
-                          sizes="3.5rem"
+                          sizes="7rem"
                           className="object-cover"
                         />
                       ) : (
@@ -3886,12 +4130,12 @@ function DayRoutePanelInner() {
                         </div>
                       )}
                     </div>
-                    <span className="min-w-0 flex-1">
-                      <span className="block line-clamp-2 text-sm font-semibold leading-snug">
+                    <span className="flex min-w-0 flex-1 flex-col justify-center py-0.5">
+                      <span className="block line-clamp-2 text-sm font-semibold leading-snug sm:text-[0.95rem]">
                         {place.name}
                       </span>
                       {hook ? (
-                        <span className="mt-0.5 block line-clamp-2 text-xs leading-snug text-slate-500">
+                        <span className="mt-1 block line-clamp-2 text-xs leading-snug text-slate-500 sm:line-clamp-3">
                           {hook}
                         </span>
                       ) : null}
@@ -4993,6 +5237,8 @@ function DayRouteVenueCard({
   variant = 'list',
   group = 'plans',
   softTimeLabel = null,
+  typeTag = null,
+  fallbackImageUrl = null,
   hasCoords,
   mapsUrl = null,
   segmentToNext,
@@ -5000,10 +5246,13 @@ function DayRouteVenueCard({
   travelMode,
   focused = false,
   dragging = false,
+  grabbed = false,
   onDragStart,
   onDragOver,
   onDrop,
   onDragEnd,
+  onGripKeyDown,
+  onGripBlur,
   onMoveUp,
   onMoveDown,
   onRemove,
@@ -5022,6 +5271,10 @@ function DayRouteVenueCard({
   variant?: 'list' | 'grid';
   group?: 'purchased' | 'plans' | 'overflow';
   softTimeLabel?: string | null;
+  /** Lovable-style type label (catalog / must-see / contextual). */
+  typeTag?: string | null;
+  /** City cover when venue has no hero image - avoids empty pin tile. */
+  fallbackImageUrl?: string | null;
   hasCoords: boolean;
   mapsUrl?: string | null;
   segmentToNext: number | null;
@@ -5030,10 +5283,13 @@ function DayRouteVenueCard({
   travelMode: DayRouteTravelMode;
   focused?: boolean;
   dragging?: boolean;
+  grabbed?: boolean;
   onDragStart?: () => void;
   onDragOver?: (event: DragEvent) => void;
   onDrop?: () => void;
   onDragEnd?: () => void;
+  onGripKeyDown?: (event: React.KeyboardEvent<HTMLButtonElement>) => void;
+  onGripBlur?: () => void;
   onMoveUp: () => void;
   onMoveDown: () => void;
   onRemove: () => void;
@@ -5048,6 +5304,7 @@ function DayRouteVenueCard({
   // Ticket QR / «отметить купленным» живут в блоке «Билеты в поездке», не в строке места.
   void onToggleBought;
   void onShowTicket;
+  void showStatusChip;
   const textStop = isTextDayRouteStop(venue);
   const noteStop = isNoteDayRouteStop(venue);
   const purchased = group === 'purchased' || Boolean(venue.ticketBought);
@@ -5062,9 +5319,10 @@ function DayRouteVenueCard({
       : null);
   const ticketUrl = resolveDayRouteTicketUrl(venue);
   const bought = Boolean(venue.ticketBought);
-  const thumbUrl = resolveDayRouteStopImage(venue);
+  const thumbUrl = resolveDayRouteStopImage(venue) || fallbackImageUrl || null;
   const chip = classifyDayRouteCommercialChip(venue);
   const showStatusChip = chip.kind !== 'free';
+  const priceChipLabel = dayRouteStopPriceChipLabel(venue);
   const buyCtaLabel = formatDayRouteBuyCtaLabel(venue);
   const buyOfferChip = formatDayRouteOfferChip({
     title: venue.title,
@@ -5116,19 +5374,13 @@ function DayRouteVenueCard({
   ) : (
     <span className={titleClass}>{venue.title}</span>
   );
-  const suburbBadge = venue.isSuburb ? (
-    <span
-      className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] font-medium leading-none text-slate-600"
-      data-day-stop-suburb
-    >
-      Пригород
-    </span>
-  ) : null;
+  const resolvedTypeTag = String(typeTag || '').trim() || null;
   const softTimeNode = softTimeLabel ? (
     <p className="m-0 text-[12px] font-semibold text-primary-700" data-day-soft-time>
       {softTimeLabel}
     </p>
   ) : null;
+  const dwellSoftLabel = dayRouteStopDwellChipLabel(venue, resolvedTypeTag);
 
   /**
    * Offer chips: always after the place/actions cluster (no ml-auto / justify-end gap).
@@ -5268,6 +5520,11 @@ function DayRouteVenueCard({
   if (variant === 'list') {
     const pinNumber = displayNumber ?? index + 1;
     const canDrag = Boolean(onDragStart) && !reorderLocked;
+    /** Lovable: type tag above title (uppercase tracking), no stacked chevrons, no empty pin tile. */
+    const typeLabel =
+      resolvedTypeTag ||
+      (purchased ? 'Оплачено' : null) ||
+      (textStop ? 'Своё место' : null);
     return (
       <li
         className={`relative w-full scroll-mt-4 list-none ${dragging ? 'opacity-40' : ''}`}
@@ -5279,6 +5536,7 @@ function DayRouteVenueCard({
         data-commercial-chip={chip.kind}
         data-day-session={sessionDisplay || undefined}
         data-day-stop-focused={focused ? '1' : undefined}
+        data-day-stop-grabbed={grabbed ? '1' : undefined}
         onMouseEnter={hoverEnter}
         onMouseLeave={hoverLeave}
         onFocusCapture={hoverEnter}
@@ -5288,14 +5546,19 @@ function DayRouteVenueCard({
         onDragEnd={canDrag ? onDragEnd : undefined}
       >
         <article
-          className={`group relative grid grid-cols-[auto_minmax(0,1fr)] gap-2.5 rounded-2xl border bg-white p-2.5 transition-[background-color,border-color] duration-150 sm:gap-3 sm:p-3 ${
+          className={`group grid grid-cols-[auto_minmax(0,1fr)] items-start gap-3 rounded-2xl border p-3 transition-colors sm:gap-4 sm:p-4 ${
             focused
-              ? 'border-primary-300 bg-primary-50/35'
-              : 'border-slate-200/70 hover:border-slate-300 hover:bg-slate-50/90'
+              ? 'border-primary-300 bg-primary-50/40 shadow-sm'
+              : grabbed
+                ? 'border-primary-400 bg-primary-50/30'
+                : 'border-transparent bg-transparent hover:bg-slate-50/90'
           } ${purchased ? 'border-l-[3px] border-l-primary-600' : ''}`}
           data-day-stop-shell
         >
-          <div className="flex shrink-0 flex-col items-center gap-1.5 pt-0.5" data-day-stop-index-cluster>
+          <div
+            className="flex shrink-0 flex-col items-center gap-2"
+            data-day-stop-index-cluster
+          >
             <DayRouteListPin n={pinNumber} />
             {reorderLocked ? (
               <span
@@ -5307,78 +5570,67 @@ function DayRouteVenueCard({
                 <Ticket className="h-3.5 w-3.5" />
               </span>
             ) : (
-              <div className="flex flex-col items-center gap-0.5">
-                <button
-                  type="button"
-                  draggable={canDrag}
-                  aria-label={`Переместить «${venue.title}», позиция ${index + 1} из ${total}`}
-                  title="Перетащите или стрелки выше / ниже"
-                  data-day-stop-grip
-                  onDragStart={
-                    canDrag
-                      ? (event) => {
-                          event.stopPropagation();
-                          onDragStart?.();
-                        }
-                      : undefined
-                  }
-                  onDragEnd={canDrag ? onDragEnd : undefined}
-                  className={`grid h-8 w-8 cursor-grab place-items-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 active:cursor-grabbing ${
-                    canDrag ? '' : 'opacity-40'
-                  }`}
-                >
-                  <GripVertical className="h-4 w-4" />
-                </button>
-                <div className="hidden flex-col sm:flex" data-day-stop-sort>
-                  <button
-                    type="button"
-                    aria-label="Выше"
-                    disabled={index === 0}
-                    onClick={onMoveUp}
-                    className="rounded p-0 text-slate-300 hover:text-slate-600 disabled:opacity-30"
-                    data-day-stop-sort="up"
-                  >
-                    <ChevronUp className="h-3.5 w-3.5" />
-                  </button>
-                  <button
-                    type="button"
-                    aria-label="Ниже"
-                    disabled={index >= total - 1}
-                    onClick={onMoveDown}
-                    className="rounded p-0 text-slate-300 hover:text-slate-600 disabled:opacity-30"
-                    data-day-stop-sort="down"
-                  >
-                    <ChevronDown className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-              </div>
+              <button
+                type="button"
+                draggable={canDrag}
+                aria-label={`Переместить «${venue.title}», позиция ${index + 1} из ${total}`}
+                aria-describedby="dnd-hint"
+                aria-pressed={grabbed}
+                title="Перетащите или используйте стрелки вверх / вниз"
+                data-day-stop-grip
+                onKeyDown={onGripKeyDown}
+                onBlur={onGripBlur}
+                onDragStart={
+                  canDrag
+                    ? (event) => {
+                        event.stopPropagation();
+                        onDragStart?.();
+                      }
+                    : undefined
+                }
+                onDragEnd={canDrag ? onDragEnd : undefined}
+                className={`grid h-9 w-9 cursor-grab place-items-center rounded-md border transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 active:cursor-grabbing ${
+                  grabbed
+                    ? 'border-primary-500 bg-primary-50 text-primary-700'
+                    : 'border-slate-200 text-slate-400'
+                } ${canDrag ? '' : 'opacity-40'}`}
+              >
+                <GripVertical className="h-4 w-4" aria-hidden />
+              </button>
             )}
           </div>
 
-          <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] gap-2 sm:gap-3">
+          <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-3 sm:gap-4">
             <div className="min-w-0" data-day-stop-content>
-              <div className="flex flex-wrap items-center gap-1.5">
+              <div className="flex flex-wrap items-center gap-2">
+                {typeLabel ? (
+                  <span
+                    className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-primary-700"
+                    data-day-stop-type-tag
+                  >
+                    {typeLabel}
+                  </span>
+                ) : null}
                 {softTimeLabel ? (
                   <span
-                    className="rounded-full bg-sky-50 px-2 py-0.5 text-[11px] font-bold text-sky-800"
+                    className="rounded-full bg-sky-50 px-2.5 py-0.5 text-xs font-bold text-sky-800"
                     data-day-soft-time
                   >
                     {softTimeLabel}
                   </span>
                 ) : null}
-                {purchased ? (
+                {purchased && typeLabel !== 'Оплачено' ? (
                   <span className="text-[11px] font-bold uppercase tracking-wide text-primary-700">
                     Оплачено
                   </span>
                 ) : null}
-                {suburbBadge}
               </div>
-              <h2 className="mt-0.5 line-clamp-2 text-base font-extrabold leading-snug tracking-tight text-slate-900 sm:text-[1.05rem]">
+              <h2 className="mt-1 line-clamp-2 font-display text-base font-bold leading-snug tracking-tight text-slate-900 sm:text-lg">
                 {titleNode}
               </h2>
               {placeLine || !hasCoords ? (
                 <p
-                  className={`mt-0.5 line-clamp-2 text-xs leading-snug sm:text-sm ${
+                  className={`mt-1 truncate text-sm ${
                     !hasCoords ? 'text-amber-700' : 'text-slate-500'
                   }`}
                 >
@@ -5386,17 +5638,16 @@ function DayRouteVenueCard({
                   {placeLine && !hasCoords ? ' · Нет координат' : ''}
                 </p>
               ) : null}
-              <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+              <div className="mt-2 flex flex-wrap items-center gap-2">
                 {sessionDisplay ? (
-                  <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-700">
+                  <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
                     {sessionDisplay}
                   </span>
                 ) : null}
-                {showStatusChip ? (
-                  <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-700">
-                    {chip.label}
-                  </span>
-                ) : null}
+                <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
+                  {priceChipLabel}
+                </span>
+                <span className="text-xs text-slate-500">{dwellSoftLabel}</span>
                 {venue.note && !textStop ? (
                   <span className="line-clamp-1 text-xs text-slate-500">{venue.note}</span>
                 ) : null}
@@ -5440,21 +5691,24 @@ function DayRouteVenueCard({
               ) : null}
             </div>
 
-            <div className="relative shrink-0" data-day-stop-media>
+            <div
+              className="flex shrink-0 flex-col items-end gap-2"
+              data-day-stop-media
+            >
               <div
-                className="relative h-16 w-16 overflow-hidden rounded-xl bg-slate-100 sm:h-[4.75rem] sm:w-[5.5rem]"
+                className="relative h-20 w-20 overflow-hidden rounded-xl bg-slate-100 sm:h-24 sm:w-28"
                 data-day-stop-thumb
               >
                 {thumbUrl ? (
-                  <SafeImage src={thumbUrl} alt="" fill sizes="6rem" className="object-cover" />
+                  <SafeImage src={thumbUrl} alt="" fill sizes="7rem" className="object-cover" />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-200 via-slate-100 to-sky-100 text-slate-400">
-                    <MapPin className="h-5 w-5" />
+                    <MapPin className="h-5 w-5" aria-hidden />
                   </div>
                 )}
               </div>
               <div
-                className="absolute -right-1 -top-1 flex items-center gap-0.5 opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100 max-lg:opacity-100"
+                className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 max-lg:opacity-100"
                 data-day-stop-actions
               >
                 {mapsUrl ? (
@@ -5465,16 +5719,16 @@ function DayRouteVenueCard({
                     aria-label="Открыть в Яндекс.Картах"
                     title="Открыть в Яндекс.Картах"
                     data-day-stop-maps
-                    className="grid h-7 w-7 place-items-center rounded-full border border-slate-200 bg-white text-sky-600 shadow-sm hover:bg-sky-50"
+                    className="grid h-7 w-7 place-items-center rounded-full border border-slate-200 bg-white text-sky-600 hover:bg-sky-50"
                   >
                     <Navigation className="h-3.5 w-3.5" />
                   </a>
                 ) : null}
                 <button
                   type="button"
-                  aria-label="Удалить точку"
+                  aria-label="Убрать из маршрута"
                   onClick={onRemove}
-                  className="grid h-7 w-7 place-items-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm hover:bg-rose-50 hover:text-rose-700"
+                  className="grid h-7 w-7 place-items-center rounded-full border border-slate-200 text-slate-500 hover:bg-slate-100"
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
@@ -5590,7 +5844,14 @@ function DayRouteVenueCard({
             ) : null}
             <p className="line-clamp-2 text-sm font-semibold leading-snug text-slate-900">
               {titleNode}
-              {suburbBadge}
+              {resolvedTypeTag === 'Пригород' ? (
+                <span
+                  className="ml-1.5 inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-1.5 py-0.5 align-middle text-[10px] font-medium leading-none text-slate-600"
+                  data-day-stop-suburb
+                >
+                  Пригород
+                </span>
+              ) : null}
             </p>
             {placeLine || !hasCoords ? (
               <p
