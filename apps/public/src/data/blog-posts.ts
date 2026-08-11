@@ -289,12 +289,12 @@ export const BLOG_POSTS: BlogPost[] = [
   },
   {
     slug: 'sankt-peterburg-3-dnya-samostoyatelno',
-    title: 'Что посмотреть в Санкт-Петербурге за 3 дня самостоятельно: маршрут без перегруза',
+    title:
+      'Санкт-Петербург за 3 дня: идеальный план сити-брейка без стертых ног и каши в голове',
     excerpt:
-      
-      'Три дня в Петербурге без попытки увидеть всё сразу: парадный центр, крепость и Петроградская сторона, острова, музеи и вода.',
+      'Три дня в Питере по характерам города: парадный центр без фанатизма, крепость и Петроградка, гибкий третий день и развод мостов без подвига.',
     date: '24 июля 2026',
-    readMin: 11,
+    readMin: 10,
     tag: 'Город',
     city: 'Санкт-Петербург',
     citySlug: 'saint-petersburg',
@@ -302,7 +302,7 @@ export const BLOG_POSTS: BlogPost[] = [
     authorName: 'Редакция',
     articleType: 'gid',
     imageUrl: blogCoverUrl('sankt-peterburg-3-dnya-samostoyatelno'),
-    imageAlt: 'Маршрут прогулки по центру Санкт-Петербурга',
+    imageAlt: 'Дворцовая площадь и парадный центр Санкт-Петербурга',
   },
   {
     slug: 'rechnye-progulki-neva-kanaly-kak-vybrat',
