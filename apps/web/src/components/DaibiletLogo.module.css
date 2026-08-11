@@ -74,3 +74,15 @@
   vector-effect: non-scaling-stroke;
   opacity: 1;
 }
+
+/*
+ * Mobile (< md / 768px): clean wordmark + й-кратка only.
+ * Hide dashed arcs, mid pebble, and destination X. Desktop unchanged.
+ */
+@media (max-width: 767.98px) {
+  .route,
+  .point,
+  .point3 {
+    display: none;
+  }
+}

@@ -44,6 +44,7 @@ type DaibiletLogoProps = {
  * Brand mark: HTML «Даибилет» + SVG route overlay.
  * Black bold wordmark; blue solid first-dash over «й» → dashed blue arc → mid
  * circle → dashed → blue X. Aria / sr-only: «Дайбилет».
+ * Below md (768px): route/pebbles/X hidden via CSS; breve stays as letterform.
  */
 export function DaibiletLogo({
   className = '',
