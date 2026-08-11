@@ -203,23 +203,24 @@ export function DayTripCanonCard({
         data-day-trip-has-cover={cover ? '1' : '0'}
         {...dataProps}
       >
+        {/* Header: cover + title only. Sights/CTA below use full card width. */}
         <div
           className={
             cover
-              ? 'flex flex-col sm:grid sm:grid-cols-[minmax(11rem,36%)_minmax(0,1fr)] sm:items-stretch'
+              ? 'flex flex-col sm:grid sm:grid-cols-[minmax(9rem,32%)_minmax(0,1fr)] sm:items-start'
               : undefined
           }
         >
           {cover ? (
             <div
-              className="relative h-36 w-full shrink-0 bg-[#F5F5F7] sm:h-auto sm:min-h-[10.5rem] sm:max-h-[14rem]"
+              className="relative h-36 w-full shrink-0 bg-[#F5F5F7] sm:h-full sm:min-h-[7.5rem] sm:max-h-[11rem]"
               data-day-trip-cover
             >
               <SafeImage
                 src={cover}
                 alt=""
                 fill
-                sizes="(max-width: 640px) 100vw, 280px"
+                sizes="(max-width: 640px) 100vw, 240px"
                 className="object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/35 via-transparent to-transparent sm:bg-gradient-to-r sm:from-transparent sm:via-transparent sm:to-slate-950/10" />
@@ -269,42 +270,48 @@ export function DayTripCanonCard({
                 </p>
               ) : null}
             </header>
-
-            {nested.length ? (
-              <section className="mt-4" data-day-trip-sights>
-                <h4 className={`text-sm font-semibold ${inkClass}`}>Что посмотреть</h4>
-                <ul className="mt-2 list-none space-y-1.5 p-0" data-day-trip-places>
-                  {nested.map((poi, poiIndex) => (
-                    <li
-                      key={`${poi.name}:${poiIndex}`}
-                      className="flex items-start gap-2 text-sm leading-snug"
-                      data-day-trip-place
-                    >
-                      <span
-                        className={`mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary-500 ${numClass}`}
-                        aria-hidden
-                      />
-                      <span className={`min-w-0 ${poiTextClass}`}>
-                        <SightLabel
-                          name={poi.name}
-                          href={poi.href}
-                          desc={poi.desc}
-                          descFromMd={sightDescFromMd}
-                        />
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            ) : null}
-
-            {cta ? (
-              <div className="mt-5" data-day-trip-cta>
-                {cta}
-              </div>
-            ) : null}
           </div>
         </div>
+
+        {nested.length ? (
+          <section
+            className={`border-t px-4 py-4 sm:px-5 sm:py-5 ${borderSoft}`}
+            data-day-trip-sights
+          >
+            <h4 className={`text-sm font-semibold ${inkClass}`}>Что посмотреть</h4>
+            <ul className="mt-2 list-none space-y-1.5 p-0" data-day-trip-places>
+              {nested.map((poi, poiIndex) => (
+                <li
+                  key={`${poi.name}:${poiIndex}`}
+                  className="flex items-start gap-2 text-sm leading-snug"
+                  data-day-trip-place
+                >
+                  <span
+                    className={`mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary-500 ${numClass}`}
+                    aria-hidden
+                  />
+                  <span className={`min-w-0 ${poiTextClass}`}>
+                    <SightLabel
+                      name={poi.name}
+                      href={poi.href}
+                      desc={poi.desc}
+                      descFromMd={sightDescFromMd}
+                    />
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
+        {cta ? (
+          <div
+            className={`border-t px-4 py-4 sm:px-5 sm:py-4 ${borderSoft}`}
+            data-day-trip-cta
+          >
+            {cta}
+          </div>
+        ) : null}
       </article>
     );
   }
