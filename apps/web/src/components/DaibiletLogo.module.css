@@ -1,48 +1,33 @@
 .logo {
-  --blue: #4267e9;
-  --dark: #101729;
+  --blue: #3b66f5;
+  --dark: #0b0f19;
 
   position: relative;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   line-height: 1;
   color: var(--dark);
   text-decoration: none;
   overflow: visible;
 }
 
-.logoText {
-  font-family: var(--font-display);
-  font-weight: 700;
-  /* ~-2.5px at 58px mock; scales with header text-* size */
-  letter-spacing: -0.043em;
-  line-height: 1;
-  color: var(--dark);
-}
-
-/* Anchor for the blue й-кратка over «и». */
-.logoI {
-  position: relative;
-}
-
-/*
- * Single bold blue dot as й-diacritic. Em-sized so it stays readable
- * at header font sizes. No routes / other points / animation.
- *
- * Vertical: Manrope 700 «и» stem top ≈ 0.525em below .logoI top;
- * native й gap stem→breve ≈ 0.06em → top 0.46em + translateY -100%
- * keeps the bold dot tight above и (was top:0 / -108%, gap ~0.54em).
- */
-.breveMark {
-  position: absolute;
-  left: 50%;
-  top: 0.46em;
-  width: 0.26em;
-  height: 0.26em;
+/* Height follows text-* on the root (em); width from viewBox aspect. */
+.logoSvg {
+  display: block;
+  height: 1.15em;
+  width: auto;
   overflow: visible;
   pointer-events: none;
-  transform: translate(-50%, -100%);
 }
 
-.dot {
+.logoSvgText {
+  font-family: var(--font-display), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+    Arial, sans-serif;
+  font-weight: 700;
+  fill: var(--dark);
+  letter-spacing: -1px;
+}
+
+.logoDot {
   fill: var(--blue);
 }

@@ -1,10 +1,11 @@
 import styles from './DaibiletLogo.module.css';
 
-export const DAIBILET_LOGO_BLUE = '#4267e9';
-export const DAIBILET_LOGO_DARK = '#101729';
+export const DAIBILET_LOGO_BLUE = '#3B66F5';
+export const DAIBILET_LOGO_DARK = '#0B0F19';
 
 type DaibiletLogoProps = {
   className?: string;
+  /** Sets em-based SVG height via Tailwind text-* on the root. */
   textClassName?: string;
   showText?: boolean;
   /** @deprecated Logo is always static. Kept for call-site compat. */
@@ -12,8 +13,8 @@ type DaibiletLogoProps = {
 };
 
 /**
- * Brand wordmark «Дайбилет»: «и» + bold blue dot as й-кратка.
- * No dashed routes, mid/end points, or animation. Link / aria-label on parent.
+ * Retina-sharp SVG wordmark «Дайбилет».
+ * Visual text is «Даибилет»; blue circle is the й-кратка (no routes / animation).
  */
 export function DaibiletLogo({
   className = '',
@@ -22,24 +23,26 @@ export function DaibiletLogo({
 }: DaibiletLogoProps) {
   if (!showText) return null;
 
-  const rootClass = [styles.logo, className].filter(Boolean).join(' ');
+  const rootClass = [styles.logo, textClassName, className].filter(Boolean).join(' ');
 
   return (
     <span className={rootClass}>
       <span className="sr-only">Дайбилет</span>
-      <span
-        className={`${styles.logoText} font-display ${textClassName || 'text-xl sm:text-2xl'}`}
+      <svg
+        className={styles.logoSvg}
+        viewBox="0 0 450 150"
+        width="100%"
+        height="100%"
         aria-hidden="true"
+        focusable="false"
       >
-        Да
-        <span className={styles.logoI}>
-          и
-          <svg className={styles.breveMark} viewBox="0 0 12 12" aria-hidden="true">
-            <circle className={styles.dot} cx="6" cy="6" r="5" />
-          </svg>
-        </span>
-        билет
-      </span>
+        <g transform="translate(20, 20)">
+          <circle className={styles.logoDot} cx="112" cy="36" r="11" />
+          <text className={styles.logoSvgText} x="0" y="100" fontSize="76">
+            Даибилет
+          </text>
+        </g>
+      </svg>
     </span>
   );
 }
