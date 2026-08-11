@@ -14,7 +14,7 @@
 | SEO.PODBORKI-CITY-0 | Phase 0: inventory + риски | Высокий | ✅ docs |
 | SEO.PODBORKI-CITY-META | Пилот Title/Desc/H1 + self-canonical `?city=` (active: kgd/spb; msk leftover) | Высокий | ✅ code live; smoke OK |
 | SEO.PODBORKI-STABLE | Stable index/sitemap пилот × (C MULTI + E) + salute D year-round index | Критический | ✅ `028e24b1` Deploy MSK web `31535631523` |
-| SEO.PODBORKI-OVERRIDE | SeoOverride + templates + Stage-1 HTML (5 пар) + intent meta; self-canonical smoke | Критический | 🔄 |
+| SEO.PODBORKI-OVERRIDE | SeoOverride + templates + Stage-1 HTML (5 пар) + intent meta; self-canonical smoke | Критический | ✅ `f8217d70` migrate+upsert MSK; fallback deploy-prod-next; smoke PASS |
 | SEO.PODBORKI-CITY-1 | Phase 1: маркер `/podborki/c/{city}` + 301 | Высокий | ⏳ следующий спринт после индексации пилота |
 | SEO.PODBORKI-CITY-3 | Phase 3: card SEO blurbs + «N • от X» | Средний | ⏳ |
 | SEO.PODBORKI-CITY-4 | Phase 4: blog banners → подборка → события | Средний | ⏳ after marker URL lock |
