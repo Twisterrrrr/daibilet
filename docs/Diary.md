@@ -1,3 +1,17 @@
+## 2026-08-11 - Колонка Артура: гастроспектакль «Вий» (Челябинск)
+
+### Наблюдения
+- Owner текст ужин-спектакля «Вий» в Horse Head; Макс только что материал недели → автор Артур («На вкус»).
+- Live event 200, priceFrom=5500, venue ул. Труда, 91.
+
+### Решения
+- MD `chelyabinsk-vii-gastro-spektakl` (column, PUBLISHED now); cover+2 inline+og; blog-posts web+public; sync-bodies.
+- Commit+push; MSK upsert + sync-public-assets + revalidate; Deploy MSK web.
+
+### Проблемы
+- Нет.
+
+---
 ## 2026-08-11 - Колонка Макса: «Как перестать гулять по кругу» (материал недели)
 
 ### Наблюдения

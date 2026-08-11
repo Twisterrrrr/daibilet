@@ -22,6 +22,22 @@ export type BlogPost = {
 export const BLOG_POSTS: BlogPost[] = [
   // SPB Top-100 / Beyond-Top-100 скрыты с публичного сайта (правятся в админке как DRAFT).
   {
+    slug: 'chelyabinsk-vii-gastro-spektakl',
+    title: 'Гастрономический хоррор на Урале: почему весь Челябинск обсуждает ужин-спектакль «Вий»',
+    excerpt:
+      'Гастроспектакль «Вий» в пабе Horse Head: иммерсивный хоррор, 5 курсов и 5 500 ₽ - почему Челябинск обсуждает этот ужин.',
+    date: '11 авг 2026',
+    readMin: 6,
+    tag: 'От автора',
+    city: 'Челябинск',
+    citySlug: 'chelyabinsk',
+    authorId: 'artur',
+    authorName: 'Артур',
+    articleType: 'column',
+    imageUrl: blogCoverUrl('chelyabinsk-vii-gastro-spektakl'),
+    imageAlt: 'Вечерний гастроужин при свечах: тарелка и полумрак паба в Челябинске',
+  },
+  {
     slug: 'kak-perestat-gulyat-po-krugu-moskva',
     title: 'Как перестать гулять по кругу: 5 нестандартных сценариев для москвичей, которые видели всё',
     excerpt:
