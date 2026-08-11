@@ -155,6 +155,15 @@ html[data-nav-pending='1'] {
     font-family: var(--font-display);
   }
 
+  /* /my-day: Lovable parity - Manrope for UI + titles (not Inter body). */
+  [data-day-list-root],
+  [data-my-day-shell],
+  [data-my-day-picker-sheet],
+  [data-my-day-picker-launch] {
+    font-family: var(--font-display);
+    -webkit-font-smoothing: antialiased;
+  }
+
   .font-serif {
     font-family: var(--font-serif);
   }

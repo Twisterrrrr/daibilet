@@ -2914,7 +2914,7 @@ function DayRoutePanelInner() {
       <div ref={listRootRef} className="min-w-0" data-day-list-root>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
-          <h1 className="font-display text-[1.65rem] font-bold leading-tight text-slate-900 sm:text-3xl">
+          <h1 className="font-display text-[1.65rem] font-extrabold tracking-tight leading-tight text-slate-900 sm:text-3xl">
             {scopeCityName ? `Мой день ${inCityPrepositional(scopeCityName)}` : 'Мой день'}
           </h1>
           <p
@@ -4950,7 +4950,7 @@ function DayRouteVenueCard({
     onHoverClear?.();
   };
 
-  const titleClass = 'font-semibold leading-snug text-slate-900';
+  const titleClass = 'font-display font-extrabold leading-snug tracking-tight text-slate-900';
   const titleNode = href ? (
     <Link href={href} className={`${titleClass} hover:text-primary-700`}>
       {venue.title}
