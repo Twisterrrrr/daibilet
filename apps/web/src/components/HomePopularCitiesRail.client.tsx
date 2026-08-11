@@ -1,7 +1,16 @@
 'use client';
 
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+  type MouseEvent as ReactMouseEvent,
+} from 'react';
 
 import { CityCard } from '@/components/CityCard';
 import {
@@ -16,8 +25,17 @@ const ARROW_CARD_STEP = 3;
 /** Keep scrollLeft inside this band of one set width (seamless wrap via 3 copies). */
 const LOOP_BAND_LO = 0.5;
 const LOOP_BAND_HI = 1.5;
+/** Finger travel above this cancels city-hub navigation (swipe, not tap). */
+const TAP_MOVE_PX = 12;
 const HIDE_SCROLLBAR_CLASS =
   '![scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:!hidden';
+
+type RailPointerGesture = {
+  id: number;
+  x: number;
+  y: number;
+  moved: boolean;
+};
 
 type HomePopularCitiesRailProps = {
   cities: PublicDestinationDto[];
@@ -91,9 +109,17 @@ function wrapScrollIntoLoopBand(el: HTMLElement, setWidth: number, loopingRef: {
  * (SPB immediately after); secondary cities may slight-peek left of the gutter.
  */
 export function HomePopularCitiesRail({ cities, className = '' }: HomePopularCitiesRailProps) {
+  const router = useRouter();
   const scrollerRef = useRef<HTMLDivElement>(null);
   const loopingRef = useRef(false);
   const programScrollRef = useRef(false);
+  /** True while a finger/pen is down - skip loop wrap so scroll jumps do not cancel the tap. */
+  const interactingRef = useRef(false);
+  const gestureRef = useRef<RailPointerGesture | null>(null);
+  /** Survives pointerup until click so a swipe does not activate the city Link. */
+  const swipeConsumedClickRef = useRef(false);
+  /** After touch tap we router.push ourselves; suppress the trailing click to avoid double nav. */
+  const suppressClickRef = useRef(false);
   const lastWidthRef = useRef(0);
   const scrollEndTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [ready, setReady] = useState(false);
@@ -161,7 +187,8 @@ export function HomePopularCitiesRail({ cities, className = '' }: HomePopularCit
     jumpToFocus();
 
     const onScroll = () => {
-      if (loopingRef.current || programScrollRef.current) return;
+      // Mid-gesture wrap jumps scrollLeft under the finger and iOS/Android cancel the click.
+      if (loopingRef.current || programScrollRef.current || interactingRef.current) return;
       normalizeLoop();
     };
 
@@ -261,6 +288,86 @@ export function HomePopularCitiesRail({ cities, className = '' }: HomePopularCit
     });
   };
 
+  const endGesture = useCallback(
+    (opts?: { normalize?: boolean }) => {
+      interactingRef.current = false;
+      gestureRef.current = null;
+      if (opts?.normalize === false) return;
+      // Wrap only after the finger lifts so a tap can still produce navigation.
+      requestAnimationFrame(() => {
+        if (!interactingRef.current) normalizeLoop();
+      });
+    },
+    [normalizeLoop],
+  );
+
+  const onRailPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (event.pointerType === 'mouse' && event.button !== 0) return;
+    interactingRef.current = true;
+    swipeConsumedClickRef.current = false;
+    gestureRef.current = {
+      id: event.pointerId,
+      x: event.clientX,
+      y: event.clientY,
+      moved: false,
+    };
+  };
+
+  const onRailPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const gesture = gestureRef.current;
+    if (!gesture || gesture.id !== event.pointerId || gesture.moved) return;
+    const dx = event.clientX - gesture.x;
+    const dy = event.clientY - gesture.y;
+    if (dx * dx + dy * dy > TAP_MOVE_PX * TAP_MOVE_PX) {
+      gesture.moved = true;
+      swipeConsumedClickRef.current = true;
+    }
+  };
+
+  const onRailPointerUp = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const gesture = gestureRef.current;
+    if (!gesture || gesture.id !== event.pointerId) {
+      endGesture();
+      return;
+    }
+
+    const moved = gesture.moved;
+    const isTouchLike = event.pointerType === 'touch' || event.pointerType === 'pen';
+    endGesture();
+
+    // Desktop mouse keeps native <Link> click. Touch/pen often loses click inside
+    // overflow-x + snap rails (micro-scroll or deferred loop wrap); push hub explicitly.
+    if (moved || !isTouchLike) return;
+
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    // Nested hub-tag chips below the photo use their own href - leave them alone.
+    if (target.closest('ul[aria-label^="Популярные направления"]')) return;
+
+    const item = target.closest<HTMLElement>('[data-rail-item]');
+    if (!item || !scrollerRef.current?.contains(item)) return;
+    const anchor = item.querySelector<HTMLAnchorElement>('a[href^="/cities/"]');
+    const href = anchor?.getAttribute('href');
+    if (!href) return;
+
+    suppressClickRef.current = true;
+    router.push(href);
+  };
+
+  const onRailClickCapture = (event: ReactMouseEvent<HTMLDivElement>) => {
+    if (suppressClickRef.current) {
+      suppressClickRef.current = false;
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+    if (swipeConsumedClickRef.current) {
+      swipeConsumedClickRef.current = false;
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  };
+
   if (!cities.length) return null;
 
   const arrowBase =
@@ -276,6 +383,11 @@ export function HomePopularCitiesRail({ cities, className = '' }: HomePopularCit
         aria-label="Популярные города"
         role="region"
         tabIndex={0}
+        onPointerDown={onRailPointerDown}
+        onPointerMove={onRailPointerMove}
+        onPointerUp={onRailPointerUp}
+        onPointerCancel={() => endGesture()}
+        onClickCapture={onRailClickCapture}
       >
         {loopItems.map(({ city, key }) => (
           <div

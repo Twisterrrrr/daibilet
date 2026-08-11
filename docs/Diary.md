@@ -1,3 +1,19 @@
+## 2026-08-11 - Home popular cities: mobile tap dead + false «0 событий»
+
+### Наблюдения
+- Owner phone: карточки «Популярные города» (`HomePopularCitiesRail`) не открывают хаб (скрин с Пермью).
+- Live href каноничны (`/cities/perm` 200); API events у городов >0. Не dead link.
+- Deploy `31499687634` (SHA `50435cdc` hang-bound) ещё in_progress; live был `249a9e67`.
+
+### Решения
+- Root cause tap: loop-normalize на `scroll` во время touch прыгал `scrollLeft` / micro-scroll в overflow-x+snap гасил click. Fix: skip wrap while pointer down; touch/pen tap → `router.push(/cities/…)`; swipe >12px глотает click.
+- «0 событий» при живых venues: `CountUp` стартует с 0 и IO в horizontal rail часто не стартует. Compact `CityCard` - сразу `pluralEvents(n)`.
+
+### Проблемы
+- Нужен Deploy MSK web после push + hard refresh на телефоне.
+
+---
+
 ## 2026-08-11 - Region Hub Tier A UX (Подмосковье → шаблон)
 
 ### Наблюдения

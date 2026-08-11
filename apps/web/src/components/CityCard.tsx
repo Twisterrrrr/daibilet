@@ -254,11 +254,17 @@ export function CityCard({
               <span className="flex min-w-0 items-center gap-1.5">
                 <MapPin className="h-3.5 w-3.5 shrink-0 opacity-90" strokeWidth={1.75} />
                 {city.events > 0 ? (
-                  <CountUp
-                    value={city.events}
-                    format={(n) => pluralEvents(n)}
-                    className="truncate font-semibold tabular-nums"
-                  />
+                  compact ? (
+                    // Compact rails (home popular cities): CountUp stays at 0 until IO fires
+                    // inside overflow-x, so cards wrongly read «0 событий» next to venue counts.
+                    <span className="truncate font-semibold tabular-nums">{pluralEvents(city.events)}</span>
+                  ) : (
+                    <CountUp
+                      value={city.events}
+                      format={(n) => pluralEvents(n)}
+                      className="truncate font-semibold tabular-nums"
+                    />
+                  )
                 ) : (
                   <span className="truncate">Скоро появятся события</span>
                 )}
