@@ -4734,16 +4734,6 @@ function DayRouteVenueCard({
     !hideGeoSegment && segmentToNext != null && index < total - 1
       ? formatDayRouteSegmentHint(segmentToNext, travelMode)
       : '';
-  const segmentMinutes =
-    !hideGeoSegment && segmentToNext != null && index < total - 1
-      ? estimateDayRouteTravelMinutes(segmentToNext, travelMode)
-      : 0;
-  const segmentDistanceLabel =
-    !hideGeoSegment && segmentToNext != null && index < total - 1
-      ? formatDayRouteDistance(segmentToNext)
-      : '';
-  const segmentTimeLabel =
-    segmentMinutes > 0 ? `~${formatDayRouteTravelMinutes(segmentMinutes)}` : '';
   const sessionDisplay = formatDayRouteSessionDisplay(venue);
   const segmentLine = segmentHint ? `далее ~ ${segmentHint}` : '';
 
