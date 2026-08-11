@@ -15,7 +15,8 @@ readMin: 8
 imageAlt: "Однодневная экскурсия из Красноярска"
 coverImageUrl: "/images/blog/krasnoyarsk-odin-den-ekskursii.jpg"
 publishedAt: "2026-08-24T11:20:00+03:00"
-status: PUBLISHED
+status: DRAFT
+isIndexable: false
 ---
 
 Один день с экскурсией в Красноярске - это не "увидеть всю Сибирь", а выбрать один понятный формат: город, природа или тематический маршрут. Ошибка в выборе обычно не в плохом гиде, а в несовпадении ожиданий и программы.

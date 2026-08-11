@@ -15,7 +15,8 @@ readMin: 9
 imageAlt: "Центр Новосибирска во время прогулки"
 coverImageUrl: "/images/blog/novosibirsk-vykhodnye-chto-posmotret.jpg"
 publishedAt: "2026-08-18T14:15:00+03:00"
-status: PUBLISHED
+status: DRAFT
+isIndexable: false
 ---
 
 Новосибирск на выходные ломают две вещи: недооценка расстояний и вера, что «ещё один музей» влезет между прогулкой и концертом. Город большой, сезоны суровые, а между точками легко потерять час на дорогу и настроение.
