@@ -12,7 +12,7 @@
 | 1.2 | Disallow `/api/`, `/admin/`, `/account/`, `/login`, `/reviews/write` | ✅ | тот же `robots.ts` (`CRAWL_DISALLOW`) |
 | 1.3 | Payment success disallow | ✅ N/A | checkout во внешнем iframe партнёра; покупки под `/account/` |
 | 1.4 | Dynamic sitemap: landings + city×category | ✅ | `lib/sitemap-data.ts` → `/sitemap.xml` + `/sitemaps/landings.xml` |
-| 1.5 | Sitemap уважает `MIN_LISTING_OFFERS_FOR_INDEX` (=6) / noindex | ✅ | `evaluateListingIndexability` в landings + intents chunks |
+| 1.5 | Sitemap уважает `MIN_LISTING_OFFERS_FOR_INDEX` (=6) / editorial bypass | ✅ | `evaluateListingIndexability` + `hasEditorialSeoText` в landings |
 | 1.6 | Canonical на landings / city×category (UTM-safe) | ✅ | `buildLandingMetadata` → `alternates.canonical` = `landingCategoryHref(...)` |
 | 2.1 | `generateMetadata`: title, description, OG, canonical | ✅ | `server/landing-route-page.tsx` → `buildLandingMetadata` |
 | 2.2 | City genitive / prepositional helpers | ✅ | `city-declension.ts` + `seo-listing-meta` (`cityToPrepositional`) |

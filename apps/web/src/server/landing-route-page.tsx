@@ -16,6 +16,7 @@ import {
 import { resolveLandingCardImage } from '@/lib/landing-images';
 import { landingCategoryHref, resolveLandingRouteFromLocation } from '@/lib/landing-routes';
 import { resolveLandingSeo } from '@/lib/landing-seo';
+import { hasSeoListingEditorial } from '@/data/seo-listing-texts';
 import {
   appendRealPriceToDescription,
   buildCategoryCityListingMeta,
@@ -57,7 +58,10 @@ export async function buildLandingMetadata(pathname: string): Promise<Metadata> 
   const cityName = resolveLandingCityName(route.citySlug);
   const offers = finalized.stats?.events ?? 0;
   const priceFrom = finalized.stats?.priceFrom ?? null;
-  const indexDecision = evaluateListingIndexability({ offers });
+  const hasEditorialSeoText = Boolean(
+    route.citySlug && hasSeoListingEditorial(slug, route.citySlug),
+  );
+  const indexDecision = evaluateListingIndexability({ offers, hasEditorialSeoText });
   const profile = resolveLandingProfileKind(slug);
 
   let title: string;

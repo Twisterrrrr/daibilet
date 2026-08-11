@@ -293,6 +293,28 @@ function withSanitizedBody(entry: SeoListingTextEntry): SeoListingTextEntry {
   return { ...entry, body: sanitizeSeoListingBody(entry.body) };
 }
 
+const CITY_SEO_ALIASES: Record<string, string[]> = {
+  moscow: ['moskva'],
+  'saint-petersburg': ['sankt-peterburg', 'spb'],
+  kazan: [],
+};
+
+/** Exact city×landing editorial (aliases OK). No national-only fallback. */
+export function hasSeoListingEditorial(
+  landingSlug: string,
+  citySlug?: string | null,
+): boolean {
+  if (!citySlug) return false;
+  if (BY_KEY.has(keyOf(landingSlug, citySlug))) return true;
+  const canonical = String(citySlug).toLowerCase();
+  for (const [canon, list] of Object.entries(CITY_SEO_ALIASES)) {
+    if (canonical === canon || list.includes(canonical)) {
+      if (BY_KEY.has(keyOf(landingSlug, canon))) return true;
+    }
+  }
+  return false;
+}
+
 export function resolveSeoListingText(
   landingSlug: string,
   citySlug?: string | null,
@@ -300,13 +322,8 @@ export function resolveSeoListingText(
   const exact = BY_KEY.get(keyOf(landingSlug, citySlug));
   if (exact) return withSanitizedBody(exact);
   if (citySlug) {
-    const aliases: Record<string, string[]> = {
-      moscow: ['moskva'],
-      'saint-petersburg': ['sankt-peterburg', 'spb'],
-      kazan: [],
-    };
     const canonical = String(citySlug).toLowerCase();
-    for (const [canon, list] of Object.entries(aliases)) {
+    for (const [canon, list] of Object.entries(CITY_SEO_ALIASES)) {
       if (canonical === canon || list.includes(canonical)) {
         const hit = BY_KEY.get(keyOf(landingSlug, canon));
         if (hit) return withSanitizedBody(hit);

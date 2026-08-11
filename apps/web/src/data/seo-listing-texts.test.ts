@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  hasSeoListingEditorial,
   resolveSeoListingText,
   sanitizeSeoListingBody,
   splitSeoListingParagraphs,
@@ -48,4 +49,11 @@ test('resolveSeoListingText returns Kaliningrad standup editorial', () => {
 
 test('resolveSeoListingText returns null for unknown city×category without national fallback', () => {
   assert.equal(resolveSeoListingText('standup', 'tyumen'), null);
+});
+
+test('hasSeoListingEditorial requires exact city pair (no national rooftops fallback)', () => {
+  assert.equal(hasSeoListingEditorial('standup', 'kaliningrad'), true);
+  assert.equal(hasSeoListingEditorial('standup', 'tyumen'), false);
+  assert.equal(hasSeoListingEditorial('rooftops', 'moscow'), false);
+  assert.equal(hasSeoListingEditorial('rooftops', null), false);
 });

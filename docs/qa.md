@@ -39,11 +39,17 @@ Finance PR-ветка `codex/stage0-admission-ticket-core` может держа
 
 ---
 
-## 2026-08-11 - Category×city SEO-текст vs noindex
+## 2026-08-11 - Category×city SEO-текст vs noindex — ЗАКРЫТО
 
-1. **Thin listing + editorial:** `/stendap-i-yumor/kaliningrad` при `<6` офферов сейчас `noindex,follow` (`MIN_LISTING_OFFERS_FOR_INDEX`). Owner дал постоянный SEO-текст «удержать в поиске». Разрешаем `index` при наличии editorial в `seo-listing-texts` даже при 1-5 офферах, или оставляем порог 6 и текст только для UX/будущего роста афиши?
-2. **Нулевой день:** при 0 активных сеансах - всё равно index + SEO-каркас, или noindex до появления ≥1 билета?
-3. **Масштаб текстов:** только ручные owner-пакеты (как Калининград), или позже AI-draft по шаблону city×category с модерацией?
+**Owner решение:** снять `noindex` из-за low offer count, если есть editorial SEO-каркас в `seo-listing-texts` для пары `(landingSlug, citySlug)`. Обоснование: страница - информационный хаб; 3–5 событий в афише нормально; непрерывная индексация важнее порога 6.
+
+| # | Вопрос | Решение |
+|---|--------|---------|
+| 1 | Thin + editorial → index? | **Да.** `evaluateListingIndexability({ hasEditorialSeoText })` → `index,follow` при ≥1 оффере даже если &lt;6. |
+| 2 | Нулевой день (0 сеансов)? | **Пока noindex** (`zero_offers`). Пустой листинг без билетов не индексируем даже с текстом. |
+| 3 | Масштаб текстов? | Ручные owner-пакеты сейчас; AI-draft позже отдельным треком. |
+
+Без editorial (мусор/пустые без каркаса) порог `MIN_LISTING_OFFERS_FOR_INDEX = 6` и `noindex,follow` сохраняются.
 
 ---
 

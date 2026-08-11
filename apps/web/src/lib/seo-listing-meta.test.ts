@@ -109,11 +109,27 @@ test('appendRealPriceToDescription skips inventing and duplicates', () => {
   assert.equal(appendRealPriceToDescription('База.', 750), 'База. Цены от 750 рублей.');
 });
 
-test('thin listing threshold default 6', () => {
+test('thin listing threshold default 6; editorial hub bypasses low count', () => {
   assert.equal(MIN_LISTING_OFFERS_FOR_INDEX, 6);
   assert.equal(evaluateListingIndexability({ offers: 5 }).indexable, false);
   assert.equal(evaluateListingIndexability({ offers: 6 }).indexable, true);
   assert.equal(evaluateListingIndexability({ offers: 0 }).reason, 'zero_offers');
+  assert.equal(
+    evaluateListingIndexability({ offers: 3, hasEditorialSeoText: true }).indexable,
+    true,
+  );
+  assert.equal(
+    evaluateListingIndexability({ offers: 3, hasEditorialSeoText: true }).reason,
+    'editorial_seo_hub',
+  );
+  assert.equal(
+    evaluateListingIndexability({ offers: 0, hasEditorialSeoText: true }).indexable,
+    false,
+  );
+  assert.equal(
+    evaluateListingIndexability({ offers: 0, hasEditorialSeoText: true }).reason,
+    'zero_offers',
+  );
 });
 
 test('thin related cards only for exactly 6 or 7 offers', () => {

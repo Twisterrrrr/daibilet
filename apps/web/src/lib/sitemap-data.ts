@@ -21,6 +21,7 @@ import {
   catalogIntentPath,
   listCatalogIntents,
 } from '@/lib/catalog-intent-routes';
+import { hasSeoListingEditorial } from '@/data/seo-listing-texts';
 import { evaluateListingIndexability, MIN_LISTING_OFFERS_FOR_INDEX } from '@/lib/seo-listing-meta';
 import { venueHref } from '@/lib/routes';
 import { getCachedCatalog } from '@/server/cached-catalog-data';
@@ -228,7 +229,13 @@ export async function buildLandingsSitemapEntries(now = new Date()): Promise<Sit
         if (!payload?.landing) continue;
         const finalized = finalizeLandingPayload(payload, slug, city);
         const offers = finalized.stats?.events ?? 0;
-        if (!evaluateListingIndexability({ offers, minOffers: MIN_LISTING_OFFERS_FOR_INDEX }).indexable) {
+        if (
+          !evaluateListingIndexability({
+            offers,
+            minOffers: MIN_LISTING_OFFERS_FOR_INDEX,
+            hasEditorialSeoText: hasSeoListingEditorial(slug, city),
+          }).indexable
+        ) {
           continue;
         }
         paths.add(landingCategoryHref(slug, city));
@@ -249,7 +256,12 @@ export async function buildLandingsSitemapEntries(now = new Date()): Promise<Sit
       }
       const finalized = finalizeLandingPayload(payload, slug, city);
       const offers = finalized.stats?.events ?? 0;
-      if (evaluateListingIndexability({ offers }).indexable) {
+      if (
+        evaluateListingIndexability({
+          offers,
+          hasEditorialSeoText: hasSeoListingEditorial(slug, city),
+        }).indexable
+      ) {
         paths.add(landingCategoryHref(slug, city));
       }
     } catch {

@@ -8,9 +8,10 @@ import {
 import { stripCityFromLandingTopic } from '@/lib/landing-seo';
 
 /**
- * Порог коммерческой SEO-страницы: ниже - noindex,follow (страница жива для UX).
- * Держим 6: база ~2400 событий, но Екб (~57) и Казань (~51) скромные -
- * порог 10-12 срежет половину их category×city посадок. Soft-цель = 10.
+ * Порог коммерческой SEO-страницы без editorial-каркаса: ниже - noindex,follow
+ * (страница жива для UX). Soft-цель = 10.
+ * Owner 2026-08-11: при editorial в seo-listing-texts (city×landing) порог
+ * не режет index - 3–5 офферов + SEO-текст = информационный хаб.
  */
 export const MIN_LISTING_OFFERS_FOR_INDEX = 6;
 
@@ -39,7 +40,12 @@ export function shouldLoadRelatedHitSessions(offers: number): boolean {
 export type ListingIndexDecision = {
   indexable: boolean;
   thin: boolean;
-  reason: 'enough_offers' | 'low_offer_count' | 'zero_offers' | 'explicit_noindex';
+  reason:
+    | 'enough_offers'
+    | 'editorial_seo_hub'
+    | 'low_offer_count'
+    | 'zero_offers'
+    | 'explicit_noindex';
   offers: number;
 };
 
@@ -48,6 +54,11 @@ export function evaluateListingIndexability(input: {
   isIndexable?: boolean | null;
   /** Override порога (например, intent без города). */
   minOffers?: number;
+  /**
+   * Exact city×landing editorial в seo-listing-texts.
+   * Снимает noindex из-за low offer count (не из-за zero_offers).
+   */
+  hasEditorialSeoText?: boolean;
 }): ListingIndexDecision {
   if (input.isIndexable === false) {
     return {
@@ -65,6 +76,9 @@ export function evaluateListingIndexability(input: {
     return { indexable: false, thin: true, reason: 'zero_offers', offers };
   }
   if (offers < min) {
+    if (input.hasEditorialSeoText) {
+      return { indexable: true, thin: true, reason: 'editorial_seo_hub', offers };
+    }
     return { indexable: false, thin: true, reason: 'low_offer_count', offers };
   }
 
