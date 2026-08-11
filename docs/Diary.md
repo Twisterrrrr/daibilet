@@ -1,3 +1,16 @@
+## 2026-08-11 - my-day: drop must-see bulk CTA
+
+### Наблюдения
+- Owner screenshot: у «Главные места» синяя кнопка «Добавить главные места» (sparkle) съедала вертикаль и дублировала chips/карточки (добавление по клику на место).
+
+### Решения
+- `DayRoutePanel`: убрать `data-day-must-see-bulk` + `addAllMustSee` / `mustSeeAddable`; оставить `MustSeeFilterTabs` и список мест.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-11 - Popular cities rail: infinite loop rollback on arrows
 
 ### Наблюдения

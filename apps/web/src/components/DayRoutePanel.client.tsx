@@ -69,7 +69,6 @@ import {
   DAY_ROUTE_SOFT_WARN,
   addNoteStopToDayRoute,
   addTextStopToDayRoute,
-  addToDayRoute,
   applyItemTokensToVenues,
   applyShareMetaToVenues,
   buildDayRouteCoordsMap,
@@ -137,7 +136,6 @@ import {
   resolveVenueHeroImage,
 } from '@/lib/city-place-images';
 import {
-  buildCityDayRoutePreset,
   dayRouteHookLine,
   dayRouteItemFromEvent,
   dayRouteItemFromMustSee,
@@ -1150,16 +1148,6 @@ function DayRoutePanelInner() {
     return mustSeeResolved.filter((row) => classifyMustSeePlace(row.place) === active);
   }, [mustSeeResolved, mustSeeFilter, mustSeeFilterMeta]);
 
-  const mustSeeAddable = useMemo(() => {
-    return mustSeeFiltered.filter(({ item }) => {
-      if (isInDayRoute(item.id, route) || (item.slug && isInDayRoute(item.slug, route))) {
-        return false;
-      }
-      // One-click add only when we can place the stop on the map.
-      return Boolean(lookupDayRouteCoords(item, buildDayRouteCoordsMap([item])));
-    });
-  }, [mustSeeFiltered, route]);
-
   const locationOptions = useMemo<DayRouteSearchOption[]>(() => {
     return locationsCatalog.map((venue) => {
       const inRoute = isInDayRoute(venue.id, route) || Boolean(venue.slug && isInDayRoute(venue.slug, route));
@@ -1362,46 +1350,6 @@ function DayRoutePanelInner() {
         ticketUrl: url,
         title: nextItem.title,
       });
-    }
-  }
-
-  function addAllMustSee() {
-    if (!mustSeeAddable.length || atMax) {
-      flashDayRouteFeedback(atMax ? dayRouteHardLimitMessage() : 'Нет мест для добавления');
-      return;
-    }
-    if (atSoft) {
-      flashDayRouteFeedback(DAY_ROUTE_SOFT_WARN);
-      return;
-    }
-    const cityCtx = {
-      id: pageCityId,
-      name: pageCityName,
-      slug: pageCitySlug,
-      sourceSlug: selectedCity?.selectedDestination?.sourceSlug || null,
-    };
-    const filteredPlaces = mustSeeFiltered.map((row) => row.place);
-    // Bulk fills to soft guideline, then warns - individual adds still allowed until hard.
-    const preset = buildCityDayRoutePreset(filteredPlaces, matchSources, cityCtx, DAY_ROUTE_SOFT);
-    let next = readDayRouteFresh();
-    let added = 0;
-    for (const item of preset) {
-      if (next.venues.length >= DAY_ROUTE_SOFT) break;
-      if (isInDayRoute(item.id, next) || (item.slug && isInDayRoute(item.slug, next))) continue;
-      next = addToDayRoute(item);
-      added += 1;
-    }
-    setRoute(next);
-    const active =
-      mustSeeFilterMeta.tabs.length < 2 ? mustSeeFilterMeta.defaultId : mustSeeFilter;
-    if (added) {
-      flashDayRouteFeedback(
-        isDayRouteAtSoft(next.venues.length)
-          ? `Добавлено: ${added} · ${DAY_ROUTE_SOFT_WARN}`
-          : `Добавлено: ${added} · ${next.venues.length}`,
-      );
-    } else {
-      flashDayRouteFeedback(`${mustSeeFilterLabel(active)} уже в маршруте`);
     }
   }
 
@@ -3717,24 +3665,6 @@ function DayRoutePanelInner() {
             <div id="day-must-see-body" className="border-t border-slate-100 px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
               {mustSeeResolved.length > 0 ? (
                 <div data-day-must-see>
-                  <div className="flex flex-col gap-2">
-                    <div className="flex flex-wrap items-center justify-start gap-x-2 gap-y-1">
-                      <button
-                        type="button"
-                        disabled={atMax || atSoft || mustSeeAddable.length === 0}
-                        onClick={addAllMustSee}
-                        data-day-must-see-bulk
-                        className="inline-flex min-h-10 shrink-0 items-center justify-center gap-1.5 rounded-full bg-sky-600 px-4 py-2 text-xs font-bold text-white hover:bg-sky-700 disabled:cursor-not-allowed disabled:bg-slate-300"
-                      >
-                        <Sparkles className="h-3.5 w-3.5" />
-                        {(mustSeeFilterMeta.tabs.length < 2
-                          ? mustSeeFilterMeta.defaultId
-                          : mustSeeFilter) === 'main'
-                          ? 'Добавить главные места'
-                          : 'Добавить выбранные'}
-                      </button>
-                    </div>
-                  </div>
                   <MustSeeFilterTabs
                     tabs={mustSeeFilterMeta.tabs}
                     hideCount
