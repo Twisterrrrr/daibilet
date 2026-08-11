@@ -39,6 +39,10 @@ import type {
 
 const MIN_DISPLAY_PRICE_RUB = 100;
 const PUBLIC_EVENT_CACHE_MS = 5 * 60 * 1000;
+/** DB fetch budget before STAND_BY/closed filter (meta products have many dated TC children). */
+const PUBLIC_EVENT_SESSION_FETCH_LIMIT = 64;
+/** Max on-sale sessions on the public event page (was hard-capped at 5). */
+const PUBLIC_EVENT_SESSION_DISPLAY_LIMIT = 32;
 
 const eventInclude = {
   primaryCity: { include: { region: true } },
@@ -180,7 +184,7 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
       },
       include: sessionInclude,
       orderBy: [{ startsAt: 'asc' }, { id: 'asc' }],
-      take: 12,
+      take: PUBLIC_EVENT_SESSION_FETCH_LIMIT,
     }).then((rows) =>
       rows.filter((session) => {
         if (!isPublicSessionRowOnSale(session)) return false;
@@ -192,7 +196,7 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
           startsAt: session.startsAt,
           endsAt: session.endsAt,
         });
-      }).slice(0, 5),
+      }).slice(0, PUBLIC_EVENT_SESSION_DISPLAY_LIMIT),
     ),
     prisma.eventOffer.findMany({
       where: {
