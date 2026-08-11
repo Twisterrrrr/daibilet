@@ -44,6 +44,7 @@ export function DayRouteOsmMap({
   selectedStopId = null,
   onStopClick,
   layoutKey,
+  fallbackCenter = null,
 }: {
   stops: DayRouteMapStop[];
   className?: string;
@@ -51,6 +52,8 @@ export function DayRouteOsmMap({
   onStopClick?: (stopId: string) => void;
   /** Bumps Leaflet invalidateSize after container height changes (mobile expand). */
   layoutKey?: string | number;
+  /** Empty-route preview: city center without markers. */
+  fallbackCenter?: { latitude: number; longitude: number } | null;
 }) {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const mapRef = React.useRef<LeafletMap | null>(null);
@@ -72,9 +75,14 @@ export function DayRouteOsmMap({
     return () => window.clearTimeout(id);
   }, [layoutKey]);
 
+  const centerKey = fallbackCenter
+    ? `${fallbackCenter.latitude.toFixed(5)},${fallbackCenter.longitude.toFixed(5)}`
+    : '';
+
   React.useEffect(() => {
     const node = containerRef.current;
-    if (!node || stops.length === 0) return;
+    if (!node) return;
+    if (stops.length === 0 && !fallbackCenter) return;
 
     let cancelled = false;
     let resizeObserver: ResizeObserver | null = null;
@@ -83,10 +91,14 @@ export function DayRouteOsmMap({
       const L = await loadDaibiletLeaflet();
       if (cancelled || !node) return;
 
+      const initialCenter: [number, number] = stops[0]
+        ? [stops[0].latitude, stops[0].longitude]
+        : [fallbackCenter!.latitude, fallbackCenter!.longitude];
+
       let map = mapRef.current;
       if (!map) {
         map = L.map(node, {
-          center: [stops[0].latitude, stops[0].longitude],
+          center: initialCenter,
           zoom: 13,
           minZoom: MIN_ZOOM,
           maxZoom: MAX_ZOOM,
@@ -150,7 +162,9 @@ export function DayRouteOsmMap({
         }).addTo(map);
       }
 
-      if (latLngs.length === 1) {
+      if (latLngs.length === 0 && fallbackCenter) {
+        map.setView([fallbackCenter.latitude, fallbackCenter.longitude], 12);
+      } else if (latLngs.length === 1) {
         map.setView(latLngs[0], 14);
       } else {
         map.fitBounds(L.latLngBounds(latLngs), { padding: [36, 36], maxZoom: 15 });
@@ -162,7 +176,7 @@ export function DayRouteOsmMap({
       cancelled = true;
       resizeObserver?.disconnect();
     };
-  }, [stopsKey, stops, selectedStopId]);
+  }, [stopsKey, stops, selectedStopId, centerKey, fallbackCenter]);
 
   React.useEffect(() => {
     return () => {
@@ -175,7 +189,7 @@ export function DayRouteOsmMap({
     };
   }, []);
 
-  if (stops.length === 0) return null;
+  if (stops.length === 0 && !fallbackCenter) return null;
 
   return (
     <div
