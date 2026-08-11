@@ -62,12 +62,27 @@ function syncScrollPadding(scroller: HTMLElement): number {
  * Instantly re-base scrollLeft into the middle loop band. Same cities stay on screen
  * because copies are identical; without this, arrow scrolls hit maxScrollLeft and snap
  * restore jumps back to the title-anchored start (visible rollback).
+ *
+ * Must stay bounded: browsers clamp scrollLeft. If layout is not ready
+ * (maxScrollLeft << setWidth), `scrollLeft += setWidth` is a no-op and an
+ * unbounded while freezes the tab - homepage-only (this rail is only on `/`).
  */
+function shiftScrollLeft(el: HTMLElement, delta: number): boolean {
+  const before = el.scrollLeft;
+  el.scrollLeft = before + delta;
+  return el.scrollLeft !== before;
+}
+
 function wrapScrollIntoLoopBand(el: HTMLElement, setWidth: number, loopingRef: { current: boolean }) {
-  if (setWidth < 1) return;
+  if (!Number.isFinite(setWidth) || setWidth < 1) return;
   loopingRef.current = true;
-  while (el.scrollLeft < setWidth * LOOP_BAND_LO) el.scrollLeft += setWidth;
-  while (el.scrollLeft > setWidth * LOOP_BAND_HI) el.scrollLeft -= setWidth;
+  const maxSteps = LOOP_COPIES + 2;
+  for (let i = 0; i < maxSteps && el.scrollLeft < setWidth * LOOP_BAND_LO; i += 1) {
+    if (!shiftScrollLeft(el, setWidth)) break;
+  }
+  for (let i = 0; i < maxSteps && el.scrollLeft > setWidth * LOOP_BAND_HI; i += 1) {
+    if (!shiftScrollLeft(el, -setWidth)) break;
+  }
   loopingRef.current = false;
 }
 
@@ -212,16 +227,13 @@ export function HomePopularCitiesRail({ cities, className = '' }: HomePopularCit
     // Pre-shift into the loop band (and leave room for this step) so the glide
     // never clamps at maxScrollLeft / 0 - that clamp + snap looked like a rollback.
     const setWidth = el.scrollWidth / LOOP_COPIES;
-    if (setWidth >= 1 && cities.length >= 2) {
-      loopingRef.current = true;
-      while (el.scrollLeft < setWidth * LOOP_BAND_LO) el.scrollLeft += setWidth;
-      while (el.scrollLeft > setWidth * LOOP_BAND_HI) el.scrollLeft -= setWidth;
+    if (Number.isFinite(setWidth) && setWidth >= 1 && cities.length >= 2) {
+      wrapScrollIntoLoopBand(el, setWidth, loopingRef);
       if (dir === 1 && el.scrollLeft + step > setWidth * LOOP_BAND_HI) {
-        el.scrollLeft -= setWidth;
+        shiftScrollLeft(el, -setWidth);
       } else if (dir === -1 && el.scrollLeft - step < setWidth * LOOP_BAND_LO) {
-        el.scrollLeft += setWidth;
+        shiftScrollLeft(el, setWidth);
       }
-      loopingRef.current = false;
     }
 
     const target = el.scrollLeft + dir * step;

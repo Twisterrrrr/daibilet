@@ -115,6 +115,21 @@ MyDayShell
 
 ---
 
+## 2026-08-11 - Homepage: popular cities rail while(scrollLeft) hang
+
+### Наблюдения
+- Owner: hangs only on `/`; other pages OK. Hypothesis: infinite scroll of cities.
+- Code: `HomePopularCitiesRail` only on home. Not network infinite scroll - capped `orderPopularRailCities(..., 12)` × `LOOP_COPIES=3` DOM clones. No IntersectionObserver / load-more fetch.
+- Risk: `wrapScrollIntoLoopBand` / arrow pre-shift used unbounded `while (scrollLeft …) scrollLeft ±= setWidth`. Browsers clamp `scrollLeft`; if layout not ready (`maxScrollLeft << setWidth`), assignment is no-op → main-thread freeze, homepage-only.
+
+### Решения
+- Bound loop (`LOOP_COPIES+2`) + break when `scrollLeft` does not change after write. Arrow path reuses same helper.
+
+### Проблемы
+- SSR home still heavier than `/cities` (articles/fingerprints/catalog); separate from this client freeze path.
+
+---
+
 ## 2026-08-11 - my-day: drop must-see bulk CTA
 
 ### Наблюдения
