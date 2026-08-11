@@ -19,6 +19,22 @@ export type BlogPost = {
 /** Обложки - уникальная статика на статью: /images/blog/{slug}.jpg */
 export const BLOG_POSTS: BlogPost[] = [
   {
+    slug: 'kak-perestat-gulyat-po-krugu-moskva',
+    title: 'Как перестать гулять по кругу: 5 нестандартных сценариев для москвичей, которые видели всё',
+    excerpt:
+      'Лекция судмедэксперта на крыше, горячая эмаль, иммерсивный особняк, «ГДЕ МОЙ 2008?» и квест в зоопарке - пять странных способов встряхнуть московские выходные.',
+    date: '11 авг 2026',
+    readMin: 8,
+    tag: 'От автора',
+    city: 'Москва',
+    citySlug: 'moscow',
+    authorId: 'max',
+    authorName: 'Макс',
+    articleType: 'column',
+    imageUrl: blogCoverUrl('kak-perestat-gulyat-po-krugu-moskva'),
+    imageAlt: 'Крыша Дизайн Завода и вечерняя Москва',
+  },
+  {
     slug: 'kaliningrad-za-2-dnya-vyhodnye',
     title: 'Калининград за 2 дня: идеальный маршрут на выходные с ценами и лайфхаками',
     excerpt:
