@@ -142,152 +142,155 @@ export function MyDayToolbar({
           ) : null}
         </div>
 
-        <div className="mt-4 flex flex-col gap-2 lg:flex-row lg:flex-wrap lg:items-center lg:gap-x-3">
-          <div className="flex flex-wrap items-center gap-2" data-my-day-toolbar-actions>
-            <div
-              className="inline-flex rounded-full border border-slate-200 p-0.5"
-              role="group"
-              aria-label="Способ передвижения"
-              data-day-travel-mode
-            >
-              <button
-                type="button"
-                onClick={() => onTravelModeChange('walk')}
-                aria-pressed={travelMode === 'walk'}
-                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold transition ${
-                  travelMode === 'walk'
-                    ? 'bg-primary-600 text-white'
-                    : 'text-slate-500 hover:bg-slate-50'
-                }`}
-              >
-                <PersonStanding className="h-4 w-4" aria-hidden />
-                Пешком
-              </button>
-              <button
-                type="button"
-                onClick={() => onTravelModeChange('auto')}
-                aria-pressed={travelMode === 'auto'}
-                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold transition ${
-                  travelMode === 'auto'
-                    ? 'bg-primary-600 text-white'
-                    : 'text-slate-500 hover:bg-slate-50'
-                }`}
-              >
-                <Car className="h-4 w-4" aria-hidden />
-                На авто
-              </button>
-            </div>
-
-            <button
-              type="button"
-              onClick={onOptimize}
-              disabled={!canOptimize}
-              data-day-map-optimize
-              className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-40"
-            >
-              <Wand2 className="h-4 w-4" aria-hidden />
-              Оптимизировать
-            </button>
-
-            {canHourPlan ? (
-              <button
-                type="button"
-                onClick={() => {
-                  if (hourPlanOn) onToggleHourPlan();
-                  else onOpenHourSheet();
-                }}
-                aria-pressed={hourPlanOn}
-                data-day-hour-plan
-                className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition ${
-                  hourPlanOn
-                    ? 'bg-sky-600 text-white hover:bg-sky-700'
-                    : 'border border-slate-200 text-slate-700 hover:bg-slate-50'
-                }`}
-              >
-                <Sparkles className="h-4 w-4" aria-hidden />
-                По часам
-              </button>
-            ) : null}
-
-            {hourPlanOn && onHourStartChange && onHourEndChange ? (
-              <>
-                <label className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm">
-                  <span className="text-slate-500">Старт</span>
-                  <input
-                    type="time"
-                    value={hourStart || '10:00'}
-                    onChange={(e) => onHourStartChange(e.target.value)}
-                    className="bg-transparent font-semibold text-slate-800 outline-none"
-                  />
-                </label>
-                <label className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm">
-                  <span className="text-slate-500">Финиш</span>
-                  <input
-                    type="time"
-                    value={hourEnd || '22:00'}
-                    onChange={(e) => onHourEndChange(e.target.value)}
-                    className="bg-transparent font-semibold text-slate-800 outline-none"
-                  />
-                </label>
-              </>
-            ) : null}
-
-            <button
-              type="button"
-              onClick={onClear}
-              disabled={stopsCount <= 0}
-              title="Очистить маршрут"
-              aria-label="Очистить маршрут"
-              data-day-clear
-              className="inline-flex items-center justify-center rounded-full border border-slate-200 p-2 text-slate-500 transition hover:bg-slate-50 disabled:opacity-40"
-            >
-              <Trash2 className="h-4 w-4" aria-hidden />
-            </button>
-          </div>
-
+        {/*
+          Lovable parity: mode / optimize / hours / clear stay ONE row (no orphan trash wrap).
+          Narrow: horizontal scroll. Export always on its own row below (never lg side-by-side).
+        */}
+        <div
+          className="-mx-1 mt-4 flex flex-nowrap items-center gap-2 overflow-x-auto px-1 pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          data-my-day-toolbar-actions
+        >
           <div
-            className="flex flex-wrap items-center gap-2 border-t border-slate-200 pt-3 lg:border-t-0 lg:pt-0"
+            className="inline-flex h-9 shrink-0 items-stretch rounded-full border border-slate-200 p-0.5 box-border"
             role="group"
-            aria-label="Экспорт маршрута"
-            data-my-day-toolbar-export
+            aria-label="Способ передвижения"
+            data-day-travel-mode
           >
-            <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 lg:sr-only">
-              Экспорт
-            </span>
-            {/* GPX / KML deferred by owner 2026-08-11 */}
             <button
               type="button"
-              onClick={onPrintPdf}
-              disabled={stopsCount <= 0 || printPdfBusy}
-              data-day-print
-              className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-40"
+              onClick={() => onTravelModeChange('walk')}
+              aria-pressed={travelMode === 'walk'}
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 text-sm font-semibold transition ${
+                travelMode === 'walk'
+                  ? 'bg-primary-600 text-white'
+                  : 'text-slate-500 hover:bg-slate-50'
+              }`}
             >
-              <FileDown className="h-3.5 w-3.5" aria-hidden />
-              {printPdfBusy ? 'Готовим PDF…' : printPdfLabel}
+              <PersonStanding className="h-4 w-4 shrink-0" aria-hidden />
+              Пешком
             </button>
-            {onSaveScenario ? (
-              <button
-                type="button"
-                onClick={onSaveScenario}
-                disabled={stopsCount <= 0 || saveScenarioBusy}
-                data-day-save-scenario
-                className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-40"
-              >
-                Сохранить как сценарий
-              </button>
-            ) : null}
-            {onShare ? (
-              <button
-                type="button"
-                onClick={onShare}
-                data-day-share
-                className="inline-flex items-center gap-2 rounded-full border border-primary-200 bg-primary-50 px-3 py-1.5 text-xs font-semibold text-primary-800 transition hover:bg-primary-100"
-              >
-                <Share2 className="h-3.5 w-3.5" aria-hidden />
-                {shareLabel}
-              </button>
-            ) : null}
+            <button
+              type="button"
+              onClick={() => onTravelModeChange('auto')}
+              aria-pressed={travelMode === 'auto'}
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 text-sm font-semibold transition ${
+                travelMode === 'auto'
+                  ? 'bg-primary-600 text-white'
+                  : 'text-slate-500 hover:bg-slate-50'
+              }`}
+            >
+              <Car className="h-4 w-4 shrink-0" aria-hidden />
+              На авто
+            </button>
           </div>
+
+          <button
+            type="button"
+            onClick={onOptimize}
+            disabled={!canOptimize}
+            data-day-map-optimize
+            className="inline-flex h-9 shrink-0 items-center gap-2 rounded-full border border-slate-200 px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-40 box-border"
+          >
+            <Wand2 className="h-4 w-4 shrink-0" aria-hidden />
+            Оптимизировать
+          </button>
+
+          {canHourPlan ? (
+            <button
+              type="button"
+              onClick={() => {
+                if (hourPlanOn) onToggleHourPlan();
+                else onOpenHourSheet();
+              }}
+              aria-pressed={hourPlanOn}
+              data-day-hour-plan
+              className={`inline-flex h-9 shrink-0 items-center gap-2 rounded-full px-4 text-sm font-semibold transition box-border ${
+                hourPlanOn
+                  ? 'bg-sky-600 text-white hover:bg-sky-700'
+                  : 'border border-slate-200 text-slate-700 hover:bg-slate-50'
+              }`}
+            >
+              <Sparkles className="h-4 w-4 shrink-0" aria-hidden />
+              По часам
+            </button>
+          ) : null}
+
+          {hourPlanOn && onHourStartChange && onHourEndChange ? (
+            <>
+              <label className="inline-flex h-9 shrink-0 items-center gap-2 rounded-full border border-slate-200 px-3 text-sm box-border">
+                <span className="text-slate-500">Старт</span>
+                <input
+                  type="time"
+                  value={hourStart || '10:00'}
+                  onChange={(e) => onHourStartChange(e.target.value)}
+                  className="bg-transparent font-semibold text-slate-800 outline-none"
+                />
+              </label>
+              <label className="inline-flex h-9 shrink-0 items-center gap-2 rounded-full border border-slate-200 px-3 text-sm box-border">
+                <span className="text-slate-500">Финиш</span>
+                <input
+                  type="time"
+                  value={hourEnd || '22:00'}
+                  onChange={(e) => onHourEndChange(e.target.value)}
+                  className="bg-transparent font-semibold text-slate-800 outline-none"
+                />
+              </label>
+            </>
+          ) : null}
+
+          <button
+            type="button"
+            onClick={onClear}
+            disabled={stopsCount <= 0}
+            title="Очистить маршрут"
+            aria-label="Очистить маршрут"
+            data-day-clear
+            className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition hover:bg-slate-50 disabled:opacity-40 box-border"
+          >
+            <Trash2 className="h-4 w-4" aria-hidden />
+          </button>
+        </div>
+
+        <div
+          className="mt-3 flex flex-wrap items-center gap-2 border-t border-slate-200 pt-3"
+          role="group"
+          aria-label="Экспорт маршрута"
+          data-my-day-toolbar-export
+        >
+          <span className="sr-only">Экспорт</span>
+          {/* GPX / KML deferred by owner 2026-08-11 */}
+          <button
+            type="button"
+            onClick={onPrintPdf}
+            disabled={stopsCount <= 0 || printPdfBusy}
+            data-day-print
+            className="inline-flex h-8 shrink-0 items-center gap-2 rounded-full border border-slate-200 px-3 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-40 box-border"
+          >
+            <FileDown className="h-3.5 w-3.5 shrink-0" aria-hidden />
+            {printPdfBusy ? 'Готовим PDF…' : printPdfLabel}
+          </button>
+          {onSaveScenario ? (
+            <button
+              type="button"
+              onClick={onSaveScenario}
+              disabled={stopsCount <= 0 || saveScenarioBusy}
+              data-day-save-scenario
+              className="inline-flex h-8 shrink-0 items-center gap-2 rounded-full border border-slate-200 px-3 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-40 box-border"
+            >
+              Сохранить как сценарий
+            </button>
+          ) : null}
+          {onShare ? (
+            <button
+              type="button"
+              onClick={onShare}
+              data-day-share
+              className="inline-flex h-8 shrink-0 items-center gap-2 rounded-full border border-primary-200 bg-primary-50 px-3 text-xs font-semibold text-primary-800 transition hover:bg-primary-100 box-border"
+            >
+              <Share2 className="h-3.5 w-3.5 shrink-0" aria-hidden />
+              {shareLabel}
+            </button>
+          ) : null}
         </div>
 
         {scheduleSlot ? <div className="mt-3">{scheduleSlot}</div> : null}
