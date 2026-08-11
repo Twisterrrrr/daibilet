@@ -3292,7 +3292,7 @@ function DayRoutePanelInner() {
                     })()}
                     segmentToNext={null}
                     travelMode={travelMode}
-                    focused={mapSelectedStopId === venue.id}
+                    focused={focusedStopId === venue.id}
                     onMoveUp={() => undefined}
                     onMoveDown={() => undefined}
                     onRemove={() => setRoute(removeFromDayRoute(venue.id))}
@@ -3323,12 +3323,12 @@ function DayRoutePanelInner() {
               </p>
             ) : null}
             <ul
-              className={
-                effectiveStopViewMode === 'grid'
-                  ? DAY_ROUTE_STOPS_GRID_RAIL
-                  : 'flex w-full flex-col items-stretch gap-0'
-              }
-              data-day-plan-list="plans"
+                className={
+                  effectiveStopViewMode === 'grid'
+                    ? DAY_ROUTE_STOPS_GRID_RAIL
+                    : 'flex w-full flex-col items-stretch gap-1'
+                }
+                data-day-plan-list="plans"
               data-day-stop-view={effectiveStopViewMode}
             >
               {effectiveStopViewMode === 'list' && planStops.length > 0 ? (
@@ -3378,7 +3378,7 @@ function DayRoutePanelInner() {
                       segmentToNext={segmentToNext}
                       hideGeoSegment={listMode}
                       travelMode={travelMode}
-                      focused={mapSelectedStopId === venue.id}
+                      focused={focusedStopId === venue.id}
                       dragging={dragVenueId === venue.id}
                       onDragStart={
                         dayRouteStopReorderLocked(venue)
@@ -3541,7 +3541,7 @@ function DayRoutePanelInner() {
                     })()}
                     segmentToNext={null}
                     travelMode={travelMode}
-                    focused={mapSelectedStopId === venue.id}
+                    focused={focusedStopId === venue.id}
                     onMoveUp={() => setRoute(moveDayRoutePlanVenue(venue.id, -1))}
                     onMoveDown={() => setRoute(moveDayRoutePlanVenue(venue.id, 1))}
                     onRemove={() => setRoute(removeFromDayRoute(venue.id))}
@@ -4655,7 +4655,7 @@ function DayRouteBetweenInsert({
       data-day-between-after={afterVenueId}
     >
       {showLeg ? (
-        <div className="ml-4 flex items-center gap-3 border-l border-dashed border-slate-200 py-2 pl-6 text-xs text-slate-500 sm:ml-5">
+        <div className="ml-[1.15rem] flex items-center gap-2.5 border-l border-dashed border-slate-200 py-1.5 pl-7 text-xs text-slate-500 sm:ml-5 sm:pl-8">
           {travelMode === 'auto' ? (
             <Car className="h-3.5 w-3.5 shrink-0" aria-hidden />
           ) : (
@@ -4679,7 +4679,7 @@ function DayRouteBetweenInsert({
         </div>
       ) : null}
 
-      <div className="ml-4 py-1 sm:ml-5" data-day-between-add>
+      <div className="ml-[1.15rem] py-0.5 sm:ml-5" data-day-between-add>
         {menuOpen ? (
           <div
             className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm"
@@ -5042,8 +5042,8 @@ function DayRouteVenueCard({
         onBlurCapture={onBlurCapture}
       >
         <div
-          className={`flex items-start gap-2 rounded-xl border border-amber-200/80 bg-amber-50/70 px-2.5 py-2 ${
-            focused ? 'ring-2 ring-amber-300 ring-offset-1' : ''
+          className={`flex items-start gap-2 rounded-xl border border-amber-200/80 bg-amber-50/70 px-2.5 py-2 transition-[box-shadow] ${
+            focused ? 'shadow-[inset_0_0_0_1px_rgba(251,191,36,0.7)]' : ''
           }`}
           data-day-stop-shell="note"
         >
@@ -5106,14 +5106,14 @@ function DayRouteVenueCard({
         onDragEnd={canDrag ? onDragEnd : undefined}
       >
         <article
-          className={`group grid grid-cols-[auto_minmax(0,1fr)] gap-2.5 rounded-2xl border p-2.5 transition-colors sm:gap-3 sm:p-3.5 ${
+          className={`group relative grid grid-cols-[auto_minmax(0,1fr)] gap-2.5 rounded-2xl border bg-white p-2.5 transition-[background-color,border-color] duration-150 sm:gap-3 sm:p-3 ${
             focused
-              ? 'border-primary-400/50 bg-white shadow-sm'
-              : 'border-transparent bg-transparent hover:bg-slate-50'
-          } ${purchased ? 'border-l-4 border-l-primary-600' : ''}`}
+              ? 'border-primary-300 bg-primary-50/35'
+              : 'border-slate-200/70 hover:border-slate-300 hover:bg-slate-50/90'
+          } ${purchased ? 'border-l-[3px] border-l-primary-600' : ''}`}
           data-day-stop-shell
         >
-          <div className="flex shrink-0 flex-col items-center gap-2" data-day-stop-index-cluster>
+          <div className="flex shrink-0 flex-col items-center gap-1.5 pt-0.5" data-day-stop-index-cluster>
             <DayRouteListPin n={pinNumber} />
             {reorderLocked ? (
               <span
@@ -5141,8 +5141,8 @@ function DayRouteVenueCard({
                       : undefined
                   }
                   onDragEnd={canDrag ? onDragEnd : undefined}
-                  className={`grid h-9 w-9 cursor-grab place-items-center rounded-md border text-slate-400 transition hover:bg-white active:cursor-grabbing ${
-                    canDrag ? 'border-slate-200' : 'border-transparent opacity-40'
+                  className={`grid h-8 w-8 cursor-grab place-items-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 active:cursor-grabbing ${
+                    canDrag ? '' : 'opacity-40'
                   }`}
                 >
                   <GripVertical className="h-4 w-4" />
@@ -5191,12 +5191,12 @@ function DayRouteVenueCard({
                 ) : null}
                 {suburbBadge}
               </div>
-              <h2 className="mt-1 line-clamp-2 text-base font-extrabold leading-snug tracking-tight text-slate-900 sm:text-lg">
+              <h2 className="mt-0.5 line-clamp-2 text-base font-extrabold leading-snug tracking-tight text-slate-900 sm:text-[1.05rem]">
                 {titleNode}
               </h2>
               {placeLine || !hasCoords ? (
                 <p
-                  className={`mt-1 line-clamp-2 text-xs leading-snug sm:text-sm ${
+                  className={`mt-0.5 line-clamp-2 text-xs leading-snug sm:text-sm ${
                     !hasCoords ? 'text-amber-700' : 'text-slate-500'
                   }`}
                 >
@@ -5258,9 +5258,9 @@ function DayRouteVenueCard({
               ) : null}
             </div>
 
-            <div className="flex shrink-0 flex-col items-end gap-1.5">
+            <div className="relative shrink-0" data-day-stop-media>
               <div
-                className="relative h-16 w-16 overflow-hidden rounded-xl bg-slate-100 sm:h-20 sm:w-24"
+                className="relative h-16 w-16 overflow-hidden rounded-xl bg-slate-100 sm:h-[4.75rem] sm:w-[5.5rem]"
                 data-day-stop-thumb
               >
                 {thumbUrl ? (
@@ -5271,7 +5271,10 @@ function DayRouteVenueCard({
                   </div>
                 )}
               </div>
-              <div className="flex items-center gap-1" data-day-stop-actions>
+              <div
+                className="absolute -right-1 -top-1 flex items-center gap-0.5 opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100 max-lg:opacity-100"
+                data-day-stop-actions
+              >
                 {mapsUrl ? (
                   <a
                     href={mapsUrl}
@@ -5280,7 +5283,7 @@ function DayRouteVenueCard({
                     aria-label="Открыть в Яндекс.Картах"
                     title="Открыть в Яндекс.Картах"
                     data-day-stop-maps
-                    className="grid h-7 w-7 place-items-center rounded-full border border-slate-200 text-sky-600 opacity-0 transition-opacity hover:bg-slate-50 group-hover:opacity-100 group-focus-within:opacity-100 max-lg:opacity-100"
+                    className="grid h-7 w-7 place-items-center rounded-full border border-slate-200 bg-white text-sky-600 shadow-sm hover:bg-sky-50"
                   >
                     <Navigation className="h-3.5 w-3.5" />
                   </a>
@@ -5289,7 +5292,7 @@ function DayRouteVenueCard({
                   type="button"
                   aria-label="Удалить точку"
                   onClick={onRemove}
-                  className="grid h-7 w-7 place-items-center rounded-full border border-slate-200 text-slate-400 opacity-0 transition-opacity hover:bg-slate-50 hover:text-slate-700 group-hover:opacity-100 group-focus-within:opacity-100 max-lg:opacity-100"
+                  className="grid h-7 w-7 place-items-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm hover:bg-rose-50 hover:text-rose-700"
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
