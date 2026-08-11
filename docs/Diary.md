@@ -1,3 +1,21 @@
+## 2026-08-11 - My Day Wave 1.5: Lovable visual parity
+
+### Наблюдения
+- Owner: Wave 1 shell alone looked crooked vs Lovable - legacy wanderlog cards + wrap toolbar + grid toggle.
+- Goal: visual parity of cards/toolbar without changing LS / share / notes schema.
+
+### Решения
+- List-only itinerary (drop Сетка/Список toggle from UI).
+- Stop card: number circle + grip | title/address/pills | thumb; commerce chips below.
+- Toolbar: dense actions row with horizontal scroll (no wrap chaos).
+- Between-leg: dashed Lovable leg (`км · ~мин пешком/авто`) + hover `+`.
+
+### Проблемы
+- Grid card branch still in file (dead); full delete later.
+- PDF/GPX = Wave 2; ticket CTA polish = Wave 3.
+
+---
+
 ## 2026-08-11 - My Day Wave 1: Lovable UX rebuild (wireframe)
 
 ### Наблюдения
@@ -22,6 +40,7 @@ MyDayShell
 
 ### Проблемы
 - Полный вынос всего state из panel в controller - следующий шаг; Wave 1 = shell + toolbar + map collapse/sheet + schedule banner.
+- Tip: см. commit Wave 1; Deploy MSK web после push.
 
 ---
 

@@ -10,8 +10,7 @@ import {
   Clock,
   Copy,
   ExternalLink,
-  LayoutGrid,
-  List,
+  GripVertical,
   MapPin,
   Navigation,
   PersonStanding,
@@ -204,41 +203,19 @@ import { toVenueCatalogCard } from '@/lib/venue-catalog-card';
 import type { VenueCatalogCard } from '@/lib/venue-map-types';
 
 type DayRouteAccordionId = 'mustSee' | 'text' | 'matches';
-/** Detail cards: Сетка = Steps + swipe carousel; Список = Wanderlog vertical. */
+/** Wave 1.5: list-only itinerary (Lovable). Grid card markup kept as dead path. */
 type DayRouteStopViewMode = 'grid' | 'list';
 type DayRouteMobileShelf = 'route' | 'add';
 
-const DAY_ROUTE_STOP_VIEW_KEY = 'daibilet:dayRouteStopView';
 /** Owner 2026-08-06: post-buy modal «Оформили билет?» off until UX revisit. Buy links still open. */
 const SHOW_DAY_TICKET_HANDOFF_MODAL = false;
 
-/** Horizontal stop cards rail (Сетка): snap + peek next card, touch swipe. */
+/** @deprecated Wave 1.5 list-only; kept for dead grid branch types. */
 const DAY_ROUTE_STOPS_GRID_RAIL =
   'horizontal-snap-row flex w-full snap-x snap-mandatory flex-nowrap items-stretch gap-2.5 overflow-x-auto overscroll-x-contain touch-pan-x pb-0.5 [scrollbar-width:thin]';
-/** Card width in Сетка carousel - readable titles, light peek of next. */
+/** @deprecated Wave 1.5 list-only. */
 const DAY_ROUTE_STOPS_GRID_CARD =
   'w-[min(82vw,20rem)] shrink-0 snap-start sm:w-[20.5rem] lg:w-[21.5rem]';
-
-function readStopViewMode(): DayRouteStopViewMode {
-  if (typeof window === 'undefined') return 'grid';
-  try {
-    const raw = window.localStorage.getItem(DAY_ROUTE_STOP_VIEW_KEY);
-    if (raw === 'list') return 'list';
-    // Migrate brief «timeline» toggle value back to grid fence.
-    return 'grid';
-  } catch {
-    return 'grid';
-  }
-}
-
-function writeStopViewMode(mode: DayRouteStopViewMode) {
-  if (typeof window === 'undefined') return;
-  try {
-    window.localStorage.setItem(DAY_ROUTE_STOP_VIEW_KEY, mode);
-  } catch {
-    /* ignore */
-  }
-}
 
 type MatchVenueStub = {
   id: string;
@@ -451,10 +428,6 @@ function DayRoutePanelInner() {
   const [mobileView, setMobileView] = useState<'list' | 'map'>('list');
   /** Mobile shelf: route steps/map vs catalog add tools. */
   const [mobileShelf, setMobileShelf] = useState<DayRouteMobileShelf>('route');
-  /** Route stops detail: Сетка (Steps + carousel) or Wanderlog Список. Default list (Lovable itinerary). */
-  const [stopViewMode, setStopViewMode] = useState<DayRouteStopViewMode>('list');
-  /** Desktop (≥lg) can pick grid/list; mobile always Wanderlog list. */
-  const [isLgUp, setIsLgUp] = useState(false);
   /** Lovable-style map chrome: collapse / fullscreen / mobile sheet. */
   const myDay = useMyDayController();
   /** Session dismiss for «Свободное окно» upsell (resets on reload). */
@@ -561,23 +534,11 @@ function DayRoutePanelInner() {
   }, []);
 
   useEffect(() => {
-    setStopViewMode(readStopViewMode());
-  }, []);
-
-  useEffect(() => {
     if (route.venues.length === 0) setMobileShelf('add');
   }, [route.venues.length]);
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const mq = window.matchMedia('(min-width: 1024px)');
-    const sync = () => setIsLgUp(mq.matches);
-    sync();
-    mq.addEventListener('change', sync);
-    return () => mq.removeEventListener('change', sync);
-  }, []);
-
-  const effectiveStopViewMode: DayRouteStopViewMode = isLgUp ? stopViewMode : 'list';
+  /** Wave 1.5: always list itinerary (Lovable parity). */
+  const effectiveStopViewMode: DayRouteStopViewMode = 'list';
   const timelineStops = useMemo(
     () =>
       route.venues.map((venue) => ({
@@ -592,11 +553,6 @@ function DayRoutePanelInner() {
     focusedStopId && route.venues.some((v) => v.id === focusedStopId)
       ? focusedStopId
       : route.venues[0]?.id || null;
-
-  function changeStopViewMode(mode: DayRouteStopViewMode) {
-    setStopViewMode(mode);
-    writeStopViewMode(mode);
-  }
 
   function focusStopFromTimeline(stopId: string) {
     focusStopFromMap(stopId);
@@ -3157,41 +3113,6 @@ function DayRoutePanelInner() {
             hourEnd={hourEnd}
             onHourStartChange={setHourStart}
             onHourEndChange={setHourEnd}
-            viewToggle={
-              <div
-                className="hidden rounded-full border border-slate-200/80 bg-slate-50 p-0.5 lg:inline-flex"
-                role="group"
-                aria-label="Вид точек маршрута"
-                data-day-stop-view-toggle
-              >
-                <button
-                  type="button"
-                  aria-pressed={stopViewMode === 'grid'}
-                  onClick={() => changeStopViewMode('grid')}
-                  className={`inline-flex min-h-7 items-center gap-1 rounded-full px-2.5 text-[11px] font-semibold transition ${
-                    stopViewMode === 'grid'
-                      ? 'bg-white text-slate-800 shadow-sm'
-                      : 'text-slate-500 hover:text-slate-700'
-                  }`}
-                >
-                  <LayoutGrid className="h-3.5 w-3.5" />
-                  Сетка
-                </button>
-                <button
-                  type="button"
-                  aria-pressed={stopViewMode === 'list'}
-                  onClick={() => changeStopViewMode('list')}
-                  className={`inline-flex min-h-7 items-center gap-1 rounded-full px-2.5 text-[11px] font-semibold transition ${
-                    stopViewMode === 'list'
-                      ? 'bg-white text-slate-800 shadow-sm'
-                      : 'text-slate-500 hover:text-slate-700'
-                  }`}
-                >
-                  <List className="h-3.5 w-3.5" />
-                  Список
-                </button>
-              </div>
-            }
           />
 
           <MyDayScheduleBanner
@@ -4552,44 +4473,23 @@ function DayRoutePanelInner() {
   );
 }
 
-/** Wanderlog-style teal pin with stop number (list mode). */
-const DAY_ROUTE_LIST_PIN_FILL = '#14B8A6';
-
+/** Stop index badge (Lovable circle, not map-pin). */
 function DayRouteListPin({ n }: { n: number }) {
   const label = String(Math.max(1, Math.floor(n)));
-  const fontSize = label.length > 2 ? 9 : label.length > 1 ? 11 : 13;
   return (
     <span
-      className="relative z-10 inline-flex h-9 w-7 shrink-0 items-center justify-center"
+      className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-600 text-sm font-bold text-white"
       aria-label={`Точка ${label}`}
       data-day-stop-pin
       data-day-stop-number
     >
-      <svg viewBox="0 0 28 36" className="h-9 w-7 drop-shadow-sm" aria-hidden>
-        <path
-          d="M14 1.5C7.096 1.5 1.5 7.096 1.5 14c0 9.75 12.5 20 12.5 20S26.5 23.75 26.5 14C26.5 7.096 20.904 1.5 14 1.5z"
-          fill={DAY_ROUTE_LIST_PIN_FILL}
-        />
-        <text
-          x="14"
-          y="16.5"
-          textAnchor="middle"
-          dominantBaseline="middle"
-          fill="#fff"
-          fontSize={fontSize}
-          fontWeight="700"
-          fontFamily="system-ui,Segoe UI,sans-serif"
-        >
-          {label}
-        </text>
-      </svg>
+      {label}
     </span>
   );
 }
 
 /**
- * Between list stops: dashed pin connector + walk stats + transit tip + insert «+».
- * Travel mode (walk/auto) lives only in the TOP mileage row - not here.
+ * Between list stops: Lovable dashed leg + insert «+».
  */
 function DayRouteBetweenInsert({
   afterVenueId,
@@ -4622,7 +4522,7 @@ function DayRouteBetweenInsert({
   const timeLabel = segmentMinutes > 0 ? formatDayRouteTravelMinutes(segmentMinutes) : '';
   const statsLabel =
     timeLabel && distanceLabel
-      ? `${timeLabel} • ${distanceLabel}`
+      ? `${distanceLabel} · ~${timeLabel}`
       : timeLabel || distanceLabel || '';
 
   useEffect(() => {
@@ -4650,76 +4550,23 @@ function DayRouteBetweenInsert({
   return (
     <li
       ref={rootRef}
-      className="group/between relative list-none py-0.5"
+      className="group/between relative list-none"
       data-day-between-insert
       data-day-between-after={afterVenueId}
     >
-      <div className="relative flex min-h-[2.5rem] items-center gap-2 pl-2 pr-2 sm:gap-2.5">
-        <div className="relative flex h-full w-7 shrink-0 flex-col items-center justify-center self-stretch">
-          <span
-            className="pointer-events-none absolute inset-y-0 left-1/2 w-0 -translate-x-1/2 border-l border-dashed border-slate-300"
-            aria-hidden
-            data-day-between-connector
-          />
-          <div
-            className={`relative z-10 transition ${
-              menuOpen
-                ? 'opacity-100'
-                : 'opacity-100 max-lg:opacity-100 lg:opacity-0 lg:group-hover/between:opacity-100'
-            }`}
-          >
-            <button
-              type="button"
-              aria-label="Добавить между точками"
-              aria-expanded={menuOpen}
-              aria-haspopup="menu"
-              disabled={disabled}
-              data-day-between-plus
-              onClick={() => {
-                onMenuOpenChange(!menuOpen);
-              }}
-              className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-teal-300 hover:text-teal-700 disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              <Plus className="h-3.5 w-3.5" />
-            </button>
-            {menuOpen ? (
-              <div
-                role="menu"
-                data-day-between-menu
-                className="absolute left-1/2 top-[calc(100%+6px)] z-30 w-56 -translate-x-1/2 overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-lg sm:left-0 sm:translate-x-0"
-              >
-                <button
-                  type="button"
-                  role="menuitem"
-                  data-day-between-add-place
-                  onClick={onAddPlace}
-                  className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-sm font-medium text-slate-800 hover:bg-slate-50"
-                >
-                  <MapPin className="h-4 w-4 shrink-0 text-teal-600" aria-hidden />
-                  Добавьте место
-                </button>
-                <button
-                  type="button"
-                  role="menuitem"
-                  data-day-between-add-note
-                  onClick={onAddNote}
-                  className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-sm font-medium text-slate-800 hover:bg-slate-50"
-                >
-                  <StickyNote className="h-4 w-4 shrink-0 text-slate-500" aria-hidden />
-                  Добавить заметку
-                </button>
-              </div>
-            ) : null}
-          </div>
-        </div>
-
+      <div className="ml-4 flex items-center gap-3 border-l border-dashed border-slate-200 py-2.5 pl-6 text-xs text-slate-500 sm:ml-5">
+        {travelMode === 'auto' ? (
+          <Car className="h-3.5 w-3.5 shrink-0" aria-hidden />
+        ) : (
+          <PersonStanding className="h-3.5 w-3.5 shrink-0" aria-hidden />
+        )}
         <div
-          className="relative z-[1] flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-0.5 text-[12px] text-slate-500"
+          className="relative z-[1] flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-0.5"
           data-day-between-meta
         >
           {statsLabel ? (
             <span className="min-w-0 truncate whitespace-nowrap tabular-nums" data-day-between-stats>
-              {statsLabel}
+              {statsLabel} {travelMode === 'auto' ? 'на авто' : 'пешком'}
             </span>
           ) : (
             <span className="whitespace-nowrap text-slate-400" data-day-between-stats="stub">
@@ -4730,6 +4577,54 @@ function DayRouteBetweenInsert({
             <span className="line-clamp-1 min-w-0 flex-1 text-[11px] text-slate-400" data-day-transit-between>
               {transitTip}
             </span>
+          ) : null}
+        </div>
+        <div className="relative shrink-0">
+          <button
+            type="button"
+            aria-label="Добавить между точками"
+            aria-expanded={menuOpen}
+            aria-haspopup="menu"
+            disabled={disabled}
+            data-day-between-plus
+            onClick={() => {
+              onMenuOpenChange(!menuOpen);
+            }}
+            className={`inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-primary-300 hover:text-primary-700 disabled:cursor-not-allowed disabled:opacity-40 ${
+              menuOpen
+                ? 'opacity-100'
+                : 'opacity-100 lg:opacity-0 lg:group-hover/between:opacity-100'
+            }`}
+          >
+            <Plus className="h-3.5 w-3.5" />
+          </button>
+          {menuOpen ? (
+            <div
+              role="menu"
+              data-day-between-menu
+              className="absolute right-0 top-[calc(100%+6px)] z-30 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-lg sm:left-0 sm:right-auto"
+            >
+              <button
+                type="button"
+                role="menuitem"
+                data-day-between-add-place
+                onClick={onAddPlace}
+                className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-sm font-medium text-slate-800 hover:bg-slate-50"
+              >
+                <MapPin className="h-4 w-4 shrink-0 text-primary-600" aria-hidden />
+                Добавьте место
+              </button>
+              <button
+                type="button"
+                role="menuitem"
+                data-day-between-add-note
+                onClick={onAddNote}
+                className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-sm font-medium text-slate-800 hover:bg-slate-50"
+              >
+                <StickyNote className="h-4 w-4 shrink-0 text-slate-500" aria-hidden />
+                Добавить заметку
+              </button>
+            </div>
           ) : null}
         </div>
       </div>
@@ -4850,14 +4745,6 @@ function DayRouteVenueCard({
   const segmentTimeLabel =
     segmentMinutes > 0 ? `~${formatDayRouteTravelMinutes(segmentMinutes)}` : '';
   const sessionDisplay = formatDayRouteSessionDisplay(venue);
-  const metaParts = [
-    sessionDisplay,
-    showStatusChip ? chip.label : null,
-    venue.note,
-    placeLine,
-    !hasCoords ? 'Нет координат' : null,
-  ].filter(Boolean) as string[];
-  const metaLine = metaParts.join(' · ');
   const segmentLine = segmentHint ? `далее ~ ${segmentHint}` : '';
 
   const hoverEnter = () => {
@@ -4888,7 +4775,7 @@ function DayRouteVenueCard({
   );
   const suburbBadge = venue.isSuburb ? (
     <span
-      className="ml-1 inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-1.5 py-0.5 align-middle text-[10px] font-medium leading-none text-slate-600"
+      className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] font-medium leading-none text-slate-600"
       data-day-stop-suburb
     >
       Пригород
@@ -4913,11 +4800,7 @@ function DayRouteVenueCard({
   const commerceRail =
     showTicketBuy || showVenueBoundCta ? (
       <div
-        className={`flex w-full min-w-0 flex-col items-center gap-1 ${
-          variant === 'list'
-            ? 'lg:w-auto lg:max-w-[min(100%,28rem)] lg:shrink-0 lg:self-center lg:items-start'
-            : ''
-        }`}
+        className="flex w-full min-w-0 flex-wrap items-center gap-1.5"
         data-day-stop-commerce
         data-day-stop-venue-bound={showVenueBoundCta ? '1' : undefined}
       >
@@ -5044,48 +4927,33 @@ function DayRouteVenueCard({
     const canDrag = Boolean(onDragStart) && !reorderLocked;
     return (
       <li
-        className={`relative w-full scroll-mt-4 list-none ${dragging ? 'opacity-60' : ''}`}
+        className={`relative w-full scroll-mt-4 list-none ${dragging ? 'opacity-40' : ''}`}
         data-day-plan-stop={venue.id}
         data-day-stop-variant="list"
-        data-day-stop-list="wanderlog"
-        data-day-stop-layout="pin-meta-thumb"
+        data-day-stop-list="lovable"
+        data-day-stop-layout="number-grip-content-thumb"
         data-ticket-bought={bought ? '1' : '0'}
         data-commercial-chip={chip.kind}
         data-day-session={sessionDisplay || undefined}
         data-day-stop-focused={focused ? '1' : undefined}
-        draggable={canDrag}
         onMouseEnter={hoverEnter}
         onMouseLeave={hoverLeave}
         onFocusCapture={hoverEnter}
         onBlurCapture={onBlurCapture}
-        onDragStart={
-          canDrag
-            ? (event) => {
-                const target = event.target as HTMLElement | null;
-                if (target?.closest('a,button,input,textarea,label')) {
-                  event.preventDefault();
-                  return;
-                }
-                onDragStart?.();
-              }
-            : undefined
-        }
         onDragOver={canDrag ? onDragOver : undefined}
         onDrop={canDrag ? onDrop : undefined}
         onDragEnd={canDrag ? onDragEnd : undefined}
       >
-        <div
-          className={`relative flex w-full items-center justify-start gap-2 rounded-xl bg-slate-100/95 p-2.5 pl-2 sm:gap-2.5 sm:p-3 ${
-            focused ? 'ring-2 ring-emerald-300 ring-offset-1' : ''
-          } ${purchased ? 'border-l-4 border-primary-600' : ''} ${
-            canDrag ? 'cursor-grab active:cursor-grabbing' : ''
-          }`}
+        <article
+          className={`group grid grid-cols-[auto_minmax(0,1fr)] gap-3 rounded-2xl border p-3 transition-colors sm:gap-4 sm:p-4 ${
+            focused
+              ? 'border-primary-400/50 bg-white shadow-sm'
+              : 'border-transparent bg-transparent hover:bg-slate-50'
+          } ${purchased ? 'border-l-4 border-l-primary-600' : ''}`}
           data-day-stop-shell
         >
-          <div
-            className="flex w-7 shrink-0 flex-col items-center justify-center gap-0.5 self-stretch"
-            data-day-stop-index-cluster
-          >
+          <div className="flex shrink-0 flex-col items-center gap-2" data-day-stop-index-cluster>
+            <DayRouteListPin n={pinNumber} />
             {reorderLocked ? (
               <span
                 className="inline-flex text-slate-300"
@@ -5096,133 +4964,184 @@ function DayRouteVenueCard({
                 <Ticket className="h-3.5 w-3.5" />
               </span>
             ) : (
-              <button
-                type="button"
-                aria-label="Выше"
-                disabled={index === 0}
-                onClick={onMoveUp}
-                className="hidden rounded p-0 text-slate-400 hover:bg-white/70 hover:text-slate-700 disabled:opacity-30 sm:inline-flex"
-                data-day-stop-sort="up"
-              >
-                <ChevronUp className="h-3.5 w-3.5" />
-              </button>
-            )}
-            <DayRouteListPin n={pinNumber} />
-            {!reorderLocked ? (
-              <button
-                type="button"
-                aria-label="Ниже"
-                disabled={index >= total - 1}
-                onClick={onMoveDown}
-                className="hidden rounded p-0 text-slate-400 hover:bg-white/70 hover:text-slate-700 disabled:opacity-30 sm:inline-flex"
-                data-day-stop-sort="down"
-              >
-                <ChevronDown className="h-3.5 w-3.5" />
-              </button>
-            ) : null}
-          </div>
-
-          <div className="min-w-0 flex-1 self-center py-0.5 pl-1.5 sm:pl-2" data-day-stop-content>
-            {softTimeNode}
-            {purchased ? (
-              <p className="m-0 text-[11px] font-bold uppercase tracking-wide text-primary-700">
-                Оплачено
-              </p>
-            ) : null}
-            <p className="m-0 line-clamp-2 text-[15px] font-bold leading-snug text-slate-900 sm:text-base">
-              {titleNode}
-              {suburbBadge}
-            </p>
-            {metaLine ? (
-              <p
-                className={`m-0 mt-1 line-clamp-2 text-[12px] leading-snug ${
-                  !hasCoords ? 'text-amber-700' : 'text-slate-500'
-                }`}
-              >
-                {metaLine}
-              </p>
-            ) : (
-              <p className="m-0 mt-1 line-clamp-2 text-[12px] leading-snug text-slate-400">
-                Добавьте здесь заметки, ссылки и т.д.
-              </p>
-            )}
-            {textStop ? (
-              <div className="mt-1.5" data-day-custom-address>
-                {addressOpen ? (
-                  <form
-                    className="flex gap-1"
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      onSetNote(addressDraft.trim());
-                      setAddressOpen(false);
-                    }}
-                  >
-                    <input
-                      type="text"
-                      value={addressDraft}
-                      onChange={(e) => setAddressDraft(e.target.value)}
-                      placeholder="Адрес или заметка"
-                      className="min-h-7 w-full rounded-md border border-slate-200 bg-white px-2 text-[11px] outline-none focus:border-primary-400"
-                      autoFocus
-                    />
-                    <button type="submit" className="text-[11px] font-semibold text-primary-700">
-                      Ок
-                    </button>
-                  </form>
-                ) : (
+              <div className="flex flex-col items-center gap-0.5">
+                <button
+                  type="button"
+                  draggable={canDrag}
+                  aria-label={`Переместить «${venue.title}», позиция ${index + 1} из ${total}`}
+                  title="Перетащите или стрелки выше / ниже"
+                  data-day-stop-grip
+                  onDragStart={
+                    canDrag
+                      ? (event) => {
+                          event.stopPropagation();
+                          onDragStart?.();
+                        }
+                      : undefined
+                  }
+                  onDragEnd={canDrag ? onDragEnd : undefined}
+                  className={`grid h-9 w-9 cursor-grab place-items-center rounded-md border text-slate-400 transition hover:bg-white active:cursor-grabbing ${
+                    canDrag ? 'border-slate-200' : 'border-transparent opacity-40'
+                  }`}
+                >
+                  <GripVertical className="h-4 w-4" />
+                </button>
+                <div className="hidden flex-col sm:flex" data-day-stop-sort>
                   <button
                     type="button"
-                    onClick={() => {
-                      setAddressDraft(String(venue.note || venue.address || ''));
-                      setAddressOpen(true);
-                    }}
-                    className="text-[11px] font-medium text-slate-400 underline-offset-2 hover:text-slate-600 hover:underline"
+                    aria-label="Выше"
+                    disabled={index === 0}
+                    onClick={onMoveUp}
+                    className="rounded p-0 text-slate-300 hover:text-slate-600 disabled:opacity-30"
+                    data-day-stop-sort="up"
                   >
-                    {venue.note || venue.address ? 'Изменить адрес' : 'Указать адрес'}
+                    <ChevronUp className="h-3.5 w-3.5" />
                   </button>
-                )}
-              </div>
-            ) : null}
-            {commerceRail ? <div className="mt-2">{commerceRail}</div> : null}
-          </div>
-
-          <div
-            className="relative h-[4.75rem] w-[5.75rem] shrink-0 self-center overflow-hidden rounded-lg bg-slate-200 sm:h-[5.25rem] sm:w-[6.5rem]"
-            data-day-stop-thumb
-          >
-            {thumbUrl ? (
-              <SafeImage src={thumbUrl} alt="" fill sizes="7rem" className="object-cover" />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-200 via-slate-100 to-sky-100 text-slate-400">
-                <MapPin className="h-5 w-5" />
+                  <button
+                    type="button"
+                    aria-label="Ниже"
+                    disabled={index >= total - 1}
+                    onClick={onMoveDown}
+                    className="rounded p-0 text-slate-300 hover:text-slate-600 disabled:opacity-30"
+                    data-day-stop-sort="down"
+                  >
+                    <ChevronDown className="h-3.5 w-3.5" />
+                  </button>
+                </div>
               </div>
             )}
           </div>
 
-          <div className="flex shrink-0 flex-col items-center gap-1 self-start pt-0.5" data-day-stop-actions>
-            {mapsUrl ? (
-              <a
-                href={mapsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Открыть в Яндекс.Картах"
-                title="Открыть в Яндекс.Картах"
-                data-day-stop-maps
-                className="inline-flex h-8 w-8 items-center justify-center rounded-full text-sky-600 hover:bg-white/80"
+          <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] gap-3 sm:gap-4">
+            <div className="min-w-0" data-day-stop-content>
+              <div className="flex flex-wrap items-center gap-2">
+                {softTimeLabel ? (
+                  <span
+                    className="rounded-full bg-sky-50 px-2.5 py-0.5 text-xs font-bold text-sky-800"
+                    data-day-soft-time
+                  >
+                    {softTimeLabel}
+                  </span>
+                ) : null}
+                {purchased ? (
+                  <span className="text-[11px] font-bold uppercase tracking-wide text-primary-700">
+                    Оплачено
+                  </span>
+                ) : null}
+                {suburbBadge}
+              </div>
+              <h2 className="mt-1 text-base font-bold leading-snug text-slate-900 sm:text-lg">
+                {titleNode}
+              </h2>
+              {placeLine || !hasCoords ? (
+                <p
+                  className={`mt-1 truncate text-sm ${
+                    !hasCoords ? 'text-amber-700' : 'text-slate-500'
+                  }`}
+                >
+                  {placeLine || 'Нет координат'}
+                  {placeLine && !hasCoords ? ' · Нет координат' : ''}
+                </p>
+              ) : null}
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                {sessionDisplay ? (
+                  <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
+                    {sessionDisplay}
+                  </span>
+                ) : null}
+                {showStatusChip ? (
+                  <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
+                    {chip.label}
+                  </span>
+                ) : null}
+                {venue.note && !textStop ? (
+                  <span className="line-clamp-1 text-xs text-slate-500">{venue.note}</span>
+                ) : null}
+              </div>
+              {textStop ? (
+                <div className="mt-2" data-day-custom-address>
+                  {addressOpen ? (
+                    <form
+                      className="flex gap-1"
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        onSetNote(addressDraft.trim());
+                        setAddressOpen(false);
+                      }}
+                    >
+                      <input
+                        type="text"
+                        value={addressDraft}
+                        onChange={(e) => setAddressDraft(e.target.value)}
+                        placeholder="Адрес или заметка"
+                        className="min-h-7 w-full rounded-md border border-slate-200 bg-white px-2 text-[11px] outline-none focus:border-primary-400"
+                        autoFocus
+                      />
+                      <button type="submit" className="text-[11px] font-semibold text-primary-700">
+                        Ок
+                      </button>
+                    </form>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAddressDraft(String(venue.note || venue.address || ''));
+                        setAddressOpen(true);
+                      }}
+                      className="text-[11px] font-medium text-slate-400 underline-offset-2 hover:text-slate-600 hover:underline"
+                    >
+                      {venue.note || venue.address ? 'Изменить адрес' : 'Указать адрес'}
+                    </button>
+                  )}
+                </div>
+              ) : null}
+            </div>
+
+            <div className="flex shrink-0 flex-col items-end gap-2">
+              <div
+                className="relative h-20 w-20 overflow-hidden rounded-xl bg-slate-100 sm:h-24 sm:w-28"
+                data-day-stop-thumb
               >
-                <Navigation className="h-4 w-4" />
-              </a>
-            ) : null}
-            <button
-              type="button"
-              aria-label="Удалить точку"
-              onClick={onRemove}
-              className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-slate-400 hover:bg-white/80 hover:text-slate-700"
-            >
-              <X className="h-4 w-4" />
-            </button>
+                {thumbUrl ? (
+                  <SafeImage src={thumbUrl} alt="" fill sizes="7rem" className="object-cover" />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-200 via-slate-100 to-sky-100 text-slate-400">
+                    <MapPin className="h-5 w-5" />
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center gap-1" data-day-stop-actions>
+                {mapsUrl ? (
+                  <a
+                    href={mapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Открыть в Яндекс.Картах"
+                    title="Открыть в Яндекс.Картах"
+                    data-day-stop-maps
+                    className="grid h-7 w-7 place-items-center rounded-full border border-slate-200 text-sky-600 opacity-0 transition-opacity hover:bg-slate-50 group-hover:opacity-100 group-focus-within:opacity-100 max-lg:opacity-100"
+                  >
+                    <Navigation className="h-3.5 w-3.5" />
+                  </a>
+                ) : null}
+                <button
+                  type="button"
+                  aria-label="Удалить точку"
+                  onClick={onRemove}
+                  className="grid h-7 w-7 place-items-center rounded-full border border-slate-200 text-slate-400 opacity-0 transition-opacity hover:bg-slate-50 hover:text-slate-700 group-hover:opacity-100 group-focus-within:opacity-100 max-lg:opacity-100"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
+        </article>
+
+        {commerceRail ? (
+          <div className="ml-11 mt-1.5 sm:ml-12" data-day-stop-offers-below>
+            {commerceRail}
+          </div>
+        ) : null}
       </li>
     );
   }
