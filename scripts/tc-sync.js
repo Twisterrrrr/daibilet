@@ -220,13 +220,14 @@ function parseIds(raw) {
 async function resolvePublicSlugsForExternalIds(externalIds) {
   const ids = [...new Set((externalIds || []).map(String).filter(Boolean))];
   if (!ids.length) return [];
-  const { Client } = require("pg");
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) return [];
-  const client = new Client({ connectionString: databaseUrl });
+  const { createRequire } = require("module");
+  const requireFromDbPackage = createRequire(path.join(rootDir, "packages", "db", "package.json"));
+  const { Pool } = requireFromDbPackage("pg");
+  const pool = new Pool({ connectionString: databaseUrl, max: 1 });
   try {
-    await client.connect();
-    const result = await client.query(
+    const result = await pool.query(
       `select e.slug
        from "EventSourceLink" l
        join "Event" e on e.id = l."eventId"
@@ -239,7 +240,7 @@ async function resolvePublicSlugsForExternalIds(externalIds) {
     return [];
   } finally {
     try {
-      await client.end();
+      await pool.end();
     } catch {
       /* ignore */
     }
