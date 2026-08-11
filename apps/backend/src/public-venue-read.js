@@ -2526,6 +2526,65 @@ async function venueRowsByIds(db, ids) {
   });
 }
 
+/** Home cold path: venue meta only (event counts come from catalog sessions). */
+async function venueRowsByIdsLean(db, ids) {
+  const venueIds = [...new Set((ids || []).map((id) => String(id || '').trim()).filter(Boolean))];
+  if (!venueIds.length) return [];
+
+  const result = await db.query(
+    `
+      select
+        venue.id,
+        venue.slug,
+        venue.title as name,
+        venue."shortDescription",
+        venue.description,
+        venue."heroImageUrl",
+        venue."hookFact",
+        city.id as "cityId",
+        city.title as city,
+        city.slug as "citySlug",
+        venue.address,
+        venue.latitude,
+        venue.longitude,
+        venue.kind,
+        venue."pageStatus",
+        0::int as events,
+        0::int as "waterEvents"
+      from "Venue" venue
+      left join "City" city on city.id = venue."cityId"
+      where venue.id = any($1::text[])
+    `,
+    [venueIds],
+  );
+
+  return result.rows.map((row) => {
+    const name = formatPublicVenueTitle(row.name);
+    const mapped = {
+      id: row.id,
+      slug: row.slug,
+      name,
+      cityId: row.cityId || null,
+      city: row.city || 'Не указан',
+      citySlug: row.citySlug || null,
+      address: row.address,
+      latitude: row.latitude,
+      longitude: row.longitude,
+      shortDescription: row.shortDescription,
+      hookFact: row.hookFact,
+      heroImageUrl: row.heroImageUrl,
+      proposedKind: String(row.kind || 'OTHER').toLowerCase(),
+      kind: String(row.kind || 'OTHER').toUpperCase(),
+      pageStatus: String(row.pageStatus || 'NONE').toLowerCase(),
+      reason: row.pageStatus === 'CANDIDATE' ? 'кандидат на public-страницу' : 'пока только локация',
+      events: row.events,
+      waterEvents: row.waterEvents,
+    };
+    mapped.city = resolvePublicVenueCity(mapped);
+    return applyPublicVenueNormalization(mapped);
+  });
+}
+
 /** Match catalog city=? against title / citySlug / canonical aliases (nizhny ↔ нижнии). */
 export function publicVenueRowMatchesCityFilter(row, cityFilterRaw) {
   const cityFilter = String(cityFilterRaw || '').trim().toLowerCase();
@@ -2652,6 +2711,55 @@ export function mergeCityPageVenues(sessionVenues, contentVenues, limit = 250) {
 
 export async function publicVenues(db, limit) {
   return (await publicVenueHubRows(db, 500)).slice(0, limit).map(mapPublicVenueListItem);
+}
+
+/**
+ * Home rail venues without awaiting full hub SQL (~5s cold).
+ * Prefer soft hub; on true cold pick top session venues + venueRowsByIds and warm hub in background.
+ */
+export async function publicVenuesForHome(db, sessions, limit = 36) {
+  const take = Math.max(36, Math.min(Number(limit) || 36, 36));
+  const hubTake = 500;
+  const hubOptions = {};
+  const hubKey = venueHubCacheBaseKey(hubTake, hubOptions);
+
+  const softHub =
+    findSoftVenueHubRows(hubTake, hubOptions) ||
+    findSoftVenueHubRows(VENUE_CATALOG_HUB_MAX, { requireEvents: false });
+  if (softHub?.cached?.rows?.length) {
+    void schedulePublicVenueHubRebuild(hubKey, hubTake, hubOptions);
+    const fromHub = publicVenuesForSessionsFromHub(sessions, softHub.cached.rows, take);
+    if (fromHub.length >= Math.min(12, take)) return fromHub.slice(0, take);
+    if (fromHub.length) return fromHub;
+    return softHub.cached.rows.slice(0, take).map(mapPublicVenueListItem);
+  }
+
+  // Cold: do not block home on lean hub rebuild; warm in background for /venues.
+  void schedulePublicVenueHubRebuild(hubKey, hubTake, hubOptions);
+
+  const { activeCounts, waterCounts, busCounts, heroImageFallbacks, nextSessionStartsAt } =
+    buildActiveVenueEventCounts(sessions);
+  const topIds = [...activeCounts.entries()]
+    .sort((left, right) => right[1] - left[1] || String(left[0]).localeCompare(String(right[0])))
+    .slice(0, Math.max(take * 3, take))
+    .map(([id]) => id);
+  if (!topIds.length) return [];
+
+  const rows = (await venueRowsByIdsLean(db, topIds))
+    .map((row) => ({
+      ...row,
+      events: activeCounts.get(row.id) || Number(row.events) || 0,
+      waterEvents: waterCounts.get(row.id) || Number(row.waterEvents) || 0,
+      busEvents: busCounts.get(row.id) || 0,
+      heroImageUrl: resolveVenueHeroImageUrl(row, heroImageFallbacks),
+      nextSessionStartsAt: nextSessionStartsAt.get(row.id) || null,
+      mergedVenueIds: [row.id],
+    }))
+    .filter((row) => isPublicVenueHub(row))
+    .sort((left, right) => (right.events || 0) - (left.events || 0) || String(left.name || '').localeCompare(String(right.name || ''), 'ru'))
+    .slice(0, take);
+
+  return rows.map(mapPublicVenueListItem);
 }
 
 /**

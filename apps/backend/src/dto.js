@@ -119,6 +119,7 @@ import {
   publicPublishedVenuesByCityId,
   mergeCityPageVenues,
   publicVenues,
+  publicVenuesForHome,
   publicVenuesForSessionsFromHub,
   publicVenueRowMatchesCityFilter,
   isPublicVenueHub,
@@ -145,6 +146,7 @@ export {
   publicPublishedVenuesByCityId,
   mergeCityPageVenues,
   publicVenues,
+  publicVenuesForHome,
   publicVenuesForSessionsFromHub,
   publicVenueRowMatchesCityFilter,
   isPublicVenueHub,
@@ -3913,19 +3915,19 @@ export async function buildPublicHome(db) {
     return publicHomeCache.payload;
   }
 
-  // One catalog load: destinations derive from sessions (avoid destinationRows → 2nd full scan).
-  const [stats, catalogSessions, venues] = await Promise.all([
-    db.stats(),
-    publicCatalogSessions(db),
-    publicVenues(db, 36),
-  ]);
+  const t0 = Date.now();
+  // Catalog first (destinations/landings/venues derive from it) - avoid parallel hub SQL.
+  const [stats, catalogSessions] = await Promise.all([db.stats(), publicCatalogSessions(db)]);
+  // Soft hub or top-N from sessions - never await full publicVenueHubRows cold rebuild (~5s).
+  const venues = await publicVenuesForHome(db, catalogSessions, 36);
   const destinations = buildPublicDestinationRowsFromSessions(catalogSessions);
   // Compact card DTO only - full session blobs made /api/public/home ~1.2MB.
   const sessions = catalogSessions
     .filter(sessionHasCoverImage)
     .slice(0, 180)
     .map((session) => toPublicHomeCardSession(session));
-  const landings = buildPublicLandings(catalogSessions);
+  // Prefer catalog landingSlugs - rematch of 3k sessions was ~1.5s CPU on MSK.
+  const landings = buildPublicLandings(catalogSessions, { preferCachedSlugs: true });
 
   const payload = {
     generatedAt: new Date().toISOString(),
@@ -3945,6 +3947,10 @@ export async function buildPublicHome(db) {
     expiresAt: now + PUBLIC_CATALOG_CACHE_MS,
     payload,
   };
+
+  console.log(
+    `buildPublicHome: ${catalogSessions.length} sessions, ${venues.length} venues in ${Date.now() - t0}ms`,
+  );
 
   return payload;
 }

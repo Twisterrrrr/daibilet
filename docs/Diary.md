@@ -1,3 +1,20 @@
+## 2026-08-11 - MSK: accelerate /api/public/home cold rebuild
+
+### Наблюдения
+- После `48a49340` home снова живой, но cold `?refresh=1` после restart API ~6.4-7.5s.
+- Profile `buildPublicHome`: venues hub SQL ~4.9s + `buildPublicLandings` rematch ~1.5s; catalog disk adopt ~0.3-0.5s.
+
+### Решения
+- `publicVenuesForHome`: soft hub или top-N venueIds из sessions + lean SQL (без Event JOIN); full hub warm в фоне.
+- `buildPublicLandings({ preferCachedSlugs: true })`: без rematch + агрегация O(sessions*slugs).
+- На MSK: файлы в `/opt/daibilet/apps/backend/src` + `systemctl restart daibilet-api`.
+- After: cold ~0.7s, refresh2 ~0.3s, warm ~7ms.
+
+### Проблемы
+- Первый hit после restart всё ещё платит ~0.5s disk catalog promote - ок для Soft-SWR; startup warm optional.
+
+---
+
 ## 2026-08-11 - MSK: /api/public/home stale fallback (publicVenues)
 
 ### Наблюдения
@@ -13,7 +30,7 @@
 - After: home `generatedAt` live, dest=98/events=2941; warm ~15-155ms; `/` ~163ms.
 
 ### Проблемы
-- Cold `home?refresh=1` localhost ~7.5s (catalog+venues hub) - отдельный perf pass.
+- ~~Cold `home?refresh=1` localhost ~7.5s (catalog+venues hub) - отдельный perf pass.~~ → fixed 2026-08-11 (~0.7s cold).
 - MSK git tip всё ещё старый checkout; файлы пропатчены точечно.
 
 ---
