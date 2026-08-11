@@ -1,3 +1,19 @@
+## 2026-08-11 - My Day: Lovable sticky route toolbar
+
+### Наблюдения
+- При непустом маршруте H1 держал generic Save/Clear/Share; Lovable держит sticky route card (stats, mode, optimize, hours, trash, export, типы точек, dnd-hint).
+
+### Решения
+- `MyDayToolbar`: stats (N точек + дистанция + total с dwell), Пешком/На авто, Оптимизировать, По часам, trash, export PDF/печать + Поделиться (GPX/KML отложены).
+- «Типы точек» pills + «Показано X из Y» + dnd-hint; фильтр скрывает точки в списке/карте.
+- H1 Save/Clear/Share row убран при непустом дне - действия в toolbar.
+
+### Проблемы
+- GPX/KML / «Сохранить как сценарий» / PDF-с-картой (карта в PDF) - не 1:1 Lovable, см. gap audit.
+- Live MSK - batch / «выкатывай».
+
+---
+
 ## 2026-08-11 - Region hub: previews + map open by default
 
 ### Наблюдения

@@ -45,6 +45,7 @@ import {
   FormEvent,
   Fragment,
   Suspense,
+  useCallback,
   useEffect,
   useLayoutEffect,
   useMemo,
@@ -205,6 +206,11 @@ import {
   type MustSeeFilterId,
 } from '@/lib/must-see-filters';
 import { MustSeeFilterTabs } from '@/components/MustSeeFilterTabs.client';
+import {
+  buildDayRouteTypeCounts,
+  dayRouteStopTypeTag,
+  estimateDayRouteDwellMinutes,
+} from '@/lib/day-route-stop-types';
 import { formatStreetAddress } from '@/lib/address';
 import {
   softGeocodeAddress,
@@ -411,6 +417,8 @@ function DayRoutePanelInner() {
   const [geocodeBusy, setGeocodeBusy] = useState(false);
   const [geocodeHint, setGeocodeHint] = useState<string | null>(null);
   const [geocodePreview, setGeocodePreview] = useState<SoftGeocodeHit | null>(null);
+  /** Lovable «Типы точек»: hidden tags filter itinerary visibility. */
+  const [hiddenStopTags, setHiddenStopTags] = useState<string[]>([]);
   /** Exclusive accordion for route-building tools only (must-see / custom / matches). */
   /** Guidebook (scenarios + suburbs DayTripCanonCard) stays always open as day-plan cards. */
   const [openPanel, setOpenPanel] = useState<DayRouteAccordionId | null>(null);
@@ -1439,6 +1447,71 @@ function DayRoutePanelInner() {
     () => estimateDayRouteTravelMinutes(totalDistanceMeters, travelMode),
     [totalDistanceMeters, travelMode],
   );
+  const totalWithStopsMinutes = useMemo(
+    () => travelMinutes + estimateDayRouteDwellMinutes(route.venues),
+    [travelMinutes, route.venues],
+  );
+  const totalWithStopsLabel = useMemo(() => {
+    if (route.venues.length === 0) return null;
+    const label = formatDayRouteTravelMinutes(totalWithStopsMinutes);
+    return label || null;
+  }, [route.venues.length, totalWithStopsMinutes]);
+  const mustSeeTagByKey = useMemo(() => {
+    const SHORT: Record<string, string> = {
+      main: 'Главное',
+      gastro: 'Еда',
+      museum: 'Музей',
+      science: 'Семейное',
+      literature: 'Литература',
+      views: 'Смотровая',
+      street: 'Улица',
+      park: 'Парк',
+      temple: 'Храм',
+      creative: 'Необычное',
+      secret: 'Секрет',
+      houses: 'Дома',
+      mansions: 'Особняк',
+    };
+    const map = new Map<string, string>();
+    for (const row of mustSeeResolved) {
+      const id = classifyMustSeePlace(row.place);
+      const label = SHORT[id] || mustSeeFilterLabel(id);
+      if (row.item.id) map.set(row.item.id, label);
+      if (row.item.slug) map.set(String(row.item.slug), label);
+    }
+    return map;
+  }, [mustSeeResolved]);
+  const resolveStopTag = useCallback(
+    (venue: DayRouteVenueItem) =>
+      mustSeeTagByKey.get(venue.id) ||
+      (venue.slug ? mustSeeTagByKey.get(String(venue.slug)) : null) ||
+      null,
+    [mustSeeTagByKey],
+  );
+  const stopTypeCounts = useMemo(
+    () => buildDayRouteTypeCounts(route.venues, resolveStopTag),
+    [route.venues, resolveStopTag],
+  );
+  const isStopTagHidden = useCallback(
+    (venue: DayRouteVenueItem) => {
+      if (isNoteDayRouteStop(venue)) return false;
+      const tag = dayRouteStopTypeTag(venue, resolveStopTag(venue));
+      return hiddenStopTags.includes(tag);
+    },
+    [hiddenStopTags, resolveStopTag],
+  );
+  const visibleRouteVenues = useMemo(
+    () => route.venues.filter((v) => !isStopTagHidden(v)),
+    [route.venues, isStopTagHidden],
+  );
+  const stopsCountLabel = useMemo(() => {
+    const n = route.venues.length;
+    const abs = Math.abs(n) % 100;
+    const last = abs % 10;
+    const word =
+      abs > 10 && abs < 20 ? 'точек' : last === 1 ? 'точка' : last >= 2 && last <= 4 ? 'точки' : 'точек';
+    return `${n} ${word}`;
+  }, [route.venues.length]);
   const cityScopeLine = useMemo(() => {
     if (!hasPageCity) return null;
     const availablePoints =
@@ -1510,6 +1583,23 @@ function DayRoutePanelInner() {
     const overflow = new Set(hourPlan?.overflowIds || []);
     return route.venues.filter((v) => !dayRouteStopIsPurchased(v) && !overflow.has(v.id));
   }, [route.venues, hourPlan]);
+
+  const displayPlanStops = useMemo(
+    () => planStops.filter((v) => !isStopTagHidden(v)),
+    [planStops, isStopTagHidden],
+  );
+  const displayPurchasedStops = useMemo(
+    () => purchasedStops.filter((v) => !isStopTagHidden(v)),
+    [purchasedStops, isStopTagHidden],
+  );
+  const displayMapStops = useMemo(
+    () =>
+      mapStops.filter((stop) => {
+        const venue = route.venues.find((v) => v.id === stop.id);
+        return venue ? !isStopTagHidden(venue) : true;
+      }),
+    [mapStops, route.venues, isStopTagHidden],
+  );
 
   const overflowStops = useMemo(() => {
     if (!hourPlan?.overflowIds.length) return [] as DayRouteVenueItem[];
@@ -3062,97 +3152,11 @@ function DayRoutePanelInner() {
           </p>
         </div>
 
-        {/* Desktop top-right: Save / Clear + Share only when route has stops */}
+        {/* Share menu opens from toolbar; host kept for outside-click ref. */}
         {route.venues.length ? (
-          <div
-            className="relative hidden shrink-0 flex-wrap items-center justify-end gap-2 sm:flex"
-            ref={shareMenuRef}
-            data-day-desktop-actions
-          >
-            <button
-              type="button"
-              onClick={printItinerary}
-              data-day-print
-              className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition duration-200 hover:bg-slate-50"
-            >
-              <Printer className="h-3.5 w-3.5" />
-              Сохранить
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                clearDayRoute();
-                setRoute(readDayRoute());
-                replaceMyDayUrl('/my-day');
-              }}
-              data-day-clear
-              className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 transition duration-200 hover:bg-slate-50"
-            >
-              <Trash2 className="h-3.5 w-3.5" /> Очистить
-            </button>
-            <button
-              type="button"
-              onClick={() => setShareMenuOpen((open) => !open)}
-              data-day-share
-              aria-expanded={shareMenuOpen}
-              className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-2xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-900 transition duration-200 hover:bg-emerald-100"
-            >
-              <Share2 className="h-3.5 w-3.5" />
-              {copyStatus === 'ok' ? 'Скопировано!' : 'Поделиться'}
-            </button>
-            {shareMenuOpen ? (
-              <div
-                role="menu"
-                data-day-share-menu
-                className="absolute right-0 top-full z-30 mt-2 w-56 overflow-hidden rounded-2xl border border-slate-200 bg-white py-1 shadow-lg"
-              >
-                {shareMenuItems}
-              </div>
-            ) : null}
-          </div>
+          <div className="relative hidden shrink-0" ref={shareMenuRef} data-day-desktop-actions />
         ) : null}
       </div>
-
-      {/* Mobile: Поделиться / Сохранить / Очистить only when route has content */}
-      {route.venues.length ? (
-        <div
-          className="mt-3 flex w-full gap-2 sm:hidden"
-          data-day-mobile-actions-row
-          data-day-mobile-actions-col
-        >
-          <button
-            type="button"
-            onClick={() => setShareMenuOpen(true)}
-            data-day-share
-            className="inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-900 transition"
-          >
-            <Share2 className="h-3.5 w-3.5 shrink-0" />
-            {copyStatus === 'ok' ? 'Скопировано!' : 'Поделиться'}
-          </button>
-          <button
-            type="button"
-            onClick={printItinerary}
-            data-day-print
-            className="inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700"
-          >
-            <Printer className="h-3.5 w-3.5 shrink-0" />
-            Сохранить
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              clearDayRoute();
-              setRoute(readDayRoute());
-              replaceMyDayUrl('/my-day');
-            }}
-            data-day-clear
-            className="inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600"
-          >
-            <Trash2 className="h-3.5 w-3.5 shrink-0" />
-            Очистить
-          </button>
-        </div>
-      ) : null}
 
       {/* ≥1 stop: compact city+search under H1 (no mid-page bordered starter card) */}
       {!isEmptyRoute ? renderHeaderCompactSearch() : null}
@@ -3292,13 +3296,14 @@ function DayRoutePanelInner() {
         <section className="mt-5 w-full sm:mt-6" data-day-route-list-section>
           <MyDayToolbar
             stopsCount={route.venues.length}
-            stopsHeading={formatDayRouteStopsHeading(route.venues.length)}
+            stopsCountLabel={stopsCountLabel}
             distanceLabel={
               totalDistanceMeters > 0 ? formatDayRouteDistance(totalDistanceMeters) : null
             }
             travelMinutesLabel={
               travelMinutes > 0 ? formatDayRouteTravelMinutes(travelMinutes) : null
             }
+            totalWithStopsLabel={totalWithStopsLabel}
             travelMode={travelMode}
             onTravelModeChange={setTravelMode}
             canOptimize={canOptimize}
@@ -3314,25 +3319,43 @@ function DayRoutePanelInner() {
             hourEnd={hourEnd}
             onHourStartChange={setHourStart}
             onHourEndChange={setHourEnd}
-          />
-
-          <MyDayScheduleBanner
-            overflowCount={overflowStops.length}
-            totalLabel={hourPlan?.totalLabel || null}
-            lunchLabel={hourPlan?.lunchHint?.label || null}
-            onTrimOverflow={
-              overflowStops.length
-                ? () => {
-                    for (const v of overflowStops) setRoute(removeFromDayRoute(v.id));
-                  }
-                : undefined
-            }
-            onExtendEnd={
-              hourPlanOn
-                ? () => {
-                    setHourEnd('23:30');
-                  }
-                : undefined
+            onClear={() => {
+              clearDayRoute();
+              setRoute(readDayRoute());
+              replaceMyDayUrl('/my-day');
+            }}
+            onPrintPdf={printItinerary}
+            onShare={() => setShareMenuOpen(true)}
+            shareLabel={copyStatus === 'ok' ? 'Скопировано!' : 'Поделиться'}
+            typeCounts={stopTypeCounts}
+            hiddenTags={hiddenStopTags}
+            visibleStopsCount={visibleRouteVenues.filter((v) => !isNoteDayRouteStop(v)).length}
+            onToggleTag={(tag) => {
+              setHiddenStopTags((prev) =>
+                prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag],
+              );
+            }}
+            onShowAllTags={() => setHiddenStopTags([])}
+            scheduleSlot={
+              <MyDayScheduleBanner
+                overflowCount={overflowStops.length}
+                totalLabel={hourPlan?.totalLabel || null}
+                lunchLabel={hourPlan?.lunchHint?.label || null}
+                onTrimOverflow={
+                  overflowStops.length
+                    ? () => {
+                        for (const v of overflowStops) setRoute(removeFromDayRoute(v.id));
+                      }
+                    : undefined
+                }
+                onExtendEnd={
+                  hourPlanOn
+                    ? () => {
+                        setHourEnd('23:30');
+                      }
+                    : undefined
+                }
+              />
             }
           />
 
@@ -3356,7 +3379,7 @@ function DayRoutePanelInner() {
             </div>
           ) : null}
 
-          {purchasedStops.length ? (
+          {displayPurchasedStops.length ? (
             <div className="mt-3" data-day-group="purchased">
               <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wide text-primary-700">
                 Купленные билеты
@@ -3370,7 +3393,7 @@ function DayRoutePanelInner() {
                 data-day-plan-list="purchased"
                 data-day-stop-view={effectiveStopViewMode}
               >
-                {purchasedStops.map((venue, index) => (
+                {displayPurchasedStops.map((venue, index) => (
                   <DayRouteVenueCard
                     key={venue.id}
                     index={index}
@@ -3441,14 +3464,14 @@ function DayRoutePanelInner() {
                   onOpenFullPicker={() => openInsertPlaceAfter('__start__')}
                 />
               ) : null}
-              {planStops.map((venue, index) => {
+              {displayPlanStops.map((venue, index) => {
                 const globalIndex = route.venues.findIndex((v) => v.id === venue.id);
                 const nextTipRaw =
                   globalIndex >= 0
                     ? route.venues[globalIndex + 1]?.transitTip
-                    : planStops[index + 1]?.transitTip;
+                    : displayPlanStops[index + 1]?.transitTip;
                 const betweenTip =
-                  index < planStops.length - 1
+                  index < displayPlanStops.length - 1
                     ? formatDayRouteTransitTipLine(nextTipRaw)
                     : '';
                 const segmentToNext =
@@ -3458,7 +3481,7 @@ function DayRoutePanelInner() {
                   <Fragment key={venue.id}>
                     <DayRouteVenueCard
                       index={index}
-                      total={planStops.length}
+                      total={displayPlanStops.length}
                       displayNumber={globalIndex >= 0 ? globalIndex + 1 : index + 1}
                       venue={venue}
                       variant={effectiveStopViewMode}
@@ -3686,7 +3709,7 @@ function DayRoutePanelInner() {
               >
                 <div className="relative isolate h-full min-h-[20rem] w-full">
                   <DayRouteOsmMap
-                    stops={mapStops}
+                    stops={displayMapStops}
                     selectedStopId={mapSelectedStopId}
                     onStopClick={(stopId) => focusStopFromMap(stopId, { scrollList: false })}
                     className="h-full min-h-[20rem] w-full bg-slate-100"
@@ -4380,7 +4403,7 @@ function DayRoutePanelInner() {
           }
         >
           <DayRouteOsmMap
-            stops={mapStops}
+            stops={displayMapStops}
             selectedStopId={focusedStopId}
             onStopClick={focusStopFromMap}
             layoutKey="mobile-map-sheet"
@@ -4391,7 +4414,7 @@ function DayRoutePanelInner() {
 
       <MyDayMapFullScreen open={myDay.mapFull && hasMapStops} onClose={myDay.closeMapFull}>
         <DayRouteOsmMap
-          stops={mapStops}
+          stops={displayMapStops}
           selectedStopId={mapSelectedStopId}
           onStopClick={(stopId) => focusStopFromMap(stopId, { scrollList: false })}
           layoutKey="desktop-map-full"
@@ -4451,7 +4474,7 @@ function DayRoutePanelInner() {
       {shareMenuOpen && typeof document !== 'undefined'
       ? createPortal(
           <div
-            className="fixed inset-0 z-[60] sm:hidden print:hidden"
+            className="fixed inset-0 z-[60] print:hidden"
             data-day-share-sheet
             role="presentation"
             onClick={() => setShareMenuOpen(false)}
@@ -4461,10 +4484,10 @@ function DayRoutePanelInner() {
               role="menu"
               data-day-share-menu
               aria-label="Поделиться маршрутом"
-              className="absolute inset-x-0 bottom-0 rounded-t-2xl border border-slate-200 bg-white py-2 shadow-xl pb-[max(0.5rem,env(safe-area-inset-bottom))]"
+              className="absolute inset-x-0 bottom-0 rounded-t-2xl border border-slate-200 bg-white py-2 shadow-xl pb-[max(0.5rem,env(safe-area-inset-bottom))] sm:inset-auto sm:left-1/2 sm:top-1/2 sm:w-80 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-2xl sm:pb-2"
               onClick={(event) => event.stopPropagation()}
             >
-              <div className="mx-auto mb-2 h-1 w-10 rounded-full bg-slate-200" aria-hidden />
+              <div className="mx-auto mb-2 h-1 w-10 rounded-full bg-slate-200 sm:hidden" aria-hidden />
               <p className="px-4 pb-1 text-sm font-semibold text-slate-900">Поделиться</p>
               {shareMenuItems}
             </div>
