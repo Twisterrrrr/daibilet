@@ -13,67 +13,88 @@ type CountUpProps = {
   format?: (n: number) => string;
 };
 
+function animateValue(
+  start: number,
+  end: number,
+  durationMs: number,
+  onFrame: (n: number) => void,
+): () => void {
+  if (start === end) {
+    onFrame(end);
+    return () => undefined;
+  }
+  let frame = 0;
+  let startTs: number | null = null;
+  const step = (ts: number) => {
+    if (startTs == null) startTs = ts;
+    const progress = Math.min(1, (ts - startTs) / durationMs);
+    // easeOutCubic
+    const eased = 1 - (1 - progress) ** 3;
+    onFrame(Math.round(start + (end - start) * eased));
+    if (progress < 1) frame = window.requestAnimationFrame(step);
+    else onFrame(end);
+  };
+  frame = window.requestAnimationFrame(step);
+  return () => window.cancelAnimationFrame(frame);
+}
+
 /**
- * Shows the real value on SSR / first paint (so home city cards are not stuck on «0»).
- * Optionally counts 0→N once when the node enters the viewport.
+ * Real count on SSR / first paint (no stuck «0 событий» on home city rail).
+ * Animates 0→N once when the node enters the viewport (carousel-safe IO).
  */
-export function CountUp({ value, durationMs = 900, className, format }: CountUpProps) {
+export function CountUp({ value, durationMs = 1000, className, format }: CountUpProps) {
   const target = Math.max(0, Math.round(value || 0));
-  const [display, setDisplay] = useState(target);
-  const ref = useRef<HTMLSpanElement>(null);
-  const animatedRef = useRef(false);
+  // Critical: initial state = target so SSR and first client frame show the truth.
+  const [count, setCount] = useState(target);
+  const elementRef = useRef<HTMLSpanElement>(null);
+  const hasAnimatedRef = useRef(false);
+  const cancelAnimRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
-    setDisplay(target);
-    animatedRef.current = false;
+    setCount(target);
+    hasAnimatedRef.current = false;
   }, [target]);
 
   useEffect(() => {
-    const el = ref.current;
-    if (!el || target === 0 || animatedRef.current) return;
-
-    let frame = 0;
-    const run = () => {
-      if (animatedRef.current) return;
-      animatedRef.current = true;
-      const start = performance.now();
-      const tick = (now: number) => {
-        const t = Math.min(1, (now - start) / durationMs);
-        const eased = 1 - (1 - t) ** 3;
-        setDisplay(Math.round(eased * target));
-        if (t < 1) frame = requestAnimationFrame(tick);
-        else setDisplay(target);
-      };
-      setDisplay(0);
-      frame = requestAnimationFrame(tick);
-    };
+    if (target === 0 || hasAnimatedRef.current) return;
+    const el = elementRef.current;
+    if (!el) return;
 
     if (typeof IntersectionObserver === 'undefined') {
-      run();
-      return () => cancelAnimationFrame(frame);
+      hasAnimatedRef.current = true;
+      cancelAnimRef.current = animateValue(0, target, durationMs, setCount);
+      return () => cancelAnimRef.current?.();
     }
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (!entries.some((entry) => entry.isIntersecting)) return;
-        observer.disconnect();
-        run();
+        for (const entry of entries) {
+          if (!entry.isIntersecting || hasAnimatedRef.current) continue;
+          hasAnimatedRef.current = true;
+          cancelAnimRef.current?.();
+          cancelAnimRef.current = animateValue(0, target, durationMs, setCount);
+          observer.unobserve(entry.target);
+        }
       },
-      // Loose thresholds: horizontal city rail on mobile often missed 0.35 + negative rootMargin.
-      { threshold: 0.05, rootMargin: '64px 48px' },
+      {
+        // Horizontal rail: trigger a bit before the card is fully on screen (mobile swipe).
+        rootMargin: '0px 50px 0px 50px',
+        threshold: 0.01,
+      },
     );
+
     observer.observe(el);
     return () => {
       observer.disconnect();
-      cancelAnimationFrame(frame);
+      cancelAnimRef.current?.();
     };
   }, [target, durationMs]);
 
-  const text = format ? format(display) : formatNumber(display);
+  const text = format ? format(count) : formatNumber(count);
   const finalText = format ? format(target) : formatNumber(target);
 
   return (
-    <span ref={ref} className={className} aria-label={finalText}>
+    <span ref={elementRef} className={className} aria-label={finalText}>
       <span aria-hidden>{text}</span>
     </span>
   );
