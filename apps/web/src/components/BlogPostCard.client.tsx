@@ -11,9 +11,9 @@ import {
   authorLabel,
   blogAuthorNameClassName,
   blogCityBadgeClassName,
+  blogListingCityBadgeLabel,
   blogQuoteSurfaceClassName,
   blogTagBadgeClassName,
-  cityFilterLabel,
   normalizeBlogTagLabel,
 } from '@/lib/blog-meta';
 import {
@@ -103,8 +103,8 @@ function TagChips({
   articleType?: string | null;
 }) {
   const displayTag = normalizeBlogTagLabel(tag, articleType);
-  const cityLabel = cityFilterLabel(citySlug, city);
-  const showCity = Boolean(city || citySlug) && cityLabel !== 'Без города';
+  const cityLabel = blogListingCityBadgeLabel(citySlug, city);
+  const showCity = Boolean(cityLabel);
 
   if (!displayTag && !showCity) return null;
 

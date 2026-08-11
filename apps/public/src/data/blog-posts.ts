@@ -654,7 +654,7 @@ export const BLOG_POSTS: BlogPost[] = [
     date: '18 июля 2026',
     readMin: 9,
     tag: 'Гид',
-    city: 'Несколько городов',
+    city: 'Москва и Петербург',
     citySlug: 'multi',
     authorId: 'editorial',
     authorName: 'Редакция',

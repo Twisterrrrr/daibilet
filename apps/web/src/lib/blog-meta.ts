@@ -218,11 +218,11 @@ const SLUG_META: Record<
     authorId: 'editorial',
     articleType: 'gid',
     citySlug: 'multi',
-    city: 'Несколько городов',
+    city: 'Москва и Петербург',
   },
   'moskva-vechernie-diskoteki-shou': {
-    authorId: 'editorial',
-    articleType: 'gid',
+    authorId: 'anna',
+    articleType: 'column',
     citySlug: 'moscow',
     city: 'Москва',
   },
@@ -357,6 +357,21 @@ export function cityFilterLabel(citySlug?: string | null, cityName?: string | nu
   if (slug && BLOG_CITY_FILTER_LABELS[slug]) return BLOG_CITY_FILTER_LABELS[slug];
   if (cityName) return cityName;
   return 'Без города';
+}
+
+/**
+ * Подпись города на карточке/hero ленты.
+ * Берёт явный city из данных (не парсит title); без citySlug/city ничего не выдумывает.
+ */
+export function blogListingCityBadgeLabel(
+  citySlug?: string | null,
+  cityName?: string | null,
+): string | null {
+  const name = String(cityName || '').trim();
+  if (name && name !== 'Без города') return name;
+  const fromFilter = cityFilterLabel(citySlug, cityName);
+  if (!fromFilter || fromFilter === 'Без города') return null;
+  return fromFilter;
 }
 
 export function resolveSlugBlogMeta(slug: string): {

@@ -13,8 +13,8 @@ import {
   authorLabel,
   blogAuthorNameClassName,
   blogCityBadgeClassName,
+  blogListingCityBadgeLabel,
   blogTagBadgeClassName,
-  cityFilterLabel,
   normalizeBlogTagLabel,
 } from '@/lib/blog-meta';
 import {
@@ -52,10 +52,10 @@ function BlogListRow({ post }: { post: BlogCardDto }) {
   if (displayTag) {
     chips.push({ key: `tag-${displayTag}`, label: displayTag, kind: 'tag' });
   }
-  const cityLabel = cityFilterLabel(post.citySlug, post.city);
-  if (post.city && cityLabel !== 'Без города') {
+  const cityLabel = blogListingCityBadgeLabel(post.citySlug, post.city);
+  if (cityLabel) {
     chips.push({
-      key: `city-${post.city}`,
+      key: `city-${post.citySlug || cityLabel}`,
       label: cityLabel,
       kind: 'city',
     });

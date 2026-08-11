@@ -82,6 +82,11 @@ export function BlogArticleHero({
                     <MapPin className="h-3.5 w-3.5" />
                     {city}
                   </a>
+                ) : city ? (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-white/12 px-3 py-1 text-xs font-semibold text-white ring-1 ring-white/25 backdrop-blur">
+                    <MapPin className="h-3.5 w-3.5" />
+                    {city}
+                  </span>
                 ) : null}
               </div>
 

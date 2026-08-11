@@ -152,7 +152,14 @@ function enrichCardFields(slug: string, partial: Partial<BlogCardDto>): Pick<
   const articleType = partial.articleType || meta.articleType;
   const citySlug =
     normalizeBlogCitySlug(partial.citySlug, partial.city, meta.citySlug) || meta.citySlug;
-  const city = partial.city || meta.city || null;
+  const partialCity = String(partial.city || '').trim();
+  const metaCity = String(meta.city || '').trim();
+  const genericCityLabels = new Set(['', 'Без города', 'Несколько городов']);
+  const city =
+    (partialCity && !genericCityLabels.has(partialCity) ? partialCity : null) ||
+    metaCity ||
+    partialCity ||
+    null;
   const tag =
     partial.tag ||
     (articleType === 'column'

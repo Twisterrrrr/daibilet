@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
-import { normalizeBlogTagLabel } from '@/lib/blog-meta';
+import { normalizeBlogTagLabel, blogListingCityBadgeLabel } from '@/lib/blog-meta';
 import type { BlogCardDto } from '@/lib/blog-utils';
 
 export type BlogSidebarLink = {
@@ -55,7 +55,8 @@ export function BlogRelatedSidebar({
           </p>
           <ul className="mt-3 space-y-4">
             {posts.map((post) => {
-              const metaLabel = [normalizeBlogTagLabel(post.tag, post.articleType), post.city]
+              const cityLabel = blogListingCityBadgeLabel(post.citySlug, post.city);
+              const metaLabel = [normalizeBlogTagLabel(post.tag, post.articleType), cityLabel]
                 .filter(Boolean)
                 .join(' · ');
               return (

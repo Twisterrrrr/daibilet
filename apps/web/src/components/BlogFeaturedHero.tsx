@@ -5,8 +5,9 @@ import { ArrowRight } from 'lucide-react';
 import { BlogAfishaPromo } from '@/components/BlogAfishaPromo.client';
 import {
   authorLabel,
+  blogCityBadgeClassName,
+  blogListingCityBadgeLabel,
   blogTagBadgeClassName,
-  cityFilterLabel,
   normalizeBlogTagLabel,
 } from '@/lib/blog-meta';
 import { resolveBlogListingCta } from '@/lib/blog-listing-links';
@@ -32,14 +33,9 @@ type BlogFeaturedHeroProps = {
 };
 
 function freshMetaLine(post: BlogCardDto): string | null {
-  const cityLabel = cityFilterLabel(post.citySlug, post.city);
-  const showCity =
-    Boolean(post.citySlug || post.city) &&
-    cityLabel !== 'Без города' &&
-    cityLabel !== 'Регионы' &&
-    cityLabel !== 'Несколько городов';
+  const cityLabel = blogListingCityBadgeLabel(post.citySlug, post.city);
   const read = post.readMin ? `${post.readMin} мин` : null;
-  const parts = [showCity ? cityLabel : null, read].filter(Boolean);
+  const parts = [cityLabel, read].filter(Boolean);
   return parts.length ? parts.join(' · ').toUpperCase() : null;
 }
 
@@ -55,6 +51,7 @@ export function BlogFeaturedHero({
   const lead = largeCopy.primary || String(featured.excerpt || '').trim();
   const dateLabel = resolveBlogCardDateLabel(featured);
   const tag = normalizeBlogTagLabel(featured.tag, featured.articleType);
+  const cityLabel = blogListingCityBadgeLabel(featured.citySlug, featured.city);
   const scheduleCta = resolveBlogListingCta({
     slug: featured.slug,
     title: featured.title,
@@ -102,6 +99,13 @@ export function BlogFeaturedHero({
                 className={`inline-flex max-w-full truncate rounded-md px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ring-1 backdrop-blur-sm md:text-[11px] ${blogTagBadgeClassName(tag)}`}
               >
                 {tag}
+              </span>
+            ) : null}
+            {cityLabel ? (
+              <span
+                className={`inline-flex max-w-full truncate rounded-md px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ring-1 backdrop-blur-sm md:text-[11px] ${blogCityBadgeClassName(featured.citySlug)}`}
+              >
+                {cityLabel}
               </span>
             ) : null}
           </div>

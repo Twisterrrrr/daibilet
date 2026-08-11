@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { resolveBlogListingCta } from './blog-listing-links';
-import { stripColumnBodyChrome, stripColumnMetaPrefix } from './blog-meta';
+import { stripColumnBodyChrome, stripColumnMetaPrefix, blogListingCityBadgeLabel } from './blog-meta';
 import { resolveBlogTopics, parseBlogTopicParam } from './blog-topics';
 import {
   expandListingExcerpt,
@@ -136,4 +136,22 @@ test('expandLargeListingCopy prefers body without concatenating excerpt', () => 
   assert.ok(joined.length > 0);
   assert.ok(!joined.startsWith(excerpt));
   assert.ok(!joined.includes(`${excerpt} `));
+});
+
+
+test('blogListingCityBadgeLabel: explicit city, multi, empty', () => {
+  assert.equal(blogListingCityBadgeLabel('moscow', 'Москва'), 'Москва');
+  assert.equal(
+    blogListingCityBadgeLabel('multi', 'Москва и Петербург'),
+    'Москва и Петербург',
+  );
+  assert.equal(blogListingCityBadgeLabel(null, null), null);
+  assert.equal(blogListingCityBadgeLabel('', 'Без города'), null);
+});
+
+test('myuzikly card exposes city badge label from static data', () => {
+  const card = staticBlogCards().find((c) => c.slug === 'myuzikly-teatr-novichok-msk-spb');
+  assert.ok(card);
+  assert.equal(card?.citySlug, 'multi');
+  assert.equal(blogListingCityBadgeLabel(card?.citySlug, card?.city), 'Москва и Петербург');
 });
