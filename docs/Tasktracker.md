@@ -18,6 +18,7 @@
 | UX.MUSTSEE-DROP-BULK | my-day «Главные места»: убрать bulk «Добавить главные места»; chips + list остаются | Высокий | ✅ `8b889e85` Deploy MSK web `31473922071` BUILD_ID=`FZI5gnbEMamJmDZd6NqvN` |
 | UX.MYDAY-LOVABLE-W1 | `/my-day` Wave 1 Lovable shell: MyDayShell split+collapse map, sticky toolbar, mobile map sheet 85vh, schedule banner, default Список | Критический | 🔄 `9fff7e7e` Deploy `31480928724` |
 | UX.MYDAY-LOVABLE-W1.5 | `/my-day` visual parity: Lovable stop cards + dense toolbar; list-only; commerce secondary | Критический | 🔄 `9fb3754f` Deploy `31482332163` |
+| UX.MYDAY-STEP2-CARD | `/my-day` Lovable «Шаг 2 из 2» при 1-2 stops; hour plan с 1+; supersede belowMin alert | Критический | 🔄 ship + Deploy MSK web |
 | UX.MYDAY-PICKER-SHEET | `/my-day` подбор точек: side drawer (сценарии/места/пригороды/picks/своё), launch bar | Критический | 🔄 in progress |
 | UX.MYDAY-MUSTSEE-HROW | Picker «Главные места»: горизонтальные row-cards (thumb left + desc), не 2-col portrait | Критический | ✅ `6b816690` |
 | UX.MYDAY-STOP-LOVABLE | Stop cards 1:1 Lovable + types/Gantt/kbd DnD/PDF map/save scenario | Критический | ✅ `6b816690` (GPX/KML deferred) |

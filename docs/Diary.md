@@ -1,3 +1,17 @@
+## 2026-08-11 - My Day: Lovable «Шаг 2 из 2» card
+
+### Наблюдения
+- При 1-2 точках был plain sky-alert «добавьте ещё» (только belowMin=1); Lovable показывает dashed lavender card «Шаг 2 из 2» с CTA.
+
+### Решения
+- Card `data-day-step2-card` при `venues.length > 0 && < 3`: eyebrow Шаг 2 из 2, title с N из DAY_ROUTE_SOFT, primary «+ Добавить ещё места» → picker places, secondary «Спланировать по часам» → `setHourPlanOn(true)`.
+- Hour plan gate снят с DAY_ROUTE_MIN (работает с 1+ точек); sky belowMin supersede этой карточкой.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-11 - My Day: horizontal main places + Lovable stop cards
 
 ### Наблюдения

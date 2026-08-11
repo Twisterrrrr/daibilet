@@ -846,6 +846,8 @@ function DayRoutePanelInner() {
     return Boolean(payload?.multiCityWarning);
   }, [route.venues, payload?.multiCityWarning]);
   const belowMin = route.venues.length > 0 && route.venues.length < DAY_ROUTE_MIN;
+  /** Lovable «Шаг 2 из 2»: 1–2 stops - nudge to add places / enable hour plan. */
+  const showStep2Card = route.venues.length > 0 && route.venues.length < 3;
   // Hard = DAY_ROUTE_MAX safety. Soft = DAY_ROUTE_SOFT warn-only. MIN = day-ready hint.
   const atMax = route.venues.length >= DAY_ROUTE_MAX;
   const atSoft = isDayRouteAtSoft(route.venues.length);
@@ -1599,7 +1601,8 @@ function DayRoutePanelInner() {
   }, [matchOfferStubs, route.venues]);
 
   const hourPlan = useMemo<DayRouteHourPlanResult | null>(() => {
-    if (!hourPlanOn || route.venues.length < DAY_ROUTE_MIN) return null;
+    // Lovable: hour plan allowed with 1–2 stops (Step 2 CTA), not only DAY_ROUTE_MIN.
+    if (!hourPlanOn || route.venues.length < 1) return null;
     return computeDayRouteHourPlan(route.venues, {
       startHHMM: hourStart,
       endHHMM: hourEnd,
@@ -3166,7 +3169,7 @@ function DayRoutePanelInner() {
    * against sticky primary «Посмотреть готовый день».
    */
   function renderMobileRouteActions() {
-    const canHourPlan = route.venues.length >= DAY_ROUTE_MIN;
+    const canHourPlan = route.venues.length >= 1;
     if (!canHourPlan && !canOptimize) return null;
     return (
       <div
@@ -3257,7 +3260,7 @@ function DayRoutePanelInner() {
 
   /** Desktop distance/stats row: Hour plan + Optimize flush right (title row stays airy). */
   function renderDesktopDistanceActions() {
-    const canHourPlan = route.venues.length >= DAY_ROUTE_MIN;
+    const canHourPlan = route.venues.length >= 1;
     if (!canHourPlan && !canOptimize) return null;
     return (
       <div
@@ -3393,7 +3396,7 @@ function DayRoutePanelInner() {
         </section>
       ) : null}
 
-      {/* Alerts */}
+      {/* Alerts + Lovable Step 2 (1–2 stops supersedes plain belowMin sky alert) */}
       {route.venues.length ? (
         <>
           {mixedCities ? (
@@ -3401,7 +3404,48 @@ function DayRoutePanelInner() {
               Точки из разных городов. Для подбора экскурсий лучше оставить один город.
             </p>
           ) : null}
-          {belowMin ? (
+          {showStep2Card ? (
+            <section
+              className="mt-4 rounded-2xl border border-dashed border-primary-300/70 bg-primary-50/40 p-5 sm:p-6"
+              data-day-step2-card
+              aria-labelledby="day-step2-title"
+            >
+              <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-primary-600">
+                Шаг 2 из 2
+              </p>
+              <h2
+                id="day-step2-title"
+                className="mt-1 font-display text-lg font-extrabold text-slate-900 sm:text-xl"
+              >
+                Дополните день - сейчас {route.venues.length}{' '}
+                {route.venues.length === 1 ? 'точка' : 'точки'} из {DAY_ROUTE_SOFT}
+              </h2>
+              <p className="mt-1 max-w-xl text-sm leading-relaxed text-slate-600">
+                Добавьте ещё 2-4 места рядом или включите план по часам - мы разложим маршрут по
+                времени и покажем, что не помещается в день.
+              </p>
+              <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                <button
+                  type="button"
+                  data-day-step2-add-places
+                  onClick={() => openPicker('places')}
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-primary-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-primary-700"
+                >
+                  <Plus className="h-4 w-4" aria-hidden />
+                  Добавить ещё места
+                </button>
+                <button
+                  type="button"
+                  data-day-step2-hour-plan
+                  onClick={() => setHourPlanOn(true)}
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-primary-300 bg-white px-5 py-3 text-sm font-semibold text-primary-700 transition hover:bg-primary-50"
+                >
+                  <Clock className="h-4 w-4" aria-hidden />
+                  Спланировать по часам
+                </button>
+              </div>
+            </section>
+          ) : belowMin ? (
             <p className="mt-4 rounded-2xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-900">
               Добавьте ещё {DAY_ROUTE_MIN - route.venues.length}{' '}
               {DAY_ROUTE_MIN - route.venues.length === 1 ? 'точку' : 'точки'} (минимум {DAY_ROUTE_MIN}), чтобы день
@@ -3491,7 +3535,7 @@ function DayRoutePanelInner() {
             canOptimize={canOptimize}
             onOptimize={optimizeOrder}
             hourPlanOn={hourPlanOn}
-            canHourPlan={route.venues.length >= DAY_ROUTE_MIN}
+            canHourPlan={route.venues.length >= 1}
             onToggleHourPlan={() => {
               setHourPlanOn(false);
               setHourSheetOpen(false);
