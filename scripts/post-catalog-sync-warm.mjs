@@ -10,6 +10,7 @@
  */
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
+import { existsSync, readdirSync, rmSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { revalidateNextHome } from '../apps/backend/src/revalidate-next-home.js';
 
@@ -24,20 +25,25 @@ const warm =
     : 'light';
 
 async function main() {
-  const nextResult = await revalidateNextHome(reason);
+  const nextResult = await revalidateSyncedEventPages(reason);
+  const homeResult = await revalidateNextHome(reason);
   const apiResult = await warmApiCaches(warm, reason);
   const diskResult = rebuildCatalogDtoDisk(reason);
+  const nginxResult = purgeNginxProxyCache();
   console.log(
     JSON.stringify(
       {
         ok:
           Boolean(nextResult?.ok || nextResult?.skipped) &&
+          Boolean(homeResult?.ok || homeResult?.skipped) &&
           Boolean(apiResult?.ok || apiResult?.skipped) &&
           Boolean(diskResult?.ok || diskResult?.skipped),
         warm,
-        next: nextResult,
+        eventPages: nextResult,
+        next: homeResult,
         api: apiResult,
         catalogDtoDisk: diskResult,
+        nginx: nginxResult,
       },
       null,
       2,
@@ -48,6 +54,47 @@ async function main() {
   }
   if (diskResult?.ok === false && !diskResult?.skipped) {
     process.exitCode = 1;
+  }
+}
+
+/**
+ * After tc:sync --ids, revalidate specific event HTML so STAND_BY/closed slots
+ * do not linger in ISR + nginx (home tags alone leave /events/[slug] stale).
+ * Env: TC_REVALIDATE_EVENT_SLUGS=slug1,slug2
+ */
+async function revalidateSyncedEventPages(warmReason) {
+  const raw = String(process.env.TC_REVALIDATE_EVENT_SLUGS || '').trim();
+  if (!raw) return { ok: true, skipped: true, reason: 'no_event_slugs' };
+  const slugs = [...new Set(raw.split(/[,;\s]+/).map((s) => s.trim()).filter(Boolean))].slice(0, 40);
+  if (!slugs.length) return { ok: true, skipped: true, reason: 'no_event_slugs' };
+
+  const { revalidateNextEventPage } = await import('../apps/backend/src/revalidate-next-blog.js');
+  const results = [];
+  for (const slug of slugs) {
+    results.push(await revalidateNextEventPage({ slug, reason: `${warmReason}:${slug}` }));
+  }
+  const failed = results.filter((row) => row && row.ok === false && !row.skipped);
+  return {
+    ok: failed.length === 0,
+    slugs,
+    results,
+  };
+}
+
+/** Drop nginx HTML proxy_cache so closed slots cannot stick behind Next revalidate. */
+function purgeNginxProxyCache() {
+  if (process.platform === 'win32') return { ok: true, skipped: true, reason: 'windows' };
+  const dir = process.env.DAIBILET_NGINX_PROXY_CACHE_DIR || '/var/cache/nginx/daibilet';
+  if (!existsSync(dir)) return { ok: true, skipped: true, reason: 'no_cache_dir' };
+  try {
+    for (const name of readdirSync(dir)) {
+      rmSync(path.join(dir, name), { recursive: true, force: true });
+    }
+    console.log(`[post-catalog-sync-warm] purged nginx proxy_cache ${dir}`);
+    return { ok: true, purged: dir };
+  } catch (error) {
+    console.warn('[post-catalog-sync-warm] nginx purge failed:', error);
+    return { ok: false, error: String(error?.message || error) };
   }
 }
 

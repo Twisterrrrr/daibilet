@@ -1,3 +1,19 @@
+## 2026-08-11 - Closed 17:30 slot stuck in ISR/nginx
+
+### Наблюдения
+- Owner: на «История в тарелке» виден закрытый 17:30 (15.08). API уже без STAND_BY; HTML `x-nextjs-cache HIT` + nginx `proxy_cache` держали stale session `sess_6a43de0d` (TC STAND_BY).
+- TC сверка meta: 8 STAND_BY / 10 PUBLIC. Остальные 17:30 в TC реально PUBLIC (vacant>0).
+- Дыра: `tc:sync --ids` warm не бил `/events/[slug]` + nginx; UI `listPurchasableSessionVariants` мог fallback на blocked.
+
+### Решения
+- Soft-redirect если opened event STAND_BY → nearest PUBLIC sibling; UI никогда не рисует blocked; `tc:sync` передаёт `TC_REVALIDATE_EVENT_SLUGS` + nginx purge в warm.
+- Ops: revalidate `:3001` + purge nginx для slug.
+
+### Проблемы
+- Полный web artifact нужен для client filter/slice; API+scripts закрывают stale HTML сразу.
+
+---
+
 ## 2026-08-11 - Event page: missing TC slots (slice 5)
 
 ### Наблюдения

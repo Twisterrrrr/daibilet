@@ -104,12 +104,15 @@ async function runIdsSync(options) {
   }
 
   if (!options.skipRevalidate) {
+    const eventSlugs = await resolvePublicSlugsForExternalIds(requestedIds);
     const revalidate = spawnSync(process.execPath, [path.join(rootDir, "scripts", "post-catalog-sync-warm.mjs")], {
       cwd: rootDir,
       env: {
         ...process.env,
         // ids upsert: always light warm (never full stack after small patch)
         TC_CATALOG_SYNC_FULL_WARM: "0",
+        // Bust /events/[slug] ISR + nginx so STAND_BY/closed slots do not stick.
+        TC_REVALIDATE_EVENT_SLUGS: eventSlugs.join(","),
       },
       stdio: "inherit",
       windowsHide: true,
@@ -211,6 +214,53 @@ function parseIds(raw) {
     .split(/[,;\s]+/)
     .map((id) => id.trim())
     .filter(Boolean);
+}
+
+/** Latin public slugs for /events/[slug] revalidate after ids upsert. */
+async function resolvePublicSlugsForExternalIds(externalIds) {
+  const ids = [...new Set((externalIds || []).map(String).filter(Boolean))];
+  if (!ids.length) return [];
+  const { Client } = require("pg");
+  const databaseUrl = process.env.DATABASE_URL;
+  if (!databaseUrl) return [];
+  const client = new Client({ connectionString: databaseUrl });
+  try {
+    await client.connect();
+    const result = await client.query(
+      `select e.slug
+       from "EventSourceLink" l
+       join "Event" e on e.id = l."eventId"
+       where l."externalId" = any($1::text[])`,
+      [ids],
+    );
+    return [...new Set(result.rows.map((row) => inlinePublicSlug(row.slug)).filter(Boolean))];
+  } catch (error) {
+    console.warn("[tc-sync] resolvePublicSlugsForExternalIds failed:", error.message || error);
+    return [];
+  } finally {
+    try {
+      await client.end();
+    } catch {
+      /* ignore */
+    }
+  }
+}
+
+function inlinePublicSlug(value) {
+  const letters = {
+    а: "a", б: "b", в: "v", г: "g", д: "d", е: "e", ё: "e", ж: "zh", з: "z", и: "i", й: "y",
+    к: "k", л: "l", м: "m", н: "n", о: "o", п: "p", р: "r", с: "s", т: "t", у: "u", ф: "f",
+    х: "h", ц: "c", ч: "ch", ш: "sh", щ: "sch", ъ: "", ы: "y", ь: "", э: "e", ю: "yu", я: "ya",
+  };
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .split("")
+    .map((character) => letters[character] ?? character)
+    .join("")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .replace(/-{2,}/g, "-");
 }
 
 function printHelp() {

@@ -171,6 +171,18 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
   ])];
 
   const now = new Date();
+  // Prefer live sibling when the opened slug itself is STAND_BY/closed (meta TC children).
+  if (
+    allowSoftRedirect &&
+    !isPublicSessionRowOnSale({ sourceStatus: requestedEvent.sourceStatus })
+  ) {
+    const nearestSibling =
+      (await findNearestSaleableSiblingSlug(requestedEvent, metaGroupMembers, mergeGroupMembers)) ||
+      (await findSaleableTitleTwinSlug(requestedEvent));
+    if (nearestSibling && publicSlug(nearestSibling) !== requestedSlug) {
+      return loadPublicEventDto(nearestSibling, false);
+    }
+  }
   const [sessionRows, offerRows] = await Promise.all([
     prisma.eventSession.findMany({
       where: {

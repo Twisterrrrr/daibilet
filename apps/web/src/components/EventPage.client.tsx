@@ -68,7 +68,7 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
     priceRange && !showMultiPurchase && ticketCategories.length === 0
       ? formatBuyCardPriceHint(priceRange)
       : null;
-  const visibleSessions = listPurchasableSessionVariants(sessions as EventSession[]).slice(0, 5);
+  const visibleSessions = listPurchasableSessionVariants(sessions as EventSession[]).slice(0, 32);
   const allFlexible =
     visibleSessions.length > 0 && visibleSessions.every((session) => isFlexibleScheduleSession(session));
   const { tcEventId, purchaseUrl, isTcWidget, purchaseTargets } = resolveTcPurchaseTarget(

@@ -128,8 +128,8 @@ export function pickPurchasableTcSession<T extends PurchaseSession>(sessions: T[
 
 export function listPurchasableSessionVariants<T extends PurchaseSession>(sessions: T[]): T[] {
   const expanded = sessions.flatMap((session) => expandSessionPurchaseVariants(session));
-  const purchasable = expanded.filter((session) => !isSessionPurchaseBlocked(session));
-  return purchasable.length ? purchasable : expanded;
+  // Never fall back to STAND_BY/closed/paused slots - empty rail is better than a dead CTA.
+  return expanded.filter((session) => !isSessionPurchaseBlocked(session));
 }
 
 export function buildTcPurchaseTargets(sessions: PurchaseSession[]): TcPurchaseTarget[] {

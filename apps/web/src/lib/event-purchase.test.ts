@@ -6,6 +6,44 @@ import {
   resolveTcPurchaseTarget,
 } from './event-purchase.ts';
 
+test('listPurchasableSessionVariants drops STAND_BY and never falls back to blocked', async () => {
+  const { listPurchasableSessionVariants } = await import('./event-purchase.ts');
+  const rows = listPurchasableSessionVariants([
+    {
+      id: 'sess-closed',
+      eventId: 'aaaaaaaaaaaaaaaaaaaa',
+      sourceStatus: 'STAND_BY',
+      purchaseUrl: 'https://widgets.ticketscloud.com/?event=aaaaaaaaaaaaaaaaaaaa',
+      purchaseReady: true,
+      vacant: 5,
+      startsAt: '2026-08-15T15:30:00.000Z',
+    },
+    {
+      id: 'sess-open',
+      eventId: 'bbbbbbbbbbbbbbbbbbbb',
+      sourceStatus: 'PUBLIC',
+      purchaseUrl: 'https://widgets.ticketscloud.com/?event=bbbbbbbbbbbbbbbbbbbb',
+      purchaseReady: true,
+      vacant: 5,
+      startsAt: '2026-08-15T17:30:00.000Z',
+    },
+  ]);
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0]?.id, 'sess-open');
+
+  const onlyClosed = listPurchasableSessionVariants([
+    {
+      id: 'sess-closed-only',
+      eventId: 'cccccccccccccccccccc',
+      sourceStatus: 'closed',
+      purchaseUrl: 'https://widgets.ticketscloud.com/?event=cccccccccccccccccccc',
+      purchaseReady: true,
+      vacant: 2,
+    },
+  ]);
+  assert.equal(onlyClosed.length, 0);
+});
+
 test('isEventPurchaseBlocked: event sourceStatus cancelled', () => {
   assert.equal(
     isEventPurchaseBlocked(
