@@ -10,11 +10,11 @@ authorName: Редакция
 articleType: gid
 tag: Город
 citySlug: kaliningrad
-date: "12 авг 2026"
+date: "11 авг 2026"
 readMin: 8
 imageAlt: "Кёнигсбергские клопсы, марципан и балтийская рыба на столе в Калининграде"
 coverImageUrl: "/images/blog/kaliningrad-gastro-kenigsberg.jpg"
-publishedAt: "2026-08-12T11:40:00+03:00"
+publishedAt: "2026-08-11T20:15:00+03:00"
 status: PUBLISHED
 ---
 
