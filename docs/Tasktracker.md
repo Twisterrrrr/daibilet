@@ -29,7 +29,7 @@
 | UX.HERMITAGE-SPBBOATS | Hermitage PDP: commercial hero/tickets/contacts; similar museums only; title Государственный Эрмитаж | Критический | ✅ `454b315c` Deploy `31419097355` + API restart MSK |
 | FIX.HERMITAGE-ALIAS-PDP | Redirect `gosudarstvennyi-ermitazh`→`ermitazh`; institution PDP: no hero chips, metro, about/visit before routes, FAQ bottom | Критический | ✅ `3fa8979e` Deploy `31415510287` |
 | FIX.HOME-CITIES-LOOP | Popular cities rail: restore infinite arrow loop (no snap-back at last city after ea6c7897) | Критический | ✅ `6234df27` Deploy `31469259250` |
-| FIX.HOME-CITIES-MOBILE-TAP | Popular cities rail mobile: tap opens city hub (defer loop wrap + touch router.push); compact card static event count | Критический | 🔄 ship |
+| FIX.HOME-CITIES-MOBILE-TAP | Popular cities rail mobile: tap opens city hub (defer loop wrap + touch router.push); compact card static event count | Критический | 🔄 `d279f68b` Deploy `31500441394` (prev hang-bound `50435cdc` run `31499687634`) |
 | UX.HOME-CITIES-MSK-ANCHOR | Popular cities rail: MSK left under H2 (adaptive); SPB next; keep infinite loop | Критический | ✅ `5d995893` tip `65276de6` Deploy `31410582677` |
 | FIX.SWAP-STATIC-COMPAT | Artifact swap: merge `.next.prev` hashed css/chunks/media (no-clobber) so s-maxage HTML не 404 CSS | Критический | ✅ `fc4d8bd7` Deploy `31468859832` BUILD_ID=`VI6qxKHs2rwnQwwgRsaIn` |
 | UX.LOGO-Y-STATIC | Logo: em-кратка point-1 = й always; zero animation; mobile кратка only | Критический | ✅ `4f20ceed` Deploy `31468480615` |
