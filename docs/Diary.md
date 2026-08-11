@@ -1,3 +1,20 @@
+## 2026-08-11 - my-day: list layout + free-window city scope
+
+### Наблюдения
+- Список: pin и ↑↓ скучены; thumb у правой стены stretched card - огромный gap.
+- «Свободное окно» могло предложить билет Сортавалы на день в Перми (header city ≠ route city; upsell без city filter).
+- Mode walk/auto дублировался в between-leg; owner: советы между точками идеальны, mode только у общего км/мин сверху.
+
+### Решения
+- List: вертикальная ось ↑ / pin / ↓; ряд `pin | content(+pad) | thumb | actions` без `ml-auto` gap.
+- Free-window: `buildDayRouteFreeWindowCityScope` (route majority wins) + filter кандидатов; copy «Между точками около N.»
+- Between-leg: stats + transitTip + «+»; top mode - icon-compact.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-11 - my-day: notes + Kryukov Nikolsky + heading copy
 
 ### Наблюдения

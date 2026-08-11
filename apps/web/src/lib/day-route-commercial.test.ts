@@ -2,8 +2,10 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
 import {
+  buildDayRouteFreeWindowCityScope,
   classifyDayRouteCommercialChip,
   computeDayRouteReadiness,
+  dayRouteCandidateMatchesCityScope,
   dayRouteOfferIsVenueBound,
   dayRouteStopIsCommerce,
   dayRouteStopReorderLocked,
@@ -217,6 +219,42 @@ describe('day-route-commercial free windows', () => {
       { afterIndex: 1, meters: 1500 },
       { afterIndex: 3, meters: 3000 },
     ]);
+  });
+
+  it('scopes free-window candidates to day city, not header mismatch', () => {
+    const scope = buildDayRouteFreeWindowCityScope({
+      pageCityId: 'city_sortavala',
+      pageCityName: 'Сортавала',
+      pageCitySlug: 'sortavala',
+      routeVenues: [
+        { city: 'Пермь', cityId: 'city_perm', citySlug: 'perm' },
+        { city: 'Пермь', cityId: 'city_perm', citySlug: 'perm' },
+      ],
+    });
+    assert.equal(
+      dayRouteCandidateMatchesCityScope(
+        {
+          city: 'Сортавала',
+          citySlug: 'respublika-kareliya',
+        },
+        scope,
+      ),
+      false,
+    );
+    assert.equal(
+      dayRouteCandidateMatchesCityScope({ city: 'Пермь', citySlug: 'perm' }, scope),
+      true,
+    );
+  });
+
+  it('rejects candidates without city when scope is set', () => {
+    const scope = buildDayRouteFreeWindowCityScope({
+      pageCityName: 'Пермь',
+      pageCitySlug: 'perm',
+      routeVenues: [],
+    });
+    assert.equal(dayRouteCandidateMatchesCityScope({}, scope), false);
+    assert.equal(dayRouteCandidateMatchesCityScope({ citySlug: 'perm' }, scope), true);
   });
 });
 

@@ -6,9 +6,11 @@
 import {
   DAY_ROUTE_MIN,
   DAY_ROUTE_SOFT,
+  dayRouteDominantCitySlug,
   encodeDayRouteShareTime,
   formatDayRouteHHMM,
   isDayRoutePlaceholderTitle,
+  normalizeDayRouteCityTitle,
   resolveDayRouteTicketUrl,
   type DayRouteVenueItem,
 } from './day-route';
@@ -240,6 +242,126 @@ export function findDayRouteFreeWindowGaps(
     gaps.push({ afterIndex: i, meters });
   }
   return gaps;
+}
+
+/**
+ * City tokens for «Свободное окно» candidates.
+ * Prefer geography of the day (route majority), not a stale header city from another region.
+ */
+export type DayRouteCityScope = {
+  tokens: ReadonlySet<string>;
+};
+
+function cityScopeToken(raw: string | null | undefined): string | null {
+  const title = normalizeDayRouteCityTitle(raw);
+  if (title) return title;
+  const slug = String(raw || '')
+    .trim()
+    .toLowerCase();
+  return slug || null;
+}
+
+function addCityScopeToken(tokens: Set<string>, raw: string | null | undefined) {
+  const token = cityScopeToken(raw);
+  if (token) tokens.add(token);
+}
+
+function dayRouteDominantCityTitle(
+  venues: Array<Pick<DayRouteVenueItem, 'city'>>,
+): string | null {
+  const counts = new Map<string, number>();
+  for (const venue of venues) {
+    const title = normalizeDayRouteCityTitle(venue.city);
+    if (!title) continue;
+    counts.set(title, (counts.get(title) || 0) + 1);
+  }
+  let best: string | null = null;
+  let bestCount = 0;
+  for (const [title, count] of counts) {
+    if (count > bestCount) {
+      best = title;
+      bestCount = count;
+    }
+  }
+  return best;
+}
+
+/**
+ * Build free-window city scope from route stops + optional page/header city.
+ * When route majority city disagrees with header (e.g. day in Perm, header still Sortavala),
+ * route wins - never suggest cross-region junk.
+ */
+export function buildDayRouteFreeWindowCityScope(input: {
+  pageCityId?: string | null;
+  pageCityName?: string | null;
+  pageCitySlug?: string | null;
+  pageCitySourceSlug?: string | null;
+  routeVenues: Array<Pick<DayRouteVenueItem, 'city' | 'cityId' | 'citySlug'>>;
+}): DayRouteCityScope {
+  const tokens = new Set<string>();
+  const routeVenues = input.routeVenues || [];
+  const dominantSlug = dayRouteDominantCitySlug(routeVenues);
+  const dominantTitle = dayRouteDominantCityTitle(routeVenues);
+
+  if (dominantSlug || dominantTitle) {
+    addCityScopeToken(tokens, dominantSlug);
+    addCityScopeToken(tokens, dominantTitle);
+    for (const venue of routeVenues) {
+      const slug = String(venue.citySlug || '').trim();
+      const title = normalizeDayRouteCityTitle(venue.city);
+      const slugMatch = Boolean(dominantSlug && slug && slug.toLowerCase() === dominantSlug.toLowerCase());
+      const titleMatch = Boolean(dominantTitle && title && title === dominantTitle);
+      if (!slugMatch && !titleMatch) continue;
+      addCityScopeToken(tokens, venue.citySlug);
+      addCityScopeToken(tokens, venue.city);
+      addCityScopeToken(tokens, venue.cityId);
+    }
+  }
+
+  const pageSlug = String(input.pageCitySlug || '').trim();
+  const pageSource = String(input.pageCitySourceSlug || '').trim();
+  const pageName = normalizeDayRouteCityTitle(input.pageCityName);
+  const pageAligned =
+    !dominantSlug && !dominantTitle
+      ? true
+      : Boolean(
+          (dominantSlug &&
+            (dominantSlug.toLowerCase() === pageSlug.toLowerCase() ||
+              dominantSlug.toLowerCase() === pageSource.toLowerCase())) ||
+            (dominantTitle && pageName && dominantTitle === pageName),
+        );
+
+  if (pageAligned || tokens.size === 0) {
+    addCityScopeToken(tokens, input.pageCityId);
+    addCityScopeToken(tokens, input.pageCityName);
+    addCityScopeToken(tokens, input.pageCitySlug);
+    addCityScopeToken(tokens, input.pageCitySourceSlug);
+  }
+
+  return { tokens };
+}
+
+/** True when candidate city fields intersect the day scope. Unknown geography → false. */
+export function dayRouteCandidateMatchesCityScope(
+  candidate: {
+    city?: string | null;
+    cityId?: string | null;
+    citySlug?: string | null;
+    sourceCitySlug?: string | null;
+  },
+  scope: DayRouteCityScope,
+): boolean {
+  if (!scope.tokens.size) return false;
+  const candidateTokens = [
+    candidate.city,
+    candidate.cityId,
+    candidate.citySlug,
+    candidate.sourceCitySlug,
+  ]
+    .map((raw) => cityScopeToken(raw))
+    .filter((token): token is string => Boolean(token));
+  if (!candidateTokens.length) return false;
+  return candidateTokens.some((token) => scope.tokens.has(token));
 }
 
 export function commercialChipClassName(kind: DayRouteCommercialChipKind): string {
