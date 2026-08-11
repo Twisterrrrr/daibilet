@@ -20,6 +20,48 @@ Finance PR-ветка `codex/stage0-admission-ticket-core` может держа
 
 ---
 
+## 2026-08-11 - Подборки `/podborki` city ЧПУ (owner gate)
+
+План/аудит: [seo-podborki-chpu-plan.md](./seo-podborki-chpu-plan.md). **Код URL-миграции и массовая перелинковка - стоп** до ответов. Трек отдельный от My Day routes и от SEO category listing texts (`seo-listing-texts`).
+
+1. **Канон city slug в path:** бриф пишет `/podborki/sankt-peterburg` и `/podborki/moskva`, но SEO landings/intents уже на `saint-petersburg` / `moscow` (aliases есть). Какой **один** канон для `/podborki/{city}` и 301 с алиасов?
+2. **Схема роута vs intents:** сейчас `/podborki/[intent]` съест city-сегмент. Ок **discriminating** `[segment]` (intent **или** city), или другой path? Ломать `/podborki/{intent}` нельзя без отдельного решения.
+3. **Нужен ли `/podborki` хаб как сейчас** (все города) + city ЧПУ, или хаб только витрина с ссылками на города? `?city=all` оставляем как 301→`/podborki`?
+4. **Охват индекса:** все destination cities в sitemap `/podborki/{city}`, только TOP (MSK/SPB/Kazan/…), или сначала 2 пилота?
+5. **User-generated / тонкие города:** если у города 0–2 карточки подборок - `noindex`, скрыть из UI, или всё равно ЧПУ?
+6. **Каннибализация с `/cities/{slug}`:** утвердить дифференциацию Title/H1 (подборки vs афиша города). Пример СПб из брифа - финальный канон текста?
+7. **Приоритет фаз:** сначала Phase 1 (ЧПУ+301+хелпер ссылок) или сначала контент карточек/meta на текущем soft `?city=` (временщина, агент **не** рекомендует)?
+8. **Blog banners (Phase 4):** сразу после URL lock или отдельным контент-батчем? Какие 3–5 пилотных гайдов?
+
+---
+
+
+## 2026-08-11 - Category×city SEO-текст vs noindex
+
+1. **Thin listing + editorial:** `/stendap-i-yumor/kaliningrad` при `<6` офферов сейчас `noindex,follow` (`MIN_LISTING_OFFERS_FOR_INDEX`). Owner дал постоянный SEO-текст «удержать в поиске». Разрешаем `index` при наличии editorial в `seo-listing-texts` даже при 1-5 офферах, или оставляем порог 6 и текст только для UX/будущего роста афиши?
+2. **Нулевой день:** при 0 активных сеансах - всё равно index + SEO-каркас, или noindex до появления ≥1 билета?
+3. **Масштаб текстов:** только ручные owner-пакеты (как Калининград), или позже AI-draft по шаблону city×category с модерацией?
+
+---
+
+## 2026-08-11 - My Day → ЧПУ `/routes/{city}/{slug}` (дизайн, не билдить)
+
+**Gap сейчас:** share уже есть - длинный `/my-day?city=&items=…` (state в query) + короткий `/d/{code}` (редирект на my-day, не посадочная). Нет crawlable H1/CTA/канона под SEO.
+
+**MVP scope (черновик):** «Сохранить и поделиться» → публичная страница `/routes/{city}/{slug}` с авто-H1, списком стопов, CTA на билеты/афишу; черновик `noindex` до publish.
+
+**Вопросы owner:**
+1. **Кто публикует?** только авторизованный / staff moderation queue / любой аноним с rate-limit?
+2. **Индексация:** draft всегда `noindex`; published - сразу index или ручной «в индекс»?
+3. **Slug:** авто из title (`peterburg-muzei-vecher`) + collision suffix, или только opaque id + отдельный title?
+4. **Canonical:** `/routes/...` канон, а `/my-day?items=` и `/d/{code}` - `noindex` + rel=canonical на route?
+5. **UGC spam / мусор:** обязательный min stops, запрет empty, captcha, TTL unpublished, abuse report?
+6. **Контент-права:** пользовательский title/notes - хранить as-is или sanitize + запрет ссылок?
+7. **Коммерция:** CTA только на события/venues из каталога Дайбилет, или внешние URL тоже?
+8. **Приоритет vs blog/category SEO:** делать после стабилизации my-day Lovable, или отдельный SEO-трек?
+
+---
+
 ## Открыто (техника)
 
 ### 1. Stage 0 closeout - e2e/smoke на live `.159` (единственный runtime gate)

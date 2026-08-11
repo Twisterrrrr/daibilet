@@ -1,3 +1,23 @@
+## SEO listing + My Day routes (2026-08-11)
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| SEO.LISTING-KGD | Editorial SEO-блок `standup:kaliningrad` в `seo-listing-texts` + Deploy MSK web | Высокий | 🔄 ship |
+| SEO.LISTING-INDEX | Owner: index thin listing при editorial SEO vs порог ≥6 офферов (qa) | Высокий | ⏳ owner |
+| SEO.MYDAY-ROUTES | План ЧПУ `/routes/{city}/{slug}` из My Day share (MVP/UGC/noindex/canonical) - docs only | Высокий | ⏳ qa owner; не билдить |
+
+## SEO Подборки city ЧПУ (2026-08-11)
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| SEO.PODBORKI-CITY-CHPU | Owner brief: `/podborki/{city}` вместо `?city=`; meta/H1; card blurbs; blog→подборка. **Сначала план** - без массовой URL/перелинковки | Высокий | 🔄 планирование: [seo-podborki-chpu-plan.md](./seo-podborki-chpu-plan.md) + qa gate; код Phase 1+ после ответов owner |
+| SEO.PODBORKI-CITY-0 | Phase 0: inventory ссылок + риски (intent collision, slug canon, `/cities` cannibalization) | Высокий | ✅ docs 2026-08-11 |
+| SEO.PODBORKI-CITY-1 | Phase 1: ЧПУ+301+helper+nav (после канона slug/роута) | Высокий | ⏳ blocked owner |
+| SEO.PODBORKI-CITY-2 | Phase 2: Title/Description/H1 city-хаба | Высокий | ⏳ after P1 |
+| SEO.PODBORKI-CITY-3 | Phase 3: card SEO blurbs + «N • от X» | Средний | ⏳ after P2 |
+| SEO.PODBORKI-CITY-4 | Phase 4: blog banners → подборка → события | Средний | ⏳ after URL lock |
+| SEO.PODBORKI-TRACK | Не смешивать с My Day Lovable/routes и `seo-listing-texts` / category landings | Высокий | ✅ зафиксировано в plan/Diary |
+
 ## Region Hub IA (2026-08-11)
 
 | ID | Задача | Приоритет | Статус |

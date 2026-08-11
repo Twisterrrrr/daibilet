@@ -1,3 +1,38 @@
+## 2026-08-11 - SEO Подборки: city ЧПУ - анализ без внедрения
+
+### Наблюдения
+- Owner brief: `/podborki/{city}` (пример `sankt-peterburg` / `moskva`) вместо soft `?city=`; meta/H1; card blurbs; цепочка блог→подборка. Жёстко: перелинковку не трогать без полной проверки.
+- Сейчас: хаб `apps/web/app/podborki/(catalog)` SSR city=all + client `?city=`; intents уже ЧПУ `/podborki/{intent}[/{city}]`. `[intent]` съест будущий city-сегмент → 404 без новой схемы роута.
+- Slug: бриф TEP-формы vs SEO-канон landings `moscow` / `saint-petersburg` (aliases есть). Inventory: CityPageView + interstitials на query; header/footer/home/blog в основном на `/podborki`; sitemap без city-хабов подборок.
+
+### Решения
+- Документ плана: [seo-podborki-chpu-plan.md](./seo-podborki-chpu-plan.md). Фазы 0→4; Phase 0 = этот аудит. Код URL/перелинковки **не** делать до qa-ответов.
+- Трек `SEO.PODBORKI-CITY-*` **отдельный** от My Day Lovable/routes и от category `seo-listing-texts` (см. запись Category hub SEO ниже).
+- Безопасных точечных багов без миграции не найдено (`?city=` - осознанный soft-filter + ISR).
+
+### Проблемы
+- Без канона slug + схемы vs intents любой «быстрый» ЧПУ даст 404 или дубли с `/cities/{slug}`.
+
+---
+
+## 2026-08-11 - Category hub SEO-текст (Калининград стендап) + My Day routes plan
+
+### Наблюдения
+- Owner: thin `/stendap-i-yumor/kaliningrad` полупустой для роботов; нужен постоянный SEO-каркас под листингом.
+- Инфра уже есть: `LandingSeoBottom` + `seo-listing-texts` (key `landingSlug:citySlug`); без editorial - generic fallback.
+- Live страница 200, но `noindex,follow` при `<6` офферов (`seo-listing-meta`) - текст сам по себе индекс не откроет.
+- My Day share: `/my-day?items=` + short `/d/{code}` (redirect). ЧПУ `/routes/{city}/{slug}` нет - большая фича.
+
+### Решения
+- Добавлен editorial `standup:kaliningrad` (owner copy, дефисы, бренд Дайбилет) в `seo-listing-texts`; пустых city×category не выдумываем.
+- Docs: qa (index vs editorial; My Day routes MVP/риски), Tasktracker SEO.LISTING-KGD + SEO.MYDAY-ROUTES.
+- Полную фабрику маршрутов / новую БД-таблицу в этом проходе не делаем.
+
+### Проблемы
+- Owner goal «топ-3 Яндекса» конфликтует с текущим noindex thin-listing - ждём ответ в qa.
+
+---
+
 ## 2026-08-11 - EKB стендап: уральский юмор (rewrite)
 
 ### Наблюдения
