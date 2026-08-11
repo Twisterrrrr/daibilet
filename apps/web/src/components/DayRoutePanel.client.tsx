@@ -2955,6 +2955,12 @@ function DayRoutePanelInner() {
       data-day-mobile-view={mobileView}
     >
       <div ref={listRootRef} className="min-w-0" data-day-list-root>
+      {!isEmptyRoute ? (
+        <MyDayShell
+          mapOpen={myDay.mapOpen}
+          showMapColumn={hasMapStops}
+          list={
+            <div data-my-day-list-inner data-my-day-page-col="1">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <h1 className="font-display text-[1.65rem] font-extrabold tracking-tight leading-tight text-slate-900 sm:text-3xl">
@@ -3154,9 +3160,6 @@ function DayRoutePanelInner() {
         </>
       ) : null}
 
-      {/* Empty plan: city+search starter is the first content block under H1 */}
-      {isEmptyRoute ? renderEmptyStarter() : null}
-
       {hasPageCity && pickerTabs.length ? (
         <div className="mt-4 lg:mt-5" data-my-day-picker-host>
           <MyDayPickerLaunch tabs={pickerTabs} onOpen={openPicker} />
@@ -3206,17 +3209,12 @@ function DayRoutePanelInner() {
       </div>
 
       <div
-        className={mobileShelf === 'route' ? 'lg:contents' : 'hidden lg:contents'}
+        className={mobileShelf === 'route' ? 'contents' : 'hidden lg:contents'}
         data-day-mobile-shelf-panel="route"
       >
-      {/* 1. Route list - Lovable shell */}
+      {/* 1. Route list */}
       {!route.venues.length ? null : (
-        <section className="mt-5 w-full sm:mt-8" data-day-route-list-section>
-          <MyDayShell
-            mapOpen={myDay.mapOpen}
-            showMapColumn={hasMapStops}
-            list={
-              <div data-my-day-list-inner>
+        <section className="mt-5 w-full sm:mt-6" data-day-route-list-section>
           <MyDayToolbar
             stopsCount={route.venues.length}
             stopsHeading={formatDayRouteStopsHeading(route.venues.length)}
@@ -3587,45 +3585,81 @@ function DayRoutePanelInner() {
           ) : null}
 
           </MyDayItinerary>
-              </div>
-            }
-            map={
-              mapStops.length > 0 ? (
-                <MyDayMapAside
-                  mapOpen={myDay.mapOpen}
-                  onToggleOpen={myDay.toggleMapOpen}
-                  onOpenFull={myDay.openMapFull}
-                  toolbar={
-                    <div className="flex items-center justify-between gap-2 pr-20">
-                      <div>
-                        <p className="text-sm font-bold text-slate-900">Карта дня</p>
-                        <p className="mt-0.5 text-xs text-slate-500">
-                          Точки с координатами - порядок как в списке
-                        </p>
-                      </div>
-                      {renderMapToolbar()}
-                    </div>
-                  }
-                >
-                  <div className="relative isolate h-full min-h-[20rem] w-full">
-                    <DayRouteOsmMap
-                      stops={mapStops}
-                      selectedStopId={mapSelectedStopId}
-                      onStopClick={(stopId) => focusStopFromMap(stopId, { scrollList: false })}
-                      className="h-full min-h-[20rem] w-full bg-slate-100"
-                    />
-                    {renderMapFocusCard('desktop')}
-                  </div>
-                </MyDayMapAside>
-              ) : (
-                <div className="hidden" />
-              )
-            }
-          />
         </section>
       )}
 
       </div>
+            </div>
+          }
+          map={
+            mapStops.length > 0 ? (
+              <MyDayMapAside
+                mapOpen={myDay.mapOpen}
+                onToggleOpen={myDay.toggleMapOpen}
+                onOpenFull={myDay.openMapFull}
+                toolbar={
+                  <div className="flex items-center justify-between gap-2 pr-20">
+                    <div>
+                      <p className="text-sm font-bold text-slate-900">Карта дня</p>
+                      <p className="mt-0.5 text-xs text-slate-500">
+                        Точки с координатами - порядок как в списке
+                      </p>
+                    </div>
+                    {renderMapToolbar()}
+                  </div>
+                }
+              >
+                <div className="relative isolate h-full min-h-[20rem] w-full">
+                  <DayRouteOsmMap
+                    stops={mapStops}
+                    selectedStopId={mapSelectedStopId}
+                    onStopClick={(stopId) => focusStopFromMap(stopId, { scrollList: false })}
+                    className="h-full min-h-[20rem] w-full bg-slate-100"
+                  />
+                  {renderMapFocusCard('desktop')}
+                </div>
+              </MyDayMapAside>
+            ) : (
+              <div className="hidden" />
+            )
+          }
+        />
+      ) : (
+        <>
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0 flex-1">
+              <h1 className="font-display text-[1.65rem] font-extrabold tracking-tight leading-tight text-slate-900 sm:text-3xl">
+                {scopeCityName ? `Мой день ${inCityPrepositional(scopeCityName)}` : 'Мой день'}
+              </h1>
+              <p
+                className="mt-1.5 flex flex-wrap items-baseline gap-x-1 text-[13px] font-medium text-slate-500"
+                data-day-route-count-label
+                data-day-route-readiness
+              >
+                <span>
+                  {readiness.summaryLine}
+                  {scopeCityName ? ' •' : ''}
+                </span>
+                {scopeCityName ? (
+                  <Link
+                    href={cityHubHref}
+                    className="text-primary-600 transition-colors hover:text-primary-700 hover:underline"
+                    data-day-city-hub-link
+                  >
+                    Страница {cityToGenitive(scopeCityName)}
+                  </Link>
+                ) : null}
+              </p>
+            </div>
+          </div>
+          {isEmptyRoute ? renderEmptyStarter() : null}
+          {hasPageCity && pickerTabs.length ? (
+            <div className="mt-4 lg:mt-5" data-my-day-picker-host>
+              <MyDayPickerLaunch tabs={pickerTabs} onOpen={openPicker} />
+            </div>
+          ) : null}
+        </>
+      )}
 
       <MyDayPickerSheet
         open={pickerOpen}

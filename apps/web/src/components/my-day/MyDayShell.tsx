@@ -12,8 +12,8 @@ type MyDayShellProps = {
 };
 
 /**
- * Lovable-style shell: page scrolls the list; map stays sticky.
- * List keeps a readable min-width when the map is open.
+ * Desktop split: list column (H1 / picker / route) + sticky map.
+ * Grid sits high enough that opening the map narrows every left block together.
  */
 export function MyDayShell({
   mapOpen,
