@@ -79,15 +79,24 @@ export function beltLabel(belt: RegionCityBelt): string {
   return BELT_LABELS[belt];
 }
 
-export function formatLogisticsChip(entry: RegionCityBeltEntry | null): string | null {
+export function formatLogisticsParts(
+  entry: RegionCityBeltEntry | null,
+): { transit: string | null; km: string | null } | null {
   if (!entry) return null;
   const transit = entry.transit ? TRANSIT_LABELS[entry.transit] || entry.transit : null;
   const km =
     typeof entry.kmFromMkad === 'number' && entry.kmFromMkad > 0
       ? `~${Math.round(entry.kmFromMkad)} км`
       : null;
-  if (transit && km) return `${transit} · ${km}`;
-  return transit || km;
+  if (!transit && !km) return null;
+  return { transit, km };
+}
+
+export function formatLogisticsChip(entry: RegionCityBeltEntry | null): string | null {
+  const parts = formatLogisticsParts(entry);
+  if (!parts) return null;
+  if (parts.transit && parts.km) return `${parts.transit} · ${parts.km}`;
+  return parts.transit || parts.km;
 }
 
 export const REGION_BELT_FILTERS: Array<{ id: 'all' | RegionCityBelt; label: string }> = [

@@ -13,6 +13,12 @@ export type RegionMapPoint = {
   active?: boolean;
 };
 
+function regionMarkerHtml(active: boolean): string {
+  const fill = active ? '#059669' : '#10b981';
+  const ring = active ? '0 0 0 3px rgba(5,150,105,0.35)' : '0 1px 3px rgba(15,23,42,0.28)';
+  return `<span style="display:block;width:14px;height:14px;border-radius:9999px;background:${fill};border:2px solid #fff;box-shadow:${ring};"></span>`;
+}
+
 /**
  * Compact orientation map for region hub. Click marker → parent filters affiche by city.
  */
@@ -59,11 +65,24 @@ export function RegionOrientMap({
       const bounds = L.latLngBounds([]);
       const markers: Marker[] = [];
       for (const point of points) {
-        const marker = L.marker([point.lat, point.lng], {
-          title: point.name,
-          opacity: point.active ? 1 : 0.85,
+        const icon = L.divIcon({
+          className: 'daibilet-region-orient-marker',
+          html: regionMarkerHtml(Boolean(point.active)),
+          iconSize: [14, 14],
+          iconAnchor: [7, 7],
+          tooltipAnchor: [0, -10],
         });
-        marker.bindTooltip(point.name, { direction: 'top', offset: [0, -12] });
+        const marker = L.marker([point.lat, point.lng], {
+          icon,
+          title: point.name,
+          opacity: 1,
+          keyboard: true,
+        });
+        marker.bindTooltip(point.name, {
+          direction: 'top',
+          offset: [0, -8],
+          opacity: 0.95,
+        });
         marker.on('click', () => onSelectRef.current(point));
         marker.addTo(map);
         markers.push(marker);
@@ -73,6 +92,7 @@ export function RegionOrientMap({
       if (points.length > 1) {
         map.fitBounds(bounds.pad(0.2));
       }
+      requestAnimationFrame(() => map?.invalidateSize({ animate: false }));
     })();
 
     return () => {

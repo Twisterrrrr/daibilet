@@ -12,3 +12,9 @@
 [data-osm-map='leaflet'][data-map-interaction='active'] {
   cursor: grab;
 }
+
+/* Region hub orientation map: DivIcon without Leaflet default white square */
+.daibilet-region-orient-marker {
+  background: transparent !important;
+  border: none !important;
+}

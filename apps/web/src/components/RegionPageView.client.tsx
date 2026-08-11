@@ -26,6 +26,7 @@ import {
 import { groupRegionAfficheSessions } from '@/lib/region-affiche-group';
 import {
   formatLogisticsChip,
+  formatLogisticsParts,
   getRegionBeltConfig,
   REGION_BELT_FILTERS,
   regionHasBeltData,
@@ -399,7 +400,7 @@ export function RegionPageView({
                       key={item.slug}
                       city={item}
                       active={isCityFilterActive([item.name])}
-                      logistics={formatLogisticsChip(resolveCityBeltEntry(slug, item))}
+                      logistics={formatLogisticsParts(resolveCityBeltEntry(slug, item))}
                       onSelect={() => applyCityFilter([item.name])}
                     />
                   ))}
@@ -657,6 +658,10 @@ export function RegionPageView({
   );
 }
 
+function shortCityRailName(name: string): string {
+  return name.replace(/\s*\([^)]*\)\s*$/u, '').trim() || name;
+}
+
 function ChildCityAvatar({
   city,
   active,
@@ -665,18 +670,20 @@ function ChildCityAvatar({
 }: {
   city: PublicRegionChildCityDto;
   active: boolean;
-  logistics: string | null;
+  logistics: { transit: string | null; km: string | null } | null;
   onSelect: () => void;
 }) {
   const image = resolveCityImage({ slug: city.slug, name: city.name });
+  const label = shortCityRailName(city.name);
   return (
     <button
       type="button"
       onClick={onSelect}
+      title={city.name}
       className={
         active
-          ? 'w-[5.75rem] shrink-0 snap-start text-center sm:w-24'
-          : 'w-[5.75rem] shrink-0 snap-start text-center opacity-95 hover:opacity-100 sm:w-24'
+          ? 'w-[6.75rem] shrink-0 snap-start text-center sm:w-28'
+          : 'w-[6.75rem] shrink-0 snap-start text-center opacity-95 hover:opacity-100 sm:w-28'
       }
     >
       <span
@@ -694,11 +701,16 @@ function ChildCityAvatar({
           </span>
         )}
       </span>
-      <span className="mt-2 block truncate text-xs font-semibold text-slate-900">{city.name}</span>
+      <span className="mt-2 block text-xs font-semibold leading-snug text-slate-900">{label}</span>
       <span className="mt-0.5 block text-[11px] text-slate-500">
         {city.eventCount > 0 ? formatNumber(city.eventCount) : '—'}
       </span>
-      {logistics ? <span className="mt-0.5 block truncate text-[10px] text-slate-400">{logistics}</span> : null}
+      {logistics?.transit ? (
+        <span className="mt-0.5 block text-[10px] leading-tight text-slate-400">{logistics.transit}</span>
+      ) : null}
+      {logistics?.km ? (
+        <span className="block text-[10px] leading-tight text-slate-400">{logistics.km}</span>
+      ) : null}
     </button>
   );
 }
