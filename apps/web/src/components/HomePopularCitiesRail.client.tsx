@@ -11,6 +11,8 @@ import {
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
 
 const LOOP_COPIES = 3;
+/** Arrow buttons step several cards so the rail feels purposeful, not one-by-one. */
+const ARROW_CARD_STEP = 3;
 const HIDE_SCROLLBAR_CLASS =
   '![scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:!hidden';
 
@@ -46,6 +48,13 @@ function measureTitleAnchorLeft(scroller: HTMLElement): number {
   return Math.max(gutter, (vw - maxW) / 2 + gutter);
 }
 
+/** Align CSS snap port with the H2 gutter so mandatory snap does not fight the MSK anchor. */
+function syncScrollPadding(scroller: HTMLElement): number {
+  const pad = Math.max(0, Math.round(measureTitleAnchorLeft(scroller) - scroller.getBoundingClientRect().left));
+  scroller.style.scrollPaddingLeft = `${pad}px`;
+  return pad;
+}
+
 /**
  * Full-bleed infinite city cards. On load/resize: Moscow left-aligned under the H2
  * (SPB immediately after); secondary cities may slight-peek left of the gutter.
@@ -53,6 +62,9 @@ function measureTitleAnchorLeft(scroller: HTMLElement): number {
 export function HomePopularCitiesRail({ cities, className = '' }: HomePopularCitiesRailProps) {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const loopingRef = useRef(false);
+  const programScrollRef = useRef(false);
+  const lastWidthRef = useRef(0);
+  const scrollEndTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [ready, setReady] = useState(false);
 
   const loopItems = useMemo(
@@ -68,7 +80,7 @@ export function HomePopularCitiesRail({ cities, className = '' }: HomePopularCit
 
   const normalizeLoop = useCallback(() => {
     const el = scrollerRef.current;
-    if (!el || cities.length < 2 || loopingRef.current) return;
+    if (!el || cities.length < 2 || loopingRef.current || programScrollRef.current) return;
     const setWidth = el.scrollWidth / LOOP_COPIES;
     if (setWidth < 1) return;
     if (el.scrollLeft < setWidth * 0.5) {
@@ -84,9 +96,11 @@ export function HomePopularCitiesRail({ cities, className = '' }: HomePopularCit
 
   const jumpToFocus = useCallback(() => {
     const el = scrollerRef.current;
-    if (!el || cities.length === 0) return;
+    if (!el || cities.length === 0 || programScrollRef.current) return;
     const setWidth = el.scrollWidth / LOOP_COPIES;
     if (setWidth < 1) return;
+
+    syncScrollPadding(el);
 
     const items = el.querySelectorAll<HTMLElement>('[data-rail-item]');
     const base = cities.length; // middle loop copy
@@ -115,32 +129,92 @@ export function HomePopularCitiesRail({ cities, className = '' }: HomePopularCit
     const el = scrollerRef.current;
     if (!el) return;
 
+    lastWidthRef.current = el.clientWidth;
     jumpToFocus();
 
     const onScroll = () => {
-      if (loopingRef.current) return;
+      if (loopingRef.current || programScrollRef.current) return;
       normalizeLoop();
     };
 
-    el.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', jumpToFocus, { passive: true });
+    const onResize = () => {
+      lastWidthRef.current = el.clientWidth;
+      jumpToFocus();
+    };
 
-    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(() => jumpToFocus()) : null;
+    el.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onResize, { passive: true });
+
+    // Re-anchor only on width changes. Height-only RO (images/fonts) used to call
+    // jumpToFocus mid-interaction and rubber-band the rail back to MSK.
+    const ro =
+      typeof ResizeObserver !== 'undefined'
+        ? new ResizeObserver((entries) => {
+            const width = entries[0]?.contentRect.width ?? el.clientWidth;
+            if (Math.abs(width - lastWidthRef.current) < 1) return;
+            lastWidthRef.current = width;
+            jumpToFocus();
+          })
+        : null;
     ro?.observe(el);
 
     return () => {
       el.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', jumpToFocus);
+      window.removeEventListener('resize', onResize);
       ro?.disconnect();
+      if (scrollEndTimerRef.current) clearTimeout(scrollEndTimerRef.current);
     };
   }, [jumpToFocus, normalizeLoop, loopItems.length]);
+
+  const finishProgramScroll = useCallback(() => {
+    const el = scrollerRef.current;
+    if (!programScrollRef.current) return;
+    if (scrollEndTimerRef.current) {
+      clearTimeout(scrollEndTimerRef.current);
+      scrollEndTimerRef.current = null;
+    }
+    programScrollRef.current = false;
+    if (el) {
+      // Restore snap after programmatic move; padding keeps snap aligned with title gutter.
+      el.style.scrollSnapType = '';
+      normalizeLoop();
+    }
+  }, [normalizeLoop]);
 
   const scrollByDir = (dir: -1 | 1) => {
     const el = scrollerRef.current;
     if (!el) return;
+
+    syncScrollPadding(el);
+    const step = measureStep(el) * ARROW_CARD_STEP;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    el.scrollBy({
-      left: dir * measureStep(el),
+    const target = el.scrollLeft + dir * step;
+
+    // Mandatory snap + smooth scrollBy fought the title-anchored offset (rubber band).
+    // Disable snap for the programmatic glide, then restore on scrollend.
+    if (scrollEndTimerRef.current) clearTimeout(scrollEndTimerRef.current);
+    programScrollRef.current = true;
+    el.style.scrollSnapType = 'none';
+
+    const onScrollEnd = () => {
+      el.removeEventListener('scrollend', onScrollEnd);
+      finishProgramScroll();
+    };
+
+    // Prefer scrollend; long safety timer only. Without scrollend, timed restore.
+    const supportsScrollEnd = typeof window !== 'undefined' && 'onscrollend' in window;
+    if (supportsScrollEnd) {
+      el.addEventListener('scrollend', onScrollEnd);
+      scrollEndTimerRef.current = setTimeout(() => {
+        el.removeEventListener('scrollend', onScrollEnd);
+        finishProgramScroll();
+      }, 1200);
+    } else {
+      scrollEndTimerRef.current = setTimeout(finishProgramScroll, reduceMotion ? 32 : 480);
+    }
+
+    el.scrollTo({
+      left: target,
       behavior: reduceMotion ? 'auto' : 'smooth',
     });
   };
