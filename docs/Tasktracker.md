@@ -2,7 +2,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| UX.MUSTSEE-DROP-BULK | my-day «Главные места»: убрать bulk «Добавить главные места»; chips + list остаются | Высокий | 🔄 ship+Deploy MSK web |
+| UX.MUSTSEE-DROP-BULK | my-day «Главные места»: убрать bulk «Добавить главные места»; chips + list остаются | Высокий | ✅ `8b889e85` Deploy MSK web `31473922071` BUILD_ID=`FZI5gnbEMamJmDZd6NqvN` |
 | UX.MYDAY-NOTES-NIKOLSKY | `/my-day`: between-stop notes; drop list insert; Kryukov Nikolo (not Kronstadt); Berthold coords; heading «Маршрут из N точек» | Критический | 🔄 `d9f25963` Deploy `31462262773` (prev `31461921550` build fail JSX) |
 | UX.MYDAY-LIST-WANDERLOG | `/my-day` Список: pin+thumb cards, between-leg `пешком • м` + «Маршруты», hover `+` insert (место/заметка/список), HTML5 DnD | Критический | 🔄 `e82aaf0e` push; deploy по «выкатывай» |
 | UX.MYDAY-HIDE-STEPS | `/my-day`: временно скрыть «Шаги» timeline (`SHOW_DAY_ROUTE_STEPS=false`); dismiss X на «Свободное окно» (session state) | Критический | 🔄 `de54fbc6` Deploy `31430742242` |

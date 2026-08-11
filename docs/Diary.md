@@ -7,7 +7,7 @@
 - `DayRoutePanel`: убрать `data-day-must-see-bulk` + `addAllMustSee` / `mustSeeAddable`; оставить `MustSeeFilterTabs` и список мест.
 
 ### Проблемы
-- Нет.
+- Нет. Tip `8b889e85`; Deploy MSK web `31473922071`; BUILD_ID=`FZI5gnbEMamJmDZd6NqvN`.
 
 ---
 
