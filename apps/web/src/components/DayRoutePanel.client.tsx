@@ -2630,47 +2630,46 @@ function DayRoutePanelInner() {
             </button>
           ) : null}
         </div>
-          {hasPageCity && catalogError ? (
-            <p className="mt-1 mb-0 text-xs font-medium text-rose-700" role="status">
-              {catalogError}
-            </p>
-          ) : null}
-          <p className="mt-1.5 mb-0 pl-1 text-left text-xs leading-tight text-slate-500">
-            <button
-              type="button"
-              data-day-header-city-change
-              aria-expanded={headerCityChangeOpen}
-              onClick={() => {
-                setHeaderCityChangeOpen((open) => {
-                  if (open) return false;
-                  setHeaderCityChangeKey((key) => key + 1);
-                  return true;
-                });
-              }}
-              className="m-0 inline p-0 font-medium text-slate-500 underline-offset-2 transition hover:text-slate-700 hover:underline"
-            >
-              или сменить город
-            </button>
+        {hasPageCity && catalogError ? (
+          <p className="mt-1 mb-0 text-xs font-medium text-rose-700" role="status">
+            {catalogError}
           </p>
-          {headerCityChangeOpen ? (
-            <div className="mt-2" data-day-city-picker data-day-header-city-picker="1">
-              <CityPicker
-                key={headerCityChangeKey}
-                defaultOpen
-                cities={destinations}
-                value={selectedCity?.cityValue || 'all'}
-                onChange={(name) => {
-                  if (selectedCity?.setCity(name) === false) return;
-                  if (name !== 'all') setCityInput(name);
-                  setHeaderCityChangeOpen(false);
-                }}
-                allLabel="Город"
-                variant="hero"
-                className="w-full"
-              />
-            </div>
-          ) : null}
-        </div>
+        ) : null}
+        <p className="mt-1.5 mb-0 pl-1 text-left text-xs leading-tight text-slate-500">
+          <button
+            type="button"
+            data-day-header-city-change
+            aria-expanded={headerCityChangeOpen}
+            onClick={() => {
+              setHeaderCityChangeOpen((open) => {
+                if (open) return false;
+                setHeaderCityChangeKey((key) => key + 1);
+                return true;
+              });
+            }}
+            className="m-0 inline p-0 font-medium text-slate-500 underline-offset-2 transition hover:text-slate-700 hover:underline"
+          >
+            или сменить город
+          </button>
+        </p>
+        {headerCityChangeOpen ? (
+          <div className="mt-2" data-day-city-picker data-day-header-city-picker="1">
+            <CityPicker
+              key={headerCityChangeKey}
+              defaultOpen
+              cities={destinations}
+              value={selectedCity?.cityValue || 'all'}
+              onChange={(name) => {
+                if (selectedCity?.setCity(name) === false) return;
+                if (name !== 'all') setCityInput(name);
+                setHeaderCityChangeOpen(false);
+              }}
+              allLabel="Город"
+              variant="hero"
+              className="w-full"
+            />
+          </div>
+        ) : null}
       </div>
     );
   }
