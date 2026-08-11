@@ -1,3 +1,30 @@
+## 2026-08-11 - My Day Wave 1: Lovable UX rebuild (wireframe)
+
+### Наблюдения
+- Owner: пересобрать `/my-day` по паттернам `daibilet-planner` (Lovable), адаптивно desktop/tablet/mobile.
+- Текущий `DayRoutePanel` ~5.4k строк - god-component; data layer (`day-route.ts`, share API, notes, between-leg) оставляем.
+- В Lovable нет Gantt: itinerary + legs + «По часам» badges; PDF/GPX - Волна 2; ticket CTA - Волна 3 (наш moat).
+
+### Решения (Волна 1 wireframe)
+```
+MyDayShell
+├─ list column (scroll)
+│  ├─ MyDayToolbar (sticky): N точек · км · мин · Пешком/Авто · Оптимизировать · По часам · Share
+│  ├─ MyDayItinerary: cards + between-leg tips/+ · hour badges · overflow banner
+│  └─ MyDayAddShelf: scenarios / must-see / search / boat (as-is)
+└─ map column (lg sticky)
+   ├─ collapse → 56px rail
+   ├─ DayRouteOsmMap + hover sync
+   └─ mobile: FAB → bottom sheet ~85vh (не fullscreen-only)
+```
+- Модули: `apps/web/src/components/my-day/*` + `useMyDayController` (layout state Wave 1).
+- Не копируем Vite/TanStack/shadcn SPA и mock cities.
+
+### Проблемы
+- Полный вынос всего state из panel в controller - следующий шаг; Wave 1 = shell + toolbar + map collapse/sheet + schedule banner.
+
+---
+
 ## 2026-08-11 - my-day: drop must-see bulk CTA
 
 ### Наблюдения

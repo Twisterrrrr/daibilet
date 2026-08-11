@@ -27,6 +27,17 @@ import {
   X,
 } from 'lucide-react';
 import {
+  MyDayAddShelf,
+  MyDayItinerary,
+  MyDayMapAside,
+  MyDayMapFullScreen,
+  MyDayMobileMapSheet,
+  MyDayScheduleBanner,
+  MyDayShell,
+  MyDayToolbar,
+  useMyDayController,
+} from '@/components/my-day';
+import {
   DragEvent,
   FormEvent,
   Fragment,
@@ -440,10 +451,12 @@ function DayRoutePanelInner() {
   const [mobileView, setMobileView] = useState<'list' | 'map'>('list');
   /** Mobile shelf: route steps/map vs catalog add tools. */
   const [mobileShelf, setMobileShelf] = useState<DayRouteMobileShelf>('route');
-  /** Route stops detail: Сетка (Steps + carousel) or Wanderlog Список. */
-  const [stopViewMode, setStopViewMode] = useState<DayRouteStopViewMode>('grid');
+  /** Route stops detail: Сетка (Steps + carousel) or Wanderlog Список. Default list (Lovable itinerary). */
+  const [stopViewMode, setStopViewMode] = useState<DayRouteStopViewMode>('list');
   /** Desktop (≥lg) can pick grid/list; mobile always Wanderlog list. */
   const [isLgUp, setIsLgUp] = useState(false);
+  /** Lovable-style map chrome: collapse / fullscreen / mobile sheet. */
+  const myDay = useMyDayController();
   /** Session dismiss for «Свободное окно» upsell (resets on reload). */
   const [freeWindowDismissed, setFreeWindowDismissed] = useState(false);
   /** HTML5 DnD: venue id currently dragged (plan stops). */
@@ -3112,26 +3125,39 @@ function DayRoutePanelInner() {
         className={mobileShelf === 'route' ? 'lg:contents' : 'hidden lg:contents'}
         data-day-mobile-shelf-panel="route"
       >
-      {/* 1. Route list - always expanded */}
+      {/* 1. Route list - Lovable shell */}
       {!route.venues.length ? null : (
-        <section className="mt-5 w-full sm:mt-8" data-day-route-list>
-          <div className="flex flex-col gap-4 lg:grid lg:grid-cols-[minmax(0,1fr)_420px] lg:gap-6">
-            <div className="lg:overflow-y-auto lg:max-h-[calc(100vh-var(--site-header-height)-12rem)] lg:pr-1">
-          {/* Row 1: title + Сетка/Список | desktop Hour plan + Optimize; mobile Список/Карта */}
-          <div className="flex min-w-0 items-center justify-between gap-2">
-            <div className="flex min-w-0 flex-wrap items-center gap-2">
-              <h2
-                className="text-sm font-semibold text-slate-800"
-                data-day-route-count-heading
-                aria-label={formatDayRouteStopsHeading(route.venues.length)}
-              >
-                {formatDayRouteStopsHeading(route.venues.length)}
-                {hourPlan?.totalLabel ? (
-                  <span className="ml-1.5 font-medium text-slate-500" data-day-hour-total>
-                    {hourPlan.totalLabel}
-                  </span>
-                ) : null}
-              </h2>
+        <section className="mt-5 w-full sm:mt-8" data-day-route-list-section>
+          <MyDayShell
+            mapOpen={myDay.mapOpen}
+            showMapColumn={hasMapStops}
+            list={
+              <div data-my-day-list-inner>
+          <MyDayToolbar
+            stopsCount={route.venues.length}
+            stopsHeading={formatDayRouteStopsHeading(route.venues.length)}
+            distanceLabel={
+              totalDistanceMeters > 0 ? formatDayRouteDistance(totalDistanceMeters) : null
+            }
+            travelMinutesLabel={
+              travelMinutes > 0 ? formatDayRouteTravelMinutes(travelMinutes) : null
+            }
+            travelMode={travelMode}
+            onTravelModeChange={setTravelMode}
+            canOptimize={canOptimize}
+            onOptimize={optimizeOrder}
+            hourPlanOn={hourPlanOn}
+            canHourPlan={route.venues.length >= DAY_ROUTE_MIN}
+            onToggleHourPlan={() => {
+              setHourPlanOn(false);
+              setHourSheetOpen(false);
+            }}
+            onOpenHourSheet={() => setHourSheetOpen(true)}
+            hourStart={hourStart}
+            hourEnd={hourEnd}
+            onHourStartChange={setHourStart}
+            onHourEndChange={setHourEnd}
+            viewToggle={
               <div
                 className="hidden rounded-full border border-slate-200/80 bg-slate-50 p-0.5 lg:inline-flex"
                 role="group"
@@ -3165,112 +3191,35 @@ function DayRoutePanelInner() {
                   Список
                 </button>
               </div>
-            </div>
-            <div className="flex shrink-0 items-center gap-2">
-              {hasMapStops ? (
-                <div
-                  className="inline-flex shrink-0 rounded-full border border-slate-200/80 bg-slate-50 p-0.5 lg:hidden"
-                  role="group"
-                  aria-label="Вид: список или карта"
-                  data-day-mobile-view-toggle
-                >
-                  <button
-                    type="button"
-                    aria-pressed={mobileView === 'list'}
-                    onClick={() => setMobileView('list')}
-                    className={`inline-flex min-h-7 items-center gap-1 rounded-full px-2.5 text-[11px] font-semibold transition ${
-                      mobileView === 'list'
-                        ? 'bg-white text-slate-800 shadow-sm'
-                        : 'text-slate-500 hover:text-slate-700'
-                    }`}
-                  >
-                    <List className="h-3.5 w-3.5" />
-                    Список
-                  </button>
-                  <button
-                    type="button"
-                    aria-pressed={mobileView === 'map'}
-                    onClick={() => setMobileView('map')}
-                    className={`inline-flex min-h-7 items-center gap-1 rounded-full px-2.5 text-[11px] font-semibold transition ${
-                      mobileView === 'map'
-                        ? 'bg-white text-slate-800 shadow-sm'
-                        : 'text-slate-500 hover:text-slate-700'
-                    }`}
-                  >
-                    <MapPin className="h-3.5 w-3.5" />
-                    Карта
-                  </button>
-                </div>
-              ) : null}
-            </div>
-          </div>
+            }
+          />
 
-          {/* Row 2: desktop left [km · min][Пешком Авто] | right CTAs; mobile km left | Пешком right */}
-          {totalDistanceMeters > 0 || route.venues.length >= DAY_ROUTE_MIN || canOptimize ? (
-            <div
-              className={`mt-2.5 flex w-full flex-wrap items-center justify-between gap-x-3 gap-y-1 ${
-                totalDistanceMeters > 0 ? '' : 'hidden lg:flex'
-              }`}
-              data-day-distance-summary
-              data-day-distance-summary-mobile
-            >
-              <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
-                <p className="min-w-0 text-[13px] leading-snug text-slate-600">
-                  {totalDistanceMeters > 0 ? (
-                    <>
-                      <span className="font-semibold text-slate-800">
-                        {formatDayRouteDistance(totalDistanceMeters)}
-                      </span>
-                      {travelMinutes > 0 ? (
-                        <>
-                          {' '}
-                          · около{' '}
-                          <span className="font-semibold text-slate-800">
-                            {formatDayRouteTravelMinutes(travelMinutes)}
-                          </span>
-                        </>
-                      ) : null}
-                    </>
-                  ) : (
-                    <span className="sr-only">Маршрут</span>
-                  )}
-                </p>
-                {totalDistanceMeters > 0 ? (
-                  <div className="hidden lg:block" data-day-travel-mode-desktop>
-                    {renderTravelModeToggle()}
-                  </div>
-                ) : null}
-              </div>
-              <div className="flex shrink-0 flex-wrap items-center justify-end gap-x-3 gap-y-1">
-                {totalDistanceMeters > 0 ? (
-                  <div className="lg:hidden" data-day-travel-mode-mobile>
-                    {renderTravelModeToggle()}
-                  </div>
-                ) : null}
-                {renderDesktopDistanceActions()}
-              </div>
-            </div>
-          ) : null}
+          <MyDayScheduleBanner
+            overflowCount={overflowStops.length}
+            totalLabel={hourPlan?.totalLabel || null}
+            lunchLabel={hourPlan?.lunchHint?.label || null}
+            onTrimOverflow={
+              overflowStops.length
+                ? () => {
+                    for (const v of overflowStops) setRoute(removeFromDayRoute(v.id));
+                  }
+                : undefined
+            }
+            onExtendEnd={
+              hourPlanOn
+                ? () => {
+                    setHourEnd('23:30');
+                  }
+                : undefined
+            }
+          />
 
-          {/* Row 3: mobile = compact Plan/Optimize icons (sticky keeps primary CTA) */}
-          <div data-day-route-toolbar className="mt-2 w-full shrink-0 lg:hidden">
-            {renderMobileRouteActions()}
-          </div>
-
-
+          <MyDayItinerary>
           {missingCoordsCount > 0 ? (
             <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
               {coordsCount < 2
                 ? `У ${missingCoordsCount} ${missingCoordsCount === 1 ? 'точки' : 'точек'} нет координат - Яндекс.Карты пока недоступны. Добавьте места из каталога или укажите lat, lng в «своём месте».`
                 : `Без координат: ${missingCoordsCount}. В Яндекс уйдут только ${coordsCount} точки с координатами (в текущем порядке).`}
-            </p>
-          ) : null}
-          {hourPlan?.lunchHint ? (
-            <p
-              className="mt-3 rounded-xl border border-dashed border-amber-200 bg-amber-50/70 px-3 py-2 text-xs text-amber-900"
-              data-day-hour-lunch
-            >
-              Обед в графике: {hourPlan.lunchHint.label}
             </p>
           ) : null}
 
@@ -3570,41 +3519,42 @@ function DayRoutePanelInner() {
             </div>
           ) : null}
 
-          </div>
-
-          <div className="lg:sticky lg:top-[var(--site-header-height)] lg:self-start">
-            {mapStops.length > 0 ? (
-              <div className="lg:pt-4 lg:pb-6">
-                <div
-                  className="rounded-2xl border border-slate-200 bg-white p-3 sm:p-4"
-                  data-day-route-map-wrap
-                  data-day-route-map-desktop
+          </MyDayItinerary>
+              </div>
+            }
+            map={
+              mapStops.length > 0 ? (
+                <MyDayMapAside
+                  mapOpen={myDay.mapOpen}
+                  onToggleOpen={myDay.toggleMapOpen}
+                  onOpenFull={myDay.openMapFull}
+                  toolbar={
+                    <div className="flex items-center justify-between gap-2 pr-20">
+                      <div>
+                        <p className="text-sm font-bold text-slate-900">Карта дня</p>
+                        <p className="mt-0.5 text-xs text-slate-500">
+                          Точки с координатами - порядок как в списке
+                        </p>
+                      </div>
+                      {renderMapToolbar()}
+                    </div>
+                  }
                 >
-                  <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                      <p className="text-sm font-bold text-slate-900">Карта дня</p>
-                      <p className="mt-0.5 text-xs text-slate-500">
-                        Точки с координатами · порядок как в списке
-                      </p>
-                    </div>
-                    {renderMapToolbar()}
-                  </div>
-                  <div className="relative isolate">
-                    <div className="relative z-0 overflow-hidden rounded-xl">
-                      <DayRouteOsmMap
-                        stops={mapStops}
-                        selectedStopId={mapSelectedStopId}
-                        onStopClick={(stopId) => focusStopFromMap(stopId, { scrollList: false })}
-                        className="h-64 w-full bg-slate-100 sm:h-80"
-                      />
-                    </div>
+                  <div className="relative isolate h-full min-h-[20rem] w-full">
+                    <DayRouteOsmMap
+                      stops={mapStops}
+                      selectedStopId={mapSelectedStopId}
+                      onStopClick={(stopId) => focusStopFromMap(stopId, { scrollList: false })}
+                      className="h-full min-h-[20rem] w-full bg-slate-100"
+                    />
                     {renderMapFocusCard('desktop')}
                   </div>
-                </div>
-              </div>
-            ) : null}
-          </div>
-          </div>
+                </MyDayMapAside>
+              ) : (
+                <div className="hidden" />
+              )
+            }
+          />
         </section>
       )}
 
@@ -3614,6 +3564,7 @@ function DayRoutePanelInner() {
         className={mobileShelf === 'add' ? 'lg:contents' : 'hidden lg:contents'}
         data-day-mobile-shelf-panel="add"
       >
+      <MyDayAddShelf>
       {/* Day-plan guides: always open (логистика / гастро / Что посмотреть). Accordion = route tools only. */}
       {showScenariosGuide ? (
         <section
@@ -4201,104 +4152,76 @@ function DayRoutePanelInner() {
         )}
       </section>
 
+      </MyDayAddShelf>
       </div>
 
-      </div>
-
-      {mobileView === 'map' && hasMapStops ? (
-        <div
-          className="fixed inset-x-0 bottom-0 top-[var(--site-header-height)] z-30 flex flex-col bg-white lg:hidden print:hidden"
-          data-day-mobile-map-mode="1"
-        >
-          <div className="flex shrink-0 items-center gap-2 border-b border-slate-200 px-3 py-2">
-            <div
-              className="inline-flex rounded-full border border-slate-200/80 bg-slate-50 p-0.5"
-              role="group"
-              aria-label="Вид: список или карта"
-            >
-              <button
-                type="button"
-                aria-pressed={false}
-                onClick={() => setMobileView('list')}
-                className="inline-flex min-h-7 items-center gap-1 rounded-full px-2.5 text-[11px] font-semibold text-slate-500 hover:text-slate-700"
-              >
-                <List className="h-3.5 w-3.5" />
-                Список
-              </button>
-              <button
-                type="button"
-                aria-pressed={true}
-                className="inline-flex min-h-7 items-center gap-1 rounded-full bg-white px-2.5 text-[11px] font-semibold text-slate-800 shadow-sm"
-              >
-                <MapPin className="h-3.5 w-3.5" />
-                Карта
-              </button>
-            </div>
-            <div className="ml-auto flex items-center gap-2">
-              {yandexUrl ? (
-                <a
-                  href={yandexUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex min-h-8 items-center justify-center gap-1 rounded-full bg-sky-600 px-3 text-[11px] font-bold text-white hover:bg-sky-700"
+      {hasMapStops ? (
+        <MyDayMobileMapSheet
+          open={myDay.mobileMapSheetOpen || mobileView === 'map'}
+          onOpen={() => {
+            myDay.openMobileMap();
+            setMobileView('map');
+          }}
+          onClose={() => {
+            myDay.closeMobileMap();
+            setMobileView('list');
+          }}
+          stopCount={mapStops.length}
+          yandexUrl={yandexUrl}
+          footer={
+            <>
+              {renderMapFocusCard('mobile')}
+              {route.venues.length > 0 ? (
+                <div
+                  className="absolute inset-x-0 bottom-0 z-[1000] border-t border-slate-200/80 bg-white/95 backdrop-blur"
+                  data-day-map-stops-rail
                 >
-                  <ExternalLink className="h-3.5 w-3.5" />
-                  Яндекс.Карты
-                </a>
-              ) : null}
-              <button
-                type="button"
-                aria-label="Закрыть карту"
-                onClick={() => setMobileView('list')}
-                className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 text-slate-600 hover:bg-slate-50"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-          <div className="relative isolate min-h-0 flex-1 bg-slate-100 pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))]">
-            <div className="absolute inset-0 z-0">
-              <DayRouteOsmMap
-                stops={mapStops}
-                selectedStopId={focusedStopId}
-                onStopClick={focusStopFromMap}
-                layoutKey="mobile-map"
-                className="h-full w-full"
-              />
-            </div>
-            {renderMapFocusCard('mobile')}
-            {route.venues.length > 0 ? (
-              <div
-                className="absolute inset-x-0 bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px))] z-[1000] border-t border-slate-200/80 bg-white/95 backdrop-blur"
-                data-day-map-stops-rail
-              >
-                <div className="flex gap-2 overflow-x-auto px-3 py-2.5">
-                  {route.venues.map((venue, index) => {
-                    const active = focusedStopId === venue.id;
-                    return (
-                      <button
-                        key={venue.id}
-                        type="button"
-                        onClick={() => focusStopFromMap(venue.id)}
-                        className={`inline-flex max-w-[10rem] shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1.5 text-left text-[11px] font-semibold ${
-                          active
-                            ? 'border-emerald-300 bg-emerald-50 text-emerald-950'
-                            : 'border-slate-200 bg-white text-slate-800'
-                        }`}
-                      >
-                        <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-900 text-[10px] font-bold text-white">
-                          {index + 1}
-                        </span>
-                        <span className="truncate">{venue.title}</span>
-                      </button>
-                    );
-                  })}
+                  <div className="flex gap-2 overflow-x-auto px-3 py-2.5">
+                    {route.venues.map((venue, index) => {
+                      const active = focusedStopId === venue.id;
+                      return (
+                        <button
+                          key={venue.id}
+                          type="button"
+                          onClick={() => focusStopFromMap(venue.id)}
+                          className={`inline-flex max-w-[10rem] shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1.5 text-left text-[11px] font-semibold ${
+                            active
+                              ? 'border-emerald-300 bg-emerald-50 text-emerald-950'
+                              : 'border-slate-200 bg-white text-slate-800'
+                          }`}
+                        >
+                          <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-900 text-[10px] font-bold text-white">
+                            {index + 1}
+                          </span>
+                          <span className="truncate">{venue.title}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            ) : null}
-          </div>
-        </div>
+              ) : null}
+            </>
+          }
+        >
+          <DayRouteOsmMap
+            stops={mapStops}
+            selectedStopId={focusedStopId}
+            onStopClick={focusStopFromMap}
+            layoutKey="mobile-map-sheet"
+            className="h-full w-full"
+          />
+        </MyDayMobileMapSheet>
       ) : null}
+
+      <MyDayMapFullScreen open={myDay.mapFull && hasMapStops} onClose={myDay.closeMapFull}>
+        <DayRouteOsmMap
+          stops={mapStops}
+          selectedStopId={mapSelectedStopId}
+          onStopClick={(stopId) => focusStopFromMap(stopId, { scrollList: false })}
+          layoutKey="desktop-map-full"
+          className="h-full w-full"
+        />
+      </MyDayMapFullScreen>
 
       <MobileStickyActionBar>
         {unpaidTicketStops.length > 0 ? (
@@ -4316,9 +4239,11 @@ function DayRoutePanelInner() {
             type="button"
             onClick={() => {
               setMobileShelf('route');
-              if (hasMapStops) setMobileView('map');
-              else {
-                const el = document.querySelector('[data-day-route-list]');
+              if (hasMapStops) {
+                myDay.openMobileMap();
+                setMobileView('map');
+              } else {
+                const el = document.querySelector('[data-my-day-itinerary]');
                 if (el instanceof HTMLElement) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
               }
             }}
@@ -4354,8 +4279,10 @@ function DayRoutePanelInner() {
           </button>
         ) : null}
       </MobileStickyActionBar>
+      </div>
     </div>
-    {shareMenuOpen && typeof document !== 'undefined'
+
+      {shareMenuOpen && typeof document !== 'undefined'
       ? createPortal(
           <div
             className="fixed inset-0 z-[60] sm:hidden print:hidden"
