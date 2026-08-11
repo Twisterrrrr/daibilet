@@ -1,59 +1,35 @@
 import styles from './DaibiletLogo.module.css';
 
 export const DAIBILET_LOGO_BLUE = '#4267e9';
-export const DAIBILET_LOGO_DARK = '#000000';
+export const DAIBILET_LOGO_DARK = '#101729';
 
-/**
- * Owner-approved geometry (annotated sketch with red !!):
- * 1. Short SOLID slanted blue stroke ON «и» = й-кратка AND first dash of the route.
- * 2. Blue dashed arc begins at the RIGHT TIP of that stroke (exact same point)
- *    → mid blue filled circle → dashed → blue X over «т».
- *
- * Two path segments joined at the tip. Dashed segment: dashoffset 0 so the first
- * dash paints AT the tip. Strokes use vector-effect:non-scaling-stroke so the
- * й-кратка stays readable at header size (~20-24px), not a 1px fleck.
- *
- * viewBox 0 0 500 95; «и» near x≈150–195.
- */
-/** Solid й-кратка (first dash), slanted up-right, sits on «и». */
-const BREVE_X1 = 148;
-const BREVE_Y1 = 56;
-const BREVE_X2 = 192;
-const BREVE_Y2 = 42;
-const BREVE_D = `M${BREVE_X1} ${BREVE_Y1} L${BREVE_X2} ${BREVE_Y2}`;
-
-/** Dashed continuation from the breve tip; cubic follows up-right breve tangent. */
-const ROUTE_1 = `M${BREVE_X2} ${BREVE_Y2} C220 24 270 -2 315 31`;
+const ROUTE_1 = 'M170 31 C215 -4 270 -4 315 31';
 const ROUTE_2 = 'M315 31 C365 -3 430 -3 475 31';
-
-const MID_X = 315;
-const MID_Y = 31;
-const DEST_X = 475;
-const DEST_Y = 31;
-const DEST_ARM = 14;
 
 type DaibiletLogoProps = {
   className?: string;
   textClassName?: string;
   showText?: boolean;
-  /** Kept for API compat; motion is disabled - logo always renders static. */
+  /** When false, skip load animation (print, static chrome, tickets). */
   animated?: boolean;
 };
 
 /**
  * Brand mark: HTML «Даибилет» + SVG route overlay.
- * Black bold wordmark; blue solid first-dash over «й» → dashed blue arc → mid
- * circle → dashed → blue X. Aria / sr-only: «Дайбилет».
- * Below md (768px): route/pebbles/X hidden via CSS; breve stays as letterform.
+ * First blue point is the кратка of «й»; aria / sr-only stay «Дайбилет».
+ * Desktop: one-shot land → route → land → route → final. Mobile: wordmark + point-1 only.
  */
 export function DaibiletLogo({
   className = '',
   textClassName = '',
   showText = true,
+  animated = true,
 }: DaibiletLogoProps) {
   if (!showText) return null;
 
-  const rootClass = [styles.logo, className].filter(Boolean).join(' ');
+  const rootClass = [styles.logo, animated ? '' : styles.static, className]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <span className={rootClass}>
@@ -62,27 +38,14 @@ export function DaibiletLogo({
         className={`${styles.logoText} font-display ${textClassName || 'text-xl sm:text-2xl'}`}
         aria-hidden="true"
       >
-        Да<span>и</span>билет
+        Да<span className={styles.logoI}>и</span>билет
       </span>
       <svg className={styles.logoRoute} viewBox="0 0 500 95" aria-hidden="true">
-        <path className={styles.breve} d={BREVE_D} />
-        <path className={styles.route} d={ROUTE_1} />
-        <path className={styles.route} d={ROUTE_2} />
-        <circle className={styles.point} cx={MID_X} cy={MID_Y} r="11" />
-        <g className={styles.point3} aria-hidden="true">
-          <line
-            x1={DEST_X - DEST_ARM}
-            y1={DEST_Y - DEST_ARM}
-            x2={DEST_X + DEST_ARM}
-            y2={DEST_Y + DEST_ARM}
-          />
-          <line
-            x1={DEST_X + DEST_ARM}
-            y1={DEST_Y - DEST_ARM}
-            x2={DEST_X - DEST_ARM}
-            y2={DEST_Y + DEST_ARM}
-          />
-        </g>
+        <path className={`${styles.route} ${styles.route1}`} d={ROUTE_1} />
+        <path className={`${styles.route} ${styles.route2}`} d={ROUTE_2} />
+        <circle className={`${styles.point} ${styles.point1}`} cx="170" cy="31" r="7" />
+        <circle className={`${styles.point} ${styles.point2}`} cx="315" cy="31" r="7" />
+        <circle className={`${styles.point} ${styles.point3}`} cx="475" cy="31" r="10" />
       </svg>
     </span>
   );

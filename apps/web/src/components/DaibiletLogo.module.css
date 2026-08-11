@@ -1,88 +1,143 @@
 .logo {
-  /* Wordmark ink; route (breve, dashed arcs, mid dot, X) use brand blue. */
-  --logo-ink: #000000;
-  --logo-blue: #4267e9;
+  --blue: #4267e9;
+  --dark: #101729;
 
   position: relative;
   display: inline-block;
   line-height: 1;
-  color: var(--logo-ink);
+  color: var(--dark);
   text-decoration: none;
   overflow: visible;
 }
 
 .logoText {
   font-family: var(--font-display);
-  font-weight: 800;
+  font-weight: 700;
+  /* ~-2.5px at 58px mock; scales with header text-* size */
   letter-spacing: -0.043em;
   line-height: 1;
-  color: var(--logo-ink);
+  color: var(--dark);
 }
 
 .logoRoute {
   position: absolute;
   left: 0;
-  /* Overlay so the solid й-кратка sits just above «и» as the diacritic. */
-  top: -28%;
+  top: -42%;
   width: 100%;
   height: auto;
   overflow: visible;
   pointer-events: none;
-  z-index: 1;
 }
 
-/*
- * Solid first dash (й-кратка). non-scaling-stroke keeps ~2.4px on screen at
- * header size so the breve does not collapse to an invisible fleck.
- */
-.breve {
-  fill: none;
-  stroke: var(--logo-blue);
-  stroke-width: 2.4px;
-  stroke-linecap: round;
-  vector-effect: non-scaling-stroke;
-  opacity: 1;
-}
-
-/*
- * Dashed continuation. dashoffset 0 = first dash paints AT the breve tip.
- * Same non-scaling stroke so punctir stays readable in the header.
- */
 .route {
   fill: none;
-  stroke: var(--logo-blue);
-  stroke-width: 2px;
+  stroke: var(--blue);
+  stroke-width: 3.5;
   stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-dasharray: 7px 6px;
-  stroke-dashoffset: 0;
-  vector-effect: non-scaling-stroke;
-  opacity: 1;
+  stroke-dasharray: 8 11;
+  opacity: 0;
+}
+
+.route1 {
+  animation: logoRouteIn 0.55s 0.15s forwards;
+}
+
+.route2 {
+  animation: logoRouteIn 0.55s 0.65s forwards;
 }
 
 .point {
-  fill: var(--logo-blue);
-  opacity: 1;
+  fill: var(--blue);
+  transform-box: fill-box;
+  transform-origin: center;
 }
 
-/* Destination: blue X (not a circle). */
+.point1 {
+  animation: logoLand 0.35s ease-out both;
+}
+
+.point2 {
+  animation: logoLand 0.35s 0.55s ease-out both;
+}
+
 .point3 {
-  fill: none;
-  stroke: var(--logo-blue);
-  stroke-width: 2.2px;
-  stroke-linecap: round;
-  vector-effect: non-scaling-stroke;
+  animation: logoLandFinal 0.45s 1.05s ease-out both;
+}
+
+@keyframes logoRouteIn {
+  from {
+    opacity: 0;
+    stroke-dashoffset: 30;
+  }
+  to {
+    opacity: 1;
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes logoLand {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.7);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(2px) scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes logoLandFinal {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.6);
+  }
+  65% {
+    opacity: 1;
+    transform: translateY(2px) scale(1.18);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Static / print / ticket: final state, no motion */
+.static .route,
+.static .point {
+  animation: none;
   opacity: 1;
+  stroke-dashoffset: 0;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route,
+  .point {
+    animation: none;
+    opacity: 1;
+    stroke-dashoffset: 0;
+    transform: none;
+  }
 }
 
 /*
- * Mobile (< md / 768px): clean wordmark + й-кратка only.
- * Hide dashed arcs, mid pebble, and destination X. Desktop unchanged.
+ * Mobile: wordmark + point-1 as й-кратка only.
+ * Hide dashed arcs and later points (no full route).
  */
 @media (max-width: 767.98px) {
   .route,
-  .point,
+  .point2,
   .point3 {
     display: none;
+  }
+
+  .point1 {
+    animation: none;
+    opacity: 1;
+    transform: none;
   }
 }
