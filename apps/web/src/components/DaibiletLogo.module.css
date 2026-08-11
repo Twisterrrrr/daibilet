@@ -19,10 +19,31 @@
   color: var(--dark);
 }
 
+/* Anchor for the й-кратка (point-1) over «и». */
+.logoI {
+  position: relative;
+}
+
+/*
+ * point-1 / й-кратка. Sized in em so it cannot collapse at header font sizes.
+ * This IS the letter й — not optional decoration. Always visible, no animation.
+ */
+.breveMark {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 0.3em;
+  height: 0.3em;
+  overflow: visible;
+  pointer-events: none;
+  transform: translate(-50%, -108%);
+}
+
 .logoRoute {
   position: absolute;
   left: 0;
-  top: -42%;
+  /* Route start aligns with the em-кратка above «и». */
+  top: -0.55em;
   width: 100%;
   height: auto;
   overflow: visible;
@@ -35,98 +56,21 @@
   stroke-width: 3.5;
   stroke-linecap: round;
   stroke-dasharray: 8 11;
-  opacity: 0;
-}
-
-.route1 {
-  animation: logoRouteIn 0.55s 0.15s forwards;
-}
-
-.route2 {
-  animation: logoRouteIn 0.55s 0.65s forwards;
+  opacity: 1;
 }
 
 .point {
   fill: var(--blue);
-  transform-box: fill-box;
-  transform-origin: center;
+  opacity: 1;
 }
 
 .point1 {
-  animation: logoLand 0.35s ease-out both;
-}
-
-.point2 {
-  animation: logoLand 0.35s 0.55s ease-out both;
-}
-
-.point3 {
-  animation: logoLandFinal 0.45s 1.05s ease-out both;
-}
-
-@keyframes logoRouteIn {
-  from {
-    opacity: 0;
-    stroke-dashoffset: 30;
-  }
-  to {
-    opacity: 1;
-    stroke-dashoffset: 0;
-  }
-}
-
-@keyframes logoLand {
-  0% {
-    opacity: 0;
-    transform: translateY(-8px) scale(0.7);
-  }
-  70% {
-    opacity: 1;
-    transform: translateY(2px) scale(1.1);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes logoLandFinal {
-  0% {
-    opacity: 0;
-    transform: translateY(-10px) scale(0.6);
-  }
-  65% {
-    opacity: 1;
-    transform: translateY(2px) scale(1.18);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-/* Static / print / ticket: final state, no motion */
-.static .route,
-.static .point {
-  animation: none;
   opacity: 1;
-  stroke-dashoffset: 0;
-  transform: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .route,
-  .point {
-    animation: none;
-    opacity: 1;
-    stroke-dashoffset: 0;
-    transform: none;
-  }
 }
 
 /*
- * Mobile: wordmark + point-1 as й-кратка only.
- * Hide dashed arcs and later points (no full route).
+ * Mobile: wordmark + point-1 (й-кратка) only.
+ * Hide dashed arcs and later points — NEVER hide point-1 / .breveMark.
  */
 @media (max-width: 767.98px) {
   .route,
@@ -135,9 +79,9 @@
     display: none;
   }
 
+  .breveMark,
   .point1 {
-    animation: none;
+    display: block;
     opacity: 1;
-    transform: none;
   }
 }

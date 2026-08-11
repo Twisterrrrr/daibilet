@@ -1,3 +1,18 @@
+## 2026-08-11 - Logo: static й-кратка (no animation)
+
+### Наблюдения
+- Owner rage: на live читалось «Даибилет» без й; point-1 в viewBox 500 схлопывался до ~2-3px; анимация с `both` могла оставить opacity 0. Owner: «просил без анимации».
+
+### Решения
+- point-1 = em-sized SVG circle over «и» (`.breveMark`) - всегда читаемая кратка й.
+- Desktop: static routes + point-2/3 сразу видны. Mobile: только wordmark + point-1 (arcs/pebbles hidden).
+- Убраны все `@keyframes` / routeIn / land / landFinal. `animated` prop deprecated no-op.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-11 - my-day: notes must not trigger coords banner
 
 ### Наблюдения
