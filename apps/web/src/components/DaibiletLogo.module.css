@@ -2,10 +2,12 @@
   --blue: #4267e9;
   --dark: #101729;
 
+  position: relative;
   display: inline-block;
   line-height: 1;
   color: var(--dark);
   text-decoration: none;
+  overflow: visible;
 }
 
 .logoText {
@@ -15,4 +17,28 @@
   letter-spacing: -0.043em;
   line-height: 1;
   color: var(--dark);
+}
+
+/* Anchor for the blue й-кратка over «и». */
+.logoI {
+  position: relative;
+}
+
+/*
+ * Single bold blue dot as й-diacritic. Em-sized so it stays readable
+ * at header font sizes. No routes / other points / animation.
+ */
+.breveMark {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 0.3em;
+  height: 0.3em;
+  overflow: visible;
+  pointer-events: none;
+  transform: translate(-50%, -108%);
+}
+
+.dot {
+  fill: var(--blue);
 }

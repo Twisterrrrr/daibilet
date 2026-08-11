@@ -12,8 +12,8 @@ type DaibiletLogoProps = {
 };
 
 /**
- * Brand wordmark: plain HTML «Дайбилет» (real Cyrillic й).
- * No SVG routes, points, or animation. Link / aria-label live on parent.
+ * Brand wordmark «Дайбилет»: «и» + bold blue dot as й-кратка.
+ * No dashed routes, mid/end points, or animation. Link / aria-label on parent.
  */
 export function DaibiletLogo({
   className = '',
@@ -26,10 +26,19 @@ export function DaibiletLogo({
 
   return (
     <span className={rootClass}>
+      <span className="sr-only">Дайбилет</span>
       <span
         className={`${styles.logoText} font-display ${textClassName || 'text-xl sm:text-2xl'}`}
+        aria-hidden="true"
       >
-        Дайбилет
+        Да
+        <span className={styles.logoI}>
+          и
+          <svg className={styles.breveMark} viewBox="0 0 12 12" aria-hidden="true">
+            <circle className={styles.dot} cx="6" cy="6" r="5" />
+          </svg>
+        </span>
+        билет
       </span>
     </span>
   );
