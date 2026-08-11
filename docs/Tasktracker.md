@@ -10,13 +10,14 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| SEO.PODBORKI-CITY-CHPU | Подборки city SEO: план + пилот Meta на `?city=` (не ЧПУ в этом проходе) | Высокий | 🔄 Meta-пилот ship; маркерный ЧПУ - след. спринт |
+| SEO.PODBORKI-CITY-CHPU | Подборки city SEO: план + пилот Meta на `?city=` (не ЧПУ в этом проходе) | Высокий | 🔄 финал пилота KGD+SPB; маркерный ЧПУ - след. спринт |
 | SEO.PODBORKI-CITY-0 | Phase 0: inventory + риски | Высокий | ✅ docs |
-| SEO.PODBORKI-CITY-META | Пилот Title/Desc/H1 + self-canonical `?city=` (kgd/spb/msk); SEO path slug | Высокий | 🔄 code; Deploy MSK web |
+| SEO.PODBORKI-CITY-META | Пилот Title/Desc/H1 + self-canonical `?city=` (active: kgd/spb; msk leftover) | Высокий | ✅ code live; smoke OK |
+| SEO.PODBORKI-STABLE | Stable index/sitemap пилот × (C MULTI + E) + salute D year-round index | Критический | 🔄 code этот проход; Deploy MSK web |
 | SEO.PODBORKI-CITY-1 | Phase 1: маркер `/podborki/c/{city}` + 301 | Высокий | ⏳ следующий спринт после индексации пилота |
 | SEO.PODBORKI-CITY-3 | Phase 3: card SEO blurbs + «N • от X» | Средний | ⏳ |
 | SEO.PODBORKI-CITY-4 | Phase 4: blog banners → подборка → события | Средний | ⏳ after marker URL lock |
-| SEO.PODBORKI-TRACK | Не смешивать с My Day / `seo-listing-texts` | Высокий | ✅ |
+| SEO.PODBORKI-TRACK | Не смешивать с My Day / не откатывать `seo-listing-texts` index | Высокий | ✅ |
 
 ## Region Hub IA (2026-08-11)
 

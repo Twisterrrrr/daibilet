@@ -16,6 +16,8 @@ type LandingEmptyStateProps = {
   relatedSessions?: PublicSessionDto[];
   relatedLinks?: SeoLink[];
   onReset?: () => void;
+  /** Seasonal off-season stub (salute-9-may): page stays 200 year-round. */
+  offSeasonStub?: boolean;
 };
 
 /**
@@ -28,22 +30,29 @@ export function LandingEmptyState({
   relatedSessions = [],
   relatedLinks = [],
   onReset,
+  offSeasonStub = false,
 }: LandingEmptyStateProps) {
   const cityPrep = cityName ? cityToPrepositional(cityName) : null;
   const hits = relatedSessions.slice(0, 4);
   const showHits = hits.length >= 1;
 
   const title =
-    kind === 'zero'
-      ? 'Сейчас в этой секции нет активных туров'
-      : 'По этим фильтрам вариантов нет';
+    kind === 'zero' && offSeasonStub
+      ? 'Праздник уже прошел - ждём следующий сезон'
+      : kind === 'zero'
+        ? 'Сейчас в этой секции нет активных туров'
+        : 'По этим фильтрам вариантов нет';
 
   const subtitle =
-    kind === 'zero'
+    kind === 'zero' && offSeasonStub
       ? cityPrep
-        ? `Но посмотрите ТОП популярных в ${cityPrep} - речные прогулки и хиты города рядом.`
-        : 'Но посмотрите ТОП популярных рядом - речные прогулки и хиты города.'
-      : 'Снимите город, формат или дату - или смотрите популярные рядом.';
+        ? `Программы к салюту 9 мая появятся ближе к майским праздникам. Пока посмотрите популярное в ${cityPrep}.`
+        : 'Программы к салюту 9 мая появятся ближе к майским праздникам. Пока посмотрите популярное рядом.'
+      : kind === 'zero'
+        ? cityPrep
+          ? `Но посмотрите ТОП популярных в ${cityPrep} - речные прогулки и хиты города рядом.`
+          : 'Но посмотрите ТОП популярных рядом - речные прогулки и хиты города.'
+        : 'Снимите город, формат или дату - или смотрите популярные рядом.';
 
   return (
     <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50/80 px-4 py-8 sm:px-6 sm:py-10">

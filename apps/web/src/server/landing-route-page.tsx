@@ -24,11 +24,15 @@ import {
   robotsForListingIndexability,
 } from '@/lib/seo-listing-meta';
 import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
+import { isPodborkiSeoPilotCitySlug } from '@/lib/podborki-city-seo';
 import { buildLandingPageJsonLd } from '@/lib/structured-data';
 import { fetchLandingPageDto, finalizeLandingPayload } from '@/server/landing-page';
 import { loadThinRelatedCardSessions } from '@/server/landing-thin-related';
 
 export const revalidate = 3600;
+
+/** Year-round indexable seasonal hubs (catalog may hide off-season; URL stays 200 + index). */
+const YEAR_ROUND_SEO_SKELETON_LANDINGS = new Set<string>(['salute-9-may']);
 
 /** Профиль SEO/UI для лендинга - зеркало LandingPageView.getLandingProfile. */
 function resolveLandingProfileKind(slug: string): LandingProfileKind {
@@ -61,7 +65,12 @@ export async function buildLandingMetadata(pathname: string): Promise<Metadata> 
   const hasEditorialSeoText = Boolean(
     route.citySlug && hasSeoListingEditorial(slug, route.citySlug),
   );
-  const indexDecision = evaluateListingIndexability({ offers, hasEditorialSeoText });
+  const indexDecision = evaluateListingIndexability({
+    offers,
+    hasEditorialSeoText,
+    stablePilotIndex: Boolean(route.citySlug && isPodborkiSeoPilotCitySlug(route.citySlug)),
+    hasSeoSkeleton: YEAR_ROUND_SEO_SKELETON_LANDINGS.has(slug),
+  });
   const profile = resolveLandingProfileKind(slug);
 
   let title: string;

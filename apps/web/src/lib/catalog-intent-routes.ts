@@ -1,6 +1,7 @@
 import type { CatalogPresetSlug } from '@/lib/catalog-presets';
 import { buildCatalogPresetValues } from '@/lib/catalog-presets';
 import type { CatalogFilterValues } from '@/lib/catalog-url';
+import { normalizeKnownCitySlug } from '@/lib/landing-routes';
 
 /** Статичные SEO-URL подборок (индексируемые), вместо `/events?…`. */
 export type CatalogIntentSlug =
@@ -100,8 +101,10 @@ export function canonicalCatalogIntentSlug(raw: string | undefined | null): Cata
 }
 
 export function catalogIntentPath(intent: CatalogIntentSlug, city?: string | null): string {
-  const citySlug = String(city || '').trim();
-  if (citySlug && citySlug !== 'all') {
+  const raw = String(city || '').trim();
+  if (raw && raw !== 'all') {
+    // Self-canonical Group E: всегда SEO path-канон города, не DB translit / alias.
+    const citySlug = normalizeKnownCitySlug(raw) || raw;
     return `/podborki/${intent}/${encodeURIComponent(citySlug)}`;
   }
   return `/podborki/${intent}`;

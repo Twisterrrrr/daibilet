@@ -20,21 +20,21 @@ Finance PR-ветка `codex/stage0-admission-ticket-core` может держа
 
 ---
 
-## 2026-08-11 - Подборки `/podborki` city (LOCKED owner)
+## 2026-08-11 - Подборки `/podborki` city (LOCKED owner - финал пилота)
 
-План: [seo-podborki-chpu-plan.md](./seo-podborki-chpu-plan.md). Трек отдельно от My Day routes и `seo-listing-texts`.
+План: [seo-podborki-chpu-plan.md](./seo-podborki-chpu-plan.md). Трек отдельно от My Day routes. Category `seo-listing-texts` editorial index - **не откатывать**.
 
-**LOCKED ответы:**
-1. **Slug:** Meta/Canonical = существующий SEO path-канон (`moscow` / `saint-petersburg` / `kaliningrad` via `normalizeKnownCitySlug`). Destinations DB translit (`moskva` / `sankt-peterburg`) - алиасы входа, не второй канон. Транслит-ЧПУ+301 только при будущем маркере.
-2. **Роут:** маркер `/podborki/c/{city}` (или `gorod-`) **не сейчас**; intents не ломаем.
-3. **Охват пилота:** kaliningrad, saint-petersburg, moscow.
+**LOCKED ответы (финал):**
+1. **Slug:** SEO path-канон (`saint-petersburg` / `kaliningrad` via `normalizeKnownCitySlug`). DB translit - алиасы входа.
+2. **Роут:** маркер `/podborki/c/{city}` **не сейчас**; intents не ломаем.
+3. **Охват пилота:** **только** `kaliningrad` + `saint-petersburg`. Москва в Meta - harmless leftover, не расширять.
 4. **vs `/cities`:** подборки = идейный хаб; city = афиша. Бренд Дайбилет.
-5. **Порядок:** сейчас только Meta на soft `?city=` + **canonical self** (`/podborki?city=X`), не `/podborki`. ЧПУ+301 - следующий спринт после успеха пилота.
-6. **Fork Meta vs маркер:** **только Meta сейчас**; маркерный сегмент - следующий спринт (не переспрашивать).
+5. **Порядок:** Meta на soft `?city=` + self-canonical; ЧПУ+301 - следующий спринт.
+6. **Groups:** A/B не ломать (soft `?city=` избыточен); C hub unique meta; C MULTI + E - stable index (не мигать ≥6); D `salute-9-may` - 200 + index круглый год (не 404/noindex); E canonical строго self ЧПУ.
+7. **Sitemap:** пилотные city-variants не выкидывать из-за порога 6 при events>0.
 
-**Ещё открыто (не блокер пилота Meta):**
-- Тонкие города / noindex порог для будущих city URL.
-- Blog banners timing / пилотные гайды.
+**Ещё открыто (не блокер):**
+- Blog banners / card blurbs после маркера ЧПУ.
 - Финальная вычитка Title/H1 copy после SERP smoke.
 
 ---
@@ -46,10 +46,11 @@ Finance PR-ветка `codex/stage0-admission-ticket-core` может держа
 | # | Вопрос | Решение |
 |---|--------|---------|
 | 1 | Thin + editorial → index? | **Да.** `evaluateListingIndexability({ hasEditorialSeoText })` → `index,follow` при ≥1 оффере даже если &lt;6. |
-| 2 | Нулевой день (0 сеансов)? | **Пока noindex** (`zero_offers`). Пустой листинг без билетов не индексируем даже с текстом. |
+| 2 | Нулевой день (0 сеансов)? | **Пока noindex** (`zero_offers`), **кроме** SEO-skeleton (`hasSeoSkeleton`, напр. salute-9-may) и пилот intent×city. |
 | 3 | Масштаб текстов? | Ручные owner-пакеты сейчас; AI-draft позже отдельным треком. |
+| 4 | Пилот KGD/SPB × MULTI/intent? | **stablePilotIndex:** index при events>0 без мигания порога 6 (финал 2026-08-11). |
 
-Без editorial (мусор/пустые без каркаса) порог `MIN_LISTING_OFFERS_FOR_INDEX = 6` и `noindex,follow` сохраняются.
+Без editorial / без пилота / без skeleton порог `MIN_LISTING_OFFERS_FOR_INDEX = 6` и `noindex,follow` сохраняются.
 
 ---
 

@@ -17,9 +17,11 @@ import {
   robotsForListingIndexability,
 } from '@/lib/seo-listing-meta';
 import { buildShareMetadata, pageTitle } from '@/lib/seo-meta';
+import { isPodborkiSeoPilotCitySlug } from '@/lib/podborki-city-seo';
 import { parseCatalogPageQuery } from '@/server/catalog-query';
 import { getCachedCatalog } from '@/server/cached-catalog-data';
 import { getCachedDestinations } from '@/server/cached-public-surfaces';
+import { normalizeKnownCitySlug } from '@/lib/landing-routes';
 
 export const revalidate = 300;
 
@@ -28,19 +30,20 @@ type PageProps = {
 };
 
 async function resolveCityLabel(citySlug?: string | null) {
-  const slug = String(citySlug || '').trim();
-  if (!slug || slug === 'all') return { citySlug: null as string | null, cityName: null as string | null };
-  const fromMap = resolveLandingCityName(slug);
+  const raw = String(citySlug || '').trim();
+  if (!raw || raw === 'all') return { citySlug: null as string | null, cityName: null as string | null };
+  const slug = normalizeKnownCitySlug(raw) || raw;
+  const fromMap = resolveLandingCityName(slug) || resolveLandingCityName(raw);
   if (fromMap) {
     return { citySlug: slug, cityName: fromMap };
   }
   try {
     const destinations = await getCachedDestinations();
     const match = (destinations.destinations || []).find(
-      (item) => item.slug === slug || item.sourceSlug === slug || item.name === slug,
+      (item) => item.slug === slug || item.sourceSlug === slug || item.slug === raw || item.sourceSlug === raw || item.name === raw,
     );
     return {
-      citySlug: match?.slug || slug,
+      citySlug: normalizeKnownCitySlug(match?.slug || match?.sourceSlug || slug) || match?.slug || slug,
       cityName: match?.name || slug,
     };
   } catch {
@@ -83,7 +86,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     cityName,
   });
   const path = catalogIntentPath(intent.intent, citySlug);
-  const decision = evaluateListingIndexability({ offers });
+  const decision = evaluateListingIndexability({
+    offers,
+    stablePilotIndex: isPodborkiSeoPilotCitySlug(citySlug),
+    // Intent pages always have H1 + seoBody skeleton; for pilot cities keep index even at 0.
+    hasSeoSkeleton: isPodborkiSeoPilotCitySlug(citySlug),
+  });
 
   return {
     title: { absolute: title },
@@ -102,13 +110,20 @@ export default async function PodborkiIntentCityPage({ params }: PageProps) {
   const { intent: raw, city: cityRaw } = await params;
   const intent = resolveCatalogIntent(raw);
   if (!intent) notFound();
+  const decodedCity = decodeURIComponent(cityRaw);
   const canonicalIntent = canonicalCatalogIntentSlug(raw);
   if (canonicalIntent && raw !== canonicalIntent) {
-    permanentRedirect(catalogIntentPath(canonicalIntent, decodeURIComponent(cityRaw)));
+    permanentRedirect(catalogIntentPath(canonicalIntent, decodedCity));
   }
 
-  const { citySlug, cityName } = await resolveCityLabel(decodeURIComponent(cityRaw));
+  const { citySlug, cityName } = await resolveCityLabel(decodedCity);
   if (!citySlug) notFound();
+
+  // Alias city segment → SEO path canon (Group E self-canonical).
+  const rawNorm = String(decodedCity || '').trim().toLowerCase();
+  if (citySlug !== rawNorm) {
+    permanentRedirect(catalogIntentPath(intent.intent, citySlug));
+  }
 
   const filters = catalogIntentFilterValues(intent);
   const pageQuery = parseCatalogPageQuery({

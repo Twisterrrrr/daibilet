@@ -3,19 +3,33 @@ import { resolveLandingCityName } from './landing-city';
 import { normalizeKnownCitySlug } from './landing-routes';
 
 /**
- * Pilot cities for `/podborki?city=` unique Title/Description/H1 + self-canonical.
- * Slugs = SEO path canon (`normalizeKnownCitySlug` / landings / city hub after redirect),
- * NOT destination DB translit (`moskva`, `sankt-peterburg`).
+ * Active SEO pilot cities (owner 2026-08-11 final): Kaliningrad + SPb only.
+ * Used for: soft `?city=` Meta primary scope, intent×city stable index, sitemap city-variants.
+ * Slugs = SEO path canon (`normalizeKnownCitySlug`), NOT DB translit (`moskva` / `sankt-peterburg`).
+ */
+export const PODBORKI_SEO_PILOT_CITY_SLUGS = ['kaliningrad', 'saint-petersburg'] as const;
+
+/**
+ * Meta Title/Desc/H1 + self-canonical on `/podborki?city=`.
+ * Includes legacy `moscow` as harmless leftover (не расширяем пилот; не ломаем уже залитый meta).
  */
 export const PODBORKI_CITY_META_PILOT_SLUGS = [
-  'kaliningrad',
-  'saint-petersburg',
+  ...PODBORKI_SEO_PILOT_CITY_SLUGS,
   'moscow',
 ] as const;
 
+export type PodborkiSeoPilotCitySlug = (typeof PODBORKI_SEO_PILOT_CITY_SLUGS)[number];
 export type PodborkiCityMetaPilotSlug = (typeof PODBORKI_CITY_META_PILOT_SLUGS)[number];
 
+const SEO_PILOT_SET = new Set<string>(PODBORKI_SEO_PILOT_CITY_SLUGS);
 const PILOT_SET = new Set<string>(PODBORKI_CITY_META_PILOT_SLUGS);
+
+export function isPodborkiSeoPilotCitySlug(
+  slug: string | null | undefined,
+): slug is PodborkiSeoPilotCitySlug {
+  const canon = normalizeKnownCitySlug(slug) || String(slug || '').trim();
+  return Boolean(canon && SEO_PILOT_SET.has(canon));
+}
 
 export type PodborkiCitySeoPackage = {
   citySlug: PodborkiCityMetaPilotSlug;

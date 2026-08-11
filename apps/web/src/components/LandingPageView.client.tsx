@@ -1179,7 +1179,7 @@ export function LandingPageView({
               reset={() => {
                 setCity(cityName || 'all');
                 setCategory('all');
-                setDateFilter(defaultLandingDateFilter(profile, landingSlug));
+                setDateFilter(defaultLandingDateFilter(profile, slug));
                 setSort(profile === 'bus' ? 'price' : 'time');
                 setTimeSlot('');
               }}
@@ -1215,10 +1215,11 @@ export function LandingPageView({
               cityName={cityName}
               relatedSessions={thinRelatedSessions}
               relatedLinks={citySlug ? resolveRelatedListingLinks(slug, citySlug) : []}
+              landingSlug={slug}
               onReset={() => {
                 setCity(cityName || 'all');
                 setCategory('all');
-                setDateFilter(defaultLandingDateFilter(profile, landingSlug));
+                setDateFilter(defaultLandingDateFilter(profile, slug));
                 setSort(profile === 'bus' ? 'price' : 'time');
                 setTimeSlot('');
                 setContextChip(null);
@@ -3193,6 +3194,7 @@ function LandingScheduleList({
   relatedSessions = [],
   relatedLinks = [],
   onReset,
+  landingSlug,
 }: {
   groups: EventGroup[];
   profile: LandingProfile;
@@ -3201,8 +3203,10 @@ function LandingScheduleList({
   relatedSessions?: PublicSessionDto[];
   relatedLinks?: import('@/lib/seo-internal-links').SeoLink[];
   onReset?: () => void;
+  landingSlug?: string;
 }) {
   if (!groups.length) {
+    const slugKey = canonicalLandingSlug(String(landingSlug || ''));
     return (
       <LandingEmptyState
         kind={emptyKind}
@@ -3210,6 +3214,7 @@ function LandingScheduleList({
         relatedSessions={relatedSessions}
         relatedLinks={relatedLinks}
         onReset={onReset}
+        offSeasonStub={profile === 'seasonal' && slugKey === 'salute-9-may'}
       />
     );
   }

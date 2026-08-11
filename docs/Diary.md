@@ -1,3 +1,20 @@
+## 2026-08-11 - SEO Подборки: финальная стратегия пилота (KGD+SPB)
+
+### Наблюдения
+- Owner финал: пилот только kaliningrad + saint-petersburg; moscow Meta leftover безвредно.
+- Live smoke: Group C `?city=` уже unique meta + self-canonical; Group E self-canonical OK, но `besplatno`/`na-vyhodnye` × KGD/SPB были `noindex` из-за порога 6; `/salut-9-maya` 200 + `noindex`.
+- Group A/B (bridges-night, spb-yards, country-tours): не трогать; soft `?city=` избыточен.
+
+### Решения
+- `stablePilotIndex` + `hasSeoSkeleton` в `evaluateListingIndexability`; wiring intent×city, landing-route (salute), sitemap (+KGD в listing cities).
+- Salute: index круглый год + off-season stub copy; каталог по-прежнему может скрывать (`OFF_SEASON_LANDING_SLUGS`).
+- Docs plan/qa/Tasktracker под Groups A-E. Editorial category index - не откатывали.
+
+### Проблемы
+- Soft `?city=` Meta всё ещё dynamic (await searchParams) - осознанный trade-off до маркера ЧПУ.
+
+---
+
 ## 2026-08-11 - Category×city: index при editorial SEO (bypass порога 6)
 
 ### Наблюдения

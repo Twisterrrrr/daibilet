@@ -23,6 +23,7 @@ import {
 } from '@/lib/catalog-intent-routes';
 import { hasSeoListingEditorial } from '@/data/seo-listing-texts';
 import { evaluateListingIndexability, MIN_LISTING_OFFERS_FOR_INDEX } from '@/lib/seo-listing-meta';
+import { isPodborkiSeoPilotCitySlug, PODBORKI_SEO_PILOT_CITY_SLUGS } from '@/lib/podborki-city-seo';
 import { venueHref } from '@/lib/routes';
 import { getCachedCatalog } from '@/server/cached-catalog-data';
 import { parseCatalogPageQuery } from '@/server/catalog-query';
@@ -48,6 +49,20 @@ export type SitemapEntry = {
 
 const MAX_EVENTS = 45_000;
 const MAX_VENUES = 10_000;
+
+/** Priority listing cities + SEO pilot cities (KGD/SPB) - без дублей. */
+function listingSitemapCitySlugs(): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const city of [...PRIORITY_LISTING_CITY_SLUGS, ...PODBORKI_SEO_PILOT_CITY_SLUGS]) {
+    if (seen.has(city)) continue;
+    seen.add(city);
+    out.push(city);
+  }
+  return out;
+}
+
+const YEAR_ROUND_SITEMAP_LANDINGS = new Set<string>(['salute-9-may']);
 
 export function getSiteUrl(): string {
   return (
@@ -103,9 +118,10 @@ async function countIntentOffers(intentSlug: string, citySlug?: string | null): 
   }
 }
 
-/** Intent URLs only when ≥ MIN_LISTING_OFFERS_FOR_INDEX (same rule as pages). */
+/** Intent URLs: threshold 6, except pilot city×intent (stable when offers>0 or SEO skeleton). */
 export async function buildIndexableIntentSitemapPaths(): Promise<string[]> {
   const paths = new Set<string>();
+  const cities = listingSitemapCitySlugs();
 
   for (const item of listCatalogIntents()) {
     const offers = await countIntentOffers(item.intent);
@@ -113,12 +129,15 @@ export async function buildIndexableIntentSitemapPaths(): Promise<string[]> {
       paths.add(catalogIntentPath(item.intent));
     }
 
-    for (const city of PRIORITY_LISTING_CITY_SLUGS) {
+    for (const city of cities) {
       const cityOffers = await countIntentOffers(item.intent, city);
+      const pilot = isPodborkiSeoPilotCitySlug(city);
       if (
         evaluateListingIndexability({
           offers: cityOffers,
           minOffers: MIN_LISTING_OFFERS_FOR_INDEX,
+          stablePilotIndex: pilot,
+          hasSeoSkeleton: pilot,
         }).indexable
       ) {
         paths.add(catalogIntentPath(item.intent, city));
@@ -216,24 +235,32 @@ export async function buildVenuesSitemapEntries(now = new Date()): Promise<Sitem
 
 export async function buildLandingsSitemapEntries(now = new Date()): Promise<SitemapEntry[]> {
   const paths = new Set<string>();
+  const cities = listingSitemapCitySlugs();
 
   for (const slug of Object.keys(LANDING_CATEGORY_PATH_BY_SLUG)) {
     if (isLandingCityAllowed(slug, 'moscow') && isLandingCityAllowed(slug, 'saint-petersburg') && isLandingCityAllowed(slug, 'kazan')) {
       paths.add(landingCategoryHref(slug));
     }
+    // Year-round seasonal hubs stay in sitemap even with 0 offers (catalog may hide).
+    if (YEAR_ROUND_SITEMAP_LANDINGS.has(slug)) {
+      paths.add(landingCategoryHref(slug));
+    }
     if (!MULTI_CITY_LANDING_SLUGS.has(slug)) continue;
-    for (const city of PRIORITY_LISTING_CITY_SLUGS) {
+    for (const city of cities) {
       if (!isLandingCityAllowed(slug, city)) continue;
       try {
         const payload = await fetchLandingPageDto(slug);
         if (!payload?.landing) continue;
         const finalized = finalizeLandingPayload(payload, slug, city);
         const offers = finalized.stats?.events ?? 0;
+        const pilot = isPodborkiSeoPilotCitySlug(city);
         if (
           !evaluateListingIndexability({
             offers,
             minOffers: MIN_LISTING_OFFERS_FOR_INDEX,
             hasEditorialSeoText: hasSeoListingEditorial(slug, city),
+            stablePilotIndex: pilot,
+            hasSeoSkeleton: YEAR_ROUND_SITEMAP_LANDINGS.has(slug),
           }).indexable
         ) {
           continue;

@@ -43,6 +43,8 @@ export type ListingIndexDecision = {
   reason:
     | 'enough_offers'
     | 'editorial_seo_hub'
+    | 'pilot_stable'
+    | 'seo_skeleton_hub'
     | 'low_offer_count'
     | 'zero_offers'
     | 'explicit_noindex';
@@ -59,6 +61,15 @@ export function evaluateListingIndexability(input: {
    * Снимает noindex из-за low offer count (не из-за zero_offers).
    */
   hasEditorialSeoText?: boolean;
+  /**
+   * Пилот city×(MULTI / intent): не мигать noindex из-за порога ≥6.
+   * `index,follow` при offers > 0.
+   */
+  stablePilotIndex?: boolean;
+  /**
+   * SEO-каркас / FAQ / off-season stub (напр. salute-9-may): index даже при 0 офферах.
+   */
+  hasSeoSkeleton?: boolean;
 }): ListingIndexDecision {
   if (input.isIndexable === false) {
     return {
@@ -73,9 +84,15 @@ export function evaluateListingIndexability(input: {
   const min = input.minOffers ?? MIN_LISTING_OFFERS_FOR_INDEX;
 
   if (offers <= 0) {
+    if (input.hasSeoSkeleton) {
+      return { indexable: true, thin: true, reason: 'seo_skeleton_hub', offers };
+    }
     return { indexable: false, thin: true, reason: 'zero_offers', offers };
   }
   if (offers < min) {
+    if (input.stablePilotIndex) {
+      return { indexable: true, thin: true, reason: 'pilot_stable', offers };
+    }
     if (input.hasEditorialSeoText) {
       return { indexable: true, thin: true, reason: 'editorial_seo_hub', offers };
     }

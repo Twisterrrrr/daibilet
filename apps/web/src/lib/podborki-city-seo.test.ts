@@ -4,6 +4,7 @@ import test from 'node:test';
 import {
   buildPodborkiCityCanonicalPath,
   buildPodborkiCitySeoPackage,
+  isPodborkiSeoPilotCitySlug,
   resolvePodborkiCatalogSeo,
   resolvePodborkiCityMetaPilot,
 } from './podborki-city-seo.ts';
@@ -29,6 +30,14 @@ test('pilot resolves destination translit and SEO aliases to path canon', () => 
     citySlug: 'moscow',
     cityName: 'Москва',
   });
+});
+
+test('active SEO pilot is KGD+SPB; moscow meta leftover only', () => {
+  assert.equal(isPodborkiSeoPilotCitySlug('kaliningrad'), true);
+  assert.equal(isPodborkiSeoPilotCitySlug('saint-petersburg'), true);
+  assert.equal(isPodborkiSeoPilotCitySlug('sankt-peterburg'), true);
+  assert.equal(isPodborkiSeoPilotCitySlug('moscow'), false);
+  assert.equal(isPodborkiSeoPilotCitySlug('moskva'), false);
 });
 
 test('non-pilot and all stay null', () => {

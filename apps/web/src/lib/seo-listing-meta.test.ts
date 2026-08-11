@@ -132,6 +132,32 @@ test('thin listing threshold default 6; editorial hub bypasses low count', () =>
   );
 });
 
+test('pilot stable index: offers>0 bypasses threshold 6', () => {
+  assert.equal(
+    evaluateListingIndexability({ offers: 2, stablePilotIndex: true }).indexable,
+    true,
+  );
+  assert.equal(
+    evaluateListingIndexability({ offers: 2, stablePilotIndex: true }).reason,
+    'pilot_stable',
+  );
+  assert.equal(
+    evaluateListingIndexability({ offers: 0, stablePilotIndex: true }).indexable,
+    false,
+  );
+});
+
+test('seo skeleton indexes even at zero offers (salute off-season)', () => {
+  assert.equal(
+    evaluateListingIndexability({ offers: 0, hasSeoSkeleton: true }).indexable,
+    true,
+  );
+  assert.equal(
+    evaluateListingIndexability({ offers: 0, hasSeoSkeleton: true }).reason,
+    'seo_skeleton_hub',
+  );
+});
+
 test('thin related cards only for exactly 6 or 7 offers', () => {
   assert.equal(shouldShowThinRelatedCards(5), false);
   assert.equal(shouldShowThinRelatedCards(6), true);
