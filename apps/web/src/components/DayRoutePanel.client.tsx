@@ -3650,121 +3650,96 @@ function DayRoutePanelInner() {
       {/* Accordion stack: must-see → custom → boat → matches → hot picks → catalog. */}
       {/* Accordion: must-see chips (route builder) */}
       {showMustSeeAccordion && pickerSection === 'places' ? (
-        <div className="rounded-2xl border border-slate-200 bg-white" data-day-accordion="mustSee">
-          <button
-            type="button"
-            aria-expanded={mustSeeOpen}
-            aria-controls="day-must-see-body"
-            data-day-must-see-accordion
-            onClick={() => togglePanel('mustSee')}
-            className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left sm:px-5"
-          >
-            <span>
-              <span className="block text-sm font-semibold text-slate-900">Главные места</span>
-              <span className="mt-0.5 block text-xs text-slate-500">
-                {mustSeeResolved.length ? 'Топ мест города' : 'Список для города пока пуст'}
-              </span>
-            </span>
-            <ChevronDown
-              className={`h-5 w-5 shrink-0 text-slate-400 transition ${mustSeeOpen ? 'rotate-180' : ''}`}
-            />
-          </button>
-          {(mustSeeOpen || pickerOpen) ? (
-            <div id="day-must-see-body" className="border-t border-slate-100 px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
-              {mustSeeResolved.length > 0 ? (
-                <div data-day-must-see>
-                  <MustSeeFilterTabs
-                    tabs={mustSeeFilterMeta.tabs}
-                    hideCount
-                    activeId={
-                      mustSeeFilterMeta.tabs.length < 2
-                        ? mustSeeFilterMeta.defaultId
-                        : mustSeeFilter
+        <div data-day-accordion="mustSee" data-day-must-see>
+          <MustSeeFilterTabs
+            tabs={mustSeeFilterMeta.tabs}
+            hideCount
+            activeId={
+              mustSeeFilterMeta.tabs.length < 2
+                ? mustSeeFilterMeta.defaultId
+                : mustSeeFilter
+            }
+            onChange={setMustSeeFilter}
+          />
+          {mustSeeResolved.length > 0 ? (
+            <div
+              id="day-must-see-list"
+              className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 sm:items-start"
+              data-day-must-see-list
+              data-day-must-see-expanded="1"
+              data-day-must-see-layout="horizontal"
+            >
+              {mustSeeFiltered.map(({ place, item, hook }) => {
+                const inRoute =
+                  isInDayRoute(item.id, route) || Boolean(item.slug && isInDayRoute(item.slug, route));
+                const hasItemCoords = Boolean(
+                  lookupDayRouteCoords(item, buildDayRouteCoordsMap([item])),
+                );
+                const thumb = resolveDayRouteStopImage(item) || item.imageUrl || null;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    disabled={inRoute || atMax || !hasItemCoords}
+                    data-day-must-see-card={item.id}
+                    title={
+                      inRoute
+                        ? 'Уже в маршруте'
+                        : atMax
+                          ? dayRouteHardLimitMessage()
+                          : !hasItemCoords
+                            ? 'Нет координат'
+                            : hook || 'Добавить в день'
                     }
-                    onChange={setMustSeeFilter}
-                  />
-                  <div
-                    id="day-must-see-list"
-                    className="mt-3 grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3"
-                    data-day-must-see-list
-                    data-day-must-see-expanded="1"
-                    data-day-must-see-layout="dense"
+                    onClick={() => addMustSeeItem(item)}
+                    className={`flex min-h-[84px] w-full min-w-0 items-center gap-3 self-start rounded-xl border p-3 text-left transition disabled:cursor-not-allowed ${
+                      inRoute
+                        ? 'border-emerald-400 bg-emerald-50 text-emerald-900'
+                        : 'border-slate-200 bg-white text-slate-800 hover:border-primary-300 hover:bg-slate-50'
+                    }`}
                   >
-                    {mustSeeFiltered.map(({ place, item, hook }) => {
-                      const inRoute =
-                        isInDayRoute(item.id, route) || Boolean(item.slug && isInDayRoute(item.slug, route));
-                      const hasItemCoords = Boolean(
-                        lookupDayRouteCoords(item, buildDayRouteCoordsMap([item])),
-                      );
-                      const thumb =
-                        resolveDayRouteStopImage(item) || item.imageUrl || null;
-                      return (
-                        <button
-                          key={item.id}
-                          type="button"
-                          disabled={inRoute || atMax || !hasItemCoords}
-                          data-day-must-see-card={item.id}
-                          title={
-                            inRoute
-                              ? 'Уже в маршруте'
-                              : atMax
-                                ? dayRouteHardLimitMessage()
-                                : !hasItemCoords
-                                  ? 'Нет координат'
-                                  : hook || 'Добавить в день'
-                          }
-                          onClick={() => addMustSeeItem(item)}
-                          className={`flex w-full min-w-0 items-center gap-3 rounded-xl border px-2.5 py-2 text-left transition disabled:cursor-not-allowed ${
-                            inRoute
-                              ? 'border-emerald-400 bg-emerald-50 text-emerald-900'
-                              : 'border-slate-200 bg-white text-slate-800 hover:border-emerald-300 hover:bg-emerald-50/50'
-                          }`}
-                        >
-                          <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-slate-100 sm:h-24 sm:w-24">
-                            {thumb ? (
-                              <SafeImage
-                                src={thumb}
-                                alt=""
-                                fill
-                                sizes="6rem"
-                                className="object-cover"
-                              />
-                            ) : (
-                              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-200 via-slate-100 to-primary-100 text-slate-400">
-                                <MapPin className="h-5 w-5" />
-                              </div>
-                            )}
-                          </div>
-                          <span className="min-w-0 flex-1 py-0.5">
-                            <span className="block line-clamp-2 text-sm font-semibold leading-snug">
-                              {place.name}
-                            </span>
-                            {hook ? (
-                              <span className="mt-0.5 block line-clamp-2 text-[11px] leading-snug text-slate-500">
-                                {hook}
-                              </span>
-                            ) : null}
-                          </span>
-                          <span
-                            className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
-                              inRoute ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-900 text-white'
-                            }`}
-                            aria-hidden
-                          >
-                            {inRoute ? <Check className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              ) : (
-                <p className="text-xs text-slate-500">
-                  Для этого города пока нет списка главных мест - добавьте точки через поиск в «Из каталога».
-                </p>
-              )}
+                    <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-slate-100">
+                      {thumb ? (
+                        <SafeImage
+                          src={thumb}
+                          alt=""
+                          fill
+                          sizes="3.5rem"
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-200 via-slate-100 to-primary-100 text-slate-400">
+                          <MapPin className="h-5 w-5" />
+                        </div>
+                      )}
+                    </div>
+                    <span className="min-w-0 flex-1">
+                      <span className="block line-clamp-2 text-sm font-semibold leading-snug">
+                        {place.name}
+                      </span>
+                      {hook ? (
+                        <span className="mt-0.5 block line-clamp-2 text-xs leading-snug text-slate-500">
+                          {hook}
+                        </span>
+                      ) : null}
+                    </span>
+                    <span
+                      className={`inline-flex h-9 w-9 shrink-0 items-center justify-center self-center rounded-full ${
+                        inRoute ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-900 text-white'
+                      }`}
+                      aria-hidden
+                    >
+                      {inRoute ? <Check className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
-          ) : null}
+          ) : (
+            <p className="mt-3 text-xs text-slate-500">
+              Для этого города пока нет списка главных мест - добавьте точки через поиск или своё место.
+            </p>
+          )}
         </div>
       ) : null}
 
@@ -5215,7 +5190,7 @@ function DayRouteVenueCard({
                 ) : null}
                 {suburbBadge}
               </div>
-              <h2 className="mt-1 line-clamp-2 text-sm font-bold leading-snug text-slate-900 sm:text-base">
+              <h2 className="mt-1 line-clamp-2 text-base font-extrabold leading-snug tracking-tight text-slate-900 sm:text-lg">
                 {titleNode}
               </h2>
               {placeLine || !hasCoords ? (
