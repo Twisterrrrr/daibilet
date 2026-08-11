@@ -1075,6 +1075,22 @@ model SeoMeta {
   @@unique([entityType, entityId])
 }
 
+/// Optional manual SEO for city×landing (or city×intent) pairs.
+/// Empty table is fine: runtime falls back to templates. Do not seed fake copy.
+model SeoOverride {
+  id                Int      @id @default(autoincrement())
+  citySlug          String
+  landingSlug       String
+  customTitle       String?
+  customDescription String?
+  customH1          String?
+  customText        String?  @db.Text
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([citySlug, landingSlug])
+}
+
 model SiteUser {
   id               String    @id @default(cuid())
   email            String    @unique

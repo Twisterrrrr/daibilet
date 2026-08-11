@@ -780,12 +780,17 @@ export function LandingPageView({
   initialPayload,
   genre: initialGenre,
   thinRelatedSessions = [],
+  seoOverrideHtml = null,
+  seoOverrideHeading = null,
 }: {
   slug: string;
   citySlug?: string;
   initialPayload: PublicLandingPageDto;
   genre?: string | null;
   thinRelatedSessions?: PublicSessionDto[];
+  /** SeoOverride.customText HTML for bottom SEO block. */
+  seoOverrideHtml?: string | null;
+  seoOverrideHeading?: string | null;
 }) {
   const slug = canonicalLandingSlug(rawSlug);
   const profile = getLandingProfile(slug);
@@ -1271,6 +1276,8 @@ export function LandingPageView({
               citySlug={citySlug}
               seoInput={buildLandingSeoInput(payload.landing, slug, profile, citySlug, payload.stats, todayReference)}
               hasCmsSeoText={landingBlocksHaveSeoText(payload.blocks)}
+              overrideHtml={seoOverrideHtml}
+              overrideHeading={seoOverrideHeading}
             />
           </div>
           {profile === 'dinner' ? (

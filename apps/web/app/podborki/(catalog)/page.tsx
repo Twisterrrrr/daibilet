@@ -4,14 +4,21 @@ import { Suspense } from 'react';
 import { LandingsCatalogView } from '@/components/LandingsCatalogView.client';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
+import { normalizeKnownCitySlug } from '@/lib/landing-routes';
 import { PODBORKI_CATEGORIES, type PodborkiCatalogItem } from '@/lib/podborki-categories';
-import { resolvePodborkiCatalogSeo } from '@/lib/podborki-city-seo';
+import {
+  isPodborkiSeoPilotCitySlug,
+  PODBORKI_HUB_SEO,
+  resolvePodborkiCatalogSeo,
+} from '@/lib/podborki-city-seo';
+import { getLandingSeo } from '@/lib/seo/get-landing-seo';
 import { buildShareMetadata, pageTitle } from '@/lib/seo-meta';
 import {
   getCachedDestinations,
   getCachedLandingsCatalog,
   getCachedPodborkiMeta,
 } from '@/server/cached-public-surfaces';
+import { findSeoOverride } from '@/server/seo-override';
 
 export const revalidate = 600;
 
@@ -24,14 +31,74 @@ function firstQueryValue(value: string | string[] | undefined): string {
   return String(value || '').trim();
 }
 
+function resolveLandingSlug(raw: string): string {
+  const value = String(raw || '').trim();
+  if (!value || value === 'all') return 'podborki';
+  return value;
+}
+
+async function resolveCatalogCitySeo(rawCity: string, rawLanding: string) {
+  const hub = resolvePodborkiCatalogSeo(null);
+  if (!rawCity || rawCity.toLowerCase() === 'all') {
+    return {
+      kind: 'hub' as const,
+      title: hub.title,
+      description: hub.description,
+      h1: hub.h1,
+      heroDescription: hub.heroDescription,
+      canonicalPath: hub.canonicalPath,
+      robots: { index: true, follow: true } as const,
+      seoText: null as string | null,
+    };
+  }
+
+  const citySlug = normalizeKnownCitySlug(rawCity) || rawCity;
+  const landingSlug = resolveLandingSlug(rawLanding);
+  const isPilot = isPodborkiSeoPilotCitySlug(citySlug);
+
+  if (isPilot) {
+    const dbOverride = await findSeoOverride(citySlug, landingSlug);
+    const seo = getLandingSeo({ citySlug, landingSlug, dbOverride });
+    // Self-canonical on SEO path slug (not broken owner sample).
+    const canonicalPath = `/podborki?city=${encodeURIComponent(citySlug)}`;
+    const legacy = resolvePodborkiCatalogSeo(citySlug);
+    return {
+      kind: 'pilot' as const,
+      title: seo.title,
+      description: seo.description,
+      h1: seo.h1 || legacy.h1,
+      heroDescription: legacy.heroDescription,
+      canonicalPath,
+      robots: { index: true, follow: true } as const,
+      seoText: seo.seoText,
+    };
+  }
+
+  // Non-pilot `?city=` - keep hub copy, noindex (owner sample). Hub itself stays indexable above.
+  return {
+    kind: 'non-pilot' as const,
+    title: PODBORKI_HUB_SEO.title,
+    description: PODBORKI_HUB_SEO.description,
+    h1: PODBORKI_HUB_SEO.h1,
+    heroDescription: PODBORKI_HUB_SEO.heroDescription,
+    canonicalPath: PODBORKI_HUB_SEO.canonicalPath,
+    robots: { index: false, follow: true } as const,
+    seoText: null as string | null,
+  };
+}
+
 export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
   const params = await searchParams;
-  const seo = resolvePodborkiCatalogSeo(firstQueryValue(params.city));
+  const seo = await resolveCatalogCitySeo(
+    firstQueryValue(params.city),
+    firstQueryValue(params.landing),
+  );
   const title = pageTitle(seo.title);
   return {
     title,
     description: seo.description,
     alternates: { canonical: seo.canonicalPath },
+    robots: seo.robots,
     ...buildShareMetadata({
       title: `${title} | Дайбилет`,
       description: seo.description,
@@ -43,12 +110,15 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
 /**
  * Catalog SSR still loads city=all landings; LandingsCatalogView refetches
  * `/api/public/landings-catalog?city=` when a city is selected.
- * Pilot `?city=` (kaliningrad / saint-petersburg / moscow) gets unique SSR meta + H1.
- * Awaiting searchParams opts the route into dynamic rendering for correct city SEO.
+ * Pilot `?city=` gets unique SSR meta + H1 via templates / SeoOverride.
+ * Hub `/podborki` and `?city=all` stay indexable. Non-pilot city query → noindex.
  */
 export default async function PodborkiCatalogPage({ searchParams }: PageProps) {
   const params = await searchParams;
-  const seo = resolvePodborkiCatalogSeo(firstQueryValue(params.city));
+  const seo = await resolveCatalogCitySeo(
+    firstQueryValue(params.city),
+    firstQueryValue(params.landing),
+  );
 
   const emptyCatalog = { generatedAt: new Date(0).toISOString(), city: 'all', items: [] as NonNullable<
     Awaited<ReturnType<typeof getCachedLandingsCatalog>>
@@ -125,6 +195,14 @@ export default async function PodborkiCatalogPage({ searchParams }: PageProps) {
             heroDescription={seo.heroDescription}
           />
         </Suspense>
+        {seo.seoText ? (
+          <section className="container-page border-t border-slate-200 py-10">
+            <div
+              className="prose prose-slate max-w-3xl text-sm leading-relaxed text-slate-600"
+              dangerouslySetInnerHTML={{ __html: seo.seoText }}
+            />
+          </section>
+        ) : null}
       </div>
     </SiteLayout>
   );

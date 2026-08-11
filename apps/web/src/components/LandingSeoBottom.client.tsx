@@ -13,10 +13,15 @@ type LandingSeoBottomProps = {
   seoInput: LandingSeoInput;
   /** CMS уже дал длинный SEO_TEXT / STORY - не дублируем. */
   hasCmsSeoText?: boolean;
+  /** SeoOverride.customText (HTML) - приоритет над editorial seed. */
+  overrideHtml?: string | null;
+  /** Optional H2 when override HTML is present. */
+  overrideHeading?: string | null;
 };
 
 /**
- * On-page SEO блок строго под выдачей: editorial seed → fallback-шаблон.
+ * On-page SEO блок строго под выдачей:
+ * SeoOverride HTML → editorial seed → fallback-шаблон.
  * Ширина = content container (без max-w, родитель уже container-page).
  */
 export function LandingSeoBottom({
@@ -24,7 +29,24 @@ export function LandingSeoBottom({
   citySlug,
   seoInput,
   hasCmsSeoText,
+  overrideHtml,
+  overrideHeading,
 }: LandingSeoBottomProps) {
+  const html = String(overrideHtml || '').trim();
+  if (html) {
+    return (
+      <section id="seo" className="w-full border-t border-slate-100 py-12">
+        <h2 className="text-xl font-bold text-slate-900 md:text-2xl">
+          {String(overrideHeading || '').trim() || 'Подробнее о направлении'}
+        </h2>
+        <div
+          className="prose prose-slate mt-4 max-w-none text-sm leading-7 text-slate-600 md:text-base prose-headings:text-slate-900 prose-strong:text-slate-800"
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
+      </section>
+    );
+  }
+
   if (hasCmsSeoText) return null;
 
   const editorial = resolveSeoListingText(canonicalLandingSlug(landingSlug), citySlug);

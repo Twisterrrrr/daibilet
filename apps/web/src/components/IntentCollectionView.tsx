@@ -14,11 +14,19 @@ export async function IntentCollectionView({
   citySlug,
   cityName,
   pageQuery,
+  heroTitle,
+  heroDescription,
+  seoText,
 }: {
   intent: CatalogIntentDefinition;
   citySlug?: string | null;
   cityName?: string | null;
   pageQuery: CatalogPageQuery;
+  /** Template / SeoOverride H1 when present. */
+  heroTitle?: string | null;
+  heroDescription?: string | null;
+  /** Optional DB customText (HTML) below catalog. */
+  seoText?: string | null;
 }) {
   let initialCatalog: Awaited<ReturnType<typeof getCachedCatalog>> | null = null;
   try {
@@ -37,19 +45,14 @@ export async function IntentCollectionView({
       label: cityName ? `${intent.label} · ${cityName}` : intent.label,
     },
   ];
+  const titleText =
+    String(heroTitle || '').trim() ||
+    `${intent.label}${cityName ? ` · ${cityName}` : ''}`;
+  const descriptionText = String(heroDescription || '').trim() || intent.description;
 
   return (
     <>
-      <SectionPageHero
-        breadcrumbs={crumbs}
-        title={
-          <>
-            {intent.label}
-            {cityName ? ` · ${cityName}` : ''}
-          </>
-        }
-        description={intent.description}
-      >
+      <SectionPageHero breadcrumbs={crumbs} title={titleText} description={descriptionText}>
         {siblings.length ? (
           <div className="mt-4 flex flex-wrap gap-2">
             {siblings.map((item) => (
@@ -84,6 +87,12 @@ export async function IntentCollectionView({
         <section className="mt-12 max-w-3xl border-t border-slate-200 pt-10">
           <h2 className="text-xl font-bold text-slate-900">О подборке</h2>
           <p className="mt-4 text-sm leading-7 text-slate-600">{seoBody}</p>
+          {seoText ? (
+            <div
+              className="prose prose-slate mt-6 max-w-none text-sm leading-relaxed text-slate-600"
+              dangerouslySetInnerHTML={{ __html: seoText }}
+            />
+          ) : null}
           <p className="mt-4 text-sm text-slate-500">
             Нужен полный каталог с произвольными фильтрами?{' '}
             <Link href="/events" className="font-semibold text-primary-700 hover:underline">

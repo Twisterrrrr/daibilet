@@ -1,3 +1,53 @@
+## 2026-08-12 - SEO Этап 1: 5 SeoOverride HTML (KGD+SPB)
+
+### Наблюдения
+- Owner дал 5 реальных HTML (standup/excursions КГД; bridges-night/spb-yards/river-cruises СПб) + FAQ.
+- Агент 73c77a2f застрял mid-flight после wiring рельсы; продолжили upsert скриптом.
+
+### Решения
+- Upsert `scripts/data/seo-override-stage1.json` → `SeoOverride` (customTitle/Description/H1/Text).
+- Рендер `customText` через `LandingSeoBottom` overrideHtml на landing pages.
+- Canonical хаба: self `/podborki?city=` (metadataBase), не apex-only.
+
+### Проблемы
+- Deploy/migrate на MSK обязательны до live smoke текстов.
+
+---
+
+## 2026-08-12 - SEO Подборки: шаблонизатор + SeoOverride (без seed)
+
+### Наблюдения
+- Owner финальный код-пакет: SeoOverride + SEO_TEMPLATES (Group C + E) + generateMetadata на хабе и ЧПУ-интентах.
+- Sample содержал баги: битый canonical, emoji, «ДайБилет», em dash, noindex хаба `all`, stub CatalogComponent.
+
+### Решения
+- Prisma `SeoOverride` (nullable customs, @@unique citySlug+landingSlug); migration без seed фейков.
+- Утилита `apps/web/src/lib/seo/get-landing-seo.ts`: DB override → template → fallback; бренд **Дайбилет**; дефис; без emoji.
+- Хаб: `/podborki` и `?city=all` = index; пилот KGD/SPB = self-canonical `/podborki?city=` + template; non-pilot `?city=` = noindex.
+- Intent×city: шаблоны Group E + self-canonical; stablePilotIndex не ломали.
+- UI каталога `LandingsCatalogView` сохранён; seoText блок только при DB override.
+
+### Проблемы
+- Таблица пустая до Этапа 1 - закрыто upsert 5 текстов.
+
+---
+
+## 2026-08-12 - SeoOverride + Stage-1 HTML (KGD/SPB) + self-canonical smoke
+
+### Наблюдения
+- Owner sample путал canonical пилота с корнем `https://daibilet.ru` - канон пилота = **self** `/podborki?city={seoSlug}`.
+- Stage-1: 5 реальных HTML (standup/excursions КГД + bridges-night/spb-yards/river-cruises СПб) без фейков.
+
+### Решения
+- Prisma `SeoOverride` + `getLandingSeo` (override → template → fallback); intent×city meta по шаблонам Group E.
+- Hub: pilot index+self-canonical; non-pilot `?city=` noindex; `/podborki` и `city=all` остаются index.
+- LandingSeoBottom рендерит `customText`; upsert `upsert-seo-override-stage1.mjs`.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-11 - SEO Подборки: финальная стратегия пилота (KGD+SPB)
 
 ### Наблюдения

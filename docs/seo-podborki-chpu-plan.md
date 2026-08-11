@@ -40,12 +40,19 @@
 
 | URL | Поведение |
 |-----|-----------|
-| `/podborki` / `?city=all` / non-meta city | Хаб meta + canonical `/podborki` |
-| `/podborki?city=kaliningrad` (и алиасы→canon) | Unique Title/Desc/H1; canonical **self** |
-| `/podborki?city=saint-petersburg` | то же |
+| `/podborki` / `?city=all` | Хаб meta + **index,follow** + canonical `/podborki` |
+| `/podborki?city=kaliningrad` (и алиасы→canon) | Unique Title/Desc/H1; **self-canonical** `/podborki?city=kaliningrad` (НЕ корень `https://daibilet.ru/`); index,follow |
+| `/podborki?city=saint-petersburg` | то же self-canonical с `city=` |
 | `/podborki?city=moscow` | leftover Meta (harmless); **не** в active SEO pilot (index/sitemap) |
+| `/podborki?city=kazan` (и прочие non-pilot) | hub copy; **noindex,follow**; canonical `/podborki` |
 
-Код: `apps/web/src/lib/podborki-city-seo.ts` (`PODBORKI_SEO_PILOT_CITY_SLUGS` vs `PODBORKI_CITY_META_PILOT_SLUGS`).
+**Smoke checklist (owner 2026-08-12):** не путать с ошибочным sample canonical на голый `https://daibilet.ru` - у пилота всегда self `/podborki?city={seoSlug}`.
+
+Код: `apps/web/src/lib/podborki-city-seo.ts` + `apps/web/src/lib/seo/get-landing-seo.ts` (`SeoOverride` → template → fallback).
+
+### Stage-1 SeoOverride (owner HTML)
+
+Пары в prod DB (без фейков): `kaliningrad/standup`, `kaliningrad/excursions`, `saint-petersburg/bridges-night`, `saint-petersburg/spb-yards`, `saint-petersburg/river-cruises`. Рендер `customText` внизу landing через `LandingSeoBottom`. Upsert: `apps/web/scripts/upsert-seo-override-stage1.mjs`.
 
 ---
 

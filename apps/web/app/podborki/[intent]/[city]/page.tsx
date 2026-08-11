@@ -10,6 +10,9 @@ import {
   resolveCatalogIntent,
 } from '@/lib/catalog-intent-routes';
 import { resolveLandingCityName } from '@/lib/landing-city';
+import { normalizeKnownCitySlug } from '@/lib/landing-routes';
+import { isPodborkiSeoPilotCitySlug } from '@/lib/podborki-city-seo';
+import { getLandingSeo } from '@/lib/seo/get-landing-seo';
 import {
   buildCategoryCityMetaDescription,
   buildCategoryCityMetaTitle,
@@ -17,11 +20,10 @@ import {
   robotsForListingIndexability,
 } from '@/lib/seo-listing-meta';
 import { buildShareMetadata, pageTitle } from '@/lib/seo-meta';
-import { isPodborkiSeoPilotCitySlug } from '@/lib/podborki-city-seo';
 import { parseCatalogPageQuery } from '@/server/catalog-query';
 import { getCachedCatalog } from '@/server/cached-catalog-data';
 import { getCachedDestinations } from '@/server/cached-public-surfaces';
-import { normalizeKnownCitySlug } from '@/lib/landing-routes';
+import { findSeoOverride } from '@/server/seo-override';
 
 export const revalidate = 300;
 
@@ -40,7 +42,12 @@ async function resolveCityLabel(citySlug?: string | null) {
   try {
     const destinations = await getCachedDestinations();
     const match = (destinations.destinations || []).find(
-      (item) => item.slug === slug || item.sourceSlug === slug || item.slug === raw || item.sourceSlug === raw || item.name === raw,
+      (item) =>
+        item.slug === slug ||
+        item.sourceSlug === slug ||
+        item.slug === raw ||
+        item.sourceSlug === raw ||
+        item.name === raw,
     );
     return {
       citySlug: normalizeKnownCitySlug(match?.slug || match?.sourceSlug || slug) || match?.slug || slug,
@@ -76,21 +83,36 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     offers = 0;
   }
 
-  const title = buildCategoryCityMetaTitle({
-    categoryTitle: intent.label,
-    cityName,
-  });
-  const description = buildCategoryCityMetaDescription({
-    seekCategory: intent.label.charAt(0).toLowerCase() + intent.label.slice(1),
-    categoryTitle: intent.label,
-    cityName,
-  });
   const path = catalogIntentPath(intent.intent, citySlug);
+  const isPilot = isPodborkiSeoPilotCitySlug(citySlug);
+  const dbOverride = isPilot ? await findSeoOverride(citySlug, intent.intent) : null;
+  const templated = getLandingSeo({
+    citySlug,
+    landingSlug: intent.intent,
+    dbOverride,
+  });
+
+  // Pilot / template hit → use matrix title/desc; else keep listing meta helpers.
+  const useTemplate = templated.source === 'template' || templated.source === 'override';
+  const title = useTemplate
+    ? `${pageTitle(templated.title)} | Дайбилет`
+    : buildCategoryCityMetaTitle({
+        categoryTitle: intent.label,
+        cityName,
+      });
+  const description = useTemplate
+    ? templated.description
+    : buildCategoryCityMetaDescription({
+        seekCategory: intent.label.charAt(0).toLowerCase() + intent.label.slice(1),
+        categoryTitle: intent.label,
+        cityName,
+      });
+
   const decision = evaluateListingIndexability({
     offers,
-    stablePilotIndex: isPodborkiSeoPilotCitySlug(citySlug),
+    stablePilotIndex: isPilot,
     // Intent pages always have H1 + seoBody skeleton; for pilot cities keep index even at 0.
-    hasSeoSkeleton: isPodborkiSeoPilotCitySlug(citySlug),
+    hasSeoSkeleton: isPilot,
   });
 
   return {
@@ -134,6 +156,15 @@ export default async function PodborkiIntentCityPage({ params }: PageProps) {
     sort: filters.sort,
   });
 
+  const isPilot = isPodborkiSeoPilotCitySlug(citySlug);
+  const dbOverride = isPilot ? await findSeoOverride(citySlug, intent.intent) : null;
+  const templated = getLandingSeo({
+    citySlug,
+    landingSlug: intent.intent,
+    dbOverride,
+  });
+  const useTemplate = templated.source === 'template' || templated.source === 'override';
+
   return (
     <SiteLayout>
       <IntentCollectionView
@@ -141,6 +172,9 @@ export default async function PodborkiIntentCityPage({ params }: PageProps) {
         citySlug={citySlug}
         cityName={cityName}
         pageQuery={pageQuery}
+        heroTitle={useTemplate ? templated.h1 : undefined}
+        heroDescription={useTemplate ? templated.description : undefined}
+        seoText={templated.seoText}
       />
     </SiteLayout>
   );
