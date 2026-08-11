@@ -57,7 +57,7 @@ export function MyDayToolbar({
       aria-label="Управление маршрутом"
       aria-orientation="horizontal"
       data-my-day-toolbar="1"
-      className={`sticky top-[calc(var(--site-header-height)+0.5rem)] z-20 rounded-2xl border border-slate-200/90 bg-white/95 p-3 shadow-sm backdrop-blur sm:p-4 lg:top-2 ${className}`.trim()}
+      className={`sticky top-[calc(var(--site-header-height)+0.5rem)] z-20 rounded-2xl border border-slate-200/90 bg-white/95 p-3 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/90 sm:p-4 ${className}`.trim()}
     >
       <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-1 text-sm">
         <span className="inline-flex min-w-0 items-center gap-2 font-semibold text-slate-900">

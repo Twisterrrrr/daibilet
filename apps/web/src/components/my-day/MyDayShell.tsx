@@ -12,7 +12,8 @@ type MyDayShellProps = {
 };
 
 /**
- * Lovable-style adaptive shell: list scroll + sticky map (collapse to 56px rail).
+ * Lovable-style shell: page scrolls the list; map stays sticky.
+ * List keeps a readable min-width when the map is open.
  */
 export function MyDayShell({
   mapOpen,
@@ -24,7 +25,7 @@ export function MyDayShell({
   const gridClass = !showMapColumn
     ? 'lg:grid-cols-1'
     : mapOpen
-      ? 'lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)]'
+      ? 'lg:grid-cols-[minmax(22rem,1fr)_minmax(18rem,1.05fr)]'
       : 'lg:grid-cols-[minmax(0,1fr)_56px]';
 
   return (
@@ -33,15 +34,12 @@ export function MyDayShell({
       data-my-day-shell="1"
       data-my-day-map-open={showMapColumn && mapOpen ? '1' : '0'}
     >
-      <div
-        className="min-w-0 lg:overflow-y-auto lg:max-h-[calc(100vh-var(--site-header-height)-6rem)] lg:pr-3"
-        data-my-day-list-col
-      >
+      <div className="min-w-0 lg:pr-4" data-my-day-list-col>
         {list}
       </div>
       {showMapColumn ? (
         <aside
-          className="relative hidden lg:sticky lg:top-[var(--site-header-height)] lg:block lg:h-[calc(100vh-var(--site-header-height)-1rem)] lg:self-start"
+          className="relative hidden lg:sticky lg:top-[var(--site-header-height)] lg:block lg:h-[calc(100vh-var(--site-header-height))] lg:self-start"
           data-my-day-map-col
         >
           {map}

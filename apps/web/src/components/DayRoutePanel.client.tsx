@@ -5130,7 +5130,7 @@ function DayRouteVenueCard({
         onDragEnd={canDrag ? onDragEnd : undefined}
       >
         <article
-          className={`group grid grid-cols-[auto_minmax(0,1fr)] gap-3 rounded-2xl border p-3 transition-colors sm:gap-4 sm:p-4 ${
+          className={`group grid grid-cols-[auto_minmax(0,1fr)] gap-2.5 rounded-2xl border p-2.5 transition-colors sm:gap-3 sm:p-3.5 ${
             focused
               ? 'border-primary-400/50 bg-white shadow-sm'
               : 'border-transparent bg-transparent hover:bg-slate-50'
@@ -5197,12 +5197,12 @@ function DayRouteVenueCard({
             )}
           </div>
 
-          <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] gap-3 sm:gap-4">
+          <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] gap-2 sm:gap-3">
             <div className="min-w-0" data-day-stop-content>
-              <div className="flex flex-wrap items-center gap-2">
+              <div className="flex flex-wrap items-center gap-1.5">
                 {softTimeLabel ? (
                   <span
-                    className="rounded-full bg-sky-50 px-2.5 py-0.5 text-xs font-bold text-sky-800"
+                    className="rounded-full bg-sky-50 px-2 py-0.5 text-[11px] font-bold text-sky-800"
                     data-day-soft-time
                   >
                     {softTimeLabel}
@@ -5215,12 +5215,12 @@ function DayRouteVenueCard({
                 ) : null}
                 {suburbBadge}
               </div>
-              <h2 className="mt-1 text-base font-bold leading-snug text-slate-900 sm:text-lg">
+              <h2 className="mt-1 line-clamp-2 text-sm font-bold leading-snug text-slate-900 sm:text-base">
                 {titleNode}
               </h2>
               {placeLine || !hasCoords ? (
                 <p
-                  className={`mt-1 truncate text-sm ${
+                  className={`mt-1 line-clamp-2 text-xs leading-snug sm:text-sm ${
                     !hasCoords ? 'text-amber-700' : 'text-slate-500'
                   }`}
                 >
@@ -5228,14 +5228,14 @@ function DayRouteVenueCard({
                   {placeLine && !hasCoords ? ' · Нет координат' : ''}
                 </p>
               ) : null}
-              <div className="mt-2 flex flex-wrap items-center gap-2">
+              <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
                 {sessionDisplay ? (
-                  <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
+                  <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-700">
                     {sessionDisplay}
                   </span>
                 ) : null}
                 {showStatusChip ? (
-                  <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
+                  <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-700">
                     {chip.label}
                   </span>
                 ) : null}
@@ -5282,13 +5282,13 @@ function DayRouteVenueCard({
               ) : null}
             </div>
 
-            <div className="flex shrink-0 flex-col items-end gap-2">
+            <div className="flex shrink-0 flex-col items-end gap-1.5">
               <div
-                className="relative h-20 w-20 overflow-hidden rounded-xl bg-slate-100 sm:h-24 sm:w-28"
+                className="relative h-16 w-16 overflow-hidden rounded-xl bg-slate-100 sm:h-20 sm:w-24"
                 data-day-stop-thumb
               >
                 {thumbUrl ? (
-                  <SafeImage src={thumbUrl} alt="" fill sizes="7rem" className="object-cover" />
+                  <SafeImage src={thumbUrl} alt="" fill sizes="6rem" className="object-cover" />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-200 via-slate-100 to-sky-100 text-slate-400">
                     <MapPin className="h-5 w-5" />
