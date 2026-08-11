@@ -1,3 +1,31 @@
+## 2026-08-11 - Колонка Анны: дискотеки Москвы (rewrite)
+
+### Наблюдения
+- Owner rewrite `moskva-vechernie-diskoteki-shou`: тон «я нашла» → column Анна; slug без изменений.
+- Старый slug ВИА «Дорогие друзья» давал 404; live URL `tc-6a4e10eb...` 200. Подборка `/vecherinki-na-teplohode` 200.
+
+### Решения
+- Verbatim owner + дефисы; без emoji; image shortcodes; cover/inline/og уже на диске.
+- MD + blog-posts web/public + blog-meta + sync-bodies; MSK upsert + revalidate + Deploy MSK web.
+
+### Проблемы
+- Нет.
+
+---
+
+## 2026-08-11 - Rewrite: Уральский Марс / Бажов (Екб)
+
+### Наблюдения
+- Owner rewrite slug `ekb-uralskiy-mars-bazhovskie-ekskursii`: 3 сценария + автобус/машина; emoji из H2 убрать; дефис вместо длинного тире.
+- Cover/inline/og уже на диске; `/ekskursii/ekaterinburg` = 200.
+
+### Решения
+- MD + blog-posts web/public + `blog:sync-bodies`; author editorial; MSK upsert + revalidate + Deploy MSK web.
+
+### Проблемы
+- Нет.
+
+---
 ## 2026-08-11 - Колонка Анны: ночной Сочи без глянца
 
 ### Наблюдения

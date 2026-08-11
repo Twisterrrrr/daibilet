@@ -2,6 +2,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
+| B.ANNA-MSK-DISCO | Колонка Анны: rewrite moskva-vechernie-diskoteki-shou (3 сценария + советы) | Высокий | 🔄 ship |
 | P.2r | Region Hub IA v1: DTO + `RegionPageView` + SEO/robots по live tier | Высокий | ✅ shipped (`feat/region-hubs` → `feat/next-monorepo`) |
 | P.2r1 | Live tier C↔B↔A (`resolveRegionLiveTier`); strip на центре только Tier C | Высокий | ✅ |
 | P.2r2 | Sitemap: indexable regions (A/B ≥3); Tier C вне карты | Средний | ✅ |
@@ -1640,6 +1641,7 @@ Owner-locked порядок: Hero → Советы → Расписание → 
 | B.30 | Pack C: 9 гидов + 2 колонки Макса (1024610) | Высокий | ✅ контент+images; blog:upsert prod; slug 404 до publishedAt | владелец + агент |
 | B.30a | Owner early-publish: Самара `samara-vykhodnye-dva-dnya-bez-gonki` (из списка 8 городов) | Высокий | ✅ `836a75f8` live; 🚫 owner 2026-08-08 → HIDDEN (без конкретики); hub blogSlug не было | агент |
 | B.31 | Blog inline images: подпись (figcaption/alt) скрыта по умолчанию, показ при hover | Средний | ✅ 2026-07-27 `BlogFigure` web+public: `group-hover` + `@media(hover:hover)`, `title`+`alt` на img | агент |
+| B.32 | Owner rewrite `ekb-uralskiy-mars-bazhovskie-ekskursii` (3 сценария) | Высокий | 🔄 MD+sync; commit/push/upsert/deploy | агент |
 
 ---
 
