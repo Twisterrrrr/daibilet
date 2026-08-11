@@ -1,3 +1,19 @@
+## 2026-08-11 - Popular cities rail: infinite loop rollback on arrows
+
+### Наблюдения
+- После `ea6c7897` (snap pause + RO width-only) стрелки на последнем городе откатывали рейку к MSK под H2 вместо бесконечного loop.
+- `programScrollRef` глушил `normalizeLoop` на время smooth scroll; на `scrollend` snap включали **до** wrap → `snap-mandatory` + `scroll-padding` якорили к title gutter (видимый rollback). У края track `scrollTo` ещё и clamp в `maxScrollLeft`.
+
+### Решения
+- Pre-shift в loop-band `[0.5, 1.5)×setWidth` перед arrow glide (с запасом под шаг 3 карточки).
+- На finish: `normalizeLoop({ force })` **пока snap=none**, затем restore snap.
+- `wrapScrollIntoLoopBand` через while (не один ±setWidth).
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-11 - Homepage CSS 404 / preload noise after artifact swap
 
 ### Наблюдения

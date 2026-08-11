@@ -13,6 +13,9 @@ import type { PublicDestinationDto } from '@daibilet/contracts/public';
 const LOOP_COPIES = 3;
 /** Arrow buttons step several cards so the rail feels purposeful, not one-by-one. */
 const ARROW_CARD_STEP = 3;
+/** Keep scrollLeft inside this band of one set width (seamless wrap via 3 copies). */
+const LOOP_BAND_LO = 0.5;
+const LOOP_BAND_HI = 1.5;
 const HIDE_SCROLLBAR_CLASS =
   '![scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:!hidden';
 
@@ -56,6 +59,19 @@ function syncScrollPadding(scroller: HTMLElement): number {
 }
 
 /**
+ * Instantly re-base scrollLeft into the middle loop band. Same cities stay on screen
+ * because copies are identical; without this, arrow scrolls hit maxScrollLeft and snap
+ * restore jumps back to the title-anchored start (visible rollback).
+ */
+function wrapScrollIntoLoopBand(el: HTMLElement, setWidth: number, loopingRef: { current: boolean }) {
+  if (setWidth < 1) return;
+  loopingRef.current = true;
+  while (el.scrollLeft < setWidth * LOOP_BAND_LO) el.scrollLeft += setWidth;
+  while (el.scrollLeft > setWidth * LOOP_BAND_HI) el.scrollLeft -= setWidth;
+  loopingRef.current = false;
+}
+
+/**
  * Full-bleed infinite city cards. On load/resize: Moscow left-aligned under the H2
  * (SPB immediately after); secondary cities may slight-peek left of the gutter.
  */
@@ -78,21 +94,18 @@ export function HomePopularCitiesRail({ cities, className = '' }: HomePopularCit
     [cities],
   );
 
-  const normalizeLoop = useCallback(() => {
-    const el = scrollerRef.current;
-    if (!el || cities.length < 2 || loopingRef.current || programScrollRef.current) return;
-    const setWidth = el.scrollWidth / LOOP_COPIES;
-    if (setWidth < 1) return;
-    if (el.scrollLeft < setWidth * 0.5) {
-      loopingRef.current = true;
-      el.scrollLeft += setWidth;
-      loopingRef.current = false;
-    } else if (el.scrollLeft > setWidth * 1.5) {
-      loopingRef.current = true;
-      el.scrollLeft -= setWidth;
-      loopingRef.current = false;
-    }
-  }, [cities.length]);
+  const normalizeLoop = useCallback(
+    (opts?: { force?: boolean }) => {
+      const el = scrollerRef.current;
+      if (!el || cities.length < 2 || loopingRef.current) return;
+      // During arrow glide, skip passive scroll normalize (would abort smooth scroll).
+      // finish/pre-shift call with force while snap is still off.
+      if (programScrollRef.current && !opts?.force) return;
+      const setWidth = el.scrollWidth / LOOP_COPIES;
+      wrapScrollIntoLoopBand(el, setWidth, loopingRef);
+    },
+    [cities.length],
+  );
 
   const jumpToFocus = useCallback(() => {
     const el = scrollerRef.current;
@@ -173,12 +186,13 @@ export function HomePopularCitiesRail({ cities, className = '' }: HomePopularCit
       clearTimeout(scrollEndTimerRef.current);
       scrollEndTimerRef.current = null;
     }
-    programScrollRef.current = false;
     if (el) {
-      // Restore snap after programmatic move; padding keeps snap aligned with title gutter.
+      // Wrap while snap is still none. Restoring snap first (ea6c7897) let
+      // snap-mandatory + scroll-padding re-anchor to MSK = rollback at last city.
+      normalizeLoop({ force: true });
       el.style.scrollSnapType = '';
-      normalizeLoop();
     }
+    programScrollRef.current = false;
   }, [normalizeLoop]);
 
   const scrollByDir = (dir: -1 | 1) => {
@@ -188,13 +202,29 @@ export function HomePopularCitiesRail({ cities, className = '' }: HomePopularCit
     syncScrollPadding(el);
     const step = measureStep(el) * ARROW_CARD_STEP;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const target = el.scrollLeft + dir * step;
 
     // Mandatory snap + smooth scrollBy fought the title-anchored offset (rubber band).
     // Disable snap for the programmatic glide, then restore on scrollend.
     if (scrollEndTimerRef.current) clearTimeout(scrollEndTimerRef.current);
     programScrollRef.current = true;
     el.style.scrollSnapType = 'none';
+
+    // Pre-shift into the loop band (and leave room for this step) so the glide
+    // never clamps at maxScrollLeft / 0 - that clamp + snap looked like a rollback.
+    const setWidth = el.scrollWidth / LOOP_COPIES;
+    if (setWidth >= 1 && cities.length >= 2) {
+      loopingRef.current = true;
+      while (el.scrollLeft < setWidth * LOOP_BAND_LO) el.scrollLeft += setWidth;
+      while (el.scrollLeft > setWidth * LOOP_BAND_HI) el.scrollLeft -= setWidth;
+      if (dir === 1 && el.scrollLeft + step > setWidth * LOOP_BAND_HI) {
+        el.scrollLeft -= setWidth;
+      } else if (dir === -1 && el.scrollLeft - step < setWidth * LOOP_BAND_LO) {
+        el.scrollLeft += setWidth;
+      }
+      loopingRef.current = false;
+    }
+
+    const target = el.scrollLeft + dir * step;
 
     const onScrollEnd = () => {
       el.removeEventListener('scrollend', onScrollEnd);
