@@ -1,3 +1,19 @@
+## 2026-08-11 - Category×city: index при editorial SEO (bypass порога 6)
+
+### Наблюдения
+- Owner: `/stendap-i-yumor/kaliningrad` - SEO-каркас важнее порога `<6` офферов; 3–5 событий в афише нормально; непрерывная индексация.
+- До фикса: `evaluateListingIndexability` всегда `noindex,follow` при 1–5 офферах.
+
+### Решения
+- `hasSeoListingEditorial(landing, city)` - exact пара (без national fallback).
+- `evaluateListingIndexability({ hasEditorialSeoText })` → reason `editorial_seo_hub`, index при ≥1; `zero_offers` остаётся noindex.
+- Wiring: `landing-route-page` metadata + landings sitemap. Docs qa/Project/Tasktracker.
+
+### Проблемы
+- KGD не в `PRIORITY_LISTING_CITY_SLUGS` - URL indexable в robots, но в landings sitemap chunk пока не попадает (отдельный follow-up при расширении priority cities).
+
+---
+
 ## 2026-08-11 - SEO Подборки: Meta-пилот на soft `?city=` (не ЧПУ)
 
 ### Наблюдения

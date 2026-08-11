@@ -3,7 +3,7 @@
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
 | SEO.LISTING-KGD | Editorial SEO-блок `standup:kaliningrad` в `seo-listing-texts` + Deploy MSK web | Высокий | ✅ `980c31d9` Deploy MSK web |
-| SEO.LISTING-INDEX | Owner: index thin listing при editorial SEO vs порог ≥6 офферов (qa) | Высокий | ⏳ owner |
+| SEO.LISTING-INDEX | Owner: index thin listing при editorial SEO (bypass порога &lt;6; 0 офферов = noindex) | Высокий | ✅ code; Deploy MSK web |
 | SEO.MYDAY-ROUTES | План ЧПУ `/routes/{city}/{slug}` из My Day share (MVP/UGC/noindex/canonical) - docs only | Высокий | ⏳ qa owner; не билдить |
 
 ## SEO Подборки city ЧПУ (2026-08-11)
