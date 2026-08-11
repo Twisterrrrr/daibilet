@@ -257,8 +257,8 @@ const SLUG_META: Record<
     city: 'Москва',
   },
   'uzhin-na-teplohode-moskva-kak-vybrat': {
-    authorId: 'editorial',
-    articleType: 'gid',
+    authorId: 'anna',
+    articleType: 'column',
     citySlug: 'moscow',
     city: 'Москва',
   },
