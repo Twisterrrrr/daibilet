@@ -319,12 +319,11 @@ export const BLOG_POSTS: BlogPost[] = [
   },
   {
     slug: 'ekb-uralskiy-mars-bazhovskie-ekskursii',
-    title: 'Уральский Марс и Бажовские места: топ загородных экскурсий из Екатеринбурга',
+    title: 'Инопланетные виды и сказы Бажова: 3 крутых загородных маршрута из Екатеринбурга',
     excerpt:
-      
-      'Как выбрать выезд из Екатеринбурга: карьеры Уральского Марса, Оленьи ручьи, бажовская Сысерть, Ганина Яма и дальнее Верхотурье.',
+      'Уральский Марс, Оленьи ручьи и бажовская Сысерть: три сценария загородного выезда из Екатеринбурга - пейзаж, трекинг или культурный день.',
     date: '24 июля 2026',
-    readMin: 10,
+    readMin: 8,
     tag: 'Город',
     city: 'Екатеринбург',
     citySlug: 'ekaterinburg',
@@ -332,7 +331,7 @@ export const BLOG_POSTS: BlogPost[] = [
     authorName: 'Редакция',
     articleType: 'gid',
     imageUrl: blogCoverUrl('ekb-uralskiy-mars-bazhovskie-ekskursii'),
-    imageAlt: 'Пейзаж Уральского Марса недалеко от Екатеринбурга',
+    imageAlt: 'Красно-оранжевый карьерный пейзаж Уральского Марса',
   },
   {
     slug: 'spb-s-rebenkom-v-dozhd',
