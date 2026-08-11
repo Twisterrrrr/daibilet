@@ -21,6 +21,7 @@ import {
   QrCode,
   Route,
   Share2,
+  Ship,
   Sparkles,
   StickyNote,
   Ticket,
@@ -74,6 +75,7 @@ import { SuburbsCarousel } from '@/components/SuburbsCarousel.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from '@/lib/catalog-url';
 import { resolveCityInfo } from '@/lib/cityInfo';
+import { isSpbDayRouteCity } from '@/lib/day-route-boat';
 import {
   DAY_ROUTE_CHANGED_EVENT,
   DAY_ROUTE_MAX,
@@ -209,7 +211,7 @@ type DayRouteAccordionId = 'mustSee' | 'text' | 'matches';
 /** Wave 1.5: list-only itinerary (Lovable). Grid card markup kept as dead path. */
 type DayRouteStopViewMode = 'grid' | 'list';
 type DayRouteMobileShelf = 'route' | 'add';
-type MyDayPickerSection = 'scenarios' | 'places' | 'suburbs' | 'picks' | 'own';
+type MyDayPickerSection = 'scenarios' | 'places' | 'suburbs' | 'picks' | 'boat' | 'own';
 
 /** Owner 2026-08-06: post-buy modal «Оформили билет?» off until UX revisit. Buy links still open. */
 const SHOW_DAY_TICKET_HANDOFF_MODAL = false;
@@ -2228,6 +2230,15 @@ function DayRoutePanelInner() {
   );
   const showSuburbsGuide = Boolean(hasPageCity && significantSuburbs.length > 0);
   const showHotPicks = Boolean(hasPageCity && (hotPickCards.length > 0 || hotPickTabIds.length > 0));
+  const showBoatPicker = Boolean(
+    hasPageCity &&
+      isSpbDayRouteCity({
+        slug: pageCitySlug,
+        name: pageCityName,
+        sourceSlug: selectedCity?.selectedDestination?.sourceSlug || null,
+        city: pageCityName,
+      }),
+  );
 
   const pickerTabs = [
     ...(showScenariosGuide
@@ -2241,6 +2252,9 @@ function DayRoutePanelInner() {
       : []),
     ...(showHotPicks || showMatches
       ? [{ value: 'picks' as const, label: 'Выбор Дайбилет', hint: 'Рекомендации сервиса', icon: Sparkles }]
+      : []),
+    ...(showBoatPicker
+      ? [{ value: 'boat' as const, label: 'Теплоход', hint: 'Прогулка по Неве и каналам', icon: Ship }]
       : []),
     { value: 'own' as const, label: 'Своё место', hint: 'Если места нет в каталоге', icon: PenLine },
   ];
@@ -2425,7 +2439,7 @@ function DayRoutePanelInner() {
     }
     return (
       <div data-day-catalog-trio>
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3">
           <DayRouteSearchSelect
             label="Локации"
             placeholder="Найти локацию…"
@@ -3877,16 +3891,18 @@ function DayRoutePanelInner() {
       </div>
       ) : null}
 
-      <DayRouteBoatWizard
-        cityName={pageCityName}
-        citySlug={pageCitySlug}
-        cityId={pageCityId}
-        citySourceSlug={selectedCity?.selectedDestination?.sourceSlug || null}
-        route={route}
-        atMax={atMax}
-        onRouteChange={setRoute}
-        locationsCatalog={locationsCatalog}
-      />
+      {pickerSection === 'boat' && showBoatPicker ? (
+        <DayRouteBoatWizard
+          cityName={pageCityName}
+          citySlug={pageCitySlug}
+          cityId={pageCityId}
+          citySourceSlug={selectedCity?.selectedDestination?.sourceSlug || null}
+          route={route}
+          atMax={atMax}
+          onRouteChange={setRoute}
+          locationsCatalog={locationsCatalog}
+        />
+      ) : null}
 
       {/* Accordion: nearby events / matches */}
       {pickerSection === 'picks' && showMatches ? (
@@ -4139,7 +4155,7 @@ function DayRoutePanelInner() {
         </section>
       ) : null}
 
-      {pickerSection === 'picks' || pickerSection === 'places' ? (
+      {pickerSection === 'picks' ? (
       <section
         className="mt-4"
         id="day-catalog-add"

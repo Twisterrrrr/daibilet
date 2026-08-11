@@ -9,6 +9,7 @@ export type MyDayPickerSection =
   | 'places'
   | 'suburbs'
   | 'picks'
+  | 'boat'
   | 'own';
 
 export type MyDayPickerTab = {
