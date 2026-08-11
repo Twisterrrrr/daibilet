@@ -2,7 +2,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| SEO.LISTING-KGD | Editorial SEO-блок `standup:kaliningrad` в `seo-listing-texts` + Deploy MSK web | Высокий | 🔄 ship |
+| SEO.LISTING-KGD | Editorial SEO-блок `standup:kaliningrad` в `seo-listing-texts` + Deploy MSK web | Высокий | ✅ `980c31d9` Deploy MSK web |
 | SEO.LISTING-INDEX | Owner: index thin listing при editorial SEO vs порог ≥6 офферов (qa) | Высокий | ⏳ owner |
 | SEO.MYDAY-ROUTES | План ЧПУ `/routes/{city}/{slug}` из My Day share (MVP/UGC/noindex/canonical) - docs only | Высокий | ⏳ qa owner; не билдить |
 
@@ -22,7 +22,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| B.ANNA-MSK-DISCO | Колонка Анны: rewrite moskva-vechernie-diskoteki-shou (3 сценария + советы) | Высокий | 🔄 ship |
+| B.ANNA-MSK-DISCO | Колонка Анны: rewrite moskva-vechernie-diskoteki-shou (3 сценария + советы) | Высокий | ✅ 4e69c323 + bodies 85bfd6df; Deploy MSK web 31532073831 |
 | P.2r | Region Hub IA v1: DTO + `RegionPageView` + SEO/robots по live tier | Высокий | ✅ shipped (`feat/region-hubs` → `feat/next-monorepo`) |
 | P.2r1 | Live tier C↔B↔A (`resolveRegionLiveTier`); strip на центре только Tier C | Высокий | ✅ |
 | P.2r2 | Sitemap: indexable regions (A/B ≥3); Tier C вне карты | Средний | ✅ |
@@ -410,7 +410,8 @@ Alias `museum-1` = первый open-date контракт (не «музеи fo
 |---|--------|-----------|--------|
 | UX.CITIES-DESKTOP | `/cities`: 8 top daytime + full-width map + remaining list; CTA row desktop; без «Все города (n)» | Высокий | ✅ `54a9ffd`; MSK BUILD_ID=`AF2liBH4Eu1LzXz8b0Yu2`; smoke 200 |
 | UX.CITIES-OCTET2 | `/cities` ranks 9-16: same dark/white chrome as top-8 + daytime JPG; MSK sync-public-assets | Высокий | ✅ `2db4ee62` Deploy `31276301334` BUILD_ID=`aXcB-Mia_CNSVUQEECgh6` |
-| UX.CITIES-DAY-NIGHTFIX | Replace remaining night city covers (12 red-V + suzdal/sortavala + sync dark PNGs) | Высокий | ✅ 780ac4c Deploy 31286030403 |
+| UX.CITIES-DAY-NIGHTFIX | Replace remaining night city covers (12 red-V + suzdal/sortavala + sync dark PNGs) | Высокий | ✅ 
+780ac4c Deploy 31286030403 |
 | UX.CITIES-HUB-NIGHT | Scope fix: catalog/home daytime; hub hero night from `cities/night/` (56 restored) | Высокий | ✅ `21e8d092` Deploy `31299826751` tip `85144f97`; smoke hub night + catalog day |
 
 ## Suburb nested coords → day-route (2026-08-06)
@@ -2070,4 +2071,3 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 - [x] **Критический** — файл `googleb3313872246ac993.html` в `apps/web/public/`, deploy prod, curl 200 (2026-07-19)
 
 13872246ac993.html` в `apps/web/public/`, deploy prod, curl 200 (2026-07-19)
-
