@@ -1,4 +1,17 @@
-<<<<<<< HEAD
+## 2026-08-11 - Region hub: previews + map open by default
+
+### Наблюдения
+- «Куда съездить» и city rail были text/pin-only; карта свёрнута по умолчанию.
+
+### Решения
+- Photo-first topPlaces (imageUrl → city asset → session cover); city rail тот же fallback; `mapOpen` = true.
+- Helper `region-place-preview.ts`; optional `imageUrl` в regionInfo DTO.
+
+### Проблемы
+- Deploy по «выкатывай».
+
+---
+
 ## 2026-08-11 - My Day: Lovable H1 scope + own-place geocode
 
 ### Наблюдения
@@ -33,22 +46,6 @@
 ---
 
 ## 2026-08-11 - Home popular cities: mobile tap dead + false «0 событий»
-=======
-## 2026-08-11 - Region hub: previews + map open by default
-
-### Наблюдения
-- «Куда съездить» и city rail были text/pin-only; карта свёрнута по умолчанию.
-
-### Решения
-- Photo-first topPlaces (imageUrl → city asset → session cover); city rail тот же fallback; `mapOpen` = true.
-- Helper `region-place-preview.ts`; optional `imageUrl` в regionInfo DTO.
-
-### Проблемы
-- Deploy по «выкатывай».
-
----
-
->>>>>>> f819b28c (feat(web): region hub place/city previews + map open by default)
 
 ### Наблюдения
 - Owner phone: карточки «Популярные города» (`HomePopularCitiesRail`) не открывают хаб (скрин с Пермью).
