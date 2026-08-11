@@ -15,6 +15,7 @@ import {
   buildYandexMultiStopRouteUrl,
   catalogDayRouteVenueIds,
   clearDayRoute,
+  countDayRoutePlacesMissingCoords,
   dayRouteAddSuccessMessage,
   dayRouteDominantCitySlug,
   dayRouteFullCoveredCount,
@@ -195,6 +196,33 @@ test('dayRouteDominantCitySlug picks majority', () => {
       { id: '3', title: 'C', citySlug: 'moscow' },
     ]),
     'moscow',
+  );
+});
+
+test('countDayRoutePlacesMissingCoords ignores notes', () => {
+  const withCoords = new Set(['place-a', 'place-b']);
+  const hasCoords = (v: { id: string }) => withCoords.has(v.id);
+  assert.equal(
+    countDayRoutePlacesMissingCoords(
+      [
+        { id: 'place-a' },
+        { id: 'note_abc123' },
+        { id: 'place-b' },
+      ],
+      hasCoords,
+    ),
+    0,
+  );
+  assert.equal(
+    countDayRoutePlacesMissingCoords(
+      [
+        { id: 'place-a' },
+        { id: 'note_only' },
+        { id: 'place-missing' },
+      ],
+      hasCoords,
+    ),
+    1,
   );
 });
 

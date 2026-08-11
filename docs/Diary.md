@@ -1,3 +1,17 @@
+## 2026-08-11 - my-day: notes must not trigger coords banner
+
+### Наблюдения
+- Добавление «Заметка» поднимало amber banner «Без координат: 1. В Яндекс уйдут…» - owner: отсебятина; notes нужны.
+
+### Решения
+- `countDayRoutePlacesMissingCoords` исключает `note_*`; banner только если у place-стопов нет lat/lng.
+- Feature notes не трогаем.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-11 - my-day: list layout + free-window city scope
 
 ### Наблюдения

@@ -192,6 +192,22 @@ export function isSyntheticDayRouteStop(
   return isTextDayRouteStop(item) || isNoteDayRouteStop(item);
 }
 
+/**
+ * Place stops missing lat/lng for the Yandex / map warning.
+ * Notes never count - they are not map pins and must not trigger «Без координат».
+ */
+export function countDayRoutePlacesMissingCoords(
+  venues: Array<Pick<DayRouteVenueItem, 'id'>>,
+  hasCoords: (venue: Pick<DayRouteVenueItem, 'id'>) => boolean,
+): number {
+  let missing = 0;
+  for (const venue of venues) {
+    if (isNoteDayRouteStop(venue)) continue;
+    if (!hasCoords(venue)) missing += 1;
+  }
+  return missing;
+}
+
 /** Ids safe to send to /api/day-route/matches (catalog venues only). */
 export function catalogDayRouteVenueIds(venues: DayRouteVenueItem[]): string[] {
   return venues

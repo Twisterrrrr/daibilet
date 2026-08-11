@@ -110,6 +110,7 @@ import {
   isInDayRoute,
   isNoteDayRouteStop,
   isTextDayRouteStop,
+  countDayRoutePlacesMissingCoords,
   lookupDayRouteCoords,
   moveDayRouteVenue,
   moveDayRoutePlanVenue,
@@ -1427,7 +1428,14 @@ function DayRoutePanelInner() {
     [route.venues, coordsById],
   );
   const coordsCount = orderedCoords.filter(Boolean).length;
-  const missingCoordsCount = route.venues.length - coordsCount;
+  /** Notes excluded - never scare users with «Без координат» after adding a Заметка. */
+  const missingCoordsCount = useMemo(
+    () =>
+      countDayRoutePlacesMissingCoords(route.venues, (venue) =>
+        Boolean(lookupDayRouteCoords(venue, coordsById)),
+      ),
+    [route.venues, coordsById],
+  );
   const mapStops = useMemo(() => {
     return route.venues
       .map((venue, index) => {
