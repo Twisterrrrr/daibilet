@@ -1,3 +1,20 @@
+## 2026-08-11 - My Day: picker side drawer (Lovable)
+
+### Наблюдения
+- Inline shelf (сценарии / места / пригороды / picks / своё) перегружал `/my-day`.
+- Lovable: компактный launch + left Sheet «Подбор точек».
+
+### Решения
+- `MyDayPickerLaunch` + `MyDayPickerSheet` (portal overlay).
+- Контент подбора только в drawer по вкладкам; страница = маршрут + карта.
+- Empty CTA / mobile «Добавить места» / between insert открывают drawer.
+
+### Проблемы
+- Accordion chrome внутри вкладок places/own ещё можно упростить.
+- Boat wizard сидит во вкладке «Своё место».
+
+---
+
 ## 2026-08-11 - My Day Wave 1.5: Lovable visual parity
 
 ### Наблюдения
