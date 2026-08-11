@@ -5,9 +5,10 @@ import { useCallback, useState } from 'react';
 /**
  * Wave 1 controller: Lovable-style layout chrome for /my-day.
  * Route/LS/catalog orchestration stays in DayRoutePanel until Wave 1.5 extraction.
+ * Map starts collapsed: empty route has nothing to show; user expands after points appear.
  */
 export function useMyDayController() {
-  const [mapOpen, setMapOpen] = useState(true);
+  const [mapOpen, setMapOpen] = useState(false);
   const [mapFull, setMapFull] = useState(false);
   const [mobileMapSheetOpen, setMobileMapSheetOpen] = useState(false);
 

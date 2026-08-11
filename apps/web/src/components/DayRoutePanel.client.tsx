@@ -2206,6 +2206,14 @@ function DayRoutePanelInner() {
     if (!hasMapStops && mobileView === 'map') setMobileView('list');
   }, [hasMapStops, mobileView]);
 
+  // Without coords there is no map content - keep desktop rail collapsed and close mobile sheet.
+  useEffect(() => {
+    if (hasMapStops) return;
+    myDay.setMapOpen(false);
+    myDay.closeMobileMap();
+    myDay.closeMapFull();
+  }, [hasMapStops, myDay.setMapOpen, myDay.closeMobileMap, myDay.closeMapFull]);
+
   // When switching to full-screen map, remove transient hover highlight.
   useEffect(() => {
     if (mobileView === 'map') setHoverStopId(null);
