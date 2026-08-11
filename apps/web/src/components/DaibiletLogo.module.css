@@ -1,40 +1,62 @@
 .logo {
+  /* Wordmark ink; route (breve, dashed arcs, mid dot, X) use brand blue. */
+  --logo-ink: #000000;
   --logo-blue: #4267e9;
-  --logo-dark: #101729;
 
   position: relative;
   display: inline-block;
   line-height: 1;
-  color: var(--logo-dark);
+  color: var(--logo-ink);
   text-decoration: none;
   overflow: visible;
 }
 
 .logoText {
   font-family: var(--font-display);
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: -0.043em;
   line-height: 1;
-  color: var(--logo-dark);
+  color: var(--logo-ink);
 }
 
 .logoRoute {
   position: absolute;
   left: 0;
-  /* Lower overlay so the breve sits tight over «и». */
-  top: -22%;
+  /* Overlay so the solid й-кратка sits just above «и» as the diacritic. */
+  top: -28%;
   width: 100%;
   height: auto;
   overflow: visible;
   pointer-events: none;
+  z-index: 1;
 }
 
+/*
+ * Solid first dash (й-кратка). non-scaling-stroke keeps ~2.4px on screen at
+ * header size so the breve does not collapse to an invisible fleck.
+ */
+.breve {
+  fill: none;
+  stroke: var(--logo-blue);
+  stroke-width: 2.4px;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  opacity: 1;
+}
+
+/*
+ * Dashed continuation. dashoffset 0 = first dash paints AT the breve tip.
+ * Same non-scaling stroke so punctir stays readable in the header.
+ */
 .route {
   fill: none;
   stroke: var(--logo-blue);
-  stroke-width: 3.5;
+  stroke-width: 2px;
   stroke-linecap: round;
-  stroke-dasharray: 8 11;
+  stroke-linejoin: round;
+  stroke-dasharray: 7px 6px;
+  stroke-dashoffset: 0;
+  vector-effect: non-scaling-stroke;
   opacity: 1;
 }
 
@@ -43,16 +65,12 @@
   opacity: 1;
 }
 
-/* Breve over «и»: brand dark; mid point stays blue circle. */
-.point1 {
-  fill: var(--logo-dark);
-}
-
 /* Destination: blue X (not a circle). */
 .point3 {
   fill: none;
   stroke: var(--logo-blue);
-  stroke-width: 3.5;
+  stroke-width: 2.2px;
   stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
   opacity: 1;
 }

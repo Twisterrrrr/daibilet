@@ -197,7 +197,7 @@ export function CityDayPresetBlock({
           </>
         )}
         <div
-          className={`${embedded || hubMagazine ? '' : 'mt-4 '}horizontal-snap-row flex snap-x snap-mandatory gap-3 overflow-x-auto pb-0.5`}
+          className={`${embedded || hubMagazine ? '' : 'mt-4 '}horizontal-snap-row flex snap-x snap-mandatory gap-3 overflow-x-auto px-1.5 pt-1.5 pb-2`}
           data-day-preset-chips
         >
           {Array.from({ length: skeletonCount }, (_, index) => (
@@ -341,7 +341,7 @@ export function CityDayPresetBlock({
           <p className={`mb-4 max-w-2xl text-sm leading-6 ${softClass}`}>{namedLead}</p>
         ) : null}
         <div
-          className={`${embedded || hubMagazine ? '' : 'mt-4 '}horizontal-snap-row flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain pb-1`}
+          className={`${embedded || hubMagazine ? '' : 'mt-4 '}horizontal-snap-row -mx-1.5 flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain px-1.5 pt-1.5 pb-2`}
           role="tablist"
           aria-label="Готовые сценарии дня"
           data-day-preset-chips

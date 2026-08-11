@@ -23,7 +23,7 @@ export type DayTripCanonCardProps = {
   /** Subtitle under title (vector / timingNote / description). */
   subtitle?: string;
   logisticsExit?: string;
-  /** Label before logisticsExit (default «Где выходить»). */
+  /** Label before logisticsExit. Empty → «Где выходить» if exit set, else «Логистика». */
   logisticsExitLabel?: string;
   logisticsText?: string;
   /** Extra prose under logistics (hub blurb). */
@@ -119,7 +119,7 @@ export function DayTripCanonCard({
   title,
   subtitle,
   logisticsExit,
-  logisticsExitLabel = 'Где выходить',
+  logisticsExitLabel,
   logisticsText,
   logisticsExtra,
   gastro,
@@ -175,7 +175,16 @@ export function DayTripCanonCard({
 
   const cover = String(heroImageUrl || '').trim() || null;
   const leadText = String(lead || '').trim();
-  const logisticsOneLiner = [logisticsExit, logisticsText].filter(Boolean).join(' · ');
+  const subtitleText = String(subtitle || '').trim();
+  // Dedupe when seed/UI pass the same blurb as both subtitle and lead.
+  const leadDistinct =
+    leadText && (!subtitleText || leadText !== subtitleText) ? leadText : '';
+  const exitHint = String(logisticsExit || '').trim();
+  const logisticsCopy = String(logisticsText || '').trim();
+  const logisticsOneLiner = [exitHint, logisticsCopy].filter(Boolean).join(' · ');
+  const resolvedExitLabel =
+    String(logisticsExitLabel || '').trim() ||
+    (exitHint ? 'Где выходить' : 'Логистика');
 
   if (magazine) {
     return (
@@ -241,22 +250,22 @@ export function DayTripCanonCard({
                   >
                     {title}
                   </h3>
-                  {subtitle ? (
+                  {subtitleText ? (
                     <p className={`mt-1 text-sm leading-snug ${softClass}`} data-day-trip-subtitle>
-                      {subtitle}
+                      {subtitleText}
                     </p>
                   ) : null}
                 </div>
               </div>
-              {leadText ? (
+              {leadDistinct ? (
                 <p className={`mt-2 text-sm leading-relaxed ${softClass}`} data-day-trip-lead>
-                  {leadText}
+                  {leadDistinct}
                 </p>
               ) : null}
               {titleExtra ? <div className="mt-1.5">{titleExtra}</div> : null}
               {logisticsOneLiner ? (
                 <p className={`mt-2 text-xs leading-snug ${mutedClass}`} data-day-trip-logistics-line>
-                  {logisticsExitLabel}: {logisticsOneLiner}
+                  {resolvedExitLabel}: {logisticsOneLiner}
                 </p>
               ) : null}
             </header>
@@ -363,7 +372,7 @@ export function DayTripCanonCard({
                 >
                   {logisticsExit ? (
                     <p className={`text-sm leading-snug ${softClass}`} data-day-trip-exit>
-                      <span className={`font-semibold ${inkClass}`}>{logisticsExitLabel}</span>
+                      <span className={`font-semibold ${inkClass}`}>{resolvedExitLabel}</span>
                       <span className={mutedClass}>: {logisticsExit}</span>
                     </p>
                   ) : null}

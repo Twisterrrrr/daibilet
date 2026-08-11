@@ -51,6 +51,35 @@ function suburbVectorTitle(place: CitySuburbItem): string {
     : '';
 }
 
+/** Avoid rendering the same blurb twice when seed copied desc into travelVector. */
+function suburbTitleLines(
+  place: CitySuburbItem,
+  compact: boolean,
+): { subtitle?: string; lead?: string } {
+  const desc = String(place.desc || '').trim();
+  const vectorRaw = String(place.travelVector || '').trim();
+  const vectorDistinct = Boolean(vectorRaw && vectorRaw !== desc);
+  const vectorTitle = vectorDistinct ? suburbVectorTitle(place) : '';
+
+  if (compact) {
+    return {
+      subtitle: vectorTitle || undefined,
+      lead: desc || undefined,
+    };
+  }
+
+  return {
+    subtitle: (vectorTitle || desc) || undefined,
+  };
+}
+
+function suburbExitLabel(place: CitySuburbItem, hasExit: boolean): string | undefined {
+  const custom = String(place.logisticsExitLabel || '').trim();
+  if (custom) return custom;
+  // «Где выходить» only for boarding/station exit; otherwise general logistics.
+  return hasExit ? 'Где выходить' : 'Логистика';
+}
+
 function suburbHeroImage(
   place: CitySuburbItem,
   venues: DayRouteVenueMatchSource[],
@@ -208,6 +237,9 @@ export function SuburbsCarousel({
     ) : (
       place.name
     );
+    const titleLines = suburbTitleLines(place, compact);
+    const logisticsExit =
+      String(place.logisticsExit || place.stationName || '').trim() || undefined;
 
     return (
       <DayTripCanonCard
@@ -218,11 +250,11 @@ export function SuburbsCarousel({
         editorial={editorial}
         magazine={compact}
         heroImageUrl={heroImageUrl}
-        lead={compact ? String(place.desc || '').trim() || undefined : undefined}
+        lead={titleLines.lead}
         title={titleNode}
-        subtitle={suburbVectorTitle(place) || undefined}
-        logisticsExit={String(place.logisticsExit || place.stationName || '').trim() || undefined}
-        logisticsExitLabel={String(place.logisticsExitLabel || '').trim() || undefined}
+        subtitle={titleLines.subtitle}
+        logisticsExit={logisticsExit}
+        logisticsExitLabel={suburbExitLabel(place, Boolean(logisticsExit))}
         logisticsText={String(place.travelVectorBlurb || '').trim() || undefined}
         logisticsExtra={
           [String(place.timingNote || '').trim(), blurb].filter(Boolean).join(' ') || undefined

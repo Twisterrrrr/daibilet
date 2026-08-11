@@ -4912,7 +4912,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         venueSlug: 'muzej-hohlovka',
         latitude: 58.26186,
         longitude: 56.26314,
-        travelVector: 'Архитектурно-этнографический музей на Каме - деревянное зодчество Прикамья.',
+        travelVector: 'Камский / Ильинский вектор',
         travelVectorBlurb:
           'Закладывайте на автобус ~1 час, чтобы приехать к 9 утра.',
         timingNote:
@@ -4934,7 +4934,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         locationSlug: 'perm-kungur',
         latitude: 57.4333,
         longitude: 56.95,
-        travelVector: 'Город купечества и ледяной пещеры в 90 км от Перми.',
+        travelVector: 'Юго-восточный / Кунгурский вектор',
         travelVectorBlurb:
           'Пешком по центру Кунгура, затем на авто к ледяной пещере, на обратном пути - Вязовская пряничная.',
         places: [
@@ -4955,7 +4955,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         locationSlug: 'perm-belaya-gora',
         latitude: 57.39202,
         longitude: 56.229,
-        travelVector: 'Белогорский монастырь, Царский крест, купель у горы и водопад Плакун за один день.',
+        travelVector: 'Южный / Суксунский вектор',
         travelVectorBlurb:
           'Трасса Р-242 / Суксун: монастырь - Царский крест - купель/источник у горы - Плакун. Не совмещать с камнем Ермак за один день - крюк под 100 км.',
         places: [
@@ -4972,8 +4972,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         locationSlug: 'perm-gubakha-usva',
         latitude: 58.723,
         longitude: 57.633,
-        travelVector:
-          'Горнозаводской край на 2 дня: Усьвинские столбы и «Сердце Пармы», затем Каменный город и гора Крестовая.',
+        travelVector: 'Горнозаводской / Чусовской вектор',
         travelVectorBlurb:
           'День 1 - Усьва (столбы, смотровая, Загубашка); день 2 - Губаха (Каменный город, пещера Российская, Крестовая на закат). Полюд (~250 км) с этой поездкой не совмещать.',
         places: [
