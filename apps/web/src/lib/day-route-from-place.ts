@@ -133,7 +133,7 @@ function pickPlaceSlug(place: CityPlaceLinkFields): string | null {
 }
 
 function findVenueForPlace(
-  place: CityPlaceLinkFields & { name?: string },
+  place: CityPlaceLinkFields & { name?: string; address?: string; desc?: string },
   venues: DayRouteVenueMatchSource[],
 ): DayRouteVenueMatchSource | null {
   const slug = pickPlaceSlug(place);
@@ -146,7 +146,35 @@ function findVenueForPlace(
   }
   const placeName = String(place.name || '').trim();
   if (!placeName || !venues.length) return null;
-  return venues.find((venue) => namesLooselyMatch(placeName, venue.title || venue.name)) || null;
+  const placeBlob = `${placeName} ${place.address || ''} ${place.desc || ''}`.toLowerCase();
+  const wantsKronstadt = /кронштадт|якорн/.test(placeBlob);
+  return (
+    venues.find((venue) => {
+      if (!namesLooselyMatch(placeName, venue.title || venue.name)) return false;
+      // Central «Никольский морской / Богоявленский» must not glue to Kronstadt (Якорная).
+      if (!wantsKronstadt && isKronstadtNavalCathedralVenue(venue)) return false;
+      return true;
+    }) || null
+  );
+}
+
+function isKronstadtNavalCathedralVenue(
+  venue: Pick<DayRouteVenueMatchSource, 'slug' | 'name' | 'title' | 'address' | 'latitude' | 'longitude'>,
+): boolean {
+  const slug = String(venue.slug || '').trim().toLowerCase();
+  if (slug === 'saint-petersburg-morskoy-nikolskiy-sobor') return true;
+  const address = String(venue.address || '').toLowerCase();
+  if (address.includes('якорн') || address.includes('кронштадт')) {
+    const title = String(venue.title || venue.name || '').toLowerCase();
+    if (title.includes('никол')) return true;
+  }
+  const lat = Number(venue.latitude);
+  const lng = Number(venue.longitude);
+  if (Number.isFinite(lat) && Number.isFinite(lng) && lat >= 59.97 && lng > 29.5 && lng < 30.05) {
+    const title = String(venue.title || venue.name || '').toLowerCase();
+    return title.includes('никол') && (title.includes('морск') || title.includes('собор'));
+  }
+  return false;
 }
 
 function coordsFromVenue(
@@ -164,13 +192,14 @@ function coordsFromPlace(
   matched: DayRouteVenueMatchSource | null,
   slug: string | null,
 ): Pick<DayRouteVenueItem, 'latitude' | 'longitude'> {
-  const fromVenue = coordsFromVenue(matched);
-  if (fromVenue.latitude != null && fromVenue.longitude != null) return fromVenue;
+  // Prefer explicit editorial place coords so a wrong hub twin cannot yank the pin to Kronstadt.
   const fromPlace = coordsFromVenue({
     latitude: place.latitude ?? null,
     longitude: place.longitude ?? null,
   });
   if (fromPlace.latitude != null && fromPlace.longitude != null) return fromPlace;
+  const fromVenue = coordsFromVenue(matched);
+  if (fromVenue.latitude != null && fromVenue.longitude != null) return fromVenue;
   return coordsFromVenue(lookupEditorialPlaceCoords(slug));
 }
 
@@ -212,6 +241,15 @@ export function dayRouteItemFromMustSee(
   // Hub often stores dark /venues/generated stubs; curated /images/venues/{city}/ wins.
   const imageUrl = resolveVenueHeroImage(slug, matched?.heroImageUrl);
   const transitTip = String(place.transitTip || '').trim() || null;
+  const placeAddress = String(place.address || '').trim();
+  const matchedAddress = String(matched?.address || '').trim();
+  // Prefer editorial address when hub twin still carries Kronstadt crumbs.
+  const address =
+    placeAddress ||
+    (matched && isKronstadtNavalCathedralVenue(matched) && !/кронштадт|якорн/i.test(`${place.name} ${place.desc || ''}`)
+      ? ''
+      : matchedAddress) ||
+    null;
   return {
     id,
     slug,
@@ -222,7 +260,7 @@ export function dayRouteItemFromMustSee(
     isSuburb: options.isSuburb || undefined,
     href,
     imageUrl,
-    address: String(matched?.address || place.address || '').trim() || null,
+    address,
     transitTip,
     ...coordsFromPlace(place, matched, slug),
   };

@@ -70,16 +70,26 @@ export function dayRoutePointsWord(count: number): string {
   return 'точек';
 }
 
+/** Genitive after «из»: 1 точки / 2-4 точек / 5+ точек (и 21 точки). */
+export function dayRoutePointsWordGenitive(count: number): string {
+  const abs = Math.abs(count) % 100;
+  const last = abs % 10;
+  if (abs > 10 && abs < 20) return 'точек';
+  if (last === 1) return 'точки';
+  return 'точек';
+}
+
 /**
- * Flat list heading: stop count, not «route #N».
- * Aligns with header «N точек из 10» without implying multiple saved routes.
+ * Flat list heading: «Маршрут из N точек» (род. падеж после «из»).
+ * Soft/hard density hints stay as a short suffix when relevant.
  */
 export function formatDayRouteStopsHeading(count: number): string {
   const n = Math.max(0, count);
-  const word = dayRoutePointsWord(n);
-  if (isDayRouteAtHard(n)) return `${n} ${word} · лимит`;
-  if (isDayRouteAtSoft(n)) return `${n} ${word} · плотный день`;
-  return `${n} ${word}`;
+  const word = dayRoutePointsWordGenitive(n);
+  const base = `Маршрут из ${n} ${word}`;
+  if (isDayRouteAtHard(n)) return `${base} · лимит`;
+  if (isDayRouteAtSoft(n)) return `${base} · плотный день`;
+  return base;
 }
 
 export type DayRouteCoords = { latitude: number; longitude: number };
@@ -137,7 +147,10 @@ export function formatDayRouteTransitTipLine(raw: string | null | undefined): st
 
 /** Synthetic planner stops (typed on /my-day) - no catalog venue id required. */
 export const DAY_ROUTE_TEXT_ID_PREFIX = 'text_';
+/** Between-stop planner notes (editable body, no coords / map pin). */
+export const DAY_ROUTE_NOTE_ID_PREFIX = 'note_';
 export const DAY_ROUTE_SHARE_TEXT_PREFIX = 't:';
+export const DAY_ROUTE_SHARE_NOTE_PREFIX = 'n:';
 /** Share token meta: `@e:{eventSlug|eventId}` after venue locator. */
 export const DAY_ROUTE_SHARE_EVENT_PREFIX = 'e:';
 
@@ -165,20 +178,48 @@ export function isTextDayRouteStop(
   return id.startsWith(DAY_ROUTE_TEXT_ID_PREFIX);
 }
 
+export function isNoteDayRouteStop(
+  item: Pick<DayRouteVenueItem, 'id'> | string | null | undefined,
+): boolean {
+  const id = typeof item === 'string' ? item : String(item?.id || '');
+  return id.startsWith(DAY_ROUTE_NOTE_ID_PREFIX);
+}
+
+/** Text place or between-stop note - not a catalog venue. */
+export function isSyntheticDayRouteStop(
+  item: Pick<DayRouteVenueItem, 'id'> | string | null | undefined,
+): boolean {
+  return isTextDayRouteStop(item) || isNoteDayRouteStop(item);
+}
+
 /** Ids safe to send to /api/day-route/matches (catalog venues only). */
 export function catalogDayRouteVenueIds(venues: DayRouteVenueItem[]): string[] {
   return venues
     .map((v) => String(v.id || '').trim())
-    .filter((id) => id && !isTextDayRouteStop(id) && !id.startsWith(DAY_ROUTE_SHARE_TEXT_PREFIX));
+    .filter(
+      (id) =>
+        id &&
+        !isSyntheticDayRouteStop(id) &&
+        !id.startsWith(DAY_ROUTE_SHARE_TEXT_PREFIX) &&
+        !id.startsWith(DAY_ROUTE_SHARE_NOTE_PREFIX),
+    );
 }
 
-export function createTextDayRouteStopId(): string {
+function createSyntheticDayRouteStopId(prefix: string): string {
   const rand =
     typeof globalThis.crypto !== 'undefined' &&
     typeof globalThis.crypto.randomUUID === 'function'
       ? globalThis.crypto.randomUUID().replace(/-/g, '').slice(0, 16)
       : `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`;
-  return `${DAY_ROUTE_TEXT_ID_PREFIX}${rand}`;
+  return `${prefix}${rand}`;
+}
+
+export function createTextDayRouteStopId(): string {
+  return createSyntheticDayRouteStopId(DAY_ROUTE_TEXT_ID_PREFIX);
+}
+
+export function createNoteDayRouteStopId(): string {
+  return createSyntheticDayRouteStopId(DAY_ROUTE_NOTE_ID_PREFIX);
 }
 
 /**
@@ -253,8 +294,47 @@ export function addTextStopToDayRoute(input: TextDayRouteStopInput): DayRouteSta
     longitude: coords?.longitude ?? null,
   };
 
+  return insertDayRouteVenueItem(current, item, input.afterVenueId, cityId);
+}
+
+export type NoteDayRouteStopInput = {
+  /** Note body (also stored as title for compact share/list). */
+  body: string;
+  afterVenueId?: string | null;
+};
+
+/**
+ * Insert an editable between-stop note into the day plan.
+ * Notes have no coords and do not appear on the map.
+ */
+export function addNoteStopToDayRoute(input: NoteDayRouteStopInput): DayRouteState {
+  const body = String(input.body || '').trim();
+  if (!body) return readDayRouteFresh();
+  const current = readDayRouteFresh();
+  if (current.venues.length >= DAY_ROUTE_MAX) return current;
+
+  const item: DayRouteVenueItem = {
+    id: createNoteDayRouteStopId(),
+    title: body,
+    note: body,
+    slug: null,
+    href: null,
+    imageUrl: null,
+    latitude: null,
+    longitude: null,
+  };
+
+  return insertDayRouteVenueItem(current, item, input.afterVenueId, null);
+}
+
+function insertDayRouteVenueItem(
+  current: DayRouteState,
+  item: DayRouteVenueItem,
+  afterVenueId?: string | null,
+  cityIdFallback?: string | null,
+): DayRouteState {
   const venues = [...current.venues];
-  const afterId = String(input.afterVenueId || '').trim();
+  const afterId = String(afterVenueId || '').trim();
   const afterIdx = afterId ? venues.findIndex((v) => v.id === afterId) : -1;
   if (afterIdx >= 0) {
     venues.splice(afterIdx + 1, 0, item);
@@ -263,11 +343,73 @@ export function addTextStopToDayRoute(input: TextDayRouteStopInput): DayRouteSta
   }
 
   const next: DayRouteState = {
-    // Keep prior cityId if set; text stops do not force a city switch.
-    cityId: current.cityId || cityId || null,
+    cityId: current.cityId || cityIdFallback || null,
     venues: venues.slice(0, DAY_ROUTE_MAX),
   };
   return writeDayRoute(next) ? readDayRouteFresh() : current;
+}
+
+/** Kryukov Naval Cathedral (Kolomna) - never Kronstadt / Якорная. */
+export const SPB_KRYUKOV_NIKOLSKY_SLUG = 'saint-petersburg-nikolo-bogoyavlenskiy-morskoy-sobor';
+export const SPB_KRONSTADT_NIKOLSKY_SLUG = 'saint-petersburg-morskoy-nikolskiy-sobor';
+export const SPB_KRYUKOV_NIKOLSKY_COORDS = { latitude: 59.9225, longitude: 30.3005 } as const;
+export const SPB_KRYUKOV_NIKOLSKY_ADDRESS = 'Никольская пл., 1/3';
+export const SPB_KRYUKOV_NIKOLSKY_TITLE = 'Николо-Богоявленский морской собор';
+
+function isKronstadtNikolskyCoords(lat: number, lng: number): boolean {
+  // Kotlin / Kronstadt bay: ~59.99 N, ~29.78 E (central Kryukov is ~59.92, 30.30).
+  return Number.isFinite(lat) && Number.isFinite(lng) && lat >= 59.97 && lng > 29.5 && lng < 30.05;
+}
+
+function looksLikeNikolskyNavalTitle(title: string): boolean {
+  const t = String(title || '')
+    .toLowerCase()
+    .replace(/ё/g, 'е');
+  if (!t.includes('никол')) return false;
+  return t.includes('морск') || t.includes('богоявлен');
+}
+
+/**
+ * Repair guest LS / old presets that bound «Никольский морской» to Kronstadt
+ * (Якорная пл.) instead of Kryukov Kolomna Nikolo-Bogoyavlensky.
+ */
+export function repairDayRouteKronstadtNikolskyStops(state: DayRouteState): DayRouteState {
+  if (!state.venues.length) return state;
+  let changed = false;
+  const venues = state.venues.map((item) => {
+    const slug = String(item.slug || item.id || '').trim();
+    const lat = Number(item.latitude);
+    const lng = Number(item.longitude);
+    const address = String(item.address || '').toLowerCase();
+    const titleLower = String(item.title || '').toLowerCase();
+    const kronstadtBound =
+      slug === SPB_KRONSTADT_NIKOLSKY_SLUG ||
+      address.includes('якорн') ||
+      address.includes('кронштадт') ||
+      isKronstadtNikolskyCoords(lat, lng);
+    if (!kronstadtBound) return item;
+    // Explicit suburb Kronstadt stop (title names Kronstadt, not Bogoyavlensky).
+    if (titleLower.includes('кронштадт') && !titleLower.includes('богоявлен')) return item;
+    if (!looksLikeNikolskyNavalTitle(item.title) && slug !== SPB_KRONSTADT_NIKOLSKY_SLUG) {
+      return item;
+    }
+
+    changed = true;
+    return {
+      ...item,
+      id: SPB_KRYUKOV_NIKOLSKY_SLUG,
+      slug: SPB_KRYUKOV_NIKOLSKY_SLUG,
+      title: SPB_KRYUKOV_NIKOLSKY_TITLE,
+      address: SPB_KRYUKOV_NIKOLSKY_ADDRESS,
+      latitude: SPB_KRYUKOV_NIKOLSKY_COORDS.latitude,
+      longitude: SPB_KRYUKOV_NIKOLSKY_COORDS.longitude,
+      imageUrl: '/images/venues/saint-petersburg/nikolo-bogoyavlenskiy-morskoy-sobor.jpg',
+    };
+  });
+  if (!changed) return state;
+  const next = { ...state, venues };
+  writeDayRoute(next);
+  return readDayRouteFresh();
 }
 
 export type DayRouteState = {
@@ -898,10 +1040,23 @@ export function isDayRouteShareTextToken(token: string): boolean {
     .startsWith(DAY_ROUTE_SHARE_TEXT_PREFIX);
 }
 
+export function isDayRouteShareNoteToken(token: string): boolean {
+  return String(token || '')
+    .trim()
+    .toLowerCase()
+    .startsWith(DAY_ROUTE_SHARE_NOTE_PREFIX);
+}
+
 export function dayRouteShareTextTitle(token: string): string {
   const raw = String(token || '').trim();
   if (!isDayRouteShareTextToken(raw)) return '';
   return raw.slice(DAY_ROUTE_SHARE_TEXT_PREFIX.length).trim();
+}
+
+export function dayRouteShareNoteBody(token: string): string {
+  const raw = String(token || '').trim();
+  if (!isDayRouteShareNoteToken(raw)) return '';
+  return raw.slice(DAY_ROUTE_SHARE_NOTE_PREFIX.length).trim();
 }
 
 /**
@@ -909,6 +1064,11 @@ export function dayRouteShareTextTitle(token: string): string {
  * Format: `{id}:{HHMM|free}` - event id preferred, else venue slug/id.
  */
 export function encodeDayRouteItemToken(venue: DayRouteVenueItem): string {
+  if (isNoteDayRouteStop(venue)) {
+    const body = (venue.note || venue.title || '').trim().replace(/[,|:]/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!body) return '';
+    return `${DAY_ROUTE_SHARE_NOTE_PREFIX}${body}:free`;
+  }
   if (isTextDayRouteStop(venue)) {
     // Text stops: keep stable local id (no catalog resolve); friend hydrates as text title.
     const title = venue.title.trim().replace(/[,|:]/g, ' ').replace(/\s+/g, ' ').trim();
@@ -976,6 +1136,7 @@ export type DayRouteItemToken = {
   id: string;
   time: string; // HHMM or free
   isText: boolean;
+  isNote: boolean;
   isFree: boolean;
 };
 
@@ -1000,12 +1161,16 @@ export function parseDayRouteItemsParam(raw: string | null | undefined): DayRout
       time = token.slice(colon + 1).trim() || 'free';
     }
     if (!id) continue;
-    const isText = isDayRouteShareTextToken(id) || id.toLowerCase().startsWith(DAY_ROUTE_SHARE_TEXT_PREFIX);
+    const isNote = isDayRouteShareNoteToken(id);
+    const isText =
+      !isNote &&
+      (isDayRouteShareTextToken(id) || id.toLowerCase().startsWith(DAY_ROUTE_SHARE_TEXT_PREFIX));
     const timeNorm = time.toLowerCase() === 'free' ? 'free' : time.replace(/\D/g, '').padStart(4, '0').slice(-4);
     out.push({
       id,
       time: timeNorm === 'free' || !/^\d{4}$/.test(timeNorm) ? 'free' : timeNorm,
       isText,
+      isNote,
       isFree: timeNorm === 'free' || !/^\d{4}$/.test(timeNorm),
     });
     if (out.length >= DAY_ROUTE_MAX) break;
@@ -1013,12 +1178,12 @@ export function parseDayRouteItemsParam(raw: string | null | undefined): DayRout
   return out;
 }
 
-/** Catalog locators from items tokens (skip text). */
+/** Catalog locators from items tokens (skip text/notes). */
 export function catalogLocatorsFromItemTokens(tokens: DayRouteItemToken[]): string[] {
   const out: string[] = [];
   const seen = new Set<string>();
   for (const token of tokens) {
-    if (token.isText) continue;
+    if (token.isText || token.isNote) continue;
     const id = token.id.trim();
     if (!id || seen.has(id)) continue;
     seen.add(id);
@@ -1033,6 +1198,9 @@ export function catalogLocatorsFromItemTokens(tokens: DayRouteItemToken[]): stri
  * Text: `t:Title`
  */
 export function encodeDayRouteShareToken(venue: DayRouteVenueItem): string {
+  if (isNoteDayRouteStop(venue)) {
+    return `${DAY_ROUTE_SHARE_NOTE_PREFIX}${(venue.note || venue.title || '').trim()}`;
+  }
   if (isTextDayRouteStop(venue)) {
     return `${DAY_ROUTE_SHARE_TEXT_PREFIX}${venue.title.trim()}`;
   }
@@ -1053,6 +1221,15 @@ export function parseDayRouteShareToken(token: string): DayRouteShareTokenMeta {
   const raw = String(token || '').trim();
   if (!raw) {
     return { locator: '', startsAt: null, eventSlug: null, eventId: null, isText: false };
+  }
+  if (isDayRouteShareNoteToken(raw)) {
+    return {
+      locator: raw,
+      startsAt: null,
+      eventSlug: null,
+      eventId: null,
+      isText: true,
+    };
   }
   if (isDayRouteShareTextToken(raw)) {
     return {
@@ -1200,6 +1377,21 @@ export function applyItemTokensToVenues(
   const ordered: DayRouteVenueItem[] = [];
 
   for (const token of tokens) {
+    if (token.isNote) {
+      const body = dayRouteShareNoteBody(token.id) || token.id.replace(/^n:/i, '').trim();
+      if (!body) continue;
+      ordered.push({
+        id: createNoteDayRouteStopId(),
+        title: body,
+        note: body,
+        slug: null,
+        href: null,
+        imageUrl: null,
+        latitude: null,
+        longitude: null,
+      });
+      continue;
+    }
     if (token.isText) {
       const title = dayRouteShareTextTitle(token.id) || token.id.replace(/^t:/i, '').trim();
       if (!title) continue;

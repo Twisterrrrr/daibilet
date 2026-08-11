@@ -60,6 +60,19 @@ const NIZHNY_NOVGOROD_COORDS: Record<string, EditorialPlaceCoords> = {
 
 const SAINT_PETERSBURG_COORDS: Record<string, EditorialPlaceCoords> = {
   'saint-petersburg-sobornaya-mechet': { latitude: 59.9552, longitude: 30.3239 },
+  // Berthold → New Holland walk (Kryukov Nikolo, not Kronstadt).
+  'saint-petersburg-bertgold-tsentr': { latitude: 59.9258, longitude: 30.3164 },
+  'saint-petersburg-naberezhnaya-kanala-griboedova': { latitude: 59.935111, longitude: 30.326814 },
+  'saint-petersburg-lvinyy-most': { latitude: 59.926944, longitude: 30.301111 },
+  'saint-petersburg-nikolo-bogoyavlenskiy-morskoy-sobor': { latitude: 59.9225, longitude: 30.3005 },
+  'saint-petersburg-semimoste': { latitude: 59.9275, longitude: 30.2958 },
+  'saint-petersburg-kolomna': { latitude: 59.9252, longitude: 30.2935 },
+  'saint-petersburg-kryukov-kanal': { latitude: 59.9268, longitude: 30.2952 },
+  'saint-petersburg-tsentralnyy-voenno-morskoy-muzey': { latitude: 59.929811, longitude: 30.294124 },
+  'saint-petersburg-poceluev-most': { latitude: 59.928889, longitude: 30.295833 },
+  'saint-petersburg-yusupovskiy-dvorets': { latitude: 59.929532, longitude: 30.303912 },
+  'saint-petersburg-novaya-gollandiya': { latitude: 59.929112, longitude: 30.289214 },
+  'saint-petersburg-spikizi-bar-el-copitas': { latitude: 59.927114, longitude: 30.347112 },
 };
 
 /** Perm fallback coords (cityInfo items also carry lat/lng for my-day). */

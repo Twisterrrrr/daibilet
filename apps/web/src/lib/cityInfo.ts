@@ -204,6 +204,7 @@ const spbPresetStop = (
     | 'longitude'
     | 'venueSlug'
     | 'locationSlug'
+    | 'address'
     | 'desc'
     | 'transitTip'
     | 'mustSeeFilter'
@@ -1105,47 +1106,81 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         stops: [
           spbPresetStop('Бертгольд-центр', {
             desc: 'Старт у Сенной/Садовой - кофе/крыша утром',
-            transitTip: 'Старт у Сенной / Садовой - Бертгольд утром'
+            transitTip: 'Старт у Сенной / Садовой - Бертгольд утром',
+            locationSlug: 'saint-petersburg-bertgold-tsentr',
+            latitude: 59.9258,
+            longitude: 30.3164,
           }),
           spbPresetStop('Набережная канала Грибоедова', {
-            desc: 'Канал к Львиному мосту'
+            desc: 'Канал к Львиному мосту',
+            locationSlug: 'saint-petersburg-naberezhnaya-kanala-griboedova',
+            latitude: 59.935111,
+            longitude: 30.326814,
           }),
           spbPresetStop('Львиный мост', {
-            desc: 'Мост на линии Грибоедова'
+            desc: 'Мост на линии Грибоедова',
+            locationSlug: 'saint-petersburg-lvinyy-most',
+            latitude: 59.926944,
+            longitude: 30.301111,
           }),
           spbPresetStop('Николо-Богоявленский морской собор', {
             desc: 'Никольский ансамбль у Крюкова канала / Никольской площади',
             locationSlug: 'saint-petersburg-nikolo-bogoyavlenskiy-morskoy-sobor',
+            address: 'Никольская пл., 1/3',
             latitude: 59.9225,
             longitude: 30.3005,
           }),
           spbPresetStop('Семимостье', {
             desc: 'Семь мостов у слияния каналов',
-            transitTip: 'Пикалов мост / Семимостье - ракурс на 7 мостов'
+            transitTip: 'Пикалов мост / Семимостье - ракурс на 7 мостов',
+            locationSlug: 'saint-petersburg-semimoste',
+            latitude: 59.9275,
+            longitude: 30.2958,
           }),
           spbPresetStop('Коломна', {
-            desc: 'Квартал между каналами'
+            desc: 'Квартал между каналами',
+            locationSlug: 'saint-petersburg-kolomna',
+            latitude: 59.9252,
+            longitude: 30.2935,
           }),
           spbPresetStop('Крюков канал', {
             desc: 'Канал мимо Мариинки',
-            transitTip: 'По Крюкову каналу мимо Мариинки'
+            transitTip: 'По Крюкову каналу мимо Мариинки',
+            locationSlug: 'saint-petersburg-kryukov-kanal',
+            latitude: 59.9268,
+            longitude: 30.2952,
           }),
           spbPresetStop('Центральный военно-морской музей', {
-            desc: 'ВММ на линии канала'
+            desc: 'ВММ на линии канала',
+            venueSlug: 'saint-petersburg-tsentralnyy-voenno-morskoy-muzey',
+            latitude: 59.929811,
+            longitude: 30.294124,
           }),
           spbPresetStop('Поцелуев мост', {
-            desc: 'К Юсуповскому'
+            desc: 'К Юсуповскому',
+            locationSlug: 'saint-petersburg-poceluev-most',
+            latitude: 59.928889,
+            longitude: 30.295833,
           }),
           spbPresetStop('Юсуповский дворец', {
             desc: 'Дворец; внутри лучше с аудиоэкскурсией',
-            transitTip: 'Внутри Юсуповского - аудиоэкскурсия'
+            transitTip: 'Внутри Юсуповского - аудиоэкскурсия',
+            locationSlug: 'saint-petersburg-yusupovskiy-dvorets',
+            latitude: 59.929532,
+            longitude: 30.303912,
           }),
           spbPresetStop('Новая Голландия (парк-остров)', {
-            desc: 'Закат / предвечерний отдых'
+            desc: 'Закат / предвечерний отдых',
+            locationSlug: 'saint-petersburg-novaya-gollandiya',
+            latitude: 59.929112,
+            longitude: 30.289214,
           }),
           spbPresetStop('Коктейльный бар «El Copitas»', {
             desc: 'Секретный двор у Владимирской',
-            transitTip: 'Такси ~15 мин к Владимирской ~20:00-21:00 - секретный двор'
+            transitTip: 'Такси ~15 мин к Владимирской ~20:00-21:00 - секретный двор',
+            locationSlug: 'saint-petersburg-spikizi-bar-el-copitas',
+            latitude: 59.927114,
+            longitude: 30.347112,
           }),
         ]
       },
@@ -5056,7 +5091,6 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         description: 'Архитектурно-этнографический музей на Каме - деревянное зодчество Прикамья.',
         timingNote:
           'По маршруту двигайтесь против часовой стрелки, напоследок оставив Усть-Боровский сользавод и смотровую площадку над заливом.',
-        travelVector: 'Архитектурно-этнографический музей на Каме - деревянное зодчество Прикамья.',
         travelVectorBlurb:
           'Закладывайте на автобус ~1 час, чтобы приехать к 9 утра.',
         stops: [

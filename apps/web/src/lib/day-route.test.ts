@@ -26,6 +26,7 @@ import {
   formatDayRouteSessionDisplay,
   formatDayRouteStartsAtLabel,
   formatDayRouteStopsHeading,
+  dayRoutePointsWordGenitive,
   isDayRouteSoftSessionLabel,
   isDayRouteAtHard,
   isDayRouteAtSoft,
@@ -117,9 +118,9 @@ test('buildDayRouteShortPath uses /d/{code}', () => {
 test('parseDayRouteItemsParam parses id:HHMM and free', () => {
   const tokens = parseDayRouteItemsParam('341:1400,892:free,115:1830');
   assert.equal(tokens.length, 3);
-  assert.deepEqual(tokens[0], { id: '341', time: '1400', isText: false, isFree: false });
-  assert.deepEqual(tokens[1], { id: '892', time: 'free', isText: false, isFree: true });
-  assert.deepEqual(tokens[2], { id: '115', time: '1830', isText: false, isFree: false });
+  assert.deepEqual(tokens[0], { id: '341', time: '1400', isText: false, isNote: false, isFree: false });
+  assert.deepEqual(tokens[1], { id: '892', time: 'free', isText: false, isNote: false, isFree: true });
+  assert.deepEqual(tokens[2], { id: '115', time: '1830', isText: false, isNote: false, isFree: false });
 });
 
 test('buildMaxShareUrl uses official max.ru/:share deep-link', () => {
@@ -730,11 +731,13 @@ test('soft guideline helpers: warn copy and count label without /MAX lock', () =
   assert.equal(formatDayRouteCountLabel(10), 'Точки · 10 · плотный день');
   assert.equal(formatDayRouteCountLabel(11, 'Маршрут'), 'Маршрут · 11 · плотный день');
   assert.equal(formatDayRouteCountLabel(15), 'Точки · 15/15');
-  assert.equal(formatDayRouteStopsHeading(1), '1 точка');
-  assert.equal(formatDayRouteStopsHeading(3), '3 точки');
-  assert.equal(formatDayRouteStopsHeading(5), '5 точек');
-  assert.equal(formatDayRouteStopsHeading(10), '10 точек · плотный день');
-  assert.equal(formatDayRouteStopsHeading(15), '15 точек · лимит');
+  assert.equal(formatDayRouteStopsHeading(1), 'Маршрут из 1 точки');
+  assert.equal(formatDayRouteStopsHeading(3), 'Маршрут из 3 точек');
+  assert.equal(formatDayRouteStopsHeading(5), 'Маршрут из 5 точек');
+  assert.equal(formatDayRouteStopsHeading(10), 'Маршрут из 10 точек · плотный день');
+  assert.equal(formatDayRouteStopsHeading(15), 'Маршрут из 15 точек · лимит');
+  assert.equal(dayRoutePointsWordGenitive(21), 'точки');
+  assert.equal(dayRoutePointsWordGenitive(22), 'точек');
   assert.match(DAY_ROUTE_SOFT_WARN, /плотный/);
   assert.doesNotMatch(DAY_ROUTE_SOFT_WARN, /[—–]/);
   assert.match(dayRouteHardLimitMessage(), /15/);

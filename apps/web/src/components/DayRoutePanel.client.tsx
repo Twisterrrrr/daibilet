@@ -12,7 +12,6 @@ import {
   ExternalLink,
   LayoutGrid,
   List,
-  ListChecks,
   MapPin,
   Navigation,
   PersonStanding,
@@ -68,6 +67,7 @@ import {
   DAY_ROUTE_MIN,
   DAY_ROUTE_SOFT,
   DAY_ROUTE_SOFT_WARN,
+  addNoteStopToDayRoute,
   addTextStopToDayRoute,
   addToDayRoute,
   applyItemTokensToVenues,
@@ -108,6 +108,7 @@ import {
   isDayRoutePlaceholderTitle,
   isDayRouteShareTextToken,
   isInDayRoute,
+  isNoteDayRouteStop,
   isTextDayRouteStop,
   lookupDayRouteCoords,
   moveDayRouteVenue,
@@ -119,6 +120,7 @@ import {
   readDayRouteFresh,
   removeFromDayRoute,
   reorderDayRoute,
+  repairDayRouteKronstadtNikolskyStops,
   resolveDayRouteTicketUrl,
   hydrateDayRouteFromShare,
   updateDayRouteVenue,
@@ -200,10 +202,10 @@ const SHOW_DAY_TICKET_HANDOFF_MODAL = false;
 
 /** Horizontal stop cards rail (Сетка): snap + peek next card, touch swipe. */
 const DAY_ROUTE_STOPS_GRID_RAIL =
-  'horizontal-snap-row flex w-full snap-x snap-mandatory flex-nowrap items-stretch gap-2.5 overflow-x-auto overscroll-x-contain touch-pan-x pb-1';
-/** Card width in Сетка carousel - peeks next stop (~home rails). */
+  'horizontal-snap-row flex w-full snap-x snap-mandatory flex-nowrap items-stretch gap-2.5 overflow-x-auto overscroll-x-contain touch-pan-x pb-0.5 [scrollbar-width:thin]';
+/** Card width in Сетка carousel - readable titles, light peek of next. */
 const DAY_ROUTE_STOPS_GRID_CARD =
-  'w-[min(72vw,17.5rem)] shrink-0 snap-start sm:w-[18rem] lg:w-[19rem]';
+  'w-[min(82vw,20rem)] shrink-0 snap-start sm:w-[20.5rem] lg:w-[21.5rem]';
 
 function readStopViewMode(): DayRouteStopViewMode {
   if (typeof window === 'undefined') return 'grid';
@@ -531,9 +533,9 @@ function DayRoutePanelInner() {
   useEffect(() => {
     const sync = () => {
       armScrollPreserve();
-      setRoute(readDayRoute());
+      setRoute(repairDayRouteKronstadtNikolskyStops(readDayRoute()));
     };
-    setRoute(readDayRoute());
+    setRoute(repairDayRouteKronstadtNikolskyStops(readDayRoute()));
     window.addEventListener(DAY_ROUTE_CHANGED_EVENT, sync);
     window.addEventListener('storage', sync);
     return () => {
@@ -2146,8 +2148,17 @@ function DayRoutePanelInner() {
       return;
     }
     setInsertAfterVenueId(afterVenueId);
-    flashDayRouteFeedback('Выберите место в поиске - вставим между точками');
     focusUnifiedSearch();
+  }
+
+  function openInsertNoteAfter(afterVenueId: string) {
+    setBetweenMenuAfterId(null);
+    if (atMax) {
+      flashDayRouteFeedback(dayRouteHardLimitMessage());
+      return;
+    }
+    setRoute(addNoteStopToDayRoute({ body: 'Заметка', afterVenueId }));
+    flashDayRouteFeedback('Заметка добавлена - отредактируйте текст');
   }
 
   function openTextForm() {
@@ -2582,46 +2593,43 @@ function DayRoutePanelInner() {
         data-day-unified-search
         data-day-header-search="1"
       >
-        <div className="min-w-0 w-full">
-          <DayRouteSearchSelect
-            label="Поиск"
-            hideLabel
-            placeholder={
-              insertAfterVenueId
-                ? 'Вставить место между точками…'
-                : 'Добавить место или событие'
-            }
-            emptyText={
-              !hasPageCity
-                ? 'Сначала выберите город'
-                : catalogLoading && unifiedSearchOptions.length === 0
-                  ? 'Загружаем…'
-                  : catalogError || 'Ничего не найдено'
-            }
-            loading={hasPageCity && catalogLoading && unifiedSearchOptions.length === 0}
-            disabled={!hasPageCity || atMax}
-            options={hasPageCity ? unifiedSearchOptions : []}
-            onPick={pickUnifiedSearch}
-            onQueryChange={setUnifiedSearchQuery}
-            onCreateCustom={hasPageCity ? createCustomFromSearch : undefined}
-            createCustomDisabled={atMax}
-          />
+        <div className="flex min-w-0 w-full items-start gap-2">
+          <div className="min-w-0 flex-1">
+            <DayRouteSearchSelect
+              label="Поиск"
+              hideLabel
+              placeholder={
+                insertAfterVenueId
+                  ? 'Вставить между точками…'
+                  : 'Добавить место или событие'
+              }
+              emptyText={
+                !hasPageCity
+                  ? 'Сначала выберите город'
+                  : catalogLoading && unifiedSearchOptions.length === 0
+                    ? 'Загружаем…'
+                    : catalogError || 'Ничего не найдено'
+              }
+              loading={hasPageCity && catalogLoading && unifiedSearchOptions.length === 0}
+              disabled={!hasPageCity || atMax}
+              options={hasPageCity ? unifiedSearchOptions : []}
+              onPick={pickUnifiedSearch}
+              onQueryChange={setUnifiedSearchQuery}
+              onCreateCustom={hasPageCity ? createCustomFromSearch : undefined}
+              createCustomDisabled={atMax}
+            />
+          </div>
           {insertAfterVenueId ? (
-            <p
-              className="mt-1.5 mb-0 flex items-center justify-between gap-2 pl-1 text-left text-xs font-medium text-sky-700"
-              data-day-insert-after-hint
-              role="status"
+            <button
+              type="button"
+              data-day-insert-after-cancel
+              className="mt-0.5 inline-flex min-h-10 shrink-0 items-center rounded-xl px-2.5 text-xs font-semibold text-slate-500 transition hover:bg-slate-100 hover:text-slate-800"
+              onClick={() => setInsertAfterVenueId(null)}
             >
-              <span>Вставка между точками маршрута</span>
-              <button
-                type="button"
-                className="shrink-0 underline-offset-2 hover:underline"
-                onClick={() => setInsertAfterVenueId(null)}
-              >
-                Отмена
-              </button>
-            </p>
+              Отмена
+            </button>
           ) : null}
+        </div>
           {hasPageCity && catalogError ? (
             <p className="mt-1 mb-0 text-xs font-medium text-rose-700" role="status">
               {catalogError}
@@ -3093,19 +3101,13 @@ function DayRoutePanelInner() {
           <div className="flex min-w-0 items-center justify-between gap-2">
             <div className="flex min-w-0 flex-wrap items-center gap-2">
               <h2
-                className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5 text-sm"
+                className="text-sm font-semibold text-slate-800"
                 data-day-route-count-heading
-                aria-label={`Маршрут: ${formatDayRouteStopsHeading(route.venues.length)}`}
+                aria-label={formatDayRouteStopsHeading(route.venues.length)}
               >
-                <span className="font-semibold text-slate-800">Маршрут</span>
-                <span className="text-slate-300" aria-hidden>
-                  ·
-                </span>
-                <span className="font-medium text-slate-600">
-                  {formatDayRouteStopsHeading(route.venues.length)}
-                </span>
+                {formatDayRouteStopsHeading(route.venues.length)}
                 {hourPlan?.totalLabel ? (
-                  <span className="font-medium text-slate-500" data-day-hour-total>
+                  <span className="ml-1.5 font-medium text-slate-500" data-day-hour-total>
                     {hourPlan.totalLabel}
                   </span>
                 ) : null}
@@ -3391,9 +3393,17 @@ function DayRoutePanelInner() {
                         setTicketHandoff({ venueId: venue.id, ticketUrl, title: venue.title })
                       }
                       onShowTicket={() => openTicketView(venue)}
-                      onSetNote={(note) =>
-                        setRoute(updateDayRouteVenue(venue.id, { note: note || null }))
-                      }
+                      onSetNote={(note) => {
+                        const body = String(note || '').trim();
+                        setRoute(
+                          updateDayRouteVenue(
+                            venue.id,
+                            isNoteDayRouteStop(venue)
+                              ? { note: body || 'Заметка', title: body || 'Заметка' }
+                              : { note: body || null },
+                          ),
+                        );
+                      }}
                     />
                     {listMode && index < planStops.length - 1 ? (
                       <DayRouteBetweenInsert
@@ -3408,14 +3418,7 @@ function DayRoutePanelInner() {
                         transitTip={betweenTip}
                         disabled={atMax}
                         onAddPlace={() => openInsertPlaceAfter(venue.id)}
-                        onAddNote={() => {
-                          setBetweenMenuAfterId(null);
-                          flashDayRouteFeedback('Скоро');
-                        }}
-                        onAddList={() => {
-                          setBetweenMenuAfterId(null);
-                          flashDayRouteFeedback('Скоро');
-                        }}
+                        onAddNote={() => openInsertNoteAfter(venue.id)}
                       />
                     ) : null}
                     {primaryFreeWindow &&
@@ -3433,7 +3436,7 @@ function DayRoutePanelInner() {
                         data-day-free-window-upsell
                         data-day-free-window
                       >
-                        <div className="relative rounded-2xl border border-dashed border-sky-200 bg-sky-50/60 p-3 sm:p-4">
+                        <div className="relative rounded-2xl border border-dashed border-sky-200 bg-sky-50/50 p-3">
                           <button
                             type="button"
                             onClick={() => setFreeWindowDismissed(true)}
@@ -3448,21 +3451,21 @@ function DayRoutePanelInner() {
                             Между точками около {formatDayRouteDistance(primaryFreeWindow.meters)} - можно добавить ещё
                             одну остановку.
                           </p>
-                          <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                          <div className="mt-3 flex flex-col gap-2">
                             {freeWindowUpsells.map((pick) => (
                               <button
                                 key={pick.key}
                                 type="button"
                                 onClick={() => addMustSeeItem(pick.item)}
-                                className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white p-2 text-left transition duration-200 hover:border-emerald-300 hover:bg-emerald-50/40"
+                                className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white p-2 text-left transition duration-200 hover:border-emerald-300 hover:bg-emerald-50/40"
                               >
-                                <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-slate-100">
+                                <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-lg bg-slate-100">
                                   {pick.item.imageUrl ? (
                                     <SafeImage
                                       src={pick.item.imageUrl}
                                       alt=""
                                       fill
-                                      sizes="3rem"
+                                      sizes="2.75rem"
                                       className="object-cover"
                                     />
                                   ) : (
@@ -3471,11 +3474,11 @@ function DayRoutePanelInner() {
                                     </div>
                                   )}
                                 </div>
-                                <span className="min-w-0">
+                                <span className="min-w-0 flex-1">
                                   <span className="block text-[10px] font-semibold uppercase tracking-wide text-slate-500">
                                     {pick.badge}
                                   </span>
-                                  <span className="mt-0.5 line-clamp-1 text-xs font-semibold text-slate-900">
+                                  <span className="mt-0.5 block text-xs font-semibold leading-snug text-slate-900">
                                     {pick.item.title}
                                   </span>
                                 </span>
@@ -4646,7 +4649,7 @@ function DayRouteListPin({ n }: { n: number }) {
 
 /**
  * Between list stops: dashed pin connector + walk stats + «Маршруты» switcher,
- * hover/tap circular «+» insert menu (place / note / list).
+ * hover/tap circular «+» insert menu (place / note).
  */
 function DayRouteBetweenInsert({
   afterVenueId,
@@ -4659,7 +4662,6 @@ function DayRouteBetweenInsert({
   disabled = false,
   onAddPlace,
   onAddNote,
-  onAddList,
 }: {
   afterVenueId: string;
   menuOpen: boolean;
@@ -4671,7 +4673,6 @@ function DayRouteBetweenInsert({
   disabled?: boolean;
   onAddPlace: () => void;
   onAddNote: () => void;
-  onAddList: () => void;
 }) {
   const rootRef = useRef<HTMLLIElement | null>(null);
   const [routesOpen, setRoutesOpen] = useState(false);
@@ -4773,16 +4774,6 @@ function DayRouteBetweenInsert({
                 >
                   <StickyNote className="h-4 w-4 shrink-0 text-slate-500" aria-hidden />
                   Добавить заметку
-                </button>
-                <button
-                  type="button"
-                  role="menuitem"
-                  data-day-between-add-list
-                  onClick={onAddList}
-                  className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-sm font-medium text-slate-800 hover:bg-slate-50"
-                >
-                  <ListChecks className="h-4 w-4 shrink-0 text-slate-500" aria-hidden />
-                  Добавить список
                 </button>
               </div>
             ) : null}
@@ -4936,6 +4927,7 @@ function DayRouteVenueCard({
   void onToggleBought;
   void onShowTicket;
   const textStop = isTextDayRouteStop(venue);
+  const noteStop = isNoteDayRouteStop(venue);
   const purchased = group === 'purchased' || Boolean(venue.ticketBought);
   const reorderLocked = purchased || group === 'overflow' || dayRouteStopReorderLocked(venue);
   const isCommerce = purchased || dayRouteStopIsCommerce(venue);
@@ -5097,6 +5089,60 @@ function DayRouteVenueCard({
       </div>
     ) : null;
 
+  if (noteStop) {
+    const noteBody = String(venue.note || venue.title || '').trim();
+    return (
+      <li
+        className={`relative w-full scroll-mt-4 list-none ${
+          variant === 'grid' ? DAY_ROUTE_STOPS_GRID_CARD : ''
+        } ${dragging ? 'opacity-60' : ''}`}
+        data-day-plan-stop={venue.id}
+        data-day-stop-variant={variant}
+        data-day-stop-kind="note"
+        data-day-stop-focused={focused ? '1' : undefined}
+      >
+        <div
+          className={`flex items-start gap-2 rounded-xl border border-amber-200/80 bg-amber-50/70 px-2.5 py-2 ${
+            focused ? 'ring-2 ring-amber-300 ring-offset-1' : ''
+          }`}
+          data-day-stop-shell="note"
+        >
+          <StickyNote className="mt-1 h-4 w-4 shrink-0 text-amber-700" aria-hidden />
+          <label className="min-w-0 flex-1">
+            <span className="sr-only">Заметка</span>
+            <textarea
+              value={noteBody}
+              rows={2}
+              data-day-stop-note-input
+              onChange={(e) => {
+                const next = e.target.value;
+                onSetNote(next);
+                // Keep title in sync for share/list headings.
+                if (next.trim() !== String(venue.title || '').trim()) {
+                  // title updated via dedicated patch below in parent if needed
+                }
+              }}
+              onBlur={(e) => {
+                const next = e.target.value.trim() || 'Заметка';
+                onSetNote(next);
+              }}
+              className="min-h-[2.5rem] w-full resize-y rounded-md border border-amber-100 bg-white/80 px-2 py-1.5 text-sm leading-snug text-slate-800 outline-none focus:border-amber-300 focus:ring-1 focus:ring-amber-200"
+              placeholder="Текст заметки"
+            />
+          </label>
+          <button
+            type="button"
+            aria-label="Удалить заметку"
+            onClick={onRemove}
+            className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-slate-400 hover:bg-white/80 hover:text-slate-700"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      </li>
+    );
+  }
+
   if (variant === 'list') {
     const pinNumber = displayNumber ?? index + 1;
     const canDrag = Boolean(onDragStart) && !reorderLocked;
@@ -5129,7 +5175,7 @@ function DayRouteVenueCard({
         onDragEnd={canDrag ? onDragEnd : undefined}
       >
         <div
-          className={`relative flex items-stretch gap-2.5 rounded-xl bg-slate-100/95 p-2.5 pl-2 sm:gap-3 sm:p-3 ${
+          className={`relative flex w-full items-start justify-start gap-2 rounded-xl bg-slate-100/95 p-2.5 pl-2 sm:gap-2.5 sm:p-3 ${
             focused ? 'ring-2 ring-emerald-300 ring-offset-1' : ''
           } ${purchased ? 'border-l-4 border-primary-600' : ''} ${
             canDrag ? 'cursor-grab active:cursor-grabbing' : ''
@@ -5171,7 +5217,7 @@ function DayRouteVenueCard({
             <DayRouteListPin n={pinNumber} />
           </div>
 
-          <div className="min-w-0 flex-1 self-center py-0.5">
+          <div className="min-w-0 max-w-[min(100%,18rem)] self-center py-0.5 sm:max-w-xs lg:max-w-sm">
             {softTimeNode}
             {purchased ? (
               <p className="m-0 text-[11px] font-bold uppercase tracking-wide text-primary-700">
@@ -5235,7 +5281,7 @@ function DayRouteVenueCard({
             {commerceRail ? <div className="mt-2">{commerceRail}</div> : null}
           </div>
 
-          <div className="flex shrink-0 flex-col items-end gap-1">
+          <div className="ml-0 flex shrink-0 flex-col items-end gap-1">
             <div className="flex items-center gap-0.5">
               {mapsUrl ? (
                 <a
@@ -5369,13 +5415,13 @@ function DayRouteVenueCard({
                 ) : null}
               </div>
             ) : null}
-            <p className="truncate text-sm font-semibold leading-snug text-slate-900">
+            <p className="line-clamp-2 text-sm font-semibold leading-snug text-slate-900">
               {titleNode}
               {suburbBadge}
             </p>
             {placeLine || !hasCoords ? (
               <p
-                className={`mt-0.5 mb-0 line-clamp-1 text-xs leading-snug ${
+                className={`mt-0.5 mb-0 line-clamp-2 text-xs leading-snug ${
                   !hasCoords && !placeLine ? 'font-medium text-amber-700' : 'text-slate-500'
                 }`}
               >
@@ -5383,6 +5429,7 @@ function DayRouteVenueCard({
                 {placeLine && !hasCoords ? ' · Нет координат' : ''}
               </p>
             ) : null}
+            {/* Segment distance/time lives in between-leg row in list; in grid show once as text line only. */}
             {segmentLine ? (
               <p
                 className="mt-0.5 mb-0 line-clamp-2 text-[11px] leading-snug text-slate-500"
@@ -5392,24 +5439,11 @@ function DayRouteVenueCard({
               </p>
             ) : null}
 
-            {segmentTimeLabel || segmentDistanceLabel || sessionDisplay ? (
+            {sessionDisplay && !ticketUrl ? (
               <div className="mt-1 flex flex-wrap items-center gap-1.5" data-day-stop-bottom-row>
-                {segmentTimeLabel ? (
-                  <span
-                    className="inline-flex items-center rounded-md border border-slate-100 bg-slate-50 px-1.5 py-0.5 text-[11px] font-medium text-slate-600"
-                    data-day-segment-hint
-                  >
-                    {segmentTimeLabel}
-                  </span>
-                ) : null}
-                {segmentDistanceLabel ? (
-                  <span className="text-[11px] text-slate-500">{segmentDistanceLabel}</span>
-                ) : null}
-                {sessionDisplay && !ticketUrl ? (
-                  <span className="inline-flex items-center rounded-md bg-emerald-50 px-1.5 py-0.5 text-[11px] font-medium text-emerald-800">
-                    {sessionDisplay}
-                  </span>
-                ) : null}
+                <span className="inline-flex items-center rounded-md bg-emerald-50 px-1.5 py-0.5 text-[11px] font-medium text-emerald-800">
+                  {sessionDisplay}
+                </span>
               </div>
             ) : null}
 

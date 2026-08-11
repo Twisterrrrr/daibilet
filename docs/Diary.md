@@ -1,3 +1,19 @@
+## 2026-08-11 - my-day: notes + Kryukov Nikolsky + heading copy
+
+### Наблюдения
+- Owner batch: polish list/grid; real between-stop notes (remove «Добавить список»); insert search without blue hint; SPB Berthold route previews/coords; Никольский = Николо-Богоявленский на Крюковом (не Кронштадт); heading «Маршрут из N точек».
+
+### Решения
+- `formatDayRouteStopsHeading` → `Маршрут из N {genitive}` (1 точки / 2-4+ точек / 21 точки); soft/hard suffixes.
+- Notes: `addNoteStopToDayRoute` + share `n:` tokens; menu place+note only; insert UI = placeholder + Отмена.
+- Kryukov: preset slug `nikolo-bogoyavlenskiy` + coords/address; `repairDayRouteKronstadtNikolskyStops` + block loose name-match to Kronstadt naval.
+- Editorial coords for Berthold-route SPB slugs; Hohlovka duplicate `travelVector` cleared when = desc.
+
+### Проблемы
+- Нет. Live: Deploy MSK web после push.
+
+---
+
 ## 2026-08-10 - my-day: Wanderlog list between-leg + insert
 
 ### Наблюдения
