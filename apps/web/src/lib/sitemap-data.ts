@@ -5,7 +5,7 @@ import {
   getPublicCatalogSessions,
 } from '@daibilet/backend/public-read';
 
-import { evaluateCityIndexability, evaluateVenueIndexability } from '@/lib/hub-indexability';
+import { evaluateCityIndexability, evaluateRegionIndexability, evaluateVenueIndexability } from '@/lib/hub-indexability';
 import {
   CITY_LANDING_PATH_BY_SLUG,
   DEFAULT_CITY_BY_LANDING_SLUG,
@@ -168,15 +168,24 @@ export async function buildCitiesSitemapEntries(now = new Date()): Promise<Sitem
   const destinationsPayload = await buildPublicDestinationsDto();
   return (destinationsPayload?.destinations || [])
     .filter((destination) => {
-      if (destination.type !== 'city' || !destination.slug) return false;
-      return evaluateCityIndexability({
-        events: destination.events,
-        slug: destination.slug,
-        sourceSlug: destination.sourceSlug,
-      }).indexable;
+      if (!destination.slug) return false;
+      if (destination.type === 'city') {
+        return evaluateCityIndexability({
+          events: destination.events,
+          slug: destination.slug,
+          sourceSlug: destination.sourceSlug,
+        }).indexable;
+      }
+      if (destination.type === 'region') {
+        // Tier C (<3 events): noindex + вне sitemap; A/B с ≥3 - в карту.
+        return evaluateRegionIndexability({
+          childEventTotal: destination.events,
+        }).indexable;
+      }
+      return false;
     })
     .map((destination) =>
-      entry(`/cities/${encodeURIComponent(String(destination.slug))}`, now, 'daily', 0.75),
+      entry(`/cities/${encodeURIComponent(String(destination.slug))}`, now, 'daily', destination.type === 'region' ? 0.7 : 0.75),
     );
 }
 

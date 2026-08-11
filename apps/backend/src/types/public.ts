@@ -283,6 +283,45 @@ export interface PublicCityPageDto extends ApiEnvelope {
     categories: number;
     priceFrom?: number | null;
   };
+  centerCity?: {
+    slug: string;
+    name: string;
+    eventCount: number;
+  } | null;
+  childCities?: Array<{
+    slug: string;
+    name: string;
+    eventCount: number;
+  }>;
+  regionInfo?: {
+    brief?: string | null;
+    topPlaces?: Array<{
+      name: string;
+      desc: string;
+      cityNames?: string[] | null;
+    }> | null;
+    faq?: Array<{ q: string; a: string }> | null;
+  } | null;
+  regionTier?: 'A' | 'B' | 'C' | null;
+  regionInfoNeedsGeneration?: boolean;
+  regionNearby?: {
+    regionSlug: string;
+    regionName: string;
+    title: string;
+    subtitle: string;
+    tier: 'A' | 'B' | 'C';
+    events: Array<{
+      id: string;
+      slug: string;
+      title: string;
+      startsAt?: string | null;
+      dateLabel?: string | null;
+      city: string;
+      venue?: string | null;
+      priceFrom?: number | null;
+      url: string;
+    }>;
+  } | null;
 }
 
 export interface PublicVenuePageDto extends ApiEnvelope {

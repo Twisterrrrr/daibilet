@@ -1,11 +1,19 @@
 /**
- * Политика индексации hub-страниц (city / venue).
+ * Политика индексации hub-страниц (city / region / venue).
  *
- * Thin = мало/ноль событий → noindex,follow (страница доступна, но не в индексе).
- * Сильные города (Москва/СПб и др.) всегда indexable, даже если временно мало сессий.
+ * Region live tier (без ручного вмешательства):
+ * - C: <3 child-events → noindex,nofollow + strip на центре
+ * - B: 3-9 → index,follow + программный Region Hub
+ * - A: ≥10 → index,follow + полный regionInfo / AI
  */
 
+import {
+  REGION_TIER_B_MIN_EVENTS,
+  resolveRegionLiveTier,
+} from '@daibilet/contracts/common';
+
 export const MIN_CITY_EVENTS_FOR_INDEX = 3;
+export const MIN_REGION_CHILD_EVENTS_FOR_INDEX = REGION_TIER_B_MIN_EVENTS;
 export const MIN_VENUE_EVENTS_FOR_INDEX = 1;
 
 /** Города, которые нельзя случайно noindex'ить из-за временных дыр в каталоге. */
@@ -87,6 +95,33 @@ export function evaluateVenueIndexability(input: {
   return { indexable: true, thin: false, reason: 'enough_events' };
 }
 
+/**
+ * Region hub: index только если live tier ≠ C (≥3 child-events).
+ */
+export function evaluateRegionIndexability(input: {
+  childEventTotal: number;
+  isIndexable?: boolean | null;
+}): HubIndexDecision {
+  if (input.isIndexable === false) {
+    return { indexable: false, thin: true, reason: 'explicit_noindex' };
+  }
+
+  const events = Number(input.childEventTotal) || 0;
+  if (events <= 0) {
+    return { indexable: false, thin: true, reason: 'zero_events' };
+  }
+  if (resolveRegionLiveTier(events) === 'C') {
+    return { indexable: false, thin: true, reason: 'low_event_count' };
+  }
+
+  return { indexable: true, thin: false, reason: 'enough_events' };
+}
+
 export function robotsForIndexability(indexable: boolean): { index: boolean; follow: boolean } {
   return indexable ? { index: true, follow: true } : { index: false, follow: true };
+}
+
+/** Region tier C: noindex + nofollow. */
+export function robotsForRegionIndexability(indexable: boolean): { index: boolean; follow: boolean } {
+  return indexable ? { index: true, follow: true } : { index: false, follow: false };
 }

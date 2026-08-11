@@ -1,7 +1,8 @@
 # Project — Daibilet (Next full-stack migration)
 
-**Обновлено:** 2026-08-05  
+**Обновлено:** 2026-08-11  
 **Ветка migration / prod:** `feat/next-monorepo`  
+**Feature branch (region hubs):** `feat/region-hubs`  
 **Prod catalog:** Next `apps/web` `:3001` + legacy API `:4000` на МСК `201.24.125.184`  
 **Web deploy canon:**  
 1. **Предпочтительно (быстро):** GitHub Actions `Deploy MSK web` - CI `pnpm web:build` (SSH local-forward к MSK API `:4000`, `EVENT_SSG_TOP_N=0`) → artifact `.next` → atomic swap на `daibilet-msk` (`deploy/scripts/swap-web-next-artifact.sh`). Secrets: `MSK_SSH_HOST`, `MSK_SSH_USER`, `MSK_SSH_KEY`. Postgres наружу не открываем.  
@@ -26,7 +27,7 @@ SPB `.16` **retired**.
 |-----------|--------|--------|
 | 1 | **F4 admin → Next** — перенос admin SPA в Next route group | ✅ F4.6; `/legacy` retired |
 | 2 | **Landing matching quality** — правила, аудит выдачи и актуальность событий всех посадок | активный |
-| 3 | **AI / статьи и city hubs** — редакционный контент и SEO-якоря | поддерживающий поток |
+| 3 | **AI / статьи и city hubs** — редакционный контент и SEO-якоря; **Region Hub IA** для `type=region` ([region-hub-v1.md](./region-hub-v1.md), live tier [region-live-tier.md](./region-live-tier.md)) | поддерживающий поток |
 | — | **Finance contour / ЛК поставщиков** | ⚠️ продукт staged: **Stage 0 open-date Path A** (музей/арт; launch-blocker) → **Stage 1** events/sessions → Stage 2 full LK; supplier ≠ museum-only; канон [museum-contract-readiness.md](./museum-contract-readiness.md); host roles → `.159` ([spb-finance-host.md](./spb-finance-host.md)) |
 | — | **Реклама / paid** | ⚠️ отложена до готовности витрины (хабы + контент + базовый финконтур) |
 
@@ -50,9 +51,9 @@ SPB `.16` **retired**.
 | Мелкие посёлки (Сортавала, Лебяжье и т.п.) | только region, не standalone |
 | Набережные Челны | Татарстан → карточка Казани / блок «события области», не отдельный public city |
 
-Источник: `data/geo/city-routing.ru.json`. Сводка исключений: [geo-excluded-cities.md](./geo-excluded-cities.md).
+Источник: `data/geo/city-routing.ru.json`. Центры субъектов: `data/geo/region-hubs.ru.json`. Live tier C/B/A по child-events (не ручной `tier` в JSON): [region-live-tier.md](./region-live-tier.md). Сводка исключений: [geo-excluded-cities.md](./geo-excluded-cities.md).
 
-См. [Diary.md](./Diary.md) (2026-07-19), задачи P.* / G.* в [Tasktracker.md](./Tasktracker.md).
+См. [Diary.md](./Diary.md) (2026-07-19), задачи P.* / G.* / P.2r* в [Tasktracker.md](./Tasktracker.md).
 
 ---
 

@@ -9,6 +9,17 @@ Finance PR-ветка `codex/stage0-admission-ticket-core` может держа
 
 ---
 
+## 2026-08-11 - Region Hub IA
+
+1. **City SEO title:** спека предлагала «Афиша {Города} на {Год}…»; сейчас канон P.2d. Меняем city title в том же релизе или оставляем P.2d?
+2. **ХМАО / Карелия:** у ХМАО в `region-hubs` центр Ханты-Мансийск (есть ли saleable standalone?). Карелия → Петрозаводск - в allowlist?
+3. **childCities с eventCount=0:** всегда в JSON для роботов + UI «Показать все», или zero-only в отдельном поле?
+4. **Тир C:** 301/302 на центр vs мягкий noindex + strip? Спека = noindex + strip на центре (текущая реализация).
+5. **FAQ count Tier A:** в seed по 2 Q; архитектурная цель 3 - добить третьим логистическим FAQ или ок 2?
+6. **LLM provider** для `region:info:draft`: OpenAI / YandexGPT / внутренний blog pipeline?
+
+---
+
 ## Открыто (техника)
 
 ### 1. Stage 0 closeout - e2e/smoke на live `.159` (единственный runtime gate)

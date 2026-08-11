@@ -15994,3 +15994,19 @@ evalidateNextBlogArticle (/blog, slug, city hub).
 ### Проблемы
 - Post-deploy warm: 2 event SSG warm 500; hub warm 10/12 (moscow/spb 500 на первом проходе) - не блокирует blog/landing surface; IndexNow api.indexnow.org 403 (yandex 202).
 
+---
+
+## 2026-08-11 - Region Hub IA на HEAD (SWR city DTO)
+
+### Наблюдения
+- Stash `feat-region-hubs-ia` опирался на старый city DTO (без SWR / soft-timeout / JsonLdScripts). На `feat/region-hubs` от `origin/feat/next-monorepo` нужна точечная интеграция без отката perf.
+- Live tier: C <3, B 3-9, A ≥10 ([region-live-tier.md](./region-live-tier.md)); ручной `tier` в JSON - только editorial hint.
+
+### Решения
+- `public-city.dto.ts`: enrichment `buildRegionHubEnrichment` / `buildCityRegionNearby` + `clearRegionHubCaches` при soft-invalidate; форма кэша `{ expiresAt, staleUntil, payload }` сохранена.
+- Web: `RegionPageView` для `type=region` (JsonLdScripts); city path (admission/articles/editorial) не тронут; `RegionNearbyStrip` после `#affiche`.
+- Contracts + hub-indexability + sitemap regions; geo из `region-hubs.ru.json` / info / strip.
+
+### Проблемы
+- Полный typecheck/build в этом workspace не прогоняли (локальный pnpm/node_modules может быть битый). Smoke `region-hub.test.ts` и MSK deploy - после commit.
+

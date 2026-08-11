@@ -8,7 +8,7 @@ import type {
 
 import { buildCityFaqItems, type CityFaqItem } from '@/lib/city-faq';
 import { getTicketPriceRange, isFlexibleScheduleSession } from '@/lib/event-page-utils';
-import { evaluateCityIndexability } from '@/lib/hub-indexability';
+import { evaluateCityIndexability, evaluateRegionIndexability } from '@/lib/hub-indexability';
 import { resolveLandingCityName } from '@/lib/landing-city';
 import { landingCategoryHref } from '@/lib/landing-routes';
 import { cityHref, eventHref, venueHref } from '@/lib/routes';
@@ -314,6 +314,10 @@ export function buildCityBreadcrumbs(payload: PublicCityPageDto): StructuredBrea
 
 /** SSR blocks для city page: FAQPage (если не thin) + BreadcrumbList. */
 export function buildCityPageJsonLd(payload: PublicCityPageDto): Array<Record<string, unknown>> {
+  if (payload.city.type === 'region') {
+    return buildRegionPageJsonLd(payload);
+  }
+
   const blocks: Array<Record<string, unknown>> = [
     buildBreadcrumbListJsonLd(buildCityBreadcrumbs(payload)),
   ];
@@ -328,6 +332,56 @@ export function buildCityPageJsonLd(payload: PublicCityPageDto): Array<Record<st
   if (decision.indexable) {
     const faq = buildFaqPageJsonLd(buildCityFaqItems(payload));
     if (faq) blocks.unshift(faq);
+  }
+
+  return blocks;
+}
+
+/** Region hub: BreadcrumbList + FAQPage + ItemList(Place). */
+export function buildRegionPageJsonLd(payload: PublicCityPageDto): Array<Record<string, unknown>> {
+  const city = payload.city;
+  const path = city.canonicalPath || `/cities/${city.slug}`;
+  const childEventTotal = (payload.childCities || []).reduce(
+    (sum, item) => sum + (Number(item.eventCount) || 0),
+    0,
+  );
+  const decision = evaluateRegionIndexability({
+    childEventTotal: childEventTotal || payload.stats?.events || city.events || 0,
+    isIndexable: city.isIndexable,
+  });
+
+  const blocks: Array<Record<string, unknown>> = [
+    buildBreadcrumbListJsonLd([
+      { name: 'Главная', path: '/' },
+      { name: 'Направления', path: '/cities' },
+      { name: city.seoH1 || city.name, path },
+    ]),
+  ];
+
+  if (!decision.indexable) return blocks;
+
+  const faqItems = (payload.regionInfo?.faq || [])
+    .filter((item) => item.q?.trim() && item.a?.trim())
+    .map((item) => ({ question: item.q, answer: item.a }));
+  const faq = buildFaqPageJsonLd(faqItems);
+  if (faq) blocks.unshift(faq);
+
+  const places = (payload.regionInfo?.topPlaces || []).filter((place) => place.name?.trim());
+  if (places.length) {
+    blocks.push({
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      name: `Куда съездить в ${city.name}`,
+      itemListElement: places.map((place, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        item: {
+          '@type': 'Place',
+          name: place.name,
+          description: place.desc || undefined,
+        },
+      })),
+    });
   }
 
   return blocks;

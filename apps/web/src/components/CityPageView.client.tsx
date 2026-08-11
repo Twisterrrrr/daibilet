@@ -9,6 +9,7 @@ import { CityAdmissionBlock } from '@/components/CityAdmissionBlock';
 import { EventCard } from '@/components/EventCard';
 import { LandingDirectionCard } from '@/components/LandingDirectionCard.client';
 import { PageBreadcrumbBar } from '@/components/PageBreadcrumbs';
+import { RegionNearbyStrip } from '@/components/RegionNearbyStrip.client';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import { CityDayPresetBlock } from '@/components/CityDayPresetBlock.client';
@@ -312,6 +313,10 @@ export function CityPageView({
                 )}
               </div>
             </section>
+
+            {payload.regionNearby?.events?.length ? (
+              <RegionNearbyStrip nearby={payload.regionNearby} editorial={editorial} />
+            ) : null}
 
             {hasPractice ? (
               <section

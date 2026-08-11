@@ -200,6 +200,56 @@ export interface PublicCityDto extends SeoFields {
   categories: Record<string, number>;
 }
 
+/** Адм. центр субъекта для region hub (мост в city hub). */
+export interface PublicRegionCenterCityDto {
+  slug: string;
+  name: string;
+  eventCount: number;
+}
+
+/** Город внутри субъекта (reverse cityToRegion + сессии региона). */
+export interface PublicRegionChildCityDto {
+  slug: string;
+  name: string;
+  eventCount: number;
+}
+
+/** Редакционный / AI слой region hub (тир A). */
+export interface PublicRegionInfoDto {
+  brief?: string | null;
+  topPlaces?: Array<{
+    name: string;
+    desc: string;
+    /** Города каталога для фильтра афиши (сквозная связь Place → sessions). */
+    cityNames?: string[] | null;
+  }> | null;
+  faq?: Array<{ q: string; a: string }> | null;
+}
+
+/** Событие региона на стрипе city hub адмцентра. */
+export interface PublicRegionNearbyEventDto {
+  id: string;
+  slug: string;
+  title: string;
+  startsAt?: string | null;
+  dateLabel?: string | null;
+  city: string;
+  venue?: string | null;
+  priceFrom?: number | null;
+  url: string;
+}
+
+/** Блок «Рядом с городом: события в области» на хабе адмцентра. */
+export interface PublicRegionNearbyDto {
+  regionSlug: string;
+  regionName: string;
+  title: string;
+  subtitle: string;
+  /** Live tier субъекта на момент сборки (стрип только при C). */
+  tier: 'A' | 'B' | 'C';
+  events: PublicRegionNearbyEventDto[];
+}
+
 export interface PublicEventDto extends SeoFields, PurchaseFields {
   id: string;
   slug: string;
@@ -337,6 +387,19 @@ export interface PublicCityPageDto extends ApiEnvelope {
     categories: number;
     priceFrom?: number | null;
   };
+  /** Только при `city.type === 'region'`. */
+  centerCity?: PublicRegionCenterCityDto | null;
+  childCities?: PublicRegionChildCityDto[];
+  regionInfo?: PublicRegionInfoDto | null;
+  /**
+   * Live tier по сумме child-events (A≥10, B≥3, C<3).
+   * Задаётся на region page; на city page - внутри `regionNearby.tier` если стрип есть.
+   */
+  regionTier?: 'A' | 'B' | 'C' | null;
+  /** Tier A без topPlaces → сигнал для AI/редактора. */
+  regionInfoNeedsGeneration?: boolean;
+  /** На city hub адмцентра: загородные события субъекта (strip) - только live Tier C. */
+  regionNearby?: PublicRegionNearbyDto | null;
 }
 
 export interface PublicVenuePageDto extends ApiEnvelope {

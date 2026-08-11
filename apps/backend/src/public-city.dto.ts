@@ -18,6 +18,12 @@ import { createDb } from './db.js';
 import { getPublicCatalogSessions, getPublicCatalogSessionsSoft, resolveCatalogSessionsByDestinationKeys } from './public-catalog.dto.js';
 import { toPublicCatalogListItem } from './public-catalog-list-item.js';
 import { resolveProjectRoot } from './project-root.js';
+import {
+  buildRegionHubEnrichment,
+  buildCityRegionNearby,
+  findRegionHubByCenterCity,
+  clearRegionHubCaches,
+} from './region-hub.js';
 import type { DestinationType } from './types/common.js';
 import type {
   PublicCityPageDto,
@@ -97,6 +103,7 @@ export function clearPublicCityDtoCache(): void {
       staleUntil: Math.max(destinationsCache.staleUntil, now + PUBLIC_CITY_STALE_MS),
     };
   }
+  clearRegionHubCaches();
 }
 
 export async function buildPublicDestinationsDto(
@@ -266,6 +273,45 @@ function scheduleCityPageRebuild(
     const landings = (buildPublicLandings(matchedSessions) as PublicLandingDto[]).filter((landing) => landing.events > 0);
     const entityLabel = destinationPrepositional(destination);
 
+    const isRegion = destination.type === 'region';
+    const destinations = isRegion
+      ? (await buildPublicDestinationsDto(forceRefresh)).destinations
+      : [];
+    const regionEnrichment = isRegion
+      ? buildRegionHubEnrichment({
+          regionName: destination.name,
+          regionSlug: destination.slug,
+          sessions: matchedSessions,
+          destinations: destinations as PublicDestinationDto[],
+        })
+      : null;
+
+    let regionNearby = null;
+    if (!isRegion && destination.type === 'city') {
+      const regionHub = findRegionHubByCenterCity({
+        name: destination.name,
+        slug: destination.slug,
+        sourceSlug: destination.sourceSlug,
+      });
+      if (regionHub) {
+        const regionSessions = lookupDestinationCatalogSessions(
+          regionHub.regionSlug,
+          regionHub.regionSlug,
+          catalogSessions,
+        ) as PublicSessionDto[];
+        regionNearby = buildCityRegionNearby({
+          cityName: destination.name,
+          citySlug: destination.slug,
+          sourceSlug: destination.sourceSlug,
+          regionSessions,
+          limit: 6,
+        });
+      }
+    }
+
+    const regionSeoDescription =
+      `Список событий, площадок и популярных городов в ${destination.name} для загородного отдыха и поездок выходного дня.`;
+
     const payload: PublicCityPageDto = {
       generatedAt: new Date().toISOString(),
       city: {
@@ -273,16 +319,24 @@ function scheduleCityPageRebuild(
         slug: destination.slug,
         sourceSlug: destination.sourceSlug,
         name: destination.name,
-        title: destination.name,
+        title: isRegion
+          ? `${destination.name}: куда съездить и что посмотреть`
+          : destination.name,
         type: destination.type as DestinationType,
         isDestination: true,
         events: matchedSessions.length,
         venues: venueCount,
         categories,
-        seoH1: cityRecord?.seoH1 || destination.name,
-        seoTitle: cityRecord?.seoTitle || buildCityHubSeoTitle(destination.name),
-        seoDescription: cityRecord?.seoDescription ||
-          `Афиша событий, экскурсий, музеев и активностей ${entityLabel}. Быстрый выбор по датам, площадкам и категориям.`,
+        seoH1: isRegion
+          ? `Мероприятия и загородный отдых в ${destination.name}`
+          : cityRecord?.seoH1 || destination.name,
+        seoTitle: isRegion
+          ? `${destination.name}: куда съездить и что посмотреть, загородный отдых`
+          : cityRecord?.seoTitle || buildCityHubSeoTitle(destination.name),
+        seoDescription: isRegion
+          ? regionSeoDescription
+          : cityRecord?.seoDescription ||
+            `Афиша событий, экскурсий, музеев и активностей ${entityLabel}. Быстрый выбор по датам, площадкам и категориям.`,
         canonicalPath: cityRecord?.canonicalPath || `/cities/${destination.slug}`,
       },
       sessions: sessions as PublicCityPageDto['sessions'],
@@ -294,6 +348,16 @@ function scheduleCityPageRebuild(
         categories: Object.keys(categories).length,
         priceFrom: prices.length ? Math.min(...prices) : null,
       },
+      ...(regionEnrichment
+        ? {
+            centerCity: regionEnrichment.centerCity,
+            childCities: regionEnrichment.childCities,
+            regionInfo: regionEnrichment.regionInfo,
+            regionTier: regionEnrichment.liveTier,
+            regionInfoNeedsGeneration: regionEnrichment.regionInfoNeedsGeneration,
+          }
+        : {}),
+      ...(regionNearby ? { regionNearby } : {}),
     };
     pageCache.set(cacheKey, {
       expiresAt: builtAt + PUBLIC_CITY_CACHE_MS,

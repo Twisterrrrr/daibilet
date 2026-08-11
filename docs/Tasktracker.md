@@ -1,3 +1,13 @@
+## Region Hub IA (2026-08-11)
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| P.2r | Region Hub IA v1: DTO + `RegionPageView` + SEO/robots по live tier | Высокий | 🔄 code on `feat/region-hubs` (не закоммичено) |
+| P.2r1 | Live tier C↔B↔A (`resolveRegionLiveTier`); strip на центре только Tier C | Высокий | 🔄 integrated on HEAD + SWR city DTO |
+| P.2r2 | Sitemap: indexable regions (A/B ≥3); Tier C вне карты | Средний | 🔄 |
+| P.2r3 | `region-info` seed + AI pipeline draft | Средний | ⏳ seed JSON есть; LLM script ⏳ |
+| P.2r4 | Smoke `region-hub.test.ts` + MSK deploy | Высокий | ⏳ после commit |
+
 ## Follow-up deploy/smoke (2026-08-08)
 
 | ID | Задача | Приоритет | Статус |

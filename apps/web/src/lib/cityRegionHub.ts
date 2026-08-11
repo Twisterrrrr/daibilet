@@ -1,82 +1,22 @@
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
 
+import regionHubsFile from '../../../../data/geo/region-hubs.ru.json';
+
 export type CityCardRegion = {
   slug: string;
   name: string;
   eventCount: number;
 };
 
-/** Публичный регион → областной / республиканский центр. */
-const REGION_HUBS: Array<{
+type RegionCenterConfig = {
   regionName: string;
   regionSlug: string;
   centerCity: string;
   centerSlugs?: string[];
-}> = [
-  { regionName: 'Московская область', regionSlug: 'moskovskaya-oblast', centerCity: 'Москва', centerSlugs: ['moskva', 'moscow'] },
-  {
-    regionName: 'Ленинградская область',
-    regionSlug: 'leningradskaya-oblast',
-    centerCity: 'Санкт-Петербург',
-    centerSlugs: ['sankt-peterburg', 'saint-petersburg', 'spb'],
-  },
-  { regionName: 'Краснодарский край', regionSlug: 'krasnodarskiy-kray', centerCity: 'Краснодар', centerSlugs: ['krasnodar'] },
-  { regionName: 'Красноярский край', regionSlug: 'krasnoyarskiy-kray', centerCity: 'Красноярск', centerSlugs: ['krasnoyarsk'] },
-  { regionName: 'Республика Татарстан', regionSlug: 'respublika-tatarstan', centerCity: 'Казань', centerSlugs: ['kazan'] },
-  { regionName: 'Ульяновская область', regionSlug: 'ulyanovskaya-oblast', centerCity: 'Ульяновск', centerSlugs: ['ulyanovsk'] },
-  { regionName: 'Республика Хакасия', regionSlug: 'respublika-hakasiya', centerCity: 'Абакан', centerSlugs: ['abakan'] },
-  { regionName: 'Хабаровский край', regionSlug: 'habarovskiy-kray', centerCity: 'Хабаровск', centerSlugs: ['habarovsk', 'khabarovsk'] },
-  { regionName: 'Приморский край', regionSlug: 'primorskiy-kray', centerCity: 'Владивосток', centerSlugs: ['vladivostok'] },
-  { regionName: 'Алтайский край', regionSlug: 'altayskiy-kray', centerCity: 'Барнаул', centerSlugs: ['barnaul'] },
-  { regionName: 'Самарская область', regionSlug: 'samarskaya-oblast', centerCity: 'Самара', centerSlugs: ['samara'] },
-  { regionName: 'Челябинская область', regionSlug: 'chelyabinskaya-oblast', centerCity: 'Челябинск', centerSlugs: ['chelyabinsk', 'cheljabinsk'] },
-  { regionName: 'Кемеровская область', regionSlug: 'kemerovskaya-oblast', centerCity: 'Кемерово', centerSlugs: ['kemerovo'] },
-  { regionName: 'Ростовская область', regionSlug: 'rostovskaya-oblast', centerCity: 'Ростов-на-Дону', centerSlugs: ['rostov-na-donu'] },
-  { regionName: 'Свердловская область', regionSlug: 'sverdlovskaya-oblast', centerCity: 'Екатеринбург', centerSlugs: ['ekaterinburg', 'yekaterinburg'] },
-  {
-    regionName: 'Нижегородская область',
-    regionSlug: 'nizhegorodskaya-oblast',
-    centerCity: 'Нижний Новгород',
-    centerSlugs: ['nizhniy-novgorod', 'nizhny-novgorod'],
-  },
-  { regionName: 'Оренбургская область', regionSlug: 'orenburgskaya-oblast', centerCity: 'Оренбург', centerSlugs: ['orenburg'] },
-  { regionName: 'Тульская область', regionSlug: 'tulskaya-oblast', centerCity: 'Тула', centerSlugs: ['tula'] },
-  { regionName: 'Вологодская область', regionSlug: 'vologodskaya-oblast', centerCity: 'Вологда', centerSlugs: ['vologda'] },
-  { regionName: 'Ставропольский край', regionSlug: 'stavropolskiy-kray', centerCity: 'Ставрополь', centerSlugs: ['stavropol'] },
-  { regionName: 'Калининградская область', regionSlug: 'kaliningradskaya-oblast', centerCity: 'Калининград', centerSlugs: ['kaliningrad'] },
-  { regionName: 'Калужская область', regionSlug: 'kaluzhskaya-oblast', centerCity: 'Калуга', centerSlugs: ['kaluga'] },
-  { regionName: 'Ярославская область', regionSlug: 'yaroslavskaya-oblast', centerCity: 'Ярославль', centerSlugs: ['yaroslavl'] },
-  {
-    regionName: 'Республика Башкортостан',
-    regionSlug: 'respublika-bashkortostan',
-    centerCity: 'Уфа',
-    centerSlugs: ['ufa'],
-  },
-  {
-    regionName: 'Амурская область',
-    regionSlug: 'amurskaya-oblast',
-    centerCity: 'Благовещенск (Амурская область)',
-    centerSlugs: ['blagoveschensk-amurskaya-oblast', 'blagoveshchensk-amurskaya-oblast'],
-  },
-  { regionName: 'Воронежская область', regionSlug: 'voronezhskaya-oblast', centerCity: 'Воронеж', centerSlugs: ['voronezh'] },
-  { regionName: 'Владимирская область', regionSlug: 'vladimirskaya-oblast', centerCity: 'Владимир', centerSlugs: ['vladimir'] },
-  { regionName: 'Тюменская область', regionSlug: 'tyumenskaya-oblast', centerCity: 'Тюмень', centerSlugs: ['tyumen'] },
-  { regionName: 'Иркутская область', regionSlug: 'irkutskaya-oblast', centerCity: 'Иркутск', centerSlugs: ['irkutsk'] },
-  { regionName: 'Пермский край', regionSlug: 'permskiy-kray', centerCity: 'Пермь', centerSlugs: ['perm'] },
-  { regionName: 'Удмуртская Республика', regionSlug: 'udmurtskaya-respublika', centerCity: 'Ижевск', centerSlugs: ['izhevsk'] },
-  { regionName: 'Псковская область', regionSlug: 'pskovskaya-oblast', centerCity: 'Псков', centerSlugs: ['pskov'] },
-  { regionName: 'Липецкая область', regionSlug: 'lipetskaya-oblast', centerCity: 'Липецк', centerSlugs: ['lipetsk'] },
-  { regionName: 'Тверская область', regionSlug: 'tverskaya-oblast', centerCity: 'Тверь', centerSlugs: ['tver'] },
-  { regionName: 'Орловская область', regionSlug: 'orlovskaya-oblast', centerCity: 'Орёл', centerSlugs: ['orel', 'oryol'] },
-  { regionName: 'Брянская область', regionSlug: 'bryanskaya-oblast', centerCity: 'Брянск', centerSlugs: ['bryansk'] },
-  { regionName: 'Республика Коми', regionSlug: 'respublika-komi', centerCity: 'Сыктывкар', centerSlugs: ['syktyvkar'] },
-  {
-    regionName: 'Кировская область',
-    regionSlug: 'kirovskaya-oblast',
-    centerCity: 'Киров (Кировская область)',
-    centerSlugs: ['kirov-kirovskaya-oblast', 'kirov'],
-  },
-];
+  tier?: string;
+};
+
+const REGION_HUBS = (regionHubsFile.regionCenters || []) as RegionCenterConfig[];
 
 const HUB_CITY_TO_REGION_SLUG = buildHubCityToRegionSlug();
 const REGION_CENTER_BY_NAME = new Map(REGION_HUBS.map((hub) => [hub.regionName, hub.centerCity]));
@@ -232,6 +172,18 @@ export function getRegionCenterCityName(region: Pick<PublicDestinationDto, 'name
   if (byName) return byName;
   const bySlug = region.slug ? REGION_CENTER_BY_SLUG.get(region.slug) : null;
   return bySlug || null;
+}
+
+export function getRegionHubConfig(
+  region: Pick<PublicDestinationDto, 'name' | 'slug'>,
+): RegionCenterConfig | null {
+  const nameKey = normalizeKey(region.name);
+  const slugKey = normalizeKey(region.slug);
+  return (
+    REGION_HUBS.find(
+      (hub) => normalizeKey(hub.regionName) === nameKey || normalizeKey(hub.regionSlug) === slugKey,
+    ) || null
+  );
 }
 
 function lookupRegionSlug(city: Pick<PublicDestinationDto, 'slug' | 'sourceSlug' | 'name'>) {

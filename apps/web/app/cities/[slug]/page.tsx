@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { CityPageView } from '@/components/CityPageView.client';
 import { CityPageViewEditorial } from '@/components/CityPageViewEditorial.client';
 import { JsonLdScripts } from '@/components/JsonLdScripts';
+import { RegionPageView } from '@/components/RegionPageView.client';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
 import { buildCityFaqItems, buildCitySeoText } from '@/lib/city-faq';
@@ -15,7 +16,17 @@ import {
 } from '@/lib/city-hub-seo';
 import { isSeoExpansionCity } from '@/lib/city-declension';
 import { resolveCityImage } from '@/lib/city-images';
-import { evaluateCityIndexability, robotsForIndexability } from '@/lib/hub-indexability';
+import {
+  evaluateCityIndexability,
+  evaluateRegionIndexability,
+  robotsForIndexability,
+  robotsForRegionIndexability,
+} from '@/lib/hub-indexability';
+import {
+  buildRegionHubSeoDescription,
+  buildRegionHubSeoTitle,
+  buildRegionHubSeoTitleCore,
+} from '@/lib/region-hub-seo';
 import { mergeBlogCards } from '@/lib/blog-utils';
 import { safeNotFound } from '@/lib/safe-not-found';
 import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
@@ -89,6 +100,40 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const city = payload.city;
   const path = city.canonicalPath || `/cities/${city.slug}`;
+
+  if (city.type === 'region') {
+    const childEventTotal = (payload.childCities || []).reduce(
+      (sum, item) => sum + (Number(item.eventCount) || 0),
+      0,
+    );
+    const decision = evaluateRegionIndexability({
+      childEventTotal: childEventTotal || payload.stats?.events || city.events || 0,
+      isIndexable: city.isIndexable,
+    });
+    const hubTitle = buildRegionHubSeoTitleCore(city.name);
+    const hubTitleFull = buildRegionHubSeoTitle(city.name);
+    const description = city.seoDescription || buildRegionHubSeoDescription(city.name);
+    const imagePath = resolveCityImage({
+      slug: city.slug,
+      sourceSlug: city.sourceSlug,
+      name: city.name,
+      heroImageUrl: city.heroImageUrl,
+    });
+
+    return {
+      title: pageTitle(hubTitle),
+      description,
+      alternates: { canonical: path },
+      robots: robotsForRegionIndexability(decision.indexable),
+      ...buildShareMetadata({
+        title: hubTitleFull,
+        description,
+        path,
+        image: imagePath,
+      }),
+    };
+  }
+
   const decision = evaluateCityIndexability({
     events: payload.stats?.events ?? city.events ?? 0,
     slug: city.slug,
@@ -152,6 +197,19 @@ export default async function CityPage({ params }: PageProps) {
   });
   if (!payload?.city) {
     safeNotFound();
+  }
+
+  if (payload.city.type === 'region') {
+    const jsonLdBlocks = buildCityPageJsonLd(payload);
+    cityPerfMark('page-total', pageStartedAt, { slug: decodedSlug, region: true });
+    return (
+      <>
+        <JsonLdScripts blocks={jsonLdBlocks} idPrefix="region-jsonld" />
+        <SiteLayout>
+          <RegionPageView slug={decodedSlug} initialPayload={payload} />
+        </SiteLayout>
+      </>
+    );
   }
 
   const articlesStartedAt = Date.now();
