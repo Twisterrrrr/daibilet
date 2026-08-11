@@ -399,7 +399,6 @@ function DayRoutePanelInner() {
   const [coordsInput, setCoordsInput] = useState('');
   const [cityInput, setCityInput] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
-  const [showAdvanced, setShowAdvanced] = useState(false);
   /** Exclusive accordion for route-building tools only (must-see / custom / matches). */
   /** Guidebook (scenarios + suburbs DayTripCanonCard) stays always open as day-plan cards. */
   const [openPanel, setOpenPanel] = useState<DayRouteAccordionId | null>(null);
@@ -1980,6 +1979,16 @@ function DayRoutePanelInner() {
     }
     if (isDayRouteAtSoft(next.venues.length)) {
       flashDayRouteFeedback(DAY_ROUTE_SOFT_WARN);
+    } else {
+      const added = next.venues[next.venues.length - 1];
+      const hasCoords = Boolean(
+        added && lookupDayRouteCoords(added, buildDayRouteCoordsMap([added])),
+      );
+      flashDayRouteFeedback(
+        hasCoords
+          ? dayRouteAddSuccessMessage(next.venues.length)
+          : 'В списке есть. На карте появится после координат (lat, lng)',
+      );
     }
     setTitleInput('');
     setNoteInput('');
@@ -2221,7 +2230,6 @@ function DayRoutePanelInner() {
     setOpenPanel((cur) => (cur === id ? null : id));
   }
 
-  const textFormOpen = openPanel === 'text';
   const mustSeeOpen = openPanel === 'mustSee';
   const matchesOpen = openPanel === 'matches';
   const showMustSeeAccordion = Boolean(hasPageCity && (mustSeeResolved.length > 0 || (!catalogLoading && pageCitySlug)));
@@ -3758,46 +3766,26 @@ function DayRoutePanelInner() {
       ) : null}
 
       {pickerSection === 'own' ? (
-      <div className="rounded-2xl border border-slate-200 bg-white" id="day-plan-form-wrap" data-day-accordion="text">
-        <button
-          type="button"
-          aria-expanded={textFormOpen}
-          aria-controls="day-plan-form"
-          data-day-plan-accordion
-          onClick={() => {
-            setOpenPanel((cur) => {
-              const next = cur === 'text' ? null : 'text';
-              if (next === 'text') {
-                window.setTimeout(() => titleFieldRef.current?.focus(), 50);
-              }
-              return next;
-            });
-          }}
-          className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left sm:px-5"
+        <div
+          className="rounded-2xl border border-slate-200 bg-white px-4 py-4 sm:px-5 sm:py-5"
+          id="day-plan-form-wrap"
+          data-day-accordion="text"
         >
-          <span>
-            <span className="block text-sm font-semibold text-slate-900">Добавить своё место</span>
-            <span className="mt-0.5 block text-xs text-slate-500">
-              Необязательно - если места нет в каталоге
-            </span>
-          </span>
-          <ChevronDown
-            className={`h-5 w-5 shrink-0 text-slate-400 transition ${textFormOpen ? 'rotate-180' : ''}`}
-          />
-        </button>
-        {(textFormOpen || pickerOpen) ? (
+          <p className="text-sm font-semibold text-slate-900">Своё место</p>
+          <p className="mt-0.5 text-xs text-slate-500">
+            Без координат точка только в списке. Для карты укажите lat, lng.
+          </p>
           <form
             onSubmit={submitTextStop}
-            className="border-t border-slate-100 px-4 pb-4 pt-3 sm:px-5 sm:pb-5"
+            className="mt-3"
             data-day-plan-form="1"
             id="day-plan-form"
           >
-            <p className="text-sm leading-relaxed text-slate-600">
-              Введите название. Адрес, город и координаты - по желанию.
-            </p>
-            <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-stretch">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch">
               <label className="min-w-0 flex-1">
-                <span className="sr-only">Название места</span>
+                <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                  Название
+                </span>
                 <input
                   ref={titleFieldRef}
                   type="text"
@@ -3818,77 +3806,74 @@ function DayRoutePanelInner() {
                 type="submit"
                 disabled={atMax}
                 data-day-plan-add
-                className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full bg-slate-900 px-5 py-2.5 text-sm font-bold text-white hover:bg-primary-600 disabled:cursor-not-allowed disabled:bg-slate-300"
+                className="inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 self-end rounded-full bg-slate-900 px-5 py-2.5 text-sm font-bold text-white hover:bg-primary-600 disabled:cursor-not-allowed disabled:bg-slate-300"
               >
                 <Plus className="h-4 w-4" />
                 Добавить
               </button>
             </div>
-            <label className="mt-2 block">
-              <span className="sr-only">Адрес или заметка</span>
+
+            <label className="mt-3 block">
+              <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                Координаты для карты
+              </span>
+              <input
+                type="text"
+                name="coords"
+                value={coordsInput}
+                onChange={(e) => setCoordsInput(e.target.value)}
+                placeholder="59.93, 30.31"
+                autoComplete="off"
+                disabled={atMax}
+                data-day-plan-coords
+                className="min-h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/30 disabled:bg-slate-50"
+              />
+              <span className="mt-1 block text-[11px] leading-snug text-slate-500">
+                Скопируйте из Яндекс.Карт: ПКМ по точке - «Что здесь?» - координаты.
+              </span>
+            </label>
+
+            <label className="mt-3 block">
+              <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                Адрес или заметка
+              </span>
               <input
                 type="text"
                 name="note"
                 value={noteInput}
                 onChange={(e) => setNoteInput(e.target.value)}
-                placeholder="Адрес или заметка (необязательно)"
+                placeholder="Необязательно"
                 autoComplete="off"
                 disabled={atMax}
                 data-day-plan-note
                 className="min-h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none ring-emerald-500/30 placeholder:text-slate-400 focus:border-emerald-400 focus:ring-2 disabled:bg-slate-50"
               />
             </label>
-            <button
-              type="button"
-              onClick={() => setShowAdvanced((v) => !v)}
-              className="mt-2 text-xs font-semibold text-slate-500 hover:text-slate-800"
-            >
-              {showAdvanced ? 'Скрыть город и координаты' : 'Город и координаты (необязательно)'}
-            </button>
-            {showAdvanced ? (
-              <div className="mt-2 grid gap-2 sm:grid-cols-2">
-                <label className="block">
-                  <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                    Город
-                  </span>
-                  <input
-                    type="text"
-                    name="city"
-                    value={cityInput}
-                    onChange={(e) => setCityInput(e.target.value)}
-                    placeholder="Город (необязательно)"
-                    autoComplete="off"
-                    disabled={atMax}
-                    data-day-plan-city
-                    className="min-h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/30 disabled:bg-slate-50"
-                  />
-                </label>
-                <label className="block">
-                  <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                    Координаты
-                  </span>
-                  <input
-                    type="text"
-                    name="coords"
-                    value={coordsInput}
-                    onChange={(e) => setCoordsInput(e.target.value)}
-                    placeholder="59.93, 30.31"
-                    autoComplete="off"
-                    disabled={atMax}
-                    data-day-plan-coords
-                    className="min-h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/30 disabled:bg-slate-50"
-                  />
-                </label>
-              </div>
-            ) : null}
+
+            <label className="mt-3 block">
+              <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                Город
+              </span>
+              <input
+                type="text"
+                name="city"
+                value={cityInput}
+                onChange={(e) => setCityInput(e.target.value)}
+                placeholder="Город"
+                autoComplete="off"
+                disabled={atMax}
+                data-day-plan-city
+                className="min-h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/30 disabled:bg-slate-50"
+              />
+            </label>
+
             {formError ? (
               <p role="alert" className="mt-2 text-sm font-medium text-rose-700">
                 {formError}
               </p>
             ) : null}
           </form>
-        ) : null}
-      </div>
+        </div>
       ) : null}
 
       {pickerSection === 'boat' && showBoatPicker ? (
