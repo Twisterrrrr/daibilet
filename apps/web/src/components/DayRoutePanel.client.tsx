@@ -1125,6 +1125,33 @@ function DayRoutePanelInner() {
     return mustSeeResolved.filter((row) => classifyMustSeePlace(row.place) === active);
   }, [mustSeeResolved, mustSeeFilter, mustSeeFilterMeta]);
 
+  const betweenInsertSuggestions = useMemo(() => {
+    const out: Array<{
+      id: string;
+      title: string;
+      tag: string;
+      imageUrl: string | null;
+      item: DayRouteVenueItem;
+    }> = [];
+    for (const row of mustSeeResolved) {
+      if (out.length >= 4) break;
+      const inRoute =
+        isInDayRoute(row.item.id, route) ||
+        Boolean(row.item.slug && isInDayRoute(row.item.slug, route));
+      if (inRoute) continue;
+      if (!lookupDayRouteCoords(row.item, buildDayRouteCoordsMap([row.item]))) continue;
+      const kind = classifyMustSeePlace(row.place);
+      out.push({
+        id: row.item.id,
+        title: row.place.name || row.item.title,
+        tag: mustSeeFilterLabel(kind),
+        imageUrl: resolveDayRouteStopImage(row.item) || row.item.imageUrl || null,
+        item: row.item,
+      });
+    }
+    return out;
+  }, [mustSeeResolved, route]);
+
   const locationOptions = useMemo<DayRouteSearchOption[]>(() => {
     return locationsCatalog.map((venue) => {
       const inRoute = isInDayRoute(venue.id, route) || Boolean(venue.slug && isInDayRoute(venue.slug, route));
@@ -2103,14 +2130,28 @@ function DayRoutePanelInner() {
     openPicker('places');
   }
 
-  function openInsertNoteAfter(afterVenueId: string) {
+  function openInsertNoteAfter(afterVenueId: string, body = 'Заметка') {
     setBetweenMenuAfterId(null);
     if (atMax) {
       flashDayRouteFeedback(dayRouteHardLimitMessage());
       return;
     }
-    setRoute(addNoteStopToDayRoute({ body: 'Заметка', afterVenueId }));
-    flashDayRouteFeedback('Заметка добавлена - отредактируйте текст');
+    const text = String(body || '').trim() || 'Заметка';
+    setRoute(addNoteStopToDayRoute({ body: text, afterVenueId }));
+    flashDayRouteFeedback('Заметка добавлена');
+  }
+
+  function insertSuggestionAfter(afterVenueId: string, item: DayRouteVenueItem) {
+    setBetweenMenuAfterId(null);
+    if (atMax) {
+      flashDayRouteFeedback(dayRouteHardLimitMessage());
+      return;
+    }
+    if (!lookupDayRouteCoords(item, buildDayRouteCoordsMap([item]))) {
+      flashDayRouteFeedback('У места нет координат - выберите другое');
+      return;
+    }
+    setRoute(appendDayRouteItem(item, afterVenueId));
   }
 
   function openTextForm() {
@@ -3268,6 +3309,22 @@ function DayRoutePanelInner() {
               data-day-plan-list="plans"
               data-day-stop-view={effectiveStopViewMode}
             >
+              {effectiveStopViewMode === 'list' && planStops.length > 0 ? (
+                <DayRouteBetweenInsert
+                  afterVenueId="__start__"
+                  menuOpen={betweenMenuAfterId === '__start__'}
+                  onMenuOpenChange={(open) =>
+                    setBetweenMenuAfterId(open ? '__start__' : null)
+                  }
+                  segmentMeters={null}
+                  travelMode={travelMode}
+                  disabled={atMax}
+                  suggestions={betweenInsertSuggestions}
+                  onAddNote={(text) => openInsertNoteAfter('__start__', text)}
+                  onAddSuggestion={(item) => insertSuggestionAfter('__start__', item)}
+                  onOpenFullPicker={() => openInsertPlaceAfter('__start__')}
+                />
+              ) : null}
               {planStops.map((venue, index) => {
                 const globalIndex = route.venues.findIndex((v) => v.id === venue.id);
                 const nextTipRaw =
@@ -3343,19 +3400,21 @@ function DayRoutePanelInner() {
                       onHoverStop={(id) => setHoverStopId(id)}
                       onHoverClear={() => setHoverStopId(null)}
                     />
-                    {listMode && index < planStops.length - 1 ? (
+                    {listMode ? (
                       <DayRouteBetweenInsert
                         afterVenueId={venue.id}
                         menuOpen={betweenMenuAfterId === venue.id}
                         onMenuOpenChange={(open) =>
                           setBetweenMenuAfterId(open ? venue.id : null)
                         }
-                        segmentMeters={segmentToNext}
+                        segmentMeters={index < planStops.length - 1 ? segmentToNext : null}
                         travelMode={travelMode}
-                        transitTip={betweenTip}
+                        transitTip={index < planStops.length - 1 ? betweenTip : ''}
                         disabled={atMax}
-                        onAddPlace={() => openInsertPlaceAfter(venue.id)}
-                        onAddNote={() => openInsertNoteAfter(venue.id)}
+                        suggestions={betweenInsertSuggestions}
+                        onAddNote={(text) => openInsertNoteAfter(venue.id, text)}
+                        onAddSuggestion={(item) => insertSuggestionAfter(venue.id, item)}
+                        onOpenFullPicker={() => openInsertPlaceAfter(venue.id)}
                       />
                     ) : null}
                     {primaryFreeWindow &&
@@ -4540,7 +4599,7 @@ function DayRouteListPin({ n }: { n: number }) {
 }
 
 /**
- * Between list stops: Lovable dashed leg + insert «+».
+ * Between list stops: travel leg + Lovable «+ Добавить» panel (note / suggested places).
  */
 function DayRouteBetweenInsert({
   afterVenueId,
@@ -4550,8 +4609,10 @@ function DayRouteBetweenInsert({
   travelMode,
   transitTip,
   disabled = false,
-  onAddPlace,
+  suggestions = [],
   onAddNote,
+  onAddSuggestion,
+  onOpenFullPicker,
 }: {
   afterVenueId: string;
   menuOpen: boolean;
@@ -4560,10 +4621,19 @@ function DayRouteBetweenInsert({
   travelMode: DayRouteTravelMode;
   transitTip?: string;
   disabled?: boolean;
-  onAddPlace: () => void;
-  onAddNote: () => void;
+  suggestions?: Array<{
+    id: string;
+    title: string;
+    tag: string;
+    imageUrl: string | null;
+    item: DayRouteVenueItem;
+  }>;
+  onAddNote: (text: string) => void;
+  onAddSuggestion: (item: DayRouteVenueItem) => void;
+  onOpenFullPicker?: () => void;
 }) {
   const rootRef = useRef<HTMLLIElement | null>(null);
+  const [noteText, setNoteText] = useState('');
   const segmentMinutes =
     segmentMeters != null && segmentMeters > 0
       ? estimateDayRouteTravelMinutes(segmentMeters, travelMode)
@@ -4575,6 +4645,11 @@ function DayRouteBetweenInsert({
     timeLabel && distanceLabel
       ? `${distanceLabel} · ~${timeLabel}`
       : timeLabel || distanceLabel || '';
+  const showLeg = Boolean(statsLabel || transitTip);
+
+  useEffect(() => {
+    if (!menuOpen) setNoteText('');
+  }, [menuOpen]);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -4586,9 +4661,7 @@ function DayRouteBetweenInsert({
       }
     }
     function onKey(event: KeyboardEvent) {
-      if (event.key === 'Escape') {
-        onMenuOpenChange(false);
-      }
+      if (event.key === 'Escape') onMenuOpenChange(false);
     }
     document.addEventListener('mousedown', onDocPointer);
     document.addEventListener('keydown', onKey);
@@ -4601,83 +4674,154 @@ function DayRouteBetweenInsert({
   return (
     <li
       ref={rootRef}
-      className="group/between relative list-none"
+      className="relative list-none"
       data-day-between-insert
       data-day-between-after={afterVenueId}
     >
-      <div className="ml-4 flex items-center gap-3 border-l border-dashed border-slate-200 py-2.5 pl-6 text-xs text-slate-500 sm:ml-5">
-        {travelMode === 'auto' ? (
-          <Car className="h-3.5 w-3.5 shrink-0" aria-hidden />
-        ) : (
-          <PersonStanding className="h-3.5 w-3.5 shrink-0" aria-hidden />
-        )}
-        <div
-          className="relative z-[1] flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-0.5"
-          data-day-between-meta
-        >
-          {statsLabel ? (
-            <span className="min-w-0 truncate whitespace-nowrap tabular-nums" data-day-between-stats>
-              {statsLabel} {travelMode === 'auto' ? 'на авто' : 'пешком'}
-            </span>
+      {showLeg ? (
+        <div className="ml-4 flex items-center gap-3 border-l border-dashed border-slate-200 py-2 pl-6 text-xs text-slate-500 sm:ml-5">
+          {travelMode === 'auto' ? (
+            <Car className="h-3.5 w-3.5 shrink-0" aria-hidden />
           ) : (
-            <span className="whitespace-nowrap text-slate-400" data-day-between-stats="stub">
-              маршрут
-            </span>
+            <PersonStanding className="h-3.5 w-3.5 shrink-0" aria-hidden />
           )}
-          {transitTip ? (
-            <span className="line-clamp-1 min-w-0 flex-1 text-[11px] text-slate-400" data-day-transit-between>
-              {transitTip}
-            </span>
-          ) : null}
-        </div>
-        <div className="relative shrink-0">
-          <button
-            type="button"
-            aria-label="Добавить между точками"
-            aria-expanded={menuOpen}
-            aria-haspopup="menu"
-            disabled={disabled}
-            data-day-between-plus
-            onClick={() => {
-              onMenuOpenChange(!menuOpen);
-            }}
-            className={`inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-primary-300 hover:text-primary-700 disabled:cursor-not-allowed disabled:opacity-40 ${
-              menuOpen
-                ? 'opacity-100'
-                : 'opacity-100 lg:opacity-0 lg:group-hover/between:opacity-100'
-            }`}
+          <div
+            className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-0.5"
+            data-day-between-meta
           >
-            <Plus className="h-3.5 w-3.5" />
-          </button>
-          {menuOpen ? (
-            <div
-              role="menu"
-              data-day-between-menu
-              className="absolute right-0 top-[calc(100%+6px)] z-30 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-lg sm:left-0 sm:right-auto"
-            >
+            {statsLabel ? (
+              <span className="tabular-nums" data-day-between-stats>
+                {statsLabel} {travelMode === 'auto' ? 'на авто' : 'пешком'}
+              </span>
+            ) : null}
+            {transitTip ? (
+              <span className="line-clamp-1 min-w-0 flex-1 text-[11px] text-slate-400" data-day-transit-between>
+                {transitTip}
+              </span>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
+
+      <div className="ml-4 py-1 sm:ml-5" data-day-between-add>
+        {menuOpen ? (
+          <div
+            className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm"
+            data-day-between-panel
+          >
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-sm font-semibold text-slate-900">Что добавить сюда?</p>
               <button
                 type="button"
-                role="menuitem"
-                data-day-between-add-place
-                onClick={onAddPlace}
-                className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-sm font-medium text-slate-800 hover:bg-slate-50"
+                aria-label="Закрыть"
+                onClick={() => onMenuOpenChange(false)}
+                className="grid h-7 w-7 place-items-center rounded-full border border-slate-200 text-slate-400 hover:bg-slate-50"
               >
-                <MapPin className="h-4 w-4 shrink-0 text-primary-600" aria-hidden />
-                Добавьте место
-              </button>
-              <button
-                type="button"
-                role="menuitem"
-                data-day-between-add-note
-                onClick={onAddNote}
-                className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-sm font-medium text-slate-800 hover:bg-slate-50"
-              >
-                <StickyNote className="h-4 w-4 shrink-0 text-slate-500" aria-hidden />
-                Добавить заметку
+                <X className="h-3.5 w-3.5" />
               </button>
             </div>
-          ) : null}
-        </div>
+
+            <div className="mt-3 flex gap-2">
+              <input
+                value={noteText}
+                onChange={(e) => setNoteText(e.target.value)}
+                placeholder="Заметка: например, кофе и передышка"
+                disabled={disabled}
+                data-day-between-note-input
+                className="min-w-0 flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-primary-400 disabled:opacity-50"
+                onKeyDown={(e) => {
+                  if (e.key !== 'Enter') return;
+                  e.preventDefault();
+                  const t = noteText.trim();
+                  if (!t || disabled) return;
+                  onAddNote(t);
+                  setNoteText('');
+                  onMenuOpenChange(false);
+                }}
+              />
+              <button
+                type="button"
+                disabled={disabled || !noteText.trim()}
+                data-day-between-add-note
+                onClick={() => {
+                  const t = noteText.trim();
+                  if (!t) return;
+                  onAddNote(t);
+                  setNoteText('');
+                  onMenuOpenChange(false);
+                }}
+                className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-primary-600 px-3 py-2 text-sm font-semibold text-white disabled:opacity-40"
+              >
+                <StickyNote className="h-4 w-4" aria-hidden />
+                Заметка
+              </button>
+            </div>
+
+            {suggestions.length ? (
+              <div className="mt-3 grid gap-2 sm:grid-cols-2" data-day-between-suggestions>
+                {suggestions.map((s) => (
+                  <button
+                    key={s.id}
+                    type="button"
+                    disabled={disabled}
+                    data-day-between-suggest={s.id}
+                    onClick={() => {
+                      onAddSuggestion(s.item);
+                      onMenuOpenChange(false);
+                    }}
+                    className="flex items-center gap-3 rounded-xl border border-slate-200 p-2 text-left transition hover:bg-slate-50 disabled:opacity-50"
+                  >
+                    <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-slate-100">
+                      {s.imageUrl ? (
+                        <SafeImage src={s.imageUrl} alt="" fill sizes="2.5rem" className="object-cover" />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center text-slate-400">
+                          <MapPin className="h-4 w-4" />
+                        </div>
+                      )}
+                    </div>
+                    <span className="min-w-0">
+                      <span className="block text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-slate-400">
+                        {s.tag}
+                      </span>
+                      <span className="block truncate text-sm font-semibold text-slate-900">{s.title}</span>
+                    </span>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-3 text-sm text-slate-500">
+                Подходящих мест рядом нет - откройте полный подбор.
+              </p>
+            )}
+
+            {onOpenFullPicker ? (
+              <button
+                type="button"
+                disabled={disabled}
+                onClick={() => {
+                  onMenuOpenChange(false);
+                  onOpenFullPicker();
+                }}
+                className="mt-3 text-xs font-semibold text-primary-700 hover:underline"
+              >
+                Открыть полный подбор
+              </button>
+            ) : null}
+          </div>
+        ) : (
+          <button
+            type="button"
+            aria-label="Добавить точку или заметку"
+            disabled={disabled}
+            data-day-between-plus
+            onClick={() => onMenuOpenChange(true)}
+            className="inline-flex items-center gap-2 rounded-full border border-dashed border-slate-300 px-3 py-1 text-xs font-semibold text-slate-500 transition hover:border-primary-400 hover:text-primary-700 disabled:opacity-40"
+          >
+            <Plus className="h-3.5 w-3.5" aria-hidden />
+            Добавить
+          </button>
+        )}
       </div>
     </li>
   );

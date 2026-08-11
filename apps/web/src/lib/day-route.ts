@@ -351,11 +351,15 @@ function insertDayRouteVenueItem(
 ): DayRouteState {
   const venues = [...current.venues];
   const afterId = String(afterVenueId || '').trim();
-  const afterIdx = afterId ? venues.findIndex((v) => v.id === afterId) : -1;
-  if (afterIdx >= 0) {
-    venues.splice(afterIdx + 1, 0, item);
+  if (afterId === '__start__') {
+    venues.unshift(item);
   } else {
-    venues.push(item);
+    const afterIdx = afterId ? venues.findIndex((v) => v.id === afterId) : -1;
+    if (afterIdx >= 0) {
+      venues.splice(afterIdx + 1, 0, item);
+    } else {
+      venues.push(item);
+    }
   }
 
   const next: DayRouteState = {
@@ -926,11 +930,15 @@ export function insertIntoDayRoute(
 
   const venues = [...current.venues];
   const afterId = String(afterVenueId || '').trim();
-  const afterIdx = afterId ? venues.findIndex((v) => v.id === afterId) : -1;
-  if (afterIdx >= 0) {
-    venues.splice(afterIdx + 1, 0, normalized);
+  if (afterId === '__start__') {
+    venues.unshift(normalized);
   } else {
-    venues.push(normalized);
+    const afterIdx = afterId ? venues.findIndex((v) => v.id === afterId) : -1;
+    if (afterIdx >= 0) {
+      venues.splice(afterIdx + 1, 0, normalized);
+    } else {
+      venues.push(normalized);
+    }
   }
 
   const next: DayRouteState = {
