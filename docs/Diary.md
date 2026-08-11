@@ -1,3 +1,23 @@
+## 2026-08-11 - MSK: /api/public/home stale fallback (publicVenues)
+
+### Наблюдения
+- Live GET `/api/public/home` отдавал `generatedAt=2026-05-30` из `apps/public/data.js`.
+- journal: `Falling back to apps/public/data.js: publicVenues is not defined`.
+- Localhost API warm: destinations/home ~10ms; cold catalog SWR adopt 0.2-2s; host load OK.
+- nginx `/api/public/*` -> `:4000` (не Next). Next `:3001/api/public/home` = 404.
+
+### Решения
+- Export `publicVenues` из `public-venue-read.js`, import в `dto.js`.
+- `buildPublicHome`: один `publicCatalogSessions` + derive destinations (без второго full scan).
+- Commit `48a49340`; на MSK checkout двух файлов + `systemctl restart daibilet-api`.
+- After: home `generatedAt` live, dest=98/events=2941; warm ~15-155ms; `/` ~163ms.
+
+### Проблемы
+- Cold `home?refresh=1` localhost ~7.5s (catalog+venues hub) - отдельный perf pass.
+- MSK git tip всё ещё старый checkout; файлы пропатчены точечно.
+
+---
+
 ## 2026-08-11 - My Day: picker side drawer (Lovable)
 
 ### Наблюдения
