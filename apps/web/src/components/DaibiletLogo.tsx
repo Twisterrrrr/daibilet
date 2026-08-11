@@ -13,8 +13,7 @@ type DaibiletLogoProps = {
 };
 
 /**
- * Retina-sharp SVG wordmark «Дайбилет».
- * Visual text is «Даибилет»; blue circle is the й-кратка (no routes / animation).
+ * Retina SVG wordmark «Дайбилет» - letters only, no dots / routes.
  */
 export function DaibiletLogo({
   className = '',
@@ -30,18 +29,15 @@ export function DaibiletLogo({
       <span className="sr-only">Дайбилет</span>
       <svg
         className={styles.logoSvg}
-        viewBox="0 0 450 150"
+        viewBox="0 0 420 110"
         width="100%"
         height="100%"
         aria-hidden="true"
         focusable="false"
       >
-        <g transform="translate(20, 20)">
-          <circle className={styles.logoDot} cx="112" cy="36" r="11" />
-          <text className={styles.logoSvgText} x="0" y="100" fontSize="76">
-            Даибилет
-          </text>
-        </g>
+        <text className={styles.logoSvgText} x="0" y="82" fontSize="76">
+          Дайбилет
+        </text>
       </svg>
     </span>
   );
