@@ -1,3 +1,19 @@
+## 2026-08-11 - EKB стендап: уральский юмор (rewrite)
+
+### Наблюдения
+- Owner rewrite `ekb-stendap-uralskiy-yumor`: 3 формата + 3 лайфхака; title «Уральский юмор без цензуры…».
+- `/stendap-i-yumor/ekaterinburg` live 200; cover/inline/og уже на диске.
+
+### Решения
+- Verbatim owner + дефисы; emoji из H2 убраны; image shortcodes; author editorial.
+- Commit `09de1fb1`; MSK upsert + sync-public-assets + revalidate; Deploy MSK web (очередь concurrency).
+- Live smoke 200: title/форматы/лайфхаки/ссылка/inline.
+
+### Проблемы
+- Параллельные Deploy MSK web часто cancel друг друга; контент на live уже через upsert+revalidate.
+
+---
+
 ## 2026-08-11 - Колонка Анны: музыка в особняках СПб (rewrite)
 
 ### Наблюдения
