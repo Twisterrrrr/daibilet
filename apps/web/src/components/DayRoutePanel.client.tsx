@@ -29,6 +29,7 @@ import {
   X,
 } from 'lucide-react';
 import {
+  MyDayCityPickStarter,
   MyDayPickerLaunch,
   MyDayPickerSheet,
   MyDayItinerary,
@@ -2861,7 +2862,7 @@ function DayRoutePanelInner() {
     );
   }
 
-  /** Lovable empty: «Шаг 1 из 2» + map preview when city known; otherwise city picker. */
+  /** Empty starter: city pick («Собери свой день») or scenario/map when city known. */
   function renderEmptyStarter() {
     const cityLabel = scopeCityName || pageCityName || '';
     const cityInCase = cityLabel ? inCityPrepositional(cityLabel) : '';
@@ -2902,36 +2903,17 @@ function DayRoutePanelInner() {
 
     if (!hasPageCity) {
       return (
-        <section
-          className="mt-3 w-full rounded-2xl border border-slate-200 bg-white px-4 py-5 sm:mt-5 sm:px-5 sm:py-6"
-          ref={unifiedSearchRef}
-          data-day-unified-search
-          data-day-starter="1"
-          data-day-starter-variant="pick-city"
-        >
-          <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-primary-600">
-            Шаг 1 из 2
-          </p>
-          <h2 className="mt-1 font-display text-xl font-extrabold text-slate-900 sm:text-2xl">
-            Сначала выберите город
-          </h2>
-          <p className="mt-1 max-w-xl text-sm text-slate-500">
-            Потом откроется готовый сценарий или ручной подбор мест - минимум {DAY_ROUTE_MIN} точки.
-          </p>
-          <div className="mt-4 max-w-md" data-day-city-picker>
-            <CityPicker
-              cities={destinations}
-              value={selectedCity?.cityValue || 'all'}
-              onChange={(name) => {
-                if (selectedCity?.setCity(name) === false) return;
-                if (name !== 'all') setCityInput(name);
-              }}
-              allLabel="Выберите город"
-              variant="hero"
-              className="w-full"
-            />
-          </div>
-        </section>
+        <MyDayCityPickStarter
+          ref={(node) => {
+            unifiedSearchRef.current = node;
+          }}
+          cities={destinations}
+          value={selectedCity?.cityValue || 'all'}
+          onChange={(name) => {
+            if (selectedCity?.setCity(name) === false) return;
+            if (name !== 'all') setCityInput(name);
+          }}
+        />
       );
     }
 
@@ -2944,10 +2926,7 @@ function DayRoutePanelInner() {
         data-day-starter-variant="lovable-step"
       >
         <div className="min-w-0">
-          <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-primary-600">
-            Шаг 1 из 2
-          </p>
-          <h2 className="mt-1 font-display text-xl font-extrabold text-slate-900 sm:text-2xl">
+          <h2 className="font-display text-xl font-extrabold text-slate-900 sm:text-2xl">
             Начните день с готового сценария
           </h2>
           <p className="mt-1 max-w-xl text-sm leading-relaxed text-slate-600">
@@ -3978,30 +3957,32 @@ function DayRoutePanelInner() {
         />
       ) : (
         <>
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0 flex-1">
-              <h1 className="font-display text-[1.65rem] font-extrabold tracking-tight leading-tight text-slate-900 sm:text-3xl">
-                {scopeCityName ? `Мой день ${inCityPrepositional(scopeCityName)}` : 'Мой день'}
-              </h1>
-              <p
-                className="mt-1.5 flex flex-wrap items-baseline gap-x-1 text-[13px] font-medium text-slate-500"
-                data-day-route-count-label
-                data-day-city-scope
-              >
-                {cityScopeLine ? <span>{cityScopeLine}</span> : null}
-                {cityScopeLine && scopeCityName ? <span aria-hidden>·</span> : null}
-                {scopeCityName ? (
-                  <Link
-                    href={cityHubHref}
-                    className="text-primary-600 transition-colors hover:text-primary-700 hover:underline"
-                    data-day-city-hub-link
-                  >
-                    Страница {cityToGenitive(scopeCityName)}
-                  </Link>
-                ) : null}
-              </p>
+          {hasPageCity ? (
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0 flex-1">
+                <h1 className="font-display text-[1.65rem] font-extrabold tracking-tight leading-tight text-slate-900 sm:text-3xl">
+                  {scopeCityName ? `Мой день ${inCityPrepositional(scopeCityName)}` : 'Мой день'}
+                </h1>
+                <p
+                  className="mt-1.5 flex flex-wrap items-baseline gap-x-1 text-[13px] font-medium text-slate-500"
+                  data-day-route-count-label
+                  data-day-city-scope
+                >
+                  {cityScopeLine ? <span>{cityScopeLine}</span> : null}
+                  {cityScopeLine && scopeCityName ? <span aria-hidden>·</span> : null}
+                  {scopeCityName ? (
+                    <Link
+                      href={cityHubHref}
+                      className="text-primary-600 transition-colors hover:text-primary-700 hover:underline"
+                      data-day-city-hub-link
+                    >
+                      Страница {cityToGenitive(scopeCityName)}
+                    </Link>
+                  ) : null}
+                </p>
+              </div>
             </div>
-          </div>
+          ) : null}
           {hasPageCity && pickerTabs.length ? (
             <div className="mt-4 lg:mt-5" data-my-day-picker-host>
               <MyDayPickerLaunch tabs={pickerTabs} onOpen={openPicker} />
