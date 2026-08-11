@@ -1,3 +1,19 @@
+## 2026-08-11 - Event page: missing TC slots (slice 5)
+
+### Наблюдения
+- Owner: live `/events/...-6a43de0d9a11d83d48179599` (История в тарелке, KGD) показывал только 5 слотов при 10+ PUBLIC в meta-группе.
+- TC: каждый timeslot = отдельный Event; meta `6a43dc57…` → 36 children (16 cancelled / 9 STAND_BY / 11 PUBLIC в DB; live TC на момент сверки 10 PUBLIC / 8 STAND_BY среди upcoming).
+- `public-event.dto.ts`: `take: 12` + `.slice(0, 5)` обрезал saleable sessions после фильтра STAND_BY/closed.
+
+### Решения
+- Лимиты: fetch 64 / display 32 (`PUBLIC_EVENT_SESSION_*`).
+- MSK: `tc:sync --ids=` по siblings + restart API (без web deploy).
+
+### Проблемы
+- Описание продукта упоминает ещё 15:30 локально; в TC/DB только wall 17:30 и 19:30 (KGD). Слоты STAND_BY корректно скрыты.
+
+---
+
 ## 2026-08-11 - My Day: Lovable «Шаг 2 из 2» card
 
 ### Наблюдения
