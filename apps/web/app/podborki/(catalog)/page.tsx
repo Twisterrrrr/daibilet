@@ -5,6 +5,7 @@ import { LandingsCatalogView } from '@/components/LandingsCatalogView.client';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
 import { PODBORKI_CATEGORIES, type PodborkiCatalogItem } from '@/lib/podborki-categories';
+import { resolvePodborkiCatalogSeo } from '@/lib/podborki-city-seo';
 import { buildShareMetadata, pageTitle } from '@/lib/seo-meta';
 import {
   getCachedDestinations,
@@ -14,28 +15,41 @@ import {
 
 export const revalidate = 600;
 
-export async function generateMetadata(): Promise<Metadata> {
-  const title = pageTitle('Подборки - тематические коллекции событий');
-  const description =
-    'Готовые подборки на вечер, выходные и бюджет: по типу событий, для кого и сезонные программы.';
+type PageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+function firstQueryValue(value: string | string[] | undefined): string {
+  if (Array.isArray(value)) return String(value[0] || '').trim();
+  return String(value || '').trim();
+}
+
+export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
+  const params = await searchParams;
+  const seo = resolvePodborkiCatalogSeo(firstQueryValue(params.city));
+  const title = pageTitle(seo.title);
   return {
     title,
-    description,
-    alternates: { canonical: '/podborki' },
+    description: seo.description,
+    alternates: { canonical: seo.canonicalPath },
     ...buildShareMetadata({
       title: `${title} | Дайбилет`,
-      description,
-      path: '/podborki',
+      description: seo.description,
+      path: seo.canonicalPath,
     }),
   };
 }
 
 /**
- * Do not await searchParams - forces dynamic no-store.
- * SSR always city=all (ISR 600s); LandingsCatalogView refetches
- * `/api/public/landings-catalog?city=` when a city is selected and merges city-bound cards.
+ * Catalog SSR still loads city=all landings; LandingsCatalogView refetches
+ * `/api/public/landings-catalog?city=` when a city is selected.
+ * Pilot `?city=` (kaliningrad / saint-petersburg / moscow) gets unique SSR meta + H1.
+ * Awaiting searchParams opts the route into dynamic rendering for correct city SEO.
  */
-export default async function PodborkiCatalogPage() {
+export default async function PodborkiCatalogPage({ searchParams }: PageProps) {
+  const params = await searchParams;
+  const seo = resolvePodborkiCatalogSeo(firstQueryValue(params.city));
+
   const emptyCatalog = { generatedAt: new Date(0).toISOString(), city: 'all', items: [] as NonNullable<
     Awaited<ReturnType<typeof getCachedLandingsCatalog>>
   >['items'] };
@@ -107,6 +121,8 @@ export default async function PodborkiCatalogPage() {
             cities={destinationsPayload.destinations}
             categories={meta.categories}
             totalEvents={totalEvents}
+            heroTitle={seo.h1}
+            heroDescription={seo.heroDescription}
           />
         </Suspense>
       </div>

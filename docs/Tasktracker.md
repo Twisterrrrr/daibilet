@@ -10,13 +10,13 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| SEO.PODBORKI-CITY-CHPU | Owner brief: `/podborki/{city}` вместо `?city=`; meta/H1; card blurbs; blog→подборка. **Сначала план** - без массовой URL/перелинковки | Высокий | 🔄 планирование: [seo-podborki-chpu-plan.md](./seo-podborki-chpu-plan.md) + qa gate; код Phase 1+ после ответов owner |
-| SEO.PODBORKI-CITY-0 | Phase 0: inventory ссылок + риски (intent collision, slug canon, `/cities` cannibalization) | Высокий | ✅ docs 2026-08-11 |
-| SEO.PODBORKI-CITY-1 | Phase 1: ЧПУ+301+helper+nav (после канона slug/роута) | Высокий | ⏳ blocked owner |
-| SEO.PODBORKI-CITY-2 | Phase 2: Title/Description/H1 city-хаба | Высокий | ⏳ after P1 |
-| SEO.PODBORKI-CITY-3 | Phase 3: card SEO blurbs + «N • от X» | Средний | ⏳ after P2 |
-| SEO.PODBORKI-CITY-4 | Phase 4: blog banners → подборка → события | Средний | ⏳ after URL lock |
-| SEO.PODBORKI-TRACK | Не смешивать с My Day Lovable/routes и `seo-listing-texts` / category landings | Высокий | ✅ зафиксировано в plan/Diary |
+| SEO.PODBORKI-CITY-CHPU | Подборки city SEO: план + пилот Meta на `?city=` (не ЧПУ в этом проходе) | Высокий | 🔄 Meta-пилот ship; маркерный ЧПУ - след. спринт |
+| SEO.PODBORKI-CITY-0 | Phase 0: inventory + риски | Высокий | ✅ docs |
+| SEO.PODBORKI-CITY-META | Пилот Title/Desc/H1 + self-canonical `?city=` (kgd/spb/msk); SEO path slug | Высокий | 🔄 code; Deploy MSK web |
+| SEO.PODBORKI-CITY-1 | Phase 1: маркер `/podborki/c/{city}` + 301 | Высокий | ⏳ следующий спринт после индексации пилота |
+| SEO.PODBORKI-CITY-3 | Phase 3: card SEO blurbs + «N • от X» | Средний | ⏳ |
+| SEO.PODBORKI-CITY-4 | Phase 4: blog banners → подборка → события | Средний | ⏳ after marker URL lock |
+| SEO.PODBORKI-TRACK | Не смешивать с My Day / `seo-listing-texts` | Высокий | ✅ |
 
 ## Region Hub IA (2026-08-11)
 

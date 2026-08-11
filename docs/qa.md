@@ -20,21 +20,24 @@ Finance PR-ветка `codex/stage0-admission-ticket-core` может держа
 
 ---
 
-## 2026-08-11 - Подборки `/podborki` city ЧПУ (owner gate)
+## 2026-08-11 - Подборки `/podborki` city (LOCKED owner)
 
-План/аудит: [seo-podborki-chpu-plan.md](./seo-podborki-chpu-plan.md). **Код URL-миграции и массовая перелинковка - стоп** до ответов. Трек отдельный от My Day routes и от SEO category listing texts (`seo-listing-texts`).
+План: [seo-podborki-chpu-plan.md](./seo-podborki-chpu-plan.md). Трек отдельно от My Day routes и `seo-listing-texts`.
 
-1. **Канон city slug в path:** бриф пишет `/podborki/sankt-peterburg` и `/podborki/moskva`, но SEO landings/intents уже на `saint-petersburg` / `moscow` (aliases есть). Какой **один** канон для `/podborki/{city}` и 301 с алиасов?
-2. **Схема роута vs intents:** сейчас `/podborki/[intent]` съест city-сегмент. Ок **discriminating** `[segment]` (intent **или** city), или другой path? Ломать `/podborki/{intent}` нельзя без отдельного решения.
-3. **Нужен ли `/podborki` хаб как сейчас** (все города) + city ЧПУ, или хаб только витрина с ссылками на города? `?city=all` оставляем как 301→`/podborki`?
-4. **Охват индекса:** все destination cities в sitemap `/podborki/{city}`, только TOP (MSK/SPB/Kazan/…), или сначала 2 пилота?
-5. **User-generated / тонкие города:** если у города 0–2 карточки подборок - `noindex`, скрыть из UI, или всё равно ЧПУ?
-6. **Каннибализация с `/cities/{slug}`:** утвердить дифференциацию Title/H1 (подборки vs афиша города). Пример СПб из брифа - финальный канон текста?
-7. **Приоритет фаз:** сначала Phase 1 (ЧПУ+301+хелпер ссылок) или сначала контент карточек/meta на текущем soft `?city=` (временщина, агент **не** рекомендует)?
-8. **Blog banners (Phase 4):** сразу после URL lock или отдельным контент-батчем? Какие 3–5 пилотных гайдов?
+**LOCKED ответы:**
+1. **Slug:** Meta/Canonical = существующий SEO path-канон (`moscow` / `saint-petersburg` / `kaliningrad` via `normalizeKnownCitySlug`). Destinations DB translit (`moskva` / `sankt-peterburg`) - алиасы входа, не второй канон. Транслит-ЧПУ+301 только при будущем маркере.
+2. **Роут:** маркер `/podborki/c/{city}` (или `gorod-`) **не сейчас**; intents не ломаем.
+3. **Охват пилота:** kaliningrad, saint-petersburg, moscow.
+4. **vs `/cities`:** подборки = идейный хаб; city = афиша. Бренд Дайбилет.
+5. **Порядок:** сейчас только Meta на soft `?city=` + **canonical self** (`/podborki?city=X`), не `/podborki`. ЧПУ+301 - следующий спринт после успеха пилота.
+6. **Fork Meta vs маркер:** **только Meta сейчас**; маркерный сегмент - следующий спринт (не переспрашивать).
+
+**Ещё открыто (не блокер пилота Meta):**
+- Тонкие города / noindex порог для будущих city URL.
+- Blog banners timing / пилотные гайды.
+- Финальная вычитка Title/H1 copy после SERP smoke.
 
 ---
-
 
 ## 2026-08-11 - Category×city SEO-текст vs noindex
 

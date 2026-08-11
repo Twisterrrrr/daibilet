@@ -1,3 +1,34 @@
+## 2026-08-11 - SEO Подборки: Meta-пилот на soft `?city=` (не ЧПУ)
+
+### Наблюдения
+- Owner LOCKED: сначала Meta/Canonical на `?city=`, не маркерный ЧПУ; canonical self; пилот kgd/spb/msk; идейный хаб vs афиша city.
+- Факт slug: destinations `moskva`/`sankt-peterburg`; SEO path `moscow`/`saint-petersburg` (`/cities/sankt-peterburg` → 308 на saint-petersburg). Meta канон = SEO path.
+
+### Решения
+- Код: `podborki-city-seo.ts` + `(catalog)/page.tsx` searchParams; H1 props в LandingsCatalogView.
+- Fork зафиксирован: маркер `/podborki/c/{city}` - следующий спринт после индексации без склейки.
+- Plan/qa/Tasktracker обновлены; intents не трогали.
+
+### Проблемы
+- await searchParams → `/podborki` dynamic (осознанный trade-off пилота).
+
+---
+
+## 2026-08-11 - Rewrite: Москва за 48 часов
+
+### Наблюдения
+- Owner rewrite moscow-2-dnya-samostoyatelno-marshrut: сити-брейк День 1-2; emoji убраны из H2; дефис вместо длинного тире.
+- /ekskursii/moscow и /rechnye-progulki/moscow live 200; cover/inline уже на диске.
+
+### Решения
+- MD + blog-posts web/public + sync-bodies; author editorial; commit 28533548.
+- MSK upsert + revalidate; Deploy MSK web 31532073831.
+
+### Проблемы
+- Очередь Deploy MSK web сильно отменялась параллельными rewrite; дождались success.
+
+---
+
 ## 2026-08-11 - SEO Подборки: city ЧПУ - анализ без внедрения
 
 ### Наблюдения

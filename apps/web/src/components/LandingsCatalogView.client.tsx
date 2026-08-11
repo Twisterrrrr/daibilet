@@ -93,12 +93,17 @@ export function LandingsCatalogView({
   cities,
   categories,
   totalEvents,
+  heroTitle,
+  heroDescription,
 }: {
   items: PodborkiCatalogItem[];
   city: string;
   cities: PublicDestinationDto[];
   categories: PodborkiCategoryMeta[];
   totalEvents: number;
+  /** SSR SEO H1 override (pilot city meta). */
+  heroTitle?: string;
+  heroDescription?: string;
 }) {
   const urlSearchParams = useSearchParams();
   const selectedCity = useSelectedCityOptional();
@@ -255,8 +260,11 @@ export function LandingsCatalogView({
       <HeroLayout
         variant="minimal"
         breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Подборки' }]}
-        title="Готовые планы на вечер и выходные"
-        description="Подборки под настроение: для двоих, с детьми, бюджетно или культурно - сразу к билетам."
+        title={heroTitle || 'Готовые планы на вечер и выходные'}
+        description={
+          heroDescription ||
+          'Подборки под настроение: для двоих, с детьми, бюджетно или культурно - сразу к билетам.'
+        }
       >
         {sections.length ? (
           <div className="mt-5 space-y-3">
