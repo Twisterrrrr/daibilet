@@ -1,3 +1,18 @@
+## 2026-08-11 - My Day empty: Lovable step card order
+
+### Наблюдения
+- Empty My Day всё ещё читался как старый «Собери свой день»: порядок блоков не совпадал со скрином Lovable (picker bar → dashed «Шаг 1 из 2»).
+
+### Решения
+- Empty branch: `MyDayPickerLaunch` сверху, затем `renderEmptyStarter` (step card + map preview / city picker).
+- Копирайт launch bar выровнен с Lovable (дефис `-`, без em dash): «Сценарии, главные места, пригороды и рекомендации - в одной боковой панели».
+- Desktop Save/Share/Open route в empty header не дублировали: в нашем shell они завязаны на непустой маршрут; city chip уже в другом месте.
+
+### Проблемы
+- Live MSK web - batch / по запросу owner (локально + push ветки достаточно).
+
+---
+
 ## 2026-08-11 - Home popular cities: mobile tap dead + false «0 событий»
 
 ### Наблюдения

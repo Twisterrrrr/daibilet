@@ -189,7 +189,7 @@ export function MyDayPickerLaunch({ tabs, onOpen, className = '' }: MyDayPickerL
         <div className="min-w-0">
           <p className="text-sm font-bold text-slate-900">Добавить точки в день</p>
           <p className="text-xs text-slate-500">
-            Сценарии, места, пригороды и рекомендации - в боковой панели
+            Сценарии, главные места, пригороды и рекомендации - в одной боковой панели
           </p>
         </div>
         <button

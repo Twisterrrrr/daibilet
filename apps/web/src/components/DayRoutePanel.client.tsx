@@ -140,6 +140,7 @@ import {
   hydrateDayRouteFromShare,
   updateDayRouteVenue,
   writeDayRoute,
+  replaceDayRouteFromVenues,
   type DayRouteState,
   type DayRouteTravelMode,
   type DayRouteVenueItem,
@@ -151,6 +152,8 @@ import {
   resolveVenueHeroImage,
 } from '@/lib/city-place-images';
 import {
+  buildCityDayRoutePreset,
+  cityDayRoutePresetAvailable,
   dayRouteHookLine,
   dayRouteItemFromEvent,
   dayRouteItemFromMustSee,
@@ -2531,134 +2534,149 @@ function DayRoutePanelInner() {
     );
   }
 
-  /** Empty plan starter - full card (= header width), desktop equal-M margins. */
+  /** Lovable empty: «Шаг 1 из 2» + map preview when city known; otherwise city picker. */
   function renderEmptyStarter() {
+    const cityLabel = scopeCityName || pageCityName || '';
+    const cityInCase = cityLabel ? inCityPrepositional(cityLabel) : '';
+    const firstPreset = dayRoutePresets[0] || null;
+    const firstPresetItems = firstPreset
+      ? buildCityDayRoutePreset(firstPreset.stops, matchSources, dayPresetCityCtx)
+      : [];
+    const firstPresetReady =
+      Boolean(firstPreset) &&
+      cityDayRoutePresetAvailable(firstPreset!.stops, matchSources, dayPresetCityCtx);
+
+    let mapCenter: { latitude: number; longitude: number } | null = null;
+    for (const place of mustSeePlaces) {
+      const lat = Number(place.latitude);
+      const lng = Number(place.longitude);
+      if (Number.isFinite(lat) && Number.isFinite(lng)) {
+        mapCenter = { latitude: lat, longitude: lng };
+        break;
+      }
+    }
+    if (!mapCenter) {
+      for (const row of mustSeeResolved) {
+        const lat = Number(row.item.latitude);
+        const lng = Number(row.item.longitude);
+        if (Number.isFinite(lat) && Number.isFinite(lng)) {
+          mapCenter = { latitude: lat, longitude: lng };
+          break;
+        }
+      }
+    }
+
+    if (!hasPageCity) {
+      return (
+        <section
+          className="mt-3 w-full rounded-2xl border border-slate-200 bg-white px-4 py-5 sm:mt-5 sm:px-5 sm:py-6"
+          ref={unifiedSearchRef}
+          data-day-unified-search
+          data-day-starter="1"
+          data-day-starter-variant="pick-city"
+        >
+          <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-primary-600">
+            Шаг 1 из 2
+          </p>
+          <h2 className="mt-1 font-display text-xl font-extrabold text-slate-900 sm:text-2xl">
+            Сначала выберите город
+          </h2>
+          <p className="mt-1 max-w-xl text-sm text-slate-500">
+            Потом откроется готовый сценарий или ручной подбор мест - минимум {DAY_ROUTE_MIN} точки.
+          </p>
+          <div className="mt-4 max-w-md" data-day-city-picker>
+            <CityPicker
+              cities={destinations}
+              value={selectedCity?.cityValue || 'all'}
+              onChange={(name) => {
+                if (selectedCity?.setCity(name) === false) return;
+                if (name !== 'all') setCityInput(name);
+              }}
+              allLabel="Выберите город"
+              variant="hero"
+              className="w-full"
+            />
+          </div>
+        </section>
+      );
+    }
+
     return (
       <section
-        className="mt-3 w-full rounded-2xl border border-slate-200 bg-white max-lg:py-3.5 sm:mt-5 sm:max-lg:py-4 lg:py-6"
+        className="mt-4 grid gap-4 rounded-2xl border border-dashed border-primary-300/70 bg-primary-50/40 p-5 sm:mt-5 sm:p-7 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,300px)]"
         ref={unifiedSearchRef}
         data-day-unified-search
         data-day-starter="1"
-        data-day-starter-variant="a"
-        data-day-starter-desktop="two-col"
-        data-day-starter-max="full"
-        data-day-starter-inset="equal-m"
-        data-day-starter-pad="sym"
-        data-day-starter-geometry="stable"
-        data-day-starter-align="col"
-        data-day-starter-form-w="400px"
-        data-day-catalog-load="progressive"
+        data-day-starter-variant="lovable-step"
       >
-        {/*
-          Full width of container-page (= header).
-          Desktop: 1fr auto 1fr auto 1fr → left M = middle M = right M.
-        */}
-        <div
-          className="flex w-full flex-col max-lg:mx-auto max-lg:max-w-md max-lg:px-3.5 sm:max-lg:px-5 lg:grid lg:grid-cols-[1fr_auto_1fr_auto_1fr] lg:items-center"
-          data-day-plan-starter
-        >
-          <div
-            className="flex min-w-0 max-w-md items-start gap-4 max-lg:w-full lg:col-start-2"
-            data-day-starter-left
-          >
-            <div
-              className="inline-flex shrink-0 items-center justify-center rounded-lg bg-slate-50 p-2 text-slate-400"
-              aria-hidden
+        <div className="min-w-0">
+          <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-primary-600">
+            Шаг 1 из 2
+          </p>
+          <h2 className="mt-1 font-display text-xl font-extrabold text-slate-900 sm:text-2xl">
+            Начните день с готового сценария
+          </h2>
+          <p className="mt-1 max-w-xl text-sm leading-relaxed text-slate-600">
+            Сценарий сразу добавит 5-7 точек с логистикой и таймингом. Или соберите маршрут вручную
+            из главных мест {cityInCase || 'города'} - порядок потом можно менять перетаскиванием.
+          </p>
+          <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+            <button
+              type="button"
+              data-day-empty-pick-scenario
+              onClick={() => openPicker('scenarios')}
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-primary-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-primary-700"
             >
-              <Route className="h-6 w-6" />
-            </div>
-            <div className="min-w-0" data-day-starter-copy>
-              <p className="text-xl font-bold leading-snug text-slate-900">Собери свой день</p>
-              <p className="mt-1 text-sm leading-relaxed text-slate-500">
-                Выбери город и минимум {DAY_ROUTE_MIN} точки для составления маршрута
-              </p>
-            </div>
+              <Route className="h-4 w-4" aria-hidden />
+              Выбрать готовый сценарий
+            </button>
+            <button
+              type="button"
+              data-day-empty-add-places
+              onClick={() => openPicker('places')}
+              className="inline-flex items-center justify-center gap-2 rounded-full border border-primary-300 bg-white px-5 py-3 text-sm font-semibold text-primary-700 transition hover:bg-primary-50"
+            >
+              <Plus className="h-4 w-4" aria-hidden />
+              Добавить места самому
+            </button>
           </div>
-          <div
-            className="mt-3 flex w-full flex-col gap-3 max-lg:min-h-0 lg:col-start-4 lg:mt-0 lg:w-[400px] lg:min-w-[20rem] lg:shrink-0 lg:translate-y-[10px]"
-            data-day-starter-right
-            data-day-city-search-stack
-          >
-            <div data-day-city-picker className="w-full text-left">
-              <CityPicker
-                cities={destinations}
-                value={selectedCity?.cityValue || 'all'}
-                onChange={(name) => {
-                  if (selectedCity?.setCity(name) === false) return;
-                  if (name !== 'all') setCityInput(name);
-                }}
-                allLabel="Выберите город"
-                variant="hero"
-                className="w-full"
+          {firstPresetReady && firstPreset ? (
+            <button
+              type="button"
+              data-day-empty-quick-preset={firstPreset.id}
+              onClick={() => {
+                replaceDayRouteFromVenues(firstPresetItems, pageCityId || null);
+                setRoute(readDayRouteFresh());
+                flashDayRouteFeedback(
+                  dayRouteAddSuccessMessage(firstPresetItems.length) ||
+                    `Сценарий «${firstPreset.title}» в маршруте`,
+                );
+              }}
+              className="mt-4 text-left text-sm font-semibold text-primary-700 underline-offset-2 hover:underline"
+            >
+              Или соберите за меня: «{firstPreset.title}» ({firstPresetItems.length} точек)
+            </button>
+          ) : null}
+        </div>
+
+        <div className="min-w-0" data-day-empty-map-preview>
+          <div className="h-[220px] w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-100 lg:h-[260px]">
+            {mapCenter ? (
+              <DayRouteOsmMap
+                stops={[]}
+                fallbackCenter={mapCenter}
+                className="h-full min-h-[220px] w-full"
+                layoutKey="empty-preview"
               />
-            </div>
-            <div className="w-full text-left">
-              <DayRouteSearchSelect
-                label="Поиск"
-                hideLabel
-                placeholder="Найти место или событие"
-                emptyText={
-                  !hasPageCity
-                    ? 'Сначала выберите город'
-                    : catalogLoading && unifiedSearchOptions.length === 0
-                      ? 'Загружаем…'
-                      : catalogError || 'Ничего не найдено'
-                }
-                loading={
-                  hasPageCity && catalogLoading && unifiedSearchOptions.length === 0
-                }
-                disabled={!hasPageCity || atMax}
-                options={hasPageCity ? unifiedSearchOptions : []}
-                onPick={pickUnifiedSearch}
-                onQueryChange={setUnifiedSearchQuery}
-                onCreateCustom={hasPageCity ? createCustomFromSearch : undefined}
-                createCustomDisabled={atMax}
-              />
-              {hasPageCity && catalogError ? (
-                <p className="mt-1.5 mb-0 pl-1 text-left text-xs font-medium text-rose-700" role="status">
-                  {catalogError}
-                </p>
-              ) : null}
-              {hasPageCity ? (
-                <p
-                  className="mt-1.5 mb-0 block pl-1 text-left text-xs leading-tight text-slate-500"
-                  data-day-starter-invite
-                >
-                  {hasNamedPresets ? (
-                    <>
-                      Добавь{' '}
-                      <button
-                        type="button"
-                        onClick={openTextForm}
-                        className="m-0 inline p-0 font-semibold text-slate-700 underline-offset-2 transition duration-200 hover:underline"
-                      >
-                        своё место
-                      </button>
-                      {' '}или{' '}
-                      <button
-                        type="button"
-                        onClick={scrollToDayPresets}
-                        className="m-0 inline p-0 font-semibold text-slate-700 underline-offset-2 transition duration-200 hover:underline"
-                      >
-                        готовый сценарий
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      или{' '}
-                      <button
-                        type="button"
-                        onClick={openTextForm}
-                        className="m-0 inline p-0 font-semibold text-slate-700 underline-offset-2 transition duration-200 hover:underline"
-                      >
-                        добавить своё место
-                      </button>
-                    </>
-                  )}
-                </p>
-              ) : null}
-            </div>
+            ) : (
+              <div className="flex h-full items-center justify-center px-4 text-center text-sm text-slate-500">
+                Карта появится после выбора точек
+              </div>
+            )}
           </div>
+          <p className="mt-2 text-xs text-slate-500">
+            Превью карты {cityInCase || 'города'}: выбирайте точки - они появятся здесь сразу
+          </p>
         </div>
       </section>
     );
@@ -3652,12 +3670,12 @@ function DayRoutePanelInner() {
               </p>
             </div>
           </div>
-          {isEmptyRoute ? renderEmptyStarter() : null}
           {hasPageCity && pickerTabs.length ? (
             <div className="mt-4 lg:mt-5" data-my-day-picker-host>
               <MyDayPickerLaunch tabs={pickerTabs} onOpen={openPicker} />
             </div>
           ) : null}
+          {isEmptyRoute ? renderEmptyStarter() : null}
         </>
       )}
 
