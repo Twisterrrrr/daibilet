@@ -19,8 +19,8 @@ type RegionBeltConfig = {
 const BELTS = beltsFile as Record<string, RegionBeltConfig>;
 
 const BELT_LABELS: Record<RegionCityBelt, string> = {
-  near: 'Ближнее',
-  mid: 'Средний пояс',
+  near: 'Ближние',
+  mid: 'Чуть дальше',
   far: 'Дальние',
 };
 
@@ -91,7 +91,7 @@ export function formatLogisticsChip(entry: RegionCityBeltEntry | null): string |
 }
 
 export const REGION_BELT_FILTERS: Array<{ id: 'all' | RegionCityBelt; label: string }> = [
-  { id: 'all', label: 'Все пояса' },
+  { id: 'all', label: 'Все города' },
   { id: 'near', label: BELT_LABELS.near },
   { id: 'mid', label: BELT_LABELS.mid },
   { id: 'far', label: BELT_LABELS.far },
