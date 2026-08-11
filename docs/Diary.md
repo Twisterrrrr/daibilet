@@ -1,3 +1,21 @@
+## 2026-08-11 - Homepage CSS 404 / preload noise after artifact swap
+
+### Наблюдения
+- Owner console: `Failed to load …/124723ded0d5f3c3.css` 404; ~77 Chrome warnings «preloaded but not used» для `/_next/static/css/*.css`.
+- Live HTML сейчас: BUILD_ID=`YwGFANzFPBZkzySBwJd_H`, только 3 stylesheet (`fdfb…`, `f621…`, `29c7…`) - все HTTP 200.
+- Owner hashes `124723…` / `6b2e1b…` / `5989a2…` на диске **нет** (404) и в текущем HTML не ссылаются → stale HTML/tab после серии Deploy MSK web (logo agent + другие), не баг preload в `apps/web`.
+- `/`: `Cache-Control: s-maxage=300, stale-while-revalidate=31535700`; nginx purge после swap есть, но open tabs / короткий HTML cache всё равно держат старые CSS hashes. `swap` полностью заменяет `.next` → hashed static пропадает сразу.
+
+### Решения
+- `swap-web-next-artifact.sh`: после atomic swap merge из `.next.prev/static/{css,chunks,media}` с `cp -rn` (no-clobber) - compat-окно для старого HTML.
+- Preload-warnings без 404: Next App Router / Chrome noise (нет явного CSS preload в apps/web) - не чиним отдельно.
+- Owner: hard refresh после стабилизации деплоя.
+
+### Проблемы
+- Быстрые параллельные Deploy MSK web усиливают окно desync; concurrency group без cancel-in-progress - очередь ок, но tabs всё равно видят старый document.
+
+---
+
 ## 2026-08-11 - Logo: static й-кратка (no animation)
 
 ### Наблюдения

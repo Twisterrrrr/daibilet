@@ -12,6 +12,7 @@
 | UX.HERMITAGE-SPBBOATS | Hermitage PDP: commercial hero/tickets/contacts; similar museums only; title Государственный Эрмитаж | Критический | ✅ `454b315c` Deploy `31419097355` + API restart MSK |
 | FIX.HERMITAGE-ALIAS-PDP | Redirect `gosudarstvennyi-ermitazh`→`ermitazh`; institution PDP: no hero chips, metro, about/visit before routes, FAQ bottom | Критический | ✅ `3fa8979e` Deploy `31415510287` |
 | UX.HOME-CITIES-MSK-ANCHOR | Popular cities rail: MSK left under H2 (adaptive); SPB next; keep infinite loop | Критический | ✅ `5d995893` tip `65276de6` Deploy `31410582677` |
+| FIX.SWAP-STATIC-COMPAT | Artifact swap: merge `.next.prev` hashed css/chunks/media (no-clobber) so s-maxage HTML не 404 CSS | Критический | 🔄 ship + Deploy после logo tip |
 | UX.LOGO-Y-STATIC | Logo: em-кратка point-1 = й always; zero animation; mobile кратка only | Критический | 🔄 ship + Deploy MSK web |
 | UX.LOGO-BREVE-LINE | Logo: solid breve-stroke over «и» → dashed route (replace black point-1) | Критический | ✅ `47fcad03` tip `65276de6` Deploy `31410582677` (superseded by UX.LOGO-Y-STATIC) |
 | UX.CITY-HUB-HERO-CTAS | City hub hero: remove search; restore Афиша + Подборки событий buttons | Критический | ✅ `47fcad03` tip `65276de6` Deploy `31410582677` |

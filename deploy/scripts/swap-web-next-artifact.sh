@@ -98,6 +98,20 @@ mv "$WEB_NEXT_STAGE" "$WEB_NEXT_DIR"
 rm -rf "${WEB_NEXT_DIR}/cache" 2>/dev/null || true
 echo "Swapped .next (BUILD_ID=$(cat "${WEB_NEXT_DIR}/BUILD_ID"))"
 
+# Soft-compat window: cached HTML (s-maxage / open tabs / SWR) still references
+# previous hashed CSS/JS under /_next/static. Full .next replace would 404 those
+# until clients refetch HTML. Merge previous static without overwriting new hashes.
+if [[ -d "${WEB_NEXT_PREV}/static" && -d "${WEB_NEXT_DIR}/static" ]]; then
+  for _sub in css chunks media; do
+    if [[ -d "${WEB_NEXT_PREV}/static/${_sub}" ]]; then
+      mkdir -p "${WEB_NEXT_DIR}/static/${_sub}"
+      # -n: no-clobber (keep newly built hashes); -r: recursive for chunk dirs
+      cp -rn "${WEB_NEXT_PREV}/static/${_sub}/." "${WEB_NEXT_DIR}/static/${_sub}/" 2>/dev/null || true
+    fi
+  done
+  echo "Merged previous hashed static from .next.prev (css/chunks/media compat)"
+fi
+
 if systemctl is-active --quiet "$API_SERVICE" 2>/dev/null; then
   # Optional: keep API up; only restart if you need code sync in api process.
   true
