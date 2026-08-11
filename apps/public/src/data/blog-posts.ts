@@ -306,12 +306,11 @@ export const BLOG_POSTS: BlogPost[] = [
   },
   {
     slug: 'rechnye-progulki-neva-kanaly-kak-vybrat',
-    title: 'Речные прогулки по Неве и каналам: как выбрать маршрут в Санкт-Петербурге',
+    title: 'Нева, каналы или разводные мосты? Как на самом деле выбрать речную прогулку в Петербурге',
     excerpt:
-      
-      'Чем отличаются каналы, большая Нева и ночные рейсы под мостами, как найти причал и почему куртка нужна даже в жаркий день.',
-    date: '25 июля 2026',
-    readMin: 10,
+      'Три сценария речной прогулки в Петербурге: тесные каналы, парадная Нева и разводные мосты - плюс три правила, чтобы не замёрзнуть и не потерять телефон.',
+    date: '28 июля 2026',
+    readMin: 8,
     tag: 'Город',
     city: 'Санкт-Петербург',
     citySlug: 'saint-petersburg',
@@ -319,7 +318,7 @@ export const BLOG_POSTS: BlogPost[] = [
     authorName: 'Редакция',
     articleType: 'gid',
     imageUrl: blogCoverUrl('rechnye-progulki-neva-kanaly-kak-vybrat'),
-    imageAlt: 'Теплоход на каналах Санкт-Петербурга',
+    imageAlt: 'Теплоход проходит под мостом на канале Санкт-Петербурга',
   },
   {
     slug: 'koncerty-peterburg-osobnyak-klub-zal',
