@@ -38,6 +38,7 @@ import type {
   PublicSessionDto,
 } from '@daibilet/contracts/public';
 import { resolveRegionLiveTier } from '@daibilet/contracts/common';
+import { cityToGenitive, inCityPrepositional } from '@/lib/city-declension';
 
 const SECTION_SCROLL_MT = 'scroll-mt-[calc(var(--site-header-height)+7rem)]';
 const AFFICHE_FILTER_STICKY =
@@ -96,6 +97,8 @@ export function RegionPageView({
 
   const city = payload?.city;
   const centerCity = payload?.centerCity ?? null;
+  const centerCityGenitive = centerCity ? cityToGenitive(centerCity.name) : '';
+  const centerCityIn = centerCity ? inCityPrepositional(centerCity.name) : '';
   const childCities = payload?.childCities || [];
   const regionInfo = payload?.regionInfo;
   const eventTotal = payload?.stats?.events ?? city?.events ?? 0;
@@ -227,7 +230,7 @@ export function RegionPageView({
   const tabs = React.useMemo(() => {
     if (isTierC) {
       return [
-        { id: 'bridge', label: centerCity ? `Афиша ${centerCity.name}` : 'Центр', show: Boolean(centerCity) },
+        { id: 'bridge', label: centerCity ? `Афиша ${centerCityGenitive}` : 'Центр', show: Boolean(centerCity) },
         { id: 'affiche', label: 'Афиша региона', show: eventTotal > 0 },
       ].filter((tab) => tab.show);
     }
@@ -237,7 +240,7 @@ export function RegionPageView({
       { id: 'affiche', label: 'Афиша', show: true },
       { id: 'faq', label: 'FAQ', show: faqItems.length > 0 },
     ].filter((tab) => tab.show);
-  }, [childCities, topPlaces.length, faqItems.length, isTierC, centerCity, eventTotal]);
+  }, [childCities, topPlaces.length, faqItems.length, isTierC, centerCity, centerCityGenitive, eventTotal]);
 
   if (error && !city) {
     return (
@@ -292,7 +295,7 @@ export function RegionPageView({
                   className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-slate-900 px-5 text-sm font-semibold text-white hover:bg-slate-800"
                 >
                   <Ticket className="h-4 w-4 shrink-0" aria-hidden="true" />
-                  Афиша {centerCity.name}
+                  Афиша {centerCityGenitive}
                 </Link>
               ) : null}
               {!isTierC || eventTotal > 0 ? (
@@ -348,9 +351,9 @@ export function RegionPageView({
                   <p className="mt-1 text-base font-semibold text-slate-950 sm:text-lg">
                     {isTierC
                       ? eventTotal > 0
-                        ? `Событий за городом мало. Полная афиша - в ${centerCity.name}`
-                        : `Сейчас за городом ничего не происходит. Посмотрите афишу ${centerCity.name}`
-                      : `Ищете события в самом городе? Перейти к афише ${centerCity.name}`}
+                        ? `Событий за городом мало. Полная афиша - ${centerCityIn}`
+                        : `Сейчас за городом ничего не происходит. Посмотрите афишу ${centerCityGenitive}`
+                      : `Ищете события в самом городе? Перейти к афише ${centerCityGenitive}`}
                     {centerCity.eventCount > 0 ? (
                       <span className="font-medium text-slate-600">
                         {' '}
@@ -568,7 +571,7 @@ export function RegionPageView({
               <h2 className="text-2xl font-bold text-slate-950">Афиша субъекта</h2>
               <p className="mt-2 text-sm text-slate-600">
                 Только события городов региона
-                {centerCity ? `, без дубля афиши ${centerCity.name}` : ''}.
+                {centerCity ? `, без дубля афиши ${centerCityGenitive}` : ''}.
                 {cityFilterLabel ? ` Фильтр: ${cityFilterLabel}.` : ''}
               </p>
 
