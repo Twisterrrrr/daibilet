@@ -434,6 +434,8 @@ function DayRoutePanelInner() {
   const [hotPickTab, setHotPickTab] = useState<HotPickTabId>('tips');
   /** Stop focused from map pin click. */
   const [focusedStopId, setFocusedStopId] = useState<string | null>(null);
+  /** Hover/focus highlight for the map marker (separate from focusedStopId). */
+  const [hoverStopId, setHoverStopId] = useState<string | null>(null);
   /** Mobile (&lt;lg): list-first; map is a separate fullscreen mode (Wanderlog-style). */
   const [mobileView, setMobileView] = useState<'list' | 'map'>('list');
   /** Mobile shelf: route steps/map vs catalog add tools. */
@@ -2223,6 +2225,7 @@ function DayRoutePanelInner() {
   const showHotPicks = Boolean(hasPageCity && (hotPickCards.length > 0 || hotPickTabIds.length > 0));
   const isEmptyRoute = route.venues.length === 0;
   const hasMapStops = mapStops.length > 0;
+  const mapSelectedStopId = hoverStopId ?? focusedStopId;
   const focusedVenue = focusedStopId
     ? route.venues.find((v) => v.id === focusedStopId) ?? null
     : null;
@@ -2233,6 +2236,11 @@ function DayRoutePanelInner() {
   useEffect(() => {
     if (!hasMapStops && mobileView === 'map') setMobileView('list');
   }, [hasMapStops, mobileView]);
+
+  // When switching to full-screen map, remove transient hover highlight.
+  useEffect(() => {
+    if (mobileView === 'map') setHoverStopId(null);
+  }, [mobileView]);
 
   useEffect(() => {
     if (typeof document === 'undefined') return;
@@ -2245,6 +2253,8 @@ function DayRoutePanelInner() {
   }, [mobileView]);
 
   function focusStopFromMap(stopId: string, opts?: { scrollList?: boolean }) {
+    // Explicit selection should win over hover highlight.
+    setHoverStopId(null);
     setFocusedStopId(stopId);
     if (mobileView === 'map') return;
     if (opts?.scrollList === false) return;
@@ -3105,6 +3115,8 @@ function DayRoutePanelInner() {
       {/* 1. Route list - always expanded */}
       {!route.venues.length ? null : (
         <section className="mt-5 w-full sm:mt-8" data-day-route-list>
+          <div className="flex flex-col gap-4 lg:grid lg:grid-cols-[minmax(0,1fr)_420px] lg:gap-6">
+            <div className="lg:overflow-y-auto lg:max-h-[calc(100vh-var(--site-header-height)-12rem)] lg:pr-1">
           {/* Row 1: title + Сетка/Список | desktop Hour plan + Optimize; mobile Список/Карта */}
           <div className="flex min-w-0 items-center justify-between gap-2">
             <div className="flex min-w-0 flex-wrap items-center gap-2">
@@ -3303,7 +3315,7 @@ function DayRoutePanelInner() {
                     })()}
                     segmentToNext={null}
                     travelMode={travelMode}
-                    focused={focusedStopId === venue.id}
+                    focused={mapSelectedStopId === venue.id}
                     onMoveUp={() => undefined}
                     onMoveDown={() => undefined}
                     onRemove={() => setRoute(removeFromDayRoute(venue.id))}
@@ -3319,6 +3331,8 @@ function DayRoutePanelInner() {
                     onSetNote={(note) =>
                       setRoute(updateDayRouteVenue(venue.id, { note: note || null }))
                     }
+                    onHoverStop={(id) => setHoverStopId(id)}
+                    onHoverClear={() => setHoverStopId(null)}
                   />
                 ))}
               </ul>
@@ -3371,7 +3385,7 @@ function DayRoutePanelInner() {
                       segmentToNext={segmentToNext}
                       hideGeoSegment={listMode}
                       travelMode={travelMode}
-                      focused={focusedStopId === venue.id}
+                      focused={mapSelectedStopId === venue.id}
                       dragging={dragVenueId === venue.id}
                       onDragStart={
                         dayRouteStopReorderLocked(venue)
@@ -3412,6 +3426,8 @@ function DayRoutePanelInner() {
                           ),
                         );
                       }}
+                      onHoverStop={(id) => setHoverStopId(id)}
+                      onHoverClear={() => setHoverStopId(null)}
                     />
                     {listMode && index < planStops.length - 1 ? (
                       <DayRouteBetweenInsert
@@ -3530,7 +3546,7 @@ function DayRoutePanelInner() {
                     })()}
                     segmentToNext={null}
                     travelMode={travelMode}
-                    focused={focusedStopId === venue.id}
+                    focused={mapSelectedStopId === venue.id}
                     onMoveUp={() => setRoute(moveDayRoutePlanVenue(venue.id, -1))}
                     onMoveDown={() => setRoute(moveDayRoutePlanVenue(venue.id, 1))}
                     onRemove={() => setRoute(removeFromDayRoute(venue.id))}
@@ -3546,40 +3562,49 @@ function DayRoutePanelInner() {
                     onSetNote={(note) =>
                       setRoute(updateDayRouteVenue(venue.id, { note: note || null }))
                     }
+                    onHoverStop={(id) => setHoverStopId(id)}
+                    onHoverClear={() => setHoverStopId(null)}
                   />
                 ))}
               </ul>
             </div>
           ) : null}
 
-          {mapStops.length > 0 ? (
-            <div
-              className="mt-4 hidden rounded-2xl border border-slate-200 bg-white p-3 sm:p-4 lg:block"
-              data-day-route-map-wrap
-              data-day-route-map-desktop
-            >
-              <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-sm font-bold text-slate-900">Карта дня</p>
-                  <p className="mt-0.5 text-xs text-slate-500">
-                    Точки с координатами · порядок как в списке
-                  </p>
+          </div>
+
+          <div className="lg:sticky lg:top-[var(--site-header-height)] lg:self-start">
+            {mapStops.length > 0 ? (
+              <div className="lg:pt-4 lg:pb-6">
+                <div
+                  className="rounded-2xl border border-slate-200 bg-white p-3 sm:p-4"
+                  data-day-route-map-wrap
+                  data-day-route-map-desktop
+                >
+                  <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="text-sm font-bold text-slate-900">Карта дня</p>
+                      <p className="mt-0.5 text-xs text-slate-500">
+                        Точки с координатами · порядок как в списке
+                      </p>
+                    </div>
+                    {renderMapToolbar()}
+                  </div>
+                  <div className="relative isolate">
+                    <div className="relative z-0 overflow-hidden rounded-xl">
+                      <DayRouteOsmMap
+                        stops={mapStops}
+                        selectedStopId={mapSelectedStopId}
+                        onStopClick={(stopId) => focusStopFromMap(stopId, { scrollList: false })}
+                        className="h-64 w-full bg-slate-100 sm:h-80"
+                      />
+                    </div>
+                    {renderMapFocusCard('desktop')}
+                  </div>
                 </div>
-                {renderMapToolbar()}
               </div>
-              <div className="relative isolate">
-                <div className="relative z-0 overflow-hidden rounded-xl">
-                  <DayRouteOsmMap
-                    stops={mapStops}
-                    selectedStopId={focusedStopId}
-                    onStopClick={(stopId) => focusStopFromMap(stopId, { scrollList: false })}
-                    className="h-64 w-full bg-slate-100 sm:h-80"
-                  />
-                </div>
-                {renderMapFocusCard('desktop')}
-              </div>
-            </div>
-          ) : null}
+            ) : null}
+          </div>
+          </div>
         </section>
       )}
 
@@ -4811,6 +4836,8 @@ function DayRouteVenueCard({
   onBuyClick,
   onShowTicket,
   onSetNote,
+  onHoverStop,
+  onHoverClear,
 }: {
   venue: DayRouteVenueItem;
   index: number;
@@ -4839,6 +4866,9 @@ function DayRouteVenueCard({
   onBuyClick: (ticketUrl: string) => void;
   onShowTicket: () => void;
   onSetNote: (note: string) => void;
+  /** Optional marker highlight on hover/focus without changing route order. */
+  onHoverStop?: (stopId: string) => void;
+  onHoverClear?: () => void;
 }) {
   // Ticket QR / «отметить купленным» живут в блоке «Билеты в поездке», не в строке места.
   void onToggleBought;
@@ -4902,6 +4932,24 @@ function DayRouteVenueCard({
   ].filter(Boolean) as string[];
   const metaLine = metaParts.join(' · ');
   const segmentLine = segmentHint ? `далее ~ ${segmentHint}` : '';
+
+  const hoverEnter = () => {
+    if (!hasCoords) return;
+    onHoverStop?.(venue.id);
+  };
+
+  const hoverLeave = () => {
+    if (!hasCoords) return;
+    onHoverClear?.();
+  };
+
+  const onBlurCapture: React.FocusEventHandler<HTMLElement> = (e) => {
+    if (!hasCoords) return;
+    const related = e.relatedTarget as Node | null;
+    const current = e.currentTarget as HTMLElement;
+    if (related && current.contains(related)) return;
+    onHoverClear?.();
+  };
 
   const titleClass = 'font-semibold leading-snug text-slate-900';
   const titleNode = href ? (
@@ -5017,6 +5065,10 @@ function DayRouteVenueCard({
         data-day-stop-variant={variant}
         data-day-stop-kind="note"
         data-day-stop-focused={focused ? '1' : undefined}
+        onMouseEnter={hoverEnter}
+        onMouseLeave={hoverLeave}
+        onFocusCapture={hoverEnter}
+        onBlurCapture={onBlurCapture}
       >
         <div
           className={`flex items-start gap-2 rounded-xl border border-amber-200/80 bg-amber-50/70 px-2.5 py-2 ${
@@ -5075,6 +5127,10 @@ function DayRouteVenueCard({
         data-day-session={sessionDisplay || undefined}
         data-day-stop-focused={focused ? '1' : undefined}
         draggable={canDrag}
+        onMouseEnter={hoverEnter}
+        onMouseLeave={hoverLeave}
+        onFocusCapture={hoverEnter}
+        onBlurCapture={onBlurCapture}
         onDragStart={
           canDrag
             ? (event) => {
@@ -5255,6 +5311,10 @@ function DayRouteVenueCard({
       data-day-session={sessionDisplay || undefined}
       data-day-stop-focused={focused ? '1' : undefined}
       data-day-commerce={isCommerce ? '1' : '0'}
+      onMouseEnter={hoverEnter}
+      onMouseLeave={hoverLeave}
+      onFocusCapture={hoverEnter}
+      onBlurCapture={onBlurCapture}
     >
       {/*
         Grid: shell = content height only (no flex-1 / stretch empty space).
