@@ -3900,8 +3900,9 @@ function DayRoutePanelInner() {
           </form>
         ) : null}
       </div>
-      <DayRouteBoatWizard
+      ) : null}
 
+      <DayRouteBoatWizard
         cityName={pageCityName}
         citySlug={pageCitySlug}
         cityId={pageCityId}
@@ -3911,7 +3912,6 @@ function DayRoutePanelInner() {
         onRouteChange={setRoute}
         locationsCatalog={locationsCatalog}
       />
-      ) : null}
 
       {/* Accordion: nearby events / matches */}
       {pickerSection === 'picks' && showMatches ? (
