@@ -73,7 +73,7 @@
 | UX.CANON-PANEL-INSET | DayTripCanonCard: logistics bg extend left; gastro pl same inset; keep text vertical | Высокий | ✅ `73509693` Deploy MSK web `31308732076` BUILD_ID=`SH7xtIXBki0ZEfrBkwYe3` |
 | CONT.PERM-GUBAHA-USVA | Perm: одна chip «Губаха / Усьва» с День 1/2 внутри; не две карточки | Высокий | ✅ `0f7363b9` Deploy MSK web `31308285355` BUILD_ID=`rcEaipEqElKkWcTQI1VD2` |
 | FIX.HIDE-CLOSED-SLOTS | Public: скрыть слоты с closed/STAND_BY/paused/isActive=false (catalog layer) | Критический | ✅ `abb583f6` API live MSK `e906ea75`; CI green |
-| FIX.EVENT-PAGE-SLOT-CAP | Event page: `take:12`+`slice(0,5)` резал PUBLIC слоты meta-группы (KGD История в тарелке); fetch 64 / display 32 | Критический | 🔄 code+MSK API |
+| FIX.EVENT-PAGE-SLOT-CAP | Event page: `take:12`+`slice(0,5)` резал PUBLIC слоты meta-группы (KGD История в тарелке); fetch 64 / display 32 | Критический | ✅ `95274ce6` MSK API restart; live 10 PUBLIC slots |
 | UX.EVENTCARD-DROP-SESSION-CTA | EventCard: убрать дубль «Выбрать сеанс» (overlap с ценой); один CTA «Купить билет» | Высокий | ✅ `95b7d2a8` Deploy MSK web `31308004380` BUILD_ID=`HR7QZofnxFLxEIb8loJVL` |
 | FIX.BOAT-TZ-20:55 | Bridges/my-day: primary −3ч vs slots; dedupe HH:mm MSK | Критический | ✅ `a905d477`/`038ea511`; API+catalog rebuild; Deploy MSK web `31306448807` BUILD_ID=`Cw8DFKoqPUl8GZ-NI-yc_` |
 | CONT.TRANSIT-TIPS | Schema `transitTip` + UI suburb timeline; NN logistics; SPB triangle/Petrograd/Bertgold/bar; Perm/KGD tips | Высокий | ✅ `c5d644d8` Deploy MSK web `31305337295` BUILD_ID=`gOTUGQNTVuIsCS_1DvAT_` |
