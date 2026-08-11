@@ -1,3 +1,19 @@
+## 2026-08-11 - Колонка Анны: музыка в особняках СПб (rewrite)
+
+### Наблюдения
+- Owner rewrite `muzyka-v-osobnyakah-spb`: 4 площадки (Половцов / Шрёдер / Мясников / Державин); emoji убран из H2.
+- Live title был «Музыка с адресом…» - обновлён под новый тон: «Концерт в особняке: 4 площадки…».
+- Старый slug Мясникова 404; рабочие: excursion, jazz garden, venue 200. Afisha `/events?city=saint-petersburg&q=особняк` = 200.
+
+### Решения
+- Verbatim owner + дефисы; адреса; image shortcodes; cover/inline/og уже на диске.
+- MD + blog-posts web/public + `blog:sync-bodies`; MSK upsert + revalidate + Deploy MSK web.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-11 - Колонка Анны: дискотеки Москвы (rewrite)
 
 ### Наблюдения
