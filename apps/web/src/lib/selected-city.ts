@@ -12,6 +12,17 @@ export function isCityFilterPath(pathname: string | null | undefined): boolean {
   );
 }
 
+/** `/my-day?city=` must drive header city (empty Lovable step card) - not a catalog filter path. */
+export function isMyDayPath(pathname: string | null | undefined): boolean {
+  const path = String(pathname || '').replace(/\/$/, '') || '/';
+  return path === '/my-day';
+}
+
+/** Surfaces that read explicit `?city=` into SelectedCityProvider. */
+export function readsCityQueryParam(pathname: string | null | undefined): boolean {
+  return isCityFilterPath(pathname) || isMyDayPath(pathname);
+}
+
 export function matchDestination(destinations: PublicDestinationDto[], value?: string | null): PublicDestinationDto | null {
   const needle = String(value || '').trim();
   if (!needle || needle === 'all') return null;

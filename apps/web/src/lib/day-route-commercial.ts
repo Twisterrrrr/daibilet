@@ -163,6 +163,27 @@ function pluralRu(n: number, one: string, few: string, many: string): string {
 }
 
 /**
+ * Lovable H1 subtitle: catalog scope for the city, not route fill / soft max.
+ * Example: «7 точек · 3 пригорода» (hyphen-safe; middle dot separator).
+ */
+export function buildMyDayCityScopeLine(input: {
+  availablePoints: number;
+  suburbCount?: number | null;
+}): string | null {
+  const points = Math.max(0, Math.floor(Number(input.availablePoints) || 0));
+  const suburbs = Math.max(0, Math.floor(Number(input.suburbCount) || 0));
+  if (points <= 0 && suburbs <= 0) return null;
+  const parts: string[] = [];
+  if (points > 0) {
+    parts.push(`${points} ${pluralRu(points, 'точка', 'точки', 'точек')}`);
+  }
+  if (suburbs > 0) {
+    parts.push(`${suburbs} ${pluralRu(suburbs, 'пригород', 'пригорода', 'пригородов')}`);
+  }
+  return parts.join(' · ') || null;
+}
+
+/**
  * Readiness formula (equal thirds, documented for product):
  * - points: min(N / DAY_ROUTE_MIN, 1) capped contribution toward a full day start
  *   plus soft fill toward DAY_ROUTE_SOFT (blend; not hard safety MAX)

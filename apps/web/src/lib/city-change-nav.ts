@@ -68,8 +68,17 @@ export function resolveCityChangeNav(input: CityChangeNavInput): CityChangeNavRe
   const name = String(input.cityName || '').trim() || 'all';
   const { matched, slug: citySlug } = resolveDestinationSlug(input.destinations, name);
 
-  if (path === '/' || path === '/my-day') {
+  if (path === '/') {
     return { action: 'persist' };
+  }
+
+  // Keep /my-day?city= in sync with header / on-page picker (empty Lovable step needs city).
+  if (path === '/my-day') {
+    const params = new URLSearchParams(input.searchParams?.toString() || '');
+    if (name === 'all') params.delete('city');
+    else params.set('city', citySlug || name);
+    const query = params.toString();
+    return { action: 'navigate', href: query ? `/my-day?${query}` : '/my-day' };
   }
 
   // Cities IA: list or hub → new hub (or list for «Все города»).

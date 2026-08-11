@@ -137,13 +137,23 @@ test('blog header city change persists without ?city=', () => {
   });
 });
 
-test('home and my-day persist; static/unknown fallback (no catalog dump)', () => {
+test('home persists; my-day navigates ?city=; static/unknown fallback (no catalog dump)', () => {
   assert.deepEqual(resolveCityChangeNav({ pathname: '/', cityName: 'Казань', destinations }), {
     action: 'persist',
   });
   assert.deepEqual(resolveCityChangeNav({ pathname: '/my-day', cityName: 'Казань', destinations }), {
-    action: 'persist',
+    action: 'navigate',
+    href: '/my-day?city=kazan',
   });
+  assert.deepEqual(
+    resolveCityChangeNav({
+      pathname: '/my-day',
+      cityName: 'all',
+      destinations,
+      searchParams: new URLSearchParams('city=kazan&items=1:free'),
+    }),
+    { action: 'navigate', href: '/my-day?items=1%3Afree' },
+  );
   assert.deepEqual(resolveCityChangeNav({ pathname: '/about', cityName: 'Казань', destinations }), {
     action: 'fallback',
   });

@@ -1,3 +1,21 @@
+## 2026-08-11 - My Day: Lovable H1 scope + own-place geocode
+
+### Наблюдения
+- H1 subtitle был readiness `N точек из 10` - не как Lovable (`7 точек · 3 пригорода` = каталог города / пригороды).
+- Sticky «Купить билеты на маршрут» слишком рано на partial/empty day.
+- «Своё место» без lat/lng оставалось list-only.
+
+### Решения
+- H1: `buildMyDayCityScopeLine(mustSee|locations, significantSuburbs)` + ссылка на хаб; separator `·`.
+- Убран sticky buy CTA; остаются «Добавить места» / «Посмотреть готовый день». Per-stop ticket CTA не трогали.
+- Soft geocode: `/api/day-route/geocode` (Nominatim + city viewbox) + кнопка «Найти на карте»; add без coords по-прежнему ок.
+- Бонусом: `/my-day?city=` читается SelectedCityProvider (readsCityQueryParam).
+
+### Проблемы
+- Live MSK web - batch / по запросу owner («выкатывай»).
+
+---
+
 ## 2026-08-11 - My Day empty: Lovable step card order
 
 ### Наблюдения

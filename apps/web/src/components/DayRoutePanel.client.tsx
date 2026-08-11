@@ -164,7 +164,7 @@ import {
   applyMatchCommerceToVenues,
   classifyDayRouteCommercialChip,
   collectDayRouteTripTickets,
-  computeDayRouteReadiness,
+  buildMyDayCityScopeLine,
   dayRouteOfferIsVenueBound,
   dayRouteStopHasTicket,
   dayRouteStopIsCommerce,
@@ -206,6 +206,12 @@ import {
 } from '@/lib/must-see-filters';
 import { MustSeeFilterTabs } from '@/components/MustSeeFilterTabs.client';
 import { formatStreetAddress } from '@/lib/address';
+import {
+  softGeocodeAddress,
+  softGeocodeFailureMessage,
+  type SoftGeocodeHit,
+} from '@/lib/soft-geocode';
+import { lookupCityMapCoords } from '@/lib/city-map-coords';
 import { eventHref, venueHref } from '@/lib/routes';
 import { toVenueCatalogCard } from '@/lib/venue-catalog-card';
 import type { VenueCatalogCard } from '@/lib/venue-map-types';
@@ -402,6 +408,9 @@ function DayRoutePanelInner() {
   const [coordsInput, setCoordsInput] = useState('');
   const [cityInput, setCityInput] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
+  const [geocodeBusy, setGeocodeBusy] = useState(false);
+  const [geocodeHint, setGeocodeHint] = useState<string | null>(null);
+  const [geocodePreview, setGeocodePreview] = useState<SoftGeocodeHit | null>(null);
   /** Exclusive accordion for route-building tools only (must-see / custom / matches). */
   /** Guidebook (scenarios + suburbs DayTripCanonCard) stays always open as day-plan cards. */
   const [openPanel, setOpenPanel] = useState<DayRouteAccordionId | null>(null);
@@ -1430,19 +1439,20 @@ function DayRoutePanelInner() {
     () => estimateDayRouteTravelMinutes(totalDistanceMeters, travelMode),
     [totalDistanceMeters, travelMode],
   );
-  const readiness = useMemo(
-    () => computeDayRouteReadiness(route.venues, { segmentMeters }),
-    [route.venues, segmentMeters],
-  );
+  const cityScopeLine = useMemo(() => {
+    if (!hasPageCity) return null;
+    const availablePoints =
+      mustSeePlaces.length > 0 ? mustSeePlaces.length : locationsCatalog.length;
+    return buildMyDayCityScopeLine({
+      availablePoints,
+      suburbCount: significantSuburbs.length,
+    });
+  }, [hasPageCity, mustSeePlaces.length, locationsCatalog.length, significantSuburbs.length]);
   const freeWindowGaps = useMemo(() => findDayRouteFreeWindowGaps(segmentMeters), [segmentMeters]);
   const primaryFreeWindow = useMemo(() => {
     if (!freeWindowGaps.length) return null;
     return freeWindowGaps.reduce((best, gap) => (gap.meters > best.meters ? gap : best));
   }, [freeWindowGaps]);
-  const unpaidTicketStops = useMemo(
-    () => route.venues.filter((v) => dayRouteStopHasTicket(v) && !v.ticketBought),
-    [route.venues],
-  );
   /** One card per product - TC sessions often share title with unique slugs/ids. */
   const uniqueMatches = useMemo(
     () => dedupeDayRouteMatches(payload?.matches || []),
@@ -1800,16 +1810,6 @@ function DayRoutePanelInner() {
     }
   }
 
-  function openFirstUnpaidTicket() {
-    const first = unpaidTicketStops[0];
-    if (!first) return;
-    const url = resolveDayRouteTicketUrl(first);
-    if (!url || typeof window === 'undefined') return;
-    if (isDayRouteVendorCheckoutUrl(url)) setGuestCheckoutUrl(url);
-    else window.open(url, '_blank', 'noopener,noreferrer');
-    setTicketHandoff({ venueId: first.id, ticketUrl: url, title: first.title });
-  }
-
   const printDateLabel = useMemo(() => {
     for (const venue of route.venues) {
       const raw = String(venue.startsAt || '').trim();
@@ -1947,7 +1947,32 @@ function DayRoutePanelInner() {
     };
   }, [ready, route.venues]);
 
-  function submitTextStop(event: FormEvent) {
+  async function findOwnPlaceOnMap() {
+    const address = noteInput.trim();
+    if (address.length < 3) {
+      setGeocodeHint('Укажите адрес - минимум несколько символов');
+      setGeocodePreview(null);
+      return;
+    }
+    setGeocodeBusy(true);
+    setGeocodeHint(null);
+    const result = await softGeocodeAddress({
+      address,
+      cityName: pageCityName || cityInput || null,
+      citySlug: pageCitySlug || null,
+    });
+    setGeocodeBusy(false);
+    if (!result.ok) {
+      setGeocodePreview(null);
+      setGeocodeHint(softGeocodeFailureMessage(result.reason));
+      return;
+    }
+    setGeocodePreview(result.hit);
+    setCoordsInput(`${result.hit.latitude.toFixed(5)}, ${result.hit.longitude.toFixed(5)}`);
+    setGeocodeHint(`Нашли: ${result.hit.displayName}. Координаты подставлены - можно добавить.`);
+  }
+
+  async function submitTextStop(event: FormEvent) {
     event.preventDefault();
     const title = titleInput.trim();
     if (!title) {
@@ -1963,11 +1988,36 @@ function DayRoutePanelInner() {
       return;
     }
     setFormError(null);
+
+    let coordsText = coordsInput.trim();
+    const address = noteInput.trim();
+    // Soft geocode from address when coords empty - never blocks list-only add.
+    if (!coordsText && address.length >= 3) {
+      setGeocodeBusy(true);
+      const result = await softGeocodeAddress({
+        address,
+        cityName: pageCityName || cityInput || null,
+        citySlug: pageCitySlug || null,
+      });
+      setGeocodeBusy(false);
+      if (result.ok) {
+        coordsText = `${result.hit.latitude.toFixed(5)}, ${result.hit.longitude.toFixed(5)}`;
+        setCoordsInput(coordsText);
+        setGeocodePreview(result.hit);
+        setGeocodeHint(`На карте: ${result.hit.displayName}`);
+      } else {
+        setGeocodePreview(null);
+        setGeocodeHint(softGeocodeFailureMessage(result.reason));
+      }
+    }
+
     const next = addTextStopToDayRoute({
       title,
       note: noteInput,
-      city: cityInput,
-      coordsText: coordsInput,
+      city: pageCityName || cityInput || null,
+      cityId: pageCityId || null,
+      citySlug: pageCitySlug || null,
+      coordsText,
       afterVenueId: consumeInsertAfterVenueId(),
     });
     setRoute(next);
@@ -1990,12 +2040,14 @@ function DayRoutePanelInner() {
       flashDayRouteFeedback(
         hasCoords
           ? dayRouteAddSuccessMessage(next.venues.length)
-          : 'В списке есть. На карте появится после координат (lat, lng)',
+          : 'В списке есть. На карте появится после адреса или lat, lng',
       );
     }
     setTitleInput('');
     setNoteInput('');
     setCoordsInput('');
+    setGeocodePreview(null);
+    setGeocodeHint(null);
     titleFieldRef.current?.focus();
   }
 
@@ -2565,6 +2617,13 @@ function DayRoutePanelInner() {
         }
       }
     }
+    if (!mapCenter) {
+      mapCenter =
+        lookupCityMapCoords(pageCitySlug) ||
+        lookupCityMapCoords(pageCitySourceSlug) ||
+        lookupCityMapCoords(pageCityName) ||
+        null;
+    }
 
     if (!hasPageCity) {
       return (
@@ -2987,12 +3046,10 @@ function DayRoutePanelInner() {
           <p
             className="mt-1.5 flex flex-wrap items-baseline gap-x-1 text-[13px] font-medium text-slate-500"
             data-day-route-count-label
-            data-day-route-readiness
+            data-day-city-scope
           >
-            <span>
-              {readiness.summaryLine}
-              {scopeCityName ? ' •' : ''}
-            </span>
+            {cityScopeLine ? <span>{cityScopeLine}</span> : null}
+            {cityScopeLine && scopeCityName ? <span aria-hidden>·</span> : null}
             {scopeCityName ? (
               <Link
                 href={cityHubHref}
@@ -3652,12 +3709,10 @@ function DayRoutePanelInner() {
               <p
                 className="mt-1.5 flex flex-wrap items-baseline gap-x-1 text-[13px] font-medium text-slate-500"
                 data-day-route-count-label
-                data-day-route-readiness
+                data-day-city-scope
               >
-                <span>
-                  {readiness.summaryLine}
-                  {scopeCityName ? ' •' : ''}
-                </span>
+                {cityScopeLine ? <span>{cityScopeLine}</span> : null}
+                {cityScopeLine && scopeCityName ? <span aria-hidden>·</span> : null}
                 {scopeCityName ? (
                   <Link
                     href={cityHubHref}
@@ -3846,7 +3901,8 @@ function DayRoutePanelInner() {
         >
           <p className="text-sm font-semibold text-slate-900">Своё место</p>
           <p className="mt-0.5 text-xs text-slate-500">
-            Без координат точка только в списке. Для карты укажите lat, lng.
+            Адрес поможет поставить точку на карте. Без адреса или если не найдём - место останется
+            только в списке.
           </p>
           <form
             onSubmit={submitTextStop}
@@ -3870,20 +3926,73 @@ function DayRoutePanelInner() {
                   }}
                   placeholder="Например: Эрмитаж"
                   autoComplete="off"
-                  disabled={atMax}
+                  disabled={atMax || geocodeBusy}
                   data-day-plan-title
                   className="min-h-11 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none ring-emerald-500/30 placeholder:text-slate-400 focus:border-emerald-400 focus:ring-2 disabled:bg-slate-50"
                 />
               </label>
               <button
                 type="submit"
-                disabled={atMax}
+                disabled={atMax || geocodeBusy}
                 data-day-plan-add
                 className="inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 self-end rounded-full bg-slate-900 px-5 py-2.5 text-sm font-bold text-white hover:bg-primary-600 disabled:cursor-not-allowed disabled:bg-slate-300"
               >
                 <Plus className="h-4 w-4" />
                 Добавить
               </button>
+            </div>
+
+            <div className="mt-3">
+              <label className="block">
+                <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                  Адрес
+                </span>
+                <input
+                  type="text"
+                  name="note"
+                  value={noteInput}
+                  onChange={(e) => {
+                    setNoteInput(e.target.value);
+                    setGeocodeHint(null);
+                    setGeocodePreview(null);
+                  }}
+                  placeholder="Улица, дом - или заметка"
+                  autoComplete="street-address"
+                  disabled={atMax || geocodeBusy}
+                  data-day-plan-note
+                  className="min-h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none ring-emerald-500/30 placeholder:text-slate-400 focus:border-emerald-400 focus:ring-2 disabled:bg-slate-50"
+                />
+              </label>
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  data-day-plan-geocode
+                  disabled={atMax || geocodeBusy || noteInput.trim().length < 3}
+                  onClick={() => {
+                    void findOwnPlaceOnMap();
+                  }}
+                  className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-full border border-primary-200 bg-primary-50 px-3.5 py-1.5 text-xs font-semibold text-primary-800 transition hover:bg-primary-100 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <MapPin className="h-3.5 w-3.5" />
+                  {geocodeBusy ? 'Ищем…' : 'Найти на карте'}
+                </button>
+                {geocodePreview ? (
+                  <span className="text-[11px] font-medium text-emerald-700" data-day-plan-geocode-ok>
+                    Координаты готовы
+                  </span>
+                ) : null}
+              </div>
+              {geocodeHint ? (
+                <p
+                  className={`mt-1.5 mb-0 text-[11px] leading-snug ${
+                    geocodePreview ? 'text-emerald-700' : 'text-slate-500'
+                  }`}
+                  role="status"
+                  data-day-plan-geocode-hint
+                >
+                  {geocodeHint}
+                </p>
+              ) : null}
             </div>
 
             <label className="mt-3 block">
@@ -3894,33 +4003,19 @@ function DayRoutePanelInner() {
                 type="text"
                 name="coords"
                 value={coordsInput}
-                onChange={(e) => setCoordsInput(e.target.value)}
-                placeholder="59.93, 30.31"
+                onChange={(e) => {
+                  setCoordsInput(e.target.value);
+                  setGeocodePreview(null);
+                }}
+                placeholder="59.93, 30.31 - или найдите по адресу выше"
                 autoComplete="off"
-                disabled={atMax}
+                disabled={atMax || geocodeBusy}
                 data-day-plan-coords
                 className="min-h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/30 disabled:bg-slate-50"
               />
               <span className="mt-1 block text-[11px] leading-snug text-slate-500">
-                Скопируйте из Яндекс.Карт: ПКМ по точке - «Что здесь?» - координаты.
+                Необязательно: можно вставить lat, lng вручную из Яндекс.Карт.
               </span>
-            </label>
-
-            <label className="mt-3 block">
-              <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                Адрес или заметка
-              </span>
-              <input
-                type="text"
-                name="note"
-                value={noteInput}
-                onChange={(e) => setNoteInput(e.target.value)}
-                placeholder="Необязательно"
-                autoComplete="off"
-                disabled={atMax}
-                data-day-plan-note
-                className="min-h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none ring-emerald-500/30 placeholder:text-slate-400 focus:border-emerald-400 focus:ring-2 disabled:bg-slate-50"
-              />
             </label>
 
             <label className="mt-3 block">
@@ -3934,7 +4029,7 @@ function DayRoutePanelInner() {
                 onChange={(e) => setCityInput(e.target.value)}
                 placeholder="Город"
                 autoComplete="off"
-                disabled={atMax}
+                disabled={atMax || geocodeBusy}
                 data-day-plan-city
                 className="min-h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/30 disabled:bg-slate-50"
               />
@@ -4305,17 +4400,8 @@ function DayRoutePanelInner() {
       </MyDayMapFullScreen>
 
       <MobileStickyActionBar>
-        {unpaidTicketStops.length > 0 ? (
-          <button
-            type="button"
-            onClick={openFirstUnpaidTicket}
-            data-day-buy-sticky
-            className="inline-flex h-12 flex-1 items-center justify-center gap-1.5 rounded-full bg-amber-500 px-4 text-sm font-bold text-white hover:bg-amber-600"
-          >
-            <Ticket className="h-4 w-4" />
-            Купить билеты на маршрут
-          </button>
-        ) : route.venues.length >= DAY_ROUTE_MIN ? (
+        {/* Owner 2026-08-11: sticky route-buy CTA too early - match Lovable (no buy push). */}
+        {route.venues.length >= DAY_ROUTE_MIN ? (
           <button
             type="button"
             onClick={() => {

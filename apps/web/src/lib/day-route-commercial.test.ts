@@ -159,6 +159,17 @@ describe('day-route-commercial chips', () => {
   });
 });
 
+describe('day-route-commercial city scope line (Lovable H1)', () => {
+  it('formats points and suburbs like Lovable', async () => {
+    const { buildMyDayCityScopeLine } = await import('./day-route-commercial.ts');
+    assert.equal(buildMyDayCityScopeLine({ availablePoints: 7, suburbCount: 3 }), '7 точек · 3 пригорода');
+    assert.equal(buildMyDayCityScopeLine({ availablePoints: 1, suburbCount: 1 }), '1 точка · 1 пригород');
+    assert.equal(buildMyDayCityScopeLine({ availablePoints: 5, suburbCount: 0 }), '5 точек');
+    assert.equal(buildMyDayCityScopeLine({ availablePoints: 0, suburbCount: 2 }), '2 пригорода');
+    assert.equal(buildMyDayCityScopeLine({ availablePoints: 0, suburbCount: 0 }), null);
+  });
+});
+
 describe('day-route-commercial readiness', () => {
   it('returns 0% for empty route', () => {
     const r = computeDayRouteReadiness([]);

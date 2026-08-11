@@ -18,9 +18,11 @@ import { resolveLandingCityName } from '@/lib/landing-city';
 import { canonicalLandingSlug } from '@/lib/landing-constants';
 import {
   isCityFilterPath,
+  isMyDayPath,
   matchDestination,
   mergeStoredCityIntoSearchParams,
   persistSelectedCity,
+  readsCityQueryParam,
   resolveCityHubDestination,
   resolveCityLabel,
 } from '@/lib/selected-city';
@@ -129,7 +131,9 @@ export function SelectedCityProvider({
         return;
       }
     }
-    const fromUrl = isCityFilterPath(pathname) ? urlCity : null;
+    // Catalog filters + /my-day share links (`?city=perm`) - without this empty My Day
+    // stays on «Сначала выберите город» even when the URL already has a city.
+    const fromUrl = readsCityQueryParam(pathname) ? urlCity : null;
     setCityLabel(resolveCityLabel(destinations, fromUrl));
     setCityReady(true);
   }, [destinations, pathname, urlCity]);
@@ -157,13 +161,14 @@ export function SelectedCityProvider({
   // Keep storage aligned with an explicit catalog city (including deep-links).
   // `city=all` clears storage so mergeStoredCityIntoSearchParams cannot bounce back.
   useLayoutEffect(() => {
-    if (isCityFilterPath(pathname) && String(urlCity || '').trim().toLowerCase() === 'all') {
+    if (readsCityQueryParam(pathname) && String(urlCity || '').trim().toLowerCase() === 'all') {
       persistSelectedCity('all');
       return;
     }
-    const matched = isCityFilterPath(pathname) && urlCity
-      ? matchDestination(destinations, urlCity)
-      : resolveCityHubDestination(destinations, pathname);
+    const matched =
+      readsCityQueryParam(pathname) && urlCity
+        ? matchDestination(destinations, urlCity)
+        : resolveCityHubDestination(destinations, pathname);
     if (matched) persistSelectedCity(matched.name);
   }, [destinations, pathname, urlCity]);
 
@@ -242,7 +247,11 @@ export function SelectedCityProvider({
 
       const sameIndexQuery =
         path === href.split('?')[0] &&
-        (path === '/events' || path === '/venues' || path === '/locations' || path === '/podborki');
+        (path === '/events' ||
+          path === '/venues' ||
+          path === '/locations' ||
+          path === '/podborki' ||
+          isMyDayPath(path));
       if (sameIndexQuery) {
         router.replace(href, { scroll: false });
       } else {
