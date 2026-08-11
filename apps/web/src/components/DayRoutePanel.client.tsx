@@ -2299,13 +2299,34 @@ function DayRoutePanelInner() {
     if (!hasMapStops && mobileView === 'map') setMobileView('list');
   }, [hasMapStops, mobileView]);
 
-  // Without coords there is no map content - keep desktop rail collapsed and close mobile sheet.
+  // Desktop map: open at 2+ mappable stops; collapse when route is empty or nothing to plot.
+  const prevVenueCountRef = useRef(0);
+  const prevHasMapStopsRef = useRef(false);
   useEffect(() => {
-    if (hasMapStops) return;
-    myDay.setMapOpen(false);
-    myDay.closeMobileMap();
-    myDay.closeMapFull();
-  }, [hasMapStops, myDay.setMapOpen, myDay.closeMobileMap, myDay.closeMapFull]);
+    const count = route.venues.length;
+    const prevCount = prevVenueCountRef.current;
+    const prevHas = prevHasMapStopsRef.current;
+
+    if (count === 0 || !hasMapStops) {
+      myDay.setMapOpen(false);
+      myDay.closeMobileMap();
+      myDay.closeMapFull();
+    } else if (
+      count >= DAY_ROUTE_MIN &&
+      (prevCount < DAY_ROUTE_MIN || (!prevHas && hasMapStops))
+    ) {
+      myDay.setMapOpen(true);
+    }
+
+    prevVenueCountRef.current = count;
+    prevHasMapStopsRef.current = hasMapStops;
+  }, [
+    route.venues.length,
+    hasMapStops,
+    myDay.setMapOpen,
+    myDay.closeMobileMap,
+    myDay.closeMapFull,
+  ]);
 
   // When switching to full-screen map, remove transient hover highlight.
   useEffect(() => {
