@@ -11,8 +11,10 @@ import {
   Copy,
   ExternalLink,
   GripVertical,
+  Landmark,
   MapPin,
   Navigation,
+  PenLine,
   PersonStanding,
   Plus,
   Printer,
@@ -26,7 +28,8 @@ import {
   X,
 } from 'lucide-react';
 import {
-  MyDayAddShelf,
+  MyDayPickerLaunch,
+  MyDayPickerSheet,
   MyDayItinerary,
   MyDayMapAside,
   MyDayMapFullScreen,
@@ -206,6 +209,7 @@ type DayRouteAccordionId = 'mustSee' | 'text' | 'matches';
 /** Wave 1.5: list-only itinerary (Lovable). Grid card markup kept as dead path. */
 type DayRouteStopViewMode = 'grid' | 'list';
 type DayRouteMobileShelf = 'route' | 'add';
+type MyDayPickerSection = 'scenarios' | 'places' | 'suburbs' | 'picks' | 'own';
 
 /** Owner 2026-08-06: post-buy modal «Оформили билет?» off until UX revisit. Buy links still open. */
 const SHOW_DAY_TICKET_HANDOFF_MODAL = false;
@@ -430,6 +434,8 @@ function DayRoutePanelInner() {
   const [mobileShelf, setMobileShelf] = useState<DayRouteMobileShelf>('route');
   /** Lovable-style map chrome: collapse / fullscreen / mobile sheet. */
   const myDay = useMyDayController();
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [pickerSection, setPickerSection] = useState<MyDayPickerSection>('scenarios');
   /** Session dismiss for «Свободное окно» upsell (resets on reload). */
   const [freeWindowDismissed, setFreeWindowDismissed] = useState(false);
   /** HTML5 DnD: venue id currently dragged (plan stops). */
@@ -534,7 +540,7 @@ function DayRoutePanelInner() {
   }, []);
 
   useEffect(() => {
-    if (route.venues.length === 0) setMobileShelf('add');
+    if (route.venues.length === 0) setMobileShelf('route');
   }, [route.venues.length]);
 
   /** Wave 1.5: always list itinerary (Lovable parity). */
@@ -1691,14 +1697,7 @@ function DayRoutePanelInner() {
   }
 
   function scrollToDayPresets() {
-    window.setTimeout(() => {
-      const el =
-        document.querySelector('[data-day-guide="scenarios"]') ||
-        document.querySelector('[data-day-presets]');
-      if (el instanceof HTMLElement) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }, 80);
+    openPicker('scenarios');
   }
 
   function createCustomFromSearch(title: string) {
@@ -2101,7 +2100,7 @@ function DayRoutePanelInner() {
       return;
     }
     setInsertAfterVenueId(afterVenueId);
-    focusUnifiedSearch();
+    openPicker('places');
   }
 
   function openInsertNoteAfter(afterVenueId: string) {
@@ -2115,11 +2114,7 @@ function DayRoutePanelInner() {
   }
 
   function openTextForm() {
-    setOpenPanel('text');
-    window.setTimeout(() => {
-      document.getElementById('day-plan-form-wrap')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      titleFieldRef.current?.focus();
-    }, 80);
+    openPicker('own');
   }
 
   const shareMenuItems = (
@@ -2192,6 +2187,41 @@ function DayRoutePanelInner() {
   );
   const showSuburbsGuide = Boolean(hasPageCity && significantSuburbs.length > 0);
   const showHotPicks = Boolean(hasPageCity && (hotPickCards.length > 0 || hotPickTabIds.length > 0));
+
+  const pickerTabs = [
+    ...(showScenariosGuide
+      ? [{ value: 'scenarios' as const, label: 'Готовые сценарии', hint: 'Соберите день в один клик', icon: Route }]
+      : []),
+    ...(showMustSeeAccordion
+      ? [{ value: 'places' as const, label: 'Главные места', hint: 'Топ мест города', icon: MapPin }]
+      : []),
+    ...(showSuburbsGuide
+      ? [{ value: 'suburbs' as const, label: 'Значимые пригороды', hint: 'Поездки за город на полдня', icon: Landmark }]
+      : []),
+    ...(showHotPicks || showMatches
+      ? [{ value: 'picks' as const, label: 'Выбор Дайбилет', hint: 'Рекомендации сервиса', icon: Sparkles }]
+      : []),
+    { value: 'own' as const, label: 'Своё место', hint: 'Если места нет в каталоге', icon: PenLine },
+  ];
+
+  function openPicker(section: MyDayPickerSection = 'scenarios') {
+    const allowed = pickerTabs.some((t) => t.value === section)
+      ? section
+      : pickerTabs[0]?.value || 'own';
+    setPickerSection(allowed);
+    setPickerOpen(true);
+    if (allowed === 'own') {
+      setOpenPanel('text');
+      window.setTimeout(() => titleFieldRef.current?.focus(), 120);
+    } else if (allowed === 'places') {
+      setOpenPanel('mustSee');
+    }
+  }
+
+  function closePicker() {
+    setPickerOpen(false);
+  }
+
   const isEmptyRoute = route.venues.length === 0;
   const hasMapStops = mapStops.length > 0;
   const mapSelectedStopId = hoverStopId ?? focusedStopId;
@@ -3043,6 +3073,12 @@ function DayRoutePanelInner() {
       {/* Empty plan: city+search starter is the first content block under H1 */}
       {isEmptyRoute ? renderEmptyStarter() : null}
 
+      {hasPageCity && pickerTabs.length ? (
+        <div className="mt-4 lg:mt-5" data-my-day-picker-host>
+          <MyDayPickerLaunch tabs={pickerTabs} onOpen={openPicker} />
+        </div>
+      ) : null}
+
       {/* Mobile: route steps vs add places */}
       <div
         className="sticky top-[var(--site-header-height)] z-20 -mx-4 mt-4 border-b border-slate-200/80 bg-white/95 px-4 py-2 backdrop-blur lg:hidden"
@@ -3072,9 +3108,9 @@ function DayRoutePanelInner() {
             type="button"
             role="tab"
             aria-selected={mobileShelf === 'add'}
-            onClick={() => setMobileShelf('add')}
+            onClick={() => openPicker(pickerTabs[0]?.value || 'own')}
             className={`inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-lg px-2 text-xs font-semibold transition ${
-              mobileShelf === 'add'
+              pickerOpen
                 ? 'bg-white text-slate-900 shadow-sm'
                 : 'text-slate-500'
             }`}
@@ -3489,15 +3525,23 @@ function DayRoutePanelInner() {
 
       </div>
 
-      <div
-        className={mobileShelf === 'add' ? 'lg:contents' : 'hidden lg:contents'}
-        data-day-mobile-shelf-panel="add"
+      <MyDayPickerSheet
+        open={pickerOpen}
+        section={pickerSection}
+        tabs={pickerTabs}
+        onSectionChange={(next) => {
+          setPickerSection(next);
+          if (next === 'own') {
+            setOpenPanel('text');
+            window.setTimeout(() => titleFieldRef.current?.focus(), 80);
+          } else if (next === 'places') setOpenPanel('mustSee');
+        }}
+        onClose={closePicker}
       >
-      <MyDayAddShelf>
-      {/* Day-plan guides: always open (логистика / гастро / Что посмотреть). Accordion = route tools only. */}
-      {showScenariosGuide ? (
+      {/* Picker panels - only active tab visible */}
+      {showScenariosGuide && pickerSection === 'scenarios' ? (
         <section
-          className="mt-3 rounded-2xl border border-slate-200 bg-white px-4 py-4 sm:px-5 sm:py-5"
+          className="rounded-2xl border border-slate-200 bg-white px-4 py-4 sm:px-5 sm:py-5"
           data-day-guide="scenarios"
         >
           <p className="text-sm font-semibold text-slate-900">Готовые сценарии</p>
@@ -3521,9 +3565,9 @@ function DayRoutePanelInner() {
         </section>
       ) : null}
 
-      {showSuburbsGuide ? (
+      {showSuburbsGuide && pickerSection === 'suburbs' ? (
         <section
-          className="mt-3 rounded-2xl border border-slate-200 bg-white px-4 py-4 sm:px-5 sm:py-5"
+          className="rounded-2xl border border-slate-200 bg-white px-4 py-4 sm:px-5 sm:py-5"
           data-day-guide="suburbs"
         >
           <p className="text-sm font-semibold text-slate-900">Значимые пригороды</p>
@@ -3546,8 +3590,8 @@ function DayRoutePanelInner() {
 
       {/* Accordion stack: must-see → custom → boat → matches → hot picks → catalog. */}
       {/* Accordion: must-see chips (route builder) */}
-      {showMustSeeAccordion ? (
-        <div className="mt-3 rounded-2xl border border-slate-200 bg-white" data-day-accordion="mustSee">
+      {showMustSeeAccordion && pickerSection === 'places' ? (
+        <div className="rounded-2xl border border-slate-200 bg-white" data-day-accordion="mustSee">
           <button
             type="button"
             aria-expanded={mustSeeOpen}
@@ -3566,7 +3610,7 @@ function DayRoutePanelInner() {
               className={`h-5 w-5 shrink-0 text-slate-400 transition ${mustSeeOpen ? 'rotate-180' : ''}`}
             />
           </button>
-          {mustSeeOpen ? (
+          {(mustSeeOpen || pickerOpen) ? (
             <div id="day-must-see-body" className="border-t border-slate-100 px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
               {mustSeeResolved.length > 0 ? (
                 <div data-day-must-see>
@@ -3665,8 +3709,8 @@ function DayRoutePanelInner() {
         </div>
       ) : null}
 
-      {/* Accordion: custom text place */}
-      <div className="mt-3 rounded-2xl border border-slate-200 bg-white" id="day-plan-form-wrap" data-day-accordion="text">
+      {pickerSection === 'own' ? (
+      <div className="rounded-2xl border border-slate-200 bg-white" id="day-plan-form-wrap" data-day-accordion="text">
         <button
           type="button"
           aria-expanded={textFormOpen}
@@ -3693,7 +3737,7 @@ function DayRoutePanelInner() {
             className={`h-5 w-5 shrink-0 text-slate-400 transition ${textFormOpen ? 'rotate-180' : ''}`}
           />
         </button>
-        {textFormOpen ? (
+        {(textFormOpen || pickerOpen) ? (
           <form
             onSubmit={submitTextStop}
             className="border-t border-slate-100 px-4 pb-4 pt-3 sm:px-5 sm:pb-5"
@@ -3797,9 +3841,8 @@ function DayRoutePanelInner() {
           </form>
         ) : null}
       </div>
-
-      {/* Boat: immediately under «Добавить своё место» (SPB-only inside wizard). */}
       <DayRouteBoatWizard
+
         cityName={pageCityName}
         citySlug={pageCitySlug}
         cityId={pageCityId}
@@ -3809,12 +3852,13 @@ function DayRoutePanelInner() {
         onRouteChange={setRoute}
         locationsCatalog={locationsCatalog}
       />
+      ) : null}
 
       {/* Accordion: nearby events / matches */}
-      {showMatches ? (
+      {pickerSection === 'picks' && showMatches ? (
         <div
           id="day-route-matches"
-          className="mt-3 rounded-2xl border border-slate-200 bg-white"
+          className="rounded-2xl border border-slate-200 bg-white"
           data-day-accordion="matches"
         >
           <button
@@ -3839,7 +3883,7 @@ function DayRoutePanelInner() {
               className={`h-5 w-5 shrink-0 text-slate-400 transition ${matchesOpen ? 'rotate-180' : ''}`}
             />
           </button>
-          {matchesOpen ? (
+          {(matchesOpen || pickerOpen) ? (
             <div id="day-route-matches-body" className="border-t border-slate-100 px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
               {loading ? <p className="text-sm text-slate-500">Ищем покрытие…</p> : null}
               {!loading && payload && uniqueMatches.length === 0 ? (
@@ -3940,9 +3984,9 @@ function DayRoutePanelInner() {
       ) : null}
 
       {/* Hot Picks - always expanded (no accordion chrome) */}
-      {showHotPicks ? (
+      {pickerSection === 'picks' && showHotPicks ? (
         <section
-          className="mt-4"
+          className="mt-1"
           data-day-hot-picks
           data-day-recommend-carousel
         >
@@ -4061,9 +4105,9 @@ function DayRoutePanelInner() {
         </section>
       ) : null}
 
-      {/* Always-open catalog trio (no accordion / no card border); boat lives under custom place. */}
+      {pickerSection === 'picks' || pickerSection === 'places' ? (
       <section
-        className="mt-5"
+        className="mt-4"
         id="day-catalog-add"
         data-day-catalog-add="1"
         data-day-catalog-open="1"
@@ -4080,9 +4124,9 @@ function DayRoutePanelInner() {
           renderCatalogTrio()
         )}
       </section>
+      ) : null}
 
-      </MyDayAddShelf>
-      </div>
+      </MyDayPickerSheet>
 
       {hasMapStops ? (
         <MyDayMobileMapSheet
@@ -4186,8 +4230,7 @@ function DayRoutePanelInner() {
           <button
             type="button"
             onClick={() => {
-              setMobileShelf('add');
-              focusUnifiedSearch();
+              openPicker(pickerTabs[0]?.value || 'own');
             }}
             data-day-add-sticky
             className="inline-flex h-12 flex-1 items-center justify-center gap-1.5 rounded-full bg-primary-600 px-4 text-sm font-bold text-white hover:bg-primary-700"
