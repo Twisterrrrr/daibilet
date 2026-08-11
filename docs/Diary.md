@@ -29,6 +29,19 @@
 
 ---
 
+## 2026-08-11 - My Day toolbar: orphan trash wrap
+
+### Наблюдения
+- Owner: корзина clear-route уезжала на отдельную строку под Пешком/Авто/Оптимизировать/По часам; export ряд визуально разъезжался vs Lovable.
+
+### Решения
+- `MyDayToolbar`: actions `flex-nowrap` + `shrink-0` + горизонтальный scroll на узких; export всегда отдельной строкой (снят `lg:flex-row` side-by-side); единая высота `h-9` / trash `h-9 w-9`.
+
+### Проблемы
+- Live MSK web - batch / «выкатывай».
+
+---
+
 ## 2026-08-11 - My Day: Lovable sticky route toolbar
 
 ### Наблюдения
@@ -41,7 +54,7 @@
 
 ### Проблемы
 - GPX/KML / «Сохранить как сценарий» / PDF-с-картой (карта в PDF) - не 1:1 Lovable, см. gap audit.
-- Live MSK - batch / «выкатывай».
+- Live MSK web - batch / «выкатывай».
 
 ---
 
