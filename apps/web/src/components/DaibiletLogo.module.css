@@ -27,16 +27,20 @@
 /*
  * Single bold blue dot as й-diacritic. Em-sized so it stays readable
  * at header font sizes. No routes / other points / animation.
+ *
+ * Vertical: Manrope 700 «и» stem top ≈ 0.525em below .logoI top;
+ * native й gap stem→breve ≈ 0.06em → top 0.46em + translateY -100%
+ * keeps the bold dot tight above и (was top:0 / -108%, gap ~0.54em).
  */
 .breveMark {
   position: absolute;
   left: 50%;
-  top: 0;
-  width: 0.3em;
-  height: 0.3em;
+  top: 0.46em;
+  width: 0.26em;
+  height: 0.26em;
   overflow: visible;
   pointer-events: none;
-  transform: translate(-50%, -108%);
+  transform: translate(-50%, -100%);
 }
 
 .dot {
