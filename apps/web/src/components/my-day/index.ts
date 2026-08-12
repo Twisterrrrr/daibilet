@@ -9,4 +9,5 @@ export { MyDayAddShelf } from './MyDayAddShelf';
 export { MyDayPickerSheet, MyDayPickerLaunch } from './MyDayPickerSheet';
 export type { MyDayPickerSection, MyDayPickerTab } from './MyDayPickerSheet';
 export { MyDaySaveScenarioDialog } from './MyDaySaveScenarioDialog';
+export { useMyDayController } from './useMyDayController';
 export type { MyDayController } from './useMyDayController';
