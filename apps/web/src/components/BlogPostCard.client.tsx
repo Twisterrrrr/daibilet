@@ -8,7 +8,6 @@ import { BLOG_POSTS } from '@/data/blog-posts';
 import type { BlogCardDto } from '@/lib/blog-utils';
 import {
   clipBlogCardExcerpt,
-  clipBlogCardTitle,
   expandLargeListingCopy,
   resolveBlogCardDateLabel,
 } from '@/lib/blog-utils';
@@ -203,7 +202,7 @@ export function BlogPostCard({
   ].join(' ');
 
   if (isQuote) {
-    const quoteText = clipBlogCardExcerpt(excerpt || titleText, 180);
+    const quoteText = clipBlogCardExcerpt(excerpt || titleText, 200);
     const displayTag = normalizeBlogTagLabel(tag, post.articleType);
     return (
       <Link
@@ -212,14 +211,14 @@ export function BlogPostCard({
       >
         <div>
           <TagChips tag={tag} city={post.city} citySlug={post.citySlug} articleType={post.articleType} />
-          <p className="font-serif text-2xl font-medium leading-snug tracking-tight break-normal md:text-[1.65rem] md:leading-[1.3]">
+          <p className="font-serif text-2xl font-medium leading-snug tracking-tight break-words md:text-[1.65rem] md:leading-[1.3]">
             {quoteText}
           </p>
         </div>
         <div className="mt-8 flex flex-wrap items-end justify-between gap-3 md:mt-6">
           <div>
-            <p className="line-clamp-2 break-normal font-serif text-sm font-semibold text-white/95">
-              {clipBlogCardTitle(titleText, 72)}
+            <p className="break-words font-serif text-sm font-semibold text-white/95">
+              {titleText}
             </p>
             <BlogCardMeta post={post} dateLabel={dateLabel} isLarge={false} onDark />
           </div>
@@ -230,7 +229,7 @@ export function BlogPostCard({
   }
 
   if (isLead) {
-    const primary = clipBlogCardExcerpt(largeCopy?.primary || excerpt, 220);
+    const primary = clipBlogCardExcerpt(largeCopy?.primary || excerpt, 280);
     return (
       <article className={`${cardShell} lg:flex-row`}>
         <Link
@@ -253,13 +252,13 @@ export function BlogPostCard({
         </Link>
         <div className="flex min-w-0 flex-1 flex-col justify-center p-7 md:p-7 lg:p-8">
           <TagChips tag={tag} city={post.city} citySlug={post.citySlug} articleType={post.articleType} />
-          <h2 className="font-serif text-[1.85rem] font-semibold leading-[1.12] tracking-tight text-graphite break-normal md:text-4xl">
+          <h2 className="font-serif text-[1.85rem] font-semibold leading-[1.12] tracking-tight text-graphite break-words md:text-4xl">
             <Link href={articleHref} className="transition-colors duration-300 hover:text-primary-700">
               {titleText}
             </Link>
           </h2>
           {primary ? (
-            <p className="mt-3 line-clamp-4 break-normal text-base leading-relaxed text-graphite-muted sm:line-clamp-5 sm:text-lg">
+            <p className="mt-3 break-words text-base leading-relaxed text-graphite-muted sm:text-lg">
               {primary}
             </p>
           ) : null}
@@ -286,8 +285,8 @@ export function BlogPostCard({
 
   if (isBanner) {
     const bannerLead = clipBlogCardExcerpt(
-      excerpt || expandLargeListingCopy(post.slug, excerpt, 180).primary,
-      120,
+      excerpt || expandLargeListingCopy(post.slug, excerpt, 240).primary,
+      160,
     );
     return (
       <article className="group relative flex min-h-[19rem] overflow-hidden rounded-card bg-slate-900 shadow-card transition-all duration-300 hover:scale-[1.01] hover:shadow-lg md:min-h-[16rem] lg:min-h-[18rem]">
@@ -311,13 +310,13 @@ export function BlogPostCard({
         </Link>
         <div className="relative z-10 mt-auto flex w-full max-w-3xl flex-col gap-3 p-7 md:gap-3 md:p-7">
           <TagChips tag={tag} city={post.city} citySlug={post.citySlug} articleType={post.articleType} />
-          <h2 className="font-serif text-2xl font-semibold leading-[1.15] tracking-tight text-white break-normal md:text-2xl lg:text-3xl">
+          <h2 className="font-serif text-2xl font-semibold leading-[1.15] tracking-tight text-white break-words md:text-2xl lg:text-3xl">
             <Link href={articleHref} className="hover:text-white/90">
-              {clipBlogCardTitle(titleText, 96)}
+              {titleText}
             </Link>
           </h2>
           {bannerLead ? (
-            <p className="line-clamp-3 break-normal text-sm leading-relaxed text-white/80 sm:line-clamp-2 sm:text-base">
+            <p className="break-words text-sm leading-relaxed text-white/80 sm:text-base">
               {bannerLead}
             </p>
           ) : null}
@@ -351,12 +350,12 @@ export function BlogPostCard({
         </Link>
         <div className="flex min-w-0 flex-1 flex-col p-6 md:p-5">
           <TagChips tag={tag} city={post.city} citySlug={post.citySlug} articleType={post.articleType} />
-          <h2 className="line-clamp-3 break-normal font-serif text-lg font-semibold leading-snug tracking-tight text-slate-900 transition-colors duration-300 group-hover:text-primary-700 md:text-lg">
-            <Link href={articleHref}>{clipBlogCardTitle(titleText, 96)}</Link>
+          <h2 className="break-words font-serif text-lg font-semibold leading-snug tracking-tight text-slate-900 transition-colors duration-300 group-hover:text-primary-700 md:text-lg">
+            <Link href={articleHref}>{titleText}</Link>
           </h2>
           {excerpt ? (
-            <p className="mt-2 line-clamp-3 break-normal text-sm leading-relaxed text-slate-600">
-              {clipBlogCardExcerpt(excerpt, 140)}
+            <p className="mt-2 break-words text-sm leading-relaxed text-slate-600">
+              {clipBlogCardExcerpt(excerpt, 160)}
             </p>
           ) : null}
           <div className="mt-auto flex flex-col gap-3 pt-4">
@@ -369,8 +368,8 @@ export function BlogPostCard({
   }
 
   if (isLarge) {
-    const primary = clipBlogCardExcerpt(largeCopy?.primary || excerpt, 280);
-    const secondary = largeCopy?.secondary ? clipBlogCardExcerpt(largeCopy.secondary, 220) : '';
+    const primary = clipBlogCardExcerpt(largeCopy?.primary || excerpt, 320);
+    const secondary = largeCopy?.secondary ? clipBlogCardExcerpt(largeCopy.secondary, 240) : '';
     const hasCopy = Boolean(primary || secondary);
 
     return (
@@ -395,13 +394,13 @@ export function BlogPostCard({
         </Link>
         <div className="flex min-w-0 flex-1 flex-col p-7 md:p-6">
           <TagChips tag={tag} city={post.city} citySlug={post.citySlug} articleType={post.articleType} />
-          <h2 className="font-serif text-[1.65rem] font-semibold leading-[1.15] tracking-tight text-graphite break-normal md:text-3xl">
+          <h2 className="font-serif text-[1.65rem] font-semibold leading-[1.15] tracking-tight text-graphite break-words md:text-3xl">
             <Link href={articleHref} className="transition-colors duration-300 hover:text-primary-700">
               {titleText}
             </Link>
           </h2>
           {hasCopy ? (
-            <p className="mt-2.5 line-clamp-5 whitespace-pre-line break-normal text-sm leading-relaxed text-graphite-muted sm:line-clamp-6 sm:text-base sm:leading-[1.55]">
+            <p className="mt-2.5 whitespace-pre-line break-words text-sm leading-relaxed text-graphite-muted sm:text-base sm:leading-[1.55]">
               {[primary, secondary].filter(Boolean).join('\n\n')}
             </p>
           ) : null}
@@ -469,20 +468,20 @@ export function BlogPostCard({
         <TagChips tag={tag} city={post.city} citySlug={post.citySlug} articleType={post.articleType} />
         <h2
           className={[
-            'line-clamp-3 break-normal font-serif font-semibold leading-snug tracking-tight text-slate-900 transition-colors duration-300 group-hover:text-primary-700',
+            'break-words font-serif font-semibold leading-snug tracking-tight text-slate-900 transition-colors duration-300 group-hover:text-primary-700',
             isSmall ? 'text-lg md:text-[1.1rem]' : 'text-xl md:text-xl',
           ].join(' ')}
         >
-          {clipBlogCardTitle(titleText, isSmall ? 72 : 88)}
+          {titleText}
         </h2>
         {excerpt ? (
           <p
             className={[
-              'mt-2 line-clamp-3 break-normal leading-relaxed text-slate-600',
+              'mt-2 break-words leading-relaxed text-slate-600',
               isSmall ? 'text-sm md:text-sm' : 'text-base md:text-sm',
             ].join(' ')}
           >
-            {clipBlogCardExcerpt(excerpt, isSmall ? 110 : 140)}
+            {clipBlogCardExcerpt(excerpt, isSmall ? 140 : 160)}
           </p>
         ) : null}
         <div className="mt-auto flex flex-col gap-3 pt-4">

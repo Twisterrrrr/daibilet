@@ -8,7 +8,7 @@ import { BlogListFiltered } from '@/components/BlogListFiltered.client';
 import { BlogListHero } from '@/components/BlogListHero';
 import { cityFilterLabel } from '@/lib/blog-meta';
 import type { BlogSidebarPromoDto } from '@/lib/blog-sidebar-promo';
-import { splitBlogListingHero, truncateAtWord, type BlogCardDto } from '@/lib/blog-utils';
+import { splitBlogListingHero, truncateAtSentence, type BlogCardDto } from '@/lib/blog-utils';
 import type { BlogListFilters } from '@/components/BlogListView';
 import type { BreadcrumbItem } from '@/components/PageBreadcrumbs';
 
@@ -25,7 +25,7 @@ function resolveEditorialQuote(featured: BlogCardDto | null | undefined): string
   const raw = String(featured.excerpt || '').trim().replace(/\s+/g, ' ');
   if (!raw) return null;
   if (raw.length <= 180) return raw;
-  return truncateAtWord(raw, 180);
+  return truncateAtSentence(raw, 180, 1);
 }
 
 export function BlogListingBody({

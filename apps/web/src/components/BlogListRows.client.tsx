@@ -10,7 +10,6 @@ import { BLOG_POSTS } from '@/data/blog-posts';
 import type { BlogCardDto } from '@/lib/blog-utils';
 import {
   clipBlogCardExcerpt,
-  clipBlogCardTitle,
   resolveBlogCardDateLabel,
 } from '@/lib/blog-utils';
 import {
@@ -89,15 +88,15 @@ function BlogListRow({ post }: { post: BlogCardDto }) {
       ) : null}
 
       <div className="flex min-w-0 flex-1 flex-col py-2.5 pr-3 sm:py-3 sm:pr-4">
-        <h2 className="line-clamp-3 break-normal font-serif text-base font-semibold leading-snug tracking-tight text-slate-900 sm:text-lg md:line-clamp-2 md:text-xl">
+        <h2 className="break-words font-serif text-base font-semibold leading-snug tracking-tight text-slate-900 sm:text-lg md:text-xl">
           <Link href={articleHref} className="transition-colors duration-300 hover:text-primary-700">
-            {clipBlogCardTitle(post.title, 96)}
+            {post.title}
           </Link>
         </h2>
 
         {excerpt ? (
-          <p className="mt-1 line-clamp-3 break-normal text-xs leading-relaxed text-slate-600 sm:mt-1.5 sm:line-clamp-2 sm:text-sm">
-            {clipBlogCardExcerpt(excerpt, 130)}
+          <p className="mt-1 break-words text-xs leading-relaxed text-slate-600 sm:mt-1.5 sm:text-sm">
+            {clipBlogCardExcerpt(excerpt, 160)}
           </p>
         ) : null}
 

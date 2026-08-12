@@ -76,42 +76,121 @@ function plainLeadFromBody(slug: string): string {
     .trim();
 }
 
-/**
- * Soft clip for listing titles/excerpts: never mid-word.
- * Prefers a sentence end near the limit; otherwise last whole word.
- */
-export function truncateAtWord(text: string, maxChars: number): string {
-  const value = String(text || '')
+function normalizeBlogPlainText(text: string): string {
+  return String(text || '')
     .replace(/\s+/g, ' ')
     .trim();
+}
+
+/** Split on real sentence ends (`.?!…` before space or EOL), not `?` inside «…». */
+function splitIntoSentences(text: string): string[] {
+  const value = normalizeBlogPlainText(text);
+  if (!value) return [];
+
+  const parts = value
+    .split(/(?<=[.!?…])(?=\s+|$)/u)
+    .map((chunk) => chunk.trim())
+    .filter(Boolean);
+  return parts.length ? parts : [value];
+}
+
+function lastSentenceEndBefore(text: string, maxChars: number): number {
+  const window = text.slice(0, maxChars);
+  let last = -1;
+  const re = /[.!?…](?=\s+|$)/gu;
+  let match: RegExpExecArray | null;
+  while ((match = re.exec(window)) !== null) {
+    last = match.index + 1;
+  }
+  return last;
+}
+
+/**
+ * Clip at sentence boundary: up to `maxSentences` full sentences within `maxChars`.
+ * Never ends mid-thought; falls back to whole-word clip only when no sentence fits.
+ */
+export function truncateAtSentence(
+  text: string,
+  maxChars: number,
+  maxSentences = 2,
+): string {
+  return clipAtSentenceBoundary(text, maxChars, maxSentences);
+}
+
+/** Alias for listing/card excerpt clipping at sentence boundaries. */
+export function clipAtSentenceBoundary(
+  text: string,
+  maxChars: number,
+  maxSentences = 2,
+): string {
+  const value = normalizeBlogPlainText(text);
+  if (!value) return '';
+  if (value.length <= maxChars && maxSentences <= 0) return value;
+
+  const sentences = splitIntoSentences(value);
+  let picked = '';
+  let count = 0;
+
+  for (const sentence of sentences) {
+    if (maxSentences > 0 && count >= maxSentences) break;
+    const candidate = picked ? `${picked} ${sentence}` : sentence;
+    if (candidate.length <= maxChars) {
+      picked = candidate;
+      count += 1;
+      continue;
+    }
+    if (!picked) {
+      const endAt = lastSentenceEndBefore(sentence, maxChars);
+      if (endAt > 0) return sentence.slice(0, endAt).trim();
+      return truncateAtWord(sentence, maxChars);
+    }
+    break;
+  }
+
+  if (picked) return picked;
+
+  const endAt = lastSentenceEndBefore(value, maxChars);
+  if (endAt > 0) return value.slice(0, endAt).trim();
+
+  return truncateAtWord(value, maxChars);
+}
+
+/**
+ * Soft clip for listing titles: whole words only, never mid-word.
+ * Prefer showing the full title in UI; this is a safety net for extreme lengths.
+ */
+export function truncateAtWord(text: string, maxChars: number): string {
+  const value = normalizeBlogPlainText(text);
   if (!value) return '';
   if (value.length <= maxChars) return value;
 
   const hard = value.slice(0, maxChars);
-  const sentenceFrom = Math.floor(maxChars * 0.55);
-  const sentenceWindow = hard.slice(sentenceFrom);
-  const sentenceMatch = sentenceWindow.match(/^[\s\S]*?[.!?…]/u);
-  if (sentenceMatch) {
-    const candidate = `${hard.slice(0, sentenceFrom)}${sentenceMatch[0]}`.trim();
-    if (candidate.length >= Math.floor(maxChars * 0.45)) return candidate;
-  }
-
   const atWord = hard.replace(/\s+\S*$/u, '').trim();
   if (atWord.length >= Math.floor(maxChars * 0.5)) return atWord;
 
   const lastSpace = hard.lastIndexOf(' ');
-  // Never fall back to a mid-word slice - shorter clean end is better.
   return lastSpace > 0 ? hard.slice(0, lastSpace).trim() : hard.trim();
 }
 
-/** Mobile-safe title clip (~2-3 lines); CSS line-clamp is only overflow safety. */
-export function clipBlogCardTitle(text: string, maxChars = 88): string {
+/** Titles: return full string when possible; word-safe clip only for extreme overflow. */
+export function clipBlogCardTitle(text: string, maxChars = 240): string {
   return truncateAtWord(text, maxChars);
 }
 
-/** Mobile-safe excerpt clip; prefer clean phrase end over filling the last line. */
-export function clipBlogCardExcerpt(text: string, maxChars = 140): string {
-  return truncateAtWord(text, maxChars);
+/** Card excerpt: 1-2 complete sentences, never mid-phrase. */
+export function clipBlogCardExcerpt(text: string, maxChars = 160): string {
+  return truncateAtSentence(text, maxChars, 2);
+}
+
+/** Featured hero lead: 2-3 full sentences from body or excerpt. */
+export function clipBlogFeaturedLead(
+  slug: string,
+  excerpt: string,
+  maxSentences = 3,
+  maxChars = 520,
+): string {
+  const lead = plainLeadFromBody(slug) || stripColumnMetaPrefix(excerpt);
+  return truncateAtSentence(lead, maxChars, maxSentences);
 }
 
 /**
@@ -120,9 +199,9 @@ export function clipBlogCardExcerpt(text: string, maxChars = 140): string {
  */
 export function expandListingExcerpt(slug: string, excerpt: string, maxChars = 420): string {
   const base = stripColumnMetaPrefix(excerpt);
-  if (base) return truncateAtWord(base, maxChars);
+  if (base) return truncateAtSentence(base, maxChars, 2);
   const lead = plainLeadFromBody(slug);
-  return lead ? truncateAtWord(lead, maxChars) : '';
+  return lead ? truncateAtSentence(lead, maxChars, 2) : '';
 }
 
 /**
@@ -136,25 +215,17 @@ export function expandLargeListingCopy(
 ): { primary: string; secondary: string } {
   const lead = plainLeadFromBody(slug);
   const base = stripColumnMetaPrefix(excerpt);
-  const full = truncateAtWord(lead || base, maxChars).trim();
-  if (!full) return { primary: '', secondary: '' };
-  if (full.length < 280) return { primary: full, secondary: '' };
+  const source = normalizeBlogPlainText(lead || base);
+  if (!source) return { primary: '', secondary: '' };
 
-  const mid = Math.floor(full.length * 0.42);
-  const from = Math.max(100, mid - 90);
-  const to = Math.min(full.length - 60, mid + 140);
-  const window = full.slice(from, to);
-  const sentenceEnd = window.search(/[.!?][\s\u00a0]+/);
-  let splitAt: number;
-  if (sentenceEnd >= 0) {
-    splitAt = from + sentenceEnd + 1;
-  } else {
-    // Prefer a single continuous paragraph over a mid-word/mid-phrase cut.
-    return { primary: full, secondary: '' };
+  const sentences = splitIntoSentences(source);
+  if (sentences.length <= 2) {
+    return { primary: truncateAtSentence(source, maxChars, 2), secondary: '' };
   }
 
-  const primary = full.slice(0, splitAt).trim();
-  const secondary = full.slice(splitAt).trim();
+  const primary = truncateAtSentence(sentences.slice(0, 2).join(' '), maxChars, 2);
+  const rest = source.slice(primary.length).trim();
+  const secondary = rest ? truncateAtSentence(rest, Math.floor(maxChars * 0.55), 2) : '';
   return { primary, secondary };
 }
 

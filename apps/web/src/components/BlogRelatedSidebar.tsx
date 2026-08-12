@@ -78,7 +78,7 @@ export function BlogRelatedSidebar({
                         {metaLabel}
                       </p>
                     ) : null}
-                    <h3 className="mt-1 line-clamp-3 font-display text-sm font-bold leading-snug text-slate-900 group-hover:text-primary-700">
+                    <h3 className="mt-1 break-words font-display text-sm font-bold leading-snug text-slate-900 group-hover:text-primary-700">
                       {post.title}
                     </h3>
                   </div>

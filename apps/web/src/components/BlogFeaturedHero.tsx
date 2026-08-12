@@ -13,9 +13,7 @@ import {
 import { resolveBlogListingCta } from '@/lib/blog-listing-links';
 import type { BlogSidebarPromoDto } from '@/lib/blog-sidebar-promo';
 import {
-  clipBlogCardExcerpt,
-  clipBlogCardTitle,
-  expandLargeListingCopy,
+  clipBlogFeaturedLead,
   resolveBlogCardDateLabel,
   type BlogCardDto,
 } from '@/lib/blog-utils';
@@ -49,11 +47,7 @@ export function BlogFeaturedHero({
   afishaFallbackCitySlug,
 }: BlogFeaturedHeroProps) {
   const articleHref = `/blog/${featured.slug}`;
-  const largeCopy = expandLargeListingCopy(featured.slug, featured.excerpt, 220);
-  const lead = clipBlogCardExcerpt(
-    largeCopy.primary || String(featured.excerpt || '').trim(),
-    150,
-  );
+  const lead = clipBlogFeaturedLead(featured.slug, featured.excerpt, 3);
   const dateLabel = resolveBlogCardDateLabel(featured);
   const tag = normalizeBlogTagLabel(featured.tag, featured.articleType);
   const cityLabel = blogListingCityBadgeLabel(featured.citySlug, featured.city);
@@ -122,7 +116,7 @@ export function BlogFeaturedHero({
           </h2>
 
           {lead ? (
-            <p className="max-w-2xl line-clamp-3 break-normal text-base leading-relaxed text-white/80 md:line-clamp-3 md:text-base md:leading-[1.5]">
+            <p className="max-w-2xl break-words text-base leading-relaxed text-white/80 md:text-base md:leading-[1.5]">
               {lead}
             </p>
           ) : null}
@@ -196,9 +190,9 @@ export function BlogFeaturedHero({
                         ) : null}
                         <Link
                           href={href}
-                          className="line-clamp-3 break-normal font-display text-base font-bold leading-snug text-slate-900 hover:text-primary-700 md:line-clamp-3 md:text-sm"
+                          className="break-words font-display text-base font-bold leading-snug text-slate-900 hover:text-primary-700 md:text-sm"
                         >
-                          {clipBlogCardTitle(post.title, 78)}
+                          {post.title}
                         </Link>
                       </div>
                     </div>

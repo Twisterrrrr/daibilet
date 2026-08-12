@@ -7,11 +7,14 @@ import { resolveBlogTopics, parseBlogTopicParam } from './blog-topics';
 import {
   clipBlogCardExcerpt,
   clipBlogCardTitle,
+  clipAtSentenceBoundary,
+  clipBlogFeaturedLead,
   expandListingExcerpt,
   expandLargeListingCopy,
   resolveBlogCardDateLabel,
   splitBlogListingHero,
   staticBlogCards,
+  truncateAtSentence,
   truncateAtWord,
 } from './blog-utils';
 
@@ -144,8 +147,48 @@ test('expandLargeListingCopy prefers body without concatenating excerpt', () => 
 test('truncateAtWord never cuts mid-word', () => {
   assert.equal(truncateAtWord('Горького переулка хватает на вечер', 12), 'Горького');
   assert.equal(truncateAtWord('иммерсивные шоу в регионах', 14), 'иммерсивные');
-  assert.ok(!clipBlogCardTitle('Иммерсивные шоу в регионах России', 18).endsWith('иммерсивно'));
+  assert.equal(
+    clipBlogCardTitle('Иммерсивные шоу в регионах России'),
+    'Иммерсивные шоу в регионах России',
+  );
   assert.equal(clipBlogCardExcerpt('билет и ужин без суеты в центре города', 18), 'билет и ужин без');
+});
+
+test('clipAtSentenceBoundary ignores ? inside guillemets', () => {
+  const excerpt =
+    'Лекция судмедэксперта на крыше, горячая эмаль, иммерсивный особняк, «ГДЕ МОЙ 2008?» и квест в зоопарке - пять странных способов встряхнуть московские выходные.';
+  assert.equal(clipAtSentenceBoundary(excerpt, 420, 2), excerpt);
+  const short = clipAtSentenceBoundary(excerpt, 72, 1);
+  assert.ok(short.endsWith('особняк') || short.endsWith('особняк,'));
+  assert.ok(!short.includes('2008'));
+});
+
+test('truncateAtSentence ends on sentence boundary, not mid-phrase', () => {
+  const text =
+    'Лекция судмедэксперта на крыше, горячая эмаль, иммерсивный особняк. Второе предложение для теста.';
+  const clipped = truncateAtSentence(text, 90, 2);
+  assert.ok(clipped.endsWith('.'));
+  assert.ok(!clipped.endsWith('...'));
+  assert.ok(!/\sиммерсивн[^\s]*$/u.test(clipped));
+});
+
+test('live blog slugs: listing excerpt ends cleanly', () => {
+  const cards = staticBlogCards();
+  for (const slug of [
+    'kak-perestat-gulyat-po-krugu-moskva',
+    'chelyabinsk-vii-gastro-spektakl',
+    'moskva-immersivnye-vystavki',
+  ]) {
+    const card = cards.find((item) => item.slug === slug);
+    assert.ok(card, slug);
+    const listing = expandListingExcerpt(card!.slug, card!.excerpt, 420);
+    assert.ok(listing.length > 0, slug);
+    assert.ok(!listing.endsWith('...'), slug);
+    assert.ok(!/\s\S{1,4}$/u.test(listing) || /[.!?…]$/.test(listing), slug);
+    const hero = clipBlogFeaturedLead(card!.slug, card!.excerpt, 3);
+    assert.ok(hero.length > 0, slug);
+    assert.ok(!hero.endsWith('...'), slug);
+  }
 });
 
 
