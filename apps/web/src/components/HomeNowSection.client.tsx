@@ -100,6 +100,7 @@ export function HomeEventRail({
   href,
   events,
   editorsPickBadge = false,
+  sectionClassName,
 }: {
   id?: string;
   title: string;
@@ -107,11 +108,13 @@ export function HomeEventRail({
   href: string;
   events: PublicSessionDto[];
   editorsPickBadge?: boolean;
+  /** Extra section classes (e.g. tighter top when mobile stories strip is hidden). */
+  sectionClassName?: string;
 }) {
   if (!events.length) return null;
 
   return (
-    <section id={id} className="section-y" data-home-band="boxed">
+    <section id={id} className={`section-y ${sectionClassName ?? ''}`.trim()} data-home-band="boxed">
       <div className="container-page min-w-0">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>

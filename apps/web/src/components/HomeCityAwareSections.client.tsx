@@ -99,6 +99,9 @@ export function HomeCityAwareSections({
         href={editorsHref}
         events={editorsPick}
         editorsPickBadge
+        sectionClassName={
+          showEditorsPick ? 'max-sm:!pt-[calc(var(--space-section)/2)]' : undefined
+        }
       />
 
       {children}
