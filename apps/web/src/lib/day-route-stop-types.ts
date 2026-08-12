@@ -37,7 +37,24 @@ export function dayRouteStopTypeTag(
   if (venue.isSuburb) return 'Пригород';
   if (venue.eventId || venue.eventSlug) return 'Событие';
   if (placeTypeTag) return String(placeTypeTag).trim() || 'Место';
+  const fromTitle = editorialTagFromTitle(venue.title);
+  if (fromTitle) return fromTitle;
   return 'Место';
+}
+
+/** Lovable editorial tags from stop title when catalog tag is missing. */
+export function editorialTagFromTitle(title: string | null | undefined): string | null {
+  const t = String(title || '').toLowerCase();
+  if (!t) return null;
+  if (/театр|спектакл|опera|opera|балет/.test(t)) return 'Театр';
+  if (/музей|галере|выстав|экспоз/.test(t)) return 'Музей';
+  if (/скulpt|скульпт|арт-объект|стрит|инстал/.test(t)) return 'Арт-объект';
+  if (/ресторан|кафе|бар|гастро|кухн|посикун|обед/.test(t)) return 'Еда';
+  if (/парк|сквер|сад|набереж|прогул|бульвар/.test(t)) return 'Прогулка';
+  if (/собор|храм|монаст|церк|лавр/.test(t)) return 'Храм';
+  if (/смотров|панорам|обзор|колон/.test(t)) return 'Смотровая';
+  if (/кремл|собор|дворец|особняк|архит/.test(t)) return 'Архитектура';
+  return null;
 }
 
 /** Soft price chip copy (Lovable: «Можно купить билет» / «Вход свободный»). */

@@ -8,5 +8,5 @@ export { MyDayHourGantt } from './MyDayHourGantt';
 export { MyDayAddShelf } from './MyDayAddShelf';
 export { MyDayPickerSheet, MyDayPickerLaunch } from './MyDayPickerSheet';
 export type { MyDayPickerSection, MyDayPickerTab } from './MyDayPickerSheet';
-export { useMyDayController } from './useMyDayController';
+export { MyDaySaveScenarioDialog } from './MyDaySaveScenarioDialog';
 export type { MyDayController } from './useMyDayController';

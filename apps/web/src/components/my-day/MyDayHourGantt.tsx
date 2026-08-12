@@ -49,7 +49,7 @@ export function MyDayHourGantt({
 
   return (
     <div
-      className={`rounded-2xl border border-slate-200 bg-white p-3 sm:p-4 ${className}`.trim()}
+      className={`rounded-2xl border border-slate-200/90 bg-white p-3 shadow-sm sm:p-4 ${className}`.trim()}
       data-my-day-hour-gantt="1"
     >
       <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -61,14 +61,14 @@ export function MyDayHourGantt({
       </div>
 
       <div className="relative mt-3 overflow-x-auto">
-        <div className="min-w-[28rem]">
+        <div className="min-w-[22rem] sm:min-w-[28rem]">
           <div className="relative mb-2 h-5 border-b border-slate-100">
             {ticks.map((t) => {
               const left = ((t - dayStart) / span) * 100;
               return (
                 <span
                   key={t}
-                  className="absolute top-0 -translate-x-1/2 text-[10px] font-medium text-slate-400"
+                  className="absolute top-0 -translate-x-1/2 text-[10px] font-medium tabular-nums text-slate-400"
                   style={{ left: `${left}%` }}
                 >
                   {formatDayRouteHHMMFromMinutes(t)}
@@ -77,7 +77,23 @@ export function MyDayHourGantt({
             })}
           </div>
 
-          <ul className="space-y-1.5">
+          <ul className="relative space-y-1.5">
+            {/* Hour grid */}
+            <div
+              className="pointer-events-none absolute inset-y-0 left-[7.75rem] right-0"
+              aria-hidden
+            >
+              {ticks.map((t) => {
+                const left = ((t - dayStart) / span) * 100;
+                return (
+                  <span
+                    key={`grid-${t}`}
+                    className="absolute bottom-0 top-0 w-px bg-slate-100"
+                    style={{ left: `${left}%` }}
+                  />
+                );
+              })}
+            </div>
             {plan.lunchHint ? (
               <li className="grid grid-cols-[7.5rem_minmax(0,1fr)] items-center gap-2">
                 <span className="truncate text-xs font-medium text-amber-800">Обед</span>

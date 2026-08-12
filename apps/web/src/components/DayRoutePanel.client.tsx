@@ -212,11 +212,13 @@ import {
   dayRouteStopDwellChipLabel,
   dayRouteStopPriceChipLabel,
   dayRouteStopTypeTag,
+  editorialTagFromTitle,
   estimateDayRouteDwellMinutes,
 } from '@/lib/day-route-stop-types';
 import { venueTypeLabel } from '@/lib/venue-meta';
 import { resolveCityCardImage } from '@/lib/city-images';
 import { MyDayHourGantt } from '@/components/my-day/MyDayHourGantt';
+import { MyDaySaveScenarioDialog } from '@/components/my-day/MyDaySaveScenarioDialog';
 import { exportDayRoutePdfWithMap } from '@/lib/day-route-pdf';
 import {
   applyDayRouteScenario,
@@ -480,6 +482,7 @@ function DayRoutePanelInner() {
   const [pdfBusy, setPdfBusy] = useState(false);
   const [savedScenarios, setSavedScenarios] = useState<DayRouteSavedScenario[]>([]);
   const [scenarioBusy, setScenarioBusy] = useState(false);
+  const [scenarioSheetOpen, setScenarioSheetOpen] = useState(false);
 
   useEffect(() => {
     setSavedScenarios(readDayRouteScenarios());
@@ -1490,12 +1493,12 @@ function DayRoutePanelInner() {
       science: 'Семейное',
       literature: 'Литература',
       views: 'Смотровая',
-      street: 'Улица',
+      street: 'Прогулка',
       park: 'Парк',
       temple: 'Храм',
-      creative: 'Необычное',
-      secret: 'Секрет',
-      houses: 'Дома',
+      creative: 'Арт-объект',
+      secret: 'Необычное',
+      houses: 'Архитектура',
       mansions: 'Особняк',
     };
     const map = new Map<string, string>();
@@ -1531,6 +1534,7 @@ function DayRoutePanelInner() {
       (venue.slug ? mustSeeTagByKey.get(String(venue.slug)) : null) ||
       catalogTypeByKey.get(venue.id) ||
       (venue.slug ? catalogTypeByKey.get(String(venue.slug)) : null) ||
+      editorialTagFromTitle(venue.title) ||
       null,
     [mustSeeTagByKey, catalogTypeByKey],
   );
@@ -1568,10 +1572,6 @@ function DayRoutePanelInner() {
     });
   }, [hasPageCity, mustSeePlaces.length, locationsCatalog.length, significantSuburbs.length]);
   const freeWindowGaps = useMemo(() => findDayRouteFreeWindowGaps(segmentMeters), [segmentMeters]);
-  const primaryFreeWindow = useMemo(() => {
-    if (!freeWindowGaps.length) return null;
-    return freeWindowGaps.reduce((best, gap) => (gap.meters > best.meters ? gap : best));
-  }, [freeWindowGaps]);
   /** One card per product - TC sessions often share title with unique slugs/ids. */
   const uniqueMatches = useMemo(
     () => dedupeDayRouteMatches(payload?.matches || []),
@@ -1690,7 +1690,7 @@ function DayRoutePanelInner() {
 
   const freeWindowUpsells = useMemo(() => {
     type FreePick = { key: string; badge: string; item: DayRouteVenueItem; hook: string | null };
-    if (!primaryFreeWindow) return [] as FreePick[];
+    if (!freeWindowGaps.length) return [] as FreePick[];
     if (!freeWindowCityScope.tokens.size) return [] as FreePick[];
     const inDayCity = (candidate: {
       city?: string | null;
@@ -1777,7 +1777,7 @@ function DayRoutePanelInner() {
     }
     return picks.slice(0, 3);
   }, [
-    primaryFreeWindow,
+    freeWindowGaps.length,
     freeWindowCityScope,
     mustSeeResolved,
     eventsCatalog,
@@ -2416,6 +2416,7 @@ function DayRoutePanelInner() {
         stops,
         rows,
       });
+      flashDayRouteFeedback('Откройте «Сохранить как PDF» в диалоге печати');
     } finally {
       setPdfBusy(false);
     }
@@ -2427,8 +2428,11 @@ function DayRoutePanelInner() {
 
   function saveCurrentAsScenario() {
     if (scenarioBusy || !route.venues.length) return;
-    const name = window.prompt('Название сценария', scopeCityName || 'Мой день');
-    if (!name) return;
+    setScenarioSheetOpen(true);
+  }
+
+  function commitScenarioSave(name: string) {
+    if (scenarioBusy || !route.venues.length) return;
     setScenarioBusy(true);
     try {
       const saved = saveDayRouteScenario({
@@ -2443,6 +2447,8 @@ function DayRoutePanelInner() {
       });
       if (saved) {
         refreshScenarios();
+        setScenarioSheetOpen(false);
+        flashDayRouteFeedback(`Сценарий «${saved.name}» сохранён`);
         setDndAnnounce(`Сценарий «${saved.name}» сохранён.`);
       }
     } finally {
@@ -3006,7 +3012,7 @@ function DayRoutePanelInner() {
     return (
       <div
         ref={unifiedSearchRef}
-        className="mt-3 flex w-full flex-col gap-1.5 sm:mt-4"
+        className="mt-3 hidden w-full flex-col gap-1.5 sm:mt-4 lg:flex"
         data-day-unified-search
         data-day-header-search="1"
       >
@@ -3283,7 +3289,11 @@ function DayRoutePanelInner() {
   return (
     <>
     <div
-      className="container-page px-4 py-5 pb-[calc(8rem+env(safe-area-inset-bottom,0px))] sm:px-6 sm:py-10 sm:pb-10 print:hidden lg:pb-10"
+      className={`container-page px-4 py-5 sm:px-6 sm:py-10 print:hidden lg:pb-10 ${
+        isEmptyRoute
+          ? 'pb-[calc(6rem+env(safe-area-inset-bottom,0px))]'
+          : 'pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] sm:pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))]'
+      }`}
       data-day-mobile-list-first="1"
       data-day-section-width="full"
       data-day-mobile-view={mobileView}
@@ -3453,13 +3463,14 @@ function DayRoutePanelInner() {
         </div>
       ) : null}
 
-      {/* Mobile: route steps vs add places */}
-      <div
-        className="sticky top-[var(--site-header-height)] z-20 -mx-4 mt-4 border-b border-slate-200/80 bg-white/95 px-4 py-2 backdrop-blur lg:hidden"
-        data-day-mobile-shelf-tabs
-        role="tablist"
-        aria-label="Разделы моего дня"
-      >
+      {/* Mobile shelf tabs - only empty day (Lovable: no dual tabs when route exists) */}
+      {!route.venues.length && hasPageCity && pickerTabs.length ? (
+        <div
+          className="sticky top-[var(--site-header-height)] z-20 -mx-4 mt-4 border-b border-slate-200/80 bg-white/95 px-4 py-2 backdrop-blur lg:hidden"
+          data-day-mobile-shelf-tabs
+          role="tablist"
+          aria-label="Разделы моего дня"
+        >
         <div className="flex gap-1 rounded-xl bg-[#F5F5F7] p-1">
           <button
             type="button"
@@ -3493,15 +3504,22 @@ function DayRoutePanelInner() {
             Добавить места
           </button>
         </div>
-      </div>
+      ) : null}
 
       <div
-        className={mobileShelf === 'route' ? 'contents' : 'hidden lg:contents'}
+        className={
+          route.venues.length > 0 || mobileShelf === 'route'
+            ? 'contents'
+            : 'hidden lg:contents'
+        }
         data-day-mobile-shelf-panel="route"
       >
       {/* 1. Route list */}
       {!route.venues.length ? null : (
-        <section className="mt-5 w-full sm:mt-6" data-day-route-list-section>
+        <section
+          className="mt-4 w-full max-lg:rounded-2xl max-lg:bg-[#F5F5F7] max-lg:p-3 sm:mt-6"
+          data-day-route-list-section
+        >
           <MyDayToolbar
             stopsCount={route.venues.length}
             stopsCountLabel={stopsCountLabel}
@@ -3792,72 +3810,81 @@ function DayRoutePanelInner() {
                         onOpenFullPicker={() => openInsertPlaceAfter(venue.id)}
                       />
                     ) : null}
-                    {primaryFreeWindow &&
-                    globalIndex >= 0 &&
-                    primaryFreeWindow.afterIndex === globalIndex &&
-                    freeWindowUpsells.length > 0 &&
-                    !atMax &&
-                    !freeWindowDismissed ? (
-                      <li
-                        className={
-                          effectiveStopViewMode === 'grid'
-                            ? `${DAY_ROUTE_STOPS_GRID_CARD} list-none`
-                            : undefined
-                        }
-                        data-day-free-window-upsell
-                        data-day-free-window
-                      >
-                        <div className="relative rounded-2xl border border-dashed border-sky-200 bg-sky-50/50 p-3">
-                          <button
-                            type="button"
-                            onClick={() => setFreeWindowDismissed(true)}
-                            className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full text-slate-500 transition hover:bg-white/80 hover:text-slate-800"
-                            aria-label="Скрыть свободное окно"
-                            data-day-free-window-dismiss
-                          >
-                            <X className="h-4 w-4" />
-                          </button>
-                          <p className="pr-9 text-sm font-semibold text-slate-900">Свободное окно</p>
-                          <p className="mt-0.5 text-[13px] text-slate-600">
-                            Между точками около {formatDayRouteDistance(primaryFreeWindow.meters)}.
-                          </p>
-                          <div className="mt-3 flex flex-col gap-2">
-                            {freeWindowUpsells.map((pick) => (
-                              <button
-                                key={pick.key}
-                                type="button"
-                                onClick={() => addMustSeeItem(pick.item)}
-                                className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white p-2 text-left transition duration-200 hover:border-emerald-300 hover:bg-emerald-50/40"
-                              >
-                                <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-lg bg-slate-100">
-                                  {pick.item.imageUrl ? (
-                                    <SafeImage
-                                      src={pick.item.imageUrl}
-                                      alt=""
-                                      fill
-                                      sizes="2.75rem"
-                                      className="object-cover"
-                                    />
-                                  ) : (
-                                    <div className="flex h-full w-full items-center justify-center text-slate-400">
-                                      <MapPin className="h-4 w-4" />
-                                    </div>
-                                  )}
-                                </div>
-                                <span className="min-w-0 flex-1">
-                                  <span className="block text-[10px] font-semibold uppercase tracking-wide text-slate-500">
-                                    {pick.badge}
+                    {(() => {
+                      const gapAtIndex =
+                        globalIndex >= 0
+                          ? freeWindowGaps.find((g) => g.afterIndex === globalIndex)
+                          : null;
+                      if (
+                        !gapAtIndex ||
+                        !freeWindowUpsells.length ||
+                        atMax ||
+                        freeWindowDismissed
+                      ) {
+                        return null;
+                      }
+                      return (
+                        <li
+                          className="relative ml-7 list-none sm:ml-8"
+                          data-day-free-window-upsell
+                          data-day-free-window
+                          data-day-free-window-after={globalIndex}
+                        >
+                          <div className="mb-2 rounded-2xl border border-dashed border-primary-300/60 bg-[#F5F5F7] p-4">
+                            <button
+                              type="button"
+                              onClick={() => setFreeWindowDismissed(true)}
+                              className="absolute right-2 top-2 grid h-7 w-7 place-items-center rounded-full text-slate-500 transition hover:bg-white hover:text-slate-800"
+                              aria-label="Скрыть свободное окно"
+                              data-day-free-window-dismiss
+                            >
+                              <X className="h-3.5 w-3.5" />
+                            </button>
+                            <p className="pr-8 text-sm font-semibold text-slate-900">
+                              Свободное окно
+                            </p>
+                            <p className="mt-1 text-sm text-slate-600">
+                              Между точками около {formatDayRouteDistance(gapAtIndex.meters)} -
+                              можно добавить ещё одну остановку.
+                            </p>
+                            <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                              {freeWindowUpsells.slice(0, 2).map((pick) => (
+                                <button
+                                  key={`${globalIndex}-${pick.key}`}
+                                  type="button"
+                                  onClick={() => addMustSeeItem(pick.item)}
+                                  className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-2 text-left transition hover:border-primary-200 hover:bg-primary-50/40"
+                                >
+                                  <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-slate-100">
+                                    {pick.item.imageUrl ? (
+                                      <SafeImage
+                                        src={pick.item.imageUrl}
+                                        alt=""
+                                        fill
+                                        sizes="3rem"
+                                        className="object-cover"
+                                      />
+                                    ) : (
+                                      <div className="flex h-full w-full items-center justify-center text-slate-400">
+                                        <MapPin className="h-4 w-4" />
+                                      </div>
+                                    )}
+                                  </div>
+                                  <span className="min-w-0 flex-1">
+                                    <span className="block text-[10px] font-semibold uppercase tracking-wide text-primary-700">
+                                      {pick.badge}
+                                    </span>
+                                    <span className="mt-0.5 block text-xs font-semibold leading-snug text-slate-900">
+                                      {pick.item.title}
+                                    </span>
                                   </span>
-                                  <span className="mt-0.5 block text-xs font-semibold leading-snug text-slate-900">
-                                    {pick.item.title}
-                                  </span>
-                                </span>
-                              </button>
-                            ))}
+                                </button>
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                      </li>
-                    ) : null}
+                        </li>
+                      );
+                    })()}
                   </Fragment>
                 );
               })}
@@ -4694,52 +4721,21 @@ function DayRoutePanelInner() {
         />
       </MyDayMapFullScreen>
 
+      {!route.venues.length ? (
       <MobileStickyActionBar>
-        {/* Owner 2026-08-11: sticky route-buy CTA too early - match Lovable (no buy push). */}
-        {route.venues.length >= DAY_ROUTE_MIN ? (
-          <button
-            type="button"
-            onClick={() => {
-              setMobileShelf('route');
-              if (hasMapStops) {
-                myDay.openMobileMap();
-                setMobileView('map');
-              } else {
-                const el = document.querySelector('[data-my-day-itinerary]');
-                if (el instanceof HTMLElement) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-              }
-            }}
-            data-day-view-ready-sticky
-            className="inline-flex h-12 flex-1 items-center justify-center gap-1.5 rounded-full bg-primary-600 px-4 text-sm font-bold text-white hover:bg-primary-700"
-          >
-            <Route className="h-4 w-4" />
-            Посмотреть готовый день
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={() => {
-              openPicker(pickerTabs[0]?.value || 'own');
-            }}
-            data-day-add-sticky
-            className="inline-flex h-12 flex-1 items-center justify-center gap-1.5 rounded-full bg-primary-600 px-4 text-sm font-bold text-white hover:bg-primary-700"
-          >
-            <Plus className="h-4 w-4" />
-            Добавить места
-          </button>
-        )}
-        {route.venues.length ? (
-          <button
-            type="button"
-            onClick={() => setShareMenuOpen(true)}
-            data-day-share-sticky
-            className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700"
-            aria-label="Поделиться"
-          >
-            <Share2 className="h-4 w-4" />
-          </button>
-        ) : null}
+        <button
+          type="button"
+          onClick={() => {
+            openPicker(pickerTabs[0]?.value || 'own');
+          }}
+          data-day-add-sticky
+          className="inline-flex h-12 flex-1 items-center justify-center gap-1.5 rounded-full bg-primary-600 px-4 text-sm font-bold text-white hover:bg-primary-700"
+        >
+          <Plus className="h-4 w-4" />
+          Добавить места
+        </button>
       </MobileStickyActionBar>
+      ) : null}
       </div>
     </div>
 
@@ -5009,6 +5005,13 @@ function DayRoutePanelInner() {
         travelMinutes={travelMinutes}
       />
     ) : null}
+    <MyDaySaveScenarioDialog
+      open={scenarioSheetOpen}
+      defaultName={scopeCityName ? `${scopeCityName} - ${route.venues.length} точек` : 'Мой день'}
+      busy={scenarioBusy}
+      onClose={() => setScenarioSheetOpen(false)}
+      onSave={commitScenarioSave}
+    />
     </>
   );
 }
@@ -5018,7 +5021,7 @@ function DayRouteListPin({ n }: { n: number }) {
   const label = String(Math.max(1, Math.floor(n)));
   return (
     <span
-      className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-600 text-sm font-bold text-white"
+      className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary-600 text-sm font-bold leading-none tabular-nums text-white"
       aria-label={`Точка ${label}`}
       data-day-stop-pin
       data-day-stop-number
@@ -5574,12 +5577,12 @@ function DayRouteVenueCard({
         onDragEnd={canDrag ? onDragEnd : undefined}
       >
         <article
-          className={`group grid grid-cols-[auto_minmax(0,1fr)] items-start gap-3 rounded-2xl border p-3 transition-colors sm:gap-4 sm:p-4 ${
+          className={`group grid grid-cols-[auto_minmax(0,1fr)] items-start gap-3 rounded-2xl border p-3 transition-colors sm:gap-4 sm:p-4 max-lg:border-slate-200/90 max-lg:bg-white max-lg:shadow-sm ${
             focused
-              ? 'border-primary-300 bg-primary-50/40 shadow-sm'
+              ? 'border-primary-300 bg-primary-50/40 shadow-sm max-lg:bg-white'
               : grabbed
-                ? 'border-primary-400 bg-primary-50/30'
-                : 'border-transparent bg-transparent hover:bg-slate-50/90'
+                ? 'border-primary-400 bg-primary-50/30 max-lg:bg-white'
+                : 'border-transparent bg-transparent hover:bg-slate-50/90 max-lg:hover:bg-white'
           } ${purchased ? 'border-l-[3px] border-l-primary-600' : ''}`}
           data-day-stop-shell
         >

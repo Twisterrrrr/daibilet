@@ -6,9 +6,15 @@ import {
   dayRouteStopDwellChipLabel,
   dayRouteStopPriceChipLabel,
   dayRouteStopTypeTag,
+  editorialTagFromTitle,
   estimateDayRouteDwellMinutes,
   formatDayRouteSoftMinutes,
 } from './day-route-stop-types.ts';
+
+test('editorialTagFromTitle detects theatre and art', () => {
+  assert.equal(editorialTagFromTitle('Пермский академический Театр-Театр'), 'Театр');
+  assert.equal(editorialTagFromTitle('Скульптура «Пермяк солёные уши»'), 'Арт-объект');
+});
 
 test('dayRouteStopTypeTag classifies custom / suburb / event', () => {
   assert.equal(dayRouteStopTypeTag({ id: 'text_1', title: 'Кафе' }), 'Своё место');

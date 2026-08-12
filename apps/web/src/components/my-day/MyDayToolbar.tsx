@@ -107,9 +107,9 @@ export function MyDayToolbar({
         aria-label="Управление маршрутом"
         aria-orientation="horizontal"
         data-my-day-toolbar="1"
-        className="sticky top-[calc(var(--site-header-height)+0.5rem)] z-20 rounded-2xl border border-slate-200/90 bg-white/95 p-4 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/90 sm:p-5"
+        className="sticky top-[calc(var(--site-header-height)+0.35rem)] z-20 rounded-2xl border border-slate-200/90 bg-white/95 p-3 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/90 sm:p-5 lg:top-[calc(var(--site-header-height)+0.5rem)]"
       >
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-sm">
+        <div className="flex flex-col gap-1.5 text-sm sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5 sm:gap-y-1.5">
           <span className="inline-flex items-center gap-2 font-semibold text-slate-900">
             <MapPin className="h-4 w-4 shrink-0 text-primary-600" aria-hidden />
             <span data-day-route-count-heading>{stopsCountLabel}</span>
@@ -298,7 +298,7 @@ export function MyDayToolbar({
 
       {showTypes ? (
         <div
-          className="mt-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+          className="mt-3 rounded-2xl border border-slate-200/80 bg-white p-3 shadow-sm sm:mt-4 sm:p-4"
           data-my-day-type-filters
         >
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -345,7 +345,11 @@ export function MyDayToolbar({
         </div>
       ) : null}
 
-      <p id="dnd-hint" className="mt-4 text-xs text-slate-500" data-my-day-dnd-hint>
+      <p
+        id="dnd-hint"
+        className="mt-4 hidden text-xs text-slate-500 lg:block"
+        data-my-day-dnd-hint
+      >
         Порядок можно менять мышью или с клавиатуры: фокус на ручке перетаскивания, стрелки вверх /
         вниз, пробел - взять и отпустить, Escape - отменить.
       </p>
