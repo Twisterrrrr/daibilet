@@ -1,3 +1,9 @@
+## Mobile header / SSR (2026-08-12)
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| FIX.MOBILE-NAV-SSR | Гамбургер кликабелен во время SSR/loading (checkbox disclosure + skeleton) | Критический | 🔄 ship + Deploy MSK web |
+
 ## SEO listing + My Day routes (2026-08-11)
 
 | ID | Задача | Приоритет | Статус |

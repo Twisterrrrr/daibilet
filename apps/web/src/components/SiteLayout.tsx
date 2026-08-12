@@ -43,24 +43,24 @@ export async function SiteLayout({
   }
 
   // SelectedCityProvider isolates useSearchParams in an inner Suspense hole so
-  // header + page can SSR. Fallback keeps brand chrome if anything still suspends
-  // (never empty spacer — that caused the 2-3s blank open on daibilet.ru).
+  // header + page can SSR. Header stays outside the content Suspense so the
+  // hamburger (checkbox disclosure) is never replaced by a dead skeleton span.
   return (
     <SiteProviders>
-      <Suspense fallback={<SiteChromeSkeleton variant="page" />}>
-        <SelectedCityProvider destinations={destinations}>
-          <div className="flex min-h-screen flex-col bg-background">
-            <div className="print:hidden">
-              <SiteHeader destinations={destinations} />
-            </div>
-            <main className="flex-1">{children}</main>
-            <div className="print:hidden">
-              <SiteFooter destinations={destinations} variant={footerVariant} />
-              <ScrollToTopButton />
-            </div>
+      <SelectedCityProvider destinations={destinations}>
+        <div className="flex min-h-screen flex-col bg-background">
+          <div className="print:hidden">
+            <SiteHeader destinations={destinations} />
           </div>
-        </SelectedCityProvider>
-      </Suspense>
+          <Suspense fallback={<SiteChromeSkeleton variant="page" omitHeader />}>
+            <main className="flex-1">{children}</main>
+          </Suspense>
+          <div className="print:hidden">
+            <SiteFooter destinations={destinations} variant={footerVariant} />
+            <ScrollToTopButton />
+          </div>
+        </div>
+      </SelectedCityProvider>
     </SiteProviders>
   );
 }

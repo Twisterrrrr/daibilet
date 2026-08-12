@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Heart, HelpCircle, LogIn, Menu, Route, User, X } from 'lucide-react';
+import { Heart, HelpCircle, LogIn, User } from 'lucide-react';
 import { forwardRef, useEffect, useRef, useState } from 'react';
 
 import { CityPicker } from '@/components/CityPicker.client';
@@ -10,6 +10,7 @@ import { DaibiletLogo } from '@/components/DaibiletLogo';
 import { DayRouteBadge } from '@/components/DayRouteBadge.client';
 import { FavoritesPanel } from '@/components/FavoritesPanel.client';
 import { HeaderSearch } from '@/components/HeaderSearch.client';
+import { MobileNavLayer, MobileNavTrigger, useMobileNavId } from '@/components/MobileNavMenu.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
 import { useUserAuthOptional } from '@/hooks/useUserAuth';
@@ -38,7 +39,7 @@ type SiteHeaderProps = {
 
 export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
   const pathname = usePathname();
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const mobileNavId = useMobileNavId();
   const [favoritesOpen, setFavoritesOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [authMounted, setAuthMounted] = useState(false);
@@ -92,13 +93,13 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
   }, [userMenuOpen]);
 
   useEffect(() => {
-    if (!mobileOpen && !favoritesOpen) return;
+    if (!favoritesOpen) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     return () => {
       document.body.style.overflow = prev;
     };
-  }, [favoritesOpen, mobileOpen]);
+  }, [favoritesOpen]);
 
   const isLoggedIn = authMounted && Boolean(auth?.isLoggedIn);
   const searchCityFilter = cityValue !== 'all' ? cityValue : undefined;
@@ -108,14 +109,8 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
       <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-200/70 bg-white/95 pt-[env(safe-area-inset-top,0px)] shadow-[0_1px_0_hsl(210_9%_11%/0.03)] backdrop-blur-md supports-[backdrop-filter]:bg-white/90">
         <div className="container-page flex min-h-[var(--site-header-height)] items-center justify-between gap-2 py-2.5 sm:gap-3 sm:py-3 lg:py-3.5">
           <div className="flex min-w-0 flex-1 flex-nowrap items-center gap-2 sm:gap-3 lg:flex-none lg:gap-4">
-            <button
-              type="button"
-              aria-label="Открыть меню"
-              onClick={() => setMobileOpen(true)}
-              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-graphite transition hover:bg-surface-muted lg:hidden"
-            >
-              <Menu className="h-5 w-5" strokeWidth={1.75} />
-            </button>
+            {/* Label only in header; sheet layer is a sibling outside backdrop-blur. */}
+            <MobileNavTrigger id={mobileNavId} />
 
             <Link
               href="/"
@@ -196,25 +191,21 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
       </header>
       <div aria-hidden="true" className="site-header-spacer" />
 
-      {mobileOpen ? (
-        <MobileNavSheet
-          pathname={pathname}
-          navLinks={navLinks}
-          cityLabel={cityLabel}
-          cityValue={cityValue}
-          destinations={destinations}
-          isLoggedIn={isLoggedIn}
-          auth={auth}
-          searchCityFilter={searchCityFilter}
-          searchInitialQuery={searchInitialQuery}
-          onClose={() => setMobileOpen(false)}
-          onCityChange={onCityChange}
-          onOpenFavorites={() => {
-            setMobileOpen(false);
-            setFavoritesOpen(true);
-          }}
-        />
-      ) : null}
+      {/* Outside header: fixed sheet must not sit under backdrop-filter containing block. */}
+      <MobileNavLayer
+        id={mobileNavId}
+        navLinks={navLinks}
+        cityLabel={cityLabel}
+        cityValue={cityValue}
+        destinations={destinations}
+        isLoggedIn={isLoggedIn}
+        auth={auth}
+        searchCityFilter={searchCityFilter}
+        searchInitialQuery={searchInitialQuery}
+        onCityChange={onCityChange}
+        onOpenFavorites={() => setFavoritesOpen(true)}
+      />
+
       {favoritesOpen ? <FavoritesPanel onClose={() => setFavoritesOpen(false)} /> : null}
     </>
   );
@@ -320,149 +311,3 @@ const HeaderAuthControls = forwardRef<
     </Link>
   );
 });
-
-function MobileNavSheet({
-  pathname,
-  navLinks,
-  cityLabel,
-  cityValue,
-  destinations,
-  isLoggedIn,
-  auth,
-  searchCityFilter,
-  searchInitialQuery,
-  onClose,
-  onCityChange,
-  onOpenFavorites,
-}: {
-  pathname: string;
-  navLinks: Array<{ label: string; href: string }>;
-  cityLabel: string;
-  cityValue: string;
-  destinations: PublicDestinationDto[];
-  isLoggedIn: boolean;
-  auth: ReturnType<typeof useUserAuthOptional>;
-  searchCityFilter?: string;
-  searchInitialQuery?: string;
-  onClose: () => void;
-  onCityChange: (name: string) => void;
-  onOpenFavorites: () => void;
-}) {
-  return (
-    <div className="fixed inset-0 z-[60] lg:hidden">
-      <button type="button" aria-label="Закрыть меню" className="absolute inset-0 bg-slate-900/45 backdrop-blur-[2px]" onClick={onClose} />
-      <aside className="relative flex h-full w-[min(20rem,88vw)] flex-col bg-white shadow-card-hover">
-        <div className="flex items-center justify-between px-4 py-4">
-          <Link
-            href="/"
-            className="inline-flex items-center overflow-visible"
-            aria-label="Дайбилет"
-            onClick={onClose}
-          >
-            <DaibiletLogo textClassName="text-xl" />
-          </Link>
-          <button type="button" aria-label="Закрыть" onClick={onClose} className="rounded-lg p-2 text-graphite-muted hover:bg-surface-muted hover:text-graphite">
-            <X className="h-5 w-5" strokeWidth={1.75} />
-          </button>
-        </div>
-        <div className="px-4 pb-3">
-          <HeaderSearch
-            variant="inline"
-            cityFilter={searchCityFilter}
-            initialQuery={searchInitialQuery}
-            className="rounded-xl bg-surface-muted py-2.5"
-          />
-        </div>
-        <nav aria-label="Мобильная навигация" className="flex-1 overflow-y-auto p-2">
-          {/* UX.LOC2: city first after search - not buried below nav/FAQ */}
-          <div className="px-2 py-1">
-            <p className="mb-1 px-2 text-xs font-medium uppercase tracking-wide text-graphite-muted">Фильтр по городу</p>
-            <CityPicker
-              cities={destinations}
-              value={cityValue}
-              onChange={(name) => {
-                onCityChange(name);
-                onClose();
-              }}
-              allLabel={cityLabel === 'Все города' || cityLabel === 'Фильтр по городу' ? 'Фильтр по городу' : cityLabel}
-              variant="compact"
-              className="w-full"
-            />
-          </div>
-          <div className="my-3 h-px bg-slate-100" />
-          <div>
-            {navLinks.map((item) => (
-              <Link
-                key={item.label}
-                href={item.href}
-                onClick={onClose}
-                className={`block w-full rounded-lg px-4 py-3 text-left text-base transition ${
-                  isNavActive(pathname, item.href.split('?')[0] || item.href)
-                    ? 'font-semibold text-graphite bg-surface-muted'
-                    : 'font-medium text-graphite-muted hover:bg-surface-muted hover:text-graphite'
-                }`}
-              >
-                {item.label}
-              </Link>
-            ))}
-          </div>
-          <div className="my-3 h-px bg-slate-100" />
-          <Link
-            href="/my-day"
-            onClick={onClose}
-            className="flex w-full items-center gap-2 rounded-lg px-4 py-3 text-left text-base font-medium text-graphite-muted hover:bg-surface-muted hover:text-graphite"
-          >
-            <Route className="h-4 w-4" strokeWidth={1.75} />
-            Мой день
-          </Link>
-          <button
-            type="button"
-            onClick={onOpenFavorites}
-            className="flex w-full items-center gap-2 rounded-lg px-4 py-3 text-left text-base font-medium text-graphite-muted hover:bg-surface-muted hover:text-graphite"
-          >
-            <Heart className="h-4 w-4" strokeWidth={1.75} />
-            Избранное
-          </button>
-          <Link
-            href="/help"
-            onClick={onClose}
-            className="flex w-full items-center gap-2 rounded-lg px-4 py-3 text-left text-base font-medium text-graphite-muted hover:bg-surface-muted hover:text-graphite"
-          >
-            <HelpCircle className="h-4 w-4" strokeWidth={1.75} />
-            Помощь и FAQ
-          </Link>
-          <div className="my-3 h-px bg-slate-100" />
-          {isLoggedIn ? (
-            <>
-              {auth?.user?.name ? <div className="px-4 py-2 text-sm text-graphite-muted">{auth.user.name}</div> : null}
-              <Link href="/account/purchases" onClick={onClose} className="flex w-full items-center gap-2 rounded-lg px-4 py-3 text-left text-base font-medium text-graphite-muted hover:bg-surface-muted hover:text-graphite">
-                <User className="h-4 w-4" strokeWidth={1.75} />
-                Мои покупки
-              </Link>
-              <button
-                type="button"
-                onClick={async () => {
-                  await auth?.logout();
-                  onClose();
-                  window.location.href = '/';
-                }}
-                className="flex w-full items-center gap-2 rounded-lg px-4 py-3 text-left text-base font-medium text-graphite-muted hover:bg-surface-muted hover:text-graphite"
-              >
-                Выйти
-              </button>
-            </>
-          ) : (
-            <Link
-              href="/login?returnUrl=/account/purchases"
-              onClick={onClose}
-              className="mx-2 mt-1 flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-4 py-3 text-base font-semibold text-white transition hover:bg-primary-700"
-            >
-              <LogIn className="h-4 w-4" strokeWidth={1.75} />
-              Войти
-            </Link>
-          )}
-        </nav>
-      </aside>
-    </div>
-  );
-}

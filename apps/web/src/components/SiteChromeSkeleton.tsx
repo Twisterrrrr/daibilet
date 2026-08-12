@@ -1,7 +1,13 @@
 import Link from 'next/link';
 
 import { DaibiletLogo } from '@/components/DaibiletLogo';
+import {
+  MobileNavDisclosureLayer,
+  MobileNavDisclosureTrigger,
+} from '@/components/MobileNavDisclosure';
 import { CITY_NIGHT_HERO } from '@/lib/city-night-hero';
+
+const SKELETON_NAV_ID = 'site-chrome-skeleton-nav';
 
 /**
  * Paintable chrome for Suspense / route loading.
@@ -9,38 +15,47 @@ import { CITY_NIGHT_HERO } from '@/lib/city-night-hero';
  * (CSR bailout fallback previously rendered only site-header-spacer = blank 2-3s).
  *
  * `city` variant: fixed night-hero shell matching CityPageView (no CLS on soft-nav).
+ * Hamburger uses zero-JS checkbox disclosure - clickable while SSR/loading (not a dead pulse span).
  */
 export function SiteChromeSkeleton({
   variant = 'page',
+  omitHeader = false,
 }: {
   variant?: 'page' | 'header-only' | 'city';
+  /** When SiteHeader is already painted (SiteLayout), skip duplicate fixed chrome. */
+  omitHeader?: boolean;
 }) {
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-200/70 bg-white/95 pt-[env(safe-area-inset-top,0px)] shadow-[0_1px_0_hsl(210_9%_11%/0.03)] backdrop-blur-md supports-[backdrop-filter]:bg-white/90">
-        <div className="container-page flex min-h-[var(--site-header-height)] items-center justify-between gap-2 py-2.5 sm:gap-3 sm:py-3 lg:py-3.5">
-          <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
-            <span className="inline-flex h-10 w-10 shrink-0 rounded-lg bg-slate-100 lg:hidden" aria-hidden />
-            <Link href="/" className="inline-flex shrink-0 items-center" aria-label="Дайбилет">
-              <DaibiletLogo textClassName="text-lg sm:text-xl lg:text-2xl" animated={false} />
-            </Link>
-            <span className="h-10 w-10 shrink-0 rounded-lg bg-slate-100 sm:h-9 sm:w-28" aria-hidden />
-          </div>
-          <nav aria-hidden className="hidden items-center gap-2 lg:flex">
-            <span className="h-4 w-14 rounded bg-slate-100" />
-            <span className="h-4 w-14 rounded bg-slate-100" />
-            <span className="h-4 w-16 rounded bg-slate-100" />
-            <span className="h-4 w-16 rounded bg-slate-100" />
-          </nav>
-          <div className="flex shrink-0 items-center gap-1.5" aria-hidden>
-            <span className="h-10 w-10 rounded-lg bg-slate-100" />
-            <span className="h-10 w-10 rounded-lg bg-slate-100" />
-            <span className="h-10 w-10 rounded-lg bg-slate-100" />
-            <span className="hidden h-10 w-10 rounded-lg bg-slate-100 lg:block" />
-          </div>
-        </div>
-      </header>
-      <div aria-hidden="true" className="site-header-spacer" />
+      {omitHeader ? null : (
+        <>
+          <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-200/70 bg-white/95 pt-[env(safe-area-inset-top,0px)] shadow-[0_1px_0_hsl(210_9%_11%/0.03)] backdrop-blur-md supports-[backdrop-filter]:bg-white/90">
+            <div className="container-page flex min-h-[var(--site-header-height)] items-center justify-between gap-2 py-2.5 sm:gap-3 sm:py-3 lg:py-3.5">
+              <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
+                <MobileNavDisclosureTrigger id={SKELETON_NAV_ID} />
+                <Link href="/" className="inline-flex shrink-0 items-center" aria-label="Дайбилет">
+                  <DaibiletLogo textClassName="text-lg sm:text-xl lg:text-2xl" animated={false} />
+                </Link>
+                <span className="h-10 w-10 shrink-0 rounded-lg bg-slate-100 sm:h-9 sm:w-28" aria-hidden />
+              </div>
+              <nav aria-hidden className="hidden items-center gap-2 lg:flex">
+                <span className="h-4 w-14 rounded bg-slate-100" />
+                <span className="h-4 w-14 rounded bg-slate-100" />
+                <span className="h-4 w-16 rounded bg-slate-100" />
+                <span className="h-4 w-16 rounded bg-slate-100" />
+              </nav>
+              <div className="flex shrink-0 items-center gap-1.5" aria-hidden>
+                <span className="h-10 w-10 rounded-lg bg-slate-100" />
+                <span className="h-10 w-10 rounded-lg bg-slate-100" />
+                <span className="h-10 w-10 rounded-lg bg-slate-100" />
+                <span className="hidden h-10 w-10 rounded-lg bg-slate-100 lg:block" />
+              </div>
+            </div>
+          </header>
+          <div aria-hidden="true" className="site-header-spacer" />
+          <MobileNavDisclosureLayer id={SKELETON_NAV_ID} />
+        </>
+      )}
       {variant === 'header-only' ? null : (
         <main className="flex-1" aria-busy="true" aria-label="Загрузка">
           {variant === 'city' ? <CityNightHeroSkeleton /> : <GenericPageSkeleton />}

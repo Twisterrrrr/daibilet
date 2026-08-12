@@ -1,3 +1,20 @@
+## 2026-08-12 - Mobile hamburger dead during SSR/loading
+
+### Наблюдения
+- Owner: на мобилке пока грузится SSR гамбургер некликабелен.
+- `SiteChromeSkeleton` (route `loading.tsx` + Suspense) рисовал мёртвый `span` вместо меню.
+- `SiteHeader` открывал sheet только через React `onClick` после гидрации толстого client-бандла.
+
+### Решения
+- Zero-JS checkbox disclosure: `MobileNavDisclosure` в skeleton + `MobileNavTrigger`/`MobileNavLayer` в header (sheet вне `backdrop-blur` header).
+- `SiteLayout`: SiteHeader вне content Suspense (`omitHeader` fallback).
+- Меню открывается из SSR HTML до гидрации; desktop `lg:hidden` без изменений.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-12 - SEO Этап 1: 5 SeoOverride HTML (KGD+SPB)
 
 ### Наблюдения
