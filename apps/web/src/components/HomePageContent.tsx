@@ -9,7 +9,6 @@ import { HomeHero } from '@/components/HomeHero.client';
 import { HomeMyDayBanner } from '@/components/HomeMyDayBanner.client';
 import { HomePageSkeleton } from '@/components/HomePageSkeleton';
 import { HomePopularCitiesRail } from '@/components/HomePopularCitiesRail.client';
-import { HomeStoriesStrip } from '@/components/HomeStoriesStrip.client';
 import { LuckyCityButton } from '@/components/LuckyCityButton.client';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { ScrollRail } from '@/components/ScrollRail.client';
@@ -84,9 +83,7 @@ async function HomePageBody() {
         landings={landingsCatalog?.items || []}
       />
 
-      <HomeStoriesStrip />
-
-      {/* Rhythm: editors → cities rail (plain) → My Day map-band → trips band */}
+      {/* Rhythm: mobile stories (hidden when editors-pick shows) → editors → cities → My Day */}
       <HomeCityAwareSections
         sessions={sessions}
         fingerprints={fingerprintsRecord}

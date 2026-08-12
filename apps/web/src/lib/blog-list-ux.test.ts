@@ -5,11 +5,14 @@ import { resolveBlogListingCta } from './blog-listing-links';
 import { stripColumnBodyChrome, stripColumnMetaPrefix, blogListingCityBadgeLabel } from './blog-meta';
 import { resolveBlogTopics, parseBlogTopicParam } from './blog-topics';
 import {
+  clipBlogCardExcerpt,
+  clipBlogCardTitle,
   expandListingExcerpt,
   expandLargeListingCopy,
   resolveBlogCardDateLabel,
   splitBlogListingHero,
   staticBlogCards,
+  truncateAtWord,
 } from './blog-utils';
 
 test('blog topics: standup / kids / routes / concerts', () => {
@@ -136,6 +139,13 @@ test('expandLargeListingCopy prefers body without concatenating excerpt', () => 
   assert.ok(joined.length > 0);
   assert.ok(!joined.startsWith(excerpt));
   assert.ok(!joined.includes(`${excerpt} `));
+});
+
+test('truncateAtWord never cuts mid-word', () => {
+  assert.equal(truncateAtWord('Горького переулка хватает на вечер', 12), 'Горького');
+  assert.equal(truncateAtWord('иммерсивные шоу в регионах', 14), 'иммерсивные');
+  assert.ok(!clipBlogCardTitle('Иммерсивные шоу в регионах России', 18).endsWith('иммерсивно'));
+  assert.equal(clipBlogCardExcerpt('билет и ужин без суеты в центре города', 18), 'билет и ужин без');
 });
 
 

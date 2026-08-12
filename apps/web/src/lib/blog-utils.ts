@@ -76,11 +76,42 @@ function plainLeadFromBody(slug: string): string {
     .trim();
 }
 
-function truncateAtWord(text: string, maxChars: number): string {
-  const value = String(text || '').trim();
+/**
+ * Soft clip for listing titles/excerpts: never mid-word.
+ * Prefers a sentence end near the limit; otherwise last whole word.
+ */
+export function truncateAtWord(text: string, maxChars: number): string {
+  const value = String(text || '')
+    .replace(/\s+/g, ' ')
+    .trim();
   if (!value) return '';
   if (value.length <= maxChars) return value;
-  return value.slice(0, maxChars).replace(/\s+\S*$/, '').trim() || value.slice(0, maxChars);
+
+  const hard = value.slice(0, maxChars);
+  const sentenceFrom = Math.floor(maxChars * 0.55);
+  const sentenceWindow = hard.slice(sentenceFrom);
+  const sentenceMatch = sentenceWindow.match(/^[\s\S]*?[.!?…]/u);
+  if (sentenceMatch) {
+    const candidate = `${hard.slice(0, sentenceFrom)}${sentenceMatch[0]}`.trim();
+    if (candidate.length >= Math.floor(maxChars * 0.45)) return candidate;
+  }
+
+  const atWord = hard.replace(/\s+\S*$/u, '').trim();
+  if (atWord.length >= Math.floor(maxChars * 0.5)) return atWord;
+
+  const lastSpace = hard.lastIndexOf(' ');
+  // Never fall back to a mid-word slice - shorter clean end is better.
+  return lastSpace > 0 ? hard.slice(0, lastSpace).trim() : hard.trim();
+}
+
+/** Mobile-safe title clip (~2-3 lines); CSS line-clamp is only overflow safety. */
+export function clipBlogCardTitle(text: string, maxChars = 88): string {
+  return truncateAtWord(text, maxChars);
+}
+
+/** Mobile-safe excerpt clip; prefer clean phrase end over filling the last line. */
+export function clipBlogCardExcerpt(text: string, maxChars = 140): string {
+  return truncateAtWord(text, maxChars);
 }
 
 /**

@@ -547,27 +547,35 @@ export function EventHero({
     'inline-flex max-w-full items-center gap-1 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-medium text-white backdrop-blur-sm';
   const venueBadgeLinkClassName = `${venueBadgeClassName} cursor-pointer transition hover:bg-white/25 hover:underline hover:decoration-white/50 hover:underline-offset-2`;
 
-  return (
-    <div className="relative">
-      <div className="relative h-[min(42vh,20rem)] min-h-[14rem] overflow-hidden bg-slate-900 sm:h-80 sm:min-h-0 lg:h-[420px]">
-        <SafeImage
-          src={heroImage || null}
-          alt={event.title}
-          fill
-          priority
-          sizes={IMAGE_SIZES.eventHero}
-          style={{ objectPosition: heroObjectPosition }}
-          className="object-cover opacity-80"
-          fallback={
-            <div className="flex h-full items-center justify-center bg-gradient-to-br from-primary-600 to-primary-900">
-              <span className="text-8xl opacity-30">🎭</span>
-            </div>
-          }
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent" />
-      </div>
+  const heroTitle = String(event.seoH1 || event.title || '').trim();
+  const longHeroTitle = heroTitle.length > 48;
 
-      <div className="container-page absolute inset-x-0 bottom-0 pb-6 sm:pb-8">
+  return (
+    <div
+      className={`relative overflow-hidden bg-slate-900 ${
+        longHeroTitle
+          ? 'min-h-[min(58vh,26rem)] sm:min-h-[22rem] lg:min-h-[28rem]'
+          : 'min-h-[min(42vh,20rem)] sm:min-h-80 lg:min-h-[420px]'
+      }`}
+    >
+      <SafeImage
+        src={heroImage || null}
+        alt={event.title}
+        fill
+        priority
+        sizes={IMAGE_SIZES.eventHero}
+        style={{ objectPosition: heroObjectPosition }}
+        className="object-cover opacity-80"
+        fallback={
+          <div className="flex h-full items-center justify-center bg-gradient-to-br from-primary-600 to-primary-900">
+            <span className="text-8xl opacity-30">🎭</span>
+          </div>
+        }
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/45 to-slate-900/25" />
+
+      {/* In-flow overlay: hero grows with long titles instead of clipping under the header. */}
+      <div className="container-page relative z-10 flex min-h-[inherit] flex-col justify-end pb-6 pt-20 sm:pb-8 sm:pt-24">
         <nav aria-label="Хлебные крошки" className="mb-3 flex flex-wrap items-center gap-1.5 text-sm text-white/70">
           {breadcrumbs.map((crumb, index) => {
             const isLast = index === breadcrumbs.length - 1;
@@ -594,8 +602,14 @@ export function EventHero({
                 <EventRatingBadge ratingValue={aggregate.ratingValue} reviewCount={aggregate.reviewCount} />
               ) : null}
             </div>
-            <h1 className="mt-2 text-2xl font-bold leading-tight text-white sm:text-3xl lg:text-4xl">
-              {event.seoH1 || event.title}
+            <h1
+              className={`mt-2 font-bold leading-tight text-white break-normal ${
+                longHeroTitle
+                  ? 'text-xl sm:text-3xl lg:text-4xl'
+                  : 'text-2xl sm:text-3xl lg:text-4xl'
+              }`}
+            >
+              {heroTitle}
             </h1>
 
             <div className="mt-3 flex flex-wrap gap-1.5">

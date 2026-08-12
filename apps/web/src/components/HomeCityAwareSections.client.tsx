@@ -3,6 +3,7 @@
 import { useMemo, type ReactNode } from 'react';
 
 import { HomeEventRail, HomeNowSection } from '@/components/HomeNowSection.client';
+import { HomeStoriesStrip } from '@/components/HomeStoriesStrip.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import type { PublicCatalogListItemDto, PublicSessionDto } from '@daibilet/contracts/public';
 import { catalogHrefWithSelectedCity } from '@/lib/catalog-url';
@@ -69,10 +70,12 @@ export function HomeCityAwareSections({
         },
       ];
     }
-    return homeNowTabs.map((tab) => ({
-      ...tab,
-      events: tab.events.filter((session) => sessionHasCoverImage(session)),
-    })).filter((tab) => tab.events.length > 0);
+    return homeNowTabs
+      .map((tab) => ({
+        ...tab,
+        events: tab.events.filter((session) => sessionHasCoverImage(session)),
+      }))
+      .filter((tab) => tab.events.length > 0);
   }, [homeNowTabs, popular, sparseCatalog]);
 
   const editorsHref = catalogHrefWithSelectedCity(cityReady ? cityValue : 'all', {
@@ -82,8 +85,13 @@ export function HomeCityAwareSections({
   const cityHint =
     cityReady && cityName ? ` · ${cityName}` : !cityReady ? '' : ' · все города';
 
+  const showEditorsPick = editorsPick.length > 0;
+
   return (
     <>
+      {/* Mobile pills: hide when «Выбор редакции» is on the page (avoid duplicate quick nav). */}
+      {showEditorsPick ? null : <HomeStoriesStrip />}
+
       <HomeEventRail
         id="editors-pick"
         title="Выбор редакции"

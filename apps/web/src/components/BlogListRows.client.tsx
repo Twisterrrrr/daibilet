@@ -8,7 +8,11 @@ import { BlogPostCard } from '@/components/BlogPostCard.client';
 import { SafeImage } from '@/components/SafeImage.client';
 import { BLOG_POSTS } from '@/data/blog-posts';
 import type { BlogCardDto } from '@/lib/blog-utils';
-import { resolveBlogCardDateLabel } from '@/lib/blog-utils';
+import {
+  clipBlogCardExcerpt,
+  clipBlogCardTitle,
+  resolveBlogCardDateLabel,
+} from '@/lib/blog-utils';
 import {
   authorLabel,
   blogAuthorNameClassName,
@@ -85,15 +89,15 @@ function BlogListRow({ post }: { post: BlogCardDto }) {
       ) : null}
 
       <div className="flex min-w-0 flex-1 flex-col py-2.5 pr-3 sm:py-3 sm:pr-4">
-        <h2 className="font-serif text-base font-semibold leading-snug tracking-tight text-slate-900 sm:text-lg md:text-xl">
+        <h2 className="line-clamp-3 break-normal font-serif text-base font-semibold leading-snug tracking-tight text-slate-900 sm:text-lg md:line-clamp-2 md:text-xl">
           <Link href={articleHref} className="transition-colors duration-300 hover:text-primary-700">
-            {post.title}
+            {clipBlogCardTitle(post.title, 96)}
           </Link>
         </h2>
 
         {excerpt ? (
-          <p className="mt-1 text-xs leading-relaxed text-slate-600 sm:mt-1.5 sm:text-sm">
-            {excerpt}
+          <p className="mt-1 line-clamp-3 break-normal text-xs leading-relaxed text-slate-600 sm:mt-1.5 sm:line-clamp-2 sm:text-sm">
+            {clipBlogCardExcerpt(excerpt, 130)}
           </p>
         ) : null}
 
