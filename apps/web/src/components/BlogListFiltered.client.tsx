@@ -66,7 +66,7 @@ function SoftSelect({
   return (
     <label className="relative inline-flex min-w-0 items-center">
       <select
-        className="appearance-none bg-transparent py-1.5 pl-0.5 pr-6 text-sm font-medium text-slate-700 outline-none transition hover:text-slate-900 focus-visible:text-slate-900"
+        className="appearance-none bg-transparent py-2.5 pl-0.5 pr-7 text-base font-medium text-slate-700 outline-none transition hover:text-slate-900 focus-visible:text-slate-900 md:py-1.5 md:pr-6 md:text-sm"
         value={value}
         onChange={(event) => onChange(event.target.value)}
         aria-label={ariaLabel}
@@ -74,7 +74,7 @@ function SoftSelect({
         {children}
       </select>
       <ChevronDown
-        className="pointer-events-none absolute right-0 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400"
+        className="pointer-events-none absolute right-0 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 md:h-3.5 md:w-3.5"
         aria-hidden
       />
     </label>
@@ -105,7 +105,7 @@ export function BlogListFiltered({
   const searchParams = useSearchParams();
   const cityOptionsSource = allPosts?.length ? allPosts : posts;
   const [viewMode, setViewModeState] = useState<BlogViewMode>('magazine');
-  /** Below md always magazine - filter/view controls are desktop-only. */
+  /** Below md always magazine - view toggle is desktop-only; city/author filter stays visible. */
   const [isMdUp, setIsMdUp] = useState(false);
   const [cursor, setCursor] = useState<string | null>(null);
   const [visiblePosts, setVisiblePosts] = useState<BlogCardDto[]>([]);
@@ -226,8 +226,8 @@ export function BlogListFiltered({
   const showEmptyCityBanner = Boolean(emptyCheckSlug && bannerLabel && emptyCheckCount === 0);
 
   const filtersBar = (
-    <div className="mb-8 hidden border-b border-slate-200/70 pb-4 md:block">
-      <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+    <div className="mb-6 border-b border-slate-200/70 pb-3 md:mb-8 md:pb-4">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 md:gap-x-5">
         <SoftSelect
           value={urlCity}
           onChange={(value) => setFilter('city', value)}
@@ -323,7 +323,7 @@ export function BlogListFiltered({
     <div>
       {/*
         Materials filter MUST sit immediately under BlogListHero, before featured/feed.
-        City/author row is desktop-only; mobile keeps search + topic chips in hero.
+        City/author row is visible on mobile and desktop (desktop-parity).
       */}
       {filtersBar}
 
