@@ -60,6 +60,7 @@ export function EventsCatalogHero() {
   return (
     <>
       <PageBreadcrumbBar
+        hideOnMobile
         items={[
           { label: 'Главная', href: '/' },
           { label: 'События', href: '/events' },

@@ -251,19 +251,25 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
         cityReady={cityReady || urlHasCity}
       />
 
-      <CatalogActiveFilters values={filterValues} />
+      {/* Active chips: sm+ only - on mobile filters live in the Фильтры sheet / FAB. */}
+      <div className="hidden sm:block">
+        <CatalogActiveFilters values={filterValues} />
+      </div>
 
       {/* Meta слева; sort + view справа (без дубля сортировки) */}
       <div className="mt-4 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 sm:mt-5">
         <p className="min-w-0 text-sm text-graphite-muted">
           {loading && !catalog ? 'Загрузка…' : null}
-          {loading && catalog ? 'Обновляем… · ' : null}
-          {catalog ? (
-            <>
-              {pluralEvents(catalog.total)}
-              {catalog.items.length < catalog.total ? ` · показано ${catalog.items.length}` : ''}
-            </>
-          ) : null}
+          {/* Event count: sm+ only - mobile keeps the row for sort + view. */}
+          <span className="hidden sm:inline">
+            {loading && catalog ? 'Обновляем… · ' : null}
+            {catalog ? (
+              <>
+                {pluralEvents(catalog.total)}
+                {catalog.items.length < catalog.total ? ` · показано ${catalog.items.length}` : ''}
+              </>
+            ) : null}
+          </span>
           {error ? error : null}
         </p>
 

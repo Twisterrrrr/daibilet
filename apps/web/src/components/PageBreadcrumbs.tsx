@@ -4,11 +4,25 @@ import { ChevronRight } from 'lucide-react';
 export type BreadcrumbItem = { label: string; href?: string };
 
 /** Белая полоска над hero - как в Lovable и на страницах площадок/локаций. */
-export function PageBreadcrumbBar({ items }: { items: BreadcrumbItem[] }) {
+export function PageBreadcrumbBar({
+  items,
+  className,
+  hideOnMobile = false,
+}: {
+  items: BreadcrumbItem[];
+  /** Extra classes on the root strip (opt-in; does not change default visibility). */
+  className?: string;
+  /** Keep breadcrumbs in DOM for SEO/a11y, visually hide below md. */
+  hideOnMobile?: boolean;
+}) {
   if (!items.length) return null;
   const lastIndex = items.length - 1;
   return (
-    <div className="border-b border-slate-200 bg-white">
+    <div
+      className={['border-b border-slate-200 bg-white', hideOnMobile ? 'hidden md:block' : '', className]
+        .filter(Boolean)
+        .join(' ')}
+    >
       <nav
         aria-label="Хлебные крошки"
         className="container-page flex min-h-11 items-center gap-1.5 overflow-hidden py-3 text-sm text-slate-500"
