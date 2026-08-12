@@ -96,7 +96,7 @@ function BlogListRow({ post }: { post: BlogCardDto }) {
 
         {excerpt ? (
           <p className="mt-1 break-words text-xs leading-relaxed text-slate-600 sm:mt-1.5 sm:text-sm">
-            {clipBlogCardExcerpt(excerpt, 160)}
+            {clipBlogCardExcerpt(excerpt, 280)}
           </p>
         ) : null}
 

@@ -105,9 +105,18 @@ function lastSentenceEndBefore(text: string, maxChars: number): number {
   return last;
 }
 
+/** Ensure teaser copy ends with a real sentence terminator (owner: «и точка»). */
+function ensureSentenceTerminator(text: string): string {
+  const value = text.trim();
+  if (!value) return '';
+  if (/[.!?…]$/u.test(value)) return value;
+  return `${value}.`;
+}
+
 /**
  * Clip at sentence boundary: up to `maxSentences` full sentences within `maxChars`.
- * Never ends mid-thought; falls back to whole-word clip only when no sentence fits.
+ * Always finishes a sentence - never mid-phrase / word-clip. Soft `maxChars`:
+ * the first sentence is kept whole even when longer than the budget.
  */
 export function truncateAtSentence(
   text: string,
@@ -125,7 +134,6 @@ export function clipAtSentenceBoundary(
 ): string {
   const value = normalizeBlogPlainText(text);
   if (!value) return '';
-  if (value.length <= maxChars && maxSentences <= 0) return value;
 
   const sentences = splitIntoSentences(value);
   let picked = '';
@@ -134,25 +142,27 @@ export function clipAtSentenceBoundary(
   for (const sentence of sentences) {
     if (maxSentences > 0 && count >= maxSentences) break;
     const candidate = picked ? `${picked} ${sentence}` : sentence;
+    if (!picked) {
+      // First sentence always in full - never cut mid-thought for card teasers.
+      picked = sentence;
+      count = 1;
+      if (picked.length > maxChars) break;
+      continue;
+    }
     if (candidate.length <= maxChars) {
       picked = candidate;
       count += 1;
       continue;
     }
-    if (!picked) {
-      const endAt = lastSentenceEndBefore(sentence, maxChars);
-      if (endAt > 0) return sentence.slice(0, endAt).trim();
-      return truncateAtWord(sentence, maxChars);
-    }
     break;
   }
 
-  if (picked) return picked;
+  if (!picked) {
+    const endAt = lastSentenceEndBefore(value, Math.max(maxChars, value.length));
+    picked = endAt > 0 ? value.slice(0, endAt).trim() : value;
+  }
 
-  const endAt = lastSentenceEndBefore(value, maxChars);
-  if (endAt > 0) return value.slice(0, endAt).trim();
-
-  return truncateAtWord(value, maxChars);
+  return ensureSentenceTerminator(picked);
 }
 
 /**
@@ -177,8 +187,8 @@ export function clipBlogCardTitle(text: string, maxChars = 240): string {
   return truncateAtWord(text, maxChars);
 }
 
-/** Card excerpt: 1-2 complete sentences, never mid-phrase. */
-export function clipBlogCardExcerpt(text: string, maxChars = 160): string {
+/** Card excerpt: 1-2 complete sentences ending with `.` / `!` / `?`. Soft char budget. */
+export function clipBlogCardExcerpt(text: string, maxChars = 280): string {
   return truncateAtSentence(text, maxChars, 2);
 }
 

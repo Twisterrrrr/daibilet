@@ -151,16 +151,29 @@ test('truncateAtWord never cuts mid-word', () => {
     clipBlogCardTitle('Иммерсивные шоу в регионах России'),
     'Иммерсивные шоу в регионах России',
   );
-  assert.equal(clipBlogCardExcerpt('билет и ужин без суеты в центре города', 18), 'билет и ужин без');
+});
+
+test('clipBlogCardExcerpt always finishes the sentence with a period', () => {
+  assert.equal(
+    clipBlogCardExcerpt('билет и ужин без суеты в центре города', 18),
+    'билет и ужин без суеты в центре города.',
+  );
+  const long =
+    'На танцполе вы можете провести три часа, упираясь взглядом в чужие спины, в первом ряду партера - оглохнуть от близости колонок, а в дорогой VIP-ложе - оказаться так высоко сбоку, что самого артиста придется разглядывать через зум в телефоне. Чтобы ваши ожидания совпали с реальностью.';
+  const clipped = clipBlogCardExcerpt(long, 160);
+  assert.ok(clipped.endsWith('телефоне.'));
+  assert.ok(!clipped.includes('через зум в.'));
+  assert.ok(!clipped.endsWith('...'));
 });
 
 test('clipAtSentenceBoundary ignores ? inside guillemets', () => {
   const excerpt =
     'Лекция судмедэксперта на крыше, горячая эмаль, иммерсивный особняк, «ГДЕ МОЙ 2008?» и квест в зоопарке - пять странных способов встряхнуть московские выходные.';
   assert.equal(clipAtSentenceBoundary(excerpt, 420, 2), excerpt);
+  // Tight budget still returns the full first sentence - never mid-phrase.
   const short = clipAtSentenceBoundary(excerpt, 72, 1);
-  assert.ok(short.endsWith('особняк') || short.endsWith('особняк,'));
-  assert.ok(!short.includes('2008'));
+  assert.equal(short, excerpt);
+  assert.ok(short.endsWith('.'));
 });
 
 test('truncateAtSentence ends on sentence boundary, not mid-phrase', () => {
@@ -170,6 +183,7 @@ test('truncateAtSentence ends on sentence boundary, not mid-phrase', () => {
   assert.ok(clipped.endsWith('.'));
   assert.ok(!clipped.endsWith('...'));
   assert.ok(!/\sиммерсивн[^\s]*$/u.test(clipped));
+  assert.equal(clipped, 'Лекция судмедэксперта на крыше, горячая эмаль, иммерсивный особняк.');
 });
 
 test('live blog slugs: listing excerpt ends cleanly', () => {

@@ -12,7 +12,7 @@ import { HomePopularCitiesRail } from '@/components/HomePopularCitiesRail.client
 import { LuckyCityButton } from '@/components/LuckyCityButton.client';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { ScrollRail } from '@/components/ScrollRail.client';
-import { mergeBlogCards } from '@/lib/blog-utils';
+import { clipBlogFeaturedLead, mergeBlogCards } from '@/lib/blog-utils';
 import '@/lib/env';
 import { catalogSocialStats } from '@/lib/catalog-social-stats';
 import { formatMoney, formatNumber, pluralEvents } from '@/lib/format';
@@ -66,6 +66,9 @@ async function HomePageBody() {
     : [...blogCards].reverse();
   const blogPosts = orderedBlog.slice(0, 4);
   const [featuredBlog, ...restBlog] = blogPosts;
+  const featuredLead = featuredBlog
+    ? clipBlogFeaturedLead(featuredBlog.slug, featuredBlog.excerpt, 2, 520)
+    : '';
   const heroBanners = await withSoftTimeout(
     getActiveHeroBanners(),
     HOME_HERO_BANNERS_TIMEOUT_MS,
@@ -240,9 +243,9 @@ async function HomePageBody() {
               <h3 className="mt-2 font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl lg:text-[2rem] lg:leading-tight">
                 {featuredBlog.title}
               </h3>
-              {featuredBlog.excerpt ? (
-                <p className="mt-4 max-w-xl text-base leading-relaxed text-slate-600 line-clamp-3">
-                  {featuredBlog.excerpt}
+              {featuredLead ? (
+                <p className="mt-4 max-w-xl text-base leading-relaxed text-slate-600">
+                  {featuredLead}
                 </p>
               ) : null}
               <Link
@@ -289,7 +292,7 @@ async function HomePageBody() {
                     </div>
                     <div className="min-w-0 sm:px-0.5">
                       <p className="text-xs font-semibold uppercase tracking-wide text-primary-600">{post.tag}</p>
-                      <h3 className="mt-1 line-clamp-2 text-sm font-semibold text-slate-900 group-hover:text-primary-700">
+                      <h3 className="mt-1 text-sm font-semibold leading-snug text-slate-900 group-hover:text-primary-700">
                         {post.title}
                       </h3>
                     </div>

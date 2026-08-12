@@ -229,7 +229,7 @@ export function BlogPostCard({
   }
 
   if (isLead) {
-    const primary = clipBlogCardExcerpt(largeCopy?.primary || excerpt, 280);
+    const primary = clipBlogCardExcerpt(largeCopy?.primary || excerpt, 520);
     return (
       <article className={`${cardShell} lg:flex-row`}>
         <Link
@@ -285,8 +285,8 @@ export function BlogPostCard({
 
   if (isBanner) {
     const bannerLead = clipBlogCardExcerpt(
-      excerpt || expandLargeListingCopy(post.slug, excerpt, 240).primary,
-      160,
+      excerpt || expandLargeListingCopy(post.slug, excerpt, 420).primary,
+      320,
     );
     return (
       <article className="group relative flex min-h-[19rem] overflow-hidden rounded-card bg-slate-900 shadow-card transition-all duration-300 hover:scale-[1.01] hover:shadow-lg md:min-h-[16rem] lg:min-h-[18rem]">
@@ -355,7 +355,7 @@ export function BlogPostCard({
           </h2>
           {excerpt ? (
             <p className="mt-2 break-words text-sm leading-relaxed text-slate-600">
-              {clipBlogCardExcerpt(excerpt, 160)}
+              {clipBlogCardExcerpt(excerpt, 280)}
             </p>
           ) : null}
           <div className="mt-auto flex flex-col gap-3 pt-4">
@@ -368,8 +368,8 @@ export function BlogPostCard({
   }
 
   if (isLarge) {
-    const primary = clipBlogCardExcerpt(largeCopy?.primary || excerpt, 320);
-    const secondary = largeCopy?.secondary ? clipBlogCardExcerpt(largeCopy.secondary, 240) : '';
+    const primary = clipBlogCardExcerpt(largeCopy?.primary || excerpt, 520);
+    const secondary = largeCopy?.secondary ? clipBlogCardExcerpt(largeCopy.secondary, 420) : '';
     const hasCopy = Boolean(primary || secondary);
 
     return (
@@ -481,7 +481,7 @@ export function BlogPostCard({
               isSmall ? 'text-sm md:text-sm' : 'text-base md:text-sm',
             ].join(' ')}
           >
-            {clipBlogCardExcerpt(excerpt, isSmall ? 140 : 160)}
+            {clipBlogCardExcerpt(excerpt, isSmall ? 240 : 280)}
           </p>
         ) : null}
         <div className="mt-auto flex flex-col gap-3 pt-4">

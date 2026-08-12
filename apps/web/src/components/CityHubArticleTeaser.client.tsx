@@ -73,12 +73,8 @@ export function CityHubArticleTeaser({
           }`}
         >
           <h3
-            className={`font-semibold leading-snug transition group-hover:text-primary-700 ${
-              isLarge
-                ? 'line-clamp-3 text-base sm:text-lg'
-                : isSmall
-                  ? 'line-clamp-2 text-sm'
-                  : 'line-clamp-2 text-sm sm:text-base'
+            className={`break-words font-semibold leading-snug transition group-hover:text-primary-700 ${
+              isLarge ? 'text-base sm:text-lg' : isSmall ? 'text-sm' : 'text-sm sm:text-base'
             } ${editorial ? 'text-zinc-950' : 'text-slate-950'}`}
           >
             {article.title}
