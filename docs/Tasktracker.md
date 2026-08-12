@@ -2,7 +2,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| FIX.MOBILE-NAV-SSR | Гамбургер кликабелен во время SSR/loading (checkbox disclosure + skeleton) | Критический | 🔄 ship + Deploy MSK web |
+| FIX.MOBILE-NAV-SSR | Гамбургер кликабелен во время SSR/loading (checkbox disclosure + skeleton) | Критический | ✅ `bc6dd254` Deploy MSK web `31569900956` (tip `37b6d863`) |
 
 ## SEO listing + My Day routes (2026-08-11)
 
