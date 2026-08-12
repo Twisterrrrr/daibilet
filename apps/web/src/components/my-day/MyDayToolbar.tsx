@@ -4,11 +4,12 @@ import type { ReactNode } from 'react';
 import {
   Car,
   Clock,
+  Download,
   FileDown,
   Filter,
+  Footprints,
   MapPin,
-  PersonStanding,
-  Share2,
+  Save,
   Sparkles,
   Trash2,
   Wand2,
@@ -27,7 +28,7 @@ type MyDayToolbarProps = {
   stopsCountLabel: string;
   distanceLabel: string | null;
   travelMinutesLabel: string | null;
-  /** Total with dwells: «4 ч 20 мин с учётом остановок». */
+  /** Total with dwells: «4 ч 20 мин» (suffix «с учётом остановок» added here). */
   totalWithStopsLabel: string | null;
   travelMode: TravelMode;
   onTravelModeChange: (mode: TravelMode) => void;
@@ -47,6 +48,7 @@ type MyDayToolbarProps = {
   printPdfBusy?: boolean;
   onSaveScenario?: () => void;
   saveScenarioBusy?: boolean;
+  /** Optional; not in Lovable summary card (share lives in header). Kept for callers. */
   onShare?: () => void;
   shareLabel?: string;
   typeCounts?: MyDayStopTypeCount[];
@@ -60,8 +62,8 @@ type MyDayToolbarProps = {
 };
 
 /**
- * Lovable sticky route toolbar: stats + mode/optimize/hours/clear + export (no GPX/KML yet)
- * + optional type filter pills.
+ * Lovable sticky route summary card (mobile screenshot parity):
+ * stats → mode pill → optimize/hours/trash → ЭКСПОРТ GPX/KML → PDF / save.
  */
 export function MyDayToolbar({
   stopsCount,
@@ -87,8 +89,6 @@ export function MyDayToolbar({
   printPdfBusy = false,
   onSaveScenario,
   saveScenarioBusy = false,
-  onShare,
-  shareLabel = 'Поделиться',
   typeCounts = [],
   hiddenTags = [],
   visibleStopsCount,
@@ -107,23 +107,24 @@ export function MyDayToolbar({
         aria-label="Управление маршрутом"
         aria-orientation="horizontal"
         data-my-day-toolbar="1"
-        className="sticky top-[calc(var(--site-header-height)+0.35rem)] z-20 rounded-2xl border border-slate-200/90 bg-white/95 p-3 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/90 sm:p-5 lg:top-[calc(var(--site-header-height)+0.5rem)]"
+        className="sticky top-[calc(var(--site-header-height)+0.35rem)] z-20 rounded-2xl border border-slate-200/90 bg-white/95 p-4 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/90 sm:p-5 lg:top-[calc(var(--site-header-height)+0.5rem)]"
       >
-        <div className="flex flex-col gap-1.5 text-sm sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5 sm:gap-y-1.5">
+        {/* 1-2. Stats */}
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-sm">
           <span className="inline-flex items-center gap-2 font-semibold text-slate-900">
             <MapPin className="h-4 w-4 shrink-0 text-primary-600" aria-hidden />
             <span data-day-route-count-heading>{stopsCountLabel}</span>
             <span className="sr-only">{stopsCount}</span>
           </span>
           {distanceLabel ? (
-            <span className="inline-flex min-w-0 items-center gap-1.5 text-slate-600">
+            <span className="inline-flex min-w-0 items-center gap-2 text-slate-600">
               {travelMode === 'auto' ? (
                 <Car className="h-4 w-4 shrink-0" aria-hidden />
               ) : (
-                <PersonStanding className="h-4 w-4 shrink-0" aria-hidden />
+                <Footprints className="h-4 w-4 shrink-0" aria-hidden />
               )}
-              <span className="truncate">
-                <span className="font-semibold text-slate-800">{distanceLabel}</span>
+              <span>
+                {distanceLabel}
                 {travelMinutesLabel ? (
                   <>
                     {' '}
@@ -135,23 +136,17 @@ export function MyDayToolbar({
             </span>
           ) : null}
           {totalWithStopsLabel ? (
-            <span className="inline-flex items-center gap-2 text-slate-600">
+            <span className="inline-flex w-full items-center gap-2 text-slate-600 sm:w-auto">
               <Clock className="h-4 w-4 shrink-0" aria-hidden />
               {totalWithStopsLabel} с учётом остановок
             </span>
           ) : null}
         </div>
 
-        {/*
-          Lovable parity: mode / optimize / hours / clear stay ONE row (no orphan trash wrap).
-          Narrow: horizontal scroll. Export always on its own row below (never lg side-by-side).
-        */}
-        <div
-          className="-mx-1 mt-4 flex flex-nowrap items-center gap-2 overflow-x-auto px-1 pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-          data-my-day-toolbar-actions
-        >
+        {/* 3. Mode pill */}
+        <div className="mt-4" data-my-day-toolbar-mode>
           <div
-            className="inline-flex h-9 shrink-0 items-stretch rounded-full border border-slate-200 p-0.5 box-border"
+            className="inline-flex rounded-full border border-slate-200 p-0.5"
             role="group"
             aria-label="Способ передвижения"
             data-day-travel-mode
@@ -160,20 +155,20 @@ export function MyDayToolbar({
               type="button"
               onClick={() => onTravelModeChange('walk')}
               aria-pressed={travelMode === 'walk'}
-              className={`inline-flex items-center gap-1.5 rounded-full px-3 text-sm font-semibold transition ${
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold transition ${
                 travelMode === 'walk'
                   ? 'bg-primary-600 text-white'
                   : 'text-slate-500 hover:bg-slate-50'
               }`}
             >
-              <PersonStanding className="h-4 w-4 shrink-0" aria-hidden />
+              <Footprints className="h-4 w-4 shrink-0" aria-hidden />
               Пешком
             </button>
             <button
               type="button"
               onClick={() => onTravelModeChange('auto')}
               aria-pressed={travelMode === 'auto'}
-              className={`inline-flex items-center gap-1.5 rounded-full px-3 text-sm font-semibold transition ${
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold transition ${
                 travelMode === 'auto'
                   ? 'bg-primary-600 text-white'
                   : 'text-slate-500 hover:bg-slate-50'
@@ -183,13 +178,19 @@ export function MyDayToolbar({
               На авто
             </button>
           </div>
+        </div>
 
+        {/* 4. Optimize | Hours | Trash (+ start/end when plan on) */}
+        <div
+          className="mt-3 flex flex-wrap items-center gap-2"
+          data-my-day-toolbar-actions
+        >
           <button
             type="button"
             onClick={onOptimize}
             disabled={!canOptimize}
             data-day-map-optimize
-            className="inline-flex h-9 shrink-0 items-center gap-2 rounded-full border border-slate-200 px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-40 box-border"
+            className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-40"
           >
             <Wand2 className="h-4 w-4 shrink-0" aria-hidden />
             Оптимизировать
@@ -204,7 +205,7 @@ export function MyDayToolbar({
               }}
               aria-pressed={hourPlanOn}
               data-day-hour-plan
-              className={`inline-flex h-9 shrink-0 items-center gap-2 rounded-full px-4 text-sm font-semibold transition box-border ${
+              className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition ${
                 hourPlanOn
                   ? 'bg-sky-600 text-white hover:bg-sky-700'
                   : 'border border-slate-200 text-slate-700 hover:bg-slate-50'
@@ -217,7 +218,7 @@ export function MyDayToolbar({
 
           {hourPlanOn && onHourStartChange && onHourEndChange ? (
             <>
-              <label className="inline-flex h-9 shrink-0 items-center gap-2 rounded-full border border-slate-200 px-3 text-sm box-border">
+              <label className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm">
                 <span className="text-slate-500">Старт</span>
                 <input
                   type="time"
@@ -226,7 +227,7 @@ export function MyDayToolbar({
                   className="bg-transparent font-semibold text-slate-800 outline-none"
                 />
               </label>
-              <label className="inline-flex h-9 shrink-0 items-center gap-2 rounded-full border border-slate-200 px-3 text-sm box-border">
+              <label className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm">
                 <span className="text-slate-500">Финиш</span>
                 <input
                   type="time"
@@ -245,52 +246,68 @@ export function MyDayToolbar({
             title="Очистить маршрут"
             aria-label="Очистить маршрут"
             data-day-clear
-            className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition hover:bg-slate-50 disabled:opacity-40 box-border"
+            className="inline-flex items-center justify-center rounded-full border border-slate-200 p-2 text-slate-500 transition hover:bg-slate-50 disabled:opacity-40"
           >
             <Trash2 className="h-4 w-4" aria-hidden />
           </button>
         </div>
 
+        {/* 5-6. Export: label + GPX/KML, then PDF + save (Lovable card) */}
         <div
-          className="mt-3 flex flex-wrap items-center gap-2 border-t border-slate-200 pt-3"
+          className="mt-3 flex flex-col gap-2 border-t border-slate-200 pt-3"
           role="group"
           aria-label="Экспорт маршрута"
           data-my-day-toolbar-export
         >
-          <span className="sr-only">Экспорт</span>
-          {/* GPX / KML deferred by owner 2026-08-11 */}
-          <button
-            type="button"
-            onClick={onPrintPdf}
-            disabled={stopsCount <= 0 || printPdfBusy}
-            data-day-print
-            className="inline-flex h-8 shrink-0 items-center gap-2 rounded-full border border-slate-200 px-3 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-40 box-border"
-          >
-            <FileDown className="h-3.5 w-3.5 shrink-0" aria-hidden />
-            {printPdfBusy ? 'Готовим PDF…' : printPdfLabel}
-          </button>
-          {onSaveScenario ? (
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
+              Экспорт
+            </span>
             <button
               type="button"
-              onClick={onSaveScenario}
-              disabled={stopsCount <= 0 || saveScenarioBusy}
-              data-day-save-scenario
-              className="inline-flex h-8 shrink-0 items-center gap-2 rounded-full border border-slate-200 px-3 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-40 box-border"
+              disabled
+              title="GPX - скоро"
+              data-day-export-gpx
+              className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-500 opacity-40"
             >
-              Сохранить как сценарий
+              <Download className="h-3.5 w-3.5 shrink-0" aria-hidden />
+              GPX
             </button>
-          ) : null}
-          {onShare ? (
             <button
               type="button"
-              onClick={onShare}
-              data-day-share
-              className="inline-flex h-8 shrink-0 items-center gap-2 rounded-full border border-primary-200 bg-primary-50 px-3 text-xs font-semibold text-primary-800 transition hover:bg-primary-100 box-border"
+              disabled
+              title="KML - скоро"
+              data-day-export-kml
+              className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-500 opacity-40"
             >
-              <Share2 className="h-3.5 w-3.5 shrink-0" aria-hidden />
-              {shareLabel}
+              <Download className="h-3.5 w-3.5 shrink-0" aria-hidden />
+              KML
             </button>
-          ) : null}
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={onPrintPdf}
+              disabled={stopsCount <= 0 || printPdfBusy}
+              data-day-print
+              className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-40"
+            >
+              <FileDown className="h-3.5 w-3.5 shrink-0" aria-hidden />
+              {printPdfBusy ? 'Готовим PDF…' : printPdfLabel}
+            </button>
+            {onSaveScenario ? (
+              <button
+                type="button"
+                onClick={onSaveScenario}
+                disabled={stopsCount <= 0 || saveScenarioBusy}
+                data-day-save-scenario
+                className="inline-flex items-center gap-2 rounded-full border border-primary-300/70 bg-primary-50/60 px-3 py-1.5 text-xs font-semibold text-primary-700 transition hover:bg-primary-50 disabled:opacity-40"
+              >
+                <Save className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                Сохранить как сценарий
+              </button>
+            ) : null}
+          </div>
         </div>
 
         {scheduleSlot ? <div className="mt-3">{scheduleSlot}</div> : null}

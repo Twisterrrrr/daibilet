@@ -14,7 +14,7 @@ export function MobileStickyActionBar({
 }) {
   return (
     <div
-      className={`fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 backdrop-blur lg:hidden pb-[env(safe-area-inset-bottom,0px)] ${className}`.trim()}
+      className={`fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 bg-white/95 backdrop-blur lg:hidden pb-[env(safe-area-inset-bottom,0px)] ${className}`.trim()}
     >
       <div className="container-page flex items-center gap-3 p-3">{children}</div>
     </div>

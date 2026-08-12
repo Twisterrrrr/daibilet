@@ -3,6 +3,18 @@
   display: none !important;
 }
 
+/*
+ * Leaflet panes use z-index 200–700. Without a local stacking context those
+ * values compete with page chrome (MobileStickyActionBar is z-40) and paint
+ * the map above fixed bottom CTAs. Keep map layers inside the embed.
+ */
+[data-osm-map='leaflet'],
+[data-day-route-map='leaflet'] {
+  position: relative;
+  z-index: 0;
+  isolation: isolate;
+}
+
 /* Ticket / content pages: locked map lets vertical page scroll pass through */
 [data-osm-map='leaflet'][data-map-interaction='locked'] {
   cursor: grab;

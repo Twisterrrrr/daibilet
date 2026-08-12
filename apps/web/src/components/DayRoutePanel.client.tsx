@@ -2981,8 +2981,8 @@ function DayRoutePanelInner() {
           ) : null}
         </div>
 
-        <div className="min-w-0" data-day-empty-map-preview>
-          <div className="h-[220px] w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-100 lg:h-[260px]">
+        <div className="relative z-0 min-w-0" data-day-empty-map-preview>
+          <div className="relative z-0 h-[220px] w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-100 isolation-isolate lg:h-[260px]">
             {mapCenter ? (
               <DayRouteOsmMap
                 stops={[]}
@@ -3291,8 +3291,10 @@ function DayRoutePanelInner() {
     <div
       className={`container-page px-4 py-5 sm:px-6 sm:py-10 print:hidden lg:pb-10 ${
         isEmptyRoute
-          ? 'pb-[calc(6rem+env(safe-area-inset-bottom,0px))]'
-          : 'pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] sm:pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))]'
+          ? 'pb-[calc(6.5rem+env(safe-area-inset-bottom,0px))]'
+          : hasMapStops
+            ? 'pb-[calc(8rem+env(safe-area-inset-bottom,0px))]'
+            : 'pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))]'
       }`}
       data-day-mobile-list-first="1"
       data-day-section-width="full"
@@ -3329,9 +3331,29 @@ function DayRoutePanelInner() {
           </p>
         </div>
 
-        {/* Share menu opens from toolbar; host kept for outside-click ref. */}
+        {/* Lovable mobile header: share next to H1 (not inside summary card). */}
         {route.venues.length ? (
-          <div className="relative hidden shrink-0" ref={shareMenuRef} data-day-desktop-actions />
+          <div className="relative flex shrink-0 items-center gap-2" ref={shareMenuRef} data-day-desktop-actions>
+            <button
+              type="button"
+              onClick={() => setShareMenuOpen(true)}
+              aria-label="Поделиться"
+              title="Поделиться"
+              data-day-share
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary-600 text-white transition hover:bg-primary-700 lg:hidden"
+            >
+              <Share2 className="h-4 w-4" aria-hidden />
+            </button>
+            <button
+              type="button"
+              onClick={() => setShareMenuOpen(true)}
+              data-day-share
+              className="hidden items-center gap-2 rounded-full border border-primary-200 bg-primary-50 px-3 py-2 text-xs font-semibold text-primary-800 transition hover:bg-primary-100 lg:inline-flex"
+            >
+              <Share2 className="h-3.5 w-3.5 shrink-0" aria-hidden />
+              {copyStatus === 'ok' ? 'Скопировано!' : 'Поделиться'}
+            </button>
+          </div>
         ) : null}
       </div>
 
@@ -3558,8 +3580,6 @@ function DayRoutePanelInner() {
             printPdfLabel="PDF с картой"
             onSaveScenario={saveCurrentAsScenario}
             saveScenarioBusy={scenarioBusy}
-            onShare={() => setShareMenuOpen(true)}
-            shareLabel={copyStatus === 'ok' ? 'Скопировано!' : 'Поделиться'}
             typeCounts={stopTypeCounts}
             hiddenTags={hiddenStopTags}
             visibleStopsCount={visibleRouteVenues.filter((v) => !isNoteDayRouteStop(v)).length}
