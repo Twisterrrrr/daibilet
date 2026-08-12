@@ -6,7 +6,7 @@ import type { Metadata } from 'next';
 import { resolveBlogCityHref } from '@/lib/blog-article-city';
 import { stripColumnMetaPrefix } from '@/lib/blog-meta';
 import type { BlogArticleDto } from '@/lib/blog-utils';
-import { pageTitle } from '@/lib/seo-meta';
+import { BLOG_LIST_OG_IMAGE, DEFAULT_OG_IMAGE, buildShareMetadata, pageTitle } from '@/lib/seo-meta';
 
 function resolveBlogMetaDescription(article: BlogArticleDto): string {
   return (
@@ -103,9 +103,17 @@ export function buildBlogArticleMetadata(article: BlogArticleDto): Metadata {
   const shareTitle = `${title} | ${SITE_NAME}`;
   const description = resolveBlogMetaDescription(article);
   const canonicalPath = resolveBlogArticleCanonicalPath(article);
-  const canonical = absoluteUrl(canonicalPath);
   const image = resolveBlogShareImage(article.coverImageUrl);
   const indexable = article.isIndexable !== false;
+  const share = buildShareMetadata({
+    title: shareTitle,
+    description,
+    path: canonicalPath,
+    image: image || DEFAULT_OG_IMAGE,
+    imageWidth: 1200,
+    imageHeight: 630,
+    type: 'article',
+  });
 
   return {
     title,
@@ -113,33 +121,11 @@ export function buildBlogArticleMetadata(article: BlogArticleDto): Metadata {
     alternates: { canonical: canonicalPath },
     robots: indexable ? { index: true, follow: true } : { index: false, follow: false },
     openGraph: {
-      type: 'article',
-      locale: 'ru_RU',
-      siteName: SITE_NAME,
-      url: canonical,
-      title: shareTitle,
-      description,
+      ...share.openGraph,
       publishedTime: article.publishedAt || undefined,
       modifiedTime: article.publishedAt || undefined,
-      images: image
-        ? [
-            {
-              url: image,
-              secureUrl: image,
-              width: 1200,
-              height: 630,
-              alt: article.title,
-              type: 'image/jpeg',
-            },
-          ]
-        : undefined,
     },
-    twitter: {
-      card: image ? 'summary_large_image' : 'summary',
-      title: shareTitle,
-      description,
-      images: image ? [image] : undefined,
-    },
+    twitter: share.twitter,
   };
 }
 
@@ -189,7 +175,6 @@ export function buildBlogArticleJsonLd(article: BlogArticleDto): Array<Record<st
 }
 
 export function buildBlogListMetadata(): Metadata {
-  const canonical = `${SITE_URL}/blog`;
   const title = pageTitle('Блог - статьи и советы о событиях');
   const description =
     'Статьи по концертам, театру и городским прогулкам. Как выбрать билет, куда пойти с детьми, что смотреть на этой неделе.';
@@ -198,18 +183,13 @@ export function buildBlogListMetadata(): Metadata {
     title,
     description,
     alternates: { canonical: '/blog' },
-    openGraph: {
-      type: 'website',
-      locale: 'ru_RU',
-      siteName: SITE_NAME,
-      url: canonical,
+    ...buildShareMetadata({
       title: `${title} | ${SITE_NAME}`,
       description,
-    },
-    twitter: {
-      card: 'summary',
-      title: `${title} | ${SITE_NAME}`,
-      description,
-    },
+      path: '/blog',
+      image: BLOG_LIST_OG_IMAGE,
+      imageWidth: 1200,
+      imageHeight: 630,
+    }),
   };
 }

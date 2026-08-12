@@ -6,6 +6,7 @@ import {
   HOME_SEO_DESCRIPTION_FALLBACK,
   HOME_SEO_TITLE,
   buildHomeSeoDescription,
+  buildShareMetadata,
 } from '@/lib/seo-meta';
 import { getHomeDestinations } from '@/server/cached-home-data';
 
@@ -25,15 +26,13 @@ export async function generateMetadata(): Promise<Metadata> {
       absolute: HOME_SEO_TITLE,
     },
     description,
-    openGraph: {
-      url: 'https://daibilet.ru/',
+    ...buildShareMetadata({
       title: HOME_SEO_TITLE,
       description,
-    },
-    twitter: {
-      title: HOME_SEO_TITLE,
-      description,
-    },
+      path: '/',
+      imageWidth: 1200,
+      imageHeight: 630,
+    }),
   };
 }
 

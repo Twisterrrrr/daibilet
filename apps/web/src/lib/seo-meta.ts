@@ -1,5 +1,11 @@
 const SITE_URL = process.env.DAIBILET_SITE_URL || 'https://daibilet.ru';
 
+/** Site-wide OG fallback when a page has no dedicated share image (1200×630 hero). */
+export const DEFAULT_OG_IMAGE = '/images/hero/home-hero-friends-selfie.jpg';
+
+/** Blog index share preview (distinct from per-article *-og.jpg). */
+export const BLOG_LIST_OG_IMAGE = '/images/blog/blog-hero-promo.jpg';
+
 /** Default home / root title - keep ≤~60–70 chars for SERP; no live counts. */
 export const HOME_SEO_TITLE =
   'Дайбилет - экскурсии, музеи и мероприятия в городах России';
@@ -84,7 +90,8 @@ export function buildShareMetadata(input: {
   const shareTitle = String(input.title || '').trim();
   const description = String(input.description || '').trim() || undefined;
   const url = absoluteUrl(input.path);
-  const image = input.image ? absoluteUrl(input.image) : undefined;
+  const imagePath = input.image || DEFAULT_OG_IMAGE;
+  const image = absoluteUrl(imagePath);
   return {
     openGraph: {
       type: input.type || 'website',
@@ -93,23 +100,21 @@ export function buildShareMetadata(input: {
       url,
       title: shareTitle,
       description,
-      images: image
-        ? [
-            {
-              url: image,
-              secureUrl: image,
-              alt: shareTitle,
-              ...(input.imageWidth ? { width: input.imageWidth } : {}),
-              ...(input.imageHeight ? { height: input.imageHeight } : {}),
-            },
-          ]
-        : undefined,
+      images: [
+        {
+          url: image,
+          secureUrl: image,
+          alt: shareTitle,
+          ...(input.imageWidth ? { width: input.imageWidth } : {}),
+          ...(input.imageHeight ? { height: input.imageHeight } : {}),
+        },
+      ],
     },
     twitter: {
-      card: image ? 'summary_large_image' : 'summary',
+      card: 'summary_large_image',
       title: shareTitle,
       description,
-      images: image ? [image] : undefined,
+      images: [image],
     },
   };
 }

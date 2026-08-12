@@ -5,7 +5,7 @@ import { ChunkLoadRecovery } from '@/components/ChunkLoadRecovery';
 import { NavigationProgress } from '@/components/NavigationProgress.client';
 import { PurchaseOpeningHost } from '@/components/PurchaseOpeningFeedback.client';
 import { fontVariableClassName } from '@/lib/fonts';
-import { HOME_SEO_DESCRIPTION_FALLBACK, HOME_SEO_TITLE } from '@/lib/seo-meta';
+import { DEFAULT_OG_IMAGE, HOME_SEO_DESCRIPTION_FALLBACK, HOME_SEO_TITLE, absoluteUrl } from '@/lib/seo-meta';
 
 import './globals.css';
 
@@ -50,11 +50,21 @@ export const metadata: Metadata = {
     siteName: SITE_NAME,
     title: HOME_SEO_TITLE,
     description: HOME_SEO_DESCRIPTION_FALLBACK,
+    images: [
+      {
+        url: absoluteUrl(DEFAULT_OG_IMAGE),
+        secureUrl: absoluteUrl(DEFAULT_OG_IMAGE),
+        alt: HOME_SEO_TITLE,
+        width: 1200,
+        height: 630,
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: HOME_SEO_TITLE,
     description: HOME_SEO_DESCRIPTION_FALLBACK,
+    images: [absoluteUrl(DEFAULT_OG_IMAGE)],
   },
   other: {
     'apple-mobile-web-app-title': SITE_NAME,
@@ -92,7 +102,11 @@ const siteJsonLd = {
           '@type': 'EntryPoint',
           urlTemplate: `${SITE_URL}/events?q={search_term_string}`,
         },
-        'query-input': 'required name=search_term_string',
+        'query-input': {
+          '@type': 'PropertyValueSpecification',
+          valueRequired: true,
+          valueName: 'search_term_string',
+        },
       },
     },
   ],
