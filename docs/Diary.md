@@ -1,3 +1,21 @@
+## 2026-08-12 - Ligovskii pr. 10/118: pier → bus
+
+### Наблюдения
+- Owner: карточка `Лиговский пр., 10 / 118` (у входа в гостиницу Октябрьская) показывала бейдж «Причал», хотя это точка посадки автобуса.
+- Live API: `venue_69de200e0d6b9816eb4af146`, public slug `ligovskii-pr-10-u-glavnogo-vhoda-v-gostinicu-oktyabrskaya`, `type=pier`.
+- DB slug кириллический (`лиговскии-пр-10-…-69de200e…`); kind был `PIER`. Соседи `tochka-sbora` / `ligovskii-pr-10b` уже `bus`.
+- Postgres MCP `query` read-only и после auth падал с пустым `-32603`; UPDATE через SSH MSK + node/pg (канон как `pl-vosstaniya`).
+
+### Решения
+- Prod DB: `kind` `PIER` → `MEETING_POINT` только по `id=venue_69de200e0d6b9816eb4af146`.
+- Override `publicKind: bus` в `scripts/data/venue-address-overrides.json` (installed on MSK + restart `daibilet-api`).
+- Revalidate tags `venue-page`/`public-surfaces` + path `/locations/…`. Live API `type=bus`, H1 без «Причал», chip «Автобусы».
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-12 - SEO Подборки: пилот-2 NN+Perm в план (без кода)
 
 ### Наблюдения
