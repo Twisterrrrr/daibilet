@@ -3504,6 +3504,7 @@ function DayRoutePanelInner() {
             Добавить места
           </button>
         </div>
+        </div>
       ) : null}
 
       <div
