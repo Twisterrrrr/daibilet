@@ -1,3 +1,19 @@
+## 2026-08-12 - SEO Подборки: пилот-2 NN+Perm в план (без кода)
+
+### Наблюдения
+- Owner: «ок. ставим в план» - следующий охват после КГД+СПб: Нижний Новгород + Пермь.
+- Пилот-1 live (meta/self-canonical/index + Stage-1 SeoOverride); рано расширять allowlist без сигнала из Вебмастера.
+
+### Решения
+- Задача `SEO.PODBORKI-PILOT-2` (Высокий, Запланировано/waiting): расширить `PODBORKI_SEO_PILOT_CITY_SLUGS` на `nizhny-novgorod` + `perm` через ~1–2 недели после закрепления пилот-1.
+- Scope: meta/self-canonical/index + intents; кастом SeoOverride только 1–2 ключа на город.
+- Критерий старта: нет склейки с `/cities`, приемлемый статус в поиске у КГД+СПб. Код/`PILOT_CITIES` **не** трогаем в этом проходе; docs-only commit+push, без web deploy.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-12 - Mobile hamburger dead during SSR/loading
 
 ### Наблюдения

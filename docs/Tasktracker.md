@@ -21,6 +21,7 @@
 | SEO.PODBORKI-CITY-META | Пилот Title/Desc/H1 + self-canonical `?city=` (active: kgd/spb; msk leftover) | Высокий | ✅ code live; smoke OK |
 | SEO.PODBORKI-STABLE | Stable index/sitemap пилот × (C MULTI + E) + salute D year-round index | Критический | ✅ `028e24b1` Deploy MSK web `31535631523` |
 | SEO.PODBORKI-OVERRIDE | SeoOverride + templates + Stage-1 HTML (5 пар) + intent meta; self-canonical smoke | Критический | ✅ `f8217d70` migrate+upsert MSK; fallback deploy-prod-next; smoke PASS |
+| SEO.PODBORKI-PILOT-2 | Пилот-2: расширить `PODBORKI_SEO_PILOT_CITY_SLUGS` на `nizhny-novgorod` + `perm` (meta/self-canonical/index + intents); SeoOverride только 1–2 ключа/город, не пачкой. **Не внедрять сейчас** | Высокий | ⏳ Запланировано / waiting: после закрепления КГД+СПб в Вебмастере (1–2 нед.); критерий старта - qa/plan |
 | SEO.PODBORKI-CITY-1 | Phase 1: маркер `/podborki/c/{city}` + 301 | Высокий | ⏳ следующий спринт после индексации пилота |
 | SEO.PODBORKI-CITY-3 | Phase 3: card SEO blurbs + «N • от X» | Средний | ⏳ |
 | SEO.PODBORKI-CITY-4 | Phase 4: blog banners → подборка → события | Средний | ⏳ after marker URL lock |

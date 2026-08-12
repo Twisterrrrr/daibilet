@@ -37,6 +37,15 @@ Finance PR-ветка `codex/stage0-admission-ticket-core` может держа
 - Blog banners / card blurbs после маркера ЧПУ.
 - Финальная вычитка Title/H1 copy после SERP smoke.
 
+### Пилот-2 (owner 2026-08-12: «ок. ставим в план» - код НЕ сейчас)
+
+**План:** `SEO.PODBORKI-PILOT-2` - после пилота-1 добавить в allowlist `nizhny-novgorod` + `perm` (тот же контур: meta/self-canonical/index + intents; кастом `SeoOverride` только 1–2 ключа на город).
+
+**Критерий старта (gate):**
+1. В Вебмастере/поиске у пилот-1 (КГД+СПб) нет склейки `/podborki?city=` с `/cities/{slug}`.
+2. Статус в поиске у пилот-1 приемлемый (страницы в индексе, без массового вылета / мигания).
+3. Окно наблюдения ~1–2 недели после live Stage-1; только потом трогать `PODBORKI_SEO_PILOT_CITY_SLUGS`.
+
 ---
 
 ## 2026-08-11 - Category×city SEO-текст vs noindex — ЗАКРЫТО
