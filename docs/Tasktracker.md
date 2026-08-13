@@ -1,3 +1,9 @@
+## Public client error UI (2026-08-13)
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| FIX.PUBLIC-ERROR-UI | Убрать английский Next fallback «Application error…» с public: error.tsx + global-error.tsx + ранний chunk reload | Критический | 🔄 code; live после Deploy MSK web |
+
 ## Mobile header / SSR (2026-08-12)
 
 | ID | Задача | Приоритет | Статус |

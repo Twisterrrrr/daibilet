@@ -1,3 +1,20 @@
+## 2026-08-13 - Public: hide Next «Application error» screen
+
+### Наблюдения
+- Live `daibilet.ru` мог показывать английский Next fallback: `Application error: a client-side exception has occurred while loading daibilet.ru`. Для пользователя это выглядит как сломанный сайт.
+- Причина UI: в `apps/web/app` не было `error.tsx` / `global-error.tsx`. Любой uncaught client error (часто ChunkLoadError после swap `.next`) падал в дефолт Next.
+- `ChunkLoadRecovery` в layout уже был, но срабатывает после гидрации; если упал root layout - слушатель не жив.
+
+### Решения
+- `app/error.tsx` + `app/global-error.tsx` + `PublicErrorScreen`: русский экран с Обновить / На главную / Афиша (plain `<a>`, без App Router).
+- Chunk-ошибка: один `location.reload()` (тот же flag, что у recovery).
+- `instrumentation-client.ts` вешает recovery до гидрации; helpers вынесены в `chunk-load-recovery.ts`.
+
+### Проблемы
+- Полностью «не падать» нельзя: остаётся спокойный русский recovery. Живой экран сменится после Deploy MSK web.
+
+---
+
 ## 2026-08-13 - City sync Variant B (header + planner)
 
 ### Наблюдения
@@ -16,7 +33,7 @@
 
 ---
 
-
+## 2026-08-12 - Ligovskii pr. 10/118: pier → bus
 
 ### Наблюдения
 - Owner: карточка `Лиговский пр., 10 / 118` (у входа в гостиницу Октябрьская) показывала бейдж «Причал», хотя это точка посадки автобуса.
