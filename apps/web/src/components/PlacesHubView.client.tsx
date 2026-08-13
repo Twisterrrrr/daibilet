@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
-import { Grid3X3, List, Route } from 'lucide-react';
+import { Grid3X3, List } from 'lucide-react';
 
 import { CatalogPaginationLinks } from '@/components/CatalogPaginationLinks';
 import { InstitutionCard } from '@/components/InstitutionCard.client';
@@ -589,7 +589,6 @@ export function PlacesHubView({
     cityFetchKey && cityFetchKey !== 'all'
       ? cityFetchKey
       : selectedCity?.selectedDestination?.slug || undefined;
-  const myDayHref = cityQuery ? `/my-day?city=${encodeURIComponent(cityQuery)}` : '/my-day';
   const paginationParams = useMemo(() => {
     const params = searchParamsRecord(searchParams);
     if (listPage > 1) params.page = String(listPage);
@@ -664,13 +663,17 @@ export function PlacesHubView({
           })}
         </div>
 
-        <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm">
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1" role="radiogroup" aria-label="Что показывать">
-            {SCOPE_OPTIONS.map(([value, label]) => {
-              const active = scope === value;
-              return (
+        <div className="mt-3 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm" role="radiogroup" aria-label="Что показывать">
+          {SCOPE_OPTIONS.map(([value, label], index) => {
+            const active = scope === value;
+            return (
+              <span key={value} className="inline-flex items-center gap-x-1.5">
+                {index > 0 ? (
+                  <span className="text-slate-300" aria-hidden="true">
+                    •
+                  </span>
+                ) : null}
                 <button
-                  key={value}
                   type="button"
                   role="radio"
                   aria-checked={active}
@@ -683,16 +686,9 @@ export function PlacesHubView({
                 >
                   {label}
                 </button>
-              );
-            })}
-          </div>
-          <Link
-            href={myDayHref}
-            className="inline-flex items-center gap-1.5 font-semibold text-primary-700 hover:text-primary-800"
-          >
-            <Route className="h-4 w-4" strokeWidth={1.75} />
-            Собрать день
-          </Link>
+              </span>
+            );
+          })}
         </div>
       </HeroLayout>
 
