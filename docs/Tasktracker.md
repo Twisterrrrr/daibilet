@@ -1,3 +1,10 @@
+## Location PDP order + mobile 3:4 heroes (2026-08-13)
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| UX.LOC-ABOUT-BEFORE-NEARBY | PDP локации: «О локации» и «Как добраться» выше блока «Рядом» | Высокий | ✅ 2026-08-13 code; live после Deploy MSK web |
+| UX.PDP-HERO-3-4-MOBILE | Hero событий / локаций / площадок на mobile: `aspect-[3/4]`, sm+ без этого кропа | Высокий | ✅ 2026-08-13 code; live после Deploy MSK web |
+
 ## Places hub: H1 types + sort label (2026-08-13)
 
 | ID | Задача | Приоритет | Статус |

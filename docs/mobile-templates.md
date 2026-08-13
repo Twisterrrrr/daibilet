@@ -46,7 +46,7 @@
 
 Каталоги (`/events`, `/venues`, `/locations`, `/cities`): предпочитать `HeroLayout` `variant="minimal"` + `dense` на mobile. Карты - **ниже fold** или `lg+` only.
 
-Детали события: mobile hero ≈ `min(42vh, 20rem)`, не `100vh`. Buy CTA в hero на mobile обязателен (уже есть).
+Детали события / локации / площадки: mobile hero **3:4**, не `100vh` и не широкий 16:10. С `sm+` - прежняя высота по контенту / min-h. Buy CTA в hero на mobile обязателен (уже есть).
 
 ---
 
@@ -80,8 +80,8 @@ Mobile sticky bottom: общий `MobileStickyActionBar` (`lg:hidden` + safe-are
 1. Sticky chrome  
 2. Hero: media + title + 1 meta row + primary CTA  
 3. Sticky subnav (опционально, institution)  
-4. Primary content (афиша / маршруты / экскурсии)  
-5. About / logistics / map  
+4. About / logistics  
+5. Nearby / афиша / маршруты / экскурсии  
 6. Related  
 7. Mobile sticky action bar  
 

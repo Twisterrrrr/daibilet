@@ -102,7 +102,7 @@ export function LocationVenueLayout({
 
       {isPier ? (
         <>
-          <section className="relative overflow-hidden bg-slate-900 text-white">
+          <section className="relative aspect-[3/4] overflow-hidden bg-slate-900 text-white sm:aspect-auto">
             <div className="absolute inset-0">
               {venue.heroImageUrl ? (
                 <SafeImage
@@ -117,7 +117,7 @@ export function LocationVenueLayout({
               )}
               <div className="absolute inset-0 bg-gradient-to-r from-sky-900/90 via-slate-900/70 to-slate-900/40" />
             </div>
-            <div className="container-page relative py-8 sm:py-12">
+            <div className="container-page relative flex h-full flex-col justify-end py-8 sm:h-auto sm:py-12">
               <div className="flex flex-wrap gap-2">
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur">
                   <Anchor className="h-3.5 w-3.5" /> Причал
@@ -143,7 +143,7 @@ export function LocationVenueLayout({
           {hasMap ? <LocationMapStrip venue={venue} /> : null}
         </>
       ) : isBus ? (
-        <section className="relative overflow-hidden bg-slate-900 text-white">
+        <section className="relative aspect-[3/4] overflow-hidden bg-slate-900 text-white sm:aspect-auto">
           <div className="absolute inset-0">
             {venue.heroImageUrl ? (
               <SafeImage src={venue.heroImageUrl} alt="" fill sizes={IMAGE_SIZES.eventHero} className="object-cover opacity-60" />
@@ -152,7 +152,7 @@ export function LocationVenueLayout({
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-slate-950/10" />
           </div>
-          <div className="container-page relative py-8 sm:py-14 md:py-20">
+          <div className="container-page relative flex h-full flex-col justify-end py-8 sm:h-auto sm:py-14 md:py-20">
             <div className="flex flex-wrap gap-2">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur">
                 <TypeIcon className="h-3.5 w-3.5" /> {typeLabel}
@@ -175,7 +175,7 @@ export function LocationVenueLayout({
         </section>
       ) : isParkLike ? (
         <>
-          <section className="relative overflow-hidden bg-emerald-900 text-white">
+          <section className="relative aspect-[3/4] overflow-hidden bg-emerald-900 text-white sm:aspect-auto">
           <div className="absolute inset-0">
             {venue.heroImageUrl ? (
               <SafeImage src={venue.heroImageUrl} alt="" fill sizes={IMAGE_SIZES.eventHero} className="object-cover opacity-60" />
@@ -184,7 +184,7 @@ export function LocationVenueLayout({
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-emerald-950 via-emerald-950/60 to-emerald-950/10" />
           </div>
-          <div className="container-page relative py-8 sm:py-14 md:py-20">
+          <div className="container-page relative flex h-full flex-col justify-end py-8 sm:h-auto sm:py-14 md:py-20">
             <div className="flex flex-wrap gap-2">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur">
                 <TypeIcon className="h-3.5 w-3.5" /> {typeLabel}
@@ -249,7 +249,7 @@ export function LocationVenueLayout({
           <div className="container-page px-0 sm:px-6 lg:px-8">
             <div className="grid gap-0 lg:grid-cols-2">
               <div className="relative overflow-hidden lg:rounded-l-3xl">
-                <div className="relative aspect-[16/10] lg:aspect-auto lg:h-[520px]">
+                <div className="relative aspect-[3/4] sm:aspect-[16/10] lg:aspect-auto lg:h-[520px]">
                   {venue.heroImageUrl ? (
                     <SafeImage src={venue.heroImageUrl} alt="" fill sizes={IMAGE_SIZES.eventCard} className="object-cover" />
                   ) : (
@@ -362,6 +362,31 @@ export function LocationVenueLayout({
             </section>
           ) : null}
 
+          <section className="rounded-2xl border border-slate-200 bg-white p-6">
+            <h2 className="text-xl font-bold text-slate-900">О локации</h2>
+            {venue.hookFact ? (
+              <p className="mt-2 text-sm font-semibold text-emerald-800">{venue.hookFact}</p>
+            ) : null}
+            <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-slate-600">{fullDescription}</p>
+            {streetAddress ? (
+              <div className="mt-5 flex items-start gap-3 rounded-xl border border-slate-100 bg-slate-50 p-3">
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary-600 text-xs font-bold text-white">
+                  1
+                </div>
+                <p className="text-sm text-slate-700">
+                  Адрес: <strong>{streetAddress}</strong>, {venue.city}
+                </p>
+              </div>
+            ) : null}
+          </section>
+
+          {hasVenueLogisticsContent(venue) ? (
+            <section className="rounded-2xl border border-slate-200 bg-white p-6">
+              <h2 className="text-xl font-bold text-slate-900">Как добраться</h2>
+              <VenueLogisticsBlock venue={venue} showName={false} className="mt-4" />
+            </section>
+          ) : null}
+
           {isParkLike && (hasStopExcursions || hasNearbyExcursions) ? (
             <section id="venue-stop-events" className="scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-6">
               <h2 className="text-xl font-bold text-slate-900">
@@ -397,24 +422,6 @@ export function LocationVenueLayout({
             </section>
           ) : null}
 
-          <section className="rounded-2xl border border-slate-200 bg-white p-6">
-            <h2 className="text-xl font-bold text-slate-900">О локации</h2>
-            {venue.hookFact ? (
-              <p className="mt-2 text-sm font-semibold text-emerald-800">{venue.hookFact}</p>
-            ) : null}
-            <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-slate-600">{fullDescription}</p>
-            {streetAddress ? (
-              <div className="mt-5 flex items-start gap-3 rounded-xl border border-slate-100 bg-slate-50 p-3">
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary-600 text-xs font-bold text-white">
-                  1
-                </div>
-                <p className="text-sm text-slate-700">
-                  Адрес: <strong>{streetAddress}</strong>, {venue.city}
-                </p>
-              </div>
-            ) : null}
-          </section>
-
           {todaySlots.length > 0 ? (
             <section className="rounded-2xl border border-slate-200 bg-white p-6">
               <div className="flex items-baseline justify-between">
@@ -439,13 +446,6 @@ export function LocationVenueLayout({
           ) : null}
 
           {children}
-
-          {hasVenueLogisticsContent(venue) ? (
-            <section className="rounded-2xl border border-slate-200 bg-white p-6">
-              <h2 className="text-xl font-bold text-slate-900">Как добраться</h2>
-              <VenueLogisticsBlock venue={venue} showName={false} className="mt-4" />
-            </section>
-          ) : null}
 
           <details className="group rounded-2xl border border-slate-200 bg-white">
             <summary className="flex cursor-pointer list-none items-center justify-between p-5">

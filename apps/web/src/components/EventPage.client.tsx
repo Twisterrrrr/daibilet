@@ -556,10 +556,10 @@ export function EventHero({
 
   return (
     <div
-      className={`relative overflow-hidden bg-slate-900 ${
+      className={`relative aspect-[3/4] overflow-hidden bg-slate-900 sm:aspect-auto ${
         longHeroTitle
-          ? 'min-h-[min(58vh,26rem)] sm:min-h-[22rem] lg:min-h-[28rem]'
-          : 'min-h-[min(42vh,20rem)] sm:min-h-80 lg:min-h-[420px]'
+          ? 'sm:min-h-[22rem] lg:min-h-[28rem]'
+          : 'sm:min-h-80 lg:min-h-[420px]'
       }`}
     >
       <EventPageCitySync city={event.city} />

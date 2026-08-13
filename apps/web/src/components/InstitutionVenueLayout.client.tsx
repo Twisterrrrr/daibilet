@@ -227,7 +227,7 @@ export function InstitutionVenueLayout({
         <VenueBreadcrumbsNav payload={pagePayload} />
       </div>
 
-      <section className="relative overflow-hidden bg-slate-900 text-white">
+      <section className="relative aspect-[3/4] overflow-hidden bg-slate-900 text-white sm:aspect-auto">
         <div className="absolute inset-0">
           {heroImage ? (
             <SafeImage
@@ -243,7 +243,7 @@ export function InstitutionVenueLayout({
           <div className={`absolute inset-0 ${heroGradient}`} />
         </div>
 
-        <div className="container-page relative py-10 md:py-14">
+        <div className="container-page relative flex h-full flex-col justify-end py-10 sm:h-auto md:py-14">
           <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-end">
             <div className="max-w-2xl">
               {openNowStatus === 'open' ? (
