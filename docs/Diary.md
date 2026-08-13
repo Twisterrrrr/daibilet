@@ -1,3 +1,18 @@
+## 2026-08-13 - My Day: hover номера + билеты в карточке
+
+### Наблюдения
+- Owner: hover на номер точки еле виден; «Билеты от …» оторваны от карточки (висели под article, перед пешим плечом).
+- Lovable: номер - primary disk; active на карте `scale(1.35)`. Price pill внутри карточки рядом с dwell, не снаружи.
+
+### Решения
+- Номер: hover/active = белый диск + primary текст + лёгкий scale (как просил owner). Карта: тот же инверт + Lovable scale.
+- CTA билетов в ряд meta (чип цены / dwell), внутри article.
+
+### Проблемы
+- Нет. Live после Deploy MSK web.
+
+---
+
 ## 2026-08-13 - My Day toolbar: адаптив как у Lovable
 
 ### Наблюдения

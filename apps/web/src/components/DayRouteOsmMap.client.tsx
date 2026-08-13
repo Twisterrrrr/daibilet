@@ -18,17 +18,11 @@ const MAX_ZOOM = 18;
 
 function numberedMarkerHtml(n: number, selected: boolean): string {
   const label = String(n);
-  const bg = selected ? '#059669' : '#0f172a';
-  const ring = selected ? '#a7f3d0' : '#fff';
+  const active = selected ? ' is-active' : '';
   return (
-    '<div style="width:28px;height:28px;border-radius:9999px;background:' +
-    bg +
-    ';color:#fff;' +
-    'border:2px solid ' +
-    ring +
-    ';box-shadow:0 1px 4px rgba(15,23,42,.35);' +
-    'display:flex;align-items:center;justify-content:center;' +
-    'font:700 12px/1 system-ui,sans-serif;cursor:pointer">' +
+    '<div class="daibilet-day-pin' +
+    active +
+    '" data-day-map-pin>' +
     label +
     '</div>'
   );
@@ -139,8 +133,8 @@ export function DayRouteOsmMap({
         const icon = L.divIcon({
           className: 'daibilet-day-route-marker',
           html: numberedMarkerHtml(stop.index + 1, selected),
-          iconSize: [28, 28],
-          iconAnchor: [14, 14],
+          iconSize: [40, 40],
+          iconAnchor: [20, 20],
         });
         const marker = L.marker(latLng, {
           icon,

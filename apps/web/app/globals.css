@@ -619,6 +619,41 @@ body > div:has(iframe[src*='ticketscloud']) {
   background: transparent !important;
   border: 0 !important;
 }
+
+/* My Day map pins: Lovable scale on active; owner hover = white invert */
+.daibilet-day-route-marker {
+  background: transparent !important;
+  border: 0 !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+.daibilet-day-pin {
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: 700 12px / 1 system-ui, sans-serif;
+  cursor: pointer;
+  border: 2px solid #fff;
+  background: hsl(var(--primary));
+  color: #fff;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.35);
+  transition:
+    transform 0.15s ease,
+    background-color 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+.daibilet-day-route-marker:hover .daibilet-day-pin,
+.daibilet-day-pin.is-active {
+  background: #fff;
+  color: hsl(var(--primary));
+  border-color: hsl(var(--primary));
+  transform: scale(1.35);
+}
 /* Leaflet OSM attribution: hide UA flag badge, keep © OpenStreetMap text.
    Upstream leaflet.css forces display:inline !important; belt-and-suspenders
    with src/styles/leaflet-daibilet.css (loaded after leaflet) + JS prefix strip. */

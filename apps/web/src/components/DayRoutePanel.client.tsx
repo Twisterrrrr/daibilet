@@ -4974,15 +4974,20 @@ function DayRoutePanelInner() {
   );
 }
 
-/** Stop index badge (Lovable circle, not map-pin). */
-function DayRouteListPin({ n }: { n: number }) {
+/** Stop index badge. Lovable: primary disk; hover/active = invert to white. */
+function DayRouteListPin({ n, active = false }: { n: number; active?: boolean }) {
   const label = String(Math.max(1, Math.floor(n)));
   return (
     <span
-      className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary-600 text-sm font-bold leading-none tabular-nums text-white"
+      className={`grid h-8 w-8 shrink-0 place-items-center rounded-full border-2 text-sm font-bold leading-none tabular-nums transition-[transform,background-color,color] duration-150 ${
+        active
+          ? 'scale-110 border-primary-600 bg-white text-primary-700'
+          : 'border-primary-600 bg-primary-600 text-white group-hover:scale-110 group-hover:bg-white group-hover:text-primary-700 group-focus-within:scale-110 group-focus-within:bg-white group-focus-within:text-primary-700'
+      }`}
       aria-label={`Точка ${label}`}
       data-day-stop-pin
       data-day-stop-number
+      data-day-stop-pin-active={active ? '1' : undefined}
     >
       {label}
     </span>
@@ -5372,9 +5377,8 @@ function DayRouteVenueCard({
   const dwellSoftLabel = dayRouteStopDwellChipLabel(venue, resolvedTypeTag);
 
   /**
-   * Offer chips: always after the place/actions cluster (no ml-auto / justify-end gap).
-   * List lg+: same row, immediately after maps/X. Grid + list mobile: below card shell.
-   * Venue-bound: «Билеты от N ₽» → venue page. Nearby under-stop upsells removed (map + free window).
+   * Offer chips live with the stop meta (Lovable price pill), not under the card.
+   * Venue-bound: «Билеты от N ₽» → venue page.
    */
   const venueBound = dayRouteOfferIsVenueBound(venue);
   const venueBoundPrice = dayRouteVenueBoundPriceLabel(venue);
@@ -5384,7 +5388,7 @@ function DayRouteVenueCard({
   const commerceRail =
     showTicketBuy || showVenueBoundCta ? (
       <div
-        className="flex w-full min-w-0 flex-wrap items-center gap-1.5"
+        className="inline-flex max-w-full flex-wrap items-center gap-1.5"
         data-day-stop-commerce
         data-day-stop-venue-bound={showVenueBoundCta ? '1' : undefined}
       >
@@ -5537,10 +5541,10 @@ function DayRouteVenueCard({
         <article
           className={`group grid grid-cols-[auto_minmax(0,1fr)] items-start gap-3 rounded-2xl border p-3 transition-colors sm:gap-4 sm:p-4 max-lg:border-slate-200/90 max-lg:bg-white max-lg:shadow-sm ${
             focused
-              ? 'border-primary-300 bg-primary-50/40 shadow-sm max-lg:bg-white'
+              ? 'border-primary-300 bg-primary-50/40 shadow-sm'
               : grabbed
-                ? 'border-primary-400 bg-primary-50/30 max-lg:bg-white'
-                : 'border-transparent bg-transparent hover:bg-slate-50/90 max-lg:hover:bg-white'
+                ? 'border-primary-400 bg-primary-50/30'
+                : 'border-transparent bg-transparent hover:bg-slate-50 max-lg:hover:bg-slate-50'
           } ${purchased ? 'border-l-[3px] border-l-primary-600' : ''}`}
           data-day-stop-shell
         >
@@ -5548,7 +5552,7 @@ function DayRouteVenueCard({
             className="flex shrink-0 flex-col items-center gap-2"
             data-day-stop-index-cluster
           >
-            <DayRouteListPin n={pinNumber} />
+            <DayRouteListPin n={pinNumber} active={focused} />
             {reorderLocked ? (
               <span
                 className="inline-flex text-slate-300"
@@ -5640,6 +5644,7 @@ function DayRouteVenueCard({
                 {venue.note && !textStop ? (
                   <span className="line-clamp-1 text-xs text-slate-500">{venue.note}</span>
                 ) : null}
+                {commerceRail}
               </div>
               {textStop ? (
                 <div className="mt-2" data-day-custom-address>
@@ -5725,12 +5730,6 @@ function DayRouteVenueCard({
             </div>
           </div>
         </article>
-
-        {commerceRail ? (
-          <div className="ml-11 mt-1.5 sm:ml-12" data-day-stop-offers-below>
-            {commerceRail}
-          </div>
-        ) : null}
       </li>
     );
   }
@@ -5870,6 +5869,8 @@ function DayRouteVenueCard({
               </div>
             ) : null}
 
+            {commerceRail ? <div className="mt-1.5">{commerceRail}</div> : null}
+
             {textStop ? (
               <div className="mt-1" data-day-custom-address>
                 {addressOpen ? (
@@ -5934,12 +5935,6 @@ function DayRouteVenueCard({
           </div>
         </div>
       </div>
-
-        {commerceRail ? (
-          <div className="mt-1.5 w-full shrink-0" data-day-stop-offers-below>
-            {commerceRail}
-          </div>
-        ) : null}
     </li>
   );
 }
