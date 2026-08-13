@@ -245,9 +245,9 @@ export function CatalogToolbar({
       <div className="catalog-toolbar sticky top-[var(--site-header-height)] z-30 -mx-4 space-y-2 border-b border-slate-200/60 bg-white/95 px-4 py-2 backdrop-blur-md supports-[backdrop-filter]:bg-white/90 sm:-mx-6 sm:px-6 md:static md:z-auto md:mx-0 md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none">
         <form
           onSubmit={onSubmit}
-          className="flex flex-col gap-1.5 rounded-2xl border border-slate-200 bg-[#F5F5F7] p-1.5 shadow-sm md:flex-row md:items-center md:gap-1.5 md:p-1.5"
+          className="flex flex-col gap-2 rounded-2xl border border-slate-200 bg-white p-2 shadow-sm md:flex-row md:items-center md:gap-2 md:p-2"
         >
-          <div ref={searchWrapRef} className="relative flex min-w-0 flex-1 items-center gap-1">
+          <div ref={searchWrapRef} className="relative flex min-w-0 flex-1 items-center gap-2">
             <label className="relative block min-w-0 flex-1">
               <span className="sr-only">Поиск по событиям</span>
               <Search
@@ -268,7 +268,7 @@ export function CatalogToolbar({
                 aria-controls={showSearchHints ? 'catalog-search-hints' : undefined}
                 disabled={disabled}
                 autoComplete="off"
-                className="inline-btn h-11 w-full rounded-xl border border-transparent bg-white pl-11 pr-9 text-sm text-graphite outline-none transition placeholder:text-slate-400 focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/30 disabled:opacity-60 md:h-10"
+                className="inline-btn h-11 w-full rounded-xl border-0 bg-transparent pl-11 pr-9 text-sm text-graphite outline-none transition placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-primary/30 disabled:opacity-60 md:h-10"
               />
               {qDraft ? (
                 <button
@@ -816,7 +816,7 @@ function FiltersButton({
       className={`relative inline-btn inline-flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 disabled:opacity-60 sm:h-10 ${
         open || count > 0
           ? 'bg-primary-600 text-white hover:bg-primary-700'
-          : 'bg-surface-muted text-graphite hover:bg-slate-200/80'
+          : 'border border-slate-200 bg-white text-graphite hover:bg-slate-50'
       } ${className}`}
     >
       <SlidersHorizontal aria-hidden className="h-4 w-4" strokeWidth={1.75} />
