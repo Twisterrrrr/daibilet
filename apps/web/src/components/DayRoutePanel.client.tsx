@@ -220,7 +220,6 @@ import {
 } from '@/lib/day-route-stop-types';
 import { venueTypeLabel } from '@/lib/venue-meta';
 import { resolveCityCardImage } from '@/lib/city-images';
-import { MyDayHourGantt } from '@/components/my-day/MyDayHourGantt';
 import { MyDaySaveScenarioDialog } from '@/components/my-day/MyDaySaveScenarioDialog';
 import { exportDayRoutePdfWithMap } from '@/lib/day-route-pdf';
 import {
@@ -3707,16 +3706,6 @@ function DayRoutePanelInner() {
                 <div className="sr-only" aria-live="polite">
                   {dndAnnounce}
                 </div>
-                {hourPlanOn && hourPlan ? (
-                  <MyDayHourGantt
-                    venues={route.venues}
-                    plan={hourPlan}
-                    dayStartHHMM={hourStart}
-                    dayEndHHMM={hourEnd}
-                    onFocusStop={(id) => setFocusedStopId(id)}
-                    className="mb-3"
-                  />
-                ) : null}
                 <MyDayScheduleBanner
                 overflowCount={overflowStops.length}
                 totalLabel={hourPlan?.totalLabel || null}
