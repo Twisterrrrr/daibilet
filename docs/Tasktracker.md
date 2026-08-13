@@ -1,3 +1,9 @@
+## My Day PDF download (2026-08-13)
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| FIX.MYDAY-PDF-JPG | «PDF с картой» скачивал JPG: `window.open(..., noopener)` = null → fallback `moi-den-karta.jpg`. Отдавать `.pdf` | Высокий | ✅ 2026-08-13 code; live после Deploy MSK web |
+
 ## City hub night-hero padding (2026-08-13)
 
 | ID | Задача | Приоритет | Статус |

@@ -1,3 +1,17 @@
+## 2026-08-13 - My Day: PDF отдавал JPG
+
+### Наблюдения
+- Owner: кнопка PDF в Мой день скачивает JPG, не PDF.
+
+### Решения
+- Причина: страницы рендерились в JPEG, PDF собирался через `window.print()`. `window.open('', '_blank', 'noopener,noreferrer')` в браузере возвращает `null`, срабатывал fallback `moi-den-karta.jpg`.
+- Теперь JPEG-страницы упаковываются в настоящий PDF (`DCTDecode`) и качаются как `moi-den.pdf`. Без jspdf.
+
+### Проблемы
+- Нет. Live после Deploy MSK web / «выкатывай».
+
+---
+
 ## 2026-08-13 - City hero: равные отступы сверху и снизу
 
 ### Наблюдения

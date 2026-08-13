@@ -1,7 +1,10 @@
 /**
  * Client-side «PDF с картой» for My Day.
- * Draws OSM/Carto static map + itinerary on canvas, then opens print dialog
- * (user saves as PDF). No jspdf dependency required.
+ * Draws OSM/Carto static map + itinerary on canvas, wraps JPEG pages in a
+ * real PDF blob and downloads `.pdf`. No jspdf dependency.
+ *
+ * Do not `window.open(..., 'noopener')` then print: browsers return `null`
+ * for that features string, and the old fallback saved `moi-den-karta.jpg`.
  */
 
 export type DayRoutePdfStop = {
@@ -169,7 +172,7 @@ function wrapText(
   return lines;
 }
 
-/** Compose canvases and open browser print (Save as PDF). */
+/** Compose canvases and download a real PDF (JPEG pages in a PDF wrapper). */
 export async function exportDayRoutePdfWithMap(payload: DayRoutePdfPayload): Promise<void> {
   if (typeof window === 'undefined' || typeof document === 'undefined') return;
 
@@ -282,52 +285,136 @@ export async function exportDayRoutePdfWithMap(payload: DayRoutePdfPayload): Pro
     y += 22;
   }
 
-  const images = pages.map((c, i) => {
-    const pctx = c.getContext('2d')!;
+  for (let i = 0; i < pages.length; i++) {
+    const pctx = pages[i]!.getContext('2d')!;
     pctx.fillStyle = '#9ca3af';
     pctx.font = '18px Arial, sans-serif';
     pctx.fillText(`daibilet.ru · страница ${i + 1} из ${pages.length}`, M, H - 36);
-    return c.toDataURL('image/jpeg', 0.92);
-  });
-
-  const html = `<!doctype html><html lang="ru"><head><meta charset="utf-8"/><title>${escapeHtml(
-    payload.title,
-  )}</title>
-<style>
-  @page { size: A4; margin: 0; }
-  body { margin: 0; background: #fff; }
-  img { display: block; width: 100%; page-break-after: always; }
-  img:last-child { page-break-after: auto; }
-  .hint { display:none; }
-  @media screen {
-    body { background: #e5e7eb; padding: 16px; }
-    img { max-width: 720px; margin: 0 auto 16px; box-shadow: 0 8px 24px rgba(0,0,0,.12); }
-    .hint { display:block; text-align:center; font: 14px/1.4 system-ui,sans-serif; color:#334155; margin-bottom:12px; }
   }
-</style></head><body>
-<p class="hint">В диалоге печати выберите «Сохранить как PDF».</p>
-${images.map((src) => `<img src="${src}" alt="Страница маршрута"/>`).join('')}
-<script>window.onload=function(){setTimeout(function(){window.print();},200);}</script>
-</body></html>`;
 
-  const win = window.open('', '_blank', 'noopener,noreferrer');
-  if (!win) {
-    // Popup blocked - fall back to downloading first page JPEG.
-    const a = document.createElement('a');
-    a.href = images[0]!;
-    a.download = 'moi-den-karta.jpg';
-    a.click();
-    return;
-  }
-  win.document.open();
-  win.document.write(html);
-  win.document.close();
+  const jpegPages = await Promise.all(
+    pages.map(async (canvas) => ({
+      width: canvas.width,
+      height: canvas.height,
+      jpeg: await canvasToJpegBytes(canvas),
+    })),
+  );
+  const pdf = buildPdfFromJpegPages(jpegPages);
+  downloadBlob(new Blob([pdf], { type: 'application/pdf' }), 'moi-den.pdf');
 }
 
-function escapeHtml(value: string): string {
-  return String(value || '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+export type JpegPdfPage = {
+  width: number;
+  height: number;
+  jpeg: Uint8Array;
+};
+
+/** Embed RGB JPEG pages into a minimal PDF (A4). Exported for unit tests. */
+export function buildPdfFromJpegPages(pages: JpegPdfPage[]): Uint8Array {
+  if (!pages.length) throw new Error('pdf: empty');
+
+  const A4_W = 595.28;
+  const A4_H = 841.89;
+  const encoder = new TextEncoder();
+  const ascii = (value: string) => encoder.encode(value);
+  const chunks: Uint8Array[] = [];
+  const offsets: number[] = [0];
+  let size = 0;
+
+  const push = (part: Uint8Array | string) => {
+    const bytes = typeof part === 'string' ? ascii(part) : part;
+    chunks.push(bytes);
+    size += bytes.length;
+  };
+
+  const beginObj = (id: number) => {
+    offsets[id] = size;
+    push(`${id} 0 obj\n`);
+  };
+
+  const endObj = () => push('endobj\n');
+
+  push('%PDF-1.4\n');
+  push(new Uint8Array([0x25, 0xe2, 0xe3, 0xcf, 0xd3, 0x0a]));
+
+  beginObj(1);
+  push('<< /Type /Catalog /Pages 2 0 R >>\n');
+  endObj();
+
+  const kids = pages.map((_, i) => `${3 + i * 3} 0 R`).join(' ');
+  beginObj(2);
+  push(`<< /Type /Pages /Kids [${kids}] /Count ${pages.length} >>\n`);
+  endObj();
+
+  pages.forEach((page, i) => {
+    const pageId = 3 + i * 3;
+    const contentId = pageId + 1;
+    const imageId = pageId + 2;
+    const content = `q\n${A4_W} 0 0 ${A4_H} 0 0 cm\n/Im0 Do\nQ\n`;
+
+    beginObj(pageId);
+    push(
+      `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${A4_W} ${A4_H}] /Contents ${contentId} 0 R /Resources << /XObject << /Im0 ${imageId} 0 R >> >> >>\n`,
+    );
+    endObj();
+
+    beginObj(contentId);
+    push(`<< /Length ${ascii(content).length} >>\nstream\n`);
+    push(content);
+    push('endstream\n');
+    endObj();
+
+    beginObj(imageId);
+    push(
+      `<< /Type /XObject /Subtype /Image /Width ${page.width} /Height ${page.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${page.jpeg.length} >>\nstream\n`,
+    );
+    push(page.jpeg);
+    push('\nendstream\n');
+    endObj();
+  });
+
+  const xrefStart = size;
+  const objCount = 3 + pages.length * 3;
+  push(`xref\n0 ${objCount}\n`);
+  push('0000000000 65535 f \n');
+  for (let id = 1; id < objCount; id++) {
+    push(`${String(offsets[id] ?? 0).padStart(10, '0')} 00000 n \n`);
+  }
+  push(`trailer\n<< /Size ${objCount} /Root 1 0 R >>\nstartxref\n${xrefStart}\n%%EOF\n`);
+
+  const out = new Uint8Array(size);
+  let offset = 0;
+  for (const chunk of chunks) {
+    out.set(chunk, offset);
+    offset += chunk.length;
+  }
+  return out;
+}
+
+function canvasToJpegBytes(canvas: HTMLCanvasElement): Promise<Uint8Array> {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) {
+          reject(new Error('jpeg'));
+          return;
+        }
+        void blob.arrayBuffer().then((buffer) => resolve(new Uint8Array(buffer)), reject);
+      },
+      'image/jpeg',
+      0.92,
+    );
+  });
+}
+
+function downloadBlob(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.rel = 'noopener';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1500);
 }

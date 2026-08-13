@@ -2413,7 +2413,7 @@ function DayRoutePanelInner() {
         stops,
         rows,
       });
-      flashDayRouteFeedback('Откройте «Сохранить как PDF» в диалоге печати');
+      flashDayRouteFeedback('Маршрутный лист скачан как PDF');
     } finally {
       setPdfBusy(false);
     }
