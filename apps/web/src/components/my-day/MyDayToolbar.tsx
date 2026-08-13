@@ -61,9 +61,8 @@ type MyDayToolbarProps = {
 };
 
 /**
- * Lovable sticky route summary: stats, then mode+optimize+hours+trash
- * wrapping with export. Narrow: export under a divider. Wide (container
- * ~36rem or lg viewport): one wrapping row, like daibilet-planner.
+ * Lovable sticky route summary: stats, then wrap-groups
+ * (travel | optimize+hours+trash | PDF+save). Clusters nowrap and wrap as a unit.
  */
 export function MyDayToolbar({
   stopsCount,
@@ -143,52 +142,51 @@ export function MyDayToolbar({
           ) : null}
         </div>
 
-        {/* Mode + optimize + hours + trash | export. Lovable: flex-col, lg:flex-row wrap.
-            Also container 36rem so a wide list column (map collapsed / desktop) joins
-            even when the viewport is not lg. */}
+        {/* Atomic wrap groups: travel | optimize+hours+trash | export.
+            Each cluster nowraps; the parent wraps whole clusters, not single buttons. */}
         <div
-          className="mt-4 flex flex-col gap-2 [@container_(min-width:36rem)]:flex-row [@container_(min-width:36rem)]:flex-wrap [@container_(min-width:36rem)]:items-center [@container_(min-width:36rem)]:gap-x-3 lg:flex-row lg:flex-wrap lg:items-center lg:gap-x-3"
+          className="mt-4 flex flex-wrap items-center gap-2"
           data-my-day-toolbar-controls
         >
           <div
-            className="flex flex-wrap items-center gap-2"
+            className="inline-flex shrink-0 rounded-full border border-slate-200 p-0.5"
+            role="group"
+            aria-label="Способ передвижения"
+            data-day-travel-mode
             data-my-day-toolbar-mode
+          >
+            <button
+              type="button"
+              onClick={() => onTravelModeChange('walk')}
+              aria-pressed={travelMode === 'walk'}
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold transition ${
+                travelMode === 'walk'
+                  ? 'bg-primary-600 text-white'
+                  : 'text-slate-500 hover:bg-slate-50'
+              }`}
+            >
+              <Footprints className="h-4 w-4 shrink-0" aria-hidden />
+              Пешком
+            </button>
+            <button
+              type="button"
+              onClick={() => onTravelModeChange('auto')}
+              aria-pressed={travelMode === 'auto'}
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold transition ${
+                travelMode === 'auto'
+                  ? 'bg-primary-600 text-white'
+                  : 'text-slate-500 hover:bg-slate-50'
+              }`}
+            >
+              <Car className="h-4 w-4 shrink-0" aria-hidden />
+              На авто
+            </button>
+          </div>
+
+          <div
+            className="inline-flex shrink-0 flex-nowrap items-center gap-2"
             data-my-day-toolbar-actions
           >
-            <div
-              className="inline-flex rounded-full border border-slate-200 p-0.5"
-              role="group"
-              aria-label="Способ передвижения"
-              data-day-travel-mode
-            >
-              <button
-                type="button"
-                onClick={() => onTravelModeChange('walk')}
-                aria-pressed={travelMode === 'walk'}
-                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold transition ${
-                  travelMode === 'walk'
-                    ? 'bg-primary-600 text-white'
-                    : 'text-slate-500 hover:bg-slate-50'
-                }`}
-              >
-                <Footprints className="h-4 w-4 shrink-0" aria-hidden />
-                Пешком
-              </button>
-              <button
-                type="button"
-                onClick={() => onTravelModeChange('auto')}
-                aria-pressed={travelMode === 'auto'}
-                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold transition ${
-                  travelMode === 'auto'
-                    ? 'bg-primary-600 text-white'
-                    : 'text-slate-500 hover:bg-slate-50'
-                }`}
-              >
-                <Car className="h-4 w-4 shrink-0" aria-hidden />
-                На авто
-              </button>
-            </div>
-
             <button
               type="button"
               onClick={onOptimize}
@@ -220,29 +218,6 @@ export function MyDayToolbar({
               </button>
             ) : null}
 
-            {hourPlanOn && onHourStartChange && onHourEndChange ? (
-              <>
-                <label className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm">
-                  <span className="text-slate-500">Старт</span>
-                  <input
-                    type="time"
-                    value={hourStart || '10:00'}
-                    onChange={(e) => onHourStartChange(e.target.value)}
-                    className="bg-transparent font-semibold text-slate-800 outline-none"
-                  />
-                </label>
-                <label className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm">
-                  <span className="text-slate-500">Финиш</span>
-                  <input
-                    type="time"
-                    value={hourEnd || '22:00'}
-                    onChange={(e) => onHourEndChange(e.target.value)}
-                    className="bg-transparent font-semibold text-slate-800 outline-none"
-                  />
-                </label>
-              </>
-            ) : null}
-
             <button
               type="button"
               onClick={onClear}
@@ -256,8 +231,31 @@ export function MyDayToolbar({
             </button>
           </div>
 
+          {hourPlanOn && onHourStartChange && onHourEndChange ? (
+            <div className="inline-flex shrink-0 flex-nowrap items-center gap-2" data-my-day-toolbar-hours>
+              <label className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm">
+                <span className="text-slate-500">Старт</span>
+                <input
+                  type="time"
+                  value={hourStart || '10:00'}
+                  onChange={(e) => onHourStartChange(e.target.value)}
+                  className="bg-transparent font-semibold text-slate-800 outline-none"
+                />
+              </label>
+              <label className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm">
+                <span className="text-slate-500">Финиш</span>
+                <input
+                  type="time"
+                  value={hourEnd || '22:00'}
+                  onChange={(e) => onHourEndChange(e.target.value)}
+                  className="bg-transparent font-semibold text-slate-800 outline-none"
+                />
+              </label>
+            </div>
+          ) : null}
+
           <div
-            className="flex flex-wrap items-center gap-2 border-t border-slate-200 pt-3 [@container_(min-width:36rem)]:border-t-0 [@container_(min-width:36rem)]:pt-0 lg:border-t-0 lg:pt-0"
+            className="inline-flex shrink-0 flex-nowrap items-center gap-2"
             role="group"
             aria-label="Экспорт маршрута"
             data-my-day-toolbar-export

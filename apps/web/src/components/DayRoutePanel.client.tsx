@@ -203,7 +203,7 @@ import {
   type HotPickTabId,
 } from '@/lib/day-route-hot-picks';
 import { cityToGenitive, inCityPrepositional } from '@/lib/city-declension';
-import { formatPriceFrom } from '@/lib/format';
+import { formatPriceFrom, pluralExcursions } from '@/lib/format';
 import {
   buildMustSeeFilterTabs,
   classifyMustSeePlace,
@@ -2873,7 +2873,11 @@ function DayRoutePanelInner() {
         <h3 className="mt-1 text-base font-semibold text-slate-900">События поблизости</h3>
         <p className="mt-0.5 text-xs text-slate-500">
           Экскурсии, которые задевают точки дня
-          {uniqueMatches.length > 1 ? ` · ${uniqueMatches.length}` : ''}
+          {uniqueMatches.length
+            ? ` · ${pluralExcursions(uniqueMatches.length)}${
+                hiddenCount > 0 ? `, сейчас ${visible.length}` : ''
+              }`
+            : ''}
         </p>
         <ul className="mt-3 grid grid-cols-1 items-start gap-3" data-day-matches-deduped>
           {visible.map((match) => {

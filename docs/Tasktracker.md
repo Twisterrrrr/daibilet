@@ -27,7 +27,7 @@
 | UX.EVENT-TITLE-BREAK | Длинный H1 события: перенос после `: ` / ` - `; на мобилке скрыть последний crumb (дубль H1) | Средний | ✅ live `31693704581` / `31694312986` |
 | FIX.HUB-BLOG-CITY | City hub «Из блога»: не показывать статьи другого города; бейдж города / multi на карточке | Высокий | ✅ live `31693704581` / `31694312986` |
 | UX.MYDAY-NEARBY-FOOT | «События поблизости» из picker «Выбор Дайбилет» → низ маршрута, 3 + показать ещё | Высокий | ✅ live `31694312986` BUILD_ID=`DNWhE8Cu-cNOGBAQRWMDI` |
-| UX.MYDAY-TOOLBAR-ADAPT | Toolbar маршрута: wrapping как Lovable; export на ту же строку когда колонка широкая | Высокий | ✅ live `31697785067` BUILD_ID=`wOdU6cU5y7ITl_bsyiqqa` |
+| UX.MYDAY-TOOLBAR-ADAPT | Toolbar маршрута: wrapping как Lovable; export на ту же строку когда колонка широкая | Высокий | ✅ live `31697785067`; 2026-08-13 группы nowrap (оптимизировать+часы+удалить / PDF+сохранить) |
 | UX.MYDAY-STOP-HOVER-TICKET | Номер точки: белый invert + scale на hover; «Билеты от» внутри карточки, не под ней | Высокий | ✅ live `31697785067` BUILD_ID=`wOdU6cU5y7ITl_bsyiqqa` |
 | UX.MYDAY-STOP-PLACE-NOT-EVENT | Стоп = место (Адмиралтейство≠причал, Эрмитаж≠балет); «Вход свободный» только outdoor; адрес без `///` EN | Высокий | ✅ live `31697785067` BUILD_ID=`wOdU6cU5y7ITl_bsyiqqa` |
 | UX.MYDAY-FREE-ENTRY-AUDIT | Аудит mustSee/пресеты/пригороды: не врать «Вход свободный» (парк/храм/Петергоф/ботаника) | Высокий | ✅ live `31697785067` BUILD_ID=`wOdU6cU5y7ITl_bsyiqqa` |
