@@ -411,6 +411,8 @@ function shouldUsePierAddressDisplayName(name, address) {
   const title = formatPublicVenueTitle(name);
   if (!address) return false;
   if (hasDescriptivePierTitle(title)) return false;
+  // Named river ports / terminals keep their proper noun (Казань Девятаева, etc.).
+  if (/речн(?:ой|ая|ого|ые)?\s+порт|речпорт|морск(?:ой|ого|ая)?\s+вокзал/i.test(title)) return false;
   if (venueTitleLooksLikeVesselName(title)) return true;
   if (/^при(?:чал|стан(?:ь|и)?)\b/i.test(title) && /\d/.test(title)) {
     const locationPart = stripPierPrefixFromTitle(title);
