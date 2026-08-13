@@ -160,7 +160,7 @@ export function HomeHero({ destinations, frames, landings = [], videoSrc }: Home
                 type="button"
                 data-rail-item
                 onClick={() => setHeroDate(option.value)}
-                className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-semibold transition sm:hidden ${
+                className={`inline-flex h-8 shrink-0 items-center rounded-full px-3.5 text-xs font-semibold transition sm:hidden ${
                   active
                     ? 'bg-white text-slate-900 shadow-sm'
                     : 'bg-white/20 text-white/95 ring-1 ring-white/35 backdrop-blur-sm hover:bg-white/30'
@@ -189,7 +189,7 @@ export function HomeHero({ destinations, frames, landings = [], videoSrc }: Home
                 key={chip.label}
                 href={href}
                 data-rail-item
-                className="shrink-0 rounded-full bg-white/20 px-3.5 py-1.5 text-xs font-semibold text-white/95 ring-1 ring-white/35 backdrop-blur-sm transition hover:bg-white/35"
+                className="inline-flex h-8 shrink-0 items-center rounded-full bg-white/20 px-3.5 text-xs font-semibold text-white/95 ring-1 ring-white/35 backdrop-blur-sm transition hover:bg-white/35"
               >
                 {chip.label}
               </a>

@@ -120,17 +120,20 @@ export function ScrollRail({
     });
   };
 
-  const arrowSize = arrowsOutside ? 'h-7 w-7' : 'h-10 w-10';
-  const iconSize = arrowsOutside ? 'h-3.5 w-3.5' : 'h-5 w-5';
+  // Outside (chip rails): same height as chip row, not tiny overlay dots.
+  const arrowSize = arrowsOutside ? 'h-8 w-8' : 'h-10 w-10';
+  const iconSize = arrowsOutside ? 'h-4 w-4' : 'h-5 w-5';
   const arrowToneCls =
     arrowTone === 'light'
-      ? 'border-white/40 bg-white/25 text-white shadow-sm backdrop-blur-sm hover:bg-white/40 focus-visible:ring-white/50'
+      ? arrowsOutside
+        ? 'border-white/35 bg-white/20 text-white shadow-none backdrop-blur-sm hover:bg-white/35 focus-visible:ring-white/50'
+        : 'border-white/40 bg-white/25 text-white shadow-sm backdrop-blur-sm hover:bg-white/40 focus-visible:ring-white/50'
       : 'border-slate-200/90 bg-white/95 text-slate-700 shadow-md backdrop-blur hover:bg-white hover:text-slate-950 focus-visible:ring-slate-300 focus-visible:ring-offset-2';
   // md+ only - mobile keeps swipe (no arrows).
   const arrowBase = `hidden ${arrowSize} shrink-0 items-center justify-center rounded-full border transition-[opacity,transform,colors] focus-visible:outline-none focus-visible:ring-2 md:inline-flex ${arrowToneCls}`;
   const overlayArrowBase = `${arrowBase} absolute z-10 -translate-y-1/2 top-[33%]`;
 
-  const fadePad = arrowsOutside ? '0.85rem' : '1.25rem';
+  const fadePad = arrowsOutside ? '0.5rem' : '1.25rem';
   const fadeMask =
     edgeFade && overflow
       ? {
@@ -152,7 +155,7 @@ export function ScrollRail({
       disabled={!canPrev}
       onClick={() => scrollByDir(-1)}
       className={`${arrowsOutside ? arrowBase : overlayArrowBase} ${arrowsOutside ? '' : 'left-3'} ${
-        canPrev ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-40'
+        canPrev ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-35'
       }`}
     >
       <ChevronLeft className={iconSize} aria-hidden />
@@ -168,7 +171,7 @@ export function ScrollRail({
       disabled={!canNext}
       onClick={() => scrollByDir(1)}
       className={`${arrowsOutside ? arrowBase : overlayArrowBase} ${arrowsOutside ? '' : 'right-3'} ${
-        canNext ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-40'
+        canNext ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-35'
       }`}
     >
       <ChevronRight className={iconSize} aria-hidden />
@@ -191,7 +194,7 @@ export function ScrollRail({
   if (arrowsOutside) {
     return (
       <div
-        className={`relative flex min-w-0 items-center gap-2 overflow-visible ${className}`.trim()}
+        className={`relative flex min-w-0 items-center gap-2.5 overflow-visible ${className}`.trim()}
         style={style}
       >
         {prevBtn}
