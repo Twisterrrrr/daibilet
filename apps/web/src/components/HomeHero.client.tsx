@@ -138,7 +138,7 @@ export function HomeHero({ destinations, frames, landings = [], videoSrc }: Home
         </div>
       </form>
 
-      {/* Soft chip rail: md+ compact arrows (same left/right inset as editorial); mobile = swipe only. */}
+      {/* Soft chip rail: md+ arrows outside the row; mobile = swipe only. */}
       <ScrollRail
         className="mt-4 w-full max-w-5xl"
         viewportClassName="!overflow-x-auto overscroll-x-contain !pb-0.5"
@@ -149,7 +149,7 @@ export function HomeHero({ destinations, frames, landings = [], videoSrc }: Home
         aria-label="Быстрые подборки"
       >
         <div
-          className="flex w-max flex-nowrap items-center gap-2 px-1 pb-0.5 md:px-10"
+          className="flex w-max flex-nowrap items-center gap-2 px-1 pb-0.5"
           data-home-hero-chips
         >
           {HERO_DATE_OPTIONS.filter((d) => d.value !== 'all').map((option) => {
