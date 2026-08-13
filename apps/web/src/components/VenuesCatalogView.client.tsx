@@ -467,6 +467,9 @@ export function VenuesCatalogView({
   const cityName = cityFilter !== 'all' ? cityFilter : null;
   const pageTitle = cityName ? `Театры и музеи ${cityToGenitive(cityName)}` : 'Театры и музеи';
   const heroTotal = stats.venues || total;
+  const venuesEyebrow = cityName
+    ? `${pluralVenues(heroTotal)} · ${cityName}`
+    : `${pluralVenues(heroTotal)} · ${pluralCities(cityCount)}`;
   const hideCityOnCards = cityFilter !== 'all';
   const paginationParams = useMemo(() => {
     const params = searchParamsRecord(searchParams);
@@ -481,7 +484,7 @@ export function VenuesCatalogView({
         variant="minimal"
         dense
         breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Места', href: '/places' }, { label: 'Площадки' }]}
-        eyebrow={`${pluralVenues(heroTotal)} · ${pluralCities(cityCount)}`}
+        eyebrow={venuesEyebrow}
         title={pageTitle}
         tone="light"
         className="bg-white"

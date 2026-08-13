@@ -601,6 +601,9 @@ export function PlacesHubView({
   const pageTitleText = buildPlacesListingCopy(cityName, family, citySlugForCopy).h1;
   const families = countCatalogFamilies(stats.types);
   const placesTotal = families.institutions + families.locations;
+  const placesEyebrow = cityName
+    ? `${pluralPlaces(placesTotal)} • ${cityName}`
+    : `${pluralPlaces(placesTotal)} • ${pluralCities(cityCount)}`;
   const hideCityOnCards = cityFilter !== 'all';
   const cityQuery =
     cityFetchKey && cityFetchKey !== 'all'
@@ -622,7 +625,7 @@ export function PlacesHubView({
         variant="minimal"
         dense
         breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Места' }]}
-        eyebrow={`${pluralPlaces(placesTotal)} • ${pluralCities(cityCount)}`}
+        eyebrow={placesEyebrow}
         title={pageTitleText}
         tone="light"
         className=""

@@ -447,6 +447,9 @@ export function LocationsCatalogView({
   const cityName = cityFilter !== 'all' ? cityFilter : null;
   const heroTitle = cityName ? `Локации в ${cityToPrepositional(cityName)}` : 'Локации и точки сбора';
   const heroTotal = stats.venues || total;
+  const locationsEyebrow = cityName
+    ? `${formatNumber(heroTotal)} локаций · ${cityName}`
+    : `${formatNumber(heroTotal)} локаций · ${pluralCities(cityCount)}`;
   const hideCityOnCards = cityFilter !== 'all';
   const paginationParams = useMemo(() => {
     const params = searchParamsRecord(searchParams);
@@ -492,7 +495,7 @@ export function LocationsCatalogView({
         variant="minimal"
         dense
         breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Места', href: '/places' }, { label: 'Локации' }]}
-        eyebrow={`${formatNumber(heroTotal)} локаций · ${pluralCities(cityCount)}`}
+        eyebrow={locationsEyebrow}
         title={heroTitle}
         tone="light"
       >
