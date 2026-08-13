@@ -32,6 +32,8 @@ type MyDayPickerSheetProps = {
   tabs: MyDayPickerTab[];
   onSectionChange: (section: MyDayPickerSection) => void;
   onClose: () => void;
+  /** Unified catalog search above tabs (places + events). */
+  search?: ReactNode;
   children: ReactNode;
 };
 
@@ -44,6 +46,7 @@ export function MyDayPickerSheet({
   tabs,
   onSectionChange,
   onClose,
+  search,
   children,
 }: MyDayPickerSheetProps) {
   const titleId = useId();
@@ -120,7 +123,7 @@ export function MyDayPickerSheet({
               Подбор точек
             </h2>
             <p id={descId} className="mt-0.5 text-xs text-slate-500">
-              Выбранные места сразу попадают в маршрут и на карту
+              Один поиск по местам и событиям. Выбранное сразу в маршрут и на карту
             </p>
           </div>
           <button
@@ -132,6 +135,15 @@ export function MyDayPickerSheet({
             <X className="h-4 w-4" />
           </button>
         </header>
+
+        {search ? (
+          <div
+            className="relative z-20 shrink-0 border-b border-slate-200 px-5 py-3"
+            data-my-day-picker-search
+          >
+            {search}
+          </div>
+        ) : null}
 
         <div className="grid min-h-0 flex-1 grid-rows-[auto_minmax(0,1fr)] sm:grid-cols-[220px_minmax(0,1fr)] sm:grid-rows-1">
           <div

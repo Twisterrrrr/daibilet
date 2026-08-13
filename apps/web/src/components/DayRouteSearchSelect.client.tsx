@@ -6,14 +6,23 @@ import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { SafeImage } from '@/components/SafeImage.client';
 import { takeDayRouteSearchOptions } from '@/lib/day-route-search-options';
 
+export type DayRouteSearchFamily = 'Площадка' | 'Локация' | 'Событие';
+
 export type DayRouteSearchOption = {
   id: string;
   label: string;
   hint?: string | null;
+  family?: DayRouteSearchFamily;
   imageUrl?: string | null;
   disabled?: boolean;
   disabledReason?: string | null;
 };
+
+function familyBadgeClass(family: DayRouteSearchFamily): string {
+  if (family === 'Площадка') return 'bg-primary-50 text-primary-800';
+  if (family === 'Событие') return 'bg-amber-50 text-amber-900';
+  return 'bg-slate-100 text-slate-700';
+}
 
 type Props = {
   label: string;
@@ -38,7 +47,7 @@ type Props = {
 };
 
 /**
- * Searchable combobox for /my-day catalog picks (locations / venues / events).
+ * Unified combobox for /my-day: places (venue+location) and events, with family tags.
  * Stays on-page - no navigation.
  */
 export function DayRouteSearchSelect({
@@ -261,9 +270,18 @@ export function DayRouteSearchSelect({
                         ) : null}
                       </span>
                     </span>
-                    {!option.disabled ? (
-                      <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-600 opacity-0 group-hover:opacity-100" />
-                    ) : null}
+                    <span className="mt-0.5 flex shrink-0 items-center gap-1.5">
+                      {option.family ? (
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${familyBadgeClass(option.family)}`}
+                        >
+                          {option.family}
+                        </span>
+                      ) : null}
+                      {!option.disabled ? (
+                        <Check className="h-3.5 w-3.5 text-emerald-600 opacity-0 group-hover:opacity-100" />
+                      ) : null}
+                    </span>
                   </button>
                 </li>
               );

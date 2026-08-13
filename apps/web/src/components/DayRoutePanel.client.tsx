@@ -76,7 +76,7 @@ import {
 import { MobileStickyActionBar } from '@/components/MobileStickyActionBar';
 import { SuburbsCarousel } from '@/components/SuburbsCarousel.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
-import { catalogHrefWithSelectedCity, placesHubHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from '@/lib/catalog-url';
+import { catalogHrefWithSelectedCity, placesHubHrefWithSelectedCity } from '@/lib/catalog-url';
 import { resolveCityInfo } from '@/lib/cityInfo';
 import { isSpbDayRouteCity } from '@/lib/day-route-boat';
 import {
@@ -950,8 +950,6 @@ function DayRoutePanelInner() {
   }, [route.venues, ready, pageCitySlug, cityParam, itemsParam, dayParam]);
 
   const afishaHref = catalogHrefWithSelectedCity(scopeCityParam || 'all');
-  const locationsHref = venueCatalogHrefWithSelectedCity('/locations', scopeCityParam);
-  const venuesHref = venueCatalogHrefWithSelectedCity('/venues', scopeCityParam);
   const placesHref = placesHubHrefWithSelectedCity(scopeCityParam);
   const cityHubHref = scopeCitySlug ? `/cities/${encodeURIComponent(scopeCitySlug)}` : '/cities';
 
@@ -1237,7 +1235,7 @@ function DayRoutePanelInner() {
     return out;
   }, [mustSeeResolved, route]);
 
-  const unifiedSearchOptions = useMemo<DayRouteSearchOption[]>(() => {
+  function pickLocationById(id: string) {
     const venue = locationsCatalog.find((item) => item.id === id);
     if (!venue) return;
     setRoute(appendDayRouteItem(venueCardToDayRouteItem(venue), consumeInsertAfterVenueId()));
@@ -2790,25 +2788,25 @@ function DayRoutePanelInner() {
             : 'Добавить место или событие'
         }
         emptyText={
-          !hasPageCity
+          !hasCatalogCity
             ? 'Сначала выберите город'
             : catalogLoading && unifiedSearchOptions.length === 0
               ? 'Загружаем…'
               : catalogError || 'Ничего не найдено'
         }
-        loading={hasPageCity && catalogLoading && unifiedSearchOptions.length === 0}
-        disabled={!hasPageCity || atMax}
-        options={hasPageCity ? unifiedSearchOptions : []}
+        loading={hasCatalogCity && catalogLoading && unifiedSearchOptions.length === 0}
+        disabled={!hasCatalogCity || atMax}
+        options={hasCatalogCity ? unifiedSearchOptions : []}
         onPick={pickUnifiedSearch}
         onQueryChange={setUnifiedSearchQuery}
-        onCreateCustom={hasPageCity ? createCustomFromSearch : undefined}
+        onCreateCustom={hasCatalogCity ? createCustomFromSearch : undefined}
         createCustomDisabled={atMax}
       />
     );
   }
 
   function renderUnifiedCatalogSearch() {
-    if (!hasPageCity) {
+    if (!hasCatalogCity) {
       return (
         <p className="rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
           Сначала выберите город - появятся места и события.
@@ -2816,7 +2814,7 @@ function DayRoutePanelInner() {
       );
     }
     return (
-      <div data-day-catalog-search="unified">
+      <div data-day-catalog-search="unified" data-day-catalog-open="1">
         {renderUnifiedSearchSelect()}
         <p className="mt-2 mb-0 text-xs text-slate-500">
           Каталог:{' '}
@@ -2978,7 +2976,7 @@ function DayRoutePanelInner() {
 
   /**
    * Non-empty plan: search under H1 (no city picker row; quiet «или сменить город»).
-   * Sticky «+ Добавить» / catalog trio still add more stops.
+   * Picker sheet has the same unified search for mobile / add-more.
    */
   function renderHeaderCompactSearch() {
     return (
@@ -2989,31 +2987,7 @@ function DayRoutePanelInner() {
         data-day-header-search="1"
       >
         <div className="flex min-w-0 w-full items-start gap-2">
-          <div className="min-w-0 flex-1">
-            <DayRouteSearchSelect
-              label="Поиск"
-              hideLabel
-              placeholder={
-                insertAfterVenueId
-                  ? 'Вставить между точками…'
-                  : 'Добавить место или событие'
-              }
-              emptyText={
-                !hasCatalogCity
-                  ? 'Сначала выберите город'
-                  : catalogLoading && unifiedSearchOptions.length === 0
-                    ? 'Загружаем…'
-                    : catalogError || 'Ничего не найдено'
-              }
-              loading={hasCatalogCity && catalogLoading && unifiedSearchOptions.length === 0}
-              disabled={!hasCatalogCity || atMax}
-              options={hasCatalogCity ? unifiedSearchOptions : []}
-              onPick={pickUnifiedSearch}
-              onQueryChange={setUnifiedSearchQuery}
-              onCreateCustom={hasCatalogCity ? createCustomFromSearch : undefined}
-              createCustomDisabled={atMax}
-            />
-          </div>
+          <div className="min-w-0 flex-1">{renderUnifiedSearchSelect()}</div>
           {insertAfterVenueId ? (
             <button
               type="button"
@@ -4052,6 +4026,7 @@ function DayRoutePanelInner() {
           } else if (next === 'places') setOpenPanel('mustSee');
         }}
         onClose={closePicker}
+        search={renderUnifiedCatalogSearch()}
       >
       {/* Picker panels - only active tab visible */}
       {showScenariosGuide && pickerSection === 'scenarios' ? (
@@ -4444,7 +4419,7 @@ function DayRoutePanelInner() {
                       Афиша города
                     </Link>
                     <Link
-                      href={locationsHref}
+                      href={placesHref}
                       className="inline-flex min-h-10 items-center justify-center rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
                     >
                       Другие точки
@@ -4641,32 +4616,11 @@ function DayRoutePanelInner() {
               </div>
             ) : (
               <p className="mt-3 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 text-[13px] text-slate-600">
-                В этой категории пока пусто - откройте другую вкладку или поиск ниже.
+                В этой категории пока пусто - откройте другую вкладку или поиск вверху панели.
               </p>
             )}
           </div>
         </section>
-      ) : null}
-
-      {pickerSection === 'picks' ? (
-      <section
-        className="mt-4"
-        id="day-catalog-add"
-        data-day-catalog-add="1"
-        data-day-catalog-open="1"
-      >
-        <div className="mb-3">
-          <p className="text-base font-semibold text-slate-900">Ещё из каталога</p>
-          <p className="mt-0.5 text-xs text-slate-500">Отдельный поиск по типам</p>
-        </div>
-        {!hasPageCity ? (
-          <p className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-            Сначала выберите город выше.
-          </p>
-        ) : (
-          renderCatalogTrio()
-        )}
-      </section>
       ) : null}
 
       </MyDayPickerSheet>
