@@ -498,7 +498,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         locationSlug: 'saint-petersburg-paradnaya-romashka-dom-eliseeva'
       },
       { name: 'Дворец Великого князя Владимира Александровича (Дом ученых)', desc: 'Великолепное палаццо на Дворцовой набережной в стиле флорентийского ренессанса, полностью сохранившее аутентичные царские залы и дубовую гостиную.', mustSeeFilter: 'mansions',
-        locationSlug: 'saint-petersburg-dvorets-velikogo-knyazya-vladimira-aleksandrovicha-dom-'
+        locationSlug: 'saint-petersburg-dvorets-velikogo-knyazya-vladimira-aleksandrovicha-dom'
       },
       { name: 'Особняк Кельха', desc: 'Один из самых дорогих частных домов города на улице Чайковского, скрывающий во дворе готический павильон, а внутри - потрясающий Белый зал с гигантским камином.', mustSeeFilter: 'mansions', locationSlug: 'saint-petersburg-osobnyak-kelha' },
       { name: 'Особняк Брусницыных', desc: 'Особняк на Кожевенной линии: за сдержанным фасадом - парадные залы в духе ренессанса и богатая история дома.', mustSeeFilter: 'mansions',
@@ -930,6 +930,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
             transitTip: 'Старт у Невы - Сенатская площадь'
           }),
           spbPresetStop('Адмиралтейство', {
+            locationSlug: 'saint-petersburg-admiralteystvo',
             desc: 'Колыбель российского флота со знаменитым позолоченным шпилем-иглой и корабликом-флюгером. Фасад украшен монументальной классической скульптурой.'
           }),
           spbPresetStop('Александровский сад', {
@@ -938,11 +939,13 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           }),
           spbPresetStop('Исаакиевский собор', {
             dayRouteId: 'spb-isaakievskiy-sobor',
+            locationSlug: 'saint-petersburg-isaakievskiy-sobor',
             latitude: 59.9343,
             longitude: 30.3061,
             desc: 'Крупнейший православный храм Петербурга, на возведение которого ушло 40 лет. Внутри поражает отделкой из малахита, лазурита и мозаик.'
           }),
           spbPresetStop('Колоннада Исаакия', {
+            locationSlug: 'saint-petersburg-kolonnada-isaakiya',
             desc: 'Лучшая смотровая в центре на высоте 43 метров - круговая панорама на 360 градусов. Поднимайтесь сейчас, если ясно и без длинной очереди.',
             transitTip: 'Колоннада при хорошей видимости - иначе в другой день'
           }),
@@ -951,6 +954,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
             transitTip: 'Коротко к Синему мосту'
           }),
           spbPresetStop('Большая Морская', {
+            locationSlug: 'saint-petersburg-bolshaya-morskaya',
             desc: 'Фешенебельная историческая улица, где селились ювелиры и банкиры. Здесь дом Фаберже и старейшие кондитерские; гастро-пауза у Литературного кафе.',
             transitTip: 'По Большой Морской; гастро у Литературного кафе'
           }),
@@ -961,10 +965,12 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
             desc: 'Главная площадь города, превосходящая по размерам Красную площадь в Москве. В центре - 600-тонная Александровская колонна, удерживаемая только собственным весом.'
           }),
           spbPresetStop('Эрмитаж', {
+            venueSlug: 'ermitazh',
             desc: 'Один из величайших художественных музеев мира в Зимнем дворце. Хранит миллионы шедевров от античности до Леонардо. Один музейный блок 2-3 часа - второй день для другого крыла.',
             transitTip: 'Один музей 2-3 часа - второй день для Зимнего'
           }),
           spbPresetStop('Главный штаб (Эрмитаж)', {
+            venueSlug: 'saint-petersburg-glavnyy-shtab-ermitazh',
             desc: 'Арка и восточное крыло - альтернатива Зимнему, если Эрмитаж оставляете на другой день.',
             transitTip: 'Через арку - если Эрмитаж пропускаете'
           }),
@@ -3657,6 +3663,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         mustSeeFilter: 'main'
         },
       { name: 'Здание Кёнигсбергской биржи', desc: 'Шедевр неоренессанса на берегу Преголи, построенный по проекту знаменитого архитектора Генриха Мюллера',
+        locationSlug: 'kaliningrad-kenigsbergskaya-birzha',
         mustSeeFilter: 'main'
       },
       { name: 'Дом Советов', desc: 'Легендарный и монументальный долгострой в стиле брутализма, возведенный на месте разрушенного Королевского замка (главный символ советского периода)',

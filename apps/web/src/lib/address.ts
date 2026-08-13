@@ -234,12 +234,34 @@ function stripInstitutionPrefix(parts: string[], city?: string | null): string[]
   return street.split(',').map((part) => part.trim()).filter(Boolean);
 }
 
+/** Yandex/2GIS bilingual: «Дворцовая наб., 34///Dvortsovaya Emb., 34» → Russian only. */
+export function stripBilingualAddressTail(value: string): string {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+  const beforeSlash = raw.split(/\s*\/\/\/\s*/)[0]?.trim() || '';
+  const withoutLatinTail = beforeSlash
+    .replace(/\s*\/\s*[A-Za-z][A-Za-z0-9 .,'’\-]*$/u, '')
+    .trim();
+  const parts = withoutLatinTail
+    .split(',')
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .filter((part) => {
+      const letters = part.replace(/[^A-Za-zА-Яа-яЁё]/g, '');
+      if (!letters) return true;
+      const latin = (part.match(/[A-Za-z]/g) || []).length;
+      const cyr = (part.match(/[А-Яа-яЁё]/g) || []).length;
+      return cyr >= latin;
+    });
+  return parts.join(', ') || withoutLatinTail;
+}
+
 export function formatStreetAddress(
   address: string | null | undefined,
   options?: FormatStreetAddressOptions,
 ): string {
   if (!address) return '';
-  const trimmed = address.replace(/\s+/g, ' ').trim();
+  const trimmed = stripBilingualAddressTail(address.replace(/\s+/g, ' ').trim());
   if (!trimmed) return '';
 
   const parts = trimmed

@@ -5316,7 +5316,6 @@ function DayRouteVenueCard({
   const thumbUrl = resolveDayRouteStopImage(venue) || fallbackImageUrl || null;
   const chip = classifyDayRouteCommercialChip(venue);
   const showStatusChip = chip.kind !== 'free';
-  const priceChipLabel = dayRouteStopPriceChipLabel(venue);
   const buyCtaLabel = formatDayRouteBuyCtaLabel(venue);
   const buyOfferChip = formatDayRouteOfferChip({
     title: venue.title,
@@ -5369,6 +5368,7 @@ function DayRouteVenueCard({
     <span className={titleClass}>{venue.title}</span>
   );
   const resolvedTypeTag = String(typeTag || '').trim() || null;
+  const priceChipLabel = dayRouteStopPriceChipLabel(venue, resolvedTypeTag);
   const softTimeNode = softTimeLabel ? (
     <p className="m-0 text-[12px] font-semibold text-primary-700" data-day-soft-time>
       {softTimeLabel}
@@ -5637,9 +5637,11 @@ function DayRouteVenueCard({
                     {sessionDisplay}
                   </span>
                 ) : null}
-                <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
-                  {priceChipLabel}
-                </span>
+                {priceChipLabel ? (
+                  <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
+                    {priceChipLabel}
+                  </span>
+                ) : null}
                 <span className="text-xs text-slate-500">{dwellSoftLabel}</span>
                 {venue.note && !textStop ? (
                   <span className="line-clamp-1 text-xs text-slate-500">{venue.note}</span>

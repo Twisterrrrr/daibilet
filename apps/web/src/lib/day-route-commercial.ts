@@ -474,6 +474,26 @@ export function matchIsSingleVenueAdmission(match: DayRouteMatchOfferStub): bool
   return true;
 }
 
+/** Ballet / concert / show: nearby recs OK, never a stand-in for museum admission. */
+const SHOW_OFFER_TITLE_RE =
+  /балет|спектакл|концерт|опера|мюзикл|стендап|шоу\b|гала|фестиваль|лебедин|swan/i;
+const LANDMARK_STOP_TITLE_RE =
+  /музей|эрмитаж|собор|храм|колоннад|дворц|галере|кремл/i;
+const ADMISSION_OFFER_TITLE_RE =
+  /вход|посещен|экскурси|билет в|колоннад|смотров|абонемент/i;
+
+export function matchLooksLikeShowOffer(match: Pick<DayRouteMatchOfferStub, 'title'>): boolean {
+  return SHOW_OFFER_TITLE_RE.test(String(match.title || ''));
+}
+
+function stopLooksLikeLandmarkPlace(venue: Pick<DayRouteVenueItem, 'title'>): boolean {
+  return LANDMARK_STOP_TITLE_RE.test(String(venue.title || ''));
+}
+
+function matchLooksLikeAdmissionOffer(match: Pick<DayRouteMatchOfferStub, 'title'>): boolean {
+  return ADMISSION_OFFER_TITLE_RE.test(String(match.title || ''));
+}
+
 export type DayRouteBuyCtaParts = {
   /** Main action line, e.g. «Купить билет» - never includes price. */
   action: string;
@@ -599,9 +619,12 @@ export function pickAdmissionMatchForStop(
   if (dayRouteStopHasTicket(venue)) return null;
   const keys = venueLocatorKeys(venue);
   if (!keys.size) return null;
+  const landmark = stopLooksLikeLandmarkPlace(venue);
   const candidates = matches.filter((m) => {
     if (!matchIsPurchaseReady(m)) return false;
     if (!matchIsSingleVenueAdmission(m)) return false;
+    if (matchLooksLikeShowOffer(m)) return false;
+    if (landmark && !matchLooksLikeAdmissionOffer(m)) return false;
     return coveredIncludes(m.covered, keys).start;
   });
   if (!candidates.length) return null;
@@ -663,7 +686,7 @@ export function pickNearbyUpsellsForStop(
     if (!matchIsPurchaseReady(match)) continue;
     const hit = coveredIncludes(match.covered, keys);
     if (!hit.stop && !hit.start && !hit.nearby) continue;
-    if (matchIsSingleVenueAdmission(match) && hit.start) continue;
+    if (matchIsSingleVenueAdmission(match) && hit.start && !matchLooksLikeShowOffer(match)) continue;
     let roleScore = 0;
     if (hit.stop) roleScore = 3;
     else if (hit.start) roleScore = 2;
@@ -723,6 +746,32 @@ export function applyMatchCommerceToVenues(
       const knownSaleable =
         (eventId && saleableIds.has(eventId)) || (eventSlug && saleableSlugs.has(eventSlug));
       if (isVenueHostedEvent && !knownSaleable) {
+        changed = true;
+        current = {
+          ...current,
+          eventId: null,
+          eventSlug: null,
+          ticketUrl: null,
+          priceFromRub: null,
+        };
+      }
+
+      const gluedId = String(current.eventId || '').trim();
+      const gluedSlug = String(current.eventSlug || '').trim();
+      const stillHosted =
+        Boolean(gluedId || gluedSlug) &&
+        gluedId !== stopId &&
+        gluedSlug !== stopId &&
+        (!stopSlug || (gluedSlug !== stopSlug && gluedId !== stopSlug));
+      const gluedMatch = matches.find(
+        (m) => (gluedId && m.eventId === gluedId) || (gluedSlug && m.slug === gluedSlug),
+      );
+      if (
+        stillHosted &&
+        stopLooksLikeLandmarkPlace(current) &&
+        gluedMatch &&
+        matchLooksLikeShowOffer(gluedMatch)
+      ) {
         changed = true;
         current = {
           ...current,

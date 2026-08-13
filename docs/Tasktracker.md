@@ -13,6 +13,7 @@
 | UX.MYDAY-NEARBY-FOOT | «События поблизости» из picker «Выбор Дайбилет» → низ маршрута, 3 + показать ещё | Высокий | ✅ live `31694312986` BUILD_ID=`DNWhE8Cu-cNOGBAQRWMDI` |
 | UX.MYDAY-TOOLBAR-ADAPT | Toolbar маршрута: wrapping как Lovable; export на ту же строку когда колонка широкая | Высокий | ✅ 2026-08-13; live после Deploy MSK web |
 | UX.MYDAY-STOP-HOVER-TICKET | Номер точки: белый invert + scale на hover; «Билеты от» внутри карточки, не под ней | Высокий | ✅ 2026-08-13; live после Deploy MSK web |
+| UX.MYDAY-STOP-PLACE-NOT-EVENT | Стоп = место (Адмиралтейство≠причал, Эрмитаж≠балет); «Вход свободный» только outdoor; адрес без `///` EN | Высокий | ✅ 2026-08-13; live после Deploy MSK web |
 
 ## Nav «Места» hub (2026-08-13)
 

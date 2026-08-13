@@ -148,14 +148,42 @@ function findVenueForPlace(
   if (!placeName || !venues.length) return null;
   const placeBlob = `${placeName} ${place.address || ''} ${place.desc || ''}`.toLowerCase();
   const wantsKronstadt = /кронштадт|якорн/.test(placeBlob);
-  return (
-    venues.find((venue) => {
-      if (!namesLooselyMatch(placeName, venue.title || venue.name)) return false;
-      // Central «Никольский морской / Богоявленский» must not glue to Kronstadt (Якорная).
-      if (!wantsKronstadt && isKronstadtNavalCathedralVenue(venue)) return false;
-      return true;
-    }) || null
-  );
+  const wantsPier = /причал|пристан|\bпирс\b/.test(placeBlob);
+  const matches = venues.filter((venue) => {
+    if (!namesLooselyMatch(placeName, venue.title || venue.name)) return false;
+    if (!wantsKronstadt && isKronstadtNavalCathedralVenue(venue)) return false;
+    if (!wantsPier && isPierishVenue(venue)) return false;
+    return true;
+  });
+  if (!matches.length) return null;
+  matches.sort((a, b) => rankNameMatch(placeName, a) - rankNameMatch(placeName, b));
+  return matches[0] || null;
+}
+
+function isPierishVenue(
+  venue: Pick<DayRouteVenueMatchSource, 'type' | 'name' | 'title' | 'slug'>,
+): boolean {
+  const type = String(venue.type || '').toLowerCase();
+  if (type.includes('pier')) return true;
+  const blob = `${venue.title || ''} ${venue.name || ''} ${venue.slug || ''}`.toLowerCase();
+  return /причал|пристан|\bпирс\b|debarcadere|pier/.test(blob);
+}
+
+function rankNameMatch(
+  placeName: string,
+  venue: Pick<DayRouteVenueMatchSource, 'name' | 'title'>,
+): number {
+  const query = String(placeName || '')
+    .toLowerCase()
+    .replace(/ё/g, 'е')
+    .trim();
+  const candidate = String(venue.title || venue.name || '')
+    .toLowerCase()
+    .replace(/ё/g, 'е')
+    .trim();
+  if (query === candidate) return 0;
+  if (candidate.startsWith(query) || query.startsWith(candidate)) return 1;
+  return 10 + Math.abs(candidate.length - query.length);
 }
 
 function isKronstadtNavalCathedralVenue(

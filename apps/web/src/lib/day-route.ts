@@ -1939,11 +1939,16 @@ export function enrichDayRouteFromMatchVenues(payloadVenues: DayRouteCoordSource
     const stubTitle =
       isDayRoutePlaceholderTitle(item.title) || item.title === item.id || item.title === item.eventId;
     if (match.title && stubTitle) next.title = match.title;
-    if (match.eventId && !item.eventId) next.eventId = match.eventId;
-    if (match.eventSlug && !item.eventSlug) next.eventSlug = match.eventSlug;
+    const placeOnly = !item.eventId && !item.eventSlug;
+    if (!placeOnly) {
+      if (match.eventId && !item.eventId) next.eventId = match.eventId;
+      if (match.eventSlug && !item.eventSlug) next.eventSlug = match.eventSlug;
+    }
     const matchImage = resolveVenueHeroImage(
       next.slug || match.slug,
-      match.heroImageUrl || match.imageUrl,
+      placeOnly && (match.eventId || match.eventSlug)
+        ? null
+        : match.heroImageUrl || match.imageUrl,
     );
     const existingImage = String(item.imageUrl || '').trim();
     if (matchImage && (!existingImage || isGeneratedVenueStub(existingImage))) {

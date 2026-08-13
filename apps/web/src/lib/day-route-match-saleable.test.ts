@@ -5,6 +5,7 @@ import { isDayRouteMatchSaleable } from '../server/day-route-match-saleable';
 import {
   applyMatchCommerceToVenues,
   pickAdmissionMatchForStop,
+  pickNearbyUpsellsForStop,
   type DayRouteMatchOfferStub,
 } from './day-route-commercial';
 import type { DayRouteVenueItem } from './day-route';
@@ -140,5 +141,67 @@ describe('day-route-commercial purchaseReady guard', () => {
     assert.equal(changed, false);
     assert.equal(venues[0]?.ticketUrl, '/events/standup-night');
     assert.equal(venues[0]?.eventId, 'evt_standup');
+  });
+});
+
+describe('landmark stops do not swallow shows as admission', () => {
+  const hermitage = stop({
+    id: 'loc_ermitazh',
+    slug: 'ermitazh',
+    title: 'Эрмитаж',
+  });
+
+  const ballet: DayRouteMatchOfferStub = {
+    eventId: 'ballet_5000',
+    slug: 'lebedinoe-ozero',
+    title: 'Лебединое озеро',
+    priceFromRub: 5000,
+    purchaseReady: true,
+    covered: { stop: [], start: ['ermitazh', 'loc_ermitazh'], nearby: [] },
+    routeVenues: [{ id: 'loc_ermitazh' }],
+  };
+
+  const museumTicket: DayRouteMatchOfferStub = {
+    eventId: 'evt_hermitage_entry',
+    slug: 'bilet-v-ermitazh',
+    title: 'Билет в Эрмитаж',
+    priceFromRub: 500,
+    purchaseReady: true,
+    covered: { stop: [], start: ['ermitazh', 'loc_ermitazh'], nearby: [] },
+    routeVenues: [{ id: 'loc_ermitazh' }],
+  };
+
+  it('does not attach ballet as museum admission', () => {
+    assert.equal(pickAdmissionMatchForStop(hermitage, [ballet]), null);
+    const { venues, changed } = applyMatchCommerceToVenues([hermitage], [ballet]);
+    assert.equal(changed, false);
+    assert.equal(venues[0]?.eventId, undefined);
+    assert.equal(venues[0]?.ticketUrl, undefined);
+    assert.equal(venues[0]?.title, 'Эрмитаж');
+  });
+
+  it('keeps museum entry tickets and puts the show in nearby recs', () => {
+    assert.equal(pickAdmissionMatchForStop(hermitage, [ballet, museumTicket])?.eventId, 'evt_hermitage_entry');
+    const nearby = pickNearbyUpsellsForStop(hermitage, [ballet, museumTicket], { limit: 3 });
+    assert.equal(nearby.some((row) => row.eventId === 'ballet_5000'), true);
+    assert.equal(nearby.some((row) => row.eventId === 'evt_hermitage_entry'), false);
+  });
+
+  it('strips a show already glued onto the museum stop', () => {
+    const poisoned = stop({
+      id: 'loc_ermitazh',
+      slug: 'ermitazh',
+      title: 'Эрмитаж',
+      eventId: 'ballet_5000',
+      eventSlug: 'lebedinoe-ozero',
+      ticketUrl: '/events/lebedinoe-ozero',
+      priceFromRub: 5000,
+    });
+    const { venues, changed } = applyMatchCommerceToVenues([poisoned], [ballet]);
+    assert.equal(changed, true);
+    assert.equal(venues[0]?.title, 'Эрмитаж');
+    assert.equal(venues[0]?.eventId, null);
+    assert.equal(venues[0]?.ticketUrl, null);
+    assert.equal(venues[0]?.priceFromRub, null);
   });
 });

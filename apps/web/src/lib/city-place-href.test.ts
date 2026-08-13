@@ -80,8 +80,10 @@ describe('namesLooselyMatch', () => {
     );
   });
 
-  it('rejects short noisy tokens', () => {
-    assert.equal(namesLooselyMatch('парк', 'Парк Горького'), false);
+  it('rejects pier/theatre extras glued onto a landmark', () => {
+    assert.equal(namesLooselyMatch('Адмиралтейство', 'Причал Адмиралтейство'), false);
+    assert.equal(namesLooselyMatch('Эрмитаж', 'Театр Эрмитажа'), false);
+    assert.equal(namesLooselyMatch('Эрмитаж', 'Государственный Эрмитаж'), true);
   });
 
   it('rejects city-name glue between mosque and MTS Live Hall', () => {

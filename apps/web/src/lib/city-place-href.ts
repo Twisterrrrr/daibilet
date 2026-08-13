@@ -59,11 +59,58 @@ function isGeoNoiseToken(token: string): boolean {
   return GEO_NOISE_TOKENS.has(token);
 }
 
+/**
+ * Extra facility words: «Адмиралтейство» must not glue to «Причал Адмиралтейство»,
+ * «Эрмитаж» must not glue to «Театр Эрмитажа» / балет.
+ */
+const EXTRA_KIND_TOKENS = [
+  'причал',
+  'пристань',
+  'пирс',
+  'дебаркадер',
+  'теплоход',
+  'катер',
+  'яхта',
+  'театр',
+  'опера',
+  'балет',
+  'спектакль',
+  'концерт',
+  'ресторан',
+  'кафе',
+  'отель',
+  'гостиница',
+  'павильон',
+];
+
+function nameTokens(value: string): string[] {
+  return normalizePlaceName(value).split(' ').filter(Boolean);
+}
+
+function tokenHasKind(token: string, kind: string): boolean {
+  return token === kind || token.startsWith(kind);
+}
+
+function hasKindToken(tokens: string[], kind: string): boolean {
+  return tokens.some((token) => tokenHasKind(token, kind));
+}
+
+/** True when the longer name adds a facility the query did not ask for. */
+export function hasExtraFacilityKind(query: string, candidate: string): boolean {
+  const queryTokens = nameTokens(query);
+  const candidateTokens = nameTokens(candidate);
+  if (!queryTokens.length || !candidateTokens.length) return false;
+  return EXTRA_KIND_TOKENS.some(
+    (kind) => hasKindToken(candidateTokens, kind) && !hasKindToken(queryTokens, kind),
+  );
+}
+
 /** Мягкое совпадение названия mustSee с venue из payload города. */
 export function namesLooselyMatch(a: string, b: string): boolean {
   const left = normalizePlaceName(a);
   const right = normalizePlaceName(b);
   if (!left || !right) return false;
+  if (hasExtraFacilityKind(a, b) || hasExtraFacilityKind(b, a)) return false;
   if (left === right) return true;
   const [shortName, longName] = left.length <= right.length ? [left, right] : [right, left];
   // Короткие токены («парк», «музей») слишком шумные для containment.

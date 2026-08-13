@@ -35,10 +35,9 @@ export function dayRouteStopTypeTag(
   if (isNoteDayRouteStop(venue)) return 'Заметка';
   if (isTextDayRouteStop(venue)) return 'Своё место';
   if (venue.isSuburb) return 'Пригород';
-  if (venue.eventId || venue.eventSlug) return 'Событие';
-  if (placeTypeTag) return String(placeTypeTag).trim() || 'Место';
-  const fromTitle = editorialTagFromTitle(venue.title);
-  if (fromTitle) return fromTitle;
+  const placeLabel = String(placeTypeTag || '').trim() || editorialTagFromTitle(venue.title);
+  if (placeLabel) return placeLabel;
+  if (Boolean(venue.eventId || venue.eventSlug)) return 'Событие';
   return 'Место';
 }
 
@@ -48,6 +47,7 @@ export function editorialTagFromTitle(title: string | null | undefined): string 
   if (!t) return null;
   if (/театр|спектакл|опera|opera|балет/.test(t)) return 'Театр';
   if (/музей|галере|выстав|экспоз/.test(t)) return 'Музей';
+  if (/^(?:государственный\s+)?эрмитаж$/.test(t)) return 'Музей';
   if (/скulpt|скульпт|арт-объект|стрит|инстал/.test(t)) return 'Арт-объект';
   if (/ресторан|кафе|бар|гастро|кухн|посикун|обед/.test(t)) return 'Еда';
   if (/парк|сквер|сад|набереж|прогул|бульвар/.test(t)) return 'Прогулка';
@@ -57,8 +57,30 @@ export function editorialTagFromTitle(title: string | null | undefined): string 
   return null;
 }
 
-/** Soft price chip copy (Lovable: «Можно купить билет» / «Вход свободный»). */
-export function dayRouteStopPriceChipLabel(venue: DayRouteVenueItem): string {
+const FREE_OUTDOOR_TITLE_RE =
+  /площад|сад\b|сквер|мост|набереж|памятник|фонтан|бульвар|проспект|всадник|аллея/i;
+const PAID_ENTRY_TITLE_RE =
+  /собор|храм|колоннад|дворц|музей|эрмитаж|театр|галере|особняк|замок|крепост|смотров|палац|выстав/i;
+const FREE_ENTRY_TAGS = new Set(['Прогулка', 'Парк', 'Арт-объект']);
+const PAID_ENTRY_TAGS = new Set(['Музей', 'Храм', 'Театр', 'Смотровая', 'Событие']);
+
+function isLikelyPaidEntry(venue: DayRouteVenueItem, typeTag?: string | null): boolean {
+  const tag = String(typeTag || dayRouteStopTypeTag(venue)).trim();
+  if (PAID_ENTRY_TAGS.has(tag)) return true;
+  return PAID_ENTRY_TITLE_RE.test(String(venue.title || ''));
+}
+
+function isLikelyFreeOutdoor(venue: DayRouteVenueItem, typeTag?: string | null): boolean {
+  const tag = String(typeTag || dayRouteStopTypeTag(venue)).trim();
+  if (FREE_ENTRY_TAGS.has(tag)) return true;
+  return FREE_OUTDOOR_TITLE_RE.test(String(venue.title || ''));
+}
+
+/** Soft price chip. Do not invent «Вход свободный» for interiors (Исаакий, колоннада, музей). */
+export function dayRouteStopPriceChipLabel(
+  venue: DayRouteVenueItem,
+  typeTag?: string | null,
+): string {
   if (venue.ticketBought) return 'Билет отмечен';
   const session = String(venue.sessionLabel || '').trim();
   if (session && /сеанс|вечерн|\d{1,2}:\d{2}/i.test(session)) {
@@ -72,7 +94,9 @@ export function dayRouteStopPriceChipLabel(venue: DayRouteVenueItem): string {
   ) {
     return 'Можно купить билет';
   }
-  return 'Вход свободный';
+  if (isLikelyPaidEntry(venue, typeTag)) return '';
+  if (isLikelyFreeOutdoor(venue, typeTag)) return 'Вход свободный';
+  return '';
 }
 
 export function formatDayRouteSoftMinutes(min: number): string {

@@ -537,6 +537,35 @@ test('enrichDayRouteFromMatchVenues fills missing address by slug', () => {
   assert.equal(next.venues[0]?.latitude, 59.9342802);
 });
 
+test('enrichDayRouteFromMatchVenues does not attach a show onto a place stop', () => {
+  mockStorage();
+  clearDayRoute();
+  addToDayRoute({
+    id: 'loc_ermitazh',
+    slug: 'ermitazh',
+    title: 'Эрмитаж',
+    href: '/venues/ermitazh',
+  });
+  const next = enrichDayRouteFromMatchVenues([
+    {
+      id: 'loc_ermitazh',
+      slug: 'ermitazh',
+      title: 'Эрмитаж',
+      latitude: 59.9398,
+      longitude: 30.3146,
+      address: 'Дворцовая наб., 34///Dvortsovaya Emb., 34',
+      eventId: 'ballet_5000',
+      eventSlug: 'lebedinoe-ozero',
+      heroImageUrl: '/images/events/ballet.jpg',
+    },
+  ]);
+  const stop = next.venues[0];
+  assert.equal(stop?.title, 'Эрмитаж');
+  assert.equal(stop?.eventId, undefined);
+  assert.equal(stop?.eventSlug, undefined);
+  assert.equal(stop?.latitude, 59.9398);
+});
+
 test('enrichDayRouteFromMatchVenues replaces event stub title + coords + image', () => {
   mockStorage();
   clearDayRoute();

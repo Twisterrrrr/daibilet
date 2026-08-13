@@ -25,12 +25,24 @@ test('dayRouteStopTypeTag classifies custom / suburb / event', () => {
   );
   assert.equal(dayRouteStopTypeTag({ id: 'v3', title: 'Площадь' }), 'Место');
   assert.equal(dayRouteStopTypeTag({ id: 'v4', title: 'Эрмитаж' }, 'Музей'), 'Музей');
+  assert.equal(
+    dayRouteStopTypeTag({
+      id: 'ermitazh',
+      slug: 'ermitazh',
+      title: 'Эрмитаж',
+      eventId: 'ballet_1',
+      eventSlug: 'lebedinoe-ozero',
+    }, 'Музей'),
+    'Музей',
+  );
 });
 
-test('dayRouteStopPriceChipLabel matches Lovable soft copy', () => {
-  assert.equal(dayRouteStopPriceChipLabel({ id: 'v1', title: 'Парк' }), 'Вход свободный');
+test('dayRouteStopPriceChipLabel does not invent free entry for interiors', () => {
+  assert.equal(dayRouteStopPriceChipLabel({ id: 'v1', title: 'Александровский сад' }), 'Вход свободный');
+  assert.equal(dayRouteStopPriceChipLabel({ id: 'v2', title: 'Исаакиевский собор' }), '');
+  assert.equal(dayRouteStopPriceChipLabel({ id: 'v3', title: 'Колоннада Исаакия' }), '');
   assert.equal(
-    dayRouteStopPriceChipLabel({ id: 'v2', title: 'Театр', ticketUrl: 'https://t.example/1' }),
+    dayRouteStopPriceChipLabel({ id: 'v4', title: 'Театр', ticketUrl: 'https://t.example/1' }),
     'Можно купить билет',
   );
 });
@@ -56,6 +68,6 @@ test('estimateDayRouteDwellMinutes skips notes', () => {
       { id: 'note_1', title: 'Пауза' },
       { id: 'v1', title: 'Парк' },
     ]),
-    60,
+    30,
   );
 });

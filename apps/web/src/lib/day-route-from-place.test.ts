@@ -148,6 +148,40 @@ test('dayRouteHookLine truncates only when maxLen is set', () => {
   assert.ok((line as string).endsWith('...'));
 });
 
+test('dayRouteItemFromMustSee does not glue Admiralty building to a pier', () => {
+  const pier = {
+    id: 'venue_pier',
+    slug: 'prichal-admiralteystvo',
+    name: 'Причал Адмиралтейство',
+    title: 'Причал Адмиралтейство',
+    type: 'pier',
+    latitude: 59.938,
+    longitude: 30.308,
+    address: 'Адмиралтейская наб., 2',
+  };
+  const building = {
+    id: 'loc_adm',
+    slug: 'saint-petersburg-admiralteystvo',
+    name: 'Адмиралтейство',
+    title: 'Адмиралтейство',
+    type: 'attraction',
+    latitude: 59.9374,
+    longitude: 30.3085,
+    address: 'Адмиралтейский проезд, 1',
+  };
+  const fuzzy = dayRouteItemFromMustSee({ name: 'Адмиралтейство', desc: 'Шпиль' }, [pier, building], city);
+  assert.ok(fuzzy);
+  assert.equal(fuzzy!.slug, 'saint-petersburg-admiralteystvo');
+  const pinned = dayRouteItemFromMustSee(
+    { name: 'Адмиралтейство', desc: 'Шпиль', locationSlug: 'saint-petersburg-admiralteystvo' },
+    [pier],
+    city,
+  );
+  assert.ok(pinned);
+  assert.equal(pinned!.slug, 'saint-petersburg-admiralteystvo');
+  assert.notEqual(pinned!.id, pier.id);
+});
+
 test('dayRouteItemFromMustSee resolves venueSlug + coords + address', () => {
   const item = dayRouteItemFromMustSee(
     { name: 'Эрмитаж', desc: 'Музей', venueSlug: 'ermitazh' },
