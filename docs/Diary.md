@@ -1,3 +1,17 @@
+## 2026-08-13 - /places: description без города при slug
+
+### Наблюдения
+- Owner: в meta description `/places?city=` нет города. H1/title брали cityName; при slug без резолва destinations (или soft-fail) description уходил в национальный шаблон «по городам России».
+
+### Решения
+- `buildPlacesListingCopy` / SEO: город из `cityName` или slug через `cityToNominative` → родительный в description.
+- `generateMetadata`: fallback slug→имя, если destinations не отдали match.
+
+### Проблемы
+- Нет. Live после Deploy MSK web / «выкатывай».
+
+---
+
 ## 2026-08-13 - Live: Deploy MSK web `31719561762`
 
 ### Наблюдения
