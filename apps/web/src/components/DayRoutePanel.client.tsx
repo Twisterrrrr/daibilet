@@ -38,6 +38,7 @@ import {
   MyDayMapFullScreen,
   MyDayMobileMapSheet,
   MyDayScheduleBanner,
+  MyDaySavedScenariosRail,
   MyDayShell,
   MyDayToolbar,
   useMyDayController,
@@ -224,6 +225,7 @@ import { MyDaySaveScenarioDialog } from '@/components/my-day/MyDaySaveScenarioDi
 import { exportDayRoutePdfWithMap } from '@/lib/day-route-pdf';
 import {
   applyDayRouteScenario,
+  filterDayRouteScenariosByCity,
   readDayRouteScenarios,
   removeDayRouteScenario,
   saveDayRouteScenario,
@@ -901,6 +903,20 @@ function DayRoutePanelInner() {
   const scopeCityName = cityTitle || pageCityName;
   const scopeCitySlug = citySlug || pageCitySlug;
   const scopeCityParam = scopeCityName || scopeCitySlug;
+  const cityScenarios = useMemo(
+    () => filterDayRouteScenariosByCity(savedScenarios, scopeCitySlug),
+    [savedScenarios, scopeCitySlug],
+  );
+  const activeSavedScenarioId = useMemo(() => {
+    if (!route.venues.length) return null;
+    try {
+      const path = buildDayRouteSharePath(route.venues, { citySlug: scopeCitySlug || null });
+      const items = new URL(path, 'https://daibilet.ru').searchParams.get('items') || '';
+      return cityScenarios.find((row) => row.items === items)?.id ?? null;
+    } catch {
+      return null;
+    }
+  }, [route.venues, scopeCitySlug, cityScenarios]);
   const catalogCityDest = useMemo(() => {
     const slug = citySlug || pageCitySlug;
     const name = cityTitle || pageCityName;
@@ -2437,7 +2453,13 @@ function DayRoutePanelInner() {
     setHourStart(scenario.hourStart);
     setHourEnd(scenario.hourEnd);
     setHourPlanOn(scenario.hourPlanOn);
+    setPickerOpen(false);
     setDndAnnounce(`Сценарий «${scenario.name}» загружен.`);
+  }
+
+  function removeSavedScenario(scenario: DayRouteSavedScenario) {
+    removeDayRouteScenario(scenario.id);
+    refreshScenarios();
   }
 
   function openInsertPlaceAfter(afterVenueId: string) {
@@ -2539,7 +2561,8 @@ function DayRoutePanelInner() {
   const mustSeeOpen = openPanel === 'mustSee';
   const showMustSeeAccordion = Boolean(hasCatalogCity && (mustSeeResolved.length > 0 || (!catalogLoading && catalogCitySlug)));
   const showScenariosGuide = Boolean(
-    hasCatalogCity && (hasNamedPresets || mustSeePlaces.length >= 3),
+    hasCatalogCity &&
+      (hasNamedPresets || mustSeePlaces.length >= 3 || cityScenarios.length > 0),
   );
   const showSuburbsGuide = Boolean(hasCatalogCity && significantSuburbs.length > 0);
   const showHotPicks = Boolean(hasCatalogCity && (hotPickCards.length > 0 || hotPickTabIds.length > 0));
@@ -3564,6 +3587,17 @@ function DayRoutePanelInner() {
         </div>
       ) : null}
 
+      {cityScenarios.length ? (
+        <div className="mt-3 lg:mt-4">
+          <MyDaySavedScenariosRail
+            scenarios={cityScenarios}
+            activeId={activeSavedScenarioId}
+            onLoad={loadScenario}
+            onRemove={removeSavedScenario}
+          />
+        </div>
+      ) : null}
+
       {/* Mobile shelf tabs - only empty day (Lovable: no dual tabs when route exists) */}
       {!route.venues.length && hasCatalogCity && pickerTabs.length ? (
         <div
@@ -4154,39 +4188,15 @@ function DayRoutePanelInner() {
               embedded
             />
           </div>
-          {savedScenarios.length ? (
-            <div className="mt-4 border-t border-slate-100 pt-3" data-day-saved-scenarios>
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Мои сценарии
-              </p>
-              <ul className="mt-2 space-y-1.5">
-                {savedScenarios.slice(0, 8).map((scenario) => (
-                  <li
-                    key={scenario.id}
-                    className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-2"
-                  >
-                    <button
-                      type="button"
-                      onClick={() => loadScenario(scenario)}
-                      className="min-w-0 flex-1 truncate text-left text-sm font-semibold text-slate-800 hover:text-primary-700"
-                    >
-                      {scenario.name}
-                    </button>
-                    <button
-                      type="button"
-                      aria-label={`Удалить сценарий ${scenario.name}`}
-                      onClick={() => {
-                        removeDayRouteScenario(scenario.id);
-                        refreshScenarios();
-                      }}
-                      className="grid h-7 w-7 place-items-center rounded-full text-slate-400 hover:bg-white hover:text-slate-700"
-                    >
-                      <X className="h-3.5 w-3.5" />
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
+          {cityScenarios.length ? (
+            <MyDaySavedScenariosRail
+              variant="picker"
+              className="mt-4"
+              scenarios={cityScenarios}
+              activeId={activeSavedScenarioId}
+              onLoad={loadScenario}
+              onRemove={removeSavedScenario}
+            />
           ) : null}
         </section>
       ) : null}

@@ -78,6 +78,22 @@ export function writeDayRouteScenarios(list: DayRouteSavedScenario[]): void {
   }
 }
 
+export function filterDayRouteScenariosByCity(
+  list: DayRouteSavedScenario[],
+  citySlug?: string | null,
+): DayRouteSavedScenario[] {
+  const key = String(citySlug || '')
+    .trim()
+    .toLowerCase();
+  if (!key) return list;
+  return list.filter((row) => {
+    const slug = String(row.citySlug || '')
+      .trim()
+      .toLowerCase();
+    return !slug || slug === key;
+  });
+}
+
 export function saveDayRouteScenario(input: {
   name: string;
   citySlug?: string | null;
