@@ -1,14 +1,15 @@
+'use client';
+
 import Link from 'next/link';
-import { ArrowRight, Clock, MapPin, Train } from 'lucide-react';
+import { MapPin, Star, Ticket } from 'lucide-react';
 
 import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
+import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { formatStreetAddress } from '@/lib/address';
 import { dayRouteHookLine } from '@/lib/day-route-from-place';
 import { pluralEvents } from '@/lib/format';
-import { venueTypeIcon, venueTypeLabel, normalizeVenueKind } from '@/lib/venue-meta';
-import type { PublicVenueDto } from '@daibilet/contracts/public';
-import { nonEmptyLogisticsText } from '@/components/VenueLogisticsBlock';
-import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
+import type { VenueCatalogCard } from '@/lib/venue-map-types';
+import { resolvePublicVenueType, venueTypeLabel, normalizeVenueKind } from '@/lib/venue-meta';
 
 const TYPE_GRADIENT: Record<string, string> = {
   pier: 'from-sky-500 via-cyan-600 to-sky-800',
@@ -19,6 +20,7 @@ const TYPE_GRADIENT: Record<string, string> = {
   outdoor_location: 'from-emerald-600 via-green-700 to-emerald-950',
   attraction: 'from-slate-600 via-slate-700 to-slate-900',
   sport_activity_space: 'from-orange-600 via-red-600 to-rose-800',
+  gastro: 'from-amber-700 via-orange-800 to-slate-950',
   venue: 'from-primary-600 via-primary-700 to-slate-900',
 };
 
@@ -46,6 +48,12 @@ function sameAddressLabel(a: string, b: string): boolean {
   return Boolean(a && b && norm(a) === norm(b));
 }
 
+function realRating(value: unknown): number | null {
+  const n = Number(value);
+  if (!Number.isFinite(n) || n <= 0) return null;
+  return Math.round(n * 10) / 10;
+}
+
 /** Minimal technical line when editorial hook/shortDescription is empty. */
 function technicalLocationBlurb(kind: string, typeLabel: string): string {
   switch (kind) {
@@ -68,81 +76,49 @@ function technicalLocationBlurb(kind: string, typeLabel: string): string {
   }
 }
 
-/** Prefer full sentences; never cut mid-word with a bare ellipsis. */
-function cardBlurbText(raw: string, maxChars = 140): string {
-  const text = String(raw || '')
-    .replace(/\s+/g, ' ')
-    .trim();
-  if (!text) return '';
-  if (text.length <= maxChars) return text;
-
-  const window = text.slice(0, maxChars + 1);
-  const sentenceEnd = Math.max(window.lastIndexOf('. '), window.lastIndexOf('! '), window.lastIndexOf('? '));
-  if (sentenceEnd >= Math.floor(maxChars * 0.45)) {
-    return text.slice(0, sentenceEnd + 1).trim();
-  }
-  const space = window.lastIndexOf(' ');
-  const cut = space > 40 ? space : maxChars;
-  const clipped = text.slice(0, cut).trim().replace(/[.,;:]+$/u, '');
-  return `${clipped}.`;
-}
-
 export function LocationCard({
   venue,
   href,
-  nextSlot,
   hideCity = false,
+  showFamilyTag = false,
 }: {
-  venue: Pick<
-    PublicVenueDto,
-    | 'id'
-    | 'slug'
-    | 'name'
-    | 'title'
-    | 'city'
-    | 'citySlug'
-    | 'events'
-    | 'type'
-    | 'address'
-    | 'metroStation'
-    | 'heroImageUrl'
-    | 'hookFact'
-    | 'shortDescription'
-    | 'stopEventCount'
-    | 'latitude'
-    | 'longitude'
-  > & {
-    cityId?: string | null;
-  };
+  venue: VenueCatalogCard;
   href: string;
-  nextSlot?: string | null;
-  /** When catalog is already city-scoped, omit city from the address line. */
+  /** When catalog is already city-scoped, omit city from the meta line. */
   hideCity?: boolean;
+  /** Mixed /places grid: show «Локация» on the photo. */
+  showFamilyTag?: boolean;
 }) {
   const kind = normalizeVenueKind(venue.type);
-  const heroUrl = String(venue.heroImageUrl || '').trim();
-  const showPhoto = Boolean(heroUrl);
-  const TypeIcon = venueTypeIcon(venue.type);
-  const typeLabel = venueTypeLabel(venue.type);
-  const gradient = TYPE_GRADIENT[venue.type] || 'from-sky-500 via-primary-600 to-slate-800';
+  const publicType = resolvePublicVenueType(venue.type, venue.name);
+  const typeLabel = venueTypeLabel(publicType, venue.name);
+  const gradient = TYPE_GRADIENT[kind] || TYPE_GRADIENT[venue.type] || 'from-slate-700 via-slate-800 to-slate-950';
   const street = formatStreetAddress(venue.address, { city: venue.city });
-  const cityLabel = String(venue.city || '').trim() || null;
-  const metro = nonEmptyLogisticsText(venue.metroStation);
-  const stopCount = Number(venue.stopEventCount ?? 0);
-  const activityCount = stopCount > 0 ? stopCount : Number(venue.events || 0);
+  const displayName = stripBoardingPlacePrefix(venue.name);
+  const routeTitle = displayName;
   const editorialHook = dayRouteHookLine({
     hookFact: venue.hookFact,
     shortDescription: venue.shortDescription,
   });
-  const blurb = cardBlurbText(editorialHook || technicalLocationBlurb(kind, typeLabel));
-  const displayName = stripBoardingPlacePrefix(venue.name);
-  const routeTitle = stripBoardingPlacePrefix(venue.title || venue.name);
+  const blurb = editorialHook || technicalLocationBlurb(kind, typeLabel);
+  const rating = realRating(venue.rating);
+  const upcoming = venue.upcomingTitles?.filter(Boolean).slice(0, 3) || [];
+  const showMiniAfisha = upcoming.length > 0;
+  const stopCount = Number(venue.stopEventCount ?? 0);
+  const ownEvents = Number(venue.events || 0);
+  const stopOrEventsLabel =
+    stopCount > 0 && stopCount >= ownEvents
+      ? `${stopCount} в маршрутах`
+      : ownEvents > 0
+        ? pluralEvents(ownEvents)
+        : null;
+  const cityLabel = String(venue.city || '').trim();
+  const metaLine = [typeLabel, hideCity ? null : cityLabel || null]
+    .filter(Boolean)
+    .join(' · ')
+    .toUpperCase();
   const showStreet = Boolean(street) && !sameAddressLabel(street, displayName);
-  const placeLine = hideCity
-    ? showStreet
-      ? street
-      : null
-    : [showStreet ? street : null, cityLabel].filter(Boolean).join(' · ') || null;
+  const addressLine = showStreet ? street : hideCity ? null : cityLabel || null;
 
   const dayRouteVenue = {
     id: venue.id,
@@ -159,97 +135,100 @@ export function LocationCard({
   };
 
   return (
-    <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition-shadow duration-300 hover:shadow-md">
-      <div
-        className={`relative aspect-[16/10] w-full shrink-0 overflow-hidden ${
-          showPhoto ? 'bg-slate-900' : `bg-gradient-to-br ${gradient}`
-        }`}
-      >
+    <div className="group relative flex h-full flex-col overflow-hidden rounded-card bg-white shadow-card transition duration-300 hover:-translate-y-0.5 hover:shadow-card-hover">
+      <div className="relative aspect-video shrink-0 overflow-hidden bg-surface-muted">
         <Link href={href} className="absolute inset-0 no-underline" aria-label={displayName}>
-          {showPhoto ? (
-            <SafeImage
-              src={heroUrl}
-              alt=""
-              fill
-              sizes={IMAGE_SIZES.institutionCard}
-              className="object-cover object-center transition duration-300 group-hover:scale-[1.03]"
-            />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center text-white">
-              <TypeIcon className="h-10 w-10 opacity-95" strokeWidth={1.75} />
-            </div>
-          )}
+          <SafeImage
+            src={venue.heroImageUrl}
+            alt=""
+            fill
+            sizes={IMAGE_SIZES.institutionCard}
+            className="object-cover transition duration-500 group-hover:scale-[1.03]"
+            fallback={<div className={`h-full w-full bg-gradient-to-br ${gradient}`} />}
+          />
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent" />
         </Link>
-        <span className="pointer-events-none absolute left-2.5 top-2.5 z-[1] rounded-md border border-white/20 bg-black/35 px-2 py-0.5 text-[11px] font-medium tracking-wide text-white/95 backdrop-blur-md">
-          {typeLabel}
-        </span>
+
+        {showFamilyTag ? (
+          <span className="pointer-events-none absolute left-2.5 top-2.5 z-[1] rounded-md border border-white/20 bg-black/35 px-2 py-0.5 text-[11px] font-medium tracking-wide text-white/95 backdrop-blur-md">
+            Локация
+          </span>
+        ) : null}
+
+        <div
+          className="absolute right-2 top-2 z-[2]"
+          onClick={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+          }}
+          onPointerDown={(event) => {
+            event.stopPropagation();
+          }}
+        >
+          <AddToDayRouteButton
+            key={venue.id}
+            compact
+            iconOnly
+            variant="overlay"
+            className="!min-h-8 !w-8 !rounded-full !p-0 !text-slate-700"
+            venue={dayRouteVenue}
+          />
+        </div>
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col gap-3 p-4 sm:p-5">
-        <div className="min-w-0 flex-1">
-          <h3 className="line-clamp-2 font-display text-base font-semibold leading-snug tracking-tight text-slate-900">
-            <Link href={href} className="no-underline transition-colors hover:text-primary-700">
-              {displayName}
-            </Link>
+      <Link href={href} className="flex min-h-0 flex-1 flex-col no-underline">
+        <div className="flex flex-1 flex-col gap-2.5 p-4 sm:p-5">
+          {metaLine ? (
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-graphite-muted sm:text-[11px]">
+              {metaLine}
+            </p>
+          ) : null}
+
+          <h3 className="line-clamp-2 font-display text-base font-semibold leading-snug text-graphite group-hover:text-primary-600">
+            {displayName}
           </h3>
 
-          {blurb ? (
-            <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-slate-600">{blurb}</p>
-          ) : null}
-
-          {metro ? (
-            <div className="mt-2 flex items-center gap-1.5 text-xs text-slate-500">
-              <Train className="h-3.5 w-3.5 shrink-0 text-slate-400" />
-              <span className="truncate">{metro}</span>
-            </div>
-          ) : null}
-
-          {nextSlot ? (
-            <div className="mt-2 inline-flex w-fit items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
-              <Clock className="h-3 w-3" />
-              Ближайший старт: {nextSlot}
-            </div>
-          ) : null}
-        </div>
-
-        <div className="mt-auto space-y-3 border-t border-slate-100 pt-3">
-          {placeLine ? (
-            <div className="flex min-w-0 items-center gap-1 text-xs text-slate-500">
-              <MapPin className="h-3.5 w-3.5 shrink-0 text-slate-400" />
-              <span className="truncate">{placeLine}</span>
-            </div>
-          ) : null}
-
-          <div className="flex items-center justify-between gap-2">
-            <div
-              onClick={(event) => {
-                event.preventDefault();
-                event.stopPropagation();
-              }}
-              onPointerDown={(event) => {
-                event.stopPropagation();
-              }}
-            >
-              <AddToDayRouteButton
-                key={venue.id}
-                compact
-                className="!min-h-8 !gap-1 !rounded-lg !px-2.5 !py-1.5 !text-[11px] !font-medium"
-                venue={dayRouteVenue}
-              />
-            </div>
-            {activityCount > 0 ? (
-              <Link
-                href={href}
-                className="inline-flex shrink-0 items-center gap-0.5 text-xs font-medium text-primary-700 no-underline hover:text-primary-800 hover:underline"
-              >
-                {pluralEvents(activityCount)}
-                <ArrowRight className="h-3 w-3" aria-hidden />
-              </Link>
+          <div className="flex min-w-0 items-center gap-1.5 text-sm text-graphite-muted">
+            <MapPin className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
+            <span className="truncate">{addressLine || 'Адрес уточняется'}</span>
+            {rating != null ? (
+              <span className="ml-auto inline-flex shrink-0 items-center gap-0.5 text-xs font-medium text-graphite-muted">
+                <Star className="h-3 w-3" strokeWidth={1.75} />
+                {rating}
+              </span>
             ) : null}
           </div>
+
+          {blurb ? (
+            <p className="line-clamp-2 text-xs leading-relaxed text-graphite-muted">{blurb}</p>
+          ) : null}
+
+          {showMiniAfisha ? (
+            <ul className="mt-0.5 space-y-1 border-t border-slate-100 pt-2.5">
+              {upcoming.map((title) => (
+                <li key={title} className="line-clamp-1 text-xs text-slate-600">
+                  <span className="mr-1.5 inline-block h-1 w-1 rounded-full bg-primary-500 align-middle" />
+                  {title}
+                </li>
+              ))}
+            </ul>
+          ) : null}
+
+          <div className="mt-auto flex items-end justify-between gap-3 pt-1">
+            <div>
+              {venue.eventsPending ? (
+                <div className="mt-0.5 h-4 w-20 animate-pulse rounded bg-slate-100" aria-hidden />
+              ) : stopOrEventsLabel ? (
+                <div className="text-sm font-semibold text-graphite">{stopOrEventsLabel}</div>
+              ) : null}
+            </div>
+            <span className="inline-flex items-center gap-1.5 rounded-lg bg-primary-600 px-3 py-1.5 text-xs font-semibold text-white transition group-hover:bg-primary-700">
+              <Ticket className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden />
+              Афиша
+            </span>
+          </div>
         </div>
-      </div>
-    </article>
+      </Link>
+    </div>
   );
 }

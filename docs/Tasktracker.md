@@ -1,8 +1,15 @@
+## Places hub: unified cards + scope toggle (2026-08-13)
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| UX.PLACES-CARD-UNIFY | Карточки локаций на `/places` как площадки: overlay «в маршрут», тип над названием, адрес над описанием, синяя Афиша справа | Высокий | ✅ 2026-08-13 code; live после Deploy MSK web |
+| UX.PLACES-SCOPE-TOGGLE | Тоггл: Показывать все / Только площадки / Только локации / Только с событиями (`family`, `hasEvents=1`) | Высокий | ✅ 2026-08-13 code; live после Deploy MSK web |
+
 ## Places hub: hide family split (2026-08-13)
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| UX.PLACES-NO-FAMILY-DOORS | Не показывать два каталога institution/location; один `/places?city=` | Высокий | ✅ 2026-08-13 code; live после Deploy MSK web |
+| UX.PLACES-NO-FAMILY-DOORS | Не два каталога; один `/places?city=`. Family - внутренний kind + тоггл фильтра, не отдельные входы | Высокий | ✅ 2026-08-13 code; live после Deploy MSK web |
 | UX.PLACES-CHIPS-WRAP | Чипы типов на `/places` переносить, не обрезать справа | Высокий | ✅ 2026-08-13 code; live после Deploy MSK web |
 
 ## Mobile scroll trapped on event/article rails (2026-08-13)

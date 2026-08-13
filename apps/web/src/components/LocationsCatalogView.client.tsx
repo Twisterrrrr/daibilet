@@ -465,7 +465,6 @@ export function LocationsCatalogView({
             key={venue.id}
             venue={venue}
             href={venueHref(venue)}
-            nextSlot={venue.nextSlot}
             hideCity={hideCityOnCards}
           />
         ))}

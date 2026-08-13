@@ -50,4 +50,11 @@ test('places listing canonical indexes hub, city and family; noindexes thin filt
   });
   assert.equal(typed.canonicalPath, '/places?city=moscow');
   assert.equal(typed.indexable, false);
+
+  const withEvents = buildPlacesListingSeo({
+    citySlug: 'perm',
+    hasEvents: '1',
+  });
+  assert.equal(withEvents.canonicalPath, '/places?city=perm');
+  assert.equal(withEvents.indexable, false);
 });

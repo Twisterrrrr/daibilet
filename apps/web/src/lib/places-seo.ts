@@ -12,6 +12,7 @@ export type PlacesListingSeoInput = {
   type?: string | null;
   family?: string | null;
   page?: string | null;
+  hasEvents?: string | null;
 };
 
 export function normalizePlacesFamily(
@@ -61,7 +62,7 @@ export function resolvePlacesCitySlug(raw?: string | null): string {
 /**
  * Listing SEO for `/places`.
  * Indexable: hub, `?city=`, `?family=institution|location` (and city+family).
- * Thin `q` / `type` / `page>1` → noindex, canonical to parent without those params.
+ * Thin `q` / `type` / `hasEvents` / `page>1` → noindex, canonical to parent without those params.
  * Entity PDP stays `/venues/[slug]` and `/locations/[slug]`.
  */
 export function buildPlacesListingSeo(input: PlacesListingSeoInput): {
@@ -76,9 +77,11 @@ export function buildPlacesListingSeo(input: PlacesListingSeoInput): {
   const family = normalizePlacesFamily(input.family);
   const page = Number.parseInt(String(input.page || '').trim(), 10);
   const hasPage = Number.isFinite(page) && page > 1;
+  const hasEventsRaw = String(input.hasEvents || '').trim().toLowerCase();
+  const hasEvents = hasEventsRaw === '1' || hasEventsRaw === 'true' || hasEventsRaw === 'yes';
   const citySlug = resolvePlacesCitySlug(input.citySlug);
   const copy = buildPlacesListingCopy(input.cityName, family);
-  const thin = Boolean(q || type || hasPage);
+  const thin = Boolean(q || type || hasPage || hasEvents);
 
   const canon = new URLSearchParams();
   if (citySlug) canon.set('city', citySlug);

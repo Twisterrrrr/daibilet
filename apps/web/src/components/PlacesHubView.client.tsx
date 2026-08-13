@@ -105,8 +105,16 @@ function cityScopeKey(query: {
   sort?: string;
   q?: string;
   limit?: number;
+  hasEvents?: boolean;
 }): string {
-  return [query.family, query.city || 'all', query.sort || 'events', query.q || '', String(query.limit || '')].join('|');
+  return [
+    query.family,
+    query.city || 'all',
+    query.sort || 'events',
+    query.q || '',
+    String(query.limit || ''),
+    query.hasEvents ? 'events' : 'all',
+  ].join('|');
 }
 
 function searchParamsRecord(sp: URLSearchParams): Record<string, string> {
@@ -121,6 +129,20 @@ function parseFamilyParam(raw: string | null): 'all' | VenueCatalogFamily {
   const family = normalizePlacesFamily(raw);
   return family || 'all';
 }
+
+function parseHasEventsParam(raw: string | null): boolean {
+  const value = String(raw || '').trim().toLowerCase();
+  return value === '1' || value === 'true' || value === 'yes';
+}
+
+type PlacesScope = 'all' | VenueCatalogFamily | 'events';
+
+const SCOPE_OPTIONS: Array<[PlacesScope, string]> = [
+  ['all', 'Показывать все'],
+  ['institution', 'Только площадки'],
+  ['location', 'Только локации'],
+  ['events', 'Только с событиями'],
+];
 
 /**
  * Unified Places catalog chrome (same layout as `/venues` screenshot).
@@ -148,6 +170,8 @@ export function PlacesHubView({
 
   const q = searchParams.get('q')?.trim() || '';
   const family = parseFamilyParam(searchParams.get('family'));
+  const hasEvents = parseHasEventsParam(searchParams.get('hasEvents'));
+  const scope: PlacesScope = hasEvents ? 'events' : family;
   const rawUrlCity = searchParams.get('city')?.trim() || '';
   const urlCityAll = isAllCitiesQuery(rawUrlCity);
   const urlCity = urlCityAll ? '' : rawUrlCity;
@@ -217,16 +241,17 @@ export function PlacesHubView({
     window.scrollTo(0, 0);
   };
 
-  const prevFiltersRef = useRef({ sort: sortMode, q, family });
+  const prevFiltersRef = useRef({ sort: sortMode, q, family, hasEvents });
   useEffect(() => {
     const prev = prevFiltersRef.current;
-    const changed = prev.sort !== sortMode || prev.q !== q || prev.family !== family;
-    prevFiltersRef.current = { sort: sortMode, q, family };
+    const changed =
+      prev.sort !== sortMode || prev.q !== q || prev.family !== family || prev.hasEvents !== hasEvents;
+    prevFiltersRef.current = { sort: sortMode, q, family, hasEvents };
     if (!changed || listPage <= 1) return;
     setListPage(1);
     writePageToUrl(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional filter-drift reset
-  }, [sortMode, q, family, listPage]);
+  }, [sortMode, q, family, hasEvents, listPage]);
 
   const feedQuery = useMemo(
     () => ({
@@ -235,10 +260,11 @@ export function PlacesHubView({
       type: typeFilter !== 'all' ? typeFilter : undefined,
       sort: sortMode,
       q: q || undefined,
+      hasEvents: hasEvents || undefined,
       page: listPage,
       limit: VENUE_CATALOG_PAGE_SIZE,
     }),
-    [family, cityFetchKey, typeFilter, sortMode, q, listPage],
+    [family, cityFetchKey, typeFilter, sortMode, q, hasEvents, listPage],
   );
 
   const feedQueryKey = useMemo(() => venueCatalogCacheKey(feedQuery), [feedQuery]);
@@ -255,6 +281,7 @@ export function PlacesHubView({
       isAllCitiesScope &&
       family === 'all' &&
       typeFilter === 'all' &&
+      !hasEvents &&
       !q &&
       listPage === 1 &&
       sortMode === 'events' &&
@@ -329,7 +356,7 @@ export function PlacesHubView({
 
         if (needsExactSlice) {
           const slice = await fetchVenueCatalogPage(
-            { ...feedQuery, counts: false },
+            { ...feedQuery, counts: hasEvents ? true : false },
             { signal: controller.signal },
           );
           if (requestId !== catalogRequestId.current) return;
@@ -355,7 +382,7 @@ export function PlacesHubView({
               ...feedQuery,
               type: undefined,
               page: 1,
-              counts: false as const,
+              counts: hasEvents ? true : (false as const),
             };
             void fetchVenueCatalogPage(shellQuery, { signal: controller.signal })
               .then((shellPage) => {
@@ -380,7 +407,7 @@ export function PlacesHubView({
             ...feedQuery,
             type: undefined,
             page: 1,
-            counts: false as const,
+            counts: hasEvents ? true : (false as const),
           };
           const shellPage = await fetchVenueCatalogPage(shellQuery, { signal: controller.signal });
           if (requestId !== catalogRequestId.current) return;
@@ -419,6 +446,7 @@ export function PlacesHubView({
     cityFetchKey,
     typeFilter,
     family,
+    hasEvents,
     q,
     sortMode,
     listPage,
@@ -452,14 +480,22 @@ export function PlacesHubView({
   const setTypeFilter = (next: string) => {
     setListPage(1);
     replaceCatalogUrl((params) => {
-      if (next === 'all') {
-        params.delete('type');
-        params.delete('family');
-      } else {
-        params.set('type', next);
-        params.delete('family');
-      }
+      if (next === 'all') params.delete('type');
+      else params.set('type', next);
       params.delete('page');
+      if (urlCityAll && !params.get('city')) params.set('city', 'all');
+    });
+  };
+
+  const setScope = (next: PlacesScope) => {
+    setListPage(1);
+    replaceCatalogUrl((params) => {
+      params.delete('family');
+      params.delete('hasEvents');
+      params.delete('type');
+      params.delete('page');
+      if (next === 'institution' || next === 'location') params.set('family', next);
+      if (next === 'events') params.set('hasEvents', '1');
       if (urlCityAll && !params.get('city')) params.set('city', 'all');
     });
   };
@@ -498,7 +534,7 @@ export function PlacesHubView({
     return params;
   }, [searchParams, listPage]);
 
-  const allPlacesOn = family === 'all' && typeFilter === 'all';
+  const allTypesOn = typeFilter === 'all';
 
   return (
     <>
@@ -542,13 +578,31 @@ export function PlacesHubView({
           </select>
         </div>
 
+        <div className="mt-4 flex flex-wrap gap-1.5" role="radiogroup" aria-label="Что показывать">
+          {SCOPE_OPTIONS.map(([value, label]) => {
+            const active = scope === value;
+            return (
+              <button
+                key={value}
+                type="button"
+                role="radio"
+                aria-checked={active}
+                onClick={() => setScope(value)}
+                className={`catalog-chip ${active ? 'catalog-chip-on' : 'catalog-chip-idle'}`}
+              >
+                <span className="whitespace-nowrap">{label}</span>
+              </button>
+            );
+          })}
+        </div>
+
         <div className="mt-4 flex flex-wrap gap-1.5">
           <button
             type="button"
             onClick={() => setTypeFilter('all')}
-            className={`catalog-chip ${allPlacesOn ? 'catalog-chip-on' : 'catalog-chip-idle'}`}
+            className={`catalog-chip ${allTypesOn ? 'catalog-chip-on' : 'catalog-chip-idle'}`}
           >
-            <span className="whitespace-nowrap">Все места</span>
+            <span className="whitespace-nowrap">Все типы</span>
           </button>
           {typeOptions.map((option) => {
             const active = typeFilter === option.value;
@@ -635,8 +689,8 @@ export function PlacesHubView({
                       key={venue.id}
                       venue={venue}
                       href={venueHref(venue)}
-                      nextSlot={venue.nextSlot}
                       hideCity={hideCityOnCards}
+                      showFamilyTag
                     />
                   ),
                 )}

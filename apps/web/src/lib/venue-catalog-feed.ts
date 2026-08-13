@@ -18,6 +18,8 @@ export type VenueCatalogFeedQuery = {
   logistics?: string;
   sort?: VenueCatalogSort;
   q?: string;
+  /** Places hub: only venues/locations with own events or STOP tours. */
+  hasEvents?: boolean;
   /** 1-based page (preferred). */
   page?: number;
   /** Legacy cursor; ignored when page is set by clients that moved to pagination. */
@@ -89,6 +91,7 @@ export function buildVenueCatalogSearchParams(query: VenueCatalogFeedQuery): URL
   if (query.logistics && query.logistics !== 'all') params.set('logistics', query.logistics);
   if (query.sort && query.sort !== 'events') params.set('sort', query.sort);
   if (query.q?.trim()) params.set('q', query.q.trim());
+  if (query.hasEvents) params.set('hasEvents', '1');
   const page = query.page && query.page > 1 ? query.page : 1;
   if (page > 1) params.set('page', String(page));
   // Prefer page over cursor for classic pagination clients.
@@ -108,6 +111,7 @@ export function venueCatalogCacheKey(query: VenueCatalogFeedQuery): string {
     query.logistics || 'all',
     query.sort || 'events',
     query.q?.trim() || '',
+    query.hasEvents ? 'events' : '',
     page > 1 ? `p${page}` : query.cursor || '',
     String(query.limit || VENUE_CATALOG_PAGE_SIZE),
     query.counts === false ? 'shell' : 'full',

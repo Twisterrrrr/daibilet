@@ -2104,8 +2104,16 @@ function hasValidVenueCatalogCoords(venue) {
 export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchParams()) {
   const mode = String(searchParams.get('mode') || 'list').trim().toLowerCase();
   const isPins = mode === 'pins';
+  const hasEventsRaw = String(
+    searchParams.get('hasEvents') || searchParams.get('has_events') || '',
+  )
+    .trim()
+    .toLowerCase();
+  const hasEventsFilter = hasEventsRaw === '1' || hasEventsRaw === 'true' || hasEventsRaw === 'yes';
+  // hasEvents needs real event/stop counts; shell zeros `events` and would empty the list.
   const shellCounts =
     !isPins &&
+    !hasEventsFilter &&
     (searchParams.get('counts') === '0' ||
       searchParams.get('phase') === 'shell' ||
       searchParams.get('shell') === '1');
@@ -2122,7 +2130,8 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
   const query = String(searchParams.get('q') || '').trim().toLowerCase();
   const cityFilter = String(searchParams.get('city') || '').trim().toLowerCase();
   const typeFilter = String(searchParams.get('type') || '').trim().toLowerCase();
-  const familyFilter = String(searchParams.get('family') || '').trim().toLowerCase();
+  const familyRaw = String(searchParams.get('family') || '').trim().toLowerCase();
+  const familyFilter = familyRaw === 'institution' || familyRaw === 'location' ? familyRaw : '';
   const scaleFilter = String(searchParams.get('scale') || '').trim().toLowerCase();
   const logisticsFilter = String(searchParams.get('logistics') || '').trim().toLowerCase();
   const sortMode = String(searchParams.get('sort') || 'events').trim().toLowerCase();
@@ -2203,6 +2212,11 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
     }
     if (familyFilter) {
       working = working.filter((venue) => venue.template === familyFilter);
+    }
+    if (hasEventsFilter) {
+      working = working.filter(
+        (venue) => Number(venue.events) > 0 || Number(venue.stopEventCount) > 0,
+      );
     }
     const cityUniverse = working;
     if (cityFilter) {

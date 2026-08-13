@@ -1,19 +1,14 @@
 export function LocationCardSkeleton() {
   return (
-    <div className="flex h-full animate-pulse flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
-      <div className="aspect-[16/10] w-full bg-slate-200" />
-      <div className="flex flex-1 flex-col gap-3 p-4 sm:p-5">
-        <div className="space-y-2">
-          <div className="h-5 w-4/5 rounded bg-slate-200" />
-          <div className="h-4 w-full rounded bg-slate-100" />
-          <div className="h-4 w-3/4 rounded bg-slate-100" />
-        </div>
-        <div className="mt-auto space-y-3 border-t border-slate-100 pt-3">
-          <div className="h-3 w-1/2 rounded bg-slate-100" />
-          <div className="flex items-center justify-between">
-            <div className="h-8 w-24 rounded-lg bg-slate-100" />
-            <div className="h-3 w-16 rounded bg-slate-100" />
-          </div>
+    <div className="flex animate-pulse flex-col overflow-hidden rounded-card bg-white shadow-card">
+      <div className="aspect-video bg-slate-200" />
+      <div className="flex flex-1 flex-col gap-3 p-4">
+        <div className="h-5 w-4/5 rounded bg-slate-200" />
+        <div className="h-4 w-1/2 rounded bg-slate-100" />
+        <div className="mt-2 h-8 w-full rounded bg-slate-100" />
+        <div className="mt-auto flex items-center justify-between border-t border-slate-100 pt-3">
+          <div className="h-8 w-24 rounded bg-slate-100" />
+          <div className="h-8 w-20 rounded-full bg-slate-200" />
         </div>
       </div>
     </div>
