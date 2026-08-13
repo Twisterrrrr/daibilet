@@ -4231,10 +4231,10 @@ function DayRoutePanelInner() {
           {mustSeeResolved.length > 0 ? (
             <div
               id="day-must-see-list"
-              className="mt-3 flex flex-col gap-2.5"
+              className="mt-3 grid grid-cols-1 items-stretch gap-2.5 [@container_(min-width:46rem)]:grid-cols-2"
               data-day-must-see-list
               data-day-must-see-expanded="1"
-              data-day-must-see-layout="horizontal-row"
+              data-day-must-see-layout="adaptive-cols"
             >
               {mustSeeFiltered.map(({ place, item, hook }) => {
                 const inRoute =
@@ -4259,13 +4259,13 @@ function DayRoutePanelInner() {
                             : hook || 'Добавить в день'
                     }
                     onClick={() => addMustSeeItem(item)}
-                    className={`flex w-full min-w-0 flex-row items-stretch gap-3 rounded-xl border p-2.5 text-left transition disabled:cursor-not-allowed sm:gap-3.5 sm:p-3 ${
+                    className={`flex h-full w-full min-w-0 flex-row items-stretch gap-2.5 rounded-xl border p-2.5 text-left transition disabled:cursor-not-allowed sm:gap-3 sm:p-3 ${
                       inRoute
                         ? 'border-emerald-400 bg-emerald-50 text-emerald-900'
                         : 'border-slate-200 bg-white text-slate-800 hover:border-primary-300 hover:bg-slate-50'
                     }`}
                   >
-                    <div className="relative h-[4.5rem] w-[4.5rem] shrink-0 overflow-hidden rounded-lg bg-slate-100 sm:h-24 sm:w-28">
+                    <div className="relative h-[4.5rem] w-[4.5rem] shrink-0 overflow-hidden rounded-lg bg-slate-100 sm:h-20 sm:w-24">
                       {thumb ? (
                         <SafeImage
                           src={thumb}
@@ -4285,7 +4285,10 @@ function DayRoutePanelInner() {
                         {place.name}
                       </span>
                       {hook ? (
-                        <span className="mt-1 block line-clamp-2 text-xs leading-snug text-slate-500 sm:line-clamp-3">
+                        <span
+                          className="mt-1 block line-clamp-3 text-xs leading-snug text-slate-500"
+                          title={hook}
+                        >
                           {hook}
                         </span>
                       ) : null}

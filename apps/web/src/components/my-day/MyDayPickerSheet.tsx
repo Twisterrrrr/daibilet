@@ -6,8 +6,8 @@ import { X, type LucideIcon } from 'lucide-react';
 import { MyDayResizeHandle } from '@/components/my-day/MyDayResizeHandle';
 import { usePersistedNumber } from '@/components/my-day/usePersistedNumber';
 
-const PICKER_WIDTH_KEY = 'daibilet.my-day.picker-width';
-const PICKER_WIDTH_DEFAULT = 920;
+const PICKER_WIDTH_KEY = 'daibilet.my-day.picker-width.v2';
+const PICKER_WIDTH_DEFAULT = 1120;
 const PICKER_WIDTH_MIN = 560;
 const PICKER_WIDTH_MAX = 1280;
 
@@ -184,7 +184,7 @@ export function MyDayPickerSheet({
             id="my-day-picker-panel"
             role="tabpanel"
             aria-labelledby={current ? `my-day-picker-tab-${current.value}` : undefined}
-            className="min-w-0 overflow-y-auto p-4"
+            className="min-w-0 overflow-y-auto p-4 [container-type:inline-size]"
           >
             {current ? (
               <p className="mb-3 text-xs text-slate-500" data-my-day-picker-hint>
