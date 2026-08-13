@@ -249,6 +249,9 @@ type MyDayPickerSection = 'scenarios' | 'places' | 'suburbs' | 'picks' | 'boat' 
 /** Owner 2026-08-06: post-buy modal «Оформили билет?» off until UX revisit. Buy links still open. */
 const SHOW_DAY_TICKET_HANDOFF_MODAL = false;
 const NEARBY_MATCHES_PREVIEW = 3;
+/** Underline via ::after so hover never changes line-box / cursor hit-testing. */
+const DAY_TEXT_LINK =
+  'relative inline-block cursor-pointer pb-0.5 leading-5 after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-transparent after:transition-colors hover:after:bg-current';
 
 /** @deprecated Wave 1.5 list-only; kept for dead grid branch types. */
 const DAY_ROUTE_STOPS_GRID_RAIL =
@@ -2801,17 +2804,17 @@ function DayRoutePanelInner() {
         {renderUnifiedSearchSelect()}
         <p className="mt-2 mb-0 text-xs text-slate-500">
           Каталог:{' '}
-          <Link href={placesHref} className="font-semibold text-slate-700 underline-offset-2 hover:underline">
+          <Link href={placesHref} className={`font-semibold text-slate-700 ${DAY_TEXT_LINK}`}>
             места
           </Link>
           {' · '}
-          <Link href={afishaHref} className="font-semibold text-slate-700 underline-offset-2 hover:underline">
+          <Link href={afishaHref} className={`font-semibold text-slate-700 ${DAY_TEXT_LINK}`}>
             события
           </Link>
           {scopeCitySlug ? (
             <>
               {' · '}
-              <Link href={cityHubHref} className="font-semibold text-slate-700 underline-offset-2 hover:underline">
+              <Link href={cityHubHref} className={`font-semibold text-slate-700 ${DAY_TEXT_LINK}`}>
                 хаб города
               </Link>
             </>
@@ -3041,7 +3044,7 @@ function DayRoutePanelInner() {
                     `Сценарий «${firstPreset.title}» в маршруте`,
                 );
               }}
-              className="mt-4 text-left text-sm font-semibold text-primary-700 underline-offset-2 hover:underline"
+              className={`inline-btn mt-4 min-h-0 text-left text-sm font-semibold text-primary-700 ${DAY_TEXT_LINK}`}
             >
               Или соберите за меня: «{firstPreset.title}» ({firstPresetItems.length} точек)
             </button>
@@ -3119,7 +3122,7 @@ function DayRoutePanelInner() {
               return true;
             });
           }}
-          className="m-0 inline-flex cursor-pointer items-center border-0 bg-transparent p-0 font-medium text-slate-500 underline decoration-transparent underline-offset-2 transition-colors hover:text-slate-700 hover:decoration-current"
+          className={`inline-btn m-0 min-h-0 appearance-none bg-transparent p-0 font-medium text-slate-500 transition-colors hover:text-slate-700 ${DAY_TEXT_LINK}`}
         >
           Сменить город
         </button>
@@ -3322,27 +3325,27 @@ function DayRoutePanelInner() {
         <>
         {/* Lovable: full-width top bar OUTSIDE map grid (map must not eat Open/Save/Share). */}
         <header
-          className="mb-4 flex flex-col gap-3 sm:mb-5 lg:flex-row lg:items-center lg:justify-between lg:gap-4"
+          className="mb-4 flex flex-col gap-3 sm:mb-5 lg:flex-row lg:items-start lg:justify-between lg:gap-4"
           data-my-day-topbar
           ref={shareMenuRef}
         >
-          <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-3 lg:flex lg:flex-1 lg:items-center">
+          <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-3 lg:flex lg:flex-1 lg:items-start">
             <div className="min-w-0">
               <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-slate-500">
                 Дайбилет · план дня
               </p>
-              <div className="mt-0.5 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+              <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5">
                 <h1 className="font-display text-[1.65rem] font-extrabold tracking-tight leading-tight text-slate-900 sm:text-3xl">
                   {scopeCityName ? `Мой день ${inCityPrepositional(scopeCityName)}` : 'Мой день'}
                 </h1>
                 {cityScopeLine ? (
-                  <span className="hidden text-[13px] font-medium text-slate-500 lg:inline" data-day-city-scope>
+                  <span className="hidden text-[13px] font-medium leading-5 text-slate-500 lg:inline" data-day-city-scope>
                     {cityScopeLine}
                   </span>
                 ) : null}
               </div>
-              <p
-                className="mt-1 flex flex-wrap items-center gap-x-1.5 text-[13px] font-medium text-slate-500 lg:mt-0.5"
+              <div
+                className="relative z-[1] mt-1 flex flex-wrap items-center gap-x-1.5 text-[13px] font-medium text-slate-500 lg:mt-0.5"
                 data-day-route-count-label
               >
                 <span className="lg:hidden">{cityScopeLine}</span>
@@ -3354,7 +3357,7 @@ function DayRoutePanelInner() {
                 {scopeCityName ? (
                   <Link
                     href={cityHubHref}
-                    className="inline-flex cursor-pointer items-center text-primary-600 underline decoration-transparent underline-offset-2 transition-colors hover:text-primary-700 hover:decoration-current"
+                    className={`text-primary-600 transition-colors hover:text-primary-700 ${DAY_TEXT_LINK}`}
                     data-day-city-hub-link
                   >
                     Страница {cityToGenitive(scopeCityName)}
@@ -3364,7 +3367,7 @@ function DayRoutePanelInner() {
                   <span aria-hidden>·</span>
                 ) : null}
                 {renderCityChangeControl()}
-              </p>
+              </div>
             </div>
 
             <div className="relative flex shrink-0 items-center gap-2 lg:hidden">
@@ -4082,17 +4085,17 @@ function DayRoutePanelInner() {
                 <h1 className="font-display text-[1.65rem] font-extrabold tracking-tight leading-tight text-slate-900 sm:text-3xl">
                   {scopeCityName ? `Мой день ${inCityPrepositional(scopeCityName)}` : 'Мой день'}
                 </h1>
-                <p
-                  className="mt-1.5 flex flex-wrap items-center gap-x-1.5 text-[13px] font-medium text-slate-500"
+                <div
+                  className="relative z-[1] mt-1.5 flex flex-wrap items-center gap-x-1.5 text-[13px] font-medium text-slate-500"
                   data-day-route-count-label
                   data-day-city-scope
                 >
-                  {cityScopeLine ? <span>{cityScopeLine}</span> : null}
+                  {cityScopeLine ? <span className="leading-5">{cityScopeLine}</span> : null}
                   {cityScopeLine && scopeCityName ? <span aria-hidden>·</span> : null}
                   {scopeCityName ? (
                     <Link
                       href={cityHubHref}
-                      className="inline-flex cursor-pointer items-center text-primary-600 underline decoration-transparent underline-offset-2 transition-colors hover:text-primary-700 hover:decoration-current"
+                      className={`text-primary-600 transition-colors hover:text-primary-700 ${DAY_TEXT_LINK}`}
                       data-day-city-hub-link
                     >
                       Страница {cityToGenitive(scopeCityName)}
@@ -4100,7 +4103,7 @@ function DayRoutePanelInner() {
                   ) : null}
                   {scopeCityName ? <span aria-hidden>·</span> : null}
                   {renderCityChangeControl()}
-                </p>
+                </div>
               </div>
             </div>
           ) : null}
@@ -5183,7 +5186,7 @@ function DayRouteBetweenInsert({
                   onMenuOpenChange(false);
                   onOpenFullPicker();
                 }}
-                className="mt-3 text-xs font-semibold text-primary-700 hover:underline"
+                className={`inline-btn mt-3 min-h-0 text-xs font-semibold text-primary-700 ${DAY_TEXT_LINK}`}
               >
                 Открыть полный подбор
               </button>
@@ -5662,7 +5665,7 @@ function DayRouteVenueCard({
                         setAddressDraft(String(venue.note || venue.address || ''));
                         setAddressOpen(true);
                       }}
-                      className="text-[11px] font-medium text-slate-400 underline-offset-2 hover:text-slate-600 hover:underline"
+                      className={`inline-btn min-h-0 text-[11px] font-medium text-slate-400 hover:text-slate-600 ${DAY_TEXT_LINK}`}
                     >
                       {venue.note || venue.address ? 'Изменить адрес' : 'Указать адрес'}
                     </button>
@@ -5887,7 +5890,7 @@ function DayRouteVenueCard({
                       setAddressDraft(String(venue.note || venue.address || ''));
                       setAddressOpen(true);
                     }}
-                    className="text-[11px] font-medium text-slate-400 underline-offset-2 hover:text-slate-600 hover:underline"
+                    className={`inline-btn min-h-0 text-[11px] font-medium text-slate-400 hover:text-slate-600 ${DAY_TEXT_LINK}`}
                   >
                     {venue.note || venue.address ? 'Изменить адрес' : 'Указать адрес'}
                   </button>

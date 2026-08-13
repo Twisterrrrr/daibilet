@@ -15,7 +15,7 @@
 | UX.MYDAY-STOP-HOVER-TICKET | Номер точки: белый invert + scale на hover; «Билеты от» внутри карточки, не под ней | Высокий | ✅ live `31697785067` BUILD_ID=`wOdU6cU5y7ITl_bsyiqqa` |
 | UX.MYDAY-STOP-PLACE-NOT-EVENT | Стоп = место (Адмиралтейство≠причал, Эрмитаж≠балет); «Вход свободный» только outdoor; адрес без `///` EN | Высокий | ✅ live `31697785067` BUILD_ID=`wOdU6cU5y7ITl_bsyiqqa` |
 | UX.MYDAY-FREE-ENTRY-AUDIT | Аудит mustSee/пресеты/пригороды: не врать «Вход свободный» (парк/храм/Петергоф/ботаника) | Высокий | ✅ live `31697785067` BUILD_ID=`wOdU6cU5y7ITl_bsyiqqa` |
-| FIX.MYDAY-CITY-LINK-HOVER | Шапка /my-day: курсор не мерцает на «Страница города» / «Сменить город» | Высокий | ✅ 2026-08-13; live после Deploy MSK web |
+| FIX.MYDAY-CITY-LINK-HOVER | Шапка и ссылки /my-day: курсор не мерцает (44px hit-box + underline) | Высокий | ✅ 2026-08-13; live после Deploy MSK web |
 
 ## Nav «Места» hub (2026-08-13)
 
