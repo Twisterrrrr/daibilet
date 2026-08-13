@@ -61,6 +61,8 @@ function plainLeadFromBody(slug: string): string {
   if (!body) return '';
   return body
     .replace(/\[image[^\]]*\]/gi, ' ')
+    .replace(/\[route[^\]]*\]/gi, ' ')
+    .replace(/\[NOTE[^\]]*\]/gi, ' ')
     .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
     .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
     .replace(/^#{1,6}\s+.+$/gm, ' ')

@@ -78,14 +78,14 @@ Finance PR-ветка `codex/stage0-admission-ticket-core` может держа
 
 ## 2026-08-11 - My Day → ЧПУ `/routes/{city}/{slug}` (дизайн, не билдить)
 
-**Gap сейчас:** share уже есть - длинный `/my-day?city=&items=…` (state в query) + короткий `/d/{code}` (редирект на my-day, не посадочная). Нет crawlable H1/CTA/канона под SEO.
+**Gap обновлён 2026-08-14:** viral MVP уже на `/m/{city}-{titleSlug}-{code}` (посадочная + counters + blog `[route]` + UGC scaffold status/ratings/author). **Единый пасс** (auth/moderation/abuse/canonical `/routes/…`) - **всё ещё deferred**, не этот ship.
 
-**MVP scope (черновик):** «Сохранить и поделиться» → публичная страница `/routes/{city}/{slug}` с авто-H1, списком стопов, CTA на билеты/афишу; черновик `noindex` до publish.
+**MVP scope (черновик `/routes`):** «Сохранить и поделиться» → публичная страница `/routes/{city}/{slug}` с авто-H1, списком стопов, CTA на билеты/афишу; черновик `noindex` до publish.
 
-**Вопросы owner:**
+**Вопросы owner (открыты для полного пасса):**
 1. **Кто публикует?** только авторизованный / staff moderation queue / любой аноним с rate-limit?
-2. **Индексация:** draft всегда `noindex`; published - сразу index или ручной «в индекс»?
-3. **Slug:** авто из title (`peterburg-muzei-vecher`) + collision suffix, или только opaque id + отдельный title?
+2. **Индексация:** draft всегда `noindex`; published - сразу index или ручной «в индекс»? *(сейчас viral MVP: default PUBLISHED + index)*
+3. **Slug:** авто из title (`peterburg-muzei-vecher`) + collision suffix, или только opaque id + отдельный title? *(сейчас: city + titleSlug + trailing opaque code на `/m`)*
 4. **Canonical:** `/routes/...` канон, а `/my-day?items=` и `/d/{code}` - `noindex` + rel=canonical на route?
 5. **UGC spam / мусор:** обязательный min stops, запрет empty, captcha, TTL unpublished, abuse report?
 6. **Контент-права:** пользовательский title/notes - хранить as-is или sanitize + запрет ссылок?

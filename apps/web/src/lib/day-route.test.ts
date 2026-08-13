@@ -11,6 +11,8 @@ import {
   buildDayRouteCoordsMap,
   buildDayRouteSharePath,
   buildDayRouteShortPath,
+  parseDayRouteReadableSlug,
+  suggestDayRouteShareTitle,
   buildMaxShareUrl,
   buildYandexMultiStopRouteUrl,
   catalogDayRouteVenueIds,
@@ -111,10 +113,35 @@ test('buildDayRouteSharePath emits city+items format', () => {
   assert.equal(url.searchParams.get('items'), '341:1400,892:free');
 });
 
-test('buildDayRouteShortPath uses /d/{code}', () => {
+test('buildDayRouteShortPath uses /d/{code} or readable /m/{city}-{title}-{code}', () => {
   assert.equal(buildDayRouteShortPath('x7k2m9a'), '/d/x7k2m9a');
   assert.equal(buildDayRouteShortPath(' AbC2345 '), '/d/abc2345');
   assert.equal(buildDayRouteShortPath(''), '/my-day');
+  assert.equal(buildDayRouteShortPath('x7k2m9a', 'spb'), '/m/spb-x7k2m9a');
+  assert.equal(
+    buildDayRouteShortPath('x7k2m9a', { citySlug: 'spb', titleSlug: 'serdtse-pitere' }),
+    '/m/spb-serdtse-pitere-x7k2m9a',
+  );
+});
+
+test('parseDayRouteReadableSlug takes code from end (title in middle)', () => {
+  const bare = parseDayRouteReadableSlug('x7k2m9a');
+  assert.equal(bare?.code, 'x7k2m9a');
+  const cityOnly = parseDayRouteReadableSlug('spb-x7k2m9a');
+  assert.equal(cityOnly?.code, 'x7k2m9a');
+  assert.equal(cityOnly?.citySlug, 'spb');
+  const withTitle = parseDayRouteReadableSlug('spb-serdtse-pitere-x7k2m9a');
+  assert.equal(withTitle?.code, 'x7k2m9a');
+  assert.equal(withTitle?.citySlug, 'spb');
+  assert.equal(withTitle?.titleSlug, 'serdtse-pitere');
+});
+
+test('suggestDayRouteShareTitle uses city + first stop', () => {
+  assert.equal(
+    suggestDayRouteShareTitle({ cityTitle: 'Санкт-Петербург', firstStopTitle: 'Эрмитаж' }),
+    'Санкт-Петербург: Эрмитаж',
+  );
+  assert.equal(suggestDayRouteShareTitle({}), 'Маршрут на день');
 });
 
 test('parseDayRouteItemsParam parses id:HHMM and free', () => {

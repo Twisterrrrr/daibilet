@@ -4,6 +4,7 @@ import * as React from 'react';
 
 import { BlogArticleCta, parseCtaBlock } from '@/components/BlogArticleCta';
 import { BlogArticleNote, parseNoteBlock } from '@/components/BlogArticleNote';
+import { BlogArticleRoute, parseRouteBlock } from '@/components/BlogArticleRoute';
 import { BlogBuyButton, parseBuyBlock } from '@/components/BlogBuyButton.client';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import {
@@ -84,7 +85,8 @@ type ContentBlock =
   | { type: 'hr' }
   | { type: 'cta'; data: ReturnType<typeof parseCtaBlock> & object }
   | { type: 'buy'; data: NonNullable<ReturnType<typeof parseBuyBlock>> }
-  | { type: 'note'; data: NonNullable<ReturnType<typeof parseNoteBlock>> };
+  | { type: 'note'; data: NonNullable<ReturnType<typeof parseNoteBlock>> }
+  | { type: 'route'; data: NonNullable<ReturnType<typeof parseRouteBlock>> };
 
 const CALLOUT_LABEL_RE =
   /^\*\*(Атмосферная деталь|Практический совет|Лайфхак|Адрес):\*\*\s*(.+)$/s;
@@ -199,6 +201,7 @@ function isSpecialLine(line: string): boolean {
   if (!trimmed) return true;
   if (parseCtaBlock(trimmed)) return true;
   if (parseNoteBlock(trimmed)) return true;
+  if (parseRouteBlock(trimmed)) return true;
   if (parseQuoteBlock(trimmed)) return true;
   if (parseBuyBlock(trimmed)) return true;
   if (parseImageBlock(trimmed)) return true;
@@ -247,6 +250,14 @@ export function parseContentBlocks(content: string): ContentBlock[] {
     if (note) {
       flushParagraph();
       blocks.push({ type: 'note', data: note });
+      index += 1;
+      continue;
+    }
+
+    const route = parseRouteBlock(line);
+    if (route) {
+      flushParagraph();
+      blocks.push({ type: 'route', data: route });
       index += 1;
       continue;
     }
@@ -749,6 +760,10 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
         break;
       case 'note':
         nodes.push(<BlogArticleNote key={`note-${index}`} {...block.data} />);
+        isLeadParagraph = false;
+        break;
+      case 'route':
+        nodes.push(<BlogArticleRoute key={`route-${index}`} {...block.data} />);
         isLeadParagraph = false;
         break;
       case 'quote':

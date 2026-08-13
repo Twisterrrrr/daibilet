@@ -94,6 +94,7 @@ import {
   buildDayRouteShareMessage,
   buildDayRouteSharePath,
   createDayRouteShortShare,
+  suggestDayRouteShareTitle,
   buildMaxShareUrl,
   buildTelegramShareUrl,
   buildWhatsAppShareUrl,
@@ -2200,10 +2201,15 @@ function DayRoutePanelInner() {
 
     try {
       const parsed = new URL(longPath, 'https://daibilet.ru');
+      const shareTitle = suggestDayRouteShareTitle({
+        cityTitle: scopeCityName || cityTitle,
+        firstStopTitle: route.venues[0]?.title,
+      });
       const short = await createDayRouteShortShare({
         citySlug: parsed.searchParams.get('city'),
         items: parsed.searchParams.get('items') || '',
         fromName: parsed.searchParams.get('from'),
+        title: shareTitle,
       });
       if (short?.path) {
         shortShareCacheRef.current.set(longPath, short.path);

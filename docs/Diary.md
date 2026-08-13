@@ -1,3 +1,20 @@
+## 2026-08-14 - My Day share A+B+C (readable `/m` + UGC scaffold)
+
+### Наблюдения
+- Owner: A title slug + B public page/blog/counters + C schema ratings/author/status; без live deploy и без prod migrate.
+- Ранее `/m/{city}-{code}` был thin 307; `/routes/…` (SEO.MYDAY-ROUTES) и «единый пасс» остаются deferred.
+
+### Решения
+- A: POST `/api/day-route/share` принимает `title`; slug `city-titleSlug-code`; code всегда с конца (`parseDayRouteReadableSlug`); `/d/{code}` без изменений.
+- B: `apps/web/app/m/[slug]/page.tsx` - SSR title/stops/counters + CTA «Открыть» / «Сохранить к себе» (localStorage + saveCount); blog `[route code|slug]`; `?go=1` → redirect long path.
+- C: migration `20260814010000_day_route_share_ugc` (title, titleSlug, saveCount, authorName, ratingSum/Count, status); POST save + rate (cookie once).
+- Docs: единый пасс / полный `/routes` - всё ещё qa deferred.
+
+### Проблемы
+- Prod migrate + web deploy - только по «выкатывай». Локально нужен `migrate` чтобы новые колонки появились в DB.
+
+---
+
 ## 2026-08-14 - /events: footer hide foreign + urgency copy polish
 
 ### Наблюдения

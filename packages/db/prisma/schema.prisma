@@ -2130,17 +2130,29 @@ model QualityIssue {
   event Event @relation(fields: [eventId], references: [id])
 }
 
-/// Viral short links for «Мой день» share (`/d/{code}` → `/my-day?city=&items=`).
+/// Viral short links for «Мой день» share (`/d/{code}`, `/m/{city}-{title}-{code}`).
 model DayRouteShare {
-  code      String   @id
-  citySlug  String?
-  items     String
-  fromName  String?
-  hitCount  Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  code        String   @id
+  citySlug    String?
+  items       String
+  fromName    String?
+  /// Display title for public `/m` page and readable slug.
+  title       String?
+  titleSlug   String?
+  /// Optional public author label (scaffold; no auth yet).
+  authorName  String?
+  hitCount    Int      @default(0)
+  saveCount   Int      @default(0)
+  ratingSum   Int      @default(0)
+  ratingCount Int      @default(0)
+  /// DRAFT | PUBLISHED - new shares default PUBLISHED for viral MVP.
+  status      String   @default("PUBLISHED")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@index([citySlug, items])
   @@index([createdAt])
+  @@index([status, createdAt])
+  @@index([titleSlug])
   @@map("day_route_shares")
 }

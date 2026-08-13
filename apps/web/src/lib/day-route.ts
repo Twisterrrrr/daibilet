@@ -1498,13 +1498,13 @@ export function buildDayRouteSharePath(
   return `/my-day?${params.toString()}`;
 }
 
-/** Public short-link path format: `/d/x7k2m9a`. */
-export function buildDayRouteShortPath(code: string): string {
-  const normalized = String(code || '')
-    .trim()
-    .toLowerCase();
-  return normalized ? `/d/${encodeURIComponent(normalized)}` : '/my-day';
-}
+/** Public short-link path: `/d/{code}` or `/m/{city}-{titleSlug}-{code}`. */
+export {
+  buildDayRouteShortPath,
+  parseDayRouteReadableSlug,
+  suggestDayRouteShareTitle,
+  slugifyDayRouteShareTitle,
+} from './day-route-share-url';
 
 /**
  * Create short share code for current long path payload.
@@ -1514,6 +1514,8 @@ export async function createDayRouteShortShare(input: {
   citySlug?: string | null;
   items: string;
   fromName?: string | null;
+  title?: string | null;
+  authorName?: string | null;
 }): Promise<{ code: string; path: string; longPath?: string } | null> {
   const items = String(input.items || '').trim();
   if (!items) return null;
@@ -1525,6 +1527,8 @@ export async function createDayRouteShortShare(input: {
         city: input.citySlug || undefined,
         items,
         from: input.fromName || undefined,
+        title: input.title || undefined,
+        authorName: input.authorName || undefined,
       }),
     });
     if (!res.ok) return null;

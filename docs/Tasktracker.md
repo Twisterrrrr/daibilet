@@ -1,3 +1,13 @@
+## My Day share A+B+C (2026-08-14)
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| UX.MYDAY-SHARE-TITLE | Readable `/m/{city}-{titleSlug}-{code}`; POST title; code from end | Критический | ✅ 2026-08-14 code; migrate SQL only |
+| UX.MYDAY-SHARE-PAGE | Public `/m/[slug]` page + CTAs open/save; hitCount; index if PUBLISHED | Критический | ✅ 2026-08-14 code; deploy batch |
+| UX.MYDAY-SHARE-BLOG | Blog shortcode `[route code\|slug=…]` compact card | Высокий | ✅ 2026-08-14 code; deploy batch |
+| UX.MYDAY-SHARE-UGC | Schema title/saveCount/rating/author/status + save/rate API scaffold | Высокий | ✅ migration `20260814010000_day_route_share_ugc` (не apply prod) |
+| SEO.MYDAY-ROUTES | Полный ЧПУ `/routes/{city}/{slug}` + единый пасс | Высокий | ⏳ deferred; scaffold на `/m` |
+
 ## Events UX ROI 1-4 polish (2026-08-14)
 
 | ID | Задача | Приоритет | Статус |
@@ -184,7 +194,7 @@
 |----|--------|-----------|--------|
 | SEO.LISTING-KGD | Editorial SEO-блок `standup:kaliningrad` в `seo-listing-texts` + Deploy MSK web | Высокий | ✅ `980c31d9` Deploy MSK web |
 | SEO.LISTING-INDEX | Owner: index thin listing при editorial SEO (bypass порога &lt;6; 0 офферов = noindex) | Высокий | ✅ `054324cb` Deploy MSK web `31534724044`; smoke `/stendap-i-yumor/kaliningrad` → `index, follow` |
-| SEO.MYDAY-ROUTES | План ЧПУ `/routes/{city}/{slug}` из My Day share (MVP/UGC/noindex/canonical) - docs only | Высокий | ⏳ qa owner; не билдить |
+| SEO.MYDAY-ROUTES | План ЧПУ `/routes/{city}/{slug}` + единый пасс - deferred; viral MVP на `/m` | Высокий | ⏳ qa; `/m` A+B+C scaffold ✅ 2026-08-14 |
 
 ## SEO Подборки city ЧПУ (2026-08-11)
 

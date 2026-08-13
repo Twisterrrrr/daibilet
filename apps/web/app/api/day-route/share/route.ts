@@ -14,12 +14,16 @@ type ShareBody = {
   items?: string;
   from?: string;
   fromName?: string;
+  title?: string;
+  author?: string;
+  authorName?: string;
+  status?: string;
 };
 
 /**
  * POST /api/day-route/share
- * Body: { city?, items, from? } → { ok, code, path, longPath }
- * Public create for viral «Мой день» short links (`/d/{code}`).
+ * Body: { city?, items, from?, title?, author? } → { ok, code, path, longPath }
+ * Short links: `/d/{code}` or readable `/m/{city}-{titleSlug}-{code}`.
  */
 export async function POST(request: Request) {
   let body: ShareBody = {};
