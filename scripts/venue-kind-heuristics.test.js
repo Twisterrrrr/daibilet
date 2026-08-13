@@ -24,16 +24,13 @@ function expectReclass(title, kind) {
 }
 
 // Buildings → ATTRACTION
-expectInfer('Особняк Половцова', 'ATTRACTION');
 expectInfer('Адмиралтейство', 'ATTRACTION');
-expectInfer('Мраморный дворец', 'ATTRACTION');
-expectInfer('Исаакиевский собор', 'ATTRACTION');
-expectInfer('Михайловский замок', 'ATTRACTION');
 expectInfer('Дом Советов', 'ATTRACTION');
 expectInfer('Юдиттен-кирха', 'ATTRACTION');
 expectInfer('Петропавловская крепость', 'ATTRACTION');
 expectInfer('Казанский Кремль', 'ATTRACTION');
 expectInfer('Софийский собор', 'ATTRACTION');
+expectInfer('Особняк Половцова', 'ATTRACTION');
 
 // True outdoors stay outdoor
 expectInfer('Дворцовая площадь', 'OUTDOOR_LOCATION');
@@ -49,8 +46,13 @@ expectInfer('Севкабель Порт', 'OUTDOOR_LOCATION');
 expectInfer('Летний сад', 'PARK');
 expectInfer('Петергоф', 'PARK');
 expectInfer('Нижний парк Петергофа', 'PARK');
-expectInfer('Большой Петергофский дворец', 'ATTRACTION');
-expectInfer('Екатерининский дворец', 'ATTRACTION');
+expectInfer('Большой Петергофский дворец', 'MUSEUM_ART_SPACE', 'institution');
+expectInfer('Екатерининский дворец', 'MUSEUM_ART_SPACE', 'institution');
+expectInfer('Юсуповский дворец', 'MUSEUM_ART_SPACE', 'institution');
+expectInfer('Мраморный дворец', 'MUSEUM_ART_SPACE', 'institution');
+expectInfer('Михайловский замок', 'MUSEUM_ART_SPACE', 'institution');
+expectInfer('Исаакиевский собор', 'MUSEUM_ART_SPACE', 'institution');
+expectInfer('Спас на Крови', 'MUSEUM_ART_SPACE', 'institution');
 expectInfer('Медный всадник', 'MONUMENT');
 expectInfer('Кунсткамера', 'MUSEUM_ART_SPACE', 'institution');
 expectInfer('Эрмитаж', 'MUSEUM_ART_SPACE', 'institution');
@@ -82,7 +84,8 @@ expectReclass('Дворцовая площадь', null);
 expectReclass('Английская набережная', null);
 expectReclass('Троицкий мост', null);
 expectReclass('Новая Голландия', null);
-expectReclass('Спас на Крови', 'ATTRACTION');
+expectReclass('Спас на Крови', 'MUSEUM_ART_SPACE');
+expectReclass('Юсуповский дворец', 'MUSEUM_ART_SPACE');
 expectReclass('Королевские ворота', null);
 expectReclass('Покровский собор', 'ATTRACTION');
 expectReclass('Астраханский кремль', 'ATTRACTION');

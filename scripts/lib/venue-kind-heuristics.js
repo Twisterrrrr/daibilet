@@ -165,6 +165,22 @@ const CONCERT_HALL_RE = new RegExp(
   'iu',
 );
 
+/** Named palace-museums / paid interiors: ticket to enter → /venues, not street ATTRACTION. */
+const PALACE_MUSEUM_RE = new RegExp(
+  [
+    'юсуповск',
+    'екатерининск\\p{L}*\\s+дворец',
+    'павловск\\p{L}*\\s+дворец',
+    'гатчинск\\p{L}*\\s+дворец',
+    'мраморн\\p{L}*\\s+дворец',
+    'михайловск\\p{L}*\\s+замок',
+    'петергофск\\p{L}*\\s+дворец',
+    'исаакиевск',
+    'спас\\s+на\\s+крови',
+  ].join('|'),
+  'iu',
+);
+
 const PIER_RE = /причал|пристань|дебаркадер|причальн/i;
 
 const BUS_STOP_RE =
@@ -262,13 +278,16 @@ function inferMustSeeKindAndFamily(name, item = null) {
   if (CONCERT_HALL_RE.test(n)) {
     return { kind: 'CONCERT_HALL', family: 'institution', confident: true };
   }
+  if (PALACE_MUSEUM_RE.test(n)) {
+    return { kind: 'MUSEUM_ART_SPACE', family: 'institution', confident: true };
+  }
 
   // Tourist gastro on locations catalog → GASTRO (owner 2026-08-05).
   if (GASTRO_RE.test(n) || (GASTRO_MARKET_RE.test(n) && /рынок|фуд/i.test(n))) {
     return { kind: 'GASTRO', family: 'location', confident: true };
   }
 
-  // Buildings before outdoor: «Дворцовый мост» stays outdoor via TRUE_OUTDOOR; «Мраморный дворец» → attraction.
+  // Buildings before outdoor: street facade stays attraction; ticketed palaces already returned above.
   if (BUILDING_ATTRACTION_RE.test(n) && !TRUE_OUTDOOR_RE.test(n)) {
     return { kind: 'ATTRACTION', family: 'location', confident: true };
   }
@@ -323,6 +342,7 @@ function reclassifyOutdoorBuilding(title, slug = '') {
   if (THEATER_RE.test(text)) return 'THEATER';
   if (MUSEUM_RE.test(text)) return 'MUSEUM_ART_SPACE';
   if (CONCERT_HALL_RE.test(text)) return 'CONCERT_HALL';
+  if (PALACE_MUSEUM_RE.test(text)) return 'MUSEUM_ART_SPACE';
 
   if (GASTRO_RE.test(text)) return 'GASTRO';
   if (GASTRO_MARKET_RE.test(text) && /рынок|фуд/i.test(text) && !TRUE_OUTDOOR_RE.test(text)) {
