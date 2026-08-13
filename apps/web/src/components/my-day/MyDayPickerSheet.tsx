@@ -3,6 +3,13 @@
 import { useEffect, useId, useRef, type KeyboardEvent, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { X, type LucideIcon } from 'lucide-react';
+import { MyDayResizeHandle } from '@/components/my-day/MyDayResizeHandle';
+import { usePersistedNumber } from '@/components/my-day/usePersistedNumber';
+
+const PICKER_WIDTH_KEY = 'daibilet.my-day.picker-width';
+const PICKER_WIDTH_DEFAULT = 920;
+const PICKER_WIDTH_MIN = 560;
+const PICKER_WIDTH_MAX = 1280;
 
 export type MyDayPickerSection =
   | 'scenarios'
@@ -43,6 +50,7 @@ export function MyDayPickerSheet({
   const descId = useId();
   const listRef = useRef<HTMLDivElement | null>(null);
   const current = tabs.find((t) => t.value === section) ?? tabs[0];
+  const [pickerWidth, setPickerWidth] = usePersistedNumber(PICKER_WIDTH_KEY, PICKER_WIDTH_DEFAULT);
 
   useEffect(() => {
     if (!open) return;
@@ -93,9 +101,19 @@ export function MyDayPickerSheet({
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descId}
-        className="absolute inset-y-0 left-0 flex w-full max-w-full flex-col bg-white shadow-2xl sm:max-w-2xl lg:max-w-3xl"
+        className="absolute inset-y-0 left-0 flex w-full max-w-full flex-col bg-white shadow-2xl sm:w-[min(92vw,var(--my-day-picker-w))] sm:max-w-none"
+        style={{ ['--my-day-picker-w' as string]: `${pickerWidth}px` }}
         data-my-day-picker-panel
       >
+        <MyDayResizeHandle
+          label="Ширина подбора"
+          showFrom="sm"
+          className="right-0 translate-x-1/2"
+          onDrag={(clientX) => {
+            const max = Math.min(PICKER_WIDTH_MAX, Math.round(window.innerWidth * 0.92));
+            setPickerWidth(Math.min(max, Math.max(PICKER_WIDTH_MIN, clientX)));
+          }}
+        />
         <header className="flex shrink-0 items-start justify-between gap-3 border-b border-slate-200 px-5 py-4">
           <div className="min-w-0">
             <h2 id={titleId} className="text-base font-bold text-slate-900">

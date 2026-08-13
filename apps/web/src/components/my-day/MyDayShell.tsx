@@ -1,6 +1,9 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { useRef, type ReactNode } from 'react';
+
+import { MyDayResizeHandle } from '@/components/my-day/MyDayResizeHandle';
+import { usePersistedNumber } from '@/components/my-day/usePersistedNumber';
 
 type MyDayShellProps = {
   mapOpen: boolean;
@@ -11,9 +14,14 @@ type MyDayShellProps = {
   className?: string;
 };
 
+const LIST_SPLIT_KEY = 'daibilet.my-day.list-split';
+const LIST_SPLIT_DEFAULT = 58;
+const LIST_SPLIT_MIN = 36;
+const LIST_SPLIT_MAX = 78;
+
 /**
- * Desktop split: list column (H1 / picker / route) + sticky map.
- * Grid sits high enough that opening the map narrows every left block together.
+ * Desktop split: list column + sticky map.
+ * When map is open, the divider can be dragged; width is remembered.
  */
 export function MyDayShell({
   mapOpen,
@@ -22,20 +30,46 @@ export function MyDayShell({
   showMapColumn = true,
   className = '',
 }: MyDayShellProps) {
+  const shellRef = useRef<HTMLDivElement | null>(null);
+  const [listPct, setListPct] = usePersistedNumber(LIST_SPLIT_KEY, LIST_SPLIT_DEFAULT);
+  const splitOn = showMapColumn && mapOpen;
   const gridClass = !showMapColumn
     ? 'lg:grid-cols-1'
     : mapOpen
-      ? 'lg:grid-cols-[minmax(24rem,1.2fr)_minmax(16rem,0.85fr)]'
+      ? ''
       : 'lg:grid-cols-[minmax(0,1fr)_56px]';
 
   return (
     <div
+      ref={shellRef}
       className={`flex flex-col gap-4 lg:grid lg:items-start lg:gap-0 ${gridClass} ${className}`.trim()}
+      style={
+        splitOn
+          ? {
+              gridTemplateColumns: `minmax(22rem, ${listPct}fr) minmax(16rem, ${100 - listPct}fr)`,
+            }
+          : undefined
+      }
       data-my-day-shell="1"
       data-my-day-map-open={showMapColumn && mapOpen ? '1' : '0'}
+      data-my-day-list-split={splitOn ? String(listPct) : undefined}
     >
-      <div className="min-w-0 lg:pr-4" data-my-day-list-col>
+      <div className="relative min-w-0 lg:pr-2" data-my-day-list-col>
         {list}
+        {splitOn ? (
+          <MyDayResizeHandle
+            label="Ширина списка и карты"
+            className="right-0"
+            onDrag={(clientX) => {
+              const el = shellRef.current;
+              if (!el) return;
+              const rect = el.getBoundingClientRect();
+              if (rect.width < 1) return;
+              const next = ((clientX - rect.left) / rect.width) * 100;
+              setListPct(Math.min(LIST_SPLIT_MAX, Math.max(LIST_SPLIT_MIN, next)));
+            }}
+          />
+        ) : null}
       </div>
       {showMapColumn ? (
         <aside
