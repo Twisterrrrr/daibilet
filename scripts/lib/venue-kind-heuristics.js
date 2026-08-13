@@ -1,6 +1,7 @@
 /**
  * Owner product rules (2026-08-05; plant-on-create 2026-08-13):
- * - OUTDOOR_LOCATION = street / bridge / square / embankment / open street access only
+ * - OUTDOOR_LOCATION = street / bridge / square / embankment / open street access only.
+ *   Place clusters (Новая Голландия, Севкабель) stay here as the parent location.
  * - Buildings → ATTRACTION; parks → PARK; monuments → MONUMENT
  * - Ticketable institutions (museum / theater / concert hall / DK / circus) →
  *   /venues immediately. Do not wait for first event or tickets.

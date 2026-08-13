@@ -219,6 +219,7 @@ BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh
 - Редакционные гастро-точки / day-point без institution-афиши → **Локации** (`GASTRO`). Если legacy kind временно institution, при `upcomingEventsCount=0` и без admission запрещены билетные chrome, цена, CTA, афиша и FAQ (но URL family не менять из-за пустой афиши).
 - Nav: **V1.1 (owner 2026-08-13)** - primary **Города • События • Места • Подборки • Блог**. «Места» = umbrella hub `/places` (два входа: `/venues` + `/locations`). Карточки **не** переезжают на `/places/[slug]`. Склейка единой выдачи с тегами = later (`UX.LOC9`). `UX.LOC3` long rename superseded.
 - Одна физическая точка = одна публичная карточка; локация→venue = upgrade / hide+301, не twin `PUBLISHED`.
+- **Кластер** (Новая Голландия, Севкабель): одна родительская **локация** + дети (`parentId`). Не апгрейдить зонтик в `/venues` из-за афиши острова. Канон: [place-cluster-canon.md](./place-cluster-canon.md). Пилот schema/PDP = `CAT.PLACE-CLUSTER` (не билдить в этом проходе).
 
 ---
 

@@ -28,6 +28,7 @@
 | **Арт-галереи** | всегда **Площадки** | institution, тот же принцип что музеи |
 | Театры / цирки / концертные залы / филармонии / консерватории / ДК / культурные центры | **Площадки** | institution (`THEATER` / `CONCERT_HALL`) |
 | Парки / набережные / памятники / улицы / площади | **Локации** | location kinds (`PARK` / `MONUMENT` / outdoor / …) |
+| **Кластер** (Новая Голландия, Севкабель Порт) | всегда **Локация**-родитель | `OUTDOOR_LOCATION` (или park); дети - отдельные карточки, см. [place-cluster-canon.md](./place-cluster-canon.md) |
 | **Здания** (особняк, дворец, собор, крепость, адмиралтейство, …) | **Локации** | `ATTRACTION` («Достопримечательность»), **не** `OUTDOOR_LOCATION` |
 | **Кафе / ресторан / бар** (туристические точки без institution-афиши) | **Локации** | `GASTRO` («Гастро»), **не** `CLUB_BAR_RESTAURANT` и **не** `OUTDOOR_LOCATION` |
 
@@ -110,6 +111,7 @@ Must-see / Hot Picks / city hub `mustSee` обязаны ссылаться на
 - [ ] Must-see / Hot Picks / hub ссылки ведут на канон, не на twin.
 - [ ] Договор с объектом не использован как критерий «делать Venue» (для музеев/галерей Venue и без договора).
 - [ ] Отсутствие tickets/sessions не использовано как повод перенести institution в `/locations`.
+- [ ] Зонтик (НГ / Севкабель / арт-квартал) → одна родительская **локация**, не `/venues`-близнец; дети не в `places[]` хаба.
 
 ---
 
@@ -118,4 +120,5 @@ Must-see / Hot Picks / city hub `mustSee` обязаны ссылаться на
 - [Project.md](./Project.md) - краткий pointer + VenueKind / Location↔Excursion
 - [myday-commercial-canon.md](./myday-commercial-canon.md) - planner UX
 - [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brief.md) - UX `/locations`
-- [qa.md](./qa.md) - LOCKED 2026-08-07 option A; 2026-08-13 Places hub + plant ticket venues into `/venues` on create
+- [place-cluster-canon.md](./place-cluster-canon.md) - зонтик Новая Голландия / Севкабель: родитель-локация, дети, афиша, Мой день
+- [qa.md](./qa.md) - LOCKED 2026-08-07 option A; 2026-08-13 Places hub + plant ticket venues + place cluster
