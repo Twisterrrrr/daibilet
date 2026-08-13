@@ -11,12 +11,19 @@
 | UX.LOC-ABOUT-BEFORE-NEARBY | PDP локации: «О локации» и «Как добраться» выше блока «Рядом» | Высокий | ✅ 2026-08-13 code; live после Deploy MSK web |
 | UX.PDP-HERO-3-4-MOBILE | Hero событий / локаций / площадок на mobile: `aspect-[3/4]`, sm+ без этого кропа | Высокий | ✅ 2026-08-13 code; live после Deploy MSK web |
 
+## Places hub: H1 + light filters (2026-08-13)
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| UX.PLACES-H1-FIXED | H1 `/places`: `Музеи, театры, локации, достопримечательности {City_Род}`; description длиннее | Средний | ✅ 2026-08-13 code; live после Deploy MSK web |
+| UX.PLACES-FILTER-LIGHT | `/places`: одна синяя кнопка (теги kind); scope - текст у «Собрать день» | Высокий | ✅ 2026-08-13 code; live после Deploy MSK web |
+| UX.PLACES-SORT-EVENTS | Сорт `events`: подпись «По событиям», не «По афише» | Средний | ✅ 2026-08-13 code; live после Deploy MSK web |
+
 ## Places hub: H1 types + sort label (2026-08-13)
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| UX.PLACES-H1-TYPES | H1 `/places`: 4 kind от slug города + родительный (стабильно, не Math.random); title = H1 | Средний | ✅ 2026-08-13 code; live после Deploy MSK web |
-| UX.PLACES-SORT-EVENTS | Сорт `events`: подпись «По событиям», не «По афише» | Средний | ✅ 2026-08-13 code; live после Deploy MSK web |
+| UX.PLACES-H1-TYPES | H1 `/places`: 4 kind от slug города + родительный (стабильно, не Math.random); title = H1 | Средний | ⛔ superseded UX.PLACES-H1-FIXED |
 
 ## Places hub: unified cards + scope toggle (2026-08-13)
 

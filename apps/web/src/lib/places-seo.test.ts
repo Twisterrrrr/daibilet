@@ -1,41 +1,25 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import {
-  buildPlacesListingCopy,
-  buildPlacesListingSeo,
-  pickPlacesH1Types,
-} from './places-seo.ts';
+import { buildPlacesListingCopy, buildPlacesListingSeo } from './places-seo.ts';
 
-test('places H1 uses genitive city and unified listing copy', () => {
-  assert.equal(buildPlacesListingCopy(null).h1, 'Музеи, театры, площадки, локации');
+test('places H1 is the fixed kinds list plus genitive city', () => {
+  assert.equal(buildPlacesListingCopy(null).h1, 'Музеи, театры, локации, достопримечательности');
   assert.equal(
     buildPlacesListingCopy(null, 'institution').h1,
-    'Музеи, театры, концертные залы, площадки',
+    'Музеи, театры, локации, достопримечательности',
   );
-  assert.match(buildPlacesListingCopy('Москва').description, /площадки/i);
-  assert.match(buildPlacesListingCopy('Москва').description, /локации/i);
 
-  const spb = buildPlacesListingCopy('Санкт-Петербург', null, 'saint-petersburg');
-  assert.match(spb.h1, /^[А-ЯЁ].+ Санкт-Петербурга$/);
+  const spb = buildPlacesListingCopy('Санкт-Петербург');
+  assert.equal(spb.h1, 'Музеи, театры, локации, достопримечательности Санкт-Петербурга');
   assert.equal(spb.title, spb.h1);
-  assert.equal(
-    spb.h1,
-    buildPlacesListingCopy('Санкт-Петербург', null, 'saint-petersburg').h1,
-  );
-  assert.notEqual(
-    buildPlacesListingCopy('Казань', null, 'kazan').h1,
-    buildPlacesListingCopy('Пермь', null, 'perm').h1,
-  );
-});
 
-test('places H1 types are stable per city seed and not Math.random', () => {
-  const first = pickPlacesH1Types('saint-petersburg');
-  const second = pickPlacesH1Types('saint-petersburg');
-  assert.deepEqual(first, second);
-  assert.equal(first.length, 4);
-  assert.notDeepEqual(pickPlacesH1Types('kazan'), pickPlacesH1Types('perm'));
-  assert.deepEqual(pickPlacesH1Types(''), ['музеи', 'театры', 'площадки', 'локации']);
+  const moscow = buildPlacesListingCopy('Москва');
+  assert.equal(moscow.h1, 'Музеи, театры, локации, достопримечательности Москвы');
+  assert.match(moscow.description, /площадки/i);
+  assert.match(moscow.description, /локации/i);
+  assert.ok(moscow.description.length > 140);
+  assert.ok(buildPlacesListingCopy(null).description.length > 140);
 });
 
 test('places listing canonical indexes hub, city and family; noindexes thin filters', () => {
@@ -54,8 +38,8 @@ test('places listing canonical indexes hub, city and family; noindexes thin filt
   });
   assert.equal(city.canonicalPath, '/places?city=kazan');
   assert.equal(city.indexable, true);
-  assert.match(city.h1, /Казани$/);
-  assert.equal(city.h1, buildPlacesListingCopy('Казань', null, 'kazan').h1);
+  assert.equal(city.h1, 'Музеи, театры, локации, достопримечательности Казани');
+  assert.equal(city.h1, buildPlacesListingCopy('Казань').h1);
 
   const family = buildPlacesListingSeo({ family: 'institution' });
   assert.equal(family.canonicalPath, '/places?family=institution');

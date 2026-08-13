@@ -536,11 +536,7 @@ export function PlacesHubView({
 
   const cityCount = cityOptions.length;
   const cityName = cityFilter !== 'all' ? cityFilter : null;
-  const citySlugForCopy =
-    cityFilter !== 'all'
-      ? selectedCity?.selectedDestination?.slug || cityFetchKey || cityName
-      : '';
-  const pageTitleText = buildPlacesListingCopy(cityName, family, citySlugForCopy).h1;
+  const pageTitleText = buildPlacesListingCopy(cityName, family).h1;
   const families = countCatalogFamilies(stats.types);
   const hideCityOnCards = cityFilter !== 'all';
   const cityQuery =
@@ -599,31 +595,13 @@ export function PlacesHubView({
           </select>
         </div>
 
-        <div className="mt-4 flex flex-wrap gap-1.5" role="radiogroup" aria-label="Что показывать">
-          {SCOPE_OPTIONS.map(([value, label]) => {
-            const active = scope === value;
-            return (
-              <button
-                key={value}
-                type="button"
-                role="radio"
-                aria-checked={active}
-                onClick={() => setScope(value)}
-                className={`catalog-chip ${active ? 'catalog-chip-on' : 'catalog-chip-idle'}`}
-              >
-                <span className="whitespace-nowrap">{label}</span>
-              </button>
-            );
-          })}
-        </div>
-
         <div className="mt-4 flex flex-wrap gap-1.5">
           <button
             type="button"
             onClick={() => setTypeFilter('all')}
             className={`catalog-chip ${allTypesOn ? 'catalog-chip-on' : 'catalog-chip-idle'}`}
           >
-            <span className="whitespace-nowrap">Все типы</span>
+            <span className="whitespace-nowrap">Все места</span>
           </button>
           {typeOptions.map((option) => {
             const active = typeFilter === option.value;
@@ -640,10 +618,31 @@ export function PlacesHubView({
           })}
         </div>
 
-        <div className="mt-3">
+        <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1" role="radiogroup" aria-label="Что показывать">
+            {SCOPE_OPTIONS.map(([value, label]) => {
+              const active = scope === value;
+              return (
+                <button
+                  key={value}
+                  type="button"
+                  role="radio"
+                  aria-checked={active}
+                  onClick={() => setScope(value)}
+                  className={
+                    active
+                      ? 'text-slate-800'
+                      : 'text-slate-500 transition hover:text-slate-700'
+                  }
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
           <Link
             href={myDayHref}
-            className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary-700 hover:text-primary-800"
+            className="inline-flex items-center gap-1.5 font-semibold text-primary-700 hover:text-primary-800"
           >
             <Route className="h-4 w-4" strokeWidth={1.75} />
             Собрать день
