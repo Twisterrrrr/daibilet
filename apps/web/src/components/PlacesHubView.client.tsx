@@ -646,29 +646,31 @@ export function PlacesHubView({
           </select>
         </div>
 
-        <div className="mt-4 flex flex-wrap items-center gap-1.5">
-          <button
-            type="button"
-            onClick={() => setTypeFilter('all')}
-            className={`catalog-chip ${allTypesOn ? 'catalog-chip-on' : 'catalog-chip-idle'}`}
-          >
-            <span className="whitespace-nowrap">Все места</span>
-          </button>
-          {categoryChips.map((chip) => {
-            const active = typeFilter === chip.id;
-            return (
-              <button
-                key={chip.id}
-                type="button"
-                onClick={() => setTypeFilter(active ? 'all' : chip.id)}
-                className={`catalog-chip ${active ? 'catalog-chip-on' : 'catalog-chip-idle'}`}
-              >
-                <span className="whitespace-nowrap">{chip.label}</span>
-              </button>
-            );
-          })}
+        <div className="mt-4 flex items-start gap-2">
+          <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => setTypeFilter('all')}
+              className={`catalog-chip ${allTypesOn ? 'catalog-chip-on' : 'catalog-chip-idle'}`}
+            >
+              <span className="whitespace-nowrap">Все места</span>
+            </button>
+            {categoryChips.map((chip) => {
+              const active = typeFilter === chip.id;
+              return (
+                <button
+                  key={chip.id}
+                  type="button"
+                  onClick={() => setTypeFilter(active ? 'all' : chip.id)}
+                  className={`catalog-chip ${active ? 'catalog-chip-on' : 'catalog-chip-idle'}`}
+                >
+                  <span className="whitespace-nowrap">{chip.label}</span>
+                </button>
+              );
+            })}
+          </div>
 
-          <div ref={filtersRef} className="relative ml-auto">
+          <div ref={filtersRef} className="relative shrink-0">
             <button
               type="button"
               onClick={() => setFiltersOpen((open) => !open)}
