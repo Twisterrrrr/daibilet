@@ -28,6 +28,11 @@ export function MyDayMapAside({
       data-day-route-map-wrap
       data-day-route-map-desktop
     >
+      {/*
+        Chrome corners must not stack on Leaflet zoom (was: Свернуть + fullscreen + +/-
+        all fighting in the top-right). Collapse sits on the panel edge (left);
+        fullscreen alone top-right; zoom is bottom-right inside DayRouteOsmMap.
+      */}
       <button
         type="button"
         onClick={onToggleOpen}
@@ -36,7 +41,7 @@ export function MyDayMapAside({
         title={mapOpen ? 'Свернуть карту' : 'Развернуть карту'}
         data-my-day-map-collapse
         className={`absolute top-3 z-[500] inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 ${
-          mapOpen ? 'right-3 px-3 py-1.5' : 'left-1/2 -translate-x-1/2 p-2'
+          mapOpen ? 'left-3 px-3 py-1.5' : 'left-1/2 -translate-x-1/2 p-2'
         }`}
       >
         {mapOpen ? (
@@ -55,7 +60,7 @@ export function MyDayMapAside({
           aria-label="Открыть карту на весь экран"
           title="Карта на весь экран"
           data-my-day-map-full
-          className="absolute right-3 top-14 z-[500] grid h-9 w-9 place-items-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:bg-slate-50"
+          className="absolute right-3 top-3 z-[500] grid h-9 w-9 place-items-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:bg-slate-50"
         >
           <Maximize2 className="h-4 w-4" aria-hidden />
         </button>

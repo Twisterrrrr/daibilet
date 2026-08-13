@@ -100,9 +100,10 @@ export function DayRouteOsmMap({
           zoomControl: false,
         });
         mapRef.current = map;
+        // bottomright: MyDayMapAside keeps collapse (left) + fullscreen (top-right).
         L.control
           .zoom({
-            position: 'topright',
+            position: 'bottomright',
             zoomInTitle: 'Приблизить',
             zoomOutTitle: 'Отдалить',
           })
