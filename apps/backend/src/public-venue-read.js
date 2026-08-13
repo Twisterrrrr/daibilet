@@ -2224,7 +2224,13 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
     }
     const typeUniverse = working;
     if (typeFilter) {
-      working = working.filter((venue) => venue.type === typeFilter);
+      const typeSet = new Set(
+        typeFilter
+          .split(',')
+          .map((part) => String(part || '').trim().toLowerCase())
+          .filter(Boolean),
+      );
+      working = working.filter((venue) => typeSet.has(String(venue.type || '').toLowerCase()));
     }
     const scaleUniverse = working;
     if (scaleFilter === 'museum' || scaleFilter === 'large_hall' || scaleFilter === 'intimate') {

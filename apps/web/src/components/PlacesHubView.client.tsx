@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
-import { Grid3X3, List } from 'lucide-react';
+import { Grid3X3, List, SlidersHorizontal } from 'lucide-react';
 
 import { CatalogPaginationLinks } from '@/components/CatalogPaginationLinks';
 import { InstitutionCard } from '@/components/InstitutionCard.client';
@@ -14,7 +14,7 @@ import { VenuesCatalogSkeleton } from '@/components/VenueCatalogSkeletons';
 import { HeroLayout } from '@/components/HeroLayout';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { placesSearchHref } from '@/lib/catalog-url';
-import { pluralCities, pluralLocations, pluralPlaces, pluralVenues } from '@/lib/format';
+import { pluralCities, pluralPlaces } from '@/lib/format';
 import { buildPlacesListingCopy, normalizePlacesFamily } from '@/lib/places-seo';
 import {
   catalogCityQueryValue,
@@ -34,11 +34,11 @@ import {
   type VenueCatalogSort,
 } from '@/lib/venue-catalog-feed';
 import {
-  CATALOG_TYPE_OPTIONS,
-  INSTITUTION_CATALOG_TYPE_OPTIONS,
-  LOCATION_CATALOG_TYPE_OPTIONS,
+  PLACES_HUB_CATEGORY_CHIPS,
   countCatalogFamilies,
   normalizeVenueKind,
+  placesHubCategoryCount,
+  resolvePlacesHubCategoryChip,
 } from '@/lib/venue-meta';
 import { venueHref, venuePageTemplate } from '@/lib/routes';
 import { isRegionLikeCityTitle, resolveVenuePlaceCity } from '@/lib/venue-place-city';
@@ -54,15 +54,12 @@ const SORT_OPTIONS: Array<[VenueCatalogSort, string]> = [
   ['desc', 'Я-А'],
 ];
 
-function readStoredViewMode(): ViewMode {
-  if (typeof window === 'undefined') return 'cards';
-  try {
-    const stored = localStorage.getItem(PLACES_VIEW_MODE_KEY);
-    return stored === 'list' ? 'list' : 'cards';
-  } catch {
-    return 'cards';
-  }
-}
+type PlacesScope = 'all' | 'events';
+
+const FILTER_SCOPE_OPTIONS: Array<[PlacesScope, string]> = [
+  ['all', 'Показывать все'],
+  ['events', 'Только с событиями'],
+];
 
 function cityOptionsFromStats(cities: Record<string, number>): Array<[string, number]> {
   return [...Object.entries(cities)].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'ru'));
@@ -156,14 +153,23 @@ function parseSortParam(raw: string | null): VenueCatalogSort {
   return 'events';
 }
 
-type PlacesScope = 'all' | VenueCatalogFamily | 'events';
+function readStoredViewMode(): ViewMode {
+  if (typeof window === 'undefined') return 'cards';
+  try {
+    const stored = localStorage.getItem(PLACES_VIEW_MODE_KEY);
+    return stored === 'list' ? 'list' : 'cards';
+  } catch {
+    return 'cards';
+  }
+}
 
-const SCOPE_OPTIONS: Array<[PlacesScope, string]> = [
-  ['all', 'Показывать все'],
-  ['institution', 'Только площадки'],
-  ['location', 'Только локации'],
-  ['events', 'Только с событиями'],
-];
+function venueMatchesPlacesChip(
+  venueType: string | null | undefined,
+  chip: ReturnType<typeof resolvePlacesHubCategoryChip>,
+): boolean {
+  if (!chip) return true;
+  return chip.types.includes(normalizeVenueKind(venueType));
+}
 
 /**
  * Unified Places catalog chrome (same layout as `/venues` screenshot).
@@ -192,12 +198,15 @@ export function PlacesHubView({
   const family = parseFamilyParam(searchParams.get('family'));
   const hasEvents = parseHasEventsParam(searchParams.get('hasEvents'));
   const sortMode = parseSortParam(searchParams.get('sort'));
-  const scope: PlacesScope = hasEvents ? 'events' : family;
+  const scope: PlacesScope = hasEvents ? 'events' : 'all';
   const rawUrlCity = searchParams.get('city')?.trim() || '';
   const urlCityAll = isAllCitiesQuery(rawUrlCity);
   const urlCity = urlCityAll ? '' : rawUrlCity;
   const rawType = searchParams.get('type')?.trim() || '';
-  const typeFilter = rawType ? normalizeVenueKind(rawType) : 'all';
+  const categoryChip = resolvePlacesHubCategoryChip(rawType);
+  const typeFilter = categoryChip?.id || (rawType ? normalizeVenueKind(rawType) : 'all');
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const filtersRef = useRef<HTMLDivElement>(null);
   const urlPage = parseVenueCatalogPageParam(searchParams.get('page'));
   const [listPage, setListPage] = useState(urlPage);
   const cityReady = selectedCity?.cityReady ?? true;
@@ -264,6 +273,24 @@ export function PlacesHubView({
     setViewMode(readStoredViewMode());
   }, []);
 
+  useEffect(() => {
+    if (!filtersOpen) return;
+    const onPointer = (event: MouseEvent) => {
+      const target = event.target as Node | null;
+      if (target && filtersRef.current?.contains(target)) return;
+      setFiltersOpen(false);
+    };
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setFiltersOpen(false);
+    };
+    document.addEventListener('mousedown', onPointer);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onPointer);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [filtersOpen]);
+
   const replaceCatalogUrl = (mutate: (params: URLSearchParams) => void) => {
     const params = new URLSearchParams(searchParams.toString());
     mutate(params);
@@ -305,14 +332,18 @@ export function PlacesHubView({
     () => ({
       family,
       city: cityFetchKey || undefined,
-      type: typeFilter !== 'all' ? typeFilter : undefined,
+      type: categoryChip
+        ? categoryChip.types.join(',')
+        : typeFilter !== 'all'
+          ? typeFilter
+          : undefined,
       sort: sortMode,
       q: q || undefined,
       hasEvents: hasEvents || undefined,
       page: listPage,
       limit: VENUE_CATALOG_PAGE_SIZE,
     }),
-    [family, cityFetchKey, typeFilter, sortMode, q, hasEvents, listPage],
+    [family, cityFetchKey, categoryChip, typeFilter, sortMode, q, hasEvents, listPage],
   );
 
   const feedQueryKey = useMemo(() => venueCatalogCacheKey(feedQuery), [feedQuery]);
@@ -368,15 +399,7 @@ export function PlacesHubView({
     const requestId = ++catalogRequestId.current;
     const cachedBase = cityBaseRef.current?.key === scopeKey ? cityBaseRef.current.page : null;
 
-    if (listPage === 1 && typeFilter !== 'all' && cachedBase && cachedBase.venues.length > 0) {
-      const filtered = cachedBase.venues
-        .filter((venue) => normalizeVenueKind(venue.type) === typeFilter)
-        .slice(0, VENUE_CATALOG_PAGE_SIZE);
-      setVenues(filtered);
-      setTotal(Number(cachedBase.stats.types?.[typeFilter]) || filtered.length);
-      setStats(cachedBase.stats);
-      setCatalogLoading(false);
-    } else if (listPage === 1 && cachedBase && typeFilter === 'all') {
+    if (listPage === 1 && cachedBase && typeFilter === 'all') {
       setVenues(cachedBase.venues);
       setTotal(cachedBase.total);
       setStats(cachedBase.stats);
@@ -538,12 +561,11 @@ export function PlacesHubView({
 
   const setScope = (next: PlacesScope) => {
     setListPage(1);
+    setFiltersOpen(false);
     replaceCatalogUrl((params) => {
       params.delete('family');
       params.delete('hasEvents');
-      params.delete('type');
       params.delete('page');
-      if (next === 'institution' || next === 'location') params.set('family', next);
       if (next === 'events') params.set('hasEvents', '1');
       if (urlCityAll && !params.get('city')) params.set('city', 'all');
     });
@@ -562,19 +584,13 @@ export function PlacesHubView({
   const listPending = (cityPending || catalogLoading) && venues.length === 0;
   const listRefreshing = (cityPending || catalogLoading) && venues.length > 0;
 
-  const typeOptions = useMemo(() => {
+  const categoryChips = useMemo(() => {
     const counts = stats.types || {};
-    const pool =
-      family === 'institution'
-        ? INSTITUTION_CATALOG_TYPE_OPTIONS
-        : family === 'location'
-          ? LOCATION_CATALOG_TYPE_OPTIONS
-          : CATALOG_TYPE_OPTIONS;
-    return pool.filter((option) => counts[option.value]).map((option) => ({
-      ...option,
-      count: counts[option.value] || 0,
-    }));
-  }, [stats.types, family]);
+    return PLACES_HUB_CATEGORY_CHIPS.map((chip) => ({
+      ...chip,
+      count: placesHubCategoryCount(counts, chip),
+    })).filter((chip) => chip.count > 0);
+  }, [stats.types]);
 
   const cityCount = cityOptions.length;
   const cityName = cityFilter !== 'all' ? cityFilter : null;
@@ -584,6 +600,7 @@ export function PlacesHubView({
       : '';
   const pageTitleText = buildPlacesListingCopy(cityName, family, citySlugForCopy).h1;
   const families = countCatalogFamilies(stats.types);
+  const placesTotal = families.institutions + families.locations;
   const hideCityOnCards = cityFilter !== 'all';
   const cityQuery =
     cityFetchKey && cityFetchKey !== 'all'
@@ -597,6 +614,7 @@ export function PlacesHubView({
   }, [searchParams, listPage]);
 
   const allTypesOn = typeFilter === 'all';
+  const filtersActiveCount = hasEvents ? 1 : 0;
 
   return (
     <>
@@ -604,7 +622,7 @@ export function PlacesHubView({
         variant="minimal"
         dense
         breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Места' }]}
-        eyebrow={`${pluralVenues(families.institutions)} • ${pluralLocations(families.locations)} • ${pluralCities(cityCount)}`}
+        eyebrow={`${pluralPlaces(placesTotal)} • ${pluralCities(cityCount)}`}
         title={pageTitleText}
         tone="light"
         className="bg-white"
@@ -626,21 +644,9 @@ export function PlacesHubView({
               </option>
             ))}
           </select>
-          <select
-            value={sortMode}
-            onChange={(event) => setSortFilter(event.target.value as VenueCatalogSort)}
-            className="rounded-xl bg-[#F5F5F7] px-3 py-2.5 text-sm outline-none sm:max-w-[10rem] sm:shrink-0"
-            aria-label="Сортировка"
-          >
-            {SORT_OPTIONS.map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </select>
         </div>
 
-        <div className="mt-4 flex flex-wrap gap-1.5">
+        <div className="mt-4 flex flex-wrap items-center gap-1.5">
           <button
             type="button"
             onClick={() => setTypeFilter('all')}
@@ -648,47 +654,68 @@ export function PlacesHubView({
           >
             <span className="whitespace-nowrap">Все места</span>
           </button>
-          {typeOptions.map((option) => {
-            const active = typeFilter === option.value;
+          {categoryChips.map((chip) => {
+            const active = typeFilter === chip.id;
             return (
               <button
-                key={option.value}
+                key={chip.id}
                 type="button"
-                onClick={() => setTypeFilter(active ? 'all' : option.value)}
+                onClick={() => setTypeFilter(active ? 'all' : chip.id)}
                 className={`catalog-chip ${active ? 'catalog-chip-on' : 'catalog-chip-idle'}`}
               >
-                <span className="whitespace-nowrap">{option.label}</span>
+                <span className="whitespace-nowrap">{chip.label}</span>
               </button>
             );
           })}
-        </div>
 
-        <div className="mt-3 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm" role="radiogroup" aria-label="Что показывать">
-          {SCOPE_OPTIONS.map(([value, label], index) => {
-            const active = scope === value;
-            return (
-              <span key={value} className="inline-flex items-center gap-x-1.5">
-                {index > 0 ? (
-                  <span className="text-slate-300" aria-hidden="true">
-                    •
-                  </span>
-                ) : null}
-                <button
-                  type="button"
-                  role="radio"
-                  aria-checked={active}
-                  onClick={() => setScope(value)}
-                  className={
-                    active
-                      ? 'text-slate-800'
-                      : 'text-slate-500 transition hover:text-slate-700'
-                  }
-                >
-                  {label}
-                </button>
-              </span>
-            );
-          })}
+          <div ref={filtersRef} className="relative ml-auto">
+            <button
+              type="button"
+              onClick={() => setFiltersOpen((open) => !open)}
+              aria-expanded={filtersOpen}
+              aria-haspopup="menu"
+              className={`inline-flex h-9 items-center gap-1.5 rounded-xl px-3 text-sm font-semibold transition ${
+                filtersOpen || filtersActiveCount > 0
+                  ? 'bg-primary-600 text-white hover:bg-primary-700'
+                  : 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+              }`}
+            >
+              <SlidersHorizontal className="h-4 w-4" strokeWidth={1.75} aria-hidden />
+              Фильтры
+              {filtersActiveCount > 0 ? (
+                <span className="grid min-w-5 place-items-center rounded-md bg-white/25 px-1.5 text-xs">
+                  {filtersActiveCount}
+                </span>
+              ) : null}
+            </button>
+            {filtersOpen ? (
+              <div
+                role="menu"
+                aria-label="Дополнительные фильтры"
+                className="absolute right-0 z-40 mt-2 w-64 overflow-hidden rounded-2xl border border-slate-200 bg-white py-2 shadow-lg"
+              >
+                {FILTER_SCOPE_OPTIONS.map(([value, label]) => {
+                  const active = scope === value;
+                  return (
+                    <button
+                      key={value}
+                      type="button"
+                      role="menuitemradio"
+                      aria-checked={active}
+                      onClick={() => setScope(value)}
+                      className={`flex w-full items-center px-3.5 py-2.5 text-left text-sm transition ${
+                        active
+                          ? 'bg-primary-50 font-semibold text-primary-800'
+                          : 'text-slate-700 hover:bg-slate-50'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : null}
+          </div>
         </div>
       </HeroLayout>
 
@@ -701,31 +728,45 @@ export function PlacesHubView({
                 ? pluralPlaces(total)
                 : null}
           </p>
-          <div className="flex shrink-0 overflow-hidden rounded-xl bg-[#F5F5F7] p-1" role="radiogroup" aria-label="Вид каталога">
-            <button
-              type="button"
-              role="radio"
-              aria-checked={viewMode === 'cards'}
-              aria-label="Карточки"
-              onClick={() => setViewModePersisted('cards')}
-              className={`grid h-9 w-9 place-items-center rounded-lg transition ${
-                viewMode === 'cards' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'
-              }`}
+          <div className="flex flex-wrap items-center gap-2">
+            <select
+              value={sortMode}
+              onChange={(event) => setSortFilter(event.target.value as VenueCatalogSort)}
+              className="rounded-xl bg-[#F5F5F7] px-3 py-2 text-sm outline-none"
+              aria-label="Сортировка"
             >
-              <Grid3X3 className="h-4 w-4" strokeWidth={1.75} />
-            </button>
-            <button
-              type="button"
-              role="radio"
-              aria-checked={viewMode === 'list'}
-              aria-label="Список"
-              onClick={() => setViewModePersisted('list')}
-              className={`grid h-9 w-9 place-items-center rounded-lg transition ${
-                viewMode === 'list' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'
-              }`}
-            >
-              <List className="h-4 w-4" strokeWidth={1.75} />
-            </button>
+              {SORT_OPTIONS.map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+            <div className="flex shrink-0 overflow-hidden rounded-xl bg-[#F5F5F7] p-1" role="radiogroup" aria-label="Вид каталога">
+              <button
+                type="button"
+                role="radio"
+                aria-checked={viewMode === 'cards'}
+                aria-label="Карточки"
+                onClick={() => setViewModePersisted('cards')}
+                className={`grid h-9 w-9 place-items-center rounded-lg transition ${
+                  viewMode === 'cards' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                <Grid3X3 className="h-4 w-4" strokeWidth={1.75} />
+              </button>
+              <button
+                type="button"
+                role="radio"
+                aria-checked={viewMode === 'list'}
+                aria-label="Список"
+                onClick={() => setViewModePersisted('list')}
+                className={`grid h-9 w-9 place-items-center rounded-lg transition ${
+                  viewMode === 'list' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                <List className="h-4 w-4" strokeWidth={1.75} />
+              </button>
+            </div>
           </div>
         </div>
 
@@ -744,7 +785,6 @@ export function PlacesHubView({
                       venue={venue}
                       href={venueHref(venue)}
                       hideCity={hideCityOnCards}
-                      showFamilyTag
                     />
                   ) : (
                     <LocationCard
@@ -752,7 +792,6 @@ export function PlacesHubView({
                       venue={venue}
                       href={venueHref(venue)}
                       hideCity={hideCityOnCards}
-                      showFamilyTag
                     />
                   ),
                 )}

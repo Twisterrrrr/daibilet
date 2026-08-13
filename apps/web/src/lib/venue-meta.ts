@@ -280,6 +280,45 @@ export const LOCATION_CATALOG_TYPE_OPTIONS = CATALOG_TYPE_OPTIONS.filter((option
   }),
 );
 
+/**
+ * Чипы `/places` для людей: без жаргона «площадка/локация» и без редких kind.
+ * `id` уходит в `?type=`; `types` - фактические kind для фильтрации.
+ */
+export const PLACES_HUB_CATEGORY_CHIPS: Array<{ id: string; label: string; types: string[] }> = [
+  { id: 'museums', label: 'Музеи', types: ['museum', 'museum_art_space', 'art_space'] },
+  { id: 'theaters', label: 'Театры', types: ['theater'] },
+  { id: 'concert_halls', label: 'Концертные залы', types: ['concert_hall'] },
+  { id: 'bars_restaurants', label: 'Бары и рестораны', types: ['bar', 'club_bar_restaurant', 'gastro'] },
+  {
+    id: 'outdoors',
+    label: 'Парки и открытые места',
+    types: ['park', 'outdoor_location', 'monument', 'attraction'],
+  },
+];
+
+export function resolvePlacesHubCategoryChip(
+  typeParam: string | null | undefined,
+): (typeof PLACES_HUB_CATEGORY_CHIPS)[number] | null {
+  const raw = String(typeParam || '')
+    .trim()
+    .toLowerCase();
+  if (!raw || raw === 'all') return null;
+  const byId = PLACES_HUB_CATEGORY_CHIPS.find((chip) => chip.id === raw);
+  if (byId) return byId;
+  // Legacy `?type=theater` / `museum` from older URLs.
+  return (
+    PLACES_HUB_CATEGORY_CHIPS.find((chip) => chip.types.includes(normalizeVenueKind(raw))) || null
+  );
+}
+
+export function placesHubCategoryCount(
+  typesCounts: Record<string, number> | null | undefined,
+  chip: (typeof PLACES_HUB_CATEGORY_CHIPS)[number],
+): number {
+  const counts = typesCounts || {};
+  return chip.types.reduce((sum, type) => sum + (Number(counts[type]) || 0), 0);
+}
+
 /** UX-масштаб площадок на `/venues` - только эвристики по kind, без Prisma. */
 export type InstitutionScale = 'museum' | 'large_hall' | 'intimate' | 'other';
 
