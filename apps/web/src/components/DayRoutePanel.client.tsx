@@ -205,6 +205,7 @@ import {
   buildMustSeeFilterTabs,
   classifyMustSeePlace,
   mustSeeFilterLabel,
+  mustSeeFilterStopTypeTag,
   type MustSeeFilterId,
 } from '@/lib/must-see-filters';
 import { MustSeeFilterTabs } from '@/components/MustSeeFilterTabs.client';
@@ -1467,25 +1468,9 @@ function DayRoutePanelInner() {
     return label || null;
   }, [route.venues.length, totalWithStopsMinutes]);
   const mustSeeTagByKey = useMemo(() => {
-    const SHORT: Record<string, string> = {
-      main: 'Главное',
-      gastro: 'Еда',
-      museum: 'Музей',
-      science: 'Семейное',
-      literature: 'Литература',
-      views: 'Смотровая',
-      street: 'Прогулка',
-      park: 'Парк',
-      temple: 'Храм',
-      creative: 'Арт-объект',
-      secret: 'Необычное',
-      houses: 'Архитектура',
-      mansions: 'Особняк',
-    };
     const map = new Map<string, string>();
     for (const row of mustSeeResolved) {
-      const id = classifyMustSeePlace(row.place);
-      const label = SHORT[id] || mustSeeFilterLabel(id);
+      const label = mustSeeFilterStopTypeTag(classifyMustSeePlace(row.place));
       if (row.item.id) map.set(row.item.id, label);
       if (row.item.slug) map.set(String(row.item.slug), label);
     }
@@ -1682,12 +1667,11 @@ function DayRoutePanelInner() {
     const notInRoute = (item: DayRouteVenueItem) =>
       !isInDayRoute(item.id, route) && !(item.slug && isInDayRoute(item.slug, route));
     const picks: FreePick[] = [];
-    const freeRow = mustSeeResolved.find(
-      (row) =>
-        (classifyMustSeePlace(row.place) === 'park' || classifyMustSeePlace(row.place) === 'temple') &&
-        inDayCity(row.item) &&
-        notInRoute(row.item),
-    );
+    const freeRow = mustSeeResolved.find((row) => {
+      if (!inDayCity(row.item) || !notInRoute(row.item)) return false;
+      const tag = mustSeeFilterStopTypeTag(classifyMustSeePlace(row.place));
+      return dayRouteStopPriceChipLabel(row.item, tag) === 'Вход свободный';
+    });
     if (freeRow) picks.push({ key: 'free', badge: 'Вход свободный', item: freeRow.item, hook: freeRow.hook });
     const museumRow = mustSeeResolved.find(
       (row) =>

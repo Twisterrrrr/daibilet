@@ -38,9 +38,17 @@ test('dayRouteStopTypeTag classifies custom / suburb / event', () => {
 });
 
 test('dayRouteStopPriceChipLabel does not invent free entry for interiors', () => {
-  assert.equal(dayRouteStopPriceChipLabel({ id: 'v1', title: 'Александровский сад' }), 'Вход свободный');
+  assert.equal(dayRouteStopPriceChipLabel({ id: 'v1', title: 'Дворцовая площадь' }), 'Вход свободный');
+  assert.equal(dayRouteStopPriceChipLabel({ id: 'v1b', title: 'Аничков мост' }), 'Вход свободный');
+  assert.equal(dayRouteStopPriceChipLabel({ id: 'v1c', title: 'Дворцовая набережная' }, 'Смотровая'), 'Вход свободный');
   assert.equal(dayRouteStopPriceChipLabel({ id: 'v2', title: 'Исаакиевский собор' }), '');
-  assert.equal(dayRouteStopPriceChipLabel({ id: 'v3', title: 'Колоннада Исаакия' }), '');
+  assert.equal(dayRouteStopPriceChipLabel({ id: 'v3', title: 'Колоннада Исаакия' }, 'Смотровая'), '');
+  assert.equal(dayRouteStopPriceChipLabel({ id: 'v5', title: 'Ботанический сад Петра Великого' }, 'Парк'), '');
+  assert.equal(dayRouteStopPriceChipLabel({ id: 'v6', title: 'Нижний парк Петергофа' }, 'Парк'), '');
+  assert.equal(dayRouteStopPriceChipLabel({ id: 'v7', title: 'Павловский парк' }, 'Парк'), '');
+  assert.equal(dayRouteStopPriceChipLabel({ id: 'v8', title: 'Ленинградский зоопарк' }, 'Семейное'), '');
+  assert.equal(dayRouteStopPriceChipLabel({ id: 'v9', title: 'Особняк Кельха' }, 'Особняк'), '');
+  assert.equal(dayRouteStopPriceChipLabel({ id: 'v10', title: 'Александровский сад' }, 'Парк'), '');
   assert.equal(
     dayRouteStopPriceChipLabel({ id: 'v4', title: 'Театр', ticketUrl: 'https://t.example/1' }),
     'Можно купить билет',

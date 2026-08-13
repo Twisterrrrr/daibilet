@@ -5,6 +5,7 @@ import {
   buildMustSeeFilterTabs,
   classifyMustSeePlace,
   filterMustSeePlaces,
+  mustSeeFilterStopTypeTag,
   mustSeePlacesForDefaultPreset,
 } from './must-see-filters.ts';
 
@@ -135,4 +136,11 @@ test('filterMustSeePlaces + default preset drop gastro', () => {
   assert.ok(preset.every((p) => classifyMustSeePlace(p) === 'main'));
   assert.equal(preset.length, 3);
   assert.ok(!preset.some((p) => /yale/i.test(p.name)));
+});
+
+test('mustSeeFilterStopTypeTag maps views/park/temple to stop pills', () => {
+  assert.equal(mustSeeFilterStopTypeTag('views'), 'Смотровая');
+  assert.equal(mustSeeFilterStopTypeTag('park'), 'Парк');
+  assert.equal(mustSeeFilterStopTypeTag('temple'), 'Храм');
+  assert.equal(mustSeeFilterStopTypeTag('mansions'), 'Особняк');
 });

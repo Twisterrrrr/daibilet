@@ -189,6 +189,27 @@ export function mustSeeFilterLabel(id: MustSeeFilterId): string {
   return FILTER_LABELS[id];
 }
 
+/** Short stop-card type pill for a must-see category (Мой день). */
+const STOP_TYPE_BY_FILTER: Record<MustSeeFilterId, string> = {
+  main: 'Главное',
+  gastro: 'Еда',
+  museum: 'Музей',
+  science: 'Семейное',
+  literature: 'Литература',
+  views: 'Смотровая',
+  street: 'Прогулка',
+  park: 'Парк',
+  temple: 'Храм',
+  creative: 'Арт-объект',
+  secret: 'Необычное',
+  houses: 'Архитектура',
+  mansions: 'Особняк',
+};
+
+export function mustSeeFilterStopTypeTag(id: MustSeeFilterId): string {
+  return STOP_TYPE_BY_FILTER[id] || 'Место';
+}
+
 /** Visible tabs: only categories with ≥1 item. Prefer `main` as default when present. */
 export function buildMustSeeFilterTabs(
   places: MustSeeClassifyInput[],

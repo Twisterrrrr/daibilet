@@ -58,21 +58,19 @@ export function editorialTagFromTitle(title: string | null | undefined): string 
 }
 
 const FREE_OUTDOOR_TITLE_RE =
-  /площад|сад\b|сквер|мост|набереж|памятник|фонтан|бульвар|проспект|всадник|аллея/i;
+  /площад|сквер|мост|набереж|бульвар|проспект|улица|переул|аллея|всадник|стрелка|лини[ияю]/i;
 const PAID_ENTRY_TITLE_RE =
-  /собор|храм|колоннад|дворц|музей|эрмитаж|театр|галере|особняк|замок|крепост|смотров|палац|выстав/i;
-const FREE_ENTRY_TAGS = new Set(['Прогулка', 'Парк', 'Арт-объект']);
-const PAID_ENTRY_TAGS = new Set(['Музей', 'Храм', 'Театр', 'Смотровая', 'Событие']);
+  /собор|храм|колоннад|дворец|дворца\b|музей|эрмитаж|театр|галере|особняк|замок|крепост|смотров|палацц|выстав|ботаническ|оранжерей|зоопарк|океанариум|планетари|петергоф|павловск|царск|кусков|царицын|гатчин|ораниенбаум|меншиков|лахта|канатно|телебашн|останкин|бункер|ледокол|аквапарк|дельфин|\bцирк|некропол|макет|усадьб|павильон|аврора|крейсер|лицей|аттракцион|диво-остров|дендрар|аптекарск/i;
+const PAID_ENTRY_TAGS = new Set(['Музей', 'Храм', 'Театр', 'Событие', 'Еда', 'Особняк']);
 
 function isLikelyPaidEntry(venue: DayRouteVenueItem, typeTag?: string | null): boolean {
+  if (PAID_ENTRY_TITLE_RE.test(String(venue.title || ''))) return true;
   const tag = String(typeTag || dayRouteStopTypeTag(venue)).trim();
-  if (PAID_ENTRY_TAGS.has(tag)) return true;
-  return PAID_ENTRY_TITLE_RE.test(String(venue.title || ''));
+  return PAID_ENTRY_TAGS.has(tag);
 }
 
 function isLikelyFreeOutdoor(venue: DayRouteVenueItem, typeTag?: string | null): boolean {
-  const tag = String(typeTag || dayRouteStopTypeTag(venue)).trim();
-  if (FREE_ENTRY_TAGS.has(tag)) return true;
+  if (isLikelyPaidEntry(venue, typeTag)) return false;
   return FREE_OUTDOOR_TITLE_RE.test(String(venue.title || ''));
 }
 
