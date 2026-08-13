@@ -9,10 +9,10 @@
 - Существующие slug не плодим: Медный всадник, Чижик-Пыжик, Кант, зубры, Жюль Верн, соленые уши, медведь, «Счастье».
 - Адреса уточнены, чтобы upsert не схлопнул памятник с площадью/парком/набережной (матч по exact address).
 - В `cityInfo` mustSee пачкой не вываливаем: хабы и так у потолка, это каталог `/locations`, не вкладка «Главные места».
-- Apply: `node scripts/enrich-must-see-editorial.js --apply --file=scripts/data/catalog-monuments-2026-08-13.json`. Локальный PG `:5437` в этом worktree не поднят. Live каталог = MSK DB.
+- Apply на MSK: 108 insert / 8 update (Медный всадник, Чижик, Кант, зубры, Жюль Верн, уши, медведь, «Счастье»). PDP smoke 200 без web deploy.
 
 ### Проблемы
-- Web deploy не нужен: карточки из API/DB. Live после apply в prod DB (+ при необходимости restart API cache).
+- Нет. Карточки из API/DB, web deploy не нужен.
 
 ---
 
