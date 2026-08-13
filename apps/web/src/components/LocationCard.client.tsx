@@ -46,8 +46,16 @@ function sameAddressLabel(a: string, b: string): boolean {
       .toLowerCase()
       .replace(/\s+/g, ' ')
       .replace(/[—–]/g, '-')
+      .replace(/,/g, '')
       .trim();
   return Boolean(a && b && norm(a) === norm(b));
+}
+
+/** Title already names the stop (street / square / metro) - not an unnamed venue. */
+function looksLikeMeetingPointLabel(name: string): boolean {
+  const text = String(name || '').trim();
+  if (!text) return false;
+  return /(?:ул\.|улиц|пр\.|просп|пер\.|наб\.|пл\.|площад|метро|ст\.\s*метро|вокзал|\d)/i.test(text);
 }
 
 function realRating(value: unknown): number | null {
@@ -114,8 +122,21 @@ export function LocationCard({
     .filter(Boolean)
     .join(' · ')
     .toUpperCase();
-  const showStreet = Boolean(street) && !sameAddressLabel(street, displayName);
-  const addressLine = showStreet ? street : showPlaceCity ? placeCity : null;
+  // Bus/pier titles often ARE the meeting address («Лиговский пр. 10»). Hiding the duplicate
+  // street then also hiding city (hideCity on city-scoped /places) left «Адрес уточняется».
+  const streetIsTitle = Boolean(street) && sameAddressLabel(street, displayName);
+  const cityLabel = placeCity || (venue.city ? String(venue.city).trim() : '') || null;
+  const addressLine = street && !streetIsTitle
+    ? street
+    : streetIsTitle
+      ? cityLabel
+      : showPlaceCity
+        ? cityLabel
+        : null;
+  const pinLabel =
+    addressLine ||
+    (streetIsTitle || looksLikeMeetingPointLabel(displayName) ? cityLabel || displayName : null) ||
+    'Адрес уточняется';
 
   const dayRouteVenue = {
     id: venue.id,
@@ -180,7 +201,7 @@ export function LocationCard({
 
             <div className="flex min-w-0 items-center gap-1.5 text-sm text-graphite-muted">
               <MapPin className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
-              <span className="truncate">{addressLine || 'Адрес уточняется'}</span>
+              <span className="truncate">{pinLabel}</span>
               {rating != null ? (
                 <span className="ml-auto inline-flex shrink-0 items-center gap-0.5 text-xs font-medium text-graphite-muted">
                   <Star className="h-3 w-3" strokeWidth={1.75} />
