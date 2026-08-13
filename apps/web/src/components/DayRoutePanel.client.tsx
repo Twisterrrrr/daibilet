@@ -76,7 +76,7 @@ import {
 import { MobileStickyActionBar } from '@/components/MobileStickyActionBar';
 import { SuburbsCarousel } from '@/components/SuburbsCarousel.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
-import { catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from '@/lib/catalog-url';
+import { catalogHrefWithSelectedCity, placesHubHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from '@/lib/catalog-url';
 import { resolveCityInfo } from '@/lib/cityInfo';
 import { isSpbDayRouteCity } from '@/lib/day-route-boat';
 import {
@@ -895,6 +895,39 @@ function DayRoutePanelInner() {
   const scopeCityName = cityTitle || pageCityName;
   const scopeCitySlug = citySlug || pageCitySlug;
   const scopeCityParam = scopeCityName || scopeCitySlug;
+  const catalogCityDest = useMemo(() => {
+    const slug = citySlug || pageCitySlug;
+    const name = cityTitle || pageCityName;
+    const list = destinations || [];
+    if (slug) {
+      const bySlug = list.find(
+        (row) =>
+          row?.type === 'city' &&
+          (row.slug === slug || row.sourceSlug === slug),
+      );
+      if (bySlug) return bySlug;
+    }
+    if (name) {
+      const byName = list.find((row) => row?.type === 'city' && row.name === name);
+      if (byName) return byName;
+    }
+    return selectedCity?.selectedDestination?.type === 'city'
+      ? selectedCity.selectedDestination
+      : null;
+  }, [
+    citySlug,
+    cityTitle,
+    destinations,
+    pageCityName,
+    pageCitySlug,
+    selectedCity?.selectedDestination,
+  ]);
+  const catalogCityName = catalogCityDest?.name || cityTitle || pageCityName;
+  const catalogCitySlug = catalogCityDest?.slug || citySlug || pageCitySlug;
+  const catalogCitySourceSlug =
+    catalogCityDest?.sourceSlug || (citySlug ? null : pageCitySourceSlug);
+  const catalogCityId = catalogCityDest?.id || (cityTitle ? null : pageCityId);
+  const hasCatalogCity = Boolean(catalogCityName);
 
   // Dynamic URL sync: /my-day?city=&items= while editing (skip during inbound hydrate).
   useEffect(() => {
@@ -919,13 +952,14 @@ function DayRoutePanelInner() {
   const afishaHref = catalogHrefWithSelectedCity(scopeCityParam || 'all');
   const locationsHref = venueCatalogHrefWithSelectedCity('/locations', scopeCityParam);
   const venuesHref = venueCatalogHrefWithSelectedCity('/venues', scopeCityParam);
+  const placesHref = placesHubHrefWithSelectedCity(scopeCityParam);
   const cityHubHref = scopeCitySlug ? `/cities/${encodeURIComponent(scopeCitySlug)}` : '/cities';
 
   // Progressive city catalog: locations / venues / events settle independently.
   // Search stays usable as soon as the first family arrives (no Promise.all gate).
   // Named day-route presets still wait for locations+venues (see venueMatchCatalogReady).
   useEffect(() => {
-    if (!pageCityName) {
+    if (!catalogCityName) {
       setLocationsCatalog([]);
       setVenuesCatalog([]);
       setEventsCatalog([]);
@@ -944,8 +978,8 @@ function DayRoutePanelInner() {
     setVenueMatchCatalogReady(false);
     setCatalogError(null);
 
-    const venuesCityFilter = pageCitySlug || pageCitySourceSlug || pageCityName;
-    const eventsCityFilter = pageCityName || pageCitySlug || pageCitySourceSlug;
+    const venuesCityFilter = catalogCitySlug || catalogCitySourceSlug || catalogCityName;
+    const eventsCityFilter = catalogCityName || catalogCitySlug || catalogCitySourceSlug;
     const venuesCityQ = encodeURIComponent(venuesCityFilter);
     const eventsCityQ = encodeURIComponent(eventsCityFilter);
     const venuesQs = (family: 'location' | 'institution') =>
@@ -1042,18 +1076,18 @@ function DayRoutePanelInner() {
     });
 
     return () => controller.abort();
-  }, [pageCityName, pageCitySlug, pageCitySourceSlug]);
+  }, [catalogCityName, catalogCitySlug, catalogCitySourceSlug]);
 
   /** Remote event hits for typed query - base popular list alone misses long-tail titles. */
   useEffect(() => {
     const needle = unifiedSearchQuery.trim();
-    if (!pageCityName || needle.length < 2) {
+    if (!catalogCityName || needle.length < 2) {
       setEventsSearchExtra([]);
       return;
     }
     const controller = new AbortController();
     const timer = window.setTimeout(() => {
-      const eventsCityFilter = pageCityName || pageCitySlug || pageCitySourceSlug;
+      const eventsCityFilter = catalogCityName || catalogCitySlug || catalogCitySourceSlug;
       const eventsCityQ = encodeURIComponent(eventsCityFilter);
       const q = encodeURIComponent(needle);
       void fetch(`/api/public/events?city=${eventsCityQ}&q=${q}&limit=40&sort=popular`, {
@@ -1079,7 +1113,7 @@ function DayRoutePanelInner() {
       window.clearTimeout(timer);
       controller.abort();
     };
-  }, [unifiedSearchQuery, pageCityName, pageCitySlug, pageCitySourceSlug]);
+  }, [unifiedSearchQuery, catalogCityName, catalogCitySlug, catalogCitySourceSlug]);
 
   const matchSources = useMemo(() => {
     const map = new Map<string, DayRouteVenueMatchSource>();
@@ -1092,42 +1126,42 @@ function DayRoutePanelInner() {
   }, [locationsCatalog, venuesCatalog]);
 
   const mustSeePlaces = useMemo(() => {
-    const info = resolveCityInfo(pageCitySlug, selectedCity?.selectedDestination?.sourceSlug);
+    const info = resolveCityInfo(catalogCitySlug, catalogCitySourceSlug);
     return info?.mustSee || [];
-  }, [pageCitySlug, selectedCity?.selectedDestination?.sourceSlug]);
+  }, [catalogCitySlug, catalogCitySourceSlug]);
 
   const significantSuburbs = useMemo(() => {
-    const info = resolveCityInfo(pageCitySlug, selectedCity?.selectedDestination?.sourceSlug);
+    const info = resolveCityInfo(catalogCitySlug, catalogCitySourceSlug);
     return info?.significantSuburbs?.length ? info.significantSuburbs : [];
-  }, [pageCitySlug, selectedCity?.selectedDestination?.sourceSlug]);
+  }, [catalogCitySlug, catalogCitySourceSlug]);
 
   const dayRoutePresets = useMemo(() => {
-    const info = resolveCityInfo(pageCitySlug, selectedCity?.selectedDestination?.sourceSlug);
+    const info = resolveCityInfo(catalogCitySlug, catalogCitySourceSlug);
     return info?.dayRoutePresets || [];
-  }, [pageCitySlug, selectedCity?.selectedDestination?.sourceSlug]);
+  }, [catalogCitySlug, catalogCitySourceSlug]);
   const hasNamedPresets = dayRoutePresets.length > 0;
   /** Gate chips until match sources settle - avoids SPB 4→6 preset pop-in. */
   const presetsCatalogPending = Boolean(
-    hasNamedPresets && hasPageCity && !venueMatchCatalogReady,
+    hasNamedPresets && hasCatalogCity && !venueMatchCatalogReady,
   );
 
   const dayPresetCityCtx = useMemo(
     () => ({
-      id: pageCityId,
-      name: pageCityName,
-      slug: pageCitySlug,
-      sourceSlug: selectedCity?.selectedDestination?.sourceSlug || null,
+      id: catalogCityId,
+      name: catalogCityName,
+      slug: catalogCitySlug,
+      sourceSlug: catalogCitySourceSlug,
     }),
-    [pageCityId, pageCityName, pageCitySlug, selectedCity?.selectedDestination?.sourceSlug],
+    [catalogCityId, catalogCityName, catalogCitySlug, catalogCitySourceSlug],
   );
 
   const mustSeeResolved = useMemo(() => {
-    if (!pageCityName || !mustSeePlaces.length) return [];
+    if (!catalogCityName || !mustSeePlaces.length) return [];
     const cityCtx = {
-      id: pageCityId,
-      name: pageCityName,
-      slug: pageCitySlug,
-      sourceSlug: selectedCity?.selectedDestination?.sourceSlug || null,
+      id: catalogCityId,
+      name: catalogCityName,
+      slug: catalogCitySlug,
+      sourceSlug: catalogCitySourceSlug,
     };
     return mustSeePlaces
       .map((place) => {
@@ -1157,7 +1191,7 @@ function DayRoutePanelInner() {
           hook: string | null;
         } => Boolean(row),
       );
-  }, [mustSeePlaces, matchSources, pageCityId, pageCityName, pageCitySlug, selectedCity?.selectedDestination?.sourceSlug]);
+  }, [mustSeePlaces, matchSources, catalogCityId, catalogCityName, catalogCitySlug, catalogCitySourceSlug]);
 
   const mustSeeFilterMeta = useMemo(() => {
     return buildMustSeeFilterTabs(mustSeeResolved.map((row) => row.place));
@@ -1203,61 +1237,7 @@ function DayRoutePanelInner() {
     return out;
   }, [mustSeeResolved, route]);
 
-  const locationOptions = useMemo<DayRouteSearchOption[]>(() => {
-    return locationsCatalog.map((venue) => {
-      const inRoute = isInDayRoute(venue.id, route) || Boolean(venue.slug && isInDayRoute(venue.slug, route));
-      return {
-        id: venue.id,
-        label: venue.name,
-        hint: venue.address || venue.city,
-        imageUrl: venue.heroImageUrl ?? null,
-        disabled: inRoute || atMax,
-        disabledReason: inRoute ? 'Уже в маршруте' : atMax ? dayRouteHardLimitMessage() : null,
-      };
-    });
-  }, [locationsCatalog, route, atMax]);
-
-  const venueOptions = useMemo<DayRouteSearchOption[]>(() => {
-    return venuesCatalog.map((venue) => {
-      const inRoute = isInDayRoute(venue.id, route) || Boolean(venue.slug && isInDayRoute(venue.slug, route));
-      return {
-        id: venue.id,
-        label: venue.name,
-        hint: venue.address || venue.city,
-        imageUrl: venue.heroImageUrl ?? null,
-        disabled: inRoute || atMax,
-        disabledReason: inRoute ? 'Уже в маршруте' : atMax ? dayRouteHardLimitMessage() : null,
-      };
-    });
-  }, [venuesCatalog, route, atMax]);
-
-  const eventOptions = useMemo<DayRouteSearchOption[]>(() => {
-    return eventsCatalog.map((event) => {
-      const sessionHint = [event.dateLabel, event.timeLabel].filter(Boolean).join(', ');
-      const venueHint = [event.venue, sessionHint].filter(Boolean).join(' · ');
-      const venueKey = String(event.venueSlug || event.venue || event.id).trim();
-      const inRoute = Boolean(
-        (event.venueSlug && isInDayRoute(event.venueSlug, route)) ||
-          (event.venue &&
-            route.venues.some((v) => v.title.trim().toLowerCase() === String(event.venue).trim().toLowerCase())),
-      );
-      return {
-        id: `event:${event.id}`,
-        label: event.title,
-        hint: venueHint || null,
-        disabled: inRoute || atMax || !venueKey,
-        disabledReason: !venueKey
-          ? 'Нет площадки'
-          : inRoute
-            ? 'Уже в маршруте'
-            : atMax
-              ? dayRouteHardLimitMessage()
-              : null,
-      };
-    });
-  }, [eventsCatalog, route, atMax]);
-
-  function pickLocationById(id: string) {
+  const unifiedSearchOptions = useMemo<DayRouteSearchOption[]>(() => {
     const venue = locationsCatalog.find((item) => item.id === id);
     if (!venue) return;
     setRoute(appendDayRouteItem(venueCardToDayRouteItem(venue), consumeInsertAfterVenueId()));
@@ -1801,7 +1781,8 @@ function DayRoutePanelInner() {
       opts.push({
         id: `loc:${venue.id}`,
         label: venue.name,
-        hint: hook || [venue.address || venue.city, 'Локация'].filter(Boolean).join(' · '),
+        hint: hook || venue.address || venue.city || null,
+        family: 'Локация',
         imageUrl: venue.heroImageUrl ?? null,
         disabled: inRoute || atMax,
         disabledReason: inRoute ? 'Уже в маршруте' : atMax ? dayRouteHardLimitMessage() : null,
@@ -1816,7 +1797,8 @@ function DayRoutePanelInner() {
       opts.push({
         id: `ven:${venue.id}`,
         label: venue.name,
-        hint: hook || [venue.address || venue.city, 'Площадка'].filter(Boolean).join(' · '),
+        hint: hook || venue.address || venue.city || null,
+        family: 'Площадка',
         imageUrl: venue.heroImageUrl ?? null,
         disabled: inRoute || atMax,
         disabledReason: inRoute ? 'Уже в маршруте' : atMax ? dayRouteHardLimitMessage() : null,
@@ -1828,7 +1810,7 @@ function DayRoutePanelInner() {
     }
     for (const event of eventsById.values()) {
       const sessionHint = [event.dateLabel, event.timeLabel].filter(Boolean).join(', ');
-      const venueHint = [event.venue, sessionHint, 'Событие'].filter(Boolean).join(' · ');
+      const venueHint = [event.venue, sessionHint].filter(Boolean).join(' · ');
       const venueKey = String(event.venueSlug || event.venue || event.id).trim();
       const inRoute = Boolean(
         (event.venueSlug && isInDayRoute(event.venueSlug, route)) ||
@@ -1839,6 +1821,7 @@ function DayRoutePanelInner() {
         id: `event:${event.id}`,
         label: event.title,
         hint: venueHint || null,
+        family: 'Событие',
         imageUrl: event.imageUrl ?? null,
         disabled: inRoute || atMax || !venueKey,
         disabledReason: !venueKey
@@ -2570,19 +2553,19 @@ function DayRoutePanelInner() {
 
   const mustSeeOpen = openPanel === 'mustSee';
   const matchesOpen = openPanel === 'matches';
-  const showMustSeeAccordion = Boolean(hasPageCity && (mustSeeResolved.length > 0 || (!catalogLoading && pageCitySlug)));
+  const showMustSeeAccordion = Boolean(hasCatalogCity && (mustSeeResolved.length > 0 || (!catalogLoading && catalogCitySlug)));
   const showScenariosGuide = Boolean(
-    hasPageCity && (hasNamedPresets || mustSeePlaces.length >= 3),
+    hasCatalogCity && (hasNamedPresets || mustSeePlaces.length >= 3),
   );
-  const showSuburbsGuide = Boolean(hasPageCity && significantSuburbs.length > 0);
-  const showHotPicks = Boolean(hasPageCity && (hotPickCards.length > 0 || hotPickTabIds.length > 0));
+  const showSuburbsGuide = Boolean(hasCatalogCity && significantSuburbs.length > 0);
+  const showHotPicks = Boolean(hasCatalogCity && (hotPickCards.length > 0 || hotPickTabIds.length > 0));
   const showBoatPicker = Boolean(
-    hasPageCity &&
+    hasCatalogCity &&
       isSpbDayRouteCity({
-        slug: pageCitySlug,
-        name: pageCityName,
-        sourceSlug: selectedCity?.selectedDestination?.sourceSlug || null,
-        city: pageCityName,
+        slug: catalogCitySlug,
+        name: catalogCityName,
+        sourceSlug: catalogCitySourceSlug,
+        city: catalogCityName,
       }),
   );
 
@@ -2795,62 +2778,50 @@ function DayRoutePanelInner() {
     );
   }
 
-  /** Typed catalog selects - always open under Hot Picks (not accordion). */
-  function renderCatalogTrio() {
+  /** One mixed search: locations + venues + events, with family tags. */
+  function renderUnifiedSearchSelect() {
+    return (
+      <DayRouteSearchSelect
+        label="Поиск"
+        hideLabel
+        placeholder={
+          insertAfterVenueId
+            ? 'Вставить между точками…'
+            : 'Добавить место или событие'
+        }
+        emptyText={
+          !hasPageCity
+            ? 'Сначала выберите город'
+            : catalogLoading && unifiedSearchOptions.length === 0
+              ? 'Загружаем…'
+              : catalogError || 'Ничего не найдено'
+        }
+        loading={hasPageCity && catalogLoading && unifiedSearchOptions.length === 0}
+        disabled={!hasPageCity || atMax}
+        options={hasPageCity ? unifiedSearchOptions : []}
+        onPick={pickUnifiedSearch}
+        onQueryChange={setUnifiedSearchQuery}
+        onCreateCustom={hasPageCity ? createCustomFromSearch : undefined}
+        createCustomDisabled={atMax}
+      />
+    );
+  }
+
+  function renderUnifiedCatalogSearch() {
     if (!hasPageCity) {
       return (
         <p className="rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-          Сначала выберите город - появятся места, музеи и события.
+          Сначала выберите город - появятся места и события.
         </p>
       );
     }
     return (
-      <div data-day-catalog-trio>
-        <div className="grid grid-cols-1 gap-3">
-          <DayRouteSearchSelect
-            label="Локации"
-            placeholder="Найти локацию…"
-            emptyText={
-              catalogLoadingParts.locations
-                ? 'Загружаем…'
-                : catalogError || 'Нет локаций в этом городе'
-            }
-            loading={catalogLoadingParts.locations && locationsCatalog.length === 0}
-            disabled={atMax}
-            options={locationOptions}
-            onPick={(option) => pickLocationById(option.id)}
-          />
-          <DayRouteSearchSelect
-            label="Площадки"
-            placeholder="Найти площадку…"
-            emptyText={
-              catalogLoadingParts.venues ? 'Загружаем…' : catalogError || 'Нет площадок в этом городе'
-            }
-            loading={catalogLoadingParts.venues && venuesCatalog.length === 0}
-            disabled={atMax}
-            options={venueOptions}
-            onPick={(option) => pickVenueById(option.id)}
-          />
-          <DayRouteSearchSelect
-            label="События"
-            placeholder="Найти событие…"
-            emptyText={
-              catalogLoadingParts.events ? 'Загружаем…' : catalogError || 'Нет событий в этом городе'
-            }
-            loading={catalogLoadingParts.events && eventsCatalog.length === 0}
-            disabled={atMax}
-            options={eventOptions}
-            onPick={(option) => pickEventById(option.id)}
-          />
-        </div>
-        <p className="mt-3 text-xs text-slate-500">
-          Каталог целиком:{' '}
-          <Link href={locationsHref} className="font-semibold text-slate-700 underline-offset-2 hover:underline">
-            локации
-          </Link>
-          {' · '}
-          <Link href={venuesHref} className="font-semibold text-slate-700 underline-offset-2 hover:underline">
-            площадки
+      <div data-day-catalog-search="unified">
+        {renderUnifiedSearchSelect()}
+        <p className="mt-2 mb-0 text-xs text-slate-500">
+          Каталог:{' '}
+          <Link href={placesHref} className="font-semibold text-slate-700 underline-offset-2 hover:underline">
+            места
           </Link>
           {' · '}
           <Link href={afishaHref} className="font-semibold text-slate-700 underline-offset-2 hover:underline">
@@ -3028,18 +2999,18 @@ function DayRoutePanelInner() {
                   : 'Добавить место или событие'
               }
               emptyText={
-                !hasPageCity
+                !hasCatalogCity
                   ? 'Сначала выберите город'
                   : catalogLoading && unifiedSearchOptions.length === 0
                     ? 'Загружаем…'
                     : catalogError || 'Ничего не найдено'
               }
-              loading={hasPageCity && catalogLoading && unifiedSearchOptions.length === 0}
-              disabled={!hasPageCity || atMax}
-              options={hasPageCity ? unifiedSearchOptions : []}
+              loading={hasCatalogCity && catalogLoading && unifiedSearchOptions.length === 0}
+              disabled={!hasCatalogCity || atMax}
+              options={hasCatalogCity ? unifiedSearchOptions : []}
               onPick={pickUnifiedSearch}
               onQueryChange={setUnifiedSearchQuery}
-              onCreateCustom={hasPageCity ? createCustomFromSearch : undefined}
+              onCreateCustom={hasCatalogCity ? createCustomFromSearch : undefined}
               createCustomDisabled={atMax}
             />
           </div>
@@ -3054,30 +3025,39 @@ function DayRoutePanelInner() {
             </button>
           ) : null}
         </div>
-        {hasPageCity && catalogError ? (
+        {hasCatalogCity && catalogError ? (
           <p className="mt-1 mb-0 text-xs font-medium text-rose-700" role="status">
             {catalogError}
           </p>
         ) : null}
-        <p className="mt-1.5 mb-0 pl-1 text-left text-xs leading-tight text-slate-500">
-          <button
-            type="button"
-            data-day-header-city-change
-            aria-expanded={headerCityChangeOpen}
-            onClick={() => {
-              setHeaderCityChangeOpen((open) => {
-                if (open) return false;
-                setHeaderCityChangeKey((key) => key + 1);
-                return true;
-              });
-            }}
-            className="m-0 inline p-0 font-medium text-slate-500 underline-offset-2 transition hover:text-slate-700 hover:underline"
-          >
-            или сменить город
-          </button>
-        </p>
+      </div>
+    );
+  }
+
+  function renderCityChangeControl() {
+    return (
+      <>
+        <button
+          type="button"
+          data-day-header-city-change
+          aria-expanded={headerCityChangeOpen}
+          onClick={() => {
+            setHeaderCityChangeOpen((open) => {
+              if (open) return false;
+              setHeaderCityChangeKey((key) => key + 1);
+              return true;
+            });
+          }}
+          className="m-0 inline p-0 font-medium text-slate-500 underline-offset-2 transition hover:text-slate-700 hover:underline"
+        >
+          Сменить город
+        </button>
         {headerCityChangeOpen ? (
-          <div className="mt-2" data-day-city-picker data-day-header-city-picker="1">
+          <div
+            className="mt-2 w-full max-w-md basis-full"
+            data-day-city-picker
+            data-day-header-city-picker="1"
+          >
             <CityPicker
               key={headerCityChangeKey}
               defaultOpen
@@ -3094,7 +3074,7 @@ function DayRoutePanelInner() {
             />
           </div>
         ) : null}
-      </div>
+      </>
     );
   }
 
@@ -3212,41 +3192,6 @@ function DayRoutePanelInner() {
     );
   }
 
-  /** Desktop map-section toolbar: Yandex only (Optimize lives near list controls). */
-  function renderMapToolbar() {
-    return (
-      <div
-        className="hidden w-full flex-col gap-1 lg:flex lg:w-auto lg:flex-row lg:items-center lg:justify-end lg:gap-2"
-        data-day-route-toolbar-inner
-        data-day-map-yandex-toolbar
-      >
-        {yandexUrl ? (
-          <a
-            href={yandexUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            data-day-yandex-cta
-            className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-full bg-sky-600 px-3.5 py-2 text-xs font-bold text-white hover:bg-sky-700"
-          >
-            <ExternalLink className="h-3.5 w-3.5 shrink-0" />
-            Открыть в Яндекс.Картах
-          </a>
-        ) : (
-          <button
-            type="button"
-            disabled
-            title="Нужны координаты минимум у 2 точек"
-            data-day-yandex-cta
-            className="inline-flex min-h-9 cursor-not-allowed items-center justify-center gap-1.5 rounded-full bg-slate-200 px-3.5 py-2 text-xs font-bold text-slate-500"
-          >
-            <ExternalLink className="h-3.5 w-3.5 shrink-0" />
-            Открыть в Яндекс.Картах
-          </button>
-        )}
-      </div>
-    );
-  }
-
   /** Desktop distance/stats row: Hour plan + Optimize flush right (title row stays airy). */
   function renderDesktopDistanceActions() {
     const canHourPlan = route.venues.length >= 1;
@@ -3344,6 +3289,10 @@ function DayRoutePanelInner() {
                     Страница {cityToGenitive(scopeCityName)}
                   </Link>
                 ) : null}
+                {scopeCityName ? (
+                  <span aria-hidden>·</span>
+                ) : null}
+                {renderCityChangeControl()}
               </p>
             </div>
 
@@ -3535,14 +3484,14 @@ function DayRoutePanelInner() {
         </>
       ) : null}
 
-      {hasPageCity && pickerTabs.length ? (
+      {hasCatalogCity && pickerTabs.length ? (
         <div className="mt-4 lg:mt-5" data-my-day-picker-host>
           <MyDayPickerLaunch tabs={pickerTabs} onOpen={openPicker} />
         </div>
       ) : null}
 
       {/* Mobile shelf tabs - only empty day (Lovable: no dual tabs when route exists) */}
-      {!route.venues.length && hasPageCity && pickerTabs.length ? (
+      {!route.venues.length && hasCatalogCity && pickerTabs.length ? (
         <div
           className="sticky top-[var(--site-header-height)] z-20 -mx-4 mt-4 border-b border-slate-200/80 bg-white/95 px-4 py-2 backdrop-blur lg:hidden"
           data-day-mobile-shelf-tabs
@@ -4035,17 +3984,6 @@ function DayRoutePanelInner() {
                 mapOpen={myDay.mapOpen}
                 onToggleOpen={myDay.toggleMapOpen}
                 onOpenFull={myDay.openMapFull}
-                toolbar={
-                  <div className="flex items-center justify-between gap-2 pr-20">
-                    <div>
-                      <p className="text-sm font-bold text-slate-900">Карта дня</p>
-                      <p className="mt-0.5 text-xs text-slate-500">
-                        Точки с координатами - порядок как в списке
-                      </p>
-                    </div>
-                    {renderMapToolbar()}
-                  </div>
-                }
               >
                 <div className="relative isolate h-full min-h-[20rem] w-full">
                   <DayRouteOsmMap
@@ -4087,11 +4025,13 @@ function DayRoutePanelInner() {
                       Страница {cityToGenitive(scopeCityName)}
                     </Link>
                   ) : null}
+                  {scopeCityName ? <span aria-hidden>·</span> : null}
+                  {renderCityChangeControl()}
                 </p>
               </div>
             </div>
           ) : null}
-          {hasPageCity && pickerTabs.length ? (
+          {hasCatalogCity && pickerTabs.length ? (
             <div className="mt-4 lg:mt-5" data-my-day-picker-host>
               <MyDayPickerLaunch tabs={pickerTabs} onOpen={openPicker} />
             </div>
@@ -4188,7 +4128,7 @@ function DayRoutePanelInner() {
               places={significantSuburbs}
               venues={matchSources}
               city={dayPresetCityCtx}
-              cityGenitive={cityToGenitive(pageCityName)}
+              cityGenitive={cityToGenitive(catalogCityName || pageCityName || '')}
               compact
               hideHeader
               className="mt-0"
