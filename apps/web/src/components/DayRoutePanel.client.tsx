@@ -4482,7 +4482,7 @@ function DayRoutePanelInner() {
         <section
           className="mt-1"
           data-day-hot-picks
-          data-day-recommend-carousel
+          data-day-recommend-grid="1"
         >
           <h2 className="px-0.5 text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
             Выбор Дайбилет
@@ -4515,7 +4515,7 @@ function DayRoutePanelInner() {
               })}
             </div>
             {hotPickCards.length ? (
-              <div className="mt-3 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1">
+              <div className="mt-3 grid grid-cols-1 items-stretch gap-3 [@container_(min-width:32rem)]:grid-cols-2">
                 {hotPickCards.map((card) => {
                   const inRoute =
                     isInDayRoute(card.item.id, route) ||
@@ -4528,7 +4528,7 @@ function DayRoutePanelInner() {
                   return (
                     <article
                       key={card.key}
-                      className="relative h-56 w-[78vw] max-w-xs shrink-0 snap-start overflow-hidden rounded-2xl border border-slate-200 bg-slate-800 shadow-sm transition duration-200 sm:w-64"
+                      className="relative h-56 min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-slate-800 shadow-sm"
                       data-day-recommend-card={card.item.id}
                       data-day-hot-pick={card.offer.kind}
                     >
@@ -4537,7 +4537,7 @@ function DayRoutePanelInner() {
                           src={card.item.imageUrl}
                           alt={card.title}
                           fill
-                          sizes="78vw"
+                          sizes="(min-width: 640px) 280px, 100vw"
                           className="object-cover"
                           fallback={pinFallback}
                         />
