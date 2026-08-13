@@ -177,7 +177,7 @@ describe('structured-data landing/event', () => {
       crumbs.map((item: any) => item.name),
       ['Главная', 'Тула', 'Музеи', 'Музей оружия'],
     );
-    assert.equal(crumbs[2].item, 'https://daibilet.ru/venues?type=museum&city=%D0%A2%D1%83%D0%BB%D0%B0');
+    assert.equal(crumbs[2].item, 'https://daibilet.ru/places?type=museum&city=%D0%A2%D1%83%D0%BB%D0%B0');
   });
 
   it('non-admin small town breadcrumbs insert region before city', () => {
@@ -233,7 +233,7 @@ describe('structured-data landing/event', () => {
       crumbs.map((item: any) => item.name),
       ['Главная', 'Москва', 'Музеи', 'Третьяковская галерея'],
     );
-    assert.equal(crumbs[2].item, 'https://daibilet.ru/venues?type=museum&city=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0');
+    assert.equal(crumbs[2].item, 'https://daibilet.ru/places?type=museum&city=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0');
   });
 
   it('art space breadcrumbs use Арт-пространства and ?type=art_space', () => {
@@ -259,7 +259,7 @@ describe('structured-data landing/event', () => {
       crumbs.map((item: any) => item.name),
       ['Главная', 'Москва', 'Арт-пространства', 'Галерея Ильи Глазунова'],
     );
-    assert.equal(crumbs[2].item, 'https://daibilet.ru/venues?type=art_space&city=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0');
+    assert.equal(crumbs[2].item, 'https://daibilet.ru/places?type=art_space&city=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0');
   });
   it('event JSON-LD Place links to venue CHPU when slug present', () => {
     const blocks = buildEventPageJsonLd({

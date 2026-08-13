@@ -115,7 +115,7 @@ export function venueCatalogCacheKey(query: VenueCatalogFeedQuery): string {
 }
 
 /** SSR default feed key: unfiltered «all cities», sort by events, page 1. */
-export function venueCatalogDefaultQueryKey(family: VenueCatalogFamily): string {
+export function venueCatalogDefaultQueryKey(family: VenueCatalogFamily | 'all'): string {
   return venueCatalogCacheKey({
     family,
     sort: 'events',

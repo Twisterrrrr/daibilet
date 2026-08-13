@@ -14,6 +14,21 @@ export const INSTITUTION_KINDS = new Set([
   'club_bar_restaurant',
 ]);
 
+/** Split catalog `stats.types` into institution vs location counts for Places eyebrow. */
+export function countCatalogFamilies(types: Record<string, number> | null | undefined): {
+  institutions: number;
+  locations: number;
+} {
+  let institutions = 0;
+  let locations = 0;
+  for (const [kind, raw] of Object.entries(types || {})) {
+    const n = Number(raw) || 0;
+    if (INSTITUTION_KINDS.has(normalizeVenueKind(kind))) institutions += n;
+    else locations += n;
+  }
+  return { institutions, locations };
+}
+
 const VENUE_TYPE_LABELS: Record<string, string> = {
   museum: 'Музей',
   art_space: 'Арт-пространство',
@@ -89,20 +104,18 @@ export function resolvePublicVenueType(type?: string | null, name?: string | nul
   return key;
 }
 
-/** Href сегмента типа в крошках: /venues?type=museum&city=… */
+/** Href сегмента типа в крошках: /places?type=museum&city=… */
 export function venueTypeCatalogHref(input: {
   type?: string | null;
   name?: string | null;
   city?: string | null;
 }): string {
   const publicType = resolvePublicVenueType(input.type, input.name);
-  const template = venuePageTemplate(publicType);
-  const base = template === 'location' ? '/locations' : '/venues';
   const params = new URLSearchParams();
   params.set('type', publicType);
   const city = String(input.city || '').trim();
   if (city && city !== 'Не указан') params.set('city', city);
-  return `${base}?${params.toString()}`;
+  return `/places?${params.toString()}`;
 }
 
 export function normalizeVenueKind(type?: string | null): string {

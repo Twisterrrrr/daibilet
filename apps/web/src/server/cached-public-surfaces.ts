@@ -122,7 +122,7 @@ export async function getCachedDestinations() {
 }
 
 export async function getCachedVenuesCatalog(
-  family: 'institution' | 'location',
+  family: 'institution' | 'location' | 'all',
   options: {
     limit?: number;
     city?: string;
@@ -163,7 +163,8 @@ export async function getCachedVenuesCatalog(
   ];
   const cached = unstable_cache(
     () => {
-      const searchParams: Record<string, string | number> = { family, limit };
+      const searchParams: Record<string, string | number> = { limit };
+      if (family === 'institution' || family === 'location') searchParams.family = family;
       if (city) searchParams.city = city;
       if (type) searchParams.type = type;
       if (scale) searchParams.scale = scale;

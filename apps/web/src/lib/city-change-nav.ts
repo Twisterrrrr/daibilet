@@ -2,7 +2,7 @@ import type { PublicDestinationDto } from '@daibilet/contracts/public';
 
 import { matchDestination } from './selected-city.ts';
 
-const QUERY_CITY_SECTION_ROOTS = ['/events', '/venues', '/locations', '/podborki'] as const;
+const QUERY_CITY_SECTION_ROOTS = ['/events', '/places', '/podborki'] as const;
 
 /** Keep in sync with `catalog-intent-routes` (avoid @/ import chain in unit tests). */
 const PODBORKI_INTENT_ALIASES: Record<string, string> = {
@@ -87,6 +87,27 @@ export function resolveCityChangeNav(input: CityChangeNavInput): CityChangeNavRe
       return { action: 'navigate', href: '/cities' };
     }
     return { action: 'navigate', href: `/cities/${encodeURIComponent(matched.slug)}` };
+  }
+
+  // Legacy listing `/venues` `/locations` 301 to `/places`. City change writes the hub
+  // directly. Entity PDP `/venues/[slug]` `/locations/[slug]` stay; picker returns to `/places`.
+  if (
+    path === '/venues' ||
+    path.startsWith('/venues/') ||
+    path === '/locations' ||
+    path.startsWith('/locations/')
+  ) {
+    const isVenues = path === '/venues' || path.startsWith('/venues/');
+    const isIndex = path === '/venues' || path === '/locations';
+    const params = isIndex
+      ? new URLSearchParams(input.searchParams?.toString() || '')
+      : new URLSearchParams();
+    if (isIndex) params.set('family', isVenues ? 'institution' : 'location');
+    if (name === 'all') params.set('city', 'all');
+    else params.set('city', citySlug || name);
+    params.delete('page');
+    const query = params.toString();
+    return { action: 'navigate', href: query ? `/places?${query}` : '/places' };
   }
 
   // Catalog section indexes + PDPs: stay in section root with ?city=.

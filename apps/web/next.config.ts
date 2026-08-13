@@ -60,6 +60,17 @@ const nextConfig: NextConfig = {
         destination: '/venues/moscow-tret-yakovskaya-galereya',
         permanent: true,
       },
+      // Listing indexes → unified `/places`. Entity `/venues/:slug` and `/locations/:slug` stay.
+      {
+        source: '/venues',
+        destination: '/places?family=institution',
+        permanent: true,
+      },
+      {
+        source: '/locations',
+        destination: '/places?family=location',
+        permanent: true,
+      },
       // HIDDEN blog twins → live канон
       {
         source: '/blog/bylinnyy-bereg-fentezi-fest',

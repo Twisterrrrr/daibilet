@@ -56,12 +56,15 @@ test('placesSearchHref is one mixed Places search URL', () => {
   assert.equal(isPlacesSectionPath('/events'), false);
 });
 
-test('venueCatalogHrefWithSelectedCity adds city to venues and locations', () => {
-  assert.equal(venueCatalogHrefWithSelectedCity('/venues', 'Уфа'), '/venues?city=%D0%A3%D1%84%D0%B0');
-  assert.equal(venueCatalogHrefWithSelectedCity('/locations', 'all'), '/locations');
+test('venueCatalogHrefWithSelectedCity points listings at /places with family', () => {
+  assert.equal(
+    venueCatalogHrefWithSelectedCity('/venues', 'Уфа'),
+    '/places?city=%D0%A3%D1%84%D0%B0&family=institution',
+  );
+  assert.equal(venueCatalogHrefWithSelectedCity('/locations', 'all'), '/places?family=location');
   assert.equal(
     venueCatalogHrefWithSelectedCity('/venues', 'Уфа', 'Москва'),
-    '/venues?city=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0',
+    '/places?city=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0&family=institution',
   );
 });
 

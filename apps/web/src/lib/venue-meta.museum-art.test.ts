@@ -32,12 +32,12 @@ describe('museum vs art_space public split', () => {
     assert.equal(venueTypeBreadcrumbPlural('art_space'), 'Арт-пространства');
     assert.equal(
       venueTypeCatalogHref({ type: 'museum_art_space', name: 'Третьяковская галерея', city: 'Москва' }),
-      '/venues?type=museum&city=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0',
+      '/places?type=museum&city=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0',
     );
     assert.equal(
       venueTypeCatalogHref({ type: 'museum_art_space', name: 'Галерея Ильи Глазунова', city: 'Москва' }),
-      '/venues?type=art_space&city=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0',
+      '/places?type=art_space&city=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0',
     );
-    assert.equal(venueTypeCatalogHref({ type: 'pier', name: 'Причал', city: 'Санкт-Петербург' }).startsWith('/locations?type=pier'), true);
+    assert.equal(venueTypeCatalogHref({ type: 'pier', name: 'Причал', city: 'Санкт-Петербург' }).startsWith('/places?type=pier'), true);
   });
 });

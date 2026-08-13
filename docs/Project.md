@@ -218,7 +218,7 @@ BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh
 - **Дворец-музей с билетом на вход** (Юсуповский, Екатерининский, Исаакий) → Площадка, не локация. Фасад/ансамбль без входного продукта (Адмиралтейство, кремль) остаётся `ATTRACTION`.
 - **URL-семейство от kind/role, не от билетов** (owner option A): museum/theater/hall без афиши → всё равно `/venues`, buy-chrome скрыт до offers/sessions. **Не** временно переносить «нет билетов» в `/locations`. Commerce = UI chrome only. Оси: `kind`→URL, `offers`→chrome, `pageStatus`→модерация.
 - Редакционные гастро-точки / day-point без institution-афиши → **Локации** (`GASTRO`). Если legacy kind временно institution, при `upcomingEventsCount=0` и без admission запрещены билетные chrome, цена, CTA, афиша и FAQ (но URL family не менять из-за пустой афиши).
-- Nav: **V1.1 (owner 2026-08-13)** - primary **Города • События • Места • Подборки • Блог**. «Места» = `/places` mixed grid (площадки + локации, чипы Все / С афишей / Достопримечательности). Карточки **не** переезжают на `/places/[slug]`. **Поиск в разделе один** (`/places?q=`). **Мой день** - смешанный поиск (плюс события) в шапке подбора. `/venues` и `/locations` остаются обзорными каталогами и каноном URL. `UX.LOC3` long rename superseded.
+- Nav: **V1.1 (owner 2026-08-13, visual lock тот же день):** primary **Города • События • Места • Подборки • Блог**. «Места» = `/places` каталог в chrome площадок (eyebrow `N площадок • N локаций • N городов`, H1 `Музеи, театры, площадки, локации {City_Род}`, поиск + теги kind). Карточки **не** переезжают на `/places/[slug]`. Листинги `/venues` и `/locations` **301** на `/places?family=…`. Entity `/venues/[slug]` `/locations/[slug]` канон. **Поиск в разделе один** (`/places?q=`). **Мой день** - смешанный поиск (плюс события) в шапке подбора. `UX.LOC3` long rename superseded.
 - Одна физическая точка = одна публичная карточка; локация→venue = upgrade / hide+301, не twin `PUBLISHED`.
 - **Кластер** (Новая Голландия, Севкабель): одна родительская **локация** + дети (`parentId`). Не апгрейдить зонтик в `/venues` из-за афиши острова. Канон: [place-cluster-canon.md](./place-cluster-canon.md). Пилот schema/PDP = `CAT.PLACE-CLUSTER` (не билдить в этом проходе).
 
@@ -232,9 +232,11 @@ BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh
 | `/events` | SSR dynamic | каталог, filters GET, pagination |
 | `/events/[slug]` | SSR/ISR | Event PDP: hero answers + badge chips + sticky mobile CTA «Выбрать билеты»; day strip; open-date stepper; price **от X**; accordion О событии / Маршрут / Как добраться; expand map; reviews |
 | `/cities`, `/cities/[slug]` | SSR dynamic | **city hub**; default = wireframe v1 + blog teasers (P.2o); `?hub=editorial` = visual experiment (P.2i) |
-| `/places` | ISR 3600 | mixed «Места» grid (venues+locations); не entity URL |
-| `/venues`, `/venues/[slug]` | SSR dynamic | institution / афиша; канон карточек |
-| `/locations`, `/locations/[slug]` | SSR dynamic | sights / points; канон карточек |
+| `/places` | ISR 300 | unified Places catalog (venues+locations); city meta; не entity URL |
+| `/venues` | 301 → `/places?family=institution` | listing only |
+| `/venues/[slug]` | SSR/ISR | institution PDP; канон карточек |
+| `/locations` | 301 → `/places?family=location` | listing only |
+| `/locations/[slug]` | SSR/ISR | location PDP; канон карточек |
 | `/podborki` | ISR 3600 | каталог подборок |
 | `/rechnye-progulki/...`, `/{city}/night-bridges/` | ISR/SSG | landing SEO paths |
 | `/api/public/*` | Route Handlers | parity с legacy API |

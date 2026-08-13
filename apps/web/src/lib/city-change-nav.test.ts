@@ -61,18 +61,26 @@ test('catalog section indexes keep filters and update city', () => {
       destinations,
       searchParams: new URLSearchParams('city=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0&q=театр'),
     }),
-    '/venues?city=all&q=%D1%82%D0%B5%D0%B0%D1%82%D1%80',
+    '/places?city=all&q=%D1%82%D0%B5%D0%B0%D1%82%D1%80&family=institution',
+  );
+  assert.equal(
+    resolveCityChangeHref({
+      pathname: '/places',
+      cityName: 'Уфа',
+      destinations,
+    }),
+    '/places?city=ufa',
   );
 });
 
-test('PDP deep links return to same section index with city', () => {
+test('PDP deep links return to Places hub with city', () => {
   assert.equal(
     resolveCityChangeHref({
       pathname: '/venues/some-hall',
       cityName: 'Казань',
       destinations,
     }),
-    '/venues?city=kazan',
+    '/places?city=kazan',
   );
   assert.equal(
     resolveCityChangeHref({
@@ -80,7 +88,7 @@ test('PDP deep links return to same section index with city', () => {
       cityName: 'Уфа',
       destinations,
     }),
-    '/locations?city=ufa',
+    '/places?city=ufa',
   );
   assert.equal(
     resolveCityChangeHref({

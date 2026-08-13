@@ -1,3 +1,18 @@
+## 2026-08-13 - /places: chrome каталога площадок + 301 листингов
+
+### Наблюдения
+- Owner: почему Места не выглядят как старый `/venues` (eyebrow, H1 города, поиск, теги, сетка). Нужны `N площадок • N локаций • N городов`, H1 «Музеи, театры, площадки, локации {город}», поиск затем теги, meta, решение по старым slug.
+
+### Решения
+- `/places` переведён на тот же Hero+поиск+чипы+grid/list, что у каталога площадок. Карточки по-прежнему `/venues/[slug]` и `/locations/[slug]`.
+- Листинги `/venues` и `/locations` (без slug) → 301 на `/places?family=institution|location`. Entity PDP не редиректим.
+- Meta: city-aware title/description/canonical; thin `q`/`type`/`page` noindex. Sitemap listing только `/places`.
+
+### Проблемы
+- Нет. Live после Deploy MSK web / «выкатывай».
+
+---
+
 ## 2026-08-13 - My Day: свои сценарии в ленте, не только в подборе
 
 ### Наблюдения

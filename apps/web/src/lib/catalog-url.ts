@@ -91,7 +91,8 @@ export function catalogHrefWithSelectedCity(
 }
 
 /**
- * `/venues` or `/locations` href with header city when none is explicit.
+ * Listing href for площадки / локации. Indexes 301 to `/places`; this helper
+ * writes the destination directly so internal links skip the extra hop.
  * Pass destination slug when available - Cyrillic `?city=Пермь` soft-nav hangs catalog loading.
  */
 export function venueCatalogHrefWithSelectedCity(
@@ -100,8 +101,10 @@ export function venueCatalogHrefWithSelectedCity(
   explicitCity?: string | null,
 ): string {
   const city = explicitCity || (cityValue && cityValue !== 'all' ? cityValue : undefined);
-  if (!city) return path;
-  return `${path}?city=${encodeURIComponent(city)}`;
+  return placesSearchHref({
+    city,
+    family: path === '/locations' ? 'location' : 'institution',
+  });
 }
 
 export function isPlacesSectionPath(pathname: string | null | undefined): boolean {
@@ -121,6 +124,7 @@ export function placesSearchHref(options: {
   city?: string | null;
   q?: string | null;
   page?: number | null;
+  type?: string | null;
   /** Mixed hub filter: omit or `all` = both families. */
   family?: 'all' | 'institution' | 'location' | null;
 }): string {
@@ -128,16 +132,18 @@ export function placesSearchHref(options: {
   const q = String(options.q || '').trim();
   const city = String(options.city || '').trim();
   const page = Number(options.page);
+  const type = String(options.type || '').trim();
   const family = options.family;
   if (q) params.set('q', q);
   if (city && city !== 'all') params.set('city', city);
   if (family === 'institution' || family === 'location') params.set('family', family);
+  if (type && type !== 'all') params.set('type', type);
   if (Number.isFinite(page) && page > 1) params.set('page', String(page));
   const query = params.toString();
   return query ? `/places?${query}` : '/places';
 }
 
-/** Umbrella «Места» hub - city query only for picker continuity; lists stay on /venues|/locations. */
+/** Umbrella «Места» hub. Entity PDP stays `/venues/[slug]` and `/locations/[slug]`. */
 export function placesHubHrefWithSelectedCity(
   cityValue: string | null | undefined,
   explicitCity?: string | null,

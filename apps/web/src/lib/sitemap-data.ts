@@ -155,8 +155,6 @@ export async function buildStaticSitemapEntries(now = new Date()): Promise<Sitem
     entry('/events', now, 'hourly', 0.8),
     entry('/cities', now, 'daily', 0.8),
     entry('/places', now, 'daily', 0.85),
-    entry('/venues', now, 'daily', 0.8),
-    entry('/locations', now, 'daily', 0.7),
     entry('/podborki', now, 'daily', 0.8),
     ...intentPaths.map((path) => entry(path, now, 'daily', 0.7)),
     entry('/blog', now, 'daily', 0.8),
