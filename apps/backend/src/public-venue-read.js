@@ -1796,8 +1796,17 @@ function resolvePublicVenueKind(storedKind, name, address, options = {}) {
   const busByAllEvents =
     hasBusOnlyEvents(busEvents, totalEvents) && !/teplohod|теплоход|причал|пристань/i.test(text);
   const busByCatalogEvents = hasActiveBusCatalogEvents(busEvents);
+  // River port / pier CMS rows must not become «bus» because one sibling session is tagged
+  // «Автобусные экскурсии» (Казань, Девятаева / речной порт).
+  const pierProtected =
+    stored === 'pier' ||
+    inferred === 'pier' ||
+    hasStrongPierLocationText(name, address);
 
-  if (inferred === 'bus' || hasBusLikeText(name, address) || busByAllEvents || busByCatalogEvents) {
+  if (
+    !pierProtected &&
+    (inferred === 'bus' || hasBusLikeText(name, address) || busByAllEvents || busByCatalogEvents)
+  ) {
     return 'bus';
   }
 

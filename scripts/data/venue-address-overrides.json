@@ -213,6 +213,22 @@
       "city": "Санкт-Петербург",
       "latitude": 59.957675,
       "longitude": 30.2363192
+    },
+    {
+      "id": "venue_tep_52",
+      "title": "Речной порт Казань, ул. Девятаева 1",
+      "match": [
+        "rechnoi-port-kazan-ul-devyataeva-1-52",
+        "речнои-порт-казань-ул-девятаева-1-52",
+        "Речной порт Казань",
+        "venue_tep_52"
+      ],
+      "kind": "PIER",
+      "publicKind": "pier",
+      "address": "ул. Девятаева, 1, Казань",
+      "city": "Казань",
+      "latitude": 55.773334,
+      "longitude": 49.091479
     }
   ]
 }
