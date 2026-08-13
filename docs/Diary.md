@@ -1,3 +1,18 @@
+## 2026-08-14 - /events: sticky bar + city footer + mobile icon rail
+
+### Наблюдения
+- Owner: весь events UX-пакет по очереди (geo-gate, sort/urgency уже в `c19b94b`), дальше sticky дата/категория/сорт, city-aware footer SEO, mobile category icon rail.
+
+### Решения
+- Desktop sticky `CatalogToolbar`: date rail + категории + sort под шапкой; date убран из hero.
+- Mobile: select даты + горизонтальный icon rail категорий (вместо select «тип»).
+- Footer: колонка «События» и places/podborki ссылки с `?city=`; popular directions текущего города первыми.
+
+### Проблемы
+- Нет. Live после «выкатывай».
+
+---
+
 ## 2026-08-13 - /places: галереи, достопримечательности, храмы, гастроточки
 
 ### Наблюдения

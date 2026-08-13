@@ -7,6 +7,7 @@ import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import { CatalogAdvancedFiltersPanel } from '@/components/CatalogAdvancedFiltersPanel.client';
+import { CatalogDateRail } from '@/components/CatalogDateRail.client';
 import { CategoryTabIcon } from '@/components/CategoryTabIcon';
 import { displayCatalogLabel } from '@/lib/catalog-labels';
 import {
@@ -22,9 +23,11 @@ import {
 import type { PublicCatalogDto } from '@daibilet/contracts/public';
 import {
   buildCatalogHref,
+  CATALOG_SORT_OPTIONS,
   catalogFiltersFromQuery,
   countAdvancedFilters,
   type CatalogFilterValues,
+  type CatalogSort,
 } from '@/lib/catalog-url';
 
 type CatalogToolbarProps = {
@@ -167,6 +170,15 @@ export function CatalogToolbar({
     });
   };
 
+  const setSort = (sort: CatalogSort) => {
+    navigate({
+      ...filters,
+      q: qDraft.trim() || undefined,
+      sort,
+      page: undefined,
+    });
+  };
+
   const discoveryRow = (
     <div
       role="group"
@@ -181,6 +193,29 @@ export function CatalogToolbar({
       />
       <div className="ml-auto flex shrink-0 flex-nowrap items-center gap-1.5">
         <QuickFilterToggles filters={filters} qDraft={qDraft} disabled={disabled} onNavigate={navigate} />
+        <div
+          role="radiogroup"
+          aria-label="Сортировка"
+          className="flex shrink-0 gap-0.5 rounded-lg bg-slate-100 p-0.5"
+        >
+          {CATALOG_SORT_OPTIONS.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              role="radio"
+              aria-checked={(filters.sort || 'time') === option.value}
+              disabled={disabled}
+              onClick={() => setSort(option.value)}
+              className={`inline-btn h-7 shrink-0 rounded-md px-2.5 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 disabled:opacity-60 ${
+                (filters.sort || 'time') === option.value
+                  ? 'bg-white text-slate-900 shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -241,8 +276,8 @@ export function CatalogToolbar({
 
   return (
     <div className="space-y-2.5 sm:space-y-3">
-      {/* Mobile sticky: search + date/type selects. Desktop: search + discovery chips; date rail in hero. */}
-      <div className="catalog-toolbar sticky top-[var(--site-header-height)] z-30 -mx-4 space-y-2 border-b border-slate-200/60 bg-white/95 px-4 py-2 backdrop-blur-md supports-[backdrop-filter]:bg-white/90 sm:-mx-6 sm:px-6 md:static md:z-auto md:mx-0 md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none">
+      {/* Sticky on all breakpoints: search + (md) date/category/sort; mobile date + category icon rail. */}
+      <div className="catalog-toolbar sticky top-[var(--site-header-height)] z-30 -mx-4 space-y-2 border-b border-slate-200/60 bg-white/95 px-4 py-2 backdrop-blur-md supports-[backdrop-filter]:bg-white/90 sm:-mx-6 sm:px-6 md:mx-0 md:rounded-2xl md:border md:border-slate-200/70 md:px-3 md:py-2.5 md:shadow-sm">
         <form onSubmit={onSubmit} className="flex flex-col gap-2">
           <div className="flex min-w-0 items-center gap-2 md:gap-3">
             <div
@@ -348,8 +383,8 @@ export function CatalogToolbar({
             />
           </div>
 
-          {/* Mobile: дата + тип как select (без chip rails). */}
-          <div className="grid grid-cols-2 gap-1.5 md:hidden">
+          {/* Mobile: дата select + горизонтальный icon rail категорий. */}
+          <div className="space-y-2 md:hidden">
             <MobileDateSelect
               chips={dateRailChips}
               filters={filters}
@@ -357,17 +392,19 @@ export function CatalogToolbar({
               onPreset={setDatePreset}
               onExactDay={setExactDay}
             />
-            <MobileCategorySelect
+            <MobileCategoryIconRail
               filters={filters}
               categories={facets.categories}
               disabled={disabled}
-              onNavigate={navigate}
               qDraft={qDraft}
             />
           </div>
         </form>
 
-        {/* Desktop discovery row under search: quick + categories. */}
+        {/* Desktop sticky: date rail, then categories + sort. */}
+        <div className="hidden md:block">
+          <CatalogDateRail disabled={disabled} className="min-w-0 w-full" />
+        </div>
         {discoveryRow}
       </div>
 
@@ -491,53 +528,96 @@ function MobileDateSelect({
   );
 }
 
-function MobileCategorySelect({
+function MobileCategoryIconRail({
   filters,
   categories,
   disabled,
-  onNavigate,
   qDraft,
 }: {
   filters: CatalogFilterValues;
   categories: CatalogCategoryFacet[];
   disabled?: boolean;
-  onNavigate: (next: CatalogFilterValues) => void;
   qDraft: string;
 }) {
-  const value = filters.category || 'all';
+  const withQ = (category: string | undefined): CatalogFilterValues => ({
+    ...filters,
+    q: qDraft.trim() || filters.q,
+    category,
+    page: undefined,
+  });
 
   return (
-    <div className="relative min-w-0">
-      <label className="sr-only" htmlFor="catalog-mobile-category">
-        Тип события
-      </label>
-      <select
-        id="catalog-mobile-category"
-        disabled={disabled}
-        value={value}
-        onChange={(event) => {
-          const next = event.target.value;
-          onNavigate({
-            ...filters,
-            q: qDraft.trim() || filters.q,
-            category: next === 'all' ? undefined : next,
-            page: undefined,
-          });
-        }}
-        className={mobileSelectCls}
+    <div
+      role="tablist"
+      aria-label="Тип события"
+      className="flex w-full min-w-0 flex-nowrap items-stretch gap-1.5 overflow-x-auto overscroll-x-contain pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+    >
+      <Link
+        href={buildCatalogHref(withQ(undefined))}
+        role="tab"
+        aria-selected={!filters.category}
+        aria-disabled={disabled || undefined}
+        className={`inline-flex min-w-[4.25rem] shrink-0 flex-col items-center gap-1 rounded-2xl px-2 py-2 text-center transition ${
+          !filters.category
+            ? 'bg-graphite text-white shadow-sm'
+            : 'bg-[#F5F5F7] text-graphite hover:bg-slate-200/70'
+        } ${disabled ? 'pointer-events-none opacity-60' : ''}`}
       >
-        <option value="all">Все типы</option>
-        {categories.map((item) => (
-          <option key={item.name} value={item.name} disabled={item.events <= 0 && filters.category !== item.name}>
-            {displayCatalogLabel(item.name)}
-          </option>
-        ))}
-      </select>
-      <ChevronDown
-        aria-hidden
-        className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6E6E73]"
-        strokeWidth={1.75}
-      />
+        <span
+          className={`grid h-9 w-9 place-items-center rounded-full ${
+            !filters.category ? 'bg-white/15' : 'bg-white'
+          }`}
+        >
+          <CategoryTabIcon name="Все" className={!filters.category ? 'text-white' : 'text-graphite-muted'} />
+        </span>
+        <span className="max-w-[4.5rem] truncate text-[11px] font-medium leading-tight">Все</span>
+      </Link>
+      {categories.map((item) => {
+        const label = displayCatalogLabel(item.name);
+        const active = filters.category === item.name;
+        const empty = item.events <= 0;
+        if (empty && !active) {
+          return (
+            <span
+              key={item.name}
+              role="tab"
+              aria-selected={false}
+              aria-disabled="true"
+              title="Нет событий при текущих фильтрах"
+              className="inline-flex min-w-[4.25rem] shrink-0 cursor-not-allowed flex-col items-center gap-1 rounded-2xl bg-[#F5F5F7] px-2 py-2 text-center opacity-40"
+            >
+              <span className="grid h-9 w-9 place-items-center rounded-full bg-white">
+                <CategoryTabIcon name={label} className="text-graphite-muted" />
+              </span>
+              <span className="max-w-[4.5rem] truncate text-[11px] font-medium leading-tight">{label}</span>
+            </span>
+          );
+        }
+        return (
+          <Link
+            key={item.name}
+            href={buildCatalogHref(withQ(active ? undefined : item.name))}
+            role="tab"
+            aria-selected={active}
+            title={item.events > 0 ? `${label}: ${item.events}` : label}
+            aria-disabled={disabled || undefined}
+            className={`inline-flex min-w-[4.25rem] shrink-0 flex-col items-center gap-1 rounded-2xl px-2 py-2 text-center transition ${
+              active
+                ? 'bg-graphite text-white shadow-sm'
+                : 'bg-[#F5F5F7] text-graphite hover:bg-slate-200/70'
+            } ${disabled ? 'pointer-events-none opacity-60' : ''}`}
+          >
+            <span
+              className={`grid h-9 w-9 place-items-center rounded-full ${
+                active ? 'bg-white/15' : 'bg-white'
+              }`}
+            >
+              <CategoryTabIcon name={label} className={active ? 'text-white' : 'text-graphite-muted'} />
+            </span>
+            <span className="max-w-[4.5rem] truncate text-[11px] font-medium leading-tight">{label}</span>
+          </Link>
+        );
+      })}
     </div>
   );
 }

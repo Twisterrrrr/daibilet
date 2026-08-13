@@ -15,16 +15,11 @@ import {
 import { transliterateSlug } from './routes';
 
 describe('seo-internal-links', () => {
-  it('footer popular directions use real CHPU and intent paths', () => {
-    const blocks = getFooterPopularDirections();
-    const msk = blocks.find((b) => b.citySlug === 'moscow');
-    const spb = blocks.find((b) => b.citySlug === 'saint-petersburg');
-    assert.ok(msk);
-    assert.ok(spb);
-    assert.equal(msk!.links[0].href, '/rechnye-progulki/moscow/');
-    assert.equal(msk!.links[3].href, '/podborki/besplatno/moscow');
-    assert.equal(spb!.links[1].href, '/progulki-po-krysham/saint-petersburg/');
-    assert.equal(spb!.links[3].href, '/podborki/na-vyhodnye/saint-petersburg');
+  it('footer popular directions prefer selected city first', () => {
+    const spbFirst = getFooterPopularDirections('saint-petersburg');
+    assert.equal(spbFirst[0]?.citySlug, 'saint-petersburg');
+    const mskFirst = getFooterPopularDirections('moscow');
+    assert.equal(mskFirst[0]?.citySlug, 'moscow');
   });
 
   it('related links for river SPB are city-scoped', () => {

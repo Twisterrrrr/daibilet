@@ -3,7 +3,6 @@
 import { useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-import { CatalogDateRail } from '@/components/CatalogDateRail.client';
 import { PageBreadcrumbBar } from '@/components/PageBreadcrumbs';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { catalogFiltersFromQuery, type CatalogFilterValues } from '@/lib/catalog-url';
@@ -11,7 +10,7 @@ import { cityToPrepositional } from '@/lib/city-declension';
 
 /**
  * Compact catalog header: breadcrumbs + H1/subtitle.
- * Desktop: date rail in the title band. Mobile: date/type selects live in CatalogToolbar.
+ * Date rail lives in sticky CatalogToolbar on desktop; mobile uses date select there.
  */
 export function EventsCatalogHero() {
   const searchParams = useSearchParams();
@@ -69,25 +68,19 @@ export function EventsCatalogHero() {
       />
       <header className="border-b border-slate-100 bg-white">
         <div className="container-page py-4 sm:py-5">
-          {/* Desktop: title band + date rail; mobile keeps date/type as selects under search. */}
-          <div className="flex flex-col gap-2.5 md:flex-row md:items-end md:gap-5">
-            <div className="min-w-0 shrink-0 md:max-w-md lg:max-w-lg">
-              <h1 className="font-display text-2xl font-extrabold tracking-tight text-graphite sm:text-3xl">
-                {title}
-              </h1>
-              <p className="mt-1 text-sm leading-snug text-graphite-muted sm:text-[15px]">
-                {subtitle ?? (
-                  <>
-                    Билеты на экскурсии, концерты и музеи
-                    <br />
-                    более чем в 100 городах России.
-                  </>
-                )}
-              </p>
-            </div>
-            <div className="hidden min-w-0 w-full md:block md:flex-1">
-              <CatalogDateRail className="min-w-0 w-full" />
-            </div>
+          <div className="min-w-0 md:max-w-2xl">
+            <h1 className="font-display text-2xl font-extrabold tracking-tight text-graphite sm:text-3xl">
+              {title}
+            </h1>
+            <p className="mt-1 text-sm leading-snug text-graphite-muted sm:text-[15px]">
+              {subtitle ?? (
+                <>
+                  Билеты на экскурсии, концерты и музеи
+                  <br />
+                  более чем в 100 городах России.
+                </>
+              )}
+            </p>
           </div>
         </div>
       </header>

@@ -1,22 +1,29 @@
+'use client';
+
 import Link from 'next/link';
 
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
 import { DaibiletLogo } from '@/components/DaibiletLogo';
+import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { catalogSocialStats } from '@/lib/catalog-social-stats';
 import { formatNumber } from '@/lib/format';
 import { cityHref } from '@/lib/routes';
 import { landingCategoryHref } from '@/lib/landing-routes';
 import { CANONICAL_LANDING_SLUGS } from '@/lib/landing-constants';
 import { getFooterPopularDirections } from '@/lib/seo-internal-links';
+import { catalogCityQueryValue } from '@/lib/selected-city';
 
-const catalogLinks = [
-  { label: 'Экскурсии', href: '/events?category=Экскурсии' },
-  { label: 'Музеи и арт', href: '/events?category=Музеи+и+арт' },
-  { label: 'Мероприятия', href: '/events?category=Мероприятия' },
-  { label: 'Активный отдых', href: '/events?category=Активный+отдых' },
-  { label: 'Развлечения', href: '/events?category=Развлечения' },
-  { label: 'Речные прогулки', href: landingCategoryHref(CANONICAL_LANDING_SLUGS.river) },
-  { label: 'Автобусные экскурсии', href: landingCategoryHref(CANONICAL_LANDING_SLUGS.bus) },
+const catalogLinkDefs: Array<
+  | { label: string; category: string; landing?: never }
+  | { label: string; landing: string; category?: never }
+> = [
+  { label: 'Экскурсии', category: 'Экскурсии' },
+  { label: 'Музеи и арт', category: 'Музеи и арт' },
+  { label: 'Мероприятия', category: 'Мероприятия' },
+  { label: 'Активный отдых', category: 'Активный отдых' },
+  { label: 'Развлечения', category: 'Развлечения' },
+  { label: 'Речные прогулки', landing: CANONICAL_LANDING_SLUGS.river },
+  { label: 'Автобусные экскурсии', landing: CANONICAL_LANDING_SLUGS.bus },
 ];
 
 const companyLinks = [
@@ -61,7 +68,36 @@ function FooterLegalLinks() {
   );
 }
 
+function eventsCategoryHref(category: string, citySlug?: string) {
+  const params = new URLSearchParams();
+  params.set('category', category);
+  if (citySlug) params.set('city', citySlug);
+  return `/events?${params.toString()}`;
+}
+
+function placesHrefWithCity(citySlug?: string) {
+  if (!citySlug) return '/places';
+  return `/places?city=${encodeURIComponent(citySlug)}`;
+}
+
+function podborkiHrefWithCity(citySlug?: string) {
+  if (!citySlug) return '/podborki';
+  return `/podborki?city=${encodeURIComponent(citySlug)}`;
+}
+
 export function SiteFooter({ destinations, variant = 'default' }: SiteFooterProps) {
+  const selectedCity = useSelectedCityOptional();
+  const cityReady = selectedCity?.cityReady ?? true;
+  const citySlug =
+    cityReady && selectedCity && selectedCity.cityValue !== 'all'
+      ? catalogCityQueryValue(destinations, selectedCity.cityValue)
+      : '';
+  const cityName =
+    citySlug && selectedCity
+      ? selectedCity.selectedDestination?.name ||
+        (selectedCity.cityLabel !== 'Все города' ? selectedCity.cityLabel : '')
+      : '';
+
   if (variant === 'compact') {
     return (
       <footer className="border-t border-slate-200/80 bg-surface-muted" data-site-footer="compact">
@@ -98,8 +134,6 @@ export function SiteFooter({ destinations, variant = 'default' }: SiteFooterProp
       href: cityHref(city),
     }));
 
-  // Catalog social proof = public destinations with events (cities + regions).
-  // Shared with home trust strip via catalogSocialStats (not /events.total / stats.events).
   const { events: eventsCount, venues: venuesCount, places: placesCount } =
     catalogSocialStats(destinations);
   const catalogStatsLine =
@@ -107,7 +141,27 @@ export function SiteFooter({ destinations, variant = 'default' }: SiteFooterProp
       ? `${formatNumber(eventsCount)} событий · ${formatNumber(venuesCount)} площадок · ${formatNumber(placesCount)} городов`
       : null;
 
-  const popularDirections = getFooterPopularDirections();
+  const catalogLinks = catalogLinkDefs.map((item) => {
+    if (item.landing) {
+      return {
+        label: item.label,
+        href: landingCategoryHref(item.landing, citySlug || undefined),
+      };
+    }
+    return {
+      label: item.label,
+      href: eventsCategoryHref(item.category, citySlug || undefined),
+    };
+  });
+
+  const companyLinksScoped = companyLinks.map((link) => {
+    if (link.href === '/places') return { ...link, href: placesHrefWithCity(citySlug || undefined) };
+    if (link.href === '/podborki') return { ...link, href: podborkiHrefWithCity(citySlug || undefined) };
+    return link;
+  });
+
+  const popularDirections = getFooterPopularDirections(citySlug || undefined);
+  const eventsColumnTitle = cityName ? `События · ${cityName}` : 'События';
 
   return (
     <footer className="border-t border-slate-200/80 bg-surface-muted" data-site-footer="default">
@@ -133,13 +187,15 @@ export function SiteFooter({ destinations, variant = 'default' }: SiteFooterProp
             </div>
           </div>
 
-          <FooterColumn title="События" links={catalogLinks} />
+          <FooterColumn title={eventsColumnTitle} links={catalogLinks} />
           <FooterColumn title="Города" links={cityLinks} />
-          <FooterColumn title="Компания" links={companyLinks} />
+          <FooterColumn title="Компания" links={companyLinksScoped} />
         </div>
 
         <div className="mt-12 pt-10">
-          <h3 className="text-sm font-semibold text-graphite">Популярные направления</h3>
+          <h3 className="text-sm font-semibold text-graphite">
+            {cityName ? `Популярные направления · ${cityName}` : 'Популярные направления'}
+          </h3>
           <div className="mt-5 grid gap-8 sm:grid-cols-2">
             {popularDirections.map((block) => (
               <div key={block.citySlug}>
@@ -179,14 +235,12 @@ function FooterColumn({
   title: string;
   links: Array<{ label: string; href: string }>;
 }) {
-  if (!links.length) return null;
-
   return (
     <div>
       <h3 className="text-sm font-semibold text-graphite">{title}</h3>
       <ul className="mt-4 space-y-2.5">
         {links.map((link) => (
-          <li key={`${title}:${link.label}`}>
+          <li key={`${title}:${link.href}:${link.label}`}>
             <Link
               href={link.href}
               className="text-sm text-graphite-muted transition-colors hover:text-primary-600"

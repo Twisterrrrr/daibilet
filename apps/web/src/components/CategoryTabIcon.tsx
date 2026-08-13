@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 
 const CATEGORY_ICONS: Record<string, LucideIcon> = {
+  Все: Ticket,
   Экскурсии: Bus,
   'Музеи и арт': Landmark,
   Музеи: Landmark,

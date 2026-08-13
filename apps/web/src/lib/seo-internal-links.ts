@@ -239,9 +239,9 @@ const DEFAULT_RELATED: RelatedLinkSpec[] = [
   { type: 'intent', intent: 'na-vyhodnye', label: 'На выходных' },
 ];
 
-/** Сквозной блок футера: вес с главной на посадки. */
-export function getFooterPopularDirections(): FooterPopularCityBlock[] {
-  return [
+/** Сквозной блок футера: вес с главной на посадки. При citySlug - текущий город первым. */
+export function getFooterPopularDirections(citySlug?: string | null): FooterPopularCityBlock[] {
+  const blocks: FooterPopularCityBlock[] = [
     {
       cityName: 'Москва',
       citySlug: 'moscow',
@@ -263,6 +263,33 @@ export function getFooterPopularDirections(): FooterPopularCityBlock[] {
       ],
     },
   ];
+
+  const preferred = normalizeCitySlug(citySlug);
+  if (!preferred) return blocks;
+
+  const preferredAliases = new Set(
+    [preferred, CITY_HUB_SLUG_BY_LANDING[preferred]].filter(Boolean) as string[],
+  );
+  // Map hub slugs back to landing city keys used in blocks.
+  if (preferred === 'moskva' || preferred === 'moscow') {
+    preferredAliases.add('moscow');
+    preferredAliases.add('moskva');
+  }
+  if (
+    preferred === 'sankt-peterburg' ||
+    preferred === 'saint-petersburg' ||
+    preferred === 'spb'
+  ) {
+    preferredAliases.add('saint-petersburg');
+    preferredAliases.add('sankt-peterburg');
+  }
+
+  const ordered = [...blocks].sort((a, b) => {
+    const aHit = preferredAliases.has(a.citySlug) ? 0 : 1;
+    const bHit = preferredAliases.has(b.citySlug) ? 0 : 1;
+    return aHit - bHit;
+  });
+  return ordered;
 }
 
 export function landingBreadcrumbLabel(landingSlug: string, fallbackTitle?: string | null): string {
