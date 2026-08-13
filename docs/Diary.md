@@ -1,4 +1,18 @@
+## 2026-08-13 - Live: Deploy MSK web `31715921191`
+
+### Наблюдения
+- Owner: «выкатывай». Пакет places cards/toggle/H1/sort + PDP about-above-nearby + mobile hero 3:4.
+
+### Решения
+- Deploy MSK web `31715921191` success, ~5m. SHA `90e9c528`. BUILD_ID=`lwH6oSCHG6Askuv3Qs_2W`.
+
+### Проблемы
+- Нет. Hard refresh, если виден старый HTML.
+
+---
+
 ## 2026-08-13 - PDP: About выше Nearby, mobile hero 3:4
+
 
 ### Наблюдения
 - На локации (Адмиралтейство) «Рядом» стояло выше «О локации» / «Как добраться»: park-like блок экскурсий шёл первым в колонке.
