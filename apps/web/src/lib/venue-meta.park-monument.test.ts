@@ -3,8 +3,13 @@ import { describe, it } from 'node:test';
 
 import {
   LOCATION_CATALOG_TYPE_OPTIONS,
+  PLACES_HUB_CATEGORY_CHIPS,
   isMeetingPointLike,
+  isTempleLikeVenueName,
   normalizeVenueKind,
+  placesHubCategoryCount,
+  resolvePlacesHubCategoryChip,
+  resolvePublicVenueType,
   venueTypeBreadcrumbPlural,
   venueTypeLabel,
 } from './venue-meta.ts';
@@ -17,6 +22,7 @@ describe('park + monument venue kinds', () => {
     assert.ok(values.includes('meeting_point'));
     assert.ok(values.includes('gastro'));
     assert.ok(values.includes('outdoor_location'));
+    assert.ok(values.includes('temple'));
   });
 
   it('labels and plurals are RU', () => {
@@ -35,5 +41,34 @@ describe('park + monument venue kinds', () => {
     assert.equal(isMeetingPointLike({ type: 'park', name: 'Парк Монрепо' }), false);
     assert.equal(isMeetingPointLike({ type: 'monument', name: 'Памятник Петру I' }), false);
     assert.equal(isMeetingPointLike({ type: 'meeting_point', name: 'памятник Достоевскому' }), true);
+  });
+});
+
+describe('places hub split chips', () => {
+  it('exposes galleries, attractions, temples, gastro as separate chips', () => {
+    const byId = Object.fromEntries(PLACES_HUB_CATEGORY_CHIPS.map((chip) => [chip.id, chip]));
+    assert.deepEqual(byId.galleries?.types, ['art_space']);
+    assert.deepEqual(byId.attractions?.types, ['attraction']);
+    assert.deepEqual(byId.temples?.types, ['temple']);
+    assert.deepEqual(byId.monuments?.types, ['monument']);
+    assert.deepEqual(byId.gastro?.types, ['gastro']);
+    assert.ok(!byId.museums.types.includes('art_space'));
+    assert.ok(!byId.bars_restaurants.types.includes('gastro'));
+    assert.ok(!byId.outdoors.types.includes('attraction'));
+  });
+
+  it('maps cathedral titles to temple public kind', () => {
+    assert.equal(isTempleLikeVenueName('Исаакиевский собор'), true);
+    assert.equal(isTempleLikeVenueName('Петропавловская крепость'), false);
+    assert.equal(resolvePublicVenueType('attraction', 'Исаакиевский собор'), 'temple');
+    assert.equal(resolvePublicVenueType('attraction', 'Бункер-42 на Таганке'), 'attraction');
+    assert.equal(resolvePlacesHubCategoryChip('temples')?.label, 'Храмы');
+    assert.equal(resolvePlacesHubCategoryChip('temple')?.id, 'temples');
+  });
+
+  it('counts temple chip from stats.types.temple', () => {
+    const chip = resolvePlacesHubCategoryChip('temples');
+    assert.ok(chip);
+    assert.equal(placesHubCategoryCount({ temple: 12, attraction: 40 }, chip), 12);
   });
 });

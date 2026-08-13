@@ -21,6 +21,7 @@ const TYPE_GRADIENT: Record<string, string> = {
   monument: 'from-stone-600 via-slate-700 to-stone-900',
   outdoor_location: 'from-emerald-600 via-green-700 to-emerald-950',
   attraction: 'from-slate-600 via-slate-700 to-slate-900',
+  temple: 'from-amber-800 via-stone-700 to-slate-950',
   sport_activity_space: 'from-orange-600 via-red-600 to-rose-800',
   gastro: 'from-amber-700 via-orange-800 to-slate-950',
   venue: 'from-primary-600 via-primary-700 to-slate-900',
@@ -76,6 +77,7 @@ function technicalLocationBlurb(kind: string, typeLabel: string): string {
       return 'Парк и открытое пространство для прогулок.';
     case 'monument':
     case 'attraction':
+    case 'temple':
       return 'Точка на маршруте и ориентир в городе.';
     case 'outdoor_location':
       return 'Открытая локация для прогулок и событий.';

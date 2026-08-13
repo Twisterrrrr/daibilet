@@ -46,7 +46,8 @@ const VENUE_TYPE_LABELS: Record<string, string> = {
   monument: 'Памятник',
   sport_activity_space: 'Спорт / активность',
   attraction: 'Достопримечательность',
-  gastro: 'Гастро',
+  temple: 'Храм',
+  gastro: 'Гастроточка',
   meeting_point: 'Точка сбора',
   online: 'Онлайн',
   other: 'Локация',
@@ -70,7 +71,8 @@ const VENUE_TYPE_BREADCRUMB_PLURALS: Record<string, string> = {
   monument: 'Памятники',
   sport_activity_space: 'Спорт и активность',
   attraction: 'Достопримечательности',
-  gastro: 'Гастро',
+  temple: 'Храмы',
+  gastro: 'Гастроточки',
   meeting_point: 'Точки сбора',
   online: 'Онлайн',
   other: 'Локации',
@@ -96,9 +98,23 @@ export function classifyMuseumOrArtSpace(name?: string | null, extraText?: strin
   return 'museum';
 }
 
-/** Нормализует public type для крошек/фильтров (split museum_art_space). */
+/** Собор / церковь / монастырь / мечеть → public kind `temple` (чип «Храмы»). */
+export function isTempleLikeVenueName(name?: string | null): boolean {
+  return /(?:собор|церков|храм|монастыр|мечет|синагог|кирх|часовн|костел|\bлавр[аы]\b)/iu.test(
+    String(name || ''),
+  );
+}
+
+/** Нормализует public type для крошек/фильтров (split museum_art_space + temple). */
 export function resolvePublicVenueType(type?: string | null, name?: string | null): string {
   const key = normalizeVenueKind(type);
+  if (key === 'temple') return 'temple';
+  if (
+    (key === 'attraction' || key === 'outdoor_location') &&
+    isTempleLikeVenueName(name)
+  ) {
+    return 'temple';
+  }
   if (key === 'museum' || key === 'art_space') return key;
   if (key === 'museum_art_space') return classifyMuseumOrArtSpace(name);
   return key;
@@ -141,7 +157,7 @@ export function isMeetingPointLike(input: {
   const kind = normalizeVenueKind(input.type);
   if (kind === 'meeting_point') return true;
   // Explicit park/monument kinds are destinations (Важные места), not tour meeting points.
-  if (kind === 'park' || kind === 'monument') return false;
+  if (kind === 'park' || kind === 'monument' || kind === 'temple' || kind === 'attraction') return false;
   const name = `${input.name || input.title || ''} ${input.address || ''}`.toLowerCase();
   return /место сбора|место встречи|точка сбора|точка встречи|площадка:|^метро\b|^м\.(?:\s|«|"|')|\bм\.\s*(?:«|[а-яё])|\bу метро\b|около метро|у памятник|памятник|\bпам\.|у пам\.|\bу пам\b|пл\.\s*у пам/u.test(name);
 }
@@ -164,7 +180,7 @@ export function venueTypeIcon(type?: string | null): LucideIcon {
   if (key === 'pier' || key === 'pier_water') return Anchor;
   if (key === 'bus') return Bus;
   if (key === 'park') return Trees;
-  if (key === 'monument') return Landmark;
+  if (key === 'monument' || key === 'temple' || key === 'attraction') return Landmark;
   if (INSTITUTION_KINDS.has(key)) return Landmark;
   return MapPin;
 }
@@ -243,7 +259,8 @@ export const CATALOG_TYPE_OPTIONS: Array<{ value: string; label: string; templat
   { value: 'outdoor_location', label: 'Открытая локация', template: 'location' },
   { value: 'sport_activity_space', label: 'Спорт / активность', template: 'location' },
   { value: 'attraction', label: 'Достопримечательность', template: 'location' },
-  { value: 'gastro', label: 'Гастро', template: 'location' },
+  { value: 'temple', label: 'Храм', template: 'location' },
+  { value: 'gastro', label: 'Гастроточка', template: 'location' },
   { value: 'meeting_point', label: 'Точка сбора', template: 'location' },
   { value: 'other', label: 'Другое', template: 'location' },
 ];
@@ -260,6 +277,7 @@ export function locationTypeEmoji(type?: string | null): string {
     outdoor_location: '🌳',
     sport_activity_space: '⚡',
     attraction: '🏛',
+    temple: '⛪',
     gastro: '🍽',
     other: '📍',
   };
@@ -286,15 +304,19 @@ export const LOCATION_CATALOG_TYPE_OPTIONS = CATALOG_TYPE_OPTIONS.filter((option
  * `id` уходит в `?type=`; `types` - фактические kind для фильтрации.
  */
 export const PLACES_HUB_CATEGORY_CHIPS: Array<{ id: string; label: string; types: string[] }> = [
-  { id: 'museums', label: 'Музеи', types: ['museum', 'museum_art_space', 'art_space'] },
+  { id: 'museums', label: 'Музеи', types: ['museum', 'museum_art_space'] },
+  { id: 'galleries', label: 'Галереи', types: ['art_space'] },
   { id: 'theaters', label: 'Театры', types: ['theater'] },
   { id: 'concert_halls', label: 'Концертные залы', types: ['concert_hall'] },
-  { id: 'bars_restaurants', label: 'Бары и рестораны', types: ['bar', 'club_bar_restaurant', 'gastro'] },
+  { id: 'bars_restaurants', label: 'Бары и рестораны', types: ['bar', 'club_bar_restaurant'] },
+  { id: 'gastro', label: 'Гастроточки', types: ['gastro'] },
   {
     id: 'outdoors',
     label: 'Парки и открытые места',
-    types: ['park', 'outdoor_location', 'attraction'],
+    types: ['park', 'outdoor_location'],
   },
+  { id: 'attractions', label: 'Достопримечательности', types: ['attraction'] },
+  { id: 'temples', label: 'Храмы', types: ['temple'] },
   { id: 'monuments', label: 'Памятники', types: ['monument'] },
   { id: 'piers', label: 'Причалы', types: ['pier', 'pier_water'] },
   { id: 'buses', label: 'Автобусы', types: ['bus'] },
@@ -364,6 +386,7 @@ const WALKING_KINDS = new Set([
   'monument',
   'outdoor_location',
   'attraction',
+  'temple',
   'gastro',
   'meeting_point',
   'sport_activity_space',
@@ -397,7 +420,10 @@ const CULTURAL_ATTRACTION_NAME_RE =
   /музей|собор|кунсткамер|галере|эрмитаж|дворец|храм|крепост|петропавл|исаак|фаберже|эрарта|штаб|арсенал|монастыр/iu;
 
 function isCulturalAttractionLike(type: string, name?: string | null): boolean {
-  return (type === 'attraction' || type === 'monument') && CULTURAL_ATTRACTION_NAME_RE.test(String(name || ''));
+  return (
+    (type === 'attraction' || type === 'monument' || type === 'temple') &&
+    CULTURAL_ATTRACTION_NAME_RE.test(String(name || ''))
+  );
 }
 
 /**

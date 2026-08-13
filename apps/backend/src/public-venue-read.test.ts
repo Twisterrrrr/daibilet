@@ -7,6 +7,7 @@ import {
   publicVenueRowMatchesCityFilter,
   publicVenuesForSessionsFromHub,
   resolvePublicVenueCanonicalPath,
+  resolvePublicVenueKind,
   scoreRelatedVenueCandidate,
   venueTextKeysFuzzyMatch,
 } from './public-venue-read.js';
@@ -203,4 +204,11 @@ test('scoreRelatedVenueCandidate keeps museums away from standup clubs', () => {
   assert.equal(scoreRelatedVenueCandidate('museum', 'Эрмитаж', 'club_bar_restaurant', 'Stage StandUp Club', 40), -1);
   assert.equal(scoreRelatedVenueCandidate('museum', 'Эрмитаж', 'bar', 'POPRAVKA BAR', 10), -1);
   assert.equal(scoreRelatedVenueCandidate('museum', 'Эрмитаж', 'theater', 'Дом Шрёдера', 5), -1);
+});
+
+test('resolvePublicVenueKind maps cathedrals to temple public kind', () => {
+  assert.equal(resolvePublicVenueKind('ATTRACTION', 'Исаакиевский собор', 'СПб'), 'temple');
+  assert.equal(resolvePublicVenueKind('OUTDOOR_LOCATION', 'Знаменский кафедральный собор', null), 'temple');
+  assert.equal(resolvePublicVenueKind('ATTRACTION', 'Петропавловская крепость', 'СПб'), 'attraction');
+  assert.equal(resolvePublicVenueKind('ATTRACTION', 'Бункер-42 на Таганке', 'Москва'), 'attraction');
 });

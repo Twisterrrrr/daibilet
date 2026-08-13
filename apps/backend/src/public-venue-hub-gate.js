@@ -34,6 +34,7 @@ export const CONTENT_PLACE_PUBLIC_KINDS = new Set([
   'monument',
   'outdoor_location',
   'attraction',
+  'temple',
   'gastro',
   'museum',
   'art_space',

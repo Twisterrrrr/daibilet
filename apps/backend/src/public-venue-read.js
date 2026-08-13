@@ -1710,6 +1710,13 @@ function hasPierLikeText(name, address) {
   return hasStrongPierLocationText(name, address);
 }
 
+/** Собор / церковь / монастырь / мечеть - public kind `temple` (чип «Храмы»). */
+function isTempleLikeVenueName(name) {
+  return /(?:собор|церков|храм|монастыр|мечет|синагог|кирх|часовн|костел|\bлавр[аы]\b)/iu.test(
+    String(name || ''),
+  );
+}
+
 function isViewingPlatformLikeVenue(name, address, shortDescription, description) {
   const text = [name, address, shortDescription, description].filter(Boolean).join(' ');
   return /смотров(?:ая|ой|ую|ые)\s+площадк|smotrovaya|viewing platform|observation deck/i.test(text);
@@ -1788,7 +1795,7 @@ function canonicalStoredVenueKind(storedKind) {
   return stored;
 }
 
-function resolvePublicVenueKind(storedKind, name, address, options = {}) {
+export function resolvePublicVenueKind(storedKind, name, address, options = {}) {
   const stored = canonicalStoredVenueKind(storedKind);
   const inferred = inferPublicVenueKindFromName(name, address);
   const { id, slug, shortDescription, description, waterEvents = 0, busEvents = 0, totalEvents = 0 } = options;
@@ -1815,8 +1822,16 @@ function resolvePublicVenueKind(storedKind, name, address, options = {}) {
   // must not turn concert halls / clubs into pier pages).
   if (stored === 'park') return 'park';
   if (stored === 'monument') return 'monument';
+  // Соборы / церкви / монастыри: отдельный public kind для чипа «Храмы» на /places.
+  if (
+    (stored === 'attraction' || stored === 'outdoor_location' || stored === 'temple') &&
+    isTempleLikeVenueName(name)
+  ) {
+    return 'temple';
+  }
   if (stored === 'outdoor_location') return 'outdoor_location';
   if (stored === 'attraction') return 'attraction';
+  if (stored === 'temple') return 'temple';
   if (stored === 'gastro') return 'gastro';
   if (stored === 'theater') return 'theater';
   if (stored === 'museum_art_space' || stored === 'museum' || stored === 'art_space') {
@@ -1967,6 +1982,7 @@ const WALKING_LOGISTICS_KINDS = new Set([
   'monument',
   'outdoor_location',
   'attraction',
+  'temple',
   'gastro',
   'meeting_point',
   'sport_activity_space',
@@ -2829,7 +2845,7 @@ function isCulturalAttractionLikeKind(kind, name) {
     .trim()
     .toLowerCase()
     .replace(/-/g, '_');
-  return (key === 'attraction' || key === 'monument') && CULTURAL_ATTRACTION_NAME_RE.test(String(name || ''));
+  return (key === 'attraction' || key === 'monument' || key === 'temple') && CULTURAL_ATTRACTION_NAME_RE.test(String(name || ''));
 }
 
 /** @internal exported for unit tests */
