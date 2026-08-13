@@ -203,7 +203,7 @@ export function destinationPrepositional(destination: Pick<DestinationRecord, 's
     'respublika-tatarstan': 'в Республике Татарстан',
     'respublika-hakasiya': 'в Республике Хакасии',
     'respublika-bashkortostan': 'в Республике Башкортостан',
-    'respublika-kareliya': 'в Республике Карелия',
+    'respublika-kareliya': 'в Республике Карелии',
     'ulyanovskaya-oblast': 'в Ульяновской области',
     'habarovskiy-kray': 'в Хабаровском крае',
     'primorskiy-kray': 'в Приморском крае',

@@ -32,4 +32,12 @@ test('destinationPrepositional returns known city forms', () => {
     destinationPrepositional({ slug: 'moskva', name: 'Москва', type: 'city' }),
     'в Москве',
   );
+  assert.equal(
+    destinationPrepositional({
+      slug: 'respublika-kareliya',
+      name: 'Республика Карелия',
+      type: 'region',
+    }),
+    'в Республике Карелии',
+  );
 });

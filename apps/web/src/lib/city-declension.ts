@@ -87,6 +87,20 @@ const CITY_FORMS: Record<string, CityFormRow> = {
   'Южно-Сахалинск': { prep: 'Южно-Сахалинске', gen: 'Южно-Сахалинска' },
   Якутск: { prep: 'Якутске', gen: 'Якутска' },
   Ярославль: { prep: 'Ярославле', gen: 'Ярославля' },
+  Карелия: { prep: 'Карелии', gen: 'Карелии', acc: 'Карелию' },
+  'Республика Карелия': {
+    prep: 'Республике Карелии',
+    gen: 'Республики Карелии',
+    acc: 'Республику Карелию',
+  },
+  Хакасия: { prep: 'Хакасии', gen: 'Хакасии', acc: 'Хакасию' },
+  'Республика Хакасия': {
+    prep: 'Республике Хакасии',
+    gen: 'Республики Хакасии',
+    acc: 'Республику Хакасию',
+  },
+  Коми: { prep: 'Коми', gen: 'Коми', acc: 'Коми' },
+  'Республика Коми': { prep: 'Республике Коми', gen: 'Республики Коми', acc: 'Республику Коми' },
 };
 
 /** Slug / alias → именительный (роутинг landings + city hubs). */
@@ -114,40 +128,95 @@ const CITY_NAME_BY_SLUG: Record<string, string> = {
   'rostov-na-donu': 'Ростов-на-Дону',
   sochi: 'Сочи',
   kaliningrad: 'Калининград',
+  'respublika-kareliya': 'Республика Карелия',
+  kareliya: 'Карелия',
 };
 
 /** Города с отдельными SEO-шаблонами meta (Казань / Екатеринбург). */
 const SEO_EXPANSION_CITY_NAMES = new Set(['Казань', 'Екатеринбург']);
 const SEO_EXPANSION_CITY_SLUGS = new Set(['kazan', 'ekaterinburg']);
 
-/** Эвристика предложного падежа, если города нет в словаре. */
+function inferAdjectivePrep(adj: string): string {
+  if (/ая$/i.test(adj)) return `${adj.slice(0, -2)}ой`;
+  if (/яя$/i.test(adj)) return `${adj.slice(0, -2)}ей`;
+  if (/ий$/i.test(adj) || /ый$/i.test(adj) || /ой$/i.test(adj)) return `${adj.slice(0, -2)}ом`;
+  return adj;
+}
+
+function inferAdjectiveGen(adj: string): string {
+  if (/ая$/i.test(adj)) return `${adj.slice(0, -2)}ой`;
+  if (/яя$/i.test(adj)) return `${adj.slice(0, -2)}ей`;
+  if (/ий$/i.test(adj) || /ый$/i.test(adj) || /ой$/i.test(adj)) return `${adj.slice(0, -2)}ого`;
+  return adj;
+}
+
+function inferAdjectiveAcc(adj: string): string {
+  if (/ая$/i.test(adj)) return `${adj.slice(0, -2)}ую`;
+  if (/яя$/i.test(adj)) return `${adj.slice(0, -2)}юю`;
+  return adj;
+}
+
+/**
+ * Эвристика предложного падежа, если города нет в словаре.
+ * Не склоняет только последнее слово: «Республика Карелия» иначе становится «Республика Карелие».
+ */
 function inferPrepositional(name: string): string {
+  const republic = name.match(/^Республика\s+(.+)$/i);
+  if (republic) return `Республике ${inferPrepositional(republic[1])}`;
+  const republicTail = name.match(/^(.+)\s+Республика$/i);
+  if (republicTail) return `${inferAdjectivePrep(republicTail[1])} Республике`;
+  const oblast = name.match(/^(.+)\s+область$/i);
+  if (oblast) return `${inferAdjectivePrep(oblast[1])} области`;
+  const kray = name.match(/^(.+)\s+край$/i);
+  if (kray) return `${inferAdjectivePrep(kray[1])} крае`;
+
   if (/ы$/i.test(name)) return `${name.slice(0, -1)}ах`; // Чебоксары → …ах (fallback)
+  if (/ия$/i.test(name)) return `${name.slice(0, -1)}и`; // Карелия → Карелии
   if (/а$/i.test(name)) return `${name.slice(0, -1)}е`; // Самара → Самаре
-  if (/я$/i.test(name)) return `${name.slice(0, -1)}е`; // Кострома handled above; -я → -е
+  if (/я$/i.test(name)) return `${name.slice(0, -1)}е`;
   if (/ь$/i.test(name)) return `${name.slice(0, -1)}и`; // Казань → Казани
-  if (/ий$/i.test(name)) return `${name.slice(0, -2)}ом`; // редкие
+  if (/ий$/i.test(name)) return `${name.slice(0, -2)}ом`;
   if (/ый$/i.test(name) || /ой$/i.test(name)) return `${name.slice(0, -2)}ом`;
   if (/о$/i.test(name)) return `${name.slice(0, -1)}е`; // Иваново → Иванове
-  if (/е$/i.test(name) || /у$/i.test(name) || /ю$/i.test(name) || /э$/i.test(name)) return name; // несклоняемые
-  return `${name}е`; // Мурманск → Мурманске, Омск → Омске
+  if (/[еиуюэ]$/i.test(name)) return name; // несклоняемые, в т.ч. Коми
+  return `${name}е`; // Мурманск → Мурманске
 }
 
 function inferGenitive(name: string): string {
+  const republic = name.match(/^Республика\s+(.+)$/i);
+  if (republic) return `Республики ${inferGenitive(republic[1])}`;
+  const republicTail = name.match(/^(.+)\s+Республика$/i);
+  if (republicTail) return `${inferAdjectiveGen(republicTail[1])} Республики`;
+  const oblast = name.match(/^(.+)\s+область$/i);
+  if (oblast) return `${inferAdjectiveGen(oblast[1])} области`;
+  const kray = name.match(/^(.+)\s+край$/i);
+  if (kray) return `${inferAdjectiveGen(kray[1])} края`;
+
   if (/ы$/i.test(name)) return name.slice(0, -1); // Чебоксары → Чебоксар
+  if (/ия$/i.test(name)) return `${name.slice(0, -1)}и`;
   if (/а$/i.test(name)) return `${name.slice(0, -1)}ы`;
   if (/я$/i.test(name)) return `${name.slice(0, -1)}и`;
   if (/ь$/i.test(name)) return `${name.slice(0, -1)}и`;
   if (/ий$/i.test(name)) return `${name.slice(0, -2)}ого`;
   if (/ый$/i.test(name) || /ой$/i.test(name)) return `${name.slice(0, -2)}ого`;
   if (/о$/i.test(name)) return `${name.slice(0, -1)}а`;
-  if (/е$/i.test(name) || /у$/i.test(name) || /ю$/i.test(name) || /э$/i.test(name)) return name;
+  if (/[еиуюэ]$/i.test(name)) return name;
   return `${name}а`;
 }
 
 /** Винительный для «ехать в …»: -а/-я → -у/-ю; иначе = именительный (неодуш.). */
 function inferAccusative(name: string): string {
-  if (/\s/.test(name) || /-/.test(name)) return name;
+  const republic = name.match(/^Республика\s+(.+)$/i);
+  if (republic) return `Республику ${inferAccusative(republic[1])}`;
+  const republicTail = name.match(/^(.+)\s+Республика$/i);
+  if (republicTail) return `${inferAdjectiveAcc(republicTail[1])} Республику`;
+  const oblast = name.match(/^(.+)\s+область$/i);
+  if (oblast) return `${inferAdjectiveAcc(oblast[1])} область`;
+  const kray = name.match(/^(.+)\s+край$/i);
+  if (kray) return `${inferAdjectiveAcc(kray[1])} край`;
+
+  if (/-/.test(name)) return name;
+  if (/ия$/i.test(name)) return `${name.slice(0, -1)}ю`;
   if (/а$/i.test(name)) return `${name.slice(0, -1)}у`;
   if (/я$/i.test(name)) return `${name.slice(0, -1)}ю`;
   return name;

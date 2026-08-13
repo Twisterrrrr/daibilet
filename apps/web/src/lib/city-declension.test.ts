@@ -9,7 +9,7 @@ import {
   inCityAccusative,
   isSeoExpansionCity,
   resolveCityCases,
-} from '@/lib/city-declension';
+} from './city-declension.ts';
 
 test('Kazan / Ekaterinburg cases by name', () => {
   assert.deepEqual(resolveCityCases('Казань'), {
@@ -44,6 +44,15 @@ test('accusative for ехать в …', () => {
   assert.equal(inCityAccusative('Владимир'), 'во Владимир');
   assert.equal(inCityAccusative('Орёл'), 'в Орёл');
   assert.equal(inCityAccusative('moscow'), 'в Москву');
+});
+
+test('Karelia region does not become Карелие', () => {
+  assert.equal(cityToPrepositional('Республика Карелия'), 'Республике Карелии');
+  assert.equal(cityToPrepositional('Карелия'), 'Карелии');
+  assert.equal(cityToPrepositional('respublika-kareliya'), 'Республике Карелии');
+  assert.equal(cityToGenitive('Республика Карелия'), 'Республики Карелии');
+  assert.equal(cityToAccusative('Республика Карелия'), 'Республику Карелию');
+  assert.equal(cityToPrepositional('Московская область'), 'Московской области');
 });
 
 test('isSeoExpansionCity', () => {

@@ -73,18 +73,23 @@ const CITY_FORMS: Record<string, { prep: string; gen: string }> = {
   'Южно-Сахалинск': { prep: 'Южно-Сахалинске', gen: 'Южно-Сахалинска' },
   Якутск: { prep: 'Якутске', gen: 'Якутска' },
   Ярославль: { prep: 'Ярославле', gen: 'Ярославля' },
+  Карелия: { prep: 'Карелии', gen: 'Карелии' },
+  'Республика Карелия': { prep: 'Республике Карелии', gen: 'Республики Карелии' },
 };
 
 /** Эвристика предложного падежа, если города нет в словаре. */
 function inferPrepositional(name: string): string {
+  const republic = name.match(/^Республика\s+(.+)$/i);
+  if (republic) return `Республике ${inferPrepositional(republic[1])}`;
   if (/ы$/i.test(name)) return `${name.slice(0, -1)}ах`;
+  if (/ия$/i.test(name)) return `${name.slice(0, -1)}и`;
   if (/а$/i.test(name)) return `${name.slice(0, -1)}е`;
   if (/я$/i.test(name)) return `${name.slice(0, -1)}е`;
   if (/ь$/i.test(name)) return `${name.slice(0, -1)}и`;
   if (/ий$/i.test(name)) return `${name.slice(0, -2)}ом`;
   if (/ый$/i.test(name) || /ой$/i.test(name)) return `${name.slice(0, -2)}ом`;
   if (/о$/i.test(name)) return `${name.slice(0, -1)}е`;
-  if (/е$/i.test(name) || /у$/i.test(name) || /ю$/i.test(name) || /э$/i.test(name)) return name;
+  if (/[еиуюэ]$/i.test(name)) return name;
   return `${name}е`;
 }
 
