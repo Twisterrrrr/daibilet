@@ -50,12 +50,37 @@ export function buildDayRouteLongPath(payload: DayRouteSharePayload): string {
   return `/my-day?${params.toString()}`;
 }
 
-export function buildDayRouteShortPath(code: string): string {
-  return `/d/${encodeURIComponent(code)}`;
+export function buildDayRouteShortPath(code: string, citySlug?: string | null): string {
+  const normalizedCode = String(code || '')
+    .trim()
+    .toLowerCase();
+  if (!normalizedCode) return '/my-day';
+  const city = String(citySlug || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, '')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+  if (city) return `/m/${encodeURIComponent(`${city}-${normalizedCode}`)}`;
+  return `/d/${encodeURIComponent(normalizedCode)}`;
 }
 
 export function isValidDayRouteShareCode(code: string): boolean {
   return /^[23456789abcdefghijkmnopqrstuvwxyz]{6,12}$/.test(code);
+}
+
+/** Parse `/m/{city}-{code}` or bare code from human-readable short share. */
+export function parseDayRouteReadableSlug(raw: string): { code: string; citySlug: string | null } | null {
+  const slug = String(raw || '')
+    .trim()
+    .toLowerCase();
+  if (!slug) return null;
+  if (isValidDayRouteShareCode(slug)) {
+    return { code: slug, citySlug: null };
+  }
+  const match = slug.match(/^([a-z0-9-]+)-([23456789abcdefghijkmnopqrstuvwxyz]{6,12})$/);
+  if (!match) return null;
+  return { citySlug: match[1] || null, code: match[2]! };
 }
 
 function generateShareCode(length = CODE_LENGTH): string {
@@ -88,7 +113,7 @@ export async function createDayRouteShare(
   if (existing?.code) {
     return {
       code: existing.code,
-      path: buildDayRouteShortPath(existing.code),
+      path: buildDayRouteShortPath(existing.code, payload.citySlug),
       longPath: buildDayRouteLongPath(payload),
       reused: true,
     };
@@ -107,7 +132,7 @@ export async function createDayRouteShare(
       });
       return {
         code,
-        path: buildDayRouteShortPath(code),
+        path: buildDayRouteShortPath(code, payload.citySlug),
         longPath: buildDayRouteLongPath(payload),
         reused: false,
       };

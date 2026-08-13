@@ -1,3 +1,19 @@
+## 2026-08-14 - /cities A-C + My Day /m/{slug} (D)
+
+### Наблюдения
+- Owner: «A, B, C, а D опционально» после fork «A или B?» (ROI `/cities` + readable share).
+
+### Решения
+- A: livesearch пишет `?q=` и фильтрует сетку.
+- B: вернули 8 popular tiles (`imageVariant=top`) над картой, без дублей в `#cities-all`.
+- C: mobile toggle Список/Карта (default список).
+- D: share отдаёт `/m/{city}-{code}`; `GET /m/[slug]` → 307 как `/d/{code}` (без миграции БД).
+
+### Проблемы
+- Полный UGC `/routes` (путь B из аудита) не делали. Live после «выкатывай».
+
+---
+
 ## 2026-08-14 - /events: sticky bar + city footer + mobile icon rail
 
 ### Наблюдения
