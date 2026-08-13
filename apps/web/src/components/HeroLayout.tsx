@@ -38,7 +38,8 @@ export type HeroLayoutProps = {
 
 const TONE = {
   light: {
-    section: 'bg-slate-50 text-slate-900',
+    // White canvas - do not pair with a second bg-* in className (Tailwind order is stylesheet, not class list).
+    section: 'bg-white text-slate-900',
     title: 'text-slate-900',
     description: 'text-slate-600',
     brand: 'text-primary-700',

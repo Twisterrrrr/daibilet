@@ -495,7 +495,6 @@ export function LocationsCatalogView({
         eyebrow={`${formatNumber(heroTotal)} локаций · ${pluralCities(cityCount)}`}
         title={heroTitle}
         tone="light"
-        className="bg-slate-50"
       >
         <div className="mt-4 flex flex-wrap gap-1.5">
           <button

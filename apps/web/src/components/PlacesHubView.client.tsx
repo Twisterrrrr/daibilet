@@ -625,7 +625,7 @@ export function PlacesHubView({
         eyebrow={`${pluralPlaces(placesTotal)} • ${pluralCities(cityCount)}`}
         title={pageTitleText}
         tone="light"
-        className="bg-white"
+        className=""
       >
         <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-stretch sm:gap-3">
           <PlacesSearch mode="hub" initialQuery={q} tone="muted" />
