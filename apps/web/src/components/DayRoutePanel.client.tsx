@@ -239,7 +239,7 @@ import { eventHref, venueHref } from '@/lib/routes';
 import { toVenueCatalogCard } from '@/lib/venue-catalog-card';
 import type { VenueCatalogCard } from '@/lib/venue-map-types';
 
-type DayRouteAccordionId = 'mustSee' | 'text' | 'matches';
+type DayRouteAccordionId = 'mustSee' | 'text';
 /** Wave 1.5: list-only itinerary (Lovable). Grid card markup kept as dead path. */
 type DayRouteStopViewMode = 'grid' | 'list';
 type DayRouteMobileShelf = 'route' | 'add';
@@ -247,6 +247,7 @@ type MyDayPickerSection = 'scenarios' | 'places' | 'suburbs' | 'picks' | 'boat' 
 
 /** Owner 2026-08-06: post-buy modal «Оформили билет?» off until UX revisit. Buy links still open. */
 const SHOW_DAY_TICKET_HANDOFF_MODAL = false;
+const NEARBY_MATCHES_PREVIEW = 3;
 
 /** @deprecated Wave 1.5 list-only; kept for dead grid branch types. */
 const DAY_ROUTE_STOPS_GRID_RAIL =
@@ -436,7 +437,7 @@ function DayRoutePanelInner() {
   const [geocodePreview, setGeocodePreview] = useState<SoftGeocodeHit | null>(null);
   /** Lovable «Типы точек»: hidden tags filter itinerary visibility. */
   const [hiddenStopTags, setHiddenStopTags] = useState<string[]>([]);
-  /** Exclusive accordion for route-building tools only (must-see / custom / matches). */
+  /** Exclusive accordion for route-building tools only (must-see / custom). */
   /** Guidebook (scenarios + suburbs DayTripCanonCard) stays always open as day-plan cards. */
   const [openPanel, setOpenPanel] = useState<DayRouteAccordionId | null>(null);
   const [locationsCatalog, setLocationsCatalog] = useState<VenueCatalogCard[]>([]);
@@ -474,6 +475,7 @@ function DayRoutePanelInner() {
   const myDay = useMyDayController();
   const [pickerOpen, setPickerOpen] = useState(false);
   const [pickerSection, setPickerSection] = useState<MyDayPickerSection>('scenarios');
+  const [matchesExpanded, setMatchesExpanded] = useState(false);
   /** Session dismiss for «Свободное окно» upsell (resets on reload). */
   const [freeWindowDismissed, setFreeWindowDismissed] = useState(false);
   /** HTML5 DnD: venue id currently dragged (plan stops). */
@@ -1948,8 +1950,10 @@ function DayRoutePanelInner() {
     return null;
   }, [route.venues]);
   const canOptimize = coordsCount >= 2;
-  const hasCatalogStops = Boolean(catalogVenueIds);
-  const showMatches = hasCatalogStops;
+
+  useEffect(() => {
+    setMatchesExpanded(false);
+  }, [catalogVenueIds]);
 
   useEffect(() => {
     if (!ready) return;
@@ -2545,12 +2549,7 @@ function DayRoutePanelInner() {
     </>
   );
 
-  function togglePanel(id: DayRouteAccordionId) {
-    setOpenPanel((cur) => (cur === id ? null : id));
-  }
-
   const mustSeeOpen = openPanel === 'mustSee';
-  const matchesOpen = openPanel === 'matches';
   const showMustSeeAccordion = Boolean(hasCatalogCity && (mustSeeResolved.length > 0 || (!catalogLoading && catalogCitySlug)));
   const showScenariosGuide = Boolean(
     hasCatalogCity && (hasNamedPresets || mustSeePlaces.length >= 3),
@@ -2577,7 +2576,7 @@ function DayRoutePanelInner() {
     ...(showSuburbsGuide
       ? [{ value: 'suburbs' as const, label: 'Значимые пригороды', hint: 'Поездки за город на полдня', icon: Landmark }]
       : []),
-    ...(showHotPicks || showMatches
+    ...(showHotPicks
       ? [{ value: 'picks' as const, label: 'Выбор Дайбилет', hint: 'Рекомендации сервиса', icon: Sparkles }]
       : []),
     ...(showBoatPicker
@@ -2835,6 +2834,120 @@ function DayRoutePanelInner() {
           ) : null}
         </p>
       </div>
+    );
+  }
+
+  /** Bottom-of-route recommendation: a few nearby events, rest behind «Показать ещё». */
+  function renderRouteNearbyMatches() {
+    if (isEmptyRoute || uniqueMatches.length === 0) return null;
+    const visible = matchesExpanded
+      ? uniqueMatches
+      : uniqueMatches.slice(0, NEARBY_MATCHES_PREVIEW);
+    const hiddenCount = uniqueMatches.length - visible.length;
+
+    return (
+      <section
+        className="mt-6 border-t border-slate-200 pt-4"
+        id="day-route-matches"
+        data-day-route-nearby-matches="1"
+      >
+        <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500">К маршруту</p>
+        <h3 className="mt-1 text-base font-semibold text-slate-900">События поблизости</h3>
+        <p className="mt-0.5 text-xs text-slate-500">
+          Экскурсии, которые задевают точки дня
+          {uniqueMatches.length > 1 ? ` · ${uniqueMatches.length}` : ''}
+        </p>
+        <ul className="mt-3 grid grid-cols-1 items-start gap-3" data-day-matches-deduped>
+          {visible.map((match) => {
+            const fullCovered = dayRouteFullCoveredCount(match.covered);
+            const nearCount = match.covered.nearby.length;
+            return (
+              <li key={match.eventId} className="rounded-2xl border border-slate-200 bg-white p-3 sm:p-4">
+                <div className="flex gap-3">
+                  <Link
+                    href={eventHref({ slug: match.slug, id: match.eventId })}
+                    className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-slate-100 sm:h-20 sm:w-20"
+                  >
+                    <SafeImage
+                      src={match.imageUrl}
+                      alt=""
+                      fill
+                      sizes={IMAGE_SIZES.favoritesThumb}
+                      className="object-cover"
+                    />
+                  </Link>
+                  <div className="min-w-0 flex-1">
+                    <Link
+                      href={eventHref({ slug: match.slug, id: match.eventId })}
+                      className="line-clamp-2 text-sm font-semibold text-slate-900 hover:text-primary-700"
+                    >
+                      {match.title}
+                    </Link>
+                    <p className="mt-1 text-xs text-slate-500">
+                      {fullCovered} из {route.venues.length} точек
+                      {nearCount ? ` · ещё ${nearCount} рядом` : ''}
+                      {match.priceFromRub != null ? ` · ${formatPriceFrom(match.priceFromRub)}` : ''}
+                    </p>
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {match.covered.stop.map((id) => (
+                        <span
+                          key={`stop-${id}`}
+                          className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-800"
+                          title={titleById.get(id) || id}
+                        >
+                          в маршруте · {titleById.get(id) || 'точка'}
+                        </span>
+                      ))}
+                      {match.covered.start.map((id) => (
+                        <span
+                          key={`start-${id}`}
+                          className="rounded-full bg-sky-50 px-2 py-0.5 text-[11px] font-semibold text-sky-800"
+                          title={titleById.get(id) || id}
+                        >
+                          старт · {titleById.get(id) || 'точка'}
+                        </span>
+                      ))}
+                      {match.covered.nearby.map((id) => (
+                        <span
+                          key={`near-${id}`}
+                          className="rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-800"
+                          title={titleById.get(id) || id}
+                        >
+                          рядом · {titleById.get(id) || 'точка'}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+        {hiddenCount > 0 || (matchesExpanded && uniqueMatches.length > NEARBY_MATCHES_PREVIEW) ? (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {hiddenCount > 0 ? (
+              <button
+                type="button"
+                data-day-matches-show-more
+                onClick={() => setMatchesExpanded(true)}
+                className="inline-flex min-h-10 items-center rounded-full border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+              >
+                Показать ещё {hiddenCount}
+              </button>
+            ) : null}
+            {matchesExpanded && uniqueMatches.length > NEARBY_MATCHES_PREVIEW ? (
+              <button
+                type="button"
+                data-day-matches-collapse
+                onClick={() => setMatchesExpanded(false)}
+                className="inline-flex min-h-10 items-center rounded-full px-3 text-sm font-semibold text-slate-500 hover:bg-slate-50 hover:text-slate-800"
+              >
+                Свернуть
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+      </section>
     );
   }
 
@@ -3945,6 +4058,8 @@ function DayRoutePanelInner() {
             </div>
           ) : null}
 
+          {renderRouteNearbyMatches()}
+
           </MyDayItinerary>
         </section>
       )}
@@ -4112,7 +4227,7 @@ function DayRoutePanelInner() {
         </section>
       ) : null}
 
-      {/* Accordion stack: must-see → custom → boat → matches → hot picks → catalog. */}
+      {/* Accordion stack: must-see → custom → boat → hot picks. */}
       {/* Accordion: must-see chips (route builder) */}
       {showMustSeeAccordion && pickerSection === 'places' ? (
         <div data-day-accordion="mustSee" data-day-must-see>
@@ -4370,135 +4485,6 @@ function DayRoutePanelInner() {
           onRouteChange={setRoute}
           locationsCatalog={locationsCatalog}
         />
-      ) : null}
-
-      {/* Accordion: nearby events / matches */}
-      {pickerSection === 'picks' && showMatches ? (
-        <div
-          id="day-route-matches"
-          className="rounded-2xl border border-slate-200 bg-white"
-          data-day-accordion="matches"
-        >
-          <button
-            type="button"
-            aria-expanded={matchesOpen}
-            aria-controls="day-route-matches-body"
-            data-day-matches-accordion
-            onClick={() => togglePanel('matches')}
-            className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left sm:px-5"
-          >
-            <span>
-              <span className="block text-sm font-semibold text-slate-900">События поблизости</span>
-              <span className="mt-0.5 block text-xs text-slate-500">
-                {loading
-                  ? 'Ищем покрытие…'
-                  : payload
-                    ? `Найдено: ${uniqueMatches.length}`
-                    : 'По покрытию точек'}
-              </span>
-            </span>
-            <ChevronDown
-              className={`h-5 w-5 shrink-0 text-slate-400 transition ${matchesOpen ? 'rotate-180' : ''}`}
-            />
-          </button>
-          {(matchesOpen || pickerOpen) ? (
-            <div id="day-route-matches-body" className="border-t border-slate-100 px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
-              {loading ? <p className="text-sm text-slate-500">Ищем покрытие…</p> : null}
-              {!loading && payload && uniqueMatches.length === 0 ? (
-                <div className="rounded-xl border border-slate-100 bg-slate-50 px-4 py-5 text-sm text-slate-600">
-                  <p className="font-semibold text-slate-800">Пока нет экскурсии, покрывающей набор</p>
-                  <p className="mt-1.5 leading-relaxed">
-                    Посмотрите афишу города или экскурсии «рядом» на карточке точки. Когда появятся STOP-связи,
-                    покрытие станет точнее.
-                  </p>
-                  <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-                    <Link
-                      href={afishaHref}
-                      className="inline-flex min-h-10 items-center justify-center rounded-full bg-slate-900 px-4 py-2 text-xs font-bold text-white hover:bg-primary-600"
-                    >
-                      Афиша города
-                    </Link>
-                    <Link
-                      href={placesHref}
-                      className="inline-flex min-h-10 items-center justify-center rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
-                    >
-                      Другие точки
-                    </Link>
-                  </div>
-                </div>
-              ) : null}
-              <ul className="mt-3 grid grid-cols-1 items-start gap-3 md:grid-cols-2" data-day-matches-deduped>
-                {uniqueMatches.map((match) => {
-                  const fullCovered = dayRouteFullCoveredCount(match.covered);
-                  const nearCount = match.covered.nearby.length;
-                  return (
-                    <li
-                      key={match.eventId}
-                      className="rounded-2xl border border-slate-200 bg-white p-3 sm:p-4"
-                    >
-                      <div className="flex gap-3">
-                        <Link
-                          href={eventHref({ slug: match.slug, id: match.eventId })}
-                          className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-slate-100 sm:h-20 sm:w-20"
-                        >
-                          <SafeImage
-                            src={match.imageUrl}
-                            alt=""
-                            fill
-                            sizes={IMAGE_SIZES.favoritesThumb}
-                            className="object-cover"
-                          />
-                        </Link>
-                        <div className="min-w-0 flex-1">
-                          <Link
-                            href={eventHref({ slug: match.slug, id: match.eventId })}
-                            className="line-clamp-2 text-sm font-semibold text-slate-900 hover:text-primary-700"
-                          >
-                            {match.title}
-                          </Link>
-                          <p className="mt-1 text-xs text-slate-500">
-                            {fullCovered} из {route.venues.length} точек
-                            {nearCount ? ` · ещё ${nearCount} рядом` : ''}
-                            {match.priceFromRub != null ? ` · ${formatPriceFrom(match.priceFromRub)}` : ''}
-                          </p>
-                          <div className="mt-2 flex flex-wrap gap-1.5">
-                            {match.covered.stop.map((id) => (
-                              <span
-                                key={`stop-${id}`}
-                                className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-800"
-                                title={titleById.get(id) || id}
-                              >
-                                в маршруте · {titleById.get(id) || 'точка'}
-                              </span>
-                            ))}
-                            {match.covered.start.map((id) => (
-                              <span
-                                key={`start-${id}`}
-                                className="rounded-full bg-sky-50 px-2 py-0.5 text-[11px] font-semibold text-sky-800"
-                                title={titleById.get(id) || id}
-                              >
-                                старт · {titleById.get(id) || 'точка'}
-                              </span>
-                            ))}
-                            {match.covered.nearby.map((id) => (
-                              <span
-                                key={`near-${id}`}
-                                className="rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-800"
-                                title={titleById.get(id) || id}
-                              >
-                                рядом · {titleById.get(id) || 'точка'}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          ) : null}
-        </div>
       ) : null}
 
       {/* Hot Picks - always expanded (no accordion chrome) */}
