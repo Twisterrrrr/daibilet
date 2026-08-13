@@ -6,6 +6,7 @@ import { PlacesHubView } from '@/components/PlacesHubView.client';
 import { SiteLayout } from '@/components/SiteLayout';
 import { VenueCatalogPageSkeleton } from '@/components/VenueCatalogSkeletons';
 import { robotsForIndexability } from '@/lib/hub-indexability';
+import { cityToNominative } from '@/lib/city-declension';
 import {
   buildPlacesListingSeo,
   firstPlacesQueryValue,
@@ -54,9 +55,17 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
       const destinations = payload?.destinations || [];
       const matched = matchDestination(destinations, cityRaw);
       cityName = matched?.name || (/[а-яё]/i.test(cityRaw) ? cityRaw : null);
+      if (!cityName) {
+        const fromSlug = cityToNominative(cityRaw);
+        if (/[а-яё]/i.test(fromSlug)) cityName = fromSlug;
+      }
       citySlug = matched?.slug || citySlug;
     } catch {
       cityName = /[а-яё]/i.test(cityRaw) ? cityRaw : null;
+      if (!cityName) {
+        const fromSlug = cityToNominative(cityRaw);
+        if (/[а-яё]/i.test(fromSlug)) cityName = fromSlug;
+      }
     }
   }
 

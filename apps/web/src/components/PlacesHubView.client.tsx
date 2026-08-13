@@ -536,7 +536,11 @@ export function PlacesHubView({
 
   const cityCount = cityOptions.length;
   const cityName = cityFilter !== 'all' ? cityFilter : null;
-  const pageTitleText = buildPlacesListingCopy(cityName, family).h1;
+  const citySlugForCopy =
+    cityFilter !== 'all'
+      ? selectedCity?.selectedDestination?.slug || cityFetchKey || cityName
+      : '';
+  const pageTitleText = buildPlacesListingCopy(cityName, family, citySlugForCopy).h1;
   const families = countCatalogFamilies(stats.types);
   const hideCityOnCards = cityFilter !== 'all';
   const cityQuery =

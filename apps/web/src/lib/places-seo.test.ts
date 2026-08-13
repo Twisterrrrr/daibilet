@@ -18,8 +18,20 @@ test('places H1 is the fixed kinds list plus genitive city', () => {
   assert.equal(moscow.h1, 'Музеи, театры, локации, достопримечательности Москвы');
   assert.match(moscow.description, /площадки/i);
   assert.match(moscow.description, /локации/i);
+  assert.match(moscow.description, /Москвы/);
   assert.ok(moscow.description.length > 140);
   assert.ok(buildPlacesListingCopy(null).description.length > 140);
+
+  const bySlug = buildPlacesListingCopy(null, null, 'saint-petersburg');
+  assert.equal(bySlug.h1, 'Музеи, театры, локации, достопримечательности Санкт-Петербурга');
+  assert.match(bySlug.description, /Санкт-Петербурга/);
+});
+
+test('places listing SEO puts city in description from slug alone', () => {
+  const seo = buildPlacesListingSeo({ citySlug: 'saint-petersburg' });
+  assert.equal(seo.canonicalPath, '/places?city=saint-petersburg');
+  assert.match(seo.description, /Санкт-Петербурга/);
+  assert.equal(seo.h1, 'Музеи, театры, локации, достопримечательности Санкт-Петербурга');
 });
 
 test('places listing canonical indexes hub, city and family; noindexes thin filters', () => {

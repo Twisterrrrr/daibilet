@@ -1,4 +1,4 @@
-import { cityToGenitive } from './city-declension.ts';
+import { cityToGenitive, cityToNominative } from './city-declension.ts';
 
 export function firstPlacesQueryValue(value: string | string[] | undefined): string {
   if (Array.isArray(value)) return String(value[0] || '').trim();
@@ -26,15 +26,24 @@ export function normalizePlacesFamily(
 
 const PLACES_H1 = 'Музеи, театры, локации, достопримечательности';
 
+function resolvePlacesCityLabel(cityName?: string | null, citySlug?: string | null): string {
+  const raw = String(cityName || citySlug || '').trim();
+  if (!raw) return '';
+  const nominative = cityToNominative(raw);
+  // Known slug/name maps to Cyrillic; unknown latin slug stays latin - skip genitive copy.
+  return /[а-яё]/i.test(nominative) ? nominative : '';
+}
+
 export function buildPlacesListingCopy(
   cityName?: string | null,
   family?: string | null,
+  citySlug?: string | null,
 ): {
   h1: string;
   title: string;
   description: string;
 } {
-  const city = String(cityName || '').trim();
+  const city = resolvePlacesCityLabel(cityName, citySlug);
   const gen = city ? cityToGenitive(city) : '';
   const h1 = gen ? `${PLACES_H1} ${gen}` : PLACES_H1;
   const fam = normalizePlacesFamily(family);
@@ -86,7 +95,7 @@ export function buildPlacesListingSeo(input: PlacesListingSeoInput): {
   const sortRaw = String(input.sort || '').trim().toLowerCase();
   const thinSort = Boolean(sortRaw && sortRaw !== 'events');
   const citySlug = resolvePlacesCitySlug(input.citySlug);
-  const copy = buildPlacesListingCopy(input.cityName, family);
+  const copy = buildPlacesListingCopy(input.cityName, family, citySlug);
   const thin = Boolean(q || type || hasPage || hasEvents || thinSort);
 
   const canon = new URLSearchParams();
