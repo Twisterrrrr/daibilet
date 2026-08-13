@@ -1168,6 +1168,8 @@ function CitySightsSection({
           city={city}
           cityGenitive={cityGenitive}
           editorial={editorial}
+          replaceDayOnApply
+          navigateToMyDayOnApply
           className="mt-10"
         />
       ) : null}

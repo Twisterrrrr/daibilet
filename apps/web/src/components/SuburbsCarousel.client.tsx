@@ -113,6 +113,9 @@ export type SuburbsCarouselProps = {
    * My-day: magazine DayTripCanonCard (cover + short sights + primary CTA).
    */
   compact?: boolean;
+  /** Hub: replace current day + open planner (avoid mixing old stops). */
+  replaceDayOnApply?: boolean;
+  navigateToMyDayOnApply?: boolean;
   /** Skip outer h2/intro when parent accordion provides the chrome. */
   hideHeader?: boolean;
   titleClass?: string;
@@ -130,6 +133,8 @@ export function SuburbsCarousel({
   cityGenitive,
   editorial = false,
   compact = false,
+  replaceDayOnApply = false,
+  navigateToMyDayOnApply = false,
   hideHeader = false,
   titleClass,
   className = 'mt-10',
@@ -273,6 +278,8 @@ export function SuburbsCarousel({
             <AddManyToDayRouteButton
               compact
               variant={compact ? 'primary' : 'light'}
+              mode={replaceDayOnApply ? 'replace' : 'append'}
+              navigateToMyDay={navigateToMyDayOnApply}
               className={
                 compact
                   ? 'w-full !min-h-11 !rounded-xl !px-4 !py-2.5 !text-sm'

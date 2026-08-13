@@ -25,7 +25,7 @@ export function MyDayShell({
   const gridClass = !showMapColumn
     ? 'lg:grid-cols-1'
     : mapOpen
-      ? 'lg:grid-cols-[minmax(22rem,1fr)_minmax(18rem,1.05fr)]'
+      ? 'lg:grid-cols-[minmax(24rem,1.2fr)_minmax(16rem,0.85fr)]'
       : 'lg:grid-cols-[minmax(0,1fr)_56px]';
 
   return (

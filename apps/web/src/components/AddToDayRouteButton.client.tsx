@@ -24,10 +24,12 @@ import {
   normalizeDayRouteVenueId,
   readDayRouteFresh,
   removeFromDayRoute,
+  replaceDayRouteFromVenues,
   sameDayRouteVenue,
   toggleDayRoute,
   type DayRouteVenueItem,
 } from '@/lib/day-route';
+import { useRouter } from 'next/navigation';
 
 type Props = {
   venue: DayRouteVenueItem;
@@ -281,6 +283,13 @@ type ManyProps = {
   className?: string;
   variant?: 'light' | 'dark' | 'overlay' | 'primary';
   compact?: boolean;
+  /**
+   * Hub → planner: replace current day (avoid mixing with old stops).
+   * Default append for in-my-day picker.
+   */
+  mode?: 'append' | 'replace';
+  /** After replace, open /my-day (city hub CTA). */
+  navigateToMyDay?: boolean;
 };
 
 /** Bulk «В маршрут» for a suburb slide: adds every listed point in one tap. */
@@ -289,7 +298,10 @@ export function AddManyToDayRouteButton({
   className = '',
   variant = 'light',
   compact = false,
+  mode = 'append',
+  navigateToMyDay = false,
 }: ManyProps) {
+  const router = useRouter();
   const [live, setLive] = useState(false);
   const [foreignCityPrompt, setForeignCityPrompt] = useState<{
     payloads: DayRouteVenueItem[];
@@ -314,26 +326,55 @@ export function AddManyToDayRouteButton({
     payloads.every((payload) => isInDayRoute(payload.id, route, payload.slug));
   const full = !allActive && route.venues.length >= DAY_ROUTE_MAX;
 
+  const showActive = mode !== 'replace' && allActive;
   const base =
     variant === 'dark'
-      ? allActive
+      ? showActive
         ? 'bg-white text-emerald-950'
         : 'bg-white/15 text-white hover:bg-white/25'
       : variant === 'overlay'
-        ? allActive
+        ? showActive
           ? 'bg-emerald-600/95 text-white shadow-sm backdrop-blur-sm hover:bg-emerald-700'
           : 'bg-white/90 text-slate-800 shadow-sm backdrop-blur-sm hover:bg-white'
         : variant === 'primary'
-          ? allActive
+          ? showActive
             ? 'bg-emerald-600 text-white hover:bg-emerald-700'
             : 'bg-primary-600 text-white hover:bg-primary-700'
-          : allActive
+          : showActive
             ? 'bg-emerald-600 text-white hover:bg-emerald-700'
             : 'bg-slate-100 text-slate-800 hover:bg-slate-200';
 
-  const label = allActive ? 'В маршруте' : compact ? 'В маршрут' : 'В мой маршрут';
+  const label =
+    mode === 'replace'
+      ? compact
+        ? 'В мой день'
+        : 'Открыть в Мой день'
+      : allActive
+        ? 'В маршруте'
+        : compact
+          ? 'В маршрут'
+          : 'В мой маршрут';
+
+  function runBulkReplace(list: DayRouteVenueItem[]) {
+    const capped = list.slice(0, DAY_ROUTE_MAX);
+    const cityId = capped[0]?.cityId || null;
+    replaceDayRouteFromVenues(capped, cityId);
+    const n = readDayRouteFresh().venues.length;
+    flashDayRouteFeedback(
+      n > 0
+        ? `Маршрут заменён: ${n} ${n === 1 ? 'точка' : n < 5 ? 'точки' : 'точек'}`
+        : 'Маршрут очищен',
+    );
+    if (navigateToMyDay) {
+      router.push('/my-day');
+    }
+  }
 
   function runBulkAdd(list: DayRouteVenueItem[]) {
+    if (mode === 'replace') {
+      runBulkReplace(list);
+      return;
+    }
     const before = readDayRouteFresh();
     const beforeCount = before.venues.length;
     let added = 0;
@@ -369,18 +410,18 @@ export function AddManyToDayRouteButton({
       flashDayRouteFeedback('Нельзя добавить: нет точек');
       return;
     }
-    if (allActive) {
+    if (mode !== 'replace' && allActive) {
       flashDayRouteFeedback('Уже в маршруте');
       return;
     }
     const before = readDayRouteFresh();
-    if (before.venues.length >= DAY_ROUTE_MAX) {
+    if (mode !== 'replace' && before.venues.length >= DAY_ROUTE_MAX) {
       flashDayRouteFeedback(dayRouteHardLimitMessage());
       return;
     }
 
     const sample = payloads[0]!;
-    if (dayRouteConflictsWithIncomingCity(before.venues, sample)) {
+    if (mode !== 'replace' && dayRouteConflictsWithIncomingCity(before.venues, sample)) {
       const routeCity = resolveDayRouteCityLabel(before.venues) || 'другого города';
       const incomingCity = String(sample.city || '').trim() || 'новый город';
       setForeignCityPrompt({ payloads, routeCity, incomingCity });
@@ -394,27 +435,36 @@ export function AddManyToDayRouteButton({
     <>
       <button
         type="button"
-        disabled={!live || !payloads.length || (full && !allActive)}
+        disabled={
+          !live ||
+          !payloads.length ||
+          (mode !== 'replace' && full && !allActive)
+        }
         title={
           !live
             ? 'Секунду…'
             : !payloads.length
               ? 'Нельзя добавить: нет точек'
-              : full && !allActive
-                ? dayRouteHardLimitMessage()
-                : allActive
-                  ? 'Уже в маршруте (убрать можно в Мой день)'
-                  : isDayRouteAtSoft(route.venues.length) && !allActive
-                    ? DAY_ROUTE_SOFT_WARN
-                    : 'Добавить все точки пригорода в маршрут'
+              : mode === 'replace'
+                ? 'Заменить текущий день этими точками и открыть планировщик'
+                : full && !allActive
+                  ? dayRouteHardLimitMessage()
+                  : allActive
+                    ? 'Уже в маршруте (убрать можно в Мой день)'
+                    : isDayRouteAtSoft(route.venues.length) && !allActive
+                      ? DAY_ROUTE_SOFT_WARN
+                      : 'Добавить все точки пригорода в маршрут'
         }
-        aria-pressed={allActive}
+        aria-pressed={mode === 'replace' ? undefined : allActive}
         aria-label={
-          allActive
-            ? 'Все точки пригорода уже в маршруте дня'
-            : `Добавить все точки пригорода в маршрут (${payloads.length})`
+          mode === 'replace'
+            ? `Открыть пригород в Мой день (${payloads.length} точек, заменить маршрут)`
+            : allActive
+              ? 'Все точки пригорода уже в маршруте дня'
+              : `Добавить все точки пригорода в маршрут (${payloads.length})`
         }
         data-day-route-bulk={payloads.length || undefined}
+        data-day-route-bulk-mode={mode}
         data-day-route-live={live ? '1' : '0'}
         onPointerDown={(event) => {
           event.stopPropagation();
@@ -426,7 +476,11 @@ export function AddManyToDayRouteButton({
         }}
         className={`inline-flex min-h-10 min-w-[2.75rem] shrink-0 items-center justify-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${base} ${className}`}
       >
-        {allActive ? <Check className="h-3.5 w-3.5 shrink-0" /> : <Route className="h-3.5 w-3.5 shrink-0" />}
+        {mode !== 'replace' && allActive ? (
+          <Check className="h-3.5 w-3.5 shrink-0" />
+        ) : (
+          <Route className="h-3.5 w-3.5 shrink-0" />
+        )}
         <span>{label}</span>
       </button>
       <CityConfirmModal

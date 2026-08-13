@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import {
+  Bookmark,
   Car,
   Check,
   ChevronDown,
@@ -532,7 +533,7 @@ function DayRoutePanelInner() {
   const hydratedDayRef = useRef<string | null>(null);
   const skipUrlSyncRef = useRef(false);
   const titleFieldRef = useRef<HTMLInputElement | null>(null);
-  const shareMenuRef = useRef<HTMLDivElement | null>(null);
+  const shareMenuRef = useRef<HTMLElement | null>(null);
   const unifiedSearchRef = useRef<HTMLElement | null>(null);
   const eventEnrichAttemptedRef = useRef<Set<string>>(new Set());
 
@@ -3302,62 +3303,117 @@ function DayRoutePanelInner() {
     >
       <div ref={listRootRef} className="min-w-0" data-day-list-root>
       {!isEmptyRoute ? (
+        <>
+        {/* Lovable: full-width top bar OUTSIDE map grid (map must not eat Open/Save/Share). */}
+        <header
+          className="mb-4 flex flex-col gap-3 sm:mb-5 lg:flex-row lg:items-center lg:justify-between lg:gap-4"
+          data-my-day-topbar
+          ref={shareMenuRef}
+        >
+          <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-3 lg:flex lg:flex-1 lg:items-center">
+            <div className="min-w-0">
+              <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                Дайбилет · план дня
+              </p>
+              <div className="mt-0.5 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                <h1 className="font-display text-[1.65rem] font-extrabold tracking-tight leading-tight text-slate-900 sm:text-3xl">
+                  {scopeCityName ? `Мой день ${inCityPrepositional(scopeCityName)}` : 'Мой день'}
+                </h1>
+                {cityScopeLine ? (
+                  <span className="hidden text-[13px] font-medium text-slate-500 lg:inline" data-day-city-scope>
+                    {cityScopeLine}
+                  </span>
+                ) : null}
+              </div>
+              <p
+                className="mt-1 flex flex-wrap items-baseline gap-x-1 text-[13px] font-medium text-slate-500 lg:mt-0.5"
+                data-day-route-count-label
+              >
+                <span className="lg:hidden">{cityScopeLine}</span>
+                {cityScopeLine && scopeCityName ? (
+                  <span className="lg:hidden" aria-hidden>
+                    ·
+                  </span>
+                ) : null}
+                {scopeCityName ? (
+                  <Link
+                    href={cityHubHref}
+                    className="text-primary-600 transition-colors hover:text-primary-700 hover:underline"
+                    data-day-city-hub-link
+                  >
+                    Страница {cityToGenitive(scopeCityName)}
+                  </Link>
+                ) : null}
+              </p>
+            </div>
+
+            <div className="relative flex shrink-0 items-center gap-2 lg:hidden">
+              <button
+                type="button"
+                onClick={() => setShareMenuOpen(true)}
+                aria-label="Поделиться"
+                title="Поделиться"
+                data-day-share
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary-600 text-white transition hover:bg-primary-700"
+              >
+                <Share2 className="h-4 w-4" aria-hidden />
+              </button>
+            </div>
+          </div>
+
+          <div
+            className="relative hidden shrink-0 flex-wrap items-center gap-2 lg:flex"
+            data-day-desktop-actions
+          >
+            {yandexUrl ? (
+              <a
+                href={yandexUrl}
+                target="_blank"
+                rel="noreferrer"
+                data-day-open-route
+                className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-50"
+              >
+                <Navigation className="h-4 w-4" aria-hidden />
+                Открыть маршрут
+              </a>
+            ) : (
+              <button
+                type="button"
+                disabled
+                title="Нужны точки с координатами"
+                className="inline-flex cursor-not-allowed items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-400"
+              >
+                <Navigation className="h-4 w-4" aria-hidden />
+                Открыть маршрут
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={saveCurrentAsScenario}
+              data-day-save
+              className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-50"
+            >
+              <Bookmark className="h-4 w-4" aria-hidden />
+              Сохранить
+            </button>
+            <button
+              type="button"
+              onClick={() => setShareMenuOpen(true)}
+              data-day-share
+              className="inline-flex items-center gap-2 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-700"
+            >
+              <Share2 className="h-4 w-4" aria-hidden />
+              {copyStatus === 'ok' ? 'Скопировано!' : 'Поделиться'}
+            </button>
+          </div>
+        </header>
+
         <MyDayShell
           mapOpen={myDay.mapOpen}
           showMapColumn={hasMapStops}
           list={
             <div data-my-day-list-inner data-my-day-page-col="1">
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0 flex-1">
-          <h1 className="font-display text-[1.65rem] font-extrabold tracking-tight leading-tight text-slate-900 sm:text-3xl">
-            {scopeCityName ? `Мой день ${inCityPrepositional(scopeCityName)}` : 'Мой день'}
-          </h1>
-          <p
-            className="mt-1.5 flex flex-wrap items-baseline gap-x-1 text-[13px] font-medium text-slate-500"
-            data-day-route-count-label
-            data-day-city-scope
-          >
-            {cityScopeLine ? <span>{cityScopeLine}</span> : null}
-            {cityScopeLine && scopeCityName ? <span aria-hidden>·</span> : null}
-            {scopeCityName ? (
-              <Link
-                href={cityHubHref}
-                className="text-primary-600 transition-colors hover:text-primary-700 hover:underline"
-                data-day-city-hub-link
-              >
-                Страница {cityToGenitive(scopeCityName)}
-              </Link>
-            ) : null}
-          </p>
-        </div>
-
-        {/* Lovable mobile header: share next to H1 (not inside summary card). */}
-        {route.venues.length ? (
-          <div className="relative flex shrink-0 items-center gap-2" ref={shareMenuRef} data-day-desktop-actions>
-            <button
-              type="button"
-              onClick={() => setShareMenuOpen(true)}
-              aria-label="Поделиться"
-              title="Поделиться"
-              data-day-share
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary-600 text-white transition hover:bg-primary-700 lg:hidden"
-            >
-              <Share2 className="h-4 w-4" aria-hidden />
-            </button>
-            <button
-              type="button"
-              onClick={() => setShareMenuOpen(true)}
-              data-day-share
-              className="hidden items-center gap-2 rounded-full border border-primary-200 bg-primary-50 px-3 py-2 text-xs font-semibold text-primary-800 transition hover:bg-primary-100 lg:inline-flex"
-            >
-              <Share2 className="h-3.5 w-3.5 shrink-0" aria-hidden />
-              {copyStatus === 'ok' ? 'Скопировано!' : 'Поделиться'}
-            </button>
-          </div>
-        ) : null}
-      </div>
-
-      {/* ≥1 stop: compact city+search under H1 (no mid-page bordered starter card) */}
+      {/* ≥1 stop: compact city+search under topbar (no mid-page bordered starter card) */}
       {!isEmptyRoute ? renderHeaderCompactSearch() : null}
 
       {copyStatus === 'ok' ? (
@@ -4006,6 +4062,7 @@ function DayRoutePanelInner() {
             )
           }
         />
+        </>
       ) : (
         <>
           {hasPageCity ? (
