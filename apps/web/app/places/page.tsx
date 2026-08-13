@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 
 import { HeroLayout } from '@/components/HeroLayout';
 import { PlacesHubView } from '@/components/PlacesHubView.client';
@@ -33,11 +34,13 @@ export default function PlacesIndexPage() {
         dense
         breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Места' }]}
         title="Места"
-        description="Куда сходить в городе: площадки с билетами и точки для прогулки. Выберите тип - карточки остаются на привычных адресах."
+        description="Куда сходить в городе: площадки с билетами и точки для прогулки. Один поиск на весь раздел."
         tone="light"
         className="bg-white"
       />
-      <PlacesHubView />
+      <Suspense fallback={<div className="container-page py-10 text-sm text-slate-500">Загружаем места…</div>}>
+        <PlacesHubView />
+      </Suspense>
     </SiteLayout>
   );
 }

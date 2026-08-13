@@ -9,10 +9,11 @@
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
 | UX.NAV-PLACES-HUB | Primary: Города•События•Места•Подборки•Блог; `/places` hub → `/venues`+`/locations`; entity URL без ломки | Высокий | 🔄 code; deploy batch / по запросу |
+| UX.PLACES-UNIFIED-SEARCH | Один поиск на раздел Места: `/places?q=` mixed + тег Площадка/Локация; каталоги не режут q по family | Высокий | ✅ 2026-08-13; live после Deploy MSK web |
 | CAT.VENUE-PLANT-ON-CREATE | Музеи/театры/залы/ДК сразу в `/venues` (institution kind), не ждать афиши | Высокий | ✅ heuristics 2026-08-13; prod reclass существующих ATTRACTION - по запросу owner |
 | CAT.PLACE-CLUSTER | Кластер: `parentId`+`isCluster`; PDP «Что внутри»+афиша; пилот НГ+Севкабель; add в Мой день = родитель | Высокий | ⏳ docs lock 2026-08-13; schema/PDP не билдить без запроса |
 | UX.LOC3 | Rename «Локации» → «Места и точки сбора» | Высокий | ⛔ superseded коротким «Места» |
-| UX.LOC9 / PH2.PLC1 | Unified mixed `/places` grid+tags | Низкий | ⏳ later после хаба |
+| UX.LOC9 / PH2.PLC1 | Unified mixed `/places` grid+tags (без поискового запроса) | Низкий | ⏳ later; поиск уже единый |
 
 ## Mobile header / SSR (2026-08-12)
 

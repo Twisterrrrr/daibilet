@@ -104,14 +104,43 @@ export function venueCatalogHrefWithSelectedCity(
   return `${path}?city=${encodeURIComponent(city)}`;
 }
 
+export function isPlacesSectionPath(pathname: string | null | undefined): boolean {
+  const path = String(pathname || '').replace(/\/$/, '') || '/';
+  return (
+    path === '/places' ||
+    path.startsWith('/places/') ||
+    path === '/venues' ||
+    path.startsWith('/venues/') ||
+    path === '/locations' ||
+    path.startsWith('/locations/')
+  );
+}
+
+/** Unified Places search URL (mixed venues + locations). */
+export function placesSearchHref(options: {
+  city?: string | null;
+  q?: string | null;
+  page?: number | null;
+}): string {
+  const params = new URLSearchParams();
+  const q = String(options.q || '').trim();
+  const city = String(options.city || '').trim();
+  const page = Number(options.page);
+  if (q) params.set('q', q);
+  if (city && city !== 'all') params.set('city', city);
+  if (Number.isFinite(page) && page > 1) params.set('page', String(page));
+  const query = params.toString();
+  return query ? `/places?${query}` : '/places';
+}
+
 /** Umbrella «Места» hub - city query only for picker continuity; lists stay on /venues|/locations. */
 export function placesHubHrefWithSelectedCity(
   cityValue: string | null | undefined,
   explicitCity?: string | null,
 ): string {
-  const city = explicitCity || (cityValue && cityValue !== 'all' ? cityValue : undefined);
-  if (!city) return '/places';
-  return `/places?city=${encodeURIComponent(city)}`;
+  return placesSearchHref({
+    city: explicitCity || (cityValue && cityValue !== 'all' ? cityValue : undefined),
+  });
 }
 
 export function mergeCatalogFilters(

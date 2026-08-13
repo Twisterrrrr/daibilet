@@ -3,12 +3,12 @@
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
-import { Search } from 'lucide-react';
 
 import { CatalogPaginationLinks } from '@/components/CatalogPaginationLinks';
 import { LocationCard } from '@/components/LocationCard.client';
 import { LocationsCatalogSkeleton } from '@/components/VenueCatalogSkeletons';
 import { HeroLayout } from '@/components/HeroLayout';
+import { PlacesSearch } from '@/components/PlacesSearch.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from '@/lib/catalog-url';
 import { cityToPrepositional } from '@/lib/city-declension';
@@ -103,8 +103,6 @@ export function LocationsCatalogView({
   const router = useRouter();
   const searchParams = useSearchParams();
   const selectedCity = useSelectedCityOptional();
-  const [query, setQuery] = useState('');
-  const [debouncedQuery, setDebouncedQuery] = useState('');
   const [sortMode, setSortMode] = useState<VenueCatalogSort>('events');
   const [, startTransition] = useTransition();
   const [venues, setVenues] = useState(initialPage.venues);
@@ -155,11 +153,6 @@ export function LocationsCatalogView({
     return catalogCityQueryValue(selectedCity?.destinations || [], cityFilter);
   }, [urlCity, urlCityAll, cityFilter, selectedCity?.destinations]);
 
-  useEffect(() => {
-    const timer = window.setTimeout(() => setDebouncedQuery(query.trim()), 250);
-    return () => window.clearTimeout(timer);
-  }, [query]);
-
   const replaceCatalogUrl = (mutate: (params: URLSearchParams) => void) => {
     const params = new URLSearchParams(searchParams.toString());
     mutate(params);
@@ -186,16 +179,16 @@ export function LocationsCatalogView({
   };
 
   // Search / sort change → back to page 1 (shareable URL). Skip mount so ?page=N stays shareable.
-  const prevFiltersRef = useRef({ q: debouncedQuery, sort: sortMode });
+  const prevFiltersRef = useRef({ sort: sortMode });
   useEffect(() => {
     const prev = prevFiltersRef.current;
-    const changed = prev.q !== debouncedQuery || prev.sort !== sortMode;
-    prevFiltersRef.current = { q: debouncedQuery, sort: sortMode };
+    const changed = prev.sort !== sortMode;
+    prevFiltersRef.current = { sort: sortMode };
     if (!changed || listPage <= 1) return;
     setListPage(1);
     writePageToUrl(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional filter-drift reset
-  }, [debouncedQuery, sortMode, listPage]);
+  }, [sortMode, listPage]);
 
   const feedQuery = useMemo(
     () => ({
@@ -203,11 +196,10 @@ export function LocationsCatalogView({
       city: cityFetchKey || undefined,
       type: typeFilter !== 'all' ? typeFilter : undefined,
       sort: sortMode,
-      q: debouncedQuery || undefined,
       page: listPage,
       limit: VENUE_CATALOG_PAGE_SIZE,
     }),
-    [cityFetchKey, typeFilter, sortMode, debouncedQuery, listPage],
+    [cityFetchKey, typeFilter, sortMode, listPage],
   );
 
   const feedQueryKey = useMemo(() => venueCatalogCacheKey(feedQuery), [feedQuery]);
@@ -225,7 +217,6 @@ export function LocationsCatalogView({
       isAllCitiesScope &&
       typeFilter === 'all' &&
       listPage === 1 &&
-      !debouncedQuery &&
       sortMode === 'events' &&
       initialQueryKey &&
       feedQueryKey === initialQueryKey &&
@@ -392,7 +383,6 @@ export function LocationsCatalogView({
     cityFilter,
     cityFetchKey,
     typeFilter,
-    debouncedQuery,
     sortMode,
     listPage,
     initialQueryKey,
@@ -536,16 +526,7 @@ export function LocationsCatalogView({
         </div>
 
         <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-stretch sm:gap-3">
-          <div className="flex min-w-0 flex-1 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 shadow-sm">
-            <Search className="h-4 w-4 shrink-0 text-slate-400" />
-            <input
-              type="search"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Название или адрес"
-              className="w-full bg-transparent py-2.5 text-sm outline-none placeholder:text-slate-400"
-            />
-          </div>
+          <PlacesSearch mode="jump" tone="outlined" />
           {/* sm+: city select; on mobile city lives in sticky header */}
           <select
             value={cityPending ? '' : cityFilter}

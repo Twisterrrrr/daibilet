@@ -3,11 +3,12 @@
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
-import { Grid3X3, List, Search } from 'lucide-react';
+import { Grid3X3, List } from 'lucide-react';
 
 import { CatalogPaginationLinks } from '@/components/CatalogPaginationLinks';
 import { InstitutionCard } from '@/components/InstitutionCard.client';
 import { InstitutionList } from '@/components/InstitutionListRow.client';
+import { PlacesSearch } from '@/components/PlacesSearch.client';
 import { VenuesCatalogSkeleton } from '@/components/VenueCatalogSkeletons';
 import { HeroLayout } from '@/components/HeroLayout';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
@@ -122,8 +123,6 @@ export function VenuesCatalogView({
   const router = useRouter();
   const searchParams = useSearchParams();
   const selectedCity = useSelectedCityOptional();
-  const [query, setQuery] = useState('');
-  const [debouncedQuery, setDebouncedQuery] = useState('');
   const [sortMode, setSortMode] = useState<VenueCatalogSort>('events');
   const [viewMode, setViewMode] = useState<ViewMode>('cards');
   const [, startTransition] = useTransition();
@@ -179,11 +178,6 @@ export function VenuesCatalogView({
     setViewMode(readStoredViewMode());
   }, []);
 
-  useEffect(() => {
-    const timer = window.setTimeout(() => setDebouncedQuery(query.trim()), 250);
-    return () => window.clearTimeout(timer);
-  }, [query]);
-
   const replaceCatalogUrl = (mutate: (params: URLSearchParams) => void) => {
     const params = new URLSearchParams(searchParams.toString());
     mutate(params);
@@ -209,16 +203,16 @@ export function VenuesCatalogView({
     window.scrollTo(0, 0);
   };
 
-  const prevFiltersRef = useRef({ q: debouncedQuery, sort: sortMode });
+  const prevFiltersRef = useRef({ sort: sortMode });
   useEffect(() => {
     const prev = prevFiltersRef.current;
-    const changed = prev.q !== debouncedQuery || prev.sort !== sortMode;
-    prevFiltersRef.current = { q: debouncedQuery, sort: sortMode };
+    const changed = prev.sort !== sortMode;
+    prevFiltersRef.current = { sort: sortMode };
     if (!changed || listPage <= 1) return;
     setListPage(1);
     writePageToUrl(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional filter-drift reset
-  }, [debouncedQuery, sortMode, listPage]);
+  }, [sortMode, listPage]);
 
   const feedQuery = useMemo(
     () => ({
@@ -226,11 +220,10 @@ export function VenuesCatalogView({
       city: cityFetchKey || undefined,
       type: typeFilter !== 'all' ? typeFilter : undefined,
       sort: sortMode,
-      q: debouncedQuery || undefined,
       page: listPage,
       limit: VENUE_CATALOG_PAGE_SIZE,
     }),
-    [cityFetchKey, typeFilter, sortMode, debouncedQuery, listPage],
+    [cityFetchKey, typeFilter, sortMode, listPage],
   );
 
   const feedQueryKey = useMemo(() => venueCatalogCacheKey(feedQuery), [feedQuery]);
@@ -247,7 +240,6 @@ export function VenuesCatalogView({
       isAllCitiesScope &&
       typeFilter === 'all' &&
       listPage === 1 &&
-      !debouncedQuery &&
       sortMode === 'events' &&
       initialQueryKey &&
       feedQueryKey === initialQueryKey &&
@@ -412,7 +404,6 @@ export function VenuesCatalogView({
     cityFilter,
     cityFetchKey,
     typeFilter,
-    debouncedQuery,
     sortMode,
     listPage,
     initialQueryKey,
@@ -496,16 +487,7 @@ export function VenuesCatalogView({
         className="bg-white"
       >
         <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-stretch sm:gap-3">
-          <div className="flex min-w-0 flex-1 items-center gap-2 rounded-xl bg-[#F5F5F7] px-3">
-            <Search className="h-4 w-4 shrink-0 text-slate-400" strokeWidth={1.75} />
-            <input
-              type="search"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Театр или клуб…"
-              className="w-full bg-transparent py-2.5 text-sm outline-none placeholder:text-slate-400"
-            />
-          </div>
+          <PlacesSearch mode="jump" tone="muted" />
           <select
             value={cityPending ? '' : cityFilter}
             disabled={cityPending}

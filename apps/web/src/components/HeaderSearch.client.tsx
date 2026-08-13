@@ -1,14 +1,16 @@
 'use client';
 
 import { Search, X } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
-import { buildCatalogHref } from '@/lib/catalog-url';
+import { buildCatalogHref, isPlacesSectionPath, placesSearchHref } from '@/lib/catalog-url';
+import { venueHref, venuePageTemplate } from '@/lib/routes';
+import { mapVenueCatalogFeedPage } from '@/lib/venue-catalog-feed';
 
 type SearchItem = {
-  type: 'event' | 'city' | 'landing';
+  type: 'event' | 'city' | 'landing' | 'venue';
   label: string;
   sublabel?: string | null;
   href: string;
@@ -28,12 +30,17 @@ type HeaderSearchProps = {
 export function HeaderSearch({
   className = '',
   inputClassName = '',
-  placeholder = 'Поиск событий, городов, подборок…',
+  placeholder,
   initialQuery = '',
   cityFilter,
   variant = 'inline',
 }: HeaderSearchProps) {
   const router = useRouter();
+  const pathname = usePathname();
+  const placesSection = isPlacesSectionPath(pathname);
+  const resolvedPlaceholder =
+    placeholder ||
+    (placesSection ? 'Музей, театр, парк, набережная…' : 'Поиск событий, городов, подборок…');
   const [query, setQuery] = useState(initialQuery);
   const [items, setItems] = useState<SearchItem[]>([]);
   const [resultsOpen, setResultsOpen] = useState(false);
@@ -86,6 +93,27 @@ export function HeaderSearch({
     window.clearTimeout(debounceRef.current ?? undefined);
     debounceRef.current = window.setTimeout(async () => {
       try {
+        if (placesSection) {
+          const params = new URLSearchParams({ q: normalized, limit: '8' });
+          if (cityFilter && cityFilter !== 'all') params.set('city', cityFilter);
+          const response = await fetch(`/api/public/venues?${params.toString()}`);
+          if (!response.ok) return;
+          const page = mapVenueCatalogFeedPage(await response.json());
+          const mapped: SearchItem[] = page.venues.map((venue) => {
+            const family = venuePageTemplate(venue.type) === 'institution' ? 'Площадка' : 'Локация';
+            return {
+              type: 'venue',
+              label: venue.name,
+              sublabel: [family, venue.city].filter(Boolean).join(' · '),
+              href: venueHref(venue),
+              imageUrl: venue.heroImageUrl || null,
+            };
+          });
+          setItems(mapped);
+          setResultsOpen(mapped.length > 0);
+          setActiveIndex(-1);
+          return;
+        }
         const params = new URLSearchParams({ q: normalized });
         if (cityFilter && cityFilter !== 'all') params.set('city', cityFilter);
         const response = await fetch(`/api/public/search?${params.toString()}`);
@@ -103,7 +131,7 @@ export function HeaderSearch({
     return () => {
       if (debounceRef.current) window.clearTimeout(debounceRef.current);
     };
-  }, [cityFilter, query]);
+  }, [cityFilter, query, placesSection]);
 
   const closeOverlay = () => {
     setOverlayOpen(false);
@@ -120,6 +148,15 @@ export function HeaderSearch({
 
   const submit = (value?: string) => {
     const normalized = (value ?? query).trim();
+    if (placesSection) {
+      navigate(
+        placesSearchHref({
+          q: normalized || undefined,
+          city: cityFilter && cityFilter !== 'all' ? cityFilter : undefined,
+        }),
+      );
+      return;
+    }
     navigate(
       buildCatalogHref({
         q: normalized || undefined,
@@ -193,7 +230,7 @@ export function HeaderSearch({
                 </span>
               ) : (
                 <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-surface-muted text-xs font-semibold uppercase text-graphite-muted">
-                  {item.type === 'city' ? 'Г' : item.type === 'landing' ? 'П' : 'E'}
+                  {item.type === 'city' ? 'Г' : item.type === 'landing' ? 'П' : item.type === 'venue' ? 'М' : 'E'}
                 </div>
               )}
               <span className="min-w-0 flex-1">
@@ -244,9 +281,9 @@ export function HeaderSearch({
                     value={query}
                     onChange={(event) => setQuery(event.target.value)}
                     onKeyDown={onKeyDown}
-                    placeholder={placeholder}
+                    placeholder={resolvedPlaceholder}
                     className={`${inputClasses} rounded-lg py-2.5 pl-10 pr-2 text-lg sm:pl-11 sm:pr-3`}
-                    aria-label="Поиск событий"
+                    aria-label={placesSection ? 'Поиск мест' : 'Поиск событий'}
                     aria-expanded={resultsOpen}
                     aria-autocomplete="list"
                     role="combobox"
@@ -290,9 +327,9 @@ export function HeaderSearch({
           if (items.length) setResultsOpen(true);
         }}
         onKeyDown={onKeyDown}
-        placeholder={placeholder}
+        placeholder={resolvedPlaceholder}
         className={`${inputClasses} py-2 pl-10 pr-3 text-sm`}
-        aria-label="Поиск событий"
+        aria-label={placesSection ? 'Поиск мест' : 'Поиск событий'}
         aria-expanded={resultsOpen}
         aria-autocomplete="list"
         role="combobox"

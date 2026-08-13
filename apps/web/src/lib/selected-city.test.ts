@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { buildCatalogHref, catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from './catalog-url.ts';
+import { buildCatalogHref, catalogHrefWithSelectedCity, isPlacesSectionPath, placesSearchHref, venueCatalogHrefWithSelectedCity } from './catalog-url.ts';
 import {
   catalogCityQueryValue,
   isAllCitiesQuery,
@@ -39,6 +39,19 @@ test('catalogHrefWithSelectedCity keeps explicit city over header', () => {
 test('catalogHrefWithSelectedCity skips all', () => {
   assert.equal(catalogHrefWithSelectedCity('all', { date: 'weekend' }), '/events?date=weekend');
   assert.equal(buildCatalogHref({ date: 'weekend' }), '/events?date=weekend');
+});
+
+test('placesSearchHref is one mixed Places search URL', () => {
+  assert.equal(placesSearchHref({}), '/places');
+  assert.equal(placesSearchHref({ q: 'эрмитаж' }), '/places?q=%D1%8D%D1%80%D0%BC%D0%B8%D1%82%D0%B0%D0%B6');
+  assert.equal(
+    placesSearchHref({ q: 'новая голландия', city: 'saint-petersburg' }),
+    '/places?q=%D0%BD%D0%BE%D0%B2%D0%B0%D1%8F+%D0%B3%D0%BE%D0%BB%D0%BB%D0%B0%D0%BD%D0%B4%D0%B8%D1%8F&city=saint-petersburg',
+  );
+  assert.equal(isPlacesSectionPath('/places'), true);
+  assert.equal(isPlacesSectionPath('/venues/ermitazh'), true);
+  assert.equal(isPlacesSectionPath('/locations/saint-petersburg-novaya-gollandiya'), true);
+  assert.equal(isPlacesSectionPath('/events'), false);
 });
 
 test('venueCatalogHrefWithSelectedCity adds city to venues and locations', () => {

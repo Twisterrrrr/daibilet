@@ -10,7 +10,8 @@ export type VenueCatalogFamily = 'institution' | 'location';
 export type VenueCatalogSort = 'events' | 'asc' | 'desc';
 
 export type VenueCatalogFeedQuery = {
-  family: VenueCatalogFamily;
+  /** Omit or `all` = mixed Places search (both families). */
+  family?: VenueCatalogFamily | 'all';
   city?: string;
   type?: string;
   scale?: string;
@@ -80,7 +81,7 @@ export function parseVenueCatalogPageParam(raw: string | null | undefined): numb
 
 export function buildVenueCatalogSearchParams(query: VenueCatalogFeedQuery): URLSearchParams {
   const params = new URLSearchParams();
-  params.set('family', query.family);
+  if (query.family && query.family !== 'all') params.set('family', query.family);
   params.set('limit', String(query.limit || VENUE_CATALOG_PAGE_SIZE));
   if (query.city && query.city !== 'all') params.set('city', query.city);
   if (query.type && query.type !== 'all') params.set('type', query.type);
@@ -100,7 +101,7 @@ export function buildVenueCatalogSearchParams(query: VenueCatalogFeedQuery): URL
 export function venueCatalogCacheKey(query: VenueCatalogFeedQuery): string {
   const page = query.page && query.page > 1 ? query.page : 1;
   return [
-    query.family,
+    query.family || 'all',
     query.city || 'all',
     query.type || 'all',
     query.scale || 'all',
