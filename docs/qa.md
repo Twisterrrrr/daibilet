@@ -422,7 +422,7 @@ Shell UI есть; hydrate - § Открыто (техника) п.5.
 6. **Кластер** (Новая Голландия, Севкабель Порт) = одна родительская **локация**, не площадка. Дети через `parentId` (v1 один уровень). События острова на родителе (или точном ребёнке); PDP агрегирует афишу. «Мой день» добавляет родителя, не взрывает детей. Канон: [place-cluster-canon.md](./place-cluster-canon.md). Schema/PDP = `CAT.PLACE-CLUSTER`, не сейчас.
 
 **LOCKED 2026-08-13 (owner, visual Places + old listing slugs):**
-1. Chrome `/places` как каталог площадок: eyebrow `N площадок • N локаций • N городов`; H1 `Музеи, театры, площадки, локации {City_Род}`; строка поиска (город + сорт), **ниже** теги kind (`Все места`, Музеи, Театр, Парк, Памятник…).
+1. Chrome `/places` как каталог площадок: eyebrow `N площадок • N локаций • N городов`; H1 четыре kind + `{City_Род}` (стабильно от slug); строка поиска (город + сорт «По событиям»), **ниже** тоггл scope и теги kind (`Все типы`, Музеи, Театр, Парк, Памятник…).
 2. **Листинги** `/venues` и `/locations` (без slug) → **301** на `/places?family=institution` и `/places?family=location`. Query `city` / `q` / `type` / `page` сохраняется.
 3. **Entity** `/venues/[slug]` и `/locations/[slug]` **не** редиректятся и остаются каноном карточек, блога, Мой день, inbound.
 4. **Meta:** city-aware title/description/canonical на `/places` и `/places?city=`; `family` без thin-фильтров индексируется (преемник старых листингов); `q` / `type` / `page>1` → `noindex,follow`, canonical на родителя.

@@ -47,7 +47,7 @@ type ViewMode = 'cards' | 'list';
 const PLACES_VIEW_MODE_KEY = 'daibilet:places-view-mode';
 
 const SORT_OPTIONS: Array<[VenueCatalogSort, string]> = [
-  ['events', 'По афише'],
+  ['events', 'По событиям'],
   ['mixed', 'Смешанно'],
   ['asc', 'А-Я'],
   ['desc', 'Я-А'],
@@ -519,7 +519,11 @@ export function PlacesHubView({
 
   const cityCount = cityOptions.length;
   const cityName = cityFilter !== 'all' ? cityFilter : null;
-  const pageTitleText = buildPlacesListingCopy(cityName).h1;
+  const citySlugForCopy =
+    cityFilter !== 'all'
+      ? selectedCity?.selectedDestination?.slug || cityFetchKey || cityName
+      : '';
+  const pageTitleText = buildPlacesListingCopy(cityName, family, citySlugForCopy).h1;
   const families = countCatalogFamilies(stats.types);
   const hideCityOnCards = cityFilter !== 'all';
   const cityQuery =

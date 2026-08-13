@@ -38,7 +38,7 @@ import {
 import { venueHref } from '@/lib/routes';
 
 const SORT_OPTIONS: Array<[VenueCatalogSort, string]> = [
-  ['events', 'По афише'],
+  ['events', 'По событиям'],
   ['asc', 'А–Я'],
   ['desc', 'Я–А'],
 ];

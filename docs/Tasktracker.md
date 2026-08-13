@@ -1,3 +1,10 @@
+## Places hub: H1 types + sort label (2026-08-13)
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| UX.PLACES-H1-TYPES | H1 `/places`: 4 kind от slug города + родительный (стабильно, не Math.random); title = H1 | Средний | ✅ 2026-08-13 code; live после Deploy MSK web |
+| UX.PLACES-SORT-EVENTS | Сорт `events`: подпись «По событиям», не «По афише» | Средний | ✅ 2026-08-13 code; live после Deploy MSK web |
+
 ## Places hub: unified cards + scope toggle (2026-08-13)
 
 | ID | Задача | Приоритет | Статус |

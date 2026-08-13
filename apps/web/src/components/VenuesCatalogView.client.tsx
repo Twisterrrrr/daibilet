@@ -42,7 +42,7 @@ type ViewMode = 'cards' | 'list';
 const VENUES_VIEW_MODE_KEY = 'daibilet:venues-view-mode';
 
 const SORT_OPTIONS: Array<[VenueCatalogSort, string]> = [
-  ['events', 'По афише'],
+  ['events', 'По событиям'],
   ['asc', 'А–Я'],
   ['desc', 'Я–А'],
 ];
