@@ -329,6 +329,9 @@ html[data-nav-pending='1'] {
     @apply w-full min-w-0 max-w-full overflow-x-auto overscroll-x-contain scroll-smooth pb-2;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: thin;
+    /* pan-x alone traps vertical page scroll while the finger is on tall
+       event/article cards (most of the mobile viewport). Keep sideways swipe. */
+    touch-action: pan-x pan-y;
   }
 
   .horizontal-snap-row::-webkit-scrollbar {

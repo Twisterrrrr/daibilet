@@ -146,7 +146,7 @@ export function ScrollRail({
     <div className={`relative min-w-0 overflow-visible ${className}`.trim()} style={style}>
       <div
         ref={scrollerRef}
-        className={`horizontal-snap-row touch-pan-x ${hideScrollbar ? HIDE_SCROLLBAR_CLASS : ''} ${viewportClassName}`.trim()}
+        className={`horizontal-snap-row ${hideScrollbar ? HIDE_SCROLLBAR_CLASS : ''} ${viewportClassName}`.trim()}
         style={fadeMask}
         aria-label={ariaLabel}
         role="region"

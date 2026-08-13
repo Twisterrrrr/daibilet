@@ -1,3 +1,9 @@
+## Mobile scroll trapped on event/article rails (2026-08-13)
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| FIX.MOBILE-RAIL-PAN-Y | Mobile: вертикальный скролл не работает на лентах событий/статей (`touch-pan-x` ловил жест) | Критический | ✅ 2026-08-13 code; live после Deploy MSK web |
+
 ## My Day nearby events copy (2026-08-13)
 
 | ID | Задача | Приоритет | Статус |

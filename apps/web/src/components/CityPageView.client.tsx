@@ -1318,8 +1318,8 @@ function CitySightsMustSeeList({
           ref={railRef}
           className={
             sparseGrid
-              ? 'horizontal-snap-row flex flex-nowrap gap-2.5 touch-pan-x snap-x snap-mandatory md:block md:overflow-visible'
-              : 'horizontal-snap-row flex flex-nowrap gap-2.5 touch-pan-x snap-x snap-mandatory md:block md:[scrollbar-width:none] md:[&::-webkit-scrollbar]:hidden'
+              ? 'horizontal-snap-row flex flex-nowrap gap-2.5 snap-x snap-mandatory md:block md:overflow-visible'
+              : 'horizontal-snap-row flex flex-nowrap gap-2.5 snap-x snap-mandatory md:block md:[scrollbar-width:none] md:[&::-webkit-scrollbar]:hidden'
           }
           data-city-must-see-rail
           data-city-must-see-layout={sparseGrid ? 'sparse-grid' : 'carousel'}

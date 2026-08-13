@@ -258,7 +258,7 @@ const DAY_TEXT_LINK =
 
 /** @deprecated Wave 1.5 list-only; kept for dead grid branch types. */
 const DAY_ROUTE_STOPS_GRID_RAIL =
-  'horizontal-snap-row flex w-full snap-x snap-mandatory flex-nowrap items-stretch gap-2.5 overflow-x-auto overscroll-x-contain touch-pan-x pb-0.5 [scrollbar-width:thin]';
+  'horizontal-snap-row flex w-full snap-x snap-mandatory flex-nowrap items-stretch gap-2.5 overflow-x-auto overscroll-x-contain pb-0.5 [scrollbar-width:thin]';
 /** @deprecated Wave 1.5 list-only. */
 const DAY_ROUTE_STOPS_GRID_CARD =
   'w-[min(82vw,20rem)] shrink-0 snap-start sm:w-[20.5rem] lg:w-[21.5rem]';

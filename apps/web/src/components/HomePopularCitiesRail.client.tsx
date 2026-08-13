@@ -377,7 +377,7 @@ export function HomePopularCitiesRail({ cities, className = '' }: HomePopularCit
     <div className={`relative min-w-0 ${className}`.trim()}>
       <div
         ref={scrollerRef}
-        className={`home-edge-cities-rail horizontal-snap-row touch-pan-x flex flex-nowrap gap-3 snap-x snap-mandatory pr-4 sm:gap-3.5 sm:pr-6 lg:pr-8 ${HIDE_SCROLLBAR_CLASS} ${
+        className={`home-edge-cities-rail horizontal-snap-row flex flex-nowrap gap-3 snap-x snap-mandatory pr-4 sm:gap-3.5 sm:pr-6 lg:pr-8 ${HIDE_SCROLLBAR_CLASS} ${
           ready ? 'opacity-100' : 'opacity-0'
         } transition-opacity duration-200`}
         aria-label="Популярные города"
