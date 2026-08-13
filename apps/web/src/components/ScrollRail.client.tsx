@@ -120,20 +120,22 @@ export function ScrollRail({
     });
   };
 
-  // Outside (chip rails): same height as chip row, not tiny overlay dots.
-  const arrowSize = arrowsOutside ? 'h-8 w-8' : 'h-10 w-10';
-  const iconSize = arrowsOutside ? 'h-4 w-4' : 'h-5 w-5';
+  // Outside (chip rails): compact discs beside the row, not chip-height buttons.
+  const arrowSize = arrowsOutside ? 'h-6 w-6' : 'h-10 w-10';
+  const iconSize = arrowsOutside ? 'h-3 w-3' : 'h-5 w-5';
   const arrowToneCls =
     arrowTone === 'light'
       ? arrowsOutside
-        ? 'border-white/35 bg-white/20 text-white shadow-none backdrop-blur-sm hover:bg-white/35 focus-visible:ring-white/50'
+        ? 'border-white/40 bg-black/35 text-white shadow-none backdrop-blur-md hover:bg-black/50 focus-visible:ring-white/50'
         : 'border-white/40 bg-white/25 text-white shadow-sm backdrop-blur-sm hover:bg-white/40 focus-visible:ring-white/50'
-      : 'border-slate-200/90 bg-white/95 text-slate-700 shadow-md backdrop-blur hover:bg-white hover:text-slate-950 focus-visible:ring-slate-300 focus-visible:ring-offset-2';
+      : arrowsOutside
+        ? 'border-slate-200 bg-white text-slate-600 shadow-sm hover:bg-slate-50 hover:text-slate-900 focus-visible:ring-slate-300 focus-visible:ring-offset-1'
+        : 'border-slate-200/90 bg-white/95 text-slate-700 shadow-md backdrop-blur hover:bg-white hover:text-slate-950 focus-visible:ring-slate-300 focus-visible:ring-offset-2';
   // md+ only - mobile keeps swipe (no arrows).
   const arrowBase = `hidden ${arrowSize} shrink-0 items-center justify-center rounded-full border transition-[opacity,transform,colors] focus-visible:outline-none focus-visible:ring-2 md:inline-flex ${arrowToneCls}`;
   const overlayArrowBase = `${arrowBase} absolute z-10 -translate-y-1/2 top-[33%]`;
 
-  const fadePad = arrowsOutside ? '0.5rem' : '1.25rem';
+  const fadePad = arrowsOutside ? '0.35rem' : '1.25rem';
   const fadeMask =
     edgeFade && overflow
       ? {
@@ -194,7 +196,7 @@ export function ScrollRail({
   if (arrowsOutside) {
     return (
       <div
-        className={`relative flex min-w-0 items-center gap-2.5 overflow-visible ${className}`.trim()}
+        className={`relative flex min-w-0 items-center gap-1.5 overflow-visible ${className}`.trim()}
         style={style}
       >
         {prevBtn}
