@@ -132,6 +132,7 @@ import {
   lookupDayRouteCoords,
   moveDayRouteVenue,
   moveDayRoutePlanVenue,
+  normalizeDayRouteVenueId,
   optimizeDayRouteNearestNeighbor,
   parseDayRouteItemsParam,
   parseDayRouteQueryParam,
@@ -145,6 +146,7 @@ import {
   updateDayRouteVenue,
   writeDayRoute,
   replaceDayRouteFromVenues,
+  sameDayRouteVenue,
   type DayRouteState,
   type DayRouteTravelMode,
   type DayRouteVenueItem,
@@ -367,17 +369,21 @@ function appendDayRouteItem(
     flashDayRouteFeedback('Не удалось добавить точку');
     return readDayRouteFresh();
   }
-  const before = readDayRouteFresh().venues.length;
-  if (before >= DAY_ROUTE_MAX) {
-    flashDayRouteFeedback(dayRouteHardLimitMessage());
-    return readDayRouteFresh();
+  const current = readDayRouteFresh();
+  const id = normalizeDayRouteVenueId(item);
+  if (id && isInDayRoute(id, current, item.slug)) {
+    const existing = current.venues.find((venue) => sameDayRouteVenue(venue, { id, slug: item.slug }));
+    const next = removeFromDayRoute(existing?.id || id);
+    const n = next.venues.length;
+    flashDayRouteFeedback(n ? `Убрано · осталось ${n}` : 'Маршрут очищен');
+    return next;
   }
-  if (isInDayRoute(item.id) || (item.slug && isInDayRoute(item.slug))) {
-    flashDayRouteFeedback('Уже в маршруте');
-    return readDayRouteFresh();
+  if (current.venues.length >= DAY_ROUTE_MAX) {
+    flashDayRouteFeedback(dayRouteHardLimitMessage());
+    return current;
   }
   const next = insertIntoDayRoute(item, afterVenueId);
-  if (next.venues.length > before) {
+  if (next.venues.length > current.venues.length) {
     flashDayRouteFeedback(dayRouteAddSuccessMessage(next.venues.length));
   } else if (next.venues.length >= DAY_ROUTE_MAX) {
     flashDayRouteFeedback(dayRouteHardLimitMessage());
@@ -1391,8 +1397,10 @@ function DayRoutePanelInner() {
       { ...card.item, title: card.title || card.item.title },
       card.offer,
     );
+    const beforeCount = readDayRouteFresh().venues.length;
     const next = appendDayRouteItem(nextItem, consumeInsertAfterVenueId());
     setRoute(next);
+    if (next.venues.length < beforeCount) return;
     const url = card.offer.ticketUrl;
     if (url && (card.offer.kind === 'affiche' || card.offer.kind === 'open_date')) {
       if (typeof window !== 'undefined') {
@@ -1786,8 +1794,9 @@ function DayRoutePanelInner() {
         hint: hook || venue.address || venue.city || null,
         family: 'Локация',
         imageUrl: venue.heroImageUrl ?? null,
-        disabled: inRoute || atMax,
-        disabledReason: inRoute ? 'Уже в маршруте' : atMax ? dayRouteHardLimitMessage() : null,
+        inRoute,
+        disabled: !inRoute && atMax,
+        disabledReason: !inRoute && atMax ? dayRouteHardLimitMessage() : null,
       });
     }
     for (const venue of venuesCatalog) {
@@ -1802,8 +1811,9 @@ function DayRoutePanelInner() {
         hint: hook || venue.address || venue.city || null,
         family: 'Площадка',
         imageUrl: venue.heroImageUrl ?? null,
-        disabled: inRoute || atMax,
-        disabledReason: inRoute ? 'Уже в маршруте' : atMax ? dayRouteHardLimitMessage() : null,
+        inRoute,
+        disabled: !inRoute && atMax,
+        disabledReason: !inRoute && atMax ? dayRouteHardLimitMessage() : null,
       });
     }
     const eventsById = new Map<string, PublicCatalogListItemDto>();
@@ -1825,14 +1835,13 @@ function DayRoutePanelInner() {
         hint: venueHint || null,
         family: 'Событие',
         imageUrl: event.imageUrl ?? null,
-        disabled: inRoute || atMax || !venueKey,
+        inRoute,
+        disabled: (!inRoute && atMax) || !venueKey,
         disabledReason: !venueKey
           ? 'Нет площадки'
-          : inRoute
-            ? 'Уже в маршруте'
-            : atMax
-              ? dayRouteHardLimitMessage()
-              : null,
+          : !inRoute && atMax
+            ? dayRouteHardLimitMessage()
+            : null,
       });
     }
     return opts;
@@ -4246,11 +4255,12 @@ function DayRoutePanelInner() {
                   <button
                     key={item.id}
                     type="button"
-                    disabled={inRoute || atMax || !hasItemCoords}
+                    disabled={(!inRoute && atMax) || !hasItemCoords}
                     data-day-must-see-card={item.id}
+                    aria-pressed={inRoute}
                     title={
                       inRoute
-                        ? 'Уже в маршруте'
+                        ? 'Убрать из маршрута'
                         : atMax
                           ? dayRouteHardLimitMessage()
                           : !hasItemCoords
@@ -4558,7 +4568,9 @@ function DayRoutePanelInner() {
                         ) : null}
                         <button
                           type="button"
-                          disabled={inRoute || atMax}
+                          disabled={!inRoute && atMax}
+                          aria-pressed={inRoute}
+                          title={inRoute ? 'Убрать из маршрута' : undefined}
                           onClick={() => activateHotPick(card)}
                           className={`mt-1 inline-flex min-h-9 w-full items-center justify-center gap-1.5 rounded-xl px-3 text-xs font-semibold backdrop-blur transition duration-200 ${
                             inRoute

@@ -4,6 +4,12 @@
 |----|--------|-----------|--------|
 | FIX.PUBLIC-ERROR-UI | Убрать английский Next fallback «Application error…» с public: error.tsx + global-error.tsx + ранний chunk reload | Критический | 🔄 code; live после Deploy MSK web |
 
+## My Day toggle from catalogs (2026-08-13)
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| UX.MYDAY-TOGGLE-PLACE | Повторный клик по площадке/локации убирает точку: каталоги, PDP, подбор в Мой день | Высокий | ✅ 2026-08-13 code; live после Deploy MSK web |
+
 ## Events catalog UX (2026-08-13)
 
 | ID | Задача | Приоритет | Статус |

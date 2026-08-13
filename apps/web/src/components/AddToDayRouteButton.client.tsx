@@ -186,26 +186,6 @@ export function AddToDayRouteButton({
       return;
     }
 
-    // Catalog compact: ADD ONLY. Accidental second tap on a green chip must not
-    // remove the only point (owner symptom «не добавляется более 1»).
-    if (compact || iconOnly) {
-      const before = readDayRouteFresh();
-      if (before.venues.some((item) => sameDayRouteVenue(item, payload))) {
-        // Merge coords / canonical id when slug-as-id alias already stored.
-        addToDayRoute(payload);
-        flashDayRouteFeedback('Уже в маршруте');
-        return;
-      }
-      if (before.venues.length >= DAY_ROUTE_MAX) {
-        flashDayRouteFeedback(dayRouteHardLimitMessage());
-        return;
-      }
-      if (!guardForeignCityOrOpen(payload)) return;
-      addToDayRoute(payload);
-      feedbackAfter(beforeCount, payload);
-      return;
-    }
-
     if (active) {
       toggleDayRoute(payload);
       feedbackAfter(beforeCount, payload);
@@ -229,15 +209,13 @@ export function AddToDayRouteButton({
               : full && !active
                 ? dayRouteHardLimitMessage()
                 : active
-                  ? compact
-                    ? 'Уже в маршруте (убрать можно в Мой день)'
-                    : activeTitle
+                  ? activeTitle
                   : isDayRouteAtSoft(route.venues.length) && !active
                     ? DAY_ROUTE_SOFT_WARN
                     : idleTitle
         }
         aria-pressed={active}
-        aria-label={active ? (iconOnly ? activeAria : compact ? 'Уже в маршруте дня' : activeAria) : idleAria}
+        aria-label={active ? activeAria : idleAria}
         data-venue-id={venueKey || undefined}
         data-day-route-intent={intent}
         data-day-route-live={live ? '1' : '0'}
@@ -411,7 +389,20 @@ export function AddManyToDayRouteButton({
       return;
     }
     if (mode !== 'replace' && allActive) {
-      flashDayRouteFeedback('Уже в маршруте');
+      const beforeCount = readDayRouteFresh().venues.length;
+      for (const payload of payloads) {
+        const current = readDayRouteFresh();
+        const existing = current.venues.find((item) => sameDayRouteVenue(item, payload));
+        if (existing) removeFromDayRoute(existing.id);
+      }
+      const n = readDayRouteFresh().venues.length;
+      flashDayRouteFeedback(
+        n < beforeCount
+          ? n
+            ? `Убрано · осталось ${n}`
+            : 'Маршрут очищен'
+          : 'Уже в маршруте',
+      );
       return;
     }
     const before = readDayRouteFresh();
@@ -450,7 +441,7 @@ export function AddManyToDayRouteButton({
                 : full && !allActive
                   ? dayRouteHardLimitMessage()
                   : allActive
-                    ? 'Уже в маршруте (убрать можно в Мой день)'
+                    ? 'Убрать все точки из маршрута'
                     : isDayRouteAtSoft(route.venues.length) && !allActive
                       ? DAY_ROUTE_SOFT_WARN
                       : 'Добавить все точки пригорода в маршрут'
@@ -460,7 +451,7 @@ export function AddManyToDayRouteButton({
           mode === 'replace'
             ? `Открыть пригород в Мой день (${payloads.length} точек, заменить маршрут)`
             : allActive
-              ? 'Все точки пригорода уже в маршруте дня'
+              ? 'Убрать все точки пригорода из маршрута дня'
               : `Добавить все точки пригорода в маршрут (${payloads.length})`
         }
         data-day-route-bulk={payloads.length || undefined}

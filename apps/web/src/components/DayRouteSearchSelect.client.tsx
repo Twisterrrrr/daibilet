@@ -16,6 +16,8 @@ export type DayRouteSearchOption = {
   imageUrl?: string | null;
   disabled?: boolean;
   disabledReason?: string | null;
+  /** Already a stop: click removes instead of adding. */
+  inRoute?: boolean;
 };
 
 function familyBadgeClass(family: DayRouteSearchFamily): string {
@@ -267,6 +269,10 @@ export function DayRouteSearchSelect({
                           <span className="mt-0.5 block text-[11px] font-medium text-slate-400">
                             {option.disabledReason}
                           </span>
+                        ) : option.inRoute ? (
+                          <span className="mt-0.5 block text-[11px] font-medium text-emerald-700">
+                            В маршруте · клик уберёт
+                          </span>
                         ) : null}
                       </span>
                     </span>
@@ -279,7 +285,11 @@ export function DayRouteSearchSelect({
                         </span>
                       ) : null}
                       {!option.disabled ? (
-                        <Check className="h-3.5 w-3.5 text-emerald-600 opacity-0 group-hover:opacity-100" />
+                        <Check
+                          className={`h-3.5 w-3.5 text-emerald-600 ${
+                            option.inRoute ? '' : 'opacity-0 group-hover:opacity-100'
+                          }`}
+                        />
                       ) : null}
                     </span>
                   </button>

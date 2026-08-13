@@ -47,6 +47,7 @@ import {
   sameDayRouteVenue,
   sanitizeDayRouteTicketFields,
   subscribeDayRoute,
+  toggleDayRoute,
   venueMatchesRouteSlug,
   type DayRouteVenueItem,
 } from './day-route.ts';
@@ -312,6 +313,16 @@ test('isInDayRoute still aliases slug-as-id must-see with catalog venue_* + same
   });
   const state = readDayRoute();
   assert.equal(isInDayRoute('venue_5661d5a99cb5385800d8807d', state, 'tochka-sbora'), true);
+});
+
+test('toggleDayRoute removes the same venue on second call', () => {
+  mockStorage();
+  clearDayRoute();
+  addToDayRoute({ id: 'venue_a', slug: 'park-a', title: 'Парк' });
+  assert.equal(readDayRoute().venues.length, 1);
+  const next = toggleDayRoute({ id: 'venue_a', slug: 'park-a', title: 'Парк' });
+  assert.equal(next.venues.length, 0);
+  assert.equal(isInDayRoute('venue_a', next, 'park-a'), false);
 });
 
 test('subscribeDayRoute fires once per successful write with matching length', () => {
