@@ -52,15 +52,8 @@ export function InstitutionCard({
   const rating = realRating(venue.rating);
   const upcoming = venue.upcomingTitles?.filter(Boolean).slice(0, 3) || [];
   const showMiniAfisha = upcoming.length > 0;
-  const stopCount = Number(venue.stopEventCount ?? 0);
   const ownEvents = Number(venue.events || 0);
-  // Prefer STOP tours when they dominate (must-see museums with sparse own afisha).
-  const stopOrEventsLabel =
-    stopCount > 0 && stopCount >= ownEvents
-      ? `${stopCount} в маршрутах`
-      : ownEvents > 0
-        ? pluralEvents(ownEvents)
-        : null;
+  const eventsLabel = ownEvents > 0 ? pluralEvents(ownEvents) : null;
   const placeCity = resolveVenuePlaceCity(venue.city, venue.citySlug);
   // В регионе City.title = регион: всегда показываем населённый пункт с slug.
   const showPlaceCity = Boolean(placeCity) && (isRegionLikeCityTitle(venue.city) || !hideCity);
@@ -163,8 +156,8 @@ export function InstitutionCard({
           <div>
             {venue.eventsPending ? (
               <div className="mt-0.5 h-4 w-20 animate-pulse rounded bg-slate-100" aria-hidden />
-            ) : stopOrEventsLabel ? (
-              <div className="text-sm font-semibold text-graphite">{stopOrEventsLabel}</div>
+            ) : eventsLabel ? (
+              <div className="text-sm font-semibold text-graphite">{eventsLabel}</div>
             ) : null}
           </div>
           <AddToDayRouteButton

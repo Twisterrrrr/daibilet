@@ -106,14 +106,8 @@ export function LocationCard({
   const rating = realRating(venue.rating);
   const upcoming = venue.upcomingTitles?.filter(Boolean).slice(0, 3) || [];
   const showMiniAfisha = upcoming.length > 0;
-  const stopCount = Number(venue.stopEventCount ?? 0);
   const ownEvents = Number(venue.events || 0);
-  const stopOrEventsLabel =
-    stopCount > 0 && stopCount >= ownEvents
-      ? `${stopCount} в маршрутах`
-      : ownEvents > 0
-        ? pluralEvents(ownEvents)
-        : null;
+  const eventsLabel = ownEvents > 0 ? pluralEvents(ownEvents) : null;
   const placeCity = resolveVenuePlaceCity(venue.city, venue.citySlug);
   const showPlaceCity = Boolean(placeCity) && (isRegionLikeCityTitle(venue.city) || !hideCity);
   const metaLine = [typeLabel, showPlaceCity ? placeCity : null]
