@@ -3157,7 +3157,7 @@ function DayRoutePanelInner() {
               return true;
             });
           }}
-          className={`inline-btn m-0 min-h-0 appearance-none bg-transparent p-0 font-medium text-slate-500 transition-colors hover:text-slate-700 ${DAY_TEXT_LINK}`}
+          className={`inline-btn m-0 min-h-0 appearance-none bg-transparent p-0 font-medium text-primary-600 transition-colors hover:text-primary-700 ${DAY_TEXT_LINK}`}
         >
           Сменить город
         </button>
