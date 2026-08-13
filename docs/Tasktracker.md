@@ -4,6 +4,12 @@
 |----|--------|-----------|--------|
 | UX.MYDAY-CHANGE-CITY-LINK | «Сменить город» в шапке Мой день - тот же синий линк, что «Страница {города}» | Средний | ✅ 2026-08-13 code; live после Deploy MSK web |
 
+## My Day must-see previews (2026-08-13)
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| FIX.MYDAY-PREVIEWS-5CITIES | `/my-day` превью SPB/KGD/MSK/NN/Пермь: slug aliases + covers для mustSee без карты | Высокий | ✅ 2026-08-13 code; live после Deploy MSK web |
+
 ## My Day PDF download (2026-08-13)
 
 | ID | Задача | Приоритет | Статус |

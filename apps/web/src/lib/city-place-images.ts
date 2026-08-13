@@ -89,6 +89,107 @@ const MOSCOW_IMAGES: Record<string, string> = {
   'moscow-artplay': '/images/venues/moscow/artplay.jpg',
   'moscow-flakon': '/images/venues/moscow/flakon.jpg',
   'moscow-danilovskiy-rynok': '/images/venues/moscow/danilovskiy-rynok.jpg',
+  'moscow-moskovskiy-kreml': '/images/venues/moscow/moskovskiy-kreml.jpg',
+  'moscow-krasnaya-ploschad': '/images/venues/moscow/krasnaya-ploschad.jpg',
+  'moscow-mgu': '/images/venues/moscow/mgu.jpg',
+  'moscow-gim': '/images/venues/moscow/gim.jpg',
+  'moscow-abramtsevo': '/images/venues/moscow/abramtsevo.jpg',
+  'moscow-andronikov-monastyr': '/images/venues/moscow/andronikov-monastyr.jpg',
+  'moscow-anglikanskaya-andrey': '/images/venues/moscow/anglikanskaya-andrey.jpg',
+  'moscow-angliyskoe-podvore': '/images/venues/moscow/angliyskoe-podvore.jpg',
+  'moscow-arma': '/images/venues/moscow/arma.jpg',
+  'moscow-bahmetevskiy-garazh': '/images/venues/moscow/bahmetevskiy-garazh.jpg',
+  'moscow-bitsevskiy-les': '/images/venues/moscow/bitsevskiy-les.jpg',
+  'moscow-bolshaya-nikitskaya': '/images/venues/moscow/bolshaya-nikitskaya.jpg',
+  'moscow-borodinskoe-pole': '/images/venues/moscow/borodinskoe-pole.jpg',
+  'moscow-botanicheskiy-sad-ran': '/images/venues/moscow/botanicheskiy-sad-ran.jpg',
+  'moscow-chaynyy-dom-perlova': '/images/venues/moscow/chaynyy-dom-perlova.jpg',
+  'moscow-danilovskaya-manufaktura': '/images/venues/moscow/danilovskaya-manufaktura.jpg',
+  'moscow-darvinovskiy-muzey': '/images/venues/moscow/darvinovskiy-muzey.jpg',
+  'moscow-depo-lesnaya': '/images/venues/moscow/depo-lesnaya.jpg',
+  'moscow-dk-rusakova': '/images/venues/moscow/dk-rusakova.jpg',
+  'moscow-dom-alekseeva': '/images/venues/moscow/dom-alekseeva.jpg',
+  'moscow-dom-epshteyna': '/images/venues/moscow/dom-epshteyna.jpg',
+  'moscow-dom-gribovyh': '/images/venues/moscow/dom-gribovyh.jpg',
+  'moscow-dom-isakova-prechistenka': '/images/venues/moscow/dom-isakova-prechistenka.jpg',
+  'moscow-dom-isakova-pyatnitskaya': '/images/venues/moscow/dom-isakova-pyatnitskaya.jpg',
+  'moscow-dom-melnikova': '/images/venues/moscow/dom-melnikova.jpg',
+  'moscow-dom-muzey-vasnetsova': '/images/venues/moscow/dom-muzey-vasnetsova.jpg',
+  'moscow-dom-narkomfina': '/images/venues/moscow/dom-narkomfina.jpg',
+  'moscow-dom-pashkova': '/images/venues/moscow/dom-pashkova.jpg',
+  'moscow-dom-pertsovoy': '/images/venues/moscow/dom-pertsovoy.jpg',
+  'moscow-dom-shugaevyh': '/images/venues/moscow/dom-shugaevyh.jpg',
+  'moscow-dom-strahovogo-rossiya': '/images/venues/moscow/dom-strahovogo-rossiya.jpg',
+  'moscow-dom-yaytso': '/images/venues/moscow/dom-yaytso.jpg',
+  'moscow-dr-zhivago': '/images/venues/moscow/dr-zhivago.jpg',
+  'moscow-dvor-so-lvami': '/images/venues/moscow/dvor-so-lvami.jpg',
+  'moscow-grigoriy-neokesariyskiy': '/images/venues/moscow/grigoriy-neokesariyskiy.jpg',
+  'moscow-hitrovka': '/images/venues/moscow/hitrovka.jpg',
+  'moscow-hlebozavod-9': '/images/venues/moscow/hlebozavod-9.jpg',
+  'moscow-hodynskoe-pole': '/images/venues/moscow/hodynskoe-pole.jpg',
+  'moscow-hohlovskaya-yama': '/images/venues/moscow/hohlovskaya-yama.jpg',
+  'moscow-horalnaya-sinagoga': '/images/venues/moscow/horalnaya-sinagoga.jpg',
+  'moscow-ioanno-predatechenskiy-dvorik': '/images/venues/moscow/ioanno-predatechenskiy-dvorik.jpg',
+  'moscow-kafe-pushkin': '/images/venues/moscow/kafe-pushkin.jpg',
+  'moscow-katolicheskiy-sobor': '/images/venues/moscow/katolicheskiy-sobor.jpg',
+  'moscow-kolomenskiy-kreml': '/images/venues/moscow/kolomenskiy-kreml.jpg',
+  'moscow-krasnyy-oktyabr': '/images/venues/moscow/krasnyy-oktyabr.jpg',
+  'moscow-krutitskoe-podvore': '/images/venues/moscow/krutitskoe-podvore.jpg',
+  'moscow-krysha-cdm': '/images/venues/moscow/krysha-cdm.jpg',
+  'moscow-losinyy-ostrov': '/images/venues/moscow/losinyy-ostrov.jpg',
+  'moscow-manezhnaya-ploschad': '/images/venues/moscow/manezhnaya-ploschad.jpg',
+  'moscow-melihovo': '/images/venues/moscow/melihovo.jpg',
+  'moscow-mosfilm': '/images/venues/moscow/mosfilm.jpg',
+  'moscow-most-bagration': '/images/venues/moscow/most-bagration.jpg',
+  'moscow-muzey-kino-vdnh': '/images/venues/moscow/muzey-kino-vdnh.jpg',
+  'moscow-muzey-kriptografii': '/images/venues/moscow/muzey-kriptografii.jpg',
+  'moscow-muzey-opticheskih-illyuziy': '/images/venues/moscow/muzey-opticheskih-illyuziy.jpg',
+  'moscow-neskuchnyy-sad': '/images/venues/moscow/neskuchnyy-sad.jpg',
+  'moscow-novo-ierusalimskiy': '/images/venues/moscow/novo-ierusalimskiy.jpg',
+  'moscow-osobnyak-derozhinskoy': '/images/venues/moscow/osobnyak-derozhinskoy.jpg',
+  'moscow-osobnyak-korobkovoy': '/images/venues/moscow/osobnyak-korobkovoy.jpg',
+  'moscow-osobnyak-mindovskogo': '/images/venues/moscow/osobnyak-mindovskogo.jpg',
+  'moscow-osobnyak-morozova': '/images/venues/moscow/osobnyak-morozova.jpg',
+  'moscow-osobnyak-ryabushinskogo': '/images/venues/moscow/osobnyak-ryabushinskogo.jpg',
+  'moscow-osobnyak-smirnova': '/images/venues/moscow/osobnyak-smirnova.jpg',
+  'moscow-ostrov-mechty': '/images/venues/moscow/ostrov-mechty.jpg',
+  'moscow-palaty-mazepy': '/images/venues/moscow/palaty-mazepy.jpg',
+  'moscow-palaty-volkovyh-yusupovyh': '/images/venues/moscow/palaty-volkovyh-yusupovyh.jpg',
+  'moscow-paleontologicheskiy-muzey': '/images/venues/moscow/paleontologicheskiy-muzey.jpg',
+  'moscow-park-pobedy': '/images/venues/moscow/park-pobedy.jpg',
+  'moscow-petrovskiy-passazh': '/images/venues/moscow/petrovskiy-passazh.jpg',
+  'moscow-ploskiy-dom': '/images/venues/moscow/ploskiy-dom.jpg',
+  'moscow-pole': '/images/venues/moscow/pole.jpg',
+  'moscow-pushkinskaya-ploschad': '/images/venues/moscow/pushkinskaya-ploschad.jpg',
+  'moscow-putinki': '/images/venues/moscow/putinki.jpg',
+  'moscow-sad-baumana': '/images/venues/moscow/sad-baumana.jpg',
+  'moscow-savvino-storozhevskiy': '/images/venues/moscow/savvino-storozhevskiy.jpg',
+  'moscow-savvinskoe-podvore': '/images/venues/moscow/savvinskoe-podvore.jpg',
+  'moscow-serebryanyy-bor': '/images/venues/moscow/serebryanyy-bor.jpg',
+  'moscow-severyane': '/images/venues/moscow/severyane.jpg',
+  'moscow-simeon-stolpnik': '/images/venues/moscow/simeon-stolpnik.jpg',
+  'moscow-smotrovaya-oko': '/images/venues/moscow/smotrovaya-oko.jpg',
+  'moscow-smotrovaya-ran': '/images/venues/moscow/smotrovaya-ran.jpg',
+  'moscow-smotrovoy-most-fili': '/images/venues/moscow/smotrovoy-most-fili.jpg',
+  'moscow-sobornaya-mechet': '/images/venues/moscow/sobornaya-mechet.jpg',
+  'moscow-solntse-moskvy': '/images/venues/moscow/solntse-moskvy.jpg',
+  'moscow-stolovaya-57': '/images/venues/moscow/stolovaya-57.jpg',
+  'moscow-supermetall': '/images/venues/moscow/supermetall.jpg',
+  'moscow-tri-vokzala-depo': '/images/venues/moscow/tri-vokzala-depo.jpg',
+  'moscow-troitse-sergieva-lavra': '/images/venues/moscow/troitse-sergieva-lavra.jpg',
+  'moscow-tsentralnyy-rynok': '/images/venues/moscow/tsentralnyy-rynok.jpg',
+  'moscow-tserkov-klimenta': '/images/venues/moscow/tserkov-klimenta.jpg',
+  'moscow-usachevskiy-rynok': '/images/venues/moscow/usachevskiy-rynok.jpg',
+  'moscow-usadba-arhangelskoe': '/images/venues/moscow/usadba-arhangelskoe.jpg',
+  'moscow-usadba-baryshnikova': '/images/venues/moscow/usadba-baryshnikova.jpg',
+  'moscow-usadba-chertkova': '/images/venues/moscow/usadba-chertkova.jpg',
+  'moscow-varvarka': '/images/venues/moscow/varvarka.jpg',
+  'moscow-vysoko-petrovskiy': '/images/venues/moscow/vysoko-petrovskiy.jpg',
+  'moscow-white-rabbit': '/images/venues/moscow/white-rabbit.jpg',
+  'moscow-zachatevskiy-monastyr': '/images/venues/moscow/zachatevskiy-monastyr.jpg',
+  'moscow-zhivopisnyy-most': '/images/venues/moscow/zhivopisnyy-most.jpg',
+  'moscow-zil': '/images/venues/moscow/zil.jpg',
+  'moscow-znamenie-dubrovitsy': '/images/venues/moscow/znamenie-dubrovitsy.jpg',
 };
 
 const NIZHNY_NOVGOROD_IMAGES: Record<string, string> = {
@@ -138,6 +239,10 @@ const NIZHNY_NOVGOROD_IMAGES: Record<string, string> = {
   "nizhny-novgorod-nizhegorodskaya-kanatnaya-doroga": "/images/venues/nizhny-novgorod/kanatnaya-doroga.jpg",
   "nizhny-novgorod-strelka-rek-volgi-i-oki": "/images/venues/nizhny-novgorod/strelka-volga-oka.jpg",
   "nizhny-novgorod-naberezhnaya-fedorovskogo": "/images/venues/nizhny-novgorod/naberezhnaya-fedorovskogo.jpg",
+  "nizhny-novgorod-gorodets": "/images/venues/nizhny-novgorod/gorodets.jpg",
+  "nizhny-novgorod-semyonov": "/images/venues/nizhny-novgorod/semyonov.jpg",
+  "nizhny-novgorod-diveevo": "/images/venues/nizhny-novgorod/diveevo.jpg",
+  "nizhny-novgorod-makaryev": "/images/venues/nizhny-novgorod/makaryev.jpg",
 };
 
 const SAINT_PETERSBURG_IMAGES: Record<string, string> = {
@@ -238,11 +343,19 @@ const SAINT_PETERSBURG_IMAGES: Record<string, string> = {
     '/images/venues/saint-petersburg/vitebskiy-vokzal.jpg',
   'saint-petersburg-grand-maket-rossiya':
     '/images/venues/saint-petersburg/grand-maket-rossiya.jpg',
+  'saint-petersburg-osobnyak-myasnikova':
+    '/images/venues/saint-petersburg/osobnyak-myasnikova.jpg',
+  'saint-petersburg-bolshoy-gatchinskiy-dvorets':
+    '/images/venues/saint-petersburg/bolshoy-gatchinskiy-dvorets.jpg',
+  'saint-petersburg-pavlovskiy-dvorets':
+    '/images/venues/saint-petersburg/pavlovskiy-dvorec-145de6e04a72.jpg',
 };
 
 const KALININGRAD_IMAGES: Record<string, string> = {
   'kaliningrad-kafedral-nyy-sobor':
     '/images/venues/kaliningrad/kafedral-nyy-sobor.jpg',
+  'kaliningrad-kenigsbergskaya-birzha':
+    '/images/venues/kaliningrad/muzey-izobrazitelnyh-iskusstv.jpg',
   'kaliningrad-muzey-mirovogo-okeana':
     '/images/venues/kaliningrad/muzey-mirovogo-okeana.jpg',
   'kaliningrad-muzey-yantarya': '/images/venues/kaliningrad/muzey-yantarya.jpg',
@@ -923,14 +1036,32 @@ const EDITORIAL_IMAGES_BY_SLUG: Record<string, string> = {
   ...GASTRO_PACK_IMAGES,
 };
 
+/**
+ * Must-see / suburb slugs that point at an already-shipped cover
+ * (hub id vs locationSlug, same building, truncated hyphen).
+ * Values are canonical keys in EDITORIAL_IMAGES_BY_SLUG.
+ */
+const PLACE_IMAGE_ALIASES: Record<string, string> = {
+  'saint-petersburg-pavlovskiy-dvorets': 'pavlovskiy-dvorec-145de6e04a72',
+};
+
+function normalizePlaceImageKey(slug: string | null | undefined): string {
+  return String(slug || '')
+    .trim()
+    .toLowerCase()
+    .replace(/-+$/g, '');
+}
+
 export function lookupEditorialPlaceImage(
   slug: string | null | undefined,
 ): string | null {
-  const key = String(slug || '')
-    .trim()
-    .toLowerCase();
+  const key = normalizePlaceImageKey(slug);
   if (!key) return null;
-  return EDITORIAL_IMAGES_BY_SLUG[key] || null;
+  const direct = EDITORIAL_IMAGES_BY_SLUG[key];
+  if (direct) return direct;
+  const alias = PLACE_IMAGE_ALIASES[key];
+  if (!alias) return null;
+  return EDITORIAL_IMAGES_BY_SLUG[alias] || null;
 }
 
 /** True for dark auto stubs that should lose to editorial covers. */
