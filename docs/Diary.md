@@ -1,3 +1,17 @@
+## 2026-08-13 - Live: Deploy MSK web `31719561762`
+
+### Наблюдения
+- Owner: «выкатывай». Пакет places H1/filters + card CTA (маршрут/сердечко) + sort STOP + PDP about/hero.
+
+### Решения
+- Deploy MSK web `31719561762` success, ~4m45s. SHA `d3d5c640`. BUILD_ID=`OMwE6Y1b82NPlQummGE9K`.
+- MSK: `git pull` + `systemctl restart daibilet-api` (sort max(events, STOP)). Smoke: api/places/home 200.
+
+### Проблемы
+- Нет. Hard refresh, если виден старый HTML.
+
+---
+
 ## 2026-08-13 - /places: «Афиша» с карточки убрана, «В маршрут» + сердечко
 
 ### Наблюдения

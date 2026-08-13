@@ -8,7 +8,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| FIX.PLACES-SORT-EVENTS | «По событиям»: max(own events, STOP), не shell-ноль; `?sort=` в URL | Высокий | ✅ 2026-08-13 code; live: web + API restart / «выкатывай» |
+| FIX.PLACES-SORT-EVENTS | «По событиям»: max(own events, STOP), не shell-ноль; `?sort=` в URL | Высокий | ✅ live `31719561762` + api restart |
 
 ## Location PDP order + mobile 3:4 heroes (2026-08-13)
 
