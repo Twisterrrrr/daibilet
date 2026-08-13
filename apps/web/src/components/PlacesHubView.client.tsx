@@ -14,7 +14,7 @@ import { VenuesCatalogSkeleton } from '@/components/VenueCatalogSkeletons';
 import { HeroLayout } from '@/components/HeroLayout';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { placesSearchHref } from '@/lib/catalog-url';
-import { pluralCities, pluralLocations, pluralVenues } from '@/lib/format';
+import { pluralCities, pluralLocations, pluralPlaces, pluralVenues } from '@/lib/format';
 import { buildPlacesListingCopy, normalizePlacesFamily } from '@/lib/places-seo';
 import {
   catalogCityQueryValue,
@@ -698,7 +698,7 @@ export function PlacesHubView({
             {listPending || listRefreshing
               ? 'Обновляем список…'
               : total > 0
-                ? `${total} ${total === 1 ? 'место' : total < 5 ? 'места' : 'мест'}`
+                ? pluralPlaces(total)
                 : null}
           </p>
           <div className="flex shrink-0 overflow-hidden rounded-xl bg-[#F5F5F7] p-1" role="radiogroup" aria-label="Вид каталога">
