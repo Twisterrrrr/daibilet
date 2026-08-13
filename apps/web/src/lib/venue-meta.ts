@@ -281,7 +281,8 @@ export const LOCATION_CATALOG_TYPE_OPTIONS = CATALOG_TYPE_OPTIONS.filter((option
 );
 
 /**
- * Чипы `/places` для людей: без жаргона «площадка/локация» и без редких kind.
+ * Чипы `/places` для людей: без жаргона «площадка/локация» как семейства.
+ * Логистика (причалы / автобусы) и редкие kind оставляем - иначе хаб «теряет» целые срезы.
  * `id` уходит в `?type=`; `types` - фактические kind для фильтрации.
  */
 export const PLACES_HUB_CATEGORY_CHIPS: Array<{ id: string; label: string; types: string[] }> = [
@@ -294,6 +295,10 @@ export const PLACES_HUB_CATEGORY_CHIPS: Array<{ id: string; label: string; types
     label: 'Парки и открытые места',
     types: ['park', 'outdoor_location', 'monument', 'attraction'],
   },
+  { id: 'piers', label: 'Причалы', types: ['pier', 'pier_water'] },
+  { id: 'buses', label: 'Автобусы', types: ['bus'] },
+  { id: 'venues', label: 'Площадки', types: ['venue', 'other'] },
+  { id: 'sport', label: 'Спорт', types: ['sport_activity_space'] },
 ];
 
 export function resolvePlacesHubCategoryChip(
