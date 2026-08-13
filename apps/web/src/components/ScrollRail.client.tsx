@@ -17,6 +17,12 @@ type ScrollRailProps = {
   viewportClassName?: string;
   /** Hide native scrollbar (keep swipe + md arrows). */
   hideScrollbar?: boolean;
+  /** `photo` = over card image band; `center` = mid rail (chips / thin rows). */
+  arrowAlign?: 'photo' | 'center';
+  /** `light` = white glass for dark heroes; default slate for light pages. */
+  arrowTone?: 'light' | 'dark';
+  /** Soft edge fade when content overflows (hints more chips). */
+  edgeFade?: boolean;
   style?: CSSProperties;
   'aria-label'?: string;
 };
@@ -52,6 +58,9 @@ export function ScrollRail({
   className = '',
   viewportClassName = '',
   hideScrollbar = false,
+  arrowAlign = 'photo',
+  arrowTone = 'dark',
+  edgeFade = false,
   style,
   'aria-label': ariaLabel = 'Горизонтальный список',
 }: ScrollRailProps) {
@@ -107,14 +116,38 @@ export function ScrollRail({
     });
   };
 
-  const arrowBase =
-    'absolute z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200/90 bg-white/95 text-slate-700 shadow-md backdrop-blur transition-[opacity,transform,colors] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:ring-offset-2 md:inline-flex top-[33%]';
+  const arrowY = arrowAlign === 'center' ? 'top-1/2' : 'top-[33%]';
+  /** Hero chips: compact; editorial cards keep larger hit target. */
+  const arrowSize = arrowAlign === 'center' ? 'h-7 w-7' : 'h-10 w-10';
+  const iconSize = arrowAlign === 'center' ? 'h-3.5 w-3.5' : 'h-5 w-5';
+  const arrowInset = 'left-3';
+  const arrowInsetRight = 'right-3';
+  const arrowToneCls =
+    arrowTone === 'light'
+      ? 'border-white/40 bg-white/25 text-white shadow-sm backdrop-blur-sm hover:bg-white/40 focus-visible:ring-white/50'
+      : 'border-slate-200/90 bg-white/95 text-slate-700 shadow-md backdrop-blur hover:bg-white hover:text-slate-950 focus-visible:ring-slate-300 focus-visible:ring-offset-2';
+  // md+ only - mobile keeps swipe (no arrows).
+  const arrowBase = `absolute z-10 hidden ${arrowSize} -translate-y-1/2 items-center justify-center rounded-full border transition-[opacity,transform,colors] focus-visible:outline-none focus-visible:ring-2 md:inline-flex ${arrowY} ${arrowToneCls}`;
+
+  const fadePad = arrowAlign === 'center' ? '0.85rem' : '1.25rem';
+  const fadeMask =
+    edgeFade && overflow
+      ? {
+          maskImage: `linear-gradient(90deg, ${canPrev ? `transparent, black ${fadePad}` : 'black'}, ${
+            canNext ? `black calc(100% - ${fadePad}), transparent` : 'black'
+          })`,
+          WebkitMaskImage: `linear-gradient(90deg, ${canPrev ? `transparent, black ${fadePad}` : 'black'}, ${
+            canNext ? `black calc(100% - ${fadePad}), transparent` : 'black'
+          })`,
+        }
+      : undefined;
 
   return (
     <div className={`relative min-w-0 overflow-visible ${className}`.trim()} style={style}>
       <div
         ref={scrollerRef}
         className={`horizontal-snap-row touch-pan-x ${hideScrollbar ? HIDE_SCROLLBAR_CLASS : ''} ${viewportClassName}`.trim()}
+        style={fadeMask}
         aria-label={ariaLabel}
         role="region"
         tabIndex={0}
@@ -131,13 +164,11 @@ export function ScrollRail({
             tabIndex={canPrev ? 0 : -1}
             disabled={!canPrev}
             onClick={() => scrollByDir(-1)}
-            className={`${arrowBase} left-3 ${
-              canPrev
-                ? 'pointer-events-auto opacity-100 hover:bg-white hover:text-slate-950'
-                : 'pointer-events-none opacity-40'
+            className={`${arrowBase} ${arrowInset} ${
+              canPrev ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-40'
             }`}
           >
-            <ChevronLeft className="h-5 w-5" aria-hidden />
+            <ChevronLeft className={iconSize} aria-hidden />
           </button>
           <button
             type="button"
@@ -146,13 +177,11 @@ export function ScrollRail({
             tabIndex={canNext ? 0 : -1}
             disabled={!canNext}
             onClick={() => scrollByDir(1)}
-            className={`${arrowBase} right-3 ${
-              canNext
-                ? 'pointer-events-auto opacity-100 hover:bg-white hover:text-slate-950'
-                : 'pointer-events-none opacity-40'
+            className={`${arrowBase} ${arrowInsetRight} ${
+              canNext ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-40'
             }`}
           >
-            <ChevronRight className="h-5 w-5" aria-hidden />
+            <ChevronRight className={iconSize} aria-hidden />
           </button>
         </>
       ) : null}

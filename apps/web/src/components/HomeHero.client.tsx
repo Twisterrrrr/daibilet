@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { CityPicker } from '@/components/CityPicker.client';
 import { HeroLayout } from '@/components/HeroLayout';
 import { HeroMedia } from '@/components/HeroMedia.client';
+import { ScrollRail } from '@/components/ScrollRail.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import type { PublicDestinationDto, PublicLandingDto } from '@daibilet/contracts/public';
 import { buildCatalogHref, catalogHrefWithSelectedCity } from '@/lib/catalog-url';
@@ -137,18 +138,27 @@ export function HomeHero({ destinations, frames, landings = [], videoSrc }: Home
         </div>
       </form>
 
-      {/* One soft swipe row: dates (mobile) + city landings / category shortcuts */}
-      <div
-        className="mt-4 w-full max-w-5xl overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        data-home-hero-chips
+      {/* Soft chip rail: md+ compact arrows (same left/right inset as editorial); mobile = swipe only. */}
+      <ScrollRail
+        className="mt-4 w-full max-w-5xl"
+        viewportClassName="!overflow-x-auto overscroll-x-contain !pb-0.5"
+        hideScrollbar
+        arrowAlign="center"
+        arrowTone="light"
+        edgeFade
+        aria-label="Быстрые подборки"
       >
-        <div className="flex w-max flex-nowrap items-center gap-2 px-0.5 pb-0.5">
+        <div
+          className="flex w-max flex-nowrap items-center gap-2 px-1 pb-0.5 md:px-10"
+          data-home-hero-chips
+        >
           {HERO_DATE_OPTIONS.filter((d) => d.value !== 'all').map((option) => {
             const active = heroDate === option.value;
             return (
               <button
                 key={option.value}
                 type="button"
+                data-rail-item
                 onClick={() => setHeroDate(option.value)}
                 className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-semibold transition sm:hidden ${
                   active
@@ -178,6 +188,7 @@ export function HomeHero({ destinations, frames, landings = [], videoSrc }: Home
               <a
                 key={chip.label}
                 href={href}
+                data-rail-item
                 className="shrink-0 rounded-full bg-white/20 px-3.5 py-1.5 text-xs font-semibold text-white/95 ring-1 ring-white/35 backdrop-blur-sm transition hover:bg-white/35"
               >
                 {chip.label}
@@ -185,7 +196,7 @@ export function HomeHero({ destinations, frames, landings = [], videoSrc }: Home
             );
           })}
         </div>
-      </div>
+      </ScrollRail>
     </HeroLayout>
   );
 }
