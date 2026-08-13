@@ -1,3 +1,9 @@
+## Places hub: sort by events actually ranks events (2026-08-13)
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| FIX.PLACES-SORT-EVENTS | «По событиям»: max(own events, STOP), не shell-ноль; `?sort=` в URL | Высокий | ✅ 2026-08-13 code; live: web + API restart / «выкатывай» |
+
 ## Location PDP order + mobile 3:4 heroes (2026-08-13)
 
 | ID | Задача | Приоритет | Статус |

@@ -68,6 +68,7 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
     family: firstPlacesQueryValue(params.family),
     page: firstPlacesQueryValue(params.page),
     hasEvents: firstPlacesQueryValue(params.hasEvents),
+    sort: firstPlacesQueryValue(params.sort),
   });
   const cleanTitle = pageTitle(seo.title);
   return {

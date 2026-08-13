@@ -2013,9 +2013,7 @@ function sortVenueCatalogItems(items, sortMode) {
   }
   const mode = sortMode === 'asc' || sortMode === 'desc' ? sortMode : 'events';
   return [...items].sort((a, b) => {
-    if (mode === 'events') {
-      return (Number(b.events) || 0) - (Number(a.events) || 0) || byName(a, b);
-    }
+    if (mode === 'events') return byPopularity(a, b);
     const cmp = byName(a, b);
     return mode === 'asc' ? cmp : -cmp;
   });
@@ -2110,10 +2108,13 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
     .trim()
     .toLowerCase();
   const hasEventsFilter = hasEventsRaw === '1' || hasEventsRaw === 'true' || hasEventsRaw === 'yes';
-  // hasEvents needs real event/stop counts; shell zeros `events` and would empty the list.
+  const sortMode = String(searchParams.get('sort') || 'events').trim().toLowerCase();
+  const sortNeedsCounts = sortMode !== 'asc' && sortMode !== 'desc';
+  // hasEvents / «По событиям» need real event+STOP counts; shell zeros `events` and sorts as A-Я.
   const shellCounts =
     !isPins &&
     !hasEventsFilter &&
+    !sortNeedsCounts &&
     (searchParams.get('counts') === '0' ||
       searchParams.get('phase') === 'shell' ||
       searchParams.get('shell') === '1');
@@ -2134,7 +2135,6 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
   const familyFilter = familyRaw === 'institution' || familyRaw === 'location' ? familyRaw : '';
   const scaleFilter = String(searchParams.get('scale') || '').trim().toLowerCase();
   const logisticsFilter = String(searchParams.get('logistics') || '').trim().toLowerCase();
-  const sortMode = String(searchParams.get('sort') || 'events').trim().toLowerCase();
 
   const buildEnvelope = (filteredItems, pageItems, nextCursor, hasMore, facetSource, countsPending, envelopePage) => {
     const citySource = facetSource?.cityUniverse || filteredItems;
@@ -2256,9 +2256,6 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
   const countsPending = Boolean(shellCounts && !servedFromFullHub);
 
   let mapped = rows.map(mapPublicVenueListItem);
-  if (countsPending) {
-    mapped = mapped.map((item) => ({ ...item, events: 0, nextSlot: null }));
-  }
   const { filtered, cityUniverse, typeUniverse, scaleUniverse } = applyListFilters(mapped);
   const sorted = sortVenueCatalogItems(filtered, sortMode);
   const facetSource = { cityUniverse, typeUniverse, scaleUniverse };
@@ -2272,7 +2269,10 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
     limit,
     page: pageIndex,
   });
-  return buildEnvelope(sorted, page, nextCursor, hasMore, facetSource, countsPending, resolvedPage);
+  const pageItems = countsPending
+    ? page.map((item) => ({ ...item, events: 0, nextSlot: null }))
+    : page;
+  return buildEnvelope(sorted, pageItems, nextCursor, hasMore, facetSource, countsPending, resolvedPage);
 }
 
 /**

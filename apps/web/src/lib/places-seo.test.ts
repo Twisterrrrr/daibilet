@@ -83,4 +83,11 @@ test('places listing canonical indexes hub, city and family; noindexes thin filt
   });
   assert.equal(withEvents.canonicalPath, '/places?city=perm');
   assert.equal(withEvents.indexable, false);
+
+  const sorted = buildPlacesListingSeo({
+    citySlug: 'perm',
+    sort: 'asc',
+  });
+  assert.equal(sorted.canonicalPath, '/places?city=perm');
+  assert.equal(sorted.indexable, false);
 });

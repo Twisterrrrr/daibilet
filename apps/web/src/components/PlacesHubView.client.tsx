@@ -135,6 +135,12 @@ function parseHasEventsParam(raw: string | null): boolean {
   return value === '1' || value === 'true' || value === 'yes';
 }
 
+function parseSortParam(raw: string | null): VenueCatalogSort {
+  const value = String(raw || '').trim().toLowerCase();
+  if (value === 'asc' || value === 'desc' || value === 'mixed' || value === 'events') return value;
+  return 'events';
+}
+
 type PlacesScope = 'all' | VenueCatalogFamily | 'events';
 
 const SCOPE_OPTIONS: Array<[PlacesScope, string]> = [
@@ -158,9 +164,8 @@ export function PlacesHubView({
   const router = useRouter();
   const searchParams = useSearchParams();
   const selectedCity = useSelectedCityOptional();
-  const [sortMode, setSortMode] = useState<VenueCatalogSort>('events');
-  const [viewMode, setViewMode] = useState<ViewMode>('cards');
   const [, startTransition] = useTransition();
+  const [viewMode, setViewMode] = useState<ViewMode>('cards');
   const [venues, setVenues] = useState(initialPage.venues);
   const [total, setTotal] = useState(initialPage.total);
   const [stats, setStats] = useState(initialPage.stats);
@@ -171,6 +176,7 @@ export function PlacesHubView({
   const q = searchParams.get('q')?.trim() || '';
   const family = parseFamilyParam(searchParams.get('family'));
   const hasEvents = parseHasEventsParam(searchParams.get('hasEvents'));
+  const sortMode = parseSortParam(searchParams.get('sort'));
   const scope: PlacesScope = hasEvents ? 'events' : family;
   const rawUrlCity = searchParams.get('city')?.trim() || '';
   const urlCityAll = isAllCitiesQuery(rawUrlCity);
@@ -269,6 +275,7 @@ export function PlacesHubView({
 
   const feedQueryKey = useMemo(() => venueCatalogCacheKey(feedQuery), [feedQuery]);
   const scopeKey = useMemo(() => cityScopeKey(feedQuery), [feedQuery]);
+  const allowShell = !hasEvents && (sortMode === 'asc' || sortMode === 'desc');
 
   useEffect(() => {
     if (!cityReady && !rawUrlCity) {
@@ -356,7 +363,7 @@ export function PlacesHubView({
 
         if (needsExactSlice) {
           const slice = await fetchVenueCatalogPage(
-            { ...feedQuery, counts: hasEvents ? true : false },
+            { ...feedQuery, counts: allowShell ? false : true },
             { signal: controller.signal },
           );
           if (requestId !== catalogRequestId.current) return;
@@ -382,7 +389,7 @@ export function PlacesHubView({
               ...feedQuery,
               type: undefined,
               page: 1,
-              counts: hasEvents ? true : (false as const),
+              counts: allowShell ? (false as const) : true,
             };
             void fetchVenueCatalogPage(shellQuery, { signal: controller.signal })
               .then((shellPage) => {
@@ -407,7 +414,7 @@ export function PlacesHubView({
             ...feedQuery,
             type: undefined,
             page: 1,
-            counts: hasEvents ? true : (false as const),
+            counts: allowShell ? (false as const) : true,
           };
           const shellPage = await fetchVenueCatalogPage(shellQuery, { signal: controller.signal });
           if (requestId !== catalogRequestId.current) return;
@@ -500,6 +507,16 @@ export function PlacesHubView({
     });
   };
 
+  const setSortFilter = (next: VenueCatalogSort) => {
+    setListPage(1);
+    replaceCatalogUrl((params) => {
+      if (next === 'events') params.delete('sort');
+      else params.set('sort', next);
+      params.delete('page');
+      if (urlCityAll && !params.get('city')) params.set('city', 'all');
+    });
+  };
+
   const listPending = (cityPending || catalogLoading) && venues.length === 0;
   const listRefreshing = (cityPending || catalogLoading) && venues.length > 0;
 
@@ -570,7 +587,7 @@ export function PlacesHubView({
           </select>
           <select
             value={sortMode}
-            onChange={(event) => setSortMode(event.target.value as VenueCatalogSort)}
+            onChange={(event) => setSortFilter(event.target.value as VenueCatalogSort)}
             className="rounded-xl bg-[#F5F5F7] px-3 py-2.5 text-sm outline-none sm:max-w-[10rem] sm:shrink-0"
             aria-label="Сортировка"
           >
