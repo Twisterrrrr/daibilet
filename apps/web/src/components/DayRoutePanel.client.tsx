@@ -3736,8 +3736,7 @@ function DayRoutePanelInner() {
               />
               </>
             }
-          />
-
+          >
           <MyDayItinerary>
           {missingCoordsCount > 0 ? (
             <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
@@ -4080,6 +4079,7 @@ function DayRoutePanelInner() {
           {renderRouteNearbyMatches()}
 
           </MyDayItinerary>
+          </MyDayToolbar>
         </section>
       )}
 

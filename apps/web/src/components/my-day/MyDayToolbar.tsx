@@ -57,6 +57,8 @@ type MyDayToolbarProps = {
   onShowAllTags?: () => void;
   /** Hour-plan overflow / lunch banner slot under toolbar card. */
   scheduleSlot?: ReactNode;
+  /** Itinerary list (and anything below). Must live inside this wrap so sticky can pin while the list scrolls. */
+  children?: ReactNode;
   className?: string;
 };
 
@@ -94,6 +96,7 @@ export function MyDayToolbar({
   onToggleTag,
   onShowAllTags,
   scheduleSlot,
+  children,
   className = '',
 }: MyDayToolbarProps) {
   const showTypes = typeCounts.length > 1 && onToggleTag;
@@ -101,6 +104,10 @@ export function MyDayToolbar({
 
   return (
     <div className={className.trim() || undefined} data-my-day-toolbar-wrap>
+      {/*
+        Sticky containing block must include the itinerary (children).
+        Previously the wrap was only the card height, so sticky unstuck immediately.
+      */}
       <div
         role="toolbar"
         aria-label="Управление маршрутом"
@@ -345,6 +352,8 @@ export function MyDayToolbar({
         Порядок можно менять мышью или с клавиатуры: фокус на ручке перетаскивания, стрелки вверх /
         вниз, пробел - взять и отпустить, Escape - отменить.
       </p>
+
+      {children}
     </div>
   );
 }
