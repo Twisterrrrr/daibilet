@@ -464,17 +464,6 @@ export function PlacesHubView({
     });
   };
 
-  const setFamilyFilter = (next: 'all' | VenueCatalogFamily) => {
-    setListPage(1);
-    replaceCatalogUrl((params) => {
-      if (next === 'all') params.delete('family');
-      else params.set('family', next);
-      params.delete('type');
-      params.delete('page');
-      if (urlCityAll && !params.get('city')) params.set('city', 'all');
-    });
-  };
-
   const listPending = (cityPending || catalogLoading) && venues.length === 0;
   const listRefreshing = (cityPending || catalogLoading) && venues.length > 0;
 
@@ -576,24 +565,10 @@ export function PlacesHubView({
           })}
         </div>
 
-        <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-500">
-          <button
-            type="button"
-            onClick={() => setFamilyFilter(family === 'location' ? 'all' : 'location')}
-            className={`transition hover:text-slate-700 ${family === 'location' ? 'font-medium text-slate-800' : ''}`}
-          >
-            Локации: причалы, парки, точки старта →
-          </button>
-          <button
-            type="button"
-            onClick={() => setFamilyFilter(family === 'institution' ? 'all' : 'institution')}
-            className={`transition hover:text-slate-700 ${family === 'institution' ? 'font-medium text-slate-800' : ''}`}
-          >
-            Площадки с афишей
-          </button>
+        <div className="mt-3">
           <Link
             href={myDayHref}
-            className="inline-flex items-center gap-1.5 font-semibold text-primary-700 hover:text-primary-800"
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary-700 hover:text-primary-800"
           >
             <Route className="h-4 w-4" strokeWidth={1.75} />
             Собрать день

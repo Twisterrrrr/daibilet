@@ -25,8 +25,6 @@ const companyLinks = [
   { label: 'Контакты', href: '/contacts' },
   { label: 'Помощь', href: '/help' },
   { label: 'Места', href: '/places' },
-  { label: 'Площадки с афишей', href: '/places?family=institution' },
-  { label: 'Локации', href: '/places?family=location' },
   { label: 'Подборки', href: '/podborki' },
   { label: 'Реквизиты', href: '/requisites' },
   { label: 'Мои покупки', href: '/account/purchases' },
