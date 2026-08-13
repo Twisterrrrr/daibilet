@@ -1,3 +1,17 @@
+## 2026-08-13 - Live: Deploy MSK web `31726792631`
+
+### Наблюдения
+- Owner: «выкати». Пакет places (Башкортостан/settlement/серый CTA/scope •/plural/без STOP-counts) + location «Рядом» + ScrollRail arrows outside chips.
+
+### Решения
+- Deploy MSK web `31726792631` success. SHA `db7042be`. BUILD_ID=`oQhiyN-C5ibiUqqKp_AEP`.
+- Smoke: `/` 200, `/places?city=saint-petersburg` 200.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-13 - /places: scope через •, без «Собрать день»
 
 ### Наблюдения
