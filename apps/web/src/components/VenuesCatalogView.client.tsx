@@ -518,11 +518,11 @@ export function VenuesCatalogView({
         </div>
 
         {typeOptions.length ? (
-          <div className="mt-4 horizontal-snap-row flex flex-nowrap gap-1.5 overflow-x-auto pb-0.5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+          <div className="mt-4 flex flex-wrap gap-1.5">
             <button
               type="button"
               onClick={() => setTypeFilter('all')}
-              className={`catalog-chip snap-start ${
+              className={`catalog-chip ${
                 typeFilter === 'all' ? 'catalog-chip-on' : 'catalog-chip-idle'
               }`}
             >
@@ -535,7 +535,7 @@ export function VenuesCatalogView({
                   key={option.value}
                   type="button"
                   onClick={() => setTypeFilter(active ? 'all' : option.value)}
-                  className={`catalog-chip snap-start ${active ? 'catalog-chip-on' : 'catalog-chip-idle'}`}
+                  className={`catalog-chip ${active ? 'catalog-chip-on' : 'catalog-chip-idle'}`}
                 >
                   <span className="whitespace-nowrap">{option.label}</span>
                 </button>

@@ -3,6 +3,7 @@
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
 | UX.PLACES-NO-FAMILY-DOORS | Не показывать два каталога institution/location; один `/places?city=` | Высокий | ✅ 2026-08-13 code; live после Deploy MSK web |
+| UX.PLACES-CHIPS-WRAP | Чипы типов на `/places` переносить, не обрезать справа | Высокий | ✅ 2026-08-13 code; live после Deploy MSK web |
 
 ## Mobile scroll trapped on event/article rails (2026-08-13)
 
