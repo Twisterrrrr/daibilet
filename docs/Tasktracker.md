@@ -1,3 +1,9 @@
+## Places hub: fill empty venue addresses (2026-08-13)
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| CAT.VENUE-ADDR-BACKFILL | Заполнить пустые `Venue.address` у PUBLISHED (cityInfo + Nominatim + curated) | Высокий | ✅ 2026-08-13 MSK: 0/903 empty; api restart |
+
 ## Places hub: card CTA is route, heart overlay (2026-08-13)
 
 | ID | Задача | Приоритет | Статус |

@@ -1,3 +1,18 @@
+## 2026-08-13 - /places: «Адрес уточняется» - backfill адресов
+
+### Наблюдения
+- Owner: на карточках мест «Адрес уточняется». В prod PUBLISHED было **180/903** без `Venue.address` (СПб 82, Мск 52, НН 39, Пермь 7).
+
+### Решения
+- Скрипт `scripts/backfill-empty-venue-addresses.js`: cityInfo → packs/monuments → curated → Nominatim reverse/forward.
+- Apply: cityInfo **46**, Nominatim **85**, curated SPB/NN **49**. Итого empty **0/903**.
+- Кураторский файл: `scripts/data/venue-address-curated-2026-08-13.json`. Restart `daibilet-api`.
+
+### Проблемы
+- Нет. Карточки после API cache / hard refresh.
+
+---
+
 ## 2026-08-13 - Афиша: поиск вплотную к «Найти»
 
 ### Наблюдения
