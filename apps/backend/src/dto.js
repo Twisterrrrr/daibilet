@@ -72,7 +72,7 @@ import {
   LANDING_SLUG_ALIASES,
   explainLandingRuleMatch,
   matchesLandingRule,
-  OFF_SEASON_LANDING_SLUGS,
+  buildOffSeasonLandingSlugs,
   resolveLandingRuleBySlug,
   sessionMatchesLandingSlug,
 } from './landing-rules.ts';
@@ -4133,7 +4133,7 @@ export async function buildPublicSearch(db, searchParams) {
 
   if (items.length < 8) {
     const landings = buildPublicLandings(sessions).filter(
-      (landing) => landing.events > 0 && !OFF_SEASON_LANDING_SLUGS.has(landing.slug),
+      (landing) => landing.events > 0 && !buildOffSeasonLandingSlugs().has(landing.slug),
     );
     for (const landing of landings) {
       if (items.length >= 8) break;
@@ -4280,7 +4280,7 @@ export { LANDING_PAGE_SESSION_LIMIT, scopePublicCatalogSessions, selectLandingPa
 function buildSortedPublicLandings(sessions, cityFilter = '') {
   return sortPromoLandings(
     buildPublicLandings(sessions).filter(
-      (landing) => landing.events > 0 && !OFF_SEASON_LANDING_SLUGS.has(landing.slug),
+      (landing) => landing.events > 0 && !buildOffSeasonLandingSlugs().has(landing.slug),
     ),
     cityFilter,
   );
@@ -4567,7 +4567,7 @@ export async function buildPublicCityPage(db, citySlugOrId) {
   const prices = sessions.map((session) => session.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
   const categories = countBy(sessions.map((event) => event.category).filter(Boolean));
   const landings = buildPublicLandings(sessions).filter(
-    (landing) => landing.events > 0 && !OFF_SEASON_LANDING_SLUGS.has(landing.slug),
+    (landing) => landing.events > 0 && !buildOffSeasonLandingSlugs().has(landing.slug),
   );
   const entityLabel = destinationPrepositional(destination);
 

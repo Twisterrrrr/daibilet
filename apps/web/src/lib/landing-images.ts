@@ -9,7 +9,7 @@ const LANDING_CARD_IMAGES: Record<string, string> = {
   'bridges-night': '/images/landings/bridges-night.png',
   'new-year': '/images/landings/new-year.png',
   'moscow-dinner-boat': '/images/landings/moscow-dinner-boat.png',
-  'moscow-city-day': '/images/landings/salute-9-may.png',
+  'moscow-city-day': '/images/landings/moscow-city-day.jpg',
   'salute-9-may': '/images/landings/salute-9-may.png',
   'bus-tours': '/images/landings/bus-tours.png',
   standup: '/images/landings/standup.png',
@@ -24,8 +24,8 @@ const LANDING_CARD_IMAGES: Record<string, string> = {
   'walking-tours': '/images/landings/walking-tours.jpg',
   excursions: '/images/landings/excursions.jpg',
   'country-tours': '/images/landings/country-tours.jpg',
-  exhibitions: '/images/home/promo-museums.jpg',
-  'unusual-theatres': '/images/home/promo-concerts.jpg',
+  exhibitions: '/images/landings/exhibitions.jpg',
+  'unusual-theatres': '/images/landings/unusual-theatres.jpg',
 };
 
 /**

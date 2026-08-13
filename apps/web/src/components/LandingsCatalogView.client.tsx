@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
 
+import { CatalogCityGate } from '@/components/EventsCityGate.client';
 import { ExpandableBlurb } from '@/components/ExpandableBlurb.client';
 import { HeroLayout } from '@/components/HeroLayout';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
@@ -18,6 +19,7 @@ import {
   landingMatchesCatalogCity,
   mergePodborkiCityCatalogItems,
 } from '@/lib/landing-routes';
+import { filterInSeasonLandings } from '@/lib/landing-season';
 import {
   PODBORKI_BENTO_GRID_CLASS,
   podborkiBentoCellClass,
@@ -33,6 +35,7 @@ import {
 import { pickPodborkiFeatured, pickPodborkiTrending } from '@/lib/podborki-hero';
 import {
   filterPodborkiByTag,
+  landingMatchesTag,
   PODBORKI_CATEGORY_TAGS,
   PODBORKI_MOODS,
   type PodborkiTagId,
@@ -108,18 +111,24 @@ export function LandingsCatalogView({
   const urlSearchParams = useSearchParams();
   const selectedCity = useSelectedCityOptional();
   const urlCity = urlSearchParams.get('city')?.trim() || '';
+  const urlCityIsAll = urlCity.toLowerCase() === 'all';
+  const cityReady = selectedCity?.cityReady ?? true;
+  /** Wait for storage resolve when URL has no city - avoids national flash then city. */
+  const cityBootstrapPending = !urlCity && Boolean(selectedCity) && !cityReady;
 
   const headerCityFilter =
-    selectedCity?.cityReady && selectedCity.cityValue !== 'all'
+    cityReady && selectedCity && selectedCity.cityValue !== 'all'
       ? selectedCity.selectedDestination?.slug ||
         selectedCity.selectedDestination?.sourceSlug ||
         selectedCity.cityValue
       : '';
 
-  const cityRaw = urlCity && urlCity !== 'all' ? urlCity : headerCityFilter || initialCity || 'all';
+  const cityRaw = urlCity && !urlCityIsAll ? urlCity : headerCityFilter || initialCity || 'all';
   const citySlug = resolveCitySlug(cities, cityRaw === 'all' ? 'all' : cityRaw);
   const cityName = resolveCityName(cities, cityRaw === 'all' ? 'all' : cityRaw);
   const citySelected = citySlug !== 'all';
+  const needsCityGate =
+    !cityBootstrapPending && cityReady && (urlCityIsAll || !citySelected);
   const apiCityParam = citySelected
     ? (cityName !== 'all' ? cityName : citySlug)
     : '';
@@ -186,10 +195,15 @@ export function LandingsCatalogView({
   }, [apiCityParam, citySelected, citySlug, initialItems]);
 
   const cityItems = useMemo(() => {
-    if (!citySelected) return initialItems;
-    if (cityScopedItems) return cityScopedItems;
-    // While city catalog loads: show multi+bound landings allowed for this city (not bound-only).
-    return initialItems.filter((item) => landingMatchesCatalogCity(item.slug, citySlug, { events: item.events }));
+    const base = (() => {
+      if (!citySelected) return initialItems;
+      if (cityScopedItems) return cityScopedItems;
+      // While city catalog loads: show multi+bound landings allowed for this city (not bound-only).
+      return initialItems.filter((item) =>
+        landingMatchesCatalogCity(item.slug, citySlug, { events: item.events }),
+      );
+    })();
+    return filterInSeasonLandings(base);
   }, [cityScopedItems, citySelected, citySlug, initialItems]);
 
   const categoryMeta = categories.length ? categories : undefined;
@@ -227,10 +241,21 @@ export function LandingsCatalogView({
     );
   }, [cityItems, resolvedCategory]);
 
+  const visibleTags = useMemo(
+    () => categoryTags.filter((tag) => categoryItems.some((item) => landingMatchesTag(item, tag.id))),
+    [categoryItems, categoryTags],
+  );
+
   const items = useMemo(
     () => filterPodborkiByTag(categoryItems, activeTag),
     [activeTag, categoryItems],
   );
+
+  useEffect(() => {
+    if (activeTag && !visibleTags.some((tag) => tag.id === activeTag)) {
+      setActiveTag(null);
+    }
+  }, [activeTag, visibleTags]);
 
   // Hero roles always come from the full city catalog so «В тренде» stays 3-5
   // even when a narrow tab (e.g. Сезонное) is selected. Grid still follows tab+tag.
@@ -254,6 +279,26 @@ export function LandingsCatalogView({
   const toggleTag = (id: PodborkiTagId) => {
     setActiveTag((prev) => (prev === id ? null : id));
   };
+
+  if (cityBootstrapPending) {
+    return (
+      <div className="container-page py-10 sm:py-14" aria-busy="true" aria-label="Загрузка подборок">
+        <div className="h-48 animate-pulse rounded-3xl bg-slate-200/80" />
+      </div>
+    );
+  }
+
+  if (needsCityGate) {
+    return (
+      <div className="container-page py-8 sm:py-10">
+        <CatalogCityGate
+          dataAttr="podborki"
+          title="Выберите город"
+          subtitle="Покажем готовые подборки и билеты только для вашего города - без мешанины из других регионов."
+        />
+      </div>
+    );
+  }
 
   return (
     <>
@@ -324,12 +369,12 @@ export function LandingsCatalogView({
               })}
             </ScrollRail>
 
-            {categoryTags.length ? (
+            {visibleTags.length ? (
               <ScrollRail
                 viewportClassName="flex flex-nowrap gap-2 pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
                 aria-label="Фильтры подборки"
               >
-                {categoryTags.map((tag) => {
+                {visibleTags.map((tag) => {
                   const active = activeTag === tag.id;
                   return (
                     <button

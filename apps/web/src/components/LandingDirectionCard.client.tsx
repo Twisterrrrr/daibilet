@@ -201,17 +201,16 @@ export function LandingDirectionCard({
   }
 
   const coverHeight = featured
-    ? 'min-h-[11.5rem] sm:min-h-[13rem]'
-    : 'min-h-[10rem] sm:min-h-[11.5rem]';
+    ? 'min-h-[13rem] sm:min-h-[15rem]'
+    : 'min-h-[9.5rem] sm:min-h-[11rem]';
 
   return (
     <Link
       href={href}
-      className="group flex h-full flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-900/8 transition duration-300 hover:-translate-y-0.5 hover:shadow-md"
+      className="group mb-0 flex w-full flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-900/8 transition duration-300 hover:-translate-y-0.5 hover:shadow-md"
     >
-      {/* flex-1: лишняя высота bento-ряда уходит в фото, не в белый хвост под meta */}
       <div
-        className={`relative flex flex-1 ${coverHeight} flex-col justify-end overflow-hidden bg-slate-900`}
+        className={`relative flex ${coverHeight} flex-col justify-end overflow-hidden bg-slate-900`}
       >
         {imageUrl ? (
           <SafeImage

@@ -2,12 +2,14 @@
  * Podborki editorial hero roles.
  * Prefer Landing.layoutVariant from DB when catalog exposes it; else slug allowlist + events fallback.
  */
+import { isLandingOffSeason } from '@/lib/landing-season';
+
 export const PODBORKI_HERO_FEATURED = 'HERO_FEATURED' as const;
 export const PODBORKI_HERO_TRENDING = 'HERO_TRENDING' as const;
 
 /**
  * Season / city pins beat DB HERO_FEATURED and national defaults.
- * Moscow City Day must win over river-cruises / museums when present in the catalog.
+ * Moscow City Day must win over river-cruises / museums when present and in season.
  */
 export const PODBORKI_SEASON_FEATURED_SLUGS = ['moscow-city-day'] as const;
 
@@ -34,11 +36,14 @@ export type PodborkiHeroItem = {
   layoutVariant?: string | null;
 };
 
-export function pickPodborkiFeatured(items: PodborkiHeroItem[]): PodborkiHeroItem | null {
+function isSeasonFeaturedPin(slug: string, now = new Date()): boolean {
+  if (!(PODBORKI_SEASON_FEATURED_SLUGS as readonly string[]).includes(slug)) return false;
+  return !isLandingOffSeason(slug, now);
+}
+
+export function pickPodborkiFeatured(items: PodborkiHeroItem[], now = new Date()): PodborkiHeroItem | null {
   if (!items.length) return null;
-  const seasonPin = items.find((item) =>
-    (PODBORKI_SEASON_FEATURED_SLUGS as readonly string[]).includes(item.slug),
-  );
+  const seasonPin = items.find((item) => isSeasonFeaturedPin(item.slug, now));
   if (seasonPin) return seasonPin;
   const flagged = items.find(
     (item) =>
@@ -56,7 +61,12 @@ export function pickPodborkiFeatured(items: PodborkiHeroItem[]): PodborkiHeroIte
   );
 }
 
-export function pickPodborkiTrending(items: PodborkiHeroItem[], featuredSlug?: string | null, limit = 5): PodborkiHeroItem[] {
+export function pickPodborkiTrending(
+  items: PodborkiHeroItem[],
+  featuredSlug?: string | null,
+  limit = 5,
+  now = new Date(),
+): PodborkiHeroItem[] {
   const rest = items.filter((item) => item.slug !== featuredSlug);
   const flagged = rest.filter((item) => item.layoutVariant === PODBORKI_HERO_TRENDING);
   if (flagged.length) return flagged.slice(0, limit);
@@ -64,8 +74,8 @@ export function pickPodborkiTrending(items: PodborkiHeroItem[], featuredSlug?: s
   if (bySlug.length) {
     return [...bySlug]
       .sort((a, b) => {
-        const aPin = (PODBORKI_SEASON_FEATURED_SLUGS as readonly string[]).includes(a.slug) ? 0 : 1;
-        const bPin = (PODBORKI_SEASON_FEATURED_SLUGS as readonly string[]).includes(b.slug) ? 0 : 1;
+        const aPin = isSeasonFeaturedPin(a.slug, now) ? 0 : 1;
+        const bPin = isSeasonFeaturedPin(b.slug, now) ? 0 : 1;
         if (aPin !== bPin) return aPin - bPin;
         return b.events - a.events;
       })

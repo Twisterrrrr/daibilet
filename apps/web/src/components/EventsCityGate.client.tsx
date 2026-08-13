@@ -22,9 +22,17 @@ function chipLabel(city: PublicDestinationDto): string {
 }
 
 /**
- * Hard geo gate for /events: no mixed national feed until the user picks a city.
+ * Hard city gate for catalog surfaces (/events, /podborki).
  */
-export function EventsCityGate() {
+export function CatalogCityGate({
+  title = 'Выберите город',
+  subtitle = 'Покажем актуальные варианты только для вашего города - без мешанины из других регионов.',
+  dataAttr = 'catalog-city-gate',
+}: {
+  title?: string;
+  subtitle?: string;
+  dataAttr?: string;
+}) {
   const selectedCity = useSelectedCityOptional();
   const cities = selectedCity?.destinations || [];
 
@@ -39,7 +47,7 @@ export function EventsCityGate() {
   return (
     <section
       className="relative overflow-hidden rounded-3xl border border-slate-200/90 bg-gradient-to-b from-primary-50/90 via-white to-slate-50/60 px-5 py-8 sm:px-8 sm:py-11"
-      data-events-city-gate="1"
+      data-catalog-city-gate={dataAttr}
     >
       <div
         className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-primary-100/60 blur-3xl"
@@ -50,10 +58,10 @@ export function EventsCityGate() {
           <MapPin className="h-7 w-7" strokeWidth={1.75} aria-hidden />
         </div>
         <h2 className="mt-4 font-display text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
-          Выберите город
+          {title}
         </h2>
         <p className="mt-2 max-w-md text-sm leading-relaxed text-slate-600 sm:text-[0.95rem]">
-          Покажем актуальную афишу и билеты только для вашего города - без мешанины из других регионов.
+          {subtitle}
         </p>
 
         <div className="mt-6 w-full max-w-md text-left">
@@ -94,5 +102,16 @@ export function EventsCityGate() {
         ) : null}
       </div>
     </section>
+  );
+}
+
+/** @deprecated Prefer CatalogCityGate; kept for existing /events imports. */
+export function EventsCityGate() {
+  return (
+    <CatalogCityGate
+      dataAttr="events"
+      title="Выберите город"
+      subtitle="Покажем актуальную афишу и билеты только для вашего города - без мешанины из других регионов."
+    />
   );
 }

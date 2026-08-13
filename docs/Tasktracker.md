@@ -1,3 +1,13 @@
+## Podborki UX package 1-5 (2026-08-14)
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| UX.POD-GEO-GATE | `/podborki`: жёсткий city gate без national mix | Высокий | ✅ 2026-08-14 code; deploy batch |
+| UX.POD-OFF-SEASON | Calendar OFF_SEASON + unpin city-day вне сезона | Высокий | ✅ 2026-08-14 code; deploy batch |
+| UX.POD-COVERS | Уникальные covers city-day / exhibitions / theatres | Высокий | ✅ 2026-08-14 code; deploy batch |
+| UX.POD-SOFT-TAGS | Скрыть soft-tags с 0 hits | Средний | ✅ 2026-08-14 code; deploy batch |
+| UX.POD-MASONRY | CSS columns masonry сетка карточек | Средний | ✅ 2026-08-14 code; deploy batch |
+
 ## Places hub: region settlement + Bashkortostan genitive (2026-08-13)
 
 | ID | Задача | Приоритет | Статус |
@@ -656,7 +666,7 @@ Alias `museum-1` = первый open-date контракт (не «музеи fo
 | FIX.CITYDAY-PRICE | Landing rows: min as fixed price → `formatMoneyRange` (мин-макс / `от`) | Высокий | ✅ `be2f075`/`c8f43ae`; MSK BUILD_ID=`LV0jzT3jaueTAOmX202ic`; landing range+ot smoke OK |
 | UX.POD1 | `/podborki`: category jump chips + SEO «Развернуть» + lazy cards + count/priceFrom | Высокий | ✅ `7535f02` live **`BCWcAIglYC8cAP-6Zgr4k`** |
 | UX.POD-BENTO | `/podborki`: Bento grid + mood filters + rich cards (photo/gradient) + badges + popular rail | Высокий | ✅ code commit; deploy пачкой / по запросу |
-| UX.POD2 | `/podborki` masonry / view counters / purchase carousel / infinite scroll | Средний | ⚠️ deferred (bento закрывает часть masonry) |
+| UX.POD2 | `/podborki` masonry / view counters / purchase carousel / infinite scroll | Средний | 🔄 masonry ✅ (CSS columns); counters/carousel/infinite ещё deferred |
 | UX.LAND2 | Tabular landings: clearer rows, timeslot chips, sticky filters, `?type=` | Высокий | ✅ `eae17f4` live **`BCWcAIglYC8cAP-6Zgr4k`** |
 | UX.LAND2b | Invent new differentiator DTO badge fields | Низкий | ⚠️ deferred (reuse deriveLandingCardBadges / bridges heuristics) |
 | UX.BLOG3 | Blog hub chips river/tours + article reading progress | Высокий | ✅ `eae17f4` live **`BCWcAIglYC8cAP-6Zgr4k`** |

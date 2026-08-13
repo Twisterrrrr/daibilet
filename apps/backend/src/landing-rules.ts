@@ -557,7 +557,46 @@ export const LANDING_SLUG_ALIASES: Record<string, string[]> = {
 };
 
 /** Seasonally off landings: keep page, hide from /podborki and promo hub. */
-export const OFF_SEASON_LANDING_SLUGS = new Set<string>(['salute-9-may']);
+export function isLandingOffSeason(slug: string, now = new Date()): boolean {
+  const key = String(slug || '')
+    .trim()
+    .toLowerCase()
+    .replace(/_/g, '-');
+  // Prefer Europe/Moscow calendar for RU seasonal landings.
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Europe/Moscow',
+    month: 'numeric',
+    day: 'numeric',
+  }).formatToParts(now);
+  const month = Number(parts.find((part) => part.type === 'month')?.value || 0);
+  const day = Number(parts.find((part) => part.type === 'day')?.value || 0);
+
+  if (key === 'salute-9-may') {
+    // Апрель - середина мая.
+    return !(month === 4 || (month === 5 && day <= 15));
+  }
+  if (key === 'moscow-city-day') {
+    // Август - сентябрь (День города Москвы).
+    return !(month === 8 || month === 9);
+  }
+  if (key === 'new-year') {
+    // Середина ноября - середина января.
+    if (month === 11 && day >= 15) return false;
+    if (month === 12) return false;
+    if (month === 1 && day <= 15) return false;
+    return true;
+  }
+  return false;
+}
+
+export function buildOffSeasonLandingSlugs(now = new Date()): Set<string> {
+  return new Set(
+    ['salute-9-may', 'moscow-city-day', 'new-year'].filter((slug) => isLandingOffSeason(slug, now)),
+  );
+}
+
+/** @deprecated Prefer buildOffSeasonLandingSlugs() - snapshot at module load. */
+export const OFF_SEASON_LANDING_SLUGS = buildOffSeasonLandingSlugs();
 
 export function resolveLandingRuleBySlug(landingSlug: string): LandingRule | undefined {
   const key = String(landingSlug || '').trim().toLowerCase().replace(/_/g, '-');

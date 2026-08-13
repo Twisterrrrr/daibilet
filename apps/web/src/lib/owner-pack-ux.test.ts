@@ -151,6 +151,18 @@ test('podborkiBentoSpan: river/city-day wide, standup narrow', () => {
   assert.equal(podborkiBentoSpan({ slug: 'new-year', categorySlug: 'seasonal' }), 2);
 });
 
+test('pickPodborkiFeatured skips moscow-city-day off season', () => {
+  const items = [
+    { slug: 'moscow-museums', title: 'Музеи', events: 61, layoutVariant: 'HERO_FEATURED' },
+    { slug: 'river-cruises', title: 'Речные', events: 80 },
+    { slug: 'moscow-city-day', title: 'День города в Москве', events: 11 },
+  ];
+  const midWinter = new Date('2026-02-10T12:00:00+03:00');
+  assert.equal(pickPodborkiFeatured(items, midWinter)?.slug, 'river-cruises');
+  const midAugust = new Date('2026-08-14T12:00:00+03:00');
+  assert.equal(pickPodborkiFeatured(items, midAugust)?.slug, 'moscow-city-day');
+});
+
 test('landingMatchesMood: romantic / kids / budget heuristics', () => {
   assert.equal(landingMatchesMood({ slug: 'river-cruises', title: 'Речные' }, 'romantic'), true);
   assert.equal(landingMatchesMood({ slug: 'standup', title: 'Стендап' }, 'romantic'), false);

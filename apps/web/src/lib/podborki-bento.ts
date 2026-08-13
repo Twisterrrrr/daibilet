@@ -59,13 +59,12 @@ export function podborkiBentoSpan(item: PodborkiBentoItem): PodborkiBentoSpan {
 }
 
 export function podborkiBentoCellClass(span: PodborkiBentoSpan): string {
-  // h-full: карточка заполняет ячейку; meta прилипает к низу через mt-auto в LandingDirectionCard
-  if (span === 2) {
-    return 'col-span-1 row-span-1 h-full md:col-span-2';
-  }
-  return 'col-span-1 row-span-1 h-full';
+  // Masonry column item; featured keeps taller card via LandingDirectionCard `featured`.
+  return span === 2
+    ? 'mb-3 break-inside-avoid sm:mb-4'
+    : 'mb-3 break-inside-avoid sm:mb-4';
 }
 
-/** Tailwind grid shell for bento sections (home + /podborki). */
+/** CSS-columns masonry for /podborki catalog grid. */
 export const PODBORKI_BENTO_GRID_CLASS =
-  'grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4 lg:grid-cols-4 auto-rows-fr';
+  'm-0 columns-1 gap-3 sm:columns-2 sm:gap-4 lg:columns-3 [column-fill:_balance] list-none p-0';

@@ -1,3 +1,20 @@
+## 2026-08-14 - /podborki: geo + сезон + covers + tags + masonry
+
+### Наблюдения
+- Owner: «1-2-3-4-5, можно masonry» по ROI-пакету `/podborki` (geo, OFF_SEASON, covers, soft-tags, сетка).
+
+### Решения
+- Жёсткий `CatalogCityGate` на хабе без города (как `/events`).
+- Календарный OFF_SEASON: `salute-9-may` / `moscow-city-day` / `new-year` (MSK); pin city-day только в сезон; dto фильтрует через `buildOffSeasonLandingSlugs()`.
+- Уникальные covers: city-day / exhibitions / unusual-theatres.
+- Soft-tags с 0 hits скрыты.
+- Сетка: CSS columns masonry вместо 4-col bento.
+
+### Проблемы
+- JPG covers ~2MB без compress-pass. Live после «выкатывай».
+
+---
+
 ## 2026-08-14 - /cities A-C + My Day /m/{slug} (D)
 
 ### Наблюдения
