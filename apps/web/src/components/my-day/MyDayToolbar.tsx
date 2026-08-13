@@ -61,8 +61,9 @@ type MyDayToolbarProps = {
 };
 
 /**
- * Lovable sticky route summary card (mobile screenshot parity):
- * stats → mode pill → optimize/hours/trash → PDF / save.
+ * Lovable sticky route summary: stats, then mode+optimize+hours+trash
+ * wrapping with export. Narrow: export under a divider. Wide (container
+ * ~36rem or lg viewport): one wrapping row, like daibilet-planner.
  */
 export function MyDayToolbar({
   stopsCount,
@@ -106,7 +107,7 @@ export function MyDayToolbar({
         aria-label="Управление маршрутом"
         aria-orientation="horizontal"
         data-my-day-toolbar="1"
-        className="sticky top-[calc(var(--site-header-height)+0.35rem)] z-20 rounded-2xl border border-slate-200/90 bg-white/95 p-4 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/90 sm:p-5 lg:top-[calc(var(--site-header-height)+0.5rem)]"
+        className="sticky top-[calc(var(--site-header-height)+0.35rem)] z-20 [container-type:inline-size] rounded-2xl border border-slate-200/90 bg-white/95 p-4 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/90 sm:p-5 lg:top-[calc(var(--site-header-height)+0.5rem)]"
       >
         {/* 1-2. Stats */}
         <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-sm">
@@ -135,150 +136,155 @@ export function MyDayToolbar({
             </span>
           ) : null}
           {totalWithStopsLabel ? (
-            <span className="inline-flex w-full items-center gap-2 text-slate-600 sm:w-auto">
+            <span className="inline-flex items-center gap-2 text-slate-600">
               <Clock className="h-4 w-4 shrink-0" aria-hidden />
               {totalWithStopsLabel} с учётом остановок
             </span>
           ) : null}
         </div>
 
-        {/* 3. Mode pill */}
-        <div className="mt-4" data-my-day-toolbar-mode>
+        {/* Mode + optimize + hours + trash | export. Lovable: flex-col, lg:flex-row wrap.
+            Also container 36rem so a wide list column (map collapsed / desktop) joins
+            even when the viewport is not lg. */}
+        <div
+          className="mt-4 flex flex-col gap-2 [@container_(min-width:36rem)]:flex-row [@container_(min-width:36rem)]:flex-wrap [@container_(min-width:36rem)]:items-center [@container_(min-width:36rem)]:gap-x-3 lg:flex-row lg:flex-wrap lg:items-center lg:gap-x-3"
+          data-my-day-toolbar-controls
+        >
           <div
-            className="inline-flex rounded-full border border-slate-200 p-0.5"
+            className="flex flex-wrap items-center gap-2"
+            data-my-day-toolbar-mode
+            data-my-day-toolbar-actions
+          >
+            <div
+              className="inline-flex rounded-full border border-slate-200 p-0.5"
+              role="group"
+              aria-label="Способ передвижения"
+              data-day-travel-mode
+            >
+              <button
+                type="button"
+                onClick={() => onTravelModeChange('walk')}
+                aria-pressed={travelMode === 'walk'}
+                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold transition ${
+                  travelMode === 'walk'
+                    ? 'bg-primary-600 text-white'
+                    : 'text-slate-500 hover:bg-slate-50'
+                }`}
+              >
+                <Footprints className="h-4 w-4 shrink-0" aria-hidden />
+                Пешком
+              </button>
+              <button
+                type="button"
+                onClick={() => onTravelModeChange('auto')}
+                aria-pressed={travelMode === 'auto'}
+                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold transition ${
+                  travelMode === 'auto'
+                    ? 'bg-primary-600 text-white'
+                    : 'text-slate-500 hover:bg-slate-50'
+                }`}
+              >
+                <Car className="h-4 w-4 shrink-0" aria-hidden />
+                На авто
+              </button>
+            </div>
+
+            <button
+              type="button"
+              onClick={onOptimize}
+              disabled={!canOptimize}
+              data-day-map-optimize
+              className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-40 sm:gap-2 sm:px-4 sm:py-2 sm:text-sm"
+            >
+              <Wand2 className="h-4 w-4 shrink-0" aria-hidden />
+              Оптимизировать
+            </button>
+
+            {canHourPlan ? (
+              <button
+                type="button"
+                onClick={() => {
+                  if (hourPlanOn) onToggleHourPlan();
+                  else onOpenHourSheet();
+                }}
+                aria-pressed={hourPlanOn}
+                data-day-hour-plan
+                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition sm:gap-2 sm:px-4 sm:py-2 sm:text-sm ${
+                  hourPlanOn
+                    ? 'bg-sky-600 text-white hover:bg-sky-700'
+                    : 'border border-slate-200 text-slate-700 hover:bg-slate-50'
+                }`}
+              >
+                <Sparkles className="h-4 w-4 shrink-0" aria-hidden />
+                По часам
+              </button>
+            ) : null}
+
+            {hourPlanOn && onHourStartChange && onHourEndChange ? (
+              <>
+                <label className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm">
+                  <span className="text-slate-500">Старт</span>
+                  <input
+                    type="time"
+                    value={hourStart || '10:00'}
+                    onChange={(e) => onHourStartChange(e.target.value)}
+                    className="bg-transparent font-semibold text-slate-800 outline-none"
+                  />
+                </label>
+                <label className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm">
+                  <span className="text-slate-500">Финиш</span>
+                  <input
+                    type="time"
+                    value={hourEnd || '22:00'}
+                    onChange={(e) => onHourEndChange(e.target.value)}
+                    className="bg-transparent font-semibold text-slate-800 outline-none"
+                  />
+                </label>
+              </>
+            ) : null}
+
+            <button
+              type="button"
+              onClick={onClear}
+              disabled={stopsCount <= 0}
+              title="Очистить маршрут"
+              aria-label="Очистить маршрут"
+              data-day-clear
+              className="inline-flex items-center justify-center rounded-full border border-slate-200 p-2 text-slate-500 transition hover:bg-slate-50 disabled:opacity-40"
+            >
+              <Trash2 className="h-4 w-4" aria-hidden />
+            </button>
+          </div>
+
+          <div
+            className="flex flex-wrap items-center gap-2 border-t border-slate-200 pt-3 [@container_(min-width:36rem)]:border-t-0 [@container_(min-width:36rem)]:pt-0 lg:border-t-0 lg:pt-0"
             role="group"
-            aria-label="Способ передвижения"
-            data-day-travel-mode
+            aria-label="Экспорт маршрута"
+            data-my-day-toolbar-export
           >
             <button
               type="button"
-              onClick={() => onTravelModeChange('walk')}
-              aria-pressed={travelMode === 'walk'}
-              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold transition ${
-                travelMode === 'walk'
-                  ? 'bg-primary-600 text-white'
-                  : 'text-slate-500 hover:bg-slate-50'
-              }`}
+              onClick={onPrintPdf}
+              disabled={stopsCount <= 0 || printPdfBusy}
+              data-day-print
+              className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-40"
             >
-              <Footprints className="h-4 w-4 shrink-0" aria-hidden />
-              Пешком
+              <FileDown className="h-3.5 w-3.5 shrink-0" aria-hidden />
+              <span>{printPdfBusy ? 'Готовим PDF…' : printPdfLabel}</span>
             </button>
-            <button
-              type="button"
-              onClick={() => onTravelModeChange('auto')}
-              aria-pressed={travelMode === 'auto'}
-              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold transition ${
-                travelMode === 'auto'
-                  ? 'bg-primary-600 text-white'
-                  : 'text-slate-500 hover:bg-slate-50'
-              }`}
-            >
-              <Car className="h-4 w-4 shrink-0" aria-hidden />
-              На авто
-            </button>
+            {onSaveScenario ? (
+              <button
+                type="button"
+                onClick={onSaveScenario}
+                disabled={stopsCount <= 0 || saveScenarioBusy}
+                data-day-save-scenario
+                className="inline-flex items-center gap-1.5 rounded-full border border-primary-300/70 bg-primary-50/60 px-3 py-1.5 text-xs font-semibold text-primary-700 transition hover:bg-primary-50 disabled:opacity-40"
+              >
+                <Save className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                <span>Сохранить сценарий</span>
+              </button>
+            ) : null}
           </div>
-        </div>
-
-        {/* 4. Optimize | Hours | Trash */}
-        <div
-          className="mt-3 flex flex-nowrap items-center gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-          data-my-day-toolbar-actions
-        >
-          <button
-            type="button"
-            onClick={onOptimize}
-            disabled={!canOptimize}
-            data-day-map-optimize
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-40 sm:gap-2 sm:px-4 sm:py-2 sm:text-sm"
-          >
-            <Wand2 className="h-4 w-4 shrink-0" aria-hidden />
-            Оптимизировать
-          </button>
-
-          {canHourPlan ? (
-            <button
-              type="button"
-              onClick={() => {
-                if (hourPlanOn) onToggleHourPlan();
-                else onOpenHourSheet();
-              }}
-              aria-pressed={hourPlanOn}
-              data-day-hour-plan
-              className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition sm:gap-2 sm:px-4 sm:py-2 sm:text-sm ${
-                hourPlanOn
-                  ? 'bg-sky-600 text-white hover:bg-sky-700'
-                  : 'border border-slate-200 text-slate-700 hover:bg-slate-50'
-              }`}
-            >
-              <Sparkles className="h-4 w-4 shrink-0" aria-hidden />
-              По часам
-            </button>
-          ) : null}
-
-          <button
-            type="button"
-            onClick={onClear}
-            disabled={stopsCount <= 0}
-            title="Очистить маршрут"
-            aria-label="Очистить маршрут"
-            data-day-clear
-            className="inline-flex shrink-0 items-center justify-center rounded-full border border-slate-200 p-2 text-slate-500 transition hover:bg-slate-50 disabled:opacity-40"
-          >
-            <Trash2 className="h-4 w-4" aria-hidden />
-          </button>
-        </div>
-
-        {hourPlanOn && onHourStartChange && onHourEndChange ? (
-          <div className="mt-2 flex flex-wrap items-center gap-2">
-            <label className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm">
-              <span className="text-slate-500">Старт</span>
-              <input
-                type="time"
-                value={hourStart || '10:00'}
-                onChange={(e) => onHourStartChange(e.target.value)}
-                className="bg-transparent font-semibold text-slate-800 outline-none"
-              />
-            </label>
-            <label className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm">
-              <span className="text-slate-500">Финиш</span>
-              <input
-                type="time"
-                value={hourEnd || '22:00'}
-                onChange={(e) => onHourEndChange(e.target.value)}
-                className="bg-transparent font-semibold text-slate-800 outline-none"
-              />
-            </label>
-          </div>
-        ) : null}
-
-        <div
-          className="mt-3 flex flex-nowrap items-center gap-1.5 overflow-x-auto border-t border-slate-200 pt-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-          role="group"
-          aria-label="Экспорт маршрута"
-          data-my-day-toolbar-export
-        >
-          <button
-            type="button"
-            onClick={onPrintPdf}
-            disabled={stopsCount <= 0 || printPdfBusy}
-            data-day-print
-            className="inline-flex min-w-0 shrink items-center gap-1.5 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-40"
-          >
-            <FileDown className="h-3.5 w-3.5 shrink-0" aria-hidden />
-            <span className="truncate">{printPdfBusy ? 'Готовим PDF…' : printPdfLabel}</span>
-          </button>
-          {onSaveScenario ? (
-            <button
-              type="button"
-              onClick={onSaveScenario}
-              disabled={stopsCount <= 0 || saveScenarioBusy}
-              data-day-save-scenario
-              className="inline-flex min-w-0 shrink items-center gap-1.5 rounded-full border border-primary-300/70 bg-primary-50/60 px-3 py-1.5 text-xs font-semibold text-primary-700 transition hover:bg-primary-50 disabled:opacity-40"
-            >
-              <Save className="h-3.5 w-3.5 shrink-0" aria-hidden />
-              <span className="truncate">Сохранить сценарий</span>
-            </button>
-          ) : null}
         </div>
 
         {scheduleSlot ? <div className="mt-3">{scheduleSlot}</div> : null}
