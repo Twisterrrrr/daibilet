@@ -29,7 +29,36 @@ type CatalogResultsProps = {
   city?: string | null;
   /** Current catalog sort - used for zero-fetch «Сейчас в городе» strip. */
   sort?: string | null;
+  /** Date/category/q/etc. active - keep filter-reset primary, city hubs secondary. */
+  hasExtraFilters?: boolean;
 };
+
+const CATALOG_EMPTY_CITY_HUBS = [
+  { slug: 'saint-petersburg', name: 'Санкт-Петербург' },
+  { slug: 'kazan', name: 'Казань' },
+  { slug: 'sochi', name: 'Сочи' },
+] as const;
+
+function normalizeCityKey(value: string | null | undefined): string {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/ё/g, 'е')
+    .replace(/[\s\-]+/g, ' ');
+}
+
+function isCurrentEmptyHubCity(
+  city: string | null | undefined,
+  hub: (typeof CATALOG_EMPTY_CITY_HUBS)[number],
+): boolean {
+  const key = normalizeCityKey(city);
+  if (!key) return false;
+  if (key === normalizeCityKey(hub.name) || key === hub.slug) return true;
+  if (hub.slug === 'saint-petersburg') {
+    return key.includes('петербург') || key === 'спб' || key === 'питер';
+  }
+  return false;
+}
 
 type CatalogGridEntry =
   | { kind: 'event'; session: PublicCatalogListItemDto }
@@ -91,34 +120,95 @@ export function CatalogResults({
   clearHref = '/events',
   city,
   sort,
+  hasExtraFilters = false,
 }: CatalogResultsProps) {
   if (!items.length) {
+    const cityName = String(city || '').trim();
+    const cityScoped = Boolean(cityName) && cityName.toLowerCase() !== 'all';
+    const hubTiles = cityScoped
+      ? CATALOG_EMPTY_CITY_HUBS.filter((hub) => !isCurrentEmptyHubCity(cityName, hub))
+      : [];
+    const cityEmptyPrimary = cityScoped && !hasExtraFilters;
+
     return (
       <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center sm:p-10">
-        <p className="text-lg font-semibold text-slate-800">Сейчас по этим фильтрам событий нет</p>
-        <p className="mt-2 text-sm leading-6 text-slate-500">
-          Сбросьте поиск или посмотрите ТОП популярных - речные прогулки и подборки города.
-        </p>
-        <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
-          <Link
-            href={clearHref}
-            className="inline-flex h-10 items-center justify-center rounded-xl bg-primary-600 px-4 text-sm font-semibold text-white hover:bg-primary-700"
-          >
-            Сбросить фильтры
-          </Link>
-          <Link
-            href="/rechnye-progulki"
-            className="inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 hover:border-primary-300 hover:text-primary-700"
-          >
-            Речные прогулки
-          </Link>
-          <Link
-            href="/podborki"
-            className="inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 hover:border-primary-300 hover:text-primary-700"
-          >
-            Подборки
-          </Link>
-        </div>
+        {cityEmptyPrimary ? (
+          <>
+            <p className="text-lg font-semibold text-slate-800">
+              В г. {cityName} сейчас нет активных событий. Посмотреть афишу в других городах?
+            </p>
+            {hubTiles.length ? (
+              <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                {hubTiles.map((hub) => (
+                  <Link
+                    key={hub.slug}
+                    href={`/cities/${hub.slug}`}
+                    className="inline-flex min-h-[3.25rem] items-center justify-center rounded-2xl bg-primary-600 px-4 text-base font-semibold text-white transition hover:bg-primary-700"
+                  >
+                    {hub.name}
+                  </Link>
+                ))}
+              </div>
+            ) : null}
+            <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+              <Link
+                href={clearHref}
+                className="inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 hover:border-primary-300 hover:text-primary-700"
+              >
+                Сбросить фильтры
+              </Link>
+              <Link
+                href="/podborki"
+                className="inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 hover:border-primary-300 hover:text-primary-700"
+              >
+                Подборки
+              </Link>
+            </div>
+          </>
+        ) : (
+          <>
+            <p className="text-lg font-semibold text-slate-800">Сейчас по этим фильтрам событий нет</p>
+            <p className="mt-2 text-sm leading-6 text-slate-500">
+              Сбросьте поиск или посмотрите ТОП популярных - речные прогулки и подборки города.
+            </p>
+            <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+              <Link
+                href={clearHref}
+                className="inline-flex h-10 items-center justify-center rounded-xl bg-primary-600 px-4 text-sm font-semibold text-white hover:bg-primary-700"
+              >
+                Сбросить фильтры
+              </Link>
+              <Link
+                href="/rechnye-progulki"
+                className="inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 hover:border-primary-300 hover:text-primary-700"
+              >
+                Речные прогулки
+              </Link>
+              <Link
+                href="/podborki"
+                className="inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 hover:border-primary-300 hover:text-primary-700"
+              >
+                Подборки
+              </Link>
+            </div>
+            {cityScoped && hubTiles.length ? (
+              <div className="mt-6">
+                <p className="text-sm font-medium text-slate-600">Или афиша других городов:</p>
+                <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
+                  {hubTiles.map((hub) => (
+                    <Link
+                      key={hub.slug}
+                      href={`/cities/${hub.slug}`}
+                      className="inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 hover:border-primary-300 hover:text-primary-700"
+                    >
+                      {hub.name}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+          </>
+        )}
       </div>
     );
   }

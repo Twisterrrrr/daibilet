@@ -6,6 +6,7 @@ import { Calendar, ChevronRight, Clock, MapPin, Percent, Shield, Train, Users } 
 
 import type { PublicEventPageDto } from '@daibilet/contracts/public';
 import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
+import { EventPageCitySync } from '@/components/EventPageCitySync.client';
 import { EventRatingBadge } from '@/components/EventPdpChrome.client';
 import {
   extractTcEventIdFromSession,
@@ -517,6 +518,7 @@ export function EventHero({
   aggregate?: { ratingValue: number; reviewCount: number } | null;
 }) {
   const { event, stats } = payload;
+  // Header follows event city (page context beats global filter).
   const ageLimit = formatAgeLimit(event.ageLimit);
   const durationLabel = extractDurationLabel(event.tags);
   const priceRange = getTicketPriceRange(payload);
@@ -558,6 +560,7 @@ export function EventHero({
           : 'min-h-[min(42vh,20rem)] sm:min-h-80 lg:min-h-[420px]'
       }`}
     >
+      <EventPageCitySync city={event.city} />
       <SafeImage
         src={heroImage || null}
         alt={event.title}

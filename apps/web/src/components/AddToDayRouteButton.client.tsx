@@ -3,7 +3,15 @@
 import { useLayoutEffect, useState } from 'react';
 import { Check, Route } from 'lucide-react';
 
+import { CityConfirmModal } from '@/components/CityConfirmModal.client';
+import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { useDayRouteState } from '@/hooks/useDayRouteState';
+import {
+  applyClearDayRouteForCityChange,
+  buildAddForeignCityConfirmMessage,
+  dayRouteConflictsWithIncomingCity,
+  resolveDayRouteCityLabel,
+} from '@/lib/day-route-city-change';
 import { flashDayRouteFeedback } from '@/lib/day-route-feedback';
 import {
   DAY_ROUTE_MAX,
@@ -48,6 +56,12 @@ export function AddToDayRouteButton({
   // SSR HTML used to paint an enabled <button> before hydration; clicks silently no-op'd
   // (owner: second point never appears after fast nav). Keep disabled until client is live.
   const [live, setLive] = useState(false);
+  const [foreignCityPrompt, setForeignCityPrompt] = useState<{
+    payload: DayRouteVenueItem;
+    routeCity: string;
+    incomingCity: string;
+  } | null>(null);
+  const selectedCity = useSelectedCityOptional();
   useLayoutEffect(() => {
     setLive(true);
   }, []);
@@ -109,6 +123,31 @@ export function AddToDayRouteButton({
     flashDayRouteFeedback('Не удалось добавить точку');
   }
 
+  function addPayload(payload: DayRouteVenueItem) {
+    const beforeCount = readDayRouteFresh().venues.length;
+    addToDayRoute(payload);
+    feedbackAfter(beforeCount, payload);
+  }
+
+  function clearAddAndSyncCity(payload: DayRouteVenueItem) {
+    applyClearDayRouteForCityChange();
+    addPayload(payload);
+    const cityName = String(payload.city || '').trim();
+    if (cityName && selectedCity) {
+      void selectedCity.setCity(cityName, { skipRouteConfirm: true, persistOnly: true });
+    }
+  }
+
+  /** Returns false when a foreign-city modal was opened (caller must stop). */
+  function guardForeignCityOrOpen(payload: DayRouteVenueItem): boolean {
+    const before = readDayRouteFresh();
+    if (!dayRouteConflictsWithIncomingCity(before.venues, payload)) return true;
+    const routeCity = resolveDayRouteCityLabel(before.venues) || 'другого города';
+    const incomingCity = String(payload.city || '').trim() || 'новый город';
+    setForeignCityPrompt({ payload, routeCity, incomingCity });
+    return false;
+  }
+
   function applyToggle() {
     if (!live) {
       flashDayRouteFeedback('Секунду, загружается…');
@@ -131,12 +170,16 @@ export function AddToDayRouteButton({
           (existing.startsAt || null) === (payload.startsAt || null);
         if (sameEventMeta) {
           removeFromDayRoute(existing.id);
-        } else {
-          addToDayRoute(payload);
+          feedbackAfter(beforeCount, payload);
+          return;
         }
-      } else {
+        if (!guardForeignCityOrOpen(payload)) return;
         addToDayRoute(payload);
+        feedbackAfter(beforeCount, payload);
+        return;
       }
+      if (!guardForeignCityOrOpen(payload)) return;
+      addToDayRoute(payload);
       feedbackAfter(beforeCount, payload);
       return;
     }
@@ -155,55 +198,81 @@ export function AddToDayRouteButton({
         flashDayRouteFeedback(dayRouteHardLimitMessage());
         return;
       }
+      if (!guardForeignCityOrOpen(payload)) return;
       addToDayRoute(payload);
       feedbackAfter(beforeCount, payload);
       return;
     }
 
+    if (active) {
+      toggleDayRoute(payload);
+      feedbackAfter(beforeCount, payload);
+      return;
+    }
+    if (!guardForeignCityOrOpen(payload)) return;
     toggleDayRoute(payload);
     feedbackAfter(beforeCount, payload);
   }
 
   return (
-    <button
-      type="button"
-      disabled={!live || !venueKey || (full && !active)}
-      title={
-        !live
-          ? 'Секунду…'
-          : !venueKey
-            ? 'Нельзя добавить: нет id точки'
-            : full && !active
-              ? dayRouteHardLimitMessage()
-              : active
-                ? compact
-                  ? 'Уже в маршруте (убрать можно в Мой день)'
-                  : activeTitle
-                : isDayRouteAtSoft(route.venues.length) && !active
-                  ? DAY_ROUTE_SOFT_WARN
-                  : idleTitle
-      }
-      aria-pressed={active}
-      aria-label={active ? (iconOnly ? activeAria : compact ? 'Уже в маршруте дня' : activeAria) : idleAria}
-      data-venue-id={venueKey || undefined}
-      data-day-route-intent={intent}
-      data-day-route-live={live ? '1' : '0'}
-      onPointerDown={(event) => {
-        // Stop bubble to parent <Link>; do NOT preventDefault (kills click on some browsers).
-        event.stopPropagation();
-      }}
-      onClick={(event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        applyToggle();
-      }}
-      className={`inline-flex min-h-10 min-w-[2.75rem] items-center justify-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${
-        iconOnly ? '!min-w-8 !px-2' : ''
-      } ${base} ${className}`}
-    >
-      {active ? <Check className="h-3.5 w-3.5 shrink-0" /> : <Route className="h-3.5 w-3.5 shrink-0" />}
-      {iconOnly ? <span className="sr-only">{label}</span> : <span>{label}</span>}
-    </button>
+    <>
+      <button
+        type="button"
+        disabled={!live || !venueKey || (full && !active)}
+        title={
+          !live
+            ? 'Секунду…'
+            : !venueKey
+              ? 'Нельзя добавить: нет id точки'
+              : full && !active
+                ? dayRouteHardLimitMessage()
+                : active
+                  ? compact
+                    ? 'Уже в маршруте (убрать можно в Мой день)'
+                    : activeTitle
+                  : isDayRouteAtSoft(route.venues.length) && !active
+                    ? DAY_ROUTE_SOFT_WARN
+                    : idleTitle
+        }
+        aria-pressed={active}
+        aria-label={active ? (iconOnly ? activeAria : compact ? 'Уже в маршруте дня' : activeAria) : idleAria}
+        data-venue-id={venueKey || undefined}
+        data-day-route-intent={intent}
+        data-day-route-live={live ? '1' : '0'}
+        onPointerDown={(event) => {
+          // Stop bubble to parent <Link>; do NOT preventDefault (kills click on some browsers).
+          event.stopPropagation();
+        }}
+        onClick={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          applyToggle();
+        }}
+        className={`inline-flex min-h-10 min-w-[2.75rem] items-center justify-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${
+          iconOnly ? '!min-w-8 !px-2' : ''
+        } ${base} ${className}`}
+      >
+        {active ? <Check className="h-3.5 w-3.5 shrink-0" /> : <Route className="h-3.5 w-3.5 shrink-0" />}
+        {iconOnly ? <span className="sr-only">{label}</span> : <span>{label}</span>}
+      </button>
+      <CityConfirmModal
+        open={Boolean(foreignCityPrompt)}
+        title="Другой город"
+        message={
+          foreignCityPrompt
+            ? buildAddForeignCityConfirmMessage(foreignCityPrompt.routeCity, foreignCityPrompt.incomingCity)
+            : ''
+        }
+        confirmLabel="Очистить и добавить"
+        cancelLabel="Не добавлять"
+        onConfirm={() => {
+          const pending = foreignCityPrompt;
+          setForeignCityPrompt(null);
+          if (pending) clearAddAndSyncCity(pending.payload);
+        }}
+        onCancel={() => setForeignCityPrompt(null)}
+      />
+    </>
   );
 }
 
@@ -222,6 +291,12 @@ export function AddManyToDayRouteButton({
   compact = false,
 }: ManyProps) {
   const [live, setLive] = useState(false);
+  const [foreignCityPrompt, setForeignCityPrompt] = useState<{
+    payloads: DayRouteVenueItem[];
+    routeCity: string;
+    incomingCity: string;
+  } | null>(null);
+  const selectedCity = useSelectedCityOptional();
   useLayoutEffect(() => {
     setLive(true);
   }, []);
@@ -258,28 +333,11 @@ export function AddManyToDayRouteButton({
 
   const label = allActive ? 'В маршруте' : compact ? 'В маршрут' : 'В мой маршрут';
 
-  function applyBulk() {
-    if (!live) {
-      flashDayRouteFeedback('Секунду, загружается…');
-      return;
-    }
-    if (!payloads.length) {
-      flashDayRouteFeedback('Нельзя добавить: нет точек');
-      return;
-    }
+  function runBulkAdd(list: DayRouteVenueItem[]) {
     const before = readDayRouteFresh();
     const beforeCount = before.venues.length;
-    if (allActive) {
-      flashDayRouteFeedback('Уже в маршруте');
-      return;
-    }
-    if (before.venues.length >= DAY_ROUTE_MAX) {
-      flashDayRouteFeedback(dayRouteHardLimitMessage());
-      return;
-    }
-
     let added = 0;
-    for (const payload of payloads) {
+    for (const payload of list) {
       const current = readDayRouteFresh();
       if (current.venues.some((item) => sameDayRouteVenue(item, payload))) continue;
       if (current.venues.length >= DAY_ROUTE_MAX) break;
@@ -291,9 +349,7 @@ export function AddManyToDayRouteButton({
     const n = after.venues.length;
     if (added > 0) {
       flashDayRouteFeedback(
-        added > 1
-          ? `Добавлено ${added} точек · ${n}`
-          : dayRouteAddSuccessMessage(n),
+        added > 1 ? `Добавлено ${added} точек · ${n}` : dayRouteAddSuccessMessage(n),
       );
       return;
     }
@@ -304,43 +360,98 @@ export function AddManyToDayRouteButton({
     flashDayRouteFeedback('Уже в маршруте');
   }
 
+  function applyBulk() {
+    if (!live) {
+      flashDayRouteFeedback('Секунду, загружается…');
+      return;
+    }
+    if (!payloads.length) {
+      flashDayRouteFeedback('Нельзя добавить: нет точек');
+      return;
+    }
+    if (allActive) {
+      flashDayRouteFeedback('Уже в маршруте');
+      return;
+    }
+    const before = readDayRouteFresh();
+    if (before.venues.length >= DAY_ROUTE_MAX) {
+      flashDayRouteFeedback(dayRouteHardLimitMessage());
+      return;
+    }
+
+    const sample = payloads[0]!;
+    if (dayRouteConflictsWithIncomingCity(before.venues, sample)) {
+      const routeCity = resolveDayRouteCityLabel(before.venues) || 'другого города';
+      const incomingCity = String(sample.city || '').trim() || 'новый город';
+      setForeignCityPrompt({ payloads, routeCity, incomingCity });
+      return;
+    }
+
+    runBulkAdd(payloads);
+  }
+
   return (
-    <button
-      type="button"
-      disabled={!live || !payloads.length || (full && !allActive)}
-      title={
-        !live
-          ? 'Секунду…'
-          : !payloads.length
-            ? 'Нельзя добавить: нет точек'
-            : full && !allActive
-              ? dayRouteHardLimitMessage()
-              : allActive
-                ? 'Уже в маршруте (убрать можно в Мой день)'
-                : isDayRouteAtSoft(route.venues.length) && !allActive
-                  ? DAY_ROUTE_SOFT_WARN
-                  : 'Добавить все точки пригорода в маршрут'
-      }
-      aria-pressed={allActive}
-      aria-label={
-        allActive
-          ? 'Все точки пригорода уже в маршруте дня'
-          : `Добавить все точки пригорода в маршрут (${payloads.length})`
-      }
-      data-day-route-bulk={payloads.length || undefined}
-      data-day-route-live={live ? '1' : '0'}
-      onPointerDown={(event) => {
-        event.stopPropagation();
-      }}
-      onClick={(event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        applyBulk();
-      }}
-      className={`inline-flex min-h-10 min-w-[2.75rem] shrink-0 items-center justify-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${base} ${className}`}
-    >
-      {allActive ? <Check className="h-3.5 w-3.5 shrink-0" /> : <Route className="h-3.5 w-3.5 shrink-0" />}
-      <span>{label}</span>
-    </button>
+    <>
+      <button
+        type="button"
+        disabled={!live || !payloads.length || (full && !allActive)}
+        title={
+          !live
+            ? 'Секунду…'
+            : !payloads.length
+              ? 'Нельзя добавить: нет точек'
+              : full && !allActive
+                ? dayRouteHardLimitMessage()
+                : allActive
+                  ? 'Уже в маршруте (убрать можно в Мой день)'
+                  : isDayRouteAtSoft(route.venues.length) && !allActive
+                    ? DAY_ROUTE_SOFT_WARN
+                    : 'Добавить все точки пригорода в маршрут'
+        }
+        aria-pressed={allActive}
+        aria-label={
+          allActive
+            ? 'Все точки пригорода уже в маршруте дня'
+            : `Добавить все точки пригорода в маршрут (${payloads.length})`
+        }
+        data-day-route-bulk={payloads.length || undefined}
+        data-day-route-live={live ? '1' : '0'}
+        onPointerDown={(event) => {
+          event.stopPropagation();
+        }}
+        onClick={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          applyBulk();
+        }}
+        className={`inline-flex min-h-10 min-w-[2.75rem] shrink-0 items-center justify-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${base} ${className}`}
+      >
+        {allActive ? <Check className="h-3.5 w-3.5 shrink-0" /> : <Route className="h-3.5 w-3.5 shrink-0" />}
+        <span>{label}</span>
+      </button>
+      <CityConfirmModal
+        open={Boolean(foreignCityPrompt)}
+        title="Другой город"
+        message={
+          foreignCityPrompt
+            ? buildAddForeignCityConfirmMessage(foreignCityPrompt.routeCity, foreignCityPrompt.incomingCity)
+            : ''
+        }
+        confirmLabel="Очистить и добавить"
+        cancelLabel="Не добавлять"
+        onConfirm={() => {
+          const pending = foreignCityPrompt;
+          setForeignCityPrompt(null);
+          if (!pending) return;
+          applyClearDayRouteForCityChange();
+          runBulkAdd(pending.payloads);
+          const cityName = String(pending.payloads[0]?.city || '').trim();
+          if (cityName && selectedCity) {
+            void selectedCity.setCity(cityName, { skipRouteConfirm: true, persistOnly: true });
+          }
+        }}
+        onCancel={() => setForeignCityPrompt(null)}
+      />
+    </>
   );
 }

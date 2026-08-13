@@ -1,7 +1,13 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { confirmClearDayRouteForCityChange } from './day-route-city-change.ts';
+import {
+  buildAddForeignCityConfirmMessage,
+  buildCityChangeConfirmMessage,
+  confirmClearDayRouteForCityChange,
+  dayRouteConflictsWithIncomingCity,
+  dayRouteNeedsClearForCityChange,
+} from './day-route-city-change.ts';
 import {
   addToDayRoute,
   clearDayRoute,
@@ -39,59 +45,74 @@ function mockStorage() {
   return store;
 }
 
-test('confirmClearDayRouteForCityChange skips dialog when route empty', () => {
+test('dayRouteNeedsClearForCityChange skips when route empty', () => {
   mockStorage();
   clearDayRoute();
-  let confirmCalls = 0;
-  const prevConfirm = window.confirm;
-  window.confirm = () => {
-    confirmCalls += 1;
-    return false;
-  };
-  try {
-    assert.equal(confirmClearDayRouteForCityChange('Казань', 'Москва'), true);
-    assert.equal(confirmCalls, 0);
-  } finally {
-    window.confirm = prevConfirm;
-  }
+  assert.equal(dayRouteNeedsClearForCityChange('Казань', 'Москва'), false);
 });
 
-test('confirmClearDayRouteForCityChange clears on OK and keeps on Cancel', () => {
+test('confirmClearDayRouteForCityChange clears on OK and keeps on Cancel', async () => {
   mockStorage();
   clearDayRoute();
   addToDayRoute({ id: 'a', title: 'A', cityId: 'c1', city: 'Москва' });
   assert.equal(readDayRoute().venues.length, 1);
 
-  let answer = false;
-  const prevConfirm = window.confirm;
-  window.confirm = () => answer;
-  try {
-    assert.equal(confirmClearDayRouteForCityChange('Казань', 'Москва'), false);
-    assert.equal(readDayRoute().venues.length, 1);
+  assert.equal(
+    await confirmClearDayRouteForCityChange('Казань', 'Москва', async () => false),
+    false,
+  );
+  assert.equal(readDayRoute().venues.length, 1);
 
-    answer = true;
-    assert.equal(confirmClearDayRouteForCityChange('Казань', 'Москва'), true);
-    assert.equal(readDayRoute().venues.length, 0);
-  } finally {
-    window.confirm = prevConfirm;
-  }
+  assert.equal(
+    await confirmClearDayRouteForCityChange('Казань', 'Москва', async () => true),
+    true,
+  );
+  assert.equal(readDayRoute().venues.length, 0);
 });
 
-test('confirmClearDayRouteForCityChange no-ops when city unchanged', () => {
+test('confirmClearDayRouteForCityChange no-ops when city unchanged', async () => {
   mockStorage();
   clearDayRoute();
-  addToDayRoute({ id: 'a', title: 'A', cityId: 'c1' });
+  addToDayRoute({ id: 'a', title: 'A', cityId: 'c1', city: 'Москва' });
   let confirmCalls = 0;
-  const prevConfirm = window.confirm;
-  window.confirm = () => {
-    confirmCalls += 1;
-    return false;
-  };
-  try {
-    assert.equal(confirmClearDayRouteForCityChange('Москва', 'Москва'), true);
-    assert.equal(confirmCalls, 0);
-    assert.equal(readDayRoute().venues.length, 1);
-  } finally {
-    window.confirm = prevConfirm;
-  }
+  assert.equal(
+    await confirmClearDayRouteForCityChange('Москва', 'Москва', async () => {
+      confirmCalls += 1;
+      return false;
+    }),
+    true,
+  );
+  assert.equal(confirmCalls, 0);
+  assert.equal(readDayRoute().venues.length, 1);
+});
+
+test('confirmClearDayRouteForCityChange denies filled route without confirmFn', async () => {
+  mockStorage();
+  clearDayRoute();
+  addToDayRoute({ id: 'a', title: 'A', city: 'Москва' });
+  assert.equal(await confirmClearDayRouteForCityChange('Казань', 'Москва'), false);
+  assert.equal(readDayRoute().venues.length, 1);
+});
+
+test('buildCityChangeConfirmMessage uses hyphen copy', () => {
+  const message = buildCityChangeConfirmMessage('Москва');
+  assert.match(message, /г\. Москва/);
+  assert.equal(message.includes('—'), false);
+  assert.equal(message.includes('–'), false);
+});
+
+test('dayRouteConflictsWithIncomingCity detects foreign city', () => {
+  mockStorage();
+  clearDayRoute();
+  addToDayRoute({ id: 'a', title: 'A', city: 'Москва', citySlug: 'moscow' });
+  const venues = readDayRoute().venues;
+  assert.equal(dayRouteConflictsWithIncomingCity(venues, { city: 'Казань', citySlug: 'kazan' }), true);
+  assert.equal(dayRouteConflictsWithIncomingCity(venues, { city: 'Москва', citySlug: 'moscow' }), false);
+  assert.equal(dayRouteConflictsWithIncomingCity([], { city: 'Казань' }), false);
+});
+
+test('buildAddForeignCityConfirmMessage names both cities', () => {
+  const message = buildAddForeignCityConfirmMessage('Москва', 'Санкт-Петербург');
+  assert.match(message, /г\. Москва/);
+  assert.match(message, /г\. Санкт-Петербург/);
 });

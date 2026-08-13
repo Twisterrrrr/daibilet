@@ -4,6 +4,13 @@
 |----|--------|-----------|--------|
 | FIX.MOBILE-NAV-SSR | Гамбургер кликабелен во время SSR/loading (checkbox disclosure + skeleton) | Критический | ✅ `bc6dd254` Deploy MSK web `31569900956` (tip `37b6d863`) |
 
+## City sync + My Day planner (2026-08-13)
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| UX.CITY-SYNC-B | Variant B: Event PDP persistOnly sync; catalog city-empty hubs; global setCity guard + CityConfirmModal; foreign-city add clear+sync | Высокий | 🔄 code; deploy batch / по запросу |
+| MYDAY.TRIPS-PER-CITY | Variant A: storage map по `citySlug`, badge per city, без удаления маршрута при switch | Высокий | ⏳ Запланировано; критерий старта - стабилизация B на live |
+
 ## SEO listing + My Day routes (2026-08-11)
 
 | ID | Задача | Приоритет | Статус |

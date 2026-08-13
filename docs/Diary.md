@@ -1,4 +1,22 @@
-## 2026-08-12 - Ligovskii pr. 10/118: pier → bus
+## 2026-08-13 - City sync Variant B (header + planner)
+
+### Наблюдения
+- UX-дыры: Event PDP / city hub не синхронизировали шапку; empty афиши по городу был тупым; смена города и add из другого города опирались на `window.confirm` только на `/my-day`.
+- Owner: Вариант B в этой итерации (один `daibilet:dayRoute`, кастомные модалки). Вариант A (trips per city) - бэклог.
+
+### Решения
+- Event PDP: `EventPageCitySync` → `setCity(..., { persistOnly, skipRouteConfirm })` без трогания маршрута.
+- Landing path с `citySlug` (не только MULTI_CITY) write-through в шапку.
+- Catalog empty: city-primary copy + плитки `/cities/{spb|kazan|sochi}`; при доп. фильтрах - reset primary, hubs secondary.
+- Глобальный guard `setCity` + `CityConfirmModal`; add foreign city → clear+add+sync шапки.
+- `MYDAY.TRIPS-PER-CITY (A)` зафиксирован в Tasktracker/qa; старт после стабилизации B на live.
+
+### Проблемы
+- Нет.
+
+---
+
+
 
 ### Наблюдения
 - Owner: карточка `Лиговский пр., 10 / 118` (у входа в гостиницу Октябрьская) показывала бейдж «Причал», хотя это точка посадки автобуса.

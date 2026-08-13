@@ -126,6 +126,21 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
     return { ...base, city: selectedCity.cityValue };
   }, [query, cityReady, selectedCity, urlCityIsAll, listPage]);
 
+  const hasExtraCatalogFilters = useMemo(() => {
+    const dateActive = Boolean(filterValues.date) && filterValues.date !== 'all';
+    return Boolean(
+      filterValues.q ||
+        filterValues.category ||
+        filterValues.landing ||
+        dateActive ||
+        filterValues.from ||
+        filterValues.to ||
+        filterValues.minPrice != null ||
+        filterValues.maxPrice != null ||
+        (filterValues.ageMax != null && filterValues.ageMax >= 0),
+    );
+  }, [filterValues]);
+
   /** Effective query key from resolved filters (header city may lead URL by one frame). */
   const effectiveQueryKey = useMemo(
     () => catalogQueryCacheKey({ ...query, city: filterValues.city, page: listPage }),
@@ -349,6 +364,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
           onViewModeChange={setViewMode}
           city={filterValues.city}
           sort={filterValues.sort}
+          hasExtraFilters={hasExtraCatalogFilters}
           clearHref={buildCatalogHref({
             city: filterValues.city,
             sort: filterValues.sort,

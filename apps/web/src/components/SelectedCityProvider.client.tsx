@@ -7,13 +7,17 @@ import {
   useContext,
   useLayoutEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
+import { CityConfirmModal } from '@/components/CityConfirmModal.client';
 import { resolveCityChangeNav } from '@/lib/city-change-nav';
-import { confirmClearDayRouteForCityChange } from '@/lib/day-route-city-change';
+import {
+  confirmClearDayRouteForCityChange,
+} from '@/lib/day-route-city-change';
 import { resolveLandingCityName } from '@/lib/landing-city';
 import { canonicalLandingSlug } from '@/lib/landing-constants';
 import {
@@ -51,8 +55,8 @@ type SelectedCityContextValue = {
   selectedDestination: PublicDestinationDto | null;
   /** Full destinations list (city picker on /my-day and chrome). */
   destinations: PublicDestinationDto[];
-  /** False when /my-day user cancels route-reset confirm (city value unchanged). */
-  setCity: (name: string, options?: SetCityOptions) => boolean;
+  /** False when user cancels route-reset confirm (city value unchanged). */
+  setCity: (name: string, options?: SetCityOptions) => Promise<boolean>;
 };
 
 const SelectedCityContext = createContext<SelectedCityContextValue | null>(null);
@@ -87,6 +91,11 @@ function CitySearchParamsBridge({
   return null;
 }
 
+type PendingConfirm = {
+  message: string;
+  resolve: (ok: boolean) => void;
+};
+
 export function SelectedCityProvider({
   destinations,
   children,
@@ -100,10 +109,27 @@ export function SelectedCityProvider({
   const [searchParamsKey, setSearchParamsKey] = useState('');
   const [cityLabel, setCityLabel] = useState('Все города');
   const [cityReady, setCityReady] = useState(false);
+  const [pendingConfirm, setPendingConfirm] = useState<PendingConfirm | null>(null);
+  const pendingConfirmRef = useRef<PendingConfirm | null>(null);
 
   const onParams = useCallback((params: URLSearchParams) => {
     setUrlCity(params.get('city'));
     setSearchParamsKey(params.toString());
+  }, []);
+
+  const requestCityChangeConfirm = useCallback((message: string) => {
+    return new Promise<boolean>((resolve) => {
+      const next = { message, resolve };
+      pendingConfirmRef.current = next;
+      setPendingConfirm(next);
+    });
+  }, []);
+
+  const closeConfirm = useCallback((ok: boolean) => {
+    const pending = pendingConfirmRef.current;
+    pendingConfirmRef.current = null;
+    setPendingConfirm(null);
+    pending?.resolve(ok);
   }, []);
 
   // Sync before paint so the first meaningful filter render already has the stored city.
@@ -115,7 +141,8 @@ export function SelectedCityProvider({
       return;
     }
     const landingRoute = resolveLandingRouteFromLocation(pathname);
-    if (landingRoute?.citySlug && MULTI_CITY_LANDING_SLUGS.has(canonicalLandingSlug(landingRoute.landingSlug))) {
+    // Any landing path that already carries a city (MULTI + city-scoped) write-through to header.
+    if (landingRoute?.citySlug) {
       const fromLanding =
         matchDestination(destinations, landingRoute.citySlug) ||
         matchDestination(destinations, resolveLandingCityName(landingRoute.citySlug));
@@ -172,11 +199,10 @@ export function SelectedCityProvider({
     if (matched) persistSelectedCity(matched.name);
   }, [destinations, pathname, urlCity]);
 
-  // Persist city from multi-city landing path into header storage.
+  // Persist city from any landing path that already carries a city segment.
   useLayoutEffect(() => {
     const landingRoute = resolveLandingRouteFromLocation(pathname);
     if (!landingRoute?.citySlug) return;
-    if (!MULTI_CITY_LANDING_SLUGS.has(canonicalLandingSlug(landingRoute.landingSlug))) return;
     const matched =
       matchDestination(destinations, landingRoute.citySlug) ||
       matchDestination(destinations, resolveLandingCityName(landingRoute.citySlug));
@@ -190,19 +216,21 @@ export function SelectedCityProvider({
   );
 
   const setCity = useCallback(
-    (name: string, options?: SetCityOptions): boolean => {
-      const path = pathname.replace(/\/$/, '') || '/';
-      // /my-day: header + on-page CityPicker share setCity - confirm before leaving a filled route.
-      if (path === '/my-day' && !options?.skipRouteConfirm) {
+    async (name: string, options?: SetCityOptions): Promise<boolean> => {
+      // Any explicit picker change with a filled day-route → custom confirm (not only /my-day).
+      if (!options?.skipRouteConfirm) {
         const current = cityLabel === 'Все города' ? 'all' : cityLabel;
-        if (!confirmClearDayRouteForCityChange(name, current)) return false;
+        const ok = await confirmClearDayRouteForCityChange(name, current, (message) =>
+          requestCityChangeConfirm(message),
+        );
+        if (!ok) return false;
       }
 
       persistSelectedCity(name);
       setCityLabel(name === 'all' ? 'Все города' : name);
       setCityReady(true);
 
-      // PDP hydrate (venue/location): only align chrome city - never navigate away.
+      // PDP hydrate (venue/location/event): only align chrome city - never navigate away.
       if (options?.persistOnly) return true;
 
       const searchParams = searchParamsKey
@@ -245,6 +273,7 @@ export function SelectedCityProvider({
       // Unknown / static surfaces: persist only - never dump into events catalog.
       if (!href) return true;
 
+      const path = pathname.replace(/\/$/, '') || '/';
       const sameIndexQuery =
         path === href.split('?')[0] &&
         (path === '/events' ||
@@ -259,7 +288,7 @@ export function SelectedCityProvider({
       }
       return true;
     },
-    [cityLabel, destinations, pathname, router, searchParamsKey],
+    [cityLabel, destinations, pathname, requestCityChangeConfirm, router, searchParamsKey],
   );
 
   const value = useMemo(
@@ -267,12 +296,23 @@ export function SelectedCityProvider({
     [cityValue, cityLabel, cityReady, selectedDestination, destinations, setCity],
   );
 
+  const confirmMessage = pendingConfirm?.message || '';
+
   return (
     <SelectedCityContext.Provider value={value}>
       <Suspense fallback={null}>
         <CitySearchParamsBridge onParams={onParams} />
       </Suspense>
       {children}
+      <CityConfirmModal
+        open={Boolean(pendingConfirm)}
+        title="Переключить город?"
+        message={confirmMessage}
+        confirmLabel="Очистить и перейти"
+        cancelLabel="Отмена"
+        onConfirm={() => closeConfirm(true)}
+        onCancel={() => closeConfirm(false)}
+      />
     </SelectedCityContext.Provider>
   );
 }

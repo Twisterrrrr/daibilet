@@ -2915,8 +2915,8 @@ function DayRoutePanelInner() {
           }}
           cities={destinations}
           value={selectedCity?.cityValue || 'all'}
-          onChange={(name) => {
-            if (selectedCity?.setCity(name) === false) return;
+          onChange={async (name) => {
+            if ((await selectedCity?.setCity(name)) === false) return;
             if (name !== 'all') setCityInput(name);
           }}
         />
@@ -3082,8 +3082,8 @@ function DayRoutePanelInner() {
               defaultOpen
               cities={destinations}
               value={selectedCity?.cityValue || 'all'}
-              onChange={(name) => {
-                if (selectedCity?.setCity(name) === false) return;
+              onChange={async (name) => {
+                if ((await selectedCity?.setCity(name)) === false) return;
                 if (name !== 'all') setCityInput(name);
                 setHeaderCityChangeOpen(false);
               }}

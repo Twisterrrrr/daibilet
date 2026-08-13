@@ -9,6 +9,19 @@ Finance PR-ветка `codex/stage0-admission-ticket-core` может держа
 
 ---
 
+## 2026-08-13 - My Day trips per city (Variant A) - DEFERRED after B
+
+**Контекст:** Variant B (один `daibilet:dayRoute`, confirm clear при смене города / foreign add) ship в этой итерации.
+
+1. **Когда стартовать A?** После стабилизации B на live (нет регрессий шапки / empty / модалок).
+2. **Storage shape:** `dayRoute: { [citySlug]: stops[] }` vs parallel keys `daibilet:dayRoute:{slug}`?
+3. **Badge / UI:** один счётчик активного города шапки или multi-badge?
+4. **Share URL /my-day?city=:** восстанавливает только bucket этого города?
+
+**Статус:** `MYDAY.TRIPS-PER-CITY` в Tasktracker - Запланировано. **Не билдить A сейчас.**
+
+---
+
 ## 2026-08-11 - Region Hub IA
 
 1. **City SEO title:** спека предлагала «Афиша {Города} на {Год}…»; сейчас канон P.2d. Меняем city title в том же релизе или оставляем P.2d?
