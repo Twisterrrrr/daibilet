@@ -293,8 +293,9 @@ export const PLACES_HUB_CATEGORY_CHIPS: Array<{ id: string; label: string; types
   {
     id: 'outdoors',
     label: 'Парки и открытые места',
-    types: ['park', 'outdoor_location', 'monument', 'attraction'],
+    types: ['park', 'outdoor_location', 'attraction'],
   },
+  { id: 'monuments', label: 'Памятники', types: ['monument'] },
   { id: 'piers', label: 'Причалы', types: ['pier', 'pier_water'] },
   { id: 'buses', label: 'Автобусы', types: ['bus'] },
   { id: 'venues', label: 'Площадки', types: ['venue', 'other'] },
