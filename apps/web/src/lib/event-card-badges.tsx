@@ -5,7 +5,14 @@ import type { ReactNode } from 'react';
 import { EditorsPickBadge, EventCardBadge } from '@/components/EventFavoriteButton.client';
 import type { PublicSessionDto } from '@daibilet/contracts/public';
 import { isHitEvent, isRecommendBadgeEvent } from '@/lib/home-showcase-sections';
-import { formatCoverDateBadge, LOW_TICKETS_THRESHOLD } from '@/lib/event-card-meta';
+import {
+  formatCoverDateBadge,
+  getDepartingSoonMinutes,
+  isOpenDate,
+  isSessionToday,
+  LOW_TICKETS_THRESHOLD,
+} from '@/lib/event-card-meta';
+import { resolveSessionTimeZoneForSession } from '@/lib/datetime';
 import { formatVacantSeats } from '@/lib/event-page-utils';
 
 type EventImageBadgesProps = {
@@ -44,6 +51,13 @@ export function EventImageBadges({
 
   const showLowTickets =
     typeof event.vacant === 'number' && event.vacant > 0 && event.vacant <= LOW_TICKETS_THRESHOLD;
+  const timeZone = resolveSessionTimeZoneForSession(event);
+  const todaySession =
+    Boolean(event.startsAt) &&
+    !isOpenDate(event) &&
+    isSessionToday(String(event.startsAt), timeZone);
+  const departingSoonMinutes =
+    !isOpenDate(event) && event.startsAt ? getDepartingSoonMinutes(event.startsAt) : null;
   const recommend = editorsPick || isRecommendBadgeEvent(event);
   const recommendLabel = editorsPick ? 'Выбор редакции' : 'Рекомендуем';
   const hit = editorsPick
@@ -63,7 +77,7 @@ export function EventImageBadges({
   if (showLowTickets && secondary.length < maxSecondary) {
     secondary.push(
       <EventCardBadge key="vacant" className="bg-rose-600 text-white shadow-md ring-1 ring-white/30">
-        {formatVacantSeats(event.vacant ?? 0)}
+        {todaySession ? 'Мало мест сегодня' : formatVacantSeats(event.vacant ?? 0)}
       </EventCardBadge>,
     );
   } else if (hit && secondary.length < maxSecondary) {
@@ -73,7 +87,13 @@ export function EventImageBadges({
       </EventCardBadge>,
     );
   }
-  if (showSoonBadge && secondary.length < maxSecondary) {
+  if (departingSoonMinutes && secondary.length < maxSecondary) {
+    secondary.push(
+      <EventCardBadge key="departing" className="bg-amber-500 text-white shadow-md ring-1 ring-white/30">
+        Через {departingSoonMinutes} мин
+      </EventCardBadge>,
+    );
+  } else if (showSoonBadge && secondary.length < maxSecondary) {
     secondary.push(
       <EventCardBadge key="soon" className="bg-slate-900/90 text-white">
         Скоро в продаже
@@ -95,5 +115,6 @@ export function EventImageBadges({
 export function catalogItemHasLiveSignal(event: PublicSessionDto): boolean {
   const lowTickets =
     typeof event.vacant === 'number' && event.vacant > 0 && event.vacant <= LOW_TICKETS_THRESHOLD;
-  return lowTickets || isRecommendBadgeEvent(event) || isHitEvent(event);
+  const departingSoon = Boolean(event.startsAt && getDepartingSoonMinutes(event.startsAt));
+  return lowTickets || departingSoon || isRecommendBadgeEvent(event) || isHitEvent(event);
 }

@@ -8,6 +8,7 @@ import { CatalogActiveFilters } from '@/components/CatalogActiveFilters';
 import { CatalogPaginationLinks } from '@/components/CatalogPaginationLinks';
 import { CatalogResults, ViewModeToggle } from '@/components/CatalogResults.client';
 import { CatalogToolbar } from '@/components/CatalogToolbar.client';
+import { EventsCityGate } from '@/components/EventsCityGate.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import type { PublicCatalogDto } from '@daibilet/contracts/public';
 import { CATALOG_PAGE_SIZE_DEFAULT } from '@daibilet/contracts/catalog';
@@ -54,6 +55,11 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
   const cityReady = selectedCity?.cityReady ?? true;
   /** Wait for storage resolve when URL has no city — avoids «Все города» then Уфа. */
   const cityBootstrapPending = !rawUrlCity && Boolean(selectedCity) && !cityReady;
+  /** Hard geo: no mixed national feed until the user picks a city. */
+  const needsCityGate =
+    !cityBootstrapPending &&
+    cityReady &&
+    (urlCityIsAll || (!urlHasCity && (!selectedCity || selectedCity.cityValue === 'all')));
 
   const searchParamsRecord = useMemo(
     () => searchParamsToRecord(Object.fromEntries(urlSearchParams.entries())),
@@ -169,6 +175,14 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
       return;
     }
 
+    // Geo gate: do not keep/refetch the national mixed feed.
+    if (needsCityGate) {
+      setCatalog(null);
+      setLoading(false);
+      setError(null);
+      return;
+    }
+
     // Deep-link or post-replace URL already has city — SSR payload matches.
     if (initialQueryKey && effectiveQueryKey === initialQueryKey && initialCatalog && urlHasCity) {
       setCatalog(initialCatalog);
@@ -219,6 +233,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
     initialQueryKey,
     initialCatalog,
     cityBootstrapPending,
+    needsCityGate,
     urlHasCity,
     filterValues.city,
     listPage,
@@ -254,6 +269,10 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
     landings: [],
     priceSteps: [],
   };
+
+  if (needsCityGate) {
+    return <EventsCityGate />;
+  }
 
   return (
     <>
