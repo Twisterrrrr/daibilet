@@ -216,7 +216,9 @@ export function CatalogResults({
   }
 
   const liveRailItems = pickLiveRailItems(catalogItems, sort);
-  const showLiveRail = liveRailItems.length >= 3 && viewMode === 'cards';
+  // Owner 2026-08-13: temporarily hide «Сейчас выбирают» / «Популярное сейчас» rail on /events.
+  const SHOW_CATALOG_LIVE_RAIL = false;
+  const showLiveRail = SHOW_CATALOG_LIVE_RAIL && liveRailItems.length >= 3 && viewMode === 'cards';
   // Keep «Сейчас выбирают» / «Популярное сейчас» from mirroring the first page of cards 1:1.
   const listItems = showLiveRail
     ? catalogItems.filter((item) => !liveRailItems.some((rail) => rail.id === item.id))
