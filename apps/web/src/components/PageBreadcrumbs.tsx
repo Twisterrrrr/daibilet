@@ -8,12 +8,15 @@ export function PageBreadcrumbBar({
   items,
   className,
   hideOnMobile = false,
+  hideLastOnMobile = false,
 }: {
   items: BreadcrumbItem[];
   /** Extra classes on the root strip (opt-in; does not change default visibility). */
   className?: string;
   /** Keep breadcrumbs in DOM for SEO/a11y, visually hide below md. */
   hideOnMobile?: boolean;
+  /** Hide the current-page crumb on mobile; H1 already shows the same title. */
+  hideLastOnMobile?: boolean;
 }) {
   if (!items.length) return null;
   const lastIndex = items.length - 1;
@@ -31,21 +34,37 @@ export function PageBreadcrumbBar({
           const isLast = index === lastIndex;
           return (
             <React.Fragment key={`${item.label}:${index}`}>
-              {index > 0 ? <ChevronRight className="h-3.5 w-3.5 shrink-0 text-slate-300" aria-hidden /> : null}
+              {index > 0 ? (
+                <ChevronRight
+                  className={`h-3.5 w-3.5 shrink-0 text-slate-300 ${isLast && hideLastOnMobile ? 'hidden md:inline' : ''}`}
+                  aria-hidden
+                />
+              ) : null}
               {item.href ? (
                 <a
                   href={item.href}
                   title={item.label}
-                  className={
+                  className={[
                     isLast
                       ? 'min-w-0 truncate text-slate-900 transition-colors hover:text-primary-600'
-                      : 'shrink-0 transition-colors hover:text-primary-600'
-                  }
+                      : 'shrink-0 transition-colors hover:text-primary-600',
+                    isLast && hideLastOnMobile ? 'hidden md:inline' : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
                 >
                   {item.label}
                 </a>
               ) : (
-                <span title={item.label} className={isLast ? 'min-w-0 truncate text-slate-900' : 'shrink-0 text-slate-900'}>
+                <span
+                  title={item.label}
+                  className={[
+                    isLast ? 'min-w-0 truncate text-slate-900' : 'shrink-0 text-slate-900',
+                    isLast && hideLastOnMobile ? 'hidden md:inline' : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
+                >
                   {item.label}
                 </span>
               )}

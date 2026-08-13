@@ -4,6 +4,12 @@
 |----|--------|-----------|--------|
 | FIX.PUBLIC-ERROR-UI | Убрать английский Next fallback «Application error…» с public: error.tsx + global-error.tsx + ранний chunk reload | Критический | 🔄 code; live после Deploy MSK web |
 
+## Event PDP title / breadcrumbs (2026-08-13)
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| UX.EVENT-TITLE-BREAK | Длинный H1 события: перенос после `: ` / ` - `; на мобилке скрыть последний crumb (дубль H1) | Средний | ✅ 2026-08-13; live после Deploy MSK web |
+
 ## Nav «Места» hub (2026-08-13)
 
 | ID | Задача | Приоритет | Статус |

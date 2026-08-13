@@ -13,7 +13,10 @@ export function VenueBreadcrumbsNav({ payload }: { payload: PublicVenuePageDto }
       {crumbs.map((crumb, index) => {
         const isLast = index === crumbs.length - 1;
         return (
-          <span key={`${crumb.path}-${index}`} className="inline-flex items-center gap-1.5">
+          <span
+            key={`${crumb.path}-${index}`}
+            className={`inline-flex items-center gap-1.5 ${isLast ? 'hidden md:inline-flex' : ''}`}
+          >
             {index > 0 ? <ChevronRight className="h-3.5 w-3.5 shrink-0" aria-hidden /> : null}
             {isLast ? (
               <span className="line-clamp-1 text-slate-900">{crumb.name}</span>

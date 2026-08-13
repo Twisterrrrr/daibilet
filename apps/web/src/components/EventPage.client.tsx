@@ -31,6 +31,7 @@ import {
 } from '@/lib/event-page-utils';
 import { extractDurationLabel } from '@/lib/catalog-labels';
 import { dayRouteItemFromEvent } from '@/lib/day-route-from-place';
+import { splitLongTitleAtBreak } from '@/lib/split-long-title';
 import { buildEventBreadcrumbs } from '@/lib/structured-data';
 import { resolveEventHeroObjectPosition } from '@/lib/event-image-focus';
 import { venueHref } from '@/lib/routes';
@@ -550,7 +551,8 @@ export function EventHero({
   const venueBadgeLinkClassName = `${venueBadgeClassName} cursor-pointer transition hover:bg-white/25 hover:underline hover:decoration-white/50 hover:underline-offset-2`;
 
   const heroTitle = String(event.seoH1 || event.title || '').trim();
-  const longHeroTitle = heroTitle.length > 48;
+  const titleSplit = splitLongTitleAtBreak(heroTitle);
+  const longHeroTitle = Boolean(titleSplit) || heroTitle.length > 48;
 
   return (
     <div
@@ -583,7 +585,10 @@ export function EventHero({
           {breadcrumbs.map((crumb, index) => {
             const isLast = index === breadcrumbs.length - 1;
             return (
-              <span key={`${crumb.path}:${index}`} className="inline-flex items-center gap-1.5">
+              <span
+                key={`${crumb.path}:${index}`}
+                className={`inline-flex items-center gap-1.5 ${isLast ? 'hidden md:inline-flex' : ''}`}
+              >
                 {index > 0 ? <ChevronRight className="h-3.5 w-3.5" /> : null}
                 {isLast ? (
                   <span className="line-clamp-1 text-white/90">{crumb.name}</span>
@@ -612,7 +617,16 @@ export function EventHero({
                   : 'text-2xl sm:text-3xl lg:text-4xl'
               }`}
             >
-              {heroTitle}
+              {titleSplit ? (
+                <>
+                  {titleSplit.lead}
+                  {titleSplit.mark}
+                  <br />
+                  {titleSplit.tail}
+                </>
+              ) : (
+                heroTitle
+              )}
             </h1>
 
             <div className="mt-3 flex flex-wrap gap-1.5">

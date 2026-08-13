@@ -41,7 +41,7 @@ export function BlogArticleHero({
 
   return (
     <>
-      <PageBreadcrumbBar items={breadcrumbs} />
+      <PageBreadcrumbBar items={breadcrumbs} hideLastOnMobile />
       <section className="relative overflow-hidden border-b border-slate-200 bg-slate-950 text-white">
         {/* Mobile strong cover; desktop taller editorial plane */}
         <div className="relative aspect-[3/4] w-full sm:aspect-[16/11] lg:aspect-auto lg:h-[min(52vw,42rem)]">
