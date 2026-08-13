@@ -210,8 +210,8 @@ export function LocationCard({
           <div>
             {venue.eventsPending ? (
               <div className="mt-0.5 h-4 w-20 animate-pulse rounded bg-slate-100" aria-hidden />
-            ) : stopOrEventsLabel ? (
-              <div className="text-sm font-semibold text-graphite">{stopOrEventsLabel}</div>
+            ) : eventsLabel ? (
+              <div className="text-sm font-semibold text-graphite">{eventsLabel}</div>
             ) : null}
           </div>
           <AddToDayRouteButton
