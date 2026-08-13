@@ -1802,6 +1802,8 @@ function resolvePublicVenueKind(storedKind, name, address, options = {}) {
   }
 
   // Explicit CMS/content kinds win over «памятник» / набережная / пивоварня heuristics (must-see).
+  // Institution kinds also win over water-only catalog heuristics (false «прогулка/судно» matches
+  // must not turn concert halls / clubs into pier pages).
   if (stored === 'park') return 'park';
   if (stored === 'monument') return 'monument';
   if (stored === 'outdoor_location') return 'outdoor_location';
@@ -1809,6 +1811,12 @@ function resolvePublicVenueKind(storedKind, name, address, options = {}) {
   if (stored === 'gastro') return 'gastro';
   if (stored === 'theater') return 'theater';
   if (stored === 'museum_art_space' || stored === 'museum' || stored === 'art_space') {
+    return finalizeMuseumArtPublicKind(stored, name, address, { id, slug, shortDescription, description });
+  }
+
+  const storedInstitution = INSTITUTION_VENUE_KINDS.has(normalizeVenueKindValue(storedKind));
+  if (storedInstitution && stored !== 'pier') {
+    // Named loft / concert hall on an embankment stays institution even with waterish sessions.
     return finalizeMuseumArtPublicKind(stored, name, address, { id, slug, shortDescription, description });
   }
 
@@ -1834,7 +1842,8 @@ function resolvePublicVenueKind(storedKind, name, address, options = {}) {
   // Explicit VENUE/loft CMS kind wins over embankment address heuristics (Высота 21 etc.).
   const nameOnly = String(name || '');
   const storedVenueNotPier =
-    (stored === 'venue' || stored === 'other') && !/причал|пристань/i.test(nameOnly);
+    (stored === 'venue' || stored === 'other' || inferred === 'venue') &&
+    !/причал|пристань/i.test(nameOnly);
   if (
     !storedVenueNotPier &&
     (stored === 'pier' ||

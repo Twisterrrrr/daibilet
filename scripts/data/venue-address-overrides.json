@@ -153,6 +153,66 @@
       "publicKind": "bus",
       "address": "Лиговский пр., 10 / 118",
       "city": "Санкт-Петербург"
+    },
+    {
+      "id": "venue_67853150bf184ce35fb8a7c4",
+      "title": "Пространство Ц",
+      "match": ["prostranstvo-c", "пространство-ц", "пространство-ц-67853150bf184ce35fb8a7c4"],
+      "kind": "CONCERT_HALL",
+      "address": "пер. Центральный Рынок, 6",
+      "city": "Екатеринбург",
+      "latitude": 56.83156086601724,
+      "longitude": 60.58862983203453
+    },
+    {
+      "id": "venue_6392d8675dd0960831d6cc98",
+      "title": "Культурно-досуговый центр «Дружба»",
+      "match": ["kulturno-dosugovyi-centr-druzhba", "kulturno-dosugovyi-centr-druzhba-6392d8675dd0960831d6cc98"],
+      "kind": "CONCERT_HALL",
+      "address": "ул. Академика Бардина, 21б",
+      "city": "Екатеринбург",
+      "latitude": 56.8034648,
+      "longitude": 60.5543552
+    },
+    {
+      "id": "venue_686d044da479b3c07a240887",
+      "title": "экскурсия Владимирский дворец",
+      "match": ["ekskursiya-vladimirskii-dvorec", "ekskursiya-vladimirskii-dvorec-686d044da479b3c07a240887"],
+      "kind": "MEETING_POINT",
+      "address": "Дворцовая набережная, 26",
+      "city": "Санкт-Петербург",
+      "latitude": 59.94195,
+      "longitude": 30.3197
+    },
+    {
+      "id": "venue_61e86fdbbbbf6dcd282d86e8",
+      "title": "LOFT HALL",
+      "match": ["loft-hall", "loft-hall-61e86fdbbbbf6dcd282d86e8", "LOFT HALL"],
+      "kind": "CONCERT_HALL",
+      "address": "Арсенальная набережная, 1",
+      "city": "Санкт-Петербург",
+      "latitude": 59.9543807,
+      "longitude": 30.3719825
+    },
+    {
+      "id": "venue_6a059c9fe41deb2c9232e7c1",
+      "title": "LXV",
+      "match": ["lxv", "lxv-6a059c9fe41deb2c9232e7c1"],
+      "kind": "CLUB_BAR_RESTAURANT",
+      "address": "Пресненская набережная, 12",
+      "city": "Москва",
+      "latitude": 55.7474907,
+      "longitude": 37.5412388
+    },
+    {
+      "id": "venue_6a3d4fa8083abeab34a7f2fa",
+      "title": "MONTE ON BOARD",
+      "match": ["monte-on-board", "monte-on-board-6a3d4fa8083abeab34a7f2fa"],
+      "kind": "VENUE",
+      "address": "ул. Наличная, 59",
+      "city": "Санкт-Петербург",
+      "latitude": 59.957675,
+      "longitude": 30.2363192
     }
   ]
 }
