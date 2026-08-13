@@ -77,7 +77,7 @@ export function EventImageBadges({
   if (showLowTickets && secondary.length < maxSecondary) {
     secondary.push(
       <EventCardBadge key="vacant" className="bg-rose-600 text-white shadow-md ring-1 ring-white/30">
-        {todaySession ? 'Мало мест сегодня' : formatVacantSeats(event.vacant ?? 0)}
+        {todaySession ? 'Сегодня заканчиваются' : formatVacantSeats(event.vacant ?? 0)}
       </EventCardBadge>,
     );
   } else if (hit && secondary.length < maxSecondary) {
@@ -90,7 +90,7 @@ export function EventImageBadges({
   if (departingSoonMinutes && secondary.length < maxSecondary) {
     secondary.push(
       <EventCardBadge key="departing" className="bg-amber-500 text-white shadow-md ring-1 ring-white/30">
-        Через {departingSoonMinutes} мин
+        Скоро начало · {departingSoonMinutes} мин
       </EventCardBadge>,
     );
   } else if (showSoonBadge && secondary.length < maxSecondary) {

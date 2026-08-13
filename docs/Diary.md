@@ -1,3 +1,19 @@
+## 2026-08-14 - /events: footer hide foreign + urgency copy polish
+
+### Наблюдения
+- Owner: «1-2-3-по возможности 4» по ROI `/events` (footer, sticky, urgency, mobile rail/sort).
+- 2+4 уже были в `f581919`/`c19b94b`; footer только переупорядочивал MSK/SPB.
+
+### Решения
+- Footer: при городе - только его popular-block (чужой MSK/SPB скрыт); колонка городов сужена до текущего + «Все города»; category `?city=`.
+- Urgency: cover «Сегодня заканчиваются» / «Скоро начало · N мин»; meta line с тем же copy.
+- Sticky + mobile icon-rail + `departing_soon` без регрессий.
+
+### Проблемы
+- Нет. Live после «выкатывай».
+
+---
+
 ## 2026-08-14 - /podborki: geo + сезон + covers + tags + masonry
 
 ### Наблюдения

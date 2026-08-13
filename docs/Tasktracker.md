@@ -1,3 +1,12 @@
+## Events UX ROI 1-4 polish (2026-08-14)
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| UX.EVENTS-FOOTER-CITY | Footer: hide foreign popular + narrow cities; category `?city=` | Высокий | ✅ 2026-08-14 code; deploy batch |
+| UX.EVENTS-STICKY | Desktop sticky Дата · Категория · Сорт | Высокий | ✅ `f581919` + polish |
+| UX.EVENTS-URGENCY-COPY | Cover/meta urgency: заканчиваются / скоро начало | Высокий | ✅ 2026-08-14 code; deploy batch |
+| UX.EVENTS-MOBILE-RAIL-SORT | Mobile category icon-rail + `departing_soon` | Средний | ✅ `f581919`/`c19b94b` |
+
 ## Podborki UX package 1-5 (2026-08-14)
 
 | ID | Задача | Приоритет | Статус |

@@ -155,7 +155,7 @@ export function EventCardHorizontal({ session }: { session: PublicCatalogListIte
           ) : departingSoonMinutes ? (
             <span className="inline-flex items-center gap-1 font-medium text-urgency">
               <Clock className="event-card-meta-icon" />
-              Через {departingSoonMinutes} мин
+              Скоро начало · через {departingSoonMinutes} мин
             </span>
           ) : sessionMetaLabel ? (
             <span className="inline-flex items-center gap-1 font-medium text-graphite">

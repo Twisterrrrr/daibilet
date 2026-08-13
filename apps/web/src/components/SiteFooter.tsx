@@ -13,6 +13,12 @@ import { CANONICAL_LANDING_SLUGS } from '@/lib/landing-constants';
 import { getFooterPopularDirections } from '@/lib/seo-internal-links';
 import { catalogCityQueryValue } from '@/lib/selected-city';
 
+function normalizeFooterCitySlug(value: string): string {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/_/g, '-');
+}
 const catalogLinkDefs: Array<
   | { label: string; category: string; landing?: never }
   | { label: string; landing: string; category?: never }
@@ -126,13 +132,31 @@ export function SiteFooter({ destinations, variant = 'default' }: SiteFooterProp
   }
 
   const cities = destinations.filter((item) => item.type === 'city');
-  const cityLinks = [...cities]
-    .sort((a, b) => b.events - a.events)
-    .slice(0, 8)
-    .map((city) => ({
-      label: city.name,
-      href: cityHref(city),
-    }));
+  const cityLinks = (() => {
+    const ranked = [...cities].sort((a, b) => b.events - a.events);
+    if (!citySlug) {
+      return ranked.slice(0, 8).map((city) => ({
+        label: city.name,
+        href: cityHref(city),
+      }));
+    }
+    // Narrow foreign city SEO when a city is selected: current hub + escape hatch.
+    const current =
+      ranked.find(
+        (city) =>
+          city.slug === citySlug ||
+          city.sourceSlug === citySlug ||
+          normalizeFooterCitySlug(city.slug) === normalizeFooterCitySlug(citySlug),
+      ) || null;
+    const links: Array<{ label: string; href: string }> = [];
+    if (current) {
+      links.push({ label: current.name, href: cityHref(current) });
+    } else if (cityName) {
+      links.push({ label: cityName, href: `/cities/${encodeURIComponent(citySlug)}` });
+    }
+    links.push({ label: 'Все города', href: '/cities' });
+    return links;
+  })();
 
   const { events: eventsCount, venues: venuesCount, places: placesCount } =
     catalogSocialStats(destinations);
@@ -188,34 +212,36 @@ export function SiteFooter({ destinations, variant = 'default' }: SiteFooterProp
           </div>
 
           <FooterColumn title={eventsColumnTitle} links={catalogLinks} />
-          <FooterColumn title="Города" links={cityLinks} />
+          <FooterColumn title={cityName ? `Город · ${cityName}` : 'Города'} links={cityLinks} />
           <FooterColumn title="Компания" links={companyLinksScoped} />
         </div>
 
-        <div className="mt-12 pt-10">
-          <h3 className="text-sm font-semibold text-graphite">
-            {cityName ? `Популярные направления · ${cityName}` : 'Популярные направления'}
-          </h3>
-          <div className="mt-5 grid gap-8 sm:grid-cols-2">
-            {popularDirections.map((block) => (
-              <div key={block.citySlug}>
-                <p className="text-sm font-medium text-graphite">{block.cityName}</p>
-                <ul className="mt-2.5 flex flex-wrap gap-x-4 gap-y-2">
-                  {block.links.map((link) => (
-                    <li key={`${block.citySlug}:${link.href}`}>
-                      <Link
-                        href={link.href}
-                        className="text-sm text-graphite-muted transition-colors hover:text-primary-600"
-                      >
-                        {link.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+        {popularDirections.length ? (
+          <div className="mt-12 pt-10">
+            <h3 className="text-sm font-semibold text-graphite">
+              {cityName ? `Популярные направления · ${cityName}` : 'Популярные направления'}
+            </h3>
+            <div className="mt-5 grid gap-8 sm:grid-cols-2">
+              {popularDirections.map((block) => (
+                <div key={block.citySlug}>
+                  <p className="text-sm font-medium text-graphite">{block.cityName}</p>
+                  <ul className="mt-2.5 flex flex-wrap gap-x-4 gap-y-2">
+                    {block.links.map((link) => (
+                      <li key={`${block.citySlug}:${link.href}`}>
+                        <Link
+                          href={link.href}
+                          className="text-sm text-graphite-muted transition-colors hover:text-primary-600"
+                        >
+                          {link.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        ) : null}
 
         <div className="mt-12 border-t border-slate-200/80 pt-8">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">

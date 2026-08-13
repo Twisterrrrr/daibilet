@@ -284,12 +284,9 @@ export function getFooterPopularDirections(citySlug?: string | null): FooterPopu
     preferredAliases.add('sankt-peterburg');
   }
 
-  const ordered = [...blocks].sort((a, b) => {
-    const aHit = preferredAliases.has(a.citySlug) ? 0 : 1;
-    const bHit = preferredAliases.has(b.citySlug) ? 0 : 1;
-    return aHit - bHit;
-  });
-  return ordered;
+  // With a city selected: only that city's SEO block (hide foreign MSK/SPB noise).
+  const matched = blocks.filter((block) => preferredAliases.has(block.citySlug));
+  return matched;
 }
 
 export function landingBreadcrumbLabel(landingSlug: string, fallbackTitle?: string | null): string {
