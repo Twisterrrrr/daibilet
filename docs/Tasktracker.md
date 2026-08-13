@@ -1,3 +1,11 @@
+## Places hub: region settlement + Bashkortostan genitive (2026-08-13)
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| FIX.PLACES-BASH-GENITIVE | H1: «Республики Башкортостан», не «…Башкортостана» | Высокий | ✅ 2026-08-13 code; deploy batch |
+| UX.PLACES-SETTLEMENT-CITY | В регионе: город на карточке + фильтр по населённому пункту | Высокий | ✅ 2026-08-13 code; deploy batch |
+| UX.PLACES-ROUTE-BTN-LIGHT | «В маршрут» на карточках мест - серый light, как на хабе города | Средний | ✅ 2026-08-13 code; deploy batch |
+
 ## Places hub: fill empty venue addresses (2026-08-13)
 
 | ID | Задача | Приоритет | Статус |

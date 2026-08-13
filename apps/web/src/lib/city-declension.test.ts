@@ -55,6 +55,13 @@ test('Karelia region does not become Карелие', () => {
   assert.equal(cityToPrepositional('Московская область'), 'Московской области');
 });
 
+test('Bashkortostan second word does not take -а', () => {
+  assert.equal(cityToNominative('respublika-bashkortostan'), 'Республика Башкортостан');
+  assert.equal(cityToGenitive('Республика Башкортостан'), 'Республики Башкортостан');
+  assert.equal(cityToPrepositional('Республика Башкортостан'), 'Республике Башкортостан');
+  assert.equal(cityToAccusative('Республика Башкортостан'), 'Республику Башкортостан');
+});
+
 test('isSeoExpansionCity', () => {
   assert.equal(isSeoExpansionCity('Казань'), true);
   assert.equal(isSeoExpansionCity({ slug: 'ekaterinburg' }), true);

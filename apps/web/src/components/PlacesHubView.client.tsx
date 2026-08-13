@@ -41,6 +41,7 @@ import {
   normalizeVenueKind,
 } from '@/lib/venue-meta';
 import { venueHref, venuePageTemplate } from '@/lib/routes';
+import { isRegionLikeCityTitle, resolveVenuePlaceCity } from '@/lib/venue-place-city';
 
 type ViewMode = 'cards' | 'list';
 
@@ -65,6 +66,20 @@ function readStoredViewMode(): ViewMode {
 
 function cityOptionsFromStats(cities: Record<string, number>): Array<[string, number]> {
   return [...Object.entries(cities)].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'ru'));
+}
+
+/** Населённые пункты внутри региона (City.title = регион, slug = город). */
+function settlementOptionsFromVenues(
+  venues: VenueCatalogFeedPage['venues'],
+): Array<[string, number]> {
+  const counts = new Map<string, number>();
+  for (const venue of venues) {
+    if (!isRegionLikeCityTitle(venue.city)) continue;
+    const label = resolveVenuePlaceCity(venue.city, venue.citySlug);
+    if (!label || label === String(venue.city || '').trim()) continue;
+    counts.set(label, (counts.get(label) || 0) + 1);
+  }
+  return [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'ru'));
 }
 
 function applyListPage(
@@ -200,7 +215,34 @@ export function PlacesHubView({
     return () => window.removeEventListener('popstate', onPopState);
   }, []);
 
-  const cityOptions = useMemo(() => cityOptionsFromStats(stats.cities || {}), [stats.cities]);
+  const cityOptions = useMemo(() => {
+    const fromStats = cityOptionsFromStats(stats.cities || {});
+    const settlements = settlementOptionsFromVenues(venues);
+    const headerLabel = String(selectedCity?.cityLabel || '').trim();
+    const urlToken = String(urlCity || '').trim();
+    const venuesInRegion =
+      venues.length > 0 && venues.every((venue) => isRegionLikeCityTitle(venue.city));
+    const regionScoped =
+      isRegionLikeCityTitle(headerLabel) ||
+      isRegionLikeCityTitle(urlToken) ||
+      /bashkortostan|respublika-|область|край/i.test(urlToken) ||
+      venuesInRegion;
+    if (!regionScoped || settlements.length === 0) return fromStats;
+
+    const regionTitle = isRegionLikeCityTitle(headerLabel)
+      ? headerLabel
+      : venuesInRegion
+        ? String(venues[0]?.city || '').trim()
+        : '';
+    const stillOnRegion =
+      isRegionLikeCityTitle(headerLabel) ||
+      isRegionLikeCityTitle(urlToken) ||
+      /bashkortostan|respublika-/i.test(urlToken);
+    if (regionTitle && stillOnRegion) {
+      return [[regionTitle, venues.length || 1] as [string, number], ...settlements];
+    }
+    return settlements;
+  }, [stats.cities, venues, selectedCity?.cityLabel, urlCity]);
 
   const cityFilter = useMemo(() => {
     if (urlCityAll) return 'all';

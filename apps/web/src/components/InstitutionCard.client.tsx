@@ -11,6 +11,7 @@ import { dayRouteHookLine } from '@/lib/day-route-from-place';
 import { pluralEvents } from '@/lib/format';
 import type { VenueCatalogCard } from '@/lib/venue-map-types';
 import { resolvePublicVenueType, venueTypeLabel } from '@/lib/venue-meta';
+import { isRegionLikeCityTitle, resolveVenuePlaceCity } from '@/lib/venue-place-city';
 
 const TYPE_GRADIENT: Record<string, string> = {
   museum: 'from-stone-600 via-amber-800 to-slate-900',
@@ -60,8 +61,10 @@ export function InstitutionCard({
       : ownEvents > 0
         ? pluralEvents(ownEvents)
         : null;
-  const cityLabel = String(venue.city || '').trim();
-  const metaLine = [typeLabel, hideCity ? null : cityLabel || null]
+  const placeCity = resolveVenuePlaceCity(venue.city, venue.citySlug);
+  // В регионе City.title = регион: всегда показываем населённый пункт с slug.
+  const showPlaceCity = Boolean(placeCity) && (isRegionLikeCityTitle(venue.city) || !hideCity);
+  const metaLine = [typeLabel, showPlaceCity ? placeCity : null]
     .filter(Boolean)
     .join(' · ')
     .toUpperCase();
@@ -69,7 +72,7 @@ export function InstitutionCard({
     id: venue.id,
     slug: venue.slug,
     title: venue.name,
-    city: venue.city,
+    city: placeCity || venue.city,
     cityId: venue.cityId,
     citySlug: venue.citySlug,
     href,
@@ -128,7 +131,9 @@ export function InstitutionCard({
 
             <div className="flex min-w-0 items-center gap-1.5 text-sm text-graphite-muted">
               <MapPin className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
-              <span className="truncate">{street || (hideCity ? null : venue.city) || 'Адрес уточняется'}</span>
+              <span className="truncate">
+                {street || (showPlaceCity ? placeCity : null) || 'Адрес уточняется'}
+              </span>
               {rating != null ? (
                 <span className="ml-auto inline-flex shrink-0 items-center gap-0.5 text-xs font-medium text-graphite-muted">
                   <Star className="h-3 w-3" strokeWidth={1.75} />
@@ -165,7 +170,6 @@ export function InstitutionCard({
           <AddToDayRouteButton
             key={venue.id}
             compact
-            variant="primary"
             className="!min-h-8 !rounded-lg !px-3 !py-1.5"
             venue={dayRouteVenue}
           />

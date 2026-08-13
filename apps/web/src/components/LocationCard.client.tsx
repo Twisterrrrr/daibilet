@@ -11,6 +11,7 @@ import { dayRouteHookLine } from '@/lib/day-route-from-place';
 import { pluralEvents } from '@/lib/format';
 import type { VenueCatalogCard } from '@/lib/venue-map-types';
 import { resolvePublicVenueType, venueTypeLabel, normalizeVenueKind } from '@/lib/venue-meta';
+import { isRegionLikeCityTitle, resolveVenuePlaceCity } from '@/lib/venue-place-city';
 
 const TYPE_GRADIENT: Record<string, string> = {
   pier: 'from-sky-500 via-cyan-600 to-sky-800',
@@ -113,19 +114,20 @@ export function LocationCard({
       : ownEvents > 0
         ? pluralEvents(ownEvents)
         : null;
-  const cityLabel = String(venue.city || '').trim();
-  const metaLine = [typeLabel, hideCity ? null : cityLabel || null]
+  const placeCity = resolveVenuePlaceCity(venue.city, venue.citySlug);
+  const showPlaceCity = Boolean(placeCity) && (isRegionLikeCityTitle(venue.city) || !hideCity);
+  const metaLine = [typeLabel, showPlaceCity ? placeCity : null]
     .filter(Boolean)
     .join(' · ')
     .toUpperCase();
   const showStreet = Boolean(street) && !sameAddressLabel(street, displayName);
-  const addressLine = showStreet ? street : hideCity ? null : cityLabel || null;
+  const addressLine = showStreet ? street : showPlaceCity ? placeCity : null;
 
   const dayRouteVenue = {
     id: venue.id,
     slug: venue.slug,
     title: routeTitle,
-    city: venue.city,
+    city: placeCity || venue.city,
     cityId: venue.cityId,
     citySlug: venue.citySlug,
     href,
@@ -221,7 +223,6 @@ export function LocationCard({
           <AddToDayRouteButton
             key={venue.id}
             compact
-            variant="primary"
             className="!min-h-8 !rounded-lg !px-3 !py-1.5"
             venue={dayRouteVenue}
           />
