@@ -459,8 +459,7 @@ export function LocationVenueLayout({
 
           {relatedVenues.length > 0 && isParkLike ? (
             <section className="rounded-2xl border border-slate-200 bg-white p-6">
-              <h2 className="text-xl font-bold text-slate-900">Связанные хабы</h2>
-              <p className="mt-1 text-sm text-slate-500">Ближайшие площадки и точки отправления в городе.</p>
+              <h2 className="text-xl font-bold text-slate-900">Рядом</h2>
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 {relatedVenues.slice(0, 4).map((related) => (
                   <LocationCard key={related.id} venue={related} href={venueHref(related)} />
