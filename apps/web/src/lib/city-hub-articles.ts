@@ -169,22 +169,27 @@ function articleMentionsCity(article: BlogCardDto, hubSlug: string, tokens: stri
   return tokens.some((token) => token.length >= 3 && hay.includes(token));
 }
 
+function articleCanonicalCity(article: BlogCardDto): string | null {
+  return normalizeBlogCitySlug(article.citySlug, article.city);
+}
+
+function isForeignCityArticle(article: BlogCardDto, hubSlug: string, tokens: string[]): boolean {
+  const explicit = articleCanonicalCity(article);
+  if (explicit && !isBroadCityMarker(explicit)) {
+    const aliases = CITY_ALIASES[hubSlug] || [hubSlug];
+    return !(aliases.includes(explicit) || explicit === hubSlug);
+  }
+  const hay = normalizeText(`${article.slug} ${article.title} ${article.city || ''}`);
+  return containsForeignCitySignal(hay, new Set(tokens));
+}
+
 function isBroadUseful(article: BlogCardDto, hubTokens: string[]): boolean {
-  const explicit = normalizeText(article.citySlug) || normalizeText(article.city);
+  const explicit = articleCanonicalCity(article) || normalizeText(article.citySlug) || normalizeText(article.city);
   const hay = normalizeText(`${article.slug} ${article.title}`);
   if (explicit && !isBroadCityMarker(explicit)) return false;
   if (containsForeignCitySignal(hay, new Set(hubTokens))) return false;
   if (explicit && isBroadCityMarker(explicit)) return true;
   return false;
-}
-
-function isGenericUseful(article: BlogCardDto, hubTokens: string[]): boolean {
-  const hay = normalizeText(`${article.slug} ${article.title}`);
-  if (containsForeignCitySignal(hay, new Set(hubTokens))) return false;
-
-  const type = String(article.articleType || '').toLowerCase();
-  if (type === 'gid' || type === 'obzor') return true;
-  return PRACTICE_RE.test(hay) || AFFICHE_RE.test(hay);
 }
 
 function scoreForBucket(article: BlogCardDto, bucket: CityHubArticleBucket, cityHit: boolean): number {
@@ -226,7 +231,7 @@ function publishedTime(article: BlogCardDto): number {
 /**
  * Подбор тизеров блога для секций city hub.
  * Одна статья — максимум в одной секции. Пустые бакеты допустимы.
- * Улучшения из Codex: кириллические алиасы, отсев чужих городов, broad multi/regions.
+ * Только этот город или явный multi/regions. Чужой citySlug на хаб не попадает.
  */
 export function pickCityHubArticles(
   city: { slug: string; sourceSlug?: string | null; name: string },
@@ -241,6 +246,7 @@ export function pickCityHubArticles(
   const broadBySlug = new Map<string, boolean>();
 
   for (const article of articles) {
+    if (isForeignCityArticle(article, hubSlug, tokens)) continue;
     const cityHit = articleMentionsCity(article, hubSlug, tokens);
     cityHitBySlug.set(article.slug, cityHit);
     broadBySlug.set(article.slug, !cityHit && isBroadUseful(article, tokens));
@@ -248,10 +254,7 @@ export function pickCityHubArticles(
 
   const cityPool = articles.filter((a) => cityHitBySlug.get(a.slug));
   const broadPool = articles.filter((a) => broadBySlug.get(a.slug));
-  const genericPool = articles.filter(
-    (a) => !cityHitBySlug.get(a.slug) && !broadBySlug.get(a.slug) && isGenericUseful(a, tokens),
-  );
-  const pool = [...cityPool, ...broadPool, ...genericPool];
+  const pool = [...cityPool, ...broadPool];
 
   const used = new Set<string>();
   const order: CityHubArticleBucket[] = ['about', 'affiche', 'sights', 'practice', 'more'];
@@ -260,8 +263,9 @@ export function pickCityHubArticles(
     const limit = LIMITS[bucket];
     const preferCity = bucket === 'about' || bucket === 'sights' || bucket === 'affiche';
     const minScore = preferCity ? 20 : 15;
+    const source = preferCity ? cityPool : pool;
 
-    const ranked = pool
+    const ranked = source
       .filter((article) => !used.has(article.slug))
       .map((article) => ({
         article,

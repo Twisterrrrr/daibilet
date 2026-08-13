@@ -4,6 +4,7 @@ import Link from 'next/link';
 
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import type { BlogCardDto } from '@/lib/blog-utils';
+import { blogCityBadgeClassName, blogListingCityBadgeLabel } from '@/lib/blog-meta';
 import type { PublicSessionDto } from '@daibilet/contracts/public';
 
 function readTimeLabel(readMin: number): string {
@@ -30,6 +31,7 @@ export function CityHubArticleTeaser({
   const articleHref = `/blog/${article.slug}`;
   const isLarge = variant === 'large';
   const isSmall = variant === 'small';
+  const cityLabel = blogListingCityBadgeLabel(article.citySlug, article.city);
 
   return (
     <article
@@ -79,8 +81,15 @@ export function CityHubArticleTeaser({
           >
             {article.title}
           </h3>
+          {cityLabel ? (
+            <p
+              className={`mt-2 inline-flex w-fit max-w-full truncate rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ring-1 sm:text-[11px] ${blogCityBadgeClassName(article.citySlug)}`}
+            >
+              {cityLabel}
+            </p>
+          ) : null}
           <p
-            className={`mt-2 text-xs font-medium ${
+            className={`${cityLabel ? 'mt-1.5' : 'mt-2'} text-xs font-medium ${
               editorial ? 'text-zinc-500' : 'text-slate-500'
             }`}
           >

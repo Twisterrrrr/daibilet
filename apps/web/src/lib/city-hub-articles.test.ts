@@ -130,6 +130,45 @@ test('pickCityHubArticles: explicit CMS citySlug wins over title heuristics', ()
   assert.ok(allSlugs(onMsk).includes('msk-about-spb-word'));
 });
 
+test('pickCityHubArticles: other-city slug stays off hub even without city in title', () => {
+  const articles = [
+    card({
+      slug: 'chto-poslushat-jazz',
+      title: 'Что послушать: джаз вечером',
+      citySlug: 'moscow',
+      city: 'Москва',
+      articleType: 'gid',
+    }),
+    card({
+      slug: 'kak-vybrat-koncert',
+      title: 'Как выбрать концерт',
+      articleType: 'gid',
+    }),
+  ];
+  const buckets = pickCityHubArticles(spb, articles);
+  const slugs = allSlugs(buckets);
+  assert.equal(slugs.includes('chto-poslushat-jazz'), false);
+  assert.equal(slugs.includes('kak-vybrat-koncert'), false);
+});
+
+test('pickCityHubArticles: city-named buckets do not take multi-city fillers', () => {
+  const articles = [
+    card({
+      slug: 'kak-vybrat-koncert',
+      title: 'Как выбрать концерт',
+      citySlug: 'multi',
+      city: 'Несколько городов',
+      articleType: 'gid',
+      excerpt: 'Практика выбора формата и билетов',
+    }),
+  ];
+  const buckets = pickCityHubArticles(spb, articles);
+  assert.equal(buckets.about.some((a) => a.slug === 'kak-vybrat-koncert'), false);
+  assert.equal(buckets.affiche.some((a) => a.slug === 'kak-vybrat-koncert'), false);
+  assert.equal(buckets.sights.some((a) => a.slug === 'kak-vybrat-koncert'), false);
+  assert.ok(buckets.practice.some((a) => a.slug === 'kak-vybrat-koncert'));
+});
+
 test('matchArticleSessions: prefers keyword hits', () => {
   const article = card({
     slug: 'spb-rooftop',

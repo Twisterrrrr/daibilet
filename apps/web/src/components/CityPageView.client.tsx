@@ -403,7 +403,7 @@ export function CityPageView({
                     Из блога
                   </h2>
                   <p className={`mt-2 max-w-3xl text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-                    Редакционные материалы о городе - без цен и кнопок покупки на карточке.
+                    Материалы про {city.name}. Общие гиды на несколько городов подписаны на карточке.
                   </p>
                   <CityHubArticlesGrid articles={footerArticles} editorial={editorial} />
                 </div>
