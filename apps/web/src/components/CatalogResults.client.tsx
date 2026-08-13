@@ -19,6 +19,7 @@ import {
   catalogInterstitialsForCity,
   type CatalogInterstitial,
 } from '@/lib/catalog-interstitials';
+import { collapseCatalogComboFamilies } from '@/lib/home-showcase-sections';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 
 type CatalogResultsProps = {
@@ -122,7 +123,8 @@ export function CatalogResults({
   sort,
   hasExtraFilters = false,
 }: CatalogResultsProps) {
-  if (!items.length) {
+  const catalogItems = collapseCatalogComboFamilies(items);
+  if (!catalogItems.length) {
     const cityName = String(city || '').trim();
     const cityScoped = Boolean(cityName) && cityName.toLowerCase() !== 'all';
     const hubTiles = cityScoped
@@ -213,12 +215,12 @@ export function CatalogResults({
     );
   }
 
-  const liveRailItems = pickLiveRailItems(items, sort);
+  const liveRailItems = pickLiveRailItems(catalogItems, sort);
   const showLiveRail = liveRailItems.length >= 3 && viewMode === 'cards';
   // Keep «Сейчас выбирают» / «Популярное сейчас» from mirroring the first page of cards 1:1.
   const listItems = showLiveRail
-    ? items.filter((item) => !liveRailItems.some((rail) => rail.id === item.id))
-    : items;
+    ? catalogItems.filter((item) => !liveRailItems.some((rail) => rail.id === item.id))
+    : catalogItems;
   const gridEntries = viewMode === 'cards' ? buildCatalogGridEntries(listItems, city) : null;
 
   return (
@@ -338,18 +340,18 @@ export function ViewModeToggle({
 }) {
   return (
     <div
-      className="inline-flex h-8 shrink-0 items-center overflow-hidden rounded-lg bg-slate-100 p-0.5 ring-1 ring-slate-200/80"
+      className="inline-flex h-10 shrink-0 items-center overflow-hidden rounded-lg bg-slate-100 p-0.5 ring-1 ring-slate-200/80"
       role="radiogroup"
       aria-label="Вид каталога"
     >
       <ViewModeButton active={mode === 'cards'} label="Карточки" onClick={() => onChange('cards')}>
-        <Grid3X3 className="h-4 w-4" aria-hidden />
+        <Grid3X3 className="h-5 w-5" aria-hidden />
       </ViewModeButton>
       <ViewModeButton active={mode === 'list'} label="Список" onClick={() => onChange('list')}>
-        <List className="h-4 w-4" aria-hidden />
+        <List className="h-5 w-5" aria-hidden />
       </ViewModeButton>
       <ViewModeButton active={mode === 'table'} label="Таблица" onClick={() => onChange('table')}>
-        <Table2 className="h-4 w-4" aria-hidden />
+        <Table2 className="h-5 w-5" aria-hidden />
       </ViewModeButton>
     </div>
   );
@@ -374,7 +376,7 @@ function ViewModeButton({
       aria-label={label}
       title={label}
       onClick={onClick}
-      className={`grid h-7 w-7 place-items-center rounded-md transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 ${
+      className={`grid h-9 w-9 place-items-center rounded-md transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 ${
         active
           ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200'
           : 'text-slate-500 hover:bg-white/70 hover:text-slate-800'

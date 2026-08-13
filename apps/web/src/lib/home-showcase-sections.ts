@@ -10,6 +10,27 @@ import type { PublicSessionDto } from '@daibilet/contracts/public';
 
 type PublicSession = PublicSessionDto;
 
+export type SessionFamilySource = {
+  groupKey?: string | null;
+  venueId?: string | null;
+  venueSlug?: string | null;
+  venue?: string | null;
+  title?: string | null;
+};
+
+export function isComboSessionTitle(title: string | null | undefined): boolean {
+  const value = String(title || '').trim().toLowerCase();
+  if (!value) return false;
+  if (/^комбо(?:\s|$|[-–—\d])/i.test(value) || /(?:^|[\s([{«"'])комбо\s*\d+/i.test(value)) {
+    return true;
+  }
+  if (/\d/.test(value)) {
+    const stem = value.replace(/\d+/g, '#').replace(/\s+/g, ' ').trim();
+    return /^комбо(?:\s*#|\s|$)/.test(stem);
+  }
+  return false;
+}
+
 export const HOME_SHOWCASE_LIMIT = 8;
 export const HOME_POPULAR_LIMIT = 6;
 
@@ -45,7 +66,7 @@ function sessionDedupeKey(event: PublicSession): string {
  * Family key for showcase rails: collapse near-duplicate ticket products
  * (e.g. «Комбо 1/2/5/7» at the same venue) into one card.
  */
-export function sessionFamilyKey(event: PublicSession): string {
+export function sessionFamilyKey(event: SessionFamilySource): string {
   const groupKey = String(event.groupKey || '').trim().toLowerCase();
   if (groupKey.startsWith('merge|')) return `merge:${groupKey}`;
 
@@ -53,23 +74,30 @@ export function sessionFamilyKey(event: PublicSession): string {
     .trim()
     .toLowerCase()
     .replace(/\s+/g, ' ');
-  const title = String(event.title || '').trim().toLowerCase();
 
   // «Комбо 1», «Комбо 7», «Комбо …» на одной площадке → одна карточка
-  // Не используем \b: в JS граница слова не работает с кириллицей.
-  if (venueKey && (/^комбо(?:\s|$|[-–—\d])/i.test(title) || /(?:^|[\s([{«"'])комбо\s*\d+/i.test(title))) {
+  if (venueKey && isComboSessionTitle(event.title)) {
     return `combo-venue:${venueKey}`;
   }
 
-  // Одинаковая площадка + «комбо #» после нормализации цифр
-  if (venueKey && title && /\d/.test(title)) {
-    const stem = title.replace(/\d+/g, '#').replace(/\s+/g, ' ').trim();
-    if (/^комбо(?:\s*#|\s|$)/.test(stem)) {
-      return `combo-venue:${venueKey}`;
-    }
-  }
+  return sessionDedupeKey(event as PublicSession);
+}
 
-  return sessionDedupeKey(event);
+/** Keep the first combo ticket per venue; leave unrelated events untouched. */
+export function collapseCatalogComboFamilies<T extends SessionFamilySource>(items: T[]): T[] {
+  const seen = new Set<string>();
+  const out: T[] = [];
+  for (const item of items) {
+    const key = sessionFamilyKey(item);
+    if (!key.startsWith('combo-venue:')) {
+      out.push(item);
+      continue;
+    }
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(item);
+  }
+  return out;
 }
 
 export function createHomePickState(seed?: Partial<HomePickState>): HomePickState {

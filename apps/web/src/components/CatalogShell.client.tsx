@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ChevronDown } from 'lucide-react';
 
 import { CatalogActiveFilters } from '@/components/CatalogActiveFilters';
 import { CatalogPaginationLinks } from '@/components/CatalogPaginationLinks';
@@ -11,7 +10,7 @@ import { CatalogResults, ViewModeToggle } from '@/components/CatalogResults.clie
 import { CatalogToolbar } from '@/components/CatalogToolbar.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import type { PublicCatalogDto } from '@daibilet/contracts/public';
-import { CATALOG_PAGE_SIZE_DEFAULT, CATALOG_PAGE_SIZES } from '@daibilet/contracts/catalog';
+import { CATALOG_PAGE_SIZE_DEFAULT } from '@daibilet/contracts/catalog';
 import {
   buildCatalogHref,
   CATALOG_SORT_OPTIONS,
@@ -319,37 +318,6 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
                 {option.label}
               </button>
             ))}
-          </div>
-
-          <div className="relative hidden lg:block">
-            <label htmlFor="catalog-page-size" className="sr-only">
-              Карточек на странице
-            </label>
-            <select
-              id="catalog-page-size"
-              value={filterValues.limit ?? CATALOG_PAGE_SIZE_DEFAULT}
-              disabled={(loading && !catalog) || cityBootstrapPending}
-              onChange={(event) => {
-                router.push(
-                  buildCatalogHref({
-                    ...filterValues,
-                    limit: Number(event.target.value) as CatalogFilterValues['limit'],
-                    page: undefined,
-                  }),
-                );
-              }}
-              className="inline-btn h-8 appearance-none rounded-lg bg-slate-100 pl-2.5 pr-7 text-xs font-medium text-slate-700 outline-none transition hover:bg-slate-200 focus-visible:ring-2 focus-visible:ring-primary/60 disabled:opacity-60"
-            >
-              {CATALOG_PAGE_SIZES.map((size) => (
-                <option key={size} value={size}>
-                  {size} на стр.
-                </option>
-              ))}
-            </select>
-            <ChevronDown
-              aria-hidden
-              className="pointer-events-none absolute right-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400"
-            />
           </div>
           <ViewModeToggle mode={viewMode} onChange={setViewMode} />
         </div>

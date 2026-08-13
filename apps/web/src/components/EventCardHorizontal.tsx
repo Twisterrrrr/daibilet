@@ -130,6 +130,10 @@ export function EventCardHorizontal({ session }: { session: PublicCatalogListIte
           </Link>
         </h3>
 
+        {descriptionText ? (
+          <p className="line-clamp-2 text-ui-xs text-graphite-muted sm:text-ui-sm">{descriptionText}</p>
+        ) : null}
+
         {(session.category || highlights.length > 0) && (
           <div className="flex flex-wrap items-center gap-1.5">
             {session.category ? (
@@ -182,7 +186,6 @@ export function EventCardHorizontal({ session }: { session: PublicCatalogListIte
           ) : null}
         </div>
 
-        {descriptionText ? <p className="line-clamp-2 text-ui-xs text-graphite-muted sm:text-ui-sm">{descriptionText}</p> : null}
         {showSlotPills ? (
           <div className="flex flex-nowrap items-center gap-1.5 overflow-hidden">
             {wideSlotLabels.map((label) => (

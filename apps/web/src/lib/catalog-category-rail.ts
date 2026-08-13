@@ -70,27 +70,50 @@ export function splitCatalogCategories(
   return { primary, overflow };
 }
 
+/** Popular queries shown on search focus (before typing). */
+const POPULAR_QUERY_HINTS: Array<{ kind: 'q'; label: string; q: string }> = [
+  { kind: 'q', label: 'Выставки', q: 'выставки' },
+  { kind: 'q', label: 'Концерты на выходных', q: 'концерт' },
+  { kind: 'q', label: 'Экскурсии', q: 'экскурсия' },
+];
+
 export function catalogSearchHintsFromFacets(
   categories: CatalogCategoryFacet[],
-  limit = 5,
+  limit = 6,
 ): Array<{ kind: 'category' | 'q'; label: string; category?: string; q?: string }> {
   const hints: Array<{ kind: 'category' | 'q'; label: string; category?: string; q?: string }> = [];
+  const seen = new Set<string>();
+
+  for (const item of POPULAR_QUERY_HINTS) {
+    if (hints.length >= limit) break;
+    const key = `q:${item.q}`;
+    const labelKey = `label:${item.label.toLowerCase()}`;
+    if (seen.has(key) || seen.has(labelKey)) continue;
+    seen.add(key);
+    seen.add(labelKey);
+    hints.push(item);
+  }
+
   const sorted = [...categories].filter((c) => c.events > 0).sort((a, b) => b.events - a.events);
 
   for (const item of sorted) {
     if (hints.length >= limit) break;
+    const label = displayCatalogLabel(item.name);
+    const key = `c:${item.name}`;
+    const labelKey = `label:${label.toLowerCase()}`;
+    if (seen.has(key) || seen.has(`q:${label.toLowerCase()}`) || seen.has(labelKey)) continue;
+    seen.add(key);
+    seen.add(labelKey);
     hints.push({
       kind: 'category',
-      label: displayCatalogLabel(item.name),
+      label,
       category: item.name,
     });
   }
 
   const hasStandupFacet = sorted.some((c) => isStandupish(c.name));
-  if (hasStandupFacet && hints.length < limit && !hints.some((h) => h.q === 'стендап')) {
-    // Prefer q intent only when standup-ish facet exists (real signal).
+  if (hasStandupFacet && !seen.has('q:стендап')) {
     hints.unshift({ kind: 'q', label: 'Стендап', q: 'стендап' });
-    if (hints.length > limit) hints.pop();
   }
 
   return hints.slice(0, limit);

@@ -49,7 +49,10 @@ describe('catalog-category-rail', () => {
       { name: 'Экскурсии', events: 12 },
       { name: 'Лекции', events: 2 },
     ]);
-    expect(hints.some((h) => h.category === 'Экскурсии')).toBe(true);
+    expect(hints.some((h) => h.q === 'выставки')).toBe(true);
+    expect(hints.some((h) => h.label === 'Концерты на выходных')).toBe(true);
+    expect(hints.some((h) => h.category === 'Лекции')).toBe(true);
+    expect(hints.filter((h) => h.label === 'Экскурсии')).toHaveLength(1);
     expect(hints.some((h) => h.q === 'стендап')).toBe(false);
   });
 });

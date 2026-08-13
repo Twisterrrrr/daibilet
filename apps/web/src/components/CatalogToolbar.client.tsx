@@ -63,7 +63,7 @@ export function CatalogToolbar({
     [facets.categories, filters.category],
   );
   const searchHints = useMemo(
-    () => catalogSearchHintsFromFacets(facets.categories, 5),
+    () => catalogSearchHintsFromFacets(facets.categories, 6),
     [facets.categories],
   );
   const showSearchHints = searchFocused && !qDraft.trim() && searchHints.length > 0 && !disabled;
@@ -245,14 +245,14 @@ export function CatalogToolbar({
       <div className="catalog-toolbar sticky top-[var(--site-header-height)] z-30 -mx-4 space-y-2 border-b border-slate-200/60 bg-white/95 px-4 py-2 backdrop-blur-md supports-[backdrop-filter]:bg-white/90 sm:-mx-6 sm:px-6 md:static md:z-auto md:mx-0 md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none">
         <form
           onSubmit={onSubmit}
-          className="flex flex-col gap-1.5 rounded-2xl border border-slate-100 bg-white p-1.5 md:flex-row md:items-center md:gap-1 md:p-1"
+          className="flex flex-col gap-1.5 rounded-2xl border border-slate-200 bg-[#F5F5F7] p-1.5 shadow-sm md:flex-row md:items-center md:gap-1.5 md:p-1.5"
         >
           <div ref={searchWrapRef} className="relative flex min-w-0 flex-1 items-center gap-1">
             <label className="relative block min-w-0 flex-1">
               <span className="sr-only">Поиск по событиям</span>
               <Search
                 aria-hidden
-                className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-graphite-muted"
+                className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500"
                 strokeWidth={1.75}
               />
               <input
@@ -268,7 +268,7 @@ export function CatalogToolbar({
                 aria-controls={showSearchHints ? 'catalog-search-hints' : undefined}
                 disabled={disabled}
                 autoComplete="off"
-                className="inline-btn h-10 w-full rounded-xl bg-transparent pl-10 pr-9 text-sm text-graphite outline-none transition placeholder:text-graphite-muted focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-60 md:h-9"
+                className="inline-btn h-11 w-full rounded-xl border border-transparent bg-white pl-11 pr-9 text-sm text-graphite outline-none transition placeholder:text-slate-400 focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/30 disabled:opacity-60 md:h-10"
               />
               {qDraft ? (
                 <button
@@ -289,7 +289,7 @@ export function CatalogToolbar({
             <button
               type="submit"
               disabled={disabled}
-              className="inline-btn btn-primary h-10 shrink-0 rounded-xl px-3.5 text-sm disabled:opacity-60 md:h-9"
+              className="inline-btn btn-primary h-11 shrink-0 rounded-xl px-4 text-sm disabled:opacity-60 md:h-10"
             >
               Найти
             </button>
@@ -299,7 +299,7 @@ export function CatalogToolbar({
                 id="catalog-search-hints"
                 role="listbox"
                 aria-label="Популярные запросы"
-                className="absolute left-0 right-0 top-[calc(100%+0.35rem)] z-50 overflow-hidden rounded-2xl border border-slate-100 bg-white py-1.5 shadow-lg"
+                className="absolute left-0 right-0 top-[calc(100%+0.35rem)] z-50 overflow-hidden rounded-2xl border border-slate-200 bg-white py-1.5 shadow-lg"
               >
                 <p className="px-3 pb-1 pt-0.5 text-[11px] font-semibold uppercase tracking-wider text-graphite-muted">
                   Часто ищут

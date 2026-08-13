@@ -149,8 +149,7 @@ export function CatalogPaginationLinks({
             onPageChange={onPageChange}
             className="inline-flex min-h-11 w-full max-w-sm items-center justify-center rounded-full bg-primary-600 px-8 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700"
           >
-            Страница {nextPage}
-            {remaining > 0 ? ` · ещё ${Math.min(limit, remaining)}` : ''}
+            {remaining > 0 ? `Показать ещё ${Math.min(limit, remaining)}` : 'Показать ещё'}
           </PaginationNavLink>
         ) : null}
         {prevPage ? (
@@ -224,9 +223,9 @@ export function CatalogPaginationLinks({
             targetPage={nextPage}
             onPageChange={onPageChange}
             className={`${navBtn} border-slate-900 bg-slate-900 text-white hover:bg-slate-800`}
-            aria-label="Следующая страница"
+            aria-label="Показать ещё"
           >
-            Дальше →
+            {remaining > 0 ? `Показать ещё ${Math.min(limit, remaining)}` : 'Дальше →'}
           </PaginationNavLink>
         ) : (
           <span className={navBtn} aria-disabled="true">

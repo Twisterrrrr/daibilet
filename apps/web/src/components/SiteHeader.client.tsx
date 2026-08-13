@@ -53,6 +53,7 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [authMounted, setAuthMounted] = useState(false);
   const [searchInitialQuery, setSearchInitialQuery] = useState('');
+  const [compactHeader, setCompactHeader] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const auth = useUserAuthOptional();
   const selectedCity = useSelectedCityOptional();
@@ -60,6 +61,40 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
   useEffect(() => {
     setAuthMounted(true);
   }, []);
+
+  useEffect(() => {
+    let lastY = window.scrollY;
+    let ticking = false;
+
+    const apply = (next: boolean) => {
+      setCompactHeader((prev) => (prev === next ? prev : next));
+    };
+
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        ticking = false;
+        const y = window.scrollY;
+        if (y < 24) {
+          apply(false);
+          lastY = y;
+          return;
+        }
+        if (y > lastY + 6) apply(true);
+        else if (y < lastY - 6) apply(false);
+        lastY = y;
+      });
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('site-header-compact', compactHeader);
+    return () => document.documentElement.classList.remove('site-header-compact');
+  }, [compactHeader]);
 
   // Avoid useSearchParams here: it CSR-bailouts the whole SiteLayout tree.
   useEffect(() => {
@@ -112,7 +147,11 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
   return (
     <>
       <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-200/70 bg-white/95 pt-[env(safe-area-inset-top,0px)] shadow-[0_1px_0_hsl(210_9%_11%/0.03)] backdrop-blur-md supports-[backdrop-filter]:bg-white/90">
-        <div className="container-page flex min-h-[var(--site-header-height)] items-center justify-between gap-2 py-2.5 sm:gap-3 sm:py-3 lg:py-3.5">
+        <div
+          className={`container-page flex min-h-[var(--site-header-height)] items-center justify-between gap-2 transition-[padding] duration-200 ${
+            compactHeader ? 'py-1.5 sm:py-1.5 lg:py-2' : 'py-2.5 sm:py-3 lg:py-3.5'
+          }`}
+        >
           <div className="flex min-w-0 flex-1 flex-nowrap items-center gap-2 sm:gap-3 lg:flex-none lg:gap-4">
             {/* Label only in header; sheet layer is a sibling outside backdrop-blur. */}
             <MobileNavTrigger id={mobileNavId} />
@@ -136,7 +175,10 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
             />
           </div>
 
-          <nav aria-label="Основная навигация" className="hidden min-w-0 items-center gap-0.5 lg:flex">
+          <nav
+            aria-label="Основная навигация"
+            className={`min-w-0 items-center gap-0.5 ${compactHeader ? 'hidden' : 'hidden lg:flex'}`}
+          >
             {navLinks.map((item) => {
               const active = isNavActive(pathname, item.href, item.label);
               const secondary = item.href.startsWith('/blog');

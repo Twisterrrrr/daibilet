@@ -2,7 +2,12 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { isHomeRailTabooSession } from './home-rail-taboos';
-import { buildEditorsPickEvents, buildPopularEvents, createHomePickState } from './home-showcase-sections';
+import {
+  buildEditorsPickEvents,
+  buildPopularEvents,
+  collapseCatalogComboFamilies,
+  createHomePickState,
+} from './home-showcase-sections';
 import {
   collectSessionImageDedupeKeys,
   normalizeSessionImageKey,
@@ -232,4 +237,16 @@ test('popular / editors pick: skip evt-auto stubs so photo rails stay photograph
   const editors = buildEditorsPickEvents(sessions, 4, createHomePickState());
   assert.equal(editors.some((s) => s.id === 'stub1'), false);
   assert.ok(editors.some((s) => s.id === 'photo1'));
+});
+
+test('collapseCatalogComboFamilies: one card per venue for Комбо N', () => {
+  const items = [
+    session({ id: 'c1', title: 'Комбо 1', venueSlug: 'museum-x', venue: 'Музей X' }),
+    session({ id: 'c2', title: 'Комбо 2', venueSlug: 'museum-x', venue: 'Музей X' }),
+    session({ id: 'c6', title: 'Комбо 6', venueSlug: 'museum-x', venue: 'Музей X' }),
+    session({ id: 'boat', title: 'Речная прогулка', venueSlug: 'pier-1', venue: 'Причал' }),
+    session({ id: 'c-other', title: 'Комбо 1', venueSlug: 'museum-y', venue: 'Музей Y' }),
+  ];
+  const collapsed = collapseCatalogComboFamilies(items);
+  assert.equal(collapsed.map((item) => item.id).join(','), 'c1,boat,c-other');
 });

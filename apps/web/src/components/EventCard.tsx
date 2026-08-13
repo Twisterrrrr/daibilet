@@ -24,6 +24,7 @@ import {
   CATALOG_DISPLAY_SLOT_LIMIT,
   formatCoverDateBadge,
   formatEventNextSession,
+  formatListDescription,
   formatPriceRub,
   formatShowcasePriceLabel,
   formatShowcaseSessionDate,
@@ -130,6 +131,12 @@ export function EventCard({
   // Missing display price (<100 / null) is not "soon" - event can still be on sale.
   const showSoonBadge = false;
   const priceFooterLabel = hasPrice ? formatPriceFrom(session.priceFrom) : null;
+  const descriptionText = formatListDescription(
+    'description' in session ? session.description : undefined,
+  );
+  const showDescription =
+    Boolean(descriptionText) &&
+    descriptionText.toLowerCase() !== String(session.title || '').trim().toLowerCase();
   const purchase = useCatalogPurchase(session);
   // Catalog list: no hidden widget DOM. Purchase UX lives on event page / landing CTA.
   const showPurchaseWidgets = landingActions && !suppressPurchaseAnchors && purchase.purchaseEnabled;
@@ -252,6 +259,10 @@ export function EventCard({
             {session.title}
           </Link>
         </h2>
+
+        {showDescription ? (
+          <p className="line-clamp-2 text-ui-xs text-graphite-muted sm:text-ui-sm">{descriptionText}</p>
+        ) : null}
 
         {landingBadges.length > 0 ? (
           <LandingCardBadgeRow badges={landingBadges} />

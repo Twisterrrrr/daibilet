@@ -58,6 +58,7 @@ html[data-nav-pending='1'] {
     --font-display: var(--font-manrope), var(--font-inter), system-ui, sans-serif;
     --font-serif: var(--font-source-serif), Georgia, 'Times New Roman', serif;
     --site-header-height: 4rem;
+    --site-header-height-compact: 3.25rem;
     --bridges-gradient-hero: radial-gradient(ellipse 90% 70% at 70% 40%, oklch(0.38 0.14 265 / 0.9), transparent 70%),
       linear-gradient(135deg, oklch(0.22 0.10 265), oklch(0.30 0.13 262));
     --bridges-gradient-amber: linear-gradient(135deg, oklch(0.78 0.17 55), oklch(0.70 0.19 40));
@@ -105,7 +106,12 @@ html[data-nav-pending='1'] {
   @media (min-width: 1024px) {
     :root {
       --site-header-height: 4.5rem;
+      --site-header-height-compact: 3.5rem;
     }
+  }
+
+  html.site-header-compact {
+    --site-header-height: var(--site-header-height-compact);
   }
 
   * {

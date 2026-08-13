@@ -4,6 +4,16 @@
 |----|--------|-----------|--------|
 | FIX.PUBLIC-ERROR-UI | Убрать английский Next fallback «Application error…» с public: error.tsx + global-error.tsx + ранний chunk reload | Критический | 🔄 code; live после Deploy MSK web |
 
+## Events catalog UX (2026-08-13)
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| UX.EVENTS-FILTERS-DEDUP | Афиша `/events`: не дублировать город/категорию/дату в «Активно»; подсветка в лентах | Высокий | ✅ 2026-08-13 code; live после Deploy MSK web |
+| UX.EVENTS-SEARCH-HINTS | Контрастный поиск + подсказки «Выставки / Концерты на выходных» на фокусе | Высокий | ✅ 2026-08-13 code; live после Deploy MSK web |
+| UX.EVENTS-COMBO-CARDS | Комбо: одна карточка на площадку, фото venue, описание под названием | Высокий | ✅ 2026-08-13 code; live после Deploy MSK web |
+| UX.EVENTS-NAV-PAGE | Крупнее вид grid/list; убрать «N на стр.»; CTA «Показать ещё» | Высокий | ✅ 2026-08-13 code; live после Deploy MSK web |
+| UX.HEADER-COMPACT-SCROLL | Шапка: скрыть основное меню при скролле вниз, вернуть при скролле вверх | Высокий | ✅ 2026-08-13 code; live после Deploy MSK web |
+
 ## Event PDP title / breadcrumbs (2026-08-13)
 
 | ID | Задача | Приоритет | Статус |
