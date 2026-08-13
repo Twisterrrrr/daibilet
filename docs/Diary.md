@@ -15,6 +15,20 @@
 
 ---
 
+## 2026-08-14 - Live: Deploy MSK web `31747819236`
+
+### Наблюдения
+- Owner: «в конце выкатывай» после пакета events/cities/podborki + My Day A-B-C.
+
+### Решения
+- Deploy MSK web `31747819236` tip `a74764a` BUILD_ID из артефакта.
+- Prod migrate `20260814010000_day_route_share_ugc` на MSK (day_route_shares UGC columns).
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-14 - /events: footer hide foreign + urgency copy polish
 
 ### Наблюдения
