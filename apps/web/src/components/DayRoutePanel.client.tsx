@@ -3119,7 +3119,7 @@ function DayRoutePanelInner() {
               return true;
             });
           }}
-          className="m-0 inline p-0 font-medium text-slate-500 underline-offset-2 transition hover:text-slate-700 hover:underline"
+          className="m-0 inline-flex cursor-pointer items-center border-0 bg-transparent p-0 font-medium text-slate-500 underline decoration-transparent underline-offset-2 transition-colors hover:text-slate-700 hover:decoration-current"
         >
           Сменить город
         </button>
@@ -3342,7 +3342,7 @@ function DayRoutePanelInner() {
                 ) : null}
               </div>
               <p
-                className="mt-1 flex flex-wrap items-baseline gap-x-1 text-[13px] font-medium text-slate-500 lg:mt-0.5"
+                className="mt-1 flex flex-wrap items-center gap-x-1.5 text-[13px] font-medium text-slate-500 lg:mt-0.5"
                 data-day-route-count-label
               >
                 <span className="lg:hidden">{cityScopeLine}</span>
@@ -3354,7 +3354,7 @@ function DayRoutePanelInner() {
                 {scopeCityName ? (
                   <Link
                     href={cityHubHref}
-                    className="text-primary-600 transition-colors hover:text-primary-700 hover:underline"
+                    className="inline-flex cursor-pointer items-center text-primary-600 underline decoration-transparent underline-offset-2 transition-colors hover:text-primary-700 hover:decoration-current"
                     data-day-city-hub-link
                   >
                     Страница {cityToGenitive(scopeCityName)}
@@ -4083,7 +4083,7 @@ function DayRoutePanelInner() {
                   {scopeCityName ? `Мой день ${inCityPrepositional(scopeCityName)}` : 'Мой день'}
                 </h1>
                 <p
-                  className="mt-1.5 flex flex-wrap items-baseline gap-x-1 text-[13px] font-medium text-slate-500"
+                  className="mt-1.5 flex flex-wrap items-center gap-x-1.5 text-[13px] font-medium text-slate-500"
                   data-day-route-count-label
                   data-day-city-scope
                 >
@@ -4092,7 +4092,7 @@ function DayRoutePanelInner() {
                   {scopeCityName ? (
                     <Link
                       href={cityHubHref}
-                      className="text-primary-600 transition-colors hover:text-primary-700 hover:underline"
+                      className="inline-flex cursor-pointer items-center text-primary-600 underline decoration-transparent underline-offset-2 transition-colors hover:text-primary-700 hover:decoration-current"
                       data-day-city-hub-link
                     >
                       Страница {cityToGenitive(scopeCityName)}
