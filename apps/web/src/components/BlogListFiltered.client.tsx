@@ -66,7 +66,7 @@ function SoftSelect({
   return (
     <label className="relative inline-flex min-w-0 items-center">
       <select
-        className="appearance-none bg-transparent py-2.5 pl-0.5 pr-7 text-base font-medium text-slate-700 outline-none transition hover:text-slate-900 focus-visible:text-slate-900 md:py-1.5 md:pr-6 md:text-sm"
+        className="h-10 appearance-none rounded-xl border border-slate-200 bg-white py-2 pl-3 pr-9 text-sm font-medium text-slate-700 outline-none transition hover:border-slate-300 hover:bg-slate-50 focus-visible:border-primary-400 focus-visible:ring-2 focus-visible:ring-primary-100 md:min-w-[11rem]"
         value={value}
         onChange={(event) => onChange(event.target.value)}
         aria-label={ariaLabel}
@@ -74,7 +74,7 @@ function SoftSelect({
         {children}
       </select>
       <ChevronDown
-        className="pointer-events-none absolute right-0 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 md:h-3.5 md:w-3.5"
+        className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
         aria-hidden
       />
     </label>
@@ -227,7 +227,7 @@ export function BlogListFiltered({
 
   const filtersBar = (
     <div className="mb-6 border-b border-slate-200/70 pb-3 md:mb-8 md:pb-4">
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 md:gap-x-5">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
         <SoftSelect
           value={urlCity}
           onChange={(value) => setFilter('city', value)}
@@ -258,7 +258,7 @@ export function BlogListFiltered({
           <button
             type="button"
             onClick={resetFilters}
-            className="text-sm font-medium text-primary-600 hover:text-primary-700"
+            className="inline-flex h-10 items-center rounded-xl px-3 text-sm font-medium text-primary-600 transition hover:bg-primary-50 hover:text-primary-700"
           >
             Сбросить
           </button>
