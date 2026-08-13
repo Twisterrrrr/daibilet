@@ -1,7 +1,9 @@
 /**
- * Owner product rules (2026-08-05):
+ * Owner product rules (2026-08-05; plant-on-create 2026-08-13):
  * - OUTDOOR_LOCATION = street / bridge / square / embankment / open street access only
- * - Buildings → ATTRACTION; parks → PARK; monuments → MONUMENT; museums → MUSEUM_ART_SPACE
+ * - Buildings → ATTRACTION; parks → PARK; monuments → MONUMENT
+ * - Ticketable institutions (museum / theater / concert hall / DK / circus) →
+ *   /venues immediately. Do not wait for first event or tickets.
  * - Cafe/restaurant/bar on /locations → GASTRO (not CLUB_BAR_RESTAURANT / not outdoor)
  * - Pier / bus boarding → PIER / MEETING_POINT
  *
@@ -73,7 +75,6 @@ const BUILDING_ATTRACTION_RE = new RegExp(
     'часовн',
     'колокольн',
     'адмиралтейств',
-    'кунсткамер',
     'доходн(?:ый|ого)\\s+дом',
     'толстовск(?:ий|ого)\\s+дом',
     'дом\\s+советов',
@@ -99,11 +100,7 @@ const BUILDING_ATTRACTION_RE = new RegExp(
     'тюрем',
     'тюрьм',
     'вокзал',
-    'консерватор',
-    'филармони',
-    'дворец\\s+культур',
     'бертгольд',
-    '(?:культурн|выставочн|творческ)\\w*\\s+центр',
     'спас\\s+на\\s+крови',
     'мечет',
     'синагог',
@@ -149,9 +146,23 @@ const MONUMENT_RE =
   /памятник|скульптур|бюст|монумент|мемориал|медн(?:ый|ого)\s+всадник|голова ленина|тысячелетие россии|колонн/i;
 
 const MUSEUM_RE =
-  /музей|галере|эрмитаж|третьяков|дацан|хохловк|арт[-\s]?пространств|кунсткамер/i;
+  /музей|галере|эрмитаж|третьяков|дацан|хохловк|арт[-\s]?пространств|кунсткамер|выставочн\w*\s+центр|экспоцентр/i;
 
-const THEATER_RE = /театр|оперн|балет|маска|новат/i;
+const THEATER_RE = /театр|оперн|балет|маска|новат|цирк/i;
+
+/** Concert / culture halls: events + future tickets → institution /venues. */
+const CONCERT_HALL_RE = new RegExp(
+  [
+    'филармони',
+    'консерватор',
+    'концертн',
+    'дворец\\s+культур',
+    'дом\\s+культур',
+    `${W}дк${WEND}`,
+    '(?:культурн|творческ)\\w*\\s+центр',
+  ].join('|'),
+  'iu',
+);
 
 const PIER_RE = /причал|пристань|дебаркадер|причальн/i;
 
@@ -247,6 +258,9 @@ function inferMustSeeKindAndFamily(name, item = null) {
   if (MUSEUM_RE.test(n)) {
     return { kind: 'MUSEUM_ART_SPACE', family: 'institution', confident: true };
   }
+  if (CONCERT_HALL_RE.test(n)) {
+    return { kind: 'CONCERT_HALL', family: 'institution', confident: true };
+  }
 
   // Tourist gastro on locations catalog → GASTRO (owner 2026-08-05).
   if (GASTRO_RE.test(n) || (GASTRO_MARKET_RE.test(n) && /рынок|фуд/i.test(n))) {
@@ -296,7 +310,7 @@ function inferMustSeeKindAndFamily(name, item = null) {
  * If stored OUTDOOR_LOCATION should be another kind, return target; else null.
  * @param {string} title
  * @param {string} [slug]
- * @returns {'ATTRACTION'|'MONUMENT'|'PARK'|'MUSEUM_ART_SPACE'|'GASTRO'|'PIER'|'MEETING_POINT'|null}
+ * @returns {'ATTRACTION'|'MONUMENT'|'PARK'|'MUSEUM_ART_SPACE'|'THEATER'|'CONCERT_HALL'|'GASTRO'|'PIER'|'MEETING_POINT'|null}
  */
 function reclassifyOutdoorBuilding(title, slug = '') {
   const text = `${title || ''} ${slug || ''}`.toLowerCase();
@@ -304,6 +318,10 @@ function reclassifyOutdoorBuilding(title, slug = '') {
 
   if (PIER_RE.test(text)) return 'PIER';
   if (BUS_STOP_RE.test(text)) return 'MEETING_POINT';
+
+  if (THEATER_RE.test(text)) return 'THEATER';
+  if (MUSEUM_RE.test(text)) return 'MUSEUM_ART_SPACE';
+  if (CONCERT_HALL_RE.test(text)) return 'CONCERT_HALL';
 
   if (GASTRO_RE.test(text)) return 'GASTRO';
   if (GASTRO_MARKET_RE.test(text) && /рынок|фуд/i.test(text) && !TRUE_OUTDOOR_RE.test(text)) {
@@ -317,9 +335,6 @@ function reclassifyOutdoorBuilding(title, slug = '') {
   }
   if (MONUMENT_RE.test(text) && !TRUE_OUTDOOR_RE.test(text)) return 'MONUMENT';
   if (MONUMENT_RE.test(text) && BUILDING_ATTRACTION_RE.test(text)) return 'MONUMENT';
-  if (MUSEUM_RE.test(text) && /музей|кунсткамер|галере|эрмитаж/i.test(text)) {
-    return 'ATTRACTION';
-  }
 
   // Keep true outdoors when outdoor token is the place head (наб/площадь/мост/улица/ворота…),
   // even if a building word appears as adjective (Кремлёвская набережная).

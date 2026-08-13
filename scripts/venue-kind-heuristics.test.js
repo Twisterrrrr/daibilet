@@ -10,9 +10,12 @@ const {
   reclassifyLocationGastro,
 } = require('./lib/venue-kind-heuristics');
 
-function expectInfer(name, kind) {
+function expectInfer(name, kind, family) {
   const got = inferMustSeeKindAndFamily(name);
   assert.strictEqual(got.kind, kind, `${name}: expected ${kind}, got ${got.kind}`);
+  if (family) {
+    assert.strictEqual(got.family, family, `${name}: expected family ${family}, got ${got.family}`);
+  }
 }
 
 function expectReclass(title, kind) {
@@ -49,7 +52,16 @@ expectInfer('Нижний парк Петергофа', 'PARK');
 expectInfer('Большой Петергофский дворец', 'ATTRACTION');
 expectInfer('Екатерининский дворец', 'ATTRACTION');
 expectInfer('Медный всадник', 'MONUMENT');
-expectInfer('Кунсткамера', 'MUSEUM_ART_SPACE');
+expectInfer('Кунсткамера', 'MUSEUM_ART_SPACE', 'institution');
+expectInfer('Эрмитаж', 'MUSEUM_ART_SPACE', 'institution');
+expectInfer('Русский музей', 'MUSEUM_ART_SPACE', 'institution');
+expectInfer('Мариинский театр', 'THEATER', 'institution');
+expectInfer('Цирк на Фонтанке', 'THEATER', 'institution');
+expectInfer('Санкт-Петербургская филармония', 'CONCERT_HALL', 'institution');
+expectInfer('Московская консерватория', 'CONCERT_HALL', 'institution');
+expectInfer('Большой концертный зал «Октябрьский»', 'CONCERT_HALL', 'institution');
+expectInfer('Дворец культуры имени Горького', 'CONCERT_HALL', 'institution');
+expectInfer('Дом культуры железнодорожников', 'CONCERT_HALL', 'institution');
 expectInfer('Ресторан «Корюшка»', 'GASTRO');
 expectInfer('Кафе «Zoom»', 'GASTRO');
 expectInfer('Гастробар «Соль»', 'GASTRO');
@@ -84,6 +96,9 @@ expectReclass('Проспект Чумбарова-Лучинского', null);
 expectReclass('Кремлёвская набережная', null);
 expectReclass('Казанский Кремль', 'ATTRACTION');
 expectReclass('Рудничный сосновый бор', 'PARK');
+expectReclass('Кунсткамера', 'MUSEUM_ART_SPACE');
+expectReclass('Мариинский театр', 'THEATER');
+expectReclass('Филармония', 'CONCERT_HALL');
 
 assert.strictEqual(reclassifyLocationGastro('Zotler Bier', 'kaliningrad-zotler-bier', 'ATTRACTION'), 'GASTRO');
 assert.strictEqual(

@@ -1,3 +1,20 @@
+## 2026-08-13 - Потенциальные площадки сразу в venues
+
+### Наблюдения
+- После хаба «Места» split «С афишей» / «Достопримечательности» стал пользовательским. Owner: музеи, театры и места, куда можно продать билет, сажать в venues сразу, не ждать первой афиши.
+- Канон option A это уже говорил, но seed-эвристики могли увести филармонию / консерваторию / ДК в `ATTRACTION` (`BUILDING_ATTRACTION_RE`), а `reclassifyOutdoorBuilding` переводил музеи в `ATTRACTION` (локации).
+
+### Решения
+- `inferMustSeeKindAndFamily`: театр / музей / концертный зал (филармония, консерватория, ДК, дом культуры, культурный центр) → institution kinds до buildings.
+- `reclassifyOutdoorBuilding` для этих имён возвращает `THEATER` / `MUSEUM_ART_SPACE` / `CONCERT_HALL`, не `ATTRACTION`.
+- Дворцы / соборы / крепости без institution-роли остаются `/locations`.
+- Prod UPDATE существующих misclassified ATTRACTION - только по запросу owner (URL `/locations` → `/venues` + 301).
+
+### Проблемы
+- Нет. Live catalog не меняется без seed/apply и без API/web deploy.
+
+---
+
 ## 2026-08-13 - Nav: Города • События • Места + hub `/places`
 
 ### Наблюдения

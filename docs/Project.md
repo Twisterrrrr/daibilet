@@ -214,7 +214,7 @@ BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh
 
 - **Локация** - парки / набережные / памятники / улицы / причалы / гастро-как-day-point (must-see без institution). **Площадка** - афиша + institution.
 - **Музеи и арт-галереи** всегда **Площадки** (`MUSEUM_ART_SPACE` / institution), даже только-инфо и без договора - блок хаба города.
-- Театры / залы / клубы → Площадки. Договор ≠ тип сущности.
+- Театры / цирки / залы / филармонии / ДК / клубы → Площадки **сразу при create/seed** (не ждать первой афиши). Договор ≠ тип сущности. Дворцы/соборы/крепости без institution-роли остаются Локациями (`ATTRACTION`).
 - **URL-семейство от kind/role, не от билетов** (owner option A): museum/theater/hall без афиши → всё равно `/venues`, buy-chrome скрыт до offers/sessions. **Не** временно переносить «нет билетов» в `/locations`. Commerce = UI chrome only. Оси: `kind`→URL, `offers`→chrome, `pageStatus`→модерация.
 - Редакционные гастро-точки / day-point без institution-афиши → **Локации** (`GASTRO`). Если legacy kind временно institution, при `upcomingEventsCount=0` и без admission запрещены билетные chrome, цена, CTA, афиша и FAQ (но URL family не менять из-за пустой афиши).
 - Nav: **V1.1 (owner 2026-08-13)** - primary **Города • События • Места • Подборки • Блог**. «Места» = umbrella hub `/places` (два входа: `/venues` + `/locations`). Карточки **не** переезжают на `/places/[slug]`. Склейка единой выдачи с тегами = later (`UX.LOC9`). `UX.LOC3` long rename superseded.

@@ -9,6 +9,7 @@
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
 | UX.NAV-PLACES-HUB | Primary: Города•События•Места•Подборки•Блог; `/places` hub → `/venues`+`/locations`; entity URL без ломки | Высокий | 🔄 code; deploy batch / по запросу |
+| CAT.VENUE-PLANT-ON-CREATE | Музеи/театры/залы/ДК сразу в `/venues` (institution kind), не ждать афиши | Высокий | ✅ heuristics 2026-08-13; prod reclass существующих ATTRACTION - по запросу owner |
 | UX.LOC3 | Rename «Локации» → «Места и точки сбора» | Высокий | ⛔ superseded коротким «Места» |
 | UX.LOC9 / PH2.PLC1 | Unified mixed `/places` grid+tags | Низкий | ⏳ later после хаба |
 
