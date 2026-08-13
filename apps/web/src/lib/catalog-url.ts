@@ -104,6 +104,16 @@ export function venueCatalogHrefWithSelectedCity(
   return `${path}?city=${encodeURIComponent(city)}`;
 }
 
+/** Umbrella «Места» hub - city query only for picker continuity; lists stay on /venues|/locations. */
+export function placesHubHrefWithSelectedCity(
+  cityValue: string | null | undefined,
+  explicitCity?: string | null,
+): string {
+  const city = explicitCity || (cityValue && cityValue !== 'all' ? cityValue : undefined);
+  if (!city) return '/places';
+  return `/places?city=${encodeURIComponent(city)}`;
+}
+
 export function mergeCatalogFilters(
   base: CatalogFilterValues,
   patch: Partial<CatalogFilterValues>,

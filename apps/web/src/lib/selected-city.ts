@@ -3,7 +3,7 @@ import type { PublicDestinationDto } from '@daibilet/contracts/public';
 export const SELECTED_CITY_STORAGE_KEY = 'daibilet:selected-city';
 
 /** Paths whose `?city=` syncs with the header city picker. */
-export const CITY_FILTER_PATHS = ['/events', '/venues', '/locations', '/podborki'] as const;
+export const CITY_FILTER_PATHS = ['/events', '/venues', '/locations', '/places', '/podborki'] as const;
 
 export function isCityFilterPath(pathname: string | null | undefined): boolean {
   const path = String(pathname || '').replace(/\/$/, '') || '/';

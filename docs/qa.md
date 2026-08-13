@@ -410,17 +410,23 @@ Shell UI есть; hydrate - § Открыто (техника) п.5.
 
 **Закрыто owner:** локация = парки/набережные/памятники/улицы; venue = афиша + institution. **Музеи и арт-галереи всегда Площадки**. Одна точка = одна карточка; локация→venue = upgrade / hide+301, не twin PUBLISHED.
 
-**LOCKED 2026-08-07 (owner OK, option A):** URL-семейство от **kind/role**, не от наличия билетов. Музей/театр/зал без афиши → `/venues`, buy-chrome скрыт до offers/sessions. Достопримечательности / парки / причалы / гастро-как-day-point → `/locations`. Commerce влияет только на UI chrome. Nav **V1** (пункт `/locations` в primary). Единый `/places` - deferred. Rename лейбла → «Места и точки сбора» = follow-up (UX.LOC3), не блокер IA.
+**LOCKED 2026-08-07 (owner OK, option A):** URL-семейство от **kind/role**, не от наличия билетов. Музей/театр/зал без афиши → `/venues`, buy-chrome скрыт до offers/sessions. Достопримечательности / парки / причалы / гастро-как-day-point → `/locations`. Commerce влияет только на UI chrome.
+
+**LOCKED 2026-08-13 (owner):** «Места» = зонтик в IA, не замена entity URL.
+1. Primary nav: **Города • События • Места • Подборки • Блог**.
+2. `/places` - хаб с двумя входами; канон карточек остаётся `/venues/[slug]` и `/locations/[slug]` (не ломать ссылки).
+3. Единая mixed-выдача с тегами из двух таблиц - later (`UX.LOC9` / `PH2.PLC1`).
+4. `UX.LOC3` («Места и точки сбора») - superseded коротким лейблом «Места».
 
 ## 2026-08-01 - UX: Locations + mobile catalog — часть LOCKED; open → DEFERRED
 
 Контекст: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brief.md).
 
-1. **Лейбл `/locations`:** ✅ target **«Места и точки сбора»** (follow-up UX.LOC3; сейчас «Локации» ok до rename).
-2. **Nav:** ✅ **V1** - оставить в primary nav.
+1. **Лейбл `/locations`:** ✅ каталог H1 может оставаться «Локации»; primary = «Места» → `/places`.
+2. **Nav:** ✅ **V1.1** - umbrella Места; порядок Города → События → Места.
 3. **Default city / гео suggest:** **DEFERRED D3**.
 4. **Список `/locations`:** ✅ SEO-контентные без афиши **да** (VK.8).
-5. **Единый `/places`:** ✅ **рано / deferred** (UX.LOC9 / PH2.PLC1).
+5. **Единый `/places` mixed grid:** ⏳ later; сейчас только hub (не merge catalogs).
 
 ## 2026-07-31 - Location↔Excursion linking — ЗАКРЫТО (LOCKED 2026-08-09)
 

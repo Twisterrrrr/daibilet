@@ -14,22 +14,31 @@ import { MobileNavLayer, MobileNavTrigger, useMobileNavId } from '@/components/M
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
 import { useUserAuthOptional } from '@/hooks/useUserAuth';
-import { catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from '@/lib/catalog-url';
+import { catalogHrefWithSelectedCity, placesHubHrefWithSelectedCity } from '@/lib/catalog-url';
 import { FAVORITES_CHANGED_EVENT, readFavoriteIds } from '@/lib/favorites';
 
 const NAV_LINKS = [
-  { label: 'События', href: '/events', catalog: true },
   { label: 'Города', href: '/cities' },
-  { label: 'Площадки', href: '/venues', venueCatalog: 'venues' as const },
-  { label: 'Локации', href: '/locations', venueCatalog: 'locations' as const },
+  { label: 'События', href: '/events', catalog: true },
+  { label: 'Места', href: '/places', placesHub: true },
   { label: 'Подборки', href: '/podborki' },
   { label: 'Блог', href: '/blog' },
 ] as const;
 
-function isNavActive(pathname: string, href: string): boolean {
+function isNavActive(pathname: string, href: string, label?: string): boolean {
   const path = pathname.replace(/\/$/, '') || '/';
-  const normalized = href.replace(/\/$/, '') || '/';
+  const normalized = href.replace(/\/$/, '').split('?')[0] || '/';
   if (normalized === '/') return path === '/';
+  if (label === 'Места') {
+    return (
+      path === '/places' ||
+      path.startsWith('/places/') ||
+      path === '/venues' ||
+      path.startsWith('/venues/') ||
+      path === '/locations' ||
+      path.startsWith('/locations/')
+    );
+  }
   return path === normalized || path.startsWith(`${normalized}/`);
 }
 
@@ -73,12 +82,8 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
     if ('catalog' in item && item.catalog) {
       return { ...item, href: catalogHrefWithSelectedCity(cityQuery) };
     }
-    if ('venueCatalog' in item && item.venueCatalog) {
-      const path = item.venueCatalog === 'venues' ? '/venues' : '/locations';
-      return {
-        ...item,
-        href: venueCatalogHrefWithSelectedCity(path, cityQuery),
-      };
+    if ('placesHub' in item && item.placesHub) {
+      return { ...item, href: placesHubHrefWithSelectedCity(cityQuery) };
     }
     return { ...item, href: item.href };
   });
@@ -133,8 +138,8 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
 
           <nav aria-label="Основная навигация" className="hidden min-w-0 items-center gap-0.5 lg:flex">
             {navLinks.map((item) => {
-              const active = isNavActive(pathname, item.href.split('?')[0] || item.href);
-              const secondary = item.href.startsWith('/venues') || item.href.startsWith('/locations') || item.href.startsWith('/blog');
+              const active = isNavActive(pathname, item.href, item.label);
+              const secondary = item.href.startsWith('/blog');
               return (
                 <Link
                   key={item.label}

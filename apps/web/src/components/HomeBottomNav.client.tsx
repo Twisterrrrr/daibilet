@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { CalendarDays, Compass, MapPin, Route } from 'lucide-react';
 
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
-import { catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from '@/lib/catalog-url';
+import { catalogHrefWithSelectedCity, placesHubHrefWithSelectedCity } from '@/lib/catalog-url';
 import { buildMyDayHref } from '@/lib/home-guide';
 
 /**
@@ -46,12 +46,18 @@ export function HomeBottomNav() {
       match: (path: string) => path === '/my-day' || path.startsWith('/my-day'),
     },
     {
-      id: 'locations',
-      label: 'Локации',
-      href: venueCatalogHrefWithSelectedCity('/locations', cityQuery),
+      id: 'places',
+      label: 'Места',
+      href: placesHubHrefWithSelectedCity(cityQuery),
       icon: MapPin,
       accent: false,
-      match: (path: string) => path === '/locations' || path.startsWith('/locations/'),
+      match: (path: string) =>
+        path === '/places' ||
+        path.startsWith('/places/') ||
+        path === '/locations' ||
+        path.startsWith('/locations/') ||
+        path === '/venues' ||
+        path.startsWith('/venues/'),
     },
   ] as const;
 

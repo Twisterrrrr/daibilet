@@ -4,6 +4,14 @@
 |----|--------|-----------|--------|
 | FIX.PUBLIC-ERROR-UI | Убрать английский Next fallback «Application error…» с public: error.tsx + global-error.tsx + ранний chunk reload | Критический | 🔄 code; live после Deploy MSK web |
 
+## Nav «Места» hub (2026-08-13)
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| UX.NAV-PLACES-HUB | Primary: Города•События•Места•Подборки•Блог; `/places` hub → `/venues`+`/locations`; entity URL без ломки | Высокий | 🔄 code; deploy batch / по запросу |
+| UX.LOC3 | Rename «Локации» → «Места и точки сбора» | Высокий | ⛔ superseded коротким «Места» |
+| UX.LOC9 / PH2.PLC1 | Unified mixed `/places` grid+tags | Низкий | ⏳ later после хаба |
+
 ## Mobile header / SSR (2026-08-12)
 
 | ID | Задача | Приоритет | Статус |

@@ -164,9 +164,9 @@ export const HOME_CATEGORY_CHIPS: HomeGuideChip[] = [
     desktopOnly: true,
   },
   {
-    id: 'locations',
-    label: 'Локации',
-    href: '/locations',
+    id: 'places',
+    label: 'Места',
+    href: '/places',
     icon: 'pin',
     desktopOnly: true,
   },

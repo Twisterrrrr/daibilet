@@ -65,6 +65,7 @@ function catalogPathBase(pathname: string): string {
   const path = pathname.replace(/\/$/, '') || '/';
   if (path.startsWith('/venues')) return '/venues';
   if (path.startsWith('/locations')) return '/locations';
+  if (path.startsWith('/places')) return '/places';
   if (path.startsWith('/podborki')) return '/podborki';
   return '/events';
 }
@@ -279,6 +280,7 @@ export function SelectedCityProvider({
         (path === '/events' ||
           path === '/venues' ||
           path === '/locations' ||
+          path === '/places' ||
           path === '/podborki' ||
           isMyDayPath(path));
       if (sameIndexQuery) {

@@ -502,7 +502,7 @@ export function LocationsCatalogView({
       <HeroLayout
         variant="minimal"
         dense
-        breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Локации' }]}
+        breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Места', href: '/places' }, { label: 'Локации' }]}
         eyebrow={`${formatNumber(heroTotal)} локаций · ${pluralCities(cityCount)}`}
         title={heroTitle}
         tone="light"
@@ -569,6 +569,12 @@ export function LocationsCatalogView({
           className="mt-3 inline-block text-sm text-slate-500 transition hover:text-slate-700"
         >
           Площадки: музеи и театры →
+        </Link>
+        <Link
+          href="/places"
+          className="mt-2 ml-0 block text-sm text-slate-400 transition hover:text-slate-600 sm:ml-3 sm:inline"
+        >
+          Все места
         </Link>
       </HeroLayout>
 

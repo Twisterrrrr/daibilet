@@ -394,13 +394,16 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
           href={venueCatalogHrefWithSelectedCity('/venues', selectedCity?.cityValue)}
           className="font-medium hover:text-primary"
         >
-          Площадки
+          Места: площадки
         </Link>
         <Link
           href={venueCatalogHrefWithSelectedCity('/locations', selectedCity?.cityValue)}
           className="font-medium hover:text-primary"
         >
           Локации
+        </Link>
+        <Link href="/places" className="font-medium hover:text-primary">
+          Все места
         </Link>
         <Link href="/podborki" className="font-medium hover:text-primary">
           Подборки

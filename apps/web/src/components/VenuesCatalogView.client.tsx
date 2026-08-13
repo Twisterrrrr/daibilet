@@ -489,7 +489,7 @@ export function VenuesCatalogView({
       <HeroLayout
         variant="minimal"
         dense
-        breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Площадки' }]}
+        breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Места', href: '/places' }, { label: 'Площадки' }]}
         eyebrow={`${pluralVenues(heroTotal)} · ${pluralCities(cityCount)}`}
         title={pageTitle}
         tone="light"
@@ -567,6 +567,12 @@ export function VenuesCatalogView({
           className="mt-3 inline-block text-sm text-slate-500 transition hover:text-slate-700"
         >
           Локации: причалы, парки, точки старта →
+        </Link>
+        <Link
+          href="/places"
+          className="mt-2 ml-0 block text-sm text-slate-400 transition hover:text-slate-600 sm:ml-3 sm:inline"
+        >
+          Все места
         </Link>
       </HeroLayout>
 

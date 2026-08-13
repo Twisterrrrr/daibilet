@@ -217,7 +217,7 @@ BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh
 - Театры / залы / клубы → Площадки. Договор ≠ тип сущности.
 - **URL-семейство от kind/role, не от билетов** (owner option A): museum/theater/hall без афиши → всё равно `/venues`, buy-chrome скрыт до offers/sessions. **Не** временно переносить «нет билетов» в `/locations`. Commerce = UI chrome only. Оси: `kind`→URL, `offers`→chrome, `pageStatus`→модерация.
 - Редакционные гастро-точки / day-point без institution-афиши → **Локации** (`GASTRO`). Если legacy kind временно institution, при `upcomingEventsCount=0` и без admission запрещены билетные chrome, цена, CTA, афиша и FAQ (но URL family не менять из-за пустой афиши).
-- Nav: **V1** - `/locations` в primary; rename лейбла «Места и точки сбора» = UX.LOC3 follow-up. Единый `/places` deferred.
+- Nav: **V1.1 (owner 2026-08-13)** - primary **Города • События • Места • Подборки • Блог**. «Места» = umbrella hub `/places` (два входа: `/venues` + `/locations`). Карточки **не** переезжают на `/places/[slug]`. Склейка единой выдачи с тегами = later (`UX.LOC9`). `UX.LOC3` long rename superseded.
 - Одна физическая точка = одна публичная карточка; локация→venue = upgrade / hide+301, не twin `PUBLISHED`.
 
 ---
@@ -230,8 +230,9 @@ BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh
 | `/events` | SSR dynamic | каталог, filters GET, pagination |
 | `/events/[slug]` | SSR/ISR | Event PDP: hero answers + badge chips + sticky mobile CTA «Выбрать билеты»; day strip; open-date stepper; price **от X**; accordion О событии / Маршрут / Как добраться; expand map; reviews |
 | `/cities`, `/cities/[slug]` | SSR dynamic | **city hub**; default = wireframe v1 + blog teasers (P.2o); `?hub=editorial` = visual experiment (P.2i) |
-| `/venues`, `/venues/[slug]` | SSR dynamic | |
-| `/locations`, `/locations/[slug]` | SSR dynamic | |
+| `/places` | ISR 3600 | umbrella «Места» - входы в `/venues` и `/locations`; не entity URL |
+| `/venues`, `/venues/[slug]` | SSR dynamic | institution / афиша; канон карточек |
+| `/locations`, `/locations/[slug]` | SSR dynamic | sights / points; канон карточек |
 | `/podborki` | ISR 3600 | каталог подборок |
 | `/rechnye-progulki/...`, `/{city}/night-bridges/` | ISR/SSG | landing SEO paths |
 | `/api/public/*` | Route Handlers | parity с legacy API |

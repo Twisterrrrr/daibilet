@@ -148,7 +148,7 @@ export function MobileNavLayer({
                 <NavLink
                   key={item.label}
                   href={item.href}
-                  active={isNavActive(pathname, item.href.split('?')[0] || item.href)}
+                  active={isNavActive(pathname, item.href.split('?')[0] || item.href, item.label)}
                   onClick={close}
                 >
                   {item.label}
@@ -226,10 +226,20 @@ export function MobileNavLayer({
   );
 }
 
-function isNavActive(pathname: string, href: string): boolean {
+function isNavActive(pathname: string, href: string, label?: string): boolean {
   const path = pathname.replace(/\/$/, '') || '/';
   const normalized = href.replace(/\/$/, '') || '/';
   if (normalized === '/') return path === '/';
+  if (label === 'Места') {
+    return (
+      path === '/places' ||
+      path.startsWith('/places/') ||
+      path === '/venues' ||
+      path.startsWith('/venues/') ||
+      path === '/locations' ||
+      path.startsWith('/locations/')
+    );
+  }
   return path === normalized || path.startsWith(`${normalized}/`);
 }
 

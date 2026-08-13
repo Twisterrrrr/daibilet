@@ -114,6 +114,7 @@ const RESERVED_PATH_SEGMENTS = new Set<string>([
   'cities',
   'venues',
   'locations',
+  'places',
   'blog',
   'podborki',
   'admin',
