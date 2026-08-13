@@ -3,9 +3,10 @@
  * Shared by CityPageView SSR/hydrate and city loading skeleton so first HTML
  * and client paint claim the same shell (no CLS jump on short copy).
  *
- * Mobile: `min-h-*` + asymmetric `pt-16 pb-10` / `justify-center` so title has
- * more air above than below (owner: pt > pb; bottom under CTAs was tight at pb-8).
- * Desktop (md+): fixed `h-[360px]` + `justify-end` letterbox (16:9 unchanged).
+ * Vertical air: equal `py-10` / `sm:py-12` + `justify-center` at all breakpoints
+ * (owner: top padding above H1 must match bottom padding under CTAs). Do not
+ * `justify-end` in a fixed shell - leftover height then sits only above the title.
+ * Desktop (md+): `min-h-[360px]` (grows if copy is tall); 16:9 photo frame unchanged.
  *
  * Desktop stacking (media z-0, content z-1):
  *  1. leftGrad: deepen toward section LEFT rim; light `#122868` plateau at photo edge
@@ -19,8 +20,8 @@
  * Text/CTA stay left above media; no scrim over type.
  *
  * Rollback (owner 2026-07-31): HERO3k/m `.city-hero-photo-mask` (~25→38% L/R) was too
- * wide and looked wrong on mobile. Keep light navy panels; keep pt>pb / mt-5 / 16:9;
- * do not restore hard 20% gutter on all md+ (2xl-only 20% is OK).
+ * wide and looked wrong on mobile. Keep light navy panels; keep mt-5 / 16:9;
+ * do not restore hard 20% gutter on all md+ (2xl-only 20% is OK). Equal py, not pt>pb.
  */
 export const CITY_NIGHT_HERO = {
   /**
@@ -37,16 +38,15 @@ export const CITY_NIGHT_HERO = {
   navyDeep: '#0a174b',
   /**
    * Outer section: light navy base.
-   * Mobile/sm: min-height (can grow); md+: fixed height for 16:9 letterbox.
+   * min-height at each breakpoint (can grow); no fixed `h-*` so equal py is not clipped.
    */
   section:
-    'relative min-h-[280px] overflow-hidden border-b border-[#122868] bg-[#122868] sm:min-h-[320px] md:h-[360px] md:min-h-[360px]',
+    'relative min-h-[280px] overflow-hidden border-b border-[#122868] bg-[#122868] sm:min-h-[320px] md:min-h-[360px]',
   /**
-   * Text + CTA column. Mobile/sm: pt > pb (top slightly more than bottom under CTAs).
-   * md+: asymmetric pt/pb inside fixed shell, justify-end.
+   * Text + CTA column. Equal vertical padding; leftover height split by justify-center.
    */
   content:
-    'container-page relative z-[1] flex min-h-[280px] flex-col justify-center pt-16 pb-10 sm:min-h-[320px] sm:pt-20 sm:pb-12 md:h-full md:min-h-0 md:justify-end md:pt-12 md:pb-10',
+    'container-page relative z-[1] flex min-h-[280px] flex-col justify-center py-10 sm:min-h-[320px] sm:py-12 md:min-h-[360px]',
   /** Copy column: full width on mobile; left safe zone on md+ (photo + gutter own the right). */
   contentInner: 'w-full max-w-2xl md:max-w-[72%]',
   /**

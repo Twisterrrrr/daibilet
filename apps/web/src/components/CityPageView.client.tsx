@@ -895,7 +895,7 @@ function CityScheduleLoadingState() {
 }
 
 function CityLoadingState({ editorial = false }: { editorial?: boolean }) {
-  // Same CITY_NIGHT_HERO shell as CityHeroStrip / SiteChromeSkeleton city (mobile min-h + top-heavy py).
+  // Same CITY_NIGHT_HERO shell as CityHeroStrip / SiteChromeSkeleton city (equal py + justify-center).
   return (
     <>
       <div className="border-b border-slate-200 bg-white">
