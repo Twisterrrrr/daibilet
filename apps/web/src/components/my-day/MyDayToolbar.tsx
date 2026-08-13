@@ -179,8 +179,9 @@ export function MyDayToolbar({
           </div>
         </div>
 
-        {/* 4. Optimize | Hours | Trash (+ start/end when plan on) */}
-        className="mt-3 flex flex-nowrap items-center gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        {/* 4. Optimize | Hours | Trash */}
+        <div
+          className="mt-3 flex flex-nowrap items-center gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           data-my-day-toolbar-actions
         >
           <button
