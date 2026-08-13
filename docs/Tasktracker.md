@@ -1,3 +1,9 @@
+## Places hub: card CTA is route, heart overlay (2026-08-13)
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| UX.PLACES-CARD-ROUTE-CTA | Карточка места: убрать «Афиша»; «В маршрут» справа внизу; сердечко избранного top-right | Высокий | ✅ 2026-08-13 code; live после Deploy MSK web |
+
 ## Places hub: sort by events actually ranks events (2026-08-13)
 
 | ID | Задача | Приоритет | Статус |
@@ -29,7 +35,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| UX.PLACES-CARD-UNIFY | Карточки локаций на `/places` как площадки: overlay «в маршрут», тип над названием, адрес над описанием, синяя Афиша справа | Высокий | ✅ 2026-08-13 code; live после Deploy MSK web |
+| UX.PLACES-CARD-UNIFY | Карточки локаций на `/places` как площадки: тип над названием, адрес над описанием; CTA «В маршрут»; сердечко top-right | Высокий | ✅ 2026-08-13 code; live после Deploy MSK web |
 | UX.PLACES-SCOPE-TOGGLE | Тоггл: Показывать все / Только площадки / Только локации / Только с событиями (`family`, `hasEvents=1`) | Высокий | ✅ 2026-08-13 code; live после Deploy MSK web |
 
 ## Places hub: hide family split (2026-08-13)

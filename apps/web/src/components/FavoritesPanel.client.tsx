@@ -13,6 +13,12 @@ import {
   resolveFavoriteSessions,
   toggleFavoriteId,
 } from '@/lib/favorites';
+import {
+  PLACE_FAVORITES_CHANGED_EVENT,
+  readPlaceFavorites,
+  togglePlaceFavorite,
+  type PlaceFavoriteItem,
+} from '@/lib/place-favorites';
 import { formatPriceFrom } from '@/lib/format';
 import { eventHref } from '@/lib/routes';
 import { catalogHrefWithSelectedCity } from '@/lib/catalog-url';
@@ -20,17 +26,24 @@ import { catalogHrefWithSelectedCity } from '@/lib/catalog-url';
 export function FavoritesPanel({ onClose }: { onClose: () => void }) {
   const selectedCity = useSelectedCityOptional();
   const [favoriteIds, setFavoriteIds] = useState<Set<string>>(() => readFavoriteIds());
+  const [placeFavorites, setPlaceFavorites] = useState<PlaceFavoriteItem[]>(() => readPlaceFavorites());
   const [catalogSessions, setCatalogSessions] = useState<PublicSessionDto[]>([]);
   const sessions = resolveFavoriteSessions(favoriteIds, catalogSessions);
   const eventsHref = catalogHrefWithSelectedCity(selectedCity?.cityValue);
+  const totalCount = favoriteIds.size + placeFavorites.length;
 
   useEffect(() => {
-    const sync = () => setFavoriteIds(readFavoriteIds());
+    const sync = () => {
+      setFavoriteIds(readFavoriteIds());
+      setPlaceFavorites(readPlaceFavorites());
+    };
     sync();
     window.addEventListener(FAVORITES_CHANGED_EVENT, sync);
+    window.addEventListener(PLACE_FAVORITES_CHANGED_EVENT, sync);
     window.addEventListener('storage', sync);
     return () => {
       window.removeEventListener(FAVORITES_CHANGED_EVENT, sync);
+      window.removeEventListener(PLACE_FAVORITES_CHANGED_EVENT, sync);
       window.removeEventListener('storage', sync);
     };
   }, []);
@@ -65,8 +78,8 @@ export function FavoritesPanel({ onClose }: { onClose: () => void }) {
           <h2 className="font-display flex items-center gap-2 text-lg font-bold text-slate-900">
             <Heart className="h-4 w-4 text-rose-500" />
             Избранное
-            {favoriteIds.size ? (
-              <span className="rounded-full bg-rose-50 px-2 py-0.5 text-xs font-semibold text-rose-600">{favoriteIds.size}</span>
+            {totalCount ? (
+              <span className="rounded-full bg-rose-50 px-2 py-0.5 text-xs font-semibold text-rose-600">{totalCount}</span>
             ) : null}
           </h2>
           <button type="button" aria-label="Закрыть" onClick={onClose} className="rounded-full p-2 text-slate-500 hover:bg-slate-100">
@@ -74,7 +87,7 @@ export function FavoritesPanel({ onClose }: { onClose: () => void }) {
           </button>
         </div>
 
-        {sessions.length ? (
+        {sessions.length || placeFavorites.length ? (
           <ul className="mt-4 flex-1 space-y-3 overflow-y-auto pr-1">
             {sessions.map((session) => (
               <li key={session.groupKey || session.id} className="flex gap-3 rounded-xl border border-slate-200 p-3">
@@ -111,12 +124,44 @@ export function FavoritesPanel({ onClose }: { onClose: () => void }) {
                 </button>
               </li>
             ))}
+            {placeFavorites.map((place) => (
+              <li key={place.id} className="flex gap-3 rounded-xl border border-slate-200 p-3">
+                <Link href={place.href} onClick={onClose} className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-slate-100">
+                  <SafeImage
+                    src={place.imageUrl}
+                    alt=""
+                    fill
+                    sizes={IMAGE_SIZES.favoritesThumb}
+                    className="object-cover"
+                    fallback={
+                      <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-lg">
+                        📍
+                      </div>
+                    }
+                  />
+                </Link>
+                <div className="min-w-0 flex-1">
+                  <Link href={place.href} onClick={onClose} className="line-clamp-2 text-sm font-semibold text-slate-900 hover:text-primary-700">
+                    {place.name}
+                  </Link>
+                  <p className="mt-1 truncate text-xs text-slate-500">{place.city || 'Место'}</p>
+                </div>
+                <button
+                  type="button"
+                  aria-label="Убрать из избранного"
+                  onClick={() => togglePlaceFavorite(place)}
+                  className="shrink-0 self-start rounded-full p-1.5 text-slate-400 hover:bg-rose-50 hover:text-rose-500"
+                >
+                  <Heart className="h-4 w-4 fill-rose-500 text-rose-500" />
+                </button>
+              </li>
+            ))}
           </ul>
         ) : (
           <div className="mt-6 flex flex-1 flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center text-sm text-slate-500">
             <Heart className="mx-auto mb-2 h-6 w-6 text-slate-300" />
             <p className="font-medium text-slate-700">Пока пусто</p>
-            <p className="mt-1">Отмечайте события сердечком на карточках — они появятся здесь. Список хранится в браузере на этом устройстве.</p>
+            <p className="mt-1">Отмечайте события и места сердечком на карточках - они появятся здесь. Список хранится в браузере на этом устройстве.</p>
             <Link
               href={eventsHref}
               onClick={onClose}

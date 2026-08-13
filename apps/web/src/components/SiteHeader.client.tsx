@@ -16,6 +16,7 @@ import type { PublicDestinationDto } from '@daibilet/contracts/public';
 import { useUserAuthOptional } from '@/hooks/useUserAuth';
 import { catalogHrefWithSelectedCity, placesHubHrefWithSelectedCity } from '@/lib/catalog-url';
 import { FAVORITES_CHANGED_EVENT, readFavoriteIds } from '@/lib/favorites';
+import { PLACE_FAVORITES_CHANGED_EVENT, readPlaceFavorites } from '@/lib/place-favorites';
 
 const NAV_LINKS = [
   { label: 'Города', href: '/cities' },
@@ -262,12 +263,14 @@ function FavoritesHeaderButton({ onClick }: { onClick: () => void }) {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
-    const sync = () => setCount(readFavoriteIds().size);
+    const sync = () => setCount(readFavoriteIds().size + readPlaceFavorites().length);
     sync();
     window.addEventListener(FAVORITES_CHANGED_EVENT, sync);
+    window.addEventListener(PLACE_FAVORITES_CHANGED_EVENT, sync);
     window.addEventListener('storage', sync);
     return () => {
       window.removeEventListener(FAVORITES_CHANGED_EVENT, sync);
+      window.removeEventListener(PLACE_FAVORITES_CHANGED_EVENT, sync);
       window.removeEventListener('storage', sync);
     };
   }, []);
