@@ -8,7 +8,7 @@ import { buildShareMetadata, pageTitle } from '@/lib/seo-meta';
 
 const TITLE = 'Места';
 const DESCRIPTION =
-  'Площадки с афишей и локации для маршрута: музеи, театры, парки, набережные и точки сбора на Дайбилет.';
+  'Площадки с афишей и локации для маршрута в одной ленте: музеи, театры, парки, набережные и точки сбора.';
 
 export const metadata: Metadata = {
   title: pageTitle(TITLE),
@@ -34,7 +34,7 @@ export default function PlacesIndexPage() {
         dense
         breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Места' }]}
         title="Места"
-        description="Куда сходить в городе: площадки с билетами и точки для прогулки. Один поиск на весь раздел."
+        description="Площадки с билетами и точки для прогулки в одной ленте. Один поиск на весь раздел."
         tone="light"
         className="bg-white"
       />

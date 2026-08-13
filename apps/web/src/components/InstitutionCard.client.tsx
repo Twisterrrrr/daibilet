@@ -33,11 +33,14 @@ export function InstitutionCard({
   venue,
   href,
   hideCity = false,
+  showFamilyTag = false,
 }: {
   venue: InstitutionCardVenue;
   href: string;
   /** When catalog is already city-scoped, omit city from the meta line. */
   hideCity?: boolean;
+  /** Mixed /places grid: show «Площадка» on the photo. */
+  showFamilyTag?: boolean;
 }) {
   const publicType = resolvePublicVenueType(venue.type, venue.name);
   const typeLabel = venueTypeLabel(publicType, venue.name);
@@ -89,6 +92,12 @@ export function InstitutionCard({
           />
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent" />
         </Link>
+
+        {showFamilyTag ? (
+          <span className="pointer-events-none absolute left-2.5 top-2.5 z-[1] rounded-md border border-white/20 bg-black/35 px-2 py-0.5 text-[11px] font-medium tracking-wide text-white/95 backdrop-blur-md">
+            Площадка
+          </span>
+        ) : null}
 
         <div
           className="absolute right-2 top-2 z-[2]"

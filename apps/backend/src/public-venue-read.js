@@ -1993,13 +1993,30 @@ function decodeVenueCatalogCursor(raw) {
   }
 }
 
+function catalogPopularity(item) {
+  return Math.max(Number(item.events) || 0, Number(item.stopEventCount) || 0);
+}
+
 function sortVenueCatalogItems(items, sortMode) {
+  const byName = (a, b) => String(a.name || '').localeCompare(String(b.name || ''), 'ru');
+  const byPopularity = (a, b) => catalogPopularity(b) - catalogPopularity(a) || byName(a, b);
+  if (sortMode === 'mixed') {
+    const institutions = items.filter((item) => item.template === 'institution').sort(byPopularity);
+    const locations = items.filter((item) => item.template !== 'institution').sort(byPopularity);
+    const mixed = [];
+    const n = Math.max(institutions.length, locations.length);
+    for (let i = 0; i < n; i += 1) {
+      if (institutions[i]) mixed.push(institutions[i]);
+      if (locations[i]) mixed.push(locations[i]);
+    }
+    return mixed;
+  }
   const mode = sortMode === 'asc' || sortMode === 'desc' ? sortMode : 'events';
   return [...items].sort((a, b) => {
     if (mode === 'events') {
-      return (Number(b.events) || 0) - (Number(a.events) || 0) || String(a.name || '').localeCompare(String(b.name || ''), 'ru');
+      return (Number(b.events) || 0) - (Number(a.events) || 0) || byName(a, b);
     }
-    const cmp = String(a.name || '').localeCompare(String(b.name || ''), 'ru');
+    const cmp = byName(a, b);
     return mode === 'asc' ? cmp : -cmp;
   });
 }

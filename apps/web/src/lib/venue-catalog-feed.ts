@@ -7,7 +7,7 @@ import type { VenueCatalogCard } from '@/lib/venue-map-types';
 export const VENUE_CATALOG_PAGE_SIZE = 24;
 
 export type VenueCatalogFamily = 'institution' | 'location';
-export type VenueCatalogSort = 'events' | 'asc' | 'desc';
+export type VenueCatalogSort = 'events' | 'asc' | 'desc' | 'mixed';
 
 export type VenueCatalogFeedQuery = {
   /** Omit or `all` = mixed Places search (both families). */

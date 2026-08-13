@@ -22,13 +22,13 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| UX.NAV-PLACES-HUB | Primary: Города•События•Места•Подборки•Блог; `/places` hub → `/venues`+`/locations`; entity URL без ломки | Высокий | 🔄 code; deploy batch / по запросу |
+| UX.NAV-PLACES-HUB | Primary: Города•События•Места•Подборки•Блог; `/places` mixed grid; entity URL без ломки | Высокий | 🔄 code; deploy batch / по запросу |
 | UX.PLACES-UNIFIED-SEARCH | Один поиск на раздел Места: `/places?q=` mixed + тег Площадка/Локация; каталоги не режут q по family | Высокий | ✅ live `31693704581` / `31694312986` |
 | UX.MYDAY-UNIFIED-SEARCH | `/my-day` picker: один поиск места+события с тегом семейства; убрать trio локации/площадки/события | Высокий | ✅ live `31693704581` / `31694312986` |
 | CAT.VENUE-PLANT-ON-CREATE | Музеи/театры/залы/ДК сразу в `/venues`; дворец-музей с билетом на вход (Юсуповский) тоже | Высокий | ✅ heuristics 2026-08-13; prod upgrade Юсуповского - по запросу |
 | CAT.PLACE-CLUSTER | Кластер: `parentId`+`isCluster`; PDP «Что внутри»+афиша; пилот НГ+Севкабель; add в Мой день = родитель | Высокий | ⏳ docs lock 2026-08-13; schema/PDP не билдить без запроса |
 | UX.LOC3 | Rename «Локации» → «Места и точки сбора» | Высокий | ⛔ superseded коротким «Места» |
-| UX.LOC9 / PH2.PLC1 | Unified mixed `/places` grid+tags (без поискового запроса) | Низкий | ⏳ later; поиск уже единый |
+| UX.LOC9 / PH2.PLC1 | Unified mixed `/places` grid+tags (без поискового запроса) | Высокий | ✅ 2026-08-13; live после Deploy MSK web |
 
 ## Mobile header / SSR (2026-08-12)
 

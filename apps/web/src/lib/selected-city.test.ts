@@ -48,6 +48,8 @@ test('placesSearchHref is one mixed Places search URL', () => {
     placesSearchHref({ q: 'новая голландия', city: 'saint-petersburg' }),
     '/places?q=%D0%BD%D0%BE%D0%B2%D0%B0%D1%8F+%D0%B3%D0%BE%D0%BB%D0%BB%D0%B0%D0%BD%D0%B4%D0%B8%D1%8F&city=saint-petersburg',
   );
+  assert.equal(placesSearchHref({ family: 'location' }), '/places?family=location');
+  assert.equal(placesSearchHref({ family: 'all' }), '/places');
   assert.equal(isPlacesSectionPath('/places'), true);
   assert.equal(isPlacesSectionPath('/venues/ermitazh'), true);
   assert.equal(isPlacesSectionPath('/locations/saint-petersburg-novaya-gollandiya'), true);

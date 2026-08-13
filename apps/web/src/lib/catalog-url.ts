@@ -121,13 +121,17 @@ export function placesSearchHref(options: {
   city?: string | null;
   q?: string | null;
   page?: number | null;
+  /** Mixed hub filter: omit or `all` = both families. */
+  family?: 'all' | 'institution' | 'location' | null;
 }): string {
   const params = new URLSearchParams();
   const q = String(options.q || '').trim();
   const city = String(options.city || '').trim();
   const page = Number(options.page);
+  const family = options.family;
   if (q) params.set('q', q);
   if (city && city !== 'all') params.set('city', city);
+  if (family === 'institution' || family === 'location') params.set('family', family);
   if (Number.isFinite(page) && page > 1) params.set('page', String(page));
   const query = params.toString();
   return query ? `/places?${query}` : '/places';
