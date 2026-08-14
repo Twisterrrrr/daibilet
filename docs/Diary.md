@@ -1,3 +1,66 @@
+## 2026-08-15 - Hub: weather Moscow + scenario covers for tourist 4
+
+### Наблюдения
+- Tourist set (кроме Перми): moscow, saint-petersburg, kaliningrad, nizhny-novgorod.
+- У Москвы не было weather/whenToGo (API 404 `no_weather`). СПб/КГД/НН weather уже был.
+- У MSK dayRoutePresets не было `coverImageUrl` (градиенты). У KGD classic - тоже.
+
+### Решения
+- `MSK_WEATHER` + `MSK_WHEN_TO_GO` в `city-hub-local-flavor.ts`; алиас `moskva` через normalize.
+- `CityWeatherWidget`: normalize slug + 8s timeout на hub API перед Open-Meteo fallback.
+- Covers: 10 MSK presets + KGD classic из существующих `/images/venues/...`.
+
+### Проблемы
+- visitMinutes mustSee у 4 городов = 0% (нужен owner pack). Identity slides только у Перми. SPB suburbs без slug/картинки (Ораниенбаум, Стрельна, Курортный, Шлиссельбург) - нет ассетов. Ekb/Ufa вне tourist set. Deploy не делали (sister agent).
+
+---
+
+## 2026-08-15 - Hub: подборки continuous strip + must-see без lead
+
+### Наблюдения
+- «Каталог подборок» после merge всё ещё выглядел второй секцией (крупный H2 + half-pad).
+- Лишний lead «Главные места, музеи и прогулочные точки» под must-see.
+
+### Решения
+- Nested `PopularDirections`: лейбл «Подборки» + `pt-3`, без HUB_SECTION_PAD / без H2 «Каталог».
+- Must-see: только H2.
+
+### Проблемы
+- Нет. В том же push: restore полного tree после docs-only `c449fec`.
+
+---
+## 2026-08-15 - Hub must-see: Убрать instead of stuck + В маршрут
+
+### Наблюдения
+- Owner: после «+ В маршрут» на карточках «Что посмотреть» тост и нижняя панель обновлялись, а чипы карточек оставались add-state.
+
+### Решения
+- Compact/iconOnly: idle Plus + «В маршрут», in-route Minus + «Убрать» (клик снимает точку).
+- subscribeDayRoute дополнительно слушает DAY_ROUTE_CHANGED_EVENT, чтобы чипы не отставали от панели при multi-chunk store.
+
+### Проблемы
+- Нет. Commit+push, без live deploy.
+
+---
+
+## 2026-08-15 - Hub suburbs: revert chip «Ещё», scroll detail, cover
+
+### Наблюдения
+- Owner: «Ещё» в пригородах **не** про скрытие маршрутов (Городец / Семёнов…). Имелся в виду скролл **карточки** day-trip, если она выше viewport.
+- Скрин НН: у Семёнова слева серый пустой cover.
+- Параллельно: `c449fec` оказался docs-only tree (сломал monorepo на tip) - восстановлен полный tree с `5a67263`.
+
+### Решения
+- Откат `98ef8ef`: чипы снова все видимы (mobile scroll / sm+ wrap), без dropdown «Ещё» для списка маршрутов.
+- `DayTripCanonCard` (hub): desktop `max-h` от viewport минус sticky header/tabs + `overflow-y-auto` на текстовой колонке; «Ещё N точек» для длинного списка POI остаётся.
+- Cover: `sm:h-full` + `unoptimized` SafeImage; wiring Семёнов = `nizhny-novgorod-semyonov` → etalon `apps/public/.../semyonov.jpg` (как Хохловка). Swap гоняет `sync-public-assets`.
+- Commit восстанавливает полный tree после битого docs-only tip.
+
+### Проблемы
+- Неверная интерпретация «Ещё» в `98ef8ef` - извинения owner. Live - следующий Deploy MSK web (после restore tip).
+
+---
+
 ## 2026-08-15 - Hub carousel arrows outside container
 
 ### Наблюдения

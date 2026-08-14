@@ -3014,6 +3014,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         description: "Кремль, Красная площадь, Зарядье и Большой театр - идеальный первый день без лишних переездов.",
         timingNote: "10:00 старт у Кремля; вечер - Большой театр.",
         blogSlug: "moscow-2-dnya-samostoyatelno-marshrut",
+        coverImageUrl: "/images/venues/moscow/moskovskiy-kreml.jpg",
         stops: [
           {
             name: "Московский Кремль",
@@ -3102,6 +3103,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         title: "Модный и светский",
         description: "Патриаршие, Никитская и панорамный ужин - атмосфера светской Москвы.",
         timingNote: "11:00 завтрак в «Северянах»; вечер - White Rabbit и бар на Патриарших.",
+        coverImageUrl: "/images/venues/moscow/severyane.jpg",
         stops: [
           {
             name: "Ресторан «Северяне»",
@@ -3150,6 +3152,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         title: "Советский авангард и конструктивизм",
         description: "Наркомфин, Мельников, Бахметьевский гараж, Русаков и ЗИЛ - день для ценителей архитектуры.",
         timingNote: "10:00 Наркомфин; день завершить в ЗИЛе.",
+        coverImageUrl: "/images/venues/moscow/dom-narkomfina.jpg",
         stops: [
           {
             name: "Дом Наркомфина",
@@ -3214,6 +3217,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         title: "Творческий и креативный",
         description: "Винзавод, Artplay, Арма, Суперметалл и «Поле» - лофты и галереи без гонки.",
         timingNote: "11:00 Винзавод; вечер - пространство «Поле».",
+        coverImageUrl: "/images/venues/moscow/vinzavod.jpg",
         stops: [
           {
             name: "Центр современного искусства «Винзавод»",
@@ -3262,6 +3266,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         title: "Усадебный и романтический",
         description: "Архангельское утром, «Пушкинъ» и Нескучный сад вечером - дворянская Москва.",
         timingNote: "10:00 выезд в Архангельское; к 15:00 - центр.",
+        coverImageUrl: "/images/venues/moscow/usadba-arhangelskoe.jpg",
         stops: [
           {
             name: "Государственный музей-усадьба «Архангельское»",
@@ -3302,6 +3307,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         title: "Секретная и мистическая Москва",
         description: "Саввинское подворье, Ивановская горка, Хитровка и Бункер-42 - скрытый центр.",
         timingNote: "11:00 Саввинское подворье; вечер - Бункер-42.",
+        coverImageUrl: "/images/venues/moscow/savvinskoe-podvore.jpg",
         stops: [
           {
             name: "Саввинское подворье",
@@ -3366,6 +3372,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         title: "Имперский масштаб ВДНХ",
         description: "Главная аллея, космос, музей кино и «Солнце Москвы» - гранд-прогулка на весь день.",
         timingNote: "10:00 арка ВДНХ; закат на колесе обозрения.",
+        coverImageUrl: "/images/venues/moscow/vdnh.jpg",
         stops: [
           {
             name: "ВДНХ",
@@ -3414,6 +3421,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         title: "Семейный и интерактивный",
         description: "Зоопарк, Планетарий, крыша ЦДМ и Музей криптографии - день с детьми без перегруза.",
         timingNote: "10:00 зоопарк; после обеда - ЦДМ и криптография.",
+        coverImageUrl: "/images/venues/moscow/zoopark.jpg",
         stops: [
           {
             name: "Московский зоопарк",
@@ -3454,6 +3462,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         title: "Индустриальный и технологичный",
         description: "Сити, Panorama360, мост Багратион и Экспериментаниум - взгляд вверх и в будущее.",
         timingNote: "День в Сити; вечер - Экспериментаниум на Соколе.",
+        coverImageUrl: "/images/venues/moscow/moskva-siti.jpg",
         stops: [
           {
             name: "Деловой центр «Москва-Сити»",
@@ -3494,6 +3503,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         title: "Старомосковский Замоскворечье",
         description: "Третьяковка, Кадаши, Пятницкая, Музеон и «Красный Октябрь» - живописный южный берег.",
         timingNote: "10:00 Третьяковка; закат на Красном Октябре.",
+        coverImageUrl: "/images/venues/moscow/tretyakovskaya-galereya.jpg",
         stops: [
           {
             name: "Государственная Третьяковская галерея",
@@ -3843,6 +3853,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         id: 'kaliningrad-classic-one-day',
         title: 'Классический Калининград за 1 день',
         description: 'Рыбная деревня, остров Канта, немецкий квартал, музейная флотилия, Амалиенау и ужин.',
+        coverImageUrl: '/images/venues/kaliningrad/rybnaya-derevnya.jpg',
         stops: [
           { name: 'Рыбная деревня', desc: 'Старт у Преголи', locationSlug: 'kaliningrad-rybnaya-derevnya', transitTip: 'Старт у Преголи / Рыбной деревни' },
           { name: 'Кафедральный собор', desc: 'Готика и орган на острове Канта', locationSlug: 'kaliningrad-kafedral-nyy-sobor'},

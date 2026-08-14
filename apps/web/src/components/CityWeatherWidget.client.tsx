@@ -55,7 +55,11 @@ async function loadCityWeatherSnapshot(
   signal: AbortSignal,
 ): Promise<CityWeatherSnapshot> {
   try {
-    const response = await fetch(hubWeatherApiPath(citySlug), { signal });
+    const hubSignal =
+      typeof AbortSignal.any === 'function'
+        ? AbortSignal.any([signal, AbortSignal.timeout(8000)])
+        : signal;
+    const response = await fetch(hubWeatherApiPath(citySlug), { signal: hubSignal });
     if (response.ok) {
       const snapshot = snapshotFromHubWeatherPayload(await response.json());
       if (snapshot) return snapshot;
@@ -79,10 +83,11 @@ const TAB_ICON = {
 } as const;
 
 export function CityWeatherWidget({ citySlug, cityIn, editorial = false }: Props) {
-  const flavor = resolveCityLocalFlavor(citySlug);
+  const resolvedSlug = normalizeCityHubSlug(citySlug) || citySlug;
+  const flavor = resolveCityLocalFlavor(resolvedSlug);
   const weather = flavor?.weather;
   const whenToGo = flavor?.whenToGo;
-  const current = resolveWhenToGoBlurb(citySlug);
+  const current = resolveWhenToGoBlurb(resolvedSlug);
   const [state, setState] = useState<LoadState>(weather ? { status: 'loading' } : { status: 'idle' });
   const [tab, setTab] = useState<CitySeasonTabId>(current?.tab || 'summer');
 
@@ -97,7 +102,7 @@ export function CityWeatherWidget({ citySlug, cityIn, editorial = false }: Props
     }
     const controller = new AbortController();
     setState({ status: 'loading' });
-    loadCityWeatherSnapshot(citySlug, weather, controller.signal)
+    loadCityWeatherSnapshot(resolvedSlug, weather, controller.signal)
       .then((snapshot) => {
         setState({ status: 'ready', snapshot });
       })
@@ -107,7 +112,7 @@ export function CityWeatherWidget({ citySlug, cityIn, editorial = false }: Props
         setState({ status: 'error' });
       });
     return () => controller.abort();
-  }, [citySlug, weather]);
+  }, [resolvedSlug, weather]);
 
   const guide = useMemo(() => seasonGuideForTab(whenToGo, current, tab), [whenToGo, current, tab]);
 
@@ -213,7 +218,7 @@ export function CityWeatherWidget({ citySlug, cityIn, editorial = false }: Props
             >
               {whenToGo.tabs.map((item) => {
                 const isSpbSummer =
-                  item.id === 'summer' && normalizeCityHubSlug(citySlug) === 'saint-petersburg';
+                  item.id === 'summer' && resolvedSlug === 'saint-petersburg';
                 const Icon = isSpbSummer ? Ship : TAB_ICON[item.id];
                 const active = item.id === tab;
                 const isNow = current?.tab === item.id;

@@ -1,3 +1,26 @@
+## 2026-08-15 - Hub: weather Moscow + tourist-4 covers
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| UX.MSK-WEATHER | Погода+сезоны Москва (Open-Meteo / day-route) | Высокий | ✅ commit+push, без live |
+| UX.MSK-KGD-PRESET-COVERS | coverImageUrl на 10 MSK presets + KGD classic | Высокий | ✅ commit+push |
+| UX.VISITMINUTES-4 | visitMinutes mustSee MSK/SPB/KGD/NN | Высокий | ⛔ needs owner pack |
+| UX.IDENTITY-4 | Identity slides кроме Перми | Средний | ⛔ needs owner copy+photo |
+
+## 2026-08-15 - Hub must-see route chip toggle
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| UX.HUB-MUSTSEE-ROUTE-TOGGLE | Must-see «+ В маршрут» → «Убрать» + sync via day-route event | Высокий | ✅ commit+push, без live |
+
+## 2026-08-15 - Affiche collections continuous + must-see subtitle
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| REPO.RESTORE-AFTER-C449FEC | Restore full tree wiped by docs-only `c449fec` | Критический | ✅ restore commit |
+| UX.HUB-COLLECTIONS-NO-SECOND-H2 | Подборки: strip под events, не H2 «Каталог» + gap | Высокий | ✅ ship (commit+push) |
+| UX.HUB-MUSTSEE-DROP-LEAD | Убрать lead «Главные места, музеи…» под must-see | Высокий | ✅ ship (commit+push) |
+
 ## 2026-08-15 - Hub carousel arrows outside + deploy batch
 
 | ID | Задача | Приоритет | Статус |

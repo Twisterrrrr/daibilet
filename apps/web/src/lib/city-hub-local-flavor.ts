@@ -3,7 +3,7 @@
  * seasonal «когда ехать» copy. Keep out of cityInfo (coords/mustSee) so other
  * agents can edit geo without merge fights.
  *
- * Moscow: no weather pack yet. SPB / Kaliningrad / NN: weather + seasons.
+ * Tourist hubs with weather+seasons: Perm, Moscow, SPB, Kaliningrad, NN.
  * Identity slides remain Perm-only until those packs are filled.
  */
 
@@ -417,6 +417,76 @@ const NN_WHEN_TO_GO: CityWhenToGoFlavor = {
   }),
 };
 
+
+const MSK_WEATHER: CityWeatherFlavor = {
+  latitude: 55.76,
+  longitude: 37.62,
+  timezone: 'Europe/Moscow',
+  outdoorSlugs: [
+    'moscow-park-zaryad-e',
+    'moscow-park-gorkogo',
+    'moscow-vdnh',
+    'moscow-vorobevy-gory',
+  ],
+  indoorSlugs: [
+    'moscow-tret-yakovskaya-galereya',
+    'moscow-gmii-imeni-pushkina',
+    'moscow-bol-shoy-teatr',
+  ],
+  outdoorCta: 'Хороший день для Зарядья, Парка Горького или ВДНХ',
+  indoorCtaOvercast: 'Сегодня пасмурно. Посмотрите Третьяковку, Пушкинский или Большой театр',
+  indoorCtaRain: 'Сегодня дождь. Посмотрите Третьяковку, Пушкинский или Большой театр',
+  indoorCtaSnow: 'Сегодня снег. Посмотрите Третьяковку, Пушкинский или Большой театр',
+};
+
+const MSK_WHEN_TO_GO: CityWhenToGoFlavor = {
+  timeZone: 'Europe/Moscow',
+  seasons: [
+    {
+      id: 'winter',
+      months: [12, 1, 2],
+      headline: 'Зима',
+      body: 'Каток на Красной площади, гирлянды и музеи без летних очередей. Новый год дорогой, февраль - тише и выгоднее.',
+    },
+    {
+      id: 'spring',
+      months: [3, 4, 5],
+      headline: 'Весна',
+      body: 'Март ещё слякотный. С мая (+15...+18 °C) открываются веранды, парки и речные прогулки по Москве-реке.',
+    },
+    {
+      id: 'summer',
+      months: [6, 7],
+      headline: 'Лето',
+      body: 'Пик сезона (+22...+28 °C): фестивали, веранды, Зарядье и Воробьёвы горы. Билеты в топ-музеи лучше брать заранее.',
+    },
+    {
+      id: 'lateSummer',
+      months: [8],
+      headline: 'Конец лета',
+      body: 'Август всё ещё тёплый, но чуть спокойнее июля. Удобное окно на парки и вечерние набережные.',
+    },
+    {
+      id: 'earlyAutumn',
+      months: [9],
+      headline: 'Ранняя осень',
+      body: 'Сентябрь часто +15 °C и золотая листва в Коломенском и Царицыно - один из лучших месяцев для прогулок.',
+    },
+    {
+      id: 'lateAutumn',
+      months: [10, 11],
+      headline: 'Поздняя осень',
+      body: 'С октября дожди и ранние сумерки. Время для театров, выставок и низких цен на жильё вне праздников.',
+    },
+  ],
+  tabs: seasonTabs({
+    spring: 'К маю тепло для парков и теплоходов. Март-апрель чаще слякоть и ветер.',
+    summer: 'Фестивали, веранды и длинные вечера. Топ-музеи лучше бронировать заранее.',
+    autumn: 'Сентябрь - золото парков. С октября дожди, к ноябрю поездка обычно дешевле.',
+    winter: 'Катки и гирлянды. Новый год дорогой, февраль - самый спокойный заезд.',
+  }),
+};
+
 const PERM_SLIDES: CityIdentitySlide[] = [
   {
     id: 'medved',
@@ -483,7 +553,7 @@ export const CITY_HUB_LOCAL_FLAVOR: Record<string, CityHubLocalFlavor> = {
     weather: PERM_WEATHER,
     whenToGo: PERM_WHEN_TO_GO,
   },
-  moscow: { tags: [] },
+  moscow: { tags: [], weather: MSK_WEATHER, whenToGo: MSK_WHEN_TO_GO },
   'saint-petersburg': { tags: [], weather: SPB_WEATHER, whenToGo: SPB_WHEN_TO_GO },
   kaliningrad: { tags: [], weather: KGD_WEATHER, whenToGo: KGD_WHEN_TO_GO },
   'nizhny-novgorod': { tags: [], weather: NN_WEATHER, whenToGo: NN_WHEN_TO_GO },
