@@ -33,14 +33,12 @@ const STATUS_RANK: Record<CityRegionalEventStatus, number> = {
   past: 2,
 };
 
-export function listCityRegionalEvents(
+function listAllCityRegionalEvents(
   slug: string | null | undefined,
   now = new Date(),
-  limit = 5,
 ): CityRegionalEventView[] {
   const normalized = normalizeCityHubSlug(slug);
   const rows = normalized ? CITY_REGIONAL_EVENTS[normalized] || [] : [];
-  const cap = Number.isFinite(limit) ? Math.max(0, Math.min(5, Math.floor(limit))) : 5;
   return rows
     .map((event) => ({ ...event, status: regionalEventStatus(event, now) }))
     .sort((a, b) => {
@@ -48,6 +46,27 @@ export function listCityRegionalEvents(
       if (rank !== 0) return rank;
       if (a.status === 'past') return b.startDate.localeCompare(a.startDate);
       return a.startDate.localeCompare(b.startDate);
-    })
+    });
+}
+
+export function listCityRegionalEvents(
+  slug: string | null | undefined,
+  now = new Date(),
+  limit = 5,
+): CityRegionalEventView[] {
+  const cap = Number.isFinite(limit) ? Math.max(0, Math.min(5, Math.floor(limit))) : 5;
+  return listAllCityRegionalEvents(slug, now)
+    .filter((event) => event.status !== 'past')
+    .slice(0, cap);
+}
+
+export function listCityRegionalPastEvents(
+  slug: string | null | undefined,
+  now = new Date(),
+  limit = 5,
+): CityRegionalEventView[] {
+  const cap = Number.isFinite(limit) ? Math.max(0, Math.min(8, Math.floor(limit))) : 5;
+  return listAllCityRegionalEvents(slug, now)
+    .filter((event) => event.status === 'past')
     .slice(0, cap);
 }

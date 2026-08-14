@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  isCityHubAfficheBeforeSuburbs,
   isCityHubBlogAfterSuburbs,
   isCityHubSectionHidden,
   resolveCityHubConfig,
@@ -65,6 +66,8 @@ test('isCityHubBlogAfterSuburbs gates five cities and aliases', () => {
   assert.equal(isCityHubBlogAfterSuburbs('kazan'), false);
   assert.equal(isCityHubBlogAfterSuburbs('ekaterinburg'), false);
   assert.equal(isCityHubBlogAfterSuburbs(''), false);
+  assert.equal(isCityHubAfficheBeforeSuburbs('perm'), true);
+  assert.equal(isCityHubAfficheBeforeSuburbs('kazan'), false);
 });
 
 test('ekaterinburg hub config has no river featuredDirections', () => {

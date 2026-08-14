@@ -17,6 +17,7 @@ import { buildPublicLandings } from './public-city-landings.js';
 import { createDb } from './db.js';
 import { getPublicCatalogSessions, getPublicCatalogSessionsSoft, resolveCatalogSessionsByDestinationKeys } from './public-catalog.dto.js';
 import { toPublicCatalogListItem } from './public-catalog-list-item.js';
+import { pickCityHubFeedSessions } from './city-hub-session-rank.js';
 import { resolveProjectRoot } from './project-root.js';
 import {
   buildRegionHubEnrichment,
@@ -229,7 +230,11 @@ function scheduleCityPageRebuild(
       return payload;
     }
     const destination = publicDestinationFromSession(seedSession);
-    const sessions = matchedSessions.slice(0, CITY_SSR_SESSION_LIMIT).map((session) => toPublicCatalogListItem(session));
+    const sessions = pickCityHubFeedSessions(
+      matchedSessions,
+      requestedSlug || citySlugOrId,
+      CITY_SSR_SESSION_LIMIT,
+    ).map((session) => toPublicCatalogListItem(session));
     const mapStartedAt = Date.now();
     const [sessionVenues, cityRecord, contentVenues] = await Promise.all([
       withTimeout(

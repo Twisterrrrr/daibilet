@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { listCityRegionalEvents, regionalEventStatus } from './city-regional-events.ts';
+import { listCityRegionalEvents, listCityRegionalPastEvents, regionalEventStatus } from './city-regional-events.ts';
 
 test('Perm regional events are hidden for empty cities and capped at 5', () => {
   assert.deepEqual(listCityRegionalEvents('moscow'), []);
@@ -27,10 +27,13 @@ test('on 14 Aug 2026 Flahertiana is upcoming and leads the Perm list', () => {
 });
 
 test('does not invent White Nights or retired Живая Пермь as 2026 cards', () => {
-  const perm = listCityRegionalEvents('perm', new Date('2026-08-14T12:00:00+05:00'));
-  const blob = perm.map((event) => `${event.title} ${event.blurb}`).join(' ');
+  const now = new Date('2026-08-14T12:00:00+05:00');
+  const perm = listCityRegionalEvents('perm', now);
+  const past = listCityRegionalPastEvents('perm', now);
+  const blob = [...perm, ...past].map((event) => `${event.title} ${event.blurb}`).join(' ');
   assert.equal(/бел(ые|ых) ноч/i.test(blob), false);
   assert.equal(/живая пермь/i.test(blob), false);
-  assert.ok(perm.some((event) => /дягилев/i.test(event.title)));
-  assert.ok(perm.some((event) => /kamwa/i.test(event.title)));
+  assert.equal(perm.every((event) => event.status !== 'past'), true);
+  assert.ok(past.some((event) => /дягилев/i.test(event.title)));
+  assert.ok(past.some((event) => /kamwa/i.test(event.title)));
 });

@@ -55,6 +55,7 @@ export type DayTripCanonCardProps = {
 };
 
 const MAGAZINE_SIGHTS_MAX = 4;
+const HUB_SIGHTS_PREVIEW = 3;
 
 function SightLabel({
   name,
@@ -155,7 +156,13 @@ export function DayTripCanonCard({
   const hasGastro = Boolean(gastro?.name);
   const showMetaGrid = hasLogistics || hasGastro;
   const nestedAll = sights.filter((s) => s?.name);
-  const nested = magazine ? nestedAll.slice(0, MAGAZINE_SIGHTS_MAX) : nestedAll;
+  const [sightsOpen, setSightsOpen] = React.useState(false);
+  const hubNeedsCollapse = !magazine && nestedAll.length > HUB_SIGHTS_PREVIEW;
+  const nested = magazine
+    ? nestedAll.slice(0, MAGAZINE_SIGHTS_MAX)
+    : hubNeedsCollapse && !sightsOpen
+      ? nestedAll.slice(0, HUB_SIGHTS_PREVIEW)
+      : nestedAll;
   const poiDayNumbers: number[] = [];
   {
     let dayPlaceNum = 0;
@@ -486,6 +493,21 @@ export function DayTripCanonCard({
               );
             })}
           </ol>
+          {hubNeedsCollapse ? (
+            <div className="mt-3 sm:grid sm:grid-cols-[2.25rem_minmax(0,1fr)] sm:gap-x-3">
+              <div aria-hidden className="hidden sm:block" />
+              <button
+                type="button"
+                data-day-trip-sights-more
+                onClick={() => setSightsOpen((open) => !open)}
+                className={`text-left text-sm font-semibold ${
+                  editorial ? 'text-zinc-700 hover:text-zinc-950' : 'text-primary-700 hover:text-primary-800'
+                }`}
+              >
+                {sightsOpen ? 'Свернуть' : `Ещё ${nestedAll.length - HUB_SIGHTS_PREVIEW} точек`}
+              </button>
+            </div>
+          ) : null}
         </section>
       ) : null}
 

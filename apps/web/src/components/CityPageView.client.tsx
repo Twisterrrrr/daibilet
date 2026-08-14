@@ -33,8 +33,10 @@ import { inCityAccusative, inCityPrepositional, cityToGenitive } from '@/lib/cit
 import { buildCatalogHref } from '@/lib/catalog-url';
 import { buildCityHubSeoPhrase } from '@/lib/city-hub-seo';
 import {
+  isCityHubAfficheBeforeSuburbs,
   isCityHubBlogAfterSuburbs,
   isCityHubSectionHidden,
+  normalizeCityHubSlug,
   resolveCityHubConfig,
 } from '@/lib/city-hub-config';
 import { matchSightAfficheLink, resolveFeaturedDirections } from '@/lib/city-hub-directions';
@@ -42,6 +44,14 @@ import { resolveCityImageObjectPosition } from '@/lib/city-image-focus';
 import { resolveCityImage } from '@/lib/city-images';
 import { CITY_NIGHT_HERO } from '@/lib/city-night-hero';
 import { cityHasLifehacks, resolveCityLifehacks } from '@/lib/city-hub-lifehacks';
+import {
+  groupStandupInHubFeed,
+  isCityHubTouristAffiche,
+  preferredAfficheCategory,
+  rankCityHubSessions,
+  visibleAfficheCategories,
+} from '@/lib/city-hub-affiche';
+import { formatCoverDateBadge } from '@/lib/event-card-meta';
 import {
   cityHasWeatherWidget,
   cityHasWhenToGo,
@@ -122,6 +132,7 @@ export function CityPageView({
   const [error, setError] = React.useState<string | null>(null);
   const [category, setCategory] = React.useState('all');
   const [placeFocus, setPlaceFocus] = React.useState<CityPlaceFocus | null>(null);
+  const userPickedCategory = React.useRef(false);
 
   React.useEffect(() => {
     setPlaceFocus(null);
@@ -170,22 +181,39 @@ export function CityPageView({
       if (category !== 'all' && session.category !== category) return false;
       return true;
     });
-    const ranked = [...filtered].sort((a, b) => sessionHitScore(b) - sessionHitScore(a));
+    const ranked = rankCityHubSessions(filtered);
     return dedupeHubSessions(ranked);
   }, [category, payload]);
 
   const city = payload?.city;
+  const touristAffiche = isCityHubTouristAffiche(normalizeCityHubSlug(city?.slug || city?.sourceSlug || slug));
+  const afficheBeforeSuburbs = isCityHubAfficheBeforeSuburbs(city?.slug || city?.sourceSlug || slug);
   // Chip facets = hub feed only (same universe as the list / «Все»), not full-city catalog.
   const categories = React.useMemo(() => {
     if (!payload?.sessions?.length) return [] as Array<[string, number]>;
-    const counts = new Map<string, number>();
-    for (const session of payload.sessions) {
-      const name = session.category?.trim();
-      if (!name) continue;
-      counts.set(name, (counts.get(name) || 0) + 1);
-    }
-    return Array.from(counts.entries()).sort((a, b) => b[1] - a[1]);
-  }, [payload]);
+    return visibleAfficheCategories(payload.sessions, { tourist: touristAffiche });
+  }, [payload, touristAffiche]);
+
+  React.useEffect(() => {
+    userPickedCategory.current = false;
+  }, [slug]);
+
+  React.useEffect(() => {
+    if (userPickedCategory.current) return;
+    setCategory(preferredAfficheCategory(categories, { tourist: touristAffiche }));
+  }, [categories, touristAffiche, slug]);
+  const afficheRows = React.useMemo(
+    () =>
+      touristAffiche
+        ? groupStandupInHubFeed(sessions)
+        : sessions.map((session) => ({ kind: 'event' as const, session })),
+    [sessions, touristAffiche],
+  );
+
+  const pickCategory = React.useCallback((value: string) => {
+    userPickedCategory.current = true;
+    setCategory(value);
+  }, []);
   const guide = city ? cityGuideFor(city) : null;
   const hubConfig = React.useMemo(() => resolveCityHubConfig(slug), [slug]);
   const unifiedFaq = React.useMemo(() => {
@@ -390,13 +418,14 @@ export function CityPageView({
                   compactTop={hasHookFact || hasWeather || hasWhenToGo}
                   placeFocus={placeFocus}
                   onPlaceFocus={applyPlaceFocus}
+                  includeSuburbs={!afficheBeforeSuburbs}
                 />
               </div>
             ) : null}
 
-            <CityRegionalEvents citySlug={hubSlug} editorial={editorial} />
+            {afficheBeforeSuburbs ? null : <CityRegionalEvents citySlug={hubSlug} editorial={editorial} />}
 
-            {blogAfterSuburbs ? renderHubBlogSection() : null}
+            {blogAfterSuburbs && !afficheBeforeSuburbs ? renderHubBlogSection() : null}
 
             <section
               id="affiche"
@@ -405,24 +434,57 @@ export function CityPageView({
               <div className={`container-page ${editorial ? 'py-12 sm:py-14' : 'py-8'}`}>
                 <CityCatalogHeader editorial={editorial} />
                 {contentReady ? (
-                  <div className="mb-5 flex flex-nowrap gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                  <div className="sticky top-[calc(var(--site-header-height)+3.25rem)] z-20 -mx-1 mb-5 bg-white/95 px-1 py-2 backdrop-blur supports-[backdrop-filter]:bg-white/90">
+                    <div className="flex flex-nowrap gap-2 overflow-x-auto overscroll-x-contain pb-0.5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                     <CategoryFilter
                       categories={categories}
                       active={category}
                       filteredCount={sessions.length}
                       editorial={editorial}
-                      onCategory={setCategory}
-                      onReset={() => setCategory('all')}
+                      onCategory={pickCategory}
+                      onReset={() => pickCategory('all')}
                     />
+                    </div>
                   </div>
                 ) : null}
                 {contentReady ? (
-                  <CityEventsGrid sessions={sessions} editorial={editorial} />
+                  <CityEventsGrid rows={afficheRows} editorial={editorial} />
                 ) : (
                   <CityScheduleLoadingState />
                 )}
               </div>
             </section>
+
+            {afficheBeforeSuburbs && guide?.significantSuburbs?.length ? (
+              <div
+                className={`border-b ${editorial ? 'border-zinc-200' : 'border-slate-100'}`}
+              >
+                <div className={`container-page ${editorial ? 'py-12 sm:py-14' : 'py-10'}`}>
+                  <SuburbsCarousel
+                    places={guide.significantSuburbs}
+                    venues={payload.venues}
+                    city={city}
+                    cityGenitive={cityToGenitive(city.name)}
+                    editorial={editorial}
+                    replaceDayOnApply
+                    navigateToMyDayOnApply
+                    sectionId="city-suburbs"
+                    focusSlugs={
+                      placeFocus &&
+                      guide.significantSuburbs.some((suburb) =>
+                        suburbMatchesSlugs(suburb, placeFocus.slugs),
+                      )
+                        ? placeFocus.slugs
+                        : undefined
+                    }
+                  />
+                </div>
+              </div>
+            ) : null}
+
+            {afficheBeforeSuburbs ? <CityRegionalEvents citySlug={hubSlug} editorial={editorial} /> : null}
+
+            {blogAfterSuburbs && afficheBeforeSuburbs ? renderHubBlogSection() : null}
 
             {payload.regionNearby?.events?.length ? (
               <RegionNearbyStrip nearby={payload.regionNearby} editorial={editorial} />
@@ -483,7 +545,7 @@ export function CityPageView({
                       editorial={editorial}
                       nested
                       onCategory={(value) => {
-                        setCategory(value);
+                        pickCategory(value);
                         scrollToSection('affiche');
                       }}
                     />
@@ -1189,6 +1251,7 @@ function CitySightsSection({
   compactTop = false,
   placeFocus = null,
   onPlaceFocus,
+  includeSuburbs = true,
 }: {
   city: PublicCityDto;
   guide: CityInfoEntry | null;
@@ -1203,6 +1266,7 @@ function CitySightsSection({
   compactTop?: boolean;
   placeFocus?: CityPlaceFocus | null;
   onPlaceFocus?: (focus: CityPlaceFocus | null) => void;
+  includeSuburbs?: boolean;
 }) {
   const fromSights: CityMustSeeItem[] =
     guide?.sights?.map((item) => ({
@@ -1242,11 +1306,12 @@ function CitySightsSection({
     priceFrom: landing.priceFrom,
   }));
   const titleClass = `font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-950'}`;
-  const suburbs = guide?.significantSuburbs?.length ? guide.significantSuburbs : [];
+  const allSuburbs = guide?.significantSuburbs?.length ? guide.significantSuburbs : [];
+  const suburbs = includeSuburbs ? allSuburbs : [];
   const namedPresets = guide?.dayRoutePresets;
   const hasNamedScenarios = Boolean(namedPresets?.length);
   const activeFocus = placeFocus?.slugs.length ? placeFocus : null;
-  const focusedPlaces = activeFocus ? collectPlacesBySlugs(activeFocus.slugs, places, suburbs) : [];
+  const focusedPlaces = activeFocus ? collectPlacesBySlugs(activeFocus.slugs, places, allSuburbs) : [];
   // Editorial «Зачем ехать» (places) always owns the section H2; scenarios follow below.
   // hookFact renders above this section (between tabs and H2).
   const sectionTitle =
@@ -1945,18 +2010,17 @@ function CategoryFilter(props: {
 }
 
 function CityEventsGrid({
-  sessions,
+  rows,
   editorial = false,
 }: {
-  sessions: PublicSessionDto[];
+  rows: ReturnType<typeof groupStandupInHubFeed<PublicSessionDto>>;
   editorial?: boolean;
 }) {
-  const items = sessions.slice(0, 48);
+  const items = rows.slice(0, 48);
   if (!items.length) {
     return <EmptyState />;
   }
 
-  // Compact photo carousel (~1.5 mobile / ~4-5 desktop); scrollbar hidden, snap + desktop arrows.
   return (
     <div data-city-events-rail>
       <ScrollRail
@@ -1965,22 +2029,88 @@ function CityEventsGrid({
         viewportClassName="flex flex-nowrap gap-2.5 snap-x snap-mandatory pb-0.5"
         aria-label="Ближайшие события"
       >
-        {items.map((session) => (
-          <div
-            key={session.id}
-            className="w-[min(62%,11.5rem)] shrink-0 snap-start sm:w-[12rem] md:w-[12.5rem] lg:w-[13rem]"
-            data-rail-item
-            data-city-events-card
-          >
-            {editorial ? (
-              <AffichePosterCard session={session} />
-            ) : (
-              <EventCard session={session} showcaseRail cityHub />
-            )}
-          </div>
-        ))}
+        {items.map((row) =>
+          row.kind === 'standup' ? (
+            <div
+              key={`standup:${row.venueName}`}
+              className="w-[min(88%,18.5rem)] shrink-0 snap-start sm:w-[20rem]"
+              data-rail-item
+              data-city-standup-series
+            >
+              <HubStandupSeriesCard sessions={row.sessions} venueName={row.venueName} editorial={editorial} />
+            </div>
+          ) : (
+            <div
+              key={row.session.id}
+              className="w-[min(62%,11.5rem)] shrink-0 snap-start sm:w-[12rem] md:w-[12.5rem] lg:w-[13rem]"
+              data-rail-item
+              data-city-events-card
+            >
+              {editorial ? (
+                <AffichePosterCard session={row.session} />
+              ) : (
+                <EventCard session={row.session} showcaseRail cityHub />
+              )}
+            </div>
+          ),
+        )}
       </ScrollRail>
     </div>
+  );
+}
+
+function HubStandupSeriesCard({
+  sessions,
+  venueName,
+  editorial = false,
+}: {
+  sessions: PublicSessionDto[];
+  venueName: string;
+  editorial?: boolean;
+}) {
+  const dates = sessions.slice(0, 8);
+  const venueLink = sessions[0]?.venueSlug
+    ? venueHref({ slug: sessions[0].venueSlug, name: venueName })
+    : null;
+  return (
+    <article
+      className={`flex h-full flex-col rounded-2xl border p-4 ${
+        editorial ? 'border-zinc-200 bg-white' : 'border-slate-200 bg-white'
+      }`}
+    >
+      <p
+        className={`text-[10px] font-semibold uppercase tracking-[0.14em] ${
+          editorial ? 'text-zinc-500' : 'text-slate-500'
+        }`}
+      >
+        Стендап на неделю
+      </p>
+      <h3 className={`mt-1 text-base font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-950'}`}>
+        {venueLink ? (
+          <Link href={venueLink} className="hover:underline">
+            {venueName}
+          </Link>
+        ) : (
+          venueName
+        )}
+      </h3>
+      <p className={`mt-1 text-xs ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}>
+        {sessions.length} ближайших дат
+      </p>
+      <div className="mt-3 flex flex-wrap gap-1.5">
+        {dates.map((session) => (
+          <Link
+            key={session.id || session.slug}
+            href={eventHref(session)}
+            className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${
+              editorial ? 'bg-zinc-100 text-zinc-800 hover:bg-zinc-200' : 'bg-slate-100 text-slate-800 hover:bg-slate-200'
+            }`}
+          >
+            {formatCoverDateBadge(session) || session.dateLabel || 'Скоро'}
+          </Link>
+        ))}
+      </div>
+    </article>
   );
 }
 
@@ -2199,17 +2329,6 @@ function dedupeHubSessions(sessions: PublicSessionDto[]): PublicSessionDto[] {
     out.push(session);
   }
   return out;
-}
-
-function sessionHaystack(session: PublicSessionDto): string {
-  return `${session.category || ''} ${session.title || ''} ${(session as { eventTitle?: string }).eventTitle || ''}`.toLowerCase();
-}
-
-function sessionHitScore(session: PublicSessionDto): number {
-  const hay = sessionHaystack(session);
-  if (/стендап|stand[\s-]?up|standup|comedy|юмор|квиз/.test(hay)) return 3;
-  if (/концерт|concert|шоу|фестиваль|live/.test(hay)) return 2;
-  return 0;
 }
 
 function defaultCityFaq(cityName: string): CityFaqItem[] {

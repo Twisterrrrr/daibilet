@@ -132,3 +132,11 @@ export function isCityHubBlogAfterSuburbs(slug: string | null | undefined): bool
   const normalized = normalizeCityHubSlug(slug);
   return Boolean(normalized) && BLOG_AFTER_SUBURBS_SLUGS.has(normalized);
 }
+
+/**
+ * Tourist discovery hubs: афиша сразу после сценариев, пригороды и фестивали ниже.
+ * Локальный стендап не должен стоять между «зачем ехать» и билетами на экскурсии.
+ */
+export function isCityHubAfficheBeforeSuburbs(slug: string | null | undefined): boolean {
+  return isCityHubBlogAfterSuburbs(slug);
+}

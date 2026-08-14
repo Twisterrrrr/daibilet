@@ -2,7 +2,7 @@
 
 import { CalendarDays } from 'lucide-react';
 
-import { listCityRegionalEvents, regionalEventStatusLabel } from '@/lib/city-regional-events';
+import { listCityRegionalEvents, listCityRegionalPastEvents, regionalEventStatusLabel } from '@/lib/city-regional-events';
 
 type Props = {
   citySlug: string;
@@ -11,7 +11,8 @@ type Props = {
 
 export function CityRegionalEvents({ citySlug, editorial = false, }: Props) {
   const events = listCityRegionalEvents(citySlug);
-  if (!events.length) return null;
+  const past = listCityRegionalPastEvents(citySlug);
+  if (!events.length && !past.length) return null;
 
   return (
     <section
@@ -32,6 +33,7 @@ export function CityRegionalEvents({ citySlug, editorial = false, }: Props) {
         <p className={`mt-2 max-w-3xl text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
           Крупные фестивали сезона - не дубль афиши, а короткий ориентир. Даты из официальных анонсов, без выдуманного API.
         </p>
+        {events.length ? (
         <ul className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {events.map((event) => (
             <li
@@ -79,6 +81,36 @@ export function CityRegionalEvents({ citySlug, editorial = false, }: Props) {
             </li>
           ))}
         </ul>
+        ) : null}
+        {past.length ? (
+          <details className="mt-5" data-city-regional-past>
+            <summary
+              className={`cursor-pointer list-none text-sm font-semibold ${
+                editorial ? 'text-zinc-600 hover:text-zinc-900' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              Прошедшие фестивали сезона ({past.length})
+            </summary>
+            <ul className="mt-3 space-y-2">
+              {past.map((event) => (
+                <li
+                  key={event.id}
+                  className={`rounded-xl px-3 py-2 text-sm ${
+                    editorial ? 'bg-zinc-100 text-zinc-600' : 'bg-slate-50 text-slate-600'
+                  }`}
+                  data-city-regional-event={event.id}
+                  data-status="past"
+                >
+                  <span className={editorial ? 'font-semibold text-zinc-800' : 'font-semibold text-slate-800'}>
+                    {event.title}
+                  </span>
+                  <span className="mx-1.5">·</span>
+                  {event.datesLabel}
+                </li>
+              ))}
+            </ul>
+          </details>
+        ) : null}
       </div>
     </section>
   );
