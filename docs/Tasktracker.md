@@ -1,3 +1,11 @@
+## 2026-08-14 - Hub: pastel lifehacks, fact amber, scenarios then suburbs
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| UX.HUB-LIFEHACKS-PASTEL | Лайфхаки: разные muted pastel фоны по индексу | Высокий | 🔄 commit+push, затем live |
+| UX.HUB-FACT-AMBER | Вернуть янтарный фон карточки «Факт» | Высокий | 🔄 commit+push, затем live |
+| UX.HUB-ORDER-SCEN-SUB-LH | Скролл: сценарии → пригороды → лайфхаки | Высокий | 🔄 commit+push, затем live |
+
 ## 2026-08-14 - Hub nav: События + mobile hero chips
 
 | ID | Задача | Приоритет | Статус |

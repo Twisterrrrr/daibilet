@@ -502,8 +502,8 @@ export function CityPageView({
                   compactTop={hasHookFact || hasWeather || hasWhenToGo}
                   placeFocus={placeFocus}
                   onPlaceFocus={applyPlaceFocus}
-                  includeSuburbs={!afficheBeforeSuburbs}
-                  beforeScenarios={
+                  includeSuburbs
+                  afterSuburbs={
                     hasLifehacks ? (
                       <CityLifehacksSection
                         citySlug={hubSlug}
@@ -550,33 +550,6 @@ export function CityPageView({
                 )}
               </div>
             </section>
-
-            {afficheBeforeSuburbs && guide?.significantSuburbs?.length ? (
-              <div
-                className={`border-b ${editorial ? 'border-zinc-200' : 'border-slate-100'}`}
-              >
-                <div className={`container-page ${editorial ? 'py-12 sm:py-14' : 'py-10'}`}>
-                  <SuburbsCarousel
-                    places={guide.significantSuburbs}
-                    venues={payload.venues}
-                    city={city}
-                    cityGenitive={cityToGenitive(city.name)}
-                    editorial={editorial}
-                    replaceDayOnApply
-                    navigateToMyDayOnApply
-                    sectionId="city-suburbs"
-                    focusSlugs={
-                      placeFocus &&
-                      guide.significantSuburbs.some((suburb) =>
-                        suburbMatchesSlugs(suburb, placeFocus.slugs),
-                      )
-                        ? placeFocus.slugs
-                        : undefined
-                    }
-                  />
-                </div>
-              </div>
-            ) : null}
 
             {afficheBeforeSuburbs ? <CityRegionalEvents citySlug={hubSlug} editorial={editorial} /> : null}
 
@@ -1222,16 +1195,16 @@ function CityHookFactCallout({
       className={`relative flex h-full flex-col overflow-hidden rounded-2xl p-5 pl-6 sm:p-6 sm:pl-7 ${
         editorial
           ? 'bg-white ring-1 ring-zinc-200'
-          : 'bg-white shadow-[0_4px_12px_rgba(15,23,42,0.06)] ring-1 ring-slate-200/80'
+          : 'bg-amber-50/80 shadow-[0_4px_12px_rgba(15,23,42,0.06)] ring-1 ring-amber-100'
       }`}
     >
       <span
-        className={`absolute inset-y-0 left-0 w-1.5 ${editorial ? 'bg-zinc-900' : 'bg-slate-900'}`}
+        className={`absolute inset-y-0 left-0 w-1.5 ${editorial ? 'bg-zinc-900' : 'bg-amber-400'}`}
         aria-hidden
       />
       <h2
         className={`flex items-center gap-2 text-xs font-bold uppercase tracking-[0.14em] ${
-          editorial ? 'text-zinc-500' : 'text-slate-500'
+          editorial ? 'text-zinc-500' : 'text-amber-800'
         }`}
       >
         <Lightbulb
@@ -1461,7 +1434,7 @@ function CitySightsSection({
   placeFocus = null,
   onPlaceFocus,
   includeSuburbs = true,
-  beforeScenarios = null,
+  afterSuburbs = null,
 }: {
   city: PublicCityDto;
   guide: CityInfoEntry | null;
@@ -1477,8 +1450,8 @@ function CitySightsSection({
   placeFocus?: CityPlaceFocus | null;
   onPlaceFocus?: (focus: CityPlaceFocus | null) => void;
   includeSuburbs?: boolean;
-  /** Rendered after must-see rail, before «Готовые сценарии» (e.g. lifehacks carousel). */
-  beforeScenarios?: React.ReactNode;
+  /** After suburbs (scenarios → suburbs → lifehacks). */
+  afterSuburbs?: React.ReactNode;
 }) {
   const fromSights: CityMustSeeItem[] =
     guide?.sights?.map((item) => ({
@@ -1502,7 +1475,8 @@ function CitySightsSection({
     !places.length &&
     !articles.length &&
     !(guide?.significantSuburbs?.length) &&
-    !(guide?.dayRoutePresets?.length)
+    !(guide?.dayRoutePresets?.length) &&
+    !afterSuburbs
   ) {
     return null;
   }
@@ -1549,7 +1523,6 @@ function CitySightsSection({
           titleClass={titleClass}
           focusSlugs={activeFocus?.slugs || []}
           onClearFocus={() => onPlaceFocus?.(null)}
-          beforeScenarios={beforeScenarios}
           focusBanner={
             activeFocus ? (
         <div
@@ -1604,6 +1577,7 @@ function CitySightsSection({
           }
         />
       ) : null}
+      {afterSuburbs}
       {articles.length ? (
         <div className={places.length || suburbs.length ? 'mt-8' : 'mt-4'}>
           <h3 className={`text-lg font-semibold ${editorial ? 'text-zinc-900' : 'text-slate-900'}`}>
@@ -1633,7 +1607,6 @@ function CitySightsMustSeeList({
   focusSlugs = [],
   onClearFocus,
   focusBanner = null,
-  beforeScenarios = null,
 }: {
   heading: string;
   places: CityMustSeeItem[];
@@ -1654,7 +1627,6 @@ function CitySightsMustSeeList({
   focusSlugs?: string[];
   onClearFocus?: () => void;
   focusBanner?: React.ReactNode;
-  beforeScenarios?: React.ReactNode;
 }) {
   const hasNamedScenarios = Boolean(namedPresets?.length);
   const showPlacesRail = places.length > 0;
@@ -1987,10 +1959,9 @@ function CitySightsMustSeeList({
       </div>
         </>
       ) : null}
-      {beforeScenarios}
       <div
         id={hasNamedScenarios ? 'city-routes' : undefined}
-        className={`${showPlacesRail || beforeScenarios ? 'mt-10' : 'mt-6'}${
+        className={`${showPlacesRail ? 'mt-10' : 'mt-6'}${
           hasNamedScenarios ? ` ${SECTION_SCROLL_MT}` : ''
         }`}
       >

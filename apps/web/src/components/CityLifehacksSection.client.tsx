@@ -46,7 +46,17 @@ const ICONS: Record<CityLifehackIcon, typeof Footprints> = {
 };
 
 const CARD_WIDTH =
-  'w-[min(100%,19.5rem)] shrink-0 snap-start overflow-hidden rounded-2xl border bg-white';
+  'w-[min(100%,19.5rem)] shrink-0 snap-start overflow-hidden rounded-2xl border';
+
+/** Soft one-tint set; rotate by card index. Readable type on all of them. */
+const LIFEHACK_TINTS = [
+  { card: 'bg-sky-50 border-sky-100', icon: 'bg-sky-100/80 text-sky-800' },
+  { card: 'bg-amber-50 border-amber-100', icon: 'bg-amber-100/80 text-amber-900' },
+  { card: 'bg-emerald-50 border-emerald-100', icon: 'bg-emerald-100/80 text-emerald-800' },
+  { card: 'bg-violet-50 border-violet-100', icon: 'bg-violet-100/80 text-violet-800' },
+  { card: 'bg-rose-50 border-rose-100', icon: 'bg-rose-100/80 text-rose-800' },
+  { card: 'bg-teal-50 border-teal-100', icon: 'bg-teal-100/80 text-teal-800' },
+] as const;
 
 function LifehackBody({ item, editorial }: { item: CityLifehackItem; editorial: boolean }) {
   return (
@@ -182,8 +192,8 @@ export function CityLifehacksSection({
     ? `Лайфхаки ${poCityDative(cityName)}: как сберечь бюджет`
     : 'Лайфхаки: как сберечь бюджет';
   const cardShell = editorial
-    ? `${CARD_WIDTH} border-zinc-200 shadow-sm`
-    : `${CARD_WIDTH} border-slate-200/90 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_rgba(15,23,42,0.06)]`;
+    ? `${CARD_WIDTH} shadow-sm`
+    : `${CARD_WIDTH} shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_rgba(15,23,42,0.06)]`;
   const arrowClass =
     'inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50';
 
@@ -232,14 +242,17 @@ export function CityLifehacksSection({
       >
         {items.map((item, cardIndex) => {
           const Icon = ICONS[item.icon] || Footprints;
+          const tint = LIFEHACK_TINTS[cardIndex % LIFEHACK_TINTS.length];
           return (
-            <article key={item.id} data-lifehack-card={item.id} className={cardShell}>
+            <article
+              key={item.id}
+              data-lifehack-card={item.id}
+              className={`${cardShell} ${tint.card}`}
+            >
               <div className="flex h-full flex-col p-4 sm:p-5">
                 <div className="flex items-start gap-3">
                   <span
-                    className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${
-                      editorial ? 'bg-zinc-100 text-zinc-800' : 'bg-slate-100 text-slate-800'
-                    }`}
+                    className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${tint.icon}`}
                     aria-hidden
                   >
                     <Icon className="h-4 w-4" strokeWidth={1.75} />
