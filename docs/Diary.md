@@ -1,3 +1,18 @@
+## 2026-08-14 - Live: Deploy MSK web `31791969657`
+
+### Наблюдения
+- Owner: «опять обрезаешь» - live `d7d77b6`/`5142146` резал home 3-card и хаб «Из блога» через `line-clamp-3`. Фикс `7009af1` уже в origin. Предыдущий swap `31790635325` уже success - lock свободен.
+
+### Решения
+- Deploy MSK web `31791969657` success, ~2m37s. SHA `7009af1` (предки: typecheck `25e8b3f`, hero `5142146`, excerpts `d7d77b6`). BUILD_ID=`NP67K2mBnUTvlh_gzMfEa`. Swap с предыдущего `HOI4exTECrPJBi1CNwzUN` (`5142146`).
+- Smoke `/` 200: BUILD_ID в HTML, `line-clamp-3` на главной **0**. Home 3-card excerpt: `<p class="mt-2 text-sm leading-relaxed text-slate-600">` без clamp, полный абзац.
+- `/cities/moscow` 200 + тот же BUILD_ID. `line-clamp-3` на хабе только у пресетов дня (заголовки), не у «Из блога».
+
+### Проблемы
+- Нет. Finance `.159` не трогали. Force-push не было.
+
+---
+
 ## 2026-08-14 - Blog card excerpt: no CSS clamp
 
 ### Наблюдения

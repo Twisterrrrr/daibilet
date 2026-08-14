@@ -2,7 +2,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| UX.HOME-BLOG-EXCERPT | Home 3-card + city hub «Из блога»: полный абзац excerpt, без CSS-ellipsis | Высокий | 🔄 git: снят `line-clamp-3`; текст тот же `hubBlogCardExcerpt`; без live deploy |
+| UX.HOME-BLOG-EXCERPT | Home 3-card + city hub «Из блога»: полный абзац excerpt, без CSS-ellipsis | Высокий | ✅ live `31791969657` SHA `7009af1` BUILD_ID=`NP67K2mBnUTvlh_gzMfEa`; smoke `/` без `line-clamp-3` |
 | UX.PDP-HERO-VERTICAL | Event / venue / location: mobile portrait 3:4, текст внизу, градиент; md+ шире. Не полоска 16:10 | Высокий | ✅ live `31790635325` SHA `5142146` BUILD_ID=`HOI4exTECrPJBi1CNwzUN`; smoke event PDP |
 
 ## 2026-08-14 - PDP vertical mobile hero
