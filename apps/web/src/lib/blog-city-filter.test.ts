@@ -59,3 +59,59 @@ test('filterBlogFeedByCity: multi-city post matches tagged cities', () => {
   );
   assert.deepEqual(filterBlogFeedByCity(posts, 'kazan').map((p) => p.slug), []);
 });
+
+test('afisha-regionalnye-goroda expands to Ekaterinburg, NN and Ufa, not Регионы', () => {
+  const hits = blogPostFilterCities({
+    citySlug: 'multi',
+    city: 'Екатеринбург, Нижний Новгород и Уфа',
+    citySlugs: ['ekaterinburg', 'nizhny-novgorod', 'ufa'],
+  });
+  assert.deepEqual(hits.map((hit) => hit.value).sort(), [
+    'ekaterinburg',
+    'nizhny-novgorod',
+    'ufa',
+  ]);
+  assert.equal(
+    hits.some((hit) => hit.value === 'regions' || hit.label === 'Регионы'),
+    false,
+  );
+});
+
+test('stale CMS regions is ignored when citySlugs are present', () => {
+  const hits = blogPostFilterCities({
+    citySlug: 'regions',
+    city: 'Регионы',
+    citySlugs: ['ekaterinburg', 'nizhny-novgorod', 'ufa'],
+  });
+  assert.deepEqual(hits.map((hit) => hit.value).sort(), [
+    'ekaterinburg',
+    'nizhny-novgorod',
+    'ufa',
+  ]);
+});
+
+test('genuine non-city article keeps Регионы', () => {
+  const hits = blogPostFilterCities({
+    citySlug: 'regions',
+    city: 'Регионы',
+  });
+  assert.deepEqual(hits, [{ value: 'regions', label: 'Регионы' }]);
+});
+
+test('filterBlogFeedByCity: regions option only matches genuine region posts', () => {
+  const posts = [
+    {
+      slug: 'afisha-regionalnye-goroda',
+      citySlug: 'multi',
+      city: 'Екатеринбург, Нижний Новгород и Уфа',
+      citySlugs: ['ekaterinburg', 'nizhny-novgorod', 'ufa'],
+    },
+    { slug: 'fentezi-fest-bylinnyy-bereg', citySlug: 'regions', city: 'Регионы' },
+    { slug: 'msk', citySlug: 'moscow', city: 'Москва' },
+  ];
+  assert.deepEqual(filterBlogFeedByCity(posts, 'regions').map((p) => p.slug), [
+    'fentezi-fest-bylinnyy-bereg',
+  ]);
+  assert.ok(filterBlogFeedByCity(posts, 'ekaterinburg').some((p) => p.slug === 'afisha-regionalnye-goroda'));
+  assert.ok(filterBlogFeedByCity(posts, 'ufa').some((p) => p.slug === 'afisha-regionalnye-goroda'));
+});

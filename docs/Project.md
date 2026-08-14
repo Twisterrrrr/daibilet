@@ -403,6 +403,8 @@ Daily scan saleable public catalog texts (`title`/`description` + override) на
 
 **CMS:** у `Article` есть `authorId` / `authorName` / `articleType` (миграция `20260719140000_article_author_type`). Публичный `/blog` фильтрует по **городу** и **автору** только через in-page `?city=&author=` (не через header CityPicker). Тип статьи хранится в БД для контент-плана, в UI не дублируется отдельным фильтром.
 
+**Канон городов блога (2026-08-14):** статья привязывается к городам из текста, не к ярлыку «Регионы». Frontmatter: канонические slug (`moscow`, `saint-petersburg`, `ekaterinburg`, `nizhny-novgorod`, `ufa`, …). Мульти-город = `citySlug: multi` + список `citySlugs` и человекочитаемый `city:`. «Регионы» (`citySlug: regions`) только если материал genuinely без конкретных городов каталога. Фильтр и чип на `/blog` раскрывают города, не «Несколько городов» и не «Регионы» при городском контенте. Проверка: `npm run blog:check-city`.
+
 Канон приветствия Макса: **«Эй, кто на маршруте!»** (не «Касатики»).
 
 Код CMS не обязателен до первого материала; генерация опирается на docs + JSON.

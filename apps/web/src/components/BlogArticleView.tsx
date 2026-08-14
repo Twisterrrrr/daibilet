@@ -15,6 +15,7 @@ import {
 import {
   COLUMN_BADGE_LABEL,
   columnAuthorSignature,
+  isBroadBlogCitySlug,
   isColumnArticle,
   normalizeBlogTagLabel,
   stripColumnBodyChrome,
@@ -41,7 +42,7 @@ function buildTopicLinks(article: BlogArticleDto): BlogSidebarLink[] {
       hint: `Ближайшие даты в ${article.city}`,
     });
   }
-  if (article.citySlug) {
+  if (article.citySlug && !isBroadBlogCitySlug(article.citySlug)) {
     links.push({
       href: `/blog?city=${encodeURIComponent(article.citySlug)}`,
       label: 'Ещё материалы по городу',

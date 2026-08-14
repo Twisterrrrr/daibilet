@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { ArrowRight, BookOpen, Calendar, Clock } from 'lucide-react';
 
-import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
+import { IMAGE_SIZES, BlogCardSafeImage, SafeImage } from '@/components/SafeImage.client';
 import { BLOG_POSTS } from '@/data/blog-posts';
 import type { BlogCardDto } from '@/lib/blog-utils';
 import {
@@ -99,15 +99,17 @@ function TagChips({
   tag,
   city,
   citySlug,
+  citySlugs,
   articleType,
 }: {
   tag: string;
   city?: string | null;
   citySlug?: string | null;
+  citySlugs?: string[] | null;
   articleType?: string | null;
 }) {
   const displayTag = normalizeBlogTagLabel(tag, articleType);
-  const cityLabel = blogListingCityBadgeLabel(citySlug, city);
+  const cityLabel = blogListingCityBadgeLabel(citySlug, city, citySlugs);
   const showCity = Boolean(cityLabel);
 
   if (!displayTag && !showCity) return null;
@@ -210,7 +212,7 @@ export function BlogPostCard({
         className={`group relative flex min-h-[16.5rem] flex-col justify-between overflow-hidden rounded-card bg-gradient-to-br p-8 text-white shadow-card transition-all duration-300 hover:scale-[1.01] hover:shadow-lg md:min-h-[14rem] md:p-8 ${blogQuoteSurfaceClassName(displayTag || tag)}`}
       >
         <div>
-          <TagChips tag={tag} city={post.city} citySlug={post.citySlug} articleType={post.articleType} />
+          <TagChips tag={tag} city={post.city} citySlug={post.citySlug} citySlugs={post.citySlugs} articleType={post.articleType} />
           <p className="font-serif text-2xl font-medium leading-snug tracking-tight break-words md:text-[1.65rem] md:leading-[1.3]">
             {quoteText}
           </p>
@@ -238,8 +240,9 @@ export function BlogPostCard({
           className="relative block aspect-[16/11] min-h-[12rem] w-full shrink-0 overflow-hidden bg-gradient-to-br from-sky-100 to-primary-50 md:aspect-[2/1] md:min-h-0 lg:aspect-auto lg:min-h-[22rem] lg:w-[58%]"
         >
           {hasCover ? (
-            <SafeImage
-              src={post.coverImageUrl}
+            <BlogCardSafeImage
+              slug={post.slug}
+              coverImageUrl={post.coverImageUrl}
               alt=""
               fill
               sizes={IMAGE_SIZES.blogFeatured}
@@ -251,7 +254,7 @@ export function BlogPostCard({
           )}
         </Link>
         <div className="flex min-w-0 flex-1 flex-col justify-center p-7 md:p-7 lg:p-8">
-          <TagChips tag={tag} city={post.city} citySlug={post.citySlug} articleType={post.articleType} />
+          <TagChips tag={tag} city={post.city} citySlug={post.citySlug} citySlugs={post.citySlugs} articleType={post.articleType} />
           <h2 className="font-serif text-[1.85rem] font-semibold leading-[1.12] tracking-tight text-graphite break-words md:text-4xl">
             <Link href={articleHref} className="transition-colors duration-300 hover:text-primary-700">
               {titleText}
@@ -292,8 +295,9 @@ export function BlogPostCard({
       <article className="group relative flex min-h-[19rem] overflow-hidden rounded-card bg-slate-900 shadow-card transition-all duration-300 hover:scale-[1.01] hover:shadow-lg md:min-h-[16rem] lg:min-h-[18rem]">
         <Link href={articleHref} aria-label={post.title} className="absolute inset-0 block">
           {hasCover ? (
-            <SafeImage
-              src={post.coverImageUrl}
+            <BlogCardSafeImage
+              slug={post.slug}
+              coverImageUrl={post.coverImageUrl}
               alt=""
               fill
               sizes={IMAGE_SIZES.blogFeatured}
@@ -309,7 +313,7 @@ export function BlogPostCard({
           />
         </Link>
         <div className="relative z-10 mt-auto flex w-full max-w-3xl flex-col gap-3 p-7 md:gap-3 md:p-7">
-          <TagChips tag={tag} city={post.city} citySlug={post.citySlug} articleType={post.articleType} />
+          <TagChips tag={tag} city={post.city} citySlug={post.citySlug} citySlugs={post.citySlugs} articleType={post.articleType} />
           <h2 className="font-serif text-2xl font-semibold leading-[1.15] tracking-tight text-white break-words md:text-2xl lg:text-3xl">
             <Link href={articleHref} className="hover:text-white/90">
               {titleText}
@@ -336,8 +340,9 @@ export function BlogPostCard({
           className="relative block aspect-[16/11] min-h-[11rem] w-full shrink-0 overflow-hidden bg-gradient-to-br from-sky-100 to-primary-50 md:aspect-auto md:min-h-[9.5rem] md:w-[42%]"
         >
           {hasCover ? (
-            <SafeImage
-              src={post.coverImageUrl}
+            <BlogCardSafeImage
+              slug={post.slug}
+              coverImageUrl={post.coverImageUrl}
               alt=""
               fill
               sizes={IMAGE_SIZES.blogCard}
@@ -349,7 +354,7 @@ export function BlogPostCard({
           )}
         </Link>
         <div className="flex min-w-0 flex-1 flex-col p-6 md:p-5">
-          <TagChips tag={tag} city={post.city} citySlug={post.citySlug} articleType={post.articleType} />
+          <TagChips tag={tag} city={post.city} citySlug={post.citySlug} citySlugs={post.citySlugs} articleType={post.articleType} />
           <h2 className="break-words font-serif text-lg font-semibold leading-snug tracking-tight text-slate-900 transition-colors duration-300 group-hover:text-primary-700 md:text-lg">
             <Link href={articleHref}>{titleText}</Link>
           </h2>
@@ -380,8 +385,9 @@ export function BlogPostCard({
           className="relative block aspect-[2/1] min-h-[13rem] shrink-0 overflow-hidden bg-gradient-to-br from-sky-100 to-primary-50 md:min-h-[11rem]"
         >
           {hasCover ? (
-            <SafeImage
-              src={post.coverImageUrl}
+            <BlogCardSafeImage
+              slug={post.slug}
+              coverImageUrl={post.coverImageUrl}
               alt=""
               fill
               sizes={IMAGE_SIZES.blogFeatured}
@@ -393,7 +399,7 @@ export function BlogPostCard({
           )}
         </Link>
         <div className="flex min-w-0 flex-1 flex-col p-7 md:p-6">
-          <TagChips tag={tag} city={post.city} citySlug={post.citySlug} articleType={post.articleType} />
+          <TagChips tag={tag} city={post.city} citySlug={post.citySlug} citySlugs={post.citySlugs} articleType={post.articleType} />
           <h2 className="font-serif text-[1.65rem] font-semibold leading-[1.15] tracking-tight text-graphite break-words md:text-3xl">
             <Link href={articleHref} className="transition-colors duration-300 hover:text-primary-700">
               {titleText}
@@ -465,7 +471,7 @@ export function BlogPostCard({
           isSmall ? 'p-5 md:p-4' : 'p-7 md:p-5',
         ].join(' ')}
       >
-        <TagChips tag={tag} city={post.city} citySlug={post.citySlug} articleType={post.articleType} />
+        <TagChips tag={tag} city={post.city} citySlug={post.citySlug} citySlugs={post.citySlugs} articleType={post.articleType} />
         <h2
           className={[
             'break-words font-serif font-semibold leading-snug tracking-tight text-slate-900 transition-colors duration-300 group-hover:text-primary-700',

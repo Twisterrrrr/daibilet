@@ -4,7 +4,11 @@ import { blogCoverUrl } from '@/lib/blog-cover';
 import { resolveBlogPrimaryLandingSlug } from '@/lib/blog-listing-links';
 import {
   authorLabel,
+  cityFilterLabel,
+  formatBlogCityListLabel,
+  isBroadBlogCitySlug,
   normalizeBlogCitySlug,
+  parseBlogCitySlugList,
   resolveSlugBlogMeta,
   stripColumnMetaPrefix,
 } from '@/lib/blog-meta';
@@ -16,6 +20,7 @@ export type BlogCardDto = {
   excerpt: string;
   city?: string | null;
   citySlug?: string | null;
+  citySlugs?: string[] | null;
   coverImageUrl: string;
   publishedAt?: string | null;
   /** Дата редакции для карточек, если publishedAt пустой (из static frontmatter). */
@@ -270,21 +275,36 @@ function buildSearchText(input: {
 
 function enrichCardFields(slug: string, partial: Partial<BlogCardDto>): Pick<
   BlogCardDto,
-  'city' | 'citySlug' | 'authorId' | 'authorName' | 'articleType' | 'tag' | 'topics'
+  'city' | 'citySlug' | 'citySlugs' | 'authorId' | 'authorName' | 'articleType' | 'tag' | 'topics'
 > {
   const meta = resolveSlugBlogMeta(slug);
   const authorId = partial.authorId || meta.authorId;
   const articleType = partial.articleType || meta.articleType;
-  const citySlug =
-    normalizeBlogCitySlug(partial.citySlug, partial.city, meta.citySlug) || meta.citySlug;
+  const tagged = parseBlogCitySlugList([
+    ...(partial.citySlugs || []),
+    ...(meta.citySlugs || []),
+  ]);
+  const partialSlug = normalizeBlogCitySlug(partial.citySlug, partial.city);
+  const metaSlug = normalizeBlogCitySlug(meta.citySlug, meta.city);
+  let citySlug: string | null = null;
+  if (tagged.length > 1) citySlug = 'multi';
+  else if (tagged.length === 1) citySlug = tagged[0];
+  else if (partialSlug && !isBroadBlogCitySlug(partialSlug)) citySlug = partialSlug;
+  else if (metaSlug && !isBroadBlogCitySlug(metaSlug)) citySlug = metaSlug;
+  else citySlug = partialSlug || metaSlug || meta.citySlug || null;
+
+  const genericCityLabels = new Set(['', 'Без города', 'Несколько городов', 'Регионы']);
   const partialCity = String(partial.city || '').trim();
   const metaCity = String(meta.city || '').trim();
-  const genericCityLabels = new Set(['', 'Без города', 'Несколько городов']);
   const city =
     (partialCity && !genericCityLabels.has(partialCity) ? partialCity : null) ||
-    metaCity ||
+    (metaCity && !genericCityLabels.has(metaCity) ? metaCity : null) ||
+    formatBlogCityListLabel(tagged) ||
+    (citySlug && !isBroadBlogCitySlug(citySlug) ? cityFilterLabel(citySlug) : null) ||
+    (citySlug === 'regions' ? 'Регионы' : null) ||
     partialCity ||
     null;
+  const citySlugs = tagged.length ? tagged : null;
   const tag =
     partial.tag ||
     (articleType === 'column'
@@ -313,6 +333,7 @@ function enrichCardFields(slug: string, partial: Partial<BlogCardDto>): Pick<
   return {
     city,
     citySlug,
+    citySlugs,
     authorId,
     authorName: partial.authorName || authorLabel(authorId),
     articleType,
@@ -328,6 +349,7 @@ export function staticBlogCards(): BlogCardDto[] {
       excerpt: post.excerpt,
       city: post.city,
       citySlug: post.citySlug,
+      citySlugs: post.citySlugs,
       authorId: post.authorId,
       authorName: post.authorName,
       articleType: post.articleType,
@@ -378,6 +400,7 @@ export function mergeBlogCards(
       excerpt,
       city: article.city ?? staticPost?.city,
       citySlug: article.citySlug ?? staticPost?.citySlug,
+      citySlugs: staticPost?.citySlugs,
       authorId: article.authorId ?? staticPost?.authorId,
       authorName: article.authorName ?? staticPost?.authorName,
       articleType: article.articleType ?? staticPost?.articleType,
@@ -459,6 +482,7 @@ export function resolveStaticArticle(slug: string): BlogArticleDto | null {
     excerpt: post.excerpt,
     city: post.city,
     citySlug: post.citySlug,
+    citySlugs: post.citySlugs,
     authorId: post.authorId,
     authorName: post.authorName,
     articleType: post.articleType,
@@ -479,6 +503,23 @@ export function resolveStaticArticle(slug: string): BlogArticleDto | null {
     seoDescription: stripColumnMetaPrefix(post.excerpt),
     canonicalPath: `/blog/${post.slug}`,
     isIndexable: true,
+  };
+}
+
+/** CMS citySlug=regions не должен перебивать конкретные города из статики/frontmatter. */
+export function applyBlogCityCanon<T extends { slug: string; city?: string | null; citySlug?: string | null }>(
+  article: T,
+): T {
+  const staticPost = BLOG_POSTS.find((item) => item.slug === article.slug);
+  const enriched = enrichCardFields(article.slug, {
+    city: article.city ?? staticPost?.city,
+    citySlug: article.citySlug ?? staticPost?.citySlug,
+    citySlugs: staticPost?.citySlugs,
+  });
+  return {
+    ...article,
+    city: enriched.city,
+    citySlug: enriched.citySlug,
   };
 }
 

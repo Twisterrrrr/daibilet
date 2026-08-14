@@ -1,3 +1,9 @@
+## 2026-08-14 - Blog city canon (не «Регионы»)
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| FIX.BLOG-CITY-CANON | Городские/мульти статьи не «Регионы»; `afisha-regionalnye-goroda` → Екб/НН/Уфа | Высокий | ✅ git, без live deploy |
+
 ## 2026-08-14 - City hub hero: duplicate Афиша
 
 | ID | Задача | Приоритет | Статус |

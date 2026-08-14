@@ -9,6 +9,7 @@ import {
   mergeBlogCards,
   pickRelatedBlogCards,
   resolveStaticArticle,
+  applyBlogCityCanon,
   type BlogArticleDto,
   type BlogCardDto,
   splitBlogListingHero,
@@ -34,7 +35,7 @@ async function loadBlogArticle(slug: string): Promise<BlogArticleDto | null> {
       timeoutMs: 3_000,
       notFoundAsNull: true,
     });
-    if (payload?.article) return payload.article;
+    if (payload?.article) return applyBlogCityCanon(payload.article);
     // CMS owns this slug (draft/review/archive) - do not resurrect static fallback body.
     if (payload?.cmsOwned) return null;
   } catch {

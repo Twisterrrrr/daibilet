@@ -55,7 +55,7 @@ function BlogListRow({ post }: { post: BlogCardDto }) {
   if (displayTag) {
     chips.push({ key: `tag-${displayTag}`, label: displayTag, kind: 'tag' });
   }
-  const cityLabel = blogListingCityBadgeLabel(post.citySlug, post.city);
+  const cityLabel = blogListingCityBadgeLabel(post.citySlug, post.city, post.citySlugs);
   if (cityLabel) {
     chips.push({
       key: `city-${post.citySlug || cityLabel}`,

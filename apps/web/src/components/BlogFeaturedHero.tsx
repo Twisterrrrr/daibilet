@@ -33,7 +33,7 @@ type BlogFeaturedHeroProps = {
 };
 
 function freshMetaLine(post: BlogCardDto): string | null {
-  const cityLabel = blogListingCityBadgeLabel(post.citySlug, post.city);
+  const cityLabel = blogListingCityBadgeLabel(post.citySlug, post.city, post.citySlugs);
   const read = post.readMin ? `${post.readMin} мин` : null;
   const parts = [cityLabel, read].filter(Boolean);
   return parts.length ? parts.join(' · ').toUpperCase() : null;
@@ -50,7 +50,7 @@ export function BlogFeaturedHero({
   const lead = clipBlogFeaturedLead(featured.slug, featured.excerpt, 3);
   const dateLabel = resolveBlogCardDateLabel(featured);
   const tag = normalizeBlogTagLabel(featured.tag, featured.articleType);
-  const cityLabel = blogListingCityBadgeLabel(featured.citySlug, featured.city);
+  const cityLabel = blogListingCityBadgeLabel(featured.citySlug, featured.city, featured.citySlugs);
   const scheduleCta = resolveBlogListingCta({
     slug: featured.slug,
     title: featured.title,

@@ -31,7 +31,7 @@ export function CityHubArticleTeaser({
   const articleHref = `/blog/${article.slug}`;
   const isLarge = variant === 'large';
   const isSmall = variant === 'small';
-  const cityLabel = blogListingCityBadgeLabel(article.citySlug, article.city);
+  const cityLabel = blogListingCityBadgeLabel(article.citySlug, article.city, article.citySlugs);
   const excerpt = String(article.excerpt || '').trim();
 
   return (

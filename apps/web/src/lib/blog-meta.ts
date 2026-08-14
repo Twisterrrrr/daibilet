@@ -26,9 +26,29 @@ export const BLOG_CITY_FILTER_LABELS: Record<string, string> = {
   ekaterinburg: 'Екатеринбург',
   kaliningrad: 'Калининград',
   'nizhny-novgorod': 'Нижний Новгород',
+  ufa: 'Уфа',
+  perm: 'Пермь',
+  sochi: 'Сочи',
+  chelyabinsk: 'Челябинск',
+  yaroslavl: 'Ярославль',
+  'rostov-on-don': 'Ростов-на-Дону',
+  novosibirsk: 'Новосибирск',
+  krasnoyarsk: 'Красноярск',
+  samara: 'Самара',
   regions: 'Регионы',
   multi: 'Несколько городов',
 };
+
+/** Pseudo-города блога: не хабы /cities/{slug}. */
+export const BLOG_BROAD_CITY_SLUGS = new Set(['multi', 'regions', 'region', 'russia', 'all']);
+export const BLOG_PSEUDO_CITY_LABELS = new Set(['Регионы', 'Несколько городов', 'Без города']);
+
+export function isBroadBlogCitySlug(slug?: string | null): boolean {
+  const raw = String(slug || '')
+    .trim()
+    .toLowerCase();
+  return BLOG_BROAD_CITY_SLUGS.has(raw);
+}
 
 /** Цветные плашки городов в колонке «Свежее» (без purple glow). */
 export const BLOG_CITY_BADGE_CLASS: Record<string, string> = {
@@ -102,6 +122,7 @@ const SLUG_META: Record<
     articleType: BlogArticleType;
     citySlug?: string;
     city?: string;
+    citySlugs?: string[];
   }
 > = {
   'fentezi-fest-bylinnyy-bereg': {
@@ -199,8 +220,9 @@ const SLUG_META: Record<
   'afisha-regionalnye-goroda': {
     authorId: 'editorial',
     articleType: 'obzor',
-    citySlug: 'regions',
-    city: 'Регионы',
+    citySlug: 'multi',
+    city: 'Екатеринбург, Нижний Новгород и Уфа',
+    citySlugs: ['ekaterinburg', 'nizhny-novgorod', 'ufa'],
   },
   'moskva-immersivnye-vystavki': {
     authorId: 'editorial',
@@ -361,17 +383,48 @@ export function cityFilterLabel(citySlug?: string | null, cityName?: string | nu
 
 /**
  * Подпись города на карточке/hero ленты.
- * Берёт явный city из данных (не парсит title); без citySlug/city ничего не выдумывает.
+ * Конкретные города из текста/frontmatter важнее ярлыка «Регионы» / «Несколько городов».
  */
 export function blogListingCityBadgeLabel(
   citySlug?: string | null,
   cityName?: string | null,
+  citySlugs?: string[] | null,
 ): string | null {
   const name = String(cityName || '').trim();
-  if (name && name !== 'Без города') return name;
+  if (name && !BLOG_PSEUDO_CITY_LABELS.has(name)) return name;
+
+  const hits = blogPostFilterCities({ citySlug, city: cityName, citySlugs });
+  const concrete = hits.filter((hit) => !isBroadBlogCitySlug(hit.value));
+  if (concrete.length === 1) return concrete[0].label;
+  if (concrete.length > 1) return formatBlogCityListLabel(concrete.map((hit) => hit.value));
+  if (hits.some((hit) => hit.value === 'regions')) return 'Регионы';
+
   const fromFilter = cityFilterLabel(citySlug, cityName);
-  if (!fromFilter || fromFilter === 'Без города') return null;
+  if (!fromFilter || BLOG_PSEUDO_CITY_LABELS.has(fromFilter)) return null;
   return fromFilter;
+}
+
+export function formatBlogCityListLabel(slugs: string[]): string | null {
+  const labels = slugs
+    .map((slug) => cityFilterLabel(slug))
+    .filter((label) => label && !BLOG_PSEUDO_CITY_LABELS.has(label));
+  if (!labels.length) return null;
+  if (labels.length === 1) return labels[0];
+  if (labels.length === 2) return `${labels[0]} и ${labels[1]}`;
+  return `${labels.slice(0, -1).join(', ')} и ${labels[labels.length - 1]}`;
+}
+
+export function parseBlogCitySlugList(raw?: string | string[] | null): string[] {
+  const parts = Array.isArray(raw) ? raw : String(raw || '').split(/[,;]+/);
+  const out: string[] = [];
+  const seen = new Set<string>();
+  for (const part of parts) {
+    const slug = normalizeBlogCitySlug(String(part || '').trim(), String(part || '').trim());
+    if (!slug || isBroadBlogCitySlug(slug) || seen.has(slug)) continue;
+    seen.add(slug);
+    out.push(slug);
+  }
+  return out;
 }
 
 export function resolveSlugBlogMeta(slug: string): {
@@ -380,15 +433,18 @@ export function resolveSlugBlogMeta(slug: string): {
   articleType: BlogArticleType;
   citySlug: string | null;
   city: string | null;
+  citySlugs: string[] | null;
 } {
   const hit = SLUG_META[slug];
   if (hit) {
+    const citySlugs = hit.citySlugs?.length ? [...hit.citySlugs] : null;
     return {
       authorId: hit.authorId,
       authorName: authorLabel(hit.authorId),
       articleType: hit.articleType,
       citySlug: hit.citySlug || null,
       city: hit.city || null,
+      citySlugs,
     };
   }
 
@@ -427,6 +483,7 @@ export function resolveSlugBlogMeta(slug: string): {
     articleType,
     citySlug,
     city,
+    citySlugs: null,
   };
 }
 
@@ -446,6 +503,9 @@ export function normalizeBlogCitySlug(
   if (raw === 'msk' || raw === 'moskva') return 'moscow';
   if (raw === 'ekb' || raw === 'yekaterinburg') return 'ekaterinburg';
   if (raw === 'nizhniy-novgorod' || raw === 'nizhny-novgorod') return 'nizhny-novgorod';
+  if (raw === 'ufa') return 'ufa';
+  if (raw === 'rostov' || raw === 'rostov-na-donu') return 'rostov-on-don';
+  if (raw && BLOG_CITY_FILTER_LABELS[raw]) return raw;
 
   const name = String(cityName || citySlug || '')
     .trim()
@@ -459,9 +519,17 @@ export function normalizeBlogCitySlug(
   if (haystack.includes('калининград')) return 'kaliningrad';
   // «Нижний Новгород» vs «Великий Новгород»: нужен маркер «нижн».
   if (haystack.includes('нижн') && haystack.includes('новгород')) return 'nizhny-novgorod';
+  if (haystack.includes('уфа')) return 'ufa';
+  if (haystack.includes('перм')) return 'perm';
+  if (haystack.includes('сочи')) return 'sochi';
+  if (haystack.includes('челябинск')) return 'chelyabinsk';
+  if (haystack.includes('ярославл')) return 'yaroslavl';
+  if (haystack.includes('ростов')) return 'rostov-on-don';
+  if (haystack.includes('новосибир')) return 'novosibirsk';
+  if (haystack.includes('краснояр')) return 'krasnoyarsk';
+  if (haystack.includes('самар')) return 'samara';
   if (haystack.includes('регион')) return 'regions';
 
-  if (raw && BLOG_CITY_FILTER_LABELS[raw]) return raw;
   // Только slug-like токены (не кириллические display-name вроде «нижний новгород»).
   if (raw && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(raw)) return raw;
   return null;
@@ -474,8 +542,8 @@ export type BlogCityFilterHit = { value: string; label: string };
 
 /**
  * Cities a post should appear under in the listing filter.
- * Multi-city posts expand to the tagged names (`Москва и Петербург`), never
- * the fake «Несколько городов» option.
+ * Concrete city slugs always win: never «Несколько городов», and never
+ * «Регионы» if the article is tagged with real cities.
  */
 export function blogPostFilterCities(post: {
   citySlug?: string | null;
@@ -487,7 +555,7 @@ export function blogPostFilterCities(post: {
 
   const add = (rawSlug?: string | null, rawName?: string | null) => {
     const slug = normalizeBlogCitySlug(rawSlug, rawName);
-    if (!slug || slug === MULTI_CITY_FILTER_SLUG) return;
+    if (!slug || slug === MULTI_CITY_FILTER_SLUG || slug === 'regions') return;
     if (seen.has(slug)) return;
     seen.add(slug);
     out.push({ value: slug, label: cityFilterLabel(slug, rawName) });
@@ -496,6 +564,7 @@ export function blogPostFilterCities(post: {
   for (const tagged of post.citySlugs || []) {
     add(tagged, null);
   }
+  if (out.length) return out;
 
   const slug = String(post.citySlug || '')
     .trim()
@@ -510,13 +579,23 @@ export function blogPostFilterCities(post: {
     const parts = name
       .split(/\s*(?:,|;|\/|\+|•|\s+и\s+)\s*/i)
       .map((part) => part.trim())
-      .filter((part) => part && part !== MULTI_CITY_FILTER_LABEL && part !== 'Без города');
+      .filter(
+        (part) =>
+          part &&
+          part !== MULTI_CITY_FILTER_LABEL &&
+          part !== 'Без города' &&
+          part !== 'Регионы',
+      );
     for (const part of parts) add(null, part);
-    return out;
+    if (out.length) return out;
   }
 
-  if (slug && slug !== MULTI_CITY_FILTER_SLUG) add(slug, name);
-  else if (name && name !== MULTI_CITY_FILTER_LABEL) add(null, name);
+  if (slug && slug !== MULTI_CITY_FILTER_SLUG && slug !== 'regions') add(slug, name);
+  else if (name && !BLOG_PSEUDO_CITY_LABELS.has(name)) add(null, name);
+
+  if (!out.length && (slug === 'regions' || name === 'Регионы')) {
+    out.push({ value: 'regions', label: 'Регионы' });
+  }
   return out;
 }
 

@@ -19,7 +19,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { randomUUID } from 'node:crypto';
 import { createDb } from '../apps/backend/src/db.js';
-import { blogCitySlugAliases, canonicalBlogCitySlug } from '../apps/backend/src/blog-city-slug.js';
+import { blogCitySlugAliases, canonicalBlogCitySlug, isBroadBlogCitySlug } from '../apps/backend/src/blog-city-slug.js';
 import { loadBlogMarkdownDir } from './lib/blog-content.mjs';
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -99,8 +99,15 @@ async function upsertArticle(article) {
           metaIndexable === '1'
         ? true
         : status === 'PUBLISHED';
-  const citySlug = canonicalBlogCitySlug(meta.citySlug) || meta.citySlug || null;
-  const cityId = await resolveCityId(citySlug);
+  const tagged = String(meta.citySlugs || meta.cities || '')
+    .split(/[,;]+/)
+    .map((part) => canonicalBlogCitySlug(part) || String(part || '').trim().toLowerCase())
+    .filter((part) => part && !isBroadBlogCitySlug(part));
+  let citySlug = canonicalBlogCitySlug(meta.citySlug) || meta.citySlug || null;
+  if (tagged.length > 1) citySlug = 'multi';
+  else if (tagged.length === 1) citySlug = tagged[0];
+  else if (isBroadBlogCitySlug(citySlug) && citySlug !== 'regions') citySlug = citySlug;
+  const cityId = await resolveCityId(isBroadBlogCitySlug(citySlug) ? null : citySlug);
   const authorId = meta.authorId || (meta.author === 'Макс' ? 'max' : null) || 'editorial';
   const authorName =
     meta.authorName || meta.author || meta.persona || (authorId === 'editorial' ? 'Редакция' : authorId);

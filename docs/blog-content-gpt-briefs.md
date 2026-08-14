@@ -108,6 +108,11 @@ authorName: Редакция
 articleType: gid
 tag: Город | Семья | Концерты | Река | Выходные
 citySlug: moscow | saint-petersburg | kazan | ekaterinburg | nizhny-novgorod | samara | ufa | novosibirsk | sochi | rostov-on-don | krasnoyarsk | kaliningrad | yaroslavl
+# мульти-город (не regions, не «Несколько городов»):
+# citySlug: multi
+# citySlugs: ekaterinburg, nizhny-novgorod, ufa
+# city: Екатеринбург, Нижний Новгород и Уфа
+# regions - только если статья не про конкретные города каталога
 date: "ДД месяц ГГГГ"
 readMin: 7-12
 imageAlt: "…"

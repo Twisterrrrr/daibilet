@@ -8431,18 +8431,21 @@ export async function buildPublicArticlesList(db, options = {}) {
       a."authorName",
       a."articleType",
       case
+        when a.slug = 'afisha-regionalnye-goroda' then 'Екатеринбург, Нижний Новгород и Уфа'
         when coalesce(nullif(a."citySlug", ''), '') = 'regions' then 'Регионы'
         when coalesce(nullif(a."citySlug", ''), '') = 'multi' then 'Несколько городов'
         else coalesce(c.title, null)
       end as city,
-      coalesce(
-        nullif(a."citySlug", ''),
-        case
-          when a.slug = 'afisha-regionalnye-goroda' then 'regions'
-          when a.slug = 'myuzikly-teatr-novichok-msk-spb' then 'multi'
-          else c.slug
-        end
-      ) as "citySlug"
+      case
+        when a.slug = 'afisha-regionalnye-goroda' then 'multi'
+        else coalesce(
+          nullif(a."citySlug", ''),
+          case
+            when a.slug = 'myuzikly-teatr-novichok-msk-spb' then 'multi'
+            else c.slug
+          end
+        )
+      end as "citySlug"
     from "Article" a
     left join "City" c on c.id = a."cityId"
     where a.status = 'PUBLISHED'
@@ -8529,18 +8532,21 @@ export async function buildPublicArticlePage(db, slug) {
         a."authorName",
         a."articleType",
         case
+          when a.slug = 'afisha-regionalnye-goroda' then 'Екатеринбург, Нижний Новгород и Уфа'
           when coalesce(nullif(a."citySlug", ''), '') = 'regions' then 'Регионы'
           when coalesce(nullif(a."citySlug", ''), '') = 'multi' then 'Несколько городов'
           else coalesce(c.title, null)
         end as city,
-        coalesce(
-          nullif(a."citySlug", ''),
-          case
-            when a.slug = 'afisha-regionalnye-goroda' then 'regions'
-            when a.slug = 'myuzikly-teatr-novichok-msk-spb' then 'multi'
-            else c.slug
-          end
-        ) as "citySlug"
+        case
+          when a.slug = 'afisha-regionalnye-goroda' then 'multi'
+          else coalesce(
+            nullif(a."citySlug", ''),
+            case
+              when a.slug = 'myuzikly-teatr-novichok-msk-spb' then 'multi'
+              else c.slug
+            end
+          )
+        end as "citySlug"
       from "Article" a
       left join "City" c on c.id = a."cityId"
       where a.slug = $1

@@ -18,6 +18,7 @@ import {
   expandListingExcerpt,
   expandLargeListingCopy,
   hubBlogCardExcerpt,
+  mergeBlogCards,
   resolveBlogCardDateLabel,
   splitBlogListingHero,
   staticBlogCards,
@@ -228,6 +229,51 @@ test('myuzikly card exposes city badge label from static data', () => {
   assert.ok(card);
   assert.equal(card?.citySlug, 'multi');
   assert.equal(blogListingCityBadgeLabel(card?.citySlug, card?.city), 'Москва и Петербург');
+});
+
+test('afisha-regionalnye-goroda is Ekaterinburg/NN/Ufa, not Регионы', () => {
+  const card = staticBlogCards().find((c) => c.slug === 'afisha-regionalnye-goroda');
+  assert.ok(card);
+  assert.notEqual(card?.citySlug, 'regions');
+  assert.notEqual(card?.city, 'Регионы');
+  assert.deepEqual([...(card?.citySlugs || [])].sort(), [
+    'ekaterinburg',
+    'nizhny-novgorod',
+    'ufa',
+  ]);
+  const label = blogListingCityBadgeLabel(card?.citySlug, card?.city, card?.citySlugs);
+  assert.equal(label, 'Екатеринбург, Нижний Новгород и Уфа');
+  const hits = blogPostFilterCities(card!);
+  assert.deepEqual(hits.map((hit) => hit.value).sort(), [
+    'ekaterinburg',
+    'nizhny-novgorod',
+    'ufa',
+  ]);
+});
+
+test('moskva-immersivnye-vystavki stays Moscow', () => {
+  const card = staticBlogCards().find((c) => c.slug === 'moskva-immersivnye-vystavki');
+  assert.ok(card);
+  assert.equal(card?.citySlug, 'moscow');
+  assert.equal(blogListingCityBadgeLabel(card?.citySlug, card?.city), 'Москва');
+});
+
+test('stale API regions on afisha is overridden by static city tags', () => {
+  const [card] = mergeBlogCards([
+    {
+      slug: 'afisha-regionalnye-goroda',
+      title: 'Жизнь за МКАДом есть',
+      city: 'Регионы',
+      citySlug: 'regions',
+    },
+  ]);
+  assert.ok(card);
+  assert.notEqual(card?.city, 'Регионы');
+  assert.equal(
+    blogListingCityBadgeLabel(card?.citySlug, card?.city, card?.citySlugs),
+    'Екатеринбург, Нижний Новгород и Уфа',
+  );
+  assert.ok(blogPostFilterCities(card!).some((hit) => hit.value === 'ufa'));
 });
 
 test('blog city filter expands multi posts into tagged cities, no Несколько городов', () => {

@@ -81,6 +81,12 @@ export function rankBlogFeedByCity<T extends Pick<BlogCardDto, 'citySlug' | 'pub
 export function filterBlogFeedByCity<
   T extends Pick<BlogCardDto, 'citySlug'> & { city?: string | null; citySlugs?: string[] | null },
 >(posts: T[], citySlug: string | null | undefined): T[] {
+  const raw = String(citySlug || '')
+    .trim()
+    .toLowerCase();
+  if (raw === 'regions') {
+    return posts.filter((post) => blogPostFilterCities(post).some((hit) => hit.value === 'regions'));
+  }
   const target = canonicalizeBlogCitySlug(citySlug);
   if (!target) return posts;
   return posts.filter((post) => blogPostFilterCities(post).some((hit) => hit.value === target));

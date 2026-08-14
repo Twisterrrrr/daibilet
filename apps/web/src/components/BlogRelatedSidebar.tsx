@@ -55,7 +55,7 @@ export function BlogRelatedSidebar({
           </p>
           <ul className="mt-3 space-y-4">
             {posts.map((post) => {
-              const cityLabel = blogListingCityBadgeLabel(post.citySlug, post.city);
+              const cityLabel = blogListingCityBadgeLabel(post.citySlug, post.city, post.citySlugs);
               const metaLabel = [normalizeBlogTagLabel(post.tag, post.articleType), cityLabel]
                 .filter(Boolean)
                 .join(' · ');

@@ -9,6 +9,7 @@ export type BlogPost = {
   tag: string;
   city?: string;
   citySlug?: string;
+  citySlugs?: string[];
   authorId?: string;
   authorName?: string;
   articleType?: string;
@@ -619,8 +620,9 @@ export const BLOG_POSTS: BlogPost[] = [
     date: '15 июля 2026',
     readMin: 7,
     tag: 'Гид',
-    city: 'Регионы',
-    citySlug: 'regions',
+    city: 'Екатеринбург, Нижний Новгород и Уфа',
+    citySlug: 'multi',
+    citySlugs: ['ekaterinburg', 'nizhny-novgorod', 'ufa'],
     authorId: 'editorial',
     authorName: 'Редакция',
     articleType: 'obzor',

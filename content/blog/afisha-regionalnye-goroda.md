@@ -9,7 +9,9 @@ authorId: editorial
 authorName: Редакция
 articleType: obzor
 tag: Гид
-citySlug: regions
+citySlug: multi
+citySlugs: ekaterinburg, nizhny-novgorod, ufa
+city: Екатеринбург, Нижний Новгород и Уфа
 date: "15 июля 2026"
 readMin: 7
 imageAlt: "Афиша событий в регионах"
