@@ -8,6 +8,7 @@ import {
   stripColumnBodyChrome,
   stripColumnMetaPrefix,
   blogListingCityBadgeLabel,
+  blogSurfaceMetaLine,
 } from './blog-meta';
 import { resolveBlogTopics, parseBlogTopicParam } from './blog-topics';
 import {
@@ -222,6 +223,30 @@ test('blogListingCityBadgeLabel: explicit city, multi, empty', () => {
   );
   assert.equal(blogListingCityBadgeLabel(null, null), null);
   assert.equal(blogListingCityBadgeLabel('', 'Без города'), null);
+});
+test('disco article: empty CMS city still shows Москва', () => {
+  const [card] = mergeBlogCards([
+    {
+      slug: 'moskva-vechernie-diskoteki-shou',
+      title: 'Дискотеки и танцевальные шоу в Москве: куда пойти на выходных',
+      city: '',
+      citySlug: '',
+    },
+  ]);
+  assert.ok(card);
+  assert.equal(card?.city, 'Москва');
+  assert.equal(card?.citySlug, 'moscow');
+  assert.equal(blogListingCityBadgeLabel(card?.citySlug, card?.city, card?.citySlugs), 'Москва');
+  assert.equal(
+    blogSurfaceMetaLine({
+      tag: card?.tag,
+      articleType: card?.articleType,
+      city: card?.city,
+      citySlug: card?.citySlug,
+      citySlugs: card?.citySlugs,
+    }),
+    'Город · Москва',
+  );
 });
 
 test('myuzikly card exposes city badge label from static data', () => {

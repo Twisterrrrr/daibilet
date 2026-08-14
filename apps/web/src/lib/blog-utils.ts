@@ -45,6 +45,7 @@ export type BlogArticleDto = {
   coverImageUrl?: string | null;
   city?: string | null;
   citySlug?: string | null;
+  citySlugs?: string[] | null;
   publishedAt?: string | null;
   isIndexable?: boolean;
   seoTitle?: string | null;
@@ -301,8 +302,6 @@ function enrichCardFields(slug: string, partial: Partial<BlogCardDto>): Pick<
     (metaCity && !genericCityLabels.has(metaCity) ? metaCity : null) ||
     formatBlogCityListLabel(tagged) ||
     (citySlug && !isBroadBlogCitySlug(citySlug) ? cityFilterLabel(citySlug) : null) ||
-    (citySlug === 'regions' ? 'Регионы' : null) ||
-    partialCity ||
     null;
   const citySlugs = tagged.length ? tagged : null;
   const tag =
@@ -398,8 +397,8 @@ export function mergeBlogCards(
     const enriched = enrichCardFields(article.slug, {
       title: article.title,
       excerpt,
-      city: article.city ?? staticPost?.city,
-      citySlug: article.citySlug ?? staticPost?.citySlug,
+      city: article.city || staticPost?.city,
+      citySlug: article.citySlug || staticPost?.citySlug,
       citySlugs: staticPost?.citySlugs,
       authorId: article.authorId ?? staticPost?.authorId,
       authorName: article.authorName ?? staticPost?.authorName,
@@ -496,6 +495,7 @@ export function resolveStaticArticle(slug: string): BlogArticleDto | null {
     coverImageUrl: post.imageUrl,
     city: enriched.city,
     citySlug: enriched.citySlug,
+    citySlugs: enriched.citySlugs,
     authorId: enriched.authorId,
     authorName: enriched.authorName,
     articleType: enriched.articleType,
@@ -507,19 +507,20 @@ export function resolveStaticArticle(slug: string): BlogArticleDto | null {
 }
 
 /** CMS citySlug=regions не должен перебивать конкретные города из статики/frontmatter. */
-export function applyBlogCityCanon<T extends { slug: string; city?: string | null; citySlug?: string | null }>(
-  article: T,
-): T {
+export function applyBlogCityCanon<
+  T extends { slug: string; city?: string | null; citySlug?: string | null; citySlugs?: string[] | null },
+>(article: T): T {
   const staticPost = BLOG_POSTS.find((item) => item.slug === article.slug);
   const enriched = enrichCardFields(article.slug, {
-    city: article.city ?? staticPost?.city,
-    citySlug: article.citySlug ?? staticPost?.citySlug,
-    citySlugs: staticPost?.citySlugs,
+    city: article.city || staticPost?.city,
+    citySlug: article.citySlug || staticPost?.citySlug,
+    citySlugs: article.citySlugs || staticPost?.citySlugs,
   });
   return {
     ...article,
     city: enriched.city,
     citySlug: enriched.citySlug,
+    citySlugs: enriched.citySlugs,
   };
 }
 

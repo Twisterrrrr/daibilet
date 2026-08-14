@@ -1,4 +1,19 @@
-## 2026-08-14 - Blog city canon: не «Регионы» для городских статей
+## 2026-08-14 - Empty «Город» / «гид» labels on blog article
+
+### Наблюдения
+- Owner: на `/blog/moskva-vechernie-diskoteki-shou` над H1 лейбл «Город» и пусто вместо «Москва». Внизу 3 карточки: «гид»/«город» без значения.
+- Регресс после канона `1138c13`: псевдо-лейблы «Регионы»/«Несколько городов» скрыли city chip, а тег «Город»/«Гид» остался. Hero брал `article.city` как есть, без fallback по `citySlug`. CMS часто отдаёт citySlug без join на City.title.
+
+### Решения
+- `blogSurfaceMeta`: тип + город; голые «Город»/«Гид» без значения не рисуем.
+- Город: `blogListingCityBadgeLabel` (один = Москва, два = «Москва и Санкт-Петербург»).
+- API `mapPublicArticleRow`: имя из slug, если City join пустой. `enrichCardFields` не держит generic city. ISR cache key v2-city.
+
+### Проблемы
+- Live deploy сам не стартовали: параллельный агент уже выкатывает MSK web. Нужен второй выкат после push.
+
+---
+
 
 ### Наблюдения
 - Owner: `afisha-regionalnye-goroda` в фильтре блога как «Регионы». В тексте три города: Екатеринбург, Нижний Новгород, Уфа.

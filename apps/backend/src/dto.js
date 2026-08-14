@@ -27,6 +27,7 @@ import { formatPublicEventTitle } from './event-title-normalize.ts';
 import { toPublicCatalogListItem, toPublicHomeCardSession } from './public-catalog-list-item.ts';
 import { enrichBuyerOrdersWithEventLinks } from './buyer-order-event-links.js';
 import {
+  blogCityDisplayName,
   blogCitySlugAliases,
   canonicalBlogCitySlug,
   isBroadBlogCitySlug,
@@ -8366,7 +8367,7 @@ function mapPublicArticleRow(row) {
     title: row.title,
     excerpt: row.excerpt || null,
     coverImageUrl: row.coverImageUrl || null,
-    city: row.city || null,
+    city: blogCityDisplayName(citySlug, row.city),
     citySlug,
     authorId: row.authorId || null,
     authorName: row.authorName || null,

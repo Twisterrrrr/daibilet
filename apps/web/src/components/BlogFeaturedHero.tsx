@@ -6,9 +6,9 @@ import { BlogAfishaPromo } from '@/components/BlogAfishaPromo.client';
 import {
   authorLabel,
   blogCityBadgeClassName,
-  blogListingCityBadgeLabel,
+  blogSurfaceMeta,
+  blogSurfaceMetaLine,
   blogTagBadgeClassName,
-  normalizeBlogTagLabel,
 } from '@/lib/blog-meta';
 import { resolveBlogListingCta } from '@/lib/blog-listing-links';
 import type { BlogSidebarPromoDto } from '@/lib/blog-sidebar-promo';
@@ -33,9 +33,15 @@ type BlogFeaturedHeroProps = {
 };
 
 function freshMetaLine(post: BlogCardDto): string | null {
-  const cityLabel = blogListingCityBadgeLabel(post.citySlug, post.city, post.citySlugs);
+  const meta = blogSurfaceMetaLine({
+    tag: post.tag,
+    articleType: post.articleType,
+    city: post.city,
+    citySlug: post.citySlug,
+    citySlugs: post.citySlugs,
+  });
   const read = post.readMin ? `${post.readMin} мин` : null;
-  const parts = [cityLabel, read].filter(Boolean);
+  const parts = [meta, read].filter(Boolean);
   return parts.length ? parts.join(' · ').toUpperCase() : null;
 }
 
@@ -49,8 +55,13 @@ export function BlogFeaturedHero({
   const articleHref = `/blog/${featured.slug}`;
   const lead = clipBlogFeaturedLead(featured.slug, featured.excerpt, 3);
   const dateLabel = resolveBlogCardDateLabel(featured);
-  const tag = normalizeBlogTagLabel(featured.tag, featured.articleType);
-  const cityLabel = blogListingCityBadgeLabel(featured.citySlug, featured.city, featured.citySlugs);
+  const { typeLabel: tag, cityLabel } = blogSurfaceMeta({
+    tag: featured.tag,
+    articleType: featured.articleType,
+    city: featured.city,
+    citySlug: featured.citySlug,
+    citySlugs: featured.citySlugs,
+  });
   const scheduleCta = resolveBlogListingCta({
     slug: featured.slug,
     title: featured.title,

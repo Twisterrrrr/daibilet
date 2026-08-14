@@ -14,6 +14,8 @@ import {
 } from '@/lib/blog-article-city';
 import {
   COLUMN_BADGE_LABEL,
+  blogSurfaceMeta,
+  blogSurfaceMetaLine,
   columnAuthorSignature,
   isBroadBlogCitySlug,
   isColumnArticle,
@@ -101,10 +103,22 @@ export function BlogArticleView({
     article.publishedAt,
     BLOG_POSTS.find((post) => post.slug === article.slug)?.date || '',
   );
-  const cityLink = resolveBlogCityHref(article.city, article.citySlug);
-  const eventsLink = resolveBlogCityEventsHref(article.city, article.citySlug);
-  const topicLinks = buildTopicLinks(article);
-  const tag = resolveArticleTag(article);
+  const staticPost = BLOG_POSTS.find((post) => post.slug === article.slug);
+  const { typeLabel, cityLabel } = blogSurfaceMeta({
+    tag: resolveArticleTag(article),
+    articleType: article.articleType,
+    city: article.city || staticPost?.city,
+    citySlug: article.citySlug || staticPost?.citySlug,
+    citySlugs: article.citySlugs || staticPost?.citySlugs,
+  });
+  const cityLink = resolveBlogCityHref(cityLabel || article.city, article.citySlug || staticPost?.citySlug);
+  const eventsLink = resolveBlogCityEventsHref(cityLabel || article.city, article.citySlug || staticPost?.citySlug);
+  const topicLinks = buildTopicLinks({
+    ...article,
+    city: cityLabel || article.city,
+    citySlug: article.citySlug || staticPost?.citySlug,
+  });
+  const tag = typeLabel;
   const isColumn = isColumnArticle(article.articleType) || tag === COLUMN_BADGE_LABEL;
   const authorSign = isColumn ? columnAuthorSignature(article.authorName) : null;
   const bodyContent = isColumn
@@ -125,9 +139,9 @@ export function BlogArticleView({
           coverImageUrl={article.coverImageUrl}
           publishedLabel={publishedLabel}
           readMin={readMin}
-          city={article.city}
-          cityHref={cityLink}
-          tag={tag}
+          city={cityLabel}
+          cityHref={cityLabel ? cityLink : null}
+          tag={typeLabel}
           authorName={article.authorName}
           articleType={article.articleType}
         />
@@ -195,14 +209,13 @@ export function BlogArticleView({
                     <li key={`strip-${post.slug}`}>
                       <Link href={`/blog/${post.slug}`} className="group block">
                         <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
-                          {[
-                            normalizeBlogTagLabel(post.tag, post.articleType) === COLUMN_BADGE_LABEL
-                              ? COLUMN_BADGE_LABEL
-                              : normalizeBlogTagLabel(post.tag, post.articleType),
-                            post.city,
-                          ]
-                            .filter(Boolean)
-                            .join(' · ') || 'Блог'}
+                          {blogSurfaceMetaLine({
+                            tag: post.tag,
+                            articleType: post.articleType,
+                            city: post.city,
+                            citySlug: post.citySlug,
+                            citySlugs: post.citySlugs,
+                          }) || 'Блог'}
                         </p>
                         <h3 className="mt-1 font-display text-base font-bold leading-snug text-slate-900 group-hover:text-primary-700">
                           {post.title}

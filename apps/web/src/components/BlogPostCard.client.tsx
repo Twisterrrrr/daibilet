@@ -15,8 +15,8 @@ import {
   authorLabel,
   blogAuthorNameClassName,
   blogCityBadgeClassName,
-  blogListingCityBadgeLabel,
   blogQuoteSurfaceClassName,
+  blogSurfaceMeta,
   blogTagBadgeClassName,
   normalizeBlogTagLabel,
 } from '@/lib/blog-meta';
@@ -108,19 +108,18 @@ function TagChips({
   citySlugs?: string[] | null;
   articleType?: string | null;
 }) {
-  const displayTag = normalizeBlogTagLabel(tag, articleType);
-  const cityLabel = blogListingCityBadgeLabel(citySlug, city, citySlugs);
+  const { typeLabel, cityLabel } = blogSurfaceMeta({ tag, articleType, city, citySlug, citySlugs });
   const showCity = Boolean(cityLabel);
 
-  if (!displayTag && !showCity) return null;
+  if (!typeLabel && !showCity) return null;
 
   return (
     <div className="mb-2 flex flex-wrap gap-1.5">
-      {displayTag ? (
+      {typeLabel ? (
         <span
-          className={`inline-flex max-w-full truncate rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ring-1 transition-colors duration-300 sm:text-[11px] ${blogTagBadgeClassName(displayTag)}`}
+          className={`inline-flex max-w-full truncate rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ring-1 transition-colors duration-300 sm:text-[11px] ${blogTagBadgeClassName(typeLabel)}`}
         >
-          {displayTag}
+          {typeLabel}
         </span>
       ) : null}
       {showCity ? (

@@ -16,9 +16,8 @@ import {
   authorLabel,
   blogAuthorNameClassName,
   blogCityBadgeClassName,
-  blogListingCityBadgeLabel,
+  blogSurfaceMeta,
   blogTagBadgeClassName,
-  normalizeBlogTagLabel,
 } from '@/lib/blog-meta';
 import {
   resolveBlogListingCta,
@@ -51,11 +50,16 @@ function BlogListRow({ post }: { post: BlogCardDto }) {
   });
 
   const chips: Array<{ key: string; label: string; kind: 'tag' | 'city' }> = [];
-  const displayTag = normalizeBlogTagLabel(tag, post.articleType);
-  if (displayTag) {
-    chips.push({ key: `tag-${displayTag}`, label: displayTag, kind: 'tag' });
+  const { typeLabel, cityLabel } = blogSurfaceMeta({
+    tag,
+    articleType: post.articleType,
+    city: post.city,
+    citySlug: post.citySlug,
+    citySlugs: post.citySlugs,
+  });
+  if (typeLabel) {
+    chips.push({ key: `tag-${typeLabel}`, label: typeLabel, kind: 'tag' });
   }
-  const cityLabel = blogListingCityBadgeLabel(post.citySlug, post.city, post.citySlugs);
   if (cityLabel) {
     chips.push({
       key: `city-${post.citySlug || cityLabel}`,

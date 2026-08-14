@@ -20,6 +20,35 @@ for (const [canonical, aliases] of Object.entries(CANONICAL_ALIASES)) {
 /** Pseudo-города без строки в City. */
 export const BROAD_BLOG_CITY_SLUGS = new Set(['multi', 'regions', 'region', 'russia', 'all']);
 
+export const BLOG_CITY_DISPLAY_NAMES = {
+  moscow: 'Москва',
+  'saint-petersburg': 'Санкт-Петербург',
+  kazan: 'Казань',
+  ekaterinburg: 'Екатеринбург',
+  kaliningrad: 'Калининград',
+  'nizhny-novgorod': 'Нижний Новгород',
+  ufa: 'Уфа',
+  perm: 'Пермь',
+  sochi: 'Сочи',
+  chelyabinsk: 'Челябинск',
+  yaroslavl: 'Ярославль',
+  'rostov-on-don': 'Ростов-на-Дону',
+  novosibirsk: 'Новосибирск',
+  krasnoyarsk: 'Красноярск',
+  samara: 'Самара',
+};
+
+const PSEUDO_CITY_NAMES = new Set(['Регионы', 'Несколько городов', 'Без города']);
+
+/** Display name for public article DTO: slug wins over a missing City join. */
+export function blogCityDisplayName(citySlug, fallbackName) {
+  const slug = canonicalBlogCitySlug(citySlug);
+  if (slug && BLOG_CITY_DISPLAY_NAMES[slug]) return BLOG_CITY_DISPLAY_NAMES[slug];
+  const name = String(fallbackName || '').trim();
+  if (name && !PSEUDO_CITY_NAMES.has(name)) return name;
+  return null;
+}
+
 export function canonicalBlogCitySlug(value) {
   const raw = String(value || '')
     .trim()

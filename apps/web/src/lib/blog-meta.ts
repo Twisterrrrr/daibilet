@@ -404,6 +404,42 @@ export function blogListingCityBadgeLabel(
   return fromFilter;
 }
 
+/** Type labels that look like a field name and must not render without a city value. */
+const NAKED_FIELD_TAGS = new Set(['город', 'гид']);
+
+export type BlogSurfaceMeta = {
+  typeLabel: string | null;
+  cityLabel: string | null;
+};
+
+/**
+ * Pair for hero/cards: type chip + city value.
+ * Never returns «Город» / «Гид» without a city name beside it.
+ */
+export function blogSurfaceMeta(input: {
+  tag?: string | null;
+  articleType?: string | null;
+  city?: string | null;
+  citySlug?: string | null;
+  citySlugs?: string[] | null;
+}): BlogSurfaceMeta {
+  const cityLabel = blogListingCityBadgeLabel(input.citySlug, input.city, input.citySlugs);
+  const typeLabel = normalizeBlogTagLabel(input.tag, input.articleType);
+  const key = String(typeLabel || '')
+    .trim()
+    .toLowerCase();
+  if (typeLabel && NAKED_FIELD_TAGS.has(key) && !cityLabel) {
+    return { typeLabel: null, cityLabel: null };
+  }
+  return { typeLabel, cityLabel };
+}
+
+export function blogSurfaceMetaLine(input: Parameters<typeof blogSurfaceMeta>[0]): string | null {
+  const { typeLabel, cityLabel } = blogSurfaceMeta(input);
+  const parts = [typeLabel, cityLabel].filter(Boolean);
+  return parts.length ? parts.join(' · ') : null;
+}
+
 export function formatBlogCityListLabel(slugs: string[]): string | null {
   const labels = slugs
     .map((slug) => cityFilterLabel(slug))

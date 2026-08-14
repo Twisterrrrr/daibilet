@@ -60,12 +60,12 @@ async function loadBlogRelated(article: BlogArticleDto): Promise<BlogCardDto[]> 
 /** Per-slug ISR entry so `/blog/[slug]` is not forced private/no-store by raw fetch. */
 export function getCachedBlogArticle(slug: string) {
   const key = String(slug || '').trim();
-  return unstable_cache(() => loadBlogArticle(key), ['blog-article-v1-http', key], blogCacheOptions)();
+  return unstable_cache(() => loadBlogArticle(key), ['blog-article-v2-city', key], blogCacheOptions)();
 }
 
 export function getCachedBlogRelated(article: BlogArticleDto) {
   const key = String(article.slug || '').trim();
-  return unstable_cache(() => loadBlogRelated(article), ['blog-related-v1-http', key], blogCacheOptions)();
+  return unstable_cache(() => loadBlogRelated(article), ['blog-related-v2-city', key], blogCacheOptions)();
 }
 
 function withListingExcerpts(posts: BlogCardDto[]): BlogCardDto[] {
@@ -106,6 +106,6 @@ async function loadBlogPageData(): Promise<BlogPageData> {
 /** Single ISR cache entry: article list + hero sidebar enrichment (city DTOs). */
 export const getCachedBlogPageData = unstable_cache(
   loadBlogPageData,
-  ['blog-page-data-v1'],
+  ['blog-page-data-v2-city'],
   blogCacheOptions,
 );

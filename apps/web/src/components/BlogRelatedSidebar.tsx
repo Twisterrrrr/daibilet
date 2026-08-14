@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
-import { normalizeBlogTagLabel, blogListingCityBadgeLabel } from '@/lib/blog-meta';
+import { blogSurfaceMetaLine } from '@/lib/blog-meta';
 import type { BlogCardDto } from '@/lib/blog-utils';
 
 export type BlogSidebarLink = {
@@ -55,10 +55,13 @@ export function BlogRelatedSidebar({
           </p>
           <ul className="mt-3 space-y-4">
             {posts.map((post) => {
-              const cityLabel = blogListingCityBadgeLabel(post.citySlug, post.city, post.citySlugs);
-              const metaLabel = [normalizeBlogTagLabel(post.tag, post.articleType), cityLabel]
-                .filter(Boolean)
-                .join(' · ');
+              const metaLabel = blogSurfaceMetaLine({
+                tag: post.tag,
+                articleType: post.articleType,
+                city: post.city,
+                citySlug: post.citySlug,
+                citySlugs: post.citySlugs,
+              });
               return (
               <li key={post.slug}>
                 <Link href={`/blog/${post.slug}`} className="group flex items-start gap-3">
