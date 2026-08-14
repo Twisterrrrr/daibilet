@@ -1,3 +1,18 @@
+## 2026-08-14 - Fix: TEP ticket categories collapsed on event buy-card
+
+### Наблюдения
+- Live `/events/...-425` (`evt_tep_425`): API отдаёт 3 `ticketPrices` (199 / 467 / 1800), но buy-card показывал одну строку «Взрослый» с вилкой 199-1800.
+- Owner: «категории билетов от TEP не передаются» - данные из TEP/импорта есть; ломалась группировка в UI.
+
+### Решения
+- `apps/web` `buildGroupedTicketCategories`: ключ группы `name|description` (как уже в `apps/public`), а не только первый сегмент до запятой.
+- Пакеты TEP вида «Взрослый, в одну сторону…» / «…с ланчем» больше не схлопываются; weekday-only суффиксы TC по-прежнему мержатся.
+
+### Проблемы
+- Нет (import/API OK; баг только frontend grouping).
+
+---
+
 ## 2026-08-14 - Live: Deploy MSK web `31834916265`
 
 ### Наблюдения

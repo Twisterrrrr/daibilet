@@ -300,6 +300,17 @@ function collectRawTicketPrices(payload: PublicEventPageDto): RawTicketPrice[] {
     .sort((a, b) => (a.sortOrder ?? 9999) - (b.sortOrder ?? 9999));
 }
 
+/**
+ * Group key must keep TEP package variants distinct.
+ * Titles like "Взрослый, в одну сторону…" / "Взрослый, с ланчем…" share the same
+ * first comma segment; collapsing on name alone hid those tariffs on the buy card.
+ * Weekday-only suffixes are already stripped in parseTicketCategory, so genuine
+ * "Взрослый, ПН—ЧТ" vs "Взрослый, ПТ—ВС" still merge into one row with a price fork.
+ */
+function ticketCategoryGroupKey(name: string, description: string | null): string {
+  return `${name}|${description || ''}`.toLowerCase().replace(/\s+/g, ' ');
+}
+
 export function buildGroupedTicketCategories(payload: PublicEventPageDto): TicketCategoryRow[] {
   const order: string[] = [];
   const groupSortOrder = new Map<string, number>();
@@ -307,7 +318,7 @@ export function buildGroupedTicketCategories(payload: PublicEventPageDto): Ticke
 
   for (const item of collectRawTicketPrices(payload)) {
     const { name, description } = parseTicketCategory(item);
-    const key = name.toLowerCase().replace(/\s+/g, ' ');
+    const key = ticketCategoryGroupKey(name, description);
     const itemOrder = item.sortOrder ?? 9999;
     const existing = groups.get(key);
     if (!existing) {

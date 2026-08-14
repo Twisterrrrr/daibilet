@@ -4,6 +4,7 @@ import test from 'node:test';
 import type { PublicEventPageDto } from '@daibilet/contracts/public';
 
 import {
+  buildGroupedTicketCategories,
   formatBuyCardPrice,
   formatBuyCardPriceHint,
   formatHeroBuyButtonPrice,
@@ -94,4 +95,63 @@ test('open_date eventType is detected', () => {
     ),
     true,
   );
+});
+
+test('TEP adult package variants stay as separate category rows', () => {
+  const rows = buildGroupedTicketCategories(
+    eventPayload({
+      ticketPrices: [
+        {
+          key: 'a',
+          title: 'Взрослый, в одну сторону до Парка «Зарядье»',
+          description: 'в одну сторону до Парка «Зарядье»',
+          priceRub: 199,
+          sortOrder: 0,
+        },
+        {
+          key: 'b',
+          title: 'Взрослый, В одну сторону до Парка «Зарядье», с горячим ЛАНЧЕМ, Питание включено',
+          description: 'В одну сторону до Парка «Зарядье», с горячим ЛАНЧЕМ, Питание включено',
+          priceRub: 467,
+          sortOrder: 2,
+        },
+        {
+          key: 'c',
+          title: 'Взрослый, для 4-х гостей с горячим ланчем, Для четверых',
+          description: 'для 4-х гостей с горячим ланчем, Для четверых',
+          priceRub: 1800,
+          sortOrder: 3,
+        },
+      ],
+    }),
+  );
+
+  assert.equal(rows.length, 3);
+  assert.deepEqual(
+    rows.map((row) => ({ name: row.name, minPrice: row.minPrice, maxPrice: row.maxPrice })),
+    [
+      { name: 'Взрослый', minPrice: 199, maxPrice: 199 },
+      { name: 'Взрослый', minPrice: 467, maxPrice: 467 },
+      { name: 'Взрослый', minPrice: 1800, maxPrice: 1800 },
+    ],
+  );
+  assert.match(rows[0]!.description || '', /зарядье/i);
+  assert.match(rows[1]!.description || '', /ланч/i);
+  assert.match(rows[2]!.description || '', /4-х|четверых/i);
+});
+
+test('weekday-only ticket title suffixes still merge into one category', () => {
+  const rows = buildGroupedTicketCategories(
+    eventPayload({
+      ticketPrices: [
+        { key: 'wd', title: 'Взрослый, ПН—ЧТ', priceRub: 1_000, sortOrder: 0 },
+        { key: 'we', title: 'Взрослый, ПТ—ВС', priceRub: 1_500, sortOrder: 1 },
+      ],
+    }),
+  );
+
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0]!.name, 'Взрослый');
+  assert.equal(rows[0]!.minPrice, 1_000);
+  assert.equal(rows[0]!.maxPrice, 1_500);
 });
