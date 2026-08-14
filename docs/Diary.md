@@ -1,10 +1,37 @@
+## 2026-08-14 - Hub nav: События + mobile hero chips
+
+### Наблюдения
+- Owner: sticky desktop и mobile - «События», не «Афиша». Hero primary CTA остаётся «Афиша». Mobile пилюли под CTA: Главные места / Лайфхаки / Заметки (не Зачем ехать / Подборки / Блог).
+
+### Решения
+- Sticky `#affiche` лейбл «События». Hero jump chips: `#city-must-see` `#lifehacks` `#blog` (лейбл Заметки), только заполненные. «Главные места» скроллит к H2 «Что посмотреть в …», не к identity. Фестивали уже без дисклеймера, прошедшие колонкой.
+
+### Проблемы
+- Нет.
+
+---
+
+## 2026-08-14 - Live: Deploy MSK web `31827723859`
+
+### Наблюдения
+- Owner: выкатить фестивали + новое sticky-меню хаба одним Deploy MSK web.
+
+### Решения
+- Deploy MSK web [`31827723859`](https://github.com/Twisterrrrr/daibilet/actions/runs/31827723859) success, ~2m22s. SHA `6b7bd8b` (fest `0671d6d` + nav). BUILD_ID=`ZgQGWmlLbb_lTTmJn9q2K`. Swap с `WHTVV_MjU86en0fh4LB-L`.
+- Smoke 200: `/` `/places` `/events` `/cities/perm`. На Перми: sticky desktop/mobile+Еще; `#city-must-see` `#city-routes`; фестивали без дисклеймера, прошедшие в aside.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-14 - Hub sticky nav: desktop 8 + mobile 4+Еще
 
 ### Наблюдения
 - Owner: sticky хаба должен вести по заполненным секциям. Desktop: Зачем ехать, Главные места, Маршруты, Лайфхаки, Пригороды, Афиша, FAQ, Из блога. Mobile: Зачем ехать, Маршруты, Пригороды, Афиша, Еще (остальное в меню).
 
 ### Решения
-- `CityStickyTabs`: отдельные ряды md+ / mobile. Якоря существующие (`#sights`, `#city-must-see`, `#city-routes`, `#lifehacks`, `#city-suburbs`, `#affiche`, `#faq`, `#blog`). `#faq` больше не алиас на `#practice`. Пункты только если секция заполнена. Live после этого же deploy.
+- `CityStickyTabs`: отдельные ряды md+ / mobile. Якоря существующие (`#sights`, `#city-must-see`, `#city-routes`, `#lifehacks`, `#city-suburbs`, `#affiche`, `#faq`, `#blog`). `#faq` больше не алиас на `#practice`. Пункты только если секция заполнена. Live: `31827723859`.
 
 ### Проблемы
 - Нет.

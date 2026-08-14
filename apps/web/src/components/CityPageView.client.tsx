@@ -110,6 +110,8 @@ const CITY_HASH_ALIASES: Record<string, string> = {
   routes: 'city-routes',
   scenarios: 'city-routes',
   'day-constructor': 'city-routes',
+  events: 'affiche',
+  zametki: 'blog',
   'region-events': 'region-events',
 };
 
@@ -119,7 +121,7 @@ const HUB_DESKTOP_NAV: Array<{ id: string; label: string }> = [
   { id: 'city-routes', label: 'Маршруты' },
   { id: 'lifehacks', label: 'Лайфхаки' },
   { id: 'city-suburbs', label: 'Пригороды' },
-  { id: 'affiche', label: 'Афиша' },
+  { id: 'affiche', label: 'События' },
   { id: 'faq', label: 'FAQ' },
   { id: 'blog', label: 'Из блога' },
 ];
@@ -348,6 +350,14 @@ export function CityPageView({
     showTravel,
   ]);
 
+  const jumpChips = React.useMemo(() => {
+    const chips: Array<{ id: string; label: string }> = [];
+    if (hasMustSeeNav) chips.push({ id: 'city-must-see', label: 'Главные места' });
+    if (hasLifehacks) chips.push({ id: 'lifehacks', label: 'Лайфхаки' });
+    if (footerArticles.length > 0) chips.push({ id: 'blog', label: 'Заметки' });
+    return chips;
+  }, [footerArticles.length, hasLifehacks, hasMustSeeNav]);
+
   const renderHubBlogSection = () => {
     if (!footerArticles.length || !city) return null;
     const citySlug = city.slug || city.sourceSlug || '';
@@ -413,6 +423,7 @@ export function CityPageView({
               hasTravel={hasTravel}
               hubConfig={hubConfig}
               editorial={editorial}
+              jumpChips={jumpChips}
             />
             <CityStickyTabs desktopTabs={tabs.desktop} extraTabs={tabs.extra} editorial={editorial} />
 
@@ -665,6 +676,7 @@ function CityHero({
   hasTravel,
   hubConfig = null,
   editorial = false,
+  jumpChips = [],
 }: {
   city: PublicCityDto;
   stats: PublicCityPageDto['stats'];
@@ -672,6 +684,7 @@ function CityHero({
   hasTravel: boolean;
   hubConfig?: ReturnType<typeof resolveCityHubConfig>;
   editorial?: boolean;
+  jumpChips?: Array<{ id: string; label: string }>;
 }) {
   if (editorial) {
     return (
@@ -681,6 +694,7 @@ function CityHero({
         guide={guide}
         hasTravel={hasTravel}
         hubConfig={hubConfig}
+        jumpChips={jumpChips}
       />
     );
   }
@@ -691,6 +705,7 @@ function CityHero({
       guide={guide}
       hasTravel={hasTravel}
       hubConfig={hubConfig}
+      jumpChips={jumpChips}
     />
   );
 }
@@ -701,12 +716,14 @@ function CityHeroEditorial({
   guide,
   hasTravel,
   hubConfig = null,
+  jumpChips = [],
 }: {
   city: PublicCityDto;
   stats: PublicCityPageDto['stats'];
   guide: CityInfoEntry | null;
   hasTravel: boolean;
   hubConfig?: ReturnType<typeof resolveCityHubConfig>;
+  jumpChips?: Array<{ id: string; label: string }>;
 }) {
   return (
     <CityHeroStrip
@@ -716,6 +733,7 @@ function CityHeroEditorial({
       hasTravel={hasTravel}
       hubConfig={hubConfig}
       editorial
+      jumpChips={jumpChips}
     />
   );
 }
@@ -726,15 +744,24 @@ function CityHeroDefault({
   guide,
   hasTravel,
   hubConfig = null,
+  jumpChips = [],
 }: {
   city: PublicCityDto;
   stats: PublicCityPageDto['stats'];
   guide: CityInfoEntry | null;
   hasTravel: boolean;
   hubConfig?: ReturnType<typeof resolveCityHubConfig>;
+  jumpChips?: Array<{ id: string; label: string }>;
 }) {
   return (
-    <CityHeroStrip city={city} stats={stats} guide={guide} hasTravel={hasTravel} hubConfig={hubConfig} />
+    <CityHeroStrip
+      city={city}
+      stats={stats}
+      guide={guide}
+      hasTravel={hasTravel}
+      hubConfig={hubConfig}
+      jumpChips={jumpChips}
+    />
   );
 }
 
@@ -746,6 +773,7 @@ function CityHeroStrip({
   hasTravel,
   hubConfig = null,
   editorial = false,
+  jumpChips = [],
 }: {
   city: PublicCityDto;
   stats: PublicCityPageDto['stats'];
@@ -753,6 +781,7 @@ function CityHeroStrip({
   hasTravel: boolean;
   hubConfig?: ReturnType<typeof resolveCityHubConfig>;
   editorial?: boolean;
+  jumpChips?: Array<{ id: string; label: string }>;
 }) {
   const [heroImageFailed, setHeroImageFailed] = React.useState(false);
   const cityIn = cityInPrepositional(city);
@@ -846,13 +875,7 @@ function CityHeroStrip({
 
   const contentClass = nightShell ? CITY_NIGHT_HERO.content : 'container-page py-8 sm:py-10';
 
-  // No «Афиша» chip: the primary CTA above already goes to the catalog.
-  const jumpChips = [
-    { id: 'sights', label: 'Зачем ехать' },
-    { id: 'more', label: 'Подборки' },
-    { id: 'blog', label: 'Блог' },
-  ] as const;
-
+  // Mobile secondary chips: Главные места / Лайфхаки / Заметки. Primary CTA stays «Афиша».
   // hasTravel kept for caller parity; hero CTAs are Афиша + Подборки событий.
   void hasTravel;
 
@@ -935,7 +958,8 @@ function CityHeroStrip({
                 </Link>
               </div>
 
-              {/* Mobile quick-jump under CTAs; desktop keeps sticky tabs. */}
+              {/* Mobile: Главные места / Лайфхаки / Заметки. Desktop uses sticky. */}
+              {jumpChips.length ? (
               <div
                 className="mt-4 flex gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:hidden"
                 data-city-hero-jump
@@ -963,6 +987,7 @@ function CityHeroStrip({
                   </a>
                 ))}
               </div>
+              ) : null}
             </div>
           </div>
         </div>
@@ -1551,11 +1576,12 @@ function CitySightsSection({
         />
       ) : (
         <h2
-          className={
+          id="city-must-see"
+          className={`${SECTION_SCROLL_MT} ${
             editorial
               ? 'font-serif text-3xl font-semibold text-zinc-950 sm:text-4xl'
               : 'text-2xl font-bold text-slate-950'
-          }
+          }`}
         >
           {sectionTitle}
         </h2>
@@ -1732,7 +1758,7 @@ function CitySightsMustSeeList({
 
   return (
     <>
-      <div className="flex items-start justify-between gap-3">
+      <div id="city-must-see" className={`flex items-start justify-between gap-3 ${SECTION_SCROLL_MT}`}>
         <h2
           className={
             editorial
@@ -1801,7 +1827,7 @@ function CitySightsMustSeeList({
         editorial={editorial}
       />
       {/* Mobile: 1-card ~80/20 peek swipe. md+: sparse (<4) = capped card grid; ≥4 = single-row snap carousel. */}
-      <div id="city-must-see" className={`relative mt-6 ${SECTION_SCROLL_MT}`}>
+      <div className={`relative mt-6`}>
         <div
           key={focusedMustSee.length ? `focus:${[...focusedSlugSet].join(',')}` : activeId}
           ref={railRef}

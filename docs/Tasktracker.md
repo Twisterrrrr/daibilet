@@ -1,8 +1,20 @@
+## 2026-08-14 - Hub nav: События + mobile hero chips
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| UX.HUB-NAV-EVENTS-CHIPS | Sticky «События» (не Афиша); mobile hero: Главные места / Лайфхаки / Заметки; CTA Афиша | Высокий | 🔄 commit+push, затем live |
+
+## 2026-08-14 - Live: Deploy MSK web `31827723859`
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| DEPLOY.MSK-31827723859 | Live tip `6b7bd8b` BUILD_ID=`ZgQGWmlLbb_lTTmJn9q2K` | Высокий | ✅ live |
+
 ## 2026-08-14 - Hub sticky nav: desktop 8 + mobile 4+Еще
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| UX.HUB-NAV-STICKY | Sticky: desktop Зачем ехать / Главные места / Маршруты / Лайфхаки / Пригороды / Афиша / FAQ / Из блога; mobile 4 + Еще | Высокий | 🔄 commit+push, затем live |
+| UX.HUB-NAV-STICKY | Sticky: desktop Зачем ехать / Главные места / Маршруты / Лайфхаки / Пригороды / События / FAQ / Из блога; mobile 4 + Еще | Высокий | 🔄 уточнение: UX.HUB-NAV-EVENTS-CHIPS |
 
 ## 2026-08-14 - Live: Deploy MSK web `31826881828`
 
