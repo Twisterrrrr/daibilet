@@ -18,9 +18,10 @@ import { pluralCities, pluralPlaces } from '@/lib/format';
 import { buildPlacesListingCopy, normalizePlacesFamily } from '@/lib/places-seo';
 import {
   catalogCityQueryValue,
+  ensureCityInOptions,
   isAllCitiesQuery,
   persistSelectedCity,
-  resolveCatalogCityFilter,
+  resolveSectionCityFilter,
 } from '@/lib/selected-city';
 import {
   applyVenueCatalogEventCounts,
@@ -225,7 +226,13 @@ export function PlacesHubView({
   }, []);
 
   const cityOptions = useMemo(() => {
-    const fromStats = cityOptionsFromStats(stats.cities || {});
+    const destCities = (selectedCity?.destinations || []).filter((item) => item.type === 'city');
+    const counts = stats.cities || {};
+    const fromDestinations = destCities.length
+      ? destCities
+          .map((item) => [item.name, counts[item.name] || 0] as [string, number])
+          .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'ru'))
+      : cityOptionsFromStats(counts);
     const settlements = settlementOptionsFromVenues(venues);
     const headerLabel = String(selectedCity?.cityLabel || '').trim();
     const urlToken = String(urlCity || '').trim();
@@ -236,38 +243,42 @@ export function PlacesHubView({
       isRegionLikeCityTitle(urlToken) ||
       /bashkortostan|respublika-|область|край/i.test(urlToken) ||
       venuesInRegion;
-    if (!regionScoped || settlements.length === 0) return fromStats;
-
-    const regionTitle = isRegionLikeCityTitle(headerLabel)
-      ? headerLabel
-      : venuesInRegion
-        ? String(venues[0]?.city || '').trim()
-        : '';
-    const stillOnRegion =
-      isRegionLikeCityTitle(headerLabel) ||
-      isRegionLikeCityTitle(urlToken) ||
-      /bashkortostan|respublika-/i.test(urlToken);
-    if (regionTitle && stillOnRegion) {
-      return [[regionTitle, venues.length || 1] as [string, number], ...settlements];
+    let options = fromDestinations;
+    if (regionScoped && settlements.length > 0) {
+      const regionTitle = isRegionLikeCityTitle(headerLabel)
+        ? headerLabel
+        : venuesInRegion
+          ? String(venues[0]?.city || '').trim()
+          : '';
+      const stillOnRegion =
+        isRegionLikeCityTitle(headerLabel) ||
+        isRegionLikeCityTitle(urlToken) ||
+        /bashkortostan|respublika-/i.test(urlToken);
+      options =
+        regionTitle && stillOnRegion
+          ? ([[regionTitle, venues.length || 1] as [string, number], ...settlements])
+          : settlements;
     }
-    return settlements;
-  }, [stats.cities, venues, selectedCity?.cityLabel, urlCity]);
+    return ensureCityInOptions(options, headerLabel);
+  }, [stats.cities, venues, selectedCity?.cityLabel, selectedCity?.destinations, urlCity]);
 
-  const cityFilter = useMemo(() => {
-    if (urlCityAll) return 'all';
-    if (urlCity) {
-      return resolveCatalogCityFilter(urlCity, cityOptions, selectedCity?.cityLabel);
-    }
-    if (!cityReady || !selectedCity || selectedCity.cityValue === 'all') return 'all';
-    return resolveCatalogCityFilter(selectedCity.cityValue, cityOptions, selectedCity.cityLabel);
-  }, [urlCity, urlCityAll, cityReady, selectedCity, cityOptions]);
+  const cityFilter = useMemo(
+    () =>
+      resolveSectionCityFilter({
+        cityReady,
+        headerCityValue: selectedCity?.cityValue,
+        headerCityLabel: selectedCity?.cityLabel,
+        urlCity,
+        urlCityAll,
+        cityOptions,
+      }),
+    [urlCity, urlCityAll, cityReady, selectedCity, cityOptions],
+  );
 
   const cityFetchKey = useMemo(() => {
-    if (urlCityAll) return '';
-    if (urlCity) return urlCity;
     if (cityFilter === 'all') return '';
     return catalogCityQueryValue(selectedCity?.destinations || [], cityFilter);
-  }, [urlCity, urlCityAll, cityFilter, selectedCity?.destinations]);
+  }, [cityFilter, selectedCity?.destinations]);
 
   useEffect(() => {
     setViewMode(readStoredViewMode());

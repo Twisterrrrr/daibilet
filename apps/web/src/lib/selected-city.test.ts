@@ -10,9 +10,11 @@ import {
   mergeStoredCityIntoEventsParams,
   mergeStoredCityIntoSearchParams,
   pathHrefWithSelectedCity,
+  ensureCityInOptions,
   resolveCatalogCityFilter,
   resolveCityHubDestination,
   resolveCityLabel,
+  resolveSectionCityFilter,
   SELECTED_CITY_STORAGE_KEY,
 } from './selected-city.ts';
 
@@ -206,4 +208,59 @@ test('catalogCityQueryValue prefers destination slug', () => {
   assert.equal(catalogCityQueryValue([...destinations], 'Уфа'), 'ufa');
   assert.equal(catalogCityQueryValue([...destinations], 'moscow'), 'moscow');
   assert.equal(catalogCityQueryValue([...destinations], 'all'), 'all');
+});
+
+test('resolveSectionCityFilter follows header once ready, URL only while bootstrapping', () => {
+  const options: Array<[string, number]> = [
+    ['Москва', 10],
+    ['Пермь', 4],
+  ];
+  assert.equal(
+    resolveSectionCityFilter({
+      cityReady: true,
+      headerCityValue: 'Пермь',
+      headerCityLabel: 'Пермь',
+      urlCity: 'moscow',
+      cityOptions: options,
+    }),
+    'Пермь',
+  );
+  assert.equal(
+    resolveSectionCityFilter({
+      cityReady: true,
+      headerCityValue: 'all',
+      headerCityLabel: 'Все города',
+      urlCity: 'moscow',
+      cityOptions: options,
+    }),
+    'all',
+  );
+  assert.equal(
+    resolveSectionCityFilter({
+      cityReady: false,
+      headerCityValue: 'all',
+      urlCity: 'perm',
+      cityOptions: options,
+    }),
+    'Пермь',
+  );
+  assert.equal(
+    resolveSectionCityFilter({
+      cityReady: false,
+      urlCityAll: true,
+      urlCity: '',
+      cityOptions: options,
+    }),
+    'all',
+  );
+});
+
+test('ensureCityInOptions prepends the selected city when stats list is filtered', () => {
+  const options: Array<[string, number]> = [['Москва', 10]];
+  assert.deepEqual(ensureCityInOptions(options, 'Пермь'), [
+    ['Пермь', 0],
+    ['Москва', 10],
+  ]);
+  assert.equal(ensureCityInOptions(options, 'Москва'), options);
+  assert.equal(ensureCityInOptions(options, 'all'), options);
 });

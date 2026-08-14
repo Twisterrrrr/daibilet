@@ -1,3 +1,9 @@
+## 2026-08-14 - /places: header city drives section
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| UX.PLACES-HEADER-CITY | Шапка и select `/places` - один город; блог отдельно | Высокий | ✅ git, без live deploy |
+
 ## 2026-08-14 - Hub chrome: fact/weather swap + suburb split
 
 | ID | Задача | Приоритет | Статус |

@@ -180,3 +180,38 @@ export function resolveCatalogCityFilter(
   }
   return needle;
 }
+
+/**
+ * In-page catalog city follows the header picker once it is resolved.
+ * URL `?city=` is only a bootstrap source (before cityReady) - same contract as `/events`.
+ * Blog stays independent: `/blog` is not a city-filter path.
+ */
+export function resolveSectionCityFilter(input: {
+  cityReady: boolean;
+  headerCityValue?: string | null;
+  headerCityLabel?: string | null;
+  urlCity?: string | null;
+  urlCityAll?: boolean;
+  cityOptions: Array<[string, number]>;
+}): string {
+  const headerValue = String(input.headerCityValue || '').trim();
+  if (input.cityReady && headerValue) {
+    if (headerValue === 'all') return 'all';
+    return resolveCatalogCityFilter(headerValue, input.cityOptions, input.headerCityLabel);
+  }
+  if (input.urlCityAll) return 'all';
+  const urlCity = String(input.urlCity || '').trim();
+  if (urlCity) return resolveCatalogCityFilter(urlCity, input.cityOptions, input.headerCityLabel);
+  return 'all';
+}
+
+/** Native `<select>` cannot display a value that is missing from options. */
+export function ensureCityInOptions(
+  options: Array<[string, number]>,
+  cityName?: string | null,
+): Array<[string, number]> {
+  const name = String(cityName || '').trim();
+  if (!name || name === 'all' || name === 'Все города') return options;
+  if (options.some(([city]) => city === name)) return options;
+  return [[name, 0], ...options];
+}

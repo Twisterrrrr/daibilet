@@ -1,3 +1,18 @@
+## 2026-08-14 - /places: header city drives section filter
+
+### Наблюдения
+- Owner: фильтр города в шапке на `/places` не меняет select в разделе. Блог должен остаться независимым.
+
+### Решения
+- Как на `/events`: после `cityReady` источник правды - header picker. `?city=` только bootstrap.
+- Список опций - destinations шапки (+ выбранный город, если stats его вырезали). Native select больше не залипает на предыдущем городе.
+- `/blog` по-прежнему `persist` without `?city=`.
+
+### Проблемы
+- Live после «выкатывай».
+
+---
+
 ## 2026-08-14 - Hub chrome: swap fact/weather, restore skins, suburb split
 
 ### Наблюдения
