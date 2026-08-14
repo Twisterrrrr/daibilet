@@ -1,3 +1,9 @@
+## 2026-08-14 - SPB mustSee owner editor coords
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| FIX.SPB-EDITOR-COORDS | 182 SPB mustSee lat/lng/address из таблицы owner; skip 46/162; lock против yandex overwrite | Высокий | ✅ 2026-08-14 code + push; live batch |
+
 ## 2026-08-14 - City hub Perm: weather + identity tags + regional events
 
 | ID | Задача | Приоритет | Статус |
