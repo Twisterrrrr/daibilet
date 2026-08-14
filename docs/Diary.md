@@ -1,3 +1,21 @@
+## 2026-08-14 - Live: Deploy MSK web `31839365845` (hub batch)
+
+### Наблюдения
+- Owner: выкатить sticky «О городе», region-events/gaps/FAQ ask, hover identity+must-see, выравнивание иконки лайфхаков.
+
+### Решения
+- Tip `ab54a35`: lifehack header `items-center` (иконка+title); ранее `a72e0ea` hover `-translate-y-1` + soft blue shadow на identity/must-see; `f6cb153`/`640bf57` sticky/anchors.
+- Deploy MSK web [`31839365845`](https://github.com/Twisterrrrr/daibilet/actions/runs/31839365845) success. BUILD_ID=`q-QUaTdDKv5GFEnFBAKHW` (swap с `154qKbbGnsSwTWJa2Je_6`).
+
+### Проблемы
+- Нет.
+
+### Smoke
+- 200 + BUILD_ID: `/` `/places` `/events` `/cities/perm`.
+- Perm: `items-center gap-3 bg-sky-50`, identity carousel, must-see cards, «О городе», `#region-events`, «Задать вопрос».
+
+---
+
 ## 2026-08-14 - Hub: region-events anchor, spacing, FAQ ask, order
 
 ### Наблюдения
@@ -14,7 +32,7 @@
 - Sticky «О городе» сохранён.
 
 ### Проблемы
-- Deploy не делали (owner не просил выкатывай).
+- Live после `31839365845`.
 
 ---
 
@@ -27,7 +45,7 @@
 - Первый пункт sticky (desktop + mobile primary): «О городе» → `#about` на hero-wrapper (`data-city-hero`); aliases `top` / `city-hero` → `about`. Старый alias `about→sights` снят.
 
 ### Проблемы
-- Нет. Deploy не делали (owner не просил выкатывай).
+- Live после `31839365845`.
 
 ---
 

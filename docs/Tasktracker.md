@@ -1,12 +1,21 @@
+## 2026-08-14 - Live: Deploy MSK web `31839365845`
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| DEPLOY.MSK-31839365845 | Live tip `ab54a35` BUILD_ID=`q-QUaTdDKv5GFEnFBAKHW` | Высокий | ✅ live |
+| UX.HUB-LIFEHACK-ICON-CENTER | Лайфхак: icon+title `items-center` | Высокий | ✅ live `31839365845` |
+| UX.HUB-IDENTITY-MUSTSEE-HOVER | Hover identity + must-see как city/lifehack | Высокий | ✅ live `31839365845` |
+| UX.HUB-ABOUT-STICKY | Sticky «О городе» → `#about` | Высокий | ✅ live `31839365845` |
+
 ## 2026-08-14 - Hub: region-events scroll + spacing + FAQ ask
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| UX.HUB-REGION-SCROLL-MT | Sticky «События региона» докручивает под nav (id+offset) | Высокий | ✅ git |
-| UX.HUB-GAP-REGION-AFFICHE | Gap region↔affiche ~-50% | Высокий | ✅ git |
-| UX.HUB-GAP-COLLECTIONS | Gap перед «Каталог подборок» ~-50% | Высокий | ✅ git |
-| UX.HUB-ORDER-NEAR-AFTER-COLLECTIONS | После подборок сразу «Рядом с городом» | Высокий | ✅ git |
-| UX.HUB-FAQ-ASK | FAQ «Задать вопрос» → mailto hello@ | Высокий | ✅ git |
+| UX.HUB-REGION-SCROLL-MT | Sticky «События региона» докручивает под nav (id+offset) | Высокий | ✅ live `31839365845` |
+| UX.HUB-GAP-REGION-AFFICHE | Gap region↔affiche ~-50% | Высокий | ✅ live `31839365845` |
+| UX.HUB-GAP-COLLECTIONS | Gap перед «Каталог подборок» ~-50% | Высокий | ✅ live `31839365845` |
+| UX.HUB-ORDER-NEAR-AFTER-COLLECTIONS | После подборок сразу «Рядом с городом» | Высокий | ✅ live `31839365845` |
+| UX.HUB-FAQ-ASK | FAQ «Задать вопрос» → mailto hello@ | Высокий | ✅ live `31839365845` |
 
 ## 2026-08-14 - Live: Deploy MSK web `31834916265`
 
