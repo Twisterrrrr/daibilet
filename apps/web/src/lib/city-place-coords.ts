@@ -1,0 +1,382 @@
+/**
+ * Editorial lat/lng for city must-see when hub venues omit the place
+ * (0-event content places or city page session-only venue list).
+ */
+
+import { haversineMeters, isValidCoordinatePair } from './day-route-score';
+
+export type EditorialPlaceCoords = {
+  latitude: number;
+  longitude: number;
+};
+
+/**
+ * Perm historic south bank (Monastyrskaya / Meshkov / river station plaza).
+ * North of this on the central embankment stretch is Kama water, not the promenade.
+ * Wiki/OSM pin the letters at ~58.021 which sits on the parapet / in-channel on tiles.
+ */
+export const PERM_KAMA_WATERFRONT_MAX_LAT = 58.0195;
+
+/** Rebase guest LS / hub geo when it drifted this far from curated pins. */
+export const EDITORIAL_COORDS_REBASE_METERS = 80;
+
+/** Promenade by Meshkov / Monastyrskaya - south of the waterline, not mid-Kama. */
+export const PERM_NABEREZHNAYA_KAMY_COORDS: EditorialPlaceCoords = {
+  latitude: 58.01825,
+  longitude: 56.2466,
+};
+
+/** Art object plaza by river station - same south-bank band, slightly east. */
+export const PERM_SCHASTE_COORDS: EditorialPlaceCoords = {
+  latitude: 58.01835,
+  longitude: 56.25055,
+};
+
+/** Owner Yandex sidebar 2026-08-14: square in Skver im. Mamina-Sibiryaka, not railway pin to the east. */
+export const PERM_CATHEDRAL_SQUARE_COORDS: EditorialPlaceCoords = {
+  latitude: 58.016205,
+  longitude: 56.2338,
+};
+
+const PERM_KAMA_WATERFRONT_SLUGS = new Set(['naberezhnaya-kamy', 'perm-schaste-ne-za-gorami']);
+const PERM_CATHEDRAL_SQUARE_SLUGS = new Set(['perm-sobornaya-ploschad']);
+
+/** Nizhny Novgorod: classic 6 + owner pack 30 must-see + 10 gastro. */
+const NIZHNY_NOVGOROD_COORDS: Record<string, EditorialPlaceCoords> = {
+  'nizhny-novgorod-nizhegorodskiy-kreml': { latitude: 56.328318, longitude: 44.002824 },
+  'nizhny-novgorod-chkalovskaya-lestnitsa': { latitude: 56.330889, longitude: 44.009278 },
+  'nizhny-novgorod-bol-shaya-pokrovskaya-ulitsa': { latitude: 56.321684, longitude: 43.996155 },
+  'nizhny-novgorod-nizhegorodskaya-kanatnaya-doroga': { latitude: 56.324209, longitude: 44.038758 },
+  'nizhny-novgorod-strelka-rek-volgi-i-oki': { latitude: 56.333889, longitude: 43.990833 },
+  'nizhny-novgorod-naberezhnaya-fedorovskogo': { latitude: 56.326887, longitude: 43.980644 },
+  'nizhny-novgorod-nizhegorodskaya-yarmarka': { latitude: 56.3275, longitude: 43.962222 },
+  'nizhny-novgorod-usadba-rukavishnikovyh': { latitude: 56.329864, longitude: 44.017772 },
+  'nizhny-novgorod-gosudarstvennyy-bank': { latitude: 56.322301, longitude: 44.002875 },
+  'nizhny-novgorod-ploschad-minina-i-pozharskogo': { latitude: 56.326759, longitude: 44.00624 },
+  'nizhny-novgorod-palaty-stroganovyh': { latitude: 56.327521, longitude: 43.985906 },
+  'nizhny-novgorod-romodanovskiy-vokzal': { latitude: 56.32174, longitude: 43.97825 },
+  'nizhny-novgorod-ploschad-lyadova': { latitude: 56.312953, longitude: 43.987786 },
+  'nizhny-novgorod-domik-petra-i': { latitude: 56.326269, longitude: 43.999658 },
+  'nizhny-novgorod-nizhne-volzhskaya-naberezhnaya': { latitude: 56.330441, longitude: 43.996112 },
+  'nizhny-novgorod-verhne-volzhskaya-naberezhnaya': { latitude: 56.329971, longitude: 44.013589 },
+  'nizhny-novgorod-rozhdestvenskaya-ulitsa': { latitude: 56.328328, longitude: 43.990471 },
+  'nizhny-novgorod-park-shveytsariya': { latitude: 56.279883, longitude: 43.978183 },
+  'nizhny-novgorod-sormovskiy-park': { latitude: 56.347717, longitude: 43.896656 },
+  'nizhny-novgorod-pochainskiy-bulvar': { latitude: 56.326305, longitude: 43.997233 },
+  'nizhny-novgorod-aleksandrovskiy-sad': { latitude: 56.330556, longitude: 44.022222 },
+  'nizhny-novgorod-pakgauzy-na-strelke': { latitude: 56.333967, longitude: 43.972304 },
+  'nizhny-novgorod-schelokovskiy-hutor': { latitude: 56.280145, longitude: 44.032644 },
+  'nizhny-novgorod-sobor-aleksandra-nevskogo': { latitude: 56.333019, longitude: 43.975412 },
+  'nizhny-novgorod-stroganovskaya-tserkov': { latitude: 56.327539, longitude: 43.984247 },
+  'nizhny-novgorod-pecherskiy-monastyr': { latitude: 56.322964, longitude: 44.050419 },
+  'nizhny-novgorod-blagoveschenskiy-monastyr': { latitude: 56.323561, longitude: 43.97495 },
+  'nizhny-novgorod-mihailo-arhangelskiy-sobor': { latitude: 56.328461, longitude: 44.002241 },
+  'nizhny-novgorod-staroyarmarochnyy-sobor': { latitude: 56.333333, longitude: 43.961944 },
+  'nizhny-novgorod-arsenal-gtsisi': { latitude: 56.328325, longitude: 44.004128 },
+  'nizhny-novgorod-muzey-istorii-gaz': { latitude: 56.251919, longitude: 43.890692 },
+  'nizhny-novgorod-domik-kashirina': { latitude: 56.326317, longitude: 43.993742 },
+  'nizhny-novgorod-tehnicheskiy-muzey': { latitude: 56.319522, longitude: 43.997238 },
+  'nizhny-novgorod-russkiy-muzey-fotografii': { latitude: 56.323531, longitude: 44.004128 },
+  'nizhny-novgorod-pamyatnik-zhyulyu-vernu': { latitude: 56.325333, longitude: 43.980417 },
+  'nizhny-novgorod-kater-geroy': { latitude: 56.331289, longitude: 44.009389 },
+  'nizhny-novgorod-seledka-i-kofe': { latitude: 56.327572, longitude: 43.987747 },
+  'nizhny-novgorod-bezuhov-cafe': { latitude: 56.329241, longitude: 43.992224 },
+  'nizhny-novgorod-lepi-testo': { latitude: 56.321045, longitude: 44.001243 },
+  'nizhny-novgorod-yale-restaurant': { latitude: 56.326884, longitude: 43.984534 },
+  'nizhny-novgorod-red-wall-restaurant': { latitude: 56.330312, longitude: 43.99845 },
+  'nizhny-novgorod-pyatkin-traktir': { latitude: 56.329432, longitude: 43.990112 },
+  'nizhny-novgorod-mitrich-restaurant': { latitude: 56.324541, longitude: 44.020114 },
+  'nizhny-novgorod-mednye-truby-bar': { latitude: 56.326102, longitude: 43.983115 },
+  'nizhny-novgorod-yula-pizza': { latitude: 56.322998, longitude: 44.004512 },
+  'nizhny-novgorod-fonoteca-bar': { latitude: 56.319874, longitude: 43.996841 },
+};
+
+/** Owner editor table 2026-08-14 for 182 SPB mustSee; Kryukov extras kept. */
+const SAINT_PETERSBURG_COORDS: Record<string, EditorialPlaceCoords> = {
+  'erarta': { latitude: 59.932230, longitude: 30.251411 },
+  'ermitazh': { latitude: 59.939864, longitude: 30.314566 },
+  'planetarii-1': { latitude: 59.907297, longitude: 30.319717 },
+  'saint-petersburg-admiralteystvo': { latitude: 59.937390, longitude: 30.308560 },
+  'saint-petersburg-aleksandro-nevskaya-lavra': { latitude: 59.920803, longitude: 30.387920 },
+  'saint-petersburg-aleksandrovskiy-park': { latitude: 59.955519, longitude: 30.312959 },
+  'saint-petersburg-angliyskaya-naberezhnaya': { latitude: 59.934149, longitude: 30.289389 },
+  'saint-petersburg-anichkov-most': { latitude: 59.933215, longitude: 30.343276 },
+  'saint-petersburg-annenkirhe-tserkov-svyatoy-anny': { latitude: 59.944645, longitude: 30.352101 },
+  'saint-petersburg-art-kafe-brodyachaya-sobaka': { latitude: 59.937243, longitude: 30.331580 },
+  'saint-petersburg-artilleriyskiy-muzey': { latitude: 59.953835, longitude: 30.313888 },
+  'saint-petersburg-bankovskiy-most': { latitude: 59.932204, longitude: 30.324976 },
+  'saint-petersburg-bar-balans-belogo': { latitude: 59.922112, longitude: 30.355675 },
+  'saint-petersburg-bar-dead-poets': { latitude: 59.936384, longitude: 30.351657 },
+  'saint-petersburg-bar-hroniki': { latitude: 59.939864, longitude: 30.354394 },
+  'saint-petersburg-bar-imbibe': { latitude: 59.936081, longitude: 30.350325 },
+  'saint-petersburg-bar-kollektiv': { latitude: 59.941031, longitude: 30.350325 },
+  'saint-petersburg-bar-mishka': { latitude: 59.933215, longitude: 30.300067 },
+  'saint-petersburg-bar-orthodox': { latitude: 59.934149, longitude: 30.345869 },
+  'saint-petersburg-bar-zaliv': { latitude: 59.939864, longitude: 30.354394 },
+  'saint-petersburg-bar-zhan-zhak': { latitude: 59.929845, longitude: 30.354394 },
+  'saint-petersburg-bertgold-tsentr': { latitude: 59.928495, longitude: 30.312959 },
+  'saint-petersburg-bolshaya-morskaya': { latitude: 59.933857, longitude: 30.309088 },
+  'saint-petersburg-botanicheskiy-sad-petra-velikogo': { latitude: 59.970221, longitude: 30.337033 },
+  'saint-petersburg-buddiyskiy-datsan-gunzechoyney': { latitude: 59.983935, longitude: 30.256247 },
+  'saint-petersburg-cheburechnaya-salhino': { latitude: 59.954848, longitude: 30.321685 },
+  'saint-petersburg-chesmenskaya-tserkov': { latitude: 59.856985, longitude: 30.329712 },
+  'saint-petersburg-chizhik-pyzhik': { latitude: 59.941785, longitude: 30.338012 },
+  'saint-petersburg-divo-ostrov': { latitude: 59.972237, longitude: 30.245084 },
+  'saint-petersburg-dohodnyy-dom-badaeva': { latitude: 59.937215, longitude: 30.359871 },
+  'saint-petersburg-dohodnyy-dom-baka': { latitude: 59.944322, longitude: 30.360051 },
+  'saint-petersburg-dohodnyy-dom-bernshteyna': { latitude: 59.972322, longitude: 30.304561 },
+  'saint-petersburg-dohodnyy-dom-bubyrya': { latitude: 59.930438, longitude: 30.351657 },
+  'saint-petersburg-dohodnyy-dom-dernova-dom-s-bashney': { latitude: 59.941031, longitude: 30.380045 },
+  'saint-petersburg-dohodnyy-dom-eliseevyh-na-fontanke': { latitude: 59.928424, longitude: 30.334057 },
+  'saint-petersburg-dohodnyy-dom-gertsoga-leyhtenbergskogo': { latitude: 59.963489, longitude: 30.292311 },
+  'saint-petersburg-dohodnyy-dom-grabbe': { latitude: 59.941031, longitude: 30.345869 },
+  'saint-petersburg-dohodnyy-dom-hrenova': { latitude: 59.943187, longitude: 30.378900 },
+  'saint-petersburg-dohodnyy-dom-ioffa-pyat-uglov': { latitude: 59.926941, longitude: 30.341496 },
+  'saint-petersburg-dohodnyy-dom-kirillovyh': { latitude: 59.954605, longitude: 30.301476 },
+  'saint-petersburg-dohodnyy-dom-kleynmihel': { latitude: 59.945233, longitude: 30.328325 },
+  'saint-petersburg-dohodnyy-dom-kolobovyh': { latitude: 59.960144, longitude: 30.308254 },
+  'saint-petersburg-dohodnyy-dom-lyalevicha': { latitude: 59.897455, longitude: 30.283120 },
+  'saint-petersburg-dohodnyy-dom-meltsera': { latitude: 59.938175, longitude: 30.323041 },
+  'saint-petersburg-dohodnyy-dom-muruzi': { latitude: 59.942917, longitude: 30.348633 },
+  'saint-petersburg-dohodnyy-dom-nikonova': { latitude: 59.927115, longitude: 30.347312 },
+  'saint-petersburg-dohodnyy-dom-polezhaeva': { latitude: 59.913349, longitude: 30.276451 },
+  'saint-petersburg-dohodnyy-dom-ratkova-rozhnova-na-pestelya': { latitude: 59.942183, longitude: 30.344445 },
+  'saint-petersburg-dohodnyy-dom-rozenshteyna-dom-s-bashnyami': { latitude: 59.966455, longitude: 30.312959 },
+  'saint-petersburg-dohodnyy-dom-shreybera': { latitude: 59.924822, longitude: 30.334057 },
+  'saint-petersburg-dohodnyy-dom-smirnova': { latitude: 59.940713, longitude: 30.285885 },
+  'saint-petersburg-dohodnyy-dom-stanovogo': { latitude: 59.934898, longitude: 30.373400 },
+  'saint-petersburg-dohodnyy-dom-stepnova': { latitude: 59.944983, longitude: 30.342416 },
+  'saint-petersburg-dohodnyy-dom-tanskogo': { latitude: 59.956715, longitude: 30.334057 },
+  'saint-petersburg-dohodnyy-dom-vege': { latitude: 59.923835, longitude: 30.300067 },
+  'saint-petersburg-dom-s-sovami': { latitude: 59.960249, longitude: 30.301546 },
+  'saint-petersburg-dvorets-beloselskih-belozerskih': { latitude: 59.933215, longitude: 30.344445 },
+  'saint-petersburg-dvorets-velikogo-knyazya-vladimira-aleksandrovicha-dom': { latitude: 59.943615, longitude: 30.320140 },
+  'saint-petersburg-dvortsovaya-naberezhnaya': { latitude: 59.943105, longitude: 30.321685 },
+  'saint-petersburg-dvortsovaya-ploschad': { latitude: 59.939095, longitude: 30.315868 },
+  'saint-petersburg-dvortsovyy-most': { latitude: 59.941031, longitude: 30.308256 },
+  'saint-petersburg-egipetskiy-dom-dom-zaharova': { latitude: 59.948242, longitude: 30.360051 },
+  'saint-petersburg-elaginoostrovskiy-dvorets': { latitude: 59.979679, longitude: 30.259972 },
+  'saint-petersburg-fudmoll-vokzal-1853': { latitude: 59.907080, longitude: 30.297491 },
+  'saint-petersburg-gastrobar-harvest': { latitude: 59.948242, longitude: 30.297491 },
+  'saint-petersburg-glavnyy-shtab-ermitazh': { latitude: 59.937243, longitude: 30.320140 },
+  'saint-petersburg-gostinyy-dvor-passazh': { latitude: 59.934447, longitude: 30.332995 },
+  'saint-petersburg-grand-maket-rossiya': { latitude: 59.887532, longitude: 30.329107 },
+  'saint-petersburg-grand-otel-evropa-lobbi-bar': { latitude: 59.935835, longitude: 30.331580 },
+  'saint-petersburg-isaakievskiy-sobor': { latitude: 59.934084, longitude: 30.306103 },
+  'saint-petersburg-kafe-rubinshteyn': { latitude: 59.930438, longitude: 30.342416 },
+  'saint-petersburg-kafe-zoom': { latitude: 59.932204, longitude: 30.319717 },
+  'saint-petersburg-kamennoostrovskiy-prospekt': { latitude: 59.964257, longitude: 30.312959 },
+  'saint-petersburg-kamennyy-ostrov': { latitude: 59.977464, longitude: 30.301546 },
+  'saint-petersburg-kazanskiy-sobor': { latitude: 59.934165, longitude: 30.324513 },
+  'saint-petersburg-kofeynya-tchk': { latitude: 59.960249, longitude: 30.316472 },
+  'saint-petersburg-kokteylnyy-bar-xander': { latitude: 59.934898, longitude: 30.306894 },
+  'saint-petersburg-kolomna': { latitude: 59.923184, longitude: 30.285885 },
+  'saint-petersburg-kolonnada-isaakiya': { latitude: 59.933946, longitude: 30.306440 },
+  'saint-petersburg-konditerskaya-sever-metropol': { latitude: 59.934447, longitude: 30.334057 },
+  'saint-petersburg-konditerskaya-troyka': { latitude: 59.924822, longitude: 30.338575 },
+  'saint-petersburg-kryukov-kanal': { latitude: 59.9268, longitude: 30.2952 },
+  'saint-petersburg-kunstkamera': { latitude: 59.941434, longitude: 30.304561 },
+  'saint-petersburg-leningradskiy-zoopark': { latitude: 59.952541, longitude: 30.307842 },
+  'saint-petersburg-letniy-sad': { latitude: 59.944903, longitude: 30.335552 },
+  'saint-petersburg-linii-vasilevskogo-ostrova': { latitude: 59.938171, longitude: 30.276451 },
+  'saint-petersburg-literaturno-memorialnyy-muzey-dostoevskogo': { latitude: 59.926941, longitude: 30.350325 },
+  'saint-petersburg-literaturnoe-kafe-volf-i-beranzhe': { latitude: 59.936384, longitude: 30.319717 },
+  'saint-petersburg-loft-proekt-etazhi': { latitude: 59.922112, longitude: 30.355675 },
+  'saint-petersburg-lvinyy-most': { latitude: 59.926944, longitude: 30.301111 },
+  'saint-petersburg-malaya-sadovaya-ulitsa': { latitude: 59.934375, longitude: 30.337968 },
+  'saint-petersburg-mariinskiy-dvorets': { latitude: 59.931210, longitude: 30.308256 },
+  'saint-petersburg-marsovo-pole': { latitude: 59.943180, longitude: 30.331580 },
+  'saint-petersburg-mednyy-vsadnik': { latitude: 59.936384, longitude: 30.302194 },
+  'saint-petersburg-mihaylovskiy-sad': { latitude: 59.940713, longitude: 30.332304 },
+  'saint-petersburg-mihaylovskiy-zamok': { latitude: 59.940156, longitude: 30.338576 },
+  'saint-petersburg-moskovskiy-rynok': { latitude: 59.879679, longitude: 30.323041 },
+  'saint-petersburg-mozaichnyy-dvorik': { latitude: 59.946055, longitude: 30.340051 },
+  'saint-petersburg-mramornyy-dvorets': { latitude: 59.944983, longitude: 30.327092 },
+  'saint-petersburg-muzey-anny-ahmatovoy-v-fontannom-dome': { latitude: 59.936081, longitude: 30.345869 },
+  'saint-petersburg-muzey-faberzhe': { latitude: 59.934488, longitude: 30.342111 },
+  'saint-petersburg-muzey-magii': { latitude: 59.932822, longitude: 30.349940 },
+  'saint-petersburg-muzey-oborony-i-blokady-leningrada': { latitude: 59.943187, longitude: 30.340798 },
+  'saint-petersburg-muzey-politicheskoy-istorii-osobnyak-kshesinskoy': { latitude: 59.954848, longitude: 30.327694 },
+  'saint-petersburg-muzey-sovetskih-igrovyh-avtomatov': { latitude: 59.941617, longitude: 30.326886 },
+  'saint-petersburg-muzey-zheleznyh-dorog-rossii': { latitude: 59.907080, longitude: 30.307399 },
+  'saint-petersburg-naberezhnaya-fontanki': { latitude: 59.930438, longitude: 30.334057 },
+  'saint-petersburg-naberezhnaya-kanala-griboedova': { latitude: 59.931210, longitude: 30.312984 },
+  'saint-petersburg-naberezhnaya-reki-moyki': { latitude: 59.932906, longitude: 30.318469 },
+  'saint-petersburg-nevskiy-prospekt': { latitude: 59.934271, longitude: 30.334460 },
+  'saint-petersburg-nikolaevskiy-dvorets-dvorets-truda': { latitude: 59.930491, longitude: 30.294154 },
+  'saint-petersburg-nikolo-bogoyavlenskiy-morskoy-sobor': { latitude: 59.922115, longitude: 30.300067 },
+  'saint-petersburg-novaya-gollandiya': { latitude: 59.930030, longitude: 30.289389 },
+  'saint-petersburg-novo-mihaylovskiy-dvorets': { latitude: 59.943180, longitude: 30.323041 },
+  'saint-petersburg-obschestvennoe-prostranstvo-dvor-gostinki': { latitude: 59.933946, longitude: 30.332995 },
+  'saint-petersburg-okeanarium': { latitude: 59.919131, longitude: 30.338575 },
+  'saint-petersburg-osobnyak-brusnitsynyh': { latitude: 59.922115, longitude: 30.251411 },
+  'saint-petersburg-osobnyak-chaeva': { latitude: 59.964257, longitude: 30.323041 },
+  'saint-petersburg-osobnyak-forostovskogo': { latitude: 59.941031, longitude: 30.283120 },
+  'saint-petersburg-osobnyak-forsha-dacha-gausvald': { latitude: 59.977464, longitude: 30.283120 },
+  'saint-petersburg-osobnyak-kelha': { latitude: 59.944645, longitude: 30.354394 },
+  'saint-petersburg-osobnyak-kochubeya-dom-s-mavrami': { latitude: 59.933857, longitude: 30.297491 },
+  'saint-petersburg-osobnyak-myasnikova': { latitude: 59.942183, longitude: 30.364257 },
+  'saint-petersburg-osobnyak-novinskih': { latitude: 59.942917, longitude: 30.276451 },
+  'saint-petersburg-osobnyak-polovtsova-dom-arhitektora': { latitude: 59.931210, longitude: 30.304561 },
+  'saint-petersburg-osobnyak-rumyantseva': { latitude: 59.933946, longitude: 30.289389 },
+  'saint-petersburg-osobnyak-trubetskih-naryshkinyh': { latitude: 59.944322, longitude: 30.352101 },
+  'saint-petersburg-osobnyak-ziva': { latitude: 59.914257, longitude: 30.276451 },
+  'saint-petersburg-paradnaya-romashka-dom-eliseeva': { latitude: 59.928731, longitude: 30.338575 },
+  'saint-petersburg-peshehodnaya-malaya-konyushennaya': { latitude: 59.936647, longitude: 30.324836 },
+  'saint-petersburg-petrogradskaya-naberezhnaya': { latitude: 59.957580, longitude: 30.337090 },
+  'saint-petersburg-petropavlovskaya-krepost': { latitude: 59.950239, longitude: 30.316472 },
+  'saint-petersburg-petrovskaya-akvatoriya': { latitude: 59.936081, longitude: 30.314811 },
+  'saint-petersburg-pivnoy-bar-dikkens': { latitude: 59.923835, longitude: 30.323041 },
+  'saint-petersburg-poceluev-most': { latitude: 59.928889, longitude: 30.295833 },
+  'saint-petersburg-primorskiy-park-pobedy-krestovskiy-ostrov': { latitude: 59.971034, longitude: 30.245842 },
+  'saint-petersburg-primorskiy-prospekt-park-300-letiya': { latitude: 59.983056, longitude: 30.205216 },
+  'saint-petersburg-pushkinskaya-10': { latitude: 59.928731, longitude: 30.357580 },
+  'saint-petersburg-pyshechnaya-na-bolshoy-konyushennoy': { latitude: 59.938363, longitude: 30.322886 },
+  'saint-petersburg-restoran-animals': { latitude: 59.937243, longitude: 30.364257 },
+  'saint-petersburg-restoran-birch': { latitude: 59.944322, longitude: 30.349141 },
+  'saint-petersburg-restoran-blok': { latitude: 59.944955, longitude: 30.368576 },
+  'saint-petersburg-restoran-il-lago-dei-cigni': { latitude: 59.977464, longitude: 30.231201 },
+  'saint-petersburg-restoran-kokoko': { latitude: 59.930030, longitude: 30.289389 },
+  'saint-petersburg-restoran-koryushka': { latitude: 59.948792, longitude: 30.316472 },
+  'saint-petersburg-restoran-mama-tuta': { latitude: 59.948242, longitude: 30.304561 },
+  'saint-petersburg-restoran-mansarda': { latitude: 59.933857, longitude: 30.304561 },
+  'saint-petersburg-restoran-metropol': { latitude: 59.932822, longitude: 30.331201 },
+  'saint-petersburg-restoran-palkin': { latitude: 59.932822, longitude: 30.347312 },
+  'saint-petersburg-restoran-percorso': { latitude: 59.934898, longitude: 30.306894 },
+  'saint-petersburg-restoran-sintez': { latitude: 59.907080, longitude: 30.285885 },
+  'saint-petersburg-restoran-stroganov-steyk-haus': { latitude: 59.933215, longitude: 30.300067 },
+  'saint-petersburg-restoran-teplo': { latitude: 59.931393, longitude: 30.302194 },
+  'saint-petersburg-rotonda-na-gorohovoy': { latitude: 59.925488, longitude: 30.326261 },
+  'saint-petersburg-russkiy-muzey': { latitude: 59.938634, longitude: 30.332170 },
+  'saint-petersburg-ryumochnaya-mayak': { latitude: 59.938363, longitude: 30.352101 },
+  'saint-petersburg-semimoste': { latitude: 59.9275, longitude: 30.2958 },
+  'saint-petersburg-sevkabel-port': { latitude: 59.924403, longitude: 30.240763 },
+  'saint-petersburg-sheremetevskiy-dvorets-fontannyy-dom': { latitude: 59.936384, longitude: 30.346894 },
+  'saint-petersburg-sidreriya-sidr-i-nensi': { latitude: 59.939131, longitude: 30.354394 },
+  'saint-petersburg-smolenskoe-lyuteranskoe-kladbische': { latitude: 59.943187, longitude: 30.254394 },
+  'saint-petersburg-smolnyy-sobor': { latitude: 59.948958, longitude: 30.395724 },
+  'saint-petersburg-smotrovaya-lahta-tsentra': { latitude: 59.987178, longitude: 30.177242 },
+  'saint-petersburg-sobornaya-mechet': { latitude: 59.9552, longitude: 30.3239 },
+  'saint-petersburg-spas-na-krovi': { latitude: 59.940114, longitude: 30.328886 },
+  'saint-petersburg-spikizi-bar-el-copitas': { latitude: 59.928424, longitude: 30.345869 },
+  'saint-petersburg-strelka-vasilevskogo-ostrova': { latitude: 59.944200, longitude: 30.306894 },
+  'saint-petersburg-stroganovskiy-dvorets': { latitude: 59.935835, longitude: 30.321685 },
+  'saint-petersburg-tavricheskiy-sad': { latitude: 59.944955, longitude: 30.373400 },
+  'saint-petersburg-tolstovskiy-dom': { latitude: 59.929845, longitude: 30.342416 },
+  'saint-petersburg-trete-mesto': { latitude: 59.934898, longitude: 30.349141 },
+  'saint-petersburg-troitskiy-most': { latitude: 59.948792, longitude: 30.327533 },
+  'saint-petersburg-tsentralnyy-voenno-morskoy-muzey': { latitude: 59.930491, longitude: 30.294154 },
+  'saint-petersburg-tsirk-chinizelli': { latitude: 59.938363, longitude: 30.341496 },
+  'saint-petersburg-tspkio-im-kirova-elagin-ostrov': { latitude: 59.979679, longitude: 30.259972 },
+  'saint-petersburg-ulitsa-rubinshteyna': { latitude: 59.931393, longitude: 30.344445 },
+  'saint-petersburg-ulitsa-zodchego-rossi': { latitude: 59.930064, longitude: 30.336495 },
+  'saint-petersburg-universitetskaya-naberezhnaya': { latitude: 59.938722, longitude: 30.297491 },
+  'saint-petersburg-usadba-demidovyh': { latitude: 59.931393, longitude: 30.316472 },
+  'saint-petersburg-usadba-e-r-dashkovoy-kiryanovo': { latitude: 59.887532, longitude: 30.264257 },
+  'saint-petersburg-vasileostrovskiy-rynok': { latitude: 59.938634, longitude: 30.285885 },
+  'saint-petersburg-vegetarianskoe-kafe-rada-k': { latitude: 59.929112, longitude: 30.324976 },
+  'saint-petersburg-vitebskiy-vokzal': { latitude: 59.919782, longitude: 30.328325 },
+  'saint-petersburg-vladimirskiy-sobor': { latitude: 59.927649, longitude: 30.348128 },
+  'saint-petersburg-yusupovskiy-dvorets': { latitude: 59.929112, longitude: 30.302302 },
+  'saint-petersburg-yusupovskiy-sad': { latitude: 59.924294, longitude: 30.317506 },
+  'saint-petersburg-zoologicheskiy-muzey-ran': { latitude: 59.942183, longitude: 30.305630 },
+};
+
+/** Perm fallback coords (cityInfo items also carry lat/lng for my-day). */
+const PERM_COORDS: Record<string, EditorialPlaceCoords> = {
+  // South-bank promenade (Monastyrskaya / Kama embankment) - not mid-river.
+  'naberezhnaya-kamy': PERM_NABEREZHNAYA_KAMY_COORDS,
+  // Plaza by river station, south of waterline letters.
+  'perm-schaste-ne-za-gorami': PERM_SCHASTE_COORDS,
+  'permskaya-esplanada': { latitude: 58.0105, longitude: 56.2285 },
+  // Owner Yandex 2026-08-14: Skver Mamina-Sibiryaka, not railway/embankment pin.
+  'perm-sobornaya-ploschad': PERM_CATHEDRAL_SQUARE_COORDS,
+  'perm-starokirpichnyy-pereulok': { latitude: 58.0139, longitude: 56.2427 },
+  'perm-park-gorkogo': { latitude: 58.0051, longitude: 56.2524 },
+  'perm-rayskiy-sad': { latitude: 58.0315, longitude: 56.3129 },
+  'permskaya-galereya': { latitude: 58.0175, longitude: 56.2541 },
+  'perm-muzey-permskikh-drevnostey': { latitude: 58.0125, longitude: 56.2494 },
+  'perm-dom-meshkova': { latitude: 58.01875, longitude: 56.24655 },
+  'perm-permm': { latitude: 58.0104, longitude: 56.2166 },
+  'perm-teatr-opery-i-baleta': { latitude: 58.0161, longitude: 56.2479 },
+  'teatr-teatr': { latitude: 58.0091, longitude: 56.2185 },
+  'perm-muzey-motovilihinskih-zavodov': { latitude: 58.0339, longitude: 56.3155 },
+  'perm-muzey-diorama-vyshka': { latitude: 58.0345, longitude: 56.3216 },
+  'perm-cgk': { latitude: 58.0108, longitude: 56.2494 },
+  'perm-maris-art': { latitude: 58.0305, longitude: 56.3023 },
+  'perm-galereya-2517': { latitude: 58.0138, longitude: 56.2497 },
+  'perm-park-nauki-nyuton': { latitude: 57.9995, longitude: 56.2625 },
+  'perm-zavod-shpagina': { latitude: 58.0202, longitude: 56.2554 },
+  'permsky-solenye-ushi': { latitude: 58.0108, longitude: 56.2415 },
+  'perm-permskiy-medved': { latitude: 58.0116, longitude: 56.2393 },
+  'perm-dom-gribushina': { latitude: 58.0177, longitude: 56.2514 },
+  'perm-bashnya-smerti': { latitude: 57.9944, longitude: 56.2573 },
+  'perm-sobor-petra-i-pavla': { latitude: 58.0185, longitude: 56.2559 },
+  'perm-voznesenskaya-tserkov': { latitude: 58.0069, longitude: 56.2291 },
+  'perm-park-kamney-permskie-vorota': { latitude: 58.0035, longitude: 56.1916 },
+  'perm-chomga': { latitude: 58.0055, longitude: 56.2519 },
+  'perm-permskie-posikunchiki': { latitude: 58.0135, longitude: 56.2412 },
+  'perm-nolan-wine-kitchen': { latitude: 58.012115, longitude: 56.238415 },
+  'perm-belka': { latitude: 58.0108, longitude: 56.2505 },
+  'perm-partizan': { latitude: 58.0169, longitude: 56.2345 },
+  'perm-demidovskaya-pivovarnya': { latitude: 58.0133, longitude: 56.2435 },
+  'perm-cup-by-cup': { latitude: 58.009415, longitude: 56.249415 },
+  'perm-gastroport': { latitude: 58.0183, longitude: 56.2163 },
+  'muzej-hohlovka': { latitude: 58.26186, longitude: 56.26314 },
+  'perm-kungur': { latitude: 57.4333, longitude: 56.95 },
+  'perm-kungurskaya-ledyanaya-peshchera': { latitude: 57.440263, longitude: 57.006206 },
+  'perm-belaya-gora': { latitude: 57.39202, longitude: 56.229 },
+  'perm-belogorskiy-monastyr': { latitude: 57.392398, longitude: 56.229415 },
+  'perm-gubakha-usva': { latitude: 58.723, longitude: 57.633 },
+  'perm-usvinskie-stolby': { latitude: 58.653457, longitude: 57.568472 },
+  'perm-kamennyy-gorod': { latitude: 58.723049, longitude: 57.633454 },
+};
+
+const EDITORIAL_COORDS_BY_SLUG: Record<string, EditorialPlaceCoords> = {
+  ...NIZHNY_NOVGOROD_COORDS,
+  ...SAINT_PETERSBURG_COORDS,
+  ...PERM_COORDS,
+};
+
+export function lookupEditorialPlaceCoords(
+  slug: string | null | undefined,
+): EditorialPlaceCoords | null {
+  const key = String(slug || '')
+    .trim()
+    .toLowerCase();
+  if (!key) return null;
+  return EDITORIAL_COORDS_BY_SLUG[key] || null;
+}
+
+function editorialSlugKey(slug: string | null | undefined): string {
+  return String(slug || '')
+    .trim()
+    .toLowerCase();
+}
+
+/**
+ * When curated coords exist and the live/LS/hub pin is missing, mid-river, or far
+ * from editorial, return the curated pair so My Day can rebase without a LS wipe.
+ */
+export function pickEditorialPlaceCoordsIfStale(
+  slug: string | null | undefined,
+  latitude?: number | null,
+  longitude?: number | null,
+): EditorialPlaceCoords | null {
+  const editorial = lookupEditorialPlaceCoords(slug);
+  if (!editorial) return null;
+  const lat = Number(latitude);
+  const lng = Number(longitude);
+  if (!isValidCoordinatePair(lat, lng)) return editorial;
+  const key = editorialSlugKey(slug);
+  if (PERM_KAMA_WATERFRONT_SLUGS.has(key) && lat > PERM_KAMA_WATERFRONT_MAX_LAT) {
+    return editorial;
+  }
+  if (PERM_CATHEDRAL_SQUARE_SLUGS.has(key) && lng > 56.2365) {
+    return editorial;
+  }
+  if (haversineMeters(lat, lng, editorial.latitude, editorial.longitude) > EDITORIAL_COORDS_REBASE_METERS) {
+    return editorial;
+  }
+  return null;
+}

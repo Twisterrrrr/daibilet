@@ -1,0 +1,780 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@keyframes nav-progress {
+  0% {
+    transform: scaleX(0.12);
+  }
+  50% {
+    transform: scaleX(0.7);
+  }
+  100% {
+    transform: scaleX(0.92);
+  }
+}
+
+.nav-progress-bar {
+  animation: nav-progress 1.4s ease-out forwards;
+  transform-origin: left center;
+}
+
+html[data-nav-pending='1'] {
+  cursor: progress;
+}
+
+@layer base {
+  :root {
+    /* 60/30/10: white / graphite surfaces / brand blue CTA */
+    --background: 0 0% 100%;
+    --foreground: 210 9% 11%; /* #1A1D20 graphite */
+    --card: 0 0% 100%;
+    --card-foreground: 210 9% 11%;
+    --primary: 221 83% 53%; /* brand blue ~#2563eb, близко к #0066FF */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 17% 98%; /* #F8F9FA */
+    --secondary-foreground: 210 9% 11%;
+    --muted: 210 17% 98%;
+    --muted-foreground: 215 10% 46%;
+    --border: 214 16% 91%;
+    --input: 214 16% 91%;
+    --ring: 221 83% 53%;
+    --urgency: 15 90% 55%;
+    --success: 145 60% 42%;
+    --graphite: 210 9% 11%;
+    --graphite-muted: 215 10% 46%;
+    --surface-muted: 210 17% 98%;
+    --radius: 1rem; /* 16px cards */
+    --radius-card: 1rem;
+    --shadow-card: 0 1px 2px hsl(210 9% 11% / 0.04), 0 4px 16px hsl(210 9% 11% / 0.05);
+    --shadow-card-hover: 0 4px 12px hsl(210 9% 11% / 0.07), 0 12px 28px hsl(210 9% 11% / 0.06);
+    --space-section: 4.5rem; /* 72px - slightly more mobile whitespace between home sections */
+    --space-section-lg: 5.5rem; /* 88px */
+    --space-card: 1rem; /* 16px */
+    --space-card-lg: 1.5rem; /* 24px */
+    --gradient-hero: linear-gradient(180deg, hsl(221, 83%, 53%) 0%, hsl(221, 83%, 42%) 100%);
+    /* next/font CSS variables on <html>; fallbacks for first paint / SSR */
+    --font-body: var(--font-inter), system-ui, sans-serif;
+    --font-display: var(--font-manrope), var(--font-inter), system-ui, sans-serif;
+    --font-serif: var(--font-source-serif), Georgia, 'Times New Roman', serif;
+    --site-header-height: 4rem;
+    --site-header-height-compact: 3.25rem;
+    --bridges-gradient-hero: radial-gradient(ellipse 90% 70% at 70% 40%, oklch(0.38 0.14 265 / 0.9), transparent 70%),
+      linear-gradient(135deg, oklch(0.22 0.10 265), oklch(0.30 0.13 262));
+    --bridges-gradient-amber: linear-gradient(135deg, oklch(0.78 0.17 55), oklch(0.70 0.19 40));
+    --bridges-shadow-glow: 0 20px 60px -20px oklch(0.72 0.17 55 / 0.35);
+    --bridges-hero-glow: oklch(0.72 0.17 55 / 0.1);
+    /* Shared landing hero atmosphere (bridges-inspired, category-adapted - CV.L-Hero) */
+    --landing-hero-glow: oklch(0.78 0.12 55 / 0.12);
+    --seasonal-gradient-hero: radial-gradient(ellipse 90% 70% at 70% 35%, oklch(0.36 0.10 255 / 0.85), transparent 70%),
+      linear-gradient(135deg, oklch(0.20 0.08 260), oklch(0.28 0.10 250));
+    --newyear-gradient-hero: radial-gradient(ellipse 85% 65% at 65% 30%, oklch(0.42 0.12 250 / 0.75), transparent 68%),
+      radial-gradient(ellipse 50% 40% at 20% 80%, oklch(0.55 0.14 55 / 0.22), transparent 60%),
+      linear-gradient(145deg, oklch(0.18 0.07 265), oklch(0.26 0.09 255));
+    --newyear-hero-glow: oklch(0.78 0.14 55 / 0.14);
+    --river-gradient-hero: radial-gradient(ellipse 90% 70% at 72% 38%, oklch(0.40 0.10 230 / 0.75), transparent 70%),
+      linear-gradient(140deg, oklch(0.20 0.06 240), oklch(0.30 0.09 220));
+    --river-hero-glow: oklch(0.72 0.10 210 / 0.12);
+    --bus-gradient-hero: radial-gradient(ellipse 88% 68% at 68% 32%, oklch(0.38 0.08 200 / 0.7), transparent 68%),
+      linear-gradient(145deg, oklch(0.19 0.04 230), oklch(0.28 0.06 195));
+    --bus-hero-glow: oklch(0.75 0.08 190 / 0.1);
+    --dinner-gradient-hero: radial-gradient(ellipse 85% 65% at 70% 28%, oklch(0.36 0.10 40 / 0.55), transparent 65%),
+      linear-gradient(150deg, oklch(0.16 0.05 280), oklch(0.24 0.07 30));
+    --dinner-hero-glow: oklch(0.72 0.14 55 / 0.12);
+    --default-gradient-hero: radial-gradient(ellipse 90% 70% at 70% 36%, oklch(0.36 0.11 255 / 0.8), transparent 70%),
+      linear-gradient(140deg, oklch(0.18 0.07 265), oklch(0.27 0.10 250));
+    --rooftop-gradient-hero: radial-gradient(ellipse 90% 70% at 65% 25%, oklch(0.42 0.10 250 / 0.55), transparent 65%),
+      linear-gradient(160deg, oklch(0.17 0.05 270), oklch(0.26 0.07 40));
+    --rooftop-hero-glow: oklch(0.78 0.12 55 / 0.1);
+    --planetarium-gradient-hero: radial-gradient(ellipse 80% 60% at 50% 20%, oklch(0.45 0.14 265 / 0.55), transparent 60%),
+      linear-gradient(180deg, oklch(0.14 0.06 280), oklch(0.22 0.08 260));
+    --planetarium-hero-glow: oklch(0.70 0.12 280 / 0.12);
+    --stage-gradient-hero: radial-gradient(ellipse 90% 65% at 50% 0%, oklch(0.40 0.12 40 / 0.45), transparent 55%),
+      linear-gradient(180deg, oklch(0.16 0.05 270), oklch(0.24 0.07 255));
+    --stage-hero-glow: oklch(0.75 0.14 55 / 0.12);
+    --family-gradient-hero: radial-gradient(ellipse 90% 70% at 70% 35%, oklch(0.42 0.09 210 / 0.65), transparent 70%),
+      linear-gradient(140deg, oklch(0.20 0.05 230), oklch(0.30 0.07 195));
+    --family-hero-glow: oklch(0.78 0.10 90 / 0.1);
+    --country-gradient-hero: radial-gradient(ellipse 90% 70% at 75% 30%, oklch(0.40 0.08 145 / 0.45), transparent 68%),
+      linear-gradient(145deg, oklch(0.18 0.04 150), oklch(0.26 0.06 120));
+    --country-hero-glow: oklch(0.72 0.10 130 / 0.1);
+    --party-gradient-hero: radial-gradient(ellipse 85% 65% at 60% 25%, oklch(0.42 0.12 25 / 0.45), transparent 65%),
+      linear-gradient(150deg, oklch(0.16 0.05 280), oklch(0.26 0.08 35));
+    --party-hero-glow: oklch(0.72 0.14 40 / 0.1);
+  }
+
+  @media (min-width: 1024px) {
+    :root {
+      --site-header-height: 4.5rem;
+      --site-header-height-compact: 3.5rem;
+    }
+  }
+
+  /*
+   * Compact header is visual-only (padding / desktop nav). Never shrink
+   * --site-header-height here: spacer + sticky tops would jump on scroll (mobile jitter).
+   */
+  html.site-header-compact {
+    /* reserved for non-layout cues if needed */
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    scroll-behavior: smooth;
+    overflow-x: clip;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: var(--font-body);
+    font-size: 0.875rem; /* 14px UI base */
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    -webkit-tap-highlight-color: transparent;
+    overflow-x: clip;
+  }
+
+  .site-header-spacer {
+    height: calc(var(--site-header-height) + env(safe-area-inset-top, 0px));
+  }
+
+  /* Color intentionally NOT set here: photo-overlay cards use text-white;
+     element color would beat inherited utilities and darken titles on photos. */
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    @apply font-bold tracking-tight;
+  }
+
+  /* Dark / photo surfaces: headings inherit surface text (not body graphite). */
+  :where(.text-white, .bg-slate-900, .bg-slate-950, .bg-graphite, .bg-emerald-900) :is(h1, h2, h3, h4) {
+    color: inherit;
+  }
+
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  /* /my-day: Lovable parity - Manrope for UI + titles (not Inter body). */
+  [data-day-list-root],
+  [data-my-day-shell],
+  [data-my-day-picker-sheet],
+  [data-my-day-picker-launch] {
+    font-family: var(--font-display);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .font-serif {
+    font-family: var(--font-serif);
+  }
+
+  button:not(.inline-btn):not(.event-favorite-btn):not(.tc-widget-trigger),
+  select {
+    min-height: 44px;
+  }
+
+  /*
+   * My Day: 44px min-height on text/icon buttons inflates an invisible hit-box
+   * over neighbouring links (city scope, hub, stop titles). Cursor then
+   * oscillates pointer/default. Explicit min-h-* utilities still win.
+   */
+  [data-day-list-root] button,
+  [data-my-day-topbar] button,
+  [data-my-day-picker-sheet] button,
+  [data-my-day-shell] button {
+    min-height: 0;
+  }
+
+  .catalog-advanced-filters button,
+  .catalog-advanced-filters select,
+  .catalog-advanced-filters input[type='date'],
+  .catalog-advanced-filters input[type='number'] {
+    min-height: 0;
+  }
+
+  .event-favorite-btn {
+    min-height: 0;
+    min-width: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  /**
+   * Full-bleed breakout: stretch a nested band to viewport width without
+   * horizontal page scroll (pair with overflow-x-hidden on a page shell).
+   * Prefer section-level bg on already-full-width siblings when possible.
+   */
+  .breakout {
+    position: relative;
+    left: 50%;
+    right: 50%;
+    width: 100vw;
+    margin-left: -50vw;
+    margin-right: -50vw;
+  }
+
+  /**
+   * Home city rail: left aligns with container-page gutter; right bleeds to edge.
+   */
+  .home-bleed-rail {
+    padding-left: max(1rem, calc((100vw - 80rem) / 2 + 1rem));
+  }
+
+  @media (min-width: 640px) {
+    .home-bleed-rail {
+      padding-left: max(1.5rem, calc((100vw - 80rem) / 2 + 1.5rem));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .home-bleed-rail {
+      padding-left: max(2rem, calc((100vw - 80rem) / 2 + 2rem));
+    }
+  }
+
+  /**
+   * My Day band: dashed route arcs only (no map pins / markers).
+   * Strong sky tint + high-opacity lines so the section reads decorated.
+   */
+  .home-myday-map-band {
+    background-color: #c5e4f6;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='280' viewBox='0 0 640 280' fill='none'%3E%3Cpath d='M48 210 C120 70, 200 240, 280 110 C340 40, 400 190, 480 90 C540 35, 580 150, 620 115' stroke='%230ea5e9' stroke-width='2' stroke-dasharray='5 7' stroke-linecap='round' opacity='0.92'/%3E%3Cpath d='M20 120 C90 185, 150 45, 230 155 C300 230, 370 55, 450 140 C520 200, 570 70, 630 175' stroke='%230284c7' stroke-width='1.75' stroke-dasharray='4 8' stroke-linecap='round' opacity='0.78'/%3E%3Cpath d='M100 40 C180 100, 260 20, 340 90 C420 160, 500 50, 580 100' stroke='%2338bdf8' stroke-width='1.6' stroke-dasharray='3 9' stroke-linecap='round' opacity='0.88'/%3E%3C/svg%3E");
+    background-size: 640px 280px;
+    background-repeat: repeat;
+  }
+
+  /**
+   * «Куда поехать» band: dashed/wavy route lines only (no pins, compass, skyline).
+   */
+  .home-trips-map-band {
+    background-color: #c5e4f6;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='720' height='320' viewBox='0 0 720 320' fill='none'%3E%3Cpath d='M0 72 Q90 48 180 78 T360 68 T540 88 T720 60' stroke='%230ea5e9' stroke-width='1.9' stroke-dasharray='2 11' stroke-linecap='round' opacity='0.9'/%3E%3Cpath d='M0 168 Q110 198 220 160 T440 178 T720 150' stroke='%230284c7' stroke-width='1.7' stroke-dasharray='10 5 2 7' stroke-linecap='round' opacity='0.8'/%3E%3Cpath d='M0 248 Q140 220 280 255 T560 240 T720 268' stroke='%2338bdf8' stroke-width='1.55' stroke-dasharray='1 9' stroke-linecap='round' opacity='0.86'/%3E%3C/svg%3E");
+    background-size: 720px 320px;
+    background-repeat: repeat;
+  }
+
+  /**
+   * Popular cities rail: full-bleed track; peeks past both edges; seamless loop.
+   * Initial scroll left-aligns Moscow under the H2 (see HomePopularCitiesRail).
+   */
+  .home-edge-cities-rail {
+    width: 100%;
+    overflow-x: auto;
+    overscroll-behavior: contain;
+    overscroll-behavior-x: contain;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+    /* Instant reposition for seamless infinite loop (override horizontal-snap-row). */
+    scroll-behavior: auto;
+  }
+
+  .catalog-chip-active {
+    @apply bg-primary-600 text-white;
+  }
+
+  .catalog-toolbar {
+    @apply border-b border-slate-200/60 bg-white/90 backdrop-blur-md supports-[backdrop-filter]:bg-white/80;
+  }
+
+  .catalog-chip {
+    @apply inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium text-graphite-muted transition hover:bg-surface-muted hover:text-graphite focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 sm:min-h-8;
+  }
+
+  .catalog-chip-idle {
+    @apply border-0 bg-[#F5F5F7] text-[#6E6E73] hover:bg-[#EBEBED] hover:text-graphite;
+  }
+
+  .catalog-chip-on {
+    @apply border-0 bg-primary text-white hover:bg-primary/90 hover:text-white;
+  }
+
+  .catalog-quick-chip {
+    @apply inline-flex min-h-8 shrink-0 items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 sm:min-h-8 sm:text-sm;
+  }
+
+  .catalog-quick-chip-idle {
+    @apply border-0 bg-[#F5F5F7] text-[#6E6E73] hover:bg-[#EBEBED] hover:text-graphite;
+  }
+
+  .catalog-quick-chip-on {
+    @apply border-0 bg-primary text-white hover:bg-primary/90;
+  }
+
+  .catalog-date-chip {
+    @apply inline-flex min-h-9 min-w-[2.75rem] shrink-0 items-center justify-center rounded-full px-3 py-1.5 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50;
+  }
+
+  .catalog-date-chip-idle {
+    @apply border-0 bg-[#F5F5F7] text-[#6E6E73] hover:bg-[#EBEBED] hover:text-graphite;
+  }
+
+  .catalog-date-chip-on {
+    @apply border-0 bg-primary text-white hover:bg-primary/90 hover:text-white;
+  }
+
+  .horizontal-snap-row {
+    @apply w-full min-w-0 max-w-full overflow-x-auto overscroll-x-contain scroll-smooth pb-2;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    /* pan-x alone traps vertical page scroll while the finger is on tall
+       event/article cards (most of the mobile viewport). Keep sideways swipe. */
+    touch-action: pan-x pan-y;
+  }
+
+  .horizontal-snap-row::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .horizontal-snap-row::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-slate-300;
+  }
+
+  .horizontal-snap-track {
+    @apply flex w-max flex-nowrap gap-5 snap-x snap-mandatory sm:gap-6;
+  }
+
+  /* ~1.5 cards mobile peek; ~3-3.5 desktop (rest scroll). */
+  .horizontal-snap-card,
+  .showcase-rail-card {
+    @apply w-[min(68vw,260px)] shrink-0 snap-start sm:w-[280px] lg:w-[300px];
+  }
+
+  .section-y {
+    padding-top: var(--space-section);
+    padding-bottom: var(--space-section);
+  }
+
+  @media (min-width: 640px) {
+    .section-y {
+      padding-top: var(--space-section-lg);
+      padding-bottom: var(--space-section-lg);
+    }
+  }
+
+  .gradient-gold {
+    background: linear-gradient(135deg, hsl(40 95% 55%) 0%, hsl(42 100% 70%) 100%);
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-xl bg-primary-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:bg-primary-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 active:scale-[0.98] sm:px-6;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-graphite shadow-sm transition-all hover:bg-surface-muted active:scale-[0.98] sm:px-6;
+  }
+
+  /* Clean & Contextual: soft shadow, no hard grey frame */
+  .card {
+    @apply overflow-hidden rounded-card bg-white shadow-card transition-shadow hover:shadow-card-hover;
+  }
+
+  .card-link {
+    @apply block overflow-hidden rounded-card bg-white shadow-card transition hover:shadow-card-hover;
+  }
+
+  .event-card {
+    @apply relative flex h-full flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition-all duration-300;
+  }
+
+  @media (hover: hover) {
+    .event-card:hover {
+      @apply -translate-y-1 border-slate-200/80 shadow-card-hover;
+    }
+  }
+
+  .event-card-meta {
+    @apply inline-flex min-w-0 items-center gap-1 text-xs text-graphite-muted;
+  }
+
+  .event-card-meta-icon {
+    @apply hidden h-3.5 w-3.5 shrink-0 text-graphite-muted sm:inline;
+    stroke-width: 1.75;
+  }
+}
+
+@layer utilities {
+  .gradient-hero-lovable {
+    background: var(--gradient-hero);
+  }
+
+  .best-deal-ring {
+    @apply border-2 border-primary;
+    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.1);
+  }
+
+  .gradient-hero {
+    background: linear-gradient(135deg, hsl(220 55% 15%) 0%, hsl(220 50% 20%) 50%, hsl(220 45% 25%) 100%);
+  }
+
+  .gradient-salute-hero {
+    background:
+      radial-gradient(ellipse 120% 90% at 50% 20%, hsl(221 83% 52% / 0.45) 0%, transparent 55%),
+      linear-gradient(180deg, hsl(221 83% 48%) 0%, hsl(221 78% 36%) 55%, hsl(226 68% 28%) 100%);
+  }
+
+  .gradient-bridges-hero {
+    background: var(--bridges-gradient-hero);
+  }
+
+  .gradient-seasonal-hero {
+    background: var(--seasonal-gradient-hero);
+  }
+
+  .gradient-newyear-hero {
+    background: var(--newyear-gradient-hero);
+  }
+
+  .gradient-river-hero {
+    background: var(--river-gradient-hero);
+  }
+
+  .gradient-bus-hero {
+    background: var(--bus-gradient-hero);
+  }
+
+  .gradient-dinner-hero {
+    background: var(--dinner-gradient-hero);
+  }
+
+  .gradient-default-hero {
+    background: var(--default-gradient-hero);
+  }
+
+  .gradient-rooftop-hero {
+    background: var(--rooftop-gradient-hero);
+  }
+
+  .gradient-planetarium-hero {
+    background: var(--planetarium-gradient-hero);
+  }
+
+  .gradient-stage-hero {
+    background: var(--stage-gradient-hero);
+  }
+
+  .gradient-family-hero {
+    background: var(--family-gradient-hero);
+  }
+
+  .gradient-country-hero {
+    background: var(--country-gradient-hero);
+  }
+
+  .gradient-party-hero {
+    background: var(--party-gradient-hero);
+  }
+
+  .bridges-cta-gradient {
+    background-image: var(--bridges-gradient-amber);
+    box-shadow: var(--bridges-shadow-glow);
+  }
+
+  .bridges-landing h1,
+  .bridges-landing h2,
+  .bridges-landing h3,
+  .landing-hero-atmosphere h1 {
+    font-family: var(--font-body);
+  }
+
+  .text-gradient-gold {
+    background: linear-gradient(135deg, hsl(40 95% 55%) 0%, hsl(42 100% 70%) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .shadow-gold {
+    box-shadow: 0 8px 32px -8px hsl(40 95% 55% / 0.35);
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+}
+
+.tc-widget-container {
+  min-height: 80px;
+}
+
+.tc-widget-container iframe {
+  max-width: 100% !important;
+  border-radius: 16px;
+}
+
+.tc-session-slot {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  padding: 10px 12px !important;
+  border-radius: 8px !important;
+  background-color: #f8f9fa !important;
+  cursor: pointer !important;
+  font-family: inherit !important;
+  font-size: inherit !important;
+  box-sizing: border-box !important;
+  transition: background-color 0.15s, box-shadow 0.15s !important;
+  min-height: auto !important;
+  text-decoration: none !important;
+  color: inherit !important;
+}
+
+.tc-session-slot:hover {
+  background-color: #eff6ff !important;
+  box-shadow: 0 0 0 1px #bfdbfe !important;
+}
+
+/* Hidden TC vendor hook: must never intercept clicks on visible buy CTAs.
+   Catalog already used off-screen + pointer-events-none; landings did not. */
+.tc-widget-trigger {
+  position: fixed !important;
+  left: -9999px !important;
+  top: 0 !important;
+  overflow: hidden !important;
+  width: 1px !important;
+  height: 1px !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Vendor payment shells must sit above PurchaseOpeningHost (z-99990)
+   and EventVenueModal (z-99980). Teplohod Fancybox defaults are often ~9xxx
+   and otherwise render under our opening shell (unclickable). */
+.fancyboxtkt-container,
+.fancyboxtkt-bg,
+.fancyboxtkt-inner,
+.fancyboxtkt-slide,
+.fancyboxtkt-content,
+.fancybox-container,
+.fancybox-bg,
+.fancybox-inner,
+.fancybox-slide,
+.fancybox-content,
+.fancybox__container,
+.fancybox__backdrop {
+  z-index: 2147483000 !important;
+}
+
+/*
+  TicketsCloud popup: #tc-widget-overlay (backdrop, vendor inline ~1e9+3) +
+  classless fixed shell (inline ~1e9+4) holding iframe.tc-widget-frame_popup.
+  Raising ONLY the overlay via !important put the dimmer ABOVE the iframe
+  shell - widget looked "under" chrome / was unclickable.
+*/
+#tc-widget-overlay {
+  z-index: 2147482990 !important;
+}
+body > div:has(iframe.tc-widget-frame_popup),
+body > div:has(iframe[src*='ticketscloud']) {
+  z-index: 2147483000 !important;
+}
+.tc-widget-frame_popup,
+.tc-widget-container {
+  z-index: 2147483000 !important;
+}
+
+.tc-buy-btn {
+  appearance: none;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  line-height: inherit;
+  text-decoration: none;
+}
+
+@keyframes blog-hero-ken {
+  from {
+    transform: scale(1.06);
+    opacity: 0.72;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes blog-hero-rise {
+  from {
+    transform: translateY(0.85rem);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* OsmMapEmbed (Leaflet): transparent divIcon + stacking below page chrome */
+[data-osm-map='leaflet'].leaflet-container {
+  width: 100%;
+  z-index: 0;
+  font: inherit;
+}
+.daibilet-osm-marker {
+  background: transparent !important;
+  border: 0 !important;
+}
+
+/* My Day map pins: Lovable scale on active; owner hover = white invert */
+.daibilet-day-route-marker {
+  background: transparent !important;
+  border: 0 !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+.daibilet-day-pin {
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: 700 12px / 1 system-ui, sans-serif;
+  cursor: pointer;
+  border: 2px solid #fff;
+  background: hsl(var(--primary));
+  color: #fff;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.35);
+  transition:
+    transform 0.15s ease,
+    background-color 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+.daibilet-day-route-marker:hover .daibilet-day-pin,
+.daibilet-day-pin.is-active {
+  background: #fff;
+  color: hsl(var(--primary));
+  border-color: hsl(var(--primary));
+  transform: scale(1.35);
+}
+/* Leaflet OSM attribution: hide UA flag badge, keep © OpenStreetMap text.
+   Upstream leaflet.css forces display:inline !important; belt-and-suspenders
+   with src/styles/leaflet-daibilet.css (loaded after leaflet) + JS prefix strip. */
+.leaflet-control-attribution .leaflet-attribution-flag,
+.leaflet-attribution-flag {
+  display: none !important;
+}
+
+/* Мой день: чистый маршрутный лист для печати / Save as PDF */
+@media print {
+  @page {
+    /* Comfortable paper margin on all sides (~0.5in / 12–15mm) */
+    margin: 14mm;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+    color: #0f172a !important;
+  }
+
+  body * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  a {
+    color: inherit !important;
+    text-decoration: none !important;
+  }
+
+  [data-day-print-sheet] {
+    display: block !important;
+  }
+
+  /* Buyer ticket: A4 sheet with page + card margins; hide chrome/actions/map */
+  [data-buyer-ticket] {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    /* Inner card padding so text/separators are not flush to border or paper edge */
+    padding: 12mm !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    box-sizing: border-box !important;
+  }
+
+  [data-buyer-ticket] header {
+    margin-bottom: 5mm !important;
+    padding-bottom: 4mm !important;
+  }
+
+  [data-buyer-ticket] dl {
+    margin-bottom: 5mm !important;
+    padding: 3mm 0 !important;
+  }
+
+  [data-buyer-ticket-actions],
+  [data-buyer-ticket-map],
+  [data-buyer-ticket] .print\:hidden,
+  .print\:hidden {
+    display: none !important;
+  }
+
+  /* Print always uses two columns (text left / QR right) like tablet+ */
+  [data-buyer-ticket] .buyer-ticket-main {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 160px !important;
+    align-items: start !important;
+    gap: 8mm !important;
+    margin-bottom: 5mm !important;
+  }
+
+  [data-buyer-ticket] .buyer-ticket-info {
+    order: 0 !important;
+  }
+
+  [data-buyer-ticket] .buyer-ticket-qr {
+    order: 0 !important;
+    justify-self: end !important;
+  }
+
+  /* Brand wordmark row - force visible in print even if utility cascade fails */
+  [data-buyer-ticket-brand] {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    margin-bottom: 6mm !important;
+    padding-bottom: 3mm !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+  }
+}
+

@@ -1,0 +1,29 @@
+# Staging Postgres — isolated from prod (127.0.0.1:5438).
+# Usage on server:
+#   docker compose -f deploy/docker-compose.staging-db.yml up -d
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: daibilet-staging-postgres
+    environment:
+      POSTGRES_DB: daibilet_staging
+      POSTGRES_USER: daibilet
+      POSTGRES_PASSWORD: ${STAGING_POSTGRES_PASSWORD:-change-me}
+    ports:
+      - "127.0.0.1:5438:5432"
+    volumes:
+      - daibilet-staging-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U daibilet -d daibilet_staging"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+      - daibilet-staging-net
+
+networks:
+  daibilet-staging-net:
+    external: true
+
+volumes:
+  daibilet-staging-postgres-data:

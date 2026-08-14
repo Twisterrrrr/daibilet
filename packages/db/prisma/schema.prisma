@@ -1,0 +1,2158 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum SourceCode {
+  TICKETSCLOUD
+  TEPLOHOD
+  MANUAL
+}
+
+enum EventKind {
+  SINGLE
+  RECURRING
+  OPEN_DATE
+}
+
+enum PublishStatus {
+  DRAFT
+  REVIEW
+  READY
+  PUBLISHED
+  HIDDEN
+}
+
+enum VenueKind {
+  VENUE
+  MUSEUM_ART_SPACE
+  THEATER
+  CONCERT_HALL
+  CLUB_BAR_RESTAURANT
+  PIER
+  MEETING_POINT
+  OUTDOOR_LOCATION
+  SPORT_ACTIVITY_SPACE
+  ATTRACTION
+  PARK
+  MONUMENT
+  /// Tourist cafe/restaurant/bar on /locations (not institution CLUB_BAR_RESTAURANT).
+  GASTRO
+  ONLINE
+  OTHER
+}
+
+enum VenuePageStatus {
+  NONE
+  CANDIDATE
+  PUBLISHED
+  HIDDEN
+}
+
+/// Role of a venue on an excursion/event route. MVP uses STOP; START/NEARBY_HUB reserved.
+enum RouteItemRole {
+  STOP
+  START
+  NEARBY_HUB
+}
+
+enum LandingType {
+  CITY
+  MULTI_CITY
+}
+
+enum LandingBlockType {
+  HERO
+  TRUST_BADGES
+  VALUE_PROPS
+  QUICK_FILTERS
+  FEATURED_VARIANTS
+  SCHEDULE_PREVIEW
+  CITY_GRID
+  CATEGORY_CHIPS
+  INFO_ICONS
+  STORY
+  HIGHLIGHTS
+  ITINERARY
+  PRICING
+  FAQ
+  REVIEWS
+  COMPARISON
+  RELATED_LANDINGS
+  RELATED_COLLECTIONS
+  RELATED_ARTICLES
+  CTA_BANNER
+  SEO_TEXT
+  RAW_RICH_TEXT
+}
+
+enum CanonicalMode {
+  SELF
+  CUSTOM
+  CANONICAL_LANDING
+  NOINDEX
+}
+
+enum SeoEntityType {
+  EVENT
+  VENUE
+  CITY
+  REGION
+  LANDING
+  ARTICLE
+  COLLECTION
+}
+
+enum ArticleStatus {
+  DRAFT
+  REVIEW
+  PUBLISHED
+  HIDDEN
+}
+
+enum SyncStatus {
+  RUNNING
+  SUCCESS
+  FAILED
+}
+
+enum ProviderEntityKind {
+  EVENT
+  SESSION
+  OFFER
+  VENUE
+}
+
+enum SupplierStatus {
+  DRAFT
+  REVIEW
+  ACTIVE
+  PAUSED
+  ARCHIVED
+}
+
+enum SupplierKind {
+  LEGAL_ENTITY
+  INDIVIDUAL_ENTREPRENEUR
+  SELF_EMPLOYED
+  INDIVIDUAL
+}
+
+enum SupplierRole {
+  OWNER
+  ADMIN
+  OPERATOR
+  ACCOUNTANT
+  VIEWER
+}
+
+enum SupplierCatalogMode {
+  WIDGET_ONLY
+  INTERNAL_CHECKOUT
+  HYBRID
+}
+
+enum CommissionScope {
+  SUPPLIER
+  CATEGORY
+  EVENT
+}
+
+enum CheckoutOrderStatus {
+  DRAFT
+  PENDING_PAYMENT
+  PAID
+  CONFIRMED
+  FULFILLED
+  CANCELLED
+  REFUNDED
+  EXPIRED
+  FAILED
+}
+
+enum CheckoutItemStatus {
+  DRAFT
+  RESERVED
+  CONFIRMED
+  FULFILLED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentProvider {
+  YOOKASSA
+  MANUAL
+}
+
+enum PaymentStatus {
+  CREATED
+  PENDING
+  WAITING_FOR_CAPTURE
+  SUCCEEDED
+  CANCELLED
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum PurchaseFlow {
+  PLATFORM
+  EXTERNAL
+}
+
+enum EventManagementMode {
+  SOURCE_MANAGED
+  DAIBILET_MANAGED
+  SUPPLIER_DRAFTS
+  SUPPLIER_SELF_SERVICE
+}
+
+enum EventActorType {
+  ADMIN
+  SUPPLIER
+  SYSTEM
+}
+
+enum EventChangeRequestType {
+  CREATE
+  UPDATE
+  DELETE
+  ARCHIVE
+  PUBLISH
+  UNPUBLISH
+  CONTENT_UPDATE
+  MEDIA_UPDATE
+  SEO_UPDATE
+  SCHEDULE_UPDATE
+  OFFER_UPDATE
+}
+
+enum EventChangeRequestStatus {
+  DRAFT
+  SUBMITTED
+  APPROVED
+  APPLY_FAILED
+  REJECTED
+  CANCELLED
+  APPLIED
+}
+
+enum EventChangeLogAction {
+  CREATED
+  UPDATED
+  DELETED
+  ARCHIVED
+  RESTORED
+  SUBMITTED
+  APPROVED
+  REJECTED
+  PUBLISHED
+  UNPUBLISHED
+  SCHEDULE_CHANGED
+  OFFER_CHANGED
+  APPLY_FAILED
+}
+
+enum FulfillmentStatus {
+  PENDING
+  RESERVING
+  RESERVED
+  CONFIRMED
+  REFUND_PENDING
+  FAILED
+  CANCELLED
+  REFUNDED
+}
+
+enum RefundRequestStatus {
+  CREATED
+  APPROVED
+  REJECTED
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum RefundRequestReason {
+  USER_REQUEST
+  EVENT_CANCELLED
+  SUPPORT
+  OTHER
+}
+
+enum RefundCreatedByType {
+  ADMIN
+  USER
+  SUPPLIER
+  SYSTEM
+}
+
+enum IdempotencyScope {
+  CHECKOUT_CREATE
+  PAYMENT_CREATE
+  REFUND_CREATE
+  YOOKASSA_WEBHOOK
+  EMAIL_SEND
+  EXTERNAL_CALLBACK
+}
+
+enum PaymentMode {
+  SINGLE_MERCHANT
+  AGENT_SINGLE_PAYOUT
+  SPLIT_MERCHANT
+}
+
+enum PspFeeMode {
+  PLATFORM_PAYS
+  SUPPLIER_PAYS
+  SHARED_50_50
+  SERVICE_FEE
+}
+
+enum FiscalReceiptType {
+  INCOME
+  REFUND
+}
+
+enum FiscalReceiptStatus {
+  NOT_REQUIRED
+  PENDING
+  SENT
+  SUCCEEDED
+  FAILED
+  CANCELLED
+}
+
+enum PayoutStatus {
+  DRAFT
+  PENDING
+  PAID
+  FAILED
+  CANCELLED
+}
+
+enum SupplierLegalProfileStatus {
+  DRAFT
+  INCOMPLETE
+  VERIFIED
+  REJECTED
+}
+
+enum TaxMode {
+  OSNO
+  USN_6
+  USN_15
+  AUSN
+  NPD
+}
+
+enum SupplierLedgerEntryType {
+  SALE
+  COMMISSION
+  REFUND
+  PAYOUT
+  ADJUSTMENT
+  CHARGEBACK_ADJUSTMENT
+  FEE_RECHARGE
+}
+
+enum SupplierReportBasis {
+  SOLD
+  COMPLETED
+}
+
+enum SupplierReportStatus {
+  DRAFT
+  FINAL
+}
+
+enum SupplierReportLineType {
+  SALE
+  COMMISSION
+  REFUND
+  PAYOUT
+  ADJUSTMENT
+}
+
+enum SupplierDocumentType {
+  AGENT_REPORT
+  SERVICE_ACT
+  UPD
+  INVOICE
+  VAT_INVOICE
+  COMMISSION_ACT
+  PAYOUT_STATEMENT
+}
+
+enum SupplierDocumentStatus {
+  DRAFT
+  GENERATED
+  ISSUED
+  SENT
+  DELIVERED
+  SIGNED
+  FAILED
+  CANCELLED
+}
+
+enum SupplierDocumentFileKind {
+  PDF
+  HTML
+  JSON_SNAPSHOT
+}
+
+enum SettlementStatus {
+  DRAFT
+  CALCULATED
+  APPROVED
+  FINALIZED
+  PAID
+  CANCELLED
+}
+
+enum SupplierDisputeStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED
+  REJECTED
+}
+
+enum SupplierDisputeReasonCategory {
+  WRONG_COMMISSION
+  MISSING_SALE
+  WRONG_DETAILS
+  OTHER
+}
+
+enum ReviewStatus {
+  PENDING_EMAIL
+  PENDING_MODERATION
+  APPROVED
+  REJECTED
+  HIDDEN
+}
+
+enum ReviewSupplierResponseStatus {
+  DRAFT
+  PENDING_MODERATION
+  APPROVED
+  REJECTED
+}
+
+enum ReviewDisputeStatus {
+  MODERATOR_REVIEW
+  RESOLVED_KEEP
+  RESOLVED_EDIT
+  RESOLVED_HIDE
+  RESOLVED_DELETE
+}
+
+enum ReviewDisputeReasonCode {
+  FAKE
+  OFFENSIVE
+  NOT_CUSTOMER
+  WRONG_EVENT
+  LEGAL
+  OTHER
+}
+
+enum TripPlanStatus {
+  DRAFT
+  RESERVED
+  PAID
+  CONFIRMED
+  CANCELLED
+  EXPIRED
+}
+
+enum TripVoucherStatus {
+  DRAFT
+  ISSUED
+  CANCELLED
+  REISSUED
+  USED
+  EXPIRED
+}
+
+model Source {
+  id        String     @id @default(cuid())
+  code      SourceCode @unique
+  name      String
+  enabled   Boolean    @default(true)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  syncRuns      SourceSyncRun[]
+  rawRecords    RawImportRecord[]
+  eventLinks    EventSourceLink[]
+  providerLinks ProviderLink[]
+  orderLinks    ExternalOrder[]
+}
+
+model SourceSyncRun {
+  id         String     @id @default(cuid())
+  sourceId   String
+  status     SyncStatus @default(RUNNING)
+  mode       String
+  startedAt  DateTime   @default(now())
+  finishedAt DateTime?
+  stats      Json?
+  error      String?
+
+  source Source @relation(fields: [sourceId], references: [id])
+
+  @@index([sourceId, startedAt])
+}
+
+model RawImportRecord {
+  id          String   @id @default(cuid())
+  sourceId    String
+  entityType  String
+  externalId  String
+  payload     Json
+  payloadHash String?
+  importedAt  DateTime @default(now())
+
+  source Source @relation(fields: [sourceId], references: [id])
+
+  @@unique([sourceId, entityType, externalId])
+}
+
+model Event {
+  id                    String              @id @default(cuid())
+  title                 String
+  slug                  String              @unique
+  description           String?
+  kind                  EventKind
+  status                PublishStatus       @default(REVIEW)
+  purchaseFlow          PurchaseFlow        @default(EXTERNAL)
+  managementMode        EventManagementMode @default(SOURCE_MANAGED)
+  sourceStatus          String?
+  ageLimit              String?
+  imageUrl              String?
+  seoH1                 String?
+  seoTitle              String?
+  seoDescription        String?
+  canonicalPath         String?
+  isIndexable           Boolean             @default(true)
+  priceFromRub          Int?
+  ticketsVacant         Int?
+  primaryCityId         String?
+  venueId               String?
+  categoryId            String?
+  primarySubcategoryId  String?
+  supplierId            String?
+  createdByType         EventActorType      @default(SYSTEM)
+  createdBySiteUserId   String?
+  submittedBySiteUserId String?
+  submittedAt           DateTime?
+  moderatedBySiteUserId String?
+  moderatedAt           DateTime?
+  moderationComment     String?
+  scheduleLocked        Boolean             @default(true)
+  defaultCapacityTotal  Int?
+  openDateValidFrom     DateTime?
+  openDateValidTo       DateTime?
+  openDateValidDays     Int?
+  salesStartsAt         DateTime?
+  salesEndsAt           DateTime?
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+
+  primaryCity        City?        @relation(fields: [primaryCityId], references: [id])
+  venue              Venue?       @relation(fields: [venueId], references: [id])
+  category           Category?    @relation(fields: [categoryId], references: [id])
+  primarySubcategory Subcategory? @relation(fields: [primarySubcategoryId], references: [id])
+  supplier           Supplier?    @relation("PrimarySupplierEvents", fields: [supplierId], references: [id], onDelete: SetNull)
+  createdBy          SiteUser?    @relation("EventCreatedBy", fields: [createdBySiteUserId], references: [id], onDelete: SetNull)
+  submittedBy        SiteUser?    @relation("EventSubmittedBy", fields: [submittedBySiteUserId], references: [id], onDelete: SetNull)
+  moderatedBy        SiteUser?    @relation("EventModeratedBy", fields: [moderatedBySiteUserId], references: [id], onDelete: SetNull)
+
+  sessions        EventSession[]
+  offers          EventOffer[]
+  sourceLinks     EventSourceLink[]
+  providerLinks   ProviderLink[]
+  subcategories   EventSubcategory[]
+  tags            EventTag[]
+  qualityIssues   QualityIssue[]
+  landingMatches  LandingMatch[]
+  supplierLinks   SupplierEvent[]
+  checkoutItems   CheckoutItem[]
+  tripPlanItems   TripPlanItem[]
+  commissionRules SupplierCommissionRule[]
+  changeRequests  EventChangeRequest[]
+  changeLogs      EventChangeLog[]
+  reviews         Review[]
+  externalReviews ExternalReview[]
+  reviewRequests  ReviewRequest[]
+  override        EventOverride?
+  routeItems      EventVenueRouteItem[]
+
+  @@index([status])
+  @@index([purchaseFlow])
+  @@index([managementMode, status])
+  @@index([primaryCityId])
+  @@index([venueId])
+  @@index([categoryId])
+  @@index([supplierId, status])
+  @@index([title])
+}
+
+/// Route stops / hubs on an excursion. Event.venueId remains the start point.
+model EventVenueRouteItem {
+  id        String        @id @default(cuid())
+  eventId   String
+  venueId   String
+  role      RouteItemRole @default(STOP)
+  sortOrder Int           @default(0)
+  label     String?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  venue Venue @relation(fields: [venueId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, venueId, role])
+  @@index([eventId, sortOrder])
+  @@index([venueId])
+  @@map("event_venue_route_items")
+}
+
+model EventOverride {
+  id               String         @id @default(cuid())
+  eventId          String         @unique
+  title            String?
+  description      String?
+  shortDescription String?
+  imageUrl         String?
+  seoH1            String?
+  seoTitle         String?
+  seoDescription   String?
+  canonicalPath    String?
+  isIndexable      Boolean?
+  editorStatus     PublishStatus?
+  /// Admin-defined key to merge distinct ticket products into one multi-purchase hub page.
+  mergeGroupKey    String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([mergeGroupKey])
+}
+
+model EventSourceLink {
+  id             String   @id @default(cuid())
+  eventId        String
+  sourceId       String
+  externalId     String
+  metaExternalId String?
+  sourceUrl      String?
+  rawRecordId    String?
+  updatedAt      DateTime @updatedAt
+
+  event  Event  @relation(fields: [eventId], references: [id])
+  source Source @relation(fields: [sourceId], references: [id])
+
+  @@unique([sourceId, externalId])
+  @@index([eventId])
+  @@index([sourceId, metaExternalId])
+}
+
+model EventSession {
+  id            String    @id @default(cuid())
+  eventId       String
+  startsAt      DateTime?
+  endsAt        DateTime?
+  sourceStatus  String?
+  priceFromRub  Int?
+  ticketsVacant Int?
+  capacityTotal Int?
+  capacitySold  Int       @default(0)
+  isActive      Boolean   @default(true)
+  cancelledAt   DateTime?
+  cancelReason  String?
+  externalId    String?
+
+  event         Event          @relation(fields: [eventId], references: [id])
+  providerLinks ProviderLink[]
+  checkoutItems CheckoutItem[]
+  tripPlanItems TripPlanItem[]
+
+  @@index([eventId, startsAt])
+  @@index([startsAt])
+  @@index([eventId, isActive, startsAt])
+  @@index([externalId])
+}
+
+model EventOffer {
+  id            String     @id @default(cuid())
+  eventId       String
+  sourceCode    SourceCode
+  title         String?
+  priceRub      Int?
+  oldPriceRub   Int?
+  capacityTotal Int?
+  groupSize     Int        @default(1)
+  weekdayMask   Int?
+  widgetUrl     String?
+  deeplinkUrl   String?
+  payload       Json?
+  active        Boolean    @default(true)
+
+  event         Event          @relation(fields: [eventId], references: [id])
+  providerLinks ProviderLink[]
+  checkoutItems CheckoutItem[]
+
+  @@index([eventId, active, priceRub])
+  @@index([sourceCode])
+}
+
+model ProviderLink {
+  id               String             @id @default(cuid())
+  sourceId         String
+  entityKind       ProviderEntityKind
+  eventId          String?
+  sessionId        String?
+  offerId          String?
+  venueId          String?
+  externalId       String
+  externalParentId String             @default("")
+  sourceUrl        String?
+  rawRecordId      String?
+  payload          Json?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  source  Source        @relation(fields: [sourceId], references: [id])
+  event   Event?        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  session EventSession? @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  offer   EventOffer?   @relation(fields: [offerId], references: [id], onDelete: Cascade)
+  venue   Venue?        @relation(fields: [venueId], references: [id], onDelete: Cascade)
+
+  @@unique([sourceId, entityKind, externalId, externalParentId])
+  @@index([eventId])
+  @@index([sessionId])
+  @@index([offerId])
+  @@index([venueId])
+  @@index([sourceId, entityKind])
+}
+
+model Category {
+  id       String @id @default(cuid())
+  slug     String @unique
+  title    String
+  position Int    @default(0)
+
+  events          Event[]
+  subcategories   Subcategory[]
+  commissionRules SupplierCommissionRule[]
+}
+
+model Subcategory {
+  id         String @id @default(cuid())
+  categoryId String
+  slug       String @unique
+  title      String
+  position   Int    @default(0)
+
+  category      Category           @relation(fields: [categoryId], references: [id])
+  primaryEvents Event[]
+  events        EventSubcategory[]
+}
+
+model EventSubcategory {
+  eventId       String
+  subcategoryId String
+  isPrimary     Boolean @default(false)
+
+  event       Event       @relation(fields: [eventId], references: [id])
+  subcategory Subcategory @relation(fields: [subcategoryId], references: [id])
+
+  @@id([eventId, subcategoryId])
+  @@index([subcategoryId])
+}
+
+model Tag {
+  id    String @id @default(cuid())
+  slug  String @unique
+  title String
+
+  events EventTag[]
+}
+
+model EventTag {
+  eventId String
+  tagId   String
+
+  event Event @relation(fields: [eventId], references: [id])
+  tag   Tag   @relation(fields: [tagId], references: [id])
+
+  @@id([eventId, tagId])
+  @@index([tagId])
+}
+
+model Region {
+  id    String @id @default(cuid())
+  slug  String @unique
+  title String
+
+  cities City[]
+}
+
+model City {
+  id             String  @id @default(cuid())
+  regionId       String?
+  slug           String  @unique
+  title          String
+  sourceTitle    String?
+  introTitle     String?
+  introText      String?
+  heroImageUrl   String?
+  seoH1          String?
+  seoTitle       String?
+  seoDescription String?
+  canonicalPath  String?
+  isDestination  Boolean @default(false)
+
+  region    Region?    @relation(fields: [regionId], references: [id])
+  venues    Venue[]
+  events    Event[]
+  landings  Landing[]
+  articles  Article[]
+  tripPlans TripPlan[]
+}
+
+model Venue {
+  id               String          @id @default(cuid())
+  slug             String          @unique
+  title            String
+  description      String?
+  shortDescription String?
+  heroImageUrl     String?
+  seoH1            String?
+  seoTitle         String?
+  seoDescription   String?
+  canonicalPath    String?
+  isIndexable      Boolean         @default(true)
+  cityId           String?
+  address          String?
+  latitude         Float?
+  longitude        Float?
+  metroStation     String?
+  wayToFind        String?         @db.Text
+  parkingInfo      String?
+  kind             VenueKind       @default(OTHER)
+  pageStatus       VenuePageStatus @default(NONE)
+  /// Short micro-intrigue for location cards (optional).
+  hookFact         String?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  city            City?            @relation(fields: [cityId], references: [id])
+  events          Event[]
+  aliases         VenueAlias[]
+  providerLinks   ProviderLink[]
+  supplierLinks   SupplierVenue[]
+  tripPlanItems   TripPlanItem[]
+  reviews         Review[]
+  externalReviews ExternalReview[]
+  routeItems      EventVenueRouteItem[]
+
+  @@index([title])
+}
+
+model VenueAlias {
+  id         String     @id @default(cuid())
+  venueId    String
+  sourceCode SourceCode
+  externalId String?
+  title      String
+  address    String?
+
+  venue Venue @relation(fields: [venueId], references: [id])
+}
+
+/// UX-группы каталога `/podborki` (карусели): по типу / для кого / сезонное.
+model LandingCategory {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  title     String
+  subtitle  String?
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  landings Landing[]
+
+  @@index([isActive, sortOrder])
+}
+
+model Landing {
+  id          String        @id @default(cuid())
+  type        LandingType   @default(MULTI_CITY)
+  slug        String        @unique
+  title       String
+  subtitle    String?
+  description String?
+  status      PublishStatus @default(REVIEW)
+  cityId      String?
+  themeId     String?
+  categoryId  String?
+  rules       Json
+
+  heroTitle          String?
+  heroSubtitle       String?
+  heroBadge          String?
+  heroImageUrl       String?
+  heroMobileImageUrl String?
+  templateType       String?
+  layoutVariant      String?
+  surfaceVariant     String?
+
+  seoH1              String?
+  seoTitle           String?
+  seoDescription     String?
+  ogImageUrl         String?
+  canonicalMode      CanonicalMode @default(SELF)
+  canonicalUrl       String?
+  canonicalLandingId String?
+  isIndexable        Boolean       @default(false)
+  isActive           Boolean       @default(true)
+  publishedAt        DateTime?
+  sortOrder          Int           @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  city         City?                 @relation(fields: [cityId], references: [id])
+  theme        LandingTheme?         @relation(fields: [themeId], references: [id])
+  category     LandingCategory?      @relation(fields: [categoryId], references: [id])
+  matches      LandingMatch[]
+  blocks       LandingContentBlock[]
+  relatedLinks LandingRelatedLink[]
+
+  @@index([type, isActive, isIndexable])
+  @@index([cityId, slug])
+  @@index([categoryId, sortOrder])
+}
+
+model LandingMatch {
+  landingId String
+  eventId   String
+  score     Int    @default(0)
+  reasons   Json?
+
+  landing Landing @relation(fields: [landingId], references: [id])
+  event   Event   @relation(fields: [eventId], references: [id])
+
+  @@id([landingId, eventId])
+}
+
+model LandingTheme {
+  id                    String   @id @default(cuid())
+  slug                  String   @unique
+  title                 String
+  subtitle              String?
+  defaultHeroTitle      String?
+  defaultHeroBody       String?
+  defaultSeoTitle       String?
+  defaultSeoDescription String?
+  coverImageUrl         String?
+  isActive              Boolean  @default(true)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  landings Landing[]
+}
+
+model LandingContentBlock {
+  id              String           @id @default(cuid())
+  landingId       String
+  type            LandingBlockType
+  variant         String?
+  title           String?
+  subtitle        String?
+  eyebrow         String?
+  body            String?
+  richTextJson    Json?
+  payload         Json?
+  assetUrl        String?
+  mobileAssetUrl  String?
+  isEnabled       Boolean          @default(true)
+  sortOrder       Int              @default(0)
+  visibilityRules Json?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  landing Landing @relation(fields: [landingId], references: [id], onDelete: Cascade)
+
+  @@index([landingId, sortOrder])
+}
+
+model LandingRelatedLink {
+  id        String @id @default(cuid())
+  landingId String
+  title     String
+  href      String
+  kind      String
+  sortOrder Int    @default(0)
+
+  landing Landing @relation(fields: [landingId], references: [id], onDelete: Cascade)
+
+  @@index([landingId, sortOrder])
+}
+
+model Article {
+  id             String        @id @default(cuid())
+  slug           String        @unique
+  status         ArticleStatus @default(DRAFT)
+  title          String
+  excerpt        String?
+  content        String?
+  coverImageUrl  String?
+  cityId         String?
+  /// Редакционный citySlug блога (moscow|saint-petersburg|multi|regions|…).
+  citySlug       String?
+  /// ИИ-автор / редакция: max|anna|elena|igor|artur|editorial
+  authorId       String?
+  authorName     String?
+  /// Тип материала: gid|column|digest|obzor
+  articleType    String?
+  seoH1          String?
+  seoTitle       String?
+  seoDescription String?
+  canonicalPath  String?
+  isIndexable    Boolean       @default(false)
+  /// Единственная статья в Blog Hero на /blog (last-wins при set true).
+  isFeatured     Boolean       @default(false)
+  publishedAt    DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  city City? @relation(fields: [cityId], references: [id])
+
+  @@index([status, isIndexable, publishedAt])
+  @@index([isFeatured])
+  @@index([authorId])
+  @@index([articleType])
+  @@index([citySlug])
+}
+
+/// Home hero rotator frames (CMS-lite). Fallback: static HOME_HERO_IMAGES.
+model HeroBanner {
+  id        String   @id @default(cuid())
+  imageUrl  String
+  title     String
+  link      String?
+  isActive  Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive, sortOrder])
+}
+
+model SeoMeta {
+  id            String        @id @default(cuid())
+  entityType    SeoEntityType
+  entityId      String
+  title         String?
+  description   String?
+  h1            String?
+  canonicalUrl  String?
+  robots        String?
+  ogTitle       String?
+  ogDescription String?
+  ogImageUrl    String?
+  updatedAt     DateTime      @updatedAt
+
+  @@unique([entityType, entityId])
+}
+
+/// Optional manual SEO for city×landing (or city×intent) pairs.
+/// Empty table is fine: runtime falls back to templates. Do not seed fake copy.
+model SeoOverride {
+  id                Int      @id @default(autoincrement())
+  citySlug          String
+  landingSlug       String
+  customTitle       String?
+  customDescription String?
+  customH1          String?
+  customText        String?  @db.Text
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([citySlug, landingSlug])
+}
+
+model SiteUser {
+  id               String    @id @default(cuid())
+  email            String    @unique
+  passwordHash     String
+  name             String?
+  phone            String?
+  emailVerifiedAt  DateTime?
+  lastLoginAt      DateTime?
+  refreshTokenHash String?
+  isActive         Boolean   @default(true)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  supplierLinks               SupplierUser[]
+  externalOrders              ExternalOrder[]
+  checkoutOrders              CheckoutOrder[]
+  tripPlans                   TripPlan[]
+  createdEvents               Event[]              @relation("EventCreatedBy")
+  submittedEvents             Event[]              @relation("EventSubmittedBy")
+  moderatedEvents             Event[]              @relation("EventModeratedBy")
+  createdEventChangeRequests  EventChangeRequest[] @relation("EventChangeRequestCreatedBy")
+  reviewedEventChangeRequests EventChangeRequest[] @relation("EventChangeRequestReviewedBy")
+  eventChangeLogs             EventChangeLog[]     @relation("EventChangeLogActor")
+  reviews                     Review[]
+  refundRequests              RefundRequest[]
+}
+
+model ExternalOrder {
+  id                   String    @id @default(cuid())
+  sourceId             String
+  siteUserId           String?
+  externalOrderId      String
+  publicCode           String?   @unique
+  status               String
+  buyerSnapshot        Json?
+  buyerEmailNormalized String?
+  buyerPhoneNormalized String?
+  linkedAt             DateTime?
+  purchasedAt          DateTime?
+  archivedAt           DateTime?
+  updatedAt            DateTime  @updatedAt
+
+  source         Source           @relation(fields: [sourceId], references: [id])
+  siteUser       SiteUser?        @relation(fields: [siteUserId], references: [id], onDelete: SetNull)
+  tickets        ExternalTicket[]
+  checkoutOrder  CheckoutOrder?
+  reviews        Review[]
+  reviewRequests ReviewRequest[]
+
+  @@unique([sourceId, externalOrderId])
+  @@index([status])
+  @@index([siteUserId, purchasedAt])
+  @@index([buyerEmailNormalized])
+  @@index([buyerPhoneNormalized])
+  @@index([purchasedAt])
+  @@index([updatedAt])
+  @@index([archivedAt])
+}
+
+model ExternalTicket {
+  id               String  @id @default(cuid())
+  externalOrderId  String
+  externalTicketId String
+  status           String
+  eventId          String?
+  sessionId        String?
+  origin           String  @default("source")
+
+  order        ExternalOrder @relation(fields: [externalOrderId], references: [id])
+  checkoutItem CheckoutItem?
+
+  @@index([externalOrderId])
+  @@index([externalTicketId])
+  @@index([eventId])
+  @@index([sessionId])
+  @@index([origin])
+}
+
+model Supplier {
+  id                   String              @id @default(cuid())
+  slug                 String              @unique
+  title                String
+  legalName            String?
+  kind                 SupplierKind        @default(LEGAL_ENTITY)
+  status               SupplierStatus      @default(DRAFT)
+  inn                  String?
+  kpp                  String?
+  ogrn                 String?
+  email                String?
+  phone                String?
+  websiteUrl           String?
+  yookassaShopId       String?
+  defaultCatalogMode   SupplierCatalogMode @default(WIDGET_ONLY)
+  paymentMode          PaymentMode         @default(SINGLE_MERCHANT)
+  agentSchemeEnabled   Boolean             @default(false)
+  splitEnabled         Boolean             @default(false)
+  pspFeeMode           PspFeeMode          @default(PLATFORM_PAYS)
+  defaultCommissionBps Int                 @default(0)
+  payoutBankName       String?
+  payoutBankBic        String?
+  payoutAccount        String?
+  payoutCorrAccount    String?
+  notes                String?
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+
+  users               SupplierUser[]
+  venues              SupplierVenue[]
+  events              SupplierEvent[]
+  ownedEvents         Event[]                  @relation("PrimarySupplierEvents")
+  eventChangeRequests EventChangeRequest[]
+  eventChangeLogs     EventChangeLog[]
+  commissionRules     SupplierCommissionRule[]
+  checkoutItems       CheckoutItem[]
+  payouts             Payout[]
+  payoutItems         PayoutItem[]
+  refundRequests      RefundRequest[]
+  fiscalReceipts      FiscalReceipt[]
+  legalProfile        SupplierLegalProfile?
+  ledgerEntries       SupplierLedgerEntry[]
+  reports             SupplierReport[]
+  settlements         SupplierSettlement[]
+  documents           SupplierDocument[]
+  supplierDisputes    SupplierDispute[]
+  reviews             Review[]
+  reviewResponses     ReviewSupplierResponse[]
+  reviewDisputes      ReviewDispute[]
+  externalReviews     ExternalReview[]
+
+  @@index([status])
+  @@index([inn])
+}
+
+model SupplierLegalProfile {
+  id         String                     @id @default(cuid())
+  supplierId String                     @unique
+  status     SupplierLegalProfileStatus @default(DRAFT)
+
+  legalName      String
+  legalAddress   String?
+  inn            String?
+  kpp            String?
+  ogrn           String?
+  taxMode        TaxMode @default(OSNO)
+  isVatPayer     Boolean @default(false)
+  defaultVatRate Int?
+
+  signerFullName String?
+  signerPosition String?
+  financeEmail   String?
+  docsEmail      String?
+
+  verifiedBySiteUserId String?
+  verifiedAt           DateTime?
+  rejectionComment     String?
+  metaJson             Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  supplier     Supplier              @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  bankAccounts SupplierBankAccount[]
+
+  @@index([status])
+  @@index([inn])
+}
+
+model SupplierBankAccount {
+  id                     String   @id @default(cuid())
+  supplierLegalProfileId String
+  bankName               String?
+  bik                    String?
+  accountNumber          String?
+  correspondentAccount   String?
+  isPrimary              Boolean  @default(false)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  legalProfile SupplierLegalProfile @relation(fields: [supplierLegalProfileId], references: [id], onDelete: Cascade)
+
+  @@index([supplierLegalProfileId])
+  @@index([isPrimary])
+}
+
+model SupplierUser {
+  id         String       @id @default(cuid())
+  supplierId String
+  siteUserId String
+  role       SupplierRole @default(OPERATOR)
+  isActive   Boolean      @default(true)
+  invitedAt  DateTime?
+  acceptedAt DateTime?
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  supplier Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  siteUser SiteUser @relation(fields: [siteUserId], references: [id], onDelete: Cascade)
+
+  @@unique([supplierId, siteUserId])
+  @@index([siteUserId])
+  @@index([supplierId, isActive])
+}
+
+model SupplierVenue {
+  id         String   @id @default(cuid())
+  supplierId String
+  venueId    String
+  isPrimary  Boolean  @default(false)
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  supplier Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  venue    Venue    @relation(fields: [venueId], references: [id], onDelete: Cascade)
+
+  @@unique([supplierId, venueId])
+  @@index([venueId, isActive])
+}
+
+model SupplierEvent {
+  id              String              @id @default(cuid())
+  supplierId      String
+  eventId         String
+  catalogMode     SupplierCatalogMode @default(WIDGET_ONLY)
+  managementMode  EventManagementMode @default(SOURCE_MANAGED)
+  canEditContent  Boolean             @default(false)
+  canEditMedia    Boolean             @default(false)
+  canEditSeo      Boolean             @default(false)
+  canEditSchedule Boolean             @default(false)
+  canEditOffers   Boolean             @default(false)
+  isPrimary       Boolean             @default(false)
+  isActive        Boolean             @default(true)
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  supplier Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  event    Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([supplierId, eventId])
+  @@index([eventId, isActive])
+  @@index([supplierId, catalogMode])
+  @@index([supplierId, managementMode])
+}
+
+model EventChangeRequest {
+  id                   String                   @id @default(cuid())
+  eventId              String?
+  supplierId           String?
+  type                 EventChangeRequestType   @default(UPDATE)
+  status               EventChangeRequestStatus @default(DRAFT)
+  createdByType        EventActorType           @default(SUPPLIER)
+  createdBySiteUserId  String?
+  reviewedBySiteUserId String?
+  title                String?
+  summary              String?
+  payload              Json?
+  adminComment         String?
+  submittedAt          DateTime?
+  reviewedAt           DateTime?
+  appliedAt            DateTime?
+  createdAt            DateTime                 @default(now())
+  updatedAt            DateTime                 @updatedAt
+
+  event      Event?    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  supplier   Supplier? @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+  createdBy  SiteUser? @relation("EventChangeRequestCreatedBy", fields: [createdBySiteUserId], references: [id], onDelete: SetNull)
+  reviewedBy SiteUser? @relation("EventChangeRequestReviewedBy", fields: [reviewedBySiteUserId], references: [id], onDelete: SetNull)
+
+  @@index([eventId, status])
+  @@index([supplierId, status])
+  @@index([createdBySiteUserId, status])
+  @@index([status, createdAt])
+}
+
+model EventChangeLog {
+  id              String               @id @default(cuid())
+  eventId         String
+  supplierId      String?
+  actorType       EventActorType       @default(SYSTEM)
+  actorSiteUserId String?
+  action          EventChangeLogAction
+  diff            Json?
+  metaJson        Json?
+  createdAt       DateTime             @default(now())
+
+  event    Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  supplier Supplier? @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+  actor    SiteUser? @relation("EventChangeLogActor", fields: [actorSiteUserId], references: [id], onDelete: SetNull)
+
+  @@index([eventId, createdAt])
+  @@index([supplierId, createdAt])
+  @@index([actorSiteUserId, createdAt])
+  @@index([action, createdAt])
+}
+
+model SupplierCommissionRule {
+  id              String          @id @default(cuid())
+  supplierId      String?
+  eventId         String?
+  categoryId      String?
+  scope           CommissionScope @default(SUPPLIER)
+  title           String?
+  percentBps      Int             @default(0)
+  fixedFeeKopecks Int             @default(0)
+  priority        Int             @default(0)
+  startsAt        DateTime?
+  endsAt          DateTime?
+  isActive        Boolean         @default(true)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  supplier Supplier? @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  event    Event?    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  category Category? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@index([supplierId, isActive])
+  @@index([eventId, isActive])
+  @@index([categoryId, isActive])
+  @@index([scope, priority])
+}
+
+model CheckoutOrder {
+  id                String              @id @default(cuid())
+  publicCode        String?             @unique
+  siteUserId        String?
+  externalOrderId   String?             @unique
+  status            CheckoutOrderStatus @default(DRAFT)
+  currency          String              @default("RUB")
+  subtotalKopecks   Int                 @default(0)
+  discountKopecks   Int                 @default(0)
+  totalKopecks      Int                 @default(0)
+  commissionKopecks Int                 @default(0)
+  buyerEmail        String?
+  buyerPhone        String?
+  buyerName         String?
+  buyerSnapshot     Json?
+  checkoutUrl       String?
+  expiresAt         DateTime?
+  paidAt            DateTime?
+  confirmedAt       DateTime?
+  cancelledAt       DateTime?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  siteUser         SiteUser?         @relation(fields: [siteUserId], references: [id])
+  externalOrder    ExternalOrder?    @relation(fields: [externalOrderId], references: [id])
+  items            CheckoutItem[]
+  payments         Payment[]
+  fiscalReceipts   FiscalReceipt[]
+  payoutItems      PayoutItem[]
+  tripVouchers     TripVoucher[]
+  fulfillmentItems FulfillmentItem[]
+  refundRequests   RefundRequest[]
+  reviews          Review[]
+  reviewRequests   ReviewRequest[]
+
+  @@index([status, createdAt])
+  @@index([siteUserId, createdAt])
+  @@index([buyerEmail])
+  @@index([updatedAt])
+}
+
+model CheckoutItem {
+  id                String             @id @default(cuid())
+  checkoutOrderId   String
+  supplierId        String?
+  eventId           String?
+  sessionId         String?
+  offerId           String?
+  externalTicketId  String?            @unique
+  title             String
+  ticketTitle       String?
+  status            CheckoutItemStatus @default(DRAFT)
+  quantity          Int                @default(1)
+  unitPriceKopecks  Int                @default(0)
+  totalKopecks      Int                @default(0)
+  commissionKopecks Int                @default(0)
+  attendeeName      String?
+  attendeePhone     String?
+  providerPayload   Json?
+  issuedAt          DateTime?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  order            CheckoutOrder     @relation(fields: [checkoutOrderId], references: [id], onDelete: Cascade)
+  supplier         Supplier?         @relation(fields: [supplierId], references: [id])
+  event            Event?            @relation(fields: [eventId], references: [id])
+  session          EventSession?     @relation(fields: [sessionId], references: [id])
+  offer            EventOffer?       @relation(fields: [offerId], references: [id])
+  externalTicket   ExternalTicket?   @relation(fields: [externalTicketId], references: [id])
+  payoutItems      PayoutItem[]
+  tripPlanItems    TripPlanItem[]
+  tripVoucherItems TripVoucherItem[]
+  fulfillmentItem  FulfillmentItem?
+
+  @@index([checkoutOrderId])
+  @@index([supplierId, status])
+  @@index([eventId])
+  @@index([sessionId])
+  @@index([offerId])
+}
+
+model FulfillmentItem {
+  id                   String            @id @default(cuid())
+  checkoutOrderId      String
+  checkoutItemId       String?           @unique
+  lineItemIndex        Int               @default(0)
+  offerId              String?
+  purchaseFlow         PurchaseFlow
+  provider             String            @default("INTERNAL")
+  status               FulfillmentStatus @default(PENDING)
+  externalOrderId      String?
+  externalPaymentUrl   String?
+  providerData         Json?
+  amountKopecks        Int               @default(0)
+  refundedKopecks      Int               @default(0)
+  refundProviderId     String?
+  attemptCount         Int               @default(0)
+  nextRetryAt          DateTime?
+  lastError            String?
+  escalatedAt          DateTime?
+  resolvedBySiteUserId String?
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+
+  order          CheckoutOrder   @relation(fields: [checkoutOrderId], references: [id], onDelete: Cascade)
+  checkoutItem   CheckoutItem?   @relation(fields: [checkoutItemId], references: [id], onDelete: SetNull)
+  refundRequests RefundRequest[]
+
+  @@index([checkoutOrderId])
+  @@index([offerId])
+  @@index([purchaseFlow, status])
+  @@index([provider])
+  @@index([status, nextRetryAt])
+  @@index([status, escalatedAt])
+}
+
+model Payment {
+  id                String          @id @default(cuid())
+  checkoutOrderId   String
+  provider          PaymentProvider @default(YOOKASSA)
+  status            PaymentStatus   @default(CREATED)
+  amountKopecks     Int             @default(0)
+  currency          String          @default("RUB")
+  providerPaymentId String?         @unique
+  confirmationUrl   String?
+  idempotenceKey    String?         @unique
+  paidAt            DateTime?
+  capturedAt        DateTime?
+  cancelledAt       DateTime?
+  rawPayload        Json?
+  error             String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  order          CheckoutOrder           @relation(fields: [checkoutOrderId], references: [id], onDelete: Cascade)
+  fiscalReceipts FiscalReceipt[]
+  refundRequests RefundRequest[]
+  webhookEvents  ProcessedWebhookEvent[]
+
+  @@index([checkoutOrderId, status])
+  @@index([status, updatedAt])
+}
+
+model RefundRequest {
+  id                String              @id @default(cuid())
+  checkoutOrderId   String?
+  fulfillmentItemId String?
+  paymentId         String?
+  supplierId        String?
+  createdByUserId   String?
+  amountKopecks     Int
+  currency          String              @default("RUB")
+  reason            RefundRequestReason @default(OTHER)
+  reasonNote        String?
+  status            RefundRequestStatus @default(CREATED)
+  createdByType     RefundCreatedByType @default(ADMIN)
+  providerRefundId  String?
+  providerPayload   Json?
+  adminComment      String?
+  processedAt       DateTime?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  checkoutOrder   CheckoutOrder?   @relation(fields: [checkoutOrderId], references: [id], onDelete: SetNull)
+  fulfillmentItem FulfillmentItem? @relation(fields: [fulfillmentItemId], references: [id], onDelete: SetNull)
+  payment         Payment?         @relation(fields: [paymentId], references: [id], onDelete: SetNull)
+  supplier        Supplier?        @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+  createdByUser   SiteUser?        @relation(fields: [createdByUserId], references: [id], onDelete: SetNull)
+
+  @@index([checkoutOrderId])
+  @@index([fulfillmentItemId])
+  @@index([paymentId])
+  @@index([supplierId, status])
+  @@index([status, createdAt])
+}
+
+model PaymentEventLog {
+  id              String   @id @default(cuid())
+  provider        String
+  eventType       String
+  paymentId       String?
+  providerEventId String?
+  idempotencyKey  String
+  payload         Json
+  receivedAt      DateTime @default(now())
+
+  @@unique([provider, eventType, idempotencyKey])
+  @@index([provider, eventType])
+  @@index([paymentId])
+  @@index([providerEventId])
+}
+
+model ProcessedWebhookEvent {
+  id              String   @id @default(cuid())
+  dedupeKey       String   @unique
+  providerEventId String
+  provider        String
+  eventType       String
+  payload         Json
+  result          String?
+  paymentId       String?
+  processedAt     DateTime @default(now())
+
+  payment Payment? @relation(fields: [paymentId], references: [id], onDelete: SetNull)
+
+  @@index([provider, eventType])
+  @@index([paymentId])
+  @@index([providerEventId])
+}
+
+model IdempotencyKey {
+  id        String           @id @default(cuid())
+  scope     IdempotencyScope
+  key       String
+  entityId  String?
+  status    String
+  response  Json?
+  metaJson  Json?
+  createdAt DateTime         @default(now())
+  expiresAt DateTime?
+
+  @@unique([scope, key])
+  @@index([expiresAt])
+  @@index([entityId])
+  @@index([status])
+}
+
+model FiscalReceipt {
+  id                   String              @id @default(cuid())
+  checkoutOrderId      String?
+  paymentId            String?
+  supplierId           String?
+  type                 FiscalReceiptType   @default(INCOME)
+  status               FiscalReceiptStatus @default(PENDING)
+  amountKopecks        Int                 @default(0)
+  providerReceiptId    String?             @unique
+  fiscalDocumentNumber String?
+  fiscalDriveNumber    String?
+  fiscalSign           String?
+  receiptUrl           String?
+  rawPayload           Json?
+  error                String?
+  sentAt               DateTime?
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+
+  order    CheckoutOrder? @relation(fields: [checkoutOrderId], references: [id], onDelete: Cascade)
+  payment  Payment?       @relation(fields: [paymentId], references: [id], onDelete: SetNull)
+  supplier Supplier?      @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+
+  @@index([checkoutOrderId])
+  @@index([paymentId])
+  @@index([supplierId, status])
+  @@index([status, updatedAt])
+}
+
+model Payout {
+  id                String       @id @default(cuid())
+  supplierId        String
+  status            PayoutStatus @default(DRAFT)
+  currency          String       @default("RUB")
+  amountKopecks     Int          @default(0)
+  commissionKopecks Int          @default(0)
+  periodStart       DateTime?
+  periodEnd         DateTime?
+  paidAt            DateTime?
+  bankPaymentId     String?
+  comment           String?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  supplier Supplier     @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  items    PayoutItem[]
+
+  @@index([supplierId, status])
+  @@index([status, createdAt])
+}
+
+model PayoutItem {
+  id                String   @id @default(cuid())
+  payoutId          String?
+  supplierId        String
+  checkoutOrderId   String?
+  checkoutItemId    String?
+  amountKopecks     Int      @default(0)
+  commissionKopecks Int      @default(0)
+  source            String?
+  createdAt         DateTime @default(now())
+
+  payout        Payout?        @relation(fields: [payoutId], references: [id], onDelete: SetNull)
+  supplier      Supplier       @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  checkoutOrder CheckoutOrder? @relation(fields: [checkoutOrderId], references: [id], onDelete: SetNull)
+  checkoutItem  CheckoutItem?  @relation(fields: [checkoutItemId], references: [id], onDelete: SetNull)
+
+  @@index([payoutId])
+  @@index([supplierId])
+  @@index([checkoutOrderId])
+  @@index([checkoutItemId])
+}
+
+model SupplierLedgerEntry {
+  id              String                  @id @default(cuid())
+  supplierId      String
+  type            SupplierLedgerEntryType
+  amountKopecks   Int
+  currency        String                  @default("RUB")
+  referenceType   String?
+  referenceId     String?
+  checkoutOrderId String?
+  checkoutItemId  String?
+  paymentId       String?
+  note            String?
+  metaJson        Json?
+  createdAt       DateTime                @default(now())
+
+  supplier Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+
+  @@index([supplierId])
+  @@index([supplierId, createdAt])
+  @@index([referenceType, referenceId])
+  @@index([checkoutOrderId])
+  @@index([paymentId])
+}
+
+model SupplierReport {
+  id                   String               @id @default(cuid())
+  supplierId           String
+  periodStart          DateTime
+  periodEnd            DateTime
+  basis                SupplierReportBasis
+  status               SupplierReportStatus @default(DRAFT)
+  hasConflict          Boolean              @default(false)
+  acceptedAt           DateTime?
+  acceptedByUserId     String?
+  grossKopecks         Int                  @default(0)
+  commissionKopecks    Int                  @default(0)
+  refundKopecks        Int                  @default(0)
+  netKopecks           Int                  @default(0)
+  snapshotJson         Json?
+  legalProfileSnapshot Json?
+  metaJson             Json?
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+
+  supplier  Supplier             @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  lines     SupplierReportLine[]
+  documents SupplierDocument[]
+  disputes  SupplierDispute[]
+
+  @@unique([supplierId, periodStart, periodEnd, basis])
+  @@index([supplierId, periodStart, periodEnd])
+  @@index([status])
+}
+
+model SupplierReportLine {
+  id               String                 @id @default(cuid())
+  supplierReportId String
+  ledgerEntryId    String?
+  type             SupplierReportLineType
+  referenceType    String?
+  referenceId      String?
+  amountKopecks    Int                    @default(0)
+  netKopecks       Int                    @default(0)
+  metaJson         Json?
+  createdAt        DateTime               @default(now())
+
+  report SupplierReport @relation(fields: [supplierReportId], references: [id], onDelete: Cascade)
+
+  @@index([supplierReportId])
+  @@index([ledgerEntryId])
+  @@index([referenceType, referenceId])
+}
+
+model SupplierSettlement {
+  id                String           @id @default(cuid())
+  supplierId        String
+  periodStart       DateTime
+  periodEnd         DateTime
+  grossKopecks      Int              @default(0)
+  commissionKopecks Int              @default(0)
+  adjustmentKopecks Int              @default(0)
+  netKopecks        Int              @default(0)
+  currency          String           @default("RUB")
+  status            SettlementStatus @default(DRAFT)
+  payoutId          String?
+  approvedAt        DateTime?
+  finalizedAt       DateTime?
+  paidAt            DateTime?
+  metaJson          Json?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  supplier  Supplier           @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  documents SupplierDocument[]
+
+  @@index([supplierId, periodStart, periodEnd])
+  @@index([status])
+}
+
+model SupplierDocument {
+  id           String                 @id @default(cuid())
+  supplierId   String
+  reportId     String?
+  settlementId String?
+  type         SupplierDocumentType
+  status       SupplierDocumentStatus @default(DRAFT)
+  title        String
+  payloadJson  Json?
+  createdAt    DateTime               @default(now())
+  updatedAt    DateTime               @updatedAt
+
+  supplier   Supplier               @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  report     SupplierReport?        @relation(fields: [reportId], references: [id], onDelete: SetNull)
+  settlement SupplierSettlement?    @relation(fields: [settlementId], references: [id], onDelete: SetNull)
+  files      SupplierDocumentFile[]
+
+  @@index([supplierId])
+  @@index([reportId])
+  @@index([settlementId])
+  @@index([status])
+}
+
+model SupplierDocumentFile {
+  id                 String                   @id @default(cuid())
+  supplierDocumentId String
+  kind               SupplierDocumentFileKind
+  storageKey         String
+  fileName           String?
+  mimeType           String?
+  sizeBytes          Int?
+  createdAt          DateTime                 @default(now())
+
+  document SupplierDocument @relation(fields: [supplierDocumentId], references: [id], onDelete: Cascade)
+
+  @@index([supplierDocumentId])
+}
+
+model SupplierDispute {
+  id               String                        @id @default(cuid())
+  supplierReportId String
+  supplierId       String
+  status           SupplierDisputeStatus         @default(OPEN)
+  reasonCategory   SupplierDisputeReasonCategory
+  reasonText       String?
+  resolutionText   String?
+  openedByUserId   String?
+  resolvedByUserId String?
+  resolvedAt       DateTime?
+  createdAt        DateTime                      @default(now())
+  updatedAt        DateTime                      @updatedAt
+
+  report   SupplierReport @relation(fields: [supplierReportId], references: [id], onDelete: Cascade)
+  supplier Supplier       @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+
+  @@index([supplierReportId])
+  @@index([supplierId, status])
+}
+
+model TripPlan {
+  id                String         @id @default(cuid())
+  publicCode        String?        @unique
+  siteUserId        String?
+  cityId            String?
+  title             String?
+  status            TripPlanStatus @default(DRAFT)
+  startsAt          DateTime?
+  endsAt            DateTime?
+  travellerSnapshot Json?
+  notes             String?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  siteUser SiteUser?      @relation(fields: [siteUserId], references: [id])
+  city     City?          @relation(fields: [cityId], references: [id])
+  items    TripPlanItem[]
+  vouchers TripVoucher[]
+
+  @@index([siteUserId, createdAt])
+  @@index([cityId, startsAt])
+  @@index([status, createdAt])
+}
+
+model TripPlanItem {
+  id             String    @id @default(cuid())
+  tripPlanId     String
+  eventId        String?
+  sessionId      String?
+  venueId        String?
+  checkoutItemId String?
+  sortOrder      Int       @default(0)
+  startsAt       DateTime?
+  endsAt         DateTime?
+  title          String?
+  notes          String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  tripPlan     TripPlan          @relation(fields: [tripPlanId], references: [id], onDelete: Cascade)
+  event        Event?            @relation(fields: [eventId], references: [id])
+  session      EventSession?     @relation(fields: [sessionId], references: [id])
+  venue        Venue?            @relation(fields: [venueId], references: [id])
+  checkoutItem CheckoutItem?     @relation(fields: [checkoutItemId], references: [id], onDelete: SetNull)
+  voucherItems TripVoucherItem[]
+
+  @@index([tripPlanId, sortOrder])
+  @@index([eventId])
+  @@index([sessionId])
+  @@index([venueId])
+  @@index([checkoutItemId])
+}
+
+model TripVoucher {
+  id              String            @id @default(cuid())
+  tripPlanId      String
+  checkoutOrderId String?
+  code            String            @unique
+  status          TripVoucherStatus @default(DRAFT)
+  issuedAt        DateTime?
+  cancelledAt     DateTime?
+  payload         Json?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  tripPlan      TripPlan          @relation(fields: [tripPlanId], references: [id], onDelete: Cascade)
+  checkoutOrder CheckoutOrder?    @relation(fields: [checkoutOrderId], references: [id], onDelete: SetNull)
+  items         TripVoucherItem[]
+
+  @@index([tripPlanId, status])
+  @@index([checkoutOrderId])
+  @@index([status, createdAt])
+}
+
+model TripVoucherItem {
+  id             String   @id @default(cuid())
+  tripVoucherId  String
+  tripPlanItemId String?
+  checkoutItemId String?
+  title          String?
+  sortOrder      Int      @default(0)
+  createdAt      DateTime @default(now())
+
+  tripVoucher  TripVoucher   @relation(fields: [tripVoucherId], references: [id], onDelete: Cascade)
+  tripPlanItem TripPlanItem? @relation(fields: [tripPlanItemId], references: [id], onDelete: SetNull)
+  checkoutItem CheckoutItem? @relation(fields: [checkoutItemId], references: [id], onDelete: SetNull)
+
+  @@index([tripVoucherId, sortOrder])
+  @@index([tripPlanItemId])
+  @@index([checkoutItemId])
+}
+
+model Review {
+  id              String       @id @default(cuid())
+  eventId         String?
+  venueId         String?
+  supplierId      String?
+  siteUserId      String?
+  checkoutOrderId String?
+  externalOrderId String?
+  rating          Int
+  title           String?
+  text            String
+  authorName      String
+  authorEmail     String
+  isVerified      Boolean      @default(false)
+  voucherCode     String?
+  /// Public-facing purchase ref (ticket/order), never full PII in UI.
+  purchaseRef     String?
+  verifyToken     String?      @unique
+  helpfulCount    Int          @default(0)
+  status          ReviewStatus @default(PENDING_EMAIL)
+  adminComment    String?
+  publishedAt     DateTime?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  event            Event?                  @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  venue            Venue?                  @relation(fields: [venueId], references: [id], onDelete: SetNull)
+  supplier         Supplier?               @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+  siteUser         SiteUser?               @relation(fields: [siteUserId], references: [id], onDelete: SetNull)
+  checkoutOrder    CheckoutOrder?          @relation(fields: [checkoutOrderId], references: [id], onDelete: SetNull)
+  externalOrder    ExternalOrder?          @relation(fields: [externalOrderId], references: [id], onDelete: SetNull)
+  supplierResponse ReviewSupplierResponse?
+  disputes         ReviewDispute[]
+  actionLogs       ReviewActionLog[]
+
+  @@index([eventId, status])
+  @@index([venueId, status])
+  @@index([supplierId, status])
+  @@index([siteUserId])
+  @@index([checkoutOrderId])
+  @@index([externalOrderId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model ReviewSupplierResponse {
+  id                String                       @id @default(cuid())
+  reviewId          String                       @unique
+  supplierId        String
+  text              String
+  status            ReviewSupplierResponseStatus @default(DRAFT)
+  moderationComment String?
+  moderatedByUserId String?
+  moderatedAt       DateTime?
+  createdAt         DateTime                     @default(now())
+  updatedAt         DateTime                     @updatedAt
+
+  review   Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  supplier Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+
+  @@index([supplierId, status])
+  @@index([status])
+}
+
+model ReviewDispute {
+  id                     String                  @id @default(cuid())
+  reviewId               String
+  supplierId             String
+  status                 ReviewDisputeStatus     @default(MODERATOR_REVIEW)
+  reasonCode             ReviewDisputeReasonCode
+  claimText              String
+  supplierConfirmedTruth Boolean                 @default(false)
+  decisionComment        String?
+  handledByUserId        String?
+  resolvedAt             DateTime?
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
+
+  review     Review            @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  supplier   Supplier          @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  actionLogs ReviewActionLog[]
+
+  @@unique([reviewId])
+  @@index([supplierId, status])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model ReviewActionLog {
+  id         String   @id @default(cuid())
+  reviewId   String?
+  disputeId  String?
+  actorType  String
+  actorId    String?
+  actionType String
+  payload    Json?
+  createdAt  DateTime @default(now())
+
+  review  Review?        @relation(fields: [reviewId], references: [id], onDelete: SetNull)
+  dispute ReviewDispute? @relation(fields: [disputeId], references: [id], onDelete: SetNull)
+
+  @@index([reviewId, createdAt])
+  @@index([disputeId, createdAt])
+  @@index([actionType])
+}
+
+model ExternalReview {
+  id          String    @id @default(cuid())
+  eventId     String?
+  venueId     String?
+  supplierId  String?
+  source      String
+  sourceUrl   String?
+  authorName  String
+  rating      Int
+  text        String
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  event    Event?    @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  venue    Venue?    @relation(fields: [venueId], references: [id], onDelete: SetNull)
+  supplier Supplier? @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+
+  @@index([eventId, source])
+  @@index([venueId, source])
+  @@index([supplierId])
+}
+
+model ReviewRequest {
+  id              String    @id @default(cuid())
+  email           String
+  eventId         String
+  checkoutOrderId String?
+  externalOrderId String?
+  token           String    @unique
+  /// Snapshot for prefilled write form (date / event title / short order ref).
+  purchaseDate    DateTime?
+  purchaseRef     String?
+  buyerName       String?
+  sentAt          DateTime  @default(now())
+  reminderSentAt  DateTime?
+  openedAt        DateTime?
+  clickedAt       DateTime?
+  reviewId        String?
+
+  event         Event          @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  checkoutOrder CheckoutOrder? @relation(fields: [checkoutOrderId], references: [id], onDelete: SetNull)
+  externalOrder ExternalOrder? @relation(fields: [externalOrderId], references: [id], onDelete: SetNull)
+
+  @@unique([email, eventId])
+  @@index([token])
+  @@index([eventId])
+  @@index([checkoutOrderId])
+  @@index([externalOrderId])
+}
+
+model QualityIssue {
+  id         String    @id @default(cuid())
+  eventId    String
+  code       String
+  severity   String
+  message    String
+  createdAt  DateTime  @default(now())
+  resolvedAt DateTime?
+
+  event Event @relation(fields: [eventId], references: [id])
+}
+
+/// Viral short links for «Мой день» share (`/d/{code}`, `/m/{city}-{title}-{code}`).
+model DayRouteShare {
+  code        String   @id
+  citySlug    String?
+  items       String
+  fromName    String?
+  /// Display title for public `/m` page and readable slug.
+  title       String?
+  titleSlug   String?
+  /// Optional public author label (scaffold; no auth yet).
+  authorName  String?
+  hitCount    Int      @default(0)
+  saveCount   Int      @default(0)
+  ratingSum   Int      @default(0)
+  ratingCount Int      @default(0)
+  /// DRAFT | PUBLISHED - new shares default PUBLISHED for viral MVP.
+  status      String   @default("PUBLISHED")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([citySlug, items])
+  @@index([createdAt])
+  @@index([status, createdAt])
+  @@index([titleSlug])
+  @@map("day_route_shares")
+}

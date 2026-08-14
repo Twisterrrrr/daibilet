@@ -1,0 +1,50 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build output
+dist/
+**/dist/
+.vite/
+**/.vite/
+apps/web/public/images/
+
+# Generated code
+packages/db/src/generated/
+
+# Logs and local runtime output
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+data/*.log
+
+# Local app/agent state
+.codex/
+.agents/
+.codex-screenshots/
+
+# One-off agent/deploy scratch (smoke scripts, patches) — never commit
+.deploy-tmp/
+tmp-*/
+
+# Generated supplier snapshots and local SQL dumps
+data/ticketscloud/*.json
+data/db/*.sql
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+__pycache__/
+*.pyc
+
+# Runtime disk caches (INC.504.4 catalog DTO snapshot)
+var/cache/

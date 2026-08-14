@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: daibilet-tours-postgres
+    environment:
+      POSTGRES_DB: daibilet
+      POSTGRES_USER: daibilet
+      POSTGRES_PASSWORD: daibilet
+    ports:
+      - "5437:5432"
+    volumes:
+      - daibilet-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U daibilet -d daibilet"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  daibilet-postgres-data:

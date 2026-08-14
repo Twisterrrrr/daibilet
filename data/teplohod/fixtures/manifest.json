@@ -1,0 +1,10 @@
+{
+  "exportedAt": "2026-06-07T12:00:00+03:00",
+  "source": "https://api.teplohod.info/v1/events?compact",
+  "eventsFile": "events-compact.json",
+  "citiesFile": "cities.json",
+  "eventsCount": 186,
+  "citiesCount": 18,
+  "eventsSha256": "c9e3efe742463616f69e39a4c229898891b2885c50b69c4d93dcabc6f22e7747",
+  "citiesSha256": "26a3bb1b54c9544d1769ac1157a6f86badcfc31ee37a4bfb251678bf784ea456"
+}
