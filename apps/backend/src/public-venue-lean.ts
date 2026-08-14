@@ -276,7 +276,7 @@ function mapLeanVenueRow(
     proposedKind: String(kind || 'OTHER').toLowerCase(),
     pageStatus,
     events: eventCount,
-    stopEventCount: stopEventCount > 0 ? stopEventCount : undefined,
+    ...(stopEventCount > 0 ? { stopEventCount } : {}),
     waterEvents: 0,
     busEvents: 0,
     reason: pageStatus === 'candidate' ? 'кандидат на public-страницу' : 'пока только локация',

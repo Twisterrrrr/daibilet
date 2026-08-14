@@ -177,8 +177,8 @@ test('lookupVenueCatalogSessions does not attach Sortavala Музей session to
       },
     ],
   );
-  assert.equal(matched.some((s) => s.id === 'sess-sortavala'), false);
-  assert.equal(matched.some((s) => s.id === 'sess-child'), true);
+  assert.equal(matched.some((s: { id: string }) => s.id === 'sess-sortavala'), false);
+  assert.equal(matched.some((s: { id: string }) => s.id === 'sess-child'), true);
 
   const drevnosti = lookupVenueCatalogSessionsForTest(
     ['venue_perm_drev'],

@@ -266,8 +266,8 @@ export function buildCityRegionNearby(input: {
 }): PublicRegionNearbyDto | null {
   const hub = findRegionHubByCenterCity({
     name: input.cityName,
-    slug: input.citySlug,
-    sourceSlug: input.sourceSlug,
+    slug: input.citySlug ?? null,
+    sourceSlug: input.sourceSlug ?? null,
   });
   if (!hub) return null;
 
