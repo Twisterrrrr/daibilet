@@ -5,12 +5,13 @@ import { ChunkLoadRecovery } from '@/components/ChunkLoadRecovery';
 import { NavigationProgress } from '@/components/NavigationProgress.client';
 import { PurchaseOpeningHost } from '@/components/PurchaseOpeningFeedback.client';
 import { fontVariableClassName } from '@/lib/fonts';
-import { DEFAULT_OG_IMAGE, HOME_SEO_DESCRIPTION_FALLBACK, HOME_SEO_TITLE, absoluteUrl } from '@/lib/seo-meta';
+import { DEFAULT_OG_IMAGE, HOME_SEO_DESCRIPTION_FALLBACK, HOME_SEO_TITLE, getOpenGraphMediaTags } from '@/lib/seo-meta';
 
 import './globals.css';
 
-const SITE_URL = process.env.DAIBILET_SITE_URL || 'https://daibilet.ru';
+const SITE_URL = process.env.DAIBILET_SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || 'https://daibilet.ru';
 const SITE_NAME = 'Дайбилет';
+const ROOT_OG = getOpenGraphMediaTags(DEFAULT_OG_IMAGE, HOME_SEO_TITLE);
 
 /** Favicon / PWA: силуэт билета ~90% кадра (мало padding во вкладке). */
 const ICON_32 = '/favicon-32x32.png';
@@ -50,21 +51,13 @@ export const metadata: Metadata = {
     siteName: SITE_NAME,
     title: HOME_SEO_TITLE,
     description: HOME_SEO_DESCRIPTION_FALLBACK,
-    images: [
-      {
-        url: absoluteUrl(DEFAULT_OG_IMAGE),
-        secureUrl: absoluteUrl(DEFAULT_OG_IMAGE),
-        alt: HOME_SEO_TITLE,
-        width: 1200,
-        height: 630,
-      },
-    ],
+    images: ROOT_OG.images,
   },
   twitter: {
-    card: 'summary_large_image',
+    card: ROOT_OG.twitterCard,
     title: HOME_SEO_TITLE,
     description: HOME_SEO_DESCRIPTION_FALLBACK,
-    images: [absoluteUrl(DEFAULT_OG_IMAGE)],
+    images: ROOT_OG.twitterImages,
   },
   other: {
     'apple-mobile-web-app-title': SITE_NAME,

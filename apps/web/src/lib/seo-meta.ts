@@ -1,10 +1,30 @@
-const SITE_URL = process.env.DAIBILET_SITE_URL || 'https://daibilet.ru';
+import type { Metadata } from 'next';
 
-/** Site-wide OG fallback when a page has no dedicated share image (1200×630 hero). */
-export const DEFAULT_OG_IMAGE = '/images/hero/home-hero-friends-selfie.jpg';
+function siteOrigin(): string {
+  return (
+    process.env.DAIBILET_SITE_URL ||
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    process.env.NEXT_PUBLIC_APP_URL ||
+    'https://daibilet.ru'
+  ).replace(/\/+$/, '');
+}
+
+const SITE_URL = siteOrigin();
+
+export const OG_IMAGE_WIDTH = 1200;
+export const OG_IMAGE_HEIGHT = 630;
+export const OG_IMAGE_TYPE = 'image/jpeg';
+
+/** Relative path on disk (apps/public/public + synced web/public). */
+export const DEFAULT_OG_IMAGE_PATH = '/images/og/default-og.jpg';
+
+/** Site-wide OG fallback. Absolute JPEG 1200x630 - never the 2.5MB home-hero selfie. */
+export const DEFAULT_OG_IMAGE = `${SITE_URL}${DEFAULT_OG_IMAGE_PATH}`;
 
 /** Blog index share preview (distinct from per-article *-og.jpg). */
 export const BLOG_LIST_OG_IMAGE = '/images/blog/blog-hero-promo.jpg';
+
+const DEFAULT_OG_ALT = 'Дайбилет';
 
 /** Default home / root title - keep ≤~60–70 chars for SERP; no live counts. */
 export const HOME_SEO_TITLE =
@@ -27,6 +47,22 @@ type DestinationLike = {
   type?: string;
   slug?: string | null;
   events: number;
+};
+
+export type OgImageDescriptor = {
+  url: string;
+  secureUrl: string;
+  width: number;
+  height: number;
+  type: string;
+  alt: string;
+};
+
+export type OpenGraphMediaTags = {
+  url: string;
+  images: OgImageDescriptor[];
+  twitterCard: 'summary_large_image';
+  twitterImages: string[];
 };
 
 /** Strip trailing brand suffixes so root title template does not become "X | Дайбилет | Дайбилет". */
@@ -63,10 +99,48 @@ export function buildHomeSeoDescription(destinations: DestinationLike[]): string
 
 export function absoluteUrl(pathname: string): string {
   const value = String(pathname || '').trim();
-  if (!value) return SITE_URL.replace(/\/+$/, '');
+  if (!value) return SITE_URL;
   if (/^https?:\/\//i.test(value)) return value;
   const path = value.startsWith('/') ? value : `/${value}`;
-  return new URL(path, SITE_URL).toString();
+  return new URL(path, `${SITE_URL}/`).toString();
+}
+
+function sanitizeOgAlt(alt?: string | null): string {
+  const value = String(alt || DEFAULT_OG_ALT)
+    .replace(/[\u2013\u2014]/g, '-')
+    .trim();
+  return value || DEFAULT_OG_ALT;
+}
+
+function toHttps(url: string): string {
+  return url.replace(/^http:\/\//i, 'https://');
+}
+
+/**
+ * Full OG + Twitter image pack: absolute https URL, 1200x630, image/jpeg, alt.
+ * No custom path → default-og.jpg. Already-absolute URLs are kept.
+ */
+export function getOpenGraphMediaTags(
+  customImagePath?: string | null,
+  alt?: string | null,
+): OpenGraphMediaTags {
+  const raw = String(customImagePath || '').trim();
+  const url = raw ? absoluteUrl(raw) : DEFAULT_OG_IMAGE;
+  const secureUrl = toHttps(url);
+  const descriptor: OgImageDescriptor = {
+    url,
+    secureUrl,
+    width: OG_IMAGE_WIDTH,
+    height: OG_IMAGE_HEIGHT,
+    type: OG_IMAGE_TYPE,
+    alt: sanitizeOgAlt(alt),
+  };
+  return {
+    url,
+    images: [descriptor],
+    twitterCard: 'summary_large_image',
+    twitterImages: [url],
+  };
 }
 
 export function routeOpenGraph(pathname: string, extras: Record<string, unknown> = {}) {
@@ -86,12 +160,16 @@ export function buildShareMetadata(input: {
   imageWidth?: number;
   imageHeight?: number;
   type?: 'website' | 'article';
-}): Pick<import('next').Metadata, 'openGraph' | 'twitter'> {
+}): Pick<Metadata, 'openGraph' | 'twitter'> {
   const shareTitle = String(input.title || '').trim();
   const description = String(input.description || '').trim() || undefined;
   const url = absoluteUrl(input.path);
-  const imagePath = input.image || DEFAULT_OG_IMAGE;
-  const image = absoluteUrl(imagePath);
+  const media = getOpenGraphMediaTags(input.image, shareTitle);
+  const image = {
+    ...media.images[0]!,
+    width: input.imageWidth || media.images[0]!.width,
+    height: input.imageHeight || media.images[0]!.height,
+  };
   return {
     openGraph: {
       type: input.type || 'website',
@@ -100,21 +178,13 @@ export function buildShareMetadata(input: {
       url,
       title: shareTitle,
       description,
-      images: [
-        {
-          url: image,
-          secureUrl: image,
-          alt: shareTitle,
-          ...(input.imageWidth ? { width: input.imageWidth } : {}),
-          ...(input.imageHeight ? { height: input.imageHeight } : {}),
-        },
-      ],
+      images: [image],
     },
     twitter: {
-      card: 'summary_large_image',
+      card: media.twitterCard,
       title: shareTitle,
       description,
-      images: [image],
+      images: media.twitterImages,
     },
   };
 }
