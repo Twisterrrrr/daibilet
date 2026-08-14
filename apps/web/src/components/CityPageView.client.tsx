@@ -30,7 +30,7 @@ import type { BlogCardDto } from '@/lib/blog-utils';
 import type { FinanceAdmissionListResult } from '@/lib/finance-projection';
 import { venuePageTemplate } from '@/lib/venue-meta';
 import { eventHref, venueHref } from '@/lib/routes';
-import { inCityAccusative, inCityPrepositional, cityToGenitive, poCityDative } from '@/lib/city-declension';
+import { inCityAccusative, inCityPrepositional, cityToGenitive } from '@/lib/city-declension';
 import { buildCatalogHref } from '@/lib/catalog-url';
 import { buildCityHubSeoPhrase } from '@/lib/city-hub-seo';
 import {
@@ -92,9 +92,10 @@ const CITY_HASH_ALIASES: Record<string, string> = {
   'city-schedule': 'affiche',
   'city-directions': 'more',
   'city-sights': 'sights',
+  lifehacks: 'lifehacks',
   'city-travel': 'practice',
   'city-guide-faq': 'practice',
-  lifehacks: 'practice',
+  practice: 'practice',
   'city-seo': 'seo',
   'why-go': 'sights',
   'zachem-ehat': 'sights',
@@ -278,7 +279,7 @@ export function CityPageView({
   const hasLifehacks = cityHasLifehacks(hubSlug);
   const lifehacks = resolveCityLifehacks(hubSlug);
   const showTravel = hasTravel && !lifehacks?.skipTravel;
-  const hasPractice = hasTravel || hasFaq || practiceArticles.length > 0 || hasLifehacks;
+  const hasPracticeContent = showTravel || hasFaq || practiceArticles.length > 0;
   const hasMore = hasDirections || hasVenues || moreArticles.length > 0;
   const showSightsBlock = hasSights || hasHookFact || hasWeather || hasWhenToGo || hasIdentity;
 
@@ -300,12 +301,20 @@ export function CityPageView({
         { id: 'sights', label: 'Зачем ехать', show: showSightsBlock },
         ...(blogAfterSuburbs ? [blogTab] : []),
         { id: 'affiche', label: 'Афиша', show: true },
-        { id: 'practice', label: hasLifehacks ? 'Лайфхаки' : 'Советы', show: hasPractice },
+        { id: 'lifehacks', label: 'Лайфхаки', show: hasLifehacks },
+        { id: 'practice', label: 'Советы', show: hasPracticeContent },
         { id: 'more', label: 'Подборки', show: hasMore },
         ...(!blogAfterSuburbs ? [blogTab] : []),
       ].filter((tab) => tab.show);
     },
-    [blogAfterSuburbs, footerArticles.length, hasLifehacks, hasMore, hasPractice, showSightsBlock],
+    [
+      blogAfterSuburbs,
+      footerArticles.length,
+      hasLifehacks,
+      hasMore,
+      hasPracticeContent,
+      showSightsBlock,
+    ],
   );
 
   const renderHubBlogSection = () => {
@@ -1295,6 +1304,7 @@ function CitySightsSection({
   placeFocus = null,
   onPlaceFocus,
   includeSuburbs = true,
+  beforeScenarios = null,
 }: {
   city: PublicCityDto;
   guide: CityInfoEntry | null;
@@ -1310,6 +1320,8 @@ function CitySightsSection({
   placeFocus?: CityPlaceFocus | null;
   onPlaceFocus?: (focus: CityPlaceFocus | null) => void;
   includeSuburbs?: boolean;
+  /** Rendered after must-see rail, before «Готовые сценарии» (e.g. lifehacks carousel). */
+  beforeScenarios?: React.ReactNode;
 }) {
   const fromSights: CityMustSeeItem[] =
     guide?.sights?.map((item) => ({
@@ -1380,6 +1392,7 @@ function CitySightsSection({
           titleClass={titleClass}
           focusSlugs={activeFocus?.slugs || []}
           onClearFocus={() => onPlaceFocus?.(null)}
+          beforeScenarios={beforeScenarios}
           focusBanner={
             activeFocus ? (
         <div
@@ -1462,6 +1475,7 @@ function CitySightsMustSeeList({
   focusSlugs = [],
   onClearFocus,
   focusBanner = null,
+  beforeScenarios = null,
 }: {
   heading: string;
   places: CityMustSeeItem[];
@@ -1482,6 +1496,7 @@ function CitySightsMustSeeList({
   focusSlugs?: string[];
   onClearFocus?: () => void;
   focusBanner?: React.ReactNode;
+  beforeScenarios?: React.ReactNode;
 }) {
   const hasNamedScenarios = Boolean(namedPresets?.length);
   const showPlacesRail = places.length > 0;
@@ -1810,7 +1825,8 @@ function CitySightsMustSeeList({
       </div>
         </>
       ) : null}
-      <div className={showPlacesRail ? 'mt-10' : 'mt-6'}>
+      {beforeScenarios}
+      <div className={showPlacesRail || beforeScenarios ? 'mt-10' : 'mt-6'}>
         {hasNamedScenarios && showPlacesRail ? (
           <h3
             className={
