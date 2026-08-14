@@ -1,10 +1,11 @@
-## 2026-08-15 - Hub: events+collections merge, FAQ+blog split
+## 2026-08-15 - Hub carousel arrows outside + deploy batch
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| UX.HUB-EVENTS-COLLECTIONS-MERGE | Подборки в зоне «События»; убрать sticky «Подборки» | Высокий | 🔄 code (commit+push; deploy batch) |
-| UX.HUB-COLLECTION-PHOTO-TILES | Плитки подборок: juicy photo covers из landings | Высокий | 🔄 code (commit+push; deploy batch) |
-| UX.HUB-FAQ-BLOG-SPLIT | Desktop FAQ\|блог 2 col; sticky FAQ / Ещё → `#faq` | Высокий | 🔄 code (commit+push; deploy batch) |
+| UX.HUB-CAROUSEL-ARROWS-OUT | Prev/next хаб-каруселей вне колонки (рядом с треком) | Высокий | 🔄 ship+Deploy MSK web |
+| UX.HUB-EVENTS-COLLECTIONS-MERGE | Подборки в зоне «События»; убрать sticky «Подборки» | Высокий | 🔄 Deploy MSK web (в batch) |
+| UX.HUB-COLLECTION-PHOTO-TILES | Плитки подборок: juicy photo covers из landings | Высокий | 🔄 Deploy MSK web (в batch) |
+| UX.HUB-FAQ-BLOG-SPLIT | Desktop FAQ\|блог 2 col; sticky FAQ / Ещё → `#faq` | Высокий | 🔄 Deploy MSK web (в batch) |
 
 ## 2026-08-14 - Live: Deploy MSK web `31839365845`
 

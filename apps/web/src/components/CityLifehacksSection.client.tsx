@@ -3,8 +3,6 @@
 import {
   Bus,
   CableCar,
-  ChevronLeft,
-  ChevronRight,
   ExternalLink,
   Footprints,
   Landmark,
@@ -16,6 +14,7 @@ import {
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { CityHubSectionHeading } from '@/components/CityHubSectionHeading';
+import { HubCarouselChrome } from '@/components/HubCarouselChrome.client';
 import {
   focusFromLifehackCta,
   resolveCityLifehacks,
@@ -188,8 +187,6 @@ export function CityLifehacksSection({
   const cardShell = editorial
     ? `${CARD_WIDTH} shadow-sm ${LIFEHACK_HOVER_SHADOW}`
     : `${CARD_WIDTH} shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_rgba(15,23,42,0.06)] ${LIFEHACK_HOVER_SHADOW}`;
-  const arrowClass =
-    'inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50';
 
   return (
     <section
@@ -201,43 +198,25 @@ export function CityLifehacksSection({
         title={heading}
         description="Практичные советы, чтобы не потерять день и бюджет"
         editorial={editorial}
-        actions={
-          items.length > 1 ? (
-            <div className="flex shrink-0 gap-2 pt-0.5">
-              <button
-                type="button"
-                aria-label="Предыдущий лайфхак"
-                onClick={() => scrollTo(index - 1)}
-                className={arrowClass}
-              >
-                <ChevronLeft className="h-4 w-4" aria-hidden />
-              </button>
-              <button
-                type="button"
-                aria-label="Следующий лайфхак"
-                onClick={() => scrollTo(index + 1)}
-                className={arrowClass}
-              >
-                <ChevronRight className="h-4 w-4" aria-hidden />
-              </button>
-            </div>
-          ) : null
-        }
       />
 
-      <div
-        ref={scrollerRef}
-        className="mt-5 flex items-stretch snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain py-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden [&::-webkit-scrollbar]:h-0"
+      <HubCarouselChrome
+        className="mt-5"
+        scrollerRef={scrollerRef}
+        trackClassName="flex items-stretch snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain py-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden [&::-webkit-scrollbar]:h-0"
         aria-label={heading}
+        showArrows={items.length > 1}
+        canPrev={index > 0}
+        canNext={index < items.length - 1}
+        onPrev={() => scrollTo(index - 1)}
+        onNext={() => scrollTo(index + 1)}
+        prevLabel="Предыдущий лайфхак"
+        nextLabel="Следующий лайфхак"
       >
         {items.map((item, cardIndex) => {
           const Icon = ICONS[item.icon] || Footprints;
           return (
-            <article
-              key={item.id}
-              data-lifehack-card={item.id}
-              className={cardShell}
-            >
+            <article key={item.id} data-lifehack-card={item.id} className={cardShell}>
               <div className="flex h-full flex-1 flex-col">
                 <div className="flex items-center gap-3 bg-sky-50 px-4 pb-3 pt-4 sm:px-5 sm:pt-5">
                   <span
@@ -272,7 +251,7 @@ export function CityLifehacksSection({
             </article>
           );
         })}
-      </div>
+      </HubCarouselChrome>
     </section>
   );
 }

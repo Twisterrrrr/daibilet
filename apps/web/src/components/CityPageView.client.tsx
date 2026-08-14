@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { ArrowLeft, ChevronDown, ChevronLeft, ChevronRight, Clock, Info, Lightbulb, MapPin, Ticket } from 'lucide-react';
+import { ArrowLeft, ChevronDown, Clock, Info, Lightbulb, MapPin, Ticket } from 'lucide-react';
 import Link from 'next/link';
 
 import { CityHubArticlesGrid } from '@/components/CityHubArticleTeaser.client';
@@ -24,6 +24,7 @@ import { useDayRouteState } from '@/hooks/useDayRouteState';
 import { CityDayPresetBlock } from '@/components/CityDayPresetBlock.client';
 import { CityIdentityCarousel } from '@/components/CityIdentityCarousel.client';
 import { CityLifehacksSection } from '@/components/CityLifehacksSection.client';
+import { HubCarouselChrome } from '@/components/HubCarouselChrome.client';
 import { CityRegionalEvents } from '@/components/CityRegionalEvents.client';
 import { CityWeatherWidget } from '@/components/CityWeatherWidget.client';
 import { MustSeeFilterTabs } from '@/components/MustSeeFilterTabs.client';
@@ -373,7 +374,9 @@ export function CityPageView({
   }, [hasFaqBlogSplit, hasLifehacks, hasMustSeeNav]);
 
   return (
-    <div className={editorial ? 'bg-zinc-50 text-zinc-900' : 'bg-slate-50 text-slate-900'}>
+    <div
+      className={`overflow-x-clip ${editorial ? 'bg-zinc-50 text-zinc-900' : 'bg-slate-50 text-slate-900'}`}
+    >
       <div>
         {!payload && !error ? <CityLoadingState editorial={editorial} /> : null}
 
@@ -1686,8 +1689,6 @@ function CitySightsMustSeeList({
     });
   };
 
-  const arrowClass =
-    'inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50 disabled:pointer-events-none disabled:opacity-40';
   const showRailArrows = showPlacesRail && !sparseGrid;
   const routeCount = useDayRouteState().venues.length;
 
@@ -1698,32 +1699,6 @@ function CitySightsMustSeeList({
           title={heading}
           description="Главные места, музеи и прогулочные точки"
           editorial={editorial}
-          actions={
-            showRailArrows ? (
-              <div className="flex shrink-0 gap-2 pt-0.5">
-                <button
-                  type="button"
-                  data-city-must-see-prev
-                  aria-label="Предыдущие места"
-                  disabled={!canPrev}
-                  onClick={() => scrollPage(-1)}
-                  className={arrowClass}
-                >
-                  <ChevronLeft className="h-4 w-4" aria-hidden />
-                </button>
-                <button
-                  type="button"
-                  data-city-must-see-next
-                  aria-label="Следующие места"
-                  disabled={!canNext}
-                  onClick={() => scrollPage(1)}
-                  className={arrowClass}
-                >
-                  <ChevronRight className="h-4 w-4" aria-hidden />
-                </button>
-              </div>
-            ) : null
-          }
         />
       </div>
       {showPlacesRail ? (
@@ -1760,20 +1735,31 @@ function CitySightsMustSeeList({
         editorial={editorial}
       />
       {/* Mobile: 1-card ~80/20 peek swipe. md+: sparse (<4) = capped card grid; ≥4 = single-row snap carousel. */}
-      <div className={`relative mt-6`}>
-        <div
-          key={focusedMustSee.length ? `focus:${[...focusedSlugSet].join(',')}` : activeId}
-          ref={railRef}
-          className={
-            sparseGrid
-              ? 'horizontal-snap-row flex flex-nowrap gap-2.5 snap-x snap-mandatory py-1 md:block md:overflow-visible md:py-1'
-              : 'horizontal-snap-row flex flex-nowrap gap-2.5 snap-x snap-mandatory py-1 md:gap-6 md:[scrollbar-width:none] md:[-ms-overflow-style:none] md:[&::-webkit-scrollbar]:hidden'
-          }
-          data-city-must-see-rail
-          data-city-must-see-layout={sparseGrid ? 'sparse-grid' : 'carousel'}
-          aria-label="Главные места"
-          tabIndex={0}
-        >
+      <HubCarouselChrome
+        key={focusedMustSee.length ? `focus:${[...focusedSlugSet].join(',')}` : activeId}
+        className="mt-6"
+        scrollerRef={railRef}
+        showArrows={showRailArrows}
+        canPrev={canPrev}
+        canNext={canNext}
+        onPrev={() => scrollPage(-1)}
+        onNext={() => scrollPage(1)}
+        prevLabel="Предыдущие места"
+        nextLabel="Следующие места"
+        prevDataAttr="data-city-must-see-prev"
+        nextDataAttr="data-city-must-see-next"
+        aria-label="Главные места"
+        tabIndex={0}
+        trackClassName={
+          sparseGrid
+            ? 'horizontal-snap-row flex flex-nowrap gap-2.5 snap-x snap-mandatory py-1 md:block md:overflow-visible md:py-1'
+            : 'horizontal-snap-row flex flex-nowrap gap-2.5 snap-x snap-mandatory py-1 md:gap-6 md:[scrollbar-width:none] md:[-ms-overflow-style:none] md:[&::-webkit-scrollbar]:hidden'
+        }
+        trackProps={{
+          'data-city-must-see-rail': '',
+          'data-city-must-see-layout': sparseGrid ? 'sparse-grid' : 'carousel',
+        }}
+      >
         {/* Mobile: contents hoists cards into the flex scrollport so % = viewport. */}
         {/* md sparse: N-col capped grid (w-max, left). md carousel: same flex snap, one row. */}
         <ol
@@ -1941,8 +1927,7 @@ function CitySightsMustSeeList({
           );
         })}
         </ol>
-        </div>
-      </div>
+      </HubCarouselChrome>
         </>
       ) : null}
       <div

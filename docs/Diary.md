@@ -1,3 +1,17 @@
+## 2026-08-15 - Hub carousel arrows outside container
+
+### Наблюдения
+- Prev/next у identity / must-see / lifehacks сидели в шапке рядом с H2 и теснили заголовок.
+
+### Решения
+- Общий `HubCarouselChrome`: md+ стрелки снаружи колонки у ряда карточек (вертикальный центр), mobile - только swipe.
+- Подключено в identity, must-see, lifehacks; `overflow-x-clip` на корне хаба.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-15 - Hub: События+подборки, FAQ+блог split
 
 ### Наблюдения
