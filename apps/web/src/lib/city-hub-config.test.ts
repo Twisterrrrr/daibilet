@@ -1,7 +1,11 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { isCityHubSectionHidden, resolveCityHubConfig } from './city-hub-config.ts';
+import {
+  isCityHubBlogAfterSuburbs,
+  isCityHubSectionHidden,
+  resolveCityHubConfig,
+} from './city-hub-config.ts';
 
 test('resolveCityHubConfig normalizes sankt-peterburg alias', () => {
   const config = resolveCityHubConfig('sankt-peterburg');
@@ -43,6 +47,24 @@ test('isCityHubSectionHidden respects hideSections', () => {
 
 test('unknown slug returns null config', () => {
   assert.equal(resolveCityHubConfig('unknown-city-slug-xyz'), null);
+});
+
+test('isCityHubBlogAfterSuburbs gates five cities and aliases', () => {
+  for (const slug of [
+    'perm',
+    'kaliningrad',
+    'moscow',
+    'moskva',
+    'saint-petersburg',
+    'sankt-peterburg',
+    'nizhny-novgorod',
+    'nizhniy-novgorod',
+  ]) {
+    assert.equal(isCityHubBlogAfterSuburbs(slug), true, slug);
+  }
+  assert.equal(isCityHubBlogAfterSuburbs('kazan'), false);
+  assert.equal(isCityHubBlogAfterSuburbs('ekaterinburg'), false);
+  assert.equal(isCityHubBlogAfterSuburbs(''), false);
 });
 
 test('ekaterinburg hub config has no river featuredDirections', () => {

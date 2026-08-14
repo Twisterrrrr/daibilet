@@ -115,3 +115,20 @@ export function isCityHubSectionHidden(
 ): boolean {
   return Boolean(config?.hideSections?.includes(section));
 }
+
+/**
+ * Owner: on these hubs «Из блога» sits after «Пригороды» (end of sights),
+ * not in the footer after Подборки. Other cities keep the footer slot.
+ */
+const BLOG_AFTER_SUBURBS_SLUGS = new Set([
+  'perm',
+  'kaliningrad',
+  'moscow',
+  'saint-petersburg',
+  'nizhny-novgorod',
+]);
+
+export function isCityHubBlogAfterSuburbs(slug: string | null | undefined): boolean {
+  const normalized = normalizeCityHubSlug(slug);
+  return Boolean(normalized) && BLOG_AFTER_SUBURBS_SLUGS.has(normalized);
+}

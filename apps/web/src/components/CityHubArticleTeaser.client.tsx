@@ -16,7 +16,7 @@ function readTimeLabel(readMin: number): string {
   return `${n} минут чтения`;
 }
 
-/** City hub blog teaser: cover + title + reading time only (commerce stays inside the article). */
+/** City hub blog teaser: 16:9 cover, title, excerpt, then city badge + reading time. */
 export function CityHubArticleTeaser({
   article,
   editorial = false,
@@ -32,6 +32,7 @@ export function CityHubArticleTeaser({
   const isLarge = variant === 'large';
   const isSmall = variant === 'small';
   const cityLabel = blogListingCityBadgeLabel(article.citySlug, article.city);
+  const excerpt = String(article.excerpt || '').trim();
 
   return (
     <article
@@ -47,9 +48,9 @@ export function CityHubArticleTeaser({
         className="group flex h-full flex-col"
       >
         <span
-          className={`relative block shrink-0 overflow-hidden ${
-            isLarge ? 'aspect-[16/10] min-h-[11rem] lg:min-h-[16rem]' : 'aspect-[16/10]'
-          } ${editorial ? 'bg-zinc-100' : 'bg-slate-100'}`}
+          className={`relative block aspect-[16/9] w-full shrink-0 overflow-hidden rounded-t-2xl ${
+            editorial ? 'bg-zinc-100' : 'bg-slate-100'
+          }`}
         >
           <SafeImage
             src={article.coverImageUrl}
@@ -81,20 +82,29 @@ export function CityHubArticleTeaser({
           >
             {article.title}
           </h3>
-          {cityLabel ? (
+          {excerpt ? (
             <p
-              className={`mt-2 inline-flex w-fit max-w-full truncate rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ring-1 sm:text-[11px] ${blogCityBadgeClassName(article.citySlug)}`}
+              className={`mt-2 line-clamp-3 text-sm leading-relaxed ${
+                editorial ? 'text-zinc-600' : 'text-slate-600'
+              }`}
             >
-              {cityLabel}
+              {excerpt}
             </p>
           ) : null}
-          <p
-            className={`${cityLabel ? 'mt-1.5' : 'mt-2'} text-xs font-medium ${
-              editorial ? 'text-zinc-500' : 'text-slate-500'
-            }`}
-          >
-            {readTimeLabel(article.readMin)}
-          </p>
+          <span className="mt-auto flex flex-wrap items-center gap-x-2 gap-y-1.5 pt-3">
+            {cityLabel ? (
+              <span
+                className={`inline-flex w-fit max-w-full truncate rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ring-1 sm:text-[11px] ${blogCityBadgeClassName(article.citySlug)}`}
+              >
+                {cityLabel}
+              </span>
+            ) : null}
+            <span
+              className={`text-xs font-medium ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}
+            >
+              {readTimeLabel(article.readMin)}
+            </span>
+          </span>
         </span>
       </Link>
     </article>
@@ -113,36 +123,8 @@ export function CityHubArticlesGrid({
   if (!articles.length) return null;
   const items = articles.slice(0, 3);
 
-  if (items.length === 3) {
-    const [lead, sideA, sideB] = items;
-    return (
-      <div className="mt-4 grid grid-cols-1 items-stretch gap-4 lg:grid-cols-3 lg:grid-rows-2 lg:gap-5">
-        <div className="lg:col-span-2 lg:row-span-2">
-          <CityHubArticleTeaser
-            key={lead!.slug}
-            article={lead!}
-            editorial={editorial}
-            variant="large"
-          />
-        </div>
-        <CityHubArticleTeaser
-          key={sideA!.slug}
-          article={sideA!}
-          editorial={editorial}
-          variant="small"
-        />
-        <CityHubArticleTeaser
-          key={sideB!.slug}
-          article={sideB!}
-          editorial={editorial}
-          variant="small"
-        />
-      </div>
-    );
-  }
-
   return (
-    <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <div className="mt-4 grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2">
       {items.map((article) => (
         <CityHubArticleTeaser
           key={article.slug}

@@ -11,6 +11,7 @@ import {
   clipBlogFeaturedLead,
   expandListingExcerpt,
   expandLargeListingCopy,
+  hubBlogCardExcerpt,
   resolveBlogCardDateLabel,
   splitBlogListingHero,
   staticBlogCards,
@@ -221,4 +222,19 @@ test('myuzikly card exposes city badge label from static data', () => {
   assert.ok(card);
   assert.equal(card?.citySlug, 'multi');
   assert.equal(blogListingCityBadgeLabel(card?.citySlug, card?.city), 'Москва и Петербург');
+});
+
+test('hubBlogCardExcerpt uses real frontmatter, 2-3 sentences, not lorem', () => {
+  const cards = staticBlogCards();
+  const perm = cards.find((item) => item.slug === 'perm-za-2-dnya');
+  assert.ok(perm?.excerpt);
+  const lead = hubBlogCardExcerpt(perm!.slug, perm!.excerpt);
+  assert.ok(lead.includes('Сити-брейк в Перми'));
+  assert.ok(lead.includes('Хохловка'));
+  assert.ok(/[.!?…]$/u.test(lead));
+  assert.ok(!/lorem/i.test(lead));
+
+  const fromBody = hubBlogCardExcerpt('perm-za-2-dnya', '');
+  assert.ok(fromBody.length > 40);
+  assert.ok(/[.!?…]$/u.test(fromBody));
 });

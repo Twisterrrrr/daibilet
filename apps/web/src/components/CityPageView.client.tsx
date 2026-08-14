@@ -28,7 +28,11 @@ import { eventHref, venueHref } from '@/lib/routes';
 import { inCityAccusative, inCityPrepositional, cityToGenitive } from '@/lib/city-declension';
 import { buildCatalogHref } from '@/lib/catalog-url';
 import { buildCityHubSeoPhrase } from '@/lib/city-hub-seo';
-import { isCityHubSectionHidden, resolveCityHubConfig } from '@/lib/city-hub-config';
+import {
+  isCityHubBlogAfterSuburbs,
+  isCityHubSectionHidden,
+  resolveCityHubConfig,
+} from '@/lib/city-hub-config';
 import { matchSightAfficheLink, resolveFeaturedDirections } from '@/lib/city-hub-directions';
 import { resolveCityImageObjectPosition } from '@/lib/city-image-focus';
 import { resolveCityImage } from '@/lib/city-images';
@@ -216,18 +220,48 @@ export function CityPageView({
   const hasMore = hasDirections || hasVenues || moreArticles.length > 0;
   const showSightsBlock = hasSights || hasHookFact;
   // Story cards UI hidden (owner 2026-08-03); keep build helper for later - do not render.
+  const blogAfterSuburbs = isCityHubBlogAfterSuburbs(city?.slug || city?.sourceSlug || slug);
 
   const tabs = React.useMemo(
-    () =>
-      [
+    () => {
+      const blogTab = { id: 'blog', label: 'Из блога', show: footerArticles.length > 0 };
+      return [
         { id: 'sights', label: 'Зачем ехать', show: showSightsBlock },
+        ...(blogAfterSuburbs ? [blogTab] : []),
         { id: 'affiche', label: 'Афиша', show: true },
         { id: 'practice', label: 'Советы', show: hasPractice },
         { id: 'more', label: 'Подборки', show: hasMore },
-        { id: 'blog', label: 'Из блога', show: footerArticles.length > 0 },
-      ].filter((tab) => tab.show),
-    [footerArticles.length, hasMore, hasPractice, showSightsBlock],
+        ...(!blogAfterSuburbs ? [blogTab] : []),
+      ].filter((tab) => tab.show);
+    },
+    [blogAfterSuburbs, footerArticles.length, hasMore, hasPractice, showSightsBlock],
   );
+
+  const renderHubBlogSection = () => {
+    if (!footerArticles.length || !city) return null;
+    return (
+      <section
+        id="blog"
+        className={`border-b ${editorial ? 'border-zinc-200' : 'border-slate-100'} ${SECTION_SCROLL_MT}`}
+      >
+        <div className={`container-page ${editorial ? 'py-12 sm:py-14' : 'py-8'}`}>
+          <h2
+            className={
+              editorial
+                ? 'font-serif text-3xl font-semibold text-zinc-950 sm:text-4xl'
+                : 'text-2xl font-bold text-slate-950'
+            }
+          >
+            Из блога
+          </h2>
+          <p className={`mt-2 max-w-3xl text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+            Материалы про {city.name}. Общие гиды на несколько городов подписаны на карточке.
+          </p>
+          <CityHubArticlesGrid articles={footerArticles} editorial={editorial} />
+        </div>
+      </section>
+    );
+  };
 
   return (
     <div className={editorial ? 'bg-zinc-50 text-zinc-900' : 'bg-white text-slate-900'}>
@@ -287,6 +321,8 @@ export function CityPageView({
                 />
               </div>
             ) : null}
+
+            {blogAfterSuburbs ? renderHubBlogSection() : null}
 
             <section
               id="affiche"
@@ -387,28 +423,7 @@ export function CityPageView({
               <CityContentLoadingState />
             )}
 
-            {footerArticles.length ? (
-              <section
-                id="blog"
-                className={`border-b ${editorial ? 'border-zinc-200' : 'border-slate-100'} ${SECTION_SCROLL_MT}`}
-              >
-                <div className={`container-page ${editorial ? 'py-12 sm:py-14' : 'py-8'}`}>
-                  <h2
-                    className={
-                      editorial
-                        ? 'font-serif text-3xl font-semibold text-zinc-950 sm:text-4xl'
-                        : 'text-2xl font-bold text-slate-950'
-                    }
-                  >
-                    Из блога
-                  </h2>
-                  <p className={`mt-2 max-w-3xl text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-                    Материалы про {city.name}. Общие гиды на несколько городов подписаны на карточке.
-                  </p>
-                  <CityHubArticlesGrid articles={footerArticles} editorial={editorial} />
-                </div>
-              </section>
-            ) : null}
+            {blogAfterSuburbs ? null : renderHubBlogSection()}
 
             {hasSeo && seoText ? (
               <CitySeoTextSection cityName={city.name} text={seoText} editorial={editorial} />

@@ -217,6 +217,17 @@ export function expandListingExcerpt(slug: string, excerpt: string, maxChars = 4
 }
 
 /**
+ * City-hub «Из блога» teaser: 2-3 sentences from excerpt / dek, else first body paragraph.
+ * No new CMS fields - uses existing card metadata and static body.
+ */
+export function hubBlogCardExcerpt(slug: string, excerpt: string): string {
+  const base = stripColumnMetaPrefix(excerpt);
+  const source = base || plainLeadFromBody(slug);
+  if (!source) return '';
+  return truncateAtSentence(source, 360, 3);
+}
+
+/**
  * Large / featured cards: body preview OR excerpt, never concatenated.
  * Prefer body lead to fill magazine space; fall back to clean excerpt.
  */

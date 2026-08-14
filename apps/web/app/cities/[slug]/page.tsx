@@ -27,7 +27,7 @@ import {
   buildRegionHubSeoTitle,
   buildRegionHubSeoTitleCore,
 } from '@/lib/region-hub-seo';
-import { mergeBlogCards } from '@/lib/blog-utils';
+import { hubBlogCardExcerpt, mergeBlogCards } from '@/lib/blog-utils';
 import { safeNotFound } from '@/lib/safe-not-found';
 import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
 import { buildCityPageJsonLd } from '@/lib/structured-data';
@@ -245,7 +245,10 @@ export default async function CityPage({ params }: PageProps) {
   cityPerfMark('faq-seo-jsonld', faqStartedAt, { jsonLd: jsonLdBlocks.length });
 
   const hubTemplate = resolveCityHubTemplate({ slug: decodedSlug });
-  const blogCards = mergeBlogCards(articlesPayload?.articles || null);
+  const blogCards = mergeBlogCards(articlesPayload?.articles || null).map((post) => ({
+    ...post,
+    excerpt: hubBlogCardExcerpt(post.slug, post.excerpt),
+  }));
   const hubArticles = pickCityHubArticles(
     {
       slug: payload.city.slug,
