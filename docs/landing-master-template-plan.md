@@ -147,7 +147,7 @@ type LandingContextWidgetConfig = {
   lead: string;           // 1-2 предложения
   chips: LandingContextChip[];
   tips: Array<{ title: string; text: string }>;
-  audience?: string[];    // plain «Кому подойдёт», через ·
+  audience?: string[];    // plain «Ваш выбор», через ·
   // ЗАПРЕЩЕНО: rating, reviewsCount, soldCount, fake stars
 };
 ```

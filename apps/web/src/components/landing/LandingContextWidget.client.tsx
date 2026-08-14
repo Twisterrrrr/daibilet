@@ -87,7 +87,7 @@ export function LandingContextWidget({ config, activeChip = null, onChipSelect }
 
       {config.audience?.length ? (
         <div className="mt-8 max-w-3xl">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Кому подойдёт</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Ваш выбор</p>
           <p className="mt-2 text-sm leading-relaxed text-foreground">{config.audience.join(' · ')}</p>
         </div>
       ) : null}

@@ -27,7 +27,7 @@ export type LandingContextWidgetConfig = {
   chips: LandingContextChip[];
   /** Practical tips (1-4). */
   tips: LandingContextTip[];
-  /** Optional «для кого» lines (plain text). */
+  /** Optional «Ваш выбор» lines (plain text, joined with ·). */
   audience?: string[];
 };
 
