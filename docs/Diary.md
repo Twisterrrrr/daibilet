@@ -1,3 +1,17 @@
+## 2026-08-14 - Live: Deploy MSK web `31819658915`
+
+### Наблюдения
+- Owner: «далее выкат на live». Пакет с tip `0c394c9`: hub chrome polish, collect-route tooltip, lifehacks «по + дательный», weather/fact CityBrief, places city sync, один «Сегодня» (уже частично на предыдущем live).
+
+### Решения
+- Deploy MSK web [`31819658915`](https://github.com/Twisterrrrr/daibilet/actions/runs/31819658915) success, ~3m30s. SHA `0c394c9`. BUILD_ID=`rLQGcMunwtV3RRRlzLyqa`. Swap с `t2jlRFy2V5mTdu2vxTVof`.
+- Smoke 200: `/` `/places` `/events` `/cities/perm` (BUILD_ID в HTML, «Лайфхаки по Перми», «Чем уникальна Пермь»).
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-14 - Lifehacks heading: по + dative
 
 ### Наблюдения
