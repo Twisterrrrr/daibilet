@@ -1,3 +1,20 @@
+## 2026-08-14 - My Day monument mini thumbs
+
+### Наблюдения
+- Owner: нужны мини-превью под памятники пакета 13.08 в My Day (Главные / Необычное). Большой размер не нужен.
+- В пакете 116 точек (MSK 35, SPB 35, NN 16, KGD 15, Perm 15). У 8 уже были editorial-кадры, но 2-3MB; у 108 не было карты и файла.
+
+### Решения
+- GenerateImage x108 уникальных экстерьеров/объектов → lean JPEG ~480-640px (Pillow, ~26-72KB) в `apps/web` и `apps/public` `/images/venues/{city}/`.
+- `MONUMENT_PACK_IMAGES` (108 slug) в `city-place-images.ts`; `resolveVenueHeroImage` / `resolveDayRouteStopImage` подхватывают locationSlug.
+- 8 старых тяжёлых covers того же пакета тоже сжаты до lean (Медный всадник, Чижик, Кант, зубры, Жюль Верн, уши, медведь, «Счастье не за горами»).
+- Live не выкатывали.
+
+### Проблемы
+- Нет. Пакет 5 городов закрыт целиком.
+
+---
+
 ## 2026-08-14 - OG tags: absolute JPEG pack (recrawl Stage-1)
 
 ### Наблюдения
