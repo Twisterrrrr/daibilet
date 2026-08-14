@@ -49,21 +49,21 @@ export function MustSeeFilterTabs({
               data-must-see-filter={tab.id}
               data-active={active ? '1' : '0'}
               onClick={() => onChange(tab.id)}
-              className={`inline-flex w-auto min-h-9 shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+              className={`inline-flex w-auto min-h-9 shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition ${
                 active
                   ? editorial
-                    ? 'border-zinc-900 bg-zinc-900 text-white'
-                    : 'border-slate-900 bg-slate-900 text-white'
+                    ? 'bg-zinc-900 text-white'
+                    : 'bg-slate-900 text-white'
                   : editorial
-                    ? 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-400'
-                    : 'border-slate-200 bg-white text-slate-700 hover:border-slate-400'
+                    ? 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200/80 hover:text-zinc-900'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200/80 hover:text-slate-800'
               }`}
             >
               <span className="whitespace-nowrap">{tab.label}</span>
               {!hideCount ? (
                 <span
                   className={`tabular-nums ${
-                    active ? 'text-white/80' : editorial ? 'text-zinc-400' : 'text-slate-400'
+                    active ? 'text-white/80' : editorial ? 'text-zinc-400' : 'text-slate-500'
                   }`}
                 >
                   {tab.count}

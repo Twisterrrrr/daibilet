@@ -46,7 +46,15 @@ test('Perm identity slides map only to cityInfo slugs', () => {
     slides.map((slide) => slide.id),
     ['medved', 'bogi', 'posikunchiki', 'schaste'],
   );
-  assert.equal(resolveCityLocalFlavor('perm')?.identityHeading, 'Чем уникальна Пермь?');
+  assert.equal(resolveCityLocalFlavor('perm')?.identityHeading, 'Чем уникальна Пермь');
+  assert.equal(
+    resolveCityLocalFlavor('perm')?.identityLead,
+    'Четыре вещи, за которыми сюда едут в первую очередь',
+  );
+  assert.deepEqual(
+    slides.map((slide) => slide.badge),
+    ['Символ', 'Искусство', 'Гастро', 'Арт-объект'],
+  );
   for (const slide of slides) {
     assert.equal(slide.text.includes('\u2014'), false, slide.id);
     for (const slug of slide.slugs) {

@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { ArrowLeft, ChevronLeft, ChevronRight, Lightbulb, MapPin, Ticket } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, Info, Lightbulb, MapPin, Ticket } from 'lucide-react';
 import Link from 'next/link';
 
 import { CityHubArticlesGrid } from '@/components/CityHubArticleTeaser.client';
@@ -12,6 +12,7 @@ import { PageBreadcrumbBar } from '@/components/PageBreadcrumbs';
 import { RegionNearbyStrip } from '@/components/RegionNearbyStrip.client';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
+import { useDayRouteState } from '@/hooks/useDayRouteState';
 import { CityDayPresetBlock } from '@/components/CityDayPresetBlock.client';
 import { CityIdentityCarousel } from '@/components/CityIdentityCarousel.client';
 import { CityLifehacksSection } from '@/components/CityLifehacksSection.client';
@@ -75,6 +76,7 @@ import {
 import {
   buildMustSeeFilterTabs,
   classifyMustSeePlace,
+  mustSeeFilterLabel,
   type MustSeeFilterId,
 } from '@/lib/must-see-filters';
 import { isOpenDate, MIN_DISPLAY_PRICE_RUB } from '@/lib/event-card-meta';
@@ -308,24 +310,38 @@ export function CityPageView({
 
   const renderHubBlogSection = () => {
     if (!footerArticles.length || !city) return null;
+    const citySlug = city.slug || city.sourceSlug || '';
+    const blogHref = citySlug ? `/blog?city=${encodeURIComponent(citySlug)}` : '/blog';
     return (
       <section
         id="blog"
-        className={`border-b ${editorial ? 'border-zinc-200' : 'border-slate-100'} ${SECTION_SCROLL_MT}`}
+        className={`border-b ${editorial ? 'border-zinc-200' : 'border-slate-200/80'} ${SECTION_SCROLL_MT}`}
       >
         <div className={`container-page ${editorial ? 'py-12 sm:py-14' : 'py-8'}`}>
-          <h2
-            className={
-              editorial
-                ? 'font-serif text-3xl font-semibold text-zinc-950 sm:text-4xl'
-                : 'text-2xl font-bold text-slate-950'
-            }
-          >
-            Из блога
-          </h2>
-          <p className={`mt-2 max-w-3xl text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-            Материалы про {city.name}. Общие гиды на несколько городов подписаны на карточке.
-          </p>
+          <div className="flex items-end justify-between gap-4">
+            <div className="min-w-0">
+              <h2
+                className={
+                  editorial
+                    ? 'font-serif text-3xl font-semibold tracking-tight text-zinc-950 sm:text-4xl'
+                    : 'text-2xl font-bold tracking-tight text-slate-950 sm:text-[1.75rem]'
+                }
+              >
+                Из блога {aboutCityPrepositional(city)}
+              </h2>
+              <p className={`mt-1.5 text-sm leading-6 ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}>
+                Маршруты, окрестности и советы местных
+              </p>
+            </div>
+            <Link
+              href={blogHref}
+              className={`shrink-0 text-sm font-semibold ${
+                editorial ? 'text-zinc-700 hover:text-zinc-950' : 'text-primary-700 hover:text-primary-800'
+              }`}
+            >
+              Все материалы →
+            </Link>
+          </div>
           <CityHubArticlesGrid articles={footerArticles} editorial={editorial} />
         </div>
       </section>
@@ -333,7 +349,7 @@ export function CityPageView({
   };
 
   return (
-    <div className={editorial ? 'bg-zinc-50 text-zinc-900' : 'bg-white text-slate-900'}>
+    <div className={editorial ? 'bg-zinc-50 text-zinc-900' : 'bg-slate-50 text-slate-900'}>
       <div>
         {!payload && !error ? <CityLoadingState editorial={editorial} /> : null}
 
@@ -364,7 +380,7 @@ export function CityPageView({
               <div
                 id={hasIdentity ? undefined : 'sights'}
                 className={`border-b ${hasIdentity ? '' : SECTION_SCROLL_MT} ${
-                  editorial ? 'border-zinc-200' : 'border-slate-100'
+                  editorial ? 'border-zinc-200' : 'border-slate-200/80'
                 }`}
               >
                 {hasHookFact || hasWeather || hasWhenToGo || hasIdentity ? (
@@ -437,12 +453,12 @@ export function CityPageView({
 
             <section
               id="affiche"
-              className={`border-b ${editorial ? 'border-zinc-200' : 'border-slate-100'} ${SECTION_SCROLL_MT}`}
+              className={`border-b ${editorial ? 'border-zinc-200' : 'border-slate-200/80'} ${SECTION_SCROLL_MT}`}
             >
               <div className={`container-page ${editorial ? 'py-12 sm:py-14' : 'py-8'}`}>
                 <CityCatalogHeader editorial={editorial} />
                 {contentReady ? (
-                  <div className="sticky top-[calc(var(--site-header-height)+3.25rem)] z-20 -mx-1 mb-5 bg-white/95 px-1 py-2 backdrop-blur supports-[backdrop-filter]:bg-white/90">
+                  <div className="sticky top-[calc(var(--site-header-height)+3.25rem)] z-20 -mx-1 mb-5 bg-slate-50/95 px-1 py-2 backdrop-blur supports-[backdrop-filter]:bg-slate-50/90">
                     <div className="flex flex-nowrap gap-2 overflow-x-auto overscroll-x-contain pb-0.5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                     <CategoryFilter
                       categories={categories}
@@ -501,14 +517,14 @@ export function CityPageView({
             {hasPractice ? (
               <section
                 id="practice"
-                className={`border-b ${editorial ? 'border-zinc-200' : 'border-slate-100'} ${SECTION_SCROLL_MT}`}
+                className={`border-b ${editorial ? 'border-zinc-200' : 'border-slate-200/80'} ${SECTION_SCROLL_MT}`}
               >
                 <div className={`container-page ${editorial ? 'pt-12 pb-4' : 'pt-8 pb-2'}`}>
                   <h2
                     className={
                       editorial
-                        ? 'font-serif text-3xl font-semibold text-zinc-950 sm:text-4xl'
-                        : 'text-2xl font-bold text-slate-950'
+                        ? 'font-serif text-3xl font-semibold tracking-tight text-zinc-950 sm:text-4xl'
+                        : 'text-2xl font-bold tracking-tight text-slate-950 sm:text-[1.75rem]'
                     }
                   >
                     {hasLifehacks && city?.name
@@ -542,7 +558,7 @@ export function CityPageView({
             {hasMore ? (
               <section
                 id="more"
-                className={`border-b ${editorial ? 'border-zinc-200' : 'border-slate-100'} ${SECTION_SCROLL_MT}`}
+                className={`border-b ${editorial ? 'border-zinc-200' : 'border-slate-200/80'} ${SECTION_SCROLL_MT}`}
               >
                 {contentReady ? (
                   <>
@@ -1554,23 +1570,24 @@ function CitySightsMustSeeList({
   };
 
   const arrowClass =
-    'inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 disabled:pointer-events-none disabled:opacity-40';
+    'inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50 disabled:pointer-events-none disabled:opacity-40';
   const showRailArrows = showPlacesRail && !sparseGrid;
+  const routeCount = useDayRouteState().venues.length;
 
   return (
     <>
-      <div className="flex items-end justify-between gap-3">
+      <div className="flex items-start justify-between gap-3">
         <h2
           className={
             editorial
-              ? 'font-serif text-3xl font-semibold text-zinc-950 sm:text-4xl'
-              : 'text-2xl font-bold text-slate-950'
+              ? 'font-serif text-3xl font-semibold tracking-tight text-zinc-950 sm:text-4xl'
+              : 'text-2xl font-bold tracking-tight text-slate-950 sm:text-[1.75rem]'
           }
         >
           {heading}
         </h2>
         {showRailArrows ? (
-          <div className="flex shrink-0 gap-2">
+          <div className="flex shrink-0 gap-2 pt-0.5">
             <button
               type="button"
               data-city-must-see-prev
@@ -1594,6 +1611,27 @@ function CitySightsMustSeeList({
           </div>
         ) : null}
       </div>
+      {showPlacesRail ? (
+        <div className="mt-2.5 flex items-start justify-between gap-3">
+          <p
+            className={`flex min-w-0 items-start gap-2 text-sm leading-6 ${
+              editorial ? 'text-zinc-500' : 'text-slate-500'
+            }`}
+          >
+            <Info className={`mt-0.5 h-4 w-4 shrink-0 ${editorial ? 'text-zinc-400' : 'text-primary-600'}`} aria-hidden />
+            <span>
+              Нажмите «В маршрут» - место появится в панели внизу экрана и сохранится до следующего визита
+            </span>
+          </p>
+          <span
+            className={`inline-flex shrink-0 items-center rounded-full px-3 py-1 text-xs font-medium tabular-nums ${
+              editorial ? 'bg-zinc-100 text-zinc-600' : 'bg-slate-100 text-slate-600'
+            }`}
+          >
+            В маршруте: {routeCount}
+          </span>
+        </div>
+      ) : null}
       {focusBanner}
       {showPlacesRail ? (
         <>
@@ -1651,68 +1689,70 @@ function CitySightsMustSeeList({
               desc: place.desc,
               preferEditorial: true,
             }) || '';
+          const categoryId = classifyMustSeePlace(place);
+          const categoryLabel = mustSeeFilterLabel(categoryId);
           // Nested sub-spots (places[]) stay in suburb cards / articles / location PDP - not on hub must-see.
           return (
             <li
               key={`${place.name}:${index}`}
-              className="flex min-w-0 shrink-0 snap-start items-start gap-3 pr-1 [flex:0_0_80%] md:w-auto md:min-w-0 md:max-w-none md:pr-0 md:[flex:none]"
+              className="flex min-w-0 shrink-0 snap-start items-stretch pr-1 [flex:0_0_80%] md:w-auto md:min-w-0 md:max-w-none md:pr-0 md:[flex:none]"
               data-city-must-see-card
             >
-              <span
-                className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold ${
-                  editorial ? 'bg-zinc-100 text-zinc-800' : 'bg-primary-50 text-primary-700'
+              <article
+                className={`flex h-full min-w-0 flex-1 flex-col rounded-2xl p-4 sm:p-5 ${
+                  editorial
+                    ? 'border border-zinc-200 bg-white shadow-sm'
+                    : 'border border-slate-200/90 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_rgba(15,23,42,0.06)]'
                 }`}
               >
-                {index + 1}
-              </span>
-              <div className="min-w-0 flex-1 pr-0.5">
-                {/* title + CTA on one row: items-center so multi-line names don't leave the button top-stuck */}
-                <div className="flex items-center gap-2">
-                  {placeHref ? (
-                    <Link
-                      href={placeHref}
-                      className={`${titleClass} min-w-0 flex-1 break-words underline decoration-slate-300 underline-offset-2 hover:decoration-current`}
-                      data-city-must-see-title
-                    >
-                      {place.name}
-                    </Link>
-                  ) : (
-                    <div className={`${titleClass} min-w-0 flex-1 break-words`}>{place.name}</div>
-                  )}
-                  {dayRouteItem ? (
-                    <div className="hidden shrink-0 md:block">
-                      <AddToDayRouteButton
-                        compact
-                        className="!min-h-9 !px-2.5 !py-1.5 !text-[11px]"
-                        venue={dayRouteItem}
-                      />
-                    </div>
-                  ) : null}
-                </div>
-                {blurb ? (
-                  <p
-                    className={`mt-1 text-sm leading-6 break-words ${
-                      editorial ? 'text-zinc-500' : 'text-slate-500'
+                <div className="flex items-start gap-3">
+                  <span
+                    className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
+                      editorial ? 'bg-zinc-100 text-zinc-600' : 'bg-slate-100 text-slate-500'
                     }`}
                   >
-                    {blurb}
-                  </p>
-                ) : null}
-                {place.seasonLabel ? (
-                  <span className="mt-2 inline-flex rounded-full bg-sky-50 px-2 py-1 text-[10px] font-semibold text-sky-800">
-                    {place.seasonLabel}
+                    {index + 1}
                   </span>
-                ) : null}
-                <div className="my-2.5 flex flex-wrap items-center gap-2">
-                  {dayRouteItem ? (
-                    <div className="md:hidden">
-                      <AddToDayRouteButton
-                        compact
-                        className="!min-h-9 !px-2.5 !py-1.5 !text-[11px]"
-                        venue={dayRouteItem}
-                      />
+                  <div className="min-w-0 flex-1">
+                    {placeHref ? (
+                      <Link
+                        href={placeHref}
+                        className={`${titleClass} text-base font-bold leading-snug break-words hover:text-primary-700`}
+                        data-city-must-see-title
+                      >
+                        {place.name}
+                      </Link>
+                    ) : (
+                      <div className={`${titleClass} text-base font-bold leading-snug break-words`}>
+                        {place.name}
+                      </div>
+                    )}
+                    {blurb ? (
+                      <p
+                        className={`mt-1.5 text-sm leading-6 break-words ${
+                          editorial ? 'text-zinc-600' : 'text-slate-600'
+                        }`}
+                      >
+                        {blurb}
+                      </p>
+                    ) : null}
+                    <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                      <span
+                        className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${
+                          editorial ? 'bg-zinc-100 text-zinc-600' : 'bg-slate-100 text-slate-600'
+                        }`}
+                      >
+                        {categoryLabel}
+                      </span>
+                      {place.seasonLabel ? (
+                        <span className="inline-flex rounded-full bg-sky-50 px-2 py-0.5 text-[11px] font-medium text-sky-800">
+                          {place.seasonLabel}
+                        </span>
+                      ) : null}
                     </div>
-                  ) : null}
+                  </div>
+                </div>
+                <div className="mt-auto flex flex-wrap items-center justify-between gap-2 pt-3">
                   {afficheLink ? (
                     afficheLink.href.startsWith('#') ? (
                       <a
@@ -1741,9 +1781,18 @@ function CitySightsMustSeeList({
                         {afficheLink.label} →
                       </Link>
                     )
+                  ) : (
+                    <span />
+                  )}
+                  {dayRouteItem ? (
+                    <AddToDayRouteButton
+                      compact
+                      className="!min-h-9 !rounded-full !px-3 !py-1.5 !text-[12px]"
+                      venue={dayRouteItem}
+                    />
                   ) : null}
                 </div>
-              </div>
+              </article>
             </li>
           );
         })}
@@ -1757,8 +1806,8 @@ function CitySightsMustSeeList({
           <h3
             className={
               editorial
-                ? 'mb-4 font-serif text-2xl font-semibold text-zinc-950 sm:text-3xl'
-                : 'mb-4 text-xl font-bold text-slate-950 sm:text-2xl'
+                ? 'mb-4 font-serif text-2xl font-semibold tracking-tight text-zinc-950 sm:text-3xl'
+                : 'mb-4 text-xl font-bold tracking-tight text-slate-950 sm:text-2xl'
             }
           >
             Готовые сценарии
@@ -1978,7 +2027,7 @@ function CityCatalogHeader({ editorial = false }: { editorial?: boolean }) {
         className={
           editorial
             ? 'font-serif text-3xl font-semibold text-balance text-zinc-950 sm:text-4xl'
-            : 'font-display text-2xl font-bold tracking-tight text-slate-950'
+            : 'font-display text-2xl font-bold tracking-tight text-slate-950 sm:text-[1.75rem]'
         }
       >
         Ближайшие события
@@ -2390,6 +2439,13 @@ function buildFallbackMustSee(
     href: venueHref(venue),
   }));
   return [...categoryPlaces, ...venuePlaces];
+}
+
+function aboutCityPrepositional(city: PublicCityDto) {
+  const inPhrase = cityInPrepositional(city);
+  const prep = inPhrase.replace(/^во?\s+/i, '');
+  const particle = /^[аеёиоуыэюя]/i.test(prep) ? 'об' : 'о';
+  return `${particle} ${prep}`;
 }
 
 function cityInPrepositional(city: PublicCityDto) {

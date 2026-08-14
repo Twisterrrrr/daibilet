@@ -21,7 +21,9 @@ type Props = {
 
 export function CityIdentityCarousel({ citySlug, editorial = false, sectionId, onSelect }: Props) {
   const slides = cityIdentitySlides(citySlug);
-  const heading = resolveCityLocalFlavor(citySlug)?.identityHeading || 'Чем уникален город?';
+  const flavor = resolveCityLocalFlavor(citySlug);
+  const heading = flavor?.identityHeading || 'Чем уникален город';
+  const lead = flavor?.identityLead?.trim() || '';
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
 
@@ -59,23 +61,30 @@ export function CityIdentityCarousel({ citySlug, editorial = false, sectionId, o
       className={`mt-8 ${sectionId ? 'scroll-mt-[calc(var(--site-header-height)+3.25rem)]' : ''}`}
       data-city-identity-carousel
     >
-      <div className="flex items-end justify-between gap-3">
-        <h2
-          className={
-            editorial
-              ? 'font-serif text-2xl font-semibold text-zinc-950 sm:text-3xl'
-              : 'text-xl font-bold text-slate-950 sm:text-2xl'
-          }
-        >
-          {heading}
-        </h2>
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h2
+            className={
+              editorial
+                ? 'font-serif text-2xl font-semibold tracking-tight text-zinc-950 sm:text-3xl'
+                : 'text-2xl font-bold tracking-tight text-slate-950 sm:text-[1.75rem]'
+            }
+          >
+            {heading}
+          </h2>
+          {lead ? (
+            <p className={`mt-1.5 text-sm leading-6 ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}>
+              {lead}
+            </p>
+          ) : null}
+        </div>
         {slides.length > 1 ? (
-          <div className="flex shrink-0 gap-2">
+          <div className="flex shrink-0 gap-2 pt-0.5">
             <button
               type="button"
               aria-label="Предыдущий слайд"
               onClick={() => scrollTo(index - 1)}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50"
             >
               <ChevronLeft className="h-4 w-4" aria-hidden />
             </button>
@@ -83,7 +92,7 @@ export function CityIdentityCarousel({ citySlug, editorial = false, sectionId, o
               type="button"
               aria-label="Следующий слайд"
               onClick={() => scrollTo(index + 1)}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50"
             >
               <ChevronRight className="h-4 w-4" aria-hidden />
             </button>
@@ -92,14 +101,18 @@ export function CityIdentityCarousel({ citySlug, editorial = false, sectionId, o
       </div>
       <div
         ref={scrollerRef}
-        className="mt-4 flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden [&::-webkit-scrollbar]:h-0"
+        className="mt-5 flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden [&::-webkit-scrollbar]:h-0"
         aria-label={heading}
       >
         {slides.map((slide) => (
           <article
             key={slide.id}
             data-identity-slide={slide.id}
-            className="w-[min(100%,19.5rem)] shrink-0 snap-start overflow-hidden rounded-2xl bg-white ring-1 ring-slate-200/80"
+            className={
+              editorial
+                ? 'w-[min(100%,19.5rem)] shrink-0 snap-start overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm'
+                : 'w-[min(100%,19.5rem)] shrink-0 snap-start overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_rgba(15,23,42,0.06)]'
+            }
           >
             <button
               type="button"
@@ -114,12 +127,17 @@ export function CityIdentityCarousel({ citySlug, editorial = false, sectionId, o
                   sizes={IMAGE_SIZES.cityCard}
                   className="object-cover"
                 />
+                {slide.badge ? (
+                  <span className="absolute left-3 top-3 inline-flex rounded-full bg-slate-900 px-2.5 py-1 text-[11px] font-semibold text-white shadow-sm">
+                    {slide.badge}
+                  </span>
+                ) : null}
               </div>
-              <div className="px-4 py-3.5">
-                <h3 className={`text-base font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-950'}`}>
+              <div className="px-4 py-4">
+                <h3 className={`text-base font-bold leading-snug ${editorial ? 'text-zinc-950' : 'text-slate-950'}`}>
                   {slide.title}
                 </h3>
-                <p className={`mt-1.5 text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+                <p className={`mt-2 text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
                   {slide.text}
                 </p>
               </div>

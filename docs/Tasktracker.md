@@ -1,3 +1,9 @@
+## 2026-08-14 - City hub chrome polish (Lovable)
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| UX.HUB-CHROME-POLISH | Заголовки, фоны, бордеры, карточки identity / must-see / блог | Высокий | 🔄 git+push, без live |
+
 ## 2026-08-14 - Event card: one «Сегодня»
 
 | ID | Задача | Приоритет | Статус |

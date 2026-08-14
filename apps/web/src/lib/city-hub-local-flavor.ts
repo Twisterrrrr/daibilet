@@ -81,10 +81,14 @@ export type CityIdentitySlide = {
   imageAlt: string;
   slugs: string[];
   target: 'places' | 'suburbs' | 'mixed';
+  /** Short category pill on the photo (Символ, Гастро, …). */
+  badge?: string;
 };
 
 export type CityHubLocalFlavor = {
   identityHeading?: string;
+  /** Muted line under the identity H2. */
+  identityLead?: string;
   tags: CityIdentityTag[];
   slides?: CityIdentitySlide[];
   weather?: CityWeatherFlavor;
@@ -422,6 +426,7 @@ const PERM_SLIDES: CityIdentitySlide[] = [
     imageAlt: 'Памятник Пермскому медведю',
     slugs: ['perm-permskiy-medved'],
     target: 'places',
+    badge: 'Символ',
   },
   {
     id: 'bogi',
@@ -431,6 +436,7 @@ const PERM_SLIDES: CityIdentitySlide[] = [
     imageAlt: 'Пермская художественная галерея',
     slugs: ['permskaya-galereya', 'muzej-hohlovka'],
     target: 'mixed',
+    badge: 'Искусство',
   },
   {
     id: 'posikunchiki',
@@ -440,6 +446,7 @@ const PERM_SLIDES: CityIdentitySlide[] = [
     imageAlt: 'Посикунчики в Перми',
     slugs: ['perm-permskie-posikunchiki', 'perm-chomga'],
     target: 'places',
+    badge: 'Гастро',
   },
   {
     id: 'schaste',
@@ -455,6 +462,7 @@ const PERM_SLIDES: CityIdentitySlide[] = [
       'perm-park-kamney-permskie-vorota',
     ],
     target: 'places',
+    badge: 'Арт-объект',
   },
 ];
 
@@ -468,7 +476,8 @@ const PERM_TAGS: CityIdentityTag[] = PERM_SLIDES.map((slide) => ({
 
 export const CITY_HUB_LOCAL_FLAVOR: Record<string, CityHubLocalFlavor> = {
   perm: {
-    identityHeading: 'Чем уникальна Пермь?',
+    identityHeading: 'Чем уникальна Пермь',
+    identityLead: 'Четыре вещи, за которыми сюда едут в первую очередь',
     tags: PERM_TAGS,
     slides: PERM_SLIDES,
     weather: PERM_WEATHER,

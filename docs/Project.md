@@ -1,6 +1,6 @@
 # Project — Daibilet (Next full-stack migration)
 
-**Обновлено:** 2026-08-11  
+**Обновлено:** 2026-08-14  
 **Ветка migration / prod:** `feat/next-monorepo`  
 **Feature branch (region hubs):** `feat/region-hubs`  
 **Prod catalog:** Next `apps/web` `:3001` + legacy API `:4000` на МСК `201.24.125.184`  
@@ -106,7 +106,7 @@ SPB `.16` **retired**.
 
 Каталог saleable ещё узкий - закрывать «рассказ о городе» только афишей нельзя. Канон наращивания:
 
-1. **City hub** - mustSee + significantSuburbs + фильтры (структура «куда сходить»). На хабе города секция `#practice` открывается блоком **«Лайфхаки {City_Род}: как сберечь бюджет»** (4 таба: Пешком / Транспорт / Перелёт / Еда; короткие карточки + CTA). Данные в `apps/web/src/lib/city-hub-lifehacks.ts` по slug, не в `cityInfo`. Другие города: getter пустой, остаётся «Советы» + `CityTravelSection`. CTA: Яндекс/2ГИС, афиша хаба, `applyPlaceFocus` must-see. Не авиаагрегаторы и не wide catalog.
+1. **City hub** - mustSee + significantSuburbs + фильтры (структура «куда сходить»). На хабе города секция `#practice` открывается блоком **«Лайфхаки {City_Род}: как сберечь бюджет»** (4 таба: Пешком / Транспорт / Перелёт / Еда; короткие карточки + CTA). Данные в `apps/web/src/lib/city-hub-lifehacks.ts` по slug, не в `cityInfo`. Другие города: getter пустой, остаётся «Советы» + `CityTravelSection`. CTA: Яндекс/2ГИС, афиша хаба, `applyPlaceFocus` must-see. Не авиаагрегаторы и не wide catalog. **Chrome (2026-08-14):** tourist hub `bg-slate-50`; identity: lead + badge на фото; must-see: карточки + подсказка «В маршрут»; блог: «Из блога о {предложный}» + «Все материалы». H2 «Зачем ехать» и 2-row карусель мест не ломаем.
 2. **Тематические статьи-гиды** в блоге (`/blog/...`) под город/район/формат (один день в центре, дворцы, острова, с детьми…) с естественными ссылками на `/venues` `/locations` `/events` и CTA покупки, когда оффер есть.
 3. **По мере роста каталога** - в тех же гидах добавлять/усиливать ссылки на билеты; без оффера гид всё равно даёт SEO и доверие.
 
