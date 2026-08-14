@@ -1,3 +1,17 @@
+## 2026-08-14 - Live: Deploy MSK web `31776097211`
+
+### Наблюдения
+- Owner: «выкатывай» - пакет museum lean covers, Perm Kama pins, monument pack в mustSee.
+
+### Решения
+- Deploy MSK web `31776097211` success, ~4m30s. SHA `ce2eada`. BUILD_ID=`RQr1vlwv-OuvxsAMcPT3i`.
+- Smoke: `/` `/events` `/podborki` `/cities` `/my-day` `/cities/perm` → 200; `/cities/sankt-peterburg` 308 → `/cities/saint-petersburg` 200. BUILD_ID в HTML home. Seed не трогали.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-14 - Памятники пака в хабах и My Day «Главные»
 
 ### Наблюдения
@@ -11,7 +25,7 @@
 - +108 точек: СПб 33, Москва 35, НН 15, КГД 13, Пермь 12.
 
 ### Проблемы
-- Live после Deploy MSK web / «выкатывай» (cityInfo в бандле). Повторный DB seed не нужен.
+- Live `31776097211` BUILD_ID=`RQr1vlwv-OuvxsAMcPT3i`. Повторный DB seed не нужен.
 
 ---
 
@@ -28,7 +42,7 @@
 - Синхрон web/public cityInfo, editorial JSON, catalog monuments, perm block; тесты `city-place-coords.test.ts` + enrich regression.
 
 ### Проблемы
-- Prod Venue lat/lng не трогали (seed coalesce); live web - batch / «выкатывай». Старый localStorage лечится enrich при matches.
+- Prod Venue lat/lng не трогали (seed coalesce). Live `31776097211`. Старый localStorage лечится enrich при matches.
 
 ---
 
@@ -43,7 +57,7 @@
 - My Day mustSee: `IMAGE_SIZES.dayMustSeeThumb` + `priority` только у первых 4 карточек.
 
 ### Проблемы
-- Остальные ~35 moscow stubs вне музейного mustSee - quality debt; на live нужны static files после deploy («выкатывай»).
+- Остальные ~35 moscow stubs вне музейного mustSee - quality debt. Lean museum thumbs live `31776097211`.
 
 ---
 
