@@ -514,7 +514,7 @@ export function CityPageView({
                     }
                   >
                     {hasLifehacks && city?.name
-                      ? `Лайфхаки по ${city.name}: как сберечь бюджет`
+                      ? `Лайфхаки ${cityToGenitive(city.name)}: как сберечь бюджет`
                       : 'Советы'}
                   </h2>
                   {hasLifehacks ? null : (
