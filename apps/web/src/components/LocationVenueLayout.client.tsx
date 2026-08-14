@@ -102,7 +102,7 @@ export function LocationVenueLayout({
 
       {isPier ? (
         <>
-          <section className="relative aspect-[3/4] overflow-hidden bg-slate-900 text-white sm:aspect-auto">
+          <section className="relative isolate grid w-full overflow-hidden bg-slate-900 text-white aspect-[3/4] md:aspect-auto md:min-h-80 lg:min-h-[28rem]">
             <div className="absolute inset-0">
               {venue.heroImageUrl ? (
                 <SafeImage
@@ -110,14 +110,14 @@ export function LocationVenueLayout({
                   alt=""
                   fill
                   sizes={IMAGE_SIZES.eventHero}
-                  className="object-cover opacity-40"
+                  className="object-cover object-[center_20%] opacity-80"
                 />
               ) : (
                 <div className="h-full w-full bg-gradient-to-br from-sky-800 to-slate-950" />
               )}
-              <div className="absolute inset-0 bg-gradient-to-r from-sky-900/90 via-slate-900/70 to-slate-900/40" />
+              <div className="absolute inset-0 bg-gradient-to-t from-sky-950/90 via-slate-900/50 to-slate-900/20" />
             </div>
-            <div className="container-page relative flex h-full flex-col justify-end py-8 sm:h-auto sm:py-12">
+            <div className="container-page absolute inset-0 z-10 flex flex-col justify-end py-8 md:py-12">
               <div className="flex flex-wrap gap-2">
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur">
                   <Anchor className="h-3.5 w-3.5" /> Причал
@@ -143,16 +143,16 @@ export function LocationVenueLayout({
           {hasMap ? <LocationMapStrip venue={venue} /> : null}
         </>
       ) : isBus ? (
-        <section className="relative aspect-[3/4] overflow-hidden bg-slate-900 text-white sm:aspect-auto">
+        <section className="relative isolate grid w-full overflow-hidden bg-slate-900 text-white aspect-[3/4] md:aspect-auto md:min-h-80 lg:min-h-[28rem]">
           <div className="absolute inset-0">
             {venue.heroImageUrl ? (
-              <SafeImage src={venue.heroImageUrl} alt="" fill sizes={IMAGE_SIZES.eventHero} className="object-cover opacity-60" />
+              <SafeImage src={venue.heroImageUrl} alt="" fill sizes={IMAGE_SIZES.eventHero} className="object-cover object-[center_20%] opacity-80" />
             ) : (
               <div className="h-full w-full bg-gradient-to-br from-amber-600 via-orange-600 to-rose-700" />
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-slate-950/10" />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/55 to-slate-950/15" />
           </div>
-          <div className="container-page relative flex h-full flex-col justify-end py-8 sm:h-auto sm:py-14 md:py-20">
+          <div className="container-page absolute inset-0 z-10 flex flex-col justify-end py-8 md:py-14 lg:py-20">
             <div className="flex flex-wrap gap-2">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur">
                 <TypeIcon className="h-3.5 w-3.5" /> {typeLabel}
@@ -175,16 +175,16 @@ export function LocationVenueLayout({
         </section>
       ) : isParkLike ? (
         <>
-          <section className="relative aspect-[3/4] overflow-hidden bg-emerald-900 text-white sm:aspect-auto">
+          <section className="relative isolate grid w-full overflow-hidden bg-emerald-900 text-white aspect-[3/4] md:aspect-auto md:min-h-80 lg:min-h-[28rem]">
           <div className="absolute inset-0">
             {venue.heroImageUrl ? (
-              <SafeImage src={venue.heroImageUrl} alt="" fill sizes={IMAGE_SIZES.eventHero} className="object-cover opacity-60" />
+              <SafeImage src={venue.heroImageUrl} alt="" fill sizes={IMAGE_SIZES.eventHero} className="object-cover object-[center_20%] opacity-80" />
             ) : (
               <div className="h-full w-full bg-gradient-to-br from-emerald-700 to-emerald-950" />
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-emerald-950 via-emerald-950/60 to-emerald-950/10" />
+            <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/90 via-emerald-950/55 to-emerald-950/15" />
           </div>
-          <div className="container-page relative flex h-full flex-col justify-end py-8 sm:h-auto sm:py-14 md:py-20">
+          <div className="container-page absolute inset-0 z-10 flex flex-col justify-end py-8 md:py-14 lg:py-20">
             <div className="flex flex-wrap gap-2">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur">
                 <TypeIcon className="h-3.5 w-3.5" /> {typeLabel}
@@ -249,9 +249,9 @@ export function LocationVenueLayout({
           <div className="container-page px-0 sm:px-6 lg:px-8">
             <div className="grid gap-0 lg:grid-cols-2">
               <div className="relative overflow-hidden lg:rounded-l-3xl">
-                <div className="relative aspect-[3/4] sm:aspect-[16/10] lg:aspect-auto lg:h-[520px]">
+                <div className="relative aspect-[3/4] md:aspect-[16/10] lg:aspect-auto lg:h-[520px]">
                   {venue.heroImageUrl ? (
-                    <SafeImage src={venue.heroImageUrl} alt="" fill sizes={IMAGE_SIZES.eventCard} className="object-cover" />
+                    <SafeImage src={venue.heroImageUrl} alt="" fill sizes={IMAGE_SIZES.eventCard} className="object-cover object-[center_20%]" />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-sky-500 via-primary-600 to-indigo-700">
                       <TypeIcon className="h-16 w-16 text-white/40" />

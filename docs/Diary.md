@@ -1,3 +1,20 @@
+## 2026-08-14 - PDP: restore vertical mobile hero
+
+### Наблюдения
+- Owner: на странице события пропорции hero неверные. На mobile контент должен быть в **нижней части** вертикального кадра. Раньше был portrait hero.
+- В `90e9c52` уже стоял `aspect-[3/4]`, но кадр не держался: оверлей был in-flow с `min-h-[inherit]` / `sm:h-auto`, `sm:aspect-auto` сбрасывал портрет уже с 640px. Landscape-фото сжималось в короткую полоску, текст не сидел внизу.
+
+### Решения
+- Event / institution / location PDP: mobile `aspect-[3/4]`, `object-cover object-[center_20%]` (события - eye-focus), градиент снизу вверх.
+- Оверлей `absolute inset-0` + `justify-end`. Портрет до `md`; с `md+` широкий min-h.
+- Отдельных `*-portrait` файлов нет - CSS crop того же cover.
+- Docs: `mobile-templates.md` hero budget. Commit+push, без live deploy.
+
+### Проблемы
+- Нет. Live - batch / по запросу owner.
+
+---
+
 ## 2026-08-14 - Live: Deploy MSK web `31787552799`
 
 ### Наблюдения

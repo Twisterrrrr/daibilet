@@ -199,8 +199,8 @@ export function InstitutionVenueLayout({
   }, [isMuseumOrArt, openingHours?.lines, cityTz]);
 
   const heroGradient = isTheatre
-    ? 'bg-gradient-to-r from-rose-900/95 via-slate-900/80 to-slate-900/50'
-    : 'bg-gradient-to-t from-slate-900 via-slate-900/70 to-slate-900/30';
+    ? 'bg-gradient-to-t from-rose-950/90 via-slate-900/55 to-slate-900/20'
+    : 'bg-gradient-to-t from-slate-900/90 via-slate-900/50 to-slate-900/25';
 
   const stickyTabs = React.useMemo(() => {
     const tabs: Array<readonly [string, string]> = [['#about', 'О месте']];
@@ -227,7 +227,7 @@ export function InstitutionVenueLayout({
         <VenueBreadcrumbsNav payload={pagePayload} />
       </div>
 
-      <section className="relative aspect-[3/4] overflow-hidden bg-slate-900 text-white sm:aspect-auto">
+      <section className="relative isolate grid w-full overflow-hidden bg-slate-900 text-white aspect-[3/4] md:aspect-auto md:min-h-80 lg:min-h-[28rem]">
         <div className="absolute inset-0">
           {heroImage ? (
             <SafeImage
@@ -235,7 +235,7 @@ export function InstitutionVenueLayout({
               alt=""
               fill
               sizes={IMAGE_SIZES.eventHero}
-              className="object-cover opacity-40"
+              className="object-cover object-[center_20%] opacity-80"
             />
           ) : (
             <div className={`h-full w-full ${isTheatre ? 'bg-gradient-to-br from-rose-800 to-slate-950' : 'bg-gradient-to-br from-indigo-800 to-slate-950'}`} />
@@ -243,7 +243,7 @@ export function InstitutionVenueLayout({
           <div className={`absolute inset-0 ${heroGradient}`} />
         </div>
 
-        <div className="container-page relative flex h-full flex-col justify-end py-10 sm:h-auto md:py-14">
+        <div className="container-page absolute inset-0 z-10 flex flex-col justify-end py-10 md:py-14">
           <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-end">
             <div className="max-w-2xl">
               {openNowStatus === 'open' ? (

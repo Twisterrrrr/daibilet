@@ -556,10 +556,10 @@ export function EventHero({
 
   return (
     <div
-      className={`relative aspect-[3/4] overflow-hidden bg-slate-900 sm:aspect-auto ${
+      className={`relative isolate grid w-full overflow-hidden bg-slate-900 aspect-[3/4] md:aspect-auto ${
         longHeroTitle
-          ? 'sm:min-h-[22rem] lg:min-h-[28rem]'
-          : 'sm:min-h-80 lg:min-h-[420px]'
+          ? 'md:min-h-[22rem] lg:min-h-[28rem]'
+          : 'md:min-h-80 lg:min-h-[420px]'
       }`}
     >
       <EventPageCitySync city={event.city} />
@@ -570,7 +570,7 @@ export function EventHero({
         priority
         sizes={IMAGE_SIZES.eventHero}
         style={{ objectPosition: heroObjectPosition }}
-        className="object-cover opacity-80"
+        className="object-cover object-[center_20%] opacity-80"
         fallback={
           <div className="flex h-full items-center justify-center bg-gradient-to-br from-primary-600 to-primary-900">
             <span className="text-8xl opacity-30">🎭</span>
@@ -579,8 +579,7 @@ export function EventHero({
       />
       <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/45 to-slate-900/25" />
 
-      {/* In-flow overlay: hero grows with long titles instead of clipping under the header. */}
-      <div className="container-page relative z-10 flex min-h-[inherit] flex-col justify-end pb-6 pt-20 sm:pb-8 sm:pt-24">
+      <div className="container-page absolute inset-0 z-10 flex flex-col justify-end pb-6 pt-20 md:pb-8 md:pt-24">
         <nav aria-label="Хлебные крошки" className="mb-3 flex flex-wrap items-center gap-1.5 text-sm text-white/70">
           {breadcrumbs.map((crumb, index) => {
             const isLast = index === breadcrumbs.length - 1;

@@ -1,3 +1,9 @@
+## 2026-08-14 - PDP vertical mobile hero
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| UX.PDP-HERO-VERTICAL | Event / venue / location: mobile portrait 3:4, текст внизу, градиент; md+ шире. Не полоска 16:10 | Высокий | ✅ 2026-08-14 code; push, без live deploy |
+
 ## 2026-08-14 - Live batch after f987ef6
 
 | ID | Задача | Приоритет | Статус |
@@ -111,7 +117,7 @@
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
 | UX.LOC-ABOUT-BEFORE-NEARBY | PDP локации: «О локации» и «Как добраться» выше блока «Рядом» | Высокий | ✅ 2026-08-13 code; live после Deploy MSK web |
-| UX.PDP-HERO-3-4-MOBILE | Hero событий / локаций / площадок на mobile: `aspect-[3/4]`, sm+ без этого кропа | Высокий | ✅ 2026-08-13 code; live после Deploy MSK web |
+| UX.PDP-HERO-3-4-MOBILE | Hero событий / локаций / площадок на mobile: `aspect-[3/4]`, sm+ без этого кропа | Высокий | ⛔ superseded UX.PDP-HERO-VERTICAL (кадр не держался из-за in-flow overlay) |
 
 ## Places hub: H1 + light filters (2026-08-13)
 
