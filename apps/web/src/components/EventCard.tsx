@@ -12,7 +12,7 @@ import {
   useCatalogPurchase,
 } from '@/components/CatalogPurchaseTrigger.client';
 import { LandingPurchaseButton } from '@/components/landing/LandingPurchaseButton.client';
-import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
+import { IMAGE_SIZES, CardSafeImage } from '@/components/SafeImage.client';
 import type { PublicCatalogListItemDto, PublicSessionDto } from '@daibilet/contracts/public';
 import { collectCatalogLabels, extractDurationLabel } from '@/lib/catalog-labels';
 import { LandingCardBadgeRow } from '@/components/landing/LandingCardBadgeRow';
@@ -178,7 +178,7 @@ export function EventCard({
             }
           />
         ) : null}
-        <SafeImage
+        <CardSafeImage
           src={imagePrimarySrc}
           alt={session.title}
           fill
@@ -187,7 +187,7 @@ export function EventCard({
           className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
           fallback={
             imageFallbackSrc && imageFallbackSrc !== imagePrimarySrc ? (
-              <SafeImage
+              <CardSafeImage
                 src={imageFallbackSrc}
                 alt={session.title}
                 fill
@@ -559,7 +559,7 @@ function ShowcaseEventCard({
           cityHub ? 'aspect-[3/4]' : 'aspect-[16/9]'
         }`}
       >
-        <SafeImage
+        <CardSafeImage
           src={imagePrimarySrc}
           alt={session.title}
           fill
@@ -568,7 +568,7 @@ function ShowcaseEventCard({
           className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
           fallback={
             imageFallbackSrc && imageFallbackSrc !== imagePrimarySrc ? (
-              <SafeImage
+              <CardSafeImage
                 src={imageFallbackSrc}
                 alt={session.title}
                 fill

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { MapPin } from 'lucide-react';
 
-import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
+import { IMAGE_SIZES, CardSafeImage } from '@/components/SafeImage.client';
 import type { PublicSessionDto } from '@daibilet/contracts/public';
 import {
   formatCoverDateBadge,
@@ -58,11 +58,11 @@ export function RegionEventCard({
     <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white">
       <Link href={href} className="relative block aspect-[4/3] overflow-hidden bg-slate-100">
         {imagePrimarySrc || imageFallbackSrc ? (
-          <SafeImage
+          <CardSafeImage
             src={imagePrimarySrc || imageFallbackSrc!}
             fallback={
               imagePrimarySrc && imageFallbackSrc ? (
-                <SafeImage
+                <CardSafeImage
                   src={imageFallbackSrc}
                   alt=""
                   fill

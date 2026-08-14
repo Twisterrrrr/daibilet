@@ -20,7 +20,7 @@ import {
   type CatalogInterstitial,
 } from '@/lib/catalog-interstitials';
 import { collapseCatalogComboFamilies } from '@/lib/home-showcase-sections';
-import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
+import { IMAGE_SIZES, CardSafeImage } from '@/components/SafeImage.client';
 
 type CatalogResultsProps = {
   items: PublicCatalogListItemDto[];
@@ -301,7 +301,7 @@ function CatalogLiveRail({
                 className="group block h-full overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition hover:border-slate-200 hover:shadow-md"
               >
                 <div className="relative aspect-[16/10] overflow-hidden bg-surface-muted">
-                  <SafeImage
+                  <CardSafeImage
                     src={coverSrc}
                     alt={session.title}
                     fill

@@ -3,6 +3,8 @@
 import Image, { type ImageProps } from 'next/image';
 import * as React from 'react';
 
+import { resolveBlogCardImage } from '@/lib/blog-cover';
+import { listingImageFallbacks } from '@/lib/card-image';
 import { shouldBypassNextImageOptimizer } from '@/lib/remote-image-bypass';
 
 export const IMAGE_SIZES = {
@@ -64,8 +66,7 @@ export function SafeImage({
   }
 
   // Local /images/* and external CDNs (teplohod, ticketscloud): browser fetches directly.
-  // Catalog cards must use venueCardImageUrl() (~640px -thumb) because this bypass
-  // cannot resize 2-3MB editorial JPGs.
+  // Listing cards: CardSafeImage tries -card then -thumb; this bypass cannot resize originals.
   const bypassOptimizer = shouldBypassNextImageOptimizer(normalized);
 
   return (
@@ -81,4 +82,32 @@ export function SafeImage({
       {...props}
     />
   );
+}
+
+/**
+ * Listing cards: `-card.jpg` → `-thumb.jpg` (places pack) → original → `fallback`.
+ * PDP / heroes should keep using SafeImage with the editorial path.
+ */
+export function CardSafeImage({ src, fallback = null, ...props }: SafeImageProps) {
+  const chain = listingImageFallbacks(src);
+  if (!chain.length) return <>{fallback}</>;
+  return chain.reduceRight(
+    (next, url) => <SafeImage src={url} fallback={next} {...props} />,
+    fallback,
+  );
+}
+
+/** /blog + home + hub teasers: existing `*-og.jpg` (~150KB), then full cover. */
+export function BlogCardSafeImage({
+  slug,
+  coverImageUrl,
+  fallback = null,
+  ...props
+}: SafeImageProps & { slug?: string | null; coverImageUrl?: string | null }) {
+  const og = resolveBlogCardImage({ slug, coverImageUrl });
+  const cover = String(coverImageUrl || '').trim();
+  if (og && cover && og !== cover) {
+    return <SafeImage src={og} fallback={<SafeImage src={cover} fallback={fallback} {...props} />} {...props} />;
+  }
+  return <SafeImage src={og || cover || null} fallback={fallback} {...props} />;
 }

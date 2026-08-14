@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Clock, MapPin, Ticket } from 'lucide-react';
 
 import { EventFavoriteButton } from '@/components/EventFavoriteButton.client';
-import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
+import { IMAGE_SIZES, CardSafeImage } from '@/components/SafeImage.client';
 import type { PublicCatalogListItemDto, PublicSessionDto } from '@daibilet/contracts/public';
 import { collectCatalogLabels, extractDurationLabel } from '@/lib/catalog-labels';
 import { EventImageBadges } from '@/lib/event-card-badges';
@@ -77,7 +77,7 @@ export function EventCardHorizontal({ session }: { session: PublicCatalogListIte
         }
       />
       <div className="relative aspect-video w-full shrink-0 overflow-hidden bg-surface-muted sm:min-w-[20rem] sm:w-80 sm:aspect-auto sm:self-stretch">
-        <SafeImage
+        <CardSafeImage
           src={imagePrimarySrc}
           alt={session.title}
           fill
@@ -86,7 +86,7 @@ export function EventCardHorizontal({ session }: { session: PublicCatalogListIte
           className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
           fallback={
             imageFallbackSrc && imageFallbackSrc !== imagePrimarySrc ? (
-              <SafeImage
+              <CardSafeImage
                 src={imageFallbackSrc}
                 alt={session.title}
                 fill
