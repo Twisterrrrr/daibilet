@@ -2,10 +2,10 @@
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| UX.CITY-LIFEHACKS-4 | Лайфхаки Москва / СПб / Калининград / Нижний; Пермь без регресса | Высокий | ✅ git, без live deploy |
-| UX.CITY-SEASONS-3 | Погода+сезоны СПб / Калининград / Нижний; Москва без пакета | Высокий | ✅ git, без live deploy |
-| UX.SEASON-TABS-SNAP | Табы сезонов: горизонтальный snap (`snap-x snap-mandatory`) | Высокий | ✅ git, без live deploy |
-| UX.SPB-SUMMER-ICON | Таб «Лето» в СПб: иконка корабля с pulse | Низкий | ✅ git, без live deploy |
+| UX.CITY-LIFEHACKS-4 | Лайфхаки Москва / СПб / Калининград / Нижний; Пермь без регресса | Высокий | ✅ live `31807691531` SHA `aece94e` BUILD_ID=`lGOleEUSJUVkVP1CB3qL1` |
+| UX.CITY-SEASONS-3 | Погода+сезоны СПб / Калининград / Нижний; Москва без пакета | Высокий | ✅ live `31807691531` SHA `aece94e` BUILD_ID=`lGOleEUSJUVkVP1CB3qL1` |
+| UX.SEASON-TABS-SNAP | Табы сезонов: горизонтальный snap (`snap-x snap-mandatory`) | Высокий | ✅ live `31807691531` |
+| UX.SPB-SUMMER-ICON | Таб «Лето» в СПб: иконка корабля с pulse | Низкий | ✅ live `31807691531` |
 
 ## 2026-08-14 - City hub: лайфхаки Перми
 

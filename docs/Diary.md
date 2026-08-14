@@ -1,3 +1,18 @@
+## 2026-08-14 - Live: Deploy MSK web `31807691531`
+
+### Наблюдения
+- Owner: «затем выкатывай» после пакета лайфхаков/сезонов на 4 города.
+
+### Решения
+- Deploy MSK web `31807691531` success, ~9m27s. SHA `aece94e`. BUILD_ID=`lGOleEUSJUVkVP1CB3qL1`. Swap с предыдущего `9RRay7R1UIXb5i29Z--aF`.
+- Smoke 200 + BUILD_ID: `/cities/moscow` `/cities/saint-petersburg` `/cities/kaliningrad` `/cities/nizhny-novgorod` `/cities/perm`.
+- Москва: лайфхаки есть, виджета погоды нет (`/api/day-route/weather/moscow` 404 `no_weather`). СПб/КГД/НН/Пермь: weather API 200. КГД: ссылка `park-kosa.ru` в HTML.
+
+### Проблемы
+- Нет. Finance `.159` не трогали. Force-push не было.
+
+---
+
 ## 2026-08-14 - City hub: лайфхаки и сезоны MSK / SPB / KGD / NN
 
 ### Наблюдения
@@ -10,7 +25,7 @@
 - Табы сезонов: `snap-x snap-mandatory` + `overscroll-x-contain`. На «Лето» в СПб - иконка корабля с `motion-safe:animate-pulse`.
 
 ### Проблемы
-- Live после web deploy. Owner не писал «выкатывай».
+- Live `31807691531` SHA `aece94e` BUILD_ID=`lGOleEUSJUVkVP1CB3qL1`.
 
 ---
 
