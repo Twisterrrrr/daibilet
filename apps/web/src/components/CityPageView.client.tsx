@@ -11,8 +11,9 @@ import { LandingDirectionCard } from '@/components/LandingDirectionCard.client';
 import { PageBreadcrumbBar } from '@/components/PageBreadcrumbs';
 import { RegionNearbyStrip } from '@/components/RegionNearbyStrip.client';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
-import { AddManyToDayRouteButton, AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
+import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import { CityDayPresetBlock } from '@/components/CityDayPresetBlock.client';
+import { CityIdentityCarousel } from '@/components/CityIdentityCarousel.client';
 import { CityRegionalEvents } from '@/components/CityRegionalEvents.client';
 import { CityWeatherWidget } from '@/components/CityWeatherWidget.client';
 import { MustSeeFilterTabs } from '@/components/MustSeeFilterTabs.client';
@@ -42,6 +43,7 @@ import { CITY_NIGHT_HERO } from '@/lib/city-night-hero';
 import {
   cityHasWeatherWidget,
   cityHasWhenToGo,
+  cityIdentitySlides,
   collectPlacesBySlugs,
   placeSlugKey,
   resolveWhenToGoBlurb,
@@ -239,9 +241,10 @@ export function CityPageView({
   const hasWeather = cityHasWeatherWidget(hubSlug);
   const whenToGo = resolveWhenToGoBlurb(hubSlug);
   const hasWhenToGo = cityHasWhenToGo(hubSlug) && Boolean(whenToGo);
+  const hasIdentity = cityIdentitySlides(hubSlug).length > 0;
   const hasPractice = hasTravel || hasFaq || practiceArticles.length > 0;
   const hasMore = hasDirections || hasVenues || moreArticles.length > 0;
-  const showSightsBlock = hasSights || hasHookFact || hasWeather || hasWhenToGo;
+  const showSightsBlock = hasSights || hasHookFact || hasWeather || hasWhenToGo || hasIdentity;
 
   const applyPlaceFocus = React.useCallback((focus: CityPlaceFocus | null) => {
     if (!focus?.slugs.length) {
@@ -338,21 +341,33 @@ export function CityPageView({
                   >
                     <div
                       className={`grid gap-4 ${
-                        hasHookFact && (hasWeather || hasWhenToGo) ? 'lg:grid-cols-2 lg:items-stretch' : ''
+                        hasHookFact && (hasWeather || hasWhenToGo)
+                          ? 'lg:grid-cols-5 lg:items-stretch'
+                          : ''
                       }`}
                     >
                       {hasHookFact ? (
-                        <CityHookFactCallout hook={hookFactText} editorial={editorial} />
+                        <div className={hasWeather || hasWhenToGo ? 'lg:col-span-3' : ''}>
+                          <CityHookFactCallout hook={hookFactText} editorial={editorial} />
+                        </div>
                       ) : null}
                       {hasWeather || hasWhenToGo ? (
-                        <CityWeatherWidget
-                          citySlug={hubSlug}
-                          editorial={editorial}
-                          whenToGo={whenToGo?.body || null}
-                          onFocusPlaces={applyPlaceFocus}
-                        />
+                        <div className={hasHookFact ? 'lg:col-span-2' : ''}>
+                          <CityWeatherWidget
+                            citySlug={hubSlug}
+                            cityIn={cityInPrepositional(city)}
+                            editorial={editorial}
+                          />
+                        </div>
                       ) : null}
                     </div>
+                    {hasIdentity ? (
+                      <CityIdentityCarousel
+                        citySlug={hubSlug}
+                        editorial={editorial}
+                        onSelect={applyPlaceFocus}
+                      />
+                    ) : null}
                   </div>
                 ) : null}
                 <CitySightsSection
@@ -938,7 +953,7 @@ function CityHookFactCallout({
         Интересный факт
       </p>
       <p
-        className={`mt-2 max-w-3xl pl-2 text-sm leading-6 ${
+        className={`mt-2 max-w-3xl pl-2 text-[15px] leading-8 ${
           editorial ? 'text-zinc-600' : 'text-slate-600'
         }`}
       >
@@ -1211,9 +1226,6 @@ function CitySightsSection({
   const hasNamedScenarios = Boolean(namedPresets?.length);
   const activeFocus = placeFocus?.slugs.length ? placeFocus : null;
   const focusedPlaces = activeFocus ? collectPlacesBySlugs(activeFocus.slugs, places, suburbs) : [];
-  const focusRouteItems = focusedPlaces
-    .map((place) => dayRouteItemFromMustSee(place, venues, city))
-    .filter((item): item is NonNullable<typeof item> => Boolean(item));
   // Editorial «Зачем ехать» (places) always owns the section H2; scenarios follow below.
   // hookFact renders above this section (between tabs and H2).
   const sectionTitle =
@@ -1242,17 +1254,9 @@ function CitySightsSection({
           data-city-place-focus={activeFocus.id}
         >
           <p className={`min-w-0 flex-1 text-sm ${editorial ? 'text-zinc-700' : 'text-slate-700'}`}>
-            Подборка {activeFocus.label}
+            {activeFocus.label}
             {focusedPlaces.length ? ` · ${focusedPlaces.length} точек` : ''}
           </p>
-          {focusRouteItems.length ? (
-            <AddManyToDayRouteButton
-              compact
-              mode="replace"
-              navigateToMyDay
-              venues={focusRouteItems}
-            />
-          ) : null}
           <button
             type="button"
             data-city-place-focus-clear

@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import {
   cityHasWeatherWidget,
   cityHasWhenToGo,
+  cityIdentitySlides,
   cityIdentityTags,
   collectPlacesBySlugs,
   placeSlugKey,
@@ -33,18 +34,22 @@ test('weather widget is Perm-only until other cities fill coords', () => {
   assert.equal(weather.timezone, 'Asia/Yekaterinburg');
 });
 
-test('Perm identity tags map only to cityInfo slugs', () => {
-  const tags = cityIdentityTags('perm');
-  assert.equal(tags.length, 4);
+test('Perm identity slides map only to cityInfo slugs', () => {
+  const slides = cityIdentitySlides('perm');
+  assert.equal(slides.length, 4);
   assert.deepEqual(
-    tags.map((tag) => tag.hashtag),
-    ['#СчастьеНеЗаГорами', '#ПермскиеБоги', '#Посикунчики', '#Загород'],
+    slides.map((slide) => slide.id),
+    ['medved', 'bogi', 'posikunchiki', 'schaste'],
   );
-  for (const tag of tags) {
-    for (const slug of tag.slugs) {
-      assert.equal(cityInfoHasSlug(slug), true, `missing cityInfo slug ${slug} for ${tag.id}`);
+  assert.equal(resolveCityLocalFlavor('perm')?.identityHeading, 'Чем уникальна Пермь?');
+  for (const slide of slides) {
+    assert.equal(slide.text.includes('\u2014'), false, slide.id);
+    for (const slug of slide.slugs) {
+      assert.equal(cityInfoHasSlug(slug), true, `missing cityInfo slug ${slug} for ${slide.id}`);
     }
   }
+  const tags = cityIdentityTags('perm');
+  assert.equal(tags.length, 4);
 });
 
 test('Moscow and SPB identity tags stay empty/hidden', () => {
@@ -95,11 +100,16 @@ test('when-to-go is Perm-only editorial seasonality, not a daily forecast', () =
   const flavor = resolveCityLocalFlavor('perm')?.whenToGo;
   assert.ok(flavor);
   assert.equal(flavor.timeZone, 'Asia/Yekaterinburg');
+  assert.equal(flavor.tabs.length, 4);
   const covered = flavor.seasons.flatMap((season) => season.months).sort((a, b) => a - b);
   assert.deepEqual(covered, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
   for (const season of flavor.seasons) {
     assert.equal(season.body.includes('\u2014'), false, season.id);
     assert.equal(season.body.includes('\u2013'), false, season.id);
+    assert.ok(season.headline);
+  }
+  for (const tab of flavor.tabs) {
+    assert.equal(tab.body.includes('\u2014'), false, tab.id);
   }
 });
 
@@ -107,29 +117,32 @@ test('Perm when-to-go maps months to honest seasonal copy', () => {
   const august = resolveWhenToGoBlurb('perm', new Date('2026-08-14T08:00:00Z'));
   assert.equal(august?.seasonId, 'lateSummer');
   assert.equal(august?.month, 8);
-  assert.match(august?.body || '', /Август/);
+  assert.equal(august?.headline, 'Конец лета');
+  assert.equal(august?.monthLabel, 'Август');
+  assert.equal(august?.tab, 'summer');
   assert.match(august?.body || '', /Хохловка/);
   assert.match(august?.body || '', /Усьва/);
 
   const january = resolveWhenToGoBlurb('perm', new Date('2026-01-15T12:00:00Z'));
   assert.equal(january?.seasonId, 'winter');
+  assert.equal(january?.tab, 'winter');
   assert.match(january?.body || '', /Кунгурская ледяная пещера/);
-  assert.match(january?.body || '', /мороз/);
 
   const may = resolveWhenToGoBlurb('perm', new Date('2026-05-10T12:00:00Z'));
   assert.equal(may?.seasonId, 'spring');
-  assert.match(may?.body || '', /межсезонье/);
+  assert.match(may?.body || '', /Межсезонье/);
 
   const june = resolveWhenToGoBlurb('perm', new Date('2026-06-20T12:00:00Z'));
   assert.equal(june?.seasonId, 'summer');
-  assert.match(june?.body || '', /июнь и июль/);
+  assert.match(june?.body || '', /Речной сезон/);
 
   const september = resolveWhenToGoBlurb('perm', new Date('2026-09-05T12:00:00Z'));
   assert.equal(september?.seasonId, 'earlyAutumn');
+  assert.equal(september?.tab, 'autumn');
 
   const november = resolveWhenToGoBlurb('perm', new Date('2026-11-02T12:00:00Z'));
   assert.equal(november?.seasonId, 'lateAutumn');
-  assert.match(november?.body || '', /гряз/);
+  assert.match(november?.body || '', /тропы/);
 
   assert.equal(resolveWhenToGoBlurb('moscow', new Date('2026-08-14T08:00:00Z')), null);
 });

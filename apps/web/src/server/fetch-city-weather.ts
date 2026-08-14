@@ -9,7 +9,7 @@ export async function fetchOpenMeteoSnapshot(weather: CityWeatherFlavor) {
   url.searchParams.set('latitude', String(weather.latitude));
   url.searchParams.set('longitude', String(weather.longitude));
   url.searchParams.set('timezone', weather.timezone);
-  url.searchParams.set('forecast_days', '2');
+  url.searchParams.set('forecast_days', '3');
   url.searchParams.set('current', 'temperature_2m,weather_code,precipitation,cloud_cover');
   url.searchParams.set('daily', 'weather_code,temperature_2m_max,temperature_2m_min');
 

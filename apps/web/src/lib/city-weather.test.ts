@@ -34,10 +34,10 @@ test('parseOpenMeteoForecast prefers current code for today', () => {
   const snapshot = parseOpenMeteoForecast({
     current: { temperature_2m: 18.4, weather_code: 0 },
     daily: {
-      time: ['2026-08-14', '2026-08-15'],
-      weather_code: [3, 61],
-      temperature_2m_max: [19.2, 16.1],
-      temperature_2m_min: [12, 11],
+      time: ['2026-08-14', '2026-08-15', '2026-08-16'],
+      weather_code: [3, 61, 0],
+      temperature_2m_max: [19.2, 16.1, 20.4],
+      temperature_2m_min: [12, 11, 13],
     },
   });
   assert.ok(snapshot);
@@ -46,6 +46,8 @@ test('parseOpenMeteoForecast prefers current code for today', () => {
   assert.equal(snapshot.today.temperatureC, 18);
   assert.equal(snapshot.tomorrow?.mood, 'indoor');
   assert.equal(snapshot.tomorrow?.weatherCode, 61);
+  assert.equal(snapshot.dayAfter?.mood, 'sunny');
+  assert.equal(snapshot.dayAfter?.weatherCode, 0);
 });
 
 test('parseOpenMeteoForecast returns null on empty payload', () => {

@@ -43,22 +43,49 @@ export type CityWhenToGoSeason = {
   id: CityWhenToGoSeasonId;
   /** Calendar months 1-12 in the city time zone. */
   months: number[];
+  /** Badge: Конец лета */
+  headline: string;
+  /** One short paragraph under the badge. */
+  body: string;
+};
+
+export type CitySeasonTabId = 'spring' | 'summer' | 'autumn' | 'winter';
+
+export type CitySeasonTab = {
+  id: CitySeasonTabId;
+  label: string;
   body: string;
 };
 
 export type CityWhenToGoFlavor = {
   timeZone: string;
   seasons: CityWhenToGoSeason[];
+  tabs: CitySeasonTab[];
 };
 
 export type CityWhenToGoBlurb = {
   seasonId: CityWhenToGoSeasonId;
   month: number;
+  monthLabel: string;
+  headline: string;
   body: string;
+  tab: CitySeasonTabId;
+};
+
+export type CityIdentitySlide = {
+  id: string;
+  title: string;
+  text: string;
+  imageSrc: string;
+  imageAlt: string;
+  slugs: string[];
+  target: 'places' | 'suburbs' | 'mixed';
 };
 
 export type CityHubLocalFlavor = {
+  identityHeading?: string;
   tags: CityIdentityTag[];
+  slides?: CityIdentitySlide[];
   weather?: CityWeatherFlavor;
   /** Editorial seasonality, not a daily weather forecast. */
   whenToGo?: CityWhenToGoFlavor;
@@ -96,47 +123,127 @@ const PERM_WEATHER: CityWeatherFlavor = {
   indoorCtaSnow: 'Сегодня снег. Посмотрите крытые музеи, Театр-Театр или рестораны',
 };
 
+const MONTH_TITLE = [
+  '',
+  'Январь',
+  'Февраль',
+  'Март',
+  'Апрель',
+  'Май',
+  'Июнь',
+  'Июль',
+  'Август',
+  'Сентябрь',
+  'Октябрь',
+  'Ноябрь',
+  'Декабрь',
+];
+
+function tabForSeasonId(id: CityWhenToGoSeasonId): CitySeasonTabId {
+  if (id === 'winter') return 'winter';
+  if (id === 'spring') return 'spring';
+  if (id === 'earlyAutumn' || id === 'lateAutumn') return 'autumn';
+  return 'summer';
+}
+
 const PERM_WHEN_TO_GO: CityWhenToGoFlavor = {
   timeZone: 'Asia/Yekaterinburg',
   seasons: [
     {
       id: 'winter',
       months: [12, 1, 2],
-      body: 'Зима в Перми честная: мороз, короткий день, набережная в снегу. «Счастье не за горами» хорошо смотрится в сугробах, Кунгурская ледяная пещера - зимняя история. Хохловку, Каменный город и Усьву в мороз тяжелее; закладывайте крытые музеи и театр, а не горные тропы.',
+      headline: 'Зима',
+      body: 'Горнолыжка в Губахе, заснеженная тайга, Белогорский монастырь и Кунгурская ледяная пещера. Хохловку и Усьву в мороз лучше не планировать.',
     },
     {
       id: 'spring',
       months: [3, 4, 5],
-      body: 'Весна в крае - межсезонье. Март и апрель: слякоть, грязь, на тропах ещё лёд. Хохловку, Каменный город и Усьву рано. Май уже теплее, но речной сезон на Каме ещё не открыт. В городе - музеи и Театр-Театр; загород лучше на июнь.',
+      headline: 'Весна',
+      body: 'Межсезонье: слякоть и лёд на тропах. В городе - музеи и Театр-Театр. Хохловку и Усьву оставьте на июнь.',
     },
     {
       id: 'summer',
       months: [6, 7],
-      body: 'Лучшее окно на Пермь и край - июнь и июль. Кама судоходная, набережная живая, Хохловка, Каменный город и Усьва без грязи и без ранней темноты. Речной сезон не бесконечный: если едете за природой, берите эти месяцы, а не «когда-нибудь осенью».',
+      headline: 'Лето',
+      body: 'Лучшее окно на край: набережная, сплавы, Хохловка, Каменный город и Усьва. Речной сезон на Каме открыт.',
     },
     {
       id: 'lateSummer',
       months: [8],
-      body: 'Август ещё лето, но уже на излёте. Кама, набережная, Хохловка, Каменный город и Усьва ещё открыты - загород лучше сейчас. К сентябрю чаще дожди и короче день; речные прогулки к осени сходят.',
+      headline: 'Конец лета',
+      body: 'Идеально для загородных поездок (Хохловка, Усьва), пока не начались осенние дожди. Речные прогулки ещё открыты.',
     },
     {
       id: 'earlyAutumn',
       months: [9],
-      body: 'Сентябрь в крае ещё терпит: лес жёлтый, в Хохловке и на Усьве народу меньше. Речной сезон на Каме уже сходит, вечера холодные. С октября тропы раскисают - если нужен загород, едьте в этом месяце, не позже.',
+      headline: 'Ранняя осень',
+      body: 'Лес жёлтый, в Хохловке народу меньше. Речной сезон на Каме уже сходит - если нужен загород, едьте в этом месяце.',
     },
     {
       id: 'lateAutumn',
       months: [10, 11],
-      body: 'Октябрь и ноябрь - не прогулочный сезон Прикамья. Дожди, грязь на тропах, темнеет рано. Каменный город и Усьву лучше не планировать. Крытые музеи, Театр-Театр, при желании Кунгурская пещера; набережная в морось мало радует.',
+      headline: 'Поздняя осень',
+      body: 'Дожди и раскисшие тропы. Время для музеев, театров и Дягилевского фестиваля, не для Усьвы.',
+    },
+  ],
+  tabs: [
+    {
+      id: 'spring',
+      label: 'Весна',
+      body: 'В городе - музеи и Театр-Театр. Хохловку и Усьву лучше оставить на июнь: в апреле ещё слякоть.',
+    },
+    {
+      id: 'summer',
+      label: 'Лето',
+      body: 'Набережная, сплавы, Хохловка, фестивали под открытым небом. Речной сезон на Каме открыт.',
+    },
+    {
+      id: 'autumn',
+      label: 'Осень',
+      body: 'Время для музеев, театров и Дягилевского фестиваля. Загород с октября раскисает.',
+    },
+    {
+      id: 'winter',
+      label: 'Зима',
+      body: 'Горнолыжка в Губахе, заснеженная тайга, Белогорский монастырь и Кунгурская ледяная пещера.',
     },
   ],
 };
 
-const PERM_TAGS: CityIdentityTag[] = [
+const PERM_SLIDES: CityIdentitySlide[] = [
+  {
+    id: 'medved',
+    title: 'Культовый мишка',
+    text: 'Медведь - главный символ края ещё с XVI века. Иностранцы шутят, что они ходят у нас по улицам, а мы поставили ему бронзовый памятник в центре. Здесь же зародилось древнее шаманское литьё - Пермский звериный стиль.',
+    imageSrc: '/images/venues/perm/permskiy-medved.jpg',
+    imageAlt: 'Памятник Пермскому медведю',
+    slugs: ['perm-permskiy-medved'],
+    target: 'places',
+  },
+  {
+    id: 'bogi',
+    title: 'Деревянные боги',
+    text: 'Уникальное явление, которого нет больше нигде в России. В XVII веке местные мастера вырезали из дерева православных святых, наделив их чертами лиц коренных народов Урала. Смесь христианства и язычества.',
+    imageSrc: '/images/venues/perm/permskaya-galereya.jpg',
+    imageAlt: 'Пермская художественная галерея',
+    slugs: ['permskaya-galereya', 'muzej-hohlovka'],
+    target: 'mixed',
+  },
+  {
+    id: 'posikunchiki',
+    title: 'Те самые посикунчики',
+    text: 'Главный гастрономический бренд Прикамья. Крошечные уральские пирожки на один укус. Фишка в сочности: когда откусываешь, они брызжут горячим бульоном - отсюда и название.',
+    imageSrc: '/images/venues/perm/permskie-posikunchiki.jpg',
+    imageAlt: 'Посикунчики в Перми',
+    slugs: ['perm-permskie-posikunchiki', 'perm-chomga'],
+    target: 'places',
+  },
   {
     id: 'schaste',
-    hashtag: '#СчастьеНеЗаГорами',
-    hint: 'Фотоместа',
+    title: 'Символ новой Перми',
+    text: 'Огромные красные буквы на берегу Камы у Речного вокзала. Главный фото-хит и визуальный бренд города, который знают по всей стране благодаря фильмам и сериалам.',
+    imageSrc: '/images/venues/perm/schaste-ne-za-gorami.jpg',
+    imageAlt: 'Инсталляция Счастье не за горами на Каме',
     slugs: [
       'perm-schaste-ne-za-gorami',
       'naberezhnaya-kamy',
@@ -146,31 +253,24 @@ const PERM_TAGS: CityIdentityTag[] = [
     ],
     target: 'places',
   },
-  {
-    id: 'bogi',
-    hashtag: '#ПермскиеБоги',
-    hint: 'Деревянные боги и Хохловка',
-    slugs: ['permskaya-galereya', 'muzej-hohlovka'],
-    target: 'mixed',
-  },
-  {
-    id: 'posikunchiki',
-    hashtag: '#Посикунчики',
-    hint: 'Местная еда',
-    slugs: ['perm-permskie-posikunchiki', 'perm-chomga'],
-    target: 'places',
-  },
-  {
-    id: 'zagorod',
-    hashtag: '#Загород',
-    hint: 'Хохловка, Кунгур, Каменный город',
-    slugs: ['muzej-hohlovka', 'perm-kungurskaya-ledyanaya-peshchera', 'perm-kamennyy-gorod'],
-    target: 'suburbs',
-  },
 ];
 
+const PERM_TAGS: CityIdentityTag[] = PERM_SLIDES.map((slide) => ({
+  id: slide.id,
+  hashtag: slide.title,
+  hint: slide.title,
+  slugs: slide.slugs,
+  target: slide.target,
+}));
+
 export const CITY_HUB_LOCAL_FLAVOR: Record<string, CityHubLocalFlavor> = {
-  perm: { tags: PERM_TAGS, weather: PERM_WEATHER, whenToGo: PERM_WHEN_TO_GO },
+  perm: {
+    identityHeading: 'Чем уникальна Пермь?',
+    tags: PERM_TAGS,
+    slides: PERM_SLIDES,
+    weather: PERM_WEATHER,
+    whenToGo: PERM_WHEN_TO_GO,
+  },
   moscow: { tags: [] },
   'saint-petersburg': { tags: [] },
 };
@@ -218,7 +318,19 @@ export function resolveWhenToGoBlurb(
   const season = pickWhenToGoSeason(flavor, month);
   const body = season?.body?.trim();
   if (!season || !body) return null;
-  return { seasonId: season.id, month, body };
+  return {
+    seasonId: season.id,
+    month,
+    monthLabel: MONTH_TITLE[month] || '',
+    headline: season.headline,
+    body,
+    tab: tabForSeasonId(season.id),
+  };
+}
+
+export function cityIdentitySlides(slug: string | null | undefined): CityIdentitySlide[] {
+  const slides = resolveCityLocalFlavor(slug)?.slides;
+  return Array.isArray(slides) ? slides.filter((slide) => slide.slugs.length > 0) : [];
 }
 
 export function cityIdentityTags(slug: string | null | undefined): CityIdentityTag[] {
@@ -295,6 +407,15 @@ export function collectPlacesBySlugs(
     out.push(place);
   }
   return out;
+}
+
+export function focusFromIdentitySlide(slide: CityIdentitySlide): CityPlaceFocus {
+  return {
+    id: slide.id,
+    label: slide.title,
+    slugs: slide.slugs,
+    scrollTo: slide.target === 'suburbs' ? 'suburbs' : 'places',
+  };
 }
 
 export function focusFromIdentityTag(tag: CityIdentityTag): CityPlaceFocus {

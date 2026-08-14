@@ -20,6 +20,7 @@ export type CityWeatherMood = 'sunny' | 'indoor';
 export type CityWeatherSnapshot = {
   today: CityWeatherDay;
   tomorrow: CityWeatherDay | null;
+  dayAfter: CityWeatherDay | null;
 };
 
 export type OpenMeteoForecast = {
@@ -62,6 +63,14 @@ export function isFogWeatherCode(code: number): boolean {
 
 export function weatherMoodFromCode(code: number): CityWeatherMood {
   return isSunnyWeatherCode(code) ? 'sunny' : 'indoor';
+}
+
+export function weatherConditionLine(code: number): string {
+  const label = weatherLabelRu(code);
+  if (isRainyWeatherCode(code) || isSnowyWeatherCode(code) || THUNDER_CODES.has(code)) {
+    return label;
+  }
+  return `${label}, без осадков`;
 }
 
 export function weatherLabelRu(code: number): string {
@@ -148,11 +157,28 @@ export function parseOpenMeteoForecast(payload: OpenMeteoForecast | null | undef
         })
       : null;
 
-  return { today, tomorrow };
+  const dayAfterCode = asCode(codes[2]);
+  const dayAfter =
+    times[2] && dayAfterCode != null
+      ? buildDay({
+          date: times[2],
+          weatherCode: dayAfterCode,
+          temperatureC: roundTemp(maxes[2]),
+          tempMaxC: roundTemp(maxes[2]),
+          tempMinC: roundTemp(mins[2]),
+        })
+      : null;
+
+  return { today, tomorrow, dayAfter };
 }
 
 export function formatTempC(value: number | null | undefined): string | null {
   if (typeof value !== 'number' || !Number.isFinite(value)) return null;
   const rounded = Math.round(value);
   return `${rounded > 0 ? '+' : ''}${rounded}°`;
+}
+
+export function formatTempCFull(value: number | null | undefined): string | null {
+  const compact = formatTempC(value);
+  return compact ? `${compact.replace(/°$/, '')} °C` : null;
 }

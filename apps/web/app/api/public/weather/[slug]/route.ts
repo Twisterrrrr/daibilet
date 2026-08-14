@@ -27,6 +27,7 @@ export async function GET(_request: Request, context: RouteContext) {
         citySlug: slug,
         today: snapshot.today,
         tomorrow: snapshot.tomorrow,
+        dayAfter: snapshot.dayAfter,
       },
       {
         headers: {
