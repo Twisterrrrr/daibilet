@@ -171,7 +171,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| CAT.MONUMENTS-PACK | Пак памятников в каталог `/locations`: СПб 35, Мск 35, НН 16, КГД 15, Пермь 15 | Высокий | ✅ 2026-08-13 MSK DB: 108 insert / 8 update; PDP 200 |
+| CAT.MONUMENTS-PACK | Пак памятников в каталог `/locations`: СПб 35, Мск 35, НН 16, КГД 15, Пермь 15 | Высокий | ✅ 2026-08-13 MSK DB; 2026-08-14 wired в hub/My Day mustSee (+108, merge-модуль; live после web deploy) |
 | UX.NAV-PLACES-HUB | Primary: Города•События•Места•Подборки•Блог; `/places` chrome как каталог площадок; entity URL без ломки | Высокий | 🔄 code (visual+301 listing); deploy batch / по запросу |
 | SEO.PLACES-META-301 | Meta city-aware на `/places`; 301 `/venues` `/locations` листинги; sitemap listing = `/places` | Высокий | ✅ 2026-08-13 code; live после Deploy MSK web |
 | UX.PLACES-UNIFIED-SEARCH | Один поиск на раздел Места: `/places?q=` mixed + тег Площадка/Локация; каталоги не режут q по family | Высокий | ✅ live `31693704581` / `31694312986` |

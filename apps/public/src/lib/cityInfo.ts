@@ -1,3 +1,5 @@
+import { mergeMonumentMustSeeIntoCityInfo } from './city-monuments-must-see';
+
 /** Ссылка на venue/location для пункта «Главные места». Без slug - заголовок не линкуем. */
 export type CityPlaceLinkFields = {
   /** Явный public path (`/venues/...` или `/locations/...`). */
@@ -6660,6 +6662,9 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     ]
   }
 };
+
+// Catalog monuments pack (SPB/MSK/NN/KGD/Perm) → hub + My Day mustSee.
+mergeMonumentMustSeeIntoCityInfo(CITY_INFO);
 
 function normalizeLookupKey(value?: string | null) {
   return String(value || '').trim().toLowerCase();
