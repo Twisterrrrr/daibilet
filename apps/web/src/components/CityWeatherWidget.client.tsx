@@ -1,6 +1,6 @@
 'use client';
 
-import { Cloud, CloudRain, CloudSun, Flower2, Leaf, Snowflake, Sun } from 'lucide-react';
+import { Cloud, CloudRain, CloudSun, Flower2, Leaf, Ship, Snowflake, Sun } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
 import {
@@ -10,6 +10,7 @@ import {
   type CitySeasonTabId,
   type CityWeatherFlavor,
 } from '@/lib/city-hub-local-flavor';
+import { normalizeCityHubSlug } from '@/lib/city-hub-config';
 import {
   buildOpenMeteoForecastUrl,
   formatTempC,
@@ -206,12 +207,14 @@ export function CityWeatherWidget({ citySlug, cityIn, editorial = false }: Props
             {showForecast ? 'Сезоны' : kicker}
           </p>
           <div
-            className="mt-3 flex flex-nowrap gap-1.5 overflow-x-auto pb-0.5 [overscroll-behavior-x:contain] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+            className="mt-3 flex snap-x snap-mandatory flex-nowrap gap-1.5 overflow-x-auto overscroll-x-contain pb-0.5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
             role="tablist"
             aria-label="Сезоны"
           >
             {whenToGo.tabs.map((item) => {
-              const Icon = TAB_ICON[item.id];
+              const isSpbSummer =
+                item.id === 'summer' && normalizeCityHubSlug(citySlug) === 'saint-petersburg';
+              const Icon = isSpbSummer ? Ship : TAB_ICON[item.id];
               const active = item.id === tab;
               const isNow = current?.tab === item.id;
               return (
@@ -221,7 +224,7 @@ export function CityWeatherWidget({ citySlug, cityIn, editorial = false }: Props
                   role="tab"
                   aria-selected={active}
                   onClick={() => setTab(item.id)}
-                  className={`inline-flex min-h-8 shrink-0 items-center gap-1 rounded-full px-2.5 text-xs font-semibold transition ${
+                  className={`inline-flex min-h-8 shrink-0 snap-start items-center gap-1 rounded-full px-2.5 text-xs font-semibold transition ${
                     active
                       ? editorial
                         ? 'bg-zinc-900 text-white'
@@ -231,7 +234,11 @@ export function CityWeatherWidget({ citySlug, cityIn, editorial = false }: Props
                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                   }`}
                 >
-                  <Icon className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden />
+                  <Icon
+                    className={`h-3.5 w-3.5 ${isSpbSummer ? 'motion-safe:animate-pulse' : ''}`}
+                    strokeWidth={1.75}
+                    aria-hidden
+                  />
                   {item.label}
                   {isNow ? (
                     <span className={`text-[10px] font-semibold ${active ? 'text-white/70' : editorial ? 'text-zinc-400' : 'text-slate-400'}`}>

@@ -23,10 +23,14 @@ function cityInfoHasSlug(slug: string): boolean {
   return quoted.test(CITY_INFO_SRC);
 }
 
-test('weather widget is Perm-only until other cities fill coords', () => {
+test('weather widget covers Perm, SPB, Kaliningrad and NN', () => {
   assert.equal(cityHasWeatherWidget('perm'), true);
+  assert.equal(cityHasWeatherWidget('saint-petersburg'), true);
+  assert.equal(cityHasWeatherWidget('sankt-peterburg'), true);
+  assert.equal(cityHasWeatherWidget('kaliningrad'), true);
+  assert.equal(cityHasWeatherWidget('nizhny-novgorod'), true);
+  assert.equal(cityHasWeatherWidget('nizhniy-novgorod'), true);
   assert.equal(cityHasWeatherWidget('moscow'), false);
-  assert.equal(cityHasWeatherWidget('saint-petersburg'), false);
   assert.equal(cityHasWeatherWidget('moskva'), false);
   const weather = resolveCityLocalFlavor('perm')?.weather;
   assert.ok(weather);
@@ -56,17 +60,19 @@ test('Perm identity slides map only to cityInfo slugs', () => {
 test('Moscow and SPB identity tags stay empty/hidden', () => {
   assert.deepEqual(cityIdentityTags('moscow'), []);
   assert.deepEqual(cityIdentityTags('saint-petersburg'), []);
+  assert.deepEqual(cityIdentityTags('kaliningrad'), []);
+  assert.deepEqual(cityIdentityTags('nizhny-novgorod'), []);
   assert.deepEqual(cityIdentityTags('kazan'), []);
 });
 
-test('weather CTA slugs exist in Perm cityInfo', () => {
-  const weather = resolveCityLocalFlavor('perm')?.weather;
-  assert.ok(weather);
-  for (const slug of [...weather.outdoorSlugs, ...weather.indoorSlugs]) {
-    assert.equal(cityInfoHasSlug(slug), true, slug);
+test('weather CTA slugs exist in cityInfo', () => {
+  for (const slug of ['perm', 'saint-petersburg', 'kaliningrad', 'nizhny-novgorod']) {
+    const weather = resolveCityLocalFlavor(slug)?.weather;
+    assert.ok(weather, slug);
+    for (const placeSlug of [...weather.outdoorSlugs, ...weather.indoorSlugs]) {
+      assert.equal(cityInfoHasSlug(placeSlug), true, `${slug}:${placeSlug}`);
+    }
   }
-  assert.ok(weather.indoorSlugs.includes('teatr-teatr'));
-  assert.ok(weather.outdoorSlugs.includes('naberezhnaya-kamy'));
 });
 
 test('collectPlacesBySlugs keeps tag order and drops unknown', () => {
@@ -94,23 +100,26 @@ test('collectPlacesBySlugs keeps tag order and drops unknown', () => {
   assert.equal(suburbMatchesSlugs(suburbs[0], ['muzej-hohlovka']), true);
 });
 
-test('when-to-go is Perm-only editorial seasonality, not a daily forecast', () => {
+test('when-to-go covers Perm, SPB, Kaliningrad and NN', () => {
   assert.equal(cityHasWhenToGo('perm'), true);
+  assert.equal(cityHasWhenToGo('saint-petersburg'), true);
+  assert.equal(cityHasWhenToGo('kaliningrad'), true);
+  assert.equal(cityHasWhenToGo('nizhny-novgorod'), true);
   assert.equal(cityHasWhenToGo('moscow'), false);
-  assert.equal(cityHasWhenToGo('saint-petersburg'), false);
-  const flavor = resolveCityLocalFlavor('perm')?.whenToGo;
-  assert.ok(flavor);
-  assert.equal(flavor.timeZone, 'Asia/Yekaterinburg');
-  assert.equal(flavor.tabs.length, 4);
-  const covered = flavor.seasons.flatMap((season) => season.months).sort((a, b) => a - b);
-  assert.deepEqual(covered, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
-  for (const season of flavor.seasons) {
-    assert.equal(season.body.includes('\u2014'), false, season.id);
-    assert.equal(season.body.includes('\u2013'), false, season.id);
-    assert.ok(season.headline);
-  }
-  for (const tab of flavor.tabs) {
-    assert.equal(tab.body.includes('\u2014'), false, tab.id);
+  for (const slug of ['perm', 'saint-petersburg', 'kaliningrad', 'nizhny-novgorod']) {
+    const flavor = resolveCityLocalFlavor(slug)?.whenToGo;
+    assert.ok(flavor, slug);
+    assert.equal(flavor.tabs.length, 4);
+    const covered = flavor.seasons.flatMap((season) => season.months).sort((a, b) => a - b);
+    assert.deepEqual(covered, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], slug);
+    for (const season of flavor.seasons) {
+      assert.equal(season.body.includes('\u2014'), false, `${slug}:${season.id}`);
+      assert.equal(season.body.includes('\u2013'), false, `${slug}:${season.id}`);
+      assert.ok(season.headline);
+    }
+    for (const tab of flavor.tabs) {
+      assert.equal(tab.body.includes('\u2014'), false, `${slug}:${tab.id}`);
+    }
   }
 });
 
@@ -146,6 +155,10 @@ test('Perm when-to-go maps months to honest seasonal copy', () => {
   assert.match(november?.body || '', /тропы/);
 
   assert.equal(resolveWhenToGoBlurb('moscow', new Date('2026-08-14T08:00:00Z')), null);
+
+  const spbAugust = resolveWhenToGoBlurb('saint-petersburg', new Date('2026-08-14T08:00:00Z'));
+  assert.equal(spbAugust?.tab, 'summer');
+  assert.match(spbAugust?.body || '', /Петергофа/);
 });
 
 test('season tabs do not keep August copy when Winter is selected', () => {

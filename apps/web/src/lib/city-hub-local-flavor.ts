@@ -3,7 +3,8 @@
  * seasonal «когда ехать» copy. Keep out of cityInfo (coords/mustSee) so other
  * agents can edit geo without merge fights.
  *
- * Moscow / SPB: empty tags + no weather / whenToGo until those packs are filled.
+ * Moscow: no weather pack yet. SPB / Kaliningrad / NN: weather + seasons.
+ * Identity slides remain Perm-only until those packs are filled.
  */
 
 import { normalizeCityHubSlug } from './city-hub-config.ts';
@@ -210,6 +211,208 @@ const PERM_WHEN_TO_GO: CityWhenToGoFlavor = {
   ],
 };
 
+function seasonTabs(bodies: Record<CitySeasonTabId, string>): CitySeasonTab[] {
+  return [
+    { id: 'spring', label: 'Весна', body: bodies.spring },
+    { id: 'summer', label: 'Лето', body: bodies.summer },
+    { id: 'autumn', label: 'Осень', body: bodies.autumn },
+    { id: 'winter', label: 'Зима', body: bodies.winter },
+  ];
+}
+
+const SPB_WEATHER: CityWeatherFlavor = {
+  latitude: 59.93,
+  longitude: 30.31,
+  timezone: 'Europe/Moscow',
+  outdoorSlugs: [
+    'saint-petersburg-dvortsovaya-ploschad',
+    'saint-petersburg-dvortsovaya-naberezhnaya',
+    'saint-petersburg-nizhniy-park-petergofa',
+  ],
+  indoorSlugs: ['ermitazh', 'saint-petersburg-pyshechnaya-na-bolshoy-konyushennoy'],
+  outdoorCta: 'Хороший день для набережной Невы или Петергофа',
+  indoorCtaOvercast: 'Сегодня пасмурно. Посмотрите Эрмитаж или пышечную на Конюшенной',
+  indoorCtaRain: 'Сегодня дождь. Посмотрите Эрмитаж или пышечную на Конюшенной',
+  indoorCtaSnow: 'Сегодня снег. Посмотрите Эрмитаж или пышечную на Конюшенной',
+};
+
+const SPB_WHEN_TO_GO: CityWhenToGoFlavor = {
+  timeZone: 'Europe/Moscow',
+  seasons: [
+    {
+      id: 'winter',
+      months: [12, 1, 2],
+      headline: 'Зима',
+      body: 'Из-за влажности -5 °C ощущаются как -15 °C. Эрмитаж и Мариинка без очередей. Новый год дорогой, февраль - самые дешёвые перелёты и отели.',
+    },
+    {
+      id: 'spring',
+      months: [3, 4, 5],
+      headline: 'Весна',
+      body: 'Март-апрель сырые и ветреные. Со второй половины мая (+15 °C) открываются фонтаны Петергофа и навигация по рекам.',
+    },
+    {
+      id: 'summer',
+      months: [6, 7],
+      headline: 'Лето',
+      body: 'Пик сезона (+20...+23 °C) и Белые ночи с конца мая до середины июля. Жильё лучше брать за 2-3 месяца.',
+    },
+    {
+      id: 'lateSummer',
+      months: [8],
+      headline: 'Конец лета',
+      body: 'В августе чуть спокойнее пика Белых ночей, но чаще дожди. Фонтаны Петергофа ещё работают.',
+    },
+    {
+      id: 'earlyAutumn',
+      months: [9],
+      headline: 'Ранняя осень',
+      body: 'Бабье лето около +13 °C, золотые парки Пушкина и Павловска. Фонтаны ещё можно застать в начале месяца.',
+    },
+    {
+      id: 'lateAutumn',
+      months: [10, 11],
+      headline: 'Поздняя осень',
+      body: 'С октября фонтаны закрыты, холодает. Ноябрь - самый бюджетный месяц для музеев и театра.',
+    },
+  ],
+  tabs: seasonTabs({
+    spring: 'Март и апрель сырые. Со второй половины мая открываются фонтаны Петергофа и теплоходы по каналам.',
+    summer: 'Белые ночи - самый плотный сезон. В августе чуть спокойнее, чаще дожди.',
+    autumn: 'Сентябрь - золотые парки. С октября фонтаны закрыты, к ноябрю цены на поездку падают.',
+    winter: 'Влажный холод. Эрмитаж без очередей. Новый год дорогой, февраль - самый тихий.',
+  }),
+};
+
+const KGD_WEATHER: CityWeatherFlavor = {
+  latitude: 54.71,
+  longitude: 20.51,
+  timezone: 'Europe/Kaliningrad',
+  outdoorSlugs: ['kaliningrad-ostrov-kanta', 'kaliningrad-kurshskaya-kosa'],
+  indoorSlugs: [
+    'kaliningrad-kafedral-nyy-sobor',
+    'kaliningrad-muzey-yantarya',
+    'kaliningrad-muzey-mirovogo-okeana',
+  ],
+  outdoorCta: 'Хороший день для острова Канта или Куршской косы',
+  indoorCtaOvercast: 'Сегодня пасмурно. Посмотрите Музей янтаря, собор или Музей Мирового океана',
+  indoorCtaRain: 'Сегодня дождь. Посмотрите Музей янтаря, собор или Музей Мирового океана',
+  indoorCtaSnow: 'Сегодня снег. Посмотрите Музей янтаря, собор или Музей Мирового океана',
+};
+
+const KGD_WHEN_TO_GO: CityWhenToGoFlavor = {
+  timeZone: 'Europe/Kaliningrad',
+  seasons: [
+    {
+      id: 'winter',
+      months: [12, 1, 2],
+      headline: 'Зима',
+      body: 'Мягкая зима около 0 °C, снег редкий. Новогодние ярмарки поднимают цены, февраль - самый тихий месяц.',
+    },
+    {
+      id: 'spring',
+      months: [3, 4, 5],
+      headline: 'Весна',
+      body: 'Март ещё +3 °C. В мае (+15 °C) каштаны и мало туристов: удобно ехать на форты и Куршскую косу.',
+    },
+    {
+      id: 'summer',
+      months: [6, 7],
+      headline: 'Лето',
+      body: 'Пик сезона (+22...+25 °C). Море прогревается к середине июля. Июль - плотные даты на косе и в Светлогорске.',
+    },
+    {
+      id: 'lateSummer',
+      months: [8],
+      headline: 'Конец лета',
+      body: 'Август всё ещё пляжный пик в Зеленоградске и Светлогорске. Перелёт лучше закрыть заранее.',
+    },
+    {
+      id: 'earlyAutumn',
+      months: [9],
+      headline: 'Ранняя осень',
+      body: 'Сентябрь часто +16 °C - спокойные прогулки без июльской толпы.',
+    },
+    {
+      id: 'lateAutumn',
+      months: [10, 11],
+      headline: 'Поздняя осень',
+      body: 'С октября штормы и янтарь на берегу. Ноябрь холодный, ветреный и самый дешёвый.',
+    },
+  ],
+  tabs: seasonTabs({
+    spring: 'К маю город в каштанах. Конец мая - форты и коса без летней толпы.',
+    summer: 'Море теплое с середины июля. Июль-август - пик в Зеленоградске и Светлогорске.',
+    autumn: 'Сентябрь ещё для прогулок. С октября штормы и янтарь, к ноябрю цены падают.',
+    winter: 'Около 0 °C, снег тает быстро. Новый год оживлённый, февраль - самый тихий.',
+  }),
+};
+
+const NN_WEATHER: CityWeatherFlavor = {
+  latitude: 56.33,
+  longitude: 44.0,
+  timezone: 'Europe/Moscow',
+  outdoorSlugs: [
+    'nizhny-novgorod-nizhegorodskiy-kreml',
+    'nizhny-novgorod-chkalovskaya-lestnitsa',
+    'nizhny-novgorod-nizhegorodskaya-kanatnaya-doroga',
+    'nizhny-novgorod-naberezhnaya-fedorovskogo',
+  ],
+  indoorSlugs: ['nizhny-novgorod-arsenal-gtsisi', 'nizhny-novgorod-usadba-rukavishnikovyh'],
+  outdoorCta: 'Хороший день для кремля, канатки или набережной закатов',
+  indoorCtaOvercast: 'Сегодня пасмурно. Посмотрите Арсенал ГЦСИ или усадьбу Рукавишниковых',
+  indoorCtaRain: 'Сегодня дождь. Посмотрите Арсенал ГЦСИ или усадьбу Рукавишниковых',
+  indoorCtaSnow: 'Сегодня снег. Посмотрите Арсенал ГЦСИ или усадьбу Рукавишниковых',
+};
+
+const NN_WHEN_TO_GO: CityWhenToGoFlavor = {
+  timeZone: 'Europe/Moscow',
+  seasons: [
+    {
+      id: 'winter',
+      months: [12, 1, 2],
+      headline: 'Зима',
+      body: 'Снежная зима -8...-12 °C. Чкаловская лестница обледеневает, кремль выглядит сказочно. Январь дорогой, февраль - спад цен.',
+    },
+    {
+      id: 'spring',
+      months: [3, 4, 5],
+      headline: 'Весна',
+      body: 'Март-апрель: снег и ледоход. Май (+17 °C) - лучшее окно для Покровки и набережных без зноя.',
+    },
+    {
+      id: 'summer',
+      months: [6, 7],
+      headline: 'Лето',
+      body: 'Столица закатов (+22...+25 °C), фестивали на набережных. Выходные лучше закрывать заранее.',
+    },
+    {
+      id: 'lateSummer',
+      months: [8],
+      headline: 'Конец лета',
+      body: 'Август всё ещё высокий сезон на Волге. Закаты на Фёдоровского и канатка работают в полную силу.',
+    },
+    {
+      id: 'earlyAutumn',
+      months: [9],
+      headline: 'Ранняя осень',
+      body: 'Сентябрь около +14 °C и золотая листва в кремле - спокойный экскурсионный месяц.',
+    },
+    {
+      id: 'lateAutumn',
+      months: [10, 11],
+      headline: 'Поздняя осень',
+      body: 'Речные туманы, дожди и похолодание. Хороший момент сэкономить на дороге в город.',
+    },
+  ],
+  tabs: seasonTabs({
+    spring: 'К маю тепло для Покровки и набережных, без июльского зноя.',
+    summer: 'Закаты, фестивали на набережных. Выходные разбирают быстро.',
+    autumn: 'Сентябрь - золото кремля. С октября туманы и дожди, цены на дорогу падают.',
+    winter: 'Настоящая снежная зима. Январь праздничный, февраль - самый выгодный заезд.',
+  }),
+};
+
 const PERM_SLIDES: CityIdentitySlide[] = [
   {
     id: 'medved',
@@ -272,7 +475,9 @@ export const CITY_HUB_LOCAL_FLAVOR: Record<string, CityHubLocalFlavor> = {
     whenToGo: PERM_WHEN_TO_GO,
   },
   moscow: { tags: [] },
-  'saint-petersburg': { tags: [] },
+  'saint-petersburg': { tags: [], weather: SPB_WEATHER, whenToGo: SPB_WHEN_TO_GO },
+  kaliningrad: { tags: [], weather: KGD_WEATHER, whenToGo: KGD_WHEN_TO_GO },
+  'nizhny-novgorod': { tags: [], weather: NN_WEATHER, whenToGo: NN_WHEN_TO_GO },
 };
 
 export function resolveCityLocalFlavor(slug: string | null | undefined): CityHubLocalFlavor | null {

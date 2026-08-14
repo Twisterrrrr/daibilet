@@ -1,6 +1,6 @@
 'use client';
 
-import { Bus, ExternalLink, Footprints, Plane, Route, UtensilsCrossed } from 'lucide-react';
+import { Bus, CableCar, ExternalLink, Footprints, Landmark, Plane, Route, Ship, UtensilsCrossed } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 import {
@@ -25,6 +25,9 @@ const ICONS: Record<CityLifehackIcon, typeof Footprints> = {
   fly: Plane,
   food: UtensilsCrossed,
   loop: Route,
+  museum: Landmark,
+  ship: Ship,
+  cable: CableCar,
 };
 
 function LifehackBody({ item, editorial }: { item: CityLifehackItem; editorial: boolean }) {
@@ -134,7 +137,7 @@ export function CityLifehacksSection({
   return (
     <div id="lifehacks" className="mt-6" data-city-lifehacks>
       <div
-        className="-mx-1 overflow-x-auto overscroll-x-contain px-1 pb-0.5 [scrollbar-width:thin]"
+        className="-mx-1 snap-x snap-mandatory overflow-x-auto overscroll-x-contain px-1 pb-0.5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
         data-city-lifehacks-tabs
       >
         <div
@@ -151,7 +154,7 @@ export function CityLifehacksSection({
                 role="tab"
                 aria-selected={active}
                 onClick={() => setTab(item.id)}
-                className={`inline-flex min-h-9 shrink-0 items-center rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                className={`inline-flex min-h-9 shrink-0 snap-start items-center rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
                   active
                     ? editorial
                       ? 'border-zinc-900 bg-zinc-900 text-white'
