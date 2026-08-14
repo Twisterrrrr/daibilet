@@ -46,7 +46,9 @@
 
 Каталоги (`/events`, `/venues`, `/locations`, `/cities`): предпочитать `HeroLayout` `variant="minimal"` + `dense` на mobile. Карты - **ниже fold** или `lg+` only.
 
-Детали события / локации / площадки: mobile hero **3:4** (портретный кадр, `object-cover` сверху/глаза, текст **внизу** кадра + градиент снизу). Не `100vh` и не широкая полоска 16:10. Портрет держать до `md` (не сбрасывать на `sm`). С `md+` - более широкий кадр / min-h. На mobile в оверлее только **H1 + одна meta-строка** (длительность · от X ₽); крошки / адрес / «Ближайший» / длинные pills - **под фото**. Buy CTA на mobile - sticky footer (`MobileStickyActionBar`), не дублировать кнопку в hero.
+Детали события: mobile hero **3:4** (портретный кадр, `object-cover` сверху/глаза, текст **внизу** кадра + градиент снизу). Не `100vh` и не широкая полоска 16:10. Портрет держать до `md` (не сбрасывать на `sm`). С `md+` - более широкий кадр / min-h. **Event overlay (mobile+desktop), порядок:** 1) крошки **без** названия события (last crumb `sr-only`, H1 уже есть) · 2) тип/категория (компактный uppercase) · 3) H1 · 4) локация + возраст (solid chips) · 5) цена мин-макс (`formatBuyCardPrice`, не только «от») · 6) «Ближайший» · 7) адрес. Не выносить крошки/адрес/ближайший под фото. Buy CTA на mobile - sticky footer (`MobileStickyActionBar`), не дублировать кнопку в hero. Venue/location hero могут отличаться.
+
+Детали локации / площадки: mobile hero **3:4** + overlay; sticky CTA по канону детали.
 
 ---
 
@@ -75,7 +77,16 @@ Mobile sticky bottom: общий `MobileStickyActionBar` (`lg:hidden` + safe-are
 5. Results list  
 6. Cross-links / map (desktop) / footer  
 
-### Detail (event / venue / location)
+### Detail (event)
+
+1. Sticky chrome  
+2. Hero overlay: crumbs (no title) · category · H1 · location/age · price range · nearest · address  
+3. Buy card / sessions  
+4. About / logistics / map / reviews  
+5. Related  
+6. Mobile sticky action bar  
+
+### Detail (venue / location)
 
 1. Sticky chrome  
 2. Hero: media + title + 1 meta row + primary CTA  

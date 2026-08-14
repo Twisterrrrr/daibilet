@@ -158,15 +158,15 @@ export default async function EventDetailPage({ params }: PageProps) {
         <EventHero payload={clientPayload} aggregate={aggregate} />
 
         <div className="container-page py-8 sm:py-10 lg:py-14">
-          <div className="grid gap-8 lg:grid-cols-3 lg:gap-12">
-            <div className="space-y-6 lg:col-span-2">
+          <div className="grid min-w-0 gap-8 lg:grid-cols-3 lg:gap-12">
+            <div className="min-w-0 space-y-6 lg:col-span-2">
               <EventPdpBody event={event} payload={clientPayload} />
               <EventTags event={event} />
               <EventTrustStrip />
             </div>
 
-            <div className="lg:col-span-1">
-              <div className="lg:sticky lg:top-[calc(var(--site-header-height)+1.25rem)]" id="buy-card">
+            <div className="min-w-0 lg:col-span-1">
+              <div className="min-w-0 lg:sticky lg:top-[calc(var(--site-header-height)+1.25rem)]" id="buy-card">
                 <EventBuyCard payload={clientPayload} />
               </div>
             </div>

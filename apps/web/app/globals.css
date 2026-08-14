@@ -110,8 +110,12 @@ html[data-nav-pending='1'] {
     }
   }
 
+  /*
+   * Compact header is visual-only (padding / desktop nav). Never shrink
+   * --site-header-height here: spacer + sticky tops would jump on scroll (mobile jitter).
+   */
   html.site-header-compact {
-    --site-header-height: var(--site-header-height-compact);
+    /* reserved for non-layout cues if needed */
   }
 
   * {

@@ -1,3 +1,13 @@
+## 2026-08-14 - Event PDP mobile hero + tickets chrome
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| UX.EVENT-HERO-FULL | Mobile event overlay: crumbs(-title) · type · H1 · place/age · min-max price · nearest · address; не slim под фото | Высокий | ✅ git, без live deploy |
+| UX.EVENT-CRUMB-HIDE-TITLE | Last crumb события hidden (`sr-only`), H1 остаётся источником названия | Высокий | ✅ git, без live deploy |
+| FIX.HEADER-SCROLL-JITTER | Compact header не меняет `--site-header-height` / spacer | Высокий | ✅ git, без live deploy |
+| FIX.EVENT-TICKETS-OVERFLOW | Buy card / date chips / grid `min-w-0` на ~375px | Высокий | ✅ git, без live deploy |
+| UX.EVENT-AUTO-NEXT-SLOT | Default day = первый с открытой продажей; ручной выбор не трогаем | Высокий | ✅ git, без live deploy |
+
 ## 2026-08-14 - Empty city labels on blog hero/cards
 
 | ID | Задача | Приоритет | Статус |
@@ -19,7 +29,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| UX.PDP-HERO-SLIM | Mobile overlay: H1 + meta `длительность · от ₽`; крошки/адрес/ближайший под фото; solid chips; без CTA в hero | Высокий | ✅ git, без live deploy |
+| UX.PDP-HERO-SLIM | ~~Mobile overlay: H1 + meta~~ superseded `UX.EVENT-HERO-FULL` (owner 2026-08-14) | Высокий | ⛔ superseded |
 | UX.PDP-DATE-CHIPS | Ticket card date chips: horizontal scroll без clip, fade + peek | Высокий | ✅ git, без live deploy |
 
 ## 2026-08-14 - City picker stale label + blog multi-city filter

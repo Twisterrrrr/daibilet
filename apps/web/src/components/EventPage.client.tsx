@@ -2,15 +2,18 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { Calendar, ChevronRight, Clock, MapPin, Percent, Shield, Train, Users } from 'lucide-react';
+import { Calendar, ChevronRight, MapPin, Percent, Shield, Users } from 'lucide-react';
 
 import type { PublicEventPageDto } from '@daibilet/contracts/public';
 import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import { EventPageCitySync } from '@/components/EventPageCitySync.client';
 import { EventRatingBadge } from '@/components/EventPdpChrome.client';
 import {
+  compareSessionsByStartsAt,
+  expandSessionPurchaseVariants,
   extractTcEventIdFromSession,
-  listPurchasableSessionVariants,
+  isSessionPurchaseBlocked,
+  pickDefaultSessionDayKey,
   pickRepresentativeSession,
   resolveTcPurchaseTarget,
 } from '@/lib/event-purchase';
@@ -29,7 +32,6 @@ import {
   isFlexibleScheduleSession,
   scrollToBuyCard,
 } from '@/lib/event-page-utils';
-import { extractDurationLabel } from '@/lib/catalog-labels';
 import { dayRouteItemFromEvent } from '@/lib/day-route-from-place';
 import { splitLongTitleAtBreak } from '@/lib/split-long-title';
 import { buildEventBreadcrumbs } from '@/lib/structured-data';
@@ -70,9 +72,12 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
     priceRange && !showMultiPurchase && ticketCategories.length === 0
       ? formatBuyCardPriceHint(priceRange)
       : null;
-  const visibleSessions = listPurchasableSessionVariants(sessions as EventSession[]).slice(0, 32);
+  const scheduleSessions = [...(sessions as EventSession[]).flatMap((session) => expandSessionPurchaseVariants(session))]
+    .sort(compareSessionsByStartsAt)
+    .slice(0, 32);
   const allFlexible =
-    visibleSessions.length > 0 && visibleSessions.every((session) => isFlexibleScheduleSession(session));
+    scheduleSessions.length > 0 &&
+    scheduleSessions.every((session) => isFlexibleScheduleSession(session));
   const { tcEventId, purchaseUrl, isTcWidget, purchaseTargets } = resolveTcPurchaseTarget(
     event,
     sessions,
@@ -113,11 +118,11 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
   });
 
   return (
-    <div className="overflow-hidden rounded-card border border-slate-200 bg-white p-6 shadow-card sm:p-7">
+    <div className="min-w-0 w-full overflow-hidden rounded-card border border-slate-200 bg-white p-4 shadow-card sm:p-6 lg:p-7">
       {priceRange ? (
-        <div>
-          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-            <span className="text-3xl font-bold tracking-tight text-graphite sm:text-4xl">
+        <div className="min-w-0">
+          <div className="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1">
+            <span className="break-words text-2xl font-bold tracking-tight text-graphite sm:text-3xl lg:text-4xl">
               {formatBuyCardPrice(priceRange)}
             </span>
             {oldPrice ? (
@@ -204,7 +209,7 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
             </p>
           ) : null}
 
-          {visibleSessions.length > 0 ? (
+          {scheduleSessions.length > 0 ? (
             allFlexible ? (
               <div className="mt-6 rounded-xl bg-surface-muted px-3.5 py-3">
                 <p className="text-sm font-medium text-graphite">{FLEXIBLE_SCHEDULE_LABEL}</p>
@@ -214,7 +219,7 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
               </div>
             ) : (
               <SessionDayStrip
-                sessions={visibleSessions}
+                sessions={scheduleSessions}
                 isTcWidget={isTcWidget && !isTepWidget}
                 tcEventId={tcEventId}
               />
@@ -318,42 +323,56 @@ function SessionDayStrip({
     return [...map.values()];
   }, [sessions]);
 
-  const [selectedDay, setSelectedDay] = React.useState(days[0]?.key || '');
+  const defaultDayKey = React.useMemo(() => pickDefaultSessionDayKey(days), [days]);
+  const [selectedDay, setSelectedDay] = React.useState(defaultDayKey);
+  const [userPickedDay, setUserPickedDay] = React.useState(false);
+
   React.useEffect(() => {
-    if (!days.some((day) => day.key === selectedDay)) {
-      setSelectedDay(days[0]?.key || '');
+    if (userPickedDay) {
+      if (!days.some((day) => day.key === selectedDay)) {
+        setSelectedDay(defaultDayKey);
+        setUserPickedDay(false);
+      }
+      return;
     }
-  }, [days, selectedDay]);
+    setSelectedDay(defaultDayKey);
+  }, [days, defaultDayKey, selectedDay, userPickedDay]);
 
   const daySessions = days.find((day) => day.key === selectedDay)?.sessions || sessions;
 
   return (
-    <div className="mt-6">
+    <div className="mt-6 min-w-0">
       {days.length > 1 ? (
-        <div className="relative -mx-6 sm:-mx-7">
+        <div className="relative -mx-4 sm:-mx-6 lg:-mx-7">
           <div
             role="tablist"
             aria-label="Дни"
-            className="horizontal-snap-row flex gap-2 overflow-x-auto overscroll-x-contain px-6 pb-1 pr-10 [scrollbar-width:none] sm:px-7 sm:pr-12 [&::-webkit-scrollbar]:hidden"
+            className="horizontal-snap-row flex max-w-full gap-2 overflow-x-auto overscroll-x-contain px-4 pb-1 pr-10 [scrollbar-width:none] sm:px-6 sm:pr-12 lg:px-7 [&::-webkit-scrollbar]:hidden"
           >
             {days.map((day) => {
               const active = day.key === selectedDay;
+              const dayOpen = day.sessions.some((session) => !isSessionPurchaseBlocked(session));
               return (
                 <button
                   key={day.key}
                   type="button"
                   role="tab"
                   aria-selected={active}
-                  onClick={() => setSelectedDay(day.key)}
+                  onClick={() => {
+                    setUserPickedDay(true);
+                    setSelectedDay(day.key);
+                  }}
                   className={`shrink-0 snap-start rounded-xl px-3 py-2 text-left text-xs font-semibold transition ${
                     active
                       ? 'bg-graphite text-white'
                       : 'bg-surface-muted text-graphite-muted hover:bg-slate-200/80 hover:text-graphite'
-                  }`}
+                  } ${!dayOpen ? 'opacity-70' : ''}`}
                 >
                   <span className="block whitespace-nowrap">{day.label}</span>
                   <span className={`mt-0.5 block text-[10px] font-medium ${active ? 'text-white/70' : 'text-graphite-muted/80'}`}>
-                    {day.sessions.length} {day.sessions.length === 1 ? 'сеанс' : 'сеанса'}
+                    {dayOpen
+                      ? `${day.sessions.length} ${day.sessions.length === 1 ? 'сеанс' : 'сеанса'}`
+                      : 'закрыто'}
                   </span>
                 </button>
               );
@@ -372,50 +391,66 @@ function SessionDayStrip({
       ) : (
         <p className="mb-2 mt-3 text-[11px] font-medium uppercase tracking-wider text-graphite-muted">Время</p>
       )}
-      <div className="space-y-1.5">
-        {daySessions.map((session) =>
-          isTcWidget ? (
-            <TcSessionSlot
+      <div className="min-w-0 space-y-1.5">
+        {daySessions.map((session) => {
+          const blocked = isSessionPurchaseBlocked(session);
+          if (isTcWidget && !blocked) {
+            return (
+              <TcSessionSlot
+                key={`${session.id}-${session.startsAt}`}
+                tcEventId={extractTcEventIdFromSession(session) || tcEventId || ''}
+                session={session}
+              />
+            );
+          }
+          return (
+            <StaticSessionRow
               key={`${session.id}-${session.startsAt}`}
-              tcEventId={extractTcEventIdFromSession(session) || tcEventId || ''}
               session={session}
+              blocked={blocked}
             />
-          ) : (
-            <StaticSessionRow key={`${session.id}-${session.startsAt}`} session={session} />
-          ),
-        )}
+          );
+        })}
       </div>
     </div>
   );
 }
 
-function StaticSessionRow({ session }: { session: EventSession }) {
+function StaticSessionRow({
+  session,
+  blocked = false,
+}: {
+  session: EventSession;
+  blocked?: boolean;
+}) {
   const flexibleSchedule = isFlexibleScheduleSession(session);
   const weekday = session.dateLabel?.split(',')[0]?.trim() || '-';
+  const closedLabel =
+    session.vacant === 0 ? 'Распродано' : blocked ? 'Продажи закрыты' : null;
 
   return (
-    <div className="flex items-center justify-between rounded-xl bg-surface-muted px-3 py-2.5">
-      <div className="flex items-center gap-3">
+    <div className="flex min-w-0 items-center justify-between gap-3 rounded-xl bg-surface-muted px-3 py-2.5">
+      <div className="flex min-w-0 items-center gap-3">
         {!flexibleSchedule ? (
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white text-xs font-bold text-primary-700 shadow-sm">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-xs font-bold text-primary-700 shadow-sm">
             {weekday}
           </div>
         ) : null}
-        <div>
-          <p className="text-sm font-medium text-graphite">
+        <div className="min-w-0">
+          <p className="truncate text-sm font-medium text-graphite">
             {flexibleSchedule ? FLEXIBLE_SCHEDULE_LABEL : session.timeLabel || session.dateLabel || '-'}
           </p>
           {session.timeLabel && session.dateLabel && !flexibleSchedule ? (
-            <p className="text-xs text-graphite-muted">{session.dateLabel}</p>
+            <p className="truncate text-xs text-graphite-muted">{session.dateLabel}</p>
           ) : null}
         </div>
       </div>
-      {typeof session.vacant === 'number' && session.vacant > 0 ? (
-        <span className="text-xs font-medium text-graphite-muted">
+      {closedLabel ? (
+        <span className="shrink-0 text-xs font-medium text-graphite-muted">{closedLabel}</span>
+      ) : typeof session.vacant === 'number' && session.vacant > 0 ? (
+        <span className="shrink-0 text-xs font-medium text-graphite-muted">
           {formatVacantSeats(session.vacant)}
         </span>
-      ) : session.vacant === 0 ? (
-        <span className="text-xs font-medium text-graphite-muted">Распродано</span>
       ) : null}
     </div>
   );
@@ -528,17 +563,10 @@ export function EventHero({
   const { event, stats } = payload;
   // Header follows event city (page context beats global filter).
   const ageLimit = formatAgeLimit(event.ageLimit);
-  const durationLabel = extractDurationLabel(event.tags);
   const priceRange = getTicketPriceRange(payload);
   const oldPrice = getTicketOldPrice(payload, priceRange);
   const fallbackPrice = formatPriceRub(stats.priceFrom ?? event.priceFrom);
   const priceLabel = priceRange ? formatHeroBuyButtonPrice(priceRange) : fallbackPrice ? `от ${fallbackPrice}` : '';
-  const fromPriceLabel = priceRange
-    ? formatHeroBuyButtonPrice(priceRange)
-    : fallbackPrice
-      ? `от ${fallbackPrice}`
-      : '';
-  const mobileMetaLine = [durationLabel, fromPriceLabel].filter(Boolean).join(' · ');
   const heroImage = String(event.imageUrl || '').trim();
   const heroObjectPosition = resolveEventHeroObjectPosition({
     slug: event.slug,
@@ -558,9 +586,8 @@ export function EventHero({
     : null;
   const breadcrumbs = buildEventBreadcrumbs(event);
   const placeLabel = event.venue || event.city || null;
-  const metro = String(event.venueMetroStation || '').trim();
   const venueAddress = String(event.venueAddress || '').trim();
-  // Skip venue/place chip when it duplicates the address line below the photo.
+  // Skip venue/place chip when it duplicates the address line in the same overlay.
   const placeDuplicatesAddress =
     Boolean(placeLabel && venueAddress) &&
     venueAddress.toLocaleLowerCase('ru').includes(String(placeLabel).toLocaleLowerCase('ru'));
@@ -576,268 +603,164 @@ export function EventHero({
       ? FLEXIBLE_SCHEDULE_LABEL
       : `Ближайший: ${[nextSession.dateLabel, nextSession.timeLabel].filter(Boolean).join(', ')}`
     : null;
+  const trailCrumbs = breadcrumbs.length > 1 ? breadcrumbs.slice(0, -1) : breadcrumbs;
+  const currentCrumb = breadcrumbs.length > 1 ? breadcrumbs[breadcrumbs.length - 1] : null;
 
   return (
-    <>
-      <div
-        className={`relative isolate grid w-full overflow-hidden bg-slate-900 aspect-[3/4] md:aspect-auto ${
-          longHeroTitle
-            ? 'md:min-h-[22rem] lg:min-h-[28rem]'
-            : 'md:min-h-80 lg:min-h-[420px]'
-        }`}
-      >
-        <EventPageCitySync city={event.city} />
-        <SafeImage
-          src={heroImage || null}
-          alt={event.title}
-          fill
-          priority
-          sizes={IMAGE_SIZES.eventHero}
-          style={{ objectPosition: heroObjectPosition }}
-          className="object-cover object-[center_20%] opacity-80"
-          fallback={
-            <div className="flex h-full items-center justify-center bg-gradient-to-br from-primary-600 to-primary-900">
-              <span className="text-8xl opacity-30">🎭</span>
-            </div>
-          }
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/45 to-slate-900/25" />
+    <div
+      className={`relative isolate grid w-full min-w-0 overflow-hidden bg-slate-900 aspect-[3/4] md:aspect-auto ${
+        longHeroTitle
+          ? 'md:min-h-[22rem] lg:min-h-[28rem]'
+          : 'md:min-h-80 lg:min-h-[420px]'
+      }`}
+    >
+      <EventPageCitySync city={event.city} />
+      <SafeImage
+        src={heroImage || null}
+        alt={event.title}
+        fill
+        priority
+        sizes={IMAGE_SIZES.eventHero}
+        style={{ objectPosition: heroObjectPosition }}
+        className="object-cover object-[center_20%] opacity-80"
+        fallback={
+          <div className="flex h-full items-center justify-center bg-gradient-to-br from-primary-600 to-primary-900">
+            <span className="text-8xl opacity-30">🎭</span>
+          </div>
+        }
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/45 to-slate-900/25" />
 
-        <div className="container-page absolute inset-0 z-10 flex flex-col justify-end pb-5 pt-20 md:pb-8 md:pt-24">
-          {/* Desktop breadcrumbs stay in overlay; mobile moves below the photo */}
-          <nav
-            aria-label="Хлебные крошки"
-            className="mb-3 hidden flex-wrap items-center gap-1.5 text-sm text-white/70 md:flex"
-          >
-            {breadcrumbs.map((crumb, index) => {
-              const isLast = index === breadcrumbs.length - 1;
-              return (
-                <span key={`${crumb.path}:${index}`} className="inline-flex items-center gap-1.5">
-                  {index > 0 ? <ChevronRight className="h-3.5 w-3.5" /> : null}
-                  {isLast ? (
-                    <span className="line-clamp-1 text-white/90">{crumb.name}</span>
-                  ) : (
-                    <Link href={crumb.path} className="transition hover:text-white">
-                      {crumb.name}
-                    </Link>
-                  )}
-                </span>
-              );
-            })}
-          </nav>
+      <div className="container-page absolute inset-0 z-10 flex min-w-0 flex-col justify-end pb-5 pt-20 md:pb-8 md:pt-24">
+        {/* 1. Breadcrumbs without event title (last crumb sr-only for a11y; JSON-LD stays full). */}
+        <nav aria-label="Хлебные крошки" className="mb-2 flex min-w-0 flex-wrap items-center gap-1.5 text-sm text-white/70">
+          {trailCrumbs.map((crumb, index) => (
+            <span key={`${crumb.path}:${index}`} className="inline-flex shrink-0 items-center gap-1.5">
+              {index > 0 ? <ChevronRight className="h-3.5 w-3.5" aria-hidden /> : null}
+              <Link href={crumb.path} className="transition hover:text-white">
+                {crumb.name}
+              </Link>
+            </span>
+          ))}
+          {currentCrumb ? <span className="sr-only">{currentCrumb.name}</span> : null}
+        </nav>
 
-          <div className="flex items-end justify-between gap-4">
-            <div className="max-w-3xl">
-              {/* Category fights long H1 on mobile - keep tiny on md+ only */}
-              <div className="mb-1.5 hidden flex-wrap items-center gap-2 md:flex">
-                {event.category ? (
-                  <p className="text-[10px] font-medium uppercase tracking-wider text-white/55">
-                    {event.category}
-                  </p>
-                ) : null}
-                {aggregate ? (
+        <div className="flex min-w-0 items-end justify-between gap-4">
+          <div className="min-w-0 max-w-3xl">
+            {/* 2. Category / type - readable, not full-width giant caps */}
+            <div className="mb-1.5 flex flex-wrap items-center gap-2">
+              {event.category ? (
+                <p className="text-[11px] font-medium uppercase tracking-wide text-white/70">
+                  {event.category}
+                </p>
+              ) : null}
+              {aggregate ? (
+                <span className="hidden md:inline-flex">
                   <EventRatingBadge ratingValue={aggregate.ratingValue} reviewCount={aggregate.reviewCount} />
+                </span>
+              ) : null}
+            </div>
+
+            {/* 3. Title */}
+            <h1
+              className={`font-bold leading-tight text-white break-normal ${
+                longHeroTitle
+                  ? 'text-xl sm:text-3xl lg:text-4xl'
+                  : 'text-2xl sm:text-3xl lg:text-4xl'
+              }`}
+            >
+              {titleSplit ? (
+                <>
+                  {titleSplit.lead}
+                  {titleSplit.mark}
+                  <br />
+                  {titleSplit.tail}
+                </>
+              ) : (
+                heroTitle
+              )}
+            </h1>
+
+            {/* 4. Location + age */}
+            {(placeLabel && !placeDuplicatesAddress) || ageLimit || oldPrice ? (
+              <div className="mt-3 flex min-w-0 flex-wrap gap-1.5">
+                {placeLabel && !placeDuplicatesAddress ? (
+                  venuePageHref ? (
+                    <Link href={venuePageHref} className={solidChipLinkClassName}>
+                      <MapPin className="h-3 w-3 shrink-0" strokeWidth={1.75} />
+                      <span className="truncate">{placeLabel}</span>
+                    </Link>
+                  ) : (
+                    <span className={solidChipClassName}>
+                      <MapPin className="h-3 w-3 shrink-0" strokeWidth={1.75} />
+                      <span className="truncate">{placeLabel}</span>
+                    </span>
+                  )
+                ) : null}
+                {ageLimit ? (
+                  <span className={solidChipClassName}>
+                    <Users className="h-3 w-3" strokeWidth={1.75} />
+                    {ageLimit}
+                  </span>
+                ) : null}
+                {oldPrice ? (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-amber-400/95 px-2.5 py-1 text-[11px] font-semibold text-slate-900">
+                    <Percent className="h-3 w-3" strokeWidth={1.75} />
+                    Скидка
+                  </span>
                 ) : null}
               </div>
+            ) : null}
 
-              <h1
-                className={`font-bold leading-tight text-white break-normal ${
-                  longHeroTitle
-                    ? 'text-xl sm:text-3xl lg:text-4xl'
-                    : 'text-2xl sm:text-3xl lg:text-4xl'
-                }`}
-              >
-                {titleSplit ? (
-                  <>
-                    {titleSplit.lead}
-                    {titleSplit.mark}
-                    <br />
-                    {titleSplit.tail}
-                  </>
-                ) : (
-                  heroTitle
-                )}
-              </h1>
-
-              {/* Mobile overlay: only title + one meta line (duration · from-price) */}
-              {mobileMetaLine ? (
-                <p className="mt-2 text-sm font-medium text-white/90 md:hidden">{mobileMetaLine}</p>
-              ) : null}
-
-              {/* Desktop overlay: solid chips + price + nearest/address */}
-              <div className="mt-3 hidden md:block">
-                <div className="flex flex-wrap gap-1.5">
-                  {durationLabel ? (
-                    <span className={solidChipClassName}>
-                      <Clock className="h-3 w-3" strokeWidth={1.75} />
-                      {durationLabel}
-                    </span>
-                  ) : null}
-                  {placeLabel && !placeDuplicatesAddress ? (
-                    venuePageHref ? (
-                      <Link href={venuePageHref} className={solidChipLinkClassName}>
-                        <MapPin className="h-3 w-3 shrink-0" strokeWidth={1.75} />
-                        <span className="truncate">{placeLabel}</span>
-                      </Link>
-                    ) : (
-                      <span className={solidChipClassName}>
-                        <MapPin className="h-3 w-3 shrink-0" strokeWidth={1.75} />
-                        <span className="truncate">{placeLabel}</span>
-                      </span>
-                    )
-                  ) : null}
-                  {metro ? (
-                    <span className={solidChipClassName}>
-                      <Train className="h-3 w-3" strokeWidth={1.75} />
-                      {metro}
-                    </span>
-                  ) : null}
-                  {ageLimit ? (
-                    <span className={solidChipClassName}>
-                      <Users className="h-3 w-3" strokeWidth={1.75} />
-                      {ageLimit}
-                    </span>
-                  ) : null}
-                  {oldPrice ? (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-400/95 px-2.5 py-1 text-[11px] font-semibold text-slate-900">
-                      <Percent className="h-3 w-3" strokeWidth={1.75} />
-                      Скидка
-                    </span>
-                  ) : null}
-                </div>
-
-                {priceRange || fallbackPrice ? (
-                  <div className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                    <span className="text-2xl font-bold text-white sm:text-3xl">
-                      {priceRange ? formatBuyCardPrice(priceRange) : `от ${fallbackPrice}`}
-                    </span>
-                    {oldPrice ? (
-                      <span className="text-sm text-white/55 line-through">{formatPriceRub(oldPrice)}</span>
-                    ) : null}
-                  </div>
+            {/* 5. Price min-max range (not only «от») */}
+            {priceRange || fallbackPrice ? (
+              <div className="mt-3 flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1">
+                <span className="break-words text-2xl font-bold text-white sm:text-3xl">
+                  {priceRange ? formatBuyCardPrice(priceRange) : `от ${fallbackPrice}`}
+                </span>
+                {oldPrice ? (
+                  <span className="text-sm text-white/55 line-through">{formatPriceRub(oldPrice)}</span>
                 ) : null}
+              </div>
+            ) : null}
 
-                <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/85">
-                  {nearestLabel ? (
-                    <span className="flex items-center gap-1.5">
-                      <Calendar className="h-4 w-4" strokeWidth={1.75} />
-                      {nearestLabel}
-                    </span>
-                  ) : null}
-                  {canOpenVenueModal && venueAddress ? (
+            {/* 6. Nearest slot · 7. Address */}
+            {(nearestLabel || venueAddress) ? (
+              <div className="mt-3 flex min-w-0 flex-col gap-1.5 text-sm text-white/85 sm:mt-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5 sm:gap-y-2">
+                {nearestLabel ? (
+                  <span className="flex min-w-0 items-center gap-1.5">
+                    <Calendar className="h-4 w-4 shrink-0" strokeWidth={1.75} />
+                    <span className="min-w-0">{nearestLabel}</span>
+                  </span>
+                ) : null}
+                {venueAddress ? (
+                  canOpenVenueModal ? (
                     <EventVenueTrigger
                       event={event}
-                      className="flex items-center gap-1.5 underline decoration-white/30 underline-offset-2 hover:text-white"
+                      className="flex min-w-0 items-start gap-1.5 underline decoration-white/30 underline-offset-2 hover:text-white sm:items-center"
                     >
-                      <MapPin className="h-4 w-4" strokeWidth={1.75} />
-                      {venueAddress}
+                      <MapPin className="mt-0.5 h-4 w-4 shrink-0 sm:mt-0" strokeWidth={1.75} />
+                      <span className="min-w-0 break-words">{venueAddress}</span>
                     </EventVenueTrigger>
-                  ) : null}
-                </div>
-              </div>
-            </div>
-
-            {/* Sticky bar covers mobile; show buy only where sticky is hidden */}
-            {priceLabel ? (
-              <div className="hidden lg:block">
-                <EventHeroBuyButton payload={payload} priceLabel={priceLabel} />
+                  ) : (
+                    <span className="flex min-w-0 items-start gap-1.5 sm:items-center">
+                      <MapPin className="mt-0.5 h-4 w-4 shrink-0 sm:mt-0" strokeWidth={1.75} />
+                      <span className="min-w-0 break-words">{venueAddress}</span>
+                    </span>
+                  )
+                ) : null}
               </div>
             ) : null}
           </div>
-        </div>
-      </div>
 
-      {/* First content block under the photo (mobile): crumbs, address, nearest, short chips */}
-      <div className="border-b border-slate-200 bg-white md:hidden">
-        <div className="container-page space-y-3 py-4">
-          <nav aria-label="Хлебные крошки" className="flex flex-wrap items-center gap-1.5 text-sm text-slate-500">
-            {breadcrumbs.map((crumb, index) => {
-              const isLast = index === breadcrumbs.length - 1;
-              return (
-                <span
-                  key={`${crumb.path}:mobile:${index}`}
-                  className={`inline-flex items-center gap-1.5 ${isLast ? 'min-w-0' : ''}`}
-                >
-                  {index > 0 ? <ChevronRight className="h-3.5 w-3.5 shrink-0 text-slate-300" /> : null}
-                  {isLast ? (
-                    <span className="truncate text-slate-900">{crumb.name}</span>
-                  ) : (
-                    <Link href={crumb.path} className="shrink-0 transition hover:text-primary-600">
-                      {crumb.name}
-                    </Link>
-                  )}
-                </span>
-              );
-            })}
-          </nav>
-
-          {venueAddress ? (
-            canOpenVenueModal ? (
-              <EventVenueTrigger
-                event={event}
-                className="flex items-start gap-1.5 text-sm text-graphite underline decoration-slate-300 underline-offset-2"
-              >
-                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary-600" strokeWidth={1.75} />
-                <span>{venueAddress}</span>
-              </EventVenueTrigger>
-            ) : (
-              <p className="flex items-start gap-1.5 text-sm text-graphite">
-                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary-600" strokeWidth={1.75} />
-                <span>{venueAddress}</span>
-              </p>
-            )
-          ) : null}
-
-          {nearestLabel ? (
-            <p className="flex items-center gap-1.5 text-sm text-graphite">
-              <Calendar className="h-4 w-4 shrink-0 text-graphite-muted" strokeWidth={1.75} />
-              {nearestLabel}
-            </p>
-          ) : null}
-
-          {((placeLabel && !placeDuplicatesAddress) || metro || ageLimit || oldPrice || aggregate) ? (
-            <div className="flex flex-wrap gap-1.5">
-              {placeLabel && !placeDuplicatesAddress ? (
-                venuePageHref ? (
-                  <Link
-                    href={venuePageHref}
-                    className="inline-flex max-w-full items-center gap-1 rounded-full bg-slate-900 px-2.5 py-1 text-[11px] font-medium text-white"
-                  >
-                    <MapPin className="h-3 w-3 shrink-0" strokeWidth={1.75} />
-                    <span className="truncate">{placeLabel}</span>
-                  </Link>
-                ) : (
-                  <span className="inline-flex max-w-full items-center gap-1 rounded-full bg-slate-900 px-2.5 py-1 text-[11px] font-medium text-white">
-                    <MapPin className="h-3 w-3 shrink-0" strokeWidth={1.75} />
-                    <span className="truncate">{placeLabel}</span>
-                  </span>
-                )
-              ) : null}
-              {metro ? (
-                <span className="inline-flex items-center gap-1 rounded-full bg-slate-900 px-2.5 py-1 text-[11px] font-medium text-white">
-                  <Train className="h-3 w-3" strokeWidth={1.75} />
-                  {metro}
-                </span>
-              ) : null}
-              {ageLimit ? (
-                <span className="inline-flex items-center gap-1 rounded-full bg-slate-900 px-2.5 py-1 text-[11px] font-medium text-white">
-                  <Users className="h-3 w-3" strokeWidth={1.75} />
-                  {ageLimit}
-                </span>
-              ) : null}
-              {oldPrice ? (
-                <span className="inline-flex items-center gap-1 rounded-full bg-amber-400 px-2.5 py-1 text-[11px] font-semibold text-slate-900">
-                  <Percent className="h-3 w-3" strokeWidth={1.75} />
-                  Скидка
-                </span>
-              ) : null}
-              {aggregate ? (
-                <EventRatingBadge ratingValue={aggregate.ratingValue} reviewCount={aggregate.reviewCount} />
-              ) : null}
+          {/* Sticky bar covers mobile; buy CTA only where sticky is hidden */}
+          {priceLabel ? (
+            <div className="hidden shrink-0 lg:block">
+              <EventHeroBuyButton payload={payload} priceLabel={priceLabel} />
             </div>
           ) : null}
         </div>
       </div>
-    </>
+    </div>
   );
 }

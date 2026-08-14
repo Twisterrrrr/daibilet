@@ -1,3 +1,24 @@
+## 2026-08-14 - Event PDP: full mobile hero + crumbs/header/tickets
+
+### Наблюдения
+- Owner откатил slim overlay (`a9d6ac1`): на мобилке снова нужен полный набор в hero, не «H1 + 75 мин · от ₽» и не блок под фото.
+- Last crumb = title дублировал H1 и распирал крошки.
+- Compact header менял `--site-header-height` → прыгал spacer при скролле.
+- Карточка билетов / date chips вылезала за 375px после 3:4 hero.
+- Ближайший закрытый день оставался выбранным по умолчанию.
+
+### Решения
+- Event hero overlay порядок: крошки без title (`sr-only`) · категория · H1 · локация/возраст · цена мин-макс · Ближайший · адрес. Sticky CTA без кнопки в hero. Venue/location не копировали.
+- Header: фиксированный padding; compact больше не сжимает CSS var высоты.
+- Buy card: `min-w-0`, меньший padding, date strip `-mx` под padding; grid колонки `min-w-0`.
+- `pickDefaultSessionDayKey` + SessionDayStrip: default = первый день с открытой продажей; ручной клик не перебиваем.
+- `docs/mobile-templates.md` обновлён под event overlay.
+
+### Проблемы
+- Live deploy не делали (выкаты у image-пайплайна `b5fc25b8`).
+
+---
+
 ## 2026-08-14 - Empty «Город» / «гид» labels on blog article
 
 ### Наблюдения

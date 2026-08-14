@@ -126,6 +126,19 @@ export function pickPurchasableTcSession<T extends PurchaseSession>(sessions: T[
   return null;
 }
 
+/** First day key that still has a buyable slot; else first day (all closed). */
+export function pickDefaultSessionDayKey<T extends PurchaseSession & { dateLabel?: string | null }>(
+  days: Array<{ key: string; sessions: T[] }>,
+): string {
+  if (!days.length) return '';
+  for (const day of days) {
+    if (day.sessions.some((session) => !isSessionPurchaseBlocked(session))) {
+      return day.key;
+    }
+  }
+  return days[0]?.key || '';
+}
+
 export function listPurchasableSessionVariants<T extends PurchaseSession>(sessions: T[]): T[] {
   const expanded = sessions.flatMap((session) => expandSessionPurchaseVariants(session));
   // Never fall back to STAND_BY/closed/paused slots - empty rail is better than a dead CTA.

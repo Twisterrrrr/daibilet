@@ -95,3 +95,44 @@ test('resolveTcPurchaseTarget does not fall back to stale event widget when bloc
   assert.equal(result.tcEventId, null);
   assert.equal(result.purchaseUrl, null);
 });
+
+test('pickDefaultSessionDayKey skips closed days then falls back', async () => {
+  const { pickDefaultSessionDayKey } = await import('./event-purchase.ts');
+  const days = [
+    {
+      key: '2026-08-15',
+      sessions: [
+        {
+          id: 'closed',
+          purchaseReady: false,
+          vacant: 0,
+          startsAt: '2026-08-15T10:00:00.000Z',
+        },
+      ],
+    },
+    {
+      key: '2026-08-16',
+      sessions: [
+        {
+          id: 'open',
+          eventId: 'bbbbbbbbbbbbbbbbbbbb',
+          purchaseReady: true,
+          purchaseUrl: 'https://widgets.ticketscloud.com/?event=bbbbbbbbbbbbbbbbbbbb',
+          vacant: 4,
+          startsAt: '2026-08-16T10:00:00.000Z',
+        },
+      ],
+    },
+  ];
+  assert.equal(pickDefaultSessionDayKey(days), '2026-08-16');
+  assert.equal(
+    pickDefaultSessionDayKey([
+      {
+        key: 'only-closed',
+        sessions: [{ id: 'x', purchaseReady: false, vacant: 0 }],
+      },
+    ]),
+    'only-closed',
+  );
+  assert.equal(pickDefaultSessionDayKey([]), '');
+});

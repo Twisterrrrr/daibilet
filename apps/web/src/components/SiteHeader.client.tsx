@@ -148,11 +148,7 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
   return (
     <>
       <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-200/70 bg-white/95 pt-[env(safe-area-inset-top,0px)] shadow-[0_1px_0_hsl(210_9%_11%/0.03)] backdrop-blur-md supports-[backdrop-filter]:bg-white/90">
-        <div
-          className={`container-page flex min-h-[var(--site-header-height)] items-center justify-between gap-2 transition-[padding] duration-200 ${
-            compactHeader ? 'py-1.5 sm:py-1.5 lg:py-2' : 'py-2.5 sm:py-3 lg:py-3.5'
-          }`}
-        >
+        <div className="container-page flex min-h-[var(--site-header-height)] items-center justify-between gap-2 py-2.5 sm:py-3 lg:py-3.5">
           <div className="flex min-w-0 flex-1 flex-nowrap items-center gap-2 sm:gap-3 lg:flex-none lg:gap-4">
             {/* Label only in header; sheet layer is a sibling outside backdrop-blur. */}
             <MobileNavTrigger id={mobileNavId} />
