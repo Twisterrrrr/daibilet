@@ -1,9 +1,48 @@
 /**
  * Open-Meteo WMO mapping + sun vs indoor mood for city-hub smart CTAs.
- * Pure helpers - fetch lives in the weather route.
+ * Pure helpers - fetch lives in the weather route / browser fallback.
+ *
+ * Live nginx sends `/api/public/*` to catalog backend :4000. Hub weather
+ * must use a Next-owned prefix (`/api/day-route/weather/:slug`).
  */
 
 import type { CityWeatherFlavor } from './city-hub-local-flavor.ts';
+
+export const OPEN_METEO_FORECAST_URL = 'https://api.open-meteo.com/v1/forecast';
+export const HUB_WEATHER_API_PREFIX = '/api/day-route/weather';
+
+export function hubWeatherApiPath(citySlug: string): string {
+  return `${HUB_WEATHER_API_PREFIX}/${encodeURIComponent(citySlug)}`;
+}
+
+export function buildOpenMeteoForecastUrl(
+  weather: Pick<CityWeatherFlavor, 'latitude' | 'longitude' | 'timezone'>,
+): string {
+  const url = new URL(OPEN_METEO_FORECAST_URL);
+  url.searchParams.set('latitude', String(weather.latitude));
+  url.searchParams.set('longitude', String(weather.longitude));
+  url.searchParams.set('timezone', weather.timezone);
+  url.searchParams.set('forecast_days', '3');
+  url.searchParams.set('current', 'temperature_2m,weather_code,precipitation,cloud_cover');
+  url.searchParams.set('daily', 'weather_code,temperature_2m_max,temperature_2m_min');
+  return url.toString();
+}
+
+export function snapshotFromHubWeatherPayload(data: unknown): CityWeatherSnapshot | null {
+  if (!data || typeof data !== 'object') return null;
+  const row = data as {
+    ok?: boolean;
+    today?: CityWeatherDay;
+    tomorrow?: CityWeatherDay | null;
+    dayAfter?: CityWeatherDay | null;
+  };
+  if (!row.ok || !row.today) return null;
+  return {
+    today: row.today,
+    tomorrow: row.tomorrow || null,
+    dayAfter: row.dayAfter || null,
+  };
+}
 
 export type CityWeatherDay = {
   date: string;

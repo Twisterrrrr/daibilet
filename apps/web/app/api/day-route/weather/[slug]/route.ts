@@ -5,6 +5,10 @@ export const revalidate = 1200;
 
 type RouteContext = { params: Promise<{ slug: string }> };
 
+/**
+ * GET /api/day-route/weather/:slug
+ * Next-owned prefix: live nginx proxies `/api/public/*` to catalog :4000.
+ */
 export async function GET(_request: Request, context: RouteContext) {
   const { slug } = await context.params;
   const flavor = resolveCityLocalFlavor(slug);

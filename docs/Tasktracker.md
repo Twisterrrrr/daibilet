@@ -1,3 +1,9 @@
+## 2026-08-14 - City hub: лайфхаки Перми
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| UX.PERM-LIFEHACKS | Хаб `#practice`: «Лайфхаки по городу» - 4 таба, короткие карточки, CTA; пилот Пермь | Высокий | ✅ git, без live deploy |
+
 ## 2026-08-14 - Event PDP mobile hero + tickets chrome
 
 | ID | Задача | Приоритет | Статус |
@@ -95,7 +101,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| UX.PERM-WEATHER | Микровиджет сегодня/завтра + smart CTA солнце vs пасмурно/дождь | Высокий | ✅ 2026-08-14 code; Open-Meteo; deploy batch |
+| UX.PERM-WEATHER | Микровиджет сегодня/завтра + smart CTA солнце vs пасмурно/дождь | Высокий | ✅ фикс 2026-08-14: `/api/day-route/weather` + Open-Meteo fallback; live после web deploy |
 | UX.PERM-TAGS | Per-city identity tags → реальные slugs + «Собрать маршрут» | Высокий | ✅ 2026-08-14 code; deploy batch |
 | UX.PERM-REG-EVENTS | Editorial 5 фестивалей 2026 + research ingest; не live API | Средний | ✅ 2026-08-14 JSON + docs; auto-ingest next |
 

@@ -4,6 +4,9 @@ import test from 'node:test';
 import {
   indoorCtaForCode,
   parseOpenMeteoForecast,
+  snapshotFromHubWeatherPayload,
+  buildOpenMeteoForecastUrl,
+  hubWeatherApiPath,
   weatherLabelRu,
   weatherMoodFromCode,
 } from './city-weather.ts';
@@ -53,4 +56,39 @@ test('parseOpenMeteoForecast prefers current code for today', () => {
 test('parseOpenMeteoForecast returns null on empty payload', () => {
   assert.equal(parseOpenMeteoForecast({}), null);
   assert.equal(parseOpenMeteoForecast(null), null);
+});
+
+test('hub weather API stays on Next-owned /api/day-route prefix', () => {
+  assert.equal(hubWeatherApiPath('perm'), '/api/day-route/weather/perm');
+  assert.equal(hubWeatherApiPath('perm').startsWith('/api/public/'), false);
+});
+
+test('Open-Meteo URL carries Perm coords and 3-day forecast', () => {
+  const flavor = resolveCityLocalFlavor('perm')?.weather;
+  assert.ok(flavor);
+  const url = buildOpenMeteoForecastUrl(flavor);
+  assert.match(url, /api\.open-meteo\.com\/v1\/forecast/);
+  assert.match(url, /latitude=58\.01/);
+  assert.match(url, /longitude=56\.23/);
+  assert.match(url, /forecast_days=3/);
+});
+
+test('snapshotFromHubWeatherPayload requires ok + today', () => {
+  assert.equal(snapshotFromHubWeatherPayload({ ok: false }), null);
+  const snapshot = snapshotFromHubWeatherPayload({
+    ok: true,
+    today: {
+      date: '2026-08-14',
+      weatherCode: 80,
+      label: 'Небольшой дождь',
+      temperatureC: 18,
+      tempMaxC: 20,
+      tempMinC: 12,
+      mood: 'indoor',
+    },
+    tomorrow: null,
+    dayAfter: null,
+  });
+  assert.ok(snapshot);
+  assert.equal(snapshot.today.temperatureC, 18);
 });

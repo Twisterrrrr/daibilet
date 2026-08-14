@@ -7,12 +7,17 @@ import {
   resolveCityLocalFlavor,
   resolveWhenToGoBlurb,
   type CitySeasonTabId,
+  type CityWeatherFlavor,
 } from '@/lib/city-hub-local-flavor';
 import {
+  buildOpenMeteoForecastUrl,
   formatTempC,
   formatTempCFull,
+  hubWeatherApiPath,
   isRainyWeatherCode,
   isSunnyWeatherCode,
+  parseOpenMeteoForecast,
+  snapshotFromHubWeatherPayload,
   weatherConditionLine,
   type CityWeatherDay,
   type CityWeatherSnapshot,
@@ -42,6 +47,28 @@ function dayTemp(day: CityWeatherDay): string | null {
   return formatTempC(day.temperatureC) || formatTempC(day.tempMaxC);
 }
 
+async function loadCityWeatherSnapshot(
+  citySlug: string,
+  weather: CityWeatherFlavor,
+  signal: AbortSignal,
+): Promise<CityWeatherSnapshot> {
+  try {
+    const response = await fetch(hubWeatherApiPath(citySlug), { signal });
+    if (response.ok) {
+      const snapshot = snapshotFromHubWeatherPayload(await response.json());
+      if (snapshot) return snapshot;
+    }
+  } catch (error) {
+    if (signal.aborted) throw error;
+  }
+
+  const response = await fetch(buildOpenMeteoForecastUrl(weather), { signal });
+  if (!response.ok) throw new Error(`open-meteo ${response.status}`);
+  const snapshot = parseOpenMeteoForecast(await response.json());
+  if (!snapshot) throw new Error('open-meteo_bad_payload');
+  return snapshot;
+}
+
 const TAB_ICON = {
   spring: Flower2,
   summer: Sun,
@@ -68,26 +95,9 @@ export function CityWeatherWidget({ citySlug, cityIn, editorial = false }: Props
     }
     const controller = new AbortController();
     setState({ status: 'loading' });
-    fetch(`/api/public/weather/${encodeURIComponent(citySlug)}`, { signal: controller.signal })
-      .then(async (response) => {
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        return (await response.json()) as {
-          ok?: boolean;
-          today?: CityWeatherDay;
-          tomorrow?: CityWeatherDay | null;
-          dayAfter?: CityWeatherDay | null;
-        };
-      })
-      .then((data) => {
-        if (!data?.ok || !data.today) throw new Error('bad_payload');
-        setState({
-          status: 'ready',
-          snapshot: {
-            today: data.today,
-            tomorrow: data.tomorrow || null,
-            dayAfter: data.dayAfter || null,
-          },
-        });
+    loadCityWeatherSnapshot(citySlug, weather, controller.signal)
+      .then((snapshot) => {
+        setState({ status: 'ready', snapshot });
       })
       .catch((error) => {
         if (controller.signal.aborted) return;
@@ -126,7 +136,7 @@ export function CityWeatherWidget({ citySlug, cityIn, editorial = false }: Props
         {state.status === 'loading' ? (
           <div className="mt-3 h-20 animate-pulse rounded-2xl bg-white/20" aria-busy="true" aria-label="Загружаем погоду" />
         ) : state.status === 'error' || !today ? (
-          <p className="mt-3 text-sm leading-6 text-white/90">Сейчас данные недоступны. Сезон ниже всё равно в силе.</p>
+          <p className="mt-3 text-sm leading-6 text-white/90">Не удалось загрузить погоду. Сезон ниже всё равно в силе.</p>
         ) : (
           <div className="mt-3 flex items-center justify-between gap-3">
             <div className="flex min-w-0 items-center gap-3">
