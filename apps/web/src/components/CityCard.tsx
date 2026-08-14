@@ -224,7 +224,7 @@ export function CityCard({
             className={`pointer-events-none absolute inset-0 ${
               isLight
                 ? 'bg-gradient-to-t from-white/95 via-white/45 to-transparent'
-                : 'bg-gradient-to-tl from-black/70 via-black/28 to-transparent'
+                : 'bg-gradient-to-tr from-black/70 via-black/28 to-transparent'
             }`}
           />
           <div
