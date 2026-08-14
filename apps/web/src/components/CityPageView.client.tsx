@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { ArrowLeft, ChevronLeft, ChevronRight, Info, Lightbulb, MapPin, Ticket } from 'lucide-react';
+import { ArrowLeft, ChevronDown, ChevronLeft, ChevronRight, Info, Lightbulb, MapPin, Ticket } from 'lucide-react';
 import Link from 'next/link';
 
 import { CityHubArticlesGrid } from '@/components/CityHubArticleTeaser.client';
@@ -94,7 +94,7 @@ const CITY_HASH_ALIASES: Record<string, string> = {
   'city-sights': 'sights',
   lifehacks: 'lifehacks',
   'city-travel': 'practice',
-  'city-guide-faq': 'practice',
+  'city-guide-faq': 'faq',
   practice: 'practice',
   'city-seo': 'seo',
   'why-go': 'sights',
@@ -103,11 +103,28 @@ const CITY_HASH_ALIASES: Record<string, string> = {
   directions: 'more',
   venues: 'more',
   travel: 'practice',
-  faq: 'practice',
+  faq: 'faq',
   suburbs: 'city-suburbs',
   'must-see': 'city-must-see',
+  'glavnye-mesta': 'city-must-see',
+  routes: 'city-routes',
+  scenarios: 'city-routes',
+  'day-constructor': 'city-routes',
   'region-events': 'region-events',
 };
+
+const HUB_DESKTOP_NAV: Array<{ id: string; label: string }> = [
+  { id: 'sights', label: 'Зачем ехать' },
+  { id: 'city-must-see', label: 'Главные места' },
+  { id: 'city-routes', label: 'Маршруты' },
+  { id: 'lifehacks', label: 'Лайфхаки' },
+  { id: 'city-suburbs', label: 'Пригороды' },
+  { id: 'affiche', label: 'Афиша' },
+  { id: 'faq', label: 'FAQ' },
+  { id: 'blog', label: 'Из блога' },
+];
+
+const HUB_MOBILE_PRIMARY_IDS = ['sights', 'city-routes', 'city-suburbs', 'affiche'] as const;
 
 const SECTION_SCROLL_MT = 'scroll-mt-[calc(var(--site-header-height)+3.25rem)]';
 
@@ -282,6 +299,15 @@ export function CityPageView({
   const hasPracticeContent = showTravel || hasFaq || practiceArticles.length > 0;
   const hasMore = hasDirections || hasVenues || moreArticles.length > 0;
   const showSightsBlock = hasSights || hasHookFact || hasWeather || hasWhenToGo || hasIdentity;
+  const hasWhyGoNav = hasIdentity || hasHookFact || hasWeather || hasWhenToGo;
+  const hasMustSeeNav = Boolean(
+    !isCityHubSectionHidden(hubConfig, 'sights') &&
+      (guide?.mustSee?.length ||
+        guide?.sights?.length ||
+        (contentReady && (categories.length > 0 || (payload?.venues?.length || 0) > 0))),
+  );
+  const hasRoutesNav = Boolean(guide?.dayRoutePresets?.length);
+  const hasSuburbsNav = Boolean(guide?.significantSuburbs?.length);
 
   const applyPlaceFocus = React.useCallback((focus: CityPlaceFocus | null) => {
     if (!focus?.slugs.length) {
@@ -294,28 +320,33 @@ export function CityPageView({
   // Story cards UI hidden (owner 2026-08-03); keep build helper for later - do not render.
   const blogAfterSuburbs = isCityHubBlogAfterSuburbs(city?.slug || city?.sourceSlug || slug);
 
-  const tabs = React.useMemo(
-    () => {
-      const blogTab = { id: 'blog', label: 'Из блога', show: footerArticles.length > 0 };
-      return [
-        { id: 'sights', label: 'Зачем ехать', show: showSightsBlock },
-        ...(blogAfterSuburbs ? [blogTab] : []),
-        { id: 'affiche', label: 'Афиша', show: true },
-        { id: 'lifehacks', label: 'Лайфхаки', show: hasLifehacks },
-        { id: 'practice', label: 'Советы', show: hasPracticeContent },
-        { id: 'more', label: 'Подборки', show: hasMore },
-        ...(!blogAfterSuburbs ? [blogTab] : []),
-      ].filter((tab) => tab.show);
-    },
-    [
-      blogAfterSuburbs,
-      footerArticles.length,
-      hasLifehacks,
-      hasMore,
-      hasPracticeContent,
-      showSightsBlock,
-    ],
-  );
+  const tabs = React.useMemo(() => {
+    const filled = new Set<string>();
+    if (hasWhyGoNav) filled.add('sights');
+    if (hasMustSeeNav) filled.add('city-must-see');
+    if (hasRoutesNav) filled.add('city-routes');
+    if (hasLifehacks) filled.add('lifehacks');
+    if (hasSuburbsNav) filled.add('city-suburbs');
+    filled.add('affiche');
+    if (hasFaq) filled.add('faq');
+    if (footerArticles.length > 0) filled.add('blog');
+    const desktop = HUB_DESKTOP_NAV.filter((item) => filled.has(item.id));
+    const extra: Array<{ id: string; label: string }> = [];
+    if (showTravel || practiceArticles.length > 0) extra.push({ id: 'practice', label: 'Советы' });
+    if (hasMore) extra.push({ id: 'more', label: 'Подборки' });
+    return { desktop, extra };
+  }, [
+    footerArticles.length,
+    hasFaq,
+    hasLifehacks,
+    hasMore,
+    hasMustSeeNav,
+    hasRoutesNav,
+    hasSuburbsNav,
+    hasWhyGoNav,
+    practiceArticles.length,
+    showTravel,
+  ]);
 
   const renderHubBlogSection = () => {
     if (!footerArticles.length || !city) return null;
@@ -383,7 +414,7 @@ export function CityPageView({
               hubConfig={hubConfig}
               editorial={editorial}
             />
-            <CityStickyTabs tabs={tabs} editorial={editorial} />
+            <CityStickyTabs desktopTabs={tabs.desktop} extraTabs={tabs.extra} editorial={editorial} />
 
             {showSightsBlock ? (
               <div
@@ -941,19 +972,38 @@ function CityHeroStrip({
 }
 
 function CityStickyTabs({
-  tabs,
+  desktopTabs,
+  extraTabs = [],
   editorial = false,
 }: {
-  tabs: Array<{ id: string; label: string }>;
+  desktopTabs: Array<{ id: string; label: string }>;
+  extraTabs?: Array<{ id: string; label: string }>;
   editorial?: boolean;
 }) {
-  const [activeId, setActiveId] = React.useState(tabs[0]?.id || 'affiche');
+  const observedTabs = React.useMemo(() => {
+    const seen = new Set<string>();
+    return [...desktopTabs, ...extraTabs].filter((tab) => {
+      if (seen.has(tab.id)) return false;
+      seen.add(tab.id);
+      return true;
+    });
+  }, [desktopTabs, extraTabs]);
+  const mobilePrimary = desktopTabs.filter((tab) =>
+    (HUB_MOBILE_PRIMARY_IDS as readonly string[]).includes(tab.id),
+  );
+  const mobileMore = [
+    ...desktopTabs.filter((tab) => !(HUB_MOBILE_PRIMARY_IDS as readonly string[]).includes(tab.id)),
+    ...extraTabs.filter((tab) => !desktopTabs.some((item) => item.id === tab.id)),
+  ];
+  const [activeId, setActiveId] = React.useState(observedTabs[0]?.id || 'affiche');
+  const [moreOpen, setMoreOpen] = React.useState(false);
+  const moreRef = React.useRef<HTMLDivElement>(null);
   /** Пока идёт programmatic smooth-scroll - не даём observer перебить activeId. */
   const scrollLockUntilRef = React.useRef(0);
 
   React.useEffect(() => {
-    if (!tabs.length) return;
-    const elements = tabs
+    if (!observedTabs.length) return;
+    const elements = observedTabs
       .map((tab) => document.getElementById(tab.id))
       .filter((el): el is HTMLElement => Boolean(el));
     if (!elements.length) return;
@@ -975,13 +1025,70 @@ function CityStickyTabs({
 
     for (const el of elements) observer.observe(el);
     return () => observer.disconnect();
-  }, [tabs]);
+  }, [observedTabs]);
 
-  if (!tabs.length) return null;
+  React.useEffect(() => {
+    if (!moreOpen) return;
+    const onPointer = (event: MouseEvent) => {
+      if (!moreRef.current?.contains(event.target as Node)) setMoreOpen(false);
+    };
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMoreOpen(false);
+    };
+    document.addEventListener('mousedown', onPointer);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onPointer);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [moreOpen]);
+
+  const goTo = (id: string) => {
+    scrollLockUntilRef.current = Date.now() + 1200;
+    setActiveId(id);
+    setMoreOpen(false);
+    scrollToSection(id);
+    if (typeof window !== 'undefined') {
+      window.history.replaceState(null, '', `#${id}`);
+    }
+  };
+
+  const tabClass = (active: boolean) =>
+    editorial
+      ? `shrink-0 whitespace-nowrap border-b-2 py-3 text-sm font-medium transition-colors md:py-4 ${
+          active ? 'border-zinc-950 text-zinc-950' : 'border-transparent text-zinc-500 hover:text-zinc-900'
+        }`
+      : `shrink-0 whitespace-nowrap border-b-2 px-2.5 py-3 text-sm font-medium transition sm:px-3 md:px-4 ${
+          active
+            ? 'border-primary-600 text-primary-700'
+            : 'border-transparent text-slate-600 hover:text-primary-700'
+        }`;
+
+  const renderTab = (tab: { id: string; label: string }) => {
+    const active = activeId === tab.id;
+    return (
+      <a
+        key={tab.id}
+        href={`#${tab.id}`}
+        onClick={(event) => {
+          event.preventDefault();
+          goTo(tab.id);
+        }}
+        className={tabClass(active)}
+      >
+        {tab.label}
+      </a>
+    );
+  };
+
+  if (!observedTabs.length) return null;
+
+  const moreActive = mobileMore.some((tab) => tab.id === activeId);
 
   return (
     <nav
       aria-label="Разделы страницы города"
+      data-city-hub-nav
       className={
         editorial
           ? 'sticky top-[var(--site-header-height)] z-30 border-b border-zinc-200 bg-zinc-50/90 backdrop-blur-md'
@@ -991,43 +1098,68 @@ function CityStickyTabs({
       <div
         className={
           editorial
-            ? 'container-page flex gap-6 overflow-x-auto py-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:gap-8'
-            : 'container-page flex gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
+            ? 'container-page hidden gap-6 overflow-x-auto py-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:gap-8 md:flex'
+            : 'container-page hidden gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:flex'
         }
+        data-city-hub-nav-desktop
       >
-        {tabs.map((tab) => {
-          const active = activeId === tab.id;
-          return (
-            <a
-              key={tab.id}
-              href={`#${tab.id}`}
-              onClick={(event) => {
-                event.preventDefault();
-                scrollLockUntilRef.current = Date.now() + 1200;
-                setActiveId(tab.id);
-                scrollToSection(tab.id);
-                if (typeof window !== 'undefined') {
-                  window.history.replaceState(null, '', `#${tab.id}`);
-                }
-              }}
-              className={
-                editorial
-                  ? `shrink-0 border-b-2 py-4 text-sm font-medium transition-colors ${
-                      active
-                        ? 'border-zinc-950 text-zinc-950'
-                        : 'border-transparent text-zinc-500 hover:text-zinc-900'
-                    }`
-                  : `shrink-0 border-b-2 px-3 py-3 text-sm font-medium transition sm:px-4 ${
-                      active
-                        ? 'border-primary-600 text-primary-700'
-                        : 'border-transparent text-slate-600 hover:text-primary-700'
-                    }`
-              }
+        {desktopTabs.map(renderTab)}
+      </div>
+      <div
+        className={
+          editorial
+            ? 'container-page flex items-end gap-3 overflow-x-auto py-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:hidden'
+            : 'container-page flex items-end gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:hidden'
+        }
+        data-city-hub-nav-mobile
+      >
+        {mobilePrimary.map(renderTab)}
+        {mobileMore.length ? (
+          <div className="relative shrink-0" ref={moreRef}>
+            <button
+              type="button"
+              aria-expanded={moreOpen}
+              aria-haspopup="menu"
+              data-city-hub-nav-more
+              onClick={() => setMoreOpen((open) => !open)}
+              className={`${tabClass(moreActive)} inline-flex items-center gap-0.5`}
             >
-              {tab.label}
-            </a>
-          );
-        })}
+              Еще
+              <ChevronDown className={`h-3.5 w-3.5 shrink-0 transition ${moreOpen ? 'rotate-180' : ''}`} aria-hidden />
+            </button>
+            {moreOpen ? (
+              <div
+                role="menu"
+                className={`absolute right-0 z-40 mt-1 min-w-[11rem] rounded-xl border py-1 shadow-lg ${
+                  editorial ? 'border-zinc-200 bg-white' : 'border-slate-200 bg-white'
+                }`}
+              >
+                {mobileMore.map((tab) => (
+                  <a
+                    key={tab.id}
+                    role="menuitem"
+                    href={`#${tab.id}`}
+                    onClick={(event) => {
+                      event.preventDefault();
+                      goTo(tab.id);
+                    }}
+                    className={`block px-3 py-2 text-sm ${
+                      activeId === tab.id
+                        ? editorial
+                          ? 'font-semibold text-zinc-950'
+                          : 'font-semibold text-primary-700'
+                        : editorial
+                          ? 'text-zinc-600 hover:bg-zinc-50 hover:text-zinc-950'
+                          : 'text-slate-600 hover:bg-slate-50 hover:text-slate-950'
+                    }`}
+                  >
+                    {tab.label}
+                  </a>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        ) : null}
       </div>
     </nav>
   );
@@ -1367,7 +1499,7 @@ function CitySightsSection({
   const hasNamedScenarios = Boolean(namedPresets?.length);
   const activeFocus = placeFocus?.slugs.length ? placeFocus : null;
   const focusedPlaces = activeFocus ? collectPlacesBySlugs(activeFocus.slugs, places, allSuburbs) : [];
-  // H2 «Что посмотреть в …»; sticky/jump tab остаётся «Зачем ехать».
+  // H2 «Что посмотреть в …»; sticky-лейбл must-see - «Главные места» (#city-must-see).
   // hookFact renders above this section (between tabs and H2).
   const sectionTitle =
     places.length || !hasNamedScenarios
@@ -1830,7 +1962,12 @@ function CitySightsMustSeeList({
         </>
       ) : null}
       {beforeScenarios}
-      <div className={showPlacesRail || beforeScenarios ? 'mt-10' : 'mt-6'}>
+      <div
+        id={hasNamedScenarios ? 'city-routes' : undefined}
+        className={`${showPlacesRail || beforeScenarios ? 'mt-10' : 'mt-6'}${
+          hasNamedScenarios ? ` ${SECTION_SCROLL_MT}` : ''
+        }`}
+      >
         {hasNamedScenarios && showPlacesRail ? (
           <h3
             className={
@@ -2316,7 +2453,7 @@ function CityFaqSection({
   return (
     <section
       id="faq"
-      className={`py-8 sm:py-10 ${nested ? '' : `${SECTION_SCROLL_MT} border-t`} ${
+      className={`py-8 sm:py-10 ${SECTION_SCROLL_MT} ${nested ? '' : 'border-t'} ${
         nested ? '' : editorial ? 'border-zinc-200' : 'border-slate-100'
       }`}
     >

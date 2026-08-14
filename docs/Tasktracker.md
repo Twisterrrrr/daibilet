@@ -1,8 +1,20 @@
+## 2026-08-14 - Hub sticky nav: desktop 8 + mobile 4+Еще
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| UX.HUB-NAV-STICKY | Sticky: desktop Зачем ехать / Главные места / Маршруты / Лайфхаки / Пригороды / Афиша / FAQ / Из блога; mobile 4 + Еще | Высокий | 🔄 commit+push, затем live |
+
+## 2026-08-14 - Live: Deploy MSK web `31826881828`
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| DEPLOY.MSK-31826881828 | Live tip `0671d6d` BUILD_ID=`WHTVV_MjU86en0fh4LB-L` | Высокий | ✅ live |
+
 ## 2026-08-14 - Hub festivals: past as open side column
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| UX.HUB-FEST-PAST-COL | Прошедшие фестивали: открытая колонка рядом с текущим, не details; убрать дисклеймер про афишу/API | Высокий | 🔄 commit+push, без live |
+| UX.HUB-FEST-PAST-COL | Прошедшие фестивали: открытая колонка рядом с текущим, не details; убрать дисклеймер про афишу/API | Высокий | ✅ live `31826881828` |
 
 ## 2026-08-14 - Lifehacks: all cards without category tabs
 

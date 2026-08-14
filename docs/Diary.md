@@ -1,10 +1,37 @@
+## 2026-08-14 - Hub sticky nav: desktop 8 + mobile 4+Еще
+
+### Наблюдения
+- Owner: sticky хаба должен вести по заполненным секциям. Desktop: Зачем ехать, Главные места, Маршруты, Лайфхаки, Пригороды, Афиша, FAQ, Из блога. Mobile: Зачем ехать, Маршруты, Пригороды, Афиша, Еще (остальное в меню).
+
+### Решения
+- `CityStickyTabs`: отдельные ряды md+ / mobile. Якоря существующие (`#sights`, `#city-must-see`, `#city-routes`, `#lifehacks`, `#city-suburbs`, `#affiche`, `#faq`, `#blog`). `#faq` больше не алиас на `#practice`. Пункты только если секция заполнена. Live после этого же deploy.
+
+### Проблемы
+- Нет.
+
+---
+
+## 2026-08-14 - Live: Deploy MSK web `31826881828`
+
+### Наблюдения
+- Owner mid-flight: после правок фестивалей сразу выкатить на live.
+
+### Решения
+- Deploy MSK web [`31826881828`](https://github.com/Twisterrrrr/daibilet/actions/runs/31826881828) success, ~2m19s. SHA `0671d6d`. BUILD_ID=`WHTVV_MjU86en0fh4LB-L`. Swap с `gVVVlmmybyhdCj0cA669K`.
+- Smoke 200: `/` `/places` `/events` `/cities/perm`. На Перми: нет дисклеймера про афишу/API; прошедшие открытой колонкой (`data-city-regional-past`), не `<details>`; Флаэртиана + Дягилев на месте.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-14 - Hub festivals: past as open side column
 
 ### Наблюдения
 - Owner: дисклеймер «не дубль афиши / без выдуманного API» не нужен. Прошедшие фестивали не прятать в свёрнутый details - показывать открытой колонкой рядом с текущим/ближайшим.
 
 ### Решения
-- `CityRegionalEvents`: подзаголовок-дисклеймер удалён. Upcoming/now и прошедшие - соседние колонки на `md+`, на мобилке стек. Источники дат без изменений (editorial `CITY_REGIONAL_EVENTS`). Live не выкатывали.
+- `CityRegionalEvents`: подзаголовок-дисклеймер удалён. Upcoming/now и прошедшие - соседние колонки на `md+`, на мобилке стек. Источники дат без изменений (editorial `CITY_REGIONAL_EVENTS`). Live: `31826881828`.
 
 ### Проблемы
 - Нет.
