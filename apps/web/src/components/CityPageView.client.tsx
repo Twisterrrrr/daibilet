@@ -30,7 +30,7 @@ import type { BlogCardDto } from '@/lib/blog-utils';
 import type { FinanceAdmissionListResult } from '@/lib/finance-projection';
 import { venuePageTemplate } from '@/lib/venue-meta';
 import { eventHref, venueHref } from '@/lib/routes';
-import { inCityAccusative, inCityPrepositional, cityToGenitive } from '@/lib/city-declension';
+import { inCityAccusative, inCityPrepositional, cityToGenitive, poCityDative } from '@/lib/city-declension';
 import { buildCatalogHref } from '@/lib/catalog-url';
 import { buildCityHubSeoPhrase } from '@/lib/city-hub-seo';
 import {
@@ -528,7 +528,7 @@ export function CityPageView({
                     }
                   >
                     {hasLifehacks && city?.name
-                      ? `Лайфхаки ${cityToGenitive(city.name)}: как сберечь бюджет`
+                      ? `Лайфхаки ${poCityDative(city.name)}: как сберечь бюджет`
                       : 'Советы'}
                   </h2>
                   {hasLifehacks ? null : (

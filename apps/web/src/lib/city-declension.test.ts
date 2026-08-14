@@ -3,11 +3,13 @@ import test from 'node:test';
 
 import {
   cityToAccusative,
+  cityToDative,
   cityToGenitive,
   cityToNominative,
   cityToPrepositional,
   inCityAccusative,
   isSeoExpansionCity,
+  poCityDative,
   resolveCityCases,
 } from './city-declension.ts';
 
@@ -17,12 +19,14 @@ test('Kazan / Ekaterinburg cases by name', () => {
     genitive: 'Казани',
     prepositional: 'Казани',
     accusative: 'Казань',
+    dative: 'Казани',
   });
   assert.deepEqual(resolveCityCases('Екатеринбург'), {
     nominative: 'Екатеринбург',
     genitive: 'Екатеринбурга',
     prepositional: 'Екатеринбурге',
     accusative: 'Екатеринбург',
+    dative: 'Екатеринбургу',
   });
 });
 
@@ -66,4 +70,25 @@ test('isSeoExpansionCity', () => {
   assert.equal(isSeoExpansionCity('Казань'), true);
   assert.equal(isSeoExpansionCity({ slug: 'ekaterinburg' }), true);
   assert.equal(isSeoExpansionCity({ name: 'Москва', slug: 'moscow' }), false);
+});
+
+test('dative for «по …» on lifehack hubs and typical cities', () => {
+  assert.equal(poCityDative('Пермь'), 'по Перми');
+  assert.equal(poCityDative('perm'), 'по Перми');
+  assert.equal(poCityDative('Москва'), 'по Москве');
+  assert.equal(poCityDative('moscow'), 'по Москве');
+  assert.equal(poCityDative('Санкт-Петербург'), 'по Санкт-Петербургу');
+  assert.equal(poCityDative('saint-petersburg'), 'по Санкт-Петербургу');
+  assert.equal(poCityDative('Калининград'), 'по Калининграду');
+  assert.equal(poCityDative('kaliningrad'), 'по Калининграду');
+  assert.equal(poCityDative('Нижний Новгород'), 'по Нижнему Новгороду');
+  assert.equal(poCityDative('nizhny-novgorod'), 'по Нижнему Новгороду');
+  assert.equal(cityToDative('Екатеринбург'), 'Екатеринбургу');
+  assert.equal(cityToDative('Казань'), 'Казани');
+  assert.equal(cityToDative('Ярославль'), 'Ярославлю');
+  assert.equal(cityToDative('Чебоксары'), 'Чебоксарам');
+  assert.equal(cityToDative('Ростов-на-Дону'), 'Ростову-на-Дону');
+  assert.equal(cityToDative('Сочи'), 'Сочи');
+  assert.notEqual(cityToDative('Санкт-Петербург'), cityToPrepositional('Санкт-Петербург'));
+  assert.notEqual(cityToDative('Нижний Новгород'), cityToPrepositional('Нижний Новгород'));
 });

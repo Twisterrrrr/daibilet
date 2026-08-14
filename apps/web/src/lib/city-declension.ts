@@ -1,4 +1,4 @@
-/** Падежи для SEO/UI: именительный, родительный, предложный, винительный (без предлога). */
+/** Падежи для SEO/UI: именительный, родительный, предложный, винительный, дательный (без предлога). */
 export type CityCases = {
   /** {City_Им} — Казань, Екатеринбург */
   nominative: string;
@@ -8,9 +8,11 @@ export type CityCases = {
   prepositional: string;
   /** {City_Вин} — Казань, Москву (ехать в …) */
   accusative: string;
+  /** {City_Дат} — Перми, Санкт-Петербургу (лайфхаки по …) */
+  dative: string;
 };
 
-type CityFormRow = { prep: string; gen: string; acc?: string };
+type CityFormRow = { prep: string; gen: string; acc?: string; dat?: string };
 
 /** Предложный / родительный / (опц.) винительный падежи городов. */
 const CITY_FORMS: Record<string, CityFormRow> = {
@@ -22,7 +24,7 @@ const CITY_FORMS: Record<string, CityFormRow> = {
   'Благовещенск (Амурская область)': { prep: 'Благовещенске', gen: 'Благовещенска' },
   Благовещенск: { prep: 'Благовещенске', gen: 'Благовещенска' },
   Брянск: { prep: 'Брянске', gen: 'Брянска' },
-  'Великий Новгород': { prep: 'Великом Новгороде', gen: 'Великого Новгорода', acc: 'Великий Новгород' },
+  'Великий Новгород': { prep: 'Великом Новгороде', gen: 'Великого Новгорода', acc: 'Великий Новгород', dat: 'Великому Новгороду' },
   Владимир: { prep: 'Владимире', gen: 'Владимира' },
   Владивосток: { prep: 'Владивостоке', gen: 'Владивостока' },
   Волгоград: { prep: 'Волгограде', gen: 'Волгограда' },
@@ -49,7 +51,7 @@ const CITY_FORMS: Record<string, CityFormRow> = {
   Магадан: { prep: 'Магадане', gen: 'Магадана' },
   Москва: { prep: 'Москве', gen: 'Москвы', acc: 'Москву' },
   Мурманск: { prep: 'Мурманске', gen: 'Мурманска' },
-  'Нижний Новгород': { prep: 'Нижнем Новгороде', gen: 'Нижнего Новгорода', acc: 'Нижний Новгород' },
+  'Нижний Новгород': { prep: 'Нижнем Новгороде', gen: 'Нижнего Новгорода', acc: 'Нижний Новгород', dat: 'Нижнему Новгороду' },
   Новосибирск: { prep: 'Новосибирске', gen: 'Новосибирска' },
   Омск: { prep: 'Омске', gen: 'Омска' },
   Орёл: { prep: 'Орле', gen: 'Орла' },
@@ -61,7 +63,7 @@ const CITY_FORMS: Record<string, CityFormRow> = {
   'Ростов-на-Дону': { prep: 'Ростове-на-Дону', gen: 'Ростова-на-Дону' },
   Рязань: { prep: 'Рязани', gen: 'Рязани' },
   Самара: { prep: 'Самаре', gen: 'Самары', acc: 'Самару' },
-  'Санкт-Петербург': { prep: 'Санкт-Петербурге', gen: 'Санкт-Петербурга' },
+  'Санкт-Петербург': { prep: 'Санкт-Петербурге', gen: 'Санкт-Петербурга', dat: 'Санкт-Петербургу' },
   Саранск: { prep: 'Саранске', gen: 'Саранска' },
   Саратов: { prep: 'Саратове', gen: 'Саратова' },
   Севастополь: { prep: 'Севастополе', gen: 'Севастополя' },
@@ -213,6 +215,44 @@ function inferGenitive(name: string): string {
   return `${name}а`;
 }
 
+function inferAdjectiveDat(adj: string): string {
+  if (/ая$/i.test(adj)) return `${adj.slice(0, -2)}ой`;
+  if (/яя$/i.test(adj)) return `${adj.slice(0, -2)}ей`;
+  if (/ий$/i.test(adj)) return `${adj.slice(0, -2)}ему`;
+  if (/ый$/i.test(adj) || /ой$/i.test(adj)) return `${adj.slice(0, -2)}ому`;
+  return adj;
+}
+
+/** Дательный для «по …»: Перми, Санкт-Петербургу, Нижнему Новгороду. */
+function inferDative(name: string): string {
+  const republic = name.match(/^Республика\s+(.+)$/i);
+  if (republic) return `Республике ${inferDative(republic[1])}`;
+  const republicTail = name.match(/^(.+)\s+Республика$/i);
+  if (republicTail) return `${inferAdjectiveDat(republicTail[1])} Республике`;
+  const oblast = name.match(/^(.+)\s+область$/i);
+  if (oblast) return `${inferAdjectiveDat(oblast[1])} области`;
+  const kray = name.match(/^(.+)\s+край$/i);
+  if (kray) return `${inferAdjectiveDat(kray[1])} краю`;
+
+  const naCompound = name.match(/^(.+)-на-(.+)$/i);
+  if (naCompound) return `${inferDative(naCompound[1])}-на-${naCompound[2]}`;
+
+  if (/ы$/i.test(name)) return `${name.slice(0, -1)}ам`;
+  if (/ия$/i.test(name)) return `${name.slice(0, -1)}и`;
+  if (/а$/i.test(name)) return `${name.slice(0, -1)}е`;
+  if (/я$/i.test(name)) return `${name.slice(0, -1)}е`;
+  if (/ь$/i.test(name)) {
+    // Ярославль / Ставрополь (м.р. -ль) → …лю; Пермь / Казань → …и
+    if (/л$/i.test(name.slice(0, -1))) return `${name.slice(0, -1)}ю`;
+    return `${name.slice(0, -1)}и`;
+  }
+  if (/ий$/i.test(name)) return `${name.slice(0, -2)}ему`;
+  if (/ый$/i.test(name) || /ой$/i.test(name)) return `${name.slice(0, -2)}ому`;
+  if (/о$/i.test(name)) return `${name.slice(0, -1)}у`;
+  if (/[еиуюэ]$/i.test(name)) return name;
+  return `${name}у`;
+}
+
 /** Винительный для «ехать в …»: -а/-я → -у/-ю; иначе = именительный (неодуш.). */
 function inferAccusative(name: string): string {
   const republic = name.match(/^Республика\s+(.+)$/i);
@@ -256,6 +296,7 @@ export function resolveCityCases(cityOrSlug: string): CityCases {
     genitive: forms?.gen || inferGenitive(nominative),
     prepositional: forms?.prep || inferPrepositional(nominative),
     accusative: forms?.acc || inferAccusative(nominative),
+    dative: forms?.dat || inferDative(nominative),
   };
 }
 
@@ -306,6 +347,18 @@ export function inCityPrepositional(city: string): string {
 /** «Москву», «Владимир» — без предлога. */
 export function cityToAccusative(city: string): string {
   return resolveCityCases(city).accusative;
+}
+
+/** «Перми», «Санкт-Петербургу» — без предлога (по …). */
+export function cityToDative(city: string): string {
+  return resolveCityCases(city).dative;
+}
+
+/** «по Перми», «по Санкт-Петербургу». */
+export function poCityDative(city: string): string {
+  const normalized = String(city || '').trim();
+  if (!normalized) return 'по городу';
+  return `по ${cityToDative(normalized)}`;
 }
 
 /**

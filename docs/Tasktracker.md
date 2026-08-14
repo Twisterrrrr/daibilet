@@ -1,3 +1,9 @@
+## 2026-08-14 - Lifehacks heading: по + dative
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| FIX.LIFEHACKS-PO-DATIVE | «Лайфхаки по Перми», не «по Пермь» / не родительный; все хабы | Высокий | 🔄 git+push, без live |
+
 ## 2026-08-14 - Suburb collect-route tooltip clipped
 
 | ID | Задача | Приоритет | Статус |
