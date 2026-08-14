@@ -193,6 +193,15 @@ export function formatEventNextSession(event: PublicSessionDto): string | null {
   return formatNextSession(event.startsAt, resolveSessionTimeZoneForSession(event));
 }
 
+/** Cover already says «Сегодня» - body/schedule must not repeat the word. */
+export function formatCardScheduleLine(event: PublicSessionDto): string | null {
+  const label = formatEventNextSession(event);
+  if (!label) return null;
+  if (formatCoverDateBadge(event) !== 'Сегодня') return label;
+  const stripped = label.replace(/^сегодня,?\s*/iu, '').trim();
+  return stripped || label;
+}
+
 export function isSessionToday(iso: string, timeZone: string = SITE_TIME_ZONE): boolean {
   return isSameSessionDay(iso, new Date(), timeZone);
 }

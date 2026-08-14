@@ -9,10 +9,8 @@ import {
   formatCoverDateBadge,
   getDepartingSoonMinutes,
   isOpenDate,
-  isSessionToday,
   LOW_TICKETS_THRESHOLD,
 } from '@/lib/event-card-meta';
-import { resolveSessionTimeZoneForSession } from '@/lib/datetime';
 import { formatVacantSeats } from '@/lib/event-page-utils';
 
 type EventImageBadgesProps = {
@@ -51,11 +49,6 @@ export function EventImageBadges({
 
   const showLowTickets =
     typeof event.vacant === 'number' && event.vacant > 0 && event.vacant <= LOW_TICKETS_THRESHOLD;
-  const timeZone = resolveSessionTimeZoneForSession(event);
-  const todaySession =
-    Boolean(event.startsAt) &&
-    !isOpenDate(event) &&
-    isSessionToday(String(event.startsAt), timeZone);
   const departingSoonMinutes =
     !isOpenDate(event) && event.startsAt ? getDepartingSoonMinutes(event.startsAt) : null;
   const recommend = editorsPick || isRecommendBadgeEvent(event);
@@ -64,6 +57,7 @@ export function EventImageBadges({
     ? (event.sessionCount || 0) >= 4 || (event.landingSlugs?.length || 0) > 0
     : isHitEvent(event);
   const maxSecondary = 4;
+  const todayOnCover = dateBadge === 'Сегодня';
 
   const secondary: ReactNode[] = [];
   // Age stays in text meta only - date takes the former age slot on cover.
@@ -77,7 +71,7 @@ export function EventImageBadges({
   if (showLowTickets && secondary.length < maxSecondary) {
     secondary.push(
       <EventCardBadge key="vacant" className="bg-rose-600 text-white shadow-md ring-1 ring-white/30">
-        {todaySession ? 'Сегодня заканчиваются' : formatVacantSeats(event.vacant ?? 0)}
+        {formatVacantSeats(event.vacant ?? 0)}
       </EventCardBadge>,
     );
   } else if (hit && secondary.length < maxSecondary) {
@@ -87,7 +81,8 @@ export function EventImageBadges({
       </EventCardBadge>,
     );
   }
-  if (departingSoonMinutes && secondary.length < maxSecondary) {
+  // Cover «Сегодня» is enough - do not stack «Скоро начало» on the photo (it stays in the body).
+  if (departingSoonMinutes && !todayOnCover && secondary.length < maxSecondary) {
     secondary.push(
       <EventCardBadge key="departing" className="bg-amber-500 text-white shadow-md ring-1 ring-white/30">
         Скоро начало · {departingSoonMinutes} мин

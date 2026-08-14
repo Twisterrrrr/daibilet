@@ -4,6 +4,7 @@ import test from 'node:test';
 import {
   collectDisplaySlotLabels,
   collectDisplaySlotPreview,
+  formatCardScheduleLine,
   formatCatalogSlotChipLabel,
   formatShowcaseSessionDate,
   formatShowcaseSessionDateCompact,
@@ -143,3 +144,11 @@ test('collectDisplaySlotPreview: moreCount after limit', () => {
   assert.equal(preview.moreCount, 3);
   assert.ok(preview.labels.every((label) => !label.includes('чт') && !label.includes('пт')));
 });
+
+test('formatCardScheduleLine drops Сегодня when cover already has it', () => {
+  const startsAt = new Date(Date.now() + 90 * 60 * 1000).toISOString();
+  const label = formatCardScheduleLine(session({ startsAt }));
+  assert.ok(label);
+  assert.ok(!/сегодня/i.test(label));
+});
+

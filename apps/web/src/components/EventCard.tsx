@@ -23,7 +23,7 @@ import {
   COMPACT_MOBILE_SLOT_LIMIT,
   CATALOG_DISPLAY_SLOT_LIMIT,
   formatCoverDateBadge,
-  formatEventNextSession,
+  formatCardScheduleLine,
   formatListDescription,
   formatPriceRub,
   formatShowcasePriceLabel,
@@ -119,7 +119,7 @@ export function EventCard({
   const highlights = collectCatalogLabels(session, 1);
   const openDate = isOpenDate(session);
   const departingSoonMinutes = openDate ? null : getDepartingSoonMinutes(session.startsAt);
-  const nextSessionLabel = openDate ? null : formatEventNextSession(session);
+  const nextSessionLabel = openDate ? null : formatCardScheduleLine(session);
   const allSlotLabels = collectAllDisplaySlotLabels(session);
   const showSlotPills = allSlotLabels.length > 0;
   const sessionMetaLabel = openDate ? null : nextSessionLabel;

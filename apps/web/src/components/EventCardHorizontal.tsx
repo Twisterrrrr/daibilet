@@ -10,7 +10,7 @@ import { collectCatalogLabels, extractDurationLabel } from '@/lib/catalog-labels
 import { EventImageBadges } from '@/lib/event-card-badges';
 import {
   collectAllDisplaySlotLabels,
-  formatEventNextSession,
+  formatCardScheduleLine,
   formatListDescription,
   getDepartingSoonMinutes,
   isOpenDate,
@@ -46,7 +46,7 @@ export function EventCardHorizontal({ session }: { session: PublicCatalogListIte
   const highlights = collectCatalogLabels(session, 1);
   const openDate = isOpenDate(session);
   const departingSoonMinutes = openDate ? null : getDepartingSoonMinutes(session.startsAt);
-  const nextSessionLabel = openDate ? null : formatEventNextSession(session);
+  const nextSessionLabel = openDate ? null : formatCardScheduleLine(session);
   const displaySlotLabels = collectAllDisplaySlotLabels(session);
   const showSlotPills = displaySlotLabels.length > 0;
   const wideSlotLabels = displaySlotLabels.slice(0, WIDE_DISPLAY_SLOT_LIMIT);
