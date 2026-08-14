@@ -1,3 +1,9 @@
+## 2026-08-14 - City hub hero: duplicate Афиша
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| UX.CITY-HUB-AFISHA-CTA | City hub hero: одна верхняя «Афиша»; убрать нижний mobile jump-chip | Высокий | ✅ git, без live deploy |
+
 ## 2026-08-14 - PDP slim mobile hero + date chips
 
 | ID | Задача | Приоритет | Статус |

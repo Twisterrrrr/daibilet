@@ -1,3 +1,16 @@
+## 2026-08-14 - City hub hero: one Афиша CTA
+
+### Наблюдения
+- Owner: на хабах городов (`/cities/{slug}`) в hero кнопка «Афиша» дважды. Оставить верхнюю.
+
+### Решения
+- Канон: одна primary CTA «Афиша» в `CityHeroStrip` (все брейкпоинты). Mobile jump-chip «Афиша» под CTA убран из разметки; чипы «Зачем ехать / Подборки / Блог» и sticky tabs без изменений. Event/venue PDP не трогали.
+
+### Проблемы
+- Нет. Live deploy не делали.
+
+---
+
 ## 2026-08-14 - PDP: slim mobile hero + date chips scroll
 
 ### Наблюдения

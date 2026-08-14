@@ -678,9 +678,9 @@ function CityHeroStrip({
 
   const contentClass = nightShell ? CITY_NIGHT_HERO.content : 'container-page py-8 sm:py-10';
 
+  // No «Афиша» chip: the primary CTA above already goes to the catalog.
   const jumpChips = [
     { id: 'sights', label: 'Зачем ехать' },
-    { id: 'affiche', label: 'Афиша' },
     { id: 'more', label: 'Подборки' },
     { id: 'blog', label: 'Блог' },
   ] as const;
