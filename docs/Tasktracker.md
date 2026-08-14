@@ -1,3 +1,11 @@
+## 2026-08-14 - City hub Perm: weather + identity tags + regional events
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| UX.PERM-WEATHER | Микровиджет сегодня/завтра + smart CTA солнце vs пасмурно/дождь | Высокий | ✅ 2026-08-14 code; Open-Meteo; deploy batch |
+| UX.PERM-TAGS | Per-city identity tags → реальные slugs + «Собрать маршрут» | Высокий | ✅ 2026-08-14 code; deploy batch |
+| UX.PERM-REG-EVENTS | Editorial 5 фестивалей 2026 + research ingest; не live API | Средний | ✅ 2026-08-14 JSON + docs; auto-ingest next |
+
 ## Perm My Day Kama pins (2026-08-14)
 
 | ID | Задача | Приоритет | Статус |

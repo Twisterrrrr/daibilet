@@ -11,8 +11,11 @@ import { LandingDirectionCard } from '@/components/LandingDirectionCard.client';
 import { PageBreadcrumbBar } from '@/components/PageBreadcrumbs';
 import { RegionNearbyStrip } from '@/components/RegionNearbyStrip.client';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
-import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
+import { AddManyToDayRouteButton, AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import { CityDayPresetBlock } from '@/components/CityDayPresetBlock.client';
+import { CityIdentityTags } from '@/components/CityIdentityTags.client';
+import { CityRegionalEvents } from '@/components/CityRegionalEvents.client';
+import { CityWeatherWidget } from '@/components/CityWeatherWidget.client';
 import { MustSeeFilterTabs } from '@/components/MustSeeFilterTabs.client';
 import { ScrollRail } from '@/components/ScrollRail.client';
 import { SuburbsCarousel } from '@/components/SuburbsCarousel.client';
@@ -37,6 +40,14 @@ import { matchSightAfficheLink, resolveFeaturedDirections } from '@/lib/city-hub
 import { resolveCityImageObjectPosition } from '@/lib/city-image-focus';
 import { resolveCityImage } from '@/lib/city-images';
 import { CITY_NIGHT_HERO } from '@/lib/city-night-hero';
+import {
+  cityHasWeatherWidget,
+  cityIdentityTags,
+  collectPlacesBySlugs,
+  placeSlugKey,
+  suburbMatchesSlugs,
+  type CityPlaceFocus,
+} from '@/lib/city-hub-local-flavor';
 import {
   resolveCityInfo,
   type CityInfoEntry,
@@ -75,6 +86,9 @@ const CITY_HASH_ALIASES: Record<string, string> = {
   venues: 'more',
   travel: 'practice',
   faq: 'practice',
+  suburbs: 'city-suburbs',
+  'must-see': 'city-must-see',
+  'region-events': 'region-events',
 };
 
 const SECTION_SCROLL_MT = 'scroll-mt-[calc(var(--site-header-height)+3.25rem)]';
@@ -102,6 +116,11 @@ export function CityPageView({
   const [contentReady, setContentReady] = React.useState(() => Boolean(initialPayload?.sessions?.length));
   const [error, setError] = React.useState<string | null>(null);
   const [category, setCategory] = React.useState('all');
+  const [placeFocus, setPlaceFocus] = React.useState<CityPlaceFocus | null>(null);
+
+  React.useEffect(() => {
+    setPlaceFocus(null);
+  }, [slug]);
 
   React.useEffect(() => {
     if (initialPayload?.sessions?.length) return;
@@ -216,9 +235,21 @@ export function CityPageView({
   // Brief lives in hero; hookFact is its own block between tabs and «Зачем ехать».
   const hasHookFact = Boolean(guide?.hookFact?.trim());
   const hookFactText = guide?.hookFact?.trim() || '';
+  const hubSlug = city?.slug || city?.sourceSlug || slug;
+  const hasWeather = cityHasWeatherWidget(hubSlug);
+  const hasIdentityTags = cityIdentityTags(hubSlug).length > 0;
   const hasPractice = hasTravel || hasFaq || practiceArticles.length > 0;
   const hasMore = hasDirections || hasVenues || moreArticles.length > 0;
-  const showSightsBlock = hasSights || hasHookFact;
+  const showSightsBlock = hasSights || hasHookFact || hasWeather || hasIdentityTags;
+
+  const applyPlaceFocus = React.useCallback((focus: CityPlaceFocus | null) => {
+    if (!focus?.slugs.length) {
+      setPlaceFocus(null);
+      return;
+    }
+    setPlaceFocus(focus);
+    scrollToSection(focus.scrollTo === 'suburbs' ? 'city-suburbs' : 'city-must-see');
+  }, []);
   // Story cards UI hidden (owner 2026-08-03); keep build helper for later - do not render.
   const blogAfterSuburbs = isCityHubBlogAfterSuburbs(city?.slug || city?.sourceSlug || slug);
 
@@ -298,13 +329,26 @@ export function CityPageView({
                   editorial ? 'border-zinc-200' : 'border-slate-100'
                 }`}
               >
-                {hasHookFact ? (
+                {hasHookFact || hasWeather ? (
                   <div
                     className={`container-page pt-8 sm:pt-10 ${
                       hasSights ? 'pb-2 sm:pb-3' : 'pb-8 sm:pb-10'
                     }`}
                   >
-                    <CityHookFactCallout hook={hookFactText} editorial={editorial} />
+                    <div
+                      className={`grid gap-4 ${hasHookFact && hasWeather ? 'lg:grid-cols-2 lg:items-stretch' : ''}`}
+                    >
+                      {hasHookFact ? (
+                        <CityHookFactCallout hook={hookFactText} editorial={editorial} />
+                      ) : null}
+                      {hasWeather ? (
+                        <CityWeatherWidget
+                          citySlug={hubSlug}
+                          editorial={editorial}
+                          onFocusPlaces={applyPlaceFocus}
+                        />
+                      ) : null}
+                    </div>
                   </div>
                 ) : null}
                 <CitySightsSection
@@ -317,10 +361,14 @@ export function CityPageView({
                   editorial={editorial}
                   articles={[]}
                   sessions={payload.sessions}
-                  compactTop={hasHookFact}
+                  compactTop={hasHookFact || hasWeather}
+                  placeFocus={placeFocus}
+                  onPlaceFocus={applyPlaceFocus}
                 />
               </div>
             ) : null}
+
+            <CityRegionalEvents citySlug={hubSlug} editorial={editorial} />
 
             {blogAfterSuburbs ? renderHubBlogSection() : null}
 
@@ -868,7 +916,7 @@ function CityHookFactCallout({
 }) {
   return (
     <div
-      className={`rounded-2xl px-5 py-4 sm:px-6 sm:py-5 ${
+      className={`h-full rounded-2xl px-5 py-4 sm:px-6 sm:py-5 ${
         editorial
           ? 'bg-amber-50 ring-1 ring-amber-200/80'
           : 'bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 ring-1 ring-amber-200/70'
@@ -1089,6 +1137,8 @@ function CitySightsSection({
   articles = [],
   sessions = [],
   compactTop = false,
+  placeFocus = null,
+  onPlaceFocus,
 }: {
   city: PublicCityDto;
   guide: CityInfoEntry | null;
@@ -1101,6 +1151,8 @@ function CitySightsSection({
   sessions?: PublicSessionDto[];
   /** True when hookFact already sits above this section. */
   compactTop?: boolean;
+  placeFocus?: CityPlaceFocus | null;
+  onPlaceFocus?: (focus: CityPlaceFocus | null) => void;
 }) {
   const fromSights: CityMustSeeItem[] =
     guide?.sights?.map((item) => ({
@@ -1143,6 +1195,11 @@ function CitySightsSection({
   const suburbs = guide?.significantSuburbs?.length ? guide.significantSuburbs : [];
   const namedPresets = guide?.dayRoutePresets;
   const hasNamedScenarios = Boolean(namedPresets?.length);
+  const activeFocus = placeFocus?.slugs.length ? placeFocus : null;
+  const focusedPlaces = activeFocus ? collectPlacesBySlugs(activeFocus.slugs, places, suburbs) : [];
+  const focusRouteItems = focusedPlaces
+    .map((place) => dayRouteItemFromMustSee(place, venues, city))
+    .filter((item): item is NonNullable<typeof item> => Boolean(item));
   // Editorial «Зачем ехать» (places) always owns the section H2; scenarios follow below.
   // hookFact renders above this section (between tabs and H2).
   const sectionTitle =
@@ -1163,6 +1220,43 @@ function CitySightsSection({
       >
         {sectionTitle}
       </h2>
+      {onPlaceFocus ? (
+        <CityIdentityTags
+          citySlug={citySlug || city.slug}
+          activeId={activeFocus?.id || null}
+          editorial={editorial}
+          onSelect={(focus) => onPlaceFocus(focus)}
+        />
+      ) : null}
+      {activeFocus ? (
+        <div
+          className={`mt-4 flex flex-wrap items-center gap-2 rounded-2xl border px-4 py-3 ${
+            editorial ? 'border-zinc-200 bg-white' : 'border-slate-200 bg-slate-50'
+          }`}
+          data-city-place-focus={activeFocus.id}
+        >
+          <p className={`min-w-0 flex-1 text-sm ${editorial ? 'text-zinc-700' : 'text-slate-700'}`}>
+            Подборка {activeFocus.label}
+            {focusedPlaces.length ? ` · ${focusedPlaces.length} точек` : ''}
+          </p>
+          {focusRouteItems.length ? (
+            <AddManyToDayRouteButton
+              compact
+              mode="replace"
+              navigateToMyDay
+              venues={focusRouteItems}
+            />
+          ) : null}
+          <button
+            type="button"
+            data-city-place-focus-clear
+            className={`text-xs font-semibold ${editorial ? 'text-zinc-500 hover:text-zinc-800' : 'text-slate-500 hover:text-slate-800'}`}
+            onClick={() => onPlaceFocus?.(null)}
+          >
+            Сбросить
+          </button>
+        </div>
+      ) : null}
       {places.length || hasNamedScenarios ? (
         <CitySightsMustSeeList
           places={places}
@@ -1174,6 +1268,8 @@ function CitySightsSection({
           categories={categories}
           citySlug={citySlug}
           titleClass={titleClass}
+          focusSlugs={activeFocus?.slugs || []}
+          onClearFocus={() => onPlaceFocus?.(null)}
         />
       ) : null}
       {suburbs.length ? (
@@ -1186,6 +1282,12 @@ function CitySightsSection({
           replaceDayOnApply
           navigateToMyDayOnApply
           className="mt-10"
+          sectionId="city-suburbs"
+          focusSlugs={
+            activeFocus && suburbs.some((suburb) => suburbMatchesSlugs(suburb, activeFocus.slugs))
+              ? activeFocus.slugs
+              : undefined
+          }
         />
       ) : null}
       {articles.length ? (
@@ -1213,6 +1315,8 @@ function CitySightsMustSeeList({
   categories,
   citySlug,
   titleClass,
+  focusSlugs = [],
+  onClearFocus,
 }: {
   places: CityMustSeeItem[];
   venues: PublicVenueDto[];
@@ -1229,6 +1333,8 @@ function CitySightsMustSeeList({
   categories: Array<[string, number]>;
   citySlug?: string;
   titleClass: string;
+  focusSlugs?: string[];
+  onClearFocus?: () => void;
 }) {
   const hasNamedScenarios = Boolean(namedPresets?.length);
   const showPlacesRail = places.length > 0;
@@ -1254,13 +1360,28 @@ function CitySightsMustSeeList({
   }, [filterMeta, filterId]);
 
   const activeId = filterMeta.tabs.length < 2 ? filterMeta.defaultId : filterId;
+  const focusedSlugSet = React.useMemo(
+    () => new Set(focusSlugs.map((slug) => String(slug || '').trim().toLowerCase()).filter(Boolean)),
+    [focusSlugs],
+  );
+  const focusedMustSee = React.useMemo(
+    () =>
+      focusedSlugSet.size
+        ? classifiedPlaces.filter((place) => focusedSlugSet.has(placeSlugKey(place)))
+        : [],
+    [classifiedPlaces, focusedSlugSet],
+  );
   const filteredPlaces = React.useMemo(
     () => classifiedPlaces.filter((place) => classifyMustSeePlace(place) === activeId),
     [classifiedPlaces, activeId],
   );
   // With category tabs show the full filtered set; single-tab cities keep top-6.
   const visiblePlaces =
-    filterMeta.tabs.length >= 2 ? filteredPlaces : filteredPlaces.slice(0, 6);
+    focusedMustSee.length > 0
+      ? focusedMustSee
+      : filterMeta.tabs.length >= 2
+        ? filteredPlaces
+        : filteredPlaces.slice(0, 6);
   // <4 places: md+ horizontal grid (2→2 cols, 3→3), same card track as ≥4 carousel.
   // Cap column width so 1–3 cards stay standard size and left-aligned (no full-bleed stretch).
   const sparseGrid = visiblePlaces.length > 0 && visiblePlaces.length < 4;
@@ -1323,13 +1444,16 @@ function CitySightsMustSeeList({
       <MustSeeFilterTabs
         tabs={filterMeta.tabs}
         activeId={activeId}
-        onChange={setFilterId}
+        onChange={(id) => {
+          onClearFocus?.();
+          setFilterId(id);
+        }}
         editorial={editorial}
       />
       {/* Mobile: 1-card ~80/20 peek swipe. md+: sparse (<4) = capped card grid; ≥4 = 2-row carousel. */}
-      <div className="relative mt-6">
+      <div id="city-must-see" className={`relative mt-6 ${SECTION_SCROLL_MT}`}>
         <div
-          key={activeId}
+          key={focusedMustSee.length ? `focus:${[...focusedSlugSet].join(',')}` : activeId}
           ref={railRef}
           className={
             sparseGrid

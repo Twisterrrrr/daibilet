@@ -11,6 +11,7 @@ import {
 } from '@/components/DayTripCanonCard.client';
 import { resolveCityPlaceTitleHref } from '@/lib/city-place-href';
 import { resolveVenueHeroImage } from '@/lib/city-place-images';
+import { suburbMatchesSlugs } from '@/lib/city-hub-local-flavor';
 import type { CityMustSeeItem, CitySuburbItem, CitySuburbPlace } from '@/lib/cityInfo';
 import {
   dayRouteHookLine,
@@ -121,6 +122,10 @@ export type SuburbsCarouselProps = {
   titleClass?: string;
   /** Outer wrapper class (hub `mt-10`, my-day `mt-5`). */
   className?: string;
+  /** Hub hash target for identity tags / weather CTAs. */
+  sectionId?: string;
+  /** Select the first suburb that matches venue/location slugs. */
+  focusSlugs?: string[];
 };
 
 /**
@@ -138,8 +143,16 @@ export function SuburbsCarousel({
   hideHeader = false,
   titleClass,
   className = 'mt-10',
+  sectionId,
+  focusSlugs,
 }: SuburbsCarouselProps) {
   const [activeIndex, setActiveIndex] = React.useState<number | null>(0);
+
+  React.useEffect(() => {
+    if (!focusSlugs?.length) return;
+    const idx = places.findIndex((place) => suburbMatchesSlugs(place, focusSlugs));
+    if (idx >= 0) setActiveIndex(idx);
+  }, [focusSlugs, places]);
 
   if (!places.length) return null;
 
@@ -300,7 +313,12 @@ export function SuburbsCarousel({
   };
 
   return (
-    <div className={className} data-city-significant-suburbs>
+  return (
+    <div
+      className={`${className}${sectionId ? ' scroll-mt-[calc(var(--site-header-height)+3.25rem)]' : ''}`}
+      data-city-significant-suburbs
+      id={sectionId || undefined}
+    >
       {hideHeader ? null : (
         <>
           <h2

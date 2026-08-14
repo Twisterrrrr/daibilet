@@ -1,3 +1,20 @@
+## 2026-08-14 - Perm hub: погода, теги, события региона
+
+### Наблюдения
+- Owner: пилот Перми - микровиджет погоды справа от «Интересный факт», identity-теги, короткий блок крупных фестивалей. Не пересекаться с coord audit / monument thumbs; cityInfo coords не трогали.
+- В репозитории погоды не было (ни Open-Meteo, ни Яндекс.Погода).
+- «Живая Пермь» в 2026 не найдена (архив ~2011). Белые ночи - СПб. Rock-Line фактически закончился к 2017. В seeds Дайбилет festival-событий Перми нет.
+
+### Решения
+- Погода: бесплатный Open-Meteo, server `GET /api/public/weather/[slug]`, cache 20 мин, координаты 58.01, 56.23, TZ `Asia/Yekaterinburg`. Smart CTA только по факту (ясно 0-2 vs пасмурно/осадки). При fail API - без выдуманной погоды, CTA скрыты.
+- Теги per-city в `city-hub-local-flavor.ts` (Москва/СПб пустые). Клик фильтрует mustSee / фокусирует пригород + «Собрать маршрут» по реальным slug.
+- Фестивали: editorial JSON 5 карточек 2026, блок после пригородов. Auto-ingest - следующий шаг (Wikidata + TimePad allowlist; не Yandex Afisha / не scrape visitperm).
+
+### Проблемы
+- Live не выкатывали (канон batch). Open-Meteo зависит от исходящего fetch на runtime.
+
+---
+
 ## 2026-08-14 - Live: Deploy MSK web `31777769202`
 
 ### Наблюдения

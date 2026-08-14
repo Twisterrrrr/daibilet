@@ -9,6 +9,44 @@ Finance PR-ветка `codex/stage0-admission-ticket-core` может держа
 
 ---
 
+## 2026-08-14 - City hub: погода, теги, события региона (пилот Пермь)
+
+**Сделано в коде (пилот Пермь):** микровиджет погоды Open-Meteo + identity-теги + editorial JSON «События региона». Live deploy не в этом ship.
+
+### Исследование фестивалей Перми (не Белые ночи)
+
+Белые ночи - Петербург, не Пермь. «Живая Пермь» - архивный формат ~2007-2012, в календаре 2026 не найден. Rock-Line фактически завершился к 2017.
+
+Крупные якоря 2026 (источники в `apps/web/src/data/city-regional-events.ts`):
+
+| Событие | Даты 2026 | Где | Источник |
+|---|---|---|---|
+| Флаэртиана | 25 сен - 1 окт | синематека «Кристалл» | [permcinema.ru](https://www.permcinema.ru/festival-projects/flaertiana/) |
+| Дягилевский фестиваль | 11-20 июня | Пермь + Хохловка | [diaghilevfest.ru](https://diaghilevfest.ru/media/mediatec/8650/) |
+| KAMWA | 1-2 августа | Полазна | [kamwa.ru](https://www.kamwa.ru/) |
+| Небесная ярмарка | 4-11 июля | Кунгур (не центр Перми) | [59.ru](https://59.ru/text/culture/2026/06/04/76459457/) |
+| Ночь музеев | 16 мая | музеи края | [sobaka.ru](https://www.sobaka.ru/prm/entertainment/art/214708) |
+
+В каталоге Дайбилет (repo seeds) отдельных festival-событий с этими именами нет. Блок хаба **не** второй афишей: 3-5 карточек после пригородов, перед «Из блога» / афишей.
+
+### Как подтягивать автоматически (рекомендация)
+
+1. **Сейчас:** editorial JSON на город (`CITY_REGIONAL_EVENTS`) - честно, без притворного live API.
+2. **Дальше, без скрейпа:** Wikidata SPARQL по recurring festival Q-id (скелет имени/месяца) + официальные страницы как `sourceUrl`.
+3. **Билетный слой:** TimePad public events по городу (есть API) - только как supplement, с ручным allowlist организаторов.
+4. **Не брать:** Yandex Afisha (нет публичного API / ToS), HTML-скрейп visitperm.ru, KudaGo public API (Перми обычно нет в city list).
+5. **Когда каталог вырастет:** матч title+даты с `Event` Дайбилет и подмена внешней ссылки на `/events/{slug}`.
+
+Официальный туристический контур края: visitperm / «Пермь Великая» (календарь CMS, стабильного API нет).
+
+### Вопросы owner
+
+1. Показывать прошедшие якоря сезона (Дягилев, KAMWA) с бейджем «Уже прошёл» или только upcoming?
+2. TimePad allowlist - ок как следующий ingest, или держим только editorial + Wikidata?
+3. Пак тегов Москвы/СПб - когда, и кто составляет hashtag-лист?
+
+---
+
 ## 2026-08-13 - My Day trips per city (Variant A) - DEFERRED after B
 
 **Контекст:** Variant B (один `daibilet:dayRoute`, confirm clear при смене города / foreign add) ship в этой итерации.
