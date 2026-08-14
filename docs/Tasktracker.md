@@ -1,3 +1,9 @@
+## 2026-08-14 - Lifehacks carousel before scenarios
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| UX.HUB-LIFEHACKS-CAROUSEL | Лайфхаки: карусель как identity, перед сценариями; tab `#lifehacks` | Высокий | ✅ git `d364640`, без live |
+
 ## 2026-08-14 - Hub: fact | fused weather+seasons
 
 | ID | Задача | Приоритет | Статус |
