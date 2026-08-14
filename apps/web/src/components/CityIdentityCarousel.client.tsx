@@ -91,7 +91,7 @@ export function CityIdentityCarousel({ citySlug, editorial = false, sectionId, o
       />
       <div
         ref={scrollerRef}
-        className="mt-5 flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden [&::-webkit-scrollbar]:h-0"
+        className="mt-5 flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain py-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden [&::-webkit-scrollbar]:h-0"
         aria-label={heading}
       >
         {slides.map((slide) => (
@@ -100,8 +100,8 @@ export function CityIdentityCarousel({ citySlug, editorial = false, sectionId, o
             data-identity-slide={slide.id}
             className={
               editorial
-                ? 'w-[min(100%,19.5rem)] shrink-0 snap-start overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm'
-                : 'w-[min(100%,19.5rem)] shrink-0 snap-start overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_rgba(15,23,42,0.06)]'
+                ? 'w-[min(100%,19.5rem)] shrink-0 snap-start overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_28px_-10px_hsl(221_83%_53%_/_0.28)]'
+                : 'w-[min(100%,19.5rem)] shrink-0 snap-start overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_rgba(15,23,42,0.06)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_28px_-10px_hsl(221_83%_53%_/_0.28)]'
             }
           >
             <button

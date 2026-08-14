@@ -1798,8 +1798,8 @@ function CitySightsMustSeeList({
           ref={railRef}
           className={
             sparseGrid
-              ? 'horizontal-snap-row flex flex-nowrap gap-2.5 snap-x snap-mandatory md:block md:overflow-visible'
-              : 'horizontal-snap-row flex flex-nowrap gap-2.5 snap-x snap-mandatory md:gap-6 md:[scrollbar-width:none] md:[-ms-overflow-style:none] md:[&::-webkit-scrollbar]:hidden'
+              ? 'horizontal-snap-row flex flex-nowrap gap-2.5 snap-x snap-mandatory py-1 md:block md:overflow-visible md:py-1'
+              : 'horizontal-snap-row flex flex-nowrap gap-2.5 snap-x snap-mandatory py-1 md:gap-6 md:[scrollbar-width:none] md:[-ms-overflow-style:none] md:[&::-webkit-scrollbar]:hidden'
           }
           data-city-must-see-rail
           data-city-must-see-layout={sparseGrid ? 'sparse-grid' : 'carousel'}
@@ -1854,7 +1854,7 @@ function CitySightsMustSeeList({
               data-city-must-see-card
             >
               <article
-                className={`flex h-full min-w-0 flex-1 flex-col rounded-2xl p-4 sm:p-5 ${
+                className={`flex h-full min-w-0 flex-1 flex-col rounded-2xl p-4 sm:p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_28px_-10px_hsl(221_83%_53%_/_0.28)] ${
                   editorial
                     ? 'border border-zinc-200 bg-white shadow-sm'
                     : 'border border-slate-200/90 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_rgba(15,23,42,0.06)]'
