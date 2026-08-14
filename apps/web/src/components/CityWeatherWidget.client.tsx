@@ -119,11 +119,17 @@ export function CityWeatherWidget({ citySlug, cityIn, editorial = false }: Props
   const temp = today ? formatTempCFull(today.temperatureC) || formatTempCFull(today.tempMaxC) : null;
   const title = cityIn ? `Погода ${cityIn}` : 'Погода';
   const showForecast = state.status === 'ready' && Boolean(today);
-  const kicker = showForecast ? title : 'Сезоны';
+  const kickerClass = editorial
+    ? 'text-xs font-bold uppercase tracking-[0.14em] text-zinc-500'
+    : 'text-xs font-bold uppercase tracking-[0.14em] text-slate-500';
+  const muted = editorial ? 'text-zinc-500' : 'text-slate-500';
+  const body = editorial ? 'text-zinc-600' : 'text-slate-600';
+  const forecastBox = editorial ? 'bg-zinc-100' : 'bg-slate-100';
+  const iconAccent = editorial ? 'text-zinc-800' : 'text-primary-600';
 
   return (
     <div
-      className={`flex h-full flex-col overflow-hidden rounded-2xl ${
+      className={`flex h-full flex-col overflow-hidden rounded-2xl p-5 sm:p-6 ${
         editorial
           ? 'bg-white ring-1 ring-zinc-200'
           : 'bg-white shadow-[0_4px_12px_rgba(15,23,42,0.06)] ring-1 ring-slate-200/80'
@@ -131,61 +137,65 @@ export function CityWeatherWidget({ citySlug, cityIn, editorial = false }: Props
       data-city-weather={state.status}
     >
       {showForecast && today ? (
-        <div
-          className={
-            editorial
-              ? 'bg-zinc-900 px-5 pt-5 pb-4 text-white'
-              : 'bg-gradient-to-br from-sky-400 via-sky-500 to-indigo-500 px-5 pt-5 pb-4 text-white'
-          }
-        >
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/70">{title}</p>
-          <div className="mt-3" data-city-weather-forecast="ready">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex min-w-0 items-center gap-3">
-                <WeatherGlyph code={today.weatherCode} className="h-9 w-9 shrink-0 text-white" />
-                <div className="min-w-0">
-                  <p className="text-[2rem] font-semibold leading-none tracking-tight">{temp || '-'}</p>
-                  <p className="mt-1 text-xs text-white/85">{weatherConditionLine(today.weatherCode)}</p>
+        <>
+          <h2 className={kickerClass}>{title}</h2>
+          <div
+            className={`mt-4 flex flex-wrap items-center gap-4 rounded-xl p-4 sm:gap-5 sm:p-5 ${forecastBox}`}
+            data-city-weather-forecast="ready"
+          >
+            <WeatherGlyph code={today.weatherCode} className={`h-10 w-10 shrink-0 sm:h-11 sm:w-11 ${iconAccent}`} />
+            <div className="min-w-0">
+              <p
+                className={`text-3xl font-extrabold leading-none tracking-tight sm:text-4xl ${
+                  editorial ? 'text-zinc-950' : 'text-slate-950'
+                }`}
+              >
+                {temp || '-'}
+              </p>
+              <p className={`mt-1.5 text-sm ${muted}`}>{weatherConditionLine(today.weatherCode)}</p>
+            </div>
+            <div className="flex w-full gap-4 sm:ml-auto sm:w-auto">
+              {tomorrow ? (
+                <div className="min-w-0 flex-1 sm:flex-none sm:text-right">
+                  <p className={`truncate text-[11px] font-semibold uppercase tracking-wider ${muted}`}>Завтра</p>
+                  <p
+                    className={`mt-0.5 flex items-center gap-1.5 text-base font-bold sm:justify-end ${
+                      editorial ? 'text-zinc-900' : 'text-slate-900'
+                    }`}
+                  >
+                    <WeatherGlyph code={tomorrow.weatherCode} className={`h-4 w-4 ${muted}`} />
+                    {dayTemp(tomorrow) || '-'}
+                  </p>
                 </div>
-              </div>
-              <div className="flex shrink-0 flex-col gap-2 text-right">
-                {tomorrow ? (
-                  <div className="flex items-center justify-end gap-1.5">
-                    <WeatherGlyph code={tomorrow.weatherCode} className="h-4 w-4 text-white/90" />
-                    <div>
-                      <p className="text-[10px] font-semibold uppercase tracking-wide text-white/65">Завтра</p>
-                      <p className="text-sm font-semibold leading-none">{dayTemp(tomorrow) || '-'}</p>
-                    </div>
-                  </div>
-                ) : null}
-                {dayAfter ? (
-                  <div className="flex items-center justify-end gap-1.5">
-                    <WeatherGlyph code={dayAfter.weatherCode} className="h-4 w-4 text-white/90" />
-                    <div>
-                      <p className="text-[10px] font-semibold uppercase tracking-wide text-white/65">Послезавтра</p>
-                      <p className="text-sm font-semibold leading-none">{dayTemp(dayAfter) || '-'}</p>
-                    </div>
-                  </div>
-                ) : null}
-              </div>
+              ) : null}
+              {dayAfter ? (
+                <div className="min-w-0 flex-1 sm:flex-none sm:text-right">
+                  <p className={`truncate text-[11px] font-semibold uppercase tracking-wider ${muted}`}>Послезавтра</p>
+                  <p
+                    className={`mt-0.5 flex items-center gap-1.5 text-base font-bold sm:justify-end ${
+                      editorial ? 'text-zinc-900' : 'text-slate-900'
+                    }`}
+                  >
+                    <WeatherGlyph code={dayAfter.weatherCode} className={`h-4 w-4 ${muted}`} />
+                    {dayTemp(dayAfter) || '-'}
+                  </p>
+                </div>
+              ) : null}
             </div>
           </div>
-        </div>
+        </>
       ) : null}
 
       {whenToGo?.tabs?.length ? (
-        <div className={`flex flex-1 flex-col px-5 ${showForecast ? 'pt-4 pb-5' : 'py-5'}`}>
-          <p
-            className={`text-[11px] font-semibold uppercase tracking-[0.16em] ${
-              editorial ? 'text-zinc-500' : 'text-slate-500'
-            }`}
-          >
-            {showForecast ? 'Сезоны' : kicker}
-          </p>
+        <div className={showForecast ? 'mt-7' : ''}>
+          <h3 id="seasons-title" className={kickerClass}>
+            Когда ехать
+          </h3>
+          <p className={`mt-1 text-xs ${muted}`}>Выберите сезон - совет ниже обновится</p>
           <div
-            className="mt-3 flex snap-x snap-mandatory flex-nowrap gap-1.5 overflow-x-auto overscroll-x-contain pb-0.5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
             role="tablist"
-            aria-label="Сезоны"
+            aria-labelledby="seasons-title"
+            className="mt-3 flex flex-wrap gap-2"
           >
             {whenToGo.tabs.map((item) => {
               const isSpbSummer =
@@ -198,26 +208,28 @@ export function CityWeatherWidget({ citySlug, cityIn, editorial = false }: Props
                   key={item.id}
                   type="button"
                   role="tab"
+                  id={`season-tab-${item.id}`}
                   aria-selected={active}
+                  aria-controls="season-panel"
                   onClick={() => setTab(item.id)}
-                  className={`inline-flex min-h-8 shrink-0 snap-start items-center gap-1 rounded-full px-2.5 text-xs font-semibold transition ${
+                  className={`inline-flex min-h-11 items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition ${
                     active
                       ? editorial
-                        ? 'bg-zinc-900 text-white'
-                        : 'bg-sky-500 text-white'
+                        ? 'bg-zinc-900 text-white shadow-sm'
+                        : 'bg-slate-900 text-white shadow-sm'
                       : editorial
-                        ? 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                        ? 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200'
+                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                   }`}
                 >
                   <Icon
-                    className={`h-3.5 w-3.5 ${isSpbSummer ? 'motion-safe:animate-pulse' : ''}`}
+                    className={`h-4 w-4 ${isSpbSummer ? 'motion-safe:animate-pulse' : ''}`}
                     strokeWidth={1.75}
                     aria-hidden
                   />
                   {item.label}
                   {isNow ? (
-                    <span className={`text-[10px] font-semibold ${active ? 'text-white/70' : editorial ? 'text-zinc-400' : 'text-slate-400'}`}>
+                    <span className={`text-[11px] font-semibold ${active ? 'text-white/70' : muted}`}>
                       сейчас
                     </span>
                   ) : null}
@@ -225,21 +237,13 @@ export function CityWeatherWidget({ citySlug, cityIn, editorial = false }: Props
               );
             })}
           </div>
-          {guide.nowLabel ? (
-            <p
-              className={`mt-3 text-[11px] font-semibold uppercase tracking-[0.14em] ${
-                editorial ? 'text-zinc-500' : 'text-slate-500'
-              }`}
-              data-city-when-to-go="now"
-            >
-              Сейчас: {guide.nowLabel}
-            </p>
-          ) : null}
           {guide.body ? (
             <p
-              className={`text-sm leading-6 ${guide.nowLabel ? 'mt-1.5' : 'mt-3'} ${
-                editorial ? 'text-zinc-600' : 'text-slate-600'
-              }`}
+              id="season-panel"
+              role="tabpanel"
+              aria-labelledby={`season-tab-${tab}`}
+              className={`mt-4 text-sm leading-relaxed ${body}`}
+              data-city-when-to-go="now"
             >
               {guide.body}
             </p>

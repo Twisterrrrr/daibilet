@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { ArrowLeft, ChevronLeft, ChevronRight, MapPin, Ticket } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, Lightbulb, MapPin, Ticket } from 'lucide-react';
 import Link from 'next/link';
 
 import { CityHubArticlesGrid } from '@/components/CityHubArticleTeaser.client';
@@ -381,11 +381,7 @@ export function CityPageView({
                       }
                     >
                       {hasWeather || hasWhenToGo ? (
-                        <div
-                          className={
-                            hasHookFact ? 'md:order-2 md:w-[42%] md:shrink-0 [&>*]:h-full' : ''
-                          }
-                        >
+                        <div className={hasHookFact ? 'md:w-[42%] md:shrink-0 [&>*]:h-full' : ''}>
                           <CityWeatherWidget
                             citySlug={hubSlug}
                             cityIn={cityInPrepositional(city)}
@@ -396,12 +392,14 @@ export function CityPageView({
                       {hasHookFact ? (
                         <div
                           className={
-                            hasWeather || hasWhenToGo
-                              ? 'md:order-1 md:min-w-0 md:flex-1 [&>*]:h-full'
-                              : ''
+                            hasWeather || hasWhenToGo ? 'md:min-w-0 md:flex-1 [&>*]:h-full' : ''
                           }
                         >
-                          <CityHookFactCallout hook={hookFactText} editorial={editorial} />
+                          <CityHookFactCallout
+                            hook={hookFactText}
+                            tip={guide?.hookFactTip?.trim() || ''}
+                            editorial={editorial}
+                          />
                         </div>
                       ) : null}
                     </div>
@@ -1021,38 +1019,48 @@ function hubFilterChipClass(isActive: boolean, editorial = false) {
 /** hookFact above «Зачем ехать»; brief stays in hero. */
 function CityHookFactCallout({
   hook,
+  tip = '',
   editorial = false,
 }: {
   hook: string;
+  tip?: string;
   editorial?: boolean;
 }) {
   return (
-    <div
-      className={`relative flex h-full flex-col overflow-hidden rounded-2xl px-5 py-5 sm:px-6 sm:py-6 ${
+    <aside
+      className={`relative flex h-full flex-col overflow-hidden rounded-2xl p-5 pl-6 sm:p-6 sm:pl-7 ${
         editorial
           ? 'bg-white ring-1 ring-zinc-200'
-          : 'bg-amber-50/80 shadow-[0_4px_12px_rgba(15,23,42,0.06)] ring-1 ring-amber-100'
+          : 'bg-white shadow-[0_4px_12px_rgba(15,23,42,0.06)] ring-1 ring-slate-200/80'
       }`}
     >
       <span
-        className={`absolute inset-y-0 left-0 w-1.5 ${editorial ? 'bg-zinc-900' : 'bg-amber-400'}`}
+        className={`absolute inset-y-0 left-0 w-1.5 ${editorial ? 'bg-zinc-900' : 'bg-slate-900'}`}
         aria-hidden
       />
-      <p
-        className={`pl-2 text-[11px] font-semibold uppercase tracking-[0.16em] ${
-          editorial ? 'text-zinc-500' : 'text-amber-800'
+      <h2
+        className={`flex items-center gap-2 text-xs font-bold uppercase tracking-[0.14em] ${
+          editorial ? 'text-zinc-500' : 'text-slate-500'
         }`}
       >
+        <Lightbulb
+          className={`h-4 w-4 ${editorial ? 'text-zinc-800' : 'text-primary-600'}`}
+          strokeWidth={1.75}
+          aria-hidden
+        />
         Интересный факт
-      </p>
+      </h2>
       <p
-        className={`mt-2 max-w-3xl pl-2 text-[15px] leading-8 ${
-          editorial ? 'text-zinc-600' : 'text-slate-600'
+        className={`mt-4 text-base leading-relaxed sm:text-lg ${
+          editorial ? 'text-zinc-800' : 'text-slate-800'
         }`}
       >
         {hook}
       </p>
-    </div>
+      {tip ? (
+        <p className={`mt-5 text-sm ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}>{tip}</p>
+      ) : null}
+    </aside>
   );
 }
 
