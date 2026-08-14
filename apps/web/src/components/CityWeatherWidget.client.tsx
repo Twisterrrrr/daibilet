@@ -147,7 +147,7 @@ export function CityWeatherWidget({ citySlug, cityIn, editorial = false }: Props
       <div
         className={
           twoCol
-            ? 'grid flex-1 gap-5 md:grid-cols-[minmax(11rem,13.5rem)_minmax(0,1fr)] md:items-stretch md:gap-0'
+            ? 'grid flex-1 gap-5 md:grid-cols-2 md:items-stretch md:gap-0'
             : 'min-w-0'
         }
       >
@@ -226,7 +226,7 @@ export function CityWeatherWidget({ citySlug, cityIn, editorial = false }: Props
                     aria-selected={active}
                     aria-controls="season-panel"
                     onClick={() => setTab(item.id)}
-                    className={`inline-flex min-h-11 items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition ${
+                    className={`inline-flex min-h-11 min-w-0 flex-[1_1_calc(50%-0.25rem)] items-center justify-center gap-1.5 rounded-full px-3 py-2.5 text-sm font-medium transition sm:gap-2 sm:px-4 ${
                       active
                         ? editorial
                           ? 'bg-zinc-900 text-white shadow-sm'
