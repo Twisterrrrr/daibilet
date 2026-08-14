@@ -1,3 +1,15 @@
+## 2026-08-14 - Lifehacks: all cards without category tabs
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| UX.HUB-LIFEHACKS-NO-TABS | Лайфхаки: все карточки в карусели сразу, без табов категорий | Высокий | 🔄 commit+push, без live |
+
+## 2026-08-14 - Hub must-see: desktop single-row carousel
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| UX.MUSTSEE-DESKTOP-1ROW | «Что посмотреть»: md+ одна горизонтальная snap-лента, не 2-row grid-flow-col | Высокий | 🔄 commit+push, без live |
+
 ## 2026-08-14 - Hub: weather/seasons inner 50/50
 
 | ID | Задача | Приоритет | Статус |

@@ -1544,7 +1544,7 @@ function CitySightsMustSeeList({
       : filterMeta.tabs.length >= 2
         ? filteredPlaces
         : filteredPlaces.slice(0, 6);
-  // <4 places: md+ horizontal grid (2→2 cols, 3→3), same card track as ≥4 carousel.
+  // <4 places: md+ horizontal grid (2→2 cols, 3→3). ≥4: single-row snap carousel.
   // Cap column width so 1–3 cards stay standard size and left-aligned (no full-bleed stretch).
   const sparseGrid = visiblePlaces.length > 0 && visiblePlaces.length < 4;
   const sparseColsClass =
@@ -1668,7 +1668,7 @@ function CitySightsMustSeeList({
         }}
         editorial={editorial}
       />
-      {/* Mobile: 1-card ~80/20 peek swipe. md+: sparse (<4) = capped card grid; ≥4 = 2-row carousel. */}
+      {/* Mobile: 1-card ~80/20 peek swipe. md+: sparse (<4) = capped card grid; ≥4 = single-row snap carousel. */}
       <div id="city-must-see" className={`relative mt-6 ${SECTION_SCROLL_MT}`}>
         <div
           key={focusedMustSee.length ? `focus:${[...focusedSlugSet].join(',')}` : activeId}
@@ -1676,7 +1676,7 @@ function CitySightsMustSeeList({
           className={
             sparseGrid
               ? 'horizontal-snap-row flex flex-nowrap gap-2.5 snap-x snap-mandatory md:block md:overflow-visible'
-              : 'horizontal-snap-row flex flex-nowrap gap-2.5 snap-x snap-mandatory md:block md:[scrollbar-width:none] md:[&::-webkit-scrollbar]:hidden'
+              : 'horizontal-snap-row flex flex-nowrap gap-2.5 snap-x snap-mandatory md:gap-6 md:[scrollbar-width:none] md:[-ms-overflow-style:none] md:[&::-webkit-scrollbar]:hidden'
           }
           data-city-must-see-rail
           data-city-must-see-layout={sparseGrid ? 'sparse-grid' : 'carousel'}
@@ -1684,12 +1684,12 @@ function CitySightsMustSeeList({
           tabIndex={0}
         >
         {/* Mobile: contents hoists cards into the flex scrollport so % = viewport. */}
-        {/* md sparse: N-col capped grid (w-max, left). md carousel: auto rows + flow-col. */}
+        {/* md sparse: N-col capped grid (w-max, left). md carousel: same flex snap, one row. */}
         <ol
           className={
             sparseGrid
               ? `contents md:grid md:w-max md:max-w-full md:items-start md:justify-items-start md:gap-x-6 md:gap-y-5 ${sparseColsClass}`
-              : 'contents md:grid md:w-max md:auto-cols-[min(22rem,calc(50vw-3rem))] md:grid-flow-col md:grid-rows-[auto_auto] md:items-start md:gap-x-6 md:gap-y-5'
+              : 'contents'
           }
         >
         {visiblePlaces.map((place, index) => {
@@ -1719,7 +1719,11 @@ function CitySightsMustSeeList({
           return (
             <li
               key={`${place.name}:${index}`}
-              className="flex min-w-0 shrink-0 snap-start items-stretch pr-1 [flex:0_0_80%] md:w-auto md:min-w-0 md:max-w-none md:pr-0 md:[flex:none]"
+              className={
+                sparseGrid
+                  ? 'flex min-w-0 shrink-0 snap-start items-stretch pr-1 [flex:0_0_80%] md:w-auto md:min-w-0 md:max-w-none md:pr-0 md:[flex:none]'
+                  : 'flex min-w-0 shrink-0 snap-start items-stretch pr-1 [flex:0_0_80%] md:pr-0 md:[flex:0_0_min(22rem,calc(50vw-3rem))]'
+              }
               data-city-must-see-card
             >
               <article
