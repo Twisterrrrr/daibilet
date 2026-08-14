@@ -41,10 +41,10 @@ export type CityMustSeeItem = CityPlaceLinkFields & {
   themeTags?: string[];
   seasonLabel?: string;
   /**
-   * Typical visit duration in minutes (hub chip «2 часа»).
-   * Optional: hide chip when missing. Editorial only - do not invent from API.
+   * Typical visit duration: minutes number or editorial chip label
+   * («1-2 ч», «полдня», «20 мин»). Hide chip when missing. Editorial only.
    */
-  visitMinutes?: number;
+  visitMinutes?: number | string;
   places?: CitySuburbPlace[];
   travelVector?: string;
   travelVectorBlurb?: string;
@@ -87,8 +87,8 @@ export type CitySuburbPlace = CityPlaceLinkFields & {
   desc?: string;
   address?: string | null;
   seasonLabel?: string;
-  /** Typical visit duration in minutes; hide chip when missing. */
-  visitMinutes?: number;
+  /** Minutes or editorial chip label; hide chip when missing. */
+  visitMinutes?: number | string;
   /** Стабильный editorial id для остановки без публичной entity-карточки. */
   dayRouteId?: string;
   /** Day-route / OSM coords when hub venues omit the nested POI. */
@@ -114,7 +114,7 @@ export type CitySuburbItem = CityMustSeeItem & {
 export type CitySightItem = CityPlaceLinkFields & {
   title: string;
   text: string;
-  visitMinutes?: number;
+  visitMinutes?: number | string;
 };
 
 /** Компактная сезонная подсказка в блоке «Советы» city hub. */
@@ -138,6 +138,12 @@ export type CityDayRoutePreset = {
   timingNote?: string;
   /** Slug статьи блога (`/blog/{blogSlug}`), если есть companion-гайд. */
   blogSlug?: string;
+  /**
+   * Обложка карточки «Готовые сценарии» (hub magazine / my-day snap).
+   * Приоритетнее фото первой остановки и выше blog cover.
+   * Нужна, когда у остановок только label-card stubs или нет blogSlug.
+   */
+  coverImageUrl?: string;
   /** Optional day-trip logistics (same canon as significantSuburbs). */
   travelVector?: string;
   travelVectorBlurb?: string;
@@ -3852,6 +3858,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         title: 'Приморский экспресс - коса и Зеленоградск',
         description: 'День на косе от Зеленоградска: Мюллер - Танцующий лес - Эфа; Фрингилла на возврате, затем Кранц.',
         timingNote: 'Старт с косы от Зеленоградска; Фрингилла на возврате к 15:00-16:00; Зеленоградск - вечерняя линия вокзал - море.',
+        coverImageUrl: '/images/venues/kaliningrad/kurshskaya-kosa.jpg',
         stops: [
           { name: 'Куршская коса', desc: 'Въезд с Зеленоградска, углубление к Эфе', locationSlug: 'kaliningrad-kurshskaya-kosa' },
           { name: 'Высота Мюллера', desc: '32 км, утро' },
@@ -3865,6 +3872,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         title: 'Приморский экспресс - Светлогорск и Янтарный',
         description: 'Светлогорск: верх - море - канатка; Янтарный: комбинат авто, дальше пешком к пляжу.',
         timingNote: 'Светлогорск - спуск и канатка обратно; Янтарный - комбинат к открытию, затем пешком парк - променад - пляж.',
+        coverImageUrl: '/images/venues/kaliningrad/yantarnyy-kombinat.jpg',
         stops: [
           { name: 'Светлогорск (Раушен)', desc: 'Башня - вилла Порр - Зодиак - канатка' },
           { name: 'Янтарный (Пальмикен)', desc: 'Комбинат - замок - парк - пляж' },
@@ -4250,6 +4258,8 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         title: 'Нижний за 1 день',
         description: 'Компактный день: площадь, Кремль, Рождественская, гастро-пауза и набережная.',
         blogSlug: 'nizhny-novgorod-za-24-chasa',
+        // First stops map to label-card stubs - pin blog cover for magazine cards.
+        coverImageUrl: '/images/blog/nizhny-novgorod-za-24-chasa.jpg',
         stops: [
           { name: 'Площадь Минина и Пожарского', desc: 'Старт у стен Кремля', locationSlug: 'nizhny-novgorod-ploschad-minina-i-pozharskogo' },
           { name: 'Нижегородский Кремль', desc: 'Крепость и виды', locationSlug: 'nizhny-novgorod-nizhegorodskiy-kreml' },
@@ -4265,6 +4275,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         title: 'Инстаграмный Нижний',
         description: 'Пакгаузы, Жюль Верн, набережные, Почаинский и ярмарочные виды.',
         blogSlug: 'instagramnyi-nizhnii',
+        coverImageUrl: '/images/blog/instagramnyi-nizhnii.jpg',
         stops: [
           { name: 'Пакгаузы на Стрелке', desc: 'Индустриальный вау', locationSlug: 'nizhny-novgorod-pakgauzy-na-strelke' },
           { name: 'Собор Александра Невского', desc: 'Доминанта Стрелки', locationSlug: 'nizhny-novgorod-sobor-aleksandra-nevskogo' },
@@ -4281,6 +4292,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         title: 'Исторический и гастрономический гайд',
         description: 'Усадьбы, палаты, Строгановская, ярмарка и вечерняя гастро-точка.',
         blogSlug: 'nizhny-novgorod-marshrut-so-vkusom',
+        coverImageUrl: '/images/blog/nizhny-novgorod-marshrut-so-vkusom.jpg',
         stops: [
           { name: 'Усадьба Рукавишниковых', desc: 'Купеческий дворец', locationSlug: 'nizhny-novgorod-usadba-rukavishnikovyh' },
           { name: 'Палаты Строгановых', desc: 'Барокко XVII века', locationSlug: 'nizhny-novgorod-palaty-stroganovyh' },
@@ -4299,6 +4311,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         timingNote:
           'Выезд к 8:30-9:00 - дорога ~1,5 часа. Финал у причала; такси ~5 мин обратно на автостанцию.',
         travelVector: 'Автостанция - монастырь - музейный квартал - Волга',
+        coverImageUrl: '/images/venues/nizhny-novgorod/gorodets.jpg',
         stops: [
           { name: 'Феодоровский монастырь', desc: 'Старт после автостанции'},
           { name: 'Торговая площадь / центр', desc: 'Историческое ядро'},
@@ -4320,6 +4333,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         timingNote:
           'Выезд к 8:30-9:00 - ~1,5-2 часа. Музей Шарыгина - бонус по пути к вокзалу.',
         travelVector: 'Вокзал - фабрика - центр - вокзал',
+        coverImageUrl: '/images/venues/nizhny-novgorod/semyonov.jpg',
         stops: [
           {
             name: 'Фабрика «Хохломская роспись»',
@@ -4340,6 +4354,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         timingNote:
           'Выезд не позже 7:00 - в пути 3+ часа. Цыгановка такси ~15 км утром; Канавка - вторая половина дня.',
         travelVector: 'Источники утром - монастырь - Канавка',
+        coverImageUrl: '/images/venues/nizhny-novgorod/diveevo.jpg',
         stops: [
           {
             name: 'Источник Серафима в Цыгановке',
@@ -4364,6 +4379,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         timingNote:
           'Паром Лысково (~30 мин в навигацию). Страусиная ферма - бонус, если остаётся время.',
         travelVector: 'Лысково паром - монастырь - село',
+        coverImageUrl: '/images/venues/nizhny-novgorod/makaryev.jpg',
         stops: [
           {
             name: 'Желтоводский Макариев монастырь / Троицкий собор',
@@ -4910,18 +4926,18 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFactTip: 'Билеты в оперный лучше брать за 3-4 недели - премьеры разбирают быстро.',
     mustSee: [
       // --- Главные прогулочные зоны ---
-      { name: 'Набережная Камы', desc: 'Главный променад вдоль реки с амфитеатром, причалами и панорамой на Каму.', address: 'ул. Монастырская, 1Б', locationSlug: 'naberezhnaya-kamy', mustSeeFilter: 'main', visitMinutes: 60, latitude: 58.01825, longitude: 56.2466 },
-      { name: 'Арт-объект «Счастье не за горами»', desc: 'Красные буквы у Речного вокзала - самый узнаваемый фото-символ Перми.', address: 'ул. Берег Камы (у Речного вокзала)', locationSlug: 'perm-schaste-ne-za-gorami', mustSeeFilter: 'main', visitMinutes: 15, latitude: 58.01835, longitude: 56.25055 },
-      { name: 'Городская эспланада', desc: 'Открытое пешеходное пространство в центре с фонтанами и событиями.', address: 'ул. Ленина (между ул. Попова и ул. Борчанинова)', locationSlug: 'permskaya-esplanada', mustSeeFilter: 'main', visitMinutes: 45, latitude: 58.0105, longitude: 56.2285 },
-      { name: 'Соборная площадь', desc: 'Историческое ядро города у Петропавловского собора.', address: 'Соборная площадь', locationSlug: 'perm-sobornaya-ploschad', mustSeeFilter: 'main', visitMinutes: 20, latitude: 58.016205, longitude: 56.2338 },
+      { name: 'Набережная Камы', desc: 'Главный променад вдоль реки с амфитеатром, причалами и панорамой на Каму.', address: 'ул. Монастырская, 1Б', locationSlug: 'naberezhnaya-kamy', mustSeeFilter: 'main', visitMinutes: '1-2 ч', latitude: 58.01825, longitude: 56.2466 },
+      { name: 'Арт-объект «Счастье не за горами»', desc: 'Красные буквы у Речного вокзала - самый узнаваемый фото-символ Перми.', address: 'ул. Берег Камы (у Речного вокзала)', locationSlug: 'perm-schaste-ne-za-gorami', mustSeeFilter: 'main', visitMinutes: 20, latitude: 58.01835, longitude: 56.25055 },
+      { name: 'Городская эспланада', desc: 'Открытое пешеходное пространство в центре с фонтанами и событиями.', address: 'ул. Ленина (между ул. Попова и ул. Борчанинова)', locationSlug: 'permskaya-esplanada', mustSeeFilter: 'main', visitMinutes: 40, latitude: 58.0105, longitude: 56.2285 },
+      { name: 'Соборная площадь', desc: 'Историческое ядро города у Петропавловского собора.', address: 'Соборная площадь', locationSlug: 'perm-sobornaya-ploschad', mustSeeFilter: 'main', visitMinutes: 30, latitude: 58.016205, longitude: 56.2338 },
       { name: 'Старокирпичный переулок', desc: 'Камерный прогулочный карман в центре с кирпичной застройкой.', address: 'ул. Ленина, 44', locationSlug: 'perm-starokirpichnyy-pereulok', mustSeeFilter: 'street', visitMinutes: 20, latitude: 58.0139, longitude: 56.2427 },
       { name: 'Парк Горького (и Ротонда)', desc: 'Классический городской парк с ротондой и аллеями.', address: 'ул. Сибирская, 49', locationSlug: 'perm-park-gorkogo', mustSeeFilter: 'park', visitMinutes: 60, latitude: 58.0051, longitude: 56.2524 },
       { name: 'Райский сад', desc: 'Зеленый уголок в Мотовилихе у музейного кластера.', address: 'ул. 1905 года, 2', locationSlug: 'perm-rayskiy-sad', mustSeeFilter: 'park', visitMinutes: 45, latitude: 58.0315, longitude: 56.3129 },
       // --- Музеи и театры ---
-      { name: 'Пермская художественная галерея', desc: 'Уникальная коллекция пермской деревянной скульптуры - «пермские боги».', address: 'ул. Театральная, 2', venueSlug: 'permskaya-galereya', mustSeeFilter: 'museum', visitMinutes: 90, latitude: 58.0175, longitude: 56.2541 },
+      { name: 'Пермская художественная галерея', desc: 'Уникальная коллекция пермской деревянной скульптуры - «пермские боги».', address: 'ул. Театральная, 2', venueSlug: 'permskaya-galereya', mustSeeFilter: 'museum', visitMinutes: 120, latitude: 58.0175, longitude: 56.2541 },
       { name: 'Музей пермских древностей', desc: 'Археология и палеонтология Прикамья, пермский геологический период.', address: 'ул. Сибирская, 15', venueSlug: 'perm-muzey-permskikh-drevnostey', mustSeeFilter: 'museum', visitMinutes: 60, latitude: 58.0125, longitude: 56.2494 },
       { name: 'Дом Мешкова', desc: 'Исторический особняк на набережной, филиал краеведческого музея.', address: 'ул. Монастырская, 11', venueSlug: 'perm-dom-meshkova', mustSeeFilter: 'museum', visitMinutes: 60, latitude: 58.01875, longitude: 56.24655 },
-      { name: 'PERMM', desc: 'Музей современного искусства в бывшем речного флота здании.', address: 'ул. Крисанова, 4', venueSlug: 'perm-permm', mustSeeFilter: 'museum', visitMinutes: 60, latitude: 58.0104, longitude: 56.2166 },
+      { name: 'PERMM', desc: 'Музей современного искусства в бывшем речного флота здании.', address: 'ул. Крисанова, 4', venueSlug: 'perm-permm', mustSeeFilter: 'museum', visitMinutes: 90, latitude: 58.0104, longitude: 56.2166 },
       { name: 'Театр оперы и балета им. Чайковского', desc: 'Один из сильнейших оперно-балетных театров страны.', address: 'ул. Петропавловская, 25А', venueSlug: 'perm-teatr-opery-i-baleta', mustSeeFilter: 'museum', latitude: 58.0161, longitude: 56.2479 },
       { name: 'Театр-Театр', desc: 'Драматическая сцена-трансформер и смелые постановки.', address: 'ул. Ленина, 53', venueSlug: 'teatr-teatr', mustSeeFilter: 'museum', latitude: 58.0091, longitude: 56.2185 },
       { name: 'Автомузей «Ретро-гараж»', desc: 'Единственный на Урале музей советского автопрома: Волги, Москвичи и редкие машины на ходу.', address: 'ул. Дружбы, 34А', venueSlug: 'perm-muzey-retro-garazh', mustSeeFilter: 'museum', visitMinutes: 60, latitude: 58.0151, longitude: 56.2796 },
@@ -4942,10 +4958,10 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       { name: 'Башня смерти', desc: 'Доминанта конструктивизма - бывшее здание НКВД.', address: 'Комсомольский проспект, 74', locationSlug: 'perm-bashnya-smerti', mustSeeFilter: 'main', visitMinutes: 20, latitude: 57.9944, longitude: 56.2573 },
       { name: 'Собор Петра и Павла', desc: 'Старейший каменный храм Перми на Соборной площади.', address: 'ул. 25-го Октября, 1', locationSlug: 'perm-sobor-petra-i-pavla', mustSeeFilter: 'temple', visitMinutes: 30, latitude: 58.0185, longitude: 56.2559 },
       { name: 'Вознесенская (Феодосьевская) церковь', desc: 'Краснокирпичный храм с узнаваемым силуэтом у эспланады.', address: 'ул. Борчанинова, 11', locationSlug: 'perm-voznesenskaya-tserkov', mustSeeFilter: 'temple', visitMinutes: 20, latitude: 58.0069, longitude: 56.2291 },
-      { name: 'Парк камней / Пермские ворота', desc: 'Арт-объект из бревен у вокзала и геологическая экспозиция камней.', address: 'площадь Гайдара', locationSlug: 'perm-park-kamney-permskie-vorota', mustSeeFilter: 'main', visitMinutes: 20, latitude: 58.0035, longitude: 56.1916 },
+      { name: 'Парк камней / Пермские ворота', desc: 'Арт-объект из бревен у вокзала и геологическая экспозиция камней.', address: 'площадь Гайдара', locationSlug: 'perm-park-kamney-permskie-vorota', mustSeeFilter: 'main', visitMinutes: 40, latitude: 58.0035, longitude: 56.1916 },
       // --- Гастро ---
       { name: 'Чомга', desc: 'Локальная кухня у парка Горького.', address: 'ул. Сибирская, 47А', locationSlug: 'perm-chomga', mustSeeFilter: 'gastro', latitude: 58.0055, longitude: 56.2519 },
-      { name: 'Пермские посикунчики', desc: 'Классика уличной пермской выпечки.', address: 'ул. Пермская, 56', locationSlug: 'perm-permskie-posikunchiki', mustSeeFilter: 'gastro', latitude: 58.0135, longitude: 56.2412 },
+      { name: 'Пермские посикунчики', desc: 'Классика уличной пермской выпечки.', address: 'ул. Пермская, 56', locationSlug: 'perm-permskie-posikunchiki', mustSeeFilter: 'gastro', visitMinutes: 30, latitude: 58.0135, longitude: 56.2412 },
       { name: 'Nolan Wine & Kitchen', desc: 'Современный концептуальный ресторан в центре Перми с изысканной европейской кухней и богатой винной картой.', address: 'Пермь, Петропавловская ул., 59 (в отеле «Урал»)', locationSlug: 'perm-nolan-wine-kitchen', mustSeeFilter: 'gastro', latitude: 58.012115, longitude: 56.238415 },
       { name: 'Belka', desc: 'Камерное гастро-место на Сибирской.', address: 'ул. Сибирская, 19Б', locationSlug: 'perm-belka', mustSeeFilter: 'gastro', latitude: 58.0108, longitude: 56.2505 },
       { name: 'Партизан', desc: 'Гастробар на Комсомольском проспекте.', address: 'Комсомольский проспект, 1', locationSlug: 'perm-partizan', mustSeeFilter: 'gastro', latitude: 58.0169, longitude: 56.2345 },
@@ -4956,7 +4972,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     significantSuburbs: [
       {
         name: 'Хохловка',
-        visitMinutes: 150,
+        visitMinutes: 'полдня',
         desc: 'Архитектурно-этнографический музей на Каме - деревянное зодчество Прикамья.',
         address: 'Пермский край, Ильинский район',
         venueSlug: 'muzej-hohlovka',
@@ -5116,6 +5132,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           'По маршруту двигайтесь против часовой стрелки, напоследок оставив Усть-Боровский сользавод и смотровую площадку над заливом.',
         travelVectorBlurb:
           'Закладывайте на автобус ~1 час, чтобы приехать к 9 утра.',
+        coverImageUrl: '/images/venues/perm/muzej-hohlovka.jpg',
         stops: [
           { name: 'Хохловка', desc: 'Въезд в музей-заповедник', venueSlug: 'muzej-hohlovka' },
           { name: 'Усадьба Баяндиных', desc: 'Старт круга' },
@@ -5134,6 +5151,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         travelVector: 'Город купечества и ледяной пещеры в 90 км от Перми.',
         travelVectorBlurb:
           'Пешком по центру Кунгура, затем на авто к ледяной пещере, на обратном пути - Вязовская пряничная.',
+        coverImageUrl: '/images/venues/perm/kungurskaya-ledyanaya-peshchera.jpg',
         stops: [
           { name: 'Пуп Земли', desc: 'Необычный малый архитектурный памятник на набережной Кунгура, установленный в точке пересечения важнейших исторических дорог.', address: 'Пермский край, Кунгур, ул. Карла Маркса (на набережной реки Сылвы)', latitude: 57.428588, longitude: 56.938883 },
           { name: 'Набережная Сылвы', desc: 'Прогулка у реки' },
@@ -5152,6 +5170,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         travelVector: 'Белогорский монастырь, Царский крест, купель у горы и водопад Плакун за один день.',
         travelVectorBlurb:
           'Трасса Р-242 / Суксун: монастырь - Царский крест - купель/источник у горы - Плакун. Не совмещать с камнем Ермак за один день - крюк под 100 км.',
+        coverImageUrl: '/images/venues/perm/belogorskiy-monastyr.jpg',
         stops: [
           { name: 'Белогорский Свято-Николаевский монастырь', desc: 'Величественный православный монастырь на вершине Белой горы, часто называемый «Уральским Афоном» за свою красоту и строгий устав.', locationSlug: 'perm-belogorskiy-monastyr', address: 'Пермский край, Кунгурский округ, д. Белая Гора, Монастырская ул., 1', latitude: 57.392398, longitude: 56.229415 },
           { name: 'Царский крест', desc: 'Огромный памятный крест в Белогорском монастыре, установленный в память о спасении цесаревича Николая Александровича после покушения в Японии.', address: 'Пермский край, Кунгурский округ, д. Белая Гора (у монастыря)', latitude: 57.391745, longitude: 56.22905 },
@@ -5168,6 +5187,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           'Горнозаводской край на 2 дня: Усьвинские столбы и «Сердце Пармы», затем Каменный город и гора Крестовая.',
         travelVectorBlurb:
           'День 1 - Усьва (столбы, смотровая, Загубашка); день 2 - Губаха (Каменный город, пещера Российская, Крестовая на закат). Полюд (~250 км) с этой поездкой не совмещать.',
+        coverImageUrl: '/images/venues/perm/usvinskie-stolby.jpg',
         stops: [
           { name: 'Усьвинские столбы', desc: 'Величественная многометровая каменная стена на берегу реки Усьвы, знаменитая отдельно стоящей скалой Чёртов Палец.', locationSlug: 'perm-usvinskie-stolby', address: 'Пермский край, Гремячинский городской округ, близ поселка Усьва', latitude: 58.653457, longitude: 57.568472 },
           { name: 'Смотровая Усьвинских столбов', desc: 'День 1 - ключевой кадр' },
@@ -5181,9 +5201,12 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     travel:
       'Международный аэропорт Большое Савино принимает десятки ежедневных прямых рейсов из Москвы (около 2 часов в воздухе), Санкт-Петербурга и крупных региональных центров. Пермь также является важнейшей станцией на главном ходу Транссиба, а автопутешественники едут по федеральной трассе Р-242. Идеальный сезон для визита - лето (с июня по август), когда широкая Кама становится судоходной, на городской набережной проходят масштабные арт-фестивали, а погода комфортна для поездок на уральскую природу. Зима привлекает любителей горнолыжного спорта в Губаху и ценителей заснеженной уральской тайги.',
     faq: [
-      { q: 'Где находится тот самый знаменитый арт-объект «Счастье не за горами»?', a: 'Легендарные огромные красные буквы установлены на парапете городской набережной Камы у здания бывшего Речного вокзала.' },
-      { q: 'Что такое пермский деревянный бог и где его увидеть?', a: 'Это уникальная коллекция старинной сакральной деревянной скульптуры XVII-XIX веков, в которой христианские сюжеты переплелись с языческими традициями; она хранится в Пермской государственной художественной галерее.' },
-      { q: 'Как добраться из Перми до знаменитой Кунгурской ледяной пещеры?', a: 'Одна из главных природных достопримечательностей Урала расположена в 90 км от города в Кунгуре; туда удобнее всего доехать на утренней пригородной электричке за 1,5 часа.' },
+      { q: 'Почему жителей края называют «пермяки соленые уши»?', a: 'Это связано с промыслом соли в Соликамске. Рабочие носили тяжелые мешки с солью на плечах, отчего их уши всегда были в соли, краснели и шелушились.' },
+      { q: 'Где загадать желание медведю в Перми?', a: 'Скульптура «Легенда о пермском медведе» («Шагающий медведь») расположена в самом центре, напротив ЦУМа. Ему принято тереть нос на удачу.' },
+      { q: 'Где посмотреть знаменитую пермскую деревянную скульптуру?', a: 'Коллекция «пермских богов» находится в Пермской государственной художественной галерее.' },
+      { q: 'Что такое PERMM и почему туда стоит сходить?', a: 'Это первый в России музей современного искусства за пределами Москвы и Санкт-Петербурга, известный своими смелыми выставками и инсталляциями.' },
+      { q: 'Как доехать до ландшафтного памятника «Каменный город»?', a: 'Он находится примерно в 200 км от Перми. Проще всего добраться на машине или с экскурсионным автобусом через город Гремячинск и поселок Усьва.' },
+      { q: 'Что посмотреть в этнографическом музее «Хохловка»?', a: 'Это музей деревянного зодчества под открытым небом на берегу Камы в 40 км от Перми. Там собраны старинные усадьбы, церкви и ветряная мельница.' },
     ]
   },
   sortavala: {

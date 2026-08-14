@@ -1193,6 +1193,60 @@ export function isGeneratedVenueStub(url: string | null | undefined): boolean {
 }
 
 /**
+ * Early NN (and similar) editorial files that are label cards:
+ * blurry color blobs + navy caption bar, not a real place photo.
+ * Scenario magazine covers must skip these or cards look like «missing preview».
+ */
+const LABEL_CARD_VENUE_STUB_BASENAMES = new Set([
+  'aleksandrovskiy-sad.jpg',
+  'arsenal-museum.jpg',
+  'bezuhov-cafe.jpg',
+  'blagoveshchenskiy-monastyr.jpg',
+  'domik-kashirina.jpg',
+  'domik-petra.jpg',
+  'fonoteca-bar.jpg',
+  'gaz-museum.jpg',
+  'gosbank-nnov.jpg',
+  'kater-geroy.jpg',
+  'mednye-truby-bar.jpg',
+  'mihailo-arhangelskiy-sobor.jpg',
+  'mitrich-restaurant.jpg',
+  'nizhne-volzhskaya-naberezhnaya.jpg',
+  'palaty-stroganovyh.jpg',
+  'park-shvejtsariya.jpg',
+  'pecherskiy-monastyr.jpg',
+  'photo-museum.jpg',
+  'ploshchad-lyadova.jpg',
+  'ploshchad-minina.jpg',
+  'pochainskiy-bulvar.jpg',
+  'pyatkin-traktir.jpg',
+  'red-wall-restaurant.jpg',
+  'romodanovskiy-vokzal.jpg',
+  'rozhdestvenskaya-street.jpg',
+  'seledka-i-kofe.jpg',
+  'shchelokovskiy-hutor.jpg',
+  'sormovskiy-park.jpg',
+  'staroyarmarochniy-sobor.jpg',
+  'stroganovskaya-church.jpg',
+  'technical-museum.jpg',
+  'usadba-rukavishnikovyh.jpg',
+  'verhne-volzhskaya-naberezhnaya.jpg',
+  'yula-pizza.jpg',
+]);
+
+/** Label-card JPG stubs (gradient + caption) - not usable as scenario covers. */
+export function isLabelCardVenueStub(url: string | null | undefined): boolean {
+  const value = String(url || '')
+    .trim()
+    .toLowerCase()
+    .split('?')[0]
+    .split('#')[0];
+  if (!value) return false;
+  const base = value.slice(value.lastIndexOf('/') + 1);
+  return LABEL_CARD_VENUE_STUB_BASENAMES.has(base);
+}
+
+/**
  * Prefer curated editorial cover for catalog cards / PDP / my-day.
  * Hub photo wins only when no editorial map entry and hub is a real image.
  */

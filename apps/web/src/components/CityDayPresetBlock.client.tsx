@@ -8,6 +8,8 @@ import { useMemo, useState } from 'react';
 import { CollectRouteCtaHint } from '@/components/CollectRouteCtaHint.client';
 import { SafeImage } from '@/components/SafeImage.client';
 import type { CityDayRoutePreset, CityMustSeeItem } from '@/lib/cityInfo';
+import { blogCoverUrl } from '@/lib/blog-cover';
+import { isLabelCardVenueStub } from '@/lib/city-place-images';
 import {
   buildCityDayRoutePreset,
   cityDayRoutePresetAvailable,
@@ -76,10 +78,21 @@ const SCENARIO_GRADIENTS = [
   'from-amber-800 via-orange-600 to-rose-400',
 ] as const;
 
-function presetCoverUrl(items: NamedRow['items']): string | null {
+/**
+ * Scenario magazine cover: explicit preset cover → companion blog cover →
+ * first real stop photo (skip label-card gradient stubs).
+ */
+function presetCoverUrl(
+  preset: CityDayRoutePreset,
+  items: NamedRow['items'],
+): string | null {
+  const explicit = String(preset.coverImageUrl || '').trim();
+  if (explicit) return explicit;
+  const blogSlug = String(preset.blogSlug || '').trim();
+  if (blogSlug) return blogCoverUrl(blogSlug);
   for (const item of items) {
     const url = String(item.imageUrl || '').trim();
-    if (url) return url;
+    if (url && !isLabelCardVenueStub(url)) return url;
   }
   return null;
 }
@@ -371,7 +384,7 @@ export function CityDayPresetBlock({
         >
           {namedResolved.map((row, index) => {
             const active = selectedIndex === index;
-            const cover = presetCoverUrl(row.items);
+            const cover = presetCoverUrl(row.preset, row.items);
             const gradient = SCENARIO_GRADIENTS[index % SCENARIO_GRADIENTS.length];
             return (
               <button
