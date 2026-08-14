@@ -5,6 +5,7 @@
 import { haversineMeters, isValidCoordinatePair } from './day-route-score';
 import { eventHref, venueHref } from './routes';
 import { isGeneratedVenueStub, resolveVenueHeroImage } from './city-place-images';
+import { lookupEditorialPlaceCoords } from './city-place-coords';
 
 /** Display clock for session labels (catalog sessions are Europe/Moscow wall-clock). */
 const DAY_ROUTE_SESSION_TZ = 'Europe/Moscow';
@@ -1952,10 +1953,6 @@ export function enrichDayRouteFromMatchVenues(payloadVenues: DayRouteCoordSource
       id: match.id || item.id,
       slug: match.slug ?? item.slug,
     };
-    if (isValidCoordinatePair(lat, lng)) {
-      next.latitude = lat;
-      next.longitude = lng;
-    }
     const matchAddress = String(match.address || '').trim();
     const existingAddress = String(item.address || '').trim();
     // Prefer fuller catalog address (e.g. street+house over street-only leftover).
@@ -1966,6 +1963,17 @@ export function enrichDayRouteFromMatchVenues(payloadVenues: DayRouteCoordSource
       isDayRoutePlaceholderTitle(item.title) || item.title === item.id || item.title === item.eventId;
     if (match.title && stubTitle) next.title = match.title;
     const placeOnly = !item.eventId && !item.eventSlug;
+    // Curated must-see pins beat hub/DB geo (e.g. Perm embankment geocoded into Kama).
+    const editorial = placeOnly
+      ? lookupEditorialPlaceCoords(next.slug || item.slug || match.slug)
+      : null;
+    if (editorial) {
+      next.latitude = editorial.latitude;
+      next.longitude = editorial.longitude;
+    } else if (isValidCoordinatePair(lat, lng)) {
+      next.latitude = lat;
+      next.longitude = lng;
+    }
     if (!placeOnly) {
       if (match.eventId && !item.eventId) next.eventId = match.eventId;
       if (match.eventSlug && !item.eventSlug) next.eventSlug = match.eventSlug;

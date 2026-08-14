@@ -77,8 +77,10 @@ const SAINT_PETERSBURG_COORDS: Record<string, EditorialPlaceCoords> = {
 
 /** Perm fallback coords (cityInfo items also carry lat/lng for my-day). */
 const PERM_COORDS: Record<string, EditorialPlaceCoords> = {
-  'naberezhnaya-kamy': { latitude: 58.0211, longitude: 56.2464 },
-  'perm-schaste-ne-za-gorami': { latitude: 58.0224, longitude: 56.252 },
+  // South-bank promenade (Monastyrskaya / Kama embankment) - not mid-river.
+  'naberezhnaya-kamy': { latitude: 58.01985, longitude: 56.2467 },
+  // Inland of waterline letters, by river station / «Россия - моя история».
+  'perm-schaste-ne-za-gorami': { latitude: 58.0205, longitude: 56.2507 },
   'permskaya-esplanada': { latitude: 58.0105, longitude: 56.2285 },
   'perm-sobornaya-ploschad': { latitude: 58.0163, longitude: 56.2378 },
   'perm-starokirpichnyy-pereulok': { latitude: 58.0139, longitude: 56.2427 },
@@ -86,7 +88,7 @@ const PERM_COORDS: Record<string, EditorialPlaceCoords> = {
   'perm-rayskiy-sad': { latitude: 58.0315, longitude: 56.3129 },
   'permskaya-galereya': { latitude: 58.0175, longitude: 56.2541 },
   'perm-muzey-permskikh-drevnostey': { latitude: 58.0125, longitude: 56.2494 },
-  'perm-dom-meshkova': { latitude: 58.0191, longitude: 56.2443 },
+  'perm-dom-meshkova': { latitude: 58.01875, longitude: 56.24655 },
   'perm-permm': { latitude: 58.0104, longitude: 56.2166 },
   'perm-teatr-opery-i-baleta': { latitude: 58.0161, longitude: 56.2479 },
   'teatr-teatr': { latitude: 58.0091, longitude: 56.2185 },

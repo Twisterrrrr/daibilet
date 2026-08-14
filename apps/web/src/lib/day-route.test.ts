@@ -553,6 +553,31 @@ test('catalog add persists address + coords snapshot for my-day', () => {
   assert.equal(stored?.longitude, 30.320574599457725);
 });
 
+test('enrichDayRouteFromMatchVenues prefers editorial place coords over hub mid-river geo', () => {
+  mockStorage();
+  clearDayRoute();
+  addToDayRoute({
+    id: 'naberezhnaya-kamy',
+    slug: 'naberezhnaya-kamy',
+    title: 'Набережная Камы',
+  });
+  const next = enrichDayRouteFromMatchVenues([
+    {
+      id: 'ven_perm_naberezhnaya',
+      slug: 'naberezhnaya-kamy',
+      title: 'Набережная Камы',
+      // Historical mid-Kama pin that used to overwrite curated south-bank coords.
+      latitude: 58.0224,
+      longitude: 56.252,
+      address: 'ул. Монастырская / Набережная Камы',
+    },
+  ]);
+  const stop = next.venues[0];
+  assert.equal(stop?.latitude, 58.01985);
+  assert.equal(stop?.longitude, 56.2467);
+  assert.equal(stop?.address, 'ул. Монастырская / Набережная Камы');
+});
+
 test('enrichDayRouteFromMatchVenues fills missing address by slug', () => {
   mockStorage();
   clearDayRoute();

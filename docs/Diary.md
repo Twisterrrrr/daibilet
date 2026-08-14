@@ -1,3 +1,20 @@
+## 2026-08-14 - Perm My Day: пины набережной в Каме
+
+### Наблюдения
+- Owner screenshot: маршрут «Классическая Пермь» - маркеры 1-2 («Набережная Камы», «Счастье не за горами») в середине Камы; 3-7 на суше.
+- Источник: `cityInfo.perm.mustSee` + `city-place-coords` PERM map; карта `/my-day` берёт те же `latitude`/`longitude` стопа.
+- Координаты были смещены на север в русло (~58.0211 / 58.0224), а не swap lat/lng. OSM artwork у уреза воды ~58.02112; для UX нужен южный берег / променад.
+
+### Решения
+- Land-safe pins: набережная `58.01985, 56.2467`; «Счастье» `58.0205, 56.2507` (у Речного вокзала); Дом Мешкова выровнен к OSM `58.01875, 56.24655`.
+- `enrichDayRouteFromMatchVenues`: place-only + editorial slug → curated coords бьют hub/DB mid-river geo.
+- Синхрон web/public cityInfo, editorial JSON, catalog monuments, perm block; тесты `city-place-coords.test.ts` + enrich regression.
+
+### Проблемы
+- Prod Venue lat/lng не трогали (seed coalesce); live web - batch / «выкатывай». Старый localStorage лечится enrich при matches.
+
+---
+
 ## 2026-08-14 - Moscow mustSee museum previews (real + lean)
 
 ### Наблюдения

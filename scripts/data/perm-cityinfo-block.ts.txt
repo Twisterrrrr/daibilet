@@ -4,8 +4,8 @@
     hookFact: 'Знаете ли вы, что Пермь - родина знаменитых «реальных пацанов», но при этом местный Театр оперы и балета считается одним из лучших в России, а пермская балетная школа ценится наравне с петербургской?',
     mustSee: [
       // --- Главные прогулочные зоны ---
-      { name: 'Набережная Камы', desc: 'Главный променад вдоль реки с амфитеатром, причалами и панорамой на Каму.', address: 'ул. Монастырская, 1Б', locationSlug: 'naberezhnaya-kamy', mustSeeFilter: 'main', latitude: 58.0211, longitude: 56.2464 },
-      { name: 'Арт-объект «Счастье не за горами»', desc: 'Красные буквы у Речного вокзала - самый узнаваемый фото-символ Перми.', address: 'ул. Берег Камы (у Речного вокзала)', locationSlug: 'perm-schaste-ne-za-gorami', mustSeeFilter: 'main', latitude: 58.0224, longitude: 56.252 },
+      { name: 'Набережная Камы', desc: 'Главный променад вдоль реки с амфитеатром, причалами и панорамой на Каму.', address: 'ул. Монастырская, 1Б', locationSlug: 'naberezhnaya-kamy', mustSeeFilter: 'main', latitude: 58.01985, longitude: 56.2467 },
+      { name: 'Арт-объект «Счастье не за горами»', desc: 'Красные буквы у Речного вокзала - самый узнаваемый фото-символ Перми.', address: 'ул. Берег Камы (у Речного вокзала)', locationSlug: 'perm-schaste-ne-za-gorami', mustSeeFilter: 'main', latitude: 58.0205, longitude: 56.2507 },
       { name: 'Городская эспланада', desc: 'Открытое пешеходное пространство в центре с фонтанами и событиями.', address: 'ул. Ленина (между ул. Попова и ул. Борчанинова)', locationSlug: 'permskaya-esplanada', mustSeeFilter: 'main', latitude: 58.0105, longitude: 56.2285 },
       { name: 'Соборная площадь', desc: 'Историческое ядро города у Петропавловского собора.', address: 'Соборная площадь', locationSlug: 'perm-sobornaya-ploschad', mustSeeFilter: 'main', latitude: 58.0163, longitude: 56.2378 },
       { name: 'Старокирпичный переулок', desc: 'Камерный прогулочный карман в центре с кирпичной застройкой.', address: 'ул. Ленина, 44', locationSlug: 'perm-starokirpichnyy-pereulok', mustSeeFilter: 'street', latitude: 58.0139, longitude: 56.2427 },
@@ -14,7 +14,7 @@
       // --- Музеи и театры ---
       { name: 'Пермская художественная галерея', desc: 'Уникальная коллекция пермской деревянной скульптуры - «пермские боги».', address: 'ул. Театральная, 2', venueSlug: 'permskaya-galereya', mustSeeFilter: 'museum', latitude: 58.0175, longitude: 56.2541 },
       { name: 'Музей пермских древностей', desc: 'Археология и палеонтология Прикамья, пермский геологический период.', address: 'ул. Сибирская, 15', venueSlug: 'perm-muzey-permskikh-drevnostey', mustSeeFilter: 'museum', latitude: 58.0125, longitude: 56.2494 },
-      { name: 'Дом Мешкова', desc: 'Исторический особняк на набережной, филиал краеведческого музея.', address: 'ул. Монастырская, 11', venueSlug: 'perm-dom-meshkova', mustSeeFilter: 'museum', latitude: 58.0191, longitude: 56.2443 },
+      { name: 'Дом Мешкова', desc: 'Исторический особняк на набережной, филиал краеведческого музея.', address: 'ул. Монастырская, 11', venueSlug: 'perm-dom-meshkova', mustSeeFilter: 'museum', latitude: 58.01875, longitude: 56.24655 },
       { name: 'PERMM', desc: 'Музей современного искусства в бывшем речного флота здании.', address: 'ул. Крисанова, 4', venueSlug: 'perm-permm', mustSeeFilter: 'museum', latitude: 58.0104, longitude: 56.2166 },
       { name: 'Театр оперы и балета им. Чайковского', desc: 'Один из сильнейших оперно-балетных театров страны.', address: 'ул. Петропавловская, 25А', venueSlug: 'perm-teatr-opery-i-baleta', mustSeeFilter: 'museum', latitude: 58.0161, longitude: 56.2479 },
       { name: 'Театр-Театр', desc: 'Драматическая сцена-трансформер и смелые постановки.', address: 'ул. Ленина, 53', venueSlug: 'teatr-teatr', mustSeeFilter: 'museum', latitude: 58.0091, longitude: 56.2185 },

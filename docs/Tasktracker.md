@@ -1,3 +1,9 @@
+## Perm My Day Kama pins (2026-08-14)
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| FIX.PERM-KAMA-PINS | My Day: набережная / «Счастье» не в середине Камы; editorial coords + enrich не даёт hub mid-river | Критический | ✅ 2026-08-14 code+push; live после Deploy MSK web |
+
 ## My Day share A+B+C (2026-08-14)
 
 | ID | Задача | Приоритет | Статус |
