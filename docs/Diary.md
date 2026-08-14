@@ -1,3 +1,17 @@
+## 2026-08-14 - Live: Deploy MSK web `31812873760`
+
+### Наблюдения
+- Owner: «выкатывай по готовности». Пакет: хаб chrome (факт/погода, пригороды, стрелки), `/places` city sync, один бейдж «Сегодня», tourist affiche `436a077`.
+
+### Решения
+- Deploy MSK web `31812873760` success, ~8m40s. SHA `d1bc155`. BUILD_ID=`t2jlRFy2V5mTdu2vxTVof`. Swap с предыдущего `lGOleEUSJUVkVP1CB3qL1`.
+- Smoke 200: `/` `/places` `/events` `/cities/perm` (BUILD_ID в HTML, «Интересный факт», «Чем уникальна»).
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-14 - /places: header city drives section filter
 
 ### Наблюдения

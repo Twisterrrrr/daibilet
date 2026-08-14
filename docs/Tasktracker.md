@@ -2,22 +2,22 @@
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| UX.CARD-TODAY-ONCE | На карточке один бейдж «Сегодня», без «Сегодня заканчиваются» | Высокий | ✅ git, без live deploy |
+| UX.CARD-TODAY-ONCE | На карточке один бейдж «Сегодня», без «Сегодня заканчиваются» | Высокий | ✅ live `31812873760` |
 
 ## 2026-08-14 - /places: header city drives section
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| UX.PLACES-HEADER-CITY | Шапка и select `/places` - один город; блог отдельно | Высокий | ✅ git, без live deploy |
+| UX.PLACES-HEADER-CITY | Шапка и select `/places` - один город; блог отдельно | Высокий | ✅ live `31812873760` |
 
 ## 2026-08-14 - Hub chrome: fact/weather swap + suburb split
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| UX.HUB-FACT-WEATHER-SWAP | Факт слева, погода справа; вернуть градиент/янтарь | Высокий | ✅ git, без live deploy |
-| UX.HUB-IDENTITY-DOTS | Убрать точки под каруселью уникальности | Высокий | ✅ git, без live deploy |
-| UX.HUB-WHY-GO-ARROWS | Стрелки в шапке «Зачем ехать» | Высокий | ✅ git, без live deploy |
-| UX.HUB-SUBURB-SPLIT | Пригород: фото слева, описание справа | Высокий | ✅ git, без live deploy |
+| UX.HUB-FACT-WEATHER-SWAP | Факт слева, погода справа; вернуть градиент/янтарь | Высокий | ✅ live `31812873760` |
+| UX.HUB-IDENTITY-DOTS | Убрать точки под каруселью уникальности | Высокий | ✅ live `31812873760` |
+| UX.HUB-WHY-GO-ARROWS | Стрелки в шапке «Зачем ехать» | Высокий | ✅ live `31812873760` |
+| UX.HUB-SUBURB-SPLIT | Пригород: фото слева, описание справа | Высокий | ✅ live `31812873760` |
 
 ## 2026-08-14 - City hub: tourist affiche + Perm IA
 
