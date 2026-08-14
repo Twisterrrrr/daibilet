@@ -10,11 +10,17 @@
 |---|---|---|---|
 | UX.MUSTSEE-DESKTOP-1ROW | «Что посмотреть»: md+ одна горизонтальная snap-лента, не 2-row grid-flow-col | Высокий | 🔄 commit+push, без live |
 
+## 2026-08-14 - Live: Deploy MSK web `31826217365`
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| DEPLOY.MSK-31826217365 | Live tip `7503887` BUILD_ID=`gVVVlmmybyhdCj0cA669K` | Высокий | ✅ live |
+
 ## 2026-08-14 - Hub: weather/seasons inner 50/50
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| UX.HUB-WEATHER-SEASONS-5050 | Внутри fused-карточки погода | сезоны 50/50, пилюли 2x2 | Высокий | 🔄 commit, deploy next |
+| UX.HUB-WEATHER-SEASONS-5050 | Внутри fused-карточки погода | сезоны 50/50, пилюли 2x2 | Высокий | ✅ live `31826217365` |
 
 ## 2026-08-14 - Live: Deploy MSK web `31825159395`
 

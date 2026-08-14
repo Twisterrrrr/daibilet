@@ -24,6 +24,18 @@
 ### Проблемы
 - Нет.
 
+## 2026-08-14 - Live: Deploy MSK web `31826217365`
+
+### Наблюдения
+- Owner: сразу выкатить inner 50/50 weather | seasons в fused-карточке.
+
+### Решения
+- Deploy MSK web [`31826217365`](https://github.com/Twisterrrrr/daibilet/actions/runs/31826217365) success, ~2m14s. SHA `7503887`. BUILD_ID=`gVVVlmmybyhdCj0cA669K`. Swap с `BE6nsS5J_JyLm9nO3VScB`.
+- Smoke 200: `/` `/places` `/events` `/cities/perm`.
+
+### Проблемы
+- Нет.
+
 ## 2026-08-14 - Hub: weather/seasons inner 50/50
 
 ### Наблюдения
@@ -32,7 +44,7 @@
 ### Решения
 - `CityWeatherWidget`: `md:grid-cols-2` вместо узкой колонки прогноза `minmax(11rem,13.5rem)`.
 - Табы сезонов: `flex-wrap` + `flex-[1_1_calc(50%-0.25rem)]` для сетки 2x2 в половине карточки.
-- Deploy: сразу после commit+push (owner «сразу выкати»).
+- Live: `31826217365` SHA `7503887` BUILD_ID=`gVVVlmmybyhdCj0cA669K`.
 
 ### Проблемы
 - Нет.
