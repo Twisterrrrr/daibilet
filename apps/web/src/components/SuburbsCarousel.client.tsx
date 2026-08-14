@@ -313,7 +313,7 @@ export function SuburbsCarousel({
   };
 
   return (
-    <div>
+    <div
       className={`${className}${sectionId ? ' scroll-mt-[calc(var(--site-header-height)+3.25rem)]' : ''}`}
       data-city-significant-suburbs
       id={sectionId || undefined}
