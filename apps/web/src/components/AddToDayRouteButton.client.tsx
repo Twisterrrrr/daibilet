@@ -4,8 +4,14 @@ import { useLayoutEffect, useState } from 'react';
 import { Check, Route } from 'lucide-react';
 
 import { CityConfirmModal } from '@/components/CityConfirmModal.client';
+import { CollectRouteCtaHint } from '@/components/CollectRouteCtaHint.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { useDayRouteState } from '@/hooks/useDayRouteState';
+import {
+  MY_DAY_COLLECT_CTA_ARIA,
+  MY_DAY_COLLECT_CTA_LABEL,
+  formatMyDayCollectTooltip,
+} from '@/lib/my-day-collect-cta';
 import {
   applyClearDayRouteForCityChange,
   buildAddForeignCityConfirmMessage,
@@ -326,11 +332,10 @@ export function AddManyToDayRouteButton({
             ? 'bg-emerald-600 text-white hover:bg-emerald-700'
             : 'bg-slate-100 text-slate-800 hover:bg-slate-200';
 
+  const collectHint = formatMyDayCollectTooltip(payloads.length);
   const label =
     mode === 'replace'
-      ? compact
-        ? 'В мой день'
-        : 'Открыть в Мой день'
+      ? MY_DAY_COLLECT_CTA_LABEL
       : allActive
         ? 'В маршруте'
         : compact
@@ -426,8 +431,7 @@ export function AddManyToDayRouteButton({
     runBulkAdd(payloads);
   }
 
-  return (
-    <>
+  const bulkButton = (
       <button
         type="button"
         disabled={
@@ -441,7 +445,7 @@ export function AddManyToDayRouteButton({
             : !payloads.length
               ? 'Нельзя добавить: нет точек'
               : mode === 'replace'
-                ? 'Заменить текущий день этими точками и открыть планировщик'
+                ? collectHint
                 : full && !allActive
                   ? dayRouteHardLimitMessage()
                   : allActive
@@ -453,7 +457,7 @@ export function AddManyToDayRouteButton({
         aria-pressed={mode === 'replace' ? undefined : allActive}
         aria-label={
           mode === 'replace'
-            ? `Открыть пригород в Мой день (${payloads.length} точек, заменить маршрут)`
+            ? `${MY_DAY_COLLECT_CTA_ARIA} (${payloads.length} точек)`
             : allActive
               ? 'Убрать все точки пригорода из маршрута дня'
               : `Добавить все точки пригорода в маршрут (${payloads.length})`
@@ -478,6 +482,17 @@ export function AddManyToDayRouteButton({
         )}
         <span>{label}</span>
       </button>
+  );
+
+  return (
+    <>
+      {mode === 'replace' ? (
+        <CollectRouteCtaHint hint={collectHint} className={compact ? 'w-full' : undefined}>
+          {bulkButton}
+        </CollectRouteCtaHint>
+      ) : (
+        bulkButton
+      )}
       <CityConfirmModal
         open={Boolean(foreignCityPrompt)}
         title="Другой город"

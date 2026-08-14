@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ArrowUpRight, MapPin, Route } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
+import { CollectRouteCtaHint } from '@/components/CollectRouteCtaHint.client';
 import { SafeImage } from '@/components/SafeImage.client';
 import type { CityDayRoutePreset, CityMustSeeItem } from '@/lib/cityInfo';
 import {
@@ -15,6 +16,7 @@ import {
 } from '@/lib/day-route-from-place';
 import { mustSeePlacesForDefaultPreset } from '@/lib/must-see-filters';
 import { formatDayRouteTransitTipLine, replaceDayRouteFromVenues } from '@/lib/day-route';
+import { MY_DAY_COLLECT_CTA_ARIA, MY_DAY_COLLECT_CTA_LABEL, formatMyDayCollectTooltip } from '@/lib/my-day-collect-cta';
 
 type Props = {
   places: CityMustSeeItem[];
@@ -155,7 +157,7 @@ export function CityDayPresetBlock({
   const fallbackLead = inMyDay
     ? `Собрать за минуту: ${mainPlacesPhrase(fallbackPreset.length)} в маршруте.`
     : `Собрать за минуту: ${mainPlacesPhrase(fallbackPreset.length)} в «Собери свой день».`;
-  const namedCta = (busy: boolean) => (busy ? 'Собираем…' : inMyDay ? 'В маршрут' : 'Открыть в Мой день');
+  const namedCta = (busy: boolean) => (busy ? 'Собираем…' : inMyDay ? 'В маршрут' : MY_DAY_COLLECT_CTA_LABEL);
 
   const shellClass = embedded
     ? ''
@@ -256,16 +258,36 @@ export function CityDayPresetBlock({
                 </Link>
               ) : null}
               {available ? (
-                <button
-                  type="button"
-                  disabled={busyId != null}
-                  onClick={() => apply(preset.id, items)}
-                  className={routeCtaClass}
-                  data-day-preset-cta
-                >
-                  <Route className="h-3.5 w-3.5 shrink-0" aria-hidden />
-                  <span>{namedCta(busyId === preset.id)}</span>
-                </button>
+                inMyDay ? (
+                  <button
+                    type="button"
+                    disabled={busyId != null}
+                    onClick={() => apply(preset.id, items)}
+                    className={routeCtaClass}
+                    data-day-preset-cta
+                  >
+                    <Route className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                    <span>{namedCta(busyId === preset.id)}</span>
+                  </button>
+                ) : (
+                  <CollectRouteCtaHint
+                    hint={formatMyDayCollectTooltip(items.length)}
+                    className="w-full sm:w-auto"
+                  >
+                    <button
+                      type="button"
+                      disabled={busyId != null}
+                      onClick={() => apply(preset.id, items)}
+                      className={routeCtaClass}
+                      data-day-preset-cta
+                      aria-label={MY_DAY_COLLECT_CTA_ARIA}
+                      title={formatMyDayCollectTooltip(items.length)}
+                    >
+                      <Route className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                      <span>{namedCta(busyId === preset.id)}</span>
+                    </button>
+                  </CollectRouteCtaHint>
+                )
               ) : null}
             </div>
             {preset.timingNote?.trim() ? (

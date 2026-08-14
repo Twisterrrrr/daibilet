@@ -3,12 +3,18 @@
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
 
+import { CollectRouteCtaHint } from '@/components/CollectRouteCtaHint.client';
 import {
   createNoteDayRouteStopId,
   createTextDayRouteStopId,
   hydrateDayRouteFromShare,
   type DayRouteVenueItem,
 } from '@/lib/day-route';
+import {
+  MY_DAY_COLLECT_CTA_ARIA,
+  MY_DAY_COLLECT_CTA_LABEL,
+  formatMyDayCollectTooltip,
+} from '@/lib/my-day-collect-cta';
 
 export type DayRouteShareStopProp = {
   index: number;
@@ -90,12 +96,16 @@ export function DayRouteSharePublicActions({ code, citySlug, longPath, stops }: 
   return (
     <div className="mt-8 space-y-4">
       <div className="flex flex-wrap gap-3">
-        <a
-          href={longPath}
-          className="inline-flex items-center justify-center rounded-lg bg-primary-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700"
-        >
-          Открыть в Мой день
-        </a>
+        <CollectRouteCtaHint hint={formatMyDayCollectTooltip(stops.length)}>
+          <a
+            href={longPath}
+            className="inline-flex items-center justify-center rounded-lg bg-primary-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700"
+            aria-label={MY_DAY_COLLECT_CTA_ARIA}
+            title={formatMyDayCollectTooltip(stops.length)}
+          >
+            {MY_DAY_COLLECT_CTA_LABEL}
+          </a>
+        </CollectRouteCtaHint>
         <button
           type="button"
           disabled={busy}
