@@ -392,12 +392,12 @@ export function CityPageView({
                     <div
                       className={
                         hasHookFact && (hasWeather || hasWhenToGo)
-                          ? 'flex flex-col gap-4 md:flex-row md:items-stretch'
+                          ? 'flex flex-col gap-4 md:grid md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] md:items-stretch'
                           : ''
                       }
                     >
                       {hasWeather || hasWhenToGo ? (
-                        <div className={hasHookFact ? 'md:w-[42%] md:shrink-0 [&>*]:h-full' : ''}>
+                        <div className={hasHookFact ? 'min-w-0 [&>*]:h-full' : ''}>
                           <CityWeatherWidget
                             citySlug={hubSlug}
                             cityIn={cityInPrepositional(city)}
@@ -408,7 +408,7 @@ export function CityPageView({
                       {hasHookFact ? (
                         <div
                           className={
-                            hasWeather || hasWhenToGo ? 'md:min-w-0 md:flex-1 [&>*]:h-full' : ''
+                            hasWeather || hasWhenToGo ? 'min-w-0 [&>*]:h-full' : ''
                           }
                         >
                           <CityHookFactCallout
