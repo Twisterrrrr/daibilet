@@ -13,6 +13,7 @@ import {
 } from './day-route';
 import { isValidCoordinatePair } from './day-route-score';
 import { eventHref, transliterateSlug, venueHref } from './routes';
+import { normalizeVisitMinutes } from './visit-duration';
 
 /** Default preset fills toward soft density guideline. */
 export const DAY_ROUTE_PRESET_SIZE = DAY_ROUTE_SOFT;
@@ -292,7 +293,7 @@ export function dayRouteItemFromMustSee(
     imageUrl,
     address,
     transitTip,
-    dwellMinutes: place.visitMinutes ?? undefined,
+    dwellMinutes: normalizeVisitMinutes(place.visitMinutes) ?? undefined,
     ...coordsFromPlace(place, matched, slug),
   };
 }
