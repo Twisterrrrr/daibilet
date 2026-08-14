@@ -1,20 +1,26 @@
+## 2026-08-14 - Live: Deploy MSK web `31825159395`
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| DEPLOY.MSK-31825159395 | Live tip `3d01bf9` BUILD_ID=`BE6nsS5J_JyLm9nO3VScB` | Высокий | ✅ live |
+
 ## 2026-08-14 - Lifehacks carousel before scenarios
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| UX.HUB-LIFEHACKS-CAROUSEL | Лайфхаки: карусель как identity, перед сценариями; tab `#lifehacks` | Высокий | ✅ git `d364640`, без live |
+| UX.HUB-LIFEHACKS-CAROUSEL | Лайфхаки: карусель как identity, перед сценариями; tab `#lifehacks` | Высокий | ✅ live `31825159395` |
 
 ## 2026-08-14 - Hub: fact | fused weather+seasons
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| UX.HUB-FACT-WEATHER-FUSED | Два внешних столбца: факт ~40%, погода+сезоны одна карточка ~60% | Высокий | ✅ git, без live deploy |
+| UX.HUB-FACT-WEATHER-FUSED | Два внешних столбца: факт ~40%, погода+сезоны одна карточка ~60% | Высокий | ✅ live `31825159395` |
 
 ## 2026-08-14 - Hub: compact weather + when-to-go card
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| UX.HUB-WEATHER-COMPACT | Погода столбиком слева, «Когда ехать» справа; ниже карточка | Высокий | ✅ уточнено: слиты в одну карточку справа, не 3 outer |
+| UX.HUB-WEATHER-COMPACT | Погода столбиком слева, «Когда ехать» справа; ниже карточка | Высокий | ✅ закрыто: слито в fused погода справа, не 3 outer |
 
 ## 2026-08-14 - Hub: Что посмотреть + fact/weather swap
 

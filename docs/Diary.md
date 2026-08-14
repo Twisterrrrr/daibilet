@@ -1,3 +1,15 @@
+## 2026-08-14 - Live: Deploy MSK web `31825159395`
+
+### Наблюдения
+- Owner: выкатить tip feat/next-monorepo с weather fuse, lifehacks carousel before scenarios и docs tip.
+
+### Решения
+- Deploy MSK web [`31825159395`](https://github.com/Twisterrrrr/daibilet/actions/runs/31825159395) success, ~5m40s. SHA `3d01bf9` (weather fuse `28b522c`, lifehacks carousel `d364640`/`3d01bf9`). BUILD_ID=`BE6nsS5J_JyLm9nO3VScB`. Swap с `D3gP-c54E5KsPI8V1neIZ`.
+- Smoke 200: `/` `/places` `/events` `/cities/perm`. На Перми: «Что посмотреть в Перми», «Лайфхаки», weather/fact блоки на месте.
+
+### Проблемы
+- Нет.
+
 ## 2026-08-14 - Hub: fact | fused weather+seasons (~40/60)
 
 ### Наблюдения
