@@ -2,21 +2,21 @@
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| SEO.HUB-CANON | `/places` `/events` `/cities` canonical = absolute clean hub; never `/`. Podborki SPB/KGD self-canonical; moscow noindex → `/podborki` | Критический | ✅ 2026-08-14 code; без live deploy |
-| SEO.HUB-DESC | Dense description на `/` `/blog` `/places` `/events`; empty → template fallback; robots index,follow на хабах | Высокий | ✅ 2026-08-14 code; без live deploy |
+| SEO.HUB-CANON | `/places` `/events` `/cities` canonical = absolute clean hub; never `/`. Podborki SPB/KGD self-canonical; moscow noindex → `/podborki` | Критический | ✅ live `31786430052` SHA `f987ef6` BUILD_ID=`hb0IJajwsACNHIzzynH08` |
+| SEO.HUB-DESC | Dense description на `/` `/blog` `/places` `/events`; empty → template fallback; robots index,follow на хабах | Высокий | ✅ live `31786430052` SHA `f987ef6` BUILD_ID=`hb0IJajwsACNHIzzynH08` |
 | PERF.LCP-HOME | Home `<picture>` / `-card.jpg` fetchpriority | Критический | 🔄 image agent `233634d1`; этот агент не дублировал |
 
 ## 2026-08-14 - OG tags recrawl pack (Stage-1)
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| SEO.OG-TAGS | Absolute `https://daibilet.ru` OG pack: image/secure_url/1200x630/jpeg/alt + Twitter summary_large_image; default JPEG `default-og.jpg` (~120KB), не 2.5MB selfie | Критический | ✅ 2026-08-14 code; без live deploy |
+| SEO.OG-TAGS | Absolute `https://daibilet.ru` OG pack: image/secure_url/1200x630/jpeg/alt + Twitter summary_large_image; default JPEG `default-og.jpg` (~120KB), не 2.5MB selfie | Критический | ✅ live `31786430052` SHA `f987ef6` BUILD_ID=`hb0IJajwsACNHIzzynH08`; OG JPEG 200 |
 
 ## 2026-08-14 - /places catalog thumbs (fastloading)
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| PERF.PLACES-THUMBS | Карточки `/places`: не грузить 2-4MB JPG; sibling `-thumb` ~640px + hero cap 1200px; sizes/priority первой ряда | Критический | ✅ 2026-08-14 code; типичный thumb ~45KB (было ~2.6MB); без live deploy |
+| PERF.PLACES-THUMBS | Карточки `/places`: не грузить 2-4MB JPG; sibling `-thumb` ~640px + hero cap 1200px; sizes/priority первой ряда | Критический | ✅ live `31786430052` SHA `f987ef6`; thumb ~45KB |
 
 ## 2026-08-14 - SPB mustSee owner editor coords
 

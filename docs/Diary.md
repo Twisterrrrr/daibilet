@@ -1,3 +1,18 @@
+## 2026-08-14 - Live: Deploy MSK web `31786430052`
+
+### Наблюдения
+- Owner: «по завершению всех задач выкатывай». Tip `f987ef6` собрал хаб Перми, блог 5 городов, SPB coords, blurbs, places thumbs, OG JPEG, monument thumbs, seasonal «Когда ехать», hub canonicals.
+
+### Решения
+- Deploy MSK web `31786430052` success. SHA `f987ef6`. BUILD_ID=`hb0IJajwsACNHIzzynH08`. Swap с предыдущего `-KlX5fZ0ctFUhnvdTMdJ_` (`a55f663`).
+- Smoke 200: `/` `/places` `/events` `/blog` `/cities/perm` `/cities/saint-petersburg` `/my-day`. OG `https://daibilet.ru/images/og/default-og.jpg` 200 `image/jpeg` 122447 байт. `/places?category=museums` canonical `https://daibilet.ru/places` (не `/`).
+- Prod DB: targeted SQL 9 Perm Venue.shortDescription (slug+title). Bulk catalog seed не делали.
+
+### Проблемы
+- Нет. Хвосты: полный Yandex-geocode вселенной Venue; P0 `-card.jpg` / home `<picture>` / blog listing `*-og.jpg` в UI (places уже `-thumb` `d059f9c`).
+
+---
+
 ## 2026-08-14 - Catalog hubs: canonical strip query
 
 ### Наблюдения
