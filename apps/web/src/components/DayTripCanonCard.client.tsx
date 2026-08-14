@@ -117,6 +117,14 @@ const GUTTER = 'flex justify-center';
 const PANEL_INSET_SM = 'sm:pl-4';
 const LOGISTICS_BG_EXTEND_SM = 'sm:-ml-4';
 
+/**
+ * Desktop: keep suburb detail inside the viewport under sticky header + hub tabs.
+ * Scroll the text column (or magazine body) - not the route chip list.
+ */
+const HUB_DETAIL_MAX_H =
+  'sm:max-h-[calc(100dvh-var(--site-header-height)-env(safe-area-inset-top,0px)-5.5rem)]';
+const HUB_DETAIL_SCROLL = `${HUB_DETAIL_MAX_H} sm:overflow-y-auto sm:overscroll-y-contain`;
+
 /** Compact between-stop tip: «↓ 5-8 мин пешком» (hyphen only). */
 function formatCanonTransitTip(raw: string): string {
   const tip = raw.trim();
@@ -240,6 +248,7 @@ export function DayTripCanonCard({
                 fill
                 sizes="(max-width: 640px) 100vw, 240px"
                 className="object-cover"
+                unoptimized
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/35 via-transparent to-transparent sm:bg-gradient-to-r sm:from-transparent sm:via-transparent sm:to-slate-950/10" />
               <span
@@ -359,13 +368,17 @@ export function DayTripCanonCard({
         }
       >
       {cover ? (
-        <div className="relative h-44 w-full overflow-hidden rounded-t-2xl bg-[#F5F5F7] sm:h-auto sm:min-h-[18rem] sm:rounded-l-2xl sm:rounded-tr-none" data-day-trip-cover>
+        <div
+          className="relative h-44 w-full self-stretch overflow-hidden rounded-t-2xl bg-[#F5F5F7] sm:h-full sm:min-h-[18rem] sm:rounded-l-2xl sm:rounded-tr-none"
+          data-day-trip-cover
+        >
           <SafeImage
             src={cover}
             alt=""
             fill
             sizes="(max-width: 640px) 100vw, 40vw"
             className="object-cover"
+            unoptimized
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950/25 via-transparent to-transparent sm:bg-gradient-to-r sm:from-transparent sm:to-slate-950/10" />
           <span
@@ -379,7 +392,8 @@ export function DayTripCanonCard({
       <div
         className={`px-3.5 py-4 sm:p-5 md:p-6 ${
           cover ? (editorial ? 'bg-zinc-50' : 'bg-slate-50') : ''
-        }`}
+        } ${HUB_DETAIL_SCROLL}`}
+        data-day-trip-body="scroll"
       >
       {/* Title row: badge in gutter unless the cover already shows it. */}
       <div className={cover ? 'min-w-0' : GRID} data-day-trip-head>

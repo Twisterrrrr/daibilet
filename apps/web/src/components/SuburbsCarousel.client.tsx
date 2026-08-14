@@ -83,6 +83,10 @@ function suburbExitLabel(place: CitySuburbItem, hasExit: boolean): string | unde
   return hasExit ? 'Где выходить' : 'Логистика';
 }
 
+/**
+ * Hub / my-day cover: editorial map by venue/location slug (same path as Khokhlovka).
+ * Nested POI slugs are a fallback when the suburb hub itself has no map entry.
+ */
 function suburbHeroImage(
   place: CitySuburbItem,
   venues: DayRouteVenueMatchSource[],
@@ -103,44 +107,6 @@ function suburbHeroImage(
     if (resolved) return resolved;
   }
   return null;
-}
-
-/**
- * First ~2 routes stay as pills (Perm: Хохловка, Кунгур). Long names and the rest → «Ещё».
- * Same cap on mobile and desktop - do not squeeze 4 into one row.
- */
-export const SUBURB_CHIP_VISIBLE_CAP = 2;
-
-/**
- * Split suburb chip indices into visible row + overflow.
- * Active route is always promoted into the visible row when it would otherwise sit in «Ещё».
- */
-export function splitSuburbChipIndices(
-  total: number,
-  activeIndex: number | null,
-  visibleCap: number = SUBURB_CHIP_VISIBLE_CAP,
-): { primary: number[]; overflow: number[] } {
-  if (total <= 0) return { primary: [], overflow: [] };
-  const cap = Math.max(1, visibleCap);
-  if (total <= cap) {
-    return {
-      primary: Array.from({ length: total }, (_, i) => i),
-      overflow: [],
-    };
-  }
-
-  let primary = Array.from({ length: cap }, (_, i) => i);
-  let overflow = Array.from({ length: total - cap }, (_, i) => i + cap);
-
-  const activeOk =
-    activeIndex != null && Number.isFinite(activeIndex) && activeIndex >= 0 && activeIndex < total;
-  if (activeOk && !primary.includes(activeIndex as number)) {
-    const displaced = primary[primary.length - 1];
-    primary = [...primary.slice(0, -1), activeIndex as number];
-    overflow = [displaced, ...overflow.filter((i) => i !== activeIndex)];
-  }
-
-  return { primary, overflow };
 }
 
 export type SuburbsCarouselProps = {
@@ -170,6 +136,7 @@ export type SuburbsCarouselProps = {
 
 /**
  * Significant-suburbs: chips + DayTripCanonCard. Bulk «В маршрут» adds nested points.
+ * Route chips stay visible (wrap / mobile horizontal scroll) - do not hide them in «Ещё».
  */
 export function SuburbsCarousel({
   places,
@@ -186,8 +153,6 @@ export function SuburbsCarousel({
   focusSlugs,
 }: SuburbsCarouselProps) {
   const [activeIndex, setActiveIndex] = React.useState<number | null>(0);
-  const [moreOpen, setMoreOpen] = React.useState(false);
-  const moreRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
     if (!focusSlugs?.length) return;
@@ -195,34 +160,11 @@ export function SuburbsCarousel({
     if (idx >= 0) setActiveIndex(idx);
   }, [focusSlugs, places]);
 
-  React.useEffect(() => {
-    if (!moreOpen) return;
-    const onPointer = (event: MouseEvent) => {
-      if (!moreRef.current?.contains(event.target as Node)) setMoreOpen(false);
-    };
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setMoreOpen(false);
-    };
-    document.addEventListener('mousedown', onPointer);
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.removeEventListener('mousedown', onPointer);
-      document.removeEventListener('keydown', onKey);
-    };
-  }, [moreOpen]);
-
   if (!places.length) return null;
 
   const selectedIndex =
     activeIndex == null || activeIndex < 0 || activeIndex >= places.length ? null : activeIndex;
   const selected = selectedIndex == null ? null : places[selectedIndex];
-  const { primary: primaryIndices, overflow: overflowIndices } = splitSuburbChipIndices(
-    places.length,
-    selectedIndex,
-    SUBURB_CHIP_VISIBLE_CAP,
-  );
-  const overflowActive =
-    selectedIndex != null && overflowIndices.includes(selectedIndex);
 
   const chipIdle = editorial
     ? 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-400'
@@ -231,56 +173,9 @@ export function SuburbsCarousel({
     ? 'border-zinc-900 bg-zinc-900 text-white'
     : 'border-slate-900 bg-slate-900 text-white';
 
-  const chipRowClass = 'flex flex-wrap items-center gap-2';
-
-  const selectChip = (mode: 'tabs' | 'accordion', index: number) => {
-    if (mode === 'accordion') {
-      setActiveIndex((prev) => (prev === index ? null : index));
-    } else {
-      setActiveIndex(index);
-    }
-    setMoreOpen(false);
-  };
-
-  const renderChipButton = (mode: 'tabs' | 'accordion', index: number) => {
-    const place = places[index];
-    if (!place) return null;
-    const active = selectedIndex === index;
-    return (
-      <button
-        key={`chip:${place.name}:${index}`}
-        type="button"
-        role="tab"
-        aria-selected={active}
-        aria-controls={mode === 'tabs' || active ? `city-suburb-panel-${index}` : undefined}
-        data-city-suburb-chip
-        data-active={active ? '1' : '0'}
-        onClick={() => selectChip(mode, index)}
-        className={`inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
-          active ? chipActive : chipIdle
-        }`}
-      >
-        <span
-          className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold tabular-nums ${
-            active
-              ? 'bg-white/20 text-white'
-              : editorial
-                ? 'bg-zinc-100 text-zinc-700'
-                : 'bg-primary-50 text-primary-700'
-          }`}
-        >
-          {index + 1}
-        </span>
-        <span>{place.name}</span>
-        {mode === 'accordion' ? (
-          <ChevronDown
-            className={`h-3.5 w-3.5 opacity-70 transition-transform ${active ? 'rotate-180' : ''}`}
-            aria-hidden
-          />
-        ) : null}
-      </button>
-    );
-  };
+  // Mobile: one-row horizontal carousel. sm+: wrap so all routes stay visible.
+  const chipRowClass =
+    'flex flex-nowrap gap-2 overflow-x-auto overscroll-x-contain pb-0.5 [scrollbar-width:thin] sm:flex-wrap sm:overflow-x-visible sm:pb-0';
 
   const renderChipRow = (mode: 'tabs' | 'accordion') => (
     <div
@@ -288,94 +183,53 @@ export function SuburbsCarousel({
       role="tablist"
       aria-label={`Пригороды ${cityGenitive}`}
       data-city-suburb-chips
-      data-city-suburb-chips-overflow={overflowIndices.length ? '1' : '0'}
+      data-city-suburb-chips-scroll="mobile"
     >
-      {primaryIndices.map((index) => renderChipButton(mode, index))}
-      {overflowIndices.length ? (
-        <div className="relative shrink-0" ref={moreRef}>
+      {places.map((place, index) => {
+        const active = selectedIndex === index;
+        return (
           <button
+            key={`chip:${place.name}:${index}`}
             type="button"
             role="tab"
-            aria-expanded={moreOpen}
-            aria-haspopup="menu"
-            aria-selected={overflowActive}
-            data-city-suburb-chip-more
-            data-active={overflowActive ? '1' : '0'}
-            onClick={() => setMoreOpen((open) => !open)}
+            aria-selected={active}
+            aria-controls={
+              mode === 'tabs' || active ? `city-suburb-panel-${index}` : undefined
+            }
+            data-city-suburb-chip
+            data-active={active ? '1' : '0'}
+            onClick={() => {
+              if (mode === 'accordion') {
+                setActiveIndex((prev) => (prev === index ? null : index));
+                return;
+              }
+              setActiveIndex(index);
+            }}
             className={`inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
-              overflowActive || moreOpen ? chipActive : chipIdle
+              active ? chipActive : chipIdle
             }`}
           >
-            <span>
-              {overflowActive && selected
-                ? `Ещё · ${selected.name}`
-                : `Ещё`}
-            </span>
             <span
-              className={`rounded-full px-1.5 text-[10px] font-bold tabular-nums ${
-                overflowActive || moreOpen
+              className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold tabular-nums ${
+                active
                   ? 'bg-white/20 text-white'
                   : editorial
-                    ? 'bg-zinc-100 text-zinc-600'
-                    : 'bg-slate-100 text-slate-600'
+                    ? 'bg-zinc-100 text-zinc-700'
+                    : 'bg-primary-50 text-primary-700'
               }`}
             >
-              {overflowIndices.length}
+              {index + 1}
             </span>
-            <ChevronDown
-              className={`h-3.5 w-3.5 opacity-70 transition-transform ${moreOpen ? 'rotate-180' : ''}`}
-              aria-hidden
-            />
+            <span>{place.name}</span>
+            {mode === 'accordion' ? (
+              <ChevronDown
+                className={`h-3.5 w-3.5 opacity-70 transition-transform ${active ? 'rotate-180' : ''}`}
+                aria-hidden
+              />
+            ) : null}
           </button>
-          {moreOpen ? (
-            <div
-              role="menu"
-              data-city-suburb-chip-menu
-              className={`absolute left-0 z-40 mt-1 min-w-[12rem] max-w-[min(100vw-2rem,18rem)] rounded-xl border py-1 shadow-lg sm:left-auto sm:right-0 ${
-                editorial ? 'border-zinc-200 bg-white' : 'border-slate-200 bg-white'
-              }`}
-            >
-              {overflowIndices.map((index) => {
-                const place = places[index];
-                if (!place) return null;
-                const active = selectedIndex === index;
-                return (
-                  <button
-                    key={`more:${place.name}:${index}`}
-                    type="button"
-                    role="menuitem"
-                    data-city-suburb-chip-menu-item
-                    data-active={active ? '1' : '0'}
-                    onClick={() => selectChip(mode, index)}
-                    className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm transition ${
-                      active
-                        ? editorial
-                          ? 'bg-zinc-900 font-semibold text-white'
-                          : 'bg-slate-900 font-semibold text-white'
-                        : editorial
-                          ? 'text-zinc-700 hover:bg-zinc-50 hover:text-zinc-950'
-                          : 'text-slate-700 hover:bg-slate-50 hover:text-slate-950'
-                    }`}
-                  >
-                    <span
-                      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold tabular-nums ${
-                        active
-                          ? 'bg-white/20 text-white'
-                          : editorial
-                            ? 'bg-zinc-100 text-zinc-700'
-                            : 'bg-primary-50 text-primary-700'
-                      }`}
-                    >
-                      {index + 1}
-                    </span>
-                    <span className="min-w-0 truncate">{place.name}</span>
-                  </button>
-                );
-              })}
-            </div>
-          ) : null}
-        </div>
-      ) : null}
+        );
+      })}
     </div>
   );
 
