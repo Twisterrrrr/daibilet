@@ -119,13 +119,20 @@ export function CityWeatherWidget({ citySlug, cityIn, editorial = false }: Props
   const temp = today ? formatTempCFull(today.temperatureC) || formatTempCFull(today.tempMaxC) : null;
   const title = cityIn ? `Погода ${cityIn}` : 'Погода';
   const showForecast = state.status === 'ready' && Boolean(today);
+  const hasSeasons = Boolean(whenToGo?.tabs?.length);
+  const twoCol = showForecast && hasSeasons;
   const kickerClass = editorial
     ? 'text-xs font-bold uppercase tracking-[0.14em] text-zinc-500'
     : 'text-xs font-bold uppercase tracking-[0.14em] text-slate-500';
   const muted = editorial ? 'text-zinc-500' : 'text-slate-500';
   const body = editorial ? 'text-zinc-600' : 'text-slate-600';
   const forecastBox = editorial ? 'bg-zinc-100' : 'bg-slate-100';
+  const forecastRule = editorial ? 'border-zinc-200' : 'border-slate-200';
   const iconAccent = editorial ? 'text-zinc-800' : 'text-primary-600';
+  const dayLabelClass = `text-[11px] font-semibold uppercase tracking-wider ${muted}`;
+  const dayTempClass = `flex items-center gap-1.5 text-base font-bold ${
+    editorial ? 'text-zinc-900' : 'text-slate-900'
+  }`;
 
   return (
     <div
@@ -136,46 +143,49 @@ export function CityWeatherWidget({ citySlug, cityIn, editorial = false }: Props
       }`}
       data-city-weather={state.status}
     >
-      {showForecast && today ? (
-        <>
-          <h2 className={kickerClass}>{title}</h2>
-          <div
-            className={`mt-4 flex flex-wrap items-center gap-4 rounded-xl p-4 sm:gap-5 sm:p-5 ${forecastBox}`}
-            data-city-weather-forecast="ready"
-          >
-            <WeatherGlyph code={today.weatherCode} className={`h-10 w-10 shrink-0 sm:h-11 sm:w-11 ${iconAccent}`} />
-            <div className="min-w-0">
-              <p
-                className={`text-3xl font-extrabold leading-none tracking-tight sm:text-4xl ${
-                  editorial ? 'text-zinc-950' : 'text-slate-950'
-                }`}
-              >
-                {temp || '-'}
-              </p>
-              <p className={`mt-1.5 text-sm ${muted}`}>{weatherConditionLine(today.weatherCode)}</p>
-            </div>
-            <div className="flex w-full gap-4 sm:ml-auto sm:w-auto">
-              {tomorrow ? (
-                <div className="min-w-0 flex-1 sm:flex-none sm:text-right">
-                  <p className={`truncate text-[11px] font-semibold uppercase tracking-wider ${muted}`}>Завтра</p>
+      <div
+        className={
+          twoCol
+            ? 'grid flex-1 gap-5 md:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] md:items-start md:gap-6'
+            : 'min-w-0'
+        }
+      >
+        {showForecast && today ? (
+          <div className="min-w-0">
+            <h2 className={kickerClass}>{title}</h2>
+            <div
+              className={`mt-3 flex flex-col gap-3 rounded-xl p-4 ${forecastBox}`}
+              data-city-weather-forecast="ready"
+            >
+              <div className="flex items-center gap-3">
+                <WeatherGlyph
+                  code={today.weatherCode}
+                  className={`h-9 w-9 shrink-0 sm:h-10 sm:w-10 ${iconAccent}`}
+                />
+                <div className="min-w-0">
                   <p
-                    className={`mt-0.5 flex items-center gap-1.5 text-base font-bold sm:justify-end ${
-                      editorial ? 'text-zinc-900' : 'text-slate-900'
+                    className={`text-3xl font-extrabold leading-none tracking-tight ${
+                      editorial ? 'text-zinc-950' : 'text-slate-950'
                     }`}
                   >
+                    {temp || '-'}
+                  </p>
+                  <p className={`mt-1 text-sm ${muted}`}>{weatherConditionLine(today.weatherCode)}</p>
+                </div>
+              </div>
+              {tomorrow ? (
+                <div className={`flex items-center justify-between gap-2 border-t pt-3 ${forecastRule}`}>
+                  <p className={dayLabelClass}>Завтра</p>
+                  <p className={dayTempClass}>
                     <WeatherGlyph code={tomorrow.weatherCode} className={`h-4 w-4 ${muted}`} />
                     {dayTemp(tomorrow) || '-'}
                   </p>
                 </div>
               ) : null}
               {dayAfter ? (
-                <div className="min-w-0 flex-1 sm:flex-none sm:text-right">
-                  <p className={`truncate text-[11px] font-semibold uppercase tracking-wider ${muted}`}>Послезавтра</p>
-                  <p
-                    className={`mt-0.5 flex items-center gap-1.5 text-base font-bold sm:justify-end ${
-                      editorial ? 'text-zinc-900' : 'text-slate-900'
-                    }`}
-                  >
+                <div className={`flex items-center justify-between gap-2 border-t pt-3 ${forecastRule}`}>
+                  <p className={dayLabelClass}>Послезавтра</p>
+                  <p className={dayTempClass}>
                     <WeatherGlyph code={dayAfter.weatherCode} className={`h-4 w-4 ${muted}`} />
                     {dayTemp(dayAfter) || '-'}
                   </p>
@@ -183,73 +193,73 @@ export function CityWeatherWidget({ citySlug, cityIn, editorial = false }: Props
               ) : null}
             </div>
           </div>
-        </>
-      ) : null}
+        ) : null}
 
-      {whenToGo?.tabs?.length ? (
-        <div className={showForecast ? 'mt-7' : ''}>
-          <h3 id="seasons-title" className={kickerClass}>
-            Когда ехать
-          </h3>
-          <p className={`mt-1 text-xs ${muted}`}>Выберите сезон - совет ниже обновится</p>
-          <div
-            role="tablist"
-            aria-labelledby="seasons-title"
-            className="mt-3 flex flex-wrap gap-2"
-          >
-            {whenToGo.tabs.map((item) => {
-              const isSpbSummer =
-                item.id === 'summer' && normalizeCityHubSlug(citySlug) === 'saint-petersburg';
-              const Icon = isSpbSummer ? Ship : TAB_ICON[item.id];
-              const active = item.id === tab;
-              const isNow = current?.tab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  role="tab"
-                  id={`season-tab-${item.id}`}
-                  aria-selected={active}
-                  aria-controls="season-panel"
-                  onClick={() => setTab(item.id)}
-                  className={`inline-flex min-h-11 items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition ${
-                    active
-                      ? editorial
-                        ? 'bg-zinc-900 text-white shadow-sm'
-                        : 'bg-slate-900 text-white shadow-sm'
-                      : editorial
-                        ? 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200'
-                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                  }`}
-                >
-                  <Icon
-                    className={`h-4 w-4 ${isSpbSummer ? 'motion-safe:animate-pulse' : ''}`}
-                    strokeWidth={1.75}
-                    aria-hidden
-                  />
-                  {item.label}
-                  {isNow ? (
-                    <span className={`text-[11px] font-semibold ${active ? 'text-white/70' : muted}`}>
-                      сейчас
-                    </span>
-                  ) : null}
-                </button>
-              );
-            })}
-          </div>
-          {guide.body ? (
-            <p
-              id="season-panel"
-              role="tabpanel"
-              aria-labelledby={`season-tab-${tab}`}
-              className={`mt-4 text-sm leading-relaxed ${body}`}
-              data-city-when-to-go="now"
+        {hasSeasons && whenToGo ? (
+          <div className="min-w-0">
+            <h3 id="seasons-title" className={kickerClass}>
+              Когда ехать
+            </h3>
+            <p className={`mt-1 text-xs ${muted}`}>Выберите сезон - совет ниже обновится</p>
+            <div
+              role="tablist"
+              aria-labelledby="seasons-title"
+              className="mt-3 flex flex-wrap gap-2"
             >
-              {guide.body}
-            </p>
-          ) : null}
-        </div>
-      ) : null}
+              {whenToGo.tabs.map((item) => {
+                const isSpbSummer =
+                  item.id === 'summer' && normalizeCityHubSlug(citySlug) === 'saint-petersburg';
+                const Icon = isSpbSummer ? Ship : TAB_ICON[item.id];
+                const active = item.id === tab;
+                const isNow = current?.tab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    role="tab"
+                    id={`season-tab-${item.id}`}
+                    aria-selected={active}
+                    aria-controls="season-panel"
+                    onClick={() => setTab(item.id)}
+                    className={`inline-flex min-h-11 items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition ${
+                      active
+                        ? editorial
+                          ? 'bg-zinc-900 text-white shadow-sm'
+                          : 'bg-slate-900 text-white shadow-sm'
+                        : editorial
+                          ? 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200'
+                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    }`}
+                  >
+                    <Icon
+                      className={`h-4 w-4 ${isSpbSummer ? 'motion-safe:animate-pulse' : ''}`}
+                      strokeWidth={1.75}
+                      aria-hidden
+                    />
+                    {item.label}
+                    {isNow ? (
+                      <span className={`text-[11px] font-semibold ${active ? 'text-white/70' : muted}`}>
+                        сейчас
+                      </span>
+                    ) : null}
+                  </button>
+                );
+              })}
+            </div>
+            {guide.body ? (
+              <p
+                id="season-panel"
+                role="tabpanel"
+                aria-labelledby={`season-tab-${tab}`}
+                className={`mt-3 text-sm leading-relaxed ${body}`}
+                data-city-when-to-go="now"
+              >
+                {guide.body}
+              </p>
+            ) : null}
+          </div>
+        ) : null}
+      </div>
     </div>
   );
 }
