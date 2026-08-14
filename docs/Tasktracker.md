@@ -1,3 +1,9 @@
+## 2026-08-14 - Suburb collect-route tooltip clipped
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| FIX.HUB-COLLECT-TOOLTIP | Тултип «Собрать маршрут» не обрезать карточкой пригорода | Высокий | 🔄 git+push, без live |
+
 ## 2026-08-14 - City hub chrome polish (Lovable)
 
 | ID | Задача | Приоритет | Статус |

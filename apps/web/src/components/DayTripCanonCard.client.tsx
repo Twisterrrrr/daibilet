@@ -202,7 +202,7 @@ export function DayTripCanonCard({
           ariaLabel ||
           (total != null ? `${index + 1} из ${total}` : undefined)
         }
-        className={`mt-4 w-full overflow-hidden rounded-2xl border bg-white shadow-sm ${
+        className={`mt-4 w-full rounded-2xl border bg-white shadow-sm ${
           editorial ? 'border-zinc-200' : 'border-slate-200'
         } ${className}`}
         data-day-trip-canon="1"
@@ -220,7 +220,7 @@ export function DayTripCanonCard({
         >
           {cover ? (
             <div
-              className="relative h-36 w-full shrink-0 bg-[#F5F5F7] sm:h-full sm:min-h-[7.5rem] sm:max-h-[11rem]"
+              className="relative h-36 w-full shrink-0 overflow-hidden rounded-t-2xl bg-[#F5F5F7] sm:h-full sm:min-h-[7.5rem] sm:max-h-[11rem] sm:rounded-l-2xl sm:rounded-tr-none"
               data-day-trip-cover
             >
               <SafeImage
@@ -313,7 +313,7 @@ export function DayTripCanonCard({
 
         {cta ? (
           <div
-            className={`border-t px-4 py-4 sm:px-5 sm:py-4 ${borderSoft}`}
+            className={`relative z-10 overflow-visible border-t px-4 py-4 sm:px-5 sm:py-4 ${borderSoft}`}
             data-day-trip-cta
           >
             {cta}
@@ -331,7 +331,7 @@ export function DayTripCanonCard({
         ariaLabel ||
         (total != null ? `${index + 1} из ${total}` : undefined)
       }
-      className={`mt-4 w-full overflow-hidden rounded-2xl border bg-white shadow-sm ${
+      className={`mt-4 w-full rounded-2xl border bg-white shadow-sm ${
         editorial ? 'border-zinc-200' : 'border-slate-200'
       } ${className}`}
       data-day-trip-canon="1"
@@ -347,7 +347,7 @@ export function DayTripCanonCard({
         }
       >
       {cover ? (
-        <div className="relative h-44 w-full bg-[#F5F5F7] sm:h-auto sm:min-h-[18rem]" data-day-trip-cover>
+        <div className="relative h-44 w-full overflow-hidden rounded-t-2xl bg-[#F5F5F7] sm:h-auto sm:min-h-[18rem] sm:rounded-l-2xl sm:rounded-tr-none" data-day-trip-cover>
           <SafeImage
             src={cover}
             alt=""
@@ -531,7 +531,7 @@ export function DayTripCanonCard({
       ) : null}
 
       {cta ? (
-        <div className={`mt-5 border-t pt-4 ${borderSoft}`} data-day-trip-cta>
+        <div className={`relative z-10 mt-5 overflow-visible border-t pt-4 ${borderSoft}`} data-day-trip-cta>
           <div className="sm:grid sm:grid-cols-[2.25rem_minmax(0,1fr)] sm:gap-x-3">
             <div aria-hidden className="hidden sm:block" />
             <div className="min-w-0">{cta}</div>

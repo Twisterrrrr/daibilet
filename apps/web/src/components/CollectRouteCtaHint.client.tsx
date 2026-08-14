@@ -42,7 +42,7 @@ export function CollectRouteCtaHint({ hint, children, className = '' }: Props) {
       <span
         id={hintId}
         role="tooltip"
-        className="pointer-events-none absolute left-1/2 top-full z-30 mt-1.5 hidden w-[min(18rem,calc(100vw-2rem))] -translate-x-1/2 rounded-lg bg-slate-900 px-3 py-2 text-left text-[11px] font-medium leading-snug text-white shadow-lg [@media(hover:hover)]:group-hover:block [@media(hover:hover)]:group-focus-within:block"
+        className="pointer-events-none absolute bottom-full left-1/2 z-40 mb-1.5 hidden w-[min(18rem,calc(100vw-2rem))] -translate-x-1/2 rounded-lg bg-slate-900 px-3 py-2 text-left text-[11px] font-medium leading-snug text-white shadow-lg [@media(hover:hover)]:group-hover:block [@media(hover:hover)]:group-focus-within:block"
       >
         {hint}
       </span>
