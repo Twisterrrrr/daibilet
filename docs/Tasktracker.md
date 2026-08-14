@@ -1,16 +1,22 @@
+## 2026-08-14 - Live: Deploy MSK web `31829274518`
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| DEPLOY.MSK-31829274518 | Live tip `5224801` BUILD_ID=`CNMLn35GX7FABFGb3G7FX` | Высокий | ✅ live |
+
 ## 2026-08-14 - Hub: pastel lifehacks, fact amber, scenarios then suburbs
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| UX.HUB-LIFEHACKS-PASTEL | Лайфхаки: разные muted pastel фоны по индексу | Высокий | 🔄 commit+push, затем live |
-| UX.HUB-FACT-AMBER | Вернуть янтарный фон карточки «Факт» | Высокий | 🔄 commit+push, затем live |
-| UX.HUB-ORDER-SCEN-SUB-LH | Скролл: сценарии → пригороды → лайфхаки | Высокий | 🔄 commit+push, затем live |
+| UX.HUB-LIFEHACKS-PASTEL | Лайфхаки: разные muted pastel фоны по индексу | Высокий | ✅ live `31829274518` |
+| UX.HUB-FACT-AMBER | Вернуть янтарный фон карточки «Факт» | Высокий | ✅ live `31829274518` |
+| UX.HUB-ORDER-SCEN-SUB-LH | Скролл: сценарии → пригороды → лайфхаки | Высокий | ✅ live `31829274518` |
 
 ## 2026-08-14 - Hub nav: События + mobile hero chips
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| UX.HUB-NAV-EVENTS-CHIPS | Sticky «События» (не Афиша); mobile hero: Главные места / Лайфхаки / Заметки; CTA Афиша | Высокий | 🔄 commit+push, затем live |
+| UX.HUB-NAV-EVENTS-CHIPS | Sticky «События» (не Афиша); mobile hero: Главные места / Лайфхаки / Заметки; CTA Афиша | Высокий | ✅ live `31829274518` |
 
 ## 2026-08-14 - Live: Deploy MSK web `31827723859`
 

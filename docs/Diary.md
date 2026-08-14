@@ -1,3 +1,17 @@
+## 2026-08-14 - Live: Deploy MSK web `31829274518`
+
+### Наблюдения
+- Owner: выкатить пакет хаба (лайфхаки pastel, фон факта, порядок секций, меню).
+
+### Решения
+- Deploy MSK web [`31829274518`](https://github.com/Twisterrrrr/daibilet/actions/runs/31829274518) success, ~2m13s. SHA `5224801`. BUILD_ID=`CNMLn35GX7FABFGb3G7FX`.
+- Smoke 200: `/` `/places` `/events` `/cities/perm`. На Перми: amber fact, pastel lifehacks, «События» / «Заметки», прошедшие фестивали в aside.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-14 - Hub: pastel lifehacks, fact amber, scenarios then suburbs
 
 ### Наблюдения
