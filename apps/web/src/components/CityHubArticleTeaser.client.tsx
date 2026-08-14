@@ -98,8 +98,8 @@ export function CityHubArticleTeaser({
           {excerpt ? (
             <p
               className={`mt-2 text-sm leading-relaxed ${
-                editorial ? 'text-zinc-600' : 'text-slate-600'
-              }`}
+                isSmall ? 'line-clamp-3' : ''
+              } ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}
             >
               {excerpt}
             </p>
@@ -123,23 +123,32 @@ export function CityHubArticleTeaser({
 export function CityHubArticlesGrid({
   articles,
   editorial = false,
+  layout = 'grid',
 }: {
   articles: BlogCardDto[];
   editorial?: boolean;
   /** Kept for callers; unused after commerce strip. */
   sessions?: PublicSessionDto[];
+  /** `stack` - single column for FAQ+blog split. */
+  layout?: 'grid' | 'stack';
 }) {
   if (!articles.length) return null;
   const items = articles.slice(0, 3);
 
   return (
-    <div className="mt-5 grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div
+      className={
+        layout === 'stack'
+          ? 'mt-5 grid grid-cols-1 items-stretch gap-4'
+          : 'mt-5 grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3'
+      }
+    >
       {items.map((article) => (
         <CityHubArticleTeaser
           key={article.slug}
           article={article}
           editorial={editorial}
-          variant={items.length === 1 ? 'large' : 'default'}
+          variant={layout === 'stack' ? 'small' : items.length === 1 ? 'large' : 'default'}
         />
       ))}
     </div>

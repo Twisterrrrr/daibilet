@@ -117,8 +117,9 @@ export function isCityHubSectionHidden(
 }
 
 /**
- * Owner: on these hubs «Из блога» sits after «Пригороды» (end of sights),
- * not in the footer after Подборки. Other cities keep the footer slot.
+ * Owner: on these hubs tourist discovery puts афиша early (after scenarios).
+ * Blog+FAQ now share the bottom split (`#faq`); this flag still gates
+ * affiche-before-suburbs order via `isCityHubAfficheBeforeSuburbs`.
  */
 const BLOG_AFTER_SUBURBS_SLUGS = new Set([
   'perm',

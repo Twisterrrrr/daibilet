@@ -99,7 +99,7 @@ import type {
 
 const CITY_HASH_ALIASES: Record<string, string> = {
   'city-schedule': 'affiche',
-  'city-directions': 'more',
+  'city-directions': 'affiche',
   'city-sights': 'sights',
   lifehacks: 'lifehacks',
   'city-travel': 'lifehacks',
@@ -110,8 +110,8 @@ const CITY_HASH_ALIASES: Record<string, string> = {
   'zachem-ehat': 'sights',
   top: 'about',
   'city-hero': 'about',
-  directions: 'more',
-  venues: 'more',
+  directions: 'affiche',
+  more: 'faq',
   travel: 'lifehacks',
   faq: 'faq',
   suburbs: 'city-suburbs',
@@ -121,7 +121,8 @@ const CITY_HASH_ALIASES: Record<string, string> = {
   scenarios: 'city-routes',
   'day-constructor': 'city-routes',
   events: 'affiche',
-  zametki: 'blog',
+  blog: 'faq',
+  zametki: 'faq',
   'region-events': 'region-events',
 };
 
@@ -134,7 +135,6 @@ const HUB_DESKTOP_NAV: Array<{ id: string; label: string }> = [
   { id: 'city-suburbs', label: 'Пригороды' },
   { id: 'region-events', label: 'События региона' },
   { id: 'affiche', label: 'События' },
-  { id: 'blog', label: 'Из блога' },
   { id: 'faq', label: 'FAQ' },
 ];
 
@@ -334,6 +334,8 @@ export function CityPageView({
   }, []);
   // Story cards UI hidden (owner 2026-08-03); keep build helper for later - do not render.
 
+  const hasFaqBlogSplit = hasFaq || footerArticles.length > 0;
+
   const tabs = React.useMemo(() => {
     const filled = new Set<string>();
     // Hero/intro always present - first sticky item «О городе» → #about.
@@ -345,16 +347,15 @@ export function CityPageView({
     if (hasSuburbsNav) filled.add('city-suburbs');
     if (hasRegionEvents) filled.add('region-events');
     filled.add('affiche');
-    if (hasFaq) filled.add('faq');
-    if (footerArticles.length > 0) filled.add('blog');
+    // Bottom FAQ+blog split: primary sticky = FAQ; blog may stay in mobile «Ещё».
+    if (hasFaqBlogSplit) filled.add('faq');
     const desktop = HUB_DESKTOP_NAV.filter((item) => filled.has(item.id));
     const extra: Array<{ id: string; label: string }> = [];
-    if (hasCollections) extra.push({ id: 'more', label: 'Подборки' });
+    if (footerArticles.length > 0) extra.push({ id: 'blog', label: 'Из блога' });
     return { desktop, extra };
   }, [
     footerArticles.length,
-    hasCollections,
-    hasFaq,
+    hasFaqBlogSplit,
     hasLifehacks,
     hasMustSeeNav,
     hasRegionEvents,
@@ -367,40 +368,9 @@ export function CityPageView({
     const chips: Array<{ id: string; label: string }> = [];
     if (hasMustSeeNav) chips.push({ id: 'city-must-see', label: 'Главные места' });
     if (hasLifehacks) chips.push({ id: 'lifehacks', label: 'Лайфхаки' });
-    if (footerArticles.length > 0) chips.push({ id: 'blog', label: 'Заметки' });
+    if (hasFaqBlogSplit) chips.push({ id: 'faq', label: 'Ещё' });
     return chips;
-  }, [footerArticles.length, hasLifehacks, hasMustSeeNav]);
-
-  const renderHubBlogSection = () => {
-    if (!footerArticles.length || !city) return null;
-    const citySlug = city.slug || city.sourceSlug || '';
-    const blogHref = citySlug ? `/blog?city=${encodeURIComponent(citySlug)}` : '/blog';
-    return (
-      <section
-        id="blog"
-        className={`border-b ${editorial ? 'border-zinc-200' : 'border-slate-200/80'} ${SECTION_SCROLL_MT}`}
-      >
-        <div className={`container-page ${HUB_SECTION_PAD}`}>
-          <CityHubSectionHeading
-            title={`Из блога ${aboutCityPrepositional(city)}`}
-            description="Маршруты, окрестности и советы местных"
-            editorial={editorial}
-            actions={
-              <Link
-                href={blogHref}
-                className={`shrink-0 text-sm font-semibold ${
-                  editorial ? 'text-zinc-700 hover:text-zinc-950' : 'text-primary-700 hover:text-primary-800'
-                }`}
-              >
-                Все материалы →
-              </Link>
-            }
-          />
-          <CityHubArticlesGrid articles={footerArticles} editorial={editorial} />
-        </div>
-      </section>
-    );
-  };
+  }, [hasFaqBlogSplit, hasLifehacks, hasMustSeeNav]);
 
   return (
     <div className={editorial ? 'bg-zinc-50 text-zinc-900' : 'bg-slate-50 text-slate-900'}>
@@ -530,7 +500,9 @@ export function CityPageView({
               className={`border-b ${editorial ? 'border-zinc-200' : 'border-slate-200/80'} ${SECTION_SCROLL_MT}`}
             >
               <div
-                className={`container-page ${HUB_SECTION_PAD_TOP_HALF} ${HUB_SECTION_PAD_BOTTOM_HALF}`}
+                className={`container-page ${HUB_SECTION_PAD_TOP_HALF} ${
+                  hasCollections ? 'pb-4 sm:pb-5' : HUB_SECTION_PAD_BOTTOM_HALF
+                }`}
               >
                 <CityCatalogHeader editorial={editorial} />
                 {contentReady ? (
@@ -555,14 +527,8 @@ export function CityPageView({
                   <CityScheduleLoadingState />
                 )}
               </div>
-            </section>
-
-            {hasCollections ? (
-              <section
-                id="more"
-                className={`border-b ${editorial ? 'border-zinc-200' : 'border-slate-200/80'} ${SECTION_SCROLL_MT}`}
-              >
-                {contentReady ? (
+              {hasCollections ? (
+                contentReady ? (
                   <PopularDirections
                     city={city}
                     featuredDirections={featuredDirections}
@@ -575,13 +541,11 @@ export function CityPageView({
                       scrollToSection('affiche');
                     }}
                   />
-                ) : (
+                ) : hasMore ? (
                   <CityContentLoadingState />
-                )}
-              </section>
-            ) : contentReady ? null : hasMore ? (
-              <CityContentLoadingState />
-            ) : null}
+                ) : null
+              ) : null}
+            </section>
 
             {payload.regionNearby?.events?.length ? (
               <RegionNearbyStrip nearby={payload.regionNearby} editorial={editorial} />
@@ -611,10 +575,13 @@ export function CityPageView({
               </section>
             ) : null}
 
-            {renderHubBlogSection()}
-
-            {hasFaq ? (
-              <CityFaqSection cityName={city.name} items={unifiedFaq} editorial={editorial} />
+            {hasFaqBlogSplit ? (
+              <CityFaqBlogSplit
+                city={city}
+                faqItems={hasFaq ? unifiedFaq : []}
+                articles={footerArticles}
+                editorial={editorial}
+              />
             ) : null}
 
             {hasSeo && seoText ? (
@@ -916,7 +883,7 @@ function CityHeroStrip({
                 </Link>
               </div>
 
-              {/* Mobile: Главные места / Лайфхаки / Заметки. Desktop uses sticky. */}
+              {/* Mobile: Главные места / Лайфхаки / Ещё. Desktop uses sticky. */}
               {jumpChips.length ? (
               <div
                 className="mt-4 flex gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:hidden"
@@ -1027,12 +994,13 @@ function CityStickyTabs({
   }, [moreOpen]);
 
   const goTo = (id: string) => {
+    const targetId = resolveSectionId(id);
     scrollLockUntilRef.current = Date.now() + 1200;
-    setActiveId(id);
+    setActiveId(targetId);
     setMoreOpen(false);
     scrollToSection(id);
     if (typeof window !== 'undefined') {
-      window.history.replaceState(null, '', `#${id}`);
+      window.history.replaceState(null, '', `#${targetId}`);
     }
   };
 
@@ -2347,6 +2315,77 @@ function CitySeoTextSection({
   );
 }
 
+function CityFaqBlogSplit({
+  city,
+  faqItems,
+  articles,
+  editorial = false,
+}: {
+  city: PublicCityDto;
+  faqItems: CityFaqItem[];
+  articles: BlogCardDto[];
+  editorial?: boolean;
+}) {
+  const citySlug = city.slug || city.sourceSlug || '';
+  const blogHref = citySlug ? `/blog?city=${encodeURIComponent(citySlug)}` : '/blog';
+  const hasFaqCol = faqItems.length > 0;
+  const hasBlogCol = articles.length > 0;
+  if (!hasFaqCol && !hasBlogCol) return null;
+
+  return (
+    <section
+      id="faq"
+      className={`border-t py-10 sm:py-12 lg:py-14 ${SECTION_SCROLL_MT} ${
+        editorial ? 'border-zinc-200 bg-white/70' : 'border-slate-100 bg-white/80'
+      }`}
+    >
+      <div className="container-page">
+        <div
+          className={
+            hasFaqCol && hasBlogCol
+              ? 'grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-12 lg:items-start'
+              : 'grid grid-cols-1'
+          }
+        >
+          {hasFaqCol ? (
+            <div className="min-w-0">
+              <CityFaqSection
+                cityName={city.name}
+                items={faqItems}
+                editorial={editorial}
+                nested
+              />
+            </div>
+          ) : null}
+          {hasBlogCol ? (
+            <div className="min-w-0">
+              <CityHubSectionHeading
+                as="h3"
+                title={`Из блога ${aboutCityPrepositional(city)}`}
+                description="Маршруты, окрестности и советы местных"
+                editorial={editorial}
+                actions={
+                  <Link
+                    href={blogHref}
+                    className={`shrink-0 text-sm font-semibold ${
+                      editorial
+                        ? 'text-zinc-700 hover:text-zinc-950'
+                        : 'text-primary-700 hover:text-primary-800'
+                    }`}
+                  >
+                    Все материалы →
+                  </Link>
+                }
+              />
+              <CityHubArticlesGrid articles={articles} editorial={editorial} layout="stack" />
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function CityFaqSection({
   cityName,
   items,
@@ -2386,147 +2425,155 @@ function CityFaqSection({
     setAskStatus('sent');
   };
 
+  const body = (
+    <>
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <CityHubSectionHeading
+          as="h3"
+          title="Частые вопросы"
+          description={`Ответы о городе и афише ${cityGenitive}`}
+          editorial={editorial}
+        />
+        <button
+          type="button"
+          onClick={() => {
+            setAskOpen((open) => !open);
+            setAskStatus('idle');
+          }}
+          className={
+            editorial
+              ? 'shrink-0 rounded-xl border border-zinc-300 bg-white px-4 py-2 text-sm font-semibold text-zinc-800 hover:bg-zinc-50'
+              : 'shrink-0 rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50'
+          }
+        >
+          {askOpen ? 'Скрыть форму' : 'Задать вопрос'}
+        </button>
+      </div>
+
+      {askOpen ? (
+        <div
+          className={`mb-6 rounded-2xl border p-4 sm:p-5 ${
+            editorial ? 'border-zinc-200 bg-white' : 'border-slate-200 bg-white'
+          }`}
+        >
+          {askStatus === 'sent' ? (
+            <p className={`text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+              Откройте почтовый клиент и отправьте письмо. Если вопрос покажется интересным - опубликуем
+              ответ в FAQ.
+            </p>
+          ) : (
+            <form onSubmit={submitAsk} className="space-y-3">
+              <p className={`text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+                Напишите вопрос о городе или афише. Если он покажется интересным - опубликуем его здесь.
+              </p>
+              <label className="block">
+                <span className="sr-only">Ваш вопрос</span>
+                <textarea
+                  value={askQuestion}
+                  onChange={(event) => {
+                    setAskQuestion(event.target.value);
+                    if (askStatus === 'error') setAskStatus('idle');
+                  }}
+                  rows={3}
+                  required
+                  placeholder="Например: куда сходить с детьми в выходные?"
+                  className={`w-full rounded-xl border px-3 py-2 text-sm outline-none focus:ring-2 ${
+                    editorial
+                      ? 'border-zinc-200 focus:ring-zinc-300'
+                      : 'border-slate-200 focus:ring-primary-200'
+                  }`}
+                />
+              </label>
+              <label className="block">
+                <span className={`mb-1 block text-xs ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}>
+                  Email - по желанию, если хотите ответ лично
+                </span>
+                <input
+                  type="email"
+                  value={askEmail}
+                  onChange={(event) => setAskEmail(event.target.value)}
+                  placeholder="you@example.com"
+                  className={`w-full rounded-xl border px-3 py-2 text-sm outline-none focus:ring-2 ${
+                    editorial
+                      ? 'border-zinc-200 focus:ring-zinc-300'
+                      : 'border-slate-200 focus:ring-primary-200'
+                  }`}
+                />
+              </label>
+              {askStatus === 'error' ? (
+                <p className="text-sm text-red-600">Напишите вопрос чуть подробнее - хотя бы пару слов.</p>
+              ) : null}
+              <button
+                type="submit"
+                className={
+                  editorial
+                    ? 'rounded-xl bg-zinc-950 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-800'
+                    : 'rounded-xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700'
+                }
+              >
+                Отправить вопрос
+              </button>
+            </form>
+          )}
+        </div>
+      ) : null}
+
+      <div className="space-y-2">
+        {items.map((item, index) => {
+          const open = openIndex === index;
+          return (
+            <div
+              key={`${item.question}:${index}`}
+              className={`rounded-xl border transition-colors ${
+                editorial
+                  ? 'border-zinc-200 bg-white hover:border-zinc-300'
+                  : 'border-slate-200 bg-white hover:border-slate-300'
+              }`}
+            >
+              <button
+                type="button"
+                aria-expanded={open}
+                onClick={() => setOpenIndex(open ? null : index)}
+                className={`flex w-full cursor-pointer items-center justify-between gap-3 p-4 text-left text-sm font-medium ${
+                  editorial ? 'text-zinc-900' : 'text-slate-900'
+                }`}
+              >
+                <span className="pr-2">{item.question}</span>
+                <span
+                  className={`shrink-0 transition-transform ${editorial ? 'text-zinc-400' : 'text-slate-400'} ${
+                    open ? 'rotate-180' : ''
+                  }`}
+                >
+                  ▾
+                </span>
+              </button>
+              {open ? (
+                <div
+                  className={`px-4 pb-4 text-sm leading-relaxed ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}
+                >
+                  {item.answer}
+                </div>
+              ) : null}
+            </div>
+          );
+        })}
+      </div>
+    </>
+  );
+
+  if (nested) {
+    return <div className="max-w-none">{body}</div>;
+  }
+
   return (
     <section
       id="faq"
-      className={`py-8 sm:py-10 ${SECTION_SCROLL_MT} ${nested ? '' : 'border-t'} ${
-        nested ? '' : editorial ? 'border-zinc-200' : 'border-slate-100'
+      className={`py-8 sm:py-10 ${SECTION_SCROLL_MT} border-t ${
+        editorial ? 'border-zinc-200' : 'border-slate-100'
       }`}
     >
       <div className="container-page">
-        <div className="max-w-3xl">
-          <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <CityHubSectionHeading
-              as="h3"
-              title="Частые вопросы"
-              description={`Ответы о городе и афише ${cityGenitive}`}
-              editorial={editorial}
-            />
-            <button
-              type="button"
-              onClick={() => {
-                setAskOpen((open) => !open);
-                setAskStatus('idle');
-              }}
-              className={
-                editorial
-                  ? 'shrink-0 rounded-xl border border-zinc-300 bg-white px-4 py-2 text-sm font-semibold text-zinc-800 hover:bg-zinc-50'
-                  : 'shrink-0 rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50'
-              }
-            >
-              {askOpen ? 'Скрыть форму' : 'Задать вопрос'}
-            </button>
-          </div>
-
-          {askOpen ? (
-            <div
-              className={`mb-6 rounded-2xl border p-4 sm:p-5 ${
-                editorial ? 'border-zinc-200 bg-white' : 'border-slate-200 bg-white'
-              }`}
-            >
-              {askStatus === 'sent' ? (
-                <p className={`text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-                  Откройте почтовый клиент и отправьте письмо. Если вопрос покажется интересным - опубликуем
-                  ответ в FAQ.
-                </p>
-              ) : (
-                <form onSubmit={submitAsk} className="space-y-3">
-                  <p className={`text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-                    Напишите вопрос о городе или афише. Если он покажется интересным - опубликуем его здесь.
-                  </p>
-                  <label className="block">
-                    <span className="sr-only">Ваш вопрос</span>
-                    <textarea
-                      value={askQuestion}
-                      onChange={(event) => {
-                        setAskQuestion(event.target.value);
-                        if (askStatus === 'error') setAskStatus('idle');
-                      }}
-                      rows={3}
-                      required
-                      placeholder="Например: куда сходить с детьми в выходные?"
-                      className={`w-full rounded-xl border px-3 py-2 text-sm outline-none focus:ring-2 ${
-                        editorial
-                          ? 'border-zinc-200 focus:ring-zinc-300'
-                          : 'border-slate-200 focus:ring-primary-200'
-                      }`}
-                    />
-                  </label>
-                  <label className="block">
-                    <span className={`mb-1 block text-xs ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}>
-                      Email - по желанию, если хотите ответ лично
-                    </span>
-                    <input
-                      type="email"
-                      value={askEmail}
-                      onChange={(event) => setAskEmail(event.target.value)}
-                      placeholder="you@example.com"
-                      className={`w-full rounded-xl border px-3 py-2 text-sm outline-none focus:ring-2 ${
-                        editorial
-                          ? 'border-zinc-200 focus:ring-zinc-300'
-                          : 'border-slate-200 focus:ring-primary-200'
-                      }`}
-                    />
-                  </label>
-                  {askStatus === 'error' ? (
-                    <p className="text-sm text-red-600">Напишите вопрос чуть подробнее - хотя бы пару слов.</p>
-                  ) : null}
-                  <button
-                    type="submit"
-                    className={
-                      editorial
-                        ? 'rounded-xl bg-zinc-950 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-800'
-                        : 'rounded-xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700'
-                    }
-                  >
-                    Отправить вопрос
-                  </button>
-                </form>
-              )}
-            </div>
-          ) : null}
-
-          <div className="space-y-2">
-            {items.map((item, index) => {
-              const open = openIndex === index;
-              return (
-                <div
-                  key={`${item.question}:${index}`}
-                  className={`rounded-xl border transition-colors ${
-                    editorial
-                      ? 'border-zinc-200 bg-white hover:border-zinc-300'
-                      : 'border-slate-200 bg-white hover:border-slate-300'
-                  }`}
-                >
-                  <button
-                    type="button"
-                    aria-expanded={open}
-                    onClick={() => setOpenIndex(open ? null : index)}
-                    className={`flex w-full cursor-pointer items-center justify-between gap-3 p-4 text-left text-sm font-medium ${
-                      editorial ? 'text-zinc-900' : 'text-slate-900'
-                    }`}
-                  >
-                    <span className="pr-2">{item.question}</span>
-                    <span
-                      className={`shrink-0 transition-transform ${editorial ? 'text-zinc-400' : 'text-slate-400'} ${
-                        open ? 'rotate-180' : ''
-                      }`}
-                    >
-                      ▾
-                    </span>
-                  </button>
-                  {open ? (
-                    <div
-                      className={`px-4 pb-4 text-sm leading-relaxed ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}
-                    >
-                      {item.answer}
-                    </div>
-                  ) : null}
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        <div className="max-w-3xl">{body}</div>
       </div>
     </section>
   );
@@ -2600,7 +2647,7 @@ function defaultCityFaq(cityName: string): CityFaqItem[] {
     {
       question: 'Где смотреть логистику и сезон?',
       answer:
-        'Короткие ответы - в разделе «Лайфхаки» (если есть у города) и в материалах «Из блога» внизу страницы.',
+        'Короткие ответы - в разделе «Лайфхаки» (если есть у города) и в блоке FAQ и блога внизу страницы.',
     },
   ];
 }

@@ -201,17 +201,19 @@ export function LandingDirectionCard({
   }
 
   const coverHeight = featured
-    ? 'min-h-[13rem] sm:min-h-[15rem]'
-    : 'min-h-[9.5rem] sm:min-h-[11rem]';
+    ? 'min-h-[14rem] sm:min-h-[16rem]'
+    : 'min-h-[11rem] sm:min-h-[12.5rem]';
+
+  const photoFallback = (
+    <div className={`absolute inset-0 bg-gradient-to-br ${landingGradient(landing.slug)}`} aria-hidden />
+  );
 
   return (
     <Link
       href={href}
-      className="group mb-0 flex w-full flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-900/8 transition duration-300 hover:-translate-y-0.5 hover:shadow-md"
+      className="group relative flex w-full overflow-hidden rounded-2xl shadow-md ring-1 ring-slate-900/15 transition duration-300 hover:-translate-y-0.5 hover:shadow-lg"
     >
-      <div
-        className={`relative flex ${coverHeight} flex-col justify-end overflow-hidden bg-slate-900`}
-      >
+      <div className={`relative flex w-full ${coverHeight} flex-col justify-end overflow-hidden bg-slate-900`}>
         {imageUrl ? (
           <SafeImage
             src={imageUrl}
@@ -219,29 +221,32 @@ export function LandingDirectionCard({
             fill
             loading="lazy"
             sizes={IMAGE_SIZES.landingCard}
-            className="object-cover transition-transform duration-500 group-hover:scale-[1.08]"
+            className="object-cover object-center transition-transform duration-500 group-hover:scale-[1.06]"
+            fallback={photoFallback}
           />
         ) : (
-          <div className={`absolute inset-0 bg-gradient-to-br ${landingGradient(landing.slug)}`} />
+          photoFallback
         )}
-        <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/40 to-transparent" />
-        <div className="relative z-[1] flex flex-col gap-2.5 p-4 text-white sm:p-5">
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/35 to-slate-950/10"
+        />
+        <div className="relative z-[1] flex flex-col gap-2 p-4 text-white sm:p-5">
+          {cityBadge}
           <h3
-            className={`font-display font-bold leading-tight text-white ${
+            className={`font-display font-bold leading-tight text-white drop-shadow-sm ${
               featured ? 'text-xl sm:text-2xl' : 'text-lg sm:text-xl'
             }`}
           >
             <span className="underline-offset-4 group-hover:underline">{landing.title}</span>
           </h3>
-          <p className="inline-flex items-center gap-1 text-sm font-semibold text-white/95">
+          <p className="text-xs font-medium text-white/85 sm:text-sm">{quietMetaLine(landing)}</p>
+          <p className="inline-flex items-center gap-1 text-sm font-semibold text-white">
             Смотреть
             <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" aria-hidden />
           </p>
         </div>
       </div>
-      <p className="mt-auto shrink-0 px-3 py-2 text-xs text-slate-500">
-        {quietMetaLine(landing)}
-      </p>
     </Link>
   );
 }

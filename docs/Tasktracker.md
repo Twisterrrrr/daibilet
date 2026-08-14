@@ -1,3 +1,11 @@
+## 2026-08-15 - Hub: events+collections merge, FAQ+blog split
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| UX.HUB-EVENTS-COLLECTIONS-MERGE | Подборки в зоне «События»; убрать sticky «Подборки» | Высокий | 🔄 code (commit+push; deploy batch) |
+| UX.HUB-COLLECTION-PHOTO-TILES | Плитки подборок: juicy photo covers из landings | Высокий | 🔄 code (commit+push; deploy batch) |
+| UX.HUB-FAQ-BLOG-SPLIT | Desktop FAQ\|блог 2 col; sticky FAQ / Ещё → `#faq` | Высокий | 🔄 code (commit+push; deploy batch) |
+
 ## 2026-08-14 - Live: Deploy MSK web `31839365845`
 
 | ID | Задача | Приоритет | Статус |
