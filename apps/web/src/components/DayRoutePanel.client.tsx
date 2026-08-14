@@ -111,6 +111,8 @@ import {
   dayRouteHasMixedCities,
   dayRouteSegmentMeters,
   dayRouteTotalDistanceMeters,
+  DAY_ROUTE_DWELL_MAX,
+  DAY_ROUTE_DWELL_MIN,
   DAY_ROUTE_EVENT_STUB_TITLE,
   DAY_ROUTE_PLACE_STUB_TITLE,
   enrichDayRouteFromMatchVenues,
@@ -133,6 +135,7 @@ import {
   lookupDayRouteCoords,
   moveDayRouteVenue,
   moveDayRoutePlanVenue,
+  normalizeDayRouteDwellMinutes,
   normalizeDayRouteVenueId,
   optimizeDayRouteNearestNeighbor,
   parseDayRouteItemsParam,
@@ -215,11 +218,15 @@ import {
 import { MustSeeFilterTabs } from '@/components/MustSeeFilterTabs.client';
 import {
   buildDayRouteTypeCounts,
+  DAY_ROUTE_DWELL_PRESETS,
+  dayRouteDefaultDwellMinutes,
   dayRouteStopDwellChipLabel,
+  dayRouteStopDwellMinutes,
   dayRouteStopPriceChipLabel,
   dayRouteStopTypeTag,
   editorialTagFromTitle,
   estimateDayRouteDwellMinutes,
+  formatDayRouteSoftMinutes,
 } from '@/lib/day-route-stop-types';
 import { venueTypeLabel } from '@/lib/venue-meta';
 import { resolveCityCardImage } from '@/lib/city-images';
@@ -3809,6 +3816,9 @@ function DayRoutePanelInner() {
                     onSetNote={(note) =>
                       setRoute(updateDayRouteVenue(venue.id, { note: note || null }))
                     }
+                    onSetDwellMinutes={(minutes) =>
+                      setRoute(updateDayRouteVenue(venue.id, { dwellMinutes: minutes }))
+                    }
                     onHoverStop={(id) => setHoverStopId(id)}
                     onHoverClear={() => setHoverStopId(null)}
                   />
@@ -3927,6 +3937,9 @@ function DayRoutePanelInner() {
                           ),
                         );
                       }}
+                      onSetDwellMinutes={(minutes) =>
+                        setRoute(updateDayRouteVenue(venue.id, { dwellMinutes: minutes }))
+                      }
                       onHoverStop={(id) => setHoverStopId(id)}
                       onHoverClear={() => setHoverStopId(null)}
                     />
@@ -4073,6 +4086,9 @@ function DayRoutePanelInner() {
                     onShowTicket={() => openTicketView(venue)}
                     onSetNote={(note) =>
                       setRoute(updateDayRouteVenue(venue.id, { note: note || null }))
+                    }
+                    onSetDwellMinutes={(minutes) =>
+                      setRoute(updateDayRouteVenue(venue.id, { dwellMinutes: minutes }))
                     }
                     onHoverStop={(id) => setHoverStopId(id)}
                     onHoverClear={() => setHoverStopId(null)}
@@ -5261,6 +5277,7 @@ function DayRouteVenueCard({
   onBuyClick,
   onShowTicket,
   onSetNote,
+  onSetDwellMinutes,
   onHoverStop,
   onHoverClear,
 }: {
@@ -5298,6 +5315,8 @@ function DayRouteVenueCard({
   onBuyClick: (ticketUrl: string) => void;
   onShowTicket: () => void;
   onSetNote: (note: string) => void;
+  /** null = reset to auto soft dwell. */
+  onSetDwellMinutes?: (minutes: number | null) => void;
   /** Optional marker highlight on hover/focus without changing route order. */
   onHoverStop?: (stopId: string) => void;
   onHoverClear?: () => void;
@@ -5313,6 +5332,10 @@ function DayRouteVenueCard({
   const isCommerce = purchased || dayRouteStopIsCommerce(venue);
   const [addressOpen, setAddressOpen] = useState(false);
   const [addressDraft, setAddressDraft] = useState(String(venue.note || venue.address || ''));
+  const [dwellOpen, setDwellOpen] = useState(false);
+  const [dwellDraft, setDwellDraft] = useState(
+    String(normalizeDayRouteDwellMinutes(venue.dwellMinutes) ?? dayRouteStopDwellMinutes(venue, typeTag)),
+  );
   const href =
     venue.href ||
     (!textStop && venue.slug
@@ -5382,6 +5405,16 @@ function DayRouteVenueCard({
     </p>
   ) : null;
   const dwellSoftLabel = dayRouteStopDwellChipLabel(venue, resolvedTypeTag);
+  const dwellIsCustom = normalizeDayRouteDwellMinutes(venue.dwellMinutes) != null;
+  const dwellCanEdit = Boolean(onSetDwellMinutes) && !noteStop;
+
+  const commitDwellDraft = () => {
+    if (!onSetDwellMinutes) return;
+    const next = normalizeDayRouteDwellMinutes(dwellDraft);
+    if (next == null) return;
+    onSetDwellMinutes(next);
+    setDwellOpen(false);
+  };
 
   /**
    * Offer chips live with the stop meta (Lovable price pill), not under the card.
@@ -5649,7 +5682,107 @@ function DayRouteVenueCard({
                     {priceChipLabel}
                   </span>
                 ) : null}
-                <span className="text-xs text-slate-500">{dwellSoftLabel}</span>
+                {dwellCanEdit ? (
+                  dwellOpen ? (
+                    <div
+                      className="flex w-full min-w-0 flex-col gap-1.5 rounded-xl border border-slate-200 bg-white p-2"
+                      data-day-dwell-editor
+                    >
+                      <div className="flex flex-wrap gap-1">
+                        {DAY_ROUTE_DWELL_PRESETS.map((min) => (
+                          <button
+                            key={min}
+                            type="button"
+                            onClick={() => {
+                              onSetDwellMinutes?.(min);
+                              setDwellDraft(String(min));
+                              setDwellOpen(false);
+                            }}
+                            className={`inline-flex min-h-7 items-center rounded-full px-2.5 text-[11px] font-semibold ${
+                              normalizeDayRouteDwellMinutes(venue.dwellMinutes) === min
+                                ? 'bg-slate-900 text-white'
+                                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                            }`}
+                          >
+                            {formatDayRouteSoftMinutes(min)}
+                          </button>
+                        ))}
+                      </div>
+                      <form
+                        className="flex flex-wrap items-center gap-1.5"
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          commitDwellDraft();
+                        }}
+                      >
+                        <label className="sr-only" htmlFor={`dwell-${venue.id}`}>
+                          Минут на месте
+                        </label>
+                        <input
+                          id={`dwell-${venue.id}`}
+                          type="number"
+                          min={DAY_ROUTE_DWELL_MIN}
+                          max={DAY_ROUTE_DWELL_MAX}
+                          step={5}
+                          value={dwellDraft}
+                          onChange={(e) => setDwellDraft(e.target.value)}
+                          className="h-7 w-20 rounded-md border border-slate-200 bg-white px-2 text-[11px] tabular-nums outline-none focus:border-primary-400"
+                        />
+                        <span className="text-[11px] text-slate-500">мин</span>
+                        <button
+                          type="submit"
+                          className="text-[11px] font-semibold text-primary-700"
+                        >
+                          Ок
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            onSetDwellMinutes?.(null);
+                            setDwellDraft(String(dayRouteDefaultDwellMinutes(venue, resolvedTypeTag)));
+                            setDwellOpen(false);
+                          }}
+                          className="text-[11px] font-medium text-slate-500 hover:text-slate-700"
+                        >
+                          Авто
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDwellOpen(false)}
+                          className="text-[11px] font-medium text-slate-400 hover:text-slate-600"
+                        >
+                          Закрыть
+                        </button>
+                      </form>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      data-day-dwell-chip
+                      data-day-dwell-custom={dwellIsCustom ? '1' : undefined}
+                      title="Изменить время на месте"
+                      aria-label={`Время на месте: ${dwellSoftLabel}. Нажмите, чтобы изменить`}
+                      onClick={() => {
+                        setDwellDraft(
+                          String(
+                            normalizeDayRouteDwellMinutes(venue.dwellMinutes) ??
+                              dayRouteStopDwellMinutes(venue, resolvedTypeTag),
+                          ),
+                        );
+                        setDwellOpen(true);
+                      }}
+                      className={`inline-btn min-h-0 rounded-full px-2.5 py-1 text-xs font-medium ${
+                        dwellIsCustom
+                          ? 'bg-primary-50 text-primary-800 ring-1 ring-primary-100'
+                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200/80'
+                      }`}
+                    >
+                      {dwellSoftLabel}
+                    </button>
+                  )
+                ) : (
+                  <span className="text-xs text-slate-500">{dwellSoftLabel}</span>
+                )}
                 {venue.note && !textStop ? (
                   <span className="line-clamp-1 text-xs text-slate-500">{venue.note}</span>
                 ) : null}

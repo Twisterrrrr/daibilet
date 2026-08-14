@@ -6,6 +6,7 @@
 import {
   isNoteDayRouteStop,
   isTextDayRouteStop,
+  normalizeDayRouteDwellMinutes,
   type DayRouteVenueItem,
 } from './day-route';
 
@@ -23,6 +24,9 @@ const DWELL_BY_TAG: Record<string, number> = {
   Событие: 90,
   'Своё место': 45,
 };
+
+/** Quick picks for guest dwell editor. */
+export const DAY_ROUTE_DWELL_PRESETS = [15, 30, 45, 60, 90, 120, 180] as const;
 
 export function dayRouteStopTypeTag(
   venue: DayRouteVenueItem,
@@ -106,16 +110,37 @@ export function formatDayRouteSoftMinutes(min: number): string {
   return `${m} мин`;
 }
 
-export function dayRouteStopDwellChipLabel(
+/** Soft default dwell by type (ignores guest override). */
+export function dayRouteDefaultDwellMinutes(
   venue: DayRouteVenueItem,
   typeTag?: string | null,
-): string {
+): number {
   const tag = dayRouteStopTypeTag(venue, typeTag);
   let minutes = DWELL_BY_TAG[tag] ?? 60;
   if (venue.ticketBought || venue.ticketUrl || venue.eventId || venue.eventSlug) {
     minutes = Math.max(minutes, 90);
   }
-  return `~${formatDayRouteSoftMinutes(minutes)} на месте`;
+  return minutes;
+}
+
+/** Effective dwell: guest override when set, else soft default. */
+export function dayRouteStopDwellMinutes(
+  venue: DayRouteVenueItem,
+  typeTag?: string | null,
+): number {
+  const custom = normalizeDayRouteDwellMinutes(venue.dwellMinutes);
+  if (custom != null) return custom;
+  return dayRouteDefaultDwellMinutes(venue, typeTag);
+}
+
+export function dayRouteStopDwellChipLabel(
+  venue: DayRouteVenueItem,
+  typeTag?: string | null,
+): string {
+  const minutes = dayRouteStopDwellMinutes(venue, typeTag);
+  const custom = normalizeDayRouteDwellMinutes(venue.dwellMinutes) != null;
+  const body = formatDayRouteSoftMinutes(minutes);
+  return custom ? `${body} на месте` : `~${body} на месте`;
 }
 
 export function buildDayRouteTypeCounts(
@@ -137,12 +162,7 @@ export function estimateDayRouteDwellMinutes(venues: DayRouteVenueItem[]): numbe
   let total = 0;
   for (const venue of venues) {
     if (isNoteDayRouteStop(venue)) continue;
-    const tag = dayRouteStopTypeTag(venue);
-    let minutes = DWELL_BY_TAG[tag] ?? 60;
-    if (venue.ticketBought || venue.ticketUrl || venue.eventId || venue.eventSlug) {
-      minutes = Math.max(minutes, 90);
-    }
-    total += minutes;
+    total += dayRouteStopDwellMinutes(venue);
   }
   return total;
 }

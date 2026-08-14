@@ -4,6 +4,7 @@ import test from 'node:test';
 import {
   buildDayRouteTypeCounts,
   dayRouteStopDwellChipLabel,
+  dayRouteStopDwellMinutes,
   dayRouteStopPriceChipLabel,
   dayRouteStopTypeTag,
   editorialTagFromTitle,
@@ -58,6 +59,12 @@ test('dayRouteStopPriceChipLabel does not invent free entry for interiors', () =
 test('formatDayRouteSoftMinutes and dwell chip', () => {
   assert.equal(formatDayRouteSoftMinutes(120), '2 ч');
   assert.equal(dayRouteStopDwellChipLabel({ id: 'v1', title: 'X' }, 'Театр'), '~2 ч на месте');
+  assert.equal(
+    dayRouteStopDwellChipLabel({ id: 'v1', title: 'X', dwellMinutes: 45 }, 'Театр'),
+    '45 мин на месте',
+  );
+  assert.equal(dayRouteStopDwellMinutes({ id: 'v1', title: 'X', dwellMinutes: 30 }, 'Музей'), 30);
+  assert.equal(estimateDayRouteDwellMinutes([{ id: 'v1', title: 'X', dwellMinutes: 20 }]), 20);
 });
 
 test('buildDayRouteTypeCounts sorts by count', () => {

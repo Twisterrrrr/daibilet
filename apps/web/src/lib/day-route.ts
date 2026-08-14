@@ -129,6 +129,11 @@ export type DayRouteVenueItem = {
   /** Lowest known ticket price (rub) from matches / catalog - for «Купить билет от X». */
   priceFromRub?: number | null;
   /**
+   * Optional guest override: minutes to spend at this stop.
+   * When unset, UI/hour-plan use soft defaults by stop type.
+   */
+  dwellMinutes?: number | null;
+  /**
    * Scannable ticket payload from orders/finance hydrate only.
    * Never invent a fake QR in UI when absent.
    */
@@ -136,6 +141,20 @@ export type DayRouteVenueItem = {
   /** Hint for renderer: image URL / raw code string. */
   ticketQrKind?: 'qr' | 'barcode' | 'image' | null;
 };
+
+/** Soft dwell bounds for guest override (minutes). */
+export const DAY_ROUTE_DWELL_MIN = 5;
+export const DAY_ROUTE_DWELL_MAX = 480;
+
+/** Clamp/normalize optional dwell override; invalid → null (auto). */
+export function normalizeDayRouteDwellMinutes(raw: unknown): number | null {
+  if (raw == null || raw === '') return null;
+  const n = typeof raw === 'number' ? raw : Number(String(raw).trim().replace(',', '.'));
+  if (!Number.isFinite(n)) return null;
+  const rounded = Math.round(n);
+  if (rounded < DAY_ROUTE_DWELL_MIN || rounded > DAY_ROUTE_DWELL_MAX) return null;
+  return rounded;
+}
 
 /** Compact between-stop line for my-day / suburb lists: «↓ 5-8 мин пешком». */
 export function formatDayRouteTransitTipLine(raw: string | null | undefined): string {
@@ -850,6 +869,9 @@ function mergeDayRouteVenueFields(
   if (typeof incoming.ticketBought === 'boolean') next.ticketBought = incoming.ticketBought;
   if (typeof incoming.planDone === 'boolean') next.planDone = incoming.planDone;
   if (incoming.note != null) next.note = incoming.note;
+  if (incoming.dwellMinutes !== undefined) {
+    next.dwellMinutes = normalizeDayRouteDwellMinutes(incoming.dwellMinutes);
+  }
   return next;
 }
 
@@ -2150,6 +2172,7 @@ export function sanitizeDayRouteTicketFields(venue: DayRouteVenueItem): DayRoute
   let eventId = String(venue.eventId || '').trim() || null;
   let eventSlug = String(venue.eventSlug || '').trim() || null;
   let ticketUrl = String(venue.ticketUrl || '').trim() || null;
+  const dwellMinutes = normalizeDayRouteDwellMinutes(venue.dwellMinutes);
 
   if (eventId && isDayRouteVenueAsEventKey(eventId, venue)) eventId = null;
   if (eventSlug && isDayRouteVenueAsEventKey(eventSlug, venue)) eventSlug = null;
@@ -2158,20 +2181,29 @@ export function sanitizeDayRouteTicketFields(venue: DayRouteVenueItem): DayRoute
     ticketUrl = null;
   }
 
+  const dwellUnchanged =
+    dwellMinutes == null
+      ? venue.dwellMinutes == null || venue.dwellMinutes === undefined
+      : venue.dwellMinutes === dwellMinutes;
+
   if (
     eventId === (venue.eventId ?? null) &&
     eventSlug === (venue.eventSlug ?? null) &&
-    ticketUrl === (venue.ticketUrl ?? null)
+    ticketUrl === (venue.ticketUrl ?? null) &&
+    dwellUnchanged
   ) {
     return venue;
   }
 
-  return {
+  const next: DayRouteVenueItem = {
     ...venue,
     eventId,
     eventSlug,
     ticketUrl,
   };
+  if (dwellMinutes == null) delete next.dwellMinutes;
+  else next.dwellMinutes = dwellMinutes;
+  return next;
 }
 
 /**

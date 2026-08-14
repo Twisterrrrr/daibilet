@@ -5,9 +5,9 @@
 
 import {
   dayRouteSessionTimeLabel,
-  dayRouteStopHasTicket,
 } from './day-route-commercial';
 import type { DayRouteVenueItem } from './day-route';
+import { dayRouteStopDwellMinutes } from './day-route-stop-types';
 
 export const DAY_ROUTE_SOFT_DWELL_MIN = 60;
 export const DAY_ROUTE_SOFT_DWELL_TICKET_MIN = 90;
@@ -73,8 +73,7 @@ function hoursPhrase(totalMinutes: number): string {
 }
 
 function dwellFor(venue: DayRouteVenueItem): number {
-  if (venue.ticketBought || dayRouteStopHasTicket(venue)) return DAY_ROUTE_SOFT_DWELL_TICKET_MIN;
-  return DAY_ROUTE_SOFT_DWELL_MIN;
+  return dayRouteStopDwellMinutes(venue);
 }
 
 export function dayRouteStopIsPurchased(venue: Pick<DayRouteVenueItem, 'ticketBought'>): boolean {
