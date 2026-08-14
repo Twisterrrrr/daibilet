@@ -25,6 +25,29 @@ const destinations = [
   },
 ];
 
+test('cities hub uses SEO-canonical SPB slug', () => {
+  const withSpb = [
+    ...destinations,
+    {
+      id: '4',
+      name: 'Санкт-Петербург',
+      slug: 'sankt-peterburg',
+      type: 'city' as const,
+      events: 80,
+      venues: 12,
+      categories: [],
+    },
+  ];
+  assert.equal(
+    resolveCityChangeHref({
+      pathname: '/cities',
+      cityName: 'Санкт-Петербург',
+      destinations: withSpb,
+    }),
+    '/cities/saint-petersburg',
+  );
+});
+
 test('cities list/hub → city hub, all → list', () => {
   assert.equal(
     resolveCityChangeHref({ pathname: '/cities', cityName: 'Казань', destinations }),

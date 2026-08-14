@@ -1,5 +1,7 @@
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
 
+import { resolveLandingCityName } from './landing-city.ts';
+
 export const SELECTED_CITY_STORAGE_KEY = 'daibilet:selected-city';
 
 /** Paths whose `?city=` syncs with the header city picker. */
@@ -23,15 +25,26 @@ export function readsCityQueryParam(pathname: string | null | undefined): boolea
   return isCityFilterPath(pathname) || isMyDayPath(pathname);
 }
 
+function destinationMatchKeys(item: PublicDestinationDto): string[] {
+  return [item.name, item.slug, item.sourceSlug]
+    .map((key) => String(key || '').trim())
+    .filter(Boolean);
+}
+
 export function matchDestination(destinations: PublicDestinationDto[], value?: string | null): PublicDestinationDto | null {
   const needle = String(value || '').trim();
   if (!needle || needle === 'all') return null;
-  return destinations.find(
-    (item) =>
-      item.name.toLowerCase() === needle.toLowerCase() ||
-      item.slug === needle ||
-      item.sourceSlug === needle,
-  ) || null;
+  const lower = needle.toLowerCase();
+  const exact = destinations.find((item) =>
+    destinationMatchKeys(item).some((key) => key.toLowerCase() === lower),
+  );
+  if (exact) return exact;
+
+  const canonName = resolveLandingCityName(needle);
+  if (canonName) {
+    return destinations.find((item) => item.name === canonName) || null;
+  }
+  return null;
 }
 
 /** Selected destination for an explicit `/cities/[slug]` hub route. */
@@ -64,6 +77,11 @@ export function resolveCityLabel(destinations: PublicDestinationDto[], urlCity?:
 
   const fromUrl = matchDestination(destinations, urlCity);
   if (fromUrl) return fromUrl.name;
+
+  // SEO slug (saint-petersburg) vs DB translit (sankt-peterburg) must not
+  // fall through to the previous city in localStorage.
+  const fromSlugMap = resolveLandingCityName(raw);
+  if (fromSlugMap) return fromSlugMap;
 
   return readStoredSelectedCity(destinations) || 'Все города';
 }
@@ -144,6 +162,16 @@ export function resolveCatalogCityFilter(
   if (!needle || needle === 'all') return 'all';
   const fromOptions = cityOptions.find(([name]) => name.toLowerCase() === needle.toLowerCase());
   if (fromOptions) return fromOptions[0];
+
+  // Map saint-petersburg / sankt-peterburg → «Санкт-Петербург» before the
+  // stale header label (previous city) can win the native <select>.
+  const fromSlug = resolveLandingCityName(needle);
+  if (fromSlug) {
+    const bySlugName = cityOptions.find(([name]) => name === fromSlug);
+    if (bySlugName) return bySlugName[0];
+    return fromSlug;
+  }
+
   const label = String(resolvedLabel || '').trim();
   if (label && label !== 'Все города') {
     const byLabel = cityOptions.find(([name]) => name === label);

@@ -2,7 +2,13 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { resolveBlogListingCta } from './blog-listing-links';
-import { stripColumnBodyChrome, stripColumnMetaPrefix, blogListingCityBadgeLabel } from './blog-meta';
+import {
+  blogPostFilterCities,
+  buildBlogCityFilterOptions,
+  stripColumnBodyChrome,
+  stripColumnMetaPrefix,
+  blogListingCityBadgeLabel,
+} from './blog-meta';
 import { resolveBlogTopics, parseBlogTopicParam } from './blog-topics';
 import {
   clipBlogCardExcerpt,
@@ -222,6 +228,29 @@ test('myuzikly card exposes city badge label from static data', () => {
   assert.ok(card);
   assert.equal(card?.citySlug, 'multi');
   assert.equal(blogListingCityBadgeLabel(card?.citySlug, card?.city), 'Москва и Петербург');
+});
+
+test('blog city filter expands multi posts into tagged cities, no Несколько городов', () => {
+  const cards = staticBlogCards();
+  const options = buildBlogCityFilterOptions(cards);
+  assert.equal(
+    options.some((option) => option.value === 'multi' || option.label === 'Несколько городов'),
+    false,
+  );
+  assert.ok(options.some((option) => option.value === 'moscow' && option.label === 'Москва'));
+  assert.ok(
+    options.some(
+      (option) => option.value === 'saint-petersburg' && option.label === 'Санкт-Петербург',
+    ),
+  );
+  const hits = blogPostFilterCities({
+    citySlug: 'multi',
+    city: 'Москва и Петербург',
+  });
+  assert.deepEqual(
+    hits.map((hit) => hit.value).sort(),
+    ['moscow', 'saint-petersburg'],
+  );
 });
 
 test('home rest-row slugs: hub excerpt from real dek, not lorem', () => {

@@ -1,3 +1,10 @@
+## 2026-08-14 - City picker stale label + blog multi-city filter
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| FIX.CITY-PICKER-STALE | Пикер ГОРОД: лейбл сразу Санкт-Петербург; алиасы saint-petersburg / sankt-peterburg, не stale previous city | Критический | ✅ git, без live deploy |
+| FIX.BLOG-MULTI-CITY | Дропдаун блога: не «Несколько городов», а города с тегов статьи | Высокий | ✅ git, без live deploy |
+
 ## 2026-08-14 - Live batch after 7eab8fc
 
 | ID | Задача | Приоритет | Статус |

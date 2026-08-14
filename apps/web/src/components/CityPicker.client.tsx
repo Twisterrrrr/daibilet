@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import { Check, ChevronDown, MapPin } from 'lucide-react';
 
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
+import { matchDestination } from '@/lib/selected-city';
 
 type CityPickerVariant = 'hero' | 'header' | 'compact';
 
@@ -40,8 +41,28 @@ export function CityPicker({
     [cities],
   );
 
-  const selectedLabel = value === 'all' ? allLabel : value;
-  const isAllSelected = value === 'all';
+  // Show the picked name immediately; parent cityLabel can lag one frame behind
+  // URL/searchParams (saint-petersburg vs sankt-peterburg) and look stale.
+  const [optimisticValue, setOptimisticValue] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (optimisticValue == null) return;
+    if (value === optimisticValue) {
+      setOptimisticValue(null);
+      return;
+    }
+    const current = matchDestination(cityOptions, value);
+    const pending = matchDestination(cityOptions, optimisticValue);
+    if (current && pending && current.name === pending.name) {
+      setOptimisticValue(null);
+    }
+  }, [value, optimisticValue, cityOptions]);
+
+  const displayValue = optimisticValue ?? value;
+  const selectedMatch = displayValue === 'all' ? null : matchDestination(cityOptions, displayValue);
+  const selectedLabel =
+    displayValue === 'all' ? allLabel : selectedMatch?.name || displayValue;
+  const isAllSelected = displayValue === 'all';
 
   const updatePosition = React.useCallback(() => {
     const button = buttonRef.current;
@@ -89,6 +110,7 @@ export function CityPicker({
   }, [open]);
 
   const selectCity = (name: string) => {
+    setOptimisticValue(name);
     setOpen(false);
     onChange(name);
   };
@@ -130,7 +152,11 @@ export function CityPicker({
               </button>
             </li>
             {cityOptions.map((city) => {
-              const active = value === city.name;
+              const active = Boolean(
+                selectedMatch
+                  ? selectedMatch.name === city.name && selectedMatch.slug === city.slug
+                  : displayValue === city.name,
+              );
               return (
                 <li key={city.name}>
                   <button

@@ -466,3 +466,73 @@ export function normalizeBlogCitySlug(
   if (raw && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(raw)) return raw;
   return null;
 }
+
+const MULTI_CITY_FILTER_SLUG = 'multi';
+const MULTI_CITY_FILTER_LABEL = 'Несколько городов';
+
+export type BlogCityFilterHit = { value: string; label: string };
+
+/**
+ * Cities a post should appear under in the listing filter.
+ * Multi-city posts expand to the tagged names (`Москва и Петербург`), never
+ * the fake «Несколько городов» option.
+ */
+export function blogPostFilterCities(post: {
+  citySlug?: string | null;
+  city?: string | null;
+  citySlugs?: string[] | null;
+}): BlogCityFilterHit[] {
+  const seen = new Set<string>();
+  const out: BlogCityFilterHit[] = [];
+
+  const add = (rawSlug?: string | null, rawName?: string | null) => {
+    const slug = normalizeBlogCitySlug(rawSlug, rawName);
+    if (!slug || slug === MULTI_CITY_FILTER_SLUG) return;
+    if (seen.has(slug)) return;
+    seen.add(slug);
+    out.push({ value: slug, label: cityFilterLabel(slug, rawName) });
+  };
+
+  for (const tagged of post.citySlugs || []) {
+    add(tagged, null);
+  }
+
+  const slug = String(post.citySlug || '')
+    .trim()
+    .toLowerCase();
+  const name = String(post.city || '').trim();
+  const looksMulti =
+    slug === MULTI_CITY_FILTER_SLUG ||
+    name === MULTI_CITY_FILTER_LABEL ||
+    /\s+и\s+|[,;/+]/.test(name);
+
+  if (looksMulti) {
+    const parts = name
+      .split(/\s*(?:,|;|\/|\+|•|\s+и\s+)\s*/i)
+      .map((part) => part.trim())
+      .filter((part) => part && part !== MULTI_CITY_FILTER_LABEL && part !== 'Без города');
+    for (const part of parts) add(null, part);
+    return out;
+  }
+
+  if (slug && slug !== MULTI_CITY_FILTER_SLUG) add(slug, name);
+  else if (name && name !== MULTI_CITY_FILTER_LABEL) add(null, name);
+  return out;
+}
+
+/** Unique city options for the blog listing dropdown (no «Несколько городов»). */
+export function buildBlogCityFilterOptions(
+  posts: Array<{ citySlug?: string | null; city?: string | null; citySlugs?: string[] | null }>,
+): Array<BlogCityFilterHit & { count: number }> {
+  const counts = new Map<string, { label: string; count: number }>();
+  for (const post of posts) {
+    for (const hit of blogPostFilterCities(post)) {
+      const prev = counts.get(hit.value);
+      if (prev) prev.count += 1;
+      else counts.set(hit.value, { label: hit.label, count: 1 });
+    }
+  }
+  return [...counts.entries()]
+    .map(([value, meta]) => ({ value, label: meta.label, count: meta.count }))
+    .sort((a, b) => a.label.localeCompare(b.label, 'ru'));
+}

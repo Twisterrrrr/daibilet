@@ -1,3 +1,19 @@
+## 2026-08-14 - City picker stale label + blog «Несколько городов»
+
+### Наблюдения
+- Owner: после ГОРОД → Санкт-Петербург в чипе/пикере остаётся предыдущий город.
+- В фильтре рубрик блога висел фейковый пункт «Несколько городов».
+
+### Решения
+- Root cause stale label: URL/SEO slug `saint-petersburg` не матчился с destination `sankt-peterburg`. `resolveCityLabel` / `resolveCatalogCityFilter` падали в localStorage предыдущего города; native `<select>` и CityPicker показывали старое имя. Cookie нет - только `daibilet:selected-city` + `?city=` + path.
+- Фикс: алиасы в `matchDestination`, slug→имя до stale label, optimistic label в CityPicker, pending-ref в SelectedCityProvider, хаб `/cities/saint-petersburg` без 301.
+- Блог: `blogPostFilterCities` раскрывает мульти-статьи в тегированные города (`Москва и Петербург` → Москва + Санкт-Петербург). Пункта «Несколько городов» в дропдауне нет; карточка по-прежнему «Москва и Петербург».
+
+### Проблемы
+- Нет. Live deploy не делали.
+
+---
+
 ## 2026-08-14 - Live: Deploy MSK web `31791969657`
 
 ### Наблюдения

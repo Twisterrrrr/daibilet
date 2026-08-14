@@ -130,10 +130,42 @@ test('resolveCityLabel and isAllCitiesQuery honor city=all', () => {
   assert.equal(resolveCityLabel([...destinations], 'all'), 'Все города');
 });
 
-test('matchDestination resolves by name and slug', () => {
+test('matchDestination aliases saint-petersburg and sankt-peterburg', () => {
   assert.equal(matchDestination([...destinations], 'ufa')?.name, 'Уфа');
   assert.equal(matchDestination([...destinations], 'Уфа')?.slug, 'ufa');
   assert.equal(matchDestination([...destinations], 'all'), null);
+  const cities = [
+    ...destinations,
+    {
+      id: '3',
+      name: 'Санкт-Петербург',
+      slug: 'sankt-peterburg',
+      type: 'city' as const,
+      events: 100,
+      venues: 20,
+      categories: [],
+    },
+  ];
+  assert.equal(matchDestination([...cities], 'sankt-peterburg')?.name, 'Санкт-Петербург');
+  assert.equal(matchDestination([...cities], 'saint-petersburg')?.name, 'Санкт-Петербург');
+  assert.equal(matchDestination([...cities], 'Санкт-Петербург')?.slug, 'sankt-peterburg');
+});
+
+test('resolveCityLabel does not keep previous city on SPB SEO slug', () => {
+  const cities = [
+    ...destinations,
+    {
+      id: '3',
+      name: 'Санкт-Петербург',
+      slug: 'sankt-peterburg',
+      type: 'city' as const,
+      events: 100,
+      venues: 20,
+      categories: [],
+    },
+  ];
+  assert.equal(resolveCityLabel([...cities], 'saint-petersburg'), 'Санкт-Петербург');
+  assert.equal(resolveCityLabel([...cities], 'sankt-peterburg'), 'Санкт-Петербург');
 });
 
 test('resolveCityHubDestination follows the city route including source slug', () => {
@@ -155,15 +187,19 @@ test('resolveCityHubDestination follows the city route including source slug', (
   assert.equal(resolveCityHubDestination(cities, '/cities'), null);
 });
 
-test('resolveCatalogCityFilter maps slug via resolved label', () => {
+test('resolveCatalogCityFilter maps SPB SEO slug even if header label is stale', () => {
   const options: Array<[string, number]> = [
     ['Москва', 10],
+    ['Санкт-Петербург', 8],
     ['Уфа', 2],
   ];
   assert.equal(resolveCatalogCityFilter('Москва', options), 'Москва');
   assert.equal(resolveCatalogCityFilter('moscow', options, 'Москва'), 'Москва');
   assert.equal(resolveCatalogCityFilter('ufa', options, 'Уфа'), 'Уфа');
   assert.equal(resolveCatalogCityFilter('all', options), 'all');
+  assert.equal(resolveCatalogCityFilter('saint-petersburg', options, 'Москва'), 'Санкт-Петербург');
+  assert.equal(resolveCatalogCityFilter('sankt-peterburg', options, 'Москва'), 'Санкт-Петербург');
+  assert.equal(resolveCatalogCityFilter('moscow', options, 'Уфа'), 'Москва');
 });
 
 test('catalogCityQueryValue prefers destination slug', () => {

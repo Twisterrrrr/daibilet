@@ -10,7 +10,7 @@ import type { BlogListFilters } from '@/components/BlogListView';
 import type { BlogCardDto } from '@/lib/blog-utils';
 import { paginateBlogFeedByCursor } from '@/lib/blog-cursor';
 import { canonicalizeBlogCitySlug, filterBlogFeedByCity } from '@/lib/blog-feed-rank';
-import { authorLabel, cityFilterLabel } from '@/lib/blog-meta';
+import { authorLabel, buildBlogCityFilterOptions, cityFilterLabel } from '@/lib/blog-meta';
 import { parseBlogTopicParam, postMatchesTopic } from '@/lib/blog-topics';
 import {
   parseBlogViewMode,
@@ -111,18 +111,14 @@ export function BlogListFiltered({
   const [visiblePosts, setVisiblePosts] = useState<BlogCardDto[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
 
-  const urlCity = paramValue(searchParams.get('city') ?? initialFilters?.city);
+  const urlCityRaw = paramValue(searchParams.get('city') ?? initialFilters?.city);
+  const urlCity = urlCityRaw === 'multi' ? 'all' : urlCityRaw;
   const author = paramValue(searchParams.get('author') ?? initialFilters?.author);
   const topic = parseBlogTopicParam(searchParams.get('topic') ?? initialFilters?.topic);
   const query = String(searchParams.get('q') ?? initialFilters?.q ?? '').trim();
 
   const cityOptions = useMemo(
-    () =>
-      buildOptions(cityOptionsSource, (post) => {
-        const value = String(post.citySlug || '').trim();
-        if (!value) return null;
-        return { value, label: cityFilterLabel(value, post.city) };
-      }),
+    () => buildBlogCityFilterOptions(cityOptionsSource),
     [cityOptionsSource],
   );
 

@@ -29,6 +29,24 @@ test('filterBlogFeedByCity: NN aliases and Russian name resolve to article cityS
   assert.equal(filterBlogFeedByCity(posts, 'Нижний Новгород').length, 3);
 });
 
+test('filterBlogFeedByCity: multi-city post matches tagged cities, not a fake multi slug', () => {
+  const posts = [
+    { slug: 'msk', citySlug: 'moscow', city: 'Москва' },
+    {
+      slug: 'myuzikly-teatr-novichok-msk-spb',
+      citySlug: 'multi',
+      city: 'Москва и Петербург',
+    },
+    { slug: 'spb', citySlug: 'saint-petersburg', city: 'Санкт-Петербург' },
+  ];
+  const moscow = filterBlogFeedByCity(posts, 'moscow').map((p) => p.slug);
+  const spb = filterBlogFeedByCity(posts, 'saint-petersburg').map((p) => p.slug);
+  const kazan = filterBlogFeedByCity(posts, 'kazan').map((p) => p.slug);
+  assert.deepEqual(moscow, ['msk', 'myuzikly-teatr-novichok-msk-spb']);
+  assert.deepEqual(spb, ['myuzikly-teatr-novichok-msk-spb', 'spb']);
+  assert.deepEqual(kazan, []);
+});
+
 test('resolveBlogRankCitySlug: display name without destination → canonical NN slug', () => {
   assert.equal(resolveBlogRankCitySlug('Нижний Новгород', null, null, null), 'nizhny-novgorod');
   assert.equal(

@@ -112,6 +112,8 @@ export function SelectedCityProvider({
   const [cityReady, setCityReady] = useState(false);
   const [pendingConfirm, setPendingConfirm] = useState<PendingConfirm | null>(null);
   const pendingConfirmRef = useRef<PendingConfirm | null>(null);
+  /** Picker choice that must not be overwritten by a stale `?city=` / hub slug. */
+  const pendingCityRef = useRef<string | null>(null);
 
   const onParams = useCallback((params: URLSearchParams) => {
     setUrlCity(params.get('city'));
@@ -136,33 +138,44 @@ export function SelectedCityProvider({
   // Sync before paint so the first meaningful filter render already has the stored city.
   useLayoutEffect(() => {
     const fromCityHub = resolveCityHubDestination(destinations, pathname);
+    let nextLabel: string;
     if (fromCityHub) {
-      setCityLabel(fromCityHub.name);
-      setCityReady(true);
-      return;
+      nextLabel = fromCityHub.name;
+    } else {
+      const landingRoute = resolveLandingRouteFromLocation(pathname);
+      // Any landing path that already carries a city (MULTI + city-scoped) write-through to header.
+      if (landingRoute?.citySlug) {
+        const fromLanding =
+          matchDestination(destinations, landingRoute.citySlug) ||
+          matchDestination(destinations, resolveLandingCityName(landingRoute.citySlug));
+        nextLabel =
+          fromLanding?.name ||
+          resolveLandingCityName(landingRoute.citySlug) ||
+          resolveCityLabel(destinations, readsCityQueryParam(pathname) ? urlCity : null);
+      } else {
+        const fromUrl = readsCityQueryParam(pathname) ? urlCity : null;
+        nextLabel = resolveCityLabel(destinations, fromUrl);
+      }
     }
-    const landingRoute = resolveLandingRouteFromLocation(pathname);
-    // Any landing path that already carries a city (MULTI + city-scoped) write-through to header.
-    if (landingRoute?.citySlug) {
-      const fromLanding =
-        matchDestination(destinations, landingRoute.citySlug) ||
-        matchDestination(destinations, resolveLandingCityName(landingRoute.citySlug));
-      if (fromLanding?.name) {
-        setCityLabel(fromLanding.name);
+
+    const pending = pendingCityRef.current;
+    if (pending) {
+      const pendingLabel = pending === 'all' ? 'Все города' : pending;
+      const pendingMatch = pending === 'all' ? null : matchDestination(destinations, pending);
+      const nextMatch = nextLabel === 'Все города' ? null : matchDestination(destinations, nextLabel);
+      const caughtUp =
+        nextLabel === pendingLabel ||
+        (pending === 'all' && nextLabel === 'Все города') ||
+        Boolean(pendingMatch && nextMatch && pendingMatch.name === nextMatch.name);
+      if (!caughtUp) {
+        setCityLabel(pendingLabel);
         setCityReady(true);
         return;
       }
-      const fallbackName = resolveLandingCityName(landingRoute.citySlug);
-      if (fallbackName) {
-        setCityLabel(fallbackName);
-        setCityReady(true);
-        return;
-      }
+      pendingCityRef.current = null;
     }
-    // Catalog filters + /my-day share links (`?city=perm`) - without this empty My Day
-    // stays on «Сначала выберите город» even when the URL already has a city.
-    const fromUrl = readsCityQueryParam(pathname) ? urlCity : null;
-    setCityLabel(resolveCityLabel(destinations, fromUrl));
+
+    setCityLabel(nextLabel);
     setCityReady(true);
   }, [destinations, pathname, urlCity]);
 
@@ -189,6 +202,14 @@ export function SelectedCityProvider({
   // Keep storage aligned with an explicit catalog city (including deep-links).
   // `city=all` clears storage so mergeStoredCityIntoSearchParams cannot bounce back.
   useLayoutEffect(() => {
+    const pending = pendingCityRef.current;
+    if (pending && pending !== 'all') {
+      const urlMatch = urlCity ? matchDestination(destinations, urlCity) : null;
+      const pendingMatch = matchDestination(destinations, pending);
+      if (urlMatch && pendingMatch && urlMatch.name !== pendingMatch.name) {
+        return;
+      }
+    }
     if (readsCityQueryParam(pathname) && String(urlCity || '').trim().toLowerCase() === 'all') {
       persistSelectedCity('all');
       return;
@@ -228,11 +249,15 @@ export function SelectedCityProvider({
       }
 
       persistSelectedCity(name);
+      pendingCityRef.current = name;
       setCityLabel(name === 'all' ? 'Все города' : name);
       setCityReady(true);
 
       // PDP hydrate (venue/location/event): only align chrome city - never navigate away.
-      if (options?.persistOnly) return true;
+      if (options?.persistOnly) {
+        pendingCityRef.current = null;
+        return true;
+      }
 
       const searchParams = searchParamsKey
         ? new URLSearchParams(searchParamsKey)
@@ -245,6 +270,7 @@ export function SelectedCityProvider({
       });
 
       if (nav.action === 'persist') {
+        pendingCityRef.current = null;
         return true;
       }
 
@@ -272,7 +298,10 @@ export function SelectedCityProvider({
       }
 
       // Unknown / static surfaces: persist only - never dump into events catalog.
-      if (!href) return true;
+      if (!href) {
+        pendingCityRef.current = null;
+        return true;
+      }
 
       const path = pathname.replace(/\/$/, '') || '/';
       const sameIndexQuery =

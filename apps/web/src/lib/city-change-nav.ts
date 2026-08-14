@@ -31,6 +31,16 @@ export type CityChangeNavResult =
   /** Unhandled path - caller may try multi-city landing, else persist (never dump to catalog). */
   | { action: 'fallback' };
 
+function cityHubPathSlug(slug: string): string {
+  const key = String(slug || '')
+    .trim()
+    .toLowerCase();
+  if (key === 'sankt-peterburg' || key === 'spb' || key === 'peterburg') {
+    return 'saint-petersburg';
+  }
+  return slug;
+}
+
 function resolveDestinationSlug(
   destinations: PublicDestinationDto[],
   name: string,
@@ -82,11 +92,15 @@ export function resolveCityChangeNav(input: CityChangeNavInput): CityChangeNavRe
   }
 
   // Cities IA: list or hub → new hub (or list for «Все города»).
+  // Prefer SEO-canonical slug (`saint-petersburg`) so we skip the
+  // `/cities/sankt-peterburg` → `/cities/saint-petersburg` 301 that left the
+  // picker showing the previous city during the redirect.
   if (path === '/cities' || path.startsWith('/cities/')) {
     if (name === 'all' || !matched?.slug) {
       return { action: 'navigate', href: '/cities' };
     }
-    return { action: 'navigate', href: `/cities/${encodeURIComponent(matched.slug)}` };
+    const hubSlug = cityHubPathSlug(matched.slug);
+    return { action: 'navigate', href: `/cities/${encodeURIComponent(hubSlug)}` };
   }
 
   // Legacy listing `/venues` `/locations` 301 to `/places`. City change writes the hub

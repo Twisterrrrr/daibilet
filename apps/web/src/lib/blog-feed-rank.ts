@@ -1,5 +1,5 @@
 import type { BlogCardDto } from './blog-utils.ts';
-import { normalizeBlogCitySlug } from './blog-meta.ts';
+import { blogPostFilterCities, normalizeBlogCitySlug } from './blog-meta.ts';
 
 const BROAD_CITY_SLUGS = new Set(['multi', 'regions']);
 
@@ -42,12 +42,16 @@ export function resolveBlogRankCitySlug(
   return canonicalizeBlogCitySlug(headerCityValue);
 }
 
-function cityMatchScore(postCitySlug: string | null | undefined, target: string): number {
-  const slug = canonicalizeBlogCitySlug(postCitySlug) || String(postCitySlug || '')
+function cityMatchScore(
+  post: Pick<BlogCardDto, 'citySlug' | 'city'> & { citySlugs?: string[] | null },
+  target: string,
+): number {
+  const hits = blogPostFilterCities(post);
+  if (hits.some((hit) => hit.value === target)) return 100;
+  const slug = canonicalizeBlogCitySlug(post.citySlug) || String(post.citySlug || '')
     .trim()
     .toLowerCase();
   if (!slug) return 0;
-  if (slug === target) return 100;
   if (BROAD_CITY_SLUGS.has(slug)) return 40;
   return 0;
 }
@@ -56,7 +60,7 @@ function cityMatchScore(postCitySlug: string | null | undefined, target: string)
  * Rank-then-others: city posts first, then multi/regions, then the rest.
  * Does not drop unmatched posts (unlike hard filter).
  */
-export function rankBlogFeedByCity<T extends Pick<BlogCardDto, 'citySlug' | 'publishedAt' | 'title' | 'slug'>>(
+export function rankBlogFeedByCity<T extends Pick<BlogCardDto, 'citySlug' | 'publishedAt' | 'title' | 'slug'> & { city?: string | null; citySlugs?: string[] | null }>(
   posts: T[],
   citySlug: string | null | undefined,
 ): T[] {
@@ -64,7 +68,7 @@ export function rankBlogFeedByCity<T extends Pick<BlogCardDto, 'citySlug' | 'pub
   if (!target) return posts;
 
   return [...posts].sort((a, b) => {
-    const diff = cityMatchScore(b.citySlug, target) - cityMatchScore(a.citySlug, target);
+    const diff = cityMatchScore(b, target) - cityMatchScore(a, target);
     if (diff !== 0) return diff;
     const ta = Date.parse(String(a.publishedAt || '')) || 0;
     const tb = Date.parse(String(b.publishedAt || '')) || 0;
@@ -74,14 +78,10 @@ export function rankBlogFeedByCity<T extends Pick<BlogCardDto, 'citySlug' | 'pub
 }
 
 /** Hard filter for explicit `?city=` in URL (dropdown). */
-export function filterBlogFeedByCity<T extends Pick<BlogCardDto, 'citySlug'>>(
-  posts: T[],
-  citySlug: string | null | undefined,
-): T[] {
+export function filterBlogFeedByCity<
+  T extends Pick<BlogCardDto, 'citySlug'> & { city?: string | null; citySlugs?: string[] | null },
+>(posts: T[], citySlug: string | null | undefined): T[] {
   const target = canonicalizeBlogCitySlug(citySlug);
   if (!target) return posts;
-  return posts.filter((post) => {
-    const postSlug = canonicalizeBlogCitySlug(post.citySlug);
-    return postSlug === target;
-  });
+  return posts.filter((post) => blogPostFilterCities(post).some((hit) => hit.value === target));
 }
