@@ -224,6 +224,27 @@ test('myuzikly card exposes city badge label from static data', () => {
   assert.equal(blogListingCityBadgeLabel(card?.citySlug, card?.city), 'Москва и Петербург');
 });
 
+test('home rest-row slugs: hub excerpt from real dek, not lorem', () => {
+  const cards = staticBlogCards();
+  const expected: Record<string, string> = {
+    'moskva-immersivnye-vystavki': 'Четыре формата иммерсива',
+    'kak-vybrat-koncert': 'Танцпол, партер, балкон или VIP',
+    'afisha-regionalnye-goroda': 'Честный гид по суперсилам',
+  };
+  for (const [slug, snippet] of Object.entries(expected)) {
+    const card = cards.find((item) => item.slug === slug);
+    assert.ok(card, slug);
+    const lead = hubBlogCardExcerpt(card!.slug, card!.excerpt);
+    assert.ok(lead.includes(snippet), slug);
+    assert.ok(lead.length > 40, slug);
+    assert.ok(/[.!?…]$/u.test(lead), slug);
+    assert.ok(!/lorem/i.test(lead), slug);
+    const fromBody = hubBlogCardExcerpt(slug, '');
+    assert.ok(fromBody.length > 40, `${slug} body fallback`);
+    assert.ok(/[.!?…]$/u.test(fromBody), `${slug} body fallback`);
+  }
+});
+
 test('hubBlogCardExcerpt uses real frontmatter, 2-3 sentences, not lorem', () => {
   const cards = staticBlogCards();
   const perm = cards.find((item) => item.slug === 'perm-za-2-dnya');

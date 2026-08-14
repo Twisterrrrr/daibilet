@@ -12,7 +12,7 @@ import { HomePopularCitiesRail } from '@/components/HomePopularCitiesRail.client
 import { LuckyCityButton } from '@/components/LuckyCityButton.client';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { ScrollRail } from '@/components/ScrollRail.client';
-import { clipBlogFeaturedLead, mergeBlogCards } from '@/lib/blog-utils';
+import { clipBlogFeaturedLead, hubBlogCardExcerpt, mergeBlogCards } from '@/lib/blog-utils';
 import '@/lib/env';
 import { catalogSocialStats } from '@/lib/catalog-social-stats';
 import { formatMoney, formatNumber, pluralEvents } from '@/lib/format';
@@ -274,30 +274,46 @@ async function HomePageBody() {
 
           {restBlog.length ? (
             <div className="container-page mt-8">
-              <div className="grid gap-3 sm:grid-cols-3 sm:gap-4">
-                {restBlog.slice(0, 3).map((post) => (
-                  <Link
-                    key={post.slug}
-                    href={`/blog/${post.slug}`}
-                    className="group flex gap-4 rounded-card bg-neutral-50 p-3 transition hover:bg-[#F5F5F7] sm:flex-col sm:gap-3 sm:p-0 sm:bg-transparent"
-                  >
-                    <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-slate-200 sm:aspect-[4/3] sm:h-auto sm:w-full">
-                      <SafeImage
-                        src={post.coverImageUrl}
-                        alt=""
-                        fill
-                        sizes={IMAGE_SIZES.blogThumb}
-                        className="object-cover transition group-hover:scale-105"
-                      />
-                    </div>
-                    <div className="min-w-0 sm:px-0.5">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-primary-600">{post.tag}</p>
-                      <h3 className="mt-1 text-sm font-semibold leading-snug text-slate-900 group-hover:text-primary-700">
-                        {post.title}
-                      </h3>
-                    </div>
-                  </Link>
-                ))}
+              <div className="grid grid-cols-1 items-stretch gap-4 sm:grid-cols-3">
+                {restBlog.slice(0, 3).map((post) => {
+                  const excerpt = hubBlogCardExcerpt(post.slug, post.excerpt);
+                  return (
+                    <article
+                      key={post.slug}
+                      className="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+                    >
+                      <Link href={`/blog/${post.slug}`} aria-label={post.title} className="group flex h-full flex-col">
+                        <span className="relative block aspect-[16/9] w-full shrink-0 overflow-hidden bg-slate-100">
+                          <SafeImage
+                            src={post.coverImageUrl}
+                            alt=""
+                            fill
+                            sizes={IMAGE_SIZES.blogCard}
+                            className="object-cover object-center transition duration-300 group-hover:scale-[1.02]"
+                            fallback={
+                              <div className="flex h-full w-full items-center justify-center bg-slate-200 text-sm text-slate-500">
+                                Материал
+                              </div>
+                            }
+                          />
+                        </span>
+                        <span className="flex min-w-0 flex-1 flex-col p-3.5 sm:p-4">
+                          <h3 className="break-words text-sm font-semibold leading-snug text-slate-950 transition group-hover:text-primary-700 sm:text-base">
+                            {post.title}
+                          </h3>
+                          {excerpt ? (
+                            <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-slate-600">{excerpt}</p>
+                          ) : null}
+                          {post.tag ? (
+                            <span className="mt-auto pt-3 text-xs font-semibold uppercase tracking-wide text-primary-600">
+                              {post.tag}
+                            </span>
+                          ) : null}
+                        </span>
+                      </Link>
+                    </article>
+                  );
+                })}
               </div>
             </div>
           ) : null}
