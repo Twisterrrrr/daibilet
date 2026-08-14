@@ -1,3 +1,9 @@
+## 2026-08-14 - OG tags recrawl pack (Stage-1)
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| SEO.OG-TAGS | Absolute `https://daibilet.ru` OG pack: image/secure_url/1200x630/jpeg/alt + Twitter summary_large_image; default JPEG `default-og.jpg` (~120KB), не 2.5MB selfie | Критический | ✅ 2026-08-14 code; без live deploy |
+
 ## 2026-08-14 - /places catalog thumbs (fastloading)
 
 | ID | Задача | Приоритет | Статус |
@@ -9,6 +15,12 @@
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
 | FIX.SPB-EDITOR-COORDS | 182 SPB mustSee lat/lng/address из таблицы owner; skip 46/162; lock против yandex overwrite | Высокий | ✅ 2026-08-14 code + push; live batch |
+
+## 2026-08-14 - Perm hub: seasonal «когда ехать»
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| UX.PERM-WHEN-TO-GO | Редакционный сезон (не 7-дневный прогноз): блок «Когда ехать» под фактом/погодой | Высокий | ✅ 2026-08-14 code; Perm only; deploy batch |
 
 ## 2026-08-14 - City hub Perm: weather + identity tags + regional events
 

@@ -1,3 +1,38 @@
+## 2026-08-14 - OG tags: absolute JPEG pack (recrawl Stage-1)
+
+### Наблюдения
+- Owner: жёсткая спека для `seo-meta.ts`. Без полного OG-пакета рекроул Stage-1 блокируется.
+- Старый fallback `/images/og/my-day.jpg` был относительным; в пакете не было `og:image:type`. Default не должен быть webp/avif и не 2.5MB home-hero selfie.
+
+### Решения
+- Файл `apps/public/public/images/og/default-og.jpg`: 1200x630 JPEG, 122447 байт (рекомпресс `my-day.jpg`).
+- Helper `getOpenGraphMediaTags(customImagePath?)` в существующем `seo-meta.ts`: абсолютный URL (`DAIBILET_SITE_URL` / `NEXT_PUBLIC_SITE_URL` / `NEXT_PUBLIC_APP_URL` / `https://daibilet.ru`), `secure_url`, width 1200, height 630, type `image/jpeg`, alt, Twitter `summary_large_image`.
+- `DEFAULT_OG_IMAGE` = абсолютный default-og.jpg. `buildShareMetadata` и root `layout` идут через helper.
+- Блог: `/images/blog/{slug}-og.jpg`; нет файла → default, не 2MB cover. `/m/...` и страницы без своего фото: helper без аргумента. `/my-day` оставляет `my-day.jpg` через helper.
+- Live не выкатывали.
+
+### Проблемы
+- Нет.
+
+---
+
+## 2026-08-14 - Perm hub: сезонное «Когда ехать»
+
+### Наблюдения
+- Owner: «когда лучше ехать» - не today/tomorrow и не 7-дневный Open-Meteo, а сезонность Перми и края.
+- Микровиджет погоды сегодня/завтра + indoor/outdoor CTA оставляем: это про сегодня, не про сезон.
+
+### Решения
+- Редакционный блок «Когда ехать» под рядом «Интересный факт» / погода. Месяц берём в TZ `Asia/Yekaterinburg`.
+- Карта: 6-7 лето; 8 лето на излёте; 9 ещё загород; 10-11 дожди и грязь; 12-2 зима (Кунгур, снег, музеи); 3-5 межсезонье.
+- Конфиг в `city-hub-local-flavor.ts` (не cityInfo coords). Москва/СПб без блока, пока нет своего пака.
+- Open-Meteo не расширяли. Live не выкатывали.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-14 - /places: lean thumbs вместо full-res
 
 ### Наблюдения

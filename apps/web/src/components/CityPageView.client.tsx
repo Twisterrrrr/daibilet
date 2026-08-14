@@ -42,9 +42,11 @@ import { resolveCityImage } from '@/lib/city-images';
 import { CITY_NIGHT_HERO } from '@/lib/city-night-hero';
 import {
   cityHasWeatherWidget,
+  cityHasWhenToGo,
   cityIdentityTags,
   collectPlacesBySlugs,
   placeSlugKey,
+  resolveWhenToGoBlurb,
   suburbMatchesSlugs,
   type CityPlaceFocus,
 } from '@/lib/city-hub-local-flavor';
@@ -237,10 +239,12 @@ export function CityPageView({
   const hookFactText = guide?.hookFact?.trim() || '';
   const hubSlug = city?.slug || city?.sourceSlug || slug;
   const hasWeather = cityHasWeatherWidget(hubSlug);
+  const whenToGo = resolveWhenToGoBlurb(hubSlug);
+  const hasWhenToGo = cityHasWhenToGo(hubSlug) && Boolean(whenToGo);
   const hasIdentityTags = cityIdentityTags(hubSlug).length > 0;
   const hasPractice = hasTravel || hasFaq || practiceArticles.length > 0;
   const hasMore = hasDirections || hasVenues || moreArticles.length > 0;
-  const showSightsBlock = hasSights || hasHookFact || hasWeather || hasIdentityTags;
+  const showSightsBlock = hasSights || hasHookFact || hasWeather || hasWhenToGo || hasIdentityTags;
 
   const applyPlaceFocus = React.useCallback((focus: CityPlaceFocus | null) => {
     if (!focus?.slugs.length) {
@@ -329,7 +333,7 @@ export function CityPageView({
                   editorial ? 'border-zinc-200' : 'border-slate-100'
                 }`}
               >
-                {hasHookFact || hasWeather ? (
+                {hasHookFact || hasWeather || hasWhenToGo ? (
                   <div
                     className={`container-page pt-8 sm:pt-10 ${
                       hasSights ? 'pb-2 sm:pb-3' : 'pb-8 sm:pb-10'
@@ -349,6 +353,9 @@ export function CityPageView({
                         />
                       ) : null}
                     </div>
+                    {hasWhenToGo && whenToGo ? (
+                      <CityWhenToGoCallout body={whenToGo.body} editorial={editorial} />
+                    ) : null}
                   </div>
                 ) : null}
                 <CitySightsSection
@@ -361,7 +368,7 @@ export function CityPageView({
                   editorial={editorial}
                   articles={[]}
                   sessions={payload.sessions}
-                  compactTop={hasHookFact || hasWeather}
+                  compactTop={hasHookFact || hasWeather || hasWhenToGo}
                   placeFocus={placeFocus}
                   onPlaceFocus={applyPlaceFocus}
                 />
@@ -929,6 +936,30 @@ function CityHookFactCallout({
         }`}
       >
         {hook}
+      </p>
+    </div>
+  );
+}
+
+function CityWhenToGoCallout({
+  body,
+  editorial = false,
+}: {
+  body: string;
+  editorial?: boolean;
+}) {
+  return (
+    <div
+      className={`mt-4 rounded-2xl px-5 py-4 sm:px-6 sm:py-5 ${
+        editorial
+          ? 'bg-emerald-50 ring-1 ring-emerald-200/80'
+          : 'bg-gradient-to-br from-emerald-50 via-teal-50 to-sky-50 ring-1 ring-emerald-200/70'
+      }`}
+      data-city-when-to-go="seasonal"
+    >
+      <p className="text-xs font-semibold uppercase tracking-wide text-emerald-900">Когда ехать</p>
+      <p className={`mt-2 max-w-3xl text-sm leading-6 ${editorial ? 'text-zinc-700' : 'text-slate-700'}`}>
+        {body}
       </p>
     </div>
   );

@@ -1,8 +1,9 @@
 /**
- * Per-city hub extras: identity tags, weather coords, indoor/outdoor CTA maps.
- * Keep out of cityInfo (coords/mustSee) so other agents can edit geo without merge fights.
+ * Per-city hub extras: identity tags, weather coords, indoor/outdoor CTA maps,
+ * seasonal «когда ехать» copy. Keep out of cityInfo (coords/mustSee) so other
+ * agents can edit geo without merge fights.
  *
- * Moscow / SPB: empty tags + no weather until those packs are filled.
+ * Moscow / SPB: empty tags + no weather / whenToGo until those packs are filled.
  */
 
 import { normalizeCityHubSlug } from './city-hub-config.ts';
@@ -30,9 +31,37 @@ export type CityWeatherFlavor = {
   indoorCtaSnow: string;
 };
 
+export type CityWhenToGoSeasonId =
+  | 'winter'
+  | 'spring'
+  | 'summer'
+  | 'lateSummer'
+  | 'earlyAutumn'
+  | 'lateAutumn';
+
+export type CityWhenToGoSeason = {
+  id: CityWhenToGoSeasonId;
+  /** Calendar months 1-12 in the city time zone. */
+  months: number[];
+  body: string;
+};
+
+export type CityWhenToGoFlavor = {
+  timeZone: string;
+  seasons: CityWhenToGoSeason[];
+};
+
+export type CityWhenToGoBlurb = {
+  seasonId: CityWhenToGoSeasonId;
+  month: number;
+  body: string;
+};
+
 export type CityHubLocalFlavor = {
   tags: CityIdentityTag[];
   weather?: CityWeatherFlavor;
+  /** Editorial seasonality, not a daily weather forecast. */
+  whenToGo?: CityWhenToGoFlavor;
 };
 
 export type CityPlaceFocus = {
@@ -65,6 +94,42 @@ const PERM_WEATHER: CityWeatherFlavor = {
   indoorCtaOvercast: 'Сегодня пасмурно. Посмотрите крытые музеи, Театр-Театр или рестораны',
   indoorCtaRain: 'Сегодня дождь. Посмотрите крытые музеи, Театр-Театр или рестораны',
   indoorCtaSnow: 'Сегодня снег. Посмотрите крытые музеи, Театр-Театр или рестораны',
+};
+
+const PERM_WHEN_TO_GO: CityWhenToGoFlavor = {
+  timeZone: 'Asia/Yekaterinburg',
+  seasons: [
+    {
+      id: 'winter',
+      months: [12, 1, 2],
+      body: 'Зима в Перми честная: мороз, короткий день, набережная в снегу. «Счастье не за горами» хорошо смотрится в сугробах, Кунгурская ледяная пещера - зимняя история. Хохловку, Каменный город и Усьву в мороз тяжелее; закладывайте крытые музеи и театр, а не горные тропы.',
+    },
+    {
+      id: 'spring',
+      months: [3, 4, 5],
+      body: 'Весна в крае - межсезонье. Март и апрель: слякоть, грязь, на тропах ещё лёд. Хохловку, Каменный город и Усьву рано. Май уже теплее, но речной сезон на Каме ещё не открыт. В городе - музеи и Театр-Театр; загород лучше на июнь.',
+    },
+    {
+      id: 'summer',
+      months: [6, 7],
+      body: 'Лучшее окно на Пермь и край - июнь и июль. Кама судоходная, набережная живая, Хохловка, Каменный город и Усьва без грязи и без ранней темноты. Речной сезон не бесконечный: если едете за природой, берите эти месяцы, а не «когда-нибудь осенью».',
+    },
+    {
+      id: 'lateSummer',
+      months: [8],
+      body: 'Август ещё лето, но уже на излёте. Кама, набережная, Хохловка, Каменный город и Усьва ещё открыты - загород лучше сейчас. К сентябрю чаще дожди и короче день; речные прогулки к осени сходят.',
+    },
+    {
+      id: 'earlyAutumn',
+      months: [9],
+      body: 'Сентябрь в крае ещё терпит: лес жёлтый, в Хохловке и на Усьве народу меньше. Речной сезон на Каме уже сходит, вечера холодные. С октября тропы раскисают - если нужен загород, едьте в этом месяце, не позже.',
+    },
+    {
+      id: 'lateAutumn',
+      months: [10, 11],
+      body: 'Октябрь и ноябрь - не прогулочный сезон Прикамья. Дожди, грязь на тропах, темнеет рано. Каменный город и Усьву лучше не планировать. Крытые музеи, Театр-Театр, при желании Кунгурская пещера; набережная в морось мало радует.',
+    },
+  ],
 };
 
 const PERM_TAGS: CityIdentityTag[] = [
@@ -105,7 +170,7 @@ const PERM_TAGS: CityIdentityTag[] = [
 ];
 
 export const CITY_HUB_LOCAL_FLAVOR: Record<string, CityHubLocalFlavor> = {
-  perm: { tags: PERM_TAGS, weather: PERM_WEATHER },
+  perm: { tags: PERM_TAGS, weather: PERM_WEATHER, whenToGo: PERM_WHEN_TO_GO },
   moscow: { tags: [] },
   'saint-petersburg': { tags: [] },
 };
@@ -118,6 +183,42 @@ export function resolveCityLocalFlavor(slug: string | null | undefined): CityHub
 
 export function cityHasWeatherWidget(slug: string | null | undefined): boolean {
   return Boolean(resolveCityLocalFlavor(slug)?.weather);
+}
+
+export function cityHasWhenToGo(slug: string | null | undefined): boolean {
+  return Boolean(resolveCityLocalFlavor(slug)?.whenToGo?.seasons?.length);
+}
+
+export function calendarMonthInTimeZone(timeZone: string, at: Date = new Date()): number {
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', { timeZone, month: 'numeric' }).formatToParts(at);
+    const month = Number(parts.find((part) => part.type === 'month')?.value);
+    if (month >= 1 && month <= 12) return month;
+  } catch {
+    // Invalid TZ: fall through to UTC month.
+  }
+  return at.getUTCMonth() + 1;
+}
+
+export function pickWhenToGoSeason(
+  flavor: CityWhenToGoFlavor,
+  month: number,
+): CityWhenToGoSeason | null {
+  if (!Number.isInteger(month) || month < 1 || month > 12) return null;
+  return flavor.seasons.find((season) => season.months.includes(month)) || null;
+}
+
+export function resolveWhenToGoBlurb(
+  slug: string | null | undefined,
+  at: Date = new Date(),
+): CityWhenToGoBlurb | null {
+  const flavor = resolveCityLocalFlavor(slug)?.whenToGo;
+  if (!flavor) return null;
+  const month = calendarMonthInTimeZone(flavor.timeZone, at);
+  const season = pickWhenToGoSeason(flavor, month);
+  const body = season?.body?.trim();
+  if (!season || !body) return null;
+  return { seasonId: season.id, month, body };
 }
 
 export function cityIdentityTags(slug: string | null | undefined): CityIdentityTag[] {

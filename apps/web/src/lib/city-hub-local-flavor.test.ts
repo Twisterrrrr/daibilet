@@ -5,10 +5,12 @@ import { fileURLToPath } from 'node:url';
 
 import {
   cityHasWeatherWidget,
+  cityHasWhenToGo,
   cityIdentityTags,
   collectPlacesBySlugs,
   placeSlugKey,
   resolveCityLocalFlavor,
+  resolveWhenToGoBlurb,
   suburbMatchesSlugs,
 } from './city-hub-local-flavor.ts';
 
@@ -84,4 +86,50 @@ test('collectPlacesBySlugs keeps tag order and drops unknown', () => {
     ['permskaya-galereya', 'muzej-hohlovka', 'perm-kungurskaya-ledyanaya-peshchera'],
   );
   assert.equal(suburbMatchesSlugs(suburbs[0], ['muzej-hohlovka']), true);
+});
+
+test('when-to-go is Perm-only editorial seasonality, not a daily forecast', () => {
+  assert.equal(cityHasWhenToGo('perm'), true);
+  assert.equal(cityHasWhenToGo('moscow'), false);
+  assert.equal(cityHasWhenToGo('saint-petersburg'), false);
+  const flavor = resolveCityLocalFlavor('perm')?.whenToGo;
+  assert.ok(flavor);
+  assert.equal(flavor.timeZone, 'Asia/Yekaterinburg');
+  const covered = flavor.seasons.flatMap((season) => season.months).sort((a, b) => a - b);
+  assert.deepEqual(covered, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  for (const season of flavor.seasons) {
+    assert.equal(season.body.includes('\u2014'), false, season.id);
+    assert.equal(season.body.includes('\u2013'), false, season.id);
+  }
+});
+
+test('Perm when-to-go maps months to honest seasonal copy', () => {
+  const august = resolveWhenToGoBlurb('perm', new Date('2026-08-14T08:00:00Z'));
+  assert.equal(august?.seasonId, 'lateSummer');
+  assert.equal(august?.month, 8);
+  assert.match(august?.body || '', /Август/);
+  assert.match(august?.body || '', /Хохловка/);
+  assert.match(august?.body || '', /Усьва/);
+
+  const january = resolveWhenToGoBlurb('perm', new Date('2026-01-15T12:00:00Z'));
+  assert.equal(january?.seasonId, 'winter');
+  assert.match(january?.body || '', /Кунгурская ледяная пещера/);
+  assert.match(january?.body || '', /мороз/);
+
+  const may = resolveWhenToGoBlurb('perm', new Date('2026-05-10T12:00:00Z'));
+  assert.equal(may?.seasonId, 'spring');
+  assert.match(may?.body || '', /межсезонье/);
+
+  const june = resolveWhenToGoBlurb('perm', new Date('2026-06-20T12:00:00Z'));
+  assert.equal(june?.seasonId, 'summer');
+  assert.match(june?.body || '', /июнь и июль/);
+
+  const september = resolveWhenToGoBlurb('perm', new Date('2026-09-05T12:00:00Z'));
+  assert.equal(september?.seasonId, 'earlyAutumn');
+
+  const november = resolveWhenToGoBlurb('perm', new Date('2026-11-02T12:00:00Z'));
+  assert.equal(november?.seasonId, 'lateAutumn');
+  assert.match(november?.body || '', /гряз/);
+
+  assert.equal(resolveWhenToGoBlurb('moscow', new Date('2026-08-14T08:00:00Z')), null);
 });
