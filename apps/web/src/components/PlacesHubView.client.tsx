@@ -783,13 +783,14 @@ export function PlacesHubView({
               <InstitutionList venues={venues} hrefFor={venueHref} />
             ) : (
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-                {venues.map((venue) =>
+                {venues.map((venue, index) =>
                   venuePageTemplate(venue.type) === 'institution' ? (
                     <InstitutionCard
                       key={venue.id}
                       venue={venue}
                       href={venueHref(venue)}
                       hideCity={hideCityOnCards}
+                      priority={index < 3}
                     />
                   ) : (
                     <LocationCard
@@ -797,6 +798,7 @@ export function PlacesHubView({
                       venue={venue}
                       href={venueHref(venue)}
                       hideCity={hideCityOnCards}
+                      priority={index < 3}
                     />
                   ),
                 )}

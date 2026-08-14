@@ -13,7 +13,9 @@ export const IMAGE_SIZES = {
   /** Editorial city hub poster 4:5 */
   affichePoster: '(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw',
   cityCard: '(max-width: 640px) 68vw, (max-width: 1024px) 218px, 229px',
-  institutionCard: '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw',
+  /** /places + venue/location cards: 1 / 2 / 3 col, not 100vw */
+  institutionCard: '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw',
+  placeCard: '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw',
   landingCard: '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw',
   /** Full-width city-hub / catalog landing banners */
   landingBanner: '100vw',
@@ -62,6 +64,8 @@ export function SafeImage({
   }
 
   // Local /images/* and external CDNs (teplohod, ticketscloud): browser fetches directly.
+  // Catalog cards must use venueCardImageUrl() (~640px -thumb) because this bypass
+  // cannot resize 2-3MB editorial JPGs.
   const bypassOptimizer = shouldBypassNextImageOptimizer(normalized);
 
   return (

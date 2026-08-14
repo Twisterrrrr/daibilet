@@ -1,3 +1,22 @@
+## 2026-08-14 - /places: lean thumbs вместо full-res
+
+### Наблюдения
+- Owner: в `/places` нет превью, карточки тянут full-res. My Day музеи уже lean (~640px, 40-80KB); каталог мест - нет.
+- На диске 908 editorial JPG в `apps/public/public/images/venues`: медиана ~2.6MB, 799 файлов ≥2MB (пик ~4MB). SafeImage для `/images/*` ставит `unoptimized` (INC.504.2, nginx alias) - `sizes` не режет байты.
+- Карточки `LocationCard` / `InstitutionCard` брали `heroImageUrl` как есть. Градиент-fallback при пустом src уже был.
+
+### Решения
+- Sibling `-thumb.jpg` ~640px JPEG q70 (медиана **45KB**). Каталог: `venueCardImageUrl` в карточках и `toVenueCatalogCard`. PDP/hero остаётся на editorial path, сжатом до max **1200px** (было 2239MB → 140MB originals + 41MB thumbs).
+- `IMAGE_SIZES.placeCard` = 1/2/3 col (не 100vw / не 25vw). `priority` только у первой ряда (3-4 карточки), остальное lazy.
+- Скрипт `scripts/lean-venue-catalog-images.py` (Pillow; mjs-вариант под sharp). GenerateImage не гоняли.
+- Live не выкатывали (batch sibling).
+
+### Проблемы
+- `/_next/image` для локальных `/images/*` по-прежнему нельзя включать на MSK (504). Без `-thumb` сетка снова упрётся в nginx original.
+- Пустые карточки без editorial/hub фото по-прежнему градиент типа, не fake full-bleed.
+
+---
+
 ## 2026-08-14 - SPB mustSee: 182 editor coords from owner table
 
 ### Наблюдения

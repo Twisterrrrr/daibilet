@@ -62,8 +62,13 @@ export function HomeVenuesSection({ venues }: { venues: PublicVenueDto[] }) {
           </Link>
         </div>
         <div className={`mt-6 grid gap-4 sm:grid-cols-2 ${balancedTileGridClass(homeVenues.length, { lg: 4 })}`}>
-          {homeVenues.map((venue) => (
-            <InstitutionCard key={venue.id} venue={venue} href={venueHref(venue)} />
+          {homeVenues.map((venue, index) => (
+            <InstitutionCard
+              key={venue.id}
+              venue={venue}
+              href={venueHref(venue)}
+              priority={index < 4}
+            />
           ))}
         </div>
       </div>

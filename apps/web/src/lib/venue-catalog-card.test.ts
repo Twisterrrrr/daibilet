@@ -34,7 +34,7 @@ test('toVenueCatalogCard prefers editorial cover over hub stub', () => {
   });
   assert.equal(
     card.heroImageUrl,
-    '/images/venues/saint-petersburg/dvortsovaya-ploschad.jpg',
+    '/images/venues/saint-petersburg/dvortsovaya-ploschad-thumb.jpg',
   );
 });
 

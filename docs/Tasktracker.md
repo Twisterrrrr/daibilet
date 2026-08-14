@@ -1,3 +1,9 @@
+## 2026-08-14 - /places catalog thumbs (fastloading)
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| PERF.PLACES-THUMBS | Карточки `/places`: не грузить 2-4MB JPG; sibling `-thumb` ~640px + hero cap 1200px; sizes/priority первой ряда | Критический | ✅ 2026-08-14 code; типичный thumb ~45KB (было ~2.6MB); без live deploy |
+
 ## 2026-08-14 - SPB mustSee owner editor coords
 
 | ID | Задача | Приоритет | Статус |

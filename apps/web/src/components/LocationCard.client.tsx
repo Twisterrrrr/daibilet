@@ -7,6 +7,7 @@ import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import { PlaceFavoriteButton } from '@/components/PlaceFavoriteButton.client';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { formatStreetAddress } from '@/lib/address';
+import { venueCardImageUrl } from '@/lib/venue-card-image';
 import { dayRouteHookLine } from '@/lib/day-route-from-place';
 import { pluralEvents } from '@/lib/format';
 import type { VenueCatalogCard } from '@/lib/venue-map-types';
@@ -93,6 +94,7 @@ export function LocationCard({
   href,
   hideCity = false,
   showFamilyTag = false,
+  priority = false,
 }: {
   venue: VenueCatalogCard;
   href: string;
@@ -100,7 +102,10 @@ export function LocationCard({
   hideCity?: boolean;
   /** Mixed /places grid: show «Локация» on the photo. */
   showFamilyTag?: boolean;
+  /** First-row LCP only - never the whole grid. */
+  priority?: boolean;
 }) {
+  const coverSrc = venueCardImageUrl(venue.heroImageUrl);
   const kind = normalizeVenueKind(venue.type);
   const publicType = resolvePublicVenueType(venue.type, venue.name);
   const typeLabel = venueTypeLabel(publicType, venue.name);
@@ -148,7 +153,7 @@ export function LocationCard({
     cityId: venue.cityId,
     citySlug: venue.citySlug,
     href,
-    imageUrl: venue.heroImageUrl,
+    imageUrl: coverSrc,
     address: venue.address,
     latitude: venue.latitude,
     longitude: venue.longitude,
@@ -159,10 +164,11 @@ export function LocationCard({
       <div className="relative aspect-video shrink-0 overflow-hidden bg-surface-muted">
         <Link href={href} className="absolute inset-0 no-underline" aria-label={displayName}>
           <SafeImage
-            src={venue.heroImageUrl}
+            src={coverSrc}
             alt=""
             fill
-            sizes={IMAGE_SIZES.institutionCard}
+            sizes={IMAGE_SIZES.placeCard}
+            priority={priority}
             className="object-cover transition duration-500 group-hover:scale-[1.03]"
             fallback={<div className={`h-full w-full bg-gradient-to-br ${gradient}`} />}
           />
@@ -182,7 +188,7 @@ export function LocationCard({
             slug: venue.slug,
             name: displayName,
             href,
-            imageUrl: venue.heroImageUrl,
+            imageUrl: coverSrc,
             city: venue.city,
           }}
         />

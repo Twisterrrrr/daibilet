@@ -1,4 +1,5 @@
 import { resolveVenueHeroImage } from './city-place-images';
+import { venueCardImageUrl } from './venue-card-image';
 import type { VenueCatalogCard } from './venue-map-types';
 
 type VenueCatalogSource = {
@@ -64,7 +65,7 @@ export function toVenueCatalogCard(venue: VenueCatalogSource): VenueCatalogCard 
     events: venue.events || 0,
     hookFact: venue.hookFact ?? null,
     shortDescription: venue.shortDescription ?? null,
-    heroImageUrl: resolveVenueHeroImage(slug, venue.heroImageUrl),
+    heroImageUrl: venueCardImageUrl(resolveVenueHeroImage(slug, venue.heroImageUrl)),
     nextSlot: venue.nextSlot ?? null,
     metroStation: venue.metroStation ?? null,
     wayToFind: venue.wayToFind ?? null,
