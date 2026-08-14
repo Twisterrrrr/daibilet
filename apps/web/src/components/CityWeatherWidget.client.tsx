@@ -142,16 +142,17 @@ export function CityWeatherWidget({ citySlug, cityIn, editorial = false }: Props
           : 'bg-white shadow-[0_4px_12px_rgba(15,23,42,0.06)] ring-1 ring-slate-200/80'
       }`}
       data-city-weather={state.status}
+      data-city-weather-layout="fused"
     >
       <div
         className={
           twoCol
-            ? 'grid flex-1 gap-5 md:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] md:items-start md:gap-6'
+            ? 'grid flex-1 gap-5 md:grid-cols-[minmax(11rem,13.5rem)_minmax(0,1fr)] md:items-stretch md:gap-0'
             : 'min-w-0'
         }
       >
         {showForecast && today ? (
-          <div className="min-w-0">
+          <div className={twoCol ? 'min-w-0 md:pr-6' : 'min-w-0'}>
             <h2 className={kickerClass}>{title}</h2>
             <div
               className={`mt-3 flex flex-col gap-3 rounded-xl p-4 ${forecastBox}`}
@@ -196,7 +197,11 @@ export function CityWeatherWidget({ citySlug, cityIn, editorial = false }: Props
         ) : null}
 
         {hasSeasons && whenToGo ? (
-          <div className="min-w-0">
+          <div
+            className={
+              twoCol ? `min-w-0 md:border-l md:pl-6 ${forecastRule}` : 'min-w-0'
+            }
+          >
             <h3 id="seasons-title" className={kickerClass}>
               Когда ехать
             </h3>

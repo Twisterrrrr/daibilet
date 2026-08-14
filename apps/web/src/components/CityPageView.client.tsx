@@ -389,11 +389,15 @@ export function CityPageView({
                       hasSights ? 'pb-2 sm:pb-3' : 'pb-8 sm:pb-10'
                     }`}
                   >
+                    {/* Two outer columns only: fact ~40% | fused weather+when-to-go ~60%. Never a third outer card. */}
                     <div
                       className={
                         hasHookFact && (hasWeather || hasWhenToGo)
                           ? 'flex flex-col gap-4 md:grid md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] md:items-stretch'
                           : ''
+                      }
+                      data-city-hub-fact-weather={
+                        hasHookFact && (hasWeather || hasWhenToGo) ? 'fact-fused' : undefined
                       }
                     >
                       {hasHookFact ? (
@@ -448,6 +452,18 @@ export function CityPageView({
                   placeFocus={placeFocus}
                   onPlaceFocus={applyPlaceFocus}
                   includeSuburbs={!afficheBeforeSuburbs}
+                  beforeScenarios={
+                    hasLifehacks ? (
+                      <CityLifehacksSection
+                        citySlug={hubSlug}
+                        cityName={city.name}
+                        editorial={editorial}
+                        className="mt-10"
+                        onPlaceFocus={applyPlaceFocus}
+                        onAffiche={() => scrollToSection('affiche')}
+                      />
+                    ) : null
+                  }
                 />
               </div>
             ) : null}
@@ -519,7 +535,7 @@ export function CityPageView({
               <RegionNearbyStrip nearby={payload.regionNearby} editorial={editorial} />
             ) : null}
 
-            {hasPractice ? (
+            {hasPracticeContent ? (
               <section
                 id="practice"
                 className={`border-b ${editorial ? 'border-zinc-200' : 'border-slate-200/80'} ${SECTION_SCROLL_MT}`}
@@ -532,23 +548,11 @@ export function CityPageView({
                         : 'text-2xl font-bold tracking-tight text-slate-950 sm:text-[1.75rem]'
                     }
                   >
-                    {hasLifehacks && city?.name
-                      ? `Лайфхаки ${poCityDative(city.name)}: как сберечь бюджет`
-                      : 'Советы'}
+                    Советы
                   </h2>
-                  {hasLifehacks ? null : (
-                    <p className={`mt-2 max-w-3xl text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-                      Как добраться, когда ехать и ответы на частые вопросы.
-                    </p>
-                  )}
-                  {hasLifehacks ? (
-                    <CityLifehacksSection
-                      citySlug={hubSlug}
-                      editorial={editorial}
-                      onPlaceFocus={(focus) => applyPlaceFocus(focus)}
-                      onAffiche={() => scrollToSection('affiche')}
-                    />
-                  ) : null}
+                  <p className={`mt-2 max-w-3xl text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+                    Как добраться, когда ехать и ответы на частые вопросы.
+                  </p>
                 </div>
                 {showTravel ? (
                   <CityTravelSection travel={guide?.travel} editorial={editorial} nested />
