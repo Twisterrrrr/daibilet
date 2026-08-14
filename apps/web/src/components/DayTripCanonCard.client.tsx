@@ -339,21 +339,39 @@ export function DayTripCanonCard({
       data-day-trip-has-cover={cover ? '1' : '0'}
       {...dataProps}
     >
+      <div
+        className={
+          cover
+            ? 'flex flex-col sm:grid sm:grid-cols-[minmax(15rem,40%)_minmax(0,1fr)] sm:items-stretch'
+            : undefined
+        }
+      >
       {cover ? (
-        <div className="relative h-40 w-full bg-[#F5F5F7] sm:h-44" data-day-trip-cover>
+        <div className="relative h-44 w-full bg-[#F5F5F7] sm:h-auto sm:min-h-[18rem]" data-day-trip-cover>
           <SafeImage
             src={cover}
             alt=""
             fill
-            sizes="(max-width: 768px) 100vw, 720px"
+            sizes="(max-width: 640px) 100vw, 40vw"
             className="object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/20 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/25 via-transparent to-transparent sm:bg-gradient-to-r sm:from-transparent sm:to-slate-950/10" />
+          <span
+            className="absolute left-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/95 text-sm font-bold tabular-nums text-slate-900 shadow-sm"
+            data-day-trip-badge
+          >
+            {index + 1}
+          </span>
         </div>
       ) : null}
-      <div className="px-3.5 py-4 sm:p-5 md:p-6">
-      {/* Title row: badge in gutter, title on text vertical. */}
-      <div className={GRID} data-day-trip-head>
+      <div
+        className={`px-3.5 py-4 sm:p-5 md:p-6 ${
+          cover ? (editorial ? 'bg-zinc-50' : 'bg-slate-50') : ''
+        }`}
+      >
+      {/* Title row: badge in gutter unless the cover already shows it. */}
+      <div className={cover ? 'min-w-0' : GRID} data-day-trip-head>
+        {cover ? null : (
         <div className={`${GUTTER} pt-0.5`} data-day-trip-gutter>
           <span
             className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold tabular-nums sm:h-9 sm:w-9 ${badgeClass}`}
@@ -362,6 +380,7 @@ export function DayTripCanonCard({
             {index + 1}
           </span>
         </div>
+        )}
         <div className="min-w-0" data-day-trip-content>
           <header>
             <h3
@@ -519,6 +538,7 @@ export function DayTripCanonCard({
           </div>
         </div>
       ) : null}
+      </div>
       </div>
     </article>
   );

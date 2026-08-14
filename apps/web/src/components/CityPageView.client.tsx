@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { ArrowLeft, ArrowRight, MapPin, Ticket } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, MapPin, Ticket } from 'lucide-react';
 import Link from 'next/link';
 
 import { CityHubArticlesGrid } from '@/components/CityHubArticleTeaser.client';
@@ -381,7 +381,11 @@ export function CityPageView({
                       }
                     >
                       {hasWeather || hasWhenToGo ? (
-                        <div className={hasHookFact ? 'md:w-[42%] md:shrink-0 [&>*]:h-full' : ''}>
+                        <div
+                          className={
+                            hasHookFact ? 'md:order-2 md:w-[42%] md:shrink-0 [&>*]:h-full' : ''
+                          }
+                        >
                           <CityWeatherWidget
                             citySlug={hubSlug}
                             cityIn={cityInPrepositional(city)}
@@ -390,7 +394,13 @@ export function CityPageView({
                         </div>
                       ) : null}
                       {hasHookFact ? (
-                        <div className={hasWeather || hasWhenToGo ? 'md:min-w-0 md:flex-1 [&>*]:h-full' : ''}>
+                        <div
+                          className={
+                            hasWeather || hasWhenToGo
+                              ? 'md:order-1 md:min-w-0 md:flex-1 [&>*]:h-full'
+                              : ''
+                          }
+                        >
                           <CityHookFactCallout hook={hookFactText} editorial={editorial} />
                         </div>
                       ) : null}
@@ -1021,16 +1031,16 @@ function CityHookFactCallout({
       className={`relative flex h-full flex-col overflow-hidden rounded-2xl px-5 py-5 sm:px-6 sm:py-6 ${
         editorial
           ? 'bg-white ring-1 ring-zinc-200'
-          : 'bg-white shadow-[0_4px_12px_rgba(15,23,42,0.06)] ring-1 ring-slate-200/80'
+          : 'bg-amber-50/80 shadow-[0_4px_12px_rgba(15,23,42,0.06)] ring-1 ring-amber-100'
       }`}
     >
       <span
-        className={`absolute inset-y-0 left-0 w-1 ${editorial ? 'bg-zinc-900' : 'bg-slate-900'}`}
+        className={`absolute inset-y-0 left-0 w-1.5 ${editorial ? 'bg-zinc-900' : 'bg-amber-400'}`}
         aria-hidden
       />
       <p
         className={`pl-2 text-[11px] font-semibold uppercase tracking-[0.16em] ${
-          editorial ? 'text-zinc-500' : 'text-slate-500'
+          editorial ? 'text-zinc-500' : 'text-amber-800'
         }`}
       >
         Интересный факт
@@ -1323,16 +1333,22 @@ function CitySightsSection({
     <section
       className={`container-page ${compactTop ? 'pt-6 pb-10' : 'py-10'}`}
     >
-      <h2
-        className={
-          editorial
-            ? 'font-serif text-3xl font-semibold text-zinc-950 sm:text-4xl'
-            : 'text-2xl font-bold text-slate-950'
-        }
-      >
-        {sectionTitle}
-      </h2>
-      {activeFocus ? (
+      {places.length || hasNamedScenarios ? (
+        <CitySightsMustSeeList
+          heading={sectionTitle}
+          places={places}
+          venues={venues}
+          city={city}
+          editorial={editorial}
+          namedPresets={namedPresets}
+          landingRows={landingRows}
+          categories={categories}
+          citySlug={citySlug}
+          titleClass={titleClass}
+          focusSlugs={activeFocus?.slugs || []}
+          onClearFocus={() => onPlaceFocus?.(null)}
+          focusBanner={
+            activeFocus ? (
         <div
           className={`mt-4 flex flex-wrap items-center gap-2 rounded-2xl border px-4 py-3 ${
             editorial ? 'border-zinc-200 bg-white' : 'border-slate-200 bg-slate-50'
@@ -1352,22 +1368,20 @@ function CitySightsSection({
             Сбросить
           </button>
         </div>
-      ) : null}
-      {places.length || hasNamedScenarios ? (
-        <CitySightsMustSeeList
-          places={places}
-          venues={venues}
-          city={city}
-          editorial={editorial}
-          namedPresets={namedPresets}
-          landingRows={landingRows}
-          categories={categories}
-          citySlug={citySlug}
-          titleClass={titleClass}
-          focusSlugs={activeFocus?.slugs || []}
-          onClearFocus={() => onPlaceFocus?.(null)}
+            ) : null
+          }
         />
-      ) : null}
+      ) : (
+        <h2
+          className={
+            editorial
+              ? 'font-serif text-3xl font-semibold text-zinc-950 sm:text-4xl'
+              : 'text-2xl font-bold text-slate-950'
+          }
+        >
+          {sectionTitle}
+        </h2>
+      )}
       {suburbs.length ? (
         <SuburbsCarousel
           places={suburbs}
@@ -1402,6 +1416,7 @@ function CitySightsSection({
 }
 
 function CitySightsMustSeeList({
+  heading,
   places,
   venues,
   city,
@@ -1413,7 +1428,9 @@ function CitySightsMustSeeList({
   titleClass,
   focusSlugs = [],
   onClearFocus,
+  focusBanner = null,
 }: {
+  heading: string;
   places: CityMustSeeItem[];
   venues: PublicVenueDto[];
   city: PublicCityDto;
@@ -1431,6 +1448,7 @@ function CitySightsMustSeeList({
   titleClass: string;
   focusSlugs?: string[];
   onClearFocus?: () => void;
+  focusBanner?: React.ReactNode;
 }) {
   const hasNamedScenarios = Boolean(namedPresets?.length);
   const showPlacesRail = places.length > 0;
@@ -1491,14 +1509,12 @@ function CitySightsMustSeeList({
   const railRef = React.useRef<HTMLDivElement>(null);
   const [canPrev, setCanPrev] = React.useState(false);
   const [canNext, setCanNext] = React.useState(false);
-  const [hasOverflow, setHasOverflow] = React.useState(false);
 
   const syncRail = React.useCallback(() => {
     const el = railRef.current;
     if (!el) return;
     const { scrollLeft, scrollWidth, clientWidth } = el;
     const overflow = scrollWidth > clientWidth + 4;
-    setHasOverflow(overflow);
     setCanPrev(overflow && scrollLeft > 4);
     setCanNext(overflow && scrollLeft + clientWidth < scrollWidth - 4);
   }, []);
@@ -1530,11 +1546,47 @@ function CitySightsMustSeeList({
   };
 
   const arrowClass =
-    'absolute top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200/90 bg-white/95 text-slate-700 shadow-md backdrop-blur transition-[opacity,colors] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:ring-offset-2 md:inline-flex';
-  const showRailArrows = !sparseGrid && hasOverflow;
+    'inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 disabled:pointer-events-none disabled:opacity-40';
+  const showRailArrows = showPlacesRail && !sparseGrid;
 
   return (
     <>
+      <div className="flex items-end justify-between gap-3">
+        <h2
+          className={
+            editorial
+              ? 'font-serif text-3xl font-semibold text-zinc-950 sm:text-4xl'
+              : 'text-2xl font-bold text-slate-950'
+          }
+        >
+          {heading}
+        </h2>
+        {showRailArrows ? (
+          <div className="flex shrink-0 gap-2">
+            <button
+              type="button"
+              data-city-must-see-prev
+              aria-label="Предыдущие места"
+              disabled={!canPrev}
+              onClick={() => scrollPage(-1)}
+              className={arrowClass}
+            >
+              <ChevronLeft className="h-4 w-4" aria-hidden />
+            </button>
+            <button
+              type="button"
+              data-city-must-see-next
+              aria-label="Следующие места"
+              disabled={!canNext}
+              onClick={() => scrollPage(1)}
+              className={arrowClass}
+            >
+              <ChevronRight className="h-4 w-4" aria-hidden />
+            </button>
+          </div>
+        ) : null}
+      </div>
+      {focusBanner}
       {showPlacesRail ? (
         <>
       <MustSeeFilterTabs
@@ -1689,42 +1741,6 @@ function CitySightsMustSeeList({
         })}
         </ol>
         </div>
-        <button
-          type="button"
-          data-city-must-see-prev
-          aria-label="Предыдущие места"
-          aria-disabled={!canPrev}
-          tabIndex={canPrev ? 0 : -1}
-          disabled={!canPrev}
-          onClick={() => scrollPage(-1)}
-          className={`${arrowClass} left-1 ${
-            showRailArrows
-              ? canPrev
-                ? 'opacity-100 hover:bg-white hover:text-slate-950'
-                : 'pointer-events-none opacity-40'
-              : 'pointer-events-none opacity-0'
-          }`}
-        >
-          <ArrowLeft className="h-5 w-5" aria-hidden />
-        </button>
-        <button
-          type="button"
-          data-city-must-see-next
-          aria-label="Следующие места"
-          aria-disabled={!canNext}
-          tabIndex={canNext ? 0 : -1}
-          disabled={!canNext}
-          onClick={() => scrollPage(1)}
-          className={`${arrowClass} right-1 ${
-            showRailArrows
-              ? canNext
-                ? 'opacity-100 hover:bg-white hover:text-slate-950'
-                : 'pointer-events-none opacity-40'
-              : 'pointer-events-none opacity-0'
-          }`}
-        >
-          <ArrowRight className="h-5 w-5" aria-hidden />
-        </button>
       </div>
         </>
       ) : null}

@@ -127,21 +127,6 @@ export function CityIdentityCarousel({ citySlug, editorial = false, sectionId, o
           </article>
         ))}
       </div>
-      {slides.length > 1 ? (
-        <div className="mt-3 flex justify-center gap-1.5" aria-hidden>
-          {slides.map((slide, i) => (
-            <button
-              key={slide.id}
-              type="button"
-              aria-label={`Слайд ${i + 1}`}
-              onClick={() => scrollTo(i)}
-              className={`h-1.5 rounded-full transition ${
-                i === index ? 'w-5 bg-slate-900' : 'w-1.5 bg-slate-300'
-              }`}
-            />
-          ))}
-        </div>
-      ) : null}
     </section>
   );
 }

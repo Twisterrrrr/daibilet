@@ -123,71 +123,47 @@ export function CityWeatherWidget({ citySlug, cityIn, editorial = false }: Props
 
   return (
     <div
-      className={`flex h-full flex-col overflow-hidden rounded-2xl bg-white ${
+      className={`flex h-full flex-col overflow-hidden rounded-2xl ${
         editorial
-          ? 'ring-1 ring-zinc-200'
-          : 'shadow-[0_4px_12px_rgba(15,23,42,0.06)] ring-1 ring-slate-200/80'
+          ? 'bg-white ring-1 ring-zinc-200'
+          : 'bg-white shadow-[0_4px_12px_rgba(15,23,42,0.06)] ring-1 ring-slate-200/80'
       }`}
       data-city-weather={state.status}
     >
       {showForecast && today ? (
-        <div className="px-5 pt-5">
-          <p
-            className={`text-[11px] font-semibold uppercase tracking-[0.16em] ${
-              editorial ? 'text-zinc-500' : 'text-slate-500'
-            }`}
-          >
-            {title}
-          </p>
-          <div
-            className={`mt-3 rounded-xl px-4 py-3 ${editorial ? 'bg-zinc-50' : 'bg-slate-50'}`}
-            data-city-weather-forecast="ready"
-          >
+        <div
+          className={
+            editorial
+              ? 'bg-zinc-900 px-5 pt-5 pb-4 text-white'
+              : 'bg-gradient-to-br from-sky-400 via-sky-500 to-indigo-500 px-5 pt-5 pb-4 text-white'
+          }
+        >
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/70">{title}</p>
+          <div className="mt-3" data-city-weather-forecast="ready">
             <div className="flex items-center justify-between gap-3">
               <div className="flex min-w-0 items-center gap-3">
-                <WeatherGlyph
-                  code={today.weatherCode}
-                  className={`h-9 w-9 shrink-0 ${editorial ? 'text-zinc-800' : 'text-slate-800'}`}
-                />
+                <WeatherGlyph code={today.weatherCode} className="h-9 w-9 shrink-0 text-white" />
                 <div className="min-w-0">
-                  <p className={`text-[2rem] font-semibold leading-none tracking-tight ${editorial ? 'text-zinc-950' : 'text-slate-950'}`}>
-                    {temp || '-'}
-                  </p>
-                  <p className={`mt-1 text-xs ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}>
-                    {weatherConditionLine(today.weatherCode)}
-                  </p>
+                  <p className="text-[2rem] font-semibold leading-none tracking-tight">{temp || '-'}</p>
+                  <p className="mt-1 text-xs text-white/85">{weatherConditionLine(today.weatherCode)}</p>
                 </div>
               </div>
               <div className="flex shrink-0 flex-col gap-2 text-right">
                 {tomorrow ? (
                   <div className="flex items-center justify-end gap-1.5">
-                    <WeatherGlyph
-                      code={tomorrow.weatherCode}
-                      className={`h-4 w-4 ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}
-                    />
+                    <WeatherGlyph code={tomorrow.weatherCode} className="h-4 w-4 text-white/90" />
                     <div>
-                      <p className={`text-[10px] font-semibold uppercase tracking-wide ${editorial ? 'text-zinc-400' : 'text-slate-400'}`}>
-                        Завтра
-                      </p>
-                      <p className={`text-sm font-semibold leading-none ${editorial ? 'text-zinc-800' : 'text-slate-800'}`}>
-                        {dayTemp(tomorrow) || '-'}
-                      </p>
+                      <p className="text-[10px] font-semibold uppercase tracking-wide text-white/65">Завтра</p>
+                      <p className="text-sm font-semibold leading-none">{dayTemp(tomorrow) || '-'}</p>
                     </div>
                   </div>
                 ) : null}
                 {dayAfter ? (
                   <div className="flex items-center justify-end gap-1.5">
-                    <WeatherGlyph
-                      code={dayAfter.weatherCode}
-                      className={`h-4 w-4 ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}
-                    />
+                    <WeatherGlyph code={dayAfter.weatherCode} className="h-4 w-4 text-white/90" />
                     <div>
-                      <p className={`text-[10px] font-semibold uppercase tracking-wide ${editorial ? 'text-zinc-400' : 'text-slate-400'}`}>
-                        Послезавтра
-                      </p>
-                      <p className={`text-sm font-semibold leading-none ${editorial ? 'text-zinc-800' : 'text-slate-800'}`}>
-                        {dayTemp(dayAfter) || '-'}
-                      </p>
+                      <p className="text-[10px] font-semibold uppercase tracking-wide text-white/65">Послезавтра</p>
+                      <p className="text-sm font-semibold leading-none">{dayTemp(dayAfter) || '-'}</p>
                     </div>
                   </div>
                 ) : null}
@@ -228,7 +204,7 @@ export function CityWeatherWidget({ citySlug, cityIn, editorial = false }: Props
                     active
                       ? editorial
                         ? 'bg-zinc-900 text-white'
-                        : 'bg-slate-900 text-white'
+                        : 'bg-sky-500 text-white'
                       : editorial
                         ? 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'

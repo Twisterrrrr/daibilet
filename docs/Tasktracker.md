@@ -1,3 +1,12 @@
+## 2026-08-14 - Hub chrome: fact/weather swap + suburb split
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| UX.HUB-FACT-WEATHER-SWAP | Факт слева, погода справа; вернуть градиент/янтарь | Высокий | ✅ git, без live deploy |
+| UX.HUB-IDENTITY-DOTS | Убрать точки под каруселью уникальности | Высокий | ✅ git, без live deploy |
+| UX.HUB-WHY-GO-ARROWS | Стрелки в шапке «Зачем ехать» | Высокий | ✅ git, без live deploy |
+| UX.HUB-SUBURB-SPLIT | Пригород: фото слева, описание справа | Высокий | ✅ git, без live deploy |
+
 ## 2026-08-14 - City hub: tourist affiche + Perm IA
 
 | ID | Задача | Приоритет | Статус |
