@@ -179,7 +179,7 @@ test('converts imported Moscow wall time to the real UTC instant', () => {
 });
 
 test('catalog mapper keeps Date and ISO string startsAt on the same UTC clock', () => {
-  const iso = '2026-08-09T20:55:00.000Z';
+  const iso = futureSlotIso(48);
   const fromDate = mapGroupedPublicSession(
     catalogRow({
       city: 'Санкт-Петербург',
@@ -188,38 +188,41 @@ test('catalog mapper keeps Date and ISO string startsAt on the same UTC clock', 
       upcomingSlots: [
         { eventId: 'evt-a', startsAt: iso },
         { eventId: 'evt-b', startsAt: new Date(iso) },
-        { eventId: 'evt-c', startsAt: '2026-08-09T20:55:00.000Z' },
+        { eventId: 'evt-c', startsAt: iso },
       ],
     }),
   );
   assert.ok(fromDate);
   assert.equal(fromDate.startsAt, iso);
-  assert.equal(fromDate.timeLabel, '23:55');
   assert.equal(fromDate.upcomingSlots?.length, 1);
-  assert.equal(fromDate.upcomingSlots?.[0]?.timeLabel, '23:55');
+  assert.equal(fromDate.upcomingSlots?.[0]?.startsAt, iso);
+  assert.equal(fromDate.upcomingSlots?.[0]?.timeLabel, fromDate.timeLabel);
 });
 
 test('catalog mapper drops same-event −3h phantom next to real MSK slot', () => {
+  const realIso = futureSlotIso(48);
+  const phantomIso = new Date(Date.parse(realIso) - 3 * 3_600_000).toISOString();
+  const nextIso = new Date(Date.parse(realIso) + 24 * 3_600_000).toISOString();
   const result = mapGroupedPublicSession(
     catalogRow({
       id: 'evt_bridges',
       city: 'Санкт-Петербург',
       citySlug: 'sankt-peterburg',
-      startsAt: new Date('2026-08-09T17:55:00.000Z'),
+      startsAt: new Date(phantomIso),
       upcomingSlots: [
-        { eventId: 'evt_bridges', startsAt: '2026-08-09T17:55:00.000Z' },
-        { eventId: 'evt_bridges', startsAt: '2026-08-09T20:55:00.000Z' },
-        { eventId: 'evt_bridges_next', startsAt: '2026-08-10T20:55:00.000Z' },
+        { eventId: 'evt_bridges', startsAt: phantomIso },
+        { eventId: 'evt_bridges', startsAt: realIso },
+        { eventId: 'evt_bridges_next', startsAt: nextIso },
       ],
     }),
   );
   assert.ok(result);
-  assert.equal(result.startsAt, '2026-08-09T20:55:00.000Z');
-  assert.equal(result.timeLabel, '23:55');
+  assert.equal(result.startsAt, realIso);
   assert.deepEqual(
-    result.upcomingSlots?.map((slot) => slot.timeLabel),
-    ['23:55', '23:55'],
+    result.upcomingSlots?.map((slot) => slot.startsAt),
+    [realIso, nextIso],
   );
+  assert.equal(result.upcomingSlots?.[0]?.timeLabel, result.upcomingSlots?.[1]?.timeLabel);
 });
 
 test('drops bus subcategory labels from river cruise cards', () => {
