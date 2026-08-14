@@ -117,18 +117,30 @@ export function LocationVenueLayout({
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-sky-950/90 via-slate-900/50 to-slate-900/20" />
             </div>
-            <div className="container-page absolute inset-0 z-10 flex flex-col justify-end py-8 md:py-12">
-              <div className="flex flex-wrap gap-2">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur">
+            <div className="container-page absolute inset-0 z-10 flex flex-col justify-end pb-5 pt-20 md:pb-12 md:pt-24">
+              {/* Type pills fight H1 on mobile - desktop only, solid chips */}
+              <div className="mb-3 hidden flex-wrap gap-2 md:flex">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-950/75 px-3 py-1 text-xs font-semibold">
                   <Anchor className="h-3.5 w-3.5" /> Причал
                 </span>
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-sky-400 px-3 py-1 text-xs font-bold text-sky-950">
                   <Waves className="h-3.5 w-3.5" /> {formatNumber(routeCount)} {routeCount === 1 ? 'маршрут' : routeCount >= 2 && routeCount <= 4 ? 'маршрута' : 'маршрутов'}
                 </span>
               </div>
-              <h1 className="mt-4 font-display text-3xl font-extrabold text-white sm:text-4xl md:text-5xl">{title}</h1>
-              {heroLead ? <p className="mt-3 max-w-3xl text-sm text-white/85 sm:text-base">{heroLead}</p> : null}
-              <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-sm text-white/85">
+              <h1 className="font-display text-2xl font-extrabold text-white sm:text-4xl md:text-5xl">{title}</h1>
+              {/* Mobile: one meta line; sticky has CTA */}
+              <p className="mt-2 text-sm font-medium text-white/90 md:hidden">
+                {[
+                  `${formatNumber(routeCount)} ${routeCount === 1 ? 'маршрут' : routeCount >= 2 && routeCount <= 4 ? 'маршрута' : 'маршрутов'}`,
+                  formatMoney(stats.priceFrom),
+                ]
+                  .filter(Boolean)
+                  .join(' · ')}
+              </p>
+              {heroLead ? (
+                <p className="mt-3 hidden max-w-3xl text-sm text-white/85 sm:text-base md:block">{heroLead}</p>
+              ) : null}
+              <div className="mt-3 hidden flex-wrap gap-x-5 gap-y-1 text-sm text-white/85 md:flex">
                 {heroAddressLine ? (
                   <span className="inline-flex items-center gap-1.5">
                     <MapPin className="h-4 w-4" /> {heroAddressLine}
@@ -140,9 +152,23 @@ export function LocationVenueLayout({
               </div>
             </div>
           </section>
+          {(heroLead || heroAddressLine) ? (
+            <div className="border-b border-slate-200 bg-white md:hidden">
+              <div className="container-page space-y-2 py-4 text-sm text-slate-700">
+                {heroLead ? <p className="leading-relaxed text-slate-600">{heroLead}</p> : null}
+                {heroAddressLine ? (
+                  <p className="flex items-start gap-1.5">
+                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary-600" />
+                    <span>{heroAddressLine}</span>
+                  </p>
+                ) : null}
+              </div>
+            </div>
+          ) : null}
           {hasMap ? <LocationMapStrip venue={venue} /> : null}
         </>
       ) : isBus ? (
+        <>
         <section className="relative isolate grid w-full overflow-hidden bg-slate-900 text-white aspect-[3/4] md:aspect-auto md:min-h-80 lg:min-h-[28rem]">
           <div className="absolute inset-0">
             {venue.heroImageUrl ? (
@@ -152,16 +178,24 @@ export function LocationVenueLayout({
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/55 to-slate-950/15" />
           </div>
-          <div className="container-page absolute inset-0 z-10 flex flex-col justify-end py-8 md:py-14 lg:py-20">
-            <div className="flex flex-wrap gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur">
+          <div className="container-page absolute inset-0 z-10 flex flex-col justify-end pb-5 pt-20 md:pb-14 md:pt-24 lg:pb-20">
+            <div className="mb-3 hidden flex-wrap gap-2 md:flex">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-950/75 px-3 py-1 text-xs font-semibold">
                 <TypeIcon className="h-3.5 w-3.5" /> {typeLabel}
               </span>
-              <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur">{venue.city}</span>
+              <span className="rounded-full bg-slate-950/75 px-3 py-1 text-xs font-semibold">{venue.city}</span>
             </div>
-            <h1 className="mt-4 font-display text-3xl font-extrabold text-white sm:text-4xl md:text-5xl">{title}</h1>
-            <p className="mt-3 max-w-2xl text-white/85">{heroLead}</p>
-            <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/85">
+            <h1 className="font-display text-2xl font-extrabold text-white sm:text-4xl md:text-5xl">{title}</h1>
+            <p className="mt-2 text-sm font-medium text-white/90 md:hidden">
+              {[
+                `${formatNumber(stats.events)} ${isBus ? 'рейсов' : 'событий'}`,
+                venue.city,
+              ]
+                .filter(Boolean)
+                .join(' · ')}
+            </p>
+            <p className="mt-3 hidden max-w-2xl text-white/85 md:block">{heroLead}</p>
+            <div className="mt-5 hidden flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/85 md:flex">
               <span className="inline-flex items-center gap-1.5">
                 <Ticket className="h-4 w-4" /> {formatNumber(stats.events)} {isBus ? 'рейсов' : 'событий'}
               </span>
@@ -173,6 +207,20 @@ export function LocationVenueLayout({
             </div>
           </div>
         </section>
+        {(heroLead || heroAddressLine) ? (
+          <div className="border-b border-slate-200 bg-white md:hidden">
+            <div className="container-page space-y-2 py-4 text-sm text-slate-700">
+              {heroLead ? <p className="leading-relaxed text-slate-600">{heroLead}</p> : null}
+              {heroAddressLine ? (
+                <p className="flex items-start gap-1.5">
+                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary-600" />
+                  <span>{heroAddressLine}</span>
+                </p>
+              ) : null}
+            </div>
+          </div>
+        ) : null}
+        </>
       ) : isParkLike ? (
         <>
           <section className="relative isolate grid w-full overflow-hidden bg-emerald-900 text-white aspect-[3/4] md:aspect-auto md:min-h-80 lg:min-h-[28rem]">
@@ -184,18 +232,34 @@ export function LocationVenueLayout({
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/90 via-emerald-950/55 to-emerald-950/15" />
           </div>
-          <div className="container-page absolute inset-0 z-10 flex flex-col justify-end py-8 md:py-14 lg:py-20">
-            <div className="flex flex-wrap gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur">
+          <div className="container-page absolute inset-0 z-10 flex flex-col justify-end pb-5 pt-20 md:pb-14 md:pt-24 lg:pb-20">
+            <div className="mb-3 hidden flex-wrap gap-2 md:flex">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-950/75 px-3 py-1 text-xs font-semibold">
                 <TypeIcon className="h-3.5 w-3.5" /> {typeLabel}
               </span>
-              <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur">{venue.city}</span>
+              <span className="rounded-full bg-slate-950/75 px-3 py-1 text-xs font-semibold">{venue.city}</span>
             </div>
-            <h1 className="mt-4 font-display text-3xl font-extrabold text-white sm:text-4xl md:text-5xl">{title}</h1>
-            <p className="mt-3 max-w-2xl text-white/85">{heroLead}</p>
-            {venue.hookFact ? <p className="mt-2 max-w-2xl text-sm text-emerald-100/95">{venue.hookFact}</p> : null}
+            <h1 className="font-display text-2xl font-extrabold text-white sm:text-4xl md:text-5xl">{title}</h1>
+            <p className="mt-2 text-sm font-medium text-white/90 md:hidden">
+              {[
+                hasStopExcursions
+                  ? `${formatNumber(stopExcursionCount)} ${
+                      stopExcursionCount === 1
+                        ? 'экскурсия'
+                        : stopExcursionCount >= 2 && stopExcursionCount <= 4
+                          ? 'экскурсии'
+                          : 'экскурсий'
+                    }`
+                  : null,
+                venue.city,
+              ]
+                .filter(Boolean)
+                .join(' · ')}
+            </p>
+            <p className="mt-3 hidden max-w-2xl text-white/85 md:block">{heroLead}</p>
+            {venue.hookFact ? <p className="mt-2 hidden max-w-2xl text-sm text-emerald-100/95 md:block">{venue.hookFact}</p> : null}
             {hasStopExcursions || heroAddressLine ? (
-              <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/85">
+              <div className="mt-5 hidden flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/85 md:flex">
                 {hasStopExcursions ? (
                   <span className="inline-flex items-center gap-1.5">
                     <Ticket className="h-4 w-4" />{' '}
@@ -214,7 +278,8 @@ export function LocationVenueLayout({
                 ) : null}
               </div>
             ) : null}
-            <div className="mt-6 flex flex-wrap items-center gap-3">
+            {/* Sticky footer has CTA on mobile - avoid duplicate hero buttons */}
+            <div className="mt-6 hidden flex-wrap items-center gap-3 md:flex">
               {hasStopExcursions ? (
                 <a
                   href="#venue-stop-events"
@@ -242,6 +307,20 @@ export function LocationVenueLayout({
             </div>
           </div>
         </section>
+          {(heroLead || venue.hookFact || heroAddressLine) ? (
+            <div className="border-b border-slate-200 bg-white md:hidden">
+              <div className="container-page space-y-2 py-4 text-sm text-slate-700">
+                {heroLead ? <p className="leading-relaxed text-slate-600">{heroLead}</p> : null}
+                {venue.hookFact ? <p className="font-medium text-emerald-800">{venue.hookFact}</p> : null}
+                {heroAddressLine ? (
+                  <p className="flex items-start gap-1.5">
+                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary-600" />
+                    <span>{heroAddressLine}</span>
+                  </p>
+                ) : null}
+              </div>
+            </div>
+          ) : null}
           {hasMap ? <LocationMapStrip venue={venue} /> : null}
         </>
       ) : (

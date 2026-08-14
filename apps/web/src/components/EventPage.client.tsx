@@ -113,7 +113,7 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
   });
 
   return (
-    <div className="rounded-card border border-slate-200 bg-white p-6 shadow-card sm:p-7">
+    <div className="overflow-hidden rounded-card border border-slate-200 bg-white p-6 shadow-card sm:p-7">
       {priceRange ? (
         <div>
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
@@ -330,33 +330,40 @@ function SessionDayStrip({
   return (
     <div className="mt-6">
       {days.length > 1 ? (
-        <div
-          role="tablist"
-          aria-label="Дни"
-          className="horizontal-snap-row flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        >
-          {days.map((day) => {
-            const active = day.key === selectedDay;
-            return (
-              <button
-                key={day.key}
-                type="button"
-                role="tab"
-                aria-selected={active}
-                onClick={() => setSelectedDay(day.key)}
-                className={`shrink-0 rounded-xl px-3 py-2 text-left text-xs font-semibold transition ${
-                  active
-                    ? 'bg-graphite text-white'
-                    : 'bg-surface-muted text-graphite-muted hover:bg-slate-200/80 hover:text-graphite'
-                }`}
-              >
-                <span className="block whitespace-nowrap">{day.label}</span>
-                <span className={`mt-0.5 block text-[10px] font-medium ${active ? 'text-white/70' : 'text-graphite-muted/80'}`}>
-                  {day.sessions.length} {day.sessions.length === 1 ? 'сеанс' : 'сеанса'}
-                </span>
-              </button>
-            );
-          })}
+        <div className="relative -mx-6 sm:-mx-7">
+          <div
+            role="tablist"
+            aria-label="Дни"
+            className="horizontal-snap-row flex gap-2 overflow-x-auto overscroll-x-contain px-6 pb-1 pr-10 [scrollbar-width:none] sm:px-7 sm:pr-12 [&::-webkit-scrollbar]:hidden"
+          >
+            {days.map((day) => {
+              const active = day.key === selectedDay;
+              return (
+                <button
+                  key={day.key}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() => setSelectedDay(day.key)}
+                  className={`shrink-0 snap-start rounded-xl px-3 py-2 text-left text-xs font-semibold transition ${
+                    active
+                      ? 'bg-graphite text-white'
+                      : 'bg-surface-muted text-graphite-muted hover:bg-slate-200/80 hover:text-graphite'
+                  }`}
+                >
+                  <span className="block whitespace-nowrap">{day.label}</span>
+                  <span className={`mt-0.5 block text-[10px] font-medium ${active ? 'text-white/70' : 'text-graphite-muted/80'}`}>
+                    {day.sessions.length} {day.sessions.length === 1 ? 'сеанс' : 'сеанса'}
+                  </span>
+                </button>
+              );
+            })}
+            <span className="w-3 shrink-0" aria-hidden="true" />
+          </div>
+          <div
+            className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-white to-transparent sm:w-12"
+            aria-hidden="true"
+          />
         </div>
       ) : null}
 
@@ -526,6 +533,12 @@ export function EventHero({
   const oldPrice = getTicketOldPrice(payload, priceRange);
   const fallbackPrice = formatPriceRub(stats.priceFrom ?? event.priceFrom);
   const priceLabel = priceRange ? formatHeroBuyButtonPrice(priceRange) : fallbackPrice ? `от ${fallbackPrice}` : '';
+  const fromPriceLabel = priceRange
+    ? formatHeroBuyButtonPrice(priceRange)
+    : fallbackPrice
+      ? `от ${fallbackPrice}`
+      : '';
+  const mobileMetaLine = [durationLabel, fromPriceLabel].filter(Boolean).join(' · ');
   const heroImage = String(event.imageUrl || '').trim();
   const heroObjectPosition = resolveEventHeroObjectPosition({
     slug: event.slug,
@@ -546,169 +559,285 @@ export function EventHero({
   const breadcrumbs = buildEventBreadcrumbs(event);
   const placeLabel = event.venue || event.city || null;
   const metro = String(event.venueMetroStation || '').trim();
-  const venueBadgeClassName =
-    'inline-flex max-w-full items-center gap-1 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-medium text-white backdrop-blur-sm';
-  const venueBadgeLinkClassName = `${venueBadgeClassName} cursor-pointer transition hover:bg-white/25 hover:underline hover:decoration-white/50 hover:underline-offset-2`;
+  const venueAddress = String(event.venueAddress || '').trim();
+  // Skip venue/place chip when it duplicates the address line below the photo.
+  const placeDuplicatesAddress =
+    Boolean(placeLabel && venueAddress) &&
+    venueAddress.toLocaleLowerCase('ru').includes(String(placeLabel).toLocaleLowerCase('ru'));
+  const solidChipClassName =
+    'inline-flex max-w-full items-center gap-1 rounded-full bg-slate-950/75 px-2.5 py-1 text-[11px] font-medium text-white';
+  const solidChipLinkClassName = `${solidChipClassName} cursor-pointer transition hover:bg-slate-950/90 hover:underline hover:decoration-white/50 hover:underline-offset-2`;
 
   const heroTitle = String(event.seoH1 || event.title || '').trim();
   const titleSplit = splitLongTitleAtBreak(heroTitle);
   const longHeroTitle = Boolean(titleSplit) || heroTitle.length > 48;
+  const nearestLabel = nextSession
+    ? isFlexibleScheduleSession(nextSession)
+      ? FLEXIBLE_SCHEDULE_LABEL
+      : `Ближайший: ${[nextSession.dateLabel, nextSession.timeLabel].filter(Boolean).join(', ')}`
+    : null;
 
   return (
-    <div
-      className={`relative isolate grid w-full overflow-hidden bg-slate-900 aspect-[3/4] md:aspect-auto ${
-        longHeroTitle
-          ? 'md:min-h-[22rem] lg:min-h-[28rem]'
-          : 'md:min-h-80 lg:min-h-[420px]'
-      }`}
-    >
-      <EventPageCitySync city={event.city} />
-      <SafeImage
-        src={heroImage || null}
-        alt={event.title}
-        fill
-        priority
-        sizes={IMAGE_SIZES.eventHero}
-        style={{ objectPosition: heroObjectPosition }}
-        className="object-cover object-[center_20%] opacity-80"
-        fallback={
-          <div className="flex h-full items-center justify-center bg-gradient-to-br from-primary-600 to-primary-900">
-            <span className="text-8xl opacity-30">🎭</span>
-          </div>
-        }
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/45 to-slate-900/25" />
-
-      <div className="container-page absolute inset-0 z-10 flex flex-col justify-end pb-6 pt-20 md:pb-8 md:pt-24">
-        <nav aria-label="Хлебные крошки" className="mb-3 flex flex-wrap items-center gap-1.5 text-sm text-white/70">
-          {breadcrumbs.map((crumb, index) => {
-            const isLast = index === breadcrumbs.length - 1;
-            return (
-              <span
-                key={`${crumb.path}:${index}`}
-                className={`inline-flex items-center gap-1.5 ${isLast ? 'hidden md:inline-flex' : ''}`}
-              >
-                {index > 0 ? <ChevronRight className="h-3.5 w-3.5" /> : null}
-                {isLast ? (
-                  <span className="line-clamp-1 text-white/90">{crumb.name}</span>
-                ) : (
-                  <Link href={crumb.path} className="transition hover:text-white">
-                    {crumb.name}
-                  </Link>
-                )}
-              </span>
-            );
-          })}
-        </nav>
-
-        <div className="flex items-end justify-between gap-4">
-          <div className="max-w-3xl">
-            <div className="flex flex-wrap items-center gap-2">
-              <p className="text-xs font-medium uppercase tracking-wider text-white/70">{event.category}</p>
-              {aggregate ? (
-                <EventRatingBadge ratingValue={aggregate.ratingValue} reviewCount={aggregate.reviewCount} />
-              ) : null}
+    <>
+      <div
+        className={`relative isolate grid w-full overflow-hidden bg-slate-900 aspect-[3/4] md:aspect-auto ${
+          longHeroTitle
+            ? 'md:min-h-[22rem] lg:min-h-[28rem]'
+            : 'md:min-h-80 lg:min-h-[420px]'
+        }`}
+      >
+        <EventPageCitySync city={event.city} />
+        <SafeImage
+          src={heroImage || null}
+          alt={event.title}
+          fill
+          priority
+          sizes={IMAGE_SIZES.eventHero}
+          style={{ objectPosition: heroObjectPosition }}
+          className="object-cover object-[center_20%] opacity-80"
+          fallback={
+            <div className="flex h-full items-center justify-center bg-gradient-to-br from-primary-600 to-primary-900">
+              <span className="text-8xl opacity-30">🎭</span>
             </div>
-            <h1
-              className={`mt-2 font-bold leading-tight text-white break-normal ${
-                longHeroTitle
-                  ? 'text-xl sm:text-3xl lg:text-4xl'
-                  : 'text-2xl sm:text-3xl lg:text-4xl'
-              }`}
-            >
-              {titleSplit ? (
-                <>
-                  {titleSplit.lead}
-                  {titleSplit.mark}
-                  <br />
-                  {titleSplit.tail}
-                </>
-              ) : (
-                heroTitle
-              )}
-            </h1>
+          }
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/45 to-slate-900/25" />
 
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              {durationLabel ? (
-                <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-medium text-white backdrop-blur-sm">
-                  <Clock className="h-3 w-3" strokeWidth={1.75} />
-                  {durationLabel}
+        <div className="container-page absolute inset-0 z-10 flex flex-col justify-end pb-5 pt-20 md:pb-8 md:pt-24">
+          {/* Desktop breadcrumbs stay in overlay; mobile moves below the photo */}
+          <nav
+            aria-label="Хлебные крошки"
+            className="mb-3 hidden flex-wrap items-center gap-1.5 text-sm text-white/70 md:flex"
+          >
+            {breadcrumbs.map((crumb, index) => {
+              const isLast = index === breadcrumbs.length - 1;
+              return (
+                <span key={`${crumb.path}:${index}`} className="inline-flex items-center gap-1.5">
+                  {index > 0 ? <ChevronRight className="h-3.5 w-3.5" /> : null}
+                  {isLast ? (
+                    <span className="line-clamp-1 text-white/90">{crumb.name}</span>
+                  ) : (
+                    <Link href={crumb.path} className="transition hover:text-white">
+                      {crumb.name}
+                    </Link>
+                  )}
                 </span>
+              );
+            })}
+          </nav>
+
+          <div className="flex items-end justify-between gap-4">
+            <div className="max-w-3xl">
+              {/* Category fights long H1 on mobile - keep tiny on md+ only */}
+              <div className="mb-1.5 hidden flex-wrap items-center gap-2 md:flex">
+                {event.category ? (
+                  <p className="text-[10px] font-medium uppercase tracking-wider text-white/55">
+                    {event.category}
+                  </p>
+                ) : null}
+                {aggregate ? (
+                  <EventRatingBadge ratingValue={aggregate.ratingValue} reviewCount={aggregate.reviewCount} />
+                ) : null}
+              </div>
+
+              <h1
+                className={`font-bold leading-tight text-white break-normal ${
+                  longHeroTitle
+                    ? 'text-xl sm:text-3xl lg:text-4xl'
+                    : 'text-2xl sm:text-3xl lg:text-4xl'
+                }`}
+              >
+                {titleSplit ? (
+                  <>
+                    {titleSplit.lead}
+                    {titleSplit.mark}
+                    <br />
+                    {titleSplit.tail}
+                  </>
+                ) : (
+                  heroTitle
+                )}
+              </h1>
+
+              {/* Mobile overlay: only title + one meta line (duration · from-price) */}
+              {mobileMetaLine ? (
+                <p className="mt-2 text-sm font-medium text-white/90 md:hidden">{mobileMetaLine}</p>
               ) : null}
-              {placeLabel ? (
+
+              {/* Desktop overlay: solid chips + price + nearest/address */}
+              <div className="mt-3 hidden md:block">
+                <div className="flex flex-wrap gap-1.5">
+                  {durationLabel ? (
+                    <span className={solidChipClassName}>
+                      <Clock className="h-3 w-3" strokeWidth={1.75} />
+                      {durationLabel}
+                    </span>
+                  ) : null}
+                  {placeLabel && !placeDuplicatesAddress ? (
+                    venuePageHref ? (
+                      <Link href={venuePageHref} className={solidChipLinkClassName}>
+                        <MapPin className="h-3 w-3 shrink-0" strokeWidth={1.75} />
+                        <span className="truncate">{placeLabel}</span>
+                      </Link>
+                    ) : (
+                      <span className={solidChipClassName}>
+                        <MapPin className="h-3 w-3 shrink-0" strokeWidth={1.75} />
+                        <span className="truncate">{placeLabel}</span>
+                      </span>
+                    )
+                  ) : null}
+                  {metro ? (
+                    <span className={solidChipClassName}>
+                      <Train className="h-3 w-3" strokeWidth={1.75} />
+                      {metro}
+                    </span>
+                  ) : null}
+                  {ageLimit ? (
+                    <span className={solidChipClassName}>
+                      <Users className="h-3 w-3" strokeWidth={1.75} />
+                      {ageLimit}
+                    </span>
+                  ) : null}
+                  {oldPrice ? (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-400/95 px-2.5 py-1 text-[11px] font-semibold text-slate-900">
+                      <Percent className="h-3 w-3" strokeWidth={1.75} />
+                      Скидка
+                    </span>
+                  ) : null}
+                </div>
+
+                {priceRange || fallbackPrice ? (
+                  <div className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                    <span className="text-2xl font-bold text-white sm:text-3xl">
+                      {priceRange ? formatBuyCardPrice(priceRange) : `от ${fallbackPrice}`}
+                    </span>
+                    {oldPrice ? (
+                      <span className="text-sm text-white/55 line-through">{formatPriceRub(oldPrice)}</span>
+                    ) : null}
+                  </div>
+                ) : null}
+
+                <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/85">
+                  {nearestLabel ? (
+                    <span className="flex items-center gap-1.5">
+                      <Calendar className="h-4 w-4" strokeWidth={1.75} />
+                      {nearestLabel}
+                    </span>
+                  ) : null}
+                  {canOpenVenueModal && venueAddress ? (
+                    <EventVenueTrigger
+                      event={event}
+                      className="flex items-center gap-1.5 underline decoration-white/30 underline-offset-2 hover:text-white"
+                    >
+                      <MapPin className="h-4 w-4" strokeWidth={1.75} />
+                      {venueAddress}
+                    </EventVenueTrigger>
+                  ) : null}
+                </div>
+              </div>
+            </div>
+
+            {/* Sticky bar covers mobile; show buy only where sticky is hidden */}
+            {priceLabel ? (
+              <div className="hidden lg:block">
+                <EventHeroBuyButton payload={payload} priceLabel={priceLabel} />
+              </div>
+            ) : null}
+          </div>
+        </div>
+      </div>
+
+      {/* First content block under the photo (mobile): crumbs, address, nearest, short chips */}
+      <div className="border-b border-slate-200 bg-white md:hidden">
+        <div className="container-page space-y-3 py-4">
+          <nav aria-label="Хлебные крошки" className="flex flex-wrap items-center gap-1.5 text-sm text-slate-500">
+            {breadcrumbs.map((crumb, index) => {
+              const isLast = index === breadcrumbs.length - 1;
+              return (
+                <span
+                  key={`${crumb.path}:mobile:${index}`}
+                  className={`inline-flex items-center gap-1.5 ${isLast ? 'min-w-0' : ''}`}
+                >
+                  {index > 0 ? <ChevronRight className="h-3.5 w-3.5 shrink-0 text-slate-300" /> : null}
+                  {isLast ? (
+                    <span className="truncate text-slate-900">{crumb.name}</span>
+                  ) : (
+                    <Link href={crumb.path} className="shrink-0 transition hover:text-primary-600">
+                      {crumb.name}
+                    </Link>
+                  )}
+                </span>
+              );
+            })}
+          </nav>
+
+          {venueAddress ? (
+            canOpenVenueModal ? (
+              <EventVenueTrigger
+                event={event}
+                className="flex items-start gap-1.5 text-sm text-graphite underline decoration-slate-300 underline-offset-2"
+              >
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary-600" strokeWidth={1.75} />
+                <span>{venueAddress}</span>
+              </EventVenueTrigger>
+            ) : (
+              <p className="flex items-start gap-1.5 text-sm text-graphite">
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary-600" strokeWidth={1.75} />
+                <span>{venueAddress}</span>
+              </p>
+            )
+          ) : null}
+
+          {nearestLabel ? (
+            <p className="flex items-center gap-1.5 text-sm text-graphite">
+              <Calendar className="h-4 w-4 shrink-0 text-graphite-muted" strokeWidth={1.75} />
+              {nearestLabel}
+            </p>
+          ) : null}
+
+          {((placeLabel && !placeDuplicatesAddress) || metro || ageLimit || oldPrice || aggregate) ? (
+            <div className="flex flex-wrap gap-1.5">
+              {placeLabel && !placeDuplicatesAddress ? (
                 venuePageHref ? (
-                  <Link href={venuePageHref} className={venueBadgeLinkClassName}>
+                  <Link
+                    href={venuePageHref}
+                    className="inline-flex max-w-full items-center gap-1 rounded-full bg-slate-900 px-2.5 py-1 text-[11px] font-medium text-white"
+                  >
                     <MapPin className="h-3 w-3 shrink-0" strokeWidth={1.75} />
                     <span className="truncate">{placeLabel}</span>
                   </Link>
                 ) : (
-                  <span className={venueBadgeClassName}>
+                  <span className="inline-flex max-w-full items-center gap-1 rounded-full bg-slate-900 px-2.5 py-1 text-[11px] font-medium text-white">
                     <MapPin className="h-3 w-3 shrink-0" strokeWidth={1.75} />
                     <span className="truncate">{placeLabel}</span>
                   </span>
                 )
               ) : null}
               {metro ? (
-                <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-medium text-white backdrop-blur-sm">
+                <span className="inline-flex items-center gap-1 rounded-full bg-slate-900 px-2.5 py-1 text-[11px] font-medium text-white">
                   <Train className="h-3 w-3" strokeWidth={1.75} />
                   {metro}
                 </span>
               ) : null}
               {ageLimit ? (
-                <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-medium text-white backdrop-blur-sm">
+                <span className="inline-flex items-center gap-1 rounded-full bg-slate-900 px-2.5 py-1 text-[11px] font-medium text-white">
                   <Users className="h-3 w-3" strokeWidth={1.75} />
                   {ageLimit}
                 </span>
               ) : null}
               {oldPrice ? (
-                <span className="inline-flex items-center gap-1 rounded-full bg-amber-400/90 px-2.5 py-1 text-[11px] font-semibold text-slate-900">
+                <span className="inline-flex items-center gap-1 rounded-full bg-amber-400 px-2.5 py-1 text-[11px] font-semibold text-slate-900">
                   <Percent className="h-3 w-3" strokeWidth={1.75} />
                   Скидка
                 </span>
               ) : null}
-            </div>
-
-            {priceRange || fallbackPrice ? (
-              <div className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                <span className="text-2xl font-bold text-white sm:text-3xl">
-                  {priceRange ? formatBuyCardPrice(priceRange) : `от ${fallbackPrice}`}
-                </span>
-                {oldPrice ? (
-                  <span className="text-sm text-white/55 line-through">{formatPriceRub(oldPrice)}</span>
-                ) : null}
-              </div>
-            ) : null}
-
-            <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/85">
-              {nextSession ? (
-                <span className="flex items-center gap-1.5">
-                  <Calendar className="h-4 w-4" strokeWidth={1.75} />
-                  {isFlexibleScheduleSession(nextSession)
-                    ? FLEXIBLE_SCHEDULE_LABEL
-                    : `Ближайший: ${[nextSession.dateLabel, nextSession.timeLabel].filter(Boolean).join(', ')}`}
-                </span>
+              {aggregate ? (
+                <EventRatingBadge ratingValue={aggregate.ratingValue} reviewCount={aggregate.reviewCount} />
               ) : null}
-              {canOpenVenueModal && event.venueAddress ? (
-                <EventVenueTrigger
-                  event={event}
-                  className="flex items-center gap-1.5 underline decoration-white/30 underline-offset-2 hover:text-white"
-                >
-                  <MapPin className="h-4 w-4" strokeWidth={1.75} />
-                  {event.venueAddress}
-                </EventVenueTrigger>
-              ) : null}
-            </div>
-
-            {/* Mobile buy lives in sticky bar - avoid duplicate CTAs */}
-          </div>
-
-          {priceLabel ? (
-            <div className="hidden sm:block">
-              <EventHeroBuyButton payload={payload} priceLabel={priceLabel} />
             </div>
           ) : null}
         </div>
       </div>
-    </div>
+    </>
   );
 }

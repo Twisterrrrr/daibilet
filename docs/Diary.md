@@ -1,4 +1,20 @@
-## 2026-08-14 - City picker stale label + blog «Несколько городов»
+## 2026-08-14 - PDP: slim mobile hero + date chips scroll
+
+### Наблюдения
+- Owner: mobile event hero overlay слишком плотный (крошки, ЭКСКУРСИИ, pills, адрес, «Ближайший», цена). Sticky footer уже даёт CTA.
+- Date chips в белой ticket-card обрезались правым краем карточки без scroll affordance (padding + overflow).
+
+### Решения
+- Event / venue / location: mobile overlay = H1 + одна meta-строка; крошки/адрес/ближайший/длинные pills - блок под фото. Category uppercase только md+. Solid dark chips вместо glass. Hero buy button только `lg+` (sticky до lg).
+- `SessionDayStrip`: `-mx` bleed + `overflow-x-auto` + fade справа + peek padding; card `overflow-hidden`.
+- `mobile-templates.md` hero budget обновлён. Commit+push, без live deploy.
+
+### Проблемы
+- Нет.
+
+---
+
+
 
 ### Наблюдения
 - Owner: после ГОРОД → Санкт-Петербург в чипе/пикере остаётся предыдущий город.

@@ -243,31 +243,37 @@ export function InstitutionVenueLayout({
           <div className={`absolute inset-0 ${heroGradient}`} />
         </div>
 
-        <div className="container-page absolute inset-0 z-10 flex flex-col justify-end py-10 md:py-14">
+        <div className="container-page absolute inset-0 z-10 flex flex-col justify-end pb-5 pt-20 md:pb-14 md:pt-24">
           <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-end">
             <div className="max-w-2xl">
               {openNowStatus === 'open' ? (
                 <div className="mb-3" data-venue-open-now>
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/90 px-3 py-1 text-xs font-semibold text-white shadow-sm">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-600 px-3 py-1 text-xs font-semibold text-white shadow-sm">
                     <span className="h-1.5 w-1.5 rounded-full bg-white" aria-hidden="true" />
                     Открыто сейчас
                   </span>
                 </div>
               ) : null}
 
-              <h1 className="font-display text-3xl font-extrabold leading-tight text-white sm:text-4xl md:text-5xl">{title}</h1>
+              <h1 className="font-display text-2xl font-extrabold leading-tight text-white sm:text-4xl md:text-5xl">{title}</h1>
+
+              {/* Mobile: short city meta; full address moves below the photo */}
+              {venue.city ? (
+                <p className="mt-2 text-sm font-medium text-white/90 md:hidden">{venue.city}</p>
+              ) : null}
 
               {heroAddressLine ? (
-                <div className="mt-4 inline-flex items-start gap-1.5 text-sm text-white/90">
+                <div className="mt-4 hidden items-start gap-1.5 text-sm text-white/90 md:inline-flex">
                   <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
                   <span>{heroAddressLine}</span>
                 </div>
               ) : null}
 
-              <p className="mt-4 max-w-xl text-white/90">{intro}</p>
+              <p className="mt-4 hidden max-w-xl text-white/90 md:block">{intro}</p>
             </div>
 
-            <div className="flex flex-col items-start gap-2 md:items-end">
+            {/* Sticky footer covers mobile CTA */}
+            <div className="hidden flex-col items-start gap-2 md:flex md:items-end">
               {hasInternalLcTickets ? (
                 <a
                   href="#venue-admission"
@@ -298,7 +304,7 @@ export function InstitutionVenueLayout({
               <button
                 type="button"
                 onClick={share}
-                className="inline-flex items-center gap-1 rounded-full bg-white/10 px-3 py-1.5 text-xs font-medium backdrop-blur hover:bg-white/20"
+                className="inline-flex items-center gap-1 rounded-full bg-slate-950/70 px-3 py-1.5 text-xs font-medium hover:bg-slate-950/85"
               >
                 <Share2 className="h-3.5 w-3.5" />
                 Поделиться
@@ -307,6 +313,20 @@ export function InstitutionVenueLayout({
           </div>
         </div>
       </section>
+
+      {(heroAddressLine || intro) ? (
+        <div className="border-b border-slate-200 bg-white md:hidden">
+          <div className="container-page space-y-2 py-4 text-sm text-slate-700">
+            {heroAddressLine ? (
+              <p className="flex items-start gap-1.5">
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary-600" />
+                <span>{heroAddressLine}</span>
+              </p>
+            ) : null}
+            {intro ? <p className="leading-relaxed text-slate-600">{intro}</p> : null}
+          </div>
+        </div>
+      ) : null}
 
       <nav className="sticky top-[var(--site-header-height)] z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
         <div className="container-page flex gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">

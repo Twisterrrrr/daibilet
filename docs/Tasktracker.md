@@ -1,3 +1,10 @@
+## 2026-08-14 - PDP slim mobile hero + date chips
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| UX.PDP-HERO-SLIM | Mobile overlay: H1 + meta `длительность · от ₽`; крошки/адрес/ближайший под фото; solid chips; без CTA в hero | Высокий | ✅ git, без live deploy |
+| UX.PDP-DATE-CHIPS | Ticket card date chips: horizontal scroll без clip, fade + peek | Высокий | ✅ git, без live deploy |
+
 ## 2026-08-14 - City picker stale label + blog multi-city filter
 
 | ID | Задача | Приоритет | Статус |
