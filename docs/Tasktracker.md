@@ -1,3 +1,10 @@
+## 2026-08-14 - Live batch after f987ef6
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| UX.LANDING-VASH-VYBOR | Заголовок audience-блока лендингов: «Ваш выбор», не «Кому подойдёт» | Высокий | ✅ live `31787552799` SHA `7eab8fc` BUILD_ID=`grpckhF4DQEb3_EIx6m_s`; smoke `/vecherinki-na-teplohode` |
+| COPY.KGD-PODHODIT | «подкатывает» → «подходит» в KGD gastro | Средний | 🔄 git `0428263` в tip; live CMS body ещё старый (нужен prod seed по запросу) |
+
 ## 2026-08-14 - Catalog hub canonicals (query strip)
 
 | ID | Задача | Приоритет | Статус |
@@ -22,7 +29,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| FIX.SPB-EDITOR-COORDS | 182 SPB mustSee lat/lng/address из таблицы owner; skip 46/162; lock против yandex overwrite | Высокий | ✅ 2026-08-14 code + push; live batch |
+| FIX.SPB-EDITOR-COORDS | 182 SPB mustSee lat/lng/address из таблицы owner; skip 46/162; lock против yandex overwrite | Высокий | ✅ live `31786430052` SHA `f987ef6` |
 
 ## 2026-08-14 - Perm hub: seasonal «когда ехать»
 

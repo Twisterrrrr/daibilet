@@ -1,3 +1,18 @@
+## 2026-08-14 - Live: Deploy MSK web `31787552799`
+
+### Наблюдения
+- Owner: «выкатывай все, жду». После `f987ef6` на tip были `ec272e4` (docs), `0428263` (KGD copy подкатывает→подходит в git), `7eab8fc` (заголовок лендингов «Ваш выбор»). Sibling `953fc03a` на origin не появился (ждали ~2 мин). Image pipelines сотен файлов не ждали.
+
+### Решения
+- Deploy MSK web `31787552799` success. SHA `7eab8fc`. BUILD_ID=`grpckhF4DQEb3_EIx6m_s`. Swap с предыдущего `hb0IJajwsACNHIzzynH08` (`f987ef6`).
+- Smoke 200: `/` `/places` `/vecherinki-na-teplohode` `/vecherinki-na-teplohode/moscow`. На вечеринках HTML: «Ваш выбор» (CSS uppercase → ВАШ ВЫБОР), «Кому подойдёт» нет.
+
+### Проблемы
+- KGD gastro copy: git `0428263` в дереве, но live `/blog/kaliningrad-gastro-kenigsberg` всё ещё «подкатывает» - body идёт из CMS API (`/api/public/articles/...`), не из static fallback. Prod DB seed не делали (только по запросу owner).
+- Хвосты: image agent `-card.jpg` / home `<picture>` / blog listing `*-og.jpg`; локальные незакоммиченные card-image правки в этом worktree не входили в деплой.
+
+---
+
 ## 2026-08-14 - Live: Deploy MSK web `31786430052`
 
 ### Наблюдения
