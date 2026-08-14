@@ -1,5 +1,0 @@
-# PERF.D1 / INC.504.4: reap orphan jest-worker / next-build (PPID=1) under /opt/daibilet.
-# Install: cp deploy/cron/daibilet-reap-jest-workers /etc/cron.d/daibilet-reap-jest-workers && chmod 644 ...
-SHELL=/bin/bash
-PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-*/10 * * * * root mkdir -p /var/log/daibilet && /usr/bin/env bash /opt/daibilet/scripts/reap-orphan-jest-workers.sh cron >>/var/log/daibilet/reap-jest-workers.log 2>&1
