@@ -47,14 +47,14 @@ const ICONS: Record<CityLifehackIcon, typeof Footprints> = {
 };
 
 const CARD_WIDTH =
-  'flex w-[min(100%,19.5rem)] shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-sky-100 bg-sky-50 transition-all duration-300 hover:-translate-y-1';
+  'flex w-[min(100%,19.5rem)] shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white transition-all duration-300 hover:-translate-y-1';
 const LIFEHACK_ICON = 'bg-sky-100/80 text-sky-800';
 const LIFEHACK_HOVER_SHADOW =
   'hover:shadow-[0_10px_28px_-10px_hsl(221_83%_53%_/_0.28)]';
 
 function LifehackBody({ item, editorial }: { item: CityLifehackItem; editorial: boolean }) {
   return (
-    <p className={`mt-2 text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+    <p className={`text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
       {item.body.map((part, index) =>
         part.strong ? <strong key={index}>{part.text}</strong> : <span key={index}>{part.text}</span>,
       )}
@@ -238,8 +238,8 @@ export function CityLifehacksSection({
               data-lifehack-card={item.id}
               className={cardShell}
             >
-              <div className="flex h-full flex-1 flex-col p-4 sm:p-5">
-                <div className="flex items-start gap-3">
+              <div className="flex h-full flex-1 flex-col">
+                <div className="flex items-start gap-3 bg-sky-50 px-4 pb-3 pt-4 sm:px-5 sm:pt-5">
                   <span
                     className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${LIFEHACK_ICON}`}
                     aria-hidden
@@ -254,17 +254,19 @@ export function CityLifehacksSection({
                     {item.title}
                   </h3>
                 </div>
-                <div className="min-w-0 flex-1">
-                  <LifehackBody item={item} editorial={editorial} />
-                </div>
-                <div className="mt-auto flex min-h-9 items-end pt-4">
-                  <CtaControl
-                    item={item}
-                    primary={cardIndex === 0}
-                    editorial={editorial}
-                    onPlaceFocus={onPlaceFocus}
-                    onAffiche={onAffiche}
-                  />
+                <div className="flex min-w-0 flex-1 flex-col bg-white px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
+                  <div className="min-w-0 flex-1">
+                    <LifehackBody item={item} editorial={editorial} />
+                  </div>
+                  <div className="mt-auto flex min-h-9 items-end pt-4">
+                    <CtaControl
+                      item={item}
+                      primary={cardIndex === 0}
+                      editorial={editorial}
+                      onPlaceFocus={onPlaceFocus}
+                      onAffiche={onAffiche}
+                    />
+                  </div>
                 </div>
               </div>
             </article>
