@@ -5,7 +5,7 @@ import { ChunkLoadRecovery } from '@/components/ChunkLoadRecovery';
 import { NavigationProgress } from '@/components/NavigationProgress.client';
 import { PurchaseOpeningHost } from '@/components/PurchaseOpeningFeedback.client';
 import { fontVariableClassName } from '@/lib/fonts';
-import { DEFAULT_OG_IMAGE, HOME_SEO_DESCRIPTION_FALLBACK, HOME_SEO_TITLE, getOpenGraphMediaTags } from '@/lib/seo-meta';
+import { DEFAULT_OG_IMAGE, HOME_SEO_DESCRIPTION_FALLBACK, HOME_SEO_TITLE, INDEX_FOLLOW_ROBOTS, getOpenGraphMediaTags } from '@/lib/seo-meta';
 
 import './globals.css';
 
@@ -31,6 +31,7 @@ export const metadata: Metadata = {
     template: '%s | Дайбилет',
   },
   description: HOME_SEO_DESCRIPTION_FALLBACK,
+  robots: INDEX_FOLLOW_ROBOTS,
   manifest: '/site.webmanifest',
   icons: {
     icon: [

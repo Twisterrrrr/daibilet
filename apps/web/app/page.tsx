@@ -5,8 +5,11 @@ import { SiteLayout } from '@/components/SiteLayout';
 import {
   HOME_SEO_DESCRIPTION_FALLBACK,
   HOME_SEO_TITLE,
+  INDEX_FOLLOW_ROBOTS,
   buildHomeSeoDescription,
   buildShareMetadata,
+  canonicalHref,
+  ensureSeoDescription,
 } from '@/lib/seo-meta';
 import { getHomeDestinations } from '@/server/cached-home-data';
 
@@ -21,11 +24,15 @@ export async function generateMetadata(): Promise<Metadata> {
     // keep fallback if destinations cache/DB is unavailable at build time
   }
 
+  description = ensureSeoDescription(description, HOME_SEO_DESCRIPTION_FALLBACK);
+
   return {
     title: {
       absolute: HOME_SEO_TITLE,
     },
     description,
+    alternates: { canonical: canonicalHref('/') },
+    robots: INDEX_FOLLOW_ROBOTS,
     ...buildShareMetadata({
       title: HOME_SEO_TITLE,
       description,

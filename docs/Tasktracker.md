@@ -1,3 +1,11 @@
+## 2026-08-14 - Catalog hub canonicals (query strip)
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| SEO.HUB-CANON | `/places` `/events` `/cities` canonical = absolute clean hub; never `/`. Podborki SPB/KGD self-canonical; moscow noindex → `/podborki` | Критический | ✅ 2026-08-14 code; без live deploy |
+| SEO.HUB-DESC | Dense description на `/` `/blog` `/places` `/events`; empty → template fallback; robots index,follow на хабах | Высокий | ✅ 2026-08-14 code; без live deploy |
+| PERF.LCP-HOME | Home `<picture>` / `-card.jpg` fetchpriority | Критический | 🔄 image agent `233634d1`; этот агент не дублировал |
+
 ## 2026-08-14 - OG tags recrawl pack (Stage-1)
 
 | ID | Задача | Приоритет | Статус |

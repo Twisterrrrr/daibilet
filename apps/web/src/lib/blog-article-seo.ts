@@ -4,7 +4,15 @@ import { resolveBlogCityHref } from '@/lib/blog-article-city';
 import { stripColumnMetaPrefix } from '@/lib/blog-meta';
 import type { BlogArticleDto } from '@/lib/blog-utils';
 import { resolveBlogShareImage } from '@/lib/blog-og-image';
-import { BLOG_LIST_OG_IMAGE, buildShareMetadata, pageTitle } from '@/lib/seo-meta';
+import {
+  BLOG_HUB_DESCRIPTION,
+  BLOG_LIST_OG_IMAGE,
+  INDEX_FOLLOW_ROBOTS,
+  buildShareMetadata,
+  canonicalHref,
+  ensureSeoDescription,
+  pageTitle,
+} from '@/lib/seo-meta';
 
 export { publicAssetExists, resolveBlogShareImage } from '@/lib/blog-og-image';
 
@@ -140,13 +148,13 @@ export function buildBlogArticleJsonLd(article: BlogArticleDto): Array<Record<st
 
 export function buildBlogListMetadata(): Metadata {
   const title = pageTitle('Блог - статьи и советы о событиях');
-  const description =
-    'Статьи по концертам, театру и городским прогулкам. Как выбрать билет, куда пойти с детьми, что смотреть на этой неделе.';
+  const description = ensureSeoDescription(BLOG_HUB_DESCRIPTION, BLOG_HUB_DESCRIPTION);
 
   return {
     title,
     description,
-    alternates: { canonical: '/blog' },
+    alternates: { canonical: canonicalHref('/blog') },
+    robots: INDEX_FOLLOW_ROBOTS,
     ...buildShareMetadata({
       title: `${title} | ${SITE_NAME}`,
       description,

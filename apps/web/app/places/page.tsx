@@ -5,14 +5,13 @@ import { Suspense } from 'react';
 import { PlacesHubView } from '@/components/PlacesHubView.client';
 import { SiteLayout } from '@/components/SiteLayout';
 import { VenueCatalogPageSkeleton } from '@/components/VenueCatalogSkeletons';
-import { robotsForIndexability } from '@/lib/hub-indexability';
 import { cityToNominative } from '@/lib/city-declension';
 import {
   buildPlacesListingSeo,
   firstPlacesQueryValue,
 } from '@/lib/places-seo';
 import { isAllCitiesQuery, matchDestination } from '@/lib/selected-city';
-import { buildShareMetadata, pageTitle } from '@/lib/seo-meta';
+import { INDEX_FOLLOW_ROBOTS, buildShareMetadata, canonicalHref, pageTitle } from '@/lib/seo-meta';
 import { withSoftTimeout } from '@/lib/soft-timeout';
 import {
   mapVenueCatalogFeedPage,
@@ -78,13 +77,15 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
     page: firstPlacesQueryValue(params.page),
     hasEvents: firstPlacesQueryValue(params.hasEvents),
     sort: firstPlacesQueryValue(params.sort),
+    category: firstPlacesQueryValue(params.category),
   });
   const cleanTitle = pageTitle(seo.title);
+  const canonical = canonicalHref(seo.canonicalPath);
   return {
     title: cleanTitle,
     description: seo.description,
-    alternates: { canonical: seo.canonicalPath },
-    robots: robotsForIndexability(seo.indexable),
+    alternates: { canonical },
+    robots: INDEX_FOLLOW_ROBOTS,
     ...buildShareMetadata({
       title: `${cleanTitle} | Дайбилет`,
       description: seo.description,

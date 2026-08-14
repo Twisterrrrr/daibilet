@@ -4,12 +4,18 @@ import test from 'node:test';
 import {
   DEFAULT_OG_IMAGE,
   DEFAULT_OG_IMAGE_PATH,
+  EVENTS_HUB_DESCRIPTION,
   OG_IMAGE_HEIGHT,
   OG_IMAGE_TYPE,
   OG_IMAGE_WIDTH,
+  PLACES_HUB_DESCRIPTION,
   absoluteUrl,
   buildShareMetadata,
+  canonicalHref,
+  ensureSeoDescription,
+  eventsCityDescriptionFallback,
   getOpenGraphMediaTags,
+  placesCityDescriptionFallback,
 } from './seo-meta.ts';
 
 const SAMPLE_DEFAULT_OG = 'https://daibilet.ru/images/og/default-og.jpg';
@@ -55,11 +61,23 @@ test('getOpenGraphMediaTags makes relative paths absolute and keeps https URLs',
   assert.equal(absolute.images[0]?.type, 'image/jpeg');
 });
 
-test('absoluteUrl does not double-prefix https URLs', () => {
-  assert.equal(
-    absoluteUrl('https://daibilet.ru/images/og/default-og.jpg'),
-    'https://daibilet.ru/images/og/default-og.jpg',
-  );
+test('canonicalHref is absolute https and never drops catalog hubs to /', () => {
+  const places = canonicalHref('/places');
+  const events = canonicalHref('/events');
+  assert.match(places, /^https:\/\//);
+  assert.match(places, /\/places$/);
+  assert.ok(!places.endsWith('/') || places === 'https://daibilet.ru/');
+  assert.notEqual(places, canonicalHref('/'));
+  assert.match(events, /\/events$/);
+  assert.ok(!events.includes('?'));
+});
+
+test('ensureSeoDescription never returns empty and strips em-dash', () => {
+  assert.equal(ensureSeoDescription('  ', PLACES_HUB_DESCRIPTION), PLACES_HUB_DESCRIPTION);
+  assert.equal(ensureSeoDescription(null, EVENTS_HUB_DESCRIPTION), EVENTS_HUB_DESCRIPTION);
+  assert.equal(ensureSeoDescription('Текст\u2014хвост', 'x'), 'Текст-хвост');
+  assert.match(placesCityDescriptionFallback('Москве'), /в Москве/);
+  assert.match(eventsCityDescriptionFallback('Казани'), /в Казани/);
 });
 
 test('buildShareMetadata without image uses default OG pack', () => {

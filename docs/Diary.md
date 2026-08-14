@@ -1,3 +1,22 @@
+## 2026-08-14 - Catalog hubs: canonical strip query
+
+### Наблюдения
+- Owner: `canonical href="https://daibilet.ru"` на `/places?category=museums` схлопнул бы весь каталог в `/` - хуже дублей фильтров.
+- Нужен strip query: pathname хаба, абсолютный https. Пилот `/podborki?city=saint-petersburg|kaliningrad` оставить self-canonical; moscow noindex на `/podborki`.
+- Yandex: пустой description на home/blog в старом scrape - после облегчения HTML сниппет уйдёт в футер.
+- LCP home - зона image agent `233634d1` (`-card.jpg`, `<picture>`).
+
+### Решения
+- `canonicalHref` в существующем `seo-meta.ts` (тот же origin, что OG). `/places?city|family|category|q|type` → `https://daibilet.ru/places`. `/events?date|city` → `https://daibilet.ru/events`. `/cities?q|sort` → `https://daibilet.ru/cities`. Home `/`, blog `/blog`.
+- Robots хабов: `index,follow` + canon хаба (как live `/events` metadata без searchParams).
+- Description: `PLACES_HUB_DESCRIPTION` / `EVENTS_HUB_DESCRIPTION` / `BLOG_HUB_DESCRIPTION`; `ensureSeoDescription`; city fallback «Каталог интересных мест… в {City_Пр}».
+- OG helper / DEFAULT_OG / cityInfo не трогали.
+
+### Проблемы
+- Нет. Live не выкатывали.
+
+---
+
 ## 2026-08-14 - My Day monument mini thumbs
 
 ### Наблюдения

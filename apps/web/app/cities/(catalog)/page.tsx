@@ -4,14 +4,18 @@ import { Suspense } from 'react';
 import { CitiesIndexChrome } from '@/components/CitiesIndexChrome.client';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
+import { INDEX_FOLLOW_ROBOTS, canonicalHref } from '@/lib/seo-meta';
 import { withSoftTimeout } from '@/lib/soft-timeout';
 import { getCachedDestinations } from '@/server/cached-public-surfaces';
 
+const CITIES_HUB_DESCRIPTION =
+  'Выберите город для посещения. Билеты на экскурсии, музеи и мероприятия в Москве, Петербурге, Казани, Владимире, Ярославле и других городах.';
+
 export const metadata: Metadata = {
   title: 'Города России - экскурсии, музеи и мероприятия',
-  description:
-    'Выберите город для посещения. Билеты на экскурсии, музеи и мероприятия в Москве, Петербурге, Казани, Владимире, Ярославле и других городах.',
-  alternates: { canonical: '/cities' },
+  description: CITIES_HUB_DESCRIPTION,
+  alternates: { canonical: canonicalHref('/cities') },
+  robots: INDEX_FOLLOW_ROBOTS,
 };
 
 /** Daily ISR; on-demand revalidateTag/path still works via /api/internal/revalidate. */

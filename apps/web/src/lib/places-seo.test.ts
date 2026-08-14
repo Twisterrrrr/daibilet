@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
+import { PLACES_HUB_DESCRIPTION } from './seo-meta.ts';
 import { buildPlacesListingCopy, buildPlacesListingSeo } from './places-seo.ts';
 
 test('places H1 is the fixed kinds list plus genitive city', () => {
@@ -21,6 +22,8 @@ test('places H1 is the fixed kinds list plus genitive city', () => {
   assert.match(moscow.description, /Москвы/);
   assert.ok(moscow.description.length > 140);
   assert.ok(buildPlacesListingCopy(null).description.length > 140);
+  assert.equal(buildPlacesListingCopy(null).description, PLACES_HUB_DESCRIPTION);
+  assert.ok(!moscow.description.includes('\u2014') && !moscow.description.includes('\u2013'));
 
   const bySlug = buildPlacesListingCopy(null, null, 'saint-petersburg');
   assert.equal(bySlug.h1, 'Музеи, театры, локации, достопримечательности Санкт-Петербурга');
@@ -29,12 +32,12 @@ test('places H1 is the fixed kinds list plus genitive city', () => {
 
 test('places listing SEO puts city in description from slug alone', () => {
   const seo = buildPlacesListingSeo({ citySlug: 'saint-petersburg' });
-  assert.equal(seo.canonicalPath, '/places?city=saint-petersburg');
+  assert.equal(seo.canonicalPath, '/places');
   assert.match(seo.description, /Санкт-Петербурга/);
   assert.equal(seo.h1, 'Музеи, театры, локации, достопримечательности Санкт-Петербурга');
 });
 
-test('places listing canonical indexes hub, city and family; noindexes thin filters', () => {
+test('places listing canonical strips query junk to hub; never homepage', () => {
   assert.deepEqual(
     buildPlacesListingSeo({}),
     {
@@ -48,42 +51,48 @@ test('places listing canonical indexes hub, city and family; noindexes thin filt
     cityName: 'Казань',
     citySlug: 'kazan',
   });
-  assert.equal(city.canonicalPath, '/places?city=kazan');
+  assert.equal(city.canonicalPath, '/places');
   assert.equal(city.indexable, true);
   assert.equal(city.h1, 'Музеи, театры, локации, достопримечательности Казани');
   assert.equal(city.h1, buildPlacesListingCopy('Казань').h1);
 
   const family = buildPlacesListingSeo({ family: 'institution' });
-  assert.equal(family.canonicalPath, '/places?family=institution');
+  assert.equal(family.canonicalPath, '/places');
   assert.equal(family.indexable, true);
+
+  const category = buildPlacesListingSeo({
+    category: 'museums',
+    citySlug: 'sankt-peterburg',
+  });
+  assert.equal(category.canonicalPath, '/places');
+  assert.notEqual(category.canonicalPath, '/');
+  assert.ok(category.description.trim().length > 80);
 
   const search = buildPlacesListingSeo({
     citySlug: 'saint-petersburg',
     cityName: 'Санкт-Петербург',
     q: 'эрмитаж',
   });
-  assert.equal(search.canonicalPath, '/places?city=saint-petersburg');
-  assert.equal(search.indexable, false);
+  assert.equal(search.canonicalPath, '/places');
+  assert.equal(search.indexable, true);
 
   const typed = buildPlacesListingSeo({
     citySlug: 'moscow',
     type: 'museum',
     family: 'institution',
   });
-  assert.equal(typed.canonicalPath, '/places?city=moscow');
-  assert.equal(typed.indexable, false);
+  assert.equal(typed.canonicalPath, '/places');
+  assert.equal(typed.indexable, true);
 
   const withEvents = buildPlacesListingSeo({
     citySlug: 'perm',
     hasEvents: '1',
   });
-  assert.equal(withEvents.canonicalPath, '/places?city=perm');
-  assert.equal(withEvents.indexable, false);
+  assert.equal(withEvents.canonicalPath, '/places');
 
   const sorted = buildPlacesListingSeo({
     citySlug: 'perm',
     sort: 'asc',
   });
-  assert.equal(sorted.canonicalPath, '/places?city=perm');
-  assert.equal(sorted.indexable, false);
+  assert.equal(sorted.canonicalPath, '/places');
 });

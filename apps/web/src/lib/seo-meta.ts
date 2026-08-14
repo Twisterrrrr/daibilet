@@ -34,6 +34,21 @@ export const HOME_SEO_TITLE =
 export const HOME_SEO_DESCRIPTION_FALLBACK =
   'Купите билеты на экскурсии, музеи и мероприятия онлайн. Афиша городов России на Дайбилет.';
 
+/** Hub `/places` - dense Yandex snippet; never empty, never footer scrap. */
+export const PLACES_HUB_DESCRIPTION =
+  'Каталог мест Дайбилет: музеи, театры, концертные залы, парки, набережные, памятники и точки сбора по городам России. Смотрите афишу, покупайте билеты и собирайте маршрут на один день.';
+
+/** Hub `/events` - unique vs places/home; filters canonical here, not to `/`. */
+export const EVENTS_HUB_DESCRIPTION =
+  'Афиша событий Дайбилет: экскурсии, музеи, концерты и билеты онлайн более чем в 100 городах России. Выберите город, дату и формат - купите электронный билет без очереди.';
+
+/** Hub `/blog` listing. */
+export const BLOG_HUB_DESCRIPTION =
+  'Статьи по концертам, театру и городским прогулкам. Как выбрать билет, куда пойти с детьми, что смотреть на этой неделе.';
+
+/** Default indexable robots for public hubs (home/blog/places/events). */
+export const INDEX_FOLLOW_ROBOTS = { index: true, follow: true } as const;
+
 /** Fixed hubs + display names for home meta description. */
 const HOME_SEO_CITIES = [
   { slug: 'moskva', label: 'Москва' },
@@ -103,6 +118,38 @@ export function absoluteUrl(pathname: string): string {
   if (/^https?:\/\//i.test(value)) return value;
   const path = value.startsWith('/') ? value : `/${value}`;
   return new URL(path, `${SITE_URL}/`).toString();
+}
+
+/**
+ * Absolute https canonical for metadata.alternates.
+ * Catalog hubs must pass a clean pathname (`/places`, `/events`) - never `/`.
+ */
+export function canonicalHref(pathname: string): string {
+  return absoluteUrl(pathname);
+}
+
+/** Never emit empty meta description (Yandex falls back to footer scrap). */
+export function ensureSeoDescription(value: string | null | undefined, fallback: string): string {
+  const text = String(value || '')
+    .replace(/[\u2013\u2014]/g, '-')
+    .trim();
+  if (text) return text;
+  return String(fallback || '')
+    .replace(/[\u2013\u2014]/g, '-')
+    .trim();
+}
+
+/** Filter-page fallback when city is known but listing copy is empty. */
+export function placesCityDescriptionFallback(cityPrepositional: string): string {
+  const city = String(cityPrepositional || '').trim();
+  if (!city) return PLACES_HUB_DESCRIPTION;
+  return `Каталог интересных мест и достопримечательностей в ${city}: музеи, театры, парки и площадки. Афиша, билеты и маршруты на один день на Дайбилет.`;
+}
+
+export function eventsCityDescriptionFallback(cityPrepositional: string): string {
+  const city = String(cityPrepositional || '').trim();
+  if (!city) return EVENTS_HUB_DESCRIPTION;
+  return `Афиша событий в ${city}: экскурсии, музеи, концерты и развлечения. Даты, площадки и электронные билеты на Дайбилет.`;
 }
 
 function sanitizeOgAlt(alt?: string | null): string {

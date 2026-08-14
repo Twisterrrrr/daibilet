@@ -463,7 +463,7 @@ Shell UI есть; hydrate - § Открыто (техника) п.5.
 1. Chrome `/places` как каталог площадок: eyebrow `N площадок • N локаций • N городов`; H1 `Музеи, театры, локации, достопримечательности {City_Род}`; строка поиска (город + сорт «По событиям»), **ниже** теги kind одной синей кнопкой (`Все места`, Музеи, Театр…); scope (все / площадки / локации / с событиями) - текстовые ссылки в одной строке с «Собрать день», без второй синей кнопки.
 2. **Листинги** `/venues` и `/locations` (без slug) → **301** на `/places?family=institution` и `/places?family=location`. Query `city` / `q` / `type` / `page` сохраняется.
 3. **Entity** `/venues/[slug]` и `/locations/[slug]` **не** редиректятся и остаются каноном карточек, блога, Мой день, inbound.
-4. **Meta:** city-aware title/description/canonical на `/places` и `/places?city=`; `family` без thin-фильтров индексируется (преемник старых листингов); `q` / `type` / `page>1` → `noindex,follow`, canonical на родителя.
+4. **Meta (owner 2026-08-14):** canonical хаба всегда чистый pathname `https://daibilet.ru/places` (strip `city`/`family`/`category`/`q`/`type`/`sort`/`page`). Не канонизировать на `/`. `?city=` не в sitemap - не invent indexable facets. Title/description city-aware для сниппета; robots index,follow + canon хаба (как `/events?city=`).
 5. Sitemap listing = `/places` (не `/venues` и не `/locations` index). PDP URL в sitemap как раньше.
 
 ## 2026-08-13 - Place cluster (LOCKED, код later)

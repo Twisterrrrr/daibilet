@@ -1,10 +1,19 @@
 import type { Metadata } from 'next';
 
-import { buildShareMetadata, pageTitle } from '@/lib/seo-meta';
+import { cityToNominative, cityToPrepositional } from './city-declension.ts';
+import {
+  EVENTS_HUB_DESCRIPTION,
+  INDEX_FOLLOW_ROBOTS,
+  buildShareMetadata,
+  canonicalHref,
+  ensureSeoDescription,
+  eventsCityDescriptionFallback,
+  pageTitle,
+} from './seo-meta.ts';
 
 export const EVENTS_CATALOG_TITLE = 'Афиша событий - экскурсии и билеты';
-export const EVENTS_CATALOG_DESCRIPTION =
-  'Афиша событий Дайбилет: фильтры по городу, дате и формату. Более чем в 100 городах России.';
+export const EVENTS_CATALOG_DESCRIPTION = EVENTS_HUB_DESCRIPTION;
+export const EVENTS_HUB_PATH = '/events';
 
 const DATE_TITLE_LABELS: Record<string, string> = {
   today: 'Сегодня',
@@ -59,10 +68,14 @@ export function buildEventsCatalogMetaParts(input: {
   const to = String(input.to || '').trim();
 
   const filtered = Boolean(category || date || city || q || from || to);
+  const cityLabel = city && /[а-яё]/i.test(cityToNominative(city)) ? cityToNominative(city) : '';
+  const cityPrep = cityLabel ? cityToPrepositional(cityLabel) : '';
+  const cityFallback = eventsCityDescriptionFallback(cityPrep);
+
   if (!filtered) {
     return {
       title: EVENTS_CATALOG_TITLE,
-      description: EVENTS_CATALOG_DESCRIPTION,
+      description: ensureSeoDescription(EVENTS_CATALOG_DESCRIPTION, EVENTS_HUB_DESCRIPTION),
       filtered: false,
     };
   }
@@ -71,7 +84,7 @@ export function buildEventsCatalogMetaParts(input: {
   if (category) chunks.push(category);
   else chunks.push('Афиша событий');
 
-  if (city) chunks.push(city);
+  if (city) chunks.push(cityLabel || city);
 
   const dateBit = date
     ? dateTitleLabel(date)
@@ -85,14 +98,16 @@ export function buildEventsCatalogMetaParts(input: {
   const title = `${chunks.join(' - ')} - билеты онлайн`;
   const descriptionParts = [
     category ? `Подборка: ${category}` : 'Афиша событий',
-    city ? `город ${city}` : null,
+    cityLabel || city ? `город ${cityLabel || city}` : null,
     dateBit ? dateBit.toLowerCase() : null,
     q ? `поиск «${q}»` : null,
   ].filter(Boolean);
 
+  const filteredDescription = `${descriptionParts.join(', ')}. Более чем в 100 городах России.`;
+
   return {
     title,
-    description: `${descriptionParts.join(', ')}. Более чем в 100 городах России.`,
+    description: ensureSeoDescription(filteredDescription, cityFallback),
     filtered: true,
   };
 }
@@ -116,17 +131,18 @@ export function buildEventsCatalogMetadata(
 
   const cleanTitle = pageTitle(parts.title);
   const shareTitle = `${cleanTitle} | Дайбилет`;
+  const description = ensureSeoDescription(parts.description, EVENTS_HUB_DESCRIPTION);
 
   return {
     title: cleanTitle,
-    description: parts.description,
-    alternates: { canonical: '/events' },
-    // Query-фильтры - UX-срезы одной афиши; индекс только канон `/events`.
-    robots: parts.filtered ? { index: false, follow: true } : { index: true, follow: true },
+    description,
+    alternates: { canonical: canonicalHref(EVENTS_HUB_PATH) },
+    // Query-фильтры - UX-срезы одной афиши; канон чистый `/events`, не `/`.
+    robots: INDEX_FOLLOW_ROBOTS,
     ...buildShareMetadata({
       title: shareTitle,
-      description: parts.description,
-      path: '/events',
+      description,
+      path: EVENTS_HUB_PATH,
     }),
   };
 }

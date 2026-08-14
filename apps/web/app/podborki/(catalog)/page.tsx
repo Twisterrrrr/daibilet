@@ -12,7 +12,7 @@ import {
   resolvePodborkiCatalogSeo,
 } from '@/lib/podborki-city-seo';
 import { getLandingSeo } from '@/lib/seo/get-landing-seo';
-import { buildShareMetadata, pageTitle } from '@/lib/seo-meta';
+import { buildShareMetadata, canonicalHref, ensureSeoDescription, pageTitle } from '@/lib/seo-meta';
 import {
   getCachedDestinations,
   getCachedLandingsCatalog,
@@ -94,14 +94,15 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
     firstQueryValue(params.landing),
   );
   const title = pageTitle(seo.title);
+  const description = ensureSeoDescription(seo.description, PODBORKI_HUB_SEO.description);
   return {
     title,
-    description: seo.description,
-    alternates: { canonical: seo.canonicalPath },
+    description,
+    alternates: { canonical: canonicalHref(seo.canonicalPath) },
     robots: seo.robots,
     ...buildShareMetadata({
       title: `${title} | Дайбилет`,
-      description: seo.description,
+      description,
       path: seo.canonicalPath,
     }),
   };

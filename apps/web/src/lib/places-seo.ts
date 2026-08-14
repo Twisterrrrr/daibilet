@@ -1,4 +1,9 @@
-import { cityToGenitive, cityToNominative } from './city-declension.ts';
+import { cityToGenitive, cityToNominative, cityToPrepositional } from './city-declension.ts';
+import {
+  PLACES_HUB_DESCRIPTION,
+  ensureSeoDescription,
+  placesCityDescriptionFallback,
+} from './seo-meta.ts';
 
 export function firstPlacesQueryValue(value: string | string[] | undefined): string {
   if (Array.isArray(value)) return String(value[0] || '').trim();
@@ -14,6 +19,7 @@ export type PlacesListingSeoInput = {
   page?: string | null;
   hasEvents?: string | null;
   sort?: string | null;
+  category?: string | null;
 };
 
 export function normalizePlacesFamily(
@@ -25,6 +31,9 @@ export function normalizePlacesFamily(
 }
 
 const PLACES_H1 = 'Музеи, театры, локации, достопримечательности';
+
+/** Sitemap listing is only `/places` - do not invent `?city=` / `?family=` / `?category=` facets. */
+export const PLACES_HUB_PATH = '/places';
 
 function resolvePlacesCityLabel(cityName?: string | null, citySlug?: string | null): string {
   const raw = String(cityName || citySlug || '').trim();
@@ -57,11 +66,14 @@ export function buildPlacesListingCopy(
     description = gen
       ? `Локации ${gen}: парки, набережные, памятники, причалы, открытые площадки и точки сбора. Адреса, как добраться и события рядом - соберите день в городе с Дайбилет.`
       : 'Локации Дайбилет: парки, набережные, памятники, причалы, открытые площадки и точки сбора по городам России. Адреса, как добраться и события рядом.';
+  } else if (gen) {
+    description = `Музеи, театры, локации и достопримечательности ${gen}: площадки с афишей, парки, набережные, памятники и точки сбора. Смотрите события, покупайте билеты и собирайте маршрут на день в Дайбилет.`;
   } else {
-    description = gen
-      ? `Музеи, театры, локации и достопримечательности ${gen}: площадки с афишей, парки, набережные, памятники и точки сбора. Смотрите события, покупайте билеты и собирайте маршрут на день в Дайбилет.`
-      : 'Каталог мест Дайбилет: музеи, театры, концертные залы, парки, набережные, памятники и точки сбора по городам России. Смотрите афишу, покупайте билеты и собирайте маршрут на один день.';
+    description = PLACES_HUB_DESCRIPTION;
   }
+
+  const prep = city ? cityToPrepositional(city) : '';
+  description = ensureSeoDescription(description, placesCityDescriptionFallback(prep));
 
   return { h1, title: h1, description };
 }
@@ -74,8 +86,9 @@ export function resolvePlacesCitySlug(raw?: string | null): string {
 
 /**
  * Listing SEO for `/places`.
- * Indexable: hub, `?city=`, `?family=institution|location` (and city+family).
- * Thin `q` / `type` / `hasEvents` / `sort≠events` / `page>1` → noindex, canonical to parent without those params.
+ * Canonical is always the clean hub `/places` (strip city/family/category/q/type/sort/page).
+ * Sitemap has no query facets - do not self-canonicalize filters.
+ * Robots: index,follow + canon hub (same pattern as `/events?city=`).
  * Entity PDP stays `/venues/[slug]` and `/locations/[slug]`.
  */
 export function buildPlacesListingSeo(input: PlacesListingSeoInput): {
@@ -85,28 +98,16 @@ export function buildPlacesListingSeo(input: PlacesListingSeoInput): {
   canonicalPath: string;
   indexable: boolean;
 } {
-  const q = String(input.q || '').trim();
-  const type = String(input.type || '').trim();
   const family = normalizePlacesFamily(input.family);
-  const page = Number.parseInt(String(input.page || '').trim(), 10);
-  const hasPage = Number.isFinite(page) && page > 1;
-  const hasEventsRaw = String(input.hasEvents || '').trim().toLowerCase();
-  const hasEvents = hasEventsRaw === '1' || hasEventsRaw === 'true' || hasEventsRaw === 'yes';
-  const sortRaw = String(input.sort || '').trim().toLowerCase();
-  const thinSort = Boolean(sortRaw && sortRaw !== 'events');
   const citySlug = resolvePlacesCitySlug(input.citySlug);
   const copy = buildPlacesListingCopy(input.cityName, family, citySlug);
-  const thin = Boolean(q || type || hasPage || hasEvents || thinSort);
-
-  const canon = new URLSearchParams();
-  if (citySlug) canon.set('city', citySlug);
-  if (!thin && family) canon.set('family', family);
-  const qs = canon.toString();
-  const canonicalPath = qs ? `/places?${qs}` : '/places';
+  const city = resolvePlacesCityLabel(input.cityName, citySlug);
+  const prep = city ? cityToPrepositional(city) : '';
 
   return {
     ...copy,
-    canonicalPath,
-    indexable: !thin,
+    description: ensureSeoDescription(copy.description, placesCityDescriptionFallback(prep)),
+    canonicalPath: PLACES_HUB_PATH,
+    indexable: true,
   };
 }

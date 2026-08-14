@@ -5,7 +5,7 @@ import {
   EVENTS_CATALOG_TITLE,
   buildEventsCatalogMetaParts,
   buildEventsCatalogMetadata,
-} from '@/lib/seo-events-catalog-meta';
+} from './seo-events-catalog-meta.ts';
 
 test('base /events meta without filters', () => {
   const parts = buildEventsCatalogMetaParts({});
@@ -34,9 +34,21 @@ test('date=today and category combine', () => {
   assert.equal(parts.title, 'Музеи и арт - Сегодня - билеты онлайн');
 });
 
-test('metadata marks filtered pages noindex with canonical /events', () => {
+test('metadata keeps index,follow with absolute canonical /events', () => {
   const meta = buildEventsCatalogMetadata({ category: 'Развлечения', date: 'today' });
-  assert.equal(meta.alternates?.canonical, '/events');
-  assert.deepEqual(meta.robots, { index: false, follow: true });
+  const canonical = String(meta.alternates?.canonical || '');
+  assert.match(canonical, /^https:\/\//);
+  assert.match(canonical, /\/events$/);
+  assert.ok(!canonical.includes('?'));
+  assert.deepEqual(meta.robots, { index: true, follow: true });
   assert.equal(meta.title, 'Развлечения - Сегодня - билеты онлайн');
+  assert.ok(String(meta.description || '').trim().length > 40);
+});
+
+test('base /events description is dense and non-empty', () => {
+  const meta = buildEventsCatalogMetadata({});
+  const canonical = String(meta.alternates?.canonical || '');
+  assert.match(canonical, /\/events$/);
+  assert.ok(String(meta.description || '').includes('Афиша событий Дайбилет'));
+  assert.ok(!String(meta.description || '').includes('\u2014'));
 });
