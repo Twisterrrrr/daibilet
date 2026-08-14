@@ -1,11 +1,17 @@
+## 2026-08-14 - Live: Deploy MSK web `31832253595`
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| DEPLOY.MSK-31832253595 | Live tip `0b38d0a` BUILD_ID=`KlIIcAYr_X557GHm4PNn3` | Высокий | ✅ live |
+
 ## 2026-08-14 - Hub: headings, visit time, lifehacks, festivals 50/50
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| UX.HUB-SECTION-RHYTHM | Крупные H2 + серый подзаголовок; ~80-100px между секциями хаба | Высокий | 🔄 commit+push, Deploy MSK web |
-| UX.HUB-VISIT-MINUTES | Chip «N часов» из `visitMinutes`; Пермь editorial; без поля - скрыть | Высокий | 🔄 commit+push, Deploy MSK web |
-| UX.HUB-LIFEHACKS-SKY | Один `sky-50` на все карточки; CTA внизу; hover как city cards | Высокий | 🔄 commit+push, Deploy MSK web |
-| UX.HUB-FEST-50-50 | Desktop 50/50 текущий/прошедшие; прошедшие 2 колонки | Высокий | 🔄 commit+push, Deploy MSK web |
+| UX.HUB-SECTION-RHYTHM | Крупные H2 + серый подзаголовок; ~80-100px между секциями хаба | Высокий | ✅ live `31832253595` |
+| UX.HUB-VISIT-MINUTES | Chip «N часов» из `visitMinutes`; Пермь editorial; без поля - скрыть | Высокий | ✅ live `31832253595` |
+| UX.HUB-LIFEHACKS-SKY | Один `sky-50` на все карточки; CTA внизу; hover как city cards | Высокий | ✅ live `31832253595` |
+| UX.HUB-FEST-50-50 | Desktop 50/50 текущий/прошедшие; прошедшие 2 колонки | Высокий | ✅ live `31832253595` |
 
 ## 2026-08-14 - Live: Deploy MSK web `31829274518`
 

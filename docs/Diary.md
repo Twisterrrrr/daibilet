@@ -1,3 +1,17 @@
+## 2026-08-14 - Live: Deploy MSK web `31832253595`
+
+### Наблюдения
+- Owner: выкатить пакет хаба (заголовки/отступы, visitMinutes, лайфхаки sky+hover, фестивали 50/50).
+
+### Решения
+- Deploy MSK web [`31832253595`](https://github.com/Twisterrrrr/daibilet/actions/runs/31832253595) success. SHA `0b38d0a`. BUILD_ID=`KlIIcAYr_X557GHm4PNn3`. Swap с `CNMLn35GX7FABFGb3G7FX`.
+- Smoke 200: `/` `/places` `/events` `/cities/perm` (BUILD_ID в HTML; visit chip; lifehacks sky; regional `grid-cols-2`).
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-14 - Hub: headings, visit time, lifehacks sky, festivals 50/50
 
 ### Наблюдения
