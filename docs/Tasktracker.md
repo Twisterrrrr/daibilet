@@ -2,7 +2,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| UX.HUB-LIFEHACKS-NO-TABS | Лайфхаки: все карточки в карусели сразу, без табов категорий | Высокий | 🔄 commit+push, без live |
+| UX.HUB-LIFEHACKS-NO-TABS | Лайфхаки: все карточки в карусели сразу, без табов категорий | Высокий | ✅ commit+push, без live |
 
 ## 2026-08-14 - Hub must-see: desktop single-row carousel
 

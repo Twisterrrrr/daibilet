@@ -13,14 +13,13 @@ import {
   Ship,
   UtensilsCrossed,
 } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import {
   focusFromLifehackCta,
   resolveCityLifehacks,
   type CityLifehackIcon,
   type CityLifehackItem,
-  type CityLifehackTabId,
 } from '@/lib/city-hub-lifehacks';
 import { poCityDative } from '@/lib/city-declension';
 import type { CityPlaceFocus } from '@/lib/city-hub-local-flavor';
@@ -145,15 +144,9 @@ export function CityLifehacksSection({
   onAffiche,
 }: Props) {
   const pack = resolveCityLifehacks(citySlug);
-  const [tab, setTab] = useState<CityLifehackTabId>(pack?.tabs[0]?.id || 'walk');
+  const items = pack?.items ?? [];
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
-
-  const activeItems = useMemo(() => {
-    if (!pack) return [];
-    const current = pack.tabs.some((item) => item.id === tab) ? tab : pack.tabs[0]?.id;
-    return pack.items.filter((item) => item.tabId === current);
-  }, [pack, tab]);
 
   const syncIndex = useCallback(() => {
     const el = scrollerRef.current;
@@ -163,8 +156,8 @@ export function CityLifehacksSection({
     if (!card) return;
     const step = card.getBoundingClientRect().width + 16;
     if (step < 1) return;
-    setIndex(Math.max(0, Math.min(activeItems.length - 1, Math.round(el.scrollLeft / step))));
-  }, [activeItems.length]);
+    setIndex(Math.max(0, Math.min(items.length - 1, Math.round(el.scrollLeft / step))));
+  }, [items.length]);
 
   useEffect(() => {
     const el = scrollerRef.current;
@@ -173,13 +166,13 @@ export function CityLifehacksSection({
     setIndex(0);
     el.addEventListener('scroll', syncIndex, { passive: true });
     return () => el.removeEventListener('scroll', syncIndex);
-  }, [syncIndex, tab]);
+  }, [syncIndex]);
 
   const scrollTo = (next: number) => {
     const el = scrollerRef.current;
     if (!el) return;
     const cards = el.querySelectorAll<HTMLElement>('[data-lifehack-card]');
-    const card = cards[Math.max(0, Math.min(activeItems.length - 1, next))];
+    const card = cards[Math.max(0, Math.min(items.length - 1, next))];
     card?.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
   };
 
@@ -210,7 +203,7 @@ export function CityLifehacksSection({
         >
           {heading}
         </h2>
-        {activeItems.length > 1 ? (
+        {items.length > 1 ? (
           <div className="flex shrink-0 gap-2 pt-0.5">
             <button
               type="button"
@@ -233,47 +226,11 @@ export function CityLifehacksSection({
       </div>
 
       <div
-        className="mt-4 -mx-1 snap-x snap-mandatory overflow-x-auto overscroll-x-contain px-1 pb-0.5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-        data-city-lifehacks-tabs
-      >
-        <div
-          className="flex w-max flex-nowrap items-center gap-2"
-          role="tablist"
-          aria-label="Лайфхаки"
-        >
-          {pack.tabs.map((item) => {
-            const active = item.id === tab;
-            return (
-              <button
-                key={item.id}
-                type="button"
-                role="tab"
-                aria-selected={active}
-                onClick={() => setTab(item.id)}
-                className={`inline-flex min-h-9 shrink-0 snap-start items-center rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
-                  active
-                    ? editorial
-                      ? 'border-zinc-900 bg-zinc-900 text-white'
-                      : 'border-slate-900 bg-slate-900 text-white'
-                    : editorial
-                      ? 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-400'
-                      : 'border-slate-200 bg-white text-slate-700 hover:border-slate-400'
-                }`}
-              >
-                <span className="whitespace-nowrap">{item.label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div
         ref={scrollerRef}
         className="mt-5 flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden [&::-webkit-scrollbar]:h-0"
-        role="tabpanel"
         aria-label={heading}
       >
-        {activeItems.map((item, cardIndex) => {
+        {items.map((item, cardIndex) => {
           const Icon = ICONS[item.icon] || Footprints;
           return (
             <article key={item.id} data-lifehack-card={item.id} className={cardShell}>
