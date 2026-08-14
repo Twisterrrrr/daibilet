@@ -14,6 +14,7 @@ import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import { CityDayPresetBlock } from '@/components/CityDayPresetBlock.client';
 import { CityIdentityCarousel } from '@/components/CityIdentityCarousel.client';
+import { CityLifehacksSection } from '@/components/CityLifehacksSection.client';
 import { CityRegionalEvents } from '@/components/CityRegionalEvents.client';
 import { CityWeatherWidget } from '@/components/CityWeatherWidget.client';
 import { MustSeeFilterTabs } from '@/components/MustSeeFilterTabs.client';
@@ -40,6 +41,7 @@ import { matchSightAfficheLink, resolveFeaturedDirections } from '@/lib/city-hub
 import { resolveCityImageObjectPosition } from '@/lib/city-image-focus';
 import { resolveCityImage } from '@/lib/city-images';
 import { CITY_NIGHT_HERO } from '@/lib/city-night-hero';
+import { cityHasLifehacks, resolveCityLifehacks } from '@/lib/city-hub-lifehacks';
 import {
   cityHasWeatherWidget,
   cityHasWhenToGo,
@@ -80,6 +82,7 @@ const CITY_HASH_ALIASES: Record<string, string> = {
   'city-sights': 'sights',
   'city-travel': 'practice',
   'city-guide-faq': 'practice',
+  lifehacks: 'practice',
   'city-seo': 'seo',
   'why-go': 'sights',
   'zachem-ehat': 'sights',
@@ -242,7 +245,10 @@ export function CityPageView({
   const whenToGo = resolveWhenToGoBlurb(hubSlug);
   const hasWhenToGo = cityHasWhenToGo(hubSlug) && Boolean(whenToGo);
   const hasIdentity = cityIdentitySlides(hubSlug).length > 0;
-  const hasPractice = hasTravel || hasFaq || practiceArticles.length > 0;
+  const hasLifehacks = cityHasLifehacks(hubSlug);
+  const lifehacks = resolveCityLifehacks(hubSlug);
+  const showTravel = hasTravel && !lifehacks?.skipTravel;
+  const hasPractice = hasTravel || hasFaq || practiceArticles.length > 0 || hasLifehacks;
   const hasMore = hasDirections || hasVenues || moreArticles.length > 0;
   const showSightsBlock = hasSights || hasHookFact || hasWeather || hasWhenToGo || hasIdentity;
 
@@ -264,12 +270,12 @@ export function CityPageView({
         { id: 'sights', label: 'Зачем ехать', show: showSightsBlock },
         ...(blogAfterSuburbs ? [blogTab] : []),
         { id: 'affiche', label: 'Афиша', show: true },
-        { id: 'practice', label: 'Советы', show: hasPractice },
+        { id: 'practice', label: hasLifehacks ? 'Лайфхаки' : 'Советы', show: hasPractice },
         { id: 'more', label: 'Подборки', show: hasMore },
         ...(!blogAfterSuburbs ? [blogTab] : []),
       ].filter((tab) => tab.show);
     },
-    [blogAfterSuburbs, footerArticles.length, hasMore, hasPractice, showSightsBlock],
+    [blogAfterSuburbs, footerArticles.length, hasLifehacks, hasMore, hasPractice, showSightsBlock],
   );
 
   const renderHubBlogSection = () => {
@@ -434,13 +440,27 @@ export function CityPageView({
                         : 'text-2xl font-bold text-slate-950'
                     }
                   >
-                    Советы
+                    {hasLifehacks && city?.name
+                      ? `Лайфхаки по ${city.name}: как сберечь бюджет`
+                      : 'Советы'}
                   </h2>
-                  <p className={`mt-2 max-w-3xl text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-                    Как добраться, когда ехать и ответы на частые вопросы.
-                  </p>
+                  {hasLifehacks ? null : (
+                    <p className={`mt-2 max-w-3xl text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+                      Как добраться, когда ехать и ответы на частые вопросы.
+                    </p>
+                  )}
+                  {hasLifehacks ? (
+                    <CityLifehacksSection
+                      citySlug={hubSlug}
+                      editorial={editorial}
+                      onPlaceFocus={(focus) => applyPlaceFocus(focus)}
+                      onAffiche={() => scrollToSection('affiche')}
+                    />
+                  ) : null}
                 </div>
-                <CityTravelSection travel={guide?.travel} editorial={editorial} nested />
+                {showTravel ? (
+                  <CityTravelSection travel={guide?.travel} editorial={editorial} nested />
+                ) : null}
                 <CitySeasonalTip tip={guide?.seasonalTip} editorial={editorial} />
                 {hasFaq ? (
                   <CityFaqSection cityName={city.name} items={unifiedFaq} editorial={editorial} nested />
