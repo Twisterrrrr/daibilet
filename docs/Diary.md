@@ -1,3 +1,35 @@
+## 2026-08-14 - Blog city canon: не «Регионы» для городских статей
+
+### Наблюдения
+- Owner: `afisha-regionalnye-goroda` в фильтре блога как «Регионы». В тексте три города: Екатеринбург, Нижний Новгород, Уфа.
+- `moskva-immersivnye-vystavki` - ложная цель, статья уже Москва; не трогали.
+
+### Решения
+- Канон: статья относится к городам из текста. Frontmatter - канонические slug. Мульти = `citySlug: multi` + `citySlugs`. «Регионы» только без конкретных городов (колонки про Волхов/Захарьино оставлены).
+- `afisha-regionalnye-goroda`: `ekaterinburg`, `nizhny-novgorod`, `ufa`. Чип «Екатеринбург, Нижний Новгород и Уфа». Фильтр раскрывает три города.
+- Код: `blogPostFilterCities` / `enrichCardFields` / PDP `applyBlogCityCanon` не дают CMS `regions` перебить конкретные города. Валидатор `npm run blog:check-city`.
+- Docs: `.cursorrules` п.9, `docs/Project.md`.
+
+### Проблемы
+- Нет. Live deploy не делали. Prod DB upsert не гоняли (batch / по запросу).
+
+---
+
+## 2026-08-14 - Blog OG: perm-neobychnye-muzei без превью
+
+### Наблюдения
+- Статья `/blog/perm-neobychnye-muzei` на live: `og:image` = `default-og.jpg`. Cover `/images/blog/perm-neobychnye-muzei.jpg` отдавался 200 (~2.6MB), а `*-og.jpg` - 404.
+- Файл `perm-neobychnye-muzei-og.jpg` лежал только в gitignored `apps/web/public/images/` и не попадал в deploy. Канон: `apps/public/public/images/blog/{slug}-og.jpg`.
+- `resolveBlogShareImage` при отсутствии `*-og.jpg` сознательно уходит в default (не в 2MB cover) - без файла на диске шаринг без нормального превью.
+
+### Решения
+- Добавлен `apps/public/public/images/blog/perm-neobychnye-muzei-og.jpg` (1200x630 JPEG ~154KB). Cover/frontmatter не менялись. Commit+push, без live deploy.
+
+### Проблемы
+- Риск повтора: локальные `*-og.jpg` в `apps/web/public` не в git. Нужен файл в `apps/public/public` (или `scripts/generate-blog-og-images.py`).
+
+---
+
 ## 2026-08-14 - City hub hero: one Афиша CTA
 
 ### Наблюдения
