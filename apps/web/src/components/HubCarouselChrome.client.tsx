@@ -3,8 +3,9 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { HTMLAttributes, ReactNode, Ref } from 'react';
 
+// inline-btn / min-h-0: defeat globals.css button min-height:44px (oval discs).
 const ARROW_BASE =
-  'absolute top-1/2 z-20 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-40 md:inline-flex';
+  'inline-btn absolute top-1/2 z-20 hidden size-10 shrink-0 aspect-square min-h-0 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white p-0 text-slate-700 shadow-sm transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-40 md:inline-flex';
 
 type HubCarouselChromeProps = {
   children: ReactNode;
@@ -62,7 +63,7 @@ export function HubCarouselChrome({
           className={`${ARROW_BASE} left-0 -translate-x-[calc(100%+0.75rem)]`}
           {...prevAttrs}
         >
-          <ChevronLeft className="h-4 w-4" aria-hidden />
+          <ChevronLeft className="h-5 w-5" aria-hidden />
         </button>
       ) : null}
       <div
@@ -84,7 +85,7 @@ export function HubCarouselChrome({
           className={`${ARROW_BASE} right-0 translate-x-[calc(100%+0.75rem)]`}
           {...nextAttrs}
         >
-          <ChevronRight className="h-4 w-4" aria-hidden />
+          <ChevronRight className="h-5 w-5" aria-hidden />
         </button>
       ) : null}
     </div>
