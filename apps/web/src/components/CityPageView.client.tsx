@@ -504,7 +504,7 @@ export function CityPageView({
             >
               <div
                 className={`container-page ${HUB_SECTION_PAD_TOP_HALF} ${
-                  hasCollections ? 'pb-4 sm:pb-5' : HUB_SECTION_PAD_BOTTOM_HALF
+                  hasCollections ? 'pb-2 sm:pb-3' : HUB_SECTION_PAD_BOTTOM_HALF
                 }`}
               >
                 <CityCatalogHeader editorial={editorial} />
@@ -1306,14 +1306,58 @@ function PopularDirections({
 
   if (!landingItems.length && !categoryItems.length) return null;
 
-  const padY = compactTop
-    ? `${HUB_SECTION_PAD_TOP_HALF} pb-8 sm:pb-10`
-    : nested
-      ? 'py-10'
-      : 'py-10';
+  /** Nested under #affiche: strip under event rail, not a second major section. */
+  const padY = nested || compactTop
+    ? 'pt-3 sm:pt-4 pb-8 sm:pb-10'
+    : 'py-10';
+
+  const heading = nested ? (
+    <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+      <p
+        className={`text-sm font-semibold tracking-wide ${
+          editorial ? 'text-zinc-700' : 'text-slate-700'
+        }`}
+      >
+        Подборки
+      </p>
+      <Link
+        href={citySlug ? `/podborki?city=${encodeURIComponent(citySlug)}` : '/podborki'}
+        className={`text-sm font-semibold ${
+          editorial ? 'text-zinc-700 hover:text-zinc-950' : 'text-primary-700 hover:text-primary-800'
+        }`}
+      >
+        Все подборки →
+      </Link>
+    </div>
+  ) : (
+    <div className="flex flex-wrap items-end justify-between gap-4">
+      <div className="max-w-2xl">
+        <h2
+          className={
+            editorial
+              ? 'font-serif text-3xl font-semibold tracking-tight text-zinc-950 sm:text-4xl'
+              : 'text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl'
+          }
+        >
+          Каталог подборок
+        </h2>
+        <p className={`mt-2 text-sm leading-6 sm:text-base ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+          Форматы, которые чаще всего ищут {cityIn} - с ценами и датами в одном списке.
+        </p>
+      </div>
+      <Link
+        href={citySlug ? `/podborki?city=${encodeURIComponent(citySlug)}` : '/podborki'}
+        className={`text-sm font-semibold ${
+          editorial ? 'text-zinc-700 hover:text-zinc-950' : 'text-primary-700 hover:text-primary-800'
+        }`}
+      >
+        Все подборки →
+      </Link>
+    </div>
+  );
 
   return (
-    <section
+    <div
       id="directions"
       className={`${padY} ${nested ? '' : SECTION_SCROLL_MT} ${
         nested
@@ -1322,33 +1366,10 @@ function PopularDirections({
       }`}
     >
       <div className="container-page">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div className="max-w-2xl">
-            <h2
-              className={
-                editorial
-                  ? 'font-serif text-3xl font-semibold tracking-tight text-zinc-950 sm:text-4xl'
-                  : 'text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl'
-              }
-            >
-              Каталог подборок
-            </h2>
-            <p className={`mt-2 text-sm leading-6 sm:text-base ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-              Форматы, которые чаще всего ищут {cityIn} - с ценами и датами в одном списке.
-            </p>
-          </div>
-          <Link
-            href={citySlug ? `/podborki?city=${encodeURIComponent(citySlug)}` : '/podborki'}
-            className={`text-sm font-semibold ${
-              editorial ? 'text-zinc-700 hover:text-zinc-950' : 'text-primary-700 hover:text-primary-800'
-            }`}
-          >
-            Все подборки →
-          </Link>
-        </div>
+        {heading}
 
         {landingItems.length ? (
-          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className={`${nested ? 'mt-3' : 'mt-6'} grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4`}>
             {landingItems.map((landing) => (
               <LandingDirectionCard
                 key={landing.slug}
@@ -1362,7 +1383,7 @@ function PopularDirections({
         ) : null}
 
         {categoryItems.length ? (
-          <div className="mt-5 flex flex-wrap gap-2">
+          <div className={`${nested ? 'mt-3' : 'mt-5'} flex flex-wrap gap-2`}>
             {categoryItems.map(([name, count]) => (
               <button
                 key={`category-${name}`}
@@ -1381,7 +1402,7 @@ function PopularDirections({
           </div>
         ) : null}
       </div>
-    </section>
+    </div>
   );
 }
 
@@ -1695,11 +1716,7 @@ function CitySightsMustSeeList({
   return (
     <>
       <div id="city-must-see" className={SECTION_SCROLL_MT}>
-        <CityHubSectionHeading
-          title={heading}
-          description="Главные места, музеи и прогулочные точки"
-          editorial={editorial}
-        />
+        <CityHubSectionHeading title={heading} editorial={editorial} />
       </div>
       {showPlacesRail ? (
         <div className="mt-2.5 flex items-start justify-between gap-3">
