@@ -1,8 +1,15 @@
+## 2026-08-14 - Live batch after 7eab8fc
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| UX.HOME-BLOG-EXCERPT | Home 3-card blog: один абзац excerpt/first body под заголовком, line-clamp-3 | Высокий | ✅ live `31790635325` SHA `d7d77b6`/`5142146` BUILD_ID=`HOI4exTECrPJBi1CNwzUN` |
+| UX.PDP-HERO-VERTICAL | Event / venue / location: mobile portrait 3:4, текст внизу, градиент; md+ шире. Не полоска 16:10 | Высокий | ✅ live `31790635325` SHA `5142146` BUILD_ID=`HOI4exTECrPJBi1CNwzUN`; smoke event PDP |
+
 ## 2026-08-14 - PDP vertical mobile hero
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| UX.PDP-HERO-VERTICAL | Event / venue / location: mobile portrait 3:4, текст внизу, градиент; md+ шире. Не полоска 16:10 | Высокий | ✅ 2026-08-14 code; push, без live deploy |
+| UX.PDP-HERO-VERTICAL | Event / venue / location: mobile portrait 3:4, текст внизу, градиент; md+ шире. Не полоска 16:10 | Высокий | ✅ live `31790635325` SHA `5142146` BUILD_ID=`HOI4exTECrPJBi1CNwzUN` |
 
 ## 2026-08-14 - Live batch after f987ef6
 

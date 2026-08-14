@@ -1,3 +1,20 @@
+## 2026-08-14 - Live: Deploy MSK web `31790635325`
+
+### Наблюдения
+- Owner: «все выкати по готовности». Ждали home excerpts `d7d77b6` и vertical mobile hero `5142146`, затем один Deploy MSK web на tip. Image pipelines / card-image WIP не ждали.
+
+### Решения
+- Deploy MSK web `31790635325` success, ~9m52s. SHA `5142146` (предок excerpts `d7d77b6`). BUILD_ID=`HOI4exTECrPJBi1CNwzUN`. Swap с предыдущего `grpckhF4DQEb3_EIx6m_s` (`7eab8fc`).
+- Smoke 200 + BUILD_ID: `/` `/places` `/events` `/events/rechnaya-progulka-ot-prichala-vorobevy-gory-do-parka-zaryade-601`.
+- Home 3-card: `line-clamp-3` с живыми excerpt (иммерсив / танцпол-партер-VIP / Екб-НН-Уфа).
+- Event PDP HTML: `aspect-[3/4]`, `justify-end`, `object-[center_20%]`.
+
+### Проблемы
+- Нет. Хвосты: P0-P2 image pipelines (`-card.jpg` / home `<picture>` / blog `*-og.jpg`); локальный card-image WIP в worktree не входил в деплой. KGD gastro CMS body всё ещё «подкатывает» без prod seed.
+- После dispatch на origin появился `25e8b3f` (backend CI typecheck) - в этот web artifact не входил, live SHA `5142146`.
+
+---
+
 ## 2026-08-14 - PDP: restore vertical mobile hero
 
 ### Наблюдения
