@@ -1746,7 +1746,7 @@ enue_54cabc2b9cb5385a9f65b95a: 404 hub (MEETING_POINT/NONE) - ensure script + TC
 | BT.1 | Public event DTO: offers из page event, не cheapest-32 по meta-группе | Критический | ✅ |
 | BT.2 | Smoke TC «Реки и каналы»: диапазон + все категории в buy-card | Критический | ✅ `98aec73` |
 | BT.3 | Убрать open-date how-it-works из price block; вилка + категории | Критический | ✅ `b6648ae7` Deploy MSK **31300726933** BUILD_ID=`7Epi1rGECNBCNmjEXaPiF` |
-| BT.4 | TEP buy-card: не схлопывать пакеты с общим «Взрослый/Детский» (name\|description) | Критический | ✅ code; verify `/events/...-425` |
+| BT.4 | TEP buy-card: не схлопывать пакеты с общим «Взрослый/Детский» (name\|description) | Критический | ✅ `cf03744` Deploy MSK **31835513094** |
 
 ---
 

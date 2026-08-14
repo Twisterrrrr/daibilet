@@ -11,6 +11,10 @@
 ### Проблемы
 - Нет (import/API OK; баг только frontend grouping).
 
+### Deploy
+- SHA `cf03744`. Deploy MSK web [`31835513094`](https://github.com/Twisterrrrr/daibilet/actions/runs/31835513094) success.
+- Smoke: `/events/...-425` - 3 строки категорий (199 / 467 / 1800), не одна вилка.
+
 ---
 
 ## 2026-08-14 - Live: Deploy MSK web `31834916265`
