@@ -239,7 +239,7 @@ export function CityLifehacksSection({
               className={cardShell}
             >
               <div className="flex h-full flex-1 flex-col">
-                <div className="flex items-start gap-3 bg-sky-50 px-4 pb-3 pt-4 sm:px-5 sm:pt-5">
+                <div className="flex items-center gap-3 bg-sky-50 px-4 pb-3 pt-4 sm:px-5 sm:pt-5">
                   <span
                     className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${LIFEHACK_ICON}`}
                     aria-hidden
