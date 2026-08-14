@@ -68,47 +68,34 @@ export function SiteChromeSkeleton({
 function CityNightHeroSkeleton() {
   return (
     <>
-      <div className="border-b border-slate-200 bg-white">
-        <div className="container-page flex min-h-11 items-center gap-1.5 py-3" aria-hidden>
-          <span className="h-3 w-16 animate-pulse rounded bg-slate-200/80" />
-          <span className="h-3 w-3 rounded bg-slate-100" />
-          <span className="h-3 w-24 animate-pulse rounded bg-slate-200/70" />
-        </div>
-      </div>
       <section className={CITY_NIGHT_HERO.section}>
         <div
           className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
-          style={{ backgroundColor: CITY_NIGHT_HERO.navy }}
+          style={{ backgroundColor: CITY_NIGHT_HERO.navyDeep }}
           aria-hidden
         >
-          {/* HERO3n: leftGrad → 16:9 photo + soft edge fade md-only → right gutter. No alpha-mask. */}
+          <div className={`${CITY_NIGHT_HERO.photoFrame} bg-white/[0.06]`} />
           <div
             className={CITY_NIGHT_HERO.leftFillDesktop}
             style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftDesktop }}
           />
-          <div className={`${CITY_NIGHT_HERO.photoFrame} bg-white/[0.06]`}>
-            <div
-              className={CITY_NIGHT_HERO.photoEdgeFade}
-              style={{ backgroundImage: CITY_NIGHT_HERO.fadePhotoEdges }}
-            />
-          </div>
           <div
             className="absolute inset-0 md:hidden"
             style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftMobile }}
           />
-          <div
-            className={CITY_NIGHT_HERO.rightGutter}
-            style={{ backgroundImage: CITY_NIGHT_HERO.fadeRightGutter }}
-          />
         </div>
         <div className={CITY_NIGHT_HERO.content}>
           <div className={CITY_NIGHT_HERO.contentInner}>
+            <div className="mb-4 h-4 w-48 animate-pulse rounded bg-white/20" />
             <div className="h-10 max-w-md animate-pulse rounded bg-white/22 sm:h-12" />
             <div className="mt-3 h-4 max-w-xl animate-pulse rounded bg-white/16" />
-            <div className="mt-2 h-4 max-w-lg animate-pulse rounded bg-white/12" />
-            <div className="mt-5 md:mt-3 flex gap-3">
-              <span className="h-11 w-44 animate-pulse rounded-lg bg-white/24" />
-              <span className="h-11 w-36 animate-pulse rounded-lg bg-white/12" />
+            <div className="mt-5 flex gap-2">
+              <span className="h-8 w-24 animate-pulse rounded-full bg-white/18" />
+              <span className="h-8 w-28 animate-pulse rounded-full bg-white/14" />
+            </div>
+            <div className="mt-6 flex gap-3">
+              <span className="h-11 w-44 animate-pulse rounded-2xl bg-white/24" />
+              <span className="h-11 w-36 animate-pulse rounded-2xl bg-white/12" />
             </div>
           </div>
         </div>

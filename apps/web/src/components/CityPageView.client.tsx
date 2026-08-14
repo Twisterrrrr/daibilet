@@ -4,6 +4,7 @@ import * as React from 'react';
 import { ArrowLeft, ChevronDown, Clock, Info, Lightbulb, MapPin, Ticket } from 'lucide-react';
 import Link from 'next/link';
 
+import { CityHeroStrip } from '@/components/CityHeroStrip.client';
 import { CityHubArticlesGrid } from '@/components/CityHubArticleTeaser.client';
 import { CityAdmissionBlock } from '@/components/CityAdmissionBlock';
 import {
@@ -693,237 +694,6 @@ function CityHeroDefault({
   );
 }
 
-/** HERO3p: 16:9 gutter md4/lg10/xl16/2xl20 + light #122868 at photo seam; иначе нейтральный strip. */
-function CityHeroStrip({
-  city,
-  stats,
-  guide,
-  hasTravel,
-  hubConfig = null,
-  editorial = false,
-  jumpChips = [],
-}: {
-  city: PublicCityDto;
-  stats: PublicCityPageDto['stats'];
-  guide: CityInfoEntry | null;
-  hasTravel: boolean;
-  hubConfig?: ReturnType<typeof resolveCityHubConfig>;
-  editorial?: boolean;
-  jumpChips?: Array<{ id: string; label: string }>;
-}) {
-  const [heroImageFailed, setHeroImageFailed] = React.useState(false);
-  const cityIn = cityInPrepositional(city);
-  const citySlug = city.slug || city.sourceSlug || undefined;
-  // Short lead always in hero; hookFact sits above «Зачем ехать».
-  const brief =
-    guide?.brief?.trim() ||
-    `Экскурсии, музеи, мероприятия и активный отдых ${cityIn}. Выбирайте формат и дату - и покупайте билет онлайн на Дайбилете.`;
-  const afficheHref = citySlug
-    ? buildCatalogHref({ city: citySlug, sort: 'popular' })
-    : '#affiche';
-  const collectionsHref = citySlug
-    ? `/podborki?city=${encodeURIComponent(citySlug)}`
-    : '/podborki';
-  const seasonChip = hubConfig?.highlightSeason;
-  const heroImage = resolveCityImage({
-    slug: city.slug,
-    sourceSlug: city.sourceSlug,
-    name: city.name,
-    heroImageUrl: city.heroImageUrl,
-  });
-
-  React.useEffect(() => {
-    setHeroImageFailed(false);
-  }, [heroImage]);
-
-  /** Layout lock from first paint: image error must not collapse night shell (CLS). */
-  const nightShell = Boolean(heroImage);
-  const showPhoto = Boolean(heroImage && !heroImageFailed);
-  const heroFocus = resolveCityImageObjectPosition({
-    slug: city.slug,
-    sourceSlug: city.sourceSlug,
-    name: city.name,
-  });
-
-  const titleClass = nightShell
-    ? editorial
-      ? 'font-serif text-4xl font-semibold tracking-tight text-white sm:text-5xl'
-      : 'font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl'
-    : editorial
-      ? 'font-serif text-4xl font-semibold tracking-tight text-zinc-950 sm:text-5xl'
-      : 'font-display text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl';
-
-  const seasonChipClass = nightShell
-    ? 'inline-flex items-center rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-white ring-1 ring-white/25'
-    : editorial
-      ? 'inline-flex items-center rounded-full bg-zinc-200 px-3 py-1 text-xs font-semibold text-zinc-800'
-      : 'inline-flex items-center rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-800';
-
-  const statsClass = nightShell
-    ? 'flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-white/70'
-    : editorial
-      ? 'flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-zinc-500'
-      : 'flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-500';
-
-  const statsStrongClass = nightShell
-    ? 'font-semibold text-white'
-    : editorial
-      ? 'font-semibold text-zinc-800'
-      : 'font-semibold text-slate-700';
-
-  const statsDotClass = nightShell ? 'text-white/35' : editorial ? 'text-zinc-300' : 'text-slate-300';
-
-  const briefClass = nightShell
-    ? 'mt-3 max-w-2xl text-base leading-relaxed text-white/85 sm:text-lg'
-    : editorial
-      ? 'mt-3 max-w-2xl text-base leading-relaxed text-zinc-600 sm:text-lg'
-      : 'mt-3 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg';
-
-  const primaryCtaClass = nightShell
-    ? editorial
-      ? 'inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-white px-5 text-sm font-medium text-zinc-950 ring-1 ring-white transition hover:bg-white/90'
-      : 'inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-white px-5 text-sm font-semibold text-slate-900 hover:bg-white/90'
-    : editorial
-      ? 'inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-zinc-950 px-5 text-sm font-medium text-white ring-1 ring-zinc-950 transition hover:bg-zinc-800'
-      : 'inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-primary-600 px-5 text-sm font-semibold text-white hover:bg-primary-700';
-
-  const secondaryCtaClass = nightShell
-    ? editorial
-      ? 'inline-flex min-h-11 items-center justify-center rounded-full border border-white/35 bg-white/10 px-5 text-sm font-medium text-white backdrop-blur-sm hover:bg-white/15'
-      : 'inline-flex min-h-11 items-center justify-center rounded-lg border border-white/35 bg-white/10 px-5 text-sm font-semibold text-white backdrop-blur-sm hover:bg-white/15'
-    : editorial
-      ? 'inline-flex min-h-11 items-center justify-center rounded-full border border-zinc-300 bg-white px-5 text-sm font-medium text-zinc-700 hover:border-zinc-400'
-      : 'inline-flex min-h-11 items-center justify-center rounded-lg border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-700 hover:border-slate-300';
-
-  const sectionClass = nightShell
-    ? CITY_NIGHT_HERO.section
-    : editorial
-      ? 'border-b border-zinc-200 bg-zinc-50'
-      : 'border-b border-slate-200 bg-slate-50';
-
-  const contentClass = nightShell ? CITY_NIGHT_HERO.content : 'container-page py-8 sm:py-10';
-
-  // Mobile secondary chips: Главные места / Лайфхаки / Заметки. Primary CTA stays «Афиша».
-  // hasTravel kept for caller parity; hero CTAs are Афиша + Подборки событий.
-  void hasTravel;
-
-  return (
-    <div id="about" data-city-hero>
-      <PageBreadcrumbBar
-        items={[
-          { label: 'Главная', href: '/' },
-          { label: city.type === 'region' ? 'Направления' : 'Города', href: '/cities' },
-          { label: city.name },
-        ]}
-      />
-      <section className={sectionClass}>
-        {nightShell ? (
-          <div
-            className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
-            style={{ backgroundColor: CITY_NIGHT_HERO.navy }}
-            aria-hidden
-          >
-            <div
-              className={CITY_NIGHT_HERO.leftFillDesktop}
-              style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftDesktop }}
-            />
-            <div className={CITY_NIGHT_HERO.photoFrame}>
-              {showPhoto ? (
-                <SafeImage
-                  src={heroImage}
-                  alt=""
-                  fill
-                  priority
-                  sizes={CITY_NIGHT_HERO.imageSizes}
-                  style={{ objectPosition: heroFocus }}
-                  onError={() => setHeroImageFailed(true)}
-                  className="object-cover object-center"
-                />
-              ) : null}
-              <div
-                className={CITY_NIGHT_HERO.photoEdgeFade}
-                style={{ backgroundImage: CITY_NIGHT_HERO.fadePhotoEdges }}
-              />
-            </div>
-            <div
-              className="absolute inset-0 md:hidden"
-              style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftMobile }}
-            />
-            <div
-              className={CITY_NIGHT_HERO.rightGutter}
-              style={{ backgroundImage: CITY_NIGHT_HERO.fadeRightGutter }}
-            />
-          </div>
-        ) : null}
-        <div className={contentClass}>
-          <div className={nightShell ? 'w-full max-w-3xl md:max-w-[72%]' : 'max-w-3xl'}>
-            <h1 className={titleClass}>{city.name}</h1>
-            {brief ? <p className={briefClass}>{brief}</p> : null}
-            <div className="mt-4 md:mt-5">
-              {seasonChip ? (
-                <p className={`mb-3 text-sm ${nightShell ? 'text-white/70' : editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-                  <span className={seasonChipClass}>
-                    {seasonChip.label}
-                    {seasonChip.monthsHint ? ` (${seasonChip.monthsHint})` : ''}
-                  </span>
-                </p>
-              ) : null}
-              <p className={statsClass}>
-                <span className={statsStrongClass}>{pluralEvents(stats.events)}</span>
-                <span aria-hidden="true" className={statsDotClass}>
-                  ·
-                </span>
-                <span className={statsStrongClass}>{pluralVenues(stats.venues)}</span>
-              </p>
-
-              <div className="mt-5 flex flex-wrap gap-3">
-                <Link href={afficheHref} className={primaryCtaClass}>
-                  <Ticket className="h-4 w-4 shrink-0" aria-hidden="true" />
-                  <span>Афиша</span>
-                </Link>
-                <Link href={collectionsHref} className={secondaryCtaClass}>
-                  Подборки событий
-                </Link>
-              </div>
-
-              {/* Mobile: Главные места / Лайфхаки / Ещё. Desktop uses sticky. */}
-              {jumpChips.length ? (
-              <div
-                className="mt-4 flex gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:hidden"
-                data-city-hero-jump
-              >
-                {jumpChips.map((chip) => (
-                  <a
-                    key={chip.id}
-                    href={`#${chip.id}`}
-                    onClick={(event) => {
-                      event.preventDefault();
-                      scrollToSection(chip.id);
-                      if (typeof window !== 'undefined') {
-                        window.history.replaceState(null, '', `#${chip.id}`);
-                      }
-                    }}
-                    className={
-                      nightShell
-                        ? 'shrink-0 rounded-full bg-white/20 px-3.5 py-1.5 text-xs font-semibold text-white ring-1 ring-white/35 backdrop-blur-sm'
-                        : editorial
-                          ? 'shrink-0 rounded-full bg-zinc-200/80 px-3.5 py-1.5 text-xs font-semibold text-zinc-800'
-                          : 'shrink-0 rounded-full bg-slate-100 px-3.5 py-1.5 text-xs font-semibold text-slate-700'
-                    }
-                  >
-                    {chip.label}
-                  </a>
-                ))}
-              </div>
-              ) : null}
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>
-  );
-}
-
 function CityStickyTabs({
   desktopTabs,
   extraTabs = [],
@@ -1211,41 +981,35 @@ function CityLoadingState({ editorial = false }: { editorial?: boolean }) {
   // Same CITY_NIGHT_HERO shell as CityHeroStrip / SiteChromeSkeleton city (equal py + justify-center).
   return (
     <>
-      <div className="border-b border-slate-200 bg-white">
-        <div className="container-page flex min-h-11 items-center gap-1.5 py-3" aria-hidden>
-          <div className="h-3 w-16 rounded bg-slate-200/80" />
-          <div className="h-3 w-3 rounded bg-slate-100" />
-          <div className="h-3 w-20 rounded bg-slate-200/70" />
-        </div>
-      </div>
       <section className={CITY_NIGHT_HERO.section} aria-busy="true" aria-label="Загрузка">
         <div
           className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
-          style={{ backgroundColor: CITY_NIGHT_HERO.navy }}
+          style={{ backgroundColor: CITY_NIGHT_HERO.navyDeep }}
           aria-hidden
         >
+          <div className={`${CITY_NIGHT_HERO.photoFrame} bg-white/[0.04]`} />
           <div
             className={CITY_NIGHT_HERO.leftFillDesktop}
             style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftDesktop }}
           />
-          <div className={`${CITY_NIGHT_HERO.photoFrame} bg-white/[0.04]`} />
           <div
             className="absolute inset-0 md:hidden"
             style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftMobile }}
           />
-          <div
-            className={CITY_NIGHT_HERO.rightGutter}
-            style={{ backgroundImage: CITY_NIGHT_HERO.fadeRightGutter }}
-          />
         </div>
         <div className={CITY_NIGHT_HERO.content}>
           <div className={CITY_NIGHT_HERO.contentInner}>
+            <div className="mb-4 h-4 w-48 rounded bg-white/20" />
             <div className={`h-10 max-w-md rounded sm:h-12 ${editorial ? 'bg-white/20' : 'bg-white/22'}`} />
-            <div className="mt-5 h-14 max-w-2xl rounded-2xl bg-white/90" />
-            <div className="mt-3 flex gap-2 md:hidden">
-              <div className="h-7 w-16 rounded-full bg-white/20" />
-              <div className="h-7 w-20 rounded-full bg-white/16" />
-              <div className="h-7 w-20 rounded-full bg-white/14" />
+            <div className="mt-3 h-4 max-w-xl rounded bg-white/16" />
+            <div className="mt-5 flex gap-2">
+              <div className="h-8 w-24 rounded-full bg-white/18" />
+              <div className="h-8 w-28 rounded-full bg-white/14" />
+              <div className="h-8 w-32 rounded-full bg-white/12" />
+            </div>
+            <div className="mt-6 flex gap-3">
+              <div className="h-11 w-40 rounded-2xl bg-white/90" />
+              <div className="h-11 w-36 rounded-2xl bg-white/20" />
             </div>
           </div>
         </div>

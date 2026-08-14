@@ -120,8 +120,8 @@ export function CityPicker({
       ? 'relative flex h-11 w-full items-center gap-2 rounded-xl bg-slate-50 px-3 pr-9 text-left text-sm font-medium text-slate-800 outline-none transition hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-primary/25'
       : variant === 'compact'
         ? 'relative flex w-full items-center gap-2 rounded-lg py-3 pl-10 pr-10 text-left text-base font-medium text-slate-700 hover:bg-slate-100'
-        : // Header: mobile = pin icon only (label truncated/eaten in sticky chrome); sm+ shows city name.
-          'inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-slate-600 outline-none transition hover:bg-surface-muted hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-primary/25 sm:h-auto sm:w-auto sm:max-w-full sm:justify-start sm:gap-1.5 sm:px-1.5 sm:py-1 sm:text-sm sm:font-medium';
+        : // Header pill: pin + city + chevron (Lovable chrome).
+          'inline-flex h-10 max-w-[11rem] shrink-0 items-center gap-1.5 rounded-full border border-slate-200/90 bg-slate-50/90 px-3 text-sm font-medium text-slate-700 outline-none transition hover:border-slate-300 hover:bg-white hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-primary/25 sm:max-w-[14rem] xl:max-w-[16rem]';
 
   const menu = open
     ? createPortal(
@@ -209,10 +209,10 @@ export function CityPicker({
           <MapPin className={`h-4 w-4 shrink-0 ${open ? 'text-primary-600' : 'text-slate-500'}`} />
         ) : null}
         {variant === 'header' ? (
-          <MapPin className={`h-5 w-5 shrink-0 sm:h-4 sm:w-4 ${open ? 'text-primary-600' : ''}`} />
+          <MapPin className={`h-4 w-4 shrink-0 ${open ? 'text-primary-600' : 'text-slate-500'}`} />
         ) : null}
         {variant === 'header' ? (
-          <span className="hidden min-w-0 truncate sm:inline">{selectedLabel}</span>
+          <span className="min-w-0 truncate">{selectedLabel}</span>
         ) : (
           <span className="min-w-0 flex-1 truncate whitespace-nowrap text-left">{selectedLabel}</span>
         )}
@@ -223,7 +223,7 @@ export function CityPicker({
             } ${variant === 'compact' ? 'right-4' : ''}`}
           />
         ) : (
-          <ChevronDown className={`hidden h-3.5 w-3.5 shrink-0 opacity-60 transition sm:inline ${open ? 'rotate-180' : ''}`} />
+          <ChevronDown className={`h-3.5 w-3.5 shrink-0 opacity-60 transition ${open ? 'rotate-180' : ''}`} />
         )}
       </button>
       {menu}

@@ -147,12 +147,9 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
 
   return (
     <>
-      <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-200/70 bg-white/95 pt-[env(safe-area-inset-top,0px)] shadow-[0_1px_0_hsl(210_9%_11%/0.03)] backdrop-blur-md supports-[backdrop-filter]:bg-white/90">
-        <div className="container-page flex min-h-[var(--site-header-height)] items-center justify-between gap-2 py-2.5 sm:py-3 lg:py-3.5">
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-200/60 bg-white/80 pt-[env(safe-area-inset-top,0px)] shadow-[0_1px_0_hsl(210_9%_11%/0.04)] backdrop-blur-xl supports-[backdrop-filter]:bg-white/70">
+        <div className="mx-auto flex w-full max-w-[1240px] min-h-[var(--site-header-height)] items-center justify-between gap-2 px-4 py-2.5 sm:px-6 sm:py-3 lg:px-8 lg:py-3.5">
           <div className="flex min-w-0 flex-1 flex-nowrap items-center gap-2 sm:gap-3 lg:flex-none lg:gap-4">
-            {/* Label only in header; sheet layer is a sibling outside backdrop-blur. */}
-            <MobileNavTrigger id={mobileNavId} />
-
             <Link
               href="/"
               className="inline-flex shrink-0 items-center overflow-visible"
@@ -161,14 +158,14 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
               <DaibiletLogo textClassName="text-lg sm:text-xl lg:text-2xl" />
             </Link>
 
-            {/* PH2.LOC2 / UX.LOC1: city outside burger - pin icon + dropdown (label from sm+). */}
+            {/* PH2.LOC2 / UX.LOC1: city outside burger - pin + pill + chevron. */}
             <CityPicker
               cities={destinations}
               value={cityValue}
               onChange={onCityChange}
               allLabel="Фильтр по городу"
               variant="header"
-              className="shrink-0 sm:min-w-0 sm:max-w-[14rem] xl:max-w-[16rem]"
+              className="shrink-0 sm:min-w-0"
             />
           </div>
 
@@ -230,6 +227,8 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
                 onCloseUserMenu={() => setUserMenuOpen(false)}
               />
             </div>
+
+            <MobileNavTrigger id={mobileNavId} />
           </div>
         </div>
       </header>
