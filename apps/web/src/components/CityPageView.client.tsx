@@ -333,7 +333,7 @@ export function CityPageView({
                   editorial ? 'border-zinc-200' : 'border-slate-100'
                 }`}
               >
-                {hasHookFact || hasWeather || hasWhenToGo ? (
+                {hasHookFact || hasWeather || hasWhenToGo || hasIdentity ? (
                   <div
                     className={`container-page pt-8 sm:pt-10 ${
                       hasSights ? 'pb-2 sm:pb-3' : 'pb-8 sm:pb-10'
