@@ -1,3 +1,9 @@
+## 2026-08-14 - Hub festivals: past as open side column
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| UX.HUB-FEST-PAST-COL | Прошедшие фестивали: открытая колонка рядом с текущим, не details; убрать дисклеймер про афишу/API | Высокий | 🔄 commit+push, без live |
+
 ## 2026-08-14 - Lifehacks: all cards without category tabs
 
 | ID | Задача | Приоритет | Статус |
@@ -112,7 +118,7 @@
 | UX.HUB-AFFICHE-TOURIST | Дефолт «Экскурсии», ранг река/театр > стендап, скрыть тонкий таб Музеи, схлопнуть стендап | Высокий | ✅ git, без live deploy |
 | UX.HUB-AFFICHE-BEFORE-SUBURBS | MSK/SPB/PERM/KGD/NN: афиша после сценариев, пригороды ниже | Высокий | ✅ git, без live deploy |
 | UX.HUB-SUBURB-COLLAPSE | Хохловка и др.: 3 точки + «Ещё N» | Высокий | ✅ git, без live deploy |
-| UX.HUB-FEST-PAST | Прошедшие фестивали в details, не в сетке | Средний | ✅ git, без live deploy |
+| UX.HUB-FEST-PAST | Прошедшие фестивали в details, не в сетке | Средний | ⛔ superseded: UX.HUB-FEST-PAST-COL |
 
 ## 2026-08-14 - City hub: лайфхаки + сезоны MSK/SPB/KGD/NN
 
