@@ -1,3 +1,23 @@
+## 2026-08-14 - Hub: region-events anchor, spacing, FAQ ask, order
+
+### Наблюдения
+- Sticky «События региона» не докручивал до заголовка (id на секции + pad, offset без safe-area).
+- Лишний вертикальный зазор region→affiche и перед «Каталог подборок».
+- Между Подборками и «Рядом с городом» вставали admission/площадки.
+- FAQ без CTA «Задать вопрос».
+
+### Решения
+- `#region-events` на heading-band; `HUB_SECTION_SCROLL_MT` + safe-area; `scrollToSection` считает offset header+hub nav.
+- Pad join ~50%: region pb half, affiche pt/pb half, collections `compactTop`.
+- Порядок: region → affiche → подборки → region-nearby → venues → blog → FAQ.
+- FAQ: кнопка «Задать вопрос» → mailto `hello@daibilet.ru` (как ContactForm).
+- Sticky «О городе» сохранён.
+
+### Проблемы
+- Deploy не делали (owner не просил выкатывай).
+
+---
+
 ## 2026-08-14 - Hub sticky: «О городе» → #about
 
 ### Наблюдения

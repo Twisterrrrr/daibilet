@@ -2,7 +2,12 @@
 
 import { CalendarDays } from 'lucide-react';
 
-import { CityHubSectionHeading, HUB_SECTION_PAD } from '@/components/CityHubSectionHeading';
+import {
+  CityHubSectionHeading,
+  HUB_SECTION_PAD_BOTTOM_HALF,
+  HUB_SECTION_PAD_TOP,
+  HUB_SECTION_SCROLL_MT,
+} from '@/components/CityHubSectionHeading';
 import { listCityRegionalEvents, listCityRegionalPastEvents, regionalEventStatusLabel } from '@/lib/city-regional-events';
 
 type Props = {
@@ -19,16 +24,18 @@ export function CityRegionalEvents({ citySlug, editorial = false, }: Props) {
 
   return (
     <section
-      id="region-events"
-      className={`border-b ${editorial ? 'border-zinc-200' : 'border-slate-100'} scroll-mt-[calc(var(--site-header-height)+3.25rem)]`}
+      className={`border-b ${editorial ? 'border-zinc-200' : 'border-slate-100'}`}
       data-city-regional-events
     >
-      <div className={`container-page ${HUB_SECTION_PAD}`}>
-        <CityHubSectionHeading
-          title="События региона"
-          description="Фестивали и крупные события рядом с городом"
-          editorial={editorial}
-        />
+      <div className={`container-page ${HUB_SECTION_PAD_TOP} ${HUB_SECTION_PAD_BOTTOM_HALF}`}>
+        {/* Anchor on heading band so sticky lands on title, not empty section pad. */}
+        <div id="region-events" className={HUB_SECTION_SCROLL_MT}>
+          <CityHubSectionHeading
+            title="События региона"
+            description="Фестивали и крупные события рядом с городом"
+            editorial={editorial}
+          />
+        </div>
         <div
           className={
             split

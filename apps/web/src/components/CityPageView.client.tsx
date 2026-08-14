@@ -10,6 +10,9 @@ import {
   CityHubSectionHeading,
   HUB_SECTION_GAP,
   HUB_SECTION_PAD,
+  HUB_SECTION_PAD_BOTTOM_HALF,
+  HUB_SECTION_PAD_TOP_HALF,
+  HUB_SECTION_SCROLL_MT,
 } from '@/components/CityHubSectionHeading';
 import { EventCard } from '@/components/EventCard';
 import { LandingDirectionCard } from '@/components/LandingDirectionCard.client';
@@ -137,7 +140,9 @@ const HUB_DESKTOP_NAV: Array<{ id: string; label: string }> = [
 
 const HUB_MOBILE_PRIMARY_IDS = ['about', 'sights', 'city-routes', 'city-suburbs', 'affiche'] as const;
 
-const SECTION_SCROLL_MT = 'scroll-mt-[calc(var(--site-header-height)+3.25rem)]';
+const SECTION_SCROLL_MT = HUB_SECTION_SCROLL_MT;
+const HUB_STICKY_TOP = 'top-[calc(var(--site-header-height)+env(safe-area-inset-top,0px))]';
+const FAQ_SUPPORT_EMAIL = 'hello@daibilet.ru';
 
 export function CityPageView({
   slug,
@@ -307,6 +312,7 @@ export function CityPageView({
   const hasRegionEvents =
     listCityRegionalEvents(hubSlug).length > 0 || listCityRegionalPastEvents(hubSlug).length > 0;
   const hasMore = hasDirections || hasVenues || moreArticles.length > 0;
+  const hasCollections = hasDirections;
   const showSightsBlock = hasSights || hasHookFact || hasWeather || hasWhenToGo || hasIdentity;
   const hasWhyGoNav = hasIdentity || hasHookFact || hasWeather || hasWhenToGo;
   const hasMustSeeNav = Boolean(
@@ -343,13 +349,13 @@ export function CityPageView({
     if (footerArticles.length > 0) filled.add('blog');
     const desktop = HUB_DESKTOP_NAV.filter((item) => filled.has(item.id));
     const extra: Array<{ id: string; label: string }> = [];
-    if (hasMore) extra.push({ id: 'more', label: 'Подборки' });
+    if (hasCollections) extra.push({ id: 'more', label: 'Подборки' });
     return { desktop, extra };
   }, [
     footerArticles.length,
+    hasCollections,
     hasFaq,
     hasLifehacks,
-    hasMore,
     hasMustSeeNav,
     hasRegionEvents,
     hasRoutesNav,
@@ -523,10 +529,14 @@ export function CityPageView({
               id="affiche"
               className={`border-b ${editorial ? 'border-zinc-200' : 'border-slate-200/80'} ${SECTION_SCROLL_MT}`}
             >
-              <div className={`container-page ${HUB_SECTION_PAD}`}>
+              <div
+                className={`container-page ${HUB_SECTION_PAD_TOP_HALF} ${HUB_SECTION_PAD_BOTTOM_HALF}`}
+              >
                 <CityCatalogHeader editorial={editorial} />
                 {contentReady ? (
-                  <div className="sticky top-[calc(var(--site-header-height)+3.25rem)] z-20 -mx-1 mb-5 bg-slate-50/95 px-1 py-2 backdrop-blur supports-[backdrop-filter]:bg-slate-50/90">
+                  <div
+                    className={`sticky z-20 -mx-1 mb-5 bg-slate-50/95 px-1 py-2 backdrop-blur supports-[backdrop-filter]:bg-slate-50/90 top-[calc(var(--site-header-height)+env(safe-area-inset-top,0px)+3.5rem)]`}
+                  >
                     <div className="flex flex-nowrap gap-2 overflow-x-auto overscroll-x-contain pb-0.5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                     <CategoryFilter
                       categories={categories}
@@ -547,50 +557,58 @@ export function CityPageView({
               </div>
             </section>
 
-            {hasMore ? (
+            {hasCollections ? (
               <section
                 id="more"
                 className={`border-b ${editorial ? 'border-zinc-200' : 'border-slate-200/80'} ${SECTION_SCROLL_MT}`}
               >
                 {contentReady ? (
-                  <>
-                    <PopularDirections
-                      city={city}
-                      featuredDirections={featuredDirections}
-                      categories={categories}
-                      editorial={editorial}
-                      nested
-                      onCategory={(value) => {
-                        pickCategory(value);
-                        scrollToSection('affiche');
-                      }}
-                    />
-                    {admission && admission.items.length > 0 ? (
-                      <CityAdmissionBlock
-                        admission={admission}
-                        cityName={city.name}
-                        editorial={editorial}
-                        nested
-                      />
-                    ) : null}
-                    <VenueHighlights
-                      city={city}
-                      venues={payload.venues}
-                      topN={hubConfig?.venuesTopN}
-                      editorial={editorial}
-                      nested
-                    />
-                  </>
+                  <PopularDirections
+                    city={city}
+                    featuredDirections={featuredDirections}
+                    categories={categories}
+                    editorial={editorial}
+                    nested
+                    compactTop
+                    onCategory={(value) => {
+                      pickCategory(value);
+                      scrollToSection('affiche');
+                    }}
+                  />
                 ) : (
                   <CityContentLoadingState />
                 )}
               </section>
-            ) : contentReady ? null : (
+            ) : contentReady ? null : hasMore ? (
               <CityContentLoadingState />
-            )}
+            ) : null}
 
             {payload.regionNearby?.events?.length ? (
               <RegionNearbyStrip nearby={payload.regionNearby} editorial={editorial} />
+            ) : null}
+
+            {contentReady && (hasVenues || (admission && admission.items.length > 0)) ? (
+              <section
+                className={`border-b ${editorial ? 'border-zinc-200' : 'border-slate-200/80'}`}
+              >
+                {admission && admission.items.length > 0 ? (
+                  <CityAdmissionBlock
+                    admission={admission}
+                    cityName={city.name}
+                    editorial={editorial}
+                    nested
+                  />
+                ) : null}
+                {hasVenues ? (
+                  <VenueHighlights
+                    city={city}
+                    venues={payload.venues}
+                    topN={hubConfig?.venuesTopN}
+                    editorial={editorial}
+                    nested
+                  />
+                ) : null}
+              </section>
             ) : null}
 
             {renderHubBlogSection()}
@@ -1056,8 +1074,8 @@ function CityStickyTabs({
       data-city-hub-nav
       className={
         editorial
-          ? 'sticky top-[var(--site-header-height)] z-30 border-b border-zinc-200 bg-zinc-50/90 backdrop-blur-md'
-          : 'sticky top-[var(--site-header-height)] z-30 border-b border-slate-200 bg-white/95 backdrop-blur'
+          ? `sticky ${HUB_STICKY_TOP} z-30 border-b border-zinc-200 bg-zinc-50/90 backdrop-blur-md`
+          : `sticky ${HUB_STICKY_TOP} z-30 border-b border-slate-200 bg-white/95 backdrop-blur`
       }
     >
       <div
@@ -1280,6 +1298,7 @@ function PopularDirections({
   onCategory,
   editorial = false,
   nested = false,
+  compactTop = false,
 }: {
   city: PublicCityDto;
   featuredDirections: ReturnType<typeof resolveFeaturedDirections>;
@@ -1287,6 +1306,8 @@ function PopularDirections({
   onCategory: (category: string) => void;
   editorial?: boolean;
   nested?: boolean;
+  /** ~50% less space above the block (hub rhythm tighten). */
+  compactTop?: boolean;
 }) {
   const cityIn = cityInPrepositional(city);
   const citySlug = city.slug || city.sourceSlug || undefined;
@@ -1314,10 +1335,16 @@ function PopularDirections({
 
   if (!landingItems.length && !categoryItems.length) return null;
 
+  const padY = compactTop
+    ? `${HUB_SECTION_PAD_TOP_HALF} pb-8 sm:pb-10`
+    : nested
+      ? 'py-10'
+      : 'py-10';
+
   return (
     <section
       id="directions"
-      className={`py-10 ${nested ? '' : SECTION_SCROLL_MT} ${
+      className={`${padY} ${nested ? '' : SECTION_SCROLL_MT} ${
         nested
           ? ''
           : `border-b ${editorial ? 'border-zinc-200 bg-zinc-50/50' : 'border-slate-100 bg-slate-50/80'}`
@@ -2332,7 +2359,32 @@ function CityFaqSection({
   nested?: boolean;
 }) {
   const [openIndex, setOpenIndex] = React.useState<number | null>(0);
+  const [askOpen, setAskOpen] = React.useState(false);
+  const [askQuestion, setAskQuestion] = React.useState('');
+  const [askEmail, setAskEmail] = React.useState('');
+  const [askStatus, setAskStatus] = React.useState<'idle' | 'sent' | 'error'>('idle');
   const cityGenitive = cityToGenitive(cityName);
+
+  const submitAsk = (event: React.FormEvent) => {
+    event.preventDefault();
+    const question = askQuestion.trim();
+    if (question.length < 8) {
+      setAskStatus('error');
+      return;
+    }
+    const subject = `Вопрос о городе: ${cityName}`;
+    const body = [
+      `Город: ${cityName}`,
+      askEmail.trim() ? `Email: ${askEmail.trim()}` : null,
+      '',
+      'Вопрос:',
+      question,
+    ]
+      .filter(Boolean)
+      .join('\n');
+    window.location.href = `mailto:${FAQ_SUPPORT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    setAskStatus('sent');
+  };
 
   return (
     <section
@@ -2343,13 +2395,97 @@ function CityFaqSection({
     >
       <div className="container-page">
         <div className="max-w-3xl">
-          <CityHubSectionHeading
-            as="h3"
-            className="mb-6"
-            title="Частые вопросы"
-            description={`Ответы о городе и афише ${cityGenitive}`}
-            editorial={editorial}
-          />
+          <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <CityHubSectionHeading
+              as="h3"
+              title="Частые вопросы"
+              description={`Ответы о городе и афише ${cityGenitive}`}
+              editorial={editorial}
+            />
+            <button
+              type="button"
+              onClick={() => {
+                setAskOpen((open) => !open);
+                setAskStatus('idle');
+              }}
+              className={
+                editorial
+                  ? 'shrink-0 rounded-xl border border-zinc-300 bg-white px-4 py-2 text-sm font-semibold text-zinc-800 hover:bg-zinc-50'
+                  : 'shrink-0 rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50'
+              }
+            >
+              {askOpen ? 'Скрыть форму' : 'Задать вопрос'}
+            </button>
+          </div>
+
+          {askOpen ? (
+            <div
+              className={`mb-6 rounded-2xl border p-4 sm:p-5 ${
+                editorial ? 'border-zinc-200 bg-white' : 'border-slate-200 bg-white'
+              }`}
+            >
+              {askStatus === 'sent' ? (
+                <p className={`text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+                  Откройте почтовый клиент и отправьте письмо. Если вопрос покажется интересным - опубликуем
+                  ответ в FAQ.
+                </p>
+              ) : (
+                <form onSubmit={submitAsk} className="space-y-3">
+                  <p className={`text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+                    Напишите вопрос о городе или афише. Если он покажется интересным - опубликуем его здесь.
+                  </p>
+                  <label className="block">
+                    <span className="sr-only">Ваш вопрос</span>
+                    <textarea
+                      value={askQuestion}
+                      onChange={(event) => {
+                        setAskQuestion(event.target.value);
+                        if (askStatus === 'error') setAskStatus('idle');
+                      }}
+                      rows={3}
+                      required
+                      placeholder="Например: куда сходить с детьми в выходные?"
+                      className={`w-full rounded-xl border px-3 py-2 text-sm outline-none focus:ring-2 ${
+                        editorial
+                          ? 'border-zinc-200 focus:ring-zinc-300'
+                          : 'border-slate-200 focus:ring-primary-200'
+                      }`}
+                    />
+                  </label>
+                  <label className="block">
+                    <span className={`mb-1 block text-xs ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}>
+                      Email - по желанию, если хотите ответ лично
+                    </span>
+                    <input
+                      type="email"
+                      value={askEmail}
+                      onChange={(event) => setAskEmail(event.target.value)}
+                      placeholder="you@example.com"
+                      className={`w-full rounded-xl border px-3 py-2 text-sm outline-none focus:ring-2 ${
+                        editorial
+                          ? 'border-zinc-200 focus:ring-zinc-300'
+                          : 'border-slate-200 focus:ring-primary-200'
+                      }`}
+                    />
+                  </label>
+                  {askStatus === 'error' ? (
+                    <p className="text-sm text-red-600">Напишите вопрос чуть подробнее - хотя бы пару слов.</p>
+                  ) : null}
+                  <button
+                    type="submit"
+                    className={
+                      editorial
+                        ? 'rounded-xl bg-zinc-950 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-800'
+                        : 'rounded-xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700'
+                    }
+                  >
+                    Отправить вопрос
+                  </button>
+                </form>
+              )}
+            </div>
+          ) : null}
+
           <div className="space-y-2">
             {items.map((item, index) => {
               const open = openIndex === index;
@@ -2555,12 +2691,33 @@ function resolveSectionId(hash: string): string {
   return CITY_HASH_ALIASES[raw] || raw;
 }
 
+function hubStickyOffsetPx(target: HTMLElement): number {
+  if (typeof window === 'undefined') return 120;
+  const styles = getComputedStyle(document.documentElement);
+  const headerRaw = styles.getPropertyValue('--site-header-height').trim();
+  const rootFont = parseFloat(styles.fontSize || '16') || 16;
+  const headerPx = headerRaw.endsWith('rem')
+    ? parseFloat(headerRaw) * rootFont
+    : parseFloat(headerRaw) || 64;
+  const spacer = document.querySelector('.site-header-spacer') as HTMLElement | null;
+  const headerBand = spacer?.getBoundingClientRect().height || headerPx;
+  const hero = document.querySelector('[data-city-hero]');
+  // Hero «О городе» sits above hub sticky - clear only fixed site header.
+  if (hero && (hero === target || hero.contains(target))) {
+    return headerBand + 8;
+  }
+  const hubNav = document.querySelector('[data-city-hub-nav]') as HTMLElement | null;
+  const hubNavH = hubNav?.getBoundingClientRect().height || 56;
+  return headerBand + hubNavH + 8;
+}
+
 function scrollToSection(id: string) {
   const targetId = resolveSectionId(id);
   const run = () => {
     const el = document.getElementById(targetId);
     if (!el) return false;
-    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const top = el.getBoundingClientRect().top + window.scrollY - hubStickyOffsetPx(el);
+    window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
     return true;
   };
   // rAF + retry: секции/картинки ещё двигают layout сразу после клика.

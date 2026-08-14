@@ -1,3 +1,13 @@
+## 2026-08-14 - Hub: region-events scroll + spacing + FAQ ask
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| UX.HUB-REGION-SCROLL-MT | Sticky «События региона» докручивает под nav (id+offset) | Высокий | ✅ git |
+| UX.HUB-GAP-REGION-AFFICHE | Gap region↔affiche ~-50% | Высокий | ✅ git |
+| UX.HUB-GAP-COLLECTIONS | Gap перед «Каталог подборок» ~-50% | Высокий | ✅ git |
+| UX.HUB-ORDER-NEAR-AFTER-COLLECTIONS | После подборок сразу «Рядом с городом» | Высокий | ✅ git |
+| UX.HUB-FAQ-ASK | FAQ «Задать вопрос» → mailto hello@ | Высокий | ✅ git |
+
 ## 2026-08-14 - Live: Deploy MSK web `31834916265`
 
 | ID | Задача | Приоритет | Статус |
