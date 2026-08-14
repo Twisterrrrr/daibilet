@@ -2,7 +2,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| FIX.PERM-KAMA-PINS | My Day: набережная / «Счастье» не в середине Камы; editorial coords + enrich не даёт hub mid-river | Критический | ✅ live `31776097211` BUILD_ID=`RQr1vlwv-OuvxsAMcPT3i` |
+| FIX.PERM-KAMA-PINS | My Day: набережная / «Счастье» не в середине Камы; editorial coords + enrich не даёт hub mid-river | Критический | 🔄 follow-up: 9408bae still in water (`58.01985`); south-bank `58.01825` / `58.01835` + LS rebase; **не live** пока нет «выкатывай» |
 
 ## My Day share A+B+C (2026-08-14)
 

@@ -4,8 +4,8 @@
     hookFact: 'Знаете ли вы, что Пермь - родина знаменитых «реальных пацанов», но при этом местный Театр оперы и балета считается одним из лучших в России, а пермская балетная школа ценится наравне с петербургской?',
     mustSee: [
       // --- Главные прогулочные зоны ---
-      { name: 'Набережная Камы', desc: 'Главный променад вдоль реки с амфитеатром, причалами и панорамой на Каму.', address: 'ул. Монастырская, 1Б', locationSlug: 'naberezhnaya-kamy', mustSeeFilter: 'main', latitude: 58.01985, longitude: 56.2467 },
-      { name: 'Арт-объект «Счастье не за горами»', desc: 'Красные буквы у Речного вокзала - самый узнаваемый фото-символ Перми.', address: 'ул. Берег Камы (у Речного вокзала)', locationSlug: 'perm-schaste-ne-za-gorami', mustSeeFilter: 'main', latitude: 58.0205, longitude: 56.2507 },
+      { name: 'Набережная Камы', desc: 'Главный променад вдоль реки с амфитеатром, причалами и панорамой на Каму.', address: 'ул. Монастырская, 1Б', locationSlug: 'naberezhnaya-kamy', mustSeeFilter: 'main', latitude: 58.01825, longitude: 56.2466 },
+      { name: 'Арт-объект «Счастье не за горами»', desc: 'Красные буквы у Речного вокзала - самый узнаваемый фото-символ Перми.', address: 'ул. Берег Камы (у Речного вокзала)', locationSlug: 'perm-schaste-ne-za-gorami', mustSeeFilter: 'main', latitude: 58.01835, longitude: 56.25055 },
       { name: 'Городская эспланада', desc: 'Открытое пешеходное пространство в центре с фонтанами и событиями.', address: 'ул. Ленина (между ул. Попова и ул. Борчанинова)', locationSlug: 'permskaya-esplanada', mustSeeFilter: 'main', latitude: 58.0105, longitude: 56.2285 },
       { name: 'Соборная площадь', desc: 'Историческое ядро города у Петропавловского собора.', address: 'Соборная площадь', locationSlug: 'perm-sobornaya-ploschad', mustSeeFilter: 'main', latitude: 58.0163, longitude: 56.2378 },
       { name: 'Старокирпичный переулок', desc: 'Камерный прогулочный карман в центре с кирпичной застройкой.', address: 'ул. Ленина, 44', locationSlug: 'perm-starokirpichnyy-pereulok', mustSeeFilter: 'street', latitude: 58.0139, longitude: 56.2427 },

@@ -29,6 +29,25 @@
 
 ---
 
+## 2026-08-14 - Perm My Day: пины всё ещё в Каме после 9408bae
+
+### Наблюдения
+- Owner screenshot: «Мой день в Перми», 7 точек; 1 «Набережная Камы» и 2 в воде, 3 на кромке моста, 4-7 на суше.
+- Live `BUILD_ID=RQr1vlwv-OuvxsAMcPT3i` (SHA `ce2eada`, предок `9408bae`). HTML `/cities/perm` отдаёт каталожный пин набережной `58.021111, 56.243889` (не `58.01985` из cityInfo). Leaflet на /my-day берёт те же `stop.latitude/longitude`, не geocode адреса.
+- «Фикс» 9408bae (`58.01985` / `58.0205`) всё ещё севернее южного берега: порог суши на этом участке ~`58.0195`; Дом Мешкова (здание) `58.01875`. Wiki/OSM букв ~`58.021` - парапет / русло на тайлах.
+- Guest LS держит старый lat/lng; enrich бьёт editorial только при matches, и editorial сам был в воде.
+
+### Решения
+- South-bank promenade: набережная `58.01825, 56.2466` (у Мешкова / Монастырской); «Счастье» `58.01835, 56.25055` (площадка у Речного вокзала). Мешков без сдвига.
+- `pickEditorialPlaceCoordsIfStale`: rebase если нет coords, расстояние >80 м, или perm waterfront lat > `58.0195`.
+- `repairDayRouteStaleEditorialCoords` на загрузке /my-day (как Kronstadt) + в конце enrich, чтобы refresh без ручной очистки LS сажал пины на берег.
+- Тест: Perm embankment lat > `58.0195` падает. Live deploy нет (owner не сказал «выкатывай»).
+
+### Проблемы
+- Prod Location/Venue lat/lng в БД по-прежнему mid-river; хаб HTML может показывать каталог, пока не будет seed/batch. My Day после выката читает editorial + LS repair.
+
+---
+
 ## 2026-08-14 - Perm My Day: пины набережной в Каме
 
 ### Наблюдения

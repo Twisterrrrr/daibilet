@@ -145,6 +145,7 @@ import {
   removeFromDayRoute,
   reorderDayRoute,
   repairDayRouteKronstadtNikolskyStops,
+  repairDayRouteStaleEditorialCoords,
   resolveDayRouteTicketUrl,
   hydrateDayRouteFromShare,
   updateDayRouteVenue,
@@ -598,9 +599,11 @@ function DayRoutePanelInner() {
   useEffect(() => {
     const sync = () => {
       armScrollPreserve();
-      setRoute(repairDayRouteKronstadtNikolskyStops(readDayRoute()));
+      setRoute(
+        repairDayRouteStaleEditorialCoords(repairDayRouteKronstadtNikolskyStops(readDayRoute())),
+      );
     };
-    setRoute(repairDayRouteKronstadtNikolskyStops(readDayRoute()));
+    setRoute(repairDayRouteStaleEditorialCoords(repairDayRouteKronstadtNikolskyStops(readDayRoute())));
     window.addEventListener(DAY_ROUTE_CHANGED_EVENT, sync);
     window.addEventListener('storage', sync);
     return () => {

@@ -260,6 +260,31 @@ test('dayRouteItemFromMustSee uses editorial coords when hub omits NN place', ()
   );
 });
 
+test('dayRouteItemFromMustSee rebases Perm hub mid-river coords onto south-bank editorial', () => {
+  const item = dayRouteItemFromMustSee(
+    {
+      name: 'Набережная Камы',
+      desc: 'Променад',
+      locationSlug: 'naberezhnaya-kamy',
+      latitude: 58.021111,
+      longitude: 56.243889,
+    },
+    [
+      {
+        id: 'loc_nab',
+        slug: 'naberezhnaya-kamy',
+        name: 'Набережная Камы',
+        latitude: 58.0224,
+        longitude: 56.252,
+      },
+    ],
+    { id: 'city_perm', name: 'Пермь', slug: 'perm' },
+  );
+  assert.ok(item);
+  assert.equal(item!.latitude, 58.01825);
+  assert.equal(item!.longitude, 56.2466);
+});
+
 test('dayRouteItemFromMustSee prefers editorial cover over hub hero', () => {
   const item = dayRouteItemFromMustSee(
     {

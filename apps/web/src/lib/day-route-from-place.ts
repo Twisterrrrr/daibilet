@@ -4,7 +4,7 @@
 
 import { resolveCityPlaceHref, type CityMustSeeItem, type CityPlaceLinkFields } from './cityInfo';
 import { namesLooselyMatch } from './city-place-href';
-import { lookupEditorialPlaceCoords } from './city-place-coords';
+import { lookupEditorialPlaceCoords, pickEditorialPlaceCoordsIfStale } from './city-place-coords';
 import { resolveVenueHeroImage } from './city-place-images';
 import {
   DAY_ROUTE_SOFT,
@@ -220,14 +220,16 @@ function coordsFromPlace(
   matched: DayRouteVenueMatchSource | null,
   slug: string | null,
 ): Pick<DayRouteVenueItem, 'latitude' | 'longitude'> {
-  // Prefer explicit editorial place coords so a wrong hub twin cannot yank the pin to Kronstadt.
   const fromPlace = coordsFromVenue({
     latitude: place.latitude ?? null,
     longitude: place.longitude ?? null,
   });
-  if (fromPlace.latitude != null && fromPlace.longitude != null) return fromPlace;
   const fromVenue = coordsFromVenue(matched);
-  if (fromVenue.latitude != null && fromVenue.longitude != null) return fromVenue;
+  const current =
+    fromPlace.latitude != null && fromPlace.longitude != null ? fromPlace : fromVenue;
+  const rebase = pickEditorialPlaceCoordsIfStale(slug, current.latitude, current.longitude);
+  if (rebase) return rebase;
+  if (current.latitude != null && current.longitude != null) return current;
   return coordsFromVenue(lookupEditorialPlaceCoords(slug));
 }
 

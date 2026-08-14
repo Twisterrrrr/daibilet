@@ -734,8 +734,8 @@ export const CITY_MONUMENTS_MUST_SEE: Record<string, MonumentMustSeeItem[]> = {
       address: 'Набережная Камы, у Речного вокзала (ул. Монастырская, 2, лит. А)',
       locationSlug: 'perm-schaste-ne-za-gorami',
       mustSeeFilter: 'creative',
-      latitude: 58.0205,
-      longitude: 56.2507,
+      latitude: 58.01835,
+      longitude: 56.25055,
     },
     {
       name: 'Памятник Пермскому трамваю',

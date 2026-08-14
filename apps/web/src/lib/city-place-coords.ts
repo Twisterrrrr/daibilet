@@ -3,10 +3,36 @@
  * (0-event content places or city page session-only venue list).
  */
 
+import { haversineMeters, isValidCoordinatePair } from './day-route-score';
+
 export type EditorialPlaceCoords = {
   latitude: number;
   longitude: number;
 };
+
+/**
+ * Perm historic south bank (Monastyrskaya / Meshkov / river station plaza).
+ * North of this on the central embankment stretch is Kama water, not the promenade.
+ * Wiki/OSM pin the letters at ~58.021 which sits on the parapet / in-channel on tiles.
+ */
+export const PERM_KAMA_WATERFRONT_MAX_LAT = 58.0195;
+
+/** Rebase guest LS / hub geo when it drifted this far from curated pins. */
+export const EDITORIAL_COORDS_REBASE_METERS = 80;
+
+/** Promenade by Meshkov / Monastyrskaya - south of the waterline, not mid-Kama. */
+export const PERM_NABEREZHNAYA_KAMY_COORDS: EditorialPlaceCoords = {
+  latitude: 58.01825,
+  longitude: 56.2466,
+};
+
+/** Art object plaza by river station - same south-bank band, slightly east. */
+export const PERM_SCHASTE_COORDS: EditorialPlaceCoords = {
+  latitude: 58.01835,
+  longitude: 56.25055,
+};
+
+const PERM_KAMA_WATERFRONT_SLUGS = new Set(['naberezhnaya-kamy', 'perm-schaste-ne-za-gorami']);
 
 /** Nizhny Novgorod: classic 6 + owner pack 30 must-see + 10 gastro. */
 const NIZHNY_NOVGOROD_COORDS: Record<string, EditorialPlaceCoords> = {
@@ -78,9 +104,9 @@ const SAINT_PETERSBURG_COORDS: Record<string, EditorialPlaceCoords> = {
 /** Perm fallback coords (cityInfo items also carry lat/lng for my-day). */
 const PERM_COORDS: Record<string, EditorialPlaceCoords> = {
   // South-bank promenade (Monastyrskaya / Kama embankment) - not mid-river.
-  'naberezhnaya-kamy': { latitude: 58.01985, longitude: 56.2467 },
-  // Inland of waterline letters, by river station / «Россия - моя история».
-  'perm-schaste-ne-za-gorami': { latitude: 58.0205, longitude: 56.2507 },
+  'naberezhnaya-kamy': PERM_NABEREZHNAYA_KAMY_COORDS,
+  // Plaza by river station, south of waterline letters.
+  'perm-schaste-ne-za-gorami': PERM_SCHASTE_COORDS,
   'permskaya-esplanada': { latitude: 58.0105, longitude: 56.2285 },
   'perm-sobornaya-ploschad': { latitude: 58.0163, longitude: 56.2378 },
   'perm-starokirpichnyy-pereulok': { latitude: 58.0139, longitude: 56.2427 },
@@ -138,4 +164,34 @@ export function lookupEditorialPlaceCoords(
     .toLowerCase();
   if (!key) return null;
   return EDITORIAL_COORDS_BY_SLUG[key] || null;
+}
+
+function editorialSlugKey(slug: string | null | undefined): string {
+  return String(slug || '')
+    .trim()
+    .toLowerCase();
+}
+
+/**
+ * When curated coords exist and the live/LS/hub pin is missing, mid-river, or far
+ * from editorial, return the curated pair so My Day can rebase without a LS wipe.
+ */
+export function pickEditorialPlaceCoordsIfStale(
+  slug: string | null | undefined,
+  latitude?: number | null,
+  longitude?: number | null,
+): EditorialPlaceCoords | null {
+  const editorial = lookupEditorialPlaceCoords(slug);
+  if (!editorial) return null;
+  const lat = Number(latitude);
+  const lng = Number(longitude);
+  if (!isValidCoordinatePair(lat, lng)) return editorial;
+  const key = editorialSlugKey(slug);
+  if (PERM_KAMA_WATERFRONT_SLUGS.has(key) && lat > PERM_KAMA_WATERFRONT_MAX_LAT) {
+    return editorial;
+  }
+  if (haversineMeters(lat, lng, editorial.latitude, editorial.longitude) > EDITORIAL_COORDS_REBASE_METERS) {
+    return editorial;
+  }
+  return null;
 }

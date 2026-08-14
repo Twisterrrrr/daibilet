@@ -5,7 +5,10 @@
 import { haversineMeters, isValidCoordinatePair } from './day-route-score';
 import { eventHref, venueHref } from './routes';
 import { isGeneratedVenueStub, resolveVenueHeroImage } from './city-place-images';
-import { lookupEditorialPlaceCoords } from './city-place-coords';
+import {
+  lookupEditorialPlaceCoords,
+  pickEditorialPlaceCoordsIfStale,
+} from './city-place-coords';
 
 /** Display clock for session labels (catalog sessions are Europe/Moscow wall-clock). */
 const DAY_ROUTE_SESSION_TZ = 'Europe/Moscow';
@@ -445,6 +448,41 @@ export function repairDayRouteKronstadtNikolskyStops(state: DayRouteState): DayR
       longitude: SPB_KRYUKOV_NIKOLSKY_COORDS.longitude,
       imageUrl: '/images/venues/saint-petersburg/nikolo-bogoyavlenskiy-morskoy-sobor.jpg',
     };
+  });
+  if (!changed) return state;
+  const next = { ...state, venues };
+  writeDayRoute(next);
+  return readDayRouteFresh();
+}
+
+function dayRoutePlaceSlug(item: Pick<DayRouteVenueItem, 'id' | 'slug'>): string {
+  return String(item.slug || item.id || '')
+    .trim()
+    .toLowerCase();
+}
+
+function rebaseDayRouteItemEditorialCoords(item: DayRouteVenueItem): DayRouteVenueItem {
+  const editorial = pickEditorialPlaceCoordsIfStale(
+    dayRoutePlaceSlug(item),
+    item.latitude,
+    item.longitude,
+  );
+  if (!editorial) return item;
+  if (item.latitude === editorial.latitude && item.longitude === editorial.longitude) return item;
+  return { ...item, latitude: editorial.latitude, longitude: editorial.longitude };
+}
+
+/**
+ * One-shot LS repair: curated must-see pins beat stale guest coords
+ * (Perm embankment previously snapshotted into Kama; hub/DB mid-river geo).
+ */
+export function repairDayRouteStaleEditorialCoords(state: DayRouteState): DayRouteState {
+  if (!state.venues.length) return state;
+  let changed = false;
+  const venues = state.venues.map((item) => {
+    const next = rebaseDayRouteItemEditorialCoords(item);
+    if (next !== item) changed = true;
+    return next;
   });
   if (!changed) return state;
   const next = { ...state, venues };
@@ -1935,7 +1973,8 @@ export function buildDayRouteCoordsMap(
 /** Merge coords/address (and canonical id/slug) from matches payload into local day-route storage. */
 export function enrichDayRouteFromMatchVenues(payloadVenues: DayRouteCoordSource[]): DayRouteState {
   const current = readDayRoute();
-  if (!current.venues.length || !payloadVenues.length) return current;
+  if (!current.venues.length) return current;
+  if (!payloadVenues.length) return repairDayRouteStaleEditorialCoords(current);
   let changed = false;
   const nextVenues = current.venues.map((item) => {
     const match = payloadVenues.find((v) => {
@@ -2037,7 +2076,13 @@ export function enrichDayRouteFromMatchVenues(payloadVenues: DayRouteCoordSource
       changed = true;
     }
     return cleaned;
-  });
+  }).map(rebaseDayRouteItemEditorialCoords);
+  if (!changed) {
+    changed = nextVenues.some((venue, index) => {
+      const prev = current.venues[index];
+      return venue.latitude !== prev?.latitude || venue.longitude !== prev?.longitude;
+    });
+  }
   if (!changed) return current;
   const next = { ...current, venues: nextVenues };
   writeDayRoute(next);

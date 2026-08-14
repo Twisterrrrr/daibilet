@@ -2,6 +2,10 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  PERM_NABEREZHNAYA_KAMY_COORDS,
+  PERM_SCHASTE_COORDS,
+} from './city-place-coords.ts';
+import {
   DAY_ROUTE_MAX,
   DAY_ROUTE_SOFT,
   DAY_ROUTE_SOFT_WARN,
@@ -44,6 +48,7 @@ import {
   parseDayRouteItemsParam,
   parseDayRouteQueryParam,
   readDayRoute,
+  repairDayRouteStaleEditorialCoords,
   resetDayRouteSnapshotCache,
   resolveDayRouteTicketUrl,
   sameDayRouteVenue,
@@ -573,9 +578,62 @@ test('enrichDayRouteFromMatchVenues prefers editorial place coords over hub mid-
     },
   ]);
   const stop = next.venues[0];
-  assert.equal(stop?.latitude, 58.01985);
-  assert.equal(stop?.longitude, 56.2467);
+  assert.equal(stop?.latitude, PERM_NABEREZHNAYA_KAMY_COORDS.latitude);
+  assert.equal(stop?.longitude, PERM_NABEREZHNAYA_KAMY_COORDS.longitude);
   assert.equal(stop?.address, 'ул. Монастырская / Набережная Камы');
+});
+
+test('enrichDayRouteFromMatchVenues rebases stale Perm LS coords already on the stop', () => {
+  mockStorage();
+  clearDayRoute();
+  addToDayRoute({
+    id: 'naberezhnaya-kamy',
+    slug: 'naberezhnaya-kamy',
+    title: 'Набережная Камы',
+    latitude: 58.01985,
+    longitude: 56.2467,
+  });
+  addToDayRoute({
+    id: 'perm-schaste-ne-za-gorami',
+    slug: 'perm-schaste-ne-za-gorami',
+    title: 'Арт-объект «Счастье не за горами»',
+    latitude: 58.0205,
+    longitude: 56.2507,
+  });
+  const next = enrichDayRouteFromMatchVenues([
+    {
+      id: 'naberezhnaya-kamy',
+      slug: 'naberezhnaya-kamy',
+      latitude: 58.021111,
+      longitude: 56.243889,
+    },
+    {
+      id: 'perm-schaste-ne-za-gorami',
+      slug: 'perm-schaste-ne-za-gorami',
+      latitude: 58.0224,
+      longitude: 56.252,
+    },
+  ]);
+  assert.equal(next.venues[0]?.latitude, PERM_NABEREZHNAYA_KAMY_COORDS.latitude);
+  assert.equal(next.venues[0]?.longitude, PERM_NABEREZHNAYA_KAMY_COORDS.longitude);
+  assert.equal(next.venues[1]?.latitude, PERM_SCHASTE_COORDS.latitude);
+  assert.equal(next.venues[1]?.longitude, PERM_SCHASTE_COORDS.longitude);
+});
+
+test('repairDayRouteStaleEditorialCoords snaps Perm water pins without matches payload', () => {
+  mockStorage();
+  clearDayRoute();
+  addToDayRoute({
+    id: 'naberezhnaya-kamy',
+    slug: 'naberezhnaya-kamy',
+    title: 'Набережная Камы',
+    latitude: 58.021111,
+    longitude: 56.243889,
+  });
+  const repaired = repairDayRouteStaleEditorialCoords(readDayRoute());
+  assert.equal(repaired.venues[0]?.latitude, PERM_NABEREZHNAYA_KAMY_COORDS.latitude);
+  assert.equal(repaired.venues[0]?.longitude, PERM_NABEREZHNAYA_KAMY_COORDS.longitude);
+  assert.equal(readDayRoute().venues[0]?.latitude, PERM_NABEREZHNAYA_KAMY_COORDS.latitude);
 });
 
 test('enrichDayRouteFromMatchVenues fills missing address by slug', () => {
