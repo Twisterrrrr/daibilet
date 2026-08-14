@@ -2,9 +2,9 @@
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| UX.HUB-SEE-H2 | H2 «Что посмотреть в …»; tab «Зачем ехать» | Высокий | 🔄 deploy |
-| UX.HUB-NO-IDENTITY-SCENARIO | Identity не создаёт focus-сценарий must-see | Высокий | 🔄 deploy |
-| UX.HUB-FACT-WEATHER-ORDER | Факт слева ~40%, погода справа ~60% | Высокий | 🔄 deploy |
+| UX.HUB-SEE-H2 | H2 «Что посмотреть в …»; tab «Зачем ехать» | Высокий | ✅ live `31822217844` |
+| UX.HUB-NO-IDENTITY-SCENARIO | Identity не создаёт focus-сценарий must-see | Высокий | ✅ live `31822217844` |
+| UX.HUB-FACT-WEATHER-ORDER | Факт слева ~40%, погода справа ~60% | Высокий | ✅ live `31822217844` |
 
 ## 2026-08-14 - Weather/fact row ~60/40
 

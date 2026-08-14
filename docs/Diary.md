@@ -1,3 +1,17 @@
+## 2026-08-14 - Live: Deploy MSK web `31822217844`
+
+### Наблюдения
+- Owner: H2 «Что посмотреть», без сценариев из уникальности, факт/погода местами, выкатывай.
+
+### Решения
+- Deploy MSK web [`31822217844`](https://github.com/Twisterrrrr/daibilet/actions/runs/31822217844) success, ~2m20s. SHA `2c794d5`. BUILD_ID=`D3gP-c54E5KsPI8V1neIZ`. Swap с `rLQGcMunwtV3RRRlzLyqa`.
+- Smoke `/cities/perm` 200: «Что посмотреть в Перми», tab «Зачем ехать», без «Зачем ехать в Пермь» в H2.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-14 - Hub: Что посмотреть + fact/weather swap
 
 ### Наблюдения
