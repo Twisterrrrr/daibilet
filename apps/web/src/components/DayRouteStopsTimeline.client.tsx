@@ -2,7 +2,7 @@
 
 import { MapPin } from 'lucide-react';
 
-import { SafeImage } from '@/components/SafeImage.client';
+import { CardSafeImage } from '@/components/SafeImage.client';
 
 export type DayRouteTimelineStop = {
   id: string;
@@ -79,7 +79,7 @@ export function DayRouteStopsTimeline({
                 </span>
                 {stop.imageUrl ? (
                   <span className="relative h-9 w-9 overflow-hidden rounded-lg bg-white ring-1 ring-black/5 sm:h-10 sm:w-10">
-                    <SafeImage
+                    <CardSafeImage
                       src={stop.imageUrl}
                       alt=""
                       fill

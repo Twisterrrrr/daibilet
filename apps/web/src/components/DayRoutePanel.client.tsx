@@ -59,7 +59,7 @@ import { createPortal } from 'react-dom';
 
 import type { PublicCatalogListItemDto, PublicDestinationDto } from '@daibilet/contracts/public';
 
-import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
+import { IMAGE_SIZES, CardSafeImage } from '@/components/SafeImage.client';
 import { CityDayPresetBlock } from '@/components/CityDayPresetBlock.client';
 import { CityPicker } from '@/components/CityPicker.client';
 import { DayRouteBoatWizard } from '@/components/DayRouteBoatWizard.client';
@@ -2902,7 +2902,7 @@ function DayRoutePanelInner() {
                     href={eventHref({ slug: match.slug, id: match.eventId })}
                     className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-slate-100 sm:h-20 sm:w-20"
                   >
-                    <SafeImage
+                    <CardSafeImage
                       src={match.imageUrl}
                       alt=""
                       fill
@@ -4010,7 +4010,7 @@ function DayRoutePanelInner() {
                                 >
                                   <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-slate-100">
                                     {pick.item.imageUrl ? (
-                                      <SafeImage
+                                      <CardSafeImage
                                         src={pick.item.imageUrl}
                                         alt=""
                                         fill
@@ -4301,7 +4301,7 @@ function DayRoutePanelInner() {
                   >
                     <div className="relative h-[4.5rem] w-[4.5rem] shrink-0 overflow-hidden rounded-lg bg-slate-100 sm:h-20 sm:w-24">
                       {thumb ? (
-                        <SafeImage
+                        <CardSafeImage
                           src={thumb}
                           alt=""
                           fill
@@ -4568,7 +4568,7 @@ function DayRoutePanelInner() {
                       data-day-hot-pick={card.offer.kind}
                     >
                       {card.item.imageUrl ? (
-                        <SafeImage
+                        <CardSafeImage
                           src={card.item.imageUrl}
                           alt={card.title}
                           fill
@@ -5196,7 +5196,7 @@ function DayRouteBetweenInsert({
                   >
                     <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-slate-100">
                       {s.imageUrl ? (
-                        <SafeImage src={s.imageUrl} alt="" fill sizes="2.5rem" className="object-cover" />
+                        <CardSafeImage src={s.imageUrl} alt="" fill sizes="2.5rem" className="object-cover" />
                       ) : (
                         <div className="flex h-full w-full items-center justify-center text-slate-400">
                           <MapPin className="h-4 w-4" />
@@ -5840,7 +5840,7 @@ function DayRouteVenueCard({
                 data-day-stop-thumb
               >
                 {thumbUrl ? (
-                  <SafeImage src={thumbUrl} alt="" fill sizes="7rem" className="object-cover" />
+                  <CardSafeImage src={thumbUrl} alt="" fill sizes="7rem" className="object-cover" />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-200 via-slate-100 to-sky-100 text-slate-400">
                     <MapPin className="h-5 w-5" aria-hidden />
@@ -5956,7 +5956,7 @@ function DayRouteVenueCard({
             </span>
             <div className="relative h-full w-full overflow-hidden rounded-xl bg-slate-100">
               {thumbUrl ? (
-                <SafeImage src={thumbUrl} alt="" fill sizes="4rem" className="object-cover" />
+                <CardSafeImage src={thumbUrl} alt="" fill sizes="4rem" className="object-cover" />
               ) : (
                 <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-200 via-slate-100 to-primary-100 text-slate-400">
                   <MapPin className="h-5 w-5" />
