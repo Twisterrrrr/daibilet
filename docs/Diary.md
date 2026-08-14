@@ -1,3 +1,17 @@
+## 2026-08-14 - Hub: section order + sticky «События региона»
+
+### Наблюдения
+- Owner: лайфхаки перед пригородами; «События региона» перед афишей; затем Подборки → Рядом → Из блога; убрать блок «Советы»; FAQ отдельно; sticky с якорем `#region-events`.
+
+### Решения
+- `CityPageView`: порядок секций и sticky nav; lifehacks через `beforeSuburbs`; practice/Советы удалён; FAQ standalone после блога.
+- Sticky desktop: … Пригороды | События региона | События | Из блога | FAQ; mobile primary без изменений, region-events в «Еще».
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-14 - Live: Deploy MSK web `31832253595`
 
 ### Наблюдения

@@ -1,3 +1,12 @@
+## 2026-08-14 - Hub: section order + sticky region events
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| UX.HUB-ORDER-LH-BEFORE-SUB | Лайфхаки перед Пригородами | Высокий | 🔄 в ветке |
+| UX.HUB-ORDER-REGION-BEFORE-AFFICHE | События региона → Ближайшие события → Подборки → Рядом → Из блога | Высокий | 🔄 в ветке |
+| UX.HUB-NAV-REGION-EVENTS | Sticky link «События региона» (`#region-events`) | Высокий | 🔄 в ветке |
+| UX.HUB-DROP-SOVETY | Убрать блок «Советы»; FAQ отдельно | Высокий | 🔄 в ветке |
+
 ## 2026-08-14 - Live: Deploy MSK web `31832253595`
 
 | ID | Задача | Приоритет | Статус |

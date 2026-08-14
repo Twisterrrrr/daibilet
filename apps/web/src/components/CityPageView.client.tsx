@@ -39,8 +39,6 @@ import { inCityAccusative, inCityPrepositional, cityToGenitive } from '@/lib/cit
 import { buildCatalogHref } from '@/lib/catalog-url';
 import { buildCityHubSeoPhrase } from '@/lib/city-hub-seo';
 import {
-  isCityHubAfficheBeforeSuburbs,
-  isCityHubBlogAfterSuburbs,
   isCityHubSectionHidden,
   normalizeCityHubSlug,
   resolveCityHubConfig,
@@ -49,7 +47,8 @@ import { matchSightAfficheLink, resolveFeaturedDirections } from '@/lib/city-hub
 import { resolveCityImageObjectPosition } from '@/lib/city-image-focus';
 import { resolveCityImage } from '@/lib/city-images';
 import { CITY_NIGHT_HERO } from '@/lib/city-night-hero';
-import { cityHasLifehacks, resolveCityLifehacks } from '@/lib/city-hub-lifehacks';
+import { cityHasLifehacks } from '@/lib/city-hub-lifehacks';
+import { listCityRegionalEvents, listCityRegionalPastEvents } from '@/lib/city-regional-events';
 import {
   groupStandupInHubFeed,
   isCityHubTouristAffiche,
@@ -100,16 +99,16 @@ const CITY_HASH_ALIASES: Record<string, string> = {
   'city-directions': 'more',
   'city-sights': 'sights',
   lifehacks: 'lifehacks',
-  'city-travel': 'practice',
+  'city-travel': 'lifehacks',
   'city-guide-faq': 'faq',
-  practice: 'practice',
+  practice: 'faq',
   'city-seo': 'seo',
   'why-go': 'sights',
   'zachem-ehat': 'sights',
   about: 'sights',
   directions: 'more',
   venues: 'more',
-  travel: 'practice',
+  travel: 'lifehacks',
   faq: 'faq',
   suburbs: 'city-suburbs',
   'must-see': 'city-must-see',
@@ -128,9 +127,10 @@ const HUB_DESKTOP_NAV: Array<{ id: string; label: string }> = [
   { id: 'city-routes', label: 'Маршруты' },
   { id: 'lifehacks', label: 'Лайфхаки' },
   { id: 'city-suburbs', label: 'Пригороды' },
+  { id: 'region-events', label: 'События региона' },
   { id: 'affiche', label: 'События' },
-  { id: 'faq', label: 'FAQ' },
   { id: 'blog', label: 'Из блога' },
+  { id: 'faq', label: 'FAQ' },
 ];
 
 const HUB_MOBILE_PRIMARY_IDS = ['sights', 'city-routes', 'city-suburbs', 'affiche'] as const;
@@ -216,7 +216,6 @@ export function CityPageView({
 
   const city = payload?.city;
   const touristAffiche = isCityHubTouristAffiche(normalizeCityHubSlug(city?.slug || city?.sourceSlug || slug));
-  const afficheBeforeSuburbs = isCityHubAfficheBeforeSuburbs(city?.slug || city?.sourceSlug || slug);
   // Chip facets = hub feed only (same universe as the list / «Все»), not full-city catalog.
   const categories = React.useMemo(() => {
     if (!payload?.sessions?.length) return [] as Array<[string, number]>;
@@ -303,9 +302,8 @@ export function CityPageView({
   const hasWhenToGo = cityHasWhenToGo(hubSlug) && Boolean(whenToGo);
   const hasIdentity = cityIdentitySlides(hubSlug).length > 0;
   const hasLifehacks = cityHasLifehacks(hubSlug);
-  const lifehacks = resolveCityLifehacks(hubSlug);
-  const showTravel = hasTravel && !lifehacks?.skipTravel;
-  const hasPracticeContent = showTravel || hasFaq || practiceArticles.length > 0;
+  const hasRegionEvents =
+    listCityRegionalEvents(hubSlug).length > 0 || listCityRegionalPastEvents(hubSlug).length > 0;
   const hasMore = hasDirections || hasVenues || moreArticles.length > 0;
   const showSightsBlock = hasSights || hasHookFact || hasWeather || hasWhenToGo || hasIdentity;
   const hasWhyGoNav = hasIdentity || hasHookFact || hasWeather || hasWhenToGo;
@@ -327,7 +325,6 @@ export function CityPageView({
     scrollToSection(focus.scrollTo === 'suburbs' ? 'city-suburbs' : 'city-must-see');
   }, []);
   // Story cards UI hidden (owner 2026-08-03); keep build helper for later - do not render.
-  const blogAfterSuburbs = isCityHubBlogAfterSuburbs(city?.slug || city?.sourceSlug || slug);
 
   const tabs = React.useMemo(() => {
     const filled = new Set<string>();
@@ -336,12 +333,12 @@ export function CityPageView({
     if (hasRoutesNav) filled.add('city-routes');
     if (hasLifehacks) filled.add('lifehacks');
     if (hasSuburbsNav) filled.add('city-suburbs');
+    if (hasRegionEvents) filled.add('region-events');
     filled.add('affiche');
     if (hasFaq) filled.add('faq');
     if (footerArticles.length > 0) filled.add('blog');
     const desktop = HUB_DESKTOP_NAV.filter((item) => filled.has(item.id));
     const extra: Array<{ id: string; label: string }> = [];
-    if (showTravel || practiceArticles.length > 0) extra.push({ id: 'practice', label: 'Советы' });
     if (hasMore) extra.push({ id: 'more', label: 'Подборки' });
     return { desktop, extra };
   }, [
@@ -350,11 +347,10 @@ export function CityPageView({
     hasLifehacks,
     hasMore,
     hasMustSeeNav,
+    hasRegionEvents,
     hasRoutesNav,
     hasSuburbsNav,
     hasWhyGoNav,
-    practiceArticles.length,
-    showTravel,
   ]);
 
   const jumpChips = React.useMemo(() => {
@@ -501,7 +497,7 @@ export function CityPageView({
                   placeFocus={placeFocus}
                   onPlaceFocus={applyPlaceFocus}
                   includeSuburbs
-                  afterSuburbs={
+                  beforeSuburbs={
                     hasLifehacks ? (
                       <CityLifehacksSection
                         citySlug={hubSlug}
@@ -517,9 +513,7 @@ export function CityPageView({
               </div>
             ) : null}
 
-            {afficheBeforeSuburbs ? null : <CityRegionalEvents citySlug={hubSlug} editorial={editorial} />}
-
-            {blogAfterSuburbs && !afficheBeforeSuburbs ? renderHubBlogSection() : null}
+            <CityRegionalEvents citySlug={hubSlug} editorial={editorial} />
 
             <section
               id="affiche"
@@ -548,36 +542,6 @@ export function CityPageView({
                 )}
               </div>
             </section>
-
-            {afficheBeforeSuburbs ? <CityRegionalEvents citySlug={hubSlug} editorial={editorial} /> : null}
-
-            {blogAfterSuburbs && afficheBeforeSuburbs ? renderHubBlogSection() : null}
-
-            {payload.regionNearby?.events?.length ? (
-              <RegionNearbyStrip nearby={payload.regionNearby} editorial={editorial} />
-            ) : null}
-
-            {hasPracticeContent ? (
-              <section
-                id="practice"
-                className={`border-b ${editorial ? 'border-zinc-200' : 'border-slate-200/80'} ${SECTION_SCROLL_MT}`}
-              >
-                <div className={`container-page ${editorial ? 'pt-16 pb-4 sm:pt-20' : 'pt-16 pb-2 sm:pt-20'}`}>
-                  <CityHubSectionHeading
-                    title="Советы"
-                    description="Как добраться, когда ехать и ответы на частые вопросы."
-                    editorial={editorial}
-                  />
-                </div>
-                {showTravel ? (
-                  <CityTravelSection travel={guide?.travel} editorial={editorial} nested />
-                ) : null}
-                <CitySeasonalTip tip={guide?.seasonalTip} editorial={editorial} />
-                {hasFaq ? (
-                  <CityFaqSection cityName={city.name} items={unifiedFaq} editorial={editorial} nested />
-                ) : null}
-              </section>
-            ) : null}
 
             {hasMore ? (
               <section
@@ -621,7 +585,15 @@ export function CityPageView({
               <CityContentLoadingState />
             )}
 
-            {blogAfterSuburbs ? null : renderHubBlogSection()}
+            {payload.regionNearby?.events?.length ? (
+              <RegionNearbyStrip nearby={payload.regionNearby} editorial={editorial} />
+            ) : null}
+
+            {renderHubBlogSection()}
+
+            {hasFaq ? (
+              <CityFaqSection cityName={city.name} items={unifiedFaq} editorial={editorial} />
+            ) : null}
 
             {hasSeo && seoText ? (
               <CitySeoTextSection cityName={city.name} text={seoText} editorial={editorial} />
@@ -1425,7 +1397,7 @@ function CitySightsSection({
   placeFocus = null,
   onPlaceFocus,
   includeSuburbs = true,
-  afterSuburbs = null,
+  beforeSuburbs = null,
 }: {
   city: PublicCityDto;
   guide: CityInfoEntry | null;
@@ -1441,8 +1413,8 @@ function CitySightsSection({
   placeFocus?: CityPlaceFocus | null;
   onPlaceFocus?: (focus: CityPlaceFocus | null) => void;
   includeSuburbs?: boolean;
-  /** After suburbs (scenarios → suburbs → lifehacks). */
-  afterSuburbs?: React.ReactNode;
+  /** Between routes and suburbs (scenarios → lifehacks → suburbs). */
+  beforeSuburbs?: React.ReactNode;
 }) {
   const fromSights: CityMustSeeItem[] =
     guide?.sights?.map((item) => ({
@@ -1468,7 +1440,7 @@ function CitySightsSection({
     !articles.length &&
     !(guide?.significantSuburbs?.length) &&
     !(guide?.dayRoutePresets?.length) &&
-    !afterSuburbs
+    !beforeSuburbs
   ) {
     return null;
   }
@@ -1551,6 +1523,7 @@ function CitySightsSection({
           {sectionTitle}
         </h2>
       )}
+      {beforeSuburbs}
       {suburbs.length ? (
         <SuburbsCarousel
           places={suburbs}
@@ -1569,7 +1542,6 @@ function CitySightsSection({
           }
         />
       ) : null}
-      {afterSuburbs}
       {articles.length ? (
         <div className={places.length || suburbs.length ? 'mt-8' : 'mt-4'}>
           <h3 className={`text-lg font-semibold ${editorial ? 'text-zinc-900' : 'text-slate-900'}`}>
@@ -1998,104 +1970,6 @@ function CitySightsMustSeeList({
         />
       </div>
     </>
-  );
-}
-
-function CityTravelSection({
-  travel,
-  editorial = false,
-  nested = false,
-}: {
-  travel?: string;
-  editorial?: boolean;
-  nested?: boolean;
-}) {
-  if (!travel?.trim()) return null;
-  return (
-    <section
-      id="travel"
-      className={`py-8 sm:py-10 ${nested ? '' : `${SECTION_SCROLL_MT} border-b`} ${
-        nested
-          ? editorial
-            ? 'bg-zinc-50'
-            : 'bg-slate-50'
-          : editorial
-            ? 'border-zinc-200 bg-zinc-50'
-            : 'border-slate-100 bg-slate-50'
-      }`}
-    >
-      <div className="container-page">
-        <div className="max-w-3xl">
-          <h3
-            className={
-              editorial
-                ? 'font-serif text-2xl font-semibold text-zinc-950 sm:text-3xl'
-                : 'text-2xl font-bold text-slate-950'
-            }
-          >
-            Как добраться и когда ехать
-          </h3>
-          <p className={`mt-4 text-sm leading-7 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>{travel}</p>
-          <a
-            href="#affiche"
-            onClick={(event) => {
-              event.preventDefault();
-              scrollToSection('affiche');
-            }}
-            className={`mt-5 inline-flex text-sm font-semibold ${
-              editorial ? 'text-zinc-900 underline-offset-4 hover:underline' : 'text-primary-700 hover:text-primary-800'
-            }`}
-          >
-            К афише →
-          </a>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function CitySeasonalTip({
-  tip,
-  editorial = false,
-}: {
-  tip?: CityInfoEntry['seasonalTip'];
-  editorial?: boolean;
-}) {
-  if (!tip) return null;
-  const tipHref = String(tip.href || '');
-  const myDayHref = tipHref.includes('/moscow/') || tipHref.includes('den-goroda')
-    ? '/my-day?city=moscow'
-    : tipHref.includes('saint-petersburg') || tipHref.includes('night-bridges')
-      ? '/my-day?city=saint-petersburg'
-      : null;
-  return (
-    <div className={`container-page py-2 sm:py-4 ${editorial ? 'bg-zinc-50' : 'bg-slate-50'}`}>
-      <aside
-        aria-label={tip.title}
-        className={`max-w-3xl rounded-xl border p-4 sm:p-5 ${
-          editorial ? 'border-zinc-200 bg-white' : 'border-sky-100 bg-white'
-        }`}
-      >
-        <h3 className={`text-base font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-950'}`}>{tip.title}</h3>
-        <p className={`mt-1.5 text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>{tip.description}</p>
-        <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-sm font-semibold">
-          <Link
-            href={tip.href}
-            className={editorial ? 'text-zinc-900 underline-offset-4 hover:underline' : 'text-primary-700 hover:text-primary-800'}
-          >
-            {tip.linkLabel} →
-          </Link>
-          {myDayHref ? (
-            <Link
-              href={myDayHref}
-              className={editorial ? 'text-zinc-900 underline-offset-4 hover:underline' : 'text-primary-700 hover:text-primary-800'}
-            >
-              Собрать вечер в Мой день →
-            </Link>
-          ) : null}
-        </div>
-      </aside>
-    </div>
   );
 }
 
@@ -2586,7 +2460,7 @@ function defaultCityFaq(cityName: string): CityFaqItem[] {
     {
       question: 'Где смотреть логистику и сезон?',
       answer:
-        'Короткие ответы - в разделе «Советы»: как добраться и когда ехать. Подробные SEO-материалы остаются внизу страницы, в блоке «Из блога».',
+        'Короткие ответы - в разделе «Лайфхаки» (если есть у города) и в материалах «Из блога» внизу страницы.',
     },
   ];
 }
