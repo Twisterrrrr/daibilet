@@ -1,11 +1,17 @@
+## 2026-08-14 - Live: Deploy MSK web `31834916265`
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| DEPLOY.MSK-31834916265 | Live tip `55a4173` BUILD_ID=`Cf8DVMmPO6-K3z7DAeItg` | Высокий | ✅ live |
+
 ## 2026-08-14 - Hub: section order + sticky region events
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| UX.HUB-ORDER-LH-BEFORE-SUB | Лайфхаки перед Пригородами | Высокий | 🔄 в ветке |
-| UX.HUB-ORDER-REGION-BEFORE-AFFICHE | События региона → Ближайшие события → Подборки → Рядом → Из блога | Высокий | 🔄 в ветке |
-| UX.HUB-NAV-REGION-EVENTS | Sticky link «События региона» (`#region-events`) | Высокий | 🔄 в ветке |
-| UX.HUB-DROP-SOVETY | Убрать блок «Советы»; FAQ отдельно | Высокий | 🔄 в ветке |
+| UX.HUB-ORDER-LH-BEFORE-SUB | Лайфхаки перед Пригородами | Высокий | ✅ live `31834916265` |
+| UX.HUB-ORDER-REGION-BEFORE-AFFICHE | События региона → Ближайшие события → Подборки → Рядом → Из блога | Высокий | ✅ live `31834916265` |
+| UX.HUB-NAV-REGION-EVENTS | Sticky link «События региона» (`#region-events`) | Высокий | ✅ live `31834916265` |
+| UX.HUB-DROP-SOVETY | Убрать блок «Советы»; FAQ отдельно | Высокий | ✅ live `31834916265` |
 
 ## 2026-08-14 - Live: Deploy MSK web `31832253595`
 

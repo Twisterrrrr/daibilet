@@ -1,3 +1,18 @@
+## 2026-08-14 - Live: Deploy MSK web `31834916265`
+
+### Наблюдения
+- Owner: порядок секций хаба + sticky «События региона» + убрать «Советы» → выкатить.
+
+### Решения
+- Deploy MSK web [`31834916265`](https://github.com/Twisterrrrr/daibilet/actions/runs/31834916265) success. SHA `55a4173`. BUILD_ID=`Cf8DVMmPO6-K3z7DAeItg`. Swap с `KlIIcAYr_X557GHm4PNn3`.
+- В пакете также `4bfa7a3` (sky tint только на header лайфхаков).
+- Smoke 200: `/` `/places` `/events` `/cities/perm` (нет `#practice`; есть `#region-events`).
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-14 - Hub: section order + sticky «События региона»
 
 ### Наблюдения
