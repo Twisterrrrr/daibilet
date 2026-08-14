@@ -1,3 +1,16 @@
+## 2026-08-14 - Hub suburbs: «Ещё» overflow for day-trip chips
+
+### Наблюдения
+- Owner: в «Значимые пригороды» длинные маршруты (Православный Урал, Усьва/Губаха…) давят ряд. Видимы Хохловка + Кунгур; остальное в «Ещё». Одинаково mobile/desktop.
+
+### Решения
+- `SuburbsCarousel`: cap 2 primary pills + dropdown «Ещё»; выбор из меню переключает карточку; active из overflow промоутится во видимый ряд (fallback лейбл `Ещё · имя`).
+
+### Проблемы
+- Нет. Commit+push, без live deploy.
+
+---
+
 ## 2026-08-14 - Live: Deploy MSK web `31839365845` (hub batch)
 
 ### Наблюдения
