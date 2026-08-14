@@ -334,8 +334,8 @@ export function CityPageView({
 
             {showSightsBlock ? (
               <div
-                id="sights"
-                className={`border-b ${SECTION_SCROLL_MT} ${
+                id={hasIdentity ? undefined : 'sights'}
+                className={`border-b ${hasIdentity ? '' : SECTION_SCROLL_MT} ${
                   editorial ? 'border-zinc-200' : 'border-slate-100'
                 }`}
               >
@@ -371,6 +371,7 @@ export function CityPageView({
                       <CityIdentityCarousel
                         citySlug={hubSlug}
                         editorial={editorial}
+                        sectionId="sights"
                         onSelect={applyPlaceFocus}
                       />
                     ) : null}

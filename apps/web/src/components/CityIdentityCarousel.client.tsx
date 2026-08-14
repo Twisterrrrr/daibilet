@@ -14,10 +14,12 @@ import {
 type Props = {
   citySlug: string;
   editorial?: boolean;
+  /** Sticky-tab / hash target. Perm: «Зачем ехать» lands on this carousel. */
+  sectionId?: string;
   onSelect: (focus: CityPlaceFocus) => void;
 };
 
-export function CityIdentityCarousel({ citySlug, editorial = false, onSelect }: Props) {
+export function CityIdentityCarousel({ citySlug, editorial = false, sectionId, onSelect }: Props) {
   const slides = cityIdentitySlides(citySlug);
   const heading = resolveCityLocalFlavor(citySlug)?.identityHeading || 'Чем уникален город?';
   const scrollerRef = useRef<HTMLDivElement>(null);
@@ -52,7 +54,11 @@ export function CityIdentityCarousel({ citySlug, editorial = false, onSelect }: 
   if (!slides.length) return null;
 
   return (
-    <section className="mt-8" data-city-identity-carousel>
+    <section
+      id={sectionId}
+      className={`mt-8 ${sectionId ? 'scroll-mt-[calc(var(--site-header-height)+3.25rem)]' : ''}`}
+      data-city-identity-carousel
+    >
       <div className="flex items-end justify-between gap-3">
         <h2
           className={
@@ -64,7 +70,7 @@ export function CityIdentityCarousel({ citySlug, editorial = false, onSelect }: 
           {heading}
         </h2>
         {slides.length > 1 ? (
-          <div className="hidden shrink-0 gap-2 sm:flex">
+          <div className="flex shrink-0 gap-2">
             <button
               type="button"
               aria-label="Предыдущий слайд"
@@ -86,7 +92,7 @@ export function CityIdentityCarousel({ citySlug, editorial = false, onSelect }: 
       </div>
       <div
         ref={scrollerRef}
-        className="mt-4 flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="mt-4 flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden [&::-webkit-scrollbar]:h-0"
         aria-label={heading}
       >
         {slides.map((slide) => (
