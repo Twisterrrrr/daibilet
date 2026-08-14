@@ -302,7 +302,7 @@ async function HomePageBody() {
                             {post.title}
                           </h3>
                           {excerpt ? (
-                            <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-slate-600">{excerpt}</p>
+                            <p className="mt-2 text-sm leading-relaxed text-slate-600">{excerpt}</p>
                           ) : null}
                           {post.tag ? (
                             <span className="mt-auto pt-3 text-xs font-semibold uppercase tracking-wide text-primary-600">

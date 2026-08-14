@@ -1,3 +1,17 @@
+## 2026-08-14 - Blog card excerpt: no CSS clamp
+
+### Наблюдения
+- Owner: «опять обрезаешь, зачем??» После live `d7d77b6` home 3-card и хаб «Из блога» резали абзац `line-clamp-3`. Нужен полный excerpt как в хабе, без ellipsis.
+
+### Решения
+- Снят `line-clamp-3` с параграфа excerpt в `HomePageContent` (ряд из 3 карточек) и `CityHubArticleTeaser` («Из блога»). Текст по-прежнему `hubBlogCardExcerpt` - один абзац, без нового копирайта.
+- `overflow-hidden` на карточке оставлен для скругления cover, не на абзаце. Commit+push, без live deploy (MSK swap мог уже идти).
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-14 - Live: Deploy MSK web `31790635325`
 
 ### Наблюдения

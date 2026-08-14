@@ -84,7 +84,7 @@ export function CityHubArticleTeaser({
           </h3>
           {excerpt ? (
             <p
-              className={`mt-2 line-clamp-3 text-sm leading-relaxed ${
+              className={`mt-2 text-sm leading-relaxed ${
                 editorial ? 'text-zinc-600' : 'text-slate-600'
               }`}
             >
