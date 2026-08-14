@@ -1,3 +1,18 @@
+## 2026-08-14 - Live: Deploy MSK web `31777769202`
+
+### Наблюдения
+- Owner: «выкатывай» - Perm Kama pins ещё в реке после `ce2eada`; CTA «Собрать маршрут».
+
+### Решения
+- Deploy MSK web `31777769202` success, ~4m23s. SHA `a55f663` (предки: Perm `a55f663`, CTA `42e01bb`). BUILD_ID=`-KlX5fZ0ctFUhnvdTMdJ_`.
+- Smoke: `/` `/events` `/my-day` `/cities/perm` → 200; BUILD_ID в HTML. Бандл cityInfo: набережная `58.01825`, «Счастье» `58.01835`. CTA «Собрать маршрут» на хабе Перми, старого «Открыть в Мой день» нет.
+- Seed не трогали. Хаб HTML ещё может показывать каталожный `58.021111` из prod Location; My Day читает editorial + LS rebase.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-14 - Live: Deploy MSK web `31776097211`
 
 ### Наблюдения
@@ -41,7 +56,7 @@
 - South-bank promenade: набережная `58.01825, 56.2466` (у Мешкова / Монастырской); «Счастье» `58.01835, 56.25055` (площадка у Речного вокзала). Мешков без сдвига.
 - `pickEditorialPlaceCoordsIfStale`: rebase если нет coords, расстояние >80 м, или perm waterfront lat > `58.0195`.
 - `repairDayRouteStaleEditorialCoords` на загрузке /my-day (как Kronstadt) + в конце enrich, чтобы refresh без ручной очистки LS сажал пины на берег.
-- Тест: Perm embankment lat > `58.0195` падает. Live deploy нет (owner не сказал «выкатывай»).
+- Тест: Perm embankment lat > `58.0195` падает. Live `31777769202` SHA `a55f663` BUILD_ID=`-KlX5fZ0ctFUhnvdTMdJ_`.
 
 ### Проблемы
 - Prod Location/Venue lat/lng в БД по-прежнему mid-river; хаб HTML может показывать каталог, пока не будет seed/batch. My Day после выката читает editorial + LS repair.
