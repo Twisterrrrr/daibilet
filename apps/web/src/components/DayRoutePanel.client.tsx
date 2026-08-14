@@ -4266,7 +4266,7 @@ function DayRoutePanelInner() {
               data-day-must-see-expanded="1"
               data-day-must-see-layout="adaptive-cols"
             >
-              {mustSeeFiltered.map(({ place, item, hook }) => {
+              {mustSeeFiltered.map(({ place, item, hook }, mustSeeIdx) => {
                 const inRoute =
                   isInDayRoute(item.id, route) || Boolean(item.slug && isInDayRoute(item.slug, route));
                 const hasItemCoords = Boolean(
@@ -4302,7 +4302,8 @@ function DayRoutePanelInner() {
                           src={thumb}
                           alt=""
                           fill
-                          sizes="7rem"
+                          sizes={IMAGE_SIZES.dayMustSeeThumb}
+                          priority={mustSeeIdx < 4}
                           className="object-cover"
                         />
                       ) : (

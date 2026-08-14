@@ -1,3 +1,18 @@
+## 2026-08-14 - Moscow mustSee museum previews (real + lean)
+
+### Наблюдения
+- Owner: в My Day вкладке «Музеи» у половины карточек «градиент» вместо фото.
+- На диске лежали sharp/OG stubs ~15–25KB (blur + полоска с названием), не реальные кадры. Phase-C mains были ~2–3MB; `/images/*` идёт через SafeImage **unoptimized** (без `/_next/image`), поэтому тяжёлый JPG бьёт по скорости списка.
+
+### Решения
+- GenerateImage ×10 музеев (космос, Новая Третьяковка, Гараж, Еврейский, Музей Москвы, Бункер-42, Булгаков, импрессионизм, Политех, ГМИИ) + lean compress sharp 640px / ~40–58KB; `gim.jpg` + Третьяковка тоже в lean.
+- My Day mustSee: `IMAGE_SIZES.dayMustSeeThumb` + `priority` только у первых 4 карточек.
+
+### Проблемы
+- Остальные ~35 moscow stubs вне музейного mustSee - quality debt; на live нужны static files после deploy («выкатывай»).
+
+---
+
 ## 2026-08-14 - My Day share A+B+C (readable `/m` + UGC scaffold)
 
 ### Наблюдения

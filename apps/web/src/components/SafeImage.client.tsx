@@ -24,6 +24,8 @@ export const IMAGE_SIZES = {
   blogFeatured: '(max-width: 768px) 100vw, 60vw',
   searchThumb: '2.5rem',
   favoritesThumb: '4rem',
+  /** My Day must-see grid thumb (~4.5–6rem) */
+  dayMustSeeThumb: '6rem',
   eventHero: '100vw',
   homeHero: '100vw',
 } as const;
