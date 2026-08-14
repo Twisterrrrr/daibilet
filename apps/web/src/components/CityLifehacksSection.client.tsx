@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { CityHubSectionHeading } from '@/components/CityHubSectionHeading';
 import {
   focusFromLifehackCta,
   resolveCityLifehacks,
@@ -46,17 +47,10 @@ const ICONS: Record<CityLifehackIcon, typeof Footprints> = {
 };
 
 const CARD_WIDTH =
-  'w-[min(100%,19.5rem)] shrink-0 snap-start overflow-hidden rounded-2xl border';
-
-/** Soft one-tint set; rotate by card index. Readable type on all of them. */
-const LIFEHACK_TINTS = [
-  { card: 'bg-sky-50 border-sky-100', icon: 'bg-sky-100/80 text-sky-800' },
-  { card: 'bg-amber-50 border-amber-100', icon: 'bg-amber-100/80 text-amber-900' },
-  { card: 'bg-emerald-50 border-emerald-100', icon: 'bg-emerald-100/80 text-emerald-800' },
-  { card: 'bg-violet-50 border-violet-100', icon: 'bg-violet-100/80 text-violet-800' },
-  { card: 'bg-rose-50 border-rose-100', icon: 'bg-rose-100/80 text-rose-800' },
-  { card: 'bg-teal-50 border-teal-100', icon: 'bg-teal-100/80 text-teal-800' },
-] as const;
+  'flex w-[min(100%,19.5rem)] shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-sky-100 bg-sky-50 transition-all duration-300 hover:-translate-y-1';
+const LIFEHACK_ICON = 'bg-sky-100/80 text-sky-800';
+const LIFEHACK_HOVER_SHADOW =
+  'hover:shadow-[0_10px_28px_-10px_hsl(221_83%_53%_/_0.28)]';
 
 function LifehackBody({ item, editorial }: { item: CityLifehackItem; editorial: boolean }) {
   return (
@@ -96,7 +90,7 @@ function CtaControl({
   const linkClass = editorial
     ? 'text-zinc-900 underline-offset-4 hover:underline'
     : 'text-primary-700 hover:text-primary-800';
-  const chipClass = `mt-4 inline-flex min-h-9 items-center gap-1.5 rounded-full px-3 text-xs font-semibold transition ${
+  const chipClass = `inline-flex min-h-9 items-center gap-1.5 rounded-full px-3 text-xs font-semibold transition ${
     filled ? filledClass : outlineClass
   }`;
 
@@ -126,7 +120,7 @@ function CtaControl({
   if (cta.extra?.length) {
     const links = [{ label: cta.label, href: cta.href || '' }, ...cta.extra].filter((link) => link.href);
     return (
-      <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-sm font-semibold">
+      <div className="flex min-h-9 flex-wrap items-center gap-x-4 gap-y-1 text-sm font-semibold">
         {links.map((link) => (
           <a key={link.href} href={link.href} className={linkClass} {...externalRel()}>
             {link.label}
@@ -192,8 +186,8 @@ export function CityLifehacksSection({
     ? `Лайфхаки ${poCityDative(cityName)}: как сберечь бюджет`
     : 'Лайфхаки: как сберечь бюджет';
   const cardShell = editorial
-    ? `${CARD_WIDTH} shadow-sm`
-    : `${CARD_WIDTH} shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_rgba(15,23,42,0.06)]`;
+    ? `${CARD_WIDTH} shadow-sm ${LIFEHACK_HOVER_SHADOW}`
+    : `${CARD_WIDTH} shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_rgba(15,23,42,0.06)] ${LIFEHACK_HOVER_SHADOW}`;
   const arrowClass =
     'inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50';
 
@@ -203,77 +197,74 @@ export function CityLifehacksSection({
       className={`scroll-mt-[calc(var(--site-header-height)+3.25rem)] ${className}`.trim()}
       data-city-lifehacks
     >
-      <div className="flex items-start justify-between gap-3">
-        <h2
-          className={
-            editorial
-              ? 'font-serif text-2xl font-semibold tracking-tight text-zinc-950 sm:text-3xl'
-              : 'text-2xl font-bold tracking-tight text-slate-950 sm:text-[1.75rem]'
-          }
-        >
-          {heading}
-        </h2>
-        {items.length > 1 ? (
-          <div className="flex shrink-0 gap-2 pt-0.5">
-            <button
-              type="button"
-              aria-label="Предыдущий лайфхак"
-              onClick={() => scrollTo(index - 1)}
-              className={arrowClass}
-            >
-              <ChevronLeft className="h-4 w-4" aria-hidden />
-            </button>
-            <button
-              type="button"
-              aria-label="Следующий лайфхак"
-              onClick={() => scrollTo(index + 1)}
-              className={arrowClass}
-            >
-              <ChevronRight className="h-4 w-4" aria-hidden />
-            </button>
-          </div>
-        ) : null}
-      </div>
+      <CityHubSectionHeading
+        title={heading}
+        description="Практичные советы, чтобы не потерять день и бюджет"
+        editorial={editorial}
+        actions={
+          items.length > 1 ? (
+            <div className="flex shrink-0 gap-2 pt-0.5">
+              <button
+                type="button"
+                aria-label="Предыдущий лайфхак"
+                onClick={() => scrollTo(index - 1)}
+                className={arrowClass}
+              >
+                <ChevronLeft className="h-4 w-4" aria-hidden />
+              </button>
+              <button
+                type="button"
+                aria-label="Следующий лайфхак"
+                onClick={() => scrollTo(index + 1)}
+                className={arrowClass}
+              >
+                <ChevronRight className="h-4 w-4" aria-hidden />
+              </button>
+            </div>
+          ) : null
+        }
+      />
 
       <div
         ref={scrollerRef}
-        className="mt-5 flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden [&::-webkit-scrollbar]:h-0"
+        className="mt-5 flex items-stretch snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain py-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden [&::-webkit-scrollbar]:h-0"
         aria-label={heading}
       >
         {items.map((item, cardIndex) => {
           const Icon = ICONS[item.icon] || Footprints;
-          const tint = LIFEHACK_TINTS[cardIndex % LIFEHACK_TINTS.length];
           return (
             <article
               key={item.id}
               data-lifehack-card={item.id}
-              className={`${cardShell} ${tint.card}`}
+              className={cardShell}
             >
-              <div className="flex h-full flex-col p-4 sm:p-5">
+              <div className="flex h-full flex-1 flex-col p-4 sm:p-5">
                 <div className="flex items-start gap-3">
                   <span
-                    className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${tint.icon}`}
+                    className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${LIFEHACK_ICON}`}
                     aria-hidden
                   >
                     <Icon className="h-4 w-4" strokeWidth={1.75} />
                   </span>
-                  <div className="min-w-0 flex-1">
-                    <h3
-                      className={`text-base font-bold leading-snug ${
-                        editorial ? 'text-zinc-950' : 'text-slate-950'
-                      }`}
-                    >
-                      {item.title}
-                    </h3>
-                    <LifehackBody item={item} editorial={editorial} />
-                    <CtaControl
-                      item={item}
-                      primary={cardIndex === 0}
-                      editorial={editorial}
-                      onPlaceFocus={onPlaceFocus}
-                      onAffiche={onAffiche}
-                    />
-                  </div>
+                  <h3
+                    className={`min-w-0 flex-1 text-base font-bold leading-snug ${
+                      editorial ? 'text-zinc-950' : 'text-slate-950'
+                    }`}
+                  >
+                    {item.title}
+                  </h3>
+                </div>
+                <div className="min-w-0 flex-1">
+                  <LifehackBody item={item} editorial={editorial} />
+                </div>
+                <div className="mt-auto flex min-h-9 items-end pt-4">
+                  <CtaControl
+                    item={item}
+                    primary={cardIndex === 0}
+                    editorial={editorial}
+                    onPlaceFocus={onPlaceFocus}
+                    onAffiche={onAffiche}
+                  />
                 </div>
               </div>
             </article>

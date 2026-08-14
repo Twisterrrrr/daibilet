@@ -40,6 +40,11 @@ export type CityMustSeeItem = CityPlaceLinkFields & {
     | 'mansions';
   themeTags?: string[];
   seasonLabel?: string;
+  /**
+   * Typical visit duration in minutes (hub chip «2 часа»).
+   * Optional: hide chip when missing. Editorial only - do not invent from API.
+   */
+  visitMinutes?: number;
   places?: CitySuburbPlace[];
   travelVector?: string;
   travelVectorBlurb?: string;
@@ -80,6 +85,8 @@ export type CitySuburbPlace = CityPlaceLinkFields & {
   desc?: string;
   address?: string | null;
   seasonLabel?: string;
+  /** Typical visit duration in minutes; hide chip when missing. */
+  visitMinutes?: number;
   /** Стабильный editorial id для остановки без публичной entity-карточки. */
   dayRouteId?: string;
   /** Day-route / OSM coords when hub venues omit the nested POI. */
@@ -105,6 +112,7 @@ export type CitySuburbItem = CityMustSeeItem & {
 export type CitySightItem = CityPlaceLinkFields & {
   title: string;
   text: string;
+  visitMinutes?: number;
 };
 
 /** Компактная сезонная подсказка в блоке «Советы» city hub. */

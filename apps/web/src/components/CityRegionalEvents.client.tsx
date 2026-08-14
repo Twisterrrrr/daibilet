@@ -2,6 +2,7 @@
 
 import { CalendarDays } from 'lucide-react';
 
+import { CityHubSectionHeading, HUB_SECTION_PAD } from '@/components/CityHubSectionHeading';
 import { listCityRegionalEvents, listCityRegionalPastEvents, regionalEventStatusLabel } from '@/lib/city-regional-events';
 
 type Props = {
@@ -22,25 +23,21 @@ export function CityRegionalEvents({ citySlug, editorial = false, }: Props) {
       className={`border-b ${editorial ? 'border-zinc-200' : 'border-slate-100'} scroll-mt-[calc(var(--site-header-height)+3.25rem)]`}
       data-city-regional-events
     >
-      <div className={`container-page ${editorial ? 'py-12 sm:py-14' : 'py-8'}`}>
-        <h2
-          className={
-            editorial
-              ? 'font-serif text-3xl font-semibold text-zinc-950 sm:text-4xl'
-              : 'text-2xl font-bold text-slate-950'
-          }
-        >
-          События региона
-        </h2>
+      <div className={`container-page ${HUB_SECTION_PAD}`}>
+        <CityHubSectionHeading
+          title="События региона"
+          description="Фестивали и крупные события рядом с городом"
+          editorial={editorial}
+        />
         <div
           className={
             split
-              ? 'mt-5 grid gap-5 md:grid-cols-[minmax(0,1.35fr)_minmax(15rem,20rem)] md:items-start'
+              ? 'mt-5 grid grid-cols-1 gap-5 md:grid-cols-2 md:items-stretch'
               : 'mt-5'
           }
         >
           {events.length ? (
-            <ul className={split ? 'grid gap-3' : 'grid gap-3 sm:grid-cols-2 xl:grid-cols-3'}>
+            <ul className={split ? 'grid min-w-0 gap-3' : 'grid gap-3 sm:grid-cols-2 xl:grid-cols-3'}>
               {events.map((event) => (
                 <li
                   key={event.id}
@@ -98,7 +95,7 @@ export function CityRegionalEvents({ citySlug, editorial = false, }: Props) {
               <h3 className={`text-sm font-semibold ${editorial ? 'text-zinc-800' : 'text-slate-800'}`}>
                 Прошедшие фестивали сезона
               </h3>
-              <ul className="mt-3 space-y-2">
+              <ul className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
                 {past.map((event) => (
                   <li
                     key={event.id}

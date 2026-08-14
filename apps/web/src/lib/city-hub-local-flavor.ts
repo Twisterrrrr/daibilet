@@ -598,6 +598,7 @@ function asMustSee(place: CityMustSeeItem | CitySuburbItem | CitySuburbPlace): C
     longitude: place.longitude,
     address: 'address' in place ? place.address : undefined,
     transitTip: 'transitTip' in place ? place.transitTip : undefined,
+    visitMinutes: 'visitMinutes' in place ? place.visitMinutes : undefined,
   };
 }
 

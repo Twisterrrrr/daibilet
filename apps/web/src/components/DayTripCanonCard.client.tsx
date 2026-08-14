@@ -5,6 +5,7 @@ import Link from 'next/link';
 
 import { SafeImage } from '@/components/SafeImage.client';
 import type { CitySuburbGastroStop } from '@/lib/cityInfo';
+import { formatVisitDuration } from '@/lib/visit-duration';
 
 export type DayTripCanonSight = {
   name: string;
@@ -14,6 +15,7 @@ export type DayTripCanonSight = {
   transitTip?: string;
   /** Заголовок дня над пунктом (multi-day suburb: «День 1 - Усьва»). */
   dayLabel?: string;
+  visitMinutes?: number;
 };
 
 export type DayTripCanonCardProps = {
@@ -62,11 +64,13 @@ function SightLabel({
   href,
   desc,
   descFromMd,
+  visitMinutes,
 }: {
   name: string;
   href?: string | null;
   desc?: string;
   descFromMd?: boolean;
+  visitMinutes?: number;
 }) {
   const nameNode = href ? (
     <Link
@@ -78,12 +82,19 @@ function SightLabel({
   ) : (
     <strong className="font-semibold">{name}</strong>
   );
+  const visitLabel = formatVisitDuration(visitMinutes);
   const text = String(desc || '').trim();
-  if (!text) return <>{nameNode}</>;
   return (
     <>
       {nameNode}
-      <span className={`font-normal ${descFromMd ? 'hidden md:inline' : ''}`}>{` - ${text}`}</span>
+      {visitLabel ? (
+        <span className="ml-1.5 font-normal text-slate-500" data-city-visit-duration>
+          {visitLabel}
+        </span>
+      ) : null}
+      {text ? (
+        <span className={`font-normal ${descFromMd ? 'hidden md:inline' : ''}`}>{` - ${text}`}</span>
+      ) : null}
     </>
   );
 }
@@ -303,6 +314,7 @@ export function DayTripCanonCard({
                       href={poi.href}
                       desc={poi.desc}
                       descFromMd={sightDescFromMd}
+                      visitMinutes={poi.visitMinutes}
                     />
                   </span>
                 </li>
@@ -505,6 +517,7 @@ export function DayTripCanonCard({
                         href={poi.href}
                         desc={poi.desc}
                         descFromMd={sightDescFromMd}
+                        visitMinutes={poi.visitMinutes}
                       />
                     </span>
                   </div>

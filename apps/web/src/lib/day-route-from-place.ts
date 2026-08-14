@@ -292,6 +292,7 @@ export function dayRouteItemFromMustSee(
     imageUrl,
     address,
     transitTip,
+    dwellMinutes: place.visitMinutes ?? undefined,
     ...coordsFromPlace(place, matched, slug),
   };
 }

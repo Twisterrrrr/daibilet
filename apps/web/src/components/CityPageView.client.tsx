@@ -1,11 +1,16 @@
 'use client';
 
 import * as React from 'react';
-import { ArrowLeft, ChevronDown, ChevronLeft, ChevronRight, Info, Lightbulb, MapPin, Ticket } from 'lucide-react';
+import { ArrowLeft, ChevronDown, ChevronLeft, ChevronRight, Clock, Info, Lightbulb, MapPin, Ticket } from 'lucide-react';
 import Link from 'next/link';
 
 import { CityHubArticlesGrid } from '@/components/CityHubArticleTeaser.client';
 import { CityAdmissionBlock } from '@/components/CityAdmissionBlock';
+import {
+  CityHubSectionHeading,
+  HUB_SECTION_GAP,
+  HUB_SECTION_PAD,
+} from '@/components/CityHubSectionHeading';
 import { EventCard } from '@/components/EventCard';
 import { LandingDirectionCard } from '@/components/LandingDirectionCard.client';
 import { PageBreadcrumbBar } from '@/components/PageBreadcrumbs';
@@ -76,9 +81,11 @@ import {
 import {
   buildMustSeeFilterTabs,
   classifyMustSeePlace,
-  mustSeeFilterLabel,
+  mustSeeFilterStopTypeTag,
   type MustSeeFilterId,
 } from '@/lib/must-see-filters';
+import { dayRouteStopPriceChipLabel } from '@/lib/day-route-stop-types';
+import { formatVisitDuration } from '@/lib/visit-duration';
 import { isOpenDate, MIN_DISPLAY_PRICE_RUB } from '@/lib/event-card-meta';
 import type {
   PublicCityDto,
@@ -367,31 +374,22 @@ export function CityPageView({
         id="blog"
         className={`border-b ${editorial ? 'border-zinc-200' : 'border-slate-200/80'} ${SECTION_SCROLL_MT}`}
       >
-        <div className={`container-page ${editorial ? 'py-12 sm:py-14' : 'py-8'}`}>
-          <div className="flex items-end justify-between gap-4">
-            <div className="min-w-0">
-              <h2
-                className={
-                  editorial
-                    ? 'font-serif text-3xl font-semibold tracking-tight text-zinc-950 sm:text-4xl'
-                    : 'text-2xl font-bold tracking-tight text-slate-950 sm:text-[1.75rem]'
-                }
+        <div className={`container-page ${HUB_SECTION_PAD}`}>
+          <CityHubSectionHeading
+            title={`Из блога ${aboutCityPrepositional(city)}`}
+            description="Маршруты, окрестности и советы местных"
+            editorial={editorial}
+            actions={
+              <Link
+                href={blogHref}
+                className={`shrink-0 text-sm font-semibold ${
+                  editorial ? 'text-zinc-700 hover:text-zinc-950' : 'text-primary-700 hover:text-primary-800'
+                }`}
               >
-                Из блога {aboutCityPrepositional(city)}
-              </h2>
-              <p className={`mt-1.5 text-sm leading-6 ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}>
-                Маршруты, окрестности и советы местных
-              </p>
-            </div>
-            <Link
-              href={blogHref}
-              className={`shrink-0 text-sm font-semibold ${
-                editorial ? 'text-zinc-700 hover:text-zinc-950' : 'text-primary-700 hover:text-primary-800'
-              }`}
-            >
-              Все материалы →
-            </Link>
-          </div>
+                Все материалы →
+              </Link>
+            }
+          />
           <CityHubArticlesGrid articles={footerArticles} editorial={editorial} />
         </div>
       </section>
@@ -509,7 +507,7 @@ export function CityPageView({
                         citySlug={hubSlug}
                         cityName={city.name}
                         editorial={editorial}
-                        className="mt-10"
+                        className={HUB_SECTION_GAP}
                         onPlaceFocus={applyPlaceFocus}
                         onAffiche={() => scrollToSection('affiche')}
                       />
@@ -527,7 +525,7 @@ export function CityPageView({
               id="affiche"
               className={`border-b ${editorial ? 'border-zinc-200' : 'border-slate-200/80'} ${SECTION_SCROLL_MT}`}
             >
-              <div className={`container-page ${editorial ? 'py-12 sm:py-14' : 'py-8'}`}>
+              <div className={`container-page ${HUB_SECTION_PAD}`}>
                 <CityCatalogHeader editorial={editorial} />
                 {contentReady ? (
                   <div className="sticky top-[calc(var(--site-header-height)+3.25rem)] z-20 -mx-1 mb-5 bg-slate-50/95 px-1 py-2 backdrop-blur supports-[backdrop-filter]:bg-slate-50/90">
@@ -564,19 +562,12 @@ export function CityPageView({
                 id="practice"
                 className={`border-b ${editorial ? 'border-zinc-200' : 'border-slate-200/80'} ${SECTION_SCROLL_MT}`}
               >
-                <div className={`container-page ${editorial ? 'pt-12 pb-4' : 'pt-8 pb-2'}`}>
-                  <h2
-                    className={
-                      editorial
-                        ? 'font-serif text-3xl font-semibold tracking-tight text-zinc-950 sm:text-4xl'
-                        : 'text-2xl font-bold tracking-tight text-slate-950 sm:text-[1.75rem]'
-                    }
-                  >
-                    Советы
-                  </h2>
-                  <p className={`mt-2 max-w-3xl text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-                    Как добраться, когда ехать и ответы на частые вопросы.
-                  </p>
+                <div className={`container-page ${editorial ? 'pt-16 pb-4 sm:pt-20' : 'pt-16 pb-2 sm:pt-20'}`}>
+                  <CityHubSectionHeading
+                    title="Советы"
+                    description="Как добраться, когда ехать и ответы на частые вопросы."
+                    editorial={editorial}
+                  />
                 </div>
                 {showTravel ? (
                   <CityTravelSection travel={guide?.travel} editorial={editorial} nested />
@@ -1362,8 +1353,8 @@ function PopularDirections({
             <h2
               className={
                 editorial
-                  ? 'font-serif text-3xl font-semibold text-zinc-950 sm:text-4xl'
-                  : 'font-display text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl'
+                  ? 'font-serif text-3xl font-semibold tracking-tight text-zinc-950 sm:text-4xl'
+                  : 'text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl'
               }
             >
               Каталог подборок
@@ -1460,6 +1451,7 @@ function CitySightsSection({
       href: item.href,
       venueSlug: item.venueSlug,
       locationSlug: item.locationSlug,
+      visitMinutes: item.visitMinutes,
     })) || [];
   const fromMustSee = guide?.mustSee?.length ? guide.mustSee : [];
   // Prefer mustSee: it carries venueSlug/locationSlug for day-route + title links.
@@ -1507,7 +1499,7 @@ function CitySightsSection({
 
   return (
     <section
-      className={`container-page ${compactTop ? 'pt-6 pb-10' : 'py-10'}`}
+      className={`container-page ${compactTop ? 'pt-16 pb-16 sm:pt-20 sm:pb-20' : HUB_SECTION_PAD}`}
     >
       {places.length || hasNamedScenarios ? (
         <CitySightsMustSeeList
@@ -1552,8 +1544,8 @@ function CitySightsSection({
           id="city-must-see"
           className={`${SECTION_SCROLL_MT} ${
             editorial
-              ? 'font-serif text-3xl font-semibold text-zinc-950 sm:text-4xl'
-              : 'text-2xl font-bold text-slate-950'
+              ? 'font-serif text-3xl font-semibold tracking-tight text-zinc-950 sm:text-4xl'
+              : 'text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl'
           }`}
         >
           {sectionTitle}
@@ -1568,7 +1560,7 @@ function CitySightsSection({
           editorial={editorial}
           replaceDayOnApply
           navigateToMyDayOnApply
-          className="mt-10"
+          className={HUB_SECTION_GAP}
           sectionId="city-suburbs"
           focusSlugs={
             activeFocus && suburbs.some((suburb) => suburbMatchesSlugs(suburb, activeFocus.slugs))
@@ -1730,40 +1722,38 @@ function CitySightsMustSeeList({
 
   return (
     <>
-      <div id="city-must-see" className={`flex items-start justify-between gap-3 ${SECTION_SCROLL_MT}`}>
-        <h2
-          className={
-            editorial
-              ? 'font-serif text-3xl font-semibold tracking-tight text-zinc-950 sm:text-4xl'
-              : 'text-2xl font-bold tracking-tight text-slate-950 sm:text-[1.75rem]'
+      <div id="city-must-see" className={SECTION_SCROLL_MT}>
+        <CityHubSectionHeading
+          title={heading}
+          description="Главные места, музеи и прогулочные точки"
+          editorial={editorial}
+          actions={
+            showRailArrows ? (
+              <div className="flex shrink-0 gap-2 pt-0.5">
+                <button
+                  type="button"
+                  data-city-must-see-prev
+                  aria-label="Предыдущие места"
+                  disabled={!canPrev}
+                  onClick={() => scrollPage(-1)}
+                  className={arrowClass}
+                >
+                  <ChevronLeft className="h-4 w-4" aria-hidden />
+                </button>
+                <button
+                  type="button"
+                  data-city-must-see-next
+                  aria-label="Следующие места"
+                  disabled={!canNext}
+                  onClick={() => scrollPage(1)}
+                  className={arrowClass}
+                >
+                  <ChevronRight className="h-4 w-4" aria-hidden />
+                </button>
+              </div>
+            ) : null
           }
-        >
-          {heading}
-        </h2>
-        {showRailArrows ? (
-          <div className="flex shrink-0 gap-2 pt-0.5">
-            <button
-              type="button"
-              data-city-must-see-prev
-              aria-label="Предыдущие места"
-              disabled={!canPrev}
-              onClick={() => scrollPage(-1)}
-              className={arrowClass}
-            >
-              <ChevronLeft className="h-4 w-4" aria-hidden />
-            </button>
-            <button
-              type="button"
-              data-city-must-see-next
-              aria-label="Следующие места"
-              disabled={!canNext}
-              onClick={() => scrollPage(1)}
-              className={arrowClass}
-            >
-              <ChevronRight className="h-4 w-4" aria-hidden />
-            </button>
-          </div>
-        ) : null}
+        />
       </div>
       {showPlacesRail ? (
         <div className="mt-2.5 flex items-start justify-between gap-3">
@@ -1844,7 +1834,11 @@ function CitySightsMustSeeList({
               preferEditorial: true,
             }) || '';
           const categoryId = classifyMustSeePlace(place);
-          const categoryLabel = mustSeeFilterLabel(categoryId);
+          const categoryLabel = mustSeeFilterStopTypeTag(categoryId);
+          const visitLabel = formatVisitDuration(place.visitMinutes);
+          const priceLabel = dayRouteItem
+            ? dayRouteStopPriceChipLabel(dayRouteItem, categoryLabel)
+            : '';
           // Nested sub-spots (places[]) stay in suburb cards / articles / location PDP - not on hub must-see.
           return (
             <li
@@ -1896,12 +1890,33 @@ function CitySightsMustSeeList({
                     ) : null}
                     <div className="mt-3 flex flex-wrap items-center gap-1.5">
                       <span
-                        className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${
+                        className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium ${
                           editorial ? 'bg-zinc-100 text-zinc-600' : 'bg-slate-100 text-slate-600'
                         }`}
                       >
+                        <MapPin className="h-3 w-3 shrink-0" aria-hidden />
                         {categoryLabel}
                       </span>
+                      {visitLabel ? (
+                        <span
+                          className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium ${
+                            editorial ? 'bg-zinc-100 text-zinc-600' : 'bg-slate-100 text-slate-600'
+                          }`}
+                          data-city-visit-duration
+                        >
+                          <Clock className="h-3 w-3 shrink-0" aria-hidden />
+                          {visitLabel}
+                        </span>
+                      ) : null}
+                      {priceLabel ? (
+                        <span
+                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${
+                            editorial ? 'bg-zinc-100 text-zinc-600' : 'bg-slate-100 text-slate-600'
+                          }`}
+                        >
+                          {priceLabel}
+                        </span>
+                      ) : null}
                       {place.seasonLabel ? (
                         <span className="inline-flex rounded-full bg-sky-50 px-2 py-0.5 text-[11px] font-medium text-sky-800">
                           {place.seasonLabel}
@@ -1961,20 +1976,18 @@ function CitySightsMustSeeList({
       ) : null}
       <div
         id={hasNamedScenarios ? 'city-routes' : undefined}
-        className={`${showPlacesRail ? 'mt-10' : 'mt-6'}${
+        className={`${showPlacesRail ? HUB_SECTION_GAP : 'mt-6'}${
           hasNamedScenarios ? ` ${SECTION_SCROLL_MT}` : ''
         }`}
       >
         {hasNamedScenarios && showPlacesRail ? (
-          <h3
-            className={
-              editorial
-                ? 'mb-4 font-serif text-2xl font-semibold tracking-tight text-zinc-950 sm:text-3xl'
-                : 'mb-4 text-xl font-bold tracking-tight text-slate-950 sm:text-2xl'
-            }
-          >
-            Готовые сценарии
-          </h3>
+          <CityHubSectionHeading
+            className="mb-4"
+            as="h3"
+            title="Готовые сценарии"
+            description="Соберите день из главных мест и пригородов"
+            editorial={editorial}
+          />
         ) : null}
         <CityDayPresetBlock
           places={places}
@@ -2117,13 +2130,13 @@ function VenueHighlights({
           <h3
             className={
               editorial
-                ? 'font-serif text-2xl font-semibold text-zinc-950 sm:text-3xl'
-                : 'text-2xl font-bold text-slate-950'
+                ? 'font-serif text-3xl font-semibold tracking-tight text-zinc-950 sm:text-4xl'
+                : 'text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl'
             }
           >
             Площадки и локации
           </h3>
-          <p className={`mt-1 max-w-3xl text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+          <p className={`mt-2 max-w-3xl text-base leading-7 ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}>
             Музеи, театры, причалы и точки старта экскурсий {cityIn}.
           </p>
         </div>
@@ -2186,15 +2199,11 @@ function VenueHighlights({
 function CityCatalogHeader({ editorial = false }: { editorial?: boolean }) {
   return (
     <div className="mb-4">
-      <h2
-        className={
-          editorial
-            ? 'font-serif text-3xl font-semibold text-balance text-zinc-950 sm:text-4xl'
-            : 'font-display text-2xl font-bold tracking-tight text-slate-950 sm:text-[1.75rem]'
-        }
-      >
-        Ближайшие события
-      </h2>
+      <CityHubSectionHeading
+        title="Ближайшие события"
+        description="Концерты, спектакли и экскурсии на ближайшие дни"
+        editorial={editorial}
+      />
     </div>
   );
 }
@@ -2456,18 +2465,13 @@ function CityFaqSection({
     >
       <div className="container-page">
         <div className="max-w-3xl">
-          <h3
-            className={
-              editorial
-                ? 'mb-2 font-serif text-2xl font-semibold text-zinc-950 md:text-3xl'
-                : 'mb-2 text-2xl font-bold text-slate-900 md:text-3xl'
-            }
-          >
-            Частые вопросы
-          </h3>
-          <p className={`mb-6 text-sm ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-            Ответы о городе и афише {cityGenitive}
-          </p>
+          <CityHubSectionHeading
+            as="h3"
+            className="mb-6"
+            title="Частые вопросы"
+            description={`Ответы о городе и афише ${cityGenitive}`}
+            editorial={editorial}
+          />
           <div className="space-y-2">
             {items.map((item, index) => {
               const open = openIndex === index;

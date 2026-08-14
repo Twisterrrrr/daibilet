@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ChevronDown } from 'lucide-react';
 
 import { AddManyToDayRouteButton } from '@/components/AddToDayRouteButton.client';
+import { CityHubSectionHeading } from '@/components/CityHubSectionHeading';
 import {
   DayTripCanonCard,
   resolveCanonGastroStop,
@@ -37,6 +38,7 @@ function buildBulkVenues(
         dayRouteId: poi.dayRouteId,
         latitude: poi.latitude,
         longitude: poi.longitude,
+        visitMinutes: poi.visitMinutes,
       };
       return dayRouteItemFromMustSee(poiAsMustSee, venues, city, { isSuburb: true });
     })
@@ -141,7 +143,6 @@ export function SuburbsCarousel({
   replaceDayOnApply = false,
   navigateToMyDayOnApply = false,
   hideHeader = false,
-  titleClass,
   className = 'mt-10',
   sectionId,
   focusSlugs,
@@ -285,6 +286,7 @@ export function SuburbsCarousel({
           href: resolveCityPlaceTitleHref(poi, venues),
           transitTip: String(poi.transitTip || '').trim() || undefined,
           dayLabel: String(poi.dayLabel || '').trim() || undefined,
+          visitMinutes: poi.visitMinutes,
         }))}
         cta={
           bulkVenues.length > 0 ? (
@@ -320,21 +322,15 @@ export function SuburbsCarousel({
     >
       {hideHeader ? null : (
         <>
-          <h2
-            className={
-              titleClass ||
-              (editorial
-                ? 'font-serif text-3xl font-semibold text-zinc-950 sm:text-4xl'
-                : 'text-2xl font-bold text-slate-950')
+          <CityHubSectionHeading
+            title={`Значимые пригороды ${cityGenitive}`}
+            description={
+              compact
+                ? null
+                : 'Поездка на день рядом с городом - отдельные мини-локации и точки внутри них.'
             }
-          >
-            Значимые пригороды {cityGenitive}
-          </h2>
-          {!compact ? (
-            <p className={`mt-1.5 text-sm ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-              Поездка на день рядом с городом - отдельные мини-локации и точки внутри них.
-            </p>
-          ) : null}
+            editorial={editorial}
+          />
         </>
       )}
 

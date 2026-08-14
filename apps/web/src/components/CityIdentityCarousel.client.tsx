@@ -3,6 +3,7 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { CityHubSectionHeading, HUB_SECTION_GAP } from '@/components/CityHubSectionHeading';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import {
   cityIdentitySlides,
@@ -58,47 +59,36 @@ export function CityIdentityCarousel({ citySlug, editorial = false, sectionId, o
   return (
     <section
       id={sectionId}
-      className={`mt-8 ${sectionId ? 'scroll-mt-[calc(var(--site-header-height)+3.25rem)]' : ''}`}
+      className={`${HUB_SECTION_GAP} ${sectionId ? 'scroll-mt-[calc(var(--site-header-height)+3.25rem)]' : ''}`.trim()}
       data-city-identity-carousel
     >
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h2
-            className={
-              editorial
-                ? 'font-serif text-2xl font-semibold tracking-tight text-zinc-950 sm:text-3xl'
-                : 'text-2xl font-bold tracking-tight text-slate-950 sm:text-[1.75rem]'
-            }
-          >
-            {heading}
-          </h2>
-          {lead ? (
-            <p className={`mt-1.5 text-sm leading-6 ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}>
-              {lead}
-            </p>
-          ) : null}
-        </div>
-        {slides.length > 1 ? (
-          <div className="flex shrink-0 gap-2 pt-0.5">
-            <button
-              type="button"
-              aria-label="Предыдущий слайд"
-              onClick={() => scrollTo(index - 1)}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50"
-            >
-              <ChevronLeft className="h-4 w-4" aria-hidden />
-            </button>
-            <button
-              type="button"
-              aria-label="Следующий слайд"
-              onClick={() => scrollTo(index + 1)}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50"
-            >
-              <ChevronRight className="h-4 w-4" aria-hidden />
-            </button>
-          </div>
-        ) : null}
-      </div>
+      <CityHubSectionHeading
+        title={heading}
+        description={lead}
+        editorial={editorial}
+        actions={
+          slides.length > 1 ? (
+            <div className="flex shrink-0 gap-2 pt-0.5">
+              <button
+                type="button"
+                aria-label="Предыдущий слайд"
+                onClick={() => scrollTo(index - 1)}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50"
+              >
+                <ChevronLeft className="h-4 w-4" aria-hidden />
+              </button>
+              <button
+                type="button"
+                aria-label="Следующий слайд"
+                onClick={() => scrollTo(index + 1)}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50"
+              >
+                <ChevronRight className="h-4 w-4" aria-hidden />
+              </button>
+            </div>
+          ) : null
+        }
+      />
       <div
         ref={scrollerRef}
         className="mt-5 flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden [&::-webkit-scrollbar]:h-0"
