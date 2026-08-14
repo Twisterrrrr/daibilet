@@ -13,7 +13,6 @@ import { RegionNearbyStrip } from '@/components/RegionNearbyStrip.client';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { AddManyToDayRouteButton, AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import { CityDayPresetBlock } from '@/components/CityDayPresetBlock.client';
-import { CityIdentityTags } from '@/components/CityIdentityTags.client';
 import { CityRegionalEvents } from '@/components/CityRegionalEvents.client';
 import { CityWeatherWidget } from '@/components/CityWeatherWidget.client';
 import { MustSeeFilterTabs } from '@/components/MustSeeFilterTabs.client';
@@ -43,7 +42,6 @@ import { CITY_NIGHT_HERO } from '@/lib/city-night-hero';
 import {
   cityHasWeatherWidget,
   cityHasWhenToGo,
-  cityIdentityTags,
   collectPlacesBySlugs,
   placeSlugKey,
   resolveWhenToGoBlurb,
@@ -241,10 +239,9 @@ export function CityPageView({
   const hasWeather = cityHasWeatherWidget(hubSlug);
   const whenToGo = resolveWhenToGoBlurb(hubSlug);
   const hasWhenToGo = cityHasWhenToGo(hubSlug) && Boolean(whenToGo);
-  const hasIdentityTags = cityIdentityTags(hubSlug).length > 0;
   const hasPractice = hasTravel || hasFaq || practiceArticles.length > 0;
   const hasMore = hasDirections || hasVenues || moreArticles.length > 0;
-  const showSightsBlock = hasSights || hasHookFact || hasWeather || hasWhenToGo || hasIdentityTags;
+  const showSightsBlock = hasSights || hasHookFact || hasWeather || hasWhenToGo;
 
   const applyPlaceFocus = React.useCallback((focus: CityPlaceFocus | null) => {
     if (!focus?.slugs.length) {
@@ -340,22 +337,22 @@ export function CityPageView({
                     }`}
                   >
                     <div
-                      className={`grid gap-4 ${hasHookFact && hasWeather ? 'lg:grid-cols-2 lg:items-stretch' : ''}`}
+                      className={`grid gap-4 ${
+                        hasHookFact && (hasWeather || hasWhenToGo) ? 'lg:grid-cols-2 lg:items-stretch' : ''
+                      }`}
                     >
                       {hasHookFact ? (
                         <CityHookFactCallout hook={hookFactText} editorial={editorial} />
                       ) : null}
-                      {hasWeather ? (
+                      {hasWeather || hasWhenToGo ? (
                         <CityWeatherWidget
                           citySlug={hubSlug}
                           editorial={editorial}
+                          whenToGo={whenToGo?.body || null}
                           onFocusPlaces={applyPlaceFocus}
                         />
                       ) : null}
                     </div>
-                    {hasWhenToGo && whenToGo ? (
-                      <CityWhenToGoCallout body={whenToGo.body} editorial={editorial} />
-                    ) : null}
                   </div>
                 ) : null}
                 <CitySightsSection
@@ -923,43 +920,29 @@ function CityHookFactCallout({
 }) {
   return (
     <div
-      className={`h-full rounded-2xl px-5 py-4 sm:px-6 sm:py-5 ${
+      className={`relative h-full overflow-hidden rounded-3xl px-5 py-5 sm:px-6 sm:py-6 ${
         editorial
-          ? 'bg-amber-50 ring-1 ring-amber-200/80'
-          : 'bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 ring-1 ring-amber-200/70'
+          ? 'bg-white ring-1 ring-zinc-200'
+          : 'bg-white shadow-[0_18px_40px_-28px_rgba(15,23,42,0.28)] ring-1 ring-slate-200/80'
       }`}
     >
-      <p className="text-xs font-semibold uppercase tracking-wide text-amber-800">Интересный факт</p>
+      <span
+        className={`absolute inset-y-0 left-0 w-1.5 ${editorial ? 'bg-zinc-900' : 'bg-amber-400'}`}
+        aria-hidden
+      />
       <p
-        className={`mt-2 max-w-3xl text-sm leading-6 ${
+        className={`pl-2 text-[11px] font-semibold uppercase tracking-[0.16em] ${
+          editorial ? 'text-zinc-500' : 'text-amber-700'
+        }`}
+      >
+        Интересный факт
+      </p>
+      <p
+        className={`mt-2 max-w-3xl pl-2 text-sm leading-6 ${
           editorial ? 'text-zinc-600' : 'text-slate-600'
         }`}
       >
         {hook}
-      </p>
-    </div>
-  );
-}
-
-function CityWhenToGoCallout({
-  body,
-  editorial = false,
-}: {
-  body: string;
-  editorial?: boolean;
-}) {
-  return (
-    <div
-      className={`mt-4 rounded-2xl px-5 py-4 sm:px-6 sm:py-5 ${
-        editorial
-          ? 'bg-emerald-50 ring-1 ring-emerald-200/80'
-          : 'bg-gradient-to-br from-emerald-50 via-teal-50 to-sky-50 ring-1 ring-emerald-200/70'
-      }`}
-      data-city-when-to-go="seasonal"
-    >
-      <p className="text-xs font-semibold uppercase tracking-wide text-emerald-900">Когда ехать</p>
-      <p className={`mt-2 max-w-3xl text-sm leading-6 ${editorial ? 'text-zinc-700' : 'text-slate-700'}`}>
-        {body}
       </p>
     </div>
   );
@@ -1251,14 +1234,6 @@ function CitySightsSection({
       >
         {sectionTitle}
       </h2>
-      {onPlaceFocus ? (
-        <CityIdentityTags
-          citySlug={citySlug || city.slug}
-          activeId={activeFocus?.id || null}
-          editorial={editorial}
-          onSelect={(focus) => onPlaceFocus(focus)}
-        />
-      ) : null}
       {activeFocus ? (
         <div
           className={`mt-4 flex flex-wrap items-center gap-2 rounded-2xl border px-4 py-3 ${
