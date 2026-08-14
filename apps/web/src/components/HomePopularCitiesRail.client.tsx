@@ -25,6 +25,8 @@ const ARROW_CARD_STEP = 3;
 /** Keep scrollLeft inside this band of one set width (seamless wrap via 3 copies). */
 const LOOP_BAND_LO = 0.5;
 const LOOP_BAND_HI = 1.5;
+/** Wrap this far before the physical edge so iOS never rubber-bands. */
+const LOOP_EDGE_CUSHION_PX = 180;
 /** Finger travel above this cancels city-hub navigation (swipe, not tap). */
 const TAP_MOVE_PX = 12;
 const HIDE_SCROLLBAR_CLASS =
@@ -187,8 +189,13 @@ export function HomePopularCitiesRail({ cities, className = '' }: HomePopularCit
     jumpToFocus();
 
     const onScroll = () => {
-      // Mid-gesture wrap jumps scrollLeft under the finger and iOS/Android cancel the click.
-      if (loopingRef.current || programScrollRef.current || interactingRef.current) return;
+      if (loopingRef.current || programScrollRef.current) return;
+      const max = el.scrollWidth - el.clientWidth;
+      const nearEdge =
+        el.scrollLeft < LOOP_EDGE_CUSHION_PX || el.scrollLeft > max - LOOP_EDGE_CUSHION_PX;
+      // Mid-rail wrap under a tap cancels the click. Near the physical edge we must
+      // wrap even with a finger down, or Safari rubber-bands before pointerup.
+      if (interactingRef.current && !nearEdge) return;
       normalizeLoop();
     };
 
@@ -199,6 +206,42 @@ export function HomePopularCitiesRail({ cities, className = '' }: HomePopularCit
 
     el.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onResize, { passive: true });
+
+    const items = el.querySelectorAll<HTMLElement>('[data-rail-item]');
+    const startCard = items[0];
+    const endCard = items[items.length - 1];
+    const canObserve =
+      typeof IntersectionObserver !== 'undefined' &&
+      startCard &&
+      endCard &&
+      startCard !== endCard &&
+      cities.length >= 2;
+    const edgeObserver = canObserve
+      ? new IntersectionObserver(
+          (entries) => {
+            if (loopingRef.current || programScrollRef.current) return;
+            const setWidth = el.scrollWidth / LOOP_COPIES;
+            if (!Number.isFinite(setWidth) || setWidth < 1) return;
+            for (const entry of entries) {
+              if (!entry.isIntersecting) continue;
+              loopingRef.current = true;
+              if (entry.target === endCard) {
+                shiftScrollLeft(el, -setWidth);
+              } else if (entry.target === startCard) {
+                shiftScrollLeft(el, setWidth);
+              }
+              loopingRef.current = false;
+            }
+          },
+          {
+            root: el,
+            rootMargin: `0px ${LOOP_EDGE_CUSHION_PX}px`,
+            threshold: 0,
+          },
+        )
+      : null;
+    if (startCard) edgeObserver?.observe(startCard);
+    if (endCard && endCard !== startCard) edgeObserver?.observe(endCard);
 
     // Re-anchor only on width changes. Height-only RO (images/fonts) used to call
     // jumpToFocus mid-interaction and rubber-band the rail back to MSK.
@@ -217,6 +260,7 @@ export function HomePopularCitiesRail({ cities, className = '' }: HomePopularCit
       el.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onResize);
       ro?.disconnect();
+      edgeObserver?.disconnect();
       if (scrollEndTimerRef.current) clearTimeout(scrollEndTimerRef.current);
     };
   }, [jumpToFocus, normalizeLoop, loopItems.length]);

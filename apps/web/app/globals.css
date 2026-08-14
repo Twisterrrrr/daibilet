@@ -280,7 +280,10 @@ html[data-nav-pending='1'] {
   .home-edge-cities-rail {
     width: 100%;
     overflow-x: auto;
+    overscroll-behavior: contain;
     overscroll-behavior-x: contain;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
     /* Instant reposition for seamless infinite loop (override horizontal-snap-row). */
     scroll-behavior: auto;
   }
