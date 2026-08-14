@@ -312,8 +312,9 @@ export function LandingsCatalogView({
         }
       >
         {sections.length ? (
-          <div className="mt-5 space-y-3">
+          <div className="mt-5 flex flex-col gap-3 md:flex-row md:items-center md:gap-5">
             <ScrollRail
+              className="min-w-0 md:max-w-[min(100%,28rem)] md:shrink-0"
               viewportClassName="flex flex-nowrap gap-2 pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
               aria-label="Категории подборок"
             >
@@ -371,6 +372,7 @@ export function LandingsCatalogView({
 
             {visibleTags.length ? (
               <ScrollRail
+                className="min-w-0 md:flex-1 md:border-l md:border-slate-200/80 md:pl-5"
                 viewportClassName="flex flex-nowrap gap-2 pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
                 aria-label="Фильтры подборки"
               >
