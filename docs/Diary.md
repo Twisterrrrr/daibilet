@@ -1,3 +1,16 @@
+## 2026-08-14 - Hub sticky: «О городе» → #about
+
+### Наблюдения
+- Sticky/nav city hub начинался с «Зачем ехать»; не было пункта вернуться к intro/hero.
+
+### Решения
+- Первый пункт sticky (desktop + mobile primary): «О городе» → `#about` на hero-wrapper (`data-city-hero`); aliases `top` / `city-hero` → `about`. Старый alias `about→sights` снят.
+
+### Проблемы
+- Нет. Deploy не делали (owner не просил выкатывай).
+
+---
+
 ## 2026-08-14 - Fix: TEP ticket categories collapsed on event buy-card
 
 ### Наблюдения

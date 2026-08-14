@@ -105,7 +105,8 @@ const CITY_HASH_ALIASES: Record<string, string> = {
   'city-seo': 'seo',
   'why-go': 'sights',
   'zachem-ehat': 'sights',
-  about: 'sights',
+  top: 'about',
+  'city-hero': 'about',
   directions: 'more',
   venues: 'more',
   travel: 'lifehacks',
@@ -122,6 +123,7 @@ const CITY_HASH_ALIASES: Record<string, string> = {
 };
 
 const HUB_DESKTOP_NAV: Array<{ id: string; label: string }> = [
+  { id: 'about', label: 'О городе' },
   { id: 'sights', label: 'Зачем ехать' },
   { id: 'city-must-see', label: 'Главные места' },
   { id: 'city-routes', label: 'Маршруты' },
@@ -133,7 +135,7 @@ const HUB_DESKTOP_NAV: Array<{ id: string; label: string }> = [
   { id: 'faq', label: 'FAQ' },
 ];
 
-const HUB_MOBILE_PRIMARY_IDS = ['sights', 'city-routes', 'city-suburbs', 'affiche'] as const;
+const HUB_MOBILE_PRIMARY_IDS = ['about', 'sights', 'city-routes', 'city-suburbs', 'affiche'] as const;
 
 const SECTION_SCROLL_MT = 'scroll-mt-[calc(var(--site-header-height)+3.25rem)]';
 
@@ -328,6 +330,8 @@ export function CityPageView({
 
   const tabs = React.useMemo(() => {
     const filled = new Set<string>();
+    // Hero/intro always present - first sticky item «О городе» → #about.
+    filled.add('about');
     if (hasWhyGoNav) filled.add('sights');
     if (hasMustSeeNav) filled.add('city-must-see');
     if (hasRoutesNav) filled.add('city-routes');
@@ -816,7 +820,7 @@ function CityHeroStrip({
   void hasTravel;
 
   return (
-    <div id="top">
+    <div id="about" data-city-hero>
       <PageBreadcrumbBar
         items={[
           { label: 'Главная', href: '/' },
