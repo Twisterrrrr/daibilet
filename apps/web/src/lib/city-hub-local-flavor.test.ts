@@ -12,6 +12,7 @@ import {
   placeSlugKey,
   resolveCityLocalFlavor,
   resolveWhenToGoBlurb,
+  seasonGuideForTab,
   suburbMatchesSlugs,
 } from './city-hub-local-flavor.ts';
 
@@ -145,4 +146,21 @@ test('Perm when-to-go maps months to honest seasonal copy', () => {
   assert.match(november?.body || '', /тропы/);
 
   assert.equal(resolveWhenToGoBlurb('moscow', new Date('2026-08-14T08:00:00Z')), null);
+});
+
+test('season tabs do not keep August copy when Winter is selected', () => {
+  const flavor = resolveCityLocalFlavor('perm')?.whenToGo;
+  const august = resolveWhenToGoBlurb('perm', new Date('2026-08-14T08:00:00Z'));
+  assert.ok(flavor);
+  assert.ok(august);
+  const summer = seasonGuideForTab(flavor, august, 'summer');
+  assert.equal(summer.isCurrent, true);
+  assert.equal(summer.nowLabel, 'Конец лета (Август)');
+  assert.match(summer.body, /Хохловка/);
+  const winter = seasonGuideForTab(flavor, august, 'winter');
+  assert.equal(winter.isCurrent, false);
+  assert.equal(winter.nowLabel, null);
+  assert.match(winter.body, /Губахе/);
+  assert.equal(winter.body.includes('Конец лета'), false);
+  assert.equal(winter.body.includes('август'), false);
 });

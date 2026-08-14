@@ -328,6 +328,22 @@ export function resolveWhenToGoBlurb(
   };
 }
 
+/** Copy under season tabs: current month wins on the active season, otherwise the tab body. */
+export function seasonGuideForTab(
+  whenToGo: CityWhenToGoFlavor | null | undefined,
+  current: CityWhenToGoBlurb | null | undefined,
+  tabId: CitySeasonTabId,
+): { body: string; nowLabel: string | null; isCurrent: boolean } {
+  const tab = whenToGo?.tabs.find((item) => item.id === tabId) || null;
+  const isCurrent = Boolean(current && current.tab === tabId);
+  const body = (isCurrent ? current?.body : tab?.body)?.trim() || tab?.body?.trim() || '';
+  const nowLabel =
+    isCurrent && current
+      ? `${current.headline}${current.monthLabel ? ` (${current.monthLabel})` : ''}`
+      : null;
+  return { body, nowLabel, isCurrent };
+}
+
 export function cityIdentitySlides(slug: string | null | undefined): CityIdentitySlide[] {
   const slides = resolveCityLocalFlavor(slug)?.slides;
   return Array.isArray(slides) ? slides.filter((slide) => slide.slugs.length > 0) : [];

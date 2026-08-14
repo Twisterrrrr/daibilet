@@ -346,24 +346,24 @@ export function CityPageView({
                     }`}
                   >
                     <div
-                      className={`grid gap-4 ${
+                      className={
                         hasHookFact && (hasWeather || hasWhenToGo)
-                          ? 'lg:grid-cols-5 lg:items-stretch'
+                          ? 'flex flex-col gap-4 md:flex-row md:items-stretch'
                           : ''
-                      }`}
+                      }
                     >
-                      {hasHookFact ? (
-                        <div className={hasWeather || hasWhenToGo ? 'lg:col-span-3' : ''}>
-                          <CityHookFactCallout hook={hookFactText} editorial={editorial} />
-                        </div>
-                      ) : null}
                       {hasWeather || hasWhenToGo ? (
-                        <div className={hasHookFact ? 'lg:col-span-2' : ''}>
+                        <div className={hasHookFact ? 'md:w-[42%] md:shrink-0 [&>*]:h-full' : ''}>
                           <CityWeatherWidget
                             citySlug={hubSlug}
                             cityIn={cityInPrepositional(city)}
                             editorial={editorial}
                           />
+                        </div>
+                      ) : null}
+                      {hasHookFact ? (
+                        <div className={hasWeather || hasWhenToGo ? 'md:min-w-0 md:flex-1 [&>*]:h-full' : ''}>
+                          <CityHookFactCallout hook={hookFactText} editorial={editorial} />
                         </div>
                       ) : null}
                     </div>
@@ -955,19 +955,19 @@ function CityHookFactCallout({
 }) {
   return (
     <div
-      className={`relative h-full overflow-hidden rounded-3xl px-5 py-5 sm:px-6 sm:py-6 ${
+      className={`relative flex h-full flex-col overflow-hidden rounded-2xl px-5 py-5 sm:px-6 sm:py-6 ${
         editorial
           ? 'bg-white ring-1 ring-zinc-200'
-          : 'bg-white shadow-[0_18px_40px_-28px_rgba(15,23,42,0.28)] ring-1 ring-slate-200/80'
+          : 'bg-white shadow-[0_4px_12px_rgba(15,23,42,0.06)] ring-1 ring-slate-200/80'
       }`}
     >
       <span
-        className={`absolute inset-y-0 left-0 w-1.5 ${editorial ? 'bg-zinc-900' : 'bg-amber-400'}`}
+        className={`absolute inset-y-0 left-0 w-1 ${editorial ? 'bg-zinc-900' : 'bg-slate-900'}`}
         aria-hidden
       />
       <p
         className={`pl-2 text-[11px] font-semibold uppercase tracking-[0.16em] ${
-          editorial ? 'text-zinc-500' : 'text-amber-700'
+          editorial ? 'text-zinc-500' : 'text-slate-500'
         }`}
       >
         Интересный факт
