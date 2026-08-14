@@ -1,3 +1,17 @@
+## 2026-08-14 - Hub suburbs: same covers as My Day
+
+### Наблюдения
+- Owner: превью пригородов Перми есть в `/my-day`, на хабе нет.
+
+### Решения
+- Данные те же (`cityInfo.significantSuburbs`). My Day включает `compact` → magazine-карточка с обложкой. Хаб оставлял canon без фото, хотя `heroImageUrl` уже резолвился.
+- На хабе показываем ту же обложку сверху карточки. Полный список точек, логистика и гастро не режем.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-14 - Perm identity: hide rail scrollbar, tab to uniqueness
 
 ### Наблюдения

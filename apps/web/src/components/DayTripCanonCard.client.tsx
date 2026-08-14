@@ -35,7 +35,7 @@ export type DayTripCanonCardProps = {
   editorial?: boolean;
   /**
    * my-day magazine: large cover photo, short «Что посмотреть», primary CTA.
-   * Hub keeps default canon layout.
+   * Hub keeps full logistics + all POIs and now also shows the same cover.
    */
   magazine?: boolean;
   /** Cover for magazine layout (editorial / hub hero). */
@@ -324,13 +324,27 @@ export function DayTripCanonCard({
         ariaLabel ||
         (total != null ? `${index + 1} из ${total}` : undefined)
       }
-      className={`mt-4 w-full rounded-2xl border bg-white px-3.5 py-4 shadow-sm sm:p-5 md:p-6 ${
+      className={`mt-4 w-full overflow-hidden rounded-2xl border bg-white shadow-sm ${
         editorial ? 'border-zinc-200' : 'border-slate-200'
       } ${className}`}
       data-day-trip-canon="1"
       data-day-trip-align="gutter-text"
+      data-day-trip-has-cover={cover ? '1' : '0'}
       {...dataProps}
     >
+      {cover ? (
+        <div className="relative h-40 w-full bg-[#F5F5F7] sm:h-44" data-day-trip-cover>
+          <SafeImage
+            src={cover}
+            alt=""
+            fill
+            sizes="(max-width: 768px) 100vw, 720px"
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/20 via-transparent to-transparent" />
+        </div>
+      ) : null}
+      <div className="px-3.5 py-4 sm:p-5 md:p-6">
       {/* Title row: badge in gutter, title on text vertical. */}
       <div className={GRID} data-day-trip-head>
         <div className={`${GUTTER} pt-0.5`} data-day-trip-gutter>
@@ -483,6 +497,7 @@ export function DayTripCanonCard({
           </div>
         </div>
       ) : null}
+      </div>
     </article>
   );
 }
