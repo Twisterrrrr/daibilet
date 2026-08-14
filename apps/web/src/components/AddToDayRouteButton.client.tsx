@@ -1,7 +1,7 @@
 'use client';
 
 import { useLayoutEffect, useState } from 'react';
-import { Check, Route } from 'lucide-react';
+import { Minus, Plus, Route } from 'lucide-react';
 
 import { CityConfirmModal } from '@/components/CityConfirmModal.client';
 import { CollectRouteCtaHint } from '@/components/CollectRouteCtaHint.client';
@@ -96,15 +96,17 @@ export function AddToDayRouteButton({
             ? 'bg-emerald-600 text-white hover:bg-emerald-700'
             : 'bg-slate-100 text-slate-800 hover:bg-slate-200';
 
+  // Compact hub/catalog: idle «+ В маршрут», in-route «Убрать» (not «В маршруте» /
+  // «✓ В маршруте» - those read as still-add next to the section chip «В маршруте: N»).
   const idleLabel = intent === 'day' ? 'В мой день' : compact || iconOnly ? 'В маршрут' : 'В мой маршрут';
-  const activeLabel = intent === 'day' ? 'Добавлено' : 'В маршруте';
+  const activeLabel = intent === 'day' ? 'Добавлено' : compact || iconOnly ? 'Убрать' : 'Убрать из маршрута';
   const label = active ? activeLabel : idleLabel;
   const idleTitle = intent === 'day' ? 'В мой день' : iconOnly ? 'В маршрут' : 'В мой маршрут';
   const activeTitle = intent === 'day' ? 'Убрать из моего дня' : 'Убрать из маршрута';
   const idleAria =
     intent === 'day' ? 'Добавить место события в мой день' : iconOnly ? 'В маршрут' : 'Добавить в маршрут дня';
   const activeAria =
-    intent === 'day' ? 'Убрать место из моего дня' : iconOnly ? 'В маршруте' : 'Убрать из маршрута дня';
+    intent === 'day' ? 'Убрать место из моего дня' : 'Убрать из маршрута дня';
 
   function feedbackAfter(beforeCount: number, payload: DayRouteVenueItem) {
     // Bust cache so toast reflects LS truth (not a stale snapshot after failed write).
@@ -229,6 +231,7 @@ export function AddToDayRouteButton({
         data-venue-id={venueKey || undefined}
         data-day-route-intent={intent}
         data-day-route-live={live ? '1' : '0'}
+        data-day-route-in-route={active ? '1' : '0'}
         onPointerDown={(event) => {
           // Stop bubble to parent <Link>; do NOT preventDefault (kills click on some browsers).
           event.stopPropagation();
@@ -242,7 +245,13 @@ export function AddToDayRouteButton({
           iconOnly ? '!min-w-8 !px-2' : ''
         } ${base} ${className}`}
       >
-        {active ? <Check className="h-3.5 w-3.5 shrink-0" /> : <Route className="h-3.5 w-3.5 shrink-0" />}
+        {active ? (
+          <Minus className="h-3.5 w-3.5 shrink-0" aria-hidden />
+        ) : compact || iconOnly ? (
+          <Plus className="h-3.5 w-3.5 shrink-0" aria-hidden />
+        ) : (
+          <Route className="h-3.5 w-3.5 shrink-0" aria-hidden />
+        )}
         {iconOnly ? <span className="sr-only">{label}</span> : <span>{label}</span>}
       </button>
       <CityConfirmModal
@@ -337,7 +346,9 @@ export function AddManyToDayRouteButton({
     mode === 'replace'
       ? MY_DAY_COLLECT_CTA_LABEL
       : allActive
-        ? 'В маршруте'
+        ? compact
+          ? 'Убрать'
+          : 'Убрать из маршрута'
         : compact
           ? 'В маршрут'
           : 'В мой маршрут';
@@ -465,6 +476,7 @@ export function AddManyToDayRouteButton({
         data-day-route-bulk={payloads.length || undefined}
         data-day-route-bulk-mode={mode}
         data-day-route-live={live ? '1' : '0'}
+        data-day-route-in-route={showActive ? '1' : '0'}
         onPointerDown={(event) => {
           event.stopPropagation();
         }}
@@ -476,9 +488,11 @@ export function AddManyToDayRouteButton({
         className={`inline-flex min-h-10 min-w-[2.75rem] shrink-0 items-center justify-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${base} ${className}`}
       >
         {mode !== 'replace' && allActive ? (
-          <Check className="h-3.5 w-3.5 shrink-0" />
+          <Minus className="h-3.5 w-3.5 shrink-0" aria-hidden />
+        ) : compact ? (
+          <Plus className="h-3.5 w-3.5 shrink-0" aria-hidden />
         ) : (
-          <Route className="h-3.5 w-3.5 shrink-0" />
+          <Route className="h-3.5 w-3.5 shrink-0" aria-hidden />
         )}
         <span>{label}</span>
       </button>

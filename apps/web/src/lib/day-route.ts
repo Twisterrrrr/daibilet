@@ -564,8 +564,25 @@ export function subscribeDayRoute(listener: DayRouteListener): () => void {
   installDayRouteBrowserBridge();
   const listeners = getDayRouteRuntime().listeners;
   listeners.add(listener);
+  // Also mirror the window event DayRoutePanel uses. Multi-chunk copies of this
+  // module can end up with divergent `listeners` Sets while still sharing LS +
+  // DAY_ROUTE_CHANGED_EVENT - without this, hub «В маршрут» chips stay idle
+  // after a successful add (toast + bottom bar update, cards do not).
+  const onEvent = () => {
+    try {
+      listener(getDayRouteSnapshot());
+    } catch {
+      // ignore subscriber errors
+    }
+  };
+  if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+    window.addEventListener(DAY_ROUTE_CHANGED_EVENT, onEvent);
+  }
   return () => {
     listeners.delete(listener);
+    if (typeof window !== 'undefined' && typeof window.removeEventListener === 'function') {
+      window.removeEventListener(DAY_ROUTE_CHANGED_EVENT, onEvent);
+    }
   };
 }
 
