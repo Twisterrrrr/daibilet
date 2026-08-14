@@ -392,19 +392,10 @@ export function CityPageView({
                     <div
                       className={
                         hasHookFact && (hasWeather || hasWhenToGo)
-                          ? 'flex flex-col gap-4 md:grid md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] md:items-stretch'
+                          ? 'flex flex-col gap-4 md:grid md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] md:items-stretch'
                           : ''
                       }
                     >
-                      {hasWeather || hasWhenToGo ? (
-                        <div className={hasHookFact ? 'min-w-0 [&>*]:h-full' : ''}>
-                          <CityWeatherWidget
-                            citySlug={hubSlug}
-                            cityIn={cityInPrepositional(city)}
-                            editorial={editorial}
-                          />
-                        </div>
-                      ) : null}
                       {hasHookFact ? (
                         <div
                           className={
@@ -418,13 +409,27 @@ export function CityPageView({
                           />
                         </div>
                       ) : null}
+                      {hasWeather || hasWhenToGo ? (
+                        <div className={hasHookFact ? 'min-w-0 [&>*]:h-full' : ''}>
+                          <CityWeatherWidget
+                            citySlug={hubSlug}
+                            cityIn={cityInPrepositional(city)}
+                            editorial={editorial}
+                          />
+                        </div>
+                      ) : null}
                     </div>
                     {hasIdentity ? (
                       <CityIdentityCarousel
                         citySlug={hubSlug}
                         editorial={editorial}
                         sectionId="sights"
-                        onSelect={applyPlaceFocus}
+                        onSelect={(focus) => {
+                          // Identity highlights places in must-see/suburbs - no filter «сценарий» banner.
+                          scrollToSection(
+                            focus.scrollTo === 'suburbs' ? 'city-suburbs' : 'city-must-see',
+                          );
+                        }}
                       />
                     ) : null}
                   </div>
@@ -1329,7 +1334,7 @@ function CitySightsSection({
     return null;
   }
   void sessions;
-  const cityInto = cityInAccusative(city);
+  const cityIn = cityInPrepositional(city);
   const cityGenitive = cityToGenitive(city.name);
   const citySlug = city.slug || city.sourceSlug || undefined;
   const landingRows = landings.map((landing) => ({
@@ -1346,11 +1351,11 @@ function CitySightsSection({
   const hasNamedScenarios = Boolean(namedPresets?.length);
   const activeFocus = placeFocus?.slugs.length ? placeFocus : null;
   const focusedPlaces = activeFocus ? collectPlacesBySlugs(activeFocus.slugs, places, allSuburbs) : [];
-  // Editorial «Зачем ехать» (places) always owns the section H2; scenarios follow below.
+  // H2 «Что посмотреть в …»; sticky/jump tab остаётся «Зачем ехать».
   // hookFact renders above this section (between tabs and H2).
   const sectionTitle =
     places.length || !hasNamedScenarios
-      ? `Зачем ехать ${cityInto}`
+      ? `Что посмотреть ${cityIn}`
       : 'Готовые сценарии дня';
 
   return (

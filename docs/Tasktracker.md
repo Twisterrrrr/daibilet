@@ -1,8 +1,16 @@
+## 2026-08-14 - Hub: Что посмотреть + fact/weather swap
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| UX.HUB-SEE-H2 | H2 «Что посмотреть в …»; tab «Зачем ехать» | Высокий | 🔄 deploy |
+| UX.HUB-NO-IDENTITY-SCENARIO | Identity не создаёт focus-сценарий must-see | Высокий | 🔄 deploy |
+| UX.HUB-FACT-WEATHER-ORDER | Факт слева ~40%, погода справа ~60% | Высокий | 🔄 deploy |
+
 ## 2026-08-14 - Weather/fact row ~60/40
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| UX.HUB-WEATHER-FACT-6040 | Desktop: погода ~60%, факт ~40% (`3fr`/`2fr`) | Средний | 🔄 git+push, без live |
+| UX.HUB-WEATHER-FACT-6040 | Desktop: погода ~60%, факт ~40% (`3fr`/`2fr`) | Средний | ⛔ superseded (факт слева, погода справа шире) |
 
 ## 2026-08-14 - Live: Deploy MSK web `31819658915`
 
