@@ -10,7 +10,6 @@ import { ExpandableBlurb } from '@/components/ExpandableBlurb.client';
 import { HeroLayout } from '@/components/HeroLayout';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { LandingDirectionCard } from '@/components/LandingDirectionCard.client';
-import { ScrollRail } from '@/components/ScrollRail.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { formatNumber, formatPriceFrom, pluralEvents } from '@/lib/format';
 import { resolveLandingCardImage } from '@/lib/landing-images';
@@ -312,21 +311,20 @@ export function LandingsCatalogView({
         }
       >
         {sections.length ? (
-          <div className="mt-5 flex flex-col gap-3 md:flex-row md:items-center md:gap-5">
-            <ScrollRail
-              className="min-w-0 md:max-w-[min(100%,28rem)] md:shrink-0"
-              viewportClassName="flex flex-nowrap gap-2 pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          <div className="mt-5 space-y-3">
+            <div
+              className="flex flex-wrap items-center gap-2"
+              role="group"
               aria-label="Категории подборок"
             >
               <button
                 type="button"
-                data-rail-item
                 onClick={() => setActiveCategory(null)}
                 aria-pressed={resolvedCategory == null}
                 className={
                   resolvedCategory == null
-                    ? 'inline-flex shrink-0 items-center rounded-full bg-slate-900 px-3.5 py-2 text-sm font-semibold text-white shadow-sm transition'
-                    : 'inline-flex shrink-0 items-center rounded-full bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-50'
+                    ? 'inline-flex items-center rounded-full bg-slate-900 px-3.5 py-2 text-sm font-semibold text-white shadow-sm transition'
+                    : 'inline-flex items-center rounded-full bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-50'
                 }
               >
                 Все
@@ -346,13 +344,12 @@ export function LandingsCatalogView({
                   <button
                     key={section.slug}
                     type="button"
-                    data-rail-item
                     onClick={() => setActiveCategory(section.slug)}
                     aria-pressed={active}
                     className={
                       active
-                        ? 'inline-flex shrink-0 items-center rounded-full bg-slate-900 px-3.5 py-2 text-sm font-semibold text-white shadow-sm transition'
-                        : 'inline-flex shrink-0 items-center rounded-full bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-50'
+                        ? 'inline-flex items-center rounded-full bg-slate-900 px-3.5 py-2 text-sm font-semibold text-white shadow-sm transition'
+                        : 'inline-flex items-center rounded-full bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-50'
                     }
                   >
                     {section.title}
@@ -368,12 +365,12 @@ export function LandingsCatalogView({
                   </button>
                 );
               })}
-            </ScrollRail>
+            </div>
 
             {visibleTags.length ? (
-              <ScrollRail
-                className="min-w-0 md:flex-1 md:border-l md:border-slate-200/80 md:pl-5"
-                viewportClassName="flex flex-nowrap gap-2 pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              <div
+                className="flex flex-wrap items-center gap-2 border-t border-slate-200/80 pt-3"
+                role="group"
                 aria-label="Фильтры подборки"
               >
                 {visibleTags.map((tag) => {
@@ -382,20 +379,19 @@ export function LandingsCatalogView({
                     <button
                       key={tag.id}
                       type="button"
-                      data-rail-item
                       onClick={() => toggleTag(tag.id)}
                       aria-pressed={active}
                       className={
                         active
-                          ? 'inline-flex shrink-0 items-center rounded-full bg-slate-200 px-3 py-1.5 text-sm font-medium text-slate-900 transition'
-                          : 'inline-flex shrink-0 items-center rounded-full bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-200/80 hover:text-slate-800'
+                          ? 'inline-flex items-center rounded-full bg-slate-200 px-3 py-1.5 text-sm font-medium text-slate-900 transition'
+                          : 'inline-flex items-center rounded-full bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-200/80 hover:text-slate-800'
                       }
                     >
                       {tag.label}
                     </button>
                   );
                 })}
-              </ScrollRail>
+              </div>
             ) : null}
           </div>
         ) : null}
