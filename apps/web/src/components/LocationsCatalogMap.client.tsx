@@ -39,18 +39,31 @@ export function LocationsCatalogMap({
   selectedId = null,
   onPinClick,
   layoutKey,
+  /** Leaflet fitBounds padding [x, y] in px. */
+  fitPadding = [36, 36],
+  /** Cap zoom-in after fitBounds. */
+  fitMaxZoom = 14,
+  /**
+   * Floor zoom after fitBounds (e.g. Russia-wide pins on mobile: without this,
+   * fitBounds zooms out so far that city dots vanish).
+   */
+  fitMinZoom,
 }: {
   pins: LocationsCatalogMapPin[];
   className?: string;
   selectedId?: string | null;
   onPinClick?: (id: string) => void;
   layoutKey?: string | number;
+  fitPadding?: [number, number];
+  fitMaxZoom?: number;
+  fitMinZoom?: number;
 }) {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const mapRef = React.useRef<LeafletMap | null>(null);
   const markersRef = React.useRef<LeafletMarker[]>([]);
   const onPinClickRef = React.useRef(onPinClick);
   onPinClickRef.current = onPinClick;
+  const fitPaddingKey = `${fitPadding[0]}x${fitPadding[1]}`;
 
   const pinsKey = pins
     .map((p) => `${p.id}:${p.latitude.toFixed(5)},${p.longitude.toFixed(5)}`)
@@ -133,7 +146,13 @@ export function LocationsCatalogMap({
       if (latLngs.length === 1) {
         map.setView(latLngs[0], 14);
       } else {
-        map.fitBounds(L.latLngBounds(latLngs), { padding: [36, 36], maxZoom: 14 });
+        map.fitBounds(L.latLngBounds(latLngs), {
+          padding: fitPadding,
+          maxZoom: fitMaxZoom,
+        });
+        if (typeof fitMinZoom === 'number' && map.getZoom() < fitMinZoom) {
+          map.setZoom(fitMinZoom);
+        }
       }
       requestAnimationFrame(() => map?.invalidateSize({ animate: false }));
     })();
@@ -142,7 +161,7 @@ export function LocationsCatalogMap({
       cancelled = true;
       resizeObserver?.disconnect();
     };
-  }, [pinsKey, pins, selectedId]);
+  }, [pinsKey, pins, selectedId, fitPaddingKey, fitMaxZoom, fitMinZoom]);
 
   React.useEffect(() => {
     return () => {

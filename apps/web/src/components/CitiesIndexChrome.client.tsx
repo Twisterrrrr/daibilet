@@ -13,11 +13,10 @@ import { RussiaMap } from '@/components/RussiaMap.client';
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
 import { filterOrphanRegions, resolveCityRegion } from '@/lib/cityRegionHub';
 import { pluralCities, pluralEvents } from '@/lib/format';
-import { cityHref, citySlug } from '@/lib/routes';
+import { cityHref } from '@/lib/routes';
 
 export type CitiesCatalogSort = 'popular' | 'name';
 
-const POPULAR_TILE_COUNT = 8;
 const SEARCH_DEBOUNCE_MS = 200;
 
 export function parseCitiesCatalogSort(raw: string | null | undefined): CitiesCatalogSort {
@@ -34,7 +33,7 @@ function sortCities(list: PublicDestinationDto[], sort: CitiesCatalogSort) {
 }
 
 /**
- * /cities hub: livesearch filters the grid, popular top tiles, mobile map/list toggle.
+ * /cities hub: livesearch + sort chips, then one list (or map via toggle).
  */
 export function CitiesIndexChrome({ destinations }: { destinations: PublicDestinationDto[] }) {
   const router = useRouter();
@@ -75,21 +74,6 @@ export function CitiesIndexChrome({ destinations }: { destinations: PublicDestin
     return sortCities(base, sort);
   }, [allCities, urlQuery, sort]);
 
-  const popularTiles = useMemo(() => {
-    if (urlQuery) return [];
-    return sortCities(allCities, 'popular').slice(0, POPULAR_TILE_COUNT);
-  }, [allCities, urlQuery]);
-
-  const popularSlugSet = useMemo(
-    () => new Set(popularTiles.map((city) => citySlug(city)).filter(Boolean)),
-    [popularTiles],
-  );
-
-  const gridCities = useMemo(() => {
-    if (urlQuery || popularSlugSet.size === 0) return filteredCities;
-    return filteredCities.filter((city) => !popularSlugSet.has(citySlug(city)));
-  }, [filteredCities, popularSlugSet, urlQuery]);
-
   const regions = useMemo(() => {
     const filtered = destinations.filter((item) => item.type === 'region' && item.events > 0);
     return [...filtered].sort(
@@ -112,6 +96,12 @@ export function CitiesIndexChrome({ destinations }: { destinations: PublicDestin
   }, [allCities, queryDraft]);
 
   const showSuggestions = focused && suggestions.length > 0;
+  const sortTitle = sort === 'name' ? 'По алфавиту' : 'По популярности';
+  const countLabel = urlQuery
+    ? filteredCities.length
+      ? pluralCities(filteredCities.length)
+      : 'Нет совпадений'
+    : pluralCities(allCities.length);
 
   const setSort = (next: CitiesCatalogSort) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -213,39 +203,18 @@ export function CitiesIndexChrome({ destinations }: { destinations: PublicDestin
             </ul>
           ) : null}
         </div>
+      </HeroLayout>
 
-        {popularTiles.length > 0 ? (
-          <section className="mt-5" aria-label="Популярные города">
-            <div className="mb-3 flex items-end justify-between gap-3">
-              <h2 className="font-display text-lg font-bold text-slate-900 sm:text-xl">
-                Популярные направления
-              </h2>
-              <p className="text-xs text-slate-500 sm:text-sm">{pluralCities(popularTiles.length)}</p>
-            </div>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
-              {popularTiles.map((city) => (
-                <CityCard
-                  key={`popular:${city.id || city.slug || city.name}`}
-                  city={city}
-                  compact
-                  imageVariant="top"
-                  region={resolveCityRegion(city, destinations)}
-                />
-              ))}
-            </div>
-          </section>
-        ) : null}
-
-        <div className="mt-4 flex items-center justify-between gap-3 lg:hidden">
-          <p className="text-sm text-slate-500">
-            {urlQuery
-              ? filteredCities.length
-                ? pluralCities(filteredCities.length)
-                : 'Нет совпадений'
-              : pluralCities(allCities.length)}
-          </p>
+      <div id="cities-all" className="container-page scroll-mt-24 bg-slate-50 py-8 sm:py-10">
+        <div className="mb-4 flex items-start justify-between gap-3 sm:mb-5">
+          <div className="min-w-0">
+            <h2 className="font-display text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
+              {sortTitle}
+            </h2>
+            <p className="mt-1 text-sm text-slate-500">{countLabel}</p>
+          </div>
           <div
-            className="flex overflow-hidden rounded-xl bg-[#F5F5F7] p-1"
+            className="flex shrink-0 overflow-hidden rounded-xl bg-[#F5F5F7] p-1"
             role="radiogroup"
             aria-label="Вид каталога городов"
           >
@@ -276,23 +245,9 @@ export function CitiesIndexChrome({ destinations }: { destinations: PublicDestin
           </div>
         </div>
 
-        <div
-          className={`mt-4 w-full lg:mt-5 ${mobileView === 'map' ? 'block' : 'hidden lg:block'}`}
-        >
-          <RussiaMap
-            className="min-h-[16rem] w-full sm:min-h-[18rem] lg:min-h-[22rem]"
-            destinations={allCities}
-          />
-        </div>
-      </HeroLayout>
-
-      <div
-        id="cities-all"
-        className={`container-page scroll-mt-24 bg-slate-50 py-10 ${
-          mobileView === 'list' ? 'block' : 'hidden lg:block'
-        }`}
-      >
-        {!filteredCities.length && !orphanRegions.length ? (
+        {mobileView === 'map' ? (
+          <RussiaMap className="w-full" destinations={allCities} closerZoom />
+        ) : !filteredCities.length && !orphanRegions.length ? (
           <div className="rounded-xl border border-dashed border-slate-300 py-20 text-center">
             <p className="text-lg text-slate-400">
               {urlQuery ? 'Ничего не найдено' : 'Города скоро появятся'}
@@ -307,38 +262,44 @@ export function CitiesIndexChrome({ destinations }: { destinations: PublicDestin
               </button>
             ) : null}
           </div>
-        ) : null}
+        ) : (
+          <>
+            {filteredCities.length > 0 ? (
+              <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-4">
+                {filteredCities.map((city) => (
+                  <CityCard
+                    key={`${city.type}:${city.id || city.slug || city.name}`}
+                    city={city}
+                    compact
+                    region={resolveCityRegion(city, destinations)}
+                  />
+                ))}
+              </div>
+            ) : null}
 
-        {gridCities.length > 0 ? (
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-4">
-            {gridCities.map((city) => (
-              <CityCard
-                key={`${city.type}:${city.id || city.slug || city.name}`}
-                city={city}
-                compact
-                region={resolveCityRegion(city, destinations)}
-              />
-            ))}
-          </div>
-        ) : null}
-
-        {orphanRegions.length > 0 ? (
-          <section className="mt-12 border-t border-slate-200 pt-10">
-            <div className="mb-5">
-              <h2 className="font-display text-xl font-bold text-slate-900 sm:text-2xl">
-                Области и направления
-              </h2>
-              <p className="mt-1 text-sm text-slate-500">
-                События в городах без отдельной карточки - курорты, пригороды и малые населённые пункты
-              </p>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {orphanRegions.map((region) => (
-                <RegionDestinationLink key={`region:${region.slug || region.name}`} region={region} />
-              ))}
-            </div>
-          </section>
-        ) : null}
+            {orphanRegions.length > 0 ? (
+              <section className="mt-12 border-t border-slate-200 pt-10">
+                <div className="mb-5">
+                  <h2 className="font-display text-xl font-bold text-slate-900 sm:text-2xl">
+                    Области и направления
+                  </h2>
+                  <p className="mt-1 text-sm text-slate-500">
+                    События в городах без отдельной карточки - курорты, пригороды и малые населённые
+                    пункты
+                  </p>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {orphanRegions.map((region) => (
+                    <RegionDestinationLink
+                      key={`region:${region.slug || region.name}`}
+                      region={region}
+                    />
+                  ))}
+                </div>
+              </section>
+            ) : null}
+          </>
+        )}
       </div>
     </>
   );
