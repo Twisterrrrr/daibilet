@@ -188,29 +188,31 @@ export function CityHeroStrip({
     <div id="about" data-city-hero>
       <section className={CITY_NIGHT_HERO.section}>
         <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
-          <div className={CITY_NIGHT_HERO.photoFrame}>
-            {showPhoto ? (
-              <SafeImage
-                src={heroImage}
-                alt=""
-                fill
-                priority
-                sizes={CITY_NIGHT_HERO.imageSizes}
-                style={{ objectPosition: heroFocus }}
-                onError={() => setHeroImageFailed(true)}
-                className="object-cover object-center"
-              />
-            ) : null}
+          <div className={CITY_NIGHT_HERO.mediaShell}>
+            <div className={CITY_NIGHT_HERO.photoFrame}>
+              {showPhoto ? (
+                <SafeImage
+                  src={heroImage}
+                  alt=""
+                  fill
+                  priority
+                  sizes={CITY_NIGHT_HERO.imageSizes}
+                  style={{ objectPosition: heroFocus }}
+                  onError={() => setHeroImageFailed(true)}
+                  className="object-cover object-center"
+                />
+              ) : null}
+            </div>
+            <div className={CITY_NIGHT_HERO.surfaceOverlay} />
+            <div
+              className={CITY_NIGHT_HERO.leftFillDesktop}
+              style={
+                CITY_NIGHT_HERO.fadeLeftDesktop !== 'none'
+                  ? { backgroundImage: CITY_NIGHT_HERO.fadeLeftDesktop }
+                  : undefined
+              }
+            />
           </div>
-          <div className={CITY_NIGHT_HERO.surfaceOverlay} />
-          <div
-            className={CITY_NIGHT_HERO.leftFillDesktop}
-            style={
-              CITY_NIGHT_HERO.fadeLeftDesktop !== 'none'
-                ? { backgroundImage: CITY_NIGHT_HERO.fadeLeftDesktop }
-                : undefined
-            }
-          />
           <div
             className="absolute inset-0 z-[1] md:hidden"
             style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftMobile }}

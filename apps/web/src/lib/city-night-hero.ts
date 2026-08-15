@@ -11,6 +11,10 @@
  * Mobile: full-width photo at reduced opacity + left navy overlay for copy.
  * Desktop: photo `md:w-[62%]` + hero-surface mask fade into navy.
  * Equal py; leftover height split by justify-center.
+ *
+ * Ultrawide: photo + mask live in `mediaShell` whose left edge matches
+ * `container-page` (max-w-7xl / 80rem). Otherwise `right:0` + 62vw + mask
+ * at 92% of the full viewport push the visible skyline into the far gutter.
  */
 export const CITY_NIGHT_HERO = {
   /** Lovable `--navy` */
@@ -27,13 +31,19 @@ export const CITY_NIGHT_HERO = {
   content:
     'container-page relative z-[1] flex flex-col justify-center py-10 sm:min-h-[380px] sm:py-12 md:min-h-[440px]',
   contentInner: 'w-full max-w-2xl text-navy-foreground md:max-w-[560px] lg:max-w-[620px]',
-  /** Lovable CityHero: right strip; mask lives on hero-surface overlay, not the photo. */
+  /**
+   * Photo geometry track: full-bleed on mobile; from container-page left
+   * to viewport right on md+ (right margin stays photo, not empty navy).
+   */
+  mediaShell:
+    'absolute inset-y-0 left-0 right-0 z-0 h-full md:left-[max(0px,calc((100%-80rem)/2))]',
+  /** Lovable CityHero: right strip inside mediaShell; mask on overlay. */
   photoFrame:
     'absolute inset-y-0 right-0 z-0 h-full w-full opacity-70 md:w-[62%] md:opacity-100',
-  /** Lovable: absolute inset-0 hero-surface opacity-95 + md mask. */
+  /** Lovable: absolute inset-0 hero-surface opacity-95 + md mask (within mediaShell). */
   surfaceOverlay:
     'pointer-events-none absolute inset-0 z-[1] hero-surface opacity-95 md:[mask-image:linear-gradient(90deg,#000_45%,transparent_92%)] md:[-webkit-mask-image:linear-gradient(90deg,#000_45%,transparent_92%)]',
-  imageSizes: '(min-width: 768px) 62vw, 100vw',
+  imageSizes: '(min-width: 768px) min(62vw, 50rem), 100vw',
   /** Unused in right-strip layout; kept for skeleton parity callers. */
   photoEdgeFade: 'pointer-events-none absolute inset-0 z-[1] hidden',
   fadePhotoEdges: 'none',
