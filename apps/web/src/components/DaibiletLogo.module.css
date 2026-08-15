@@ -1,5 +1,6 @@
 .logo {
-  --dark: #0b0f19;
+  /* Lovable SiteHeader brand: text-navy-deep */
+  --dark: var(--navy-deep, #0b1a4a);
 
   position: relative;
   display: inline-flex;

@@ -2,7 +2,8 @@ import { Inter, Manrope, Source_Serif_4 } from 'next/font/google';
 
 /**
  * Self-hosted via next/font (emitted to `/_next/static/media/*` at build).
- * Manrope = headings / display; Inter = UI body; Source Serif 4 = city editorial hub.
+ * Lovable MHTML: UI + titles = Manrope wght@400;500;600;700;800.
+ * Inter kept as fallback variable; Source Serif 4 = city editorial hub only.
  */
 export const fontInter = Inter({
   subsets: ['latin', 'cyrillic'],

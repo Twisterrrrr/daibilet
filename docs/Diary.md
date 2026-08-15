@@ -1,4 +1,21 @@
-## 2026-08-15 - Hub/home UX: Lovable hero + mobile chrome + route clear
+## 2026-08-15 - Hub hero: Lovable navy + Manrope + chip copy
+
+### Наблюдения
+- Owner CRITICAL: left navy не совпадал с Lovable (`#0a174b`/`#122868` vs MHTML `--navy-deep: oklch(21% .11 265)` ≈ `#0b1a4a`).
+- Шрифты «каша»: body Inter, H1/H2 `font-bold` 700; Lovable - Manrope 400-800 везде, H1/H2 `font-extrabold tracking-tight`.
+- Чип «N мест в гиде» читался как рейтинг/позиция.
+
+### Решения
+- CSS tokens: `--navy-deep` / `--navy` / `--navy-foreground` / `--gradient-hero` + `.hero-surface` из MHTML.
+- `CITY_NIGHT_HERO` + overlay mask; CTA white/`text-navy-deep` + ghost secondary.
+- Body/sans/display → Manrope; headings `font-extrabold` + `--tracking-tight: -0.025em`.
+- Hero chip: `pluralPoints` → «N точка/точки/точек в гиде».
+- Identity slides `d64e33e8` + этот фикс → один Deploy MSK web.
+
+### Проблемы
+- Нет.
+
+---
 
 ### Наблюдения
 - Owner: night hero wrong vs Lovable (photo right + mask); mushy type; «Наверх» на краю viewport; mobile hero share + secondary pills; sticky labels; burger справа; home infinite cities; places filter chips cut; /events gap hero→search; route panel без явной очистки; «В маршруте: N» шум на мобилке.

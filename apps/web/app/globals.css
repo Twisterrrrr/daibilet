@@ -52,9 +52,20 @@ html[data-nav-pending='1'] {
     --space-section-lg: 5.5rem; /* 88px */
     --space-card: 1rem; /* 16px */
     --space-card-lg: 1.5rem; /* 24px */
-    --gradient-hero: linear-gradient(180deg, hsl(221, 83%, 53%) 0%, hsl(221, 83%, 42%) 100%);
-    /* next/font CSS variables on <html>; fallbacks for first paint / SSR */
-    --font-body: var(--font-inter), system-ui, sans-serif;
+    /* Lovable city palette (MHTML perm-palette-perfection :root) */
+    --navy: oklch(29% 0.13 264);
+    --navy-deep: oklch(21% 0.11 265); /* ≈ #0b1a4a / #08143a */
+    --navy-foreground: oklch(98% 0.006 250);
+    --hero-primary: oklch(53% 0.21 262);
+    --gradient-hero: linear-gradient(
+      100deg,
+      var(--navy-deep) 0%,
+      var(--navy) 55%,
+      var(--hero-primary) 100%
+    );
+    --tracking-tight: -0.025em;
+    /* Lovable: Manrope is --font-sans for body + titles (wght 400-800) */
+    --font-body: var(--font-manrope), var(--font-inter), system-ui, sans-serif;
     --font-display: var(--font-manrope), var(--font-inter), system-ui, sans-serif;
     --font-serif: var(--font-source-serif), Georgia, 'Times New Roman', serif;
     --site-header-height: 4rem;
@@ -101,6 +112,17 @@ html[data-nav-pending='1'] {
     --party-gradient-hero: radial-gradient(ellipse 85% 65% at 60% 25%, oklch(0.42 0.12 25 / 0.45), transparent 65%),
       linear-gradient(150deg, oklch(0.16 0.05 280), oklch(0.26 0.08 35));
     --party-hero-glow: oklch(0.72 0.14 40 / 0.1);
+  }
+
+  @supports (color: color-mix(in lab, red, red)) {
+    :root {
+      --gradient-hero: linear-gradient(
+        100deg,
+        var(--navy-deep) 0%,
+        var(--navy) 55%,
+        color-mix(in oklab, var(--hero-primary) 45%, var(--navy)) 100%
+      );
+    }
   }
 
   @media (min-width: 1024px) {
@@ -153,7 +175,8 @@ html[data-nav-pending='1'] {
   h3,
   h4 {
     font-family: var(--font-display);
-    @apply font-bold tracking-tight;
+    /* Lovable H1/H2: font-extrabold (800) + tracking-tight (-0.025em) */
+    @apply font-extrabold tracking-tight;
   }
 
   /* Dark / photo surfaces: headings inherit surface text (not body graphite). */
@@ -413,6 +436,11 @@ html[data-nav-pending='1'] {
 }
 
 @layer utilities {
+  /* Lovable city hub: section + overlay use --gradient-hero */
+  .hero-surface {
+    background-image: var(--gradient-hero);
+  }
+
   .gradient-hero-lovable {
     background: var(--gradient-hero);
   }

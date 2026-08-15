@@ -991,34 +991,35 @@ function CityLoadingState({ editorial = false }: { editorial?: boolean }) {
   return (
     <>
       <section className={CITY_NIGHT_HERO.section} aria-busy="true" aria-label="Загрузка">
-        <div
-          className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
-          style={{ backgroundColor: CITY_NIGHT_HERO.navyDeep }}
-          aria-hidden
-        >
-          <div className={`${CITY_NIGHT_HERO.photoFrame} bg-white/[0.04]`} />
+        <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
+          <div className={`${CITY_NIGHT_HERO.photoFrame} bg-navy-foreground/[0.04]`} />
+          <div className={CITY_NIGHT_HERO.surfaceOverlay} />
           <div
             className={CITY_NIGHT_HERO.leftFillDesktop}
-            style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftDesktop }}
+            style={
+              CITY_NIGHT_HERO.fadeLeftDesktop !== 'none'
+                ? { backgroundImage: CITY_NIGHT_HERO.fadeLeftDesktop }
+                : undefined
+            }
           />
           <div
-            className="absolute inset-0 md:hidden"
+            className="absolute inset-0 z-[1] md:hidden"
             style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftMobile }}
           />
         </div>
         <div className={CITY_NIGHT_HERO.content}>
           <div className={CITY_NIGHT_HERO.contentInner}>
-            <div className="mb-4 h-4 w-48 rounded bg-white/20" />
-            <div className={`h-10 max-w-md rounded sm:h-12 ${editorial ? 'bg-white/20' : 'bg-white/22'}`} />
-            <div className="mt-3 h-4 max-w-xl rounded bg-white/16" />
+            <div className="mb-4 h-4 w-48 rounded bg-navy-foreground/20" />
+            <div className={`h-10 max-w-md rounded sm:h-12 ${editorial ? 'bg-navy-foreground/20' : 'bg-navy-foreground/22'}`} />
+            <div className="mt-3 h-4 max-w-xl rounded bg-navy-foreground/16" />
             <div className="mt-5 flex gap-2">
-              <div className="h-8 w-24 rounded-full bg-white/18" />
-              <div className="h-8 w-28 rounded-full bg-white/14" />
-              <div className="h-8 w-32 rounded-full bg-white/12" />
+              <div className="h-8 w-24 rounded-full bg-navy-foreground/18" />
+              <div className="h-8 w-28 rounded-full bg-navy-foreground/14" />
+              <div className="h-8 w-32 rounded-full bg-navy-foreground/12" />
             </div>
             <div className="mt-6 flex gap-3">
-              <div className="h-11 w-40 rounded-2xl bg-white/90" />
-              <div className="h-11 w-36 rounded-2xl bg-white/20" />
+              <div className="h-11 w-40 rounded-full bg-card/90" />
+              <div className="h-11 w-36 rounded-full bg-navy-foreground/20" />
             </div>
           </div>
         </div>
@@ -1108,8 +1109,8 @@ function PopularDirections({
         <h2
           className={
             editorial
-              ? 'font-serif text-3xl font-semibold tracking-tight text-zinc-950 sm:text-4xl'
-              : 'text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl'
+              ? 'font-display text-3xl font-extrabold tracking-tight text-zinc-950 sm:text-4xl'
+              : 'font-display text-3xl font-extrabold tracking-tight text-slate-950 sm:text-4xl'
           }
         >
           Каталог подборок
@@ -1312,8 +1313,8 @@ function CitySightsSection({
           id="city-must-see"
           className={`${SECTION_SCROLL_MT} ${
             editorial
-              ? 'font-serif text-3xl font-semibold tracking-tight text-zinc-950 sm:text-4xl'
-              : 'text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl'
+              ? 'font-display text-3xl font-extrabold tracking-tight text-zinc-950 sm:text-4xl'
+              : 'font-display text-3xl font-extrabold tracking-tight text-slate-950 sm:text-4xl'
           }`}
         >
           {sectionTitle}
@@ -1778,8 +1779,8 @@ function VenueHighlights({
           <h3
             className={
               editorial
-                ? 'font-serif text-3xl font-semibold tracking-tight text-zinc-950 sm:text-4xl'
-                : 'text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl'
+                ? 'font-display text-3xl font-extrabold tracking-tight text-zinc-950 sm:text-4xl'
+                : 'font-display text-3xl font-extrabold tracking-tight text-slate-950 sm:text-4xl'
             }
           >
             Площадки и локации

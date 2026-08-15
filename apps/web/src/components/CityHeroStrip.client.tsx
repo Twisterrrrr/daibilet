@@ -12,7 +12,7 @@ import { resolveCityImageObjectPosition } from '@/lib/city-image-focus';
 import { resolveCityImage } from '@/lib/city-images';
 import { CITY_NIGHT_HERO } from '@/lib/city-night-hero';
 import { inCityPrepositional } from '@/lib/city-declension';
-import { pluralEvents, pluralPlaces, pluralVenues } from '@/lib/format';
+import { pluralEvents, pluralPoints, pluralVenues } from '@/lib/format';
 import type { CityInfoEntry } from '@/lib/cityInfo';
 import type { resolveCityHubConfig } from '@/lib/city-hub-config';
 import type { PublicCityDto, PublicCityPageDto } from '@daibilet/contracts/public';
@@ -146,7 +146,7 @@ export function CityHeroStrip({
                 </span>
                 {guidePlaces > 0 ? (
                   <span className="inline-flex rounded-full bg-white px-3 py-1.5 text-sm font-semibold text-slate-800 ring-1 ring-slate-200">
-                    {pluralPlaces(guidePlaces)} в гиде
+                    {pluralPoints(guidePlaces)} в гиде
                   </span>
                 ) : null}
               </div>
@@ -187,11 +187,7 @@ export function CityHeroStrip({
   return (
     <div id="about" data-city-hero>
       <section className={CITY_NIGHT_HERO.section}>
-        <div
-          className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
-          style={{ backgroundColor: CITY_NIGHT_HERO.navyDeep }}
-          aria-hidden
-        >
+        <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
           <div className={CITY_NIGHT_HERO.photoFrame}>
             {showPhoto ? (
               <SafeImage
@@ -206,6 +202,7 @@ export function CityHeroStrip({
               />
             ) : null}
           </div>
+          <div className={CITY_NIGHT_HERO.surfaceOverlay} />
           <div
             className={CITY_NIGHT_HERO.leftFillDesktop}
             style={
@@ -215,7 +212,7 @@ export function CityHeroStrip({
             }
           />
           <div
-            className="absolute inset-0 md:hidden"
+            className="absolute inset-0 z-[1] md:hidden"
             style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftMobile }}
           />
         </div>
@@ -224,21 +221,23 @@ export function CityHeroStrip({
           <div className={CITY_NIGHT_HERO.contentInner}>
             <nav
               aria-label="Хлебные крошки"
-              className="mb-4 flex flex-wrap items-center gap-1.5 text-sm text-white/70"
+              className="mb-4 flex flex-wrap items-center gap-1.5 text-sm text-navy-foreground/70"
             >
               {breadcrumbItems.map((item, index) => {
                 const isLast = index === breadcrumbItems.length - 1;
                 return (
                   <React.Fragment key={`${item.label}:${index}`}>
                     {index > 0 ? (
-                      <ChevronRight className="h-3.5 w-3.5 shrink-0 text-white/35" aria-hidden />
+                      <ChevronRight className="h-3.5 w-3.5 shrink-0 text-navy-foreground/35" aria-hidden />
                     ) : null}
                     {item.href && !isLast ? (
-                      <Link href={item.href} className="shrink-0 transition hover:text-white">
+                      <Link href={item.href} className="shrink-0 transition hover:text-navy-foreground">
                         {item.label}
                       </Link>
                     ) : (
-                      <span className={`min-w-0 truncate ${isLast ? 'text-white' : ''}`}>{item.label}</span>
+                      <span className={`min-w-0 truncate ${isLast ? 'text-navy-foreground' : ''}`}>
+                        {item.label}
+                      </span>
                     )}
                   </React.Fragment>
                 );
@@ -248,12 +247,12 @@ export function CityHeroStrip({
             {regionBadge || seasonChip ? (
               <div className="mb-3 flex flex-wrap items-center gap-2">
                 {regionBadge ? (
-                  <span className="inline-flex items-center rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-white ring-1 ring-white/25">
+                  <span className="inline-flex items-center rounded-full bg-navy-foreground/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-navy-foreground/85 ring-1 ring-inset ring-navy-foreground/15">
                     {regionBadge}
                   </span>
                 ) : null}
                 {seasonChip ? (
-                  <span className="inline-flex items-center rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/90 ring-1 ring-white/20">
+                  <span className="inline-flex items-center rounded-full bg-navy-foreground/10 px-3 py-1 text-xs font-semibold text-navy-foreground/90 ring-1 ring-inset ring-navy-foreground/20">
                     {seasonChip.label}
                     {seasonChip.monthsHint ? ` (${seasonChip.monthsHint})` : ''}
                   </span>
@@ -261,23 +260,25 @@ export function CityHeroStrip({
               </div>
             ) : null}
 
-              <h1 className="font-display text-4xl font-extrabold tracking-tight text-white sm:text-5xl md:text-6xl">
+            <h1 className="font-display text-4xl font-extrabold tracking-tight text-navy-foreground sm:text-5xl md:text-6xl">
               {city.name}
             </h1>
             {brief ? (
-              <p className="mt-3 max-w-xl text-base leading-relaxed text-white/85 sm:text-lg">{brief}</p>
+              <p className="mt-3 max-w-xl text-base leading-relaxed text-navy-foreground/85 sm:text-lg">
+                {brief}
+              </p>
             ) : null}
 
             <div className="mt-5 flex flex-wrap gap-2">
-              <span className="inline-flex rounded-full bg-white/15 px-3 py-1.5 text-sm font-semibold text-white ring-1 ring-white/20 backdrop-blur-sm">
+              <span className="inline-flex rounded-full bg-navy-foreground/15 px-3 py-1.5 text-sm font-semibold text-navy-foreground ring-1 ring-navy-foreground/20 backdrop-blur-sm">
                 {pluralEvents(stats.events)}
               </span>
-              <span className="inline-flex rounded-full bg-white/15 px-3 py-1.5 text-sm font-semibold text-white ring-1 ring-white/20 backdrop-blur-sm">
+              <span className="inline-flex rounded-full bg-navy-foreground/15 px-3 py-1.5 text-sm font-semibold text-navy-foreground ring-1 ring-navy-foreground/20 backdrop-blur-sm">
                 {pluralVenues(stats.venues)}
               </span>
               {guidePlaces > 0 ? (
-                <span className="inline-flex rounded-full bg-white/15 px-3 py-1.5 text-sm font-semibold text-white ring-1 ring-white/20 backdrop-blur-sm">
-                  {pluralPlaces(guidePlaces)} в гиде
+                <span className="inline-flex rounded-full bg-navy-foreground/15 px-3 py-1.5 text-sm font-semibold text-navy-foreground ring-1 ring-navy-foreground/20 backdrop-blur-sm">
+                  {pluralPoints(guidePlaces)} в гиде
                 </span>
               ) : null}
             </div>
@@ -285,14 +286,14 @@ export function CityHeroStrip({
             <div className="mt-6 flex flex-wrap gap-3">
               <Link
                 href={afficheHref}
-                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl bg-white px-5 text-sm font-semibold text-slate-900 shadow-[0_8px_24px_rgba(0,0,0,0.18)] transition hover:bg-white/92"
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-card px-6 py-3.5 text-sm font-semibold text-navy-deep shadow-[0_2px_6px_oklch(29%_0.13_264/0.08),0_20px_40px_-20px_oklch(29%_0.13_264/0.28)] transition-transform hover:scale-[1.03] active:scale-95"
               >
-                <Ticket className="h-4 w-4 shrink-0" aria-hidden="true" />
+                <Ticket className="h-[18px] w-[18px] shrink-0" aria-hidden="true" />
                 <span>Афиша событий</span>
               </Link>
               <Link
                 href={collectionsHref}
-                className="inline-flex min-h-11 items-center justify-center rounded-2xl border border-white/35 bg-white/10 px-5 text-sm font-semibold text-white backdrop-blur-sm hover:bg-white/15"
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-navy-foreground/12 px-6 py-3.5 text-sm font-semibold text-navy-foreground ring-1 ring-inset ring-navy-foreground/25 transition-colors hover:bg-navy-foreground/20"
               >
                 Подборки событий
               </Link>
@@ -301,9 +302,9 @@ export function CityHeroStrip({
                 onClick={() => void shareCity()}
                 aria-label={shareCopied ? 'Ссылка скопирована' : 'Поделиться'}
                 title={shareCopied ? 'Ссылка скопирована' : 'Поделиться'}
-                className="hidden h-11 w-11 items-center justify-center rounded-2xl border border-white/35 bg-white/10 text-white backdrop-blur-sm hover:bg-white/15 md:inline-flex"
+                className="hidden size-11 items-center justify-center rounded-full text-navy-foreground/75 ring-1 ring-inset ring-navy-foreground/20 transition-colors hover:bg-navy-foreground/15 hover:text-navy-foreground md:inline-flex"
               >
-                <Share2 className="h-4 w-4" aria-hidden />
+                <Share2 className="h-[18px] w-[18px]" aria-hidden />
               </button>
             </div>
           </div>

@@ -53,10 +53,16 @@ const config: Config = {
         },
         urgency: 'hsl(var(--urgency))',
         success: 'hsl(var(--success))',
+        navy: {
+          DEFAULT: 'var(--navy)',
+          deep: 'var(--navy-deep)',
+          foreground: 'var(--navy-foreground)',
+        },
       },
       fontFamily: {
-        sans: ['var(--font-inter)', 'system-ui', '-apple-system', 'sans-serif'],
-        body: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+        /* Lovable: --font-sans = Manrope for body + UI */
+        sans: ['var(--font-manrope)', 'var(--font-inter)', 'system-ui', '-apple-system', 'sans-serif'],
+        body: ['var(--font-manrope)', 'var(--font-inter)', 'system-ui', 'sans-serif'],
         display: ['var(--font-manrope)', 'var(--font-inter)', 'system-ui', 'sans-serif'],
         serif: ['var(--font-source-serif)', 'Georgia', 'Times New Roman', 'serif'],
       },

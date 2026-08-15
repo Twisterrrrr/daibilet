@@ -69,12 +69,9 @@ function CityNightHeroSkeleton() {
   return (
     <>
       <section className={CITY_NIGHT_HERO.section}>
-        <div
-          className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
-          style={{ backgroundColor: CITY_NIGHT_HERO.navyDeep }}
-          aria-hidden
-        >
-          <div className={`${CITY_NIGHT_HERO.photoFrame} bg-white/[0.06]`} />
+        <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
+          <div className={`${CITY_NIGHT_HERO.photoFrame} bg-navy-foreground/[0.06]`} />
+          <div className={CITY_NIGHT_HERO.surfaceOverlay} />
           <div
             className={CITY_NIGHT_HERO.leftFillDesktop}
             style={
@@ -84,22 +81,22 @@ function CityNightHeroSkeleton() {
             }
           />
           <div
-            className="absolute inset-0 md:hidden"
+            className="absolute inset-0 z-[1] md:hidden"
             style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftMobile }}
           />
         </div>
         <div className={CITY_NIGHT_HERO.content}>
           <div className={CITY_NIGHT_HERO.contentInner}>
-            <div className="mb-4 h-4 w-48 animate-pulse rounded bg-white/20" />
-            <div className="h-10 max-w-md animate-pulse rounded bg-white/22 sm:h-12" />
-            <div className="mt-3 h-4 max-w-xl animate-pulse rounded bg-white/16" />
+            <div className="mb-4 h-4 w-48 animate-pulse rounded bg-navy-foreground/20" />
+            <div className="h-10 max-w-md animate-pulse rounded bg-navy-foreground/22 sm:h-12" />
+            <div className="mt-3 h-4 max-w-xl animate-pulse rounded bg-navy-foreground/16" />
             <div className="mt-5 flex gap-2">
-              <span className="h-8 w-24 animate-pulse rounded-full bg-white/18" />
-              <span className="h-8 w-28 animate-pulse rounded-full bg-white/14" />
+              <span className="h-8 w-24 animate-pulse rounded-full bg-navy-foreground/18" />
+              <span className="h-8 w-28 animate-pulse rounded-full bg-navy-foreground/14" />
             </div>
             <div className="mt-6 flex gap-3">
-              <span className="h-11 w-44 animate-pulse rounded-2xl bg-white/24" />
-              <span className="h-11 w-36 animate-pulse rounded-2xl bg-white/12" />
+              <span className="h-11 w-44 animate-pulse rounded-full bg-card/90" />
+              <span className="h-11 w-36 animate-pulse rounded-full bg-navy-foreground/12" />
             </div>
           </div>
         </div>
