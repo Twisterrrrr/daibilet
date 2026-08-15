@@ -354,14 +354,17 @@ export function AddManyToDayRouteButton({
           : 'В мой маршрут';
 
   function runBulkReplace(list: DayRouteVenueItem[]) {
+    const beforeCount = readDayRouteFresh().venues.length;
     const capped = list.slice(0, DAY_ROUTE_MAX);
     const cityId = capped[0]?.cityId || null;
     replaceDayRouteFromVenues(capped, cityId);
     const n = readDayRouteFresh().venues.length;
     flashDayRouteFeedback(
-      n > 0
-        ? `Маршрут заменён: ${n} ${n === 1 ? 'точка' : n < 5 ? 'точки' : 'точек'}`
-        : 'Маршрут очищен',
+      n <= 0
+        ? 'Маршрут очищен'
+        : beforeCount > 0
+          ? `Предыдущий маршрут сброшен · ${n} ${n === 1 ? 'точка' : n < 5 ? 'точки' : 'точек'}`
+          : `Маршрут собран: ${n} ${n === 1 ? 'точка' : n < 5 ? 'точки' : 'точек'}`,
     );
     if (navigateToMyDay) {
       router.push('/my-day');

@@ -2470,6 +2470,7 @@ function DayRoutePanelInner() {
   }
 
   function loadScenario(scenario: DayRouteSavedScenario) {
+    const beforeCount = readDayRouteFresh().venues.length;
     const n = applyDayRouteScenario(scenario);
     if (!n) return;
     setRoute(readDayRouteFresh());
@@ -2478,6 +2479,12 @@ function DayRoutePanelInner() {
     setHourEnd(scenario.hourEnd);
     setHourPlanOn(scenario.hourPlanOn);
     setPickerOpen(false);
+    const points = n === 1 ? '1 точка' : n < 5 ? `${n} точки` : `${n} точек`;
+    flashDayRouteFeedback(
+      beforeCount > 0
+        ? `Предыдущий маршрут сброшен · «${scenario.name}» (${points})`
+        : `Сценарий «${scenario.name}» загружен · ${points}`,
+    );
     setDndAnnounce(`Сценарий «${scenario.name}» загружен.`);
   }
 
@@ -4275,6 +4282,7 @@ function DayRoutePanelInner() {
               cityGenitive={cityToGenitive(catalogCityName || pageCityName || '')}
               compact
               hideHeader
+              replaceDayOnApply
               className="mt-0"
             />
           </div>
