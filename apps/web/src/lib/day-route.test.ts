@@ -8,6 +8,7 @@ import {
 import {
   DAY_ROUTE_MAX,
   DAY_ROUTE_SOFT,
+  DAY_ROUTE_DENSE,
   DAY_ROUTE_SOFT_WARN,
   DAY_ROUTE_STORAGE_KEY,
   addTextStopToDayRoute,
@@ -898,38 +899,42 @@ test('addTextStopToDayRoute rejects blank title and respects MAX', () => {
   assert.equal(addTextStopToDayRoute({ title: 'Overflow' }).venues.length, DAY_ROUTE_MAX);
 });
 
-test('soft guideline helpers: warn copy and count label without /MAX lock', () => {
+test('dense-day warn above 25 stops; soft guideline stays 10 for planning copy', () => {
   assert.equal(DAY_ROUTE_SOFT, 10);
+  assert.equal(DAY_ROUTE_DENSE, 25);
   assert.equal(DAY_ROUTE_MAX, 35);
-  assert.equal(isDayRouteAtSoft(9), false);
-  assert.equal(isDayRouteAtSoft(10), true);
-  assert.equal(isDayRouteAtHard(19), false);
-  assert.equal(isDayRouteAtHard(20), true);
+  assert.equal(isDayRouteAtSoft(25), false);
+  assert.equal(isDayRouteAtSoft(26), true);
+  assert.equal(isDayRouteAtHard(34), false);
+  assert.equal(isDayRouteAtHard(35), true);
   assert.equal(formatDayRouteCountLabel(3), 'Точки · 3');
-  assert.equal(formatDayRouteCountLabel(10), 'Точки · 10 · плотный день');
-  assert.equal(formatDayRouteCountLabel(11, 'Маршрут'), 'Маршрут · 11 · плотный день');
-  assert.equal(formatDayRouteCountLabel(20), 'Точки · 20/20');
+  assert.equal(formatDayRouteCountLabel(25), 'Точки · 25');
+  assert.equal(formatDayRouteCountLabel(26), 'Точки · 26 · плотный день');
+  assert.equal(formatDayRouteCountLabel(27, 'Маршрут'), 'Маршрут · 27 · плотный день');
+  assert.equal(formatDayRouteCountLabel(35), 'Точки · 35/35');
   assert.equal(formatDayRouteStopsHeading(1), 'Маршрут из 1 точки');
   assert.equal(formatDayRouteStopsHeading(3), 'Маршрут из 3 точек');
   assert.equal(formatDayRouteStopsHeading(5), 'Маршрут из 5 точек');
-  assert.equal(formatDayRouteStopsHeading(10), 'Маршрут из 10 точек · плотный день');
-  assert.equal(formatDayRouteStopsHeading(20), 'Маршрут из 20 точек · лимит');
+  assert.equal(formatDayRouteStopsHeading(25), 'Маршрут из 25 точек');
+  assert.equal(formatDayRouteStopsHeading(26), 'Маршрут из 26 точек · плотный день');
+  assert.equal(formatDayRouteStopsHeading(35), 'Маршрут из 35 точек · лимит');
   assert.equal(dayRoutePointsWordGenitive(21), 'точки');
   assert.equal(dayRoutePointsWordGenitive(22), 'точек');
   assert.match(DAY_ROUTE_SOFT_WARN, /плотный/);
   assert.doesNotMatch(DAY_ROUTE_SOFT_WARN, /[—–]/);
-  assert.match(dayRouteHardLimitMessage(), /20/);
+  assert.match(dayRouteHardLimitMessage(), /35/);
   assert.match(dayRouteAddSuccessMessage(3), /Добавлено · 3/);
-  assert.match(dayRouteAddSuccessMessage(10), /плотный/);
+  assert.match(dayRouteAddSuccessMessage(25), /^Добавлено · 25$/);
+  assert.match(dayRouteAddSuccessMessage(26), /плотный/);
 });
 
-test('add allows past soft until hard safety', () => {
+test('add allows past soft guideline until hard safety; dense warn past 25', () => {
   mockStorage();
   clearDayRoute();
-  for (let i = 0; i < DAY_ROUTE_SOFT + 2; i += 1) {
+  for (let i = 0; i < DAY_ROUTE_DENSE + 2; i += 1) {
     addTextStopToDayRoute({ title: `Soft ${i}` });
   }
-  assert.equal(readDayRoute().venues.length, DAY_ROUTE_SOFT + 2);
+  assert.equal(readDayRoute().venues.length, DAY_ROUTE_DENSE + 2);
   assert.equal(isDayRouteAtSoft(readDayRoute().venues.length), true);
   assert.equal(isDayRouteAtHard(readDayRoute().venues.length), false);
 });

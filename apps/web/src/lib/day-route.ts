@@ -30,15 +30,21 @@ export const DAY_ROUTE_STORAGE_KEY = 'daibilet:dayRoute';
 export const DAY_ROUTE_CHANGED_EVENT = 'daibilet:day-route-changed';
 
 export const DAY_ROUTE_MIN = 2;
-/** Soft density guideline: warn in UI, still allow adding until hard cap. */
+/**
+ * Soft planning guideline (step-2 copy, commercial score, default preset size).
+ * Not the dense-day banner threshold.
+ */
 export const DAY_ROUTE_SOFT = 10;
+/** Show map/time caution when the route has more than this many stops. */
+export const DAY_ROUTE_DENSE = 25;
 export const DAY_ROUTE_SOFT_WARN =
   'День уже плотный - карта и время могут разъехаться';
 /** Hard safety cap for localStorage / share URL (not a planning ideal). */
 export const DAY_ROUTE_MAX = 35;
 
+/** Dense-day caution (painted lines / long hubs) - not the soft guideline of 10. */
 export function isDayRouteAtSoft(count: number): boolean {
-  return count >= DAY_ROUTE_SOFT;
+  return count > DAY_ROUTE_DENSE;
 }
 
 export function isDayRouteAtHard(count: number): boolean {

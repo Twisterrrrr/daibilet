@@ -19,7 +19,9 @@ import {
 import { mustSeePlacesForDefaultPreset } from '@/lib/must-see-filters';
 import {
   DAY_ROUTE_MAX,
+  DAY_ROUTE_SOFT_WARN,
   formatDayRouteTransitTipLine,
+  isDayRouteAtSoft,
   readDayRouteFresh,
   replaceDayRouteFromVenues,
 } from '@/lib/day-route';
@@ -163,6 +165,10 @@ export function CityDayPresetBlock({
     const points =
       n === 1 ? '1 точка' : n > 0 && n < 5 ? `${n} точки` : `${n} точек`;
     // Keep toast compact - no scenario title (long names bloated the floating badge).
+    if (isDayRouteAtSoft(n)) {
+      flashDayRouteFeedback(DAY_ROUTE_SOFT_WARN, { showClear: true });
+      return;
+    }
     flashDayRouteFeedback(
       beforeCount > 0 ? `Маршрут обновлён · ${points}` : `Маршрут собран · ${points}`,
       { showClear: true },
@@ -328,6 +334,14 @@ export function CityDayPresetBlock({
             {preset.timingNote?.trim() ? (
               <p className={`mt-1.5 text-[12px] leading-4 ${mutedClass}`} data-day-preset-timing>
                 {preset.timingNote.trim()}
+              </p>
+            ) : null}
+            {isDayRouteAtSoft(items.length) ? (
+              <p
+                className="mt-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-[12px] leading-snug text-amber-900"
+                data-day-preset-dense-warn
+              >
+                {DAY_ROUTE_SOFT_WARN}
               </p>
             ) : null}
           </div>
