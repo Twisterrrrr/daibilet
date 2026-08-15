@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  lookupEditorialPlaceCoords,
   PERM_NABEREZHNAYA_KAMY_COORDS,
   PERM_SCHASTE_COORDS,
 } from './city-place-coords.ts';
@@ -517,11 +518,35 @@ test('buildDayRouteCoordsMap merges route + payload by id and slug', () => {
     [{ id: 'slug-only', slug: 'park', title: 'Park', latitude: 55.1, longitude: 37.1 }],
     [{ id: 'venue_1', slug: 'park', latitude: 59.9, longitude: 30.3 }],
   );
-  assert.deepEqual(map.get('park'), { latitude: 59.9, longitude: 30.3 });
+  // Route wins over matches payload (payload used to overwrite and put Perm pins in Kama).
+  assert.deepEqual(map.get('park'), { latitude: 55.1, longitude: 37.1 });
   assert.deepEqual(map.get('venue_1'), { latitude: 59.9, longitude: 30.3 });
   assert.deepEqual(lookupDayRouteCoords({ id: 'slug-only', slug: 'park' }, map), {
-    latitude: 59.9,
-    longitude: 30.3,
+    latitude: 55.1,
+    longitude: 37.1,
+  });
+});
+
+test('buildDayRouteCoordsMap snaps Perm waterfront payload pins to south bank', () => {
+  mockStorage();
+  const map = buildDayRouteCoordsMap(
+    [{ id: 'naberezhnaya-kamy', slug: 'naberezhnaya-kamy', title: 'Набережная Камы' }],
+    [
+      {
+        id: 'ven_perm_naberezhnaya',
+        slug: 'naberezhnaya-kamy',
+        latitude: 58.021111,
+        longitude: 56.243889,
+      },
+    ],
+  );
+  assert.deepEqual(map.get('naberezhnaya-kamy'), {
+    latitude: PERM_NABEREZHNAYA_KAMY_COORDS.latitude,
+    longitude: PERM_NABEREZHNAYA_KAMY_COORDS.longitude,
+  });
+  assert.deepEqual(map.get('ven_perm_naberezhnaya'), {
+    latitude: PERM_NABEREZHNAYA_KAMY_COORDS.latitude,
+    longitude: PERM_NABEREZHNAYA_KAMY_COORDS.longitude,
   });
 });
 
@@ -685,7 +710,8 @@ test('enrichDayRouteFromMatchVenues does not attach a show onto a place stop', (
   assert.equal(stop?.title, 'Эрмитаж');
   assert.equal(stop?.eventId, undefined);
   assert.equal(stop?.eventSlug, undefined);
-  assert.equal(stop?.latitude, 59.9398);
+  // Place stops keep curated editorial coords when the slug is in the map.
+  assert.equal(stop?.latitude, lookupEditorialPlaceCoords('ermitazh')?.latitude);
 });
 
 test('enrichDayRouteFromMatchVenues replaces event stub title + coords + image', () => {

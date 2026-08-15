@@ -819,6 +819,9 @@ function editorialSlugKey(slug: string | null | undefined): string {
 /**
  * When curated coords exist and the live/LS/hub pin is missing, mid-river, or far
  * from editorial, return the curated pair so My Day can rebase without a LS wipe.
+ *
+ * Perm Kama waterfront: always snap to south-bank pins - catalog/OSM centroids
+ * sit in the channel and used to overwrite the map via matches payload.
  */
 export function pickEditorialPlaceCoordsIfStale(
   slug: string | null | undefined,
@@ -827,13 +830,20 @@ export function pickEditorialPlaceCoordsIfStale(
 ): EditorialPlaceCoords | null {
   const editorial = lookupEditorialPlaceCoords(slug);
   if (!editorial) return null;
+  const key = editorialSlugKey(slug);
   const lat = Number(latitude);
   const lng = Number(longitude);
-  if (!isValidCoordinatePair(lat, lng)) return editorial;
-  const key = editorialSlugKey(slug);
-  if (PERM_KAMA_WATERFRONT_SLUGS.has(key) && lat > PERM_KAMA_WATERFRONT_MAX_LAT) {
-    return editorial;
+  const same =
+    isValidCoordinatePair(lat, lng) &&
+    lat === editorial.latitude &&
+    lng === editorial.longitude;
+
+  // Hard lock: never trust hub/DB/LS for these two promenade pins.
+  if (PERM_KAMA_WATERFRONT_SLUGS.has(key)) {
+    return same ? null : editorial;
   }
+
+  if (!isValidCoordinatePair(lat, lng)) return editorial;
   if (PERM_CATHEDRAL_SQUARE_SLUGS.has(key) && lng > 56.2365) {
     return editorial;
   }

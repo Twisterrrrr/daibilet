@@ -89,6 +89,8 @@
 | UX.MSK-WEATHER | Погода+сезоны Москва (Open-Meteo / day-route) | Высокий | ✅ commit+push, без live |
 | UX.MSK-KGD-PRESET-COVERS | coverImageUrl на 10 MSK presets + KGD classic | Высокий | ✅ commit+push |
 | UX.VISITMINUTES-4 | visitMinutes mustSee: owner table (15/20/30/60/1-2ч/2ч) via `must-see-visit-minutes` | Высокий | ✅ rules + chip/dwell wire |
+| UX.HUB-SEO-P2D | Meta city hubs → единый P.2d как СПб (снять year-шаблон Казань/Екб) | Высокий | ✅ code |
+| UX.PERM-KAMA-PINS | My Day: набережная/Счастье не в Каме (coords map + hard lock) | Критический | ✅ code; DB apply отдельно |
 | UX.IDENTITY-4 | Identity slides MSK/SPB/KGD/NN (+ tourist hubs): owner texts + GenerateImage covers in `city-hub-local-flavor` | Средний | ✅ code live; pack закрыт |
 
 ## 2026-08-15 - Hub must-see route chip toggle

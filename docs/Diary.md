@@ -1,3 +1,34 @@
+## 2026-08-15 - Perm My Day: точки в Каме
+
+### Наблюдения
+- Live Venue: `naberezhnaya-kamy` `58.021111`, `perm-schaste` `58.023247` - середина русла.
+- Editorial south-bank уже был (`58.01825` / `58.01835`), enrich в LS работал, но `buildDayRouteCoordsMap` клал matches payload **поверх** route - карта снова брала речные coords.
+
+### Решения
+- `buildDayRouteCoordsMap`: rebase через `pickEditorialPlaceCoordsIfStale`; payload first, route last.
+- Perm waterfront slugs: всегда snap к editorial (не только lat > 58.0195).
+- Скрипт `fix-perm-kama-waterfront-coords.js` для правки prod Venue.
+
+### Проблемы
+- Без `--apply` в prod DB API всё ещё отдаёт речные пины; клиент после деплоя уже не должен рисовать их в воде.
+
+---
+
+## 2026-08-15 - City hub SEO: единый канон P.2d
+
+### Наблюдения
+- Казань/Екб сидели на отдельном title/description (`Афиша {Род} {Год}…` / Daibilet.ru); МСК/СПб и остальные - на P.2d с «на сегодня, {date}».
+- Owner: канон как у Питера.
+
+### Решения
+- `city-hub-seo.ts`: убран fork `isSeoExpansionCity` для hub title/description; один шаблон P.2d.
+- Listing/event SEO expansion для Казани/Екб не трогали (другая поверхность).
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-15 - visitMinutes: упрощённая таблица owner
 
 ### Наблюдения

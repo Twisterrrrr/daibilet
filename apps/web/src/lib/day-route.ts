@@ -1975,8 +1975,19 @@ export function buildDayRouteCoordsMap(
 ): Map<string, DayRouteCoords> {
   const map = new Map<string, DayRouteCoords>();
   const put = (source: DayRouteCoordSource) => {
-    const lat = Number(source.latitude);
-    const lng = Number(source.longitude);
+    let lat = Number(source.latitude);
+    let lng = Number(source.longitude);
+    const slugOrId = String(source.slug || source.id || '').trim();
+    const rebase = pickEditorialPlaceCoordsIfStale(slugOrId, lat, lng);
+    if (rebase) {
+      lat = rebase.latitude;
+      lng = rebase.longitude;
+    } else if (!isValidCoordinatePair(lat, lng)) {
+      const editorial = lookupEditorialPlaceCoords(slugOrId);
+      if (!editorial) return;
+      lat = editorial.latitude;
+      lng = editorial.longitude;
+    }
     if (!isValidCoordinatePair(lat, lng)) return;
     const coords = { latitude: lat, longitude: lng };
     const id = String(source.id || '').trim();
@@ -1988,8 +1999,9 @@ export function buildDayRouteCoordsMap(
     if (eventId) map.set(eventId, coords);
     if (eventSlug) map.set(eventSlug, coords);
   };
-  for (const venue of routeVenues) put(venue);
+  // Payload first, route last: repaired localStorage / editorial wins over hub DB.
   for (const venue of payloadVenues) put(venue);
+  for (const venue of routeVenues) put(venue);
   return map;
 }
 
