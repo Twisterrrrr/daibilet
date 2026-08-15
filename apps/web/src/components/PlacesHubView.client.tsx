@@ -59,7 +59,7 @@ type PlacesScope = 'all' | 'events';
 
 const FILTER_SCOPE_OPTIONS: Array<[PlacesScope, string]> = [
   ['all', 'Показывать все'],
-  ['events', 'Только с событиями'],
+  ['events', 'Площадки с событиями'],
 ];
 
 function cityOptionsFromStats(cities: Record<string, number>): Array<[string, number]> {
@@ -692,7 +692,7 @@ export function PlacesHubView({
             className="w-full rounded-xl bg-[#F5F5F7] px-3 py-2.5 text-sm outline-none"
           >
             <option value="all">Все места</option>
-            <option value="events">С событиями</option>
+            <option value="events">Площадки с событиями</option>
             {categoryChips.map((chip) => (
               <option key={chip.id} value={chip.id}>
                 {chip.label}

@@ -2247,9 +2247,11 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
     if (familyFilter) {
       working = working.filter((venue) => venue.template === familyFilter);
     }
+    // Places «С событиями»: только площадки (institution) с афишей/билетами.
+    // Локации (гастро, парки, STOP-туры) в этот фильтр не входят.
     if (hasEventsFilter) {
       working = working.filter(
-        (venue) => Number(venue.events) > 0 || Number(venue.stopEventCount) > 0,
+        (venue) => venue.template === 'institution' && Number(venue.events) > 0,
       );
     }
     const cityUniverse = working;

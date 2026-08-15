@@ -18,7 +18,7 @@ export type VenueCatalogFeedQuery = {
   logistics?: string;
   sort?: VenueCatalogSort;
   q?: string;
-  /** Places hub: only venues/locations with own events or STOP tours. */
+  /** Places hub: only institutions (площадки) with afisha/ticket events. */
   hasEvents?: boolean;
   /** 1-based page (preferred). */
   page?: number;
