@@ -17,10 +17,14 @@ import {
 } from './city-hub-local-flavor.ts';
 
 const CITY_INFO_SRC = readFileSync(fileURLToPath(new URL('./cityInfo.ts', import.meta.url)), 'utf8');
+const MONUMENTS_SRC = readFileSync(
+  fileURLToPath(new URL('./city-monuments-must-see.ts', import.meta.url)),
+  'utf8',
+);
 
 function cityInfoHasSlug(slug: string): boolean {
   const quoted = new RegExp(`['"]${slug.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}['"]`);
-  return quoted.test(CITY_INFO_SRC);
+  return quoted.test(CITY_INFO_SRC) || quoted.test(MONUMENTS_SRC);
 }
 
 test('weather widget covers Perm, Moscow, SPB, Kaliningrad and NN', () => {
@@ -71,11 +75,66 @@ test('Perm identity slides map only to cityInfo slugs', () => {
   assert.equal(tags.length, 4);
 });
 
-test('Moscow and SPB identity tags stay empty/hidden', () => {
-  assert.deepEqual(cityIdentityTags('moscow'), []);
-  assert.deepEqual(cityIdentityTags('saint-petersburg'), []);
-  assert.deepEqual(cityIdentityTags('kaliningrad'), []);
-  assert.deepEqual(cityIdentityTags('nizhny-novgorod'), []);
+test('Moscow SPB NN Kaliningrad identity packs have 4 slides', () => {
+  const packs: Array<{
+    slug: string;
+    heading: string;
+    ids: string[];
+    badges: string[];
+  }> = [
+    {
+      slug: 'moscow',
+      heading: 'Чем уникальна Москва',
+      ids: ['moskva-siti', 'usadby', 'foodmalls', 'vysotki'],
+      badges: ['Символ', 'Искусство', 'Гастро', 'Архитектура'],
+    },
+    {
+      slug: 'saint-petersburg',
+      heading: 'Чем уникален Санкт-Петербург',
+      ids: ['razvod-mostov', 'dvory', 'pyshki', 'sevkabel'],
+      badges: ['Символ', 'Искусство', 'Гастро', 'Арт-объект'],
+    },
+    {
+      slug: 'nizhny-novgorod',
+      heading: 'Чем уникален Нижний Новгород',
+      ids: ['zakaty', 'street-art', 'shaverma', 'pakgauzy'],
+      badges: ['Символ', 'Искусство', 'Гастро', 'Архитектура'],
+    },
+    {
+      slug: 'kaliningrad',
+      heading: 'Чем уникален Калининград',
+      ids: ['homliny', 'gotika', 'klopsy', 'kosa'],
+      badges: ['Символ', 'Искусство', 'Гастро', 'Арт-объект'],
+    },
+  ];
+
+  for (const pack of packs) {
+    const slides = cityIdentitySlides(pack.slug);
+    assert.equal(slides.length, 4, pack.slug);
+    assert.equal(resolveCityLocalFlavor(pack.slug)?.identityHeading, pack.heading);
+    assert.deepEqual(
+      slides.map((slide) => slide.id),
+      pack.ids,
+    );
+    assert.deepEqual(
+      slides.map((slide) => slide.badge),
+      pack.badges,
+    );
+    for (const slide of slides) {
+      assert.equal(slide.text.includes('\u2014'), false, `${pack.slug}:${slide.id}`);
+      assert.equal(slide.text.includes('\u2013'), false, `${pack.slug}:${slide.id}`);
+      assert.equal(slide.title.includes('\u2014'), false, `${pack.slug}:${slide.id}`);
+      for (const slug of slide.slugs) {
+        assert.equal(
+          cityInfoHasSlug(slug),
+          true,
+          `missing cityInfo slug ${slug} for ${pack.slug}:${slide.id}`,
+        );
+      }
+    }
+    assert.equal(cityIdentityTags(pack.slug).length, 4, pack.slug);
+  }
+
   assert.deepEqual(cityIdentityTags('kazan'), []);
 });
 

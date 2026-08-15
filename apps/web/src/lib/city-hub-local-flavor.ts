@@ -3,8 +3,7 @@
  * seasonal «когда ехать» copy. Keep out of cityInfo (coords/mustSee) so other
  * agents can edit geo without merge fights.
  *
- * Tourist hubs with weather+seasons: Perm, Moscow, SPB, Kaliningrad, NN.
- * Identity slides remain Perm-only until those packs are filled.
+ * Tourist hubs with weather+seasons+identity: Perm, Moscow, SPB, Kaliningrad, NN.
  */
 
 import { normalizeCityHubSlug } from './city-hub-config.ts';
@@ -536,27 +535,245 @@ const PERM_SLIDES: CityIdentitySlide[] = [
   },
 ];
 
-const PERM_TAGS: CityIdentityTag[] = PERM_SLIDES.map((slide) => ({
-  id: slide.id,
-  hashtag: slide.title,
-  hint: slide.title,
-  slugs: slide.slugs,
-  target: slide.target,
-}));
+function tagsFromSlides(slides: CityIdentitySlide[]): CityIdentityTag[] {
+  return slides.map((slide) => ({
+    id: slide.id,
+    hashtag: slide.title,
+    hint: slide.title,
+    slugs: slide.slugs,
+    target: slide.target,
+  }));
+}
+
+const IDENTITY_LEAD = 'Четыре вещи, за которыми сюда едут в первую очередь';
+
+const MSK_SLIDES: CityIdentitySlide[] = [
+  {
+    id: 'moskva-siti',
+    title: 'Скорость и масштаб',
+    text: 'Культ «Москва-Сити». Бешеный темп, дух больших денег и вечного движения. Стеклянные башни-небоскребы стали новым визуальным кодом города, определяющим его амбициозный характер.',
+    imageSrc: '/images/venues/moscow/moskva-siti.jpg',
+    imageAlt: 'Москва-Сити',
+    slugs: ['moscow-moskva-siti', 'moscow-smotrovaya-moskva-siti'],
+    target: 'places',
+    badge: 'Символ',
+  },
+  {
+    id: 'usadby',
+    title: 'Усадебный побег',
+    text: 'Парковые резиденции. Уникальный московский контраст: огромные царские усадьбы (Царицыно, Коломенское), интегрированные в мегаполис. Главное место силы, где москвичи замедляют время.',
+    imageSrc: '/images/venues/moscow/tsaritsyno.jpg',
+    imageAlt: 'Музей-заповедник Царицыно',
+    slugs: ['moscow-tsaritsyno', 'moscow-kolomenskoe'],
+    target: 'places',
+    badge: 'Искусство',
+  },
+  {
+    id: 'foodmalls',
+    title: 'Культ фуд-моллов',
+    text: 'Рынки-гиганты. В Москве не просто едят, здесь празднуют гастрономию. Пространства вроде «Депо» и «Даниловского» превратили покупку еды в главный социальный ритуал и стиль жизни.',
+    imageSrc: '/images/venues/moscow/depo-lesnaya.jpg',
+    imageAlt: 'Депо.Москва на Лесной',
+    slugs: ['moscow-depo-lesnaya', 'moscow-danilovskiy-rynok'],
+    target: 'places',
+    badge: 'Гастро',
+  },
+  {
+    id: 'vysotki',
+    title: 'Монументальный ампир',
+    text: 'Сталинские высотки. «Семь сестер» - величественные каменные шпили, которые царят над городом. Они задают Москве ее имперский, слегка суровый и торжественный силуэт.',
+    imageSrc: '/images/venues/moscow/kotelnicheskaya-naberezhnaya.jpg',
+    imageAlt: 'Жилой дом на Котельнической набережной',
+    slugs: ['moscow-kotelnicheskaya-naberezhnaya'],
+    target: 'places',
+    badge: 'Архитектура',
+  },
+];
+
+const SPB_SLIDES: CityIdentitySlide[] = [
+  {
+    id: 'razvod-mostov',
+    title: 'Поэзия большой воды',
+    text: 'Развод мостов. Дух города-порта и Северной Венеции. Ночной подъем многотонных крыльев мостов под музыку над Невой - главный объединяющий ритуал питерских белых ночей.',
+    imageSrc: '/images/venues/saint-petersburg/dvortsovyy-most.jpg',
+    imageAlt: 'Дворцовый мост в Санкт-Петербурге',
+    slugs: ['saint-petersburg-dvortsovyy-most', 'saint-petersburg-dvortsovaya-naberezhnaya'],
+    target: 'places',
+    badge: 'Символ',
+  },
+  {
+    id: 'dvory',
+    title: 'Изнанка Петербурга',
+    text: 'Парадные и дворы. Романтика распада, мистические дворы-колодцы и доходные дома со световыми фонарями и лепниной. Тайный мир, формирующий меланхоличный и глубокий дух города.',
+    imageSrc: '/images/venues/saint-petersburg/otkrytye-dvory-kolodtsy-ekskursii-po-dvoram.jpg',
+    imageAlt: 'Дворы-колодцы Петербурга',
+    slugs: [
+      'saint-petersburg-otkrytye-dvory-kolodtsy-ekskursii-po-dvoram',
+      'saint-petersburg-paradnaya-romashka-dom-eliseeva',
+    ],
+    target: 'places',
+    badge: 'Искусство',
+  },
+  {
+    id: 'pyshki',
+    title: 'Вкус ностальгии',
+    text: 'Легендарные пышки. Горячая выпечка в сахарной пудре из культовой пышечной на Большой Конюшенной. Главный гастро-код, где советские традиции и рецепт неизменны с 1958 года.',
+    imageSrc: '/images/venues/saint-petersburg/pyshechnaya-na-bolshoy-konyushennoy.jpg',
+    imageAlt: 'Пышечная на Большой Конюшенной',
+    slugs: ['saint-petersburg-pyshechnaya-na-bolshoy-konyushennoy'],
+    target: 'places',
+    badge: 'Гастро',
+  },
+  {
+    id: 'sevkabel',
+    title: 'Заводской ренессанс',
+    text: 'Севкабель Порт. Превращение серых кирпичных заводов у залива в центры моды, инди-музыки и современного арта. Символ нового, живого и свободного Петербурга.',
+    imageSrc: '/images/venues/saint-petersburg/sevkabel-port.jpg',
+    imageAlt: 'Севкабель Порт',
+    slugs: ['saint-petersburg-sevkabel-port'],
+    target: 'places',
+    badge: 'Арт-объект',
+  },
+];
+
+const NN_SLIDES: CityIdentitySlide[] = [
+  {
+    id: 'zakaty',
+    title: 'Столица закатов',
+    text: 'Слияние двух рек. Географический феномен: из-за расположения на высоких холмах над Стрелкой Волги и Оки солнце здесь уходит за горизонт невероятно долго, окрашивая весь город в золото.',
+    imageSrc: '/images/venues/nizhny-novgorod/strelka-rek-volgi-i-oki.jpg',
+    imageAlt: 'Стрелка рек Волги и Оки',
+    slugs: ['nizhny-novgorod-strelka-rek-volgi-i-oki', 'nizhny-novgorod-naberezhnaya-fedorovskogo'],
+    target: 'places',
+    badge: 'Символ',
+  },
+  {
+    id: 'street-art',
+    title: 'Город-галерея',
+    text: 'Нижегородский стрит-арт. Мекка уличного искусства России. Локальные художники не портят стены, а тонко вписывают свои глубокие философские полотна в фактуру старых деревянных домов.',
+    imageSrc: '/images/venues/nizhny-novgorod/arsenal-museum.jpg',
+    imageAlt: 'Арсенал ГЦСИ в Нижнем Новгороде',
+    slugs: ['nizhny-novgorod-arsenal-gtsisi', 'nizhny-novgorod-pochainskiy-bulvar'],
+    target: 'places',
+    badge: 'Искусство',
+  },
+  {
+    id: 'shaverma',
+    title: 'Культ на Средном',
+    text: 'Нижегородская шаверма. Главный стритфуд-феномен Поволжья. Огромное, легендарное локальное блюдо, ради которого топ-менеджеры и студенты стоят в одной круглосуточной очереди.',
+    imageSrc: '',
+    imageAlt: '',
+    slugs: ['nizhny-novgorod-rozhdestvenskaya-ulitsa', 'nizhny-novgorod-seledka-i-kofe'],
+    target: 'places',
+    badge: 'Гастро',
+  },
+  {
+    id: 'pakgauzy',
+    title: 'Ажурное кружево',
+    text: 'Пакгаузы на Стрелке. Металлические каркасы XIX века, сохраненные и превращенные на стрелке рек в хайтек-концертный зал. Символ бережного отношения к промышленному наследию.',
+    imageSrc: '/images/venues/nizhny-novgorod/pakgauzy-strelka.jpg',
+    imageAlt: 'Пакгаузы на Стрелке',
+    slugs: ['nizhny-novgorod-pakgauzy-na-strelke', 'nizhny-novgorod-strelka-rek-volgi-i-oki'],
+    target: 'places',
+    badge: 'Архитектура',
+  },
+];
+
+const KGD_SLIDES: CityIdentitySlide[] = [
+  {
+    id: 'homliny',
+    title: 'Локальный квест',
+    text: 'Семья Хомлинов. Семь крошечных бронзовых фигурок мифических существ-домовых, спрятанных по городу. Интерактивная сказка, которая знакомит туристов с духом места через игру.',
+    imageSrc: '/images/venues/kaliningrad/homlin-mama-varya.jpg',
+    imageAlt: 'Хомлин-мама Варя у Бранденбургских ворот',
+    slugs: [
+      'kaliningrad-skulptura-dedushka-homlin-karl',
+      'kaliningrad-skulptura-babushka-homlin-marta',
+      'kaliningrad-malysh-homlin-unya',
+      'kaliningrad-malyshka-homlin-ulya',
+      'kaliningrad-homlin-mama-varya',
+    ],
+    target: 'places',
+    badge: 'Символ',
+  },
+  {
+    id: 'gotika',
+    title: 'Немецкий след',
+    text: 'Кёнигсбергская готика. Оборонительные форты, городские ворота и величественный Кафедральный собор XIV века на острове Канта. Суровое балтийское средневековье посреди России.',
+    imageSrc: '/images/venues/kaliningrad/kafedral-nyy-sobor.jpg',
+    imageAlt: 'Кафедральный собор на острове Канта',
+    slugs: [
+      'kaliningrad-kafedral-nyy-sobor',
+      'kaliningrad-ostrov-kanta',
+      'kaliningrad-fort-5',
+      'kaliningrad-korolevskie-vorota',
+    ],
+    target: 'places',
+    badge: 'Искусство',
+  },
+  {
+    id: 'klopsy',
+    title: 'Прусский ужин',
+    text: 'Кёнигсбергские клопсы. Нежные мясные биточки под каперсовым соусом, сваренные в наваристом бульоне. Исторический вкус старого Кёнигсберга, возрожденный современными шефами.',
+    imageSrc: '/images/venues/kaliningrad/shtayndamm-99.jpg',
+    imageAlt: 'Ресторан Штайндамм 99',
+    slugs: ['kaliningrad-shtayndamm-99', 'kaliningrad-gastrobar-sol'],
+    target: 'places',
+    badge: 'Гастро',
+  },
+  {
+    id: 'kosa',
+    title: 'Песчаная утопия',
+    text: 'Куршская коса. Хрупкий мир гигантских дюн, Танцующего леса и суровой Балтики. Уникальный природный заповедник, определяющий уединенный и созерцательный характер региона.',
+    imageSrc: '/images/venues/kaliningrad/kurshskaya-kosa.jpg',
+    imageAlt: 'Куршская коса',
+    slugs: ['kaliningrad-kurshskaya-kosa', 'kaliningrad-tantsuyuschiy-les', 'kaliningrad-dyuna-efa'],
+    target: 'suburbs',
+    badge: 'Арт-объект',
+  },
+];
 
 export const CITY_HUB_LOCAL_FLAVOR: Record<string, CityHubLocalFlavor> = {
   perm: {
     identityHeading: 'Чем уникальна Пермь',
-    identityLead: 'Четыре вещи, за которыми сюда едут в первую очередь',
-    tags: PERM_TAGS,
+    identityLead: IDENTITY_LEAD,
+    tags: tagsFromSlides(PERM_SLIDES),
     slides: PERM_SLIDES,
     weather: PERM_WEATHER,
     whenToGo: PERM_WHEN_TO_GO,
   },
-  moscow: { tags: [], weather: MSK_WEATHER, whenToGo: MSK_WHEN_TO_GO },
-  'saint-petersburg': { tags: [], weather: SPB_WEATHER, whenToGo: SPB_WHEN_TO_GO },
-  kaliningrad: { tags: [], weather: KGD_WEATHER, whenToGo: KGD_WHEN_TO_GO },
-  'nizhny-novgorod': { tags: [], weather: NN_WEATHER, whenToGo: NN_WHEN_TO_GO },
+  moscow: {
+    identityHeading: 'Чем уникальна Москва',
+    identityLead: IDENTITY_LEAD,
+    tags: tagsFromSlides(MSK_SLIDES),
+    slides: MSK_SLIDES,
+    weather: MSK_WEATHER,
+    whenToGo: MSK_WHEN_TO_GO,
+  },
+  'saint-petersburg': {
+    identityHeading: 'Чем уникален Санкт-Петербург',
+    identityLead: IDENTITY_LEAD,
+    tags: tagsFromSlides(SPB_SLIDES),
+    slides: SPB_SLIDES,
+    weather: SPB_WEATHER,
+    whenToGo: SPB_WHEN_TO_GO,
+  },
+  kaliningrad: {
+    identityHeading: 'Чем уникален Калининград',
+    identityLead: IDENTITY_LEAD,
+    tags: tagsFromSlides(KGD_SLIDES),
+    slides: KGD_SLIDES,
+    weather: KGD_WEATHER,
+    whenToGo: KGD_WHEN_TO_GO,
+  },
+  'nizhny-novgorod': {
+    identityHeading: 'Чем уникален Нижний Новгород',
+    identityLead: IDENTITY_LEAD,
+    tags: tagsFromSlides(NN_SLIDES),
+    slides: NN_SLIDES,
+    weather: NN_WEATHER,
+    whenToGo: NN_WHEN_TO_GO,
+  },
 };
 
 export function resolveCityLocalFlavor(slug: string | null | undefined): CityHubLocalFlavor | null {
