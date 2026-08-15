@@ -1,3 +1,10 @@
+## 2026-08-15 - Painted lines logistics rebuild (MSK/NN/Samara/SPB/KGD)
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| CONT.LINES-WALKABLE-5CITIES | Пересборка Зелёной/Красной: компактные пешеходные треки без прыжков по районам | Критический | ✅ code; commit+push; Deploy MSK web |
+| CONT.LINES-PREVIEWS | Превью ГЭС-2 / Дом-корабль / Никольские ряды | Высокий | ✅ |
+
 ## 2026-08-15 - Красноярск tourist hub
 
 | ID | Задача | Приоритет | Статус |

@@ -1,3 +1,5 @@
+import { SAMARA_LINE_DAY_ROUTE_PRESETS } from './samara-line-presets.ts';
+
 /** Samara tourist hub pack (owner 2026-08-15). Hyphen-only copy. */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -707,6 +709,7 @@ export const SAMARA_DAY_ROUTE_PRESETS: any[] = [
       },
     ],
   },
+  ...SAMARA_LINE_DAY_ROUTE_PRESETS,
 ];
 
 export const SAMARA_FAQ: Array<{ q: string; a: string }> = [

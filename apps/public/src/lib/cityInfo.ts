@@ -34,6 +34,10 @@ import {
   KRASNOYARSK_SUBURBS,
   KRASNOYARSK_TRAVEL,
 } from './krasnoyarsk-hub';
+import { MOSCOW_LINE_DAY_ROUTE_PRESETS } from './moscow-line-presets';
+import { NIZHNY_NOVGOROD_LINE_DAY_ROUTE_PRESETS } from './nizhny-novgorod-line-presets';
+import { SAINT_PETERSBURG_LINE_DAY_ROUTE_PRESETS } from './saint-petersburg-line-presets';
+import { KALININGRAD_LINE_DAY_ROUTE_PRESETS } from './kaliningrad-line-presets';
 
 /** Ссылка на venue/location для пункта «Главные места». Без slug - заголовок не линкуем. */
 export type CityPlaceLinkFields = {
@@ -823,6 +827,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       },
     ],
     dayRoutePresets: [
+      ...SAINT_PETERSBURG_LINE_DAY_ROUTE_PRESETS,
       {
         id: 'spb-1',
         title: 'Золотой треугольник / парадный центр',
@@ -3028,6 +3033,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       }
     ],
     dayRoutePresets: [
+      ...MOSCOW_LINE_DAY_ROUTE_PRESETS,
       {
         id: "msk-1",
         title: "Классический парадный центр",
@@ -3837,6 +3843,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       },
     ],
     dayRoutePresets: [
+      ...KALININGRAD_LINE_DAY_ROUTE_PRESETS,
       {
         id: 'kaliningrad-classic-one-day',
         title: 'Классический Калининград за 1 день',
@@ -4251,6 +4258,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       },
     ],
     dayRoutePresets: [
+      ...NIZHNY_NOVGOROD_LINE_DAY_ROUTE_PRESETS,
       {
         id: 'nn-one-day',
         title: 'Нижний за 1 день',

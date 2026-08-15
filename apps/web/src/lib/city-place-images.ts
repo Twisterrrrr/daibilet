@@ -1429,6 +1429,37 @@ const KRASNOYARSK_IMAGES: Record<string, string> = {
   'krasnoyarsk-pamyatnik-voinam-sportsmenam': '/images/venues/krasnoyarsk/identity-architecture.jpg',
 };
 
+const PAINTED_LINE_IMAGES_20260815: Record<string, string> = {
+  'moscow-green-nulevoy-km': '/images/venues/moscow/krasnaya-ploschad.jpg',
+  'moscow-green-moskvoretskaya-nab': '/images/venues/moscow/park-zaryad-e.jpg',
+  'moscow-green-bolshoy-kamennyy-most': '/images/venues/moscow/hram-hrista-spasitelya.jpg',
+  'moscow-green-krymskiy-most': '/images/venues/moscow/park-gorkogo.jpg',
+  'moscow-red-yakimanskaya-nab': '/images/venues/moscow/krymskaya-naberezhnaya.jpg',
+  'moscow-red-ges-2': '/images/venues/moscow/ges-2.jpg',
+  'moscow-red-luzhkov-most': '/images/venues/moscow/tret-yakovskaya-galereya.jpg',
+  'nn-green-dmitrievskaya-bashnya': '/images/venues/nizhny-novgorod/nizhegorodskiy-kreml.jpg',
+  'nn-red-filtrovalnaya': '/images/venues/nizhny-novgorod/nizhegorodskaya-yarmarka.jpg',
+  'nn-red-ploschad-lenina': '/images/venues/nizhny-novgorod/nizhegorodskaya-yarmarka.jpg',
+  'nn-red-ulitsa-sovetskaya': '/images/venues/nizhny-novgorod/nizhegorodskaya-yarmarka.jpg',
+  'nn-red-art-strelka': '/images/venues/nizhny-novgorod/strelka-rek-volgi-i-oki.jpg',
+  'samara-red-kozlovskaya': '/images/venues/samara/muzey-samara-kosmicheskaya.jpg',
+  'samara-red-dom-korabl': '/images/venues/samara/dom-korabl.jpg',
+  'samara-red-skver-bortsov': '/images/venues/samara/fabrika-kuhnya-zim.jpg',
+  'samara-red-raduga': '/images/venues/samara/fabrika-kuhnya-zim.jpg',
+  'samara-red-park-mira': '/images/venues/samara/zagorodnyy-park.jpg',
+  'spb-red-nikolskie-ryady': '/images/venues/saint-petersburg/nikolskie-ryady.jpg',
+  'spb-red-gtsi': '/images/venues/saint-petersburg/sevkabel-port.jpg',
+  'kgd-green-mogila-kanta': '/images/venues/kaliningrad/ostrov-kanta.jpg',
+  'kgd-green-medovyy-most': '/images/venues/kaliningrad/rybnaya-derevnya.jpg',
+  'kgd-green-okean-main-building': '/images/venues/kaliningrad/muzey-mirovogo-okeana.jpg',
+  'kgd-green-nikolay-chudotvorets': '/images/venues/kaliningrad/muzey-mirovogo-okeana.jpg',
+  'kgd-green-fridrikhsburgskie': '/images/venues/kaliningrad/muzey-mirovogo-okeana.jpg',
+  'kgd-red-teatr-kukol': '/images/venues/kaliningrad/tsentralnyy-park.jpg',
+  'kgd-red-villa-rut': '/images/venues/kaliningrad/rayon-vill-amalienau.jpg',
+  'kgd-red-villa-makovski': '/images/venues/kaliningrad/rayon-vill-amalienau.jpg',
+  'kgd-red-villa-schmidt': '/images/venues/kaliningrad/rayon-vill-amalienau.jpg',
+};
+
 const EDITORIAL_IMAGES_BY_SLUG: Record<string, string> = {
   ...KAZAN_IMAGES,
   ...SAMARA_IMAGES,
@@ -1445,6 +1476,7 @@ const EDITORIAL_IMAGES_BY_SLUG: Record<string, string> = {
   ...SAMARA_IMAGES,
   ...KRASNODAR_IMAGES,
   ...KRASNOYARSK_IMAGES,
+  ...PAINTED_LINE_IMAGES_20260815,
 };
 
 /**

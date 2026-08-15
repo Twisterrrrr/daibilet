@@ -322,3 +322,39 @@ test('Krasnoyarsk painted lines have 18 / 11 stops with coords and slugs', async
     11,
   );
 });
+
+test('MSK NN Samara SPB KGD painted lines: compact walkable stop counts', async () => {
+  const cases = [
+    { mod: './moscow-line-presets.ts', green: 'MOSCOW_GREEN_LINE_STOPS', presets: 'MOSCOW_LINE_DAY_ROUTE_PRESETS', g: 12, r: 10, gid: 'moscow-green-line', rid: 'moscow-red-line' },
+    { mod: './nizhny-novgorod-line-presets.ts', green: 'NIZHNY_NOVGOROD_GREEN_LINE_STOPS', presets: 'NIZHNY_NOVGOROD_LINE_DAY_ROUTE_PRESETS', g: 10, r: 8, gid: 'nizhny-novgorod-green-line', rid: 'nizhny-novgorod-red-line' },
+    { mod: './samara-line-presets.ts', green: 'SAMARA_GREEN_LINE_STOPS', presets: 'SAMARA_LINE_DAY_ROUTE_PRESETS', g: 10, r: 8, gid: 'samara-green-line', rid: 'samara-red-line' },
+    { mod: './saint-petersburg-line-presets.ts', green: 'SAINT_PETERSBURG_GREEN_LINE_STOPS', presets: 'SAINT_PETERSBURG_LINE_DAY_ROUTE_PRESETS', g: 10, r: 9, gid: 'saint-petersburg-green-line', rid: 'saint-petersburg-red-line' },
+    { mod: './kaliningrad-line-presets.ts', green: 'KALININGRAD_GREEN_LINE_STOPS', presets: 'KALININGRAD_LINE_DAY_ROUTE_PRESETS', g: 10, r: 8, gid: 'kaliningrad-green-line', rid: 'kaliningrad-red-line' },
+  ] as const;
+  for (const item of cases) {
+    const mod = await import(item.mod);
+    const greenStops = mod[item.green];
+    const presets = mod[item.presets];
+    assert.equal(greenStops.length, item.g, item.gid);
+    assert.ok(
+      greenStops.every(
+        (stop: {
+          latitude?: number;
+          longitude?: number;
+          locationSlug?: string;
+          dayRouteId?: string;
+        }) =>
+          Number.isFinite(stop.latitude) &&
+          Number.isFinite(stop.longitude) &&
+          Boolean(stop.locationSlug || stop.dayRouteId),
+      ),
+      item.gid,
+    );
+    assert.equal(presets.find((p: { id: string }) => p.id === item.gid)?.stops?.length, item.g, item.gid);
+    assert.equal(presets.find((p: { id: string }) => p.id === item.rid)?.stops?.length, item.r, item.rid);
+  }
+  const samaraRed = (await import('./samara-line-presets.ts')).SAMARA_RED_LINE_STOPS as Array<{
+    longitude?: number;
+  }>;
+  assert.ok(samaraRed.every((s) => (s.longitude || 0) > 40), 'samara red stays in Samara lon');
+});
