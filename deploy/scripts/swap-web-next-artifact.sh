@@ -38,7 +38,12 @@ clear_deploy_active() {
 trap clear_deploy_active EXIT
 echo "Deploy lock acquired (${DEPLOY_LOCK})"
 
-git fetch origin "$BRANCH"
+git fetch origin "$BRANCH" || {
+  echo "ERROR: git fetch origin failed." >&2
+  echo "MSK origin must be SSH with a read-only deploy key (not HTTPS without creds)." >&2
+  echo "See docs/deploy-timeweb.md § GitHub. remote=$(git remote get-url origin 2>/dev/null || echo unknown)" >&2
+  exit 1
+}
 git checkout "$BRANCH"
 if [[ -n "$GIT_SHA" ]]; then
   git reset --hard "$GIT_SHA"

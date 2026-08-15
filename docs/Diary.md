@@ -1,3 +1,18 @@
+## 2026-08-15 - MSK: GitHub deploy key для origin fetch
+
+### Наблюдения
+- Repo private; на `daibilet-msk` `origin` был HTTPS → `could not read Username` / GHA swap и API pull ломались, оставался ручной bundle.
+
+### Решения
+- Read-only deploy key `~/.ssh/daibilet_github_deploy` + GitHub key `daibilet-msk-readonly-20260815`.
+- `origin` → `git@github.com:Twisterrrrr/daibilet.git`; `git fetch` OK до tip.
+- Docs `deploy-timeweb.md` + ясный fail в `swap-web-next-artifact.sh`.
+
+### Проблемы
+- Нет. Приватный ключ только на MSK (не в git).
+
+---
+
 ## 2026-08-15 - Пермь: сверка координат Зелёной/Красной линий
 
 ### Наблюдения
