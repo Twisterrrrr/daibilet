@@ -1,3 +1,16 @@
+## 2026-08-15 - Prod backfill hub geo (MSK)
+
+### Наблюдения
+- Owner «гоняй БД»: address/coords новых хабов пустые в Venue; Пермь waterfront в Каме.
+
+### Решения
+- scripts/backfill-hub-venue-geo.js на MSK: --apply --force-geo для ekaterinburg,kazan,samara,krasnodar,krasnoyarsk + FORCE_PINS Пермь.
+- Updated **271** Venue; API restart daibilet-api; smoke: naberezhnaya 58.01825, schaste 58.01835, meriya/belaya-bashnya с address+coords.
+
+### Проблемы
+- Часть EKB hero файлов на диске всё ещё нет - geo/address закрыты, превью отдельно.
+
+---
 ## 2026-08-15 - Editorial geo: hard lock for all curated slugs
 
 ### Наблюдения
