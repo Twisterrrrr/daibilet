@@ -219,19 +219,20 @@ export function CityCard({
               />
             }
           />
-          {/* Dark: owner - darken only bottom-left under title/stats; photo stays open elsewhere. */}
+          {isLight ? (
+            <div
+              className="pointer-events-none absolute inset-0 bg-gradient-to-t from-white/95 via-white/45 to-transparent"
+              aria-hidden
+            />
+          ) : (
+            /* Owner: semi-circle under title/stats, black @ 30% opacity - no glass, no full-card wash. */
+            <div
+              className="pointer-events-none absolute -bottom-[18%] -left-[22%] h-[78%] w-[78%] rounded-full bg-black/30"
+              aria-hidden
+            />
+          )}
           <div
-            className={`pointer-events-none absolute inset-0 ${
-              isLight
-                ? 'bg-gradient-to-t from-white/95 via-white/45 to-transparent'
-                : 'bg-[radial-gradient(80%_70%_at_0%_100%,rgba(0,0,0,0.72)_0%,rgba(0,0,0,0.32)_38%,transparent_68%)]'
-            }`}
-            aria-hidden
-          />
-          <div
-            className={`absolute inset-x-0 bottom-0 ${compact ? 'p-2 sm:p-2.5' : 'p-2.5 sm:p-3'} ${
-              isLight ? '' : '[text-shadow:0_1px_2px_rgba(0,0,0,0.9),0_2px_12px_rgba(0,0,0,0.55)]'
-            }`}
+            className={`absolute inset-x-0 bottom-0 z-[1] ${compact ? 'p-2 sm:p-2.5' : 'p-2.5 sm:p-3'}`}
           >
             <h3 className={cityCardTitleClass(titleVariant, tone)}>{city.name}</h3>
             {showBrief ? (
