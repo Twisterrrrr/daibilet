@@ -10,6 +10,7 @@ authorName: Редакция
 articleType: gid
 tag: Гид
 citySlug: multi
+citySlugs: moscow, saint-petersburg
 city: "Москва и Петербург"
 date: "18 июля 2026"
 readMin: 9

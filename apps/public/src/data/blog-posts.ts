@@ -670,6 +670,7 @@ export const BLOG_POSTS: BlogPost[] = [
     tag: 'Гид',
     city: 'Москва и Петербург',
     citySlug: 'multi',
+    citySlugs: ['moscow', 'saint-petersburg'],
     authorId: 'editorial',
     authorName: 'Редакция',
     articleType: 'gid',

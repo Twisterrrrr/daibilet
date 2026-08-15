@@ -12,6 +12,7 @@ import { HomePopularCitiesRail } from '@/components/HomePopularCitiesRail.client
 import { LuckyCityButton } from '@/components/LuckyCityButton.client';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { ScrollRail } from '@/components/ScrollRail.client';
+import { blogSurfaceMeta, blogSurfaceMetaLine } from '@/lib/blog-meta';
 import { clipBlogFeaturedLead, hubBlogCardExcerpt, mergeBlogCards } from '@/lib/blog-utils';
 import '@/lib/env';
 import { catalogSocialStats } from '@/lib/catalog-social-stats';
@@ -69,6 +70,15 @@ async function HomePageBody() {
   const featuredLead = featuredBlog
     ? clipBlogFeaturedLead(featuredBlog.slug, featuredBlog.excerpt, 2, 520)
     : '';
+  const featuredMeta = featuredBlog
+    ? blogSurfaceMetaLine({
+        tag: featuredBlog.tag,
+        articleType: featuredBlog.articleType,
+        city: featuredBlog.city,
+        citySlug: featuredBlog.citySlug,
+        citySlugs: featuredBlog.citySlugs,
+      })
+    : null;
   const heroBanners = await withSoftTimeout(
     getActiveHeroBanners(),
     HOME_HERO_BANNERS_TIMEOUT_MS,
@@ -239,8 +249,8 @@ async function HomePageBody() {
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary-600">
                 Материал недели
               </p>
-              {featuredBlog.tag ? (
-                <p className="mt-3 text-sm font-medium text-slate-500">{featuredBlog.tag}</p>
+              {featuredMeta ? (
+                <p className="mt-3 text-sm font-medium text-slate-500">{featuredMeta}</p>
               ) : null}
               <h3 className="mt-2 font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl lg:text-[2rem] lg:leading-tight">
                 {featuredBlog.title}
@@ -279,6 +289,15 @@ async function HomePageBody() {
               <div className="grid grid-cols-1 items-stretch gap-4 sm:grid-cols-3">
                 {restBlog.slice(0, 3).map((post) => {
                   const excerpt = hubBlogCardExcerpt(post.slug, post.excerpt);
+                  const { typeLabel, cityLabel } = blogSurfaceMeta({
+                    tag: post.tag,
+                    articleType: post.articleType,
+                    city: post.city,
+                    citySlug: post.citySlug,
+                    citySlugs: post.citySlugs,
+                  });
+                  // Prefer city names on the home rail; type alone only when it is not a naked «Город»/«Гид».
+                  const badge = cityLabel || typeLabel;
                   return (
                     <article
                       key={post.slug}
@@ -306,9 +325,9 @@ async function HomePageBody() {
                           {excerpt ? (
                             <p className="mt-2 text-sm leading-relaxed text-slate-600">{excerpt}</p>
                           ) : null}
-                          {post.tag ? (
+                          {badge ? (
                             <span className="mt-auto pt-3 text-xs font-semibold uppercase tracking-wide text-primary-600">
-                              {post.tag}
+                              {badge}
                             </span>
                           ) : null}
                         </span>

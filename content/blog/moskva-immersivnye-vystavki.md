@@ -10,6 +10,7 @@ authorName: Редакция
 articleType: gid
 tag: Город
 citySlug: moscow
+city: Москва
 date: "11 авг 2026"
 readMin: 8
 imageAlt: "Иммерсивная световая инсталляция в выставочном зале"
