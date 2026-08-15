@@ -582,6 +582,26 @@ export function PlacesHubView({
     });
   };
 
+  /** Mobile dropdown: Все места | С событиями | categories (mutually exclusive with events). */
+  const mobileTypeSelectValue = hasEvents ? 'events' : typeFilter === 'all' ? 'all' : typeFilter;
+
+  const applyMobileTypeSelect = (next: string) => {
+    setListPage(1);
+    setFiltersOpen(false);
+    replaceCatalogUrl((params) => {
+      params.delete('family');
+      params.delete('hasEvents');
+      params.delete('type');
+      params.delete('page');
+      if (next === 'events') {
+        params.set('hasEvents', '1');
+      } else if (next !== 'all') {
+        params.set('type', next);
+      }
+      if (urlCityAll && !params.get('city')) params.set('city', 'all');
+    });
+  };
+
   const setSortFilter = (next: VenueCatalogSort) => {
     setListPage(1);
     replaceCatalogUrl((params) => {
@@ -660,16 +680,35 @@ export function PlacesHubView({
           </select>
         </div>
 
-        <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-start sm:gap-2">
-          <div
-            className="-mx-4 min-w-0 flex-1 overflow-x-auto overscroll-x-contain px-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:overflow-visible sm:px-0"
-            data-places-hub-chips
+        {/* Mobile: one dropdown (categories + «С событиями») - no separate Фильтры button. */}
+        <div className="mt-4 sm:hidden">
+          <label className="sr-only" htmlFor="places-hub-mobile-type">
+            Тип места
+          </label>
+          <select
+            id="places-hub-mobile-type"
+            value={mobileTypeSelectValue}
+            onChange={(event) => applyMobileTypeSelect(event.target.value)}
+            className="w-full rounded-xl bg-[#F5F5F7] px-3 py-2.5 text-sm outline-none"
           >
-            <div className="flex w-max flex-nowrap items-center gap-1.5 sm:w-auto sm:flex-wrap">
+            <option value="all">Все места</option>
+            <option value="events">С событиями</option>
+            {categoryChips.map((chip) => (
+              <option key={chip.id} value={chip.id}>
+                {chip.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* sm+: chip rail + Фильтры (events scope) as before */}
+        <div className="mt-4 hidden gap-2 sm:flex sm:items-start">
+          <div className="min-w-0 flex-1" data-places-hub-chips>
+            <div className="flex flex-wrap items-center gap-1.5">
               <button
                 type="button"
                 onClick={() => setTypeFilter('all')}
-                className={`catalog-chip min-h-11 sm:min-h-9 ${allTypesOn ? 'catalog-chip-on' : 'catalog-chip-idle'}`}
+                className={`catalog-chip min-h-9 ${allTypesOn ? 'catalog-chip-on' : 'catalog-chip-idle'}`}
               >
                 <span className="whitespace-nowrap">Все места</span>
               </button>
@@ -680,7 +719,7 @@ export function PlacesHubView({
                     key={chip.id}
                     type="button"
                     onClick={() => setTypeFilter(active ? 'all' : chip.id)}
-                    className={`catalog-chip min-h-11 sm:min-h-9 ${active ? 'catalog-chip-on' : 'catalog-chip-idle'}`}
+                    className={`catalog-chip min-h-9 ${active ? 'catalog-chip-on' : 'catalog-chip-idle'}`}
                   >
                     <span className="whitespace-nowrap">{chip.label}</span>
                   </button>
@@ -695,7 +734,7 @@ export function PlacesHubView({
               onClick={() => setFiltersOpen((open) => !open)}
               aria-expanded={filtersOpen}
               aria-haspopup="menu"
-              className={`inline-flex h-11 items-center gap-1.5 rounded-xl px-3 text-sm font-semibold transition sm:h-9 ${
+              className={`inline-flex h-9 items-center gap-1.5 rounded-xl px-3 text-sm font-semibold transition ${
                 filtersOpen || filtersActiveCount > 0
                   ? 'bg-primary-600 text-white hover:bg-primary-700'
                   : 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
