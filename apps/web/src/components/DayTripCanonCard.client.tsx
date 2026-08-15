@@ -395,17 +395,31 @@ export function DayTripCanonCard({
         } ${HUB_DETAIL_SCROLL}`}
         data-day-trip-body="scroll"
       >
-      {/* Title row: badge in gutter unless the cover already shows it. */}
-      <div className={cover ? 'min-w-0' : GRID} data-day-trip-head>
-        {cover ? null : (
-        <div className={`${GUTTER} pt-0.5`} data-day-trip-gutter>
-          <span
-            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold tabular-nums sm:h-9 sm:w-9 ${badgeClass}`}
-            data-day-trip-badge
-          >
-            {index + 1}
-          </span>
-        </div>
+      {/*
+        Title row: same content vertical as logistics box / sights.
+        Cover: badge lives on the photo - keep an empty sm gutter so H2
+        matches body section headers (no hanging left of content).
+        No cover: badge sits in the gutter column.
+      */}
+      <div
+        className={
+          cover
+            ? 'min-w-0 sm:grid sm:grid-cols-[2.25rem_minmax(0,1fr)] sm:gap-x-3'
+            : GRID
+        }
+        data-day-trip-head
+      >
+        {cover ? (
+          <div aria-hidden className="hidden sm:block" data-day-trip-gutter />
+        ) : (
+          <div className={`${GUTTER} pt-0.5`} data-day-trip-gutter>
+            <span
+              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold tabular-nums sm:h-9 sm:w-9 ${badgeClass}`}
+              data-day-trip-badge
+            >
+              {index + 1}
+            </span>
+          </div>
         )}
         <div className="min-w-0" data-day-trip-content>
           <header>
@@ -438,10 +452,10 @@ export function DayTripCanonCard({
           >
             {hasLogistics ? (
               <section data-day-trip-logistics>
-                <h4 className={`text-sm font-semibold ${inkClass}`}>Логистика</h4>
+                {/* No section label - box alone is enough (owner). */}
                 {/* Desktop: bg bleeds left; copy stays on title vertical. */}
                 <div
-                  className={`mt-1.5 ${panelClass} px-2.5 py-2.5 sm:mt-2 sm:py-3.5 sm:pr-4 ${PANEL_INSET_SM} ${LOGISTICS_BG_EXTEND_SM}`}
+                  className={`${panelClass} px-2.5 py-2.5 sm:py-3.5 sm:pr-4 ${PANEL_INSET_SM} ${LOGISTICS_BG_EXTEND_SM}`}
                 >
                   {logisticsExit ? (
                     <p className={`text-sm leading-snug ${softClass}`} data-day-trip-exit>
