@@ -1,28 +1,18 @@
 import {
   cityToGenitive,
-  cityToPrepositional,
   inCityPrepositional,
-  isSeoExpansionCity,
-} from '@/lib/city-declension';
-import { formatLandingTodayParts } from '@/lib/datetime';
-import { listingSeoYear } from '@/lib/seo-listing-meta';
+} from './city-declension.ts';
+import { formatLandingTodayParts } from './datetime.ts';
 
 /**
- * SEO title city hub (standalone).
- * Казань/Екб: `Афиша {City_Род} {Год} - куда сходить, купить билеты на события в {City_Пр}`
- * Остальные: именительный + «на сегодня, {date}».
+ * SEO title city hub (канон P.2d, как у Санкт-Петербурга):
+ * `{City}: афиша, экскурсии и билеты на сегодня, {date} | Дайбилет`
  */
 export function buildCityHubSeoTitle(
   cityName: string,
   reference: Date = new Date(),
 ): string {
   const name = String(cityName || '').trim() || 'Город';
-  if (isSeoExpansionCity(name)) {
-    const year = listingSeoYear(reference);
-    const gen = cityToGenitive(name);
-    const prep = cityToPrepositional(name);
-    return `Афиша ${gen} ${year} - куда сходить, купить билеты на события в ${prep}`;
-  }
   const { short } = formatLandingTodayParts(reference);
   return `${name}: афиша, экскурсии и билеты на сегодня, ${short} | Дайбилет`;
 }
@@ -32,9 +22,7 @@ export function buildCityHubSeoTitleCore(
   cityName: string,
   reference: Date = new Date(),
 ): string {
-  const full = buildCityHubSeoTitle(cityName, reference);
-  if (isSeoExpansionCity(cityName)) return full;
-  return full.replace(/\s*\|\s*Дайбилет\s*$/i, '');
+  return buildCityHubSeoTitle(cityName, reference).replace(/\s*\|\s*Дайбилет\s*$/i, '');
 }
 
 /**
@@ -49,18 +37,9 @@ export function buildCityHubSeoPhrase(cityName: string): string {
 /** Fallback meta description, если в CMS нет seoDescription. */
 export function buildCityHubSeoDescription(
   cityName: string,
-  reference: Date = new Date(),
+  _reference: Date = new Date(),
 ): string {
   const name = String(cityName || '').trim() || 'городе';
-  if (isSeoExpansionCity(name)) {
-    const gen = cityToGenitive(name);
-    const year = listingSeoYear(reference);
-    return (
-      `Все развлечения, экскурсии и концерты ${gen} в одном месте. ` +
-      `Актуальное расписание на ${year} год, цены на билеты и лучшие места. ` +
-      `Спланируйте свой досуг с Daibilet.ru!`
-    );
-  }
   const inCity = inCityPrepositional(name);
   return `${buildCityHubSeoPhrase(name)}. События, музеи и активности ${inCity}: выбор по датам, площадкам и категориям. Билеты онлайн на Дайбилете.`;
 }
