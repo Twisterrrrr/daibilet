@@ -772,6 +772,7 @@ export const EKB_DAY_ROUTE_PRESETS: any[] = [
       'Классический пешеходный трек на 1 день: контраст суровых заводов XVIII века и зеркальных небоскребов.',
     travelVector: 'Парадный пешеходный променад',
     timingNote: 'Около 6-7 часов пешком по центру и пруду.',
+    coverImageUrl: '/images/venues/ekaterinburg/plotinka-istoricheskiy-skver.jpg',
     stops: [
       {
         name: 'Исторический сквер (Плотинка)',
@@ -839,6 +840,7 @@ export const EKB_DAY_ROUTE_PRESETS: any[] = [
       'Мировые шедевры советского авангарда 1930-х и лучшие смотровые площадки мегаполиса.',
     travelVector: 'Эстетика бетона и геометрии',
     timingNote: 'Около 5-6 часов по центру; Белую башню на Уралмаше лучше отдельным выездом.',
+    coverImageUrl: '/images/venues/ekaterinburg/belaya-bashnya.jpg',
     stops: [
       {
         name: 'Здание Главпочтамта',
@@ -911,6 +913,7 @@ export const EKB_DAY_ROUTE_PRESETS: any[] = [
       'Рок, стрит-арт STENOGRAFFIA и культовый уральский фастфуд: The Beatles, барсы и посикунчики.',
     travelVector: 'Музыкальный и стрит-арт культ',
     timingNote: 'День по центру + ночной финал в рок-клубе.',
+    coverImageUrl: '/images/venues/ekaterinburg/identity-street-art.jpg',
     stops: [
       {
         name: 'Мурал «Уральский барс»',
