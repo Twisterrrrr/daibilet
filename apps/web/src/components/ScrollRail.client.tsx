@@ -37,9 +37,9 @@ const EDGE_EPS = 4;
 const HIDE_SCROLLBAR_CLASS =
   '![scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:!hidden';
 
-/** Same discs as HubCarouselChrome (city hub). */
+/** Same discs as HubCarouselChrome (city hub). No native `disabled` - see sync note below. */
 const HUB_OUTSIDE_ARROW =
-  'inline-btn absolute top-1/2 z-20 hidden size-10 shrink-0 aspect-square min-h-0 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white p-0 text-slate-700 shadow-sm transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-40 md:inline-flex';
+  'inline-btn absolute top-1/2 z-20 hidden size-10 shrink-0 aspect-square min-h-0 items-center justify-center rounded-full border border-slate-200 bg-white p-0 text-slate-700 shadow-sm transition-[opacity,transform,colors] hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:ring-offset-1 md:inline-flex';
 
 function measureStep(scroller: HTMLElement): number {
   const card =
@@ -57,10 +57,20 @@ function measureStep(scroller: HTMLElement): number {
   return Math.max(240, Math.round(scroller.clientWidth * 0.85));
 }
 
+function readRailState(el: HTMLElement) {
+  const { scrollLeft, scrollWidth, clientWidth } = el;
+  const hasOverflow = scrollWidth > clientWidth + EDGE_EPS;
+  return {
+    hasOverflow,
+    canPrev: hasOverflow && scrollLeft > EDGE_EPS,
+    canNext: hasOverflow && scrollLeft + clientWidth < scrollWidth - EDGE_EPS,
+  };
+}
+
 /**
  * Horizontal row with md+ prev/next controls when content overflows.
  * Mobile keeps swipe; optional hideScrollbar (city hub rail).
- * Both arrows stay visible while overflowing (edge buttons muted/disabled).
+ * Both arrows stay visible while overflowing (edge buttons muted).
  * `center` = hub discs outside the rail; `photo` = overlay on the image band.
  */
 export function ScrollRail({
@@ -83,11 +93,10 @@ export function ScrollRail({
   const update = useCallback(() => {
     const el = scrollerRef.current;
     if (!el) return;
-    const { scrollLeft, scrollWidth, clientWidth } = el;
-    const hasOverflow = scrollWidth > clientWidth + EDGE_EPS;
-    setOverflow(hasOverflow);
-    setCanPrev(hasOverflow && scrollLeft > EDGE_EPS);
-    setCanNext(hasOverflow && scrollLeft + clientWidth < scrollWidth - EDGE_EPS);
+    const next = readRailState(el);
+    setOverflow(next.hasOverflow);
+    setCanPrev(next.canPrev);
+    setCanNext(next.canNext);
   }, []);
 
   useEffect(() => {
@@ -96,6 +105,8 @@ export function ScrollRail({
 
     update();
     el.addEventListener('scroll', update, { passive: true });
+    // scrollend covers smooth scrollBy finishing after the last scroll event.
+    el.addEventListener('scrollend', update);
     window.addEventListener('resize', update, { passive: true });
 
     const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(update) : null;
@@ -111,19 +122,32 @@ export function ScrollRail({
 
     return () => {
       el.removeEventListener('scroll', update);
+      el.removeEventListener('scrollend', update);
       window.removeEventListener('resize', update);
       ro?.disconnect();
       mo?.disconnect();
     };
-  }, [update, children]);
+    // Intentionally not depending on `children` identity (new element every parent render).
+  }, [update]);
 
   const scrollByDir = (dir: -1 | 1) => {
     const el = scrollerRef.current;
     if (!el) return;
+    if (dir < 0 && !readRailState(el).canPrev) return;
+    if (dir > 0 && !readRailState(el).canNext) return;
+
+    // Optimistic: smooth scroll can lag before the first scroll event.
+    if (dir > 0) setCanPrev(true);
+    if (dir < 0) setCanNext(true);
+
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     el.scrollBy({
       left: dir * measureStep(el),
       behavior: reduceMotion ? 'auto' : 'smooth',
+    });
+    requestAnimationFrame(() => {
+      update();
+      requestAnimationFrame(update);
     });
   };
 
@@ -146,20 +170,22 @@ export function ScrollRail({
         }
       : undefined;
 
+  const muted = 'pointer-events-none opacity-40';
+  const live = 'pointer-events-auto opacity-100';
+
   const prevBtn = overflow ? (
     <button
       type="button"
       aria-label="Прокрутить влево"
       aria-disabled={!canPrev}
       tabIndex={canPrev ? 0 : -1}
-      disabled={!canPrev}
       onClick={() => scrollByDir(-1)}
       className={
         arrowsOutside
-          ? `${HUB_OUTSIDE_ARROW} left-0 -translate-x-[calc(100%+0.75rem)]`
-          : `${overlayArrowBase} left-3 ${
-              canPrev ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-35'
+          ? `${HUB_OUTSIDE_ARROW} left-0 -translate-x-[calc(100%+0.75rem)] -translate-y-1/2 ${
+              canPrev ? live : muted
             }`
+          : `${overlayArrowBase} left-3 ${canPrev ? live : muted}`
       }
     >
       <ChevronLeft className="h-5 w-5" aria-hidden />
@@ -172,14 +198,13 @@ export function ScrollRail({
       aria-label="Прокрутить вправо"
       aria-disabled={!canNext}
       tabIndex={canNext ? 0 : -1}
-      disabled={!canNext}
       onClick={() => scrollByDir(1)}
       className={
         arrowsOutside
-          ? `${HUB_OUTSIDE_ARROW} right-0 translate-x-[calc(100%+0.75rem)]`
-          : `${overlayArrowBase} right-3 ${
-              canNext ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-35'
+          ? `${HUB_OUTSIDE_ARROW} right-0 translate-x-[calc(100%+0.75rem)] -translate-y-1/2 ${
+              canNext ? live : muted
             }`
+          : `${overlayArrowBase} right-3 ${canNext ? live : muted}`
       }
     >
       <ChevronRight className="h-5 w-5" aria-hidden />
@@ -199,21 +224,21 @@ export function ScrollRail({
     </div>
   );
 
-  if (arrowsOutside) {
-    return (
-      <div className={`relative min-w-0 overflow-visible ${className}`.trim()} style={style}>
-        {prevBtn}
-        {viewport}
-        {nextBtn}
-      </div>
-    );
-  }
-
   return (
     <div className={`relative min-w-0 overflow-visible ${className}`.trim()} style={style}>
-      {viewport}
-      {prevBtn}
-      {nextBtn}
+      {arrowsOutside ? (
+        <>
+          {prevBtn}
+          {viewport}
+          {nextBtn}
+        </>
+      ) : (
+        <>
+          {viewport}
+          {prevBtn}
+          {nextBtn}
+        </>
+      )}
     </div>
   );
 }

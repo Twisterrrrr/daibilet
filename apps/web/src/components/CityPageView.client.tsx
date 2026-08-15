@@ -1473,11 +1473,13 @@ function CitySightsMustSeeList({
     if (!el) return;
     syncRail();
     el.addEventListener('scroll', syncRail, { passive: true });
+    el.addEventListener('scrollend', syncRail);
     window.addEventListener('resize', syncRail, { passive: true });
     const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(syncRail) : null;
     ro?.observe(el);
     return () => {
       el.removeEventListener('scroll', syncRail);
+      el.removeEventListener('scrollend', syncRail);
       window.removeEventListener('resize', syncRail);
       ro?.disconnect();
     };
@@ -1486,10 +1488,23 @@ function CitySightsMustSeeList({
   const scrollPage = (dir: -1 | 1) => {
     const el = railRef.current;
     if (!el) return;
+    const { scrollLeft, scrollWidth, clientWidth } = el;
+    const overflow = scrollWidth > clientWidth + 4;
+    const atStart = scrollLeft <= 4;
+    const atEnd = scrollLeft + clientWidth >= scrollWidth - 4;
+    if (!overflow || (dir < 0 && atStart) || (dir > 0 && atEnd)) return;
+
+    if (dir > 0) setCanPrev(true);
+    if (dir < 0) setCanNext(true);
+
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     el.scrollBy({
       left: dir * el.clientWidth,
       behavior: reduceMotion ? 'auto' : 'smooth',
+    });
+    requestAnimationFrame(() => {
+      syncRail();
+      requestAnimationFrame(syncRail);
     });
   };
 
