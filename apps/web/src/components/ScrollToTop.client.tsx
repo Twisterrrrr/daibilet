@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 const SHOW_AFTER_VIEWPORTS = 1;
 
 /**
- * Back-to-top aligned to the content column (max-w-[1240px]), not the viewport edge.
+ * Back-to-top aligned to the content column (container-page / max-w-7xl), not the viewport edge.
  * Desktop: hide while site footer is in view so the chip does not cover legal links.
  */
 export function ScrollToTopButton() {
@@ -98,7 +98,7 @@ export function ScrollToTopButton() {
       }`}
       aria-hidden={!show}
     >
-      <div className="relative mx-auto max-w-[1240px] px-4 sm:px-6 lg:px-8">
+      <div className="container-page relative">
         <button
           type="button"
           onClick={scrollToTop}

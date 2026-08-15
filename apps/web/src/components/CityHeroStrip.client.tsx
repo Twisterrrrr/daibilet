@@ -110,7 +110,7 @@ export function CityHeroStrip({
             editorial ? 'border-b border-zinc-200 bg-zinc-50' : 'border-b border-slate-200 bg-slate-50'
           }
         >
-          <div className="mx-auto w-full max-w-[1240px] px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+          <div className="container-page py-8 sm:py-10">
             <div className="max-w-3xl">
               {regionBadge ? (
                 <p
