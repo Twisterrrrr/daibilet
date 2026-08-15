@@ -22,7 +22,9 @@ export function CityRegionalEvents({ citySlug, editorial = false, nested = false
   const past = listCityRegionalPastEvents(citySlug);
   if (!events.length && !past.length) return null;
 
-  const split = events.length > 0 && past.length > 0;
+  /** 3-col desktop grid when 2+ cards; single festival stays full-width. */
+  const eventsGridClass =
+    events.length >= 2 ? 'grid gap-3 sm:grid-cols-2 xl:grid-cols-3' : 'grid gap-3';
 
   return (
     <section
@@ -47,15 +49,9 @@ export function CityRegionalEvents({ citySlug, editorial = false, nested = false
           description="Анонсы и прошедшие фестивали рядом с городом"
           editorial={editorial}
         />
-        <div
-          className={
-            split
-              ? 'mt-5 grid grid-cols-1 gap-5 md:grid-cols-2 md:items-stretch'
-              : 'mt-5'
-          }
-        >
+        <div className="mt-5 flex flex-col gap-5">
           {events.length ? (
-            <ul className={split ? 'grid min-w-0 gap-3' : 'grid gap-3 sm:grid-cols-2 xl:grid-cols-3'}>
+            <ul className={eventsGridClass}>
               {events.map((event) => (
                 <li
                   key={event.id}
@@ -113,7 +109,7 @@ export function CityRegionalEvents({ citySlug, editorial = false, nested = false
               <h3 className={`text-sm font-semibold ${editorial ? 'text-zinc-800' : 'text-slate-800'}`}>
                 Прошедшие фестивали сезона
               </h3>
-              <ul className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+              <ul className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 {past.map((event) => (
                   <li
                     key={event.id}
