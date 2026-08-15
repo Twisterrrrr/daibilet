@@ -250,19 +250,17 @@ function regionNameGenitive(regionName: string): string {
   const mapped = REGION_GENITIVE[key];
   if (mapped) return mapped;
   // Light fallback mirroring apps/web city-declension for «X край/область».
-  const kray = regionName.match(/^(.+)\s+край$/i);
+  const kray = regionName.match(/^(.+)\s+край$/i)?.[1]?.trim();
   if (kray) {
-    const adj = kray[1];
-    if (/ий$/i.test(adj)) return `${adj.slice(0, -2)}ого края`;
-    if (/ый$/i.test(adj) || /ой$/i.test(adj)) return `${adj.slice(0, -2)}ого края`;
-    return `${adj} края`;
+    if (/ий$/i.test(kray)) return `${kray.slice(0, -2)}ого края`;
+    if (/ый$/i.test(kray) || /ой$/i.test(kray)) return `${kray.slice(0, -2)}ого края`;
+    return `${kray} края`;
   }
-  const oblast = regionName.match(/^(.+)\s+область$/i);
+  const oblast = regionName.match(/^(.+)\s+область$/i)?.[1]?.trim();
   if (oblast) {
-    const adj = oblast[1];
-    if (/ая$/i.test(adj)) return `${adj.slice(0, -2)}ой области`;
-    if (/яя$/i.test(adj)) return `${adj.slice(0, -2)}ей области`;
-    return `${adj} области`;
+    if (/ая$/i.test(oblast)) return `${oblast.slice(0, -2)}ой области`;
+    if (/яя$/i.test(oblast)) return `${oblast.slice(0, -2)}ей области`;
+    return `${oblast} области`;
   }
   return regionName;
 }

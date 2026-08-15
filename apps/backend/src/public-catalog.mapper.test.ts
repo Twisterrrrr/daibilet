@@ -237,7 +237,7 @@ test('drops bus subcategory labels from river cruise cards', () => {
   assert.deepEqual(labels, ['Водные экскурсии']);
 });
 
-function catalogRow(overrides: Partial<PublicCatalogMappingRow>): PublicCatalogMappingRow {
+function catalogRow(overrides: Partial<PublicCatalogMappingRow> = {}): PublicCatalogMappingRow {
   return {
     id: 'event-local-1',
     slug: 'test-event',
@@ -262,6 +262,7 @@ function catalogRow(overrides: Partial<PublicCatalogMappingRow>): PublicCatalogM
     venueId: 'venue-1',
     venueSlug: 'prichal-1',
     venue: 'Причал 1',
+    venueAddress: null,
     venueHeroImageUrl: null,
     venueKind: 'PIER',
     overrideTitle: null,
@@ -285,5 +286,5 @@ function catalogRow(overrides: Partial<PublicCatalogMappingRow>): PublicCatalogM
     vacant: 10,
     upcomingSlots: [],
     ...overrides,
-  };
+  } as PublicCatalogMappingRow;
 }
