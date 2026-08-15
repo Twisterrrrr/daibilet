@@ -1,3 +1,19 @@
+## 2026-08-15 - Самара: полный tourist hub + превью + MyDay
+
+### Наблюдения
+- Owner pack: whenToGo / identity / ~50 mustSee / 2 day scenarios / Ширяево / FAQ / festivals; MyDay через `dayRoutePresets`.
+
+### Решения
+- `samara-hub.ts` (web+public): mustSee (+ Дом обороны для сценария), suburb Самарская Лука/Ширяево, `samara-resort-one-day` / `samara-space-constructivism`, FAQ, travel.
+- Local flavor: weather (Europe/Samara) + whenToGo + 4 identity slides; tourist affiche.
+- Coords/images editorial; превью в `images/venues/samara/`.
+- Festivals: ВолгаФест, Грушинский 2027, Рок над Волгой + past.
+
+### Проблемы
+- Часть карточек делит cover; Дом обороны - приближенный пин; prod Location seed по запросу.
+
+---
+
 ## 2026-08-15 - Казань: полный tourist hub + превью + MyDay
 
 ### Наблюдения

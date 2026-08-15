@@ -975,6 +975,135 @@ const KAZAN_SLIDES: CityIdentitySlide[] = [
   },
 ];
 
+const SAMARA_WEATHER: CityWeatherFlavor = {
+  latitude: 53.1959,
+  longitude: 50.1002,
+  timezone: 'Europe/Samara',
+  outdoorSlugs: [
+    'samara-samarskaya-naberezhnaya',
+    'samara-ulitsa-leningradskaya',
+    'samara-ploschad-slavy',
+    'samara-strukovskiy-sad',
+    'samara-smotrovaya-vertolyotka',
+  ],
+  indoorSlugs: [
+    'samara-bunker-stalina',
+    'samara-muzey-moderna-usadba-kurlinoy',
+    'samara-muzey-samara-kosmicheskaya',
+    'samara-pivnoy-bar-na-dne',
+    'samara-fabrika-kuhnya-zim',
+  ],
+  outdoorCta: 'Отличная погода для набережной, Арбата и площади Славы',
+  indoorCtaOvercast: 'Сегодня пасмурно. Загляните в Бункер Сталина, Музей Модерна или к ракете «Союз»',
+  indoorCtaRain: 'Сегодня дождь. Бункер Сталина, фабрика-кухня ЗИМ или бар «На Дне» укроют от непогоды',
+  indoorCtaSnow: 'Сегодня снег. Музеи, бункер и горячее «Жигулёвское» у завода',
+};
+
+const SAMARA_WHEN_TO_GO: CityWhenToGoFlavor = {
+  timeZone: 'Europe/Samara',
+  seasons: [
+    {
+      id: 'winter',
+      months: [12, 1, 2],
+      headline: 'Зима',
+      body: 'Пушистый волжский снег и катки на площади Куйбышева. Набережная - заснеженный променад; турбазы на Самарской Луке и гастро-бары.',
+    },
+    {
+      id: 'spring',
+      months: [3, 4, 5],
+      headline: 'Весна',
+      body: 'В апреле лед уходит с Волги. Май - город зеленеет, стартуют первые теплоходы, набережная оживает.',
+    },
+    {
+      id: 'summer',
+      months: [6, 7, 8],
+      headline: 'Лето',
+      body: 'Пик сезона: пляжи в центре, купание, open-air на набережной - город как курорт.',
+    },
+    {
+      id: 'earlyAutumn',
+      months: [9],
+      headline: 'Ранняя осень',
+      body: 'Бабье лето и хайкинг по Жигулям - Вертолётка и Царёв курган.',
+    },
+    {
+      id: 'lateAutumn',
+      months: [10, 11],
+      headline: 'Поздняя осень',
+      body: 'Первый лёд на Волге и спокойный музейно-театральный формат.',
+    },
+  ],
+  tabs: seasonTabs({
+    spring:
+      'В апреле лед с грохотом уходит с Волги. Май - город резко зеленеет, запускаются первые речные теплоходы, набережная оживает после зимы.',
+    summer:
+      'Пик и золотой век самарского сезона. Пляжи в центре, Волга прогревается для купания, на набережной non-stop музыкальные и гастрономические open-air.',
+    autumn:
+      'Сентябрь дарит теплое бабье лето и идеальные условия для хайкинга по Жигулёвским горам (Вертолётка и Царёв курган). В ноябре Волга покрывается первой коркой льда - сезон переходит в культурно-музейный формат.',
+    winter:
+      'Время пушистого волжского снега и масштабных катков на площади Куйбышева. Набережная превращается в заснеженный променад. Отлично подходит для зимних турбаз на Самарской Луке и согревающих гастро-туров по локальным барам.',
+  }),
+};
+
+const SAMARA_SLIDES: CityIdentitySlide[] = [
+  {
+    id: 'space-capital',
+    title: 'Космическая столица',
+    text: 'Мощный индустриальный и научный статус. На заводе «Прогресс» собраны ступени ракеты Юрия Гагарина. Настоящая ракета на проспекте Ленина - главный символ города.',
+    imageSrc: '/images/venues/samara/identity-space.jpg',
+    imageAlt: 'Ракета «Союз» у музея «Самара Космическая»',
+    slugs: [
+      'samara-muzey-samara-kosmicheskaya',
+      'samara-fabrika-kuhnya-zim',
+      'samara-dom-chemodan',
+    ],
+    target: 'places',
+    badge: 'Символ',
+  },
+  {
+    id: 'zhiguli-songs',
+    title: 'Песни Жигулей',
+    text: 'Колыбель бардовской песни, палаточного романтизма и гитарных фестивалей. Дух свободы, костров, уличных музыкантов на набережной и локального стрит-арта.',
+    imageSrc: '/images/venues/samara/identity-art.jpg',
+    imageAlt: 'Музыканты и бардовский дух на самарской набережной',
+    slugs: [
+      'samara-samarskaya-naberezhnaya',
+      'samara-shiryaevo-samarskaya-luka',
+      'samara-ulitsa-leningradskaya',
+    ],
+    target: 'places',
+    badge: 'Искусство',
+  },
+  {
+    id: 'zhiguli-beer',
+    title: 'Культ «Жигулёвского»',
+    text: 'Свежесваренное пиво легендарного завода Альфреда фон Вакано в паре с волжскими раками - абсолютный кулинарный код Самары.',
+    imageSrc: '/images/venues/samara/identity-gastro.jpg',
+    imageAlt: 'Жигулёвское пиво и волжские раки',
+    slugs: [
+      'samara-pivnoy-bar-na-dne',
+      'samara-zhigulevskiy-pivovarennyy-zavod',
+      'samara-osobnyak-fon-vakano',
+    ],
+    target: 'places',
+    badge: 'Гастро',
+  },
+  {
+    id: 'volga-resort',
+    title: 'Курортная линия Волги',
+    text: 'Многокилометровая каскадная набережная с песчаными пляжами прямо в историческом центре - атмосфера южного курорта посреди России.',
+    imageSrc: '/images/venues/samara/identity-architecture.jpg',
+    imageAlt: 'Самарская набережная с пляжем у Волги',
+    slugs: [
+      'samara-samarskaya-naberezhnaya',
+      'samara-volzhskiy-plyazh',
+      'samara-strukovskiy-sad',
+    ],
+    target: 'places',
+    badge: 'Архитектура',
+  },
+];
+
 export const CITY_HUB_LOCAL_FLAVOR: Record<string, CityHubLocalFlavor> = {
   perm: {
     identityHeading: 'Чем уникальна Пермь',
@@ -1031,6 +1160,14 @@ export const CITY_HUB_LOCAL_FLAVOR: Record<string, CityHubLocalFlavor> = {
     slides: KAZAN_SLIDES,
     weather: KAZAN_WEATHER,
     whenToGo: KAZAN_WHEN_TO_GO,
+  },
+  samara: {
+    identityHeading: 'Чем уникальна Самара',
+    identityLead: IDENTITY_LEAD,
+    tags: tagsFromSlides(SAMARA_SLIDES),
+    slides: SAMARA_SLIDES,
+    weather: SAMARA_WEATHER,
+    whenToGo: SAMARA_WHEN_TO_GO,
   },
 };
 

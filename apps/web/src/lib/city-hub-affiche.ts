@@ -22,6 +22,7 @@ const TOURIST_AFFICHE_SLUGS = new Set([
   'moscow',
   'ekaterinburg',
   'kazan',
+  'samara',
 ]);
 
 const CHIP_ORDER = [

@@ -1,3 +1,9 @@
+## 2026-08-15 - Самара tourist hub
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| CONT.SAMARA-HUB | whenToGo / identity / ~50 mustSee / 2 scenarios / Ширяево / FAQ / festivals + превью + MyDay | Высокий | ✅ code; commit+push; live по «выкатывай» |
+
 ## 2026-08-15 - Казань tourist hub
 
 | ID | Задача | Приоритет | Статус |

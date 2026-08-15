@@ -18,6 +18,7 @@ test('tourist affiche cities include Perm aliases via normalized slugs', () => {
   assert.equal(isCityHubTouristAffiche('moscow'), true);
   assert.equal(isCityHubTouristAffiche('ekaterinburg'), true);
   assert.equal(isCityHubTouristAffiche('kazan'), true);
+  assert.equal(isCityHubTouristAffiche('samara'), true);
 });
 
 test('tourist score puts excursions and theater above standup', () => {

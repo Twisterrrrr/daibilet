@@ -26,6 +26,7 @@ const EKB_HUB_SRC = readFileSync(
   'utf8',
 );
 const KAZAN_HUB_SRC = readFileSync(fileURLToPath(new URL('./kazan-hub.ts', import.meta.url)), 'utf8');
+const SAMARA_HUB_SRC = readFileSync(fileURLToPath(new URL('./samara-hub.ts', import.meta.url)), 'utf8');
 
 function cityInfoHasSlug(slug: string): boolean {
   const quoted = new RegExp(`['"]${slug.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}['"]`);
@@ -33,11 +34,12 @@ function cityInfoHasSlug(slug: string): boolean {
     quoted.test(CITY_INFO_SRC) ||
     quoted.test(MONUMENTS_SRC) ||
     quoted.test(EKB_HUB_SRC) ||
-    quoted.test(KAZAN_HUB_SRC)
+    quoted.test(KAZAN_HUB_SRC) ||
+    quoted.test(SAMARA_HUB_SRC)
   );
 }
 
-test('weather widget covers Perm, Moscow, SPB, Kaliningrad, NN, EKB and Kazan', () => {
+test('weather widget covers Perm, Moscow, SPB, Kaliningrad, NN, EKB, Kazan and Samara', () => {
   assert.equal(cityHasWeatherWidget('perm'), true);
   assert.equal(cityHasWeatherWidget('moscow'), true);
   assert.equal(cityHasWeatherWidget('moskva'), true);
@@ -48,6 +50,7 @@ test('weather widget covers Perm, Moscow, SPB, Kaliningrad, NN, EKB and Kazan', 
   assert.equal(cityHasWeatherWidget('nizhniy-novgorod'), true);
   assert.equal(cityHasWeatherWidget('ekaterinburg'), true);
   assert.equal(cityHasWeatherWidget('kazan'), true);
+  assert.equal(cityHasWeatherWidget('samara'), true);
   assert.equal(cityHasWeatherWidget('ufa'), false);
   const weather = resolveCityLocalFlavor('perm')?.weather;
   assert.ok(weather);
@@ -194,7 +197,7 @@ test('collectPlacesBySlugs keeps tag order and drops unknown', () => {
   assert.equal(suburbMatchesSlugs(suburbs[0], ['muzej-hohlovka']), true);
 });
 
-test('when-to-go covers Perm, Moscow, SPB, Kaliningrad, NN, EKB and Kazan', () => {
+test('when-to-go covers Perm, Moscow, SPB, Kaliningrad, NN, EKB, Kazan and Samara', () => {
   assert.equal(cityHasWhenToGo('perm'), true);
   assert.equal(cityHasWhenToGo('moscow'), true);
   assert.equal(cityHasWhenToGo('moskva'), true);
@@ -203,6 +206,7 @@ test('when-to-go covers Perm, Moscow, SPB, Kaliningrad, NN, EKB and Kazan', () =
   assert.equal(cityHasWhenToGo('nizhny-novgorod'), true);
   assert.equal(cityHasWhenToGo('ekaterinburg'), true);
   assert.equal(cityHasWhenToGo('kazan'), true);
+  assert.equal(cityHasWhenToGo('samara'), true);
   for (const slug of [
     'perm',
     'moscow',
@@ -211,6 +215,7 @@ test('when-to-go covers Perm, Moscow, SPB, Kaliningrad, NN, EKB and Kazan', () =
     'nizhny-novgorod',
     'ekaterinburg',
     'kazan',
+    'samara',
   ]) {
     const flavor = resolveCityLocalFlavor(slug)?.whenToGo;
     assert.ok(flavor, slug);
