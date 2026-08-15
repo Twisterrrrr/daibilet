@@ -1,3 +1,19 @@
+## 2026-08-15 - Хаб Екатеринбурга: полный tourist fill
+
+### Наблюдения
+- Owner отдал identity / festivals / FAQ / whenToGo / сценарии / mustSee / пригороды; хаб был thin stub (6 mustSee).
+
+### Решения
+- `ekaterinburg-hub.ts`: ~60 mustSee + 4 suburbs + 2 dayRoutePresets + FAQ.
+- Local flavor (4 slides + weather + whenToGo), regional events, tourist affiche flag.
+- Превью: identity + ключевые venues в `images/venues/ekaterinburg/` (сжаты).
+- Coords/images editorial maps.
+
+### Проблемы
+- Часть карточек делит cover с identity до точечной догенерации; seed Location в prod DB - по запросу.
+
+---
+
 ## 2026-08-15 - MSK: GitHub deploy key для origin fetch
 
 ### Наблюдения

@@ -733,6 +733,132 @@ const KGD_SLIDES: CityIdentitySlide[] = [
   },
 ];
 
+const EKB_WEATHER: CityWeatherFlavor = {
+  latitude: 56.838,
+  longitude: 60.597,
+  timezone: 'Asia/Yekaterinburg',
+  outdoorSlugs: [
+    'ekaterinburg-plotinka-istoricheskiy-skver',
+    'ekaterinburg-naberezhnaya-rabochey-molodezhi',
+    'ekaterinburg-smotrovaya-ploschadka-bts-vysotskiy',
+    'ekaterinburg-pamyatnik-klaviatura',
+    'ekaterinburg-park-uktus',
+  ],
+  indoorSlugs: [
+    'ekaterinburg-el-tsin-tsentr',
+    'ekaterinburg-muzey-izobrazitelnyh-iskusstv',
+    'ekaterinburg-kraevedcheskiy-muzey',
+    'ekaterinburg-pashtet',
+    'ekaterinburg-zmeeed',
+  ],
+  outdoorCta: 'Отличная погода для Плотинки, набережной и смотровой «Высоцкого»',
+  indoorCtaOvercast: 'Сегодня пасмурно. Загляните в Ельцин Центр, музеи или «Паштет»',
+  indoorCtaRain: 'Сегодня дождь. Загляните в Ельцин Центр, музеи или «Паштет»',
+  indoorCtaSnow: 'Сегодня снег. Загляните в Ельцин Центр, музеи или термы Уктуса',
+};
+
+const EKB_WHEN_TO_GO: CityWhenToGoFlavor = {
+  timeZone: 'Asia/Yekaterinburg',
+  seasons: [
+    {
+      id: 'winter',
+      months: [12, 1, 2],
+      headline: 'Зима',
+      body: 'Суровые уральские морозы, Ледовый городок на площади 1905 года, Уктус и тур по пельменным.',
+    },
+    {
+      id: 'spring',
+      months: [3, 4, 5],
+      headline: 'Весна',
+      body: 'В марте ещё снег, к маю город резко зеленеет. Театральные премьеры и первые прогулки по конструктивизму.',
+    },
+    {
+      id: 'summer',
+      months: [6, 7, 8],
+      headline: 'Лето',
+      body: 'Пик сезона: Ural Music Night, STENOGRAFFIA, набережные и навигация на Городском пруду.',
+    },
+    {
+      id: 'earlyAutumn',
+      months: [9],
+      headline: 'Ранняя осень',
+      body: 'Золото в ЦПКиО и Шарташе, театральный сезон и марафон «Безумные дни».',
+    },
+    {
+      id: 'lateAutumn',
+      months: [10, 11],
+      headline: 'Поздняя осень',
+      body: 'Город плавно уходит в зиму: музеи, концерты и меньше туристического шума.',
+    },
+  ],
+  tabs: seasonTabs({
+    spring:
+      'В марте ещё лежит снег, а в мае город резко зеленеет. Сезон театральных премьер и первых экскурсий по конструктивизму.',
+    summer:
+      'Пик сезона: набережные, open-air (Ural Music Night, STENOGRAFFIA) и навигация на Городском пруду.',
+    autumn:
+      'Сентябрь - золотая осень в ЦПКиО и Шарташе, «Безумные дни». С ноября город уходит в зиму.',
+    winter:
+      'Ледовый городок на площади 1905 года, Уктус и согревающий тур по пельменным и барам.',
+  }),
+};
+
+const EKB_SLIDES: CityIdentitySlide[] = [
+  {
+    id: 'ural-rock',
+    title: 'Столица уральского рока',
+    text: 'Свободный, дерзкий и музыкальный характер. Родина «Наутилуса Помпилиуса», «Чайфа» и «Агаты Кристи». Раз в год город превращается в гигантскую сцену Ural Music Night.',
+    imageSrc: '/images/venues/ekaterinburg/identity-rock.jpg',
+    imageAlt: 'Уральский рок и ночная сцена Екатеринбурга',
+    slugs: [
+      'ekaterinburg-everjazz',
+      'ekaterinburg-rok-bar-tsyn',
+      'ekaterinburg-tele-club-fabrika',
+      'ekaterinburg-new-bar',
+    ],
+    target: 'places',
+    badge: 'Символ',
+  },
+  {
+    id: 'stenograffia',
+    title: 'Заводские стены Бажова',
+    text: 'Один из главных центров стрит-арта в стране. Фестиваль STENOGRAFFIA легально превращает индустриальные постройки, заборы и дворы в признанные арт-объекты.',
+    imageSrc: '/images/venues/ekaterinburg/identity-street-art.jpg',
+    imageAlt: 'Стрит-арт на заводских стенах Екатеринбурга',
+    slugs: [
+      'ekaterinburg-pamyatnik-klaviatura',
+      'ekaterinburg-belaya-bashnya',
+      'ekaterinburg-muzey-arhitektury-i-dizayna',
+    ],
+    target: 'places',
+    badge: 'Искусство',
+  },
+  {
+    id: 'posikunchiki',
+    title: 'Уральские посикунчики',
+    text: 'Сытная таежная кухня: крошечные пирожки-посикунчики с горячим бульоном и пельмени с мясом, дичью или лесными грибами.',
+    imageSrc: '/images/venues/ekaterinburg/identity-gastro.jpg',
+    imageAlt: 'Уральские пельмени и посикунчики',
+    slugs: ['ekaterinburg-pashtet', 'ekaterinburg-zmeeed', 'ekaterinburg-estory'],
+    target: 'places',
+    badge: 'Гастро',
+  },
+  {
+    id: 'avangard',
+    title: 'Заповедник авангарда',
+    text: 'Мировая столица конструктивизма 1920-1930-х. Городок чекистов, гостиница «Исеть» и водонапорная Белая башня задают суровый индустриальный силуэт.',
+    imageSrc: '/images/venues/ekaterinburg/belaya-bashnya.jpg',
+    imageAlt: 'Белая башня на Уралмаше',
+    slugs: [
+      'ekaterinburg-belaya-bashnya',
+      'ekaterinburg-gorodok-chekistov',
+      'ekaterinburg-gostinitsa-iset',
+    ],
+    target: 'places',
+    badge: 'Архитектура',
+  },
+];
+
 export const CITY_HUB_LOCAL_FLAVOR: Record<string, CityHubLocalFlavor> = {
   perm: {
     identityHeading: 'Чем уникальна Пермь',
@@ -773,6 +899,14 @@ export const CITY_HUB_LOCAL_FLAVOR: Record<string, CityHubLocalFlavor> = {
     slides: NN_SLIDES,
     weather: NN_WEATHER,
     whenToGo: NN_WHEN_TO_GO,
+  },
+  ekaterinburg: {
+    identityHeading: 'Чем уникален Екатеринбург',
+    identityLead: IDENTITY_LEAD,
+    tags: tagsFromSlides(EKB_SLIDES),
+    slides: EKB_SLIDES,
+    weather: EKB_WEATHER,
+    whenToGo: EKB_WHEN_TO_GO,
   },
 };
 

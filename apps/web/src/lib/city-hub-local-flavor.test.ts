@@ -36,7 +36,7 @@ test('weather widget covers Perm, Moscow, SPB, Kaliningrad and NN', () => {
   assert.equal(cityHasWeatherWidget('kaliningrad'), true);
   assert.equal(cityHasWeatherWidget('nizhny-novgorod'), true);
   assert.equal(cityHasWeatherWidget('nizhniy-novgorod'), true);
-  assert.equal(cityHasWeatherWidget('ekaterinburg'), false);
+  assert.equal(cityHasWeatherWidget('ekaterinburg'), true);
   assert.equal(cityHasWeatherWidget('ufa'), false);
   const weather = resolveCityLocalFlavor('perm')?.weather;
   assert.ok(weather);

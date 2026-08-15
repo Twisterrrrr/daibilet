@@ -16,7 +16,7 @@ test('tourist affiche cities include Perm aliases via normalized slugs', () => {
   assert.equal(isCityHubTouristAffiche('moskva'), true);
   assert.equal(isCityHubTouristAffiche('sankt-peterburg'), true);
   assert.equal(isCityHubTouristAffiche('moscow'), true);
-  assert.equal(isCityHubTouristAffiche('ekaterinburg'), false);
+  assert.equal(isCityHubTouristAffiche('ekaterinburg'), true);
 });
 
 test('tourist score puts excursions and theater above standup', () => {

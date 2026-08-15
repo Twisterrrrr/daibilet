@@ -127,6 +127,7 @@ const BLOG_AFTER_SUBURBS_SLUGS = new Set([
   'moscow',
   'saint-petersburg',
   'nizhny-novgorod',
+  'ekaterinburg',
 ]);
 
 export function isCityHubBlogAfterSuburbs(slug: string | null | undefined): boolean {
