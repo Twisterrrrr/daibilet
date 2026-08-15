@@ -201,7 +201,13 @@ export function PlacesHubView({
   const family = parseFamilyParam(searchParams.get('family'));
   const hasEvents = parseHasEventsParam(searchParams.get('hasEvents'));
   const sortMode = parseSortParam(searchParams.get('sort'));
-  const scope: PlacesScope = hasEvents ? 'events' : 'all';
+  const scope: PlacesScope = hasEvents
+    ? 'events'
+    : family === 'institution'
+      ? 'institutions'
+      : family === 'location'
+        ? 'locations'
+        : 'all';
   const rawUrlCity = searchParams.get('city')?.trim() || '';
   const urlCityAll = isAllCitiesQuery(rawUrlCity);
   const urlCity = urlCityAll ? '' : rawUrlCity;
@@ -667,8 +673,8 @@ export function PlacesHubView({
     return params;
   }, [searchParams, listPage]);
 
-  const allTypesOn = typeFilter === 'all';
-  const filtersActiveCount = hasEvents ? 1 : 0;
+  const allTypesOn = typeFilter === 'all' && family === 'all' && !hasEvents;
+  const filtersActiveCount = hasEvents || family !== 'all' ? 1 : 0;
 
   return (
     <>
@@ -712,6 +718,8 @@ export function PlacesHubView({
             className="w-full rounded-xl bg-[#F5F5F7] px-3 py-2.5 text-sm outline-none"
           >
             <option value="all">Все места</option>
+            <option value="institutions">Только площадки</option>
+            <option value="locations">Только локации</option>
             <option value="events">Площадки с событиями</option>
             {categoryChips.map((chip) => (
               <option key={chip.id} value={chip.id}>
