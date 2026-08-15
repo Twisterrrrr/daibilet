@@ -11,10 +11,10 @@ import {
   Ship,
   UtensilsCrossed,
 } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { CityHubSectionHeading } from '@/components/CityHubSectionHeading';
 import { HubCarouselChrome } from '@/components/HubCarouselChrome.client';
+import { useHubCardRail } from '@/hooks/useHubCardRail';
 import {
   focusFromLifehackCta,
   resolveCityLifehacks,
@@ -148,36 +148,10 @@ export function CityLifehacksSection({
 }: Props) {
   const pack = resolveCityLifehacks(citySlug);
   const items = pack?.items ?? [];
-  const scrollerRef = useRef<HTMLDivElement>(null);
-  const [index, setIndex] = useState(0);
-
-  const syncIndex = useCallback(() => {
-    const el = scrollerRef.current;
-    if (!el) return;
-    const cards = el.querySelectorAll<HTMLElement>('[data-lifehack-card]');
-    const card = cards[0];
-    if (!card) return;
-    const step = card.getBoundingClientRect().width + 16;
-    if (step < 1) return;
-    setIndex(Math.max(0, Math.min(items.length - 1, Math.round(el.scrollLeft / step))));
-  }, [items.length]);
-
-  useEffect(() => {
-    const el = scrollerRef.current;
-    if (!el) return;
-    el.scrollLeft = 0;
-    setIndex(0);
-    el.addEventListener('scroll', syncIndex, { passive: true });
-    return () => el.removeEventListener('scroll', syncIndex);
-  }, [syncIndex]);
-
-  const scrollTo = (next: number) => {
-    const el = scrollerRef.current;
-    if (!el) return;
-    const cards = el.querySelectorAll<HTMLElement>('[data-lifehack-card]');
-    const card = cards[Math.max(0, Math.min(items.length - 1, next))];
-    card?.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
-  };
+  const { scrollerRef, canPrev, canNext, onPrev, onNext } = useHubCardRail(
+    '[data-lifehack-card]',
+    `${citySlug}:${items.length}`,
+  );
 
   if (!pack) return null;
 
@@ -206,10 +180,10 @@ export function CityLifehacksSection({
         trackClassName="flex items-stretch snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain py-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden [&::-webkit-scrollbar]:h-0"
         aria-label={heading}
         showArrows={items.length > 1}
-        canPrev={index > 0}
-        canNext={index < items.length - 1}
-        onPrev={() => scrollTo(index - 1)}
-        onNext={() => scrollTo(index + 1)}
+        canPrev={canPrev}
+        canNext={canNext}
+        onPrev={onPrev}
+        onNext={onNext}
         prevLabel="Предыдущий лайфхак"
         nextLabel="Следующий лайфхак"
       >

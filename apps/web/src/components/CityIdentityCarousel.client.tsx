@@ -1,10 +1,9 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
-
 import { CityHubSectionHeading, HUB_SECTION_GAP } from '@/components/CityHubSectionHeading';
 import { HubCarouselChrome } from '@/components/HubCarouselChrome.client';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
+import { useHubCardRail } from '@/hooks/useHubCardRail';
 import {
   cityIdentitySlides,
   focusFromIdentitySlide,
@@ -25,38 +24,12 @@ export function CityIdentityCarousel({ citySlug, editorial = false, sectionId, o
   const flavor = resolveCityLocalFlavor(citySlug);
   const heading = flavor?.identityHeading || 'Чем уникален город';
   const lead = flavor?.identityLead?.trim() || '';
-  const scrollerRef = useRef<HTMLDivElement>(null);
-  const [index, setIndex] = useState(0);
-
-  const syncIndex = useCallback(() => {
-    const el = scrollerRef.current;
-    if (!el) return;
-    const cards = el.querySelectorAll<HTMLElement>('[data-identity-slide]');
-    const card = cards[0];
-    if (!card) return;
-    const step = card.getBoundingClientRect().width + 16;
-    if (step < 1) return;
-    setIndex(Math.max(0, Math.min(slides.length - 1, Math.round(el.scrollLeft / step))));
-  }, [slides.length]);
-
-  useEffect(() => {
-    const el = scrollerRef.current;
-    if (!el) return;
-    el.addEventListener('scroll', syncIndex, { passive: true });
-    return () => el.removeEventListener('scroll', syncIndex);
-  }, [syncIndex]);
-
-  const scrollTo = (next: number) => {
-    const el = scrollerRef.current;
-    if (!el) return;
-    const cards = el.querySelectorAll<HTMLElement>('[data-identity-slide]');
-    const card = cards[Math.max(0, Math.min(slides.length - 1, next))];
-    card?.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
-  };
+  const { scrollerRef, canPrev, canNext, onPrev, onNext } = useHubCardRail(
+    '[data-identity-slide]',
+    `${citySlug}:${slides.length}`,
+  );
 
   if (!slides.length) return null;
-
-  const showArrows = slides.length > 1;
 
   return (
     <section
@@ -70,11 +43,11 @@ export function CityIdentityCarousel({ citySlug, editorial = false, sectionId, o
         scrollerRef={scrollerRef}
         trackClassName="flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain py-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden [&::-webkit-scrollbar]:h-0"
         aria-label={heading}
-        showArrows={showArrows}
-        canPrev={index > 0}
-        canNext={index < slides.length - 1}
-        onPrev={() => scrollTo(index - 1)}
-        onNext={() => scrollTo(index + 1)}
+        showArrows={slides.length > 1}
+        canPrev={canPrev}
+        canNext={canNext}
+        onPrev={onPrev}
+        onNext={onNext}
         prevLabel="Предыдущий слайд"
         nextLabel="Следующий слайд"
       >
