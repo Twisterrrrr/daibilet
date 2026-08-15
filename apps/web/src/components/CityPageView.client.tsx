@@ -127,6 +127,7 @@ const CITY_HASH_ALIASES: Record<string, string> = {
   zametki: 'blog',
   festivals: 'festivals',
   festival: 'festivals',
+  venues: 'venues',
   'region-events': 'festivals',
   'region-nearby': 'affiche',
 };
@@ -140,10 +141,12 @@ const HUB_DESKTOP_NAV: Array<{ id: string; label: string }> = [
   { id: 'city-suburbs', label: 'Пригороды' },
   { id: 'affiche', label: 'События' },
   { id: 'festivals', label: 'Фестивали' },
+  { id: 'venues', label: 'Площадки' },
   { id: 'faq', label: 'FAQ' },
+  { id: 'blog', label: 'Из блога' },
 ];
 
-/** Mobile sticky labels/order (owner). No «О городе»; «Места» / «Заметки». */
+/** Mobile sticky labels/order (owner). No «О городе»; после Фестивалей - Площадки, FAQ, Из блога. */
 const HUB_MOBILE_NAV: Array<{ id: string; label: string }> = [
   { id: 'sights', label: 'Зачем ехать' },
   { id: 'city-must-see', label: 'Места' },
@@ -152,8 +155,9 @@ const HUB_MOBILE_NAV: Array<{ id: string; label: string }> = [
   { id: 'city-suburbs', label: 'Пригороды' },
   { id: 'affiche', label: 'События' },
   { id: 'festivals', label: 'Фестивали' },
-  { id: 'blog', label: 'Заметки' },
+  { id: 'venues', label: 'Площадки' },
   { id: 'faq', label: 'FAQ' },
+  { id: 'blog', label: 'Из блога' },
 ];
 
 /** Primary row before «Ещё» overflow on mobile. */
@@ -165,6 +169,9 @@ const HUB_MOBILE_PRIMARY_IDS = [
   'city-suburbs',
   'affiche',
   'festivals',
+  'venues',
+  'faq',
+  'blog',
 ] as const;
 
 const SECTION_SCROLL_MT = HUB_SECTION_SCROLL_MT;
@@ -374,22 +381,21 @@ export function CityPageView({
     // «События» = афиша + подборки + рядом; dedicated «Фестивали» → #festivals when present.
     filled.add('affiche');
     if (hasFestivalsNav) filled.add('festivals');
-    if (hasFaqBlogSplit) filled.add('faq');
+    if (hasVenues) filled.add('venues');
+    if (hasFaq) filled.add('faq');
     if (footerArticles.length > 0) filled.add('blog');
     const desktop = HUB_DESKTOP_NAV.filter((item) => filled.has(item.id));
     const mobile = HUB_MOBILE_NAV.filter((item) => filled.has(item.id));
-    const mobileExtra: Array<{ id: string; label: string }> = [];
-    const desktopExtra: Array<{ id: string; label: string }> = [];
-    if (footerArticles.length > 0) desktopExtra.push({ id: 'blog', label: 'Из блога' });
-    return { desktop, desktopExtra, mobile, mobileExtra };
+    return { desktop, desktopExtra: [], mobile, mobileExtra: [] };
   }, [
     footerArticles.length,
-    hasFaqBlogSplit,
+    hasFaq,
     hasFestivalsNav,
     hasLifehacks,
     hasMustSeeNav,
     hasRoutesNav,
     hasSuburbsNav,
+    hasVenues,
     hasWhyGoNav,
   ]);
 
