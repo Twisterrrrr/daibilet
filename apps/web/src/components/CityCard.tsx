@@ -222,13 +222,19 @@ export function CityCard({
               />
             }
           />
-          {/* Dark: soft blue band only in bottom ~30% so the photo stays open. */}
+          {/* Dark: oval scrim protruding from the left edge (owner sketch), not a flat bottom band. */}
           <div
-            className={`pointer-events-none absolute ${
-              isLight
-                ? 'inset-0 bg-gradient-to-t from-white/95 via-white/45 to-transparent'
-                : 'inset-x-0 bottom-0 h-[30%] bg-gradient-to-t from-primary-950/40 via-primary-900/18 to-transparent'
+            className={`pointer-events-none absolute inset-0 ${
+              isLight ? 'bg-gradient-to-t from-white/95 via-white/45 to-transparent' : ''
             }`}
+            style={
+              isLight
+                ? undefined
+                : {
+                    backgroundImage:
+                      'radial-gradient(ellipse 92% 105% at -8% 72%, hsl(222 55% 12% / 0.78) 0%, hsl(221 58% 18% / 0.52) 36%, hsl(221 60% 28% / 0.2) 58%, transparent 74%)',
+                  }
+            }
             aria-hidden
           />
           <div
