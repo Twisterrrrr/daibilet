@@ -1,11 +1,11 @@
-import { parseSessionStartsAt } from '@/lib/datetime';
-import { isHomeRailTabooSession } from '@/lib/home-rail-taboos';
+import { parseSessionStartsAt } from './datetime';
+import { isHomeRailTabooSession } from './home-rail-taboos';
 import {
   collectSessionImageDedupeKeys,
   sessionHasCoverImage,
   spreadCatalogSessionsByCoverImage,
   spreadSessionsForGrid,
-} from '@/lib/session-cover-image';
+} from './session-cover-image';
 import type { PublicSessionDto } from '@daibilet/contracts/public';
 
 type PublicSession = PublicSessionDto;
@@ -34,11 +34,26 @@ export function isComboSessionTitle(title: string | null | undefined): boolean {
 export const HOME_SHOWCASE_LIMIT = 8;
 export const HOME_POPULAR_LIMIT = 6;
 
+/** Soft mix so «Мероприятия» / museums are not drowned by excursion clones. */
+const EDITORS_CATEGORY_CYCLE = [
+  'Мероприятия',
+  'Экскурсии',
+  'Музеи и арт',
+  'Концерты',
+  'Театр',
+  'Речные прогулки',
+  'Активный отдых',
+  'Развлечения',
+] as const;
+
+const EDITORS_MAX_PER_CATEGORY = 3;
+
 export type HomePickState = {
   seenIds: Set<string>;
   seenTitles: Set<string>;
   seenImages: Set<string>;
   seenFamilies: Set<string>;
+  seenThemes: Set<string>;
   /** URL → content fingerprint (etag:...), from HEAD at home build time. */
   fingerprints: Map<string, string>;
 };
@@ -106,8 +121,38 @@ export function createHomePickState(seed?: Partial<HomePickState>): HomePickStat
     seenTitles: new Set(seed?.seenTitles),
     seenImages: new Set(seed?.seenImages),
     seenFamilies: new Set(seed?.seenFamilies),
+    seenThemes: new Set(seed?.seenThemes),
     fingerprints: seed?.fingerprints ?? new Map(),
   };
+}
+
+/**
+ * Collapse near-identical tourist products that reuse the same stock Hermitage /
+ * night-city flyer under different CDN asset ids (fingerprints often missing client-side).
+ */
+export function sessionEditorsThemeKey(event: Pick<PublicSession, 'title' | 'category'>): string | null {
+  const title = String(event.title || '')
+    .toLowerCase()
+    .replace(/[«»""„]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (!title) return null;
+
+  if (/ночн\w*\s+петербург|вечерн\w*\s+петербург|петербург.*лахат|лахта.*петербург|магия огней|от классики до футури/i.test(title)) {
+    return 'theme:spb-night-tour';
+  }
+  if (/пушкин|царск\w*\s+сел/i.test(title)) {
+    return 'theme:spb-pushkin-tour';
+  }
+  if (/ночн\w*\s+москв|вечерн\w*\s+москв|москва\s+ситив\w*\s+огнях/i.test(title)) {
+    return 'theme:msk-night-tour';
+  }
+  return null;
+}
+
+function sessionCategoryKey(event: PublicSession): string {
+  const raw = String(event.category || '').trim();
+  return raw || 'Прочее';
 }
 
 function sessionCoverKeys(event: PublicSession, state: HomePickState): string[] {
@@ -118,24 +163,93 @@ function sessionCoverKeys(event: PublicSession, state: HomePickState): string[] 
   return keys;
 }
 
+function canTakeSession(event: PublicSession, state: HomePickState): boolean {
+  if (!sessionHasCoverImage(event)) return false;
+  if (isHomeRailTabooSession(event)) return false;
+  const dedupeKey = sessionDedupeKey(event);
+  const familyKey = sessionFamilyKey(event);
+  if (state.seenIds.has(event.id) || state.seenTitles.has(dedupeKey) || state.seenFamilies.has(familyKey)) {
+    return false;
+  }
+  const themeKey = sessionEditorsThemeKey(event);
+  if (themeKey && state.seenThemes.has(themeKey)) return false;
+  const imageKeys = sessionCoverKeys(event, state);
+  if (imageKeys.some((key) => state.seenImages.has(key))) return false;
+  return true;
+}
+
+function markTaken(event: PublicSession, state: HomePickState): void {
+  state.seenIds.add(event.id);
+  state.seenTitles.add(sessionDedupeKey(event));
+  state.seenFamilies.add(sessionFamilyKey(event));
+  const themeKey = sessionEditorsThemeKey(event);
+  if (themeKey) state.seenThemes.add(themeKey);
+  for (const key of sessionCoverKeys(event, state)) state.seenImages.add(key);
+}
+
 function takeUnique(events: PublicSession[], max: number, state: HomePickState): PublicSession[] {
   const result: PublicSession[] = [];
   for (const event of events) {
-    if (!sessionHasCoverImage(event)) continue;
-    if (isHomeRailTabooSession(event)) continue;
-    const dedupeKey = sessionDedupeKey(event);
-    const familyKey = sessionFamilyKey(event);
-    if (state.seenIds.has(event.id) || state.seenTitles.has(dedupeKey) || state.seenFamilies.has(familyKey)) continue;
-    const imageKeys = sessionCoverKeys(event, state);
-    if (imageKeys.some((key) => state.seenImages.has(key))) continue;
-
-    state.seenIds.add(event.id);
-    state.seenTitles.add(dedupeKey);
-    state.seenFamilies.add(familyKey);
-    for (const key of imageKeys) state.seenImages.add(key);
+    if (!canTakeSession(event, state)) continue;
+    markTaken(event, state);
     result.push(event);
     if (result.length >= max) break;
   }
+  return result;
+}
+
+function takeCategoryDiverse(
+  events: PublicSession[],
+  max: number,
+  state: HomePickState,
+): PublicSession[] {
+  if (max <= 0) return [];
+
+  const byCategory = new Map<string, PublicSession[]>();
+  for (const event of events) {
+    if (!canTakeSession(event, state)) continue;
+    const key = sessionCategoryKey(event);
+    const list = byCategory.get(key) || [];
+    list.push(event);
+    byCategory.set(key, list);
+  }
+  for (const list of byCategory.values()) {
+    list.sort((a, b) => popularScore(b) - popularScore(a));
+  }
+
+  const categoryCounts = new Map<string, number>();
+  const result: PublicSession[] = [];
+  const preferred = new Set<string>(EDITORS_CATEGORY_CYCLE);
+  const cycle = [
+    ...EDITORS_CATEGORY_CYCLE.filter((name) => byCategory.has(name)),
+    ...[...byCategory.keys()].filter((name) => !preferred.has(name)),
+  ];
+
+  let guard = 0;
+  while (result.length < max && guard < max * cycle.length + 8) {
+    guard += 1;
+    let progressed = false;
+    for (const category of cycle) {
+      if (result.length >= max) break;
+      const used = categoryCounts.get(category) || 0;
+      if (used >= EDITORS_MAX_PER_CATEGORY) continue;
+      const bucket = byCategory.get(category);
+      if (!bucket?.length) continue;
+      const next = bucket.find((event) => canTakeSession(event, state));
+      if (!next) continue;
+      markTaken(next, state);
+      categoryCounts.set(category, used + 1);
+      result.push(next);
+      progressed = true;
+    }
+    if (!progressed) break;
+  }
+
+  if (result.length < max) {
+    const rest = [...events].sort((a, b) => popularScore(b) - popularScore(a));
+    result.push(...takeUnique(rest, max - result.length, state));
+  }
+
   return result;
 }
 
@@ -154,13 +268,13 @@ export function buildEditorsPickEvents(
   limit = HOME_SHOWCASE_LIMIT,
   state = createHomePickState(),
 ): PublicSession[] {
-  // Pin first (taboo / image-dupes skipped), then fill from the rest so rails stay full.
+  // Pin first (taboo / standup / image-dupes skipped), then category-diverse fill.
   const pinned = [...sessions.filter(isFeaturedEvent)].sort((a, b) => popularScore(b) - popularScore(a));
   const picked = takeUnique(pinned, limit, state);
   if (picked.length >= limit) return picked;
 
   const rest = [...sessions].sort((a, b) => popularScore(b) - popularScore(a));
-  return picked.concat(takeUnique(rest, limit - picked.length, state));
+  return picked.concat(takeCategoryDiverse(rest, limit - picked.length, state));
 }
 
 export function buildThisWeekEvents(

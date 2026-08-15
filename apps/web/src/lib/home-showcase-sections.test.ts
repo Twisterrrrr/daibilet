@@ -196,6 +196,74 @@ test('editors pick: skip identical binaries under different basenames via ETag f
   assert.ok(picked.some((s) => s.id === 'ok2'));
 });
 
+test('editors pick: skip standup; mix Мероприятия with excursions; collapse night-tour theme', () => {
+  const sessions = [
+    session({
+      id: 'standup1',
+      title: 'Стендап открытый микрофон',
+      category: 'Мероприятия',
+      slug: 'standup-1',
+      imageUrl: 'https://cdn.example/standup-a.jpg',
+      sessionCount: 200,
+      manualLandingStatus: 'PINNED',
+    }),
+    session({
+      id: 'exc1',
+      title: 'Ночной Петербург: от классики до футуризма',
+      category: 'Экскурсии',
+      slug: 'night-1',
+      imageUrl: 'https://cdn.example/night-a.jpg',
+      sessionCount: 80,
+    }),
+    session({
+      id: 'exc2',
+      title: 'Вечерний Петербург: магия огней и легенд',
+      category: 'Экскурсии',
+      slug: 'night-2',
+      imageUrl: 'https://cdn.example/night-b.jpg',
+      sessionCount: 70,
+    }),
+    session({
+      id: 'exc3',
+      title: 'Ночное волшебство Петербурга: Лахта',
+      category: 'Экскурсии',
+      slug: 'night-3',
+      imageUrl: 'https://cdn.example/night-c.jpg',
+      sessionCount: 60,
+    }),
+    session({
+      id: 'evt1',
+      title: 'Концерт в филармонии',
+      category: 'Мероприятия',
+      slug: 'concert-1',
+      imageUrl: 'https://cdn.example/concert-a.jpg',
+      sessionCount: 25,
+    }),
+    session({
+      id: 'mus1',
+      title: 'Выставка в Русском музее',
+      category: 'Музеи и арт',
+      slug: 'museum-1',
+      imageUrl: 'https://cdn.example/museum-a.jpg',
+      sessionCount: 20,
+    }),
+    session({
+      id: 'boat1',
+      title: 'Речная прогулка по Неве',
+      category: 'Речные прогулки',
+      slug: 'boat-1',
+      imageUrl: 'https://cdn.example/boat-a.jpg',
+      sessionCount: 18,
+    }),
+  ];
+
+  const picked = buildEditorsPickEvents(sessions, 5, createHomePickState());
+  assert.equal(picked.some((s) => s.id === 'standup1'), false, 'standup excluded from hub rail');
+  assert.equal(picked.filter((s) => /^exc/.test(s.id)).length, 1, 'one night-tour theme only');
+  assert.ok(picked.some((s) => s.id === 'evt1'), 'Мероприятия back in rail');
+  assert.ok(picked.some((s) => s.id === 'mus1'), 'museums mixed in');
+});
+
 test('sessionHasCoverImage rejects evt-auto category gradients', () => {
   assert.equal(
     sessionHasCoverImage({ imageUrl: '/images/events/generated/evt-auto-34e6ebcbf9bd.jpg' }),
