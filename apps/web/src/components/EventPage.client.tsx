@@ -77,7 +77,7 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
       : null;
   const scheduleSessions = [...(sessions as EventSession[]).flatMap((session) => expandSessionPurchaseVariants(session))]
     .sort(compareSessionsByStartsAt)
-    .slice(0, 32);
+    .slice(0, EVENT_PAGE_NEAREST_SLOTS);
   const allFlexible =
     scheduleSessions.length > 0 &&
     scheduleSessions.every((session) => isFlexibleScheduleSession(session));
