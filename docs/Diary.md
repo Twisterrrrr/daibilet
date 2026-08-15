@@ -17,6 +17,8 @@
 
 ---
 
+## 2026-08-15 - Hub/home UX: Lovable hero + mobile chrome + route clear
+
 ### Наблюдения
 - Owner: night hero wrong vs Lovable (photo right + mask); mushy type; «Наверх» на краю viewport; mobile hero share + secondary pills; sticky labels; burger справа; home infinite cities; places filter chips cut; /events gap hero→search; route panel без явной очистки; «В маршруте: N» шум на мобилке.
 
