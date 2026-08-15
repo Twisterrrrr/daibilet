@@ -527,9 +527,6 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         locationSlug: 'saint-petersburg-bar-orthodox', address: 'ул. Рубинштейна, 2', latitude: 59.934149, longitude: 30.345869 },
       { name: 'Ресторан «Кококо»', desc: 'Знаменитый проект Матильды Шнуровой, ставший пионером русского нью-вейва в кулинарии благодаря переосмыслению фермерских продуктов региона.', mustSeeFilter: 'gastro',
         locationSlug: 'saint-petersburg-restoran-kokoko', address: 'наб. Адмиралтейского канала, 2 (Новая Голландия)', latitude: 59.930030, longitude: 30.289389 },
-      { name: 'Булочная Ф. Вольчека', desc: 'Самая масштабная народная сеть пекарен города, сформировавшая современную культуру доступного петербургского стрит-фуда и вечерних скидок на выпечку.', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-bulochnaya-f-volcheka'
-      },
       { name: 'Общественное пространство «Двор Гостинки»', desc: 'Внутренний двор Большого Гостиного двора - летнее открытое пространство с кафе и зонами отдыха.', mustSeeFilter: 'gastro',
         locationSlug: 'saint-petersburg-obschestvennoe-prostranstvo-dvor-gostinki', address: 'Невский пр., 35 (внутренний двор)', latitude: 59.933946, longitude: 30.332995 },
       { name: 'Ресторан «Il Lago dei Cigni»', desc: 'Роскошный ресторан высокой итальянской кухни на берегу Лебяжьего пруда Крестовского острова с люстрой из селенита и панорамными окнами.', mustSeeFilter: 'gastro',
@@ -556,8 +553,6 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         locationSlug: 'saint-petersburg-konditerskaya-troyka', address: 'Загородный пр., 27', latitude: 59.924822, longitude: 30.338575 },
       { name: 'Ресторан «Мама Тута»', desc: 'Концептуальный ресторан грузинской кухни Арама Мнацаканова на Петроградской стороне с утонченным дизайном и современным прочтением классических блюд.', mustSeeFilter: 'gastro',
         locationSlug: 'saint-petersburg-restoran-mama-tuta', address: 'Зоологический пер., 2-4', latitude: 59.948242, longitude: 30.304561 },
-      { name: 'Бар «Залив»', desc: 'Уютная стильная рюмочная на острове Новая Голландия, воссоздающая атмосферу советского приморского дачного буфета в курортных Комарово.', mustSeeFilter: 'gastro',
-        locationSlug: 'saint-petersburg-bar-zaliv', address: 'ул. Некрасова, 24', latitude: 59.939864, longitude: 30.354394 },
       { name: 'Ресторан «Синтез»', desc: 'Экспериментальная гастрономическая лаборатория на Васильевском острове, совмещающая блюда молекулярной кухни с арт-перформансами.', mustSeeFilter: 'gastro',
         locationSlug: 'saint-petersburg-restoran-sintez', address: 'наб. Обводного канала, 136', latitude: 59.907080, longitude: 30.285885 },
       { name: 'Пивной бар «Диккенс»', desc: 'Огромный двухэтажный классический английский паб на набережной Фонтанки с антикварной мебелью и огромной коллекцией британского эля.', mustSeeFilter: 'gastro',

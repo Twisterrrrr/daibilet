@@ -48,8 +48,4 @@ test('SPB owner editor coords: Hermitage, Peter-Paul, Bronze Horseman', () => {
     webCityInfo,
     /name: 'Открытые дворы-колодцы \(экскурсии по дворам\)'[\s\S]{0,220}?locationSlug: 'saint-petersburg-otkrytye-dvory-kolodtsy-ekskursii-po-dvoram'\s*\}/,
   );
-  assert.match(
-    webCityInfo,
-    /name: 'Булочная Ф\. Вольчека'[\s\S]{0,280}?locationSlug: 'saint-petersburg-bulochnaya-f-volcheka'\s*\}/,
-  );
 });

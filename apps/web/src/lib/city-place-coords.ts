@@ -112,7 +112,6 @@ const SAINT_PETERSBURG_COORDS: Record<string, EditorialPlaceCoords> = {
   'saint-petersburg-bar-kollektiv': { latitude: 59.941031, longitude: 30.350325 },
   'saint-petersburg-bar-mishka': { latitude: 59.933215, longitude: 30.300067 },
   'saint-petersburg-bar-orthodox': { latitude: 59.934149, longitude: 30.345869 },
-  'saint-petersburg-bar-zaliv': { latitude: 59.939864, longitude: 30.354394 },
   'saint-petersburg-bar-zhan-zhak': { latitude: 59.929845, longitude: 30.354394 },
   'saint-petersburg-bertgold-tsentr': { latitude: 59.928495, longitude: 30.312959 },
   'saint-petersburg-bolshaya-morskaya': { latitude: 59.933857, longitude: 30.309088 },
