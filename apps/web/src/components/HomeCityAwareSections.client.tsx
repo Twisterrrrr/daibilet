@@ -21,8 +21,8 @@ export function HomeCityAwareSections({
   sessions: PublicSession[];
   fingerprints: Record<string, string>;
   sparseCatalog: boolean;
-  /** Inserted after «Выбор редакции» (e.g. popular cities). */
-  children?: ReactNode | ((ctx: { showEditorsPick: boolean }) => ReactNode);
+  /** Inserted after «Выбор редакции» (e.g. popular cities). Must be ReactNode - not a render prop (RSC). */
+  children?: ReactNode;
 }) {
   const selectedCity = useSelectedCityOptional();
   const cityReady = selectedCity?.cityReady ?? true;
@@ -85,7 +85,6 @@ export function HomeCityAwareSections({
     cityReady && cityName ? ` · ${cityName}` : !cityReady ? '' : ' · все города';
 
   const showEditorsPick = editorsPick.length > 0;
-  const inserted = typeof children === 'function' ? children({ showEditorsPick }) : children;
 
   return (
     <>
@@ -99,7 +98,17 @@ export function HomeCityAwareSections({
         sectionClassName={showEditorsPick ? 'max-sm:!pt-[calc(var(--space-section)/2)]' : undefined}
       />
 
-      {inserted}
+      {children ? (
+        <div
+          className={
+            showEditorsPick
+              ? undefined
+              : '[&_[data-home-band=full-bleed]]:!pt-[calc(var(--space-section)/2)] sm:[&_[data-home-band=full-bleed]]:!pt-[calc(var(--space-section-lg)/2)]'
+          }
+        >
+          {children}
+        </div>
+      ) : null}
 
       {mergedTabs.length ? (
         <HomeNowSection

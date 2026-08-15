@@ -17,7 +17,7 @@ const nextConfig: NextConfig = {
     },
   },
   transpilePackages: ['@daibilet/backend', '@daibilet/db', '@daibilet/contracts'],
-  serverExternalPackages: ['@prisma/client', '@prisma/adapter-pg', 'pg'],
+  serverExternalPackages: ['@prisma/client', '@prisma/adapter-pg', 'pg', 'nodemailer'],
   // Image optimizer: WebP/AVIF + long cache to avoid re-encode CPU spikes on small VPS.
   images: {
     formats: ['image/avif', 'image/webp'],

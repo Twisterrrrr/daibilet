@@ -4,7 +4,6 @@ import Link from 'next/link';
 import type { LucideIcon } from 'lucide-react';
 import {
   Anchor,
-  Bridge,
   Building2,
   Cake,
   Church,
@@ -68,7 +67,7 @@ const VIBE_ICONS: Record<CityVibeIconName, LucideIcon> = {
   Clapperboard,
   Train,
   Moon,
-  Bridge,
+  Bridge: Landmark,
   Landmark,
   Waves,
   Sun,
