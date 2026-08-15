@@ -209,9 +209,7 @@ export function CityCard({
             sizes={IMAGE_SIZES.cityCard}
             style={{ objectPosition: imageFocus }}
             className={`object-cover transition-transform duration-500 group-hover:scale-105 ${
-              isLight
-                ? 'brightness-[1.05] contrast-[1.02] saturate-[1.05]'
-                : 'brightness-[0.96] contrast-[1.04] saturate-[1.02]'
+              isLight ? 'brightness-[1.05] contrast-[1.02] saturate-[1.05]' : ''
             }`}
             fallback={
               <div
@@ -221,75 +219,63 @@ export function CityCard({
               />
             }
           />
-          {/* Dark: oval scrim protruding from the left edge (owner sketch), not a flat bottom band. */}
+          {/* Dark: owner - darken only bottom-left under title/stats; photo stays open elsewhere. */}
           <div
             className={`pointer-events-none absolute inset-0 ${
-              isLight ? 'bg-gradient-to-t from-white/95 via-white/45 to-transparent' : ''
-            }`}
-            style={
               isLight
-                ? undefined
-                : {
-                    backgroundImage:
-                      'radial-gradient(ellipse 92% 105% at -8% 72%, hsl(222 55% 12% / 0.78) 0%, hsl(221 58% 18% / 0.52) 36%, hsl(221 60% 28% / 0.2) 58%, transparent 74%)',
-                  }
-            }
+                ? 'bg-gradient-to-t from-white/95 via-white/45 to-transparent'
+                : 'bg-[radial-gradient(80%_70%_at_0%_100%,rgba(0,0,0,0.72)_0%,rgba(0,0,0,0.32)_38%,transparent_68%)]'
+            }`}
             aria-hidden
           />
           <div
-            className={`absolute inset-x-0 bottom-0 ${compact ? 'p-2 sm:p-2.5' : 'p-2.5 sm:p-3'}`}
+            className={`absolute inset-x-0 bottom-0 ${compact ? 'p-2 sm:p-2.5' : 'p-2.5 sm:p-3'} ${
+              isLight ? '' : '[text-shadow:0_1px_2px_rgba(0,0,0,0.9),0_2px_12px_rgba(0,0,0,0.55)]'
+            }`}
           >
+            <h3 className={cityCardTitleClass(titleVariant, tone)}>{city.name}</h3>
+            {showBrief ? (
+              <p
+                className={`mt-1 line-clamp-1 text-xs opacity-0 transition-opacity duration-200 group-hover:opacity-100 sm:text-sm ${
+                  isLight ? 'text-slate-600' : 'text-white/90'
+                }`}
+              >
+                {brief}
+              </p>
+            ) : null}
             <div
-              className={
-                isLight
-                  ? 'max-w-full'
-                  : 'max-w-[min(100%,16rem)] rounded-xl bg-primary-900/30 px-2.5 py-1.5 ring-1 ring-white/25 backdrop-blur-[6px] sm:max-w-[min(100%,18rem)] sm:px-3 sm:py-2'
-              }
+              className={`mt-1 flex flex-col gap-0.5 ${
+                isLight ? 'text-slate-700' : 'text-white'
+              } ${compact ? 'text-[11px] sm:text-xs' : 'text-xs sm:text-sm'}`}
             >
-              <h3 className={cityCardTitleClass(titleVariant, tone)}>{city.name}</h3>
-              {showBrief ? (
-                <p
-                  className={`mt-1 line-clamp-1 text-xs opacity-0 transition-opacity duration-200 group-hover:opacity-100 sm:text-sm ${
-                    isLight ? 'text-slate-600' : 'text-white/90'
+              <span className="flex min-w-0 items-center gap-1.5">
+                <MapPin className="h-3.5 w-3.5 shrink-0 opacity-90" strokeWidth={1.75} />
+                {city.events > 0 ? (
+                  compact ? (
+                    // Compact rails (home popular cities): CountUp stays at 0 until IO fires
+                    // inside overflow-x, so cards wrongly read «0 событий» next to venue counts.
+                    <span className="truncate font-semibold tabular-nums">{pluralEvents(city.events)}</span>
+                  ) : (
+                    <CountUp
+                      value={city.events}
+                      format={(n) => pluralEvents(n)}
+                      className="truncate font-semibold tabular-nums"
+                    />
+                  )
+                ) : (
+                  <span className="truncate">Скоро появятся события</span>
+                )}
+              </span>
+              {city.venues != null && city.venues > 0 ? (
+                <span
+                  className={`flex min-w-0 items-center gap-1.5 ${
+                    isLight ? 'text-slate-500' : 'text-white/90'
                   }`}
                 >
-                  {brief}
-                </p>
-              ) : null}
-              <div
-                className={`mt-1 flex flex-col gap-0.5 ${
-                  isLight ? 'text-slate-700' : 'text-white'
-                } ${compact ? 'text-[11px] sm:text-xs' : 'text-xs sm:text-sm'}`}
-              >
-                <span className="flex min-w-0 items-center gap-1.5">
-                  <MapPin className="h-3.5 w-3.5 shrink-0 opacity-90" strokeWidth={1.75} />
-                  {city.events > 0 ? (
-                    compact ? (
-                      // Compact rails (home popular cities): CountUp stays at 0 until IO fires
-                      // inside overflow-x, so cards wrongly read «0 событий» next to venue counts.
-                      <span className="truncate font-semibold tabular-nums">{pluralEvents(city.events)}</span>
-                    ) : (
-                      <CountUp
-                        value={city.events}
-                        format={(n) => pluralEvents(n)}
-                        className="truncate font-semibold tabular-nums"
-                      />
-                    )
-                  ) : (
-                    <span className="truncate">Скоро появятся события</span>
-                  )}
+                  <Landmark className="h-3.5 w-3.5 shrink-0 opacity-90" strokeWidth={1.75} />
+                  <span className="truncate">{pluralVenues(city.venues)}</span>
                 </span>
-                {city.venues != null && city.venues > 0 ? (
-                  <span
-                    className={`flex min-w-0 items-center gap-1.5 ${
-                      isLight ? 'text-slate-500' : 'text-white/90'
-                    }`}
-                  >
-                    <Landmark className="h-3.5 w-3.5 shrink-0 opacity-90" strokeWidth={1.75} />
-                    <span className="truncate">{pluralVenues(city.venues)}</span>
-                  </span>
-                ) : null}
-              </div>
+              ) : null}
             </div>
           </div>
         </div>
