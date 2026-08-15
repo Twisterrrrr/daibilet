@@ -222,68 +222,68 @@ export function CityCard({
               />
             }
           />
-          {/* Dark tone: keep daylight covers vivid up top, put a readable band under type. */}
+          {/* Soft full-card fade; dark tone also gets a content-hugging frosted panel below. */}
           <div
             className={`pointer-events-none absolute inset-0 ${
               isLight
                 ? 'bg-gradient-to-t from-white/95 via-white/45 to-transparent'
-                : 'bg-gradient-to-t from-black/78 via-black/38 to-black/10'
+                : 'bg-gradient-to-t from-black/45 via-black/15 to-transparent'
             }`}
           />
-          {!isLight ? (
-            <div
-              className="pointer-events-none absolute inset-0 bg-[radial-gradient(75%_55%_at_0%_100%,rgba(0,0,0,0.55)_0%,transparent_62%)]"
-              aria-hidden
-            />
-          ) : null}
           <div
-            className={`absolute inset-x-0 bottom-0 ${compact ? 'p-2.5 sm:p-3' : 'p-3 sm:p-3.5'} ${
-              isLight ? '' : '[text-shadow:0_1px_2px_rgba(0,0,0,0.95),0_2px_14px_rgba(0,0,0,0.65)]'
-            }`}
+            className={`absolute inset-x-0 bottom-0 ${compact ? 'p-2 sm:p-2.5' : 'p-2.5 sm:p-3'}`}
           >
-            <h3 className={cityCardTitleClass(titleVariant, tone)}>{city.name}</h3>
-            {showBrief ? (
-              <p
-                className={`mt-1 line-clamp-1 text-xs opacity-0 transition-opacity duration-200 group-hover:opacity-100 sm:text-sm ${
-                  isLight ? 'text-slate-600' : 'text-white/80'
-                }`}
-              >
-                {brief}
-              </p>
-            ) : null}
             <div
-              className={`mt-1.5 flex flex-col gap-0.5 ${
-                isLight ? 'text-slate-700' : 'text-white'
-              } ${compact ? 'text-[11px] sm:text-xs' : 'text-xs sm:text-sm'}`}
+              className={
+                isLight
+                  ? 'max-w-full'
+                  : 'max-w-[min(100%,20rem)] rounded-xl bg-black/45 px-2.5 py-2 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.55)] ring-1 ring-white/15 backdrop-blur-md sm:px-3 sm:py-2.5'
+              }
             >
-              <span className="flex min-w-0 items-center gap-1.5">
-                <MapPin className="h-3.5 w-3.5 shrink-0 opacity-90" strokeWidth={1.75} />
-                {city.events > 0 ? (
-                  compact ? (
-                    // Compact rails (home popular cities): CountUp stays at 0 until IO fires
-                    // inside overflow-x, so cards wrongly read «0 событий» next to venue counts.
-                    <span className="truncate font-semibold tabular-nums">{pluralEvents(city.events)}</span>
-                  ) : (
-                    <CountUp
-                      value={city.events}
-                      format={(n) => pluralEvents(n)}
-                      className="truncate font-semibold tabular-nums"
-                    />
-                  )
-                ) : (
-                  <span className="truncate">Скоро появятся события</span>
-                )}
-              </span>
-              {city.venues != null && city.venues > 0 ? (
-                <span
-                  className={`flex min-w-0 items-center gap-1.5 ${
-                    isLight ? 'text-slate-500' : 'text-white/85'
+              <h3 className={cityCardTitleClass(titleVariant, tone)}>{city.name}</h3>
+              {showBrief ? (
+                <p
+                  className={`mt-1 line-clamp-1 text-xs opacity-0 transition-opacity duration-200 group-hover:opacity-100 sm:text-sm ${
+                    isLight ? 'text-slate-600' : 'text-white/85'
                   }`}
                 >
-                  <Landmark className="h-3.5 w-3.5 shrink-0 opacity-90" strokeWidth={1.75} />
-                  <span className="truncate">{pluralVenues(city.venues)}</span>
-                </span>
+                  {brief}
+                </p>
               ) : null}
+              <div
+                className={`mt-1.5 flex flex-col gap-0.5 ${
+                  isLight ? 'text-slate-700' : 'text-white'
+                } ${compact ? 'text-[11px] sm:text-xs' : 'text-xs sm:text-sm'}`}
+              >
+                <span className="flex min-w-0 items-center gap-1.5">
+                  <MapPin className="h-3.5 w-3.5 shrink-0 opacity-90" strokeWidth={1.75} />
+                  {city.events > 0 ? (
+                    compact ? (
+                      // Compact rails (home popular cities): CountUp stays at 0 until IO fires
+                      // inside overflow-x, so cards wrongly read «0 событий» next to venue counts.
+                      <span className="truncate font-semibold tabular-nums">{pluralEvents(city.events)}</span>
+                    ) : (
+                      <CountUp
+                        value={city.events}
+                        format={(n) => pluralEvents(n)}
+                        className="truncate font-semibold tabular-nums"
+                      />
+                    )
+                  ) : (
+                    <span className="truncate">Скоро появятся события</span>
+                  )}
+                </span>
+                {city.venues != null && city.venues > 0 ? (
+                  <span
+                    className={`flex min-w-0 items-center gap-1.5 ${
+                      isLight ? 'text-slate-500' : 'text-white/90'
+                    }`}
+                  >
+                    <Landmark className="h-3.5 w-3.5 shrink-0 opacity-90" strokeWidth={1.75} />
+                    <span className="truncate">{pluralVenues(city.venues)}</span>
+                  </span>
+                ) : null}
+              </div>
             </div>
           </div>
         </div>
