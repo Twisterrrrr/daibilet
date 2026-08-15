@@ -219,7 +219,7 @@ export function LocationCard({
             </div>
 
             {blurb ? (
-              <p className="line-clamp-2 text-xs leading-relaxed text-graphite-muted">{blurb}</p>
+              <p className="text-xs leading-relaxed text-graphite-muted">{blurb}</p>
             ) : null}
 
             {showMiniAfisha ? (
