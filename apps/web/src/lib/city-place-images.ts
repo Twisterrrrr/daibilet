@@ -217,7 +217,7 @@ const NIZHNY_NOVGOROD_IMAGES: Record<string, string> = {
   "nizhny-novgorod-blagoveschenskiy-monastyr": "/images/venues/nizhny-novgorod/blagoveshchenskiy-monastyr.jpg",
   "nizhny-novgorod-mihailo-arhangelskiy-sobor": "/images/venues/nizhny-novgorod/mihailo-arhangelskiy-sobor.jpg",
   "nizhny-novgorod-staroyarmarochnyy-sobor": "/images/venues/nizhny-novgorod/staroyarmarochniy-sobor.jpg",
-  "nizhny-novgorod-arsenal-gtsisi": "/images/venues/nizhny-novgorod/arsenal-museum.jpg",
+  "nizhny-novgorod-arsenal-gtsisi": "/images/venues/nizhny-novgorod/arsenal-gtsisi.jpg",
   "nizhny-novgorod-muzey-istorii-gaz": "/images/venues/nizhny-novgorod/gaz-museum.jpg",
   "nizhny-novgorod-domik-kashirina": "/images/venues/nizhny-novgorod/domik-kashirina.jpg",
   "nizhny-novgorod-tehnicheskiy-muzey": "/images/venues/nizhny-novgorod/technical-museum.jpg",
