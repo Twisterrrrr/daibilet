@@ -1108,7 +1108,13 @@ export function mergeMonumentMustSeeIntoCityInfo(
     for (const extra of extras) {
       const key = placeKey(extra);
       if (!key || seen.has(key)) continue;
-      entry.mustSee.push({ ...extra });
+      // Pack used to dump iconic statues into «Главные» - own chip + photo stop duration.
+      const filter = extra.mustSeeFilter === 'creative' ? 'creative' : 'monument';
+      entry.mustSee.push({
+        ...extra,
+        mustSeeFilter: filter,
+        visitMinutes: typeof extra.visitMinutes === 'number' ? extra.visitMinutes : 15,
+      });
       seen.add(key);
     }
   }

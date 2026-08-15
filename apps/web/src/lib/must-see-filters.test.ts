@@ -75,14 +75,38 @@ test('classifyMustSeePlace: Nizhny landmarks vs gastro vs museum vs park vs temp
     }),
     'temple',
   );
-  // Street with «гастро» in desc stays landmark (locationSlug).
+  assert.equal(
+    classifyMustSeePlace({
+      name: 'Памятник Жюлю Верну',
+      desc: 'Писатель на воздушном шаре',
+      locationSlug: 'nizhny-novgorod-pamyatnik-zhyulyu-vernu',
+    }),
+    'monument',
+  );
+  assert.equal(
+    classifyMustSeePlace({
+      name: 'Большая Покровская улица',
+      desc: 'Пешеходный маршрут',
+      locationSlug: 'nizhny-novgorod-bol-shaya-pokrovskaya-ulitsa',
+    }),
+    'street',
+  );
+  assert.equal(
+    classifyMustSeePlace({
+      name: 'Чкаловская лестница',
+      desc: 'Спуск к Волге',
+      locationSlug: 'nizhny-novgorod-chkalovskaya-lestnitsa',
+    }),
+    'views',
+  );
+  // Pedestrian streets → «Улицы» (duration still via visitMinutes when curated).
   assert.equal(
     classifyMustSeePlace({
       name: 'Рождественская улица',
       desc: 'Гастрономический и исторический квартал',
       locationSlug: 'nizhny-novgorod-rozhdestvenskaya-ulitsa',
     }),
-    'main',
+    'street',
   );
   // Strelka mentions собор in desc - still main by name/slug.
   assert.equal(
@@ -142,5 +166,6 @@ test('mustSeeFilterStopTypeTag maps views/park/temple to stop pills', () => {
   assert.equal(mustSeeFilterStopTypeTag('views'), 'Смотровая');
   assert.equal(mustSeeFilterStopTypeTag('park'), 'Парк');
   assert.equal(mustSeeFilterStopTypeTag('temple'), 'Храм');
+  assert.equal(mustSeeFilterStopTypeTag('monument'), 'Памятник');
   assert.equal(mustSeeFilterStopTypeTag('mansions'), 'Особняк');
 });

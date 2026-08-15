@@ -17,6 +17,7 @@ export type MustSeeFilterId =
   | 'street'
   | 'park'
   | 'temple'
+  | 'monument'
   | 'creative'
   | 'secret'
   | 'houses'
@@ -47,6 +48,7 @@ const FILTER_LABELS: Record<MustSeeFilterId, string> = {
   street: 'Улицы / дворы',
   park: 'Парки',
   temple: 'Храмы',
+  monument: 'Памятники',
   creative: 'Необычное',
   secret: 'Секретные',
   houses: 'Доходные дома и парадные',
@@ -63,6 +65,7 @@ const FILTER_ORDER: MustSeeFilterId[] = [
   'street',
   'park',
   'temple',
+  'monument',
   'creative',
   'secret',
   'houses',
@@ -153,8 +156,34 @@ function isTemple(place: MustSeeClassifyInput, kind: string): boolean {
   return false;
 }
 
+function isMonument(place: MustSeeClassifyInput): boolean {
+  const slug = slugHaystack(place);
+  const name = nameHaystack(place);
+  if (/(?:^|[-_/])(?:pamyatnik|skulptura|monument|memorial)(?:$|[-_/])/i.test(slug)) return true;
+  if (/^памятник\b|^скульптур|^монумент\b/i.test(name)) return true;
+  // Ship-monument / genre photo stops without «памятник» in the title.
+  if (/судно-памятник|катер.?«?герой/i.test(haystack(place))) return true;
+  return false;
+}
+
+function isStreet(place: MustSeeClassifyInput): boolean {
+  const slug = slugHaystack(place);
+  const name = nameHaystack(place);
+  if (/(?:^|[-_/])(?:ulitsa|street|prospekt|pereulok|ploschad)(?:$|[-_/])/i.test(slug)) return true;
+  if (/\bулица\b|\bпроспект\b|\bпереулок\b|^площадь\b/i.test(name)) return true;
+  return false;
+}
+
+function isViews(place: MustSeeClassifyInput): boolean {
+  const slug = slugHaystack(place);
+  const name = nameHaystack(place);
+  if (/strelka|smotrov|lestnitsa|kanatnaya/i.test(slug)) return true;
+  if (/стрелка|смотров|лестниц|канатн/i.test(name)) return true;
+  return false;
+}
+
 /**
- * Single category for a must-see row. Priority: gastro → museum → park → temple → main.
+ * Single category for a must-see row. Priority: gastro → museum → park → temple → monument → street → views → main.
  */
 export function classifyMustSeePlace(place: MustSeeClassifyInput): MustSeeFilterId {
   const override = place.mustSeeFilter;
@@ -168,6 +197,7 @@ export function classifyMustSeePlace(place: MustSeeClassifyInput): MustSeeFilter
     override === 'street' ||
     override === 'park' ||
     override === 'temple' ||
+    override === 'monument' ||
     override === 'creative' ||
     override === 'secret' ||
     override === 'houses' ||
@@ -182,6 +212,9 @@ export function classifyMustSeePlace(place: MustSeeClassifyInput): MustSeeFilter
   if (isMuseum(place, kind) || isMuseum(place, normalized)) return 'museum';
   if (isParkOrEmbankment(place, kind) || isParkOrEmbankment(place, normalized)) return 'park';
   if (isTemple(place, kind)) return 'temple';
+  if (isMonument(place)) return 'monument';
+  if (isStreet(place)) return 'street';
+  if (isViews(place)) return 'views';
   return 'main';
 }
 
@@ -200,6 +233,7 @@ const STOP_TYPE_BY_FILTER: Record<MustSeeFilterId, string> = {
   street: 'Прогулка',
   park: 'Парк',
   temple: 'Храм',
+  monument: 'Памятник',
   creative: 'Арт-объект',
   secret: 'Необычное',
   houses: 'Архитектура',
@@ -224,6 +258,7 @@ export function buildMustSeeFilterTabs(
     street: 0,
     park: 0,
     temple: 0,
+    monument: 0,
     creative: 0,
     secret: 0,
     houses: 0,

@@ -13,9 +13,10 @@ export type MonumentMustSeeItem = {
   desc: string;
   address?: string | null;
   locationSlug: string;
-  mustSeeFilter: 'main' | 'creative';
+  mustSeeFilter: 'main' | 'monument' | 'creative';
   latitude?: number | null;
   longitude?: number | null;
+  visitMinutes?: number;
 };
 
 export const CITY_MONUMENTS_MUST_SEE: Record<string, MonumentMustSeeItem[]> = {
@@ -1108,7 +1109,12 @@ export function mergeMonumentMustSeeIntoCityInfo(
     for (const extra of extras) {
       const key = placeKey(extra);
       if (!key || seen.has(key)) continue;
-      entry.mustSee.push({ ...extra });
+      const filter = extra.mustSeeFilter === 'creative' ? 'creative' : 'monument';
+      entry.mustSee.push({
+        ...extra,
+        mustSeeFilter: filter,
+        visitMinutes: typeof extra.visitMinutes === 'number' ? extra.visitMinutes : 15,
+      });
       seen.add(key);
     }
   }

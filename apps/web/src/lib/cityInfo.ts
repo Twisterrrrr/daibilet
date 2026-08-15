@@ -34,6 +34,7 @@ export type CityMustSeeItem = CityPlaceLinkFields & {
     | 'street'
     | 'park'
     | 'temple'
+    | 'monument'
     | 'creative'
     | 'secret'
     | 'houses'
@@ -3996,63 +3997,63 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'Знаете ли вы, что местная Чкаловская лестница построена в виде математической восьмерки, а её 560 ступеней - это почти в три раза больше, чем на знаменитой Потемкинской лестнице в Одессе? Отсюда открывается один из лучших панорамных видов в европейской части России.',
     mustSee: [
       { name: 'Нижегородский Кремль', desc: 'Древняя кирпичная крепость с 13 башнями и прогулочной зоной прямо по крепостной стене',
-        locationSlug: 'nizhny-novgorod-nizhegorodskiy-kreml'
+        locationSlug: 'nizhny-novgorod-nizhegorodskiy-kreml', mustSeeFilter: 'main', visitMinutes: 60
       },
       { name: 'Чкаловская лестница', desc: 'Монументальная лестница в виде восьмёрки, спускающаяся от Кремля к самой Волге',
-        locationSlug: 'nizhny-novgorod-chkalovskaya-lestnitsa'
+        locationSlug: 'nizhny-novgorod-chkalovskaya-lestnitsa', mustSeeFilter: 'main', visitMinutes: 30
       },
       { name: 'Большая Покровская улица', desc: 'Пешеходный маршрут через исторический центр с купеческой архитектурой и уличными театрами',
-        locationSlug: 'nizhny-novgorod-bol-shaya-pokrovskaya-ulitsa'
+        locationSlug: 'nizhny-novgorod-bol-shaya-pokrovskaya-ulitsa', mustSeeFilter: 'street', visitMinutes: 20
       },
       { name: 'Нижегородская канатная дорога', desc: 'Воздушная переправа через Волгу до города Бор с живописными видами на речные просторы',
-        locationSlug: 'nizhny-novgorod-nizhegorodskaya-kanatnaya-doroga'
+        locationSlug: 'nizhny-novgorod-nizhegorodskaya-kanatnaya-doroga', mustSeeFilter: 'main', visitMinutes: 30
       },
       { name: 'Стрелка рек Волги и Оки', desc: 'Место слияния двух великих рек, где расположены собор Александра Невского и современные пакгаузы',
-        locationSlug: 'nizhny-novgorod-strelka-rek-volgi-i-oki'
+        locationSlug: 'nizhny-novgorod-strelka-rek-volgi-i-oki', mustSeeFilter: 'views', visitMinutes: 40
       },
       { name: 'Набережная Фёдоровского', desc: 'Лучшая смотровая площадка города с благоустроенными террасами для встречи закатов',
-        locationSlug: 'nizhny-novgorod-naberezhnaya-fedorovskogo'
+        locationSlug: 'nizhny-novgorod-naberezhnaya-fedorovskogo', mustSeeFilter: 'views', visitMinutes: 40
       },
-      { name: 'Нижегородская ярмарка', desc: 'Главный ярмарочный дом - символ купеческого Нижнего', locationSlug: 'nizhny-novgorod-nizhegorodskaya-yarmarka' },
-      { name: 'Усадьба Рукавишниковых', desc: 'Купеческий дворец-музей на Верхне-Волжской', locationSlug: 'nizhny-novgorod-usadba-rukavishnikovyh' },
-      { name: 'Государственный банк', desc: 'Сказочный терем неорусского стиля на Покровке', locationSlug: 'nizhny-novgorod-gosudarstvennyy-bank' },
-      { name: 'Площадь Минина и Пожарского', desc: 'Сердце города у стен Кремля', locationSlug: 'nizhny-novgorod-ploschad-minina-i-pozharskogo' },
-      { name: 'Палаты Строгановых', desc: 'Белокаменные купеческие палаты XVII века', locationSlug: 'nizhny-novgorod-palaty-stroganovyh' },
-      { name: 'Ромодановский вокзал', desc: 'Возрожденный вокзал у Оки', locationSlug: 'nizhny-novgorod-romodanovskiy-vokzal' },
-      { name: 'Площадь Лядова', desc: 'Исторический транспортный узел', locationSlug: 'nizhny-novgorod-ploschad-lyadova' },
-      { name: 'Домик Петра I', desc: 'Палаты купца Чатыгина XVII века', locationSlug: 'nizhny-novgorod-domik-petra-i' },
-      { name: 'Нижне-Волжская набережная', desc: 'Главный променад у воды', locationSlug: 'nizhny-novgorod-nizhne-volzhskaya-naberezhnaya' },
-      { name: 'Верхне-Волжская набережная', desc: 'Аристократический променад над Волгой', locationSlug: 'nizhny-novgorod-verhne-volzhskaya-naberezhnaya' },
-      { name: 'Рождественская улица', desc: 'Гастрономический и исторический квартал', locationSlug: 'nizhny-novgorod-rozhdestvenskaya-ulitsa' },
-      { name: 'Парк «Швейцария»', desc: 'Самый большой зеленый парк города', locationSlug: 'nizhny-novgorod-park-shveytsariya' },
-      { name: 'Сормовский парк', desc: 'Сосновый бор, аттракционы и озера', locationSlug: 'nizhny-novgorod-sormovskiy-park' },
-      { name: 'Почаинский бульвар', desc: 'Тихий променад над оврагом', locationSlug: 'nizhny-novgorod-pochainskiy-bulvar' },
-      { name: 'Александровский сад', desc: 'Исторический парк на склоне', locationSlug: 'nizhny-novgorod-aleksandrovskiy-sad' },
-      { name: 'Пакгаузы на Стрелке', desc: 'Индустриальная архитектура и концертный зал', locationSlug: 'nizhny-novgorod-pakgauzy-na-strelke' },
-      { name: 'Щёлоковский хутор', desc: 'Заповедный лес и три озера', locationSlug: 'nizhny-novgorod-schelokovskiy-hutor' },
-      { name: 'Собор Александра Невского', desc: 'Грандиозный храм у слияния рек', locationSlug: 'nizhny-novgorod-sobor-aleksandra-nevskogo' },
-      { name: 'Строгановская церковь', desc: 'Вершина русского барокко', locationSlug: 'nizhny-novgorod-stroganovskaya-tserkov' },
-      { name: 'Печерский монастырь', desc: 'Древняя обитель с наклонной колокольней', locationSlug: 'nizhny-novgorod-pecherskiy-monastyr' },
-      { name: 'Благовещенский монастырь', desc: 'Древнейшая обитель Поволжья', locationSlug: 'nizhny-novgorod-blagoveschenskiy-monastyr' },
-      { name: 'Михайло-Архангельский собор', desc: 'Древнейший храм Кремля', locationSlug: 'nizhny-novgorod-mihailo-arhangelskiy-sobor' },
-      { name: 'Староярмарочный собор', desc: 'Классический шедевр Монферрана', locationSlug: 'nizhny-novgorod-staroyarmarochnyy-sobor' },
-      { name: 'Арсенал ГЦСИ', desc: 'Центр современного искусства в Кремле', venueSlug: 'nizhny-novgorod-arsenal-gtsisi' },
-      { name: 'Музей истории ГАЗ', desc: 'Легендарные советские автомобили', venueSlug: 'nizhny-novgorod-muzey-istorii-gaz' },
-      { name: 'Домик Каширина', desc: 'Музей детства Максима Горького', venueSlug: 'nizhny-novgorod-domik-kashirina' },
-      { name: 'Технический музей', desc: 'Старинные инструменты и механизмы', venueSlug: 'nizhny-novgorod-tehnicheskiy-muzey' },
-      { name: 'Русский музей фотографии', desc: 'Дагерротипы и история русской съемки', venueSlug: 'nizhny-novgorod-russkiy-muzey-fotografii' },
-      { name: 'Памятник Жюлю Верну', desc: 'Писатель на воздушном шаре', locationSlug: 'nizhny-novgorod-pamyatnik-zhyulyu-vernu' },
-      { name: 'Катер «Герой»', desc: 'Судно-памятник у Чкаловской лестницы', locationSlug: 'nizhny-novgorod-kater-geroy' },
-      { name: 'Селёдка и Кофе', desc: 'Культовое кафе-бар на Рождественской', venueSlug: 'nizhny-novgorod-seledka-i-kofe' },
-      { name: 'Безухов', desc: 'Литературное кафе с волжской кухней', venueSlug: 'nizhny-novgorod-bezuhov-cafe' },
-      { name: 'Лепи Тесто', desc: 'Авторские пельмени на Покровке', venueSlug: 'nizhny-novgorod-lepi-testo' },
-      { name: 'Yale', desc: 'Высокая кухня в усадьбе XIX века', venueSlug: 'nizhny-novgorod-yale-restaurant' },
-      { name: 'Red Wall', desc: 'Гастрономия у подножия Кремля', venueSlug: 'nizhny-novgorod-red-wall-restaurant' },
-      { name: 'Пяткинъ', desc: 'Купеческий обед в старинной усадьбе', venueSlug: 'nizhny-novgorod-pyatkin-traktir' },
-      { name: 'Mitrich', desc: 'Стейкхаус премиум-класса', venueSlug: 'nizhny-novgorod-mitrich-restaurant' },
-      { name: 'Медные Трубы', desc: 'Секретный камерный коктейльный бар', venueSlug: 'nizhny-novgorod-mednye-truby-bar' },
-      { name: 'Юла Pizza', desc: 'Неаполитанская пицца во дворе Покровки', venueSlug: 'nizhny-novgorod-yula-pizza' },
-      { name: 'Фонотека', desc: 'Арт-бар с винилом и джазом', venueSlug: 'nizhny-novgorod-fonoteca-bar' },
+      { name: 'Нижегородская ярмарка', desc: 'Главный ярмарочный дом - символ купеческого Нижнего', locationSlug: 'nizhny-novgorod-nizhegorodskaya-yarmarka', mustSeeFilter: 'main', visitMinutes: 60 },
+      { name: 'Усадьба Рукавишниковых', desc: 'Купеческий дворец-музей на Верхне-Волжской', locationSlug: 'nizhny-novgorod-usadba-rukavishnikovyh', mustSeeFilter: 'museum', visitMinutes: '1-2 ч' },
+      { name: 'Государственный банк', desc: 'Сказочный терем неорусского стиля на Покровке', locationSlug: 'nizhny-novgorod-gosudarstvennyy-bank', mustSeeFilter: 'houses', visitMinutes: 20 },
+      { name: 'Площадь Минина и Пожарского', desc: 'Сердце города у стен Кремля', locationSlug: 'nizhny-novgorod-ploschad-minina-i-pozharskogo', mustSeeFilter: 'main', visitMinutes: 20 },
+      { name: 'Палаты Строгановых', desc: 'Белокаменные купеческие палаты XVII века', locationSlug: 'nizhny-novgorod-palaty-stroganovyh', mustSeeFilter: 'houses', visitMinutes: 30 },
+      { name: 'Ромодановский вокзал', desc: 'Возрожденный вокзал у Оки', locationSlug: 'nizhny-novgorod-romodanovskiy-vokzal', mustSeeFilter: 'houses', visitMinutes: 20 },
+      { name: 'Площадь Лядова', desc: 'Исторический транспортный узел', locationSlug: 'nizhny-novgorod-ploschad-lyadova', mustSeeFilter: 'main', visitMinutes: 15 },
+      { name: 'Домик Петра I', desc: 'Палаты купца Чатыгина XVII века', locationSlug: 'nizhny-novgorod-domik-petra-i', mustSeeFilter: 'museum', visitMinutes: 60 },
+      { name: 'Нижне-Волжская набережная', desc: 'Главный променад у воды', locationSlug: 'nizhny-novgorod-nizhne-volzhskaya-naberezhnaya', mustSeeFilter: 'views', visitMinutes: 60 },
+      { name: 'Верхне-Волжская набережная', desc: 'Аристократический променад над Волгой', locationSlug: 'nizhny-novgorod-verhne-volzhskaya-naberezhnaya', mustSeeFilter: 'views', visitMinutes: 45 },
+      { name: 'Рождественская улица', desc: 'Гастрономический и исторический квартал', locationSlug: 'nizhny-novgorod-rozhdestvenskaya-ulitsa', mustSeeFilter: 'street', visitMinutes: 20 },
+      { name: 'Парк «Швейцария»', desc: 'Самый большой зеленый парк города', locationSlug: 'nizhny-novgorod-park-shveytsariya', mustSeeFilter: 'park', visitMinutes: '1-2 ч' },
+      { name: 'Сормовский парк', desc: 'Сосновый бор, аттракционы и озера', locationSlug: 'nizhny-novgorod-sormovskiy-park', mustSeeFilter: 'park', visitMinutes: '1-2 ч' },
+      { name: 'Почаинский бульвар', desc: 'Тихий променад над оврагом', locationSlug: 'nizhny-novgorod-pochainskiy-bulvar', mustSeeFilter: 'street', visitMinutes: 25 },
+      { name: 'Александровский сад', desc: 'Исторический парк на склоне', locationSlug: 'nizhny-novgorod-aleksandrovskiy-sad', mustSeeFilter: 'park', visitMinutes: 60 },
+      { name: 'Пакгаузы на Стрелке', desc: 'Индустриальная архитектура и концертный зал', locationSlug: 'nizhny-novgorod-pakgauzy-na-strelke', mustSeeFilter: 'creative', visitMinutes: 60 },
+      { name: 'Щёлоковский хутор', desc: 'Заповедный лес и три озера', locationSlug: 'nizhny-novgorod-schelokovskiy-hutor', mustSeeFilter: 'park', visitMinutes: '1-2 ч' },
+      { name: 'Собор Александра Невского', desc: 'Грандиозный храм у слияния рек', locationSlug: 'nizhny-novgorod-sobor-aleksandra-nevskogo', mustSeeFilter: 'temple', visitMinutes: 30 },
+      { name: 'Строгановская церковь', desc: 'Вершина русского барокко', locationSlug: 'nizhny-novgorod-stroganovskaya-tserkov', mustSeeFilter: 'temple', visitMinutes: 30 },
+      { name: 'Печерский монастырь', desc: 'Древняя обитель с наклонной колокольней', locationSlug: 'nizhny-novgorod-pecherskiy-monastyr', mustSeeFilter: 'temple', visitMinutes: 45 },
+      { name: 'Благовещенский монастырь', desc: 'Древнейшая обитель Поволжья', locationSlug: 'nizhny-novgorod-blagoveschenskiy-monastyr', mustSeeFilter: 'temple', visitMinutes: 45 },
+      { name: 'Михайло-Архангельский собор', desc: 'Древнейший храм Кремля', locationSlug: 'nizhny-novgorod-mihailo-arhangelskiy-sobor', mustSeeFilter: 'temple', visitMinutes: 30 },
+      { name: 'Староярмарочный собор', desc: 'Классический шедевр Монферрана', locationSlug: 'nizhny-novgorod-staroyarmarochnyy-sobor', mustSeeFilter: 'temple', visitMinutes: 30 },
+      { name: 'Арсенал ГЦСИ', desc: 'Центр современного искусства в Кремле', venueSlug: 'nizhny-novgorod-arsenal-gtsisi', mustSeeFilter: 'museum', visitMinutes: '1-2 ч' },
+      { name: 'Музей истории ГАЗ', desc: 'Легендарные советские автомобили', venueSlug: 'nizhny-novgorod-muzey-istorii-gaz', mustSeeFilter: 'museum', visitMinutes: '1-2 ч' },
+      { name: 'Домик Каширина', desc: 'Музей детства Максима Горького', venueSlug: 'nizhny-novgorod-domik-kashirina', mustSeeFilter: 'museum', visitMinutes: 60 },
+      { name: 'Технический музей', desc: 'Старинные инструменты и механизмы', venueSlug: 'nizhny-novgorod-tehnicheskiy-muzey', mustSeeFilter: 'museum', visitMinutes: 60 },
+      { name: 'Русский музей фотографии', desc: 'Дагерротипы и история русской съемки', venueSlug: 'nizhny-novgorod-russkiy-muzey-fotografii', mustSeeFilter: 'museum', visitMinutes: 60 },
+      { name: 'Памятник Жюлю Верну', desc: 'Писатель на воздушном шаре', locationSlug: 'nizhny-novgorod-pamyatnik-zhyulyu-vernu', mustSeeFilter: 'monument', visitMinutes: 15 },
+      { name: 'Катер «Герой»', desc: 'Судно-памятник у Чкаловской лестницы', locationSlug: 'nizhny-novgorod-kater-geroy', mustSeeFilter: 'monument', visitMinutes: 15 },
+      { name: 'Селёдка и Кофе', desc: 'Культовое кафе-бар на Рождественской', venueSlug: 'nizhny-novgorod-seledka-i-kofe', mustSeeFilter: 'gastro', visitMinutes: 60 },
+      { name: 'Безухов', desc: 'Литературное кафе с волжской кухней', venueSlug: 'nizhny-novgorod-bezuhov-cafe', mustSeeFilter: 'gastro', visitMinutes: 60 },
+      { name: 'Лепи Тесто', desc: 'Авторские пельмени на Покровке', venueSlug: 'nizhny-novgorod-lepi-testo', mustSeeFilter: 'gastro', visitMinutes: 60 },
+      { name: 'Yale', desc: 'Высокая кухня в усадьбе XIX века', venueSlug: 'nizhny-novgorod-yale-restaurant', mustSeeFilter: 'gastro', visitMinutes: 60 },
+      { name: 'Red Wall', desc: 'Гастрономия у подножия Кремля', venueSlug: 'nizhny-novgorod-red-wall-restaurant', mustSeeFilter: 'gastro', visitMinutes: 60 },
+      { name: 'Пяткинъ', desc: 'Купеческий обед в старинной усадьбе', venueSlug: 'nizhny-novgorod-pyatkin-traktir', mustSeeFilter: 'gastro', visitMinutes: 60 },
+      { name: 'Mitrich', desc: 'Стейкхаус премиум-класса', venueSlug: 'nizhny-novgorod-mitrich-restaurant', mustSeeFilter: 'gastro', visitMinutes: 60 },
+      { name: 'Медные Трубы', desc: 'Секретный камерный коктейльный бар', venueSlug: 'nizhny-novgorod-mednye-truby-bar', mustSeeFilter: 'gastro', visitMinutes: 60 },
+      { name: 'Юла Pizza', desc: 'Неаполитанская пицца во дворе Покровки', venueSlug: 'nizhny-novgorod-yula-pizza', mustSeeFilter: 'gastro', visitMinutes: 60 },
+      { name: 'Фонотека', desc: 'Арт-бар с винилом и джазом', venueSlug: 'nizhny-novgorod-fonoteca-bar', mustSeeFilter: 'gastro', visitMinutes: 60 },
     ],
     significantSuburbs: [
       {
@@ -4074,43 +4075,50 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
             name: 'Феодоровский монастырь',
             desc: 'действующая обитель - первая точка после автостанции',
             latitude: 56.6505,
-            longitude: 43.4685
+            longitude: 43.4685,
+            visitMinutes: 45,
           },
           {
             name: 'Торговая площадь / центр',
             desc: 'историческое ядро с купеческими домами и лавками',
             latitude: 56.644,
-            longitude: 43.472
+            longitude: 43.472,
+            visitMinutes: 20,
           },
           {
             name: 'Музей городецкого пряника',
             desc: 'пряничная традиция и мастер-классы - старт музейного квартала',
             latitude: 56.6442,
-            longitude: 43.4715
+            longitude: 43.4715,
+            visitMinutes: 60,
           },
           {
             name: 'Музей самоваров',
             desc: 'одна из лучших коллекций самоваров в России',
             latitude: 56.6455,
-            longitude: 43.4735
+            longitude: 43.4735,
+            visitMinutes: 60,
           },
           {
             name: 'Музей городецкой росписи',
             desc: 'классическая роспись по дереву - промысел города',
             latitude: 56.6438,
-            longitude: 43.4708
+            longitude: 43.4708,
+            visitMinutes: 60,
           },
           {
             name: 'Набережная Волги / Революции',
             desc: 'променад с видами на Волгу и купеческую застройку',
             latitude: 56.6465,
-            longitude: 43.4755
+            longitude: 43.4755,
+            visitMinutes: 40,
           },
           {
             name: 'Детский музейный центр «Город мастеров»',
             desc: 'интерактив и ремёсла - финал у причала',
             latitude: 56.6445,
             longitude: 43.4728,
+            visitMinutes: 60,
             transitTip: 'Финал у причала; такси ~5 мин обратно на автостанцию'
           },
         ]
@@ -4135,6 +4143,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
             desc: 'действующее производство с экскурсиями; сувениры рядом',
             latitude: 56.7875,
             longitude: 44.4955,
+            visitMinutes: 60,
             transitTip: 'От вокзала короткое такси к фабрике'
           },
           {
@@ -4142,25 +4151,29 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
             desc: 'лакированные изделия и посуда у фабрики',
             latitude: 56.789,
             longitude: 44.493,
+            visitMinutes: 20,
             transitTip: 'Сувениры рядом с фабрикой - без отдельного рейса'
           },
           {
             name: 'Музейно-туристический центр «Золотая хохлома»',
             desc: 'главная экспозиция о промысле и росписи',
             latitude: 56.7895,
-            longitude: 44.4925
+            longitude: 44.4925,
+            visitMinutes: 60,
           },
           {
             name: 'Исторический центр / пл. Ленина',
             desc: 'компактная прогулка по центру после музея',
             latitude: 56.7885,
-            longitude: 44.491
+            longitude: 44.491,
+            visitMinutes: 20,
           },
           {
             name: 'Парк Победы',
             desc: 'зелёная пауза перед возвратом к вокзалу',
             latitude: 56.7905,
-            longitude: 44.4895
+            longitude: 44.4895,
+            visitMinutes: 40,
           },
         ]
       },
@@ -4184,6 +4197,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
             desc: 'дальний источник - купель и набор воды утром',
             latitude: 55.0525,
             longitude: 43.2355,
+            visitMinutes: 40,
             transitTip: 'Такси ~15 км утром из Дивеева / от автостанции'
           },
           {
@@ -4191,31 +4205,36 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
             desc: 'контекст монастыря и жизни Серафима Саровского',
             latitude: 55.0482,
             longitude: 43.2435,
+            visitMinutes: 60,
             transitTip: 'Возврат в обитель - музей у входа / рядом с ансамблем'
           },
           {
             name: 'Троицкий собор',
             desc: 'главный храм с мощами преподобного Серафима Саровского',
             latitude: 55.0488,
-            longitude: 43.2418
+            longitude: 43.2418,
+            visitMinutes: 30,
           },
           {
             name: 'Преображенский собор',
             desc: 'второй крупный собор ансамбля',
             latitude: 55.0492,
-            longitude: 43.2425
+            longitude: 43.2425,
+            visitMinutes: 30,
           },
           {
             name: 'Благовещенский собор',
             desc: 'новый крупный храм ансамбля',
             latitude: 55.0495,
-            longitude: 43.2408
+            longitude: 43.2408,
+            visitMinutes: 30,
           },
           {
             name: 'Канавка Божьей Матери',
             desc: 'святая канавка - обход во второй половине дня',
             latitude: 55.0475,
             longitude: 43.2405,
+            visitMinutes: 60,
             transitTip: 'Вторая половина дня - обход Канавки; ближние источники у обители'
           },
         ]
@@ -4240,19 +4259,22 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
             desc: 'укреплённый ансамбль и главный храм на берегу Волги',
             latitude: 56.0835,
             longitude: 45.0615,
+            visitMinutes: 60,
             transitTip: 'Паром из Лыскова (~30 мин)'
           },
           {
             name: 'Крепостные стены / волжская смотровая',
             desc: 'оборонительный контур и вид на Волгу с берега',
             latitude: 56.0842,
-            longitude: 45.0605
+            longitude: 45.0605,
+            visitMinutes: 30,
           },
           {
             name: 'Посёлок Макарьево',
             desc: 'тихий посад у стен - короткая прогулка после обители',
             latitude: 56.0825,
             longitude: 45.0635,
+            visitMinutes: 20,
             transitTip: 'Страусиная ферма - бонус отдельным такси/авто'
           },
         ]

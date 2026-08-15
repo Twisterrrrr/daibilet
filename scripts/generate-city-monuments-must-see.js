@@ -12,7 +12,7 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const PACK = path.join(__dirname, 'data', 'catalog-monuments-2026-08-13.json');
 
-/** Genre / quirky → «Необычное»; iconic → «Главные места». */
+/** Genre / quirky → «Необычное»; iconic statues → «Памятники» (not «Главные»). */
 const CREATIVE_SLUGS = new Set([
   'saint-petersburg-chizhik-pyzhik',
   'saint-petersburg-pamyatnik-peterburgskomu-fotografu',
@@ -77,7 +77,7 @@ function main() {
   for (const item of pack) {
     const cityKey = item.cityKey;
     if (!cityKey) continue;
-    const filter = CREATIVE_SLUGS.has(item.slug) ? 'creative' : 'main';
+    const filter = CREATIVE_SLUGS.has(item.slug) ? 'creative' : 'monument';
     const desc = item.shortDescription || item.hookFact || item.description || '';
     (byCity[cityKey] ||= []).push({
       name: item.title,
@@ -85,6 +85,7 @@ function main() {
       address: item.address || null,
       locationSlug: item.slug,
       mustSeeFilter: filter,
+      visitMinutes: 15,
       latitude: item.latitude ?? null,
       longitude: item.longitude ?? null,
     });
@@ -103,6 +104,7 @@ function main() {
       address: ${address},
       locationSlug: '${esc(row.locationSlug)}',
       mustSeeFilter: '${row.mustSeeFilter}',
+      visitMinutes: ${row.visitMinutes ?? 15},
       latitude: ${numOrNull(row.latitude)},
       longitude: ${numOrNull(row.longitude)},
     }`;
@@ -119,7 +121,7 @@ function main() {
  * Do not edit by hand - re-run the generator.
  *
  * Merged into CITY_INFO.mustSee at module load so city hubs + My Day
- * «Главные места» see the 2026-08-13 monuments pack (catalog DB alone is not enough).
+ * «Главные места» stay curated; pack statues go to «Памятники» (+ visitMinutes 15).
  */
 
 export type MonumentMustSeeItem = {
@@ -127,7 +129,8 @@ export type MonumentMustSeeItem = {
   desc: string;
   address?: string | null;
   locationSlug: string;
-  mustSeeFilter: 'main' | 'creative';
+  mustSeeFilter: 'main' | 'monument' | 'creative';
+  visitMinutes?: number;
   latitude?: number | null;
   longitude?: number | null;
 };
