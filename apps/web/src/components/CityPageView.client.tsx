@@ -1013,19 +1013,7 @@ function CityLoadingState({ editorial = false }: { editorial?: boolean }) {
           <div className={CITY_NIGHT_HERO.mediaShell}>
             <div className={`${CITY_NIGHT_HERO.photoFrame} bg-navy-foreground/[0.04]`} />
             <div className={CITY_NIGHT_HERO.surfaceOverlay} />
-            <div
-              className={CITY_NIGHT_HERO.leftFillDesktop}
-              style={
-                CITY_NIGHT_HERO.fadeLeftDesktop !== 'none'
-                  ? { backgroundImage: CITY_NIGHT_HERO.fadeLeftDesktop }
-                  : undefined
-              }
-            />
           </div>
-          <div
-            className="absolute inset-0 z-[1] md:hidden"
-            style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftMobile }}
-          />
         </div>
         <div className={CITY_NIGHT_HERO.content}>
           <div className={CITY_NIGHT_HERO.contentInner}>

@@ -1,58 +1,49 @@
 /**
- * City hub hero shell - Lovable MHTML (`perm-palette-perfection`):
- * night photo right + left navy from `--navy-deep` / `--gradient-hero`.
+ * City hub hero shell - match Lovable MHTML (`perm-palette-perfection` CityHero):
+ * full-bleed section `hero-surface` + photo right 62% + same-surface overlay with soft mask.
  *
- * Tokens (exact from Lovable :root):
- *   --navy-deep: oklch(21% .11 265) ≈ #0b1a4a / #08143a (owner swatch)
- *   --navy: oklch(29% .13 264)
- *   --navy-foreground: oklch(98% .006 250)
- *   --gradient-hero: 100deg navy-deep → navy → primary mix
+ * Do NOT nest overlay inside a left-offset mediaShell: double-stacking the gradient
+ * only inside the shell creates a hard black vertical seam (owner screenshot 2026-08-15).
  *
- * Mobile: full-width photo at reduced opacity + left navy overlay for copy.
- * Desktop: photo `md:w-[62%]` + hero-surface mask fade into navy.
- * Equal py; leftover height split by justify-center.
- *
- * Ultrawide: photo + mask live in `mediaShell` whose left edge matches
- * `container-page` (max-w-7xl / 80rem). Otherwise `right:0` + 62vw + mask
- * at 92% of the full viewport push the visible skyline into the far gutter.
+ * Tokens (Lovable :root):
+ *   --navy-deep / --navy / --navy-foreground / --gradient-hero
  */
 export const CITY_NIGHT_HERO = {
   /** Lovable `--navy` */
   navy: 'oklch(29% 0.13 264)',
-  /** Mid stop between deep and navy (mobile fade). */
+  /** Mid stop between deep and navy (legacy mobile fade; unused when matching Lovable). */
   navyMid: 'oklch(25% 0.12 264.5)',
   /** Lovable `--navy-deep` (owner perceptual ~#0b1a4a / #08143a). */
   navyDeep: 'oklch(21% 0.11 265)',
-  /** Hex aliases for smoke / docs (not used as live fill when CSS vars apply). */
   navyDeepHex: '#0b1a4a',
   navyHex: '#0d2268',
+  /** Section fill = --gradient-hero only (no flat navy-deep underpaint). */
   section:
-    'relative min-h-[320px] overflow-hidden border-b border-[color:var(--navy-deep)] bg-[color:var(--navy-deep)] hero-surface sm:min-h-[380px] md:min-h-[440px]',
+    'relative min-h-[320px] overflow-hidden border-b border-[color:var(--navy-deep)] hero-surface sm:min-h-[380px] md:min-h-[440px]',
   content:
     'container-page relative z-[1] flex flex-col justify-center py-10 sm:min-h-[380px] sm:py-12 md:min-h-[440px]',
   contentInner: 'w-full max-w-2xl text-navy-foreground md:max-w-[560px] lg:max-w-[620px]',
-  /**
-   * Photo geometry track: full-bleed on mobile; from container-page left
-   * to viewport right on md+ (right margin stays photo, not empty navy).
-   */
-  mediaShell:
-    'absolute inset-y-0 left-0 right-0 z-0 h-full md:left-[max(0px,calc((100%-80rem)/2))]',
-  /** Lovable CityHero: right strip inside mediaShell; mask on overlay. */
+  /** Full-bleed track (Lovable: photo + overlay are direct section children). */
+  mediaShell: 'pointer-events-none absolute inset-0 z-0 h-full overflow-hidden',
+  /** Lovable: absolute inset-y-0 right-0 w-full md:w-[62%], opacity-70 → md:opacity-100. */
   photoFrame:
     'absolute inset-y-0 right-0 z-0 h-full w-full opacity-70 md:w-[62%] md:opacity-100',
-  /** Lovable: absolute inset-0 hero-surface opacity-95 + md mask (within mediaShell). */
+  /**
+   * Lovable: absolute inset-0 hero-surface opacity-95 + md mask fade into photo.
+   * Mask is on the overlay only - one gradient stack across the full section.
+   */
   surfaceOverlay:
     'pointer-events-none absolute inset-0 z-[1] hero-surface opacity-95 md:[mask-image:linear-gradient(90deg,#000_45%,transparent_92%)] md:[-webkit-mask-image:linear-gradient(90deg,#000_45%,transparent_92%)]',
-  imageSizes: '(min-width: 768px) min(62vw, 50rem), 100vw',
-  /** Unused in right-strip layout; kept for skeleton parity callers. */
+  imageSizes: '(min-width: 768px) 62vw, 100vw',
   photoEdgeFade: 'pointer-events-none absolute inset-0 z-[1] hidden',
   fadePhotoEdges: 'none',
-  /** Desktop left is hero-surface overlay (photo only covers right 62%). */
   leftFillDesktop: 'absolute inset-0 hidden',
   fadeLeftDesktop: 'none',
-  /** Mobile: denser left navy under copy over full-bleed photo. */
-  fadeLeftMobile:
-    'linear-gradient(to right, oklch(21% 0.11 265) 0%, oklch(25% 0.12 264.5) 32%, oklch(29% 0.13 264 / 0.88) 58%, oklch(29% 0.13 264 / 0.4) 82%, transparent 100%)',
+  /**
+   * No extra mobile navy wash - Lovable relies on photo opacity-70 + full overlay.
+   * A second left gradient made the hero look like a black slab.
+   */
+  fadeLeftMobile: 'none',
   rightGutter: 'absolute inset-y-0 right-0 hidden',
   fadeRightGutter: 'none',
 } as const;
