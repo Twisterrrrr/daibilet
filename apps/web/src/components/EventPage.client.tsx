@@ -57,6 +57,9 @@ type EventSession = PublicEventPageDto['sessions'][number] & {
   timeLabel?: string | null;
 };
 
+/** Buy card: nearest upcoming slots only - not the full day dump. */
+const EVENT_PAGE_NEAREST_SLOTS = 5;
+
 export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
   const { event } = payload;
   const sessions = payload.sessions ?? [];
