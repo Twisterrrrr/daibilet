@@ -222,13 +222,14 @@ export function CityCard({
               />
             }
           />
-          {/* Soft full-card fade; dark tone also gets a content-hugging frosted panel below. */}
+          {/* Dark: soft blue band only in bottom ~30% so the photo stays open. */}
           <div
-            className={`pointer-events-none absolute inset-0 ${
+            className={`pointer-events-none absolute ${
               isLight
-                ? 'bg-gradient-to-t from-white/95 via-white/45 to-transparent'
-                : 'bg-gradient-to-t from-black/45 via-black/15 to-transparent'
+                ? 'inset-0 bg-gradient-to-t from-white/95 via-white/45 to-transparent'
+                : 'inset-x-0 bottom-0 h-[30%] bg-gradient-to-t from-primary-950/40 via-primary-900/18 to-transparent'
             }`}
+            aria-hidden
           />
           <div
             className={`absolute inset-x-0 bottom-0 ${compact ? 'p-2 sm:p-2.5' : 'p-2.5 sm:p-3'}`}
@@ -237,21 +238,21 @@ export function CityCard({
               className={
                 isLight
                   ? 'max-w-full'
-                  : 'max-w-[min(100%,20rem)] rounded-xl bg-black/45 px-2.5 py-2 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.55)] ring-1 ring-white/15 backdrop-blur-md sm:px-3 sm:py-2.5'
+                  : 'max-w-[min(100%,16rem)] rounded-xl bg-primary-900/30 px-2.5 py-1.5 ring-1 ring-white/25 backdrop-blur-[6px] sm:max-w-[min(100%,18rem)] sm:px-3 sm:py-2'
               }
             >
               <h3 className={cityCardTitleClass(titleVariant, tone)}>{city.name}</h3>
               {showBrief ? (
                 <p
                   className={`mt-1 line-clamp-1 text-xs opacity-0 transition-opacity duration-200 group-hover:opacity-100 sm:text-sm ${
-                    isLight ? 'text-slate-600' : 'text-white/85'
+                    isLight ? 'text-slate-600' : 'text-white/90'
                   }`}
                 >
                   {brief}
                 </p>
               ) : null}
               <div
-                className={`mt-1.5 flex flex-col gap-0.5 ${
+                className={`mt-1 flex flex-col gap-0.5 ${
                   isLight ? 'text-slate-700' : 'text-white'
                 } ${compact ? 'text-[11px] sm:text-xs' : 'text-xs sm:text-sm'}`}
               >
