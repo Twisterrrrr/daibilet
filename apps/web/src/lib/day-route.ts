@@ -35,7 +35,7 @@ export const DAY_ROUTE_SOFT = 10;
 export const DAY_ROUTE_SOFT_WARN =
   'День уже плотный - карта и время могут разъехаться';
 /** Hard safety cap for localStorage / share URL (not a planning ideal). */
-export const DAY_ROUTE_MAX = 15;
+export const DAY_ROUTE_MAX = 20;
 
 export function isDayRouteAtSoft(count: number): boolean {
   return count >= DAY_ROUTE_SOFT;

@@ -6,7 +6,7 @@
 ## Product rules
 
 - Хранилище: существующий `daibilet:dayRoute` localStorage; share `/d/{code}` → `/my-day?city=&items=`.
-- `DAY_ROUTE_SOFT=10 / MAX=15`, `DAY_ROUTE_MIN=2` (UX «день сложился», не потолок add).
+- `DAY_ROUTE_SOFT=10 / MAX=20`, `DAY_ROUTE_MIN=2` (UX «день сложился», не потолок add).
 - Цены не выдумывать: только `ticketUrl` / event page / уже известные поля.
 - Hyphen `-` в user copy (без длинного тире).
 

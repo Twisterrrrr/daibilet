@@ -1,3 +1,19 @@
+## 2026-08-15 - Пермь: Зелёная/Красная линии + DAY_ROUTE_MAX=20
+
+### Наблюдения
+- Owner: пешеходные «Зелёная» (20) и «Красная» (10) линии в сценарии Мой день; hard cap 15 обрезал зелёную линию.
+- `buildCityDayRoutePreset` дополнительно резал named presets по `DAY_ROUTE_SOFT=10`.
+
+### Решения
+- `DAY_ROUTE_MAX=20`; named presets в `CityDayPresetBlock` собирают до длины stops / MAX.
+- `cityInfo` Пермь: `perm-green-line` (20) + `perm-red-line` (10) с owner blurbs; matched catalog slugs где есть, иначе `dayRouteId` без битых ссылок.
+- Docs: Project / myday-commercial / mobile-templates.
+
+### Проблемы
+- Часть остановок без карточек в каталоге (ЦУМ, Дом чекистов, Смышляев, Дягилев и др.) - editorial stubs; seed locations - follow-up по запросу.
+
+---
+
 ## 2026-08-15 - Hub hero: Lovable navy + Manrope + chip copy
 
 ### Наблюдения

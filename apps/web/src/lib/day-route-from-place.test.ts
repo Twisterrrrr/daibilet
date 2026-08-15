@@ -436,6 +436,21 @@ test('buildCityDayRoutePreset takes all resolvable must-see up to soft guideline
   );
 });
 
+test('buildCityDayRoutePreset named size can fill up to DAY_ROUTE_MAX with dayRouteId stubs', () => {
+  const places = Array.from({ length: 22 }, (_, i) => ({
+    name: `Точка ${i + 1}`,
+    desc: `Описание ${i + 1}`,
+    dayRouteId: `perm-test-stop-${i + 1}`,
+    latitude: 58.01 + i * 0.001,
+    longitude: 56.24 + i * 0.001,
+  }));
+  const capped = buildCityDayRoutePreset(places, [], city, 20);
+  assert.equal(capped.length, 20);
+  assert.equal(capped[0]!.id, 'perm-test-stop-1');
+  assert.equal(capped[19]!.id, 'perm-test-stop-20');
+  assert.ok(cityDayRoutePresetAvailable(places, [], city, 20));
+});
+
 test('dayRouteItemFromEvent adds venue + session label', () => {
   const item = dayRouteItemFromEvent({
     id: 'evt_1',

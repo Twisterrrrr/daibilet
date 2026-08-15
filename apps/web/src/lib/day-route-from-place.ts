@@ -7,6 +7,7 @@ import { namesLooselyMatch } from './city-place-href';
 import { lookupEditorialPlaceCoords, pickEditorialPlaceCoordsIfStale } from './city-place-coords';
 import { resolveVenueHeroImage } from './city-place-images';
 import {
+  DAY_ROUTE_MAX,
   DAY_ROUTE_SOFT,
   formatDayRouteStartsAtLabel,
   type DayRouteVenueItem,
@@ -432,7 +433,7 @@ export function buildCityDayRoutePreset(
   city: DayRouteCityContext,
   size = DAY_ROUTE_PRESET_SIZE,
 ): DayRouteVenueItem[] {
-  const cap = Math.min(Math.max(1, size), DAY_ROUTE_SOFT);
+  const cap = Math.min(Math.max(1, size), DAY_ROUTE_MAX);
   const items: DayRouteVenueItem[] = [];
   const seen = new Set<string>();
   for (const place of places) {
@@ -451,6 +452,7 @@ export function cityDayRoutePresetAvailable(
   places: CityMustSeeItem[],
   venues: DayRouteVenueMatchSource[],
   city: DayRouteCityContext,
+  size = DAY_ROUTE_PRESET_SIZE,
 ): boolean {
-  return buildCityDayRoutePreset(places, venues, city).length >= DAY_ROUTE_PRESET_MIN;
+  return buildCityDayRoutePreset(places, venues, city, size).length >= DAY_ROUTE_PRESET_MIN;
 }

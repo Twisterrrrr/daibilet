@@ -17,7 +17,11 @@ import {
   type DayRouteVenueMatchSource,
 } from '@/lib/day-route-from-place';
 import { mustSeePlacesForDefaultPreset } from '@/lib/must-see-filters';
-import { formatDayRouteTransitTipLine, replaceDayRouteFromVenues } from '@/lib/day-route';
+import {
+  DAY_ROUTE_MAX,
+  formatDayRouteTransitTipLine,
+  replaceDayRouteFromVenues,
+} from '@/lib/day-route';
 import { MY_DAY_COLLECT_CTA_ARIA, MY_DAY_COLLECT_CTA_LABEL, formatMyDayCollectTooltip } from '@/lib/my-day-collect-cta';
 
 type Props = {
@@ -125,11 +129,14 @@ export function CityDayPresetBlock({
 
   const namedResolved = useMemo(() => {
     return (namedPresets || [])
-      .map((preset) => ({
-        preset,
-        items: buildCityDayRoutePreset(preset.stops, venues, city),
-        available: cityDayRoutePresetAvailable(preset.stops, venues, city),
-      }))
+      .map((preset) => {
+        const size = Math.min(Math.max(preset.stops?.length || 0, 1), DAY_ROUTE_MAX);
+        return {
+          preset,
+          items: buildCityDayRoutePreset(preset.stops, venues, city, size),
+          available: cityDayRoutePresetAvailable(preset.stops, venues, city, size),
+        };
+      })
       // Сценарий обязан собирать план: гид без resolvable stops не маскируем
       // под готовый маршрут.
       .filter((row) => row.available);

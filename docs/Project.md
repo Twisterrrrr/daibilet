@@ -82,7 +82,7 @@ SPB `.16` **retired**.
 
 **Связь с «Мой день» (код, не путать с тирами must-see):**
 - Soft guideline: `DAY_ROUTE_SOFT = 10` (warn «день уже плотный», add ещё можно)
-- Hard safety: `DAY_ROUTE_MAX = 15` (localStorage / share URL / matches API)
+- Hard safety: `DAY_ROUTE_MAX = 20` (localStorage / share URL / matches API; named walking routes up to 20)
 - Min ready hint: `DAY_ROUTE_MIN = 2`
 
 Источник констант: `apps/web/src/lib/day-route.ts`. Фильтр-табы: `apps/web/src/lib/must-see-filters.ts` (уже на hub / my-day).
@@ -100,7 +100,7 @@ SPB `.16` **retired**.
    - **Объём nested POI (LOCKED 2026-08-09):** не жёсткие 5 на каждый пригород, а **по насыщенности** - то же правило для top cities suburbs (СПб, KGD, Perm, NN…), не только дворцы СПб. Дворец/ансамбль/насыщенный day-trip → **7–9**; компактные → **4–6**. При расширении обновлять `timingNote` у companion preset, если день стал длиннее.
 3. Наращивать тематическими слотами (музеи, виды/смотровые, прогулки/набережные, классические landmarks и др.), чтобы filter tabs имели смысл (не одна куча в «Главные»).
 4. Гастро - **опционально отдельно** от must-see landmarks (как у NN), не обязательный Phase B; если добавлять - через gastro-классификацию фильтров, не раздувая «Главные» ресторанами.
-5. `dayRoutePresets` (именованные «готовые дни» / multi-day) - **Phase 2**, после стабильного широкого списка; помогают разнести богатство хаба по дням при лимите плана 10/15.
+5. `dayRoutePresets` (именованные «готовые дни» / multi-day) - **Phase 2**, после стабильного широкого списка; помогают разнести богатство хаба по дням при лимите плана soft 10 / hard 20.
 
 ### Контент-путь: хаб → тематические гиды → билеты
 

@@ -1,3 +1,10 @@
+## 2026-08-15 - Пермь walking lines + My Day MAX 20
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| UX.MYDAY-MAX-20 | `DAY_ROUTE_MAX=20`; named presets не режутся soft=10 | Критический | ✅ |
+| CONT.PERM-GREEN-RED | Сценарии Зелёная (20) + Красная (10) в cityInfo | Высокий | ✅ commit+push, без live |
+
 ## 2026-08-15 - Hub events zone: festivals + near-city
 
 | ID | Задача | Приоритет | Статус |

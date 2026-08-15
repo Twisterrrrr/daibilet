@@ -900,25 +900,25 @@ test('addTextStopToDayRoute rejects blank title and respects MAX', () => {
 
 test('soft guideline helpers: warn copy and count label without /MAX lock', () => {
   assert.equal(DAY_ROUTE_SOFT, 10);
-  assert.equal(DAY_ROUTE_MAX, 15);
+  assert.equal(DAY_ROUTE_MAX, 20);
   assert.equal(isDayRouteAtSoft(9), false);
   assert.equal(isDayRouteAtSoft(10), true);
-  assert.equal(isDayRouteAtHard(14), false);
-  assert.equal(isDayRouteAtHard(15), true);
+  assert.equal(isDayRouteAtHard(19), false);
+  assert.equal(isDayRouteAtHard(20), true);
   assert.equal(formatDayRouteCountLabel(3), 'Точки · 3');
   assert.equal(formatDayRouteCountLabel(10), 'Точки · 10 · плотный день');
   assert.equal(formatDayRouteCountLabel(11, 'Маршрут'), 'Маршрут · 11 · плотный день');
-  assert.equal(formatDayRouteCountLabel(15), 'Точки · 15/15');
+  assert.equal(formatDayRouteCountLabel(20), 'Точки · 20/20');
   assert.equal(formatDayRouteStopsHeading(1), 'Маршрут из 1 точки');
   assert.equal(formatDayRouteStopsHeading(3), 'Маршрут из 3 точек');
   assert.equal(formatDayRouteStopsHeading(5), 'Маршрут из 5 точек');
   assert.equal(formatDayRouteStopsHeading(10), 'Маршрут из 10 точек · плотный день');
-  assert.equal(formatDayRouteStopsHeading(15), 'Маршрут из 15 точек · лимит');
+  assert.equal(formatDayRouteStopsHeading(20), 'Маршрут из 20 точек · лимит');
   assert.equal(dayRoutePointsWordGenitive(21), 'точки');
   assert.equal(dayRoutePointsWordGenitive(22), 'точек');
   assert.match(DAY_ROUTE_SOFT_WARN, /плотный/);
   assert.doesNotMatch(DAY_ROUTE_SOFT_WARN, /[—–]/);
-  assert.match(dayRouteHardLimitMessage(), /15/);
+  assert.match(dayRouteHardLimitMessage(), /20/);
   assert.match(dayRouteAddSuccessMessage(3), /Добавлено в маршрут · 3/);
   assert.match(dayRouteAddSuccessMessage(10), /плотный/);
 });
