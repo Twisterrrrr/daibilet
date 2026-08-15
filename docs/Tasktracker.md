@@ -1,3 +1,10 @@
+## 2026-08-15 - Казань tourist hub
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| CONT.KAZAN-HUB | whenToGo / identity / ~50 mustSee / 2 scenarios / suburbs / FAQ / festivals + превью + MyDay presets | Высокий | ✅ code; commit+push; live по «выкатывай» |
+| CONT.EKB-FAQ-FEST | FAQ 4 Q/A + festivals UMN/STENO/Безумные дни (owner pack) | Высокий | ✅ |
+
 ## 2026-08-15 - Hub hero lead contrast (navy)
 
 | ID | Задача | Приоритет | Статус |

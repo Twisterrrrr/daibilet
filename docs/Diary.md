@@ -1,3 +1,19 @@
+## 2026-08-15 - Казань: полный tourist hub + превью + MyDay
+
+### Наблюдения
+- Owner pack: whenToGo / identity / ~50 mustSee / 2 day scenarios / Свияжск+Болгар / FAQ / festivals; MyDay через `dayRoutePresets`.
+
+### Решения
+- `kazan-hub.ts` (web+public): mustSee, suburbs, `kazan-classic-one-day` / `kazan-creative`, FAQ, travel.
+- Local flavor: weather + whenToGo + 4 identity slides; tourist affiche + blog-after-suburbs.
+- Coords/images editorial; превью в `images/venues/kazan/` (identity + ключевые venues).
+- Festivals в `city-regional-events.ts` (Вкусная Казань 2027, Нур, КультТорг + past).
+
+### Проблемы
+- Часть карточек делит cover до точечной догенерации; prod Location seed - по запросу.
+
+---
+
 ## 2026-08-15 - Екатеринбург: 3 городских сценария + coords
 
 ### Наблюдения

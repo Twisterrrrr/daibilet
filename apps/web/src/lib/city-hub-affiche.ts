@@ -20,6 +20,8 @@ const TOURIST_AFFICHE_SLUGS = new Set([
   'nizhny-novgorod',
   'saint-petersburg',
   'moscow',
+  'ekaterinburg',
+  'kazan',
 ]);
 
 const CHIP_ORDER = [

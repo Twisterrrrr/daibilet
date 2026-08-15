@@ -862,6 +862,119 @@ const EKB_SLIDES: CityIdentitySlide[] = [
   },
 ];
 
+const KAZAN_WEATHER: CityWeatherFlavor = {
+  latitude: 55.796,
+  longitude: 49.109,
+  timezone: 'Europe/Moscow',
+  outdoorSlugs: [
+    'kazan-kazanskiy-kreml',
+    'kazan-kremlevskaya-naberezhnaya',
+    'kazan-ulitsa-baumana',
+    'kazan-tsentr-semi-kazan',
+    'kazan-naberezhnaya-nizhniy-kaban',
+  ],
+  indoorSlugs: [
+    'kazan-ermitazh-kazan',
+    'kazan-natsionalnyy-muzey-rt',
+    'kazan-dom-ushkovoy',
+    'kazan-tyubetey',
+    'kazan-tugan-avylim',
+  ],
+  outdoorCta: 'Отличная погода для Кремля, Баумана и набережных',
+  indoorCtaOvercast: 'Сегодня пасмурно. Загляните в музеи Кремля, Дом Ушковой или «Тюбетей»',
+  indoorCtaRain: 'Сегодня дождь. Загляните в Эрмитаж-Казань, Национальный музей или «Туган Авылым»',
+  indoorCtaSnow: 'Сегодня снег. Музеи Кремля, театр Камала и горячая татарская выпечка',
+};
+
+const KAZAN_WHEN_TO_GO: CityWhenToGoFlavor = {
+  timeZone: 'Europe/Moscow',
+  seasons: [
+    {
+      id: 'winter',
+      months: [12, 1, 2],
+      headline: 'Зима',
+      body: 'Сказочная иллюминация Кремлевской набережной и замерзшая Казанка. Горячая татарская выпечка, театры и заснеженный Свияжск.',
+    },
+    {
+      id: 'spring',
+      months: [3, 4, 5],
+      headline: 'Весна',
+      body: 'В апреле лед уходит с рек. Май - идеальный месяц для прогулок: город расцветает, открываются террасы, комфортно для длинных экскурсий.',
+    },
+    {
+      id: 'summer',
+      months: [6, 7, 8],
+      headline: 'Лето',
+      body: 'Пик сезона: речные прогулки до Болгара, вечерние променады, озера Лебяжье и open-air фестивали.',
+    },
+    {
+      id: 'earlyAutumn',
+      months: [9],
+      headline: 'Ранняя осень',
+      body: 'Мягкое бабье лето и золото в парке «Черное озеро».',
+    },
+    {
+      id: 'lateAutumn',
+      months: [10, 11],
+      headline: 'Поздняя осень',
+      body: 'С ноября - театральный сезон и уютный музейный отдых.',
+    },
+  ],
+  tabs: seasonTabs({
+    spring:
+      'В апреле лед полностью уходит с рек. Май - идеальный месяц для прогулок: город расцветает, открываются летние террасы, температура комфортна для долгих экскурсий.',
+    summer:
+      'Пик туристического сезона. Идеальное время для речных прогулок до Болгара, вечерних променадов по набережным, купания в озерах Лебяжье и open-air фестивалей.',
+    autumn:
+      'Сентябрь и начало октября радуют мягким бабьим летом и золотыми красками в парке «Черное озеро». С ноября - театральный сезон и музейный отдых.',
+    winter:
+      'Время сказочной иллюминации на Кремлевской набережной и замерзшей Казанки. Отлично подходит для горячей татарской выпечки, театров и поездок в заснеженный Свияжск.',
+  }),
+};
+
+const KAZAN_SLIDES: CityIdentitySlide[] = [
+  {
+    id: 'crossroads',
+    title: 'Перекресток культур',
+    text: 'Уникальный дух мирного сотворчества и слияния культур. Город, где на одной площади веками гармонично соседствуют православные колокольни и полумесяцы мечетей.',
+    imageSrc: '/images/venues/kazan/identity-cultures.jpg',
+    imageAlt: 'Казанский Кремль: мечеть и собор рядом',
+    slugs: ['kazan-kazanskiy-kreml', 'kazan-mechet-kul-sharif', 'kazan-hram-vseh-religiy'],
+    target: 'places',
+    badge: 'Символ',
+  },
+  {
+    id: 'tatar-avantgarde',
+    title: 'Татарский авангард',
+    text: 'Глубокая национальная айдентика в современной моде, каллиграфии, театре Камала и креативных пространствах, которые транслируют культуру татарского народа в мировом контексте.',
+    imageSrc: '/images/venues/kazan/identity-art.jpg',
+    imageAlt: 'Татарский авангард и творческая сцена Казани',
+    slugs: ['kazan-teatr-kamala', 'kazan-kreativnyy-klaster-shtab', 'kazan-pamyatnik-gabdulle-tukayu'],
+    target: 'places',
+    badge: 'Искусство',
+  },
+  {
+    id: 'echpochmak',
+    title: 'Культ эчпочмака',
+    text: 'Легендарная национальная выпечка: сочные треугольные эчпочмаки, нежные кыстыбый и медовый чак-чак - главный гастрономический бренд региона.',
+    imageSrc: '/images/venues/kazan/identity-gastro.jpg',
+    imageAlt: 'Татарская выпечка: эчпочмак, кыстыбый, чак-чак',
+    slugs: ['kazan-tyubetey', 'kazan-tugan-avylim', 'kazan-muzey-chak-chaka'],
+    target: 'places',
+    badge: 'Гастро',
+  },
+  {
+    id: 'white-stone',
+    title: 'Древний белокаменный код',
+    text: 'Слияние восточного зодчества и русского барокко. Древние стены, бирюзовые минареты Кул-Шариф и падающая башня Сююмбике формируют силуэт третьей столицы.',
+    imageSrc: '/images/venues/kazan/identity-architecture.jpg',
+    imageAlt: 'Белокаменный Казанский Кремль и башня Сююмбике',
+    slugs: ['kazan-kazanskiy-kreml', 'kazan-bashnya-syuyumbike', 'kazan-mechet-kul-sharif'],
+    target: 'places',
+    badge: 'Архитектура',
+  },
+];
+
 export const CITY_HUB_LOCAL_FLAVOR: Record<string, CityHubLocalFlavor> = {
   perm: {
     identityHeading: 'Чем уникальна Пермь',
@@ -910,6 +1023,14 @@ export const CITY_HUB_LOCAL_FLAVOR: Record<string, CityHubLocalFlavor> = {
     slides: EKB_SLIDES,
     weather: EKB_WEATHER,
     whenToGo: EKB_WHEN_TO_GO,
+  },
+  kazan: {
+    identityHeading: 'Чем уникальна Казань',
+    identityLead: IDENTITY_LEAD,
+    tags: tagsFromSlides(KAZAN_SLIDES),
+    slides: KAZAN_SLIDES,
+    weather: KAZAN_WEATHER,
+    whenToGo: KAZAN_WHEN_TO_GO,
   },
 };
 

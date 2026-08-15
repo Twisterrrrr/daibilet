@@ -21,13 +21,23 @@ const MONUMENTS_SRC = readFileSync(
   fileURLToPath(new URL('./city-monuments-must-see.ts', import.meta.url)),
   'utf8',
 );
+const EKB_HUB_SRC = readFileSync(
+  fileURLToPath(new URL('./ekaterinburg-hub.ts', import.meta.url)),
+  'utf8',
+);
+const KAZAN_HUB_SRC = readFileSync(fileURLToPath(new URL('./kazan-hub.ts', import.meta.url)), 'utf8');
 
 function cityInfoHasSlug(slug: string): boolean {
   const quoted = new RegExp(`['"]${slug.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}['"]`);
-  return quoted.test(CITY_INFO_SRC) || quoted.test(MONUMENTS_SRC);
+  return (
+    quoted.test(CITY_INFO_SRC) ||
+    quoted.test(MONUMENTS_SRC) ||
+    quoted.test(EKB_HUB_SRC) ||
+    quoted.test(KAZAN_HUB_SRC)
+  );
 }
 
-test('weather widget covers Perm, Moscow, SPB, Kaliningrad and NN', () => {
+test('weather widget covers Perm, Moscow, SPB, Kaliningrad, NN, EKB and Kazan', () => {
   assert.equal(cityHasWeatherWidget('perm'), true);
   assert.equal(cityHasWeatherWidget('moscow'), true);
   assert.equal(cityHasWeatherWidget('moskva'), true);
@@ -37,6 +47,7 @@ test('weather widget covers Perm, Moscow, SPB, Kaliningrad and NN', () => {
   assert.equal(cityHasWeatherWidget('nizhny-novgorod'), true);
   assert.equal(cityHasWeatherWidget('nizhniy-novgorod'), true);
   assert.equal(cityHasWeatherWidget('ekaterinburg'), true);
+  assert.equal(cityHasWeatherWidget('kazan'), true);
   assert.equal(cityHasWeatherWidget('ufa'), false);
   const weather = resolveCityLocalFlavor('perm')?.weather;
   assert.ok(weather);
@@ -106,6 +117,18 @@ test('Moscow SPB NN Kaliningrad identity packs have 4 slides', () => {
       ids: ['homliny', 'gotika', 'klopsy', 'kosa'],
       badges: ['Символ', 'Искусство', 'Гастро', 'Арт-объект'],
     },
+    {
+      slug: 'ekaterinburg',
+      heading: 'Чем уникален Екатеринбург',
+      ids: ['ural-rock', 'stenograffia', 'posikunchiki', 'avangard'],
+      badges: ['Символ', 'Искусство', 'Гастро', 'Архитектура'],
+    },
+    {
+      slug: 'kazan',
+      heading: 'Чем уникальна Казань',
+      ids: ['crossroads', 'tatar-avantgarde', 'echpochmak', 'white-stone'],
+      badges: ['Символ', 'Искусство', 'Гастро', 'Архитектура'],
+    },
   ];
 
   for (const pack of packs) {
@@ -134,8 +157,6 @@ test('Moscow SPB NN Kaliningrad identity packs have 4 slides', () => {
     }
     assert.equal(cityIdentityTags(pack.slug).length, 4, pack.slug);
   }
-
-  assert.deepEqual(cityIdentityTags('kazan'), []);
 });
 
 test('weather CTA slugs exist in cityInfo', () => {
@@ -173,14 +194,24 @@ test('collectPlacesBySlugs keeps tag order and drops unknown', () => {
   assert.equal(suburbMatchesSlugs(suburbs[0], ['muzej-hohlovka']), true);
 });
 
-test('when-to-go covers Perm, Moscow, SPB, Kaliningrad and NN', () => {
+test('when-to-go covers Perm, Moscow, SPB, Kaliningrad, NN, EKB and Kazan', () => {
   assert.equal(cityHasWhenToGo('perm'), true);
   assert.equal(cityHasWhenToGo('moscow'), true);
   assert.equal(cityHasWhenToGo('moskva'), true);
   assert.equal(cityHasWhenToGo('saint-petersburg'), true);
   assert.equal(cityHasWhenToGo('kaliningrad'), true);
   assert.equal(cityHasWhenToGo('nizhny-novgorod'), true);
-  for (const slug of ['perm', 'moscow', 'saint-petersburg', 'kaliningrad', 'nizhny-novgorod']) {
+  assert.equal(cityHasWhenToGo('ekaterinburg'), true);
+  assert.equal(cityHasWhenToGo('kazan'), true);
+  for (const slug of [
+    'perm',
+    'moscow',
+    'saint-petersburg',
+    'kaliningrad',
+    'nizhny-novgorod',
+    'ekaterinburg',
+    'kazan',
+  ]) {
     const flavor = resolveCityLocalFlavor(slug)?.whenToGo;
     assert.ok(flavor, slug);
     assert.equal(flavor.tabs.length, 4);
