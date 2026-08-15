@@ -111,7 +111,7 @@ async function HomePageBody() {
                 </Link>
               </div>
             </div>
-            {/* Infinite rail: MSK left under title, SPB next; left loop may slight-peek. */}
+            {/* Finite city grid + «Показать ещё» (no infinite loop). */}
             <HomePopularCitiesRail cities={topCities} className="mt-6" />
           </section>
         ) : null}

@@ -15,8 +15,8 @@ export const HUB_SECTION_SCROLL_MT =
 
 export function hubSectionHeadingClass(editorial = false): string {
   return editorial
-    ? 'font-serif text-3xl font-semibold tracking-tight text-zinc-950 sm:text-4xl'
-    : 'text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl';
+    ? 'font-display text-3xl font-extrabold tracking-tight text-zinc-950 sm:text-4xl'
+    : 'font-display text-3xl font-extrabold tracking-tight text-slate-950 sm:text-4xl';
 }
 
 export function hubSectionLeadClass(editorial = false): string {

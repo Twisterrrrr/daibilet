@@ -1,3 +1,18 @@
+## 2026-08-15 - Hub/home Lovable parity + route clear
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| UX.HUB-HERO-LOVABLE | Night photo right 62% + mask; night PNGs | Высокий | ✅ commit+push, без live |
+| UX.HUB-FONTS-MANROPE | Hub titles Manrope extrabold tracking-tight | Высокий | ✅ |
+| UX.NAV-TOP-IN-COLUMN | «Наверх» в колонке max-w-[1240px] | Высокий | ✅ |
+| UX.HUB-MOBILE-STICKY | Sticky labels/order; без О городе; Заметки | Высокий | ✅ |
+| UX.HEADER-BURGER-LEFT | Mobile hamburger слева | Высокий | ✅ |
+| UX.HOME-CITIES-FINITE | Убрать infinite cities; grid + показать ещё | Высокий | ✅ |
+| UX.MUSTSEE-FILTERS-MOBILE | Must-see/places chips scroll + tap | Высокий | ✅ |
+| UX.EVENTS-HERO-SEARCH-GAP | Mobile /events: минимальный gap hero→search | Высокий | ✅ |
+| UX.MYDAY-CLEAR-VISIBLE | Trash clear в route panel header+toolbar | Высокий | ✅ |
+| UX.HUB-ROUTE-COUNT-DESKTOP | «В маршруте: N» скрыть на mobile | Средний | ✅ |
+
 ## 2026-08-15 - Hub: weather Moscow + tourist-4 covers
 
 | ID | Задача | Приоритет | Статус |

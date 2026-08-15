@@ -3418,6 +3418,23 @@ function DayRoutePanelInner() {
             </div>
 
             <div className="relative flex shrink-0 items-center gap-2 lg:hidden">
+              {route.venues.length ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    clearDayRoute();
+                    setRoute(readDayRoute());
+                    replaceMyDayUrl('/my-day');
+                    flashDayRouteFeedback('Маршрут очищен');
+                  }}
+                  aria-label="Очистить маршрут"
+                  title="Очистить маршрут"
+                  data-day-clear
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 transition hover:bg-slate-50 hover:text-slate-900"
+                >
+                  <Trash2 className="h-4 w-4" aria-hidden />
+                </button>
+              ) : null}
               <button
                 type="button"
                 onClick={() => setShareMenuOpen(true)}
@@ -3457,6 +3474,23 @@ function DayRoutePanelInner() {
                 Открыть маршрут
               </button>
             )}
+            {route.venues.length ? (
+              <button
+                type="button"
+                onClick={() => {
+                  clearDayRoute();
+                  setRoute(readDayRoute());
+                  replaceMyDayUrl('/my-day');
+                  flashDayRouteFeedback('Маршрут очищен');
+                }}
+                aria-label="Очистить маршрут"
+                title="Очистить маршрут"
+                data-day-clear
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 transition hover:bg-slate-50 hover:text-slate-900"
+              >
+                <Trash2 className="h-4 w-4" aria-hidden />
+              </button>
+            ) : null}
             <button
               type="button"
               onClick={saveCurrentAsScenario}

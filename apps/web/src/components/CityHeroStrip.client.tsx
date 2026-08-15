@@ -23,12 +23,7 @@ function cityInPrepositional(city: PublicCityDto) {
   return inCityPrepositional(name);
 }
 
-function scrollToSection(id: string) {
-  const el = document.getElementById(id);
-  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-/** Lovable-inspired full-bleed night hero for city hubs. */
+/** Lovable-inspired night hero for city hubs (photo right + navy left). */
 export function CityHeroStrip({
   city,
   stats,
@@ -36,7 +31,6 @@ export function CityHeroStrip({
   hasTravel,
   hubConfig = null,
   editorial = false,
-  jumpChips = [],
 }: {
   city: PublicCityDto;
   stats: PublicCityPageDto['stats'];
@@ -44,6 +38,7 @@ export function CityHeroStrip({
   hasTravel: boolean;
   hubConfig?: ReturnType<typeof resolveCityHubConfig> | null;
   editorial?: boolean;
+  /** @deprecated Mobile jump chips removed (owner). */
   jumpChips?: Array<{ id: string; label: string }>;
 }) {
   const [heroImageFailed, setHeroImageFailed] = React.useState(false);
@@ -128,13 +123,7 @@ export function CityHeroStrip({
                   {regionBadge}
                 </p>
               ) : null}
-              <h1
-                className={
-                  editorial
-                    ? 'font-serif text-4xl font-semibold tracking-tight text-zinc-950 sm:text-5xl'
-                    : 'font-display text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl md:text-5xl'
-                }
-              >
+              <h1 className="font-display text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl md:text-5xl">
                 {city.name}
               </h1>
               {brief ? (
@@ -183,7 +172,7 @@ export function CityHeroStrip({
                   type="button"
                   onClick={() => void shareCity()}
                   aria-label={shareCopied ? 'Ссылка скопирована' : 'Поделиться'}
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700 hover:border-slate-300"
+                  className="hidden h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700 hover:border-slate-300 md:inline-flex"
                 >
                   <Share2 className="h-4 w-4" aria-hidden />
                 </button>
@@ -219,7 +208,11 @@ export function CityHeroStrip({
           </div>
           <div
             className={CITY_NIGHT_HERO.leftFillDesktop}
-            style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftDesktop }}
+            style={
+              CITY_NIGHT_HERO.fadeLeftDesktop !== 'none'
+                ? { backgroundImage: CITY_NIGHT_HERO.fadeLeftDesktop }
+                : undefined
+            }
           />
           <div
             className="absolute inset-0 md:hidden"
@@ -268,13 +261,7 @@ export function CityHeroStrip({
               </div>
             ) : null}
 
-            <h1
-              className={
-                editorial
-                  ? 'font-serif text-4xl font-semibold tracking-tight text-white sm:text-5xl md:text-6xl'
-                  : 'font-display text-4xl font-extrabold tracking-tight text-white sm:text-5xl md:text-6xl'
-              }
-            >
+              <h1 className="font-display text-4xl font-extrabold tracking-tight text-white sm:text-5xl md:text-6xl">
               {city.name}
             </h1>
             {brief ? (
@@ -314,35 +301,11 @@ export function CityHeroStrip({
                 onClick={() => void shareCity()}
                 aria-label={shareCopied ? 'Ссылка скопирована' : 'Поделиться'}
                 title={shareCopied ? 'Ссылка скопирована' : 'Поделиться'}
-                className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-white/35 bg-white/10 text-white backdrop-blur-sm hover:bg-white/15"
+                className="hidden h-11 w-11 items-center justify-center rounded-2xl border border-white/35 bg-white/10 text-white backdrop-blur-sm hover:bg-white/15 md:inline-flex"
               >
                 <Share2 className="h-4 w-4" aria-hidden />
               </button>
             </div>
-
-            {jumpChips.length ? (
-              <div
-                className="mt-4 flex gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:hidden"
-                data-city-hero-jump
-              >
-                {jumpChips.map((chip) => (
-                  <a
-                    key={chip.id}
-                    href={`#${chip.id}`}
-                    onClick={(event) => {
-                      event.preventDefault();
-                      scrollToSection(chip.id);
-                      if (typeof window !== 'undefined') {
-                        window.history.replaceState(null, '', `#${chip.id}`);
-                      }
-                    }}
-                    className="shrink-0 rounded-full bg-white/20 px-3.5 py-1.5 text-xs font-semibold text-white ring-1 ring-white/35 backdrop-blur-sm"
-                  >
-                    {chip.label}
-                  </a>
-                ))}
-              </div>
-            ) : null}
           </div>
         </div>
       </section>

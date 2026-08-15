@@ -115,38 +115,51 @@ export function MyDayToolbar({
         data-my-day-toolbar="1"
         className="sticky top-[calc(var(--site-header-height)+0.35rem)] z-20 [container-type:inline-size] rounded-2xl border border-slate-200/90 bg-white/95 p-4 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/90 sm:p-5 lg:top-[calc(var(--site-header-height)+0.5rem)]"
       >
-        {/* 1-2. Stats */}
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-sm">
-          <span className="inline-flex items-center gap-2 font-semibold text-slate-900">
-            <MapPin className="h-4 w-4 shrink-0 text-primary-600" aria-hidden />
-            <span data-day-route-count-heading>{stopsCountLabel}</span>
-            <span className="sr-only">{stopsCount}</span>
-          </span>
-          {distanceLabel ? (
-            <span className="inline-flex min-w-0 items-center gap-2 text-slate-600">
-              {travelMode === 'auto' ? (
-                <Car className="h-4 w-4 shrink-0" aria-hidden />
-              ) : (
-                <Footprints className="h-4 w-4 shrink-0" aria-hidden />
-              )}
-              <span>
-                {distanceLabel}
-                {travelMinutesLabel ? (
-                  <>
-                    {' '}
-                    · в пути ~{travelMinutesLabel}{' '}
-                    {travelMode === 'auto' ? 'на авто' : 'пешком'}
-                  </>
-                ) : null}
+        {/* 1-2. Stats + always-visible clear (owner: clear pictogram in route panel). */}
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex min-w-0 flex-wrap items-center gap-x-5 gap-y-1.5 text-sm">
+            <span className="inline-flex items-center gap-2 font-semibold text-slate-900">
+              <MapPin className="h-4 w-4 shrink-0 text-primary-600" aria-hidden />
+              <span data-day-route-count-heading>{stopsCountLabel}</span>
+              <span className="sr-only">{stopsCount}</span>
+            </span>
+            {distanceLabel ? (
+              <span className="inline-flex min-w-0 items-center gap-2 text-slate-600">
+                {travelMode === 'auto' ? (
+                  <Car className="h-4 w-4 shrink-0" aria-hidden />
+                ) : (
+                  <Footprints className="h-4 w-4 shrink-0" aria-hidden />
+                )}
+                <span>
+                  {distanceLabel}
+                  {travelMinutesLabel ? (
+                    <>
+                      {' '}
+                      · в пути ~{travelMinutesLabel}{' '}
+                      {travelMode === 'auto' ? 'на авто' : 'пешком'}
+                    </>
+                  ) : null}
+                </span>
               </span>
-            </span>
-          ) : null}
-          {totalWithStopsLabel ? (
-            <span className="inline-flex items-center gap-2 text-slate-600">
-              <Clock className="h-4 w-4 shrink-0" aria-hidden />
-              {totalWithStopsLabel} с учётом остановок
-            </span>
-          ) : null}
+            ) : null}
+            {totalWithStopsLabel ? (
+              <span className="inline-flex items-center gap-2 text-slate-600">
+                <Clock className="h-4 w-4 shrink-0" aria-hidden />
+                {totalWithStopsLabel} с учётом остановок
+              </span>
+            ) : null}
+          </div>
+          <button
+            type="button"
+            onClick={onClear}
+            disabled={stopsCount <= 0}
+            title="Очистить маршрут"
+            aria-label="Очистить маршрут"
+            data-day-clear
+            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition hover:bg-slate-50 hover:text-slate-800 disabled:opacity-40"
+          >
+            <Trash2 className="h-4 w-4" aria-hidden />
+          </button>
         </div>
 
         {/* Atomic wrap groups: travel | optimize+hours+trash | export.
@@ -224,18 +237,6 @@ export function MyDayToolbar({
                 По часам
               </button>
             ) : null}
-
-            <button
-              type="button"
-              onClick={onClear}
-              disabled={stopsCount <= 0}
-              title="Очистить маршрут"
-              aria-label="Очистить маршрут"
-              data-day-clear
-              className="inline-flex items-center justify-center rounded-full border border-slate-200 p-2 text-slate-500 transition hover:bg-slate-50 disabled:opacity-40"
-            >
-              <Trash2 className="h-4 w-4" aria-hidden />
-            </button>
           </div>
 
           {hourPlanOn && onHourStartChange && onHourEndChange ? (

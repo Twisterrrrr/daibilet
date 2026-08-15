@@ -14,8 +14,8 @@ type Props = {
 
 /**
  * Must-see category chips.
- * Mobile: one-row horizontal carousel (fit-content chips).
- * sm+: classic wrap.
+ * Mobile: horizontal scroll with edge padding + comfortable tap targets.
+ * sm+: wrap row.
  */
 export function MustSeeFilterTabs({
   tabs,
@@ -28,11 +28,11 @@ export function MustSeeFilterTabs({
 
   return (
     <div
-      className="mt-3 -mx-1 overflow-x-auto overscroll-x-contain px-1 pb-0.5 [scrollbar-width:thin] sm:mx-0 sm:overflow-visible sm:px-0 sm:pb-0"
+      className="mt-3 -mx-4 overflow-x-auto overscroll-x-contain px-4 pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:overflow-visible sm:px-0 sm:pb-0"
       data-must-see-filters-scroll
     >
       <div
-        className="flex w-max flex-nowrap items-center gap-2 sm:w-auto sm:flex-wrap"
+        className="flex w-max max-w-none flex-nowrap items-center gap-2 sm:w-auto sm:flex-wrap"
         role="tablist"
         aria-label="Фильтр главных мест"
         data-must-see-filters
@@ -49,7 +49,7 @@ export function MustSeeFilterTabs({
               data-must-see-filter={tab.id}
               data-active={active ? '1' : '0'}
               onClick={() => onChange(tab.id)}
-              className={`inline-flex w-auto min-h-9 shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition ${
+              className={`inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition sm:min-h-9 sm:px-3.5 sm:py-1.5 sm:text-xs ${
                 active
                   ? editorial
                     ? 'bg-zinc-900 text-white'

@@ -150,6 +150,10 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
       <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-200/60 bg-white/80 pt-[env(safe-area-inset-top,0px)] shadow-[0_1px_0_hsl(210_9%_11%/0.04)] backdrop-blur-xl supports-[backdrop-filter]:bg-white/70">
         <div className="mx-auto flex w-full max-w-[1240px] min-h-[var(--site-header-height)] items-center justify-between gap-2 px-4 py-2.5 sm:px-6 sm:py-3 lg:px-8 lg:py-3.5">
           <div className="flex min-w-0 flex-1 flex-nowrap items-center gap-2 sm:gap-3 lg:flex-none lg:gap-4">
+            {/* Mobile: burger left (owner); desktop nav stays in center/right chrome. */}
+            <div className="lg:hidden">
+              <MobileNavTrigger id={mobileNavId} />
+            </div>
             <Link
               href="/"
               className="inline-flex shrink-0 items-center overflow-visible"
@@ -227,8 +231,6 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
                 onCloseUserMenu={() => setUserMenuOpen(false)}
               />
             </div>
-
-            <MobileNavTrigger id={mobileNavId} />
           </div>
         </div>
       </header>

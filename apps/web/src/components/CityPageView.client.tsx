@@ -123,8 +123,8 @@ const CITY_HASH_ALIASES: Record<string, string> = {
   scenarios: 'city-routes',
   'day-constructor': 'city-routes',
   events: 'affiche',
-  blog: 'faq',
-  zametki: 'faq',
+  blog: 'blog',
+  zametki: 'blog',
   'region-events': 'region-events',
 };
 
@@ -140,7 +140,27 @@ const HUB_DESKTOP_NAV: Array<{ id: string; label: string }> = [
   { id: 'faq', label: 'FAQ' },
 ];
 
-const HUB_MOBILE_PRIMARY_IDS = ['about', 'sights', 'city-routes', 'city-suburbs', 'affiche'] as const;
+/** Mobile sticky labels/order (owner). No «О городе»; «Места» / «Заметки». */
+const HUB_MOBILE_NAV: Array<{ id: string; label: string }> = [
+  { id: 'sights', label: 'Зачем ехать' },
+  { id: 'city-must-see', label: 'Места' },
+  { id: 'city-routes', label: 'Маршруты' },
+  { id: 'lifehacks', label: 'Лайфхаки' },
+  { id: 'city-suburbs', label: 'Пригороды' },
+  { id: 'affiche', label: 'События' },
+  { id: 'blog', label: 'Заметки' },
+  { id: 'faq', label: 'FAQ' },
+];
+
+/** Primary row before «Ещё» overflow on mobile. */
+const HUB_MOBILE_PRIMARY_IDS = [
+  'sights',
+  'city-must-see',
+  'city-routes',
+  'lifehacks',
+  'city-suburbs',
+  'affiche',
+] as const;
 
 const SECTION_SCROLL_MT = HUB_SECTION_SCROLL_MT;
 const HUB_STICKY_TOP = 'top-[calc(var(--site-header-height)+env(safe-area-inset-top,0px))]';
@@ -340,7 +360,7 @@ export function CityPageView({
 
   const tabs = React.useMemo(() => {
     const filled = new Set<string>();
-    // Hero/intro always present - first sticky item «О городе» → #about.
+    // Desktop keeps «О городе»; mobile sticky omits it (owner).
     filled.add('about');
     if (hasWhyGoNav) filled.add('sights');
     if (hasMustSeeNav) filled.add('city-must-see');
@@ -349,12 +369,18 @@ export function CityPageView({
     if (hasSuburbsNav) filled.add('city-suburbs');
     if (hasRegionEvents) filled.add('region-events');
     filled.add('affiche');
-    // Bottom FAQ+blog split: primary sticky = FAQ; blog may stay in mobile «Ещё».
     if (hasFaqBlogSplit) filled.add('faq');
+    if (footerArticles.length > 0) filled.add('blog');
     const desktop = HUB_DESKTOP_NAV.filter((item) => filled.has(item.id));
-    const extra: Array<{ id: string; label: string }> = [];
-    if (footerArticles.length > 0) extra.push({ id: 'blog', label: 'Из блога' });
-    return { desktop, extra };
+    const mobile = HUB_MOBILE_NAV.filter((item) => filled.has(item.id));
+    // Region events (desktop-only label) can overflow into mobile «Ещё».
+    const mobileExtra: Array<{ id: string; label: string }> = [];
+    if (hasRegionEvents && !mobile.some((item) => item.id === 'region-events')) {
+      mobileExtra.push({ id: 'region-events', label: 'События региона' });
+    }
+    const desktopExtra: Array<{ id: string; label: string }> = [];
+    if (footerArticles.length > 0) desktopExtra.push({ id: 'blog', label: 'Из блога' });
+    return { desktop, desktopExtra, mobile, mobileExtra };
   }, [
     footerArticles.length,
     hasFaqBlogSplit,
@@ -365,14 +391,6 @@ export function CityPageView({
     hasSuburbsNav,
     hasWhyGoNav,
   ]);
-
-  const jumpChips = React.useMemo(() => {
-    const chips: Array<{ id: string; label: string }> = [];
-    if (hasMustSeeNav) chips.push({ id: 'city-must-see', label: 'Главные места' });
-    if (hasLifehacks) chips.push({ id: 'lifehacks', label: 'Лайфхаки' });
-    if (hasFaqBlogSplit) chips.push({ id: 'faq', label: 'Ещё' });
-    return chips;
-  }, [hasFaqBlogSplit, hasLifehacks, hasMustSeeNav]);
 
   return (
     <div
@@ -401,9 +419,14 @@ export function CityPageView({
               hasTravel={hasTravel}
               hubConfig={hubConfig}
               editorial={editorial}
-              jumpChips={jumpChips}
             />
-            <CityStickyTabs desktopTabs={tabs.desktop} extraTabs={tabs.extra} editorial={editorial} />
+            <CityStickyTabs
+              desktopTabs={tabs.desktop}
+              desktopExtraTabs={tabs.desktopExtra}
+              mobileTabs={tabs.mobile}
+              mobileExtraTabs={tabs.mobileExtra}
+              editorial={editorial}
+            />
 
             {showSightsBlock ? (
               <div
@@ -605,7 +628,6 @@ function CityHero({
   hasTravel,
   hubConfig = null,
   editorial = false,
-  jumpChips = [],
 }: {
   city: PublicCityDto;
   stats: PublicCityPageDto['stats'];
@@ -613,7 +635,6 @@ function CityHero({
   hasTravel: boolean;
   hubConfig?: ReturnType<typeof resolveCityHubConfig>;
   editorial?: boolean;
-  jumpChips?: Array<{ id: string; label: string }>;
 }) {
   if (editorial) {
     return (
@@ -623,7 +644,6 @@ function CityHero({
         guide={guide}
         hasTravel={hasTravel}
         hubConfig={hubConfig}
-        jumpChips={jumpChips}
       />
     );
   }
@@ -634,7 +654,6 @@ function CityHero({
       guide={guide}
       hasTravel={hasTravel}
       hubConfig={hubConfig}
-      jumpChips={jumpChips}
     />
   );
 }
@@ -645,14 +664,12 @@ function CityHeroEditorial({
   guide,
   hasTravel,
   hubConfig = null,
-  jumpChips = [],
 }: {
   city: PublicCityDto;
   stats: PublicCityPageDto['stats'];
   guide: CityInfoEntry | null;
   hasTravel: boolean;
   hubConfig?: ReturnType<typeof resolveCityHubConfig>;
-  jumpChips?: Array<{ id: string; label: string }>;
 }) {
   return (
     <CityHeroStrip
@@ -662,7 +679,6 @@ function CityHeroEditorial({
       hasTravel={hasTravel}
       hubConfig={hubConfig}
       editorial
-      jumpChips={jumpChips}
     />
   );
 }
@@ -673,14 +689,12 @@ function CityHeroDefault({
   guide,
   hasTravel,
   hubConfig = null,
-  jumpChips = [],
 }: {
   city: PublicCityDto;
   stats: PublicCityPageDto['stats'];
   guide: CityInfoEntry | null;
   hasTravel: boolean;
   hubConfig?: ReturnType<typeof resolveCityHubConfig>;
-  jumpChips?: Array<{ id: string; label: string }>;
 }) {
   return (
     <CityHeroStrip
@@ -689,34 +703,37 @@ function CityHeroDefault({
       guide={guide}
       hasTravel={hasTravel}
       hubConfig={hubConfig}
-      jumpChips={jumpChips}
     />
   );
 }
 
 function CityStickyTabs({
   desktopTabs,
-  extraTabs = [],
+  desktopExtraTabs = [],
+  mobileTabs,
+  mobileExtraTabs = [],
   editorial = false,
 }: {
   desktopTabs: Array<{ id: string; label: string }>;
-  extraTabs?: Array<{ id: string; label: string }>;
+  desktopExtraTabs?: Array<{ id: string; label: string }>;
+  mobileTabs: Array<{ id: string; label: string }>;
+  mobileExtraTabs?: Array<{ id: string; label: string }>;
   editorial?: boolean;
 }) {
   const observedTabs = React.useMemo(() => {
     const seen = new Set<string>();
-    return [...desktopTabs, ...extraTabs].filter((tab) => {
+    return [...desktopTabs, ...desktopExtraTabs, ...mobileTabs, ...mobileExtraTabs].filter((tab) => {
       if (seen.has(tab.id)) return false;
       seen.add(tab.id);
       return true;
     });
-  }, [desktopTabs, extraTabs]);
-  const mobilePrimary = desktopTabs.filter((tab) =>
+  }, [desktopTabs, desktopExtraTabs, mobileTabs, mobileExtraTabs]);
+  const mobilePrimary = mobileTabs.filter((tab) =>
     (HUB_MOBILE_PRIMARY_IDS as readonly string[]).includes(tab.id),
   );
   const mobileMore = [
-    ...desktopTabs.filter((tab) => !(HUB_MOBILE_PRIMARY_IDS as readonly string[]).includes(tab.id)),
-    ...extraTabs.filter((tab) => !desktopTabs.some((item) => item.id === tab.id)),
+    ...mobileTabs.filter((tab) => !(HUB_MOBILE_PRIMARY_IDS as readonly string[]).includes(tab.id)),
+    ...mobileExtraTabs.filter((tab) => !mobileTabs.some((item) => item.id === tab.id)),
   ];
   const [activeId, setActiveId] = React.useState(observedTabs[0]?.id || 'affiche');
   const [moreOpen, setMoreOpen] = React.useState(false);
@@ -828,6 +845,7 @@ function CityStickyTabs({
         data-city-hub-nav-desktop
       >
         {desktopTabs.map(renderTab)}
+        {desktopExtraTabs.map(renderTab)}
       </div>
       <div
         className={
@@ -848,7 +866,7 @@ function CityStickyTabs({
               onClick={() => setMoreOpen((open) => !open)}
               className={`${tabClass(moreActive)} inline-flex items-center gap-0.5`}
             >
-              Еще
+              Ещё
               <ChevronDown className={`h-3.5 w-3.5 shrink-0 transition ${moreOpen ? 'rotate-180' : ''}`} aria-hidden />
             </button>
             {moreOpen ? (
@@ -1495,7 +1513,7 @@ function CitySightsMustSeeList({
             </span>
           </p>
           <span
-            className={`inline-flex shrink-0 items-center rounded-full px-3 py-1 text-xs font-medium tabular-nums ${
+            className={`hidden shrink-0 items-center rounded-full px-3 py-1 text-xs font-medium tabular-nums sm:inline-flex ${
               editorial ? 'bg-zinc-100 text-zinc-600' : 'bg-slate-100 text-slate-600'
             }`}
           >
@@ -2068,8 +2086,8 @@ function CitySeoTextSection({
           <h2
             className={
               editorial
-                ? 'font-serif text-3xl font-semibold text-zinc-950'
-                : 'text-2xl font-bold text-slate-900'
+                ? 'font-display text-3xl font-extrabold tracking-tight text-zinc-950'
+                : 'font-display text-2xl font-extrabold tracking-tight text-slate-900'
             }
           >
             {buildCityHubSeoPhrase(cityName)}
@@ -2124,7 +2142,7 @@ function CityFaqBlogSplit({
             </div>
           ) : null}
           {hasBlogCol ? (
-            <div className="min-w-0">
+            <div id="blog" className={`min-w-0 ${SECTION_SCROLL_MT}`}>
               <CityHubSectionHeading
                 as="h3"
                 title={`Из блога ${aboutCityPrepositional(city)}`}

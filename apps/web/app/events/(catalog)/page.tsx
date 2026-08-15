@@ -42,7 +42,7 @@ export default async function EventsCatalogPage() {
       <Suspense
         fallback={
           <div className="border-b border-slate-100 bg-white">
-            <div className="container-page py-4 sm:py-5">
+            <div className="container-page py-3 sm:py-5">
               <div className="flex flex-col gap-2.5 md:flex-row md:items-end md:justify-between">
                 <div className="min-w-0 flex-1 space-y-1.5">
                   <div className="h-7 w-2/3 max-w-md animate-pulse rounded bg-slate-200 sm:h-8" />
@@ -57,7 +57,8 @@ export default async function EventsCatalogPage() {
       >
         <EventsCatalogHero />
       </Suspense>
-      <div className="container-page py-5 sm:py-6 lg:py-8">
+      {/* Mobile: minimal gap hero → search; keep air on sm+. */}
+      <div className="container-page pt-2 pb-5 sm:py-6 lg:py-8">
         <Suspense
           fallback={
             <div className="space-y-5">

@@ -660,37 +660,42 @@ export function PlacesHubView({
           </select>
         </div>
 
-        <div className="mt-4 flex items-start gap-2">
-          <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
-            <button
-              type="button"
-              onClick={() => setTypeFilter('all')}
-              className={`catalog-chip ${allTypesOn ? 'catalog-chip-on' : 'catalog-chip-idle'}`}
-            >
-              <span className="whitespace-nowrap">Все места</span>
-            </button>
-            {categoryChips.map((chip) => {
-              const active = typeFilter === chip.id;
-              return (
-                <button
-                  key={chip.id}
-                  type="button"
-                  onClick={() => setTypeFilter(active ? 'all' : chip.id)}
-                  className={`catalog-chip ${active ? 'catalog-chip-on' : 'catalog-chip-idle'}`}
-                >
-                  <span className="whitespace-nowrap">{chip.label}</span>
-                </button>
-              );
-            })}
+        <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-start sm:gap-2">
+          <div
+            className="-mx-4 min-w-0 flex-1 overflow-x-auto overscroll-x-contain px-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:overflow-visible sm:px-0"
+            data-places-hub-chips
+          >
+            <div className="flex w-max flex-nowrap items-center gap-1.5 sm:w-auto sm:flex-wrap">
+              <button
+                type="button"
+                onClick={() => setTypeFilter('all')}
+                className={`catalog-chip min-h-11 sm:min-h-9 ${allTypesOn ? 'catalog-chip-on' : 'catalog-chip-idle'}`}
+              >
+                <span className="whitespace-nowrap">Все места</span>
+              </button>
+              {categoryChips.map((chip) => {
+                const active = typeFilter === chip.id;
+                return (
+                  <button
+                    key={chip.id}
+                    type="button"
+                    onClick={() => setTypeFilter(active ? 'all' : chip.id)}
+                    className={`catalog-chip min-h-11 sm:min-h-9 ${active ? 'catalog-chip-on' : 'catalog-chip-idle'}`}
+                  >
+                    <span className="whitespace-nowrap">{chip.label}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
-          <div ref={filtersRef} className="relative shrink-0">
+          <div ref={filtersRef} className="relative shrink-0 self-start">
             <button
               type="button"
               onClick={() => setFiltersOpen((open) => !open)}
               aria-expanded={filtersOpen}
               aria-haspopup="menu"
-              className={`inline-flex h-9 items-center gap-1.5 rounded-xl px-3 text-sm font-semibold transition ${
+              className={`inline-flex h-11 items-center gap-1.5 rounded-xl px-3 text-sm font-semibold transition sm:h-9 ${
                 filtersOpen || filtersActiveCount > 0
                   ? 'bg-primary-600 text-white hover:bg-primary-700'
                   : 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50'

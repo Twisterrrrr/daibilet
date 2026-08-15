@@ -77,7 +77,11 @@ function CityNightHeroSkeleton() {
           <div className={`${CITY_NIGHT_HERO.photoFrame} bg-white/[0.06]`} />
           <div
             className={CITY_NIGHT_HERO.leftFillDesktop}
-            style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftDesktop }}
+            style={
+              CITY_NIGHT_HERO.fadeLeftDesktop !== 'none'
+                ? { backgroundImage: CITY_NIGHT_HERO.fadeLeftDesktop }
+                : undefined
+            }
           />
           <div
             className="absolute inset-0 md:hidden"

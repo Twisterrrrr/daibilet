@@ -67,12 +67,12 @@ export function EventsCatalogHero() {
         ]}
       />
       <header className="border-b border-slate-100 bg-white">
-        <div className="container-page py-4 sm:py-5">
+        <div className="container-page py-3 sm:py-5">
           <div className="min-w-0 md:max-w-2xl">
             <h1 className="font-display text-2xl font-extrabold tracking-tight text-graphite sm:text-3xl">
               {title}
             </h1>
-            <p className="mt-1 text-sm leading-snug text-graphite-muted sm:text-[15px]">
+            <p className="mt-0.5 text-sm leading-snug text-graphite-muted sm:mt-1 sm:text-[15px]">
               {subtitle ?? (
                 <>
                   Билеты на экскурсии, концерты и музеи
