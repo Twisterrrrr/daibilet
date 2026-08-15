@@ -1,3 +1,19 @@
+## 2026-08-15 - Краснодар: полный tourist hub + линии + превью + MyDay
+
+### Наблюдения
+- Owner pack: whenToGo (весна/лето/осень + мягкая зима на 12 мес), identity ×4, ~50 mustSee, 2 day scenarios, Зелёная (18) / Красная (10), Горячий Ключ, FAQ, festivals, lifehacks.
+
+### Решения
+- `krasnodar-hub.ts` + `krasnodar-line-presets.ts` (web+public): mustSee, suburb, presets, FAQ, travel; merge линий в dayRoutePresets.
+- Local flavor: weather Europe/Moscow ~45.0355/38.9753; lifehacks ×5; tourist affiche + blog-after-suburbs.
+- Coords/images editorial; превью в `images/venues/krasnodar/`.
+- Festivals: КУБАНЬ STREET FOOD 2027, Stereopicnic, past этно/театр/джаз.
+
+### Проблемы
+- Часть карточек делит cover; аэропорт Пашковский отмечен как временно закрытый в FAQ/travel; prod Location seed по запросу.
+
+---
+
 ## 2026-08-15 - Лайфхаки EKB/Kazan/Samara + MyDay MAX 35 + цветные линии ЕКБ
 
 ### Наблюдения

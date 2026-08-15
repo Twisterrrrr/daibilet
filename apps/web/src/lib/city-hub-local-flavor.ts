@@ -1104,6 +1104,129 @@ const SAMARA_SLIDES: CityIdentitySlide[] = [
   },
 ];
 
+const KRASNODAR_WEATHER: CityWeatherFlavor = {
+  latitude: 45.0355,
+  longitude: 38.9753,
+  timezone: 'Europe/Moscow',
+  outdoorSlugs: [
+    'krasnodar-park-galitskogo-park-krasnodar',
+    'krasnodar-ulitsa-krasnaya',
+    'krasnodar-most-potseluev',
+    'krasnodar-yaponskiy-sad',
+    'krasnodar-botanicheskiy-sad-kosenko',
+  ],
+  indoorSlugs: [
+    'krasnodar-muzey-felitsyna',
+    'krasnodar-hudozhestvennyy-muzey-kovalenko',
+    'krasnodar-restoran-borschberry',
+    'krasnodar-fudmarket',
+    'krasnodar-kreativnyy-klaster-kolos',
+  ],
+  outdoorCta: 'Отличная погода для парка Галицкого, Красной и набережной',
+  indoorCtaOvercast: 'Сегодня пасмурно. Музеи, «Борщberry» или кластер «Колос»',
+  indoorCtaRain: 'Сегодня дождь. Фелицын, Коваленко или Фудмаркет укроют от ливня',
+  indoorCtaSnow: 'Сегодня сыро и холодно. Музеи, борщ и тёплые гастро-пространства',
+};
+
+const KRASNODAR_WHEN_TO_GO: CityWhenToGoFlavor = {
+  timeZone: 'Europe/Moscow',
+  seasons: [
+    {
+      id: 'winter',
+      months: [12, 1, 2],
+      headline: 'Зима',
+      body: 'Мягкая южная зима без лютого мороза: Красная остаётся прогулочной, парк Галицкого зеленеет, сезон уходит в музеи, театры и горячий кубанский борщ.',
+    },
+    {
+      id: 'spring',
+      months: [3, 4, 5],
+      headline: 'Весна',
+      body: 'Настоящее южное лето стартует уже в мае. В апреле город взрывно расцветает, улицы покрываются зеленью - идеально для пеших марафонов, пока асфальт ещё не плавится.',
+    },
+    {
+      id: 'summer',
+      months: [6, 7, 8],
+      headline: 'Лето',
+      body: 'Экстремально жаркий сезон: днём город замирает. Жизнь после 19:00 - набережные, Красная, фонтаны и летние веранды до поздней ночи.',
+    },
+    {
+      id: 'autumn',
+      months: [9, 10, 11],
+      headline: 'Осень',
+      body: 'Бархатный сезон: сентябрь и октябрь около +20-25 °C для виноделен и хайкинга в предгорьях. Листопад в парках держится до конца ноября.',
+    },
+  ],
+  tabs: seasonTabs({
+    spring:
+      'Настоящее южное лето стартует уже в мае. В апреле город взрывно расцветает, улицы покрываются зеленью, а температура идеально подходит для пеших марафонов, пока солнце ещё не начало плавить асфальт.',
+    summer:
+      'Экстремально жаркий сезон, когда днём город буквально замирает. Вся жизнь переносится на вечер: набережные и Красная оживают после 19:00, фонтаны работают на максимум, а летние веранды забиты до поздней ночи.',
+    autumn:
+      'Бархатный и самый комфортный сезон. Сентябрь и октябрь радуют стабильным теплом (+20-25 °C), идеальным для поездок в винодельни и хайкинга по предгорьям. Листопад в парках держится до конца ноября.',
+    winter:
+      'Мягкая кубанская зима без сибирских морозов: Красная остаётся живой пешеходной осью, парк Галицкого не закрывается, а город уходит в музейно-театральный и гастрономический режим - борщ, сыры и тёплые веранды.',
+  }),
+};
+
+const KRASNODAR_SLIDES: CityIdentitySlide[] = [
+  {
+    id: 'southern-chill',
+    title: 'Южная столица чилла',
+    text: 'Абсолютно расслабленный, гедонистический характер южного мегаполиса. Прогулки без спешки, кофейный культ и футуристический парк «Краснодар» - феномен парка Галицкого, одно из лучших современных пространств страны.',
+    imageSrc: '/images/venues/krasnodar/identity-chill.jpg',
+    imageAlt: 'Парк Галицкого и атмосфера южного чилла',
+    slugs: [
+      'krasnodar-park-galitskogo-park-krasnodar',
+      'krasnodar-yaponskiy-sad',
+      'krasnodar-gorodskoy-sad-park-gor-kogo',
+    ],
+    target: 'places',
+    badge: 'Символ',
+  },
+  {
+    id: 'cossack-avantgarde',
+    title: 'Казачий авангард',
+    text: 'Мощный южный темперамент: казачьи певческие традиции, яркий уличный арт, южная школа живописи и колоритные арт-кластеры на бывших заводах.',
+    imageSrc: '/images/venues/krasnodar/identity-art.jpg',
+    imageAlt: 'Казачий и современный арт Краснодара',
+    slugs: [
+      'krasnodar-kreativnyy-klaster-kolos',
+      'krasnodar-hudozhestvennyy-muzey-kovalenko',
+      'krasnodar-skulptura-avrora',
+    ],
+    target: 'places',
+    badge: 'Искусство',
+  },
+  {
+    id: 'borsch-tomatoes',
+    title: 'Культ борща и томатов',
+    text: 'Главная житница страны диктует правила: наваристый кубанский борщ с салом и пампушками, сладкие томаты, свежая зелень, кавказские шашлыки и локальные сыры.',
+    imageSrc: '/images/venues/krasnodar/identity-gastro.jpg',
+    imageAlt: 'Кубанский борщ и южная гастрономия',
+    slugs: [
+      'krasnodar-restoran-borschberry',
+      'krasnodar-fudmarket',
+      'krasnodar-ulitsa-krasnaya',
+    ],
+    target: 'places',
+    badge: 'Гастро',
+  },
+  {
+    id: 'ekaterinodar-baroque',
+    title: 'Екатерининское барокко',
+    text: 'Контраст старого Екатеринодара и южного полиса: кирпичные купеческие особняки XIX века, вековые платаны, кованые козырьки и торжественные триумфальные арки на Красной.',
+    imageSrc: '/images/venues/krasnodar/identity-architecture.jpg',
+    imageAlt: 'Красная улица и екатеринодарская архитектура',
+    slugs: [
+      'krasnodar-ulitsa-krasnaya',
+      'krasnodar-aleksandrovskaya-triumfal-naya-arka',
+      'krasnodar-osobnyak-likhatskogo',
+    ],
+    target: 'places',
+    badge: 'Архитектура',
+  },
+];
+
 export const CITY_HUB_LOCAL_FLAVOR: Record<string, CityHubLocalFlavor> = {
   perm: {
     identityHeading: 'Чем уникальна Пермь',
@@ -1168,6 +1291,14 @@ export const CITY_HUB_LOCAL_FLAVOR: Record<string, CityHubLocalFlavor> = {
     slides: SAMARA_SLIDES,
     weather: SAMARA_WEATHER,
     whenToGo: SAMARA_WHEN_TO_GO,
+  },
+  krasnodar: {
+    identityHeading: 'Чем уникален Краснодар',
+    identityLead: IDENTITY_LEAD,
+    tags: tagsFromSlides(KRASNODAR_SLIDES),
+    slides: KRASNODAR_SLIDES,
+    weather: KRASNODAR_WEATHER,
+    whenToGo: KRASNODAR_WHEN_TO_GO,
   },
 };
 

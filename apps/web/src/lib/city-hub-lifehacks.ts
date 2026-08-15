@@ -800,6 +800,90 @@ const SAMARA_ITEMS: CityLifehackItem[] = [
   },
 ];
 
+const KRASNODAR_ITEMS: CityLifehackItem[] = [
+  {
+    id: 'krasnodar-galitskiy-free',
+    tabId: 'walk',
+    icon: 'walk',
+    title: 'Парк Галицкого без затрат',
+    body: body(
+      'Вся территория парка «Краснодар» и арт-объекты полностью ',
+      { s: 'бесплатны' },
+      '. Тратиться придётся только на кафе или сувениры.',
+    ),
+    cta: {
+      kind: 'maps',
+      label: 'Маршрут на карте',
+      href: yandexMapsSearchUrl('Парк Краснодар Галицкого'),
+    },
+  },
+  {
+    id: 'krasnodar-dendrariy',
+    tabId: 'walk',
+    icon: 'walk',
+    title: 'Дендрарий вместо платных зоопарков',
+    body: body(
+      'Ботанический сад им. Косенко полностью ',
+      { s: 'бесплатен' },
+      '. Берите семечки и орехи: здесь живут ручные белки и павлины.',
+    ),
+    cta: {
+      kind: 'gis',
+      label: 'Транспорт на карте',
+      href: twoGisCitySearchUrl('krasnodar', 'Ботанический сад Косенко'),
+    },
+  },
+  {
+    id: 'krasnodar-stadium-ring',
+    tabId: 'walk',
+    icon: 'walk',
+    title: 'Смотровая чаши стадиона',
+    body: body(
+      'Верхнее пешеходное кольцо вокруг стадиона «Краснодар» даёт панораму парка и города ',
+      { s: 'бесплатно' },
+      ' в любой день, кроме матчевых.',
+    ),
+    cta: {
+      kind: 'maps',
+      label: 'Яндекс Карты',
+      href: yandexMapsSearchUrl('Стадион Краснодар смотровая'),
+      extra: [{ label: '2ГИС', href: twoGisCitySearchUrl('krasnodar', 'Стадион Краснодар') }],
+    },
+  },
+  {
+    id: 'krasnodar-fudmarket-lunch',
+    tabId: 'food',
+    icon: 'food',
+    title: 'Обед на Фудмаркете в будни',
+    body: body(
+      'Заходите в «Фудмаркет» в будни с 12:00 до 16:00. Многие корнеры делают скидку до ',
+      { s: '40%' },
+      ' на южные сеты и комбо-ланчи.',
+    ),
+    cta: {
+      kind: 'affiche',
+      label: 'Смотреть афишу Краснодара',
+    },
+  },
+  {
+    id: 'krasnodar-stolovaya',
+    tabId: 'food',
+    icon: 'food',
+    title: 'Добрая столовая на Красной',
+    body: body(
+      'Сытно пообедать южным супом, котлетами или выпечкой до ',
+      { s: '250 ₽' },
+      ' можно в сетевых столовых в начале Красной улицы.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Где поесть в Краснодаре',
+      slugs: ['krasnodar-restoran-borschberry', 'krasnodar-fudmarket'],
+      scrollTo: 'places',
+    },
+  },
+];
+
 const CITY_HUB_LIFEHACKS: Record<string, CityLifehackPack> = {
   perm: lifehackPack(PERM_ITEMS),
   moscow: lifehackPack(MOSCOW_ITEMS),
@@ -809,6 +893,7 @@ const CITY_HUB_LIFEHACKS: Record<string, CityLifehackPack> = {
   ekaterinburg: lifehackPack(EKB_ITEMS),
   kazan: lifehackPack(KAZAN_ITEMS),
   samara: lifehackPack(SAMARA_ITEMS),
+  krasnodar: lifehackPack(KRASNODAR_ITEMS),
 };
 
 export function resolveCityLifehacks(slug: string | null | undefined): CityLifehackPack | null {

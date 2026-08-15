@@ -16,6 +16,10 @@ const CITY_INFO_SRC = readFileSync(fileURLToPath(new URL('./cityInfo.ts', import
 const EKB_HUB_SRC = readFileSync(fileURLToPath(new URL('./ekaterinburg-hub.ts', import.meta.url)), 'utf8');
 const KAZAN_HUB_SRC = readFileSync(fileURLToPath(new URL('./kazan-hub.ts', import.meta.url)), 'utf8');
 const SAMARA_HUB_SRC = readFileSync(fileURLToPath(new URL('./samara-hub.ts', import.meta.url)), 'utf8');
+const KRASNODAR_HUB_SRC = readFileSync(
+  fileURLToPath(new URL('./krasnodar-hub.ts', import.meta.url)),
+  'utf8',
+);
 
 function cityInfoHasSlug(slug: string): boolean {
   const quoted = new RegExp(`['"]${slug.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}['"]`);
@@ -23,7 +27,8 @@ function cityInfoHasSlug(slug: string): boolean {
     quoted.test(CITY_INFO_SRC) ||
     quoted.test(EKB_HUB_SRC) ||
     quoted.test(KAZAN_HUB_SRC) ||
-    quoted.test(SAMARA_HUB_SRC)
+    quoted.test(SAMARA_HUB_SRC) ||
+    quoted.test(KRASNODAR_HUB_SRC)
   );
 }
 
@@ -32,7 +37,7 @@ function assertNoLongDash(value: string, label: string) {
   assert.equal(value.includes('\u2013'), false, label);
 }
 
-test('lifehacks cover Perm, Moscow, SPB, Kaliningrad, NN, EKB, Kazan and Samara', () => {
+test('lifehacks cover Perm, Moscow, SPB, Kaliningrad, NN, EKB, Kazan, Samara and Krasnodar', () => {
   assert.equal(cityHasLifehacks('perm'), true);
   assert.equal(cityHasLifehacks('moscow'), true);
   assert.equal(cityHasLifehacks('moskva'), true);
@@ -44,6 +49,7 @@ test('lifehacks cover Perm, Moscow, SPB, Kaliningrad, NN, EKB, Kazan and Samara'
   assert.equal(cityHasLifehacks('ekaterinburg'), true);
   assert.equal(cityHasLifehacks('kazan'), true);
   assert.equal(cityHasLifehacks('samara'), true);
+  assert.equal(cityHasLifehacks('krasnodar'), true);
   assert.equal(cityHasLifehacks('ufa'), false);
 });
 
@@ -195,8 +201,8 @@ test('NN lifehacks: Lastochka affiche, cableway and free kremlin', () => {
   assert.equal(kremlin?.cta.kind, 'places');
 });
 
-test('EKB Kazan Samara lifehacks: 5 cards, no fly tab, places CTAs resolve', () => {
-  for (const city of ['ekaterinburg', 'kazan', 'samara'] as const) {
+test('EKB Kazan Samara Krasnodar lifehacks: 5 cards, no fly tab, places CTAs resolve', () => {
+  for (const city of ['ekaterinburg', 'kazan', 'samara', 'krasnodar'] as const) {
     const pack = resolveCityLifehacks(city);
     assert.ok(pack, city);
     assertPackCopy(pack, city);
@@ -215,6 +221,8 @@ test('EKB Kazan Samara lifehacks: 5 cards, no fly tab, places CTAs resolve', () 
   assert.equal(kazan?.items[0]?.id, 'kazan-kremlin-free');
   const samara = resolveCityLifehacks('samara');
   assert.equal(samara?.items[0]?.id, 'samara-embankment-free');
+  const krd = resolveCityLifehacks('krasnodar');
+  assert.equal(krd?.items[0]?.id, 'krasnodar-galitskiy-free');
 });
 
 test('EKB painted lines have 35 / 11 / 10 stops with coords and slugs', async () => {
@@ -242,6 +250,31 @@ test('EKB painted lines have 35 / 11 / 10 stops with coords and slugs', async ()
   );
   assert.equal(
     EKB_LINE_DAY_ROUTE_PRESETS.find((p: { id: string }) => p.id === 'ekaterinburg-purple-line')
+      ?.stops?.length,
+    10,
+  );
+});
+
+test('Krasnodar painted lines have 18 / 10 stops with coords and slugs', async () => {
+  const { KRASNODAR_GREEN_LINE_STOPS, KRASNODAR_LINE_DAY_ROUTE_PRESETS } = await import(
+    './krasnodar-line-presets.ts'
+  );
+  assert.equal(KRASNODAR_GREEN_LINE_STOPS.length, 18);
+  assert.ok(
+    KRASNODAR_GREEN_LINE_STOPS.every(
+      (stop: { latitude?: number; longitude?: number; locationSlug?: string; dayRouteId?: string }) =>
+        Number.isFinite(stop.latitude) &&
+        Number.isFinite(stop.longitude) &&
+        Boolean(stop.locationSlug || stop.dayRouteId),
+    ),
+  );
+  assert.equal(
+    KRASNODAR_LINE_DAY_ROUTE_PRESETS.find((p: { id: string }) => p.id === 'krasnodar-green-line')
+      ?.stops?.length,
+    18,
+  );
+  assert.equal(
+    KRASNODAR_LINE_DAY_ROUTE_PRESETS.find((p: { id: string }) => p.id === 'krasnodar-red-line')
       ?.stops?.length,
     10,
   );

@@ -1,3 +1,9 @@
+## 2026-08-15 - Краснодар tourist hub
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| CONT.KRASNODAR-HUB | whenToGo / identity / ~50 mustSee / 2 scenarios + Зелёная 18 / Красная 10 / Горячий Ключ / FAQ / festivals / lifehacks + превью + MyDay | Высокий | ✅ code; commit+push; live по «выкатывай» |
+
 ## 2026-08-15 - Lifehacks EKB/Kazan/Samara + MyDay 35 + EKB lines
 
 | ID | Задача | Приоритет | Статус |
