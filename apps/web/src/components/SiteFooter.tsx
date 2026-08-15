@@ -50,8 +50,8 @@ type SiteFooterProps = {
 
 function FooterLegalLinks() {
   return (
-    <div className="flex flex-col gap-2 text-right sm:ml-auto">
-      <div className="flex flex-wrap justify-end gap-x-5 gap-y-1.5">
+    <div className="flex flex-col gap-2 text-left sm:ml-auto sm:max-w-none sm:text-right lg:pr-28">
+      <div className="flex flex-wrap justify-start gap-x-5 gap-y-1.5 sm:justify-end">
         <Link href="/privacy#user-agreement" className="text-sm text-graphite-muted hover:text-graphite">
           Пользовательское соглашение
         </Link>
@@ -62,7 +62,7 @@ function FooterLegalLinks() {
           Договор-оферта (для партнёров)
         </Link>
       </div>
-      <div className="flex flex-wrap justify-end gap-x-5 gap-y-1.5">
+      <div className="flex flex-wrap justify-start gap-x-5 gap-y-1.5 sm:justify-end">
         <Link href="/legal#refunds" className="text-sm text-graphite-muted hover:text-graphite">
           Правила возврата
         </Link>
