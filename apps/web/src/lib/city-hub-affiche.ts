@@ -33,7 +33,6 @@ const CHIP_ORDER = [
   'Мероприятия',
 ];
 
-const DEFAULT_CATEGORY_CANDIDATES = ['Экскурсии', 'Речные прогулки'];
 const MUSEUM_TAB_MIN = 3;
 const STANDUP_GROUP_MIN = 3;
 
@@ -98,14 +97,21 @@ export function visibleAfficheCategories(
 }
 
 export function preferredAfficheCategory(
-  categories: Array<[string, number]>,
-  options?: { tourist?: boolean },
+  _categories: Array<[string, number]>,
+  _options?: { tourist?: boolean },
 ): string {
-  if (!options?.tourist) return 'all';
-  for (const name of DEFAULT_CATEGORY_CANDIDATES) {
-    if (categories.some(([item, count]) => item === name && count > 0)) return name;
-  }
+  // Hub default: chip «Все». Tourist feed still demotes standup via filterStandupFromAllFeed.
   return 'all';
+}
+
+/** «Все» on tourist hubs: hide standup/comedy flood; open chips still show those categories. */
+export function filterStandupFromAllFeed<T extends HubAfficheSession>(
+  sessions: T[],
+  category: string,
+  options?: { tourist?: boolean },
+): T[] {
+  if (!options?.tourist || category !== 'all') return sessions;
+  return sessions.filter((session) => !isStandupSession(session));
 }
 
 export function groupStandupInHubFeed<T extends HubAfficheSession>(sessions: T[]): HubAfficheRow<T>[] {

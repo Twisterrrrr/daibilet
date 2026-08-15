@@ -3,6 +3,7 @@ import test from 'node:test';
 
 import {
   cityHubSessionHitScore,
+  filterStandupFromAllFeed,
   groupStandupInHubFeed,
   isCityHubTouristAffiche,
   preferredAfficheCategory,
@@ -30,7 +31,7 @@ test('tourist score puts excursions and theater above standup', () => {
   assert.equal(ranked[2]?.title, standup.title);
 });
 
-test('default chip is Excursions when the feed has that category', () => {
+test('default chip is All for tourist and regular hubs', () => {
   const categories = visibleAfficheCategories(
     [
       { category: 'Мероприятия', title: 'Стендап 1' },
@@ -46,8 +47,24 @@ test('default chip is Excursions when the feed has that category', () => {
     categories.some(([name]) => name === 'Музеи и арт'),
     false,
   );
-  assert.equal(preferredAfficheCategory(categories, { tourist: true }), 'Экскурсии');
+  assert.equal(preferredAfficheCategory(categories, { tourist: true }), 'all');
   assert.equal(preferredAfficheCategory(categories, { tourist: false }), 'all');
+});
+
+test('All feed on tourist hubs drops standup; category chips keep it', () => {
+  const sessions = [
+    { id: 'e1', title: 'Обзорная', category: 'Экскурсии' },
+    { id: 's1', title: 'Стендап пятница', category: 'Мероприятия' },
+    { id: 's2', title: 'Стендап суббота', category: 'Мероприятия' },
+  ];
+  const all = filterStandupFromAllFeed(sessions, 'all', { tourist: true });
+  assert.deepEqual(
+    all.map((s) => s.id),
+    ['e1'],
+  );
+  const events = filterStandupFromAllFeed(sessions, 'Мероприятия', { tourist: true });
+  assert.equal(events.length, 3);
+  assert.equal(filterStandupFromAllFeed(sessions, 'all', { tourist: false }).length, 3);
 });
 
 test('three or more standup cards collapse into one widget at the end', () => {

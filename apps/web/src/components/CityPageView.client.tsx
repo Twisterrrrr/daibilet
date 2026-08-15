@@ -55,6 +55,7 @@ import { resolveCityImage } from '@/lib/city-images';
 import { CITY_NIGHT_HERO } from '@/lib/city-night-hero';
 import { cityHasLifehacks } from '@/lib/city-hub-lifehacks';
 import {
+  filterStandupFromAllFeed,
   groupStandupInHubFeed,
   isCityHubTouristAffiche,
   preferredAfficheCategory,
@@ -245,18 +246,20 @@ export function CityPageView({
     return () => window.removeEventListener('hashchange', onHashChange);
   }, []);
 
+  const city = payload?.city;
+  const touristAffiche = isCityHubTouristAffiche(normalizeCityHubSlug(city?.slug || city?.sourceSlug || slug));
+
   const sessions = React.useMemo(() => {
     if (!payload) return [];
-    const filtered = payload.sessions.filter((session) => {
+    const byChip = payload.sessions.filter((session) => {
       if (category !== 'all' && session.category !== category) return false;
       return true;
     });
+    const filtered = filterStandupFromAllFeed(byChip, category, { tourist: touristAffiche });
     const ranked = rankCityHubSessions(filtered);
     return dedupeHubSessions(ranked);
-  }, [category, payload]);
+  }, [category, payload, touristAffiche]);
 
-  const city = payload?.city;
-  const touristAffiche = isCityHubTouristAffiche(normalizeCityHubSlug(city?.slug || city?.sourceSlug || slug));
   // Chip facets = hub feed only (same universe as the list / «Все»), not full-city catalog.
   const categories = React.useMemo(() => {
     if (!payload?.sessions?.length) return [] as Array<[string, number]>;
