@@ -275,6 +275,13 @@ export function resolveCityTopPreviewImage(city: CityImageSource): string | null
   return `/images/cities/top/${imageSlug}.jpg`;
 }
 
+/** Catalog/home card src: sibling `-thumb.jpg` (~640px). Hub hero stays full / night. */
+export function resolveCityCardThumbImage(city: CityImageSource): string | null {
+  const daytime = resolveCityTopPreviewImage(city);
+  if (!daytime) return null;
+  return daytime.replace(/\.jpe?g$/i, '-thumb.jpg');
+}
+
 /** Night hero for city hub (`/cities/[slug]`). */
 export function resolveCityNightImage(city: CityImageSource): string | null {
   const imageSlug = cityCardImageSlug(city);
@@ -286,21 +293,21 @@ export function resolveCityCardImage(
   city: CityImageSource,
   options?: { variant?: 'default' | 'top' },
 ): string | null {
-  const daytime = resolveCityTopPreviewImage(city);
-  if (options?.variant === 'top' && daytime) return daytime;
+  const cardThumb = resolveCityCardThumbImage(city);
+  if (options?.variant === 'top' && cardThumb) return cardThumb;
 
   const fromApi = city.heroImageUrl?.trim();
   if (fromApi && isUsableRemoteImage(fromApi)) return fromApi;
 
-  // Prefer daytime JPG over legacy PNG so catalog/home never keep night covers primary.
-  if (daytime) return daytime;
+  // Prefer daytime card thumb over legacy PNG so catalog/home never keep night covers primary.
+  if (cardThumb) return cardThumb;
 
   const imageSlug = cityCardImageSlug(city);
   if (!CITY_CARD_IMAGE_SLUGS.has(imageSlug)) return null;
   return `/images/cities/${imageSlug}.png`;
 }
 
-/** Hero / OG for city hub: night when restored, else daytime, else remote/root. */
+/** Hero / OG for city hub: night when restored, else full daytime, else remote/root. */
 export function resolveCityImage(city: CityImageSource): string | null {
   const night = resolveCityNightImage(city);
   if (night) return night;

@@ -218,7 +218,7 @@ async function main() {
   if (!cityInfoPath) throw new Error('cityInfo.ts not found');
 
   const source = fs.readFileSync(cityInfoPath, 'utf8');
-  const mustSee = parseMustSee(source);
+  const mustSee = [...parseMustSee(source), ...parseHubModuleMustSee()];
   const filtered = citiesFilter.size
     ? mustSee.filter((row) => citiesFilter.has(row.cityKey))
     : mustSee;
@@ -358,23 +358,80 @@ function parseMustSee(source) {
     const cityKey = keyMatch ? keyMatch[1] || keyMatch[2] : null;
     if (!cityKey) continue;
     const arrayBody = body.slice(arrStart + 1, arrEnd);
-    const itemRe = /\{([^{}]*)\}/g;
-    let im;
-    while ((im = itemRe.exec(arrayBody))) {
-      const block = im[1];
-      const nameMatch = block.match(/name:\s*'((?:\\'|[^'])*)'/);
-      if (!nameMatch) continue;
-      const descMatch = block.match(/desc:\s*'((?:\\'|[^'])*)'/);
-      rows.push({
-        cityKey,
-        name: unescapeTs(nameMatch[1]),
-        desc: descMatch ? unescapeTs(descMatch[1]) : '',
-        venueSlug: (block.match(/venueSlug:\s*'([^']+)'/) || [])[1] || null,
-        locationSlug: (block.match(/locationSlug:\s*'([^']+)'/) || [])[1] || null,
-        href: (block.match(/href:\s*'([^']+)'/) || [])[1] || null,
-      });
-    }
+    rows.push(...parseMustSeeArrayBody(arrayBody, cityKey));
     markerRe.lastIndex = arrEnd + 1;
+  }
+  return rows;
+}
+
+/** New hubs keep mustSee in *-hub.ts modules (`mustSee: KAZAN_MUST_SEE`). */
+function parseHubModuleMustSee() {
+  const hubs = [
+    { cityKey: 'kazan', file: 'apps/web/src/lib/kazan-hub.ts', exportName: 'KAZAN_MUST_SEE' },
+    { cityKey: 'samara', file: 'apps/web/src/lib/samara-hub.ts', exportName: 'SAMARA_MUST_SEE' },
+    {
+      cityKey: 'ekaterinburg',
+      file: 'apps/web/src/lib/ekaterinburg-hub.ts',
+      exportName: 'EKB_MUST_SEE',
+    },
+    {
+      cityKey: 'krasnodar',
+      file: 'apps/web/src/lib/krasnodar-hub.ts',
+      exportName: 'KRASNODAR_MUST_SEE',
+    },
+    {
+      cityKey: 'krasnoyarsk',
+      file: 'apps/web/src/lib/krasnoyarsk-hub.ts',
+      exportName: 'KRASNOYARSK_MUST_SEE',
+    },
+  ];
+  const rows = [];
+  for (const hub of hubs) {
+    const abs = path.join(rootDir, hub.file);
+    if (!fs.existsSync(abs)) continue;
+    const src = fs.readFileSync(abs, 'utf8');
+    const re = new RegExp(
+      `export const ${hub.exportName}[^=]*=\\s*\\[`,
+      'm',
+    );
+    const m = re.exec(src);
+    if (!m) continue;
+    const arrStart = m.index + m[0].length - 1;
+    let depth = 0;
+    let arrEnd = -1;
+    for (let i = arrStart; i < src.length; i++) {
+      if (src[i] === '[') depth++;
+      else if (src[i] === ']') {
+        depth--;
+        if (depth === 0) {
+          arrEnd = i;
+          break;
+        }
+      }
+    }
+    if (arrEnd < 0) continue;
+    rows.push(...parseMustSeeArrayBody(src.slice(arrStart + 1, arrEnd), hub.cityKey));
+  }
+  return rows;
+}
+
+function parseMustSeeArrayBody(arrayBody, cityKey) {
+  const rows = [];
+  const itemRe = /\{([^{}]*)\}/g;
+  let im;
+  while ((im = itemRe.exec(arrayBody))) {
+    const block = im[1];
+    const nameMatch = block.match(/name:\s*'((?:\\'|[^'])*)'/);
+    if (!nameMatch) continue;
+    const descMatch = block.match(/desc:\s*'((?:\\'|[^'])*)'/);
+    rows.push({
+      cityKey,
+      name: unescapeTs(nameMatch[1]),
+      desc: descMatch ? unescapeTs(descMatch[1]) : '',
+      venueSlug: (block.match(/venueSlug:\s*'([^']+)'/) || [])[1] || null,
+      locationSlug: (block.match(/locationSlug:\s*'([^']+)'/) || [])[1] || null,
+      href: (block.match(/href:\s*'([^']+)'/) || [])[1] || null,
+    });
   }
   return rows;
 }
