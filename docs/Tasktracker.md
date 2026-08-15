@@ -510,7 +510,7 @@
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
 | UX.HERO3q | Hero хаба города: верхний отступ над H1 = нижнему под CTA (`py` + `justify-center`, без `justify-end`) | Высокий | ✅ 2026-08-13 code; live после Deploy MSK web |
-| UX.HERO3r | Lovable navy `--navy-deep` oklch + Manrope body/extrabold + chip «N точек в гиде» | Критический | 🔄 code; Deploy MSK web |
+| UX.HERO3r | Lovable navy `--navy-deep` oklch + Manrope body/extrabold + chip «N точек в гиде» | Критический | ✅ `f2d972bc` tip `4babb231` MSK **BUILD_ID=`TLW69pLHqCKQ4LASp1q5K`** |
 
 ## Public client error UI (2026-08-13)
 
