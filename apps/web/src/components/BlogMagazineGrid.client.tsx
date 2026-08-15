@@ -10,8 +10,8 @@ import type { BlogCardDto } from '@/lib/blog-utils';
 type MagazineRow =
   | { kind: 'lead'; post: BlogCardDto }
   | { kind: 'quote'; post: BlogCardDto }
-  | { kind: 'trio'; mirror: boolean; large: BlogCardDto; small: [BlogCardDto, BlogCardDto] }
-  | { kind: 'pair'; lead: BlogCardDto; side: BlogCardDto; mirror: boolean }
+  | { kind: 'trio'; large: BlogCardDto; small: [BlogCardDto, BlogCardDto] }
+  | { kind: 'pair'; lead: BlogCardDto; side: BlogCardDto }
   | { kind: 'strip'; posts: [BlogCardDto, BlogCardDto, BlogCardDto] }
   | { kind: 'banner'; post: BlogCardDto }
   | { kind: 'single'; post: BlogCardDto };
@@ -44,7 +44,8 @@ function buildMagazineRows(posts: BlogCardDto[]): MagazineRow[] {
     }
 
     const left = valid.length - i;
-    const mirror = pack % 2 === 1;
+    // Keep large cards left-aligned. Mirrored packs (`col-start-2`) leave an empty
+    // left gutter beside a tall lead when the side column is short or missing.
     const phase = pack % 3;
 
     if (phase === 1 && left >= 1 && i % 5 !== 4) {
@@ -93,7 +94,6 @@ function buildMagazineRows(posts: BlogCardDto[]): MagazineRow[] {
       }
       rows.push({
         kind: 'trio',
-        mirror,
         large: a,
         small: [b, c],
       });
@@ -107,7 +107,6 @@ function buildMagazineRows(posts: BlogCardDto[]): MagazineRow[] {
         kind: 'pair',
         lead: valid[i]!,
         side: valid[i + 1]!,
-        mirror,
       });
       i += 2;
       pack += 1;
@@ -125,27 +124,19 @@ function buildMagazineRows(posts: BlogCardDto[]): MagazineRow[] {
 function TrioRow({
   large,
   small,
-  mirror,
 }: {
   large: BlogCardDto;
   small: [BlogCardDto, BlogCardDto];
-  mirror: boolean;
 }) {
   return (
     <div className="grid grid-cols-1 gap-5 lg:grid-cols-3 lg:grid-rows-2 lg:gap-x-6 lg:gap-y-5">
-      <div
-        className={
-          mirror
-            ? 'lg:col-span-2 lg:col-start-2 lg:row-span-2 lg:row-start-1'
-            : 'lg:col-span-2 lg:row-span-2'
-        }
-      >
+      <div className="lg:col-span-2 lg:row-span-2">
         <BlogPostCard post={large} variant="large" />
       </div>
-      <div className={mirror ? 'lg:col-start-1 lg:row-start-1' : undefined}>
+      <div>
         <BlogPostCard post={small[0]} variant="small" />
       </div>
-      <div className={mirror ? 'lg:col-start-1 lg:row-start-2' : undefined}>
+      <div>
         <BlogPostCard post={small[1]} variant="small" />
       </div>
     </div>
@@ -155,18 +146,16 @@ function TrioRow({
 function PairRow({
   lead,
   side,
-  mirror,
 }: {
   lead: BlogCardDto;
   side: BlogCardDto;
-  mirror: boolean;
 }) {
   return (
     <div className="grid grid-cols-1 gap-5 lg:grid-cols-3 lg:gap-6">
-      <div className={mirror ? 'lg:col-span-2 lg:col-start-2' : 'lg:col-span-2'}>
+      <div className="lg:col-span-2">
         <BlogPostCard post={lead} variant="large" />
       </div>
-      <div className={mirror ? 'lg:col-start-1 lg:row-start-1' : undefined}>
+      <div>
         <BlogPostCard post={side} variant="small" />
       </div>
     </div>
@@ -239,9 +228,9 @@ export function BlogMagazineGrid({
           ) : row.kind === 'quote' ? (
             <BlogPostCard post={row.post} variant="quote" />
           ) : row.kind === 'trio' ? (
-            <TrioRow large={row.large} small={row.small} mirror={row.mirror} />
+            <TrioRow large={row.large} small={row.small} />
           ) : row.kind === 'pair' ? (
-            <PairRow lead={row.lead} side={row.side} mirror={row.mirror} />
+            <PairRow lead={row.lead} side={row.side} />
           ) : row.kind === 'strip' ? (
             <StripRow posts={row.posts} />
           ) : row.kind === 'banner' ? (
