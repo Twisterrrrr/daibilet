@@ -53,10 +53,12 @@ const config: Config = {
         },
         urgency: 'hsl(var(--urgency))',
         success: 'hsl(var(--success))',
+        /* Literal oklch + <alpha-value>: var(--navy-*) alone breaks /opacity
+           (invalid color → body graphite inherits on navy hero lead/crumbs). */
         navy: {
-          DEFAULT: 'var(--navy)',
-          deep: 'var(--navy-deep)',
-          foreground: 'var(--navy-foreground)',
+          DEFAULT: 'oklch(29% 0.13 264 / <alpha-value>)',
+          deep: 'oklch(21% 0.11 265 / <alpha-value>)',
+          foreground: 'oklch(98% 0.006 250 / <alpha-value>)',
         },
       },
       fontFamily: {

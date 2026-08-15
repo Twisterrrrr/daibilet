@@ -1,3 +1,9 @@
+## 2026-08-15 - Hub hero lead contrast (navy)
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| FIX.HUB-HERO-LEAD-CONTRAST | Navy hero: lead/crumbs/region chip светлые (Tailwind alpha + hero-surface color) | Критический | 🔄 commit+deploy |
+
 ## 2026-08-15 - Hub festivals: curate + card hover
 
 | ID | Задача | Приоритет | Статус |

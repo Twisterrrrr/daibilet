@@ -436,9 +436,11 @@ html[data-nav-pending='1'] {
 }
 
 @layer utilities {
-  /* Lovable city hub: section + overlay use --gradient-hero */
+  /* Lovable city hub: section + overlay use --gradient-hero.
+     Default text is near-white so lead/crumbs stay readable if a utility fails. */
   .hero-surface {
     background-image: var(--gradient-hero);
+    color: var(--navy-foreground);
   }
 
   .gradient-hero-lovable {

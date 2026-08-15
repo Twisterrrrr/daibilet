@@ -264,7 +264,7 @@ export function CityHeroStrip({
               {city.name}
             </h1>
             {brief ? (
-              <p className="mt-3 max-w-xl text-base leading-relaxed text-navy-foreground/85 sm:text-lg">
+              <p className="mt-3 max-w-xl text-base leading-relaxed text-navy-foreground/80 sm:text-lg">
                 {brief}
               </p>
             ) : null}

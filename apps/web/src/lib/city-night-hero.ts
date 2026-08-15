@@ -26,7 +26,7 @@ export const CITY_NIGHT_HERO = {
     'relative min-h-[320px] overflow-hidden border-b border-[color:var(--navy-deep)] bg-[color:var(--navy-deep)] hero-surface sm:min-h-[380px] md:min-h-[440px]',
   content:
     'relative z-[1] mx-auto flex w-full max-w-[1240px] flex-col justify-center px-4 py-10 sm:min-h-[380px] sm:px-6 sm:py-12 md:min-h-[440px] lg:px-8',
-  contentInner: 'w-full max-w-2xl md:max-w-[560px] lg:max-w-[620px]',
+  contentInner: 'w-full max-w-2xl text-navy-foreground md:max-w-[560px] lg:max-w-[620px]',
   /** Lovable CityHero: right strip; mask lives on hero-surface overlay, not the photo. */
   photoFrame:
     'absolute inset-y-0 right-0 z-0 h-full w-full opacity-70 md:w-[62%] md:opacity-100',

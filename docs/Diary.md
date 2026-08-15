@@ -1,3 +1,18 @@
+## 2026-08-15 - Hub hero: lead/crumbs contrast on navy
+
+### Наблюдения
+- Owner screenshot NN: H1/чипы/кнопки белые, лид («Город, где Волга…»), крошки и region chip - тёмные на navy (контраст провал).
+- После `f2d972bc` классы `text-navy-foreground/70|/85` при `navy.foreground: var(--navy-foreground)` без `<alpha-value>` давали невалидный color → наследование body graphite.
+
+### Решения
+- Tailwind `navy` / `navy-deep` / `navy-foreground`: literal oklch + `<alpha-value>` (opacity utilities работают).
+- `.hero-surface { color: var(--navy-foreground) }` + `contentInner` с `text-navy-foreground`; lead `/80`.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-15 - Hub festivals: curate flagships + hover
 
 ### Наблюдения
