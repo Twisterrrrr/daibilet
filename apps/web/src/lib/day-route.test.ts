@@ -919,7 +919,7 @@ test('soft guideline helpers: warn copy and count label without /MAX lock', () =
   assert.match(DAY_ROUTE_SOFT_WARN, /плотный/);
   assert.doesNotMatch(DAY_ROUTE_SOFT_WARN, /[—–]/);
   assert.match(dayRouteHardLimitMessage(), /20/);
-  assert.match(dayRouteAddSuccessMessage(3), /Добавлено в маршрут · 3/);
+  assert.match(dayRouteAddSuccessMessage(3), /Добавлено · 3/);
   assert.match(dayRouteAddSuccessMessage(10), /плотный/);
 });
 

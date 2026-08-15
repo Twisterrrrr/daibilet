@@ -2482,9 +2482,7 @@ function DayRoutePanelInner() {
     setPickerOpen(false);
     const points = n === 1 ? '1 точка' : n < 5 ? `${n} точки` : `${n} точек`;
     flashDayRouteFeedback(
-      beforeCount > 0
-        ? `Предыдущий маршрут сброшен · «${scenario.name}» (${points})`
-        : `Сценарий «${scenario.name}» загружен · ${points}`,
+      beforeCount > 0 ? `Маршрут обновлён · ${points}` : `Маршрут загружен · ${points}`,
       { showClear: true },
     );
     setDndAnnounce(`Сценарий «${scenario.name}» загружен.`);

@@ -37,11 +37,18 @@ function ensureHost(): HTMLDivElement {
   return host;
 }
 
+function hideToast(host: HTMLDivElement) {
+  // Inline `display:flex` beats the HTML `hidden` attribute's UA `display:none`,
+  // so the toast stayed visible forever after add. Hide via display explicitly.
+  host.hidden = true;
+  host.style.display = 'none';
+}
+
 function scheduleHide(host: HTMLDivElement, ms: number) {
   const prev = Number(host.dataset.hideTimer || 0);
   if (prev) window.clearTimeout(prev);
   const timer = window.setTimeout(() => {
-    host.hidden = true;
+    hideToast(host);
   }, ms);
   host.dataset.hideTimer = String(timer);
 }
@@ -60,17 +67,17 @@ export function flashDayRouteFeedback(message: string, options: DayRouteFeedback
     'bottom:1.25rem',
     'transform:translateX(-50%)',
     'z-index:99999',
-    'max-width:min(24rem,calc(100vw - 2rem))',
-    'padding:0.65rem 0.85rem',
+    'max-width:min(18rem,calc(100vw - 2rem))',
+    'padding:0.55rem 0.75rem',
     'border-radius:9999px',
     'background:#064e3b',
     'color:#fff',
-    'font:600 13px/1.35 system-ui,sans-serif',
+    'font:600 13px/1.3 system-ui,sans-serif',
     'box-shadow:0 8px 24px rgba(0,0,0,.18)',
     'text-align:center',
     'display:flex',
     'align-items:center',
-    'gap:0.55rem',
+    'gap:0.45rem',
     showClear ? 'pointer-events:auto' : 'pointer-events:none',
   ].join(';');
 
@@ -78,7 +85,7 @@ export function flashDayRouteFeedback(message: string, options: DayRouteFeedback
 
   const label = document.createElement('span');
   label.textContent = text;
-  label.style.cssText = 'min-width:0;flex:1;text-align:left';
+  label.style.cssText = 'min-width:0;flex:1;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis';
   host.appendChild(label);
 
   if (showClear) {

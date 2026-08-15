@@ -51,9 +51,9 @@ export function dayRouteHardLimitMessage(): string {
 
 export function dayRouteAddSuccessMessage(count: number): string {
   if (isDayRouteAtSoft(count) && count < DAY_ROUTE_MAX) {
-    return `Добавлено · ${count} · ${DAY_ROUTE_SOFT_WARN}`;
+    return `Добавлено · ${count} · плотный день`;
   }
-  return `Добавлено в маршрут · ${count}`;
+  return `Добавлено · ${count}`;
 }
 
 /** Count label for header / route block (soft is guideline, not /10 lock). */

@@ -156,23 +156,22 @@ export function CityDayPresetBlock({
   /** Hub magazine covers: large cards (not tiny chips). My-day / embedded keep compact chips. */
   const hubMagazine = !inMyDay && !embedded;
 
-  const applyNamedRoute = (title: string, items: ReturnType<typeof buildCityDayRoutePreset>) => {
+  const applyNamedRoute = (items: ReturnType<typeof buildCityDayRoutePreset>) => {
     const beforeCount = readDayRouteFresh().venues.length;
     replaceDayRouteFromVenues(items, city.id || null);
     const n = items.length;
     const points =
       n === 1 ? '1 точка' : n > 0 && n < 5 ? `${n} точки` : `${n} точек`;
+    // Keep toast compact - no scenario title (long names bloated the floating badge).
     flashDayRouteFeedback(
-      beforeCount > 0
-        ? `Предыдущий маршрут сброшен · «${title}» (${points})`
-        : `Сценарий «${title}» · ${points}`,
+      beforeCount > 0 ? `Маршрут обновлён · ${points}` : `Маршрут собран · ${points}`,
       { showClear: true },
     );
   };
 
-  const apply = (id: string, items: ReturnType<typeof buildCityDayRoutePreset>, title: string) => {
+  const apply = (id: string, items: ReturnType<typeof buildCityDayRoutePreset>) => {
     setBusyId(id);
-    applyNamedRoute(title, items);
+    applyNamedRoute(items);
     if (navigateToMyDay) {
       router.push('/my-day');
       return;
@@ -183,7 +182,7 @@ export function CityDayPresetBlock({
   const selectNamed = (index: number, row: NamedRow) => {
     setActiveIndex(index);
     // Load scenario into guest day-route bucket so constructor timeline matches the card.
-    applyNamedRoute(row.preset.title, row.items);
+    applyNamedRoute(row.items);
     if (hubMagazine) scrollToDayConstructor();
   };
 
@@ -298,7 +297,7 @@ export function CityDayPresetBlock({
                   <button
                     type="button"
                     disabled={busyId != null}
-                    onClick={() => apply(preset.id, items, preset.title)}
+                    onClick={() => apply(preset.id, items)}
                     className={routeCtaClass}
                     data-day-preset-cta
                   >
@@ -313,7 +312,7 @@ export function CityDayPresetBlock({
                     <button
                       type="button"
                       disabled={busyId != null}
-                      onClick={() => apply(preset.id, items, preset.title)}
+                      onClick={() => apply(preset.id, items)}
                       className={routeCtaClass}
                       data-day-preset-cta
                       aria-label={MY_DAY_COLLECT_CTA_ARIA}
@@ -504,7 +503,7 @@ export function CityDayPresetBlock({
         <button
           type="button"
           disabled={busyId != null}
-          onClick={() => apply('default', fallbackPreset, 'Главные места')}
+          onClick={() => apply('default', fallbackPreset)}
           className={`inline-flex min-h-11 w-full shrink-0 items-center justify-center rounded-full px-4 py-2.5 text-sm font-semibold transition disabled:opacity-60 md:w-auto ${
             editorial
               ? 'bg-zinc-900 text-white hover:bg-zinc-800'
