@@ -900,7 +900,7 @@ test('addTextStopToDayRoute rejects blank title and respects MAX', () => {
 
 test('soft guideline helpers: warn copy and count label without /MAX lock', () => {
   assert.equal(DAY_ROUTE_SOFT, 10);
-  assert.equal(DAY_ROUTE_MAX, 20);
+  assert.equal(DAY_ROUTE_MAX, 35);
   assert.equal(isDayRouteAtSoft(9), false);
   assert.equal(isDayRouteAtSoft(10), true);
   assert.equal(isDayRouteAtHard(19), false);

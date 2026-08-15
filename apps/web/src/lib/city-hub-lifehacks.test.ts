@@ -13,10 +13,18 @@ import {
 } from './city-hub-lifehacks.ts';
 
 const CITY_INFO_SRC = readFileSync(fileURLToPath(new URL('./cityInfo.ts', import.meta.url)), 'utf8');
+const EKB_HUB_SRC = readFileSync(fileURLToPath(new URL('./ekaterinburg-hub.ts', import.meta.url)), 'utf8');
+const KAZAN_HUB_SRC = readFileSync(fileURLToPath(new URL('./kazan-hub.ts', import.meta.url)), 'utf8');
+const SAMARA_HUB_SRC = readFileSync(fileURLToPath(new URL('./samara-hub.ts', import.meta.url)), 'utf8');
 
 function cityInfoHasSlug(slug: string): boolean {
   const quoted = new RegExp(`['"]${slug.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}['"]`);
-  return quoted.test(CITY_INFO_SRC);
+  return (
+    quoted.test(CITY_INFO_SRC) ||
+    quoted.test(EKB_HUB_SRC) ||
+    quoted.test(KAZAN_HUB_SRC) ||
+    quoted.test(SAMARA_HUB_SRC)
+  );
 }
 
 function assertNoLongDash(value: string, label: string) {
@@ -24,7 +32,7 @@ function assertNoLongDash(value: string, label: string) {
   assert.equal(value.includes('\u2013'), false, label);
 }
 
-test('lifehacks cover Perm, Moscow, SPB, Kaliningrad and NN', () => {
+test('lifehacks cover Perm, Moscow, SPB, Kaliningrad, NN, EKB, Kazan and Samara', () => {
   assert.equal(cityHasLifehacks('perm'), true);
   assert.equal(cityHasLifehacks('moscow'), true);
   assert.equal(cityHasLifehacks('moskva'), true);
@@ -33,7 +41,10 @@ test('lifehacks cover Perm, Moscow, SPB, Kaliningrad and NN', () => {
   assert.equal(cityHasLifehacks('kaliningrad'), true);
   assert.equal(cityHasLifehacks('nizhny-novgorod'), true);
   assert.equal(cityHasLifehacks('nizhniy-novgorod'), true);
-  assert.equal(cityHasLifehacks('kazan'), false);
+  assert.equal(cityHasLifehacks('ekaterinburg'), true);
+  assert.equal(cityHasLifehacks('kazan'), true);
+  assert.equal(cityHasLifehacks('samara'), true);
+  assert.equal(cityHasLifehacks('ufa'), false);
 });
 
 test('Perm lifehacks have 4 tabs and 5 short cards with CTA', () => {
@@ -182,4 +193,56 @@ test('NN lifehacks: Lastochka affiche, cableway and free kremlin', () => {
   assert.equal(cable?.cta.kind, 'places');
   const kremlin = pack.items.find((item) => item.id === 'nn-kremlin-free');
   assert.equal(kremlin?.cta.kind, 'places');
+});
+
+test('EKB Kazan Samara lifehacks: 5 cards, no fly tab, places CTAs resolve', () => {
+  for (const city of ['ekaterinburg', 'kazan', 'samara'] as const) {
+    const pack = resolveCityLifehacks(city);
+    assert.ok(pack, city);
+    assertPackCopy(pack, city);
+    assert.equal(pack.items.length, 5, city);
+    assert.equal(
+      pack.items.some((item) => item.tabId === 'fly'),
+      false,
+      city,
+    );
+    assert.ok(pack.items.some((item) => item.cta.kind === 'affiche'), city);
+    assert.ok(pack.items.some((item) => item.cta.kind === 'places'), city);
+  }
+  const ekb = resolveCityLifehacks('ekaterinburg');
+  assert.equal(ekb?.items[0]?.id, 'ekb-colored-lines');
+  const kazan = resolveCityLifehacks('kazan');
+  assert.equal(kazan?.items[0]?.id, 'kazan-kremlin-free');
+  const samara = resolveCityLifehacks('samara');
+  assert.equal(samara?.items[0]?.id, 'samara-embankment-free');
+});
+
+test('EKB painted lines have 35 / 11 / 10 stops with coords and slugs', async () => {
+  const { EKB_RED_LINE_STOPS, EKB_LINE_DAY_ROUTE_PRESETS } = await import(
+    './ekaterinburg-line-presets.ts'
+  );
+  assert.equal(EKB_RED_LINE_STOPS.length, 35);
+  assert.ok(
+    EKB_RED_LINE_STOPS.every(
+      (stop: { latitude?: number; longitude?: number; locationSlug?: string; dayRouteId?: string }) =>
+        Number.isFinite(stop.latitude) &&
+        Number.isFinite(stop.longitude) &&
+        Boolean(stop.locationSlug || stop.dayRouteId),
+    ),
+  );
+  assert.equal(
+    EKB_LINE_DAY_ROUTE_PRESETS.find((p: { id: string }) => p.id === 'ekaterinburg-red-line')?.stops
+      ?.length,
+    35,
+  );
+  assert.equal(
+    EKB_LINE_DAY_ROUTE_PRESETS.find((p: { id: string }) => p.id === 'ekaterinburg-blue-line')?.stops
+      ?.length,
+    11,
+  );
+  assert.equal(
+    EKB_LINE_DAY_ROUTE_PRESETS.find((p: { id: string }) => p.id === 'ekaterinburg-purple-line')
+      ?.stops?.length,
+    10,
+  );
 });

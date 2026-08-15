@@ -82,7 +82,7 @@ SPB `.16` **retired**.
 
 **Связь с «Мой день» (код, не путать с тирами must-see):**
 - Soft guideline: `DAY_ROUTE_SOFT = 10` (warn «день уже плотный», add ещё можно)
-- Hard safety: `DAY_ROUTE_MAX = 20` (localStorage / share URL / matches API; named walking routes up to 20)
+- Hard safety: `DAY_ROUTE_MAX = 35` (localStorage / share URL / matches API; named walking routes up to 35)
 - Min ready hint: `DAY_ROUTE_MIN = 2`
 
 Источник констант: `apps/web/src/lib/day-route.ts`. Фильтр-табы: `apps/web/src/lib/must-see-filters.ts` (уже на hub / my-day).

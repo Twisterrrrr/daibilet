@@ -4,15 +4,15 @@
 
 import { resolveCityPlaceHref, type CityMustSeeItem, type CityPlaceLinkFields } from './cityInfo';
 import { namesLooselyMatch } from './city-place-href';
-import { lookupEditorialPlaceCoords, pickEditorialPlaceCoordsIfStale } from './city-place-coords';
-import { resolveVenueHeroImage } from './city-place-images';
+import { lookupEditorialPlaceCoords, pickEditorialPlaceCoordsIfStale } from './city-place-coords.ts'
+import { resolveVenueHeroImage } from './city-place-images.ts'
 import {
   DAY_ROUTE_MAX,
   DAY_ROUTE_SOFT,
   formatDayRouteStartsAtLabel,
   type DayRouteVenueItem,
-} from './day-route';
-import { isValidCoordinatePair } from './day-route-score';
+} from './day-route.ts'
+import { isValidCoordinatePair } from './day-route-score.ts'
 import { eventHref, transliterateSlug, venueHref } from './routes';
 import { normalizeVisitMinutes } from './visit-duration';
 

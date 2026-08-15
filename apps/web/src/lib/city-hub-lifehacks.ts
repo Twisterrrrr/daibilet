@@ -1,7 +1,7 @@
 /**
  * City hub «лайфхаки»: короткие карточки с CTA.
  * Держим отдельно от cityInfo (coords/mustSee) и local-flavor (погода/уникальность).
- * Пакеты: Пермь, Москва, СПб, Калининград, Нижний Новгород. Остальные города - null.
+ * Пакеты: Пермь, Москва, СПб, Калининград, Нижний Новгород, Екатеринбург, Казань, Самара.
  */
 
 import { normalizeCityHubSlug } from './city-hub-config.ts';
@@ -542,12 +542,273 @@ const NN_ITEMS: CityLifehackItem[] = [
   },
 ];
 
+const EKB_ITEMS: CityLifehackItem[] = [
+  {
+    id: 'ekb-colored-lines',
+    tabId: 'walk',
+    icon: 'walk',
+    title: 'Бесплатный гид под ногами',
+    body: body(
+      'Цветные линии на асфальте центра. ',
+      { s: 'Красная' },
+      ' - главный исторический маршрут, ',
+      { s: 'Синяя' },
+      ' - царский путь Романовых, ',
+      { s: 'Фиолетовая' },
+      ' - стрит-арт. Гид не нужен.',
+    ),
+    cta: {
+      kind: 'maps',
+      label: 'Маршрут на карте',
+      href: yandexMapsSearchUrl('Красная линия Екатеринбург'),
+    },
+  },
+  {
+    id: 'ekb-ekarta',
+    tabId: 'transit',
+    icon: 'transit',
+    title: 'Скидка на пересадки по ЕКАРТЕ',
+    body: body(
+      'Пополняемая карта-кошелек «ЕКАРТА». С тарифом «Электронный кошелек» пересадка между трамваями и автобусами в течение ',
+      { s: '60 минут' },
+      ' бесплатна.',
+    ),
+    cta: {
+      kind: 'gis',
+      label: 'Транспорт на карте',
+      href: twoGisCitySearchUrl('ekaterinburg', 'ЕКАРТА'),
+    },
+  },
+  {
+    id: 'ekb-meteogorka',
+    tabId: 'walk',
+    icon: 'walk',
+    title: 'Смотровая Метеогорки вместо высотки',
+    body: body(
+      'Смотровая площадка Метеогорки - панорама на Екатеринбург-Сити и центр ',
+      { s: 'бесплатна' },
+      ', в отличие от платного 52 этажа «Высоцкого».',
+    ),
+    cta: {
+      kind: 'maps',
+      label: 'Яндекс Карты',
+      href: yandexMapsSearchUrl('Метеогорка Екатеринбург'),
+      extra: [{ label: '2ГИС', href: twoGisCitySearchUrl('ekaterinburg', 'Метеогорка') }],
+    },
+  },
+  {
+    id: 'ekb-yeltsin-wednesday',
+    tabId: 'walk',
+    icon: 'museum',
+    title: 'Музейная неделя в Ельцин Центре',
+    body: body(
+      'Каждую третью среду месяца вход в интерактивный музей Бориса Ельцина и арт-галерею стоит всего ',
+      { s: '100-150 ₽' },
+      ' вместо полной стоимости. Планируйте даты.',
+    ),
+    cta: {
+      kind: 'affiche',
+      label: 'Смотреть афишу Екатеринбурга',
+    },
+  },
+  {
+    id: 'ekb-posikunchiki',
+    tabId: 'food',
+    icon: 'food',
+    title: 'Посикунчики и пельмени до 350 ₽',
+    body: body(
+      'Сытный обед уральскими мини-пирожками или пельменями ручной лепки в сетях «Пельмени Клуб» или «Кулинария №1» - до ',
+      { s: '350 ₽' },
+      '.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Где поесть в Екатеринбурге',
+      slugs: ['ekaterinburg-pelmeni-klub', 'ekaterinburg-pashtet'],
+      scrollTo: 'places',
+    },
+  },
+];
+
+const KAZAN_ITEMS: CityLifehackItem[] = [
+  {
+    id: 'kazan-kremlin-free',
+    tabId: 'walk',
+    icon: 'museum',
+    title: 'Кремль без билета',
+    body: body(
+      'Территория белокаменного Казанского Кремля и вход в мечеть Кул-Шариф полностью ',
+      { s: 'бесплатны' },
+      '. Платить нужно только за закрытые музеи в башнях.',
+    ),
+    cta: {
+      kind: 'maps',
+      label: 'Маршрут на карте',
+      href: yandexMapsSearchUrl('Казанский Кремль'),
+    },
+  },
+  {
+    id: 'kazan-transport-card',
+    tabId: 'transit',
+    icon: 'transit',
+    title: 'Безлимитный проезд по карте КТ',
+    body: body(
+      'Покупайте карту «Транспортная карта Казани» на ',
+      { s: '1-3 дня' },
+      ' в кассах метро. Безлимитные поездки на автобусах, трамваях и метро без переплат.',
+    ),
+    cta: {
+      kind: 'gis',
+      label: 'Транспорт на карте',
+      href: twoGisCitySearchUrl('kazan', 'метро Казань'),
+    },
+  },
+  {
+    id: 'kazan-chasha',
+    tabId: 'walk',
+    icon: 'walk',
+    title: 'Вид с Чаши за 150 ₽',
+    body: body(
+      'Подъем на крышу Центра семьи «Казан» (Чаша) - лучшая панорама на Казанку и Кремль по цене чашки чая, около ',
+      { s: '150 ₽' },
+      '.',
+    ),
+    cta: {
+      kind: 'maps',
+      label: 'Яндекс Карты',
+      href: yandexMapsSearchUrl('Центр семьи Казан'),
+      extra: [{ label: '2ГИС', href: twoGisCitySearchUrl('kazan', 'Центр семьи Казан') }],
+    },
+  },
+  {
+    id: 'kazan-sviyazhsk-train',
+    tabId: 'transit',
+    icon: 'ship',
+    title: 'Электричка до Свияжска вместо Метеора',
+    body: body(
+      'Пригородный поезд от вокзала Казань-1 до станции Свияжск идет ',
+      { s: '1 час' },
+      ' и стоит около ',
+      { s: '120 ₽' },
+      '. Это примерно в 8 раз дешевле билета на скоростной водный Метеор.',
+    ),
+    cta: {
+      kind: 'affiche',
+      label: 'Смотреть афишу Казани',
+    },
+  },
+  {
+    id: 'kazan-echpochmak-lunch',
+    tabId: 'food',
+    icon: 'food',
+    title: 'Эчпочмак-ланч до 250 ₽',
+    body: body(
+      'Национальная выпечка (эчпочмаки, кыстыбый, губадия) в сети «Тюбетей» или «Доброй столовой». Обед до ',
+      { s: '250 ₽' },
+      '.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Где поесть в Казани',
+      slugs: ['kazan-tyubetey', 'kazan-tugan-avylim'],
+      scrollTo: 'places',
+    },
+  },
+];
+
+const SAMARA_ITEMS: CityLifehackItem[] = [
+  {
+    id: 'samara-embankment-free',
+    tabId: 'walk',
+    icon: 'walk',
+    title: 'Бесплатный курорт в центре',
+    body: body(
+      'Самарская набережная и многокилометровые песчаные пляжи полностью ',
+      { s: 'бесплатны' },
+      '. Есть кабинки, души и спортплощадки - южный курорт без затрат.',
+    ),
+    cta: {
+      kind: 'maps',
+      label: 'Маршрут на карте',
+      href: yandexMapsSearchUrl('Самарская набережная'),
+    },
+  },
+  {
+    id: 'samara-social-card',
+    tabId: 'transit',
+    icon: 'transit',
+    title: 'Скидка по Единой Социальной Карте',
+    body: body(
+      'Оплачивайте проезд в трамваях и метро картой жителя Самарской области или банковской картой МИР. Поездка выходит на ',
+      { s: '5-7 ₽' },
+      ' дешевле наличных.',
+    ),
+    cta: {
+      kind: 'gis',
+      label: 'Транспорт на карте',
+      href: twoGisCitySearchUrl('samara', 'транспорт Самара'),
+    },
+  },
+  {
+    id: 'samara-vertolyotka',
+    tabId: 'walk',
+    icon: 'walk',
+    title: 'Вертолетка вместо речного круиза',
+    body: body(
+      'Смотровая «Вертолетка» на холмах посёлка Управленческий дает лучшую панораму Жигулёвских ворот ',
+      { s: 'бесплатно' },
+      '. Добраться можно на автобусе.',
+    ),
+    cta: {
+      kind: 'maps',
+      label: 'Яндекс Карты',
+      href: yandexMapsSearchUrl('Вертолетка Самара'),
+      extra: [{ label: '2ГИС', href: twoGisCitySearchUrl('samara', 'Вертолетка') }],
+    },
+  },
+  {
+    id: 'samara-om-valday',
+    tabId: 'transit',
+    icon: 'ship',
+    title: 'ОМ и Валдай вместо частных катеров',
+    body: body(
+      'До Жигулёвского заповедника в Ширяево плывите на регулярных теплоходах «ОМ» от Речного вокзала. Билет чуть больше ',
+      { s: '150 ₽' },
+      ' вместо дорогого такси-катера.',
+    ),
+    cta: {
+      kind: 'affiche',
+      label: 'Смотреть афишу Самары',
+    },
+  },
+  {
+    id: 'samara-na-dne',
+    tabId: 'food',
+    icon: 'food',
+    title: 'Пиво и раки «На Дне» до 400 ₽',
+    body: body(
+      'Берите Жигулёвское в культовом окошке розлива «На Дне» у завода. Литр свежего пива и порция волжских раков на вынос - до ',
+      { s: '400 ₽' },
+      '.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Где поесть в Самаре',
+      slugs: ['samara-pivnoy-bar-na-dne', 'samara-zhigulevskiy-pivovarennyy-zavod'],
+      scrollTo: 'places',
+    },
+  },
+];
+
 const CITY_HUB_LIFEHACKS: Record<string, CityLifehackPack> = {
   perm: lifehackPack(PERM_ITEMS),
   moscow: lifehackPack(MOSCOW_ITEMS),
   'saint-petersburg': lifehackPack(SPB_ITEMS),
   kaliningrad: lifehackPack(KGD_ITEMS),
   'nizhny-novgorod': lifehackPack(NN_ITEMS),
+  ekaterinburg: lifehackPack(EKB_ITEMS),
+  kazan: lifehackPack(KAZAN_ITEMS),
+  samara: lifehackPack(SAMARA_ITEMS),
 };
 
 export function resolveCityLifehacks(slug: string | null | undefined): CityLifehackPack | null {

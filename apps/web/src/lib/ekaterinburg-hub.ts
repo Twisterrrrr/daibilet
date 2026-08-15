@@ -1,6 +1,8 @@
 /** Ekaterinburg tourist hub pack (owner 2026-08-15). Hyphen-only copy. */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import { EKB_LINE_DAY_ROUTE_PRESETS } from './ekaterinburg-line-presets.ts';
+
 export const EKB_MUST_SEE: any[] = [
   // --- Core ---
   {
@@ -972,6 +974,7 @@ export const EKB_DAY_ROUTE_PRESETS: any[] = [
       },
     ],
   },
+  ...EKB_LINE_DAY_ROUTE_PRESETS,
 ];
 
 export const EKB_FAQ: Array<{ q: string; a: string }> = [

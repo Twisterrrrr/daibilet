@@ -3,7 +3,7 @@
  * (0-event content places or city page session-only venue list).
  */
 
-import { haversineMeters, isValidCoordinatePair } from './day-route-score';
+import { haversineMeters, isValidCoordinatePair } from './day-route-score.ts';
 
 export type EditorialPlaceCoords = {
   latitude: number;
@@ -523,12 +523,70 @@ const SAMARA_COORDS: Record<string, EditorialPlaceCoords> = {
   'samara-shiryaevo-samarskaya-luka': { latitude: 53.416112, longitude: 50.017511 },
 };
 
+const EKB_LINE_COORDS: Record<string, EditorialPlaceCoords> = {
+  'ekaterinburg-red-ploschad-1905': { latitude: 56.838221, longitude: 60.597441 },
+  'ekaterinburg-red-vtoroy-dom-sovetov': { latitude: 56.839841, longitude: 60.599112 },
+  'ekaterinburg-oktyabrskaya-ploschad': { latitude: 56.842711, longitude: 60.599112 },
+  'ekaterinburg-ekaterinburg-siti': { latitude: 56.844711, longitude: 60.596912 },
+  'ekaterinburg-el-tsin-tsentr': { latitude: 56.843112, longitude: 60.595611 },
+  'ekaterinburg-red-skver-275': { latitude: 56.841541, longitude: 60.595211 },
+  'ekaterinburg-red-gimnazicheskaya-naberezhnaya': { latitude: 56.839121, longitude: 60.598912 },
+  'ekaterinburg-red-gimnaziya-9': { latitude: 56.837811, longitude: 60.6091 },
+  'ekaterinburg-plotinka-istoricheskiy-skver': { latitude: 56.838511, longitude: 60.602812 },
+  'ekaterinburg-red-muzei-istoricheskogo-skvera': { latitude: 56.837812, longitude: 60.604011 },
+  'ekaterinburg-red-ploschad-truda': { latitude: 56.838512, longitude: 60.605211 },
+  'ekaterinburg-pamyatnik-tatischevu-i-de-genninu': { latitude: 56.838158, longitude: 60.605889 },
+  'ekaterinburg-vodonapornaya-bashnya-plotinka': { latitude: 56.837812, longitude: 60.604011 },
+  'ekaterinburg-red-chasovnya-svyatoy-ekateriny': { latitude: 56.838341, longitude: 60.606312 },
+  'ekaterinburg-red-nulevoy-kilometr': { latitude: 56.839211, longitude: 60.606712 },
+  'ekaterinburg-pamyatnik-popovu': { latitude: 56.839619, longitude: 60.6078 },
+  'ekaterinburg-red-literaturnyy-kvartal': { latitude: 56.841521, longitude: 60.608311 },
+  'ekaterinburg-red-muzey-literaturnaya-zhizn': { latitude: 56.841912, longitude: 60.6078 },
+  'ekaterinburg-pamyatnik-pushkinu': { latitude: 56.8419, longitude: 60.6078 },
+  'ekaterinburg-kharitonovskiy-sad': { latitude: 56.843112, longitude: 60.611113 },
+  'ekaterinburg-usadba-kharitonova-rastorguevyh': { latitude: 56.8422, longitude: 60.6106 },
+  'ekaterinburg-red-voznesenskaya-tserkov': { latitude: 56.842711, longitude: 60.613312 },
+  'ekaterinburg-hram-na-krovi': { latitude: 56.843342, longitude: 60.608611 },
+  'ekaterinburg-red-chernyy-tyulpan': { latitude: 56.839112, longitude: 60.622112 },
+  'ekaterinburg-red-ploschad-sovetskoy-armii': { latitude: 56.838312, longitude: 60.6247 },
+  'ekaterinburg-okruzhnoy-dom-ofitserov': { latitude: 56.8383, longitude: 60.6247 },
+  'ekaterinburg-urfu-glavnyy-korpus': { latitude: 56.841122, longitude: 60.614211 },
+  'ekaterinburg-red-pamyatnik-sverdlovu': { latitude: 56.839112, longitude: 60.613112 },
+  'ekaterinburg-ural-opera-balet': { latitude: 56.838911, longitude: 60.611112 },
+  'ekaterinburg-dom-pechati': { latitude: 56.839411, longitude: 60.609712 },
+  'ekaterinburg-red-urgu': { latitude: 56.840112, longitude: 60.613112 },
+  'ekaterinburg-red-ploschad-parizhskoy-kommuny': { latitude: 56.840612, longitude: 60.618133 },
+  'ekaterinburg-gorodok-chekistov': { latitude: 56.841742, longitude: 60.613911 },
+  'ekaterinburg-red-teatr-muzkomedii': { latitude: 56.838112, longitude: 60.605 },
+  'ekaterinburg-red-kolizey': { latitude: 56.838311, longitude: 60.612112 },
+  'ekaterinburg-blue-tsarskiy': { latitude: 56.843612, longitude: 60.608933 },
+  'ekaterinburg-blue-voznesenie': { latitude: 56.842711, longitude: 60.613312 },
+  'ekaterinburg-blue-teatr-estrady': { latitude: 56.834411, longitude: 60.603312 },
+  'ekaterinburg-blue-kolizey': { latitude: 56.838311, longitude: 60.612112 },
+  'ekaterinburg-blue-kantselyariya': { latitude: 56.837831, longitude: 60.607512 },
+  'ekaterinburg-blue-uggu': { latitude: 56.828112, longitude: 60.598912 },
+  'ekaterinburg-blue-novo-tikhvinskiy': { latitude: 56.821312, longitude: 60.595612 },
+  'ekaterinburg-blue-geologicheskiy-muzey': { latitude: 56.827912, longitude: 60.599112 },
+  'ekaterinburg-blue-rossiya-moya-istoriya': { latitude: 56.811512, longitude: 60.612112 },
+  'ekaterinburg-mural-uralskiy-bars': { latitude: 56.831512, longitude: 60.6021 },
+  'ekaterinburg-purple-pokras-lampas': { latitude: 56.839811, longitude: 60.610512 },
+  'ekaterinburg-purple-banka-sgushchenki': { latitude: 56.833912, longitude: 60.601112 },
+  'ekaterinburg-purple-bumazhnyy-samoletik': { latitude: 56.835987, longitude: 60.591214 },
+  'ekaterinburg-purple-devochka-s-ptichkoy': { latitude: 56.835112, longitude: 60.620112 },
+  'ekaterinburg-purple-gtsi': { latitude: 56.832112, longitude: 60.599411 },
+  'ekaterinburg-purple-stena-na-drame': { latitude: 56.842711, longitude: 60.599112 },
+  'ekaterinburg-purple-dvor-kaleydoskop': { latitude: 56.839912, longitude: 60.614211 },
+  'ekaterinburg-purple-tsvetochnyy-kover': { latitude: 56.835412, longitude: 60.598211 },
+  'ekaterinburg-purple-zim-grinwich': { latitude: 56.828111, longitude: 60.606712 },
+};
+
 const EDITORIAL_COORDS_BY_SLUG: Record<string, EditorialPlaceCoords> = {
   ...NIZHNY_NOVGOROD_COORDS,
   ...SAINT_PETERSBURG_COORDS,
   ...PERM_COORDS,
   ...EKATERINBURG_COORDS,
   ...SAMARA_COORDS,
+  ...EKB_LINE_COORDS,
 };
 
 export function lookupEditorialPlaceCoords(

@@ -25,7 +25,7 @@ export {
 } from '@/lib/day-route-share-url';
 
 const CODE_LENGTH = 7;
-const MAX_ITEMS_LEN = 1200;
+const MAX_ITEMS_LEN = 2800;
 const MAX_CITY_LEN = 64;
 const MAX_FROM_LEN = 40;
 const MAX_AUTHOR_LEN = 60;

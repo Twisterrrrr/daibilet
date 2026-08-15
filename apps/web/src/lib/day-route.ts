@@ -2,13 +2,13 @@
  * Guest «Собери свой день» bucket (localStorage). Separate from favorites wishlist.
  */
 
-import { haversineMeters, isValidCoordinatePair } from './day-route-score';
+import { haversineMeters, isValidCoordinatePair } from './day-route-score.ts';
 import { eventHref, venueHref } from './routes';
-import { isGeneratedVenueStub, resolveVenueHeroImage } from './city-place-images';
+import { isGeneratedVenueStub, resolveVenueHeroImage } from './city-place-images.ts'
 import {
   lookupEditorialPlaceCoords,
   pickEditorialPlaceCoordsIfStale,
-} from './city-place-coords';
+} from './city-place-coords.ts'
 
 /** Display clock for session labels (catalog sessions are Europe/Moscow wall-clock). */
 const DAY_ROUTE_SESSION_TZ = 'Europe/Moscow';
@@ -35,7 +35,7 @@ export const DAY_ROUTE_SOFT = 10;
 export const DAY_ROUTE_SOFT_WARN =
   'День уже плотный - карта и время могут разъехаться';
 /** Hard safety cap for localStorage / share URL (not a planning ideal). */
-export const DAY_ROUTE_MAX = 20;
+export const DAY_ROUTE_MAX = 35;
 
 export function isDayRouteAtSoft(count: number): boolean {
   return count >= DAY_ROUTE_SOFT;

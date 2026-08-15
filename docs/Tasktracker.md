@@ -1,3 +1,11 @@
+## 2026-08-15 - Lifehacks EKB/Kazan/Samara + MyDay 35 + EKB lines
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| UX.MYDAY-MAX-35 | `DAY_ROUTE_MAX=35`; share items len 2800; Красная линия 35 точек | Критический | ✅ code; commit+push |
+| CONT.LIFEHACKS-EKB-KZN-SMR | Лайфхаки ЕКБ / Казань / Самара (5 карточек) | Высокий | ✅ |
+| CONT.EKB-COLORED-LINES | Сценарии Красная / Синяя / Фиолетовая линии | Высокий | ✅ |
+
 ## 2026-08-15 - Самара tourist hub
 
 | ID | Задача | Приоритет | Статус |

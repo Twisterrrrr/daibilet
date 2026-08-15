@@ -1,3 +1,18 @@
+## 2026-08-15 - Лайфхаки EKB/Kazan/Samara + MyDay MAX 35 + цветные линии ЕКБ
+
+### Наблюдения
+- Owner: лайфхаки для трёх хабов; три painted lines для ЕКБ; Красная линия = 35 точек - нужен hard cap выше 20.
+
+### Решения
+- `DAY_ROUTE_MAX=35`, share `MAX_ITEMS_LEN=2800`.
+- Lifehacks packs: ekaterinburg / kazan / samara.
+- `ekaterinburg-line-presets.ts`: Красная 35 / Синяя 11 / Фиолетовая 10 + merge в `EKB_DAY_ROUTE_PRESETS`.
+
+### Проблемы
+- Часть стопов линий - dayRouteId-stubs без отдельных mustSee covers.
+
+---
+
 ## 2026-08-15 - Самара: полный tourist hub + превью + MyDay
 
 ### Наблюдения
