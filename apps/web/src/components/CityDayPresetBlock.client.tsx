@@ -166,6 +166,7 @@ export function CityDayPresetBlock({
       beforeCount > 0
         ? `Предыдущий маршрут сброшен · «${title}» (${points})`
         : `Сценарий «${title}» · ${points}`,
+      { showClear: true },
     );
   };
 

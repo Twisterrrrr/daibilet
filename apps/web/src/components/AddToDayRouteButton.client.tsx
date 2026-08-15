@@ -113,7 +113,7 @@ export function AddToDayRouteButton({
     const after = readDayRouteFresh();
     const n = after.venues.length;
     if (n > beforeCount) {
-      flashDayRouteFeedback(dayRouteAddSuccessMessage(n));
+      flashDayRouteFeedback(dayRouteAddSuccessMessage(n), { showClear: true });
       return;
     }
     if (n < beforeCount) {
@@ -365,6 +365,7 @@ export function AddManyToDayRouteButton({
         : beforeCount > 0
           ? `Предыдущий маршрут сброшен · ${n} ${n === 1 ? 'точка' : n < 5 ? 'точки' : 'точек'}`
           : `Маршрут собран: ${n} ${n === 1 ? 'точка' : n < 5 ? 'точки' : 'точек'}`,
+      n > 0 ? { showClear: true } : undefined,
     );
     if (navigateToMyDay) {
       router.push('/my-day');
@@ -392,6 +393,7 @@ export function AddManyToDayRouteButton({
     if (added > 0) {
       flashDayRouteFeedback(
         added > 1 ? `Добавлено ${added} точек · ${n}` : dayRouteAddSuccessMessage(n),
+        { showClear: true },
       );
       return;
     }

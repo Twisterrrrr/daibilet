@@ -393,7 +393,7 @@ function appendDayRouteItem(
   }
   const next = insertIntoDayRoute(item, afterVenueId);
   if (next.venues.length > current.venues.length) {
-    flashDayRouteFeedback(dayRouteAddSuccessMessage(next.venues.length));
+    flashDayRouteFeedback(dayRouteAddSuccessMessage(next.venues.length), { showClear: true });
   } else if (next.venues.length >= DAY_ROUTE_MAX) {
     flashDayRouteFeedback(dayRouteHardLimitMessage());
   } else {
@@ -1910,9 +1910,9 @@ function DayRoutePanelInner() {
       );
       return;
     }
-    flashDayRouteFeedback(dayRouteAddSuccessMessage(next.venues.length));
+    flashDayRouteFeedback(dayRouteAddSuccessMessage(next.venues.length), { showClear: true });
     if (isDayRouteAtSoft(next.venues.length)) {
-      flashDayRouteFeedback(DAY_ROUTE_SOFT_WARN);
+      flashDayRouteFeedback(DAY_ROUTE_SOFT_WARN, { showClear: true });
     }
   }
 
@@ -2186,6 +2186,7 @@ function DayRoutePanelInner() {
         hasCoords
           ? dayRouteAddSuccessMessage(next.venues.length)
           : 'В списке есть. На карте появится после адреса или lat, lng',
+        { showClear: true },
       );
     }
     setTitleInput('');
@@ -2484,6 +2485,7 @@ function DayRoutePanelInner() {
       beforeCount > 0
         ? `Предыдущий маршрут сброшен · «${scenario.name}» (${points})`
         : `Сценарий «${scenario.name}» загружен · ${points}`,
+      { showClear: true },
     );
     setDndAnnounce(`Сценарий «${scenario.name}» загружен.`);
   }
@@ -3096,6 +3098,7 @@ function DayRoutePanelInner() {
                 flashDayRouteFeedback(
                   dayRouteAddSuccessMessage(firstPresetItems.length) ||
                     `Сценарий «${firstPreset.title}» в маршруте`,
+                  { showClear: true },
                 );
               }}
               className={`inline-btn mt-4 min-h-0 text-left text-sm font-semibold text-primary-700 ${DAY_TEXT_LINK}`}
