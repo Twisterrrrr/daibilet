@@ -48,6 +48,7 @@ export const INDEXNOW_DEPLOY_PATHS: readonly string[] = [
   '/progulki-po-krysham/saint-petersburg',
   '/podborki/na-vyhodnye',
   '/contacts',
+  '/partners',
 ];
 
 let pendingUrls = new Set<string>();

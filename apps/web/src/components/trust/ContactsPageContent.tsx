@@ -20,7 +20,12 @@ export function ContactsPageContent() {
           <p className="text-sm font-semibold uppercase tracking-wider text-primary-700">Дайбилет</p>
           <h1 className="mt-2 text-3xl font-extrabold text-slate-900 md:text-4xl">Контакты</h1>
           <p className="mt-3 text-lg leading-7 text-slate-600">
-            Свяжитесь с нами по вопросам заказов, возвратов и партнёрства. Ответим в рабочие дни в течение 24 часов.
+            Свяжитесь с нами по вопросам заказов и возвратов. Ответим в рабочие дни в течение 24 часов. Реклама и
+            подключение площадок - на странице{' '}
+            <Link href="/partners" className="font-semibold text-primary-700 hover:underline">
+              Реклама и сотрудничество
+            </Link>
+            .
           </p>
         </div>
       </section>

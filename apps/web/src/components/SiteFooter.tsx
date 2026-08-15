@@ -34,6 +34,7 @@ const catalogLinkDefs: Array<
 
 const companyLinks = [
   { label: 'О проекте', href: '/about' },
+  { label: 'Реклама и сотрудничество', href: '/partners' },
   { label: 'Блог', href: '/blog' },
   { label: 'Контакты', href: '/contacts' },
   { label: 'Помощь', href: '/help' },

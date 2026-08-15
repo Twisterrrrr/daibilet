@@ -160,6 +160,7 @@ export async function buildStaticSitemapEntries(now = new Date()): Promise<Sitem
     entry('/blog', now, 'daily', 0.8),
     entry('/help', now, 'monthly', 0.5),
     entry('/contacts', now, 'monthly', 0.5),
+    entry('/partners', now, 'monthly', 0.6),
     entry('/offer', now, 'yearly', 0.3),
     entry('/privacy', now, 'yearly', 0.3),
     entry('/legal', now, 'yearly', 0.3),

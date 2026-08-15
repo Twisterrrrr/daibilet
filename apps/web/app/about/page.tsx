@@ -54,9 +54,13 @@ export default function AboutPage() {
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
             <h2 className="text-xl font-bold text-slate-900">Связь</h2>
             <p className="mt-3 leading-7 text-slate-600">
-              Вопросы по заказам и партнёрству - на странице{' '}
+              Вопросы по заказам - на странице{' '}
               <Link href="/contacts" className="font-semibold text-primary-700 hover:text-primary-800">
                 Контакты
+              </Link>
+              . Реклама, подключение площадок и спецпроекты - в разделе{' '}
+              <Link href="/partners" className="font-semibold text-primary-700 hover:text-primary-800">
+                Реклама и сотрудничество
               </Link>
               . Частые ответы - в{' '}
               <Link href="/help" className="font-semibold text-primary-700 hover:text-primary-800">
