@@ -22,7 +22,7 @@ export function HomeCityAwareSections({
   fingerprints: Record<string, string>;
   sparseCatalog: boolean;
   /** Inserted after «Выбор редакции» (e.g. popular cities). */
-  children?: ReactNode;
+  children?: ReactNode | ((ctx: { showEditorsPick: boolean }) => ReactNode);
 }) {
   const selectedCity = useSelectedCityOptional();
   const cityReady = selectedCity?.cityReady ?? true;
@@ -85,6 +85,7 @@ export function HomeCityAwareSections({
     cityReady && cityName ? ` · ${cityName}` : !cityReady ? '' : ' · все города';
 
   const showEditorsPick = editorsPick.length > 0;
+  const inserted = typeof children === 'function' ? children({ showEditorsPick }) : children;
 
   return (
     <>
@@ -98,7 +99,7 @@ export function HomeCityAwareSections({
         sectionClassName={showEditorsPick ? 'max-sm:!pt-[calc(var(--space-section)/2)]' : undefined}
       />
 
-      {children}
+      {inserted}
 
       {mergedTabs.length ? (
         <HomeNowSection

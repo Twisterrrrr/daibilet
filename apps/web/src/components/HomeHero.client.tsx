@@ -104,7 +104,7 @@ export function HomeHero({ destinations, frames, landings = [], videoSrc }: Home
         className="mt-8 w-full max-w-5xl rounded-2xl bg-white p-2 text-left shadow-2xl shadow-slate-950/30"
         aria-label="Поиск билетов"
       >
-        {/* Mobile: city + find. Desktop: city + date + find. Category lives in soft chip rail. */}
+        {/* City + date + find on all breakpoints. Category lives in soft chip rail. */}
         <div className="grid w-full grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1.4fr)_minmax(120px,0.9fr)_auto]">
           <CityPicker
             cities={destinations}
@@ -113,7 +113,7 @@ export function HomeHero({ destinations, frames, landings = [], videoSrc }: Home
             allLabel="Город"
             variant="hero"
           />
-          <div className="relative hidden sm:block">
+          <div className="relative">
             <CalendarDays className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <select
               value={heroDate}
@@ -151,24 +151,6 @@ export function HomeHero({ destinations, frames, landings = [], videoSrc }: Home
           className="flex w-max flex-nowrap items-center gap-2 px-1 pb-0.5"
           data-home-hero-chips
         >
-          {HERO_DATE_OPTIONS.filter((d) => d.value !== 'all').map((option) => {
-            const active = heroDate === option.value;
-            return (
-              <button
-                key={option.value}
-                type="button"
-                data-rail-item
-                onClick={() => setHeroDate(option.value)}
-                className={`inline-flex h-8 shrink-0 items-center rounded-full px-3.5 text-xs font-semibold transition sm:hidden ${
-                  active
-                    ? 'bg-white text-slate-900 shadow-sm'
-                    : 'bg-white/20 text-white/95 ring-1 ring-white/35 backdrop-blur-sm hover:bg-white/30'
-                }`}
-              >
-                {option.label}
-              </button>
-            );
-          })}
           {quickChips.map((chip) => {
             let href = chip.href;
             if (chip.href.startsWith('/events')) {

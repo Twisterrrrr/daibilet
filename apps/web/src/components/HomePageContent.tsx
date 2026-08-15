@@ -92,32 +92,40 @@ async function HomePageBody() {
         fingerprints={fingerprintsRecord}
         sparseCatalog={sparseCatalog}
       >
-        {topCities.length ? (
-          <section
-            id="destinations"
-            className="section-y pb-6 sm:pb-8"
-            data-home-band="full-bleed"
-          >
-            <div className="container-page">
-              <div className="flex items-end justify-between gap-4">
-                <div>
-                  <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-                    Популярные города
-                  </h2>
-                  <p className="mt-1 text-sm text-slate-500">Выберите город - покажем афишу и подборки</p>
+        {({ showEditorsPick }) => (
+          <>
+            {topCities.length ? (
+              <section
+                id="destinations"
+                className={`section-y pb-6 sm:pb-8${
+                  showEditorsPick
+                    ? ''
+                    : ' !pt-[calc(var(--space-section)/2)] sm:!pt-[calc(var(--space-section-lg)/2)]'
+                }`}
+                data-home-band="full-bleed"
+              >
+                <div className="container-page">
+                  <div className="flex items-end justify-between gap-4">
+                    <div>
+                      <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+                        Популярные города
+                      </h2>
+                      <p className="mt-1 text-sm text-slate-500">Выберите город - покажем афишу и подборки</p>
+                    </div>
+                    <Link href="/cities" className="shrink-0 text-sm font-semibold text-primary-600 hover:text-primary-700">
+                      Все города →
+                    </Link>
+                  </div>
                 </div>
-                <Link href="/cities" className="shrink-0 text-sm font-semibold text-primary-600 hover:text-primary-700">
-                  Все города →
-                </Link>
-              </div>
-            </div>
-            {/* Finite city grid + «Показать ещё» (no infinite loop). */}
-            <HomePopularCitiesRail cities={topCities} className="mt-6" />
-          </section>
-        ) : null}
+                {/* Finite city grid + «Показать ещё» (no infinite loop). */}
+                <HomePopularCitiesRail cities={topCities} className="mt-6" />
+              </section>
+            ) : null}
 
-        {/* My Day CTA - constructor card on soft map-band */}
-        <HomeMyDayBanner />
+            {/* My Day CTA - constructor card on soft map-band */}
+            <HomeMyDayBanner />
+          </>
+        )}
       </HomeCityAwareSections>
 
       {/* Mobile formats: after event rails, away from My Day CTA */}

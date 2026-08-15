@@ -1,9 +1,6 @@
-import { isSessionToday } from '@/lib/datetime';
 import {
   formatSessionDate,
   formatSessionTime,
-  isSessionTomorrow,
-  isSessionWeekend,
   parseSessionStartsAt,
   resolveSessionTimeZoneForSession,
 } from '@/lib/datetime';
@@ -143,6 +140,7 @@ export function buildHomeNowTabs(sessions: PublicSession[], options: BuildHomeNo
   const pickState = options.pickState ?? createHomePickState();
   const inCity = cityName ? ` в ${cityName}` : '';
 
+  // Date presets (today / tomorrow / weekend) live in the home hero selector - keep one popular rail here.
   const tabDefs: Array<{
     key: HomeNowTabKey;
     label: string;
@@ -153,36 +151,6 @@ export function buildHomeNowTabs(sessions: PublicSession[], options: BuildHomeNo
     fallbackTitle: string;
     fallbackSubtitle: string;
   }> = [
-    {
-      key: 'today',
-      label: 'Сегодня',
-      title: `Сегодня${inCity}`,
-      subtitle: 'Сеансы, которые ещё можно успеть',
-      slotFilter: (iso, timeZone) => isSessionToday(iso, timeZone),
-      catalogQuery: { date: 'today', sort: 'time' },
-      fallbackTitle: cityName ? `Популярное${inCity}` : 'Популярное в ближайшие дни',
-      fallbackSubtitle: 'Рекомендуем начать с этих событий',
-    },
-    {
-      key: 'tomorrow',
-      label: 'Завтра',
-      title: `Завтра${inCity}`,
-      subtitle: 'Удобно спланировать заранее',
-      slotFilter: (iso, timeZone) => isSessionTomorrow(iso, timeZone),
-      catalogQuery: { date: 'tomorrow', sort: 'time' },
-      fallbackTitle: cityName ? `Рекомендуем${inCity}` : 'Рекомендуем в ближайшие дни',
-      fallbackSubtitle: 'Лучшие предложения из каталога',
-    },
-    {
-      key: 'weekend',
-      label: 'На выходных',
-      title: `На выходных${inCity}`,
-      subtitle: 'Сб и вс - семейные и вечерние форматы',
-      slotFilter: (iso, timeZone) => isSessionWeekend(iso, timeZone),
-      catalogQuery: { date: 'weekend', sort: 'popular' },
-      fallbackTitle: 'Лучшие предложения сезона',
-      fallbackSubtitle: 'Подборка по популярности',
-    },
     {
       key: 'nearest',
       label: 'Ближайшие даты',
@@ -205,7 +173,7 @@ export function buildHomeNowTabs(sessions: PublicSession[], options: BuildHomeNo
 
       if (usedFallback) {
         if (!fallbackByTab.has(def.key)) {
-          const offset = { today: 0, tomorrow: 2, weekend: 4, nearest: 6 }[def.key];
+          const offset = { today: 0, tomorrow: 2, weekend: 4, nearest: 0 }[def.key];
           const rotated = [...sessions.slice(offset), ...sessions.slice(0, offset)];
           fallbackByTab.set(
             def.key,
@@ -232,9 +200,9 @@ export function buildHomeNowTabs(sessions: PublicSession[], options: BuildHomeNo
 }
 
 export function pickDefaultHomeNowTab(tabs: HomeNowTab[]): HomeNowTabKey {
-  const preferred: HomeNowTabKey[] = ['today', 'weekend', 'tomorrow', 'nearest'];
+  const preferred: HomeNowTabKey[] = ['nearest', 'today', 'weekend', 'tomorrow'];
   for (const key of preferred) {
     if (tabs.some((tab) => tab.key === key)) return key;
   }
-  return tabs[0]?.key || 'today';
+  return tabs[0]?.key || 'nearest';
 }
