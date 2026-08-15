@@ -75,7 +75,7 @@ const FEATURE_CHIPS: Record<VenueFeatureCode, VenueFeatureChip> = {
 
 const EDITORIAL_BY_SLUG: Record<string, VenueEditorialContent> = {
   ermitazh: {
-    displayTitle: 'Государственный Эрмитаж',
+    displayTitle: 'Государственный Эрмитаж (Зимний дворец)',
     hookFact:
       'Если вы решите задержаться у каждого экспоната музея хотя бы на одну минуту, вам придется провести здесь без сна и еды целых 8 лет.',
     // Real local covers only (main complex + General Staff) - no stock Unsplash fillers.

@@ -14,7 +14,7 @@ import {
 test('ermitazh has highlights, features, FAQ without em dash', () => {
   const content = resolveVenueEditorialContent('ermitazh');
   assert.ok(content);
-  assert.equal(content!.displayTitle, 'Государственный Эрмитаж');
+  assert.equal(content!.displayTitle, 'Государственный Эрмитаж (Зимний дворец)');
   assert.ok(content!.hookFact && content!.hookFact.includes('8 лет'));
   assert.ok((content!.galleryUrls || []).length >= 2);
   assert.equal(content!.tickets?.priceFromRub, 500);
@@ -65,8 +65,8 @@ test('applyVenueEditorialOverlay patches legacy Hermitage title', () => {
     metroStation: null,
     hookFact: null,
   });
-  assert.equal(patched.name, 'Государственный Эрмитаж');
-  assert.equal(patched.seoH1, 'Государственный Эрмитаж');
+  assert.equal(patched.name, 'Государственный Эрмитаж (Зимний дворец)');
+  assert.equal(patched.seoH1, 'Государственный Эрмитаж (Зимний дворец)');
   assert.equal(patched.metroStation, 'Адмиралтейская');
   assert.ok(patched.hookFact && patched.hookFact.includes('8 лет'));
 });

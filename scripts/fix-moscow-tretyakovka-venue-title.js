@@ -3,7 +3,7 @@
  * Fix TC venue whose title was the street address of Tretyakov Gallery.
  *
  * Bad:  title/address = «Москва, Лаврушинский переулок, 10»
- * Good: title = «Третьяковская галерея», address = «Лаврушинский переулок, 10»
+ * Good: title = «Государственная Третьяковская галерея», address = «Лаврушинский переулок, 10»
  * Canon name matches cityInfo / must-see editorial (moscow-tret-yakovskaya-galereya).
  *
  * Usage (MSK):
@@ -23,7 +23,7 @@ const { Pool } = requireFromDbPackage('pg');
 const VENUE_ID = 'venue_6a1fd5158bd71b8ae77e127c';
 const VENUE_SLUG = 'moskva-lavrushinskii-pereulok-10-6a1fd5158bd71b8ae77e127c';
 const NEXT = {
-  title: 'Третьяковская галерея',
+  title: 'Государственная Третьяковская галерея',
   address: 'Лаврушинский переулок, 10',
   /** TC put the street line into description; clear if it still mirrors the old address-title. */
   clearAddressDescription: true,

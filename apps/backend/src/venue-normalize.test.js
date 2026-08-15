@@ -35,6 +35,15 @@ test('normalizePublicVenueRecord strips poisoned ул. г. prefix', () => {
   assert.match(String(result.address), /Садовая/i);
 });
 
+test('normalizePublicVenueRecord applies official Hermitage display title by slug', () => {
+  const result = normalizePublicVenueRecord({
+    slug: 'ermitazh',
+    title: 'Эрмитаж',
+    city: 'Санкт-Петербург',
+  });
+  assert.equal(result.title, 'Государственный Эрмитаж (Зимний дворец)');
+});
+
 test('normalizePublicVenueRecord renames Lavrushinsky address-title to Tretyakov Gallery', () => {
   const byId = normalizePublicVenueRecord({
     id: 'venue_6a1fd5158bd71b8ae77e127c',
@@ -42,7 +51,7 @@ test('normalizePublicVenueRecord renames Lavrushinsky address-title to Tretyakov
     address: 'Москва, Лаврушинский переулок, 10',
     city: 'Москва',
   });
-  assert.equal(byId.title, 'Третьяковская галерея');
+  assert.equal(byId.title, 'Государственная Третьяковская галерея');
   assert.equal(byId.address, 'Лаврушинский переулок, 10');
 
   const byMatch = normalizePublicVenueRecord({
@@ -50,7 +59,7 @@ test('normalizePublicVenueRecord renames Lavrushinsky address-title to Tretyakov
     address: 'Лаврушинский переулок, 10',
     city: 'Москва',
   });
-  assert.equal(byMatch.title, 'Третьяковская галерея');
+  assert.equal(byMatch.title, 'Государственная Третьяковская галерея');
   assert.equal(byMatch.address, 'Лаврушинский переулок, 10');
 });
 

@@ -841,6 +841,7 @@ function canonicalVenueMergeTitle(name) {
 export function applyPublicVenueNormalization(row = {}) {
   const normalized = normalizePublicVenueRecord({
     id: row.id,
+    slug: row.slug,
     title: row.name || row.title,
     name: row.name || row.title,
     address: row.address,
