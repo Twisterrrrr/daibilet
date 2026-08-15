@@ -55,8 +55,10 @@ export function CityRegionalEvents({ citySlug, editorial = false, nested = false
               {events.map((event) => (
                 <li
                   key={event.id}
-                  className={`rounded-2xl border p-4 ${
-                    editorial ? 'border-zinc-200 bg-white' : 'border-slate-200 bg-white'
+                  className={`rounded-2xl border p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_28px_-10px_hsl(221_83%_53%_/_0.28)] ${
+                    editorial
+                      ? 'border-zinc-200 bg-white hover:border-zinc-400'
+                      : 'border-slate-200 bg-white hover:border-primary/40'
                   }`}
                   data-city-regional-event={event.id}
                   data-status={event.status}
@@ -113,8 +115,10 @@ export function CityRegionalEvents({ citySlug, editorial = false, nested = false
                 {past.map((event) => (
                   <li
                     key={event.id}
-                    className={`rounded-xl px-3 py-2 text-sm ${
-                      editorial ? 'bg-white text-zinc-600' : 'bg-white text-slate-600'
+                    className={`rounded-xl border border-transparent px-3 py-2 text-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-10px_hsl(221_83%_53%_/_0.22)] ${
+                      editorial
+                        ? 'bg-white text-zinc-600 hover:border-zinc-300'
+                        : 'bg-white text-slate-600 hover:border-primary/30'
                     }`}
                     data-city-regional-event={event.id}
                     data-status="past"

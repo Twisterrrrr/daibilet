@@ -1,3 +1,10 @@
+## 2026-08-15 - Hub festivals: curate + card hover
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| CONT.HUB-FEST-CURATE | Курация fest 5 tourist hubs (~2-3 upcoming/past) | Высокий | ✅ |
+| UX.HUB-FEST-CARD-HOVER | Hover lift/shadow/border на карточках фестивалей | Высокий | ✅ |
+
 ## 2026-08-15 - Пермь walking lines + My Day MAX 20
 
 | ID | Задача | Приоритет | Статус |

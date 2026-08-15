@@ -52,9 +52,9 @@ function listAllCityRegionalEvents(
 export function listCityRegionalEvents(
   slug: string | null | undefined,
   now = new Date(),
-  limit = 5,
+  limit = 3,
 ): CityRegionalEventView[] {
-  const cap = Number.isFinite(limit) ? Math.max(0, Math.min(5, Math.floor(limit))) : 5;
+  const cap = Number.isFinite(limit) ? Math.max(0, Math.min(3, Math.floor(limit))) : 3;
   return listAllCityRegionalEvents(slug, now)
     .filter((event) => event.status !== 'past')
     .slice(0, cap);
@@ -63,9 +63,9 @@ export function listCityRegionalEvents(
 export function listCityRegionalPastEvents(
   slug: string | null | undefined,
   now = new Date(),
-  limit = 5,
+  limit = 3,
 ): CityRegionalEventView[] {
-  const cap = Number.isFinite(limit) ? Math.max(0, Math.min(8, Math.floor(limit))) : 5;
+  const cap = Number.isFinite(limit) ? Math.max(0, Math.min(3, Math.floor(limit))) : 3;
   return listAllCityRegionalEvents(slug, now)
     .filter((event) => event.status === 'past')
     .slice(0, cap);

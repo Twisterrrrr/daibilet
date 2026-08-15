@@ -1,3 +1,19 @@
+## 2026-08-15 - Hub festivals: curate flagships + hover
+
+### Наблюдения
+- Owner: слишком много фестивалей «всё подряд» на tourist hubs; нужны флагманы, не полный dump.
+- На карточках не было hover - выглядели статично.
+
+### Решения
+- `CITY_REGIONAL_EVENTS`: ~2-3 upcoming + ~2-3 past на moscow / SPB / NN / KGD / perm; cap list API = 3.
+- `CityRegionalEvents`: hover lift + shadow + border accent (как must-see / identity cards); past chips тоже.
+- Layout past снизу + 3-col grid без изменений.
+
+### Проблемы
+- Нет. Commit+push, без live deploy.
+
+---
+
 ## 2026-08-15 - Пермь: Зелёная/Красная линии + DAY_ROUTE_MAX=20
 
 ### Наблюдения
