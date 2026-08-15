@@ -210,7 +210,9 @@ export function CityCard({
             sizes={IMAGE_SIZES.cityCard}
             style={{ objectPosition: imageFocus }}
             className={`object-cover transition-transform duration-500 group-hover:scale-105 ${
-              isLight ? 'brightness-[1.05] contrast-[1.02] saturate-[1.05]' : ''
+              isLight
+                ? 'brightness-[1.05] contrast-[1.02] saturate-[1.05]'
+                : 'brightness-[0.96] contrast-[1.04] saturate-[1.02]'
             }`}
             fallback={
               <div
@@ -220,16 +222,23 @@ export function CityCard({
               />
             }
           />
+          {/* Dark tone: keep daylight covers vivid up top, put a readable band under type. */}
           <div
             className={`pointer-events-none absolute inset-0 ${
               isLight
                 ? 'bg-gradient-to-t from-white/95 via-white/45 to-transparent'
-                : 'bg-[radial-gradient(80%_70%_at_0%_100%,rgba(0,0,0,0.72)_0%,rgba(0,0,0,0.32)_38%,transparent_68%)]'
+                : 'bg-gradient-to-t from-black/78 via-black/38 to-black/10'
             }`}
           />
+          {!isLight ? (
+            <div
+              className="pointer-events-none absolute inset-0 bg-[radial-gradient(75%_55%_at_0%_100%,rgba(0,0,0,0.55)_0%,transparent_62%)]"
+              aria-hidden
+            />
+          ) : null}
           <div
             className={`absolute inset-x-0 bottom-0 ${compact ? 'p-2.5 sm:p-3' : 'p-3 sm:p-3.5'} ${
-              isLight ? '' : '[text-shadow:0_1px_2px_rgba(0,0,0,0.9),0_2px_12px_rgba(0,0,0,0.55)]'
+              isLight ? '' : '[text-shadow:0_1px_2px_rgba(0,0,0,0.95),0_2px_14px_rgba(0,0,0,0.65)]'
             }`}
           >
             <h3 className={cityCardTitleClass(titleVariant, tone)}>{city.name}</h3>
