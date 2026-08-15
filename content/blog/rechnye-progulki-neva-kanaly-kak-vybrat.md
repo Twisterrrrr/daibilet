@@ -12,7 +12,7 @@ tag: Город
 citySlug: saint-petersburg
 date: "28 июл 2026"
 readMin: 8
-imageAlt: "Теплоход проходит под мостом на канале Санкт-Петербурга"
+imageAlt: "Речной теплоход на узком канале Петербурга у каменного моста"
 coverImageUrl: "/images/blog/rechnye-progulki-neva-kanaly-kak-vybrat.jpg"
 publishedAt: "2026-07-28T18:20:00+03:00"
 status: PUBLISHED
