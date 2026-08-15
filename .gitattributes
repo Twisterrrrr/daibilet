@@ -6,3 +6,6 @@
 *.jpeg binary
 *.webp binary
 *.ico binary
+
+# Legacy Vite catalog dumps - inflate GitHub Linguist (bytes), not product source.
+apps/**/data.js linguist-generated
