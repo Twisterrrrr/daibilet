@@ -1,9 +1,9 @@
 /**
- * Editorial visit duration for hub sights (mustSee / suburb POI).
- * Missing or invalid → hide chip. Do not invent from heuristics.
+ * Format / normalize visit duration for hub chips and day-route dwell.
+ * Must-see chips use `resolveMustSeeVisitMinutes` (owner category table).
+ * Raw editorial strings still parse here when passed through.
  *
- * Chip copy matches hub mock: «15 мин», «1,5 ч», «1-2 ч», «полдня».
- * `visitMinutes` may be a number (minutes) or an editorial label string.
+ * Chip copy: «15 мин», «1,5 ч», «1-2 ч», «полдня».
  */
 
 /** ~half day for day-route dwell when chip is «полдня». */

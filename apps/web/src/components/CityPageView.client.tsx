@@ -91,6 +91,7 @@ import {
 } from '@/lib/must-see-filters';
 import { dayRouteStopPriceChipLabel } from '@/lib/day-route-stop-types';
 import { formatVisitDuration } from '@/lib/visit-duration';
+import { resolveMustSeeVisitMinutes } from '@/lib/must-see-visit-minutes';
 import { isOpenDate, MIN_DISPLAY_PRICE_RUB } from '@/lib/event-card-meta';
 import type {
   PublicCityDto,
@@ -1606,7 +1607,7 @@ function CitySightsMustSeeList({
             }) || '';
           const categoryId = classifyMustSeePlace(place);
           const categoryLabel = mustSeeFilterStopTypeTag(categoryId);
-          const visitLabel = formatVisitDuration(place.visitMinutes);
+          const visitLabel = formatVisitDuration(resolveMustSeeVisitMinutes(place));
           const priceLabel = dayRouteItem
             ? dayRouteStopPriceChipLabel(dayRouteItem, categoryLabel)
             : '';
