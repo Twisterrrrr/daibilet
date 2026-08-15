@@ -1,3 +1,19 @@
+## 2026-08-15 - Hub: «События региона» для tourist hubs (owner festivals)
+
+### Наблюдения
+- Owner pack: moscow, saint-petersburg, nizhny-novgorod, kaliningrad, perm - лето/осень 2026, зима 2026-27, весна 2027 + past сезона.
+- Статус upcoming|now|past уже считается в `regionalEventStatus` по ISO `startDate`/`endDate` vs today; month-only → границы месяца.
+
+### Решения
+- Заполнен `CITY_REGIONAL_EVENTS` для 5 хабов; past не держим в «Скоро» (фильтр в `listCityRegionalEvents`).
+- RED FEST 22.08 и «Город встреч» до 31.08 остаются upcoming/now на 15.08 по датам, даже если owner клал в past-список.
+- Тесты: hubs non-empty, past не в upcoming, end-of-month → past после 1 сен.
+
+### Проблемы
+- Deploy не делали (по запросу). Источники - туристические порталы городов + уже известные fest URL Перми.
+
+---
+
 ## 2026-08-15 - Hub: weather Moscow + scenario covers for tourist 4
 
 ### Наблюдения
