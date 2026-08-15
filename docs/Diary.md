@@ -1,3 +1,19 @@
+## 2026-08-15 - Painted lines: walkable rebuild MSK/NN/Samara/SPB/KGD
+
+### Наблюдения
+- Owner: прежние Красные линии рвали пешеходную логистику (МСК Савёловская/Воробьёвы; НН канатка+Пакгаузы; Самара Фабрика-кухня+Вертолётка ~20 км).
+
+### Решения
+- Новые `*-line-presets.ts` для moscow / nizhny-novgorod / samara / saint-petersburg / kaliningrad; wire в `dayRoutePresets` (+ Samara hub merge).
+- МСК Красная: Остоженка/Якиманка/Замоскворечье (ГЭС-2, Пятницкая вместо Даниловского).
+- НН: Нагорная vs Заречная; Самара Красная - кластер пр. Ленина; СПб/КГД - компактные треки.
+- Coords batch + превью GES-2 / dom-korabl / nikolskie-ryady; Deploy MSK web.
+
+### Проблемы
+- Часть стопов - dayRouteId stubs без отдельных Location seed.
+
+---
+
 ## 2026-08-15 - Красноярск: полный tourist hub + линии + превью + MyDay
 
 ### Наблюдения
