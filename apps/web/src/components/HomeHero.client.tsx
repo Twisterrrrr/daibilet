@@ -138,13 +138,12 @@ export function HomeHero({ destinations, frames, landings = [], videoSrc }: Home
         </div>
       </form>
 
-      {/* Soft chip rail: md+ arrows outside the row; mobile = swipe only. */}
+      {/* Soft chip rail: md+ hub discs outside the track; mobile = swipe only. */}
       <ScrollRail
         className="mt-4 w-full max-w-5xl"
         viewportClassName="!overflow-x-auto overscroll-x-contain !pb-0.5"
         hideScrollbar
         arrowAlign="center"
-        arrowTone="light"
         edgeFade
         aria-label="Быстрые подборки"
       >

@@ -86,6 +86,7 @@ export function HomeGuideEvents({
         <ScrollRail
           className="mt-5 sm:hidden"
           viewportClassName="flex flex-nowrap gap-3 snap-x snap-mandatory px-0.5"
+          arrowAlign="center"
           aria-label="Куда сходить"
         >
           {events.map((session) => (

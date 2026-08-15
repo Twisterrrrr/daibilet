@@ -79,7 +79,12 @@ export function HomeNowSection({
           </div>
         ) : null}
 
-        <ScrollRail key={current.key} className="mt-5" aria-label={sectionTitle}>
+        <ScrollRail
+          key={current.key}
+          className="mt-5"
+          arrowAlign="center"
+          aria-label={sectionTitle}
+        >
           <div className="horizontal-snap-track">
             {current.events.map((event) => (
               <div key={`${current.key}-${event.id}-${event.startsAt}`} className="showcase-rail-card">
@@ -125,7 +130,7 @@ export function HomeEventRail({
             Смотреть все <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
-        <ScrollRail className="mt-5" aria-label={title}>
+        <ScrollRail className="mt-5" arrowAlign="center" aria-label={title}>
           <div className="horizontal-snap-track">
             {events.map((event) => (
               <div key={event.id} className="showcase-rail-card">

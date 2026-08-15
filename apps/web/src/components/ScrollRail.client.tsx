@@ -19,10 +19,13 @@ type ScrollRailProps = {
   hideScrollbar?: boolean;
   /**
    * `photo` = overlay arrows over card image band.
-   * `center` = mid row; arrows sit outside the scroll edges (chips).
+   * `center` = hub-style discs outside the track (beside the content column).
    */
   arrowAlign?: 'photo' | 'center';
-  /** `light` = white glass for dark heroes; default slate for light pages. */
+  /**
+   * Only for `photo` overlay. Hub-outside (`center`) always uses white discs
+   * like city hub `HubCarouselChrome`.
+   */
   arrowTone?: 'light' | 'dark';
   /** Soft edge fade when content overflows (hints more chips). */
   edgeFade?: boolean;
@@ -33,6 +36,10 @@ type ScrollRailProps = {
 const EDGE_EPS = 4;
 const HIDE_SCROLLBAR_CLASS =
   '![scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:!hidden';
+
+/** Same discs as HubCarouselChrome (city hub). */
+const HUB_OUTSIDE_ARROW =
+  'inline-btn absolute top-1/2 z-20 hidden size-10 shrink-0 aspect-square min-h-0 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white p-0 text-slate-700 shadow-sm transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-40 md:inline-flex';
 
 function measureStep(scroller: HTMLElement): number {
   const card =
@@ -54,7 +61,7 @@ function measureStep(scroller: HTMLElement): number {
  * Horizontal row with md+ prev/next controls when content overflows.
  * Mobile keeps swipe; optional hideScrollbar (city hub rail).
  * Both arrows stay visible while overflowing (edge buttons muted/disabled).
- * `center` = arrows outside the rail; `photo` = overlay on the image band.
+ * `center` = hub discs outside the rail; `photo` = overlay on the image band.
  */
 export function ScrollRail({
   children,
@@ -120,20 +127,11 @@ export function ScrollRail({
     });
   };
 
-  // Outside (chip rails): compact discs beside the row, not chip-height buttons.
-  const arrowSize = arrowsOutside ? 'h-6 w-6' : 'h-10 w-10';
-  const iconSize = arrowsOutside ? 'h-3 w-3' : 'h-5 w-5';
-  const arrowToneCls =
+  const overlayToneCls =
     arrowTone === 'light'
-      ? arrowsOutside
-        ? 'border-white/40 bg-black/35 text-white shadow-none backdrop-blur-md hover:bg-black/50 focus-visible:ring-white/50'
-        : 'border-white/40 bg-white/25 text-white shadow-sm backdrop-blur-sm hover:bg-white/40 focus-visible:ring-white/50'
-      : arrowsOutside
-        ? 'border-slate-200 bg-white text-slate-600 shadow-sm hover:bg-slate-50 hover:text-slate-900 focus-visible:ring-slate-300 focus-visible:ring-offset-1'
-        : 'border-slate-200/90 bg-white/95 text-slate-700 shadow-md backdrop-blur hover:bg-white hover:text-slate-950 focus-visible:ring-slate-300 focus-visible:ring-offset-2';
-  // md+ only - mobile keeps swipe (no arrows).
-  const arrowBase = `hidden ${arrowSize} shrink-0 items-center justify-center rounded-full border transition-[opacity,transform,colors] focus-visible:outline-none focus-visible:ring-2 md:inline-flex ${arrowToneCls}`;
-  const overlayArrowBase = `${arrowBase} absolute z-10 -translate-y-1/2 top-[33%]`;
+      ? 'border-white/40 bg-white/25 text-white shadow-sm backdrop-blur-sm hover:bg-white/40 focus-visible:ring-white/50'
+      : 'border-slate-200/90 bg-white/95 text-slate-700 shadow-md backdrop-blur hover:bg-white hover:text-slate-950 focus-visible:ring-slate-300 focus-visible:ring-offset-2';
+  const overlayArrowBase = `inline-btn absolute z-10 top-[33%] hidden h-10 w-10 min-h-0 -translate-y-1/2 items-center justify-center rounded-full border p-0 transition-[opacity,transform,colors] focus-visible:outline-none focus-visible:ring-2 md:inline-flex ${overlayToneCls}`;
 
   const fadePad = arrowsOutside ? '0.35rem' : '1.25rem';
   const fadeMask =
@@ -156,11 +154,15 @@ export function ScrollRail({
       tabIndex={canPrev ? 0 : -1}
       disabled={!canPrev}
       onClick={() => scrollByDir(-1)}
-      className={`${arrowsOutside ? arrowBase : overlayArrowBase} ${arrowsOutside ? '' : 'left-3'} ${
-        canPrev ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-35'
-      }`}
+      className={
+        arrowsOutside
+          ? `${HUB_OUTSIDE_ARROW} left-0 -translate-x-[calc(100%+0.75rem)]`
+          : `${overlayArrowBase} left-3 ${
+              canPrev ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-35'
+            }`
+      }
     >
-      <ChevronLeft className={iconSize} aria-hidden />
+      <ChevronLeft className="h-5 w-5" aria-hidden />
     </button>
   ) : null;
 
@@ -172,11 +174,15 @@ export function ScrollRail({
       tabIndex={canNext ? 0 : -1}
       disabled={!canNext}
       onClick={() => scrollByDir(1)}
-      className={`${arrowsOutside ? arrowBase : overlayArrowBase} ${arrowsOutside ? '' : 'right-3'} ${
-        canNext ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-35'
-      }`}
+      className={
+        arrowsOutside
+          ? `${HUB_OUTSIDE_ARROW} right-0 translate-x-[calc(100%+0.75rem)]`
+          : `${overlayArrowBase} right-3 ${
+              canNext ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-35'
+            }`
+      }
     >
-      <ChevronRight className={iconSize} aria-hidden />
+      <ChevronRight className="h-5 w-5" aria-hidden />
     </button>
   ) : null;
 
@@ -195,10 +201,7 @@ export function ScrollRail({
 
   if (arrowsOutside) {
     return (
-      <div
-        className={`relative flex min-w-0 items-center gap-1.5 overflow-visible ${className}`.trim()}
-        style={style}
-      >
+      <div className={`relative min-w-0 overflow-visible ${className}`.trim()} style={style}>
         {prevBtn}
         {viewport}
         {nextBtn}

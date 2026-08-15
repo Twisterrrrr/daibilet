@@ -165,7 +165,7 @@ async function HomePageBody() {
                 Смотреть все <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
-            <ScrollRail className="mt-6" aria-label="Подборки">
+            <ScrollRail className="mt-6" arrowAlign="center" aria-label="Подборки">
               <div className="flex w-max flex-nowrap gap-3 snap-x snap-mandatory sm:gap-4">
                 {promoLandings.map((landing) => {
                   const imageUrl = resolveHomePromoImage(landing.slug, landing.title);
