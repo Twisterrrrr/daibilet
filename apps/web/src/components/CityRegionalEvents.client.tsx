@@ -6,16 +6,18 @@ import {
   CityHubSectionHeading,
   HUB_SECTION_PAD_BOTTOM_HALF,
   HUB_SECTION_PAD_TOP,
-  HUB_SECTION_SCROLL_MT,
+  HUB_SECTION_PAD_TOP_HALF,
 } from '@/components/CityHubSectionHeading';
 import { listCityRegionalEvents, listCityRegionalPastEvents, regionalEventStatusLabel } from '@/lib/city-regional-events';
 
 type Props = {
   citySlug: string;
   editorial?: boolean;
+  /** Inside continuous #affiche zone (after collections / with near-city). */
+  nested?: boolean;
 };
 
-export function CityRegionalEvents({ citySlug, editorial = false, }: Props) {
+export function CityRegionalEvents({ citySlug, editorial = false, nested = false }: Props) {
   const events = listCityRegionalEvents(citySlug);
   const past = listCityRegionalPastEvents(citySlug);
   if (!events.length && !past.length) return null;
@@ -24,18 +26,27 @@ export function CityRegionalEvents({ citySlug, editorial = false, }: Props) {
 
   return (
     <section
-      className={`border-b ${editorial ? 'border-zinc-200' : 'border-slate-100'}`}
-      data-city-regional-events
+      className={
+        nested
+          ? editorial
+            ? 'border-t border-zinc-200/80'
+            : 'border-t border-slate-100'
+          : `border-b ${editorial ? 'border-zinc-200' : 'border-slate-100'}`
+      }
+      data-city-regional-events={nested ? 'nested' : 'standalone'}
     >
-      <div className={`container-page ${HUB_SECTION_PAD_TOP} ${HUB_SECTION_PAD_BOTTOM_HALF}`}>
-        {/* Anchor on heading band so sticky lands on title, not empty section pad. */}
-        <div id="region-events" className={HUB_SECTION_SCROLL_MT}>
-          <CityHubSectionHeading
-            title="События региона"
-            description="Фестивали и крупные события рядом с городом"
-            editorial={editorial}
-          />
-        </div>
+      <div
+        className={`container-page ${
+          nested
+            ? `${HUB_SECTION_PAD_TOP_HALF} ${HUB_SECTION_PAD_BOTTOM_HALF}`
+            : `${HUB_SECTION_PAD_TOP} ${HUB_SECTION_PAD_BOTTOM_HALF}`
+        }`}
+      >
+        <CityHubSectionHeading
+          title="Фестивали и крупные события"
+          description="Анонсы и прошедшие фестивали рядом с городом"
+          editorial={editorial}
+        />
         <div
           className={
             split

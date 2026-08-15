@@ -1,3 +1,12 @@
+## 2026-08-15 - Hub events zone: festivals + near-city
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| UX.HUB-EVENTS-ZONE-ORDER | Фестивали+рядом после Подборок внутри #affiche | Высокий | ✅ |
+| UX.HUB-DROP-REGION-STICKY | Убрать sticky «События региона» | Высокий | ✅ |
+| UX.HUB-NEAR-CITY-GENITIVE | Title «события Пермского края» + без «Все события региона» | Высокий | ✅ |
+| UX.HUB-WEATHER-EAGER-SHELL | Weather forecast skeleton сразу (deferred fetch) | Средний | ✅ |
+
 ## 2026-08-15 - Hub/home Lovable parity + route clear
 
 | ID | Задача | Приоритет | Статус |

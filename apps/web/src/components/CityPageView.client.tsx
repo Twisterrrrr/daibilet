@@ -53,7 +53,6 @@ import { resolveCityImageObjectPosition } from '@/lib/city-image-focus';
 import { resolveCityImage } from '@/lib/city-images';
 import { CITY_NIGHT_HERO } from '@/lib/city-night-hero';
 import { cityHasLifehacks } from '@/lib/city-hub-lifehacks';
-import { listCityRegionalEvents, listCityRegionalPastEvents } from '@/lib/city-regional-events';
 import {
   groupStandupInHubFeed,
   isCityHubTouristAffiche,
@@ -125,7 +124,8 @@ const CITY_HASH_ALIASES: Record<string, string> = {
   events: 'affiche',
   blog: 'blog',
   zametki: 'blog',
-  'region-events': 'region-events',
+  'region-events': 'affiche',
+  'region-nearby': 'affiche',
 };
 
 const HUB_DESKTOP_NAV: Array<{ id: string; label: string }> = [
@@ -135,7 +135,6 @@ const HUB_DESKTOP_NAV: Array<{ id: string; label: string }> = [
   { id: 'city-routes', label: 'Маршруты' },
   { id: 'lifehacks', label: 'Лайфхаки' },
   { id: 'city-suburbs', label: 'Пригороды' },
-  { id: 'region-events', label: 'События региона' },
   { id: 'affiche', label: 'События' },
   { id: 'faq', label: 'FAQ' },
 ];
@@ -331,8 +330,6 @@ export function CityPageView({
   const hasWhenToGo = cityHasWhenToGo(hubSlug) && Boolean(whenToGo);
   const hasIdentity = cityIdentitySlides(hubSlug).length > 0;
   const hasLifehacks = cityHasLifehacks(hubSlug);
-  const hasRegionEvents =
-    listCityRegionalEvents(hubSlug).length > 0 || listCityRegionalPastEvents(hubSlug).length > 0;
   const hasMore = hasDirections || hasVenues || moreArticles.length > 0;
   const hasCollections = hasDirections;
   const showSightsBlock = hasSights || hasHookFact || hasWeather || hasWhenToGo || hasIdentity;
@@ -367,17 +364,13 @@ export function CityPageView({
     if (hasRoutesNav) filled.add('city-routes');
     if (hasLifehacks) filled.add('lifehacks');
     if (hasSuburbsNav) filled.add('city-suburbs');
-    if (hasRegionEvents) filled.add('region-events');
+    // One sticky «События» covers affiche + festivals + near-city.
     filled.add('affiche');
     if (hasFaqBlogSplit) filled.add('faq');
     if (footerArticles.length > 0) filled.add('blog');
     const desktop = HUB_DESKTOP_NAV.filter((item) => filled.has(item.id));
     const mobile = HUB_MOBILE_NAV.filter((item) => filled.has(item.id));
-    // Region events (desktop-only label) can overflow into mobile «Ещё».
     const mobileExtra: Array<{ id: string; label: string }> = [];
-    if (hasRegionEvents && !mobile.some((item) => item.id === 'region-events')) {
-      mobileExtra.push({ id: 'region-events', label: 'События региона' });
-    }
     const desktopExtra: Array<{ id: string; label: string }> = [];
     if (footerArticles.length > 0) desktopExtra.push({ id: 'blog', label: 'Из блога' });
     return { desktop, desktopExtra, mobile, mobileExtra };
@@ -386,7 +379,6 @@ export function CityPageView({
     hasFaqBlogSplit,
     hasLifehacks,
     hasMustSeeNav,
-    hasRegionEvents,
     hasRoutesNav,
     hasSuburbsNav,
     hasWhyGoNav,
@@ -520,8 +512,6 @@ export function CityPageView({
               </div>
             ) : null}
 
-            <CityRegionalEvents citySlug={hubSlug} editorial={editorial} />
-
             <section
               id="affiche"
               className={`border-b ${editorial ? 'border-zinc-200' : 'border-slate-200/80'} ${SECTION_SCROLL_MT}`}
@@ -572,11 +562,12 @@ export function CityPageView({
                   <CityContentLoadingState />
                 ) : null
               ) : null}
+              {/* Festivals + near-city stay in continuous «События» zone after collections. */}
+              <CityRegionalEvents citySlug={hubSlug} editorial={editorial} nested />
+              {payload.regionNearby?.events?.length ? (
+                <RegionNearbyStrip nearby={payload.regionNearby} editorial={editorial} nested />
+              ) : null}
             </section>
-
-            {payload.regionNearby?.events?.length ? (
-              <RegionNearbyStrip nearby={payload.regionNearby} editorial={editorial} />
-            ) : null}
 
             {contentReady && (hasVenues || (admission && admission.items.length > 0)) ? (
               <section

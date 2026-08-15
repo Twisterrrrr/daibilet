@@ -241,7 +241,7 @@ export interface PublicRegionNearbyEventDto {
   url: string;
 }
 
-/** Блок «Рядом с городом: события в области» на хабе адмцентра. */
+/** Блок «Рядом с городом: события {region genitive}» на хабе адмцентра. */
 export interface PublicRegionNearbyDto {
   regionSlug: string;
   regionName: string;

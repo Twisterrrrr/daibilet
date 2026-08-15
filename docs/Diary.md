@@ -34,6 +34,22 @@
 
 ---
 
+## 2026-08-15 - Hub: festivals + near-city inside «События»
+
+### Наблюдения
+- Owner: фестивали и «Рядом с городом» в зоне «События» после Подборок; sticky «События региона» лишний; «Все события региона» убрать; title с родительным («Пермского края»).
+
+### Решения
+- `CityRegionalEvents` + `RegionNearbyStrip` nested в `#affiche` после collections.
+- Sticky: один пункт «События»; hash `region-events`/`region-nearby` → `#affiche`.
+- Title: `Рядом с городом: события ${cityToGenitive(region)}`; backend `defaultStripTitle` + `region-strip.ru.json` на genitive.
+- Weather: deferred fetch, не missing - skeleton прогноза сразу при наличии weather pack.
+
+### Проблемы
+- Нет. Deploy не делали.
+
+---
+
 ## 2026-08-15 - Hub: weather Moscow + scenario covers for tourist 4
 
 ### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П

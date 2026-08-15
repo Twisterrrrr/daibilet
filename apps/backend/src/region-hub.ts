@@ -221,7 +221,8 @@ export function findRegionHubByCenterCity(city: {
   return null;
 }
 
-const REGION_PREPOSITIONAL: Record<string, string> = {
+const REGION_GENITIVE: Record<string, string> = {
+  'пермский край': 'Пермского края',
   'московская область': 'Московской области',
   'ленинградская область': 'Ленинградской области',
   'свердловская область': 'Свердловской области',
@@ -232,25 +233,42 @@ const REGION_PREPOSITIONAL: Record<string, string> = {
   'оренбургская область': 'Оренбургской области',
   'брянская область': 'Брянской области',
   'псковская область': 'Псковской области',
-  'республика коми': 'Республике Коми',
-  'алтайский край': 'Алтайском крае',
-  'приморский край': 'Приморском крае',
+  'республика коми': 'Республики Коми',
+  'алтайский край': 'Алтайского края',
+  'приморский край': 'Приморского края',
   'вологодская область': 'Вологодской области',
   'калужская область': 'Калужской области',
   'калининградская область': 'Калининградской области',
-  'республика татарстан': 'Республике Татарстан',
-  'краснодарский край': 'Краснодарском крае',
+  'республика татарстан': 'Республики Татарстан',
+  'краснодарский край': 'Краснодарского края',
   'самарская область': 'Самарской области',
+  'нижегородская область': 'Нижегородской области',
 };
 
-function regionNamePrepositional(regionName: string): string {
-  const mapped = REGION_PREPOSITIONAL[normalizeKey(regionName)];
+function regionNameGenitive(regionName: string): string {
+  const key = normalizeKey(regionName);
+  const mapped = REGION_GENITIVE[key];
   if (mapped) return mapped;
+  // Light fallback mirroring apps/web city-declension for «X край/область».
+  const kray = regionName.match(/^(.+)\s+край$/i);
+  if (kray) {
+    const adj = kray[1];
+    if (/ий$/i.test(adj)) return `${adj.slice(0, -2)}ого края`;
+    if (/ый$/i.test(adj) || /ой$/i.test(adj)) return `${adj.slice(0, -2)}ого края`;
+    return `${adj} края`;
+  }
+  const oblast = regionName.match(/^(.+)\s+область$/i);
+  if (oblast) {
+    const adj = oblast[1];
+    if (/ая$/i.test(adj)) return `${adj.slice(0, -2)}ой области`;
+    if (/яя$/i.test(adj)) return `${adj.slice(0, -2)}ей области`;
+    return `${adj} области`;
+  }
   return regionName;
 }
 
 function defaultStripTitle(regionName: string): string {
-  return `Рядом с городом: события в ${regionNamePrepositional(regionName)}`;
+  return `Рядом с городом: события ${regionNameGenitive(regionName)}`;
 }
 
 /**

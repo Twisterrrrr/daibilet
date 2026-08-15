@@ -125,7 +125,10 @@ export function CityWeatherWidget({ citySlug, cityIn, editorial = false }: Props
   const title = cityIn ? `Погода ${cityIn}` : 'Погода';
   const showForecast = state.status === 'ready' && Boolean(today);
   const hasSeasons = Boolean(whenToGo?.tabs?.length);
-  const twoCol = showForecast && hasSeasons;
+  // Reserve forecast column as soon as weather pack exists (avoid late pop-in after fetch).
+  const showForecastShell = Boolean(weather);
+  const twoCol = showForecastShell && hasSeasons;
+  const forecastPending = showForecastShell && !showForecast;
   const kickerClass = editorial
     ? 'text-xs font-bold uppercase tracking-[0.14em] text-zinc-500'
     : 'text-xs font-bold uppercase tracking-[0.14em] text-slate-500';
@@ -197,6 +200,27 @@ export function CityWeatherWidget({ citySlug, cityIn, editorial = false }: Props
                   </p>
                 </div>
               ) : null}
+            </div>
+          </div>
+        ) : forecastPending ? (
+          <div className={twoCol ? 'min-w-0 md:pr-6' : 'min-w-0'} data-city-weather-forecast="pending">
+            <h2 className={kickerClass}>{title}</h2>
+            <div className={`mt-3 flex flex-col gap-3 rounded-xl p-4 ${forecastBox}`} aria-hidden>
+              <div className="flex items-center gap-3">
+                <span className={`h-10 w-10 shrink-0 animate-pulse rounded-full ${editorial ? 'bg-zinc-200' : 'bg-slate-200'}`} />
+                <div className="min-w-0 flex-1 space-y-2">
+                  <span className={`block h-8 w-20 animate-pulse rounded ${editorial ? 'bg-zinc-200' : 'bg-slate-200'}`} />
+                  <span className={`block h-3.5 w-28 animate-pulse rounded ${editorial ? 'bg-zinc-200/80' : 'bg-slate-200/80'}`} />
+                </div>
+              </div>
+              <div className={`flex items-center justify-between gap-2 border-t pt-3 ${forecastRule}`}>
+                <span className={`h-3 w-14 animate-pulse rounded ${editorial ? 'bg-zinc-200' : 'bg-slate-200'}`} />
+                <span className={`h-4 w-12 animate-pulse rounded ${editorial ? 'bg-zinc-200' : 'bg-slate-200'}`} />
+              </div>
+              <div className={`flex items-center justify-between gap-2 border-t pt-3 ${forecastRule}`}>
+                <span className={`h-3 w-20 animate-pulse rounded ${editorial ? 'bg-zinc-200' : 'bg-slate-200'}`} />
+                <span className={`h-4 w-12 animate-pulse rounded ${editorial ? 'bg-zinc-200' : 'bg-slate-200'}`} />
+              </div>
             </div>
           </div>
         ) : null}

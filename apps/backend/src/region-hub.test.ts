@@ -66,6 +66,8 @@ const nearbyC = buildCityRegionNearby({
 });
 assert.ok(nearbyC);
 assert.equal(nearbyC?.tier, 'C');
+assert.equal(nearbyC?.title, 'Рядом с городом: события Свердловской области');
+assert.doesNotMatch(String(nearbyC?.title || ''), /Все события региона|события в /);
 
 const nearbyB = buildCityRegionNearby({
   cityName: 'Екатеринбург',

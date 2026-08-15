@@ -3,50 +3,71 @@
 import Link from 'next/link';
 import { MapPin, Ticket } from 'lucide-react';
 
+import { cityToGenitive } from '@/lib/city-declension';
 import { formatPriceFrom } from '@/lib/format';
 import type { PublicRegionNearbyDto } from '@daibilet/contracts/public';
+
+/** «Рядом с городом: события Пермского края» - region in genitive. */
+export function regionNearbyStripTitle(regionName: string): string {
+  const genitive = cityToGenitive(String(regionName || '').trim());
+  return genitive ? `Рядом с городом: события ${genitive}` : 'Рядом с городом';
+}
 
 export function RegionNearbyStrip({
   nearby,
   editorial = false,
+  nested = false,
 }: {
   nearby: PublicRegionNearbyDto;
   editorial?: boolean;
+  /** Inside continuous #affiche zone (after collections). */
+  nested?: boolean;
 }) {
   if (!nearby.events?.length) return null;
+
+  const title = regionNearbyStripTitle(nearby.regionName);
 
   return (
     <section
       id="region-nearby"
       className={
-        editorial
-          ? 'border-b border-zinc-200 bg-emerald-50/40'
-          : 'border-b border-slate-100 bg-emerald-50/50'
+        nested
+          ? editorial
+            ? 'border-t border-zinc-200/80'
+            : 'border-t border-slate-100'
+          : editorial
+            ? 'border-b border-zinc-200 bg-emerald-50/40'
+            : 'border-b border-slate-100 bg-emerald-50/50'
       }
-      aria-label={nearby.title}
+      aria-label={title}
+      data-city-region-nearby={nested ? 'nested' : 'standalone'}
     >
-      <div className={`container-page ${editorial ? 'py-10 sm:py-12' : 'py-8 sm:py-10'}`}>
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-          <div className="min-w-0">
-            <h2
-              className={
-                editorial
-                  ? 'font-serif text-2xl font-semibold text-zinc-950 sm:text-3xl'
-                  : 'text-xl font-bold text-slate-950 sm:text-2xl'
-              }
-            >
-              {nearby.title}
-            </h2>
+      <div
+        className={`container-page ${
+          nested
+            ? editorial
+              ? 'py-8 sm:py-10'
+              : 'py-6 sm:py-8'
+            : editorial
+              ? 'py-10 sm:py-12'
+              : 'py-8 sm:py-10'
+        }`}
+      >
+        <div className="min-w-0">
+          <h2
+            className={
+              editorial
+                ? 'font-display text-2xl font-extrabold tracking-tight text-zinc-950 sm:text-3xl'
+                : 'font-display text-xl font-extrabold tracking-tight text-slate-950 sm:text-2xl'
+            }
+          >
+            {title}
+          </h2>
+          {nearby.subtitle ? (
             <p className={`mt-2 max-w-3xl text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
               {nearby.subtitle}
             </p>
-          </div>
-          <Link
-            href={`/cities/${encodeURIComponent(nearby.regionSlug)}`}
-            className="shrink-0 text-sm font-medium text-emerald-900 underline-offset-4 hover:underline"
-          >
-            Все события региона
-          </Link>
+          ) : null}
         </div>
 
         <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

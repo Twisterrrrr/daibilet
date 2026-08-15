@@ -92,3 +92,8 @@ test('dative for «по …» on lifehack hubs and typical cities', () => {
   assert.notEqual(cityToDative('Санкт-Петербург'), cityToPrepositional('Санкт-Петербург'));
   assert.notEqual(cityToDative('Нижний Новгород'), cityToPrepositional('Нижний Новгород'));
 });
+
+test('region names decline to genitive for near-city strip', () => {
+  assert.equal(cityToGenitive('Пермский край'), 'Пермского края');
+  assert.equal(cityToGenitive('Свердловская область'), 'Свердловской области');
+});
