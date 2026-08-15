@@ -102,7 +102,7 @@ function isGastro(place: MustSeeClassifyInput, kind: string): boolean {
   if (String(place.venueSlug || '').trim()) {
     if (
       /(?:^|[-_/])(?:cafe|restaurant|bar|pizza|traktir|kofe|coffee|bistro|pub)(?:$|[-_/])/i.test(slug) ||
-      /seledka|bezuhov|lepi-testo|yale|mitrich|fonoteca|yula-pizza|mednye-truby|pyatkin|red-wall/i.test(
+      /seledka|bezuhov|lepi-testo|yale|mitrich|ribs|fonoteca|yula-pizza|mednye-truby|pyatkin|red-wall|shaverma/i.test(
         slug,
       )
     ) {

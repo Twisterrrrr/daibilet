@@ -43,8 +43,9 @@ const PERM_CATHEDRAL_SQUARE_SLUGS = new Set(['perm-sobornaya-ploschad']);
 
 /** Nizhny Novgorod: classic 6 + owner pack 30 must-see + 10 gastro. */
 const NIZHNY_NOVGOROD_COORDS: Record<string, EditorialPlaceCoords> = {
-  'nizhny-novgorod-nizhegorodskiy-kreml': { latitude: 56.328318, longitude: 44.002824 },
-  'nizhny-novgorod-chkalovskaya-lestnitsa': { latitude: 56.330889, longitude: 44.009278 },
+  // Coords synced 2026-08-15 with Nominatim where available; embankment mid-points kept walkable for routes.
+  'nizhny-novgorod-nizhegorodskiy-kreml': { latitude: 56.328033, longitude: 44.002105 },
+  'nizhny-novgorod-chkalovskaya-lestnitsa': { latitude: 56.330467, longitude: 44.009438 },
   'nizhny-novgorod-bol-shaya-pokrovskaya-ulitsa': { latitude: 56.321684, longitude: 43.996155 },
   'nizhny-novgorod-nizhegorodskaya-kanatnaya-doroga': { latitude: 56.324209, longitude: 44.038758 },
   'nizhny-novgorod-strelka-rek-volgi-i-oki': { latitude: 56.333889, longitude: 43.990833 },
@@ -52,19 +53,20 @@ const NIZHNY_NOVGOROD_COORDS: Record<string, EditorialPlaceCoords> = {
   'nizhny-novgorod-nizhegorodskaya-yarmarka': { latitude: 56.3275, longitude: 43.962222 },
   'nizhny-novgorod-usadba-rukavishnikovyh': { latitude: 56.329864, longitude: 44.017772 },
   'nizhny-novgorod-gosudarstvennyy-bank': { latitude: 56.322301, longitude: 44.002875 },
-  'nizhny-novgorod-ploschad-minina-i-pozharskogo': { latitude: 56.326759, longitude: 44.00624 },
+  'nizhny-novgorod-ploschad-minina-i-pozharskogo': { latitude: 56.328393, longitude: 44.007966 },
   'nizhny-novgorod-palaty-stroganovyh': { latitude: 56.327521, longitude: 43.985906 },
   'nizhny-novgorod-romodanovskiy-vokzal': { latitude: 56.32174, longitude: 43.97825 },
-  'nizhny-novgorod-ploschad-lyadova': { latitude: 56.312953, longitude: 43.987786 },
+  'nizhny-novgorod-ploschad-lyadova': { latitude: 56.309238, longitude: 43.98555 },
   'nizhny-novgorod-domik-petra-i': { latitude: 56.326269, longitude: 43.999658 },
+  // Mid-embankment west of Chkalov/Geroy toward Rozhdestvenskaya (not Nominatim street centroid at stairs).
   'nizhny-novgorod-nizhne-volzhskaya-naberezhnaya': { latitude: 56.330441, longitude: 43.996112 },
   'nizhny-novgorod-verhne-volzhskaya-naberezhnaya': { latitude: 56.329971, longitude: 44.013589 },
-  'nizhny-novgorod-rozhdestvenskaya-ulitsa': { latitude: 56.328328, longitude: 43.990471 },
+  'nizhny-novgorod-rozhdestvenskaya-ulitsa': { latitude: 56.330008, longitude: 43.9967 },
   'nizhny-novgorod-park-shveytsariya': { latitude: 56.279883, longitude: 43.978183 },
   'nizhny-novgorod-sormovskiy-park': { latitude: 56.347717, longitude: 43.896656 },
   'nizhny-novgorod-pochainskiy-bulvar': { latitude: 56.326305, longitude: 43.997233 },
   'nizhny-novgorod-aleksandrovskiy-sad': { latitude: 56.330556, longitude: 44.022222 },
-  'nizhny-novgorod-pakgauzy-na-strelke': { latitude: 56.333967, longitude: 43.972304 },
+  'nizhny-novgorod-pakgauzy-na-strelke': { latitude: 56.334936, longitude: 43.974804 },
   'nizhny-novgorod-schelokovskiy-hutor': { latitude: 56.280145, longitude: 44.032644 },
   'nizhny-novgorod-sobor-aleksandra-nevskogo': { latitude: 56.333019, longitude: 43.975412 },
   'nizhny-novgorod-stroganovskaya-tserkov': { latitude: 56.327539, longitude: 43.984247 },
@@ -80,15 +82,19 @@ const NIZHNY_NOVGOROD_COORDS: Record<string, EditorialPlaceCoords> = {
   'nizhny-novgorod-pamyatnik-zhyulyu-vernu': { latitude: 56.325333, longitude: 43.980417 },
   'nizhny-novgorod-kater-geroy': { latitude: 56.331289, longitude: 44.009389 },
   'nizhny-novgorod-seledka-i-kofe': { latitude: 56.327572, longitude: 43.987747 },
-  'nizhny-novgorod-bezuhov-cafe': { latitude: 56.329241, longitude: 43.992224 },
-  'nizhny-novgorod-lepi-testo': { latitude: 56.321045, longitude: 44.001243 },
+  'nizhny-novgorod-bezuhov-cafe': { latitude: 56.329584, longitude: 43.99455 },
+  'nizhny-novgorod-lepi-testo': { latitude: 56.317781, longitude: 43.995141 },
   'nizhny-novgorod-yale-restaurant': { latitude: 56.326884, longitude: 43.984534 },
   'nizhny-novgorod-red-wall-restaurant': { latitude: 56.330312, longitude: 43.99845 },
   'nizhny-novgorod-pyatkin-traktir': { latitude: 56.329432, longitude: 43.990112 },
   'nizhny-novgorod-mitrich-restaurant': { latitude: 56.324541, longitude: 44.020114 },
+  'nizhny-novgorod-ribs-restaurant': { latitude: 56.316758, longitude: 44.01924 },
   'nizhny-novgorod-mednye-truby-bar': { latitude: 56.326102, longitude: 43.983115 },
   'nizhny-novgorod-yula-pizza': { latitude: 56.322998, longitude: 44.004512 },
   'nizhny-novgorod-fonoteca-bar': { latitude: 56.319874, longitude: 43.996841 },
+  'nizhny-novgorod-street-art-kvartaly': { latitude: 56.320225, longitude: 43.993579 },
+  'nizhny-novgorod-shaverma-na-srednom': { latitude: 56.309147, longitude: 43.991085 },
+  'nizhny-novgorod-rechnaya-progulka': { latitude: 56.329694, longitude: 43.988173 },
 };
 
 /** Owner editor table 2026-08-14 for 182 SPB mustSee; Kryukov extras kept. */
