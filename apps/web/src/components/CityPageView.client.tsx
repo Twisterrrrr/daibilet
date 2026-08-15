@@ -2141,6 +2141,13 @@ function CityFaqBlogSplit({
   const hasBlogCol = articles.length > 0;
   if (!hasFaqCol && !hasBlogCol) return null;
 
+  // Cap matches CityHubArticlesGrid. With FAQ+blog two-col, 3rd card fills space under FAQ
+  // on lg+ (owner: empty left column while blog stacks three tall teasers).
+  const items = articles.slice(0, 3);
+  const spillUnderFaq = hasFaqCol && hasBlogCol && items.length >= 3;
+  const blogDesktopArticles = spillUnderFaq ? items.slice(0, 2) : items;
+  const leftSpillArticles = spillUnderFaq ? items.slice(2) : [];
+
   return (
     <section
       id="faq"
@@ -2164,6 +2171,15 @@ function CityFaqBlogSplit({
                 editorial={editorial}
                 nested
               />
+              {leftSpillArticles.length ? (
+                <div className="mt-8 hidden lg:block" data-city-faq-blog-spill>
+                  <CityHubArticlesGrid
+                    articles={leftSpillArticles}
+                    editorial={editorial}
+                    layout="stack"
+                  />
+                </div>
+              ) : null}
             </div>
           ) : null}
           {hasBlogCol ? (
@@ -2186,7 +2202,19 @@ function CityFaqBlogSplit({
                   </Link>
                 }
               />
-              <CityHubArticlesGrid articles={articles} editorial={editorial} layout="stack" />
+              {/* Mobile / single column: keep all teasers under the blog heading. */}
+              <div className={spillUnderFaq ? 'lg:hidden' : undefined}>
+                <CityHubArticlesGrid articles={items} editorial={editorial} layout="stack" />
+              </div>
+              {spillUnderFaq ? (
+                <div className="hidden lg:block">
+                  <CityHubArticlesGrid
+                    articles={blogDesktopArticles}
+                    editorial={editorial}
+                    layout="stack"
+                  />
+                </div>
+              ) : null}
             </div>
           ) : null}
         </div>
