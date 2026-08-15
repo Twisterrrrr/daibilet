@@ -1,3 +1,9 @@
+## 2026-08-15 - Красноярск tourist hub
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| CONT.KRASNOYARSK-HUB | whenToGo / identity / ~50 mustSee / 2 scenarios + Зелёная 18 / Красная 11 / Дивногорск / FAQ / festivals / lifehacks + превью + MyDay | Высокий | ✅ code; commit+push; live по «выкатывай» |
+
 ## 2026-08-15 - Краснодар tourist hub
 
 | ID | Задача | Приоритет | Статус |

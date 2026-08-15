@@ -24,6 +24,7 @@ const TOURIST_AFFICHE_SLUGS = new Set([
   'kazan',
   'samara',
   'krasnodar',
+  'krasnoyarsk',
 ]);
 
 const CHIP_ORDER = [

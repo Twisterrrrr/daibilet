@@ -131,6 +131,7 @@ const BLOG_AFTER_SUBURBS_SLUGS = new Set([
   'kazan',
   'samara',
   'krasnodar',
+  'krasnoyarsk',
 ]);
 
 export function isCityHubBlogAfterSuburbs(slug: string | null | undefined): boolean {

@@ -884,6 +884,91 @@ const KRASNODAR_ITEMS: CityLifehackItem[] = [
   },
 ];
 
+const KRASNOYARSK_ITEMS: CityLifehackItem[] = [
+  {
+    id: 'krasnoyarsk-tatyshev-free',
+    tabId: 'walk',
+    icon: 'walk',
+    title: 'Суслики Татышева без затрат',
+    body: body(
+      'Остров Татышев - полностью ',
+      { s: 'бесплатный' },
+      ' эко-парк. Купите овсяные хлопья или яблоки: ручные суслики выйдут сами.',
+    ),
+    cta: {
+      kind: 'maps',
+      label: 'Маршрут на карте',
+      href: yandexMapsSearchUrl('Остров Татышев Красноярск'),
+    },
+  },
+  {
+    id: 'krasnoyarsk-nikolaevskaya',
+    tabId: 'walk',
+    icon: 'walk',
+    title: 'Николаевская сопка вместо платных канаток',
+    body: body(
+      'Смотровая на Николаевской сопке даёт хайтек-панораму на город и тайгу ',
+      { s: 'бесплатно' },
+      '. До подножия - городской автобус, дальше пешком.',
+    ),
+    cta: {
+      kind: 'gis',
+      label: 'Транспорт на карте',
+      href: twoGisCitySearchUrl('krasnoyarsk', 'Николаевская сопка'),
+    },
+  },
+  {
+    id: 'krasnoyarsk-uspenskiy',
+    tabId: 'walk',
+    icon: 'walk',
+    title: 'Свободный вход в монастырь на Енисее',
+    body: body(
+      'Свято-Успенский мужской монастырь открыт для всех ',
+      { s: 'бесплатно' },
+      ': ландшафтный сад, деревянный собор и выставки икон.',
+    ),
+    cta: {
+      kind: 'maps',
+      label: 'Яндекс Карты',
+      href: yandexMapsSearchUrl('Свято-Успенский монастырь Красноярск'),
+      extra: [
+        { label: '2ГИС', href: twoGisCitySearchUrl('krasnoyarsk', 'Успенский монастырь') },
+      ],
+    },
+  },
+  {
+    id: 'krasnoyarsk-lunch-075',
+    tabId: 'food',
+    icon: 'food',
+    title: 'Обед строганиной на ланчах',
+    body: body(
+      'В будни с 12:00 до 16:00 «0.75 Please» и «Тунгуска» делают скидки до ',
+      { s: '30%' },
+      ' или сибирские сет-ланчи по доступной цене.',
+    ),
+    cta: {
+      kind: 'affiche',
+      label: 'Смотреть афишу Красноярска',
+    },
+  },
+  {
+    id: 'krasnoyarsk-elektrichka',
+    tabId: 'transit',
+    icon: 'transit',
+    title: 'Городская электричка до Дивногорска',
+    body: body(
+      'Вместо такси езжайте в Дивногорск на городской электричке вдоль Енисея. Билет около ',
+      { s: '40 ₽' },
+      '.',
+    ),
+    cta: {
+      kind: 'gis',
+      label: 'Транспорт в Красноярске',
+      href: twoGisCitySearchUrl('krasnoyarsk', 'электричка Дивногорск'),
+    },
+  },
+];
+
 const CITY_HUB_LIFEHACKS: Record<string, CityLifehackPack> = {
   perm: lifehackPack(PERM_ITEMS),
   moscow: lifehackPack(MOSCOW_ITEMS),
@@ -894,6 +979,7 @@ const CITY_HUB_LIFEHACKS: Record<string, CityLifehackPack> = {
   kazan: lifehackPack(KAZAN_ITEMS),
   samara: lifehackPack(SAMARA_ITEMS),
   krasnodar: lifehackPack(KRASNODAR_ITEMS),
+  krasnoyarsk: lifehackPack(KRASNOYARSK_ITEMS),
 };
 
 export function resolveCityLifehacks(slug: string | null | undefined): CityLifehackPack | null {

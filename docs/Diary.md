@@ -1,3 +1,18 @@
+## 2026-08-15 - Красноярск: полный tourist hub + линии + превью + MyDay
+
+### Наблюдения
+- Owner pack: whenToGo ×4, identity ×4, ~50 mustSee, 2 day scenarios, Зелёная (18) / Красная (11), Дивногорск+ГЭС, FAQ, festivals, lifehacks; coords-правки 92.* вместо ошибочных 38.*.
+
+### Решения
+- `krasnoyarsk-hub.ts` + `krasnoyarsk-line-presets.ts` (web+public); канонические slug Столбов/часовни/набережной/моста/Сурикова/парохода сохранены.
+- Local flavor Asia/Krasnoyarsk; lifehacks ×5; tourist affiche; festivals МИР Сибири / В центре Мира / АТФ + past.
+- Превью identity + ключевые venues в `images/venues/krasnoyarsk/`.
+
+### Проблемы
+- Часть карточек делит cover; prod Location seed по запросу.
+
+---
+
 ## 2026-08-15 - Краснодар: полный tourist hub + линии + превью + MyDay
 
 ### Наблюдения

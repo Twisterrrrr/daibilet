@@ -1227,6 +1227,129 @@ const KRASNODAR_SLIDES: CityIdentitySlide[] = [
   },
 ];
 
+const KRASNOYARSK_WEATHER: CityWeatherFlavor = {
+  latitude: 56.0153,
+  longitude: 92.8932,
+  timezone: 'Asia/Krasnoyarsk',
+  outdoorSlugs: [
+    'krasnoyarsk-natsional-nyy-park-krasnoyarskie-stolby',
+    'krasnoyarsk-karaul-naya-gora-i-chasovnya-paraskevy-pyatnitsy',
+    'krasnoyarsk-tsentral-naya-naberezhnaya-eniseya',
+    'krasnoyarsk-ostrov-tatyshev',
+    'krasnoyarsk-nikolaevskaya-sopka',
+  ],
+  indoorSlugs: [
+    'krasnoyarsk-muzey-usad-ba-v-i-surikova',
+    'krasnoyarsk-ploschad-mira-kic',
+    'krasnoyarsk-restoran-tunguska',
+    'krasnoyarsk-restoran-075-please',
+    'krasnoyarsk-kraevedcheskiy-muzey',
+  ],
+  outdoorCta: 'Отличная погода для Столбов, Караульной горы и набережной Енисея',
+  indoorCtaOvercast: 'Сегодня пасмурно. Усадьба Сурикова, «Площадь Мира» или «Тунгуска»',
+  indoorCtaRain: 'Сегодня дождь. Музеи, БКЗ и сибирская кухня укроют от непогоды',
+  indoorCtaSnow: 'Сегодня снег. «Бобровый лог», музеи и горячая сибирская кухня',
+};
+
+const KRASNOYARSK_WHEN_TO_GO: CityWhenToGoFlavor = {
+  timeZone: 'Asia/Krasnoyarsk',
+  seasons: [
+    {
+      id: 'winter',
+      months: [12, 1, 2],
+      headline: 'Зима',
+      body: 'Сказочная сибирская зима со снегом и морозами. Енисей не замерзает из-за ГЭС и парит туманами. Время для «Бобрового лога» и согревающей гастрономии.',
+    },
+    {
+      id: 'spring',
+      months: [3, 4, 5],
+      headline: 'Весна',
+      body: 'В марте и апреле ещё лежит снег. Настоящая весна в мае: город резко зеленеет, открываются террасы, комфорт для первых длинных прогулок.',
+    },
+    {
+      id: 'summer',
+      months: [6, 7, 8],
+      headline: 'Лето',
+      body: 'Пик сезона: Столбы, катера по Красноярскому морю и вечерние набережные. Часто выше +25-30 °C.',
+    },
+    {
+      id: 'autumn',
+      months: [9, 10, 11],
+      headline: 'Осень',
+      body: 'Сентябрь и начало октября - «золотая тайга». Смотровые на Николаевской сопке и Караульной горе. С ноября город уходит в зиму.',
+    },
+  ],
+  tabs: seasonTabs({
+    spring:
+      'В марте и апреле ещё вовсю лежит снег. Настоящая весна приходит в мае, когда город резко зеленеет, открываются летние террасы, а погода становится комфортной для первых долгих прогулок на природе.',
+    summer:
+      'Пик туристического сезона. Идеальное время для штурма скал в заповеднике «Столбы», прогулок на катерах по Красноярскому морю и вечерних променадов по набережным. Температура часто поднимается выше +25-30 °C.',
+    autumn:
+      'Сентябрь и начало октября - невероятно красивый сезон «золотой тайги». Смотровые на Николаевской сопке и Караульной горе предлагают лучшие виды. С ноября город окончательно уходит в зиму.',
+    winter:
+      'Настоящая сказочная сибирская зима с пушистым снегом и морозами. Енисей в черте города не замерзает из-за ГЭС и создаёт эффектные парящие туманы. Идеально для «Бобрового лога» и согревающего гастро-тура.',
+  }),
+};
+
+const KRASNOYARSK_SLIDES: CityIdentitySlide[] = [
+  {
+    id: 'mighty-siberia',
+    title: 'Дух могучей Сибири',
+    text: 'Величественный характер дикой природы у мегаполиса. Гигантские сиенитовые скалы-останцы среди тайги - главное место силы и символ города: заповедник «Столбы».',
+    imageSrc: '/images/venues/krasnoyarsk/identity-siberia.jpg',
+    imageAlt: 'Скалы Столбы среди сибирской тайги',
+    slugs: [
+      'krasnoyarsk-natsional-nyy-park-krasnoyarskie-stolby',
+      'krasnoyarsk-fanpark-bobrovyy-log',
+      'krasnoyarsk-nikolaevskaya-sopka',
+    ],
+    target: 'places',
+    badge: 'Символ',
+  },
+  {
+    id: 'surikov-hvorostovsky',
+    title: 'Родина Сурикова и Хворостовского',
+    text: 'Глубокие культурные традиции: родина художника Василия Сурикова и оперного гения Дмитрия Хворостовского. Мощная художественная школа и лофт-кластеры на берегах Енисея.',
+    imageSrc: '/images/venues/krasnoyarsk/identity-art.jpg',
+    imageAlt: 'Культурное наследие Красноярска',
+    slugs: [
+      'krasnoyarsk-muzey-usad-ba-v-i-surikova',
+      'krasnoyarsk-hudozhestvennyy-muzey-surikova',
+      'krasnoyarsk-ploschad-mira-kic',
+    ],
+    target: 'places',
+    badge: 'Искусство',
+  },
+  {
+    id: 'siberian-game',
+    title: 'Культ сибирской дичи',
+    text: 'Гастрономическая столица Сибири: строганина из муксуна и нельмы, оленина, таежные грибы, папоротник, кедровые орехи и десерты с брусникой.',
+    imageSrc: '/images/venues/krasnoyarsk/identity-gastro.jpg',
+    imageAlt: 'Сибирская кухня: рыба, ягоды и дичь',
+    slugs: [
+      'krasnoyarsk-restoran-tunguska',
+      'krasnoyarsk-restoran-075-please',
+      'krasnoyarsk-kupecheskiy-kvartal-mira',
+    ],
+    target: 'places',
+    badge: 'Гастро',
+  },
+  {
+    id: 'yenisei-bridges',
+    title: 'Мосты и каскады Енисея',
+    text: 'Масштабное советское и дореволюционное зодчество. Коммунальный мост и часовня Параскевы Пятницы на десятирублевой купюре - главный архитектурный код.',
+    imageSrc: '/images/venues/krasnoyarsk/identity-architecture.jpg',
+    imageAlt: 'Мосты Енисея и десятирублевый вид',
+    slugs: [
+      'krasnoyarsk-kommunalnyy-most',
+      'krasnoyarsk-karaul-naya-gora-i-chasovnya-paraskevy-pyatnitsy',
+      'krasnoyarsk-peshehodnyy-most-na-ostrov-tatyshev',
+    ],
+    target: 'places',
+    badge: 'Архитектура',
+  },
+];
+
 export const CITY_HUB_LOCAL_FLAVOR: Record<string, CityHubLocalFlavor> = {
   perm: {
     identityHeading: 'Чем уникальна Пермь',
@@ -1299,6 +1422,14 @@ export const CITY_HUB_LOCAL_FLAVOR: Record<string, CityHubLocalFlavor> = {
     slides: KRASNODAR_SLIDES,
     weather: KRASNODAR_WEATHER,
     whenToGo: KRASNODAR_WHEN_TO_GO,
+  },
+  krasnoyarsk: {
+    identityHeading: 'Чем уникален Красноярск',
+    identityLead: IDENTITY_LEAD,
+    tags: tagsFromSlides(KRASNOYARSK_SLIDES),
+    slides: KRASNOYARSK_SLIDES,
+    weather: KRASNOYARSK_WEATHER,
+    whenToGo: KRASNOYARSK_WHEN_TO_GO,
   },
 };
 
