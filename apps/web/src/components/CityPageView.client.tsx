@@ -27,6 +27,7 @@ import { CityIdentityCarousel } from '@/components/CityIdentityCarousel.client';
 import { CityLifehacksSection } from '@/components/CityLifehacksSection.client';
 import { HubCarouselChrome } from '@/components/HubCarouselChrome.client';
 import { CityRegionalEvents } from '@/components/CityRegionalEvents.client';
+import { cityHasRegionalFestivals } from '@/lib/city-regional-events';
 import { CityWeatherWidget } from '@/components/CityWeatherWidget.client';
 import { MustSeeFilterTabs } from '@/components/MustSeeFilterTabs.client';
 import { ScrollRail } from '@/components/ScrollRail.client';
@@ -124,7 +125,9 @@ const CITY_HASH_ALIASES: Record<string, string> = {
   events: 'affiche',
   blog: 'blog',
   zametki: 'blog',
-  'region-events': 'affiche',
+  festivals: 'festivals',
+  festival: 'festivals',
+  'region-events': 'festivals',
   'region-nearby': 'affiche',
 };
 
@@ -136,6 +139,7 @@ const HUB_DESKTOP_NAV: Array<{ id: string; label: string }> = [
   { id: 'lifehacks', label: 'Лайфхаки' },
   { id: 'city-suburbs', label: 'Пригороды' },
   { id: 'affiche', label: 'События' },
+  { id: 'festivals', label: 'Фестивали' },
   { id: 'faq', label: 'FAQ' },
 ];
 
@@ -147,6 +151,7 @@ const HUB_MOBILE_NAV: Array<{ id: string; label: string }> = [
   { id: 'lifehacks', label: 'Лайфхаки' },
   { id: 'city-suburbs', label: 'Пригороды' },
   { id: 'affiche', label: 'События' },
+  { id: 'festivals', label: 'Фестивали' },
   { id: 'blog', label: 'Заметки' },
   { id: 'faq', label: 'FAQ' },
 ];
@@ -159,6 +164,7 @@ const HUB_MOBILE_PRIMARY_IDS = [
   'lifehacks',
   'city-suburbs',
   'affiche',
+  'festivals',
 ] as const;
 
 const SECTION_SCROLL_MT = HUB_SECTION_SCROLL_MT;
@@ -342,6 +348,7 @@ export function CityPageView({
   );
   const hasRoutesNav = Boolean(guide?.dayRoutePresets?.length);
   const hasSuburbsNav = Boolean(guide?.significantSuburbs?.length);
+  const hasFestivalsNav = cityHasRegionalFestivals(hubSlug);
 
   const applyPlaceFocus = React.useCallback((focus: CityPlaceFocus | null) => {
     if (!focus?.slugs.length) {
@@ -364,8 +371,9 @@ export function CityPageView({
     if (hasRoutesNav) filled.add('city-routes');
     if (hasLifehacks) filled.add('lifehacks');
     if (hasSuburbsNav) filled.add('city-suburbs');
-    // One sticky «События» covers affiche + festivals + near-city.
+    // «События» = афиша + подборки + рядом; dedicated «Фестивали» → #festivals when present.
     filled.add('affiche');
+    if (hasFestivalsNav) filled.add('festivals');
     if (hasFaqBlogSplit) filled.add('faq');
     if (footerArticles.length > 0) filled.add('blog');
     const desktop = HUB_DESKTOP_NAV.filter((item) => filled.has(item.id));
@@ -377,6 +385,7 @@ export function CityPageView({
   }, [
     footerArticles.length,
     hasFaqBlogSplit,
+    hasFestivalsNav,
     hasLifehacks,
     hasMustSeeNav,
     hasRoutesNav,

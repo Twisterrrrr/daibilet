@@ -70,3 +70,8 @@ export function listCityRegionalPastEvents(
     .filter((event) => event.status === 'past')
     .slice(0, cap);
 }
+
+/** Sticky «Фестивали» and block render gate (upcoming and/or past cards). */
+export function cityHasRegionalFestivals(slug: string | null | undefined, now = new Date()): boolean {
+  return listAllCityRegionalEvents(slug, now).length > 0;
+}

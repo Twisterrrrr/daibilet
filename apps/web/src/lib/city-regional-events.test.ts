@@ -1,7 +1,12 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { listCityRegionalEvents, listCityRegionalPastEvents, regionalEventStatus } from './city-regional-events.ts';
+import {
+  cityHasRegionalFestivals,
+  listCityRegionalEvents,
+  listCityRegionalPastEvents,
+  regionalEventStatus,
+} from './city-regional-events.ts';
 
 const NOW_AUG_15 = new Date('2026-08-15T12:00:00+03:00');
 
@@ -65,4 +70,10 @@ test('Perm keeps EFEST as optional upcoming; RED FEST filler is dropped', () => 
     perm.some((event) => event.id === 'perm-red-fest-2026'),
     false,
   );
+});
+
+test('cityHasRegionalFestivals gates sticky item by editorial catalog', () => {
+  assert.equal(cityHasRegionalFestivals('perm', NOW_AUG_15), true);
+  assert.equal(cityHasRegionalFestivals('moscow', NOW_AUG_15), true);
+  assert.equal(cityHasRegionalFestivals('unknown-city-xyz', NOW_AUG_15), false);
 });

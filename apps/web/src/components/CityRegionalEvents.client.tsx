@@ -7,6 +7,7 @@ import {
   HUB_SECTION_PAD_BOTTOM_HALF,
   HUB_SECTION_PAD_TOP,
   HUB_SECTION_PAD_TOP_HALF,
+  HUB_SECTION_SCROLL_MT,
 } from '@/components/CityHubSectionHeading';
 import { listCityRegionalEvents, listCityRegionalPastEvents, regionalEventStatusLabel } from '@/lib/city-regional-events';
 
@@ -28,13 +29,14 @@ export function CityRegionalEvents({ citySlug, editorial = false, nested = false
 
   return (
     <section
-      className={
+      id="festivals"
+      className={`${HUB_SECTION_SCROLL_MT} ${
         nested
           ? editorial
             ? 'border-t border-zinc-200/80'
             : 'border-t border-slate-100'
           : `border-b ${editorial ? 'border-zinc-200' : 'border-slate-100'}`
-      }
+      }`}
       data-city-regional-events={nested ? 'nested' : 'standalone'}
     >
       <div
