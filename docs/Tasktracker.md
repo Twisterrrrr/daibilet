@@ -2,7 +2,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| FIX.HUB-HERO-LEAD-CONTRAST | Navy hero: lead/crumbs/region chip светлые (Tailwind alpha + hero-surface color) | Критический | 🔄 commit+deploy |
+| FIX.HUB-HERO-LEAD-CONTRAST | Navy hero: lead/crumbs/region chip светлые (Tailwind alpha + hero-surface color) | Критический | ✅ live `31872965367` SHA `6f36c766` |
 
 ## 2026-08-15 - Hub festivals: curate + card hover
 
