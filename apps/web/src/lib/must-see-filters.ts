@@ -40,11 +40,11 @@ export type MustSeeClassifyInput = CityPlaceLinkFields & {
 
 const FILTER_LABELS: Record<MustSeeFilterId, string> = {
   main: 'Главные места',
-  gastro: 'Гастрономические точки',
+  gastro: 'Гастро',
   museum: 'Музеи',
   science: 'Семейное',
   literature: 'Литература',
-  views: 'Виды / набережные',
+  views: 'Променады',
   street: 'Улицы / дворы',
   park: 'Парки',
   temple: 'Храмы',
