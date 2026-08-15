@@ -55,10 +55,12 @@ const SORT_OPTIONS: Array<[VenueCatalogSort, string]> = [
   ['desc', 'Я-А'],
 ];
 
-type PlacesScope = 'all' | 'events';
+type PlacesScope = 'all' | 'institutions' | 'locations' | 'events';
 
 const FILTER_SCOPE_OPTIONS: Array<[PlacesScope, string]> = [
   ['all', 'Показывать все'],
+  ['institutions', 'Только площадки'],
+  ['locations', 'Только локации'],
   ['events', 'Площадки с событиями'],
 ];
 
@@ -563,6 +565,9 @@ export function PlacesHubView({
   const setTypeFilter = (next: string) => {
     setListPage(1);
     replaceCatalogUrl((params) => {
+      // Category chip clears family / events scope (types already imply family).
+      params.delete('family');
+      params.delete('hasEvents');
       if (next === 'all') params.delete('type');
       else params.set('type', next);
       params.delete('page');
@@ -576,14 +581,25 @@ export function PlacesHubView({
     replaceCatalogUrl((params) => {
       params.delete('family');
       params.delete('hasEvents');
+      params.delete('type');
       params.delete('page');
       if (next === 'events') params.set('hasEvents', '1');
+      if (next === 'institutions') params.set('family', 'institution');
+      if (next === 'locations') params.set('family', 'location');
       if (urlCityAll && !params.get('city')) params.set('city', 'all');
     });
   };
 
-  /** Mobile dropdown: Все места | С событиями | categories (mutually exclusive with events). */
-  const mobileTypeSelectValue = hasEvents ? 'events' : typeFilter === 'all' ? 'all' : typeFilter;
+  /** Mobile: Все | семьи | с событиями | категории. */
+  const mobileTypeSelectValue = hasEvents
+    ? 'events'
+    : family === 'institution'
+      ? 'institutions'
+      : family === 'location'
+        ? 'locations'
+        : typeFilter === 'all'
+          ? 'all'
+          : typeFilter;
 
   const applyMobileTypeSelect = (next: string) => {
     setListPage(1);
@@ -595,6 +611,10 @@ export function PlacesHubView({
       params.delete('page');
       if (next === 'events') {
         params.set('hasEvents', '1');
+      } else if (next === 'institutions') {
+        params.set('family', 'institution');
+      } else if (next === 'locations') {
+        params.set('family', 'location');
       } else if (next !== 'all') {
         params.set('type', next);
       }
