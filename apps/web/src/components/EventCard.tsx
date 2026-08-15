@@ -317,7 +317,8 @@ export function EventCard({
           ) : null}
         </div>
 
-        {showSlotPills ? (
+        {/* Catalog cards: no alt slots (confusing). Landing purchase chips only. */}
+        {showSlotPills && landingActions ? (
           <EventCardSlotChips
             session={session}
             labels={allSlotLabels}

@@ -1,11 +1,13 @@
 'use client';
 
 import { Calendar as CalendarIcon } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import {
   buildCatalogDateRailChips,
+  CATALOG_DATE_RAIL_DAYS_DESKTOP_MAX,
+  CATALOG_DATE_RAIL_DAYS_TABLET,
   isDateRailChipActive,
   toLocalIsoDay,
   type CatalogDateRailChip,
@@ -21,19 +23,26 @@ type CatalogDateRailProps = {
   className?: string;
 };
 
+const DESKTOP_DATE_RAIL_MQ = '(min-width: 1024px)';
+
 /**
  * Horizontal date presets + upcoming days + corner calendar (range).
  * Owned by EventsCatalogHero (not CatalogToolbar) so search stays one row below.
+ *
+ * Tablet / <lg: 7 day chips (as before). Desktop: fill unused width up to MAX.
  */
 export function CatalogDateRail({ disabled = false, className = '' }: CatalogDateRailProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const chips = useMemo(() => buildCatalogDateRailChips(), []);
+  const [upcomingDays, setUpcomingDays] = useState(CATALOG_DATE_RAIL_DAYS_TABLET);
+  const chips = useMemo(() => buildCatalogDateRailChips(new Date(), upcomingDays), [upcomingDays]);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [draftFrom, setDraftFrom] = useState('');
   const [draftTo, setDraftTo] = useState('');
   const pickerRef = useRef<HTMLDivElement>(null);
   const fromInputRef = useRef<HTMLInputElement>(null);
+  const railRef = useRef<HTMLDivElement>(null);
+  const measureRef = useRef<HTMLDivElement>(null);
 
   const filters = useMemo(() => {
     const minRaw = searchParams.get('minPrice');
@@ -65,6 +74,52 @@ export function CatalogDateRail({ disabled = false, className = '' }: CatalogDat
     calendarActive &&
     Boolean(filters.from) &&
     !chips.some((chip) => chip.kind === 'day' && chip.iso === filters.from && filters.to === filters.from);
+
+  const measurePool = useMemo(
+    () => buildCatalogDateRailChips(new Date(), CATALOG_DATE_RAIL_DAYS_DESKTOP_MAX),
+    [],
+  );
+
+  useLayoutEffect(() => {
+    const mq = window.matchMedia(DESKTOP_DATE_RAIL_MQ);
+
+    const fitDesktopDays = () => {
+      if (!mq.matches) {
+        setUpcomingDays(CATALOG_DATE_RAIL_DAYS_TABLET);
+        return;
+      }
+      const rail = railRef.current;
+      const measure = measureRef.current;
+      if (!rail || !measure) {
+        setUpcomingDays(CATALOG_DATE_RAIL_DAYS_DESKTOP_MAX);
+        return;
+      }
+      const available = rail.clientWidth;
+      if (available <= 0) return;
+
+      const gap = 6; // gap-1.5
+      const kids = Array.from(measure.children) as HTMLElement[];
+      let used = 0;
+      let dayCount = 0;
+      for (let i = 0; i < kids.length; i += 1) {
+        const w = kids[i]!.offsetWidth;
+        const next = used === 0 ? w : used + gap + w;
+        if (next > available + 0.5) break;
+        used = next;
+        if (measurePool[i]?.kind === 'day') dayCount += 1;
+      }
+      setUpcomingDays(Math.max(CATALOG_DATE_RAIL_DAYS_TABLET, dayCount));
+    };
+
+    fitDesktopDays();
+    const ro = new ResizeObserver(fitDesktopDays);
+    if (railRef.current) ro.observe(railRef.current);
+    mq.addEventListener('change', fitDesktopDays);
+    return () => {
+      ro.disconnect();
+      mq.removeEventListener('change', fitDesktopDays);
+    };
+  }, [measurePool]);
 
   useEffect(() => {
     if (!pickerOpen) return;
@@ -167,12 +222,23 @@ export function CatalogDateRail({ disabled = false, className = '' }: CatalogDat
 
   const minDay = toLocalIsoDay(new Date());
 
+  const renderChipLabel = (chip: CatalogDateRailChip) =>
+    chip.kind === 'day' ? (
+      <span className="whitespace-nowrap">
+        <span className="text-[11px] font-semibold uppercase tracking-wide opacity-80">{chip.weekday}</span>
+        <span className="ml-1 font-semibold">{chip.iso.slice(8)}</span>
+      </span>
+    ) : (
+      <span className="whitespace-nowrap">{chip.shortLabel}</span>
+    );
+
   return (
     <div className={`flex min-w-0 items-center gap-2 ${className}`}>
       <div
+        ref={railRef}
         role="group"
         aria-label="Дата"
-        className="horizontal-snap-row flex min-w-0 flex-1 flex-nowrap items-center gap-1.5 overflow-x-auto pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="horizontal-snap-row flex min-w-0 flex-1 flex-nowrap items-center gap-1.5 overflow-x-auto pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:overflow-x-hidden"
       >
         {chips.map((chip) => {
           const active = isDateRailChipActive(chip, filters);
@@ -188,17 +254,24 @@ export function CatalogDateRail({ disabled = false, className = '' }: CatalogDat
                 active ? 'catalog-date-chip-on' : 'catalog-date-chip-idle'
               }`}
             >
-              {chip.kind === 'day' ? (
-                <span className="whitespace-nowrap">
-                  <span className="text-[11px] font-semibold uppercase tracking-wide opacity-80">
-                    {chip.weekday}
-                  </span>
-                  <span className="ml-1 font-semibold">{chip.iso.slice(8)}</span>
-                </span>
-              ) : (
-                <span className="whitespace-nowrap">{chip.shortLabel}</span>
-              )}
+              {renderChipLabel(chip)}
             </button>
+          );
+        })}
+      </div>
+
+      {/* Off-screen measure row: full desktop pool so we can count how many day chips fit. */}
+      <div
+        ref={measureRef}
+        aria-hidden
+        className="pointer-events-none absolute -left-[9999px] top-0 flex flex-nowrap items-center gap-1.5 opacity-0"
+      >
+        {measurePool.map((chip) => {
+          const key = chip.kind === 'preset' ? `m-${chip.value}` : `m-${chip.iso}`;
+          return (
+            <span key={key} className="catalog-date-chip catalog-date-chip-idle h-9">
+              {renderChipLabel(chip)}
+            </span>
           );
         })}
       </div>

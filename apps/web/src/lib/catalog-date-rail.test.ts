@@ -1,19 +1,31 @@
 import { describe, expect, it } from 'vitest';
 
 import { catalogSearchHintsFromFacets, splitCatalogCategories } from './catalog-category-rail';
-import { buildCatalogDateRailChips, isDateRailChipActive, toLocalIsoDay } from './catalog-date-rail';
+import {
+  buildCatalogDateRailChips,
+  CATALOG_DATE_RAIL_DAYS_DESKTOP,
+  CATALOG_DATE_RAIL_DAYS_TABLET,
+  isDateRailChipActive,
+  toLocalIsoDay,
+} from './catalog-date-rail';
 
 describe('catalog-date-rail', () => {
-  it('builds presets plus upcoming calendar days', () => {
+  it('builds presets plus upcoming calendar days (tablet default)', () => {
     const now = new Date(2026, 7, 9); // Sun Aug 9 local
-    const chips = buildCatalogDateRailChips(now, 7);
+    const chips = buildCatalogDateRailChips(now, CATALOG_DATE_RAIL_DAYS_TABLET);
     expect(chips[0]).toMatchObject({ kind: 'preset', value: 'all' });
     expect(chips[1]).toMatchObject({ kind: 'preset', value: 'today' });
     expect(chips[2]).toMatchObject({ kind: 'preset', value: 'tomorrow' });
     expect(chips[3]).toMatchObject({ kind: 'preset', value: 'weekend' });
     const days = chips.filter((c) => c.kind === 'day');
-    expect(days).toHaveLength(7);
+    expect(days).toHaveLength(CATALOG_DATE_RAIL_DAYS_TABLET);
     expect(days[0]?.kind === 'day' && days[0].iso).toBe(toLocalIsoDay(new Date(2026, 7, 11)));
+  });
+
+  it('can build a longer desktop day strip', () => {
+    const now = new Date(2026, 7, 9);
+    const days = buildCatalogDateRailChips(now, CATALOG_DATE_RAIL_DAYS_DESKTOP).filter((c) => c.kind === 'day');
+    expect(days).toHaveLength(CATALOG_DATE_RAIL_DAYS_DESKTOP);
   });
 
   it('marks exact day active', () => {

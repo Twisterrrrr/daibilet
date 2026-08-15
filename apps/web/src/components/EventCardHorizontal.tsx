@@ -1,5 +1,6 @@
 'use client';
 
+import { useLayoutEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { Clock, MapPin, Ticket } from 'lucide-react';
 
@@ -15,7 +16,6 @@ import {
   getDepartingSoonMinutes,
   isOpenDate,
   MIN_DISPLAY_PRICE_RUB,
-  WIDE_DISPLAY_SLOT_LIMIT,
 } from '@/lib/event-card-meta';
 import { resolveEventCardObjectPosition } from '@/lib/event-image-focus';
 import { resolveEventCardFallbackImage, resolveEventCardPrimaryImage } from '@/lib/event-card-image';
@@ -31,6 +31,129 @@ import { eventHref, sessionVenueHref } from '@/lib/routes';
 
 const SLOT_CHIP_CLASS =
   'inline-btn inline-flex h-6 min-h-6 shrink-0 items-center justify-center rounded-md bg-surface-muted px-2.5 text-ui-xs font-medium leading-none text-graphite-muted';
+
+const SLOT_GAP_PX = 6; // gap-1.5
+
+/** List mode: «А также:» + as many session chips as fit on one line. */
+function AlsoSlotsRow({ labels }: { labels: string[] }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const measureRef = useRef<HTMLDivElement>(null);
+  const [visibleCount, setVisibleCount] = useState(labels.length);
+  const [moreCount, setMoreCount] = useState(0);
+
+  useLayoutEffect(() => {
+    const container = containerRef.current;
+    const measure = measureRef.current;
+    if (!container || !measure || labels.length === 0) {
+      setVisibleCount(0);
+      setMoreCount(0);
+      return;
+    }
+
+    const fit = () => {
+      const available = container.clientWidth;
+      if (available <= 0) return;
+
+      const kids = Array.from(measure.children) as HTMLElement[];
+      // [0] = «А также:», [1..] = slot chips in order
+      const labelEl = kids[0];
+      const chipEls = kids.slice(1);
+      if (!labelEl || chipEls.length === 0) {
+        setVisibleCount(0);
+        setMoreCount(0);
+        return;
+      }
+
+      let used = labelEl.offsetWidth;
+      let count = 0;
+
+      const moreWidthFor = (n: number) => {
+        // Approximate «ещё N» chip; measure sibling if present at end of measure row.
+        const moreEl = measure.querySelector('[data-also-more]') as HTMLElement | null;
+        if (moreEl) return moreEl.offsetWidth;
+        // Fallback estimate
+        return 48 + String(n).length * 6;
+      };
+
+      for (let i = 0; i < chipEls.length; i += 1) {
+        const chipW = chipEls[i]!.offsetWidth;
+        const remainingAfter = chipEls.length - (i + 1);
+        const withChip = used + SLOT_GAP_PX + chipW;
+
+        if (remainingAfter === 0) {
+          if (withChip <= available + 0.5) {
+            used = withChip;
+            count = i + 1;
+          }
+          break;
+        }
+
+        const moreW = moreWidthFor(remainingAfter);
+        const withChipAndMore = withChip + SLOT_GAP_PX + moreW;
+        if (withChipAndMore <= available + 0.5) {
+          used = withChip;
+          count = i + 1;
+          continue;
+        }
+        // Cannot take this chip if we still need «ещё»; stop and show more for rest including this one.
+        break;
+      }
+
+      const leftover = labels.length - count;
+      // If nothing fitted but we have chips, try to show at least one without more, or only more.
+      if (count === 0 && chipEls.length > 0) {
+        const one = used + SLOT_GAP_PX + chipEls[0]!.offsetWidth;
+        if (one <= available + 0.5) {
+          setVisibleCount(1);
+          setMoreCount(Math.max(0, labels.length - 1));
+          return;
+        }
+      }
+
+      setVisibleCount(count);
+      setMoreCount(Math.max(0, leftover));
+    };
+
+    fit();
+    const ro = new ResizeObserver(fit);
+    ro.observe(container);
+    return () => ro.disconnect();
+  }, [labels]);
+
+  if (labels.length === 0) return null;
+
+  return (
+    <div className="relative min-w-0">
+      <div ref={containerRef} className="flex min-w-0 flex-nowrap items-center gap-1.5 overflow-hidden">
+        <span className="shrink-0 text-ui-xs font-medium text-graphite-muted">А также:</span>
+        {labels.slice(0, visibleCount).map((label) => (
+          <span key={label} className={SLOT_CHIP_CLASS}>
+            {label}
+          </span>
+        ))}
+        {moreCount > 0 ? (
+          <span className={`${SLOT_CHIP_CLASS} text-graphite-muted`}>ещё {moreCount}</span>
+        ) : null}
+      </div>
+
+      <div
+        ref={measureRef}
+        aria-hidden
+        className="pointer-events-none absolute -left-[9999px] top-0 flex flex-nowrap items-center gap-1.5 opacity-0"
+      >
+        <span className="shrink-0 text-ui-xs font-medium text-graphite-muted">А также:</span>
+        {labels.map((label) => (
+          <span key={label} className={SLOT_CHIP_CLASS}>
+            {label}
+          </span>
+        ))}
+        <span data-also-more className={SLOT_CHIP_CLASS}>
+          ещё {Math.max(1, labels.length)}
+        </span>
+      </div>
+    </div>
+  );
+}
 
 export function EventCardHorizontal({ session }: { session: PublicCatalogListItemDto | PublicSessionDto }) {
   const href = eventHref(session);
@@ -48,9 +171,6 @@ export function EventCardHorizontal({ session }: { session: PublicCatalogListIte
   const departingSoonMinutes = openDate ? null : getDepartingSoonMinutes(session.startsAt);
   const nextSessionLabel = openDate ? null : formatCardScheduleLine(session);
   const displaySlotLabels = collectAllDisplaySlotLabels(session);
-  const showSlotPills = displaySlotLabels.length > 0;
-  const wideSlotLabels = displaySlotLabels.slice(0, WIDE_DISPLAY_SLOT_LIMIT);
-  const wideSlotMore = Math.max(0, displaySlotLabels.length - WIDE_DISPLAY_SLOT_LIMIT);
   const sessionMetaLabel = openDate ? null : nextSessionLabel;
   const descriptionText = formatListDescription(session.description);
   const destinationLabel = resolveEventCardDestinationLabel(session);
@@ -186,18 +306,7 @@ export function EventCardHorizontal({ session }: { session: PublicCatalogListIte
           ) : null}
         </div>
 
-        {showSlotPills ? (
-          <div className="flex flex-nowrap items-center gap-1.5 overflow-hidden">
-            {wideSlotLabels.map((label) => (
-              <span key={label} className={SLOT_CHIP_CLASS}>
-                {label}
-              </span>
-            ))}
-            {wideSlotMore > 0 ? (
-              <span className={`${SLOT_CHIP_CLASS} text-graphite-muted`}>ещё {wideSlotMore}</span>
-            ) : null}
-          </div>
-        ) : null}
+        {displaySlotLabels.length > 0 ? <AlsoSlotsRow labels={displaySlotLabels} /> : null}
 
         <div className="mt-auto flex items-center justify-between gap-2 pt-1">
           {priceFooterLabel ? (

@@ -4,6 +4,13 @@ export type CatalogDateRailChip =
   | { kind: 'preset'; value: 'all' | 'today' | 'tomorrow' | 'weekend'; label: string; shortLabel: string }
   | { kind: 'day'; iso: string; label: string; shortLabel: string; weekday: string };
 
+/** Tablet / narrow: keep the current week-long day strip. */
+export const CATALOG_DATE_RAIL_DAYS_TABLET = 7;
+/** Desktop: fill unused rail width (~+5 day chips vs tablet). */
+export const CATALOG_DATE_RAIL_DAYS_DESKTOP = 12;
+/** Upper bound when measuring how many day chips fit on wide screens. */
+export const CATALOG_DATE_RAIL_DAYS_DESKTOP_MAX = 14;
+
 const WEEKDAY_SHORT = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'] as const;
 
 function pad2(n: number): string {
@@ -24,7 +31,10 @@ function addLocalDays(base: Date, days: number): Date {
  * Preset chips + next N calendar days (skip today/tomorrow - covered by presets).
  * Day chips start from day+2 so the rail stays swipeable without duplicating Сегодня/Завтра.
  */
-export function buildCatalogDateRailChips(now = new Date(), upcomingDays = 7): CatalogDateRailChip[] {
+export function buildCatalogDateRailChips(
+  now = new Date(),
+  upcomingDays = CATALOG_DATE_RAIL_DAYS_TABLET,
+): CatalogDateRailChip[] {
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const chips: CatalogDateRailChip[] = [
     { kind: 'preset', value: 'all', label: 'Любая дата', shortLabel: 'Любая' },
