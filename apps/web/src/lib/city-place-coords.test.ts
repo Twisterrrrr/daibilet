@@ -60,6 +60,20 @@ test('Perm cityInfo mustSee waterfront coords match editorial map', () => {
   }
 });
 
+test('any curated editorial slug always wins over nearby catalog drift', () => {
+  const hermitage = pickEditorialPlaceCoordsIfStale('ermitazh', 59.9398, 30.3146);
+  assert.deepEqual(hermitage, lookupEditorialPlaceCoords('ermitazh'));
+
+  const already = pickEditorialPlaceCoordsIfStale(
+    'ermitazh',
+    lookupEditorialPlaceCoords('ermitazh')!.latitude,
+    lookupEditorialPlaceCoords('ermitazh')!.longitude,
+  );
+  assert.equal(already, null);
+
+  assert.equal(pickEditorialPlaceCoordsIfStale('unknown-place-xyz', 55, 37), null);
+});
+
 test('stale Perm water / previous-fix pins rebase onto south-bank editorial', () => {
   const midRiver = pickEditorialPlaceCoordsIfStale('naberezhnaya-kamy', 58.021111, 56.243889);
   assert.deepEqual(midRiver, PERM_NABEREZHNAYA_KAMY_COORDS);

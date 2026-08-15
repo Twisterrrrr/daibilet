@@ -1,3 +1,18 @@
+## 2026-08-15 - Editorial geo: hard lock for all curated slugs
+
+### Наблюдения
+- Owner: geo должны быть верными везде, не только Пермь-Кама.
+- Worktree без `.env` / DATABASE_URL (secrets не в git); MCP Postgres auth есть, SQL падает -3103; prod БД на MSK не «пропала».
+
+### Решения
+- `pickEditorialPlaceCoordsIfStale`: любой slug из `city-place-coords` всегда побеждает DB/payload/LS, если пара отличается.
+- Карта My Day уже rebase'ит в `buildDayRouteCoordsMap` (предыдущий коммит).
+
+### Проблемы
+- Точки без editorial map по-прежнему из Venue DB; backfill адресов/coords новых хабов ждёт DATABASE_URL / owner apply.
+
+---
+
 ## 2026-08-15 - Perm My Day: точки в Каме
 
 ### Наблюдения

@@ -3,7 +3,7 @@
  * (0-event content places or city page session-only venue list).
  */
 
-import { haversineMeters, isValidCoordinatePair } from './day-route-score.ts';
+import { isValidCoordinatePair } from './day-route-score.ts';
 
 export type EditorialPlaceCoords = {
   latitude: number;
@@ -37,9 +37,6 @@ export const PERM_CATHEDRAL_SQUARE_COORDS: EditorialPlaceCoords = {
   latitude: 58.016205,
   longitude: 56.2338,
 };
-
-const PERM_KAMA_WATERFRONT_SLUGS = new Set(['naberezhnaya-kamy', 'perm-schaste-ne-za-gorami']);
-const PERM_CATHEDRAL_SQUARE_SLUGS = new Set(['perm-sobornaya-ploschad']);
 
 /** Nizhny Novgorod: classic 6 + owner pack 30 must-see + 10 gastro. */
 const NIZHNY_NOVGOROD_COORDS: Record<string, EditorialPlaceCoords> = {
@@ -810,18 +807,10 @@ export function lookupEditorialPlaceCoords(
   return EDITORIAL_COORDS_BY_SLUG[key] || null;
 }
 
-function editorialSlugKey(slug: string | null | undefined): string {
-  return String(slug || '')
-    .trim()
-    .toLowerCase();
-}
-
 /**
- * When curated coords exist and the live/LS/hub pin is missing, mid-river, or far
- * from editorial, return the curated pair so My Day can rebase without a LS wipe.
- *
- * Perm Kama waterfront: always snap to south-bank pins - catalog/OSM centroids
- * sit in the channel and used to overwrite the map via matches payload.
+ * Curated `city-place-coords` / hub pins beat hub DB, matches payload, and stale LS.
+ * If we have editorial for the slug and the live pair differs (or is missing) - rebase.
+ * Equality → null (no write). No editorial → null (keep catalog geo).
  */
 export function pickEditorialPlaceCoordsIfStale(
   slug: string | null | undefined,
@@ -830,25 +819,14 @@ export function pickEditorialPlaceCoordsIfStale(
 ): EditorialPlaceCoords | null {
   const editorial = lookupEditorialPlaceCoords(slug);
   if (!editorial) return null;
-  const key = editorialSlugKey(slug);
   const lat = Number(latitude);
   const lng = Number(longitude);
-  const same =
+  if (
     isValidCoordinatePair(lat, lng) &&
     lat === editorial.latitude &&
-    lng === editorial.longitude;
-
-  // Hard lock: never trust hub/DB/LS for these two promenade pins.
-  if (PERM_KAMA_WATERFRONT_SLUGS.has(key)) {
-    return same ? null : editorial;
+    lng === editorial.longitude
+  ) {
+    return null;
   }
-
-  if (!isValidCoordinatePair(lat, lng)) return editorial;
-  if (PERM_CATHEDRAL_SQUARE_SLUGS.has(key) && lng > 56.2365) {
-    return editorial;
-  }
-  if (haversineMeters(lat, lng, editorial.latitude, editorial.longitude) > EDITORIAL_COORDS_REBASE_METERS) {
-    return editorial;
-  }
-  return null;
+  return editorial;
 }
