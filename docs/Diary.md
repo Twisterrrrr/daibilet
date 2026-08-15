@@ -1,3 +1,21 @@
+## 2026-08-15 - MCP Postgres (`user-postgres`) restored via SSH tunnel
+
+### Наблюдения
+- Cursor MCP `postgres` (`user-postgres`) auth/status был ready, но любой `query` давал `MCP error -32603` (пустое тело).
+- `~/.cursor/mcp.json` указывал на `localhost:5433` с паролем `daibilet_dev`; на Windows порт 5433 никто не слушал.
+- Prod `DATABASE_URL` на `daibilet-msk` = Postgres Docker `127.0.0.1:5437/daibilet` (не открыт наружу).
+
+### Решения
+- В `~/.ssh/config` для `daibilet-msk`: `LocalForward 5433 127.0.0.1:5437`.
+- MCP URL переведён на `127.0.0.1:5433` с теми же credentials, что `/opt/daibilet/.env` (секреты только локально, не в git).
+- Helper без секретов: `scripts/mcp-postgres-tunnel.ps1` (`-Background` / `-Status`).
+- Smoke MCP: `SELECT 1` OK; Venue count для slug `екатеринбург` = 108.
+
+### Проблемы
+- Туннель должен быть жив (`ssh -N daibilet-msk` или helper); без него снова `-32603`.
+- После правки `mcp.json` при необходимости Reload MCP / перезапуск Cursor.
+
+---
 ## 2026-08-15 - Prod backfill hub geo (MSK)
 
 ### Наблюдения

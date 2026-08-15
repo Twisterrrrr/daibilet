@@ -9,6 +9,16 @@ Finance PR-ветка `codex/stage0-admission-ticket-core` может держа
 
 ---
 
+## 2026-08-15 - MCP Postgres (`user-postgres`) - LOCKED
+
+**Сломано было:** `~/.cursor/mcp.json` → `localhost:5433` + неверный пароль; порт не слушал → `query` = `-32603`. Auth Cursor при этом зелёный.
+
+**Канон:** SSH `LocalForward 5433 127.0.0.1:5437` на `daibilet-msk`; MCP URL на `127.0.0.1:5433` с credentials из MSK `/opt/daibilet/.env` (только локально). Поднять туннель: `pwsh scripts/mcp-postgres-tunnel.ps1 -Background`. Secrets / `.env` в git не класть.
+
+**Owner 1 шаг при `-32603` снова:** проверить `pwsh scripts/mcp-postgres-tunnel.ps1 -Status`; если `5433_listen=False` - `-Background`, при необходимости Reload MCP в Cursor.
+
+---
+
 ## 2026-08-14 - City hub: погода, теги, события региона (пилот Пермь)
 
 **Сделано в коде (пилот Пермь):** микровиджет погоды Open-Meteo + identity-теги + editorial JSON «События региона». Live deploy не в этом ship.
@@ -62,7 +72,7 @@ Finance PR-ветка `codex/stage0-admission-ticket-core` может держа
 
 ## 2026-08-11 - Region Hub IA
 
-1. **City SEO title:** спека предлагала «Афиша {Города} на {Год}…»; сейчас канон P.2d. Меняем city title в том же релизе или оставляем P.2d?
+1. **City SEO title:** ~~спека предлагала «Афиша {Города} на {Год}…»; сейчас канон P.2d. Меняем city title в том же релизе или оставляем P.2d?~~ → **закрыто 2026-08-15:** все city hubs на P.2d (как СПб); year-шаблон Казани/Екб снят с hub.
 2. **ХМАО / Карелия:** у ХМАО в `region-hubs` центр Ханты-Мансийск (есть ли saleable standalone?). Карелия → Петрозаводск - в allowlist?
 3. **childCities с eventCount=0:** всегда в JSON для роботов + UI «Показать все», или zero-only в отдельном поле?
 4. **Тир C:** 301/302 на центр vs мягкий noindex + strip? Спека = noindex + strip на центре (текущая реализация).
