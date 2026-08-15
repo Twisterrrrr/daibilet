@@ -447,16 +447,6 @@ export function LocationVenueLayout({
               <p className="mt-2 text-sm font-semibold text-emerald-800">{venue.hookFact}</p>
             ) : null}
             <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-slate-600">{fullDescription}</p>
-            {streetAddress ? (
-              <div className="mt-5 flex items-start gap-3 rounded-xl border border-slate-100 bg-slate-50 p-3">
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary-600 text-xs font-bold text-white">
-                  1
-                </div>
-                <p className="text-sm text-slate-700">
-                  Адрес: <strong>{streetAddress}</strong>, {venue.city}
-                </p>
-              </div>
-            ) : null}
           </section>
 
           {hasVenueLogisticsContent(venue) ? (
