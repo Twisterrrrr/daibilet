@@ -249,12 +249,55 @@ export function getDepartingSoonMinutes(startsAt: string): number | null {
 
 export function formatListDescription(value?: string | null): string {
   if (!value) return '';
-  return value
+  let text = value
     .replace(/<[^>]+>/g, ' ')
     .replace(/&nbsp;/gi, ' ')
     .replace(/&amp;/gi, '&')
     .replace(/\s+/g, ' ')
     .trim();
+  // TC dumps logistics into description («Место встречи: …»). Strip labels; keep body.
+  text = text
+    .replace(
+      /^(?:место(?:\s+и\s+время)?\s+встречи|точка\s+(?:сбора|встречи)|место\s+сбора|адрес)(?:\s*[•·|:：\-–—]\s*|\s+)/iu,
+      '',
+    )
+    .replace(/^адрес\s*[•·|:：\-–—]?\s*/iu, '')
+    .trim();
+  return text;
+}
+
+/**
+ * True when catalog description is logistics/address, not a short blurb.
+ * Such text belongs under the pin, not under the title.
+ */
+export function isLogisticsListDescription(value?: string | null): boolean {
+  const raw = String(value || '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (!raw) return false;
+  if (
+    /^(?:место(?:\s+и\s+время)?\s+встречи|точка\s+(?:сбора|встречи)|место\s+сбора)\b/iu.test(raw)
+  ) {
+    return true;
+  }
+  const cleaned = formatListDescription(raw);
+  if (!cleaned) return true;
+  // Address-like after strip, without a real sentence.
+  if (
+    /(?:\bг\.|\bст\.?\s*м\.|\bул\.|\bпр\.|\bпер\.|наб\.|просп|площад|причал\b)/iu.test(cleaned) &&
+    !/[.!?…]/.test(cleaned) &&
+    cleaned.length < 160
+  ) {
+    return true;
+  }
+  return false;
+}
+
+/** Pull street/metro address from a logistics description for the pin line. */
+export function extractAddressFromListDescription(value?: string | null): string {
+  if (!isLogisticsListDescription(value)) return '';
+  return formatListDescription(value);
 }
 
 /** Стабильный псевдорейтинг 4.5–5.0 до ≥10 реальных отзывов (только UI). */

@@ -81,6 +81,8 @@ export interface PublicSessionDto extends PurchaseFields {
   venueId?: string | null;
   venueSlug?: string | null;
   venue: string;
+  /** Street address of venue / meeting point for card pin. */
+  venueAddress?: string | null;
   venueKind: string;
   offerTitle?: string | null;
   offerSourceCode?: string | null;
@@ -121,6 +123,8 @@ export interface PublicCatalogListItemDto extends PurchaseFields {
   destinationType: DestinationType;
   venueSlug?: string | null;
   venue: string;
+  /** Street address for card pin (not venue marketing name). */
+  venueAddress?: string | null;
   venueKind: string;
   category: string;
   subcategories?: string[];

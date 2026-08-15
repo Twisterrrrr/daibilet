@@ -39,6 +39,7 @@ export function toPublicCatalogListItem(session: PublicSessionDto): PublicCatalo
   if (session.sessionCount != null) item.sessionCount = session.sessionCount;
   if (session.citySlug != null) item.citySlug = session.citySlug;
   if (session.venueSlug != null) item.venueSlug = session.venueSlug;
+  if (session.venueAddress != null) item.venueAddress = session.venueAddress;
   if (session.subcategories?.length) item.subcategories = session.subcategories.slice(0, 4);
   if (session.kind != null) item.kind = session.kind;
   if (session.sourceStatus != null) item.sourceStatus = session.sourceStatus;
@@ -90,6 +91,7 @@ export function toPublicHomeCardSession(session: PublicSessionDto): PublicCatalo
     ...(base.slug != null ? { slug: base.slug } : {}),
     ...(base.citySlug != null ? { citySlug: base.citySlug } : {}),
     ...(base.venueSlug != null ? { venueSlug: base.venueSlug } : {}),
+    ...(base.venueAddress != null ? { venueAddress: base.venueAddress } : {}),
     ...(base.subcategories?.length ? { subcategories: base.subcategories } : {}),
     ...(base.priceFrom != null ? { priceFrom: base.priceFrom } : {}),
     ...(base.priceTo != null ? { priceTo: base.priceTo } : {}),

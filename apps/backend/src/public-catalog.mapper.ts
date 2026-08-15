@@ -59,6 +59,7 @@ export interface PublicCatalogMappingRow {
   venueId: string | null;
   venueSlug: string | null;
   venue: string | null;
+  venueAddress: string | null;
   venueHeroImageUrl: string | null;
   venueKind: string | null;
   overrideTitle: string | null;
@@ -215,6 +216,7 @@ export function mapGroupedPublicSession(
     venueId: row.venueId,
     venueSlug: row.venueSlug,
     venue: row.venue || 'Не указано',
+    venueAddress: row.venueAddress || null,
     venueKind: row.venueKind || 'OTHER',
     offerTitle: row.offerTitle,
     offerSourceCode: row.offerSourceCode,

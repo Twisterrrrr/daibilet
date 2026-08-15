@@ -11,9 +11,11 @@ import { collectCatalogLabels, extractDurationLabel } from '@/lib/catalog-labels
 import { EventImageBadges } from '@/lib/event-card-badges';
 import {
   collectAllDisplaySlotLabels,
+  extractAddressFromListDescription,
   formatCardScheduleLine,
   formatListDescription,
   getDepartingSoonMinutes,
+  isLogisticsListDescription,
   isOpenDate,
   MIN_DISPLAY_PRICE_RUB,
 } from '@/lib/event-card-meta';
@@ -172,9 +174,13 @@ export function EventCardHorizontal({ session }: { session: PublicCatalogListIte
   const nextSessionLabel = openDate ? null : formatCardScheduleLine(session);
   const displaySlotLabels = collectAllDisplaySlotLabels(session);
   const sessionMetaLabel = openDate ? null : nextSessionLabel;
-  const descriptionText = formatListDescription(session.description);
+  const descriptionText = isLogisticsListDescription(session.description)
+    ? ''
+    : formatListDescription(session.description);
   const destinationLabel = resolveEventCardDestinationLabel(session);
-  const locationLabel = resolveEventCardLocationLabel(session);
+  const locationLabel =
+    resolveEventCardLocationLabel(session) ||
+    extractAddressFromListDescription(session.description);
   const pinLines = resolveEventCardPinLines(session);
   const pinPrimary = pinLines.primary || locationLabel;
   const durationLabel = extractDurationLabel(session.tags);
@@ -244,7 +250,7 @@ export function EventCardHorizontal({ session }: { session: PublicCatalogListIte
           ) : null}
         </div>
 
-        <h3 className="line-clamp-3 font-display text-ui-sm font-bold leading-snug text-graphite sm:text-lg">
+        <h3 className="font-display text-ui-sm font-bold leading-snug text-graphite sm:text-lg">
           <Link href={href} className="relative z-[2] transition-colors hover:text-primary-600">
             {session.title}
           </Link>

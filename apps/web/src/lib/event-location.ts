@@ -84,7 +84,7 @@ function resolveVenueParts(session: EventCardLocationInput) {
   return { venueName, providerFromVenue, address, rawVenue };
 }
 
-/** Строка локации для карточки события: адрес, если название площадки служебное. */
+/** Строка локации для карточки события: физический адрес точки, не имя площадки. */
 export function resolveEventCardLocationLabel(session: EventCardLocationInput): string {
   const { venueName, providerFromVenue, address } = resolveVenueParts(session);
   const meetingPoint = isMeetingPointLike({
@@ -93,11 +93,11 @@ export function resolveEventCardLocationLabel(session: EventCardLocationInput): 
     address: session.venueAddress || address,
   });
 
-  if (session.destinationType === 'region' && address && isRuralSettlementAddress(address)) {
-    return address;
-  }
-
-  if (address && (meetingPoint || isGenericVenueLabel(venueName) || providerFromVenue)) {
+  // Always prefer street address under the pin when we have one.
+  if (address) {
+    if (session.destinationType === 'region' && isRuralSettlementAddress(address)) {
+      return address;
+    }
     return address;
   }
 
@@ -105,12 +105,12 @@ export function resolveEventCardLocationLabel(session: EventCardLocationInput): 
     return formatStreetAddress(venueName, { city: session.city }) || venueName;
   }
 
-  if (venueName && !isGenericVenueLabel(venueName)) {
+  if (venueName && !isGenericVenueLabel(venueName) && !meetingPoint) {
     return venueName;
   }
 
   // Do not leak generic / «Место отправления Teplohod» placeholders into UI.
-  return address || '';
+  return '';
 }
 
 export type EventCardPinLines = {

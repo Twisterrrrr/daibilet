@@ -22,6 +22,7 @@ import {
   collectAllDisplaySlotLabels,
   COMPACT_MOBILE_SLOT_LIMIT,
   CATALOG_DISPLAY_SLOT_LIMIT,
+  extractAddressFromListDescription,
   formatCoverDateBadge,
   formatCardScheduleLine,
   formatListDescription,
@@ -30,6 +31,7 @@ import {
   formatShowcaseSessionDate,
   formatShowcaseSessionDateCompact,
   getDepartingSoonMinutes,
+  isLogisticsListDescription,
   isOpenDate,
   MIN_DISPLAY_PRICE_RUB,
   WIDE_DISPLAY_SLOT_LIMIT,
@@ -61,7 +63,7 @@ const SHOWCASE_BUY_CTA_CLASS =
   'inline-flex shrink-0 items-center justify-center gap-0.5 whitespace-nowrap rounded-lg bg-primary-600 px-2.5 py-[5px] text-[11px] font-semibold leading-none text-white';
 
 const TITLE_LINK_CLASS =
-  'relative z-[2] line-clamp-2 font-display text-ui-sm font-bold leading-snug text-graphite transition-colors hover:text-primary-600 sm:text-base';
+  'relative z-[2] font-display text-ui-sm font-bold leading-snug text-graphite transition-colors hover:text-primary-600 sm:text-base';
 
 const SLOT_MORE_CHIP_CLASS = `${SLOT_CHIP_CLASS} text-graphite-muted`;
 
@@ -125,15 +127,20 @@ export function EventCard({
   const sessionMetaLabel = openDate ? null : nextSessionLabel;
   // List DTO has no real rating / visit counts - never invent ★ 4.9.
   const landingBadges = landingActions ? deriveLandingCardBadges(session) : [];
-  const locationLabel = resolveEventCardLocationLabel(session);
+  const locationLabel =
+    resolveEventCardLocationLabel(session) ||
+    extractAddressFromListDescription(
+      'description' in session ? session.description : undefined,
+    );
   const durationLabel = extractDurationLabel(session.tags);
   const ageLabel = formatAgeLimit(session.ageLimit);
   // Missing display price (<100 / null) is not "soon" - event can still be on sale.
   const showSoonBadge = false;
   const priceFooterLabel = hasPrice ? formatPriceFrom(session.priceFrom) : null;
-  const descriptionText = formatListDescription(
-    'description' in session ? session.description : undefined,
-  );
+  const rawDescription = 'description' in session ? session.description : undefined;
+  const descriptionText = isLogisticsListDescription(rawDescription)
+    ? ''
+    : formatListDescription(rawDescription);
   const showDescription =
     Boolean(descriptionText) &&
     descriptionText.toLowerCase() !== String(session.title || '').trim().toLowerCase();
