@@ -86,7 +86,7 @@ async function HomePageBody() {
         landings={landingsCatalog?.items || []}
       />
 
-      {/* Rhythm: mobile stories (hidden when editors-pick shows) → editors → cities → My Day */}
+      {/* Rhythm: editors → cities → My Day */}
       <HomeCityAwareSections
         sessions={sessions}
         fingerprints={fingerprintsRecord}

@@ -33,7 +33,7 @@ export type HomeFeaturedBanner = Omit<HomeHeroSlide, 'id' | 'badge'> & {
   badge?: string;
 };
 
-/** Category chip under desktop bento / mobile stories. */
+/** Category chip under desktop bento / mobile category stack. */
 export type HomeGuideChip = {
   id: string;
   label: string;
@@ -51,31 +51,9 @@ export type HomeGuideChip = {
     | 'pin'
     | 'route'
     | 'theater';
-  /** Shown only in desktop category rail (not mobile stories strip). */
+  /** Shown only in desktop category rail (not mobile category stack). */
   desktopOnly?: boolean;
 };
-
-/** Horizontal quick links under mobile header (no river - owner 2026-08-06). */
-export const HOME_STORIES: HomeGuideChip[] = [
-  {
-    id: 'top-podborki',
-    label: 'Топ-подборки',
-    href: '/podborki',
-    icon: 'sparkles',
-  },
-  {
-    id: 'today',
-    label: 'Сегодня',
-    href: buildCatalogHref({ date: 'today', sort: 'popular' }),
-    icon: 'calendar',
-  },
-  {
-    id: 'free',
-    label: 'Бесплатно',
-    href: buildCatalogHref({ minPrice: 0, maxPrice: 0, sort: 'popular' }),
-    icon: 'gift',
-  },
-];
 
 /** Mobile category CTAs - full format set (2-col grid in UI). */
 export const HOME_MOBILE_CATEGORY_STACK: HomeGuideChip[] = [

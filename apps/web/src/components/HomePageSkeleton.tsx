@@ -8,16 +8,6 @@ export function HomePageSkeleton() {
       <div className="min-h-[320px] animate-pulse bg-gradient-to-br from-[#122868] via-sky-900 to-slate-900 sm:min-h-[380px] lg:min-h-[420px]" />
 
       <div className="container-page mt-6 space-y-10 lg:mt-10">
-        {/* Mobile stories */}
-        <div className="flex gap-3 overflow-hidden lg:hidden">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <span
-              key={i}
-              className="h-16 w-16 shrink-0 animate-pulse rounded-full bg-primary-100/80 ring-2 ring-sky-100"
-            />
-          ))}
-        </div>
-
         <SectionSkeleton cards={6} />
         <SectionSkeleton cards={4} tall />
         <div className="h-28 animate-pulse rounded-2xl bg-gradient-to-r from-primary-50 via-sky-50 to-primary-50" />

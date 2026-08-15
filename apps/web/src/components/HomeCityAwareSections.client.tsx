@@ -3,7 +3,6 @@
 import { useMemo, type ReactNode } from 'react';
 
 import { HomeEventRail, HomeNowSection } from '@/components/HomeNowSection.client';
-import { HomeStoriesStrip } from '@/components/HomeStoriesStrip.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import type { PublicCatalogListItemDto, PublicSessionDto } from '@daibilet/contracts/public';
 import { catalogHrefWithSelectedCity } from '@/lib/catalog-url';
@@ -89,9 +88,6 @@ export function HomeCityAwareSections({
 
   return (
     <>
-      {/* Mobile pills: hide when «Выбор редакции» is on the page (avoid duplicate quick nav). */}
-      {showEditorsPick ? null : <HomeStoriesStrip />}
-
       <HomeEventRail
         id="editors-pick"
         title="Выбор редакции"
@@ -99,9 +95,7 @@ export function HomeCityAwareSections({
         href={editorsHref}
         events={editorsPick}
         editorsPickBadge
-        sectionClassName={
-          showEditorsPick ? 'max-sm:!pt-[calc(var(--space-section)/2)]' : undefined
-        }
+        sectionClassName={showEditorsPick ? 'max-sm:!pt-[calc(var(--space-section)/2)]' : undefined}
       />
 
       {children}
