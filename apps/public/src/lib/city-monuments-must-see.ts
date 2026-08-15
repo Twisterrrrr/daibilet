@@ -626,8 +626,8 @@ export const CITY_MONUMENTS_MUST_SEE: Record<string, MonumentMustSeeItem[]> = {
       address: 'Комсомольский проспект, д. 27',
       locationSlug: 'permsky-solenye-ushi',
       mustSeeFilter: 'creative',
-      latitude: 58.010461,
-      longitude: 56.237881,
+      latitude: 58.00974,
+      longitude: 56.23973,
     },
     {
       name: 'Пермский медведь',
@@ -635,8 +635,8 @@ export const CITY_MONUMENTS_MUST_SEE: Record<string, MonumentMustSeeItem[]> = {
       address: 'ул. Ленина, д. 58',
       locationSlug: 'perm-permskiy-medved',
       mustSeeFilter: 'creative',
-      latitude: 58.009489,
-      longitude: 56.221528,
+      latitude: 58.01042,
+      longitude: 56.23735,
     },
     {
       name: 'Памятник Василию Татищеву',
@@ -653,8 +653,8 @@ export const CITY_MONUMENTS_MUST_SEE: Record<string, MonumentMustSeeItem[]> = {
       address: 'сквер у Театра оперы и балета, бюст Пастернака',
       locationSlug: 'perm-pamyatnik-borisu-pasternaku',
       mustSeeFilter: 'main',
-      latitude: 58.016389,
-      longitude: 56.248611,
+      latitude: 58.01443,
+      longitude: 56.2461,
     },
     {
       name: 'Памятник Трус, Балбес и Бывалый',
