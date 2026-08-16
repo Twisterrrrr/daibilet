@@ -1,3 +1,9 @@
+## 2026-08-16 - Новосибирск tourist hub
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| CONT.NOVOSIBIRSK-HUB | whenToGo / identity / ~55 mustSee / семейный + Академ / Зелёная 5 / Красная 5 / FAQ / lifehacks + identity images | Высокий | ✅ code; commit+push; live по «выкатывай» |
+
 ## 2026-08-15 - Painted lines logistics rebuild (MSK/NN/Samara/SPB/KGD)
 
 | ID | Задача | Приоритет | Статус |

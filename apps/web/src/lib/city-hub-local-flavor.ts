@@ -3,7 +3,8 @@
  * seasonal «когда ехать» copy. Keep out of cityInfo (coords/mustSee) so other
  * agents can edit geo without merge fights.
  *
- * Tourist hubs with weather+seasons+identity: Perm, Moscow, SPB, Kaliningrad, NN.
+ * Tourist hubs with weather+seasons+identity: Perm, Moscow, SPB, Kaliningrad, NN,
+ * Ekaterinburg, Kazan, Samara, Krasnodar, Krasnoyarsk, Novosibirsk.
  */
 
 import { normalizeCityHubSlug } from './city-hub-config.ts';
@@ -1350,6 +1351,129 @@ const KRASNOYARSK_SLIDES: CityIdentitySlide[] = [
   },
 ];
 
+const NOVOSIBIRSK_WEATHER: CityWeatherFlavor = {
+  latitude: 55.0302,
+  longitude: 82.9204,
+  timezone: 'Asia/Novosibirsk',
+  outdoorSlugs: [
+    'novosibirsk-mihaylovskaya-naberezhnaya',
+    'novosibirsk-akademgorodok',
+    'novosibirsk-zaeltsovskiy-park',
+    'novosibirsk-plyazh-zvezda-obskoe-more',
+    'novosibirsk-tsentralnyy-park',
+  ],
+  indoorSlugs: [
+    'novosibirsk-novosibirskiy-teatr-opery-i-baleta-novat',
+    'novosibirsk-novosibirskiy-hudozhestvennyy-muzey',
+    'novosibirsk-muzey-mirovoy-pogrebal-noy-kul-tury',
+    'novosibirsk-restoran-sibir-sibir',
+    'novosibirsk-akvapark',
+  ],
+  outdoorCta: 'Отличная погода для Михайловской набережной, Академгородка и Заельцовского бора',
+  indoorCtaOvercast: 'Сегодня пасмурно. НОВАТ, Художественный музей или «#СибирьСибирь»',
+  indoorCtaRain: 'Сегодня дождь. Музеи, театры и крытый аквапарк укроют от непогоды',
+  indoorCtaSnow: 'Сегодня снег. НОВАТ, музеи и горячая сибирская кухня',
+};
+
+const NOVOSIBIRSK_WHEN_TO_GO: CityWhenToGoFlavor = {
+  timeZone: 'Asia/Novosibirsk',
+  seasons: [
+    {
+      id: 'winter',
+      months: [12, 1, 2],
+      headline: 'Зима',
+      body: 'Сибирская сказка с морозами до -30 °C и хрустящим снегом. Каток у НОВАТ, баня и горнолыжный комплекс «Ключи». Передвигайтесь на метро и такси - сугробы усложняют логистику.',
+    },
+    {
+      id: 'spring',
+      months: [3, 4, 5],
+      headline: 'Весна',
+      body: 'Март и апрель - продолжение зимы со слякотью. Настоящее тепло в мае: город резко зеленеет, на Михайловской набережной открывается сезон променадов. Бюджетные перелеты и музеи без очередей.',
+    },
+    {
+      id: 'summer',
+      months: [6, 7, 8],
+      headline: 'Лето',
+      body: 'Пик сезона: до +25 °C, пляжи Обского моря, фестивали в Академгородке и долгие вечерние прогулки. Открыта навигация по Оби, летние веранды и прокат самокатов.',
+    },
+    {
+      id: 'autumn',
+      months: [9, 10, 11],
+      headline: 'Осень',
+      body: 'Сентябрь - бабье лето и золото Заельцовского бора. С октября дожди, мокрый снег и ветер. Идеально для театральных сезонов и обновленных ресторанных меню.',
+    },
+  ],
+  tabs: seasonTabs({
+    spring:
+      'Март и апрель здесь - продолжение зимы с затяжным таянием снега и гололедицей. Настоящее тепло прилетает только в мае, когда город резко зеленеет, а на Михайловской набережной открывается сезон променадов. Лучшее время для бюджетных перелетов и музеев без очередей.',
+    summer:
+      'Пиковый туристический сезон с комфортным теплом до +25 °C, а иногда и палящим зноем. Главные фишки - отдых на пляжах Обского моря, фестивали в Академгородке и долгие вечерние прогулки. Открыта навигация по Оби, летние веранды и прокат самокатов.',
+    autumn:
+      'Сентябрь радует мягким бабьим летом и золотыми пейзажами в парке «Заельцовский бор». С октября погода резко портится: дожди, мокрый снег и сильные ветра. Осень идеальна для культурного туризма: открываются театральные сезоны, рестораны обновляют меню.',
+    winter:
+      'Новосибирск превращается в сибирскую сказку с крепкими морозами до -30 °C и хрустящим снегом. Сюда едут ради катка у НОВАТ, сибирской бани и горнолыжного комплекса «Ключи». Планируйте поездки на метро и такси - сугробы усложняют логистику.',
+  }),
+};
+
+const NOVOSIBIRSK_SLIDES: CityIdentitySlide[] = [
+  {
+    id: 'akademgorodok',
+    title: 'Академгородок',
+    text: 'Ум в окружении тайги. Научный анклав, где среди векового леса живут ученые, а по улицам бегают ручные белки. Исследовательское сердце Сибири - интеллигентный, новаторский и немного бунтарский Новосибирск. Прогулка по Морской показывает, как мирный хай-тек живет рядом с дикой природой.',
+    imageSrc: '/images/venues/novosibirsk/identity-symbol.jpg',
+    imageAlt: 'Академгородок среди сибирской тайги',
+    slugs: [
+      'novosibirsk-akademgorodok',
+      'novosibirsk-pamyatnik-laboratornoy-myshi',
+      'novosibirsk-art-obekt-shpargalka',
+    ],
+    target: 'places',
+    badge: 'Символ',
+  },
+  {
+    id: 'novat',
+    title: 'Сибирский Колизей (НОВАТ)',
+    text: 'Культурный масштаб за Уралом. Новосибирский театр оперы и балета - монументальный символ сибирского размаха. Под гигантским куполом ставили авангард даже в годы эвакуации, задав высокую планку зрителям. По масштабам и качеству труппы театр не уступает столичным подмосткам.',
+    imageSrc: '/images/venues/novosibirsk/identity-art.jpg',
+    imageAlt: 'Купол Новосибирского театра оперы и балета',
+    slugs: [
+      'novosibirsk-novosibirskiy-teatr-opery-i-baleta-novat',
+      'novosibirsk-teatr-globus',
+      'novosibirsk-teatr-krasnyy-fakel',
+    ],
+    target: 'places',
+    badge: 'Искусство',
+  },
+  {
+    id: 'siberian-gastro',
+    title: 'Сибирская кухня новой волны',
+    text: 'Дикоросы, дичь и гастрономический андеграунд. Новосибирск - ресторанная столица Сибири: косуля, омуль, папоротник-орляк и кедровый орех в современных подачах. Еда здесь сытная и честная, но утонченная.',
+    imageSrc: '/images/venues/novosibirsk/identity-gastro.jpg',
+    imageAlt: 'Новая сибирская кухня в Новосибирске',
+    slugs: [
+      'novosibirsk-restoran-sibir-sibir',
+      'novosibirsk-gastrokort-tsentralnyy-rynok',
+      'novosibirsk-kafe-ip-fedoseev',
+    ],
+    target: 'places',
+    badge: 'Гастро',
+  },
+  {
+    id: 'constructivism',
+    title: 'Конструктивизм и Стоек',
+    text: 'Архитектурный манифест советского авангарда. Новосибирск - заповедник конструктивизма 1920-1930-х: дома-коммуны в центре и наклонный Технопарк («Гуси») в Академгородке. Функциональность и устремленность в будущее без лишней мишуры.',
+    imageSrc: '/images/venues/novosibirsk/identity-architecture.jpg',
+    imageAlt: 'Конструктивистская архитектура Новосибирска',
+    slugs: [
+      'novosibirsk-stokvartirnyy-dom',
+      'novosibirsk-dom-s-chasami',
+      'novosibirsk-glavpochtamt',
+    ],
+    target: 'places',
+    badge: 'Архитектура',
+  },
+];
+
 export const CITY_HUB_LOCAL_FLAVOR: Record<string, CityHubLocalFlavor> = {
   perm: {
     identityHeading: 'Чем уникальна Пермь',
@@ -1430,6 +1554,14 @@ export const CITY_HUB_LOCAL_FLAVOR: Record<string, CityHubLocalFlavor> = {
     slides: KRASNOYARSK_SLIDES,
     weather: KRASNOYARSK_WEATHER,
     whenToGo: KRASNOYARSK_WHEN_TO_GO,
+  },
+  novosibirsk: {
+    identityHeading: 'Чем уникален Новосибирск',
+    identityLead: IDENTITY_LEAD,
+    tags: tagsFromSlides(NOVOSIBIRSK_SLIDES),
+    slides: NOVOSIBIRSK_SLIDES,
+    weather: NOVOSIBIRSK_WEATHER,
+    whenToGo: NOVOSIBIRSK_WHEN_TO_GO,
   },
 };
 

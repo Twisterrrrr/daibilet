@@ -1,7 +1,8 @@
 /**
  * City hub «лайфхаки»: короткие карточки с CTA.
  * Держим отдельно от cityInfo (coords/mustSee) и local-flavor (погода/уникальность).
- * Пакеты: Пермь, Москва, СПб, Калининград, Нижний Новгород, Екатеринбург, Казань, Самара.
+ * Пакеты: Пермь, Москва, СПб, Калининград, Нижний Новгород, Екатеринбург, Казань, Самара,
+ * Краснодар, Красноярск, Новосибирск.
  */
 
 import { normalizeCityHubSlug } from './city-hub-config.ts';
@@ -969,6 +970,129 @@ const KRASNOYARSK_ITEMS: CityLifehackItem[] = [
   },
 ];
 
+const NOVOSIBIRSK_ITEMS: CityLifehackItem[] = [
+  {
+    id: 'novosibirsk-etk',
+    tabId: 'transit',
+    icon: 'transit',
+    title: 'Безлимит на подземку',
+    body: body(
+      'Не покупайте разовые жетоны. Единая транспортная карта ',
+      { s: '«ЕТК»' },
+      ' экономит до ',
+      { s: '5 ₽' },
+      ' с каждой поездки на метро, автобусах и троллейбусах.',
+    ),
+    cta: {
+      kind: 'link',
+      label: 'Тарифы ЕТК',
+      href: 'https://metro-nsk.ru/',
+      extra: [{ label: 'Схема метро Новосибирска', href: yandexMapsSearchUrl('схема метро Новосибирск') }],
+    },
+  },
+  {
+    id: 'novosibirsk-ob-panorama',
+    tabId: 'walk',
+    icon: 'walk',
+    title: 'Бесплатная панорама Оби',
+    body: body(
+      'Не платите за смотровые в отелях. Лучший бесплатный вид на Обь, Коммунальный и Бугринский мосты - с верхней террасы ',
+      { s: 'Михайловской набережной' },
+      ' у памятника Александру III на закате.',
+    ),
+    cta: {
+      kind: 'maps',
+      label: 'Точка на карте',
+      href: yandexMapsSearchUrl('Михайловская набережная Новосибирск Александр III'),
+      extra: [
+        {
+          label: 'Пешеходный гид по набережной',
+          href: twoGisCitySearchUrl('novosibirsk', 'Михайловская набережная'),
+        },
+      ],
+    },
+  },
+  {
+    id: 'novosibirsk-museum-thursday',
+    tabId: 'walk',
+    icon: 'museum',
+    title: 'Культурный четверг',
+    body: body(
+      'В Художественном музее каждый ',
+      { s: 'второй четверг месяца' },
+      ' для студентов (и в соцдни для других категорий) вход в главные залы бесплатный или ',
+      { s: '50-100 ₽' },
+      '.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Афиша Художественного музея',
+      slugs: ['novosibirsk-novosibirskiy-hudozhestvennyy-muzey'],
+      scrollTo: 'places',
+      extra: [
+        {
+          label: 'Дни бесплатных посещений',
+          href: 'https://nsartmuseum.ru/',
+        },
+      ],
+    },
+  },
+  {
+    id: 'novosibirsk-doner',
+    tabId: 'food',
+    icon: 'food',
+    title: 'Кулинарный феномен «Дёнер»',
+    body: body(
+      'Локальный стритфуд: «Подорожник», запеченная шаурма в ',
+      { s: 'MGrill' },
+      ' или ',
+      { s: '«Дёнер»' },
+      '. Сытный обед за ',
+      { s: '180-250 ₽' },
+      ' в любой точке центра.',
+    ),
+    cta: {
+      kind: 'maps',
+      label: 'Карта стритфуда',
+      href: yandexMapsSearchUrl('Дёнер Новосибирск'),
+      extra: [
+        {
+          label: 'Где недорого перекусить',
+          href: twoGisCitySearchUrl('novosibirsk', 'шаурма Подорожник'),
+        },
+      ],
+    },
+  },
+  {
+    id: 'novosibirsk-akadem-train',
+    tabId: 'transit',
+    icon: 'loop',
+    title: 'Тайны Академгородка за 40 рублей',
+    body: body(
+      'Вместо такси - электричка от ',
+      { s: '«Новосибирск-Главный»' },
+      ' до ',
+      { s: '«Сеятель»' },
+      ' или ',
+      { s: '«Обское море»' },
+      '. Около ',
+      { s: '40 ₽' },
+      ' и без пробок на Большевистской.',
+    ),
+    cta: {
+      kind: 'gis',
+      label: 'Расписание электричек',
+      href: twoGisCitySearchUrl('novosibirsk', 'электричка Сеятель'),
+      extra: [
+        {
+          label: 'Маршрут по Академгородку',
+          href: yandexMapsSearchUrl('Академгородок Новосибирск'),
+        },
+      ],
+    },
+  },
+];
+
 const CITY_HUB_LIFEHACKS: Record<string, CityLifehackPack> = {
   perm: lifehackPack(PERM_ITEMS),
   moscow: lifehackPack(MOSCOW_ITEMS),
@@ -980,6 +1104,7 @@ const CITY_HUB_LIFEHACKS: Record<string, CityLifehackPack> = {
   samara: lifehackPack(SAMARA_ITEMS),
   krasnodar: lifehackPack(KRASNODAR_ITEMS),
   krasnoyarsk: lifehackPack(KRASNOYARSK_ITEMS),
+  novosibirsk: lifehackPack(NOVOSIBIRSK_ITEMS),
 };
 
 export function resolveCityLifehacks(slug: string | null | undefined): CityLifehackPack | null {

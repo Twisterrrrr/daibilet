@@ -24,6 +24,10 @@ const KRASNOYARSK_HUB_SRC = readFileSync(
   fileURLToPath(new URL('./krasnoyarsk-hub.ts', import.meta.url)),
   'utf8',
 );
+const NOVOSIBIRSK_HUB_SRC = readFileSync(
+  fileURLToPath(new URL('./novosibirsk-hub.ts', import.meta.url)),
+  'utf8',
+);
 
 function cityInfoHasSlug(slug: string): boolean {
   const quoted = new RegExp(`['"]${slug.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}['"]`);
@@ -33,7 +37,8 @@ function cityInfoHasSlug(slug: string): boolean {
     quoted.test(KAZAN_HUB_SRC) ||
     quoted.test(SAMARA_HUB_SRC) ||
     quoted.test(KRASNODAR_HUB_SRC) ||
-    quoted.test(KRASNOYARSK_HUB_SRC)
+    quoted.test(KRASNOYARSK_HUB_SRC) ||
+    quoted.test(NOVOSIBIRSK_HUB_SRC)
   );
 }
 
@@ -42,7 +47,7 @@ function assertNoLongDash(value: string, label: string) {
   assert.equal(value.includes('\u2013'), false, label);
 }
 
-test('lifehacks cover Perm, Moscow, SPB, Kaliningrad, NN, EKB, Kazan, Samara, Krasnodar and Krasnoyarsk', () => {
+test('lifehacks cover Perm, Moscow, SPB, Kaliningrad, NN, EKB, Kazan, Samara, Krasnodar, Krasnoyarsk and Novosibirsk', () => {
   assert.equal(cityHasLifehacks('perm'), true);
   assert.equal(cityHasLifehacks('moscow'), true);
   assert.equal(cityHasLifehacks('moskva'), true);
@@ -56,6 +61,7 @@ test('lifehacks cover Perm, Moscow, SPB, Kaliningrad, NN, EKB, Kazan, Samara, Kr
   assert.equal(cityHasLifehacks('samara'), true);
   assert.equal(cityHasLifehacks('krasnodar'), true);
   assert.equal(cityHasLifehacks('krasnoyarsk'), true);
+  assert.equal(cityHasLifehacks('novosibirsk'), true);
   assert.equal(cityHasLifehacks('ufa'), false);
 });
 
@@ -207,8 +213,15 @@ test('NN lifehacks: Lastochka affiche, cableway and free kremlin', () => {
   assert.equal(kremlin?.cta.kind, 'places');
 });
 
-test('EKB Kazan Samara Krasnodar Krasnoyarsk lifehacks: 5 cards, no fly tab', () => {
-  for (const city of ['ekaterinburg', 'kazan', 'samara', 'krasnodar', 'krasnoyarsk'] as const) {
+test('EKB Kazan Samara Krasnodar Krasnoyarsk Novosibirsk lifehacks: 5 cards, no fly tab', () => {
+  for (const city of [
+    'ekaterinburg',
+    'kazan',
+    'samara',
+    'krasnodar',
+    'krasnoyarsk',
+    'novosibirsk',
+  ] as const) {
     const pack = resolveCityLifehacks(city);
     assert.ok(pack, city);
     assertPackCopy(pack, city);
@@ -218,10 +231,14 @@ test('EKB Kazan Samara Krasnodar Krasnoyarsk lifehacks: 5 cards, no fly tab', ()
       false,
       city,
     );
-    assert.ok(pack.items.some((item) => item.cta.kind === 'affiche'), city);
-    if (city === 'krasnoyarsk') {
+    if (city === 'novosibirsk') {
+      assert.ok(pack.items.some((item) => item.cta.kind === 'places'), city);
+      assert.ok(pack.items.some((item) => item.cta.kind === 'gis'), city);
+    } else if (city === 'krasnoyarsk') {
+      assert.ok(pack.items.some((item) => item.cta.kind === 'affiche'), city);
       assert.ok(pack.items.some((item) => item.cta.kind === 'gis'), city);
     } else {
+      assert.ok(pack.items.some((item) => item.cta.kind === 'affiche'), city);
       assert.ok(pack.items.some((item) => item.cta.kind === 'places'), city);
     }
   }
@@ -235,6 +252,33 @@ test('EKB Kazan Samara Krasnodar Krasnoyarsk lifehacks: 5 cards, no fly tab', ()
   assert.equal(krd?.items[0]?.id, 'krasnodar-galitskiy-free');
   const krs = resolveCityLifehacks('krasnoyarsk');
   assert.equal(krs?.items[0]?.id, 'krasnoyarsk-tatyshev-free');
+  const nsk = resolveCityLifehacks('novosibirsk');
+  assert.equal(nsk?.items[0]?.id, 'novosibirsk-etk');
+});
+
+test('Novosibirsk painted lines have 5 / 5 stops with coords', async () => {
+  const { NOVOSIBIRSK_GREEN_LINE_STOPS, NOVOSIBIRSK_LINE_DAY_ROUTE_PRESETS } = await import(
+    './novosibirsk-line-presets.ts'
+  );
+  assert.equal(NOVOSIBIRSK_GREEN_LINE_STOPS.length, 5);
+  assert.equal(
+    NOVOSIBIRSK_LINE_DAY_ROUTE_PRESETS.find((p: { id: string }) => p.id === 'novosibirsk-red-line')
+      ?.stops?.length,
+    5,
+  );
+  assert.ok(
+    NOVOSIBIRSK_GREEN_LINE_STOPS.every(
+      (stop: {
+        latitude?: number;
+        longitude?: number;
+        locationSlug?: string;
+        dayRouteId?: string;
+      }) =>
+        Number.isFinite(stop.latitude) &&
+        Number.isFinite(stop.longitude) &&
+        Boolean(stop.locationSlug || stop.dayRouteId),
+    ),
+  );
 });
 
 test('EKB painted lines have 35 / 11 / 10 stops with coords and slugs', async () => {
