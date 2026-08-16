@@ -323,6 +323,11 @@ test('Perm when-to-go maps months to honest seasonal copy', () => {
   const spbAugust = resolveWhenToGoBlurb('saint-petersburg', new Date('2026-08-14T08:00:00Z'));
   assert.equal(spbAugust?.tab, 'summer');
   assert.match(spbAugust?.body || '', /Петергофа/);
+
+  const nskOctober = resolveWhenToGoBlurb('novosibirsk', new Date('2026-10-15T06:00:00Z'));
+  assert.equal(nskOctober?.seasonId, 'autumn');
+  assert.equal(nskOctober?.tab, 'autumn');
+  assert.match(nskOctober?.body || '', /Заельцовского|театральных/);
 });
 
 test('season tabs do not keep August copy when Winter is selected', () => {

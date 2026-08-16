@@ -38,7 +38,9 @@ export type CityWhenToGoSeasonId =
   | 'summer'
   | 'lateSummer'
   | 'earlyAutumn'
-  | 'lateAutumn';
+  | 'lateAutumn'
+  /** Compact 4-season packs (Krasnodar / Krasnoyarsk / Novosibirsk). */
+  | 'autumn';
 
 export type CityWhenToGoSeason = {
   id: CityWhenToGoSeasonId;
@@ -147,7 +149,7 @@ const MONTH_TITLE = [
 function tabForSeasonId(id: CityWhenToGoSeasonId): CitySeasonTabId {
   if (id === 'winter') return 'winter';
   if (id === 'spring') return 'spring';
-  if (id === 'earlyAutumn' || id === 'lateAutumn') return 'autumn';
+  if (id === 'earlyAutumn' || id === 'lateAutumn' || id === 'autumn') return 'autumn';
   return 'summer';
 }
 
