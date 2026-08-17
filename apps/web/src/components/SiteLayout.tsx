@@ -55,7 +55,7 @@ export async function SiteLayout({
           <Suspense fallback={<SiteChromeSkeleton variant="page" omitHeader />}>
             <main className="flex-1">{children}</main>
           </Suspense>
-          <div className="print:hidden">
+          <div className="print:hidden pb-[calc(6rem+env(safe-area-inset-bottom,0px))] lg:pb-0">
             <SiteFooter destinations={destinations} variant={footerVariant} />
             <ScrollToTopButton />
           </div>

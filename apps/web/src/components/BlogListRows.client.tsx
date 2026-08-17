@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { ArrowRight, BookOpen, Clock } from 'lucide-react';
 
 import { BlogPostCard } from '@/components/BlogPostCard.client';
-import { SafeImage } from '@/components/SafeImage.client';
+import { BlogCardSafeImage } from '@/components/SafeImage.client';
 import { BLOG_POSTS } from '@/data/blog-posts';
 import type { BlogCardDto } from '@/lib/blog-utils';
 import {
@@ -76,8 +76,9 @@ function BlogListRow({ post }: { post: BlogCardDto }) {
           aria-label={post.title}
           className="relative aspect-video w-[9rem] shrink-0 self-start overflow-hidden bg-gradient-to-br from-sky-100 to-primary-50 sm:w-52 md:w-64 lg:w-72"
         >
-          <SafeImage
-            src={post.coverImageUrl}
+          <BlogCardSafeImage
+            slug={post.slug}
+            coverImageUrl={post.coverImageUrl}
             alt=""
             fill
             sizes="(max-width: 640px) 9rem, (max-width: 768px) 13rem, (max-width: 1024px) 16rem, 18rem"

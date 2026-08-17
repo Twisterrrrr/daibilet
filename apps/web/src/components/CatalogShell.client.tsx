@@ -373,7 +373,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
         />
       ) : null}
 
-      <nav className="mt-10 flex flex-wrap gap-4 border-t border-slate-200 pb-20 pt-8 text-sm text-slate-600 md:pb-0">
+      <nav className="mt-10 flex flex-wrap gap-4 border-t border-slate-200 pb-[calc(5rem+env(safe-area-inset-bottom,0px))] pt-8 text-sm text-slate-600 md:pb-0">
         <Link href="/cities" className="font-medium hover:text-primary">
           Города
         </Link>

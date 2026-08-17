@@ -10,7 +10,8 @@ import { buildMyDayHref } from '@/lib/home-guide';
 
 /**
  * Mobile sticky bottom nav for personal-guide home (and soft-nav siblings).
- * Hidden on lg+. Pair with `pb-24 lg:pb-0` on page root.
+ * Hidden on lg+. Pair with `pb-24 lg:pb-0` on page root; SiteLayout chrome
+ * also pads the footer so legal links are not clipped by this bar.
  */
 export function HomeBottomNav() {
   const pathname = usePathname();

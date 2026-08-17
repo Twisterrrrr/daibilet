@@ -77,6 +77,8 @@
     "tep:landing-diagnose": "node scripts/tep-landing-diagnose.mjs",
     "tep:import-fixtures": "node scripts/tep-import-fixtures.js",
     "covers:ensure": "node scripts/ensure-catalog-covers.js",
+    "images:cards": "node scripts/compress-card-images.mjs",
+    "images:cards:dry": "node scripts/compress-card-images.mjs events --dry-run",
     "tep:sync": "node scripts/tep-import-fixtures.js && node scripts/ensure-catalog-covers.js && node scripts/revalidate-next-home.mjs",
     "tep:orders": "node scripts/tep-sync-orders.js",
     "tep:bridge": "node scripts/teplohod-fixture-bridge.js",

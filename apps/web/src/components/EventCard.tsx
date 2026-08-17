@@ -25,13 +25,11 @@ import {
   extractAddressFromListDescription,
   formatCoverDateBadge,
   formatCardScheduleLine,
-  formatListDescription,
   formatPriceRub,
   formatShowcasePriceLabel,
   formatShowcaseSessionDate,
   formatShowcaseSessionDateCompact,
   getDepartingSoonMinutes,
-  isLogisticsListDescription,
   isOpenDate,
   MIN_DISPLAY_PRICE_RUB,
   WIDE_DISPLAY_SLOT_LIMIT,
@@ -56,7 +54,7 @@ const SLOT_CHIP_PURCHASE_CLASS =
   'transition hover:bg-primary/10 hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40';
 
 const DETAILS_LINK_CLASS =
-  'relative z-[2] inline-flex shrink-0 items-center justify-center gap-0.5 whitespace-nowrap rounded-lg bg-primary-600 px-2.5 py-[5px] text-ui-xs font-semibold text-white transition hover:bg-primary-700 sm:text-ui-sm';
+  'relative z-[2] inline-flex min-h-9 shrink-0 items-center justify-center gap-1 whitespace-nowrap rounded-xl bg-primary-600 px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-primary-700 sm:min-h-10 sm:px-4 sm:text-base';
 
 /** Rail / city-hub cards: wider horizontal padding so label is not flush to pill edges. */
 const SHOWCASE_BUY_CTA_CLASS =
@@ -137,13 +135,6 @@ export function EventCard({
   // Missing display price (<100 / null) is not "soon" - event can still be on sale.
   const showSoonBadge = false;
   const priceFooterLabel = hasPrice ? formatPriceFrom(session.priceFrom) : null;
-  const rawDescription = 'description' in session ? session.description : undefined;
-  const descriptionText = isLogisticsListDescription(rawDescription)
-    ? ''
-    : formatListDescription(rawDescription);
-  const showDescription =
-    Boolean(descriptionText) &&
-    descriptionText.toLowerCase() !== String(session.title || '').trim().toLowerCase();
   const purchase = useCatalogPurchase(session);
   // Catalog list: no hidden widget DOM. Purchase UX lives on event page / landing CTA.
   const showPurchaseWidgets = landingActions && !suppressPurchaseAnchors && purchase.purchaseEnabled;
@@ -267,10 +258,6 @@ export function EventCard({
           </Link>
         </h2>
 
-        {showDescription ? (
-          <p className="line-clamp-2 text-ui-xs text-graphite-muted sm:text-ui-sm">{descriptionText}</p>
-        ) : null}
-
         {landingBadges.length > 0 ? (
           <LandingCardBadgeRow badges={landingBadges} />
         ) : highlights.length > 0 || (landingActions && session.category) ? (
@@ -280,12 +267,12 @@ export function EventCard({
             }`}
           >
             {landingActions && session.category ? (
-              <span className="rounded-md bg-surface-muted px-2 py-0.5 text-ui-xs font-medium text-graphite-muted">
+              <span className="rounded-md bg-surface-muted px-2.5 py-1 text-xs font-medium text-graphite-muted">
                 {session.category}
               </span>
             ) : null}
             {highlights.map((label) => (
-              <span key={label} className="rounded-md bg-surface-muted px-2 py-0.5 text-ui-xs font-medium text-graphite-muted">
+              <span key={label} className="rounded-md bg-surface-muted px-2.5 py-1 text-xs font-medium text-graphite-muted">
                 {label}
               </span>
             ))}
@@ -358,7 +345,7 @@ export function EventCard({
           ) : (
             <>
               {priceFooterLabel ? (
-                <span className="relative z-[2] min-w-0 flex-1 whitespace-nowrap text-base font-bold tracking-tight text-primary-700 sm:text-lg">
+                <span className="relative z-[2] min-w-0 flex-1 whitespace-nowrap text-lg font-bold tracking-tight text-primary-700 sm:text-xl">
                   {priceFooterLabel}
                 </span>
               ) : (
@@ -375,7 +362,7 @@ export function EventCard({
                   })
                 }
               >
-                <Ticket className="hidden h-3.5 w-3.5 shrink-0 sm:inline" strokeWidth={1.75} />
+                <Ticket className="h-4 w-4 shrink-0" strokeWidth={1.75} />
                 <span className="sm:hidden">Купить</span>
                 <span className="hidden sm:inline">Купить билет</span>
               </Link>

@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """Disk sidecars and listing-weight compress (no /_next/image).
 
-  python scripts/compress-card-images.py [events|venues|blog-inline|landings|all]
+  python scripts/compress-card-images.py [events|venues|blog-inline|landings|all] [--dry-run]
 
 P0 events: sibling *-card.jpg, width 640, q 60-70, ~40-80KB. Originals untouched.
 P1 blog inline: in-place max 1200px, q~75, 120-200KB.
 P1b landings: PNG→JPEG ~1200px / <150KB.
+
+MSK mass cut: always dry-run first. Do not git-add generated catalog sidecars.
 """
 from __future__ import annotations
 
@@ -146,7 +148,7 @@ def rel(path: Path) -> str:
         return path.as_posix()
 
 
-def process_card(path: Path) -> dict:
+def process_card(path: Path, dry_run: bool = False) -> dict:
     before = path.stat().st_size
     dest = card_path_for(path)
     row = {"kind": "card", "file": rel(path), "before": before, "after": 0, "action": "skip-lean"}
@@ -158,10 +160,17 @@ def process_card(path: Path) -> dict:
         return row
     thumb = thumb_path_for(path)
     if card_ok(thumb) and thumb.suffix.lower() in {".jpg", ".jpeg"}:
+        if dry_run:
+            row["after"] = thumb.stat().st_size
+            row["action"] = "would-copy-thumb"
+            return row
         shutil.copyfile(thumb, dest)
         mirror_to_web(dest)
         row["after"] = dest.stat().st_size
         row["action"] = "copy-thumb"
+        return row
+    if dry_run:
+        row["action"] = "would-write"
         return row
     size, _q = fit_target(
         path,
@@ -178,12 +187,16 @@ def process_card(path: Path) -> dict:
     return row
 
 
-def process_inline(path: Path) -> dict:
+def process_inline(path: Path, dry_run: bool = False) -> dict:
     before = path.stat().st_size
     row = {"kind": "inline", "file": rel(path), "before": before, "after": before, "action": "skip-ok"}
     im = open_rgb(path)
     long = max(im.size)
     if before <= INLINE_TARGET_MAX and 0 < long <= INLINE_MAX_SIDE:
+        return row
+    if dry_run:
+        row["after"] = 0
+        row["action"] = "would-write"
         return row
     size, _q = fit_target(
         path,
@@ -200,7 +213,7 @@ def process_inline(path: Path) -> dict:
     return row
 
 
-def process_landing(path: Path) -> dict:
+def process_landing(path: Path, dry_run: bool = False) -> dict:
     before = path.stat().st_size
     is_png = path.suffix.lower() == ".png"
     dest = jpeg_path_for(path)
@@ -217,6 +230,10 @@ def process_landing(path: Path) -> dict:
         long = max(im.size)
         if 0 < long <= LANDING_MAX_SIDE:
             return row
+    if dry_run:
+        row["after"] = 0
+        row["action"] = "would-png-to-jpg" if is_png else "would-write"
+        return row
     size, _q = fit_target(
         path,
         dest,
@@ -238,7 +255,7 @@ def process_landing(path: Path) -> dict:
 
 
 def summarize(label: str, rows: list[dict]) -> dict:
-    wrote = [row for row in rows if row["action"] in {"wrote", "png-to-jpg", "copy-thumb"}]
+    wrote = [row for row in rows if row["action"] in {"wrote", "png-to-jpg", "copy-thumb", "would-write", "would-copy-thumb", "would-png-to-jpg"}]
     before = sum(row["before"] for row in wrote)
     after = sum(row["after"] for row in wrote)
     sample = sorted(wrote, key=lambda row: row["before"], reverse=True)[:5]
@@ -262,10 +279,13 @@ def summarize(label: str, rows: list[dict]) -> dict:
 
 
 def main() -> None:
-    mode = (sys.argv[1] if len(sys.argv) > 1 else "events").strip().lower()
+    raw = sys.argv[1:]
+    dry_run = "--dry-run" in raw
+    args = [item for item in raw if not item.startswith("--")]
+    mode = (args[0] if args else "events").strip().lower()
     allowed = {"events", "venues", "blog-inline", "landings", "all"}
     if mode not in allowed:
-        raise SystemExit(f'Unknown mode "{mode}". Use events|venues|blog-inline|landings|all')
+        raise SystemExit(f'Unknown mode "{mode}". Use events|venues|blog-inline|landings|all [--dry-run]')
 
     venues = [p for p in walk_images(PUBLIC / "venues") if is_source_name(p)]
     events = [
@@ -282,13 +302,15 @@ def main() -> None:
 
     report: dict = {}
     if mode in {"events", "all"}:
-        report["cards"] = summarize("events-card", [process_card(p) for p in events])
+        report["cards"] = summarize("events-card", [process_card(p, dry_run) for p in events])
     if mode in {"venues", "all"}:
-        report["venues"] = summarize("venues-card", [process_card(p) for p in venues])
+        report["venues"] = summarize("venues-card", [process_card(p, dry_run) for p in venues])
     if mode in {"blog-inline", "all"}:
-        report["blogInline"] = summarize("blog-inline", [process_inline(p) for p in inlines])
+        report["blogInline"] = summarize("blog-inline", [process_inline(p, dry_run) for p in inlines])
     if mode in {"landings", "all"}:
-        report["landings"] = summarize("landings", [process_landing(p) for p in landings])
+        report["landings"] = summarize("landings", [process_landing(p, dry_run) for p in landings])
+    if dry_run:
+        report["dryRun"] = True
     print(json.dumps(report, ensure_ascii=True, indent=2))
 
 

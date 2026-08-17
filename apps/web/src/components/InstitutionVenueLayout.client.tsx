@@ -227,7 +227,7 @@ export function InstitutionVenueLayout({
         <VenueBreadcrumbsNav payload={pagePayload} />
       </div>
 
-      <section className="relative isolate grid w-full overflow-hidden bg-slate-900 text-white aspect-[3/4] md:aspect-auto md:min-h-80 lg:min-h-[28rem]">
+      <section className="relative isolate grid w-full overflow-hidden bg-slate-900 text-white aspect-square md:aspect-auto md:min-h-80 lg:min-h-[28rem]">
         <div className="absolute inset-0">
           {heroImage ? (
             <SafeImage

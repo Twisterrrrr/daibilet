@@ -231,13 +231,22 @@ export function CatalogResults({
         <CatalogLiveRail items={liveRailItems} popularSort={sort === 'popular'} />
       ) : null}
       {viewMode === 'list' ? (
-        <ul className="mt-4 space-y-4 sm:space-y-5">
-          {listItems.map((session) => (
-            <li key={`${session.id}-${session.startsAt}`}>
-              <EventCardHorizontal session={session} />
-            </li>
-          ))}
-        </ul>
+        <>
+          <ul className="mt-4 grid grid-cols-1 gap-4 sm:hidden">
+            {listItems.map((session) => (
+              <li key={`${session.id}-${session.startsAt}`}>
+                <EventCard session={session} compact />
+              </li>
+            ))}
+          </ul>
+          <ul className="mt-4 hidden space-y-4 sm:block sm:space-y-5">
+            {listItems.map((session) => (
+              <li key={`${session.id}-${session.startsAt}`}>
+                <EventCardHorizontal session={session} />
+              </li>
+            ))}
+          </ul>
+        </>
       ) : viewMode === 'table' ? (
         <CatalogTable items={listItems} />
       ) : (
@@ -346,10 +355,20 @@ export function ViewModeToggle({
       role="radiogroup"
       aria-label="Вид каталога"
     >
-      <ViewModeButton active={mode === 'cards'} label="Карточки" onClick={() => onChange('cards')}>
+      <ViewModeButton
+        active={mode === 'cards'}
+        mobileActive={mode === 'list'}
+        label="Карточки"
+        onClick={() => onChange('cards')}
+      >
         <Grid3X3 className="h-5 w-5" aria-hidden />
       </ViewModeButton>
-      <ViewModeButton active={mode === 'list'} label="Список" onClick={() => onChange('list')}>
+      <ViewModeButton
+        active={mode === 'list'}
+        label="Список"
+        onClick={() => onChange('list')}
+        className="hidden sm:grid"
+      >
         <List className="h-5 w-5" aria-hidden />
       </ViewModeButton>
       <ViewModeButton active={mode === 'table'} label="Таблица" onClick={() => onChange('table')}>
@@ -361,13 +380,17 @@ export function ViewModeToggle({
 
 function ViewModeButton({
   active,
+  mobileActive = false,
   label,
   onClick,
+  className = '',
   children,
 }: {
   active: boolean;
+  mobileActive?: boolean;
   label: string;
   onClick: () => void;
+  className?: string;
   children: React.ReactNode;
 }) {
   return (
@@ -382,7 +405,11 @@ function ViewModeButton({
         active
           ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200'
           : 'text-slate-500 hover:bg-white/70 hover:text-slate-800'
-      }`}
+      } ${
+        mobileActive && !active
+          ? 'max-sm:bg-white max-sm:text-slate-900 max-sm:shadow-sm max-sm:ring-1 max-sm:ring-slate-200'
+          : ''
+      } ${className}`}
     >
       {children}
     </button>

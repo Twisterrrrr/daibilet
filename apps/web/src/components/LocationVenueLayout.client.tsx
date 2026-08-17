@@ -102,7 +102,7 @@ export function LocationVenueLayout({
 
       {isPier ? (
         <>
-          <section className="relative isolate grid w-full overflow-hidden bg-slate-900 text-white aspect-[3/4] md:aspect-auto md:min-h-80 lg:min-h-[28rem]">
+          <section className="relative isolate grid w-full overflow-hidden bg-slate-900 text-white aspect-square md:aspect-auto md:min-h-80 lg:min-h-[28rem]">
             <div className="absolute inset-0">
               {venue.heroImageUrl ? (
                 <SafeImage
@@ -169,7 +169,7 @@ export function LocationVenueLayout({
         </>
       ) : isBus ? (
         <>
-        <section className="relative isolate grid w-full overflow-hidden bg-slate-900 text-white aspect-[3/4] md:aspect-auto md:min-h-80 lg:min-h-[28rem]">
+        <section className="relative isolate grid w-full overflow-hidden bg-slate-900 text-white aspect-square md:aspect-auto md:min-h-80 lg:min-h-[28rem]">
           <div className="absolute inset-0">
             {venue.heroImageUrl ? (
               <SafeImage src={venue.heroImageUrl} alt="" fill sizes={IMAGE_SIZES.eventHero} className="object-cover object-[center_20%] opacity-80" />
@@ -223,7 +223,7 @@ export function LocationVenueLayout({
         </>
       ) : isParkLike ? (
         <>
-          <section className="relative isolate grid w-full overflow-hidden bg-emerald-900 text-white aspect-[3/4] md:aspect-auto md:min-h-80 lg:min-h-[28rem]">
+          <section className="relative isolate grid w-full overflow-hidden bg-emerald-900 text-white aspect-square md:aspect-auto md:min-h-80 lg:min-h-[28rem]">
           <div className="absolute inset-0">
             {venue.heroImageUrl ? (
               <SafeImage src={venue.heroImageUrl} alt="" fill sizes={IMAGE_SIZES.eventHero} className="object-cover object-[center_20%] opacity-80" />
@@ -328,7 +328,7 @@ export function LocationVenueLayout({
           <div className="container-page px-0 sm:px-6 lg:px-8">
             <div className="grid gap-0 lg:grid-cols-2">
               <div className="relative overflow-hidden lg:rounded-l-3xl">
-                <div className="relative aspect-[3/4] md:aspect-[16/10] lg:aspect-auto lg:h-[520px]">
+                <div className="relative aspect-square md:aspect-[16/10] lg:aspect-auto lg:h-[520px]">
                   {venue.heroImageUrl ? (
                     <SafeImage src={venue.heroImageUrl} alt="" fill sizes={IMAGE_SIZES.eventCard} className="object-cover object-[center_20%]" />
                   ) : (

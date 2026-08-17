@@ -1,7 +1,7 @@
 /**
  * Disk sidecars and listing-weight compress (no /_next/image).
  *
- *   node scripts/compress-card-images.mjs [events|venues|blog-inline|landings|all]
+ *   node scripts/compress-card-images.mjs [events|venues|blog-inline|landings|all] [--dry-run]
  *
  * P0: events/** → sibling `-card.jpg` (width 640, q 60–70, 40–80KB).
  *     Does not overwrite originals (PDP keeps image.jpg).
@@ -11,6 +11,15 @@
  * P1b: landings PNG→JPEG ~1200px / <150KB (also caps oversized landing JPG).
  *
  * Source of truth: apps/public/public/images/ (mirrors to apps/web/public/images if present).
+ *
+ * Mass cut on MSK (owner / ops — do not commit thousands of binaries):
+ *   ssh daibilet-msk
+ *   cd /opt/daibilet
+ *   node scripts/compress-card-images.mjs events --dry-run
+ *   # review wrote/skipped; then without --dry-run
+ *   node scripts/compress-card-images.mjs events
+ * Sidecars stay next to originals on disk. `git reset --hard` on deploy does not
+ * delete untracked `-card.jpg`. Do not `git add` the generated catalog sidecars.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -134,7 +143,7 @@ async function fitTarget(sharp, input, output, { width, height, quality, minQual
   return { size, quality: q };
 }
 
-async function processCard(sharp, file) {
+async function processCard(sharp, file, dryRun) {
   const rel = path.relative(publicImages, file).replace(/\\/g, '/');
   const before = fs.statSync(file).size;
   const dest = cardPathFor(file);
@@ -153,6 +162,15 @@ async function processCard(sharp, file) {
 
   const thumb = thumbPathFor(file);
   if (cardOk(thumb) && path.extname(thumb).toLowerCase() === '.jpg') {
+    if (dryRun) {
+      return {
+        kind: 'card',
+        file: rel,
+        before,
+        after: fs.statSync(thumb).size,
+        action: 'would-copy-thumb',
+      };
+    }
     fs.copyFileSync(thumb, dest);
     mirrorToWeb(dest);
     return {
@@ -162,6 +180,10 @@ async function processCard(sharp, file) {
       after: fs.statSync(dest).size,
       action: 'copy-thumb',
     };
+  }
+
+  if (dryRun) {
+    return { kind: 'card', file: rel, before, after: 0, action: 'would-write' };
   }
 
   const { size } = await fitTarget(sharp, file, dest, {
@@ -175,7 +197,7 @@ async function processCard(sharp, file) {
   return { kind: 'card', file: rel, before, after: size, action: 'wrote' };
 }
 
-async function processInline(sharp, file) {
+async function processInline(sharp, file, dryRun) {
   const rel = path.relative(publicImages, file).replace(/\\/g, '/');
   const before = fs.statSync(file).size;
   if (before <= INLINE_TARGET_MAX) {
@@ -184,6 +206,9 @@ async function processInline(sharp, file) {
     if (long > 0 && long <= INLINE_MAX_SIDE) {
       return { kind: 'inline', file: rel, before, after: before, action: 'skip-ok' };
     }
+  }
+  if (dryRun) {
+    return { kind: 'inline', file: rel, before, after: 0, action: 'would-write' };
   }
   const { size } = await fitTarget(sharp, file, file, {
     width: INLINE_MAX_SIDE,
@@ -196,7 +221,7 @@ async function processInline(sharp, file) {
   return { kind: 'inline', file: rel, before, after: size, action: 'wrote' };
 }
 
-async function processLanding(sharp, file) {
+async function processLanding(sharp, file, dryRun) {
   const rel = path.relative(publicImages, file).replace(/\\/g, '/');
   const before = fs.statSync(file).size;
   const isPng = /\.png$/i.test(file);
@@ -207,6 +232,16 @@ async function processLanding(sharp, file) {
     if (long > 0 && long <= LANDING_MAX_SIDE) {
       return { kind: 'landing', file: rel, before, after: before, action: 'skip-ok' };
     }
+  }
+  if (dryRun) {
+    return {
+      kind: 'landing',
+      file: rel,
+      dest: path.relative(publicImages, dest).replace(/\\/g, '/'),
+      before,
+      after: 0,
+      action: isPng ? 'would-png-to-jpg' : 'would-write',
+    };
   }
   const { size } = await fitTarget(sharp, file, dest, {
     width: LANDING_MAX_SIDE,
@@ -232,7 +267,11 @@ async function processLanding(sharp, file) {
 }
 
 function summarize(label, rows) {
-  const wrote = rows.filter((row) => row.action === 'wrote' || row.action === 'png-to-jpg' || row.action === 'copy-thumb');
+  const wrote = rows.filter((row) =>
+    ['wrote', 'png-to-jpg', 'copy-thumb', 'would-write', 'would-copy-thumb', 'would-png-to-jpg'].includes(
+      row.action,
+    ),
+  );
   const before = wrote.reduce((sum, row) => sum + row.before, 0);
   const after = wrote.reduce((sum, row) => sum + row.after, 0);
   const sample = wrote
@@ -257,16 +296,19 @@ function summarize(label, rows) {
 }
 
 async function main() {
-  const mode = String(process.argv[2] || 'events').trim().toLowerCase();
+  const argv = process.argv.slice(2);
+  const dryRun = argv.includes('--dry-run') || process.env.DRY_RUN === '1';
+  const mode = String(argv.find((arg) => !arg.startsWith('--')) || 'events').trim().toLowerCase();
   const allowed = new Set(['events', 'venues', 'blog-inline', 'landings', 'all']);
   if (!allowed.has(mode)) {
-    throw new Error(`Unknown mode "${mode}". Use events|venues|blog-inline|landings|all`);
+    throw new Error(`Unknown mode "${mode}". Use events|venues|blog-inline|landings|all [--dry-run]`);
   }
   const sharp = loadSharp();
   if (!sharp) {
     const { spawnSync } = await import('node:child_process');
     const py = path.join(rootDir, 'scripts/compress-card-images.py');
-    const result = spawnSync('python', [py, mode], { stdio: 'inherit', cwd: rootDir });
+    const pyArgs = [py, mode, ...(dryRun ? ['--dry-run'] : [])];
+    const result = spawnSync('python', pyArgs, { stdio: 'inherit', cwd: rootDir });
     process.exit(result.status ?? 1);
   }
   const venues = walkImages(path.join(publicImages, 'venues')).filter(isSourceName);
@@ -283,27 +325,28 @@ async function main() {
   if (mode === 'events' || mode === 'all') {
     report.cards = summarize(
       'events-card',
-      await mapPool(events, CONCURRENCY, (file) => processCard(sharp, file)),
+      await mapPool(events, CONCURRENCY, (file) => processCard(sharp, file, dryRun)),
     );
   }
   if (mode === 'venues' || mode === 'all') {
     report.venues = summarize(
       'venues-card',
-      await mapPool(venues, CONCURRENCY, (file) => processCard(sharp, file)),
+      await mapPool(venues, CONCURRENCY, (file) => processCard(sharp, file, dryRun)),
     );
   }
   if (mode === 'blog-inline' || mode === 'all') {
     report.blogInline = summarize(
       'blog-inline',
-      await mapPool(inlines, CONCURRENCY, (file) => processInline(sharp, file)),
+      await mapPool(inlines, CONCURRENCY, (file) => processInline(sharp, file, dryRun)),
     );
   }
   if (mode === 'landings' || mode === 'all') {
     report.landings = summarize(
       'landings',
-      await mapPool(landings, CONCURRENCY, (file) => processLanding(sharp, file)),
+      await mapPool(landings, CONCURRENCY, (file) => processLanding(sharp, file, dryRun)),
     );
   }
+  if (dryRun) report.dryRun = true;
   console.log(JSON.stringify(report, null, 2));
 }
 

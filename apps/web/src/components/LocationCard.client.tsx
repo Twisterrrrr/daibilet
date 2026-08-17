@@ -5,7 +5,7 @@ import { MapPin, Star } from 'lucide-react';
 
 import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import { PlaceFavoriteButton } from '@/components/PlaceFavoriteButton.client';
-import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
+import { IMAGE_SIZES, CardSafeImage } from '@/components/SafeImage.client';
 import { formatStreetAddress } from '@/lib/address';
 import { venueCardImageUrl } from '@/lib/venue-card-image';
 import { dayRouteHookLine } from '@/lib/day-route-from-place';
@@ -163,7 +163,7 @@ export function LocationCard({
     <div className="group relative flex h-full flex-col overflow-hidden rounded-card bg-white shadow-card transition duration-300 hover:-translate-y-0.5 hover:shadow-card-hover">
       <div className="relative aspect-video shrink-0 overflow-hidden bg-surface-muted">
         <Link href={href} className="absolute inset-0 no-underline" aria-label={displayName}>
-          <SafeImage
+          <CardSafeImage
             src={coverSrc}
             alt=""
             fill

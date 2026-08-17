@@ -37,6 +37,7 @@ import { splitLongTitleAtBreak } from '@/lib/split-long-title';
 import { buildEventBreadcrumbs } from '@/lib/structured-data';
 import { resolveEventHeroObjectPosition } from '@/lib/event-image-focus';
 import { venueHref } from '@/lib/routes';
+import { formatStreetAddress } from '@/lib/address';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { CheckoutModalButton } from '@/components/CheckoutModal.client';
 import { EventVenueTrigger } from '@/components/EventVenueModal.client';
@@ -589,11 +590,13 @@ export function EventHero({
     : null;
   const breadcrumbs = buildEventBreadcrumbs(event);
   const placeLabel = event.venue || event.city || null;
-  const venueAddress = String(event.venueAddress || '').trim();
+  const venueAddressRaw = String(event.venueAddress || '').trim();
+  const venueStreetAddress =
+    formatStreetAddress(venueAddressRaw, { city: event.city }) || venueAddressRaw;
   // Skip venue/place chip when it duplicates the address line in the same overlay.
   const placeDuplicatesAddress =
-    Boolean(placeLabel && venueAddress) &&
-    venueAddress.toLocaleLowerCase('ru').includes(String(placeLabel).toLocaleLowerCase('ru'));
+    Boolean(placeLabel && venueStreetAddress) &&
+    venueStreetAddress.toLocaleLowerCase('ru').includes(String(placeLabel).toLocaleLowerCase('ru'));
   const solidChipClassName =
     'inline-flex max-w-full items-center gap-1 rounded-full bg-slate-950/75 px-2.5 py-1 text-[11px] font-medium text-white';
   const solidChipLinkClassName = `${solidChipClassName} cursor-pointer transition hover:bg-slate-950/90 hover:underline hover:decoration-white/50 hover:underline-offset-2`;
@@ -727,32 +730,36 @@ export function EventHero({
               </div>
             ) : null}
 
-            {/* 6. Nearest slot · 7. Address */}
-            {(nearestLabel || venueAddress) ? (
-              <div className="mt-3 flex min-w-0 flex-col gap-1.5 text-sm text-white/85 sm:mt-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5 sm:gap-y-2">
-                {nearestLabel ? (
-                  <span className="flex min-w-0 items-center gap-1.5">
-                    <Calendar className="h-4 w-4 shrink-0" strokeWidth={1.75} />
-                    <span className="min-w-0">{nearestLabel}</span>
-                  </span>
-                ) : null}
-                {venueAddress ? (
-                  canOpenVenueModal ? (
-                    <EventVenueTrigger
-                      event={event}
-                      className="flex min-w-0 items-start gap-1.5 underline decoration-white/30 underline-offset-2 hover:text-white sm:items-center"
-                    >
-                      <MapPin className="mt-0.5 h-4 w-4 shrink-0 sm:mt-0" strokeWidth={1.75} />
-                      <span className="min-w-0 break-words">{venueAddress}</span>
-                    </EventVenueTrigger>
-                  ) : (
-                    <span className="flex min-w-0 items-start gap-1.5 sm:items-center">
-                      <MapPin className="mt-0.5 h-4 w-4 shrink-0 sm:mt-0" strokeWidth={1.75} />
-                      <span className="min-w-0 break-words">{venueAddress}</span>
-                    </span>
-                  )
-                ) : null}
+            {/* 6. Nearest slot */}
+            {nearestLabel ? (
+              <div className="mt-3 flex min-w-0 items-center gap-1.5 text-sm text-white/85 sm:mt-4">
+                <Calendar className="h-4 w-4 shrink-0" strokeWidth={1.75} />
+                <span className="min-w-0">{nearestLabel}</span>
               </div>
+            ) : null}
+
+            {/* 7. Street + house, own left-aligned line (not the full index address). */}
+            {venueStreetAddress ? (
+              canOpenVenueModal ? (
+                <EventVenueTrigger
+                  event={event}
+                  className={`flex w-full min-w-0 items-start justify-start gap-1.5 text-left text-sm text-white/85 underline decoration-white/30 underline-offset-2 hover:text-white ${
+                    nearestLabel ? 'mt-1.5' : 'mt-3 sm:mt-4'
+                  }`}
+                >
+                  <MapPin className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.75} />
+                  <span className="min-w-0 break-words">{venueStreetAddress}</span>
+                </EventVenueTrigger>
+              ) : (
+                <span
+                  className={`flex w-full min-w-0 items-start justify-start gap-1.5 text-left text-sm text-white/85 ${
+                    nearestLabel ? 'mt-1.5' : 'mt-3 sm:mt-4'
+                  }`}
+                >
+                  <MapPin className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.75} />
+                  <span className="min-w-0 break-words">{venueStreetAddress}</span>
+                </span>
+              )
             ) : null}
           </div>
 

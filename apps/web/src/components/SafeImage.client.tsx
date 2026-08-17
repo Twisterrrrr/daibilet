@@ -3,9 +3,9 @@
 import Image, { type ImageProps } from 'next/image';
 import * as React from 'react';
 
-import { resolveBlogCardImage } from '@/lib/blog-cover';
-import { listingImageFallbacks } from '@/lib/card-image';
+import { blogListingImageFallbacks, listingImageFallbacks } from '@/lib/card-image';
 import { shouldBypassNextImageOptimizer } from '@/lib/remote-image-bypass';
+import { venueCardImageFallbacks } from '@/lib/venue-card-image';
 
 export const IMAGE_SIZES = {
   /** Catalog / home event cards in grids */
@@ -86,10 +86,16 @@ export function SafeImage({
 
 /**
  * Listing cards: `-card.jpg` → `-thumb.jpg` (places pack) → original → `fallback`.
+ * If `src` is already `-thumb`, thumb is tried first so a missing sidecar
+ * falls through to the original instead of an empty placeholder.
  * PDP / heroes should keep using SafeImage with the editorial path.
  */
 export function CardSafeImage({ src, fallback = null, ...props }: SafeImageProps) {
-  const chain = listingImageFallbacks(src);
+  const value = typeof src === 'string' ? src.trim() : '';
+  const chain =
+    value.startsWith('/images/venues/') && !value.includes('/generated/')
+      ? venueCardImageFallbacks(value)
+      : listingImageFallbacks(src);
   if (!chain.length) return <>{fallback}</>;
   return chain.reduceRight(
     (next, url) => <SafeImage src={url} fallback={next} {...props} />,
@@ -97,17 +103,17 @@ export function CardSafeImage({ src, fallback = null, ...props }: SafeImageProps
   );
 }
 
-/** /blog + home + hub teasers: existing `*-og.jpg` (~150KB), then full cover. */
+/** /blog + home + hub teasers: `*-og.jpg` → `-card` → `-thumb` → original cover. */
 export function BlogCardSafeImage({
   slug,
   coverImageUrl,
   fallback = null,
   ...props
 }: SafeImageProps & { slug?: string | null; coverImageUrl?: string | null }) {
-  const og = resolveBlogCardImage({ slug, coverImageUrl });
-  const cover = String(coverImageUrl || '').trim();
-  if (og && cover && og !== cover) {
-    return <SafeImage src={og} fallback={<SafeImage src={cover} fallback={fallback} {...props} />} {...props} />;
-  }
-  return <SafeImage src={og || cover || null} fallback={fallback} {...props} />;
+  const chain = blogListingImageFallbacks({ slug, coverImageUrl });
+  if (!chain.length) return <>{fallback}</>;
+  return chain.reduceRight(
+    (next, url) => <SafeImage src={url} fallback={next} {...props} />,
+    fallback,
+  );
 }

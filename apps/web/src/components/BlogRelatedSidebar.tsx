@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
+import { IMAGE_SIZES, BlogCardSafeImage } from '@/components/SafeImage.client';
 import { blogSurfaceMetaLine } from '@/lib/blog-meta';
 import type { BlogCardDto } from '@/lib/blog-utils';
 
@@ -66,8 +66,9 @@ export function BlogRelatedSidebar({
               <li key={post.slug}>
                 <Link href={`/blog/${post.slug}`} className="group flex items-start gap-3">
                   <div className="relative size-16 shrink-0 self-start overflow-hidden bg-slate-100">
-                    <SafeImage
-                      src={post.coverImageUrl}
+                    <BlogCardSafeImage
+                      slug={post.slug}
+                      coverImageUrl={post.coverImageUrl}
                       alt=""
                       fill
                       sizes={IMAGE_SIZES.blogThumb}
