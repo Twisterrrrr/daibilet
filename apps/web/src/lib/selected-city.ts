@@ -3,6 +3,8 @@ import type { PublicDestinationDto } from '@daibilet/contracts/public';
 import { resolveLandingCityName } from './landing-city.ts';
 
 export const SELECTED_CITY_STORAGE_KEY = 'daibilet:selected-city';
+/** Set after first-visit confirm, picker choice, or «Позже» - do not nag again. */
+export const CITY_PROMPT_STORAGE_KEY = 'daibilet:city-prompted';
 
 /** Paths whose `?city=` syncs with the header city picker. */
 export const CITY_FILTER_PATHS = ['/events', '/venues', '/locations', '/places', '/podborki'] as const;
@@ -86,10 +88,27 @@ export function resolveCityLabel(destinations: PublicDestinationDto[], urlCity?:
   return readStoredSelectedCity(destinations) || 'Все города';
 }
 
+export function markCityPromptCompleted() {
+  try {
+    localStorage.setItem(CITY_PROMPT_STORAGE_KEY, '1');
+  } catch {
+    // ignore storage errors
+  }
+}
+
+export function hasCompletedCityPrompt(): boolean {
+  try {
+    return localStorage.getItem(CITY_PROMPT_STORAGE_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
 export function persistSelectedCity(name: string) {
   try {
     if (name === 'all') localStorage.removeItem(SELECTED_CITY_STORAGE_KEY);
     else localStorage.setItem(SELECTED_CITY_STORAGE_KEY, name);
+    markCityPromptCompleted();
   } catch {
     // ignore storage errors
   }

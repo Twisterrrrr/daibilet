@@ -1,3 +1,19 @@
+## 2026-08-17 - Первый заход: город в шапке
+
+### Наблюдения
+- Owner: «оставь иконку локации. можно при первом заходе уточнить город». Это chrome шапки, не возврат имени города на grid EventCard.
+- На мобилке чип города плюс поиск/планнер/избранное давит слот: имя truncate, пин не убирать. Icon-only только когда слот не держит имя.
+
+### Решения
+- `CityPicker` header всегда рисует MapPin. Имя truncates; при ширине слота < 92px текст в `sr-only`, `aria-label` остаётся.
+- Первый визит без выбранного города: тот же `CityConfirmModal`. Если geolocation уже granted - ближайший каталожный город (центры `city-map-coords`, ≤80 км). Иначе «Выберите город» / «Позже». Nominatim reverse не зовём (`soft-geocode.ts` остаётся address→coords для Мой день). Не перезаписываем storage/URL/хаб.
+- `/events` и `/podborki` не дублируют модал: там уже `EventsCityGate`.
+
+### Проблемы
+- Safari часто не отдаёт `permissions.query(geolocation)` - тогда без GPS-догадки, только ручной confirm. Сознательно, чтобы не всплывал системный prompt.
+
+---
+
 ## 2026-08-17 - My Day: mobile sticky toolbar collapse
 
 ### Наблюдения

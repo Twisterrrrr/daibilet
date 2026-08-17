@@ -10,11 +10,13 @@ import {
   mergeStoredCityIntoEventsParams,
   mergeStoredCityIntoSearchParams,
   pathHrefWithSelectedCity,
+  persistSelectedCity,
   ensureCityInOptions,
   resolveCatalogCityFilter,
   resolveCityHubDestination,
   resolveCityLabel,
   resolveSectionCityFilter,
+  CITY_PROMPT_STORAGE_KEY,
   SELECTED_CITY_STORAGE_KEY,
 } from './selected-city.ts';
 
@@ -119,6 +121,31 @@ test('mergeStoredCityIntoSearchParams injects storage city only when city missin
     storage.clear();
     const empty = mergeStoredCityIntoSearchParams([...destinations], new URLSearchParams(''));
     assert.equal(empty, null);
+  } finally {
+    Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: original });
+  }
+});
+
+test('persistSelectedCity marks the first-visit prompt done and keeps all as empty city', () => {
+  const storage = new Map<string, string>();
+  const original = globalThis.localStorage;
+  Object.defineProperty(globalThis, 'localStorage', {
+    configurable: true,
+    value: {
+      getItem: (key: string) => storage.get(key) ?? null,
+      setItem: (key: string, value: string) => storage.set(key, value),
+      removeItem: (key: string) => storage.delete(key),
+    },
+  });
+
+  try {
+    persistSelectedCity('Уфа');
+    assert.equal(storage.get(SELECTED_CITY_STORAGE_KEY), 'Уфа');
+    assert.equal(storage.get(CITY_PROMPT_STORAGE_KEY), '1');
+
+    persistSelectedCity('all');
+    assert.equal(storage.has(SELECTED_CITY_STORAGE_KEY), false);
+    assert.equal(storage.get(CITY_PROMPT_STORAGE_KEY), '1');
   } finally {
     Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: original });
   }
