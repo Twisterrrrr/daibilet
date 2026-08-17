@@ -328,8 +328,7 @@ html[data-nav-pending='1'] {
   }
 
   .catalog-chip-on {
-    @apply border-0 bg-graphite text-white hover:bg-graphite/90 hover:text-white;
-    box-shadow: 0 6px 14px rgba(26, 26, 26, 0.28);
+    @apply border-0 bg-primary text-white hover:bg-primary/90 hover:text-white;
   }
 
   .catalog-quick-chip {
@@ -341,8 +340,7 @@ html[data-nav-pending='1'] {
   }
 
   .catalog-quick-chip-on {
-    @apply border-0 bg-graphite text-white hover:bg-graphite/90;
-    box-shadow: 0 6px 14px rgba(26, 26, 26, 0.28);
+    @apply border-0 bg-primary text-white hover:bg-primary/90;
   }
 
   .catalog-date-chip {

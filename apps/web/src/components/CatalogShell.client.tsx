@@ -276,7 +276,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
 
   return (
     <>
-      {/* Sticky search + date + kind chips. Sort / view stay in the meta row. */}
+      {/* Sticky search + date/category/sort in CatalogToolbar. */}
       <CatalogToolbar
         facets={facets}
         values={filterValues}
@@ -284,12 +284,12 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
         cityReady={cityReady || urlHasCity}
       />
 
-      {/* Active chips: sm+ only - on mobile advanced filters live in the search-row sheet. */}
+      {/* Active chips: sm+ only - on mobile filters live in the Фильтры sheet / FAB. */}
       <div className="hidden sm:block">
         <CatalogActiveFilters values={filterValues} />
       </div>
 
-      {/* Meta: счётчик · sort · вид - не в sticky. */}
+      {/* Meta слева; sort только mobile (desktop sort в sticky toolbar); view справа */}
       <div className="mt-4 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 sm:mt-5">
         <p className="min-w-0 text-sm text-graphite-muted">
           {loading && !catalog ? 'Загрузка…' : null}
@@ -310,7 +310,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
           <div
             role="radiogroup"
             aria-label="Сортировка"
-            className="flex gap-0.5 overflow-x-auto rounded-lg bg-slate-100 p-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="flex gap-0.5 overflow-x-auto rounded-lg bg-slate-100 p-0.5 [scrollbar-width:none] md:hidden [&::-webkit-scrollbar]:hidden"
           >
             {CATALOG_SORT_OPTIONS.map((option) => (
               <button

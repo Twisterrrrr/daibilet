@@ -13,7 +13,6 @@ import { PlacesSearch } from '@/components/PlacesSearch.client';
 import { VenuesCatalogSkeleton } from '@/components/VenueCatalogSkeletons';
 import { HeroLayout } from '@/components/HeroLayout';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
-import { catalogIndexEyebrow, placesCatalogLead } from '@/lib/catalog-index-copy';
 import { placesSearchHref } from '@/lib/catalog-url';
 import { pluralCities, pluralPlaces } from '@/lib/format';
 import { buildPlacesListingCopy, normalizePlacesFamily } from '@/lib/places-seo';
@@ -21,6 +20,7 @@ import {
   catalogCityQueryValue,
   ensureCityInOptions,
   isAllCitiesQuery,
+  persistSelectedCity,
   resolveSectionCityFilter,
 } from '@/lib/selected-city';
 import {
@@ -554,6 +554,20 @@ export function PlacesHubView({
     }
   };
 
+  const setCityFilter = (next: string) => {
+    setListPage(1);
+    if (selectedCity?.setCity) {
+      selectedCity.setCity(next === 'all' ? 'all' : next);
+      return;
+    }
+    persistSelectedCity(next === 'all' ? 'all' : next);
+    replaceCatalogUrl((params) => {
+      if (next === 'all') params.set('city', 'all');
+      else params.set('city', catalogCityQueryValue([], next));
+      params.delete('page');
+    });
+  };
+
   const setTypeFilter = (next: string) => {
     setListPage(1);
     replaceCatalogUrl((params) => {
@@ -578,6 +592,38 @@ export function PlacesHubView({
       if (next === 'events') params.set('hasEvents', '1');
       if (next === 'institutions') params.set('family', 'institution');
       if (next === 'locations') params.set('family', 'location');
+      if (urlCityAll && !params.get('city')) params.set('city', 'all');
+    });
+  };
+
+  /** Mobile: Все | семьи | с событиями | категории. */
+  const mobileTypeSelectValue = hasEvents
+    ? 'events'
+    : family === 'institution'
+      ? 'institutions'
+      : family === 'location'
+        ? 'locations'
+        : typeFilter === 'all'
+          ? 'all'
+          : typeFilter;
+
+  const applyMobileTypeSelect = (next: string) => {
+    setListPage(1);
+    setFiltersOpen(false);
+    replaceCatalogUrl((params) => {
+      params.delete('family');
+      params.delete('hasEvents');
+      params.delete('type');
+      params.delete('page');
+      if (next === 'events') {
+        params.set('hasEvents', '1');
+      } else if (next === 'institutions') {
+        params.set('family', 'institution');
+      } else if (next === 'locations') {
+        params.set('family', 'location');
+      } else if (next !== 'all') {
+        params.set('type', next);
+      }
       if (urlCityAll && !params.get('city')) params.set('city', 'all');
     });
   };
@@ -613,9 +659,8 @@ export function PlacesHubView({
   const families = countCatalogFamilies(stats.types);
   const placesTotal = families.institutions + families.locations;
   const placesEyebrow = cityName
-    ? catalogIndexEyebrow(pluralPlaces(placesTotal), cityName)
-    : `${pluralPlaces(placesTotal)} · ${pluralCities(cityCount)}`;
-  const placesLead = placesCatalogLead(cityName);
+    ? `${pluralPlaces(placesTotal)} • ${cityName}`
+    : `${pluralPlaces(placesTotal)} • ${pluralCities(cityCount)}`;
   const hideCityOnCards = cityFilter !== 'all';
   const cityQuery =
     cityFetchKey && cityFetchKey !== 'all'
@@ -636,96 +681,134 @@ export function PlacesHubView({
       <HeroLayout
         variant="minimal"
         dense
-        hideBreadcrumbsOnMobile
         breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Места' }]}
         eyebrow={placesEyebrow}
         title={pageTitleText}
-        description={placesLead}
         tone="light"
         className=""
-      />
+      >
+        <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-stretch sm:gap-3">
+          <PlacesSearch mode="hub" initialQuery={q} tone="muted" />
+          <select
+            value={cityPending ? '' : cityFilter}
+            disabled={cityPending}
+            onChange={(event) => setCityFilter(event.target.value)}
+            className="rounded-xl bg-[#F5F5F7] px-3 py-2.5 text-sm outline-none disabled:opacity-70 sm:max-w-[12rem] sm:shrink-0"
+            aria-label="Город"
+          >
+            {cityPending ? <option value="">Город…</option> : null}
+            <option value="all">Все города</option>
+            {cityOptions.map(([city]) => (
+              <option key={city} value={city}>
+                {city}
+              </option>
+            ))}
+          </select>
+        </div>
 
-      <div className="container-page pt-2 pb-5 sm:py-6 lg:py-8">
-        <div className="catalog-toolbar sticky top-[var(--site-header-height)] z-30 -mx-4 space-y-2 border-b border-slate-200/60 bg-white/95 px-4 py-2 backdrop-blur-md supports-[backdrop-filter]:bg-white/90 sm:-mx-6 sm:px-6 md:mx-0 md:rounded-2xl md:border md:border-slate-200/70 md:px-3 md:py-2.5 md:shadow-sm">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <PlacesSearch mode="hub" initialQuery={q} tone="muted" />
-            <div ref={filtersRef} className="relative shrink-0">
+        {/* Mobile: one dropdown (categories + «С событиями») - no separate Фильтры button. */}
+        <div className="mt-4 sm:hidden">
+          <label className="sr-only" htmlFor="places-hub-mobile-type">
+            Тип места
+          </label>
+          <select
+            id="places-hub-mobile-type"
+            value={mobileTypeSelectValue}
+            onChange={(event) => applyMobileTypeSelect(event.target.value)}
+            className="w-full rounded-xl bg-[#F5F5F7] px-3 py-2.5 text-sm outline-none"
+          >
+            <option value="all">Все места</option>
+            <option value="institutions">Только площадки</option>
+            <option value="locations">Только локации</option>
+            <option value="events">Площадки с событиями</option>
+            {categoryChips.map((chip) => (
+              <option key={chip.id} value={chip.id}>
+                {chip.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* sm+: chip rail + Фильтры (events scope) as before */}
+        <div className="mt-4 hidden gap-2 sm:flex sm:items-start">
+          <div className="min-w-0 flex-1" data-places-hub-chips>
+            <div className="flex flex-wrap items-center gap-1.5">
               <button
                 type="button"
-                onClick={() => setFiltersOpen((open) => !open)}
-                aria-expanded={filtersOpen}
-                aria-haspopup="menu"
-                className={`inline-flex h-11 items-center justify-center gap-1.5 rounded-xl px-3 text-sm font-semibold transition sm:h-10 ${
-                  filtersOpen || filtersActiveCount > 0
-                    ? 'bg-graphite text-white hover:bg-graphite/90'
-                    : 'border border-slate-200 bg-white text-graphite hover:bg-slate-50'
-                }`}
+                onClick={() => setTypeFilter('all')}
+                className={`catalog-chip min-h-9 ${allTypesOn ? 'catalog-chip-on' : 'catalog-chip-idle'}`}
               >
-                <SlidersHorizontal className="h-4 w-4" strokeWidth={1.75} aria-hidden />
-                <span className="hidden sm:inline">Фильтры</span>
-                {filtersActiveCount > 0 ? (
-                  <span className="grid min-w-5 place-items-center rounded-md bg-white/25 px-1.5 text-xs">
-                    {filtersActiveCount}
-                  </span>
-                ) : null}
+                <span className="whitespace-nowrap">Все места</span>
               </button>
-              {filtersOpen ? (
-                <div
-                  role="menu"
-                  aria-label="Дополнительные фильтры"
-                  className="absolute right-0 z-40 mt-2 w-64 overflow-hidden rounded-2xl border border-slate-200 bg-white py-2 shadow-lg"
-                >
-                  {FILTER_SCOPE_OPTIONS.map(([value, label]) => {
-                    const active = scope === value;
-                    return (
-                      <button
-                        key={value}
-                        type="button"
-                        role="menuitemradio"
-                        aria-checked={active}
-                        onClick={() => setScope(value)}
-                        className={`flex w-full items-center px-3.5 py-2.5 text-left text-sm transition ${
-                          active
-                            ? 'bg-slate-100 font-semibold text-graphite'
-                            : 'text-slate-700 hover:bg-slate-50'
-                        }`}
-                      >
-                        {label}
-                      </button>
-                    );
-                  })}
-                </div>
-              ) : null}
+              {categoryChips.map((chip) => {
+                const active = typeFilter === chip.id;
+                return (
+                  <button
+                    key={chip.id}
+                    type="button"
+                    onClick={() => setTypeFilter(active ? 'all' : chip.id)}
+                    className={`catalog-chip min-h-9 ${active ? 'catalog-chip-on' : 'catalog-chip-idle'}`}
+                  >
+                    <span className="whitespace-nowrap">{chip.label}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          <div
-            data-places-hub-chips
-            className="flex w-full min-w-0 flex-nowrap items-center gap-1.5 overflow-x-auto overscroll-x-contain pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-          >
+          <div ref={filtersRef} className="relative shrink-0 self-start">
             <button
               type="button"
-              onClick={() => setTypeFilter('all')}
-              className={`catalog-chip snap-start ${allTypesOn ? 'catalog-chip-on' : 'catalog-chip-idle'}`}
+              onClick={() => setFiltersOpen((open) => !open)}
+              aria-expanded={filtersOpen}
+              aria-haspopup="menu"
+              className={`inline-flex h-9 items-center gap-1.5 rounded-xl px-3 text-sm font-semibold transition ${
+                filtersOpen || filtersActiveCount > 0
+                  ? 'bg-primary-600 text-white hover:bg-primary-700'
+                  : 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+              }`}
             >
-              <span className="whitespace-nowrap">Все места</span>
+              <SlidersHorizontal className="h-4 w-4" strokeWidth={1.75} aria-hidden />
+              Фильтры
+              {filtersActiveCount > 0 ? (
+                <span className="grid min-w-5 place-items-center rounded-md bg-white/25 px-1.5 text-xs">
+                  {filtersActiveCount}
+                </span>
+              ) : null}
             </button>
-            {categoryChips.map((chip) => {
-              const active = typeFilter === chip.id;
-              return (
-                <button
-                  key={chip.id}
-                  type="button"
-                  onClick={() => setTypeFilter(active ? 'all' : chip.id)}
-                  className={`catalog-chip snap-start ${active ? 'catalog-chip-on' : 'catalog-chip-idle'}`}
-                >
-                  <span className="whitespace-nowrap">{chip.label}</span>
-                </button>
-              );
-            })}
+            {filtersOpen ? (
+              <div
+                role="menu"
+                aria-label="Дополнительные фильтры"
+                className="absolute right-0 z-40 mt-2 w-64 overflow-hidden rounded-2xl border border-slate-200 bg-white py-2 shadow-lg"
+              >
+                {FILTER_SCOPE_OPTIONS.map(([value, label]) => {
+                  const active = scope === value;
+                  return (
+                    <button
+                      key={value}
+                      type="button"
+                      role="menuitemradio"
+                      aria-checked={active}
+                      onClick={() => setScope(value)}
+                      className={`flex w-full items-center px-3.5 py-2.5 text-left text-sm transition ${
+                        active
+                          ? 'bg-primary-50 font-semibold text-primary-800'
+                          : 'text-slate-700 hover:bg-slate-50'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : null}
           </div>
         </div>
-        <div className="mt-4 mb-4 flex flex-wrap items-center justify-between gap-3">
+      </HeroLayout>
+
+      <div className="container-page py-6 sm:py-8">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-slate-500">
             {listPending || listRefreshing
               ? 'Обновляем список…'

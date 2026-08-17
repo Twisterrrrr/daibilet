@@ -34,8 +34,6 @@ export type HeroLayoutProps = {
   media?: React.ReactNode;
   /** Tighter vertical padding for catalog pages that need results sooner. */
   dense?: boolean;
-  /** Hide breadcrumbs below md (catalog H1 already names the page). */
-  hideBreadcrumbsOnMobile?: boolean;
 };
 
 const TONE = {
@@ -74,18 +72,14 @@ export function HeroLayout({
   children,
   media,
   dense = false,
-  hideBreadcrumbsOnMobile = false,
 }: HeroLayoutProps) {
   const tone = toneProp ?? (variant === 'imageOverlay' || variant === 'video' || variant === 'withMap' ? 'dark' : 'light');
   const t = TONE[tone];
-  const crumbs = breadcrumbs?.length ? (
-    <PageBreadcrumbBar items={breadcrumbs} hideOnMobile={hideBreadcrumbsOnMobile} />
-  ) : null;
 
   if (variant === 'split') {
     return (
       <>
-        {crumbs}
+        {breadcrumbs?.length ? <PageBreadcrumbBar items={breadcrumbs} /> : null}
         <section className={`relative overflow-hidden border-b border-slate-200 ${t.section} ${className}`.trim()}>
           <div className="container-page py-10 lg:py-14">
             <div className={`grid w-full items-stretch gap-4 lg:gap-5 ${splitClassName}`.trim()}>
@@ -113,7 +107,7 @@ export function HeroLayout({
   if (variant === 'minimal') {
     return (
       <>
-        {crumbs}
+        {breadcrumbs?.length ? <PageBreadcrumbBar items={breadcrumbs} /> : null}
         <section className={`border-b border-slate-200 ${t.section} ${className}`.trim()}>
           <div className={`container-page ${dense ? 'py-5 sm:py-6' : 'py-8 sm:py-10'}`}>
             {/* Full container-page width on desktop (same axis as catalog sections below). */}
@@ -148,7 +142,7 @@ export function HeroLayout({
   // Высота: контент + padding (без 70vh / ultrawide min-h inflation).
   return (
     <>
-      {crumbs}
+      {breadcrumbs?.length ? <PageBreadcrumbBar items={breadcrumbs} /> : null}
       <section className={`relative overflow-hidden ${t.section} ${className}`.trim()}>
         {media}
         <div className="container-page relative z-10 pb-12 pt-12 sm:pb-16 sm:pt-16">

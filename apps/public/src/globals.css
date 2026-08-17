@@ -123,15 +123,6 @@
     @apply inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50;
   }
 
-  .catalog-chip-idle {
-    @apply border-0 bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900;
-  }
-
-  .catalog-chip-on {
-    @apply border-0 bg-slate-900 text-white hover:bg-slate-800;
-    box-shadow: 0 6px 14px rgba(26, 26, 26, 0.28);
-  }
-
   .horizontal-snap-row {
     @apply w-full min-w-0 max-w-full overflow-x-auto overscroll-x-contain scroll-smooth pb-2;
     -webkit-overflow-scrolling: touch;
