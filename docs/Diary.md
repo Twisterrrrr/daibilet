@@ -1,3 +1,18 @@
+## 2026-08-17 - Превью мест: пустые карточки
+
+### Наблюдения
+- Owner: «опять не все места имеют превью». `/places` и сетки площадок уже имели `CardSafeImage` (`-thumb` → `-card` → оригинал), но хаб «50 локаций» рендерил карточки без фото. Уфа/Новосибирск почти не были в editorial map; новый slug без unique jpg давал серую дыру. `cities/*.png` и `/venues/generated/` отсекались в пустоту.
+
+### Решения
+- Хаб must-see: обложка через `CardSafeImage`. Identity carousel и suburb magazine covers тоже на цепочке sidecar.
+- `resolveVenueHeroImage`: editorial → city identity pack (`identity-symbol` / cultures/space/chill/siberia/rock) → живой hub URL. Не `cities/*.png`.
+- Пакеты `UFA_HUB_IMAGES` / `NOVOSIBIRSK_HUB_IMAGES`. GenerateImage identity Уфы + `-card`/`-thumb` на диске для паков Уфа/НСК/Омск и соседних хабов.
+
+### Проблемы
+- Уникальный кадр на каждую из 50 точек не делали: shared identity + key stills. Следующая пачка - named photos для главных дыр.
+
+---
+
 ## 2026-08-17 - Туристический хаб Омска
 
 ### Наблюдения

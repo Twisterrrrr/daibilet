@@ -19,7 +19,7 @@ import { EventCard } from '@/components/EventCard';
 import { LandingDirectionCard } from '@/components/LandingDirectionCard.client';
 import { PageBreadcrumbBar } from '@/components/PageBreadcrumbs';
 import { RegionNearbyStrip } from '@/components/RegionNearbyStrip.client';
-import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
+import { IMAGE_SIZES, CardSafeImage, SafeImage } from '@/components/SafeImage.client';
 import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import { useDayRouteState } from '@/hooks/useDayRouteState';
 import { CityDayPresetBlock } from '@/components/CityDayPresetBlock.client';
@@ -79,6 +79,7 @@ import {
   type CityMustSeeItem,
 } from '@/lib/cityInfo';
 import { resolveCityPlaceTitleHref } from '@/lib/city-place-href';
+import { resolveVenueHeroImage } from '@/lib/city-place-images';
 import {
   dayRouteHookLine,
   dayRouteItemFromMustSee,
@@ -1611,6 +1612,12 @@ function CitySightsMustSeeList({
           const priceLabel = dayRouteItem
             ? dayRouteStopPriceChipLabel(dayRouteItem, categoryLabel)
             : '';
+          const coverSrc =
+            dayRouteItem?.imageUrl ||
+            resolveVenueHeroImage(
+              String(place.venueSlug || place.locationSlug || '').trim(),
+              matchedVenue?.heroImageUrl,
+            );
           // Nested sub-spots (places[]) stay in suburb cards / articles / location PDP - not on hub must-see.
           return (
             <li
@@ -1623,12 +1630,29 @@ function CitySightsMustSeeList({
               data-city-must-see-card
             >
               <article
-                className={`flex h-full min-w-0 flex-1 flex-col rounded-2xl p-4 sm:p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_28px_-10px_hsl(221_83%_53%_/_0.28)] ${
+                className={`flex h-full min-w-0 flex-1 flex-col overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_28px_-10px_hsl(221_83%_53%_/_0.28)] ${
                   editorial
                     ? 'border border-zinc-200 bg-white shadow-sm'
                     : 'border border-slate-200/90 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_rgba(15,23,42,0.06)]'
                 }`}
               >
+                <div className="relative aspect-[16/10] shrink-0 overflow-hidden bg-slate-100">
+                  <CardSafeImage
+                    src={coverSrc}
+                    alt=""
+                    fill
+                    sizes={IMAGE_SIZES.placeCard}
+                    className="object-cover"
+                    fallback={
+                      <div
+                        className={`h-full w-full bg-gradient-to-br ${
+                          editorial ? 'from-zinc-300 to-zinc-500' : 'from-slate-300 to-slate-600'
+                        }`}
+                      />
+                    }
+                  />
+                </div>
+                <div className="flex min-h-0 flex-1 flex-col p-4 sm:p-5">
                 <div className="flex items-start gap-3">
                   <span
                     className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
@@ -1736,6 +1760,7 @@ function CitySightsMustSeeList({
                       venue={dayRouteItem}
                     />
                   ) : null}
+                </div>
                 </div>
               </article>
             </li>

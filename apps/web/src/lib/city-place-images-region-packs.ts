@@ -1,0 +1,212 @@
+/**
+ * Hub must-see covers for Ufa / Novosibirsk (identity pack + unique stills).
+ * Unique files win; remaining slugs share identity-*.jpg so cards are never empty.
+ */
+
+const UFA_SYM = '/images/venues/ufa/identity-symbol.jpg';
+const UFA_ART = '/images/venues/ufa/identity-art.jpg';
+const UFA_GAS = '/images/venues/ufa/identity-gastro.jpg';
+const UFA_ARC = '/images/venues/ufa/identity-architecture.jpg';
+const UFA_SAL = '/images/venues/ufa/pamyatnik-salavatu-yulaevu.jpg';
+const UFA_DRU = '/images/venues/ufa/monument-druzhby.jpg';
+const UFA_GOST = '/images/venues/ufa/gostinyy-dvor.jpg';
+const UFA_LAL = '/images/venues/ufa/mechet-medrese-lyalya-tyul-pan.jpg';
+const UFA_KVAD = '/images/venues/ufa/art-kvadrat.jpg';
+const UFA_FONT = '/images/venues/ufa/fontan-sem-devushek.jpg';
+
+export const UFA_HUB_IMAGES: Record<string, string> = {
+  'ufa-pamyatnik-salavatu-yulaevu': UFA_SAL,
+  'ufa-pamyatnik-salavatu-yulaevu-u-gossobraniya': UFA_SAL,
+  'ufa-smotrovaya-u-pamyatnika-salavatu': UFA_SAL,
+  'ufa-monument-druzhby': UFA_DRU,
+  'ufa-pamyatnik-mustayu-karimu': UFA_ART,
+  'ufa-pamyatnik-fedoru-shalyapinu': UFA_ART,
+  'ufa-pamyatnik-kunitse': UFA_ART,
+  'ufa-pamyatnik-generalu-shaymuratovu': UFA_SYM,
+  'ufa-art-obyekt-tri-shurupa': UFA_ART,
+  'ufa-pamyatnik-dvorniku': UFA_ART,
+  'ufa-pamyatnik-geroyam-oktyabrskoy-revolyutsii': UFA_SYM,
+  'ufa-pamyatnik-leninu': UFA_SYM,
+  'ufa-skulptura-dom-kunitsy': UFA_ART,
+  'ufa-pamyatnik-pushkinu': UFA_ART,
+  'ufa-pamyatnik-zemlyakam-ushedshim-na-front': UFA_SYM,
+  'ufa-pamyatnik-akmulle': UFA_ART,
+  'ufa-gostinyy-dvor': UFA_GOST,
+  'ufa-dom-kommuna': UFA_ARC,
+  'ufa-osobnyak-kosterina-i-chernikova': UFA_ARC,
+  'ufa-zdanie-dvoryanskogo-sobraniya': UFA_ARC,
+  'ufa-dom-gubernatora': UFA_ARC,
+  'ufa-zdanie-krestyanskogo-pozemelnogo-banka': UFA_ARC,
+  'ufa-ufimskaya-demidovskaya-preemstvennost': UFA_ARC,
+  'ufa-dom-soyuzov': UFA_ARC,
+  'ufa-dom-shamovyh': UFA_ARC,
+  'ufa-dom-ponosovoy-mollo': UFA_ARC,
+  'ufa-natsionalnyy-muzey': UFA_ARC,
+  'ufa-hudozhestvennyy-muzey-nesterova': UFA_ART,
+  'ufa-muzey-arheologii-i-etnografii': UFA_ARC,
+  'ufa-dom-muzey-lenina': UFA_ARC,
+  'ufa-muzey-roka-kinoteatr-rodina': UFA_ART,
+  'ufa-muzey-boevoy-slavy': UFA_SYM,
+  'ufa-dom-muzey-aksakova': UFA_ARC,
+  'ufa-mechet-medrese-lyalya-tyul-pan': UFA_LAL,
+  'ufa-pervaya-sobornaya-mechet': UFA_ARC,
+  'ufa-sergievskiy-kafedralnyy-sobor': UFA_ARC,
+  'ufa-rozhdestvo-bogoroditskiy-hram': UFA_ARC,
+  'ufa-spasskiy-hram': UFA_ARC,
+  'ufa-mechet-ihlas': UFA_ARC,
+  'ufa-pokrovskiy-hram': UFA_ARC,
+  'ufa-park-mazhita-gafuri': UFA_SYM,
+  'ufa-park-pobedy': UFA_SYM,
+  'ufa-sad-aksakova': UFA_SYM,
+  'ufa-art-kvadrat': UFA_KVAD,
+  'ufa-sluchevskaya-gora': UFA_SYM,
+  'ufa-novaya-ufimskaya-naberezhnaya': UFA_SYM,
+  'ufa-bashkirskiy-teatr-dramy-gafuri': UFA_ART,
+  'ufa-bashkirskiy-teatr-opery-i-baleta': UFA_ARC,
+  'ufa-kumpan-cafe': UFA_GAS,
+  'ufa-aibat-hallyar': UFA_GAS,
+  'ufa-musichall27': UFA_ART,
+  'ufa-teatr-nur': UFA_ART,
+  'ufa-matcha-komnata': UFA_GAS,
+  'ufa-fontan-sem-devushek': UFA_FONT,
+  'ufa-kongress-holl-toratau': UFA_ARC,
+  'ufa-shulgan-tash': UFA_SYM,
+  'ufa-shulgan-tash-muzeynyy-kompleks': UFA_ARC,
+  'ufa-shulgan-tash-portal-kapovoy-peschery': UFA_SYM,
+  'ufa-shulgan-tash-zal-naskalnoy-zhivopisi': UFA_ART,
+  'ufa-shulgan-tash-goluboe-ozero': UFA_SYM,
+  'ufa-shulgan-tash-muzey-bortevoy-pchely': UFA_GAS,
+  'ufa-shulgan-tash-smotrovoy-most': UFA_SYM,
+  'ufa-shulgan-tash-koloda-bort': UFA_GAS,
+  'ufa-toratau': UFA_SYM,
+  'ufa-toratau-ekotropa': UFA_SYM,
+  'ufa-toratau-vershina': UFA_SYM,
+  'ufa-toratau-gulag': UFA_ARC,
+  'ufa-toratau-vizit-tsentr': UFA_ARC,
+  'ufa-toratau-ozero-tugar-salgan': UFA_SYM,
+  'ufa-toratau-paraplan': UFA_SYM,
+  'ufa-toratau-kochevye': UFA_ART,
+};
+
+const NSK_SYM = '/images/venues/novosibirsk/identity-symbol.jpg';
+const NSK_ART = '/images/venues/novosibirsk/identity-art.jpg';
+const NSK_GAS = '/images/venues/novosibirsk/identity-gastro.jpg';
+const NSK_ARC = '/images/venues/novosibirsk/identity-architecture.jpg';
+const NSK_NOVAT =
+  '/images/venues/novosibirsk/novosibirskiy-teatr-opery-i-baleta-novat.jpg';
+const NSK_NAB = '/images/venues/novosibirsk/mihaylovskaya-naberezhnaya.jpg';
+const NSK_AKAD = '/images/venues/novosibirsk/akademgorodok.jpg';
+const NSK_ZOO =
+  '/images/venues/novosibirsk/novosibirskiy-zoopark-imeni-r-a-shilo.jpg';
+const NSK_ARTM = '/images/venues/novosibirsk/novosibirskiy-hudozhestvennyy-muzey.jpg';
+const NSK_POGREB =
+  '/images/venues/novosibirsk/muzey-mirovoy-pogrebal-noy-kul-tury.jpg';
+
+export const NOVOSIBIRSK_HUB_IMAGES: Record<string, string> = {
+  'novosibirsk-novosibirskiy-teatr-opery-i-baleta-novat': NSK_NOVAT,
+  'novosibirsk-mihaylovskaya-naberezhnaya': NSK_NAB,
+  'novosibirsk-akademgorodok': NSK_AKAD,
+  'novosibirsk-novosibirskiy-zoopark-imeni-r-a-shilo': NSK_ZOO,
+  'novosibirsk-novosibirskiy-hudozhestvennyy-muzey': NSK_ARTM,
+  'novosibirsk-muzey-mirovoy-pogrebal-noy-kul-tury': NSK_POGREB,
+  'novosibirsk-pamyatnik-leninu': NSK_SYM,
+  'novosibirsk-pamyatnik-laboratornoy-myshi': NSK_ART,
+  'novosibirsk-pamyatnik-svetoforu': NSK_ART,
+  'novosibirsk-vovka-v-tridevyatom-tsarstve': NSK_ART,
+  'novosibirsk-pamyatnik-tramvayu-13': NSK_ART,
+  'novosibirsk-pamyatnik-vysotskomu': NSK_ART,
+  'novosibirsk-art-obekt-shpargalka': NSK_ART,
+  'novosibirsk-arka-kolokol-mira': NSK_SYM,
+  'novosibirsk-pamyatnik-pervomu-svidaniyu': NSK_ART,
+  'novosibirsk-stseny-iz-kukolnyh-spektakley': NSK_ART,
+  'novosibirsk-skulptura-delovaya-zhenschina': NSK_ART,
+  'novosibirsk-pamyatnik-shveynoy-mashinke-zinger': NSK_ART,
+  'novosibirsk-pamyatnik-pervomu-mostu': NSK_NAB,
+  'novosibirsk-pamyatnik-kryachkovu': NSK_ARC,
+  'novosibirsk-pamyatnik-tostu-za-zdravie': NSK_GAS,
+  'novosibirsk-stokvartirnyy-dom': NSK_ARC,
+  'novosibirsk-dom-lenina': NSK_ARC,
+  'novosibirsk-gorodskoy-torgovyy-korpus': NSK_ARC,
+  'novosibirsk-osobnyak-kryukova': NSK_ARC,
+  'novosibirsk-dom-s-chasami': NSK_ARC,
+  'novosibirsk-glavpochtamt': NSK_ARC,
+  'novosibirsk-vokzal-novosibirsk-glavnyy': NSK_ARC,
+  'novosibirsk-kraevedcheskiy-muzey': NSK_ARC,
+  'novosibirsk-muzey-zheleznodorozhnoy-tehniki': NSK_ARC,
+  'novosibirsk-muzey-sibirskaya-beresta': NSK_ART,
+  'novosibirsk-muzey-solntsa': NSK_ART,
+  'novosibirsk-muzey-olimpiyskoy-slavy': NSK_SYM,
+  'novosibirsk-sobor-aleksandra-nevskogo': NSK_ARC,
+  'novosibirsk-voznesenskiy-sobor': NSK_ARC,
+  'novosibirsk-chasovnya-nikolaya': NSK_ARC,
+  'novosibirsk-hram-pokrova': NSK_ARC,
+  'novosibirsk-katolicheskiy-sobor': NSK_ARC,
+  'novosibirsk-datsan-rinchin': NSK_ART,
+  'novosibirsk-zaeltsovskiy-park': NSK_SYM,
+  'novosibirsk-tsentralnyy-park': NSK_SYM,
+  'novosibirsk-skver-geroev-revolyutsii': NSK_SYM,
+  'novosibirsk-plyazh-zvezda-obskoe-more': NSK_NAB,
+  'novosibirsk-smotrovaya-aura': NSK_SYM,
+  'novosibirsk-teatr-globus': NSK_ART,
+  'novosibirsk-teatr-krasnyy-fakel': NSK_ART,
+  'novosibirsk-tsentr-pobeda': NSK_ART,
+  'novosibirsk-restoran-sibir-sibir': NSK_GAS,
+  'novosibirsk-gastrokort-tsentralnyy-rynok': NSK_GAS,
+  'novosibirsk-barnyy-dvorik-lenina-3': NSK_GAS,
+  'novosibirsk-kafe-ip-fedoseev': NSK_GAS,
+  'novosibirsk-akvapark': NSK_SYM,
+  'novosibirsk-park-chudes-galileo': NSK_ART,
+  'novosibirsk-bolshoy-planetariy': NSK_ARC,
+  'novosibirsk-delfiniya': NSK_SYM,
+  'novosibirsk-suzun': NSK_ARC,
+  'novosibirsk-suzun-tolchelnya': NSK_ARC,
+  'novosibirsk-suzun-muzey-monetnyy-dvor': NSK_ARC,
+  'novosibirsk-suzun-dom-upravlyayuschego': NSK_ARC,
+  'novosibirsk-suzun-bor': NSK_SYM,
+  'novosibirsk-suzun-pamyatnik-sibirskoy-monete': NSK_ART,
+  'novosibirsk-suzun-voznesenskaya-tserkov': NSK_ARC,
+  'novosibirsk-suzun-gidrotehnicheskaya-plotina': NSK_SYM,
+  'novosibirsk-iskitim-lozhok': NSK_SYM,
+  'novosibirsk-iskitim-hram-novomuchenikov': NSK_ARC,
+  'novosibirsk-iskitim-svyatoy-istochnik': NSK_SYM,
+  'novosibirsk-iskitim-kupeli': NSK_SYM,
+  'novosibirsk-iskitim-muzey-siblaga': NSK_ARC,
+  'novosibirsk-iskitim-poklonnyy-krest': NSK_SYM,
+  'novosibirsk-iskitim-ikonnaya-lavka': NSK_ARC,
+  'novosibirsk-iskitim-lesnaya-tropa': NSK_SYM,
+  'novosibirsk-koltsovo': NSK_AKAD,
+  'novosibirsk-koltsovo-park': NSK_SYM,
+  'novosibirsk-koltsovo-ozero-s-lebedyami': NSK_SYM,
+  'novosibirsk-koltsovo-ckp-biotehnoparka': NSK_ARC,
+  'novosibirsk-koltsovo-tropa-zdorovya': NSK_SYM,
+  'novosibirsk-koltsovo-alleya-uchenyh': NSK_ART,
+  'novosibirsk-koltsovo-pamyatnik-sandukhchanu': NSK_ART,
+  'novosibirsk-koltsovo-akademiya-kofe': NSK_GAS,
+  'novosibirsk-berdskie-skaly': NSK_SYM,
+  'novosibirsk-berdskie-skaly-zveroboy': NSK_SYM,
+  'novosibirsk-berdskie-skaly-urochische-zvereva': NSK_SYM,
+  'novosibirsk-berdskie-skaly-stendy-ekotropy': NSK_SYM,
+  'novosibirsk-berdskie-skaly-podvesnoy-most-berd': NSK_NAB,
+  'novosibirsk-berdskie-skaly-skala-verblyud': NSK_SYM,
+  'novosibirsk-berdskie-skaly-serebryanyy-klyuch': NSK_SYM,
+  'novosibirsk-berdskie-skaly-zona-otdyha': NSK_SYM,
+};
+
+/**
+ * Last-resort cover when a hub/catalog slug has no unique still:
+ * city identity pack that exists on disk (not cities/*.png).
+ */
+export const CITY_IDENTITY_FALLBACK: Record<string, string> = {
+  chelyabinsk: '/images/venues/chelyabinsk/identity-symbol.jpg',
+  novosibirsk: '/images/venues/novosibirsk/identity-symbol.jpg',
+  omsk: '/images/venues/omsk/identity-symbol.jpg',
+  ryazan: '/images/venues/ryazan/identity-symbol.jpg',
+  tyumen: '/images/venues/tyumen/identity-symbol.jpg',
+  voronezh: '/images/venues/voronezh/identity-symbol.jpg',
+  ufa: '/images/venues/ufa/identity-symbol.jpg',
+  kazan: '/images/venues/kazan/identity-cultures.jpg',
+  samara: '/images/venues/samara/identity-space.jpg',
+  krasnodar: '/images/venues/krasnodar/identity-chill.jpg',
+  krasnoyarsk: '/images/venues/krasnoyarsk/identity-siberia.jpg',
+  ekaterinburg: '/images/venues/ekaterinburg/identity-rock.jpg',
+};

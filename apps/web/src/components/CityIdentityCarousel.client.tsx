@@ -2,7 +2,7 @@
 
 import { CityHubSectionHeading, HUB_SECTION_GAP } from '@/components/CityHubSectionHeading';
 import { HubCarouselChrome } from '@/components/HubCarouselChrome.client';
-import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
+import { IMAGE_SIZES, CardSafeImage } from '@/components/SafeImage.client';
 import { useHubCardRail } from '@/hooks/useHubCardRail';
 import {
   cityIdentitySlides,
@@ -80,12 +80,13 @@ export function CityIdentityCarousel({ citySlug, editorial = false, sectionId, o
               onClick={() => onSelect(focusFromIdentitySlide(slide))}
             >
               <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
-                <SafeImage
+                <CardSafeImage
                   src={resolveIdentitySlideImage(slide)}
                   alt={slide.imageAlt}
                   fill
                   sizes={IMAGE_SIZES.cityCard}
                   className="object-cover"
+                  fallback={<div className="h-full w-full bg-slate-200" />}
                 />
                 {slide.badge ? (
                   <span className="absolute left-3 top-3 inline-flex rounded-full bg-slate-900 px-2.5 py-1 text-[11px] font-semibold text-white shadow-sm">

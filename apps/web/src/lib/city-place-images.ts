@@ -8,6 +8,12 @@
  * Blog Top-100/Beyond series is DRAFT (admin-only); assets still feed catalog/my-day.
  */
 
+import {
+  CITY_IDENTITY_FALLBACK,
+  NOVOSIBIRSK_HUB_IMAGES,
+  UFA_HUB_IMAGES,
+} from './city-place-images-region-packs.ts';
+
 const MOSCOW_IMAGES: Record<string, string> = {
   'moscow-krasnaya-ploschad-i-kreml':
     '/images/venues/moscow/krasnaya-ploschad-kreml.jpg',
@@ -1969,6 +1975,8 @@ const EDITORIAL_IMAGES_BY_SLUG: Record<string, string> = {
   ...OMSK_IMAGES,
   ...CHELYABINSK_IMAGES,
   ...TYUMEN_IMAGES,
+  ...UFA_HUB_IMAGES,
+  ...NOVOSIBIRSK_HUB_IMAGES,
 };
 
 /**
@@ -2064,9 +2072,31 @@ export function isLabelCardVenueStub(url: string | null | undefined): boolean {
   return LABEL_CARD_VENUE_STUB_BASENAMES.has(base);
 }
 
+const IDENTITY_CITY_PREFIXES = Object.keys(CITY_IDENTITY_FALLBACK).sort(
+  (a, b) => b.length - a.length,
+);
+
+export function isCityPlaceholderImage(url: string | null | undefined): boolean {
+  const value = String(url || '').trim().toLowerCase();
+  return value.startsWith('/images/cities/');
+}
+
+/** City identity pack when a listed place has no unique still (avoids gray cards). */
+export function inferCityIdentityImage(slug: string | null | undefined): string | null {
+  const key = normalizePlaceImageKey(slug);
+  if (!key) return null;
+  for (const city of IDENTITY_CITY_PREFIXES) {
+    if (key === city || key.startsWith(`${city}-`)) {
+      return CITY_IDENTITY_FALLBACK[city] || null;
+    }
+  }
+  return null;
+}
+
 /**
  * Prefer curated editorial cover for catalog cards / PDP / my-day.
- * Hub photo wins only when no editorial map entry and hub is a real image.
+ * Then city identity pack. Hub photo wins only when no editorial/identity
+ * and hub is a real image (not generated stub / cities/*.png).
  */
 export function resolveVenueHeroImage(
   slug: string | null | undefined,
@@ -2074,8 +2104,10 @@ export function resolveVenueHeroImage(
 ): string | null {
   const editorial = lookupEditorialPlaceImage(slug);
   if (editorial) return editorial;
+  const identity = inferCityIdentityImage(slug);
+  if (identity) return identity;
   const hub = String(hubImageUrl || '').trim() || null;
-  if (!hub || isGeneratedVenueStub(hub)) return null;
+  if (!hub || isGeneratedVenueStub(hub) || isCityPlaceholderImage(hub)) return null;
   return hub;
 }
 

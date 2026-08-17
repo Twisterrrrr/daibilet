@@ -46,7 +46,7 @@
 |---|---|---|---|
 | CONT.NOVOSIBIRSK-HUB | whenToGo / identity / ~55 mustSee / Академ + Сузун + Искитим/Ложок + Кольцово + Бердские скалы / фестивали / FAQ / lifehacks | Высокий | 🔄 suburbs+festivals+FAQ; Deploy MSK web после push |
 | PERF.EVENTS-CARDS | Массовая нарезка обложек `/events` в sibling `-card.jpg` (~640px) | Высокий | 🔄 fallback в коде; `pnpm images:cards:dry`; MSK write = owner после dry-run, бинарники не в git |
-| PERF.PLACES-THUMB-FALLBACK | `/places`: нет `-thumb` → `-card` → оригинал, не градиент | Критический | 🔄 `CardSafeImage` + `venueCardImageFallbacks`; в следующем web batch |
+| PERF.PLACES-THUMB-FALLBACK | `/places`: нет `-thumb` → `-card` → оригинал, не градиент | Критический | ✅ resolver + identity fallback + hub must-see photo; sidecar `-card`/`-thumb` для Ufa/NSK/Omsk packs |
 | PERF.BLOG-CARD-FALLBACK | `/blog`: нет `*-og`/`-card`/`-thumb` → полный cover | Высокий | 🔄 `BlogCardSafeImage` chain; в следующем web batch |
 
 ## 2026-08-17 - Выборг oblast child (не suburb СПб)
