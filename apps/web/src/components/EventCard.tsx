@@ -328,9 +328,9 @@ export function EventCard({
             <>
               {priceValue != null ? (
                 <span className="relative z-[2] inline-flex min-w-0 flex-1 items-baseline gap-1 whitespace-nowrap font-extrabold tracking-tight text-primary-700">
-                  <span className="text-sm font-semibold sm:text-base">от</span>
-                  <span className="text-xl sm:text-2xl">{formatNumber(priceValue)}</span>
-                  <span className="text-sm font-semibold sm:text-base">₽</span>
+                  <span className="text-[11px] font-semibold sm:text-xs">от</span>
+                  <span className="text-[15px] sm:text-lg">{formatNumber(priceValue)}</span>
+                  <span className="text-[11px] font-semibold sm:text-xs">₽</span>
                 </span>
               ) : (
                 <span />
