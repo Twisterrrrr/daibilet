@@ -7,6 +7,18 @@
     "./public-read": {
       "types": "./src/public-read.ts",
       "default": "./src/public-read.ts"
+    },
+    "./search-geo": {
+      "types": "./src/search-geo.ts",
+      "default": "./src/search-geo.ts"
+    },
+    "./search-geo-match": {
+      "types": "./src/search-geo-match.ts",
+      "default": "./src/search-geo-match.ts"
+    },
+    "./search-synonyms": {
+      "types": "./src/search-synonyms.ts",
+      "default": "./src/search-synonyms.ts"
     }
   },
   "scripts": {

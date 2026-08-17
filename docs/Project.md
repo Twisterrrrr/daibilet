@@ -49,7 +49,7 @@ SPB `.16` **retired**.
 | Не-столица с живой афишей / catchment / туристический магнит | тоже может быть `standaloneCities` (Тольятти, Сургут, Новокузнецк, Сортавала) - не только адмцентр |
 | Карточка в индексе `/cities` | **адмцентры субъекта** (Владикавказ, Ханты-Мансийск, Самара, …): events ≥ 1. **Региональные городки** (Тольятти, Сургут, Новокузнецк, Сортавала): **events > 5**, иначе свёртка в субъект через `cityToRegion`. Прямой `/cities/{slug}` не прячем |
 | Туристический магнит (люди едут, афиша тонкая) | search geo-hit + editorial promo даже при events ≤ 5 (Сортавала). Flavor-пак не обязателен |
-| Город области без отдельного хаба | `cityToRegion` → субъект; later `?city=` на region hub |
+| Город области без отдельного хаба | `cityToRegion` → субъект; later `?city=` на region hub. Поиск `/cities` и шапка: `matchSearchGeoHits` (Выборг → `/cities/leningradskaya-oblast?city=vyborg`, без карточки при events≤5). Palace suburbs СПб → `?suburb=#city-suburbs` |
 | Зарубежье (non-RF) | `foreignCities` - не standalone, не public catalog |
 | Набережные Челны / Анапа / Коломна | не поднимать в standalone в этом срезе |
 

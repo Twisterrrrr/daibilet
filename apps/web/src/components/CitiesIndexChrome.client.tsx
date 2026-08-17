@@ -11,9 +11,9 @@ import { LuckyCityButton } from '@/components/LuckyCityButton.client';
 import { RegionDestinationLink } from '@/components/RegionDestinationLink';
 import { RussiaMap } from '@/components/RussiaMap.client';
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
+import { matchCitiesCatalogSearch } from '@/lib/cities-catalog-search';
 import { filterOrphanRegions, resolveCityRegion } from '@/lib/cityRegionHub';
 import { pluralCities, pluralEvents } from '@/lib/format';
-import { cityHref } from '@/lib/routes';
 
 export type CitiesCatalogSort = 'popular' | 'name';
 
@@ -66,13 +66,20 @@ export function CitiesIndexChrome({ destinations }: { destinations: PublicDestin
     [destinations],
   );
 
-  const filteredCities = useMemo(() => {
-    const normalized = urlQuery.toLowerCase();
-    const base = normalized
-      ? allCities.filter((item) => item.name.toLowerCase().includes(normalized))
-      : allCities;
-    return sortCities(base, sort);
-  }, [allCities, urlQuery, sort]);
+  const catalogSearch = useMemo(
+    () =>
+      matchCitiesCatalogSearch(urlQuery, allCities, {
+        eventsLabel: pluralEvents,
+      }),
+    [allCities, urlQuery],
+  );
+
+  const filteredCities = useMemo(
+    () => sortCities(catalogSearch.gridCities, sort),
+    [catalogSearch.gridCities, sort],
+  );
+
+  const geoHits = catalogSearch.geoHits;
 
   const regions = useMemo(() => {
     const filtered = destinations.filter((item) => item.type === 'region' && item.events > 0);
@@ -87,12 +94,10 @@ export function CitiesIndexChrome({ destinations }: { destinations: PublicDestin
   );
 
   const suggestions = useMemo(() => {
-    const normalized = queryDraft.trim().toLowerCase();
-    if (normalized.length < 1) return [];
-    return sortCities(
-      allCities.filter((item) => item.name.toLowerCase().includes(normalized)),
-      'popular',
-    ).slice(0, 6);
+    if (!queryDraft.trim()) return [];
+    return matchCitiesCatalogSearch(queryDraft, allCities, {
+      eventsLabel: pluralEvents,
+    }).suggestions;
   }, [allCities, queryDraft]);
 
   const showSuggestions = focused && suggestions.length > 0;
@@ -100,7 +105,9 @@ export function CitiesIndexChrome({ destinations }: { destinations: PublicDestin
   const countLabel = urlQuery
     ? filteredCities.length
       ? pluralCities(filteredCities.length)
-      : 'Нет совпадений'
+      : geoHits.length
+        ? 'Города области и пригороды'
+        : 'Нет совпадений'
     : pluralCities(allCities.length);
 
   const setSort = (next: CitiesCatalogSort) => {
@@ -189,14 +196,21 @@ export function CitiesIndexChrome({ destinations }: { destinations: PublicDestin
               className="absolute left-0 right-0 z-20 mt-2 w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg sm:right-auto sm:max-w-xl"
               role="listbox"
             >
-              {suggestions.map((city) => (
-                <li key={city.slug || city.name} role="option">
+              {suggestions.map((hit) => (
+                <li key={`${hit.kind}:${hit.href}`} role="option">
                   <Link
-                    href={cityHref(city)}
+                    href={hit.href}
                     className="flex items-center justify-between gap-3 px-4 py-3 text-sm transition hover:bg-slate-50"
                   >
-                    <span className="font-semibold text-slate-900">{city.name}</span>
-                    <span className="text-xs text-slate-500">{pluralEvents(city.events)}</span>
+                    <span className="min-w-0">
+                      <span className="block truncate font-semibold text-slate-900">{hit.title}</span>
+                      {hit.kind !== 'city' ? (
+                        <span className="mt-0.5 block truncate text-xs text-slate-500">{hit.subtitle}</span>
+                      ) : null}
+                    </span>
+                    {hit.kind === 'city' ? (
+                      <span className="shrink-0 text-xs text-slate-500">{hit.subtitle}</span>
+                    ) : null}
                   </Link>
                 </li>
               ))}
@@ -247,7 +261,7 @@ export function CitiesIndexChrome({ destinations }: { destinations: PublicDestin
 
         {mobileView === 'map' ? (
           <RussiaMap className="w-full" destinations={allCities} closerZoom />
-        ) : !filteredCities.length && !orphanRegions.length ? (
+        ) : !filteredCities.length && !geoHits.length && !orphanRegions.length ? (
           <div className="rounded-xl border border-dashed border-slate-300 py-20 text-center">
             <p className="text-lg text-slate-400">
               {urlQuery ? 'Ничего не найдено' : 'Города скоро появятся'}
@@ -264,6 +278,22 @@ export function CitiesIndexChrome({ destinations }: { destinations: PublicDestin
           </div>
         ) : (
           <>
+            {geoHits.length > 0 ? (
+              <ul className="mb-6 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+                {geoHits.map((hit) => (
+                  <li key={`${hit.kind}:${hit.href}`} className="border-b border-slate-100 last:border-b-0">
+                    <Link
+                      href={hit.href}
+                      className="flex flex-col gap-0.5 px-4 py-3 transition hover:bg-slate-50 sm:flex-row sm:items-center sm:justify-between sm:gap-3"
+                    >
+                      <span className="font-semibold text-slate-900">{hit.title}</span>
+                      <span className="text-xs text-slate-500 sm:text-sm">{hit.subtitle}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+
             {filteredCities.length > 0 ? (
               <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-4">
                 {filteredCities.map((city) => (

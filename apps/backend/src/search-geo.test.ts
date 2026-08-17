@@ -70,6 +70,7 @@ test('palace suburbs focus the SPb day-trip card', () => {
 test('выборг is an LO oblast child, not an SPb suburb', () => {
   const vyborg = matchSearchGeoHits(['выборг']);
   assert.equal(vyborg[0]?.kind, 'satellite');
+  assert.equal(vyborg[0]?.shortLabel, 'Выборг, Ленинградская область');
   assert.equal(vyborg[0]?.label, 'Выборг, Ленинградская область • Ближайшие события');
   assert.equal(vyborg[0]?.href, '/cities/leningradskaya-oblast?city=vyborg');
   assert.notEqual(vyborg[0]?.href, '/cities/saint-petersburg/#city-suburbs');
@@ -82,6 +83,7 @@ test('выборг is an LO oblast child, not an SPb suburb', () => {
 test('cityToRegion satellites go to the region hub, not a thin city affiche', () => {
   const ramenskoe = matchSearchGeoHits(['раменское']);
   assert.equal(ramenskoe[0]?.kind, 'satellite');
+  assert.equal(ramenskoe[0]?.shortLabel, 'Раменское, Московская область');
   assert.equal(ramenskoe[0]?.label, 'Раменское, Московская область • Ближайшие события');
   assert.equal(ramenskoe[0]?.href, '/cities/moskovskaya-oblast?city=ramenskoe');
 
