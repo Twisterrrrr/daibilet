@@ -65,6 +65,16 @@ test('standalone admin centers stay city destinations', () => {
   } as never);
   assert.equal(khanty.type, 'city');
   assert.equal(khanty.name, 'Ханты-Мансийск');
+
+  const khantyFolded = publicDestinationFromSession({
+    destination: 'Ханты-Мансийский автономный округ',
+    destinationType: 'region',
+    city: 'Ханты-Мансийск',
+    cityId: 'city_hanty_mansiysk',
+    sourceCitySlug: 'hanty-mansiysk',
+  } as never);
+  assert.equal(khantyFolded.type, 'city');
+  assert.equal(khantyFolded.name, 'Ханты-Мансийск');
 });
 
 test('non-capital standalone is a city destination, not folded to region', () => {
@@ -109,6 +119,41 @@ test('adm centers show a /cities card from 1 event; regional towns need events >
 
   const khanty = buildPublicDestinationRowsFromSessions(citySessions('Ханты-Мансийск', 3) as never);
   assert.equal(khanty.some((row) => row.name === 'Ханты-Мансийск' && row.type === 'city'), true);
+
+  const khantyFolded = buildPublicDestinationRowsFromSessions(
+    citySessions('Ханты-Мансийск', 3).map((session) => ({
+      ...session,
+      destination: 'Ханты-Мансийский автономный округ',
+      destinationType: 'region' as const,
+    })) as never,
+  );
+  assert.equal(
+    khantyFolded.some((row) => row.name === 'Ханты-Мансийск' && row.type === 'city' && row.events === 3),
+    true,
+  );
+  assert.equal(khantyFolded.some((row) => row.name === 'Ханты-Мансийский автономный округ'), false);
+
+  const khantyWithSurgut = buildPublicDestinationRowsFromSessions([
+    ...citySessions('Ханты-Мансийск', 3).map((session) => ({
+      ...session,
+      destination: 'Ханты-Мансийский автономный округ',
+      destinationType: 'region' as const,
+    })),
+    ...citySessions('Сургут', 3).map((session) => ({
+      ...session,
+      destination: 'Ханты-Мансийский автономный округ',
+      destinationType: 'region' as const,
+    })),
+  ] as never);
+  assert.equal(
+    khantyWithSurgut.some((row) => row.name === 'Ханты-Мансийск' && row.type === 'city' && row.events === 3),
+    true,
+  );
+  assert.equal(khantyWithSurgut.some((row) => row.name === 'Сургут'), false);
+  assert.equal(
+    khantyWithSurgut.some((row) => row.name === 'Ханты-Мансийский автономный округ' && row.type === 'region' && row.events === 3),
+    true,
+  );
 
   const sortavala = buildPublicDestinationRowsFromSessions(citySessions('Сортавала', 3) as never);
   assert.equal(sortavala.some((row) => row.name === 'Сортавала'), false);

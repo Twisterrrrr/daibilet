@@ -1,3 +1,9 @@
+## 2026-08-17 - Ханты-Мансийск в сетке /cities
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| GEO.KHANTY-CITIES-CARD | Адмцентр ХМАО: карточка `/cities` с 1 saleable; не gate >5; не fold в округ | Критический | 🔄 code; commit+push+Deploy MSK web |
+
 ## 2026-08-17 - Новосибирск live deploy + listing image sidecars
 
 | ID | Задача | Приоритет | Статус |

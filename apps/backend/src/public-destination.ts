@@ -83,8 +83,24 @@ const CITY_HUB_LANDING_SHORT: Record<string, string> = {
   'salute-9-may': 'Салют',
 };
 
+function cityDestinationRecord(session: PublicSessionDto, cityName: string): DestinationRecord {
+  const slug = publicCitySlug(cityName);
+  return {
+    id: session.cityId || `city_${slug}`,
+    slug,
+    sourceSlug: session.sourceCitySlug || slug,
+    name: cityName,
+    type: 'city',
+  };
+}
+
 export function publicDestinationFromSession(session: PublicSessionDto): DestinationRecord {
-  const name = cleanDisplayName(session.destination) || cleanDisplayName(session.city) || 'Не указан';
+  const cityName = cleanDisplayName(session.city);
+  // Adm centers stay type=city even if the mapper already folded destination to the subject.
+  if (isSubjectCapitalCity(cityName)) {
+    return cityDestinationRecord(session, cityName);
+  }
+  const name = cleanDisplayName(session.destination) || cityName || 'Не указан';
   let type: DestinationType = session.destinationType === 'region' ? 'region' : 'city';
   if (type === 'city' && isPublicRegionName(name)) type = 'region';
   if (type === 'region' && standaloneCityNames.has(name)) type = 'city';
@@ -137,9 +153,24 @@ export function buildPublicDestinationRowsFromSessions(
   sessions: PublicSessionDto[],
 ): PublicDestinationDto[] {
   const buckets = new Map<string, DestinationBucket>();
+  const cityEventCounts = new Map<string, number>();
+  for (const session of sessions) {
+    const cityName = cleanDisplayName(session.city);
+    if (!cityName || cityName === 'Не указан') continue;
+    cityEventCounts.set(cityName, (cityEventCounts.get(cityName) || 0) + 1);
+  }
 
   for (const session of sessions) {
-    const destination = publicDestinationFromSession(session);
+    const cityName = cleanDisplayName(session.city);
+    const keepSeparateCityCard =
+      Boolean(cityName) &&
+      (isSubjectCapitalCity(cityName) ||
+        (isFoldingRegionalTown(cityName) &&
+          (cityEventCounts.get(cityName) || 0) >= PUBLIC_CATALOG_THIN_MIN_EVENTS));
+    const destination =
+      keepSeparateCityCard && cityName
+        ? cityDestinationRecord(session, cityName)
+        : publicDestinationFromSession(session);
     if (!destination.name || destination.name === 'Не указан') continue;
     if (!buckets.has(destination.name)) {
       buckets.set(destination.name, {

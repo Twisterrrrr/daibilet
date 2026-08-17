@@ -1,4 +1,19 @@
-## 2026-08-17 - Новосибирск Deploy MSK web + listing sidecars
+## 2026-08-17 - Ханты-Мансийск карточка /cities с 1 событием
+
+### Наблюдения
+- Owner: в сетке `/cities` нет Ханты-Мансийска. Это адмцентр ХМАО, ~3 READY, не региональный городок.
+- Live `/api/public/destinations` (generatedAt 18:39Z) отдавал `type=region` «Ханты-Мансийский автономный округ» (12 событий: центр + Сургут), без city-карточки. `/cities` фильтрует только `type=city`.
+- `city-routing`: Ханты-Мансийск в `standaloneCities`, не в `cityToRegion`. `region-hubs.centerCity` уже «Ханты-Мансийск». Сортавала dual-member, 0 событий - карточку не показывать.
+- Mapper-исключение для адмцентров уже было в `900da77`, но live API/кэш каталога держал свёрнутый `destination` субъекта. Агрегатор сетки смотрел на `session.destination`, а не на `session.city`.
+
+### Решения
+- `publicDestinationFromSession` / `buildPublicDestinationRowsFromSessions`: адмцентр (`isSubjectCapitalCity`) всегда type=city с ≥1. Региональные городки (Сортавала/Тольятти) по-прежнему сворачиваются, пока events ≤ 5.
+- Сетка не применяет порог >5 к Ханты-Мансийску.
+
+### Проблемы
+- Destinations API живёт в backend; Deploy MSK web обновляет git на диске и Next. Карточка появится после remap каталога (cron ~8 мин) и нового BUILD_ID.
+
+---
 
 ### Наблюдения
 - Owner item 10: хаб Новосибирска уже на `origin/feat/next-monorepo` `678bf7e` (`novosibirsk-hub.ts`). Локальный UX (search-geo, city-routing, EventCard) не должен попасть в этот выкат.
