@@ -85,6 +85,28 @@ test('on 17 Aug 2026 Voronezh shows Zhatva and Gorod-sad; Platonovfest is past',
   );
 });
 
+test('on 17 Aug 2026 Novosibirsk shows TehnoArt and snow sculpture; Chernika and V Sibiri are past', () => {
+  const now = new Date('2026-08-17T12:00:00+07:00');
+  const upcoming = listCityRegionalEvents('novosibirsk', now, 3);
+  const past = listCityRegionalPastEvents('novosibirsk', now, 3);
+  assert.ok(upcoming.some((event) => event.id === 'novosibirsk-tehnoart-2026'));
+  assert.ok(upcoming.some((event) => event.id === 'novosibirsk-snezhnaya-skulptura-2027'));
+  assert.ok(past.some((event) => event.id === 'novosibirsk-chernika-2026'));
+  assert.ok(past.some((event) => event.id === 'novosibirsk-v-sibiri-est-2026'));
+  assert.equal(
+    upcoming.some((event) => event.id === 'novosibirsk-chernika-2026'),
+    false,
+  );
+  assert.ok(
+    [...upcoming, ...past].every(
+      (event) =>
+        !event.datesLabel.includes('\u2014') &&
+        !event.blurb.includes('\u2014') &&
+        !event.title.includes('\u2014'),
+    ),
+  );
+});
+
 test('cityHasRegionalFestivals gates sticky item by editorial catalog', () => {
   assert.equal(cityHasRegionalFestivals('perm', NOW_AUG_15), true);
   assert.equal(cityHasRegionalFestivals('moscow', NOW_AUG_15), true);

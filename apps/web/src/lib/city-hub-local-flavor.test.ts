@@ -395,3 +395,45 @@ test('editorial hub mustSee, suburb roots and nested places have non-empty desc'
     }
   }
 });
+
+test('Novosibirsk day-trip suburbs keep Akademgorodok and add Suzun Iskitim Koltsovo Berdskie', () => {
+  const suburbs = CITY_INFO.novosibirsk?.significantSuburbs || [];
+  const bySlug = new Map(suburbs.map((suburb) => [suburb.locationSlug, suburb]));
+  for (const slug of [
+    'novosibirsk-akademgorodok',
+    'novosibirsk-suzun',
+    'novosibirsk-iskitim-lozhok',
+    'novosibirsk-koltsovo',
+    'novosibirsk-berdskie-skaly',
+  ]) {
+    const suburb = bySlug.get(slug);
+    assert.ok(suburb, slug);
+    assert.equal(emptyHubDesc(suburb?.desc), false, slug);
+    assert.equal(emptyHubDesc(suburb?.address), false, `${slug} address`);
+    assert.ok(Number.isFinite(suburb?.latitude), `${slug} lat`);
+    assert.ok(Number.isFinite(suburb?.longitude), `${slug} lng`);
+    assert.ok((suburb?.places || []).length >= 4, `${slug} nested`);
+    for (const nested of suburb?.places || []) {
+      assert.equal(emptyHubDesc(nested.desc), false, `${slug} / ${nested.name}`);
+      const nestedSlug = nested.locationSlug || nested.dayRouteId;
+      assert.ok(nestedSlug, `${nested.name} slug`);
+      assert.match(String(nestedSlug), /^novosibirsk-/);
+      if (nested.locationSlug && suburb?.locationSlug !== 'novosibirsk-akademgorodok') {
+        assert.equal(emptyHubDesc(nested.address), false, `${nestedSlug} address`);
+        assert.ok(Number.isFinite(nested.latitude), `${nestedSlug} lat`);
+        assert.ok(Number.isFinite(nested.longitude), `${nestedSlug} lng`);
+      }
+    }
+  }
+  const coffee = suburbs
+    .flatMap((suburb) => suburb.places || [])
+    .find((place) => place.locationSlug === 'novosibirsk-koltsovo-akademiya-kofe');
+  assert.ok(coffee);
+  assert.equal(/чернозем/i.test(String(coffee?.desc)), false);
+  assert.match(String(coffee?.desc), /наукоград|за Уралом/i);
+  const faq = CITY_INFO.novosibirsk?.faq || [];
+  assert.ok(faq.some((item) => /спортивн/i.test(item.q)));
+  assert.ok(faq.some((item) => /большевистск/i.test(item.q)));
+  assert.ok(faq.some((item) => /бункер/i.test(item.q)));
+  assert.ok(faq.some((item) => /обск/i.test(item.q)));
+});

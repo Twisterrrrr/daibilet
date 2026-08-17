@@ -691,4 +691,54 @@ export const CITY_REGIONAL_EVENTS: Record<string, CityRegionalEvent[]> = {
       sourceLabel: 'platonovfest.com',
     },
   ],
+
+  novosibirsk: [
+    {
+      id: 'novosibirsk-tehnoart-2026',
+      title: 'Фестиваль «ТехноАрт»',
+      startDate: '2026-09-01',
+      endDate: '2026-09-10',
+      datesLabel: 'Начало сентября 2026',
+      place: 'ЦКиО «Победа», ул. Ленина, 7',
+      blurb:
+        'Техно-арт фестиваль на площадке ЦКиО «Победа»: инсталляции, медиа и вечерняя программа в сталинском ампире центра.',
+      sourceUrl: 'https://novo-sibirsk.ru/',
+      sourceLabel: 'novo-sibirsk.ru',
+    },
+    {
+      id: 'novosibirsk-snezhnaya-skulptura-2027',
+      title: 'Сибирский фестиваль снежной скульптуры / «Город эскимосов»',
+      startDate: '2027-01-01',
+      endDate: '2027-02-28',
+      datesLabel: 'Январь - февраль 2027',
+      place: 'Центральный парк / пляж «Бумеранг»',
+      blurb:
+        'Зимний флагман города: снежные фигуры, ледовые городки и прогулка между Центральным парком и пляжем «Бумеранг».',
+      sourceUrl: 'https://novo-sibirsk.ru/',
+      sourceLabel: 'novo-sibirsk.ru',
+    },
+    {
+      id: 'novosibirsk-chernika-2026',
+      title: 'Черника Music Fest',
+      startDate: '2026-06-14',
+      endDate: '2026-06-15',
+      datesLabel: '14-15 июня 2026',
+      place: 'Арена у ЛДС',
+      blurb: 'Летний музыкальный open-air у ледового дворца: две сцены и вечерняя программа на левом берегу.',
+      sourceUrl: 'https://novo-sibirsk.ru/',
+      sourceLabel: 'novo-sibirsk.ru',
+    },
+    {
+      id: 'novosibirsk-v-sibiri-est-2026',
+      title: '«В Сибири - есть!»',
+      startDate: '2026-07-10',
+      endDate: '2026-07-12',
+      datesLabel: '10-12 июля 2026',
+      place: 'Михайловская набережная',
+      blurb:
+        'Гастрономический фестиваль локальных продуктов на Михайловской набережной: сибирская кухня, маркеты и сцена у Оби.',
+      sourceUrl: 'https://novo-sibirsk.ru/',
+      sourceLabel: 'novo-sibirsk.ru',
+    },
+  ],
 };
