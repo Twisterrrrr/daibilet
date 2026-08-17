@@ -11,3 +11,4 @@ export { MyDaySaveScenarioDialog } from './MyDaySaveScenarioDialog';
 export { MyDaySavedScenariosRail } from './MyDaySavedScenariosRail';
 export { useMyDayController } from './useMyDayController';
 export type { MyDayController } from './useMyDayController';
+export { useMobileScrollCollapse } from './useMobileScrollCollapse';

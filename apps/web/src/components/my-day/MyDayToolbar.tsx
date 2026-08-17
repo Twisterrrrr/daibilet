@@ -3,6 +3,8 @@
 import type { ReactNode } from 'react';
 import {
   Car,
+  ChevronDown,
+  ChevronUp,
   Clock,
   FileDown,
   Filter,
@@ -13,6 +15,8 @@ import {
   Trash2,
   Wand2,
 } from 'lucide-react';
+
+import { useMobileScrollCollapse } from '@/components/my-day/useMobileScrollCollapse';
 
 type TravelMode = 'walk' | 'auto';
 
@@ -101,6 +105,7 @@ export function MyDayToolbar({
 }: MyDayToolbarProps) {
   const showTypes = typeCounts.length > 1 && onToggleTag;
   const shown = visibleStopsCount ?? stopsCount;
+  const { collapsed, expand, collapse } = useMobileScrollCollapse();
 
   return (
     <div className={className.trim() || undefined} data-my-day-toolbar-wrap>
@@ -112,9 +117,35 @@ export function MyDayToolbar({
         role="toolbar"
         aria-label="Управление маршрутом"
         aria-orientation="horizontal"
+        aria-expanded={!collapsed}
         data-my-day-toolbar="1"
-        className="sticky top-[calc(var(--site-header-height)+0.35rem)] z-20 [container-type:inline-size] rounded-2xl border border-slate-200/90 bg-white/95 p-4 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/90 sm:p-5 lg:top-[calc(var(--site-header-height)+0.5rem)]"
+        data-my-day-toolbar-collapsed={collapsed ? '1' : '0'}
+        className={`sticky top-[calc(var(--site-header-height)+0.35rem)] z-20 [container-type:inline-size] rounded-2xl border border-slate-200/90 bg-white/95 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/90 lg:top-[calc(var(--site-header-height)+0.5rem)] ${
+          collapsed ? 'px-3 py-1.5 lg:p-5' : 'p-4 sm:p-5'
+        }`}
       >
+        {/* Mobile compact strip after scroll-down. Desktop always uses the full card. */}
+        {collapsed ? (
+          <button
+            type="button"
+            onClick={expand}
+            data-my-day-toolbar-compact
+            className="flex w-full min-h-10 items-center gap-2 lg:hidden"
+            aria-label={`Развернуть панель маршрута, ${stopsCountLabel}`}
+          >
+            <MapPin className="h-4 w-4 shrink-0 text-primary-600" aria-hidden />
+            <span className="min-w-0 truncate text-sm font-semibold text-slate-900">
+              {stopsCountLabel}
+              {distanceLabel ? (
+                <span className="font-medium text-slate-500"> · {distanceLabel}</span>
+              ) : null}
+            </span>
+            <ChevronDown className="ml-auto h-4 w-4 shrink-0 text-slate-400" aria-hidden />
+          </button>
+        ) : null}
+
+        {/* Full chrome: hidden on mobile while collapsed. lg+ always visible. */}
+        <div className={collapsed ? 'hidden lg:block' : undefined} data-my-day-toolbar-full>
         {/* 1-2. Stats + always-visible clear (owner: clear pictogram in route panel). */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex min-w-0 flex-wrap items-center gap-x-5 gap-y-1.5 text-sm">
@@ -149,17 +180,29 @@ export function MyDayToolbar({
               </span>
             ) : null}
           </div>
-          <button
-            type="button"
-            onClick={onClear}
-            disabled={stopsCount <= 0}
-            title="Очистить маршрут"
-            aria-label="Очистить маршрут"
-            data-day-clear
-            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition hover:bg-slate-50 hover:text-slate-800 disabled:opacity-40"
-          >
-            <Trash2 className="h-4 w-4" aria-hidden />
-          </button>
+          <div className="flex shrink-0 items-center gap-1.5">
+            <button
+              type="button"
+              onClick={collapse}
+              title="Свернуть панель"
+              aria-label="Свернуть панель маршрута"
+              data-my-day-toolbar-collapse
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition hover:bg-slate-50 hover:text-slate-800 lg:hidden"
+            >
+              <ChevronUp className="h-4 w-4" aria-hidden />
+            </button>
+            <button
+              type="button"
+              onClick={onClear}
+              disabled={stopsCount <= 0}
+              title="Очистить маршрут"
+              aria-label="Очистить маршрут"
+              data-day-clear
+              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition hover:bg-slate-50 hover:text-slate-800 disabled:opacity-40"
+            >
+              <Trash2 className="h-4 w-4" aria-hidden />
+            </button>
+          </div>
         </div>
 
         {/* Atomic wrap groups: travel | optimize+hours+trash | export.
@@ -294,6 +337,7 @@ export function MyDayToolbar({
         </div>
 
         {scheduleSlot ? <div className="mt-3">{scheduleSlot}</div> : null}
+        </div>
       </div>
 
       {showTypes ? (

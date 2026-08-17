@@ -1,8 +1,20 @@
+## 2026-08-17 - Первый заход: уточнить город, пин в шапке
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| UX.HEADER-CITY-PIN-FIRST | Mobile header: оставить MapPin; имя города с truncate; icon-only только overflow + aria-label. Первый визит: CityConfirmModal. GPS только если permission already granted. Сетка EventCard без города | Высокий | 🔄 code |
+
 ## 2026-08-17 - Ханты-Мансийск в сетке /cities
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
 | GEO.KHANTY-CITIES-CARD | Адмцентр ХМАО: карточка `/cities` с 1 saleable; не gate >5; не fold в округ | Критический | 🔄 code; commit+push+Deploy MSK web |
+
+## 2026-08-17 - My Day mobile sticky collapse
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| UX.MYDAY-STICKY-COLLAPSE | `/my-day` mobile: sticky toolbar сжимается при скролле вниз (остаётся счётчик точек); кнопки прячутся; скролл вверх / тап - развернуть. Desktop без изменений. SiteFooter pb не трогать | Высокий | 🔄 code |
 
 ## 2026-08-17 - Новосибирск live deploy + listing image sidecars
 
