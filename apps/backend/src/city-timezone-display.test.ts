@@ -21,6 +21,17 @@ test('Ufa session labels use YEKT, not MSK', () => {
   assert.match(formatDate(startsAt, timeZone), /2/);
 });
 
+test('Ханты-Мансийск uses YEKT, not MSK default', () => {
+  assert.equal(resolveCityTimeZone('Ханты-Мансийск'), 'Asia/Yekaterinburg');
+});
+
+test('promoted non-capitals keep oblast TZ after leaving cityToRegion', () => {
+  assert.equal(resolveCityTimeZone('Тольятти'), 'Europe/Samara');
+  assert.equal(resolveCityTimeZone('Сургут'), 'Asia/Yekaterinburg');
+  assert.equal(resolveCityTimeZone('Новокузнецк'), 'Asia/Novokuznetsk');
+  assert.equal(resolveCityTimeZone('Сортавала'), 'Europe/Moscow');
+});
+
 test('Moscow stays Europe/Moscow', () => {
   assert.equal(resolveCityTimeZone('Москва'), 'Europe/Moscow');
   assert.equal(formatTime('2026-08-02T13:00:00.000Z', resolveCityTimeZone('Москва')), '16:00');

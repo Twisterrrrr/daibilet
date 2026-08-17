@@ -176,6 +176,13 @@ function loadRegionCenters(): RegionCenterConfig[] {
   return regionHubsCache;
 }
 
+/** Адм. центры субъектов из region-hubs.ru.json (не региональные городки). */
+export function listRegionCenterCityNames(): string[] {
+  return loadRegionCenters()
+    .map((hub) => String(hub.centerCity || '').trim())
+    .filter(Boolean);
+}
+
 function loadRegionInfoFile(): RegionInfoFile {
   if (regionInfoCache) return regionInfoCache;
   try {
@@ -452,6 +459,12 @@ export function buildRegionHubEnrichment(input: {
     childNames.add(name);
   }
 
+  const visibleCityHubs = new Set(
+    (input.destinations || [])
+      .filter((item) => item.type === 'city')
+      .map((item) => normalizeKey(item.name)),
+  );
+
   const childCities: PublicRegionChildCityDto[] = [...childNames]
     .map((name) => ({
       name,
@@ -459,6 +472,7 @@ export function buildRegionHubEnrichment(input: {
       eventCount: sessionCounts.get(name) || 0,
     }))
     .filter((city) => normalizeKey(city.name) !== centerNameKey)
+    .filter((city) => !visibleCityHubs.has(normalizeKey(city.name)))
     .sort((a, b) => b.eventCount - a.eventCount || a.name.localeCompare(b.name, 'ru'));
 
   let centerCity: PublicRegionCenterCityDto | null = null;

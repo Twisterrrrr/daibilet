@@ -94,4 +94,30 @@ const nearbyB = buildCityRegionNearby({
 });
 assert.equal(nearbyB, null);
 
+const karelia = buildRegionHubEnrichment({
+  regionName: 'Республика Карелия',
+  regionSlug: 'respublika-kareliya',
+  sessions: [],
+  destinations: [],
+});
+assert.ok(karelia.childCities.some((city) => city.name === 'Сортавала'));
+assert.equal(karelia.childCities.find((city) => city.name === 'Сортавала')?.eventCount, 0);
+
+const samara = buildRegionHubEnrichment({
+  regionName: 'Самарская область',
+  regionSlug: 'samarskaya-oblast',
+  sessions: [],
+  destinations: [
+    {
+      name: 'Тольятти',
+      slug: 'tolyatti',
+      type: 'city',
+      events: 18,
+      venues: 7,
+      categories: [],
+    },
+  ],
+});
+assert.equal(samara.childCities.some((city) => city.name === 'Тольятти'), false);
+
 console.log('region live tier + strip gate ok');

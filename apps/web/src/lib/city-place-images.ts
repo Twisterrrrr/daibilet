@@ -1486,6 +1486,8 @@ const EDITORIAL_IMAGES_BY_SLUG: Record<string, string> = {
  */
 const PLACE_IMAGE_ALIASES: Record<string, string> = {
   'saint-petersburg-pavlovskiy-dvorets': 'pavlovskiy-dvorec-145de6e04a72',
+  'vyborg-vyborgskiy-zamok': 'saint-petersburg-vyborgskiy-zamok',
+  'vyborg-skalnyy-park-monrepo': 'saint-petersburg-skalnyy-park-monrepo',
 };
 
 function normalizePlaceImageKey(slug: string | null | undefined): string {

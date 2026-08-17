@@ -97,3 +97,12 @@ test('region names decline to genitive for near-city strip', () => {
   assert.equal(cityToGenitive('Пермский край'), 'Пермского края');
   assert.equal(cityToGenitive('Свердловская область'), 'Свердловской области');
 });
+
+test('satellite and hub locative for child-city question copy', () => {
+  assert.equal(cityToPrepositional('Раменское'), 'Раменском');
+  assert.equal(cityToGenitive('Раменское'), 'Раменского');
+  assert.equal(cityToPrepositional('Тула'), 'Туле');
+  assert.equal(cityToPrepositional('Ханты-Мансийск'), 'Ханты-Мансийске');
+  assert.equal(cityToPrepositional('Московская область'), 'Московской области');
+  assert.notEqual(cityToPrepositional('Раменское'), 'Раменское');
+});

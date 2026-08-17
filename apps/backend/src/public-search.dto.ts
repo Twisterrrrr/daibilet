@@ -1,5 +1,6 @@
 import { prisma } from '@daibilet/db';
 import { publicVenueSlug } from './public-venue-read.js';
+import { matchSearchGeoHits } from './search-geo.js';
 import { expandSearchQuery } from './search-synonyms.js';
 
 const LANDING_CATEGORY_PATH: Record<string, string> = {
@@ -37,7 +38,7 @@ function landingSearchHref(slug: string): string {
 }
 
 export type PublicSearchItem = {
-  type: 'event' | 'venue' | 'city' | 'landing';
+  type: 'event' | 'venue' | 'city' | 'landing' | 'suburb';
   label: string;
   sublabel: string;
   href: string;
@@ -70,6 +71,15 @@ const CITY_CARD_SLUGS = new Set([
   'sochi',
   'novosibirsk',
   'nizhny-novgorod',
+  'kaliningrad',
+  'krasnodar',
+  'krasnoyarsk',
+  'perm',
+  'samara',
+  'vladivostok',
+  'voronezh',
+  'yaroslavl',
+  'rostov-na-donu',
 ]);
 
 function cityCardImage(slug: string): string | null {
@@ -83,7 +93,7 @@ function likePattern(term: string): string {
 }
 
 /**
- * Header search: pg_trgm + ILIKE on Event/Venue titles, synonym expand, lean city/landing rows.
+ * Header search: geo hubs/suburbs first, then pg_trgm events/venues and landings.
  * Avoids hydrating the full public catalog session list per keystroke.
  */
 export async function buildPublicSearchDto(
@@ -99,6 +109,7 @@ export async function buildPublicSearchDto(
   const terms = expandSearchQuery(q);
   const primary = terms[0] || q;
   const like = likePattern(primary);
+  const geoHits = matchSearchGeoHits(terms, 2);
 
   const items: PublicSearchItem[] = [];
   const seen = new Set<string>();
@@ -108,10 +119,22 @@ export async function buildPublicSearchDto(
     items.push(item);
   };
 
-  const [events, venues, cities, landings] = await Promise.all([
+  for (const hit of geoHits) {
+    push(
+      {
+        type: hit.kind === 'suburb' ? 'suburb' : 'city',
+        label: hit.label,
+        sublabel: hit.sublabel,
+        href: hit.href,
+        imageUrl: cityCardImage(hit.slug),
+      },
+      `${hit.kind}:${hit.label}`,
+    );
+  }
+
+  const [events, venues, landings] = await Promise.all([
     searchEventsTrgm(primary, like, cityFilter, 6),
     searchVenuesTrgm(primary, like, cityFilter, 4),
-    searchCitiesIlike(terms, 3),
     searchLandingsIlike(terms, 3),
   ]);
 
@@ -148,19 +171,6 @@ export async function buildPublicSearchDto(
         imageUrl: row.imageUrl || null,
       },
       `venue:${row.id}`,
-    );
-  }
-
-  for (const row of cities) {
-    push(
-      {
-        type: 'city',
-        label: row.title,
-        sublabel: 'Город',
-        href: `/cities/${row.slug}`,
-        imageUrl: cityCardImage(row.slug),
-      },
-      `city:${row.slug}`,
     );
   }
 
@@ -500,25 +510,6 @@ async function searchVenuesIlikeFallback(
     city: row.city?.title ?? null,
     imageUrl: row.heroImageUrl,
     kind: String(row.kind),
-  }));
-}
-
-async function searchCitiesIlike(terms: string[], limit: number): Promise<TrgmRow[]> {
-  const or = terms.flatMap((term) => [
-    { title: { contains: term, mode: 'insensitive' as const } },
-    { slug: { contains: term, mode: 'insensitive' as const } },
-  ]);
-  const rows = await prisma.city.findMany({
-    where: { OR: or },
-    select: { id: true, slug: true, title: true },
-    take: limit,
-    orderBy: { title: 'asc' },
-  });
-  return rows.map((row: { id: string; slug: string; title: string }) => ({
-    id: row.id,
-    slug: row.slug,
-    title: row.title,
-    score: 0.5,
   }));
 }
 

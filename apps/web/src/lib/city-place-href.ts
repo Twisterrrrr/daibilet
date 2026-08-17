@@ -133,17 +133,39 @@ function isLinkableVenueStatus(pageStatus?: string | null): boolean {
   return status === 'published' || status === 'candidate';
 }
 
+export type ResolveCityPlaceTitleHrefOptions = {
+  /**
+   * Significant-suburb POIs must not glue to the parent hub by name
+   * (Выборг «Ратуша» ≠ случайная петербургская площадка).
+   * Default true for in-city must-see.
+   */
+  allowNameMatch?: boolean;
+};
+
 /**
  * Href для заголовка «Главные места»:
  * 1) явные cityInfo fields
- * 2) совпадение по имени с venue города (published/candidate)
+ * 2) совпадение по имени с venue города (published/candidate), если разрешено
  */
 export function resolveCityPlaceTitleHref(
   place: CityPlaceLinkFields & { name?: string },
   venues: VenueMatchSource[] = [],
+  options: ResolveCityPlaceTitleHrefOptions = {},
 ): string | null {
+  const allowNameMatch = options.allowNameMatch !== false;
   const explicit = resolveCityPlaceHref(place);
-  if (explicit) return explicit;
+  if (explicit) {
+    const slug = String(place.venueSlug || place.locationSlug || '').trim();
+    if (!allowNameMatch && slug && venues.length) {
+      const found = venues.find(
+        (venue) => isLinkableVenueStatus(venue.pageStatus) && String(venue.slug || '').trim() === slug,
+      );
+      if (!found) return null;
+    }
+    return explicit;
+  }
+
+  if (!allowNameMatch) return null;
 
   const placeName = String(place.name || '').trim();
   if (!placeName || !venues.length) return null;

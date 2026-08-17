@@ -19,6 +19,20 @@ test('loadCityRoutingConfig returns standalone cities', () => {
   const routing = loadCityRoutingConfig(import.meta.url);
   assert.ok(Array.isArray(routing.standaloneCities));
   assert.ok((routing.standaloneCities || []).includes('Самара'));
+  assert.ok((routing.standaloneCities || []).includes('Владикавказ'));
+  assert.ok((routing.standaloneCities || []).includes('Ханты-Мансийск'));
+  assert.ok((routing.standaloneCities || []).includes('Тольятти'));
+  assert.ok((routing.standaloneCities || []).includes('Сортавала'));
+  assert.ok((routing.standaloneCities || []).includes('Сургут'));
+  assert.ok((routing.standaloneCities || []).includes('Новокузнецк'));
+  assert.equal((routing.cityToRegion || {})['Тольятти'], 'Самарская область');
+  assert.equal((routing.cityToRegion || {})['Сортавала'], 'Республика Карелия');
+  assert.equal((routing.cityToRegion || {})['Сургут'], 'Ханты-Мансийский автономный округ');
+  assert.equal((routing.cityToRegion || {})['Новокузнецк'], 'Кемеровская область');
+  assert.equal((routing.cityToRegion || {})['Владикавказ'], undefined);
+  assert.equal((routing.cityToRegion || {})['Ханты-Мансийск'], undefined);
+  assert.equal((routing.standaloneCities || []).includes('Махачкала'), false);
+  assert.equal((routing.standaloneCities || []).includes('Набережные Челны'), false);
 });
 
 test('resolveProjectRoot prefers DAIBILET_PROJECT_ROOT when marker exists', () => {

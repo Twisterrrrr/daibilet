@@ -27,6 +27,7 @@ const CITY_FORMS: Record<string, CityFormRow> = {
   'Великий Новгород': { prep: 'Великом Новгороде', gen: 'Великого Новгорода', acc: 'Великий Новгород', dat: 'Великому Новгороду' },
   Владимир: { prep: 'Владимире', gen: 'Владимира' },
   Владивосток: { prep: 'Владивостоке', gen: 'Владивостока' },
+  Владикавказ: { prep: 'Владикавказе', gen: 'Владикавказа' },
   Волгоград: { prep: 'Волгограде', gen: 'Волгограда' },
   Вологда: { prep: 'Вологде', gen: 'Вологды', acc: 'Вологду' },
   Воронеж: { prep: 'Воронеже', gen: 'Воронежа' },
@@ -60,6 +61,7 @@ const CITY_FORMS: Record<string, CityFormRow> = {
   Пенза: { prep: 'Пензе', gen: 'Пензы', acc: 'Пензу' },
   Пермь: { prep: 'Перми', gen: 'Перми' },
   Псков: { prep: 'Пскове', gen: 'Пскова' },
+  Раменское: { prep: 'Раменском', gen: 'Раменского' },
   'Ростов-на-Дону': { prep: 'Ростове-на-Дону', gen: 'Ростова-на-Дону' },
   Рязань: { prep: 'Рязани', gen: 'Рязани' },
   Самара: { prep: 'Самаре', gen: 'Самары', acc: 'Самару' },
@@ -83,6 +85,7 @@ const CITY_FORMS: Record<string, CityFormRow> = {
   Ульяновск: { prep: 'Ульяновске', gen: 'Ульяновска' },
   Уфа: { prep: 'Уфе', gen: 'Уфы', acc: 'Уфу' },
   Хабаровск: { prep: 'Хабаровске', gen: 'Хабаровска' },
+  'Ханты-Мансийск': { prep: 'Ханты-Мансийске', gen: 'Ханты-Мансийска' },
   Чебоксары: { prep: 'Чебоксарах', gen: 'Чебоксар' },
   Челябинск: { prep: 'Челябинске', gen: 'Челябинска' },
   Чита: { prep: 'Чите', gen: 'Читы', acc: 'Читу' },
@@ -188,6 +191,8 @@ function inferPrepositional(name: string): string {
   if (/ь$/i.test(name)) return `${name.slice(0, -1)}и`; // Казань → Казани
   if (/ий$/i.test(name)) return `${name.slice(0, -2)}ом`;
   if (/ый$/i.test(name) || /ой$/i.test(name)) return `${name.slice(0, -2)}ом`;
+  if (/ое$/i.test(name)) return `${name.slice(0, -2)}ом`; // Раменское → Раменском
+  if (/ее$/i.test(name)) return `${name.slice(0, -2)}ем`;
   if (/о$/i.test(name)) return `${name.slice(0, -1)}е`; // Иваново → Иванове
   if (/[еиуюэ]$/i.test(name)) return name; // несклоняемые, в т.ч. Коми
   return `${name}е`; // Мурманск → Мурманске
@@ -210,6 +215,8 @@ function inferGenitive(name: string): string {
   if (/ь$/i.test(name)) return `${name.slice(0, -1)}и`;
   if (/ий$/i.test(name)) return `${name.slice(0, -2)}ого`;
   if (/ый$/i.test(name) || /ой$/i.test(name)) return `${name.slice(0, -2)}ого`;
+  if (/ое$/i.test(name)) return `${name.slice(0, -2)}ого`; // Раменского
+  if (/ее$/i.test(name)) return `${name.slice(0, -2)}его`;
   if (/о$/i.test(name)) return `${name.slice(0, -1)}а`;
   if (/[еиуюэ]$/i.test(name)) return name;
   return `${name}а`;
@@ -248,6 +255,8 @@ function inferDative(name: string): string {
   }
   if (/ий$/i.test(name)) return `${name.slice(0, -2)}ему`;
   if (/ый$/i.test(name) || /ой$/i.test(name)) return `${name.slice(0, -2)}ому`;
+  if (/ое$/i.test(name)) return `${name.slice(0, -2)}ому`;
+  if (/ее$/i.test(name)) return `${name.slice(0, -2)}ему`;
   if (/о$/i.test(name)) return `${name.slice(0, -1)}у`;
   if (/[еиуюэ]$/i.test(name)) return name;
   return `${name}у`;

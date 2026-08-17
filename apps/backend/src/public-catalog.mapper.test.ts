@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
+  collectSeparateCityHubNames,
   mapGroupedPublicSession,
   pickCatalogSubcategories,
   type PublicCatalogMappingRow,
@@ -49,10 +50,81 @@ test('skips teplohod placeholder image and falls back to venue hero', () => {
   }));
   assert.ok(result);
 
-  assert.equal(
-    result.imageUrl,
-    'https://api.teplohod.info/v1/image?item=Event179&dirtyAlias=b82266d150-1.jpg',
+  assert.equal(result.imageUrl, 'https://api.teplohod.info/v1/image?item=Event179&dirtyAlias=b82266d150-1.jpg');
+});
+
+test('regional towns fold to the subject until they qualify as a separate hub', () => {
+  const sortavala = mapGroupedPublicSession(catalogRow({
+    city: 'Сортавала',
+    citySlug: 'sortavala',
+    cityIsDestination: false,
+    regionTitle: 'Республика Карелия',
+    regionSlug: 'respublika-kareliya',
+  }));
+  assert.ok(sortavala);
+  assert.equal(sortavala.city, 'Сортавала');
+  assert.equal(sortavala.destination, 'Республика Карелия');
+  assert.equal(sortavala.destinationType, 'region');
+
+  const tolyattiFolded = mapGroupedPublicSession(catalogRow({
+    city: 'Тольятти',
+    citySlug: 'tolyatti',
+    cityIsDestination: false,
+    regionTitle: 'Самарская область',
+    regionSlug: 'samarskaya-oblast',
+  }));
+  assert.ok(tolyattiFolded);
+  assert.equal(tolyattiFolded.destination, 'Самарская область');
+  assert.equal(tolyattiFolded.destinationType, 'region');
+
+  const tolyattiHub = mapGroupedPublicSession(
+    catalogRow({
+      city: 'Тольятти',
+      citySlug: 'tolyatti',
+      cityIsDestination: false,
+      regionTitle: 'Самарская область',
+      regionSlug: 'samarskaya-oblast',
+    }),
+    new Set(),
+    { separateCityHubs: new Set(['Тольятти']) },
   );
+  assert.ok(tolyattiHub);
+  assert.equal(tolyattiHub.destination, 'Тольятти');
+  assert.equal(tolyattiHub.destinationType, 'city');
+});
+
+test('subject capitals stay city destinations even when isDestination is false', () => {
+  const result = mapGroupedPublicSession(catalogRow({
+    city: 'Ханты-Мансийск',
+    citySlug: 'hanty-mansiysk',
+    cityIsDestination: false,
+    regionTitle: 'Ханты-Мансийский автономный округ',
+    regionSlug: 'hanty-mansiyskiy-avtonomnyy-okrug',
+  }));
+  assert.ok(result);
+  assert.equal(result.destination, 'Ханты-Мансийск');
+  assert.equal(result.destinationType, 'city');
+
+  const vladikavkaz = mapGroupedPublicSession(catalogRow({
+    city: 'Владикавказ',
+    citySlug: 'vladikavkaz',
+    cityIsDestination: false,
+    regionTitle: 'Республика Северная Осетия-Алания',
+  }));
+  assert.ok(vladikavkaz);
+  assert.equal(vladikavkaz.destination, 'Владикавказ');
+  assert.equal(vladikavkaz.destinationType, 'city');
+});
+
+test('collectSeparateCityHubNames counts only folding towns above the card gate', () => {
+  const hubs = collectSeparateCityHubNames([
+    ...Array.from({ length: 6 }, () => catalogRow({ city: 'Тольятти', sourceStatus: 'PUBLIC' })),
+    ...Array.from({ length: 3 }, () => catalogRow({ city: 'Сортавала', sourceStatus: 'PUBLIC' })),
+    ...Array.from({ length: 3 }, () => catalogRow({ city: 'Ханты-Мансийск', sourceStatus: 'PUBLIC' })),
+  ]);
+  assert.equal(hubs.has('Тольятти'), true);
+  assert.equal(hubs.has('Сортавала'), false);
+  assert.equal(hubs.has('Ханты-Мансийск'), false);
 });
 
 test('rewrites pre-signed Teplohod S3 URLs to stable image proxy', () => {

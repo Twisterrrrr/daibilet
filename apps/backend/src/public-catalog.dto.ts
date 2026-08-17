@@ -26,7 +26,7 @@ import {
   sessionHasCoverImage,
 } from './public-catalog-grouping.js';
 import { formatDate, formatTime, normalizeStartsAt, timeBucket } from './public-datetime.js';
-import { mapGroupedPublicSession, pickCatalogSubcategories } from './public-catalog.mapper.js';
+import { mapGroupedPublicSession, collectSeparateCityHubNames, pickCatalogSubcategories } from './public-catalog.mapper.js';
 import { findLandingRule } from './landing-rules.js';
 import { LIST_SLOT_PREVIEW_LIMIT, toPublicCatalogListItem } from './public-catalog-list-item.js';
 import { providerForSource } from './provider-purchase.js';
@@ -440,12 +440,13 @@ function scheduleInlineCatalogRebuild(reason: string): Promise<PublicSessionDto[
     const startedAt = Date.now();
     try {
       const [rows, pinnedEventIds] = await Promise.all([loadPublicCatalogRows(), loadPinnedEventIds()]);
+      const separateCityHubs = collectSeparateCityHubNames(rows);
       // Yield between chunks so inline rebuild (API/cron child) does not monopolize the event loop.
       const mapped: PublicSessionDto[] = [];
       for (let i = 0; i < rows.length; i += PUBLIC_CATALOG_MAP_CHUNK) {
         const chunk = rows.slice(i, i + PUBLIC_CATALOG_MAP_CHUNK);
         for (const row of chunk) {
-          const session = mapGroupedPublicSession(row, pinnedEventIds);
+          const session = mapGroupedPublicSession(row, pinnedEventIds, { separateCityHubs });
           if (session) mapped.push(session);
         }
         if (i + PUBLIC_CATALOG_MAP_CHUNK < rows.length) {

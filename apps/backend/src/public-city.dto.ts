@@ -11,6 +11,7 @@ import {
   countDistinctSessionVenues,
   destinationPrepositional,
   lookupDestinationCatalogSessions,
+  matchStandaloneCityBySlug,
   publicDestinationFromSession,
 } from './public-destination.js';
 import { buildPublicLandings } from './public-city-landings.js';
@@ -208,26 +209,25 @@ function scheduleCityPageRebuild(
     ) as PublicSessionDto[];
     const builtAt = Date.now();
     if (!matchedSessions.length) {
-      const payload = null;
-      pageCache.set(cacheKey, {
-        expiresAt: builtAt + PUBLIC_CITY_CACHE_MS,
-        staleUntil: builtAt + PUBLIC_CITY_STALE_MS,
-        payload,
+      const emptyPage = await buildStandaloneCityPageWithoutSessions({
+        citySlugOrId,
+        requestedSlug,
+        cacheKey,
+        builtAt,
+        buildStartedAt,
       });
-      cityPerfMark('empty', buildStartedAt, { slug: cacheKey });
-      return payload;
+      return emptyPage;
     }
 
     const seedSession = matchedSessions[0];
     if (!seedSession) {
-      const payload = null;
-      pageCache.set(cacheKey, {
-        expiresAt: builtAt + PUBLIC_CITY_CACHE_MS,
-        staleUntil: builtAt + PUBLIC_CITY_STALE_MS,
-        payload,
+      return buildStandaloneCityPageWithoutSessions({
+        citySlugOrId,
+        requestedSlug,
+        cacheKey,
+        builtAt,
+        buildStartedAt,
       });
-      cityPerfMark('empty', buildStartedAt, { slug: cacheKey });
-      return payload;
     }
     const destination = publicDestinationFromSession(seedSession);
     const sessions = pickCityHubFeedSessions(
@@ -383,6 +383,90 @@ function scheduleCityPageRebuild(
   return build.finally(() => {
     if (pageBuildPromises.get(cacheKey) === build) pageBuildPromises.delete(cacheKey);
   });
+}
+
+async function buildStandaloneCityPageWithoutSessions(args: {
+  citySlugOrId: string;
+  requestedSlug: string;
+  cacheKey: string;
+  builtAt: number;
+  buildStartedAt: number;
+}): Promise<PublicCityPageDto | null> {
+  const standaloneName =
+    matchStandaloneCityBySlug(args.requestedSlug) || matchStandaloneCityBySlug(args.citySlugOrId);
+  if (!standaloneName) {
+    const payload = null;
+    pageCache.set(args.cacheKey, {
+      expiresAt: args.builtAt + PUBLIC_CITY_CACHE_MS,
+      staleUntil: args.builtAt + PUBLIC_CITY_STALE_MS,
+      payload,
+    });
+    cityPerfMark('empty', args.buildStartedAt, { slug: args.cacheKey });
+    return payload;
+  }
+
+  const cityRecord = await withTimeout(
+    prisma.city.findFirst({ where: { title: standaloneName } }),
+    CITY_SECONDARY_TIMEOUT_MS,
+    null,
+    'standalone-city-record',
+  );
+  const destination = publicDestinationFromSession({
+    destination: standaloneName,
+    destinationType: 'city',
+    city: standaloneName,
+    cityId: cityRecord?.id,
+    sourceCitySlug: cityRecord?.slug,
+  } as never);
+  const contentVenues = cityRecord?.id
+    ? await withTimeout(
+        publicPublishedVenuesByCityId(getLegacyDb(), cityRecord.id, 250),
+        CITY_SECONDARY_TIMEOUT_MS,
+        [],
+        'standalone-city-venues',
+      )
+    : [];
+  const entityLabel = destinationPrepositional(destination);
+  const payload: PublicCityPageDto = {
+    generatedAt: new Date().toISOString(),
+    city: {
+      id: destination.id,
+      slug: destination.slug,
+      sourceSlug: destination.sourceSlug,
+      name: destination.name,
+      title: destination.name,
+      type: 'city',
+      isDestination: true,
+      events: 0,
+      venues: contentVenues.length,
+      categories: {},
+      seoH1: cityRecord?.seoH1 || destination.name,
+      seoTitle: cityRecord?.seoTitle || buildCityHubSeoTitle(destination.name),
+      seoDescription:
+        cityRecord?.seoDescription ||
+        `Афиша событий, экскурсий, музеев и активностей ${entityLabel}. Быстрый выбор по датам, площадкам и категориям.`,
+      canonicalPath: cityRecord?.canonicalPath || `/cities/${destination.slug}`,
+    },
+    sessions: [],
+    venues: contentVenues,
+    landings: [],
+    stats: {
+      events: 0,
+      venues: contentVenues.length,
+      categories: 0,
+      priceFrom: null,
+    },
+  };
+  pageCache.set(args.cacheKey, {
+    expiresAt: args.builtAt + PUBLIC_CITY_CACHE_MS,
+    staleUntil: args.builtAt + PUBLIC_CITY_STALE_MS,
+    payload,
+  });
+  cityPerfMark('standalone-empty-sessions', args.buildStartedAt, {
+    slug: args.cacheKey,
+    venues: contentVenues.length,
+  });
+  return payload;
 }
 
 function countBy(values: string[]): Record<string, number> {

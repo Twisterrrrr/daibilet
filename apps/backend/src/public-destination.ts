@@ -1,9 +1,12 @@
 import { LANDING_RULES } from './landing-rules.js';
 import { loadCityRoutingConfig } from './city-routing-config.js';
+import { listRegionCenterCityNames } from './region-hub.js';
 import type { DestinationType } from './types/common.js';
 import type { PublicDestinationDto, PublicSessionDto } from './types/public.js';
 
 const PUBLIC_DESTINATION_MIN_EVENTS = 1;
+/** Owner 2026-08-17: regional-town cards on /cities only if events > 5. Adm centers stay at ≥1. */
+export const PUBLIC_CATALOG_THIN_MIN_EVENTS = 6;
 
 interface CityRoutingConfig {
   standaloneCities?: string[];
@@ -34,6 +37,8 @@ interface DestinationBucket {
 
 const cityRouting = loadCityRoutingConfig(import.meta.url) as CityRoutingConfig;
 const standaloneCityNames = new Set(cityRouting.standaloneCities || []);
+const cityToRegion = new Map(Object.entries(cityRouting.cityToRegion || {}));
+const regionHubCenterCities = new Set(listRegionCenterCityNames());
 const foreignCityNames = new Set(cityRouting.foreignCities || []);
 const publicRegionNames = new Set([
   ...(cityRouting.publicRegions || []),
@@ -175,9 +180,47 @@ export function buildPublicDestinationRowsFromSessions(
         .sort((left, right) => right.events - left.events || left.name.localeCompare(right.name, 'ru')),
       hubTags: buildCityHubTags(bucket),
     }))
-    .filter((bucket) => bucket.events >= PUBLIC_DESTINATION_MIN_EVENTS)
+    .filter(isVisibleOnCitiesCatalog)
     .filter(isAllowedPublicDestination)
     .sort(destinationSort);
+}
+
+export function isVisibleOnCitiesCatalog(destination: {
+  name: string;
+  type: DestinationType;
+  events: number;
+}): boolean {
+  if (destination.events < PUBLIC_DESTINATION_MIN_EVENTS) return false;
+  if (destination.type === 'city' && isFoldingRegionalTown(destination.name)) {
+    return destination.events >= PUBLIC_CATALOG_THIN_MIN_EVENTS;
+  }
+  return true;
+}
+
+/** Адмцентр субъекта: region-hubs.centerCity или standalone без cityToRegion. */
+export function isSubjectCapitalCity(name?: string | null): boolean {
+  const clean = cleanDisplayName(name);
+  if (!clean) return false;
+  if (regionHubCenterCities.has(clean)) return true;
+  return standaloneCityNames.has(clean) && !cityToRegion.has(clean);
+}
+
+/** Региональный городок: dual membership, не адмцентр. Карточка /cities только при events > 5. */
+export function isFoldingRegionalTown(name?: string | null): boolean {
+  const clean = cleanDisplayName(name);
+  if (!clean) return false;
+  if (regionHubCenterCities.has(clean)) return false;
+  return standaloneCityNames.has(clean) && cityToRegion.has(clean);
+}
+
+/** Direct /cities/{slug} for standalone even with 0 catalog sessions. */
+export function matchStandaloneCityBySlug(requested?: string | null): string | null {
+  const requestedCanon = canonicalCitySlug(requested);
+  if (!requestedCanon) return null;
+  for (const name of standaloneCityNames) {
+    if (canonicalCitySlug(name) === requestedCanon) return name;
+  }
+  return null;
 }
 
 export function buildCityHubSeoTitle(cityName: string, reference = new Date()): string {

@@ -17,6 +17,11 @@ import {
 import { normalizeStartsAt, parseSessionStartsAt } from './public-datetime.js';
 import { formatPublicEventTitle } from './event-title-normalize.ts';
 import { loadCityRoutingConfig } from './city-routing-config.js';
+import {
+  PUBLIC_CATALOG_THIN_MIN_EVENTS,
+  isFoldingRegionalTown,
+  isSubjectCapitalCity,
+} from './public-destination.js';
 import type { DestinationType, TimeBucket } from './types/common.js';
 import type { PublicSessionDto } from './types/public.js';
 
@@ -125,9 +130,32 @@ const knownSessionCities = [
   'Владимир', 'Пермь', 'Тверь', 'Сочи', 'Тула',
 ].sort((left, right) => right.length - left.length);
 
+export type MapGroupedPublicSessionOptions = {
+  /** Towns with saleable events > 5: keep type=city instead of folding to the subject. */
+  separateCityHubs?: ReadonlySet<string>;
+};
+
+export function collectSeparateCityHubNames(
+  rows: Array<{ city?: string | null; sourceStatus?: string | null }>,
+): Set<string> {
+  const counts = new Map<string, number>();
+  for (const row of rows || []) {
+    if (!isPublicSessionRowOnSale({ sourceStatus: row.sourceStatus })) continue;
+    const cityName = cleanDisplayName(row.city);
+    if (!isFoldingRegionalTown(cityName)) continue;
+    counts.set(cityName, (counts.get(cityName) || 0) + 1);
+  }
+  const hubs = new Set<string>();
+  for (const [cityName, count] of counts) {
+    if (count >= PUBLIC_CATALOG_THIN_MIN_EVENTS) hubs.add(cityName);
+  }
+  return hubs;
+}
+
 export function mapGroupedPublicSession(
   row: PublicCatalogMappingRow,
   pinnedEventIds: Set<string> = new Set(),
+  options?: MapGroupedPublicSessionOptions,
 ): PublicSessionDto | null {
   const tags = row.tags || [];
   const subcategories = pickCatalogSubcategories({
@@ -139,7 +167,7 @@ export function mapGroupedPublicSession(
   });
   const cityName = resolvePublicSessionCity(row);
   if (isForeignPublicCity(cityName) || isForeignPublicCity(row.city)) return null;
-  const destination = publicDestinationForCity({ ...row, city: cityName });
+  const destination = publicDestinationForCity({ ...row, city: cityName }, options?.separateCityHubs);
   if (!destination) return null;
   const timeZone = resolveCityTimeZone(cityName, destination.name);
   const fallbackWidgetUrl = buildProviderWidgetUrl(row);
@@ -355,12 +383,31 @@ function isAmenityCatalogTag(tag: string): boolean {
     /тё?плые?\s+плед|^панорамн|детск(ие|ая)\s+стуль|^с\s+(обедом|ужином|питанием)|^ледовый\s+класс/i.test(lower);
 }
 
-function publicDestinationForCity(row: PublicCatalogMappingRow): PublicDestination | null {
+function publicDestinationForCity(
+  row: PublicCatalogMappingRow,
+  separateCityHubs?: ReadonlySet<string>,
+): PublicDestination | null {
   const cityName = cleanDisplayName(row.city) || 'Не указан';
   if (isForeignPublicCity(cityName)) return null;
 
   const mappedRegion = cityToRegion.get(cityName);
-  if (mappedRegion && !standaloneCityNames.has(cityName)) {
+  const keepAsSeparateCity =
+    isSubjectCapitalCity(cityName) ||
+    (isFoldingRegionalTown(cityName) && Boolean(separateCityHubs?.has(cityName))) ||
+    (standaloneCityNames.has(cityName) && !mappedRegion);
+
+  if (keepAsSeparateCity) {
+    const slug = publicSlug(cityName);
+    return {
+      id: row.cityId || `city_${slug}`,
+      slug,
+      sourceSlug: row.citySlug || slug,
+      name: cityName,
+      type: 'city',
+    };
+  }
+
+  if (mappedRegion) {
     // Fold into standalone city when mapped target is itself a public city (Зеленоград→Москва).
     if (standaloneCityNames.has(mappedRegion)) {
       const slug = publicSlug(mappedRegion);

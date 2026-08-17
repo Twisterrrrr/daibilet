@@ -138,6 +138,7 @@ function pickPlaceSlug(place: CityPlaceLinkFields): string | null {
 function findVenueForPlace(
   place: CityPlaceLinkFields & { name?: string; address?: string; desc?: string },
   venues: DayRouteVenueMatchSource[],
+  options: { allowNameMatch?: boolean } = {},
 ): DayRouteVenueMatchSource | null {
   const slug = pickPlaceSlug(place);
   if (slug) {
@@ -147,6 +148,7 @@ function findVenueForPlace(
     // (mosque «Санкт-Петербургская…» previously matched «МТС Live Холл Санкт-Петербург»).
     return null;
   }
+  if (options.allowNameMatch === false) return null;
   const placeName = String(place.name || '').trim();
   if (!placeName || !venues.length) return null;
   const placeBlob = `${placeName} ${place.address || ''} ${place.desc || ''}`.toLowerCase();
@@ -243,7 +245,7 @@ export function dayRouteItemFromMustSee(
   city: DayRouteCityContext,
   options: DayRoutePlaceOptions = {},
 ): DayRouteVenueItem | null {
-  const matched = findVenueForPlace(place, venues);
+  const matched = findVenueForPlace(place, venues, { allowNameMatch: !options.isSuburb });
   const slug = pickPlaceSlug(place) || String(matched?.slug || '').trim() || null;
   const editorialId = String(place.dayRouteId || '').trim();
   // Significant-suburb nested POIs often lack catalog slug; still allow «В маршрут»
@@ -258,7 +260,7 @@ export function dayRouteItemFromMustSee(
   const id = String(matched?.id || slug || editorialId || suburbStubId).trim();
   if (!id) return null;
 
-  const href =
+  const catalogHref =
     resolveCityPlaceHref(place) ||
     (matched
       ? venueHref({
@@ -270,6 +272,8 @@ export function dayRouteItemFromMustSee(
       : slug
         ? `/locations/${slug}`
         : null);
+  // Suburb POI without a hub venue: keep the pin, do not link to a missing / parent-city page.
+  const href = options.isSuburb && !matched ? null : catalogHref;
 
   // Hub often stores dark /venues/generated stubs; curated /images/venues/{city}/ wins.
   const imageUrl = resolveVenueHeroImage(slug, matched?.heroImageUrl);

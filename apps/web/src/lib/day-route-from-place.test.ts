@@ -365,7 +365,47 @@ test('dayRouteItemFromMustSee suburb stub without slug still pins to route', () 
   assert.equal(item!.title, 'Якорная площадь');
   assert.equal(item!.id, 'suburb:yakornaya-ploschad');
   assert.equal(item!.slug, null);
+  assert.equal(item!.href, null);
   assert.equal(item!.isSuburb, true);
+});
+
+test('suburb without slug does not name-match parent hub venue', () => {
+  const item = dayRouteItemFromMustSee(
+    { name: 'Эрмитаж', desc: 'не петербургская точка' },
+    venues,
+    city,
+    { isSuburb: true },
+  );
+  assert.ok(item);
+  assert.equal(item!.id, 'suburb:ermitazh');
+  assert.equal(item!.href, null);
+  assert.equal(item!.slug, null);
+});
+
+test('vyborg castle slug does not glue to saint-petersburg venue', () => {
+  const spbTwin = {
+    id: 'venue_spb_castle',
+    slug: 'saint-petersburg-vyborgskiy-zamok',
+    name: 'Выборгский замок',
+    title: 'Выборгский замок',
+  };
+  const item = dayRouteItemFromMustSee(
+    {
+      name: 'Выборгский замок',
+      desc: 'замок на скале',
+      locationSlug: 'vyborg-vyborgskiy-zamok',
+      latitude: 60.7158,
+      longitude: 28.7292,
+    },
+    [...venues, spbTwin],
+    city,
+    { isSuburb: true },
+  );
+  assert.ok(item);
+  assert.equal(item!.slug, 'vyborg-vyborgskiy-zamok');
+  assert.equal(item!.href, null);
+  assert.notEqual(item!.id, 'venue_spb_castle');
+  assert.equal(item!.latitude, 60.7158);
 });
 
 test('dayRouteItemFromMustSee suburb stub carries editorial lat/lng', () => {

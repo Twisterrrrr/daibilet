@@ -9,6 +9,7 @@
 
 import { normalizeCityHubSlug } from './city-hub-config.ts';
 import type { CityMustSeeItem, CitySuburbItem, CitySuburbPlace } from './cityInfo.ts';
+import { transliterateSlug } from './routes.ts';
 
 export type CityIdentityTag = {
   id: string;
@@ -1654,10 +1655,21 @@ export function placeSlugKey(
   return String(place?.locationSlug || '').trim().toLowerCase();
 }
 
+function suburbNameFocusKeys(name: string): string[] {
+  const keys: string[] = [];
+  const full = transliterateSlug(name);
+  if (full) keys.push(full);
+  for (const part of String(name || '').split(/[/]/)) {
+    const slug = transliterateSlug(part);
+    if (slug) keys.push(slug);
+  }
+  return keys;
+}
+
 export function suburbMatchesSlugs(suburb: CitySuburbItem, slugs: string[]): boolean {
   const want = new Set(slugs.map((slug) => String(slug || '').trim().toLowerCase()).filter(Boolean));
   if (!want.size) return false;
-  const keys = [placeSlugKey(suburb)];
+  const keys = [placeSlugKey(suburb), ...suburbNameFocusKeys(suburb.name)];
   for (const poi of suburb.places || []) {
     keys.push(placeSlugKey(poi));
   }

@@ -100,13 +100,17 @@ import {
   uniqueValues,
   sessionGroupIds,
 } from './public-catalog-grouping.ts';
-import { mapGroupedPublicSession } from './public-catalog.mapper.ts';
+import { mapGroupedPublicSession, collectSeparateCityHubNames } from './public-catalog.mapper.ts';
 import {
   buildCityHubSeoTitle,
   buildPublicDestinationRowsFromSessions,
   countDistinctSessionVenues,
   destinationPrepositional,
+  isFoldingRegionalTown,
+  isSubjectCapitalCity,
+  isVisibleOnCitiesCatalog,
   lookupDestinationCatalogSessions,
+  matchStandaloneCityBySlug,
   publicDestinationFromSession,
 } from './public-destination.ts';
 import { dedupePublicVenueLinkedEvents } from './public-venue-linked-events.ts';
@@ -172,6 +176,7 @@ export {
   buildPublicDestinationRowsFromSessions,
   countDistinctSessionVenues,
   destinationPrepositional,
+  isVisibleOnCitiesCatalog,
   lookupDestinationCatalogSessions,
   publicDestinationFromSession,
 };
@@ -4556,7 +4561,50 @@ export async function buildPublicCityPage(db, citySlugOrId) {
     publicVenueHubRows(db, 500),
   ]);
   const matchedSessions = lookupDestinationCatalogSessions(citySlugOrId, requestedSlug, catalogSessions);
-  if (!matchedSessions.length) return null;
+  if (!matchedSessions.length) {
+    const standaloneName = matchStandaloneCityBySlug(requestedSlug) || matchStandaloneCityBySlug(citySlugOrId);
+    if (!standaloneName) return null;
+    const destination = publicDestinationFromSession({
+      destination: standaloneName,
+      destinationType: 'city',
+      city: standaloneName,
+    });
+    let cityVenues = [];
+    try {
+      const found = await db.query('select id from "City" where title = $1 limit 1', [standaloneName]);
+      const cityId = found?.rows?.[0]?.id;
+      if (cityId) cityVenues = await publicPublishedVenuesByCityId(db, cityId, 250);
+    } catch {
+      cityVenues = [];
+    }
+    const entityLabel = destinationPrepositional(destination);
+    return {
+      generatedAt: new Date().toISOString(),
+      city: {
+        id: destination.id,
+        slug: destination.slug,
+        sourceSlug: destination.sourceSlug,
+        name: destination.name,
+        title: destination.name,
+        type: 'city',
+        isDestination: true,
+        events: 0,
+        venues: cityVenues.length,
+        categories: {},
+        seoTitle: buildCityHubSeoTitle(destination.name),
+        seoDescription: `Афиша событий, экскурсий, музеев и активностей ${entityLabel}. Быстрый выбор по датам, площадкам и категориям.`,
+      },
+      sessions: [],
+      venues: cityVenues,
+      landings: [],
+      stats: {
+        events: 0,
+        venues: cityVenues.length,
+        categories: 0,
+        priceFrom: null,
+      },
+    };
+  }
 
   const destination = publicDestinationFromSession(matchedSessions[0]);
   const sessions = matchedSessions.slice(0, 160);
@@ -4847,7 +4895,9 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
   if (!catalogSessions) {
     catalogSessions = await publicCatalogSessions(db);
   }
-  const eventDestination = publicDestinationForCity(event);
+  const eventCity = cleanDisplayName(event.city);
+  const eventHubs = STANDALONE_CITY_NAMES.has(eventCity) ? new Set([eventCity]) : undefined;
+  const eventDestination = publicDestinationForCity(event, eventHubs);
 
   const requestedSlug = publicEventSlug(eventSlugOrId);
   if (!targetPublicSession && catalogSessions?.length) {
@@ -5618,9 +5668,10 @@ async function eventRows(db, limit, options = {}) {
     params,
   );
 
+  const separateCityHubs = collectSeparateCityHubNames(result.rows);
   return result.rows.map((row) => {
     const tags = row.tags || [];
-    const destination = publicDestinationForCity(row);
+    const destination = publicDestinationForCity(row, separateCityHubs);
     const fallbackDestinationName = cleanDisplayName(row.city) || 'Не указан';
     const priceFrom = displayPriceFrom(row.priceFromRub, row.sessionPriceFromRub, row.offerPriceRub);
     const purchase = purchaseInfo(row);
@@ -6498,8 +6549,9 @@ async function destinationSummaryRowsFast(db) {
   );
 
   const buckets = new Map();
+  const separateCityHubs = collectSeparateCityHubNames(result.rows);
   for (const row of result.rows) {
-    const destination = publicDestinationForCity(row);
+    const destination = publicDestinationForCity(row, separateCityHubs);
     // Foreign / unroutable cities return null — skip without crashing /api/public/stats.
     if (!destination?.name || destination.name === 'Не указан') continue;
     if (!buckets.has(destination.name)) {
@@ -6529,19 +6581,25 @@ async function destinationSummaryRowsFast(db) {
       events: bucket.events,
       venues: bucket.venueIds.size,
     }))
-    .filter((bucket) => bucket.events >= PUBLIC_DESTINATION_MIN_EVENTS)
+    .filter(isVisibleOnCitiesCatalog)
     .filter(isAllowedPublicDestination)
     .sort(destinationSort);
 }
 
-function publicDestinationForCity(row) {
+function publicDestinationForCity(row, separateCityHubs) {
   const cityName = cleanDisplayName(row.city) || 'Не указан';
 
   if (isForeignPublicCity(cityName)) {
     return null;
   }
 
-  if (STANDALONE_CITY_NAMES.has(cityName)) {
+  const mappedRegion = CITY_TO_REGION.get(cityName);
+  const keepAsSeparateCity =
+    isSubjectCapitalCity(cityName) ||
+    (isFoldingRegionalTown(cityName) && separateCityHubs && separateCityHubs.has(cityName)) ||
+    (STANDALONE_CITY_NAMES.has(cityName) && !mappedRegion);
+
+  if (keepAsSeparateCity) {
     return buildPublicDestinationRecord(row, cityName);
   }
 
@@ -6549,7 +6607,6 @@ function publicDestinationForCity(row) {
     return buildPublicDestinationRecord(row, cityName);
   }
 
-  const mappedRegion = CITY_TO_REGION.get(cityName);
   if (mappedRegion) {
     return buildPublicDestinationRecord(row, mappedRegion);
   }
@@ -7283,8 +7340,9 @@ async function publicCatalogSessionsFast(db) {
   ]);
 
   const pinnedEventIds = new Set(pinnedResult.rows.map((row) => row.eventId));
+  const separateCityHubs = collectSeparateCityHubNames(result.rows);
   const sessions = result.rows
-    .map((row) => mapGroupedPublicSession(row, pinnedEventIds))
+    .map((row) => mapGroupedPublicSession(row, pinnedEventIds, { separateCityHubs }))
     .filter(Boolean);
   return dedupeCrossSourceCatalogSessions(regroupMappedPublicCatalogSessions(sessions));
 }
@@ -7631,10 +7689,11 @@ async function publicEventRowsLean(db, limit) {
     [limit],
   );
 
+  const separateCityHubs = collectSeparateCityHubNames(result.rows);
   return result.rows
     .map((row) => {
       const tags = row.tags || [];
-      const destination = publicDestinationForCity(row);
+      const destination = publicDestinationForCity(row, separateCityHubs);
       const fallbackDestinationName = cleanDisplayName(row.city) || 'Не указан';
       const priceFrom = displayPriceFrom(row.priceFromRub, row.sessionPriceFromRub, row.offerPriceRub);
       const purchase = purchaseInfo(row);

@@ -63,6 +63,57 @@ describe('resolveCityPlaceTitleHref', () => {
     );
     assert.equal(href, '/locations/naberezhnaya-kamy');
   });
+
+  it('does not name-match suburb POI without slug', () => {
+    const href = resolveCityPlaceTitleHref(
+      { name: 'Ратуша (Старая ратуша)' },
+      [
+        {
+          id: 'v-spb',
+          slug: 'saint-petersburg-gorodskaya-ratusha',
+          name: 'Ратуша',
+          type: 'museum',
+          pageStatus: 'published',
+        },
+      ],
+      { allowNameMatch: false },
+    );
+    assert.equal(href, null);
+  });
+
+  it('does not link Vyborg slug that is missing from the parent hub', () => {
+    const href = resolveCityPlaceTitleHref(
+      { name: 'Выборгский замок', locationSlug: 'vyborg-vyborgskiy-zamok' },
+      [
+        {
+          id: 'v-spb',
+          slug: 'saint-petersburg-vyborgskiy-zamok',
+          name: 'Выборгский замок',
+          type: 'outdoor_location',
+          pageStatus: 'published',
+        },
+      ],
+      { allowNameMatch: false },
+    );
+    assert.equal(href, null);
+  });
+
+  it('still links suburb POI when the slug is on the hub', () => {
+    const href = resolveCityPlaceTitleHref(
+      { name: 'Нижний парк Петергофа', locationSlug: 'saint-petersburg-nizhniy-park-petergofa' },
+      [
+        {
+          id: 'v-park',
+          slug: 'saint-petersburg-nizhniy-park-petergofa',
+          name: 'Нижний парк Петергофа',
+          type: 'outdoor_location',
+          pageStatus: 'published',
+        },
+      ],
+      { allowNameMatch: false },
+    );
+    assert.equal(href, '/locations/saint-petersburg-nizhniy-park-petergofa');
+  });
 });
 
 describe('namesLooselyMatch', () => {

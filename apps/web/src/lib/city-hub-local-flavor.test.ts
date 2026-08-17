@@ -4,6 +4,7 @@ import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 import {
+  CITY_HUB_LOCAL_FLAVOR,
   cityHasWeatherWidget,
   cityHasWhenToGo,
   cityIdentitySlides,
@@ -15,6 +16,7 @@ import {
   seasonGuideForTab,
   suburbMatchesSlugs,
 } from './city-hub-local-flavor.ts';
+import { CITY_INFO } from './cityInfo.ts';
 
 const CITY_INFO_SRC = readFileSync(fileURLToPath(new URL('./cityInfo.ts', import.meta.url)), 'utf8');
 const MONUMENTS_SRC = readFileSync(
@@ -345,4 +347,33 @@ test('season tabs do not keep August copy when Winter is selected', () => {
   assert.match(winter.body, /Губахе/);
   assert.equal(winter.body.includes('Конец лета'), false);
   assert.equal(winter.body.includes('август'), false);
+});
+
+function emptyHubDesc(value: unknown): boolean {
+  return !String(value ?? '').trim();
+}
+
+test('editorial hub mustSee, suburb roots and nested places have non-empty desc', () => {
+  const cities = [...Object.keys(CITY_HUB_LOCAL_FLAVOR), 'sochi'];
+  const seen = new Set<string>();
+  for (const city of cities) {
+    if (seen.has(city)) continue;
+    seen.add(city);
+    const info = CITY_INFO[city];
+    assert.ok(info, `${city}: missing CITY_INFO`);
+    assert.ok((info.mustSee || []).length > 0, `${city}: mustSee empty`);
+    for (const place of info.mustSee || []) {
+      assert.equal(emptyHubDesc(place.desc), false, `${city} mustSee: ${place.name}`);
+    }
+    for (const suburb of info.significantSuburbs || []) {
+      assert.equal(emptyHubDesc(suburb.desc), false, `${city} suburb: ${suburb.name}`);
+      for (const nested of suburb.places || []) {
+        assert.equal(
+          emptyHubDesc(nested.desc),
+          false,
+          `${city} nested: ${suburb.name} / ${nested.name}`,
+        );
+      }
+    }
+  }
 });

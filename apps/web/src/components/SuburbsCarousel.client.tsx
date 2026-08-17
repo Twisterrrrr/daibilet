@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { ChevronDown } from 'lucide-react';
 
 import { AddManyToDayRouteButton } from '@/components/AddToDayRouteButton.client';
@@ -64,15 +65,9 @@ function suburbTitleLines(
   const vectorDistinct = Boolean(vectorRaw && vectorRaw !== desc);
   const vectorTitle = vectorDistinct ? suburbVectorTitle(place) : '';
 
-  if (compact) {
-    return {
-      subtitle: vectorTitle || undefined,
-      lead: desc || undefined,
-    };
-  }
-
   return {
-    subtitle: (vectorTitle || desc) || undefined,
+    subtitle: (vectorTitle || (compact ? undefined : desc)) || undefined,
+    lead: desc || undefined,
   };
 }
 
@@ -152,13 +147,16 @@ export function SuburbsCarousel({
   sectionId,
   focusSlugs,
 }: SuburbsCarouselProps) {
+  const searchParams = useSearchParams();
   const [activeIndex, setActiveIndex] = React.useState<number | null>(0);
+  const urlSuburb = String(searchParams.get('suburb') || '').trim().toLowerCase();
+  const resolvedFocusSlugs = urlSuburb ? [urlSuburb] : focusSlugs || [];
 
   React.useEffect(() => {
-    if (!focusSlugs?.length) return;
-    const idx = places.findIndex((place) => suburbMatchesSlugs(place, focusSlugs));
+    if (!resolvedFocusSlugs.length) return;
+    const idx = places.findIndex((place) => suburbMatchesSlugs(place, resolvedFocusSlugs));
     if (idx >= 0) setActiveIndex(idx);
-  }, [focusSlugs, places]);
+  }, [urlSuburb, focusSlugs, places]);
 
   if (!places.length) return null;
 
@@ -234,7 +232,7 @@ export function SuburbsCarousel({
   );
 
   const renderSuburbPanel = (place: CitySuburbItem, index: number) => {
-    const placeHref = resolveCityPlaceTitleHref(place, venues);
+    const placeHref = resolveCityPlaceTitleHref(place, venues, { allowNameMatch: false });
     const matchedVenue = venues.find((venue) => {
       const slug = String(place.venueSlug || place.locationSlug || '').trim();
       return slug && String(venue.slug || '').trim() === slug;
@@ -288,7 +286,7 @@ export function SuburbsCarousel({
         sights={nested.map((poi) => ({
           name: poi.name,
           desc: String(poi.desc || '').trim() || undefined,
-          href: resolveCityPlaceTitleHref(poi, venues),
+          href: resolveCityPlaceTitleHref(poi, venues, { allowNameMatch: false }),
           transitTip: String(poi.transitTip || '').trim() || undefined,
           dayLabel: String(poi.dayLabel || '').trim() || undefined,
           visitMinutes: poi.visitMinutes,

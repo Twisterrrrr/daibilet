@@ -10,7 +10,7 @@ import { venueHref, venuePageTemplate } from '@/lib/routes';
 import { mapVenueCatalogFeedPage } from '@/lib/venue-catalog-feed';
 
 type SearchItem = {
-  type: 'event' | 'city' | 'landing' | 'venue';
+  type: 'event' | 'city' | 'landing' | 'venue' | 'suburb';
   label: string;
   sublabel?: string | null;
   href: string;
@@ -230,7 +230,13 @@ export function HeaderSearch({
                 </span>
               ) : (
                 <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-surface-muted text-xs font-semibold uppercase text-graphite-muted">
-                  {item.type === 'city' ? 'Г' : item.type === 'landing' ? 'П' : item.type === 'venue' ? 'М' : 'E'}
+                  {item.type === 'city' || item.type === 'suburb'
+                    ? 'Г'
+                    : item.type === 'landing'
+                      ? 'П'
+                      : item.type === 'venue'
+                        ? 'М'
+                        : 'E'}
                 </div>
               )}
               <span className="min-w-0 flex-1">
