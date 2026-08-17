@@ -15,6 +15,37 @@
 
 ---
 
+## 2026-08-17 - Туристический хаб Челябинска
+
+### Наблюдения
+- Owner: полный editorial-пакет Челябинска по канону Воронежа/Новосибирска, slug `chelyabinsk` (не `chelyaba`).
+- В брифе два paste-хвоста Уфы: «Первая учительница» на Воровского и «Новая Уфимская» на красной линии. Широта камерного театра `54.x` - опечатка, должно быть `55.x`.
+
+### Решения
+- `chelyabinsk-hub.ts` + `chelyabinsk-line-presets.ts` в web и public. Wiring: cityInfo, CITY_HUB_LOCAL_FLAVOR, BLOG_AFTER_SUBURBS / affiche-before-suburbs, lifehacks, city-regional-events, city-place-images.
+- Памятник 14 заменен на основателей Челябинска (Кирова, 82). Красная линия: набережная Миасса. Камерный театр: `55.165847, 61.404314`.
+- Identity + ключевые площадки: GenerateImage в `apps/public/public/images/venues/chelyabinsk/` (web подтягивает sync-public-assets).
+- Фестивали: PROProm окт 2026, валенки дек 2026-янв 2027, Мацуев апр 2027 upcoming; Бажов 19-21 июн 2026 past.
+
+### Проблемы
+- Часть карточек 50 локаций делит identity/кировка-фото, пока нет уникального jpg на каждую точку.
+
+---
+
+## 2026-08-17 - Region hub H1 для свёрнутого города
+
+### Наблюдения
+- Live `/cities/leningradskaya-oblast?city=vyborg` (на скрине также `?city-vyborg`) показывал H1 «Ленинградская область». Поиск уже вёл на формулу A, страница хаба query не читала.
+
+### Решения
+- H1: «Выборг, Ленинградская область • Ближайшие события». Лид: куда сходить в Выборге. Title: «Афиша Выборга: … {year} | Дайбилет». Canonical без query (ISR). `noindex,follow` на child query.
+- Афиша фильтруется по городу (`session.city` / `citySlug`). Канон href `?city=vyborg`; сломанный `?city-vyborg` принимаем и редиректим на equals.
+
+### Проблемы
+- searchParams на city hub не await (ISR). Child chrome - клиент RegionPageView + middleware canonicalize.
+
+---
+
 ## 2026-08-17 - Туристический хаб Уфы
 
 ### Наблюдения

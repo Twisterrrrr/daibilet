@@ -4,6 +4,12 @@
 |---|---|---|---|
 | CONT.OMSK-HUB | Омск: identity / whenToGo / 15+50 mustSee / Старина Сибирская + Чернолучье / 2 дня + green/red / FAQ / lifehacks / фестивали | Высокий | 🔄 code; commit+push+Deploy MSK web |
 
+## 2026-08-17 - Туристический хаб Челябинска
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| CONT.CHELYABINSK-HUB | Челябинск: seasons / identity / 15 памятников + 50 мест / Таганай + Тургояк / 2 дня + green/red / FAQ / lifehacks / фестивали 2026-27 | Высокий | 🔄 code; commit+push+Deploy MSK web |
+
 ## 2026-08-17 - Поиск /cities: свёрнутые города
 
 | ID | Задача | Приоритет | Статус |
@@ -47,7 +53,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| GEO.VYBORG-OBLAST-CHILD | Канон событий/search/H1: `/cities/leningradskaya-oblast?city=vyborg` (формула A); карточка СПб suburbs остаётся tourist; не standalone | Высокий | 🔄 search-geo + `/cities` catalog search; hydration `?city=` later |
+| GEO.VYBORG-OBLAST-CHILD | Канон событий/search/H1: `/cities/leningradskaya-oblast?city=vyborg` (формула A); карточка СПб suburbs остаётся tourist; не standalone | Высокий | ✅ H1/лид/title + фильтр афиши на `?city=`; hyphen `?city-vyborg` → `?city=` |
 
 ## 2026-08-16 - Новосибирск tourist hub
 
