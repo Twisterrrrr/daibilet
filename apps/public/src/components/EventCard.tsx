@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Clock, MapPin, Star, Ticket } from 'lucide-react';
+import { Clock, Star, Ticket } from 'lucide-react';
 
 import { resolveEditorialEventImage } from '@/lib/event-cover-images';
 import { resolveEventCardDestinationLabel, resolveEventCardLocationLabel } from '@/lib/event-location';
@@ -52,7 +52,6 @@ export function EventCard({
   const showImage = Boolean(coverImageUrl && !hasImageError);
   const detailsHref = eventHref(event);
   const hasPrice = typeof event.priceFrom === 'number' && event.priceFrom >= MIN_DISPLAY_PRICE_RUB;
-  const destinationLabel = resolveEventCardDestinationLabel(event);
   const openDate = isOpenDate(event);
   const departingSoonMinutes = openDate ? null : getDepartingSoonMinutes(event.startsAt);
   const nextSessionLabel = openDate ? null : formatEventNextSession(event);
@@ -121,12 +120,6 @@ export function EventCard({
           {ageLabel ? (
             <span className="font-semibold tabular-nums text-slate-600" title="Возрастное ограничение">
               {ageLabel}
-            </span>
-          ) : null}
-          {destinationLabel ? (
-            <span className="inline-flex min-w-0 max-w-full items-center gap-0.5 text-slate-500">
-              <MapPin className="h-3 w-3 shrink-0" />
-              <span className="truncate">{destinationLabel}</span>
             </span>
           ) : null}
         </div>

@@ -22,7 +22,6 @@ import {
   collectAllDisplaySlotLabels,
   COMPACT_MOBILE_SLOT_LIMIT,
   CATALOG_DISPLAY_SLOT_LIMIT,
-  extractAddressFromListDescription,
   formatCoverDateBadge,
   formatCardScheduleLine,
   formatPriceRub,
@@ -54,7 +53,7 @@ const SLOT_CHIP_PURCHASE_CLASS =
   'transition hover:bg-primary/10 hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40';
 
 const DETAILS_LINK_CLASS =
-  'relative z-[2] inline-flex min-h-9 shrink-0 items-center justify-center gap-1 whitespace-nowrap rounded-xl bg-primary-600 px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-primary-700 sm:min-h-10 sm:px-4 sm:text-base';
+  'relative z-[2] inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-full bg-primary-600 px-5 py-2.5 text-base font-bold text-white transition hover:bg-primary-700 sm:min-h-12 sm:px-6 sm:text-lg';
 
 /** Rail / city-hub cards: wider horizontal padding so label is not flush to pill edges. */
 const SHOWCASE_BUY_CTA_CLASS =
@@ -115,7 +114,6 @@ export function EventCard({
     </div>
   );
   const hasPrice = typeof session.priceFrom === 'number' && session.priceFrom >= MIN_DISPLAY_PRICE_RUB;
-  const destinationLabel = resolveEventCardDestinationLabel(session);
   const openDate = isOpenDate(session);
   const departingSoonMinutes = openDate ? null : getDepartingSoonMinutes(session.startsAt);
   const nextSessionLabel = openDate ? null : formatCardScheduleLine(session);
@@ -124,11 +122,12 @@ export function EventCard({
   const sessionMetaLabel = openDate ? null : nextSessionLabel;
   // List DTO has no real rating / visit counts - never invent ★ 4.9.
   const landingBadges = landingActions ? deriveLandingCardBadges(session) : [];
+  const cityLabel = resolveEventCardDestinationLabel(session);
+  const rawLocation = resolveEventCardLocationLabel(session);
   const locationLabel =
-    resolveEventCardLocationLabel(session) ||
-    extractAddressFromListDescription(
-      'description' in session ? session.description : undefined,
-    );
+    rawLocation && cityLabel && rawLocation.trim().toLowerCase() === cityLabel.trim().toLowerCase()
+      ? null
+      : rawLocation;
   const durationLabel = extractDurationLabel(session.tags);
   const ageLabel = formatAgeLimit(session.ageLimit);
   // Missing display price (<100 / null) is not "soon" - event can still be on sale.
@@ -218,8 +217,8 @@ export function EventCard({
           </p>
         ) : null}
 
-        {/* Meta сразу под фото, над названием (как ожидает owner / как в list-карточке). */}
-        {destinationLabel || durationLabel || ageLabel ? (
+        {/* Grid: category + age only. City lives in the header picker; no desc/subcategory chips. */}
+        {durationLabel || ageLabel ? (
           <div className={`flex flex-wrap items-center gap-x-3 gap-y-1.5 ${session.category && !landingActions ? '-mt-1' : ''}`}>
             {durationLabel ? (
               <span className="event-card-meta hidden sm:inline-flex">
@@ -230,12 +229,6 @@ export function EventCard({
             {ageLabel ? (
               <span className="event-card-meta text-graphite-muted" title="Возрастное ограничение">
                 <span className="font-semibold tabular-nums">{ageLabel}</span>
-              </span>
-            ) : null}
-            {destinationLabel ? (
-              <span className="event-card-meta max-w-full">
-                <MapPin className="event-card-meta-icon" />
-                <span className="truncate">{destinationLabel}</span>
               </span>
             ) : null}
           </div>
@@ -325,7 +318,7 @@ export function EventCard({
           ) : (
             <>
               {priceFooterLabel ? (
-                <span className="relative z-[2] min-w-0 flex-1 whitespace-nowrap text-lg font-bold tracking-tight text-primary-700 sm:text-xl">
+                <span className="relative z-[2] min-w-0 flex-1 whitespace-nowrap text-xl font-extrabold tracking-tight text-primary-700 sm:text-2xl">
                   {priceFooterLabel}
                 </span>
               ) : (
@@ -342,9 +335,8 @@ export function EventCard({
                   })
                 }
               >
-                <Ticket className="h-4 w-4 shrink-0" strokeWidth={1.75} />
-                <span className="sm:hidden">Купить</span>
-                <span className="hidden sm:inline">Купить билет</span>
+                <Ticket className="h-5 w-5 shrink-0" strokeWidth={1.75} />
+                Купить
               </Link>
             </>
           )}
