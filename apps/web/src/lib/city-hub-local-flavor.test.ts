@@ -223,6 +223,12 @@ test('Moscow SPB NN Kaliningrad identity packs have 4 slides', () => {
       ids: ['chelyabinsk-meteorite', 'tankograd', 'ural-pelmeni', 'gosbank-elevator'],
       badges: ['Символ', 'Искусство', 'Гастро', 'Архитектура'],
     },
+    {
+      slug: 'tyumen',
+      heading: 'Чем уникальна Тюмень',
+      ids: ['tura-quay', 'wooden-lace', 'stroganina-kvartet', 'dzerzhinskogo-arbat'],
+      badges: ['Символ', 'Искусство', 'Гастро', 'Архитектура'],
+    },
   ];
 
   for (const pack of packs) {
@@ -271,6 +277,7 @@ test('weather CTA slugs exist in cityInfo', () => {
     'ufa',
     'omsk',
     'chelyabinsk',
+    'tyumen',
   ]) {
     const weather = resolveCityLocalFlavor(slug)?.weather;
     assert.ok(weather, slug);

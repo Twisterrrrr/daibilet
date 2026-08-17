@@ -188,6 +188,28 @@ test('on 17 Aug 2026 Omsk shows winter zabavy upcoming; Flora marathon Academy a
   );
 });
 
+test('on 17 Aug 2026 Tyumen shows thermal season, ProDvizhenie and Siberian borscht; Tobolsk summer is past', () => {
+  const now = new Date('2026-08-17T12:00:00+05:00');
+  const upcoming = listCityRegionalEvents('tyumen', now, 3);
+  const past = listCityRegionalPastEvents('tyumen', now, 3);
+  assert.ok(upcoming.some((event) => event.id === 'tyumen-thermal-season-2026'));
+  assert.ok(upcoming.some((event) => event.id === 'tyumen-prodvizhenie-2027'));
+  assert.ok(upcoming.some((event) => event.id === 'tyumen-siberian-borscht-2026'));
+  assert.ok(past.some((event) => event.id === 'tyumen-leto-v-tobolske-2026'));
+  assert.equal(
+    upcoming.some((event) => event.id === 'tyumen-leto-v-tobolske-2026'),
+    false,
+  );
+  assert.ok(
+    [...upcoming, ...past].every(
+      (event) =>
+        !event.datesLabel.includes('\u2014') &&
+        !event.blurb.includes('\u2014') &&
+        !event.title.includes('\u2014'),
+    ),
+  );
+});
+
 test('cityHasRegionalFestivals gates sticky item by editorial catalog', () => {
   assert.equal(cityHasRegionalFestivals('perm', NOW_AUG_15), true);
   assert.equal(cityHasRegionalFestivals('moscow', NOW_AUG_15), true);

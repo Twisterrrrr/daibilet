@@ -39,6 +39,7 @@ const CHELYABINSK_HUB_SRC = readFileSync(
   fileURLToPath(new URL('./chelyabinsk-hub.ts', import.meta.url)),
   'utf8',
 );
+const TYUMEN_HUB_SRC = readFileSync(fileURLToPath(new URL('./tyumen-hub.ts', import.meta.url)), 'utf8');
 
 function cityInfoHasSlug(slug: string): boolean {
   const quoted = new RegExp(`['"]${slug.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}['"]`);
@@ -54,7 +55,8 @@ function cityInfoHasSlug(slug: string): boolean {
     quoted.test(UFA_HUB_SRC) ||
     quoted.test(RYAZAN_HUB_SRC) ||
     quoted.test(OMSK_HUB_SRC) ||
-    quoted.test(CHELYABINSK_HUB_SRC)
+    quoted.test(CHELYABINSK_HUB_SRC) ||
+    quoted.test(TYUMEN_HUB_SRC)
   );
 }
 
@@ -83,6 +85,7 @@ test('lifehacks cover Perm, Moscow, SPB, Kaliningrad, NN, EKB, Kazan, Samara, Kr
   assert.equal(cityHasLifehacks('ufa'), true);
   assert.equal(cityHasLifehacks('chelyabinsk'), true);
   assert.equal(cityHasLifehacks('omsk'), true);
+  assert.equal(cityHasLifehacks('tyumen'), true);
 });
 
 test('Perm lifehacks have 4 tabs and 5 short cards with CTA', () => {
@@ -246,6 +249,7 @@ test('EKB Kazan Samara Krasnodar Krasnoyarsk Novosibirsk Voronezh Ryazan Ufa lif
     'ufa',
     'omsk',
     'chelyabinsk',
+    'tyumen',
   ] as const) {
     const pack = resolveCityLifehacks(city);
     assert.ok(pack, city);
@@ -264,7 +268,8 @@ test('EKB Kazan Samara Krasnodar Krasnoyarsk Novosibirsk Voronezh Ryazan Ufa lif
       city === 'ufa' ||
       city === 'ryazan' ||
       city === 'omsk' ||
-      city === 'chelyabinsk'
+      city === 'chelyabinsk' ||
+      city === 'tyumen'
     ) {
       assert.ok(pack.items.some((item) => item.cta.kind === 'places'), city);
       assert.ok(pack.items.some((item) => item.cta.kind === 'gis'), city);
@@ -298,6 +303,8 @@ test('EKB Kazan Samara Krasnodar Krasnoyarsk Novosibirsk Voronezh Ryazan Ufa lif
   assert.equal(omsk?.items[0]?.id, 'omsk-omka-card');
   const chelyabinsk = resolveCityLifehacks('chelyabinsk');
   assert.equal(chelyabinsk?.items[0]?.id, 'chelyabinsk-transport-card');
+  const tyumen = resolveCityLifehacks('tyumen');
+  assert.equal(tyumen?.items[0]?.id, 'tyumen-tts-card');
 });
 
 test('Ryazan painted lines have 6 / 7 stops with coords', async () => {
@@ -425,6 +432,34 @@ test('Omsk painted lines have 6 / 6 stops with coords', async () => {
         Boolean(stop.locationSlug || stop.venueSlug || stop.dayRouteId) &&
         (stop.longitude || 0) > 70 &&
         (stop.longitude || 0) < 76,
+    ),
+  );
+});
+
+test('Tyumen painted lines have 6 / 6 stops with coords', async () => {
+  const { TYUMEN_GREEN_LINE_STOPS, TYUMEN_LINE_DAY_ROUTE_PRESETS } = await import(
+    './tyumen-line-presets.ts'
+  );
+  assert.equal(TYUMEN_GREEN_LINE_STOPS.length, 6);
+  assert.equal(
+    TYUMEN_LINE_DAY_ROUTE_PRESETS.find((p: { id: string }) => p.id === 'tyumen-red-line')?.stops
+      ?.length,
+    6,
+  );
+  assert.ok(
+    TYUMEN_GREEN_LINE_STOPS.every(
+      (stop: {
+        latitude?: number;
+        longitude?: number;
+        locationSlug?: string;
+        venueSlug?: string;
+        dayRouteId?: string;
+      }) =>
+        Number.isFinite(stop.latitude) &&
+        Number.isFinite(stop.longitude) &&
+        Boolean(stop.locationSlug || stop.venueSlug || stop.dayRouteId) &&
+        (stop.longitude || 0) > 65 &&
+        (stop.longitude || 0) < 66,
     ),
   );
 });
