@@ -2,7 +2,7 @@
  * City hub «лайфхаки»: короткие карточки с CTA.
  * Держим отдельно от cityInfo (coords/mustSee) и local-flavor (погода/уникальность).
  * Пакеты: Пермь, Москва, СПб, Калининград, Нижний Новгород, Екатеринбург, Казань, Самара,
- * Краснодар, Красноярск, Новосибирск.
+ * Краснодар, Красноярск, Новосибирск, Воронеж.
  */
 
 import { normalizeCityHubSlug } from './city-hub-config.ts';
@@ -1093,6 +1093,97 @@ const NOVOSIBIRSK_ITEMS: CityLifehackItem[] = [
   },
 ];
 
+const VORONEZH_ITEMS: CityLifehackItem[] = [
+  {
+    id: 'voronezh-transport-sbp',
+    tabId: 'transit',
+    icon: 'transit',
+    title: 'Карта и СБП дешевле наличных',
+    body: body(
+      'При оплате банковской картой или через СБП проезд в автобусах и троллейбусах автоматически дешевле наличных на ',
+      { s: '2-4 ₽' },
+      '.',
+    ),
+    cta: {
+      kind: 'gis',
+      label: 'Транспорт на карте',
+      href: twoGisCitySearchUrl('voronezh', 'транспорт Воронеж'),
+    },
+  },
+  {
+    id: 'voronezh-free-museums',
+    tabId: 'walk',
+    icon: 'museum',
+    title: 'Третья среда и бесплатная диорама',
+    body: body(
+      'В музее Крамского и Краеведческом каждая ',
+      { s: 'третья среда' },
+      ' месяца - бесплатный вход для лиц до 18 лет и студентов. Постоянную экспозицию «Музей-диорама» все смотрят бесплатно в любой день работы.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Музеи Воронежа',
+      slugs: [
+        'voronezh-hudozhestvennyy-muzey-kramskogo',
+        'voronezh-kraevedcheskiy-muzey',
+        'voronezh-muzey-diorama',
+      ],
+      scrollTo: 'places',
+    },
+  },
+  {
+    id: 'voronezh-free-views',
+    tabId: 'walk',
+    icon: 'walk',
+    title: 'Бесплатные смотровые',
+    body: body(
+      'Не платите за рестораны ради панорамы. Лучший вид на реку, Чернавский мост и левый берег - с холма у ',
+      { s: 'Ильинского храма' },
+      ' и с площадок на ',
+      { s: 'Чернавской дамбе' },
+      '.',
+    ),
+    cta: {
+      kind: 'maps',
+      label: 'Точки на карте',
+      href: yandexMapsSearchUrl('Ильинский храм Воронеж'),
+      extra: [{ label: 'Чернавская дамба', href: yandexMapsSearchUrl('Чернавская дамба Воронеж') }],
+    },
+  },
+  {
+    id: 'voronezh-robin-sdobin',
+    tabId: 'food',
+    icon: 'food',
+    title: 'Робин Сдобин вместо фастфуда',
+    body: body(
+      'Ищите киоски «Робин Сдобин» или «Кулинария» у Центрального рынка. Пышные слойки, закрытые пиццы «робики» и пирожки с мясом - за смешные деньги.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Где поесть в Воронеже',
+      slugs: ['voronezh-gastro-tsentralnyy-rynok', 'voronezh-kofeynya-promka'],
+      scrollTo: 'places',
+    },
+  },
+  {
+    id: 'voronezh-ramon-park-free',
+    tabId: 'walk',
+    icon: 'walk',
+    title: 'Парк дворца в Рамони бесплатно',
+    body: body(
+      'Вход внутрь Дворца Ольденбургских платный, но прогулка по Верхнему и Нижнему парку усадьбы с видом на каскады террас ',
+      { s: 'бесплатна' },
+      '.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Маршрут в Рамонь',
+      slugs: ['voronezh-ramon'],
+      scrollTo: 'suburbs',
+    },
+  },
+];
+
 const CITY_HUB_LIFEHACKS: Record<string, CityLifehackPack> = {
   perm: lifehackPack(PERM_ITEMS),
   moscow: lifehackPack(MOSCOW_ITEMS),
@@ -1105,6 +1196,7 @@ const CITY_HUB_LIFEHACKS: Record<string, CityLifehackPack> = {
   krasnodar: lifehackPack(KRASNODAR_ITEMS),
   krasnoyarsk: lifehackPack(KRASNOYARSK_ITEMS),
   novosibirsk: lifehackPack(NOVOSIBIRSK_ITEMS),
+  voronezh: lifehackPack(VORONEZH_ITEMS),
 };
 
 export function resolveCityLifehacks(slug: string | null | undefined): CityLifehackPack | null {

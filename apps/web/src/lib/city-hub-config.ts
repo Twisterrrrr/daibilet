@@ -83,6 +83,17 @@ export const CITY_HUB_CONFIG: Record<string, CityHubConfig> = {
     ],
     venuesTopN: 8,
   },
+  voronezh: {
+    highlightSeason: { label: 'Город-сад', monthsHint: 'сентябрь' },
+    primaryCta: { label: 'События в Воронеже', target: '#affiche' },
+    featuredDirections: [
+      { id: 'center', label: 'Центр и флот', categoryKey: 'Экскурсии', emphasis: 'primary' },
+      { id: 'walking', label: 'Пешие прогулки', landingSlug: 'walking-tours' },
+      { id: 'theatre', label: 'Театр', categoryKey: 'Театр' },
+      { id: 'family', label: 'Семейные', landingSlug: 'family-kids' },
+    ],
+    venuesTopN: 8,
+  },
   // Landlocked: no river-cruises / river-party in curated chips (count>0 still gates fallbacks).
   ekaterinburg: {
     highlightSeason: { label: 'Уральское лето', monthsHint: 'июнь-август' },
@@ -132,6 +143,7 @@ const BLOG_AFTER_SUBURBS_SLUGS = new Set([
   'samara',
   'krasnodar',
   'krasnoyarsk',
+  'voronezh',
 ]);
 
 export function isCityHubBlogAfterSuburbs(slug: string | null | undefined): boolean {

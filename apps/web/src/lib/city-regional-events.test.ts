@@ -72,6 +72,19 @@ test('Perm keeps EFEST as optional upcoming; RED FEST filler is dropped', () => 
   );
 });
 
+test('on 17 Aug 2026 Voronezh shows Zhatva and Gorod-sad; Platonovfest is past', () => {
+  const now = new Date('2026-08-17T12:00:00+03:00');
+  const upcoming = listCityRegionalEvents('voronezh', now, 3);
+  const past = listCityRegionalPastEvents('voronezh', now, 3);
+  assert.ok(upcoming.some((event) => event.id === 'voronezh-zhatva-2026'));
+  assert.ok(upcoming.some((event) => event.id === 'voronezh-gorod-sad-2026'));
+  assert.ok(past.some((event) => event.id === 'voronezh-platonovfest-2026'));
+  assert.equal(
+    upcoming.some((event) => event.id === 'voronezh-platonovfest-2026'),
+    false,
+  );
+});
+
 test('cityHasRegionalFestivals gates sticky item by editorial catalog', () => {
   assert.equal(cityHasRegionalFestivals('perm', NOW_AUG_15), true);
   assert.equal(cityHasRegionalFestivals('moscow', NOW_AUG_15), true);

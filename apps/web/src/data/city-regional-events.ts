@@ -640,4 +640,55 @@ export const CITY_REGIONAL_EVENTS: Record<string, CityRegionalEvent[]> = {
       sourceLabel: 'krasnoyarsk.travel',
     },
   ],
+
+  voronezh: [
+    {
+      id: 'voronezh-zhatva-2026',
+      title: 'Фестиваль «Жатва» (Zhatva Fest)',
+      startDate: '2026-08-21',
+      endDate: '2026-08-23',
+      datesLabel: '21-23 августа 2026',
+      place: 'Этно-пространство «Camp Sich» под Воронежем',
+      blurb:
+        'Фестиваль современного фольклора и славянской культуры: этно-рок, ярмарка ремесел, костры, реконструкции и мастер-классы по ковке и ткачеству.',
+      sourceUrl: 'https://zhatva.live/',
+      sourceLabel: 'zhatva.live',
+    },
+    {
+      id: 'voronezh-gorod-sad-2026',
+      title: 'Международный фестиваль садов и цветов «Город-сад»',
+      startDate: '2026-09-01',
+      endDate: '2026-09-15',
+      datesLabel: 'Первая половина сентября 2026',
+      place: 'Центральный парк Воронежа («Динамо»)',
+      blurb:
+        'Главное зеленое событие Черноземья: живые арт-объекты, цветочные инсталляции, мастер-классы, эко-лектории и зеленые маркеты.',
+      sourceUrl: 'https://www.govvrn.ru/',
+      sourceLabel: 'govvrn.ru',
+    },
+    {
+      id: 'voronezh-ramenye-opera-2026',
+      title: 'Театральный фестиваль «Раменье-Опера»',
+      startDate: '2026-07-25',
+      endDate: '2026-08-31',
+      datesLabel: 'Конец июля - август 2026',
+      place: 'Внутренний двор Дворцового комплекса Ольденбургских (Рамонь)',
+      blurb:
+        'Летняя опера под открытым небом совместно с Воронежским театром оперы и балета: классика в живых декорациях неоготического замка.',
+      sourceUrl: 'https://theatre-vrn.ru/',
+      sourceLabel: 'theatre-vrn.ru',
+    },
+    {
+      id: 'voronezh-platonovfest-2026',
+      title: 'XV Международный Платоновский фестиваль искусств',
+      startDate: '2026-05-30',
+      endDate: '2026-06-28',
+      datesLabel: '30 мая - 28 июня 2026',
+      place: 'Театры города, Советская площадь, парк «Алые паруса», карьер «Белый колодец»',
+      blurb:
+        'Главный культурный бренд Воронежа: парады уличных театров, шоу у воды, оупен-эйр «Музыка мира» в меловом карьере и спектакли ведущих коллективов.',
+      sourceUrl: 'https://platonovfest.com/',
+      sourceLabel: 'platonovfest.com',
+    },
+  ],
 };

@@ -50,7 +50,7 @@ test('unknown slug returns null config', () => {
   assert.equal(resolveCityHubConfig('unknown-city-slug-xyz'), null);
 });
 
-test('isCityHubBlogAfterSuburbs gates five cities and aliases', () => {
+test('isCityHubBlogAfterSuburbs gates tourist discovery hubs and aliases', () => {
   for (const slug of [
     'perm',
     'kaliningrad',
@@ -60,14 +60,19 @@ test('isCityHubBlogAfterSuburbs gates five cities and aliases', () => {
     'sankt-peterburg',
     'nizhny-novgorod',
     'nizhniy-novgorod',
+    'ekaterinburg',
+    'kazan',
+    'samara',
+    'krasnodar',
+    'krasnoyarsk',
+    'voronezh',
   ]) {
     assert.equal(isCityHubBlogAfterSuburbs(slug), true, slug);
   }
-  assert.equal(isCityHubBlogAfterSuburbs('kazan'), false);
-  assert.equal(isCityHubBlogAfterSuburbs('ekaterinburg'), false);
+  assert.equal(isCityHubBlogAfterSuburbs('ufa'), false);
   assert.equal(isCityHubBlogAfterSuburbs(''), false);
   assert.equal(isCityHubAfficheBeforeSuburbs('perm'), true);
-  assert.equal(isCityHubAfficheBeforeSuburbs('kazan'), false);
+  assert.equal(isCityHubAfficheBeforeSuburbs('voronezh'), true);
 });
 
 test('ekaterinburg hub config has no river featuredDirections', () => {

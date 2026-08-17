@@ -4,7 +4,7 @@
  * agents can edit geo without merge fights.
  *
  * Tourist hubs with weather+seasons+identity: Perm, Moscow, SPB, Kaliningrad, NN,
- * Ekaterinburg, Kazan, Samara, Krasnodar, Krasnoyarsk, Novosibirsk.
+ * Ekaterinburg, Kazan, Samara, Krasnodar, Krasnoyarsk, Novosibirsk, Voronezh.
  */
 
 import { normalizeCityHubSlug } from './city-hub-config.ts';
@@ -1477,6 +1477,129 @@ const NOVOSIBIRSK_SLIDES: CityIdentitySlide[] = [
   },
 ];
 
+const VORONEZH_WEATHER: CityWeatherFlavor = {
+  latitude: 51.672,
+  longitude: 39.1843,
+  timezone: 'Europe/Moscow',
+  outdoorSlugs: [
+    'voronezh-admiralteyskaya-ploschad',
+    'voronezh-park-alye-parusa',
+    'voronezh-pamyatnik-petru-i',
+    'voronezh-park-orlyonok',
+    'voronezh-chernavskaya-damba',
+  ],
+  indoorSlugs: [
+    'voronezh-hudozhestvennyy-muzey-kramskogo',
+    'voronezh-kraevedcheskiy-muzey',
+    'voronezh-kamernyy-teatr',
+    'voronezh-restoran-el-chico',
+    'voronezh-kofeynya-promka',
+  ],
+  outdoorCta: 'Отличная погода для Адмиралтейской, «Алых парусов» и прогулки к Петру',
+  indoorCtaOvercast: 'Сегодня пасмурно. Загляните в музей Крамского, Краеведческий или «Промку»',
+  indoorCtaRain: 'Сегодня дождь. Музей Крамского, Камерный театр или стейкхаус «El Chico»',
+  indoorCtaSnow: 'Сегодня снег. Музеи центра и стейкхаусы после прогулки к Петру',
+};
+
+const VORONEZH_WHEN_TO_GO: CityWhenToGoFlavor = {
+  timeZone: 'Europe/Moscow',
+  seasons: [
+    {
+      id: 'winter',
+      months: [12, 1, 2],
+      headline: 'Зима',
+      body: 'Плотный снег и около -5...-9 °C. Тюбинги и лыжи в «Чертовицах» за городом. Центральные улицы чистят, согреться помогают местные стейкхаусы.',
+    },
+    {
+      id: 'spring',
+      months: [3, 4, 5],
+      headline: 'Весна',
+      body: 'В апреле город стремительно зеленеет, термометр скачет до +15 °C. Пешие холмы без летнего зноя. В мае открывается навигация: сап по Воронежскому водохранилищу.',
+    },
+    {
+      id: 'summer',
+      months: [6, 7, 8],
+      headline: 'Лето',
+      body: 'Жарко и сухо, часто выше +30 °C: город оживает вечером. Карла Маркса превращается в сплошную веранду. Плюс сезона - загородные арт-парки и замки в часе езды.',
+    },
+    {
+      id: 'autumn',
+      months: [9, 10, 11],
+      headline: 'Осень',
+      body: 'Сентябрь и октябрь: мягкое солнце и +12...+18 °C. «Алые паруса» золотеют. Меньше транзита на юг, отели заметно дешевле.',
+    },
+  ],
+  tabs: seasonTabs({
+    spring:
+      'В апреле Воронеж стремительно зеленеет, а термометр резко скачет до +15 °C. Идеальное время для долгих пеших прогулок по историческим холмам без летнего зноя. В мае открывается сезон навигации, и можно арендовать сапборд для заплыва по Воронежскому водохранилищу.',
+    summer:
+      'Лето здесь жаркое и сухое, часто выше +30 °C, из-за чего город оживает в вечернее время. Центральная пешеходная улица Карла Маркса превращается в сплошную веранду с крафтовыми барами. Главный плюс сезона - доступность загородных арт-парков и замков в часе езды от центра.',
+    autumn:
+      'Сентябрь и октябрь радуют мягким солнцем и комфортными +12...+18 °C. Леса вокруг города и парк «Алые паруса» окрашиваются в золото. Логистически это золотой сезон: спадает поток транзитных туристов, едущих на юг, и цены на отели заметно снижаются.',
+    winter:
+      'Город укрывает плотный снег, а температура держится около -5...-9 °C. Главная фишка - катание на тюбингах и лыжах в спортивном комплексе «Чертовицы» прямо за городом. Центральные улицы отлично чистят, а согреться после прогулок помогают местные стейкхаусы.',
+  }),
+};
+
+const VORONEZH_SLIDES: CityIdentitySlide[] = [
+  {
+    id: 'petrovsky-fleet',
+    title: 'Родина регулярного флота',
+    text: 'Сухопутный город, где Петр I строил флот. Копия линкора «Гото Предестинация» стоит на воде у Адмиралтейской площади.',
+    imageSrc: '/images/venues/voronezh/identity-symbol.jpg',
+    imageAlt: 'Корабль-музей «Гото Предестинация» на Воронежском водохранилище',
+    slugs: [
+      'voronezh-korabl-muzey-goto-predestinatsiya',
+      'voronezh-admiralteyskaya-ploschad',
+      'voronezh-pamyatnik-petru-i',
+    ],
+    target: 'places',
+    badge: 'Символ',
+  },
+  {
+    id: 'literary-city',
+    title: 'Платонов, Бим и неформальный город',
+    text: 'Литературный и рок-Воронеж: Платонов на проспекте, Белый Бим у театра «Шут» и память Юрия Хоя на левом берегу.',
+    imageSrc: '/images/venues/voronezh/identity-art.jpg',
+    imageAlt: 'Памятник Белому Биму у театра кукол «Шут»',
+    slugs: [
+      'voronezh-pamyatnik-belomu-bimu',
+      'voronezh-pamyatnik-platonovu',
+      'voronezh-pamyatnik-yuriyu-hoyu',
+    ],
+    target: 'places',
+    badge: 'Искусство',
+  },
+  {
+    id: 'chernozem-meat',
+    title: 'Мясо Черноземья',
+    text: 'Стейкхаусы, фудхолл Центрального рынка и кофе «Промка» на проспекте. Вечером - настойки и крафт вдоль Красной линии.',
+    imageSrc: '/images/venues/voronezh/identity-gastro.jpg',
+    imageAlt: 'Стейкхаус и гастрономия Воронежа',
+    slugs: [
+      'voronezh-restoran-el-chico',
+      'voronezh-gastro-tsentralnyy-rynok',
+      'voronezh-kofeynya-promka',
+    ],
+    target: 'places',
+    badge: 'Гастро',
+  },
+  {
+    id: 'merchant-spire',
+    title: 'Шпиль ЮВЖД и замок в Рамони',
+    text: 'Купеческий классицизм, 68-метровый шпиль ЮВЖД и модерн «Бристоля». В часе езды - неоготический дворец Ольденбургских.',
+    imageSrc: '/images/venues/voronezh/identity-architecture.jpg',
+    imageAlt: 'Шпиль здания Управления ЮВЖД на проспекте Революции',
+    slugs: [
+      'voronezh-zdanie-upravleniya-yuvzhd',
+      'voronezh-gostinitsa-bristol',
+      'voronezh-ramon',
+    ],
+    target: 'mixed',
+    badge: 'Архитектура',
+  },
+];
+
 export const CITY_HUB_LOCAL_FLAVOR: Record<string, CityHubLocalFlavor> = {
   perm: {
     identityHeading: 'Чем уникальна Пермь',
@@ -1565,6 +1688,14 @@ export const CITY_HUB_LOCAL_FLAVOR: Record<string, CityHubLocalFlavor> = {
     slides: NOVOSIBIRSK_SLIDES,
     weather: NOVOSIBIRSK_WEATHER,
     whenToGo: NOVOSIBIRSK_WHEN_TO_GO,
+  },
+  voronezh: {
+    identityHeading: 'Чем уникален Воронеж',
+    identityLead: IDENTITY_LEAD,
+    tags: tagsFromSlides(VORONEZH_SLIDES),
+    slides: VORONEZH_SLIDES,
+    weather: VORONEZH_WEATHER,
+    whenToGo: VORONEZH_WHEN_TO_GO,
   },
 };
 
