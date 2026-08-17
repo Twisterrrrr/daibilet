@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { Clock, MapPin, Star, Ticket } from 'lucide-react';
 
-import { collectCatalogLabels } from '@/lib/catalog-labels';
 import { resolveEditorialEventImage } from '@/lib/event-cover-images';
 import { resolveEventCardDestinationLabel, resolveEventCardLocationLabel } from '@/lib/event-location';
 import { EventFavoriteButton } from '@/components/EventFavoriteButton';
@@ -54,7 +53,6 @@ export function EventCard({
   const detailsHref = eventHref(event);
   const hasPrice = typeof event.priceFrom === 'number' && event.priceFrom >= MIN_DISPLAY_PRICE_RUB;
   const destinationLabel = resolveEventCardDestinationLabel(event);
-  const highlights = collectCatalogLabels(event);
   const openDate = isOpenDate(event);
   const departingSoonMinutes = openDate ? null : getDepartingSoonMinutes(event.startsAt);
   const nextSessionLabel = openDate ? null : formatEventNextSession(event);
@@ -156,17 +154,6 @@ export function EventCard({
           ) : null}
           {locationLabel ? <span className="line-clamp-1">{locationLabel}</span> : null}
         </div>
-
-        {highlights.length > 0 ? (
-          <ul className="mt-2 space-y-0.5 text-[10px] leading-relaxed text-slate-600 sm:text-xs">
-            {highlights.map((highlight) => (
-              <li key={highlight} className="flex gap-1.5">
-                <span className="text-primary-500">•</span>
-                <span className="line-clamp-1">{highlight}</span>
-              </li>
-            ))}
-          </ul>
-        ) : null}
 
         {showSlotPills ? (
           <div className="mt-2 flex flex-wrap items-center justify-center gap-1.5">

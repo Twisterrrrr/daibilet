@@ -14,7 +14,7 @@ import {
 import { LandingPurchaseButton } from '@/components/landing/LandingPurchaseButton.client';
 import { IMAGE_SIZES, CardSafeImage } from '@/components/SafeImage.client';
 import type { PublicCatalogListItemDto, PublicSessionDto } from '@daibilet/contracts/public';
-import { collectCatalogLabels, extractDurationLabel } from '@/lib/catalog-labels';
+import { extractDurationLabel } from '@/lib/catalog-labels';
 import { LandingCardBadgeRow } from '@/components/landing/LandingCardBadgeRow';
 import { EventImageBadges } from '@/lib/event-card-badges';
 import { deriveLandingCardBadges } from '@/lib/landing-card-badges';
@@ -116,7 +116,6 @@ export function EventCard({
   );
   const hasPrice = typeof session.priceFrom === 'number' && session.priceFrom >= MIN_DISPLAY_PRICE_RUB;
   const destinationLabel = resolveEventCardDestinationLabel(session);
-  const highlights = collectCatalogLabels(session, 1);
   const openDate = isOpenDate(session);
   const departingSoonMinutes = openDate ? null : getDepartingSoonMinutes(session.startsAt);
   const nextSessionLabel = openDate ? null : formatCardScheduleLine(session);
@@ -258,26 +257,7 @@ export function EventCard({
           </Link>
         </h2>
 
-        {landingBadges.length > 0 ? (
-          <LandingCardBadgeRow badges={landingBadges} />
-        ) : highlights.length > 0 || (landingActions && session.category) ? (
-          <div
-            className={`flex flex-wrap items-center gap-1.5 ${
-              compact && !landingActions ? 'hidden sm:flex' : ''
-            }`}
-          >
-            {landingActions && session.category ? (
-              <span className="rounded-md bg-surface-muted px-2.5 py-1 text-xs font-medium text-graphite-muted">
-                {session.category}
-              </span>
-            ) : null}
-            {highlights.map((label) => (
-              <span key={label} className="rounded-md bg-surface-muted px-2.5 py-1 text-xs font-medium text-graphite-muted">
-                {label}
-              </span>
-            ))}
-          </div>
-        ) : null}
+        {landingBadges.length > 0 ? <LandingCardBadgeRow badges={landingBadges} /> : null}
 
         {/* Primary schedule line */}
         <div className="flex flex-col gap-1">
