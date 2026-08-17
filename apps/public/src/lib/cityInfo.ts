@@ -619,7 +619,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     significantSuburbs: [
       {
         name: 'Петергоф',
-        desc: '',
+        desc: 'Парадная резиденция Петра I на заливе: фонтаны без насосов, Большой каскад и Нижний парк.',
         mustSeeFilter: 'main',
         places: [
           { name: 'Нижний парк Петергофа', seasonLabel: 'Летняя навигация - май-октябрь', desc: 'регулярный парадный сад Петра I на берегу Финского залива со знаменитой системой фонтанов, работающей вообще без насосов.', locationSlug: 'saint-petersburg-nizhniy-park-petergofa', latitude: 59.885112, longitude: 29.908214, transitTip: 'От ст. Новый Петергоф автобус' },
@@ -641,7 +641,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       },
       {
         name: 'Царское Село / Пушкин',
-        desc: '',
+        desc: 'Барочный Екатерининский дворец с Янтарной комнатой и парками в Пушкине.',
         mustSeeFilter: 'main',
         places: [
           { name: 'Екатерининский дворец', desc: 'грандиозный барочный замок Франческо Растрелли, внутри которого находится знаменитая, полностью восстановленная Янтарная комната.', locationSlug: 'saint-petersburg-ekaterininskiy-dvorets', latitude: 59.715911, longitude: 30.395812 },
@@ -661,7 +661,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       },
       {
         name: 'Кронштадт',
-        desc: '',
+        desc: 'Остров-крепость на Котлине: Морской Никольский собор, форты и музей военно-морской славы.',
         mustSeeFilter: 'main',
         places: [
           { name: 'Морской Никольский собор', desc: 'колоссальный ставропигиальный храм на Якорной площади, построенный по образу Софии Константинопольской как мемориал погибшим морякам.', locationSlug: 'saint-petersburg-morskoy-nikolskiy-sobor', latitude: 59.993412, longitude: 29.777414 },
@@ -684,7 +684,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       },
       {
         name: 'Гатчина',
-        desc: '',
+        desc: 'Охотничий замок Павла I из пудостского камня, Приоратский дворец и пейзажный парк.',
         mustSeeFilter: 'main',
         places: [
           { name: 'Большой Гатчинский дворец', desc: 'суровый охотничий замок Антонио Ринальди из пудостского камня, скрывающий 130-метровый подземный ход к Серебряному озеру.', locationSlug: 'saint-petersburg-bolshoy-gatchinskiy-dvorets', latitude: 59.564112, longitude: 30.108114 },
@@ -702,7 +702,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       },
       {
         name: 'Павловск',
-        desc: '',
+        desc: 'Классический дворец Камерона и один из самых больших пейзажных парков Европы.',
         mustSeeFilter: 'main',
         places: [
           { name: 'Павловский парк', seasonLabel: 'Зимний эксклюзив: заснеженный парк', desc: 'один из самых больших пейзажных парков Европы (600 гектаров), славящийся своими живописными районами «Белая береза» и «Старая Сильвия».', latitude: 59.6875, longitude: 30.4485 },
@@ -723,7 +723,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       },
       {
         name: 'Ораниенбаум / Ломоносов',
-        desc: '',
+        desc: 'Барочный Меншиковский дворец, Китайский дворец рококо и павильон Катальной горки.',
         mustSeeFilter: 'main',
         places: [
           { name: 'Большой Меншиковский дворец', desc: 'грандиозная барочная резиденция фаворита Петра I, которая по своим масштабам изначально превосходила даже строящийся в то же время Петергоф.', latitude: 59.91485, longitude: 29.75365 },
@@ -742,7 +742,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       },
       {
         name: 'Стрельна',
-        desc: '',
+        desc: 'Константиновский дворец конгрессов у залива и путевой дом Петра I.',
         mustSeeFilter: 'main',
         places: [
           { name: 'Константиновский дворец', desc: 'величественная парадная резиденция Романовых у самой воды, полностью восстановленная в XXI веке как действующий Государственный комплекс «Дворец конгрессов».', latitude: 59.85585, longitude: 30.05765 },
@@ -759,7 +759,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       },
       {
         name: 'Выборг',
-        desc: '',
+        desc: 'Средневековый шведский город у финской границы: замок на скале, парк Монрепо и гранитная брусчатка Старого города.',
         mustSeeFilter: 'main',
         places: [
           { name: 'Выборгский замок', desc: 'единственный в России полностью сохранившийся средневековый шведский рыцарский замок, основанный на скалистом острове в 1293 году.', locationSlug: 'saint-petersburg-vyborgskiy-zamok', latitude: 60.7158, longitude: 28.7292 },
@@ -781,7 +781,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       },
       {
         name: 'Курортный район / Побережье',
-        desc: '',
+        desc: 'Сестрорецк, Репино и Комарово: дюны, экотропы и репинские «Пенаты».',
         mustSeeFilter: 'main',
         places: [
           { name: 'Сестрорецкий Рубеж', desc: 'выставочный комплекс на месте оборонительного Карельского укрепрайона с подлинным железобетонным ДОТом «Миллионер» внутри.', latitude: 60.11295, longitude: 29.9712 },
@@ -798,7 +798,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       },
       {
         name: 'Шлиссельбург / Ладога',
-        desc: '',
+        desc: 'Крепость Орешек на острове в истоке Невы и старая имперская тюрьма.',
         mustSeeFilter: 'main',
         places: [
           { name: 'Крепость Орешек', seasonLabel: 'Летняя навигация - май-октябрь', desc: 'древняя новгородская фортеция XIV века на Ореховом острове в истоке Невы, выдержавшая жестокие штурмы шведов и ставшая главной тюрьмой империи.', latitude: 59.9535, longitude: 31.0385 },
@@ -815,7 +815,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       },
       {
         name: 'Сосновый Бор / Атомград',
-        desc: '',
+        desc: 'Детский Андерсенград, Липовский пляж и приморский лесопарк на юге залива.',
         mustSeeFilter: 'main',
         places: [
           { name: 'Андерсенград', desc: 'уникальный детский игровой городок из камня, построенный к 175-летию Ханса Кристиана Андерсена в стиле средневековой западноевропейской архитектуры с ратушей, подземным ходом и бастионами.', locationSlug: 'saint-petersburg-andersengrad-sosnovyy-bor', latitude: 59.897811, longitude: 29.086412 },
