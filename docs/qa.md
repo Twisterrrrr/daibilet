@@ -73,11 +73,12 @@ Finance PR-ветка `codex/stage0-admission-ticket-core` может держа
 ## 2026-08-11 - Region Hub IA
 
 1. **City SEO title:** ~~спека предлагала «Афиша {Города} на {Год}…»; сейчас канон P.2d. Меняем city title в том же релизе или оставляем P.2d?~~ → **закрыто 2026-08-15:** все city hubs на P.2d (как СПб); year-шаблон Казани/Екб снят с hub.
-2. **ХМАО / Карелия:** у ХМАО в `region-hubs` центр Ханты-Мансийск (есть ли saleable standalone?). Карелия → Петрозаводск - в allowlist?
+2. **ХМАО / Карелия:** ~~у ХМАО в `region-hubs` центр Ханты-Мансийск (есть ли saleable standalone?).~~ → **закрыто 2026-08-17:** Ханты-Мансийск - адмцентр (`region-hubs.centerCity`), карточка `/cities` с ≥1 событием (3 READY не прячем). **Карелия:** Петрозаводск по-прежнему не в `City`; **Сортавала** dual membership - страница/search сразу, сетка только при events > 5, до порога сессии и child на республике. Region hub Карелии на Петрозаводск не меняли.
 3. **childCities с eventCount=0:** всегда в JSON для роботов + UI «Показать все», или zero-only в отдельном поле?
 4. **Тир C:** 301/302 на центр vs мягкий noindex + strip? Спека = noindex + strip на центре (текущая реализация).
 5. **FAQ count Tier A:** в seed по 2 Q; архитектурная цель 3 - добить третьим логистическим FAQ или ок 2?
 6. **LLM provider** для `region:info:draft`: OpenAI / YandexGPT / внутренний blog pipeline?
+7. **Выборг vs пригороды СПб:** ~~search/афиша как `#city-suburbs` СПб?~~ → **LOCKED 2026-08-17:** Выборг - город ЛО (`cityToRegion`), не standalone. События + search + later H1 = формула A на `/cities/leningradskaya-oblast?city=vyborg`. Карточка `significantSuburbs` на СПб остаётся day-trip (замок/Монрепо), не канон афиши. Петергоф/Пушкин/Кронштадт - `#city-suburbs`. Не pin концертов Выборга в афише СПб.
 
 ---
 

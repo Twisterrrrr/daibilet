@@ -1,6 +1,6 @@
 # Project — Daibilet (Next full-stack migration)
 
-**Обновлено:** 2026-08-14  
+**Обновлено:** 2026-08-17  
 **Ветка migration / prod:** `feat/next-monorepo`  
 **Feature branch (region hubs):** `feat/region-hubs`  
 **Prod catalog:** Next `apps/web` `:3001` + legacy API `:4000` на МСК `201.24.125.184`  
@@ -41,15 +41,17 @@ SPB `.16` **retired**.
 3. Blog conversion layer (chips + reading progress; schema/related уже были)
 4. **Next phase (не в этом ship):** cities hub / venues monetization / `/locations` IA - см. [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brief.md) и задачи `PH2.*` в Tasktracker
 
-**Allowlist городов (geo-политика 2026-07-19):**
+**Allowlist городов (geo-политика 2026-07-19, доп. 2026-08-17):**
 
 | Правило | Действие |
 |---------|----------|
-| Адм. центр субъекта + saleable | `standaloneCities` + city hub (thin listing ok; приоритет ≥2–3 saleable) |
-| Город области/края/республики (не центр) | `cityToRegion` → субъект; **не** считать «дырой» allowlist |
-| Зарубежье (non-RF) | `foreignCities` — не standalone, не public catalog |
-| Мелкие посёлки (Сортавала, Лебяжье и т.п.) | только region, не standalone |
-| Набережные Челны | Татарстан → карточка Казани / блок «события области», не отдельный public city |
+| Адм. центр субъекта + saleable | `standaloneCities` + city hub (thin listing ok) |
+| Не-столица с живой афишей / catchment / туристический магнит | тоже может быть `standaloneCities` (Тольятти, Сургут, Новокузнецк, Сортавала) - не только адмцентр |
+| Карточка в индексе `/cities` | **адмцентры субъекта** (Владикавказ, Ханты-Мансийск, Самара, …): events ≥ 1. **Региональные городки** (Тольятти, Сургут, Новокузнецк, Сортавала): **events > 5**, иначе свёртка в субъект через `cityToRegion`. Прямой `/cities/{slug}` не прячем |
+| Туристический магнит (люди едут, афиша тонкая) | search geo-hit + editorial promo даже при events ≤ 5 (Сортавала). Flavor-пак не обязателен |
+| Город области без отдельного хаба | `cityToRegion` → субъект; later `?city=` на region hub |
+| Зарубежье (non-RF) | `foreignCities` - не standalone, не public catalog |
+| Набережные Челны / Анапа / Коломна | не поднимать в standalone в этом срезе |
 
 Источник: `data/geo/city-routing.ru.json`. Центры субъектов: `data/geo/region-hubs.ru.json`. Live tier C/B/A по child-events (не ручной `tier` в JSON): [region-live-tier.md](./region-live-tier.md). Сводка исключений: [geo-excluded-cities.md](./geo-excluded-cities.md).
 
@@ -286,7 +288,7 @@ Cherry-pick из **`codex/phase2-foundation`**: schema, event change requests, a
 
 - **Node** ≥22.13, **pnpm** 11.7 workspaces
 - **Next 15**, React 19, Tailwind 3
-- **Images:** `next/image` + `sharp` (WebP/AVIF), `SafeImage` wrapper, `remotePatterns` для TC/TEP/S3 CDN
+- **Images:** `next/image` + `sharp` (WebP/AVIF), `SafeImage` wrapper, `remotePatterns` для TC/TEP/S3 CDN. Listing sidecars (nginx `/images`, unoptimized): `/events` `-card.jpg` → `-thumb` → original; `/places` `-thumb` → `-card` → original; `/blog` `*-og.jpg` → `-card` → `-thumb` → cover. Mass cut event covers: `pnpm images:cards:dry` locally, then owner on MSK `node scripts/compress-card-images.mjs events` (не коммитить тысячи sidecar). Missing sidecar = runtime fallback, не пустой placeholder.
 - **Catalog covers:** после TC/TEP import - `scripts/ensure-catalog-covers.js`: сначала CDN/event image на Venue, иначе unique generate (`/images/{events|venues}/generated/*`). City-placeholder не считается cover. Lean venue fallback принимает https и `/images/events|venues/*`.
 - **UI standards (sitewide minimalism; LOCKED 2026-08-10):**
   1. **One filter row on mobile** - категории / даты / теги = один горизонтальный swipe-rail (не стек selects + чипов).

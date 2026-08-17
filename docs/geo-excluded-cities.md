@@ -10,8 +10,9 @@
 | Ситуация | Куда кладём | В сводке «дыр»? |
 |----------|-------------|-----------------|
 | Адм. центр субъекта + saleable | `standaloneCities` (+ hub) | нет — публичный city |
-| Город субъекта, не центр | `cityToRegion` → область/край/республика | **нет** — штатная свёртка |
-| Мелкий посёлок (Сортавала, Лебяжье, …) | только `cityToRegion`, не standalone | нет |
+| Город субъекта, не центр | `cityToRegion` → область/край/республика | **нет** - штатная свёртка |
+| Мелкий посёлок без хаба (Лебяжье, …) | только `cityToRegion`, не standalone | нет |
+| Туристический магнит не-адмцентр (Сортавала) | dual: `standaloneCities` + `cityToRegion`; индекс `/cities` при events > 5; search сразу | нет |
 | Набережные Челны | `cityToRegion` → Республика Татарстан → под карточкой **Казани** | нет (после fix republic) |
 | Зарубежье (Батуми, Осака, …) | `foreignCities` — cut из destinations и public catalog sessions | нет — намеренный отсев |
 | Нет saleable | не попадает в destination buckets | `no-saleable` |
@@ -57,24 +58,24 @@
 
 | Город | Событий (READY/saleable) | Причина (аудит) | После политики |
 |---|---:|---|---|
-| Сортавала | 0/877 | allowlist | cityToRegion→Республика Карелия |
+| Сортавала | 0/877 | allowlist | **standalone 2026-08-17** (search + URL; сетка `/cities` при events > 5) |
 | Раменское | 362/199 | cityToRegion→Московская область | без изменений (region) |
 | Лебяжье | 0/72 | allowlist | cityToRegion→Ленинградская область |
 | Чебоксары | 75/62 | allowlist | **standalone** |
 | Светлогорск | 68/54 | allowlist | cityToRegion→Калининградская область |
 | Владивосток | 31/31 | allowlist | **standalone** |
-| Тольятти | 21/17 | allowlist | cityToRegion→Самарская область (не адмцентр) |
+| Тольятти | 21/17 | allowlist | **standalone 2026-08-17** (сетка да, 18 READY) |
 | Липецк | 15/17 | allowlist | **standalone** |
 | Новороссийск | 20/12 | cityToRegion→Краснодарский край | region |
 | Королёв | 14/11 | allowlist | cityToRegion→Московская область |
 | Хабаровск | 10/10 | allowlist | **standalone** |
-| Сургут | 18/9 | allowlist | cityToRegion→Ханты-Мансийский АО |
+| Сургут | 18/9 | allowlist | **standalone 2026-08-17** (сетка да, 14 READY) |
 | Иркутск | 10/9 | allowlist | **standalone** |
 | Барнаул | 9/8 | allowlist | **standalone** |
 | Набережные Челны | 9/8 | republic-regex | cityToRegion→Республика Татарстан (под Казанью) |
 | Курган | 8/8 | allowlist | **standalone** |
 | Киров (Кировская область) | 3/8 | allowlist | **standalone** |
-| Новокузнецк | 19/7 | allowlist | cityToRegion→Кемеровская область |
+| Новокузнецк | 19/7 | allowlist | **standalone 2026-08-17** (сетка да, 9 READY) |
 | Пенза | 7/6 | allowlist | **standalone** |
 | Подольск | 7/6 | allowlist | cityToRegion→Московская область |
 | Череповец | 6/6 | allowlist | cityToRegion→Вологодская область |

@@ -1,3 +1,86 @@
+## 2026-08-17 - Новосибирск Deploy MSK web + listing sidecars
+
+### Наблюдения
+- Owner item 10: хаб Новосибирска уже на `origin/feat/next-monorepo` `678bf7e` (`novosibirsk-hub.ts`). Локальный UX (search-geo, city-routing, EventCard) не должен попасть в этот выкат.
+- Item 9: карточки `/events` и `/places` тянут полные JPG, если нет sibling `-card`/`-thumb`; `/places` при 404 thumb показывал градиент, а не оригинал.
+
+### Решения
+- Deploy: `gh workflow run deploy-msk-web.yml` с `ref=678bf7e…` (без push локальных файлов, без force-push). Run: https://github.com/Twisterrrrr/daibilet/actions/runs/32053126326
+- Runtime fallback: `listingImageFallbacks` / `venueCardImageFallbacks` / `blogListingImageFallbacks` + `CardSafeImage` / `BlogCardSafeImage`. Places: thumb → card → original. Blog: og → card → thumb → cover.
+- Массовая нарезка event covers уже есть в `scripts/compress-card-images.mjs`. Добавлен `--dry-run`. На MSK owner: dry-run, затем write на диск; sidecar не коммитить. Этот агент не переписывал prod images.
+
+### Проблемы
+- Fallback item 9 не в этом live deploy (только origin SHA). Нужен следующий web batch.
+- Тысячи TC CDN-обложек не локальные файлы: sidecar только для `/images/events/**` на диске VPS.
+
+---
+## 2026-08-17 - Dual membership: адмцентры ≥1, городки >5 + cityToRegion
+
+### Наблюдения
+- Снять шесть имён с `cityToRegion` и одновременно прятать карточку при events ≤ 5 - логическая дыра: Сортавала (0) и Ханты-Мансийск (3) пропадали и из сетки `/cities`, и из child/афиши субъекта.
+
+### Решения
+- Адмцентры субъекта (Владикавказ, Ханты-Мансийск, Москва, Самара, Кемерово, …; источник - `region-hubs.centerCity` и standalone без `cityToRegion`) остаются type=city и видны в сетке с **1** saleable событием.
+- Региональные городки (Тольятти, Сургут, Новокузнецк, Сортавала) живут в **обоих** списках. Пока events ≤ 5, сессии сворачиваются в субъект (карточки нет, афиша региона и child не пустеют). При events > 5 городок получает отдельную карточку type=city. Прямой URL / search / promo работают через standalone даже при 0 событий. Челны и Раменское не standalone.
+
+### Проблемы
+- Петрозаводска в City по-прежнему нет; Карелия держит Сортавалу как child, пока у городка нет своей карточки.
+
+---
+## 2026-08-17 - Standalone не-столицы + порог карточки /cities
+
+### Наблюдения
+- Owner: включить Сортавалу, Тольятти, Сургут, Новокузнецк. Карточку в сетке `/cities` отдельно только при events > 5. Промо в первую очередь туда, куда едут люди (Сортавала), даже если афиша тонкая.
+- Сортавала: 0 READY, 6 published POI, CITY_INFO уже есть. Петрозаводска в City нет.
+- Тольятти 18, Сургут 14, Новокузнецк 9 - выше порога. Ханты-Мансийск 3 - страница есть, сетка нет. Владикавказ 8 - сетка да.
+
+### Решения
+- `standaloneCities` += четыре имени; сняты с `cityToRegion`, иначе mapper снова схлопывал бы в субъект.
+- Каталог destinations: тонкий набор (Владикавказ, Ханты-Мансийск, Сортавала, Тольятти, Сургут, Новокузнецк) виден при events ≥ 6. Классические хабы (Вологда и т.п.) остаются при ≥ 1. Прямой slug не закрываем.
+- Search-geo берёт standalone: Сортавала находится с 0 событий. Flavor-паки новым не писали.
+- TZ override: Тольятти Europe/Samara, Сургут YEKT, Новокузнецк Asia/Novokuznetsk (после выхода из cityToRegion регион больше не подсказывает пояс).
+
+### Проблемы
+- Ханты-Мансийск - адмцентр, куда летают, но в сетке скрыт до >5. Не в tourist-promo (это не Сортавала).
+- Карелия: Петрозаводск по-прежнему не в City; region hub смотрит на него. Сортавала теперь city-хаб республики по факту продукта.
+- Челны / Анапа / Коломна не добавляли.
+
+---
+## 2026-08-17 - Выборг: город ЛО, не пригород СПб для событий
+
+### Наблюдения
+- Owner: «на словах пригород, а по факту отдельный город». Выборг - муниципалитет Ленинградской области (адм. центр субъекта - Гатчина; СПб - другой субъект РФ). Не `standaloneCities`.
+- Редакционно остаётся карточка `significantSuburbs` на хабе СПб (day-trip: замок, Монрепо). Это контент «как доехать», не канон событий.
+- ~3 READY концерта с `City=Выборг` уже складываются в destination «Ленинградская область» (`cityToRegion`). На афише `/cities/saint-petersburg` их нет: матч хаба идёт по destination, не по `session.city`. Стрип «рядом» на СПб при ≥3 child-событиях ЛО выключен (tier B).
+
+### Решения
+- Канон событий / search / later H1 - как Раменское: `/cities/leningradskaya-oblast?city=vyborg`, формула A «Выборг, Ленинградская область • Ближайшие события». Не `/cities/vyborg`, не pin в афише СПб.
+- Петергоф / Пушкин / Кронштадт остаются `#city-suburbs` (муниципальные части / дворцовые пригороды СПб).
+- Search-geo: Выборг снят с suburb-хита СПб; satellite href на хаб ЛО. Раменское по-прежнему без geo-hit до hydration `?city=`. `city-routing.ru.json` не трогали.
+
+### Проблемы
+- Region hub ещё не читает `?city=` из URL (фильтр городов - in-page). Href уже канонический; hydration - later.
+- Карточка Выборга на СПб и канон афиши ЛО живут параллельно: не склеивать в один H1 «в Выборге и Ленинградской области».
+
+---
+## 2026-08-17 - Standalone: Владикавказ и Ханты-Мансийск
+
+### Наблюдения
+- Owner: оба города делать standalone (thin city hub). Тольятти - не хаб.
+- Оба адм. центры субъектов с saleable (Владикавказ 8 READY / 1 title circus; Ханты-Мансийск 3 READY / 2 titles). Раньше не было ни в `standaloneCities`, ни в `cityToRegion` - билеты выпадали из public destinations.
+- Махачкала 0 saleable, Петрозаводск нет в `City` - не добавляли.
+
+### Решения
+- `data/geo/city-routing.ru.json` → `standaloneCities`: Владикавказ, Ханты-Мансийск. Flavor packs / ручные `/cities` страницы не делали.
+- `region-hubs`: ХМАО уже `centerCity: Ханты-Мансийск` (как Краснодар у края) - не сворачивает city в region. Северной Осетии в JSON нет, добавлять region hub без спутников не стали.
+- Mapper: standalone проверяется раньше `City.isDestination=false`, чтобы центр не схлопывался в субъект.
+- Ханты-Мансийск: TZ `Asia/Yekaterinburg` (иначе default MSK). Тольятти остаётся `cityToRegion` → Самарская область (хаб - Самара).
+
+### Проблемы
+- Thin hub без CITY_INFO: афиша и SEO-fallback brief, без mustSee/identity. Flavor - отдельным пакетом по запросу owner.
+- Карелия / Петрозаводск по-прежнему открытый вопрос qa Region Hub IA.
+
+---
 ## 2026-08-16 - Новосибирск tourist hub (лекало Перми)
 
 ### Наблюдения

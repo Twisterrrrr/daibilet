@@ -1,8 +1,23 @@
+## 2026-08-17 - Новосибирск live deploy + listing image sidecars
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| CONT.NOVOSIBIRSK-HUB | whenToGo / identity / ~55 mustSee / семейный + Академ / Зелёная 5 / Красная 5 / FAQ / lifehacks + identity images | Высокий | 🔄 Deploy MSK web [32053126326](https://github.com/Twisterrrrr/daibilet/actions/runs/32053126326) SHA `678bf7e` (origin HEAD; локальный UX не вкатывали). Live может отставать до конца swap. |
+| PERF.EVENTS-CARDS | Массовая нарезка обложек `/events` в sibling `-card.jpg` (~640px) | Высокий | 🔄 fallback в коде; `pnpm images:cards:dry`; MSK write = owner после dry-run, бинарники не в git |
+| PERF.PLACES-THUMB-FALLBACK | `/places`: нет `-thumb` → `-card` → оригинал, не градиент | Критический | 🔄 `CardSafeImage` + `venueCardImageFallbacks`; в следующем web batch |
+| PERF.BLOG-CARD-FALLBACK | `/blog`: нет `*-og`/`-card`/`-thumb` → полный cover | Высокий | 🔄 `BlogCardSafeImage` chain; в следующем web batch |
+
+## 2026-08-17 - Выборг oblast child (не suburb СПб)
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| GEO.VYBORG-OBLAST-CHILD | Канон событий/search/H1: `/cities/leningradskaya-oblast?city=vyborg` (формула A); карточка СПб suburbs остаётся tourist; не standalone | Высокий | 🔄 search-geo satellite; hydration `?city=` later |
+
 ## 2026-08-16 - Новосибирск tourist hub
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| CONT.NOVOSIBIRSK-HUB | whenToGo / identity / ~55 mustSee / семейный + Академ / Зелёная 5 / Красная 5 / FAQ / lifehacks + identity images | Высокий | ✅ code; commit+push; live по «выкатывай» |
+| CONT.NOVOSIBIRSK-HUB | whenToGo / identity / ~55 mustSee / семейный + Академ / Зелёная 5 / Красная 5 / FAQ / lifehacks + identity images | Высокий | 🔄 см. секцию 2026-08-17 live deploy `32053126326` SHA `678bf7e` |
 
 ## 2026-08-15 - Painted lines logistics rebuild (MSK/NN/Samara/SPB/KGD)
 
@@ -2241,8 +2256,9 @@ Owner-locked порядок: Hero → Советы → Расписание → 
 |---|--------|-----------|--------|
 | G.1 | Fix `isPublicRegionName` для «Республика …» (префикс, без `\b`) | Критический | ✅ |
 | G.2 | Челны → Республика Татарстан под карточкой Казани | Критический | ✅ |
-| G.3 | Expand standaloneCities адмцентрами с saleable | Высокий | ✅ |
-| G.4 | Expand cityToRegion для не-адмцентров (Тольятти, Сортавала, …) | Высокий | ✅ |
+| G.3 | Expand standaloneCities адмцентрами с saleable | Высокий | ✅ + Владикавказ, Ханты-Мансийск 2026-08-17 (карточка с ≥1; без flavor) |
+| G.4 | Expand cityToRegion для не-адмцентров (Тольятти, Сортавала, …) | Высокий | ✅ 2026-07-19; dual membership 2026-08-17: городки снова в cityToRegion до карточки >5 |
+| G.7 | Non-capital standalone + catalog card events>5 | Высокий | 🔧 код 2026-08-17, без commit/deploy |
 | G.5 | Docs + prod deploy geo | Критический | ✅ `6f0fcf7` prod |
 | G.6 | Хвост allowlist 63 → cityToRegion; зарубежье (`foreignCities`: Батуми, Осака) | Высокий | ✅ `a63d612` prod (HEAD `c312095`) |
 
