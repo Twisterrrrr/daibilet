@@ -13,6 +13,12 @@ import {
 } from '@/lib/event-card-meta';
 import { formatVacantSeats } from '@/lib/event-page-utils';
 
+function isTodayTomorrowCoverBadge(label: string | null): boolean {
+  if (!label) return false;
+  const lower = label.toLocaleLowerCase('ru-RU');
+  return lower === 'сегодня' || lower === 'завтра' || lower.startsWith('сегодня') || lower.startsWith('завтра');
+}
+
 type EventImageBadgesProps = {
   event: PublicSessionDto;
   showSoonBadge?: boolean;
@@ -21,6 +27,8 @@ type EventImageBadgesProps = {
   editorsPick?: boolean;
   /** Cover: only compact date (city hub / cleaned rails). */
   dateOnly?: boolean;
+  /** Grid catalog: drop Сегодня/Завтра on the photo; Hit and other signals stay. */
+  hideRelativeCoverDate?: boolean;
 };
 
 const DATE_BADGE_CLASS =
@@ -32,8 +40,10 @@ export function EventImageBadges({
   rail = false,
   editorsPick = false,
   dateOnly = false,
+  hideRelativeCoverDate = false,
 }: EventImageBadgesProps) {
   const dateBadge = formatCoverDateBadge(event);
+  const showCoverDate = Boolean(dateBadge) && !(hideRelativeCoverDate && isTodayTomorrowCoverBadge(dateBadge));
 
   // Rails / date-only: clean cover - date in top-left, no Hit/FOMO/age pile.
   if (rail || dateOnly) {
@@ -61,7 +71,7 @@ export function EventImageBadges({
 
   const secondary: ReactNode[] = [];
   // Age stays in text meta only - date takes the former age slot on cover.
-  if (dateBadge) {
+  if (showCoverDate && dateBadge) {
     secondary.push(
       <EventCardBadge key="date" className={DATE_BADGE_CLASS}>
         {dateBadge}

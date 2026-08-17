@@ -23,7 +23,7 @@ import {
   COMPACT_MOBILE_SLOT_LIMIT,
   CATALOG_DISPLAY_SLOT_LIMIT,
   formatCoverDateBadge,
-  formatCardScheduleLine,
+  formatEventNextSession,
   formatPriceRub,
   formatShowcasePriceLabel,
   formatShowcaseSessionDate,
@@ -41,7 +41,7 @@ import {
   resolveEventVenueDisplayLabel,
 } from '@/lib/event-location';
 import { dayRouteItemFromEvent } from '@/lib/day-route-from-place';
-import { formatPriceFrom } from '@/lib/format';
+import { formatNumber } from '@/lib/format';
 import { formatAgeLimit } from '@/lib/event-page-utils';
 import { trackProductCardClick } from '@/lib/catalog-analytics';
 import { eventHref } from '@/lib/routes';
@@ -53,7 +53,7 @@ const SLOT_CHIP_PURCHASE_CLASS =
   'transition hover:bg-primary/10 hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40';
 
 const DETAILS_LINK_CLASS =
-  'relative z-[2] inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-full bg-primary-600 px-5 py-2.5 text-base font-bold text-white transition hover:bg-primary-700 sm:min-h-12 sm:px-6 sm:text-lg';
+  'relative z-[2] inline-flex min-h-8 shrink-0 items-center justify-center gap-1 whitespace-nowrap rounded-full bg-primary-600 px-2.5 py-1 text-xs font-bold text-white transition hover:bg-primary-700 sm:min-h-9 sm:px-3 sm:text-sm';
 
 /** Rail / city-hub cards: wider horizontal padding so label is not flush to pill edges. */
 const SHOWCASE_BUY_CTA_CLASS =
@@ -113,10 +113,14 @@ export function EventCard({
       </div>
     </div>
   );
-  const hasPrice = typeof session.priceFrom === 'number' && session.priceFrom >= MIN_DISPLAY_PRICE_RUB;
+  const priceValue =
+    typeof session.priceFrom === 'number' && session.priceFrom >= MIN_DISPLAY_PRICE_RUB
+      ? session.priceFrom
+      : null;
+  const hasPrice = priceValue != null;
   const openDate = isOpenDate(session);
   const departingSoonMinutes = openDate ? null : getDepartingSoonMinutes(session.startsAt);
-  const nextSessionLabel = openDate ? null : formatCardScheduleLine(session);
+  const nextSessionLabel = openDate ? null : formatEventNextSession(session);
   const allSlotLabels = collectAllDisplaySlotLabels(session);
   const showSlotPills = allSlotLabels.length > 0;
   const sessionMetaLabel = openDate ? null : nextSessionLabel;
@@ -132,7 +136,6 @@ export function EventCard({
   const ageLabel = formatAgeLimit(session.ageLimit);
   // Missing display price (<100 / null) is not "soon" - event can still be on sale.
   const showSoonBadge = false;
-  const priceFooterLabel = hasPrice ? formatPriceFrom(session.priceFrom) : null;
   const purchase = useCatalogPurchase(session);
   // Catalog list: no hidden widget DOM. Purchase UX lives on event page / landing CTA.
   const showPurchaseWidgets = landingActions && !suppressPurchaseAnchors && purchase.purchaseEnabled;
@@ -197,7 +200,7 @@ export function EventCard({
           }
         />
 
-        <EventImageBadges event={session} showSoonBadge={showSoonBadge} />
+        <EventImageBadges event={session} showSoonBadge={showSoonBadge} hideRelativeCoverDate />
         <EventFavoriteButton eventId={session.id} className="right-2 top-2 sm:right-3 sm:top-3" />
         {!landingActions && dayRouteVenue ? (
           <AddToDayRouteButton
@@ -317,9 +320,11 @@ export function EventCard({
             />
           ) : (
             <>
-              {priceFooterLabel ? (
-                <span className="relative z-[2] min-w-0 flex-1 whitespace-nowrap text-xl font-extrabold tracking-tight text-primary-700 sm:text-2xl">
-                  {priceFooterLabel}
+              {priceValue != null ? (
+                <span className="relative z-[2] inline-flex min-w-0 flex-1 items-baseline gap-1 whitespace-nowrap font-extrabold tracking-tight text-primary-700">
+                  <span className="text-sm font-semibold sm:text-base">от</span>
+                  <span className="text-xl sm:text-2xl">{formatNumber(priceValue)}</span>
+                  <span className="text-sm font-semibold sm:text-base">₽</span>
                 </span>
               ) : (
                 <span />
@@ -335,7 +340,7 @@ export function EventCard({
                   })
                 }
               >
-                <Ticket className="h-5 w-5 shrink-0" strokeWidth={1.75} />
+                <Ticket className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
                 Купить
               </Link>
             </>
