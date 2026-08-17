@@ -85,6 +85,42 @@ test('on 17 Aug 2026 Voronezh shows Zhatva and Gorod-sad; Platonovfest is past',
   );
 });
 
+test('on 17 Aug 2026 Ufa shows TERRA ZIMA, Ayda igrat and Kupecheskaya; Serdce Evrazii is past', () => {
+  const now = new Date('2026-08-17T12:00:00+05:00');
+  const upcoming = listCityRegionalEvents('ufa', now, 3);
+  const past = listCityRegionalPastEvents('ufa', now, 3);
+  assert.ok(upcoming.some((event) => event.id === 'ufa-terra-zima-2027'));
+  assert.ok(upcoming.some((event) => event.id === 'ufa-ayda-igrat-2027'));
+  assert.ok(upcoming.some((event) => event.id === 'ufa-kupecheskaya-2026'));
+  assert.ok(past.some((event) => event.id === 'ufa-serdce-evrazii-2026'));
+  assert.equal(
+    upcoming.some((event) => event.id === 'ufa-serdce-evrazii-2026'),
+    false,
+  );
+});
+
+test('on 17 Aug 2026 Ryazan shows kalinnik and New Year Meshchera; smotriny and Ranovskie leta are past', () => {
+  const now = new Date('2026-08-17T12:00:00+03:00');
+  const upcoming = listCityRegionalEvents('ryazan', now, 3);
+  const past = listCityRegionalPastEvents('ryazan', now, 3);
+  assert.ok(upcoming.some((event) => event.id === 'ryazan-kalinnik-2026'));
+  assert.ok(upcoming.some((event) => event.id === 'ryazan-novogodnyaya-stolitsa-2026-27'));
+  assert.ok(past.some((event) => event.id === 'ryazan-smotriny-2026'));
+  assert.ok(past.some((event) => event.id === 'ryazan-ranovskie-leta-2026'));
+  assert.equal(
+    upcoming.some((event) => event.id === 'ryazan-smotriny-2026'),
+    false,
+  );
+  assert.ok(
+    [...upcoming, ...past].every(
+      (event) =>
+        !event.datesLabel.includes('\u2014') &&
+        !event.blurb.includes('\u2014') &&
+        !event.title.includes('\u2014'),
+    ),
+  );
+});
+
 test('on 17 Aug 2026 Novosibirsk shows TehnoArt and snow sculpture; Chernika and V Sibiri are past', () => {
   const now = new Date('2026-08-17T12:00:00+07:00');
   const upcoming = listCityRegionalEvents('novosibirsk', now, 3);

@@ -45,6 +45,8 @@ const VORONEZH_HUB_SRC = readFileSync(
   fileURLToPath(new URL('./voronezh-hub.ts', import.meta.url)),
   'utf8',
 );
+const UFA_HUB_SRC = readFileSync(fileURLToPath(new URL('./ufa-hub.ts', import.meta.url)), 'utf8');
+const RYAZAN_HUB_SRC = readFileSync(fileURLToPath(new URL('./ryazan-hub.ts', import.meta.url)), 'utf8');
 
 function cityInfoHasSlug(slug: string): boolean {
   const quoted = new RegExp(`['"]${slug.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}['"]`);
@@ -57,7 +59,9 @@ function cityInfoHasSlug(slug: string): boolean {
     quoted.test(KRASNODAR_HUB_SRC) ||
     quoted.test(KRASNOYARSK_HUB_SRC) ||
     quoted.test(NOVOSIBIRSK_HUB_SRC) ||
-    quoted.test(VORONEZH_HUB_SRC)
+    quoted.test(VORONEZH_HUB_SRC) ||
+    quoted.test(UFA_HUB_SRC) ||
+    quoted.test(RYAZAN_HUB_SRC)
   );
 }
 
@@ -77,7 +81,8 @@ test('weather widget covers Perm, Moscow, SPB, Kaliningrad, NN, EKB, Kazan, Sama
   assert.equal(cityHasWeatherWidget('krasnoyarsk'), true);
   assert.equal(cityHasWeatherWidget('novosibirsk'), true);
   assert.equal(cityHasWeatherWidget('voronezh'), true);
-  assert.equal(cityHasWeatherWidget('ufa'), false);
+  assert.equal(cityHasWeatherWidget('ryazan'), true);
+  assert.equal(cityHasWeatherWidget('ufa'), true);
   const weather = resolveCityLocalFlavor('perm')?.weather;
   assert.ok(weather);
   assert.equal(weather.latitude, 58.01);
@@ -182,6 +187,18 @@ test('Moscow SPB NN Kaliningrad identity packs have 4 slides', () => {
       ids: ['petrovsky-fleet', 'literary-city', 'chernozem-meat', 'merchant-spire'],
       badges: ['Символ', 'Искусство', 'Гастро', 'Архитектура'],
     },
+    {
+      slug: 'ryazan',
+      heading: 'Чем уникальна Рязань',
+      ids: ['ryazan-kremlin', 'yesenin-meshchera', 'karavaets-kalinnik', 'saltykov-wood'],
+      badges: ['Символ', 'Искусство', 'Гастро', 'Архитектура'],
+    },
+    {
+      slug: 'ufa',
+      heading: 'Чем уникальна Уфа',
+      ids: ['salavat-yulaev', 'ufa-rock', 'bashkir-honey', 'lyalya-tyulpan'],
+      badges: ['Символ', 'Искусство', 'Гастро', 'Архитектура'],
+    },
   ];
 
   for (const pack of packs) {
@@ -226,6 +243,8 @@ test('weather CTA slugs exist in cityInfo', () => {
     'krasnoyarsk',
     'novosibirsk',
     'voronezh',
+    'ryazan',
+    'ufa',
   ]) {
     const weather = resolveCityLocalFlavor(slug)?.weather;
     assert.ok(weather, slug);
@@ -274,6 +293,8 @@ test('when-to-go covers Perm, Moscow, SPB, Kaliningrad, NN, EKB, Kazan, Samara, 
   assert.equal(cityHasWhenToGo('krasnoyarsk'), true);
   assert.equal(cityHasWhenToGo('novosibirsk'), true);
   assert.equal(cityHasWhenToGo('voronezh'), true);
+  assert.equal(cityHasWhenToGo('ryazan'), true);
+  assert.equal(cityHasWhenToGo('ufa'), true);
   for (const slug of [
     'perm',
     'moscow',
@@ -287,6 +308,8 @@ test('when-to-go covers Perm, Moscow, SPB, Kaliningrad, NN, EKB, Kazan, Samara, 
     'krasnoyarsk',
     'novosibirsk',
     'voronezh',
+    'ryazan',
+    'ufa',
   ]) {
     const flavor = resolveCityLocalFlavor(slug)?.whenToGo;
     assert.ok(flavor, slug);
@@ -379,6 +402,13 @@ test('editorial hub mustSee, suburb roots and nested places have non-empty desc'
     assert.ok((info.mustSee || []).length > 0, `${city}: mustSee empty`);
     if (city === 'voronezh') {
       assert.ok((info.mustSee || []).length >= 50, 'voronezh mustSee floor ~50');
+    }
+    if (city === 'ryazan') {
+      assert.ok((info.mustSee || []).length >= 70, 'ryazan mustSee floor 50+15+7');
+    }
+    if (city === 'ufa') {
+      assert.ok((info.mustSee || []).length >= 50, 'ufa mustSee floor ~50');
+      assert.ok((info.mustSee || []).length <= 58, 'ufa mustSee cap ~55');
     }
     for (const place of info.mustSee || []) {
       assert.equal(emptyHubDesc(place.desc), false, `${city} mustSee: ${place.name}`);

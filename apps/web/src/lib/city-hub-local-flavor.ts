@@ -4,7 +4,7 @@
  * agents can edit geo without merge fights.
  *
  * Tourist hubs with weather+seasons+identity: Perm, Moscow, SPB, Kaliningrad, NN,
- * Ekaterinburg, Kazan, Samara, Krasnodar, Krasnoyarsk, Novosibirsk, Voronezh.
+ * Ekaterinburg, Kazan, Samara, Krasnodar, Krasnoyarsk, Novosibirsk, Voronezh, Ufa.
  */
 
 import { normalizeCityHubSlug } from './city-hub-config.ts';
@@ -1541,6 +1541,121 @@ const VORONEZH_WHEN_TO_GO: CityWhenToGoFlavor = {
   }),
 };
 
+const UFA_WEATHER: CityWeatherFlavor = {
+  latitude: 54.726,
+  longitude: 55.948,
+  timezone: 'Asia/Yekaterinburg',
+  outdoorSlugs: [
+    'ufa-pamyatnik-salavatu-yulaevu',
+    'ufa-monument-druzhby',
+    'ufa-art-kvadrat',
+    'ufa-novaya-ufimskaya-naberezhnaya',
+    'ufa-smotrovaya-u-pamyatnika-salavatu',
+  ],
+  indoorSlugs: [
+    'ufa-hudozhestvennyy-muzey-nesterova',
+    'ufa-natsionalnyy-muzey',
+    'ufa-bashkirskiy-teatr-opery-i-baleta',
+    'ufa-aibat-hallyar',
+    'ufa-kumpan-cafe',
+  ],
+  outdoorCta: 'Отличная погода для Салавата Юлаева, Арт-квадрата и набережной Белой',
+  indoorCtaOvercast: 'Сегодня пасмурно. Загляните в музей Нестерова, Национальный музей или «Kumpan Cafe»',
+  indoorCtaRain: 'Сегодня дождь. Музей Нестерова, опера или кыстыбыи в Aibat Hallyar',
+  indoorCtaSnow: 'Сегодня снег. Музеи центра и кофейни с башкирским медом после прогулки к Салавату',
+};
+
+const UFA_WHEN_TO_GO: CityWhenToGoFlavor = {
+  timeZone: 'Asia/Yekaterinburg',
+  seasons: [
+    {
+      id: 'winter',
+      months: [12, 1, 2],
+      headline: 'Зима',
+      body: 'Пушистый снег и около -12...-15 °C. Катание на сноуборде и лыжах в «Олимпик Парке» в черте города, ледовые городки у площади Салавата Юлаева. Крутые холмы и гололед, согреться помогают кофейни с башкирским медом.',
+    },
+    {
+      id: 'spring',
+      months: [3, 4, 5],
+      headline: 'Весна',
+      body: 'В апреле Уфа резко сбрасывает снег, к маю воздух прогревается до +18 °C и пахнет черемухой. Лучшее время для утесов и памятников без жары. В мае запускают речные прогулки по Белой и Уфе.',
+    },
+    {
+      id: 'summer',
+      months: [6, 7, 8],
+      headline: 'Лето',
+      body: 'Жарко и солнечно, часто за +30 °C. Город укрывается в тени парков и веранд на Чернышевского. Плюс сезона - озера, шиханы и оборудованные пляжи Белой.',
+    },
+    {
+      id: 'autumn',
+      months: [9, 10, 11],
+      headline: 'Осень',
+      body: 'Сентябрь: бабье лето +15...+20 °C. В октябре Уфа золотеет и багровеет. Меньше очередей на смотровых, перелеты и отели дешевле. Хороший сезон для музеев и гастро.',
+    },
+  ],
+  tabs: seasonTabs({
+    spring:
+      'В апреле Уфа резко сбрасывает снежные оковы, а к маю воздух прогревается до +18 °C и наполняется ароматом цветущей черемухи. Это лучшее время для осмотра уфимских крутых утесов и памятников без изнуряющей жары. В мае официально запускают речные прогулки по рекам Белая (Агидель) и Уфа (Караидель).',
+    summer:
+      'Лето здесь по-южному жаркое и солнечное, часто за +30 °C. Весь город укрывается в тени вековых парков и уличных веранд на улице Чернышевского. Главный плюс сезона - возможность с комфортом доехать до культовых башкирских озер, шиханов и скал, а также искупаться на оборудованных пляжах реки Белой.',
+    autumn:
+      'Сентябрь балует комфортным бабьим летом (+15...+20 °C), а в октябре Уфа окрашивается в золотые и багряные тона. Логистически это идеальное время: спадают летние очереди на смотровых площадках, а цены на перелеты и отели опускаются до минимума. Отличный сезон для музеев и гастро-туров.',
+    winter:
+      'Уфа превращается в суровую сказку с пушистым снегом и средней температурой -12...-15 °C. Главная фишка - катание на сноубордах и лыжах в черте города («Олимпик Парк») и масштабные ледовые городки у площади Салавата Юлаева. Логистика усложняется из-за крутых холмов и гололеда, но городские кофейни с башкирским медом компенсируют зимний холод.',
+  }),
+};
+
+const UFA_SLIDES: CityIdentitySlide[] = [
+  {
+    id: 'salavat-yulaev',
+    title: 'Салават Юлаев',
+    text: 'Крупнейшая конная статуя в России и Европе весом 40 тонн возвышается над Белой на крутом утесе. Место встреч и силы для каждого уфимца.',
+    imageSrc: '/images/venues/ufa/pamyatnik-salavatu-yulaevu.jpg',
+    imageAlt: 'Памятник Салавату Юлаеву над рекой Белой',
+    slugs: [
+      'ufa-pamyatnik-salavatu-yulaevu',
+      'ufa-smotrovaya-u-pamyatnika-salavatu',
+      'ufa-kongress-holl-toratau',
+    ],
+    target: 'places',
+    badge: 'Символ',
+  },
+  {
+    id: 'ufa-rock',
+    title: 'Уфимский рок и андеграунд',
+    text: 'Родина Земфиры, Юрия Шевчука и Lumen. Концерты, уличные музыканты и независимые арт-пространства сильнее, чем в других регионах Поволжья.',
+    imageSrc: '/images/venues/ufa/art-kvadrat.jpg',
+    imageAlt: 'Арт-квадрат и уфимский рок',
+    slugs: ['ufa-art-kvadrat', 'ufa-muzey-roka-kinoteatr-rodina', 'ufa-musichall27'],
+    target: 'places',
+    badge: 'Искусство',
+  },
+  {
+    id: 'bashkir-honey',
+    title: 'Башкирский мед и конина',
+    text: 'Бортевой мед, казылык, корот и корот-чай. Здесь кормят сытно и щедро продуктами уральских предгорий.',
+    imageSrc: '/images/venues/ufa/gostinyy-dvor.jpg',
+    imageAlt: 'Гостиный двор и башкирская гастрономия Уфы',
+    slugs: ['ufa-aibat-hallyar', 'ufa-kumpan-cafe', 'ufa-gostinyy-dvor'],
+    target: 'places',
+    badge: 'Гастро',
+  },
+  {
+    id: 'lyalya-tyulpan',
+    title: 'Мечеть-медресе «Ляля-Тюльпан»',
+    text: 'Минареты в виде бутонов тюльпанов. Уфа как мост между Азией и Европой, где восточные традиции соседствуют с городским ритмом.',
+    imageSrc: '/images/venues/ufa/mechet-medrese-lyalya-tyul-pan.jpg',
+    imageAlt: 'Мечеть-медресе «Ляля-Тюльпан»',
+    slugs: [
+      'ufa-mechet-medrese-lyalya-tyul-pan',
+      'ufa-pervaya-sobornaya-mechet',
+      'ufa-fontan-sem-devushek',
+    ],
+    target: 'places',
+    badge: 'Архитектура',
+  },
+];
+
 const VORONEZH_SLIDES: CityIdentitySlide[] = [
   {
     id: 'petrovsky-fleet',
@@ -1596,6 +1711,117 @@ const VORONEZH_SLIDES: CityIdentitySlide[] = [
       'voronezh-ramon',
     ],
     target: 'mixed',
+    badge: 'Архитектура',
+  },
+];
+
+const RYAZAN_WEATHER: CityWeatherFlavor = {
+  latitude: 54.629,
+  longitude: 39.742,
+  timezone: 'Europe/Moscow',
+  outdoorSlugs: [
+    'ryazan-ulitsa-pochtovaya',
+    'ryazan-lybedskiy-bulvar',
+    'ryazan-smotrovaya-kremlevskiy-val',
+    'ryazan-nizhniy-gorodskoy-sad',
+    'ryazan-torgovyy-gorodok',
+  ],
+  indoorSlugs: [
+    'ryazan-hudozhestvennyy-muzey-pozhalostina',
+    'ryazan-muzey-istorii-ryazanskogo-ledentsa',
+    'ryazan-muzey-usad-ba-akademika-i-p-pavlova',
+    'ryazan-restoran-grafin',
+    'ryazan-kofeynya-kofe-kult',
+  ],
+  outdoorCta: 'Отличная погода для Кремлевского вала, Почтовой и Лыбедского бульвара',
+  indoorCtaOvercast: 'Сегодня пасмурно. Загляните в музей Пожалостина, леденец или «Кофе Культ»',
+  indoorCtaRain: 'Сегодня дождь. Музей Пожалостина, усадьба Павлова или калинник в «Графине»',
+  indoorCtaSnow: 'Сегодня снег. Музеи центра и русская печь после прогулки по Кремлю',
+};
+
+const RYAZAN_WHEN_TO_GO: CityWhenToGoFlavor = {
+  timeZone: 'Europe/Moscow',
+  seasons: [
+    {
+      id: 'winter',
+      months: [12, 1, 2],
+      headline: 'Зима',
+      body: 'Глубокий снег при комфортных -6...-10 °C. Главная фишка - комплекс «В некотором царстве» и лыжи в Солотче. Согреться помогают блюда из русской печи и локальные настойки.',
+    },
+    {
+      id: 'spring',
+      months: [3, 4, 5],
+      headline: 'Весна',
+      body: 'В апреле город сбрасывает снег, в мае цветет сирень при +15...+18 °C. Лучшее время для Константиново: Ока разливается. Навигация от Кремлевской пристани открывается в середине мая.',
+    },
+    {
+      id: 'summer',
+      months: [6, 7, 8],
+      headline: 'Лето',
+      body: 'Тепло и солнечно, около +25 °C. Весь город на верандах Почтовой и пляжах Оки и озер Солотчи. Долгие прогулки, палатки в Мещере и уличные фестивали.',
+    },
+    {
+      id: 'autumn',
+      months: [9, 10, 11],
+      headline: 'Осень',
+      body: 'Сентябрь - бабье лето около +15 °C, в октябре золотеют сосны Солотчи. Меньше транзита из Москвы, билеты на экспрессы свободны, отели дешевле. Удобный сезон для музеев.',
+    },
+  ],
+  tabs: seasonTabs({
+    spring:
+      'В апреле Рязань стремительно сбрасывает снег, а в мае зацветает сирень при +15...+18 °C. Это лучшее время для поездки в Константиново на родину Есенина, когда Ока разливается, создавая бескрайнее водное море. Навигация на реке открывается в середине мая, запуская сезон речных круизов от Кремлевской пристани.',
+    summer:
+      'Лето здесь теплое и солнечное, средняя температура держится около +25 °C. Весь город перемещается на летние веранды пешеходной Почтовой улицы и пляжи Оки и озер Солотчи. Главный плюс сезона - идеальные условия для долгих пеших прогулок, загородных палаточных лагерей в Мещере и посещения уличных фестивалей.',
+    autumn:
+      'Сентябрь радует мягким бабьим летом (+15 °C), а в октябре сосновые леса Солотчи и парки города окрашиваются в золото. Логистически это золотой сезон: спадает волна транзитных туристов из Москвы, билеты на экспрессы свободны, а цены на гостиницы заметно снижаются. Отличное время для музейных туров.',
+    winter:
+      'Рязань засыпает глубоким снегом при комфортных -6...-10 °C. Главная фишка - посещение сказочного загородного комплекса «В некотором царстве» и катание на лыжах в курортном поселке Солотча. Логистика в историческом центре хорошая, а согреться помогают местные рестораны, предлагающие блюда из русской печи и локальные настойки.',
+  }),
+};
+
+const RYAZAN_SLIDES: CityIdentitySlide[] = [
+  {
+    id: 'ryazan-kremlin',
+    title: 'Рязанский Кремль',
+    text: 'Древнерусский форпост на холме между Трубежем и Лыбедью. Кремль сохранил подлинные гражданские и церковные постройки XVII века, которые определяют силуэт города.',
+    imageSrc: '/images/venues/ryazan/identity-symbol.jpg',
+    imageAlt: 'Успенский собор Рязанского Кремля на высоком холме',
+    slugs: [
+      'ryazan-uspenskiy-sobor',
+      'ryazan-dvorets-olega',
+      'ryazan-smotrovaya-kremlevskiy-val',
+    ],
+    target: 'places',
+    badge: 'Символ',
+  },
+  {
+    id: 'yesenin-meshchera',
+    title: 'Поэзия Есенина и Мещера',
+    text: 'Рязанская земля связана с Есениным, Окой и березовыми рощами Мещеры. Эта лирика чувствуется в Константиново, на пристани и в камерных театрах.',
+    imageSrc: '/images/venues/ryazan/identity-art.jpg',
+    imageAlt: 'Берег Оки и есенинский пейзаж у Константиново',
+    slugs: ['ryazan-konstantinovo', 'ryazan-pamyatnik-eseninu', 'ryazan-solotcha'],
+    target: 'mixed',
+    badge: 'Искусство',
+  },
+  {
+    id: 'karavaets-kalinnik',
+    title: 'Караваец и калинник',
+    text: 'Главные вкусы региона - тонкие блины каравайцы и пирог калинник из черемуховой муки с калиной. Современные шефы собирают из грибов, ягод и дичи Мещеры высокую кухню.',
+    imageSrc: '/images/venues/ryazan/identity-gastro.jpg',
+    imageAlt: 'Рязанские каравайцы и пирог калинник на столе',
+    slugs: ['ryazan-restoran-grafin', 'ryazan-kafe-briosh', 'ryazan-kofeynya-kofe-kult'],
+    target: 'places',
+    badge: 'Гастро',
+  },
+  {
+    id: 'saltykov-wood',
+    title: 'Деревянное кружево Салтыкова-Щедрина',
+    text: 'Квартал купеческих и мещанских домов конца XIX - начала XX века с резными наличниками. Рязань сквозь пожары сберегла дух старой купеческой улицы, соразмерной человеку.',
+    imageSrc: '/images/venues/ryazan/identity-architecture.jpg',
+    imageAlt: 'Деревянные дома с резными наличниками на улице Салтыкова-Щедрина',
+    slugs: ['ryazan-dom-morozova', 'ryazan-dom-sester-hvoshchinskih', 'ryazan-dom-heraskovyh'],
+    target: 'places',
     badge: 'Архитектура',
   },
 ];
@@ -1696,6 +1922,22 @@ export const CITY_HUB_LOCAL_FLAVOR: Record<string, CityHubLocalFlavor> = {
     slides: VORONEZH_SLIDES,
     weather: VORONEZH_WEATHER,
     whenToGo: VORONEZH_WHEN_TO_GO,
+  },
+  ryazan: {
+    identityHeading: 'Чем уникальна Рязань',
+    identityLead: IDENTITY_LEAD,
+    tags: tagsFromSlides(RYAZAN_SLIDES),
+    slides: RYAZAN_SLIDES,
+    weather: RYAZAN_WEATHER,
+    whenToGo: RYAZAN_WHEN_TO_GO,
+  },
+  ufa: {
+    identityHeading: 'Чем уникальна Уфа',
+    identityLead: IDENTITY_LEAD,
+    tags: tagsFromSlides(UFA_SLIDES),
+    slides: UFA_SLIDES,
+    weather: UFA_WEATHER,
+    whenToGo: UFA_WHEN_TO_GO,
   },
 };
 

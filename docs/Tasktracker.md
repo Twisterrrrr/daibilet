@@ -1,3 +1,15 @@
+## 2026-08-17 - Поиск /cities: свёрнутые города
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| GEO.CITIES-CATALOG-SEARCH | Поиск на `/cities`: cityToRegion (Выборг, Раменское) и palace suburbs (Петергоф); без фейковой карточки при events≤5; тот же `matchSearchGeoHits` | Высокий | 🔄 code; commit+push+Deploy MSK web |
+
+## 2026-08-17 - Туристический хаб Уфы
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| CONT.UFA-HUB | Уфа: identity / whenToGo / ~55 mustSee / Шульган-Таш + Торатау / 2 дня + green/red / FAQ / lifehacks / фестивали | Высокий | 🔄 code; commit+push+Deploy MSK web |
+
 ## 2026-08-17 - Первый заход: уточнить город, пин в шапке
 
 | ID | Задача | Приоритет | Статус |
@@ -29,7 +41,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| GEO.VYBORG-OBLAST-CHILD | Канон событий/search/H1: `/cities/leningradskaya-oblast?city=vyborg` (формула A); карточка СПб suburbs остаётся tourist; не standalone | Высокий | 🔄 search-geo satellite; hydration `?city=` later |
+| GEO.VYBORG-OBLAST-CHILD | Канон событий/search/H1: `/cities/leningradskaya-oblast?city=vyborg` (формула A); карточка СПб suburbs остаётся tourist; не standalone | Высокий | 🔄 search-geo + `/cities` catalog search; hydration `?city=` later |
 
 ## 2026-08-16 - Новосибирск tourist hub
 

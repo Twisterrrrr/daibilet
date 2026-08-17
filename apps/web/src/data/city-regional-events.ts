@@ -741,4 +741,106 @@ export const CITY_REGIONAL_EVENTS: Record<string, CityRegionalEvent[]> = {
       sourceLabel: 'novo-sibirsk.ru',
     },
   ],
+
+  ufa: [
+    {
+      id: 'ufa-terra-zima-2027',
+      title: 'Зимний фестиваль «TERRA ZIMA»',
+      startDate: '2027-01-01',
+      endDate: '2027-01-03',
+      datesLabel: '1-3 января 2027',
+      place: 'Площадка перед Гостиным двором и набережная реки Белой',
+      blurb:
+        'Главный новогодний бренд республики: Парад Снегурочек, карнавальное шествие, Парад конно-санных экипажей и уральские гастро-баттлы.',
+      sourceUrl: 'https://tourism.bashkortostan.ru/',
+      sourceLabel: 'tourism.bashkortostan.ru',
+    },
+    {
+      id: 'ufa-ayda-igrat-2027',
+      title: 'Всероссийский фестиваль игр «Айда играть»',
+      startDate: '2027-05-22',
+      endDate: '2027-05-30',
+      datesLabel: 'Конец мая 2027',
+      place: 'Советская площадь',
+      blurb:
+        'Семейный фестиваль: игровые зоны, парады аниматоров, выставки игрушек, мастер-классы по башкирским народным играм и концерты детских коллективов.',
+      sourceUrl: 'https://www.bashkortostan.ru/',
+      sourceLabel: 'bashkortostan.ru',
+    },
+    {
+      id: 'ufa-kupecheskaya-2026',
+      title: 'Гастрономический фестиваль «Уфа-Купеческая»',
+      startDate: '2026-10-01',
+      endDate: '2026-10-31',
+      datesLabel: 'Октябрь 2026',
+      place: 'Пешеходные зоны Арт-квадрата и улицы Ленина',
+      blurb:
+        'Праздник локальной еды и купеческих традиций: старинные уфимские пироги, башкирский чай из гигантских самоваров и деликатесы из конины и дичи.',
+      sourceUrl: 'https://ufacity.info/',
+      sourceLabel: 'ufacity.info',
+    },
+    {
+      id: 'ufa-serdce-evrazii-2026',
+      title: 'Международный фестиваль искусств «Сердце Евразии»',
+      startDate: '2026-06-26',
+      endDate: '2026-06-28',
+      datesLabel: '26-28 июня 2026',
+      place: 'Амфитеатр за Конгресс-холлом «Торатау»',
+      blurb:
+        'Open-air бренд Уфы до 100 000 зрителей ежедневно: Симфоническая ночь, Этно-ночь и массовое исполнение национального танца.',
+      sourceUrl: 'https://culture.bashkortostan.ru/',
+      sourceLabel: 'culture.bashkortostan.ru',
+    },
+  ],
+
+  ryazan: [
+    {
+      id: 'ryazan-kalinnik-2026',
+      title: 'Гастрономический фестиваль «Рязанское гостеприимство» / Фестиваль калинника',
+      startDate: '2026-09-01',
+      endDate: '2026-09-30',
+      datesLabel: 'Сентябрь 2026',
+      place: 'Почтовая улица и Лыбедский бульвар',
+      blurb:
+        'Главный кулинарный бренд города: рестораны показывают свои калинники, пекут каравайцы на огне и проводят кулинарные баттлы.',
+      sourceUrl: 'https://kultura.ryazangov.ru/',
+      sourceLabel: 'kultura.ryazangov.ru',
+    },
+    {
+      id: 'ryazan-novogodnyaya-stolitsa-2026-27',
+      title: '«Рязань - Новогодняя столица Мещеры»',
+      startDate: '2026-12-25',
+      endDate: '2027-01-08',
+      datesLabel: '25 декабря 2026 - 8 января 2027',
+      place: 'Площадь Ленина, Лыбедский бульвар, Торговый городок',
+      blurb:
+        'Зимний фестиваль мещерских сказок: Парад Дедов Морозов, световые шоу на стенах Торгового городка, ярмарки, бесплатные экскурсии по Кремлю и сбитень на морозе.',
+      sourceUrl: 'https://admrzn.ru/',
+      sourceLabel: 'admrzn.ru',
+    },
+    {
+      id: 'ryazan-smotriny-2026',
+      title: 'Международный фестиваль театров кукол «Рязанские смотрины»',
+      startDate: '2026-06-01',
+      endDate: '2026-06-30',
+      datesLabel: 'Июнь 2026 (спецпрограммы; основной сезон - сентябрь 2025)',
+      place: 'Рязанский театр кукол',
+      blurb:
+        'Старейший кукольный фестиваль на постсоветском пространстве: детские сказки и авангардные постановки для взрослых, в том числе под открытым небом.',
+      sourceUrl: 'https://www.ryazanteatrkukol.ru/',
+      sourceLabel: 'ryazanteatrkukol.ru',
+    },
+    {
+      id: 'ryazan-ranovskie-leta-2026',
+      title: 'Фестиваль этнокультуры и ремесел «Рановские лета»',
+      startDate: '2026-07-25',
+      endDate: '2026-07-27',
+      datesLabel: 'Конец июля 2026',
+      place: 'Берег реки Ранова (Ряжский район Рязанской области)',
+      blurb:
+        'Фольклорный open-air: купеческие и крестьянские подворья, старинные песни, лоза, ковка и конкурс традиционной каши.',
+      sourceUrl: 'https://kultura.ryazangov.ru/',
+      sourceLabel: 'kultura.ryazangov.ru',
+    },
+  ],
 };

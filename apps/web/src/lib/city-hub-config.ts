@@ -94,6 +94,28 @@ export const CITY_HUB_CONFIG: Record<string, CityHubConfig> = {
     ],
     venuesTopN: 8,
   },
+  ryazan: {
+    highlightSeason: { label: 'Калинник', monthsHint: 'сентябрь' },
+    primaryCta: { label: 'События в Рязани', target: '#affiche' },
+    featuredDirections: [
+      { id: 'kremlin', label: 'Кремль и центр', categoryKey: 'Экскурсии', emphasis: 'primary' },
+      { id: 'walking', label: 'Пешие прогулки', landingSlug: 'walking-tours' },
+      { id: 'theatre', label: 'Театр', categoryKey: 'Театр' },
+      { id: 'family', label: 'Семейные', landingSlug: 'family-kids' },
+    ],
+    venuesTopN: 8,
+  },
+  ufa: {
+    highlightSeason: { label: 'Золотая осень', monthsHint: 'сентябрь-октябрь' },
+    primaryCta: { label: 'События в Уфе', target: '#affiche' },
+    featuredDirections: [
+      { id: 'center', label: 'Салават и центр', categoryKey: 'Экскурсии', emphasis: 'primary' },
+      { id: 'walking', label: 'Пешие прогулки', landingSlug: 'walking-tours' },
+      { id: 'theatre', label: 'Театр', categoryKey: 'Театр' },
+      { id: 'family', label: 'Семейные', landingSlug: 'family-kids' },
+    ],
+    venuesTopN: 8,
+  },
   // Landlocked: no river-cruises / river-party in curated chips (count>0 still gates fallbacks).
   ekaterinburg: {
     highlightSeason: { label: 'Уральское лето', monthsHint: 'июнь-август' },
@@ -144,6 +166,8 @@ const BLOG_AFTER_SUBURBS_SLUGS = new Set([
   'krasnodar',
   'krasnoyarsk',
   'voronezh',
+  'ryazan',
+  'ufa',
 ]);
 
 export function isCityHubBlogAfterSuburbs(slug: string | null | undefined): boolean {

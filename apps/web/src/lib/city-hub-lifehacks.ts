@@ -2,7 +2,7 @@
  * City hub «лайфхаки»: короткие карточки с CTA.
  * Держим отдельно от cityInfo (coords/mustSee) и local-flavor (погода/уникальность).
  * Пакеты: Пермь, Москва, СПб, Калининград, Нижний Новгород, Екатеринбург, Казань, Самара,
- * Краснодар, Красноярск, Новосибирск, Воронеж.
+ * Краснодар, Красноярск, Новосибирск, Воронеж, Рязань, Уфа.
  */
 
 import { normalizeCityHubSlug } from './city-hub-config.ts';
@@ -1184,6 +1184,180 @@ const VORONEZH_ITEMS: CityLifehackItem[] = [
   },
 ];
 
+const RYAZAN_ITEMS: CityLifehackItem[] = [
+  {
+    id: 'ryazan-umka-card',
+    tabId: 'transit',
+    icon: 'transit',
+    title: 'Безнал дешевле наличных',
+    body: body(
+      'Платите в автобусах и троллейбусах любой бесконтактной картой. При безнале проезд автоматически дешевле наличных на ',
+      { s: '2-3 ₽' },
+      '. Карта «Умка» не обязательна.',
+    ),
+    cta: {
+      kind: 'gis',
+      label: 'Маршруты транспорта',
+      href: twoGisCitySearchUrl('ryazan', 'транспорт Рязань'),
+    },
+  },
+  {
+    id: 'ryazan-kremlin-ticket',
+    tabId: 'walk',
+    icon: 'museum',
+    title: 'Единый билет в Кремль',
+    body: body(
+      'Не берите билеты в каждый корпус отдельно. В кассе Дворца Олега просите ',
+      { s: 'Единый билет' },
+      ' на все постоянные экспозиции музея-заповедника - это сбережет до ',
+      { s: '40%' },
+      '.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Кремль и палаты',
+      slugs: ['ryazan-dvorets-olega', 'ryazan-uspenskiy-sobor', 'ryazan-pevcheskiy-korpus'],
+      scrollTo: 'places',
+    },
+  },
+  {
+    id: 'ryazan-torgovyy-gorodok-view',
+    tabId: 'walk',
+    icon: 'walk',
+    title: 'Секретный вид из Торгового городка',
+    body: body(
+      'На территории обновленного Торгового городка («Рязанской ВДНХ») можно ',
+      { s: 'бесплатно' },
+      ' гулять среди павильонов сталинского ампира и снимать панораму Лесопарка.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Торговый городок',
+      slugs: ['ryazan-torgovyy-gorodok', 'ryazan-lesopark'],
+      scrollTo: 'places',
+    },
+  },
+  {
+    id: 'ryazan-karavaets',
+    tabId: 'food',
+    icon: 'food',
+    title: 'Каравайцы на Почтовой',
+    body: body(
+      'Ищите на пешеходной Почтовой локальные пекарни и кофейни. Свежий рязанский караваец с сытной начинкой стоит сущие копейки и заменяет обед.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Где поесть каравайцы',
+      slugs: ['ryazan-kafe-briosh', 'ryazan-kofeynya-kofe-kult', 'ryazan-ulitsa-pochtovaya'],
+      scrollTo: 'places',
+    },
+  },
+  {
+    id: 'ryazan-lybedskiy-free',
+    tabId: 'walk',
+    icon: 'walk',
+    title: 'Бесплатный Лыбедский бульвар',
+    body: body(
+      'Огромная ландшафтная зона с сухими фонтанами, арт-объектами и скамейками открыта ',
+      { s: 'бесплатно 24/7' },
+      '. Парки аттракционов для этой прогулки не нужны.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Маршрут бульвара',
+      slugs: ['ryazan-lybedskiy-bulvar', 'ryazan-grib-rybak', 'ryazan-grib-sportsmen'],
+      scrollTo: 'places',
+    },
+  },
+];
+
+const UFA_ITEMS: CityLifehackItem[] = [
+  {
+    id: 'ufa-alga-card',
+    tabId: 'transit',
+    icon: 'transit',
+    title: 'Транспортная карта «Алга»',
+    body: body(
+      'Купите в киоске или на вокзале карту «Алга». Проезд в автобусах, троллейбусах и трамваях сразу дешевле на ',
+      { s: '5-7 ₽' },
+      '. Фишка тарифа «Счастливый час»: бесплатная пересадка между городскими маршрутами в течение ',
+      { s: '60 минут' },
+      '.',
+    ),
+    cta: {
+      kind: 'gis',
+      label: 'Транспорт на карте',
+      href: twoGisCitySearchUrl('ufa', 'транспорт Уфа'),
+    },
+  },
+  {
+    id: 'ufa-nesterov-saturday',
+    tabId: 'walk',
+    icon: 'museum',
+    title: 'Бесплатный день в музее Нестерова',
+    body: body(
+      'Шедевры Бурлюка, Шишкина, Коровина и самого Нестерова можно увидеть бесплатно. Каждую ',
+      { s: 'последнюю субботу' },
+      ' месяца Художественный музей им. Нестерова открывает двери для лиц до 18 лет и многодетных семей.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Музей Нестерова',
+      slugs: ['ufa-hudozhestvennyy-muzey-nesterova'],
+      scrollTo: 'places',
+    },
+  },
+  {
+    id: 'ufa-vatan-view',
+    tabId: 'walk',
+    icon: 'walk',
+    title: 'Панорама у Конгресс-холла вместо ресторанов',
+    body: body(
+      'Лучший вид на Белую и Забелье открывается бесплатно со склонов парка «Ватан» у памятника Салавату Юлаеву и смотровых за Конгресс-холлом. Вид отсюда круче, чем из любого уфимского панорамного пентхауса.',
+    ),
+    cta: {
+      kind: 'maps',
+      label: 'Точки на карте',
+      href: yandexMapsSearchUrl('Памятник Салавату Юлаеву Уфа'),
+      extra: [
+        { label: 'Конгресс-холл Торатау', href: yandexMapsSearchUrl('Конгресс-холл Торатау Уфа') },
+      ],
+    },
+  },
+  {
+    id: 'ufa-aibat-hallyar',
+    tabId: 'food',
+    icon: 'food',
+    title: 'Национальный стритфуд в Aibat Hallyar',
+    body: body(
+      'Не тратьте деньги на стандартный фастфуд. Заходите в «Aibat Hallyar» за башкирскими кыстыбыями. Огромная лепешка с картофельным пюре, кониной или грибами стоит копейки, но насыщает на полдня.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Где поесть в Уфе',
+      slugs: ['ufa-aibat-hallyar', 'ufa-kumpan-cafe'],
+      scrollTo: 'places',
+    },
+  },
+  {
+    id: 'ufa-art-kvadrat-free',
+    tabId: 'walk',
+    icon: 'walk',
+    title: 'Бесплатные лекции и кино в Арт-квадрате',
+    body: body(
+      'Не покупайте билеты на дорогие шоу. Во внутреннем дворе «Арт-квадрата» на открытой синей сцене летом почти каждый день ',
+      { s: 'бесплатно' },
+      ' крутят кино, устраивают поэтические слэмы, уличный театр и лекции урбанистов.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Арт-квадрат',
+      slugs: ['ufa-art-kvadrat'],
+      scrollTo: 'places',
+    },
+  },
+];
+
 const CITY_HUB_LIFEHACKS: Record<string, CityLifehackPack> = {
   perm: lifehackPack(PERM_ITEMS),
   moscow: lifehackPack(MOSCOW_ITEMS),
@@ -1197,6 +1371,8 @@ const CITY_HUB_LIFEHACKS: Record<string, CityLifehackPack> = {
   krasnoyarsk: lifehackPack(KRASNOYARSK_ITEMS),
   novosibirsk: lifehackPack(NOVOSIBIRSK_ITEMS),
   voronezh: lifehackPack(VORONEZH_ITEMS),
+  ryazan: lifehackPack(RYAZAN_ITEMS),
+  ufa: lifehackPack(UFA_ITEMS),
 };
 
 export function resolveCityLifehacks(slug: string | null | undefined): CityLifehackPack | null {

@@ -32,6 +32,8 @@ const VORONEZH_HUB_SRC = readFileSync(
   fileURLToPath(new URL('./voronezh-hub.ts', import.meta.url)),
   'utf8',
 );
+const UFA_HUB_SRC = readFileSync(fileURLToPath(new URL('./ufa-hub.ts', import.meta.url)), 'utf8');
+const RYAZAN_HUB_SRC = readFileSync(fileURLToPath(new URL('./ryazan-hub.ts', import.meta.url)), 'utf8');
 
 function cityInfoHasSlug(slug: string): boolean {
   const quoted = new RegExp(`['"]${slug.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}['"]`);
@@ -43,7 +45,9 @@ function cityInfoHasSlug(slug: string): boolean {
     quoted.test(KRASNODAR_HUB_SRC) ||
     quoted.test(KRASNOYARSK_HUB_SRC) ||
     quoted.test(NOVOSIBIRSK_HUB_SRC) ||
-    quoted.test(VORONEZH_HUB_SRC)
+    quoted.test(VORONEZH_HUB_SRC) ||
+    quoted.test(UFA_HUB_SRC) ||
+    quoted.test(RYAZAN_HUB_SRC)
   );
 }
 
@@ -68,7 +72,8 @@ test('lifehacks cover Perm, Moscow, SPB, Kaliningrad, NN, EKB, Kazan, Samara, Kr
   assert.equal(cityHasLifehacks('krasnoyarsk'), true);
   assert.equal(cityHasLifehacks('novosibirsk'), true);
   assert.equal(cityHasLifehacks('voronezh'), true);
-  assert.equal(cityHasLifehacks('ufa'), false);
+  assert.equal(cityHasLifehacks('ryazan'), true);
+  assert.equal(cityHasLifehacks('ufa'), true);
 });
 
 test('Perm lifehacks have 4 tabs and 5 short cards with CTA', () => {
@@ -219,7 +224,7 @@ test('NN lifehacks: Lastochka affiche, cableway and free kremlin', () => {
   assert.equal(kremlin?.cta.kind, 'places');
 });
 
-test('EKB Kazan Samara Krasnodar Krasnoyarsk Novosibirsk Voronezh lifehacks: 5 cards, no fly tab', () => {
+test('EKB Kazan Samara Krasnodar Krasnoyarsk Novosibirsk Voronezh Ryazan Ufa lifehacks: 5 cards, no fly tab', () => {
   for (const city of [
     'ekaterinburg',
     'kazan',
@@ -228,6 +233,8 @@ test('EKB Kazan Samara Krasnodar Krasnoyarsk Novosibirsk Voronezh lifehacks: 5 c
     'krasnoyarsk',
     'novosibirsk',
     'voronezh',
+    'ryazan',
+    'ufa',
   ] as const) {
     const pack = resolveCityLifehacks(city);
     assert.ok(pack, city);
@@ -241,7 +248,7 @@ test('EKB Kazan Samara Krasnodar Krasnoyarsk Novosibirsk Voronezh lifehacks: 5 c
     if (city === 'novosibirsk') {
       assert.ok(pack.items.some((item) => item.cta.kind === 'places'), city);
       assert.ok(pack.items.some((item) => item.cta.kind === 'gis'), city);
-    } else if (city === 'voronezh') {
+    } else if (city === 'voronezh' || city === 'ufa' || city === 'ryazan') {
       assert.ok(pack.items.some((item) => item.cta.kind === 'places'), city);
       assert.ok(pack.items.some((item) => item.cta.kind === 'gis'), city);
     } else if (city === 'krasnoyarsk') {
@@ -266,6 +273,38 @@ test('EKB Kazan Samara Krasnodar Krasnoyarsk Novosibirsk Voronezh lifehacks: 5 c
   assert.equal(nsk?.items[0]?.id, 'novosibirsk-etk');
   const voronezh = resolveCityLifehacks('voronezh');
   assert.equal(voronezh?.items[0]?.id, 'voronezh-transport-sbp');
+  const ryazan = resolveCityLifehacks('ryazan');
+  assert.equal(ryazan?.items[0]?.id, 'ryazan-umka-card');
+  const ufa = resolveCityLifehacks('ufa');
+  assert.equal(ufa?.items[0]?.id, 'ufa-alga-card');
+});
+
+test('Ryazan painted lines have 6 / 7 stops with coords', async () => {
+  const { RYAZAN_GREEN_LINE_STOPS, RYAZAN_LINE_DAY_ROUTE_PRESETS } = await import(
+    './ryazan-line-presets.ts'
+  );
+  assert.equal(RYAZAN_GREEN_LINE_STOPS.length, 6);
+  assert.equal(
+    RYAZAN_LINE_DAY_ROUTE_PRESETS.find((p: { id: string }) => p.id === 'ryazan-red-line')?.stops
+      ?.length,
+    7,
+  );
+  assert.ok(
+    RYAZAN_GREEN_LINE_STOPS.every(
+      (stop: {
+        latitude?: number;
+        longitude?: number;
+        locationSlug?: string;
+        venueSlug?: string;
+        dayRouteId?: string;
+      }) =>
+        Number.isFinite(stop.latitude) &&
+        Number.isFinite(stop.longitude) &&
+        Boolean(stop.locationSlug || stop.venueSlug || stop.dayRouteId) &&
+        (stop.longitude || 0) > 30 &&
+        (stop.longitude || 0) < 45,
+    ),
+  );
 });
 
 test('Voronezh painted lines have 7 / 7 stops with coords', async () => {
@@ -289,6 +328,29 @@ test('Voronezh painted lines have 7 / 7 stops with coords', async () => {
         Number.isFinite(stop.latitude) &&
         Number.isFinite(stop.longitude) &&
         Boolean(stop.locationSlug || stop.dayRouteId),
+    ),
+  );
+});
+
+test('Ufa painted lines have 7 / 7 stops with coords', async () => {
+  const { UFA_GREEN_LINE_STOPS, UFA_LINE_DAY_ROUTE_PRESETS } = await import('./ufa-line-presets.ts');
+  assert.equal(UFA_GREEN_LINE_STOPS.length, 7);
+  assert.equal(
+    UFA_LINE_DAY_ROUTE_PRESETS.find((p: { id: string }) => p.id === 'ufa-red-line')?.stops?.length,
+    7,
+  );
+  assert.ok(
+    UFA_GREEN_LINE_STOPS.every(
+      (stop: {
+        latitude?: number;
+        longitude?: number;
+        locationSlug?: string;
+        venueSlug?: string;
+        dayRouteId?: string;
+      }) =>
+        Number.isFinite(stop.latitude) &&
+        Number.isFinite(stop.longitude) &&
+        Boolean(stop.locationSlug || stop.venueSlug || stop.dayRouteId),
     ),
   );
 });
