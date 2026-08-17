@@ -85,6 +85,28 @@ test('on 17 Aug 2026 Voronezh shows Zhatva and Gorod-sad; Platonovfest is past',
   );
 });
 
+test('on 17 Aug 2026 Chelyabinsk shows PROProm, valenki and Matsuev; Bazhov is past', () => {
+  const now = new Date('2026-08-17T12:00:00+05:00');
+  const upcoming = listCityRegionalEvents('chelyabinsk', now, 3);
+  const past = listCityRegionalPastEvents('chelyabinsk', now, 3);
+  assert.ok(upcoming.some((event) => event.id === 'chelyabinsk-proprom-2026'));
+  assert.ok(upcoming.some((event) => event.id === 'chelyabinsk-ural-valenki-2026-27'));
+  assert.ok(upcoming.some((event) => event.id === 'chelyabinsk-matsuev-2027'));
+  assert.ok(past.some((event) => event.id === 'chelyabinsk-bazhov-2026'));
+  assert.equal(
+    upcoming.some((event) => event.id === 'chelyabinsk-bazhov-2026'),
+    false,
+  );
+  assert.ok(
+    [...upcoming, ...past].every(
+      (event) =>
+        !event.datesLabel.includes('\u2014') &&
+        !event.blurb.includes('\u2014') &&
+        !event.title.includes('\u2014'),
+    ),
+  );
+});
+
 test('on 17 Aug 2026 Ufa shows TERRA ZIMA, Ayda igrat and Kupecheskaya; Serdce Evrazii is past', () => {
   const now = new Date('2026-08-17T12:00:00+05:00');
   const upcoming = listCityRegionalEvents('ufa', now, 3);
@@ -139,6 +161,29 @@ test('on 17 Aug 2026 Novosibirsk shows TehnoArt and snow sculpture; Chernika and
         !event.datesLabel.includes('\u2014') &&
         !event.blurb.includes('\u2014') &&
         !event.title.includes('\u2014'),
+    ),
+  );
+});
+
+test('on 17 Aug 2026 Omsk shows winter zabavy upcoming; Flora marathon Academy are past', () => {
+  const now = new Date('2026-08-17T12:00:00+06:00');
+  const upcoming = listCityRegionalEvents('omsk', now, 3);
+  const past = listCityRegionalPastEvents('omsk', now, 3);
+  assert.ok(upcoming.some((event) => event.id === 'omsk-zimnie-zabavy-2027'));
+  assert.ok(past.some((event) => event.id === 'omsk-flora-2026'));
+  assert.ok(past.some((event) => event.id === 'omsk-siberian-marathon-2026'));
+  assert.ok(past.some((event) => event.id === 'omsk-akademia-2026'));
+  assert.equal(
+    upcoming.some((event) => event.id === 'omsk-flora-2026'),
+    false,
+  );
+  assert.ok(
+    [...upcoming, ...past].every(
+      (event) =>
+        !event.datesLabel.includes('\u2014') &&
+        !event.blurb.includes('\u2014') &&
+        !event.title.includes('\u2014') &&
+        !/челябин/i.test(`${event.title} ${event.blurb} ${event.place}`),
     ),
   );
 });

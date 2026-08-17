@@ -34,6 +34,11 @@ const VORONEZH_HUB_SRC = readFileSync(
 );
 const UFA_HUB_SRC = readFileSync(fileURLToPath(new URL('./ufa-hub.ts', import.meta.url)), 'utf8');
 const RYAZAN_HUB_SRC = readFileSync(fileURLToPath(new URL('./ryazan-hub.ts', import.meta.url)), 'utf8');
+const OMSK_HUB_SRC = readFileSync(fileURLToPath(new URL('./omsk-hub.ts', import.meta.url)), 'utf8');
+const CHELYABINSK_HUB_SRC = readFileSync(
+  fileURLToPath(new URL('./chelyabinsk-hub.ts', import.meta.url)),
+  'utf8',
+);
 
 function cityInfoHasSlug(slug: string): boolean {
   const quoted = new RegExp(`['"]${slug.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}['"]`);
@@ -47,7 +52,9 @@ function cityInfoHasSlug(slug: string): boolean {
     quoted.test(NOVOSIBIRSK_HUB_SRC) ||
     quoted.test(VORONEZH_HUB_SRC) ||
     quoted.test(UFA_HUB_SRC) ||
-    quoted.test(RYAZAN_HUB_SRC)
+    quoted.test(RYAZAN_HUB_SRC) ||
+    quoted.test(OMSK_HUB_SRC) ||
+    quoted.test(CHELYABINSK_HUB_SRC)
   );
 }
 
@@ -74,6 +81,8 @@ test('lifehacks cover Perm, Moscow, SPB, Kaliningrad, NN, EKB, Kazan, Samara, Kr
   assert.equal(cityHasLifehacks('voronezh'), true);
   assert.equal(cityHasLifehacks('ryazan'), true);
   assert.equal(cityHasLifehacks('ufa'), true);
+  assert.equal(cityHasLifehacks('chelyabinsk'), true);
+  assert.equal(cityHasLifehacks('omsk'), true);
 });
 
 test('Perm lifehacks have 4 tabs and 5 short cards with CTA', () => {
@@ -235,6 +244,8 @@ test('EKB Kazan Samara Krasnodar Krasnoyarsk Novosibirsk Voronezh Ryazan Ufa lif
     'voronezh',
     'ryazan',
     'ufa',
+    'omsk',
+    'chelyabinsk',
   ] as const) {
     const pack = resolveCityLifehacks(city);
     assert.ok(pack, city);
@@ -248,7 +259,13 @@ test('EKB Kazan Samara Krasnodar Krasnoyarsk Novosibirsk Voronezh Ryazan Ufa lif
     if (city === 'novosibirsk') {
       assert.ok(pack.items.some((item) => item.cta.kind === 'places'), city);
       assert.ok(pack.items.some((item) => item.cta.kind === 'gis'), city);
-    } else if (city === 'voronezh' || city === 'ufa' || city === 'ryazan') {
+    } else if (
+      city === 'voronezh' ||
+      city === 'ufa' ||
+      city === 'ryazan' ||
+      city === 'omsk' ||
+      city === 'chelyabinsk'
+    ) {
       assert.ok(pack.items.some((item) => item.cta.kind === 'places'), city);
       assert.ok(pack.items.some((item) => item.cta.kind === 'gis'), city);
     } else if (city === 'krasnoyarsk') {
@@ -277,6 +294,10 @@ test('EKB Kazan Samara Krasnodar Krasnoyarsk Novosibirsk Voronezh Ryazan Ufa lif
   assert.equal(ryazan?.items[0]?.id, 'ryazan-umka-card');
   const ufa = resolveCityLifehacks('ufa');
   assert.equal(ufa?.items[0]?.id, 'ufa-alga-card');
+  const omsk = resolveCityLifehacks('omsk');
+  assert.equal(omsk?.items[0]?.id, 'omsk-omka-card');
+  const chelyabinsk = resolveCityLifehacks('chelyabinsk');
+  assert.equal(chelyabinsk?.items[0]?.id, 'chelyabinsk-transport-card');
 });
 
 test('Ryazan painted lines have 6 / 7 stops with coords', async () => {
@@ -332,6 +353,34 @@ test('Voronezh painted lines have 7 / 7 stops with coords', async () => {
   );
 });
 
+test('Chelyabinsk painted lines have 6 / 6 stops with coords', async () => {
+  const { CHELYABINSK_GREEN_LINE_STOPS, CHELYABINSK_LINE_DAY_ROUTE_PRESETS } = await import(
+    './chelyabinsk-line-presets.ts'
+  );
+  assert.equal(CHELYABINSK_GREEN_LINE_STOPS.length, 6);
+  assert.equal(
+    CHELYABINSK_LINE_DAY_ROUTE_PRESETS.find((p: { id: string }) => p.id === 'chelyabinsk-red-line')
+      ?.stops?.length,
+    6,
+  );
+  assert.ok(
+    CHELYABINSK_GREEN_LINE_STOPS.every(
+      (stop: {
+        latitude?: number;
+        longitude?: number;
+        locationSlug?: string;
+        venueSlug?: string;
+        dayRouteId?: string;
+      }) =>
+        Number.isFinite(stop.latitude) &&
+        Number.isFinite(stop.longitude) &&
+        Boolean(stop.locationSlug || stop.venueSlug || stop.dayRouteId) &&
+        (stop.latitude || 0) > 55 &&
+        (stop.longitude || 0) > 61,
+    ),
+  );
+});
+
 test('Ufa painted lines have 7 / 7 stops with coords', async () => {
   const { UFA_GREEN_LINE_STOPS, UFA_LINE_DAY_ROUTE_PRESETS } = await import('./ufa-line-presets.ts');
   assert.equal(UFA_GREEN_LINE_STOPS.length, 7);
@@ -351,6 +400,31 @@ test('Ufa painted lines have 7 / 7 stops with coords', async () => {
         Number.isFinite(stop.latitude) &&
         Number.isFinite(stop.longitude) &&
         Boolean(stop.locationSlug || stop.venueSlug || stop.dayRouteId),
+    ),
+  );
+});
+
+test('Omsk painted lines have 6 / 6 stops with coords', async () => {
+  const { OMSK_GREEN_LINE_STOPS, OMSK_LINE_DAY_ROUTE_PRESETS } = await import('./omsk-line-presets.ts');
+  assert.equal(OMSK_GREEN_LINE_STOPS.length, 6);
+  assert.equal(
+    OMSK_LINE_DAY_ROUTE_PRESETS.find((p: { id: string }) => p.id === 'omsk-red-line')?.stops?.length,
+    6,
+  );
+  assert.ok(
+    OMSK_GREEN_LINE_STOPS.every(
+      (stop: {
+        latitude?: number;
+        longitude?: number;
+        locationSlug?: string;
+        venueSlug?: string;
+        dayRouteId?: string;
+      }) =>
+        Number.isFinite(stop.latitude) &&
+        Number.isFinite(stop.longitude) &&
+        Boolean(stop.locationSlug || stop.venueSlug || stop.dayRouteId) &&
+        (stop.longitude || 0) > 70 &&
+        (stop.longitude || 0) < 76,
     ),
   );
 });

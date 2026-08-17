@@ -68,6 +68,8 @@ test('isCityHubBlogAfterSuburbs gates tourist discovery hubs and aliases', () =>
     'voronezh',
     'ryazan',
     'ufa',
+    'omsk',
+    'chelyabinsk',
   ]) {
     assert.equal(isCityHubBlogAfterSuburbs(slug), true, slug);
   }
@@ -75,6 +77,7 @@ test('isCityHubBlogAfterSuburbs gates tourist discovery hubs and aliases', () =>
   assert.equal(isCityHubAfficheBeforeSuburbs('perm'), true);
   assert.equal(isCityHubAfficheBeforeSuburbs('voronezh'), true);
   assert.equal(isCityHubAfficheBeforeSuburbs('ufa'), true);
+  assert.equal(isCityHubAfficheBeforeSuburbs('chelyabinsk'), true);
 });
 
 test('ekaterinburg hub config has no river featuredDirections', () => {

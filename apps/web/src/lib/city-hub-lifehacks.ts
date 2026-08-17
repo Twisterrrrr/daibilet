@@ -2,7 +2,7 @@
  * City hub «лайфхаки»: короткие карточки с CTA.
  * Держим отдельно от cityInfo (coords/mustSee) и local-flavor (погода/уникальность).
  * Пакеты: Пермь, Москва, СПб, Калининград, Нижний Новгород, Екатеринбург, Казань, Самара,
- * Краснодар, Красноярск, Новосибирск, Воронеж, Рязань, Уфа.
+ * Краснодар, Красноярск, Новосибирск, Воронеж, Рязань, Уфа, Омск, Челябинск, Тюмень.
  */
 
 import { normalizeCityHubSlug } from './city-hub-config.ts';
@@ -1358,6 +1358,277 @@ const UFA_ITEMS: CityLifehackItem[] = [
   },
 ];
 
+const OMSK_ITEMS: CityLifehackItem[] = [
+  {
+    id: 'omsk-omka-card',
+    tabId: 'transit',
+    icon: 'transit',
+    title: 'Карта «Омка» дешевле наличных',
+    body: body(
+      'Проезд по транспортной карте «Омка» дешевле оплаты наличными на ',
+      { s: '5 ₽' },
+      '. Карту берут в киосках и на остановках центра.',
+    ),
+    cta: {
+      kind: 'gis',
+      label: 'Транспорт на карте',
+      href: twoGisCitySearchUrl('omsk', 'транспорт Омск'),
+    },
+  },
+  {
+    id: 'omsk-vrubel-free',
+    tabId: 'walk',
+    icon: 'museum',
+    title: 'Третья среда у Врубеля',
+    body: body(
+      'Каждая ',
+      { s: 'третья среда' },
+      ' месяца в музее Врубеля - бесплатный вход для лиц до 18 лет, студентов и многодетных семей. Билеты в Эрмитаж-Сибирь все равно берите на сайте музея.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Музеи Омска',
+      slugs: [
+        'omsk-muzey-izobrazitelnyh-iskusstv-vrubelya',
+        'omsk-ermitazh-sibir',
+        'omsk-kraevedcheskiy-muzey',
+      ],
+      scrollTo: 'places',
+    },
+  },
+  {
+    id: 'omsk-free-sunset',
+    tabId: 'walk',
+    icon: 'walk',
+    title: 'Бесплатный закат у речного вокзала',
+    body: body(
+      'Не платите за веранду ради Иртыша. Лучший закат - со смотровой у ',
+      { s: 'речного вокзала' },
+      ' на Лермонтова, 2. Зимой рядом - каток в крепости.',
+    ),
+    cta: {
+      kind: 'maps',
+      label: 'Точки на карте',
+      href: yandexMapsSearchUrl('Речной вокзал Омск'),
+      extra: [{ label: 'Омская крепость', href: yandexMapsSearchUrl('Омская крепость') }],
+    },
+  },
+  {
+    id: 'omsk-skuratov',
+    tabId: 'food',
+    icon: 'food',
+    title: 'Кофе Skuratov вместо сетевых',
+    body: body(
+      'На Лермонтова, 4Б берите фильтр и выпечку в Skuratov. Это короткая пауза между речным вокзалом и Камергерским, без очередей фудкортов.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Где поесть в Омске',
+      slugs: ['omsk-skuratov', 'omsk-gastrodvor-lyubinskiy'],
+      scrollTo: 'places',
+    },
+  },
+  {
+    id: 'omsk-krepost-free',
+    tabId: 'walk',
+    icon: 'walk',
+    title: 'Крепость открыта круглосуточно',
+    body: body(
+      'Территория Омской крепости, Тарские и Тобольские ворота доступны ',
+      { s: '24/7 бесплатно' },
+      '. Платите только за музеи внутри квартала.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Крепость и ворота',
+      slugs: ['omsk-omskaya-krepost', 'omsk-tarskie-vorota', 'omsk-tobolskie-vorota'],
+      scrollTo: 'places',
+    },
+  },
+];
+
+const CHELYABINSK_ITEMS: CityLifehackItem[] = [
+  {
+    id: 'chelyabinsk-transport-card',
+    tabId: 'transit',
+    icon: 'transit',
+    title: 'Транспортная карта и 60 минут пересадки',
+    body: body(
+      'Купите транспортную карту. Безнал дешевле наличных, а пересадка между городскими маршрутами в течение ',
+      { s: '60 минут' },
+      ' идет по льготному тарифу.',
+    ),
+    cta: {
+      kind: 'gis',
+      label: 'Транспорт на карте',
+      href: twoGisCitySearchUrl('chelyabinsk', 'транспорт Челябинск'),
+    },
+  },
+  {
+    id: 'chelyabinsk-fine-arts-thursday',
+    tabId: 'walk',
+    icon: 'museum',
+    title: 'Бесплатный первый четверг в музее искусств',
+    body: body(
+      'Музей изобразительных искусств на площади Революции открывает постоянную экспозицию бесплатно каждый ',
+      { s: 'первый четверг' },
+      ' месяца для студентов и гостей до 18 лет.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Музеи Челябинска',
+      slugs: [
+        'chelyabinsk-muzey-izobrazitelnyh-iskusstv',
+        'chelyabinsk-gosudarstvennyy-istoricheskiy-muzey-yuzhnogo-urala',
+      ],
+      scrollTo: 'places',
+    },
+  },
+  {
+    id: 'chelyabinsk-miass-view',
+    tabId: 'walk',
+    icon: 'walk',
+    title: 'Бесплатная смотровая на Миасс',
+    body: body(
+      'Не платите за ресторан ради панорамы. Лучший вид на реку - с набережной у Исторического музея Южного Урала. Вход на смотровую ',
+      { s: 'бесплатный' },
+      '.',
+    ),
+    cta: {
+      kind: 'maps',
+      label: 'Точки на карте',
+      href: yandexMapsSearchUrl('Набережная реки Миасс Челябинск'),
+      extra: [
+        {
+          label: 'Исторический музей',
+          href: yandexMapsSearchUrl('Исторический музей Южного Урала'),
+        },
+      ],
+    },
+  },
+  {
+    id: 'chelyabinsk-pelmeni-ternopolskaya',
+    tabId: 'food',
+    icon: 'food',
+    title: 'Дешевые пельмени на Тернопольской',
+    body: body(
+      'Уральские пельмени трех мяс на Тернопольской заметно дешевле, чем на террасах Белого рынка. Рынок берите для вечера и атмосферы, обед - в пельменных рядом.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Где поесть в Челябинске',
+      slugs: ['chelyabinsk-belyy-rynok', 'chelyabinsk-restoran-kupecheskiy'],
+      scrollTo: 'places',
+    },
+  },
+  {
+    id: 'chelyabinsk-victory-tanks',
+    tabId: 'walk',
+    icon: 'walk',
+    title: 'Танки в Саду Победы круглосуточно',
+    body: body(
+      'Уличная выставка техники в Саду Победы открыта ',
+      { s: 'бесплатно 24/7' },
+      '. Билет в музей ЧТЗ для этой прогулки не нужен.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Сад Победы и ЧТЗ',
+      slugs: ['chelyabinsk-sad-pobedy', 'chelyabinsk-muzey-istorii-chtz'],
+      scrollTo: 'places',
+    },
+  },
+];
+
+const TYUMEN_ITEMS: CityLifehackItem[] = [
+  {
+    id: 'tyumen-tts-card',
+    tabId: 'transit',
+    icon: 'transit',
+    title: 'Бесконтакт ТТС дешевле наличных',
+    body: body(
+      'В автобусах Тюмени бесконтактная карта или смартфон ТТС сразу дешевле наличных на ',
+      { s: '1-2 ₽' },
+      '.',
+    ),
+    cta: {
+      kind: 'gis',
+      label: 'Транспорт на карте',
+      href: twoGisCitySearchUrl('tyumen', 'транспорт Тюмень'),
+    },
+  },
+  {
+    id: 'tyumen-slovtsov-wednesday',
+    tabId: 'walk',
+    icon: 'museum',
+    title: 'Словцов бесплатно в третью среду',
+    body: body(
+      'Музей Словцова в ',
+      { s: 'третью среду' },
+      ' месяца бесплатен для лиц до 18 лет и студентов.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Музей Словцова',
+      slugs: ['tyumen-muzey-slovtsova'],
+      scrollTo: 'places',
+    },
+  },
+  {
+    id: 'tyumen-lovers-bridge-view',
+    tabId: 'walk',
+    icon: 'walk',
+    title: 'Панорама с Моста Влюбленных бесплатно',
+    body: body(
+      'Не платите за ресторан ради вида. Лучший бесплатный ракурс на четыре яруса Туры - с ',
+      { s: 'Моста Влюбленных' },
+      '.',
+    ),
+    cta: {
+      kind: 'maps',
+      label: 'Точки на карте',
+      href: yandexMapsSearchUrl('Мост Влюбленных Тюмень'),
+      extra: [
+        { label: 'Четырехъярусная набережная', href: yandexMapsSearchUrl('Четырехъярусная набережная Тюмень') },
+      ],
+    },
+  },
+  {
+    id: 'tyumen-shanezhki',
+    tabId: 'food',
+    icon: 'food',
+    title: 'Шанежки на Дзержинского',
+    body: body(
+      'Уличный стол Арбата: шанежки на Дзержинского вместо сетевого фастфуда. Чай рядом - в «Наличниках» на ',
+      { s: 'Дзержинского, 34С' },
+      '.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Где поесть в Тюмени',
+      slugs: ['tyumen-chaynaya-nalichniki', 'tyumen-peshehodnaya-ulitsa-dzerzhinskogo'],
+      scrollTo: 'places',
+    },
+  },
+  {
+    id: 'tyumen-steamship-free',
+    tabId: 'walk',
+    icon: 'walk',
+    title: 'Бесплатные события в пароходной конторе',
+    body: body(
+      'На площадке пароходной конторы Колмакова у Туры часто проходят ',
+      { s: 'бесплатные' },
+      ' городские события и ярмарки. Проверяйте афишу у фудкорта, билет не обязателен.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Пароходная контора',
+      slugs: ['tyumen-parohodnaya-kontora-kolmakova', 'tyumen-fudkort-parohodnoy-kontory'],
+      scrollTo: 'places',
+    },
+  },
+];
+
 const CITY_HUB_LIFEHACKS: Record<string, CityLifehackPack> = {
   perm: lifehackPack(PERM_ITEMS),
   moscow: lifehackPack(MOSCOW_ITEMS),
@@ -1373,6 +1644,9 @@ const CITY_HUB_LIFEHACKS: Record<string, CityLifehackPack> = {
   voronezh: lifehackPack(VORONEZH_ITEMS),
   ryazan: lifehackPack(RYAZAN_ITEMS),
   ufa: lifehackPack(UFA_ITEMS),
+  omsk: lifehackPack(OMSK_ITEMS),
+  chelyabinsk: lifehackPack(CHELYABINSK_ITEMS),
+  tyumen: lifehackPack(TYUMEN_ITEMS),
 };
 
 export function resolveCityLifehacks(slug: string | null | undefined): CityLifehackPack | null {

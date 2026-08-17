@@ -4,7 +4,7 @@
  * agents can edit geo without merge fights.
  *
  * Tourist hubs with weather+seasons+identity: Perm, Moscow, SPB, Kaliningrad, NN,
- * Ekaterinburg, Kazan, Samara, Krasnodar, Krasnoyarsk, Novosibirsk, Voronezh, Ufa.
+ * Ekaterinburg, Kazan, Samara, Krasnodar, Krasnoyarsk, Novosibirsk, Voronezh, Ufa, Omsk, Chelyabinsk, Tyumen.
  */
 
 import { normalizeCityHubSlug } from './city-hub-config.ts';
@@ -1826,6 +1826,359 @@ const RYAZAN_SLIDES: CityIdentitySlide[] = [
   },
 ];
 
+const OMSK_WEATHER: CityWeatherFlavor = {
+  latitude: 54.984,
+  longitude: 73.372,
+  timezone: 'Asia/Omsk',
+  outdoorSlugs: [
+    'omsk-tarskie-vorota',
+    'omsk-lyubinskiy-prospekt-ulitsa-lenina',
+    'omsk-omskaya-krepost',
+    'omsk-rechnoy-vokzal',
+    'omsk-ulitsa-chokana-valihanova',
+  ],
+  indoorSlugs: [
+    'omsk-muzey-izobrazitelnyh-iskusstv-vrubelya',
+    'omsk-ermitazh-sibir',
+    'omsk-kraevedcheskiy-muzey',
+    'omsk-skuratov',
+    'omsk-gastrodvor-lyubinskiy',
+  ],
+  outdoorCta: 'Отличная погода для Любинского, Тарских ворот и заката у речного вокзала',
+  indoorCtaOvercast: 'Сегодня пасмурно. Загляните к Врубелю, в Эрмитаж-Сибирь или Skuratov',
+  indoorCtaRain: 'Сегодня дождь. Музей Врубеля, Эрмитаж-Сибирь или Гастродвор «Любинский»',
+  indoorCtaSnow: 'Сегодня снег. Крепость, каток и сибирские настойки после Любинского',
+};
+
+const OMSK_WHEN_TO_GO: CityWhenToGoFlavor = {
+  timeZone: 'Asia/Omsk',
+  seasons: [
+    {
+      id: 'winter',
+      months: [12, 1, 2],
+      headline: 'Зима',
+      body: 'Сухой мороз -16...-20 °C и солнце, переносится легче влажного холода. Каток в Омской крепости и заснеженный Любинский. Центр чистят, согревают сибирские настойки и блюда из дичи.',
+    },
+    {
+      id: 'spring',
+      months: [3, 4, 5],
+      headline: 'Весна',
+      body: 'В апреле сходит снег, в мае +15...+18 °C. Лучшие прогулки без жары. Ледоход на Иртыше. С конца мая открывается навигация и яхты у речного вокзала.',
+    },
+    {
+      id: 'summer',
+      months: [6, 7, 8],
+      headline: 'Лето',
+      body: 'Жарко, сухо и солнечно, часто +30 °C. Пляжи Иртыша, Камергерские террасы и газоны парка Королева. Долгие закаты и выезды к пяти озерам Муромцевского района.',
+    },
+    {
+      id: 'autumn',
+      months: [9, 10, 11],
+      headline: 'Осень',
+      body: 'Сентябрь - сибирское бабье лето около +15 °C, в октябре золотеют старые площади и набережные. Меньше транзита, дешевле перелеты и отели. Удобный сезон для музеев.',
+    },
+  ],
+  tabs: seasonTabs({
+    spring:
+      'В апреле Омск сбрасывает снег, в мае +15...+18 °C. Это лучшее время для пеших маршрутов по Любинскому и крепости без летнего зноя. Следите за ледоходом на Иртыше. С конца мая открывается речная навигация, у речного вокзала появляются яхты.',
+    summer:
+      'Лето жаркое, сухое и солнечное, часто +30 °C. Город уходит на пляжи Иртыша, Камергерские террасы и газоны парка Королева. Главный плюс сезона - длинные закаты и однодневные выезды к пяти известным озерам Муромцевского района.',
+    autumn:
+      'Сентябрь держит сибирское бабье лето около +15 °C, в октябре золотеют старые площади и набережные. Логистически это золотой сезон: меньше транзитных путешественников, дешевле перелеты и отели. Удобное время для музейных туров к Врубелю и в Эрмитаж-Сибирь.',
+    winter:
+      'Зима сухая и солнечная при -16...-20 °C, мороз переносится легче, чем кажется. Главная фишка - каток в Омской крепости и заснеженный Любинский проспект. Логистика центра хорошая, согревают сибирские настойки и блюда из дичи.',
+  }),
+};
+
+const OMSK_SLIDES: CityIdentitySlide[] = [
+  {
+    id: 'tara-gates',
+    title: 'Тарские ворота',
+    text: 'Каменный портал крепости XVIII века и память о каторге Достоевского. Под аркой загадывают желание - визуальный маркер старого Омска.',
+    imageSrc: '/images/venues/omsk/identity-symbol.jpg',
+    imageAlt: 'Тарские ворота Омской крепости',
+    slugs: ['omsk-tarskie-vorota', 'omsk-pamyatnik-dostoevskomu-nesuschiy-krest', 'omsk-omskaya-krepost'],
+    target: 'places',
+    badge: 'Символ',
+  },
+  {
+    id: 'siberian-punk',
+    title: 'Сибирский панк и Егор Летов',
+    text: 'Родина «Гражданской обороны»: текстовый авангард, гаражный рок, граффити, инди-бары и поэтические слэмы. Живая сцена - клуб «Викинг».',
+    imageSrc: '/images/venues/omsk/identity-art.jpg',
+    imageAlt: 'Омский панк и инди-дворы',
+    slugs: ['omsk-viking-rok-klub', 'omsk-kamergerskiy-pereulok', 'omsk-pamyatnik-van-gogu'],
+    target: 'places',
+    badge: 'Искусство',
+  },
+  {
+    id: 'lyubinsky-milk',
+    title: 'Любинская сгущенка и сибирская дичь',
+    text: 'Кабан, косуля, строганина из нельмы. Гостеприимство, большие порции, таежный мед или сгущенка к чаю в Гастродворе.',
+    imageSrc: '/images/venues/omsk/identity-gastro.jpg',
+    imageAlt: 'Сибирская дичь и сгущенка к чаю в Омске',
+    slugs: ['omsk-gastrodvor-lyubinskiy', 'omsk-skuratov', 'omsk-restoran-senkevich'],
+    target: 'places',
+    badge: 'Гастро',
+  },
+  {
+    id: 'kamergersky',
+    title: 'Камергерский переулок',
+    text: 'Петербургский дворик в Сибири: кирпич начала XX века и ресторанная улица за Московскими рядами.',
+    imageSrc: '/images/venues/omsk/identity-architecture.jpg',
+    imageAlt: 'Кирпичный Камергерский переулок в Омске',
+    slugs: [
+      'omsk-kamergerskiy-pereulok',
+      'omsk-moskovskie-torgovye-ryady',
+      'omsk-lyubinskiy-prospekt-ulitsa-lenina',
+    ],
+    target: 'places',
+    badge: 'Архитектура',
+  },
+];
+
+const CHELYABINSK_WEATHER: CityWeatherFlavor = {
+  latitude: 55.1644,
+  longitude: 61.4368,
+  timezone: 'Asia/Yekaterinburg',
+  outdoorSlugs: [
+    'chelyabinsk-naberezhnaya-reki-miass',
+    'chelyabinsk-aloe-pole',
+    'chelyabinsk-park-kul-tury-i-otdyha-im-yu-a-gagarina',
+    'chelyabinsk-elevator',
+    'chelyabinsk-pamyatnik-osnovatelyam',
+  ],
+  indoorSlugs: [
+    'chelyabinsk-gosudarstvennyy-istoricheskiy-muzey-yuzhnogo-urala',
+    'chelyabinsk-muzey-izobrazitelnyh-iskusstv',
+    'chelyabinsk-organnyy-zal-rodina',
+    'chelyabinsk-restoran-kupecheskiy',
+    'chelyabinsk-kofeynya-udobno',
+  ],
+  outdoorCta: 'Отличная погода для Кировки, набережной Миасса и Алого поля',
+  indoorCtaOvercast: 'Сегодня пасмурно. Загляните к метеориту, в музей искусств или UDOBNO',
+  indoorCtaRain: 'Сегодня дождь. Исторический музей, опера Глинки или «Купеческий»',
+  indoorCtaSnow: 'Сегодня снег. Музеи центра и уральские пельмени после катка в парке Гагарина',
+};
+
+const CHELYABINSK_WHEN_TO_GO: CityWhenToGoFlavor = {
+  timeZone: 'Asia/Yekaterinburg',
+  seasons: [
+    {
+      id: 'winter',
+      months: [12, 1, 2],
+      headline: 'Зима',
+      body: 'Скрипучий снег, солнце и около -12...-16 °C. Сноуборд в «Солнечной долине» у города, большой каток в парке Гагарина среди старых сосен. Улицы чистят быстро, мороз пережидают в ресторанах уральской кухни.',
+    },
+    {
+      id: 'spring',
+      months: [3, 4, 5],
+      headline: 'Весна',
+      body: 'Апрель сбрасывает зиму, в мае +15...+18 °C. Лучшие долгие прогулки по историческим улицам и набережной Миасса без летней пыли и жары. В мае сап и лодки на Изумрудном карьере.',
+    },
+    {
+      id: 'summer',
+      months: [6, 7, 8],
+      headline: 'Лето',
+      body: 'Ярко, сухо, часто +30 °C, на Кировке плавится асфальт. Город уходит на террасы Белого рынка и пляжи Смолино, Тургояка, Увильдов. Лучшая логистика для однодневных выездов на Таганай и Зюраткуль.',
+    },
+    {
+      id: 'autumn',
+      months: [9, 10, 11],
+      headline: 'Осень',
+      body: 'В сентябре бабье лето около +15 °C, в октябре реликтовый городской бор золотеет. Самая дешевая логистика: меньше транзитных туристов к озерам, билеты на поезда и цены отелей падают.',
+    },
+  ],
+  tabs: seasonTabs({
+    spring:
+      'Апрель сбрасывает зиму, к маю воздух прогревается до +15...+18 °C. Это лучшее время для долгих прогулок по историческим улицам и набережной Миасса без летней пыли и жары. В мае на Изумрудном (Смолинском) карьере открывают сап и лодки.',
+    summer:
+      'Лето яркое, сухое и часто жаркое, около +30 °C: на Кировке плавится асфальт. Город уходит на террасы Белого рынка и пляжи Смолино, Тургояка и Увильдов. Плюс сезона - самая удобная логистика однодневных выездов на Таганай и Зюраткуль.',
+    autumn:
+      'Сентябрь балует бабьим летом около +15 °C, в октябре реликтовый челябинский городской бор золотеет. Логистически это самый дешевый сезон: меньше транзитных туристов к озерам, свободнее билеты на поезда, отели заметно дешевле.',
+    winter:
+      'Скрипучий снег, яркое солнце и около -12...-16 °C. Главная фишка - сноуборд в «Солнечной долине» у города и большой каток в парке Гагарина среди старых сосен. Улицы чистят быстро, мороз пережидают в ресторанах уральской кухни.',
+  }),
+};
+
+const CHELYABINSK_SLIDES: CityIdentitySlide[] = [
+  {
+    id: 'chelyabinsk-meteorite',
+    title: 'Челябинский метеорит',
+    text: 'Космический бренд и железный характер. Взорвался в 2013 году, крупнейший осколок больше 500 кг хранится в Историческом музее Южного Урала. Код города: неуязвимость, ирония и «космическая столица» Урала.',
+    imageSrc: '/images/venues/chelyabinsk/identity-symbol.jpg',
+    imageAlt: 'Осколок челябинского метеорита в Историческом музее Южного Урала',
+    slugs: [
+      'chelyabinsk-gosudarstvennyy-istoricheskiy-muzey-yuzhnogo-urala',
+      'chelyabinsk-naberezhnaya-reki-miass',
+      'chelyabinsk-skaz-ob-urale',
+    ],
+    target: 'places',
+    badge: 'Символ',
+  },
+  {
+    id: 'tankograd',
+    title: 'Танкоград и индустриальный гигантизм',
+    text: 'Ансамбли ЧТЗ, танки ИС и КВ времен войны. Брутальная эстетика, конструктивизм, трудовая гордость; современное искусство в старых цехах.',
+    imageSrc: '/images/venues/chelyabinsk/identity-art.jpg',
+    imageAlt: 'Ансамбль ЧТЗ и танк у заводских корпусов Танкограда',
+    slugs: [
+      'chelyabinsk-chtz',
+      'chelyabinsk-muzey-istorii-chtz',
+      'chelyabinsk-pamyatnik-tankistam-dobrovoltsam',
+    ],
+    target: 'places',
+    badge: 'Искусство',
+  },
+  {
+    id: 'ural-pelmeni',
+    title: 'Уральские пельмени и дичь',
+    text: 'Три мяса, грузди в сметане, котлеты из лося, пироги со снытью. Современные рестораны пересобирают таежную ДНК: «Купеческий», «По Чесноку» и террасы Белого рынка.',
+    imageSrc: '/images/venues/chelyabinsk/identity-gastro.jpg',
+    imageAlt: 'Уральские пельмени и дичь в челябинском ресторане',
+    slugs: [
+      'chelyabinsk-restoran-kupecheskiy',
+      'chelyabinsk-po-chesnoku',
+      'chelyabinsk-belyy-rynok',
+    ],
+    target: 'places',
+    badge: 'Гастро',
+  },
+  {
+    id: 'gosbank-elevator',
+    title: 'Элеватор Госбанка',
+    text: 'Заброшенное 40-метровое зернохранилище начала XX века, похожее на готический замок. Индустриальный авангард Челябинска на Кирова, 130Р.',
+    imageSrc: '/images/venues/chelyabinsk/identity-architecture.jpg',
+    imageAlt: 'Элеватор Госбанка в Челябинске, похожий на готический замок',
+    slugs: [
+      'chelyabinsk-elevator',
+      'chelyabinsk-gosbank',
+      'chelyabinsk-dom-oblispolkoma',
+    ],
+    target: 'places',
+    badge: 'Архитектура',
+  },
+];
+
+const TYUMEN_WEATHER: CityWeatherFlavor = {
+  latitude: 57.1522,
+  longitude: 65.5272,
+  timezone: 'Asia/Yekaterinburg',
+  outdoorSlugs: [
+    'tyumen-chetyrehurovnevaya-naberezhnaya',
+    'tyumen-most-vlyublennyh',
+    'tyumen-peshehodnaya-ulitsa-dzerzhinskogo',
+    'tyumen-skver-sibirskih-koshek',
+    'tyumen-tsvetnoy-bulvar',
+  ],
+  indoorSlugs: [
+    'tyumen-muzey-slovtsova',
+    'tyumen-tyumenskiy-dramaticheskiy-teatr',
+    'tyumen-restoran-chum',
+    'tyumen-chaynaya-nalichniki',
+    'tyumen-znamenskiy-kafedral-nyy-sobor',
+  ],
+  outdoorCta: 'Отличная погода для четырех ярусов Туры, Моста Влюбленных и Дзержинского',
+  indoorCtaOvercast: 'Сегодня пасмурно. Загляните в музей Словцова, Большой драматический или «Чум»',
+  indoorCtaRain: 'Сегодня дождь. Словцов, чайная «Наличники» или строганина в «Чуме»',
+  indoorCtaSnow: 'Сегодня снег. Музеи центра и термы Верхнего Бора после прогулки по ярусам',
+};
+
+const TYUMEN_WHEN_TO_GO: CityWhenToGoFlavor = {
+  timeZone: 'Asia/Yekaterinburg',
+  seasons: [
+    {
+      id: 'winter',
+      months: [12, 1, 2],
+      headline: 'Зима',
+      body: 'Главный зимний курорт: -13...-17 °C и пушистый снег. Открытые термы +38...+40 в сосновом лесу (ЛетоЛето, Верхний Бор). Дороги чистят сразу, согреться помогают сибирские рестораны.',
+    },
+    {
+      id: 'spring',
+      months: [3, 4, 5],
+      headline: 'Весна',
+      body: 'В апреле Тура ломает лед, в мае +15...+18 °C. Лучшие прогулки по купеческим кварталам. В конце мая открывается речная навигация.',
+    },
+    {
+      id: 'summer',
+      months: [6, 7, 8],
+      headline: 'Лето',
+      body: 'Сухо и жарко, часто +30 °C. Гранитный променад Туры и террасы Дзержинского. Экопарки, лесные озера и Тобольск около 2-3 часов.',
+    },
+    {
+      id: 'autumn',
+      months: [9, 10, 11],
+      headline: 'Осень',
+      body: 'Сентябрь +14...+16 °C, бабье лето. В октябре парки золотеют. Золотая логистика: меньше термальных туристов, дешевле перелеты из Москвы и отели.',
+    },
+  ],
+  tabs: seasonTabs({
+    spring:
+      'В апреле Тура ломает лед, к маю воздух прогревается до +15...+18 °C. Это лучшее время для прогулок по купеческим кварталам без летней жары. В конце мая открывается речная навигация.',
+    summer:
+      'Лето сухое и жаркое, часто около +30 °C. Гранитный променад четырех ярусов Туры и террасы Дзержинского работают допоздна. Плюс сезона - экопарки, лесные озера и выезд в Тобольск примерно за 2-3 часа.',
+    autumn:
+      'Сентябрь держит бабье лето +14...+16 °C, в октябре парки золотеют. Логистически это золотой сезон: меньше очередей на термах, перелеты из Москвы и отели дешевле.',
+    winter:
+      'Тюмень - главный зимний курорт: пушистый снег и -13...-17 °C. Открытые термальные бассейны +38...+40 в сосновом лесу (ЛетоЛето, Верхний Бор). Дороги чистят сразу, после прогулки согревают сибирские рестораны.',
+  }),
+};
+
+const TYUMEN_SLIDES: CityIdentitySlide[] = [
+  {
+    id: 'tura-quay',
+    title: 'Четыре яруса Туры',
+    text: 'Единственная в России четырехярусная гранитная набережная: перепад около 20 м и бронзовые рельефы Сибири. Масштаб нефтяной столицы на реке.',
+    imageSrc: '/images/venues/tyumen/identity-symbol.jpg',
+    imageAlt: 'Четырехъярусная гранитная набережная Туры в Тюмени',
+    slugs: [
+      'tyumen-chetyrehurovnevaya-naberezhnaya',
+      'tyumen-most-vlyublennyh',
+      'tyumen-amfiteatr-nizhney-naberezhnoy',
+    ],
+    target: 'places',
+    badge: 'Символ',
+  },
+  {
+    id: 'wooden-lace',
+    title: 'Тюменская резьба и купеческое кружево',
+    text: 'Глухая и пропильная корабельная резьба: наличники как триумфальные арки на деревянных домах Арбата.',
+    imageSrc: '/images/venues/tyumen/identity-art.jpg',
+    imageAlt: 'Резные наличники деревянного купеческого дома в Тюмени',
+    slugs: [
+      'tyumen-peshehodnaya-ulitsa-dzerzhinskogo',
+      'tyumen-dom-burkova',
+      'tyumen-chaynaya-nalichniki',
+    ],
+    target: 'places',
+    badge: 'Искусство',
+  },
+  {
+    id: 'stroganina-kvartet',
+    title: 'Строганина, дичь и конфеты «Квартет»',
+    text: 'Нельма и муксун, лось и медведь, таежные ягоды с кедровым молоком. Сибирский стол, а не столичный фастфуд.',
+    imageSrc: '/images/venues/tyumen/identity-gastro.jpg',
+    imageAlt: 'Строганина и сибирская дичь на столе в Тюмени',
+    slugs: ['tyumen-restoran-chum', 'tyumen-restoran-poseydon', 'tyumen-chaynaya-nalichniki'],
+    target: 'places',
+    badge: 'Гастро',
+  },
+  {
+    id: 'dzerzhinskogo-arbat',
+    title: 'Пешеходная Дзержинского',
+    text: 'Тюменский Арбат: музей деревянного зодчества под открытым небом, террасы и резное кружево.',
+    imageSrc: '/images/venues/tyumen/identity-architecture.jpg',
+    imageAlt: 'Пешеходная улица Дзержинского с деревянными купеческими домами',
+    slugs: [
+      'tyumen-peshehodnaya-ulitsa-dzerzhinskogo',
+      'tyumen-dom-burkova',
+      'tyumen-gostinyy-dvor',
+    ],
+    target: 'places',
+    badge: 'Архитектура',
+  },
+];
+
 export const CITY_HUB_LOCAL_FLAVOR: Record<string, CityHubLocalFlavor> = {
   perm: {
     identityHeading: 'Чем уникальна Пермь',
@@ -1938,6 +2291,30 @@ export const CITY_HUB_LOCAL_FLAVOR: Record<string, CityHubLocalFlavor> = {
     slides: UFA_SLIDES,
     weather: UFA_WEATHER,
     whenToGo: UFA_WHEN_TO_GO,
+  },
+  omsk: {
+    identityHeading: 'Чем уникален Омск',
+    identityLead: IDENTITY_LEAD,
+    tags: tagsFromSlides(OMSK_SLIDES),
+    slides: OMSK_SLIDES,
+    weather: OMSK_WEATHER,
+    whenToGo: OMSK_WHEN_TO_GO,
+  },
+  chelyabinsk: {
+    identityHeading: 'Чем уникален Челябинск',
+    identityLead: IDENTITY_LEAD,
+    tags: tagsFromSlides(CHELYABINSK_SLIDES),
+    slides: CHELYABINSK_SLIDES,
+    weather: CHELYABINSK_WEATHER,
+    whenToGo: CHELYABINSK_WHEN_TO_GO,
+  },
+  tyumen: {
+    identityHeading: 'Чем уникальна Тюмень',
+    identityLead: IDENTITY_LEAD,
+    tags: tagsFromSlides(TYUMEN_SLIDES),
+    slides: TYUMEN_SLIDES,
+    weather: TYUMEN_WEATHER,
+    whenToGo: TYUMEN_WHEN_TO_GO,
   },
 };
 

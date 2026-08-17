@@ -843,4 +843,157 @@ export const CITY_REGIONAL_EVENTS: Record<string, CityRegionalEvent[]> = {
       sourceLabel: 'kultura.ryazangov.ru',
     },
   ],
+
+  omsk: [
+    {
+      id: 'omsk-flora-2026',
+      title: 'Выставка «Флора-2026» (День города)',
+      startDate: '2026-08-01',
+      endDate: '2026-08-09',
+      datesLabel: 'Первая неделя августа 2026',
+      place: 'Выставочные площади у Омской крепости и Соборной площади',
+      blurb:
+        'Главное зеленое событие Омска к Дню города: цветочные композиции, ярмарка и вечерние гуляния на площадках «Флоры».',
+      sourceUrl: 'https://admomsk.ru/',
+      sourceLabel: 'admomsk.ru',
+    },
+    {
+      id: 'omsk-zimnie-zabavy-2027',
+      title: '«Омские зимние забавы»',
+      startDate: '2027-01-02',
+      endDate: '2027-01-05',
+      datesLabel: '2-5 января 2027',
+      place: 'Омская крепость',
+      blurb:
+        'Новогодние гуляния в крепости: каток, ярмарка, сибирские настойки и семейные мастер-классы у Тарских ворот.',
+      sourceUrl: 'https://admomsk.ru/',
+      sourceLabel: 'admomsk.ru',
+    },
+    {
+      id: 'omsk-siberian-marathon-2026',
+      title: 'Сибирский международный марафон',
+      startDate: '2026-08-01',
+      endDate: '2026-08-02',
+      datesLabel: 'Первые выходные августа 2026',
+      place: 'Центр Омска, набережная Тухачевского',
+      blurb:
+        'Один из старейших марафонов России: старт у центра, трасса по Любинскому и набережным Иртыша.',
+      sourceUrl: 'https://omsmarathon.ru/',
+      sourceLabel: 'omsmarathon.ru',
+    },
+    {
+      id: 'omsk-akademia-2026',
+      title: 'Театральный фестиваль «Академия»',
+      startDate: '2026-06-01',
+      endDate: '2026-07-31',
+      datesLabel: 'Июнь-июль 2026 (раз в два года)',
+      place: 'Омский академический театр драмы и площадки города',
+      blurb:
+        'Биеннале академических театров: гастроли, лаборатории и вечерние спектакли на главной драматической сцене Сибири.',
+      sourceUrl: 'https://omskdrama.ru/',
+      sourceLabel: 'omskdrama.ru',
+    },
+  ],
+
+  chelyabinsk: [
+    {
+      id: 'chelyabinsk-proprom-2026',
+      title: 'PROProm / промышленный туризм ЧТПЗ',
+      startDate: '2026-10-01',
+      endDate: '2026-10-31',
+      datesLabel: 'Октябрь 2026',
+      place: 'ЦМТ Челябинск, «Высота 239», ММК, ЧТЗ',
+      blurb:
+        'Неделя промышленного туризма: экскурсии на «Высоту 239», Магнитку и ЧТЗ. Запись заранее, паспорт и закрытая обувь.',
+      sourceUrl: 'https://www.cheladmin.ru/',
+      sourceLabel: 'cheladmin.ru',
+    },
+    {
+      id: 'chelyabinsk-ural-valenki-2026-27',
+      title: 'Фестиваль «Уральские валенки»',
+      startDate: '2026-12-15',
+      endDate: '2027-01-15',
+      datesLabel: 'Декабрь 2026 - январь 2027',
+      place: 'Купеческий двор / «Солнечная долина»',
+      blurb:
+        'Зимний уральский фестиваль: ярмарка валенок, народные промыслы в Купеческом дворе и снежная программа на склонах «Солнечной долины».',
+      sourceUrl: 'https://www.cheladmin.ru/',
+      sourceLabel: 'cheladmin.ru',
+    },
+    {
+      id: 'chelyabinsk-matsuev-2027',
+      title: 'Фестиваль Дениса Мацуева',
+      startDate: '2027-04-01',
+      endDate: '2027-04-30',
+      datesLabel: 'Апрель 2027',
+      place: 'Челябинская филармония',
+      blurb:
+        'Весенний фортепианный фестиваль в филармонии: Мацуев, оркестр и камерные вечера для гостей города.',
+      sourceUrl: 'https://www.filarmonia74.ru/',
+      sourceLabel: 'filarmonia74.ru',
+    },
+    {
+      id: 'chelyabinsk-bazhov-2026',
+      title: 'Бажовский фестиваль',
+      startDate: '2026-06-19',
+      endDate: '2026-06-21',
+      datesLabel: '19-21 июня 2026',
+      place: 'Пластушка / Златоуст',
+      blurb:
+        'Фольклорный open-air по сказам Бажова: ремесла, уральская кухня и сцена у Златоуста, в стороне от Таганая.',
+      sourceUrl: 'https://www.zlatoust.ru/',
+      sourceLabel: 'zlatoust.ru',
+    },
+  ],
+
+  tyumen: [
+    {
+      id: 'tyumen-thermal-season-2026',
+      title: 'Открытие термального сезона',
+      startDate: '2026-11-01',
+      endDate: '2026-12-31',
+      datesLabel: 'Ноябрь-декабрь 2026',
+      place: 'ЛетоЛето, Верхний Бор, Сибирь',
+      blurb:
+        'Старт зимнего купания: открытые бассейны +38...+40 в соснах, вечерние программы на ЛетоЛето, Верхнем Боре и «Сибири».',
+      sourceUrl: 'https://visittyumen.ru/',
+      sourceLabel: 'visittyumen.ru',
+    },
+    {
+      id: 'tyumen-prodvizhenie-2027',
+      title: 'Театральный фестиваль «Продвижение»',
+      startDate: '2027-04-01',
+      endDate: '2027-04-30',
+      datesLabel: 'Апрель 2027',
+      place: 'Тюменский большой драматический театр, ул. Республики, 129',
+      blurb:
+        'Весенний театральный фестиваль на самой большой драматической площадке города: лаборатории, гастроли и вечерние спектакли.',
+      sourceUrl: 'https://www.tyumendrama.ru/',
+      sourceLabel: 'tyumendrama.ru',
+    },
+    {
+      id: 'tyumen-siberian-borscht-2026',
+      title: 'Сибирский борщ / День Сибири',
+      startDate: '2026-10-01',
+      endDate: '2026-10-31',
+      datesLabel: 'Октябрь 2026',
+      place: 'ул. Дзержинского и набережная Туры',
+      blurb:
+        'Гастро-день Сибири: борщ, уличные столы на Дзержинского и вечерняя программа на четырех ярусах Туры.',
+      sourceUrl: 'https://visittyumen.ru/',
+      sourceLabel: 'visittyumen.ru',
+    },
+    {
+      id: 'tyumen-leto-v-tobolske-2026',
+      title: 'Лето в Тобольском кремле',
+      startDate: '2026-07-01',
+      endDate: '2026-07-31',
+      datesLabel: 'Июль 2026',
+      place: 'Тобольский кремль',
+      blurb:
+        'Летняя программа в кремле: концерты на Софийском дворе, ярмарка нижнего посада и вечерняя подсветка Рентереи.',
+      sourceUrl: 'https://tobolsk.org/',
+      sourceLabel: 'tobolsk.org',
+    },
+  ],
 };

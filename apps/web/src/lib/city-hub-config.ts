@@ -116,6 +116,39 @@ export const CITY_HUB_CONFIG: Record<string, CityHubConfig> = {
     ],
     venuesTopN: 8,
   },
+  omsk: {
+    highlightSeason: { label: 'Флора', monthsHint: 'август' },
+    primaryCta: { label: 'События в Омске', target: '#affiche' },
+    featuredDirections: [
+      { id: 'center', label: 'Любинский и крепость', categoryKey: 'Экскурсии', emphasis: 'primary' },
+      { id: 'walking', label: 'Пешие прогулки', landingSlug: 'walking-tours' },
+      { id: 'theatre', label: 'Театр', categoryKey: 'Театр' },
+      { id: 'family', label: 'Семейные', landingSlug: 'family-kids' },
+    ],
+    venuesTopN: 8,
+  },
+  chelyabinsk: {
+    highlightSeason: { label: 'Бабье лето', monthsHint: 'сентябрь' },
+    primaryCta: { label: 'События в Челябинске', target: '#affiche' },
+    featuredDirections: [
+      { id: 'center', label: 'Кировка и метеорит', categoryKey: 'Экскурсии', emphasis: 'primary' },
+      { id: 'walking', label: 'Пешие прогулки', landingSlug: 'walking-tours' },
+      { id: 'theatre', label: 'Театр', categoryKey: 'Театр' },
+      { id: 'family', label: 'Семейные', landingSlug: 'family-kids' },
+    ],
+    venuesTopN: 8,
+  },
+  tyumen: {
+    highlightSeason: { label: 'Термальный сезон', monthsHint: 'ноябрь-март' },
+    primaryCta: { label: 'События в Тюмени', target: '#affiche' },
+    featuredDirections: [
+      { id: 'center', label: 'Набережная и Арбат', categoryKey: 'Экскурсии', emphasis: 'primary' },
+      { id: 'walking', label: 'Пешие прогулки', landingSlug: 'walking-tours' },
+      { id: 'theatre', label: 'Театр', categoryKey: 'Театр' },
+      { id: 'family', label: 'Семейные', landingSlug: 'family-kids' },
+    ],
+    venuesTopN: 8,
+  },
   // Landlocked: no river-cruises / river-party in curated chips (count>0 still gates fallbacks).
   ekaterinburg: {
     highlightSeason: { label: 'Уральское лето', monthsHint: 'июнь-август' },
@@ -168,6 +201,9 @@ const BLOG_AFTER_SUBURBS_SLUGS = new Set([
   'voronezh',
   'ryazan',
   'ufa',
+  'omsk',
+  'chelyabinsk',
+  'tyumen',
 ]);
 
 export function isCityHubBlogAfterSuburbs(slug: string | null | undefined): boolean {
