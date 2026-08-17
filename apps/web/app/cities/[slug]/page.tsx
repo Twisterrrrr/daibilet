@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 
 import { CityPageView } from '@/components/CityPageView.client';
 import { CityPageViewEditorial } from '@/components/CityPageViewEditorial.client';
@@ -172,7 +173,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 /**
- * Do not await searchParams (?hub=) - forces dynamic no-store on every city hub.
+ * Do not await searchParams (?hub= / ?city=) - forces dynamic no-store on every city hub.
+ * Region child-city H1 (`?city=vyborg`) is client-side in RegionPageView (Suspense).
  * Template comes from CITY_HUB_EDITORIAL_SLUGS allowlist; Next Data Cache via getCached*.
  * Articles are secondary: timeout hides related, never blocks HTML for 60s.
  */
@@ -206,7 +208,9 @@ export default async function CityPage({ params }: PageProps) {
       <>
         <JsonLdScripts blocks={jsonLdBlocks} idPrefix="region-jsonld" />
         <SiteLayout>
-          <RegionPageView slug={decodedSlug} initialPayload={payload} />
+          <Suspense fallback={<RegionPageFallback />}>
+            <RegionPageView slug={decodedSlug} initialPayload={payload} />
+          </Suspense>
         </SiteLayout>
       </>
     );
@@ -277,5 +281,14 @@ export default async function CityPage({ params }: PageProps) {
         />
       </SiteLayout>
     </>
+  );
+}
+
+function RegionPageFallback() {
+  return (
+    <div className="container-page py-16">
+      <div className="h-10 w-64 animate-pulse rounded bg-slate-100" />
+      <div className="mt-4 h-24 max-w-2xl animate-pulse rounded bg-slate-50" />
+    </div>
   );
 }

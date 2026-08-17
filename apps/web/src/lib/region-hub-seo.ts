@@ -30,6 +30,7 @@ export function buildRegionHubH1(regionName: string): string {
  */
 const CHILD_CITY_TITLE_GENITIVE: Record<string, string> = {
   Раменское: 'Раменского',
+  Выборг: 'Выборга',
 };
 
 export function childCityTitleGenitive(cityName: string): string {
@@ -50,7 +51,7 @@ export function buildChildCityScopeLabel(cityName: string, regionName: string): 
 
 /**
  * Child SERP title. Бренд как в layout/`pageTitle`: «Дайбилет».
- * Later на запросе с ?city=: этот title + noindex + canonical на region.
+ * На `?city=` region hub: этот title + noindex + canonical без query.
  * Indexed document без query остаётся на buildRegionHubSeoTitle.
  */
 export function buildChildCityScopeSeoTitle(

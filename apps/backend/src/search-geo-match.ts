@@ -150,9 +150,57 @@ export function childCityShortLabel(cityName: string, regionName: string): strin
   return `${cityName}, ${regionName}`;
 }
 
-/** Formula A: search label + later client H1. Not SSR document title. */
+/** Formula A: search label + region-hub H1. Not the indexed document title. */
 export function childCityScopeLabel(cityName: string, regionName: string): string {
   return `${childCityShortLabel(cityName, regionName)} • Ближайшие события`;
+}
+
+/** Canonical satellite href. Always `?city=`, never `?city-slug`. */
+export function regionChildCityHref(regionSlug: string, citySlug: string): string {
+  const region = publicCitySlug(regionSlug) || String(regionSlug || '').trim();
+  const city = publicCitySlug(citySlug) || String(citySlug || '').trim().toLowerCase();
+  return `/cities/${region}?city=${encodeURIComponent(city)}`;
+}
+
+function readSearchParams(search: string | URLSearchParams): URLSearchParams {
+  if (typeof search === 'string') {
+    const trimmed = search.startsWith('?') ? search.slice(1) : search;
+    return new URLSearchParams(trimmed);
+  }
+  return new URLSearchParams(search.toString());
+}
+
+/**
+ * Child scope on a region hub.
+ * Canonical: `?city=vyborg`. Also accepts the broken `?city-vyborg` (hyphen, empty value).
+ */
+export function parseRegionChildCityQuery(search: string | URLSearchParams): string | null {
+  const params = readSearchParams(search);
+  const explicit = String(params.get('city') || '').trim();
+  if (explicit) return publicCitySlug(explicit) || explicit.toLowerCase();
+
+  for (const [key, value] of params.entries()) {
+    if (String(value || '').trim()) continue;
+    const match = key.match(/^city-(.+)$/i);
+    if (match?.[1]) return publicCitySlug(match[1]) || match[1].toLowerCase();
+  }
+  return null;
+}
+
+/** Rewrite `?city-vyborg` → `?city=vyborg`. Null if already canonical or no child token. */
+export function canonicalizeRegionChildCitySearch(search: string | URLSearchParams): URLSearchParams | null {
+  const params = readSearchParams(search);
+  const slug = parseRegionChildCityQuery(params);
+  if (!slug) return null;
+  const current = String(params.get('city') || '').trim();
+  const hasBroken = [...params.keys()].some((key) => /^city-/i.test(key) && !String(params.get(key) || '').trim());
+  if (current === slug && !hasBroken) return null;
+  const next = new URLSearchParams(params.toString());
+  for (const key of [...next.keys()]) {
+    if (/^city-/i.test(key) && !String(next.get(key) || '').trim()) next.delete(key);
+  }
+  next.set('city', slug);
+  return next;
 }
 
 export function publicCitySlug(value?: string | null): string {
@@ -303,7 +351,7 @@ function matchHits(
       shortLabel,
       sublabel: 'Город области',
       slug: satellite.regionSlug,
-      href: `/cities/${satellite.regionSlug}?city=${satellite.citySlug}`,
+      href: regionChildCityHref(satellite.regionSlug, satellite.citySlug),
       score,
     });
   }

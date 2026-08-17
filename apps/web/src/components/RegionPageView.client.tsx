@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { ArrowRight, MapPin, Ticket, Train } from 'lucide-react';
 import Link from 'next/link';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import { RegionEventCard } from '@/components/RegionEventCard.client';
 import { RegionOrientMap, type RegionMapPoint } from '@/components/RegionOrientMap.client';
@@ -10,6 +11,11 @@ import { RegionVenueSeriesCard } from '@/components/RegionVenueSeriesCard.client
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { formatNumber } from '@/lib/format';
 import { buildRegionSystemBrief } from '@/lib/region-hub-seo';
+import {
+  buildRegionChildCityChrome,
+  canonicalizeRegionChildCitySearch,
+  sessionMatchesRegionCityFilter,
+} from '@/lib/region-child-city-scope';
 import { cityHref } from '@/lib/routes';
 import {
   buildCitySessionCoverIndex,
@@ -60,10 +66,12 @@ export function RegionPageView({
   slug: string;
   initialPayload: PublicCityPageDto | null;
 }) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [payload, setPayload] = React.useState<PublicCityPageDto | null>(initialPayload);
   const [contentReady, setContentReady] = React.useState(() => Boolean(initialPayload?.sessions?.length));
   const [error, setError] = React.useState<string | null>(null);
-  const [cityFilter, setCityFilter] = React.useState<string[] | null>(null);
   const [dateSelection, setDateSelection] = React.useState<DateSelection>({ kind: 'preset', value: 'all' });
   const [beltFilter, setBeltFilter] = React.useState<'all' | RegionCityBelt>('all');
   const [categoryFilter, setCategoryFilter] = React.useState<string | null>(null);
@@ -114,7 +122,22 @@ export function RegionPageView({
         eventTotal,
     );
   const isTierC = liveTier === 'C';
-  const brief =
+  const childChrome = React.useMemo(
+    () =>
+      city
+        ? buildRegionChildCityChrome({
+            search: searchParams,
+            regionName: city.name,
+            regionSlug: slug,
+            centerSlug: centerCity?.slug,
+            childCities,
+          })
+        : null,
+    [searchParams, city, slug, centerCity?.slug, childCities],
+  );
+  const cityFilter = childChrome ? [childChrome.child.name] : null;
+  const heading = childChrome?.h1 || city?.name || '';
+  const regionBrief =
     regionInfo?.brief?.trim() ||
     (city
       ? isTierC
@@ -123,6 +146,27 @@ export function RegionPageView({
           : `Сейчас за городом ничего не происходит. Загляните в афишу ${centerCityGenitive || 'центра региона'}.`
         : buildRegionSystemBrief(city.name)
       : '');
+  const brief = childChrome?.lead || regionBrief;
+
+  React.useEffect(() => {
+    const next = canonicalizeRegionChildCitySearch(searchParams);
+    if (!next) return;
+    const qs = next.toString();
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+  }, [searchParams, pathname, router]);
+
+  const replaceCityQuery = React.useCallback(
+    (nextSlug: string | null) => {
+      const next = new URLSearchParams(searchParams.toString());
+      for (const key of [...next.keys()]) {
+        if (key === 'city' || /^city-/i.test(key)) next.delete(key);
+      }
+      if (nextSlug) next.set('city', nextSlug);
+      const qs = next.toString();
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    },
+    [searchParams, pathname, router],
+  );
 
   const visibleCities = React.useMemo(() => {
     if (isTierC) return [];
@@ -130,20 +174,33 @@ export function RegionPageView({
     if (hasBelts && beltFilter !== 'all') {
       list = list.filter((item) => resolveCityBeltEntry(slug, item)?.belt === beltFilter);
     }
+    if (childChrome) {
+      const scoped = childCities.find(
+        (item) =>
+          item.name.toLowerCase() === childChrome.child.name.toLowerCase() ||
+          item.slug === childChrome.child.slug,
+      );
+      if (scoped && !list.some((item) => item.slug === scoped.slug || item.name === scoped.name)) {
+        list = [scoped, ...list];
+      }
+    }
     return list;
-  }, [childCities, showAllCities, isTierC, hasBelts, beltFilter, slug]);
+  }, [childCities, showAllCities, isTierC, hasBelts, beltFilter, slug, childChrome]);
 
   const hiddenZeroCount = isTierC ? 0 : childCities.filter((item) => item.eventCount <= 0).length;
 
   const sessions = React.useMemo(() => {
     const list = payload?.sessions || [];
-    const filterSet = cityFilter?.length
-      ? new Set(cityFilter.map((name) => name.trim().toLowerCase()).filter(Boolean))
-      : null;
+    const filterNames = cityFilter || [];
+    const filterSlugs = childChrome ? [childChrome.child.slug] : [];
     return list.filter((session) => {
-      if (filterSet) {
-        const sessionCity = String(session.city || '').trim().toLowerCase();
-        if (!filterSet.has(sessionCity)) return false;
+      if (filterNames.length) {
+        const extraSlugs = childCities
+          .filter((item) => filterNames.some((name) => name.toLowerCase() === item.name.toLowerCase()))
+          .map((item) => item.slug);
+        if (!sessionMatchesRegionCityFilter(session, filterNames, [...filterSlugs, ...extraSlugs])) {
+          return false;
+        }
       }
       if (hasBelts && beltFilter !== 'all') {
         const entry = resolveCityBeltEntry(slug, {
@@ -158,7 +215,17 @@ export function RegionPageView({
       }
       return sessionMatchesDate(session, dateSelection);
     });
-  }, [payload?.sessions, cityFilter, dateSelection, beltFilter, categoryFilter, hasBelts, slug]);
+  }, [
+    payload?.sessions,
+    cityFilter,
+    childChrome,
+    childCities,
+    dateSelection,
+    beltFilter,
+    categoryFilter,
+    hasBelts,
+    slug,
+  ]);
 
   const cityCoverIndex = React.useMemo(
     () => buildCitySessionCoverIndex(payload?.sessions || []),
@@ -201,7 +268,7 @@ export function RegionPageView({
     const seen = new Set<string>();
     const points: RegionMapPoint[] = [];
     for (const child of childCities) {
-      if (child.eventCount <= 0 && !showAllCities) continue;
+      if (child.eventCount <= 0 && !showAllCities && childChrome?.child.slug !== child.slug) continue;
       const entry = resolveCityBeltEntry(slug, child);
       if (!entry?.lat || !entry?.lng) continue;
       const id = child.slug || child.name;
@@ -216,7 +283,7 @@ export function RegionPageView({
       });
     }
     return points;
-  }, [beltConfig, childCities, showAllCities, slug, cityFilter]);
+  }, [beltConfig, childCities, showAllCities, slug, cityFilter, childChrome]);
 
   const isCityFilterActive = React.useCallback(
     (names: string[]) => {
@@ -228,14 +295,21 @@ export function RegionPageView({
     [cityFilter],
   );
 
-  const applyCityFilter = React.useCallback((names: string[]) => {
-    const cleaned = names.map((n) => n.trim()).filter(Boolean);
-    setCityFilter((prev) => {
-      if (prev && isSameCitySet(prev, cleaned)) return null;
-      return cleaned.length ? cleaned : null;
-    });
-    scrollToSection('affiche');
-  }, []);
+  const applyCityFilter = React.useCallback(
+    (names: string[]) => {
+      const cleaned = names.map((n) => n.trim()).filter(Boolean);
+      if (cityFilter && isSameCitySet(cityFilter, cleaned)) {
+        replaceCityQuery(null);
+      } else {
+        const match = childCities.find((item) =>
+          cleaned.some((name) => name.toLowerCase() === item.name.toLowerCase()),
+        );
+        replaceCityQuery(match?.slug || null);
+      }
+      scrollToSection('affiche');
+    },
+    [cityFilter, childCities, replaceCityQuery],
+  );
 
   const tabs = React.useMemo(() => {
     if (isTierC) {
@@ -272,6 +346,12 @@ export function RegionPageView({
 
   return (
     <div className="bg-white text-slate-900">
+      {childChrome ? (
+        <>
+          <title>{childChrome.title}</title>
+          <meta name="robots" content="noindex, follow" />
+        </>
+      ) : null}
       <main>
         <section id="top" className="border-b border-slate-200 bg-white">
           <div className="container-page py-12 sm:py-14">
@@ -283,13 +363,15 @@ export function RegionPageView({
               <span className="text-slate-800">Направление</span>
             </div>
             <h1 className="mt-5 max-w-4xl text-4xl font-extrabold tracking-tight text-slate-950 sm:text-5xl">
-              {city.name}
+              {heading}
             </h1>
             <p className="mt-3 max-w-3xl text-base leading-7 text-slate-600 sm:text-lg">{brief}</p>
             <p className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-600">
               <span>
-                <span className="font-semibold text-slate-900">{formatNumber(payload.stats.events)}</span> событий в
-                регионе
+                <span className="font-semibold text-slate-900">
+                  {formatNumber(childChrome ? sessions.length : payload.stats.events)}
+                </span>{' '}
+                {childChrome ? `событий ${inCityPrepositional(childChrome.child.name)}` : 'событий в регионе'}
               </span>
               <span aria-hidden="true" className="text-slate-300">
                 ·
@@ -317,7 +399,11 @@ export function RegionPageView({
                   }}
                   className="inline-flex min-h-11 items-center justify-center rounded-lg border border-slate-300 px-5 text-sm font-semibold text-slate-800 hover:bg-slate-50"
                 >
-                  {isTierC ? 'Редкие события региона' : 'Смотреть афишу региона'}
+                  {childChrome
+                    ? `Смотреть афишу ${cityToGenitive(childChrome.child.name)}`
+                    : isTierC
+                      ? 'Редкие события региона'
+                      : 'Смотреть афишу региона'}
                 </a>
               ) : null}
             </div>
@@ -395,7 +481,7 @@ export function RegionPageView({
                   <button
                     type="button"
                     className="text-sm font-semibold text-emerald-800 underline-offset-4 hover:underline"
-                    onClick={() => setCityFilter(null)}
+                    onClick={() => replaceCityQuery(null)}
                   >
                     Сбросить ({cityFilterLabel})
                   </button>

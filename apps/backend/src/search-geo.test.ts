@@ -1,7 +1,12 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { expandSearchQuery } from './search-synonyms.js';
-import { hubHrefSlug, matchSearchGeoHits } from './search-geo.js';
+import {
+  canonicalizeRegionChildCitySearch,
+  hubHrefSlug,
+  matchSearchGeoHits,
+  parseRegionChildCityQuery,
+} from './search-geo.js';
 
 function labels(query: string, limit = 2): string[] {
   return matchSearchGeoHits(expandSearchQuery(query), limit).map((hit) => hit.label);
@@ -73,6 +78,8 @@ test('выборг is an LO oblast child, not an SPb suburb', () => {
   assert.equal(vyborg[0]?.shortLabel, 'Выборг, Ленинградская область');
   assert.equal(vyborg[0]?.label, 'Выборг, Ленинградская область • Ближайшие события');
   assert.equal(vyborg[0]?.href, '/cities/leningradskaya-oblast?city=vyborg');
+  assert.ok(vyborg[0]?.href.includes('?city='));
+  assert.ok(!vyborg[0]?.href.includes('?city-'));
   assert.notEqual(vyborg[0]?.href, '/cities/saint-petersburg/#city-suburbs');
 
   const monrepo = matchSearchGeoHits(['монрепо']);
@@ -100,4 +107,11 @@ test('equal prefix prefers hub city over suburb', () => {
   const hits = matchSearchGeoHits(['петер'], 2);
   assert.equal(hits[0]?.label, 'Санкт-Петербург');
   assert.equal(hits[1]?.label, 'Петергоф');
+});
+
+test('parseRegionChildCityQuery accepts equals and hyphen forms', () => {
+  assert.equal(parseRegionChildCityQuery('city=vyborg'), 'vyborg');
+  assert.equal(parseRegionChildCityQuery('city-vyborg'), 'vyborg');
+  assert.equal(canonicalizeRegionChildCitySearch('city-vyborg')?.get('city'), 'vyborg');
+  assert.equal(canonicalizeRegionChildCitySearch('city=vyborg'), null);
 });

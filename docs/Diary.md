@@ -1,3 +1,17 @@
+## 2026-08-17 - Region hub H1 для свёрнутого города
+
+### Наблюдения
+- Live `/cities/leningradskaya-oblast?city=vyborg` (на скрине также `?city-vyborg`) показывал H1 «Ленинградская область». Поиск уже вёл на формулу A, страница хаба query не читала.
+
+### Решения
+- H1: «Выборг, Ленинградская область • Ближайшие события». Лид: куда сходить в Выборге. Title: «Афиша Выборга: … {year} | Дайбилет». Canonical без query (ISR). `noindex,follow` на child query.
+- Афиша фильтруется по городу (`session.city` / `citySlug`). Канон href `?city=vyborg`; сломанный `?city-vyborg` принимаем и редиректим на equals.
+
+### Проблемы
+- searchParams на city hub не await (ISR). Child chrome - клиент RegionPageView + middleware canonicalize.
+
+---
+
 ## 2026-08-17 - Превью мест: пустые карточки
 
 ### Наблюдения
@@ -44,20 +58,6 @@
 
 ### Проблемы
 - Часть карточек 50 локаций делит identity/кировка-фото, пока нет уникального jpg на каждую точку.
-
----
-
-## 2026-08-17 - Region hub H1 для свёрнутого города
-
-### Наблюдения
-- Live `/cities/leningradskaya-oblast?city=vyborg` (на скрине также `?city-vyborg`) показывал H1 «Ленинградская область». Поиск уже вёл на формулу A, страница хаба query не читала.
-
-### Решения
-- H1: «Выборг, Ленинградская область • Ближайшие события». Лид: куда сходить в Выборге. Title: «Афиша Выборга: … {year} | Дайбилет». Canonical без query (ISR). `noindex,follow` на child query.
-- Афиша фильтруется по городу (`session.city` / `citySlug`). Канон href `?city=vyborg`; сломанный `?city-vyborg` принимаем и редиректим на equals.
-
-### Проблемы
-- searchParams на city hub не await (ISR). Child chrome - клиент RegionPageView + middleware canonicalize.
 
 ---
 

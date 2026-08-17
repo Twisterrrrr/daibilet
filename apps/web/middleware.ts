@@ -8,6 +8,7 @@ import {
 } from '@/lib/admin-basic-auth';
 import { isAdminHost, rewriteAdminHostPathname } from '@/lib/admin-host';
 import { resolveLegacyLandingRedirect } from '@/lib/landing-routes';
+import { canonicalizeRegionChildCitySearch } from '../backend/src/search-geo-match.ts';
 
 function unauthorizedAdminResponse(realm: string) {
   return new NextResponse('Authentication required', {
@@ -84,12 +85,25 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  const cityQueryRedirect = redirectBrokenRegionChildCityQuery(request);
+  if (cityQueryRedirect) return cityQueryRedirect;
+
   const redirectTarget = resolveLegacyLandingRedirect(pathname);
   if (!redirectTarget) return NextResponse.next();
 
   const url = request.nextUrl.clone();
   url.pathname = redirectTarget.replace(/\/+$/, '') || '/';
   return NextResponse.redirect(url, 301);
+}
+
+function redirectBrokenRegionChildCityQuery(request: NextRequest): NextResponse | null {
+  const { pathname } = request.nextUrl;
+  if (!pathname.startsWith('/cities/')) return null;
+  const next = canonicalizeRegionChildCitySearch(request.nextUrl.searchParams);
+  if (!next) return null;
+  const url = request.nextUrl.clone();
+  url.search = next.toString() ? `?${next.toString()}` : '';
+  return NextResponse.redirect(url, 302);
 }
 
 // Static matcher only — Next rejects spread/dynamic arrays in config.matcher.

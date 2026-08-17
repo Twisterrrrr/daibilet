@@ -7,12 +7,15 @@ import {
 
 export type { SearchGeoHit, SearchGeoKind } from './search-geo-match.js';
 export {
+  canonicalizeRegionChildCitySearch,
   childCityScopeLabel,
   childCityShortLabel,
   createSearchGeoMatcher,
   hubHrefSlug,
   matchSearchGeoHitsWithRouting,
+  parseRegionChildCityQuery,
   publicCitySlug,
+  regionChildCityHref,
 } from './search-geo-match.js';
 
 const routing = loadCityRoutingConfig(import.meta.url) as CityRoutingConfig;

@@ -38,3 +38,18 @@ test('lead absorbs куда сходить; not H1 or title', () => {
   assert.notEqual(lead, buildChildCityScopeLabel('Раменское', 'Московская область'));
   assert.ok(!lead.startsWith('Куда сходить в Раменском и Московской области?'));
 });
+
+test('Выборг formula A copy for LO hub', () => {
+  assert.equal(
+    buildChildCityScopeLabel('Выборг', 'Ленинградская область'),
+    'Выборг, Ленинградская область • Ближайшие события',
+  );
+  assert.equal(childCityTitleGenitive('Выборг'), 'Выборга');
+  const lead = buildChildCityScopeLead('Выборг', 'Ленинградская область');
+  assert.match(lead, /в Выборге и ближайших населенных пунктах Ленинградской области/);
+  assert.ok(!lead.includes('—') && !lead.includes('–'));
+  assert.equal(
+    buildChildCityScopeSeoTitle('Выборг', new Date('2026-08-17T12:00:00+03:00')),
+    'Афиша Выборга: главные события и мероприятия 2026 | Дайбилет',
+  );
+});
