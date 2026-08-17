@@ -134,6 +134,7 @@ export function EventCard({
       : rawLocation;
   const durationLabel = extractDurationLabel(session.tags);
   const ageLabel = formatAgeLimit(session.ageLimit);
+  const showCategory = Boolean(session.category && !landingActions);
   // Missing display price (<100 / null) is not "soon" - event can still be on sale.
   const showSoonBadge = false;
   const purchase = useCatalogPurchase(session);
@@ -214,27 +215,32 @@ export function EventCard({
       </div>
 
       <div className={`flex flex-1 flex-col ${compact ? 'gap-2 p-3.5 sm:gap-2.5 sm:p-4' : 'gap-2.5 p-4'}`}>
-        {session.category && !landingActions ? (
-          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-graphite-muted sm:text-[11px]">
-            {session.category}
-          </p>
-        ) : null}
-
-        {/* Grid: category + age only. City lives in the header picker; no desc/subcategory chips. */}
-        {durationLabel || ageLabel ? (
-          <div className={`flex flex-wrap items-center gap-x-3 gap-y-1.5 ${session.category && !landingActions ? '-mt-1' : ''}`}>
-            {durationLabel ? (
-              <span className="event-card-meta hidden sm:inline-flex">
-                <Clock className="event-card-meta-icon" />
-                <span className="truncate">{durationLabel}</span>
-              </span>
-            ) : null}
+        {/* Grid: category left, age right on one row. No extra line for 16+. */}
+        {showCategory || ageLabel ? (
+          <div className="flex w-full items-center justify-between gap-2">
+            {showCategory ? (
+              <p className="min-w-0 truncate text-[10px] font-semibold uppercase tracking-[0.14em] text-graphite-muted sm:text-[11px]">
+                {session.category}
+              </p>
+            ) : (
+              <span className="min-w-0" />
+            )}
             {ageLabel ? (
-              <span className="event-card-meta text-graphite-muted" title="Возрастное ограничение">
-                <span className="font-semibold tabular-nums">{ageLabel}</span>
+              <span
+                className="shrink-0 text-[10px] font-semibold tabular-nums text-graphite-muted sm:text-[11px]"
+                title="Возрастное ограничение"
+              >
+                {ageLabel}
               </span>
             ) : null}
           </div>
+        ) : null}
+
+        {durationLabel ? (
+          <span className="event-card-meta hidden sm:inline-flex">
+            <Clock className="event-card-meta-icon" />
+            <span className="truncate">{durationLabel}</span>
+          </span>
         ) : null}
 
         <h2>
