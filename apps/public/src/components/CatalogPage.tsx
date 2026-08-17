@@ -12,6 +12,7 @@ import { collectCatalogLabels } from '@/lib/catalog-labels';
 import { applyCatalogPreset, catalogPresetMatches, CATALOG_PRESETS } from '@/lib/catalog-presets';
 import { AGE_FILTER_OPTIONS } from '@/components/CatalogAdvancedFiltersPanel';
 import { eventHref } from '@/routes';
+import { eventsCatalogH1, eventsCatalogLead } from '@/lib/catalog-index-copy';
 import { formatShowcaseSessionDate, resolvePseudoRating } from '@/lib/event-card-meta';
 import { resolveEventCardDestinationLabel } from '@/lib/event-location';
 import { arrangeCatalogSessions } from '@/lib/session-cover-image';
@@ -391,9 +392,19 @@ export function CatalogPage() {
         <div className="container-page py-6 sm:py-10">
           <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
             <div>
-              <h1 className="font-display text-2xl font-bold text-slate-900 sm:text-3xl">Каталог событий</h1>
+              <h1 className="font-display text-2xl font-bold text-slate-900 sm:text-3xl">
+                {eventsCatalogH1({
+                  cityName: city !== 'all' ? city : null,
+                  q: query,
+                  category: category !== 'all' ? category : null,
+                })}
+              </h1>
               <p className="mt-1 text-sm text-slate-500 sm:text-base">
-                Найдите то, что нравится — экскурсии, музеи и события по всей России
+                {eventsCatalogLead({
+                  cityName: city !== 'all' ? city : null,
+                  q: query,
+                  category: category !== 'all' ? category : null,
+                })}
               </p>
             </div>
             <div className="text-sm text-slate-500">
@@ -709,8 +720,8 @@ function CatalogToolbarSticky({
             <button
               type="button"
               onClick={() => setCategory('all')}
-              className={`shrink-0 rounded-full px-4 py-1.5 text-sm font-medium transition ${
-                category === 'all' ? 'bg-slate-900 text-white' : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50'
+              className={`catalog-chip snap-start ${
+                category === 'all' ? 'catalog-chip-on' : 'catalog-chip-idle'
               }`}
             >
               <span className="mr-1">✨</span>
@@ -721,8 +732,8 @@ function CatalogToolbarSticky({
                 key={name}
                 type="button"
                 onClick={() => setCategory(category === name ? 'all' : name)}
-                className={`shrink-0 rounded-full px-4 py-1.5 text-sm font-medium transition ${
-                  category === name ? 'bg-slate-900 text-white' : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50'
+                className={`catalog-chip snap-start ${
+                  category === name ? 'catalog-chip-on' : 'catalog-chip-idle'
                 }`}
               >
                 <span className="mr-1">{categoryEmoji(name)}</span>

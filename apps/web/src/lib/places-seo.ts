@@ -1,3 +1,4 @@
+import { placesCatalogH1 } from './catalog-index-copy.ts';
 import { cityToGenitive, cityToNominative, cityToPrepositional } from './city-declension.ts';
 import {
   PLACES_HUB_DESCRIPTION,
@@ -30,8 +31,6 @@ export function normalizePlacesFamily(
   return '';
 }
 
-const PLACES_H1 = 'Музеи, театры, локации, достопримечательности';
-
 /** Sitemap listing is only `/places` - do not invent `?city=` / `?family=` / `?category=` facets. */
 export const PLACES_HUB_PATH = '/places';
 
@@ -54,7 +53,7 @@ export function buildPlacesListingCopy(
 } {
   const city = resolvePlacesCityLabel(cityName, citySlug);
   const gen = city ? cityToGenitive(city) : '';
-  const h1 = gen ? `${PLACES_H1} ${gen}` : PLACES_H1;
+  const h1 = placesCatalogH1(city || null);
   const fam = normalizePlacesFamily(family);
 
   let description: string;

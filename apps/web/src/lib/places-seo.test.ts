@@ -4,19 +4,16 @@ import test from 'node:test';
 import { PLACES_HUB_DESCRIPTION } from './seo-meta.ts';
 import { buildPlacesListingCopy, buildPlacesListingSeo } from './places-seo.ts';
 
-test('places H1 is the fixed kinds list plus genitive city', () => {
-  assert.equal(buildPlacesListingCopy(null).h1, 'Музеи, театры, локации, достопримечательности');
-  assert.equal(
-    buildPlacesListingCopy(null, 'institution').h1,
-    'Музеи, театры, локации, достопримечательности',
-  );
+test('places H1 is umbrella plus genitive city', () => {
+  assert.equal(buildPlacesListingCopy(null).h1, 'Места и достопримечательности');
+  assert.equal(buildPlacesListingCopy(null, 'institution').h1, 'Места и достопримечательности');
 
   const spb = buildPlacesListingCopy('Санкт-Петербург');
-  assert.equal(spb.h1, 'Музеи, театры, локации, достопримечательности Санкт-Петербурга');
+  assert.equal(spb.h1, 'Места и достопримечательности Санкт-Петербурга');
   assert.equal(spb.title, spb.h1);
 
   const moscow = buildPlacesListingCopy('Москва');
-  assert.equal(moscow.h1, 'Музеи, театры, локации, достопримечательности Москвы');
+  assert.equal(moscow.h1, 'Места и достопримечательности Москвы');
   assert.match(moscow.description, /площадки/i);
   assert.match(moscow.description, /локации/i);
   assert.match(moscow.description, /Москвы/);
@@ -26,7 +23,7 @@ test('places H1 is the fixed kinds list plus genitive city', () => {
   assert.ok(!moscow.description.includes('\u2014') && !moscow.description.includes('\u2013'));
 
   const bySlug = buildPlacesListingCopy(null, null, 'saint-petersburg');
-  assert.equal(bySlug.h1, 'Музеи, театры, локации, достопримечательности Санкт-Петербурга');
+  assert.equal(bySlug.h1, 'Места и достопримечательности Санкт-Петербурга');
   assert.match(bySlug.description, /Санкт-Петербурга/);
 });
 
@@ -34,7 +31,7 @@ test('places listing SEO puts city in description from slug alone', () => {
   const seo = buildPlacesListingSeo({ citySlug: 'saint-petersburg' });
   assert.equal(seo.canonicalPath, '/places');
   assert.match(seo.description, /Санкт-Петербурга/);
-  assert.equal(seo.h1, 'Музеи, театры, локации, достопримечательности Санкт-Петербурга');
+  assert.equal(seo.h1, 'Места и достопримечательности Санкт-Петербурга');
 });
 
 test('places listing canonical strips query junk to hub; never homepage', () => {
@@ -53,7 +50,7 @@ test('places listing canonical strips query junk to hub; never homepage', () => 
   });
   assert.equal(city.canonicalPath, '/places');
   assert.equal(city.indexable, true);
-  assert.equal(city.h1, 'Музеи, театры, локации, достопримечательности Казани');
+  assert.equal(city.h1, 'Места и достопримечательности Казани');
   assert.equal(city.h1, buildPlacesListingCopy('Казань').h1);
 
   const family = buildPlacesListingSeo({ family: 'institution' });

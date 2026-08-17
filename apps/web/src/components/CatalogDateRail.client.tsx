@@ -27,7 +27,7 @@ const DESKTOP_DATE_RAIL_MQ = '(min-width: 1024px)';
 
 /**
  * Horizontal date presets + upcoming days + corner calendar (range).
- * Owned by EventsCatalogHero (not CatalogToolbar) so search stays one row below.
+ * Desktop sticky slot under search in CatalogToolbar. Mobile uses the date select.
  *
  * Tablet / <lg: 7 day chips (as before). Desktop: fill unused width up to MAX.
  */

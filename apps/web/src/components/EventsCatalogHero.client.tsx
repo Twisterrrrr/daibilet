@@ -3,13 +3,13 @@
 import { useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-import { PageBreadcrumbBar } from '@/components/PageBreadcrumbs';
+import { HeroLayout } from '@/components/HeroLayout';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { catalogFiltersFromQuery, type CatalogFilterValues } from '@/lib/catalog-url';
-import { cityToPrepositional } from '@/lib/city-declension';
+import { eventsCatalogH1, eventsCatalogLead } from '@/lib/catalog-index-copy';
 
 /**
- * Compact catalog header: breadcrumbs + H1/subtitle.
+ * Compact catalog header: breadcrumbs + eyebrow + H1/lead.
  * Date rail lives in sticky CatalogToolbar on desktop; mobile uses date select there.
  */
 export function EventsCatalogHero() {
@@ -34,56 +34,23 @@ export function EventsCatalogHero() {
         null
       : null;
 
-  const cityPrep = cityName ? cityToPrepositional(cityName) : null;
-
-  const title = q
-    ? `Результаты поиска: «${q}»`
-    : category
-      ? `События: ${category}`
-      : cityPrep
-        ? `Афиша событий в ${cityPrep}`
-        : 'Афиша событий';
-
-  const subtitle = q
-    ? cityPrep
-      ? `Подборка по запросу в ${cityPrep}`
-      : 'Подборка по запросу'
-    : category
-      ? cityPrep
-        ? `Афиша в категории «${category}» - ${cityPrep}`
-        : `Афиша в категории «${category}»`
-      : cityPrep
-        ? `Билеты и расписание - выбирайте по дате и интересам`
-        : 'Сначала выберите город - покажем только актуальную афишу';
+  const title = eventsCatalogH1({ cityName, q, category });
+  const subtitle = eventsCatalogLead({ cityName, q, category });
 
   return (
-    <>
-      <PageBreadcrumbBar
-        hideOnMobile
-        items={[
-          { label: 'Главная', href: '/' },
-          { label: 'События', href: '/events' },
-          ...(category ? [{ label: category }] : []),
-        ]}
-      />
-      <header className="border-b border-slate-100 bg-white">
-        <div className="container-page py-3 sm:py-5">
-          <div className="min-w-0 md:max-w-2xl">
-            <h1 className="font-display text-2xl font-extrabold tracking-tight text-graphite sm:text-3xl">
-              {title}
-            </h1>
-            <p className="mt-0.5 text-sm leading-snug text-graphite-muted sm:mt-1 sm:text-[15px]">
-              {subtitle ?? (
-                <>
-                  Билеты на экскурсии, концерты и музеи
-                  <br />
-                  более чем в 100 городах России.
-                </>
-              )}
-            </p>
-          </div>
-        </div>
-      </header>
-    </>
+    <HeroLayout
+      variant="minimal"
+      dense
+      hideBreadcrumbsOnMobile
+      breadcrumbs={[
+        { label: 'Главная', href: '/' },
+        { label: 'События', href: '/events' },
+        ...(category ? [{ label: category }] : []),
+      ]}
+      eyebrow={cityName || undefined}
+      title={title}
+      description={subtitle}
+      tone="light"
+    />
   );
 }

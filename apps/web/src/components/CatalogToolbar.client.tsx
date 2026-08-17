@@ -23,11 +23,9 @@ import {
 import type { PublicCatalogDto } from '@daibilet/contracts/public';
 import {
   buildCatalogHref,
-  CATALOG_SORT_OPTIONS,
   catalogFiltersFromQuery,
   countAdvancedFilters,
   type CatalogFilterValues,
-  type CatalogSort,
 } from '@/lib/catalog-url';
 
 type CatalogToolbarProps = {
@@ -170,20 +168,11 @@ export function CatalogToolbar({
     });
   };
 
-  const setSort = (sort: CatalogSort) => {
-    navigate({
-      ...filters,
-      q: qDraft.trim() || undefined,
-      sort,
-      page: undefined,
-    });
-  };
-
   const discoveryRow = (
     <div
       role="group"
       aria-label="Быстрые фильтры и категории"
-      className="hidden w-full min-w-0 flex-nowrap items-center gap-1.5 overflow-x-auto overscroll-x-contain pb-0.5 [scrollbar-width:none] md:flex [&::-webkit-scrollbar]:hidden"
+      className="flex w-full min-w-0 flex-nowrap items-center gap-1.5 overflow-x-auto overscroll-x-contain pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
     >
       <CategoryTabs
         filters={filters}
@@ -191,32 +180,7 @@ export function CatalogToolbar({
         overflow={categorySplit.overflow}
         onOpenMore={() => setCategoriesMoreOpen(true)}
       />
-      <div className="ml-auto flex shrink-0 flex-nowrap items-center gap-1.5">
-        <QuickFilterToggles filters={filters} qDraft={qDraft} disabled={disabled} onNavigate={navigate} />
-        <div
-          role="radiogroup"
-          aria-label="Сортировка"
-          className="flex shrink-0 gap-0.5 rounded-lg bg-slate-100 p-0.5"
-        >
-          {CATALOG_SORT_OPTIONS.map((option) => (
-            <button
-              key={option.value}
-              type="button"
-              role="radio"
-              aria-checked={(filters.sort || 'time') === option.value}
-              disabled={disabled}
-              onClick={() => setSort(option.value)}
-              className={`inline-btn h-7 shrink-0 rounded-md px-2.5 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 disabled:opacity-60 ${
-                (filters.sort || 'time') === option.value
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
-      </div>
+      <QuickFilterToggles filters={filters} qDraft={qDraft} disabled={disabled} onNavigate={navigate} />
     </div>
   );
 
@@ -276,7 +240,7 @@ export function CatalogToolbar({
 
   return (
     <div className="space-y-2.5 sm:space-y-3">
-      {/* Sticky on all breakpoints: search + (md) date/category/sort; mobile date + category icon rail. */}
+      {/* Sticky: search + filters; events date slot; kind chips (capsule, graphite). Sort lives in CatalogShell meta. */}
       <div className="catalog-toolbar sticky top-[var(--site-header-height)] z-30 -mx-4 space-y-2 border-b border-slate-200/60 bg-white/95 px-4 py-2 backdrop-blur-md supports-[backdrop-filter]:bg-white/90 sm:-mx-6 sm:px-6 md:mx-0 md:rounded-2xl md:border md:border-slate-200/70 md:px-3 md:py-2.5 md:shadow-sm">
         <form onSubmit={onSubmit} className="flex flex-col gap-2">
           <div className="flex min-w-0 items-center gap-2 md:gap-3">
@@ -379,24 +343,17 @@ export function CatalogToolbar({
               count={advancedCount}
               disabled={disabled}
               onClick={() => setFiltersOpen(true)}
-              className="max-md:hidden"
             />
           </div>
 
-          {/* Mobile: дата select + горизонтальный icon rail категорий. */}
-          <div className="space-y-2 md:hidden">
+          {/* Mobile: дата select; kind-чипы капсулы - общий discoveryRow ниже. */}
+          <div className="md:hidden">
             <MobileDateSelect
               chips={dateRailChips}
               filters={filters}
               disabled={disabled}
               onPreset={setDatePreset}
               onExactDay={setExactDay}
-            />
-            <MobileCategoryIconRail
-              filters={filters}
-              categories={facets.categories}
-              disabled={disabled}
-              qDraft={qDraft}
             />
           </div>
         </form>
@@ -416,28 +373,6 @@ export function CatalogToolbar({
         overflow={categorySplit.overflow}
         onClose={() => setCategoriesMoreOpen(false)}
       />
-
-      {/* Mobile filters FAB. SiteLayout chrome pads the footer so it is not clipped. */}
-      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 md:hidden">
-        <div className="pointer-events-auto border-t border-slate-200/80 bg-white/95 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2.5 shadow-[0_-8px_24px_rgba(15,23,42,0.08)] backdrop-blur-md supports-[backdrop-filter]:bg-white/90">
-          <button
-            type="button"
-            disabled={disabled}
-            aria-expanded={filtersOpen}
-            aria-haspopup="dialog"
-            aria-controls="advanced-filters-panel"
-            onClick={() => setFiltersOpen(true)}
-            className={`inline-btn flex h-11 w-full items-center justify-center gap-2 rounded-full text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 disabled:opacity-60 ${
-              filtersOpen || advancedCount > 0
-                ? 'bg-primary text-white hover:bg-primary/90'
-                : 'bg-[#1A1A1A] text-white hover:bg-slate-800'
-            }`}
-          >
-            <SlidersHorizontal aria-hidden className="h-4 w-4" strokeWidth={1.75} />
-            {advancedCount > 0 ? `Фильтры (${advancedCount})` : 'Фильтры'}
-          </button>
-        </div>
-      </div>
     </div>
   );
 }
@@ -525,100 +460,6 @@ function MobileDateSelect({
         className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6E6E73]"
         strokeWidth={1.75}
       />
-    </div>
-  );
-}
-
-function MobileCategoryIconRail({
-  filters,
-  categories,
-  disabled,
-  qDraft,
-}: {
-  filters: CatalogFilterValues;
-  categories: CatalogCategoryFacet[];
-  disabled?: boolean;
-  qDraft: string;
-}) {
-  const withQ = (category: string | undefined): CatalogFilterValues => ({
-    ...filters,
-    q: qDraft.trim() || filters.q,
-    category,
-    page: undefined,
-  });
-
-  return (
-    <div
-      role="tablist"
-      aria-label="Тип события"
-      className="flex w-full min-w-0 flex-nowrap items-stretch gap-1.5 overflow-x-auto overscroll-x-contain pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-    >
-      <Link
-        href={buildCatalogHref(withQ(undefined))}
-        role="tab"
-        aria-selected={!filters.category}
-        aria-disabled={disabled || undefined}
-        className={`inline-flex min-w-[4.25rem] shrink-0 flex-col items-center gap-1 rounded-2xl px-2 py-2 text-center transition ${
-          !filters.category
-            ? 'bg-graphite text-white shadow-sm'
-            : 'bg-[#F5F5F7] text-graphite hover:bg-slate-200/70'
-        } ${disabled ? 'pointer-events-none opacity-60' : ''}`}
-      >
-        <span
-          className={`grid h-9 w-9 place-items-center rounded-full ${
-            !filters.category ? 'bg-white/15' : 'bg-white'
-          }`}
-        >
-          <CategoryTabIcon name="Все" className={!filters.category ? 'text-white' : 'text-graphite-muted'} />
-        </span>
-        <span className="max-w-[4.5rem] truncate text-[11px] font-medium leading-tight">Все</span>
-      </Link>
-      {categories.map((item) => {
-        const label = displayCatalogLabel(item.name);
-        const active = filters.category === item.name;
-        const empty = item.events <= 0;
-        if (empty && !active) {
-          return (
-            <span
-              key={item.name}
-              role="tab"
-              aria-selected={false}
-              aria-disabled="true"
-              title="Нет событий при текущих фильтрах"
-              className="inline-flex min-w-[4.25rem] shrink-0 cursor-not-allowed flex-col items-center gap-1 rounded-2xl bg-[#F5F5F7] px-2 py-2 text-center opacity-40"
-            >
-              <span className="grid h-9 w-9 place-items-center rounded-full bg-white">
-                <CategoryTabIcon name={label} className="text-graphite-muted" />
-              </span>
-              <span className="max-w-[4.5rem] truncate text-[11px] font-medium leading-tight">{label}</span>
-            </span>
-          );
-        }
-        return (
-          <Link
-            key={item.name}
-            href={buildCatalogHref(withQ(active ? undefined : item.name))}
-            role="tab"
-            aria-selected={active}
-            title={item.events > 0 ? `${label}: ${item.events}` : label}
-            aria-disabled={disabled || undefined}
-            className={`inline-flex min-w-[4.25rem] shrink-0 flex-col items-center gap-1 rounded-2xl px-2 py-2 text-center transition ${
-              active
-                ? 'bg-graphite text-white shadow-sm'
-                : 'bg-[#F5F5F7] text-graphite hover:bg-slate-200/70'
-            } ${disabled ? 'pointer-events-none opacity-60' : ''}`}
-          >
-            <span
-              className={`grid h-9 w-9 place-items-center rounded-full ${
-                active ? 'bg-white/15' : 'bg-white'
-              }`}
-            >
-              <CategoryTabIcon name={label} className={active ? 'text-white' : 'text-graphite-muted'} />
-            </span>
-            <span className="max-w-[4.5rem] truncate text-[11px] font-medium leading-tight">{label}</span>
-          </Link>
-        );
-      })}
     </div>
   );
 }
@@ -898,7 +739,7 @@ function FiltersButton({
       aria-controls="advanced-filters-panel"
       className={`relative inline-btn inline-flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 disabled:opacity-60 sm:h-10 ${
         open || count > 0
-          ? 'bg-primary-600 text-white hover:bg-primary-700'
+          ? 'bg-graphite text-white hover:bg-graphite/90'
           : 'border border-slate-200 bg-white text-graphite hover:bg-slate-50'
       } ${className}`}
     >
