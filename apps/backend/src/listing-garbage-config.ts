@@ -187,3 +187,8 @@ export function findListingGarbageHitsInText(text: string): ListingGarbageHit[] 
 export function textHasListingGarbage(text: string): boolean {
   return findListingGarbageHitsInText(text).length > 0;
 }
+
+export {
+  sanitizePartnerVenueDisplayTitle,
+  isFortressComplexName,
+} from './venue-normalize.js';

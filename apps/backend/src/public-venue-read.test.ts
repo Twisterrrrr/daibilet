@@ -4,6 +4,7 @@ import {
   isPublicVenueHub,
   lookupVenueCatalogSessionsForTest,
   mergeCityPageVenues,
+  mergePublicVenueHubRows,
   publicVenueRowMatchesCityFilter,
   publicVenuesForSessionsFromHub,
   resolvePublicVenueCanonicalPath,
@@ -211,4 +212,50 @@ test('resolvePublicVenueKind maps cathedrals to temple public kind', () => {
   assert.equal(resolvePublicVenueKind('OUTDOOR_LOCATION', 'Знаменский кафедральный собор', null), 'temple');
   assert.equal(resolvePublicVenueKind('ATTRACTION', 'Петропавловская крепость', 'СПб'), 'attraction');
   assert.equal(resolvePublicVenueKind('ATTRACTION', 'Бункер-42 на Таганке', 'Москва'), 'attraction');
+});
+
+test('saleable fortress is one museum card, not a parallel sight', () => {
+  assert.equal(
+    resolvePublicVenueKind('ATTRACTION', 'Петропавловская крепость', 'СПб', { totalEvents: 1 }),
+    'museum',
+  );
+  assert.equal(
+    resolvePublicVenueKind(
+      'MUSEUM_ART_SPACE',
+      'Петропавловская крепость. Алексеевский равелин (внутренняя территория, ближе к пляжу со стороны Кронверкского пролива)',
+      'СПб',
+      { totalEvents: 1 },
+    ),
+    'museum',
+  );
+
+  const merged = mergePublicVenueHubRows([
+    {
+      id: 'venue_fortress_sight',
+      slug: 'saint-petersburg-petropavlovskaya-krepost',
+      name: 'Петропавловская крепость',
+      title: 'Петропавловская крепость',
+      city: 'Санкт-Петербург',
+      address: 'Территория Петропавловская Крепость, 3',
+      kind: 'ATTRACTION',
+      events: 0,
+      pageStatus: 'PUBLISHED',
+    },
+    {
+      id: 'venue_ravelin_museum',
+      slug: 'alekseevskiy-ravelin',
+      name: 'Петропавловская крепость. Алексеевский равелин (внутренняя территория, ближе к пляжу со стороны Кронверкского пролива)',
+      title: 'Петропавловская крепость. Алексеевский равелин (внутренняя территория, ближе к пляжу со стороны Кронверкского пролива)',
+      city: 'Санкт-Петербург',
+      address: 'ул. территория Петропавловская крепость, дом 3У',
+      kind: 'MUSEUM_ART_SPACE',
+      events: 1,
+      pageStatus: 'CANDIDATE',
+    },
+  ]);
+  assert.equal(merged.length, 1);
+  assert.equal(merged[0]?.name, 'Петропавловская крепость');
+  assert.equal(String(merged[0]?.kind).toUpperCase(), 'MUSEUM_ART_SPACE');
+  assert.equal(merged[0]?.events, 1);
+  assert.equal(merged[0]?.mergedVenueIds?.length, 2);
 });

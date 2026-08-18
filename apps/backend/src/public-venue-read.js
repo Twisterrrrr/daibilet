@@ -10,6 +10,8 @@ import {
   formatBusLocationDisplayName,
   formatPierLocationDisplayName,
   findVenueOverride,
+  formatPublicVenueTitle,
+  isFortressComplexName,
 } from './venue-normalize.js';
 import { formatPublicEventTitle } from './event-title-normalize.ts';
 import {
@@ -172,12 +174,6 @@ function normalizeNullableString(value) {
   return text ? text : null;
 }
 
-function formatPublicVenueTitle(value) {
-  if (value == null) return value;
-  return String(value)
-    .replace(/\s*\(\s*-?\d+(?:\.\d+)?\s*,\s*-?\d+(?:\.\d+)?\s*\)\s*$/u, '')
-    .trim();
-}
 
 function countBy(values) {
   return values.reduce((acc, value) => {
@@ -936,6 +932,10 @@ function normalizePublicVenueMergeKey(name, city, address) {
     return `clubhall|${cityKey}|${title}`;
   }
 
+  if (isFortressComplexName(name) && title.length >= 8) {
+    return `fortress|${cityKey}|${title}`;
+  }
+
   const addressKey = canonicalVenueAddressKey(name, address);
   if (addressKey.length >= 10) {
     return `addr|${cityKey}|${addressKey}`;
@@ -1054,10 +1054,21 @@ function venueRowMergeScore(row) {
   if (String(row.pageStatus || '').toUpperCase() === 'PUBLISHED') score += 200;
   if (row.address) score += 50;
   if (row.shortDescription) score += 25;
+  if (isFortressComplexName(row.name || row.title)) {
+    const raw = String(row.name || row.title || '').trim();
+    const clean = String(formatPublicVenueTitle(raw) || '').trim();
+    if (clean && normalizeVenueTextKey(raw) === normalizeVenueTextKey(clean)) score += 3000;
+  }
   return score;
 }
 
-function mergePublicVenueHubRows(rows) {
+function applyFortressSaleableMuseumKind(row, eventsCount) {
+  if (!isFortressComplexName(row.name || row.title)) return row;
+  if (Number(eventsCount || 0) <= 0) return row;
+  return { ...row, kind: 'MUSEUM_ART_SPACE', proposedKind: 'museum' };
+}
+
+export function mergePublicVenueHubRows(rows) {
   const groups = new Map();
 
   for (const row of rows) {
@@ -1071,27 +1082,38 @@ function mergePublicVenueHubRows(rows) {
     if (items.length === 1) {
       const only = items[0];
       const canonicalName = canonicalVenueMergeTitle(only.name || only.title) || only.name;
-      merged.push({ ...only, name: canonicalName, title: canonicalName, mergedVenueIds: [only.id] });
+      merged.push(
+        applyFortressSaleableMuseumKind(
+          { ...only, name: canonicalName, title: canonicalName, mergedVenueIds: [only.id] },
+          only.events,
+        ),
+      );
       continue;
     }
 
     const sorted = [...items].sort((a, b) => venueRowMergeScore(b) - venueRowMergeScore(a));
     const primary = sorted[0];
     const canonicalName = canonicalVenueMergeTitle(primary.name || primary.title) || primary.name;
-    merged.push({
-      ...primary,
-      name: canonicalName,
-      title: canonicalName,
-      city: resolvePublicVenueCity(primary),
-      events: items.reduce((sum, item) => sum + (Number(item.events) || 0), 0),
-      waterEvents: items.reduce((sum, item) => sum + (Number(item.waterEvents) || 0), 0),
-      busEvents: items.reduce((sum, item) => sum + (Number(item.busEvents) || 0), 0),
-      heroImageUrl: sorted.find((item) => item.heroImageUrl)?.heroImageUrl || primary.heroImageUrl,
-      shortDescription: sorted.find((item) => item.shortDescription)?.shortDescription || primary.shortDescription,
-      description: sorted.find((item) => item.description)?.description || primary.description,
-      address: sorted.find((item) => item.address)?.address || primary.address,
-      mergedVenueIds: items.map((item) => item.id),
-    });
+    const events = items.reduce((sum, item) => sum + (Number(item.events) || 0), 0);
+    merged.push(
+      applyFortressSaleableMuseumKind(
+        {
+          ...primary,
+          name: canonicalName,
+          title: canonicalName,
+          city: resolvePublicVenueCity(primary),
+          events,
+          waterEvents: items.reduce((sum, item) => sum + (Number(item.waterEvents) || 0), 0),
+          busEvents: items.reduce((sum, item) => sum + (Number(item.busEvents) || 0), 0),
+          heroImageUrl: sorted.find((item) => item.heroImageUrl)?.heroImageUrl || primary.heroImageUrl,
+          shortDescription: sorted.find((item) => item.shortDescription)?.shortDescription || primary.shortDescription,
+          description: sorted.find((item) => item.description)?.description || primary.description,
+          address: sorted.find((item) => item.address)?.address || primary.address,
+          mergedVenueIds: items.map((item) => item.id),
+        },
+        events,
+      ),
+    );
   }
 
   return merged.sort((a, b) => (b.events - a.events) || String(a.name || '').localeCompare(String(b.name || ''), 'ru'));
@@ -1831,6 +1853,10 @@ export function resolvePublicVenueKind(storedKind, name, address, options = {}) 
     return 'temple';
   }
   if (stored === 'outdoor_location') return 'outdoor_location';
+  // Saleable fortress complex = museum card; do not keep a parallel sight row.
+  if (isFortressComplexName(name) && (totalEvents > 0 || stored === 'museum' || stored === 'museum_art_space')) {
+    return 'museum';
+  }
   if (stored === 'attraction') return 'attraction';
   if (stored === 'temple') return 'temple';
   if (stored === 'gastro') return 'gastro';

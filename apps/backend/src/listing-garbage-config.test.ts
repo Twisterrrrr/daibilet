@@ -7,6 +7,8 @@ import {
   hasCapsLockSpam,
   STOP_WORDS_REGEXP,
   textHasListingGarbage,
+  sanitizePartnerVenueDisplayTitle,
+  isFortressComplexName,
 } from './listing-garbage-config.js';
 import {
   formatListingAuditTelegramMessage,
@@ -105,4 +107,21 @@ test('scanListingRows + telegram message cap at 10', () => {
 
 test('escapeTelegramHtml escapes markup', () => {
   assert.equal(escapeTelegramHtml('a <b> & c'), 'a &lt;b&gt; &amp; c');
+});
+
+const RAVELIN_TITLE =
+  'Петропавловская крепость. Алексеевский равелин (внутренняя территория, ближе к пляжу со стороны Кронверкского пролива)';
+
+test('sanitizePartnerVenueDisplayTitle strips ravelin pickup to fortress name', () => {
+  assert.equal(sanitizePartnerVenueDisplayTitle(RAVELIN_TITLE), 'Петропавловская крепость');
+  assert.equal(
+    sanitizePartnerVenueDisplayTitle('Государственный Эрмитаж (Зимний дворец)'),
+    'Государственный Эрмитаж (Зимний дворец)',
+  );
+  assert.equal(
+    sanitizePartnerVenueDisplayTitle('ГМИИ им. А. С. Пушкина'),
+    'ГМИИ им. А. С. Пушкина',
+  );
+  assert.ok(isFortressComplexName(RAVELIN_TITLE));
+  assert.equal(isFortressComplexName('Петропавловский собор'), false);
 });

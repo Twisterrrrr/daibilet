@@ -143,9 +143,24 @@ export function normalizeVenueKind(type?: string | null): string {
 
 export function formatPublicVenueTitle(value?: string | null): string {
   if (!value) return '';
-  return String(value)
-    .replace(/\s*\(\s*-?\d+(?:\.\d+)?\s*,\s*-?\d+(?:\.\d+)?\s*\)\s*$/u, '')
-    .trim();
+  let text = String(value).replace(/\s+/g, ' ').trim();
+  text = text.replace(/\s*\(\s*-?\d+(?:\.\d+)?\s*,\s*-?\d+(?:\.\d+)?\s*\)\s*$/u, '').trim();
+  const pickupParen =
+    /\s*\((?=[^)]*(?:внутренняя территория|ближе к|со стороны|точка сбора|место сбора|место встречи|вход со стороны|у входа|площадка расположена|ориентир))[^)]*\)\s*$/iu;
+  const hadPickup = pickupParen.test(text);
+  text = text.replace(pickupParen, '').replace(/[.,;:\s]+$/u, '').trim();
+  const split = text.match(/^(.{4,120}?)\.\s+([^.]+)$/u);
+  if (!split) return text;
+  const head = split[1].trim();
+  const tail = split[2].trim();
+  const lastWord = head.split(/\s+/).pop() || '';
+  if (/^(им|ул|пр|пер|наб|ш|пл|д|г|стр|лит|о|т|п|с|ч|н)\.?$/i.test(lastWord) || /^[А-ЯЁA-Z]\.?$/u.test(lastWord)) {
+    return text;
+  }
+  if (hadPickup || /равелин|бастион|куртина|внутренн|корпус|крыло|флигель|башня\b/iu.test(tail)) {
+    return head;
+  }
+  return text;
 }
 
 export function isMeetingPointLike(input: {

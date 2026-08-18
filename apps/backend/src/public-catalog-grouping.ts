@@ -1,5 +1,6 @@
 import { MIN_DISPLAY_PRICE_RUB, isOpenDateCatalogRow, isPublicSalesStatusBlocked } from './catalog-availability.js';
 import { formatPublicEventTitle } from './event-title-normalize.ts';
+import { formatPublicVenueTitle as sanitizePublicVenueTitle } from './venue-normalize.js';
 import type { PublicSessionDto } from './types/public.js';
 
 type CatalogSlot = NonNullable<PublicSessionDto['upcomingSlots']>[number] & {
@@ -414,9 +415,8 @@ function normalizeCatalogGroupTitle(rawTitle?: string | null): string {
 
 function formatPublicVenueTitle(value?: string | null): string | null {
   if (value == null) return null;
-  return String(value)
-    .replace(/\s*\(\s*-?\d+(?:\.\d+)?\s*,\s*-?\d+(?:\.\d+)?\s*\)\s*$/u, '')
-    .trim();
+  const cleaned = sanitizePublicVenueTitle(value);
+  return cleaned == null ? null : String(cleaned).trim();
 }
 
 function normalizeVenueTextKey(value?: string | null): string {

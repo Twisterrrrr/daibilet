@@ -2,6 +2,12 @@ import { prisma } from '@daibilet/db';
 import { publicVenueSlug } from './public-venue-read.js';
 import { matchSearchGeoHits } from './search-geo.js';
 import { expandSearchQuery } from './search-synonyms.js';
+import { formatPublicVenueTitle, isFortressComplexName } from './venue-normalize.js';
+import {
+  collapsePublicSearchVenueRows,
+  isMuseumLikeSearchKind,
+  searchVenueTextKey,
+} from './public-search-venues.ts';
 
 const LANDING_CATEGORY_PATH: Record<string, string> = {
   'river-cruises': 'rechnye-progulki',
@@ -92,6 +98,29 @@ function likePattern(term: string): string {
   return `%${term.replace(/[%_\\]/g, '')}%`;
 }
 
+function mapPublicSearchVenueItem(row: TrgmRow): PublicSearchItem {
+  const title = String(formatPublicVenueTitle(row.title) || row.title || '').trim();
+  const kind = String(row.kind || '').toUpperCase();
+  const fortressMuseum = isFortressComplexName(title) && isMuseumLikeSearchKind(kind);
+  const isLocation =
+    !fortressMuseum &&
+    (kind.includes('PIER') ||
+      kind.includes('OUTDOOR') ||
+      kind === 'BUS' ||
+      kind === 'PARK' ||
+      kind === 'MONUMENT' ||
+      kind === 'ATTRACTION' ||
+      kind === 'SPORT_ACTIVITY_SPACE');
+  const slug = publicVenueSlug(row.slug, title, row.id) || row.slug;
+  return {
+    type: 'venue',
+    label: title,
+    sublabel: row.city || '',
+    href: isLocation ? `/locations/${slug}` : `/venues/${slug}`,
+    imageUrl: row.imageUrl || null,
+  };
+}
+
 /**
  * Header search: geo hubs/suburbs first, then pg_trgm events/venues and landings.
  * Avoids hydrating the full public catalog session list per keystroke.
@@ -151,27 +180,9 @@ export async function buildPublicSearchDto(
     );
   }
 
-  for (const row of venues) {
-    const kind = String(row.kind || '').toUpperCase();
-    const isLocation =
-      kind.includes('PIER') ||
-      kind.includes('OUTDOOR') ||
-      kind === 'BUS' ||
-      kind === 'PARK' ||
-      kind === 'MONUMENT' ||
-      kind === 'ATTRACTION' ||
-      kind === 'SPORT_ACTIVITY_SPACE';
-    const slug = publicVenueSlug(row.slug, row.title, row.id) || row.slug;
-    push(
-      {
-        type: 'venue',
-        label: row.title,
-        sublabel: row.city || '',
-        href: isLocation ? `/locations/${slug}` : `/venues/${slug}`,
-        imageUrl: row.imageUrl || null,
-      },
-      `venue:${row.id}`,
-    );
+  for (const row of collapsePublicSearchVenueRows(venues)) {
+    const item = mapPublicSearchVenueItem(row);
+    push(item, `venue:${searchVenueTextKey(item.label)}|${searchVenueTextKey(row.city)}`);
   }
 
   for (const row of landings) {

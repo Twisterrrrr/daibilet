@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { normalizePublicVenueRecord } from './venue-normalize.js';
+import { normalizePublicVenueRecord, sanitizePartnerVenueDisplayTitle } from './venue-normalize.js';
 
 test('normalizePublicVenueRecord does not invent ул. before city prefix', () => {
   const result = normalizePublicVenueRecord({
@@ -119,4 +119,20 @@ test('inferCityFromAddressText prefers SPB embankment over ship Moskva-N', () =>
   });
   // Override by match title/aliases may apply; city must not stay Москва from hull name.
   assert.equal(result.city, 'Санкт-Петербург');
+});
+
+test('sanitizePartnerVenueDisplayTitle keeps fortress name only', () => {
+  assert.equal(
+    sanitizePartnerVenueDisplayTitle(
+      'Петропавловская крепость. Алексеевский равелин (внутренняя территория, ближе к пляжу со стороны Кронверкского пролива)',
+    ),
+    'Петропавловская крепость',
+  );
+  const record = normalizePublicVenueRecord({
+    title:
+      'Петропавловская крепость. Алексеевский равелин (внутренняя территория, ближе к пляжу со стороны Кронверкского пролива)',
+    address: 'ул. территория Петропавловская крепость, дом 3У',
+    city: 'Санкт-Петербург',
+  });
+  assert.equal(record.title, 'Петропавловская крепость');
 });

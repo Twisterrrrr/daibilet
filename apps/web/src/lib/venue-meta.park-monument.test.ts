@@ -4,6 +4,7 @@ import { describe, it } from 'node:test';
 import {
   LOCATION_CATALOG_TYPE_OPTIONS,
   PLACES_HUB_CATEGORY_CHIPS,
+  formatPublicVenueTitle,
   isMeetingPointLike,
   isTempleLikeVenueName,
   normalizeVenueKind,
@@ -70,5 +71,16 @@ describe('places hub split chips', () => {
     const chip = resolvePlacesHubCategoryChip('temples');
     assert.ok(chip);
     assert.equal(placesHubCategoryCount({ temple: 12, attraction: 40 }, chip), 12);
+  });
+});
+
+describe('fortress display title', () => {
+  it('strips ravelin meeting-point garbage', () => {
+    assert.equal(
+      formatPublicVenueTitle(
+        'Петропавловская крепость. Алексеевский равелин (внутренняя территория, ближе к пляжу со стороны Кронверкского пролива)',
+      ),
+      'Петропавловская крепость',
+    );
   });
 });

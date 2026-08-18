@@ -7,6 +7,7 @@ import {
   formatBusLocationDisplayName,
   formatPierLocationDisplayName,
   findVenueOverride,
+  formatPublicVenueTitle,
 } from './venue-normalize.js';
 import {
   resolveCityTimeZone,
@@ -5942,15 +5943,6 @@ function normalizeNullableString(value) {
   const text = String(value).trim();
   return text ? text : null;
 }
-
-function formatPublicVenueTitle(value) {
-  if (value == null) return value;
-  return String(value)
-    .replace(/\s*\(\s*-?\d+(?:\.\d+)?\s*,\s*-?\d+(?:\.\d+)?\s*\)\s*$/u, '')
-    .trim();
-}
-
-
 
 function capitalizeLocality(value) {
   const text = String(value || '').trim();
