@@ -46,6 +46,48 @@ const HUB_MUST_SEE_MODULES = [
     exportName: 'TVER_MUST_SEE',
     suburbsExport: 'TVER_SUBURBS',
   },
+  {
+    cityKey: 'novosibirsk',
+    file: 'apps/web/src/lib/novosibirsk-hub.ts',
+    exportName: 'NOVOSIBIRSK_MUST_SEE',
+    suburbsExport: 'NOVOSIBIRSK_SUBURBS',
+  },
+  {
+    cityKey: 'omsk',
+    file: 'apps/web/src/lib/omsk-hub.ts',
+    exportName: 'OMSK_MUST_SEE',
+    suburbsExport: 'OMSK_SUBURBS',
+  },
+  {
+    cityKey: 'ufa',
+    file: 'apps/web/src/lib/ufa-hub.ts',
+    exportName: 'UFA_MUST_SEE',
+    suburbsExport: 'UFA_SUBURBS',
+  },
+  {
+    cityKey: 'tyumen',
+    file: 'apps/web/src/lib/tyumen-hub.ts',
+    exportName: 'TYUMEN_MUST_SEE',
+    suburbsExport: 'TYUMEN_SUBURBS',
+  },
+  {
+    cityKey: 'chelyabinsk',
+    file: 'apps/web/src/lib/chelyabinsk-hub.ts',
+    exportName: 'CHELYABINSK_MUST_SEE',
+    suburbsExport: 'CHELYABINSK_SUBURBS',
+  },
+  {
+    cityKey: 'voronezh',
+    file: 'apps/web/src/lib/voronezh-hub.ts',
+    exportName: 'VORONEZH_MUST_SEE',
+    suburbsExport: 'VORONEZH_SUBURBS',
+  },
+  {
+    cityKey: 'ryazan',
+    file: 'apps/web/src/lib/ryazan-hub.ts',
+    exportName: 'RYAZAN_MUST_SEE',
+    suburbsExport: 'RYAZAN_SUBURBS',
+  },
 ];
 
 /** Live twins that already exist under a slightly different slug. */

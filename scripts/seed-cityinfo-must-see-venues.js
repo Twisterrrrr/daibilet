@@ -19,7 +19,13 @@ const fs = require('fs');
 const { createRequire } = require('module');
 const crypto = require('crypto');
 const { inferMustSeeKindAndFamily } = require('./lib/venue-kind-heuristics');
-const { collectHubMustSeeRows, toSeedPlan, HUB_PLACE_SLUG_ALIASES } = require('./lib/hub-must-see-seed');
+const {
+  collectHubMustSeeRows,
+  toSeedPlan,
+  HUB_PLACE_SLUG_ALIASES,
+  hasMinimalLocationProfile,
+  sanitizeEditorialText,
+} = require('./lib/hub-must-see-seed');
 
 const rootDir = path.resolve(__dirname, '..');
 loadRootEnv(rootDir);
@@ -272,6 +278,20 @@ async function main() {
       longitude: Number.isFinite(Number(item.longitude)) ? Number(item.longitude) : null,
     };
 
+    if (
+      !hasMinimalLocationProfile({
+        name: entry.name,
+        desc: item.desc,
+        latitude: entry.latitude,
+        longitude: entry.longitude,
+        address: entry.address,
+      })
+    ) {
+      entry.action = 'skip-thin-profile';
+      planned.push(entry);
+      continue;
+    }
+
     if (pool && !dryRun) {
       const city = await ensureCity(pool, cityCache, item.cityKey);
       if (!city) {
@@ -393,6 +413,25 @@ function parseHubModuleMustSee() {
       file: 'apps/web/src/lib/krasnoyarsk-hub.ts',
       exportName: 'KRASNOYARSK_MUST_SEE',
     },
+    {
+      cityKey: 'novosibirsk',
+      file: 'apps/web/src/lib/novosibirsk-hub.ts',
+      exportName: 'NOVOSIBIRSK_MUST_SEE',
+    },
+    { cityKey: 'omsk', file: 'apps/web/src/lib/omsk-hub.ts', exportName: 'OMSK_MUST_SEE' },
+    { cityKey: 'ufa', file: 'apps/web/src/lib/ufa-hub.ts', exportName: 'UFA_MUST_SEE' },
+    { cityKey: 'tyumen', file: 'apps/web/src/lib/tyumen-hub.ts', exportName: 'TYUMEN_MUST_SEE' },
+    {
+      cityKey: 'chelyabinsk',
+      file: 'apps/web/src/lib/chelyabinsk-hub.ts',
+      exportName: 'CHELYABINSK_MUST_SEE',
+    },
+    {
+      cityKey: 'voronezh',
+      file: 'apps/web/src/lib/voronezh-hub.ts',
+      exportName: 'VORONEZH_MUST_SEE',
+    },
+    { cityKey: 'ryazan', file: 'apps/web/src/lib/ryazan-hub.ts', exportName: 'RYAZAN_MUST_SEE' },
   ];
   const rows = [];
   for (const hub of hubs) {
@@ -433,13 +472,19 @@ function parseMustSeeArrayBody(arrayBody, cityKey) {
     const nameMatch = block.match(/name:\s*'((?:\\'|[^'])*)'/);
     if (!nameMatch) continue;
     const descMatch = block.match(/desc:\s*'((?:\\'|[^'])*)'/);
+    const latMatch = block.match(/latitude:\s*(-?\d+(?:\.\d+)?)/);
+    const lngMatch = block.match(/longitude:\s*(-?\d+(?:\.\d+)?)/);
+    const addressMatch = block.match(/address:\s*'((?:\\'|[^'])*)'/);
     rows.push({
       cityKey,
       name: unescapeTs(nameMatch[1]),
-      desc: descMatch ? unescapeTs(descMatch[1]) : '',
+      desc: sanitizeEditorialText(descMatch ? unescapeTs(descMatch[1]) : ''),
       venueSlug: (block.match(/venueSlug:\s*'([^']+)'/) || [])[1] || null,
       locationSlug: (block.match(/locationSlug:\s*'([^']+)'/) || [])[1] || null,
       href: (block.match(/href:\s*'([^']+)'/) || [])[1] || null,
+      address: addressMatch ? unescapeTs(addressMatch[1]) : null,
+      latitude: latMatch ? Number(latMatch[1]) : null,
+      longitude: lngMatch ? Number(lngMatch[1]) : null,
     });
   }
   return rows;
