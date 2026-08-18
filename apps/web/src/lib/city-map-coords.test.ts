@@ -59,8 +59,10 @@ const LIVE_CITY_SLUGS = [
   'smolensk',
   'sochi',
   'stavropol',
+  'surgut',
   'syktyvkar',
   'tambov',
+  'tolyatti',
   'tver',
   'tomsk',
   'tula',
@@ -78,7 +80,7 @@ test('city-map-coords covers all live destination city slugs', () => {
     if (!lookupCityMapCoords(slug)) missing.push(slug);
   }
   assert.deepEqual(missing, [], `missing coords for: ${missing.join(', ')}`);
-  assert.equal(LIVE_CITY_SLUGS.length, 65);
+  assert.equal(LIVE_CITY_SLUGS.length, 67);
 });
 
 test('resolveCityMapCoords accepts SEO aliases and Russian names', () => {

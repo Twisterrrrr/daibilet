@@ -1,3 +1,18 @@
+## 2026-08-18 - Tolyatti/Surgut: city cards and previews
+
+### Наблюдения
+- Для региональных standalone towns правило `events > 5 => отдельная city-card` уже было зафиксировано в `public-destination`, но для срочного ship не хватало окружающей обвязки `/cities`: у `Тольятти` и `Сургута` не было preview-ассетов в паттерне `apps/public/public/images/cities/top/{slug}.jpg` + `-thumb.jpg`.
+- После появления новых `type=city` карточек у `/cities`-карты также должны быть координаты для новых slug; без этого карта отставала бы от destinations-выдачи.
+- Локальную runtime-проверку `buildPublicDestinationsDto` не удалось довести до конца в этой среде: Prisma не достучалась до Postgres на `127.0.0.1:5437`.
+
+### Решения
+- Добавлены preview slug'и `tolyatti` и `surgut` в `apps/web/src/lib/city-images.ts` и зеркале `apps/public/src/lib/city-images.ts`, чтобы `/cities` и city hub сразу брали полноценные cover/thumb assets.
+- Сгенерированы локальные city previews `tolyatti.jpg`, `tolyatti-thumb.jpg`, `surgut.jpg`, `surgut-thumb.jpg` в `apps/public/public/images/cities/top/` без использования city-placeholder.
+- Добавлены координаты и crop-focus для обоих городов; обновлены focused tests на backend-порог `>5`, image resolution и live city-map slug list.
+
+### Проблемы
+- MCP Postgres в этой сессии недоступен (`ECONNREFUSED 127.0.0.1:5433`), а локальный Prisma runtime без поднятой БД не даёт проверить фактический `/api/public/destinations` payload against live data.
+
 ## 2026-08-18 - Музеи не должны жить в sights
 
 ### Наблюдения

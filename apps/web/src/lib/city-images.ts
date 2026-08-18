@@ -93,6 +93,8 @@ const CITY_CARD_IMAGE_SLUGS = new Set([
   'abakan',
   'sevastopol',
   'simferopol',
+  'surgut',
+  'tolyatti',
 ]);
 
 /**
@@ -176,6 +178,8 @@ const CITY_DAYTIME_PREVIEW_SLUGS = new Set([
   'vologda',
   'suzdal',
   'sortavala',
+  'surgut',
+  'tolyatti',
 ]);
 
 /**

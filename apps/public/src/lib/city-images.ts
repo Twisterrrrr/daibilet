@@ -93,6 +93,8 @@ const CITY_CARD_IMAGE_SLUGS = new Set([
   'abakan',
   'sevastopol',
   'simferopol',
+  'surgut',
+  'tolyatti',
 ]);
 
 /** Daytime JPG under `/images/cities/top/` when available; else legacy PNG. */
@@ -164,6 +166,8 @@ const CITY_DAYTIME_PREVIEW_SLUGS = new Set([
   'vologda',
   'suzdal',
   'sortavala',
+  'surgut',
+  'tolyatti',
 ]);
 
 /** Night hub heroes under `/images/cities/night/`. */

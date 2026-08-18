@@ -181,6 +181,26 @@ test('adm centers show a /cities card from 1 event; regional towns need events >
   assert.equal(vologda.some((row) => row.name === 'Вологда'), true);
 });
 
+test('tolyatti and surgut become city cards once they clear the live threshold', () => {
+  const rows = buildPublicDestinationRowsFromSessions([
+    ...citySessions('Тольятти', 11).map((session) => ({
+      ...session,
+      destination: 'Самарская область',
+      destinationType: 'region' as const,
+    })),
+    ...citySessions('Сургут', 13).map((session) => ({
+      ...session,
+      destination: 'Ханты-Мансийский автономный округ',
+      destinationType: 'region' as const,
+    })),
+  ] as never);
+
+  assert.equal(rows.some((row) => row.name === 'Тольятти' && row.type === 'city' && row.events === 11), true);
+  assert.equal(rows.some((row) => row.name === 'Сургут' && row.type === 'city' && row.events === 13), true);
+  assert.equal(rows.some((row) => row.name === 'Самарская область' && row.events > 0), false);
+  assert.equal(rows.some((row) => row.name === 'Ханты-Мансийский автономный округ' && row.events > 0), false);
+});
+
 test('standalone slug matches even with zero catalog events', () => {
   assert.equal(matchStandaloneCityBySlug('sortavala'), 'Сортавала');
   assert.equal(matchStandaloneCityBySlug('Сортавала'), 'Сортавала');

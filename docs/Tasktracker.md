@@ -1,3 +1,9 @@
+## 2026-08-18 - Tolyatti/Surgut city cards + previews
+
+| ID | Задача | Priority | Status |
+|---|---|---|---|
+| GEO.CITIES-STANDALONE-CARDS | `/api/public/destinations` и `/cities`: Тольятти/Сургут как standalone `type=city` при `events > 5`, плюс coords и card previews без placeholder | Высокий | ✅ code+tests+assets локально; push pending, live deploy не делали |
+
 ## 2026-08-18 - Museums leave sights in catalog
 
 | ID | Задача | Приоритет | Статус |
