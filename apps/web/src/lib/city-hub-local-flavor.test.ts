@@ -45,6 +45,12 @@ const VORONEZH_HUB_SRC = readFileSync(
   fileURLToPath(new URL('./voronezh-hub.ts', import.meta.url)),
   'utf8',
 );
+const ROSTOV_HUB_SRC = readFileSync(
+  fileURLToPath(new URL('./rostov-na-donu-hub.ts', import.meta.url)),
+  'utf8',
+);
+const PENZA_HUB_SRC = readFileSync(fileURLToPath(new URL('./penza-hub.ts', import.meta.url)), 'utf8');
+const TVER_HUB_SRC = readFileSync(fileURLToPath(new URL('./tver-hub.ts', import.meta.url)), 'utf8');
 const UFA_HUB_SRC = readFileSync(fileURLToPath(new URL('./ufa-hub.ts', import.meta.url)), 'utf8');
 const RYAZAN_HUB_SRC = readFileSync(fileURLToPath(new URL('./ryazan-hub.ts', import.meta.url)), 'utf8');
 const OMSK_HUB_SRC = readFileSync(fileURLToPath(new URL('./omsk-hub.ts', import.meta.url)), 'utf8');
@@ -66,6 +72,9 @@ function cityInfoHasSlug(slug: string): boolean {
     quoted.test(KRASNOYARSK_HUB_SRC) ||
     quoted.test(NOVOSIBIRSK_HUB_SRC) ||
     quoted.test(VORONEZH_HUB_SRC) ||
+    quoted.test(ROSTOV_HUB_SRC) ||
+    quoted.test(PENZA_HUB_SRC) ||
+    quoted.test(TVER_HUB_SRC) ||
     quoted.test(UFA_HUB_SRC) ||
     quoted.test(RYAZAN_HUB_SRC) ||
     quoted.test(OMSK_HUB_SRC) ||
@@ -90,6 +99,9 @@ test('weather widget covers Perm, Moscow, SPB, Kaliningrad, NN, EKB, Kazan, Sama
   assert.equal(cityHasWeatherWidget('krasnoyarsk'), true);
   assert.equal(cityHasWeatherWidget('novosibirsk'), true);
   assert.equal(cityHasWeatherWidget('voronezh'), true);
+  assert.equal(cityHasWeatherWidget('rostov-na-donu'), true);
+  assert.equal(cityHasWeatherWidget('penza'), true);
+  assert.equal(cityHasWeatherWidget('tver'), true);
   assert.equal(cityHasWeatherWidget('ryazan'), true);
   assert.equal(cityHasWeatherWidget('ufa'), true);
   assert.equal(cityHasWeatherWidget('omsk'), true);
@@ -200,6 +212,24 @@ test('Moscow SPB NN Kaliningrad identity packs have 4 slides', () => {
       badges: ['Символ', 'Искусство', 'Гастро', 'Архитектура'],
     },
     {
+      slug: 'rostov-na-donu',
+      heading: 'Чем уникален Ростов-на-Дону',
+      ids: ['don-bridge', 'merchant-yards', 'don-crayfish', 'tractor-theatre'],
+      badges: ['Символ', 'Искусство', 'Гастро', 'Архитектура'],
+    },
+    {
+      slug: 'penza',
+      heading: 'Чем уникальна Пенза',
+      ids: ['old-fortress', 'meyerhold-city', 'quiet-moscow', 'lermontov-tarhany'],
+      badges: ['Символ', 'Искусство', 'Гастро', 'Архитектура'],
+    },
+    {
+      slug: 'tver',
+      heading: 'Чем уникальна Тверь',
+      ids: ['starovolzhsky-bridge', 'travel-palace', 'pozharskaya-goat', 'morozov-town'],
+      badges: ['Символ', 'Искусство', 'Гастро', 'Архитектура'],
+    },
+    {
       slug: 'ryazan',
       heading: 'Чем уникальна Рязань',
       ids: ['ryazan-kremlin', 'yesenin-meshchera', 'karavaets-kalinnik', 'saltykov-wood'],
@@ -273,6 +303,9 @@ test('weather CTA slugs exist in cityInfo', () => {
     'krasnoyarsk',
     'novosibirsk',
     'voronezh',
+    'rostov-na-donu',
+    'penza',
+    'tver',
     'ryazan',
     'ufa',
     'omsk',
@@ -326,6 +359,9 @@ test('when-to-go covers Perm, Moscow, SPB, Kaliningrad, NN, EKB, Kazan, Samara, 
   assert.equal(cityHasWhenToGo('krasnoyarsk'), true);
   assert.equal(cityHasWhenToGo('novosibirsk'), true);
   assert.equal(cityHasWhenToGo('voronezh'), true);
+  assert.equal(cityHasWhenToGo('rostov-na-donu'), true);
+  assert.equal(cityHasWhenToGo('penza'), true);
+  assert.equal(cityHasWhenToGo('tver'), true);
   assert.equal(cityHasWhenToGo('ryazan'), true);
   assert.equal(cityHasWhenToGo('ufa'), true);
   assert.equal(cityHasWhenToGo('omsk'), true);
@@ -344,6 +380,9 @@ test('when-to-go covers Perm, Moscow, SPB, Kaliningrad, NN, EKB, Kazan, Samara, 
     'krasnoyarsk',
     'novosibirsk',
     'voronezh',
+    'rostov-na-donu',
+    'penza',
+    'tver',
     'ryazan',
     'ufa',
     'omsk',
@@ -442,12 +481,46 @@ test('editorial hub mustSee, suburb roots and nested places have non-empty desc'
     if (city === 'voronezh') {
       assert.ok((info.mustSee || []).length >= 50, 'voronezh mustSee floor ~50');
     }
+    if (city === 'rostov-na-donu') {
+      assert.ok((info.mustSee || []).length >= 50, 'rostov mustSee floor ~50');
+      const suburbSlugs = (info.significantSuburbs || []).map((suburb) => suburb.locationSlug);
+      assert.ok(suburbSlugs.includes('rostov-na-donu-aksayskaya-tamozhennaya-zastava'), 'rostov suburb Aksai');
+    }
+    if (city === 'penza') {
+      assert.ok((info.mustSee || []).length >= 50, 'penza mustSee floor ~50');
+      const suburbSlugs = (info.significantSuburbs || []).map((suburb) => suburb.locationSlug);
+      assert.ok(suburbSlugs.includes('penza-ahunskiy-sosnovyy-bor'), 'penza suburb Akhuny');
+    }
+    if (city === 'tver') {
+      assert.ok((info.mustSee || []).length >= 50, 'tver mustSee floor ~50');
+      const suburbSlugs = (info.significantSuburbs || []).map((suburb) => suburb.locationSlug);
+      assert.ok(suburbSlugs.includes('tver-torzhok'), 'tver suburb Torzhok');
+      assert.ok(suburbSlugs.includes('tver-domotkanovo'), 'tver suburb Domotkanovo');
+      assert.ok(suburbSlugs.includes('tver-staritsa'), 'tver suburb Staritsa');
+    }
     if (city === 'ryazan') {
       assert.ok((info.mustSee || []).length >= 70, 'ryazan mustSee floor 50+15+7');
     }
     if (city === 'ufa') {
       assert.ok((info.mustSee || []).length >= 50, 'ufa mustSee floor ~50');
       assert.ok((info.mustSee || []).length <= 58, 'ufa mustSee cap ~55');
+      const suburbSlugs = (info.significantSuburbs || []).map((suburb) => suburb.locationSlug);
+      assert.ok(suburbSlugs.includes('ufa-muradymovskoe-ushchele'), 'ufa suburb Muradymovo');
+      assert.ok(suburbSlugs.includes('ufa-rozovye-skaly-inzer'), 'ufa suburb Inzer rocks');
+    }
+    if (city === 'krasnoyarsk') {
+      const suburbSlugs = (info.significantSuburbs || []).map((suburb) => suburb.locationSlug);
+      assert.ok(suburbSlugs.includes('krasnoyarsk-ovsyanka-astafev'), 'krasnoyarsk suburb Ovsyanka');
+    }
+    if (city === 'krasnodar') {
+      const suburbSlugs = (info.significantSuburbs || []).map((suburb) => suburb.locationSlug);
+      assert.ok(suburbSlugs.includes('krasnodar-pshada-dolmeny'), 'krasnodar suburb Pshada');
+      assert.ok(suburbSlugs.includes('krasnodar-guamskoe-ushchele'), 'krasnodar suburb Guamka');
+    }
+    if (city === 'samara') {
+      const suburbSlugs = (info.significantSuburbs || []).map((suburb) => suburb.locationSlug);
+      assert.ok(suburbSlugs.includes('samara-zamok-garibaldi'), 'samara suburb Garibaldi');
+      assert.ok(suburbSlugs.includes('samara-sergievskie-mineralnye-vody'), 'samara suburb Sergievskie');
     }
     if (city === 'omsk') {
       assert.ok((info.mustSee || []).length >= 60, 'omsk mustSee floor 15+50');

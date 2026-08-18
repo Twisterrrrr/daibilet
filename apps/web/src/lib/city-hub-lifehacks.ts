@@ -1184,6 +1184,259 @@ const VORONEZH_ITEMS: CityLifehackItem[] = [
   },
 ];
 
+const ROSTOV_ITEMS: CityLifehackItem[] = [
+  {
+    id: 'rostov-card-cheaper',
+    tabId: 'transit',
+    icon: 'transit',
+    title: 'Карта дешевле наличных',
+    body: body(
+      'В ростовских автобусах и трамваях выгоднее платить банковской картой. Безнал обычно дешевле наличных на ',
+      { s: '5-6 ₽' },
+      '.',
+    ),
+    cta: {
+      kind: 'gis',
+      label: 'Транспорт на карте',
+      href: twoGisCitySearchUrl('rostov', 'транспорт Ростов-на-Дону'),
+    },
+  },
+  {
+    id: 'rostov-pushkinskaya-free',
+    tabId: 'walk',
+    icon: 'walk',
+    title: 'Пушкинская бесплатно и без лимита',
+    body: body(
+      'Главный зеленый променад города доступен ',
+      { s: '24/7' },
+      ': бульвар, скамейки, клумбы, тень и длинная пешая ось через центр без билетов и турникетов.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Маршрут по Пушкинской',
+      slugs: ['rostov-na-donu-pushkinskaya-ulitsa', 'rostov-na-donu-pamyatnik-pushkinu'],
+      scrollTo: 'places',
+    },
+  },
+  {
+    id: 'rostov-free-view',
+    tabId: 'walk',
+    icon: 'walk',
+    title: 'Седова вместо платной панорамы',
+    body: body(
+      'Лучший вид на порт, Дон и Ворошиловский мост открывается ',
+      { s: 'бесплатно' },
+      ' со смотровой на Седова. На закат приходите за 30-40 минут до солнца.',
+    ),
+    cta: {
+      kind: 'maps',
+      label: 'Смотровая на карте',
+      href: yandexMapsSearchUrl('Смотровая на Седова Ростов-на-Дону'),
+    },
+  },
+  {
+    id: 'rostov-market-snack',
+    tabId: 'food',
+    icon: 'food',
+    title: 'Перекус на Старом базаре',
+    body: body(
+      'Вместо дорогого фастфуда идите на Центральный рынок за пирожками, рыбой, овощами и локальными закусками. Это самый дешевый способ попробовать город ',
+      { s: 'по-настоящему' },
+      '.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Рынок и гастро',
+      slugs: ['rostov-na-donu-tsentralnyy-rynok-staryy-bazar', 'rostov-na-donu-raki-i-gady'],
+      scrollTo: 'places',
+    },
+  },
+  {
+    id: 'rostov-museum-day',
+    tabId: 'walk',
+    icon: 'museum',
+    title: 'Краеведческий музей по льготному дню',
+    body: body(
+      'Перед визитом проверяйте льготные и бесплатные дни у областного музея краеведения. Для студентов и детей они часто заметно выгоднее разового входа в высокий сезон.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Музеи Ростова',
+      slugs: [
+        'rostov-na-donu-oblastnoy-muzey-kraevedeniya',
+        'rostov-na-donu-muzey-izobrazitelnyh-iskusstv',
+      ],
+      scrollTo: 'places',
+    },
+  },
+];
+
+const PENZA_ITEMS: CityLifehackItem[] = [
+  {
+    id: 'penza-center-walk',
+    tabId: 'walk',
+    icon: 'walk',
+    title: 'Центр реально пройти пешком',
+    body: body(
+      'Пенза выигрывает компактностью. Крепостной холм, Московская, фонтан и музей одной картины собираются в один маршрут ',
+      { s: 'без такси' },
+      '.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Маршрут по центру',
+      slugs: ['penza-pamyatnik-pervoposelentsu', 'penza-penzenskaya-peshehodnaya-ulitsa-moskovskaya'],
+      scrollTo: 'places',
+    },
+  },
+  {
+    id: 'penza-card-transport',
+    tabId: 'transit',
+    icon: 'transit',
+    title: 'Безнал удобнее наличных',
+    body: body(
+      'В городском транспорте проще и быстрее платить картой. Для короткой поездки между вокзалом и центром отдельная транспортная карта не нужна.',
+    ),
+    cta: {
+      kind: 'gis',
+      label: 'Транспорт на карте',
+      href: twoGisCitySearchUrl('penza', 'транспорт Пенза'),
+    },
+  },
+  {
+    id: 'penza-park-free',
+    tabId: 'walk',
+    icon: 'walk',
+    title: 'Парк Белинского почти бесплатен',
+    body: body(
+      'Сам вход в исторический парк и прогулка по аллеям ',
+      { s: 'бесплатны' },
+      '. Платить есть смысл только за отдельные аттракционы и планетарий.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Парк Белинского',
+      slugs: ['penza-park-imeni-v-g-belinskogo', 'penza-planetariy'],
+      scrollTo: 'places',
+    },
+  },
+  {
+    id: 'penza-market-snack',
+    tabId: 'food',
+    icon: 'food',
+    title: 'Перекус вместо ресторанной паузы',
+    body: body(
+      'На центральных улицах ищите пекарни, кофейни и быстрые обеды. Для небольшого города это часто выгоднее, чем садиться в полноценный ресторан посреди маршрута.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Где поесть в Пензе',
+      slugs: ['penza-moskovskaya-gastro-kvartal', 'penza-centralnyy-rynok'],
+      scrollTo: 'places',
+    },
+  },
+  {
+    id: 'penza-tarhany-plan',
+    tabId: 'walk',
+    icon: 'museum',
+    title: 'Тарханы - только половиной дня',
+    body: body(
+      'Не вставляйте Тарханы в короткий городской день. Это отдельный выезд минимум на ',
+      { s: 'полдня' },
+      ', иначе вы потеряете и музей, и саму Пензу.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Выезд в Тарханы',
+      slugs: ['penza-tarhany-day-trip', 'penza-muzey-zapovednik-tarhany'],
+      scrollTo: 'suburbs',
+    },
+  },
+];
+
+const TVER_ITEMS: CityLifehackItem[] = [
+  {
+    id: 'tver-volga-card',
+    tabId: 'transit',
+    icon: 'transit',
+    title: 'Карта «Волга» дешевле наличных',
+    body: body(
+      'В автобусах и троллейбусах платите картой «Волга» или любой бесконтактной. Безнал сразу дешевле наличных на ',
+      { s: '4-5 ₽' },
+      ', а онлайн-тариф дает бесплатную пересадку за 60 минут.',
+    ),
+    cta: {
+      kind: 'gis',
+      label: 'Транспорт Твери',
+      href: twoGisCitySearchUrl('tver', 'транспорт Тверь'),
+    },
+  },
+  {
+    id: 'tver-palace-free',
+    tabId: 'walk',
+    icon: 'museum',
+    title: 'Бесплатный день во дворце',
+    body: body(
+      'Каждую последнюю среду месяца Путевой дворец бесплатен для лиц до 18 лет, многодетных семей и студентов ссузов. Левитан и залы Екатерины II можно увидеть ',
+      { s: 'без лишнего билета' },
+      '.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Путевой дворец',
+      slugs: ['tver-imperatorskiy-putevoy-dvorets', 'tver-oblastnaya-kartinnaya-galereya'],
+      scrollTo: 'places',
+    },
+  },
+  {
+    id: 'tver-nikitin-view',
+    tabId: 'walk',
+    icon: 'walk',
+    title: 'Бесплатный вид с набережной Никитина',
+    body: body(
+      'Не платите за пентхаус ради кадра Волги. Лучший круговой вид на дворец, стрелку и арки Староволжского моста открывается с гранитных амфитеатров набережной Афанасия Никитина.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Смотровая на Волгу',
+      slugs: ['tver-naberezhnaya-afanasiya-nikitina', 'tver-starovolzhskiy-most'],
+      scrollTo: 'places',
+    },
+  },
+  {
+    id: 'tver-sloyki',
+    tabId: 'food',
+    icon: 'food',
+    title: 'Тверские слойки на Трехсвятской',
+    body: body(
+      'Ищите кулинарии «Тверской кондитер» на пешеходной Трехсвятской. Слойка с брусникой или пирожок с рыбой стоят копейки и лучше держат долгую прогулку, чем дорогая кофейня.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Где поесть в Твери',
+      slugs: ['tver-peshehodnaya-trehsvyatskaya-ulitsa', 'tver-restoran-lyublin'],
+      scrollTo: 'places',
+    },
+  },
+  {
+    id: 'tver-tmaka-free',
+    tabId: 'walk',
+    icon: 'walk',
+    title: 'Парк «Тьмака» бесплатен',
+    body: body(
+      'Благоустроенная пойма с экотропами, пикник-зонами и воркаутом открыта ',
+      { s: 'бесплатно 24/7' },
+      '. Платные закрытые зоны отдыха для этой прогулки не нужны.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Парк Тьмака',
+      slugs: ['tver-landshaftnyy-park-tmaka'],
+      scrollTo: 'places',
+    },
+  },
+];
+
 const RYAZAN_ITEMS: CityLifehackItem[] = [
   {
     id: 'ryazan-umka-card',
@@ -1647,6 +1900,9 @@ const CITY_HUB_LIFEHACKS: Record<string, CityLifehackPack> = {
   omsk: lifehackPack(OMSK_ITEMS),
   chelyabinsk: lifehackPack(CHELYABINSK_ITEMS),
   tyumen: lifehackPack(TYUMEN_ITEMS),
+  'rostov-na-donu': lifehackPack(ROSTOV_ITEMS),
+  penza: lifehackPack(PENZA_ITEMS),
+  tver: lifehackPack(TVER_ITEMS),
 };
 
 export function resolveCityLifehacks(slug: string | null | undefined): CityLifehackPack | null {

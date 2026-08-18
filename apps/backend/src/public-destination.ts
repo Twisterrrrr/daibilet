@@ -57,6 +57,10 @@ const CITY_SLUG_CANONICAL: Record<string, string> = {
   rostov: 'rostov-na-donu',
   'rostov-on-don': 'rostov-na-donu',
   'rostov-na-donu': 'rostov-na-donu',
+  'hanty-mansiysk': 'hanty-mansiysk',
+  'khanty-mansiysk': 'hanty-mansiysk',
+  novokuzneck: 'novokuzneck',
+  novokuznetsk: 'novokuzneck',
 };
 
 const CITY_HUB_LANDING_SHORT: Record<string, string> = {

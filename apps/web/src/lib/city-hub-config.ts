@@ -94,6 +94,28 @@ export const CITY_HUB_CONFIG: Record<string, CityHubConfig> = {
     ],
     venuesTopN: 8,
   },
+  penza: {
+    highlightSeason: { label: 'Лермонтовская осень', monthsHint: 'сентябрь-октябрь' },
+    primaryCta: { label: 'События в Пензе', target: '#affiche' },
+    featuredDirections: [
+      { id: 'center', label: 'Крепость и центр', categoryKey: 'Экскурсии', emphasis: 'primary' },
+      { id: 'walking', label: 'Пешие прогулки', landingSlug: 'walking-tours' },
+      { id: 'theatre', label: 'Театр', categoryKey: 'Театр' },
+      { id: 'family', label: 'Семейные', landingSlug: 'family-kids' },
+    ],
+    venuesTopN: 8,
+  },
+  tver: {
+    highlightSeason: { label: 'Золотые набережные', monthsHint: 'сентябрь-октябрь' },
+    primaryCta: { label: 'События в Твери', target: '#affiche' },
+    featuredDirections: [
+      { id: 'center', label: 'Дворец и Волга', categoryKey: 'Экскурсии', emphasis: 'primary' },
+      { id: 'walking', label: 'Пешие прогулки', landingSlug: 'walking-tours' },
+      { id: 'theatre', label: 'Театр', categoryKey: 'Театр' },
+      { id: 'family', label: 'Семейные', landingSlug: 'family-kids' },
+    ],
+    venuesTopN: 8,
+  },
   ryazan: {
     highlightSeason: { label: 'Калинник', monthsHint: 'сентябрь' },
     primaryCta: { label: 'События в Рязани', target: '#affiche' },
@@ -143,6 +165,17 @@ export const CITY_HUB_CONFIG: Record<string, CityHubConfig> = {
     primaryCta: { label: 'События в Тюмени', target: '#affiche' },
     featuredDirections: [
       { id: 'center', label: 'Набережная и Арбат', categoryKey: 'Экскурсии', emphasis: 'primary' },
+      { id: 'walking', label: 'Пешие прогулки', landingSlug: 'walking-tours' },
+      { id: 'theatre', label: 'Театр', categoryKey: 'Театр' },
+      { id: 'family', label: 'Семейные', landingSlug: 'family-kids' },
+    ],
+    venuesTopN: 8,
+  },
+  'rostov-na-donu': {
+    highlightSeason: { label: 'Бархатный сезон', monthsHint: 'сентябрь-октябрь' },
+    primaryCta: { label: 'События в Ростове-на-Дону', target: '#affiche' },
+    featuredDirections: [
+      { id: 'don', label: 'Дон и центр', categoryKey: 'Экскурсии', emphasis: 'primary' },
       { id: 'walking', label: 'Пешие прогулки', landingSlug: 'walking-tours' },
       { id: 'theatre', label: 'Театр', categoryKey: 'Театр' },
       { id: 'family', label: 'Семейные', landingSlug: 'family-kids' },
@@ -199,11 +232,14 @@ const BLOG_AFTER_SUBURBS_SLUGS = new Set([
   'krasnodar',
   'krasnoyarsk',
   'voronezh',
+  'penza',
+  'tver',
   'ryazan',
   'ufa',
   'omsk',
   'chelyabinsk',
   'tyumen',
+  'rostov-na-donu',
 ]);
 
 export function isCityHubBlogAfterSuburbs(slug: string | null | undefined): boolean {

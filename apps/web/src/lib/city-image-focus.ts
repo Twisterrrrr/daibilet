@@ -5,6 +5,7 @@ const CITY_IMAGE_OBJECT_POSITION: Record<string, string> = {
   chelyabinsk: '65% 57%',
   // Небоскрёбы (Исеть и др.) у верхнего края кадра - якорим к top, иначе hero их срезает.
   ekaterinburg: '72% 0%',
+  'hanty-mansiysk': '48% 52%',
   irkutsk: '59% 52%',
   izhevsk: '60% 52%',
   kaliningrad: '65% 49%',
@@ -14,6 +15,7 @@ const CITY_IMAGE_OBJECT_POSITION: Record<string, string> = {
   moscow: '56% 54%',
   'nizhny-novgorod': 'center 54%',
   novosibirsk: '58% 56%',
+  novokuznetsk: '52% 48%',
   omsk: '65% 50%',
   orel: '62% 50%',
   orenburg: '65% 55%',

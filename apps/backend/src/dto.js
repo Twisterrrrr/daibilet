@@ -6626,6 +6626,10 @@ const CITY_SLUG_CANONICAL = {
   rostov: 'rostov-na-donu',
   'rostov-on-don': 'rostov-na-donu',
   'rostov-na-donu': 'rostov-na-donu',
+  'hanty-mansiysk': 'hanty-mansiysk',
+  'khanty-mansiysk': 'hanty-mansiysk',
+  novokuzneck: 'novokuzneck',
+  novokuznetsk: 'novokuzneck',
 };
 
 function canonicalCitySlug(value) {

@@ -1,3 +1,11 @@
+## 2026-08-18 - Rostov/Penza/Tver hubs + Главные + geo cards
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| CONT.ROSTOV-PENZA-TVER-HUBS | Хабы Ростов/Пенза/Тверь: identity / whenToGo / 50+ mustSee / suburbs / lines / FAQ / lifehacks / фестивали + public sync | Высокий | 🔄 code; commit+push+Deploy MSK web |
+| UX.MUSTSEE-MAIN-SHARED | «Главные» - общий топ города: `alsoMain` + backfill до 6, точки остаются в тематических вкладках | Высокий | 🔄 code |
+| GEO.CITIES-STANDALONE-CARDS | `/cities`: Тольятти/Сургут/Новокузнецк при events>5; Ханты-Мансийск как адмцентр; preview+coords; alias `khanty-mansiysk` | Высокий | 🔄 web assets; live destinations ждут restart `daibilet-api` |
+
 ## 2026-08-18 - Tolyatti/Surgut city cards + previews
 
 | ID | Задача | Priority | Status |

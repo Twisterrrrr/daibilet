@@ -205,6 +205,10 @@ test('standalone slug matches even with zero catalog events', () => {
   assert.equal(matchStandaloneCityBySlug('sortavala'), 'Сортавала');
   assert.equal(matchStandaloneCityBySlug('Сортавала'), 'Сортавала');
   assert.equal(matchStandaloneCityBySlug('tolyatti'), 'Тольятти');
+  assert.equal(matchStandaloneCityBySlug('novokuznetsk'), 'Новокузнецк');
+  assert.equal(matchStandaloneCityBySlug('novokuzneck'), 'Новокузнецк');
+  assert.equal(matchStandaloneCityBySlug('hanty-mansiysk'), 'Ханты-Мансийск');
+  assert.equal(matchStandaloneCityBySlug('khanty-mansiysk'), 'Ханты-Мансийск');
   assert.equal(matchStandaloneCityBySlug('ramenskoe'), null);
 });
 

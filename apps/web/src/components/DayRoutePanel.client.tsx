@@ -212,6 +212,7 @@ import { formatPriceFrom } from '@/lib/format';
 import {
   buildMustSeeFilterTabs,
   classifyMustSeePlace,
+  filterMustSeePlaces,
   mustSeeFilterLabel,
   mustSeeFilterStopTypeTag,
   type MustSeeFilterId,
@@ -1243,7 +1244,15 @@ function DayRoutePanelInner() {
   const mustSeeFiltered = useMemo(() => {
     const active =
       mustSeeFilterMeta.tabs.length < 2 ? mustSeeFilterMeta.defaultId : mustSeeFilter;
-    return mustSeeResolved.filter((row) => classifyMustSeePlace(row.place) === active);
+    const allowed = new Set(
+      filterMustSeePlaces(
+        mustSeeResolved.map((row) => row.place),
+        active,
+      ).map((place) => `${place.venueSlug || ''}::${place.locationSlug || ''}::${place.name || ''}`),
+    );
+    return mustSeeResolved.filter((row) =>
+      allowed.has(`${row.place.venueSlug || ''}::${row.place.locationSlug || ''}::${row.place.name || ''}`),
+    );
   }, [mustSeeResolved, mustSeeFilter, mustSeeFilterMeta]);
 
   const betweenInsertSuggestions = useMemo(() => {

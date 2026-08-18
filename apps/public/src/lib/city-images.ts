@@ -22,6 +22,8 @@ const CITY_CARD_IMAGE_ALIASES: Record<string, string> = {
   blagoveshchensk: 'blagoveschensk-amurskaya-oblast',
   'blagoveshchensk-amurskaya-oblast': 'blagoveschensk-amurskaya-oblast',
   'yuzhno-sakhalinsk': 'yuzhno-sahalinsk',
+  'khanty-mansiysk': 'hanty-mansiysk',
+  novokuzneck: 'novokuznetsk',
 };
 
 const CITY_CARD_IMAGE_SLUGS = new Set([
@@ -95,6 +97,8 @@ const CITY_CARD_IMAGE_SLUGS = new Set([
   'simferopol',
   'surgut',
   'tolyatti',
+  'novokuznetsk',
+  'hanty-mansiysk',
 ]);
 
 /** Daytime JPG under `/images/cities/top/` when available; else legacy PNG. */
@@ -168,6 +172,8 @@ const CITY_DAYTIME_PREVIEW_SLUGS = new Set([
   'sortavala',
   'surgut',
   'tolyatti',
+  'novokuznetsk',
+  'hanty-mansiysk',
 ]);
 
 /** Night hub heroes under `/images/cities/night/`. */

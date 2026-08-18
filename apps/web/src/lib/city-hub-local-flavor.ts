@@ -4,7 +4,7 @@
  * agents can edit geo without merge fights.
  *
  * Tourist hubs with weather+seasons+identity: Perm, Moscow, SPB, Kaliningrad, NN,
- * Ekaterinburg, Kazan, Samara, Krasnodar, Krasnoyarsk, Novosibirsk, Voronezh, Ufa, Omsk, Chelyabinsk, Tyumen.
+ * Ekaterinburg, Kazan, Samara, Krasnodar, Krasnoyarsk, Novosibirsk, Voronezh, Ufa, Omsk, Chelyabinsk, Tyumen, Rostov-on-Don, Penza, Tver.
  */
 
 import { normalizeCityHubSlug } from './city-hub-config.ts';
@@ -1715,6 +1715,303 @@ const VORONEZH_SLIDES: CityIdentitySlide[] = [
   },
 ];
 
+const ROSTOV_NA_DONU_WEATHER: CityWeatherFlavor = {
+  latitude: 47.222,
+  longitude: 39.72,
+  timezone: 'Europe/Moscow',
+  outdoorSlugs: [
+    'rostov-na-donu-naberezhnaya-reki-don-beregovaya-ulitsa',
+    'rostov-na-donu-pushkinskaya-ulitsa',
+    'rostov-na-donu-park-revolyutsii',
+    'rostov-na-donu-smotrovaya-na-sedova',
+    'rostov-na-donu-park-levoberezhnyy',
+  ],
+  indoorSlugs: [
+    'rostov-na-donu-oblastnoy-muzey-kraevedeniya',
+    'rostov-na-donu-muzey-izobrazitelnyh-iskusstv',
+    'rostov-na-donu-teatr-dramy-im-gorkogo',
+    'rostov-na-donu-onegin-dacha',
+    'rostov-na-donu-tsentralnyy-rynok-staryy-bazar',
+  ],
+  outdoorCta: 'Отличная погода для Дона, Пушкинской и смотровой на Седова',
+  indoorCtaOvercast: 'Сегодня пасмурно. Загляните в краеведческий, музей на Пушкинской или на рынок',
+  indoorCtaRain: 'Сегодня дождь. Музеи центра, театр Горького или длинный обед в «Онегин Даче»',
+  indoorCtaSnow: 'Сегодня ветрено и сыро. Музеи, театр и гастро-точки центра подойдут лучше набережной',
+};
+
+const ROSTOV_NA_DONU_WHEN_TO_GO: CityWhenToGoFlavor = {
+  timeZone: 'Europe/Moscow',
+  seasons: [
+    {
+      id: 'winter',
+      months: [12, 1, 2],
+      headline: 'Зима',
+      body: 'Мягко, но ветрено: около -3...-5 °C, снег легко сменяется дождем. Лучше планировать музеи, рынки и короткие прогулки между гастро-паузы.',
+    },
+    {
+      id: 'spring',
+      months: [3, 4, 5],
+      headline: 'Весна',
+      body: 'В апреле город быстро зеленеет, а в мае уже +20...+25 °C. Лучшее время для длинных прогулок по Пушкинской, рынку и набережной до летней жары.',
+    },
+    {
+      id: 'summer',
+      months: [6, 7, 8],
+      headline: 'Лето',
+      body: 'Очень жарко и сухо, нередко +35...+40 °C. Днем лучше музеи и рестораны, а набережную и Левбердон оставлять на вечер.',
+    },
+    {
+      id: 'autumn',
+      months: [9, 10, 11],
+      headline: 'Осень',
+      body: 'Сентябрь и октябрь - золотой сезон Ростова: долгое тепло, меньше транзитного трафика по М-4 и комфортные прогулки по центру.',
+    },
+  ],
+  tabs: seasonTabs({
+    spring:
+      'В апреле Ростов быстро зеленеет, а к маю воздух выходит на +20...+25 °C. Это идеальное время для Пушкинской, Большой Садовой и рынков без изнуряющей жары. В мае оживает набережная и стартует сезон прогулочных теплоходов.',
+    summer:
+      'Лето здесь экстремально жаркое и сухое, часто выше +35 °C. Планируйте основные прогулки утром и после заката, а дневные часы оставляйте на музеи, рынок и рестораны с кондиционером. Плюс сезона - южные фрукты, раки и доступность загородных выездов.',
+    autumn:
+      'Сентябрь и октябрь дают Ростову тот самый бархатный ритм: +18...+23 °C, меньше трафика по М-4, дешевле отели и комфортнее длинные пешие маршруты. Это лучший момент для смотровых, Парамоновских складов и винных выездов по области.',
+    winter:
+      'Зима на Дону мягкая, но ветреная: около -3...-5 °C, а снег легко сменяется дождем. Зато исторический центр остается компактным и удобным, а согреваться приятно на рынке, в музеях и купеческих ресторанах.',
+  }),
+};
+
+const ROSTOV_NA_DONU_SLIDES: CityIdentitySlide[] = [
+  {
+    id: 'don-bridge',
+    title: 'Дон и Ворошиловский мост',
+    text: 'Широкий Дон делит Ростов на деловой правый и расслабленный левый берег. Мост и река вместе объясняют южный характер города лучше любой открытки.',
+    imageSrc: '/images/venues/rostov-na-donu/naberezhnaya-reki-don-beregovaya-ulitsa.jpg',
+    imageAlt: 'Набережная Дона в Ростове-на-Дону',
+    slugs: [
+      'rostov-na-donu-naberezhnaya-reki-don-beregovaya-ulitsa',
+      'rostov-na-donu-park-levoberezhnyy',
+      'rostov-na-donu-smotrovaya-na-sedova',
+    ],
+    target: 'places',
+    badge: 'Символ',
+  },
+  {
+    id: 'merchant-yards',
+    title: 'Купеческие дворы и Нахичевань',
+    text: 'Ростовская эклектика, дворики-галерки и армянская Нахичевань формируют ощущение южной Одессы без моря. Город сильнее всего раскрывается именно в полутонаx фасадов и дворов.',
+    imageSrc: '/images/venues/rostov-na-donu/bol-shaya-sadovaya-ulitsa.jpg',
+    imageAlt: 'Большая Садовая улица и купеческая архитектура Ростова',
+    slugs: [
+      'rostov-na-donu-zdanie-gorodskoy-dumy',
+      'rostov-na-donu-torgovyy-dom-yablokovyh',
+      'rostov-na-donu-dom-kotlyarova',
+    ],
+    target: 'places',
+    badge: 'Искусство',
+  },
+  {
+    id: 'don-crayfish',
+    title: 'Раки, рынок и южный стол',
+    text: 'Донские раки, сазан, помидоры, автохтонные вина и большой рынок делают гастрономию не дополнением, а частью городского характера.',
+    imageSrc: '/images/venues/rostov-na-donu/tsentral-nyy-rynok-staryy-bazar.jpg',
+    imageAlt: 'Центральный рынок Ростова-на-Дону',
+    slugs: [
+      'rostov-na-donu-tsentralnyy-rynok-staryy-bazar',
+      'rostov-na-donu-raki-i-gady',
+      'rostov-na-donu-onegin-dacha',
+    ],
+    target: 'places',
+    badge: 'Гастро',
+  },
+  {
+    id: 'tractor-theatre',
+    title: 'Театр-трактор и авангард',
+    text: 'Театр Горького 1935 года - один из самых сильных памятников конструктивизма в стране. Ростов умеет быть не только купеческим и южным, но и по-настоящему смелым.',
+    imageSrc: '/images/venues/rostov-na-donu/teatral-naya-ploschad.jpg',
+    imageAlt: 'Театральная площадь и театр драмы в Ростове-на-Дону',
+    slugs: [
+      'rostov-na-donu-teatr-dramy-im-gorkogo',
+      'rostov-na-donu-park-revolyutsii',
+      'rostov-na-donu-paramonovskie-sklady',
+    ],
+    target: 'places',
+    badge: 'Архитектура',
+  },
+];
+
+const PENZA_WEATHER: CityWeatherFlavor = {
+  latitude: 53.195,
+  longitude: 45.0183,
+  timezone: 'Europe/Moscow',
+  outdoorSlugs: [
+    'penza-pamyatnik-pervoposelentsu',
+    'penza-penzenskaya-peshehodnaya-ulitsa-moskovskaya',
+    'penza-park-imeni-v-g-belinskogo',
+    'penza-svetozvukovoy-fontan',
+    'penza-smotrovaya-staraya-penza',
+  ],
+  indoorSlugs: [
+    'penza-muzey-odnoy-kartiny-im-g-v-myasnikova',
+    'penza-kartinnaya-galereya-im-savickogo',
+    'penza-dom-meyerholda',
+    'penza-kraevedcheskiy-muzey',
+    'penza-dramaticheskiy-teatr-lunacharskogo',
+  ],
+  outdoorCta: 'Отличная погода для старой крепости, Московской и парка Белинского',
+  indoorCtaOvercast: 'Сегодня пасмурно. Выбирайте музей одной картины, галерею или Дом Мейерхольда',
+  indoorCtaRain: 'Сегодня дождь. Музеи и драмтеатр дадут Пензу не хуже прогулки',
+  indoorCtaSnow: 'Сегодня снег. Компактный центр удобно смотреть через музеи и театр',
+};
+
+const PENZA_WHEN_TO_GO: CityWhenToGoFlavor = {
+  timeZone: 'Europe/Moscow',
+  seasons: [
+    { id: 'winter', months: [12, 1, 2], headline: 'Зима', body: 'Спокойный музейный сезон: театр, галерея и музей одной картины собираются в короткий городской маршрут.' },
+    { id: 'spring', months: [3, 4, 5], headline: 'Весна', body: 'Город быстро зеленеет, становится приятно гулять по Московской и крепостному холму.' },
+    { id: 'summer', months: [6, 7, 8], headline: 'Лето', body: 'Лучшее время для фонтанной площади, парка Белинского и длинных прогулок по центру без верхней одежды.' },
+    { id: 'autumn', months: [9, 10, 11], headline: 'Осень', body: 'Литературный и самый атмосферный сезон: Тарханы, желтые аллеи и мягкий провинциальный ритм.' },
+  ],
+  tabs: seasonTabs({
+    spring:
+      'Весной Пенза быстро зеленеет и особенно хорошо читается как тихий город на холмах. Это удобный сезон для центра, Московской и парка Белинского без летней толпы.',
+    summer:
+      'Лето - самый открытый городской сезон: фонтанная площадь оживает вечером, в парке Белинского дольше светло, а пешие маршруты между музеями проходят без пауз на холод.',
+    autumn:
+      'Осень особенно идет Пензе: желтеют аллеи, спокойнее в центре и лучше сочетаются городской маршрут с выездом в Тарханы. Это главный литературный сезон города.',
+    winter:
+      'Зимой Пенза становится камерной. Лучше делать ставку на музей одной картины, Дом Мейерхольда, галерею и вечерний театр, а прогулки держать короткими.',
+  }),
+};
+
+const PENZA_SLIDES: CityIdentitySlide[] = [
+  {
+    id: 'old-fortress',
+    title: 'Крепостной холм',
+    text: 'Пенза начинается с крепостной смотровой и памятника первопоселенцу. Здесь особенно хорошо видно, что город вырос на пограничной линии, а не вокруг промышленной гигантомании.',
+    imageSrc: '/images/venues/penza/pamyatnik-pervoposelentsu.jpg',
+    imageAlt: 'Памятник Первопоселенцу в Пензе',
+    slugs: ['penza-pamyatnik-pervoposelentsu', 'penza-smotrovaya-staraya-penza', 'penza-spasskiy-kafedralnyy-sobor'],
+    target: 'places',
+    badge: 'Символ',
+  },
+  {
+    id: 'meyerhold-city',
+    title: 'Мейерхольд и камерный театр',
+    text: 'Для нестоличного города у Пензы необычно сильный театральный код: Мейерхольд, драмтеатр и спокойный культурный центр в шаговой доступности.',
+    imageSrc: '/images/venues/penza/muzey-odnoy-kartiny-im-g-v-myasnikova.jpg',
+    imageAlt: 'Культурная Пенза и музейный центр',
+    slugs: ['penza-dom-meyerholda', 'penza-dramaticheskiy-teatr-lunacharskogo', 'penza-muzey-odnoy-kartiny-im-g-v-myasnikova'],
+    target: 'places',
+    badge: 'Искусство',
+  },
+  {
+    id: 'quiet-moscow',
+    title: 'Московская без спешки',
+    text: 'Пешеходная Московская, кофейни, фонтан и размеренный провинциальный темп - одна из главных причин, почему Пенза ощущается человеческой и удобной.',
+    imageSrc: '/images/venues/penza/penzenskaya-peshehodnaya-ulitsa-moskovskaya.jpg',
+    imageAlt: 'Пешеходная улица Московская в Пензе',
+    slugs: ['penza-penzenskaya-peshehodnaya-ulitsa-moskovskaya', 'penza-svetozvukovoy-fontan', 'penza-moskovskaya-gastro-kvartal'],
+    target: 'places',
+    badge: 'Гастро',
+  },
+  {
+    id: 'lermontov-tarhany',
+    title: 'Лермонтов и Тарханы',
+    text: 'Пенза сильна тем, что городской центр легко продолжается в литературный day trip. Тарханы - не случайный музей области, а часть местной идентичности.',
+    imageSrc: '/images/venues/penza/muzey-zapovednik-tarhany.jpg',
+    imageAlt: 'Музей-заповедник Тарханы',
+    slugs: ['penza-muzey-zapovednik-tarhany', 'penza-tarhany-day-trip', 'penza-literaturnyy-muzey'],
+    target: 'mixed',
+    badge: 'Архитектура',
+  },
+];
+
+const TVER_WEATHER: CityWeatherFlavor = {
+  latitude: 56.8587,
+  longitude: 35.9176,
+  timezone: 'Europe/Moscow',
+  outdoorSlugs: [
+    'tver-starovolzhskiy-most',
+    'tver-naberezhnaya-stepana-razina',
+    'tver-naberezhnaya-afanasiya-nikitina',
+    'tver-gorodskoy-sad',
+    'tver-peshehodnaya-trehsvyatskaya-ulitsa',
+  ],
+  indoorSlugs: [
+    'tver-imperatorskiy-putevoy-dvorets',
+    'tver-oblastnaya-kartinnaya-galereya',
+    'tver-muzey-kozla',
+    'tver-kraevedcheskiy-muzey',
+    'tver-dramaticheskiy-teatr',
+  ],
+  outdoorCta: 'Отличная погода для Староволжского моста, набережных и Трехсвятской',
+  indoorCtaOvercast: 'Сегодня пасмурно. Выбирайте Путевой дворец, галерею или Музей козла',
+  indoorCtaRain: 'Сегодня дождь. Дворец, краеведческий музей и театр дадут Тверь не хуже прогулки',
+  indoorCtaSnow: 'Сегодня снег. Компактный центр удобно смотреть через дворцы, музеи и Трехсвятскую',
+};
+
+const TVER_WHEN_TO_GO: CityWhenToGoFlavor = {
+  timeZone: 'Europe/Moscow',
+  seasons: [
+    { id: 'winter', months: [12, 1, 2], headline: 'Зима', body: 'Пушистый снег при комфортных -6...-10 °C. Главная фишка - тюбинг в парке «Яр» и праздничная Трехсвятская, а «Ласточка» из Москвы занимает около 1 часа 40 минут.' },
+    { id: 'spring', months: [3, 4, 5], headline: 'Весна', body: 'В апреле Волга вскрывается ото льда, в мае город зеленеет при +15...+18 °C. Это лучшее время смотреть лучевой центр без летней пыли, а в середине мая стартует речная навигация.' },
+    { id: 'summer', months: [6, 7, 8], headline: 'Лето', body: 'Мягкое лето около +24 °C, в июле бывает и за +30. Город уходит в тень Городского сада, на веранды Радищева и пляжи Волги и Тверцы. Удобно ехать в Торжок, на Селигер и к истоку Волги.' },
+    { id: 'autumn', months: [9, 10, 11], headline: 'Осень', body: 'Сентябрь держит бабье лето около +15 °C, в октябре набережные и Императорский сад золотеют. Транзит спадает, билеты на экспрессы свободнее - идеальный музейный сезон.' },
+  ],
+  tabs: seasonTabs({
+    spring:
+      'Весной Тверь быстро зеленеет и особенно хорошо читается как лучевой город на холмах. Это удобный сезон для Путевого дворца, Трехсвятской и набережной Афанасия Никитина без летнего зноя.',
+    summer:
+      'Лето - самый открытый городской сезон: пляжи Волги и Тверцы, веранды бульвара Радищева и длинный свет для Торжка и Старицы. В жару прячьтесь в Городском саду и во дворце.',
+    autumn:
+      'Осень особенно идет Твери: золотеют набережные, спокойнее в центре и лучше сочетаются городской маршрут с выездом в Домотканово. Это главный музейный сезон между двумя столицами.',
+    winter:
+      'Зимой Тверь становится камерной. Лучше делать ставку на Путевой дворец, галерею и сытную купеческую кухню, а прогулки держать короткими по подсвеченной Трехсвятской.',
+  }),
+};
+
+const TVER_SLIDES: CityIdentitySlide[] = [
+  {
+    id: 'starovolzhsky-bridge',
+    title: 'Староволжский мост',
+    text: 'Ажурный консольный мост 1900 года визуально близок к будапештским аркам. Это главный маркер Твери: связующее звено двух столиц и европейская инженерия над Волгой.',
+    imageSrc: '/images/venues/tver/starovolzhskiy-most.jpg',
+    imageAlt: 'Староволжский мост в Твери',
+    slugs: ['tver-starovolzhskiy-most', 'tver-naberezhnaya-afanasiya-nikitina', 'tver-pamyatnik-afanasiyu-nikitinu'],
+    target: 'places',
+    badge: 'Символ',
+  },
+  {
+    id: 'travel-palace',
+    title: 'Путевой дворец и тверское барокко',
+    text: 'Резиденция Екатерины II на набережной задает парадный масштаб города. После пожара XVIII века Тверь застраивалась трезубцем радиальных улиц по петербургскому образцу.',
+    imageSrc: '/images/venues/tver/imperatorskiy-putevoy-dvorets.jpg',
+    imageAlt: 'Императорский путевой дворец в Твери',
+    slugs: ['tver-imperatorskiy-putevoy-dvorets', 'tver-oblastnaya-kartinnaya-galereya', 'tver-spaso-preobrazhenskiy-sobor'],
+    target: 'places',
+    badge: 'Искусство',
+  },
+  {
+    id: 'pozharskaya-goat',
+    title: 'Пожарская котлета и тверской козел',
+    text: 'Сочная котлета в сухарях, слойки с брусникой и ироничный культ козла держат гастрономический каркас города. Здесь принято кормить сытно и с историческим шлейфом.',
+    imageSrc: '/images/venues/tver/naberezhnaya-stepana-razina.jpg',
+    imageAlt: 'Набережная Степана Разина в Твери',
+    slugs: ['tver-restoran-lyublin', 'tver-muzey-kozla', 'tver-peshehodnaya-trehsvyatskaya-ulitsa'],
+    target: 'places',
+    badge: 'Гастро',
+  },
+  {
+    id: 'morozov-town',
+    title: 'Морозовский городок',
+    text: 'Текстильная мануфактура Абрама Морозова - город в городе из красного кирпича с готическими арками. Рабочие казармы здесь строили как замки, а не как бараки.',
+    imageSrc: '/images/venues/tver/morozovskiy-gorodok-dvor-proletarki.jpg',
+    imageAlt: 'Морозовский городок Двор Пролетарки',
+    slugs: ['tver-morozovskiy-gorodok-dvor-proletarki', 'tver-gastroprostranstvo-fabrika', 'tver-kinoteatr-zvezda'],
+    target: 'places',
+    badge: 'Архитектура',
+  },
+];
+
 const RYAZAN_WEATHER: CityWeatherFlavor = {
   latitude: 54.629,
   longitude: 39.742,
@@ -2275,6 +2572,30 @@ export const CITY_HUB_LOCAL_FLAVOR: Record<string, CityHubLocalFlavor> = {
     slides: VORONEZH_SLIDES,
     weather: VORONEZH_WEATHER,
     whenToGo: VORONEZH_WHEN_TO_GO,
+  },
+  'rostov-na-donu': {
+    identityHeading: 'Чем уникален Ростов-на-Дону',
+    identityLead: IDENTITY_LEAD,
+    tags: tagsFromSlides(ROSTOV_NA_DONU_SLIDES),
+    slides: ROSTOV_NA_DONU_SLIDES,
+    weather: ROSTOV_NA_DONU_WEATHER,
+    whenToGo: ROSTOV_NA_DONU_WHEN_TO_GO,
+  },
+  penza: {
+    identityHeading: 'Чем уникальна Пенза',
+    identityLead: IDENTITY_LEAD,
+    tags: tagsFromSlides(PENZA_SLIDES),
+    slides: PENZA_SLIDES,
+    weather: PENZA_WEATHER,
+    whenToGo: PENZA_WHEN_TO_GO,
+  },
+  tver: {
+    identityHeading: 'Чем уникальна Тверь',
+    identityLead: IDENTITY_LEAD,
+    tags: tagsFromSlides(TVER_SLIDES),
+    slides: TVER_SLIDES,
+    weather: TVER_WEATHER,
+    whenToGo: TVER_WHEN_TO_GO,
   },
   ryazan: {
     identityHeading: 'Чем уникальна Рязань',

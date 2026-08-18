@@ -88,6 +88,7 @@ import {
 import {
   buildMustSeeFilterTabs,
   classifyMustSeePlace,
+  filterMustSeePlaces,
   mustSeeFilterStopTypeTag,
   type MustSeeFilterId,
 } from '@/lib/must-see-filters';
@@ -1436,7 +1437,7 @@ function CitySightsMustSeeList({
     [classifiedPlaces, focusedSlugSet],
   );
   const filteredPlaces = React.useMemo(
-    () => classifiedPlaces.filter((place) => classifyMustSeePlace(place) === activeId),
+    () => filterMustSeePlaces(classifiedPlaces, activeId),
     [classifiedPlaces, activeId],
   );
   // With category tabs show the full filtered set; single-tab cities keep top-6.

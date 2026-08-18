@@ -85,6 +85,26 @@ test('on 17 Aug 2026 Voronezh shows Zhatva and Gorod-sad; Platonovfest is past',
   );
 });
 
+test('on 17 Aug 2026 Penza shows city day and theatre; Jazz May is past', () => {
+  const now = new Date('2026-08-17T12:00:00+03:00');
+  const upcoming = listCityRegionalEvents('penza', now, 3);
+  const past = listCityRegionalPastEvents('penza', now, 3);
+  assert.ok(upcoming.some((event) => event.id === 'penza-city-day-2026'));
+  assert.ok(upcoming.some((event) => event.id === 'penza-theatre-festival-2026'));
+  assert.ok(past.some((event) => event.id === 'penza-jazz-may-2026'));
+  assert.equal(upcoming.some((event) => event.id === 'penza-jazz-may-2026'), false);
+});
+
+test('on 17 Aug 2026 Rostov shows loza and jazz; Chekhov is past', () => {
+  const now = new Date('2026-08-17T12:00:00+03:00');
+  const upcoming = listCityRegionalEvents('rostov-na-donu', now, 3);
+  const past = listCityRegionalPastEvents('rostov-na-donu', now, 3);
+  assert.ok(upcoming.some((event) => event.id === 'rostov-donskaya-loza-2026'));
+  assert.ok(upcoming.some((event) => event.id === 'rostov-jazz-2026'));
+  assert.ok(past.some((event) => event.id === 'rostov-na-rodine-chehova-2026'));
+  assert.equal(upcoming.some((event) => event.id === 'rostov-na-rodine-chehova-2026'), false);
+});
+
 test('on 17 Aug 2026 Chelyabinsk shows PROProm, valenki and Matsuev; Bazhov is past', () => {
   const now = new Date('2026-08-17T12:00:00+05:00');
   const upcoming = listCityRegionalEvents('chelyabinsk', now, 3);

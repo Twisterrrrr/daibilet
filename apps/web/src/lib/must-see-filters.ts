@@ -36,6 +36,11 @@ export type MustSeeClassifyInput = CityPlaceLinkFields & {
   type?: string | null;
   /** Optional cityInfo chip override. */
   mustSeeFilter?: MustSeeFilterId | null;
+  /**
+   * Product canon: top city anchors may live both in «Главные места»
+   * and in their thematic tab (museum / park / street / etc.).
+   */
+  alsoMain?: boolean | null;
 };
 
 const FILTER_LABELS: Record<MustSeeFilterId, string> = {
@@ -76,6 +81,7 @@ const FILTER_ORDER: MustSeeFilterId[] = [
 const GASTRO_KINDS = new Set(['club_bar_restaurant', 'bar']);
 const MUSEUM_KINDS = new Set(['museum', 'art_space', 'museum_art_space']);
 const PARK_KINDS = new Set(['park']);
+const MIN_MAIN_BACKFILL = 6;
 
 function haystack(place: MustSeeClassifyInput): string {
   const venueSlug = String(place.venueSlug || '').trim();
@@ -87,7 +93,11 @@ function haystack(place: MustSeeClassifyInput): string {
 }
 
 function slugHaystack(place: MustSeeClassifyInput): string {
-  return `${place.venueSlug || ''} ${place.locationSlug || ''} ${place.href || ''}`.toLowerCase();
+  return [place.venueSlug, place.locationSlug, place.href]
+    .map((value) => String(value || '').trim())
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
 }
 
 function nameHaystack(place: MustSeeClassifyInput): string {
@@ -218,6 +228,36 @@ export function classifyMustSeePlace(place: MustSeeClassifyInput): MustSeeFilter
   return 'main';
 }
 
+function isExplicitMain(place: MustSeeClassifyInput): boolean {
+  return place.mustSeeFilter === 'main' || Boolean(place.alsoMain);
+}
+
+function placeKey(place: MustSeeClassifyInput): string {
+  return `${place.venueSlug || ''}::${place.locationSlug || ''}::${place.name || ''}`;
+}
+
+export function buildMainMustSeePlaces<T extends MustSeeClassifyInput>(places: T[]): T[] {
+  const picked: T[] = [];
+  const seen = new Set<string>();
+  for (const place of places) {
+    if (!isExplicitMain(place)) continue;
+    const key = placeKey(place);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    picked.push(place);
+  }
+  if (picked.length >= MIN_MAIN_BACKFILL) return picked;
+  for (const place of places) {
+    if (classifyMustSeePlace(place) === 'gastro') continue;
+    const key = placeKey(place);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    picked.push(place);
+    if (picked.length >= MIN_MAIN_BACKFILL) break;
+  }
+  return picked;
+}
+
 export function mustSeeFilterLabel(id: MustSeeFilterId): string {
   return FILTER_LABELS[id];
 }
@@ -264,8 +304,11 @@ export function buildMustSeeFilterTabs(
     houses: 0,
     mansions: 0,
   };
+  counts.main = buildMainMustSeePlaces(places).length;
   for (const place of places) {
-    counts[classifyMustSeePlace(place)] += 1;
+    const kind = classifyMustSeePlace(place);
+    if (kind === 'main') continue;
+    counts[kind] += 1;
   }
   const tabs = FILTER_ORDER.filter((id) => counts[id] > 0).map((id) => ({
     id,
@@ -281,6 +324,7 @@ export function filterMustSeePlaces<T extends MustSeeClassifyInput>(
   places: T[],
   filterId: MustSeeFilterId,
 ): T[] {
+  if (filterId === 'main') return buildMainMustSeePlaces(places);
   return places.filter((place) => classifyMustSeePlace(place) === filterId);
 }
 

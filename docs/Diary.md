@@ -1,3 +1,19 @@
+## 2026-08-18 - Rostov/Penza/Tver hubs + Главные + geo cards
+
+### Наблюдения
+- Пакет хабов Ростова, Пензы и Твери уже лежал в рабочем дереве без public-sync и без live.
+- «Главные места» как общий топ: `alsoMain` + `buildMainMustSeePlaces` с добором до 6, чтобы вкладка не схлопывалась в 1-2 точки.
+- Live `/api/public/destinations` после утреннего web deploy всё ещё без Тольятти/Сургута/Ханты: Destinations MSK web swap не рестартит `daibilet-api`. События уже city (`Тольятти` 11, `Сургут` 13, `Ханты-Мансийск` 2, `Новокузнецк` 11).
+- Слаг Ханты: канон API `hanty-mansiysk`; `khanty-mansiysk` давал пустую афишу.
+
+### Решения
+- Добили tourist hubs Ростов/Пенза/Тверь в Next и SPA, extra-пригороды Уфа/Красноярск/Краснодар/Самара, карточки Новокузнецка и Ханты с preview.
+- Alias `khanty-mansiysk` → `hanty-mansiysk` в destinations slug canon.
+- Карточки `/cities` для folding towns появятся после рестарта API на том же SHA, что и web.
+
+### Проблемы
+- Web-only deploy не подхватывает `public-destination.ts` в живом Node API.
+
 ## 2026-08-18 - Tolyatti/Surgut: city cards and previews
 
 ### Наблюдения

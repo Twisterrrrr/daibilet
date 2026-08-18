@@ -14,6 +14,7 @@ const LIVE_CITY_SLUGS = [
   'ulyanovsk',
   'vladivostok',
   'habarovsk',
+  'hanty-mansiysk',
   'samara',
   'chelyabinsk',
   'ufa',
@@ -43,6 +44,7 @@ const LIVE_CITY_SLUGS = [
   'lipeck',
   'murmansk',
   'nizhniy-novgorod',
+  'novokuznetsk',
   'novosibirsk',
   'omsk',
   'orel',
@@ -80,7 +82,7 @@ test('city-map-coords covers all live destination city slugs', () => {
     if (!lookupCityMapCoords(slug)) missing.push(slug);
   }
   assert.deepEqual(missing, [], `missing coords for: ${missing.join(', ')}`);
-  assert.equal(LIVE_CITY_SLUGS.length, 67);
+  assert.equal(LIVE_CITY_SLUGS.length, 69);
 });
 
 test('resolveCityMapCoords accepts SEO aliases and Russian names', () => {

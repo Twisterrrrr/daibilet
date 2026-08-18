@@ -32,6 +32,12 @@ const VORONEZH_HUB_SRC = readFileSync(
   fileURLToPath(new URL('./voronezh-hub.ts', import.meta.url)),
   'utf8',
 );
+const ROSTOV_HUB_SRC = readFileSync(
+  fileURLToPath(new URL('./rostov-na-donu-hub.ts', import.meta.url)),
+  'utf8',
+);
+const PENZA_HUB_SRC = readFileSync(fileURLToPath(new URL('./penza-hub.ts', import.meta.url)), 'utf8');
+const TVER_HUB_SRC = readFileSync(fileURLToPath(new URL('./tver-hub.ts', import.meta.url)), 'utf8');
 const UFA_HUB_SRC = readFileSync(fileURLToPath(new URL('./ufa-hub.ts', import.meta.url)), 'utf8');
 const RYAZAN_HUB_SRC = readFileSync(fileURLToPath(new URL('./ryazan-hub.ts', import.meta.url)), 'utf8');
 const OMSK_HUB_SRC = readFileSync(fileURLToPath(new URL('./omsk-hub.ts', import.meta.url)), 'utf8');
@@ -52,6 +58,9 @@ function cityInfoHasSlug(slug: string): boolean {
     quoted.test(KRASNOYARSK_HUB_SRC) ||
     quoted.test(NOVOSIBIRSK_HUB_SRC) ||
     quoted.test(VORONEZH_HUB_SRC) ||
+    quoted.test(ROSTOV_HUB_SRC) ||
+    quoted.test(PENZA_HUB_SRC) ||
+    quoted.test(TVER_HUB_SRC) ||
     quoted.test(UFA_HUB_SRC) ||
     quoted.test(RYAZAN_HUB_SRC) ||
     quoted.test(OMSK_HUB_SRC) ||
@@ -81,6 +90,9 @@ test('lifehacks cover Perm, Moscow, SPB, Kaliningrad, NN, EKB, Kazan, Samara, Kr
   assert.equal(cityHasLifehacks('krasnoyarsk'), true);
   assert.equal(cityHasLifehacks('novosibirsk'), true);
   assert.equal(cityHasLifehacks('voronezh'), true);
+  assert.equal(cityHasLifehacks('rostov-na-donu'), true);
+  assert.equal(cityHasLifehacks('penza'), true);
+  assert.equal(cityHasLifehacks('tver'), true);
   assert.equal(cityHasLifehacks('ryazan'), true);
   assert.equal(cityHasLifehacks('ufa'), true);
   assert.equal(cityHasLifehacks('chelyabinsk'), true);
@@ -236,7 +248,7 @@ test('NN lifehacks: Lastochka affiche, cableway and free kremlin', () => {
   assert.equal(kremlin?.cta.kind, 'places');
 });
 
-test('EKB Kazan Samara Krasnodar Krasnoyarsk Novosibirsk Voronezh Ryazan Ufa lifehacks: 5 cards, no fly tab', () => {
+test('Regional tourist hubs lifehacks: 5 cards, no fly tab', () => {
   for (const city of [
     'ekaterinburg',
     'kazan',
@@ -245,6 +257,9 @@ test('EKB Kazan Samara Krasnodar Krasnoyarsk Novosibirsk Voronezh Ryazan Ufa lif
     'krasnoyarsk',
     'novosibirsk',
     'voronezh',
+    'rostov-na-donu',
+    'penza',
+    'tver',
     'ryazan',
     'ufa',
     'omsk',
@@ -265,6 +280,9 @@ test('EKB Kazan Samara Krasnodar Krasnoyarsk Novosibirsk Voronezh Ryazan Ufa lif
       assert.ok(pack.items.some((item) => item.cta.kind === 'gis'), city);
     } else if (
       city === 'voronezh' ||
+      city === 'rostov-na-donu' ||
+      city === 'penza' ||
+      city === 'tver' ||
       city === 'ufa' ||
       city === 'ryazan' ||
       city === 'omsk' ||
@@ -295,6 +313,10 @@ test('EKB Kazan Samara Krasnodar Krasnoyarsk Novosibirsk Voronezh Ryazan Ufa lif
   assert.equal(nsk?.items[0]?.id, 'novosibirsk-etk');
   const voronezh = resolveCityLifehacks('voronezh');
   assert.equal(voronezh?.items[0]?.id, 'voronezh-transport-sbp');
+  const rostov = resolveCityLifehacks('rostov-na-donu');
+  assert.equal(rostov?.items[0]?.id, 'rostov-card-cheaper');
+  const penza = resolveCityLifehacks('penza');
+  assert.equal(penza?.items[0]?.id, 'penza-center-walk');
   const ryazan = resolveCityLifehacks('ryazan');
   assert.equal(ryazan?.items[0]?.id, 'ryazan-umka-card');
   const ufa = resolveCityLifehacks('ufa');
@@ -356,6 +378,27 @@ test('Voronezh painted lines have 7 / 7 stops with coords', async () => {
         Number.isFinite(stop.latitude) &&
         Number.isFinite(stop.longitude) &&
         Boolean(stop.locationSlug || stop.dayRouteId),
+    ),
+  );
+});
+
+test('Penza painted lines have 6 / 6 stops with coords', async () => {
+  const { PENZA_GREEN_LINE_STOPS, PENZA_LINE_DAY_ROUTE_PRESETS } = await import('./penza-line-presets.ts');
+  assert.equal(PENZA_GREEN_LINE_STOPS.length, 6);
+  assert.equal(
+    PENZA_LINE_DAY_ROUTE_PRESETS.find((p: { id: string }) => p.id === 'penza-red-line')?.stops?.length,
+    6,
+  );
+  assert.ok(
+    PENZA_GREEN_LINE_STOPS.every(
+      (stop: { latitude?: number; longitude?: number; locationSlug?: string; venueSlug?: string }) =>
+        Number.isFinite(stop.latitude) &&
+        Number.isFinite(stop.longitude) &&
+        Boolean(stop.locationSlug || stop.venueSlug) &&
+        (stop.latitude || 0) > 52 &&
+        (stop.latitude || 0) < 54 &&
+        (stop.longitude || 0) > 43 &&
+        (stop.longitude || 0) < 46,
     ),
   );
 });

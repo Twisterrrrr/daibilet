@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  buildMainMustSeePlaces,
   buildMustSeeFilterTabs,
   classifyMustSeePlace,
   filterMustSeePlaces,
@@ -108,14 +109,14 @@ test('classifyMustSeePlace: Nizhny landmarks vs gastro vs museum vs park vs temp
     }),
     'street',
   );
-  // Strelka mentions собор in desc - still main by name/slug.
+  // Strelka mentions собор in desc - still not a temple; slug maps to promenade/views.
   assert.equal(
     classifyMustSeePlace({
       name: 'Стрелка рек Волги и Оки',
       desc: 'Место слияния, где расположен собор Александра Невского',
       locationSlug: 'nizhny-novgorod-strelka-rek-volgi-i-oki',
     }),
-    'main',
+    'views',
   );
 });
 
@@ -129,7 +130,7 @@ test('buildMustSeeFilterTabs hides empty categories and defaults to main', () =>
   assert.equal(defaultId, 'main');
   assert.deepEqual(
     tabs.map((t) => t.id),
-    ['main', 'gastro', 'museum'],
+    ['main', 'museum', 'gastro'],
   );
   assert.equal(tabs.find((t) => t.id === 'park'), undefined);
   assert.equal(tabs.find((t) => t.id === 'temple'), undefined);
@@ -138,7 +139,7 @@ test('buildMustSeeFilterTabs hides empty categories and defaults to main', () =>
 test('buildMustSeeFilterTabs: city with only landmarks has single main tab', () => {
   const places = [
     { name: 'Кремль', desc: 'x', locationSlug: 'kreml' },
-    { name: 'Площадь', desc: 'y', locationSlug: 'ploschad' },
+    { name: 'Ядро города', desc: 'y', locationSlug: 'city-core' },
   ];
   const { tabs, defaultId } = buildMustSeeFilterTabs(places);
   assert.equal(tabs.length, 1);
@@ -155,11 +156,57 @@ test('filterMustSeePlaces + default preset drop gastro', () => {
     { name: 'Парк', desc: 'z', locationSlug: 'park-a' },
   ];
   assert.equal(filterMustSeePlaces(places, 'gastro').length, 1);
-  assert.equal(filterMustSeePlaces(places, 'main').length, 3);
+  assert.equal(filterMustSeePlaces(places, 'main').length, 4);
   const preset = mustSeePlacesForDefaultPreset(places);
-  assert.ok(preset.every((p) => classifyMustSeePlace(p) === 'main'));
-  assert.equal(preset.length, 3);
+  assert.ok(preset.length >= 3);
   assert.ok(!preset.some((p) => /yale/i.test(p.name)));
+});
+
+test('main tab backfills curated anchors from list order', () => {
+  const places = [
+    { name: 'Центральный рынок', desc: 'Гастро', locationSlug: 'market', mustSeeFilter: 'gastro' as const },
+    { name: 'Главная площадь', desc: 'Ядро города', locationSlug: 'square' },
+    { name: 'Музей города', desc: 'Классика', venueSlug: 'museum-city' },
+    { name: 'Парк у реки', desc: 'Тень и вода', locationSlug: 'park-river' },
+    { name: 'Старый собор', desc: 'Храм на холме', locationSlug: 'sobor-old' },
+    { name: 'Пешеходная улица', desc: 'Фасады и кафе', locationSlug: 'street-main' },
+    { name: 'Памятник основателю', desc: 'Бронза', locationSlug: 'monument-founder' },
+  ];
+  const main = buildMainMustSeePlaces(places);
+  assert.equal(main.length, 6);
+  assert.equal(main.some((place) => place.locationSlug === 'market'), false);
+  assert.deepEqual(
+    main.map((place) => place.locationSlug || place.venueSlug),
+    ['square', 'museum-city', 'park-river', 'sobor-old', 'street-main', 'monument-founder'],
+  );
+});
+
+test('main tab may overlap with museum and park tabs', () => {
+  const places = [
+    { name: 'Кремль', desc: 'Якорь', locationSlug: 'kreml', mustSeeFilter: 'main' as const },
+    {
+      name: 'Главный музей',
+      desc: 'Коллекция города',
+      venueSlug: 'museum-top',
+      mustSeeFilter: 'museum' as const,
+      alsoMain: true,
+    },
+    {
+      name: 'Парк на набережной',
+      desc: 'Главный городской парк',
+      locationSlug: 'park-top',
+      mustSeeFilter: 'park' as const,
+      alsoMain: true,
+    },
+  ];
+  const { tabs } = buildMustSeeFilterTabs(places);
+  assert.equal(tabs.find((tab) => tab.id === 'main')?.count, 3);
+  assert.equal(tabs.find((tab) => tab.id === 'museum')?.count, 1);
+  assert.equal(tabs.find((tab) => tab.id === 'park')?.count, 1);
+  assert.equal(filterMustSeePlaces(places, 'main').some((place) => place.venueSlug === 'museum-top'), true);
+  assert.equal(filterMustSeePlaces(places, 'main').some((place) => place.locationSlug === 'park-top'), true);
+  assert.equal(filterMustSeePlaces(places, 'museum').length, 1);
+  assert.equal(filterMustSeePlaces(places, 'park').length, 1);
 });
 
 test('mustSeeFilterStopTypeTag maps views/park/temple to stop pills', () => {

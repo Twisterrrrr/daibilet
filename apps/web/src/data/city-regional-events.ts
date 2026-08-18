@@ -692,6 +692,159 @@ export const CITY_REGIONAL_EVENTS: Record<string, CityRegionalEvent[]> = {
     },
   ],
 
+  'rostov-na-donu': [
+    {
+      id: 'rostov-donskaya-uha-2026',
+      title: 'Гастрономический фестиваль «Донская уха»',
+      startDate: '2026-07-04',
+      endDate: '2026-07-05',
+      datesLabel: 'Начало июля 2026',
+      place: 'Набережная Ростова-на-Дону / станица Старочеркасская',
+      blurb:
+        'Главный южный open-air про рыбу, уху и казачью кухню: большие котлы, ярмарка и уличная программа у Дона.',
+      sourceUrl: 'https://visitdon.ru/',
+      sourceLabel: 'visitdon.ru',
+    },
+    {
+      id: 'rostov-donskaya-loza-2026',
+      title: 'Этно-фестиваль «Донская лоза»',
+      startDate: '2026-09-25',
+      endDate: '2026-10-05',
+      datesLabel: 'Конец сентября - начало октября 2026',
+      place: 'хутор Пухляковский',
+      blurb:
+        'Осенний винный и гастрономический фестиваль с автохтонными сортами, фермерами и казачьими программами.',
+      sourceUrl: 'https://www.donland.ru/',
+      sourceLabel: 'donland.ru',
+    },
+    {
+      id: 'rostov-jazz-2026',
+      title: 'Ростовский джазовый фестиваль',
+      startDate: '2026-09-10',
+      endDate: '2026-09-13',
+      datesLabel: 'Сентябрь 2026',
+      place: 'парк Революции / Ростовская филармония',
+      blurb:
+        'Городской джазовый бренд с вечерними концертами под открытым небом и сценической программой в филармонии.',
+      sourceUrl: 'https://rostovfilarm.ru/',
+      sourceLabel: 'rostovfilarm.ru',
+    },
+    {
+      id: 'rostov-na-rodine-chehova-2026',
+      title: 'Театральный фестиваль «На родине Чехова»',
+      startDate: '2026-05-15',
+      endDate: '2026-05-30',
+      datesLabel: 'Май 2026',
+      place: 'Ростов-на-Дону / Таганрог',
+      blurb:
+        'Весенний театральный проект региона с гастролями, читками и большой программой вокруг чеховского наследия.',
+      sourceUrl: 'https://www.rostov-teatr.ru/',
+      sourceLabel: 'rostov-teatr.ru',
+    },
+  ],
+
+  penza: [
+    {
+      id: 'penza-lermontov-fest-2026',
+      title: 'Лермонтовский праздник в Тарханах',
+      startDate: '2026-07-10',
+      endDate: '2026-07-12',
+      datesLabel: 'Июль 2026',
+      place: 'музей-заповедник «Тарханы»',
+      blurb:
+        'Главное литературное событие области: чтения, концерты и историческая программа в усадебном парке Лермонтова.',
+      sourceUrl: 'https://tarhany.ru/',
+      sourceLabel: 'tarhany.ru',
+    },
+    {
+      id: 'penza-jazz-may-2026',
+      title: 'Фестиваль Jazz May Penza',
+      startDate: '2026-05-15',
+      endDate: '2026-05-17',
+      datesLabel: 'Май 2026',
+      place: 'центр Пензы / открытые площадки',
+      blurb:
+        'Весенний городской джаз с концертами в центре и атмосферой легкого фестивального открытия сезона.',
+      sourceUrl: 'https://welcome2penza.ru/',
+      sourceLabel: 'welcome2penza.ru',
+    },
+    {
+      id: 'penza-city-day-2026',
+      title: 'День города Пензы',
+      startDate: '2026-09-04',
+      endDate: '2026-09-06',
+      datesLabel: 'Начало сентября 2026',
+      place: 'Московская, Фонтанная площадь, парк Белинского',
+      blurb:
+        'Большие городские выходные с концертами, уличной едой и вечерними шоу у светомузыкального фонтана.',
+      sourceUrl: 'https://penza-gorod.ru/',
+      sourceLabel: 'penza-gorod.ru',
+    },
+    {
+      id: 'penza-theatre-festival-2026',
+      title: 'Театральный фестиваль «Маскерадъ»',
+      startDate: '2026-10-01',
+      endDate: '2026-10-10',
+      datesLabel: 'Октябрь 2026',
+      place: 'Пензенский драмтеатр и городские площадки',
+      blurb:
+        'Осенний театральный акцент Пензы с гастрольными спектаклями и профессиональной программой вокруг драмтеатра.',
+      sourceUrl: 'https://dramteatr-penza.ru/',
+      sourceLabel: 'dramteatr-penza.ru',
+    },
+  ],
+
+  tver: [
+    {
+      id: 'tver-pozharskaya-kotleta-2027',
+      title: 'Зимний гастрономический фестиваль «Пожарская котлета»',
+      startDate: '2027-01-15',
+      endDate: '2027-02-28',
+      datesLabel: 'Январь - февраль 2027',
+      place: 'Торжок / Путевой дворец',
+      blurb:
+        'Главный зимний гастро-бренд региона: шефы соревнуются в каноничной котлете XIX века, на улице дают дегустации и горячий сбитень.',
+      sourceUrl: 'https://welcometver.ru/',
+      sourceLabel: 'welcometver.ru',
+    },
+    {
+      id: 'tver-kinoavangard-2027',
+      title: 'Фестиваль независимого кино «Тверь-КиноАвангард»',
+      startDate: '2027-04-08',
+      endDate: '2027-04-12',
+      datesLabel: 'Апрель 2027',
+      place: 'кинотеатр «Звезда» / кластер «Рельсы»',
+      blurb:
+        'Весенний кинофестиваль в здании-бинокле «Звезды»: короткометражки, лекции и ночные показы артхауса.',
+      sourceUrl: 'https://welcometver.ru/',
+      sourceLabel: 'welcometver.ru',
+    },
+    {
+      id: 'tver-knyazhestvo-2026',
+      title: 'Музыкально-исторический open-air «Княжество Тверское»',
+      startDate: '2026-07-11',
+      endDate: '2026-07-12',
+      datesLabel: '11-12 июля 2026',
+      place: 'остров Памяти / ландшафтный парк «Тьмака»',
+      blurb:
+        'Главный фестиваль реконструкции региона: рыцарские турниры, ярмарка ковки и фолк-рок на пойме Тьмаки.',
+      sourceUrl: 'https://welcometver.ru/',
+      sourceLabel: 'welcometver.ru',
+    },
+    {
+      id: 'tver-domotkanovo-sezony-2026',
+      title: 'Литературно-театральный фестиваль «Домоткановские сезоны»',
+      startDate: '2026-08-22',
+      endDate: '2026-09-07',
+      datesLabel: 'Конец августа - начало сентября 2026',
+      place: 'усадьба Домотканово',
+      blurb:
+        'Серебряный век под открытым небом: чеховские сцены у прудов, костюмированные балы и пленэры у березовой рощи Серова.',
+      sourceUrl: 'https://gallery.tver.ru/',
+      sourceLabel: 'gallery.tver.ru',
+    },
+  ],
+
   novosibirsk: [
     {
       id: 'novosibirsk-tehnoart-2026',
