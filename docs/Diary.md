@@ -2,6 +2,18 @@
 
 ### Наблюдения
 - Live `/places`: 2562 карточки (1026 location / 1536 institution). Первая страница каталога (48 href) все **200**. `/places?family=location|institution` **200**.
+- 761 хаб-ссылок нет в live каталоге → 404. Object-hubs (Челябинск, Тюмень, НСК, Омск, Уфа, Воронеж, Рязань) seed не парсил - только `place()` Ростов/Пенза/Тверь.
+
+### Решения
+- Seed parser: object-array hubs + coords/address; min profile skip. Local apply: **+378** (176 Rostov/Penza/Tver already existed).
+- Prod apply тех же городов + restart `daibilet-api` + Deploy MSK web (copy без «точки на карте»).
+
+### Проблемы
+- Nested suburb POI (Таганай тропы и т.п.) по канону остаются хаб-пинами, не PDP.
+
+
+### Наблюдения
+- Live `/places`: 2562 карточки (1026 location / 1536 institution). Первая страница каталога (48 href) все **200**. `/places?family=location|institution` **200**.
 - 761 хаб-ссылок нет в live каталоге → 404 (Челябинск 77, Тюмень 91, Новосибирск 81, Омск 76, Тверь 83, Ростов 80, Пенза 68, Воронеж 65, Уфа 67, …). Ростов/Пенза/Тверь сиднули только в local Docker.
 - 82 хаб-ссылки не той семьи: 308 на правильный `/venues` или `/locations` и открываются.
 - Карточки без editorial текста рисовали «N на карте города» / «Точка на маршруте».
