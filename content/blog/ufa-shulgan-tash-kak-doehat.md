@@ -15,7 +15,7 @@ date: "22 авг 2026"
 readMin: 10
 imageAlt: "Портал Каповой пещеры в скалах Южного Урала, река и лес"
 coverImageUrl: "/images/blog/ufa-shulgan-tash-kak-doehat.jpg"
-publishedAt: "2026-08-19T02:20:00+03:00"
+publishedAt: "2026-08-19T02:00:00+03:00"
 status: PUBLISHED
 isIndexable: true
 ---

@@ -1,3 +1,17 @@
+## 2026-08-19 - Blog PUBLISHED + future publishedAt = HTML 404
+
+### Наблюдения
+- После Deploy MSK web `32196125018` (SHA `082cb2e`) Воронеж `/blog/voronezh-zhatva-gorod-sad` был 200, Уфа `/blog/ufa-shulgan-tash-kak-doehat` - HTML 404. API: `article: null`, `cmsOwned: true`, `cmsStatus: published`. Cover/inline jpg обеих - 200.
+- Причина: `publishedAt: 2026-08-19T02:20:00+03:00` ещё в будущем относительно смоука (~02:16 МСК). Public filter `publishedAt <= now`. Кэш DTO статей 5 мин держал null.
+
+### Решения
+- Prod: `Article.publishedAt = now()` для обоих slug; `POST /api/internal/public-cache`; revalidate `/blog` + оба slug + хабы.
+- Frontmatter обоих md: `publishedAt: 2026-08-19T02:00:00+03:00`, чтобы следующий upsert с диска MSK снова не спрятал Уфу.
+- Повторный полный web deploy только ради timestamp не гоняли: артефакт `082cb2e` уже на live.
+
+### Проблемы
+- Не ставить `publishedAt` в будущем для `PUBLISHED`. Сначала upsert с прошедшим временем, потом revalidate.
+
 ## 2026-08-19 - Suburb hub pins: OSM short query, not 2GIS API
 
 ### Наблюдения

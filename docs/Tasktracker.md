@@ -1,3 +1,12 @@
+## 2026-08-19 - Blog Voronezh + Ufa live
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| BLOG.VORONEZH-ZHATVA | Гид Жатва / Город-сад + живая афиша; PUBLISHED | Высокий | ✅ live `/blog/voronezh-zhatva-gorod-sad` 200; SHA `082cb2e` + DB now() |
+| BLOG.UFA-SHULGAN | Гид Шульган-Таш / Капова за длинный день; PUBLISHED | Высокий | ✅ live `/blog/ufa-shulgan-tash-kak-doehat` 200 после сдвига publishedAt |
+| FIX.PLACES-SMOKE-ALIASES | 301/308 Салават, Крамской, кремль Рязани | Высокий | ✅ live 308 → канон; канон 200 |
+| GEO.SUBURB-PINS-OSM | Константиново / Тарханы / Ахуны | Средний | ✅ coords в хабах; live в `082cb2e` |
+
 ## 2026-08-19 - Hub location pages from mustSee
 
 | ID | Задача | Приоритет | Статус |

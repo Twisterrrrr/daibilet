@@ -15,7 +15,7 @@ date: "20 авг 2026"
 readMin: 8
 imageAlt: "Летний этно-фестиваль в поле под Воронежем: сцена, трава, публика"
 coverImageUrl: "/images/blog/voronezh-zhatva-gorod-sad.jpg"
-publishedAt: "2026-08-19T02:15:00+03:00"
+publishedAt: "2026-08-19T02:00:00+03:00"
 status: PUBLISHED
 isIndexable: true
 ---
