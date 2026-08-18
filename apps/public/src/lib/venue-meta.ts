@@ -148,12 +148,15 @@ export function locationFamilyLabel(): string {
 }
 
 const WEAK_VENUE_LEAD_RE = /^(легенда|описание|текст|n\/a|нет|—|-)$/i;
+const MAP_PIN_LEAD_RE =
+  /на карте города|точка на (карте|маршруте)|ориентир в городе|жанровая точка|парковая точка|литературная точка|открытое пространство для прогулок|открытая локация для прогулок и событий/i;
 
 export function isWeakVenueLeadText(value?: string | null): boolean {
   const text = String(value || '').replace(/\s+/g, ' ').trim();
   if (!text) return true;
   if (text.length < 24) return true;
   if (WEAK_VENUE_LEAD_RE.test(text)) return true;
+  if (MAP_PIN_LEAD_RE.test(text)) return true;
   return false;
 }
 
@@ -169,18 +172,16 @@ export function resolveLocationVenueCopy(venue: {
 }) {
   const description = String(venue.description || '').replace(/\s+/g, ' ').trim();
   const shortDescription = String(venue.shortDescription || '').replace(/\s+/g, ' ').trim();
-  const fullDescription =
-    description || (!isWeakVenueLeadText(shortDescription) ? shortDescription : '');
+  const strongDescription = !isWeakVenueLeadText(description) ? description : '';
+  const strongShort = !isWeakVenueLeadText(shortDescription) ? shortDescription : '';
+  const fullDescription = strongDescription || strongShort;
   const heroLead =
-    !isWeakVenueLeadText(shortDescription) && !isTruncatedVenueLeadText(shortDescription)
-      ? shortDescription
-      : fullDescription;
-  const fallback = `Локация «${venue.name || 'точка отправления'}» в ${venue.city || 'городе'}. Адрес и время отправления уточняйте в карточке события перед покупкой.`;
+    strongShort && !isTruncatedVenueLeadText(shortDescription) ? strongShort : fullDescription;
 
   return {
-    fullDescription: fullDescription || fallback,
-    heroLead: heroLead || fallback,
-    howToFind: fullDescription || fallback,
+    fullDescription,
+    heroLead,
+    howToFind: fullDescription,
   };
 }
 

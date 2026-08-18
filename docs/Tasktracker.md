@@ -4,6 +4,7 @@
 |---|---|---|---|
 | CAT.HUB-LOCATION-PAGES | Завести `/locations` (и institution `/venues`) из mustSee Ростов/Пенза/Тверь при min profile | Высокий | ✅ seed 176 в local Docker; live MSK apply pending |
 | UX.PLACES-FAMILY-SSR | SSR `/places?family=location` отдаёт локации, не mixed `all` | Средний | ✅ code |
+| QA.PLACES-HREF-AUDIT | Проверить все href `/places` + хаб-slug на 404; вычистить copy «точка на карте» | Высокий | ✅ live catalog 48/48 HTTP 200; 761 хаб-slug нет в live каталоге; map-pin fallbacks сняты |
 
 ## 2026-08-18 - Rostov/Penza/Tver hubs + Главные + geo cards
 

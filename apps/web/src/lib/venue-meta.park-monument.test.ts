@@ -9,6 +9,8 @@ import {
   isTempleLikeVenueName,
   normalizeVenueKind,
   placesHubCategoryCount,
+  isWeakVenueLeadText,
+  resolveLocationVenueCopy,
   resolvePlacesHubCategoryChip,
   resolvePublicVenueType,
   venueTypeBreadcrumbPlural,
@@ -82,5 +84,29 @@ describe('fortress display title', () => {
       ),
       'Петропавловская крепость',
     );
+  });
+});
+
+describe('location copy is not a map pin', () => {
+  it('treats map-pin fallbacks as weak', () => {
+    assert.equal(isWeakVenueLeadText('Памятник на карте города.'), true);
+    assert.equal(isWeakVenueLeadText('Точка на маршруте и ориентир в городе.'), true);
+    assert.equal(isWeakVenueLeadText('Легкая жанровая точка на прогулочном маршруте.'), true);
+    assert.equal(
+      isWeakVenueLeadText('Шолохов в лодке среди камышей на набережной Дона - самый живой кадр берега.'),
+      false,
+    );
+  });
+
+  it('does not invent boarding-point copy when the venue has no text', () => {
+    const copy = resolveLocationVenueCopy({
+      name: 'Тачанка',
+      city: 'Ростов-на-Дону',
+      description: '',
+      shortDescription: 'Памятник на карте города.',
+    });
+    assert.equal(copy.fullDescription, '');
+    assert.equal(copy.heroLead, '');
+    assert.ok(!/точка отправления|время отправления/i.test(copy.howToFind));
   });
 });

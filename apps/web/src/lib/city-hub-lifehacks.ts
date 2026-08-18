@@ -1002,7 +1002,7 @@ const NOVOSIBIRSK_ITEMS: CityLifehackItem[] = [
     ),
     cta: {
       kind: 'maps',
-      label: 'Точка на карте',
+      label: 'Открыть на карте',
       href: yandexMapsSearchUrl('Михайловская набережная Новосибирск Александр III'),
       extra: [
         {
@@ -1145,7 +1145,7 @@ const VORONEZH_ITEMS: CityLifehackItem[] = [
     ),
     cta: {
       kind: 'maps',
-      label: 'Точки на карте',
+      label: 'Места на карте',
       href: yandexMapsSearchUrl('Ильинский храм Воронеж'),
       extra: [{ label: 'Чернавская дамба', href: yandexMapsSearchUrl('Чернавская дамба Воронеж') }],
     },
@@ -1570,7 +1570,7 @@ const UFA_ITEMS: CityLifehackItem[] = [
     ),
     cta: {
       kind: 'maps',
-      label: 'Точки на карте',
+      label: 'Места на карте',
       href: yandexMapsSearchUrl('Памятник Салавату Юлаеву Уфа'),
       extra: [
         { label: 'Конгресс-холл Торатау', href: yandexMapsSearchUrl('Конгресс-холл Торатау Уфа') },
@@ -1661,7 +1661,7 @@ const OMSK_ITEMS: CityLifehackItem[] = [
     ),
     cta: {
       kind: 'maps',
-      label: 'Точки на карте',
+      label: 'Места на карте',
       href: yandexMapsSearchUrl('Речной вокзал Омск'),
       extra: [{ label: 'Омская крепость', href: yandexMapsSearchUrl('Омская крепость') }],
     },
@@ -1749,7 +1749,7 @@ const CHELYABINSK_ITEMS: CityLifehackItem[] = [
     ),
     cta: {
       kind: 'maps',
-      label: 'Точки на карте',
+      label: 'Места на карте',
       href: yandexMapsSearchUrl('Набережная реки Миасс Челябинск'),
       extra: [
         {
@@ -1839,7 +1839,7 @@ const TYUMEN_ITEMS: CityLifehackItem[] = [
     ),
     cta: {
       kind: 'maps',
-      label: 'Точки на карте',
+      label: 'Места на карте',
       href: yandexMapsSearchUrl('Мост Влюбленных Тюмень'),
       extra: [
         { label: 'Четырехъярусная набережная', href: yandexMapsSearchUrl('Четырехъярусная набережная Тюмень') },

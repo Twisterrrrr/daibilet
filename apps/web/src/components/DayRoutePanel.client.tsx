@@ -2761,7 +2761,7 @@ function DayRoutePanelInner() {
       formatStreetAddress(focusedVenue.address, { city: focusedVenue.city }) ||
       String(focusedVenue.address || '').trim() ||
       '';
-    const focusSubtitle = hook || addressLine || 'Точка на карте';
+    const focusSubtitle = hook || addressLine;
     return (
       <div
         className={
@@ -2775,6 +2775,7 @@ function DayRoutePanelInner() {
         <div className="flex items-start gap-2">
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-semibold text-slate-900">{focusedVenue.title}</p>
+            {focusSubtitle ? (
             <p
               className="mt-0.5 line-clamp-4 text-[11px] leading-snug text-slate-500"
               title={focusSubtitle}
@@ -2782,6 +2783,7 @@ function DayRoutePanelInner() {
             >
               {focusSubtitle}
             </p>
+            ) : null}
           </div>
           <div
             className="flex shrink-0 flex-col items-center gap-1"

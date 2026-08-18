@@ -1373,12 +1373,19 @@ function isWeakVenueLeadText(value) {
   if (!text) return true;
   if (text.length < 24) return true;
   if (/^(легенда|описание|текст|n\/a|нет|—|-)$/i.test(text)) return true;
+  if (
+    /на карте города|точка на (карте|маршруте)|ориентир в городе|жанровая точка|парковая точка|литературная точка|открытое пространство для прогулок|открытая локация для прогулок и событий/i.test(
+      text,
+    )
+  ) {
+    return true;
+  }
   return false;
 }
 
 function pickPublicVenueDescriptionText(shortDescription, description) {
   const full = cleanImportedDescription(description);
-  if (full) return full;
+  if (full && !isWeakVenueLeadText(full)) return full;
   const short = cleanImportedDescription(shortDescription);
   if (short && !isWeakVenueLeadText(short)) return short;
   return null;

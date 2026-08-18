@@ -441,13 +441,17 @@ export function LocationVenueLayout({
             </section>
           ) : null}
 
+          {(venue.hookFact || fullDescription) ? (
           <section className="rounded-2xl border border-slate-200 bg-white p-6">
             <h2 className="text-xl font-bold text-slate-900">О локации</h2>
             {venue.hookFact ? (
               <p className="mt-2 text-sm font-semibold text-emerald-800">{venue.hookFact}</p>
             ) : null}
+            {fullDescription ? (
             <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-slate-600">{fullDescription}</p>
+            ) : null}
           </section>
+          ) : null}
 
           {hasVenueLogisticsContent(venue) ? (
             <section className="rounded-2xl border border-slate-200 bg-white p-6">

@@ -46,7 +46,7 @@ export const ROSTOV_NA_DONU_MUST_SEE: any[] = [
     mustSeeFilter: 'monument',
     visitMinutes: 15,
   }),
-  place('Памятник М. А. Шолохову', 'Писатель на лодке среди воды и камышей - важная литературная точка на набережной.', 47.218112, 39.718912, {
+  place('Памятник М. А. Шолохову', 'Шолохов в лодке среди камышей на набережной Дона - самый живой кадр берега.', 47.218112, 39.718912, {
     address: 'ул. Береговая, 35',
     locationSlug: 'rostov-na-donu-pamyatnik-sholohovu',
     mustSeeFilter: 'monument',
@@ -89,7 +89,7 @@ export const ROSTOV_NA_DONU_MUST_SEE: any[] = [
     mustSeeFilter: 'monument',
     visitMinutes: 10,
   }),
-  place('Памятник А. С. Пушкину', 'Старт Пушкинской улицы и классическая литературная точка центрального променада.', 47.224112, 39.715891, {
+  place('Памятник А. С. Пушкину', 'Пушкин стоит у начала Пушкинской: отсюда начинается центральный променад.', 47.224112, 39.715891, {
     address: 'ул. Пушкинская / Буденновский проспект',
     locationSlug: 'rostov-na-donu-pamyatnik-pushkinu',
     mustSeeFilter: 'monument',

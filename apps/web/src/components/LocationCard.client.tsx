@@ -66,29 +66,6 @@ function realRating(value: unknown): number | null {
   return Math.round(n * 10) / 10;
 }
 
-/** Minimal technical line when editorial hook/shortDescription is empty. */
-function technicalLocationBlurb(kind: string, typeLabel: string): string {
-  switch (kind) {
-    case 'bus':
-      return 'Точка сбора для автобусных туров и трансферов.';
-    case 'pier':
-    case 'pier_water':
-      return 'Причал - место посадки на водные прогулки.';
-    case 'park':
-      return 'Парк и открытое пространство для прогулок.';
-    case 'monument':
-    case 'attraction':
-    case 'temple':
-      return 'Точка на маршруте и ориентир в городе.';
-    case 'outdoor_location':
-      return 'Открытая локация для прогулок и событий.';
-    case 'sport_activity_space':
-      return 'Площадка для активного отдыха и событий.';
-    default:
-      return `${typeLabel} на карте города.`;
-  }
-}
-
 export function LocationCard({
   venue,
   href,
@@ -117,7 +94,7 @@ export function LocationCard({
     hookFact: venue.hookFact,
     shortDescription: venue.shortDescription,
   });
-  const blurb = editorialHook || technicalLocationBlurb(kind, typeLabel);
+  const blurb = editorialHook;
   const rating = realRating(venue.rating);
   const upcoming = venue.upcomingTitles?.filter(Boolean).slice(0, 3) || [];
   const showMiniAfisha = upcoming.length > 0;
