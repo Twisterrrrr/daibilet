@@ -1,3 +1,9 @@
+## 2026-08-18 - Museums leave sights in catalog
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| CAT.MUSEUMS-NOT-SIGHTS | Каталог/search: museum-like `ATTRACTION` с билетами идут в «Музеи», не в «Достопримечательности»; museum+sight дубль не плодим | Высокий | ✅ code + focused tests; commit+push+Deploy MSK web |
+
 ## 2026-08-18 - Петропавловская крепость: одна карточка
 
 | ID | Задача | Приоритет | Статус |

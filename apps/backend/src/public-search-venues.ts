@@ -24,15 +24,27 @@ export function isMuseumLikeSearchKind(kind?: string | null): boolean {
   return key.includes('MUSEUM') || key === 'ART_SPACE';
 }
 
+const MUSEUM_LANDMARK_SEARCH_RE =
+  /музей|галере|эрмитаж|кунсткамер|дворец|усадьб|крепост|цитадел|арсенал|павильон|планетар|панорам|выставочн/iu;
+
+export function isMuseumLikeSearchVenue(kind?: string | null, title?: string | null): boolean {
+  if (isMuseumLikeSearchKind(kind)) return true;
+  const key = String(kind || '').toUpperCase();
+  if (key !== 'ATTRACTION') return false;
+  return MUSEUM_LANDMARK_SEARCH_RE.test(String(title || ''));
+}
+
 function pickPreferredSearchVenue(
   current: PublicSearchVenueRow,
   candidate: PublicSearchVenueRow,
 ): PublicSearchVenueRow {
-  const fortress = isFortressComplexName(current.title) || isFortressComplexName(candidate.title);
-  if (fortress) {
-    const currentMuseum = isMuseumLikeSearchKind(current.kind);
-    const candidateMuseum = isMuseumLikeSearchKind(candidate.kind);
-    if (currentMuseum !== candidateMuseum) return candidateMuseum ? candidate : current;
+  const currentMuseum = isMuseumLikeSearchVenue(current.kind, current.title);
+  const candidateMuseum = isMuseumLikeSearchVenue(candidate.kind, candidate.title);
+  if (currentMuseum !== candidateMuseum) {
+    const fortress = isFortressComplexName(current.title) || isFortressComplexName(candidate.title);
+    if (fortress || searchVenueTextKey(current.title) === searchVenueTextKey(candidate.title)) {
+      return candidateMuseum ? candidate : current;
+    }
   }
   return (candidate.score || 0) > (current.score || 0) ? candidate : current;
 }

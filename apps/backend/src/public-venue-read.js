@@ -1498,6 +1498,27 @@ function finalizeMuseumArtPublicKind(kind, name, address, options = {}) {
   return key;
 }
 
+const SALEABLE_MUSEUM_LANDMARK_RE =
+  /музей|галере|эрмитаж|кунсткамер|дворец|усадьб|крепост|цитадел|арсенал|павильон|планетар|панорам|выставочн/iu;
+const NON_MUSEUM_SALEABLE_PLACE_RE = /театр|концерт|клуб|бар|ресторан|причал|автобус|теплоход/iu;
+
+function isSaleableMuseumLikeAttraction(name, address, options = {}) {
+  if (isTempleLikeVenueName(name)) return false;
+  const text = [
+    name,
+    address,
+    options.shortDescription,
+    options.description,
+    options.slug,
+    options.id,
+  ]
+    .filter(Boolean)
+    .join(' ');
+  if (!SALEABLE_MUSEUM_LANDMARK_RE.test(text)) return false;
+  if (NON_MUSEUM_SALEABLE_PLACE_RE.test(text)) return false;
+  return true;
+}
+
 export function normalizeVenueKindValue(value) {
   return String(value || 'OTHER')
     .trim()
@@ -1855,6 +1876,13 @@ export function resolvePublicVenueKind(storedKind, name, address, options = {}) 
   if (stored === 'outdoor_location') return 'outdoor_location';
   // Saleable fortress complex = museum card; do not keep a parallel sight row.
   if (isFortressComplexName(name) && (totalEvents > 0 || stored === 'museum' || stored === 'museum_art_space')) {
+    return 'museum';
+  }
+  if (
+    stored === 'attraction' &&
+    totalEvents > 0 &&
+    isSaleableMuseumLikeAttraction(name, address, { id, slug, shortDescription, description })
+  ) {
     return 'museum';
   }
   if (stored === 'attraction') return 'attraction';

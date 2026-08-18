@@ -5,7 +5,7 @@ import { expandSearchQuery } from './search-synonyms.js';
 import { formatPublicVenueTitle, isFortressComplexName } from './venue-normalize.js';
 import {
   collapsePublicSearchVenueRows,
-  isMuseumLikeSearchKind,
+  isMuseumLikeSearchVenue,
   searchVenueTextKey,
 } from './public-search-venues.ts';
 
@@ -61,7 +61,7 @@ type TrgmRow = {
   id: string;
   slug: string;
   title: string;
-  score: number;
+  score?: number;
   city?: string | null;
   venue?: string | null;
   imageUrl?: string | null;
@@ -101,8 +101,10 @@ function likePattern(term: string): string {
 function mapPublicSearchVenueItem(row: TrgmRow): PublicSearchItem {
   const title = String(formatPublicVenueTitle(row.title) || row.title || '').trim();
   const kind = String(row.kind || '').toUpperCase();
-  const fortressMuseum = isFortressComplexName(title) && isMuseumLikeSearchKind(kind);
+  const museumLike = isMuseumLikeSearchVenue(kind, title);
+  const fortressMuseum = isFortressComplexName(title) && museumLike;
   const isLocation =
+    !museumLike &&
     !fortressMuseum &&
     (kind.includes('PIER') ||
       kind.includes('OUTDOOR') ||

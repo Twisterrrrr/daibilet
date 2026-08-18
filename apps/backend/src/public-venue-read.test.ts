@@ -259,3 +259,18 @@ test('saleable fortress is one museum card, not a parallel sight', () => {
   assert.equal(merged[0]?.events, 1);
   assert.equal(merged[0]?.mergedVenueIds?.length, 2);
 });
+
+test('saleable museum-like attraction moves to museum, plain sight stays attraction', () => {
+  assert.equal(
+    resolvePublicVenueKind('ATTRACTION', 'Екатерининский дворец', 'Пушкин, Садовая ул., 7', { totalEvents: 3 }),
+    'museum',
+  );
+  assert.equal(
+    resolvePublicVenueKind('ATTRACTION', 'Дворцовая площадь', 'Санкт-Петербург', { totalEvents: 3 }),
+    'attraction',
+  );
+  assert.equal(
+    resolvePublicVenueKind('ATTRACTION', 'Екатерининский дворец', 'Пушкин, Садовая ул., 7', { totalEvents: 0 }),
+    'attraction',
+  );
+});

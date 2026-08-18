@@ -1,3 +1,19 @@
+## 2026-08-18 - Музеи не должны жить в sights
+
+### Наблюдения
+- После one-off фикса Петропавловской крепости в общем канале `/places` и header search оставалась системная дыра: saleable museum-like `ATTRACTION` могли продолжать жить в «Достопримечательностях».
+- Owner lock: все места типа музей надо переводить в «Музеи», не держать параллельно в sights.
+
+### Решения
+- В `public-venue-read.js` добавлена общая эвристика: ticketed `ATTRACTION` с museum-like профилем (`музей`, `галерея`, `дворец`, `крепость` и т.п.) получают public kind `museum`.
+- В header search (`public-search.dto.ts` + `public-search-venues.ts`) выровнен shortcut-маршрут: museum-like `ATTRACTION` идут в `/venues`, а при совпадающем имени приоритет у museum-варианта, не у sight.
+- Добавлены focused tests на классификацию `Екатерининского дворца` и search-side museum routing, чтобы museum не возвращался в `attraction`.
+
+### Проблемы
+- Это продуктовая эвристика по public kind, а не массовый backfill БД. Сырой `Venue.kind` в базе может оставаться `ATTRACTION`, но в каталоге и поиске теперь важен нормализованный public type.
+
+---
+
 ## 2026-08-18 - Петропавловская крепость: одна карточка музея
 
 ### Наблюдения
