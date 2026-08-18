@@ -94,14 +94,15 @@ export function buildRegionChildCityChrome(
 }
 
 export function sessionMatchesRegionCityFilter(
-  session: {
+  session?: {
     city?: string | null;
     citySlug?: string | null;
     sourceCitySlug?: string | null;
-  },
-  names: string[],
+  } | null,
+  names: string[] = [],
   slugs: string[] = [],
 ): boolean {
+  if (!session) return false;
   const nameSet = new Set(names.map((name) => String(name || '').trim().toLowerCase()).filter(Boolean));
   const slugSet = new Set(slugs.map((slug) => publicCitySlug(slug)).filter(Boolean));
   const city = String(session.city || '').trim().toLowerCase();
@@ -111,4 +112,26 @@ export function sessionMatchesRegionCityFilter(
   if (citySlug && slugSet.has(citySlug)) return true;
   if (sourceSlug && slugSet.has(sourceSlug)) return true;
   return false;
+}
+
+export function filterSessionsForRegionChildCity<
+  T extends {
+    city?: string | null;
+    citySlug?: string | null;
+    sourceCitySlug?: string | null;
+  },
+>(
+  sessions: Array<T | null | undefined>,
+  child: { name: string; slug: string } | null,
+  childCities: Array<{ slug?: string | null; name: string }> = [],
+): T[] {
+  const list = (sessions || []).filter((session): session is T => Boolean(session));
+  if (!child) return list;
+  const extraSlugs = childCities
+    .filter((item) => String(item.name || '').toLowerCase() === child.name.toLowerCase())
+    .map((item) => item.slug)
+    .filter((slug): slug is string => Boolean(slug));
+  return list.filter((session) =>
+    sessionMatchesRegionCityFilter(session, [child.name], [child.slug, ...extraSlugs]),
+  );
 }

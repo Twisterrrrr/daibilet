@@ -4,6 +4,7 @@ import test from 'node:test';
 import {
   buildRegionChildCityChrome,
   canonicalizeRegionChildCitySearch,
+  filterSessionsForRegionChildCity,
   parseRegionChildCityQuery,
   regionChildCityHref,
   resolveRegionChildCityScope,
@@ -89,4 +90,37 @@ test('affiche filter matches child by name or slug', () => {
     sessionMatchesRegionCityFilter({ city: 'Выборгский район', citySlug: 'vyborg' }, ['Выборг'], ['vyborg']),
     true,
   );
+});
+
+test('?city=vyborg on LO hub does not throw on sparse sessions', () => {
+  const chrome = buildRegionChildCityChrome({
+    ...LO,
+    search: new URLSearchParams('city=vyborg'),
+  });
+  assert.ok(chrome);
+  assert.doesNotThrow(() => {
+    filterSessionsForRegionChildCity(
+      [
+        undefined,
+        null,
+        { city: null, citySlug: null },
+        { city: 'Выборг', citySlug: 'vyborg' },
+        { city: 'Гатчина' },
+      ],
+      chrome.child,
+      LO.childCities,
+    );
+  });
+  const filtered = filterSessionsForRegionChildCity(
+    [
+      undefined,
+      { city: null },
+      { city: 'Выборг', citySlug: 'vyborg' },
+      { city: 'Гатчина', citySlug: 'gatchina' },
+    ],
+    chrome.child,
+    LO.childCities,
+  );
+  assert.equal(filtered.length, 1);
+  assert.equal(filtered[0]?.city, 'Выборг');
 });

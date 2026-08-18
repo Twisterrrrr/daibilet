@@ -1,3 +1,16 @@
+## 2026-08-18 - Петропавловская крепость: одна карточка
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| CAT.FORTRESS-ONE-MUSEUM | Одна public-карточка Музей «Петропавловская крепость»: trim равелин/pickup, merge museum+sight, search без дубля | Высокий | 🔄 code; commit+push+Deploy MSK web |
+
+## 2026-08-18 - Live LO child + header search
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| GEO.VYBORG-HUB-CRASH | Live `/cities/leningradskaya-oblast?city=vyborg`: убрать JSX title/meta (webpack `undefined.call`); фильтр сессий без throw | Критический | 🔄 code; commit+push+Deploy MSK web |
+| GEO.HEADER-SEARCH-SATELLITES | Шапка: Выборг/Раменское через `matchSearchGeoHits` (формула A, до 2 geo), места/события не пустые | Критический | 🔄 code; commit+push+Deploy MSK web |
+
 ## 2026-08-17 - Туристический хаб Омска
 
 | ID | Задача | Приоритет | Статус |
@@ -53,7 +66,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| GEO.VYBORG-OBLAST-CHILD | Канон событий/search/H1: `/cities/leningradskaya-oblast?city=vyborg` (формула A); карточка СПб suburbs остаётся tourist; не standalone | Высокий | ✅ H1/лид/title + фильтр афиши на `?city=`; hyphen `?city-vyborg` → `?city=` |
+| GEO.VYBORG-OBLAST-CHILD | Канон событий/search/H1: `/cities/leningradskaya-oblast?city=vyborg` (формула A); карточка СПб suburbs остаётся tourist; не standalone | Высокий | 🔄 H1 ок; live crash title/meta + header geo 2026-08-18 |
 
 ## 2026-08-16 - Новосибирск tourist hub
 

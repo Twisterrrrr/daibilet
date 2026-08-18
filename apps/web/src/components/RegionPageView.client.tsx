@@ -14,7 +14,7 @@ import { buildRegionSystemBrief } from '@/lib/region-hub-seo';
 import {
   buildRegionChildCityChrome,
   canonicalizeRegionChildCitySearch,
-  sessionMatchesRegionCityFilter,
+  filterSessionsForRegionChildCity,
 } from '@/lib/region-child-city-scope';
 import { cityHref } from '@/lib/routes';
 import {
@@ -147,6 +147,8 @@ export function RegionPageView({
         : buildRegionSystemBrief(city.name)
       : '');
   const brief = childChrome?.lead || regionBrief;
+  const statsEvents = payload?.stats?.events ?? eventTotal;
+  const statsVenues = payload?.stats?.venues ?? 0;
 
   React.useEffect(() => {
     const next = canonicalizeRegionChildCitySearch(searchParams);
@@ -154,6 +156,31 @@ export function RegionPageView({
     const qs = next.toString();
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
   }, [searchParams, pathname, router]);
+
+  // Do not render <title>/<meta> in this client tree: Next metadata runtime
+  // treats them as resources and crashes the hub (`undefined.call` in webpack).
+  React.useEffect(() => {
+    if (!childChrome) return;
+    const previousTitle = document.title;
+    document.title = childChrome.title;
+    let robots = document.querySelector('meta[name="robots"]');
+    const previousRobots = robots?.getAttribute('content') ?? null;
+    let created = false;
+    if (!robots) {
+      robots = document.createElement('meta');
+      robots.setAttribute('name', 'robots');
+      document.head.appendChild(robots);
+      created = true;
+    }
+    robots.setAttribute('content', 'noindex, follow');
+    return () => {
+      document.title = previousTitle;
+      if (!robots) return;
+      if (created) robots.remove();
+      else if (previousRobots != null) robots.setAttribute('content', previousRobots);
+      else robots.removeAttribute('content');
+    };
+  }, [childChrome]);
 
   const replaceCityQuery = React.useCallback(
     (nextSlug: string | null) => {
@@ -191,17 +218,8 @@ export function RegionPageView({
 
   const sessions = React.useMemo(() => {
     const list = payload?.sessions || [];
-    const filterNames = cityFilter || [];
-    const filterSlugs = childChrome ? [childChrome.child.slug] : [];
-    return list.filter((session) => {
-      if (filterNames.length) {
-        const extraSlugs = childCities
-          .filter((item) => filterNames.some((name) => name.toLowerCase() === item.name.toLowerCase()))
-          .map((item) => item.slug);
-        if (!sessionMatchesRegionCityFilter(session, filterNames, [...filterSlugs, ...extraSlugs])) {
-          return false;
-        }
-      }
+    const scoped = filterSessionsForRegionChildCity(list, childChrome?.child || null, childCities);
+    return scoped.filter((session) => {
       if (hasBelts && beltFilter !== 'all') {
         const entry = resolveCityBeltEntry(slug, {
           slug: session.citySlug,
@@ -217,7 +235,6 @@ export function RegionPageView({
     });
   }, [
     payload?.sessions,
-    cityFilter,
     childChrome,
     childCities,
     dateSelection,
@@ -346,12 +363,6 @@ export function RegionPageView({
 
   return (
     <div className="bg-white text-slate-900">
-      {childChrome ? (
-        <>
-          <title>{childChrome.title}</title>
-          <meta name="robots" content="noindex, follow" />
-        </>
-      ) : null}
       <main>
         <section id="top" className="border-b border-slate-200 bg-white">
           <div className="container-page py-12 sm:py-14">
@@ -369,7 +380,7 @@ export function RegionPageView({
             <p className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-600">
               <span>
                 <span className="font-semibold text-slate-900">
-                  {formatNumber(childChrome ? sessions.length : payload.stats.events)}
+                  {formatNumber(childChrome ? sessions.length : statsEvents)}
                 </span>{' '}
                 {childChrome ? `событий ${inCityPrepositional(childChrome.child.name)}` : 'событий в регионе'}
               </span>
@@ -377,7 +388,7 @@ export function RegionPageView({
                 ·
               </span>
               <span>
-                <span className="font-semibold text-slate-900">{formatNumber(payload.stats.venues)}</span> площадок
+                <span className="font-semibold text-slate-900">{formatNumber(statsVenues)}</span> площадок
               </span>
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
@@ -492,7 +503,7 @@ export function RegionPageView({
                 <div className="mt-6 flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                   {visibleCities.map((item) => (
                     <ChildCityAvatar
-                      key={item.slug}
+                      key={item.slug || item.name}
                       city={item}
                       active={isCityFilterActive([item.name])}
                       logistics={formatLogisticsParts(resolveCityBeltEntry(slug, item))}

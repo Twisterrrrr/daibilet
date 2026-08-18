@@ -1,3 +1,19 @@
+## 2026-08-18 - Петропавловская крепость: одна карточка музея
+
+### Наблюдения
+- В поиске/places были две карточки: достопримечательность «Петропавловская крепость» и музей с мусорным title «…Алексеевский равелин (внутренняя территория…)».
+- Owner: оставить одну карточку. Билет продаётся - значит музей, а не параллельный sight. Гулять по территории без билета - копирайт на PDP, не второй kind.
+
+### Решения
+- Display-title sanitizer: «X. равелин (внутренняя территория…)» → «Петропавловская крепость».
+- Merge fortress complex в одном городе в одну hub/search карточку; при events > 0 public kind = museum.
+- События (собор/экспозиции) висят на этой карточке.
+
+### Проблемы
+- Не склеивать «Петропавловский собор» как отдельное имя, если оно не сводится к «крепость» после sanitize.
+
+---
+
 ## 2026-08-18 - Mobile header: город пиктограммой
 
 ### Наблюдения
@@ -8,6 +24,22 @@
 
 ### Проблемы
 - Не путать с иконкой поиска: пин слева у логотипа, лупа справа.
+
+---
+
+## 2026-08-18 - Live crash `?city=vyborg` + header search geo
+
+### Наблюдения
+- `/cities/leningradskaya-oblast?city=vyborg` и хаб без query: HTTP 200, один ISR ETag. Краш клиентский: «Не удалось открыть страницу», webpack `undefined.call`.
+- В RegionPageView на child-query рендерили `<title>` и `<meta name="robots">` в клиентском дереве. Next metadata runtime на клиенте дергает отсутствующий module factory.
+- Шапка: HeaderSearch только проксировал `/api/public/search`. Live API не отдаёт geo-hit Выборга (матчер был в `/cities` catalog SHA 741dd3a и в backend dto, но BFF не мержил, API :4000 без выката). Раменское приходило как `/cities/раменское`.
+
+### Решения
+- Child title/robots через `document.title` + DOM meta, не JSX. Фильтр сессий `filterSessionsForRegionChildCity` не падает на sparse session.
+- `mergeHeaderSearchItems` в HeaderSearch и в Next BFF `/api/public/search`: geo (до 2) выше событий, формула A, thin City-row заменяется на `?city=`. Venue/event слоты не выкидываем.
+
+### Проблемы
+- Backend :4000 отдельно не деплоили: web BFF + клиент достаточны после Deploy MSK web.
 
 ---
 

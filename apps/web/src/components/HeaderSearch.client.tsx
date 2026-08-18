@@ -6,16 +6,11 @@ import { useEffect, useRef, useState } from 'react';
 
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { buildCatalogHref, isPlacesSectionPath, placesSearchHref } from '@/lib/catalog-url';
+import { mergeHeaderSearchItems, type HeaderSearchItem } from '@/lib/header-search-results';
 import { venueHref, venuePageTemplate } from '@/lib/routes';
 import { mapVenueCatalogFeedPage } from '@/lib/venue-catalog-feed';
 
-type SearchItem = {
-  type: 'event' | 'city' | 'landing' | 'venue' | 'suburb';
-  label: string;
-  sublabel?: string | null;
-  href: string;
-  imageUrl?: string | null;
-};
+type SearchItem = HeaderSearchItem;
 
 type HeaderSearchProps = {
   className?: string;
@@ -116,15 +111,25 @@ export function HeaderSearch({
         }
         const params = new URLSearchParams({ q: normalized });
         if (cityFilter && cityFilter !== 'all') params.set('city', cityFilter);
-        const response = await fetch(`/api/public/search?${params.toString()}`);
-        if (!response.ok) return;
-        const payload = (await response.json()) as { items?: SearchItem[] };
-        setItems(payload.items || []);
-        setResultsOpen(Boolean(payload.items?.length));
+        let apiItems: SearchItem[] = [];
+        try {
+          const response = await fetch(`/api/public/search?${params.toString()}`);
+          if (response.ok) {
+            const payload = (await response.json()) as { items?: SearchItem[] };
+            apiItems = payload.items || [];
+          }
+        } catch {
+          apiItems = [];
+        }
+        const merged = mergeHeaderSearchItems(normalized, apiItems);
+        setItems(merged);
+        setResultsOpen(merged.length > 0);
         setActiveIndex(-1);
       } catch {
-        setItems([]);
-        setResultsOpen(false);
+        const fallback = mergeHeaderSearchItems(normalized, []);
+        setItems(fallback);
+        setResultsOpen(fallback.length > 0);
+        setActiveIndex(-1);
       }
     }, 220);
 
