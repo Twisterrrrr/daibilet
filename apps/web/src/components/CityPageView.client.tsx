@@ -33,6 +33,7 @@ import { MustSeeFilterTabs } from '@/components/MustSeeFilterTabs.client';
 import { ScrollRail } from '@/components/ScrollRail.client';
 import { SuburbsCarousel } from '@/components/SuburbsCarousel.client';
 import { formatStreetAddress } from '@/lib/address';
+import { placesHubHrefWithSelectedCity } from '@/lib/catalog-url';
 import { formatNumber, formatPriceFrom, pluralEvents, pluralVenues } from '@/lib/format';
 import type { CityFaqItem } from '@/lib/city-faq';
 import type { CityHubArticlesBuckets } from '@/lib/city-hub-articles';
@@ -1812,6 +1813,7 @@ function VenueHighlights({
 }) {
   if (!venues.length) return null;
   const cityIn = cityInPrepositional(city);
+  const citySlug = city.slug || city.sourceSlug || undefined;
   const institutions = venues.filter((venue) => venuePageTemplate(venue.type) !== 'location');
   const locations = venues.filter((venue) => venuePageTemplate(venue.type) === 'location');
   const featured = [...institutions, ...locations].slice(0, Math.max(1, topN));
@@ -1849,12 +1851,12 @@ function VenueHighlights({
           >
             Смотреть афишу
           </a>
-          {locations.length ? (
+          {venues.length ? (
             <a
-              href="/locations"
+              href={placesHubHrefWithSelectedCity(undefined, citySlug)}
               className={editorial ? 'hover:underline' : 'text-primary-700 hover:text-primary-800'}
             >
-              Все локации →
+              Все места →
             </a>
           ) : null}
         </div>

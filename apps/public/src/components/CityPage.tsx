@@ -450,6 +450,7 @@ function CategoryTiles({ categories, onSelect }: { categories: Array<[string, nu
 function VenueHighlights({ city, venues }: { city: PublicCity; venues: PublicVenue[] }) {
   if (!venues.length) return null;
   const cityIn = cityInPrepositional(city);
+  const citySlug = city.slug || city.sourceSlug || undefined;
   const institutions = venues.filter((venue) => venue.template !== 'location');
   const locations = venues.filter((venue) => venue.template === 'location');
   const featured = [...institutions, ...locations].slice(0, 6);
@@ -467,9 +468,12 @@ function VenueHighlights({ city, venues }: { city: PublicCity; venues: PublicVen
           <a href="#city-schedule" className="text-primary-700 hover:text-primary-800">
             Смотреть афишу
           </a>
-          {locations.length ? (
-            <a href="/locations" className="text-primary-700 hover:text-primary-800">
-              Все локации →
+          {venues.length ? (
+            <a
+              href={citySlug ? `/places?city=${encodeURIComponent(citySlug)}` : '/places'}
+              className="text-primary-700 hover:text-primary-800"
+            >
+              Все места →
             </a>
           ) : null}
         </div>
