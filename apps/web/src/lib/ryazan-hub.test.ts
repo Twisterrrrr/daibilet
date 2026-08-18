@@ -78,6 +78,11 @@ test('Ryazan suburbs Konstantinovo and Solotcha keep nested POIs', () => {
   }
   assert.match(String(bySlug.get('ryazan-konstantinovo')?.travelVectorBlurb), /132/);
   assert.match(String(bySlug.get('ryazan-solotcha')?.travelVectorBlurb), /108/);
+  const kon = bySlug.get('ryazan-konstantinovo') as { longitude?: number } | undefined;
+  assert.ok(
+    Math.abs((kon?.longitude || 0) - 39.598984) < 0.01,
+    'Konstantinovo pin must sit in the village (OSM museum), not 10 km west',
+  );
 });
 
 test('Ryazan day presets include two walks, mushroom map and painted lines', () => {
