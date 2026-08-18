@@ -35,6 +35,7 @@ export const BLOG_CITY_FILTER_LABELS: Record<string, string> = {
   novosibirsk: 'Новосибирск',
   krasnoyarsk: 'Красноярск',
   samara: 'Самара',
+  voronezh: 'Воронеж',
   regions: 'Регионы',
   multi: 'Несколько городов',
 };
@@ -564,6 +565,7 @@ export function normalizeBlogCitySlug(
   if (haystack.includes('новосибир')) return 'novosibirsk';
   if (haystack.includes('краснояр')) return 'krasnoyarsk';
   if (haystack.includes('самар')) return 'samara';
+  if (haystack.includes('воронеж')) return 'voronezh';
   if (haystack.includes('регион')) return 'regions';
 
   // Только slug-like токены (не кириллические display-name вроде «нижний новгород»).
