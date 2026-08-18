@@ -1,5 +1,7 @@
 import type { NextConfig } from 'next';
 
+import { placeSlugAliasRedirects } from './src/lib/place-slug-aliases';
+
 const nextConfig: NextConfig = {
   // MSK prod ~8Gi / 4 CPU: allow parallel build. (Legacy SPB 3.8Gi used cpus:1 + workerThreads:false.)
   eslint: { ignoreDuringBuilds: true },
@@ -60,6 +62,8 @@ const nextConfig: NextConfig = {
         destination: '/venues/moscow-tret-yakovskaya-galereya',
         permanent: true,
       },
+      // Smoke/typo slugs → live catalog twins (Salavat, Kramskoy, Ryazan kremlin).
+      ...placeSlugAliasRedirects(),
       // Listing indexes → unified `/places`. Entity `/venues/:slug` and `/locations/:slug` stay.
       {
         source: '/venues',

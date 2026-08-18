@@ -16,6 +16,7 @@ import {
   VENUE_CATALOG_PAGE_SIZE,
 } from '@/lib/venue-catalog-feed';
 import { evaluateVenueIndexability, robotsForIndexability } from '@/lib/hub-indexability';
+import { resolvePlaceSlugAlias } from '@/lib/place-slug-aliases';
 import { venueHref, venueCanonicalPath, venuePageTemplate } from '@/lib/routes';
 import { safeNotFound } from '@/lib/safe-not-found';
 import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
@@ -64,7 +65,7 @@ type VenueDtoLoad =
  * Transient API errors throw from getCachedPublicVenueDto → unavailable (not HTML 404 poison).
  */
 async function loadVenueDto(slug: string): Promise<VenueDtoLoad> {
-  const key = String(slug || '').trim();
+  const key = resolvePlaceSlugAlias(String(slug || '').trim());
   if (!key) return { kind: 'miss' };
 
   try {
@@ -242,18 +243,18 @@ export async function VenueDetailPage({
 
   let payload = loaded.payload;
   const family = resolveVenueRouteFamily(payload.venue);
-  if (family !== routeFamily) {
-    // Never trust stored canonicalPath here: if it still points at the wrong
-    // family (e.g. /locations/… while template=institution) Next 308-loops and
-    // the PDP hangs the tab (live 2026-08-09 Yaani Kirik church).
-    permanentRedirect(
-      venueHref({
-        id: payload.venue.id,
-        slug: payload.venue.slug || decodedSlug,
-        name: payload.venue.name,
-        type: family === 'location' ? 'location' : payload.venue.type,
-      }),
-    );
+  const targetHref = venueHref({
+    id: payload.venue.id,
+    slug: payload.venue.slug || decodedSlug,
+    name: payload.venue.name,
+    type: family === 'location' ? 'location' : payload.venue.type,
+  });
+  const currentHref = `${routeFamily === 'location' ? '/locations' : '/venues'}/${decodedSlug}`;
+  if (targetHref !== currentHref) {
+    // Family mismatch or slug alias (e.g. /locations/ryazan-kreml).
+    // Never trust stored canonicalPath: wrong-family paths 308-loop
+    // (live 2026-08-09 Yaani Kirik church).
+    permanentRedirect(targetHref);
   }
 
   const editorialHero = resolveVenueHeroImage(

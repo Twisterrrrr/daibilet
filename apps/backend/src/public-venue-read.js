@@ -33,6 +33,7 @@ import { dedupePublicVenueLinkedEvents } from './public-venue-linked-events.ts';
 import { pickFirstUsableEventImageUrl } from './event-image-url.ts';
 import { loadCityRoutingConfig } from './city-routing-config.js';
 import { resolveProjectRoot } from './project-root.js';
+import { resolvePlaceSlugAlias } from './place-slug-aliases.js';
 
 const PUBLIC_CATALOG_CACHE_MS = 5 * 60 * 1000;
 /** Soft TTL: serve expired hub while single-flight rebuild runs (INC.504 venues hang). */
@@ -1285,7 +1286,7 @@ const PUBLIC_VENUE_ROW_SELECT = `
 `;
 
 async function resolvePublicVenueRow(db, venueSlugOrId) {
-  const value = String(venueSlugOrId || '').trim();
+  const value = resolvePlaceSlugAlias(String(venueSlugOrId || '').trim());
   if (!value) return null;
 
   const candidates = new Set([value]);
