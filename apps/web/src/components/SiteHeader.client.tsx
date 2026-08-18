@@ -162,14 +162,14 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
               <DaibiletLogo textClassName="text-lg sm:text-xl lg:text-2xl" />
             </Link>
 
-            {/* PH2.LOC2 / UX.LOC1: city outside burger - pin stays; name truncates; icon-only only as overflow. */}
+            {/* Mobile: city as MapPin pictogram; lg+ named chip. Tap opens CityPicker. */}
             <CityPicker
               cities={destinations}
               value={cityValue}
               onChange={onCityChange}
               allLabel="Фильтр по городу"
               variant="header"
-              className="min-w-10 max-w-[9.5rem] shrink sm:max-w-[14rem] sm:shrink-0 xl:max-w-[16rem]"
+              className="shrink-0 lg:min-w-0 lg:max-w-[14rem] xl:max-w-[16rem]"
             />
           </div>
 

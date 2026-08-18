@@ -202,7 +202,7 @@ function HeaderCitySelector({
       onChange={selectCity}
       allLabel="Фильтр по городу"
       variant={compact ? 'compact' : 'header'}
-      className={compact ? 'w-full' : 'shrink-0 sm:min-w-0 sm:max-w-[14rem]'}
+      className={compact ? 'w-full' : 'shrink-0 md:min-w-0 md:max-w-[14rem]'}
     />
   );
 }

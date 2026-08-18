@@ -26,7 +26,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| UX.HEADER-CITY-PIN-FIRST | Mobile header: оставить MapPin; имя города с truncate; icon-only только overflow + aria-label. Первый визит: CityConfirmModal. GPS только если permission already granted. Сетка EventCard без города | Высокий | 🔄 code |
+| UX.HEADER-CITY-PIN-FIRST | Mobile header: город только пиктограмма MapPin (не чип с именем); aria-label с городом; tap → CityPicker. Desktop: именованный чип. Первый визит: CityConfirmModal | Высокий | 🔄 code |
 
 ## 2026-08-17 - Ханты-Мансийск в сетке /cities
 

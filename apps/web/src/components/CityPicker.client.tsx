@@ -5,10 +5,7 @@ import { createPortal } from 'react-dom';
 import { Check, ChevronDown, MapPin } from 'lucide-react';
 
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
-import {
-  HEADER_CITY_ICON_ONLY_MAX_PX,
-  OPEN_HEADER_CITY_PICKER_EVENT,
-} from '@/lib/first-visit-city';
+import { OPEN_HEADER_CITY_PICKER_EVENT } from '@/lib/first-visit-city';
 import { matchDestination } from '@/lib/selected-city';
 
 type CityPickerVariant = 'hero' | 'header' | 'compact';
@@ -37,7 +34,6 @@ export function CityPicker({
 }: CityPickerProps) {
   const [open, setOpen] = React.useState(defaultOpen);
   const [menuStyle, setMenuStyle] = React.useState<React.CSSProperties>({ visibility: 'hidden' });
-  const [headerIconOnly, setHeaderIconOnly] = React.useState(false);
   const buttonRef = React.useRef<HTMLButtonElement>(null);
   const menuRef = React.useRef<HTMLDivElement>(null);
   const rootRef = React.useRef<HTMLDivElement>(null);
@@ -125,19 +121,6 @@ export function CityPicker({
     return () => window.removeEventListener(OPEN_HEADER_CITY_PICKER_EVENT, openPicker);
   }, [variant]);
 
-  React.useEffect(() => {
-    if (variant !== 'header') return;
-    const root = rootRef.current;
-    if (!root || typeof ResizeObserver === 'undefined') return;
-    const sync = () => {
-      setHeaderIconOnly(root.getBoundingClientRect().width < HEADER_CITY_ICON_ONLY_MAX_PX);
-    };
-    sync();
-    const observer = new ResizeObserver(sync);
-    observer.observe(root);
-    return () => observer.disconnect();
-  }, [variant]);
-
   const selectCity = (name: string) => {
     setOptimisticValue(name);
     setOpen(false);
@@ -149,10 +132,8 @@ export function CityPicker({
       ? 'relative flex h-11 w-full items-center gap-2 rounded-xl bg-slate-50 px-3 pr-9 text-left text-sm font-medium text-slate-800 outline-none transition hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-primary/25'
       : variant === 'compact'
         ? 'relative flex w-full items-center gap-2 rounded-lg py-3 pl-10 pr-10 text-left text-base font-medium text-slate-700 hover:bg-slate-100'
-        : // Header pill: always pin; name truncates; icon-only only when the flex slot is too tight.
-          `inline-flex h-10 w-full min-w-10 items-center gap-1.5 rounded-full border border-slate-200/90 bg-slate-50/90 text-sm font-medium text-slate-700 outline-none transition hover:border-slate-300 hover:bg-white hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-primary/25 ${
-            headerIconOnly ? 'justify-center px-0' : 'px-3'
-          }`;
+        : // Header: mobile = MapPin icon (same chrome as search/heart); lg+ named chip.
+          'inline-flex h-10 w-10 items-center justify-center rounded-lg text-graphite-muted outline-none transition hover:bg-surface-muted hover:text-graphite focus-visible:ring-2 focus-visible:ring-primary/25 lg:w-full lg:min-w-10 lg:justify-start lg:gap-1.5 lg:rounded-full lg:border lg:border-slate-200/90 lg:bg-slate-50/90 lg:px-3 lg:text-sm lg:font-medium lg:text-slate-700 lg:hover:border-slate-300 lg:hover:bg-white lg:hover:text-slate-900';
 
   const menu = open
     ? createPortal(
@@ -225,9 +206,9 @@ export function CityPicker({
         ref={buttonRef}
         type="button"
         aria-label={`Выбрать город: ${selectedLabel}`}
+        title={variant === 'header' ? selectedLabel : undefined}
         aria-expanded={open}
         aria-haspopup="listbox"
-        data-header-city-icon-only={variant === 'header' && headerIconOnly ? '1' : undefined}
         onClick={() => {
           setOpen((current) => {
             if (current) return false;
@@ -241,10 +222,14 @@ export function CityPicker({
           <MapPin className={`h-4 w-4 shrink-0 ${open ? 'text-primary-600' : 'text-slate-500'}`} aria-hidden />
         ) : null}
         {variant === 'header' ? (
-          <MapPin className={`h-4 w-4 shrink-0 ${open ? 'text-primary-600' : 'text-slate-500'}`} aria-hidden />
+          <MapPin
+            className={`h-5 w-5 shrink-0 lg:h-4 lg:w-4 ${open ? 'text-primary-600' : ''}`}
+            strokeWidth={1.75}
+            aria-hidden
+          />
         ) : null}
         {variant === 'header' ? (
-          <span className={headerIconOnly ? 'sr-only' : 'min-w-0 truncate'}>{selectedLabel}</span>
+          <span className="hidden min-w-0 truncate lg:inline">{selectedLabel}</span>
         ) : (
           <span className="min-w-0 flex-1 truncate whitespace-nowrap text-left">{selectedLabel}</span>
         )}
@@ -254,8 +239,11 @@ export function CityPicker({
               open ? 'rotate-180' : ''
             } ${variant === 'compact' ? 'right-4' : ''}`}
           />
-        ) : headerIconOnly ? null : (
-          <ChevronDown className={`h-3.5 w-3.5 shrink-0 opacity-60 transition ${open ? 'rotate-180' : ''}`} />
+        ) : (
+          <ChevronDown
+            className={`hidden h-3.5 w-3.5 shrink-0 opacity-60 transition lg:inline ${open ? 'rotate-180' : ''}`}
+            aria-hidden
+          />
         )}
       </button>
       {menu}

@@ -18,9 +18,6 @@ export const OPEN_HEADER_CITY_PICKER_EVENT = 'daibilet:open-header-city-picker';
 /** City + inner suburbs. Beyond this we ask without a guess. */
 export const MAX_CITY_SUGGEST_METERS = 80_000;
 
-/** Pin-only header chip when the flex slot cannot fit ~2 letters of the name. */
-export const HEADER_CITY_ICON_ONLY_MAX_PX = 92;
-
 export { hasCompletedCityPrompt, markCityPromptCompleted } from './selected-city.ts';
 
 /**
