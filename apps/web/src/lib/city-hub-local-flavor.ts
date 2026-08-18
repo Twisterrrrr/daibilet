@@ -1731,7 +1731,7 @@ const ROSTOV_NA_DONU_WEATHER: CityWeatherFlavor = {
     'rostov-na-donu-muzey-izobrazitelnyh-iskusstv',
     'rostov-na-donu-teatr-dramy-im-gorkogo',
     'rostov-na-donu-onegin-dacha',
-    'rostov-na-donu-tsentralnyy-rynok-staryy-bazar',
+    'rostov-na-donu-tsentral-nyy-rynok-staryy-bazar',
   ],
   outdoorCta: 'Отличная погода для Дона, Пушкинской и смотровой на Седова',
   indoorCtaOvercast: 'Сегодня пасмурно. Загляните в краеведческий, музей на Пушкинской или на рынок',
@@ -1815,7 +1815,7 @@ const ROSTOV_NA_DONU_SLIDES: CityIdentitySlide[] = [
     imageSrc: '/images/venues/rostov-na-donu/tsentral-nyy-rynok-staryy-bazar.jpg',
     imageAlt: 'Центральный рынок Ростова-на-Дону',
     slugs: [
-      'rostov-na-donu-tsentralnyy-rynok-staryy-bazar',
+      'rostov-na-donu-tsentral-nyy-rynok-staryy-bazar',
       'rostov-na-donu-raki-i-gady',
       'rostov-na-donu-onegin-dacha',
     ],

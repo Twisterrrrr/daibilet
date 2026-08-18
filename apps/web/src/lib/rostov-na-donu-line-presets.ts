@@ -76,7 +76,7 @@ export const ROSTOV_GREEN_LINE_STOPS: any[] = [
 
 export const ROSTOV_RED_LINE_STOPS: any[] = [
   stop('Центральный рынок', 'Южный гастро-театр с раками, рыбой и овощами на Старом базаре.', 47.217912, 39.710912, {
-    locationSlug: 'rostov-na-donu-tsentralnyy-rynok-staryy-bazar',
+    locationSlug: 'rostov-na-donu-tsentral-nyy-rynok-staryy-bazar',
     address: 'Буденновский проспект, 12',
     mustSeeFilter: 'gastro',
     visitMinutes: 60,

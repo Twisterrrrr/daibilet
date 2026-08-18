@@ -9,12 +9,14 @@ import { cityToNominative } from '@/lib/city-declension';
 import {
   buildPlacesListingSeo,
   firstPlacesQueryValue,
+  normalizePlacesFamily,
 } from '@/lib/places-seo';
 import { isAllCitiesQuery, matchDestination } from '@/lib/selected-city';
 import { INDEX_FOLLOW_ROBOTS, buildShareMetadata, canonicalHref, pageTitle } from '@/lib/seo-meta';
 import { withSoftTimeout } from '@/lib/soft-timeout';
 import {
   mapVenueCatalogFeedPage,
+  venueCatalogCacheKey,
   venueCatalogDefaultQueryKey,
   VENUE_CATALOG_PAGE_SIZE,
 } from '@/lib/venue-catalog-feed';
@@ -96,8 +98,13 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
 
 /**
  * Unified Places catalog. Entity URLs stay `/venues/[slug]` and `/locations/[slug]`.
+ * SSR must follow `?family=` so `/locations` → `/places?family=location` is not a venues first paint.
  */
-export default async function PlacesIndexPage() {
+export default async function PlacesIndexPage({ searchParams }: PageProps) {
+  const params = await searchParams;
+  const family = normalizePlacesFamily(firstPlacesQueryValue(params.family)) || 'all';
+  const cityRaw = firstPlacesQueryValue(params.city);
+  const city = cityRaw && !isAllCitiesQuery(cityRaw) ? cityRaw : '';
   let initialPage = EMPTY_FEED;
   try {
     const emptyPayload = {
@@ -109,8 +116,13 @@ export default async function PlacesIndexPage() {
       hasMore: false,
       limit: VENUE_CATALOG_PAGE_SIZE,
     };
+    const catalogOpts = {
+      limit: VENUE_CATALOG_PAGE_SIZE,
+      counts: false as const,
+      ...(city ? { city } : {}),
+    };
     const payload = await withSoftTimeout(
-      getCachedVenuesCatalog('all', { limit: VENUE_CATALOG_PAGE_SIZE, counts: false }),
+      getCachedVenuesCatalog(family, catalogOpts),
       VENUE_LIST_TIMEOUT_MS,
       emptyPayload,
       'places-list',
@@ -118,7 +130,7 @@ export default async function PlacesIndexPage() {
     initialPage = mapVenueCatalogFeedPage(payload);
     if (!initialPage.venues.length) {
       const retry = await withSoftTimeout(
-        getCachedVenuesCatalog('all', { limit: VENUE_CATALOG_PAGE_SIZE, counts: false }),
+        getCachedVenuesCatalog(family, catalogOpts),
         VENUE_LIST_RETRY_TIMEOUT_MS,
         emptyPayload,
         'places-list-retry',
@@ -131,11 +143,19 @@ export default async function PlacesIndexPage() {
     initialPage = EMPTY_FEED;
   }
 
-  const initialQueryKey = venueCatalogDefaultQueryKey('all');
+  const initialQueryKey = city
+    ? venueCatalogCacheKey({
+        family,
+        city,
+        sort: 'events',
+        page: 1,
+        limit: VENUE_CATALOG_PAGE_SIZE,
+      })
+    : venueCatalogDefaultQueryKey(family);
 
   return (
     <SiteLayout>
-      <Suspense fallback={<VenueCatalogPageSkeleton family="institution" />}>
+      <Suspense fallback={<VenueCatalogPageSkeleton family={family === 'location' ? 'location' : 'institution'} />}>
         <PlacesHubView initialPage={initialPage} initialQueryKey={initialQueryKey} />
       </Suspense>
     </SiteLayout>

@@ -1,4 +1,18 @@
-## 2026-08-18 - Rostov/Penza/Tver hubs + Главные + geo cards
+## 2026-08-19 - Hub location pages from mustSee min profile
+
+### Наблюдения
+- Хабы Ростов/Пенза/Тверь линковали `locationSlug` на PDP, которых не было в каталоге (Тачанка, Дума, Пушкинская и т.д.). Каталог `/locations` при этом живой.
+- Owner: если есть минимальный профиль, лучше завести страницу, чем вести в 404.
+
+### Решения
+- `scripts/lib/hub-must-see-seed.js`: парсит `place()` хабов; публикуем точку при имени + coords + адрес + текст. Не сажаем безымянное гастро и nested suburb POI.
+- `seed-cityinfo-must-see-venues.js --apply --cities=rostov-na-donu,penza,tver` на локальном Docker: **176** Venue (138 location / 38 institution).
+- SSR `/places?family=location` грузит family=location, не `all`.
+- Пенза: убрана агентская пометка про «53-й широты». Ростовский рынок: slug на живой `tsentral-nyy`.
+
+### Проблемы
+- Live MSK DB этим apply не трогали. На daibilet.ru страницы откроются после того же `--apply` на prod DB + рестарт API (hub-gate).
+
 
 ### Наблюдения
 - Пакет хабов Ростова, Пензы и Твери уже лежал в рабочем дереве без public-sync и без live.

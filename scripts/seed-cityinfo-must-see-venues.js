@@ -19,6 +19,7 @@ const fs = require('fs');
 const { createRequire } = require('module');
 const crypto = require('crypto');
 const { inferMustSeeKindAndFamily } = require('./lib/venue-kind-heuristics');
+const { collectHubMustSeeRows, toSeedPlan, HUB_PLACE_SLUG_ALIASES } = require('./lib/hub-must-see-seed');
 
 const rootDir = path.resolve(__dirname, '..');
 loadRootEnv(rootDir);
@@ -218,7 +219,8 @@ async function main() {
   if (!cityInfoPath) throw new Error('cityInfo.ts not found');
 
   const source = fs.readFileSync(cityInfoPath, 'utf8');
-  const mustSee = [...parseMustSee(source), ...parseHubModuleMustSee()];
+  const hubItems = collectHubPlaceHelperItems();
+  const mustSee = [...parseMustSee(source), ...parseHubModuleMustSee(), ...hubItems];
   const filtered = citiesFilter.size
     ? mustSee.filter((row) => citiesFilter.has(row.cityKey))
     : mustSee;
@@ -238,12 +240,16 @@ async function main() {
   const slugUsed = new Set();
 
   for (const item of filtered) {
-    const existingSlug = item.venueSlug || item.locationSlug || null;
-    const inferred = inferKindAndFamily(item.name);
+    const rawSlug = item.venueSlug || item.locationSlug || null;
+    const existingSlug = rawSlug ? HUB_PLACE_SLUG_ALIASES[rawSlug] || rawSlug : null;
+    const inferred = item.kind && item.family
+      ? { kind: item.kind, family: item.family }
+      : inferKindAndFamily(item.name);
     const slug =
       existingSlug ||
       uniqueSlug(slugify(`${item.cityKey}-${item.name}`), slugUsed) ||
       uniqueSlug(slugify(item.name), slugUsed);
+    if (slugUsed.has(slug)) continue;
     slugUsed.add(slug);
 
     const pageStatus = 'PUBLISHED';
@@ -261,10 +267,13 @@ async function main() {
       canonicalPath,
       hadSlug: Boolean(existingSlug),
       slugField: inferred.family === 'institution' ? 'venueSlug' : 'locationSlug',
+      address: item.address || null,
+      latitude: Number.isFinite(Number(item.latitude)) ? Number(item.latitude) : null,
+      longitude: Number.isFinite(Number(item.longitude)) ? Number(item.longitude) : null,
     };
 
     if (pool && !dryRun) {
-      const city = await resolveCity(pool, cityCache, item.cityKey);
+      const city = await ensureCity(pool, cityCache, item.cityKey);
       if (!city) {
         entry.action = 'skip-no-city';
       } else {
@@ -455,16 +464,21 @@ async function upsertVenue(pool, venue) {
     return 'skipped-exists';
   }
 
+  const lat = Number.isFinite(Number(venue.latitude)) ? Number(venue.latitude) : null;
+  const lng = Number.isFinite(Number(venue.longitude)) ? Number(venue.longitude) : null;
+  const address = String(venue.address || '').trim() || null;
+
   if (venue.hasHookFact) {
     await pool.query(
       `
         insert into "Venue" (
           id, slug, title, kind, "pageStatus", "cityId",
           "shortDescription", "seoH1", "seoTitle", "seoDescription",
-          "canonicalPath", "isIndexable", "createdAt", "updatedAt"
+          "canonicalPath", "isIndexable", address, latitude, longitude,
+          "createdAt", "updatedAt"
         ) values (
           $1, $2, $3, $4::"VenueKind", $5::"VenuePageStatus", $6,
-          $7, $3, $8, $7, $9, $10, now(), now()
+          $7, $3, $8, $7, $9, $10, $11, $12, $13, now(), now()
         )
       `,
       [
@@ -478,6 +492,9 @@ async function upsertVenue(pool, venue) {
         seoTitle,
         venue.canonicalPath,
         venue.pageStatus === 'PUBLISHED',
+        address,
+        lat,
+        lng,
       ],
     );
   } else {
@@ -486,10 +503,11 @@ async function upsertVenue(pool, venue) {
         insert into "Venue" (
           id, slug, title, kind, "pageStatus", "cityId",
           "shortDescription", "seoH1", "seoTitle", "seoDescription",
-          "canonicalPath", "isIndexable", "createdAt", "updatedAt"
+          "canonicalPath", "isIndexable", address, latitude, longitude,
+          "createdAt", "updatedAt"
         ) values (
           $1, $2, $3, $4::"VenueKind", $5::"VenuePageStatus", $6,
-          $7, $3, $8, $7, $9, $10, now(), now()
+          $7, $3, $8, $7, $9, $10, $11, $12, $13, now(), now()
         )
       `,
       [
@@ -503,6 +521,9 @@ async function upsertVenue(pool, venue) {
         seoTitle,
         venue.canonicalPath,
         venue.pageStatus === 'PUBLISHED',
+        address,
+        lat,
+        lng,
       ],
     );
   }
@@ -547,6 +568,52 @@ async function resolveCity(pool, cache, cityKey) {
   });
   cache.set(cityKey, fuzzy || null);
   return fuzzy || null;
+}
+
+async function ensureCity(pool, cache, cityKey) {
+  const existing = await resolveCity(pool, cache, cityKey);
+  if (existing) return existing;
+  const title = (CITY_TITLE_ALIASES[cityKey] || [])[0];
+  if (!title) return null;
+  const slug = String(cityKey || '').trim();
+  if (!slug) return null;
+  const inserted = await pool.query(
+    `
+      insert into "City" (id, slug, title, "isDestination", "canonicalPath")
+      values ($1, $2, $3, true, $4)
+      on conflict (slug) do update set title = excluded.title
+      returning id, slug, title
+    `,
+    [`city_${slug}`.slice(0, 64), slug, title, `/cities/${slug}`],
+  );
+  const row = inserted.rows[0] || null;
+  cache.delete('__city_index__');
+  cache.set(cityKey, row);
+  return row;
+}
+
+function collectHubPlaceHelperItems() {
+  const seen = new Set();
+  const items = [];
+  for (const row of collectHubMustSeeRows((file, enc) => fs.readFileSync(file, enc), rootDir)) {
+    const plan = toSeedPlan(row);
+    if (plan.skipReason || !plan.slug) continue;
+    if (seen.has(plan.slug)) continue;
+    seen.add(plan.slug);
+    items.push({
+      cityKey: plan.cityKey,
+      name: plan.name,
+      desc: plan.desc,
+      venueSlug: plan.slugField === 'venueSlug' ? plan.slug : null,
+      locationSlug: plan.slugField === 'locationSlug' ? plan.slug : null,
+      latitude: plan.latitude,
+      longitude: plan.longitude,
+      address: plan.address,
+      kind: plan.kind,
+      family: plan.family,
+    });
+  }
+  return items;
 }
 
 async function loadCityIndex(pool, cache) {

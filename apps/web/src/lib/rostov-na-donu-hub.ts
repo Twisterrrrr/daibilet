@@ -332,7 +332,7 @@ export const ROSTOV_NA_DONU_MUST_SEE: any[] = [
   }),
   place('Центральный рынок (Старый базар)', 'Южный гастро-хаб с рыбой, овощами, раками и характером старого торгового города.', 47.217912, 39.710912, {
     address: 'Буденновский проспект, 12',
-    locationSlug: 'rostov-na-donu-tsentralnyy-rynok-staryy-bazar',
+    locationSlug: 'rostov-na-donu-tsentral-nyy-rynok-staryy-bazar',
     mustSeeFilter: 'gastro',
     visitMinutes: 60,
     alsoMain: true,
@@ -569,7 +569,7 @@ export const ROSTOV_NA_DONU_DAY_ROUTE_PRESETS: any[] = [
       }),
       place('Центральный рынок', 'Час на рыбу, раков и южный шум Старого базара.', 47.217912, 39.710912, {
         address: 'Буденновский проспект, 12',
-        locationSlug: 'rostov-na-donu-tsentralnyy-rynok-staryy-bazar',
+        locationSlug: 'rostov-na-donu-tsentral-nyy-rynok-staryy-bazar',
         mustSeeFilter: 'gastro',
         visitMinutes: 60,
         alsoMain: true,

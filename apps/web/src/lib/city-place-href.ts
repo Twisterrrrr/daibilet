@@ -156,11 +156,20 @@ export function resolveCityPlaceTitleHref(
   const explicit = resolveCityPlaceHref(place);
   if (explicit) {
     const slug = String(place.venueSlug || place.locationSlug || '').trim();
-    if (!allowNameMatch && slug && venues.length) {
+    if (slug && venues.length) {
       const found = venues.find(
         (venue) => isLinkableVenueStatus(venue.pageStatus) && String(venue.slug || '').trim() === slug,
       );
-      if (!found) return null;
+      if (found) {
+        return venueHref({
+          id: found.id || found.slug || found.name,
+          slug: found.slug,
+          name: found.name,
+          type: found.type,
+        });
+      }
+      // Significant-suburb POIs must not 404 a parent-hub slug that was never imported.
+      if (!allowNameMatch) return null;
     }
     return explicit;
   }

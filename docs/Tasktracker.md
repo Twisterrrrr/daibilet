@@ -1,3 +1,10 @@
+## 2026-08-19 - Hub location pages from mustSee
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| CAT.HUB-LOCATION-PAGES | Завести `/locations` (и institution `/venues`) из mustSee Ростов/Пенза/Тверь при min profile | Высокий | ✅ seed 176 в local Docker; live MSK apply pending |
+| UX.PLACES-FAMILY-SSR | SSR `/places?family=location` отдаёт локации, не mixed `all` | Средний | ✅ code |
+
 ## 2026-08-18 - Rostov/Penza/Tver hubs + Главные + geo cards
 
 | ID | Задача | Приоритет | Статус |

@@ -98,6 +98,38 @@ describe('resolveCityPlaceTitleHref', () => {
     assert.equal(href, null);
   });
 
+  it('keeps explicit locationSlug when the city payload omits outdoor pages', () => {
+    const href = resolveCityPlaceTitleHref(
+      { name: 'Парк Горького', locationSlug: 'moscow-park-gorkogo' },
+      [
+        {
+          id: 'v-pier',
+          slug: 'vorobevy-gory-sektor-a-3',
+          name: 'Воробьевы горы, сектор A',
+          type: 'pier',
+          pageStatus: 'published',
+        },
+      ],
+    );
+    assert.equal(href, '/locations/moscow-park-gorkogo');
+  });
+
+  it('uses hub venue family when locationSlug is on the payload', () => {
+    const href = resolveCityPlaceTitleHref(
+      { name: 'Набережная Дона', locationSlug: 'rostov-na-donu-naberezhnaya-reki-don-beregovaya-ulitsa' },
+      [
+        {
+          id: 'v-emb',
+          slug: 'rostov-na-donu-naberezhnaya-reki-don-beregovaya-ulitsa',
+          name: 'Набережная реки Дон',
+          type: 'outdoor_location',
+          pageStatus: 'published',
+        },
+      ],
+    );
+    assert.equal(href, '/locations/rostov-na-donu-naberezhnaya-reki-don-beregovaya-ulitsa');
+  });
+
   it('still links suburb POI when the slug is on the hub', () => {
     const href = resolveCityPlaceTitleHref(
       { name: 'Нижний парк Петергофа', locationSlug: 'saint-petersburg-nizhniy-park-petergofa' },

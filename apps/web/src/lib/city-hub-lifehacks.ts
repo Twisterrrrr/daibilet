@@ -1247,7 +1247,7 @@ const ROSTOV_ITEMS: CityLifehackItem[] = [
     cta: {
       kind: 'places',
       label: 'Рынок и гастро',
-      slugs: ['rostov-na-donu-tsentralnyy-rynok-staryy-bazar', 'rostov-na-donu-raki-i-gady'],
+      slugs: ['rostov-na-donu-tsentral-nyy-rynok-staryy-bazar', 'rostov-na-donu-raki-i-gady'],
       scrollTo: 'places',
     },
   },
