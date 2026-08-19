@@ -2358,6 +2358,35 @@ Owner-locked порядок: Hero → Советы → Расписание → 
 
 ---
 
+## Destination registry roadmap (2026-08-19)
+
+Единый реестр `city-destination-registry.ts`: suburb-карточка на хабе + region child `?city=slug` + cross-link «Афиша и события {род. падеж}». Audit: `node --import ./apps/backend/node_modules/tsx/dist/loader.mjs scripts/audit-destination-coverage.mjs`.
+
+| Приоритет | Задача | Статус |
+|-----------|--------|--------|
+| **P0** | Deploy smoke live: KGD/NN/LO cross-links, genitive labels | ✅ deploy `#32291705661`; HTTP 200 `/cities/kaliningrad`, `?city=vyborg`, `?city=baltiysk` |
+| **P1a** | SPB palace belt → registry + `saint-petersburg-suburbs.ts` (11/11) | ✅ |
+| **P1b** | Moscow suburb pack (8 cards) → registry + `moscow-suburbs.ts` | ✅ |
+| **P1c** | Perm → `perm-hub.ts`; hub-модули для остальных уже были | ✅ |
+| **P2** | Auto-hydrate registry from `CITY_INFO`; audit 86/86 | ✅ локально |
+| **P3** | Bulk nature day-trips via `destination-registry-auto.ts` | ✅ 57 auto entries |
+
+**Метрики:** migrated **86/86** (29 manual + 57 auto-hydrate). `apps/public/cityInfo` sync - отложено (web = source of truth).
+
+---
+
+## Общий product roadmap (сводка 2026-08-19)
+
+| Контур | Ближайшее | Средний горизонт |
+|--------|-----------|------------------|
+| **Geo / хабы** | Destination registry P1 (Moscow), hub location seed live | Region child guides для всех satellite-city; deprecate duplicate `apps/public/cityInfo` |
+| **Catalog / SEO** | Standalone cards events>5 (Тольятти/Сургут); restart API для destinations | Allowlist + cityToRegion consistency; `/cities` map all destinations |
+| **Контент** | Blog inline UI deploy; city hub lifehacks | Региональные статьи под новые destination pages |
+| **Finance / LC** | Stage 0 sandbox pay → CONFIRMED (`.159`) | Supplier LK M1, operator reconcile (qa.md § Roadmap) |
+| **Perf / ops** | MSK web batch deploy; не гонять build на каждый UI-фикс | TC sync timer; image remotePatterns follow-ups |
+
+---
+
 ## CI (2026-07-19)
 
 | # | Задача | Приоритет | Статус |

@@ -8,7 +8,13 @@
  */
 
 import { CITY_INFO } from '../apps/web/src/lib/cityInfo.ts';
-import { listDestinationCoverageRows } from '../apps/web/src/lib/city-destination-registry.ts';
+import {
+  DESTINATION_REGISTRY,
+  hydrateDestinationRegistryFromCityInfo,
+  listDestinationCoverageRows,
+} from '../apps/web/src/lib/city-destination-registry.ts';
+
+hydrateDestinationRegistryFromCityInfo(CITY_INFO);
 
 const asJson = process.argv.includes('--json');
 const rows = listDestinationCoverageRows(CITY_INFO);

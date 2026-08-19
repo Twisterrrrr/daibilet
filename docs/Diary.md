@@ -1,3 +1,44 @@
+## 2026-08-19 - Destination registry: SPB palace belt (P1a)
+
+### Наблюдения
+- После KGD/NN миграции (11 destinations) SPB оставался с 9 inline suburb blocks ~200 строк в `cityInfo.ts` - главный ROI для slim monolith.
+- Deploy MSK `#32291705661` успешен; live smoke KGD/LO cross-links - HTTP 200.
+
+### Решения
+- `saint-petersburg-suburbs.ts`: 10 named `*_SUBURB_CARD` + `buildSaintPetersburgSuburbs(vyborgCard)` без circular import с registry.
+- Registry: +10 entries `spb-*` (`kind: suburb`, `showStandalonePage: false`); SPB hub **11/11 migrated**.
+- `cityInfo.ts`: `-195` строк inline suburbs → one-liner builder.
+- Audit: **21/86** migrated, **65** pending.
+
+### Проблемы
+- Следующий шаг P1b: Moscow ~7 suburbs по тому же паттерну.
+
+## 2026-08-19 - Destination registry: Moscow suburbs (P1b)
+
+### Наблюдения
+- Moscow hub: 8 inline suburb cards (~400 строк) - второй по ROI после SPB для slim `cityInfo.ts`.
+
+### Решения
+- `moscow-suburbs.ts`: 8 named `*_SUBURB_CARD` + `MOSCOW_SUBURBS` array.
+- Registry: +8 entries `moscow-*` (`kind: suburb`, без standalone).
+- Audit: **29/86** migrated, **57** pending.
+
+### Проблемы
+- P1c: hub-модули для оставшихся городов; P2: `apps/public` sync.
+
+## 2026-08-19 - Destination registry: P1c-P3 auto-hydrate (86/86)
+
+### Наблюдения
+- 57 suburbs уже жили в hub-модулях, но не были в `DESTINATION_REGISTRY` - audit показывал pending.
+
+### Решения
+- `destination-registry-auto.ts`: idempotent `hydrateDestinationRegistryFromCityInfo()` с editorial из suburb cards.
+- `perm-hub.ts`: 4 inline cards вынесены (P1c хвост).
+- Audit: **86/86 migrated**, pending 0.
+
+### Проблемы
+- `apps/public/cityInfo` дубль без registry - web канон.
+
 ## 2026-08-19 - Blog PUBLISHED + future publishedAt = HTML 404
 
 ### Наблюдения
