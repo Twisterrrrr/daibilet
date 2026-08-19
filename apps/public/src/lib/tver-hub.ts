@@ -127,6 +127,7 @@ export const TVER_SUBURBS: any[] = [
       place('Деревянная Старо-Вознесенская церковь', 'Шедевр поволжского зодчества XVII века без единого гвоздя на обрыве.', 57.042112, 34.957112, { address: 'правый берег Тверцы', locationSlug: 'tver-torzhok-staro-voznesenskaya-tserkov', mustSeeFilter: 'temple', visitMinutes: 25 }),
       place('Пешеходный мост через Тверцу', 'Арочный виадук между купеческим правым берегом и монастырским левым.', 57.040512, 34.959512, { address: 'река Тверца', locationSlug: 'tver-torzhok-peshehodnyy-most', mustSeeFilter: 'views', visitMinutes: 15 }),
       place('Усадьба Знаменское-Раёк', 'Дворцовый палаццо Львова с круговой колоннадой в 15 км от Торжка.', 57.083112, 34.863112, { address: 'Тверская обл., усадьба Знаменское-Раёк', locationSlug: 'tver-torzhok-znamenskoe-rayok', mustSeeFilter: 'mansions', visitMinutes: 50 }),
+      place('Этнографический музей «Василёво»', 'Деревянный музей под открытым небом с Чёртовым мостом и храмами на берегах Тверцы.', 57.096112, 34.968912, { address: 'Тверская обл., Торжокский район, деревня Василёво', locationSlug: 'tver-torzhok-vasilevo', mustSeeFilter: 'museum', visitMinutes: 60 }),
     ],
   },
   {
