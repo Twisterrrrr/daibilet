@@ -12,6 +12,7 @@ import {
   resolveCanonGastroStop,
 } from '@/components/DayTripCanonCard.client';
 import { resolveCityPlaceTitleHref } from '@/lib/city-place-href';
+import { resolveDestinationRegionLinkForSuburb } from '@/lib/city-destination-registry';
 import { resolveVenueHeroImage } from '@/lib/city-place-images';
 import { suburbMatchesSlugs } from '@/lib/city-hub-local-flavor';
 import type { CityMustSeeItem, CitySuburbItem, CitySuburbPlace } from '@/lib/cityInfo';
@@ -262,6 +263,7 @@ export function SuburbsCarousel({
     const titleLines = suburbTitleLines(place, compact);
     const logisticsExit =
       String(place.logisticsExit || place.stationName || '').trim() || undefined;
+    const regionLink = resolveDestinationRegionLinkForSuburb(city.slug || city.sourceSlug, place.name);
 
     return (
       <DayTripCanonCard
@@ -275,6 +277,16 @@ export function SuburbsCarousel({
         lead={titleLines.lead}
         title={titleNode}
         subtitle={titleLines.subtitle}
+        titleExtra={
+          regionLink ? (
+            <Link
+              href={regionLink.href}
+              className="inline-flex items-center gap-1 text-sm font-medium text-emerald-900 underline-offset-4 hover:underline"
+            >
+              {regionLink.label}
+            </Link>
+          ) : null
+        }
         logisticsExit={logisticsExit}
         logisticsExitLabel={suburbExitLabel(place, Boolean(logisticsExit))}
         logisticsText={String(place.travelVectorBlurb || '').trim() || undefined}

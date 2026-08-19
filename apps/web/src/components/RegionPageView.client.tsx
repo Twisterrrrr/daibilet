@@ -16,6 +16,8 @@ import {
   canonicalizeRegionChildCitySearch,
   filterSessionsForRegionChildCity,
 } from '@/lib/region-child-city-scope';
+import { resolveDestinationPageGuideForRegionChild } from '@/lib/city-destination-registry';
+import { DestinationRegionGuide } from '@/components/DestinationRegionGuide.client';
 import { cityHref } from '@/lib/routes';
 import {
   buildCitySessionCoverIndex,
@@ -134,6 +136,17 @@ export function RegionPageView({
           })
         : null,
     [searchParams, city, slug, centerCity?.slug, childCities],
+  );
+  const destinationGuide = React.useMemo(
+    () =>
+      childChrome
+        ? resolveDestinationPageGuideForRegionChild({
+            childSlug: childChrome.child.slug,
+            childName: childChrome.child.name,
+            regionSlug: slug,
+          })
+        : null,
+    [childChrome, slug],
   );
   const cityFilter = childChrome ? [childChrome.child.name] : null;
   const heading = childChrome?.h1 || city?.name || '';
@@ -336,12 +349,13 @@ export function RegionPageView({
       ].filter((tab) => tab.show);
     }
     return [
+      { id: 'guide', label: 'Гид', show: Boolean(destinationGuide) },
       { id: 'cities', label: 'Города', show: childCities.some((c) => c.eventCount > 0) || childCities.length > 0 },
       { id: 'places', label: 'Куда съездить', show: topPlaces.length > 0 },
       { id: 'affiche', label: 'Афиша', show: true },
       { id: 'faq', label: 'FAQ', show: faqItems.length > 0 },
     ].filter((tab) => tab.show);
-  }, [childCities, topPlaces.length, faqItems.length, isTierC, centerCity, centerCityGenitive, eventTotal]);
+  }, [childCities, topPlaces.length, faqItems.length, isTierC, centerCity, centerCityGenitive, eventTotal, destinationGuide]);
 
   if (error && !city) {
     return (
@@ -474,6 +488,18 @@ export function RegionPageView({
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </span>
               </Link>
+            </div>
+          </section>
+        ) : null}
+
+        {destinationGuide ? (
+          <section id="guide" className={`border-b border-slate-200 bg-white ${SECTION_SCROLL_MT}`}>
+            <div className="container-page py-8 sm:py-10">
+              <h2 className="text-2xl font-bold text-slate-950">{destinationGuide.name}: что посмотреть</h2>
+              <p className="mt-2 max-w-2xl text-sm text-slate-600">{destinationGuide.brief}</p>
+              <div className="mt-6">
+                <DestinationRegionGuide guide={destinationGuide} />
+              </div>
             </div>
           </section>
         ) : null}

@@ -31,6 +31,13 @@ export function buildRegionHubH1(regionName: string): string {
 const CHILD_CITY_TITLE_GENITIVE: Record<string, string> = {
   Раменское: 'Раменского',
   Выборг: 'Выборга',
+  Зеленоградск: 'Зеленоградска',
+  Светлогорск: 'Светлогорска',
+  Городец: 'Городца',
+  Семёнов: 'Семёнова',
+  Балтийск: 'Балтийска',
+  Янтарный: 'Янтарного',
+  Дивеево: 'Дивеева',
 };
 
 export function childCityTitleGenitive(cityName: string): string {

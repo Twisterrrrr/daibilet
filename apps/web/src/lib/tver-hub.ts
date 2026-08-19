@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { TVER_LINE_DAY_ROUTE_PRESETS } from './tver-line-presets.ts';
+import { TORZHOK_SUBURB_CARD } from './city-destination-registry.ts';
 
 function place(
   name: string,
@@ -105,31 +106,7 @@ export const TVER_MUST_SEE: any[] = [
 ];
 
 export const TVER_SUBURBS: any[] = [
-  {
-    name: 'Торжок',
-    desc: 'Древнейший город Тверской земли: Борисоглебский монастырь, золотое шитье, пожарские котлеты и купеческий масштаб на холмах Тверцы.',
-    locationSlug: 'tver-torzhok',
-    mustSeeFilter: 'main',
-    visitMinutes: '6-8 ч',
-    latitude: 57.039112,
-    longitude: 34.958912,
-    address: 'Тверская обл., г. Торжок, ул. Старицкая, 1',
-    travelVector: '«Ласточка» / авто ~1 ч',
-    travelVectorBlurb: 'Закладывайте на скоростной поезд «Ласточка» или автомобиль около часа, чтобы приехать к 09:30 утра.',
-    timingNote: 'По крутым набережным Тверцы к стенам Борисоглебского монастыря, золотое шитье и котлеты оставьте на финал.',
-    logisticsExit: 'вокзал Торжка / парковка у монастыря',
-    gastroStop: { name: 'Пожарская котлета', blurb: 'Именно здесь Пушкин заказывал котлеты у Дарьи Пожарской. Берите их в историческом центре, а не в придорожном кафе у трассы.' },
-    places: [
-      place('Новоторжский Борисоглебский монастырь', 'Один из старейших монастырей России XI века с собором работы Николая Львова.', 57.039112, 34.958912, { address: 'ул. Старицкая, 1', locationSlug: 'tver-torzhok-borisoglebskiy-monastyr', mustSeeFilter: 'temple', visitMinutes: 50 }),
-      place('Свечная башня монастыря', 'Высокая башня со шпилем и лучшим видом на весь Торжок.', 57.039412, 34.958512, { address: 'территория монастыря', locationSlug: 'tver-torzhok-svechnaya-bashnya', mustSeeFilter: 'views', visitMinutes: 20 }),
-      place('Этнографический музей им. Пожарского', 'Купеческие палаты про гастро-бренд края и историю пожарской котлеты.', 57.040112, 34.960112, { address: 'центр Торжка', locationSlug: 'tver-torzhok-muzey-pozharskogo', mustSeeFilter: 'museum', visitMinutes: 40 }),
-      place('Музей «Торжокские золотошвеи»', 'Подлинное золотное шитье канителью, которым расшивали парадные платья двора.', 57.041112, 34.961112, { address: 'центр Торжка', locationSlug: 'tver-torzhok-zolotoshvei', mustSeeFilter: 'museum', visitMinutes: 40 }),
-      place('Деревянная Старо-Вознесенская церковь', 'Шедевр поволжского зодчества XVII века без единого гвоздя на обрыве.', 57.042112, 34.957112, { address: 'правый берег Тверцы', locationSlug: 'tver-torzhok-staro-voznesenskaya-tserkov', mustSeeFilter: 'temple', visitMinutes: 25 }),
-      place('Пешеходный мост через Тверцу', 'Арочный виадук между купеческим правым берегом и монастырским левым.', 57.040512, 34.959512, { address: 'река Тверца', locationSlug: 'tver-torzhok-peshehodnyy-most', mustSeeFilter: 'views', visitMinutes: 15 }),
-      place('Усадьба Знаменское-Раёк', 'Дворцовый палаццо Львова с круговой колоннадой в 15 км от Торжка.', 57.083112, 34.863112, { address: 'Тверская обл., усадьба Знаменское-Раёк', locationSlug: 'tver-torzhok-znamenskoe-rayok', mustSeeFilter: 'mansions', visitMinutes: 50 }),
-      place('Этнографический музей «Василёво»', 'Деревянный музей под открытым небом с Чёртовым мостом и храмами на берегах Тверцы.', 57.096112, 34.968912, { address: 'Тверская обл., Торжокский район, деревня Василёво', locationSlug: 'tver-torzhok-vasilevo', mustSeeFilter: 'museum', visitMinutes: 60 }),
-    ],
-  },
+  TORZHOK_SUBURB_CARD,
   {
     name: 'Домотканово',
     desc: 'Мемориальная усадьба Дервизов, где Серов писал «Девушку, освещенную солнцем» и «Заросший пруд»: пруды, березы и тихий пленэрный день.',
