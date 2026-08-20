@@ -517,6 +517,7 @@ function ShowcaseEventCard({
   const showCityMeta = !cityHub && Boolean(categoryLabel || cityLabel);
   const priceLabel = hasPrice ? formatShowcasePriceLabel(session.priceFrom) : null;
   const coverDateBadge = formatCoverDateBadge(session);
+  const imageSizes = cityHub ? IMAGE_SIZES.affichePoster : IMAGE_SIZES.eventCard;
 
   return (
     <article className="group event-card">
@@ -541,7 +542,7 @@ function ShowcaseEventCard({
           src={imagePrimarySrc}
           alt={session.title}
           fill
-          sizes={IMAGE_SIZES.eventCard}
+          sizes={imageSizes}
           style={{ objectPosition: imageObjectPosition }}
           className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
           fallback={
@@ -550,7 +551,7 @@ function ShowcaseEventCard({
                 src={imageFallbackSrc}
                 alt={session.title}
                 fill
-                sizes={IMAGE_SIZES.eventCard}
+                sizes={imageSizes}
                 className="object-cover"
                 fallback={emptyImageFallback}
               />

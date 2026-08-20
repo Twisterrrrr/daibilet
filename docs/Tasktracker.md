@@ -1,3 +1,9 @@
+## 2026-08-20 - Hub events image size
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| PERF.HUB-EVENT-TC-OPTIMIZER | TicketsCloud/yandexcloud через `/_next/image` (не full CDN); cityHub `affichePoster` sizes | Высокий | 🔄 code pushed; live после Deploy MSK web |
+
 ## 2026-08-20 - Suburb nested photo rail
 
 | ID | Задача | Приоритет | Статус |

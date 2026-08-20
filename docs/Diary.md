@@ -1,3 +1,15 @@
+## 2026-08-20 - Hub events: TicketsCloud via /_next/image
+
+### Наблюдения
+- «Ближайшие события» тянули полные TC covers (~4MB) с `unoptimized`: bypass `yandexcloud.net` / ticketscloud после INC.504.
+- На MSK сейчас `/_next/image?url=TC&w=384` ≈ 19KB (egress OK).
+
+### Решения
+- Убрали yandexcloud/ticketscloud из `shouldBypassNextImageOptimizer`; cityHub `EventCard` → `IMAGE_SIZES.affichePoster`.
+
+### Проблемы
+- teplohod / googleapis / twcstorage / amazonaws всё ещё bypass. Live web deploy - по запросу.
+
 ## 2026-08-20 - Region affiche = city hub EventCard rail
 
 ### Наблюдения

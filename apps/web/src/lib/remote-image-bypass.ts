@@ -1,16 +1,17 @@
 /**
  * Hosts where Next.js image optimizer must NOT fetch server-side.
  * MSK prod may have broken outbound HTTPS; browser still reaches CDNs directly.
+ *
+ * TicketsCloud / Yandex Object Storage: MSK egress OK (2026-08-20) - allow
+ * `/_next/image?w=` so hub rails do not pull 2-4MB originals. Keep teplohod
+ * on bypass until proven stable.
  */
 const CLIENT_FETCH_HOST_SUFFIXES = [
   'teplohod.info',
-  'yandexcloud.net',
   'twcstorage.ru',
   'googleapis.com',
   'amazonaws.com',
 ] as const;
-
-const CLIENT_FETCH_HOST_INCLUDES = ['ticketscloud'] as const;
 
 /** Local nginx alias on prod - never route via /_next/image. */
 export function isLocalStaticImageUrl(src: string): boolean {
@@ -28,15 +29,10 @@ export function shouldBypassNextImageOptimizer(src: string): boolean {
     if (url.protocol !== 'http:' && url.protocol !== 'https:') return false;
 
     const host = url.hostname.toLowerCase();
-    if (CLIENT_FETCH_HOST_SUFFIXES.some((suffix) => host === suffix || host.endsWith(`.${suffix}`))) {
-      return true;
-    }
-    if (CLIENT_FETCH_HOST_INCLUDES.some((part) => host.includes(part))) {
-      return true;
-    }
+    return CLIENT_FETCH_HOST_SUFFIXES.some(
+      (suffix) => host === suffix || host.endsWith(`.${suffix}`),
+    );
   } catch {
     return false;
   }
-
-  return false;
 }

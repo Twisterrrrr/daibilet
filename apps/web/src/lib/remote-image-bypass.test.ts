@@ -16,12 +16,15 @@ describe('shouldBypassNextImageOptimizer', () => {
     ).toBe(true);
   });
 
-  it('bypasses ticketscloud and yandexcloud CDNs', () => {
+  it('allows ticketscloud / yandexcloud through Next image optimizer', () => {
     expect(
       shouldBypassNextImageOptimizer(
         'https://ticketscloud-prod.storage.yandexcloud.net/production/image/abc.jpg',
       ),
-    ).toBe(true);
+    ).toBe(false);
+  });
+
+  it('still bypasses ticketscloud on googleapis (egress risk)', () => {
     expect(
       shouldBypassNextImageOptimizer(
         'https://ticketscloud-prod.storage.googleapis.com/production/image/abc.jpg',
