@@ -38,7 +38,6 @@ import { resolveEventCardFallbackImage, resolveEventCardPrimaryImage } from '@/l
 import {
   resolveEventCardDestinationLabel,
   resolveEventCardLocationLabel,
-  resolveEventVenueDisplayLabel,
   resolveHubAfficheLocationLine,
 } from '@/lib/event-location';
 import { dayRouteItemFromEvent } from '@/lib/day-route-from-place';
