@@ -151,15 +151,9 @@ export function RegionPageView({
     ? stripCityDisambiguator(childChrome.child.name) || childChrome.child.name
     : null;
   const breadcrumbItems = React.useMemo(() => {
-    // Region child: Главная > {хаб} > {область} > {город}.
-    // Region root: Главная > {хаб} > {область}.
+    // Region child: Главная > {область} > {город}. Region root: Главная > {область}.
+    // Hub (СПб) stays in the bridge CTA, not in the trail.
     const items: Array<{ label: string; href?: string }> = [{ label: 'Главная', href: '/' }];
-    if (centerCity) {
-      items.push({
-        label: centerCity.name,
-        href: cityHref({ slug: centerCity.slug, name: centerCity.name }),
-      });
-    }
     if (city) {
       items.push({
         label: city.name,
@@ -170,7 +164,7 @@ export function RegionPageView({
       items.push({ label: childCityDisplay });
     }
     return items;
-  }, [city, centerCity, childChrome, childCityDisplay, slug]);
+  }, [city, childChrome, childCityDisplay, slug]);
   const regionBrief =
     regionInfo?.brief?.trim() ||
     (city
