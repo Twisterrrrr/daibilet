@@ -1,3 +1,14 @@
+## 2026-08-20 - My Day: keyboard / soft keyboard on stops
+
+### Наблюдения
+- После sticky-collapse: при вводе минут на месте / DnD-стрелках скролл от фокуса сворачивал toolbar → blur → клавиатура пропадала.
+
+### Решения
+- Pause collapse while input/grip focused; autofocus dwell number field.
+
+### Проблемы
+- Нет.
+
 ## 2026-08-20 - My Day sticky toolbar collapse (all viewports)
 
 ### Наблюдения
