@@ -8,6 +8,7 @@ import {
   cityToNominative,
   cityToPrepositional,
   inCityAccusative,
+  inCityPrepositional,
   isSeoExpansionCity,
   poCityDative,
   resolveCityCases,
@@ -108,4 +109,11 @@ test('satellite and hub locative for child-city question copy', () => {
   assert.equal(cityToPrepositional('Московская область'), 'Московской области');
   assert.equal(cityToGenitive('Ленинградская область'), 'Ленинградской области');
   assert.notEqual(cityToPrepositional('Раменское'), 'Раменское');
+});
+
+test('catalog disambiguator in parentheses is stripped before decline', () => {
+  assert.equal(cityToNominative('Отрадное (Ленинградская область)'), 'Отрадное');
+  assert.equal(inCityPrepositional('Отрадное (Ленинградская область)'), 'в Отрадном');
+  assert.equal(cityToGenitive('Отрадное (Ленинградская область)'), 'Отрадного');
+  assert.notEqual(inCityPrepositional('Отрадное (Ленинградская область)'), 'в Отрадное (Ленинградская область)е');
 });

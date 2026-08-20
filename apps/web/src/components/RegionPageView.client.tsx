@@ -292,7 +292,9 @@ export function RegionPageView({
   const faqItems = isTierC
     ? []
     : regionInfo?.faq?.filter((item) => item.q?.trim() && item.a?.trim()) || [];
-  const cityFilterLabel = cityFilter?.length ? cityFilter.join(', ') : null;
+  const cityFilterLabel = cityFilter?.length
+    ? cityFilter.map((name) => shortCityRailName(name)).join(', ')
+    : null;
 
   const mapPoints = React.useMemo((): RegionMapPoint[] => {
     if (!beltConfig) return [];

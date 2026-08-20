@@ -288,12 +288,22 @@ function lookupCityForms(city: string): CityFormRow | null {
 
 /** Именительный по slug/alias или имени; иначе исходная строка. */
 export function cityToNominative(cityOrSlug: string): string {
-  const raw = String(cityOrSlug || '').trim();
+  const raw = stripCityDisambiguator(String(cityOrSlug || '').trim());
   if (!raw) return raw;
   if (CITY_FORMS[raw]) return raw;
   const bySlug = CITY_NAME_BY_SLUG[raw.toLowerCase()];
   if (bySlug) return bySlug;
   return raw;
+}
+
+/**
+ * Catalog sometimes stores «Отрадное (Ленинградская область)».
+ * Declension must use the city alone - otherwise «в … области)е».
+ */
+export function stripCityDisambiguator(name: string): string {
+  const raw = String(name || '').trim();
+  if (!raw) return raw;
+  return raw.replace(/\s*\([^)]*\)\s*$/u, '').trim() || raw;
 }
 
 /** Полный набор падежей по имени или slug города. */
