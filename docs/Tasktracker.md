@@ -11,7 +11,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| CAT.HUB-LOCATION-PAGES | Завести `/locations` (и institution `/venues`) из mustSee хабов при min profile (coords+текст; address fallback `г. {City}`) | Высокий | ✅ live MSK: +80 Venue (apply 2026-08-20); gate без address; ~359 без coords остаются hub-only |
+| CAT.HUB-LOCATION-PAGES | Завести `/locations` (и institution `/venues`) из mustSee хабов при min profile (coords+текст; address fallback `г. {City}`) | Высокий | ✅ live MSK: +80 Venue; TOP coords 21→0 missing (Sochi/Irkutsk/Vladivostok+); long-tail без coords отдельно |
 | UX.PLACES-FAMILY-SSR | SSR `/places?family=location` отдаёт локации, не mixed `all` | Средний | ✅ code |
 | QA.PLACES-HREF-AUDIT | Проверить все href `/places` + хаб-slug на 404; вычистить copy «точка на карте» | Высокий | ✅ catalog 200; seed object-hubs local +378; prod apply + Deploy MSK web |
 

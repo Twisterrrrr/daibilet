@@ -439,8 +439,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         locationSlug: 'saint-petersburg-kolomna', address: 'Исторический район Коломна', latitude: 59.923184, longitude: 30.285885 },
       { name: 'Линии Васильевского острова', desc: 'Сетка дворов и повседневная жизнь острова.', mustSeeFilter: 'street', locationSlug: 'saint-petersburg-linii-vasilevskogo-ostrova', address: 'Васильевский остров (от 1-й до 29-й линии)', latitude: 59.938171, longitude: 30.276451 },
       { name: 'Открытые дворы-колодцы (экскурсии по дворам)', desc: 'Классический петербургский код.', mustSeeFilter: 'secret',
-        locationSlug: 'saint-petersburg-otkrytye-dvory-kolodtsy-ekskursii-po-dvoram'
-      },
+        locationSlug: 'saint-petersburg-otkrytye-dvory-kolodtsy-ekskursii-po-dvoram', address: 'центр Петербурга', latitude: 59.934, longitude: 30.32 },
       { name: 'Гостиный двор / Пассаж', desc: 'Торговые пассажи XIX века.', mustSeeFilter: 'street',
         locationSlug: 'saint-petersburg-gostinyy-dvor-passazh', address: 'Невский пр., 35 / Невский пр., 48', latitude: 59.934447, longitude: 30.332995 },
       { name: 'Каменноостровский проспект', desc: 'Модерн и зелень Петроградской стороны.', mustSeeFilter: 'street' , themeTags: ['Северный модерн'],
@@ -3458,8 +3457,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         longitude: 40.411132,
       },
       { name: 'Патриаршие сады', desc: 'Живописный сад XVI века с видом на Клязьму',
-        locationSlug: 'vladimir-patriarshie-sady'
-      },
+        locationSlug: 'vladimir-patriarshie-sady', address: 'Козлов тупик, 5', latitude: 56.124503, longitude: 40.398939 },
       { name: 'Водонапорная башня', desc: 'Музей «Старый Владимир» с панорамной площадкой',
         locationSlug: 'vladimir-vodonapornaya-bashnya',
         latitude: 56.124314,
@@ -3598,7 +3596,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       { name: 'Технический музей', desc: 'Старинные инструменты и механизмы', venueSlug: 'nizhny-novgorod-tehnicheskiy-muzey', mustSeeFilter: 'museum', visitMinutes: 60 , latitude: 56.32392, longitude: 43.990692 },
       { name: 'Русский музей фотографии', desc: 'Дагерротипы и история русской съемки', venueSlug: 'nizhny-novgorod-russkiy-muzey-fotografii', mustSeeFilter: 'museum', visitMinutes: 60 , latitude: 56.323531, longitude: 44.004128 },
       { name: 'Памятник Жюлю Верну', desc: 'Писатель на воздушном шаре', locationSlug: 'nizhny-novgorod-pamyatnik-zhyulyu-vernu', mustSeeFilter: 'monument', visitMinutes: 15, latitude: 56.326261, longitude: 43.980836 },
-      { name: 'Катер «Герой»', desc: 'Судно-памятник у Чкаловской лестницы', locationSlug: 'nizhny-novgorod-kater-geroy', mustSeeFilter: 'monument', visitMinutes: 15 },
+      { name: 'Катер «Герой»', desc: 'Судно-памятник у Чкаловской лестницы', locationSlug: 'nizhny-novgorod-kater-geroy', mustSeeFilter: 'monument', visitMinutes: 15, address: 'Нижневолжская набережная', latitude: 56.331289, longitude: 44.009389 },
       { name: 'Селёдка и Кофе', desc: 'Культовое кафе-бар на Рождественской', venueSlug: 'nizhny-novgorod-seledka-i-kofe', mustSeeFilter: 'gastro', visitMinutes: 60 , latitude: 56.327572, longitude: 43.987747 },
       { name: 'Безухов', desc: 'Литературное кафе с волжской кухней', venueSlug: 'nizhny-novgorod-bezuhov-cafe', mustSeeFilter: 'gastro', visitMinutes: 60 , latitude: 56.332241, longitude: 44.009503 },
       { name: 'Лепи Тесто', desc: 'Авторские пельмени у Грузинской / Покровки', venueSlug: 'nizhny-novgorod-lepi-testo', mustSeeFilter: 'gastro', visitMinutes: 60 , latitude: 56.321045, longitude: 44.001243 },
@@ -4162,23 +4160,17 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'А вы знали, что Сочи - это самый длинный город в России и второй по длине в мире после Мехико? Он растянулся вдоль береговой линии Черного моря на рекордные 145 километров, вмещая в себя четыре огромных курортных района.',
     mustSee: [
       { name: 'Парк «Ривьера»', desc: 'Старейший курортный парк с вековыми платанами, розарием, аттракционами и дельфинарием',
-        locationSlug: 'sochi-park-riv-era'
-      },
+        locationSlug: 'sochi-park-riv-era', address: 'ул. Егорова, 1', latitude: 43.591245, longitude: 39.715412 },
       { name: 'Морской вокзал Сочи', desc: 'Шедевр сталинского ампира со шпилем, главная прогулочная зона у причалов с яхтами',
-        locationSlug: 'sochi-morskoy-vokzal-sochi'
-      },
+        locationSlug: 'sochi-morskoy-vokzal-sochi', address: 'ул. Войкова, 1', latitude: 43.580412, longitude: 39.718854 },
       { name: 'Олимпийский парк', desc: 'Грандиозный комплекс прибрежного кластера Игр-2014 с поющим фонтаном в Сириусе',
-        locationSlug: 'sochi-olimpiyskiy-park'
-      },
+        locationSlug: 'sochi-olimpiyskiy-park', address: 'пгт. Сириус, Имеретинская низменность, Олимпийский парк', latitude: 43.405278, longitude: 39.954444 },
       { name: 'Курорт Роза Хутор', desc: 'Горнолыжный и туристический комплекс в горах Красной Поляны с канатной дорогой до пика Роза',
-        locationSlug: 'sochi-kurort-roza-hutor'
-      },
+        locationSlug: 'sochi-kurort-roza-hutor', address: 'ул. с. Эстосадок, ул. Олимпийская, 35', latitude: 43.672512, longitude: 40.296142 },
       { name: 'Тисо-самшитовая роща', desc: 'Реликтовый первобытный лес с карстовыми каньонами и древними растениями в Хосте',
-        locationSlug: 'sochi-tiso-samshitovaya-roscha'
-      },
+        locationSlug: 'sochi-tiso-samshitovaya-roscha', address: 'ул. Хостинский район, ул. Самшитовая', latitude: 43.526944, longitude: 39.873611 },
       { name: 'Дендрарий', desc: 'Уникальное собрание субтропической флоры и фауны на склоне горы с канатной дорогой',
-        locationSlug: 'sochi-dendrariy'
-      },
+        locationSlug: 'sochi-dendrariy', address: 'Курортный проспект, 74', latitude: 43.571667, longitude: 39.7425 },
     ],
     travel:
       "Международный аэропорт Сочи имени В. И. Севастьянова (в Адлере) является главным действующим авиахабом юга России, принимающим сотни рейсов ежедневно. Также в город ходят регулярные фирменные поезда и скоростные «Ласточки», а автомобилисты едут по трассе М-4 «Дон» с выездом на живописный, но сложный горный серпантин А-147. Сочи — круглогодичный курорт: пляжный и экскурсионный сезон длится с июня по октябрь, а любители горнолыжного спорта оккупируют склоны Красной Поляны и Розы Хутор в период с конца декабря по апрель.",
@@ -4225,23 +4217,17 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'А вы знали, что Владивосток находится на той же географической широте, что и курортный Сочи, но из-за холодного дыхания океана здесь можно за один день застать и тропический ливень, и плотный морской туман?',
     mustSee: [
       { name: 'Русский мост', desc: 'Самый длинный вантовый мост в мире - символ города',
-        locationSlug: 'vladivostok-russkiy-most'
-      },
+        locationSlug: 'vladivostok-russkiy-most', address: 'Русский мост (трасса А-371)', latitude: 43.063889, longitude: 131.905278 },
       { name: 'Океанариум', desc: 'Крупнейший океанариум страны с туннелем среди акул',
-        locationSlug: 'vladivostok-okeanarium'
-      },
+        locationSlug: 'vladivostok-okeanarium', address: 'ул. о. Русский, ул. Академика Касьянова, 25', latitude: 43.008954, longitude: 131.925412 },
       { name: 'Остров Русский', desc: 'Остров с фортами, пляжами и панорамами залива',
-        locationSlug: 'vladivostok-ostrov-russkiy'
-      },
+        locationSlug: 'vladivostok-ostrov-russkiy', address: 'остров Русский', latitude: 42.985641, longitude: 131.868745 },
       { name: 'Маяк на Токаревской кошке', desc: 'Живописный мыс с видом на залив и мосты',
-        locationSlug: 'vladivostok-mayak-na-tokarevskoy-koshke'
-      },
+        locationSlug: 'vladivostok-mayak-na-tokarevskoy-koshke', address: 'ул. Токаревская кошка, 1', latitude: 43.072222, longitude: 131.843333 },
       { name: 'Набережная Цесаревича', desc: 'Прогулочная зона с морским бризом и ресторанами',
-        locationSlug: 'vladivostok-naberezhnaya-tsesarevicha'
-      },
+        locationSlug: 'vladivostok-naberezhnaya-tsesarevicha', address: 'ул. Корабельная Набережная, 21', latitude: 43.115042, longitude: 131.903854 },
       { name: 'Фуникулёр и Орлиная сопка', desc: 'Короткий подъём на лучшую смотровую над бухтой Золотой Рог',
-        locationSlug: 'vladivostok-funikulyor'
-      },
+        locationSlug: 'vladivostok-funikulyor', address: 'ул. Пушкинская / ул. Суханова', latitude: 43.1169, longitude: 131.8853 },
     ],
     travel:
       "Прямой перелет из Москвы в международный аэропорт Кневичи занимает около 8–9 часов, также город является конечной точкой легендарной Транссибирской магистрали. Лучший и самый предсказуемый сезон для поездки — август, сентябрь и первая половина октября: в это время море максимально прогревается, уходят летние затяжные туманы и тайга вспыхивает яркими красками. Июнь и июль часто бывают дождливыми и пасмурными из-за муссонов. Зима здесь солнечная, но ветреная и очень морозная по ощущениям.",
@@ -4289,23 +4275,17 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     hookFact: 'А вы знали, что в XIX веке Иркутск уважительно величали «Сибирским Парижем»? Всё из-за богатых купцов, которые выписывали модную одежду, вина и мебель напрямую из Франции.',
     mustSee: [
       { name: '130-й квартал', desc: 'Квартал деревянного зодчества - визитная карточка города',
-        locationSlug: 'irkutsk-130-y-kvartal'
-      },
+        locationSlug: 'irkutsk-130-y-kvartal', address: 'ул. 3-го Июля / ул. Седова (пешеходная зона)', latitude: 52.274854, longitude: 104.288512 },
       { name: 'Набережная Ангары', desc: 'Прогулочная зона с видами на реку и мосты',
-        locationSlug: 'irkutsk-naberezhnaya-angary'
-      },
+        locationSlug: 'irkutsk-naberezhnaya-angary', address: 'Нижняя набережная (пешеходная зона)', latitude: 52.292222, longitude: 104.281944 },
       { name: 'Музей «Декабристы»', desc: 'История ссыльных декабристов в Сибири',
-        venueSlug: 'irkutsk-muzey-dekabristy'
-      },
+        venueSlug: 'irkutsk-muzey-dekabristy', address: 'переулок Волконского, 10', latitude: 52.288889, longitude: 104.300556 },
       { name: 'Казанская церковь', desc: 'Яркий храм сибирского барокко - символ Иркутска',
-        locationSlug: 'irkutsk-kazanskaya-tserkov'
-      },
+        locationSlug: 'irkutsk-kazanskaya-tserkov', address: 'ул. Баррикад, 34', latitude: 52.294124, longitude: 104.305142 },
       { name: 'Листвянка', desc: 'Посёлок у Байкала - ворота к озеру и музею Байкала',
-        locationSlug: 'irkutsk-listvyanka'
-      },
+        locationSlug: 'irkutsk-listvyanka', address: 'Листвянка, Иркутский муниципальный округ', latitude: 51.85693, longitude: 104.86058 },
       { name: 'Усадьба В. П. Сукачева', desc: 'Деревянный особняк мецената с садом и музеем быта',
-        venueSlug: 'irkutsk-usadba-sukacheva'
-      },
+        venueSlug: 'irkutsk-usadba-sukacheva', address: 'ул. Декабрьских Событий, 112', latitude: 52.2897, longitude: 104.2811 },
     ],
     travel:
       "Прямой перелет из Москвы в международный аэропорт Иркутска занимает около 5,5–6 часов, а поезда, следующие по Транссибирской магистрали, доезжают сюда из столицы за 3,5–4 суток. Лучшее время для посещения Иркутска в сочетании с поездкой на озеро Байкал зависит от ваших целей: для летнего отдыха, походов и круизов идеально подходит период с июля по август, когда вода максимально прогревается. За знаменитым чистейшим прозрачным байкальским льдом и катанием на коньках по бескрайним просторам нужно лететь строго с середины февраля по конец марта.",

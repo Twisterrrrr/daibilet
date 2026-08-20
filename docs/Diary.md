@@ -1,3 +1,16 @@
+## 2026-08-20 - TOP hubs mustSee coords backfill (Sochi/Irkutsk/Vladivostok+)
+
+### Наблюдения
+- Аудит TOP-32 через cityInfo + hub modules + `collectHubMustSeeRows`: missing finite lat/lng = **21** (было ~255 в long-tail; в TOP почти всё уже закрыто прошлым пассом).
+- Дыры: Sochi 6, Irkutsk 6, Vladivostok 6, плюс SPB дворы-колодцы, NN «Катер Герой», Владимир Патриаршие сады. Moscow/Kazan/EKB/… = 0 missing.
+
+### Решения
+- Geocode: catalog API ` /api/public/venues/{slug}` закрыл **21/21** (Nominatim не понадобился в первом проходе).
+- Патч `apps/web` + `apps/public` cityInfo (address+lat/lng по slug). Seed apply MSK для cities sochi/irkutsk/vladivostok/vladimir/nizhny-novgorod/saint-petersburg; Deploy MSK web для карт хабов.
+
+### Проблемы
+- Long-tail ~230+ вне TOP без coords - отдельный пасс. Тольятти/Сургут/НК/Ханты/Владикавказ в cityInfo без mustSee packs - не в этой итерации.
+
 ## 2026-08-20 - Routing aliases + blog cards + quiet /locations /blog
 
 ### Наблюдения
