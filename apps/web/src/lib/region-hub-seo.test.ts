@@ -53,3 +53,13 @@ test('Выборг formula A copy for LO hub', () => {
     'Афиша Выборга: главные события и мероприятия 2026 | Дайбилет',
   );
 });
+
+test('catalog disambiguator is not repeated next to region in Formula A', () => {
+  assert.equal(
+    buildChildCityScopeLabel('Отрадное (Ленинградская область)', 'Ленинградская область'),
+    'Отрадное, Ленинградская область • Ближайшие события',
+  );
+  const lead = buildChildCityScopeLead('Отрадное (Ленинградская область)', 'Ленинградская область');
+  assert.match(lead, /в Отрадном и ближайших населенных пунктах Ленинградской области/);
+  assert.ok(!lead.includes('(Ленинградская область)'));
+});

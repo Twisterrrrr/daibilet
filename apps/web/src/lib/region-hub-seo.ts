@@ -1,4 +1,4 @@
-import { cityToGenitive, cityToPrepositional } from './city-declension.ts';
+import { cityToGenitive, cityToPrepositional, stripCityDisambiguator } from './city-declension.ts';
 
 /**
  * SEO title/description для region hub (`type=region`).
@@ -41,7 +41,7 @@ const CHILD_CITY_TITLE_GENITIVE: Record<string, string> = {
 };
 
 export function childCityTitleGenitive(cityName: string): string {
-  const name = String(cityName || '').trim();
+  const name = stripCityDisambiguator(String(cityName || '').trim());
   if (!name) return 'города';
   return CHILD_CITY_TITLE_GENITIVE[name] || cityToGenitive(name);
 }
@@ -49,9 +49,10 @@ export function childCityTitleGenitive(cityName: string): string {
 /**
  * H1 / search label (locator). Без «Афиша» - она уже в title.
  * «Раменское, Московская область • Ближайшие события».
+ * Catalog may store «Отрадное (Ленинградская область)» - strip before Formula A.
  */
 export function buildChildCityScopeLabel(cityName: string, regionName: string): string {
-  const city = String(cityName || '').trim() || 'Город';
+  const city = stripCityDisambiguator(String(cityName || '').trim()) || 'Город';
   const region = String(regionName || '').trim() || 'регион';
   return `${city}, ${region} • Ближайшие события`;
 }
@@ -80,7 +81,7 @@ export function buildChildCityScopeSeoTitleCore(
  * Лид под H1: intent, не вопрос-H1. Вопрос «куда сходить» живёт здесь.
  */
 export function buildChildCityScopeLead(cityName: string, regionName: string): string {
-  const city = String(cityName || '').trim() || 'городе';
+  const city = stripCityDisambiguator(String(cityName || '').trim()) || 'городе';
   const region = String(regionName || '').trim() || 'регионе';
   return `Ищете, куда сходить в выходные? Мы собрали все актуальные события, выставки и концерты в ${cityToPrepositional(city)} и ближайших населенных пунктах ${cityToGenitive(region)}.`;
 }

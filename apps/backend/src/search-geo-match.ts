@@ -146,8 +146,16 @@ const SATELLITE_ALIAS_EXTRAS: Record<string, string[]> = {
   vyborg: ['выборгский замок', 'монрепо'],
 };
 
+/** Catalog may store «Отрадное (Ленинградская область)» - strip before Formula A. */
+function stripCityDisambiguator(name: string): string {
+  const raw = String(name || '').trim();
+  if (!raw) return raw;
+  return raw.replace(/\s*\([^)]*\)\s*$/u, '').trim() || raw;
+}
+
 export function childCityShortLabel(cityName: string, regionName: string): string {
-  return `${cityName}, ${regionName}`;
+  const city = stripCityDisambiguator(cityName) || String(cityName || '').trim();
+  return `${city}, ${regionName}`;
 }
 
 /** Formula A: search label + region-hub H1. Not the indexed document title. */
