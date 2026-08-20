@@ -10,6 +10,25 @@ const TOP_EXPAND_Y = 64;
 const COOLDOWN_MS = 320;
 
 /**
+ * While the user types dwell/notes or reorders with the grip keyboard,
+ * viewport scroll from focus/keyboard must not toggle sticky chrome
+ * (that remounts the card and steals focus / dismisses the soft keyboard).
+ */
+function shouldPauseToolbarCollapse(): boolean {
+  const el = document.activeElement;
+  if (!(el instanceof HTMLElement)) return false;
+  const tag = el.tagName;
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return true;
+  if (el.isContentEditable) return true;
+  if (el.matches('[data-day-stop-grip]')) return true;
+  return Boolean(
+    el.closest(
+      '[data-day-dwell-editor], [data-day-between-panel], [data-day-custom-address], [data-day-stop-grabbed="1"]',
+    ),
+  );
+}
+
+/**
  * Sticky route toolbar: collapse after scrolling down; expand near top or via tap.
  *
  * Mid-page scroll-up does NOT expand (that remounted the full chrome and lagged on mobile).
@@ -29,6 +48,7 @@ export function useMobileScrollCollapse() {
       const lastY = lastYRef.current;
       lastYRef.current = y;
 
+      if (shouldPauseToolbarCollapse()) return;
       if (now < lockedUntilRef.current) return;
 
       if (y < TOP_EXPAND_Y) {

@@ -5394,6 +5394,16 @@ function DayRouteVenueCard({
   const [dwellDraft, setDwellDraft] = useState(
     String(normalizeDayRouteDwellMinutes(venue.dwellMinutes) ?? dayRouteStopDwellMinutes(venue, typeTag)),
   );
+  const dwellInputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    if (!dwellOpen) return;
+    const id = window.requestAnimationFrame(() => {
+      dwellInputRef.current?.focus({ preventScroll: true });
+      dwellInputRef.current?.select();
+    });
+    return () => window.cancelAnimationFrame(id);
+  }, [dwellOpen]);
   const href =
     venue.href ||
     (!textStop && venue.slug
@@ -5777,8 +5787,10 @@ function DayRouteVenueCard({
                           Минут на месте
                         </label>
                         <input
+                          ref={dwellInputRef}
                           id={`dwell-${venue.id}`}
                           type="number"
+                          inputMode="numeric"
                           min={DAY_ROUTE_DWELL_MIN}
                           max={DAY_ROUTE_DWELL_MAX}
                           step={5}
