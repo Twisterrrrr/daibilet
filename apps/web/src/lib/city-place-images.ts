@@ -1082,6 +1082,21 @@ const LOCATION_PACK_IMAGES: Record<string, string> = {
   'nizhny-novgorod-nizhegorodskiy-kreml': '/images/venues/nizhny-novgorod/nizhegorodskiy-kreml.jpg',
   'lipeck-nizhniy-park-i-lipetskiy-byuvet': '/images/venues/lipeck/nizhniy-park-i-lipetskiy-byuvet.jpg',
   'saint-petersburg-nizhniy-park-petergofa': '/images/venues/saint-petersburg/nizhniy-park-petergofa.jpg',
+  'saint-petersburg-bolshoy-kaskad-petergofa':
+    '/images/venues/saint-petersburg/bolshoy-kaskad-petergofa.jpg',
+  'saint-petersburg-verkhniy-sad-petergofa': '/images/venues/saint-petersburg/verkhniy-sad-petergofa.jpg',
+  'saint-petersburg-dvorets-monplezir': '/images/venues/saint-petersburg/dvorets-monplezir.jpg',
+  'saint-petersburg-pavilion-marli': '/images/venues/saint-petersburg/pavilion-marli.jpg',
+  'saint-petersburg-park-aleksandriya': '/images/venues/saint-petersburg/park-aleksandriya.jpg',
+  'saint-petersburg-goticheskaya-kapella': '/images/venues/saint-petersburg/goticheskaya-kapella.jpg',
+  'saint-petersburg-ekaterininskiy-park': '/images/venues/saint-petersburg/ekaterininskiy-park.jpg',
+  'saint-petersburg-kameronova-galereya': '/images/venues/saint-petersburg/kameronova-galereya.jpg',
+  'saint-petersburg-pavilion-ermitazh-tsarskoe':
+    '/images/venues/saint-petersburg/pavilion-ermitazh-tsarskoe.jpg',
+  'saint-petersburg-aleksandrovskiy-dvorets':
+    '/images/venues/saint-petersburg/aleksandrovskiy-dvorets.jpg',
+  'saint-petersburg-kitayskaya-derevnya': '/images/venues/saint-petersburg/kitayskaya-derevnya.jpg',
+  'saint-petersburg-ratnaya-palata': '/images/venues/saint-petersburg/ratnaya-palata.jpg',
   'novosibirsk-novosibirskiy-zoopark-imeni-r-a-shilo': '/images/venues/novosibirsk/novosibirskiy-zoopark-imeni-r-a-shilo.jpg',
   'sochi-olimpiyskiy-park': '/images/venues/sochi/olimpiyskiy-park.jpg',
   'smolensk-pamyatnik-blagodarnaya-rossiya-geroyam-1812-goda-pamyatnik-s-or': '/images/venues/smolensk/pamyatnik-blagodarnaya-rossiya-geroyam-1812-goda-pamyatnik-s-or.jpg',

@@ -135,6 +135,18 @@
 
 ### Проблемы
 - Уникальные фото вложенных suburb POI без locationSlug - отдельный батч (сейчас fallback на cover пригорода).
+- Аудит: 253/524 nested без slug (SPB 53, Moscow 37, EKB/NN/… 100%). Хорошие: Chelyabinsk/Voronezh/Tyumen/Rostov/Tver/Penza/Omsk/Ryazan = 0.
+
+## 2026-08-20 - SPB palace-belt nested POI covers
+
+### Наблюдения
+- Петергоф/Пушкин nested без slug дублировали suburb cover в photo rail.
+
+### Решения
+- locationSlug на 12 точек + GenerateImage + map в `city-place-images` + card/thumb.
+
+### Проблемы
+- Остальные SPB suburbs (Кронштадт…Сосновый Бор) и Moscow/EKB/… - следующие пассы.
 
 ## 2026-08-20 - Blog listing cards in git + tmp hygiene
 
