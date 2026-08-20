@@ -1,5 +1,6 @@
 export { MyDayShell } from './MyDayShell';
 export { MyDayCityPickStarter } from './MyDayCityPickStarter';
+export { MyDayRegionCityPrompt } from './MyDayRegionCityPrompt';
 export { MyDayToolbar } from './MyDayToolbar';
 export { MyDayMapAside } from './MyDayMapAside';
 export { MyDayMobileMapSheet, MyDayMapFullScreen } from './MyDayMobileMapSheet';

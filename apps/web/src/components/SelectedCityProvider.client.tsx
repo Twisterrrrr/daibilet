@@ -39,6 +39,8 @@ import {
   resolveCityHubDestination,
   resolveCityLabel,
 } from '@/lib/selected-city';
+import { resolveRegionChildCityScope } from '@/lib/region-child-city-scope';
+import { getRegionCenterCityName } from '@/lib/cityRegionHub';
 import {
   landingCategoryHref,
   MULTI_CITY_LANDING_SLUGS,
@@ -155,7 +157,18 @@ export function SelectedCityProvider({
     const fromCityHub = resolveCityHubDestination(destinations, pathname);
     let nextLabel: string;
     if (fromCityHub) {
-      nextLabel = fromCityHub.name;
+      if (fromCityHub.type === 'region') {
+        const child = resolveRegionChildCityScope({
+          search: searchParamsKey,
+          regionName: fromCityHub.name,
+          regionSlug: fromCityHub.slug || '',
+          centerSlug: getRegionCenterCityName(fromCityHub),
+          childCities: [],
+        });
+        nextLabel = child?.name || fromCityHub.name;
+      } else {
+        nextLabel = fromCityHub.name;
+      }
     } else {
       const landingRoute = resolveLandingRouteFromLocation(pathname);
       // Any landing path that already carries a city (MULTI + city-scoped) write-through to header.
@@ -192,7 +205,7 @@ export function SelectedCityProvider({
 
     setCityLabel(nextLabel);
     setCityReady(true);
-  }, [destinations, pathname, urlCity]);
+  }, [destinations, pathname, urlCity, searchParamsKey]);
 
   // Index pages without explicit city= — inject header city into URL (deep-links untouched).
   useLayoutEffect(() => {
@@ -216,6 +229,8 @@ export function SelectedCityProvider({
 
   // Keep storage aligned with an explicit catalog city (including deep-links).
   // `city=all` clears storage so mergeStoredCityIntoSearchParams cannot bounce back.
+  // Region hub `/cities/{oblast}?city=vyborg` must persist the child city, not the oblast
+  // (My Day cannot use type=region as a day-route city).
   useLayoutEffect(() => {
     const pending = pendingCityRef.current;
     if (pending && pending !== 'all') {
@@ -229,12 +244,34 @@ export function SelectedCityProvider({
       persistSelectedCity('all');
       return;
     }
-    const matched =
-      readsCityQueryParam(pathname) && urlCity
-        ? matchDestination(destinations, urlCity)
-        : resolveCityHubDestination(destinations, pathname);
-    if (matched) persistSelectedCity(matched.name);
-  }, [destinations, pathname, urlCity]);
+    if (readsCityQueryParam(pathname) && urlCity) {
+      const matched = matchDestination(destinations, urlCity);
+      if (matched) {
+        // My Day URL with a region token → do not lock storage on the oblast.
+        if (isMyDayPath(pathname) && matched.type === 'region') return;
+        persistSelectedCity(matched.name);
+      }
+      return;
+    }
+
+    const hub = resolveCityHubDestination(destinations, pathname);
+    if (!hub) return;
+    if (hub.type === 'region') {
+      const child = resolveRegionChildCityScope({
+        search: searchParamsKey,
+        regionName: hub.name,
+        regionSlug: hub.slug || '',
+        centerSlug: getRegionCenterCityName(hub),
+        childCities: [],
+      });
+      if (child?.name) {
+        persistSelectedCity(child.name);
+        return;
+      }
+      // Bare region hub: keep region in chrome for catalog, My Day will redirect UI.
+    }
+    persistSelectedCity(hub.name);
+  }, [destinations, pathname, urlCity, searchParamsKey]);
 
   // Persist city from any landing path that already carries a city segment.
   useLayoutEffect(() => {

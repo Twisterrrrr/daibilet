@@ -1,3 +1,9 @@
+## 2026-08-20 - My Day rejects region as day-route city
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| FIX.MYDAY-NO-REGION | type=region в chrome/storage → prompt hub + областные города, не пустой «Шаг 1» | Высокий | 🔄 Deploy MSK web |
+
 ## 2026-08-20 - Afternoon batch (declension + affiche pin + my-day)
 
 Live: Deploy MSK web [`32371428354`](https://github.com/Twisterrrrr/daibilet/actions/runs/32371428354) · SHA `807cc7e` (включает продукт через `12eb5d3` + docs).

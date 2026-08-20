@@ -31,6 +31,7 @@ import {
 } from 'lucide-react';
 import {
   MyDayCityPickStarter,
+  MyDayRegionCityPrompt,
   MyDayPickerLaunch,
   MyDayPickerSheet,
   MyDayItinerary,
@@ -208,6 +209,7 @@ import {
   type HotPickTabId,
 } from '@/lib/day-route-hot-picks';
 import { cityToGenitive, inCityPrepositional } from '@/lib/city-declension';
+import { resolveMyDayRegionAlternatives } from '@/lib/my-day-region-scope';
 import { formatPriceFrom } from '@/lib/format';
 import {
   buildMustSeeFilterTabs,
@@ -916,7 +918,13 @@ function DayRoutePanelInner() {
       ? String(selectedCity.selectedDestination.sourceSlug || '').trim() || null
       : null;
   const pageCityId = selectedCity?.selectedDestination?.id || null;
-  const hasPageCity = Boolean(pageCityName);
+  /** Region hubs are aggregators - My Day needs a real city (hub or oblast town). */
+  const selectedRegionAlternatives = useMemo(
+    () =>
+      resolveMyDayRegionAlternatives(selectedCity?.selectedDestination, destinations || []),
+    [selectedCity?.selectedDestination, destinations],
+  );
+  const hasPageCity = Boolean(pageCityName) && !selectedRegionAlternatives;
   const scopeCityName = cityTitle || pageCityName;
   const scopeCitySlug = citySlug || pageCitySlug;
   const scopeCityParam = scopeCityName || scopeCitySlug;
@@ -3043,6 +3051,22 @@ function DayRoutePanelInner() {
     }
 
     if (!hasPageCity) {
+      if (selectedRegionAlternatives) {
+        return (
+          <MyDayRegionCityPrompt
+            ref={(node) => {
+              unifiedSearchRef.current = node;
+            }}
+            alternatives={selectedRegionAlternatives}
+            cities={destinations}
+            value={selectedCity?.cityValue || 'all'}
+            onChange={async (name) => {
+              if ((await selectedCity?.setCity(name)) === false) return;
+              if (name !== 'all') setCityInput(name);
+            }}
+          />
+        );
+      }
       return (
         <MyDayCityPickStarter
           ref={(node) => {
