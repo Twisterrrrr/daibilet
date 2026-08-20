@@ -74,7 +74,7 @@ export function DestinationRegionGuide({
           href={guide.parentHubHref}
           className="group inline-flex items-center gap-2 text-sm font-semibold text-emerald-900 underline-offset-4 hover:underline"
         >
-          Смотреть {guide.name} как пригород {guide.parentHubLabel}
+          Смотреть {guide.name} как пригород {cityToGenitive(guide.parentHubLabel)}
           <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" aria-hidden />
         </Link>
       ) : null}
