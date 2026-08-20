@@ -2,7 +2,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| UX.REGION-AFFICHE-CITY-RAIL | Region/child афиша = city hub poster rail (`HubEventsAfficheRail`), без «серия на площадке» | Высокий | 🔄 ship+Deploy MSK web |
+| UX.REGION-AFFICHE-CITY-RAIL | Region/child афиша = city hub poster rail (`HubEventsAfficheRail`), без «серия на площадке» | Высокий | ✅ live Deploy `32367020739` SHA `0ffa2f6` |
 
 ## 2026-08-20 - Region child guide + affiche copy
 
