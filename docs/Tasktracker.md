@@ -11,7 +11,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| CAT.HUB-LOCATION-PAGES | Завести `/locations` (и institution `/venues`) из mustSee Ростов/Пенза/Тверь при min profile | Высокий | ✅ seed 176 в local Docker; live MSK apply pending |
+| CAT.HUB-LOCATION-PAGES | Завести `/locations` (и institution `/venues`) из mustSee Ростов/Пенза/Тверь при min profile | Высокий | ✅ live MSK: Venue в prod (Ростов/Пенза/Тверь PARK+MONUMENT+hub slugs 200) |
 | UX.PLACES-FAMILY-SSR | SSR `/places?family=location` отдаёт локации, не mixed `all` | Средний | ✅ code |
 | QA.PLACES-HREF-AUDIT | Проверить все href `/places` + хаб-slug на 404; вычистить copy «точка на карте» | Высокий | ✅ catalog 200; seed object-hubs local +378; prod apply + Deploy MSK web |
 
@@ -95,7 +95,8 @@
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
 | CONT.NOVOSIBIRSK-HUB | whenToGo / identity / ~55 mustSee / Академ + Сузун + Искитим/Ложок + Кольцово + Бердские скалы / фестивали / FAQ / lifehacks | Высокий | 🔄 suburbs+festivals+FAQ; Deploy MSK web после push |
-| PERF.EVENTS-CARDS | Массовая нарезка обложек `/events` в sibling `-card.jpg` (~640px) | Высокий | 🔄 fallback в коде; `pnpm images:cards:dry`; MSK write = owner после dry-run, бинарники не в git |
+| PERF.EVENTS-CARDS | Массовая нарезка обложек `/events` в sibling `-card.jpg` (~640px) | Высокий | ✅ MSK events: нечего писать (102 card + lean skip); listing `CardSafeImage` |
+| PERF.VENUES-CARDS | Venue `-card.jpg` для `/places` fallback после `-thumb` | Высокий | ✅ 2026-08-20 MSK wrote 409 (99MB→19MB); dry-run 0 remaining |
 | PERF.PLACES-THUMB-FALLBACK | `/places`: нет `-thumb` → `-card` → оригинал, не градиент | Критический | ✅ resolver + identity fallback + hub must-see photo; sidecar `-card`/`-thumb` для Ufa/NSK/Omsk packs |
 | PERF.BLOG-CARD-FALLBACK | `/blog`: нет `*-og`/`-card`/`-thumb` → полный cover | Высокий | 🔄 `BlogCardSafeImage` chain; в следующем web batch |
 

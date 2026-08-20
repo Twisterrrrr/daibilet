@@ -1,3 +1,17 @@
+## 2026-08-20 - Venue -card sidecars on MSK + hub locations live
+
+### Наблюдения
+- Event `-card.jpg` на live уже были: dry-run `events` = 0 write; пример Sortavala original 2.4MB / card 44KB.
+- Дыра была в **venues**: 409 исходников без валидного `-card` (Казань парки до ~3MB). `/places` сначала берёт `-thumb`, затем `-card`.
+- Tasktracker `CAT.HUB-LOCATION-PAGES` «live apply pending» устарел: в prod Venue есть (тачанка Ростова, Тарханы, Старица, Домотканово), страницы `/locations/...` = 200.
+
+### Решения
+- На `daibilet-msk`: `node scripts/compress-card-images.mjs venues` → wrote 409, повторный dry-run 0. Бинарники не в git.
+- Live smoke: `/images/venues/kazan/park-chernoe-ozero-card.jpg` 33KB vs original 3.0MB.
+
+### Проблемы
+- Партнёрские remote URL (не `/images/*`) sidecar не режут - это не диск nginx. Новый каталог не делаем, только listing src chain.
+
 ## 2026-08-19 - Destination registry: SPB palace belt (P1a)
 
 ### Наблюдения
