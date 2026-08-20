@@ -1480,6 +1480,14 @@ function classifyMuseumOrArtSpace(name, address, shortDescription, description, 
   const text = [name, address, shortDescription, description, idOrSlug].filter(Boolean).join(' ').toLowerCase();
   // Explicit overrides: Erarta (legacy ART_SPACE) stays art_space despite «Музей» in title.
   if (/эрарта|\berarta\b|ven_spbboats_erarta/i.test(text)) return 'art_space';
+  // Commercial gallery despite «Музейно-выставочный центр» in the legal title.
+  if (
+    /петербургск(?:ий|ого)\s+художник|muzeino-vystavochnyi-centr-peterburgskii-hudozhnik/i.test(
+      text,
+    )
+  ) {
+    return 'art_space';
+  }
   if (/музей\s+современного\s+искусств/i.test(text)) return 'art_space';
   if (/арт[-\s]?пространств|art[-\s]?space|иммерсив|люмьер|глазунов/i.test(text)) return 'art_space';
   if (/галере/i.test(text) && !/музей|третьяков|эрмитаж|пушкинск|русск(?:ий|ого)\s+музей/i.test(text)) {
@@ -1493,8 +1501,9 @@ function finalizeMuseumArtPublicKind(kind, name, address, options = {}) {
     .trim()
     .toLowerCase()
     .replace(/-/g, '_');
-  if (key === 'museum' || key === 'art_space') return key;
-  if (key === 'museum_art_space') {
+  if (key === 'art_space') return 'art_space';
+  // Stored museum / legacy museum_art_space: title may still mean gallery.
+  if (key === 'museum' || key === 'museum_art_space') {
     return classifyMuseumOrArtSpace(
       name,
       address,

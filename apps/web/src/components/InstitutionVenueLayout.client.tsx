@@ -107,7 +107,7 @@ export function InstitutionVenueLayout({
   const isTheatre = normalizeVenueKind(venue.type) === 'theater';
   const publicType = resolvePublicVenueType(venue.type, venue.name);
   const isMuseumOrArt = MUSEUM_ART_KINDS.has(publicType);
-  const typeLabel = venueTypeLabel(venue.type);
+  const typeLabel = venueTypeLabel(venue.type, venue.name);
   const intro =
     venue.shortDescription ||
     venue.description ||

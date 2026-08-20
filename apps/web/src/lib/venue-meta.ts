@@ -31,7 +31,8 @@ export function countCatalogFamilies(types: Record<string, number> | null | unde
 
 const VENUE_TYPE_LABELS: Record<string, string> = {
   museum: 'Музей',
-  art_space: 'Арт-пространство',
+  /** Public kind for commercial / artist galleries (places chip «Галереи»). */
+  art_space: 'Галерея',
   /** Legacy DB enum MUSEUM_ART_SPACE до split в public kind. */
   museum_art_space: 'Музей',
   theater: 'Театр',
@@ -56,7 +57,7 @@ const VENUE_TYPE_LABELS: Record<string, string> = {
 /** Множественное число для сегмента крошек: Главная > Город > {Type} > Title. */
 const VENUE_TYPE_BREADCRUMB_PLURALS: Record<string, string> = {
   museum: 'Музеи',
-  art_space: 'Арт-пространства',
+  art_space: 'Галереи',
   museum_art_space: 'Музеи',
   theater: 'Театры',
   concert_hall: 'Концертные залы',
@@ -90,6 +91,14 @@ export function classifyMuseumOrArtSpace(name?: string | null, extraText?: strin
   const text = `${name || ''} ${extraText || ''}`.toLowerCase();
   // Explicit overrides: Erarta (legacy ART_SPACE) stays art_space despite «Музей» in title.
   if (/эрарта|\berarta\b|ven_spbboats_erarta/i.test(text)) return 'art_space';
+  // Commercial gallery despite «Музейно-выставочный центр» in the legal title.
+  if (
+    /петербургск(?:ий|ого)\s+художник|muzeino-vystavochnyi-centr-peterburgskii-hudozhnik/i.test(
+      text,
+    )
+  ) {
+    return 'art_space';
+  }
   if (/музей\s+современного\s+искусств/i.test(text)) return 'art_space';
   if (/арт[-\s]?пространств|art[-\s]?space|иммерсив|люмьер|глазунов/i.test(text)) return 'art_space';
   if (/галере/i.test(text) && !/музей|третьяков|эрмитаж|пушкинск|русск(?:ий|ого)\s+музей/i.test(text)) {
@@ -115,8 +124,9 @@ export function resolvePublicVenueType(type?: string | null, name?: string | nul
   ) {
     return 'temple';
   }
-  if (key === 'museum' || key === 'art_space') return key;
-  if (key === 'museum_art_space') return classifyMuseumOrArtSpace(name);
+  if (key === 'art_space') return 'art_space';
+  // Stored museum / legacy museum_art_space: title may still mean gallery (Глазунов, Петербургский художник).
+  if (key === 'museum' || key === 'museum_art_space') return classifyMuseumOrArtSpace(name);
   return key;
 }
 
@@ -262,7 +272,7 @@ export function institutionTypeEmoji(type?: string | null): string {
 
 export const CATALOG_TYPE_OPTIONS: Array<{ value: string; label: string; template: VenuePageTemplate }> = [
   { value: 'museum', label: 'Музеи', template: 'institution' },
-  { value: 'art_space', label: 'Арт-пространства', template: 'institution' },
+  { value: 'art_space', label: 'Галереи', template: 'institution' },
   { value: 'theater', label: 'Театр', template: 'institution' },
   { value: 'concert_hall', label: 'Концертный зал', template: 'institution' },
   { value: 'bar', label: 'Бар', template: 'institution' },

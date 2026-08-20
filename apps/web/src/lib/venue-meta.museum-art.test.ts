@@ -20,6 +20,24 @@ describe('museum vs art_space public split', () => {
     assert.equal(classifyMuseumOrArtSpace('', 'erarta'), 'art_space');
   });
 
+  it('classifies Петербургский художник as gallery despite музейно-выставочный title', () => {
+    assert.equal(
+      classifyMuseumOrArtSpace('Музейно-выставочный центр "Петербургский художник"'),
+      'art_space',
+    );
+    assert.equal(
+      classifyMuseumOrArtSpace('', 'muzeino-vystavochnyi-centr-peterburgskii-hudozhnik'),
+      'art_space',
+    );
+    assert.equal(
+      resolvePublicVenueType(
+        'museum',
+        'Музейно-выставочный центр "Петербургский художник"',
+      ),
+      'art_space',
+    );
+  });
+
   it('resolves legacy museum_art_space via title', () => {
     assert.equal(resolvePublicVenueType('museum_art_space', 'Третьяковская галерея'), 'museum');
     assert.equal(resolvePublicVenueType('museum_art_space', 'Галерея Ильи Глазунова'), 'art_space');
@@ -29,7 +47,7 @@ describe('museum vs art_space public split', () => {
 
   it('breadcrumb plurals and catalog hrefs', () => {
     assert.equal(venueTypeBreadcrumbPlural('museum'), 'Музеи');
-    assert.equal(venueTypeBreadcrumbPlural('art_space'), 'Арт-пространства');
+    assert.equal(venueTypeBreadcrumbPlural('art_space'), 'Галереи');
     assert.equal(
       venueTypeCatalogHref({ type: 'museum_art_space', name: 'Третьяковская галерея', city: 'Москва' }),
       '/places?type=museum&city=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0',

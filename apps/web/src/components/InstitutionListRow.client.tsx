@@ -16,7 +16,7 @@ export function InstitutionListRow({
   href: string;
 }) {
   const street = formatStreetAddress(venue.address, { city: venue.city });
-  const typeLabel = venueTypeLabel(venue.type);
+  const typeLabel = venueTypeLabel(venue.type, venue.name);
 
   return (
     <Link href={href} className="group flex items-center gap-3 px-4 py-3 transition hover:bg-slate-50 sm:gap-4 sm:px-5 sm:py-3.5">
