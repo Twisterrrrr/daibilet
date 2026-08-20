@@ -110,7 +110,20 @@
 - `/blog`: magazine-only (drop view toggle), swipe topic/filter rails.
 
 ### Проблемы
-- Blog sidecars на MSK - через SSH compress (не в git). Deploy web для UI.
+- ~~Blog sidecars на MSK - через SSH compress (не в git)~~ → 2026-08-20 owner: коммитим `*-card.jpg` в `apps/public` (~5MB), CI sync в web artifact.
+
+## 2026-08-20 - Blog listing cards in git + tmp hygiene
+
+### Наблюдения
+- ~169 untracked `apps/public/.../blog/*-card.jpg` после local `compress-card-images.mjs blog`; listing LCP без них тянет full cover.
+- Корневые `tmp-*.json` и `scripts/tmp-*` - одноразовые geocode/seed audits, в git не должны попадать.
+
+### Решения
+- Закоммичены blog `-card.jpg`; `.gitignore` расширен на `tmp-*.json` / `scripts/tmp-*`.
+- Deploy MSK web подхватывает через `sync-public-assets` на build.
+
+### Проблемы
+- Venue/event catalog sidecars по-прежнему только на диске MSK (тысячи бинарников), не в git.
 
 ## 2026-08-20 - Coords backfill top hubs + tracker hygiene
 

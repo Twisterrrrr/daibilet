@@ -13,14 +13,14 @@
  *
  * Source of truth: apps/public/public/images/ (mirrors to apps/web/public/images if present).
  *
- * Mass cut on MSK (owner / ops — do not commit thousands of binaries):
+ * Mass cut on MSK (owner / ops — do not commit thousands of event/venue binaries):
  *   ssh daibilet-msk
  *   cd /opt/daibilet
  *   node scripts/compress-card-images.mjs events --dry-run
  *   # review wrote/skipped; then without --dry-run
  *   node scripts/compress-card-images.mjs events
- * Sidecars stay next to originals on disk. `git reset --hard` on deploy does not
- * delete untracked `-card.jpg`. Do not `git add` the generated catalog sidecars.
+ * Event/venue sidecars stay on disk only (`git reset --hard` keeps untracked).
+ * Blog listing `blog/*-card.jpg` — commit into apps/public (sync → web build).
  */
 import fs from 'node:fs';
 import path from 'node:path';

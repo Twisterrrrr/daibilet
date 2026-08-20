@@ -33,6 +33,10 @@ data/*.log
 # One-off agent/deploy scratch (smoke scripts, patches) — never commit
 .deploy-tmp/
 tmp-*/
+tmp-*.json
+tmp-*.txt
+scripts/tmp-*
+scripts/analyze-seed-thin.*
 
 # Generated supplier snapshots and local SQL dumps
 data/ticketscloud/*.json
