@@ -540,36 +540,43 @@ export const KAZAN_SUBURBS: any[] = [
     places: [
       {
         name: 'Успенский монастырь',
+        locationSlug: 'kazan-uspenskiy-monastyr-sviyazhsk',
         desc: 'Белокаменный ансамбль ЮНЕСКО - ядро острова.',
         visitMinutes: 60,
       },
       {
         name: 'Собор иконы Божией Матери «Всех скорбящих Радость»',
+        locationSlug: 'kazan-sobor-vseh-skorbyaschih-sviyazhsk',
         desc: 'Краснокирпичный храм с высокой колокольней.',
         visitMinutes: 30,
       },
       {
         name: 'Троицкая церковь',
+        locationSlug: 'kazan-troitskaya-tserkov-sviyazhsk',
         desc: 'Деревянный храм XVI века - один из старейших на острове.',
         visitMinutes: 25,
       },
       {
         name: 'Музей археологического дерева',
+        locationSlug: 'kazan-muzey-arheologicheskogo-dereva',
         desc: 'Находки из влажной почвы Свияжска под крышей.',
         visitMinutes: 40,
       },
       {
         name: 'Рождественская площадь',
+        locationSlug: 'kazan-rozhdestvenskaya-ploschad-sviyazhsk',
         desc: 'Центральная площадь с видами на Волгу.',
         visitMinutes: 20,
       },
       {
         name: 'Конный двор',
+        locationSlug: 'kazan-konnyy-dvor-sviyazhsk',
         desc: 'Ремесленные мастерские, кафе и сувениры.',
         visitMinutes: 40,
       },
       {
         name: 'Смотровая площадка',
+        locationSlug: 'kazan-smotrovaya-sviyazhsk',
         desc: 'Панорама Волги и Свияги на финал маршрута.',
         visitMinutes: 20,
       },
@@ -589,36 +596,43 @@ export const KAZAN_SUBURBS: any[] = [
     places: [
       {
         name: 'Мемориальный знак принятия ислама',
+        locationSlug: 'kazan-memorial-prinyatiya-islama-bolgar',
         desc: 'Точка памяти о крещении Волжской Булгарии в ислам.',
         visitMinutes: 20,
       },
       {
         name: 'Соборная мечеть',
+        locationSlug: 'kazan-sobornaya-mechet-bolgar',
         desc: 'Руины главной мечети средневекового Болгара.',
         visitMinutes: 30,
       },
       {
         name: 'Восточная палата',
+        locationSlug: 'kazan-vostochnaya-palata-bolgar',
         desc: 'Остатки дворцового комплекса булгарской знати.',
         visitMinutes: 25,
       },
       {
         name: 'Черная палата',
+        locationSlug: 'kazan-chernaya-palata-bolgar',
         desc: 'Загадочное купольное сооружение городища.',
         visitMinutes: 25,
       },
       {
         name: 'Малый минарет',
+        locationSlug: 'kazan-malyy-minaret-bolgar',
         desc: 'Сохранившийся минарет с узкой винтовой лестницей.',
         visitMinutes: 20,
       },
       {
         name: 'Музей болгарской цивилизации',
+        locationSlug: 'kazan-muzey-bolgarskoy-tsivilizatsii',
         desc: 'Артефакты и история Волжской Булгарии.',
         visitMinutes: 60,
       },
       {
         name: 'Белая мечеть',
+        locationSlug: 'kazan-belaya-mechet-bolgar',
         desc: 'Современный беломраморный храм у воды - финальный кадр.',
         visitMinutes: 30,
       },
