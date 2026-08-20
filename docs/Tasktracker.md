@@ -19,8 +19,8 @@
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| CONT.ROSTOV-PENZA-TVER-HUBS | Хабы Ростов/Пенза/Тверь: identity / whenToGo / 50+ mustSee / suburbs / lines / FAQ / lifehacks / фестивали + public sync | Высокий | 🔄 code; commit+push+Deploy MSK web |
-| UX.MUSTSEE-MAIN-SHARED | «Главные» - общий топ города: `alsoMain` + backfill до 6, точки остаются в тематических вкладках | Высокий | 🔄 code |
+| CONT.ROSTOV-PENZA-TVER-HUBS | Хабы Ростов/Пенза/Тверь: identity / whenToGo / 50+ mustSee / suburbs / lines / FAQ / lifehacks / фестивали + public sync | Высокий | ✅ live (хабы + locations); public sync via web canon |
+| UX.MUSTSEE-MAIN-SHARED | «Главные» - общий топ города: `alsoMain` + backfill до 6, точки остаются в тематических вкладках | Высокий | ✅ code live (Deploy MSK web batch 2026-08) |
 | GEO.CITIES-STANDALONE-CARDS | `/cities`: Тольятти/Сургут/Новокузнецк при events>5; Ханты-Мансийск как адмцентр; preview+coords; alias `khanty-mansiysk` | Высокий | ✅ live: destinations city + `/cities/*` 200; Сортавала fold (events≤5), URL/search OK |
 
 ## 2026-08-18 - Tolyatti/Surgut city cards + previews
@@ -47,8 +47,8 @@
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| GEO.VYBORG-HUB-CRASH | Live `/cities/leningradskaya-oblast?city=vyborg`: убрать JSX title/meta (webpack `undefined.call`); фильтр сессий без throw | Критический | 🔄 code; commit+push+Deploy MSK web |
-| GEO.HEADER-SEARCH-SATELLITES | Шапка: Выборг/Раменское через `matchSearchGeoHits` (формула A, до 2 geo), места/события не пустые | Критический | 🔄 code; commit+push+Deploy MSK web |
+| GEO.VYBORG-HUB-CRASH | Live `/cities/leningradskaya-oblast?city=vyborg`: убрать JSX title/meta (webpack `undefined.call`); фильтр сессий без throw | Критический | ✅ live 200 `?city=vyborg` |
+| GEO.HEADER-SEARCH-SATELLITES | Шапка: Выборг/Раменское через `matchSearchGeoHits` (формула A, до 2 geo), места/события не пустые | Критический | ✅ live search geo |
 
 ## 2026-08-17 - Туристический хаб Омска
 
@@ -84,7 +84,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| GEO.KHANTY-CITIES-CARD | Адмцентр ХМАО: карточка `/cities` с 1 saleable; не gate >5; не fold в округ | Критический | 🔄 code; commit+push+Deploy MSK web |
+| GEO.KHANTY-CITIES-CARD | Адмцентр ХМАО: карточка `/cities` с 1 saleable; не gate >5; не fold в округ | Критический | ✅ live `/cities/hanty-mansiysk` 200; destinations events=2 |
 
 ## 2026-08-17 - My Day mobile sticky collapse
 
@@ -764,8 +764,8 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| UX.CITY-SYNC-B | Variant B: Event PDP persistOnly sync; catalog city-empty hubs; global setCity guard + CityConfirmModal; foreign-city add clear+sync | Высокий | 🔄 code; deploy batch / по запросу |
-| MYDAY.TRIPS-PER-CITY | Variant A: storage map по `citySlug`, badge per city, без удаления маршрута при switch | Высокий | ⏳ Запланировано; критерий старта - стабилизация B на live |
+| UX.CITY-SYNC-B | Variant B: Event PDP persistOnly sync; catalog city-empty hubs; global setCity guard + CityConfirmModal; foreign-city add clear+sync | Высокий | ✅ live (persistOnly + CityConfirmModal); A не стартуем |
+| MYDAY.TRIPS-PER-CITY | Variant A: storage map по `citySlug`, badge per city, без удаления маршрута при switch | Высокий | ⏳ deferred (qa): один bucket dayRoute; A = multi-city map без wipe при switch |
 
 ## SEO listing + My Day routes (2026-08-11)
 
@@ -2383,7 +2383,7 @@ Owner-locked порядок: Hero → Советы → Расписание → 
 | Контур | Ближайшее | Средний горизонт |
 |--------|-----------|------------------|
 | **Geo / хабы** | Destination registry 86/86; hub seed +80 Venue; public cityInfo DEPRECATED mirror | Region child guides для satellite-city; editorial coords для ~359 thin hubs |
-| **Catalog / SEO** | Standalone cards events>5 (Тольятти/Сургут); restart API для destinations | Allowlist + cityToRegion consistency; `/cities` map all destinations |
+| **Catalog / SEO** | Standalone cards events>5 live; podborki pilot KGD+SPB ждать Вебмастер | Allowlist consistency; `/cities` map; ЧПУ `/podborki/c/{city}` после индексации |
 | **Контент** | Blog inline UI deploy; city hub lifehacks | Региональные статьи под новые destination pages |
 | **Finance / LC** | Stage 0 sandbox pay → CONFIRMED (`.159`) | Supplier LK M1, operator reconcile (qa.md § Roadmap) |
 | **Perf / ops** | MSK web batch deploy; не гонять build на каждый UI-фикс | TC sync timer; image remotePatterns follow-ups |

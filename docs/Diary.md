@@ -1,3 +1,18 @@
+## 2026-08-20 - Coords backfill top hubs + tracker hygiene
+
+### Наблюдения
+- После relax seed gate «thin с address без coords» в top-хабах почти не осталось; дыра - mustSee в `cityInfo` без lat/lng (KGD/NN/VN/Vladimir/Yaroslavl/Tula и др.).
+- Источники: catalog API (уже seeded Venue) + Nominatim; Yandex Geocoder API без ключа недоступен.
+- Парсер dry-run путал quoted city keys (`'nizhny-novgorod'`) - для патча брали только slug с префиксом города.
+
+### Решения
+- В `cityInfo.ts` проставлены coords (~102 точек; thin no-coords 359→255). Источник преимущественно catalog-api.
+- Tasktracker: GEO standalone / Vyborg / Khanty / Rostov hubs / CITY-SYNC-B помечены live; MYDAY.TRIPS-PER-CITY оставлен deferred.
+
+### Проблемы
+- Остаток ~255 без coords - мелкие/региональные хабы; следующий пасс по запросу.
+- My Day Variant A (trips-per-city) не баг: осознанный defer после B.
+
 ## 2026-08-20 - Hub seed gate + public cityInfo sync + cities promotion
 
 ### Наблюдения
