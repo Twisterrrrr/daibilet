@@ -368,8 +368,8 @@ export function RegionPageView({
   const tabs = React.useMemo(() => {
     if (isTierC) {
       return [
-        { id: 'bridge', label: centerCity ? `Афиша ${centerCityGenitive}` : 'Центр', show: Boolean(centerCity) },
         { id: 'affiche', label: 'События', show: eventTotal > 0 },
+        { id: 'bridge', label: centerCity ? `Афиша ${centerCityGenitive}` : 'Центр', show: Boolean(centerCity) },
       ].filter((tab) => tab.show);
     }
     return [
@@ -377,6 +377,7 @@ export function RegionPageView({
       { id: 'cities', label: 'Города', show: childCities.some((c) => c.eventCount > 0) || childCities.length > 0 },
       { id: 'places', label: 'Куда съездить', show: topPlaces.length > 0 },
       { id: 'affiche', label: 'События', show: true },
+      { id: 'bridge', label: centerCity ? `Афиша ${centerCityGenitive}` : 'Центр', show: Boolean(centerCity) },
       { id: 'faq', label: 'FAQ', show: faqItems.length > 0 },
     ].filter((tab) => tab.show);
   }, [childCities, topPlaces.length, faqItems.length, isTierC, centerCity, centerCityGenitive, eventTotal, destinationGuide]);
@@ -482,40 +483,6 @@ export function RegionPageView({
               ))}
             </div>
           </nav>
-        ) : null}
-
-        {centerCity ? (
-          <section id="bridge" className={`border-b border-slate-100 bg-white ${SECTION_SCROLL_MT}`}>
-            <div className="container-page py-8">
-              <Link
-                href={cityHref({ slug: centerCity.slug, name: centerCity.name })}
-                className="group flex flex-col gap-3 rounded-2xl border border-emerald-200/80 bg-emerald-50/60 px-5 py-5 transition hover:border-emerald-300 hover:bg-emerald-50 sm:flex-row sm:items-center sm:justify-between sm:px-6"
-              >
-                <div className="min-w-0">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-emerald-800/80">
-                    {isTierC ? 'Сейчас лучше смотреть центр' : 'Мост в центр'}
-                  </p>
-                  <p className="mt-1 text-base font-semibold text-slate-950 sm:text-lg">
-                    {isTierC
-                      ? eventTotal > 0
-                        ? `Событий за городом мало. Полная афиша - ${centerCityIn}`
-                        : `Сейчас за городом ничего не происходит. Посмотрите афишу ${centerCityGenitive}`
-                      : `Ищете больше событий? Перейти к афише ${centerCityGenitive}`}
-                    {centerCity.eventCount > 0 ? (
-                      <span className="font-medium text-slate-600">
-                        {' '}
-                        ({formatNumber(centerCity.eventCount)} {pluralEvents(centerCity.eventCount)})
-                      </span>
-                    ) : null}
-                  </p>
-                </div>
-                <span className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-900 group-hover:gap-3">
-                  На страницу {centerCityGenitive}
-                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </span>
-              </Link>
-            </div>
-          </section>
         ) : null}
 
         {destinationGuide ? (
