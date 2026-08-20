@@ -36,7 +36,7 @@ test('canonicalize rewrites hyphen query to ?city=', () => {
   assert.equal(canonicalizeRegionChildCitySearch('city=vyborg'), null);
 });
 
-test('H1 formula A for Выборг query on LO hub', () => {
+test('H1 is city-only; Formula A stays on locatorLabel', () => {
   const chrome = buildRegionChildCityChrome({
     ...LO,
     search: 'city=vyborg',
@@ -44,7 +44,9 @@ test('H1 formula A for Выборг query on LO hub', () => {
   });
   assert.ok(chrome);
   assert.equal(chrome.child.name, 'Выборг');
-  assert.equal(chrome.h1, 'Выборг, Ленинградская область • Ближайшие события');
+  assert.equal(chrome.h1, 'Выборг');
+  assert.equal(chrome.regionLine, 'Ленинградская область');
+  assert.equal(chrome.locatorLabel, 'Выборг, Ленинградская область • Ближайшие события');
   assert.match(chrome.lead, /в Выборге и ближайших населенных пунктах Ленинградской области/);
   assert.ok(!chrome.lead.includes('—'));
   assert.ok(!chrome.lead.includes('–'));
@@ -53,7 +55,8 @@ test('H1 formula A for Выборг query on LO hub', () => {
 
 test('broken hyphen query still scopes H1 to Выборг', () => {
   const chrome = buildRegionChildCityChrome({ ...LO, search: 'city-vyborg' });
-  assert.equal(chrome?.h1, 'Выборг, Ленинградская область • Ближайшие события');
+  assert.equal(chrome?.h1, 'Выборг');
+  assert.equal(chrome?.locatorLabel, 'Выборг, Ленинградская область • Ближайшие события');
 });
 
 test('cityToRegion fallback when child is missing from payload', () => {
@@ -64,7 +67,7 @@ test('cityToRegion fallback when child is missing from payload', () => {
     search: 'city=vyborg',
   });
   assert.equal(chrome?.child.name, 'Выборг');
-  assert.equal(chrome?.h1, 'Выборг, Ленинградская область • Ближайшие события');
+  assert.equal(chrome?.h1, 'Выборг');
 });
 
 test('region or unknown query does not rewrite H1', () => {

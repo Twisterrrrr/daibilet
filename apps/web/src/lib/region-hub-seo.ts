@@ -47,6 +47,14 @@ export function childCityTitleGenitive(cityName: string): string {
 }
 
 /**
+ * Visible H1 on region child scope - city only (SPB hub pattern).
+ * Formula A with «• Ближайшие события» stays for search labels, not the page H1.
+ */
+export function buildChildCityHeroH1(cityName: string): string {
+  return stripCityDisambiguator(String(cityName || '').trim()) || 'Город';
+}
+
+/**
  * H1 / search label (locator). Без «Афиша» - она уже в title.
  * «Раменское, Московская область • Ближайшие события».
  * Catalog may store «Отрадное (Ленинградская область)» - strip before Formula A.

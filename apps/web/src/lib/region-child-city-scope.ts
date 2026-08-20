@@ -6,6 +6,7 @@ import {
 } from '../../../backend/src/search-geo-match.ts';
 
 import {
+  buildChildCityHeroH1,
   buildChildCityScopeLabel,
   buildChildCityScopeLead,
   buildChildCityScopeSeoTitle,
@@ -24,7 +25,12 @@ export type RegionChildCityMatch = {
 
 export type RegionChildCityChrome = {
   child: RegionChildCityMatch;
+  /** Visible page H1 - city name only. */
   h1: string;
+  /** Soft line under H1 / breadcrumb context. */
+  regionLine: string;
+  /** Formula A locator (search / geo), not the page H1. */
+  locatorLabel: string;
   lead: string;
   title: string;
 };
@@ -87,7 +93,9 @@ export function buildRegionChildCityChrome(
   if (!child) return null;
   return {
     child,
-    h1: buildChildCityScopeLabel(child.name, input.regionName),
+    h1: buildChildCityHeroH1(child.name),
+    regionLine: String(input.regionName || '').trim(),
+    locatorLabel: buildChildCityScopeLabel(child.name, input.regionName),
     lead: buildChildCityScopeLead(child.name, input.regionName),
     title: buildChildCityScopeSeoTitle(child.name, input.now),
   };

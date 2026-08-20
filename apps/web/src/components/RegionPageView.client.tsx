@@ -7,6 +7,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import { DestinationRegionGuide } from '@/components/DestinationRegionGuide.client';
 import { HubEventsAfficheRail } from '@/components/HubEventsAfficheRail.client';
+import { PageBreadcrumbBar } from '@/components/PageBreadcrumbs';
 import { RegionOrientMap, type RegionMapPoint } from '@/components/RegionOrientMap.client';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { formatNumber } from '@/lib/format';
@@ -48,7 +49,7 @@ import type {
   PublicSessionDto,
 } from '@daibilet/contracts/public';
 import { resolveRegionLiveTier } from '@daibilet/contracts/common';
-import { cityToGenitive, inCityPrepositional } from '@/lib/city-declension';
+import { cityToGenitive, inCityPrepositional, stripCityDisambiguator } from '@/lib/city-declension';
 
 const SECTION_SCROLL_MT = 'scroll-mt-[calc(var(--site-header-height)+7rem)]';
 const AFFICHE_FILTER_STICKY =
@@ -146,6 +147,30 @@ export function RegionPageView({
   );
   const cityFilter = childChrome ? [childChrome.child.name] : null;
   const heading = childChrome?.h1 || city?.name || '';
+  const childCityDisplay = childChrome
+    ? stripCityDisambiguator(childChrome.child.name) || childChrome.child.name
+    : null;
+  const breadcrumbItems = React.useMemo(() => {
+    // Region child: Главная > {хаб} > {область} > {город}.
+    // Region root: Главная > {хаб} > {область}.
+    const items: Array<{ label: string; href?: string }> = [{ label: 'Главная', href: '/' }];
+    if (centerCity) {
+      items.push({
+        label: centerCity.name,
+        href: cityHref({ slug: centerCity.slug, name: centerCity.name }),
+      });
+    }
+    if (city) {
+      items.push({
+        label: city.name,
+        href: childChrome ? cityHref({ slug, name: city.name }) : undefined,
+      });
+    }
+    if (childChrome && childCityDisplay) {
+      items.push({ label: childCityDisplay });
+    }
+    return items;
+  }, [city, centerCity, childChrome, childCityDisplay, slug]);
   const regionBrief =
     regionInfo?.brief?.trim() ||
     (city
@@ -383,58 +408,60 @@ export function RegionPageView({
   return (
     <div className="bg-white text-slate-900">
       <main>
+        <PageBreadcrumbBar items={breadcrumbItems} hideLastOnMobile />
         <section id="top" className="border-b border-slate-200 bg-white">
-          <div className="container-page py-12 sm:py-14">
-            <div className="flex items-center gap-2 text-sm text-slate-500">
-              <Link href="/" className="hover:text-slate-800">
-                Главная
-              </Link>
-              <span>/</span>
-              <span className="text-slate-800">Направление</span>
-            </div>
-            <h1 className="mt-5 max-w-4xl text-4xl font-extrabold tracking-tight text-slate-950 sm:text-5xl">
+          <div className="container-page py-10 sm:py-12">
+            {childChrome?.regionLine ? (
+              <p className="text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                {childChrome.regionLine}
+              </p>
+            ) : null}
+            <h1
+              className={
+                childChrome
+                  ? 'mt-3 max-w-4xl font-display text-4xl font-extrabold tracking-tight text-slate-950 sm:text-5xl'
+                  : 'mt-1 max-w-4xl text-4xl font-extrabold tracking-tight text-slate-950 sm:text-5xl'
+              }
+            >
               {heading}
             </h1>
             <p className="mt-3 max-w-3xl text-base leading-7 text-slate-600 sm:text-lg">{brief}</p>
-            <p className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-600">
-              <span>
-                <span className="font-semibold text-slate-900">
-                  {formatNumber(childChrome ? sessions.length : statsEvents)}
-                </span>{' '}
-                {childChrome ? `событий ${inCityPrepositional(childChrome.child.name)}` : 'событий в регионе'}
+            <div className="mt-5 flex flex-wrap gap-2">
+              <span className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-800">
+                {formatNumber(childChrome ? sessions.length : statsEvents)}{' '}
+                {childChrome
+                  ? `событий ${inCityPrepositional(childChrome.child.name)}`
+                  : 'событий в регионе'}
               </span>
-              <span aria-hidden="true" className="text-slate-300">
-                ·
+              <span className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-800">
+                {formatNumber(statsVenues)} площадок
               </span>
-              <span>
-                <span className="font-semibold text-slate-900">{formatNumber(statsVenues)}</span> площадок
-              </span>
-            </p>
+            </div>
             <div className="mt-6 flex flex-wrap gap-3">
-              {centerCity ? (
-                <Link
-                  href={cityHref({ slug: centerCity.slug, name: centerCity.name })}
-                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-slate-900 px-5 text-sm font-semibold text-white hover:bg-slate-800"
-                >
-                  <Ticket className="h-4 w-4 shrink-0" aria-hidden="true" />
-                  Афиша {centerCityGenitive}
-                </Link>
-              ) : null}
-              {!isTierC || eventTotal > 0 ? (
+              {!isTierC || eventTotal > 0 || childChrome ? (
                 <a
                   href="#affiche"
                   onClick={(event) => {
                     event.preventDefault();
                     scrollToSection('affiche');
                   }}
-                  className="inline-flex min-h-11 items-center justify-center rounded-lg border border-slate-300 px-5 text-sm font-semibold text-slate-800 hover:bg-slate-50"
+                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-slate-900 px-5 text-sm font-semibold text-white hover:bg-slate-800"
                 >
+                  <Ticket className="h-4 w-4 shrink-0" aria-hidden="true" />
                   {childChrome
-                    ? `Смотреть события ${cityToGenitive(childChrome.child.name)}`
+                    ? `Афиша ${cityToGenitive(childChrome.child.name)}`
                     : isTierC
                       ? 'Редкие события области'
                       : 'Смотреть события'}
                 </a>
+              ) : null}
+              {centerCity && !childChrome ? (
+                <Link
+                  href={cityHref({ slug: centerCity.slug, name: centerCity.name })}
+                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 hover:bg-slate-50"
+                >
+                  Афиша {centerCityGenitive}
+                </Link>
               ) : null}
             </div>
           </div>

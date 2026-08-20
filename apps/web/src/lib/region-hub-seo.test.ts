@@ -3,6 +3,7 @@ import test from 'node:test';
 
 import { cityToGenitive } from './city-declension.ts';
 import {
+  buildChildCityHeroH1,
   buildChildCityScopeLabel,
   buildChildCityScopeLead,
   buildChildCityScopeSeoTitle,
@@ -59,6 +60,7 @@ test('catalog disambiguator is not repeated next to region in Formula A', () => 
     buildChildCityScopeLabel('Отрадное (Ленинградская область)', 'Ленинградская область'),
     'Отрадное, Ленинградская область • Ближайшие события',
   );
+  assert.equal(buildChildCityHeroH1('Отрадное (Ленинградская область)'), 'Отрадное');
   const lead = buildChildCityScopeLead('Отрадное (Ленинградская область)', 'Ленинградская область');
   assert.match(lead, /в Отрадном и ближайших населенных пунктах Ленинградской области/);
   assert.ok(!lead.includes('(Ленинградская область)'));
