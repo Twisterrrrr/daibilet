@@ -1,3 +1,15 @@
+## 2026-08-20 - Hub suburbs: vertical scroll stuck
+
+### Наблюдения
+- На `#city-suburbs` колесо не крутило страницу: body карточки `overflow-y-auto` + `overscroll-y-contain`, внутри - горизонтальный `SuburbPlacesPhotoRail` / `ScrollRail` (deltaY → scrollLeft).
+
+### Решения
+- `ScrollRail`: вертикальный wheel → nearest overflow-y / page; shift/deltaX без изменений.
+- `DayTripCanonCard`: `min-h-0`, убрали `overscroll-y-contain`.
+
+### Проблемы
+- Live после Deploy MSK web.
+
 ## 2026-08-20 - Hub events: TicketsCloud via /_next/image
 
 ### Наблюдения

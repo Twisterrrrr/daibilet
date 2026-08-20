@@ -1,3 +1,9 @@
+## 2026-08-20 - Hub suburbs scroll
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| FIX.HUB-SUBURB-WHEEL | Вертикальный скролл на пригородах хаба (ScrollRail + DayTripCanonCard) | Высокий | 🔄 code; live после Deploy MSK web |
+
 ## 2026-08-20 - Hub events image size
 
 | ID | Задача | Приоритет | Статус |
