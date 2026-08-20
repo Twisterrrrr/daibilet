@@ -1,3 +1,14 @@
+## 2026-08-20 - Region affiche = city hub EventCard rail
+
+### Наблюдения
+- Child Выборг: «СЕРИЯ НА ПЛОЩАДКЕ» (`RegionVenueSeriesCard`) без постеров - не как city hub «Ближайшие события».
+
+### Решения
+- Shared `HubEventsAfficheRail` (ScrollRail + `EventCard` showcaseRail cityHub + standup group) в `RegionPageView`. Без region invent.
+
+### Проблемы
+- Нет.
+
 ## 2026-08-20 - Suburb nested places: photo rail everywhere
 
 ### Наблюдения

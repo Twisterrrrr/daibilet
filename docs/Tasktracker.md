@@ -2,7 +2,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| UX.SUBURB-PLACES-PHOTO-RAIL | Nested places пригородов: ScrollRail фотокарточки на хабе + region child; Vyborg P0 JPG×6 | Высокий | ✅ live Deploy `32366488438` SHA `7309f5e` |
+| UX.REGION-AFFICHE-CITY-RAIL | Region/child афиша = city hub poster rail (`HubEventsAfficheRail`), без «серия на площадке» | Высокий | 🔄 ship+Deploy MSK web |
 
 ## 2026-08-20 - Region child guide + affiche copy
 
