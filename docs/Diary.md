@@ -1,3 +1,18 @@
+## 2026-08-20 - Hub seed gate + public cityInfo sync + cities promotion
+
+### Наблюдения
+- Точки mustSee не попадали в каталог: gate требовал address; `Number("")`/`null` → lat/lng `0` → ложный thin. Без coords реально ~359; generic gastro ~4.
+- `apps/public/cityInfo` дублировал suburbs без registry.
+- Promotion cityToRegion уже live: Тольятти 11 / Сургут 13 / Новокузнецк 11 / Ханты-Мансийск 2 (адмцентр). Сортавала 0 events - fold с `/cities` grid, URL+search 200.
+
+### Решения
+- Seed: address optional + `resolveSeedAddress` → `г. {City}`; `finiteCoord`; canon только `apps/web/.../cityInfo.ts`. MSK apply **+80** Venue.
+- Public: `sync-public-cityinfo-canon.mjs` + suburb modules/cards; cityInfo DEPRECATED banner.
+- Brief Lovable: `docs/lovable-events-places-ux-brief.md` (UX skin, тот же `/events`/`/places` backend).
+
+### Проблемы
+- ~359 hub points без lat/lng остаются hub-only до editorial coords. Сортавала на сетке `/cities` - только после events>5.
+
 ## 2026-08-20 - Venue -card sidecars on MSK + hub locations live
 
 ### Наблюдения

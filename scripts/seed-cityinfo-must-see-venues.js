@@ -24,6 +24,7 @@ const {
   toSeedPlan,
   HUB_PLACE_SLUG_ALIASES,
   hasMinimalLocationProfile,
+  resolveSeedAddress,
   sanitizeEditorialText,
 } = require('./lib/hub-must-see-seed');
 
@@ -31,8 +32,8 @@ const rootDir = path.resolve(__dirname, '..');
 loadRootEnv(rootDir);
 
 const CITY_INFO_PATHS = [
+  // Canon: Next web hub + destination registry. Vite public mirror is deprecated.
   path.join(rootDir, 'apps/web/src/lib/cityInfo.ts'),
-  path.join(rootDir, 'apps/public/src/lib/cityInfo.ts'),
 ];
 
 const CITY_SLUG_ALIASES = {
@@ -212,6 +213,12 @@ const dryRun = process.argv.includes('--dry-run') || !process.argv.includes('--a
 const writeCityInfo = process.argv.includes('--write-cityinfo');
 const citiesFilter = parseCitiesFilter(process.argv);
 
+function finiteCoord(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n) || Math.abs(n) < 1) return null;
+  return n;
+}
+
 const connectionString =
   process.env.DATABASE_URL || 'postgresql://daibilet:daibilet@127.0.0.1:5437/daibilet';
 
@@ -273,9 +280,12 @@ async function main() {
       canonicalPath,
       hadSlug: Boolean(existingSlug),
       slugField: inferred.family === 'institution' ? 'venueSlug' : 'locationSlug',
-      address: item.address || null,
-      latitude: Number.isFinite(Number(item.latitude)) ? Number(item.latitude) : null,
-      longitude: Number.isFinite(Number(item.longitude)) ? Number(item.longitude) : null,
+      address: resolveSeedAddress(
+        item,
+        (CITY_TITLE_ALIASES[item.cityKey] && CITY_TITLE_ALIASES[item.cityKey][0]) || null,
+      ),
+      latitude: finiteCoord(item.latitude),
+      longitude: finiteCoord(item.longitude),
     };
 
     if (
@@ -314,7 +324,16 @@ async function main() {
 
   const byAction = countBy(planned.map((p) => p.action));
   const skipNoCity = planned.filter((p) => p.action === 'skip-no-city');
+  const skipThin = planned.filter((p) => p.action === 'skip-thin-profile');
   const skipNoCityByCity = countBy(skipNoCity.map((p) => p.cityKey));
+  const thinReasons = countBy(
+    skipThin.map((p) => {
+      if (!Number.isFinite(p.latitude) || !Number.isFinite(p.longitude)) return 'no-coords';
+      if (String(p.desc || '').trim().length < 24) return 'short-desc';
+      if (String(p.name || '').trim().length < 4) return 'short-name';
+      return 'generic-or-other';
+    }),
+  );
   const report = {
     dryRun,
     writeCityInfo,
@@ -328,11 +347,20 @@ async function main() {
       byFamily: countBy(planned.map((p) => p.family)),
       byAction,
       skipNoCityByCity,
+      thinReasons,
     },
     skipNoCitySample: skipNoCity.slice(0, 30).map((p) => ({ cityKey: p.cityKey, name: p.name })),
-    sample: planned.slice(0, 25),
+    thinSample: skipThin.slice(0, 20).map((p) => ({
+      cityKey: p.cityKey,
+      name: p.name,
+      hasCoords: Number.isFinite(p.latitude) && Number.isFinite(p.longitude),
+      address: p.address,
+      descLen: String(p.desc || '').trim().length,
+      generic: require('./lib/hub-must-see-seed').isGenericUnnamedPlace(p.name),
+    })),
+    sample: planned.filter((p) => p.action !== 'skip-thin-profile').slice(0, 25),
     note:
-      'Catalog listing needs deployed hub-gate (content-place without events). Seed alone is not enough on live MSK until dto.js is restarted with isContentPlaceHubEligible.',
+      'Catalog listing: hub-gate isContentPlaceHubEligible must be live. Thin skips = no coords / generic gastro names.',
   };
 
   if (writeCityInfo) {

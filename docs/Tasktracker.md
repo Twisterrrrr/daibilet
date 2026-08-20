@@ -11,7 +11,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| CAT.HUB-LOCATION-PAGES | Завести `/locations` (и institution `/venues`) из mustSee Ростов/Пенза/Тверь при min profile | Высокий | ✅ live MSK: Venue в prod (Ростов/Пенза/Тверь PARK+MONUMENT+hub slugs 200) |
+| CAT.HUB-LOCATION-PAGES | Завести `/locations` (и institution `/venues`) из mustSee хабов при min profile (coords+текст; address fallback `г. {City}`) | Высокий | ✅ live MSK: +80 Venue (apply 2026-08-20); gate без address; ~359 без coords остаются hub-only |
 | UX.PLACES-FAMILY-SSR | SSR `/places?family=location` отдаёт локации, не mixed `all` | Средний | ✅ code |
 | QA.PLACES-HREF-AUDIT | Проверить все href `/places` + хаб-slug на 404; вычистить copy «точка на карте» | Высокий | ✅ catalog 200; seed object-hubs local +378; prod apply + Deploy MSK web |
 
@@ -21,13 +21,15 @@
 |---|---|---|---|
 | CONT.ROSTOV-PENZA-TVER-HUBS | Хабы Ростов/Пенза/Тверь: identity / whenToGo / 50+ mustSee / suburbs / lines / FAQ / lifehacks / фестивали + public sync | Высокий | 🔄 code; commit+push+Deploy MSK web |
 | UX.MUSTSEE-MAIN-SHARED | «Главные» - общий топ города: `alsoMain` + backfill до 6, точки остаются в тематических вкладках | Высокий | 🔄 code |
-| GEO.CITIES-STANDALONE-CARDS | `/cities`: Тольятти/Сургут/Новокузнецк при events>5; Ханты-Мансийск как адмцентр; preview+coords; alias `khanty-mansiysk` | Высокий | 🔄 web assets; live destinations ждут restart `daibilet-api` |
+| GEO.CITIES-STANDALONE-CARDS | `/cities`: Тольятти/Сургут/Новокузнецк при events>5; Ханты-Мансийск как адмцентр; preview+coords; alias `khanty-mansiysk` | Высокий | ✅ live: destinations city + `/cities/*` 200; Сортавала fold (events≤5), URL/search OK |
 
 ## 2026-08-18 - Tolyatti/Surgut city cards + previews
 
 | ID | Задача | Priority | Status |
 |---|---|---|---|
-| GEO.CITIES-STANDALONE-CARDS | `/api/public/destinations` и `/cities`: Тольятти/Сургут как standalone `type=city` при `events > 5`, плюс coords и card previews без placeholder | Высокий | ✅ code+tests+assets локально; push pending, live deploy не делали |
+| GEO.CITIES-STANDALONE-CARDS | `/api/public/destinations` и `/cities`: Тольятти/Сургут как standalone `type=city` при `events > 5`, плюс coords и card previews без placeholder | Высокий | ✅ superseded: live smoke 2026-08-20 (см. строку 2026-08-18 выше) |
+| SYNC.PUBLIC-CITYINFO | Vite `apps/public` cityInfo = DEPRECATED mirror web registry (suburb modules + sync script) | Средний | ✅ script + modules; seed читает только web |
+| UX.LOVABLE-EVENTS-PLACES | Brief Lovable: refresh UI `/events`+`/places`, тот же backend/DTO | Средний | ✅ `docs/lovable-events-places-ux-brief.md` |
 
 ## 2026-08-18 - Museums leave sights in catalog
 
@@ -2372,7 +2374,7 @@ Owner-locked порядок: Hero → Советы → Расписание → 
 | **P2** | Auto-hydrate registry from `CITY_INFO`; audit 86/86 | ✅ локально |
 | **P3** | Bulk nature day-trips via `destination-registry-auto.ts` | ✅ 57 auto entries |
 
-**Метрики:** migrated **86/86** (29 manual + 57 auto-hydrate). `apps/public/cityInfo` sync - отложено (web = source of truth).
+**Метрики:** migrated **86/86** (29 manual + 57 auto-hydrate). `apps/public/cityInfo` - DEPRECATED mirror: suburb modules + cards synced from web (`scripts/sync-public-cityinfo-canon.mjs`).
 
 ---
 
@@ -2380,7 +2382,7 @@ Owner-locked порядок: Hero → Советы → Расписание → 
 
 | Контур | Ближайшее | Средний горизонт |
 |--------|-----------|------------------|
-| **Geo / хабы** | Destination registry P1 (Moscow), hub location seed live | Region child guides для всех satellite-city; deprecate duplicate `apps/public/cityInfo` |
+| **Geo / хабы** | Destination registry 86/86; hub seed +80 Venue; public cityInfo DEPRECATED mirror | Region child guides для satellite-city; editorial coords для ~359 thin hubs |
 | **Catalog / SEO** | Standalone cards events>5 (Тольятти/Сургут); restart API для destinations | Allowlist + cityToRegion consistency; `/cities` map all destinations |
 | **Контент** | Blog inline UI deploy; city hub lifehacks | Региональные статьи под новые destination pages |
 | **Finance / LC** | Stage 0 sandbox pay → CONFIRMED (`.159`) | Supplier LK M1, operator reconcile (qa.md § Roadmap) |

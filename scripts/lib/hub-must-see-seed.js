@@ -165,6 +165,36 @@ function parsePlaceHelperCalls(source, cityKey) {
   return rows;
 }
 
+/**
+ * Ryazan-style helpers:
+ * loc(name, desc, address, locationSlug, filter, minutes, lat, lng)
+ * venue(name, desc, address, venueSlug, filter, minutes, lat, lng)
+ * Nested suburb `places: [ loc() ]` use deeper indent and are skipped.
+ */
+function parseLocVenueHelperCalls(source, cityKey) {
+  const rows = [];
+  const re =
+    /^(?<indent>[ \t]*)(?<helper>loc|venue)\(\s*'(?<name>(?:\\'|[^'])*)'\s*,\s*'(?<desc>(?:\\'|[^'])*)'\s*,\s*'(?<address>(?:\\'|[^'])*)'\s*,\s*'(?<slug>(?:\\'|[^'])*)'\s*,\s*'(?<filter>(?:\\'|[^'])*)'\s*,\s*(?:\d+(?:\.\d+)?|'[^']*')\s*,\s*(?<lat>-?\d+(?:\.\d+)?)\s*,\s*(?<lng>-?\d+(?:\.\d+)?)\s*,?\s*\)/gm;
+  let m;
+  while ((m = re.exec(source))) {
+    const helper = m.groups.helper;
+    const slug = unescapeTs(m.groups.slug);
+    rows.push({
+      cityKey,
+      nested: m.groups.indent.length > 2,
+      name: unescapeTs(m.groups.name),
+      desc: unescapeTs(m.groups.desc),
+      address: unescapeTs(m.groups.address),
+      locationSlug: helper === 'loc' ? slug : null,
+      venueSlug: helper === 'venue' ? slug : null,
+      mustSeeFilter: unescapeTs(m.groups.filter),
+      latitude: Number(m.groups.lat),
+      longitude: Number(m.groups.lng),
+    });
+  }
+  return rows;
+}
+
 function parseExportArray(source, exportName) {
   const re = new RegExp(`export const ${exportName}[^=]*=\\s*\\[`, 'm');
   const m = re.exec(source);
@@ -234,6 +264,11 @@ function isGenericUnnamedPlace(name) {
   return false;
 }
 
+/**
+ * Min profile for catalog Venue: name + desc + coords.
+ * Address preferred; if missing, caller may synthesize city-level address
+ * (`resolveSeedAddress`) so hub points with lat/lng still enter /locations.
+ */
 function hasMinimalLocationProfile(item) {
   const name = String(item?.name || '').trim();
   const desc = sanitizeEditorialText(item?.desc);
@@ -244,9 +279,19 @@ function hasMinimalLocationProfile(item) {
   if (desc.length < 24) return false;
   if (!Number.isFinite(lat) || !Number.isFinite(lng)) return false;
   if (Math.abs(lat) < 1 || Math.abs(lng) < 1) return false;
-  if (!address) return false;
+  // Address optional when coords present: seed fills city title as fallback.
+  if (!address && !(Number.isFinite(lat) && Number.isFinite(lng))) return false;
   if (isGenericUnnamedPlace(name)) return false;
   return true;
+}
+
+function resolveSeedAddress(item, cityTitle) {
+  const address = String(item?.address || '').trim();
+  if (address) return address;
+  const title = String(cityTitle || '').trim();
+  if (title) return `г. ${title}`;
+  const key = String(item?.cityKey || '').trim();
+  return key ? `г. ${key}` : '';
 }
 
 function kindFromMustSeeItem(item) {
@@ -281,7 +326,8 @@ function kindFromMustSeeItem(item) {
 }
 
 function resolveSeedSlug(item) {
-  const raw = String(item?.venueSlug || item?.locationSlug || '').trim();
+  // Prefer locationSlug when both exist (suburb umbrella + museum twin).
+  const raw = String(item?.locationSlug || item?.venueSlug || '').trim();
   if (!raw) return null;
   return HUB_PLACE_SLUG_ALIASES[raw] || raw;
 }
@@ -308,7 +354,7 @@ function toSeedPlan(item) {
     cityKey: item.cityKey,
     name: item.name,
     desc,
-    address: String(item.address || '').trim(),
+    address: resolveSeedAddress(item, null),
     latitude: Number(item.latitude),
     longitude: Number(item.longitude),
     slug,
@@ -316,7 +362,11 @@ function toSeedPlan(item) {
     family: canonicalFamily,
     skipReason: !slug
       ? 'no-slug'
-      : !hasMinimalLocationProfile({ ...item, desc })
+      : !hasMinimalLocationProfile({
+            ...item,
+            desc,
+            address: resolveSeedAddress(item, null),
+          })
         ? 'thin-profile'
         : item.nested
           ? 'nested-suburb-poi'
@@ -342,6 +392,9 @@ function collectHubMustSeeRows(readFile, rootDir) {
     for (const row of parsePlaceHelperCalls(mustSeeSrc, hub.cityKey)) {
       rows.push(row);
     }
+    for (const row of parseLocVenueHelperCalls(mustSeeSrc, hub.cityKey)) {
+      rows.push(row);
+    }
     if (hub.suburbsExport) {
       rows.push(...parseSuburbParents(src, hub.cityKey, hub.suburbsExport));
     }
@@ -353,10 +406,12 @@ module.exports = {
   HUB_MUST_SEE_MODULES,
   HUB_PLACE_SLUG_ALIASES,
   parsePlaceHelperCalls,
+  parseLocVenueHelperCalls,
   parseSuburbParents,
   sanitizeEditorialText,
   isGenericUnnamedPlace,
   hasMinimalLocationProfile,
+  resolveSeedAddress,
   kindFromMustSeeItem,
   resolveSeedSlug,
   toSeedPlan,

@@ -5,6 +5,7 @@ import {
   hasMinimalLocationProfile,
   isGenericUnnamedPlace,
   kindFromMustSeeItem,
+  parseLocVenueHelperCalls,
   parsePlaceHelperCalls,
   parseSuburbParents,
   resolveSeedSlug,
@@ -42,6 +43,71 @@ export const ROSTOV_NA_DONU_SUBURBS: any[] = [
     assert.equal(rows[0].locationSlug, 'rostov-na-donu-tachanka-rostovchanka');
     assert.equal(rows[1].nested, true);
     assert.equal(rows[1].name, 'Главный раскоп Танаиса');
+  });
+});
+
+describe('parseLocVenueHelperCalls', () => {
+  it('reads top-level loc/venue and marks nested suburb POIs', () => {
+    const src = `
+export const RYAZAN_MUST_SEE: any[] = [
+  loc(
+    'Дворец Олега',
+    'Самое большое гражданское здание Кремля XVII века.',
+    'ул. Кремль, 15',
+    'ryazan-dvorets-olega',
+    'houses',
+    40,
+    54.636112,
+    39.749102,
+  ),
+  venue(
+    'Рязанский кремль (музей-заповедник)',
+    'Архитектурный ансамбль на крутом берегу реки Трубеж.',
+    'ул. Кремль, 15',
+    'ryazan-kreml-muzey-zapovednik',
+    'museum',
+    90,
+    54.6358,
+    39.7484,
+  ),
+];
+
+export const RYAZAN_SUBURBS: any[] = [
+  {
+    name: 'Константиново',
+    places: [
+      loc(
+        'Дом родителей С. А. Есенина',
+        'Крестьянская изба с обстановкой семьи поэта.',
+        'с. Константиново',
+        'ryazan-konstantinovo-dom-roditeley-esenina',
+        'museum',
+        30,
+        54.862312,
+        39.449102,
+      ),
+    ],
+  },
+];
+`;
+    const rows = parseLocVenueHelperCalls(src, 'ryazan');
+    assert.equal(rows.length, 3);
+    assert.equal(rows[0].nested, false);
+    assert.equal(rows[0].locationSlug, 'ryazan-dvorets-olega');
+    assert.equal(rows[0].latitude, 54.636112);
+    assert.equal(rows[1].venueSlug, 'ryazan-kreml-muzey-zapovednik');
+    assert.equal(rows[1].locationSlug, null);
+    assert.equal(rows[2].nested, true);
+  });
+
+  it('prefers suburb locationSlug over museum twin', () => {
+    assert.equal(
+      resolveSeedSlug({
+        locationSlug: 'ryazan-konstantinovo',
+        venueSlug: 'ryazan-muzey-zapovednik-s-a-esenina-v-konstantinovo',
+      }),
+      'ryazan-konstantinovo',
+    );
   });
 });
 
