@@ -1,3 +1,16 @@
+## 2026-08-20 - Region child guide: must-see cards + no «субъект»
+
+### Наблюдения
+- `/cities/leningradskaya-oblast?city=vyborg`: brief+whyGo дублировались под H2, места - текстовый список без фото.
+- H2 афиши region hub: «Афиша субъекта» - канцелярит.
+
+### Решения
+- Brief/whyGo → hero; блок мест = ScrollRail карточки как «Главные места» (`DestinationRegionGuide` + `resolveVenueHeroImage`).
+- Афиша: «Ближайшие события»; sticky «События»; убрали «субъект».
+
+### Проблемы
+- У части точек Выборга ещё нет editorial JPG (alias только замок/Монрепо) - карточка с градиентом до донабора фото.
+
 ## 2026-08-20 - TOP hubs mustSee coords backfill (Sochi/Irkutsk/Vladivostok+)
 
 ### Наблюдения

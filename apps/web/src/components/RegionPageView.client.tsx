@@ -159,7 +159,14 @@ export function RegionPageView({
           : `Сейчас за городом ничего не происходит. Загляните в афишу ${centerCityGenitive || 'центра региона'}.`
         : buildRegionSystemBrief(city.name)
       : '');
-  const brief = childChrome?.lead || regionBrief;
+  const guideHeroLead = destinationGuide
+    ? [destinationGuide.brief, destinationGuide.whyGo]
+        .map((part) => String(part || '').trim())
+        .filter(Boolean)
+        .filter((part, index, all) => all.indexOf(part) === index)
+        .join(' ')
+    : '';
+  const brief = guideHeroLead || childChrome?.lead || regionBrief;
   const statsEvents = payload?.stats?.events ?? eventTotal;
   const statsVenues = payload?.stats?.venues ?? 0;
 
@@ -345,14 +352,14 @@ export function RegionPageView({
     if (isTierC) {
       return [
         { id: 'bridge', label: centerCity ? `Афиша ${centerCityGenitive}` : 'Центр', show: Boolean(centerCity) },
-        { id: 'affiche', label: 'Афиша региона', show: eventTotal > 0 },
+        { id: 'affiche', label: 'События', show: eventTotal > 0 },
       ].filter((tab) => tab.show);
     }
     return [
-      { id: 'guide', label: 'Гид', show: Boolean(destinationGuide) },
+      { id: 'guide', label: 'Места', show: Boolean(destinationGuide) },
       { id: 'cities', label: 'Города', show: childCities.some((c) => c.eventCount > 0) || childCities.length > 0 },
       { id: 'places', label: 'Куда съездить', show: topPlaces.length > 0 },
-      { id: 'affiche', label: 'Афиша', show: true },
+      { id: 'affiche', label: 'События', show: true },
       { id: 'faq', label: 'FAQ', show: faqItems.length > 0 },
     ].filter((tab) => tab.show);
   }, [childCities, topPlaces.length, faqItems.length, isTierC, centerCity, centerCityGenitive, eventTotal, destinationGuide]);
@@ -425,10 +432,10 @@ export function RegionPageView({
                   className="inline-flex min-h-11 items-center justify-center rounded-lg border border-slate-300 px-5 text-sm font-semibold text-slate-800 hover:bg-slate-50"
                 >
                   {childChrome
-                    ? `Смотреть афишу ${cityToGenitive(childChrome.child.name)}`
+                    ? `Смотреть события ${cityToGenitive(childChrome.child.name)}`
                     : isTierC
-                      ? 'Редкие события региона'
-                      : 'Смотреть афишу региона'}
+                      ? 'Редкие события области'
+                      : 'Смотреть события'}
                 </a>
               ) : null}
             </div>
@@ -495,10 +502,11 @@ export function RegionPageView({
         {destinationGuide ? (
           <section id="guide" className={`border-b border-slate-200 bg-white ${SECTION_SCROLL_MT}`}>
             <div className="container-page py-8 sm:py-10">
-              <h2 className="text-2xl font-bold text-slate-950">{destinationGuide.name}: что посмотреть</h2>
-              <p className="mt-2 max-w-2xl text-sm text-slate-600">{destinationGuide.brief}</p>
+              <h2 className="text-2xl font-bold text-slate-950">
+                Главные места {inCityPrepositional(destinationGuide.name)}
+              </h2>
               <div className="mt-6">
-                <DestinationRegionGuide guide={destinationGuide} />
+                <DestinationRegionGuide guide={destinationGuide} hideIntro />
               </div>
             </div>
           </section>
@@ -729,11 +737,17 @@ export function RegionPageView({
             </div>
 
             <div className="container-page py-8 sm:py-10">
-              <h2 className="text-2xl font-bold text-slate-950">Афиша субъекта</h2>
+              <h2 className="text-2xl font-bold text-slate-950">
+                {cityFilterLabel
+                  ? `Ближайшие события ${inCityPrepositional(cityFilterLabel)}`
+                  : 'Ближайшие события'}
+              </h2>
               <p className="mt-2 text-sm text-slate-600">
-                Только события городов региона
-                {centerCity ? `, без дубля афиши ${centerCityGenitive}` : ''}.
-                {cityFilterLabel ? ` Фильтр: ${cityFilterLabel}.` : ''}
+                {cityFilterLabel
+                  ? 'Концерты, спектакли и экскурсии на ближайшие дни'
+                  : centerCity
+                    ? `События по области - без дубля афиши ${centerCityGenitive}`
+                    : 'Концерты, спектакли и выезды по области'}
               </p>
 
               {contentReady ? (
