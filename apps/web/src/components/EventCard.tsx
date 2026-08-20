@@ -39,6 +39,7 @@ import {
   resolveEventCardDestinationLabel,
   resolveEventCardLocationLabel,
   resolveEventVenueDisplayLabel,
+  resolveHubAfficheLocationLine,
 } from '@/lib/event-location';
 import { dayRouteItemFromEvent } from '@/lib/day-route-from-place';
 import { formatNumber } from '@/lib/format';
@@ -509,9 +510,8 @@ function ShowcaseEventCard({
   const hasPrice = typeof session.priceFrom === 'number' && session.priceFrom >= MIN_DISPLAY_PRICE_RUB;
   const dateLabel = rail ? formatShowcaseSessionDateCompact(session) : formatShowcaseSessionDate(session);
   const cityLabel = resolveEventCardDestinationLabel(session) || null;
-  const venueName = resolveEventVenueDisplayLabel(session);
   const locationLine = cityHub
-    ? venueName
+    ? resolveHubAfficheLocationLine(session)
     : resolveShowcaseLocationLine(session, cityLabel);
   const categoryLabel = cityHub ? null : session.category?.trim() || null;
   const showCityMeta = !cityHub && Boolean(categoryLabel || cityLabel);
@@ -619,7 +619,7 @@ function ShowcaseEventCard({
           ) : null}
           {locationLine ? (
             <p className={`event-card-meta ${cityHub ? 'text-graphite-muted' : ''}`}>
-              {cityHub ? null : <MapPin className="event-card-meta-icon shrink-0" />}
+              <MapPin className="event-card-meta-icon shrink-0" />
               <span className="truncate">{locationLine}</span>
             </p>
           ) : null}

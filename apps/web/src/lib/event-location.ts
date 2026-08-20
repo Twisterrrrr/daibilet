@@ -128,18 +128,15 @@ export function resolveEventCardPinLines(session: EventCardLocationInput): Event
   const city = resolveEventCardDestinationLabel(session);
   const { venueName, providerFromVenue, address } = resolveVenueParts(session);
   const institution = resolveEventInstitutionLabel(session);
+  const cityShort = shortCityForPin(city);
 
   let primary = '';
   if (address) {
-    const addressHasCity =
-      city && normalizeComparableLabel(address).includes(normalizeComparableLabel(city));
-    if (addressHasCity || !city) primary = address;
-    else if (address.length <= 42) primary = `${address} · ${city}`;
-    else primary = city || address;
-  } else if (city) {
-    primary = city;
+    primary = joinAddressAndCity(address, cityShort);
   } else if (venueName && looksLikeStreet(venueName)) {
-    primary = venueName;
+    primary = joinAddressAndCity(venueName, cityShort);
+  } else if (cityShort) {
+    primary = cityShort;
   } else if (venueName && !isGenericVenueLabel(venueName) && !providerFromVenue) {
     primary = venueName;
   }
@@ -170,6 +167,36 @@ export function resolveEventCardPinLines(session: EventCardLocationInput): Event
     return { primary, secondary: null };
   }
   return { primary, secondary };
+}
+
+/** Hub/region affiche pin: street + city, never a bare «д. 5/1». */
+export function resolveHubAfficheLocationLine(session: EventCardLocationInput): string | null {
+  const pin = resolveEventCardPinLines(session);
+  if (pin.primary) return pin.primary;
+  return resolveEventVenueDisplayLabel(session);
+}
+
+function shortCityForPin(cityLabel: string): string {
+  const raw = String(cityLabel || '').trim();
+  if (!raw) return '';
+  // «Горбунки, Ленинградская обл.» → «Горбунки» for compact cards.
+  const beforeComma = raw.split(',')[0]?.trim() || raw;
+  return beforeComma.replace(/\s*\([^)]*\)\s*$/u, '').trim() || beforeComma;
+}
+
+function isHouseNumberOnlyLabel(value: string): boolean {
+  return /^(?:д\.?|дом)\s*\d/iu.test(String(value || '').trim());
+}
+
+function joinAddressAndCity(address: string, city: string): string {
+  const addr = String(address || '').trim();
+  const place = String(city || '').trim();
+  if (!addr) return place;
+  if (!place) return addr;
+  if (normalizeComparableLabel(addr).includes(normalizeComparableLabel(place))) return addr;
+  // Bare house number without street: lead with settlement/city.
+  if (isHouseNumberOnlyLabel(addr)) return `${place}, ${addr}`;
+  return `${addr} · ${place}`;
 }
 
 /** Физический адрес для блока «Адрес» на странице события. */
