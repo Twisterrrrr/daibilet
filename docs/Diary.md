@@ -1,3 +1,19 @@
+## 2026-08-20 - Routing aliases + blog cards + quiet /locations /blog
+
+### Наблюдения
+- city-routing dual/fold intentional; orphan `Каспийск`→Дагестан без hub - не invent.
+- Alias gap: `novokuzneck` vs assets `novokuznetsk`; focus/DTO без surgut/tolyatti/hanty.
+- Blog covers: 0 `-card` на диске при готовом `BlogCardSafeImage` chain → LCP на full cover.
+
+### Решения
+- `city-image-focus` + `dto.js` CITY_CARD_IMAGE_SLUGS aliases; note в geo-excluded.
+- `compress-card-images.mjs blog` → sidecar `-card.jpg` (~169 local).
+- `/locations`: muted filter row, chip rail без counts, без «N локаций».
+- `/blog`: magazine-only (drop view toggle), swipe topic/filter rails.
+
+### Проблемы
+- Blog sidecars на MSK - через SSH compress (не в git). Deploy web для UI.
+
 ## 2026-08-20 - Coords backfill top hubs + tracker hygiene
 
 ### Наблюдения

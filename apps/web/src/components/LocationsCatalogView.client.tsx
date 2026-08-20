@@ -12,7 +12,6 @@ import { PlacesSearch } from '@/components/PlacesSearch.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from '@/lib/catalog-url';
 import { cityToPrepositional } from '@/lib/city-declension';
-import { formatNumber, pluralCities } from '@/lib/format';
 import {
   catalogCityQueryValue,
   isAllCitiesQuery,
@@ -436,7 +435,6 @@ export function LocationsCatalogView({
     return [...known, ...extras].sort((a, b) => b.count - a.count || a.label.localeCompare(b.label, 'ru'));
   }, [stats.types]);
 
-  const cityCount = cityOptions.length;
   const eventsHref = catalogHrefWithSelectedCity(
     selectedCity?.selectedDestination?.slug || selectedCity?.cityValue,
   );
@@ -446,10 +444,6 @@ export function LocationsCatalogView({
   );
   const cityName = cityFilter !== 'all' ? cityFilter : null;
   const heroTitle = cityName ? `Локации в ${cityToPrepositional(cityName)}` : 'Локации и точки сбора';
-  const heroTotal = stats.venues || total;
-  const locationsEyebrow = cityName
-    ? `${formatNumber(heroTotal)} локаций · ${cityName}`
-    : `${formatNumber(heroTotal)} локаций · ${pluralCities(cityCount)}`;
   const hideCityOnCards = cityFilter !== 'all';
   const paginationParams = useMemo(() => {
     const params = searchParamsRecord(searchParams);
@@ -491,25 +485,54 @@ export function LocationsCatalogView({
 
   return (
     <>
-      {/* Mobile template: dense hero, kind chips primary. */}
       <HeroLayout
         variant="minimal"
         dense
         breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Места', href: '/places' }, { label: 'Локации' }]}
-        eyebrow={locationsEyebrow}
         title={heroTitle}
         tone="light"
+        className="bg-white"
       >
-        <div className="mt-4 flex flex-wrap gap-1.5">
+        <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-stretch sm:gap-3">
+          <PlacesSearch mode="jump" tone="muted" />
+          <select
+            value={cityPending ? '' : cityFilter}
+            disabled={cityPending}
+            onChange={(event) => setCityFilter(event.target.value)}
+            className="hidden rounded-xl bg-[#F5F5F7] px-3 py-2.5 text-sm outline-none disabled:opacity-70 sm:block sm:max-w-[12rem] sm:shrink-0"
+            aria-label="Город"
+          >
+            {cityPending ? <option value="">Город…</option> : null}
+            <option value="all">Все города</option>
+            {cityOptions.map(([city]) => (
+              <option key={city} value={city}>
+                {city}
+              </option>
+            ))}
+          </select>
+          <select
+            value={sortMode}
+            onChange={(event) => setSortMode(event.target.value as VenueCatalogSort)}
+            className="rounded-xl bg-[#F5F5F7] px-3 py-2.5 text-sm outline-none sm:max-w-[10rem] sm:shrink-0"
+            aria-label="Сортировка"
+          >
+            {SORT_OPTIONS.map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="-mx-1 mt-4 flex gap-1.5 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <button
             type="button"
             onClick={() => setTypeFilter('all')}
-            className={`catalog-chip ${
+            className={`catalog-chip shrink-0 ${
               typeFilter === 'all' ? 'catalog-chip-on' : 'catalog-chip-idle'
             }`}
           >
             <span className="whitespace-nowrap">Все точки</span>
-            <span className="text-xs opacity-75">({heroTotal})</span>
           </button>
           {typeOptions.map((option) => {
             const active = typeFilter === option.value;
@@ -518,33 +541,12 @@ export function LocationsCatalogView({
                 key={option.value}
                 type="button"
                 onClick={() => setTypeFilter(active ? 'all' : option.value)}
-                className={`catalog-chip ${active ? 'catalog-chip-on' : 'catalog-chip-idle'}`}
+                className={`catalog-chip shrink-0 ${active ? 'catalog-chip-on' : 'catalog-chip-idle'}`}
               >
                 <span className="whitespace-nowrap">{option.label}</span>
-                <span className="text-xs opacity-75">({option.count})</span>
               </button>
             );
           })}
-        </div>
-
-        <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-stretch sm:gap-3">
-          <PlacesSearch mode="jump" tone="outlined" />
-          {/* sm+: city select; on mobile city lives in sticky header */}
-          <select
-            value={cityPending ? '' : cityFilter}
-            disabled={cityPending}
-            onChange={(event) => setCityFilter(event.target.value)}
-            className="hidden rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm shadow-sm outline-none disabled:opacity-70 sm:block"
-            aria-label="Город"
-          >
-            {cityPending ? <option value="">Город…</option> : null}
-            <option value="all">Все города</option>
-            {cityOptions.map(([city, count]) => (
-              <option key={city} value={city}>
-                {city} ({count})
-              </option>
-            ))}
-          </select>
         </div>
 
         <Link
@@ -562,27 +564,9 @@ export function LocationsCatalogView({
       </HeroLayout>
 
       <div className="container-page py-6 sm:py-8">
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-          <p className="text-sm text-slate-500">
-            {listPending || listRefreshing
-              ? 'Обновляем список…'
-              : total > 0
-                ? `${formatNumber(total)} локаций`
-                : null}
-          </p>
-          <select
-            value={sortMode}
-            onChange={(event) => setSortMode(event.target.value as VenueCatalogSort)}
-            className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none"
-            aria-label="Сортировка"
-          >
-            {SORT_OPTIONS.map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </select>
-        </div>
+        {listPending || listRefreshing ? (
+          <p className="mb-4 text-sm text-slate-500">Обновляем список…</p>
+        ) : null}
 
         {listBlock}
 

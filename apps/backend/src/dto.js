@@ -280,6 +280,12 @@ const CITY_CARD_IMAGE_SLUGS = new Set([
   'penza',
   'volgograd',
   'sortavala',
+  'surgut',
+  'tolyatti',
+  'novokuzneck',
+  'novokuznetsk',
+  'hanty-mansiysk',
+  'khanty-mansiysk',
 ]);
 const PROJECT_ROOT = resolveProjectRoot(import.meta.url);
 const CITY_ROUTING = loadCityRoutingConfig(import.meta.url);

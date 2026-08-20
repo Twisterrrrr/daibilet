@@ -4,7 +4,6 @@ import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { ChevronDown, Search } from 'lucide-react';
 
-import { BlogListRows } from '@/components/BlogListRows.client';
 import { BlogMagazineGrid } from '@/components/BlogMagazineGrid.client';
 import type { BlogListFilters } from '@/components/BlogListView';
 import type { BlogCardDto } from '@/lib/blog-utils';
@@ -12,11 +11,6 @@ import { paginateBlogFeedByCursor } from '@/lib/blog-cursor';
 import { canonicalizeBlogCitySlug, filterBlogFeedByCity } from '@/lib/blog-feed-rank';
 import { authorLabel, buildBlogCityFilterOptions, cityFilterLabel } from '@/lib/blog-meta';
 import { parseBlogTopicParam, postMatchesTopic } from '@/lib/blog-topics';
-import {
-  parseBlogViewMode,
-  readStoredBlogViewMode,
-  type BlogViewMode,
-} from '@/lib/blog-view-mode';
 
 const PAGE_SIZE = 12;
 
@@ -64,7 +58,7 @@ function SoftSelect({
   children: ReactNode;
 }) {
   return (
-    <label className="relative inline-flex min-w-0 items-center">
+    <label className="relative inline-flex min-w-0 shrink-0 items-center">
       <select
         className="h-10 appearance-none rounded-xl border border-slate-200 bg-white py-2 pl-3 pr-9 text-sm font-medium text-slate-700 outline-none transition hover:border-slate-300 hover:bg-slate-50 focus-visible:border-primary-400 focus-visible:ring-2 focus-visible:ring-primary-100 md:min-w-[11rem]"
         value={value}
@@ -104,9 +98,6 @@ export function BlogListFiltered({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const cityOptionsSource = allPosts?.length ? allPosts : posts;
-  const [viewMode, setViewModeState] = useState<BlogViewMode>('magazine');
-  /** Below md always magazine - view toggle is desktop-only; city/author filter stays visible. */
-  const [isMdUp, setIsMdUp] = useState(false);
   const [cursor, setCursor] = useState<string | null>(null);
   const [visiblePosts, setVisiblePosts] = useState<BlogCardDto[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
@@ -147,35 +138,17 @@ export function BlogListFiltered({
   }, [posts, author, topic, query, urlCity]);
 
   useEffect(() => {
-    const fromUrl = searchParams.get('view');
-    if (fromUrl) {
-      setViewModeState(parseBlogViewMode(fromUrl));
-      return;
-    }
-    setViewModeState(readStoredBlogViewMode() || 'magazine');
-  }, [searchParams]);
-
-  useEffect(() => {
-    const mq = window.matchMedia('(min-width: 768px)');
-    const sync = () => setIsMdUp(mq.matches);
-    sync();
-    mq.addEventListener('change', sync);
-    return () => mq.removeEventListener('change', sync);
-  }, []);
-
-  const effectiveViewMode: BlogViewMode = isMdUp ? viewMode : 'magazine';
-
-  useEffect(() => {
     const page = paginateBlogFeedByCursor(filtered, { cursor: null, limit: PAGE_SIZE });
     setCursor(null);
     setVisiblePosts(page.items);
     setNextCursor(page.nextCursor);
-  }, [filtered, effectiveViewMode]);
+  }, [filtered]);
 
   const setFilter = useCallback(
     (key: 'city' | 'author', value: string) => {
       const next = new URLSearchParams(searchParams.toString());
       next.delete('type');
+      next.delete('view');
       if (!value || value === 'all') next.delete(key);
       else next.set(key, value);
       const qs = next.toString();
@@ -185,11 +158,8 @@ export function BlogListFiltered({
   );
 
   const resetFilters = useCallback(() => {
-    const next = new URLSearchParams();
-    if (viewMode === 'list') next.set('view', 'list');
-    const qs = next.toString();
-    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-  }, [pathname, router, viewMode]);
+    router.replace(pathname, { scroll: false });
+  }, [pathname, router]);
 
   const loadMore = useCallback(() => {
     if (!nextCursor) return;
@@ -223,7 +193,7 @@ export function BlogListFiltered({
 
   const filtersBar = (
     <div className="mb-6 border-b border-slate-200/70 pb-3 md:mb-8 md:pb-4">
-      <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+      <div className="-mx-1 flex items-center gap-2 overflow-x-auto px-1 pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:flex-wrap sm:overflow-visible">
         <SoftSelect
           value={urlCity}
           onChange={(value) => setFilter('city', value)}
@@ -254,7 +224,7 @@ export function BlogListFiltered({
           <button
             type="button"
             onClick={resetFilters}
-            className="inline-flex h-10 items-center rounded-xl px-3 text-sm font-medium text-primary-600 transition hover:bg-primary-50 hover:text-primary-700"
+            className="inline-flex h-10 shrink-0 items-center rounded-xl px-3 text-sm font-medium text-primary-600 transition hover:bg-primary-50 hover:text-primary-700"
           >
             Сбросить
           </button>
@@ -276,11 +246,7 @@ export function BlogListFiltered({
 
       {filtered.length > 0 ? (
         <>
-          {effectiveViewMode === 'list' ? (
-            <BlogListRows posts={displayPosts} />
-          ) : (
-            <BlogMagazineGrid posts={displayPosts} editorialQuote={editorialQuote} />
-          )}
+          <BlogMagazineGrid posts={displayPosts} editorialQuote={editorialQuote} />
           {hasMore ? (
             <div className="mt-8 flex justify-center">
               <button

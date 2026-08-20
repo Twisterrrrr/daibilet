@@ -1,12 +1,13 @@
 /**
  * Disk sidecars and listing-weight compress (no /_next/image).
  *
- *   node scripts/compress-card-images.mjs [events|venues|blog-inline|landings|all] [--dry-run]
+ *   node scripts/compress-card-images.mjs [events|venues|blog|blog-inline|landings|all] [--dry-run]
  *
  * P0: events/** → sibling `-card.jpg` (width 640, q 60–70, 40–80KB).
  *     Does not overwrite originals (PDP keeps image.jpg).
  *     Skips sources already ≤80KB (lean stubs).
  * P0 venues: optional copy/compress from venues/** (places already have `-thumb`).
+ * P0b: blog cover `blog/{slug}.jpg` → sibling `-card.jpg` (listing; PDP/cover stay original).
  * P1: blog `*-inline*.jpg` in place, max 1200px, q~75, 120–200KB.
  * P1b: landings PNG→JPEG ~1200px / <150KB (also caps oversized landing JPG).
  *
@@ -299,9 +300,9 @@ async function main() {
   const argv = process.argv.slice(2);
   const dryRun = argv.includes('--dry-run') || process.env.DRY_RUN === '1';
   const mode = String(argv.find((arg) => !arg.startsWith('--')) || 'events').trim().toLowerCase();
-  const allowed = new Set(['events', 'venues', 'blog-inline', 'landings', 'all']);
+  const allowed = new Set(['events', 'venues', 'blog', 'blog-inline', 'landings', 'all']);
   if (!allowed.has(mode)) {
-    throw new Error(`Unknown mode "${mode}". Use events|venues|blog-inline|landings|all [--dry-run]`);
+    throw new Error(`Unknown mode "${mode}". Use events|venues|blog|blog-inline|landings|all [--dry-run]`);
   }
   const sharp = loadSharp();
   if (!sharp) {
@@ -315,6 +316,12 @@ async function main() {
   const events = walkImages(path.join(publicImages, 'events')).filter((file) => {
     if (!isSourceName(file)) return false;
     return !/evt-auto-/i.test(path.basename(file));
+  });
+  const blogCovers = walkImages(path.join(publicImages, 'blog')).filter((file) => {
+    if (!isSourceName(file)) return false;
+    // Covers only: skip inline/og already handled by SKIP_NAME; keep top-level slug.jpg
+    const base = path.basename(file);
+    return !/-inline(?:-2)?\./i.test(base);
   });
   const inlines = walkImages(path.join(publicImages, 'blog')).filter((file) =>
     /-inline(?:-2)?\.(jpe?g|png|webp)$/i.test(path.basename(file)),
@@ -332,6 +339,12 @@ async function main() {
     report.venues = summarize(
       'venues-card',
       await mapPool(venues, CONCURRENCY, (file) => processCard(sharp, file, dryRun)),
+    );
+  }
+  if (mode === 'blog' || mode === 'all') {
+    report.blogCards = summarize(
+      'blog-card',
+      await mapPool(blogCovers, CONCURRENCY, (file) => processCard(sharp, file, dryRun)),
     );
   }
   if (mode === 'blog-inline' || mode === 'all') {

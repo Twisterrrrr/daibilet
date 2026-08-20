@@ -102,7 +102,11 @@ export function BlogListHero({ breadcrumbs, cityName = null }: BlogListHeroProps
   const topicChips = HERO_TOPIC_IDS.filter((id) => BLOG_TOPIC_ORDER.includes(id));
 
   const topicPills = (
-    <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Быстрые темы">
+    <div
+      className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:flex-wrap sm:overflow-visible"
+      role="group"
+      aria-label="Быстрые темы"
+    >
       {topicChips.map((id) => {
         const active = topic === id;
         return (
@@ -111,7 +115,7 @@ export function BlogListHero({ breadcrumbs, cityName = null }: BlogListHeroProps
             type="button"
             aria-pressed={active}
             onClick={() => setTopic(active ? 'all' : id)}
-            className={`catalog-chip ${active ? 'catalog-chip-on' : 'catalog-chip-idle'}`}
+            className={`catalog-chip shrink-0 ${active ? 'catalog-chip-on' : 'catalog-chip-idle'}`}
           >
             <span className="whitespace-nowrap">{HERO_TOPIC_LABELS[id] || blogTopicLabel(id)}</span>
           </button>

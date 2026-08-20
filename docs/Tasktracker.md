@@ -100,7 +100,9 @@
 | PERF.EVENTS-CARDS | Массовая нарезка обложек `/events` в sibling `-card.jpg` (~640px) | Высокий | ✅ MSK events: нечего писать (102 card + lean skip); listing `CardSafeImage` |
 | PERF.VENUES-CARDS | Venue `-card.jpg` для `/places` fallback после `-thumb` | Высокий | ✅ 2026-08-20 MSK wrote 409 (99MB→19MB); dry-run 0 remaining |
 | PERF.PLACES-THUMB-FALLBACK | `/places`: нет `-thumb` → `-card` → оригинал, не градиент | Критический | ✅ resolver + identity fallback + hub must-see photo; sidecar `-card`/`-thumb` для Ufa/NSK/Omsk packs |
-| PERF.BLOG-CARD-FALLBACK | `/blog`: нет `*-og`/`-card`/`-thumb` → полный cover | Высокий | 🔄 `BlogCardSafeImage` chain; в следующем web batch |
+| PERF.BLOG-CARD-FALLBACK | `/blog`: нет `*-og`/`-card`/`-thumb` → полный cover | Высокий | ✅ chain + `compress-card-images.mjs blog`; sidecars на диск (не в git) |
+| UX.BLOG-INDEX-POLISH | `/blog`: soft toolbar/chips; quiet fresh meta; simplify afisha promo; drop count+view toggle | Высокий | ✅ magazine-only; swipe filter/topic rails |
+| UX.LOCATIONS-CATALOG-QUIET | `/locations`: quieter hero/filters; vertical premium cards; no overlay route pill; strip city on address | Высокий | ✅ parity с `/venues`: no count junk, muted filter row, chip rail |
 
 ## 2026-08-17 - Выборг oblast child (не suburb СПб)
 
@@ -847,8 +849,8 @@
 | UX.PODBORKI-ONE-FILTER | `/podborki`: один filter-system (black tabs + soft tags); kill «Каталог подборок»/дубль city; clean covers (meta under photo); dedupe featured | Высокий | ✅ `eb68f461` Deploy `31342186797` BUILD_ID=`RWJuTMEW-R707-yh7VQwJ` |
 | UX.SITEWIDE-MINIMALISM | Sitewide UX: 1 mobile filter rail; no system junk; clean covers (meta under photo); one monochrome line icon pack. Canon LOCKED in Project/Diary | Высокий | ✅ docs locked; 🔄 page polishes ongoing (venues done; locations/podborki/blog) |
 | UX.VENUES-CATALOG-QUIET | `/venues`: kill dark hero; white H1; soft chip rail; no Найдено/стр.; clean InstitutionCard (+ icon, meta above title) | Высокий | ✅ `e78f905b` Deploy `31342186797` BUILD_ID=`RWJuTMEW-R707-yh7VQwJ` |
-| UX.BLOG-INDEX-POLISH | `/blog`: soft toolbar/chips; quiet fresh meta; simplify afisha promo; drop count+view toggle | Высокий | 🔄 ship; deploy по «выкатывай» |
-| UX.LOCATIONS-CATALOG-QUIET | `/locations`: quieter hero/filters; vertical premium cards; no overlay route pill; strip city on address | Высокий | 🔄 ship; deploy по «выкатывай» |
+| UX.BLOG-INDEX-POLISH | `/blog`: soft toolbar/chips; quiet fresh meta; simplify afisha promo; drop count+view toggle | Высокий | ✅ magazine-only; swipe rails (2026-08-20) |
+| UX.LOCATIONS-CATALOG-QUIET | `/locations`: quieter hero/filters; vertical premium cards; no overlay route pill; strip city on address | Высокий | ✅ parity `/venues` (2026-08-20) |
 | UX.EVENTS-CHIPS-SIMPLIFY | `/events`: date rail в title band; quick+categories один soft-ряд под search; без system date input | Высокий | ✅ follow-up после `ad5f3dc0`; deploy по «выкатывай» |
 | UX.CITIES-SORT-ONE-LIST | `/cities`: один список (без top/octet); sort popular/name на весь набор; toolbar search+controls в одной строке | Высокий | ✅ `2965a338`; deploy по «выкатывай» | Deploy `31336541746` BUILD_ID=`SR08A3UaBJ4IlLsjQcK4n`
 | UX.VENUE-AFISHA-ORDER | Venue/location: афиша выше; хабы/похожие ниже | Высокий | ✅ `28795f43`; deploy по «выкатывай» | Deploy `31336541746` BUILD_ID=`SR08A3UaBJ4IlLsjQcK4n`

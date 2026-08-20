@@ -56,6 +56,9 @@ const SLUG_ALIASES: Record<string, string> = {
   'velikiy-novgorod': 'veliky-novgorod',
   'rostov-na-donu': 'rostov-on-don',
   rostov: 'rostov-on-don',
+  // Destination canon (ц→c) vs asset filenames
+  novokuzneck: 'novokuznetsk',
+  'khanty-mansiysk': 'hanty-mansiysk',
 };
 
 type CityFocusSource = {

@@ -19,6 +19,11 @@
 
 **Не считать `cityToRegion` «дырой» allowlist** — это намеренный region bucket.
 
+### 2026-08-20 audit note
+- Dual (Тольятти/Сургут/Новокузнецк/Сортавала) и fold Зеленоград/Щербинка/Пушкин - intentional.
+- Orphan region target: `Каспийск` → `Республика Дагестан` (нет в `region-hubs.ru.json`). Hub не invent - оставляем thin region до отдельного решения owner.
+- Alias: destination slug `novokuzneck` vs asset `novokuznetsk`; `khanty-mansiysk` → `hanty-mansiysk` (web focus + images).
+
 ## 2026-07-19 — хвост allowlist (63) + зарубежье
 
 После expand адмцентров оставалось **63** города только с причиной `allowlist`. Закрыто:
