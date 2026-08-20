@@ -2,8 +2,8 @@
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| UX.REGION-CHILD-MUSTSEE | Child `?city=`: brief в hero; места ScrollRail как «Главные места»; без текстового списка | Высокий | 🔄 ship+Deploy MSK web |
-| UX.REGION-AFFICHE-COPY | Убрать «Афиша субъекта»; H2 «Ближайшие события»; tab «События» | Высокий | 🔄 ship+Deploy MSK web |
+| UX.REGION-CHILD-MUSTSEE | Child `?city=`: brief в hero; места ScrollRail как «Главные места»; без текстового списка | Высокий | ✅ live Deploy `32363947363` SHA `346b10d` |
+| UX.REGION-AFFICHE-COPY | Убрать «Афиша субъекта»; H2 «Ближайшие события»; tab «События» | Высокий | ✅ live Deploy `32363947363` SHA `346b10d` |
 
 ## 2026-08-19 - Blog Voronezh + Ufa live
 
