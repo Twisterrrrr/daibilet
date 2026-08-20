@@ -5,6 +5,7 @@ import { ArrowRight } from 'lucide-react';
 
 import { SuburbPlacesPhotoRail } from '@/components/SuburbPlacesPhotoRail.client';
 import type { DestinationPageGuide } from '@/lib/city-destination-registry';
+import { cityToGenitive } from '@/lib/city-declension';
 import { venueHref } from '@/lib/routes';
 
 export function DestinationRegionGuide({
