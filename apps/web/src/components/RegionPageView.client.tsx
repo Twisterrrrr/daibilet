@@ -475,7 +475,7 @@ export function RegionPageView({
                       ? eventTotal > 0
                         ? `Событий за городом мало. Полная афиша - ${centerCityIn}`
                         : `Сейчас за городом ничего не происходит. Посмотрите афишу ${centerCityGenitive}`
-                      : `Ищете события в самом городе? Перейти к афише ${centerCityGenitive}`}
+                      : `Ищете больше событий? Перейти к афише ${centerCityGenitive}`}
                     {centerCity.eventCount > 0 ? (
                       <span className="font-medium text-slate-600">
                         {' '}
@@ -485,7 +485,7 @@ export function RegionPageView({
                   </p>
                 </div>
                 <span className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-900 group-hover:gap-3">
-                  Открыть хаб
+                  На страницу {centerCityGenitive}
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </span>
               </Link>
