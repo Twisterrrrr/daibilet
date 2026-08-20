@@ -2,8 +2,8 @@
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| FIX.HUB-SUBURB-WHEEL | Вертикальный скролл на пригородах хаба (ScrollRail + DayTripCanonCard) | Высокий | 🔄 code; live после Deploy MSK web |
-| UX.MYDAY-STICKY-COLLAPSE | `/my-day` sticky сжимается при скролле вниз (все viewport); без thrash на scroll-up | Высокий | 🔄 code; live после Deploy MSK web |
+| FIX.HUB-SUBURB-WHEEL | Вертикальный скролл на пригородах хаба (ScrollRail + DayTripCanonCard) | Высокий | ✅ live Deploy `32368896798` SHA `0677103` |
+| UX.MYDAY-STICKY-COLLAPSE | `/my-day` sticky сжимается при скролле вниз (все viewport); без thrash на scroll-up | Высокий | ✅ live Deploy `32368896798` SHA `0677103` |
 
 ## 2026-08-20 - Hub events image size
 
