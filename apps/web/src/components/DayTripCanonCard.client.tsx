@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-import { CardSafeImage } from '@/components/SafeImage.client';
+import { SafeImage } from '@/components/SafeImage.client';
 import { SuburbPlacesPhotoRail } from '@/components/SuburbPlacesPhotoRail.client';
 import type { CitySuburbGastroStop } from '@/lib/cityInfo';
 
@@ -181,7 +181,7 @@ export function DayTripCanonCard({
               className="relative h-36 w-full shrink-0 overflow-hidden rounded-t-2xl bg-[#F5F5F7] sm:h-full sm:min-h-[7.5rem] sm:max-h-[11rem] sm:rounded-l-2xl sm:rounded-tr-none"
               data-day-trip-cover
             >
-              <CardSafeImage
+              <SafeImage
                 src={cover}
                 alt=""
                 fill
@@ -302,7 +302,7 @@ export function DayTripCanonCard({
           className="relative h-44 w-full self-stretch overflow-hidden rounded-t-2xl bg-[#F5F5F7] sm:h-full sm:min-h-[18rem] sm:rounded-l-2xl sm:rounded-tr-none"
           data-day-trip-cover
         >
-          <CardSafeImage
+          <SafeImage
             src={cover}
             alt=""
             fill

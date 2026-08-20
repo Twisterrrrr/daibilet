@@ -28,6 +28,8 @@ function formatTransitTip(raw: string): string {
 /**
  * Photo cards for suburb nested places - same language as city hub «Главные места».
  * Used by DestinationRegionGuide (region child) and DayTripCanonCard (hub / my-day).
+ * CardSafeImage prefers `-thumb` then `-card` then original (avoid 404 waterfall when
+ * sidecars are missing on disk).
  */
 export function SuburbPlacesPhotoRail({
   places,
