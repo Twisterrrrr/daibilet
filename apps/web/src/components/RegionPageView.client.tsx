@@ -332,14 +332,16 @@ export function RegionPageView({
     (names: string[]) => {
       const cleaned = names.map((n) => n.trim()).filter(Boolean);
       if (cityFilter && isSameCitySet(cityFilter, cleaned)) {
+        // Same chip again → clear scope (back to whole region).
         replaceCityQuery(null);
       } else {
         const match = childCities.find((item) =>
           cleaned.some((name) => name.toLowerCase() === item.name.toLowerCase()),
         );
+        // Soft-nav: `?city={slug}` scopes H1/lead/sessions. Stay put - do not
+        // jump to #affiche (that felt like the page "flying away").
         replaceCityQuery(match?.slug || null);
       }
-      scrollToSection('affiche');
     },
     [cityFilter, childCities, replaceCityQuery],
   );
@@ -515,7 +517,8 @@ export function RegionPageView({
                 <div>
                   <h2 className="text-2xl font-bold text-slate-950">Города региона</h2>
                   <p className="mt-2 max-w-2xl text-sm text-slate-600">
-                    Выберите город - афиша ниже отфильтруется. Спросите себя: далеко ли ехать и что там будет.
+                    Выберите город - заголовок и афиша ниже отфильтруются без прыжка по странице. Повторный
+                    тап сбрасывает фильтр.
                   </p>
                 </div>
                 {cityFilterLabel ? (
@@ -576,7 +579,7 @@ export function RegionPageView({
                         center={beltConfig.anchor}
                         onSelect={(point) => applyCityFilter([point.name])}
                       />
-                      <p className="mt-2 text-xs text-slate-500">Нажмите точку на карте - лента афиши отфильтруется.</p>
+                      <p className="mt-2 text-xs text-slate-500">Нажмите точку на карте - афиша отфильтруется на месте.</p>
                     </div>
                   ) : null}
                 </div>
