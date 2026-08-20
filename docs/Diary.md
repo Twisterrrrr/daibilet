@@ -6,7 +6,7 @@
 
 ### Решения
 - Geocode: catalog API ` /api/public/venues/{slug}` закрыл **21/21** (Nominatim не понадобился в первом проходе).
-- Патч `apps/web` + `apps/public` cityInfo (address+lat/lng по slug). Seed apply MSK для cities sochi/irkutsk/vladivostok/vladimir/nizhny-novgorod/saint-petersburg; Deploy MSK web для карт хабов.
+- Патч `apps/web` + `apps/public` cityInfo (address+lat/lng по slug). Commit `c49238d`. Seed MSK `--apply` (6 cities): **254 skipped-exists / 0 inserted / 3 thin** (venues уже были в catalog - оттуда и coords). Deploy MSK web `#32363060389`.
 
 ### Проблемы
 - Long-tail ~230+ вне TOP без coords - отдельный пасс. Тольятти/Сургут/НК/Ханты/Владикавказ в cityInfo без mustSee packs - не в этой итерации.
