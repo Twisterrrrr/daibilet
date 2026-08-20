@@ -123,7 +123,18 @@
 - Остальные caption-stubs удалены с диска (чистый CardSafeImage fallback без фейковой «фото+подпись»).
 
 ### Проблемы
-- Нужен проход GenerateImage по удалённым must-see (Парк Горького, Арбат, …) - иначе серый градиент до замены.
+- ~~Нужен проход GenerateImage по удалённым must-see (Парк Горького, Арбат, …)~~ → 2026-08-20: 32 moscow covers regenerated (+ card/thumb). Остаются NN/Ekb дыры из того же purge.
+
+## 2026-08-20 - Moscow must-see covers after caption-stub purge
+
+### Наблюдения
+- После purge 32 moscow editorial JPG отсутствовали → серые must-see / catalog cards.
+
+### Решения
+- GenerateImage → `apps/public/.../venues/moscow/{slug}.jpg` (1200px) + `-card`/`-thumb` для всех 32.
+
+### Проблемы
+- Уникальные фото вложенных suburb POI без locationSlug - отдельный батч (сейчас fallback на cover пригорода).
 
 ## 2026-08-20 - Blog listing cards in git + tmp hygiene
 
