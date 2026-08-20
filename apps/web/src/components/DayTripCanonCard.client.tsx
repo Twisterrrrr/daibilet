@@ -1,21 +1,22 @@
 'use client';
 
 import * as React from 'react';
-import Link from 'next/link';
 
 import { CardSafeImage } from '@/components/SafeImage.client';
+import { SuburbPlacesPhotoRail } from '@/components/SuburbPlacesPhotoRail.client';
 import type { CitySuburbGastroStop } from '@/lib/cityInfo';
-import { formatVisitDuration } from '@/lib/visit-duration';
 
 export type DayTripCanonSight = {
   name: string;
   desc?: string;
   href?: string | null;
+  /** venueSlug / locationSlug for photo cover */
+  imageSlug?: string | null;
   /** Совет по перемещению к этой точке (серая строка между пунктами). */
   transitTip?: string;
   /** Заголовок дня над пунктом (multi-day suburb: «День 1 - Усьва»). */
   dayLabel?: string;
-  visitMinutes?: number;
+  visitMinutes?: number | string;
 };
 
 export type DayTripCanonCardProps = {
@@ -57,47 +58,6 @@ export type DayTripCanonCardProps = {
 };
 
 const MAGAZINE_SIGHTS_MAX = 4;
-const HUB_SIGHTS_PREVIEW = 3;
-
-function SightLabel({
-  name,
-  href,
-  desc,
-  descFromMd,
-  visitMinutes,
-}: {
-  name: string;
-  href?: string | null;
-  desc?: string;
-  descFromMd?: boolean;
-  visitMinutes?: number;
-}) {
-  const nameNode = href ? (
-    <Link
-      href={href}
-      className="font-semibold underline decoration-slate-300 underline-offset-2 hover:decoration-current"
-    >
-      {name}
-    </Link>
-  ) : (
-    <strong className="font-semibold">{name}</strong>
-  );
-  const visitLabel = formatVisitDuration(visitMinutes);
-  const text = String(desc || '').trim();
-  return (
-    <>
-      {nameNode}
-      {visitLabel ? (
-        <span className="ml-1.5 font-normal text-slate-500" data-city-visit-duration>
-          {visitLabel}
-        </span>
-      ) : null}
-      {text ? (
-        <span className={`font-normal ${descFromMd ? 'hidden md:inline' : ''}`}>{` - ${text}`}</span>
-      ) : null}
-    </>
-  );
-}
 
 /**
  * Desktop (owner red line):
@@ -124,14 +84,6 @@ const LOGISTICS_BG_EXTEND_SM = 'sm:-ml-4';
 const HUB_DETAIL_MAX_H =
   'sm:max-h-[calc(100dvh-var(--site-header-height)-env(safe-area-inset-top,0px)-5.5rem)]';
 const HUB_DETAIL_SCROLL = `${HUB_DETAIL_MAX_H} sm:overflow-y-auto sm:overscroll-y-contain`;
-
-/** Compact between-stop tip: «↓ 5-8 мин пешком» (hyphen only). */
-function formatCanonTransitTip(raw: string): string {
-  const tip = raw.trim();
-  if (!tip) return '';
-  if (/^[↓▾▼]/.test(tip)) return tip;
-  return `↓ ${tip}`;
-}
 
 export function DayTripCanonCard({
   index,
@@ -162,35 +114,19 @@ export function DayTripCanonCard({
   const borderSoft = editorial ? 'border-zinc-100' : 'border-slate-100';
   const inkClass = editorial ? 'text-zinc-950' : 'text-slate-950';
   const titleClass = editorial ? 'text-zinc-950' : 'text-slate-950';
-  const numClass = editorial ? 'text-zinc-400' : 'text-slate-400';
-  const poiTextClass = editorial ? 'text-zinc-700' : 'text-slate-700';
   const badgeClass = editorial
     ? 'bg-zinc-100 text-zinc-800'
     : 'bg-primary-50 text-primary-700';
   const panelClass = editorial
     ? 'rounded-xl border border-zinc-100 bg-zinc-50/60'
     : 'rounded-xl border border-slate-100 bg-slate-50/70';
+  void sightDescFromMd;
 
   const hasLogistics = Boolean(logisticsExit || logisticsText || logisticsExtra);
   const hasGastro = Boolean(gastro?.name);
   const showMetaGrid = hasLogistics || hasGastro;
   const nestedAll = sights.filter((s) => s?.name);
-  const [sightsOpen, setSightsOpen] = React.useState(false);
-  const hubNeedsCollapse = !magazine && nestedAll.length > HUB_SIGHTS_PREVIEW;
-  const nested = magazine
-    ? nestedAll.slice(0, MAGAZINE_SIGHTS_MAX)
-    : hubNeedsCollapse && !sightsOpen
-      ? nestedAll.slice(0, HUB_SIGHTS_PREVIEW)
-      : nestedAll;
-  const poiDayNumbers: number[] = [];
-  {
-    let dayPlaceNum = 0;
-    for (const poi of nested) {
-      if (String(poi.dayLabel || '').trim()) dayPlaceNum = 0;
-      dayPlaceNum += 1;
-      poiDayNumbers.push(dayPlaceNum);
-    }
-  }
+  const nested = magazine ? nestedAll.slice(0, MAGAZINE_SIGHTS_MAX) : nestedAll;
 
   const dataProps: Record<string, string> = {};
   if (dataAttrs) {
@@ -307,29 +243,19 @@ export function DayTripCanonCard({
             data-day-trip-sights
           >
             <h4 className={`text-sm font-semibold ${inkClass}`}>Что посмотреть</h4>
-            <ul className="mt-2 list-none space-y-1.5 p-0" data-day-trip-places>
-              {nested.map((poi, poiIndex) => (
-                <li
-                  key={`${poi.name}:${poiIndex}`}
-                  className="flex items-start gap-2 text-sm leading-snug"
-                  data-day-trip-place
-                >
-                  <span
-                    className={`mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary-500 ${numClass}`}
-                    aria-hidden
-                  />
-                  <span className={`min-w-0 ${poiTextClass}`}>
-                    <SightLabel
-                      name={poi.name}
-                      href={poi.href}
-                      desc={poi.desc}
-                      descFromMd={sightDescFromMd}
-                      visitMinutes={poi.visitMinutes}
-                    />
-                  </span>
-                </li>
-              ))}
-            </ul>
+            <SuburbPlacesPhotoRail
+              className="mt-3"
+              ariaLabel="Что посмотреть"
+              places={nested.map((poi) => ({
+                name: poi.name,
+                desc: poi.desc,
+                href: poi.href,
+                imageSlug: poi.imageSlug,
+                visitMinutes: poi.visitMinutes,
+                transitTip: poi.transitTip,
+                dayLabel: poi.dayLabel,
+              }))}
+            />
           </section>
         ) : null}
 
@@ -504,72 +430,21 @@ export function DayTripCanonCard({
             <div aria-hidden className="hidden sm:block" />
             <h4 className={`text-sm font-semibold ${inkClass}`}>Что посмотреть</h4>
           </div>
-          <ol className="mt-2.5 list-none space-y-2 p-0 sm:mt-3 sm:space-y-2.5" data-day-trip-places>
-            {nested.map((poi, poiIndex) => {
-              const dayLabel = String(poi.dayLabel || '').trim();
-              const tip = formatCanonTransitTip(String(poi.transitTip || ''));
-              return (
-                <li key={`${poi.name}:${poiIndex}`} className="list-none" data-day-trip-place>
-                  {dayLabel ? (
-                    <div
-                      className={`${
-                        poiIndex > 0
-                          ? `mt-3 border-t pt-3 sm:mt-3.5 sm:pt-3.5 ${borderSoft}`
-                          : ''
-                      } mb-1.5 sm:mb-2 ${GRID}`}
-                      data-day-trip-day-label
-                    >
-                      <span aria-hidden />
-                      <h5 className={`min-w-0 text-sm font-semibold ${inkClass}`}>{dayLabel}</h5>
-                    </div>
-                  ) : null}
-                  {tip ? (
-                    <div className={`mb-0.5 sm:mb-1 ${GRID}`}>
-                      <span aria-hidden />
-                      <p
-                        className={`min-w-0 text-[11px] leading-snug sm:text-[12px] ${mutedClass}`}
-                        data-day-trip-transit-tip
-                      >
-                        {tip}
-                      </p>
-                    </div>
-                  ) : null}
-                  <div className={`${GRID} text-sm leading-snug`}>
-                    <span
-                      className={`${GUTTER} tabular-nums ${numClass}`}
-                      data-day-trip-place-num
-                    >
-                      {poiDayNumbers[poiIndex]}.
-                    </span>
-                    <span className={`min-w-0 ${poiTextClass}`}>
-                      <SightLabel
-                        name={poi.name}
-                        href={poi.href}
-                        desc={poi.desc}
-                        descFromMd={sightDescFromMd}
-                        visitMinutes={poi.visitMinutes}
-                      />
-                    </span>
-                  </div>
-                </li>
-              );
-            })}
-          </ol>
-          {hubNeedsCollapse ? (
-            <div className="mt-3 sm:grid sm:grid-cols-[2.25rem_minmax(0,1fr)] sm:gap-x-3">
-              <div aria-hidden className="hidden sm:block" />
-              <button
-                type="button"
-                data-day-trip-sights-more
-                onClick={() => setSightsOpen((open) => !open)}
-                className={`text-left text-sm font-semibold ${
-                  editorial ? 'text-zinc-700 hover:text-zinc-950' : 'text-primary-700 hover:text-primary-800'
-                }`}
-              >
-                {sightsOpen ? 'Свернуть' : `Ещё ${nestedAll.length - HUB_SIGHTS_PREVIEW} точек`}
-              </button>
-            </div>
-          ) : null}
+          <div className="mt-3 sm:grid sm:grid-cols-[2.25rem_minmax(0,1fr)] sm:gap-x-3" data-day-trip-places>
+            <div aria-hidden className="hidden sm:block" />
+            <SuburbPlacesPhotoRail
+              ariaLabel="Что посмотреть"
+              places={nested.map((poi) => ({
+                name: poi.name,
+                desc: poi.desc,
+                href: poi.href,
+                imageSlug: poi.imageSlug,
+                visitMinutes: poi.visitMinutes,
+                transitTip: poi.transitTip,
+                dayLabel: poi.dayLabel,
+              }))}
+            />
+          </div>
         </section>
       ) : null}
 

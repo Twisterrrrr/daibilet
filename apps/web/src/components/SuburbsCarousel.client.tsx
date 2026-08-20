@@ -299,6 +299,7 @@ export function SuburbsCarousel({
           name: poi.name,
           desc: String(poi.desc || '').trim() || undefined,
           href: resolveCityPlaceTitleHref(poi, venues, { allowNameMatch: false }),
+          imageSlug: String(poi.locationSlug || poi.venueSlug || '').trim() || null,
           transitTip: String(poi.transitTip || '').trim() || undefined,
           dayLabel: String(poi.dayLabel || '').trim() || undefined,
           visitMinutes: poi.visitMinutes,

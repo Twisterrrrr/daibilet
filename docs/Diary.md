@@ -1,3 +1,16 @@
+## 2026-08-20 - Suburb nested places: photo rail everywhere
+
+### Наблюдения
+- Region child (Выборг) уже на photo cards; хаб `#city-suburbs` и my-day всё ещё текстовый список в `DayTripCanonCard`.
+- У 6 точек Выборга не было editorial JPG → gradient.
+
+### Решения
+- Shared `SuburbPlacesPhotoRail` → `DestinationRegionGuide` + `DayTripCanonCard` (все significantSuburbs).
+- GenerateImage ×6 Vyborg POI + map в `city-place-images`.
+
+### Проблемы
+- Identity-only / no-slug nested (~360) ещё без уникальных фото - следующий пасс по запросу.
+
 ## 2026-08-20 - Region child guide: must-see cards + no «субъект»
 
 ### Наблюдения

@@ -1,3 +1,9 @@
+## 2026-08-20 - Suburb nested photo rail
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| UX.SUBURB-PLACES-PHOTO-RAIL | Nested places пригородов: ScrollRail фотокарточки на хабе + region child; Vyborg P0 JPG×6 | Высокий | 🔄 ship+Deploy MSK web |
+
 ## 2026-08-20 - Region child guide + affiche copy
 
 | ID | Задача | Приоритет | Статус |
