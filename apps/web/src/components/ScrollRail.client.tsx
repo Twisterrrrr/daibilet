@@ -67,6 +67,31 @@ function readRailState(el: HTMLElement) {
   };
 }
 
+function isVerticallyScrollable(node: HTMLElement): boolean {
+  const { overflowY } = getComputedStyle(node);
+  if (overflowY !== 'auto' && overflowY !== 'scroll' && overflowY !== 'overlay') return false;
+  return node.scrollHeight > node.clientHeight + EDGE_EPS;
+}
+
+/**
+ * Vertical-dominant wheel on overflow-x rails is often remapped to scrollLeft
+ * (hub suburb «Что посмотреть», event rails). Forward it to the nearest
+ * vertical scroller / page instead.
+ */
+function forwardVerticalWheel(from: HTMLElement, deltaY: number): void {
+  let node: HTMLElement | null = from.parentElement;
+  while (node && node !== document.documentElement) {
+    if (isVerticallyScrollable(node)) {
+      const prev = node.scrollTop;
+      node.scrollTop += deltaY;
+      if (node.scrollTop !== prev) return;
+    }
+    node = node.parentElement;
+  }
+  const root = document.scrollingElement || document.documentElement;
+  root.scrollTop += deltaY;
+}
+
 /**
  * Horizontal row with md+ prev/next controls when content overflows.
  * Mobile keeps swipe; optional hideScrollbar (city hub rail).
@@ -109,6 +134,14 @@ export function ScrollRail({
     el.addEventListener('scrollend', update);
     window.addEventListener('resize', update, { passive: true });
 
+    const onWheel = (event: WheelEvent) => {
+      if (event.ctrlKey || event.metaKey || event.shiftKey) return;
+      if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+      event.preventDefault();
+      forwardVerticalWheel(el, event.deltaY);
+    };
+    el.addEventListener('wheel', onWheel, { passive: false });
+
     const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(update) : null;
     ro?.observe(el);
 
@@ -123,6 +156,7 @@ export function ScrollRail({
     return () => {
       el.removeEventListener('scroll', update);
       el.removeEventListener('scrollend', update);
+      el.removeEventListener('wheel', onWheel);
       window.removeEventListener('resize', update);
       ro?.disconnect();
       mo?.disconnect();

@@ -79,11 +79,14 @@ const LOGISTICS_BG_EXTEND_SM = 'sm:-ml-4';
 
 /**
  * Desktop: keep suburb detail inside the viewport under sticky header + hub tabs.
- * Scroll the text column (or magazine body) - not the route chip list.
+ * Scroll the text column - not the route chip list.
+ * `min-h-0` lets the grid item shrink so overflow-y actually scrolls.
+ * No overscroll-y-contain: it trapped page wheel when the panel was not overflowing
+ * (and after photo rail, wheel often never reached the page).
  */
 const HUB_DETAIL_MAX_H =
   'sm:max-h-[calc(100dvh-var(--site-header-height)-env(safe-area-inset-top,0px)-5.5rem)]';
-const HUB_DETAIL_SCROLL = `${HUB_DETAIL_MAX_H} sm:overflow-y-auto sm:overscroll-y-contain`;
+const HUB_DETAIL_SCROLL = `${HUB_DETAIL_MAX_H} sm:min-h-0 sm:overflow-y-auto`;
 
 export function DayTripCanonCard({
   index,
@@ -290,7 +293,7 @@ export function DayTripCanonCard({
       <div
         className={
           cover
-            ? 'flex flex-col sm:grid sm:grid-cols-[minmax(15rem,40%)_minmax(0,1fr)] sm:items-stretch'
+            ? 'flex flex-col sm:grid sm:min-h-0 sm:grid-cols-[minmax(15rem,40%)_minmax(0,1fr)] sm:items-stretch'
             : undefined
         }
       >
