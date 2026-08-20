@@ -1,3 +1,16 @@
+## 2026-08-20 - Afternoon batch (declension + affiche pin + my-day)
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| FIX.MYDAY-KEYBOARD-FOCUS | Sticky collapse не сбрасывает фокус инпутов/grip | Высокий | 🔄 Deploy MSK web (этот batch) |
+| FIX.REGION-BRIDGE-COPY | «Ищете больше событий?» + CTA «На страницу {род.п.}» | Высокий | 🔄 Deploy MSK web (этот batch) |
+| FIX.REGION-PARENT-GENITIVE | «как пригород Санкт-Петербурга» | Высокий | 🔄 Deploy MSK web (этот batch) |
+| FIX.CITY-DECLINE-STRIP-PARENS | «Отрадное (ЛО)» → «в Отрадном» | Высокий | 🔄 Deploy MSK web (этот batch) |
+| FIX.CITY-DECLINE-NOVOE-DEVYATKINO | «в Новом Девяткино» (прил. + -ино) | Высокий | 🔄 Deploy MSK web (этот batch) |
+| FIX.CITY-DECLINE-GORBUNKI | «в Горбунках» (мн.ч. -ки) | Высокий | 🔄 Deploy MSK web (этот batch) |
+| FIX.AFFICHE-PIN-CITY-STREET | Афиша: pin = улица · город, не голое «д. 5/1» | Критический | 🔄 Deploy MSK web (этот batch) |
+| PERF.HUB-EVENT-TC-OPTIMIZER | TC covers через `/_next/image` (все города) | Высокий | ✅ уже live `32368896798`; в batch для полноты |
+
 ## 2026-08-20 - Hub suburbs scroll
 
 | ID | Задача | Приоритет | Статус |
@@ -9,7 +22,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| PERF.HUB-EVENT-TC-OPTIMIZER | TicketsCloud/yandexcloud через `/_next/image` (не full CDN); cityHub `affichePoster` sizes | Высокий | 🔄 code pushed; live после Deploy MSK web |
+| PERF.HUB-EVENT-TC-OPTIMIZER | TicketsCloud/yandexcloud через `/_next/image` (не full CDN); cityHub `affichePoster` sizes | Высокий | ✅ live Deploy `32368896798` SHA `0677103` |
 
 ## 2026-08-20 - Suburb nested photo rail
 
@@ -116,7 +129,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| UX.MYDAY-STICKY-COLLAPSE | `/my-day` sticky сжимается при скролле вниз (все viewport); expand у верха / тап; без thrash | Высокий | 🔄 Deploy MSK web |
+| UX.MYDAY-STICKY-COLLAPSE | `/my-day` sticky сжимается при скролле вниз (все viewport); expand у верха / тап; без thrash | Высокий | ✅ live Deploy `32368896798` SHA `0677103` |
 
 ## 2026-08-17 - Новосибирск live deploy + listing image sidecars
 
