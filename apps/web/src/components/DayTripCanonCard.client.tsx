@@ -249,6 +249,7 @@ export function DayTripCanonCard({
             <SuburbPlacesPhotoRail
               className="mt-3"
               ariaLabel="Что посмотреть"
+              fallbackImageUrl={cover}
               places={nested.map((poi) => ({
                 name: poi.name,
                 desc: poi.desc,
@@ -437,6 +438,7 @@ export function DayTripCanonCard({
             <div aria-hidden className="hidden sm:block" />
             <SuburbPlacesPhotoRail
               ariaLabel="Что посмотреть"
+              fallbackImageUrl={cover}
               places={nested.map((poi) => ({
                 name: poi.name,
                 desc: poi.desc,

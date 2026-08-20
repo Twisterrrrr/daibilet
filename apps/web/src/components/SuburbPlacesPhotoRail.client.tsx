@@ -13,6 +13,8 @@ export type SuburbPlaceRailItem = {
   href?: string | null;
   /** venueSlug / locationSlug for editorial cover */
   imageSlug?: string | null;
+  /** Direct cover when slug is missing (suburb hero fallback). */
+  imageUrl?: string | null;
   visitMinutes?: number | string;
   transitTip?: string;
   dayLabel?: string;
@@ -25,18 +27,33 @@ function formatTransitTip(raw: string): string {
   return `↓ ${tip}`;
 }
 
+function resolveRailCover(
+  place: SuburbPlaceRailItem,
+  fallbackImageUrl?: string | null,
+): string | null {
+  const fromSlug = resolveVenueHeroImage(place.imageSlug);
+  if (fromSlug) return fromSlug;
+  const direct = String(place.imageUrl || '').trim();
+  if (direct) return direct;
+  const fallback = String(fallbackImageUrl || '').trim();
+  return fallback || null;
+}
+
 /**
  * Photo cards for suburb nested places - same language as city hub «Главные места».
  * Used by DestinationRegionGuide (region child) and DayTripCanonCard (hub / my-day).
- * CardSafeImage prefers `-thumb` then `-card` then original (avoid 404 waterfall when
- * sidecars are missing on disk).
+ * Most nested POIs still lack locationSlug - fall back to suburb hero so the rail
+ * is not a row of gray boxes.
  */
 export function SuburbPlacesPhotoRail({
   places,
+  fallbackImageUrl = null,
   ariaLabel = 'Что посмотреть',
   className = '',
 }: {
   places: SuburbPlaceRailItem[];
+  /** Suburb / destination cover when a POI has no own editorial image. */
+  fallbackImageUrl?: string | null;
   ariaLabel?: string;
   className?: string;
 }) {
@@ -50,7 +67,7 @@ export function SuburbPlacesPhotoRail({
       aria-label={ariaLabel}
     >
       {places.map((place, index) => {
-        const coverSrc = resolveVenueHeroImage(place.imageSlug);
+        const coverSrc = resolveRailCover(place, fallbackImageUrl);
         const visitLabel = formatVisitDuration(place.visitMinutes);
         const tip = formatTransitTip(String(place.transitTip || ''));
         const dayLabel = String(place.dayLabel || '').trim();

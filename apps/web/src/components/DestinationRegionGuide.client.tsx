@@ -6,6 +6,7 @@ import { ArrowRight } from 'lucide-react';
 import { SuburbPlacesPhotoRail } from '@/components/SuburbPlacesPhotoRail.client';
 import type { DestinationPageGuide } from '@/lib/city-destination-registry';
 import { cityToGenitive } from '@/lib/city-declension';
+import { resolveVenueHeroImage } from '@/lib/city-place-images';
 import { venueHref } from '@/lib/routes';
 
 export function DestinationRegionGuide({
@@ -19,6 +20,16 @@ export function DestinationRegionGuide({
   const { suburbCard } = guide;
   const gastro = suburbCard.gastroStop;
   const logisticsExit = String(suburbCard.logisticsExit || suburbCard.stationName || '').trim();
+  const railFallback =
+    guide.places
+      .map((place) =>
+        resolveVenueHeroImage(String(place.locationSlug || place.venueSlug || '').trim() || null),
+      )
+      .find(Boolean) ||
+    resolveVenueHeroImage(
+      String(suburbCard.locationSlug || suburbCard.venueSlug || '').trim() || null,
+    ) ||
+    null;
 
   return (
     <div className="space-y-8">
@@ -30,6 +41,7 @@ export function DestinationRegionGuide({
         <SuburbPlacesPhotoRail
           className="mt-1"
           ariaLabel={`Главные места: ${guide.name}`}
+          fallbackImageUrl={railFallback}
           places={guide.places.map((place) => {
             const slug = String(place.locationSlug || place.venueSlug || '').trim();
             return {
