@@ -99,6 +99,7 @@ const CITY_CARD_IMAGE_SLUGS = new Set([
   'tolyatti',
   'novokuznetsk',
   'hanty-mansiysk',
+  'vladikavkaz',
 ]);
 
 /** Daytime JPG under `/images/cities/top/` when available; else legacy PNG. */
@@ -174,6 +175,7 @@ const CITY_DAYTIME_PREVIEW_SLUGS = new Set([
   'tolyatti',
   'novokuznetsk',
   'hanty-mansiysk',
+  'vladikavkaz',
 ]);
 
 /** Night hub heroes under `/images/cities/night/`. */

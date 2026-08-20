@@ -99,6 +99,7 @@ const CITY_CARD_IMAGE_SLUGS = new Set([
   'tolyatti',
   'novokuznetsk',
   'hanty-mansiysk',
+  'vladikavkaz',
 ]);
 
 /**
@@ -186,6 +187,7 @@ const CITY_DAYTIME_PREVIEW_SLUGS = new Set([
   'tolyatti',
   'novokuznetsk',
   'hanty-mansiysk',
+  'vladikavkaz',
 ]);
 
 /**

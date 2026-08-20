@@ -39,6 +39,7 @@ const CITY_IMAGE_OBJECT_POSITION: Record<string, string> = {
   'ulan-ude': '60% 54%',
   ulyanovsk: '65% 53%',
   'veliky-novgorod': '65% 49%',
+  vladikavkaz: '58% 42%',
   vladivostok: 'center 56%',
   volgograd: '57% 53%',
   vologda: '65% 53%',
