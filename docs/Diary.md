@@ -1,3 +1,16 @@
+## 2026-08-20 - My Day sticky toolbar collapse (all viewports)
+
+### Наблюдения
+- Desktop sticky не сжимался: `lg+` принудительно expanded + compact был `lg:hidden`.
+- Mobile лаг при скролле вверх: разворот полной панели на каждый scroll-up + backdrop-blur.
+
+### Решения
+- Collapse на всех ширинах; compact strip везде; без blur.
+- Expand у верха страницы или тапом; mid-page scroll-up больше не разворачивает; cooldown 320ms.
+
+### Проблемы
+- Нет.
+
 ## 2026-08-20 - Hub suburbs: vertical scroll stuck
 
 ### Наблюдения
