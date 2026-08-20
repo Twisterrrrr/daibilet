@@ -78,6 +78,9 @@ const CITY_FORMS: Record<string, CityFormRow> = {
     dat: 'Красному Селу',
   },
   Отрадное: { prep: 'Отрадном', gen: 'Отрадного' },
+  Горбунки: { prep: 'Горбунках', gen: 'Горбунок', acc: 'Горбунки', dat: 'Горбункам' },
+  Химки: { prep: 'Химках', gen: 'Химок', acc: 'Химки', dat: 'Химкам' },
+  Мытищи: { prep: 'Мытищах', gen: 'Мытищ', acc: 'Мытищи', dat: 'Мытищам' },
   'Ростов-на-Дону': { prep: 'Ростове-на-Дону', gen: 'Ростова-на-Дону' },
   Рязань: { prep: 'Рязани', gen: 'Рязани' },
   Самара: { prep: 'Самаре', gen: 'Самары', acc: 'Самару' },
@@ -247,6 +250,11 @@ function inferPrepositional(name: string): string {
   // Мурино / Девяткино: не «Мурине».
   if (/(?:ино|ыно)$/i.test(name)) return name;
 
+  // Мн.ч. топонимы: Горбунки → Горбунках (до несклоняемого «…и»).
+  if (/ки$/i.test(name)) return `${name.slice(0, -2)}ках`;
+  if (/цы$/i.test(name)) return `${name.slice(0, -2)}цах`;
+  if (/щи$/i.test(name)) return `${name.slice(0, -2)}щах`;
+
   if (/ы$/i.test(name)) return `${name.slice(0, -1)}ах`; // Чебоксары → …ах (fallback)
   if (/ия$/i.test(name)) return `${name.slice(0, -1)}и`; // Карелия → Карелии
   if (/а$/i.test(name)) return `${name.slice(0, -1)}е`; // Самара → Самаре
@@ -280,6 +288,10 @@ function inferGenitive(name: string): string {
   }
 
   if (/(?:ино|ыно)$/i.test(name)) return name;
+
+  if (/ки$/i.test(name)) return `${name.slice(0, -2)}ок`; // Горбунки → Горбунок
+  if (/цы$/i.test(name)) return `${name.slice(0, -2)}цев`;
+  if (/щи$/i.test(name)) return `${name.slice(0, -2)}щ`; // Мытищи → Мытищ
 
   if (/ы$/i.test(name)) return name.slice(0, -1); // Чебоксары → Чебоксар
   if (/ия$/i.test(name)) return `${name.slice(0, -1)}и`;
@@ -318,6 +330,10 @@ function inferDative(name: string): string {
   }
 
   if (/(?:ино|ыно)$/i.test(name)) return name;
+
+  if (/ки$/i.test(name)) return `${name.slice(0, -2)}кам`; // Горбунки → Горбункам
+  if (/цы$/i.test(name)) return `${name.slice(0, -2)}цам`;
+  if (/щи$/i.test(name)) return `${name.slice(0, -2)}щам`;
 
   if (/ы$/i.test(name)) return `${name.slice(0, -1)}ам`;
   if (/ия$/i.test(name)) return `${name.slice(0, -1)}и`;

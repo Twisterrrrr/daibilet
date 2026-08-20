@@ -137,4 +137,8 @@ test('SPB satellites and LO towns decline sanely', () => {
   assert.equal(inCityPrepositional('Всеволожск'), 'в Всеволожске');
   assert.equal(inCityPrepositional('Отрадное'), 'в Отрадном');
   assert.equal(inCityPrepositional('Иваново'), 'в Иванове'); // dictionary still declines
+  assert.equal(inCityPrepositional('Горбунки'), 'в Горбунках');
+  assert.equal(cityToGenitive('Горбунки'), 'Горбунок');
+  assert.equal(inCityPrepositional('Химки'), 'в Химках');
+  assert.equal(inCityPrepositional('Мытищи'), 'в Мытищах');
 });
