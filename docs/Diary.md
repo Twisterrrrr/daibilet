@@ -112,6 +112,19 @@
 ### Проблемы
 - ~~Blog sidecars на MSK - через SSH compress (не в git)~~ → 2026-08-20 owner: коммитим `*-card.jpg` в `apps/public` (~5MB), CI sync в web artifact.
 
+## 2026-08-20 - Caption-stub venue covers purge
+
+### Наблюдения
+- Hub must-see превью (зоопарк / планетарий) показывали JPG-stubs: blur-градиент + подпись имени внизу кадра - не 404.
+- Таких originals `<22KB` в `venues/**` было ~49 (в основном Москва + хвост НН/Екб).
+
+### Решения
+- Перегенерированы `moscow/zoopark.jpg` + `planetariy.jpg` (+ card/thumb).
+- Остальные caption-stubs удалены с диска (чистый CardSafeImage fallback без фейковой «фото+подпись»).
+
+### Проблемы
+- Нужен проход GenerateImage по удалённым must-see (Парк Горького, Арбат, …) - иначе серый градиент до замены.
+
 ## 2026-08-20 - Blog listing cards in git + tmp hygiene
 
 ### Наблюдения
