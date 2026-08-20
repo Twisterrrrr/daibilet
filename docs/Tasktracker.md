@@ -2,7 +2,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| FIX.MYDAY-NO-REGION | type=region в chrome/storage → prompt hub + областные города, не пустой «Шаг 1» | Высокий | 🔄 Deploy MSK web |
+| FIX.MYDAY-NO-REGION | type=region в chrome/storage → prompt hub + областные города, не пустой «Шаг 1» | Высокий | ✅ live Deploy [`32395396047`](https://github.com/Twisterrrrr/daibilet/actions/runs/32395396047) SHA `1317d64` |
 
 ## 2026-08-20 - Afternoon batch (declension + affiche pin + my-day)
 
