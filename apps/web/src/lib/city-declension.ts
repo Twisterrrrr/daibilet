@@ -62,6 +62,22 @@ const CITY_FORMS: Record<string, CityFormRow> = {
   Пермь: { prep: 'Перми', gen: 'Перми' },
   Псков: { prep: 'Пскове', gen: 'Пскова' },
   Раменское: { prep: 'Раменском', gen: 'Раменского' },
+  'Новое Девяткино': {
+    prep: 'Новом Девяткино',
+    gen: 'Нового Девяткино',
+    acc: 'Новое Девяткино',
+    dat: 'Новому Девяткино',
+  },
+  Мурино: { prep: 'Мурино', gen: 'Мурино', acc: 'Мурино', dat: 'Мурино' },
+  Кудрово: { prep: 'Кудрово', gen: 'Кудрово', acc: 'Кудрово', dat: 'Кудрово' },
+  Парголово: { prep: 'Парголово', gen: 'Парголово', acc: 'Парголово', dat: 'Парголово' },
+  'Красное Село': {
+    prep: 'Красном Селе',
+    gen: 'Красного Села',
+    acc: 'Красное Село',
+    dat: 'Красному Селу',
+  },
+  Отрадное: { prep: 'Отрадном', gen: 'Отрадного' },
   'Ростов-на-Дону': { prep: 'Ростове-на-Дону', gen: 'Ростова-на-Дону' },
   Рязань: { prep: 'Рязани', gen: 'Рязани' },
   Самара: { prep: 'Самаре', gen: 'Самары', acc: 'Самару' },
@@ -153,6 +169,8 @@ const SEO_EXPANSION_CITY_SLUGS = new Set(['kazan', 'ekaterinburg']);
 function inferAdjectivePrep(adj: string): string {
   if (/ая$/i.test(adj)) return `${adj.slice(0, -2)}ой`;
   if (/яя$/i.test(adj)) return `${adj.slice(0, -2)}ей`;
+  if (/ое$/i.test(adj)) return `${adj.slice(0, -2)}ом`; // Новое → Новом
+  if (/ее$/i.test(adj)) return `${adj.slice(0, -2)}ем`;
   if (/ий$/i.test(adj) || /ый$/i.test(adj) || /ой$/i.test(adj)) return `${adj.slice(0, -2)}ом`;
   return adj;
 }
@@ -160,14 +178,46 @@ function inferAdjectivePrep(adj: string): string {
 function inferAdjectiveGen(adj: string): string {
   if (/ая$/i.test(adj)) return `${adj.slice(0, -2)}ой`;
   if (/яя$/i.test(adj)) return `${adj.slice(0, -2)}ей`;
+  if (/ое$/i.test(adj)) return `${adj.slice(0, -2)}ого`; // Новое → Нового
+  if (/ее$/i.test(adj)) return `${adj.slice(0, -2)}его`;
   if (/ий$/i.test(adj) || /ый$/i.test(adj) || /ой$/i.test(adj)) return `${adj.slice(0, -2)}ого`;
+  return adj;
+}
+
+function inferAdjectiveDat(adj: string): string {
+  if (/ая$/i.test(adj)) return `${adj.slice(0, -2)}ой`;
+  if (/яя$/i.test(adj)) return `${adj.slice(0, -2)}ей`;
+  if (/ое$/i.test(adj)) return `${adj.slice(0, -2)}ому`; // Новое → Новому
+  if (/ее$/i.test(adj)) return `${adj.slice(0, -2)}ему`;
+  if (/ий$/i.test(adj)) return `${adj.slice(0, -2)}ему`;
+  if (/ый$/i.test(adj) || /ой$/i.test(adj)) return `${adj.slice(0, -2)}ому`;
   return adj;
 }
 
 function inferAdjectiveAcc(adj: string): string {
   if (/ая$/i.test(adj)) return `${adj.slice(0, -2)}ую`;
   if (/яя$/i.test(adj)) return `${adj.slice(0, -2)}юю`;
+  // Neut / masc inanimate adjectives keep nominative in accusative.
   return adj;
+}
+
+/** «Новое Девяткино», «Красное Село» - first token is an adjective. */
+const ADJECTIVAL_FIRST =
+  /^(\S+(?:ое|ее|ая|яя|ий|ый|ой))\s+(.+)$/iu;
+/**
+ * Modern settlement tails -ино/-ово often stay undeclined (в Мурино, в Девяткино).
+ * With an adjective only the adjective declines: в Новом Девяткино.
+ */
+const INDECLINABLE_SETTLEMENT_TAIL = /(?:ино|ыно|ово|ево|ёво)$/iu;
+
+function splitAdjectivalToponym(name: string): { adj: string; rest: string } | null {
+  const match = name.match(ADJECTIVAL_FIRST);
+  if (!match) return null;
+  return { adj: match[1], rest: match[2] };
+}
+
+function isIndeclinableSettlementTail(rest: string): boolean {
+  return INDECLINABLE_SETTLEMENT_TAIL.test(rest.trim());
 }
 
 /**
@@ -184,6 +234,19 @@ function inferPrepositional(name: string): string {
   const kray = name.match(/^(.+)\s+край$/i);
   if (kray) return `${inferAdjectivePrep(kray[1])} крае`;
 
+  const adjectival = splitAdjectivalToponym(name);
+  if (adjectival) {
+    // Новое Девяткино → Новом Девяткино (хвост не склоняем).
+    if (isIndeclinableSettlementTail(adjectival.rest)) {
+      return `${inferAdjectivePrep(adjectival.adj)} ${adjectival.rest}`;
+    }
+    // Красное Село → Красном Селе.
+    return `${inferAdjectivePrep(adjectival.adj)} ${inferPrepositional(adjectival.rest)}`;
+  }
+
+  // Мурино / Девяткино: не «Мурине».
+  if (/(?:ино|ыно)$/i.test(name)) return name;
+
   if (/ы$/i.test(name)) return `${name.slice(0, -1)}ах`; // Чебоксары → …ах (fallback)
   if (/ия$/i.test(name)) return `${name.slice(0, -1)}и`; // Карелия → Карелии
   if (/а$/i.test(name)) return `${name.slice(0, -1)}е`; // Самара → Самаре
@@ -193,7 +256,7 @@ function inferPrepositional(name: string): string {
   if (/ый$/i.test(name) || /ой$/i.test(name)) return `${name.slice(0, -2)}ом`;
   if (/ое$/i.test(name)) return `${name.slice(0, -2)}ом`; // Раменское → Раменском
   if (/ее$/i.test(name)) return `${name.slice(0, -2)}ем`;
-  if (/о$/i.test(name)) return `${name.slice(0, -1)}е`; // Иваново → Иванове
+  if (/о$/i.test(name)) return `${name.slice(0, -1)}е`; // Иваново → Иванове (словарь перекрывает Кудрово)
   if (/[еиуюэ]$/i.test(name)) return name; // несклоняемые, в т.ч. Коми
   return `${name}е`; // Мурманск → Мурманске
 }
@@ -207,6 +270,16 @@ function inferGenitive(name: string): string {
   if (oblast) return `${inferAdjectiveGen(oblast[1])} области`;
   const kray = name.match(/^(.+)\s+край$/i);
   if (kray) return `${inferAdjectiveGen(kray[1])} края`;
+
+  const adjectival = splitAdjectivalToponym(name);
+  if (adjectival) {
+    if (isIndeclinableSettlementTail(adjectival.rest)) {
+      return `${inferAdjectiveGen(adjectival.adj)} ${adjectival.rest}`;
+    }
+    return `${inferAdjectiveGen(adjectival.adj)} ${inferGenitive(adjectival.rest)}`;
+  }
+
+  if (/(?:ино|ыно)$/i.test(name)) return name;
 
   if (/ы$/i.test(name)) return name.slice(0, -1); // Чебоксары → Чебоксар
   if (/ия$/i.test(name)) return `${name.slice(0, -1)}и`;
@@ -222,14 +295,6 @@ function inferGenitive(name: string): string {
   return `${name}а`;
 }
 
-function inferAdjectiveDat(adj: string): string {
-  if (/ая$/i.test(adj)) return `${adj.slice(0, -2)}ой`;
-  if (/яя$/i.test(adj)) return `${adj.slice(0, -2)}ей`;
-  if (/ий$/i.test(adj)) return `${adj.slice(0, -2)}ему`;
-  if (/ый$/i.test(adj) || /ой$/i.test(adj)) return `${adj.slice(0, -2)}ому`;
-  return adj;
-}
-
 /** Дательный для «по …»: Перми, Санкт-Петербургу, Нижнему Новгороду. */
 function inferDative(name: string): string {
   const republic = name.match(/^Республика\s+(.+)$/i);
@@ -243,6 +308,16 @@ function inferDative(name: string): string {
 
   const naCompound = name.match(/^(.+)-на-(.+)$/i);
   if (naCompound) return `${inferDative(naCompound[1])}-на-${naCompound[2]}`;
+
+  const adjectival = splitAdjectivalToponym(name);
+  if (adjectival) {
+    if (isIndeclinableSettlementTail(adjectival.rest)) {
+      return `${inferAdjectiveDat(adjectival.adj)} ${adjectival.rest}`;
+    }
+    return `${inferAdjectiveDat(adjectival.adj)} ${inferDative(adjectival.rest)}`;
+  }
+
+  if (/(?:ино|ыно)$/i.test(name)) return name;
 
   if (/ы$/i.test(name)) return `${name.slice(0, -1)}ам`;
   if (/ия$/i.test(name)) return `${name.slice(0, -1)}и`;
@@ -272,6 +347,14 @@ function inferAccusative(name: string): string {
   if (oblast) return `${inferAdjectiveAcc(oblast[1])} область`;
   const kray = name.match(/^(.+)\s+край$/i);
   if (kray) return `${inferAdjectiveAcc(kray[1])} край`;
+
+  const adjectival = splitAdjectivalToponym(name);
+  if (adjectival) {
+    if (isIndeclinableSettlementTail(adjectival.rest)) {
+      return `${inferAdjectiveAcc(adjectival.adj)} ${adjectival.rest}`;
+    }
+    return `${inferAdjectiveAcc(adjectival.adj)} ${inferAccusative(adjectival.rest)}`;
+  }
 
   if (/-/.test(name)) return name;
   if (/ия$/i.test(name)) return `${name.slice(0, -1)}ю`;

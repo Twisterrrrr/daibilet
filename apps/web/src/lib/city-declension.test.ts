@@ -117,3 +117,24 @@ test('catalog disambiguator in parentheses is stripped before decline', () => {
   assert.equal(cityToGenitive('Отрадное (Ленинградская область)'), 'Отрадного');
   assert.notEqual(inCityPrepositional('Отрадное (Ленинградская область)'), 'в Отрадное (Ленинградская область)е');
 });
+
+test('adjective + -ино/-ово: decline adjective only', () => {
+  assert.equal(inCityPrepositional('Новое Девяткино'), 'в Новом Девяткино');
+  assert.equal(cityToGenitive('Новое Девяткино'), 'Нового Девяткино');
+  assert.equal(cityToDative('Новое Девяткино'), 'Новому Девяткино');
+  assert.equal(cityToAccusative('Новое Девяткино'), 'Новое Девяткино');
+  assert.equal(inCityPrepositional('Старое Девяткино'), 'в Старом Девяткино');
+  assert.notEqual(inCityPrepositional('Новое Девяткино'), 'в Новое Девяткине');
+});
+
+test('SPB satellites and LO towns decline sanely', () => {
+  assert.equal(inCityPrepositional('Мурино'), 'в Мурино');
+  assert.equal(inCityPrepositional('Кудрово'), 'в Кудрово');
+  assert.equal(inCityPrepositional('Парголово'), 'в Парголово');
+  assert.equal(inCityPrepositional('Красное Село'), 'в Красном Селе');
+  assert.equal(cityToGenitive('Красное Село'), 'Красного Села');
+  assert.equal(inCityPrepositional('Выборг'), 'в Выборге');
+  assert.equal(inCityPrepositional('Всеволожск'), 'в Всеволожске');
+  assert.equal(inCityPrepositional('Отрадное'), 'в Отрадном');
+  assert.equal(inCityPrepositional('Иваново'), 'в Иванове'); // dictionary still declines
+});
