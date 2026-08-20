@@ -5,9 +5,9 @@ import { ArrowRight, MapPin, Ticket, Train } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
-import { RegionEventCard } from '@/components/RegionEventCard.client';
+import { DestinationRegionGuide } from '@/components/DestinationRegionGuide.client';
+import { HubEventsAfficheRail } from '@/components/HubEventsAfficheRail.client';
 import { RegionOrientMap, type RegionMapPoint } from '@/components/RegionOrientMap.client';
-import { RegionVenueSeriesCard } from '@/components/RegionVenueSeriesCard.client';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { formatNumber } from '@/lib/format';
 import { buildRegionSystemBrief } from '@/lib/region-hub-seo';
@@ -17,7 +17,6 @@ import {
   filterSessionsForRegionChildCity,
 } from '@/lib/region-child-city-scope';
 import { resolveDestinationPageGuideForRegionChild } from '@/lib/city-destination-registry';
-import { DestinationRegionGuide } from '@/components/DestinationRegionGuide.client';
 import { cityHref } from '@/lib/routes';
 import {
   buildCitySessionCoverIndex,
@@ -35,9 +34,7 @@ import {
   isSessionWeekend,
   resolveSessionTimeZoneForSession,
 } from '@/lib/datetime';
-import { groupRegionAfficheSessions } from '@/lib/region-affiche-group';
 import {
-  formatLogisticsChip,
   formatLogisticsParts,
   getRegionBeltConfig,
   REGION_BELT_FILTERS,
@@ -79,7 +76,6 @@ export function RegionPageView({
   const [categoryFilter, setCategoryFilter] = React.useState<string | null>(null);
   const [showAllCities, setShowAllCities] = React.useState(false);
   const [mapOpen, setMapOpen] = React.useState(true);
-  const [expandedSeries, setExpandedSeries] = React.useState<Record<string, boolean>>({});
 
   const dateChips = React.useMemo(() => buildCatalogDateRailChips(new Date(), 10), []);
   const hasBelts = regionHasBeltData(slug);
@@ -281,8 +277,6 @@ export function RegionPageView({
       .slice(0, 8)
       .map(([name, count]) => ({ name, count }));
   }, [payload?.sessions]);
-
-  const afficheRows = React.useMemo(() => groupRegionAfficheSessions(sessions), [sessions]);
 
   const topPlaces =
     liveTier === 'A'
@@ -752,57 +746,25 @@ export function RegionPageView({
 
               {contentReady ? (
                 sessions.length ? (
-                  <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                    {afficheRows.map((row) => {
-                      if (row.kind === 'series') {
-                        const logistics = formatLogisticsChip(
-                          resolveCityBeltEntry(slug, {
-                            name: row.city,
-                            slug: row.sessions[0]?.citySlug,
-                          }),
-                        );
-                        return (
-                          <RegionVenueSeriesCard
-                            key={row.key}
-                            venueName={row.venueName}
-                            venueSlug={row.venueSlug}
-                            city={row.city}
-                            sessions={row.sessions}
-                            logisticsChip={logistics}
-                            expanded={Boolean(expandedSeries[row.key])}
-                            onToggle={() =>
-                              setExpandedSeries((prev) => ({
-                                ...prev,
-                                [row.key]: !prev[row.key],
-                              }))
-                            }
-                          />
-                        );
-                      }
-                      const logistics = formatLogisticsChip(
-                        resolveCityBeltEntry(slug, {
-                          slug: row.session.citySlug,
-                          name: row.session.city,
-                          sourceSlug:
-                            'sourceCitySlug' in row.session ? row.session.sourceCitySlug : null,
-                        }),
-                      );
-                      return (
-                        <RegionEventCard
-                          key={row.session.id || row.session.slug}
-                          session={row.session}
-                          logisticsChip={logistics}
-                        />
-                      );
-                    })}
-                  </div>
+                  <HubEventsAfficheRail
+                    className="mt-6"
+                    sessions={sessions}
+                    ariaLabel={
+                      cityFilterLabel
+                        ? `Ближайшие события ${inCityPrepositional(cityFilterLabel)}`
+                        : 'Ближайшие события'
+                    }
+                  />
                 ) : (
                   <p className="mt-6 text-sm text-slate-500">Нет событий по выбранным фильтрам.</p>
                 )
               ) : (
-                <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                <div className="mt-6 flex gap-2.5 overflow-hidden">
                   {Array.from({ length: 6 }).map((_, index) => (
-                    <div key={index} className="h-64 animate-pulse rounded-2xl bg-white" />
+                    <div
+                      key={index}
+                      className="h-64 w-[11.5rem] shrink-0 animate-pulse rounded-2xl bg-white sm:w-[12.5rem]"
+                    />
                   ))}
                 </div>
               )}
