@@ -1,15 +1,17 @@
 ## 2026-08-20 - Afternoon batch (declension + affiche pin + my-day)
 
+Live: Deploy MSK web [`32371428354`](https://github.com/Twisterrrrr/daibilet/actions/runs/32371428354) · SHA `807cc7e` (включает продукт через `12eb5d3` + docs).
+
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| FIX.MYDAY-KEYBOARD-FOCUS | Sticky collapse не сбрасывает фокус инпутов/grip | Высокий | 🔄 Deploy MSK web (этот batch) |
-| FIX.REGION-BRIDGE-COPY | «Ищете больше событий?» + CTA «На страницу {род.п.}» | Высокий | 🔄 Deploy MSK web (этот batch) |
-| FIX.REGION-PARENT-GENITIVE | «как пригород Санкт-Петербурга» | Высокий | 🔄 Deploy MSK web (этот batch) |
-| FIX.CITY-DECLINE-STRIP-PARENS | «Отрадное (ЛО)» → «в Отрадном» | Высокий | 🔄 Deploy MSK web (этот batch) |
-| FIX.CITY-DECLINE-NOVOE-DEVYATKINO | «в Новом Девяткино» (прил. + -ино) | Высокий | 🔄 Deploy MSK web (этот batch) |
-| FIX.CITY-DECLINE-GORBUNKI | «в Горбунках» (мн.ч. -ки) | Высокий | 🔄 Deploy MSK web (этот batch) |
-| FIX.AFFICHE-PIN-CITY-STREET | Афиша: pin = улица · город, не голое «д. 5/1» | Критический | 🔄 Deploy MSK web (этот batch) |
-| PERF.HUB-EVENT-TC-OPTIMIZER | TC covers через `/_next/image` (все города) | Высокий | ✅ уже live `32368896798`; в batch для полноты |
+| FIX.MYDAY-KEYBOARD-FOCUS | Sticky collapse не сбрасывает фокус инпутов/grip | Высокий | ✅ live `32371428354` |
+| FIX.REGION-BRIDGE-COPY | «Ищете больше событий?» + CTA «На страницу {род.п.}» | Высокий | ✅ live `32371428354` |
+| FIX.REGION-PARENT-GENITIVE | «как пригород Санкт-Петербурга» | Высокий | ✅ live `32371428354` |
+| FIX.CITY-DECLINE-STRIP-PARENS | «Отрадное (ЛО)» → «в Отрадном» | Высокий | ✅ live `32371428354` |
+| FIX.CITY-DECLINE-NOVOE-DEVYATKINO | «в Новом Девяткино» (прил. + -ино) | Высокий | ✅ live `32371428354` |
+| FIX.CITY-DECLINE-GORBUNKI | «в Горбунках» (мн.ч. -ки) | Высокий | ✅ live `32371428354` |
+| FIX.AFFICHE-PIN-CITY-STREET | Афиша: pin = улица · город, не голое «д. 5/1» | Критический | ✅ live `32371428354` |
+| PERF.HUB-EVENT-TC-OPTIMIZER | TC covers через `/_next/image` (все города) | Высокий | ✅ live (ранее `32368896798`, подтверждено в batch) |
 
 ## 2026-08-20 - Hub suburbs scroll
 
