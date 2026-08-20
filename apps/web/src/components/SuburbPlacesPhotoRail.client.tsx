@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 import { IMAGE_SIZES, CardSafeImage } from '@/components/SafeImage.client';
 import { ScrollRail } from '@/components/ScrollRail.client';
-import { resolveVenueHeroImage } from '@/lib/city-place-images';
+import { lookupEditorialPlaceImage } from '@/lib/city-place-images';
 import { formatVisitDuration } from '@/lib/visit-duration';
 
 export type SuburbPlaceRailItem = {
@@ -27,14 +27,23 @@ function formatTransitTip(raw: string): string {
   return `↓ ${tip}`;
 }
 
+/**
+ * Nested POI rail must stay unique per card.
+ * Do NOT use resolveVenueHeroImage here: city-identity fallback paints every
+ * `ekaterinburg-*` / similar slug with the same pack still.
+ * Prefer editorial map → explicit imageUrl → suburb cover only if POI has no slug.
+ * Slug without editorial → null (gray) rather than cloning the suburb hero across the row.
+ */
 function resolveRailCover(
   place: SuburbPlaceRailItem,
   fallbackImageUrl?: string | null,
 ): string | null {
-  const fromSlug = resolveVenueHeroImage(place.imageSlug);
-  if (fromSlug) return fromSlug;
+  const editorial = lookupEditorialPlaceImage(place.imageSlug);
+  if (editorial) return editorial;
   const direct = String(place.imageUrl || '').trim();
   if (direct) return direct;
+  const ownSlug = String(place.imageSlug || '').trim();
+  if (ownSlug) return null;
   const fallback = String(fallbackImageUrl || '').trim();
   return fallback || null;
 }
@@ -42,8 +51,7 @@ function resolveRailCover(
 /**
  * Photo cards for suburb nested places - same language as city hub «Главные места».
  * Used by DestinationRegionGuide (region child) and DayTripCanonCard (hub / my-day).
- * Most nested POIs still lack locationSlug - fall back to suburb hero so the rail
- * is not a row of gray boxes.
+ * Unique editorial per locationSlug; suburb cover only as last resort (never city-identity pack).
  */
 export function SuburbPlacesPhotoRail({
   places,
@@ -97,6 +105,7 @@ export function SuburbPlacesPhotoRail({
             >
               <div className="relative aspect-[16/10] shrink-0 overflow-hidden bg-slate-100">
                 <CardSafeImage
+                  key={coverSrc || place.name}
                   src={coverSrc}
                   alt=""
                   fill

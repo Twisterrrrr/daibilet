@@ -6,7 +6,7 @@ import { ArrowRight } from 'lucide-react';
 import { SuburbPlacesPhotoRail } from '@/components/SuburbPlacesPhotoRail.client';
 import type { DestinationPageGuide } from '@/lib/city-destination-registry';
 import { cityToGenitive } from '@/lib/city-declension';
-import { resolveVenueHeroImage } from '@/lib/city-place-images';
+import { lookupEditorialPlaceImage } from '@/lib/city-place-images';
 import { venueHref } from '@/lib/routes';
 
 export function DestinationRegionGuide({
@@ -23,10 +23,10 @@ export function DestinationRegionGuide({
   const railFallback =
     guide.places
       .map((place) =>
-        resolveVenueHeroImage(String(place.locationSlug || place.venueSlug || '').trim() || null),
+        lookupEditorialPlaceImage(String(place.locationSlug || place.venueSlug || '').trim() || null),
       )
       .find(Boolean) ||
-    resolveVenueHeroImage(
+    lookupEditorialPlaceImage(
       String(suburbCard.locationSlug || suburbCard.venueSlug || '').trim() || null,
     ) ||
     null;

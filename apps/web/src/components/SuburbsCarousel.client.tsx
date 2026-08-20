@@ -13,7 +13,7 @@ import {
 } from '@/components/DayTripCanonCard.client';
 import { resolveCityPlaceTitleHref } from '@/lib/city-place-href';
 import { resolveDestinationRegionLinkForSuburb } from '@/lib/city-destination-registry';
-import { resolveVenueHeroImage } from '@/lib/city-place-images';
+import { lookupEditorialPlaceImage } from '@/lib/city-place-images';
 import { suburbMatchesSlugs } from '@/lib/city-hub-local-flavor';
 import type { CityMustSeeItem, CitySuburbItem, CitySuburbPlace } from '@/lib/cityInfo';
 import {
@@ -80,8 +80,9 @@ function suburbExitLabel(place: CitySuburbItem, hasExit: boolean): string | unde
 }
 
 /**
- * Hub / my-day cover: editorial map by venue/location slug (same path as Khokhlovka).
+ * Hub / my-day cover: unique editorial still only (lookup map).
  * Nested POI slugs are a fallback when the suburb hub itself has no map entry.
+ * Never use city-identity pack via resolveVenueHeroImage - one pack still for every POI.
  */
 function suburbHeroImage(
   place: CitySuburbItem,
@@ -98,9 +99,18 @@ function suburbHeroImage(
   for (const raw of candidates) {
     const slug = String(raw || '').trim();
     if (!slug) continue;
+    const editorial = lookupEditorialPlaceImage(slug);
+    if (editorial) return editorial;
     const matched = venues.find((venue) => String(venue.slug || '').trim() === slug);
-    const resolved = resolveVenueHeroImage(slug, matched?.heroImageUrl);
-    if (resolved) return resolved;
+    const hub = String(matched?.heroImageUrl || '').trim();
+    if (
+      hub &&
+      !hub.includes('/venues/generated/') &&
+      !hub.startsWith('/images/cities/') &&
+      !hub.includes('/identity-')
+    ) {
+      return hub;
+    }
   }
   return null;
 }
