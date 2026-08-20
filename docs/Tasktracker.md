@@ -141,7 +141,7 @@ Live: Deploy MSK web [`32371428354`](https://github.com/Twisterrrrr/daibilet/act
 | PERF.EVENTS-CARDS | Массовая нарезка обложек `/events` в sibling `-card.jpg` (~640px) | Высокий | ✅ MSK events: нечего писать (102 card + lean skip); listing `CardSafeImage` |
 | PERF.VENUES-CARDS | Venue `-card.jpg` для `/places` fallback после `-thumb` | Высокий | ✅ 2026-08-20 MSK wrote 409 (99MB→19MB); dry-run 0 remaining |
 | PERF.PLACES-THUMB-FALLBACK | `/places`: нет `-thumb` → `-card` → оригинал, не градиент | Критический | ✅ resolver + identity fallback + hub must-see photo; sidecar `-card`/`-thumb` для Ufa/NSK/Omsk packs |
-| PERF.BLOG-CARD-FALLBACK | `/blog`: нет `*-og`/`-card`/`-thumb` → полный cover | Высокий | ✅ chain + ~169 `*-card.jpg` в git (`apps/public/.../blog/`); sync → web build |
+| PERF.BLOG-CARD-FALLBACK | `/blog`: нет `*-og`/`-card`/`-thumb` → полный cover | Высокий | ✅ live Deploy [`32390907855`](https://github.com/Twisterrrrr/daibilet/actions/runs/32390907855) SHA `9e0acaf` (~169 `*-card.jpg` в git) |
 | UX.BLOG-INDEX-POLISH | `/blog`: soft toolbar/chips; quiet fresh meta; simplify afisha promo; drop count+view toggle | Высокий | ✅ magazine-only; swipe filter/topic rails |
 | UX.LOCATIONS-CATALOG-QUIET | `/locations`: quieter hero/filters; vertical premium cards; no overlay route pill; strip city on address | Высокий | ✅ parity с `/venues`: no count junk, muted filter row, chip rail |
 
