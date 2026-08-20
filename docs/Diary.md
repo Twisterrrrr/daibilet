@@ -5,8 +5,8 @@
 - Дыры: Sochi 6, Irkutsk 6, Vladivostok 6, плюс SPB дворы-колодцы, NN «Катер Герой», Владимир Патриаршие сады. Moscow/Kazan/EKB/… = 0 missing.
 
 ### Решения
-- Geocode: catalog API ` /api/public/venues/{slug}` закрыл **21/21** (Nominatim не понадобился в первом проходе).
-- Патч `apps/web` + `apps/public` cityInfo (address+lat/lng по slug). Commit `c49238d`. Seed MSK `--apply` (6 cities): **254 skipped-exists / 0 inserted / 3 thin** (venues уже были в catalog - оттуда и coords). Deploy MSK web `#32363060389`.
+- Geocode: catalog API `/api/public/venues/{slug}` закрыл **21/21** (Nominatim не понадобился в первом проходе).
+- Патч `apps/web` + `apps/public` cityInfo (address+lat/lng по slug). Commit `c49238d`. Seed MSK `--apply` (6 cities): **254 skipped-exists / 0 inserted / 3 thin** (venues уже были в catalog - оттуда и coords). Deploy MSK web success `#32363060389`.
 
 ### Проблемы
 - Long-tail ~230+ вне TOP без coords - отдельный пасс. Тольятти/Сургут/НК/Ханты/Владикавказ в cityInfo без mustSee packs - не в этой итерации.
