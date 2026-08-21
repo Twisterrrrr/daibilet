@@ -1,7 +1,7 @@
 /** Novosibirsk tourist hub pack (owner 2026-08-16). Hyphen-only copy. */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { NOVOSIBIRSK_LINE_DAY_ROUTE_PRESETS } from './novosibirsk-line-presets.ts';
+import { NOVOSIBIRSK_LINE_DAY_ROUTE_PRESETS } from './novosibirsk-line-presets';
 
 export const NOVOSIBIRSK_MUST_SEE: any[] = [
   // --- Core / main ---
@@ -601,6 +601,7 @@ export const NOVOSIBIRSK_SUBURBS: any[] = [
       {
         name: 'Улица Морская',
         desc: 'Хай-тек и вековой лес в одном кадре.',
+        locationSlug: 'novosibirsk-ulitsa-morskaya',
         dayRouteId: 'novosibirsk-suburb-ulitsa-morskaya',
         latitude: 54.8475,
         longitude: 83.0985,

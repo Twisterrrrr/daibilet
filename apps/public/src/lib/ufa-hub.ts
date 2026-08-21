@@ -1,7 +1,7 @@
 /** Ufa tourist hub pack (owner 2026-08-17). Hyphen-only copy. */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { UFA_LINE_DAY_ROUTE_PRESETS } from './ufa-line-presets.ts';
+import { UFA_LINE_DAY_ROUTE_PRESETS } from './ufa-line-presets';
 
 export const UFA_MUST_SEE: any[] = [
   // --- Памятники и уличные арт-объекты (1-15) ---
@@ -728,6 +728,44 @@ export const UFA_SUBURBS: any[] = [
         longitude: 56.101112,
         visitMinutes: 30,
       },
+    ],
+  },
+  {
+    name: 'Мурадымовское ущелье',
+    desc: 'Большой природный выезд в известняковое ущелье с пещерами, рекой и лучшими известными видами южного Урала.',
+    locationSlug: 'ufa-muradymovskoe-ushchele',
+    mustSeeFilter: 'main',
+    visitMinutes: '10-12 ч',
+    latitude: 52.587112,
+    longitude: 56.628112,
+    address: 'Башкортостан, природный парк «Мурадымовское ущелье»',
+    travelVector: 'Только авто ~4-5 ч',
+    travelVectorBlurb: 'Это дальний маршрут на целый день. Выезд рано утром обязателен.',
+    timingNote: 'Сначала визит-центр и экотропы, затем пещеры и смотровые над рекой.',
+    places: [
+      { name: 'Главное ущелье', desc: 'Ключевой ландшафт с известняковыми бортами и рекой Бол. Ик.', locationSlug: 'ufa-glavnoe-uschele', visitMinutes: 50 },
+      { name: 'Ново-Мурадымовская пещера', desc: 'Самая известная пещера парка с оборудованным подходом.', locationSlug: 'ufa-novo-muradymovskaya-peschera', visitMinutes: 40 },
+      { name: 'Смотровая над долиной', desc: 'Лучший кадр на изгибы ущелья и леса.', locationSlug: 'ufa-smotrovaya-nad-dolinoy', visitMinutes: 30 },
+      { name: 'Экотропа вдоль реки', desc: 'Пеший маршрут, который лучше всего объясняет масштаб парка.', locationSlug: 'ufa-ekotropa-vdol-reki', visitMinutes: 60 },
+    ],
+  },
+  {
+    name: 'Розовые скалы и Инзер',
+    desc: 'Редкий башкирский маршрут ради каменных гребней, речных видов и длинного пейзажного выезда в горную часть региона.',
+    locationSlug: 'ufa-rozovye-skaly-inzer',
+    mustSeeFilter: 'main',
+    visitMinutes: '10-12 ч',
+    latitude: 54.233112,
+    longitude: 57.612112,
+    address: 'Башкортостан, район Инзера',
+    travelVector: 'Электричка + авто или авто ~4 ч',
+    travelVectorBlurb: 'Маршрут длинный, но очень фотогеничный. Лучше ехать в сухую погоду.',
+    timingNote: 'Утром к скалам, затем виды на реку Инзер и длинная пешая часть по лесу.',
+    places: [
+      { name: 'Розовые скалы', desc: 'Главная геологическая цель маршрута с узнаваемым цветом породы.', locationSlug: 'ufa-rozovye-skaly', visitMinutes: 45 },
+      { name: 'Панорама Инзера', desc: 'Обзорная точка над рекой и лесистыми склонами.', locationSlug: 'ufa-panorama-inzera', visitMinutes: 30 },
+      { name: 'Лесная тропа к хребту', desc: 'Переход без городской инфраструктуры, ради которого и едут.', locationSlug: 'ufa-lesnaya-tropa-k-hrebtu', visitMinutes: 60 },
+      { name: 'Береговая поляна', desc: 'Тихая остановка у воды перед дорогой обратно.', locationSlug: 'ufa-beregovaya-polyana', visitMinutes: 25 },
     ],
   },
 ];

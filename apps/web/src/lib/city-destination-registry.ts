@@ -260,13 +260,13 @@ export const ZELENOGRADSK_SUBURB_CARD: CitySuburbItem = {
   logisticsExit: 'Ж/д вокзал Зеленоградск',
   timingNote: 'Сквозная линия вокзал - центр - море без возвратов.',
   places: [
-    { name: 'Курортный проспект', desc: 'от вокзала - пешеходная улица со старой немецкой застройкой, гирляндами и кошачьими граффити', latitude: 54.9595, longitude: 20.4765 },
-    { name: 'Памятник зеленоградским котам', desc: 'вращающаяся скульптура кота - символ и фото-точка на линии проспекта', latitude: 54.9598, longitude: 20.4755 },
-    { name: 'Музей «Домик Ангелов»', desc: 'музейный квартал Саратовская - частная коллекция ангелов в деревянном доме', latitude: 54.9582, longitude: 20.4745 },
-    { name: 'Музей кошек «Мурариум»', desc: 'музейный квартал Саратовская - 40-метровая водонапорная башня со смотровой', venueSlug: 'kaliningrad-muzey-koshek-murarium', latitude: 54.958914, longitude: 20.481211 },
-    { name: 'Бювет «Королева Луиза»', desc: 'выход к променаду - бесплатная минеральная вода у набережной', latitude: 54.9615, longitude: 20.4785 },
-    { name: 'Променад и волнорез', desc: 'морской финал линии - длинный променад и волнорез Кранца', latitude: 54.9625, longitude: 20.4795 },
-    { name: 'Кирха Святого Адальберта', desc: 'неоготический силуэт курорта - доминанта старого Кранца рядом с центром', latitude: 54.9575, longitude: 20.4805 },
+    { name: 'Курортный проспект', desc: 'от вокзала - пешеходная улица со старой немецкой застройкой, гирляндами и кошачьими граффити', locationSlug: 'kaliningrad-zelenogradsk-kurortnyy-prospekt', latitude: 54.9595, longitude: 20.4765 },
+    { name: 'Памятник зеленоградским котам', desc: 'вращающаяся скульптура кота - символ и фото-точка на линии проспекта', locationSlug: 'kaliningrad-zelenogradsk-pamyatnik-zelenogradskim-kotam', latitude: 54.9598, longitude: 20.4755 },
+    { name: 'Музей «Домик Ангелов»', desc: 'музейный квартал Саратовская - частная коллекция ангелов в деревянном доме', locationSlug: 'kaliningrad-zelenogradsk-muzey-domik-angelov', latitude: 54.9582, longitude: 20.4745 },
+    { name: 'Музей кошек «Мурариум»', desc: 'музейный квартал Саратовская - 40-метровая водонапорная башня со смотровой', locationSlug: 'kaliningrad-zelenogradsk-muzey-koshek-murarium', venueSlug: 'kaliningrad-muzey-koshek-murarium', latitude: 54.958914, longitude: 20.481211 },
+    { name: 'Бювет «Королева Луиза»', desc: 'выход к променаду - бесплатная минеральная вода у набережной', locationSlug: 'kaliningrad-zelenogradsk-byuvet-koroleva-luiza', latitude: 54.9615, longitude: 20.4785 },
+    { name: 'Променад и волнорез', desc: 'морской финал линии - длинный променад и волнорез Кранца', locationSlug: 'kaliningrad-zelenogradsk-promenad-i-volnorez', latitude: 54.9625, longitude: 20.4795 },
+    { name: 'Кирха Святого Адальберта', desc: 'неоготический силуэт курорта - доминанта старого Кранца рядом с центром', locationSlug: 'kaliningrad-zelenogradsk-kirha-svyatogo-adalberta', latitude: 54.9575, longitude: 20.4805 },
   ],
 };
 
@@ -280,12 +280,12 @@ export const SVETLOGORSK_SUBURB_CARD: CitySuburbItem = {
   timingNote: 'Верх архитектура - спуск к морю - канатка обратно.',
   places: [
     { name: 'Водонапорная башня Раушена', desc: 'у Светлогорск-2 - 25-метровый силуэт в стиле немецкого романтизма, визитная карточка города', locationSlug: 'kaliningrad-vodonapornaya-bashnya-raushena', latitude: 54.943112, longitude: 20.151214 },
-    { name: 'Вилла Порр', desc: 'роскошная немецкая вилла начала XX века с дендропарком - следующий шаг верхнего круга', latitude: 54.9455, longitude: 20.1555 },
-    { name: 'Органный зал «Макаров»', desc: 'концертный зал на месте капеллы Santa Maria Stella Maris - перед спуском к морю', latitude: 54.9445, longitude: 20.1525 },
-    { name: 'Променад и Солнечные часы «Зодиак»', desc: 'спуск к морю - набережная с мозаичными часами из Книги рекордов Гиннесса', latitude: 54.9405, longitude: 20.1485, transitTip: 'Спуск к морю / променад' },
-    { name: 'Скульптура «Нимфея»', desc: 'русалка у променада - фото-точка у моря перед канаткой', latitude: 54.9398, longitude: 20.1475 },
-    { name: 'Пляж у фуникулера', desc: 'песчаный пляж у нижней станции - перед подъемом', latitude: 54.9408, longitude: 20.1488 },
-    { name: 'Канатная дорога', desc: 'финал наверх к вокзалу - ретро-фуникулер с желтыми кабинками от моря к скале', latitude: 54.9415, longitude: 20.1495, transitTip: 'Канатка обратно к вокзалу' },
+    { name: 'Вилла Порр', desc: 'роскошная немецкая вилла начала XX века с дендропарком - следующий шаг верхнего круга', locationSlug: 'kaliningrad-svetlogorsk-villa-porr', latitude: 54.9455, longitude: 20.1555 },
+    { name: 'Органный зал «Макаров»', desc: 'концертный зал на месте капеллы Santa Maria Stella Maris - перед спуском к морю', locationSlug: 'kaliningrad-svetlogorsk-organnyy-zal-makarov', latitude: 54.9445, longitude: 20.1525 },
+    { name: 'Променад и Солнечные часы «Зодиак»', desc: 'спуск к морю - набережная с мозаичными часами из Книги рекордов Гиннесса', locationSlug: 'kaliningrad-svetlogorsk-promenad-i-solnechnye-chasy-zodiak', latitude: 54.9405, longitude: 20.1485, transitTip: 'Спуск к морю / променад' },
+    { name: 'Скульптура «Нимфея»', desc: 'русалка у променада - фото-точка у моря перед канаткой', locationSlug: 'kaliningrad-svetlogorsk-skulptura-nimfeya', latitude: 54.9398, longitude: 20.1475 },
+    { name: 'Пляж у фуникулера', desc: 'песчаный пляж у нижней станции - перед подъемом', locationSlug: 'kaliningrad-svetlogorsk-plyazh-u-funikulera', latitude: 54.9408, longitude: 20.1488 },
+    { name: 'Канатная дорога', desc: 'финал наверх к вокзалу - ретро-фуникулер с желтыми кабинками от моря к скале', locationSlug: 'kaliningrad-svetlogorsk-kanatnaya-doroga', latitude: 54.9415, longitude: 20.1495, transitTip: 'Канатка обратно к вокзалу' },
   ],
 };
 
@@ -304,13 +304,13 @@ export const GORODETS_SUBURB_CARD: CitySuburbItem = {
   timingNote:
     'Выезд к 8:30-9:00 - дорога ~1,5 часа. Сквозная линия без возвратов; финал у причала, такси ~5 мин на автостанцию.',
   places: [
-    { name: 'Феодоровский монастырь', desc: 'действующая обитель - первая точка после автостанции', latitude: 56.6505, longitude: 43.4685, visitMinutes: 45 },
-    { name: 'Торговая площадь / центр', desc: 'историческое ядро с купеческими домами и лавками', latitude: 56.644, longitude: 43.472, visitMinutes: 20 },
-    { name: 'Музей городецкого пряника', desc: 'пряничная традиция и мастер-классы - старт музейного квартала', latitude: 56.6442, longitude: 43.4715, visitMinutes: 60 },
-    { name: 'Музей самоваров', desc: 'одна из лучших коллекций самоваров в России', latitude: 56.6455, longitude: 43.4735, visitMinutes: 60 },
-    { name: 'Музей городецкой росписи', desc: 'классическая роспись по дереву - промысел города', latitude: 56.6438, longitude: 43.4708, visitMinutes: 60 },
-    { name: 'Набережная Волги / Революции', desc: 'променад с видами на Волгу и купеческую застройку', latitude: 56.6465, longitude: 43.4755, visitMinutes: 40 },
-    { name: 'Детский музейный центр «Город мастеров»', desc: 'интерактив и ремёсла - финал у причала', latitude: 56.6445, longitude: 43.4728, visitMinutes: 60, transitTip: 'Финал у причала; такси ~5 мин обратно на автостанцию' },
+    { name: 'Феодоровский монастырь', desc: 'действующая обитель - первая точка после автостанции', locationSlug: 'nizhny-novgorod-gorodets-feodorovskiy-monastyr', latitude: 56.6505, longitude: 43.4685, visitMinutes: 45 },
+    { name: 'Торговая площадь / центр', desc: 'историческое ядро с купеческими домами и лавками', locationSlug: 'nizhny-novgorod-gorodets-torgovaya-ploschad-tsentr', latitude: 56.644, longitude: 43.472, visitMinutes: 20 },
+    { name: 'Музей городецкого пряника', desc: 'пряничная традиция и мастер-классы - старт музейного квартала', locationSlug: 'nizhny-novgorod-gorodets-muzey-gorodetskogo-pryanika', latitude: 56.6442, longitude: 43.4715, visitMinutes: 60 },
+    { name: 'Музей самоваров', desc: 'одна из лучших коллекций самоваров в России', locationSlug: 'nizhny-novgorod-gorodets-muzey-samovarov', latitude: 56.6455, longitude: 43.4735, visitMinutes: 60 },
+    { name: 'Музей городецкой росписи', desc: 'классическая роспись по дереву - промысел города', locationSlug: 'nizhny-novgorod-gorodets-muzey-gorodetskoy-rospisi', latitude: 56.6438, longitude: 43.4708, visitMinutes: 60 },
+    { name: 'Набережная Волги / Революции', desc: 'променад с видами на Волгу и купеческую застройку', locationSlug: 'nizhny-novgorod-gorodets-naberezhnaya-volgi-revolyutsii', latitude: 56.6465, longitude: 43.4755, visitMinutes: 40 },
+    { name: 'Детский музейный центр «Город мастеров»', desc: 'интерактив и ремёсла - финал у причала', locationSlug: 'nizhny-novgorod-gorodets-detskiy-muzeynyy-tsentr-gorod-masterov', latitude: 56.6445, longitude: 43.4728, visitMinutes: 60, transitTip: 'Финал у причала; такси ~5 мин обратно на автостанцию' },
   ],
 };
 
@@ -329,11 +329,11 @@ export const SEMYONOV_SUBURB_CARD: CitySuburbItem = {
   timingNote:
     'Выезд к 8:30-9:00 - ~1,5-2 часа. Кольцо вокзал - фабрика - центр - вокзал; музей Шарыгина - бонус по пути к вокзалу.',
   places: [
-    { name: 'Фабрика «Хохломская роспись»', desc: 'действующее производство с экскурсиями; сувениры рядом', latitude: 56.7875, longitude: 44.4955, visitMinutes: 60, transitTip: 'От вокзала короткое такси к фабрике' },
-    { name: 'Хохломские ряды / сувениры', desc: 'лакированные изделия и посуда у фабрики', latitude: 56.789, longitude: 44.493, visitMinutes: 20, transitTip: 'Сувениры рядом с фабрикой - без отдельного рейса' },
-    { name: 'Музейно-туристический центр «Золотая хохлома»', desc: 'главная экспозиция о промысле и росписи', latitude: 56.7895, longitude: 44.4925, visitMinutes: 60 },
-    { name: 'Исторический центр / пл. Ленина', desc: 'компактная прогулка по центру после музея', latitude: 56.7885, longitude: 44.491, visitMinutes: 20 },
-    { name: 'Парк Победы', desc: 'зелёная пауза перед возвратом к вокзалу', latitude: 56.7905, longitude: 44.4895, visitMinutes: 40 },
+    { name: 'Фабрика «Хохломская роспись»', desc: 'действующее производство с экскурсиями; сувениры рядом', locationSlug: 'nizhny-novgorod-semyonov-fabrika-hohlomskaya-rospis', latitude: 56.7875, longitude: 44.4955, visitMinutes: 60, transitTip: 'От вокзала короткое такси к фабрике' },
+    { name: 'Хохломские ряды / сувениры', desc: 'лакированные изделия и посуда у фабрики', locationSlug: 'nizhny-novgorod-semyonov-hohlomskie-ryady-suveniry', latitude: 56.789, longitude: 44.493, visitMinutes: 20, transitTip: 'Сувениры рядом с фабрикой - без отдельного рейса' },
+    { name: 'Музейно-туристический центр «Золотая хохлома»', desc: 'главная экспозиция о промысле и росписи', locationSlug: 'nizhny-novgorod-semyonov-muzeyno-turisticheskiy-tsentr-zolotaya-hohloma', latitude: 56.7895, longitude: 44.4925, visitMinutes: 60 },
+    { name: 'Исторический центр / пл. Ленина', desc: 'компактная прогулка по центру после музея', locationSlug: 'nizhny-novgorod-semyonov-istoricheskiy-tsentr-pl-lenina', latitude: 56.7885, longitude: 44.491, visitMinutes: 20 },
+    { name: 'Парк Победы', desc: 'зелёная пауза перед возвратом к вокзалу', locationSlug: 'nizhny-novgorod-semyonov-park-pobedy', latitude: 56.7905, longitude: 44.4895, visitMinutes: 40 },
   ],
 };
 
@@ -348,13 +348,13 @@ export const KURSHKAYA_KOSA_SUBURB_CARD: CitySuburbItem = {
   timingNote: 'Старт с косы от Зеленоградска; Фрингилла на возврате к 15:00-16:00.',
   gastroStop: { name: 'Морское / Рыбачий', blurb: 'Обед после дюны Эфа - перед разворотом к Фрингилле.' },
   places: [
-    { name: 'Высота Мюллера', desc: '32 км от Зеленоградска, утро - пешеходный маршрут по древней части дюны Брухберг через вековой сосновый лес', latitude: 55.1725, longitude: 20.8415, transitTip: 'Авто ~32 км от Зеленоградска - утро' },
+    { name: 'Высота Мюллера', desc: '32 км от Зеленоградска, утро - пешеходный маршрут по древней части дюны Брухберг через вековой сосновый лес', locationSlug: 'place-vysota-myullera', latitude: 55.1725, longitude: 20.8415, transitTip: 'Авто ~32 км от Зеленоградска - утро' },
     { name: 'Танцующий лес', desc: '37 км, до полудня - аномальный сосновый бор, где стволы изгибаются кольцами и спиралями', locationSlug: 'kaliningrad-tantsuyuschiy-les', latitude: 55.181211, longitude: 20.854112, transitTip: 'Авто дальше по косе (~37 км) - до полудня' },
     { name: 'Дюна Эфа', desc: '42 км, дальняя точка - высокие песчаные дюны с эко-тропами; обед удобно в Морском или Рыбачьем', locationSlug: 'kaliningrad-dyuna-efa', latitude: 55.223412, longitude: 20.901412, transitTip: 'Авто к дальней точке (~42 км); обед в Морском / Рыбачьем' },
-    { name: 'Королевский бор', desc: 'вековой лесной массив у дальней части косы - пауза между Эфой и разворотом', latitude: 55.2055, longitude: 20.8755, transitTip: 'Авто / короткая пауза на развороте' },
-    { name: 'Посёлок Рыбачий', desc: 'исторический Rossitten - обед и логистика перед возвратом', latitude: 55.1515, longitude: 20.8235, transitTip: 'Авто к Рыбачьему - обед перед возвратом' },
-    { name: 'Лебединое озеро', desc: 'пресноводное озеро у Рыбачьего - спокойная пауза на обратном пути', latitude: 55.1535, longitude: 20.8485 },
-    { name: 'Орнитологическая станция «Фрингилла»', desc: '23 км на обратном пути - сеанс кольцевания птиц к 15:00-16:00', latitude: 55.1585, longitude: 20.8255, transitTip: 'Авто на возврате (~23 км) - к сеансу 15:00-16:00' },
+    { name: 'Королевский бор', desc: 'вековой лесной массив у дальней части косы - пауза между Эфой и разворотом', locationSlug: 'place-korolevskiy-bor', latitude: 55.2055, longitude: 20.8755, transitTip: 'Авто / короткая пауза на развороте' },
+    { name: 'Посёлок Рыбачий', desc: 'исторический Rossitten - обед и логистика перед возвратом', locationSlug: 'place-poselok-rybachiy', latitude: 55.1515, longitude: 20.8235, transitTip: 'Авто к Рыбачьему - обед перед возвратом' },
+    { name: 'Лебединое озеро', desc: 'пресноводное озеро у Рыбачьего - спокойная пауза на обратном пути', locationSlug: 'place-lebedinoe-ozero', latitude: 55.1535, longitude: 20.8485 },
+    { name: 'Орнитологическая станция «Фрингилла»', desc: '23 км на обратном пути - сеанс кольцевания птиц к 15:00-16:00', locationSlug: 'place-ornitologicheskaya-stantsiya-fringilla', latitude: 55.1585, longitude: 20.8255, transitTip: 'Авто на возврате (~23 км) - к сеансу 15:00-16:00' },
   ],
 };
 
@@ -368,10 +368,10 @@ export const BALTIYSK_SUBURB_CARD: CitySuburbItem = {
   timingNote: 'Крепость утром; коса после парома у маяка.',
   places: [
     { name: 'Шведская крепость Пиллау', desc: 'экскурсия ~11:00-11:30 - цитадель XVII века в форме звезды, действующий военный объект', locationSlug: 'kaliningrad-shvedskaya-krepost-pillau', latitude: 54.639411, longitude: 19.891114, transitTip: 'Утро в городе - экскурсия ~11:00-11:30' },
-    { name: 'Пехотные казармы', desc: 'красный кирпич начала XX века, штаб Балтийского флота - городской блок до парома', latitude: 54.6405, longitude: 19.8935 },
-    { name: 'Маяк Пиллау и памятник Петру I', desc: 'у парома на косу - самый западный маяк России (Шинкель) и памятник Петру I', latitude: 54.6415, longitude: 19.8825 },
-    { name: 'Немецкий аэродром Нойтиф', desc: 'паром/катер на Балтийскую косу - заброшенные авиационные ангары на песке', latitude: 54.6125, longitude: 19.8755, transitTip: 'Паром / катер на Балтийскую косу' },
-    { name: 'Памятник Елизавете Петровне', desc: 'финал после возврата - монумент на Северном молу у Балтийского пролива', latitude: 54.6385, longitude: 19.8855, transitTip: 'После парома обратно - Северный мол' },
+    { name: 'Пехотные казармы', desc: 'красный кирпич начала XX века, штаб Балтийского флота - городской блок до парома', locationSlug: 'kaliningrad-baltiysk-pehotnye-kazarmy', latitude: 54.6405, longitude: 19.8935 },
+    { name: 'Маяк Пиллау и памятник Петру I', desc: 'у парома на косу - самый западный маяк России (Шинкель) и памятник Петру I', locationSlug: 'kaliningrad-baltiysk-mayak-pillau-i-pamyatnik-petru-i', latitude: 54.6415, longitude: 19.8825 },
+    { name: 'Немецкий аэродром Нойтиф', desc: 'паром/катер на Балтийскую косу - заброшенные авиационные ангары на песке', locationSlug: 'kaliningrad-baltiysk-nemetskiy-aerodrom-noytif', latitude: 54.6125, longitude: 19.8755, transitTip: 'Паром / катер на Балтийскую косу' },
+    { name: 'Памятник Елизавете Петровне', desc: 'финал после возврата - монумент на Северном молу у Балтийского пролива', locationSlug: 'kaliningrad-baltiysk-pamyatnik-elizavete-petrovne', latitude: 54.6385, longitude: 19.8855, transitTip: 'После парома обратно - Северный мол' },
   ],
 };
 
@@ -386,10 +386,10 @@ export const YANTARNY_SUBURB_CARD: CitySuburbItem = {
   timingNote: 'Комбината на авто к открытию; дальше пешком парк - променад - пляж.',
   places: [
     { name: 'Смотровая площадка Янтарного комбината', desc: 'на авто к открытию - карьер открытой добычи и «янтарная песочница»', locationSlug: 'kaliningrad-smotrovaya-yantarnogo-kombinata', latitude: 54.869212, longitude: 19.94151, transitTip: 'Авто к смотровой комбината - к открытию' },
-    { name: 'Музей янтаря / выставка комбината', desc: 'экспозиция у карьера - короткий контекст перед пешим кругом в центр', latitude: 54.8688, longitude: 19.9425 },
-    { name: 'Янтарный замок', desc: 'пешком в центр - замок XIV века, музей пыток, оружие и янтарная лавка', latitude: 54.8675, longitude: 19.9435 },
-    { name: 'Парк Беккера', desc: 'пешком к морю - парк Мориса Беккера с редкими деревьями; дальше выход на променад к пляжу', latitude: 54.8685, longitude: 19.9455 },
-    { name: 'Пляж «Шахта Анна»', desc: 'финал - широкий пляж с «Голубым флагом» после променада', latitude: 54.8725, longitude: 19.9355 },
+    { name: 'Музей янтаря / выставка комбината', desc: 'экспозиция у карьера - короткий контекст перед пешим кругом в центр', locationSlug: 'kaliningrad-yantarny-muzey-yantarya-vystavka-kombinata', latitude: 54.8688, longitude: 19.9425 },
+    { name: 'Янтарный замок', desc: 'пешком в центр - замок XIV века, музей пыток, оружие и янтарная лавка', locationSlug: 'kaliningrad-yantarny-yantarnyy-zamok', latitude: 54.8675, longitude: 19.9435 },
+    { name: 'Парк Беккера', desc: 'пешком к морю - парк Мориса Беккера с редкими деревьями; дальше выход на променад к пляжу', locationSlug: 'kaliningrad-yantarny-park-bekkera', latitude: 54.8685, longitude: 19.9455 },
+    { name: 'Пляж «Шахта Анна»', desc: 'финал - широкий пляж с «Голубым флагом» после променада', locationSlug: 'kaliningrad-yantarny-plyazh-shahta-anna', latitude: 54.8725, longitude: 19.9355 },
   ],
 };
 
@@ -408,12 +408,12 @@ export const DIVEEVO_SUBURB_CARD: CitySuburbItem = {
   timingNote:
     'Выезд не позже 7:00 - в пути 3+ часа. Источник в Цыгановке утром (такси ~15 км); Канавка - после обеда. Ближние источники - у обители без отдельного рейса.',
   places: [
-    { name: 'Источник Серафима в Цыгановке', desc: 'дальний источник - купель и набор воды утром', latitude: 55.0525, longitude: 43.2355, visitMinutes: 40, transitTip: 'Такси ~15 км утром из Дивеева / от автостанции' },
-    { name: 'Музей истории Дивеевской обители', desc: 'контекст монастыря и жизни Серафима Саровского', latitude: 55.0482, longitude: 43.2435, visitMinutes: 60, transitTip: 'Возврат в обитель - музей у входа / рядом с ансамблем' },
-    { name: 'Троицкий собор', desc: 'главный храм с мощами преподобного Серафима Саровского', latitude: 55.0488, longitude: 43.2418, visitMinutes: 30 },
-    { name: 'Преображенский собор', desc: 'второй крупный собор ансамбля', latitude: 55.0492, longitude: 43.2425, visitMinutes: 30 },
-    { name: 'Благовещенский собор', desc: 'новый крупный храм ансамбля', latitude: 55.0495, longitude: 43.2408, visitMinutes: 30 },
-    { name: 'Канавка Божьей Матери', desc: 'святая канавка - обход во второй половине дня', latitude: 55.0475, longitude: 43.2405, visitMinutes: 60, transitTip: 'Вторая половина дня - обход Канавки; ближние источники у обители' },
+    { name: 'Источник Серафима в Цыгановке', desc: 'дальний источник - купель и набор воды утром', locationSlug: 'nizhny-novgorod-diveevo-istochnik-serafima-v-tsyganovke', latitude: 55.0525, longitude: 43.2355, visitMinutes: 40, transitTip: 'Такси ~15 км утром из Дивеева / от автостанции' },
+    { name: 'Музей истории Дивеевской обители', desc: 'контекст монастыря и жизни Серафима Саровского', locationSlug: 'nizhny-novgorod-diveevo-muzey-istorii-diveevskoy-obiteli', latitude: 55.0482, longitude: 43.2435, visitMinutes: 60, transitTip: 'Возврат в обитель - музей у входа / рядом с ансамблем' },
+    { name: 'Троицкий собор', desc: 'главный храм с мощами преподобного Серафима Саровского', locationSlug: 'nizhny-novgorod-diveevo-troitskiy-sobor', latitude: 55.0488, longitude: 43.2418, visitMinutes: 30 },
+    { name: 'Преображенский собор', desc: 'второй крупный собор ансамбля', locationSlug: 'nizhny-novgorod-diveevo-preobrazhenskiy-sobor', latitude: 55.0492, longitude: 43.2425, visitMinutes: 30 },
+    { name: 'Благовещенский собор', desc: 'новый крупный храм ансамбля', locationSlug: 'nizhny-novgorod-diveevo-blagoveschenskiy-sobor', latitude: 55.0495, longitude: 43.2408, visitMinutes: 30 },
+    { name: 'Канавка Божьей Матери', desc: 'святая канавка - обход во второй половине дня', locationSlug: 'nizhny-novgorod-diveevo-kanavka-bozhey-materi', latitude: 55.0475, longitude: 43.2405, visitMinutes: 60, transitTip: 'Вторая половина дня - обход Канавки; ближние источники у обители' },
   ],
 };
 
@@ -432,9 +432,9 @@ export const MAKARYEV_SUBURB_CARD: CitySuburbItem = {
   timingNote:
     'Закладывайте паром Лысково (~30 мин в навигацию). Монастырь - стены/смотровая - посёлок; страусиная ферма - бонус.',
   places: [
-    { name: 'Желтоводский Макариев монастырь / Троицкий собор', desc: 'укреплённый ансамбль и главный храм на берегу Волги', latitude: 56.0835, longitude: 45.0615, visitMinutes: 60, transitTip: 'Паром из Лыскова (~30 мин)' },
-    { name: 'Крепостные стены / волжская смотровая', desc: 'оборонительный контур и вид на Волгу с берега', latitude: 56.0842, longitude: 45.0605, visitMinutes: 30 },
-    { name: 'Посёлок Макарьево', desc: 'тихий посад у стен - короткая прогулка после обители', latitude: 56.0825, longitude: 45.0635, visitMinutes: 20, transitTip: 'Страусиная ферма - бонус отдельным такси/авто' },
+    { name: 'Желтоводский Макариев монастырь / Троицкий собор', desc: 'укреплённый ансамбль и главный храм на берегу Волги', locationSlug: 'nizhny-novgorod-makaryev-zheltovodskiy-makariev-monastyr-troitskiy-sobor', latitude: 56.0835, longitude: 45.0615, visitMinutes: 60, transitTip: 'Паром из Лыскова (~30 мин)' },
+    { name: 'Крепостные стены / волжская смотровая', desc: 'оборонительный контур и вид на Волгу с берега', locationSlug: 'nizhny-novgorod-makaryev-krepostnye-steny-volzhskaya-smotrovaya', latitude: 56.0842, longitude: 45.0605, visitMinutes: 30 },
+    { name: 'Посёлок Макарьево', desc: 'тихий посад у стен - короткая прогулка после обители', locationSlug: 'nizhny-novgorod-makaryev-poselok-makarevo', latitude: 56.0825, longitude: 45.0635, visitMinutes: 20, transitTip: 'Страусиная ферма - бонус отдельным такси/авто' },
   ],
 };
 

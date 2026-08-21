@@ -526,36 +526,43 @@ export const KRASNOYARSK_SUBURBS: any[] = [
       {
         name: 'Дивногорская набережная',
         desc: 'Променад вдоль Енисея с видами на скалы.',
+        locationSlug: 'krasnoyarsk-divnogorskaya-naberezhnaya',
         visitMinutes: 40,
       },
       {
         name: 'Царь-рыба / Слизнево',
         desc: 'Скульптура осетра на утесе у трассы Р-257.',
+        locationSlug: 'krasnoyarsk-tsar-ryba-sliznevo',
         visitMinutes: 25,
       },
       {
         name: 'Овсянка, музей Астафьева',
         desc: 'Дом-музей писателя в родном селе.',
+        locationSlug: 'krasnoyarsk-ovsyanka-muzey-astafeva',
         visitMinutes: 50,
       },
       {
         name: 'Административная площадь',
         desc: 'Центральная площадь Дивногорска.',
+        locationSlug: 'krasnoyarsk-administrativnaya-ploschad',
         visitMinutes: 20,
       },
       {
         name: 'Знаменский скит',
         desc: 'Монастырский скит в скалах над Енисеем.',
+        locationSlug: 'krasnoyarsk-znamenskiy-skit',
         visitMinutes: 40,
       },
       {
         name: 'Смотровая ГЭС',
         desc: 'Панорама плотины Красноярской ГЭС.',
+        locationSlug: 'krasnoyarsk-smotrovaya-ges',
         visitMinutes: 35,
       },
       {
         name: 'Судоподъемник',
         desc: 'Уникальный судоподъемник для прохода судов через плотину.',
+        locationSlug: 'krasnoyarsk-sudopodemnik',
         visitMinutes: 30,
       },
     ],
@@ -573,10 +580,10 @@ export const KRASNOYARSK_SUBURBS: any[] = [
     travelVectorBlurb: 'Удобный спокойный выезд, который можно делать отдельно от большой Дивногорской поездки.',
     timingNote: 'Сначала музей Астафьева, затем берег Енисея и прогулка по селу.',
     places: [
-      { name: 'Дом-музей Виктора Астафьева', desc: 'Главное ядро маршрута и самый содержательный литературный stop.', visitMinutes: 45 },
-      { name: 'Набережная Овсянки', desc: 'Спокойный Енисей без городской суеты.', visitMinutes: 30 },
-      { name: 'Сельская панорама', desc: 'Точка, где особенно хорошо читается масштаб берега и воды.', visitMinutes: 20 },
-      { name: 'Мемориальный сад', desc: 'Тихое продолжение музейного маршрута.', visitMinutes: 20 },
+      { name: 'Дом-музей Виктора Астафьева', desc: 'Главное ядро маршрута и самый содержательный литературный stop.', locationSlug: 'krasnoyarsk-dom-muzey-viktora-astafeva', visitMinutes: 45 },
+      { name: 'Набережная Овсянки', desc: 'Спокойный Енисей без городской суеты.', locationSlug: 'krasnoyarsk-naberezhnaya-ovsyanki', visitMinutes: 30 },
+      { name: 'Сельская панорама', desc: 'Точка, где особенно хорошо читается масштаб берега и воды.', locationSlug: 'krasnoyarsk-selskaya-panorama', visitMinutes: 20 },
+      { name: 'Мемориальный сад', desc: 'Тихое продолжение музейного маршрута.', locationSlug: 'krasnoyarsk-memorialnyy-sad', visitMinutes: 20 },
     ],
   },
   {
@@ -592,10 +599,10 @@ export const KRASNOYARSK_SUBURBS: any[] = [
     travelVectorBlurb: 'Лучше ехать в ясную сухую погоду и оставлять силы на обратный спуск.',
     timingNote: 'Маршрут держится на лестнице, видовом гребне и нескольких смотровых точках.',
     places: [
-      { name: 'Торгашинская лестница', desc: 'Главный вход в маршрут и уже сама по себе городская достопримечательность.', visitMinutes: 45 },
-      { name: 'Смотровая на город', desc: 'Лучший городской кадр без Столбов и без долгой логистики.', visitMinutes: 30 },
-      { name: 'Скальные выходы хребта', desc: 'Пейзажная часть маршрута выше городской кромки.', visitMinutes: 40 },
-      { name: 'Лесная тропа по гребню', desc: 'Неспешный хайкинг без музеев и лишних поводов торопиться.', visitMinutes: 45 },
+      { name: 'Торгашинская лестница', desc: 'Главный вход в маршрут и уже сама по себе городская достопримечательность.', locationSlug: 'krasnoyarsk-torgashinskaya-lestnitsa', visitMinutes: 45 },
+      { name: 'Смотровая на город', desc: 'Лучший городской кадр без Столбов и без долгой логистики.', locationSlug: 'krasnoyarsk-smotrovaya-na-gorod', visitMinutes: 30 },
+      { name: 'Скальные выходы хребта', desc: 'Пейзажная часть маршрута выше городской кромки.', locationSlug: 'krasnoyarsk-skalnye-vyhody-hrebta', visitMinutes: 40 },
+      { name: 'Лесная тропа по гребню', desc: 'Неспешный хайкинг без музеев и лишних поводов торопиться.', locationSlug: 'krasnoyarsk-lesnaya-tropa-po-grebnyu', visitMinutes: 45 },
     ],
   },
 ];
