@@ -123,6 +123,7 @@ export const ROSTOV_LINE_DAY_ROUTE_PRESETS: any[] = [
       'Купеческий Ростов, Пушкинская и панорама Дона: парадные фасады, модерн и финал на холме Седова.',
     travelVector: '6 точек · пешком по центру',
     timingNote: 'Связный трек от Большой Садовой к Пушкинской и панораме порта.',
+    coverImageUrl: '/images/venues/rostov-na-donu/smotrovaya-na-sedova.jpg',
     stops: ROSTOV_GREEN_LINE_STOPS,
   },
   {
@@ -132,6 +133,7 @@ export const ROSTOV_LINE_DAY_ROUTE_PRESETS: any[] = [
       'Старый Базар, дворики Газетного и финал у театра-трактора: гастро и южный андеграунд без логистических разрывов.',
     travelVector: '6 точек · пешком по старому центру',
     timingNote: 'От рынка через дворики Шаумяна к Театральной площади.',
+    coverImageUrl: '/images/venues/rostov-na-donu/tsentral-nyy-rynok-staryy-bazar.jpg',
     gastroStop: {
       name: 'Рынок, настойки и крафт',
       blurb:

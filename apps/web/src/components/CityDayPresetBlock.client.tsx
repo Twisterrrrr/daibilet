@@ -87,22 +87,43 @@ const SCENARIO_GRADIENTS = [
 ] as const;
 
 /**
- * Scenario magazine cover: explicit preset cover → companion blog cover →
- * first real stop photo (skip label-card gradient stubs).
+ * Scenario magazine cover candidates: explicit preset cover → companion blog
+ * cover → stop photos (skip label-card gradient stubs).
+ * Prefer uniqueness across the chip row so two scenarios that share a first
+ * stop do not look like identical product tiles.
  */
-function presetCoverUrl(
+function presetCoverCandidates(
   preset: CityDayRoutePreset,
   items: NamedRow['items'],
-): string | null {
-  const explicit = String(preset.coverImageUrl || '').trim();
-  if (explicit) return explicit;
+): string[] {
+  const out: string[] = [];
+  const seen = new Set<string>();
+  const push = (raw: string | null | undefined) => {
+    const url = String(raw || '').trim();
+    if (!url || seen.has(url) || isLabelCardVenueStub(url)) return;
+    seen.add(url);
+    out.push(url);
+  };
+  push(preset.coverImageUrl);
   const blogSlug = String(preset.blogSlug || '').trim();
-  if (blogSlug) return blogCoverUrl(blogSlug);
-  for (const item of items) {
-    const url = String(item.imageUrl || '').trim();
-    if (url && !isLabelCardVenueStub(url)) return url;
+  if (blogSlug) push(blogCoverUrl(blogSlug));
+  for (const item of items) push(item.imageUrl);
+  return out;
+}
+
+function pickUniquePresetCover(
+  candidates: string[],
+  usedInRow: Set<string>,
+): string | null {
+  for (const url of candidates) {
+    if (!usedInRow.has(url)) {
+      usedInRow.add(url);
+      return url;
+    }
   }
-  return null;
+  const fallback = candidates[0] || null;
+  if (fallback) usedInRow.add(fallback);
+  return fallback;
 }
 
 function scrollToDayConstructor() {
@@ -395,6 +416,10 @@ export function CityDayPresetBlock({
         ? null
         : activeIndex;
     const selected = selectedIndex == null ? null : namedResolved[selectedIndex];
+    const usedScenarioCovers = new Set<string>();
+    const scenarioChipCovers = namedResolved.map((row) =>
+      pickUniquePresetCover(presetCoverCandidates(row.preset, row.items), usedScenarioCovers),
+    );
 
     return (
       <div
@@ -420,7 +445,7 @@ export function CityDayPresetBlock({
         >
           {namedResolved.map((row, index) => {
             const active = selectedIndex === index;
-            const cover = presetCoverUrl(row.preset, row.items);
+            const cover = scenarioChipCovers[index] ?? null;
             const gradient = SCENARIO_GRADIENTS[index % SCENARIO_GRADIENTS.length];
             return (
               <button

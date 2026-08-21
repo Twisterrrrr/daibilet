@@ -177,6 +177,7 @@ export const PENZA_DAY_ROUTE_PRESETS: any[] = [
     description: 'Первый день в Пензе: крепостной холм, собор, Московская и музей одной картины.',
     travelVector: 'Пешком по центру',
     timingNote: 'Около 4 часов с одной длинной музейной паузой и фонтанным финалом.',
+    coverImageUrl: '/images/venues/penza/pamyatnik-pervoposelentsu.jpg',
     stops: [
       place('Памятник Первопоселенцу', 'Старт на лучшей исторической смотровой.', 53.195112, 45.019112, { address: 'ул. Кирова', locationSlug: 'penza-pamyatnik-pervoposelentsu', mustSeeFilter: 'monument', visitMinutes: 20, alsoMain: true }),
       place('Спасский собор', 'Полчаса на собор и площадь.', 53.194812, 45.018512, { address: 'Соборная площадь', locationSlug: 'penza-spasskiy-kafedralnyy-sobor', mustSeeFilter: 'temple', visitMinutes: 30, alsoMain: true }),
@@ -191,6 +192,7 @@ export const PENZA_DAY_ROUTE_PRESETS: any[] = [
     description: 'Культурная Пенза без спешки: Дом Мейерхольда, галерея и зеленый финал в парке Белинского.',
     travelVector: 'Пешком по центру и на холм',
     timingNote: 'Около 4-5 часов с галереей и парком.',
+    coverImageUrl: '/images/venues/penza/dom-meyerholda.jpg',
     stops: [
       place('Дом Мейерхольда', 'Старт с театральной биографии города.', 53.196112, 45.020612, { address: 'ул. Володарского, 59', venueSlug: 'penza-dom-meyerholda', mustSeeFilter: 'creative', visitMinutes: 45 }),
       place('Картинная галерея', 'Час-полтора на коллекцию Савицкого.', 53.196612, 45.018212, { address: 'ул. Советская, 3', venueSlug: 'penza-kartinnaya-galereya-im-savickogo', mustSeeFilter: 'museum', visitMinutes: '1-2 ч', alsoMain: true }),
