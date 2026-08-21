@@ -3953,6 +3953,8 @@ const SUBURB_NESTED_AUTO_IMAGES: Record<string, string> = {
   'volgograd-promenad-chuikova': '/images/venues/volgograd/promenad-chuikova.jpg',
 
   'ryazan-solotcha': '/images/venues/ryazan/solotcha.jpg',
+
+  'novosibirsk-suzun': '/images/venues/novosibirsk/suzun.jpg',
 };
 
 const EDITORIAL_IMAGES_BY_SLUG: Record<string, string> = {
