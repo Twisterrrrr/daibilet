@@ -37,7 +37,7 @@ Live: Deploy MSK web [`32371428354`](https://github.com/Twisterrrrr/daibilet/act
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
 | UX.REGION-AFFICHE-CITY-RAIL | Region/child афиша = city hub poster rail (`HubEventsAfficheRail`), без «серия на площадке» | Высокий | ✅ live Deploy `32367020739` SHA `0ffa2f6` |
-| UX.REGION-AFFICHE-LEAD-DOCS | Lead без «дубля афиши центра»; `region-hub-v1` = city-rail parity | Средний | 🔄 commit |
+| UX.REGION-AFFICHE-LEAD-DOCS | Lead без «дубля афиши центра»; `region-hub-v1` = city-rail parity | Средний | ✅ `55a7253` push; live по «выкатывай» |
 
 ## 2026-08-20 - Region child guide + affiche copy
 
