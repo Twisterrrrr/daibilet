@@ -623,8 +623,6 @@ const SAINT_PETERSBURG_IMAGES: Record<string, string> = {
 const KALININGRAD_IMAGES: Record<string, string> = {
   'kaliningrad-kafedral-nyy-sobor':
     '/images/venues/kaliningrad/kafedral-nyy-sobor.jpg',
-  'kaliningrad-kenigsbergskaya-birzha':
-    '/images/venues/kaliningrad/muzey-izobrazitelnyh-iskusstv.jpg',
   'kaliningrad-muzey-mirovogo-okeana':
     '/images/venues/kaliningrad/muzey-mirovogo-okeana.jpg',
   'kaliningrad-muzey-yantarya': '/images/venues/kaliningrad/muzey-yantarya.jpg',
@@ -3905,6 +3903,22 @@ const SUBURB_NESTED_AUTO_IMAGES: Record<string, string> = {
   'nizhny-novgorod-ploschad-lenina': '/images/venues/nizhny-novgorod/ploschad-lenina.jpg',
   'nizhny-novgorod-ulitsa-sovetskaya': '/images/venues/nizhny-novgorod/ulitsa-sovetskaya.jpg',
   'nizhny-novgorod-art-strelka': '/images/venues/nizhny-novgorod/art-strelka.jpg',
+
+
+
+  'kaliningrad-kgd-green-medovyy-most': '/images/venues/kaliningrad/kgd-green-medovyy-most.jpg',
+  'kaliningrad-kgd-green-nikolay-chudotvorets': '/images/venues/kaliningrad/kgd-green-nikolay-chudotvorets.jpg',
+  'kaliningrad-kgd-red-villa-schmidt': '/images/venues/kaliningrad/kgd-red-villa-schmidt.jpg',
+
+  'krasnoyarsk-pamyatnik-dubenskomu-strelka': '/images/venues/krasnoyarsk/pamyatnik-dubenskomu-strelka.jpg',
+
+  'kaliningrad-mogila-kanta': '/images/venues/kaliningrad/mogila-kanta.jpg',
+  'kaliningrad-okean-main-building': '/images/venues/kaliningrad/okean-main-building.jpg',
+  'kaliningrad-fridrikhsburgskie-vorota': '/images/venues/kaliningrad/fridrikhsburgskie-vorota.jpg',
+  'kaliningrad-teatr-kukol-kirha-luizy': '/images/venues/kaliningrad/teatr-kukol-kirha-luizy.jpg',
+  'kaliningrad-villa-rut': '/images/venues/kaliningrad/villa-rut.jpg',
+  'kaliningrad-villa-makovski': '/images/venues/kaliningrad/villa-makovski.jpg',
+  'kaliningrad-kenigsbergskaya-birzha': '/images/venues/kaliningrad/kenigsbergskaya-birzha-uniq.jpg',
 };
 
 const EDITORIAL_IMAGES_BY_SLUG: Record<string, string> = {

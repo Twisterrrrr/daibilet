@@ -43,6 +43,7 @@ export const KRASNOYARSK_GREEN_LINE_STOPS: any[] = [
     visitMinutes: 25,
   }),
   stop('Памятник Дубенскому на Стрелке', 'Воевода у слияния Качи и Енисея.', 56.016211, 92.894112, {
+    locationSlug: 'krasnoyarsk-pamyatnik-dubenskomu-strelka',
     dayRouteId: 'krasnoyarsk-green-dubenskiy-strelka',
     mustSeeFilter: 'monument',
   }),
