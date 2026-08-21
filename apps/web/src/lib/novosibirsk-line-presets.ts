@@ -37,6 +37,7 @@ export const NOVOSIBIRSK_GREEN_LINE_STOPS: any[] = [
     55.023254,
     82.929851,
     {
+      locationSlug: 'novosibirsk-dom-kupca-istomina',
       dayRouteId: 'novosibirsk-green-dom-istomina',
       mustSeeFilter: 'houses',
       visitMinutes: 15,
@@ -48,6 +49,7 @@ export const NOVOSIBIRSK_GREEN_LINE_STOPS: any[] = [
     55.025642,
     82.922123,
     {
+      locationSlug: 'novosibirsk-dom-kupca-mashtakova',
       dayRouteId: 'novosibirsk-green-dom-mashtakova',
       mustSeeFilter: 'houses',
       visitMinutes: 15,
@@ -99,6 +101,7 @@ export const NOVOSIBIRSK_RED_LINE_STOPS: any[] = [
     55.03212,
     82.92645,
     {
+      locationSlug: 'novosibirsk-art-el',
       dayRouteId: 'novosibirsk-red-art-el',
       mustSeeFilter: 'creative',
       visitMinutes: 25,
@@ -110,6 +113,7 @@ export const NOVOSIBIRSK_RED_LINE_STOPS: any[] = [
     55.03154,
     82.91986,
     {
+      locationSlug: 'novosibirsk-dvorik-centralnaya',
       dayRouteId: 'novosibirsk-red-dvorik-tsentralnaya',
       mustSeeFilter: 'street',
       visitMinutes: 20,
@@ -121,6 +125,7 @@ export const NOVOSIBIRSK_RED_LINE_STOPS: any[] = [
     55.028945,
     82.92182,
     {
+      locationSlug: 'novosibirsk-arka-street-art',
       dayRouteId: 'novosibirsk-red-arka-street-art',
       mustSeeFilter: 'street',
       visitMinutes: 15,
@@ -144,6 +149,7 @@ export const NOVOSIBIRSK_RED_LINE_STOPS: any[] = [
     55.02158,
     82.93214,
     {
+      locationSlug: 'novosibirsk-art-klaster-fabrika',
       dayRouteId: 'novosibirsk-red-fabrika',
       mustSeeFilter: 'creative',
       visitMinutes: 40,

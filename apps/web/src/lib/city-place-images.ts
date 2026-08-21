@@ -3868,6 +3868,16 @@ const SUBURB_NESTED_AUTO_IMAGES: Record<string, string> = {
   'yaroslavl-yaroslavskiy-hudozhestvennyy-muzey': '/images/venues/yaroslavl/yaroslavskiy-hudozhestvennyy-muzey.jpg',
   'yaroslavl-yaroslavskiy-kreml-spaso-preobrazhenskiy-monastyr': '/images/venues/yaroslavl/yaroslavskiy-kreml-spaso-preobrazhenskiy-monastyr.jpg',
   'yaroslavl-znamenskaya-bashnya': '/images/venues/yaroslavl/znamenskaya-bashnya.jpg',
+
+  'novosibirsk-dom-kupca-istomina': '/images/venues/novosibirsk/dom-kupca-istomina.jpg',
+  'novosibirsk-dom-kupca-mashtakova': '/images/venues/novosibirsk/dom-kupca-mashtakova.jpg',
+  'novosibirsk-art-el': '/images/venues/novosibirsk/art-el.jpg',
+  'novosibirsk-dvorik-centralnaya': '/images/venues/novosibirsk/dvorik-centralnaya.jpg',
+  'novosibirsk-arka-street-art': '/images/venues/novosibirsk/arka-street-art.jpg',
+  'novosibirsk-art-klaster-fabrika': '/images/venues/novosibirsk/art-klaster-fabrika.jpg',
+  'novosibirsk-koltsovo': '/images/venues/novosibirsk/koltsovo.jpg',
+  'novosibirsk-iskitim-lozhok': '/images/venues/novosibirsk/iskitim-lozhok.jpg',
+  'novosibirsk-berdskie-skaly': '/images/venues/novosibirsk/berdskie-skaly.jpg',
 };
 
 const EDITORIAL_IMAGES_BY_SLUG: Record<string, string> = {
