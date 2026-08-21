@@ -1,3 +1,29 @@
+## 2026-08-21 - Tourist hubs: Sochi, Saratov, Yaroslavl, Volgograd
+
+### Наблюдения
+- Четыре полных брифa owner уже были; субагенты на gpt-5.6 упёрлись в usage, на Auto (inherit) пакеты собрались.
+- До итерации у городов были тонкие stubs (~6 mustSee) без `*-hub.ts`.
+
+### Решения
+- Пакеты `sochi|saratov|yaroslavl|volgograd-hub.ts` + line-presets + flavor/lifehacks fragments; wiring в `cityInfo`, `city-hub-local-flavor`, `city-hub-lifehacks`.
+- mustSee floor: 50 / 51 / 54 / 52. Identity JPG уже были на диске; массовая GenerateImage по must-see - следующий батч.
+
+### Проблемы
+- У новых slug ещё нет уникальных editorial JPG (кроме существующих 6+identity): рейлы могут быть серыми до fill/GenerateImage.
+
+## 2026-08-21 - Suburb nested previews: unique covers audit gate
+
+### Наблюдения
+- Аудит nested places: 72 без slug, 145 slug без editorial, 2 полных дубля (Рамонь/Дивногорье → один JPG на весь рейл).
+
+### Решения
+- Рамонь/Дивногорье: уникальные GenerateImage + map.
+- Остальные дыры: `scripts/fill-suburb-preview-gaps.mjs` (slug + уникальный файл на slug, без клона parent/identity в одном рейле).
+- Повторный audit: 0 missing slug / editorial / file / duplicateInRail.
+
+### Проблемы
+- Часть auto-covers - modulate/SVG stub; AI-фото батчами позже. Identity packs Sochi/Saratov/Yaroslavl/Volgograd уже на диске.
+
 ## 2026-08-21 - Region affiche lead + docs = city hub parity
 
 ### Наблюдения

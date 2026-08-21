@@ -75,6 +75,8 @@ const CITY_ALIASES: Record<string, string[]> = {
   irkutsk: ['irkutsk', 'иркутск'],
   perm: ['perm', 'пермь', 'перм'],
   saratov: ['saratov', 'саратов'],
+  sochi: ['sochi', 'сочи'],
+  volgograd: ['volgograd', 'волгоград', 'сталинград'],
   'ulan-ude': ['ulan-ude', 'улан-удэ', 'улан удэ'],
   chelyabinsk: ['chelyabinsk', 'челябинск'],
 };

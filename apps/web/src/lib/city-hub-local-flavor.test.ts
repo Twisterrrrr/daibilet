@@ -470,7 +470,7 @@ function emptyHubDesc(value: unknown): boolean {
 }
 
 test('editorial hub mustSee, suburb roots and nested places have non-empty desc', () => {
-  const cities = [...Object.keys(CITY_HUB_LOCAL_FLAVOR), 'sochi'];
+  const cities = Object.keys(CITY_HUB_LOCAL_FLAVOR);
   const seen = new Set<string>();
   for (const city of cities) {
     if (seen.has(city)) continue;
@@ -480,6 +480,9 @@ test('editorial hub mustSee, suburb roots and nested places have non-empty desc'
     assert.ok((info.mustSee || []).length > 0, `${city}: mustSee empty`);
     if (city === 'voronezh') {
       assert.ok((info.mustSee || []).length >= 50, 'voronezh mustSee floor ~50');
+    }
+    if (city === 'sochi' || city === 'saratov' || city === 'yaroslavl' || city === 'volgograd') {
+      assert.ok((info.mustSee || []).length >= 50, `${city} mustSee floor ~50`);
     }
     if (city === 'rostov-na-donu') {
       assert.ok((info.mustSee || []).length >= 50, 'rostov mustSee floor ~50');

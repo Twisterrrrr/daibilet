@@ -7,6 +7,10 @@
 
 import { normalizeCityHubSlug } from './city-hub-config.ts';
 import type { CityPlaceFocus } from './city-hub-local-flavor.ts';
+import { SOCHI_ITEMS } from './_lifehacks-sochi.fragment.ts';
+import { SARATOV_ITEMS } from './_lifehacks-saratov.fragment.ts';
+import { YAROSLAVL_ITEMS } from './_lifehacks-yaroslavl.fragment.ts';
+import { VOLGOGRAD_ITEMS } from './_lifehacks-volgograd.fragment.ts';
 
 export type CityLifehackTabId = 'walk' | 'transit' | 'fly' | 'food';
 
@@ -1903,6 +1907,10 @@ const CITY_HUB_LIFEHACKS: Record<string, CityLifehackPack> = {
   'rostov-na-donu': lifehackPack(ROSTOV_ITEMS),
   penza: lifehackPack(PENZA_ITEMS),
   tver: lifehackPack(TVER_ITEMS),
+  sochi: lifehackPack(SOCHI_ITEMS),
+  saratov: lifehackPack(SARATOV_ITEMS),
+  yaroslavl: lifehackPack(YAROSLAVL_ITEMS),
+  volgograd: lifehackPack(VOLGOGRAD_ITEMS),
 };
 
 export function resolveCityLifehacks(slug: string | null | undefined): CityLifehackPack | null {

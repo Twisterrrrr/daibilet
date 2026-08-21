@@ -7,6 +7,26 @@
  * Ekaterinburg, Kazan, Samara, Krasnodar, Krasnoyarsk, Novosibirsk, Voronezh, Ufa, Omsk, Chelyabinsk, Tyumen, Rostov-on-Don, Penza, Tver.
  */
 
+import {
+  SOCHI_SLIDES,
+  SOCHI_WEATHER,
+  SOCHI_WHEN_TO_GO,
+} from './_flavor-sochi.fragment.ts';
+import {
+  SARATOV_SLIDES,
+  SARATOV_WEATHER,
+  SARATOV_WHEN_TO_GO,
+} from './_flavor-saratov.fragment.ts';
+import {
+  YAROSLAVL_SLIDES,
+  YAROSLAVL_WEATHER,
+  YAROSLAVL_WHEN_TO_GO,
+} from './_flavor-yaroslavl.fragment.ts';
+import {
+  VOLGOGRAD_SLIDES,
+  VOLGOGRAD_WEATHER,
+  VOLGOGRAD_WHEN_TO_GO,
+} from './_flavor-volgograd.fragment.ts';
 import { normalizeCityHubSlug } from './city-hub-config.ts';
 import type { CityMustSeeItem, CitySuburbItem, CitySuburbPlace } from './cityInfo.ts';
 import { transliterateSlug } from './routes.ts';
@@ -2636,6 +2656,38 @@ export const CITY_HUB_LOCAL_FLAVOR: Record<string, CityHubLocalFlavor> = {
     slides: TYUMEN_SLIDES,
     weather: TYUMEN_WEATHER,
     whenToGo: TYUMEN_WHEN_TO_GO,
+  },
+  sochi: {
+    identityHeading: 'Чем уникален Сочи',
+    identityLead: IDENTITY_LEAD,
+    tags: tagsFromSlides(SOCHI_SLIDES),
+    slides: SOCHI_SLIDES,
+    weather: SOCHI_WEATHER,
+    whenToGo: SOCHI_WHEN_TO_GO,
+  },
+  saratov: {
+    identityHeading: 'Чем уникален Саратов',
+    identityLead: IDENTITY_LEAD,
+    tags: tagsFromSlides(SARATOV_SLIDES),
+    slides: SARATOV_SLIDES,
+    weather: SARATOV_WEATHER,
+    whenToGo: SARATOV_WHEN_TO_GO,
+  },
+  yaroslavl: {
+    identityHeading: 'Чем уникален Ярославль',
+    identityLead: IDENTITY_LEAD,
+    tags: tagsFromSlides(YAROSLAVL_SLIDES),
+    slides: YAROSLAVL_SLIDES,
+    weather: YAROSLAVL_WEATHER,
+    whenToGo: YAROSLAVL_WHEN_TO_GO,
+  },
+  volgograd: {
+    identityHeading: 'Чем уникален Волгоград',
+    identityLead: IDENTITY_LEAD,
+    tags: tagsFromSlides(VOLGOGRAD_SLIDES),
+    slides: VOLGOGRAD_SLIDES,
+    weather: VOLGOGRAD_WEATHER,
+    whenToGo: VOLGOGRAD_WHEN_TO_GO,
   },
 };
 
