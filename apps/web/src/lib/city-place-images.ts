@@ -806,7 +806,6 @@ const LOCATION_PACK_IMAGES: Record<string, string> = {
   'stavropol-tatarskoe-gorodische': '/images/venues/stavropol/tatarskoe-gorodische.jpg',
   'kemerovo-muzey-zapovednik-tomskaya-pisanitsa': '/images/venues/kemerovo/muzey-zapovednik-tomskaya-pisanitsa.jpg',
   'sevastopol-muzey-zapovednik-hersones-tavricheskiy': '/images/venues/sevastopol/muzey-zapovednik-hersones-tavricheskiy.jpg',
-  'ryazan-muzey-zapovednik-s-a-esenina-v-konstantinovo': '/images/venues/ryazan/muzey-zapovednik-s-a-esenina-v-konstantinovo.jpg',
   'volgograd-muzey-panorama-stalingradskaya-bitva': '/images/venues/volgograd/muzey-panorama-stalingradskaya-bitva.jpg',
   'kursk-muzey-usadba-a-a-feta': '/images/venues/kursk/muzey-usadba-a-a-feta.jpg',
   'ryazan-muzey-usad-ba-akademika-i-p-pavlova': '/images/venues/ryazan/muzey-usad-ba-akademika-i-p-pavlova.jpg',
@@ -3062,7 +3061,6 @@ const SUBURB_NESTED_AUTO_IMAGES: Record<string, string> = {
   'ryazan-muzey-istorii-ryazanskogo-ledentsa': '/images/venues/ryazan/muzey-istorii-ryazanskogo-ledentsa.jpg',
   'ryazan-muzey-pahlavy': '/images/venues/ryazan/muzey-pahlavy.jpg',
   'ryazan-muzey-usad-ba-akademika-i-p-pavlova': '/images/venues/ryazan/muzey-usad-ba-akademika-i-p-pavlova.jpg',
-  'ryazan-muzey-zapovednik-s-a-esenina-v-konstantinovo': '/images/venues/ryazan/muzey-zapovednik-s-a-esenina-v-konstantinovo.jpg',
   'ryazan-muzykalnyy-teatr': '/images/venues/ryazan/muzykalnyy-teatr.jpg',
   'ryazan-nikolo-yamskoy-hram': '/images/venues/ryazan/nikolo-yamskoy-hram.jpg',
   'ryazan-nizhniy-gorodskoy-sad': '/images/venues/ryazan/nizhniy-gorodskoy-sad.jpg',
@@ -3536,7 +3534,6 @@ const SUBURB_NESTED_AUTO_IMAGES: Record<string, string> = {
   'tyumen-tobolsk-pryamskiy-vzvoz': '/images/venues/tyumen/tobolsk-pryamskiy-vzvoz.jpg',
   'tyumen-tobolsk-rentereya': '/images/venues/tyumen/tobolsk-rentereya.jpg',
   'tyumen-tobolsk-sofiysko-uspenskiy-sobor': '/images/venues/tyumen/tobolsk-sofiysko-uspenskiy-sobor.jpg',
-  'tyumen-tobolsk-troitskaya-tserkov': '/images/venues/tyumen/tobolsk-troitskaya-tserkov.jpg',
   'tyumen-tobolsk-tyuremnyy-zamok': '/images/venues/tyumen/tobolsk-tyuremnyy-zamok.jpg',
   'tyumen-tobolsk-zahariya-i-elisaveta': '/images/venues/tyumen/tobolsk-zahariya-i-elisaveta.jpg',
   'tyumen-troitskiy-monastyr': '/images/venues/tyumen/troitskiy-monastyr.jpg',
@@ -3557,7 +3554,6 @@ const SUBURB_NESTED_AUTO_IMAGES: Record<string, string> = {
   'tyumen-yalutorovsk-blinnaya': '/images/venues/tyumen/yalutorovsk-blinnaya.jpg',
   'tyumen-yalutorovsk-dekabristy': '/images/venues/tyumen/yalutorovsk-dekabristy.jpg',
   'tyumen-yalutorovsk-krepost': '/images/venues/tyumen/yalutorovsk-krepost.jpg',
-  'tyumen-yalutorovsk-ostrog': '/images/venues/tyumen/yalutorovsk-ostrog.jpg',
   'tyumen-yalutorovsk-skovoroda': '/images/venues/tyumen/yalutorovsk-skovoroda.jpg',
   'tyumen-zatyumenskiy-ekopark': '/images/venues/tyumen/zatyumenskiy-ekopark.jpg',
   'tyumen-znamenskiy-kafedral-nyy-sobor': '/images/venues/tyumen/znamenskiy-kafedral-nyy-sobor.jpg',
@@ -3919,6 +3915,44 @@ const SUBURB_NESTED_AUTO_IMAGES: Record<string, string> = {
   'kaliningrad-villa-rut': '/images/venues/kaliningrad/villa-rut.jpg',
   'kaliningrad-villa-makovski': '/images/venues/kaliningrad/villa-makovski.jpg',
   'kaliningrad-kenigsbergskaya-birzha': '/images/venues/kaliningrad/kenigsbergskaya-birzha-uniq.jpg',
+
+  'ryazan-muzey-istorii-vdv': '/images/venues/ryazan/muzey-istorii-vdv.jpg',
+  'ryazan-muzey-zapovednik-s-a-esenina-v-konstantinovo': '/images/venues/ryazan/muzey-zapovednik-s-a-esenina-v-konstantinovo-uniq.jpg',
+
+  'ufa-shulgan-tash': '/images/venues/ufa/shulgan-tash.jpg',
+  'ufa-toratau': '/images/venues/ufa/toratau.jpg',
+
+
+
+  'rostov-na-donu-bar-golodranets': '/images/venues/rostov-na-donu/bar-golodranets.jpg',
+
+  'sochi-dom-kuptsa-hludova': '/images/venues/sochi/dom-kuptsa-hludova.jpg',
+  'sochi-tsentr-prostranstv': '/images/venues/sochi/tsentr-prostranstv.jpg',
+  'sochi-mural-kusto': '/images/venues/sochi/mural-kusto.jpg',
+  'sochi-street-art-alleya-melodiya': '/images/venues/sochi/street-art-alleya-melodiya.jpg',
+  'sochi-ploschad-iskusstv-hub': '/images/venues/sochi/ploschad-iskusstv-hub.jpg',
+  'sochi-skeyt-park-primorskaya': '/images/venues/sochi/skeyt-park-primorskaya.jpg',
+  'sochi-art-galereya-fort': '/images/venues/sochi/art-galereya-fort.jpg',
+
+
+
+  'tyumen-yalutorovsk-ostrog': '/images/venues/tyumen/yalutorovsk-ostrog-uniq.jpg',
+  'tyumen-tobolsk-troitskaya-tserkov': '/images/venues/tyumen/tobolsk-troitskaya-tserkov.jpg',
+
+
+
+  'saratov-art-klaster-sklady-reyneke': '/images/venues/saratov/art-klaster-sklady-reyneke.jpg',
+  'saratov-mural-volga-i-sterlyad': '/images/venues/saratov/mural-volga-i-sterlyad.jpg',
+  'saratov-strit-art-stena-sgyua': '/images/venues/saratov/strit-art-stena-sgyua.jpg',
+  'saratov-tehnicheskiy-prichal-naberezhnoy-kosmonavtov': '/images/venues/saratov/tehnicheskiy-prichal-naberezhnoy-kosmonavtov.jpg',
+
+
+
+  'volgograd-street-art-tsaritsa': '/images/venues/volgograd/street-art-tsaritsa.jpg',
+  'volgograd-mural-devochka-s-siney-ptitsey': '/images/venues/volgograd/mural-devochka-s-siney-ptitsey.jpg',
+  'volgograd-promenad-chuikova': '/images/venues/volgograd/promenad-chuikova.jpg',
+
+  'ryazan-solotcha': '/images/venues/ryazan/solotcha.jpg',
 };
 
 const EDITORIAL_IMAGES_BY_SLUG: Record<string, string> = {
