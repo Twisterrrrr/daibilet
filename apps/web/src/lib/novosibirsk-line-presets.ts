@@ -165,7 +165,7 @@ export const NOVOSIBIRSK_LINE_DAY_ROUTE_PRESETS: any[] = [
       'Купеческий и исторический Ново-Николаевск: каменные особняки и деревянное зодчество начала XX века в Центральном и Железнодорожном районах.',
     travelVector: '5 точек · пешком по центру',
     timingNote: 'Связный трек без разрывов: от дома Истомина к музею бересты.',
-    coverImageUrl: '/images/venues/novosibirsk/gorodskoy-torgovyy-korpus.jpg',
+    coverImageUrl: '/images/venues/novosibirsk/green-line-cover.jpg',
     stops: NOVOSIBIRSK_GREEN_LINE_STOPS,
   },
   {
@@ -175,7 +175,7 @@ export const NOVOSIBIRSK_LINE_DAY_ROUTE_PRESETS: any[] = [
       'Неформальный и креативный Новосибирск: дворы, стрит-арт и локальные бренды у Октябрьской магистрали и Красного проспекта.',
     travelVector: '5 точек · пешком по дворам',
     timingNote: 'От «Арт-Ели» к арт-кластеру «Фабрика» без логистических разрывов.',
-    coverImageUrl: '/images/venues/novosibirsk/dom-s-chasami.jpg',
+    coverImageUrl: '/images/venues/novosibirsk/red-line-cover.jpg',
     stops: NOVOSIBIRSK_RED_LINE_STOPS,
   },
 ];
