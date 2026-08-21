@@ -189,6 +189,7 @@ export const CHELYABINSK_LINE_DAY_ROUTE_PRESETS: any[] = [
       'Купеческий Челяба и сталинский ампир: пассаж Яушевых, особняк Архипова, опера Глинки, дом Данцигера, Госбанк и дом облисполкома. Весь трек компактно уложен в исторический центр.',
     travelVector: '6 точек · пешком по центру',
     timingNote: 'Связный трек без разрывов: от пассажа Яушевых к дому облисполкома.',
+    coverImageUrl: '/images/venues/chelyabinsk/osobnyak-arhipova.jpg',
     stops: CHELYABINSK_GREEN_LINE_STOPS,
   },
   {
@@ -203,6 +204,7 @@ export const CHELYABINSK_LINE_DAY_ROUTE_PRESETS: any[] = [
       blurb:
         '«Тортуга» на Труда и кластер «Свечка» на Воровского - дворы без вывесок, куда ходят свои.',
     },
+    coverImageUrl: '/images/venues/chelyabinsk/gosudarstvennyy-istoricheskiy-muzey-yuzhnogo-urala.jpg',
     stops: CHELYABINSK_RED_LINE_STOPS,
   },
 ];

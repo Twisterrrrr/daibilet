@@ -890,6 +890,7 @@ export const VORONEZH_DAY_ROUTE_PRESETS: any[] = [
       'Классический ознакомительный трек по главной артерии города с плавным спуском к колыбели русского флота у реки.',
     travelVector: 'Парадный пешеходный променад',
     timingNote: 'Около 3 часов пешком: Петр - ЮВЖД - «Промка» - Бим - Успенский - Адмиралтейская.',
+    coverImageUrl: '/images/venues/voronezh/identity-symbol.jpg',
     stops: [
       {
         name: 'Памятник Петру I',
@@ -965,6 +966,7 @@ export const VORONEZH_DAY_ROUTE_PRESETS: any[] = [
       'Маршрут для ценителей неочевидной архитектуры, концептуального искусства и знаменитого воронежского мяса.',
     travelVector: 'Арт, модерн и фудхолл',
     timingNote: 'Около 3 часов; вечером стоит вернуться в Камерный на спектакль.',
+    coverImageUrl: '/images/venues/voronezh/park-orlyonok.jpg',
     stops: [
       {
         name: 'Парк «Орлёнок» и памятник Мандельштаму',

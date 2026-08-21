@@ -213,6 +213,7 @@ export const UFA_LINE_DAY_ROUTE_PRESETS: any[] = [
       'Купеческая Уфа и дворянское гнездо: особняки, Гостиный двор, Крестьянский банк и финал у Первой соборной мечети. Весь трек компактно уложен в исторический центр.',
     travelVector: '7 точек · пешком по центру',
     timingNote: 'Связный трек без разрывов: от Дворянского собрания к мечети на Тукаева.',
+    coverImageUrl: '/images/venues/ufa/zdanie-dvoryanskogo-sobraniya.jpg',
     stops: UFA_GREEN_LINE_STOPS,
   },
   {
@@ -227,6 +228,7 @@ export const UFA_LINE_DAY_ROUTE_PRESETS: any[] = [
       blurb:
         '«Матча комната» во дворах Арт-квадрата и живые концерты в MusicHall27 закрывают неформальный трек.',
     },
+    coverImageUrl: '/images/venues/ufa/dom-kommuna.jpg',
     stops: UFA_RED_LINE_STOPS,
   },
 ];

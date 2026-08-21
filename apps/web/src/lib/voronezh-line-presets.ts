@@ -213,6 +213,7 @@ export const VORONEZH_LINE_DAY_ROUTE_PRESETS: any[] = [
       'Купеческий и губернский Воронеж: особняки XVIII-XIX веков, шпиль ЮВЖД, «Бристоль» и спуск к Ильинскому храму. Весь трек компактно уложен в исторический центр.',
     travelVector: '7 точек · пешком по центру',
     timingNote: 'Связный трек без разрывов: от дома губернатора к Ильинскому холму.',
+    coverImageUrl: '/images/venues/voronezh/dom-gubernatora.jpg',
     stops: VORONEZH_GREEN_LINE_STOPS,
   },
   {
@@ -227,6 +228,7 @@ export const VORONEZH_LINE_DAY_ROUTE_PRESETS: any[] = [
       blurb:
         '«Культурно Коротко» у «Шута», спикизи «Архив» между Высоцким и Камерным, крафт «Цензура» у «Хлама» и рюмочная «Зюзя» у лечебного стула.',
     },
+    coverImageUrl: '/images/venues/voronezh/pamyatnik-mandelshtamu.jpg',
     stops: VORONEZH_RED_LINE_STOPS,
   },
 ];

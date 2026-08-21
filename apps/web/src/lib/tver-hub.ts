@@ -164,6 +164,7 @@ export const TVER_DAY_ROUTE_PRESETS: any[] = [
     description: 'Классический первый день: Путевой дворец, Городской сад, «Звезда», Никитин и Староволжский мост.',
     travelVector: 'Пешком по центру и через мост',
     timingNote: 'Около 4-5 часов с одной длинной дворцовой паузой и обедом в «Люблине».',
+    coverImageUrl: '/images/venues/tver/imperatorskiy-putevoy-dvorets.jpg',
     stops: [
       place('Спасо-Преображенский собор и Путевой дворец', 'Час на залы дворца и белокаменный собор рядом.', 56.860112, 35.898912, { address: 'ул. Советская, 3', locationSlug: 'tver-imperatorskiy-putevoy-dvorets', mustSeeFilter: 'houses', visitMinutes: 60, alsoMain: true }),
       place('Городской сад и памятник Пушкину', 'Террасы у Волги и короткая парковая пауза.', 56.859812, 35.908912, { address: 'Городской сад', locationSlug: 'tver-gorodskoy-sad', mustSeeFilter: 'park', visitMinutes: 30, alsoMain: true }),
@@ -179,6 +180,7 @@ export const TVER_DAY_ROUTE_PRESETS: any[] = [
     description: 'Трехсвятская, Круг, «Рельсы», Музей козла и кирпичные корпуса Двора Пролетарки.',
     travelVector: 'Пешком по центру и доезд до Пролетарки',
     timingNote: 'Около 5 часов. До Морозовского городка удобен автобус №21 или такси, не растягивайте пешком.',
+    coverImageUrl: '/images/venues/tver/peshehodnaya-trehsvyatskaya-ulitsa.jpg',
     stops: [
       place('Трехсвятская и памятник Кругу', 'Променад и фото на скамейке шансонье.', 56.856912, 35.911112, { address: 'ул. Трехсвятская', locationSlug: 'tver-peshehodnaya-trehsvyatskaya-ulitsa', mustSeeFilter: 'street', visitMinutes: 40, alsoMain: true }),
       place('Креативный кластер «Рельсы»', 'Фильтр-кофе и короткая пауза во дворе.', 56.856412, 35.911891, { address: 'ул. Трехсвятская, 18А', locationSlug: 'tver-kreativnyy-klaster-relsy', mustSeeFilter: 'creative', visitMinutes: 40 }),

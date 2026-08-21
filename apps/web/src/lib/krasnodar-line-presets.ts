@@ -206,6 +206,7 @@ export const KRASNODAR_LINE_DAY_ROUTE_PRESETS: any[] = [
       'Исторический Екатеринодар: ~4,5 км строго по Красной улице - купеческое наследие от Войскового собора до «Гостя».',
     travelVector: '~4,5 км · 18 точек',
     timingNote: 'Полдня пешком по Красной; в выходные улица перекрыта для машин.',
+    coverImageUrl: '/images/venues/krasnodar/voyskovoy-sobor-aleksandra-nevskogo.jpg',
     stops: KRASNODAR_GREEN_LINE_STOPS,
   },
   {
@@ -215,6 +216,7 @@ export const KRASNODAR_LINE_DAY_ROUTE_PRESETS: any[] = [
       'Романтический и неформальный Юг: ~5,5 км по набережным, Затону, «Колосу» и арт-точкам.',
     travelVector: '~5,5 км · 10 точек',
     timingNote: 'День с короткими переездами между Затоном, дендрарием и рощей.',
+    coverImageUrl: '/images/venues/krasnodar/literaturnyy-muzey-kubani.jpg',
     stops: KRASNODAR_RED_LINE_STOPS,
   },
 ];

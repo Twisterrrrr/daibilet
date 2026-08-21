@@ -189,6 +189,7 @@ export const OMSK_LINE_DAY_ROUTE_PRESETS: any[] = [
       'Белая столица и сибирское барокко: Воскресенский собор, казначейство, Тобольские и Тарские ворота, Успенский собор и особняк Батюшкина у памятника Колчаку. Весь трек держится крепости и Иртыша.',
     travelVector: '6 точек · пешком по крепости',
     timingNote: 'Связный трек: от Воскресенского собора к набережной у дома Колчака.',
+    coverImageUrl: '/images/venues/omsk/voskresenskiy-voennyy-sobor.jpg',
     stops: OMSK_GREEN_LINE_STOPS,
   },
   {
@@ -203,6 +204,7 @@ export const OMSK_LINE_DAY_ROUTE_PRESETS: any[] = [
       blurb:
         'Обед в Гастродворе «Любинский», кофе в Skuratov на Лермонтова и вечер в «Викинге» или «Одно вино».',
     },
+    coverImageUrl: '/images/venues/omsk/moskovskie-torgovye-ryady.jpg',
     stops: OMSK_RED_LINE_STOPS,
   },
 ];

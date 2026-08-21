@@ -121,6 +121,7 @@ export const SAMARA_LINE_DAY_ROUTE_PRESETS: any[] = [
       'Старая купеческая набережная: ~3,5 км от Ленинградской через скульптуры и Струковский сад к Жигулёвскому заводу.',
     travelVector: '~3,5 км · 10 точек',
     timingNote: 'Короткий пешеходный маршрут по центру и набережной.',
+    coverImageUrl: '/images/venues/samara/pamyatnik-dyade-stepe.jpg',
     stops: SAMARA_GREEN_LINE_STOPS,
   },
   {
@@ -130,6 +131,7 @@ export const SAMARA_LINE_DAY_ROUTE_PRESETS: any[] = [
       'Самара Космическая и Авангард: ~2,9 км от ракеты «Союз» через конструктивизм ЗИМ к Загородному парку.',
     travelVector: '~2,9 км · 8 точек',
     timingNote: 'Компактный пеший день; удобно совместить с музеем космоса.',
+    coverImageUrl: '/images/venues/samara/muzey-samara-kosmicheskaya.jpg',
     stops: SAMARA_RED_LINE_STOPS,
   },
 ];

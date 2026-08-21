@@ -1034,6 +1034,7 @@ export const TYUMEN_DAY_ROUTE_PRESETS: any[] = [
       'От Колокольниковых и Знаменского к Гостиному двору, Мосту Влюбленных и гранитным ярусам. Обед в пароходной конторе.',
     travelVector: 'Пешком по историческому центру и набережной',
     timingNote: 'Около 3 часов: Колокольниковы - Знаменский - Гостиный двор - мост - ярусы - обед.',
+    coverImageUrl: '/images/venues/tyumen/usadba-kolokolnikovyh.jpg',
     stops: [
       {
         name: 'Усадьба Колокольниковых',
@@ -1109,6 +1110,7 @@ export const TYUMEN_DAY_ROUTE_PRESETS: any[] = [
       'Деревянный Арбат, чай в «Наличниках», Спасская, сибирские кошки, музей Словцова и ужин в «Чуме».',
     travelVector: 'Пешком по Дзержинского и центру',
     timingNote: 'Около 4 часов; вечером имеет смысл «Чум» на Малыгина.',
+    coverImageUrl: '/images/venues/tyumen/dom-burkova.jpg',
     stops: [
       {
         name: 'Дом Буркова',

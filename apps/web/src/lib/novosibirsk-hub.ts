@@ -949,6 +949,7 @@ export const NOVOSIBIRSK_DAY_ROUTE_PRESETS: any[] = [
     id: 'novosibirsk-classic-one-day',
     title: 'Классический Новосибирск за 1 день',
     description: 'НОВАТ, Красный проспект, набережная Оби и сибирская кухня.',
+    coverImageUrl: '/images/venues/novosibirsk/novosibirskiy-teatr-opery-i-baleta-novat.jpg',
     stops: [
       {
         name: 'НОВАТ (Театр оперы и балета)',
@@ -988,6 +989,7 @@ export const NOVOSIBIRSK_DAY_ROUTE_PRESETS: any[] = [
     description:
       'Зоопарк с лиграми, аквапарк, Галилео, планетарий и дельфинарий - главные точки с детьми.',
     timingNote: 'Не пытайтесь закрыть всё за день: выберите 2-3 точки и заложите трансферы.',
+    coverImageUrl: '/images/venues/novosibirsk/novosibirskiy-zoopark-imeni-r-a-shilo.jpg',
     stops: [
       {
         name: 'Новосибирский зоопарк имени Р. А. Шило',
@@ -1051,6 +1053,7 @@ export const NOVOSIBIRSK_DAY_ROUTE_PRESETS: any[] = [
     description: 'Научный пригород: мышь ДНК, «Шпаргалка», Морская и Обское море.',
     travelVectorBlurb:
       'Электричка до «Сеятель» или «Обское море» - около 40 ₽ и без пробок на Большевистской.',
+    coverImageUrl: '/images/venues/novosibirsk/akademgorodok.jpg',
     stops: [
       { name: 'Академгородок', desc: 'Въезд', locationSlug: 'novosibirsk-akademgorodok' },
       {

@@ -460,6 +460,7 @@ export const EKB_LINE_DAY_ROUTE_PRESETS: any[] = [
       'Главный исторический маршрут центра: 6,5 км и 35 ключевых объектов по краске на асфальте.',
     travelVector: '6,5 км · 35 точек',
     timingNote: 'Полный день пешком; можно пройти частями, ориентируясь на красную линию.',
+    coverImageUrl: '/images/venues/ekaterinburg/oktyabrskaya-ploschad.jpg',
     stops: EKB_RED_LINE_STOPS,
   },
   {
@@ -469,6 +470,7 @@ export const EKB_LINE_DAY_ROUTE_PRESETS: any[] = [
       'Царский маршрут Романовых: около 3 км и 11 точек от Храма на Крови до «Россия - Моя история».',
     travelVector: '~3 км · 11 точек',
     timingNote: 'Полдня; к Ново-Тихвинскому и парку истории удобен транспорт.',
+    coverImageUrl: '/images/venues/ekaterinburg/hram-na-krovi.jpg',
     stops: EKB_BLUE_LINE_STOPS,
   },
   {
@@ -478,6 +480,7 @@ export const EKB_LINE_DAY_ROUTE_PRESETS: any[] = [
       'Street Art Line: культовые легальные муралы фестиваля STENOGRAFFIA на ~10 км.',
     travelVector: '~10 км · стрит-арт',
     timingNote: 'Длинный трек по городу; удобнее самокат или короткие переезды между кластерами.',
+    coverImageUrl: '/images/venues/ekaterinburg/mural-uralskiy-bars.jpg',
     stops: EKB_PURPLE_LINE_STOPS,
   },
 ];

@@ -615,6 +615,7 @@ export const KRASNOYARSK_DAY_ROUTE_PRESETS: any[] = [
       'Часовня на Караульной, купеческий пр. Мира, сибирский обед, Стрелка и вантовый мост на Татышев.',
     travelVector: 'Центр, Стрелка и остров',
     timingNote: 'Около 7-8 часов; от Стрелки на Татышев - пешком по Виноградовскому мосту.',
+    coverImageUrl: '/images/venues/krasnoyarsk/karaul-naya-gora-i-chasovnya-paraskevy-pyatnitsy.jpg',
     stops: [
       {
         name: 'Караульная гора и часовня Параскевы Пятницы',
@@ -683,6 +684,7 @@ export const KRASNOYARSK_DAY_ROUTE_PRESETS: any[] = [
       'Столбы, Бобровый лог, Николаевская сопка, Гремячая грива и ужин в «Тунгуске».',
     travelVector: 'Тайга у города и сибирская кухня',
     timingNote: 'Около 8-9 часов; между точками удобен такси или автобус.',
+    coverImageUrl: '/images/venues/krasnoyarsk/natsional-nyy-park-krasnoyarskie-stolby.jpg',
     stops: [
       {
         name: 'Национальный парк «Красноярские Столбы»',

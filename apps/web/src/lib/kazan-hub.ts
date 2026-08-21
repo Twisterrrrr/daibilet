@@ -728,6 +728,7 @@ export const KAZAN_DAY_ROUTE_PRESETS: any[] = [
       'Парадный день по центру: Кремль и Кул-Шариф, Дворец земледельцев, набережная, Баумана и татарский обед.',
     travelVector: 'Парадный пешеходный променад',
     timingNote: 'Около 6-7 часов пешком по центру и Кабану.',
+    coverImageUrl: '/images/venues/kazan/kazanskiy-kreml.jpg',
     stops: [
       {
         name: 'Казанский Кремль и Кул-Шариф',
@@ -794,6 +795,7 @@ export const KAZAN_DAY_ROUTE_PRESETS: any[] = [
       'Парк и особняки центра, затем правый берег: Чаша, УРАМ и дизайн-кластер «Штаб».',
     travelVector: 'Экстрим, смотровые и дизайн-кластеры',
     timingNote: 'Около 5-6 часов; на Чашу поднимайтесь только в ясную погоду.',
+    coverImageUrl: '/images/venues/kazan/park-chernoe-ozero.jpg',
     stops: [
       {
         name: 'Парк «Черное озеро»',

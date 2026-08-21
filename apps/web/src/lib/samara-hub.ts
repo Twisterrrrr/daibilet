@@ -636,6 +636,7 @@ export const SAMARA_DAY_ROUTE_PRESETS: any[] = [
       'Парадный день: Арбат, костёл и модерн, Струковский сад, Жигулёвский завод с «На Дне», Площадь Славы и закат на набережной.',
     travelVector: 'Парадный променад вдоль Волги',
     timingNote: 'Около 7-8 часов пешком по центру и набережной.',
+    coverImageUrl: '/images/venues/samara/ulitsa-leningradskaya.jpg',
     stops: [
       {
         name: 'Улица Ленинградская',
@@ -702,6 +703,7 @@ export const SAMARA_DAY_ROUTE_PRESETS: any[] = [
       'От Дома-чемодана и Дома обороны к ракете «Союз», фабрике-кухне ЗИМ и закату на Вертолётке.',
     travelVector: 'Советский авангард и ракета «Союз»',
     timingNote: 'Около 6-7 часов; на Вертолётку лучше на такси или автобусе.',
+    coverImageUrl: '/images/venues/samara/identity-space.jpg',
     stops: [
       {
         name: 'Дом-чемодан СЖД',

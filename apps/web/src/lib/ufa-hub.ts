@@ -779,6 +779,7 @@ export const UFA_DAY_ROUTE_PRESETS: any[] = [
     travelVector: 'Парадный пешеходный променад',
     timingNote:
       'Около 3 часов: Шаймуратов - Национальный музей - опера - Aibat Hallyar - Салават и смотровая.',
+    coverImageUrl: '/images/venues/ufa/pamyatnik-generalu-shaymuratovu.jpg',
     stops: [
       {
         name: 'Памятник генералу Шаймуратову',
@@ -843,6 +844,7 @@ export const UFA_DAY_ROUTE_PRESETS: any[] = [
       'Молодежный творческий трек: столица уральского музыкального бунта, модерн и урбанистика дворов.',
     travelVector: 'Рок, модерн и стрит-арт',
     timingNote: 'Около 3 часов; вечером стоит задержаться в Арт-квадрате или MusicHall27.',
+    coverImageUrl: '/images/venues/ufa/pamyatnik-mustayu-karimu.jpg',
     stops: [
       {
         name: 'Памятник Мустаю Кариму',

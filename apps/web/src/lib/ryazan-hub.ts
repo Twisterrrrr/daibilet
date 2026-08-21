@@ -952,6 +952,7 @@ export const RYAZAN_DAY_ROUTE_PRESETS: any[] = [
     travelVector: 'Парадный пешеходный променад',
     timingNote:
       'Около 3 часов пешком: Успенский и Дворец Олега - вал - леденец - ТЮЗ - Почтовая - «Кофе Культ».',
+    coverImageUrl: '/images/venues/ryazan/uspenskiy-sobor.jpg',
     stops: [
       {
         name: 'Успенский собор и Дворец Олега в Кремле',
@@ -1028,6 +1029,7 @@ export const RYAZAN_DAY_ROUTE_PRESETS: any[] = [
     travelVector: 'Сады, музеи и наличники',
     timingNote:
       'Около 4 часов: Павлов - Пожалостин - Нижний сад - дом Морозова - «Чулан».',
+    coverImageUrl: '/images/venues/ryazan/muzey-usad-ba-akademika-i-p-pavlova.jpg',
     stops: [
       {
         name: 'Музей-усадьба академика И. П. Павлова',
@@ -1092,6 +1094,7 @@ export const RYAZAN_DAY_ROUTE_PRESETS: any[] = [
       'Пешеходный квест по семи бронзовым грибам с глазами: от боровика в Нижнем саду через Лыбедский и Почтовую к коробейнику у музея леденца, мудрецу у библиотеки, спортсмену и путешественнику у ТИЦ.',
     travelVector: '7 точек · охота за грибами',
     timingNote: 'Около 2 часов пешком по центру, без билетов и касс.',
+    coverImageUrl: '/images/venues/ryazan/grib-borovik.jpg',
     stops: [
       {
         name: 'Грибной боровик',

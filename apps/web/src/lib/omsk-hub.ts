@@ -847,6 +847,7 @@ export const OMSK_DAY_ROUTE_PRESETS: any[] = [
     travelVector: 'Пешком по центру и крепости',
     timingNote:
       'Около 4 часов: речной вокзал - Любинский - Камергерский - Тарские ворота - Воскресенский - крепость. Обед в Гастродворе.',
+    coverImageUrl: '/images/venues/omsk/rechnoy-vokzal.jpg',
     stops: [
       {
         name: 'Смотровая у речного вокзала',
@@ -922,6 +923,7 @@ export const OMSK_DAY_ROUTE_PRESETS: any[] = [
       'День для залов: Эрмитаж-Сибирь, музей Врубеля, Никольский казачий, кристаллы Валиханова и закат у «Сенкевича».',
     travelVector: 'Музеи центра и бульвар Валиханова',
     timingNote: 'Около 4 часов; билеты в Эрмитаж-Сибирь берите заранее на сайте Врубеля.',
+    coverImageUrl: '/images/venues/omsk/ermitazh-sibir.jpg',
     stops: [
       {
         name: 'Эрмитаж-Сибирь',

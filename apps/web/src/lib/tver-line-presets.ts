@@ -120,6 +120,7 @@ export const TVER_LINE_DAY_ROUTE_PRESETS: any[] = [
     description: 'Императорский трезубец и тверское барокко: собор, Путевой дворец и купеческая набережная без логистических разрывов.',
     travelVector: '6 точек · пешком по центру',
     timingNote: 'От Соборной площади вдоль Советской к набережной Степана Разина.',
+    coverImageUrl: '/images/venues/tver/spaso-preobrazhenskiy-sobor.jpg',
     stops: TVER_GREEN_LINE_STOPS,
   },
   {
@@ -128,6 +129,7 @@ export const TVER_LINE_DAY_ROUTE_PRESETS: any[] = [
     description: 'Трехсвятская, Круг, «Рельсы» и Морозовский городок: творческий и индустриальный трек Твери.',
     travelVector: '6 точек · пешком и короткий доезд до Пролетарки',
     timingNote: 'От Трехсвятской через музей Козла к Двору Пролетарки. До Морозовского городка удобен автобус или такси.',
+    coverImageUrl: '/images/venues/tver/pamyatnik-mihailu-krugu.jpg',
     stops: TVER_RED_LINE_STOPS,
   },
 ];

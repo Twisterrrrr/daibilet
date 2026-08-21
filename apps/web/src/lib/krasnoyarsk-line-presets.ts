@@ -197,6 +197,7 @@ export const KRASNOYARSK_LINE_DAY_ROUTE_PRESETS: any[] = [
       'Купеческая и историческая Сибирь: ~4,2 км по пр. Мира и Ленина - каменное и деревянное зодчество.',
     travelVector: '~4,2 км · 18 точек',
     timingNote: 'Полдня пешком по историческому центру; линия нанесена краской на тротуары.',
+    coverImageUrl: '/images/venues/krasnoyarsk/pamyatnik-andreyu-dubenskomu.jpg',
     stops: KRASNOYARSK_GREEN_LINE_STOPS,
   },
   {
@@ -206,6 +207,7 @@ export const KRASNOYARSK_LINE_DAY_ROUTE_PRESETS: any[] = [
       'Природный променад у Енисея: ~5,1 км по мостам, набережным и современному арту.',
     travelVector: '~5,1 км · 11 точек',
     timingNote: 'День у воды: Татышев, Стрелка, Коммунальный мост и парк Горького.',
+    coverImageUrl: '/images/venues/krasnoyarsk/ostrov-tatyshev.jpg',
     stops: KRASNOYARSK_RED_LINE_STOPS,
   },
 ];

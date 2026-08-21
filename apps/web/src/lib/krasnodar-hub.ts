@@ -645,6 +645,7 @@ export const KRASNODAR_DAY_ROUTE_PRESETS: any[] = [
       'Парадный день: Екатерининский сквер, Красная улица, Царские ворота, борщ и парк Галицкого с Японским садом.',
     travelVector: 'Парадный пешеходный маршрут',
     timingNote: 'Около 8-9 часов; к парку Галицкого удобен автобус или такси.',
+    coverImageUrl: '/images/venues/krasnodar/pamyatnik-ekaterine-ii.jpg',
     stops: [
       {
         name: 'Екатерининский сквер и Екатерина II',
@@ -711,6 +712,7 @@ export const KRASNODAR_DAY_ROUTE_PRESETS: any[] = [
       'Мост Поцелуев, Затон, кластер «Колос», башня Шухова и ужин на Фудмаркете.',
     travelVector: 'Набережные, креатив и фото-точки',
     timingNote: 'Около 6-7 часов; между Затоном и «Колосом» удобен транспорт.',
+    coverImageUrl: '/images/venues/krasnodar/most-potseluev.jpg',
     stops: [
       {
         name: 'Мост Поцелуев',

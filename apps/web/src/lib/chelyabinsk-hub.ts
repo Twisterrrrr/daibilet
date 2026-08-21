@@ -1080,6 +1080,7 @@ export const CHELYABINSK_DAY_ROUTE_PRESETS: any[] = [
     travelVector: 'Пешеходный центр и набережная',
     timingNote:
       'Около 5 часов: Кировка / Яушевы - опера - набережная Миасса - метеорит - «Родина» - «Купеческий».',
+    coverImageUrl: '/images/venues/chelyabinsk/passage-yaushevyh.jpg',
     stops: [
       {
         name: 'Кировка и пассаж Яушевых',
@@ -1156,6 +1157,7 @@ export const CHELYABINSK_DAY_ROUTE_PRESETS: any[] = [
     travelVector: 'Ампир, парк и гастро-рынок',
     timingNote:
       'Около 4 часов: облисполком - Алое поле / Невский - UDOBNO - элеватор - Белый рынок.',
+    coverImageUrl: '/images/venues/chelyabinsk/dom-oblispolkoma.jpg',
     stops: [
       {
         name: 'Дом облисполкома',

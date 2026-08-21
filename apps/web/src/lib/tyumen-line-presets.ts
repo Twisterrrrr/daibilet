@@ -189,6 +189,7 @@ export const TYUMEN_LINE_DAY_ROUTE_PRESETS: any[] = [
       'Сибирское барокко и купеческие палаты: Троицкий монастырь, дума, дворянское собрание, Колокольниковы, Знаменский и Спасская.',
     travelVector: '6 точек · пешком по центру',
     timingNote: 'Связный трек: от монастыря на высоком берегу к Спасской на Ленина.',
+    coverImageUrl: '/images/venues/tyumen/troitskiy-monastyr.jpg',
     stops: TYUMEN_GREEN_LINE_STOPS,
   },
   {
@@ -203,6 +204,7 @@ export const TYUMEN_LINE_DAY_ROUTE_PRESETS: any[] = [
       blurb:
         'Чайная «Наличники» на Дзержинского, 34С и фудкорт пароходной конторы у Туры - паузы между Арбатом и ярусами.',
     },
+    coverImageUrl: '/images/venues/tyumen/chaynaya-nalichniki.jpg',
     stops: TYUMEN_RED_LINE_STOPS,
   },
 ];

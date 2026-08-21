@@ -201,6 +201,7 @@ export const RYAZAN_LINE_DAY_ROUTE_PRESETS: any[] = [
       'Древний Кремль и купеческое кружево: Успенский собор, Дворец Олега, вал, музей леденца, дом Херасковых и деревянный дом Морозова. Весь трек без разрывов по старейшей части города.',
     travelVector: '6 точек · пешком по центру',
     timingNote: 'Связный трек: от Успенского собора к улице Салтыкова-Щедрина.',
+    coverImageUrl: '/images/venues/ryazan/ryazanskiy-kreml.jpg',
     stops: RYAZAN_GREEN_LINE_STOPS,
   },
   {
@@ -215,6 +216,7 @@ export const RYAZAN_LINE_DAY_ROUTE_PRESETS: any[] = [
       blurb:
         'Каравайцы и кофе на Почтовой, сидр во дворах «Червячка» и фильтр у Гостиного двора - удобные паузы Красной линии.',
     },
+    coverImageUrl: '/images/venues/ryazan/identity-symbol.jpg',
     stops: RYAZAN_RED_LINE_STOPS,
   },
 ];
