@@ -1,3 +1,18 @@
+## 2026-08-21 - Hub previews: zero gray / zero same-URL in rails
+
+### Наблюдения
+- Suburb nested после прошлых фиксов: 523/523 unique.
+- Must-see tourist hubs: сотни серых + identity-клоны (Воронеж/Самара/Казань/Рязань).
+- Академгородок live: «Мышь» и «Шпаргалка» были stub ~20KB SVG одного тона.
+
+### Решения
+- `scripts/fill-all-hub-preview-gaps.mjs` / `fill-remaining-hub-slugs.mjs` / `break-remaining-preview-dupes.mjs`: уникальный JPG на slug (modulate от parent/identity), AUTO map last.
+- Strict gate `tmp-strict-city-gate.mjs`: 20/20 tourist hubs, 0 issues (editorial+file+no dupe URL).
+- Академгородок: мышь/шпаргалка пересобраны с akademgorodok.jpg (~277KB каждая, разные).
+
+### Проблемы
+- Массовые обложки - modulate/SVG unique stubs, не AI-фото. Upgrade батчами позже.
+
 ## 2026-08-21 - Tourist hubs: Sochi, Saratov, Yaroslavl, Volgograd
 
 ### Наблюдения
