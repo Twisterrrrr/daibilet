@@ -2727,7 +2727,8 @@ const SUBURB_NESTED_AUTO_IMAGES: Record<string, string> = {
   'novosibirsk-novosibirskiy-zoopark-imeni-r-a-shilo': '/images/venues/novosibirsk/novosibirskiy-zoopark-imeni-r-a-shilo.jpg',
   'novosibirsk-osobnyak-kryukova': '/images/venues/novosibirsk/osobnyak-kryukova.jpg',
   'novosibirsk-pamyatnik-kryachkovu': '/images/venues/novosibirsk/pamyatnik-kryachkovu.jpg',
-  'novosibirsk-pamyatnik-laboratornoy-myshi': '/images/venues/novosibirsk/pamyatnik-laboratornoy-myshi.jpg',
+  'novosibirsk-pamyatnik-laboratornoy-myshi':
+    '/images/venues/novosibirsk/pamyatnik-laboratornoy-myshi-preview.jpg',
   'novosibirsk-pamyatnik-leninu': '/images/venues/novosibirsk/pamyatnik-leninu.jpg',
   'novosibirsk-pamyatnik-pervomu-mostu': '/images/venues/novosibirsk/pamyatnik-pervomu-mostu.jpg',
   'novosibirsk-pamyatnik-pervomu-svidaniyu': '/images/venues/novosibirsk/pamyatnik-pervomu-svidaniyu.jpg',
@@ -4103,12 +4104,32 @@ export function inferCityIdentityImage(slug: string | null | undefined): string 
  * Then city identity pack. Hub photo wins only when no editorial/identity
  * and hub is a real image (not generated stub / cities/*.png).
  */
+/**
+ * On-disk convention `/images/venues/{city}/{stem}.jpg` for `city-stem` slugs.
+ * Beats city-identity pack so nested/must-see cards do not all share one symbol
+ * when the editorial map entry is missing from a stale bundle.
+ */
+export function inferConventionalVenueImage(slug: string | null | undefined): string | null {
+  const key = normalizePlaceImageKey(slug);
+  if (!key) return null;
+  for (const city of IDENTITY_CITY_PREFIXES) {
+    if (key === city) continue;
+    if (!key.startsWith(`${city}-`)) continue;
+    const stem = key.slice(city.length + 1);
+    if (!stem || stem.includes('/')) return null;
+    return `/images/venues/${city}/${stem}.jpg`;
+  }
+  return null;
+}
+
 export function resolveVenueHeroImage(
   slug: string | null | undefined,
   hubImageUrl?: string | null,
 ): string | null {
   const editorial = lookupEditorialPlaceImage(slug);
   if (editorial) return editorial;
+  const conventional = inferConventionalVenueImage(slug);
+  if (conventional) return conventional;
   const identity = inferCityIdentityImage(slug);
   if (identity) return identity;
   const hub = String(hubImageUrl || '').trim() || null;
