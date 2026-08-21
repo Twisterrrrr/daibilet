@@ -732,9 +732,7 @@ export function RegionPageView({
               <p className="mt-2 text-sm text-slate-600">
                 {cityFilterLabel
                   ? 'Концерты, спектакли и экскурсии на ближайшие дни'
-                  : centerCity
-                    ? `События по области - без дубля афиши ${centerCityGenitive}`
-                    : 'Концерты, спектакли и выезды по области'}
+                  : 'Концерты, спектакли и выезды по области'}
               </p>
 
               {contentReady ? (

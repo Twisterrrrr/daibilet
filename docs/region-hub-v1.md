@@ -48,15 +48,15 @@ regionTier?: 'A' | 'B' | 'C' | null;
 2. **Мост в центр** - CTA на `/cities/{centerSlug}` + count.
 3. **Города региона** (`bg-slate-50`) - горизонтальный avatar-rail (превью: city asset → session cover → pin; count + logistics) → фильтр афиши; OSM-карта точек **развёрнута по умолчанию**.
 4. **Куда съездить** (Tier A, `bg-white`) - `topPlaces` плитки **photo-first** (editorial `imageUrl` → обложка города → постер события).
-5. **Афиша** (`bg-slate-50`) - sticky бар: date rail (неделя) + пояса (если JSON) + жанры; lean `RegionEventCard`; схлопывание серий одной площадки (`RegionVenueSeriesCard`).
+5. **Афиша** (`bg-slate-50`) - sticky бар: date rail (неделя) + пояса (если JSON) + жанры; H2 **«Ближайшие события»** (при `?city=` - «События в {City}»); лента = city-hub parity: `HubEventsAfficheRail` (`ScrollRail` + `EventCard` showcaseRail / standup group из `city-hub-affiche`). Sticky tab: **События**.
 6. **FAQ** (`bg-white`).
 
 Пустые city-секции (`travel` / `sights` из `CITY_INFO`) для region **не** рендерить.
 
 ### Tier A UX notes
 
-- **Не** shared `EventCard`: region-only photo-first card, один CTA «Билет», один genre bubble, logistics chip (`МЦД · ~N км`).
-- **Серии:** ≥3 события на venue **или** ≥40% видимой ленты → карусель дат + «Показать все».
+- Афиша = **тот же** poster-rail, что city hub «Ближайшие события» (не lean `RegionEventCard` / не `RegionVenueSeriesCard`).
+- City name и meta места уже на `EventCard`; отдельный logistics chip на карточке афиши не обязателен.
 - **Пояса v1:** `near` / `mid` / `far` от МКАД (пилот `moskovskaya-oblast`). Шоссе-коридоры - v2.
 - **Карта v1:** ориентация + клик = city filter; без cluster SDK; open by default.
 
@@ -94,4 +94,4 @@ regionTier?: 'A' | 'B' | 'C' | null;
 | 1 | type=region branch, `centerCity`/`childCities`, скрытие пустых city-секций | ✅ |
 | 2 | UI: мост + города региона + афиша | ✅ |
 | 3 | region SEO meta, noindex C, strip на центре, AI `regionInfo` A | ✅ SEO+noindex+strip; LLM script ⏳ |
-| 4 | Tier A UX: lean cards, city rail, date/belt/genre sticky, series collapse, belts+map (MSK oblast) | ✅ code |
+| 4 | Tier A UX: sticky date/belt/genre + city rail/map; афиша = city EventCard rail (`HubEventsAfficheRail`) | ✅ code |

@@ -1,3 +1,15 @@
+## 2026-08-21 - Region affiche lead + docs = city hub parity
+
+### Наблюдения
+- H2/tab/rail уже как у city (`HubEventsAfficheRail`), но lead всё ещё «без дубля афиши {центра}», а `region-hub-v1.md` описывал lean `RegionEventCard`.
+
+### Решения
+- Lead афиши: одна человеческая строка «Концерты, спектакли и выезды по области» (child: «…на ближайшие дни»).
+- Docs: афиша region = city-rail parity, не region invent.
+
+### Проблемы
+- Нет.
+
 ## 2026-08-20 - My Day: keyboard / soft keyboard on stops
 
 ### Наблюдения
