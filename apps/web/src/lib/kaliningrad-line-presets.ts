@@ -34,11 +34,13 @@ export const KALININGRAD_GREEN_LINE_STOPS: any[] = [
     mustSeeFilter: 'temple',
   }),
   stop('Могила Канта', 'Могила Иммануила Канта у стены собора.', 54.706712, 20.512612, {
+    locationSlug: 'kaliningrad-mogila-kanta',
     dayRouteId: 'kgd-green-mogila-kanta',
     mustSeeFilter: 'monument',
     visitMinutes: 10,
   }),
   stop('Медовый мост', 'Мост с острова Канта к Рыбной деревне.', 54.705811, 20.513911, {
+    locationSlug: 'kaliningrad-kgd-green-medovyy-most',
     dayRouteId: 'kgd-green-medovyy-most',
     mustSeeFilter: 'views',
   }),
@@ -51,16 +53,19 @@ export const KALININGRAD_GREEN_LINE_STOPS: any[] = [
     mustSeeFilter: 'museum',
   }),
   stop('Музей Мирового океана', 'Главное здание Музея Мирового океана.', 54.706112, 20.499412, {
+    locationSlug: 'kaliningrad-okean-main-building',
     dayRouteId: 'kgd-green-okean-main-building',
     mustSeeFilter: 'museum',
     visitMinutes: 40,
   }),
   stop('Памятник Николаю Чудотворцу', 'Памятник святителю у набережной.', 54.706312, 20.501211, {
+    locationSlug: 'kaliningrad-kgd-green-nikolay-chudotvorets',
     dayRouteId: 'kgd-green-nikolay-chudotvorets',
     mustSeeFilter: 'monument',
     visitMinutes: 10,
   }),
   stop('Фридрихсбургские ворота', 'Ворота у Музея Мирового океана.', 54.704412, 20.494112, {
+    locationSlug: 'kaliningrad-fridrikhsburgskie-vorota',
     dayRouteId: 'kgd-green-fridrikhsburgskie',
     mustSeeFilter: 'houses',
   }),
@@ -82,6 +87,7 @@ export const KALININGRAD_RED_LINE_STOPS: any[] = [
     mustSeeFilter: 'park',
   }),
   stop('Театр кукол (кирха Луизы)', 'Театр кукол в бывшей кирхе Луизы.', 54.719412, 20.476112, {
+    locationSlug: 'kaliningrad-teatr-kukol-kirha-luizy',
     dayRouteId: 'kgd-red-teatr-kukol',
     mustSeeFilter: 'creative',
   }),
@@ -91,6 +97,7 @@ export const KALININGRAD_RED_LINE_STOPS: any[] = [
     visitMinutes: 10,
   }),
   stop('Вилла Рут', 'Особняк в районе вилл Амалиенау.', 54.719812, 20.469112, {
+    locationSlug: 'kaliningrad-villa-rut',
     dayRouteId: 'kgd-red-villa-rut',
     address: 'ул. Кутузова, 8',
     mustSeeFilter: 'mansions',
@@ -100,10 +107,12 @@ export const KALININGRAD_RED_LINE_STOPS: any[] = [
     mustSeeFilter: 'mansions',
   }),
   stop('Вилла Маковски', 'Историческая вилла в Амалиенау.', 54.718512, 20.463211, {
+    locationSlug: 'kaliningrad-villa-makovski',
     dayRouteId: 'kgd-red-villa-makovski',
     mustSeeFilter: 'mansions',
   }),
   stop('Вилла Шмидт', 'Вилла на улице Марины Расковой.', 54.720112, 20.461512, {
+    locationSlug: 'kaliningrad-kgd-red-villa-schmidt',
     dayRouteId: 'kgd-red-villa-schmidt',
     address: 'ул. Марины Расковой, 23',
     mustSeeFilter: 'mansions',
@@ -123,6 +132,7 @@ export const KALININGRAD_LINE_DAY_ROUTE_PRESETS: any[] = [
       'Сердце Кёнигсберга: ~3,2 км от острова Канта через Рыбную деревню и Музей океана к башне Дона.',
     travelVector: '~3,2 км · 10 точек',
     timingNote: 'Пеший маршрут по центру; финальный отрезок к воротам и Музею янтаря.',
+    coverImageUrl: '/images/venues/kaliningrad/green-line-cover.jpg',
     stops: KALININGRAD_GREEN_LINE_STOPS,
   },
   {
@@ -132,6 +142,7 @@ export const KALININGRAD_LINE_DAY_ROUTE_PRESETS: any[] = [
       'Город-сад Амалиенау: ~2,8 км от Центрального парка через кирху Луизы и виллы к «Альтес Хаус».',
     travelVector: '~2,8 км · 8 точек',
     timingNote: 'Короткий спокойный променад по зелёному району вилл.',
+    coverImageUrl: '/images/venues/kaliningrad/red-line-cover.jpg',
     stops: KALININGRAD_RED_LINE_STOPS,
   },
 ];
