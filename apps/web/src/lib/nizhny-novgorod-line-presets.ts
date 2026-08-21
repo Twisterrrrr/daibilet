@@ -34,6 +34,7 @@ export const NIZHNY_NOVGOROD_GREEN_LINE_STOPS: any[] = [
     mustSeeFilter: 'views',
   }),
   stop('Дмитриевская башня', 'Главная проездная башня Нижегородского Кремля.', 56.326112, 44.005812, {
+    locationSlug: 'nizhny-novgorod-dmitrievskaya-bashnya',
     dayRouteId: 'nn-green-dmitrievskaya-bashnya',
     mustSeeFilter: 'houses',
   }),
@@ -81,14 +82,17 @@ export const NIZHNY_NOVGOROD_RED_LINE_STOPS: any[] = [
     mustSeeFilter: 'houses',
   }),
   stop('Ярмарочная фильтровальная станция', 'Историческая водонапорная станция у ярмарки.', 56.329112, 43.961211, {
+    locationSlug: 'nizhny-novgorod-filtrovalnaya-stantsiya',
     dayRouteId: 'nn-red-filtrovalnaya',
     mustSeeFilter: 'houses',
   }),
   stop('Площадь Ленина', 'Площадь на пути к собору и Стрелке.', 56.329812, 43.968112, {
+    locationSlug: 'nizhny-novgorod-ploschad-lenina',
     dayRouteId: 'nn-red-ploschad-lenina',
     mustSeeFilter: 'views',
   }),
   stop('Улица Советская', 'Подход к собору Александра Невского.', 56.331212, 43.971112, {
+    locationSlug: 'nizhny-novgorod-ulitsa-sovetskaya',
     dayRouteId: 'nn-red-ulitsa-sovetskaya',
     mustSeeFilter: 'views',
   }),
@@ -101,6 +105,7 @@ export const NIZHNY_NOVGOROD_RED_LINE_STOPS: any[] = [
     mustSeeFilter: 'creative',
   }),
   stop('Арт-объект «Стрелка»', 'Инсталляция на мысе у слияния Оки и Волги.', 56.335112, 43.977211, {
+    locationSlug: 'nizhny-novgorod-art-strelka',
     dayRouteId: 'nn-red-art-strelka',
     mustSeeFilter: 'monument',
   }),
@@ -118,6 +123,7 @@ export const NIZHNY_NOVGOROD_LINE_DAY_ROUTE_PRESETS: any[] = [
       'Холмы, Кремль и Рождественская: ~4,2 км от площади Минина через Кремль и Чкаловскую лестницу к купеческой улице.',
     travelVector: '~4,2 км · 10 точек',
     timingNote: 'Пеший маршрут с перепадом высоты; лестница - главный набор ступеней.',
+    coverImageUrl: '/images/venues/nizhny-novgorod/nn-green-line-cover.jpg',
     stops: NIZHNY_NOVGOROD_GREEN_LINE_STOPS,
   },
   {
@@ -127,6 +133,7 @@ export const NIZHNY_NOVGOROD_LINE_DAY_ROUTE_PRESETS: any[] = [
       'Стрелка, Ярмарка и Пакгаузы: ~3,8 км от ярмарки к собору Александра Невского и мысу Стрелки.',
     travelVector: '~3,8 км · 8 точек',
     timingNote: 'Короткий пешеходный променад без крутых подъёмов.',
+    coverImageUrl: '/images/venues/nizhny-novgorod/nn-red-line-cover.jpg',
     stops: NIZHNY_NOVGOROD_RED_LINE_STOPS,
   },
 ];
