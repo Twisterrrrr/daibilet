@@ -55,6 +55,7 @@
     "check:widgets": "node scripts/widget-readiness-check.mjs",
     "check:sync-invariants": "node scripts/sync-invariants-check.js",
     "hub:check-image-map": "node scripts/audit-slug-path-collisions.mjs --check",
+    "hub:check-image-quality": "node scripts/audit-venue-image-quality.mjs --check",
     "check:post-deploy": "bash scripts/post-deploy-check.sh",
     "check:parity": "bash scripts/run-parity-check.sh",
     "revalidate:home": "node scripts/revalidate-next-home.mjs",

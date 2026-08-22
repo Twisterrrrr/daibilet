@@ -1,0 +1,60 @@
+{
+  "generatedAt": "2026-08-22T17:01:08.106Z",
+  "cityFilter": null,
+  "mustSeeSlugs": 528,
+  "byCity": {
+    "omsk": {
+      "slugs": 65,
+      "issues": 0
+    },
+    "penza": {
+      "slugs": 53,
+      "issues": 0
+    },
+    "rostov-na-donu": {
+      "slugs": 50,
+      "issues": 0
+    },
+    "ryazan": {
+      "slugs": 72,
+      "issues": 0
+    },
+    "saratov": {
+      "slugs": 51,
+      "issues": 0
+    },
+    "sochi": {
+      "slugs": 50,
+      "issues": 0
+    },
+    "tver": {
+      "slugs": 65,
+      "issues": 0
+    },
+    "tyumen": {
+      "slugs": 67,
+      "issues": 0
+    },
+    "ufa": {
+      "slugs": 55,
+      "issues": 0
+    }
+  },
+  "issueCounts": {
+    "missingBase": 0,
+    "missingThumb": 0,
+    "tinyThumb": 0,
+    "badOrientation": 0,
+    "badAspect": 0,
+    "duplicateThumbMd5": 0
+  },
+  "md5DupesInCity": {},
+  "issues": {
+    "missingBase": [],
+    "missingThumb": [],
+    "tinyThumb": [],
+    "badOrientation": [],
+    "badAspect": [],
+    "duplicateThumbMd5": []
+  }
+}

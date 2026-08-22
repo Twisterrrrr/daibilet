@@ -28,6 +28,9 @@ jobs:
       - name: Hub image map guard (scan cities)
         run: pnpm hub:check-image-map
 
+      - name: Hub image quality guard (scan cities)
+        run: pnpm hub:check-image-quality
+
       - name: Prisma validate and generate
         run: |
           pnpm db:validate
