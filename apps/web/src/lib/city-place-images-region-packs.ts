@@ -201,6 +201,7 @@ export const CITY_IDENTITY_FALLBACK: Record<string, string> = {
   novosibirsk: '/images/venues/novosibirsk/identity-symbol.jpg',
   omsk: '/images/venues/omsk/identity-symbol.jpg',
   ryazan: '/images/venues/ryazan/identity-symbol.jpg',
+  tula: '/images/venues/tula/identity-symbol.jpg',
   penza: '/images/venues/penza/pamyatnik-pervoposelentsu.jpg',
   tver: '/images/venues/tver/starovolzhskiy-most.jpg',
   tyumen: '/images/venues/tyumen/identity-symbol.jpg',

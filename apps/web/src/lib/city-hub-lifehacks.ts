@@ -1528,6 +1528,91 @@ const RYAZAN_ITEMS: CityLifehackItem[] = [
   },
 ];
 
+const TULA_ITEMS: CityLifehackItem[] = [
+  {
+    id: 'tula-troyka-card',
+    tabId: 'transit',
+    icon: 'transit',
+    title: 'Безлимитный проезд по городу',
+    body: body(
+      'Купите в кассе Тулгорэлектротранса единую транспортную карту «Тройка». Проезд по ней в автобусах, трамваях и троллейбусах дешевле, чем по банковской карте или за наличные. За уикенд экономия набегает на приличный обед.',
+    ),
+    cta: {
+      kind: 'gis',
+      label: 'Маршруты транспорта',
+      href: twoGisCitySearchUrl('tula', 'транспорт Тула'),
+    },
+  },
+  {
+    id: 'tula-kremlin-free',
+    tabId: 'walk',
+    icon: 'museum',
+    title: 'Бесплатный Кремль без гидов',
+    body: body(
+      'Вход на территорию Тульского кремля ',
+      { s: 'бесплатный' },
+      ' в любое время работы. Плата берется только за экспозиции в башнях и прогулку по стене. Скачайте бесплатный аудиогид в приложении izi.TRAVEL.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Кремль и башни',
+      slugs: ['tula-tul-skiy-kreml', 'tula-bashnya-odoevskih-vorot', 'tula-uspenskiy-sobor-kremlya'],
+      scrollTo: 'places',
+    },
+  },
+  {
+    id: 'tula-free-museum-tuesday',
+    tabId: 'walk',
+    icon: 'museum',
+    title: 'День бесплатных музеев',
+    body: body(
+      'Каждый последний вторник месяца Тульский областной художественный музей и Выставочный зал открывают двери ',
+      { s: 'бесплатно' },
+      '. Подгадайте даты поездки и увидите подлинники Айвазовского, Шишкина и Поленова без билета.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Художественный музей',
+      slugs: ['tula-oblastnoy-hudozhestvennyy-muzey'],
+      scrollTo: 'places',
+    },
+  },
+  {
+    id: 'tula-kuleyki',
+    tabId: 'food',
+    icon: 'food',
+    title: 'Альтернативный стритфуд в Заречье',
+    body: body(
+      'Вместо дорогих ресторанов в «Искре» обедайте в Заречье. В пекарнях у Музея оружия продают тульские кулейки - открытые ватрушки с творожно-сметанной начинкой за ',
+      { s: '80-120 ₽' },
+      '.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Заречье и Музей оружия',
+      slugs: ['tula-muzey-oruzhiya-shlem', 'tula-kafe-pryanosti-i-radosti'],
+      scrollTo: 'places',
+    },
+  },
+  {
+    id: 'tula-proletarskaya-view',
+    tabId: 'walk',
+    icon: 'walk',
+    title: 'Лучший бесплатный вид на реку',
+    body: body(
+      'Не платите за смотровые. Панорама Упы, Оружейного завода и «Шлема» открывается со Смотровой площадки Пролетарской набережной ',
+      { s: 'бесплатно' },
+      '. Приходите на закат со своим кофе.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Смотровая набережной',
+      slugs: ['tula-smotrovaya-proletarskoy-naberezhnoy', 'tula-muzey-oruzhiya-shlem'],
+      scrollTo: 'places',
+    },
+  },
+];
+
 const UFA_ITEMS: CityLifehackItem[] = [
   {
     id: 'ufa-alga-card',
@@ -1900,6 +1985,7 @@ const CITY_HUB_LIFEHACKS: Record<string, CityLifehackPack> = {
   novosibirsk: lifehackPack(NOVOSIBIRSK_ITEMS),
   voronezh: lifehackPack(VORONEZH_ITEMS),
   ryazan: lifehackPack(RYAZAN_ITEMS),
+  tula: lifehackPack(TULA_ITEMS),
   ufa: lifehackPack(UFA_ITEMS),
   omsk: lifehackPack(OMSK_ITEMS),
   chelyabinsk: lifehackPack(CHELYABINSK_ITEMS),

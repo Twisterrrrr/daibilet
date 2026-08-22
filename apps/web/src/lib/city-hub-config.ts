@@ -240,6 +240,7 @@ const BLOG_AFTER_SUBURBS_SLUGS = new Set([
   'chelyabinsk',
   'tyumen',
   'rostov-na-donu',
+  'tula',
 ]);
 
 export function isCityHubBlogAfterSuburbs(slug: string | null | undefined): boolean {

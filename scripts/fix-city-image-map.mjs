@@ -23,6 +23,7 @@ if (!city) {
 
 const PACK_PREFIX = {
   ryazan: { pack: 'RYAZAN_IMAGES', file: 'city-place-images.ts' },
+  tula: { pack: 'TULA_IMAGES', file: 'city-place-images.ts' },
   ufa: { pack: 'UFA_HUB_IMAGES', file: 'city-place-images-region-packs.ts' },
   chelyabinsk: { pack: 'CHELYABINSK_IMAGES', file: 'city-place-images.ts' },
   omsk: { pack: 'OMSK_IMAGES', file: 'city-place-images.ts' },

@@ -2143,6 +2143,125 @@ const RYAZAN_SLIDES: CityIdentitySlide[] = [
   },
 ];
 
+const TULA_WEATHER: CityWeatherFlavor = {
+  latitude: 54.1931,
+  longitude: 37.6173,
+  timezone: 'Europe/Moscow',
+  outdoorSlugs: [
+    'tula-kazanskaya-naberezhnaya',
+    'tula-ulitsa-metallistov',
+    'tula-tul-skiy-kreml',
+    'tula-smotrovaya-proletarskoy-naberezhnoy',
+    'tula-park-belousova',
+  ],
+  indoorSlugs: [
+    'tula-muzey-oruzhiya-shlem',
+    'tula-muzey-tulskie-samovary',
+    'tula-muzey-tul-skiy-pryanik',
+    'tula-tvorcheskiy-industrial-nyy-klaster-oktava',
+    'tula-restoran-kultura',
+  ],
+  outdoorCta: 'Отличная погода для Кремля, Казанской набережной и улицы Металлистов',
+  indoorCtaOvercast: 'Сегодня пасмурно. Загляните в Музей оружия, самовары или «Октаву»',
+  indoorCtaRain: 'Сегодня дождь. Музей оружия, пряник или обед в «Культуре»',
+  indoorCtaSnow: 'Сегодня снег. Музеи центра и чай с пряником после прогулки по Кремлю',
+};
+
+const TULA_WHEN_TO_GO: CityWhenToGoFlavor = {
+  timeZone: 'Europe/Moscow',
+  seasons: [
+    {
+      id: 'winter',
+      months: [12, 1, 2],
+      headline: 'Зима',
+      body: 'Атмосфера сказочного купеческого Рождества. Кремль и улица Металлистов сияют иллюминацией, везде пахнет имбирным чаем и выпечкой. Морозы бывают крепкими, так что прогулки совмещают с музеями.',
+    },
+    {
+      id: 'spring',
+      months: [3, 4, 5],
+      headline: 'Весна',
+      body: 'Время для прогулок по паркам и усадьбам. В апреле сходит снег, в мае Тула расцветает и открываются веранды. Дороги чистые, пробок на въезде из Москвы еще мало.',
+    },
+    {
+      id: 'summer',
+      months: [6, 7, 8],
+      headline: 'Лето',
+      body: 'Пиковый сезон: на набережной и в «Октаве» идут фестивали, концерты и маркеты. Погода жаркая, отели лучше бронировать заранее.',
+    },
+    {
+      id: 'autumn',
+      months: [9, 10, 11],
+      headline: 'Осень',
+      body: 'Идеальное время для Ясной Поляны. Сентябрь и октябрь красят город в золото, поток туристов спадает, жилье чуть дешевле.',
+    },
+  ],
+  tabs: seasonTabs({
+    spring:
+      'В апреле сходит снег, а в мае Тула расцветает и открываются веранды. Логистика идеальна: дороги чистые, пробок на въезде из Москвы еще мало. Удобный сезон для парков, усадеб и первых прогулок по набережной.',
+    summer:
+      'Пиковый туристический сезон с лучшей атмосферой. На набережной и в «Октаве» постоянно идут фестивали, концерты и маркеты под открытым небом. Погода жаркая, поэтому бронировать отели нужно за месяц.',
+    autumn:
+      'Идеальное время для поездки в Ясную Поляну. Сентябрь и октябрь красят Тулу в золотые тона - отличный фон для фотосессий. Поток туристов спадает, цены на жилье немного снижаются.',
+    winter:
+      'Атмосфера сказочного купеческого Рождества. Кремль и пешеходная улица Металлистов сияют иллюминацией, везде пахнет имбирным чаем и выпечкой. Морозы бывают крепкими, так что прогулки придется совмещать с визитами в музеи.',
+  }),
+};
+
+const TULA_SLIDES: CityIdentitySlide[] = [
+  {
+    id: 'tula-weapons',
+    title: 'Оружейное мастерство и стальной характер',
+    text: 'ДНК Тулы ковалось веками у раскаленных горнов. Город возвел оборонное дело в культ: от кремлевских башен до футуристического Музея оружия в форме шлема.',
+    imageSrc: '/images/venues/tula/identity-symbol.jpg',
+    imageAlt: 'Тульский музей оружия в форме богатырского шлема',
+    slugs: ['tula-muzey-oruzhiya-shlem', 'tula-pamyatnik-levshe', 'tula-pamyatnik-petru-i'],
+    target: 'places',
+    badge: 'Символ',
+  },
+  {
+    id: 'tula-tolstoy',
+    title: 'Лев Толстой и вселенская философия',
+    text: 'Тульская земля - колыбель великой русской литературы. Дух Ясной Поляны формирует культуру созерцания, поиска правды и близости к корням.',
+    imageSrc: '/images/venues/tula/identity-art.jpg',
+    imageAlt: 'Аллея Прешпект в усадьбе Ясная Поляна',
+    slugs: [
+      'tula-muzey-usad-ba-l-n-tolstogo-yasnaya-polyana',
+      'tula-yasnaya-polyana-dom-muzey',
+      'tula-yasnaya-polyana-mogila',
+    ],
+    target: 'mixed',
+    badge: 'Искусство',
+  },
+  {
+    id: 'tula-pryanik',
+    title: 'Пряничный бренд и чайные традиции',
+    text: 'Вкус Тулы - смесь терпкого меда, пряностей и дымка из самовара. Печатный пряник и самоварное чаепитие стали визитной карточкой России.',
+    imageSrc: '/images/venues/tula/identity-gastro.jpg',
+    imageAlt: 'Тульский печатный пряник и самовар на столе',
+    slugs: [
+      'tula-skulptura-tulskiy-pryanik',
+      'tula-muzey-tul-skiy-pryanik',
+      'tula-muzey-tulskie-samovary',
+    ],
+    target: 'places',
+    badge: 'Гастро',
+  },
+  {
+    id: 'tula-kreml-oktava',
+    title: 'Краснокирпичный Кремль и «Октава»',
+    text: 'Архитектурный код города - стык древней истории и постиндустриального урбанизма. Оборонительные стены соседствуют с креативными пространствами из стекла и бетона.',
+    imageSrc: '/images/venues/tula/identity-architecture.jpg',
+    imageAlt: 'Стены Тульского кремля и современный кластер Октава',
+    slugs: [
+      'tula-tul-skiy-kreml',
+      'tula-tvorcheskiy-industrial-nyy-klaster-oktava',
+      'tula-ulitsa-metallistov',
+    ],
+    target: 'places',
+    badge: 'Архитектура',
+  },
+];
+
 const OMSK_WEATHER: CityWeatherFlavor = {
   latitude: 54.984,
   longitude: 73.372,
@@ -2624,6 +2743,14 @@ export const CITY_HUB_LOCAL_FLAVOR: Record<string, CityHubLocalFlavor> = {
     slides: RYAZAN_SLIDES,
     weather: RYAZAN_WEATHER,
     whenToGo: RYAZAN_WHEN_TO_GO,
+  },
+  tula: {
+    identityHeading: 'Чем уникальна Тула',
+    identityLead: IDENTITY_LEAD,
+    tags: tagsFromSlides(TULA_SLIDES),
+    slides: TULA_SLIDES,
+    weather: TULA_WEATHER,
+    whenToGo: TULA_WHEN_TO_GO,
   },
   ufa: {
     identityHeading: 'Чем уникальна Уфа',
