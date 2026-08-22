@@ -40,6 +40,25 @@ test('resolveVenueHeroImage uses city identity pack when slug is unmapped', () =
   );
 });
 
+test('resolveVenueHeroImage prefers conventional still over stale shared editorial fallback', () => {
+  assert.equal(
+    resolveVenueHeroImage('ryazan-pevcheskiy-korpus', null),
+    '/images/venues/ryazan/pevcheskiy-korpus.jpg',
+  );
+  assert.equal(
+    resolveVenueHeroImage('ryazan-konsistorskiy-korpus', null),
+    '/images/venues/ryazan/konsistorskiy-korpus.jpg',
+  );
+  assert.equal(
+    resolveVenueHeroImage('ryazan-ryazanskiy-kreml', null),
+    '/images/venues/ryazan/ryazanskiy-kreml.jpg',
+  );
+  assert.equal(
+    resolveVenueHeroImage('ryazan-dvorets-olega', null),
+    '/images/venues/ryazan/dvorets-olega.jpg',
+  );
+});
+
 test('resolveVenueHeroImage drops city placeholders and generated stubs', () => {
   assert.equal(resolveVenueHeroImage('some-unmapped-park', '/images/cities/moscow.png'), null);
   assert.equal(

@@ -13,7 +13,7 @@ import {
 } from '@/components/DayTripCanonCard.client';
 import { resolveCityPlaceTitleHref } from '@/lib/city-place-href';
 import { resolveDestinationRegionLinkForSuburb } from '@/lib/city-destination-registry';
-import { lookupEditorialPlaceImage } from '@/lib/city-place-images';
+import { resolveEditorialVenueCover } from '@/lib/city-place-images';
 import { suburbMatchesSlugs } from '@/lib/city-hub-local-flavor';
 import type { CityMustSeeItem, CitySuburbItem, CitySuburbPlace } from '@/lib/cityInfo';
 import {
@@ -99,7 +99,7 @@ function suburbHeroImage(
   for (const raw of candidates) {
     const slug = String(raw || '').trim();
     if (!slug) continue;
-    const editorial = lookupEditorialPlaceImage(slug);
+    const editorial = resolveEditorialVenueCover(slug);
     if (editorial) return editorial;
     const matched = venues.find((venue) => String(venue.slug || '').trim() === slug);
     const hub = String(matched?.heroImageUrl || '').trim();

@@ -4,10 +4,7 @@ import Link from 'next/link';
 
 import { IMAGE_SIZES, CardSafeImage } from '@/components/SafeImage.client';
 import { ScrollRail } from '@/components/ScrollRail.client';
-import {
-  inferConventionalVenueImage,
-  lookupEditorialPlaceImage,
-} from '@/lib/city-place-images';
+import { resolveEditorialVenueCover } from '@/lib/city-place-images';
 import { formatVisitDuration } from '@/lib/visit-duration';
 
 export type SuburbPlaceRailItem = {
@@ -41,10 +38,8 @@ function resolveRailCover(
   place: SuburbPlaceRailItem,
   fallbackImageUrl?: string | null,
 ): string | null {
-  const editorial = lookupEditorialPlaceImage(place.imageSlug);
-  if (editorial) return editorial;
-  const conventional = inferConventionalVenueImage(place.imageSlug);
-  if (conventional) return conventional;
+  const cover = resolveEditorialVenueCover(place.imageSlug);
+  if (cover) return cover;
   const direct = String(place.imageUrl || '').trim();
   if (direct) return direct;
   const ownSlug = String(place.imageSlug || '').trim();
