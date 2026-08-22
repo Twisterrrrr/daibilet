@@ -1,3 +1,7 @@
+import {
+  lookupEditorialPlaceImage,
+  resolveEditorialPlaceSlugAlias,
+} from './city-place-images';
 import { resolveCityPlaceHref, type CityPlaceLinkFields } from './cityInfo';
 import { venueHref } from './routes';
 
@@ -133,6 +137,23 @@ function isLinkableVenueStatus(pageStatus?: string | null): boolean {
   return status === 'published' || status === 'candidate';
 }
 
+function findLinkableVenueBySlug(
+  slug: string,
+  venues: VenueMatchSource[],
+): VenueMatchSource | undefined {
+  const alias = resolveEditorialPlaceSlugAlias(slug);
+  const candidates = [slug, alias].filter(Boolean) as string[];
+  for (const candidate of candidates) {
+    const found = venues.find(
+      (venue) =>
+        isLinkableVenueStatus(venue.pageStatus) &&
+        String(venue.slug || '').trim() === candidate,
+    );
+    if (found) return found;
+  }
+  return undefined;
+}
+
 export type ResolveCityPlaceTitleHrefOptions = {
   /**
    * Significant-suburb POIs must not glue to the parent hub by name
@@ -157,9 +178,7 @@ export function resolveCityPlaceTitleHref(
   if (explicit) {
     const slug = String(place.venueSlug || place.locationSlug || '').trim();
     if (slug && venues.length) {
-      const found = venues.find(
-        (venue) => isLinkableVenueStatus(venue.pageStatus) && String(venue.slug || '').trim() === slug,
-      );
+      const found = findLinkableVenueBySlug(slug, venues);
       if (found) {
         return venueHref({
           id: found.id || found.slug || found.name,
@@ -168,8 +187,11 @@ export function resolveCityPlaceTitleHref(
           type: found.type,
         });
       }
-      // Significant-suburb POIs must not 404 a parent-hub slug that was never imported.
-      if (!allowNameMatch) return null;
+      // Suburb POI: link when editorial still is shipped (NN suburbs, Vyborg via alias map).
+      if (!allowNameMatch) {
+        if (lookupEditorialPlaceImage(slug)) return explicit;
+        return null;
+      }
     }
     return explicit;
   }

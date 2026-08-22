@@ -4003,6 +4003,13 @@ function normalizePlaceImageKey(slug: string | null | undefined): string {
     .replace(/-+$/g, '');
 }
 
+/** Suburb card slug → canonical catalog slug (same keys as PLACE_IMAGE_ALIASES). */
+export function resolveEditorialPlaceSlugAlias(slug: string | null | undefined): string | null {
+  const key = normalizePlaceImageKey(slug);
+  if (!key) return null;
+  return PLACE_IMAGE_ALIASES[key] || null;
+}
+
 export function lookupEditorialPlaceImage(
   slug: string | null | undefined,
 ): string | null {

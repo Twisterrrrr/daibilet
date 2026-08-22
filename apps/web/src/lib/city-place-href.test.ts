@@ -81,21 +81,41 @@ describe('resolveCityPlaceTitleHref', () => {
     assert.equal(href, null);
   });
 
-  it('does not link Vyborg slug that is missing from the parent hub', () => {
+  it('links Vyborg suburb slug via editorial alias on the parent hub', () => {
     const href = resolveCityPlaceTitleHref(
-      { name: 'Выборгский замок', locationSlug: 'vyborg-vyborgskiy-zamok' },
+      { name: 'Скальный парк Монрепо', locationSlug: 'vyborg-skalnyy-park-monrepo' },
       [
         {
           id: 'v-spb',
-          slug: 'saint-petersburg-vyborgskiy-zamok',
-          name: 'Выборгский замок',
+          slug: 'saint-petersburg-skalnyy-park-monrepo',
+          name: 'Скальный парк Монрепо',
           type: 'outdoor_location',
           pageStatus: 'published',
         },
       ],
       { allowNameMatch: false },
     );
-    assert.equal(href, null);
+    assert.equal(href, '/locations/saint-petersburg-skalnyy-park-monrepo');
+  });
+
+  it('links suburb POI by explicit slug when editorial still exists but slug is off-hub', () => {
+    const href = resolveCityPlaceTitleHref(
+      {
+        name: 'Феодоровский монастырь',
+        locationSlug: 'nizhny-novgorod-gorodets-feodorovskiy-monastyr',
+      },
+      [
+        {
+          id: 'v-nn',
+          slug: 'nizhny-novgorod-nizhegorodskiy-kreml',
+          name: 'Нижегородский кремль',
+          type: 'museum',
+          pageStatus: 'published',
+        },
+      ],
+      { allowNameMatch: false },
+    );
+    assert.equal(href, '/locations/nizhny-novgorod-gorodets-feodorovskiy-monastyr');
   });
 
   it('keeps explicit locationSlug when the city payload omits outdoor pages', () => {
