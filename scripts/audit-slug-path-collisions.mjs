@@ -14,6 +14,19 @@ const regionPath = path.join(root, 'apps/web/src/lib/city-place-images-region-pa
 const outPath = path.join(root, 'scripts/audit-slug-path-collisions.json');
 
 const cityFilter = process.argv.find((a) => a.startsWith('--city='))?.slice('--city='.length) || null;
+const checkMode = process.argv.includes('--check');
+
+/** Hub cities that must have zero non-identity slug→path collisions in CI. */
+const SCAN_CITIES = [
+  'ryazan', 'ufa', 'tver', 'penza', 'tyumen', 'rostov-na-donu', 'omsk', 'saratov', 'sochi',
+];
+
+/** Legacy alias slugs outside scan pack - tracked, not launch blockers yet. */
+const LEGACY_COLLISION_ALLOWLIST = new Set([
+  'teatr', 'teatr-teatr',
+  'voronezh-prospekt-revolyutsii', 'voronezh-skulptura-neznakomka',
+  'voronezh-ramon', 'voronezh-ramon-dvorets-oldenburgskih',
+]);
 
 const src = fs.readFileSync(mapPath, 'utf8') + '\n' + fs.readFileSync(regionPath, 'utf8');
 
@@ -176,4 +189,32 @@ if (crossCityGroups.length) {
   for (const g of crossCityGroups.slice(0, 10)) {
     console.log(`  ${g.count} → ${g.url} [${g.cities.join(', ')}]`);
   }
+}
+
+if (checkMode) {
+  let failed = false;
+  for (const scanCity of SCAN_CITIES) {
+    const cityCollisions = collisionGroups.filter((g) =>
+      g.slugs.every((s) => cityOf(s) === scanCity),
+    );
+    if (cityCollisions.length) {
+      failed = true;
+      console.error(`\nCHECK FAIL: ${scanCity} has ${cityCollisions.length} collision group(s)`);
+      for (const g of cityCollisions) {
+        console.error(`  ${g.url}: ${g.slugs.join(', ')}`);
+      }
+    }
+  }
+  const legacyOnly = collisionGroups.filter((g) =>
+    g.slugs.every((s) => LEGACY_COLLISION_ALLOWLIST.has(s)),
+  );
+  if (legacyOnly.length) {
+    console.log(`\nCHECK note: ${legacyOnly.length} legacy collision group(s) allowlisted (perm/voronezh)`);
+  }
+  if (failed) {
+    console.error('\nCHECK FAIL: scan-priority hub cities must have unique slug→path mapping.');
+    console.error('Fix: node scripts/fix-scan-city.mjs --city=<slug>');
+    process.exit(1);
+  }
+  console.log('\nCHECK OK: scan-priority cities have zero slug→path collisions.');
 }

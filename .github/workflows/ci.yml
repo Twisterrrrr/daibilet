@@ -25,6 +25,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Hub image map guard (scan cities)
+        run: pnpm hub:check-image-map
+
       - name: Prisma validate and generate
         run: |
           pnpm db:validate
