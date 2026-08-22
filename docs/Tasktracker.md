@@ -1,3 +1,9 @@
+## 2026-08-22 - Smolensk tourist hub pack
+
+| ID | Задача | Приоритет | Статус |
+|---|---|---|---|
+| HUB.SMOLENSK-FULL | Полный hub pack Смоленска: 50 mustSee, 5 suburbs, lines, flavor, lifehacks, festivals, images | Высокий | ✅ code `feat/next-monorepo`; live по «выкатывай» |
+
 ## 2026-08-20 - My Day rejects region as day-route city
 
 | ID | Задача | Приоритет | Статус |

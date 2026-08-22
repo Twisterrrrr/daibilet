@@ -1048,6 +1048,57 @@ export const CITY_REGIONAL_EVENTS: Record<string, CityRegionalEvent[]> = {
     },
   ],
 
+  smolensk: [
+    {
+      id: 'smolensk-jazz-fest-2026',
+      title: 'Джазовый фестиваль «Смоленск Джаз Фест»',
+      startDate: '2026-08-22',
+      endDate: '2026-08-24',
+      datesLabel: 'Середина августа 2026',
+      place: 'пешеходная улица Ленина / центр',
+      blurb:
+        'Городской джаз на пешеходной Ленина: open-air сцены, локальные и приезжие коллективы, вечерняя атмосфера исторического центра.',
+      sourceUrl: 'https://smolensk-travel.ru/',
+      sourceLabel: 'smolensk-travel.ru',
+    },
+    {
+      id: 'smolensk-pervoe-kasanie-2026',
+      title: 'Межрегиональный фестиваль современного театра «Первое касание»',
+      startDate: '2026-08-28',
+      endDate: '2026-08-29',
+      datesLabel: '28-29 августа 2026',
+      place: 'Арт-завод «Бахус»',
+      blurb:
+        'Короткий фестивальный уикенд современного театра на площадке Арт-завода «Бахус»: камерные постановки и после-шоу разговоры.',
+      sourceUrl: 'https://afisha.yandex.ru/smolensk',
+      sourceLabel: 'Яндекс Афиша Смоленск',
+    },
+    {
+      id: 'smolensk-gnezdovo-2026',
+      title: 'XIV фестиваль «Гнёздово»',
+      startDate: '2026-08-01',
+      endDate: '2026-08-02',
+      datesLabel: '1-2 августа 2026',
+      place: 'историко-археологический комплекс «Гнёздово»',
+      blurb:
+        'Историческая реконструкция у курганов: лагеря эпохи пути «из варяг в греки», ремесла и бои под открытым небом.',
+      sourceUrl: 'https://smolensk-travel.ru/',
+      sourceLabel: 'smolensk-travel.ru',
+    },
+    {
+      id: 'smolensk-glinka-fest-2026',
+      title: '68-й фестиваль имени Глинки',
+      startDate: '2026-05-25',
+      endDate: '2026-06-05',
+      datesLabel: 'Конец мая - начало июня 2026',
+      place: 'филармония и концертные площадки Смоленска',
+      blurb:
+        'Классический музыкальный сезон Смоленщины: концерты, камерные вечера и программы, связанные с наследием Михаила Глинки.',
+      sourceUrl: 'https://smolensk-filarmonia.ru/',
+      sourceLabel: 'Смоленская филармония',
+    },
+  ],
+
   omsk: [
     {
       id: 'omsk-flora-2026',

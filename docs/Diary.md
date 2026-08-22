@@ -1,3 +1,17 @@
+## 2026-08-22 - Smolensk full hub pack
+
+### Наблюдения
+- До итерации у Смоленска был тонкий stub в `cityInfo` (~6 mustSee) без `*-hub.ts`, flavor и lifehacks.
+- Паттерн фестивалей есть: `apps/web/src/data/city-regional-events.ts` (как у Тулы/Рязани).
+
+### Решения
+- Полный pack как у Тулы: `smolensk-hub.ts` + `smolensk-line-presets.ts` (зеркало в `apps/public/src/lib/`), wiring в `cityInfo`, `city-hub-local-flavor`, `city-hub-lifehacks`, `SMOLENSK_IMAGES`, festivals 2026.
+- mustSee ровно 50 (стена instead of redundant wall-segment #21); suburbs 5; KEEP 6 slug'ов; identity 4 столба; procedural JPG stubs для новых stems (6 photoreal не трогали).
+- Тест `smolensk-hub.test.ts`: 4/4 pass; collision audit SMOLENSK_IMAGES: 95 keys / 0 path collisions.
+
+### Проблемы
+- Массовые обложки новых stems - modulate stubs от стены, не AI-фото. Upgrade батчем позже.
+
 ## 2026-08-21 - Hub previews: zero gray / zero same-URL in rails
 
 ### Наблюдения

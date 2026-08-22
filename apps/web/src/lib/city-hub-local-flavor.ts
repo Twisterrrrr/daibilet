@@ -2167,6 +2167,30 @@ const TULA_WEATHER: CityWeatherFlavor = {
   indoorCtaSnow: 'Сегодня снег. Музеи центра и чай с пряником после прогулки по Кремлю',
 };
 
+const SMOLENSK_WEATHER: CityWeatherFlavor = {
+  latitude: 54.7826,
+  longitude: 32.0453,
+  timezone: 'Europe/Moscow',
+  outdoorSlugs: [
+    'smolensk-smolenskaya-krepostnaya-stena',
+    'smolensk-lopatinskiy-sad',
+    'smolensk-sad-blone',
+    'smolensk-naberezhnaya-vladimira-krestitelya',
+    'smolensk-smotrovaya-na-sobornom-holme',
+  ],
+  indoorSlugs: [
+    'smolensk-svyato-uspenskiy-kafedralnyy-sobor',
+    'smolensk-gromovaya-bashnya',
+    'smolensk-smolenskaya-hudozhestvennaya-galereya',
+    'smolensk-istoricheskiy-muzey',
+    'smolensk-kafe-smolenskiy-konfekt',
+  ],
+  outdoorCta: 'Отличная погода для крепостной стены, Лопатинского сада и набережной Днепра',
+  indoorCtaOvercast: 'Сегодня пасмурно. Загляните в Громовую башню, галерею или Успенский собор',
+  indoorCtaRain: 'Сегодня дождь. Музеи центра, «Смоленский конфект» или филармония',
+  indoorCtaSnow: 'Сегодня снег. Стена особенно красива; после прогулки - кофейни у Блонье',
+};
+
 const TULA_WHEN_TO_GO: CityWhenToGoFlavor = {
   timeZone: 'Europe/Moscow',
   seasons: [
@@ -2204,6 +2228,46 @@ const TULA_WHEN_TO_GO: CityWhenToGoFlavor = {
       'Идеальное время для поездки в Ясную Поляну. Сентябрь и октябрь красят Тулу в золотые тона - отличный фон для фотосессий. Поток туристов спадает, цены на жилье немного снижаются.',
     winter:
       'Атмосфера сказочного купеческого Рождества. Кремль и пешеходная улица Металлистов сияют иллюминацией, везде пахнет имбирным чаем и выпечкой. Морозы бывают крепкими, так что прогулки придется совмещать с визитами в музеи.',
+  }),
+};
+
+const SMOLENSK_WHEN_TO_GO: CityWhenToGoFlavor = {
+  timeZone: 'Europe/Moscow',
+  seasons: [
+    {
+      id: 'winter',
+      months: [12, 1, 2],
+      headline: 'Зима',
+      body: 'Заснеженная крепостная стена, холмы-горки и уютные кофейни. Снегопады на крутых улицах требуют осторожности, зато фото стены зимой особенно сильны.',
+    },
+    {
+      id: 'spring',
+      months: [3, 4, 5],
+      headline: 'Весна',
+      body: 'Город просыпается рано: зелень парков и прогулки у крепостной стены без жары и гололеда. В мае Смоленск расцветает.',
+    },
+    {
+      id: 'summer',
+      months: [6, 7, 8],
+      headline: 'Лето',
+      body: 'Пик сезона: башни, набережная Днепра и Лопатинский сад, эко-маршруты и усадьбы. Фестивали и длинные вечера на валах.',
+    },
+    {
+      id: 'autumn',
+      months: [9, 10, 11],
+      headline: 'Осень',
+      body: 'Золотые холмы, музеи и архитектура. В дожди на валах берите непромокаемую обувь - центр холмистый.',
+    },
+  ],
+  tabs: seasonTabs({
+    spring:
+      'Город просыпается рано: зелень парков и прогулки у крепостной стены без жары и гололеда. В мае Смоленск расцветает - удобный старт сезона для первого визита.',
+    summer:
+      'Пиковый сезон: башни, набережная Днепра и Лопатинский сад, эко-маршруты и усадьбы. Бронируйте жилье заранее и закладывайте дневные паузы в тени садов.',
+    autumn:
+      'Золотые холмы, музеи и архитектура. После дождей валы скользят - непромокаемая обувь обязательна, зато фото Соборного холма особенно красивы.',
+    winter:
+      'Заснеженная стена, холмы-горки и кофейни у Блонье. Снегопады на крутых улицах требуют осторожности; музеи и собор отлично дополняют короткие прогулки.',
   }),
 };
 
@@ -2256,6 +2320,65 @@ const TULA_SLIDES: CityIdentitySlide[] = [
       'tula-tul-skiy-kreml',
       'tula-tvorcheskiy-industrial-nyy-klaster-oktava',
       'tula-ulitsa-metallistov',
+    ],
+    target: 'places',
+    badge: 'Архитектура',
+  },
+];
+
+const SMOLENSK_SLIDES: CityIdentitySlide[] = [
+  {
+    id: 'smolensk-wall',
+    title: 'Смоленская крепостная стена',
+    text: '«Ожерелье всея Руси» - каменный щит города. Прясла и башни задают ритм прогулок и силуэт холмов.',
+    imageSrc: '/images/venues/smolensk/identity-symbol.jpg',
+    imageAlt: 'Смоленская крепостная стена и башни',
+    slugs: [
+      'smolensk-smolenskaya-krepostnaya-stena',
+      'smolensk-gromovaya-bashnya',
+      'smolensk-bashnya-veselukha',
+    ],
+    target: 'places',
+    badge: 'Символ',
+  },
+  {
+    id: 'smolensk-glinka-tenisheva',
+    title: 'Наследие Глинки и Тенишевой',
+    text: 'Музыка Новоспасского и художественная колония Талашкина - две линии смоленской культуры, которые слышны до сих пор.',
+    imageSrc: '/images/venues/smolensk/identity-art.jpg',
+    imageAlt: 'Наследие Глинки и Тенишевой в Смоленске',
+    slugs: [
+      'smolensk-pamyatnik-mihailu-glinke',
+      'smolensk-istoriko-arhitekturnyy-kompleks-teremok-flenovo',
+      'smolensk-muzey-usadba-glinki-novospasskoe',
+    ],
+    target: 'mixed',
+    badge: 'Искусство',
+  },
+  {
+    id: 'smolensk-konfekt',
+    title: 'Смоленский конфект и вяземский пряник',
+    text: 'Сладкий код региона: конфект в центре города и пряничная традиция Вязьмы как главный гастросувенир.',
+    imageSrc: '/images/venues/smolensk/identity-gastro.jpg',
+    imageAlt: 'Смоленский конфект и вяземский пряник',
+    slugs: [
+      'smolensk-kafe-smolenskiy-konfekt',
+      'smolensk-vyazma-muzey-pryanika',
+      'smolensk-restoran-pivovarnya-mayakovskiy',
+    ],
+    target: 'places',
+    badge: 'Гастро',
+  },
+  {
+    id: 'smolensk-temples',
+    title: 'Домонгольские храмы и Успенский собор',
+    text: 'От Петра и Павла на Городянке до бело-бирюзового Успенского на холме - Смоленск читается как каменная летопись Руси.',
+    imageSrc: '/images/venues/smolensk/identity-architecture.jpg',
+    imageAlt: 'Успенский собор и древние храмы Смоленска',
+    slugs: [
+      'smolensk-svyato-uspenskiy-kafedralnyy-sobor',
+      'smolensk-tserkov-petra-i-pavla-na-gorodyanke',
+      'smolensk-tserkov-arhangela-mihaila-svirskaya',
     ],
     target: 'places',
     badge: 'Архитектура',
@@ -2751,6 +2874,14 @@ export const CITY_HUB_LOCAL_FLAVOR: Record<string, CityHubLocalFlavor> = {
     slides: TULA_SLIDES,
     weather: TULA_WEATHER,
     whenToGo: TULA_WHEN_TO_GO,
+  },
+  smolensk: {
+    identityHeading: 'Чем уникален Смоленск',
+    identityLead: IDENTITY_LEAD,
+    tags: tagsFromSlides(SMOLENSK_SLIDES),
+    slides: SMOLENSK_SLIDES,
+    weather: SMOLENSK_WEATHER,
+    whenToGo: SMOLENSK_WHEN_TO_GO,
   },
   ufa: {
     identityHeading: 'Чем уникальна Уфа',

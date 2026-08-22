@@ -1613,6 +1613,93 @@ const TULA_ITEMS: CityLifehackItem[] = [
   },
 ];
 
+const SMOLENSK_ITEMS: CityLifehackItem[] = [
+  {
+    id: 'smolensk-tram-unlimited',
+    tabId: 'transit',
+    icon: 'transit',
+    title: 'Трамвайный безлимит вместо такси',
+    body: body(
+      'На холмистом рельефе такси быстро съедает бюджет. Возьмите проездной или пополняемую карту Смоленскэлектротранса: трамваи и автобусы закрывают стену, Блонье и площадь Победы дешевле разовых поездок.',
+    ),
+    cta: {
+      kind: 'gis',
+      label: 'Транспорт Смоленска',
+      href: twoGisCitySearchUrl('smolensk', 'трамвай Смоленск'),
+    },
+  },
+  {
+    id: 'smolensk-uspenskiy-secret-view',
+    tabId: 'walk',
+    icon: 'walk',
+    title: 'Секретный вид на Успенский собор',
+    body: body(
+      'Лучший ракурс на бело-бирюзовый собор - не с парадной лестницы, а с холма у Георгиевской церкви. Приходите на закат: купола и прясла стены складываются в один кадр ',
+      { s: 'бесплатно' },
+      '.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Собор и смотровая',
+      slugs: ['smolensk-svyato-uspenskiy-kafedralnyy-sobor', 'smolensk-smotrovaya-na-sobornom-holme'],
+      scrollTo: 'places',
+    },
+  },
+  {
+    id: 'smolensk-free-museums',
+    tabId: 'walk',
+    icon: 'museum',
+    title: 'Культурная среда: бесплатные музеи',
+    body: body(
+      'Следите за днями открытых дверей областных музеев и галереи: в будни часто бывают льготные и ',
+      { s: 'бесплатные' },
+      ' часы для студентов и многодетных. Подгадайте вторник или последний день месяца.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Музеи центра',
+      slugs: [
+        'smolensk-smolenskaya-hudozhestvennaya-galereya',
+        'smolensk-istoricheskiy-muzey',
+        'smolensk-muzey-skulptury-konenkova',
+      ],
+      scrollTo: 'places',
+    },
+  },
+  {
+    id: 'smolensk-budget-pryanik',
+    tabId: 'food',
+    icon: 'food',
+    title: 'Где бюджетно съесть легендарный пряник',
+    body: body(
+      'Вяземский пряник в центре берите в небольших кондитерских и на ярмарках у Блонье, а не только в сувенирных лавках у вокзала. Порция к чаю выходит ',
+      { s: 'дешевле' },
+      ' туристических наборов «на подарок».',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Конфект и пряник',
+      slugs: ['smolensk-kafe-smolenskiy-konfekt', 'smolensk-vyazma-muzey-pryanika'],
+      scrollTo: 'places',
+    },
+  },
+  {
+    id: 'smolensk-streetfood-mayakovskogo',
+    tabId: 'food',
+    icon: 'food',
+    title: 'Сытный стритфуд по-смоленски',
+    body: body(
+      'На улице Маяковского ищите пивоварню «Маяковский» и соседние кухни: плотные бургеры, локальное пиво и быстрый обед без ресторанного чека. Удобная пауза между Блонье и Лопатинским садом.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Маяковский',
+      slugs: ['smolensk-restoran-pivovarnya-mayakovskiy', 'smolensk-lopatinskiy-sad'],
+      scrollTo: 'places',
+    },
+  },
+];
+
 const UFA_ITEMS: CityLifehackItem[] = [
   {
     id: 'ufa-alga-card',
@@ -1986,6 +2073,7 @@ const CITY_HUB_LIFEHACKS: Record<string, CityLifehackPack> = {
   voronezh: lifehackPack(VORONEZH_ITEMS),
   ryazan: lifehackPack(RYAZAN_ITEMS),
   tula: lifehackPack(TULA_ITEMS),
+  smolensk: lifehackPack(SMOLENSK_ITEMS),
   ufa: lifehackPack(UFA_ITEMS),
   omsk: lifehackPack(OMSK_ITEMS),
   chelyabinsk: lifehackPack(CHELYABINSK_ITEMS),
