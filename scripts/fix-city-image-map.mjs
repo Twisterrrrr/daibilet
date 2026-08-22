@@ -27,6 +27,10 @@ const PACK_PREFIX = {
   chelyabinsk: { pack: 'CHELYABINSK_IMAGES', file: 'city-place-images.ts' },
   omsk: { pack: 'OMSK_IMAGES', file: 'city-place-images.ts' },
   tyumen: { pack: 'TYUMEN_IMAGES', file: 'city-place-images.ts' },
+  voronezh: { pack: 'VORONEZH_IMAGES', file: 'city-place-images.ts' },
+  novosibirsk: { pack: 'NOVOSIBIRSK_HUB_IMAGES', file: 'city-place-images-region-packs.ts' },
+  krasnoyarsk: { pack: 'KRASNOYARSK_IMAGES', file: 'city-place-images.ts' },
+  kaliningrad: { pack: 'KALININGRAD_IMAGES', file: 'city-place-images.ts' },
 };
 
 const packCfg = PACK_PREFIX[city];

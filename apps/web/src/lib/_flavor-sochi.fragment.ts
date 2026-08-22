@@ -110,7 +110,7 @@ export const SOCHI_SLIDES: CityIdentitySlide[] = [
     id: 'barabulya-hinkali',
     title: 'Барабуля и хинкали',
     text: 'Гастрономический сплав черноморской свежести и кавказского гостеприимства. Хрустящая барабуля на побережье и сочные хинкали с абхазскими специями в горах отражают дуализм курорта.',
-    imageSrc: '/images/venues/sochi/identity-gastro.jpg',
+    imageSrc: '/images/venues/sochi/barabulya-hinkali.jpg',
     imageAlt: 'Сочинская гастрономия: барабуля и хинкали',
     slugs: ['sochi-belye-nochi', 'sochi-baran-rapan', 'sochi-plakuchaya-iva'],
     target: 'places',
