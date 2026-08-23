@@ -128,6 +128,8 @@ export function DayRouteOsmMap({
           maxZoom: MAX_ZOOM,
           scrollWheelZoom: true,
           zoomControl: false,
+          // Arrow keys on the map region cycle route stops (see onKeyDown on container).
+          keyboard: false,
         });
         mapRef.current = map;
         // bottomright: MyDayMapAside keeps collapse (left) + fullscreen (top-right).
@@ -227,6 +229,35 @@ export function DayRouteOsmMap({
     };
   }, []);
 
+  function selectAdjacentStop(delta: -1 | 1) {
+    if (!stops.length) return;
+    const ids = stops.map((stop) => stop.id);
+    let index = selectedStopId ? ids.indexOf(selectedStopId) : 0;
+    if (index < 0) index = 0;
+    const nextIndex = index + delta;
+    if (nextIndex < 0 || nextIndex >= ids.length) return;
+    const nextId = ids[nextIndex];
+    if (nextId) onStopClickRef.current?.(nextId);
+  }
+
+  function onMapKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+    if (!stops.length) return;
+    if (
+      event.key !== 'ArrowLeft' &&
+      event.key !== 'ArrowRight' &&
+      event.key !== 'ArrowUp' &&
+      event.key !== 'ArrowDown'
+    ) {
+      return;
+    }
+    event.preventDefault();
+    if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+      selectAdjacentStop(1);
+      return;
+    }
+    selectAdjacentStop(-1);
+  }
+
   if (stops.length === 0 && !fallbackCenter) return null;
 
   return (
@@ -235,7 +266,13 @@ export function DayRouteOsmMap({
       className={className}
       role="region"
       aria-label="Карта маршрута дня"
+      aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight"
       data-day-route-map="leaflet"
+      tabIndex={stops.length > 0 ? 0 : undefined}
+      onKeyDown={onMapKeyDown}
+      onPointerDown={() => {
+        containerRef.current?.focus({ preventScroll: true });
+      }}
     />
   );
 }

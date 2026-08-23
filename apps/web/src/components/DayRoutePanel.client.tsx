@@ -504,6 +504,8 @@ function DayRoutePanelInner() {
   /** HTML5 DnD: venue id currently dragged (plan stops). */
   const [dragVenueId, setDragVenueId] = useState<string | null>(null);
   const [grabbedKey, setGrabbedKey] = useState<string | null>(null);
+  /** Restore grip focus after keyboard reorder (React remount can drop focus). */
+  const gripFocusVenueIdRef = useRef<string | null>(null);
   const [dndAnnounce, setDndAnnounce] = useState('');
   const [pdfBusy, setPdfBusy] = useState(false);
   const [savedScenarios, setSavedScenarios] = useState<DayRouteSavedScenario[]>([]);
@@ -582,6 +584,18 @@ function DayRoutePanelInner() {
       el,
     };
   }
+
+  useLayoutEffect(() => {
+    const gripVenueId = gripFocusVenueIdRef.current;
+    if (!gripVenueId) return;
+    gripFocusVenueIdRef.current = null;
+    const root = listRootRef.current || document;
+    const escaped = String(gripVenueId).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+    const grip = root.querySelector(`[data-day-plan-stop="${escaped}"] [data-day-stop-grip]`);
+    if (grip instanceof HTMLElement) {
+      grip.focus({ preventScroll: true });
+    }
+  }, [route.venues]);
 
   useLayoutEffect(() => {
     const lock = scrollPreserveRef.current;
@@ -2363,6 +2377,8 @@ function DayRoutePanelInner() {
     const title = displayPlanStops[index]?.title || 'Точка';
     if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
       event.preventDefault();
+      gripFocusVenueIdRef.current = venueId;
+      armScrollPreserve();
       setRoute(moveDayRoutePlanVenue(venueId, event.key === 'ArrowUp' ? -1 : 1));
       return;
     }
@@ -2718,6 +2734,17 @@ function DayRoutePanelInner() {
       document.body.style.overflow = prev;
     };
   }, [mobileView]);
+
+  function focusAdjacentRouteStop(delta: -1 | 1) {
+    const ids = route.venues.map((venue) => venue.id);
+    if (!ids.length) return;
+    let index = focusedStopId ? ids.indexOf(focusedStopId) : 0;
+    if (index < 0) index = 0;
+    const nextIndex = index + delta;
+    if (nextIndex < 0 || nextIndex >= ids.length) return;
+    const nextId = ids[nextIndex];
+    if (nextId) focusStopFromMap(nextId);
+  }
 
   function focusStopFromMap(stopId: string, opts?: { scrollList?: boolean }) {
     // Explicit selection should win over hover highlight.
@@ -4741,13 +4768,25 @@ function DayRoutePanelInner() {
                   className="absolute inset-x-0 bottom-0 z-[1000] border-t border-slate-200/80 bg-white/95 backdrop-blur"
                   data-day-map-stops-rail
                 >
-                  <div className="flex gap-2 overflow-x-auto px-3 py-2.5">
+                  <div
+                    className="flex gap-2 overflow-x-auto px-3 py-2.5 outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/30"
+                    role="tablist"
+                    aria-label="Точки маршрута"
+                    tabIndex={0}
+                    onKeyDown={(event) => {
+                      if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+                      event.preventDefault();
+                      focusAdjacentRouteStop(event.key === 'ArrowRight' ? 1 : -1);
+                    }}
+                  >
                     {route.venues.map((venue, index) => {
                       const active = focusedStopId === venue.id;
                       return (
                         <button
                           key={venue.id}
                           type="button"
+                          role="tab"
+                          aria-selected={active}
                           onClick={() => focusStopFromMap(venue.id)}
                           className={`inline-flex max-w-[10rem] shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1.5 text-left text-[11px] font-semibold ${
                             active

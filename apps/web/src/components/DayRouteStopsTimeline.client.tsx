@@ -1,5 +1,6 @@
 'use client';
 
+import type { KeyboardEvent } from 'react';
 import { MapPin } from 'lucide-react';
 
 import { CardSafeImage } from '@/components/SafeImage.client';
@@ -30,6 +31,27 @@ export function DayRouteStopsTimeline({
   className = '',
   label = 'Шаги маршрута',
 }: Props) {
+  function onTimelineKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+    if (!onSelect || stops.length < 2) return;
+    if (
+      event.key !== 'ArrowLeft' &&
+      event.key !== 'ArrowRight' &&
+      event.key !== 'ArrowUp' &&
+      event.key !== 'ArrowDown'
+    ) {
+      return;
+    }
+    event.preventDefault();
+    const ids = stops.map((stop) => stop.id);
+    let index = activeId ? ids.indexOf(activeId) : 0;
+    if (index < 0) index = 0;
+    const delta = event.key === 'ArrowRight' || event.key === 'ArrowDown' ? 1 : -1;
+    const nextIndex = index + delta;
+    if (nextIndex < 0 || nextIndex >= ids.length) return;
+    const nextId = ids[nextIndex];
+    if (nextId) onSelect(nextId);
+  }
+
   if (!stops.length) return null;
 
   return (
@@ -38,9 +60,11 @@ export function DayRouteStopsTimeline({
       data-day-stops-timeline
     >
       <div
-        className="horizontal-snap-row flex snap-x snap-mandatory gap-0 overflow-x-auto overscroll-x-contain pb-0.5"
+        className="horizontal-snap-row flex snap-x snap-mandatory gap-0 overflow-x-auto overscroll-x-contain pb-0.5 outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
         role="list"
         aria-label={label}
+        tabIndex={0}
+        onKeyDown={onTimelineKeyDown}
       >
         {stops.map((stop, index) => {
           const active = activeId ? activeId === stop.id : index === 0;
