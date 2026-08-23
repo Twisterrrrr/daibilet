@@ -1,0 +1,37 @@
+{
+  "city": "sochi",
+  "mustSeeCount": 50,
+  "regen": [
+    {
+      "stem": "identity-architecture",
+      "name": "identity architecture",
+      "clusterSize": 2,
+      "keeper": "fort-aleksandriya"
+    },
+    {
+      "stem": "identity-art",
+      "name": "identity art",
+      "clusterSize": 2,
+      "keeper": "dama-s-popugaem"
+    },
+    {
+      "stem": "letniy-teatr",
+      "name": "Летний театр",
+      "clusterSize": 4,
+      "keeper": "identity-symbol"
+    },
+    {
+      "stem": "ornitologicheskiy-park",
+      "name": "Орнитологический парк",
+      "clusterSize": 3,
+      "keeper": "ahun-peshchera"
+    },
+    {
+      "stem": "pamyatnik-arhangelu-mihailu",
+      "name": "Памятник Архангелу Михаилу",
+      "clusterSize": 4,
+      "keeper": "identity-symbol"
+    }
+  ],
+  "d0": 10
+}

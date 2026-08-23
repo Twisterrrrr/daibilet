@@ -1,0 +1,152 @@
+[
+  {
+    "city": "chelyabinsk",
+    "d0": 206,
+    "regen": 48,
+    "mustSee": 65
+  },
+  {
+    "city": "volgograd",
+    "d0": 111,
+    "regen": 45,
+    "mustSee": 52
+  },
+  {
+    "city": "tula",
+    "d0": 34,
+    "regen": 41,
+    "mustSee": 50
+  },
+  {
+    "city": "samara",
+    "d0": 672,
+    "regen": 37,
+    "mustSee": 51
+  },
+  {
+    "city": "voronezh",
+    "d0": 115,
+    "regen": 35,
+    "mustSee": 54
+  },
+  {
+    "city": "kazan",
+    "d0": 118,
+    "regen": 34,
+    "mustSee": 51
+  },
+  {
+    "city": "novosibirsk",
+    "d0": 72,
+    "regen": 27,
+    "mustSee": 55
+  },
+  {
+    "city": "yaroslavl",
+    "d0": 52,
+    "regen": 25,
+    "mustSee": 54
+  },
+  {
+    "city": "ekaterinburg",
+    "d0": 73,
+    "regen": 17,
+    "mustSee": 66
+  },
+  {
+    "city": "rostov-na-donu",
+    "d0": 13,
+    "regen": 7,
+    "mustSee": 50
+  },
+  {
+    "city": "ufa",
+    "d0": 5,
+    "regen": 7,
+    "mustSee": 55
+  },
+  {
+    "city": "penza",
+    "d0": 11,
+    "regen": 6,
+    "mustSee": 53
+  },
+  {
+    "city": "saratov",
+    "d0": 7,
+    "regen": 6,
+    "mustSee": 51
+  },
+  {
+    "city": "sochi",
+    "d0": 10,
+    "regen": 5,
+    "mustSee": 50
+  },
+  {
+    "city": "tyumen",
+    "d0": 2,
+    "regen": 5,
+    "mustSee": 67
+  },
+  {
+    "city": "tver",
+    "d0": 49,
+    "regen": 4,
+    "mustSee": 65
+  },
+  {
+    "city": "omsk",
+    "d0": 4,
+    "regen": 4,
+    "mustSee": 65
+  },
+  {
+    "city": "krasnodar",
+    "d0": 7,
+    "regen": 3,
+    "mustSee": 52
+  },
+  {
+    "city": "krasnoyarsk",
+    "d0": 6,
+    "regen": 2,
+    "mustSee": 49
+  },
+  {
+    "city": "kaliningrad",
+    "d0": 53,
+    "regen": 0,
+    "mustSee": 0
+  },
+  {
+    "city": "smolensk",
+    "d0": 15,
+    "regen": 0,
+    "mustSee": 50
+  },
+  {
+    "city": "nizhny-novgorod",
+    "d0": 7,
+    "regen": 0,
+    "mustSee": 0
+  },
+  {
+    "city": "moscow",
+    "d0": 1,
+    "regen": 0,
+    "mustSee": 0
+  },
+  {
+    "city": "vyborg",
+    "d0": 1,
+    "regen": 0,
+    "mustSee": 0
+  },
+  {
+    "city": "saint-petersburg",
+    "d0": 0,
+    "regen": 0,
+    "mustSee": 0
+  }
+]

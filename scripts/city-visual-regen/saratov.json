@@ -1,0 +1,43 @@
+{
+  "city": "saratov",
+  "mustSeeCount": 51,
+  "regen": [
+    {
+      "stem": "dom-kommuna-inzhener",
+      "name": "Дом-коммуна «Инженер»",
+      "clusterSize": 3,
+      "keeper": "detskiy-park"
+    },
+    {
+      "stem": "identity-architecture",
+      "name": "identity architecture",
+      "clusterSize": 2,
+      "keeper": "gagarin-memorialnaya-stena"
+    },
+    {
+      "stem": "identity-art",
+      "name": "identity art",
+      "clusterSize": 2,
+      "keeper": "art-klaster-sklady-reyneke"
+    },
+    {
+      "stem": "pamyatnik-garmoshke",
+      "name": "Памятник Саратовской гармошке",
+      "clusterSize": 2,
+      "keeper": "identity-gastro"
+    },
+    {
+      "stem": "pamyatnik-zhuravli",
+      "name": "Памятник «Журавли»",
+      "clusterSize": 2,
+      "keeper": "identity-symbol"
+    },
+    {
+      "stem": "smotrovaya-aeroport-tsentralnyy",
+      "name": "Смотровая площадка у аэропорта «Центральный»",
+      "clusterSize": 2,
+      "keeper": "avtodorozhnyy-most-saratov-engel-s"
+    }
+  ],
+  "d0": 7
+}

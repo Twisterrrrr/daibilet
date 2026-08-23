@@ -1,0 +1,277 @@
+{
+  "city": "volgograd",
+  "mustSeeCount": 52,
+  "regen": [
+    {
+      "stem": "bar-and-grill",
+      "name": "Стейк-хаус «Bar&Grill»",
+      "clusterSize": 7,
+      "keeper": "art-prostranstvo-ikra"
+    },
+    {
+      "stem": "identity-architecture",
+      "name": "identity architecture",
+      "clusterSize": 4,
+      "keeper": "gastrobar-bulgakov"
+    },
+    {
+      "stem": "identity-art",
+      "name": "identity art",
+      "clusterSize": 7,
+      "keeper": "art-prostranstvo-ikra"
+    },
+    {
+      "stem": "identity-gastro",
+      "name": "identity gastro",
+      "clusterSize": 4,
+      "keeper": "ges-monument-stroitelyam"
+    },
+    {
+      "stem": "kafe-marusya",
+      "name": "Кафе «Маруся»",
+      "clusterSize": 7,
+      "keeper": "art-prostranstvo-ikra"
+    },
+    {
+      "stem": "kleymo-voyny",
+      "name": "Арт-объект «Клеймо войны»",
+      "clusterSize": 8,
+      "keeper": "angel-cakes"
+    },
+    {
+      "stem": "komsomolskiy-sad",
+      "name": "Комсомольский сад",
+      "clusterSize": 7,
+      "keeper": "art-prostranstvo-ikra"
+    },
+    {
+      "stem": "mamaev-kurgan",
+      "name": "Скульптура «Родина-мать зовёт!»",
+      "clusterSize": 4,
+      "keeper": "ges-kraevedcheskiy-muzey"
+    },
+    {
+      "stem": "mel-nitsa-gergardta",
+      "name": "Мельница Гергардта",
+      "clusterSize": 8,
+      "keeper": "angel-cakes"
+    },
+    {
+      "stem": "muzey-mashkova",
+      "name": "Музей изобразительных искусств им. И.И. Машкова",
+      "clusterSize": 4,
+      "keeper": "ges-dvorets-kultury-vgs"
+    },
+    {
+      "stem": "muzey-pamyat",
+      "name": "Музей «Память»",
+      "clusterSize": 3,
+      "keeper": "ges-shlyuzy-volgo-don"
+    },
+    {
+      "stem": "muzykalnyy-teatr",
+      "name": "Волгоградский музыкальный театр",
+      "clusterSize": 3,
+      "keeper": "ges-shlyuzy-volgo-don"
+    },
+    {
+      "stem": "net-teatr",
+      "name": "Новый экспериментальный театр (НЭТ)",
+      "clusterSize": 8,
+      "keeper": "angel-cakes"
+    },
+    {
+      "stem": "nikitskaya-tserkov",
+      "name": "Никитская церковь",
+      "clusterSize": 4,
+      "keeper": "kazanskiy-sobor"
+    },
+    {
+      "stem": "osobnyak-repnikovoy",
+      "name": "Мемориально-исторический музей (Особняк Репниковой)",
+      "clusterSize": 7,
+      "keeper": "art-prostranstvo-ikra"
+    },
+    {
+      "stem": "pamyatnik-aleksandru-nevskomu",
+      "name": "Памятник Александру Невскому",
+      "clusterSize": 4,
+      "keeper": "ges-kraevedcheskiy-muzey"
+    },
+    {
+      "stem": "pamyatnik-holzunovu-naberezhnaya",
+      "name": "Памятник Виктору Хользунову на набережной",
+      "clusterSize": 4,
+      "keeper": "gastrobar-bulgakov"
+    },
+    {
+      "stem": "pamyatnik-leninu-volgo-don",
+      "name": "Памятник Ленину у Волго-Донского канала",
+      "clusterSize": 12,
+      "keeper": "muzey-panorama-stalingradskaya-bitva"
+    },
+    {
+      "stem": "pamyatnik-mirnym-zhitelyam",
+      "name": "Памятник мирным жителям Сталинграда",
+      "clusterSize": 12,
+      "keeper": "muzey-panorama-stalingradskaya-bitva"
+    },
+    {
+      "stem": "pamyatnik-panikakhe",
+      "name": "Памятник Михаилу Паникахе",
+      "clusterSize": 12,
+      "keeper": "muzey-panorama-stalingradskaya-bitva"
+    },
+    {
+      "stem": "pamyatnik-sobakam-podryvnikam",
+      "name": "Памятник собакам-подрывникам",
+      "clusterSize": 3,
+      "keeper": "pamyatnik-holzunovu"
+    },
+    {
+      "stem": "pamyatnik-zasekinu",
+      "name": "Памятник Засекину",
+      "clusterSize": 4,
+      "keeper": "ges-kraevedcheskiy-muzey"
+    },
+    {
+      "stem": "park-razdole",
+      "name": "Парк «Раздолье»",
+      "clusterSize": 4,
+      "keeper": "ges-park-novyy-gorod"
+    },
+    {
+      "stem": "planetariy",
+      "name": "Волгоградский планетарий",
+      "clusterSize": 12,
+      "keeper": "muzey-panorama-stalingradskaya-bitva"
+    },
+    {
+      "stem": "pozharnaya-kalancha",
+      "name": "Пожарная каланча Царицына",
+      "clusterSize": 8,
+      "keeper": "angel-cakes"
+    },
+    {
+      "stem": "restoran-reka",
+      "name": "Ресторан «Река»",
+      "clusterSize": 4,
+      "keeper": "ges-dvorets-kultury-vgs"
+    },
+    {
+      "stem": "restoran-shveyn",
+      "name": "Ресторан «Швейн»",
+      "clusterSize": 7,
+      "keeper": "art-prostranstvo-ikra"
+    },
+    {
+      "stem": "restoran-volgograd",
+      "name": "Ресторан «Волгоград»",
+      "clusterSize": 3,
+      "keeper": "alleya-geroev"
+    },
+    {
+      "stem": "skorb-materi",
+      "name": "Скульптурная композиция «Скорбь матери»",
+      "clusterSize": 4,
+      "keeper": "gastrobar-bulgakov"
+    },
+    {
+      "stem": "skver-sashi-filippova",
+      "name": "Сквер имени Саши Филиппова",
+      "clusterSize": 4,
+      "keeper": "ges-dvorets-kultury-vgs"
+    },
+    {
+      "stem": "smotrovaya-mamaeva-kurgana",
+      "name": "Смотровая площадка Мамаева кургана",
+      "clusterSize": 12,
+      "keeper": "muzey-panorama-stalingradskaya-bitva"
+    },
+    {
+      "stem": "sobor-aleksandra-nevskogo",
+      "name": "Кафедральный собор Александра Невского",
+      "clusterSize": 4,
+      "keeper": "kazanskiy-sobor"
+    },
+    {
+      "stem": "stalingradskiy-topol",
+      "name": "Сталинградский тополь",
+      "clusterSize": 12,
+      "keeper": "muzey-panorama-stalingradskaya-bitva"
+    },
+    {
+      "stem": "staraya-sarepta",
+      "name": "Музей-заповедник «Старая Сарепта»",
+      "clusterSize": 3,
+      "keeper": "sarepta-muzey-gorchitsy"
+    },
+    {
+      "stem": "stoyat-nasmert",
+      "name": "Скульптура «Стоять насмерть»",
+      "clusterSize": 12,
+      "keeper": "muzey-panorama-stalingradskaya-bitva"
+    },
+    {
+      "stem": "t-34-chelyabinskiy-kolkhoznik",
+      "name": "Памятник Т-34 «Челябинский колхозник»",
+      "clusterSize": 4,
+      "keeper": "dom-pavlova"
+    },
+    {
+      "stem": "teatr-kukol",
+      "name": "Волгоградский областной театр кукол",
+      "clusterSize": 12,
+      "keeper": "muzey-panorama-stalingradskaya-bitva"
+    },
+    {
+      "stem": "tsaritsynskaya-opera",
+      "name": "Царицынская опера",
+      "clusterSize": 3,
+      "keeper": "alleya-geroev"
+    },
+    {
+      "stem": "tsentral-naya-naberezhnaya-imeni-62-y-armii",
+      "name": "Центральная набережная им. 62-й Армии",
+      "clusterSize": 4,
+      "keeper": "ges-park-novyy-gorod"
+    },
+    {
+      "stem": "tsentralnyy-univermag",
+      "name": "Центральный Универмаг (подвал ЦУМа)",
+      "clusterSize": 3,
+      "keeper": "pamyatnik-santekhniku"
+    },
+    {
+      "stem": "tspkio",
+      "name": "Центральный парк культуры и отдыха (ЦПКиО)",
+      "clusterSize": 4,
+      "keeper": "ges-monument-stroitelyam"
+    },
+    {
+      "stem": "vokzal-volgograd-1",
+      "name": "Железнодорожный вокзал Волгоград-1",
+      "clusterSize": 3,
+      "keeper": "pamyatnik-santekhniku"
+    },
+    {
+      "stem": "volgogradskiy-metrotram",
+      "name": "Волгоградский метротрам",
+      "clusterSize": 4,
+      "keeper": "kazanskiy-sobor"
+    },
+    {
+      "stem": "zal-voinskoy-slavy",
+      "name": "Зал Воинской Славы",
+      "clusterSize": 8,
+      "keeper": "angel-cakes"
+    },
+    {
+      "stem": "znamya-pobedy",
+      "name": "Скульптура «Знамя Победы»",
+      "clusterSize": 12,
+      "keeper": "muzey-panorama-stalingradskaya-bitva"
+    }
+  ],
+  "d0": 111
+}

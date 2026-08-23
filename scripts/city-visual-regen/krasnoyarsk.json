@@ -1,0 +1,19 @@
+{
+  "city": "krasnoyarsk",
+  "mustSeeCount": 49,
+  "regen": [
+    {
+      "stem": "stolby-vizit-tsentr",
+      "name": "Визит-центр «Столбы» (Лалетино)",
+      "clusterSize": 3,
+      "keeper": "literaturnyy-muzey-astafieva"
+    },
+    {
+      "stem": "tsentralnyy-park-gorkogo",
+      "name": "Центральный парк им. Горького",
+      "clusterSize": 2,
+      "keeper": "tsar-ryba-sliznevo"
+    }
+  ],
+  "d0": 6
+}

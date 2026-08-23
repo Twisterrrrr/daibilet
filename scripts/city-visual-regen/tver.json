@@ -1,0 +1,31 @@
+{
+  "city": "tver",
+  "mustSeeCount": 65,
+  "regen": [
+    {
+      "stem": "imperatorskiy-putevoy-dvorets",
+      "name": "Императорский путевой дворец",
+      "clusterSize": 2,
+      "keeper": "domotkanovo-zemskaya-shkola"
+    },
+    {
+      "stem": "kofeynya-tapioka",
+      "name": "Кофейня «Тапиока»",
+      "clusterSize": 2,
+      "keeper": "armyanskaya-tserkov-surb-arutyun"
+    },
+    {
+      "stem": "morozovskiy-gorodok-dvor-proletarki",
+      "name": "Казармы Морозовского городка",
+      "clusterSize": 2,
+      "keeper": "domotkanovo-berezovaya-alleya"
+    },
+    {
+      "stem": "starovolzhskiy-most",
+      "name": "Староволжский мост",
+      "clusterSize": 2,
+      "keeper": "bar-kalinin"
+    }
+  ],
+  "d0": 49
+}

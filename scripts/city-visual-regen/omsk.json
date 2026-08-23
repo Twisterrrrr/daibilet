@@ -1,0 +1,31 @@
+{
+  "city": "omsk",
+  "mustSeeCount": 65,
+  "regen": [
+    {
+      "stem": "ermitazh-sibir",
+      "name": "Эрмитаж-Сибирь",
+      "clusterSize": 2,
+      "keeper": "chernoluchye"
+    },
+    {
+      "stem": "identity-architecture",
+      "name": "identity architecture",
+      "clusterSize": 2,
+      "keeper": "distsiplinarnye-kazarma"
+    },
+    {
+      "stem": "muzykalnyy-teatr",
+      "name": "Омский музыкальный театр",
+      "clusterSize": 2,
+      "keeper": "chernoluchye-plyazh-luka"
+    },
+    {
+      "stem": "rechnoy-vokzal",
+      "name": "Смотровая у речного вокзала",
+      "clusterSize": 2,
+      "keeper": "identity-symbol"
+    }
+  ],
+  "d0": 4
+}

@@ -1,0 +1,109 @@
+{
+  "city": "ekaterinburg",
+  "mustSeeCount": 66,
+  "regen": [
+    {
+      "stem": "dom-oborony",
+      "name": "Дом обороны",
+      "clusterSize": 18,
+      "keeper": "belaya-bashnya"
+    },
+    {
+      "stem": "el-tsin-tsentr",
+      "name": "Ельцин Центр",
+      "clusterSize": 18,
+      "keeper": "belaya-bashnya"
+    },
+    {
+      "stem": "everjazz",
+      "name": "Джаз-клуб EverJazz",
+      "clusterSize": 18,
+      "keeper": "belaya-bashnya"
+    },
+    {
+      "stem": "gostinitsa-iset",
+      "name": "Гостиница «Исеть»",
+      "clusterSize": 18,
+      "keeper": "belaya-bashnya"
+    },
+    {
+      "stem": "l52",
+      "name": "Креативный кластер «Л52»",
+      "clusterSize": 18,
+      "keeper": "belaya-bashnya"
+    },
+    {
+      "stem": "mural-uralskiy-bars",
+      "name": "Мурал «Уральский барс»",
+      "clusterSize": 18,
+      "keeper": "belaya-bashnya"
+    },
+    {
+      "stem": "muzey-arhitektury-i-dizayna",
+      "name": "Музей архитектуры и дизайна",
+      "clusterSize": 18,
+      "keeper": "belaya-bashnya"
+    },
+    {
+      "stem": "naberezhnaya-rabochey-molodezhi",
+      "name": "Набережная Рабочей Молодёжи",
+      "clusterSize": 18,
+      "keeper": "belaya-bashnya"
+    },
+    {
+      "stem": "oktyabrskaya-ploschad",
+      "name": "Октябрьская площадь и Драмтеатр",
+      "clusterSize": 18,
+      "keeper": "belaya-bashnya"
+    },
+    {
+      "stem": "pamyatnik-klaviatura",
+      "name": "Памятник клавиатуре",
+      "clusterSize": 18,
+      "keeper": "belaya-bashnya"
+    },
+    {
+      "stem": "pashtet",
+      "name": "Ресторан «Паштет»",
+      "clusterSize": 18,
+      "keeper": "belaya-bashnya"
+    },
+    {
+      "stem": "pelmeni-klub",
+      "name": "Ресторан «Пельмени Клуб»",
+      "clusterSize": 18,
+      "keeper": "belaya-bashnya"
+    },
+    {
+      "stem": "plotinka-istoricheskiy-skver",
+      "name": "Плотинка (Исторический сквер)",
+      "clusterSize": 18,
+      "keeper": "belaya-bashnya"
+    },
+    {
+      "stem": "rok-bar-tsyn",
+      "name": "Рок-бар «Цынь»",
+      "clusterSize": 18,
+      "keeper": "belaya-bashnya"
+    },
+    {
+      "stem": "smotrovaya-ploschadka-bts-vysotskiy",
+      "name": "Смотровая площадка БЦ «Высоцкий»",
+      "clusterSize": 2,
+      "keeper": "meteogorka"
+    },
+    {
+      "stem": "vodonapornaya-bashnya-plotinka",
+      "name": "Водонапорная башня на Плотинке",
+      "clusterSize": 18,
+      "keeper": "belaya-bashnya"
+    },
+    {
+      "stem": "zmeeed",
+      "name": "Ресторан «Змееед»",
+      "clusterSize": 18,
+      "keeper": "belaya-bashnya"
+    }
+  ],
+  "d0": 73
+}

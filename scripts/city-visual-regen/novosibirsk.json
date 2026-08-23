@@ -1,0 +1,169 @@
+{
+  "city": "novosibirsk",
+  "mustSeeCount": 55,
+  "regen": [
+    {
+      "stem": "barnyy-dvorik-lenina-3",
+      "name": "Бар-хоппинг дворик на Ленина, 3",
+      "clusterSize": 6,
+      "keeper": "arka-street-art"
+    },
+    {
+      "stem": "gastrokort-tsentralnyy-rynok",
+      "name": "Гастрокорт на Центральном рынке",
+      "clusterSize": 2,
+      "keeper": "dvorik-centralnaya"
+    },
+    {
+      "stem": "glavpochtamt",
+      "name": "Главпочтамт (Контора связи)",
+      "clusterSize": 6,
+      "keeper": "arka-street-art"
+    },
+    {
+      "stem": "green-line-cover",
+      "name": "green line cover",
+      "clusterSize": 5,
+      "keeper": "akvapark"
+    },
+    {
+      "stem": "identity-art",
+      "name": "identity art",
+      "clusterSize": 2,
+      "keeper": "dom-s-chasami"
+    },
+    {
+      "stem": "kafe-ip-fedoseev",
+      "name": "Кафе-кондитерская «ИП Федосеев»",
+      "clusterSize": 5,
+      "keeper": "art-klaster-fabrika"
+    },
+    {
+      "stem": "muzey-olimpiyskoy-slavy",
+      "name": "Музей олимпийской славы",
+      "clusterSize": 4,
+      "keeper": "arka-kolokol-mira"
+    },
+    {
+      "stem": "muzey-solntsa",
+      "name": "Музей солнца",
+      "clusterSize": 5,
+      "keeper": "datsan-rinchin"
+    },
+    {
+      "stem": "novosibirskiy-zoopark-imeni-r-a-shilo",
+      "name": "Новосибирский зоопарк имени Р. А. Шило",
+      "clusterSize": 3,
+      "keeper": "iskitim-poklonnyy-krest"
+    },
+    {
+      "stem": "pamyatnik-kryachkovu",
+      "name": "Памятник архитектору Андрею Крячкову",
+      "clusterSize": 4,
+      "keeper": "delfiniya"
+    },
+    {
+      "stem": "pamyatnik-laboratornoy-myshi",
+      "name": "Памятник лабораторной мыши",
+      "clusterSize": 5,
+      "keeper": "datsan-rinchin"
+    },
+    {
+      "stem": "pamyatnik-leninu",
+      "name": "Памятник Ленину и фигурам революции",
+      "clusterSize": 5,
+      "keeper": "art-klaster-fabrika"
+    },
+    {
+      "stem": "pamyatnik-pervomu-mostu",
+      "name": "Памятник первому мосту через Обь",
+      "clusterSize": 2,
+      "keeper": "identity-symbol"
+    },
+    {
+      "stem": "pamyatnik-pervomu-svidaniyu",
+      "name": "Памятник первому свиданию",
+      "clusterSize": 6,
+      "keeper": "arka-street-art"
+    },
+    {
+      "stem": "pamyatnik-svetoforu",
+      "name": "Памятник светофору",
+      "clusterSize": 5,
+      "keeper": "akvapark"
+    },
+    {
+      "stem": "pamyatnik-tostu-za-zdravie",
+      "name": "Памятник тосту «За здравие»",
+      "clusterSize": 4,
+      "keeper": "arka-kolokol-mira"
+    },
+    {
+      "stem": "pamyatnik-tramvayu-13",
+      "name": "Памятник трамваю №13",
+      "clusterSize": 2,
+      "keeper": "bolshoy-planetariy"
+    },
+    {
+      "stem": "pamyatnik-vysotskomu",
+      "name": "Памятник Высоцкому",
+      "clusterSize": 4,
+      "keeper": "delfiniya"
+    },
+    {
+      "stem": "restoran-sibir-sibir",
+      "name": "Ресторан «#СибирьСибирь»",
+      "clusterSize": 2,
+      "keeper": "art-el"
+    },
+    {
+      "stem": "smotrovaya-aura",
+      "name": "Смотровая площадка у ТРЦ «Аура»",
+      "clusterSize": 5,
+      "keeper": "art-klaster-fabrika"
+    },
+    {
+      "stem": "stokvartirnyy-dom",
+      "name": "Стоквартирный дом",
+      "clusterSize": 2,
+      "keeper": "sobor-aleksandra-nevskogo"
+    },
+    {
+      "stem": "stseny-iz-kukolnyh-spektakley",
+      "name": "Скульптурная композиция «Сцены из кукольных спектаклей»",
+      "clusterSize": 3,
+      "keeper": "red-line-cover"
+    },
+    {
+      "stem": "teatr-globus",
+      "name": "Театр «Глобус»",
+      "clusterSize": 5,
+      "keeper": "akvapark"
+    },
+    {
+      "stem": "teatr-krasnyy-fakel",
+      "name": "Драматический театр «Красный факел»",
+      "clusterSize": 2,
+      "keeper": "berdskie-skaly-zona-otdyha"
+    },
+    {
+      "stem": "tsentr-pobeda",
+      "name": "Центр культуры и отдыха «Победа»",
+      "clusterSize": 2,
+      "keeper": "dom-kupca-istomina"
+    },
+    {
+      "stem": "vokzal-novosibirsk-glavnyy",
+      "name": "Железнодорожный вокзал «Новосибирск-Главный»",
+      "clusterSize": 3,
+      "keeper": "iskitim-poklonnyy-krest"
+    },
+    {
+      "stem": "vovka-v-tridevyatom-tsarstve",
+      "name": "Скульптура «Вовка в Тридевятом царстве»",
+      "clusterSize": 2,
+      "keeper": "park-chudes-galileo"
+    }
+  ],
+  "d0": 72
+}

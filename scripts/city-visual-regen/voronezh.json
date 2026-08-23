@@ -1,0 +1,217 @@
+{
+  "city": "voronezh",
+  "mustSeeCount": 54,
+  "regen": [
+    {
+      "stem": "aviatsionnyy-zavod-vaso",
+      "name": "Авиационный завод (ВАСО)",
+      "clusterSize": 38,
+      "keeper": "alekseevo-akatov-monastyr"
+    },
+    {
+      "stem": "bar-tsenzura",
+      "name": "Крафтовый бар «Цензура»",
+      "clusterSize": 38,
+      "keeper": "alekseevo-akatov-monastyr"
+    },
+    {
+      "stem": "blagoveschenskiy-sobor",
+      "name": "Благовещенский кафедральный собор",
+      "clusterSize": 38,
+      "keeper": "alekseevo-akatov-monastyr"
+    },
+    {
+      "stem": "dom-gubernatora",
+      "name": "Дом губернатора",
+      "clusterSize": 38,
+      "keeper": "alekseevo-akatov-monastyr"
+    },
+    {
+      "stem": "dom-kazennoy-palaty",
+      "name": "Дом Казенной палаты",
+      "clusterSize": 3,
+      "keeper": "chernavskaya-damba"
+    },
+    {
+      "stem": "gostinitsa-bristol",
+      "name": "Гостиница «Бристоль»",
+      "clusterSize": 38,
+      "keeper": "alekseevo-akatov-monastyr"
+    },
+    {
+      "stem": "hudozhestvennyy-muzey-kramskogo",
+      "name": "Областной художественный музей им. И.Н. Крамского",
+      "clusterSize": 3,
+      "keeper": "admiralteyskaya-ploschad"
+    },
+    {
+      "stem": "ilinskiy-hram",
+      "name": "Ильинский храм",
+      "clusterSize": 38,
+      "keeper": "alekseevo-akatov-monastyr"
+    },
+    {
+      "stem": "kamennyy-most",
+      "name": "Каменный мост",
+      "clusterSize": 38,
+      "keeper": "alekseevo-akatov-monastyr"
+    },
+    {
+      "stem": "kamernyy-teatr",
+      "name": "Воронежский Камерный театр",
+      "clusterSize": 38,
+      "keeper": "alekseevo-akatov-monastyr"
+    },
+    {
+      "stem": "kirha-svyatoy-marii",
+      "name": "Лютеранская кирха святой Марии",
+      "clusterSize": 38,
+      "keeper": "alekseevo-akatov-monastyr"
+    },
+    {
+      "stem": "kofeynya-promka",
+      "name": "Кофейня «Промка»",
+      "clusterSize": 38,
+      "keeper": "alekseevo-akatov-monastyr"
+    },
+    {
+      "stem": "meshchanskaya-politseyskaya-chast",
+      "name": "Мещанская полицейская часть",
+      "clusterSize": 38,
+      "keeper": "alekseevo-akatov-monastyr"
+    },
+    {
+      "stem": "muzey-diorama",
+      "name": "Музей-диорама",
+      "clusterSize": 3,
+      "keeper": "chernavskaya-damba"
+    },
+    {
+      "stem": "muzey-zabytoy-muzyki",
+      "name": "Музей забытой музыки",
+      "clusterSize": 38,
+      "keeper": "alekseevo-akatov-monastyr"
+    },
+    {
+      "stem": "pamyatnik-buninu",
+      "name": "Памятник И. Бунину",
+      "clusterSize": 38,
+      "keeper": "alekseevo-akatov-monastyr"
+    },
+    {
+      "stem": "pamyatnik-eseninu",
+      "name": "Памятник С. Есенину",
+      "clusterSize": 38,
+      "keeper": "alekseevo-akatov-monastyr"
+    },
+    {
+      "stem": "pamyatnik-frontovomu-pochtalonu",
+      "name": "Памятник фронтовому почтальону",
+      "clusterSize": 38,
+      "keeper": "alekseevo-akatov-monastyr"
+    },
+    {
+      "stem": "pamyatnik-lechebnomu-stulu",
+      "name": "Памятник лечебному стулу",
+      "clusterSize": 3,
+      "keeper": "admiralteyskaya-ploschad"
+    },
+    {
+      "stem": "pamyatnik-mandelshtamu",
+      "name": "Памятник О. Мандельштаму",
+      "clusterSize": 38,
+      "keeper": "alekseevo-akatov-monastyr"
+    },
+    {
+      "stem": "pamyatnik-platonovu",
+      "name": "Памятник А. Платонову",
+      "clusterSize": 38,
+      "keeper": "alekseevo-akatov-monastyr"
+    },
+    {
+      "stem": "pamyatnik-pyatnitskomu",
+      "name": "Памятник Митрофану Пятницкому",
+      "clusterSize": 38,
+      "keeper": "alekseevo-akatov-monastyr"
+    },
+    {
+      "stem": "pamyatnik-vysotskomu",
+      "name": "Памятник В. Высоцкому",
+      "clusterSize": 38,
+      "keeper": "alekseevo-akatov-monastyr"
+    },
+    {
+      "stem": "pamyatnik-yuriyu-hoyu",
+      "name": "Памятник Юрию Хою",
+      "clusterSize": 38,
+      "keeper": "alekseevo-akatov-monastyr"
+    },
+    {
+      "stem": "park-orlyonok",
+      "name": "Парк «Орлёнок»",
+      "clusterSize": 3,
+      "keeper": "arsenal"
+    },
+    {
+      "stem": "petrovskaya-naberezhnaya",
+      "name": "Петровская набережная",
+      "clusterSize": 38,
+      "keeper": "alekseevo-akatov-monastyr"
+    },
+    {
+      "stem": "pokrovskiy-sobor",
+      "name": "Покровский собор",
+      "clusterSize": 38,
+      "keeper": "alekseevo-akatov-monastyr"
+    },
+    {
+      "stem": "ryumochnaya-kulturno-korotko",
+      "name": "Рюмочная «Культурно Коротко»",
+      "clusterSize": 38,
+      "keeper": "alekseevo-akatov-monastyr"
+    },
+    {
+      "stem": "ryumochnaya-zyuzya",
+      "name": "Рюмочная «Зюзя»",
+      "clusterSize": 38,
+      "keeper": "alekseevo-akatov-monastyr"
+    },
+    {
+      "stem": "skulptura-neznakomka",
+      "name": "Скульптура «Незнакомка»",
+      "clusterSize": 2,
+      "keeper": "prospekt-revolyutsii"
+    },
+    {
+      "stem": "smotrovaya-park-durova",
+      "name": "Смотровая площадка у парка им. Дурова",
+      "clusterSize": 38,
+      "keeper": "alekseevo-akatov-monastyr"
+    },
+    {
+      "stem": "teatr-dramy-koltsova",
+      "name": "Театр драмы им. А. Кольцова",
+      "clusterSize": 38,
+      "keeper": "alekseevo-akatov-monastyr"
+    },
+    {
+      "stem": "teatr-kukol-shut",
+      "name": "Театр кукол «Шут»",
+      "clusterSize": 38,
+      "keeper": "alekseevo-akatov-monastyr"
+    },
+    {
+      "stem": "tsentralnyy-park-dinamo",
+      "name": "Центральный парк («Динамо»)",
+      "clusterSize": 2,
+      "keeper": "restoran-el-chico"
+    },
+    {
+      "stem": "uspenskiy-admiralteyskiy-hram",
+      "name": "Успенский Адмиралтейский храм",
+      "clusterSize": 38,
+      "keeper": "alekseevo-akatov-monastyr"
+    }
+  ],
+  "d0": 115
+}

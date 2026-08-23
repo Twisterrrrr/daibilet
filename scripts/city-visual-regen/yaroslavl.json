@@ -1,0 +1,157 @@
+{
+  "city": "yaroslavl",
+  "mustSeeCount": 54,
+  "regen": [
+    {
+      "stem": "filarmoniya",
+      "name": "Ярославская государственная филармония",
+      "clusterSize": 6,
+      "keeper": "demidovskiy-stolp"
+    },
+    {
+      "stem": "gubernatorskiy-sad",
+      "name": "Губернаторский сад",
+      "clusterSize": 3,
+      "keeper": "art-prostranstvo-teplo"
+    },
+    {
+      "stem": "mitropolichi-palaty",
+      "name": "Митрополичьи палаты",
+      "clusterSize": 2,
+      "keeper": "identity-symbol"
+    },
+    {
+      "stem": "pamyatnik-kopeyke-1612",
+      "name": "Памятник Копейке 1612 года",
+      "clusterSize": 5,
+      "keeper": "muzey-istorii-goroda"
+    },
+    {
+      "stem": "pamyatnik-nekrasovu",
+      "name": "Памятник Некрасову",
+      "clusterSize": 3,
+      "keeper": "muzey-zarubezhnogo-iskusstva"
+    },
+    {
+      "stem": "pamyatnik-rychashemu-medvedyu",
+      "name": "Памятник Рычащему Медведю",
+      "clusterSize": 4,
+      "keeper": "damanskiy-ostrov"
+    },
+    {
+      "stem": "pivovarnya-plan-b",
+      "name": "Пивоварня «План Б»",
+      "clusterSize": 2,
+      "keeper": "demidovskiy-sad"
+    },
+    {
+      "stem": "restoran-mamuka",
+      "name": "Ресторан «Мамука»",
+      "clusterSize": 5,
+      "keeper": "muzey-istorii-goroda"
+    },
+    {
+      "stem": "restoran-penaty",
+      "name": "Ресторан «Пенаты»",
+      "clusterSize": 6,
+      "keeper": "demidovskiy-stolp"
+    },
+    {
+      "stem": "restoran-sobranie",
+      "name": "Ресторан «Собрание»",
+      "clusterSize": 2,
+      "keeper": "identity-art"
+    },
+    {
+      "stem": "skulptura-afonya-i-kolya",
+      "name": "Скульптура «Афоня и Коля»",
+      "clusterSize": 6,
+      "keeper": "demidovskiy-stolp"
+    },
+    {
+      "stem": "skulptura-medved-s-ryboy",
+      "name": "Скульптура «Медведь с рыбой»",
+      "clusterSize": 4,
+      "keeper": "damanskiy-ostrov"
+    },
+    {
+      "stem": "skulptura-postovoy-u-zastavy",
+      "name": "Скульптура «Постовой у заставы»",
+      "clusterSize": 6,
+      "keeper": "gubernatorskiy-dom"
+    },
+    {
+      "stem": "stela-strelka-1000",
+      "name": "Арт-объект «Стрелка»",
+      "clusterSize": 3,
+      "keeper": "muzey-zarubezhnogo-iskusstva"
+    },
+    {
+      "stem": "strelka-rek-volgi-i-kotorosli",
+      "name": "Парк на Стрелке (Нижний партер)",
+      "clusterSize": 3,
+      "keeper": "kafe-baget-pashtet"
+    },
+    {
+      "stem": "strit-art-aura",
+      "name": "Стрит-арт стена за ТЦ «Аура»",
+      "clusterSize": 3,
+      "keeper": "kafe-baget-pashtet"
+    },
+    {
+      "stem": "teatr-volkova",
+      "name": "Театр драмы имени Федора Волкова",
+      "clusterSize": 5,
+      "keeper": "muzey-istorii-goroda"
+    },
+    {
+      "stem": "tserkov-il-i-proroka",
+      "name": "Церковь Ильи Пророка",
+      "clusterSize": 3,
+      "keeper": "restoran-ioann-vasilevich"
+    },
+    {
+      "stem": "usadba-matveevskih",
+      "name": "Усадьба Матвеевских",
+      "clusterSize": 3,
+      "keeper": "smotrovaya-zvonitsa-spasskogo"
+    },
+    {
+      "stem": "uspenskiy-sobor",
+      "name": "Успенский кафедральный собор",
+      "clusterSize": 3,
+      "keeper": "art-prostranstvo-teplo"
+    },
+    {
+      "stem": "volzhskaya-naberezhnaya",
+      "name": "Волжская набережная (верхний ярус)",
+      "clusterSize": 6,
+      "keeper": "gubernatorskiy-dom"
+    },
+    {
+      "stem": "volzhskaya-naberezhnaya-nizhniy-yarus",
+      "name": "Волжская набережная (нижний ярус)",
+      "clusterSize": 6,
+      "keeper": "gubernatorskiy-dom"
+    },
+    {
+      "stem": "yaroslavskiy-hudozhestvennyy-muzey",
+      "name": "Ярославский художественный музей",
+      "clusterSize": 5,
+      "keeper": "muzey-istorii-goroda"
+    },
+    {
+      "stem": "yaroslavskiy-kreml-spaso-preobrazhenskiy-monastyr",
+      "name": "Ярославский музей-заповедник (Спасский монастырь)",
+      "clusterSize": 3,
+      "keeper": "smotrovaya-zvonitsa-spasskogo"
+    },
+    {
+      "stem": "znamenskaya-bashnya",
+      "name": "Знаменская (Власьевская) башня",
+      "clusterSize": 4,
+      "keeper": "damanskiy-ostrov"
+    }
+  ],
+  "d0": 52
+}

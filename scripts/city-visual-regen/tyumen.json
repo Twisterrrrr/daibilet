@@ -1,0 +1,37 @@
+{
+  "city": "tyumen",
+  "mustSeeCount": 67,
+  "regen": [
+    {
+      "stem": "muzey-slovtsova",
+      "name": "Музей Словцова",
+      "clusterSize": 2,
+      "keeper": "chetyrehurovnevaya-naberezhnaya"
+    },
+    {
+      "stem": "peshehodnaya-ulitsa-dzerzhinskogo",
+      "name": "Пешеходная улица Дзержинского",
+      "clusterSize": 2,
+      "keeper": "detskiy-muzey-skazki"
+    },
+    {
+      "stem": "skver-sibirskih-koshek",
+      "name": "Сквер сибирских кошек",
+      "clusterSize": 2,
+      "keeper": "muzey-kuznechnogo-remesla"
+    },
+    {
+      "stem": "sobornaya-mechet",
+      "name": "Соборная мечеть",
+      "clusterSize": 2,
+      "keeper": "identity-symbol"
+    },
+    {
+      "stem": "znamenskiy-kafedral-nyy-sobor",
+      "name": "Знаменский кафедральный собор",
+      "clusterSize": 2,
+      "keeper": "muzey-nauki-i-tehniki-zauralya"
+    }
+  ],
+  "d0": 2
+}

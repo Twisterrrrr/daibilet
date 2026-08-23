@@ -1,0 +1,43 @@
+{
+  "city": "penza",
+  "mustSeeCount": 53,
+  "regen": [
+    {
+      "stem": "byust-radishcheva",
+      "name": "Бюст А. Н. Радищева",
+      "clusterSize": 2,
+      "keeper": "ahuny-sosnovye-allei"
+    },
+    {
+      "stem": "muzey-klyuchevskogo",
+      "name": "Музей В. О. Ключевского",
+      "clusterSize": 3,
+      "keeper": "dramaticheskiy-teatr-lunacharskogo"
+    },
+    {
+      "stem": "muzey-zapovednik-tarhany",
+      "name": "Тарханы",
+      "clusterSize": 4,
+      "keeper": "ahuny-sanatornyy-kvartal"
+    },
+    {
+      "stem": "penzenskaya-peshehodnaya-ulitsa-moskovskaya",
+      "name": "Улица Московская",
+      "clusterSize": 2,
+      "keeper": "ahunskiy-sosnovyy-bor"
+    },
+    {
+      "stem": "planetariy",
+      "name": "Планетарий",
+      "clusterSize": 3,
+      "keeper": "dramaticheskiy-teatr-lunacharskogo"
+    },
+    {
+      "stem": "restoran-lokalnoy-kuhni",
+      "name": "Ресторан с пензенской локальной кухней",
+      "clusterSize": 4,
+      "keeper": "ahuny-sanatornyy-kvartal"
+    }
+  ],
+  "d0": 11
+}
