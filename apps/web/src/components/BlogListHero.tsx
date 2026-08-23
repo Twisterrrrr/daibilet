@@ -69,7 +69,7 @@ export function BlogListHero({ breadcrumbs, cityName = null }: BlogListHeroProps
 
   const title = cityName
     ? `Статьи, обзоры и советы по событиям в ${cityToPrepositional(cityName)}`
-    : 'Блог о событиях';
+    : 'Статьи, обзоры и советы по событиям';
 
   return (
     <>
