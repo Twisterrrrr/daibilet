@@ -148,9 +148,10 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
   return (
     <>
       <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-200/60 bg-white/80 pt-[env(safe-area-inset-top,0px)] shadow-[0_1px_0_hsl(210_9%_11%/0.04)] backdrop-blur-xl supports-[backdrop-filter]:bg-white/70">
-        <div className="container-header flex min-h-[var(--site-header-height)] items-center justify-between py-2.5 sm:py-3 lg:py-3.5">
-          <div className="flex min-w-0 flex-1 flex-nowrap items-center gap-2 sm:gap-3 lg:flex-none lg:gap-4 xl:gap-5">
-            {/* Mobile: burger left (owner); desktop nav stays in center/right chrome. */}
+        {/* Same width as page content (.container-page). */}
+        <div className="container-page relative flex min-h-[var(--site-header-height)] items-center justify-between py-2.5 sm:py-3 lg:py-3.5">
+          <div className="flex min-w-0 flex-1 flex-nowrap items-center gap-2 sm:gap-3 lg:flex-none lg:gap-6 xl:gap-8">
+            {/* Mobile: burger left (owner); desktop nav stays centered. */}
             <div className="lg:hidden">
               <MobileNavTrigger id={mobileNavId} />
             </div>
@@ -161,11 +162,20 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
             >
               <DaibiletLogo textClassName="text-lg sm:text-xl lg:text-2xl" />
             </Link>
+            {/* City next to logo (desktop); modest gap, not flush. */}
+            <CityPicker
+              cities={destinations}
+              value={cityValue}
+              onChange={onCityChange}
+              allLabel="Фильтр по городу"
+              variant="header"
+              className="hidden shrink-0 lg:block lg:min-w-0 lg:max-w-[12rem] xl:max-w-[14rem]"
+            />
           </div>
 
           <nav
             aria-label="Основная навигация"
-            className={`min-w-0 items-center gap-[var(--header-menu-gap)] ${compactHeader ? 'hidden' : 'hidden lg:flex'}`}
+            className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center gap-[var(--header-menu-gap)] ${compactHeader ? 'hidden' : 'hidden lg:flex'}`}
           >
             {navLinks.map((item) => {
               const active = isNavActive(pathname, item.href, item.label);
@@ -177,7 +187,7 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
                   className={
                     [
                       secondary ? 'hidden xl:inline-flex' : 'inline-flex',
-                      'items-center rounded-lg px-2.5 py-1.5 text-sm font-medium transition xl:px-3.5 xl:text-[0.9375rem] 2xl:px-4 2xl:text-base',
+                      'items-center rounded-lg px-2 py-1.5 text-sm font-medium transition xl:px-2.5',
                       active
                         ? 'text-graphite underline decoration-graphite/70 decoration-2 underline-offset-[6px]'
                         : 'text-graphite-muted hover:bg-surface-muted hover:text-graphite',
@@ -191,24 +201,22 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
           </nav>
 
           <div className="flex shrink-0 items-center gap-[var(--header-icons-gap)]">
-            {/* Desktop ultrawide: city next to search (left cluster stays logo-only). */}
+            {/* Mobile: city stays with actions (desktop city is by logo). */}
             <CityPicker
               cities={destinations}
               value={cityValue}
               onChange={onCityChange}
               allLabel="Фильтр по городу"
               variant="header"
-              className="shrink-0 lg:min-w-0 lg:max-w-[14rem] xl:max-w-[16rem] 2xl:max-w-[18rem]"
+              className="shrink-0 lg:hidden"
             />
 
-            {/* Sticky order: City | Search | Route | Favorites (search icon on mobile too). */}
             <HeaderSearch
               variant="overlay"
               cityFilter={searchCityFilter}
               initialQuery={searchInitialQuery}
             />
 
-            {/* Day-route + favorites: icon-first on mobile sticky; badges when count > 0. */}
             <DayRouteBadge />
             <FavoritesHeaderButton onClick={() => setFavoritesOpen(true)} />
 

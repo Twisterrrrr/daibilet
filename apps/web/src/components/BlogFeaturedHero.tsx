@@ -73,12 +73,21 @@ export function BlogFeaturedHero({
     citySlug: featured.citySlug,
   });
 
+  // When hot/promo live in page sidebar, featured must be a single full-width card —
+  // keeping the old 1fr|2fr grid leaves an empty column and squashes the hero.
+  const sectionClass = hideAsideOnDesktop
+    ? 'mb-8 w-full'
+    : 'mb-8 grid w-full items-stretch gap-4 lg:grid-cols-[minmax(16rem,1fr)_minmax(0,2fr)] lg:gap-5';
+  const articleClass = hideAsideOnDesktop
+    ? 'group relative flex min-h-[22rem] overflow-hidden rounded-2xl bg-slate-900 shadow-md md:min-h-[24rem] lg:min-h-[28rem]'
+    : 'group order-1 relative flex min-h-[24rem] overflow-hidden rounded-2xl bg-slate-900 shadow-md md:min-h-[22rem] lg:order-2 lg:min-h-full';
+  const imageSizes = hideAsideOnDesktop
+    ? '(max-width: 1024px) 100vw, 80vw'
+    : FEATURED_IMAGE_SIZES;
+
   return (
-    <section
-      aria-label="Главная статья блога"
-      className="mb-8 grid w-full items-stretch gap-4 lg:grid-cols-[minmax(16rem,1fr)_minmax(0,2fr)] lg:gap-5"
-    >
-      <article className="group order-1 relative flex min-h-[24rem] overflow-hidden rounded-2xl bg-slate-900 shadow-md md:min-h-[22rem] lg:order-2 lg:min-h-full">
+    <section aria-label="Главная статья блога" className={sectionClass}>
+      <article className={articleClass}>
         <Link
           href={articleHref}
           aria-label={featured.title}
@@ -89,7 +98,7 @@ export function BlogFeaturedHero({
             alt=""
             fill
             priority
-            sizes={FEATURED_IMAGE_SIZES}
+            sizes={imageSizes}
             className="object-cover transition-transform duration-700 group-hover:scale-105"
           />
           <span

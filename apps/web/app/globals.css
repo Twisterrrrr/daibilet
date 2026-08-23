@@ -72,10 +72,10 @@ html[data-nav-pending='1'] {
     --site-header-height-compact: 3.25rem;
     /** Content column max width (header, footer, pages). */
     --container-page-max: 112rem;
-    --header-menu-gap: 1.25rem;
-    --header-icons-gap: 1rem;
-    --header-container-max: 112rem;
-    --blog-layout-max: 90rem;
+    /* Compact equal gaps; ultrawide must not inflate menu into a sparse strip. */
+    --header-menu-gap: 0.75rem;
+    --header-icons-gap: 0.625rem;
+    --blog-layout-max: 112rem;
     --bridges-gradient-hero: radial-gradient(ellipse 90% 70% at 70% 40%, oklch(0.38 0.14 265 / 0.9), transparent 70%),
       linear-gradient(135deg, oklch(0.22 0.10 265), oklch(0.30 0.13 262));
     --bridges-gradient-amber: linear-gradient(135deg, oklch(0.78 0.17 55), oklch(0.70 0.19 40));
@@ -140,17 +140,15 @@ html[data-nav-pending='1'] {
 
   @media (min-width: 1920px) {
     :root {
-      --header-menu-gap: 2rem;
-      --header-icons-gap: 1.5rem;
-      --header-container-max: 90rem;
+      --header-menu-gap: 1rem;
+      --header-icons-gap: 0.75rem;
     }
   }
 
   @media (min-width: 2560px) {
     :root {
-      --header-menu-gap: 3rem;
-      --header-icons-gap: 2rem;
-      --header-container-max: 100rem;
+      --header-menu-gap: 1.25rem;
+      --header-icons-gap: 0.875rem;
     }
   }
 
@@ -264,27 +262,27 @@ html[data-nav-pending='1'] {
     @apply mx-auto w-full max-w-[112rem] px-4 sm:px-6 lg:px-8 xl:px-10;
   }
 
-  .container-header {
-    @apply mx-auto w-full px-4 sm:px-6 lg:px-8 xl:px-10;
-    max-width: var(--header-container-max);
-  }
-
   .site-header-icon-link {
     @apply inline-flex items-center justify-center rounded-full p-2.5 text-graphite-muted transition hover:bg-surface-muted hover:text-graphite;
   }
 
-  /** Blog listing: main column + 360px sidebar on desktop; capped width on ultrawide. */
+  /** Blog listing: main + sidebar fills container-page (same width as header). */
   .blog-layout {
-    @apply mx-auto w-full;
-    max-width: var(--blog-layout-max);
+    @apply w-full;
   }
 
   @media (min-width: 1024px) {
     .blog-layout {
       display: grid;
       grid-template-columns: minmax(0, 1fr) 22.5rem;
-      gap: 3rem;
+      gap: 2.5rem;
       align-items: start;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .blog-layout {
+      gap: 3rem;
     }
   }
 
