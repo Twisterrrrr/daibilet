@@ -151,8 +151,8 @@ function PairRow({
   side: BlogCardDto;
 }) {
   return (
-    <div className="grid grid-cols-1 gap-5 lg:grid-cols-3 lg:gap-6">
-      <div className="lg:col-span-2">
+    <div className="grid grid-cols-1 gap-5 xl:grid-cols-2 xl:gap-6">
+      <div>
         <BlogPostCard post={lead} variant="large" />
       </div>
       <div>

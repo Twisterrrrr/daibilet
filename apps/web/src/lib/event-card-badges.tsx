@@ -32,7 +32,7 @@ type EventImageBadgesProps = {
 };
 
 const DATE_BADGE_CLASS =
-  'bg-slate-950/80 text-white shadow-md ring-1 ring-white/20 backdrop-blur-sm';
+  'bg-white/90 text-slate-950 shadow-[0_4px_12px_rgba(0,0,0,0.05)] ring-1 ring-white/60 backdrop-blur-md';
 
 export function EventImageBadges({
   event,
@@ -80,13 +80,13 @@ export function EventImageBadges({
   }
   if (showLowTickets && secondary.length < maxSecondary) {
     secondary.push(
-      <EventCardBadge key="vacant" className="bg-rose-600 text-white shadow-md ring-1 ring-white/30">
+      <EventCardBadge key="vacant" className="bg-slate-900/85 text-white shadow-md ring-1 ring-white/20 backdrop-blur-md">
         {formatVacantSeats(event.vacant ?? 0)}
       </EventCardBadge>,
     );
   } else if (hit && secondary.length < maxSecondary) {
     secondary.push(
-      <EventCardBadge key="hit" className="bg-primary-600 text-white shadow-md ring-1 ring-white/25">
+      <EventCardBadge key="hit" className="bg-white/90 text-slate-950 shadow-[0_4px_12px_rgba(0,0,0,0.05)] ring-1 ring-white/60 backdrop-blur-md">
         Хит
       </EventCardBadge>,
     );

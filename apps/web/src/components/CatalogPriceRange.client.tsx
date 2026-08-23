@@ -36,7 +36,7 @@ export function CatalogPriceRange({
     if (!el || max <= min) return;
     const percentMin = ((lo - min) / (max - min)) * 100;
     const percentMax = ((hi - min) / (max - min)) * 100;
-    el.style.background = `linear-gradient(to right, #e2e8f0 ${percentMin}%, #2563eb ${percentMin}%, #2563eb ${percentMax}%, #e2e8f0 ${percentMax}%)`;
+    el.style.background = `linear-gradient(to right, #e2e8f0 ${percentMin}%, #0f172a ${percentMin}%, #0f172a ${percentMax}%, #e2e8f0 ${percentMax}%)`;
   };
 
   useEffect(() => {

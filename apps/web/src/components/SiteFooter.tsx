@@ -108,7 +108,7 @@ export function SiteFooter({ destinations, variant = 'default' }: SiteFooterProp
   if (variant === 'compact') {
     return (
       <footer className="border-t border-slate-200/80 bg-surface-muted" data-site-footer="compact">
-        <div className="container-page py-6 sm:py-8">
+        <div className="container-page site-footer-inner py-6 sm:py-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
               <Link href="/" className="inline-flex" aria-label="Дайбилет">
@@ -190,7 +190,7 @@ export function SiteFooter({ destinations, variant = 'default' }: SiteFooterProp
 
   return (
     <footer className="border-t border-slate-200/80 bg-surface-muted" data-site-footer="default">
-      <div className="container-page py-14 sm:py-16">
+      <div className="container-page site-footer-inner py-14 sm:py-16">
         <div className="grid grid-cols-2 gap-10 md:grid-cols-4 md:gap-12">
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="inline-flex" aria-label="Дайбилет">

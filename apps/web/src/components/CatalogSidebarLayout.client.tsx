@@ -11,10 +11,13 @@ type CatalogSidebarLayoutProps = {
   triggerLabel?: string;
   /** Active filter count badge on mobile trigger */
   activeCount?: number;
-  onDrawerClose?: () => void;
+  /** Overlay / X / Escape — rollback draft without applying. */
+  onDrawerDismiss?: () => void;
   /** Called when drawer opens — use to snapshot filter state for reset-on-dismiss */
   onDrawerOpen?: () => void;
-  footer?: ReactNode;
+  footer?:
+    | ReactNode
+    | ((actions: { closeApply: () => void; closeDismiss: () => void }) => ReactNode);
 };
 
 /**
@@ -27,17 +30,21 @@ export function CatalogSidebarLayout({
   title = 'Фильтры',
   triggerLabel = 'Фильтры и поиск',
   activeCount = 0,
-  onDrawerClose,
+  onDrawerDismiss,
   onDrawerOpen,
   footer,
 }: CatalogSidebarLayoutProps) {
   const [open, setOpen] = useState(false);
   const titleId = useId();
 
-  const close = useCallback(() => {
+  const closeDismiss = useCallback(() => {
     setOpen(false);
-    onDrawerClose?.();
-  }, [onDrawerClose]);
+    onDrawerDismiss?.();
+  }, [onDrawerDismiss]);
+
+  const closeApply = useCallback(() => {
+    setOpen(false);
+  }, []);
 
   const openDrawer = useCallback(() => {
     onDrawerOpen?.();
@@ -49,14 +56,14 @@ export function CatalogSidebarLayout({
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') close();
+      if (event.key === 'Escape') closeDismiss();
     };
     document.addEventListener('keydown', onKey);
     return () => {
       document.body.style.overflow = prev;
       document.removeEventListener('keydown', onKey);
     };
-  }, [open, close]);
+  }, [open, closeDismiss]);
 
   return (
     <>
@@ -74,7 +81,7 @@ export function CatalogSidebarLayout({
       <div
         className={`catalog-sidebar-overlay${open ? ' is-visible' : ''}`}
         aria-hidden={!open}
-        onClick={close}
+        onClick={closeDismiss}
       />
 
       <div className="catalog-page-layout">
@@ -91,13 +98,17 @@ export function CatalogSidebarLayout({
               type="button"
               className="catalog-sidebar-close"
               aria-label="Закрыть фильтры"
-              onClick={close}
+              onClick={closeDismiss}
             >
               <X className="h-5 w-5" strokeWidth={1.75} />
             </button>
           </div>
           {sidebar}
-          {footer ? <div className="catalog-sidebar-mobile-footer lg:hidden">{footer}</div> : null}
+          {footer ? (
+            <div className="catalog-sidebar-mobile-footer lg:hidden">
+              {typeof footer === 'function' ? footer({ closeApply, closeDismiss }) : footer}
+            </div>
+          ) : null}
         </aside>
 
         <div className="catalog-main min-w-0">{children}</div>

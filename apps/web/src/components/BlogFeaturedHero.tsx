@@ -30,6 +30,8 @@ type BlogFeaturedHeroProps = {
   afishaPromos?: Record<string, BlogSidebarPromoDto>;
   afishaFallbackCityName?: string | null;
   afishaFallbackCitySlug?: string | null;
+  /** Magazine layout: hot list + promo move to page sidebar on lg+. */
+  hideAsideOnDesktop?: boolean;
 };
 
 function freshMetaLine(post: BlogCardDto): string | null {
@@ -51,6 +53,7 @@ export function BlogFeaturedHero({
   afishaPromos = {},
   afishaFallbackCityName,
   afishaFallbackCitySlug,
+  hideAsideOnDesktop = false,
 }: BlogFeaturedHeroProps) {
   const articleHref = `/blog/${featured.slug}`;
   const lead = clipBlogFeaturedLead(featured.slug, featured.excerpt, 3);
@@ -165,7 +168,7 @@ export function BlogFeaturedHero({
       {hotPosts.length ? (
         <aside
           aria-label="Свежие материалы"
-          className="order-2 flex h-full flex-col gap-4 lg:order-1"
+          className={`order-2 flex h-full flex-col gap-4 lg:order-1${hideAsideOnDesktop ? ' lg:hidden' : ''}`}
         >
           <div className="shrink-0">
             <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">

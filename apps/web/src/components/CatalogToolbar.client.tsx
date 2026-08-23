@@ -6,8 +6,10 @@ import { Baby, ChevronDown, Gift, Moon, MoreHorizontal, Search, SlidersHorizonta
 import { FormEvent, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 
+import { CatalogAdvancedFiltersInline } from '@/components/CatalogAdvancedFiltersInline.client';
 import { CatalogAdvancedFiltersPanel } from '@/components/CatalogAdvancedFiltersPanel.client';
 import { CatalogDateRail } from '@/components/CatalogDateRail.client';
+import { CatalogDrawerApplyFooter } from '@/components/CatalogDrawerApplyFooter.client';
 import { CatalogPriceRange } from '@/components/CatalogPriceRange.client';
 import { CatalogSidebarLayout } from '@/components/CatalogSidebarLayout.client';
 import { CategoryTabIcon } from '@/components/CategoryTabIcon';
@@ -46,6 +48,7 @@ type CatalogToolbarProps = {
 const CATALOG_PRICE_MAX = 10_000;
 
 const SEARCH_DEBOUNCE_MS = 350;
+const MOBILE_DRAWER_MQ = '(max-width: 1023px)';
 /** Events with ageLimit ≤ 12 - family-friendly quick filter. */
 const KIDS_AGE_MAX = 12;
 
@@ -63,6 +66,10 @@ export function CatalogToolbar({
   const filtersRef = useRef(filters);
   filtersRef.current = filters;
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+  const [drawerDraft, setDrawerDraft] = useState<CatalogFilterValues | null>(null);
+  const [drawerQDraft, setDrawerQDraft] = useState<string | null>(null);
+  const drawerSnapshotRef = useRef<{ filters: CatalogFilterValues; q: string } | null>(null);
   const [categoriesMoreOpen, setCategoriesMoreOpen] = useState(false);
   const [qDraft, setQDraft] = useState(filters.q || '');
   const [searchFocused, setSearchFocused] = useState(false);
@@ -112,10 +119,63 @@ export function CatalogToolbar({
     router.push(buildCatalogHref(next));
   };
 
-  // Live search on desktop-sized viewports; mobile relies on «Найти».
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.matchMedia('(max-width: 639px)').matches) {
+  const isMobileDrawerDraft = mobileDrawerOpen && drawerDraft != null;
+
+  const effectiveFilters = isMobileDrawerDraft ? drawerDraft : filters;
+  const effectiveQDraft = isMobileDrawerDraft && drawerQDraft != null ? drawerQDraft : qDraft;
+
+  const catalogNavigate = (next: CatalogFilterValues) => {
+    if (isMobileDrawerDraft) {
+      setDrawerDraft(next);
       return;
+    }
+    navigate(next);
+  };
+
+  const setEffectiveQDraft = (next: string) => {
+    if (isMobileDrawerDraft) {
+      setDrawerQDraft(next);
+      setQDraft(next);
+      return;
+    }
+    setQDraft(next);
+  };
+
+  const openMobileDrawer = () => {
+    drawerSnapshotRef.current = { filters, q: qDraft };
+    setDrawerDraft({ ...filters });
+    setDrawerQDraft(qDraft);
+    setMobileDrawerOpen(true);
+  };
+
+  const dismissMobileDrawer = () => {
+    const snapshot = drawerSnapshotRef.current;
+    if (snapshot) setQDraft(snapshot.q);
+    drawerSnapshotRef.current = null;
+    setDrawerDraft(null);
+    setDrawerQDraft(null);
+    setMobileDrawerOpen(false);
+  };
+
+  const applyMobileDrawer = () => {
+    const next = drawerDraft ?? filters;
+    const q = (drawerQDraft ?? qDraft).trim();
+    drawerSnapshotRef.current = null;
+    setDrawerDraft(null);
+    setDrawerQDraft(null);
+    setMobileDrawerOpen(false);
+    navigate({
+      ...next,
+      q: q || undefined,
+      page: undefined,
+    });
+  };
+
+  // Live search on desktop-sized viewports; mobile drawer uses draft until «Применить».
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (window.matchMedia('(max-width: 639px)').matches) return;
+      if (window.matchMedia(MOBILE_DRAWER_MQ).matches && mobileDrawerOpen) return;
     }
     const next = qDraft.trim();
     const current = (filtersRef.current.q || '').trim();
@@ -129,14 +189,14 @@ export function CatalogToolbar({
       });
     }, SEARCH_DEBOUNCE_MS);
     return () => window.clearTimeout(timer);
-  }, [qDraft]);
+  }, [qDraft, mobileDrawerOpen]);
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setSearchFocused(false);
-    navigate({
-      ...filters,
-      q: qDraft.trim() || undefined,
+    catalogNavigate({
+      ...effectiveFilters,
+      q: effectiveQDraft.trim() || undefined,
       page: undefined,
     });
   };
@@ -233,17 +293,30 @@ export function CatalogToolbar({
     <CatalogAdvancedFiltersPanel
       open={filtersOpen}
       filters={{
-        dateFrom: filters.from || '',
-        dateTo: filters.to || '',
-        date: filters.date || '',
-        minPrice: filters.minPrice != null ? String(filters.minPrice) : 'all',
-        maxPrice: filters.maxPrice != null ? String(filters.maxPrice) : 'all',
-        ageMax: filters.ageMax != null && filters.ageMax >= 0 ? filters.ageMax : -1,
-        landing: filters.landing || 'all',
+        dateFrom: effectiveFilters.from || '',
+        dateTo: effectiveFilters.to || '',
+        date: effectiveFilters.date || '',
+        minPrice: effectiveFilters.minPrice != null ? String(effectiveFilters.minPrice) : 'all',
+        maxPrice: effectiveFilters.maxPrice != null ? String(effectiveFilters.maxPrice) : 'all',
+        ageMax:
+          effectiveFilters.ageMax != null && effectiveFilters.ageMax >= 0
+            ? effectiveFilters.ageMax
+            : -1,
+        landing: effectiveFilters.landing || 'all',
       }}
       landings={facets.landings}
-      previewContext={previewContext}
+      previewContext={{
+        q: effectiveQDraft.trim() || effectiveFilters.q,
+        city: effectiveFilters.city,
+        category: effectiveFilters.category,
+        sort: effectiveFilters.sort,
+      }}
       onApply={(next) => {
+        if (isMobileDrawerDraft) {
+          setDrawerDraft(mergeAdvancedFilters(drawerDraft ?? filters, drawerQDraft ?? qDraft, next));
+          setFiltersOpen(false);
+          return;
+        }
         applyAdvanced(navigate, filters, qDraft, next);
         setFiltersOpen(false);
       }}
@@ -283,14 +356,14 @@ export function CatalogToolbar({
     );
   }
 
-  const priceMinValue = filters.minPrice ?? 0;
-  const priceMaxValue = filters.maxPrice ?? CATALOG_PRICE_MAX;
+  const priceMinValue = effectiveFilters.minPrice ?? 0;
+  const priceMaxValue = effectiveFilters.maxPrice ?? CATALOG_PRICE_MAX;
 
   const setPriceRange = (min: number, max: number) => {
     const atDefault = min <= 0 && max >= CATALOG_PRICE_MAX;
-    navigate({
-      ...filters,
-      q: qDraft.trim() || filters.q,
+    catalogNavigate({
+      ...effectiveFilters,
+      q: effectiveQDraft.trim() || effectiveFilters.q,
       minPrice: atDefault ? undefined : min,
       maxPrice: atDefault ? undefined : max,
       page: undefined,
@@ -298,6 +371,16 @@ export function CatalogToolbar({
   };
 
   const resetSidebarFilters = () => {
+    if (isMobileDrawerDraft) {
+      setDrawerDraft({
+        city: effectiveFilters.city,
+        sort: effectiveFilters.sort,
+        limit: effectiveFilters.limit,
+      });
+      setDrawerQDraft('');
+      setQDraft('');
+      return;
+    }
     setQDraft('');
     navigate({
       city: filters.city,
@@ -307,7 +390,9 @@ export function CatalogToolbar({
   };
 
   const sidebarActiveCount =
-    advancedCount + (filters.category ? 1 : 0) + (qDraft.trim() ? 1 : 0);
+    countAdvancedFilters(effectiveFilters) +
+    (effectiveFilters.category ? 1 : 0) +
+    (effectiveQDraft.trim() ? 1 : 0);
 
   const catalogSearchField = (
     <div ref={searchWrapRef} className="catalog-toolbar-search-field max-w-none md:max-w-none">
@@ -322,8 +407,8 @@ export function CatalogToolbar({
           ref={searchInputRef}
           type="search"
           name="q"
-          value={qDraft}
-          onChange={(event) => setQDraft(event.target.value)}
+          value={effectiveQDraft}
+          onChange={(event) => setEffectiveQDraft(event.target.value)}
           onFocus={() => setSearchFocused(true)}
           placeholder="Название, место или артист"
           aria-label="Поиск по событиям"
@@ -333,14 +418,14 @@ export function CatalogToolbar({
           autoComplete="off"
           className="inline-btn h-11 w-full rounded-xl border-0 bg-transparent pl-10 pr-9 text-sm text-graphite outline-none transition placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-primary/30 disabled:opacity-60"
         />
-        {qDraft ? (
+        {effectiveQDraft ? (
           <button
             type="button"
             aria-label="Очистить поиск"
             disabled={disabled}
             onClick={() => {
-              setQDraft('');
-              navigate({ ...filters, q: undefined, page: undefined });
+              setEffectiveQDraft('');
+              catalogNavigate({ ...effectiveFilters, q: undefined, page: undefined });
             }}
             className="inline-btn absolute right-1.5 top-1/2 grid h-6 w-6 -translate-y-1/2 place-items-center rounded-lg text-graphite-muted hover:bg-surface-muted hover:text-graphite disabled:opacity-60"
           >
@@ -367,11 +452,21 @@ export function CatalogToolbar({
               onClick={() => {
                 setSearchFocused(false);
                 if (hint.kind === 'q' && hint.q) {
-                  setQDraft(hint.q);
-                  navigate({ ...filters, q: hint.q, category: undefined, page: undefined });
+                  setEffectiveQDraft(hint.q);
+                  catalogNavigate({
+                    ...effectiveFilters,
+                    q: hint.q,
+                    category: undefined,
+                    page: undefined,
+                  });
                   return;
                 }
-                navigate({ ...filters, q: undefined, category: hint.category, page: undefined });
+                catalogNavigate({
+                  ...effectiveFilters,
+                  q: undefined,
+                  category: hint.category,
+                  page: undefined,
+                });
               }}
             >
               <Search aria-hidden className="h-3.5 w-3.5 shrink-0 text-graphite-muted" strokeWidth={1.75} />
@@ -395,12 +490,12 @@ export function CatalogToolbar({
           ) : null}
         </div>
 
-        <form onSubmit={onSubmit} className="catalog-sidebar-section">
+        <form onSubmit={onSubmit} className="catalog-sidebar-section catalog-sidebar-search">
           {catalogSearchField}
           <button
             type="submit"
             disabled={disabled}
-            className="mt-2 inline-flex h-10 w-full items-center justify-center rounded-xl bg-primary text-sm font-semibold text-white transition hover:bg-primary/90 disabled:opacity-60"
+            className="catalog-sidebar-search__submit mt-2.5"
           >
             Найти
           </button>
@@ -421,27 +516,38 @@ export function CatalogToolbar({
         <div className="catalog-sidebar-section">
           <p className="catalog-sidebar-section__title">Категории</p>
           <CategorySidebarNav
-            filters={filters}
+            filters={effectiveFilters}
             primary={categorySplit.primary}
             overflow={categorySplit.overflow}
             onOpenMore={() => setCategoriesMoreOpen(true)}
+            onNavigate={catalogNavigate}
           />
         </div>
 
         <div className="catalog-sidebar-section">
           <p className="catalog-sidebar-section__title">Особенности</p>
           <QuickFilterSidebarNav
-            filters={filters}
-            qDraft={qDraft}
+            filters={effectiveFilters}
+            qDraft={effectiveQDraft}
             disabled={disabled}
-            onNavigate={navigate}
+            onNavigate={catalogNavigate}
           />
         </div>
 
-        <div className="catalog-sidebar-section pb-2 lg:pb-0">
+        <div className="hidden lg:block">
+          <CatalogAdvancedFiltersInline
+            filters={effectiveFilters}
+            landings={facets.landings}
+            qDraft={effectiveQDraft}
+            disabled={disabled}
+            onNavigate={catalogNavigate}
+          />
+        </div>
+
+        <div className="catalog-sidebar-section pb-2 lg:hidden">
           <FiltersButton
             open={filtersOpen}
-            count={advancedCount}
+            count={countAdvancedFilters(effectiveFilters)}
             disabled={disabled}
             onClick={() => setFiltersOpen(true)}
             className="w-full justify-center"
@@ -450,6 +556,11 @@ export function CatalogToolbar({
       </>
     );
 
+    const drawerPreviewFilters: CatalogFilterValues = {
+      ...effectiveFilters,
+      q: effectiveQDraft.trim() || effectiveFilters.q,
+    };
+
     return (
       <>
         <CatalogSidebarLayout
@@ -457,9 +568,21 @@ export function CatalogToolbar({
           title="Фильтры"
           triggerLabel="Фильтры и поиск"
           activeCount={sidebarActiveCount}
+          onDrawerOpen={openMobileDrawer}
+          onDrawerDismiss={dismissMobileDrawer}
+          footer={({ closeApply }) => (
+            <CatalogDrawerApplyFooter
+              filters={drawerPreviewFilters}
+              disabled={disabled}
+              onApply={() => {
+                applyMobileDrawer();
+                closeApply();
+              }}
+            />
+          )}
         >
-          <div className="catalog-toolbar sticky top-[var(--site-header-height)] z-30 -mx-4 border-b border-slate-200/60 bg-white/95 px-4 py-2 backdrop-blur-md supports-[backdrop-filter]:bg-white/90 sm:-mx-6 sm:px-6 lg:static lg:mx-0 lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none">
-            <div className="space-y-2 md:hidden">
+          <div className="catalog-content">
+            <div className="w-full md:hidden">
               <MobileDateSelect
                 chips={dateRailChips}
                 filters={filters}
@@ -468,11 +591,11 @@ export function CatalogToolbar({
                 onExactDay={setExactDay}
               />
             </div>
-            <div className="catalog-date-timeline hidden md:block">
+            <div className="catalog-date-timeline hidden w-full md:block">
               <CatalogDateRail disabled={disabled} className="min-w-0 w-full" />
             </div>
+            {children}
           </div>
-          {children}
         </CatalogSidebarLayout>
         {advancedPanel}
         <MoreCategoriesSheet
@@ -985,20 +1108,20 @@ function QuickFilterSidebarNav({
   ];
 
   return (
-    <nav className="catalog-sidebar-nav" aria-label="Особенности">
+    <div className="catalog-sidebar-checkbox-list" aria-label="Особенности">
       {items.map((item) => (
-        <button
-          key={item.key}
-          type="button"
-          disabled={disabled}
-          aria-pressed={item.active}
-          onClick={item.onClick}
-          className={`catalog-sidebar-nav__item${item.active ? ' catalog-sidebar-nav__item--active' : ''}`}
-        >
-          <span>{item.label}</span>
-        </button>
+        <label key={item.key} className="catalog-sidebar-checkbox">
+          <input
+            type="checkbox"
+            checked={item.active}
+            disabled={disabled}
+            onChange={() => item.onClick()}
+          />
+          <span className="catalog-sidebar-checkbox__mark" aria-hidden />
+          <span className="catalog-sidebar-checkbox__label">{item.label}</span>
+        </label>
       ))}
-    </nav>
+    </div>
   );
 }
 
@@ -1007,20 +1130,40 @@ function CategorySidebarNav({
   primary,
   overflow,
   onOpenMore,
+  onNavigate,
 }: {
   filters: CatalogFilterValues;
   primary: CatalogCategoryFacet[];
   overflow: CatalogCategoryFacet[];
   onOpenMore: () => void;
+  onNavigate?: (next: CatalogFilterValues) => void;
 }) {
+  const pickCategory = (category?: string) => {
+    const next = { ...filters, category, page: undefined };
+    if (onNavigate) {
+      onNavigate(next);
+      return;
+    }
+  };
+
   return (
     <nav className="catalog-sidebar-nav" aria-label="Категории">
-      <Link
-        href={buildCatalogHref({ ...filters, category: undefined, page: undefined })}
-        className={`catalog-sidebar-nav__item${!filters.category ? ' catalog-sidebar-nav__item--active' : ''}`}
-      >
-        <span>Все события</span>
-      </Link>
+      {onNavigate ? (
+        <button
+          type="button"
+          onClick={() => pickCategory(undefined)}
+          className={`catalog-sidebar-nav__item${!filters.category ? ' catalog-sidebar-nav__item--active' : ''}`}
+        >
+          <span className="catalog-sidebar-nav__name">Все события</span>
+        </button>
+      ) : (
+        <Link
+          href={buildCatalogHref({ ...filters, category: undefined, page: undefined })}
+          className={`catalog-sidebar-nav__item${!filters.category ? ' catalog-sidebar-nav__item--active' : ''}`}
+        >
+          <span className="catalog-sidebar-nav__name">Все события</span>
+        </Link>
+      )}
       {primary.map((item) => {
         const active = filters.category === item.name;
         const empty = item.events <= 0;
@@ -1032,9 +1175,24 @@ function CategorySidebarNav({
               className="catalog-sidebar-nav__item cursor-not-allowed opacity-40"
               aria-disabled="true"
             >
-              <span>{label}</span>
+              <span className="catalog-sidebar-nav__name">{label}</span>
               <span className="catalog-sidebar-nav__count">0</span>
             </span>
+          );
+        }
+        if (onNavigate) {
+          return (
+            <button
+              key={item.name}
+              type="button"
+              onClick={() => pickCategory(active ? undefined : item.name)}
+              className={`catalog-sidebar-nav__item${active ? ' catalog-sidebar-nav__item--active' : ''}${empty ? ' opacity-60' : ''}`}
+            >
+              <span className="catalog-sidebar-nav__name">{label}</span>
+              {item.events > 0 ? (
+                <span className="catalog-sidebar-nav__count">{item.events}</span>
+              ) : null}
+            </button>
           );
         }
         return (
@@ -1047,14 +1205,16 @@ function CategorySidebarNav({
             })}
             className={`catalog-sidebar-nav__item${active ? ' catalog-sidebar-nav__item--active' : ''}${empty ? ' opacity-60' : ''}`}
           >
-            <span>{label}</span>
-            {item.events > 0 ? <span className="catalog-sidebar-nav__count">{item.events}</span> : null}
+            <span className="catalog-sidebar-nav__name">{label}</span>
+            {item.events > 0 ? (
+              <span className="catalog-sidebar-nav__count">{item.events}</span>
+            ) : null}
           </Link>
         );
       })}
       {overflow.length > 0 ? (
-        <button type="button" onClick={onOpenMore} className="catalog-sidebar-nav__item text-primary">
-          <span>Ещё категории</span>
+        <button type="button" onClick={onOpenMore} className="catalog-sidebar-nav__item catalog-sidebar-nav__item--more">
+          <span className="catalog-sidebar-nav__name">Ещё категории</span>
           <span className="catalog-sidebar-nav__count">{overflow.length}</span>
         </button>
       ) : null}
@@ -1263,6 +1423,36 @@ function FiltersButton({
       ) : null}
     </button>
   );
+}
+
+function mergeAdvancedFilters(
+  filters: CatalogFilterValues,
+  qDraft: string,
+  next: {
+    dateFrom: string;
+    dateTo: string;
+    date?: string;
+    minPrice: string;
+    maxPrice: string;
+    ageMax: number;
+    landing: string;
+  },
+): CatalogFilterValues {
+  const minPrice = next.minPrice === 'all' ? undefined : Number(next.minPrice);
+  const maxPrice = next.maxPrice === 'all' ? undefined : Number(next.maxPrice);
+  const hasRange = Boolean(next.dateFrom || next.dateTo);
+  return {
+    ...filters,
+    q: qDraft.trim() || filters.q,
+    date: hasRange ? undefined : next.date || undefined,
+    from: next.dateFrom || undefined,
+    to: next.dateTo || undefined,
+    minPrice: Number.isFinite(minPrice) ? minPrice : undefined,
+    maxPrice: Number.isFinite(maxPrice) ? maxPrice : undefined,
+    ageMax: next.ageMax >= 0 ? next.ageMax : undefined,
+    landing: next.landing === 'all' ? undefined : next.landing,
+    page: undefined,
+  };
 }
 
 function applyAdvanced(

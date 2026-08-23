@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Suspense, useMemo, type ReactNode } from 'react';
 
 import { BlogFeaturedHero } from '@/components/BlogFeaturedHero';
+import { BlogListingSidebar } from '@/components/BlogListingSidebar';
 import { BlogListFiltered } from '@/components/BlogListFiltered.client';
 import { BlogListHero } from '@/components/BlogListHero';
 import { cityFilterLabel } from '@/lib/blog-meta';
@@ -52,6 +53,16 @@ export function BlogListingBody({
       featured={featured}
       hotPosts={hot}
       hotMinPrices={hotMinPrices}
+      afishaPromos={afishaPromos}
+      afishaFallbackCityName={afishaFallbackCityName}
+      afishaFallbackCitySlug={featured?.citySlug}
+      hideAsideOnDesktop
+    />
+  ) : null;
+
+  const sidebarSlot: ReactNode = featured ? (
+    <BlogListingSidebar
+      hotPosts={hot}
       afishaPromos={afishaPromos}
       afishaFallbackCityName={afishaFallbackCityName}
       afishaFallbackCitySlug={featured?.citySlug}
@@ -105,6 +116,7 @@ export function BlogListingBody({
             initialFilters={initialFilters}
             featuredSlot={featuredSlot}
             editorialQuote={editorialQuote}
+            sidebarSlot={sidebarSlot}
           />
         </Suspense>
 

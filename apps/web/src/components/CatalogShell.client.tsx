@@ -288,7 +288,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
       </div>
 
       {/* Meta слева; sort только mobile; view справа */}
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 sm:mt-5">
+      <div className="catalog-meta-row mt-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 sm:mt-4">
         <p className="min-w-0 text-sm text-graphite-muted">
           {loading && !catalog ? 'Загрузка…' : null}
           {/* Event count: sm+ only - mobile keeps the row for sort + view. */}

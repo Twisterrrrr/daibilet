@@ -53,11 +53,11 @@ const SLOT_CHIP_PURCHASE_CLASS =
   'transition hover:bg-primary/10 hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40';
 
 const DETAILS_LINK_CLASS =
-  'relative z-[2] inline-flex min-h-8 shrink-0 items-center justify-center gap-1 whitespace-nowrap rounded-full bg-primary-600 px-2.5 py-1 text-xs font-bold text-white transition hover:bg-primary-700 sm:min-h-9 sm:px-3 sm:text-sm';
+  'event-card__buy-btn relative z-[2] inline-flex min-h-8 shrink-0 items-center justify-center gap-1 whitespace-nowrap rounded-lg px-3 py-2 text-xs font-semibold sm:min-h-9 sm:px-3.5 sm:text-sm';
 
 /** Rail / city-hub cards: wider horizontal padding so label is not flush to pill edges. */
 const SHOWCASE_BUY_CTA_CLASS =
-  'inline-flex shrink-0 items-center justify-center gap-0.5 whitespace-nowrap rounded-lg bg-primary-600 px-2.5 py-[5px] text-[11px] font-semibold leading-none text-white';
+  'event-card__buy-btn inline-flex shrink-0 items-center justify-center gap-0.5 whitespace-nowrap rounded-lg px-2.5 py-[5px] text-[11px] font-semibold leading-none';
 
 const TITLE_LINK_CLASS =
   'relative z-[2] font-display text-ui-sm font-bold leading-snug text-graphite transition-colors hover:text-primary-600 sm:text-base';
@@ -322,7 +322,7 @@ export function EventCard({
             <LandingPurchaseButton
               session={session}
               label={hasPrice ? `Купить от ${formatPriceRub(session.priceFrom)} ₽` : 'Купить'}
-              className="relative z-[2] inline-flex w-full items-center justify-center rounded-xl bg-primary-600 px-3 py-2.5 text-ui-sm font-semibold text-white hover:bg-primary-700"
+              className="event-card__buy-btn relative z-[2] inline-flex w-full items-center justify-center rounded-xl px-3 py-2.5 text-ui-sm font-semibold"
             />
           ) : (
             <>

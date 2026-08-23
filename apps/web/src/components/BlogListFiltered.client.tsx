@@ -81,6 +81,7 @@ export function BlogListFiltered({
   initialFilters,
   featuredSlot = null,
   editorialQuote = null,
+  sidebarSlot = null,
 }: {
   posts: BlogCardDto[];
   /** Full blog list for city filter dropdown counts (without hero split). */
@@ -93,6 +94,8 @@ export function BlogListFiltered({
   featuredSlot?: ReactNode;
   /** Short quote for magazine editorial break (from featured excerpt). */
   editorialQuote?: string | null;
+  /** Desktop sidebar: popular posts, promos, Telegram. */
+  sidebarSlot?: ReactNode;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -282,24 +285,24 @@ export function BlogListFiltered({
   );
 
   return (
-    <div>
-      {/*
-        Materials filter MUST sit immediately under BlogListHero, before featured/feed.
-        City/author row is visible on mobile and desktop (desktop-parity).
-      */}
-      {filtersBar}
+    <div className="blog-layout">
+      <div className="blog-layout__main min-w-0">
+        {filtersBar}
 
-      {hasActive ? (
-        <>
-          <div className="mb-8">{feedBody}</div>
-          {featuredSlot}
-        </>
-      ) : (
-        <>
-          {featuredSlot}
-          {feedBody}
-        </>
-      )}
+        {hasActive ? (
+          <>
+            <div className="mb-8">{feedBody}</div>
+            {featuredSlot}
+          </>
+        ) : (
+          <>
+            {featuredSlot}
+            {feedBody}
+          </>
+        )}
+      </div>
+
+      {sidebarSlot ? <div className="hidden lg:block">{sidebarSlot}</div> : null}
     </div>
   );
 }

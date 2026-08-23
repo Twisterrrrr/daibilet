@@ -148,7 +148,7 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
   return (
     <>
       <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-200/60 bg-white/80 pt-[env(safe-area-inset-top,0px)] shadow-[0_1px_0_hsl(210_9%_11%/0.04)] backdrop-blur-xl supports-[backdrop-filter]:bg-white/70">
-        <div className="container-page flex min-h-[var(--site-header-height)] items-center justify-between gap-3 py-2.5 sm:gap-4 sm:py-3 lg:gap-6 lg:py-3.5 xl:gap-10 2xl:gap-12">
+        <div className="container-header flex min-h-[var(--site-header-height)] items-center justify-between py-2.5 sm:py-3 lg:py-3.5">
           <div className="flex min-w-0 flex-1 flex-nowrap items-center gap-2 sm:gap-3 lg:flex-none lg:gap-4 xl:gap-5">
             {/* Mobile: burger left (owner); desktop nav stays in center/right chrome. */}
             <div className="lg:hidden">
@@ -165,7 +165,7 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
 
           <nav
             aria-label="Основная навигация"
-            className={`min-w-0 items-center gap-0.5 lg:gap-1 xl:gap-2 2xl:gap-2.5 ${compactHeader ? 'hidden' : 'hidden lg:flex'}`}
+            className={`min-w-0 items-center gap-[var(--header-menu-gap)] ${compactHeader ? 'hidden' : 'hidden lg:flex'}`}
           >
             {navLinks.map((item) => {
               const active = isNavActive(pathname, item.href, item.label);
@@ -190,7 +190,7 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
             })}
           </nav>
 
-          <div className="flex shrink-0 items-center gap-1 sm:gap-1.5 xl:gap-2.5 2xl:gap-3">
+          <div className="flex shrink-0 items-center gap-[var(--header-icons-gap)]">
             {/* Desktop ultrawide: city next to search (left cluster stays logo-only). */}
             <CityPicker
               cities={destinations}
@@ -212,12 +212,12 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
             <DayRouteBadge />
             <FavoritesHeaderButton onClick={() => setFavoritesOpen(true)} />
 
-            <div className="hidden items-center gap-1 lg:flex">
+            <div className="hidden items-center gap-[var(--header-icons-gap)] lg:flex">
               <Link
                 href="/help"
                 title="Помощь и FAQ"
                 aria-label="Помощь и FAQ"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-graphite-muted transition hover:bg-surface-muted hover:text-graphite"
+                className="site-header-icon-link h-10 w-10"
               >
                 <HelpCircle className="h-5 w-5" strokeWidth={1.75} />
               </Link>
@@ -279,7 +279,7 @@ function FavoritesHeaderButton({ onClick }: { onClick: () => void }) {
       title="Избранное"
       data-favorites-count={count}
       onClick={onClick}
-      className="relative inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-graphite-muted transition hover:bg-surface-muted hover:text-graphite"
+      className="site-header-icon-link relative h-10 w-10 shrink-0"
     >
       <Heart className="h-5 w-5" strokeWidth={1.75} />
       {count > 0 ? (
