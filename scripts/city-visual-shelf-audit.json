@@ -1,0 +1,498 @@
+{
+  "thresh": 2,
+  "shelfN": 12,
+  "summary": [
+    {
+      "city": "tula",
+      "d0": 26,
+      "clusters": 3,
+      "shelfPairs": 2,
+      "regen": 8
+    },
+    {
+      "city": "volgograd",
+      "d0": 90,
+      "clusters": 17,
+      "shelfPairs": 2,
+      "regen": 4
+    },
+    {
+      "city": "chelyabinsk",
+      "d0": 178,
+      "clusters": 7,
+      "shelfPairs": 1,
+      "regen": 3
+    },
+    {
+      "city": "samara",
+      "d0": 331,
+      "clusters": 1,
+      "shelfPairs": 0,
+      "regen": 0
+    }
+  ],
+  "cities": {
+    "samara": {
+      "city": "samara",
+      "files": 77,
+      "d0": 331,
+      "pairs": 465,
+      "clusters": 1,
+      "topCluster": 31,
+      "mustSeeCount": 51,
+      "shelfFiles": [
+        "samarskaya-naberezhnaya.jpg",
+        "muzey-samara-kosmicheskaya.jpg",
+        "bunker-stalina.jpg",
+        "zhigulevskiy-pivovarennyy-zavod.jpg",
+        "ulitsa-leningradskaya.jpg",
+        "ploschad-slavy.jpg",
+        "monument-slavy.jpg",
+        "pamyatnik-grigoriyu-zasekinu.jpg",
+        "pamyatnik-tovarischu-suhovu.jpg",
+        "skulptura-burlaki-na-volge.jpg",
+        "pamyatnik-kuybyshevu.jpg",
+        "pamyatnik-yuriyu-detochkinu.jpg"
+      ],
+      "identity": [
+        "identity-space.jpg",
+        "identity-architecture.jpg",
+        "identity-art.jpg",
+        "identity-gastro.jpg"
+      ],
+      "scenarioCovers": [
+        "ulitsa-leningradskaya.jpg",
+        "fabrika-kuhnya-zim.jpg",
+        "pamyatnik-dyade-stepe.jpg",
+        "muzey-samara-kosmicheskaya.jpg"
+      ],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "chelyabinsk": {
+      "city": "chelyabinsk",
+      "files": 111,
+      "d0": 178,
+      "pairs": 687,
+      "clusters": 7,
+      "topCluster": 58,
+      "mustSeeCount": 65,
+      "shelfFiles": [
+        "skaz-ob-urale.jpg",
+        "pamyatnik-kurchatovu.jpg",
+        "pamyatnik-levshe.jpg",
+        "pamyatnik-nishchemu.jpg",
+        "pamyatnik-tankistam-dobrovoltsam.jpg",
+        "hodok-s-sobakoy.jpg",
+        "roza-vetrov.jpg",
+        "pamyatnik-glinke.jpg",
+        "pamyatnik-izvozchiku.jpg",
+        "pamyatnik-orlenku.jpg",
+        "venskiy-vals.jpg",
+        "pamyatnik-prokofievu.jpg"
+      ],
+      "identity": [
+        "identity-symbol.jpg",
+        "identity-architecture.jpg",
+        "identity-art.jpg",
+        "identity-gastro.jpg"
+      ],
+      "scenarioCovers": [
+        "passage-yaushevyh.jpg",
+        "dom-oblispolkoma.jpg",
+        "osobnyak-arhipova.jpg",
+        "gosudarstvennyy-istoricheskiy-muzey-yuzhnogo-urala.jpg"
+      ],
+      "shelfPairs": 1,
+      "regen": [
+        {
+          "stem": "pamyatnik-prokofievu",
+          "file": "pamyatnik-prokofievu.jpg",
+          "cluster": [],
+          "keeper": null,
+          "reason": "small"
+        },
+        {
+          "stem": "passage-yaushevyh",
+          "file": "passage-yaushevyh.jpg",
+          "cluster": [
+            "arkaim-gora-shamanka-lysaya",
+            "arkaim-muzey-prirody-i-cheloveka",
+            "arkaim-muzey-vosssozdanogo-poseleniya",
+            "arkaim-vetryanaya-melnitsa",
+            "brudershaft",
+            "chelyabinsk-siti",
+            "chtz",
+            "dom-pechati",
+            "elevator",
+            "experimentus",
+            "gorodskoy-bor",
+            "hram-aleksandra-nevskogo",
+            "hram-georgiya-pobedonostsa",
+            "hram-ioanna-voina",
+            "izumrudnyy-karer",
+            "kaslinskaya-64",
+            "katolicheskiy-hram",
+            "kofeynya-udobno",
+            "muzey-geologii-garmoniya",
+            "muzey-istorii-chtz",
+            "muzey-izobrazitelnyh-iskusstv",
+            "muzey-yuzhno-uralskoy-zheleznoy-dorogi",
+            "odigitrievskiy-monastyr",
+            "organnyy-zal-rodina",
+            "pamyatnik-leninu",
+            "pamyatnik-osnovatelyam",
+            "pamyatnik-prokofievu",
+            "passage-yaushevyh",
+            "po-chesnoku",
+            "pochtovyy-muzey",
+            "restoran-kupecheskiy",
+            "sobornaya-mechet",
+            "staryy-kraevedcheskiy",
+            "taganay-belyy-klyuch",
+            "taganay-kamennaya-reka",
+            "taganay-lestnitsa",
+            "taganay-meteostantsiya",
+            "taganay-perya",
+            "taganay-usadba",
+            "teatr-kukol-volkhovskiy",
+            "teatr-opery-glinki",
+            "troitskaya-tserkov",
+            "turgoyak-buhta-trimaranov",
+            "turgoyak-ekotropa",
+            "turgoyak-simvol-very",
+            "uvildy-mys-krasnyy",
+            "uvildy-ostrov-golodai",
+            "uvildy-ostrov-vyazovyy",
+            "uvildy-radonovyy-byuvet",
+            "uvildy-tsentralnyy-plyazh",
+            "venskiy-vals",
+            "zyuratkul-ekotropa-na-hrebet",
+            "zyuratkul-gora-lukash",
+            "zyuratkul-kipyashchiy-klyuch",
+            "zyuratkul-maralovaya-ferma",
+            "zyuratkul-reka-bolshaya-satka",
+            "zyuratkul-skaly-medvedi",
+            "zyuratkul-vysokogornoe-ozero"
+          ],
+          "keeper": "pamyatnik-prokofievu"
+        },
+        {
+          "stem": "venskiy-vals",
+          "file": "venskiy-vals.jpg",
+          "cluster": [
+            "arkaim-gora-shamanka-lysaya",
+            "arkaim-muzey-prirody-i-cheloveka",
+            "arkaim-muzey-vosssozdanogo-poseleniya",
+            "arkaim-vetryanaya-melnitsa",
+            "brudershaft",
+            "chelyabinsk-siti",
+            "chtz",
+            "dom-pechati",
+            "elevator",
+            "experimentus",
+            "gorodskoy-bor",
+            "hram-aleksandra-nevskogo",
+            "hram-georgiya-pobedonostsa",
+            "hram-ioanna-voina",
+            "izumrudnyy-karer",
+            "kaslinskaya-64",
+            "katolicheskiy-hram",
+            "kofeynya-udobno",
+            "muzey-geologii-garmoniya",
+            "muzey-istorii-chtz",
+            "muzey-izobrazitelnyh-iskusstv",
+            "muzey-yuzhno-uralskoy-zheleznoy-dorogi",
+            "odigitrievskiy-monastyr",
+            "organnyy-zal-rodina",
+            "pamyatnik-leninu",
+            "pamyatnik-osnovatelyam",
+            "pamyatnik-prokofievu",
+            "passage-yaushevyh",
+            "po-chesnoku",
+            "pochtovyy-muzey",
+            "restoran-kupecheskiy",
+            "sobornaya-mechet",
+            "staryy-kraevedcheskiy",
+            "taganay-belyy-klyuch",
+            "taganay-kamennaya-reka",
+            "taganay-lestnitsa",
+            "taganay-meteostantsiya",
+            "taganay-perya",
+            "taganay-usadba",
+            "teatr-kukol-volkhovskiy",
+            "teatr-opery-glinki",
+            "troitskaya-tserkov",
+            "turgoyak-buhta-trimaranov",
+            "turgoyak-ekotropa",
+            "turgoyak-simvol-very",
+            "uvildy-mys-krasnyy",
+            "uvildy-ostrov-golodai",
+            "uvildy-ostrov-vyazovyy",
+            "uvildy-radonovyy-byuvet",
+            "uvildy-tsentralnyy-plyazh",
+            "venskiy-vals",
+            "zyuratkul-ekotropa-na-hrebet",
+            "zyuratkul-gora-lukash",
+            "zyuratkul-kipyashchiy-klyuch",
+            "zyuratkul-maralovaya-ferma",
+            "zyuratkul-reka-bolshaya-satka",
+            "zyuratkul-skaly-medvedi",
+            "zyuratkul-vysokogornoe-ozero"
+          ],
+          "keeper": "pamyatnik-prokofievu"
+        }
+      ]
+    },
+    "volgograd": {
+      "city": "volgograd",
+      "files": 75,
+      "d0": 90,
+      "pairs": 142,
+      "clusters": 17,
+      "topCluster": 10,
+      "mustSeeCount": 52,
+      "shelfFiles": [
+        "mamaev-kurgan.jpg",
+        "stoyat-nasmert.jpg",
+        "pamyatnik-panikakhe.jpg",
+        "skorb-materi.jpg",
+        "pamyatnik-holzunovu.jpg",
+        "pamyatnik-mirnym-zhitelyam.jpg",
+        "kleymo-voyny.jpg",
+        "pamyatnik-sobakam-podryvnikam.jpg",
+        "pamyatnik-aleksandru-nevskomu.jpg",
+        "pamyatnik-holzunovu-naberezhnaya.jpg",
+        "znamya-pobedy.jpg",
+        "t-34-chelyabinskiy-kolkhoznik.jpg"
+      ],
+      "identity": [
+        "identity-architecture.jpg",
+        "identity-art.jpg",
+        "identity-gastro.jpg",
+        "identity-symbol.jpg"
+      ],
+      "scenarioCovers": [
+        "muzey-panorama-stalingradskaya-bitva.jpg",
+        "mamaev-kurgan.jpg",
+        "tsentral-naya-naberezhnaya-imeni-62-y-armii.jpg",
+        "volgogradskiy-metrotram.jpg"
+      ],
+      "shelfPairs": 2,
+      "regen": [
+        {
+          "stem": "pamyatnik-holzunovu-naberezhnaya",
+          "file": "pamyatnik-holzunovu-naberezhnaya.jpg",
+          "cluster": [
+            "gastrobar-bulgakov",
+            "identity-architecture",
+            "pamyatnik-holzunovu-naberezhnaya"
+          ],
+          "keeper": "identity-architecture"
+        },
+        {
+          "stem": "pamyatnik-mirnym-zhitelyam",
+          "file": "pamyatnik-mirnym-zhitelyam.jpg",
+          "cluster": [
+            "muzey-panorama-stalingradskaya-bitva",
+            "pamyatnik-leninu-volgo-don",
+            "pamyatnik-mirnym-zhitelyam",
+            "pamyatnik-panikakhe",
+            "planetariy",
+            "sarepta-kirkha",
+            "smotrovaya-mamaeva-kurgana",
+            "stalingradskiy-topol",
+            "street-art-tsaritsa",
+            "teatr-kukol"
+          ],
+          "keeper": "muzey-panorama-stalingradskaya-bitva"
+        },
+        {
+          "stem": "pamyatnik-panikakhe",
+          "file": "pamyatnik-panikakhe.jpg",
+          "cluster": [
+            "muzey-panorama-stalingradskaya-bitva",
+            "pamyatnik-leninu-volgo-don",
+            "pamyatnik-mirnym-zhitelyam",
+            "pamyatnik-panikakhe",
+            "planetariy",
+            "sarepta-kirkha",
+            "smotrovaya-mamaeva-kurgana",
+            "stalingradskiy-topol",
+            "street-art-tsaritsa",
+            "teatr-kukol"
+          ],
+          "keeper": "muzey-panorama-stalingradskaya-bitva"
+        },
+        {
+          "stem": "pamyatnik-sobakam-podryvnikam",
+          "file": "pamyatnik-sobakam-podryvnikam.jpg",
+          "cluster": [
+            "pamyatnik-holzunovu",
+            "pamyatnik-sobakam-podryvnikam",
+            "sarepta-dom-holostyh-bratyev"
+          ],
+          "keeper": "pamyatnik-holzunovu"
+        }
+      ]
+    },
+    "tula": {
+      "city": "tula",
+      "files": 86,
+      "d0": 26,
+      "pairs": 195,
+      "clusters": 3,
+      "topCluster": 29,
+      "mustSeeCount": 50,
+      "shelfFiles": [
+        "pamyatnik-levshe.jpg",
+        "skulptura-tulskiy-pryanik.jpg",
+        "pamyatnik-nikite-demidovu.jpg",
+        "art-tulskoe-chaepitie.jpg",
+        "pamyatnik-svodnomu-otryadu-chekistov.jpg",
+        "skulptura-tulskiy-dinozavr.jpg",
+        "pamyatnik-veresaevu.jpg",
+        "pamyatnik-petru-i.jpg",
+        "pamyatnik-zashchitnikam-tuly.jpg",
+        "art-ezh-patriot.jpg",
+        "pamyatnik-hvostu.jpg",
+        "pamyatnik-rudnevu.jpg"
+      ],
+      "identity": [
+        "identity-symbol.jpg",
+        "identity-architecture.jpg",
+        "identity-art.jpg",
+        "identity-gastro.jpg"
+      ],
+      "scenarioCovers": [
+        "tul-skiy-kreml.jpg",
+        "muzey-oruzhiya-shlem.jpg",
+        "tvorcheskiy-industrial-nyy-klaster-oktava.jpg"
+      ],
+      "shelfPairs": 2,
+      "regen": [
+        {
+          "stem": "identity-architecture",
+          "file": "identity-architecture.jpg",
+          "cluster": [],
+          "keeper": null,
+          "reason": "small"
+        },
+        {
+          "stem": "identity-art",
+          "file": "identity-art.jpg",
+          "cluster": [],
+          "keeper": null,
+          "reason": "small"
+        },
+        {
+          "stem": "pamyatnik-hvostu",
+          "file": "pamyatnik-hvostu.jpg",
+          "cluster": [],
+          "keeper": null,
+          "reason": "small"
+        },
+        {
+          "stem": "pamyatnik-petru-i",
+          "file": "pamyatnik-petru-i.jpg",
+          "cluster": [],
+          "keeper": null,
+          "reason": "small"
+        },
+        {
+          "stem": "pamyatnik-rudnevu",
+          "file": "pamyatnik-rudnevu.jpg",
+          "cluster": [
+            "bashnya-odoevskih-vorot",
+            "blagoveshchenskaya-tserkov",
+            "hram-sergiya-radonezhskogo",
+            "kafe-pryanosti-i-radosti",
+            "kreativnoe-prostranstvo-iskra",
+            "kremlevskiy-skver",
+            "kulikovo-pole-slianie-don-nepryadva",
+            "kulikovo-pole",
+            "muzey-garmoni-deda-filimona",
+            "muzey-tulskie-samovary",
+            "oblastnoy-hudozhestvennyy-muzey",
+            "osobnyak-belolipetskih",
+            "pamyatnik-hvostu",
+            "pamyatnik-rudnevu",
+            "pamyatnik-uchenomu-kotu",
+            "polenovo-bolshoy-dom",
+            "polenovo",
+            "restoran-kultura",
+            "rogozhinskiy-park",
+            "usadba-ermolaeva-zvereva",
+            "uspenskiy-sobor-kremlya",
+            "vsekhsvyatskiy-kafedralnyy-sobor",
+            "yasnaya-polyana-mogila",
+            "yasnaya-polyana-prud",
+            "yasnaya-polyana-skameyka",
+            "yasno-pole-dom-byk",
+            "yasno-pole-konnyy-kompleks",
+            "yasno-pole-portal-vremeni",
+            "yasno-pole"
+          ],
+          "keeper": "pamyatnik-hvostu"
+        },
+        {
+          "stem": "pamyatnik-svodnomu-otryadu-chekistov",
+          "file": "pamyatnik-svodnomu-otryadu-chekistov.jpg",
+          "cluster": [],
+          "keeper": null,
+          "reason": "small"
+        },
+        {
+          "stem": "pamyatnik-veresaevu",
+          "file": "pamyatnik-veresaevu.jpg",
+          "cluster": [
+            "art-gribnaya-polyana",
+            "bashnya-pyatnitskih-vorot",
+            "dom-lisitsynyh",
+            "dom-muzey-veresaeva",
+            "istoriko-memorialnyy-muzey-demidovyh",
+            "kulikovo-pole-alleya-pamyati",
+            "kulikovo-pole-hram-sergiya",
+            "kulikovo-pole-kolonna-dmitriyu-donskomu",
+            "kulikovo-pole-maket-bitvy",
+            "kulikovo-pole-muzey-epifani",
+            "kulikovo-pole-muzeynyy-kompleks",
+            "muzey-dpi-tsentr-semeynoy-istorii",
+            "muzey-stanka-oktava",
+            "pamyatnik-sotrudnikam-gosbezopasnosti",
+            "pamyatnik-svodnomu-otryadu-chekistov",
+            "pamyatnik-veresaevu",
+            "park-belousova",
+            "polenovo-abbatstvo",
+            "polenovo-admiralteystvo",
+            "polenovo-svyatoy-istochnik",
+            "staraya-tulskaya-apteka",
+            "vodyanye-vorota",
+            "yasnaya-polyana-fligel-kuzminskih",
+            "yasno-pole-eko-ferma",
+            "yasno-pole-prudy"
+          ],
+          "keeper": "pamyatnik-svodnomu-otryadu-chekistov"
+        },
+        {
+          "stem": "pamyatnik-zashchitnikam-tuly",
+          "file": "pamyatnik-zashchitnikam-tuly.jpg",
+          "cluster": [
+            "ivanovskaya-bashnya",
+            "pamyatnik-petru-i",
+            "pamyatnik-zashchitnikam-tuly",
+            "polenovo-fahverkovyy-saray",
+            "polenovo-troitskaya-tserkov-behovo",
+            "polenovo-tropa-k-oke",
+            "torgovye-ryady-kremlya",
+            "yasnaya-polyana-dom-muzey",
+            "yasnaya-polyana-pashnya",
+            "yasno-pole-otel-kovcheg",
+            "yasno-pole-syrovarnya"
+          ],
+          "keeper": "pamyatnik-petru-i"
+        }
+      ]
+    }
+  }
+}
