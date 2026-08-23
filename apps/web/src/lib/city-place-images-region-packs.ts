@@ -214,4 +214,5 @@ export const CITY_IDENTITY_FALLBACK: Record<string, string> = {
   krasnodar: '/images/venues/krasnodar/identity-chill.jpg',
   krasnoyarsk: '/images/venues/krasnoyarsk/identity-siberia.jpg',
   ekaterinburg: '/images/venues/ekaterinburg/identity-rock.jpg',
+  'nizhny-novgorod': '/images/venues/nizhny-novgorod/identity-symbol.jpg',
 };

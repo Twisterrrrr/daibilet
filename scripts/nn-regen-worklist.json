@@ -1,207 +1,68 @@
 {
   "city": "nizhny-novgorod",
-  "done": ["aleksandrovskiy-sad"],
-  "pending": [
-    {
-      "stem": "gosbank-nnov",
-      "name": "Государственный банк",
-      "prompt": "Photorealistic wide 16:9 travel photo: ornate neo-Russian fairy-tale terem State Bank building on Bolshaya Pokrovskaya street Nizhny Novgorod, colorful carved wood facade, sunny day, editorial tourism, no text, no watermark"
-    },
-    {
-      "stem": "ploshchad-minina",
-      "name": "Площадь Минина и Пожарского",
-      "prompt": "Photorealistic wide 16:9 travel photo: Minin and Pozharsky monument on central square with Nizhny Novgorod Kremlin red brick walls behind, cobblestone, blue sky, editorial tourism, no text, no watermark"
-    },
-    {
-      "stem": "shchelokovskiy-hutor",
-      "name": "Щёлоковский хутор",
-      "prompt": "Photorealistic wide 16:9 travel photo: pine forest trail and small lake at Shchelokovsky Khutor nature reserve near Nizhny Novgorod, peaceful Russian woodland, morning mist, editorial tourism, no text, no watermark"
-    },
-    {
-      "stem": "stroganovskaya-church",
-      "name": "Строгановская церковь",
-      "prompt": "Photorealistic wide 16:9 travel photo: Stroganov baroque church with ornate white stone facade and golden domes in Nizhny Novgorod, dramatic sky, editorial tourism, no text, no watermark"
-    },
-    {
-      "stem": "bezuhov-cafe",
-      "name": "Безухов",
-      "prompt": "Photorealistic wide 16:9 travel photo: cozy literary cafe interior with Volga river view through window in Nizhny Novgorod Rozhdestvenskaya quarter, warm light, wooden tables, editorial tourism, no text, no watermark"
-    },
-    {
-      "stem": "blagoveshchenskiy-monastyr",
-      "name": "Благовещенский монastырь",
-      "prompt": "Photorealistic wide 16:9 travel photo: Blagoveshchensky monastery ancient walls and church domes above Volga slope in Nizhny Novgorod, golden hour, editorial tourism, no text, no watermark"
-    },
-    {
-      "stem": "domik-kashirina",
-      "name": "Домик Каширина",
-      "prompt": "Photorealistic wide 16:9 travel photo: small wooden merchant house museum of Maxim Gorky childhood on Kashirin lane Nizhny Novgorod, historic district, editorial tourism, no text, no watermark"
-    },
-    {
-      "stem": "domik-petra",
-      "name": "Домик Петра I",
-      "prompt": "Photorealistic wide 16:9 travel photo: Petrovsky domik wooden palace of merchant Chatygin XVII century Nizhny Novgorod near Kremlin, historic architecture, editorial tourism, no text, no watermark"
-    },
-    {
-      "stem": "fonoteca-bar",
-      "name": "Фонотека",
-      "prompt": "Photorealistic wide 16:9 travel photo: vinyl records and street art mural in trendy Fonoteca bar on Bolshaya Pokrovskaya Nizhny Novgorod, evening ambient light, editorial tourism, no text, no watermark"
-    },
-    {
-      "stem": "gaz-museum",
-      "name": "Музей истории ГАЗ",
-      "prompt": "Photorealistic wide 16:9 travel photo: vintage Soviet GAZ automobile on display at GAZ history museum Nizhny Novgorod, industrial heritage hall, editorial tourism, no text, no watermark"
-    },
-    {
-      "stem": "kater-geroy",
-      "name": "Катер «Герой»",
-      "prompt": "Photorealistic wide 16:9 travel photo: Hero patrol boat memorial ship on Lower Volga embankment near Chkalov stairs Nizhny Novgorod, river panorama, editorial tourism, no text, no watermark"
-    },
-    {
-      "stem": "mednye-truby-bar",
-      "name": "Медные Трубы",
-      "prompt": "Photorealistic wide 16:9 travel photo: intimate speakeasy cocktail bar with copper pipes decor on Suetinskaya street Nizhny Novgorod, moody warm lighting, editorial tourism, no text, no watermark"
-    },
-    {
-      "stem": "mihailo-arhangelskiy-sobor",
-      "name": "Михайло-Архангельский собор",
-      "prompt": "Photorealistic wide 16:9 travel photo: Michael Archangel Cathedral inside Nizhny Novgorod Kremlin, white stone walls and green domes, editorial tourism, no text, no watermark"
-    },
-    {
-      "stem": "mitrich-restaurant",
-      "name": "Mitrich",
-      "prompt": "Photorealistic wide 16:9 travel photo: premium steakhouse dining room with dry-aged beef display Mitrich restaurant Nizhny Novgorod, elegant interior, editorial tourism, no text, no watermark"
-    },
-    {
-      "stem": "nizhne-volzhskaya-naberezhnaya",
-      "name": "Нижне-Волzhская набережная",
-      "prompt": "Photorealistic wide 16:9 travel photo: Lower Volga embankment promenade with wide river and boats Nizhny Novgorod, summer evening, editorial tourism, no text, no watermark"
-    },
-    {
-      "stem": "palaty-stroganovyh",
-      "name": "Палаты Строгановых",
-      "prompt": "Photorealistic wide 16:9 travel photo: white stone Stroganov merchant chambers XVII century Nizhny Novgorod, carved facade details, editorial tourism, no text, no watermark"
-    },
-    {
-      "stem": "park-shvejtsariya",
-      "name": "Парк Швейцария",
-      "prompt": "Photorealistic wide 16:9 travel photo: Switzerland park green hills and alleys largest city park Nizhny Novgorod, families walking, sunny day, editorial tourism, no text, no watermark"
-    },
-    {
-      "stem": "pecherskiy-monastyr",
-      "name": "Печерский монastырь",
-      "prompt": "Photorealistic wide 16:9 travel photo: Pechersky monastery with leaning bell tower above Oka river cliff Nizhny Novgorod, panoramic view, editorial tourism, no text, no watermark"
-    },
-    {
-      "stem": "photo-museum",
-      "name": "Русский музей фотографии",
-      "prompt": "Photorealistic wide 16:9 travel photo: vintage daguerreotype cameras exhibit in Russian Museum of Photography Nizhny Novgorod, museum gallery, editorial tourism, no text, no watermark"
-    },
-    {
-      "stem": "ploshchad-lyadova",
-      "name": "Площадь Лядова",
-      "prompt": "Photorealistic wide 16:9 travel photo: Lyadov square historic transport hub with old tram lines Nizhny Novgorod, urban architecture, editorial tourism, no text, no watermark"
-    },
-    {
-      "stem": "pochainskiy-bulvar",
-      "name": "Почаинский бульвар",
-      "prompt": "Photorealistic wide 16:9 travel photo: Pochain boulevard walkway above deep ravine with bridges Nizhny Novgorod, trees and city views, editorial tourism, no text, no watermark"
-    },
-    {
-      "stem": "pyatkin-traktir",
-      "name": "Пяткинъ",
-      "prompt": "Photorealistic wide 16:9 travel photo: merchant tavern Pyatkin in restored XIX century estate dining room Nizhny Novgorod, traditional Russian cuisine setting, editorial tourism, no text, no watermark"
-    },
-    {
-      "stem": "red-wall-restaurant",
-      "name": "Red Wall",
-      "prompt": "Photorealistic wide 16:9 travel photo: Red Wall restaurant terrace at foot of Kremlin wall Nizhny Novgorod, fine dining with fortress view, editorial tourism, no text, no watermark"
-    },
-    {
-      "stem": "romodanovskiy-vokzal",
-      "name": "Ромодановский вокzal",
-      "prompt": "Photorealistic wide 16:9 travel photo: restored Romodanovsky railway station building by Oka river Nizhny Novgorod, historic architecture, editorial tourism, no text, no watermark"
-    },
-    {
-      "stem": "rozhdestvenskaya-street",
-      "name": "Рождественская улица",
-      "prompt": "Photorealistic wide 16:9 travel photo: Rozhdestvenskaya street colorful historic merchant houses and cafes Nizhny Novgorod, cobblestone, editorial tourism, no text, no watermark"
-    },
-    {
-      "stem": "seledka-i-kofe",
-      "name": "Селёдka и Кофе",
-      "prompt": "Photorealistic wide 16:9 travel photo: iconic Seledka i Kofe cafe-bar on Rozhdestvenskaya street Nizhny Novgorod, retro interior and herring tapas, editorial tourism, no text, no watermark"
-    },
-    {
-      "stem": "sormovskiy-park",
-      "name": "Сормовский парк",
-      "prompt": "Photorealistic wide 16:9 travel photo: Sormovsky park pine forest and lake with amusement area Nizhny Novgorod, green summer scene, editorial tourism, no text, no watermark"
-    },
-    {
-      "stem": "staroyarmarochniy-sobor",
-      "name": "Староярмarочный собор",
-      "prompt": "Photorealistic wide 16:9 travel photo: Old Fair cathedral classical dome by Montferrand at former fairground Nizhny Novgorod, grand architecture, editorial tourism, no text, no watermark"
-    },
-    {
-      "stem": "technical-museum",
-      "name": "Технический музей",
-      "prompt": "Photorealistic wide 16:9 travel photo: antique tools and mechanical devices in Technical Museum Nizhny Novgorod, industrial heritage display, editorial tourism, no text, no watermark"
-    },
-    {
-      "stem": "usadba-rukavishnikovyh",
-      "name": "Усадьба Рукavishnikovyh",
-      "prompt": "Photorealistic wide 16:9 travel photo: Rukavishnikov merchant palace museum on Upper Volga embankment Nizhny Novgorod, ornate facade, editorial tourism, no text, no watermark"
-    },
-    {
-      "stem": "verhne-volzhskaya-naberezhnaya",
-      "name": "Верхне-Волzhская набережная",
-      "prompt": "Photorealistic wide 16:9 travel photo: Upper Volga embankment aristocratic promenade with river panorama Nizhny Novgorod, elegant lampposts, editorial tourism, no text, no watermark"
-    },
-    {
-      "stem": "yula-pizza",
-      "name": "Юla Pizza",
-      "prompt": "Photorealistic wide 16:9 travel photo: Yula Pizza neapolitan pizzeria courtyard off Pokrovka Nizhny Novgorod, wood-fired oven and cozy patio, editorial tourism, no text, no watermark"
-    },
-    {
-      "stem": "arsenal-museum",
-      "name": "Арсенал ГЦСИ",
-      "prompt": "Photorealistic wide 16:9 travel photo: contemporary art exhibition in Arsenal GES-2 center inside Nizhny Novgorod Kremlin, modern gallery space, editorial tourism, no text, no watermark"
-    },
-    {
-      "stem": "street-art-kvartaly",
-      "name": "Street-art кварталы",
-      "prompt": "Photorealistic wide 16:9 travel photo: colorful street art murals and graffiti on industrial buildings in Nizhny Novgorod creative district, urban art walk, editorial tourism, no text, no watermark"
-    },
-    {
-      "stem": "rechnaya-progulka",
-      "name": "Речная прогулка",
-      "prompt": "Photorealistic wide 16:9 travel photo: tourist river cruise boat on wide Volga river with Nizhny Novgorod Kremlin skyline, summer day, editorial tourism, no text, no watermark"
-    },
-    {
-      "stem": "identity-symbol",
-      "name": "Identity symbol",
-      "prompt": "Photorealistic wide 16:9 travel photo: iconic Nizhny Novgorod Kremlin towers and Volga-Oka confluence panorama, city symbol postcard view, golden hour, editorial tourism, no text, no watermark"
-    },
-    {
-      "stem": "identity-art",
-      "name": "Identity art",
-      "prompt": "Photorealistic wide 16:9 travel photo: contemporary art installation and creative space in Nizhny Novgorod, gallery atmosphere, editorial tourism, no text, no watermark"
-    },
-    {
-      "stem": "identity-gastro",
-      "name": "Identity gastro",
-      "prompt": "Photorealistic wide 16:9 travel photo: Volga region gastronomy spread with local fish, pickles and kvass on wooden table in Nizhny Novgorod restaurant, editorial tourism, no text, no watermark"
-    },
-    {
-      "stem": "identity-architecture",
-      "name": "Identity architecture",
-      "prompt": "Photorealistic wide 16:9 travel photo: merchant houses and carved wooden balconies on Bolshaya Pokrovskaya street Nizhny Novgorod, historic urban architecture, editorial tourism, no text, no watermark"
-    }
+  "done": [
+    "aleksandrovskiy-sad",
+    "arsenal-museum",
+    "bezuhov-cafe",
+    "blagoveshchenskiy-monastyr",
+    "domik-kashirina",
+    "domik-petra",
+    "fonoteca-bar",
+    "gaz-museum",
+    "gosbank-nnov",
+    "identity-architecture",
+    "identity-art",
+    "identity-gastro",
+    "identity-symbol",
+    "kater-geroy",
+    "mednye-truby-bar",
+    "mihailo-arhangelskiy-sobor",
+    "mitrich-restaurant",
+    "nizhne-volzhskaya-naberezhnaya",
+    "palaty-stroganovyh",
+    "park-shvejtsariya",
+    "pecherskiy-monastyr",
+    "photo-museum",
+    "ploshchad-lyadova",
+    "ploshchad-minina",
+    "pochainskiy-bulvar",
+    "pyatkin-traktir",
+    "rechnaya-progulka",
+    "red-wall-restaurant",
+    "romodanovskiy-vokzal",
+    "rozhdestvenskaya-street",
+    "seledka-i-kofe",
+    "shchelokovskiy-hutor",
+    "sormovskiy-park",
+    "staroyarmarochniy-sobor",
+    "street-art-kvartaly",
+    "stroganovskaya-church",
+    "technical-museum",
+    "usadba-rukavishnikovyh",
+    "verhne-volzhskaya-naberezhnaya",
+    "yula-pizza"
   ],
+  "pending": [],
   "excluded": [
     {
       "stem": "ribs-restaurant",
       "reason": "already has unique non-label-card image on disk"
     }
-  ]
+  ],
+  "summary": {
+    "worklistTotal": 40,
+    "installed": 40,
+    "gateRetriesOnInstall": 29,
+    "imageRegenRounds": 4,
+    "remainingFailures": 0,
+    "mapFixes": [
+      "nizhny-novgorod-ribs-restaurant -> ribs-restaurant.jpg (was mitrich-restaurant.jpg)",
+      "nizhny-novgorod-street-art-kvartaly -> street-art-kvartaly.jpg (was arsenal-gtsisi.jpg)",
+      "nizhny-novgorod-rechnaya-progulka -> rechnaya-progulka.jpg (was nizhne-volzhskaya-naberezhnaya.jpg)",
+      "EDITORIAL: street-art-kvartaly-uniq/rechnaya-progulka-uniq -> canonical stems",
+      "LABEL_CARD_VENUE_STUB_BASENAMES cleared (34 NN stubs regen'd)",
+      "CITY_IDENTITY_FALLBACK: nizhny-novgorod -> identity-symbol.jpg"
+    ],
+    "completedAt": "2026-08-23T12:00:00+03:00"
+  }
 }
