@@ -2385,6 +2385,129 @@ const SMOLENSK_SLIDES: CityIdentitySlide[] = [
   },
 ];
 
+const BARNAUL_WEATHER: CityWeatherFlavor = {
+  latitude: 53.3548,
+  longitude: 83.7698,
+  timezone: 'Asia/Barnaul',
+  outdoorSlugs: [
+    'barnaul-nagornyy-park-i-bukvy-barnaul',
+    'barnaul-gorodskaya-naberezhnaya-obi',
+    'barnaul-lentochnyy-bor',
+    'barnaul-park-izumrudnyy',
+    'barnaul-malo-tobol-skaya-ulitsa-barnaul-skiy-arbat',
+  ],
+  indoorSlugs: [
+    'barnaul-altayskiy-kraevedcheskiy-muzey',
+    'barnaul-turisticheskiy-tsentr-gornaya-apteka',
+    'barnaul-gosudarstvennyy-hudozhestvennyy-muzey-altayskogo-kraya-ghmak',
+    'barnaul-gosudarstvennaya-filarmoniya-altayskogo-kraya',
+    'barnaul-restoratsiya-gornaya-apteka',
+  ],
+  outdoorCta: 'Отличная погода для Нагорного парка, набережной Оби и прогулки по Ленточному бору',
+  indoorCtaOvercast: 'Сегодня пасмурно. Загляните в «Горную аптеку», краеведческий или художественный музей',
+  indoorCtaRain: 'Сегодня дождь. Музеи Ползунова, филармония или обед в «Горной аптеке»',
+  indoorCtaSnow: 'Сегодня снег. Лыжня в Ленточном бору, затем чай и дичь в «Горной аптеке»',
+};
+
+const BARNAUL_WHEN_TO_GO: CityWhenToGoFlavor = {
+  timeZone: 'Asia/Barnaul',
+  seasons: [
+    {
+      id: 'winter',
+      months: [12, 1, 2],
+      headline: 'Зима',
+      body: 'Настоящая сибирская сказка с сухими морозами до -25 °C и пушистым снегом. Логистика усложняется метелями, но спасает общественный транспорт. Главная фишка - лыжи в Ленточном бору прямо в черте города.',
+    },
+    {
+      id: 'spring',
+      months: [3, 4, 5],
+      headline: 'Весна',
+      body: 'Март еще зимний, стремительное таяние начинается в апреле. Дороги быстро сохнут, открывая пешеходные маршруты старого центра. В мае город зеленеет, на Оби начинается зрелищный ледоход.',
+    },
+    {
+      id: 'summer',
+      months: [6, 7, 8],
+      headline: 'Лето',
+      body: 'Жаркое и солнечное, около +25 °C. Идеальное время для прогулок, речных круизов по Оби и поездок на соленые озера. Жизнь перемещается на набережную и в уличные кафе.',
+    },
+    {
+      id: 'autumn',
+      months: [9, 10, 11],
+      headline: 'Осень',
+      body: 'Золотая пора до середины октября с мягким «бабьим летом». Транспорт и загородные трассы работают без сбоев. Городской бор окрашивается в багряные тона - отличные локации для фото.',
+    },
+  ],
+  tabs: seasonTabs({
+    spring:
+      'Март еще зимний, а в апреле быстро тает снег и открываются маршруты старого центра. В мае - зелень и ледоход на Оби. Удобный сезон для первого знакомства с купеческим Барнаулом.',
+    summer:
+      'Пик сезона: набережная, речные круизы и поездки к соленым озерам. Бронируйте жилье заранее и закладывайте вечерние прогулки на Нагорный парк.',
+    autumn:
+      'Золотой бор и комфортные экскурсии без летней жары. Сентябрь - время «Дней алтайского сыра» и спокойных прогулок по Арбату.',
+    winter:
+      'Сухие морозы и лыжня в Ленточном бору. Следите за метелями, но зимний «Алтайская зимовка» и лебеди в заказнике того стоят.',
+  }),
+};
+
+const BARNAUL_SLIDES: CityIdentitySlide[] = [
+  {
+    id: 'barnaul-bear-silver',
+    title: 'Медведь и Серебро',
+    text: 'ДНК Барнаула связан с Демидовским сереброплавильным заводом. Медведь как хозяин тайги символизирует сибирский характер: суровый, прагматичный, но способный создавать красоту из грубого камня.',
+    imageSrc: '/images/venues/barnaul/identity-symbol.jpg',
+    imageAlt: 'Символы Барнаула: медведь и серебро',
+    slugs: [
+      'barnaul-demidovskiy-stolp',
+      'barnaul-barnaul-skiy-serebroplavil-nyy-zavod-spichka',
+      'barnaul-skulptura-medved',
+    ],
+    target: 'places',
+    badge: 'Символ',
+  },
+  {
+    id: 'barnaul-mining-culture',
+    title: 'Горнозаводская культура и литература',
+    text: 'Здесь творил изобретатель Иван Ползунов и черпал вдохновение Василий Шукшин. Местное искусство пропитано темой земли, труда и просторов Алтая.',
+    imageSrc: '/images/venues/barnaul/identity-art.jpg',
+    imageAlt: 'Горнозаводская культура и литература Барнаула',
+    slugs: [
+      'barnaul-pamyatnik-polzunovu',
+      'barnaul-pamyatnik-shukshinu',
+      'barnaul-teatr-dramy-imeni-shukshina',
+    ],
+    target: 'mixed',
+    badge: 'Искусство',
+  },
+  {
+    id: 'barnaul-altai-gastro',
+    title: 'Алтайские специалитеты',
+    text: 'Барнаул - гастрономическая витрина региона: мед, сыры, облепиха и дичь. Кухня здесь про здоровье, экологичность и связь с тайгой.',
+    imageSrc: '/images/venues/barnaul/identity-gastro.jpg',
+    imageAlt: 'Алтайские специалитеты Барнаула',
+    slugs: [
+      'barnaul-restoratsiya-gornaya-apteka',
+      'barnaul-kraftovyy-restoran-biver',
+      'barnaul-malo-tobol-skaya-ulitsa-barnaul-skiy-arbat',
+    ],
+    target: 'places',
+    badge: 'Гастро',
+  },
+  {
+    id: 'barnaul-wood-architecture',
+    title: 'Сибирское барокко и деревянное зодчество',
+    text: 'Кирпичный классицизм и купеческие усадьбы с резными наличниками. Нагорный парк связывает прошлое с панорамой на Обь.',
+    imageSrc: '/images/venues/barnaul/identity-architecture.jpg',
+    imageAlt: 'Деревянное и каменное зодчество Барнаула',
+    slugs: [
+      'barnaul-dom-kuptsov-shadrinyh',
+      'barnaul-usadba-inzhenera-lesnevskogo',
+      'barnaul-nagornyy-park-i-bukvy-barnaul',
+    ],
+    target: 'places',
+    badge: 'Архитектура',
+  },
+];
+
 const OMSK_WEATHER: CityWeatherFlavor = {
   latitude: 54.984,
   longitude: 73.372,
@@ -2882,6 +3005,14 @@ export const CITY_HUB_LOCAL_FLAVOR: Record<string, CityHubLocalFlavor> = {
     slides: SMOLENSK_SLIDES,
     weather: SMOLENSK_WEATHER,
     whenToGo: SMOLENSK_WHEN_TO_GO,
+  },
+  barnaul: {
+    identityHeading: 'Чем уникален Барнаул',
+    identityLead: IDENTITY_LEAD,
+    tags: tagsFromSlides(BARNAUL_SLIDES),
+    slides: BARNAUL_SLIDES,
+    weather: BARNAUL_WEATHER,
+    whenToGo: BARNAUL_WHEN_TO_GO,
   },
   ufa: {
     identityHeading: 'Чем уникальна Уфа',

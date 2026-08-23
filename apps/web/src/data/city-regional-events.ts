@@ -1099,6 +1099,45 @@ export const CITY_REGIONAL_EVENTS: Record<string, CityRegionalEvent[]> = {
     },
   ],
 
+  barnaul: [
+    {
+      id: 'barnaul-altayskaya-zimovka-2026',
+      title: 'Зимний фестиваль «Алтайская зимовка»',
+      startDate: '2026-12-12',
+      endDate: '2026-12-13',
+      datesLabel: 'Вторые выходные декабря 2026',
+      place: 'парк «Изумрудный», набережная Оби, заказник «Лебединый»',
+      blurb:
+        'Старт зимнего туристического сезона на Алтае: гонки на собачьих упряжках, ярмарка ремесел, таежный фастфуд и экскурсии к зимующим лебедям-кликунам.',
+      sourceUrl: 'https://visitaltai.info/',
+      sourceLabel: 'visitaltai.info',
+    },
+    {
+      id: 'barnaul-altayskiy-syr-2026',
+      title: 'Гастрономический фестиваль «Дни алтайского сыра»',
+      startDate: '2026-09-01',
+      endDate: '2026-09-30',
+      datesLabel: 'Сентябрь 2026',
+      place: 'площадь Сахарова / Мало-Тобольская',
+      blurb:
+        'Крупнейший сырный праздник Сибири: дегустации, мастер-классы по сыроделию и конкурсы алтайских производителей.',
+      sourceUrl: 'https://pishcheprom.altai-krai.ru/',
+      sourceLabel: 'пищепром.алтайкрай.рф',
+    },
+    {
+      id: 'barnaul-shukshinskie-dni-2026',
+      title: 'Всероссийский фестиваль «Шукшинские дни на Алтае»',
+      startDate: '2026-07-20',
+      endDate: '2026-07-26',
+      datesLabel: 'Конец июля 2026',
+      place: 'Барнаул и село Сростки',
+      blurb:
+        'Культурный бренд региона: кинопоказы и встречи в Барнауле, финал на родине Василия Шукшина под открытым небом.',
+      sourceUrl: 'https://culture.alregn.ru/',
+      sourceLabel: 'culture.alregn.ru',
+    },
+  ],
+
   omsk: [
     {
       id: 'omsk-flora-2026',

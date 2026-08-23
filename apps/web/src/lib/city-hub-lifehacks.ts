@@ -1700,6 +1700,96 @@ const SMOLENSK_ITEMS: CityLifehackItem[] = [
   },
 ];
 
+const BARNAUL_ITEMS: CityLifehackItem[] = [
+  {
+    id: 'barnaul-transport-card',
+    tabId: 'transit',
+    icon: 'transit',
+    title: 'Экономия на проезде с картой «Транспортная»',
+    body: body(
+      'Купите в киосках «Лига Пресс» общегражданскую транспортную карту Барнаула. Проезд на трамваях, троллейбусах и автобусах ',
+      { s: 'дешевле' },
+      ', чем наличными. Карта окупается уже на третий день активных поездок по историческим маршрутам.',
+    ),
+    cta: {
+      kind: 'gis',
+      label: 'Трамваи Барнаула',
+      href: twoGisCitySearchUrl('barnaul', 'трамвай Барнаул'),
+    },
+  },
+  {
+    id: 'barnaul-nagornyy-free-view',
+    tabId: 'walk',
+    icon: 'walk',
+    title: 'Бесплатная панорама без колеса обозрения',
+    body: body(
+      'Не тратьте деньги на аттракционы ради кадров. Поднимитесь по лестнице Нагорного парка за храмом Иоанна Предтечи - оттуда ',
+      { s: 'бесплатный' },
+      ' вид на Обь, Новый мост и пойменные луга.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Нагорный парк',
+      slugs: ['barnaul-nagornyy-park-i-bukvy-barnaul', 'barnaul-ioanno-predtechenskiy-hram'],
+      scrollTo: 'places',
+    },
+  },
+  {
+    id: 'barnaul-museum-wednesday',
+    tabId: 'walk',
+    icon: 'museum',
+    title: 'Музейный день: среда ловит выгоду',
+    body: body(
+      'Государственные музеи Барнаула, включая краеведческий и художественный, часто дают ',
+      { s: 'бесплатный' },
+      ' вход или скидки в последнюю среду месяца. Планируйте культурную программу на этот день.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Музеи центра',
+      slugs: [
+        'barnaul-altayskiy-kraevedcheskiy-muzey',
+        'barnaul-gosudarstvennyy-hudozhestvennyy-muzey-altayskogo-kraya-ghmak',
+      ],
+      scrollTo: 'places',
+    },
+  },
+  {
+    id: 'barnaul-arbat-streetfood',
+    tabId: 'food',
+    icon: 'food',
+    title: 'Купеческий стритфуд на Мало-Тобольской',
+    body: body(
+      'На пешеходном Арбате в деревянных павильонах продают посикунчики, пироги с брусникой и облепиховый чай по ',
+      { s: 'низким' },
+      ' ценам. Сытно, колоритно и безопасно для кошелька.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Барнаульский Арбат',
+      slugs: ['barnaul-malo-tobol-skaya-ulitsa-barnaul-skiy-arbat', 'barnaul-art-obekt-zontik'],
+      scrollTo: 'places',
+    },
+  },
+  {
+    id: 'barnaul-filarmoniya-rehearsal',
+    tabId: 'food',
+    icon: 'museum',
+    title: 'Культура за копейки в филармонии',
+    body: body(
+      'В филармонии Алтайского края часто проходят дневные репетиции и студенческие концерты органной музыки. Билеты ',
+      { s: 'в 3-4 раза дешевле' },
+      ' вечерних программ, а акустика та же.',
+    ),
+    cta: {
+      kind: 'places',
+      label: 'Филармония',
+      slugs: ['barnaul-gosudarstvennaya-filarmoniya-altayskogo-kraya'],
+      scrollTo: 'places',
+    },
+  },
+];
+
 const UFA_ITEMS: CityLifehackItem[] = [
   {
     id: 'ufa-alga-card',
@@ -2074,6 +2164,7 @@ const CITY_HUB_LIFEHACKS: Record<string, CityLifehackPack> = {
   ryazan: lifehackPack(RYAZAN_ITEMS),
   tula: lifehackPack(TULA_ITEMS),
   smolensk: lifehackPack(SMOLENSK_ITEMS),
+  barnaul: lifehackPack(BARNAUL_ITEMS),
   ufa: lifehackPack(UFA_ITEMS),
   omsk: lifehackPack(OMSK_ITEMS),
   chelyabinsk: lifehackPack(CHELYABINSK_ITEMS),
