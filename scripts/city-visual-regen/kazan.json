@@ -5,207 +5,183 @@
     {
       "stem": "blagoveschenskiy-sobor",
       "name": "Благовещенский собор",
-      "clusterSize": 36,
+      "clusterSize": 32,
       "keeper": "azimovskaya-mechet"
     },
     {
       "stem": "bogoroditskiy-monastyr",
       "name": "Богородицкий монастырь",
-      "clusterSize": 36,
+      "clusterSize": 32,
       "keeper": "azimovskaya-mechet"
     },
     {
       "stem": "bogoyavlenskaya-kolokolnya",
       "name": "Богоявленская колокольня",
-      "clusterSize": 36,
+      "clusterSize": 32,
       "keeper": "azimovskaya-mechet"
     },
     {
       "stem": "chasy-v-tatarskom-stile",
       "name": "Часы в татарском стиле",
-      "clusterSize": 36,
+      "clusterSize": 32,
       "keeper": "azimovskaya-mechet"
     },
     {
       "stem": "dom-muzey-lenina",
       "name": "Дом-музей Ленина",
-      "clusterSize": 36,
+      "clusterSize": 32,
       "keeper": "azimovskaya-mechet"
     },
     {
       "stem": "dom-shamilya-muzey-tukaya",
       "name": "Дом Шамиля / музей Тукая",
-      "clusterSize": 36,
+      "clusterSize": 32,
       "keeper": "azimovskaya-mechet"
     },
     {
       "stem": "dom-ushkovoy",
       "name": "Дом Ушковой",
-      "clusterSize": 36,
+      "clusterSize": 32,
       "keeper": "azimovskaya-mechet"
     },
     {
       "stem": "ermitazh-kazan",
       "name": "Эрмитаж-Казань",
-      "clusterSize": 36,
+      "clusterSize": 32,
       "keeper": "azimovskaya-mechet"
     },
     {
       "stem": "fuksovskiy-sad",
       "name": "Фуксовский сад",
-      "clusterSize": 36,
+      "clusterSize": 32,
       "keeper": "azimovskaya-mechet"
     },
     {
       "stem": "gorkinsko-ometevskiy-les",
       "name": "Горкинско-Ометьевский лес",
-      "clusterSize": 36,
+      "clusterSize": 32,
       "keeper": "azimovskaya-mechet"
     },
     {
       "stem": "kareta-ekateriny-ii",
       "name": "Карета Екатерины II",
-      "clusterSize": 36,
+      "clusterSize": 32,
       "keeper": "azimovskaya-mechet"
     },
     {
       "stem": "kazanskiy-universitet",
       "name": "Казанский университет",
-      "clusterSize": 36,
+      "clusterSize": 32,
       "keeper": "azimovskaya-mechet"
     },
     {
       "stem": "mechet-al-mardzhani",
       "name": "Мечеть аль-Марджани",
-      "clusterSize": 36,
+      "clusterSize": 32,
       "keeper": "azimovskaya-mechet"
     },
     {
       "stem": "natsionalnyy-muzey-rt",
       "name": "Национальный музей РТ",
-      "clusterSize": 36,
+      "clusterSize": 32,
       "keeper": "azimovskaya-mechet"
     },
     {
       "stem": "pamyatnik-blagotvoritelyu",
       "name": "Памятник Благотворителю",
-      "clusterSize": 36,
-      "keeper": "azimovskaya-mechet"
-    },
-    {
-      "stem": "pamyatnik-drakonu-zilantu",
-      "name": "Памятник дракону Зиланту",
-      "clusterSize": 36,
-      "keeper": "azimovskaya-mechet"
-    },
-    {
-      "stem": "pamyatnik-fedoru-shalyapinu",
-      "name": "Памятник Федору Шаляпину",
-      "clusterSize": 36,
+      "clusterSize": 32,
       "keeper": "azimovskaya-mechet"
     },
     {
       "stem": "pamyatnik-karlu-fuksu",
       "name": "Памятник Карлу Фуксу",
-      "clusterSize": 36,
-      "keeper": "azimovskaya-mechet"
-    },
-    {
-      "stem": "pamyatnik-kotu-kazanskomu",
-      "name": "Памятник коту казанскому",
-      "clusterSize": 36,
-      "keeper": "azimovskaya-mechet"
-    },
-    {
-      "stem": "pamyatnik-muse-dzhaliyu",
-      "name": "Памятник Мусе Джалилю",
-      "clusterSize": 36,
+      "clusterSize": 32,
       "keeper": "azimovskaya-mechet"
     },
     {
       "stem": "pamyatnik-voinam-internatsionalistam",
       "name": "Памятник воинам-интернационалистам",
-      "clusterSize": 36,
+      "clusterSize": 32,
       "keeper": "azimovskaya-mechet"
     },
     {
       "stem": "pamyatnik-zodchim-kremlya",
       "name": "Памятник зодчим Казанского кремля",
-      "clusterSize": 36,
+      "clusterSize": 32,
       "keeper": "azimovskaya-mechet"
     },
     {
       "stem": "park-gorkogo",
       "name": "Парк Горького",
-      "clusterSize": 36,
+      "clusterSize": 32,
       "keeper": "azimovskaya-mechet"
     },
     {
       "stem": "park-pobedy",
       "name": "Парк Победы",
-      "clusterSize": 36,
+      "clusterSize": 32,
       "keeper": "azimovskaya-mechet"
     },
     {
       "stem": "petropavlovskiy-sobor",
       "name": "Петропавловский собор",
-      "clusterSize": 36,
+      "clusterSize": 32,
       "keeper": "azimovskaya-mechet"
     },
     {
       "stem": "skulptura-taykazan",
       "name": "Скульптура «Тайказан»",
-      "clusterSize": 36,
+      "clusterSize": 32,
       "keeper": "azimovskaya-mechet"
     },
     {
       "stem": "skulptura-zagadki-shurale",
       "name": "Скульптура «Загадки Шурале»",
-      "clusterSize": 36,
+      "clusterSize": 32,
       "keeper": "azimovskaya-mechet"
     },
     {
       "stem": "staro-tatarskaya-sloboda",
       "name": "Старо-Татарская слобода",
-      "clusterSize": 36,
+      "clusterSize": 32,
       "keeper": "azimovskaya-mechet"
     },
     {
       "stem": "sultanovskaya-mechet",
       "name": "Султановская мечеть",
-      "clusterSize": 36,
+      "clusterSize": 32,
       "keeper": "azimovskaya-mechet"
     },
     {
       "stem": "teatr-kamala",
       "name": "Театр имени Камала",
-      "clusterSize": 36,
+      "clusterSize": 32,
       "keeper": "azimovskaya-mechet"
     },
     {
       "stem": "teatr-opery-i-baleta",
       "name": "Театр оперы и балета",
-      "clusterSize": 36,
+      "clusterSize": 32,
       "keeper": "azimovskaya-mechet"
     },
     {
       "stem": "tsentr-semi-kazan",
       "name": "Центр семьи «Казан» (Чаша)",
-      "clusterSize": 36,
+      "clusterSize": 32,
       "keeper": "azimovskaya-mechet"
     },
     {
       "stem": "tugan-avylim",
       "name": "«Туган Авылым»",
-      "clusterSize": 36,
+      "clusterSize": 32,
       "keeper": "azimovskaya-mechet"
     },
     {
       "stem": "zakabannaya-mechet",
       "name": "Закабанная мечеть",
-      "clusterSize": 36,
+      "clusterSize": 32,
       "keeper": "azimovskaya-mechet"
     }
   ],
-  "d0": 118
+  "d0": 86
 }
