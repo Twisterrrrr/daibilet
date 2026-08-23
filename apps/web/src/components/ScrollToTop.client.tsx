@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 const SHOW_AFTER_VIEWPORTS = 1;
 
 /**
- * Back-to-top aligned to the content column (container-page / max-w-7xl), not the viewport edge.
+ * Back-to-top aligned to the content column (container-page), not the viewport edge.
  * Desktop: hide while site footer is in view so the chip does not cover legal links.
  */
 export function ScrollToTopButton() {

@@ -245,7 +245,7 @@ async function HomePageBody() {
           </div>
 
           <div className="mt-8 grid bg-[#F8F9FB] lg:grid-cols-2 lg:items-stretch">
-            <div className="flex flex-col justify-center px-4 py-10 sm:px-6 sm:py-12 lg:py-16 lg:pl-[max(2rem,calc((100vw-80rem)/2+2rem))] lg:pr-10">
+            <div className="flex flex-col justify-center px-4 py-10 sm:px-6 sm:py-12 lg:py-16 lg:pl-[max(2rem,calc((100vw-112rem)/2+2rem))] lg:pr-10">
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary-600">
                 Материал недели
               </p>

@@ -126,7 +126,7 @@ export function CitiesIndexChrome({ destinations }: { destinations: PublicDestin
       <HeroLayout
         variant="minimal"
         dense
-        containerClassName="container-page-wide"
+        containerClassName="container-page"
         breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Города' }]}
         title="Города России"
       >
@@ -220,7 +220,7 @@ export function CitiesIndexChrome({ destinations }: { destinations: PublicDestin
         </div>
       </HeroLayout>
 
-      <div id="cities-all" className="container-page-wide scroll-mt-24 bg-slate-50 py-8 sm:py-10">
+      <div id="cities-all" className="container-page scroll-mt-24 bg-slate-50 py-8 sm:py-10">
         <div className="mb-4 flex items-start justify-between gap-3 sm:mb-5">
           <div className="min-w-0">
             <h2 className="font-display text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">

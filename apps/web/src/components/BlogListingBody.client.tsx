@@ -65,7 +65,7 @@ export function BlogListingBody({
       <Suspense
         fallback={
           <div className="border-b border-slate-200 bg-slate-50">
-            <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-5 sm:px-6 sm:py-6 lg:px-8">
+            <div className="container-page flex flex-col gap-4 py-5 sm:py-6">
               <div className="h-10 w-full max-w-3xl animate-pulse rounded-lg bg-slate-200/80" />
               <div className="h-10 w-full max-w-xl animate-pulse rounded-xl bg-slate-200/70" />
               <div className="flex flex-wrap gap-1.5">
@@ -82,8 +82,8 @@ export function BlogListingBody({
         <BlogListHero breadcrumbs={breadcrumbs} />
       </Suspense>
 
-      {/* Explicit max-w + px gutter (not only .container-page) so filters/Свежее never hug viewport. */}
-      <div className="mx-auto w-full max-w-7xl px-4 pt-6 pb-10 sm:px-6 sm:pt-8 sm:pb-14 lg:px-8">
+      {/* container-page keeps filters/Свежее aligned with header/footer gutters. */}
+      <div className="container-page pt-6 pb-10 sm:pt-8 sm:pb-14">
         <Suspense
           fallback={
             <div className="space-y-4">

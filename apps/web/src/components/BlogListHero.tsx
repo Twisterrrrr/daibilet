@@ -129,7 +129,7 @@ export function BlogListHero({ breadcrumbs, cityName = null }: BlogListHeroProps
       <PageBreadcrumbBar items={breadcrumbs} />
       <section className="border-b border-slate-200 bg-slate-50">
         {/* Explicit px (same as .container-page) so gutter never depends only on @apply. */}
-        <div className="mx-auto w-full max-w-7xl px-4 py-5 sm:px-6 sm:py-6 lg:px-8">
+        <div className="container-page py-5 sm:py-6">
           {/*
             Desktop: stack like Places hub - full-width search, then wrapping topic chips.
             Side-by-side search+chips left a large empty right gutter on wide screens.

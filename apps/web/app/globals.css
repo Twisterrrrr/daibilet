@@ -70,6 +70,8 @@ html[data-nav-pending='1'] {
     --font-serif: var(--font-source-serif), Georgia, 'Times New Roman', serif;
     --site-header-height: 4rem;
     --site-header-height-compact: 3.25rem;
+    /** Content column max width (header, footer, pages). */
+    --container-page-max: 112rem;
     --bridges-gradient-hero: radial-gradient(ellipse 90% 70% at 70% 40%, oklch(0.38 0.14 265 / 0.9), transparent 70%),
       linear-gradient(135deg, oklch(0.22 0.10 265), oklch(0.30 0.13 262));
     --bridges-gradient-amber: linear-gradient(135deg, oklch(0.78 0.17 55), oklch(0.70 0.19 40));
@@ -239,15 +241,12 @@ html[data-nav-pending='1'] {
 
 @layer components {
   .container-page {
-    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+    @apply mx-auto w-full max-w-[112rem] px-4 sm:px-6 lg:px-8 xl:px-10;
   }
 
-  /**
-   * Catalog hubs that should use ultrawide width (/cities card grid).
-   * Keeps the same gutters as container-page; lifts the ~80rem ceiling.
-   */
+  /** Alias kept for hubs that explicitly opted into ultrawide before it was global. */
   .container-page-wide {
-    @apply mx-auto w-full max-w-[112rem] px-4 sm:px-6 lg:px-8 xl:px-10;
+    @apply container-page;
   }
 
   /**
@@ -255,7 +254,8 @@ html[data-nav-pending='1'] {
    * right edge (map column) bleeds to the viewport.
    */
   .my-day-desktop-bleed {
-    @apply mx-auto w-full max-w-7xl px-4 sm:px-6;
+    @apply mx-auto w-full px-4 sm:px-6;
+    max-width: var(--container-page-max);
   }
 
   @media (min-width: 1024px) {
@@ -263,7 +263,7 @@ html[data-nav-pending='1'] {
       max-width: none;
       margin-left: 0;
       margin-right: 0;
-      padding-left: max(2rem, calc((100vw - 80rem) / 2 + 2rem));
+      padding-left: max(2rem, calc((100vw - var(--container-page-max)) / 2 + 2rem));
       padding-right: 0;
       padding-bottom: 0;
     }
@@ -287,18 +287,18 @@ html[data-nav-pending='1'] {
    * Home city rail: left aligns with container-page gutter; right bleeds to edge.
    */
   .home-bleed-rail {
-    padding-left: max(1rem, calc((100vw - 80rem) / 2 + 1rem));
+    padding-left: max(1rem, calc((100vw - var(--container-page-max)) / 2 + 1rem));
   }
 
   @media (min-width: 640px) {
     .home-bleed-rail {
-      padding-left: max(1.5rem, calc((100vw - 80rem) / 2 + 1.5rem));
+      padding-left: max(1.5rem, calc((100vw - var(--container-page-max)) / 2 + 1.5rem));
     }
   }
 
   @media (min-width: 1024px) {
     .home-bleed-rail {
-      padding-left: max(2rem, calc((100vw - 80rem) / 2 + 2rem));
+      padding-left: max(2rem, calc((100vw - var(--container-page-max)) / 2 + 2rem));
     }
   }
 
