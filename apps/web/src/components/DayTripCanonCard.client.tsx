@@ -78,14 +78,13 @@ const PANEL_INSET_SM = 'sm:pl-4';
 const LOGISTICS_BG_EXTEND_SM = 'sm:-ml-4';
 
 /**
- * Desktop: keep suburb detail inside the viewport under sticky header + hub tabs + chip rail.
- * Scroll the text column - not the route chip list.
- * `min-h-0` lets the grid item shrink so overflow-y actually scrolls.
- * Ultrawide budget is tighter so photo + copy + chips fit one screen.
+ * Suburb card must fit under header + tabs + chip rail on one ultrawide screen.
+ * Columns scroll internally; cover is a fixed thumbnail (never stretch-to-row).
  */
-const HUB_DETAIL_MAX_H =
-  'sm:max-h-[calc(100dvh-var(--site-header-height)-env(safe-area-inset-top,0px)-7.5rem)] 2xl:max-h-[calc(100dvh-var(--site-header-height)-env(safe-area-inset-top,0px)-11rem)]';
-const HUB_DETAIL_SCROLL = `${HUB_DETAIL_MAX_H} sm:min-h-0 sm:overflow-y-auto`;
+const HUB_CARD_MAX_H =
+  'sm:max-h-[calc(100dvh-var(--site-header-height)-env(safe-area-inset-top,0px)-9rem)] 2xl:max-h-[calc(100dvh-var(--site-header-height)-env(safe-area-inset-top,0px)-12rem)]';
+/** Text / sights columns scroll; height capped so cover is not stretched to match. */
+const HUB_COL_SCROLL = `${HUB_CARD_MAX_H} sm:min-h-0 sm:overflow-y-auto`;
 
 export function DayTripCanonCard({
   index,
@@ -294,7 +293,7 @@ export function DayTripCanonCard({
         ariaLabel ||
         (total != null ? `${index + 1} из ${total}` : undefined)
       }
-      className={`mt-4 w-full rounded-2xl border bg-white shadow-sm ${
+      className={`mt-4 flex w-full flex-col overflow-hidden rounded-2xl border bg-white shadow-sm ${HUB_CARD_MAX_H} ${
         editorial ? 'border-zinc-200' : 'border-slate-200'
       } ${className}`}
       data-day-trip-canon="1"
@@ -307,20 +306,19 @@ export function DayTripCanonCard({
         className={
           cover
             ? triptych
-              ? 'flex flex-col sm:grid sm:min-h-0 sm:grid-cols-[minmax(10rem,24%)_minmax(0,1fr)] sm:items-start 2xl:grid-cols-[minmax(10rem,13rem)_minmax(0,1fr)_minmax(14rem,16rem)]'
-              : 'flex flex-col sm:grid sm:min-h-0 sm:grid-cols-[minmax(10rem,24%)_minmax(0,1fr)] sm:items-start'
+              ? 'grid min-h-0 flex-1 grid-cols-1 sm:grid-cols-[9.5rem_minmax(0,1fr)] sm:items-start 2xl:grid-cols-[10rem_minmax(0,1fr)_15rem]'
+              : 'grid min-h-0 flex-1 grid-cols-1 sm:grid-cols-[9.5rem_minmax(0,1fr)] sm:items-start'
             : undefined
         }
       >
       {cover ? (
         <div
-          className={`sm:flex sm:h-full sm:min-h-0 sm:flex-col sm:self-stretch ${
-            editorial ? 'sm:bg-zinc-50' : 'sm:bg-slate-50'
-          }`}
+          className={`shrink-0 ${editorial ? 'bg-zinc-50' : 'bg-slate-50'}`}
           data-day-trip-cover-col
         >
+          {/* Fixed thumbnail — never h-full / stretch with the text column */}
           <div
-            className={`relative h-40 w-full overflow-hidden rounded-t-2xl sm:h-[12.5rem] sm:max-h-[12.5rem] sm:shrink-0 sm:rounded-l-2xl sm:rounded-tr-none 2xl:h-[13.5rem] 2xl:max-h-[13.5rem] ${
+            className={`relative h-36 w-full overflow-hidden rounded-t-2xl sm:h-36 sm:w-[9.5rem] sm:rounded-none sm:rounded-tl-2xl 2xl:h-40 2xl:w-40 ${
               editorial ? 'bg-zinc-100' : 'bg-slate-100'
             }`}
             data-day-trip-cover
@@ -329,14 +327,14 @@ export function DayTripCanonCard({
               src={cover}
               alt=""
               fill
-              sizes="(max-width: 640px) 100vw, (min-width: 1536px) 208px, 24vw"
-              className="object-cover"
+              sizes="160px"
+              className="object-cover object-center"
               unoptimized
               fallback={<div className="h-full w-full bg-slate-200" />}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/25 via-transparent to-transparent sm:bg-gradient-to-r sm:from-transparent sm:to-slate-950/10" />
             <span
-              className="absolute left-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/95 text-sm font-bold tabular-nums text-slate-900 shadow-sm"
+              className="absolute left-2.5 top-2.5 flex h-7 w-7 items-center justify-center rounded-full bg-white/95 text-sm font-bold tabular-nums text-slate-900 shadow-sm"
               data-day-trip-badge
             >
               {index + 1}
@@ -345,9 +343,9 @@ export function DayTripCanonCard({
         </div>
       ) : null}
       <div
-        className={`px-3.5 py-4 sm:p-5 md:p-6 ${
+        className={`min-w-0 px-3.5 py-4 sm:p-5 md:p-6 ${
           cover ? (editorial ? 'bg-zinc-50' : 'bg-slate-50') : ''
-        } ${HUB_DETAIL_SCROLL}`}
+        } ${HUB_COL_SCROLL}`}
         data-day-trip-body="scroll"
       >
       {/*
@@ -489,7 +487,7 @@ export function DayTripCanonCard({
         <aside
           className={`hidden min-h-0 flex-col border-t 2xl:flex 2xl:border-l 2xl:border-t-0 ${
             editorial ? 'border-zinc-100 bg-zinc-50/80' : 'border-slate-100 bg-slate-50/80'
-          } ${HUB_DETAIL_SCROLL}`}
+          } ${HUB_COL_SCROLL}`}
           data-day-trip-sights
           data-day-trip-sights-layout="stack"
         >
