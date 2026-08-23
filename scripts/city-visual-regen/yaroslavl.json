@@ -1,139 +1,61 @@
 {
   "city": "yaroslavl",
-  "mustSeeCount": 54,
+  "mustSeeCount": 70,
   "regen": [
     {
-      "stem": "filarmoniya",
-      "name": "Ярославская государственная филармония",
-      "clusterSize": 5,
+      "stem": "karabikha-muzey-dedushki-mazaya",
+      "name": "karabikha muzey dedushki mazaya",
+      "clusterSize": 2,
+      "keeper": "karabikha-bolshoy-gospodskiy-dom"
+    },
+    {
+      "stem": "karabikha-nizhniy-angliyskiy-park",
+      "name": "karabikha nizhniy angliyskiy park",
+      "clusterSize": 3,
       "keeper": "demidovskiy-stolp"
     },
     {
-      "stem": "gubernatorskiy-sad",
-      "name": "Губернаторский сад",
+      "stem": "karabikha-verhniy-frantsuzskiy-park",
+      "name": "karabikha verhniy frantsuzskiy park",
       "clusterSize": 3,
-      "keeper": "art-prostranstvo-teplo"
-    },
-    {
-      "stem": "mitropolichi-palaty",
-      "name": "Митрополичьи палаты",
-      "clusterSize": 2,
-      "keeper": "identity-symbol"
-    },
-    {
-      "stem": "pamyatnik-kopeyke-1612",
-      "name": "Памятник Копейке 1612 года",
-      "clusterSize": 5,
-      "keeper": "muzey-istorii-goroda"
-    },
-    {
-      "stem": "pamyatnik-nekrasovu",
-      "name": "Памятник Некрасову",
-      "clusterSize": 2,
-      "keeper": "muzey-zarubezhnogo-iskusstva"
-    },
-    {
-      "stem": "pamyatnik-rychashemu-medvedyu",
-      "name": "Памятник Рычащему Медведю",
-      "clusterSize": 3,
-      "keeper": "damanskiy-ostrov"
-    },
-    {
-      "stem": "pivovarnya-plan-b",
-      "name": "Пивоварня «План Б»",
-      "clusterSize": 2,
-      "keeper": "demidovskiy-sad"
-    },
-    {
-      "stem": "restoran-mamuka",
-      "name": "Ресторан «Мамука»",
-      "clusterSize": 5,
-      "keeper": "muzey-istorii-goroda"
-    },
-    {
-      "stem": "restoran-penaty",
-      "name": "Ресторан «Пенаты»",
-      "clusterSize": 5,
-      "keeper": "demidovskiy-stolp"
-    },
-    {
-      "stem": "restoran-sobranie",
-      "name": "Ресторан «Собрание»",
-      "clusterSize": 2,
-      "keeper": "identity-art"
-    },
-    {
-      "stem": "skulptura-postovoy-u-zastavy",
-      "name": "Скульптура «Постовой у заставы»",
-      "clusterSize": 6,
       "keeper": "gubernatorskiy-dom"
     },
     {
-      "stem": "strelka-rek-volgi-i-kotorosli",
-      "name": "Парк на Стрелке (Нижний партер)",
-      "clusterSize": 3,
-      "keeper": "kafe-baget-pashtet"
-    },
-    {
-      "stem": "strit-art-aura",
-      "name": "Стрит-арт стена за ТЦ «Аура»",
-      "clusterSize": 3,
-      "keeper": "kafe-baget-pashtet"
-    },
-    {
-      "stem": "teatr-volkova",
-      "name": "Театр драмы имени Федора Волкова",
-      "clusterSize": 5,
-      "keeper": "muzey-istorii-goroda"
-    },
-    {
-      "stem": "tserkov-il-i-proroka",
-      "name": "Церковь Ильи Пророка",
-      "clusterSize": 3,
+      "stem": "vyatskoe-hram-voskreseniya",
+      "name": "vyatskoe hram voskreseniya",
+      "clusterSize": 2,
       "keeper": "restoran-ioann-vasilevich"
     },
     {
-      "stem": "usadba-matveevskih",
-      "name": "Усадьба Матвеевских",
-      "clusterSize": 3,
-      "keeper": "smotrovaya-zvonitsa-spasskogo"
+      "stem": "vyatskoe-kupecheskaya-pekarniya",
+      "name": "vyatskoe kupecheskaya pekarniya",
+      "clusterSize": 2,
+      "keeper": "skulptura-troitsa"
     },
     {
-      "stem": "uspenskiy-sobor",
-      "name": "Успенский кафедральный собор",
+      "stem": "vyatskoe-muzey-kuhonnoy-mashinerii",
+      "name": "vyatskoe muzey kuhonnoy mashinerii",
       "clusterSize": 3,
-      "keeper": "art-prostranstvo-teplo"
+      "keeper": "demidovskiy-stolp"
     },
     {
-      "stem": "volzhskaya-naberezhnaya",
-      "name": "Волжская набережная (верхний ярус)",
-      "clusterSize": 6,
+      "stem": "vyatskoe-muzey-russkoy-predpriimchivosti",
+      "name": "vyatskoe muzey russkoy predpriimchivosti",
+      "clusterSize": 2,
+      "keeper": "identity-gastro"
+    },
+    {
+      "stem": "vyatskoe-muzey-zabavnyh-veshchey",
+      "name": "vyatskoe muzey zabavnyh veshchey",
+      "clusterSize": 2,
+      "keeper": "pamyatnik-savve-mamontovu"
+    },
+    {
+      "stem": "vyatskoe-zvuki-vremeni",
+      "name": "vyatskoe zvuki vremeni",
+      "clusterSize": 3,
       "keeper": "gubernatorskiy-dom"
-    },
-    {
-      "stem": "volzhskaya-naberezhnaya-nizhniy-yarus",
-      "name": "Волжская набережная (нижний ярус)",
-      "clusterSize": 6,
-      "keeper": "gubernatorskiy-dom"
-    },
-    {
-      "stem": "yaroslavskiy-hudozhestvennyy-muzey",
-      "name": "Ярославский художественный музей",
-      "clusterSize": 5,
-      "keeper": "muzey-istorii-goroda"
-    },
-    {
-      "stem": "yaroslavskiy-kreml-spaso-preobrazhenskiy-monastyr",
-      "name": "Ярославский музей-заповедник (Спасский монастырь)",
-      "clusterSize": 3,
-      "keeper": "smotrovaya-zvonitsa-spasskogo"
-    },
-    {
-      "stem": "znamenskaya-bashnya",
-      "name": "Знаменская (Власьевская) башня",
-      "clusterSize": 3,
-      "keeper": "damanskiy-ostrov"
     }
   ],
-  "d0": 42
+  "d0": 11
 }

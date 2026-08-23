@@ -1,229 +1,31 @@
 {
   "city": "samara",
-  "mustSeeCount": 51,
+  "mustSeeCount": 69,
   "regen": [
     {
-      "stem": "dom-oborony",
-      "name": "Дом обороны",
-      "clusterSize": 42,
+      "stem": "gryazelechebnitsa-sergiyevsk",
+      "name": "gryazelechebnitsa sergiyevsk",
+      "clusterSize": 5,
       "keeper": "botanicheskiy-sad"
     },
     {
-      "stem": "dom-s-atlantami",
-      "name": "Дом с атлантами (Особняк Шихобаловых)",
-      "clusterSize": 42,
+      "stem": "sergievskie-mineralnye-vody",
+      "name": "sergievskie mineralnye vody",
+      "clusterSize": 5,
       "keeper": "botanicheskiy-sad"
     },
     {
-      "stem": "gril-bar-po-chesnoku",
-      "name": "Гриль-бар «По-чесноку»",
-      "clusterSize": 42,
+      "stem": "shiryaevskie-shtolni",
+      "name": "shiryaevskie shtolni",
+      "clusterSize": 5,
       "keeper": "botanicheskiy-sad"
     },
     {
-      "stem": "iverskiy-monastyr",
-      "name": "Иверский женский монастырь",
-      "clusterSize": 42,
-      "keeper": "botanicheskiy-sad"
-    },
-    {
-      "stem": "katolicheskiy-kostel-presvyatogo-serdtsa-iisusa",
-      "name": "Католический костёл Пресвятого Сердца Иисуса",
-      "clusterSize": 42,
-      "keeper": "botanicheskiy-sad"
-    },
-    {
-      "stem": "kraevedcheskiy-muzey-alabina",
-      "name": "Краеведческий музей им. П. В. Алабина",
-      "clusterSize": 42,
-      "keeper": "botanicheskiy-sad"
-    },
-    {
-      "stem": "krestyanskiy-pozemelnyy-bank",
-      "name": "Здание Крестьянского поземельного банка",
-      "clusterSize": 42,
-      "keeper": "botanicheskiy-sad"
-    },
-    {
-      "stem": "literaturnyy-muzey-gorkogo",
-      "name": "Самарский литературный музей им. М. Горького",
-      "clusterSize": 42,
-      "keeper": "botanicheskiy-sad"
-    },
-    {
-      "stem": "lyuteranskaya-kirha",
-      "name": "Лютеранская кирха Святого Георга",
-      "clusterSize": 42,
-      "keeper": "botanicheskiy-sad"
-    },
-    {
-      "stem": "monument-slavy",
-      "name": "Монумент Славы",
-      "clusterSize": 42,
-      "keeper": "botanicheskiy-sad"
-    },
-    {
-      "stem": "muzey-eldara-ryazanova",
-      "name": "Музей Эльдара Рязанова",
-      "clusterSize": 42,
-      "keeper": "botanicheskiy-sad"
-    },
-    {
-      "stem": "muzey-moderna-usadba-kurlinoy",
-      "name": "Музей Модерна (Усадьба Курлиной)",
-      "clusterSize": 42,
-      "keeper": "botanicheskiy-sad"
-    },
-    {
-      "stem": "osobnyak-fon-vakano",
-      "name": "Особняк Альфреда фон Вакано",
-      "clusterSize": 42,
-      "keeper": "botanicheskiy-sad"
-    },
-    {
-      "stem": "osobnyak-klodta",
-      "name": "Особняк Клодта",
-      "clusterSize": 42,
-      "keeper": "botanicheskiy-sad"
-    },
-    {
-      "stem": "osobnyak-neronova",
-      "name": "Особняк Неронова",
-      "clusterSize": 42,
-      "keeper": "botanicheskiy-sad"
-    },
-    {
-      "stem": "pamyatnik-aleshe-peshkovu",
-      "name": "Памятник Алеше Пешкову",
-      "clusterSize": 42,
-      "keeper": "botanicheskiy-sad"
-    },
-    {
-      "stem": "pamyatnik-dyade-stepe",
-      "name": "Памятник Дяде Стёпе",
-      "clusterSize": 42,
-      "keeper": "botanicheskiy-sad"
-    },
-    {
-      "stem": "pamyatnik-grigoriyu-zasekinu",
-      "name": "Памятник Григорию Засекину",
-      "clusterSize": 42,
-      "keeper": "botanicheskiy-sad"
-    },
-    {
-      "stem": "pamyatnik-otopitelnoy-bataree",
-      "name": "Памятник отопительной батарее",
-      "clusterSize": 42,
-      "keeper": "botanicheskiy-sad"
-    },
-    {
-      "stem": "pamyatnik-pervomu-tramvayu",
-      "name": "Памятник первому самарскому трамваю",
-      "clusterSize": 42,
-      "keeper": "botanicheskiy-sad"
-    },
-    {
-      "stem": "pamyatnik-petru-i-fevronii",
-      "name": "Памятник Петру и Февронии",
-      "clusterSize": 42,
-      "keeper": "botanicheskiy-sad"
-    },
-    {
-      "stem": "pamyatnik-tovarischu-suhovu",
-      "name": "Памятник Товарищу Сухову",
-      "clusterSize": 42,
-      "keeper": "botanicheskiy-sad"
-    },
-    {
-      "stem": "pamyatnik-yuriyu-detochkinu",
-      "name": "Памятник Юрию Деточкину",
-      "clusterSize": 42,
-      "keeper": "botanicheskiy-sad"
-    },
-    {
-      "stem": "park-gagarina",
-      "name": "Парк имени Юрия Гагарина",
-      "clusterSize": 42,
-      "keeper": "botanicheskiy-sad"
-    },
-    {
-      "stem": "pokrovskiy-sobor",
-      "name": "Покровский кафедральный собор",
-      "clusterSize": 42,
-      "keeper": "botanicheskiy-sad"
-    },
-    {
-      "stem": "samarskiy-hudozhestvennyy-muzey",
-      "name": "Самарский художественный музей",
-      "clusterSize": 42,
-      "keeper": "botanicheskiy-sad"
-    },
-    {
-      "stem": "skulptura-burlaki-na-volge",
-      "name": "Скульптура «Бурлаки на Волге»",
-      "clusterSize": 42,
-      "keeper": "botanicheskiy-sad"
-    },
-    {
-      "stem": "skulptura-dama-s-raketkoy",
-      "name": "Скульптура «Дама с ракеткой»",
-      "clusterSize": 42,
-      "keeper": "botanicheskiy-sad"
-    },
-    {
-      "stem": "skulptura-knyaz-vladimir",
-      "name": "Скульптура «Князь Владимир»",
-      "clusterSize": 42,
-      "keeper": "botanicheskiy-sad"
-    },
-    {
-      "stem": "sobornaya-mechet",
-      "name": "Самарская соборная мечеть",
-      "clusterSize": 42,
-      "keeper": "botanicheskiy-sad"
-    },
-    {
-      "stem": "strukovskiy-sad",
-      "name": "Струковский сад",
-      "clusterSize": 42,
-      "keeper": "botanicheskiy-sad"
-    },
-    {
-      "stem": "teatr-dramy-gorkogo",
-      "name": "Театр драмы им. М. Горького",
-      "clusterSize": 42,
-      "keeper": "botanicheskiy-sad"
-    },
-    {
-      "stem": "teatr-opery-i-baleta",
-      "name": "Театр оперы и балета",
-      "clusterSize": 42,
-      "keeper": "botanicheskiy-sad"
-    },
-    {
-      "stem": "volzhskiy-plyazh",
-      "name": "Волжский пляж",
-      "clusterSize": 42,
-      "keeper": "botanicheskiy-sad"
-    },
-    {
-      "stem": "yuzhnyy-gorod-amfiteatr",
-      "name": "Южный город / Парк Амфитеатр",
-      "clusterSize": 42,
-      "keeper": "botanicheskiy-sad"
-    },
-    {
-      "stem": "zagorodnyy-park",
-      "name": "Загородный парк",
-      "clusterSize": 42,
-      "keeper": "botanicheskiy-sad"
-    },
-    {
-      "stem": "zdanie-zhigulevskogo-kombinata",
-      "name": "Здание Жигулёвского пивоваренного комбината",
-      "clusterSize": 42,
+      "stem": "smotrovaya-sernovodsk",
+      "name": "smotrovaya sernovodsk",
+      "clusterSize": 5,
       "keeper": "botanicheskiy-sad"
     }
   ],
-  "d0": 672
+  "d0": 10
 }

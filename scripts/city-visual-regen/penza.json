@@ -1,7 +1,13 @@
 {
   "city": "penza",
-  "mustSeeCount": 53,
+  "mustSeeCount": 74,
   "regen": [
+    {
+      "stem": "ahuny-smotrovye-proseki",
+      "name": "Лесные тропы здоровья",
+      "clusterSize": 4,
+      "keeper": "ahuny-sanatornyy-kvartal"
+    },
     {
       "stem": "byust-radishcheva",
       "name": "Бюст А. Н. Радищева",
@@ -22,7 +28,7 @@
     },
     {
       "stem": "penzenskaya-peshehodnaya-ulitsa-moskovskaya",
-      "name": "Улица Московская",
+      "name": "Драмтеатр",
       "clusterSize": 2,
       "keeper": "ahunskiy-sosnovyy-bor"
     },

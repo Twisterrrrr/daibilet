@@ -1,295 +1,163 @@
 {
   "city": "chelyabinsk",
-  "mustSeeCount": 65,
+  "mustSeeCount": 105,
   "regen": [
     {
-      "stem": "brudershaft",
-      "name": "Пивоварня «Брудершафт»",
-      "clusterSize": 67,
+      "stem": "arkaim-muzey-prirody-i-cheloveka",
+      "name": "arkaim muzey prirody i cheloveka",
+      "clusterSize": 24,
       "keeper": "arkaim-gora-shamanka-lysaya"
     },
     {
-      "stem": "chelyabinsk-siti",
-      "name": "Смотровая «Челябинск-Сити»",
-      "clusterSize": 67,
+      "stem": "arkaim-muzey-vosssozdanogo-poseleniya",
+      "name": "arkaim muzey vosssozdanogo poseleniya",
+      "clusterSize": 24,
       "keeper": "arkaim-gora-shamanka-lysaya"
     },
     {
-      "stem": "chelyabinskiy-verblyud",
-      "name": "Челябинский верблюд",
-      "clusterSize": 67,
-      "keeper": "arkaim-gora-shamanka-lysaya"
-    },
-    {
-      "stem": "chtz",
-      "name": "Ансамбль ЧТЗ",
-      "clusterSize": 67,
-      "keeper": "arkaim-gora-shamanka-lysaya"
-    },
-    {
-      "stem": "dom-dantsigera",
-      "name": "Дом Данцигера",
-      "clusterSize": 5,
+      "stem": "arkaim-poselok-mednogo-veka",
+      "name": "arkaim poselok mednogo veka",
+      "clusterSize": 3,
       "keeper": "arkaim-gora-razuma"
     },
     {
-      "stem": "dom-oblispolkoma",
-      "name": "Дом облисполкома",
-      "clusterSize": 67,
+      "stem": "arkaim-vetryanaya-melnitsa",
+      "name": "arkaim vetryanaya melnitsa",
+      "clusterSize": 24,
       "keeper": "arkaim-gora-shamanka-lysaya"
     },
     {
-      "stem": "dom-pechati",
-      "name": "Дом печати",
-      "clusterSize": 67,
+      "stem": "taganay-belyy-klyuch",
+      "name": "taganay belyy klyuch",
+      "clusterSize": 24,
       "keeper": "arkaim-gora-shamanka-lysaya"
     },
     {
-      "stem": "elevator",
-      "name": "Элеватор Госбанка",
-      "clusterSize": 67,
+      "stem": "taganay-kamennaya-reka",
+      "name": "taganay kamennaya reka",
+      "clusterSize": 24,
       "keeper": "arkaim-gora-shamanka-lysaya"
     },
     {
-      "stem": "experimentus",
-      "name": "Научный музей «Экспериментус»",
-      "clusterSize": 67,
+      "stem": "taganay-lestnitsa",
+      "name": "taganay lestnitsa",
+      "clusterSize": 24,
       "keeper": "arkaim-gora-shamanka-lysaya"
     },
     {
-      "stem": "gorodskoy-bor",
-      "name": "Челябинский городской бор",
-      "clusterSize": 67,
+      "stem": "taganay-perya",
+      "name": "taganay perya",
+      "clusterSize": 24,
       "keeper": "arkaim-gora-shamanka-lysaya"
     },
     {
-      "stem": "hodok-s-sobakoy",
-      "name": "Скульптура «Ходок с собакой»",
-      "clusterSize": 67,
+      "stem": "taganay-usadba",
+      "name": "taganay usadba",
+      "clusterSize": 24,
       "keeper": "arkaim-gora-shamanka-lysaya"
     },
     {
-      "stem": "hram-aleksandra-nevskogo",
-      "name": "Храм Александра Невского",
-      "clusterSize": 67,
+      "stem": "turgoyak-buhta-trimaranov",
+      "name": "turgoyak buhta trimaranov",
+      "clusterSize": 24,
       "keeper": "arkaim-gora-shamanka-lysaya"
     },
     {
-      "stem": "hram-georgiya-pobedonostsa",
-      "name": "Храм Георгия Победоносца",
-      "clusterSize": 67,
+      "stem": "turgoyak-ekotropa",
+      "name": "turgoyak ekotropa",
+      "clusterSize": 24,
       "keeper": "arkaim-gora-shamanka-lysaya"
     },
     {
-      "stem": "hram-ioanna-voina",
-      "name": "Храм Иоанна Воина",
-      "clusterSize": 67,
+      "stem": "turgoyak-simvol-very",
+      "name": "turgoyak simvol very",
+      "clusterSize": 24,
       "keeper": "arkaim-gora-shamanka-lysaya"
     },
     {
-      "stem": "identity-symbol",
-      "name": "identity symbol",
-      "clusterSize": 5,
+      "stem": "uvildy-ekotropa-uvildinskie-zori",
+      "name": "uvildy ekotropa uvildinskie zori",
+      "clusterSize": 3,
       "keeper": "arkaim-gora-razuma"
     },
     {
-      "stem": "izumrudnyy-karer",
-      "name": "Изумрудный (Смолинский) карьер",
-      "clusterSize": 67,
-      "keeper": "arkaim-gora-shamanka-lysaya"
-    },
-    {
-      "stem": "kaslinskaya-64",
-      "name": "Купольный пассаж на Каслинской",
-      "clusterSize": 67,
-      "keeper": "arkaim-gora-shamanka-lysaya"
-    },
-    {
-      "stem": "katolicheskiy-hram",
-      "name": "Католический храм Непорочного Зачатия",
-      "clusterSize": 67,
-      "keeper": "arkaim-gora-shamanka-lysaya"
-    },
-    {
-      "stem": "kofeynya-udobno",
-      "name": "Кофейня UDOBNO",
-      "clusterSize": 67,
-      "keeper": "arkaim-gora-shamanka-lysaya"
-    },
-    {
-      "stem": "muzey-geologii-garmoniya",
-      "name": "Геологический музей «Гармония»",
-      "clusterSize": 67,
-      "keeper": "arkaim-gora-shamanka-lysaya"
-    },
-    {
-      "stem": "muzey-istorii-chtz",
-      "name": "Музей истории ЧТЗ",
-      "clusterSize": 67,
-      "keeper": "arkaim-gora-shamanka-lysaya"
-    },
-    {
-      "stem": "muzey-izobrazitelnyh-iskusstv",
-      "name": "Музей изобразительных искусств",
-      "clusterSize": 67,
-      "keeper": "arkaim-gora-shamanka-lysaya"
-    },
-    {
-      "stem": "muzey-retro-avtomobiley",
-      "name": "Музей ретроавтомобилей",
-      "clusterSize": 3,
-      "keeper": "bar-tortuga"
-    },
-    {
-      "stem": "muzey-yuzhno-uralskoy-zheleznoy-dorogi",
-      "name": "Музей Южно-Уральской железной дороги",
-      "clusterSize": 67,
-      "keeper": "arkaim-gora-shamanka-lysaya"
-    },
-    {
-      "stem": "odigitrievskiy-monastyr",
-      "name": "Одигитриевский монастырь",
-      "clusterSize": 67,
-      "keeper": "arkaim-gora-shamanka-lysaya"
-    },
-    {
-      "stem": "organnyy-zal-rodina",
-      "name": "Органный зал «Родина»",
-      "clusterSize": 67,
-      "keeper": "arkaim-gora-shamanka-lysaya"
-    },
-    {
-      "stem": "osobnyak-arhipova",
-      "name": "Особняк Архипова",
-      "clusterSize": 67,
-      "keeper": "arkaim-gora-shamanka-lysaya"
-    },
-    {
-      "stem": "pamyatnik-glinke",
-      "name": "Памятник М. И. Глинке",
-      "clusterSize": 67,
-      "keeper": "arkaim-gora-shamanka-lysaya"
-    },
-    {
-      "stem": "pamyatnik-kurchatovu",
-      "name": "Памятник И. В. Курчатову",
-      "clusterSize": 3,
-      "keeper": "dom-holodova"
-    },
-    {
-      "stem": "pamyatnik-leninu",
-      "name": "Памятник Ленину на площади Революции",
-      "clusterSize": 67,
-      "keeper": "arkaim-gora-shamanka-lysaya"
-    },
-    {
-      "stem": "pamyatnik-levshe",
-      "name": "Памятник Левше",
-      "clusterSize": 67,
-      "keeper": "arkaim-gora-shamanka-lysaya"
-    },
-    {
-      "stem": "pamyatnik-nishchemu",
-      "name": "Скульптура «Нищий»",
-      "clusterSize": 67,
-      "keeper": "arkaim-gora-shamanka-lysaya"
-    },
-    {
-      "stem": "pamyatnik-osnovatelyam",
-      "name": "Памятник основателям Челябинска",
-      "clusterSize": 67,
-      "keeper": "arkaim-gora-shamanka-lysaya"
-    },
-    {
-      "stem": "pamyatnik-prokofievu",
-      "name": "Памятник С. С. Прокофьеву",
-      "clusterSize": 67,
-      "keeper": "arkaim-gora-shamanka-lysaya"
-    },
-    {
-      "stem": "park-pushkina",
-      "name": "Парк Пушкина",
-      "clusterSize": 3,
-      "keeper": "bar-tortuga"
-    },
-    {
-      "stem": "passage-yaushevyh",
-      "name": "Пассаж Яушевых",
-      "clusterSize": 67,
-      "keeper": "arkaim-gora-shamanka-lysaya"
-    },
-    {
-      "stem": "po-chesnoku",
-      "name": "«По Чесноку»",
-      "clusterSize": 67,
-      "keeper": "arkaim-gora-shamanka-lysaya"
-    },
-    {
-      "stem": "pochtovyy-muzey",
-      "name": "Почтовый музей",
-      "clusterSize": 67,
-      "keeper": "arkaim-gora-shamanka-lysaya"
-    },
-    {
-      "stem": "restoran-kupecheskiy",
-      "name": "Ресторан «Купеческий»",
-      "clusterSize": 67,
-      "keeper": "arkaim-gora-shamanka-lysaya"
-    },
-    {
-      "stem": "simeonovskiy-sobor",
-      "name": "Симеоновский кафедральный собор",
+      "stem": "uvildy-lesnoe-ozero-maloe-uvildy",
+      "name": "uvildy lesnoe ozero maloe uvildy",
       "clusterSize": 2,
-      "keeper": "roza-vetrov"
+      "keeper": "arkaim-kurgan-temir"
     },
     {
-      "stem": "skaz-ob-urale",
-      "name": "Скульптура «Сказ об Урале»",
-      "clusterSize": 67,
+      "stem": "uvildy-mys-krasnyy",
+      "name": "uvildy mys krasnyy",
+      "clusterSize": 24,
       "keeper": "arkaim-gora-shamanka-lysaya"
     },
     {
-      "stem": "sobornaya-mechet",
-      "name": "Соборная мечеть",
-      "clusterSize": 67,
+      "stem": "uvildy-ostrov-golodai",
+      "name": "uvildy ostrov golodai",
+      "clusterSize": 24,
       "keeper": "arkaim-gora-shamanka-lysaya"
     },
     {
-      "stem": "staryy-kraevedcheskiy",
-      "name": "Старый краеведческий музей",
-      "clusterSize": 67,
+      "stem": "uvildy-ostrov-vyazovyy",
+      "name": "uvildy ostrov vyazovyy",
+      "clusterSize": 24,
       "keeper": "arkaim-gora-shamanka-lysaya"
     },
     {
-      "stem": "teatr-kukol-volkhovskiy",
-      "name": "Театр кукол «Вольховский»",
-      "clusterSize": 67,
+      "stem": "uvildy-radonovyy-byuvet",
+      "name": "uvildy radonovyy byuvet",
+      "clusterSize": 24,
       "keeper": "arkaim-gora-shamanka-lysaya"
     },
     {
-      "stem": "teatr-opery-glinki",
-      "name": "Театр оперы и балета им. Глинки",
-      "clusterSize": 67,
+      "stem": "uvildy-tsentralnyy-plyazh",
+      "name": "uvildy tsentralnyy plyazh",
+      "clusterSize": 24,
       "keeper": "arkaim-gora-shamanka-lysaya"
     },
     {
-      "stem": "troitskaya-tserkov",
-      "name": "Свято-Троицкий храм",
-      "clusterSize": 67,
+      "stem": "zyuratkul-ekotropa-na-hrebet",
+      "name": "zyuratkul ekotropa na hrebet",
+      "clusterSize": 24,
       "keeper": "arkaim-gora-shamanka-lysaya"
     },
     {
-      "stem": "tyuz",
-      "name": "Молодежный театр / ТЮЗ",
-      "clusterSize": 2,
-      "keeper": "ploschad-iskusstv"
+      "stem": "zyuratkul-gora-lukash",
+      "name": "zyuratkul gora lukash",
+      "clusterSize": 24,
+      "keeper": "arkaim-gora-shamanka-lysaya"
     },
     {
-      "stem": "venskiy-vals",
-      "name": "Скульптура «Венский вальс»",
-      "clusterSize": 67,
+      "stem": "zyuratkul-kipyashchiy-klyuch",
+      "name": "zyuratkul kipyashchiy klyuch",
+      "clusterSize": 24,
+      "keeper": "arkaim-gora-shamanka-lysaya"
+    },
+    {
+      "stem": "zyuratkul-maralovaya-ferma",
+      "name": "zyuratkul maralovaya ferma",
+      "clusterSize": 24,
+      "keeper": "arkaim-gora-shamanka-lysaya"
+    },
+    {
+      "stem": "zyuratkul-reka-bolshaya-satka",
+      "name": "zyuratkul reka bolshaya satka",
+      "clusterSize": 24,
+      "keeper": "arkaim-gora-shamanka-lysaya"
+    },
+    {
+      "stem": "zyuratkul-skaly-medvedi",
+      "name": "zyuratkul skaly medvedi",
+      "clusterSize": 24,
+      "keeper": "arkaim-gora-shamanka-lysaya"
+    },
+    {
+      "stem": "zyuratkul-vysokogornoe-ozero",
+      "name": "zyuratkul vysokogornoe ozero",
+      "clusterSize": 24,
       "keeper": "arkaim-gora-shamanka-lysaya"
     }
   ],
-  "d0": 206
+  "d0": 21
 }

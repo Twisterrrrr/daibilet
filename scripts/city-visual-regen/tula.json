@@ -1,253 +1,139 @@
 {
   "city": "tula",
-  "mustSeeCount": 50,
+  "mustSeeCount": 82,
   "regen": [
     {
-      "stem": "art-tulskoe-chaepitie",
-      "name": "Арт-объект «Тульское чаепитие»",
-      "clusterSize": 34,
-      "keeper": "art-ezh-patriot"
+      "stem": "kulikovo-pole",
+      "name": "Памятник-колонна Дмитрию Донскому",
+      "clusterSize": 4,
+      "keeper": "kulikovo-pole-slianie-don-nepryadva"
     },
     {
-      "stem": "bashnya-odoevskih-vorot",
-      "name": "Башня Одоевских ворот",
-      "clusterSize": 34,
-      "keeper": "art-ezh-patriot"
+      "stem": "kulikovo-pole-kolonna-dmitriyu-donskomu",
+      "name": "Слияние рек Дона и Непрядвы",
+      "clusterSize": 10,
+      "keeper": "kulikovo-pole-hram-sergiya"
     },
     {
-      "stem": "bashnya-pyatnitskih-vorot",
-      "name": "Башня Пятницких ворот",
-      "clusterSize": 26,
-      "keeper": "art-gribnaya-polyana"
+      "stem": "kulikovo-pole-maket-bitvy",
+      "name": "Музей купеческого быта в Епифани",
+      "clusterSize": 10,
+      "keeper": "kulikovo-pole-hram-sergiya"
     },
     {
-      "stem": "blagoveshchenskaya-tserkov",
-      "name": "Благовещенская церковь",
-      "clusterSize": 34,
-      "keeper": "art-ezh-patriot"
+      "stem": "kulikovo-pole-muzey-epifani",
+      "name": "Большой дом с коллекциями живописи",
+      "clusterSize": 10,
+      "keeper": "kulikovo-pole-hram-sergiya"
     },
     {
-      "stem": "dom-lisitsynyh",
-      "name": "Дом жилой оружейников Лисицыных",
-      "clusterSize": 26,
-      "keeper": "art-gribnaya-polyana"
+      "stem": "kulikovo-pole-muzeynyy-kompleks",
+      "name": "Храм-памятник Сергия Радонежского",
+      "clusterSize": 10,
+      "keeper": "kulikovo-pole-hram-sergiya"
     },
     {
-      "stem": "dom-muzey-veresaeva",
-      "name": "Дом-музей В. В. Вересаева",
-      "clusterSize": 26,
-      "keeper": "art-gribnaya-polyana"
+      "stem": "polenovo",
+      "name": "Фахверковый сарай",
+      "clusterSize": 4,
+      "keeper": "muzey-garmoni-deda-filimona"
     },
     {
-      "stem": "hram-sergiya-radonezhskogo",
-      "name": "Храм Сергия Радонежского",
-      "clusterSize": 34,
-      "keeper": "art-ezh-patriot"
+      "stem": "polenovo-admiralteystvo",
+      "name": "Святой источник и смотровая на обрыве",
+      "clusterSize": 10,
+      "keeper": "kulikovo-pole-hram-sergiya"
     },
     {
-      "stem": "identity-gastro",
-      "name": "identity gastro",
-      "clusterSize": 3,
-      "keeper": "identity-architecture"
+      "stem": "polenovo-bolshoy-dom",
+      "name": "Живописная тропа к реке Оке",
+      "clusterSize": 4,
+      "keeper": "kulikovo-pole-slianie-don-nepryadva"
     },
     {
-      "stem": "identity-symbol",
-      "name": "identity symbol",
-      "clusterSize": 3,
-      "keeper": "identity-architecture"
+      "stem": "polenovo-svyatoy-istochnik",
+      "name": "Современный конный комплекс",
+      "clusterSize": 10,
+      "keeper": "kulikovo-pole-hram-sergiya"
     },
     {
-      "stem": "istoriko-memorialnyy-muzey-demidovyh",
-      "name": "Историко-мемориальный музей Демидовых",
-      "clusterSize": 26,
-      "keeper": "art-gribnaya-polyana"
+      "stem": "polenovo-troitskaya-tserkov-behovo",
+      "name": "Портал времени из дерева",
+      "clusterSize": 7,
+      "keeper": "polenovo-fahverkovyy-saray"
     },
     {
-      "stem": "kafe-pryanosti-i-radosti",
-      "name": "Кафе-кондитерская «Пряности и Радости»",
-      "clusterSize": 34,
-      "keeper": "art-ezh-patriot"
+      "stem": "polenovo-tropa-k-oke",
+      "name": "Арт-объект «Дом-Бык»",
+      "clusterSize": 7,
+      "keeper": "polenovo-fahverkovyy-saray"
     },
     {
-      "stem": "kreativnoe-prostranstvo-iskra",
-      "name": "Креативное пространство «Искра»",
-      "clusterSize": 34,
-      "keeper": "art-ezh-patriot"
+      "stem": "yasnaya-polyana-dom-muzey",
+      "name": "Историческая пашня и конюшня",
+      "clusterSize": 7,
+      "keeper": "polenovo-fahverkovyy-saray"
     },
     {
-      "stem": "kremlevskiy-skver",
-      "name": "Кремлевский сквер",
-      "clusterSize": 34,
-      "keeper": "art-ezh-patriot"
+      "stem": "yasnaya-polyana-fligel-kuzminskih",
+      "name": "Любимая скамейка писателя",
+      "clusterSize": 10,
+      "keeper": "kulikovo-pole-hram-sergiya"
     },
     {
-      "stem": "muzey-dpi-tsentr-semeynoy-istorii",
-      "name": "Музей ДПИ в Центре семейной истории",
-      "clusterSize": 26,
-      "keeper": "art-gribnaya-polyana"
+      "stem": "yasnaya-polyana-pashnya",
+      "name": "Могила Льва Толстого",
+      "clusterSize": 7,
+      "keeper": "polenovo-fahverkovyy-saray"
     },
     {
-      "stem": "muzey-garmoni-deda-filimona",
-      "name": "Музей «Гармони Деда Филимона»",
-      "clusterSize": 34,
-      "keeper": "art-ezh-patriot"
+      "stem": "yasnaya-polyana-prud",
+      "name": "Флигель Кузминских",
+      "clusterSize": 4,
+      "keeper": "muzey-garmoni-deda-filimona"
     },
     {
-      "stem": "muzey-stanka-oktava",
-      "name": "Музей станка в кластере «Октава»",
-      "clusterSize": 26,
-      "keeper": "art-gribnaya-polyana"
+      "stem": "yasnaya-polyana-skameyka",
+      "name": "Музейный комплекс «Куликово поле» в Моховом",
+      "clusterSize": 4,
+      "keeper": "muzey-garmoni-deda-filimona"
     },
     {
-      "stem": "muzey-tulskie-samovary",
-      "name": "Музей «Тульские самовары»",
-      "clusterSize": 34,
-      "keeper": "art-ezh-patriot"
+      "stem": "yasno-pole",
+      "name": "Пруды для рыбалки и настилы",
+      "clusterSize": 2,
+      "keeper": "yasnaya-polyana-mogila"
     },
     {
-      "stem": "oblastnoy-hudozhestvennyy-muzey",
-      "name": "Тульский областной художественный музей",
-      "clusterSize": 34,
-      "keeper": "art-ezh-patriot"
+      "stem": "yasno-pole-eko-ferma",
+      "name": "yasno pole eko ferma",
+      "clusterSize": 10,
+      "keeper": "kulikovo-pole-hram-sergiya"
     },
     {
-      "stem": "osobnyak-belolipetskih",
-      "name": "Особняк Белолипецких",
-      "clusterSize": 34,
-      "keeper": "art-ezh-patriot"
+      "stem": "yasno-pole-otel-kovcheg",
+      "name": "Локальная эко-ферма",
+      "clusterSize": 7,
+      "keeper": "polenovo-fahverkovyy-saray"
     },
     {
-      "stem": "pamyatnik-hvostu",
-      "name": "Памятник хвосту",
-      "clusterSize": 34,
-      "keeper": "art-ezh-patriot"
+      "stem": "yasno-pole-portal-vremeni",
+      "name": "yasno pole portal vremeni",
+      "clusterSize": 4,
+      "keeper": "kulikovo-pole-slianie-don-nepryadva"
     },
     {
-      "stem": "pamyatnik-levshe",
-      "name": "Памятник Левше",
-      "clusterSize": 34,
-      "keeper": "art-ezh-patriot"
+      "stem": "yasno-pole-prudy",
+      "name": "yasno pole prudy",
+      "clusterSize": 10,
+      "keeper": "kulikovo-pole-hram-sergiya"
     },
     {
-      "stem": "pamyatnik-nikite-demidovu",
-      "name": "Памятник Никите Демидову",
-      "clusterSize": 26,
-      "keeper": "art-gribnaya-polyana"
-    },
-    {
-      "stem": "pamyatnik-petru-i",
-      "name": "Памятник Петру I",
-      "clusterSize": 12,
-      "keeper": "ivanovskaya-bashnya"
-    },
-    {
-      "stem": "pamyatnik-rudnevu",
-      "name": "Памятник В. Ф. Рудневу",
-      "clusterSize": 34,
-      "keeper": "art-ezh-patriot"
-    },
-    {
-      "stem": "pamyatnik-sotrudnikam-gosbezopasnosti",
-      "name": "Памятник сотрудникам органов госбезопасности",
-      "clusterSize": 26,
-      "keeper": "art-gribnaya-polyana"
-    },
-    {
-      "stem": "pamyatnik-svodnomu-otryadu-chekistov",
-      "name": "Памятник Сводному отряду чекистов",
-      "clusterSize": 26,
-      "keeper": "art-gribnaya-polyana"
-    },
-    {
-      "stem": "pamyatnik-uchenomu-kotu",
-      "name": "Памятник Ученому коту",
-      "clusterSize": 34,
-      "keeper": "art-ezh-patriot"
-    },
-    {
-      "stem": "pamyatnik-veresaevu",
-      "name": "Памятник В. В. Вересаеву",
-      "clusterSize": 26,
-      "keeper": "art-gribnaya-polyana"
-    },
-    {
-      "stem": "pamyatnik-zashchitnikam-tuly",
-      "name": "Памятник защитникам Тулы",
-      "clusterSize": 12,
-      "keeper": "ivanovskaya-bashnya"
-    },
-    {
-      "stem": "park-belousova",
-      "name": "Центральный парк культуры и отдыха им. П. П. Белоусова",
-      "clusterSize": 26,
-      "keeper": "art-gribnaya-polyana"
-    },
-    {
-      "stem": "restoran-kultura",
-      "name": "Ресторан «Культура»",
-      "clusterSize": 34,
-      "keeper": "art-ezh-patriot"
-    },
-    {
-      "stem": "rogozhinskiy-park",
-      "name": "Рогожинский парк",
-      "clusterSize": 34,
-      "keeper": "art-ezh-patriot"
-    },
-    {
-      "stem": "skulptura-tulskiy-dinozavr",
-      "name": "Скульптура «Тульский динозавр» (Тёща)",
-      "clusterSize": 12,
-      "keeper": "ivanovskaya-bashnya"
-    },
-    {
-      "stem": "skulptura-tulskiy-pryanik",
-      "name": "Скульптура «Тульский пряник»",
-      "clusterSize": 34,
-      "keeper": "art-ezh-patriot"
-    },
-    {
-      "stem": "staraya-tulskaya-apteka",
-      "name": "Старая тульская аптека",
-      "clusterSize": 26,
-      "keeper": "art-gribnaya-polyana"
-    },
-    {
-      "stem": "torgovye-ryady-kremlya",
-      "name": "Торговые ряды Кремля",
-      "clusterSize": 12,
-      "keeper": "ivanovskaya-bashnya"
-    },
-    {
-      "stem": "ulitsa-metallistov",
-      "name": "Улица Металлистов",
-      "clusterSize": 34,
-      "keeper": "art-ezh-patriot"
-    },
-    {
-      "stem": "usadba-ermolaeva-zvereva",
-      "name": "Усадьба Ермолаева-Зверева",
-      "clusterSize": 34,
-      "keeper": "art-ezh-patriot"
-    },
-    {
-      "stem": "uspenskiy-sobor-kremlya",
-      "name": "Успенский собор в Кремле",
-      "clusterSize": 34,
-      "keeper": "art-ezh-patriot"
-    },
-    {
-      "stem": "vodyanye-vorota",
-      "name": "Водяные ворота Кремля",
-      "clusterSize": 26,
-      "keeper": "art-gribnaya-polyana"
-    },
-    {
-      "stem": "vsekhsvyatskiy-kafedralnyy-sobor",
-      "name": "Всехсвятский кафедральный собор",
-      "clusterSize": 34,
-      "keeper": "art-ezh-patriot"
+      "stem": "yasno-pole-syrovarnya",
+      "name": "yasno pole syrovarnya",
+      "clusterSize": 7,
+      "keeper": "polenovo-fahverkovyy-saray"
     }
   ],
-  "d0": 34
+  "d0": 4
 }

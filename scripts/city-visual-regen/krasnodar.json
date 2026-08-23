@@ -1,25 +1,25 @@
 {
   "city": "krasnodar",
-  "mustSeeCount": 52,
+  "mustSeeCount": 70,
   "regen": [
     {
-      "stem": "identity-architecture",
-      "name": "identity architecture",
+      "stem": "guamskoe-ushchele",
+      "name": "guamskoe ushchele",
       "clusterSize": 3,
-      "keeper": "aleksandrovskaya-triumfal-naya-arka"
+      "keeper": "alleya-tysyachi-sosen"
     },
     {
-      "stem": "pamyatnik-ekaterine-ii",
-      "name": "Памятник Екатерине II",
+      "stem": "pshada-dolmeny",
+      "name": "pshada dolmeny",
       "clusterSize": 3,
-      "keeper": "aleksandrovskaya-triumfal-naya-arka"
+      "keeper": "alleya-tysyachi-sosen"
     },
     {
       "stem": "ulitsa-krasnaya",
-      "name": "Улица Красная",
+      "name": "ulitsa krasnaya",
       "clusterSize": 2,
       "keeper": "gorodskoy-sad-park-gor-kogo"
     }
   ],
-  "d0": 7
+  "d0": 4
 }

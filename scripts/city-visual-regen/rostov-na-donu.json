@@ -1,49 +1,19 @@
 {
   "city": "rostov-na-donu",
-  "mustSeeCount": 50,
+  "mustSeeCount": 83,
   "regen": [
     {
-      "stem": "dohodnyy-dom-kisina",
-      "name": "Доходный дом Кисина",
+      "stem": "starocherkasskaya-monastyrskoe-urochishche",
+      "name": "Здание заставы",
       "clusterSize": 2,
-      "keeper": "bol-shaya-sadovaya-ulitsa"
-    },
-    {
-      "stem": "muzey-skzhd",
-      "name": "Музей истории Северо-Кавказской железной дороги",
-      "clusterSize": 3,
-      "keeper": "aksay-kupecheskaya-ulica"
-    },
-    {
-      "stem": "park-revolyutsii",
-      "name": "Парк Революции",
-      "clusterSize": 3,
-      "keeper": "aksay-kupecheskaya-ulica"
-    },
-    {
-      "stem": "rostovskiy-rak",
-      "name": "Арт-объект «Ростовский рак»",
-      "clusterSize": 4,
       "keeper": "puhlyakovskiy"
     },
     {
-      "stem": "skulptura-kupec-korobeynik",
-      "name": "Скульптура «Купец-коробейник»",
-      "clusterSize": 4,
-      "keeper": "puhlyakovskiy"
-    },
-    {
-      "stem": "surb-hach",
-      "name": "Армянская церковь Сурб Хач",
+      "stem": "teatral-naya-ploschad",
+      "name": "teatral naya ploschad",
       "clusterSize": 2,
-      "keeper": "pamyatnik-elizavete-petrovne"
-    },
-    {
-      "stem": "tsentral-nyy-rynok-staryy-bazar",
-      "name": "Центральный рынок (Старый базар)",
-      "clusterSize": 2,
-      "keeper": "aksay-podzemnyy-kompleks"
+      "keeper": "bar-golodranets"
     }
   ],
-  "d0": 13
+  "d0": 2
 }

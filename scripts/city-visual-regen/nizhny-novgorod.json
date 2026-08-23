@@ -1,61 +1,13 @@
 {
   "city": "nizhny-novgorod",
-  "mustSeeCount": 50,
+  "mustSeeCount": 0,
   "regen": [
     {
-      "stem": "blagoveschenskiy-monastyr",
-      "name": "Благовещенский монастырь",
-      "clusterSize": 4,
-      "keeper": "arsenal-gtsisi"
-    },
-    {
-      "stem": "chkalovskaya-lestnitsa",
-      "name": "Чкаловская лестница",
-      "clusterSize": 3,
-      "keeper": "bol-shaya-pokrovskaya-ulitsa"
-    },
-    {
-      "stem": "muzey-istorii-gaz",
-      "name": "Музей истории ГАЗ",
-      "clusterSize": 3,
-      "keeper": "filtrovalnaya-stantsiya"
-    },
-    {
-      "stem": "naberezhnaya-fedorovskogo",
-      "name": "Набережная Фёдоровского",
-      "clusterSize": 3,
-      "keeper": "gorodets-feodorovskiy-monastyr"
-    },
-    {
-      "stem": "nizhegorodskaya-yarmarka",
-      "name": "Нижегородская ярмарка",
-      "clusterSize": 3,
-      "keeper": "filtrovalnaya-stantsiya"
-    },
-    {
-      "stem": "ribs-restaurant",
-      "name": "РИБС",
+      "stem": "pamyatnik-valeriyu-chkalovu",
+      "name": "pamyatnik valeriyu chkalovu",
       "clusterSize": 2,
-      "keeper": "pamyatnik-evgeniyu-evstigneevu"
-    },
-    {
-      "stem": "staroyarmarochnyy-sobor",
-      "name": "Староярмарочный собор",
-      "clusterSize": 4,
       "keeper": "arsenal-gtsisi"
-    },
-    {
-      "stem": "stroganovskaya-tserkov",
-      "name": "Строгановская церковь",
-      "clusterSize": 3,
-      "keeper": "bol-shaya-pokrovskaya-ulitsa"
-    },
-    {
-      "stem": "tehnicheskiy-muzey",
-      "name": "Технический музей",
-      "clusterSize": 2,
-      "keeper": "ploschad-lenina"
     }
   ],
-  "d0": 7
+  "d0": 1
 }

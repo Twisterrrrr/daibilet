@@ -1,211 +1,85 @@
 {
   "city": "volgograd",
-  "mustSeeCount": 52,
+  "mustSeeCount": 68,
   "regen": [
     {
-      "stem": "bar-and-grill",
-      "name": "Стейк-хаус «Bar&Grill»",
-      "clusterSize": 7,
-      "keeper": "art-prostranstvo-ikra"
-    },
-    {
-      "stem": "identity-art",
-      "name": "identity art",
-      "clusterSize": 7,
-      "keeper": "art-prostranstvo-ikra"
-    },
-    {
-      "stem": "identity-gastro",
-      "name": "identity gastro",
-      "clusterSize": 4,
-      "keeper": "ges-monument-stroitelyam"
-    },
-    {
-      "stem": "kafe-marusya",
-      "name": "Кафе «Маруся»",
-      "clusterSize": 7,
-      "keeper": "art-prostranstvo-ikra"
-    },
-    {
-      "stem": "komsomolskiy-sad",
-      "name": "Комсомольский сад",
-      "clusterSize": 7,
-      "keeper": "art-prostranstvo-ikra"
-    },
-    {
-      "stem": "mel-nitsa-gergardta",
-      "name": "Мельница Гергардта",
-      "clusterSize": 7,
-      "keeper": "angel-cakes"
-    },
-    {
-      "stem": "muzey-mashkova",
-      "name": "Музей изобразительных искусств им. И.И. Машкова",
-      "clusterSize": 4,
-      "keeper": "ges-dvorets-kultury-vgs"
-    },
-    {
-      "stem": "muzey-pamyat",
-      "name": "Музей «Память»",
+      "stem": "ges-park-gidrostroitel",
+      "name": "ges park gidrostroitel",
       "clusterSize": 3,
-      "keeper": "ges-shlyuzy-volgo-don"
-    },
-    {
-      "stem": "muzykalnyy-teatr",
-      "name": "Волгоградский музыкальный театр",
-      "clusterSize": 3,
-      "keeper": "ges-shlyuzy-volgo-don"
-    },
-    {
-      "stem": "net-teatr",
-      "name": "Новый экспериментальный театр (НЭТ)",
-      "clusterSize": 7,
-      "keeper": "angel-cakes"
-    },
-    {
-      "stem": "nikitskaya-tserkov",
-      "name": "Никитская церковь",
-      "clusterSize": 4,
-      "keeper": "kazanskiy-sobor"
-    },
-    {
-      "stem": "osobnyak-repnikovoy",
-      "name": "Мемориально-исторический музей (Особняк Репниковой)",
-      "clusterSize": 7,
-      "keeper": "art-prostranstvo-ikra"
-    },
-    {
-      "stem": "pamyatnik-aleksandru-nevskomu",
-      "name": "Памятник Александру Невскому",
-      "clusterSize": 3,
-      "keeper": "ges-kraevedcheskiy-muzey"
-    },
-    {
-      "stem": "pamyatnik-zasekinu",
-      "name": "Памятник Засекину",
-      "clusterSize": 3,
-      "keeper": "ges-kraevedcheskiy-muzey"
-    },
-    {
-      "stem": "park-razdole",
-      "name": "Парк «Раздолье»",
-      "clusterSize": 4,
-      "keeper": "ges-park-novyy-gorod"
-    },
-    {
-      "stem": "planetariy",
-      "name": "Волгоградский планетарий",
-      "clusterSize": 7,
-      "keeper": "pamyatnik-leninu-volgo-don"
-    },
-    {
-      "stem": "pozharnaya-kalancha",
-      "name": "Пожарная каланча Царицына",
-      "clusterSize": 7,
-      "keeper": "angel-cakes"
-    },
-    {
-      "stem": "restoran-reka",
-      "name": "Ресторан «Река»",
-      "clusterSize": 4,
-      "keeper": "ges-dvorets-kultury-vgs"
-    },
-    {
-      "stem": "restoran-shveyn",
-      "name": "Ресторан «Швейн»",
-      "clusterSize": 7,
-      "keeper": "art-prostranstvo-ikra"
-    },
-    {
-      "stem": "restoran-volgograd",
-      "name": "Ресторан «Волгоград»",
-      "clusterSize": 3,
-      "keeper": "alleya-geroev"
-    },
-    {
-      "stem": "skver-sashi-filippova",
-      "name": "Сквер имени Саши Филиппова",
-      "clusterSize": 4,
-      "keeper": "ges-dvorets-kultury-vgs"
-    },
-    {
-      "stem": "smotrovaya-mamaeva-kurgana",
-      "name": "Смотровая площадка Мамаева кургана",
-      "clusterSize": 7,
-      "keeper": "pamyatnik-leninu-volgo-don"
-    },
-    {
-      "stem": "sobor-aleksandra-nevskogo",
-      "name": "Кафедральный собор Александра Невского",
-      "clusterSize": 4,
-      "keeper": "kazanskiy-sobor"
-    },
-    {
-      "stem": "stalingradskiy-topol",
-      "name": "Сталинградский тополь",
-      "clusterSize": 7,
-      "keeper": "pamyatnik-leninu-volgo-don"
-    },
-    {
-      "stem": "staraya-sarepta",
-      "name": "Музей-заповедник «Старая Сарепта»",
-      "clusterSize": 3,
-      "keeper": "sarepta-muzey-gorchitsy"
-    },
-    {
-      "stem": "t-34-chelyabinskiy-kolkhoznik",
-      "name": "Памятник Т-34 «Челябинский колхозник»",
-      "clusterSize": 4,
       "keeper": "dom-pavlova"
     },
     {
-      "stem": "teatr-kukol",
-      "name": "Волгоградский областной театр кукол",
-      "clusterSize": 7,
-      "keeper": "pamyatnik-leninu-volgo-don"
-    },
-    {
-      "stem": "tsaritsynskaya-opera",
-      "name": "Царицынская опера",
+      "stem": "ges-smotrovaya",
+      "name": "ges smotrovaya",
       "clusterSize": 3,
-      "keeper": "alleya-geroev"
+      "keeper": "dom-pavlova"
     },
     {
-      "stem": "tsentral-naya-naberezhnaya-imeni-62-y-armii",
-      "name": "Центральная набережная им. 62-й Армии",
-      "clusterSize": 4,
+      "stem": "mural-devochka-s-siney-ptitsey",
+      "name": "mural devochka s siney ptitsey",
+      "clusterSize": 2,
       "keeper": "ges-park-novyy-gorod"
     },
     {
-      "stem": "tsentralnyy-univermag",
-      "name": "Центральный Универмаг (подвал ЦУМа)",
+      "stem": "promenad-chuikova",
+      "name": "promenad chuikova",
       "clusterSize": 3,
-      "keeper": "pamyatnik-santekhniku"
+      "keeper": "hram-ioanna-predtechi"
     },
     {
-      "stem": "tspkio",
-      "name": "Центральный парк культуры и отдыха (ЦПКиО)",
-      "clusterSize": 4,
-      "keeper": "ges-monument-stroitelyam"
-    },
-    {
-      "stem": "vokzal-volgograd-1",
-      "name": "Железнодорожный вокзал Волгоград-1",
+      "stem": "sarepta-dom-aptekaarya",
+      "name": "sarepta dom aptekaarya",
       "clusterSize": 3,
-      "keeper": "pamyatnik-santekhniku"
-    },
-    {
-      "stem": "volgogradskiy-metrotram",
-      "name": "Волгоградский метротрам",
-      "clusterSize": 4,
-      "keeper": "kazanskiy-sobor"
-    },
-    {
-      "stem": "zal-voinskoy-slavy",
-      "name": "Зал Воинской Славы",
-      "clusterSize": 7,
       "keeper": "angel-cakes"
+    },
+    {
+      "stem": "sarepta-dom-holostyh-bratyev",
+      "name": "sarepta dom holostyh bratyev",
+      "clusterSize": 2,
+      "keeper": "pamyatnik-holzunovu"
+    },
+    {
+      "stem": "sarepta-kirkha",
+      "name": "sarepta kirkha",
+      "clusterSize": 3,
+      "keeper": "pamyatnik-leninu-volgo-don"
+    },
+    {
+      "stem": "sarepta-pamyatnik-gorchichnomu-zernu",
+      "name": "sarepta pamyatnik gorchichnomu zernu",
+      "clusterSize": 3,
+      "keeper": "hram-ioanna-predtechi"
+    },
+    {
+      "stem": "sarepta-podvaly-reyngolda",
+      "name": "sarepta podvaly reyngolda",
+      "clusterSize": 2,
+      "keeper": "identity-symbol"
+    },
+    {
+      "stem": "sarepta-vinokurnya",
+      "name": "sarepta vinokurnya",
+      "clusterSize": 2,
+      "keeper": "sarepta-muzey-gorchitsy"
+    },
+    {
+      "stem": "street-art-tsaritsa",
+      "name": "street art tsaritsa",
+      "clusterSize": 3,
+      "keeper": "pamyatnik-leninu-volgo-don"
+    },
+    {
+      "stem": "suburb-staraya-sarepta",
+      "name": "suburb staraya sarepta",
+      "clusterSize": 3,
+      "keeper": "angel-cakes"
+    },
+    {
+      "stem": "suburb-volzhskaya-ges",
+      "name": "suburb volzhskaya ges",
+      "clusterSize": 2,
+      "keeper": "ges-monument-stroitelyam"
     }
   ],
-  "d0": 77
+  "d0": 12
 }

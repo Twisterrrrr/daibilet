@@ -1,10 +1,10 @@
 {
   "city": "tver",
-  "mustSeeCount": 65,
+  "mustSeeCount": 81,
   "regen": [
     {
       "stem": "imperatorskiy-putevoy-dvorets",
-      "name": "Императорский путевой дворец",
+      "name": "Кинотеатр «Звезда»",
       "clusterSize": 2,
       "keeper": "domotkanovo-zemskaya-shkola"
     },
@@ -16,15 +16,69 @@
     },
     {
       "stem": "morozovskiy-gorodok-dvor-proletarki",
-      "name": "Казармы Морозовского городка",
+      "name": "morozovskiy gorodok dvor proletarki",
       "clusterSize": 2,
       "keeper": "domotkanovo-berezovaya-alleya"
     },
     {
       "stem": "starovolzhskiy-most",
-      "name": "Староволжский мост",
+      "name": "Трехсвятская и памятник Кругу",
       "clusterSize": 2,
       "keeper": "bar-kalinin"
+    },
+    {
+      "stem": "torzhok",
+      "name": "torzhok",
+      "clusterSize": 10,
+      "keeper": "peshehodnaya-trehsvyatskaya-ulitsa"
+    },
+    {
+      "stem": "torzhok-borisoglebskiy-monastyr",
+      "name": "torzhok borisoglebskiy monastyr",
+      "clusterSize": 10,
+      "keeper": "peshehodnaya-trehsvyatskaya-ulitsa"
+    },
+    {
+      "stem": "torzhok-muzey-pozharskogo",
+      "name": "torzhok muzey pozharskogo",
+      "clusterSize": 10,
+      "keeper": "peshehodnaya-trehsvyatskaya-ulitsa"
+    },
+    {
+      "stem": "torzhok-peshehodnyy-most",
+      "name": "torzhok peshehodnyy most",
+      "clusterSize": 10,
+      "keeper": "peshehodnaya-trehsvyatskaya-ulitsa"
+    },
+    {
+      "stem": "torzhok-staro-voznesenskaya-tserkov",
+      "name": "torzhok staro voznesenskaya tserkov",
+      "clusterSize": 10,
+      "keeper": "peshehodnaya-trehsvyatskaya-ulitsa"
+    },
+    {
+      "stem": "torzhok-svechnaya-bashnya",
+      "name": "torzhok svechnaya bashnya",
+      "clusterSize": 10,
+      "keeper": "peshehodnaya-trehsvyatskaya-ulitsa"
+    },
+    {
+      "stem": "torzhok-vasilevo",
+      "name": "torzhok vasilevo",
+      "clusterSize": 10,
+      "keeper": "peshehodnaya-trehsvyatskaya-ulitsa"
+    },
+    {
+      "stem": "torzhok-znamenskoe-rayok",
+      "name": "torzhok znamenskoe rayok",
+      "clusterSize": 10,
+      "keeper": "peshehodnaya-trehsvyatskaya-ulitsa"
+    },
+    {
+      "stem": "torzhok-zolotoshvei",
+      "name": "torzhok zolotoshvei",
+      "clusterSize": 10,
+      "keeper": "peshehodnaya-trehsvyatskaya-ulitsa"
     }
   ],
   "d0": 49

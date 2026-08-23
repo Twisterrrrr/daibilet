@@ -1,6 +1,25 @@
 {
   "city": "ryazan",
-  "mustSeeCount": 0,
-  "regen": [],
-  "d0": 55
+  "mustSeeCount": 21,
+  "regen": [
+    {
+      "stem": "solotcha",
+      "name": "solotcha",
+      "clusterSize": 2,
+      "keeper": "art-centr-vhod-s-ulitsy"
+    },
+    {
+      "stem": "solotcha-monastyr",
+      "name": "solotcha monastyr",
+      "clusterSize": 3,
+      "keeper": "solotcha-dom-pozhalostina"
+    },
+    {
+      "stem": "solotcha-svyatye-vorota",
+      "name": "solotcha svyatye vorota",
+      "clusterSize": 3,
+      "keeper": "solotcha-dom-pozhalostina"
+    }
+  ],
+  "d0": 1
 }

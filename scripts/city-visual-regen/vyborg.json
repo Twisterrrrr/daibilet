@@ -1,6 +1,13 @@
 {
   "city": "vyborg",
   "mustSeeCount": 0,
-  "regen": [],
+  "regen": [
+    {
+      "stem": "vyborgskiy-zamok",
+      "name": "vyborgskiy zamok",
+      "clusterSize": 2,
+      "keeper": "chasovaya-bashnya"
+    }
+  ],
   "d0": 1
 }

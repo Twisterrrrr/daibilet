@@ -1,6 +1,181 @@
 {
   "city": "kaliningrad",
   "mustSeeCount": 0,
-  "regen": [],
+  "regen": [
+    {
+      "stem": "baltiysk-nemetskiy-aerodrom-noytif",
+      "name": "baltiysk nemetskiy aerodrom noytif",
+      "clusterSize": 24,
+      "keeper": "baltiysk-mayak-pillau-i-pamyatnik-petru-i"
+    },
+    {
+      "stem": "baltiysk-pamyatnik-elizavete-petrovne",
+      "name": "baltiysk pamyatnik elizavete petrovne",
+      "clusterSize": 24,
+      "keeper": "baltiysk-mayak-pillau-i-pamyatnik-petru-i"
+    },
+    {
+      "stem": "baltiysk-pehotnye-kazarmy",
+      "name": "baltiysk pehotnye kazarmy",
+      "clusterSize": 24,
+      "keeper": "baltiysk-mayak-pillau-i-pamyatnik-petru-i"
+    },
+    {
+      "stem": "mogila-kanta",
+      "name": "mogila kanta",
+      "clusterSize": 24,
+      "keeper": "baltiysk-mayak-pillau-i-pamyatnik-petru-i"
+    },
+    {
+      "stem": "muzey-koshek-murarium",
+      "name": "muzey koshek murarium",
+      "clusterSize": 2,
+      "keeper": "muzey-izobrazitelnyh-iskusstv"
+    },
+    {
+      "stem": "muzey-yantarya",
+      "name": "muzey yantarya",
+      "clusterSize": 2,
+      "keeper": "fort-5"
+    },
+    {
+      "stem": "smotrovaya-yantarnogo-kombinata",
+      "name": "smotrovaya yantarnogo kombinata",
+      "clusterSize": 2,
+      "keeper": "fridrikhsburgskie-vorota"
+    },
+    {
+      "stem": "svetlogorsk-kanatnaya-doroga",
+      "name": "svetlogorsk kanatnaya doroga",
+      "clusterSize": 24,
+      "keeper": "baltiysk-mayak-pillau-i-pamyatnik-petru-i"
+    },
+    {
+      "stem": "svetlogorsk-organnyy-zal-makarov",
+      "name": "svetlogorsk organnyy zal makarov",
+      "clusterSize": 24,
+      "keeper": "baltiysk-mayak-pillau-i-pamyatnik-petru-i"
+    },
+    {
+      "stem": "svetlogorsk-plyazh-u-funikulera",
+      "name": "svetlogorsk plyazh u funikulera",
+      "clusterSize": 24,
+      "keeper": "baltiysk-mayak-pillau-i-pamyatnik-petru-i"
+    },
+    {
+      "stem": "svetlogorsk-promenad-i-solnechnye-chasy-zodiak",
+      "name": "svetlogorsk promenad i solnechnye chasy zodiak",
+      "clusterSize": 24,
+      "keeper": "baltiysk-mayak-pillau-i-pamyatnik-petru-i"
+    },
+    {
+      "stem": "svetlogorsk-skulptura-nimfeya",
+      "name": "svetlogorsk skulptura nimfeya",
+      "clusterSize": 24,
+      "keeper": "baltiysk-mayak-pillau-i-pamyatnik-petru-i"
+    },
+    {
+      "stem": "svetlogorsk-villa-porr",
+      "name": "svetlogorsk villa porr",
+      "clusterSize": 24,
+      "keeper": "baltiysk-mayak-pillau-i-pamyatnik-petru-i"
+    },
+    {
+      "stem": "tantsuyuschiy-les",
+      "name": "tantsuyuschiy les",
+      "clusterSize": 24,
+      "keeper": "baltiysk-mayak-pillau-i-pamyatnik-petru-i"
+    },
+    {
+      "stem": "teatr-kukol-luiza",
+      "name": "teatr kukol luiza",
+      "clusterSize": 2,
+      "keeper": "teatr-kukol-kirha-luizy"
+    },
+    {
+      "stem": "villa-makovski",
+      "name": "villa makovski",
+      "clusterSize": 24,
+      "keeper": "baltiysk-mayak-pillau-i-pamyatnik-petru-i"
+    },
+    {
+      "stem": "vodonapornaya-bashnya-raushena",
+      "name": "vodonapornaya bashnya raushena",
+      "clusterSize": 2,
+      "keeper": "shtayndamm-99"
+    },
+    {
+      "stem": "yantarny-muzey-yantarya-vystavka-kombinata",
+      "name": "yantarny muzey yantarya vystavka kombinata",
+      "clusterSize": 24,
+      "keeper": "baltiysk-mayak-pillau-i-pamyatnik-petru-i"
+    },
+    {
+      "stem": "yantarny-park-bekkera",
+      "name": "yantarny park bekkera",
+      "clusterSize": 24,
+      "keeper": "baltiysk-mayak-pillau-i-pamyatnik-petru-i"
+    },
+    {
+      "stem": "yantarny-plyazh-shahta-anna",
+      "name": "yantarny plyazh shahta anna",
+      "clusterSize": 24,
+      "keeper": "baltiysk-mayak-pillau-i-pamyatnik-petru-i"
+    },
+    {
+      "stem": "yantarny-yantarnyy-zamok",
+      "name": "yantarny yantarnyy zamok",
+      "clusterSize": 24,
+      "keeper": "baltiysk-mayak-pillau-i-pamyatnik-petru-i"
+    },
+    {
+      "stem": "yuditten-kirkha",
+      "name": "yuditten kirkha",
+      "clusterSize": 2,
+      "keeper": "rayon-maraunenhof"
+    },
+    {
+      "stem": "zelenogradsk-byuvet-koroleva-luiza",
+      "name": "zelenogradsk byuvet koroleva luiza",
+      "clusterSize": 24,
+      "keeper": "baltiysk-mayak-pillau-i-pamyatnik-petru-i"
+    },
+    {
+      "stem": "zelenogradsk-kirha-svyatogo-adalberta",
+      "name": "zelenogradsk kirha svyatogo adalberta",
+      "clusterSize": 24,
+      "keeper": "baltiysk-mayak-pillau-i-pamyatnik-petru-i"
+    },
+    {
+      "stem": "zelenogradsk-kurortnyy-prospekt",
+      "name": "zelenogradsk kurortnyy prospekt",
+      "clusterSize": 24,
+      "keeper": "baltiysk-mayak-pillau-i-pamyatnik-petru-i"
+    },
+    {
+      "stem": "zelenogradsk-muzey-domik-angelov",
+      "name": "zelenogradsk muzey domik angelov",
+      "clusterSize": 24,
+      "keeper": "baltiysk-mayak-pillau-i-pamyatnik-petru-i"
+    },
+    {
+      "stem": "zelenogradsk-muzey-koshek-murarium",
+      "name": "zelenogradsk muzey koshek murarium",
+      "clusterSize": 24,
+      "keeper": "baltiysk-mayak-pillau-i-pamyatnik-petru-i"
+    },
+    {
+      "stem": "zelenogradsk-pamyatnik-zelenogradskim-kotam",
+      "name": "zelenogradsk pamyatnik zelenogradskim kotam",
+      "clusterSize": 24,
+      "keeper": "baltiysk-mayak-pillau-i-pamyatnik-petru-i"
+    },
+    {
+      "stem": "zelenogradsk-promenad-i-volnorez",
+      "name": "zelenogradsk promenad i volnorez",
+      "clusterSize": 24,
+      "keeper": "baltiysk-mayak-pillau-i-pamyatnik-petru-i"
+    }
+  ],
   "d0": 53
 }
