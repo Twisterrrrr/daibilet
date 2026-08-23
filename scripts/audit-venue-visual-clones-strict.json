@@ -1,0 +1,1164 @@
+{
+  "thresh": 2,
+  "summary": [
+    {
+      "city": "ryazan",
+      "files": 94,
+      "md5": 0,
+      "pairs": 213,
+      "d0": 194,
+      "clusters": 10,
+      "topCluster": 12
+    }
+  ],
+  "full": {
+    "ryazan": {
+      "md5Dups": [],
+      "near": [
+        {
+          "d": 0,
+          "a": "arhangelskiy-sobor.jpg",
+          "b": "hristorozhdestvenskiy-sobor.jpg"
+        },
+        {
+          "d": 0,
+          "a": "arhangelskiy-sobor.jpg",
+          "b": "preobrazhenskiy-sobor.jpg"
+        },
+        {
+          "d": 0,
+          "a": "arhangelskiy-sobor.jpg",
+          "b": "pristan-kreml.jpg"
+        },
+        {
+          "d": 0,
+          "a": "arhangelskiy-sobor.jpg",
+          "b": "sobornyy-park.jpg"
+        },
+        {
+          "d": 0,
+          "a": "art-centr-vhod-s-ulitsy.jpg",
+          "b": "eksperimentoriya.jpg"
+        },
+        {
+          "d": 0,
+          "a": "art-centr-vhod-s-ulitsy.jpg",
+          "b": "lesopark.jpg"
+        },
+        {
+          "d": 0,
+          "a": "art-centr-vhod-s-ulitsy.jpg",
+          "b": "pamyatnik-eseninu.jpg"
+        },
+        {
+          "d": 0,
+          "a": "art-centr-vhod-s-ulitsy.jpg",
+          "b": "pamyatnik-pozharnomu-avtomobilyu.jpg"
+        },
+        {
+          "d": 0,
+          "a": "art-centr-vhod-s-ulitsy.jpg",
+          "b": "pamyatnik-shuriku-i-lide.jpg"
+        },
+        {
+          "d": 0,
+          "a": "art-centr-vhod-s-ulitsy.jpg",
+          "b": "pamyatnik-tsiolkovskomu.jpg"
+        },
+        {
+          "d": 0,
+          "a": "art-centr-vhod-s-ulitsy.jpg",
+          "b": "pamyatnik-ulyanovoy.jpg"
+        },
+        {
+          "d": 0,
+          "a": "art-centr-vhod-s-ulitsy.jpg",
+          "b": "skver-skobeleva.jpg"
+        },
+        {
+          "d": 0,
+          "a": "art-centr-vhod-s-ulitsy.jpg",
+          "b": "solotcha.jpg"
+        },
+        {
+          "d": 0,
+          "a": "art-centr-vhod-s-ulitsy.jpg",
+          "b": "teatr-kukol.jpg"
+        },
+        {
+          "d": 0,
+          "a": "art-centr-vhod-s-ulitsy.jpg",
+          "b": "verhniy-gorodskoy-sad.jpg"
+        },
+        {
+          "d": 0,
+          "a": "eksperimentoriya.jpg",
+          "b": "lesopark.jpg"
+        },
+        {
+          "d": 0,
+          "a": "eksperimentoriya.jpg",
+          "b": "pamyatnik-eseninu.jpg"
+        },
+        {
+          "d": 0,
+          "a": "eksperimentoriya.jpg",
+          "b": "pamyatnik-pozharnomu-avtomobilyu.jpg"
+        },
+        {
+          "d": 0,
+          "a": "eksperimentoriya.jpg",
+          "b": "pamyatnik-shuriku-i-lide.jpg"
+        },
+        {
+          "d": 0,
+          "a": "eksperimentoriya.jpg",
+          "b": "pamyatnik-tsiolkovskomu.jpg"
+        },
+        {
+          "d": 0,
+          "a": "eksperimentoriya.jpg",
+          "b": "pamyatnik-ulyanovoy.jpg"
+        },
+        {
+          "d": 0,
+          "a": "eksperimentoriya.jpg",
+          "b": "skver-skobeleva.jpg"
+        },
+        {
+          "d": 0,
+          "a": "eksperimentoriya.jpg",
+          "b": "solotcha.jpg"
+        },
+        {
+          "d": 0,
+          "a": "eksperimentoriya.jpg",
+          "b": "teatr-kukol.jpg"
+        },
+        {
+          "d": 0,
+          "a": "eksperimentoriya.jpg",
+          "b": "verhniy-gorodskoy-sad.jpg"
+        },
+        {
+          "d": 0,
+          "a": "grib-puteshestvennik.jpg",
+          "b": "konstantinovo-dom-roditeley-esenina.jpg"
+        },
+        {
+          "d": 0,
+          "a": "grib-puteshestvennik.jpg",
+          "b": "konstantinovo-dom-smirnova.jpg"
+        },
+        {
+          "d": 0,
+          "a": "grib-puteshestvennik.jpg",
+          "b": "konstantinovo-literaturnyy-muzey.jpg"
+        },
+        {
+          "d": 0,
+          "a": "grib-puteshestvennik.jpg",
+          "b": "konstantinovo-okskiy-utes.jpg"
+        },
+        {
+          "d": 0,
+          "a": "grib-puteshestvennik.jpg",
+          "b": "konstantinovo-tserkov-kazanskoy.jpg"
+        },
+        {
+          "d": 0,
+          "a": "grib-puteshestvennik.jpg",
+          "b": "konstantinovo-usadba-kashinoy.jpg"
+        },
+        {
+          "d": 0,
+          "a": "grib-puteshestvennik.jpg",
+          "b": "konstantinovo-zemskaya-shkola.jpg"
+        },
+        {
+          "d": 0,
+          "a": "grib-puteshestvennik.jpg",
+          "b": "konstantinovo.jpg"
+        },
+        {
+          "d": 0,
+          "a": "grib-puteshestvennik.jpg",
+          "b": "muzey-zapovednik-s-a-esenina-v-konstantinovo.jpg"
+        },
+        {
+          "d": 0,
+          "a": "grib-puteshestvennik.jpg",
+          "b": "nizhniy-gorodskoy-sad.jpg"
+        },
+        {
+          "d": 0,
+          "a": "grib-puteshestvennik.jpg",
+          "b": "smotrovaya-kremlevskiy-val.jpg"
+        },
+        {
+          "d": 0,
+          "a": "hristorozhdestvenskiy-sobor.jpg",
+          "b": "preobrazhenskiy-sobor.jpg"
+        },
+        {
+          "d": 0,
+          "a": "hristorozhdestvenskiy-sobor.jpg",
+          "b": "pristan-kreml.jpg"
+        },
+        {
+          "d": 0,
+          "a": "hristorozhdestvenskiy-sobor.jpg",
+          "b": "sobornyy-park.jpg"
+        },
+        {
+          "d": 0,
+          "a": "kafe-briosh.jpg",
+          "b": "muzey-pahlavy.jpg"
+        },
+        {
+          "d": 0,
+          "a": "kafe-briosh.jpg",
+          "b": "skulptura-muzhichok-borovichok.jpg"
+        },
+        {
+          "d": 0,
+          "a": "kazanskiy-sobor.jpg",
+          "b": "memorial-voinam-internatsionalistam.jpg"
+        },
+        {
+          "d": 0,
+          "a": "kazanskiy-sobor.jpg",
+          "b": "monument-pobedy.jpg"
+        },
+        {
+          "d": 0,
+          "a": "kazanskiy-sobor.jpg",
+          "b": "muzey-avtomobilnoy-tehniki.jpg"
+        },
+        {
+          "d": 0,
+          "a": "kazanskiy-sobor.jpg",
+          "b": "pamyatnik-evpatiyu-kolovratu.jpg"
+        },
+        {
+          "d": 0,
+          "a": "kazanskiy-sobor.jpg",
+          "b": "pamyatnik-georgiyu-pobedonostsu.jpg"
+        },
+        {
+          "d": 0,
+          "a": "kazanskiy-sobor.jpg",
+          "b": "pamyatnik-margelovu.jpg"
+        },
+        {
+          "d": 0,
+          "a": "kazanskiy-sobor.jpg",
+          "b": "sobor-borisa-i-gleba.jpg"
+        },
+        {
+          "d": 0,
+          "a": "kazanskiy-sobor.jpg",
+          "b": "tserkov-blagovescheniya.jpg"
+        },
+        {
+          "d": 0,
+          "a": "kazanskiy-sobor.jpg",
+          "b": "tserkov-spasa-na-yaru.jpg"
+        },
+        {
+          "d": 0,
+          "a": "kofeynya-kofe-kult.jpg",
+          "b": "restoran-grafin.jpg"
+        },
+        {
+          "d": 0,
+          "a": "kofeynya-kofe-kult.jpg",
+          "b": "restoran-staryy-melnik.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-dom-roditeley-esenina.jpg",
+          "b": "konstantinovo-dom-smirnova.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-dom-roditeley-esenina.jpg",
+          "b": "konstantinovo-literaturnyy-muzey.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-dom-roditeley-esenina.jpg",
+          "b": "konstantinovo-okskiy-utes.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-dom-roditeley-esenina.jpg",
+          "b": "konstantinovo-tserkov-kazanskoy.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-dom-roditeley-esenina.jpg",
+          "b": "konstantinovo-usadba-kashinoy.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-dom-roditeley-esenina.jpg",
+          "b": "konstantinovo-zemskaya-shkola.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-dom-roditeley-esenina.jpg",
+          "b": "konstantinovo.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-dom-roditeley-esenina.jpg",
+          "b": "muzey-zapovednik-s-a-esenina-v-konstantinovo.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-dom-roditeley-esenina.jpg",
+          "b": "nizhniy-gorodskoy-sad.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-dom-roditeley-esenina.jpg",
+          "b": "smotrovaya-kremlevskiy-val.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-dom-smirnova.jpg",
+          "b": "konstantinovo-literaturnyy-muzey.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-dom-smirnova.jpg",
+          "b": "konstantinovo-okskiy-utes.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-dom-smirnova.jpg",
+          "b": "konstantinovo-tserkov-kazanskoy.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-dom-smirnova.jpg",
+          "b": "konstantinovo-usadba-kashinoy.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-dom-smirnova.jpg",
+          "b": "konstantinovo-zemskaya-shkola.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-dom-smirnova.jpg",
+          "b": "konstantinovo.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-dom-smirnova.jpg",
+          "b": "muzey-zapovednik-s-a-esenina-v-konstantinovo.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-dom-smirnova.jpg",
+          "b": "nizhniy-gorodskoy-sad.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-dom-smirnova.jpg",
+          "b": "smotrovaya-kremlevskiy-val.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-literaturnyy-muzey.jpg",
+          "b": "konstantinovo-okskiy-utes.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-literaturnyy-muzey.jpg",
+          "b": "konstantinovo-tserkov-kazanskoy.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-literaturnyy-muzey.jpg",
+          "b": "konstantinovo-usadba-kashinoy.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-literaturnyy-muzey.jpg",
+          "b": "konstantinovo-zemskaya-shkola.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-literaturnyy-muzey.jpg",
+          "b": "konstantinovo.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-literaturnyy-muzey.jpg",
+          "b": "muzey-zapovednik-s-a-esenina-v-konstantinovo.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-literaturnyy-muzey.jpg",
+          "b": "nizhniy-gorodskoy-sad.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-literaturnyy-muzey.jpg",
+          "b": "smotrovaya-kremlevskiy-val.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-okskiy-utes.jpg",
+          "b": "konstantinovo-tserkov-kazanskoy.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-okskiy-utes.jpg",
+          "b": "konstantinovo-usadba-kashinoy.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-okskiy-utes.jpg",
+          "b": "konstantinovo-zemskaya-shkola.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-okskiy-utes.jpg",
+          "b": "konstantinovo.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-okskiy-utes.jpg",
+          "b": "muzey-zapovednik-s-a-esenina-v-konstantinovo.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-okskiy-utes.jpg",
+          "b": "nizhniy-gorodskoy-sad.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-okskiy-utes.jpg",
+          "b": "smotrovaya-kremlevskiy-val.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-tserkov-kazanskoy.jpg",
+          "b": "konstantinovo-usadba-kashinoy.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-tserkov-kazanskoy.jpg",
+          "b": "konstantinovo-zemskaya-shkola.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-tserkov-kazanskoy.jpg",
+          "b": "konstantinovo.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-tserkov-kazanskoy.jpg",
+          "b": "muzey-zapovednik-s-a-esenina-v-konstantinovo.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-tserkov-kazanskoy.jpg",
+          "b": "nizhniy-gorodskoy-sad.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-tserkov-kazanskoy.jpg",
+          "b": "smotrovaya-kremlevskiy-val.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-usadba-kashinoy.jpg",
+          "b": "konstantinovo-zemskaya-shkola.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-usadba-kashinoy.jpg",
+          "b": "konstantinovo.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-usadba-kashinoy.jpg",
+          "b": "muzey-zapovednik-s-a-esenina-v-konstantinovo.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-usadba-kashinoy.jpg",
+          "b": "nizhniy-gorodskoy-sad.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-usadba-kashinoy.jpg",
+          "b": "smotrovaya-kremlevskiy-val.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-zemskaya-shkola.jpg",
+          "b": "konstantinovo.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-zemskaya-shkola.jpg",
+          "b": "muzey-zapovednik-s-a-esenina-v-konstantinovo.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-zemskaya-shkola.jpg",
+          "b": "nizhniy-gorodskoy-sad.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo-zemskaya-shkola.jpg",
+          "b": "smotrovaya-kremlevskiy-val.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo.jpg",
+          "b": "muzey-zapovednik-s-a-esenina-v-konstantinovo.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo.jpg",
+          "b": "nizhniy-gorodskoy-sad.jpg"
+        },
+        {
+          "d": 0,
+          "a": "konstantinovo.jpg",
+          "b": "smotrovaya-kremlevskiy-val.jpg"
+        },
+        {
+          "d": 0,
+          "a": "lesopark.jpg",
+          "b": "pamyatnik-eseninu.jpg"
+        },
+        {
+          "d": 0,
+          "a": "lesopark.jpg",
+          "b": "pamyatnik-pozharnomu-avtomobilyu.jpg"
+        },
+        {
+          "d": 0,
+          "a": "lesopark.jpg",
+          "b": "pamyatnik-shuriku-i-lide.jpg"
+        },
+        {
+          "d": 0,
+          "a": "lesopark.jpg",
+          "b": "pamyatnik-tsiolkovskomu.jpg"
+        },
+        {
+          "d": 0,
+          "a": "lesopark.jpg",
+          "b": "pamyatnik-ulyanovoy.jpg"
+        },
+        {
+          "d": 0,
+          "a": "lesopark.jpg",
+          "b": "skver-skobeleva.jpg"
+        },
+        {
+          "d": 0,
+          "a": "lesopark.jpg",
+          "b": "solotcha.jpg"
+        },
+        {
+          "d": 0,
+          "a": "lesopark.jpg",
+          "b": "teatr-kukol.jpg"
+        },
+        {
+          "d": 0,
+          "a": "lesopark.jpg",
+          "b": "verhniy-gorodskoy-sad.jpg"
+        },
+        {
+          "d": 0,
+          "a": "memorial-voinam-internatsionalistam.jpg",
+          "b": "monument-pobedy.jpg"
+        },
+        {
+          "d": 0,
+          "a": "memorial-voinam-internatsionalistam.jpg",
+          "b": "muzey-avtomobilnoy-tehniki.jpg"
+        },
+        {
+          "d": 0,
+          "a": "memorial-voinam-internatsionalistam.jpg",
+          "b": "pamyatnik-evpatiyu-kolovratu.jpg"
+        },
+        {
+          "d": 0,
+          "a": "memorial-voinam-internatsionalistam.jpg",
+          "b": "pamyatnik-georgiyu-pobedonostsu.jpg"
+        },
+        {
+          "d": 0,
+          "a": "memorial-voinam-internatsionalistam.jpg",
+          "b": "pamyatnik-margelovu.jpg"
+        },
+        {
+          "d": 0,
+          "a": "memorial-voinam-internatsionalistam.jpg",
+          "b": "sobor-borisa-i-gleba.jpg"
+        },
+        {
+          "d": 0,
+          "a": "memorial-voinam-internatsionalistam.jpg",
+          "b": "tserkov-blagovescheniya.jpg"
+        },
+        {
+          "d": 0,
+          "a": "memorial-voinam-internatsionalistam.jpg",
+          "b": "tserkov-spasa-na-yaru.jpg"
+        },
+        {
+          "d": 0,
+          "a": "monument-pobedy.jpg",
+          "b": "muzey-avtomobilnoy-tehniki.jpg"
+        },
+        {
+          "d": 0,
+          "a": "monument-pobedy.jpg",
+          "b": "pamyatnik-evpatiyu-kolovratu.jpg"
+        },
+        {
+          "d": 0,
+          "a": "monument-pobedy.jpg",
+          "b": "pamyatnik-georgiyu-pobedonostsu.jpg"
+        },
+        {
+          "d": 0,
+          "a": "monument-pobedy.jpg",
+          "b": "pamyatnik-margelovu.jpg"
+        },
+        {
+          "d": 0,
+          "a": "monument-pobedy.jpg",
+          "b": "sobor-borisa-i-gleba.jpg"
+        },
+        {
+          "d": 0,
+          "a": "monument-pobedy.jpg",
+          "b": "tserkov-blagovescheniya.jpg"
+        },
+        {
+          "d": 0,
+          "a": "monument-pobedy.jpg",
+          "b": "tserkov-spasa-na-yaru.jpg"
+        },
+        {
+          "d": 0,
+          "a": "muzey-avtomobilnoy-tehniki.jpg",
+          "b": "pamyatnik-evpatiyu-kolovratu.jpg"
+        },
+        {
+          "d": 0,
+          "a": "muzey-avtomobilnoy-tehniki.jpg",
+          "b": "pamyatnik-georgiyu-pobedonostsu.jpg"
+        },
+        {
+          "d": 0,
+          "a": "muzey-avtomobilnoy-tehniki.jpg",
+          "b": "pamyatnik-margelovu.jpg"
+        },
+        {
+          "d": 0,
+          "a": "muzey-avtomobilnoy-tehniki.jpg",
+          "b": "sobor-borisa-i-gleba.jpg"
+        },
+        {
+          "d": 0,
+          "a": "muzey-avtomobilnoy-tehniki.jpg",
+          "b": "tserkov-blagovescheniya.jpg"
+        },
+        {
+          "d": 0,
+          "a": "muzey-avtomobilnoy-tehniki.jpg",
+          "b": "tserkov-spasa-na-yaru.jpg"
+        },
+        {
+          "d": 0,
+          "a": "muzey-pahlavy.jpg",
+          "b": "skulptura-muzhichok-borovichok.jpg"
+        },
+        {
+          "d": 0,
+          "a": "muzey-zapovednik-s-a-esenina-v-konstantinovo.jpg",
+          "b": "nizhniy-gorodskoy-sad.jpg"
+        },
+        {
+          "d": 0,
+          "a": "muzey-zapovednik-s-a-esenina-v-konstantinovo.jpg",
+          "b": "smotrovaya-kremlevskiy-val.jpg"
+        },
+        {
+          "d": 0,
+          "a": "nizhniy-gorodskoy-sad.jpg",
+          "b": "smotrovaya-kremlevskiy-val.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-eseninu.jpg",
+          "b": "pamyatnik-pozharnomu-avtomobilyu.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-eseninu.jpg",
+          "b": "pamyatnik-shuriku-i-lide.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-eseninu.jpg",
+          "b": "pamyatnik-tsiolkovskomu.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-eseninu.jpg",
+          "b": "pamyatnik-ulyanovoy.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-eseninu.jpg",
+          "b": "skver-skobeleva.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-eseninu.jpg",
+          "b": "solotcha.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-eseninu.jpg",
+          "b": "teatr-kukol.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-eseninu.jpg",
+          "b": "verhniy-gorodskoy-sad.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-evpatiyu-kolovratu.jpg",
+          "b": "pamyatnik-georgiyu-pobedonostsu.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-evpatiyu-kolovratu.jpg",
+          "b": "pamyatnik-margelovu.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-evpatiyu-kolovratu.jpg",
+          "b": "sobor-borisa-i-gleba.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-evpatiyu-kolovratu.jpg",
+          "b": "tserkov-blagovescheniya.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-evpatiyu-kolovratu.jpg",
+          "b": "tserkov-spasa-na-yaru.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-georgiyu-pobedonostsu.jpg",
+          "b": "pamyatnik-margelovu.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-georgiyu-pobedonostsu.jpg",
+          "b": "sobor-borisa-i-gleba.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-georgiyu-pobedonostsu.jpg",
+          "b": "tserkov-blagovescheniya.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-georgiyu-pobedonostsu.jpg",
+          "b": "tserkov-spasa-na-yaru.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-leninu.jpg",
+          "b": "torgovyy-gorodok.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-margelovu.jpg",
+          "b": "sobor-borisa-i-gleba.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-margelovu.jpg",
+          "b": "tserkov-blagovescheniya.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-margelovu.jpg",
+          "b": "tserkov-spasa-na-yaru.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-pozharnomu-avtomobilyu.jpg",
+          "b": "pamyatnik-shuriku-i-lide.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-pozharnomu-avtomobilyu.jpg",
+          "b": "pamyatnik-tsiolkovskomu.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-pozharnomu-avtomobilyu.jpg",
+          "b": "pamyatnik-ulyanovoy.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-pozharnomu-avtomobilyu.jpg",
+          "b": "skver-skobeleva.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-pozharnomu-avtomobilyu.jpg",
+          "b": "solotcha.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-pozharnomu-avtomobilyu.jpg",
+          "b": "teatr-kukol.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-pozharnomu-avtomobilyu.jpg",
+          "b": "verhniy-gorodskoy-sad.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-shuriku-i-lide.jpg",
+          "b": "pamyatnik-tsiolkovskomu.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-shuriku-i-lide.jpg",
+          "b": "pamyatnik-ulyanovoy.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-shuriku-i-lide.jpg",
+          "b": "skver-skobeleva.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-shuriku-i-lide.jpg",
+          "b": "solotcha.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-shuriku-i-lide.jpg",
+          "b": "teatr-kukol.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-shuriku-i-lide.jpg",
+          "b": "verhniy-gorodskoy-sad.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-tsiolkovskomu.jpg",
+          "b": "pamyatnik-ulyanovoy.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-tsiolkovskomu.jpg",
+          "b": "skver-skobeleva.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-tsiolkovskomu.jpg",
+          "b": "solotcha.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-tsiolkovskomu.jpg",
+          "b": "teatr-kukol.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-tsiolkovskomu.jpg",
+          "b": "verhniy-gorodskoy-sad.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-ulyanovoy.jpg",
+          "b": "skver-skobeleva.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-ulyanovoy.jpg",
+          "b": "solotcha.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-ulyanovoy.jpg",
+          "b": "teatr-kukol.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pamyatnik-ulyanovoy.jpg",
+          "b": "verhniy-gorodskoy-sad.jpg"
+        },
+        {
+          "d": 0,
+          "a": "preobrazhenskiy-sobor.jpg",
+          "b": "pristan-kreml.jpg"
+        },
+        {
+          "d": 0,
+          "a": "preobrazhenskiy-sobor.jpg",
+          "b": "sobornyy-park.jpg"
+        },
+        {
+          "d": 0,
+          "a": "pristan-kreml.jpg",
+          "b": "sobornyy-park.jpg"
+        },
+        {
+          "d": 0,
+          "a": "restoran-grafin.jpg",
+          "b": "restoran-staryy-melnik.jpg"
+        },
+        {
+          "d": 0,
+          "a": "skver-skobeleva.jpg",
+          "b": "solotcha.jpg"
+        },
+        {
+          "d": 0,
+          "a": "skver-skobeleva.jpg",
+          "b": "teatr-kukol.jpg"
+        },
+        {
+          "d": 0,
+          "a": "skver-skobeleva.jpg",
+          "b": "verhniy-gorodskoy-sad.jpg"
+        },
+        {
+          "d": 0,
+          "a": "sobor-borisa-i-gleba.jpg",
+          "b": "tserkov-blagovescheniya.jpg"
+        },
+        {
+          "d": 0,
+          "a": "sobor-borisa-i-gleba.jpg",
+          "b": "tserkov-spasa-na-yaru.jpg"
+        },
+        {
+          "d": 0,
+          "a": "solotcha.jpg",
+          "b": "teatr-kukol.jpg"
+        },
+        {
+          "d": 0,
+          "a": "solotcha.jpg",
+          "b": "verhniy-gorodskoy-sad.jpg"
+        },
+        {
+          "d": 0,
+          "a": "teatr-kukol.jpg",
+          "b": "verhniy-gorodskoy-sad.jpg"
+        },
+        {
+          "d": 0,
+          "a": "tserkov-blagovescheniya.jpg",
+          "b": "tserkov-spasa-na-yaru.jpg"
+        },
+        {
+          "d": 1,
+          "a": "arhangelskiy-sobor.jpg",
+          "b": "pamyatnik-olegu-ryazanskomu.jpg"
+        },
+        {
+          "d": 1,
+          "a": "grib-rybak.jpg",
+          "b": "grib-sportsmen.jpg"
+        },
+        {
+          "d": 1,
+          "a": "hristorozhdestvenskiy-sobor.jpg",
+          "b": "pamyatnik-olegu-ryazanskomu.jpg"
+        },
+        {
+          "d": 1,
+          "a": "kazanskiy-sobor.jpg",
+          "b": "nikolo-yamskoy-hram.jpg"
+        },
+        {
+          "d": 1,
+          "a": "memorial-voinam-internatsionalistam.jpg",
+          "b": "nikolo-yamskoy-hram.jpg"
+        },
+        {
+          "d": 1,
+          "a": "monument-pobedy.jpg",
+          "b": "nikolo-yamskoy-hram.jpg"
+        },
+        {
+          "d": 1,
+          "a": "muzey-avtomobilnoy-tehniki.jpg",
+          "b": "nikolo-yamskoy-hram.jpg"
+        },
+        {
+          "d": 1,
+          "a": "nikolo-yamskoy-hram.jpg",
+          "b": "pamyatnik-evpatiyu-kolovratu.jpg"
+        },
+        {
+          "d": 1,
+          "a": "nikolo-yamskoy-hram.jpg",
+          "b": "pamyatnik-georgiyu-pobedonostsu.jpg"
+        },
+        {
+          "d": 1,
+          "a": "nikolo-yamskoy-hram.jpg",
+          "b": "pamyatnik-margelovu.jpg"
+        },
+        {
+          "d": 1,
+          "a": "nikolo-yamskoy-hram.jpg",
+          "b": "sobor-borisa-i-gleba.jpg"
+        },
+        {
+          "d": 1,
+          "a": "nikolo-yamskoy-hram.jpg",
+          "b": "tserkov-blagovescheniya.jpg"
+        },
+        {
+          "d": 1,
+          "a": "nikolo-yamskoy-hram.jpg",
+          "b": "tserkov-spasa-na-yaru.jpg"
+        },
+        {
+          "d": 1,
+          "a": "pamyatnik-olegu-ryazanskomu.jpg",
+          "b": "preobrazhenskiy-sobor.jpg"
+        },
+        {
+          "d": 1,
+          "a": "pamyatnik-olegu-ryazanskomu.jpg",
+          "b": "pristan-kreml.jpg"
+        },
+        {
+          "d": 1,
+          "a": "pamyatnik-olegu-ryazanskomu.jpg",
+          "b": "sobornyy-park.jpg"
+        },
+        {
+          "d": 1,
+          "a": "solotcha-dom-pozhalostina.jpg",
+          "b": "solotcha-svyatye-vorota.jpg"
+        },
+        {
+          "d": 2,
+          "a": "grib-borovik.jpg",
+          "b": "pamyatnik-griby-s-glazami.jpg"
+        },
+        {
+          "d": 2,
+          "a": "solotcha-dom-pozhalostina.jpg",
+          "b": "solotcha-monastyr.jpg"
+        }
+      ],
+      "clusters": [
+        [
+          "art-centr-vhod-s-ulitsy.jpg",
+          "eksperimentoriya.jpg",
+          "lesopark.jpg",
+          "pamyatnik-eseninu.jpg",
+          "pamyatnik-pozharnomu-avtomobilyu.jpg",
+          "pamyatnik-shuriku-i-lide.jpg",
+          "pamyatnik-tsiolkovskomu.jpg",
+          "pamyatnik-ulyanovoy.jpg",
+          "skver-skobeleva.jpg",
+          "solotcha.jpg",
+          "teatr-kukol.jpg",
+          "verhniy-gorodskoy-sad.jpg"
+        ],
+        [
+          "grib-puteshestvennik.jpg",
+          "konstantinovo-dom-roditeley-esenina.jpg",
+          "konstantinovo-dom-smirnova.jpg",
+          "konstantinovo-literaturnyy-muzey.jpg",
+          "konstantinovo-okskiy-utes.jpg",
+          "konstantinovo-tserkov-kazanskoy.jpg",
+          "konstantinovo-usadba-kashinoy.jpg",
+          "konstantinovo-zemskaya-shkola.jpg",
+          "konstantinovo.jpg",
+          "muzey-zapovednik-s-a-esenina-v-konstantinovo.jpg",
+          "nizhniy-gorodskoy-sad.jpg",
+          "smotrovaya-kremlevskiy-val.jpg"
+        ],
+        [
+          "kazanskiy-sobor.jpg",
+          "memorial-voinam-internatsionalistam.jpg",
+          "monument-pobedy.jpg",
+          "muzey-avtomobilnoy-tehniki.jpg",
+          "pamyatnik-evpatiyu-kolovratu.jpg",
+          "pamyatnik-georgiyu-pobedonostsu.jpg",
+          "pamyatnik-margelovu.jpg",
+          "sobor-borisa-i-gleba.jpg",
+          "tserkov-blagovescheniya.jpg",
+          "tserkov-spasa-na-yaru.jpg",
+          "nikolo-yamskoy-hram.jpg"
+        ],
+        [
+          "arhangelskiy-sobor.jpg",
+          "hristorozhdestvenskiy-sobor.jpg",
+          "preobrazhenskiy-sobor.jpg",
+          "pristan-kreml.jpg",
+          "sobornyy-park.jpg",
+          "pamyatnik-olegu-ryazanskomu.jpg"
+        ],
+        [
+          "kafe-briosh.jpg",
+          "muzey-pahlavy.jpg",
+          "skulptura-muzhichok-borovichok.jpg"
+        ],
+        [
+          "kofeynya-kofe-kult.jpg",
+          "restoran-grafin.jpg",
+          "restoran-staryy-melnik.jpg"
+        ],
+        [
+          "solotcha-dom-pozhalostina.jpg",
+          "solotcha-svyatye-vorota.jpg",
+          "solotcha-monastyr.jpg"
+        ],
+        [
+          "pamyatnik-leninu.jpg",
+          "torgovyy-gorodok.jpg"
+        ],
+        [
+          "grib-rybak.jpg",
+          "grib-sportsmen.jpg"
+        ],
+        [
+          "grib-borovik.jpg",
+          "pamyatnik-griby-s-glazami.jpg"
+        ]
+      ]
+    }
+  }
+}
