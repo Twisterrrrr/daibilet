@@ -111,14 +111,12 @@ export function CitiesIndexChrome({ destinations }: { destinations: PublicDestin
     : pluralCities(allCities.length);
 
   const setSort = (next: CitiesCatalogSort) => {
+    if (next === sort) return;
     const params = new URLSearchParams(searchParams.toString());
     if (next === 'popular') params.delete('sort');
     else params.set('sort', next);
     const qs = params.toString();
-    router.replace(qs ? `/cities?${qs}#cities-all` : '/cities#cities-all', { scroll: false });
-    window.requestAnimationFrame(() => {
-      document.getElementById('cities-all')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
+    router.replace(qs ? `/cities?${qs}` : '/cities', { scroll: false });
   };
 
   return (
@@ -167,10 +165,10 @@ export function CitiesIndexChrome({ destinations }: { destinations: PublicDestin
                   role="radio"
                   aria-checked={sort === 'popular'}
                   onClick={() => setSort('popular')}
-                  className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition ${
+                  className={`rounded-full px-3.5 py-1.5 text-xs font-semibold ring-1 transition ${
                     sort === 'popular'
-                      ? 'bg-slate-900 text-white'
-                      : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50'
+                      ? 'bg-slate-900 text-white ring-slate-900'
+                      : 'bg-white text-slate-700 ring-slate-200 hover:bg-slate-50'
                   }`}
                 >
                   Популярные
@@ -180,10 +178,10 @@ export function CitiesIndexChrome({ destinations }: { destinations: PublicDestin
                   role="radio"
                   aria-checked={sort === 'name'}
                   onClick={() => setSort('name')}
-                  className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition ${
+                  className={`rounded-full px-3.5 py-1.5 text-xs font-semibold ring-1 transition ${
                     sort === 'name'
-                      ? 'bg-slate-900 text-white'
-                      : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50'
+                      ? 'bg-slate-900 text-white ring-slate-900'
+                      : 'bg-white text-slate-700 ring-slate-200 hover:bg-slate-50'
                   }`}
                 >
                   По алфавиту
