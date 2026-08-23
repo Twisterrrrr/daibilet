@@ -1,0 +1,2343 @@
+{
+  "generatedAt": "2026-08-23T17:17:27.959Z",
+  "total": 330,
+  "byWave": {
+    "small-mustsee": 110,
+    "d0-tail": 220
+  },
+  "byCity": {
+    "chelyabinsk": 42,
+    "voronezh": 39,
+    "volgograd": 34,
+    "kazan": 33,
+    "tula": 32,
+    "samara": 29,
+    "novosibirsk": 26,
+    "yaroslavl": 22,
+    "ekaterinburg": 13,
+    "nizhny-novgorod": 9,
+    "rostov-na-donu": 7,
+    "ufa": 7,
+    "penza": 6,
+    "saratov": 6,
+    "saint-petersburg": 5,
+    "sochi": 5,
+    "tyumen": 5,
+    "tver": 4,
+    "krasnodar": 3,
+    "kaliningrad": 2,
+    "omsk": 1
+  },
+  "queue": [
+    {
+      "city": "chelyabinsk",
+      "stem": "brudershaft",
+      "name": "Пивоварня «Брудершафт»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "chelyabinsk-siti",
+      "name": "Смотровая «Челябинск-Сити»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "chtz",
+      "name": "Ансамбль ЧТЗ",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "dom-dantsigera",
+      "name": "Дом Данцигера",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "dom-pechati",
+      "name": "Дом печати",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "elevator",
+      "name": "Элеватор Госбанка",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "experimentus",
+      "name": "Научный музей «Экспериментус»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "gorodskoy-bor",
+      "name": "Челябинский городской бор",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "gosbank",
+      "name": "gosbank",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "hram-aleksandra-nevskogo",
+      "name": "Храм Александра Невского",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "hram-georgiya-pobedonostsa",
+      "name": "hram georgiya pobedonostsa",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "hram-ioanna-voina",
+      "name": "hram ioanna voina",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "izumrudnyy-karer",
+      "name": "izumrudnyy karer",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "kamernyy-teatr",
+      "name": "kamernyy teatr",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "kaslinskaya-64",
+      "name": "kaslinskaya 64",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "katolicheskiy-hram",
+      "name": "katolicheskiy hram",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "kofeynya-udobno",
+      "name": "kofeynya udobno",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "muzey-geologii-garmoniya",
+      "name": "muzey geologii garmoniya",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "muzey-istorii-chtz",
+      "name": "muzey istorii chtz",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "muzey-izobrazitelnyh-iskusstv",
+      "name": "muzey izobrazitelnyh iskusstv",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "muzey-retro-avtomobiley",
+      "name": "muzey retro avtomobiley",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "muzey-yuzhno-uralskoy-zheleznoy-dorogi",
+      "name": "muzey yuzhno uralskoy zheleznoy dorogi",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "odigitrievskiy-monastyr",
+      "name": "odigitrievskiy monastyr",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "organnyy-zal-rodina",
+      "name": "organnyy zal rodina",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "pamyatnik-leninu",
+      "name": "pamyatnik leninu",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "pamyatnik-osnovatelyam",
+      "name": "pamyatnik osnovatelyam",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "park-pushkina",
+      "name": "park pushkina",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "ploschad-iskusstv",
+      "name": "ploschad iskusstv",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "po-chesnoku",
+      "name": "po chesnoku",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "pochtovyy-muzey",
+      "name": "pochtovyy muzey",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "restoran-kupecheskiy",
+      "name": "restoran kupecheskiy",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "sad-pobedy",
+      "name": "sad pobedy",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "simeonovskiy-sobor",
+      "name": "simeonovskiy sobor",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "sinagoga-chabad",
+      "name": "sinagoga chabad",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "sobornaya-mechet",
+      "name": "sobornaya mechet",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "staryy-kraevedcheskiy",
+      "name": "staryy kraevedcheskiy",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "svechka",
+      "name": "svechka",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "teatr-kukol-volkhovskiy",
+      "name": "teatr kukol volkhovskiy",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "teatr-opery-glinki",
+      "name": "teatr opery glinki",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "troitskaya-tserkov",
+      "name": "troitskaya tserkov",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "tyuz",
+      "name": "tyuz",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "chelyabinsk",
+      "stem": "vokzal-glavnyy",
+      "name": "vokzal glavnyy",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "ekaterinburg",
+      "stem": "dom-oborony",
+      "name": "Дом обороны",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "ekaterinburg",
+      "stem": "everjazz",
+      "name": "Джаз-клуб EverJazz",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "ekaterinburg",
+      "stem": "gostinitsa-iset",
+      "name": "Гостиница «Исеть»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "ekaterinburg",
+      "stem": "l52",
+      "name": "Креативный кластер «Л52»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "ekaterinburg",
+      "stem": "muzey-arhitektury-i-dizayna",
+      "name": "Музей архитектуры и дизайна",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "ekaterinburg",
+      "stem": "naberezhnaya-rabochey-molodezhi",
+      "name": "Набережная Рабочей Молодёжи",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "ekaterinburg",
+      "stem": "pashtet",
+      "name": "Ресторан «Паштет»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "ekaterinburg",
+      "stem": "pelmeni-klub",
+      "name": "Ресторан «Пельмени Клуб»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "ekaterinburg",
+      "stem": "perekhod-tsoya",
+      "name": "perekhod tsoya",
+      "reason": "missing",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "ekaterinburg",
+      "stem": "rok-bar-tsyn",
+      "name": "Рок-бар «Цынь»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "ekaterinburg",
+      "stem": "smotrovaya-ploschadka-bts-vysotskiy",
+      "name": "Смотровая площадка БЦ «Высоцкий»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "ekaterinburg",
+      "stem": "vodonapornaya-bashnya-plotinka",
+      "name": "Водонапорная башня на Плотинке",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "ekaterinburg",
+      "stem": "zmeeed",
+      "name": "Ресторан «Змееед»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "kaliningrad",
+      "stem": "muzey-yantarya",
+      "name": "Музей янтаря",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "kaliningrad",
+      "stem": "yuditten-kirkha",
+      "name": "Юдиттен-кирха",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "kazan",
+      "stem": "blagoveschenskiy-sobor",
+      "name": "Благовещенский собор",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "kazan",
+      "stem": "bogoroditskiy-monastyr",
+      "name": "Богородицкий монастырь",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "kazan",
+      "stem": "bogoyavlenskaya-kolokolnya",
+      "name": "Богоявленская колокольня",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "kazan",
+      "stem": "chasy-v-tatarskom-stile",
+      "name": "Часы в татарском стиле",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "kazan",
+      "stem": "dom-muzey-lenina",
+      "name": "Дом-музей Ленина",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "kazan",
+      "stem": "dom-shamilya-muzey-tukaya",
+      "name": "Дом Шамиля / музей Тукая",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "kazan",
+      "stem": "dom-ushkovoy",
+      "name": "Дом Ушковой",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "kazan",
+      "stem": "ermitazh-kazan",
+      "name": "Эрмитаж-Казань",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "kazan",
+      "stem": "fuksovskiy-sad",
+      "name": "Фуксовский сад",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "kazan",
+      "stem": "gorkinsko-ometevskiy-les",
+      "name": "Горкинско-Ометьевский лес",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "kazan",
+      "stem": "kareta-ekateriny-ii",
+      "name": "Карета Екатерины II",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "kazan",
+      "stem": "kazanskiy-universitet",
+      "name": "Казанский университет",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "kazan",
+      "stem": "mechet-al-mardzhani",
+      "name": "Мечеть аль-Марджани",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "kazan",
+      "stem": "muzey-chak-chaka",
+      "name": "muzey chak chaka",
+      "reason": "missing",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "kazan",
+      "stem": "natsionalnyy-muzey-rt",
+      "name": "Национальный музей РТ",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "kazan",
+      "stem": "pamyatnik-blagotvoritelyu",
+      "name": "Памятник Благотворителю",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "kazan",
+      "stem": "pamyatnik-karlu-fuksu",
+      "name": "Памятник Карлу Фуксу",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "kazan",
+      "stem": "pamyatnik-lobachevskomu",
+      "name": "pamyatnik lobachevskomu",
+      "reason": "missing",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "kazan",
+      "stem": "pamyatnik-tolstomu",
+      "name": "pamyatnik tolstomu",
+      "reason": "missing",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "kazan",
+      "stem": "pamyatnik-voinam-internatsionalistam",
+      "name": "Памятник воинам-интернационалистам",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "kazan",
+      "stem": "pamyatnik-zodchim-kremlya",
+      "name": "Памятник зодчим Казанского кремля",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "kazan",
+      "stem": "park-gorkogo",
+      "name": "Парк Горького",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "kazan",
+      "stem": "park-pobedy",
+      "name": "Парк Победы",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "kazan",
+      "stem": "petropavlovskiy-sobor",
+      "name": "Петропавловский собор",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "kazan",
+      "stem": "skulptura-taykazan",
+      "name": "Скульптура «Тайказан»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "kazan",
+      "stem": "skulptura-zagadki-shurale",
+      "name": "Скульптура «Загадки Шурале»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "kazan",
+      "stem": "staro-tatarskaya-sloboda",
+      "name": "Старо-Татарская слобода",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "kazan",
+      "stem": "sultanovskaya-mechet",
+      "name": "Султановская мечеть",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "kazan",
+      "stem": "teatr-kamala",
+      "name": "Театр имени Камала",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "kazan",
+      "stem": "teatr-opery-i-baleta",
+      "name": "Театр оперы и балета",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "kazan",
+      "stem": "tsentr-semi-kazan",
+      "name": "Центр семьи «Казан» (Чаша)",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "kazan",
+      "stem": "tugan-avylim",
+      "name": "«Туган Авылым»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "kazan",
+      "stem": "zakabannaya-mechet",
+      "name": "Закабанная мечеть",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "krasnodar",
+      "stem": "identity-architecture",
+      "name": "identity architecture",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "krasnodar",
+      "stem": "pamyatnik-ekaterine-ii",
+      "name": "Памятник Екатерине II",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "krasnodar",
+      "stem": "ulitsa-krasnaya",
+      "name": "Улица Красная",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "nizhny-novgorod",
+      "stem": "blagoveschenskiy-monastyr",
+      "name": "Благовещенский монастырь",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "nizhny-novgorod",
+      "stem": "chkalovskaya-lestnitsa",
+      "name": "Чкаловская лестница",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "nizhny-novgorod",
+      "stem": "muzey-istorii-gaz",
+      "name": "Музей истории ГАЗ",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "nizhny-novgorod",
+      "stem": "naberezhnaya-fedorovskogo",
+      "name": "Набережная Фёдоровского",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "nizhny-novgorod",
+      "stem": "nizhegorodskaya-yarmarka",
+      "name": "Нижегородская ярмарка",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "nizhny-novgorod",
+      "stem": "ribs-restaurant",
+      "name": "РИБС",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "nizhny-novgorod",
+      "stem": "staroyarmarochnyy-sobor",
+      "name": "Староярмарочный собор",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "nizhny-novgorod",
+      "stem": "stroganovskaya-tserkov",
+      "name": "Строгановская церковь",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "nizhny-novgorod",
+      "stem": "tehnicheskiy-muzey",
+      "name": "Технический музей",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "novosibirsk",
+      "stem": "barnyy-dvorik-lenina-3",
+      "name": "Бар-хоппинг дворик на Ленина, 3",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "novosibirsk",
+      "stem": "gastrokort-tsentralnyy-rynok",
+      "name": "Гастрокорт на Центральном рынке",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "novosibirsk",
+      "stem": "glavpochtamt",
+      "name": "Главпочтамт (Контора связи)",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "novosibirsk",
+      "stem": "green-line-cover",
+      "name": "green line cover",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "novosibirsk",
+      "stem": "identity-art",
+      "name": "identity art",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "novosibirsk",
+      "stem": "kafe-ip-fedoseev",
+      "name": "Кафе-кондитерская «ИП Федосеев»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "novosibirsk",
+      "stem": "muzey-olimpiyskoy-slavy",
+      "name": "Музей олимпийской славы",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "novosibirsk",
+      "stem": "muzey-solntsa",
+      "name": "Музей солнца",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "novosibirsk",
+      "stem": "novosibirskiy-zoopark-imeni-r-a-shilo",
+      "name": "Новосибирский зоопарк имени Р. А. Шило",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "novosibirsk",
+      "stem": "pamyatnik-kryachkovu",
+      "name": "Памятник архитектору Андрею Крячкову",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "novosibirsk",
+      "stem": "pamyatnik-laboratornoy-myshi",
+      "name": "Памятник лабораторной мыши",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "novosibirsk",
+      "stem": "pamyatnik-leninu",
+      "name": "Памятник Ленину и фигурам революции",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "novosibirsk",
+      "stem": "pamyatnik-pervomu-mostu",
+      "name": "Памятник первому мосту через Обь",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "novosibirsk",
+      "stem": "pamyatnik-pervomu-svidaniyu",
+      "name": "Памятник первому свиданию",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "novosibirsk",
+      "stem": "pamyatnik-tostu-za-zdravie",
+      "name": "Памятник тосту «За здравие»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "novosibirsk",
+      "stem": "pamyatnik-tramvayu-13",
+      "name": "Памятник трамваю №13",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "novosibirsk",
+      "stem": "pamyatnik-vysotskomu",
+      "name": "Памятник Высоцкому",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "novosibirsk",
+      "stem": "restoran-sibir-sibir",
+      "name": "Ресторан «#СибирьСибирь»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "novosibirsk",
+      "stem": "smotrovaya-aura",
+      "name": "Смотровая площадка у ТРЦ «Аура»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "novosibirsk",
+      "stem": "stokvartirnyy-dom",
+      "name": "Стоквартирный дом",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "novosibirsk",
+      "stem": "stseny-iz-kukolnyh-spektakley",
+      "name": "Скульптурная композиция «Сцены из кукольных спектаклей»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "novosibirsk",
+      "stem": "teatr-globus",
+      "name": "Театр «Глобус»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "novosibirsk",
+      "stem": "teatr-krasnyy-fakel",
+      "name": "Драматический театр «Красный факел»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "novosibirsk",
+      "stem": "tsentr-pobeda",
+      "name": "Центр культуры и отдыха «Победа»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "novosibirsk",
+      "stem": "vokzal-novosibirsk-glavnyy",
+      "name": "Железнодорожный вокзал «Новосибирск-Главный»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "novosibirsk",
+      "stem": "vovka-v-tridevyatom-tsarstve",
+      "name": "Скульптура «Вовка в Тридевятом царстве»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "omsk",
+      "stem": "ermitazh-sibir",
+      "name": "Эрмитаж-Сибирь",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "penza",
+      "stem": "byust-radishcheva",
+      "name": "Бюст А. Н. Радищева",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "penza",
+      "stem": "muzey-klyuchevskogo",
+      "name": "Музей В. О. Ключевского",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "penza",
+      "stem": "muzey-zapovednik-tarhany",
+      "name": "Тарханы",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "penza",
+      "stem": "penzenskaya-peshehodnaya-ulitsa-moskovskaya",
+      "name": "Улица Московская",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "penza",
+      "stem": "planetariy",
+      "name": "Планетарий",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "penza",
+      "stem": "restoran-lokalnoy-kuhni",
+      "name": "Ресторан с пензенской локальной кухней",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "rostov-na-donu",
+      "stem": "dohodnyy-dom-kisina",
+      "name": "Доходный дом Кисина",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "rostov-na-donu",
+      "stem": "muzey-skzhd",
+      "name": "Музей истории Северо-Кавказской железной дороги",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "rostov-na-donu",
+      "stem": "park-revolyutsii",
+      "name": "Парк Революции",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "rostov-na-donu",
+      "stem": "rostovskiy-rak",
+      "name": "Арт-объект «Ростовский рак»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "rostov-na-donu",
+      "stem": "skulptura-kupec-korobeynik",
+      "name": "Скульптура «Купец-коробейник»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "rostov-na-donu",
+      "stem": "surb-hach",
+      "name": "Армянская церковь Сурб Хач",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "rostov-na-donu",
+      "stem": "tsentral-nyy-rynok-staryy-bazar",
+      "name": "Центральный рынок (Старый базар)",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "saint-petersburg",
+      "stem": "divo-ostrov",
+      "name": "Планетарий №1",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "saint-petersburg",
+      "stem": "mihaylovskiy-zamok",
+      "name": "Стрелка Васильевского острова",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "saint-petersburg",
+      "stem": "sheremetevskiy-dvorets-fontannyy-dom",
+      "name": "Дворец Великого князя Владимира Александровича (Дом ученых)",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "saint-petersburg",
+      "stem": "tsentralnyy-voenno-morskoy-muzey",
+      "name": "Эрарта",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "saint-petersburg",
+      "stem": "yusupovskiy-dvorets",
+      "name": "Музей Фаберже",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "samara",
+      "stem": "dom-chemodan",
+      "name": "dom chemodan",
+      "reason": "missing",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "samara",
+      "stem": "gril-bar-po-chesnoku",
+      "name": "Гриль-бар «По-чесноку»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "samara",
+      "stem": "katolicheskiy-kostel-presvyatogo-serdtsa-iisusa",
+      "name": "Католический костёл Пресвятого Сердца Иисуса",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "samara",
+      "stem": "kraevedcheskiy-muzey-alabina",
+      "name": "Краеведческий музей им. П. В. Алабина",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "samara",
+      "stem": "krestyanskiy-pozemelnyy-bank",
+      "name": "Здание Крестьянского поземельного банка",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "samara",
+      "stem": "literaturnyy-muzey-gorkogo",
+      "name": "Самарский литературный музей им. М. Горького",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "samara",
+      "stem": "lyuteranskaya-kirha",
+      "name": "Лютеранская кирха Святого Георга",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "samara",
+      "stem": "muzey-eldara-ryazanova",
+      "name": "Музей Эльдара Рязанова",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "samara",
+      "stem": "muzey-moderna-usadba-kurlinoy",
+      "name": "Музей Модерна (Усадьба Курлиной)",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "samara",
+      "stem": "osobnyak-fon-vakano",
+      "name": "Особняк Альфреда фон Вакано",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "samara",
+      "stem": "osobnyak-klodta",
+      "name": "Особняк Клодта",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "samara",
+      "stem": "osobnyak-neronova",
+      "name": "Особняк Неронова",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "samara",
+      "stem": "pamyatnik-alekseyu-tolstomu",
+      "name": "pamyatnik alekseyu tolstomu",
+      "reason": "missing",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "samara",
+      "stem": "pamyatnik-aleshe-peshkovu",
+      "name": "Памятник Алеше Пешкову",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "samara",
+      "stem": "pamyatnik-otopitelnoy-bataree",
+      "name": "Памятник отопительной батарее",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "samara",
+      "stem": "pamyatnik-pervomu-tramvayu",
+      "name": "Памятник первому самарскому трамваю",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "samara",
+      "stem": "pamyatnik-petru-i-fevronii",
+      "name": "Памятник Петру и Февронии",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "samara",
+      "stem": "park-gagarina",
+      "name": "Парк имени Юрия Гагарина",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "samara",
+      "stem": "restoran-vasche-ogon",
+      "name": "restoran vasche ogon",
+      "reason": "missing",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "samara",
+      "stem": "samarskiy-hudozhestvennyy-muzey",
+      "name": "Самарский художественный музей",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "samara",
+      "stem": "skulptura-dama-s-raketkoy",
+      "name": "Скульптура «Дама с ракеткой»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "samara",
+      "stem": "skulptura-knyaz-vladimir",
+      "name": "Скульптура «Князь Владимир»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "samara",
+      "stem": "sobornaya-mechet",
+      "name": "Самарская соборная мечеть",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "samara",
+      "stem": "teatr-dramy-gorkogo",
+      "name": "Театр драмы им. М. Горького",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "samara",
+      "stem": "teatr-opery-i-baleta",
+      "name": "Театр оперы и балета",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "samara",
+      "stem": "volzhskiy-plyazh",
+      "name": "Волжский пляж",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "samara",
+      "stem": "yuzhnyy-gorod-amfiteatr",
+      "name": "Южный город / Парк Амфитеатр",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "samara",
+      "stem": "zagorodnyy-park",
+      "name": "Загородный парк",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "samara",
+      "stem": "zdanie-zhigulevskogo-kombinata",
+      "name": "Здание Жигулёвского пивоваренного комбината",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "saratov",
+      "stem": "dom-kommuna-inzhener",
+      "name": "Дом-коммуна «Инженер»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "saratov",
+      "stem": "identity-architecture",
+      "name": "identity architecture",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "saratov",
+      "stem": "identity-art",
+      "name": "identity art",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "saratov",
+      "stem": "pamyatnik-garmoshke",
+      "name": "Памятник Саратовской гармошке",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "saratov",
+      "stem": "pamyatnik-zhuravli",
+      "name": "Памятник «Журавли»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "saratov",
+      "stem": "smotrovaya-aeroport-tsentralnyy",
+      "name": "Смотровая площадка у аэропорта «Центральный»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "sochi",
+      "stem": "identity-architecture",
+      "name": "identity architecture",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "sochi",
+      "stem": "identity-art",
+      "name": "identity art",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "sochi",
+      "stem": "letniy-teatr",
+      "name": "Летний театр",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "sochi",
+      "stem": "ornitologicheskiy-park",
+      "name": "Орнитологический парк",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "sochi",
+      "stem": "pamyatnik-arhangelu-mihailu",
+      "name": "Памятник Архангелу Михаилу",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "tula",
+      "stem": "art-gribnaya-polyana",
+      "name": "Арт-объект «Грибная поляна»",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "tula",
+      "stem": "bashnya-odoevskih-vorot",
+      "name": "Башня Одоевских ворот",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "tula",
+      "stem": "bashnya-pyatnitskih-vorot",
+      "name": "Башня Пятницких ворот",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "tula",
+      "stem": "blagoveshchenskaya-tserkov",
+      "name": "Благовещенская церковь",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "tula",
+      "stem": "dom-lisitsynyh",
+      "name": "Дом жилой оружейников Лисицыных",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "tula",
+      "stem": "dom-muzey-veresaeva",
+      "name": "Дом-музей В. В. Вересаева",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "tula",
+      "stem": "hram-sergiya-radonezhskogo",
+      "name": "Храм Сергия Радонежского",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "tula",
+      "stem": "istoriko-memorialnyy-muzey-demidovyh",
+      "name": "Историко-мемориальный музей Демидовых",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "tula",
+      "stem": "ivanovskaya-bashnya",
+      "name": "Ивановская башня",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "tula",
+      "stem": "kafe-pryanosti-i-radosti",
+      "name": "Кафе-кондитерская «Пряности и Радости»",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "tula",
+      "stem": "kreativnoe-prostranstvo-iskra",
+      "name": "Креативное пространство «Искра»",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "tula",
+      "stem": "kremlevskiy-skver",
+      "name": "Кремлевский сквер",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "tula",
+      "stem": "muzey-dpi-tsentr-semeynoy-istorii",
+      "name": "Музей ДПИ в Центре семейной истории",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "tula",
+      "stem": "muzey-garmoni-deda-filimona",
+      "name": "Музей «Гармони Деда Филимона»",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "tula",
+      "stem": "muzey-stanka-oktava",
+      "name": "Музей станка в кластере «Октава»",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "tula",
+      "stem": "muzey-tulskie-samovary",
+      "name": "Музей «Тульские самовары»",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "tula",
+      "stem": "nikolo-zaretskaya-tserkov",
+      "name": "Николо-Зарецкая церковь",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "tula",
+      "stem": "oblastnoy-hudozhestvennyy-muzey",
+      "name": "Тульский областной художественный музей",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "tula",
+      "stem": "osobnyak-belolipetskih",
+      "name": "Особняк Белолипецких",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "tula",
+      "stem": "pamyatnik-sotrudnikam-gosbezopasnosti",
+      "name": "Памятник сотрудникам органов госбезопасности",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "tula",
+      "stem": "pamyatnik-uchenomu-kotu",
+      "name": "Памятник Ученому коту",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "tula",
+      "stem": "park-belousova",
+      "name": "Центральный парк культуры и отдыха им. П. П. Белоусова",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "tula",
+      "stem": "restoran-kultura",
+      "name": "Ресторан «Культура»",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "tula",
+      "stem": "rogozhinskiy-park",
+      "name": "Рогожинский парк",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "tula",
+      "stem": "smotrovaya-proletarskoy-naberezhnoy",
+      "name": "Смотровая площадка Пролетарской набережной",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "tula",
+      "stem": "staraya-tulskaya-apteka",
+      "name": "Старая тульская аптека",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "tula",
+      "stem": "teatr-dramy-gorkogo",
+      "name": "Тульский академический театр драмы им. М. Горького",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "tula",
+      "stem": "torgovye-ryady-kremlya",
+      "name": "Торговые ряды Кремля",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "tula",
+      "stem": "usadba-ermolaeva-zvereva",
+      "name": "Усадьба Ермолаева-Зверева",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "tula",
+      "stem": "uspenskiy-sobor-kremlya",
+      "name": "Успенский собор в Кремле",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "tula",
+      "stem": "vodyanye-vorota",
+      "name": "Водяные ворота Кремля",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "tula",
+      "stem": "vsekhsvyatskiy-kafedralnyy-sobor",
+      "name": "Всехсвятский кафедральный собор",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "tver",
+      "stem": "imperatorskiy-putevoy-dvorets",
+      "name": "Императорский путевой дворец",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "tver",
+      "stem": "kofeynya-tapioka",
+      "name": "Кофейня «Тапиока»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "tver",
+      "stem": "morozovskiy-gorodok-dvor-proletarki",
+      "name": "Казармы Морозовского городка",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "tver",
+      "stem": "starovolzhskiy-most",
+      "name": "Староволжский мост",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "tyumen",
+      "stem": "muzey-slovtsova",
+      "name": "Музей Словцова",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "tyumen",
+      "stem": "peshehodnaya-ulitsa-dzerzhinskogo",
+      "name": "Пешеходная улица Дзержинского",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "tyumen",
+      "stem": "skver-sibirskih-koshek",
+      "name": "Сквер сибирских кошек",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "tyumen",
+      "stem": "sobornaya-mechet",
+      "name": "Соборная мечеть",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "tyumen",
+      "stem": "znamenskiy-kafedral-nyy-sobor",
+      "name": "Знаменский кафедральный собор",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "ufa",
+      "stem": "dom-soyuzov",
+      "name": "Уфимский Дом Союзов",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "ufa",
+      "stem": "identity-art",
+      "name": "identity art",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "ufa",
+      "stem": "monument-druzhby",
+      "name": "Монумент Дружбы",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "ufa",
+      "stem": "osobnyak-kosterina-i-chernikova",
+      "name": "Особняк Костерина и Черникова",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "ufa",
+      "stem": "pamyatnik-generalu-shaymuratovu",
+      "name": "Памятник генералу Шаймуратову",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "ufa",
+      "stem": "pamyatnik-leninu",
+      "name": "Памятник В. И. Ленину",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "ufa",
+      "stem": "pamyatnik-pushkinu",
+      "name": "Памятник А. С. Пушкину",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "volgograd",
+      "stem": "bar-and-grill",
+      "name": "Стейк-хаус «Bar&Grill»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "volgograd",
+      "stem": "identity-art",
+      "name": "identity art",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "volgograd",
+      "stem": "identity-gastro",
+      "name": "identity gastro",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "volgograd",
+      "stem": "kafe-marusya",
+      "name": "Кафе «Маруся»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "volgograd",
+      "stem": "komsomolskiy-sad",
+      "name": "Комсомольский сад",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "volgograd",
+      "stem": "mel-nitsa-gergardta",
+      "name": "Мельница Гергардта",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "volgograd",
+      "stem": "muzey-mashkova",
+      "name": "Музей изобразительных искусств им. И.И. Машкова",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "volgograd",
+      "stem": "muzey-pamyat",
+      "name": "Музей «Память»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "volgograd",
+      "stem": "muzykalnyy-teatr",
+      "name": "Волгоградский музыкальный театр",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "volgograd",
+      "stem": "net-teatr",
+      "name": "Новый экспериментальный театр (НЭТ)",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "volgograd",
+      "stem": "nikitskaya-tserkov",
+      "name": "Никитская церковь",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "volgograd",
+      "stem": "osobnyak-repnikovoy",
+      "name": "Мемориально-исторический музей (Особняк Репниковой)",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "volgograd",
+      "stem": "pamyatnik-aleksandru-nevskomu",
+      "name": "Памятник Александру Невскому",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "volgograd",
+      "stem": "pamyatnik-zasekinu",
+      "name": "Памятник Засекину",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "volgograd",
+      "stem": "park-razdole",
+      "name": "Парк «Раздолье»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "volgograd",
+      "stem": "planetariy",
+      "name": "Волгоградский планетарий",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "volgograd",
+      "stem": "pozharnaya-kalancha",
+      "name": "Пожарная каланча Царицына",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "volgograd",
+      "stem": "restoran-reka",
+      "name": "Ресторан «Река»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "volgograd",
+      "stem": "restoran-shveyn",
+      "name": "Ресторан «Швейн»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "volgograd",
+      "stem": "restoran-volgograd",
+      "name": "Ресторан «Волгоград»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "volgograd",
+      "stem": "skver-sashi-filippova",
+      "name": "Сквер имени Саши Филиппова",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "volgograd",
+      "stem": "smotrovaya-mamaeva-kurgana",
+      "name": "Смотровая площадка Мамаева кургана",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "volgograd",
+      "stem": "sobor-aleksandra-nevskogo",
+      "name": "Кафедральный собор Александра Невского",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "volgograd",
+      "stem": "stalingradskiy-topol",
+      "name": "Сталинградский тополь",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "volgograd",
+      "stem": "staraya-sarepta",
+      "name": "Музей-заповедник «Старая Сарепта»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "volgograd",
+      "stem": "t-34-chelyabinskiy-kolkhoznik",
+      "name": "Памятник Т-34 «Челябинский колхозник»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "volgograd",
+      "stem": "teatr-kukol",
+      "name": "Волгоградский областной театр кукол",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "volgograd",
+      "stem": "tsaritsynskaya-opera",
+      "name": "Царицынская опера",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "volgograd",
+      "stem": "tsentral-naya-naberezhnaya-imeni-62-y-armii",
+      "name": "Центральная набережная им. 62-й Армии",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "volgograd",
+      "stem": "tsentralnyy-univermag",
+      "name": "Центральный Универмаг (подвал ЦУМа)",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "volgograd",
+      "stem": "tspkio",
+      "name": "Центральный парк культуры и отдыха (ЦПКиО)",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "volgograd",
+      "stem": "vokzal-volgograd-1",
+      "name": "Железнодорожный вокзал Волгоград-1",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "volgograd",
+      "stem": "volgogradskiy-metrotram",
+      "name": "Волгоградский метротрам",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "volgograd",
+      "stem": "zal-voinskoy-slavy",
+      "name": "Зал Воинской Славы",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "voronezh",
+      "stem": "admiralteyskaya-ploschad",
+      "name": "admiralteyskaya ploschad",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "voronezh",
+      "stem": "alekseevo-akatov-monastyr",
+      "name": "alekseevo akatov monastyr",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "voronezh",
+      "stem": "arsenal",
+      "name": "arsenal",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "voronezh",
+      "stem": "aviatsionnyy-zavod-vaso",
+      "name": "aviatsionnyy zavod vaso",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "voronezh",
+      "stem": "bar-hlam",
+      "name": "bar hlam",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "voronezh",
+      "stem": "bar-tsenzura",
+      "name": "bar tsenzura",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "voronezh",
+      "stem": "blagoveschenskiy-sobor",
+      "name": "blagoveschenskiy sobor",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "voronezh",
+      "stem": "chernavskaya-damba",
+      "name": "chernavskaya damba",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "voronezh",
+      "stem": "dom-kazennoy-palaty",
+      "name": "dom kazennoy palaty",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "voronezh",
+      "stem": "gastro-tsentralnyy-rynok",
+      "name": "gastro tsentralnyy rynok",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "voronezh",
+      "stem": "gostinitsa-bristol",
+      "name": "gostinitsa bristol",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "voronezh",
+      "stem": "hudozhestvennyy-muzey-kramskogo",
+      "name": "hudozhestvennyy muzey kramskogo",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "voronezh",
+      "stem": "ilinskiy-hram",
+      "name": "ilinskiy hram",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "voronezh",
+      "stem": "kamennyy-most",
+      "name": "kamennyy most",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "voronezh",
+      "stem": "kamernyy-teatr",
+      "name": "kamernyy teatr",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "voronezh",
+      "stem": "kazanskiy-hram",
+      "name": "kazanskiy hram",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "voronezh",
+      "stem": "kirha-svyatoy-marii",
+      "name": "kirha svyatoy marii",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "voronezh",
+      "stem": "kofeynya-promka",
+      "name": "kofeynya promka",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "voronezh",
+      "stem": "kraevedcheskiy-muzey",
+      "name": "kraevedcheskiy muzey",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "voronezh",
+      "stem": "literaturnyy-muzey-nikitina",
+      "name": "literaturnyy muzey nikitina",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "voronezh",
+      "stem": "meshchanskaya-politseyskaya-chast",
+      "name": "meshchanskaya politseyskaya chast",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "voronezh",
+      "stem": "muzey-diorama",
+      "name": "muzey diorama",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "voronezh",
+      "stem": "muzey-zabytoy-muzyki",
+      "name": "muzey zabytoy muzyki",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "voronezh",
+      "stem": "pamyatnik-frontovomu-pochtalonu",
+      "name": "pamyatnik frontovomu pochtalonu",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "voronezh",
+      "stem": "pamyatnik-lechebnomu-stulu",
+      "name": "pamyatnik lechebnomu stulu",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "voronezh",
+      "stem": "pamyatnik-yuriyu-hoyu",
+      "name": "pamyatnik yuriyu hoyu",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "voronezh",
+      "stem": "petrovskaya-naberezhnaya",
+      "name": "petrovskaya naberezhnaya",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "voronezh",
+      "stem": "pokrovskiy-sobor",
+      "name": "pokrovskiy sobor",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "voronezh",
+      "stem": "restoran-el-chico",
+      "name": "restoran el chico",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "voronezh",
+      "stem": "ryumochnaya-kulturno-korotko",
+      "name": "ryumochnaya kulturno korotko",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "voronezh",
+      "stem": "ryumochnaya-zyuzya",
+      "name": "ryumochnaya zyuzya",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "voronezh",
+      "stem": "skulptura-neznakomka",
+      "name": "Скульптура «Незнакомка»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "voronezh",
+      "stem": "smotrovaya-park-durova",
+      "name": "smotrovaya park durova",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "voronezh",
+      "stem": "spikizi-bar-arhiv",
+      "name": "spikizi bar arhiv",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "voronezh",
+      "stem": "teatr-dramy-koltsova",
+      "name": "teatr dramy koltsova",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "voronezh",
+      "stem": "teatr-kukol-shut",
+      "name": "teatr kukol shut",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "voronezh",
+      "stem": "tsentralnyy-park-dinamo",
+      "name": "tsentralnyy park dinamo",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "voronezh",
+      "stem": "uspenskiy-admiralteyskiy-hram",
+      "name": "uspenskiy admiralteyskiy hram",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "voronezh",
+      "stem": "zdanie-upravleniya-yuvzhd",
+      "name": "zdanie upravleniya yuvzhd",
+      "reason": "small",
+      "wave": "small-mustsee"
+    },
+    {
+      "city": "yaroslavl",
+      "stem": "filarmoniya",
+      "name": "Ярославская государственная филармония",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "yaroslavl",
+      "stem": "gubernatorskiy-sad",
+      "name": "Губернаторский сад",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "yaroslavl",
+      "stem": "mitropolichi-palaty",
+      "name": "Митрополичьи палаты",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "yaroslavl",
+      "stem": "pamyatnik-kopeyke-1612",
+      "name": "Памятник Копейке 1612 года",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "yaroslavl",
+      "stem": "pamyatnik-nekrasovu",
+      "name": "Памятник Некрасову",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "yaroslavl",
+      "stem": "pamyatnik-rychashemu-medvedyu",
+      "name": "Памятник Рычащему Медведю",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "yaroslavl",
+      "stem": "pivovarnya-plan-b",
+      "name": "Пивоварня «План Б»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "yaroslavl",
+      "stem": "restoran-mamuka",
+      "name": "Ресторан «Мамука»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "yaroslavl",
+      "stem": "restoran-penaty",
+      "name": "Ресторан «Пенаты»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "yaroslavl",
+      "stem": "restoran-sobranie",
+      "name": "Ресторан «Собрание»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "yaroslavl",
+      "stem": "skulptura-postovoy-u-zastavy",
+      "name": "Скульптура «Постовой у заставы»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "yaroslavl",
+      "stem": "strelka-rek-volgi-i-kotorosli",
+      "name": "Парк на Стрелке (Нижний партер)",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "yaroslavl",
+      "stem": "strit-art-aura",
+      "name": "Стрит-арт стена за ТЦ «Аура»",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "yaroslavl",
+      "stem": "teatr-volkova",
+      "name": "Театр драмы имени Федора Волкова",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "yaroslavl",
+      "stem": "tserkov-il-i-proroka",
+      "name": "Церковь Ильи Пророка",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "yaroslavl",
+      "stem": "usadba-matveevskih",
+      "name": "Усадьба Матвеевских",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "yaroslavl",
+      "stem": "uspenskiy-sobor",
+      "name": "Успенский кафедральный собор",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "yaroslavl",
+      "stem": "volzhskaya-naberezhnaya",
+      "name": "Волжская набережная (верхний ярус)",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "yaroslavl",
+      "stem": "volzhskaya-naberezhnaya-nizhniy-yarus",
+      "name": "Волжская набережная (нижний ярус)",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "yaroslavl",
+      "stem": "yaroslavskiy-hudozhestvennyy-muzey",
+      "name": "Ярославский художественный музей",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "yaroslavl",
+      "stem": "yaroslavskiy-kreml-spaso-preobrazhenskiy-monastyr",
+      "name": "Ярославский музей-заповедник (Спасский монастырь)",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    },
+    {
+      "city": "yaroslavl",
+      "stem": "znamenskaya-bashnya",
+      "name": "Знаменская (Власьевская) башня",
+      "reason": "d0-cluster",
+      "wave": "d0-tail"
+    }
+  ]
+}

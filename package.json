@@ -60,6 +60,7 @@
     "hub:audit-visual-clones": "node scripts/audit-venue-visual-clones-strict.mjs",
     "hub:audit-visual-shelf": "node scripts/audit-city-visual-shelf.mjs",
     "hub:build-visual-regen-worklists": "node scripts/build-city-visual-regen-worklists.mjs",
+    "hub:build-full-visual-regen-queue": "node scripts/build-full-visual-regen-queue.mjs",
     "check:post-deploy": "bash scripts/post-deploy-check.sh",
     "check:parity": "bash scripts/run-parity-check.sh",
     "revalidate:home": "node scripts/revalidate-next-home.mjs",

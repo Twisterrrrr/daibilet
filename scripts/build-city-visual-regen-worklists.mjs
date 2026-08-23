@@ -146,7 +146,7 @@ const cities = only.length
   : audit.summary
       .filter((s) => s.d0 > 0 || s.pairs > 0)
       .map((s) => s.city)
-      .filter((c) => c !== 'place' && c !== 'ryazan');
+      .filter((c) => c !== 'place');
 
 fs.mkdirSync(outDir, { recursive: true });
 const master = [];
