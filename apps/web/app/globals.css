@@ -266,27 +266,6 @@ html[data-nav-pending='1'] {
     @apply inline-flex items-center justify-center rounded-full p-2.5 text-graphite-muted transition hover:bg-surface-muted hover:text-graphite;
   }
 
-  /**
-   * Hub suburb cover: fixed thumbnail. Never stretch to the text-column row height
-   * (that produced a full-viewport portrait strip on ultrawide).
-   */
-  @media (min-width: 640px) {
-    [data-day-trip-cover] {
-      width: 9.5rem !important;
-      height: 9rem !important;
-      max-height: 9rem !important;
-      min-height: 0 !important;
-    }
-  }
-
-  @media (min-width: 1536px) {
-    [data-day-trip-cover] {
-      width: 10rem !important;
-      height: 10rem !important;
-      max-height: 10rem !important;
-    }
-  }
-
   /** Blog listing: filters | bento feed | widgets (ultrawide 3-col). */
   .blog-layout {
     @apply w-full;
