@@ -78,14 +78,13 @@ const PANEL_INSET_SM = 'sm:pl-4';
 const LOGISTICS_BG_EXTEND_SM = 'sm:-ml-4';
 
 /**
- * Desktop: keep suburb detail inside the viewport under sticky header + hub tabs.
+ * Desktop: keep suburb detail inside the viewport under sticky header + hub tabs + chip rail.
  * Scroll the text column - not the route chip list.
  * `min-h-0` lets the grid item shrink so overflow-y actually scrolls.
- * No overscroll-y-contain: it trapped page wheel when the panel was not overflowing
- * (and after photo rail, wheel often never reached the page).
+ * Ultrawide budget is tighter so photo + copy + chips fit one screen.
  */
 const HUB_DETAIL_MAX_H =
-  'sm:max-h-[calc(100dvh-var(--site-header-height)-env(safe-area-inset-top,0px)-5.5rem)]';
+  'sm:max-h-[calc(100dvh-var(--site-header-height)-env(safe-area-inset-top,0px)-7.5rem)] 2xl:max-h-[calc(100dvh-var(--site-header-height)-env(safe-area-inset-top,0px)-11rem)]';
 const HUB_DETAIL_SCROLL = `${HUB_DETAIL_MAX_H} sm:min-h-0 sm:overflow-y-auto`;
 
 export function DayTripCanonCard({
@@ -308,32 +307,41 @@ export function DayTripCanonCard({
         className={
           cover
             ? triptych
-              ? 'flex flex-col sm:grid sm:min-h-0 sm:grid-cols-[minmax(15rem,40%)_minmax(0,1fr)] sm:items-stretch 2xl:grid-cols-[minmax(15rem,18rem)_minmax(0,1fr)_minmax(15rem,17.5rem)]'
-              : 'flex flex-col sm:grid sm:min-h-0 sm:grid-cols-[minmax(15rem,40%)_minmax(0,1fr)] sm:items-stretch'
+              ? 'flex flex-col sm:grid sm:min-h-0 sm:grid-cols-[minmax(10rem,24%)_minmax(0,1fr)] sm:items-start 2xl:grid-cols-[minmax(10rem,13rem)_minmax(0,1fr)_minmax(14rem,16rem)]'
+              : 'flex flex-col sm:grid sm:min-h-0 sm:grid-cols-[minmax(10rem,24%)_minmax(0,1fr)] sm:items-start'
             : undefined
         }
       >
       {cover ? (
         <div
-          className="relative h-44 w-full self-stretch overflow-hidden rounded-t-2xl bg-[#F5F5F7] sm:h-full sm:min-h-[18rem] sm:rounded-l-2xl sm:rounded-tr-none 2xl:min-h-[22rem]"
-          data-day-trip-cover
+          className={`sm:flex sm:h-full sm:min-h-0 sm:flex-col sm:self-stretch ${
+            editorial ? 'sm:bg-zinc-50' : 'sm:bg-slate-50'
+          }`}
+          data-day-trip-cover-col
         >
-          <SafeImage
-            src={cover}
-            alt=""
-            fill
-            sizes="(max-width: 640px) 100vw, (min-width: 1536px) 288px, 40vw"
-            className="object-cover"
-            unoptimized
-            fallback={<div className="h-full w-full bg-slate-200" />}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/25 via-transparent to-transparent sm:bg-gradient-to-r sm:from-transparent sm:to-slate-950/10" />
-          <span
-            className="absolute left-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/95 text-sm font-bold tabular-nums text-slate-900 shadow-sm"
-            data-day-trip-badge
+          <div
+            className={`relative h-40 w-full overflow-hidden rounded-t-2xl sm:h-[12.5rem] sm:max-h-[12.5rem] sm:shrink-0 sm:rounded-l-2xl sm:rounded-tr-none 2xl:h-[13.5rem] 2xl:max-h-[13.5rem] ${
+              editorial ? 'bg-zinc-100' : 'bg-slate-100'
+            }`}
+            data-day-trip-cover
           >
-            {index + 1}
-          </span>
+            <SafeImage
+              src={cover}
+              alt=""
+              fill
+              sizes="(max-width: 640px) 100vw, (min-width: 1536px) 208px, 24vw"
+              className="object-cover"
+              unoptimized
+              fallback={<div className="h-full w-full bg-slate-200" />}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/25 via-transparent to-transparent sm:bg-gradient-to-r sm:from-transparent sm:to-slate-950/10" />
+            <span
+              className="absolute left-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/95 text-sm font-bold tabular-nums text-slate-900 shadow-sm"
+              data-day-trip-badge
+            >
+              {index + 1}
+            </span>
+          </div>
         </div>
       ) : null}
       <div
