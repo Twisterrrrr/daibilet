@@ -358,18 +358,190 @@ html[data-nav-pending='1'] {
     @apply border-0 bg-primary text-white hover:bg-primary/90 hover:text-white;
   }
 
-  /** Adaptive card grid inside container-page — grows to ~6–7 cols on ultrawide. */
+  /** Adaptive card grid inside container-page — ~4–5 cols on ultrawide with readable card width. */
   .catalog-card-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 18.75rem), 1fr));
     gap: 1rem;
   }
 
   @media (min-width: 640px) {
     .catalog-card-grid {
-      gap: 1.25rem;
-      grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+      gap: 1.5rem 1.25rem;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 18.75rem), 1fr));
     }
+  }
+
+  /** Sidebar + main content (places / events catalogs). */
+  .catalog-page-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+
+  @media (min-width: 1024px) {
+    .catalog-page-layout {
+      grid-template-columns: 17.5rem minmax(0, 1fr);
+      gap: 2.5rem;
+      align-items: start;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .catalog-page-layout {
+      grid-template-columns: 18.75rem minmax(0, 1fr);
+      gap: 3rem;
+    }
+  }
+
+  .catalog-sidebar {
+    @apply min-w-0;
+  }
+
+  @media (min-width: 1024px) {
+    .catalog-sidebar {
+      position: sticky;
+      top: calc(var(--site-header-height, 4rem) + 1rem);
+      max-height: calc(100vh - var(--site-header-height, 4rem) - 2rem);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding-right: 0.25rem;
+    }
+  }
+
+  @media (max-width: 1023px) {
+    .catalog-sidebar {
+      position: fixed;
+      top: 0;
+      left: -100%;
+      z-index: 1000;
+      width: min(100vw, 24rem);
+      height: 100vh;
+      overflow-y: auto;
+      background: #fff;
+      padding: 1rem 1rem 5.5rem;
+      border-radius: 0 1rem 1rem 0;
+      box-shadow: 1.25rem 0 2.5rem rgba(15, 23, 42, 0.15);
+      transition: left 0.28s ease;
+    }
+
+    .catalog-sidebar.is-open {
+      left: 0;
+    }
+  }
+
+  .catalog-sidebar-overlay {
+    display: none;
+  }
+
+  @media (max-width: 1023px) {
+    .catalog-sidebar-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      background: rgba(15, 23, 42, 0.4);
+    }
+
+    .catalog-sidebar-overlay.is-visible {
+      display: block;
+    }
+  }
+
+  .catalog-mobile-filters-trigger {
+    display: none;
+  }
+
+  @media (max-width: 1023px) {
+    .catalog-mobile-filters-trigger {
+      @apply fixed bottom-[calc(1.25rem+env(safe-area-inset-bottom,0px))] left-1/2 z-[99] inline-flex -translate-x-1/2 items-center gap-2 rounded-full border-0 bg-primary px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-primary/30;
+    }
+  }
+
+  .catalog-sidebar-mobile-header {
+    @apply mb-5 flex items-center justify-between border-b border-slate-100 pb-4;
+  }
+
+  .catalog-sidebar-close {
+    @apply inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-900;
+  }
+
+  .catalog-sidebar-mobile-footer {
+    @apply fixed bottom-0 left-0 z-[1001] w-full max-w-[24rem] border-t border-slate-100 bg-white p-4 shadow-[0_-10px_20px_rgba(0,0,0,0.05)];
+  }
+
+  .catalog-sidebar-section {
+    @apply mb-6;
+  }
+
+  .catalog-sidebar-section__title {
+    @apply mb-2.5 text-xs font-semibold uppercase tracking-wide text-slate-500;
+  }
+
+  /** Vertical category / filter list in sidebar */
+  .catalog-sidebar-nav {
+    @apply flex flex-col gap-1;
+  }
+
+  .catalog-sidebar-nav__item {
+    @apply inline-flex w-full items-center justify-between gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-slate-700 transition hover:bg-slate-50;
+  }
+
+  .catalog-sidebar-nav__item--active {
+    @apply bg-slate-900 text-white hover:bg-slate-800;
+  }
+
+  .catalog-sidebar-nav__count {
+    @apply shrink-0 text-xs tabular-nums text-slate-400;
+  }
+
+  .catalog-sidebar-nav__item--active .catalog-sidebar-nav__count {
+    @apply text-white/70;
+  }
+
+  .catalog-sidebar-desktop-header {
+    @apply mb-4 hidden items-center justify-between border-b border-slate-100 pb-3 lg:flex;
+  }
+
+  .catalog-sidebar-desktop-title {
+    @apply text-base font-bold text-slate-900;
+  }
+
+  .catalog-sidebar-clear {
+    @apply rounded-md px-2 py-1 text-sm font-medium text-slate-500 transition hover:bg-red-50 hover:text-red-600;
+  }
+
+  /** Date rail in main column — capped width on ultrawide */
+  .catalog-date-timeline {
+    @apply mb-4 max-w-[68.75rem] overflow-x-auto pb-1 [scrollbar-width:thin];
+  }
+
+  .catalog-price-range__inputs {
+    @apply mb-3 flex items-center gap-2;
+  }
+
+  .catalog-price-range__input {
+    @apply h-10 w-full min-w-0 rounded-xl border border-slate-200 bg-[#F5F5F7] px-2 text-center text-sm outline-none focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20;
+  }
+
+  .catalog-price-range__track {
+    @apply relative h-1.5 w-full rounded-full bg-slate-200;
+  }
+
+  .catalog-price-range__range {
+    @apply pointer-events-none absolute inset-x-0 top-1/2 h-0 w-full -translate-y-1/2 appearance-none bg-transparent;
+  }
+
+  .catalog-price-range__range::-webkit-slider-thumb {
+    @apply pointer-events-auto h-[1.125rem] w-[1.125rem] cursor-pointer appearance-none rounded-full border-2 border-white bg-primary shadow-md;
+  }
+
+  .catalog-price-range__range::-moz-range-thumb {
+    @apply pointer-events-auto h-[1.125rem] w-[1.125rem] cursor-pointer rounded-full border-2 border-white bg-primary shadow-md;
+  }
+
+  /** Venue cards in catalog grid — taller cover */
+  .catalog-card-grid .aspect-video {
+    aspect-ratio: 16 / 10;
   }
 
   /** Places/events/blog hero: keep search + selects grouped, not edge-to-edge. */

@@ -3,11 +3,13 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Baby, ChevronDown, Gift, Moon, MoreHorizontal, Search, SlidersHorizontal, X } from 'lucide-react';
-import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 
 import { CatalogAdvancedFiltersPanel } from '@/components/CatalogAdvancedFiltersPanel.client';
 import { CatalogDateRail } from '@/components/CatalogDateRail.client';
+import { CatalogPriceRange } from '@/components/CatalogPriceRange.client';
+import { CatalogSidebarLayout } from '@/components/CatalogSidebarLayout.client';
 import { CategoryTabIcon } from '@/components/CategoryTabIcon';
 import { displayCatalogLabel } from '@/lib/catalog-labels';
 import {
@@ -36,7 +38,12 @@ type CatalogToolbarProps = {
   disabled?: boolean;
   cityReady?: boolean;
   compact?: boolean;
+  /** Sidebar + main column on lg+; children render in main column. */
+  layout?: 'default' | 'split';
+  children?: ReactNode;
 };
+
+const CATALOG_PRICE_MAX = 10_000;
 
 const SEARCH_DEBOUNCE_MS = 350;
 /** Events with ageLimit ≤ 12 - family-friendly quick filter. */
@@ -48,6 +55,8 @@ export function CatalogToolbar({
   disabled = false,
   cityReady: _cityReady = true,
   compact = false,
+  layout = 'default',
+  children,
 }: CatalogToolbarProps) {
   const router = useRouter();
   const filters = useMemo(() => catalogFiltersFromQuery(values), [values]);
@@ -271,6 +280,208 @@ export function CatalogToolbar({
           onClose={() => setCategoriesMoreOpen(false)}
         />
       </div>
+    );
+  }
+
+  const priceMinValue = filters.minPrice ?? 0;
+  const priceMaxValue = filters.maxPrice ?? CATALOG_PRICE_MAX;
+
+  const setPriceRange = (min: number, max: number) => {
+    const atDefault = min <= 0 && max >= CATALOG_PRICE_MAX;
+    navigate({
+      ...filters,
+      q: qDraft.trim() || filters.q,
+      minPrice: atDefault ? undefined : min,
+      maxPrice: atDefault ? undefined : max,
+      page: undefined,
+    });
+  };
+
+  const resetSidebarFilters = () => {
+    setQDraft('');
+    navigate({
+      city: filters.city,
+      sort: filters.sort,
+      limit: filters.limit,
+    });
+  };
+
+  const sidebarActiveCount =
+    advancedCount + (filters.category ? 1 : 0) + (qDraft.trim() ? 1 : 0);
+
+  const catalogSearchField = (
+    <div ref={searchWrapRef} className="catalog-toolbar-search-field max-w-none md:max-w-none">
+      <label className="relative block min-w-0 flex-1">
+        <span className="sr-only">Поиск по событиям</span>
+        <Search
+          aria-hidden
+          className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500"
+          strokeWidth={1.75}
+        />
+        <input
+          ref={searchInputRef}
+          type="search"
+          name="q"
+          value={qDraft}
+          onChange={(event) => setQDraft(event.target.value)}
+          onFocus={() => setSearchFocused(true)}
+          placeholder="Название, место или артист"
+          aria-label="Поиск по событиям"
+          aria-expanded={showSearchHints}
+          aria-controls={showSearchHints ? 'catalog-search-hints-sidebar' : undefined}
+          disabled={disabled}
+          autoComplete="off"
+          className="inline-btn h-11 w-full rounded-xl border-0 bg-transparent pl-10 pr-9 text-sm text-graphite outline-none transition placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-primary/30 disabled:opacity-60"
+        />
+        {qDraft ? (
+          <button
+            type="button"
+            aria-label="Очистить поиск"
+            disabled={disabled}
+            onClick={() => {
+              setQDraft('');
+              navigate({ ...filters, q: undefined, page: undefined });
+            }}
+            className="inline-btn absolute right-1.5 top-1/2 grid h-6 w-6 -translate-y-1/2 place-items-center rounded-lg text-graphite-muted hover:bg-surface-muted hover:text-graphite disabled:opacity-60"
+          >
+            <X aria-hidden className="h-3.5 w-3.5" strokeWidth={1.75} />
+          </button>
+        ) : null}
+      </label>
+      {showSearchHints ? (
+        <div
+          id="catalog-search-hints-sidebar"
+          role="listbox"
+          aria-label="Популярные запросы"
+          className="absolute left-0 right-0 top-[calc(100%+0.35rem)] z-50 overflow-hidden rounded-2xl border border-slate-200 bg-white py-1.5 shadow-lg"
+        >
+          <p className="px-3 pb-1 pt-0.5 text-[11px] font-semibold uppercase tracking-wider text-graphite-muted">
+            Часто ищут
+          </p>
+          {searchHints.map((hint) => (
+            <button
+              key={`sidebar-${hint.kind}:${hint.category || hint.q || hint.label}`}
+              type="button"
+              role="option"
+              className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm text-graphite transition hover:bg-surface-muted"
+              onClick={() => {
+                setSearchFocused(false);
+                if (hint.kind === 'q' && hint.q) {
+                  setQDraft(hint.q);
+                  navigate({ ...filters, q: hint.q, category: undefined, page: undefined });
+                  return;
+                }
+                navigate({ ...filters, q: undefined, category: hint.category, page: undefined });
+              }}
+            >
+              <Search aria-hidden className="h-3.5 w-3.5 shrink-0 text-graphite-muted" strokeWidth={1.75} />
+              <span className="truncate">{hint.label}</span>
+            </button>
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+
+  if (layout === 'split') {
+    const eventsSidebar = (
+      <>
+        <div className="catalog-sidebar-desktop-header">
+          <span className="catalog-sidebar-desktop-title">Фильтры</span>
+          {sidebarActiveCount > 0 ? (
+            <button type="button" className="catalog-sidebar-clear" onClick={resetSidebarFilters}>
+              Сбросить
+            </button>
+          ) : null}
+        </div>
+
+        <form onSubmit={onSubmit} className="catalog-sidebar-section">
+          {catalogSearchField}
+          <button
+            type="submit"
+            disabled={disabled}
+            className="mt-2 inline-flex h-10 w-full items-center justify-center rounded-xl bg-primary text-sm font-semibold text-white transition hover:bg-primary/90 disabled:opacity-60"
+          >
+            Найти
+          </button>
+        </form>
+
+        <div className="catalog-sidebar-section">
+          <p className="catalog-sidebar-section__title">Стоимость, ₽</p>
+          <CatalogPriceRange
+            min={0}
+            max={CATALOG_PRICE_MAX}
+            valueMin={priceMinValue}
+            valueMax={priceMaxValue}
+            disabled={disabled}
+            onChange={setPriceRange}
+          />
+        </div>
+
+        <div className="catalog-sidebar-section">
+          <p className="catalog-sidebar-section__title">Категории</p>
+          <CategorySidebarNav
+            filters={filters}
+            primary={categorySplit.primary}
+            overflow={categorySplit.overflow}
+            onOpenMore={() => setCategoriesMoreOpen(true)}
+          />
+        </div>
+
+        <div className="catalog-sidebar-section">
+          <p className="catalog-sidebar-section__title">Особенности</p>
+          <QuickFilterSidebarNav
+            filters={filters}
+            qDraft={qDraft}
+            disabled={disabled}
+            onNavigate={navigate}
+          />
+        </div>
+
+        <div className="catalog-sidebar-section pb-2 lg:pb-0">
+          <FiltersButton
+            open={filtersOpen}
+            count={advancedCount}
+            disabled={disabled}
+            onClick={() => setFiltersOpen(true)}
+            className="w-full justify-center"
+          />
+        </div>
+      </>
+    );
+
+    return (
+      <>
+        <CatalogSidebarLayout
+          sidebar={eventsSidebar}
+          title="Фильтры"
+          triggerLabel="Фильтры и поиск"
+          activeCount={sidebarActiveCount}
+        >
+          <div className="catalog-toolbar sticky top-[var(--site-header-height)] z-30 -mx-4 border-b border-slate-200/60 bg-white/95 px-4 py-2 backdrop-blur-md supports-[backdrop-filter]:bg-white/90 sm:-mx-6 sm:px-6 lg:static lg:mx-0 lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none">
+            <div className="space-y-2 md:hidden">
+              <MobileDateSelect
+                chips={dateRailChips}
+                filters={filters}
+                disabled={disabled}
+                onPreset={setDatePreset}
+                onExactDay={setExactDay}
+              />
+            </div>
+            <div className="catalog-date-timeline hidden md:block">
+              <CatalogDateRail disabled={disabled} className="min-w-0 w-full" />
+            </div>
+          </div>
+          {children}
+        </CatalogSidebarLayout>
+        {advancedPanel}
+        <MoreCategoriesSheet
+          open={categoriesMoreOpen}
+          filters={filters}
+          overflow={categorySplit.overflow}
+          onClose={() => setCategoriesMoreOpen(false)}
+        />
+      </>
     );
   }
 
@@ -707,6 +918,147 @@ function QuickFilterToggles({
         <span className="whitespace-nowrap">С детьми</span>
       </button>
     </>
+  );
+}
+
+function QuickFilterSidebarNav({
+  filters,
+  qDraft,
+  disabled,
+  onNavigate,
+}: {
+  filters: CatalogFilterValues;
+  qDraft: string;
+  disabled?: boolean;
+  onNavigate: (next: CatalogFilterValues) => void;
+}) {
+  const freeOn = filters.minPrice === 0 && filters.maxPrice === 0;
+  const kidsOn = filters.ageMax === KIDS_AGE_MAX;
+  const eveningOn = filters.date === 'evening' && !filters.from && !filters.to;
+
+  const withQ = (next: CatalogFilterValues): CatalogFilterValues => ({
+    ...next,
+    q: qDraft.trim() || filters.q,
+    page: undefined,
+  });
+
+  const items = [
+    {
+      key: 'evening',
+      label: 'Сегодня вечером',
+      active: eveningOn,
+      onClick: () =>
+        onNavigate(
+          withQ({
+            ...filters,
+            date: eveningOn ? undefined : 'evening',
+            from: undefined,
+            to: undefined,
+          }),
+        ),
+    },
+    {
+      key: 'free',
+      label: 'Бесплатные',
+      active: freeOn,
+      onClick: () =>
+        onNavigate(
+          withQ({
+            ...filters,
+            minPrice: freeOn ? undefined : 0,
+            maxPrice: freeOn ? undefined : 0,
+          }),
+        ),
+    },
+    {
+      key: 'kids',
+      label: 'С детьми',
+      active: kidsOn,
+      onClick: () =>
+        onNavigate(
+          withQ({
+            ...filters,
+            ageMax: kidsOn ? undefined : KIDS_AGE_MAX,
+          }),
+        ),
+    },
+  ];
+
+  return (
+    <nav className="catalog-sidebar-nav" aria-label="Особенности">
+      {items.map((item) => (
+        <button
+          key={item.key}
+          type="button"
+          disabled={disabled}
+          aria-pressed={item.active}
+          onClick={item.onClick}
+          className={`catalog-sidebar-nav__item${item.active ? ' catalog-sidebar-nav__item--active' : ''}`}
+        >
+          <span>{item.label}</span>
+        </button>
+      ))}
+    </nav>
+  );
+}
+
+function CategorySidebarNav({
+  filters,
+  primary,
+  overflow,
+  onOpenMore,
+}: {
+  filters: CatalogFilterValues;
+  primary: CatalogCategoryFacet[];
+  overflow: CatalogCategoryFacet[];
+  onOpenMore: () => void;
+}) {
+  return (
+    <nav className="catalog-sidebar-nav" aria-label="Категории">
+      <Link
+        href={buildCatalogHref({ ...filters, category: undefined, page: undefined })}
+        className={`catalog-sidebar-nav__item${!filters.category ? ' catalog-sidebar-nav__item--active' : ''}`}
+      >
+        <span>Все события</span>
+      </Link>
+      {primary.map((item) => {
+        const active = filters.category === item.name;
+        const empty = item.events <= 0;
+        const label = displayCatalogLabel(item.name);
+        if (empty && !active) {
+          return (
+            <span
+              key={item.name}
+              className="catalog-sidebar-nav__item cursor-not-allowed opacity-40"
+              aria-disabled="true"
+            >
+              <span>{label}</span>
+              <span className="catalog-sidebar-nav__count">0</span>
+            </span>
+          );
+        }
+        return (
+          <Link
+            key={item.name}
+            href={buildCatalogHref({
+              ...filters,
+              category: active ? undefined : item.name,
+              page: undefined,
+            })}
+            className={`catalog-sidebar-nav__item${active ? ' catalog-sidebar-nav__item--active' : ''}${empty ? ' opacity-60' : ''}`}
+          >
+            <span>{label}</span>
+            {item.events > 0 ? <span className="catalog-sidebar-nav__count">{item.events}</span> : null}
+          </Link>
+        );
+      })}
+      {overflow.length > 0 ? (
+        <button type="button" onClick={onOpenMore} className="catalog-sidebar-nav__item text-primary">
+          <span>Ещё категории</span>
+          <span className="catalog-sidebar-nav__count">{overflow.length}</span>
+        </button>
+      ) : null}
+    </nav>
   );
 }
 

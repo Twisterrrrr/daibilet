@@ -275,21 +275,19 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
   }
 
   return (
-    <>
-      {/* Sticky search + date/category/sort in CatalogToolbar. */}
-      <CatalogToolbar
-        facets={facets}
-        values={filterValues}
-        disabled={(loading && !catalog) || cityBootstrapPending}
-        cityReady={cityReady || urlHasCity}
-      />
-
-      {/* Active chips: sm+ only - on mobile filters live in the Фильтры sheet / FAB. */}
+    <CatalogToolbar
+      facets={facets}
+      values={filterValues}
+      disabled={(loading && !catalog) || cityBootstrapPending}
+      cityReady={cityReady || urlHasCity}
+      layout="split"
+    >
+      {/* Active chips: sm+ only - on mobile filters live in the drawer. */}
       <div className="hidden sm:block">
         <CatalogActiveFilters values={filterValues} />
       </div>
 
-      {/* Meta слева; sort только mobile (desktop sort в sticky toolbar); view справа */}
+      {/* Meta слева; sort только mobile; view справа */}
       <div className="mt-4 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 sm:mt-5">
         <p className="min-w-0 text-sm text-graphite-muted">
           {loading && !catalog ? 'Загрузка…' : null}
@@ -396,7 +394,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
           Подборки
         </Link>
       </nav>
-    </>
+    </CatalogToolbar>
   );
 }
 

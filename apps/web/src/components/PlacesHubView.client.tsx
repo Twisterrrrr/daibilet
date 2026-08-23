@@ -3,9 +3,10 @@
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
-import { Grid3X3, List, SlidersHorizontal } from 'lucide-react';
+import { Grid3X3, List } from 'lucide-react';
 
 import { CatalogPaginationLinks } from '@/components/CatalogPaginationLinks';
+import { CatalogSidebarLayout } from '@/components/CatalogSidebarLayout.client';
 import { InstitutionCard } from '@/components/InstitutionCard.client';
 import { InstitutionList } from '@/components/InstitutionListRow.client';
 import { LocationCard } from '@/components/LocationCard.client';
@@ -214,8 +215,6 @@ export function PlacesHubView({
   const rawType = searchParams.get('type')?.trim() || '';
   const categoryChip = resolvePlacesHubCategoryChip(rawType);
   const typeFilter = categoryChip?.id || (rawType ? normalizeVenueKind(rawType) : 'all');
-  const [filtersOpen, setFiltersOpen] = useState(false);
-  const filtersRef = useRef<HTMLDivElement>(null);
   const urlPage = parseVenueCatalogPageParam(searchParams.get('page'));
   const [listPage, setListPage] = useState(urlPage);
   const cityReady = selectedCity?.cityReady ?? true;
@@ -291,24 +290,6 @@ export function PlacesHubView({
   useEffect(() => {
     setViewMode(readStoredViewMode());
   }, []);
-
-  useEffect(() => {
-    if (!filtersOpen) return;
-    const onPointer = (event: MouseEvent) => {
-      const target = event.target as Node | null;
-      if (target && filtersRef.current?.contains(target)) return;
-      setFiltersOpen(false);
-    };
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setFiltersOpen(false);
-    };
-    document.addEventListener('mousedown', onPointer);
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.removeEventListener('mousedown', onPointer);
-      document.removeEventListener('keydown', onKey);
-    };
-  }, [filtersOpen]);
 
   const replaceCatalogUrl = (mutate: (params: URLSearchParams) => void) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -583,7 +564,6 @@ export function PlacesHubView({
 
   const setScope = (next: PlacesScope) => {
     setListPage(1);
-    setFiltersOpen(false);
     replaceCatalogUrl((params) => {
       params.delete('family');
       params.delete('hasEvents');
@@ -592,38 +572,6 @@ export function PlacesHubView({
       if (next === 'events') params.set('hasEvents', '1');
       if (next === 'institutions') params.set('family', 'institution');
       if (next === 'locations') params.set('family', 'location');
-      if (urlCityAll && !params.get('city')) params.set('city', 'all');
-    });
-  };
-
-  /** Mobile: Все | семьи | с событиями | категории. */
-  const mobileTypeSelectValue = hasEvents
-    ? 'events'
-    : family === 'institution'
-      ? 'institutions'
-      : family === 'location'
-        ? 'locations'
-        : typeFilter === 'all'
-          ? 'all'
-          : typeFilter;
-
-  const applyMobileTypeSelect = (next: string) => {
-    setListPage(1);
-    setFiltersOpen(false);
-    replaceCatalogUrl((params) => {
-      params.delete('family');
-      params.delete('hasEvents');
-      params.delete('type');
-      params.delete('page');
-      if (next === 'events') {
-        params.set('hasEvents', '1');
-      } else if (next === 'institutions') {
-        params.set('family', 'institution');
-      } else if (next === 'locations') {
-        params.set('family', 'location');
-      } else if (next !== 'all') {
-        params.set('type', next);
-      }
       if (urlCityAll && !params.get('city')) params.set('city', 'all');
     });
   };
@@ -676,6 +624,102 @@ export function PlacesHubView({
   const allTypesOn = typeFilter === 'all' && family === 'all' && !hasEvents;
   const filtersActiveCount = hasEvents || family !== 'all' ? 1 : 0;
 
+  const resetPlacesFilters = () => {
+    setListPage(1);
+    replaceCatalogUrl((params) => {
+      params.delete('family');
+      params.delete('hasEvents');
+      params.delete('type');
+      params.delete('q');
+      params.delete('page');
+      if (urlCityAll && !params.get('city')) params.set('city', 'all');
+    });
+  };
+
+  const placesSidebar = (
+    <>
+      <div className="catalog-sidebar-desktop-header">
+        <span className="catalog-sidebar-desktop-title">Фильтры</span>
+        {filtersActiveCount > 0 || q || typeFilter !== 'all' ? (
+          <button type="button" className="catalog-sidebar-clear" onClick={resetPlacesFilters}>
+            Сбросить
+          </button>
+        ) : null}
+      </div>
+
+      <div className="catalog-sidebar-section">
+        <PlacesSearch mode="hub" initialQuery={q} tone="muted" />
+      </div>
+
+      <div className="catalog-sidebar-section">
+        <label className="catalog-sidebar-section__title" htmlFor="places-sidebar-city">
+          Город
+        </label>
+        <select
+          id="places-sidebar-city"
+          value={cityPending ? '' : cityFilter}
+          disabled={cityPending}
+          onChange={(event) => setCityFilter(event.target.value)}
+          className="w-full rounded-xl bg-[#F5F5F7] px-3 py-2.5 text-sm outline-none disabled:opacity-70"
+        >
+          {cityPending ? <option value="">Город…</option> : null}
+          <option value="all">Все города</option>
+          {cityOptions.map(([city]) => (
+            <option key={city} value={city}>
+              {city}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="catalog-sidebar-section">
+        <p className="catalog-sidebar-section__title">Показывать</p>
+        <nav className="catalog-sidebar-nav" aria-label="Область каталога">
+          {FILTER_SCOPE_OPTIONS.map(([value, label]) => {
+            const active = scope === value;
+            return (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setScope(value)}
+                className={`catalog-sidebar-nav__item${active ? ' catalog-sidebar-nav__item--active' : ''}`}
+              >
+                <span>{label}</span>
+              </button>
+            );
+          })}
+        </nav>
+      </div>
+
+      <div className="catalog-sidebar-section">
+        <p className="catalog-sidebar-section__title">Категории</p>
+        <nav className="catalog-sidebar-nav" aria-label="Тип места">
+          <button
+            type="button"
+            onClick={() => setTypeFilter('all')}
+            className={`catalog-sidebar-nav__item${allTypesOn ? ' catalog-sidebar-nav__item--active' : ''}`}
+          >
+            <span>Все места</span>
+          </button>
+          {categoryChips.map((chip) => {
+            const active = typeFilter === chip.id;
+            return (
+              <button
+                key={chip.id}
+                type="button"
+                onClick={() => setTypeFilter(active ? 'all' : chip.id)}
+                className={`catalog-sidebar-nav__item${active ? ' catalog-sidebar-nav__item--active' : ''}`}
+              >
+                <span>{chip.label}</span>
+                <span className="catalog-sidebar-nav__count">{chip.count}</span>
+              </button>
+            );
+          })}
+        </nav>
+      </div>
+    </>
+  );
+
   return (
     <>
       <HeroLayout
@@ -686,240 +730,133 @@ export function PlacesHubView({
         title={pageTitleText}
         tone="light"
         className=""
-      >
-        <div className="catalog-hub-filters mt-4">
-          <PlacesSearch mode="hub" initialQuery={q} tone="muted" />
-          <select
-            value={cityPending ? '' : cityFilter}
-            disabled={cityPending}
-            onChange={(event) => setCityFilter(event.target.value)}
-            className="rounded-xl bg-[#F5F5F7] px-3 py-2.5 text-sm outline-none disabled:opacity-70 sm:max-w-[12rem] sm:shrink-0"
-            aria-label="Город"
-          >
-            {cityPending ? <option value="">Город…</option> : null}
-            <option value="all">Все города</option>
-            {cityOptions.map(([city]) => (
-              <option key={city} value={city}>
-                {city}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Mobile: one dropdown (categories + «С событиями») - no separate Фильтры button. */}
-        <div className="mt-4 sm:hidden">
-          <label className="sr-only" htmlFor="places-hub-mobile-type">
-            Тип места
-          </label>
-          <select
-            id="places-hub-mobile-type"
-            value={mobileTypeSelectValue}
-            onChange={(event) => applyMobileTypeSelect(event.target.value)}
-            className="w-full rounded-xl bg-[#F5F5F7] px-3 py-2.5 text-sm outline-none"
-          >
-            <option value="all">Все места</option>
-            <option value="institutions">Только площадки</option>
-            <option value="locations">Только локации</option>
-            <option value="events">Площадки с событиями</option>
-            {categoryChips.map((chip) => (
-              <option key={chip.id} value={chip.id}>
-                {chip.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* sm+: chip rail + Фильтры (events scope) as before */}
-        <div className="catalog-hub-chip-section hidden sm:flex">
-          <div className="catalog-chip-rail" data-places-hub-chips>
-            <div className="flex flex-wrap items-center gap-1.5">
-              <button
-                type="button"
-                onClick={() => setTypeFilter('all')}
-                className={`catalog-chip min-h-9 ${allTypesOn ? 'catalog-chip-on' : 'catalog-chip-idle'}`}
-              >
-                <span className="whitespace-nowrap">Все места</span>
-              </button>
-              {categoryChips.map((chip) => {
-                const active = typeFilter === chip.id;
-                return (
-                  <button
-                    key={chip.id}
-                    type="button"
-                    onClick={() => setTypeFilter(active ? 'all' : chip.id)}
-                    className={`catalog-chip min-h-9 ${active ? 'catalog-chip-on' : 'catalog-chip-idle'}`}
-                  >
-                    <span className="whitespace-nowrap">{chip.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div ref={filtersRef} className="relative shrink-0 self-start">
-            <button
-              type="button"
-              onClick={() => setFiltersOpen((open) => !open)}
-              aria-expanded={filtersOpen}
-              aria-haspopup="menu"
-              className={`inline-flex h-9 items-center gap-1.5 rounded-xl px-3 text-sm font-semibold transition ${
-                filtersOpen || filtersActiveCount > 0
-                  ? 'bg-primary-600 text-white hover:bg-primary-700'
-                  : 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
-              }`}
-            >
-              <SlidersHorizontal className="h-4 w-4" strokeWidth={1.75} aria-hidden />
-              Фильтры
-              {filtersActiveCount > 0 ? (
-                <span className="grid min-w-5 place-items-center rounded-md bg-white/25 px-1.5 text-xs">
-                  {filtersActiveCount}
-                </span>
-              ) : null}
-            </button>
-            {filtersOpen ? (
-              <div
-                role="menu"
-                aria-label="Дополнительные фильтры"
-                className="absolute right-0 z-40 mt-2 w-64 overflow-hidden rounded-2xl border border-slate-200 bg-white py-2 shadow-lg"
-              >
-                {FILTER_SCOPE_OPTIONS.map(([value, label]) => {
-                  const active = scope === value;
-                  return (
-                    <button
-                      key={value}
-                      type="button"
-                      role="menuitemradio"
-                      aria-checked={active}
-                      onClick={() => setScope(value)}
-                      className={`flex w-full items-center px-3.5 py-2.5 text-left text-sm transition ${
-                        active
-                          ? 'bg-primary-50 font-semibold text-primary-800'
-                          : 'text-slate-700 hover:bg-slate-50'
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  );
-                })}
-              </div>
-            ) : null}
-          </div>
-        </div>
-      </HeroLayout>
+      />
 
       <div className="container-page py-6 sm:py-8">
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-          <p className="text-sm text-slate-500">
-            {listPending || listRefreshing
-              ? 'Обновляем список…'
-              : total > 0
-                ? pluralPlaces(total)
-                : null}
-          </p>
-          <div className="flex flex-wrap items-center gap-2">
-            <select
-              value={sortMode}
-              onChange={(event) => setSortFilter(event.target.value as VenueCatalogSort)}
-              className="rounded-xl bg-[#F5F5F7] px-3 py-2 text-sm outline-none"
-              aria-label="Сортировка"
-            >
-              {SORT_OPTIONS.map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
-            <div className="flex shrink-0 overflow-hidden rounded-xl bg-[#F5F5F7] p-1" role="radiogroup" aria-label="Вид каталога">
-              <button
-                type="button"
-                role="radio"
-                aria-checked={viewMode === 'cards'}
-                aria-label="Карточки"
-                onClick={() => setViewModePersisted('cards')}
-                className={`grid h-9 w-9 place-items-center rounded-lg transition ${
-                  viewMode === 'cards'
-                    ? 'bg-white text-slate-900 shadow-sm'
-                    : 'text-slate-500 hover:text-slate-800'
-                } ${
-                  viewMode === 'list'
-                    ? 'max-sm:bg-white max-sm:text-slate-900 max-sm:shadow-sm'
-                    : ''
-                }`}
+        <CatalogSidebarLayout
+          sidebar={placesSidebar}
+          title="Фильтры мест"
+          triggerLabel="Фильтры и поиск"
+          activeCount={filtersActiveCount + (q ? 1 : 0) + (typeFilter !== 'all' ? 1 : 0)}
+        >
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-slate-500">
+              {listPending || listRefreshing
+                ? 'Обновляем список…'
+                : total > 0
+                  ? pluralPlaces(total)
+                  : null}
+            </p>
+            <div className="flex flex-wrap items-center gap-2">
+              <select
+                value={sortMode}
+                onChange={(event) => setSortFilter(event.target.value as VenueCatalogSort)}
+                className="rounded-xl bg-[#F5F5F7] px-3 py-2 text-sm outline-none"
+                aria-label="Сортировка"
               >
-                <Grid3X3 className="h-4 w-4" strokeWidth={1.75} />
-              </button>
-              <button
-                type="button"
-                role="radio"
-                aria-checked={viewMode === 'list'}
-                aria-label="Список"
-                onClick={() => setViewModePersisted('list')}
-                className={`hidden h-9 w-9 place-items-center rounded-lg transition sm:grid ${
-                  viewMode === 'list' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'
-                }`}
+                {SORT_OPTIONS.map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+              <div
+                className="flex shrink-0 overflow-hidden rounded-xl bg-[#F5F5F7] p-1"
+                role="radiogroup"
+                aria-label="Вид каталога"
               >
-                <List className="h-4 w-4" strokeWidth={1.75} />
-              </button>
+                <button
+                  type="button"
+                  role="radio"
+                  aria-checked={viewMode === 'cards'}
+                  aria-label="Карточки"
+                  onClick={() => setViewModePersisted('cards')}
+                  className={`grid h-9 w-9 place-items-center rounded-lg transition ${
+                    viewMode === 'cards'
+                      ? 'bg-white text-slate-900 shadow-sm'
+                      : 'text-slate-500 hover:text-slate-800'
+                  } ${
+                    viewMode === 'list'
+                      ? 'max-sm:bg-white max-sm:text-slate-900 max-sm:shadow-sm'
+                      : ''
+                  }`}
+                >
+                  <Grid3X3 className="h-4 w-4" strokeWidth={1.75} />
+                </button>
+                <button
+                  type="button"
+                  role="radio"
+                  aria-checked={viewMode === 'list'}
+                  aria-label="Список"
+                  onClick={() => setViewModePersisted('list')}
+                  className={`hidden h-9 w-9 place-items-center rounded-lg transition sm:grid ${
+                    viewMode === 'list' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  <List className="h-4 w-4" strokeWidth={1.75} />
+                </button>
+              </div>
             </div>
           </div>
-        </div>
 
-        {listPending ? (
-          <VenuesCatalogSkeleton count={8} />
-        ) : venues.length > 0 ? (
-          <>
-            {viewMode === 'list' ? (
-              <div className="hidden sm:block">
-                <InstitutionList venues={venues} hrefFor={venueHref} />
-              </div>
-            ) : null}
-            {viewMode === 'cards' || viewMode === 'list' ? (
-              <div
-                className={`catalog-card-grid ${viewMode === 'list' ? 'sm:hidden' : ''}`}
-              >
-                {venues.map((venue, index) =>
-                  venuePageTemplate(venue.type) === 'institution' ? (
-                    <InstitutionCard
-                      key={venue.id}
-                      venue={venue}
-                      href={venueHref(venue)}
-                      hideCity={hideCityOnCards}
-                      priority={index < 3}
-                    />
-                  ) : (
-                    <LocationCard
-                      key={venue.id}
-                      venue={venue}
-                      href={venueHref(venue)}
-                      hideCity={hideCityOnCards}
-                      priority={index < 3}
-                    />
-                  ),
-                )}
-              </div>
-            ) : null}
-            <CatalogPaginationLinks
-              page={listPage}
-              total={total}
-              limit={VENUE_CATALOG_PAGE_SIZE}
-              searchParams={paginationParams}
-              basePath="/places"
-              onPageChange={goToListPage}
-            />
-          </>
-        ) : (
-          <div className="rounded-2xl border border-dashed border-slate-300 bg-white py-16 text-center text-slate-500">
-            <p className="text-lg font-semibold text-slate-700">{q ? 'Ничего не нашли' : 'Пока нет мест'}</p>
-            <p className="mt-1 text-sm">
-              {q ? 'Попробуйте другое название или смените город.' : 'Попробуйте убрать фильтры или сменить город.'}
-            </p>
-            {q ? (
-              <Link href={placesSearchHref({ city: cityQuery })} className="mt-3 inline-block text-sm font-medium text-primary hover:underline">
-                Сбросить поиск
-              </Link>
-            ) : null}
-          </div>
-        )}
+          {listPending ? (
+            <VenuesCatalogSkeleton count={8} />
+          ) : venues.length > 0 ? (
+            <>
+              {viewMode === 'list' ? (
+                <div className="hidden sm:block">
+                  <InstitutionList venues={venues} hrefFor={venueHref} />
+                </div>
+              ) : null}
+              {viewMode === 'cards' || viewMode === 'list' ? (
+                <div className={`catalog-card-grid ${viewMode === 'list' ? 'sm:hidden' : ''}`}>
+                  {venues.map((venue, index) =>
+                    venuePageTemplate(venue.type) === 'institution' ? (
+                      <InstitutionCard
+                        key={venue.id}
+                        venue={venue}
+                        href={venueHref(venue)}
+                        hideCity={hideCityOnCards}
+                        priority={index < 3}
+                      />
+                    ) : (
+                      <LocationCard
+                        key={venue.id}
+                        venue={venue}
+                        href={venueHref(venue)}
+                        hideCity={hideCityOnCards}
+                        priority={index < 3}
+                      />
+                    ),
+                  )}
+                </div>
+              ) : null}
+              <CatalogPaginationLinks
+                page={listPage}
+                total={total}
+                limit={VENUE_CATALOG_PAGE_SIZE}
+                searchParams={paginationParams}
+                basePath="/places"
+                onPageChange={goToListPage}
+              />
+            </>
+          ) : (
+            <div className="rounded-2xl border border-dashed border-slate-300 bg-white py-16 text-center text-slate-500">
+              <p className="text-lg font-semibold text-slate-700">{q ? 'Ничего не нашли' : 'Пока нет мест'}</p>
+              <p className="mt-1 text-sm">
+                {q ? 'Попробуйте другое название или смените город.' : 'Попробуйте убрать фильтры или сменить город.'}
+              </p>
+              {q ? (
+                <Link
+                  href={placesSearchHref({ city: cityQuery })}
+                  className="mt-3 inline-block text-sm font-medium text-primary hover:underline"
+                >
+                  Сбросить поиск
+                </Link>
+              ) : null}
+            </div>
+          )}
+        </CatalogSidebarLayout>
       </div>
     </>
   );
