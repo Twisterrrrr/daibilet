@@ -72,6 +72,7 @@ export function LocationCard({
   hideCity = false,
   showFamilyTag = false,
   priority = false,
+  hideBlurb = false,
 }: {
   venue: VenueCatalogCard;
   href: string;
@@ -81,6 +82,8 @@ export function LocationCard({
   showFamilyTag?: boolean;
   /** First-row LCP only - never the whole grid. */
   priority?: boolean;
+  /** /places: keep cards compact without hook/shortDescription. */
+  hideBlurb?: boolean;
 }) {
   const coverSrc = venueCardImageUrl(venue.heroImageUrl);
   const kind = normalizeVenueKind(venue.type);
@@ -90,10 +93,12 @@ export function LocationCard({
   const street = formatStreetAddress(venue.address, { city: venue.city });
   const displayName = stripBoardingPlacePrefix(venue.name);
   const routeTitle = displayName;
-  const editorialHook = dayRouteHookLine({
-    hookFact: venue.hookFact,
-    shortDescription: venue.shortDescription,
-  });
+  const editorialHook = hideBlurb
+    ? ''
+    : dayRouteHookLine({
+        hookFact: venue.hookFact,
+        shortDescription: venue.shortDescription,
+      });
   const blurb = editorialHook;
   const rating = realRating(venue.rating);
   const upcoming = venue.upcomingTitles?.filter(Boolean).slice(0, 3) || [];

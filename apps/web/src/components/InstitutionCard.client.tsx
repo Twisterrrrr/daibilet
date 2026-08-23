@@ -38,6 +38,7 @@ export function InstitutionCard({
   hideCity = false,
   showFamilyTag = false,
   priority = false,
+  hideBlurb = false,
 }: {
   venue: InstitutionCardVenue;
   href: string;
@@ -47,13 +48,15 @@ export function InstitutionCard({
   showFamilyTag?: boolean;
   /** First-row LCP only - never the whole grid. */
   priority?: boolean;
+  /** /places: keep cards compact without shortDescription. */
+  hideBlurb?: boolean;
 }) {
   const coverSrc = venueCardImageUrl(venue.heroImageUrl);
   const publicType = resolvePublicVenueType(venue.type, venue.name);
   const typeLabel = venueTypeLabel(publicType, venue.name);
   const gradient = TYPE_GRADIENT[publicType] || 'from-slate-700 via-slate-800 to-slate-950';
   const street = formatStreetAddress(venue.address, { city: venue.city });
-  const blurb = dayRouteHookLine({ shortDescription: venue.shortDescription });
+  const blurb = hideBlurb ? '' : dayRouteHookLine({ shortDescription: venue.shortDescription });
   const rating = realRating(venue.rating);
   const upcoming = venue.upcomingTitles?.filter(Boolean).slice(0, 3) || [];
   const showMiniAfisha = upcoming.length > 0;

@@ -817,6 +817,7 @@ export function PlacesHubView({
                         venue={venue}
                         href={venueHref(venue)}
                         hideCity={hideCityOnCards}
+                        hideBlurb
                         priority={index < 3}
                       />
                     ) : (
@@ -825,6 +826,7 @@ export function PlacesHubView({
                         venue={venue}
                         href={venueHref(venue)}
                         hideCity={hideCityOnCards}
+                        hideBlurb
                         priority={index < 3}
                       />
                     ),

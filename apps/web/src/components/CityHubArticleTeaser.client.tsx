@@ -89,17 +89,21 @@ export function CityHubArticleTeaser({
             </span>
           ) : null}
           <h3
-            className={`break-words font-bold leading-snug transition group-hover:text-primary-700 ${
-              isLarge ? 'text-base sm:text-lg' : isSmall ? 'text-sm' : 'text-sm sm:text-base'
+            className={`line-clamp-3 break-words font-semibold leading-snug tracking-tight transition group-hover:text-primary-700 ${
+              isLarge
+                ? 'text-sm sm:text-[0.9375rem]'
+                : isSmall
+                  ? 'text-[0.8125rem] sm:text-sm'
+                  : 'text-[0.8125rem] sm:text-[0.9375rem]'
             } ${editorial ? 'text-zinc-950' : 'text-slate-950'}`}
           >
             {article.title}
           </h3>
           {excerpt ? (
             <p
-              className={`mt-2 text-sm leading-relaxed ${
-                isSmall ? 'line-clamp-3' : ''
-              } ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}
+              className={`mt-1.5 line-clamp-2 text-xs leading-relaxed sm:text-[0.8125rem] ${
+                editorial ? 'text-zinc-600' : 'text-slate-600'
+              }`}
             >
               {excerpt}
             </p>
