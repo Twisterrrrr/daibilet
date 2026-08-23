@@ -5,7 +5,7 @@
     {
       "stem": "filarmoniya",
       "name": "Ярославская государственная филармония",
-      "clusterSize": 6,
+      "clusterSize": 5,
       "keeper": "demidovskiy-stolp"
     },
     {
@@ -29,13 +29,13 @@
     {
       "stem": "pamyatnik-nekrasovu",
       "name": "Памятник Некрасову",
-      "clusterSize": 3,
+      "clusterSize": 2,
       "keeper": "muzey-zarubezhnogo-iskusstva"
     },
     {
       "stem": "pamyatnik-rychashemu-medvedyu",
       "name": "Памятник Рычащему Медведю",
-      "clusterSize": 4,
+      "clusterSize": 3,
       "keeper": "damanskiy-ostrov"
     },
     {
@@ -53,7 +53,7 @@
     {
       "stem": "restoran-penaty",
       "name": "Ресторан «Пенаты»",
-      "clusterSize": 6,
+      "clusterSize": 5,
       "keeper": "demidovskiy-stolp"
     },
     {
@@ -63,28 +63,10 @@
       "keeper": "identity-art"
     },
     {
-      "stem": "skulptura-afonya-i-kolya",
-      "name": "Скульптура «Афоня и Коля»",
-      "clusterSize": 6,
-      "keeper": "demidovskiy-stolp"
-    },
-    {
-      "stem": "skulptura-medved-s-ryboy",
-      "name": "Скульптура «Медведь с рыбой»",
-      "clusterSize": 4,
-      "keeper": "damanskiy-ostrov"
-    },
-    {
       "stem": "skulptura-postovoy-u-zastavy",
       "name": "Скульптура «Постовой у заставы»",
       "clusterSize": 6,
       "keeper": "gubernatorskiy-dom"
-    },
-    {
-      "stem": "stela-strelka-1000",
-      "name": "Арт-объект «Стрелка»",
-      "clusterSize": 3,
-      "keeper": "muzey-zarubezhnogo-iskusstva"
     },
     {
       "stem": "strelka-rek-volgi-i-kotorosli",
@@ -149,9 +131,9 @@
     {
       "stem": "znamenskaya-bashnya",
       "name": "Знаменская (Власьевская) башня",
-      "clusterSize": 4,
+      "clusterSize": 3,
       "keeper": "damanskiy-ostrov"
     }
   ],
-  "d0": 52
+  "d0": 42
 }
