@@ -126,6 +126,7 @@ export function CitiesIndexChrome({ destinations }: { destinations: PublicDestin
       <HeroLayout
         variant="minimal"
         dense
+        containerClassName="container-page-wide"
         breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Города' }]}
         title="Города России"
       >
@@ -219,7 +220,7 @@ export function CitiesIndexChrome({ destinations }: { destinations: PublicDestin
         </div>
       </HeroLayout>
 
-      <div id="cities-all" className="container-page scroll-mt-24 bg-slate-50 py-8 sm:py-10">
+      <div id="cities-all" className="container-page-wide scroll-mt-24 bg-slate-50 py-8 sm:py-10">
         <div className="mb-4 flex items-start justify-between gap-3 sm:mb-5">
           <div className="min-w-0">
             <h2 className="font-display text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
@@ -295,7 +296,7 @@ export function CitiesIndexChrome({ destinations }: { destinations: PublicDestin
             ) : null}
 
             {filteredCities.length > 0 ? (
-              <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-4">
+              <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 min-[1800px]:grid-cols-7">
                 {filteredCities.map((city) => (
                   <CityCard
                     key={`${city.type}:${city.id || city.slug || city.name}`}
@@ -318,7 +319,7 @@ export function CitiesIndexChrome({ destinations }: { destinations: PublicDestin
                     пункты
                   </p>
                 </div>
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
                   {orphanRegions.map((region) => (
                     <RegionDestinationLink
                       key={`region:${region.slug || region.name}`}

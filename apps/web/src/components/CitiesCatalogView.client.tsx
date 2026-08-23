@@ -68,7 +68,7 @@ export function CitiesCatalogView({
       ) : null}
 
       {cities.length > 0 ? (
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 min-[1800px]:grid-cols-7">
           {cities.map((city) => (
             <CityCard
               key={`${city.type}:${city.id || city.slug || city.name}`}
@@ -88,7 +88,7 @@ export function CitiesCatalogView({
               События в городах без отдельной карточки - курорты, пригороды и малые населённые пункты
             </p>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
             {orphanRegions.map((region) => (
               <RegionDestinationLink key={`region:${region.slug || region.name}`} region={region} />
             ))}

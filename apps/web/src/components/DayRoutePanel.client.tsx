@@ -3399,15 +3399,17 @@ function DayRoutePanelInner() {
   return (
     <>
     <div
-      className={`container-page px-4 py-5 sm:px-6 sm:py-10 print:hidden lg:pb-10 ${
+      className={`${
+        !isEmptyRoute && hasMapStops ? 'my-day-desktop-bleed' : 'container-page px-4 sm:px-6 lg:px-8'
+      } py-5 sm:py-10 print:hidden lg:pb-10 ${
         isEmptyRoute
           ? 'pb-[calc(6.5rem+env(safe-area-inset-bottom,0px))]'
           : hasMapStops
-            ? 'pb-[calc(8rem+env(safe-area-inset-bottom,0px))]'
+            ? 'pb-[calc(8rem+env(safe-area-inset-bottom,0px))] lg:pb-0'
             : 'pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))]'
       }`}
       data-day-mobile-list-first="1"
-      data-day-section-width="full"
+      data-day-section-width={!isEmptyRoute && hasMapStops ? 'bleed' : 'full'}
       data-day-mobile-view={mobileView}
     >
       <div ref={listRootRef} className="min-w-0" data-day-list-root>
@@ -3415,7 +3417,7 @@ function DayRoutePanelInner() {
         <>
         {/* Lovable: full-width top bar OUTSIDE map grid (map must not eat Open/Save/Share). */}
         <header
-          className="mb-4 flex flex-col gap-3 sm:mb-5 lg:flex-row lg:items-start lg:justify-between lg:gap-4"
+          className="mb-4 flex flex-col gap-3 sm:mb-5 lg:flex-row lg:items-start lg:justify-between lg:gap-4 lg:pr-4"
           data-my-day-topbar
           ref={shareMenuRef}
         >

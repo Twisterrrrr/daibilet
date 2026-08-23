@@ -34,6 +34,8 @@ export type HeroLayoutProps = {
   media?: React.ReactNode;
   /** Tighter vertical padding for catalog pages that need results sooner. */
   dense?: boolean;
+  /** Override default `container-page` on the content wrapper (e.g. ultrawide hubs). */
+  containerClassName?: string;
 };
 
 const TONE = {
@@ -72,9 +74,11 @@ export function HeroLayout({
   children,
   media,
   dense = false,
+  containerClassName = 'container-page',
 }: HeroLayoutProps) {
   const tone = toneProp ?? (variant === 'imageOverlay' || variant === 'video' || variant === 'withMap' ? 'dark' : 'light');
   const t = TONE[tone];
+  const containerCls = containerClassName || 'container-page';
 
   if (variant === 'split') {
     return (
@@ -109,8 +113,8 @@ export function HeroLayout({
       <>
         {breadcrumbs?.length ? <PageBreadcrumbBar items={breadcrumbs} /> : null}
         <section className={`border-b border-slate-200 ${t.section} ${className}`.trim()}>
-          <div className={`container-page ${dense ? 'py-5 sm:py-6' : 'py-8 sm:py-10'}`}>
-            {/* Full container-page width on desktop (same axis as catalog sections below). */}
+          <div className={`${containerCls} ${dense ? 'py-5 sm:py-6' : 'py-8 sm:py-10'}`}>
+            {/* Full container width on desktop (same axis as catalog sections below). */}
             <div className="w-full">
               {brand ? <div className={`font-display text-sm font-bold tracking-[0.18em] uppercase ${t.brand}`}>{brand}</div> : null}
               {eyebrow ? <p className={`text-sm font-semibold uppercase tracking-wider ${t.eyebrow} ${brand ? 'mt-2' : ''}`}>{eyebrow}</p> : null}

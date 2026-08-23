@@ -15,9 +15,10 @@ type MyDayShellProps = {
 };
 
 const LIST_SPLIT_KEY = 'daibilet.my-day.list-split';
-const LIST_SPLIT_DEFAULT = 58;
-const LIST_SPLIT_MIN = 36;
-const LIST_SPLIT_MAX = 78;
+/** Prefer a wider map on desktop; user can still drag the divider. */
+const LIST_SPLIT_DEFAULT = 46;
+const LIST_SPLIT_MIN = 32;
+const LIST_SPLIT_MAX = 72;
 
 /**
  * Desktop split: list column + sticky map.
@@ -54,7 +55,7 @@ export function MyDayShell({
       data-my-day-map-open={showMapColumn && mapOpen ? '1' : '0'}
       data-my-day-list-split={splitOn ? String(listPct) : undefined}
     >
-      <div className="relative min-w-0 lg:pr-2" data-my-day-list-col>
+      <div className="relative min-w-0 lg:pr-3" data-my-day-list-col>
         {list}
         {splitOn ? (
           <MyDayResizeHandle

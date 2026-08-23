@@ -243,6 +243,33 @@ html[data-nav-pending='1'] {
   }
 
   /**
+   * Catalog hubs that should use ultrawide width (/cities card grid).
+   * Keeps the same gutters as container-page; lifts the ~80rem ceiling.
+   */
+  .container-page-wide {
+    @apply mx-auto w-full max-w-[112rem] px-4 sm:px-6 lg:px-8 xl:px-10;
+  }
+
+  /**
+   * /my-day with desktop map: left edge aligns with container-page;
+   * right edge (map column) bleeds to the viewport.
+   */
+  .my-day-desktop-bleed {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6;
+  }
+
+  @media (min-width: 1024px) {
+    .my-day-desktop-bleed {
+      max-width: none;
+      margin-left: 0;
+      margin-right: 0;
+      padding-left: max(2rem, calc((100vw - 80rem) / 2 + 2rem));
+      padding-right: 0;
+      padding-bottom: 0;
+    }
+  }
+
+  /**
    * Full-bleed breakout: stretch a nested band to viewport width without
    * horizontal page scroll (pair with overflow-x-hidden on a page shell).
    * Prefer section-level bg on already-full-width siblings when possible.
