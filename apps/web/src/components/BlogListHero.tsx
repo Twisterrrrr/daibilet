@@ -5,20 +5,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Search } from 'lucide-react';
 
 import { PageBreadcrumbBar, type BreadcrumbItem } from '@/components/PageBreadcrumbs';
-import {
-  BLOG_TOPIC_ORDER,
-  blogTopicLabel,
-  parseBlogTopicParam,
-  type BlogTopicId,
-} from '@/lib/blog-topics';
 import { cityToPrepositional } from '@/lib/city-declension';
-
-/** Короткие ярлыки для hero-чипов (владелец: Детям). */
-const HERO_TOPIC_LABELS: Partial<Record<BlogTopicId, string>> = {
-  kids: 'Детям',
-};
-
-const HERO_TOPIC_IDS: BlogTopicId[] = ['standup', 'routes', 'kids', 'concerts', 'river', 'tours'];
 
 type BlogListHeroProps = {
   breadcrumbs: BreadcrumbItem[];
@@ -29,12 +16,12 @@ type BlogListHeroProps = {
   cityName?: string | null;
 };
 
+/** Compact hero: title + search. Cities/topics live in sticky left nav. */
 export function BlogListHero({ breadcrumbs, cityName = null }: BlogListHeroProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const topic = parseBlogTopicParam(searchParams.get('topic'));
   const query = String(searchParams.get('q') || '').trim();
   const [searchDraft, setSearchDraft] = useState(query);
 
@@ -43,8 +30,6 @@ export function BlogListHero({ breadcrumbs, cityName = null }: BlogListHeroProps
   }, [query]);
 
   const scrollToFeed = useCallback(() => {
-    // URL меняется с scroll:false - без явного скролла пользователь остаётся в hero
-    // и думает, что чипы/поиск не работают.
     requestAnimationFrame(() => {
       document.getElementById('blog-feed')?.scrollIntoView({
         behavior: 'smooth',
@@ -67,19 +52,6 @@ export function BlogListHero({ breadcrumbs, cityName = null }: BlogListHeroProps
     return () => window.clearTimeout(handle);
   }, [searchDraft, query, pathname, router, searchParams]);
 
-  const setTopic = useCallback(
-    (value: BlogTopicId | 'all') => {
-      const next = new URLSearchParams(searchParams.toString());
-      next.delete('type');
-      if (!value || value === 'all') next.delete('topic');
-      else next.set('topic', value);
-      const qs = next.toString();
-      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-      scrollToFeed();
-    },
-    [pathname, router, searchParams, scrollToFeed],
-  );
-
   const submitSearch = useCallback(
     (event?: FormEvent<HTMLFormElement>) => {
       event?.preventDefault();
@@ -97,49 +69,22 @@ export function BlogListHero({ breadcrumbs, cityName = null }: BlogListHeroProps
 
   const title = cityName
     ? `Статьи, обзоры и советы по событиям в ${cityToPrepositional(cityName)}`
-    : 'Статьи, обзоры и советы по событиям';
-
-  const topicChips = HERO_TOPIC_IDS.filter((id) => BLOG_TOPIC_ORDER.includes(id));
-
-  const topicPills = (
-    <div className="catalog-chip-rail" role="group" aria-label="Быстрые темы">
-      {topicChips.map((id) => {
-        const active = topic === id;
-        return (
-          <button
-            key={id}
-            type="button"
-            aria-pressed={active}
-            onClick={() => setTopic(active ? 'all' : id)}
-            className={`catalog-chip shrink-0 ${active ? 'catalog-chip-on' : 'catalog-chip-idle'}`}
-          >
-            <span className="whitespace-nowrap">{HERO_TOPIC_LABELS[id] || blogTopicLabel(id)}</span>
-          </button>
-        );
-      })}
-    </div>
-  );
+    : 'Блог о событиях';
 
   return (
     <>
       <PageBreadcrumbBar items={breadcrumbs} />
       <section className="border-b border-slate-200 bg-slate-50">
-        {/* Explicit px (same as .container-page) so gutter never depends only on @apply. */}
-        <div className="container-page py-5 sm:py-6">
-          {/*
-            Desktop: stack like Places hub - full-width search, then wrapping topic chips.
-            Side-by-side search+chips left a large empty right gutter on wide screens.
-          */}
-          <div className="flex flex-col gap-4 xl:gap-5">
-            <h1 className="w-full min-w-0 font-display text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+        <div className="container-page py-5 sm:py-7">
+          <div className="flex max-w-3xl flex-col gap-4">
+            <h1 className="font-display text-[clamp(1.75rem,3.5vw,3.25rem)] font-extrabold tracking-tight text-slate-900">
               {title}
             </h1>
-
-            <form className="catalog-hub-filters" onSubmit={submitSearch} role="search">
-              <label className="relative block min-w-0 flex-1">
+            <form className="relative w-full max-w-xl" onSubmit={submitSearch} role="search">
+              <label className="relative block">
                 <span className="sr-only">Поиск по статьям</span>
                 <Search
-                  className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+                  className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
                   aria-hidden
                 />
                 <input
@@ -147,13 +92,11 @@ export function BlogListHero({ breadcrumbs, cityName = null }: BlogListHeroProps
                   value={searchDraft}
                   onChange={(event) => setSearchDraft(event.target.value)}
                   placeholder="Найти статью: стендап, маршрут, концерт…"
-                  className="h-10 w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-primary-400 focus:ring-2 focus:ring-primary-100"
+                  className="h-11 w-full rounded-2xl border border-slate-200 bg-white py-2.5 pl-10 pr-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-200/60"
                   aria-label="Поиск по статьям блога"
                 />
               </label>
             </form>
-
-            {topicPills}
           </div>
         </div>
       </section>

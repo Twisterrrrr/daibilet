@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { ChevronDown, Search } from 'lucide-react';
 
 import { BlogMagazineGrid } from '@/components/BlogMagazineGrid.client';
+import { BlogListingFiltersNav } from '@/components/BlogListingFiltersNav.client';
 import type { BlogListFilters } from '@/components/BlogListView';
 import type { BlogCardDto } from '@/lib/blog-utils';
 import { paginateBlogFeedByCursor } from '@/lib/blog-cursor';
@@ -195,44 +196,29 @@ export function BlogListFiltered({
   const showEmptyCityBanner = Boolean(emptyCheckSlug && bannerLabel && emptyCheckCount === 0);
 
   const filtersBar = (
-    <div className="mb-6 border-b border-slate-200/70 pb-3 md:mb-8 md:pb-4">
-      <div className="catalog-chip-rail items-center gap-2">
-        <SoftSelect
-          value={urlCity}
-          onChange={(value) => setFilter('city', value)}
-          ariaLabel="Фильтр материалов по городу"
-        >
-          <option value="all">Все города</option>
-          {cityOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </SoftSelect>
+    <div className="mb-5 flex flex-wrap items-center gap-2 md:mb-6">
+      <SoftSelect
+        value={author}
+        onChange={(value) => setFilter('author', value)}
+        ariaLabel="Фильтр по автору"
+      >
+        <option value="all">Все авторы</option>
+        {authorOptions.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </SoftSelect>
 
-        <SoftSelect
-          value={author}
-          onChange={(value) => setFilter('author', value)}
-          ariaLabel="Фильтр по автору"
+      {hasActive ? (
+        <button
+          type="button"
+          onClick={resetFilters}
+          className="inline-flex h-10 shrink-0 items-center rounded-xl px-3 text-sm font-medium text-primary-600 transition hover:bg-primary-50 hover:text-primary-700 lg:hidden"
         >
-          <option value="all">Все авторы</option>
-          {authorOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </SoftSelect>
-
-        {hasActive ? (
-          <button
-            type="button"
-            onClick={resetFilters}
-            className="inline-flex h-10 shrink-0 items-center rounded-xl px-3 text-sm font-medium text-primary-600 transition hover:bg-primary-50 hover:text-primary-700"
-          >
-            Сбросить
-          </button>
-        ) : null}
-      </div>
+          Сбросить
+        </button>
+      ) : null}
     </div>
   );
 
@@ -286,6 +272,14 @@ export function BlogListFiltered({
 
   return (
     <div className="blog-layout">
+      <BlogListingFiltersNav
+        cityOptions={cityOptions}
+        cityValue={urlCity}
+        onCityChange={(value) => setFilter('city', value)}
+        onReset={resetFilters}
+        hasActive={hasActive}
+      />
+
       <div className="blog-layout__main min-w-0">
         {filtersBar}
 
@@ -302,7 +296,7 @@ export function BlogListFiltered({
         )}
       </div>
 
-      {sidebarSlot ? <div className="hidden lg:block">{sidebarSlot}</div> : null}
+      {sidebarSlot ? <div className="blog-layout__aside">{sidebarSlot}</div> : null}
     </div>
   );
 }
