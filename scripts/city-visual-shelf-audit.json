@@ -3,49 +3,93 @@
   "shelfN": 12,
   "summary": [
     {
-      "city": "kazan",
-      "d0": 86,
-      "clusters": 1,
+      "city": "voronezh",
+      "d0": 87,
+      "clusters": 7,
       "shelfPairs": 0,
       "regen": 0
     },
     {
-      "city": "omsk",
-      "d0": 2,
+      "city": "novosibirsk",
+      "d0": 68,
+      "clusters": 20,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "yaroslavl",
+      "d0": 42,
+      "clusters": 16,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "ekaterinburg",
+      "d0": 38,
       "clusters": 2,
-      "shelfPairs": 0,
-      "regen": 0
-    },
-    {
-      "city": "ufa",
-      "d0": 0,
-      "clusters": 0,
       "shelfPairs": 0,
       "regen": 0
     }
   ],
   "cities": {
-    "ufa": {
-      "city": "ufa",
-      "files": 85,
-      "d0": 0,
-      "pairs": 0,
-      "clusters": 0,
-      "topCluster": 0,
+    "voronezh": {
+      "city": "voronezh",
+      "files": 92,
+      "d0": 87,
+      "pairs": 263,
+      "clusters": 7,
+      "topCluster": 30,
+      "mustSeeCount": 54,
+      "shelfFiles": [
+        "pamyatnik-petru-i.jpg",
+        "pamyatnik-belomu-bimu.jpg",
+        "pamyatnik-kotenku-s-ulitsy-lizyukova.jpg",
+        "skulptura-neznakomka.jpg",
+        "pamyatnik-eseninu.jpg",
+        "pamyatnik-platonovu.jpg",
+        "maket-korablya-merkuriy.jpg",
+        "pamyatnik-mandelshtamu.jpg",
+        "pamyatnik-vysotskomu.jpg",
+        "pamyatnik-buninu.jpg",
+        "skulptura-prodavets-i-pokupatel.jpg",
+        "pamyatnik-pyatnitskomu.jpg"
+      ],
+      "identity": [
+        "identity-symbol.jpg",
+        "identity-architecture.jpg",
+        "identity-art.jpg",
+        "identity-gastro.jpg"
+      ],
+      "scenarioCovers": [
+        "pamyatnik-petru-i.jpg",
+        "park-orlyonok.jpg",
+        "dom-gubernatora.jpg",
+        "pamyatnik-mandelshtamu.jpg"
+      ],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "novosibirsk": {
+      "city": "novosibirsk",
+      "files": 101,
+      "d0": 68,
+      "pairs": 71,
+      "clusters": 20,
+      "topCluster": 6,
       "mustSeeCount": 55,
       "shelfFiles": [
-        "pamyatnik-salavatu-yulaevu.jpg",
-        "monument-druzhby.jpg",
-        "pamyatnik-mustayu-karimu.jpg",
-        "pamyatnik-fedoru-shalyapinu.jpg",
-        "pamyatnik-kunitse.jpg",
-        "pamyatnik-generalu-shaymuratovu.jpg",
-        "art-obyekt-tri-shurupa.jpg",
-        "pamyatnik-dvorniku.jpg",
-        "pamyatnik-geroyam-oktyabrskoy-revolyutsii.jpg",
+        "novosibirskiy-teatr-opery-i-baleta-novat.jpg",
+        "mihaylovskaya-naberezhnaya.jpg",
+        "akademgorodok.jpg",
+        "novosibirskiy-zoopark-imeni-r-a-shilo.jpg",
+        "novosibirskiy-hudozhestvennyy-muzey.jpg",
+        "muzey-mirovoy-pogrebal-noy-kul-tury.jpg",
         "pamyatnik-leninu.jpg",
-        "skulptura-dom-kunitsy.jpg",
-        "pamyatnik-pushkinu.jpg"
+        "pamyatnik-laboratornoy-myshi.jpg",
+        "pamyatnik-svetoforu.jpg",
+        "vovka-v-tridevyatom-tsarstve.jpg",
+        "pamyatnik-tramvayu-13.jpg",
+        "pamyatnik-vysotskomu.jpg"
       ],
       "identity": [
         "identity-symbol.jpg",
@@ -54,82 +98,85 @@
         "identity-gastro.jpg"
       ],
       "scenarioCovers": [
-        "pamyatnik-generalu-shaymuratovu.jpg",
-        "pamyatnik-mustayu-karimu.jpg",
-        "zdanie-dvoryanskogo-sobraniya.jpg",
-        "dom-kommuna.jpg"
+        "novosibirskiy-teatr-opery-i-baleta-novat.jpg",
+        "novosibirskiy-zoopark-imeni-r-a-shilo.jpg",
+        "akademgorodok.jpg",
+        "green-line-cover.jpg",
+        "red-line-cover.jpg"
       ],
       "shelfPairs": 0,
       "regen": []
     },
-    "omsk": {
-      "city": "omsk",
-      "files": 86,
-      "d0": 2,
-      "pairs": 4,
+    "yaroslavl": {
+      "city": "yaroslavl",
+      "files": 74,
+      "d0": 42,
+      "pairs": 58,
+      "clusters": 16,
+      "topCluster": 6,
+      "mustSeeCount": 54,
+      "shelfFiles": [
+        "pamyatnik-yaroslavu-mudromu.jpg",
+        "pamyatnik-rychashemu-medvedyu.jpg",
+        "pamyatnik-fedoru-volkovu.jpg",
+        "skulptura-afonya-i-kolya.jpg",
+        "pamyatnik-nekrasovu.jpg",
+        "skulptura-troitsa.jpg",
+        "pamyatnik-kopeyke-1612.jpg",
+        "skulptura-medved-s-ryboy.jpg",
+        "pamyatnik-sobinovu.jpg",
+        "demidovskiy-stolp.jpg",
+        "stela-strelka-1000.jpg",
+        "pamyatnik-petru-i-fevronii.jpg"
+      ],
+      "identity": [
+        "identity-architecture.jpg",
+        "identity-art.jpg",
+        "identity-gastro.jpg",
+        "identity-symbol.jpg"
+      ],
+      "scenarioCovers": [
+        "strelka-rek-volgi-i-kotorosli.jpg",
+        "tserkov-il-i-proroka.jpg",
+        "volzhskaya-naberezhnaya.jpg"
+      ],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "ekaterinburg": {
+      "city": "ekaterinburg",
+      "files": 100,
+      "d0": 38,
+      "pairs": 79,
       "clusters": 2,
-      "topCluster": 3,
-      "mustSeeCount": 65,
+      "topCluster": 13,
+      "mustSeeCount": 66,
       "shelfFiles": [
-        "pamyatnik-slesar-stepanych.jpg",
-        "pamyatnik-lyubochka.jpg",
-        "pamyatnik-dostoevskomu-nesuschiy-krest.jpg",
-        "pamyatnik-don-kihot.jpg",
-        "pamyatnik-gorodovomu.jpg",
-        "pamyatnik-kolchaku.jpg",
-        "pamyatnik-van-gogu.jpg",
-        "pamyatnik-kniga-lyubvi.jpg",
-        "pamyatnik-petru-i-fevronii.jpg",
-        "pamyatnik-bortsam-revolyutsii.jpg",
-        "pamyatnik-maratonets.jpg",
-        "zakladnoy-kamen-hrama-sergiya-radonezhskogo.jpg"
+        "plotinka-istoricheskiy-skver.jpg",
+        "hram-na-krovi.jpg",
+        "el-tsin-tsentr.jpg",
+        "smotrovaya-ploschadka-bts-vysotskiy.jpg",
+        "gorodok-chekistov.jpg",
+        "ulitsa-vaynera.jpg",
+        "pamyatnik-tatischevu-i-de-genninu.jpg",
+        "pamyatnik-popovu.jpg",
+        "byust-mamina-sibiryaka.jpg",
+        "pamyatnik-zhukovu.jpg",
+        "pamyatnik-klaviatura.jpg",
+        "pamyatnik-bazhovu.jpg"
       ],
       "identity": [
-        "identity-symbol.jpg",
-        "identity-architecture.jpg",
-        "identity-art.jpg",
-        "identity-gastro.jpg"
+        "identity-rock.jpg",
+        "identity-gastro.jpg",
+        "identity-street-art.jpg"
       ],
       "scenarioCovers": [
-        "rechnoy-vokzal.jpg",
-        "ermitazh-sibir.jpg",
-        "voskresenskiy-voennyy-sobor.jpg",
-        "moskovskie-torgovye-ryady.jpg"
-      ],
-      "shelfPairs": 0,
-      "regen": []
-    },
-    "kazan": {
-      "city": "kazan",
-      "files": 76,
-      "d0": 86,
-      "pairs": 450,
-      "clusters": 1,
-      "topCluster": 32,
-      "mustSeeCount": 51,
-      "shelfFiles": [
-        "kazanskiy-kreml.jpg",
-        "mechet-kul-sharif.jpg",
-        "ulitsa-baumana.jpg",
-        "bashnya-syuyumbike.jpg",
-        "dvorets-zemledeltsev.jpg",
-        "kremlevskaya-naberezhnaya.jpg",
-        "pamyatnik-kotu-kazanskomu.jpg",
-        "pamyatnik-muse-dzhaliyu.jpg",
-        "pamyatnik-gabdulle-tukayu.jpg",
-        "pamyatnik-fedoru-shalyapinu.jpg",
-        "kareta-ekateriny-ii.jpg",
-        "pamyatnik-drakonu-zilantu.jpg"
-      ],
-      "identity": [
-        "identity-cultures.jpg",
-        "identity-architecture.jpg",
-        "identity-art.jpg",
-        "identity-gastro.jpg"
-      ],
-      "scenarioCovers": [
-        "kazanskiy-kreml.jpg",
-        "park-chernoe-ozero.jpg"
+        "plotinka-istoricheskiy-skver.jpg",
+        "belaya-bashnya.jpg",
+        "identity-street-art.jpg",
+        "oktyabrskaya-ploschad.jpg",
+        "hram-na-krovi.jpg",
+        "mural-uralskiy-bars.jpg"
       ],
       "shelfPairs": 0,
       "regen": []
