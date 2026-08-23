@@ -275,18 +275,6 @@ export function DayTripCanonCard({
     );
   }
 
-  const nestedPlaces = nested.map((poi) => ({
-    name: poi.name,
-    desc: poi.desc,
-    href: poi.href,
-    imageSlug: poi.imageSlug,
-    visitMinutes: poi.visitMinutes,
-    transitTip: poi.transitTip,
-    dayLabel: poi.dayLabel,
-  }));
-  /** Ultrawide hub: photo | readable text | vertical sights rail. */
-  const triptych = Boolean(cover && nested.length);
-
   return (
     <article
       id={id}
@@ -301,28 +289,25 @@ export function DayTripCanonCard({
       data-day-trip-canon="1"
       data-day-trip-align="gutter-text"
       data-day-trip-has-cover={cover ? '1' : '0'}
-      data-day-trip-triptych={triptych ? '1' : undefined}
       {...dataProps}
     >
       <div
         className={
           cover
-            ? triptych
-              ? 'flex flex-col sm:grid sm:min-h-0 sm:grid-cols-[minmax(15rem,40%)_minmax(0,1fr)] sm:items-stretch 2xl:grid-cols-[minmax(15rem,18rem)_minmax(0,1fr)_minmax(15rem,17.5rem)]'
-              : 'flex flex-col sm:grid sm:min-h-0 sm:grid-cols-[minmax(15rem,40%)_minmax(0,1fr)] sm:items-stretch'
+            ? 'flex flex-col sm:grid sm:min-h-0 sm:grid-cols-[minmax(15rem,40%)_minmax(0,1fr)] sm:items-stretch'
             : undefined
         }
       >
       {cover ? (
         <div
-          className="relative h-44 w-full self-stretch overflow-hidden rounded-t-2xl bg-[#F5F5F7] sm:h-full sm:min-h-[18rem] sm:rounded-l-2xl sm:rounded-tr-none 2xl:min-h-[22rem]"
+          className="relative h-44 w-full self-stretch overflow-hidden rounded-t-2xl bg-[#F5F5F7] sm:h-full sm:min-h-[18rem] sm:rounded-l-2xl sm:rounded-tr-none"
           data-day-trip-cover
         >
           <SafeImage
             src={cover}
             alt=""
             fill
-            sizes="(max-width: 640px) 100vw, (min-width: 1536px) 288px, 40vw"
+            sizes="(max-width: 640px) 100vw, 40vw"
             className="object-cover"
             unoptimized
             fallback={<div className="h-full w-full bg-slate-200" />}
@@ -401,9 +386,8 @@ export function DayTripCanonCard({
               <section data-day-trip-logistics>
                 {/* No section label - box alone is enough (owner). */}
                 {/* Desktop: bg bleeds left; copy stays on title vertical. */}
-                {/* Ultrawide: cap measure so logistics does not span the whole middle column. */}
                 <div
-                  className={`${panelClass} px-2.5 py-2.5 sm:py-3.5 sm:pr-4 ${PANEL_INSET_SM} ${LOGISTICS_BG_EXTEND_SM} 2xl:max-w-prose`}
+                  className={`${panelClass} px-2.5 py-2.5 sm:py-3.5 sm:pr-4 ${PANEL_INSET_SM} ${LOGISTICS_BG_EXTEND_SM}`}
                 >
                   {logisticsExit ? (
                     <p className={`text-sm leading-snug ${softClass}`} data-day-trip-exit>
@@ -445,13 +429,7 @@ export function DayTripCanonCard({
       ) : null}
 
       {nested.length ? (
-        <section
-          className={`mt-4 border-t pt-3.5 sm:mt-5 sm:pt-4 ${borderSoft} ${
-            triptych ? '2xl:hidden' : ''
-          }`}
-          data-day-trip-sights
-          data-day-trip-sights-layout="rail"
-        >
+        <section className={`mt-4 border-t pt-3.5 sm:mt-5 sm:pt-4 ${borderSoft}`} data-day-trip-sights>
           <div className="sm:grid sm:grid-cols-[2.25rem_minmax(0,1fr)] sm:gap-x-3">
             <div aria-hidden className="hidden sm:block" />
             <h4 className={`text-sm font-semibold ${inkClass}`}>Что посмотреть</h4>
@@ -461,7 +439,15 @@ export function DayTripCanonCard({
             <SuburbPlacesPhotoRail
               ariaLabel="Что посмотреть"
               fallbackImageUrl={cover}
-              places={nestedPlaces}
+              places={nested.map((poi) => ({
+                name: poi.name,
+                desc: poi.desc,
+                href: poi.href,
+                imageSlug: poi.imageSlug,
+                visitMinutes: poi.visitMinutes,
+                transitTip: poi.transitTip,
+                dayLabel: poi.dayLabel,
+              }))}
             />
           </div>
         </section>
@@ -476,27 +462,6 @@ export function DayTripCanonCard({
         </div>
       ) : null}
       </div>
-
-      {triptych ? (
-        <aside
-          className={`hidden min-h-0 flex-col border-t 2xl:flex 2xl:border-l 2xl:border-t-0 ${
-            editorial ? 'border-zinc-100 bg-zinc-50/80' : 'border-slate-100 bg-slate-50/80'
-          } ${HUB_DETAIL_SCROLL}`}
-          data-day-trip-sights
-          data-day-trip-sights-layout="stack"
-        >
-          <div className="px-4 pb-5 pt-5">
-            <h4 className={`text-sm font-semibold ${inkClass}`}>Что посмотреть</h4>
-            <SuburbPlacesPhotoRail
-              className="mt-3"
-              layout="stack"
-              ariaLabel="Что посмотреть"
-              fallbackImageUrl={cover}
-              places={nestedPlaces}
-            />
-          </div>
-        </aside>
-      ) : null}
       </div>
     </article>
   );
