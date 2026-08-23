@@ -489,7 +489,7 @@ export function VenuesCatalogView({
         tone="light"
         className="bg-white"
       >
-        <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-stretch sm:gap-3">
+        <div className="catalog-hub-filters mt-4">
           <PlacesSearch mode="jump" tone="muted" />
           <select
             value={cityPending ? '' : cityFilter}
@@ -521,7 +521,7 @@ export function VenuesCatalogView({
         </div>
 
         {typeOptions.length ? (
-          <div className="mt-4 flex flex-wrap gap-1.5">
+          <div className="catalog-chip-rail mt-4">
             <button
               type="button"
               onClick={() => setTypeFilter('all')}
@@ -605,7 +605,7 @@ export function VenuesCatalogView({
             {viewMode === 'list' ? (
               <InstitutionList venues={venues} hrefFor={venueHref} />
             ) : (
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
+              <div className="catalog-card-grid">
                 {venues.map((venue, index) => (
                   <InstitutionCard
                     key={venue.id}

@@ -403,7 +403,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
 function CatalogCardSkeletonGrid() {
   return (
     <div
-      className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4"
+      className="catalog-card-grid mt-5"
       aria-busy="true"
       aria-label="Загрузка каталога"
     >

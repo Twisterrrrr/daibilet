@@ -34,7 +34,7 @@ export function InstitutionCardSkeleton() {
 
 export function LocationsCatalogSkeleton({ count = 8 }: { count?: number }) {
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <div className="catalog-card-grid">
       {Array.from({ length: count }).map((_, index) => (
         <LocationCardSkeleton key={index} />
       ))}
@@ -44,7 +44,7 @@ export function LocationsCatalogSkeleton({ count = 8 }: { count?: number }) {
 
 export function VenuesCatalogSkeleton({ count = 8 }: { count?: number }) {
   return (
-    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="catalog-card-grid">
       {Array.from({ length: count }).map((_, index) => (
         <InstitutionCardSkeleton key={index} />
       ))}

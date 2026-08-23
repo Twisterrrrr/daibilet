@@ -164,9 +164,9 @@ function PairRow({
 
 function StripRow({ posts }: { posts: [BlogCardDto, BlogCardDto, BlogCardDto] }) {
   return (
-    <div className="flex flex-col gap-4 sm:gap-5">
+    <div className="catalog-card-grid">
       {posts.map((post) => (
-        <BlogPostCard key={post.slug} post={post} variant="strip" />
+        <BlogPostCard key={post.slug} post={post} variant="small" />
       ))}
     </div>
   );

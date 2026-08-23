@@ -358,6 +358,56 @@ html[data-nav-pending='1'] {
     @apply border-0 bg-primary text-white hover:bg-primary/90 hover:text-white;
   }
 
+  /** Adaptive card grid inside container-page — grows to ~6–7 cols on ultrawide. */
+  .catalog-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+    gap: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .catalog-card-grid {
+      gap: 1.25rem;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+    }
+  }
+
+  /** Places/events/blog hero: keep search + selects grouped, not edge-to-edge. */
+  .catalog-hub-filters {
+    @apply flex w-full max-w-[40rem] flex-col gap-2 sm:flex-row sm:items-stretch sm:gap-3 xl:max-w-[44rem];
+  }
+
+  /** Events toolbar: cap search row width on wide screens. */
+  .catalog-toolbar-search-row {
+    @apply flex w-full min-w-0 flex-wrap items-center gap-2 md:max-w-[44rem] md:gap-3;
+  }
+
+  .catalog-toolbar-search-field {
+    @apply relative flex min-w-0 flex-1 items-center rounded-2xl border border-slate-200 bg-white px-2 py-1.5 shadow-sm md:max-w-[32rem] md:px-2.5;
+  }
+
+  /** Category/type chips — wrap naturally instead of one endless row. */
+  .catalog-chip-rail {
+    @apply flex flex-wrap items-center justify-start gap-1.5;
+  }
+
+  .catalog-hub-chip-section {
+    @apply mt-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4;
+  }
+
+  .catalog-hub-chip-section .catalog-chip-rail {
+    @apply min-w-0 flex-1 xl:max-w-[56rem];
+  }
+
+  /** Events discovery row: wrap on ultrawide instead of pushing sort to far edge. */
+  .catalog-discovery-row {
+    @apply hidden w-full min-w-0 flex-wrap items-center gap-1.5 pb-0.5 md:flex md:max-w-[56rem];
+  }
+
+  .catalog-discovery-row__actions {
+    @apply flex shrink-0 flex-wrap items-center gap-1.5 md:ml-auto xl:ml-0;
+  }
+
   .catalog-quick-chip {
     @apply inline-flex min-h-8 shrink-0 items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 sm:min-h-8 sm:text-sm;
   }

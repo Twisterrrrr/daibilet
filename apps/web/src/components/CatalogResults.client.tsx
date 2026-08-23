@@ -88,7 +88,7 @@ function buildCatalogGridEntries(
 
 function CatalogInterstitialBanner({ banner }: { banner: CatalogInterstitial }) {
   return (
-    <li className="sm:col-span-2 lg:col-span-3 xl:col-span-4">
+    <li className="col-span-full">
       <Link
         href={banner.href}
         onClick={() => trackCatalogBannerClick(banner.id)}
@@ -250,7 +250,7 @@ export function CatalogResults({
       ) : viewMode === 'table' ? (
         <CatalogTable items={listItems} />
       ) : (
-        <ul className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
+        <ul className="catalog-card-grid mt-4">
           {gridEntries!.map((entry) =>
             entry.kind === 'banner' ? (
               <CatalogInterstitialBanner key={`banner-${entry.banner.id}`} banner={entry.banner} />

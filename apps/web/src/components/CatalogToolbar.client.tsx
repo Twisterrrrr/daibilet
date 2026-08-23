@@ -183,7 +183,7 @@ export function CatalogToolbar({
     <div
       role="group"
       aria-label="Быстрые фильтры и категории"
-      className="hidden w-full min-w-0 flex-nowrap items-center gap-1.5 overflow-x-auto overscroll-x-contain pb-0.5 [scrollbar-width:none] md:flex [&::-webkit-scrollbar]:hidden"
+      className="catalog-discovery-row"
     >
       <CategoryTabs
         filters={filters}
@@ -191,7 +191,7 @@ export function CatalogToolbar({
         overflow={categorySplit.overflow}
         onOpenMore={() => setCategoriesMoreOpen(true)}
       />
-      <div className="ml-auto flex shrink-0 flex-nowrap items-center gap-1.5">
+      <div className="catalog-discovery-row__actions">
         <QuickFilterToggles filters={filters} qDraft={qDraft} disabled={disabled} onNavigate={navigate} />
         <div
           role="radiogroup"
@@ -279,10 +279,10 @@ export function CatalogToolbar({
       {/* Sticky on all breakpoints: search + (md) date/category/sort; mobile date + category icon rail. */}
       <div className="catalog-toolbar sticky top-[var(--site-header-height)] z-30 -mx-4 space-y-2 border-b border-slate-200/60 bg-white/95 px-4 py-2 backdrop-blur-md supports-[backdrop-filter]:bg-white/90 sm:-mx-6 sm:px-6 md:mx-0 md:rounded-2xl md:border md:border-slate-200/70 md:px-3 md:py-2.5 md:shadow-sm">
         <form onSubmit={onSubmit} className="flex flex-col gap-2">
-          <div className="flex min-w-0 items-center gap-2 md:gap-3">
+          <div className="catalog-toolbar-search-row">
             <div
               ref={searchWrapRef}
-              className="relative flex min-w-0 flex-1 items-center rounded-2xl border border-slate-200 bg-white px-2 py-1.5 shadow-sm md:px-2.5"
+              className="catalog-toolbar-search-field"
             >
               <label className="relative block min-w-0 flex-1">
                 <span className="sr-only">Поиск по событиям</span>

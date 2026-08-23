@@ -88,7 +88,7 @@ export function BlogListingBody({
           fallback={
             <div className="space-y-4">
               <div className="h-10 w-full max-w-xl animate-pulse rounded-xl bg-gradient-to-r from-sky-100 to-primary-100/70" />
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="catalog-card-grid">
                 {Array.from({ length: 6 }).map((_, index) => (
                   <div
                     key={index}

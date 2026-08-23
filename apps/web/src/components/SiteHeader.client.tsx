@@ -19,8 +19,8 @@ import { FAVORITES_CHANGED_EVENT, readFavoriteIds } from '@/lib/favorites';
 import { PLACE_FAVORITES_CHANGED_EVENT, readPlaceFavorites } from '@/lib/place-favorites';
 
 const NAV_LINKS = [
-  { label: 'Города', href: '/cities' },
   { label: 'События', href: '/events', catalog: true },
+  { label: 'Города', href: '/cities' },
   { label: 'Места', href: '/places', placesHub: true },
   { label: 'Подборки', href: '/podborki' },
   { label: 'Блог', href: '/blog' },
@@ -148,8 +148,8 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
   return (
     <>
       <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-200/60 bg-white/80 pt-[env(safe-area-inset-top,0px)] shadow-[0_1px_0_hsl(210_9%_11%/0.04)] backdrop-blur-xl supports-[backdrop-filter]:bg-white/70">
-        <div className="container-page flex min-h-[var(--site-header-height)] items-center justify-between gap-2 py-2.5 sm:py-3 lg:py-3.5">
-          <div className="flex min-w-0 flex-1 flex-nowrap items-center gap-2 sm:gap-3 lg:flex-none lg:gap-4">
+        <div className="container-page flex min-h-[var(--site-header-height)] items-center justify-between gap-3 py-2.5 sm:gap-4 sm:py-3 lg:gap-6 lg:py-3.5 xl:gap-10 2xl:gap-12">
+          <div className="flex min-w-0 flex-1 flex-nowrap items-center gap-2 sm:gap-3 lg:flex-none lg:gap-4 xl:gap-5">
             {/* Mobile: burger left (owner); desktop nav stays in center/right chrome. */}
             <div className="lg:hidden">
               <MobileNavTrigger id={mobileNavId} />
@@ -161,21 +161,11 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
             >
               <DaibiletLogo textClassName="text-lg sm:text-xl lg:text-2xl" />
             </Link>
-
-            {/* Mobile: city as MapPin pictogram; lg+ named chip. Tap opens CityPicker. */}
-            <CityPicker
-              cities={destinations}
-              value={cityValue}
-              onChange={onCityChange}
-              allLabel="Фильтр по городу"
-              variant="header"
-              className="shrink-0 lg:min-w-0 lg:max-w-[14rem] xl:max-w-[16rem]"
-            />
           </div>
 
           <nav
             aria-label="Основная навигация"
-            className={`min-w-0 items-center gap-0.5 ${compactHeader ? 'hidden' : 'hidden lg:flex'}`}
+            className={`min-w-0 items-center gap-0.5 lg:gap-1 xl:gap-2 2xl:gap-2.5 ${compactHeader ? 'hidden' : 'hidden lg:flex'}`}
           >
             {navLinks.map((item) => {
               const active = isNavActive(pathname, item.href, item.label);
@@ -187,7 +177,7 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
                   className={
                     [
                       secondary ? 'hidden xl:inline-flex' : 'inline-flex',
-                      'items-center rounded-lg px-2.5 py-1.5 text-sm font-medium transition xl:px-3',
+                      'items-center rounded-lg px-2.5 py-1.5 text-sm font-medium transition xl:px-3.5 xl:text-[0.9375rem] 2xl:px-4 2xl:text-base',
                       active
                         ? 'text-graphite underline decoration-graphite/70 decoration-2 underline-offset-[6px]'
                         : 'text-graphite-muted hover:bg-surface-muted hover:text-graphite',
@@ -200,8 +190,18 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
             })}
           </nav>
 
-          <div className="flex shrink-0 items-center gap-1 sm:gap-1.5">
-            {/* Sticky order: … City | Search | Route | Favorites (search icon on mobile too). */}
+          <div className="flex shrink-0 items-center gap-1 sm:gap-1.5 xl:gap-2.5 2xl:gap-3">
+            {/* Desktop ultrawide: city next to search (left cluster stays logo-only). */}
+            <CityPicker
+              cities={destinations}
+              value={cityValue}
+              onChange={onCityChange}
+              allLabel="Фильтр по городу"
+              variant="header"
+              className="shrink-0 lg:min-w-0 lg:max-w-[14rem] xl:max-w-[16rem] 2xl:max-w-[18rem]"
+            />
+
+            {/* Sticky order: City | Search | Route | Favorites (search icon on mobile too). */}
             <HeaderSearch
               variant="overlay"
               cityFilter={searchCityFilter}

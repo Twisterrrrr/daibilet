@@ -687,7 +687,7 @@ export function PlacesHubView({
         tone="light"
         className=""
       >
-        <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-stretch sm:gap-3">
+        <div className="catalog-hub-filters mt-4">
           <PlacesSearch mode="hub" initialQuery={q} tone="muted" />
           <select
             value={cityPending ? '' : cityFilter}
@@ -730,8 +730,8 @@ export function PlacesHubView({
         </div>
 
         {/* sm+: chip rail + Фильтры (events scope) as before */}
-        <div className="mt-4 hidden gap-2 sm:flex sm:items-start">
-          <div className="min-w-0 flex-1" data-places-hub-chips>
+        <div className="catalog-hub-chip-section hidden sm:flex">
+          <div className="catalog-chip-rail" data-places-hub-chips>
             <div className="flex flex-wrap items-center gap-1.5">
               <button
                 type="button"
@@ -875,9 +875,7 @@ export function PlacesHubView({
             ) : null}
             {viewMode === 'cards' || viewMode === 'list' ? (
               <div
-                className={`grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 ${
-                  viewMode === 'list' ? 'sm:hidden' : ''
-                }`}
+                className={`catalog-card-grid ${viewMode === 'list' ? 'sm:hidden' : ''}`}
               >
                 {venues.map((venue, index) =>
                   venuePageTemplate(venue.type) === 'institution' ? (

@@ -102,11 +102,7 @@ export function BlogListHero({ breadcrumbs, cityName = null }: BlogListHeroProps
   const topicChips = HERO_TOPIC_IDS.filter((id) => BLOG_TOPIC_ORDER.includes(id));
 
   const topicPills = (
-    <div
-      className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:flex-wrap sm:overflow-visible"
-      role="group"
-      aria-label="Быстрые темы"
-    >
+    <div className="catalog-chip-rail" role="group" aria-label="Быстрые темы">
       {topicChips.map((id) => {
         const active = topic === id;
         return (
@@ -134,13 +130,13 @@ export function BlogListHero({ breadcrumbs, cityName = null }: BlogListHeroProps
             Desktop: stack like Places hub - full-width search, then wrapping topic chips.
             Side-by-side search+chips left a large empty right gutter on wide screens.
           */}
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 xl:gap-5">
             <h1 className="w-full min-w-0 font-display text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
               {title}
             </h1>
 
-            <form className="w-full max-w-xl" onSubmit={submitSearch} role="search">
-              <label className="relative block">
+            <form className="catalog-hub-filters" onSubmit={submitSearch} role="search">
+              <label className="relative block min-w-0 flex-1">
                 <span className="sr-only">Поиск по статьям</span>
                 <Search
                   className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"

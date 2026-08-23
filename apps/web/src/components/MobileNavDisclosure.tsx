@@ -5,8 +5,8 @@ import { DaibiletLogo } from '@/components/DaibiletLogo';
 
 /** Static mobile destinations - city-aware hrefs enrich after hydration in SiteHeader. */
 export const MOBILE_NAV_LINKS = [
-  { label: 'Города', href: '/cities' },
   { label: 'События', href: '/events' },
+  { label: 'Города', href: '/cities' },
   { label: 'Места', href: '/places' },
   { label: 'Подборки', href: '/podborki' },
   { label: 'Блог', href: '/blog' },

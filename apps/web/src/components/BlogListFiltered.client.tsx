@@ -193,7 +193,7 @@ export function BlogListFiltered({
 
   const filtersBar = (
     <div className="mb-6 border-b border-slate-200/70 pb-3 md:mb-8 md:pb-4">
-      <div className="-mx-1 flex items-center gap-2 overflow-x-auto px-1 pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:flex-wrap sm:overflow-visible">
+      <div className="catalog-chip-rail items-center gap-2">
         <SoftSelect
           value={urlCity}
           onChange={(value) => setFilter('city', value)}
