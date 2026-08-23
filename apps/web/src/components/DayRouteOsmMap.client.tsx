@@ -15,6 +15,31 @@ export type DayRouteMapStop = {
 
 const MIN_ZOOM = 3;
 const MAX_ZOOM = 18;
+/** Default bottom reserve for the focus card overlay (px). */
+const DEFAULT_FOCUS_OVERLAY_RESERVE_PX = 180;
+
+function panStopForFocusOverlay(
+  map: LeafletMap,
+  latitude: number,
+  longitude: number,
+  reserveBottomPx: number,
+) {
+  const size = map.getSize();
+  if (size.x < 1 || size.y < 1) return;
+
+  const point = map.latLngToContainerPoint([latitude, longitude]);
+  const margin = 28;
+  const targetX = size.x / 2;
+  const targetY = Math.max(margin + 40, size.y - reserveBottomPx - margin);
+
+  const deltaX =
+    point.x < margin ? point.x - margin : point.x > size.x - margin ? point.x - (size.x - margin) : 0;
+  const deltaY = point.y - targetY;
+
+  if (Math.abs(deltaX) > 2 || Math.abs(deltaY) > 2) {
+    map.panBy([deltaX, deltaY], { animate: true });
+  }
+}
 
 function numberedMarkerHtml(n: number, selected: boolean): string {
   const label = String(n);
@@ -39,6 +64,9 @@ export function DayRouteOsmMap({
   onStopClick,
   layoutKey,
   fallbackCenter = null,
+  /** When set, pans the map so the stop stays above the focus-card overlay. */
+  panToStopId = null,
+  focusOverlayReservePx = DEFAULT_FOCUS_OVERLAY_RESERVE_PX,
 }: {
   stops: DayRouteMapStop[];
   className?: string;
@@ -48,6 +76,8 @@ export function DayRouteOsmMap({
   layoutKey?: string | number;
   /** Empty-route preview: city center without markers. */
   fallbackCenter?: { latitude: number; longitude: number } | null;
+  panToStopId?: string | null;
+  focusOverlayReservePx?: number;
 }) {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const mapRef = React.useRef<LeafletMap | null>(null);
@@ -172,6 +202,19 @@ export function DayRouteOsmMap({
       resizeObserver?.disconnect();
     };
   }, [stopsKey, stops, selectedStopId, centerKey, fallbackCenter]);
+
+  React.useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !panToStopId) return;
+    const stop = stops.find((item) => item.id === panToStopId);
+    if (!stop) return;
+
+    const id = window.setTimeout(() => {
+      map.invalidateSize({ animate: false });
+      panStopForFocusOverlay(map, stop.latitude, stop.longitude, focusOverlayReservePx);
+    }, 80);
+    return () => window.clearTimeout(id);
+  }, [panToStopId, stopsKey, stops, focusOverlayReservePx, layoutKey]);
 
   React.useEffect(() => {
     return () => {

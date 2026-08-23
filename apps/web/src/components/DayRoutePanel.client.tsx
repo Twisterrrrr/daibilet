@@ -2774,8 +2774,8 @@ function DayRoutePanelInner() {
       <div
         className={
           placement === 'desktop'
-            ? 'pointer-events-auto absolute bottom-3 left-3 right-3 z-[1100] rounded-2xl border border-slate-200 bg-white/95 p-2.5 shadow-md backdrop-blur sm:left-auto sm:right-3 sm:w-[min(22rem,calc(100%-1.5rem))]'
-            : 'pointer-events-auto absolute bottom-[calc(5.5rem+env(safe-area-inset-bottom,0px))] left-3 right-3 z-[1100] rounded-2xl border border-slate-200 bg-white/95 p-2.5 shadow-md backdrop-blur'
+            ? 'pointer-events-auto absolute bottom-3 left-3 right-3 z-[1100] max-h-[min(36vh,11.5rem)] overflow-hidden rounded-2xl border border-slate-200 bg-white/95 p-2.5 shadow-md backdrop-blur sm:left-auto sm:right-3 sm:w-[min(22rem,calc(100%-1.5rem))]'
+            : 'pointer-events-auto absolute bottom-[calc(5.5rem+env(safe-area-inset-bottom,0px))] left-3 right-3 z-[1100] max-h-[min(32vh,10rem)] overflow-hidden rounded-2xl border border-slate-200 bg-white/95 p-2.5 shadow-md backdrop-blur'
         }
         data-day-map-focus-card
         data-day-map-focus-placement={placement}
@@ -2785,7 +2785,7 @@ function DayRoutePanelInner() {
             <p className="truncate text-sm font-semibold text-slate-900">{focusedVenue.title}</p>
             {focusSubtitle ? (
             <p
-              className="mt-0.5 line-clamp-4 text-[11px] leading-snug text-slate-500"
+              className="mt-0.5 line-clamp-2 text-[11px] leading-snug text-slate-500"
               title={focusSubtitle}
               data-day-map-focus-subtitle
             >
@@ -4201,6 +4201,8 @@ function DayRoutePanelInner() {
                   <DayRouteOsmMap
                     stops={displayMapStops}
                     selectedStopId={mapSelectedStopId}
+                    panToStopId={focusedStopId}
+                    focusOverlayReservePx={188}
                     onStopClick={(stopId) => focusStopFromMap(stopId, { scrollList: false })}
                     className="h-full min-h-[20rem] w-full bg-slate-100"
                   />
@@ -4769,6 +4771,8 @@ function DayRoutePanelInner() {
           <DayRouteOsmMap
             stops={displayMapStops}
             selectedStopId={focusedStopId}
+            panToStopId={focusedStopId}
+            focusOverlayReservePx={248}
             onStopClick={focusStopFromMap}
             layoutKey="mobile-map-sheet"
             className="h-full w-full"
