@@ -14,15 +14,35 @@ const assets = process.env.VENUE_ASSETS_DIR || 'C:/Users/user/.cursor/projects/f
 const publicDir = path.join(root, 'apps/public/public/images/venues');
 const sharp = createRequire(path.join(root, 'apps/web/package.json'))('sharp');
 
+async function gate(src, city, stem) {
+  if (process.env.SKIP_UNIQUENESS_GATE === '1') return { ok: true, skipped: true };
+  const { spawnSync } = await import('child_process');
+  const r = spawnSync(
+    process.execPath,
+    [path.join(root, 'scripts/venue-still-uniqueness-gate.mjs'), src, city, `--stem=${stem}`],
+    { encoding: 'utf8' },
+  );
+  let parsed = null;
+  try {
+    parsed = JSON.parse(String(r.stdout || '').trim().split('\n').pop());
+  } catch {
+    parsed = { ok: false, reason: 'gate_parse', stdout: r.stdout, stderr: r.stderr };
+  }
+  return parsed;
+}
+
 async function install(stem, city) {
   const src = path.join(assets, `${stem}.jpg`);
   const destDir = path.join(publicDir, city);
   if (!fs.existsSync(src)) return { stem, city, ok: false, reason: 'missing asset' };
+  const g = await gate(src, city, stem);
+  if (!g?.ok) return { stem, city, ok: false, reason: 'uniqueness_gate', gate: g };
   const buf = await sharp(src)
     .rotate()
     .resize(1600, 1067, { fit: 'cover', position: 'centre' })
     .jpeg({ quality: 86, mozjpeg: true })
     .toBuffer();
+  fs.mkdirSync(destDir, { recursive: true });
   await sharp(buf).toFile(path.join(destDir, `${stem}.jpg`));
   await sharp(buf)
     .resize(640, null, { withoutEnlargement: true })
@@ -32,7 +52,7 @@ async function install(stem, city) {
     .resize(320, null, { withoutEnlargement: true })
     .jpeg({ quality: 65 })
     .toFile(path.join(destDir, `${stem}-thumb.jpg`));
-  return { stem, city, ok: true, bytes: buf.length };
+  return { stem, city, ok: true, bytes: buf.length, gate: g };
 }
 
 const batchArg = process.argv.find((a) => a.startsWith('--batch='));
