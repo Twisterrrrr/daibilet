@@ -2,1785 +2,1098 @@
   "thresh": 2,
   "summary": [
     {
+      "city": "saint-petersburg",
+      "files": 322,
+      "md5": 0,
+      "pairs": 8,
+      "d0": 0,
+      "clusters": 1,
+      "topCluster": 7
+    },
+    {
+      "city": "ekaterinburg",
+      "files": 101,
+      "md5": 0,
+      "pairs": 1,
+      "d0": 0,
+      "clusters": 1,
+      "topCluster": 2
+    },
+    {
+      "city": "kazan",
+      "files": 79,
+      "md5": 0,
+      "pairs": 1,
+      "d0": 0,
+      "clusters": 1,
+      "topCluster": 2
+    },
+    {
+      "city": "place",
+      "files": 5,
+      "md5": 0,
+      "pairs": 1,
+      "d0": 0,
+      "clusters": 1,
+      "topCluster": 2
+    },
+    {
+      "city": "abakan",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "arhangelsk",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "astrahan",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "barnaul",
+      "files": 77,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "belgorod",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "blagoveschensk-amurskaya-oblast",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "bryansk",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "cheboksary",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
       "city": "chelyabinsk",
       "files": 111,
       "md5": 0,
-      "pairs": 327,
-      "d0": 80,
-      "clusters": 4,
-      "topCluster": 40
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "chita",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "habarovsk",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "irkutsk",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "ivanovo",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "izhevsk",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "kaliningrad",
+      "files": 91,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "kaluga",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "kemerovo",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "kirov",
+      "files": 1,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "kirov-kirovskaya-oblast",
+      "files": 5,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "kostroma",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "krasnodar",
+      "files": 74,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "krasnoyarsk",
+      "files": 71,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "kurgan",
+      "files": 7,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "kursk",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "lipeck",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "moscow",
+      "files": 243,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "murmansk",
+      "files": 7,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "nizhny-novgorod",
+      "files": 115,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "novosibirsk",
+      "files": 101,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "omsk",
+      "files": 86,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "orel",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "orenburg",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "penza",
+      "files": 74,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "perm",
+      "files": 80,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "pskov",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "rostov-na-donu",
+      "files": 86,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "ryazan",
+      "files": 94,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
     },
     {
       "city": "samara",
+      "files": 80,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "saransk",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "saratov",
       "files": 77,
       "md5": 0,
-      "pairs": 10,
-      "d0": 10,
-      "clusters": 1,
-      "topCluster": 5
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "sevastopol",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "simferopol",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "smolensk",
+      "files": 96,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "sochi",
+      "files": 98,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "sortavala",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "stavropol",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "surgut",
+      "files": 8,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "syktyvkar",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "tambov",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "tolyatti",
+      "files": 8,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "tomsk",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "tula",
+      "files": 87,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "tver",
+      "files": 90,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "tyumen",
+      "files": 102,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "ufa",
+      "files": 85,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "ulan-ude",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "ulyanovsk",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "veliky-novgorod",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "vladikavkaz",
+      "files": 8,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "vladimir",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "vladivostok",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "volgograd",
+      "files": 75,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "vologda",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "voronezh",
+      "files": 92,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "vyborg",
+      "files": 8,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "yaroslavl",
+      "files": 74,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "yoshkar-ola",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
+    },
+    {
+      "city": "yuzhno-sahalinsk",
+      "files": 6,
+      "md5": 0,
+      "pairs": 0,
+      "d0": 0,
+      "clusters": 0,
+      "topCluster": 0
     }
   ],
   "full": {
+    "abakan": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "arhangelsk": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "astrahan": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "barnaul": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "belgorod": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "blagoveschensk-amurskaya-oblast": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "bryansk": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "cheboksary": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
     "chelyabinsk": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "chita": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "ekaterinburg": {
       "md5Dups": [],
       "near": [
         {
-          "d": 0,
-          "a": "arkaim-muzey-prirody-i-cheloveka.jpg",
-          "b": "arkaim-vetryanaya-melnitsa.jpg"
-        },
-        {
-          "d": 0,
-          "a": "arkaim-muzey-prirody-i-cheloveka.jpg",
-          "b": "muzey-yuzhno-uralskoy-zheleznoy-dorogi.jpg"
-        },
-        {
-          "d": 0,
-          "a": "arkaim-muzey-prirody-i-cheloveka.jpg",
-          "b": "organnyy-zal-rodina.jpg"
-        },
-        {
-          "d": 0,
-          "a": "arkaim-muzey-prirody-i-cheloveka.jpg",
-          "b": "pochtovyy-muzey.jpg"
-        },
-        {
-          "d": 0,
-          "a": "arkaim-muzey-prirody-i-cheloveka.jpg",
-          "b": "sobornaya-mechet.jpg"
-        },
-        {
-          "d": 0,
-          "a": "arkaim-muzey-prirody-i-cheloveka.jpg",
-          "b": "staryy-kraevedcheskiy.jpg"
-        },
-        {
-          "d": 0,
-          "a": "arkaim-muzey-prirody-i-cheloveka.jpg",
-          "b": "taganay-lestnitsa.jpg"
-        },
-        {
-          "d": 0,
-          "a": "arkaim-muzey-prirody-i-cheloveka.jpg",
-          "b": "zyuratkul-ekotropa-na-hrebet.jpg"
-        },
-        {
-          "d": 0,
-          "a": "arkaim-muzey-prirody-i-cheloveka.jpg",
-          "b": "zyuratkul-maralovaya-ferma.jpg"
-        },
-        {
-          "d": 0,
-          "a": "arkaim-vetryanaya-melnitsa.jpg",
-          "b": "muzey-yuzhno-uralskoy-zheleznoy-dorogi.jpg"
-        },
-        {
-          "d": 0,
-          "a": "arkaim-vetryanaya-melnitsa.jpg",
-          "b": "organnyy-zal-rodina.jpg"
-        },
-        {
-          "d": 0,
-          "a": "arkaim-vetryanaya-melnitsa.jpg",
-          "b": "pochtovyy-muzey.jpg"
-        },
-        {
-          "d": 0,
-          "a": "arkaim-vetryanaya-melnitsa.jpg",
-          "b": "sobornaya-mechet.jpg"
-        },
-        {
-          "d": 0,
-          "a": "arkaim-vetryanaya-melnitsa.jpg",
-          "b": "staryy-kraevedcheskiy.jpg"
-        },
-        {
-          "d": 0,
-          "a": "arkaim-vetryanaya-melnitsa.jpg",
-          "b": "taganay-lestnitsa.jpg"
-        },
-        {
-          "d": 0,
-          "a": "arkaim-vetryanaya-melnitsa.jpg",
-          "b": "zyuratkul-ekotropa-na-hrebet.jpg"
-        },
-        {
-          "d": 0,
-          "a": "arkaim-vetryanaya-melnitsa.jpg",
-          "b": "zyuratkul-maralovaya-ferma.jpg"
-        },
-        {
-          "d": 0,
-          "a": "muzey-istorii-chtz.jpg",
-          "b": "po-chesnoku.jpg"
-        },
-        {
-          "d": 0,
-          "a": "muzey-istorii-chtz.jpg",
-          "b": "restoran-kupecheskiy.jpg"
-        },
-        {
-          "d": 0,
-          "a": "muzey-istorii-chtz.jpg",
-          "b": "turgoyak-buhta-trimaranov.jpg"
-        },
-        {
-          "d": 0,
-          "a": "muzey-istorii-chtz.jpg",
-          "b": "turgoyak-ekotropa.jpg"
-        },
-        {
-          "d": 0,
-          "a": "muzey-istorii-chtz.jpg",
-          "b": "uvildy-mys-krasnyy.jpg"
-        },
-        {
-          "d": 0,
-          "a": "muzey-istorii-chtz.jpg",
-          "b": "zyuratkul-kipyashchiy-klyuch.jpg"
-        },
-        {
-          "d": 0,
-          "a": "muzey-istorii-chtz.jpg",
-          "b": "zyuratkul-reka-bolshaya-satka.jpg"
-        },
-        {
-          "d": 0,
-          "a": "muzey-yuzhno-uralskoy-zheleznoy-dorogi.jpg",
-          "b": "organnyy-zal-rodina.jpg"
-        },
-        {
-          "d": 0,
-          "a": "muzey-yuzhno-uralskoy-zheleznoy-dorogi.jpg",
-          "b": "pochtovyy-muzey.jpg"
-        },
-        {
-          "d": 0,
-          "a": "muzey-yuzhno-uralskoy-zheleznoy-dorogi.jpg",
-          "b": "sobornaya-mechet.jpg"
-        },
-        {
-          "d": 0,
-          "a": "muzey-yuzhno-uralskoy-zheleznoy-dorogi.jpg",
-          "b": "staryy-kraevedcheskiy.jpg"
-        },
-        {
-          "d": 0,
-          "a": "muzey-yuzhno-uralskoy-zheleznoy-dorogi.jpg",
-          "b": "taganay-lestnitsa.jpg"
-        },
-        {
-          "d": 0,
-          "a": "muzey-yuzhno-uralskoy-zheleznoy-dorogi.jpg",
-          "b": "zyuratkul-ekotropa-na-hrebet.jpg"
-        },
-        {
-          "d": 0,
-          "a": "muzey-yuzhno-uralskoy-zheleznoy-dorogi.jpg",
-          "b": "zyuratkul-maralovaya-ferma.jpg"
-        },
-        {
-          "d": 0,
-          "a": "organnyy-zal-rodina.jpg",
-          "b": "pochtovyy-muzey.jpg"
-        },
-        {
-          "d": 0,
-          "a": "organnyy-zal-rodina.jpg",
-          "b": "sobornaya-mechet.jpg"
-        },
-        {
-          "d": 0,
-          "a": "organnyy-zal-rodina.jpg",
-          "b": "staryy-kraevedcheskiy.jpg"
-        },
-        {
-          "d": 0,
-          "a": "organnyy-zal-rodina.jpg",
-          "b": "taganay-lestnitsa.jpg"
-        },
-        {
-          "d": 0,
-          "a": "organnyy-zal-rodina.jpg",
-          "b": "zyuratkul-ekotropa-na-hrebet.jpg"
-        },
-        {
-          "d": 0,
-          "a": "organnyy-zal-rodina.jpg",
-          "b": "zyuratkul-maralovaya-ferma.jpg"
-        },
-        {
-          "d": 0,
-          "a": "pamyatnik-osnovatelyam.jpg",
-          "b": "taganay-usadba.jpg"
-        },
-        {
-          "d": 0,
-          "a": "pamyatnik-osnovatelyam.jpg",
-          "b": "troitskaya-tserkov.jpg"
-        },
-        {
-          "d": 0,
-          "a": "pamyatnik-osnovatelyam.jpg",
-          "b": "zyuratkul-gora-lukash.jpg"
-        },
-        {
-          "d": 0,
-          "a": "po-chesnoku.jpg",
-          "b": "restoran-kupecheskiy.jpg"
-        },
-        {
-          "d": 0,
-          "a": "po-chesnoku.jpg",
-          "b": "turgoyak-buhta-trimaranov.jpg"
-        },
-        {
-          "d": 0,
-          "a": "po-chesnoku.jpg",
-          "b": "turgoyak-ekotropa.jpg"
-        },
-        {
-          "d": 0,
-          "a": "po-chesnoku.jpg",
-          "b": "uvildy-mys-krasnyy.jpg"
-        },
-        {
-          "d": 0,
-          "a": "po-chesnoku.jpg",
-          "b": "zyuratkul-kipyashchiy-klyuch.jpg"
-        },
-        {
-          "d": 0,
-          "a": "po-chesnoku.jpg",
-          "b": "zyuratkul-reka-bolshaya-satka.jpg"
-        },
-        {
-          "d": 0,
-          "a": "pochtovyy-muzey.jpg",
-          "b": "sobornaya-mechet.jpg"
-        },
-        {
-          "d": 0,
-          "a": "pochtovyy-muzey.jpg",
-          "b": "staryy-kraevedcheskiy.jpg"
-        },
-        {
-          "d": 0,
-          "a": "pochtovyy-muzey.jpg",
-          "b": "taganay-lestnitsa.jpg"
-        },
-        {
-          "d": 0,
-          "a": "pochtovyy-muzey.jpg",
-          "b": "zyuratkul-ekotropa-na-hrebet.jpg"
-        },
-        {
-          "d": 0,
-          "a": "pochtovyy-muzey.jpg",
-          "b": "zyuratkul-maralovaya-ferma.jpg"
-        },
-        {
-          "d": 0,
-          "a": "restoran-kupecheskiy.jpg",
-          "b": "turgoyak-buhta-trimaranov.jpg"
-        },
-        {
-          "d": 0,
-          "a": "restoran-kupecheskiy.jpg",
-          "b": "turgoyak-ekotropa.jpg"
-        },
-        {
-          "d": 0,
-          "a": "restoran-kupecheskiy.jpg",
-          "b": "uvildy-mys-krasnyy.jpg"
-        },
-        {
-          "d": 0,
-          "a": "restoran-kupecheskiy.jpg",
-          "b": "zyuratkul-kipyashchiy-klyuch.jpg"
-        },
-        {
-          "d": 0,
-          "a": "restoran-kupecheskiy.jpg",
-          "b": "zyuratkul-reka-bolshaya-satka.jpg"
-        },
-        {
-          "d": 0,
-          "a": "sobornaya-mechet.jpg",
-          "b": "staryy-kraevedcheskiy.jpg"
-        },
-        {
-          "d": 0,
-          "a": "sobornaya-mechet.jpg",
-          "b": "taganay-lestnitsa.jpg"
-        },
-        {
-          "d": 0,
-          "a": "sobornaya-mechet.jpg",
-          "b": "zyuratkul-ekotropa-na-hrebet.jpg"
-        },
-        {
-          "d": 0,
-          "a": "sobornaya-mechet.jpg",
-          "b": "zyuratkul-maralovaya-ferma.jpg"
-        },
-        {
-          "d": 0,
-          "a": "staryy-kraevedcheskiy.jpg",
-          "b": "taganay-lestnitsa.jpg"
-        },
-        {
-          "d": 0,
-          "a": "staryy-kraevedcheskiy.jpg",
-          "b": "zyuratkul-ekotropa-na-hrebet.jpg"
-        },
-        {
-          "d": 0,
-          "a": "staryy-kraevedcheskiy.jpg",
-          "b": "zyuratkul-maralovaya-ferma.jpg"
-        },
-        {
-          "d": 0,
-          "a": "taganay-lestnitsa.jpg",
-          "b": "zyuratkul-ekotropa-na-hrebet.jpg"
-        },
-        {
-          "d": 0,
-          "a": "taganay-lestnitsa.jpg",
-          "b": "zyuratkul-maralovaya-ferma.jpg"
-        },
-        {
-          "d": 0,
-          "a": "taganay-usadba.jpg",
-          "b": "troitskaya-tserkov.jpg"
-        },
-        {
-          "d": 0,
-          "a": "taganay-usadba.jpg",
-          "b": "zyuratkul-gora-lukash.jpg"
-        },
-        {
-          "d": 0,
-          "a": "teatr-opery-glinki.jpg",
-          "b": "zyuratkul-skaly-medvedi.jpg"
-        },
-        {
-          "d": 0,
-          "a": "troitskaya-tserkov.jpg",
-          "b": "zyuratkul-gora-lukash.jpg"
-        },
-        {
-          "d": 0,
-          "a": "turgoyak-buhta-trimaranov.jpg",
-          "b": "turgoyak-ekotropa.jpg"
-        },
-        {
-          "d": 0,
-          "a": "turgoyak-buhta-trimaranov.jpg",
-          "b": "uvildy-mys-krasnyy.jpg"
-        },
-        {
-          "d": 0,
-          "a": "turgoyak-buhta-trimaranov.jpg",
-          "b": "zyuratkul-kipyashchiy-klyuch.jpg"
-        },
-        {
-          "d": 0,
-          "a": "turgoyak-buhta-trimaranov.jpg",
-          "b": "zyuratkul-reka-bolshaya-satka.jpg"
-        },
-        {
-          "d": 0,
-          "a": "turgoyak-ekotropa.jpg",
-          "b": "uvildy-mys-krasnyy.jpg"
-        },
-        {
-          "d": 0,
-          "a": "turgoyak-ekotropa.jpg",
-          "b": "zyuratkul-kipyashchiy-klyuch.jpg"
-        },
-        {
-          "d": 0,
-          "a": "turgoyak-ekotropa.jpg",
-          "b": "zyuratkul-reka-bolshaya-satka.jpg"
-        },
-        {
-          "d": 0,
-          "a": "uvildy-mys-krasnyy.jpg",
-          "b": "zyuratkul-kipyashchiy-klyuch.jpg"
-        },
-        {
-          "d": 0,
-          "a": "uvildy-mys-krasnyy.jpg",
-          "b": "zyuratkul-reka-bolshaya-satka.jpg"
-        },
-        {
-          "d": 0,
-          "a": "zyuratkul-ekotropa-na-hrebet.jpg",
-          "b": "zyuratkul-maralovaya-ferma.jpg"
-        },
-        {
-          "d": 0,
-          "a": "zyuratkul-kipyashchiy-klyuch.jpg",
-          "b": "zyuratkul-reka-bolshaya-satka.jpg"
-        },
-        {
           "d": 1,
-          "a": "arkaim-gora-razuma.jpg",
-          "b": "arkaim-poselok-mednogo-veka.jpg"
-        },
-        {
-          "d": 1,
-          "a": "arkaim-gora-shamanka-lysaya.jpg",
-          "b": "arkaim-muzey-prirody-i-cheloveka.jpg"
-        },
-        {
-          "d": 1,
-          "a": "arkaim-gora-shamanka-lysaya.jpg",
-          "b": "arkaim-vetryanaya-melnitsa.jpg"
-        },
-        {
-          "d": 1,
-          "a": "arkaim-gora-shamanka-lysaya.jpg",
-          "b": "muzey-yuzhno-uralskoy-zheleznoy-dorogi.jpg"
-        },
-        {
-          "d": 1,
-          "a": "arkaim-gora-shamanka-lysaya.jpg",
-          "b": "organnyy-zal-rodina.jpg"
-        },
-        {
-          "d": 1,
-          "a": "arkaim-gora-shamanka-lysaya.jpg",
-          "b": "pochtovyy-muzey.jpg"
-        },
-        {
-          "d": 1,
-          "a": "arkaim-gora-shamanka-lysaya.jpg",
-          "b": "sobornaya-mechet.jpg"
-        },
-        {
-          "d": 1,
-          "a": "arkaim-gora-shamanka-lysaya.jpg",
-          "b": "staryy-kraevedcheskiy.jpg"
-        },
-        {
-          "d": 1,
-          "a": "arkaim-gora-shamanka-lysaya.jpg",
-          "b": "taganay-lestnitsa.jpg"
-        },
-        {
-          "d": 1,
-          "a": "arkaim-gora-shamanka-lysaya.jpg",
-          "b": "zyuratkul-ekotropa-na-hrebet.jpg"
-        },
-        {
-          "d": 1,
-          "a": "arkaim-gora-shamanka-lysaya.jpg",
-          "b": "zyuratkul-maralovaya-ferma.jpg"
-        },
-        {
-          "d": 1,
-          "a": "arkaim-kurgan-temir.jpg",
-          "b": "uvildy-lesnoe-ozero-maloe-uvildy.jpg"
-        },
-        {
-          "d": 1,
-          "a": "arkaim-muzey-prirody-i-cheloveka.jpg",
-          "b": "muzey-geologii-garmoniya.jpg"
-        },
-        {
-          "d": 1,
-          "a": "arkaim-muzey-prirody-i-cheloveka.jpg",
-          "b": "muzey-istorii-chtz.jpg"
-        },
-        {
-          "d": 1,
-          "a": "arkaim-muzey-prirody-i-cheloveka.jpg",
-          "b": "po-chesnoku.jpg"
-        },
-        {
-          "d": 1,
-          "a": "arkaim-muzey-prirody-i-cheloveka.jpg",
-          "b": "restoran-kupecheskiy.jpg"
-        },
-        {
-          "d": 1,
-          "a": "arkaim-muzey-prirody-i-cheloveka.jpg",
-          "b": "taganay-perya.jpg"
-        },
-        {
-          "d": 1,
-          "a": "arkaim-muzey-prirody-i-cheloveka.jpg",
-          "b": "turgoyak-buhta-trimaranov.jpg"
-        },
-        {
-          "d": 1,
-          "a": "arkaim-muzey-prirody-i-cheloveka.jpg",
-          "b": "turgoyak-ekotropa.jpg"
-        },
-        {
-          "d": 1,
-          "a": "arkaim-muzey-prirody-i-cheloveka.jpg",
-          "b": "uvildy-mys-krasnyy.jpg"
-        },
-        {
-          "d": 1,
-          "a": "arkaim-muzey-prirody-i-cheloveka.jpg",
-          "b": "zyuratkul-kipyashchiy-klyuch.jpg"
-        },
-        {
-          "d": 1,
-          "a": "arkaim-muzey-prirody-i-cheloveka.jpg",
-          "b": "zyuratkul-reka-bolshaya-satka.jpg"
-        },
-        {
-          "d": 1,
-          "a": "arkaim-muzey-vosssozdanogo-poseleniya.jpg",
-          "b": "pamyatnik-osnovatelyam.jpg"
-        },
-        {
-          "d": 1,
-          "a": "arkaim-muzey-vosssozdanogo-poseleniya.jpg",
-          "b": "taganay-usadba.jpg"
-        },
-        {
-          "d": 1,
-          "a": "arkaim-muzey-vosssozdanogo-poseleniya.jpg",
-          "b": "troitskaya-tserkov.jpg"
-        },
-        {
-          "d": 1,
-          "a": "arkaim-muzey-vosssozdanogo-poseleniya.jpg",
-          "b": "zyuratkul-gora-lukash.jpg"
-        },
-        {
-          "d": 1,
-          "a": "arkaim-poselok-mednogo-veka.jpg",
-          "b": "uvildy-ekotropa-uvildinskie-zori.jpg"
-        },
-        {
-          "d": 1,
-          "a": "arkaim-vetryanaya-melnitsa.jpg",
-          "b": "muzey-geologii-garmoniya.jpg"
-        },
-        {
-          "d": 1,
-          "a": "arkaim-vetryanaya-melnitsa.jpg",
-          "b": "muzey-istorii-chtz.jpg"
-        },
-        {
-          "d": 1,
-          "a": "arkaim-vetryanaya-melnitsa.jpg",
-          "b": "po-chesnoku.jpg"
-        },
-        {
-          "d": 1,
-          "a": "arkaim-vetryanaya-melnitsa.jpg",
-          "b": "restoran-kupecheskiy.jpg"
-        },
-        {
-          "d": 1,
-          "a": "arkaim-vetryanaya-melnitsa.jpg",
-          "b": "taganay-perya.jpg"
-        },
-        {
-          "d": 1,
-          "a": "arkaim-vetryanaya-melnitsa.jpg",
-          "b": "turgoyak-buhta-trimaranov.jpg"
-        },
-        {
-          "d": 1,
-          "a": "arkaim-vetryanaya-melnitsa.jpg",
-          "b": "turgoyak-ekotropa.jpg"
-        },
-        {
-          "d": 1,
-          "a": "arkaim-vetryanaya-melnitsa.jpg",
-          "b": "uvildy-mys-krasnyy.jpg"
-        },
-        {
-          "d": 1,
-          "a": "arkaim-vetryanaya-melnitsa.jpg",
-          "b": "zyuratkul-kipyashchiy-klyuch.jpg"
-        },
-        {
-          "d": 1,
-          "a": "arkaim-vetryanaya-melnitsa.jpg",
-          "b": "zyuratkul-reka-bolshaya-satka.jpg"
-        },
-        {
-          "d": 1,
-          "a": "muzey-geologii-garmoniya.jpg",
-          "b": "muzey-yuzhno-uralskoy-zheleznoy-dorogi.jpg"
-        },
-        {
-          "d": 1,
-          "a": "muzey-geologii-garmoniya.jpg",
-          "b": "organnyy-zal-rodina.jpg"
-        },
-        {
-          "d": 1,
-          "a": "muzey-geologii-garmoniya.jpg",
-          "b": "pochtovyy-muzey.jpg"
-        },
-        {
-          "d": 1,
-          "a": "muzey-geologii-garmoniya.jpg",
-          "b": "sobornaya-mechet.jpg"
-        },
-        {
-          "d": 1,
-          "a": "muzey-geologii-garmoniya.jpg",
-          "b": "staryy-kraevedcheskiy.jpg"
-        },
-        {
-          "d": 1,
-          "a": "muzey-geologii-garmoniya.jpg",
-          "b": "taganay-lestnitsa.jpg"
-        },
-        {
-          "d": 1,
-          "a": "muzey-geologii-garmoniya.jpg",
-          "b": "uvildy-ostrov-vyazovyy.jpg"
-        },
-        {
-          "d": 1,
-          "a": "muzey-geologii-garmoniya.jpg",
-          "b": "zyuratkul-ekotropa-na-hrebet.jpg"
-        },
-        {
-          "d": 1,
-          "a": "muzey-geologii-garmoniya.jpg",
-          "b": "zyuratkul-maralovaya-ferma.jpg"
-        },
-        {
-          "d": 1,
-          "a": "muzey-istorii-chtz.jpg",
-          "b": "muzey-yuzhno-uralskoy-zheleznoy-dorogi.jpg"
-        },
-        {
-          "d": 1,
-          "a": "muzey-istorii-chtz.jpg",
-          "b": "odigitrievskiy-monastyr.jpg"
-        },
-        {
-          "d": 1,
-          "a": "muzey-istorii-chtz.jpg",
-          "b": "organnyy-zal-rodina.jpg"
-        },
-        {
-          "d": 1,
-          "a": "muzey-istorii-chtz.jpg",
-          "b": "pochtovyy-muzey.jpg"
-        },
-        {
-          "d": 1,
-          "a": "muzey-istorii-chtz.jpg",
-          "b": "sobornaya-mechet.jpg"
-        },
-        {
-          "d": 1,
-          "a": "muzey-istorii-chtz.jpg",
-          "b": "staryy-kraevedcheskiy.jpg"
-        },
-        {
-          "d": 1,
-          "a": "muzey-istorii-chtz.jpg",
-          "b": "taganay-lestnitsa.jpg"
-        },
-        {
-          "d": 1,
-          "a": "muzey-istorii-chtz.jpg",
-          "b": "teatr-opery-glinki.jpg"
-        },
-        {
-          "d": 1,
-          "a": "muzey-istorii-chtz.jpg",
-          "b": "zyuratkul-ekotropa-na-hrebet.jpg"
-        },
-        {
-          "d": 1,
-          "a": "muzey-istorii-chtz.jpg",
-          "b": "zyuratkul-maralovaya-ferma.jpg"
-        },
-        {
-          "d": 1,
-          "a": "muzey-istorii-chtz.jpg",
-          "b": "zyuratkul-skaly-medvedi.jpg"
-        },
-        {
-          "d": 1,
-          "a": "muzey-yuzhno-uralskoy-zheleznoy-dorogi.jpg",
-          "b": "po-chesnoku.jpg"
-        },
-        {
-          "d": 1,
-          "a": "muzey-yuzhno-uralskoy-zheleznoy-dorogi.jpg",
-          "b": "restoran-kupecheskiy.jpg"
-        },
-        {
-          "d": 1,
-          "a": "muzey-yuzhno-uralskoy-zheleznoy-dorogi.jpg",
-          "b": "taganay-perya.jpg"
-        },
-        {
-          "d": 1,
-          "a": "muzey-yuzhno-uralskoy-zheleznoy-dorogi.jpg",
-          "b": "turgoyak-buhta-trimaranov.jpg"
-        },
-        {
-          "d": 1,
-          "a": "muzey-yuzhno-uralskoy-zheleznoy-dorogi.jpg",
-          "b": "turgoyak-ekotropa.jpg"
-        },
-        {
-          "d": 1,
-          "a": "muzey-yuzhno-uralskoy-zheleznoy-dorogi.jpg",
-          "b": "uvildy-mys-krasnyy.jpg"
-        },
-        {
-          "d": 1,
-          "a": "muzey-yuzhno-uralskoy-zheleznoy-dorogi.jpg",
-          "b": "zyuratkul-kipyashchiy-klyuch.jpg"
-        },
-        {
-          "d": 1,
-          "a": "muzey-yuzhno-uralskoy-zheleznoy-dorogi.jpg",
-          "b": "zyuratkul-reka-bolshaya-satka.jpg"
-        },
-        {
-          "d": 1,
-          "a": "odigitrievskiy-monastyr.jpg",
-          "b": "po-chesnoku.jpg"
-        },
-        {
-          "d": 1,
-          "a": "odigitrievskiy-monastyr.jpg",
-          "b": "restoran-kupecheskiy.jpg"
-        },
-        {
-          "d": 1,
-          "a": "odigitrievskiy-monastyr.jpg",
-          "b": "taganay-perya.jpg"
-        },
-        {
-          "d": 1,
-          "a": "odigitrievskiy-monastyr.jpg",
-          "b": "turgoyak-buhta-trimaranov.jpg"
-        },
-        {
-          "d": 1,
-          "a": "odigitrievskiy-monastyr.jpg",
-          "b": "turgoyak-ekotropa.jpg"
-        },
-        {
-          "d": 1,
-          "a": "odigitrievskiy-monastyr.jpg",
-          "b": "uvildy-mys-krasnyy.jpg"
-        },
-        {
-          "d": 1,
-          "a": "odigitrievskiy-monastyr.jpg",
-          "b": "zyuratkul-kipyashchiy-klyuch.jpg"
-        },
-        {
-          "d": 1,
-          "a": "odigitrievskiy-monastyr.jpg",
-          "b": "zyuratkul-reka-bolshaya-satka.jpg"
-        },
-        {
-          "d": 1,
-          "a": "organnyy-zal-rodina.jpg",
-          "b": "po-chesnoku.jpg"
-        },
-        {
-          "d": 1,
-          "a": "organnyy-zal-rodina.jpg",
-          "b": "restoran-kupecheskiy.jpg"
-        },
-        {
-          "d": 1,
-          "a": "organnyy-zal-rodina.jpg",
-          "b": "taganay-perya.jpg"
-        },
-        {
-          "d": 1,
-          "a": "organnyy-zal-rodina.jpg",
-          "b": "turgoyak-buhta-trimaranov.jpg"
-        },
-        {
-          "d": 1,
-          "a": "organnyy-zal-rodina.jpg",
-          "b": "turgoyak-ekotropa.jpg"
-        },
-        {
-          "d": 1,
-          "a": "organnyy-zal-rodina.jpg",
-          "b": "uvildy-mys-krasnyy.jpg"
-        },
-        {
-          "d": 1,
-          "a": "organnyy-zal-rodina.jpg",
-          "b": "zyuratkul-kipyashchiy-klyuch.jpg"
-        },
-        {
-          "d": 1,
-          "a": "organnyy-zal-rodina.jpg",
-          "b": "zyuratkul-reka-bolshaya-satka.jpg"
-        },
-        {
-          "d": 1,
-          "a": "pamyatnik-leninu.jpg",
-          "b": "turgoyak-simvol-very.jpg"
-        },
-        {
-          "d": 1,
-          "a": "pamyatnik-osnovatelyam.jpg",
-          "b": "uvildy-tsentralnyy-plyazh.jpg"
-        },
-        {
-          "d": 1,
-          "a": "po-chesnoku.jpg",
-          "b": "pochtovyy-muzey.jpg"
-        },
-        {
-          "d": 1,
-          "a": "po-chesnoku.jpg",
-          "b": "sobornaya-mechet.jpg"
-        },
-        {
-          "d": 1,
-          "a": "po-chesnoku.jpg",
-          "b": "staryy-kraevedcheskiy.jpg"
-        },
-        {
-          "d": 1,
-          "a": "po-chesnoku.jpg",
-          "b": "taganay-lestnitsa.jpg"
-        },
-        {
-          "d": 1,
-          "a": "po-chesnoku.jpg",
-          "b": "teatr-opery-glinki.jpg"
-        },
-        {
-          "d": 1,
-          "a": "po-chesnoku.jpg",
-          "b": "zyuratkul-ekotropa-na-hrebet.jpg"
-        },
-        {
-          "d": 1,
-          "a": "po-chesnoku.jpg",
-          "b": "zyuratkul-maralovaya-ferma.jpg"
-        },
-        {
-          "d": 1,
-          "a": "po-chesnoku.jpg",
-          "b": "zyuratkul-skaly-medvedi.jpg"
-        },
-        {
-          "d": 1,
-          "a": "pochtovyy-muzey.jpg",
-          "b": "restoran-kupecheskiy.jpg"
-        },
-        {
-          "d": 1,
-          "a": "pochtovyy-muzey.jpg",
-          "b": "taganay-perya.jpg"
-        },
-        {
-          "d": 1,
-          "a": "pochtovyy-muzey.jpg",
-          "b": "turgoyak-buhta-trimaranov.jpg"
-        },
-        {
-          "d": 1,
-          "a": "pochtovyy-muzey.jpg",
-          "b": "turgoyak-ekotropa.jpg"
-        },
-        {
-          "d": 1,
-          "a": "pochtovyy-muzey.jpg",
-          "b": "uvildy-mys-krasnyy.jpg"
-        },
-        {
-          "d": 1,
-          "a": "pochtovyy-muzey.jpg",
-          "b": "zyuratkul-kipyashchiy-klyuch.jpg"
-        },
-        {
-          "d": 1,
-          "a": "pochtovyy-muzey.jpg",
-          "b": "zyuratkul-reka-bolshaya-satka.jpg"
-        },
-        {
-          "d": 1,
-          "a": "restoran-kupecheskiy.jpg",
-          "b": "sobornaya-mechet.jpg"
-        },
-        {
-          "d": 1,
-          "a": "restoran-kupecheskiy.jpg",
-          "b": "staryy-kraevedcheskiy.jpg"
-        },
-        {
-          "d": 1,
-          "a": "restoran-kupecheskiy.jpg",
-          "b": "taganay-lestnitsa.jpg"
-        },
-        {
-          "d": 1,
-          "a": "restoran-kupecheskiy.jpg",
-          "b": "teatr-opery-glinki.jpg"
-        },
-        {
-          "d": 1,
-          "a": "restoran-kupecheskiy.jpg",
-          "b": "zyuratkul-ekotropa-na-hrebet.jpg"
-        },
-        {
-          "d": 1,
-          "a": "restoran-kupecheskiy.jpg",
-          "b": "zyuratkul-maralovaya-ferma.jpg"
-        },
-        {
-          "d": 1,
-          "a": "restoran-kupecheskiy.jpg",
-          "b": "zyuratkul-skaly-medvedi.jpg"
-        },
-        {
-          "d": 1,
-          "a": "sobornaya-mechet.jpg",
-          "b": "taganay-perya.jpg"
-        },
-        {
-          "d": 1,
-          "a": "sobornaya-mechet.jpg",
-          "b": "turgoyak-buhta-trimaranov.jpg"
-        },
-        {
-          "d": 1,
-          "a": "sobornaya-mechet.jpg",
-          "b": "turgoyak-ekotropa.jpg"
-        },
-        {
-          "d": 1,
-          "a": "sobornaya-mechet.jpg",
-          "b": "uvildy-mys-krasnyy.jpg"
-        },
-        {
-          "d": 1,
-          "a": "sobornaya-mechet.jpg",
-          "b": "zyuratkul-kipyashchiy-klyuch.jpg"
-        },
-        {
-          "d": 1,
-          "a": "sobornaya-mechet.jpg",
-          "b": "zyuratkul-reka-bolshaya-satka.jpg"
-        },
-        {
-          "d": 1,
-          "a": "staryy-kraevedcheskiy.jpg",
-          "b": "taganay-perya.jpg"
-        },
-        {
-          "d": 1,
-          "a": "staryy-kraevedcheskiy.jpg",
-          "b": "turgoyak-buhta-trimaranov.jpg"
-        },
-        {
-          "d": 1,
-          "a": "staryy-kraevedcheskiy.jpg",
-          "b": "turgoyak-ekotropa.jpg"
-        },
-        {
-          "d": 1,
-          "a": "staryy-kraevedcheskiy.jpg",
-          "b": "uvildy-mys-krasnyy.jpg"
-        },
-        {
-          "d": 1,
-          "a": "staryy-kraevedcheskiy.jpg",
-          "b": "zyuratkul-kipyashchiy-klyuch.jpg"
-        },
-        {
-          "d": 1,
-          "a": "staryy-kraevedcheskiy.jpg",
-          "b": "zyuratkul-reka-bolshaya-satka.jpg"
-        },
-        {
-          "d": 1,
-          "a": "taganay-belyy-klyuch.jpg",
-          "b": "uvildy-ostrov-vyazovyy.jpg"
-        },
-        {
-          "d": 1,
-          "a": "taganay-kamennaya-reka.jpg",
-          "b": "teatr-kukol-volkhovskiy.jpg"
-        },
-        {
-          "d": 1,
-          "a": "taganay-kamennaya-reka.jpg",
-          "b": "turgoyak-simvol-very.jpg"
-        },
-        {
-          "d": 1,
-          "a": "taganay-lestnitsa.jpg",
-          "b": "taganay-perya.jpg"
-        },
-        {
-          "d": 1,
-          "a": "taganay-lestnitsa.jpg",
-          "b": "turgoyak-buhta-trimaranov.jpg"
-        },
-        {
-          "d": 1,
-          "a": "taganay-lestnitsa.jpg",
-          "b": "turgoyak-ekotropa.jpg"
-        },
-        {
-          "d": 1,
-          "a": "taganay-lestnitsa.jpg",
-          "b": "uvildy-mys-krasnyy.jpg"
-        },
-        {
-          "d": 1,
-          "a": "taganay-lestnitsa.jpg",
-          "b": "zyuratkul-kipyashchiy-klyuch.jpg"
-        },
-        {
-          "d": 1,
-          "a": "taganay-lestnitsa.jpg",
-          "b": "zyuratkul-reka-bolshaya-satka.jpg"
-        },
-        {
-          "d": 1,
-          "a": "taganay-perya.jpg",
-          "b": "zyuratkul-ekotropa-na-hrebet.jpg"
-        },
-        {
-          "d": 1,
-          "a": "taganay-perya.jpg",
-          "b": "zyuratkul-maralovaya-ferma.jpg"
-        },
-        {
-          "d": 1,
-          "a": "taganay-usadba.jpg",
-          "b": "uvildy-tsentralnyy-plyazh.jpg"
-        },
-        {
-          "d": 1,
-          "a": "teatr-kukol-volkhovskiy.jpg",
-          "b": "uvildy-radonovyy-byuvet.jpg"
-        },
-        {
-          "d": 1,
-          "a": "teatr-opery-glinki.jpg",
-          "b": "turgoyak-buhta-trimaranov.jpg"
-        },
-        {
-          "d": 1,
-          "a": "teatr-opery-glinki.jpg",
-          "b": "turgoyak-ekotropa.jpg"
-        },
-        {
-          "d": 1,
-          "a": "teatr-opery-glinki.jpg",
-          "b": "uvildy-mys-krasnyy.jpg"
-        },
-        {
-          "d": 1,
-          "a": "teatr-opery-glinki.jpg",
-          "b": "zyuratkul-kipyashchiy-klyuch.jpg"
-        },
-        {
-          "d": 1,
-          "a": "teatr-opery-glinki.jpg",
-          "b": "zyuratkul-reka-bolshaya-satka.jpg"
-        },
-        {
-          "d": 1,
-          "a": "troitskaya-tserkov.jpg",
-          "b": "uvildy-tsentralnyy-plyazh.jpg"
-        },
-        {
-          "d": 1,
-          "a": "turgoyak-buhta-trimaranov.jpg",
-          "b": "zyuratkul-ekotropa-na-hrebet.jpg"
-        },
-        {
-          "d": 1,
-          "a": "turgoyak-buhta-trimaranov.jpg",
-          "b": "zyuratkul-maralovaya-ferma.jpg"
-        },
-        {
-          "d": 1,
-          "a": "turgoyak-buhta-trimaranov.jpg",
-          "b": "zyuratkul-skaly-medvedi.jpg"
-        },
-        {
-          "d": 1,
-          "a": "turgoyak-ekotropa.jpg",
-          "b": "zyuratkul-ekotropa-na-hrebet.jpg"
-        },
-        {
-          "d": 1,
-          "a": "turgoyak-ekotropa.jpg",
-          "b": "zyuratkul-maralovaya-ferma.jpg"
-        },
-        {
-          "d": 1,
-          "a": "turgoyak-ekotropa.jpg",
-          "b": "zyuratkul-skaly-medvedi.jpg"
-        },
-        {
-          "d": 1,
-          "a": "uvildy-mys-krasnyy.jpg",
-          "b": "zyuratkul-ekotropa-na-hrebet.jpg"
-        },
-        {
-          "d": 1,
-          "a": "uvildy-mys-krasnyy.jpg",
-          "b": "zyuratkul-maralovaya-ferma.jpg"
-        },
-        {
-          "d": 1,
-          "a": "uvildy-mys-krasnyy.jpg",
-          "b": "zyuratkul-skaly-medvedi.jpg"
-        },
-        {
-          "d": 1,
-          "a": "uvildy-tsentralnyy-plyazh.jpg",
-          "b": "zyuratkul-gora-lukash.jpg"
-        },
-        {
-          "d": 1,
-          "a": "zyuratkul-ekotropa-na-hrebet.jpg",
-          "b": "zyuratkul-kipyashchiy-klyuch.jpg"
-        },
-        {
-          "d": 1,
-          "a": "zyuratkul-ekotropa-na-hrebet.jpg",
-          "b": "zyuratkul-reka-bolshaya-satka.jpg"
-        },
-        {
-          "d": 1,
-          "a": "zyuratkul-kipyashchiy-klyuch.jpg",
-          "b": "zyuratkul-maralovaya-ferma.jpg"
-        },
-        {
-          "d": 1,
-          "a": "zyuratkul-kipyashchiy-klyuch.jpg",
-          "b": "zyuratkul-skaly-medvedi.jpg"
-        },
-        {
-          "d": 1,
-          "a": "zyuratkul-maralovaya-ferma.jpg",
-          "b": "zyuratkul-reka-bolshaya-satka.jpg"
-        },
-        {
-          "d": 1,
-          "a": "zyuratkul-reka-bolshaya-satka.jpg",
-          "b": "zyuratkul-skaly-medvedi.jpg"
-        },
-        {
-          "d": 2,
-          "a": "arkaim-gora-razuma.jpg",
-          "b": "uvildy-ekotropa-uvildinskie-zori.jpg"
-        },
-        {
-          "d": 2,
-          "a": "arkaim-gora-shamanka-lysaya.jpg",
-          "b": "muzey-geologii-garmoniya.jpg"
-        },
-        {
-          "d": 2,
-          "a": "arkaim-gora-shamanka-lysaya.jpg",
-          "b": "muzey-istorii-chtz.jpg"
-        },
-        {
-          "d": 2,
-          "a": "arkaim-gora-shamanka-lysaya.jpg",
-          "b": "po-chesnoku.jpg"
-        },
-        {
-          "d": 2,
-          "a": "arkaim-gora-shamanka-lysaya.jpg",
-          "b": "restoran-kupecheskiy.jpg"
-        },
-        {
-          "d": 2,
-          "a": "arkaim-gora-shamanka-lysaya.jpg",
-          "b": "taganay-perya.jpg"
-        },
-        {
-          "d": 2,
-          "a": "arkaim-gora-shamanka-lysaya.jpg",
-          "b": "turgoyak-buhta-trimaranov.jpg"
-        },
-        {
-          "d": 2,
-          "a": "arkaim-gora-shamanka-lysaya.jpg",
-          "b": "turgoyak-ekotropa.jpg"
-        },
-        {
-          "d": 2,
-          "a": "arkaim-gora-shamanka-lysaya.jpg",
-          "b": "uvildy-mys-krasnyy.jpg"
-        },
-        {
-          "d": 2,
-          "a": "arkaim-gora-shamanka-lysaya.jpg",
-          "b": "uvildy-radonovyy-byuvet.jpg"
-        },
-        {
-          "d": 2,
-          "a": "arkaim-gora-shamanka-lysaya.jpg",
-          "b": "zyuratkul-kipyashchiy-klyuch.jpg"
-        },
-        {
-          "d": 2,
-          "a": "arkaim-gora-shamanka-lysaya.jpg",
-          "b": "zyuratkul-reka-bolshaya-satka.jpg"
-        },
-        {
-          "d": 2,
-          "a": "arkaim-muzey-prirody-i-cheloveka.jpg",
-          "b": "odigitrievskiy-monastyr.jpg"
-        },
-        {
-          "d": 2,
-          "a": "arkaim-muzey-prirody-i-cheloveka.jpg",
-          "b": "teatr-opery-glinki.jpg"
-        },
-        {
-          "d": 2,
-          "a": "arkaim-muzey-prirody-i-cheloveka.jpg",
-          "b": "uvildy-ostrov-vyazovyy.jpg"
-        },
-        {
-          "d": 2,
-          "a": "arkaim-muzey-prirody-i-cheloveka.jpg",
-          "b": "zyuratkul-skaly-medvedi.jpg"
-        },
-        {
-          "d": 2,
-          "a": "arkaim-muzey-vosssozdanogo-poseleniya.jpg",
-          "b": "uvildy-tsentralnyy-plyazh.jpg"
-        },
-        {
-          "d": 2,
-          "a": "arkaim-vetryanaya-melnitsa.jpg",
-          "b": "odigitrievskiy-monastyr.jpg"
-        },
-        {
-          "d": 2,
-          "a": "arkaim-vetryanaya-melnitsa.jpg",
-          "b": "teatr-opery-glinki.jpg"
-        },
-        {
-          "d": 2,
-          "a": "arkaim-vetryanaya-melnitsa.jpg",
-          "b": "uvildy-ostrov-vyazovyy.jpg"
-        },
-        {
-          "d": 2,
-          "a": "arkaim-vetryanaya-melnitsa.jpg",
-          "b": "zyuratkul-skaly-medvedi.jpg"
-        },
-        {
-          "d": 2,
-          "a": "muzey-geologii-garmoniya.jpg",
-          "b": "muzey-istorii-chtz.jpg"
-        },
-        {
-          "d": 2,
-          "a": "muzey-geologii-garmoniya.jpg",
-          "b": "po-chesnoku.jpg"
-        },
-        {
-          "d": 2,
-          "a": "muzey-geologii-garmoniya.jpg",
-          "b": "restoran-kupecheskiy.jpg"
-        },
-        {
-          "d": 2,
-          "a": "muzey-geologii-garmoniya.jpg",
-          "b": "taganay-belyy-klyuch.jpg"
-        },
-        {
-          "d": 2,
-          "a": "muzey-geologii-garmoniya.jpg",
-          "b": "taganay-perya.jpg"
-        },
-        {
-          "d": 2,
-          "a": "muzey-geologii-garmoniya.jpg",
-          "b": "turgoyak-buhta-trimaranov.jpg"
-        },
-        {
-          "d": 2,
-          "a": "muzey-geologii-garmoniya.jpg",
-          "b": "turgoyak-ekotropa.jpg"
-        },
-        {
-          "d": 2,
-          "a": "muzey-geologii-garmoniya.jpg",
-          "b": "uvildy-mys-krasnyy.jpg"
-        },
-        {
-          "d": 2,
-          "a": "muzey-geologii-garmoniya.jpg",
-          "b": "zyuratkul-kipyashchiy-klyuch.jpg"
-        },
-        {
-          "d": 2,
-          "a": "muzey-geologii-garmoniya.jpg",
-          "b": "zyuratkul-reka-bolshaya-satka.jpg"
-        },
-        {
-          "d": 2,
-          "a": "muzey-istorii-chtz.jpg",
-          "b": "taganay-perya.jpg"
-        },
-        {
-          "d": 2,
-          "a": "muzey-izobrazitelnyh-iskusstv.jpg",
-          "b": "pamyatnik-osnovatelyam.jpg"
-        },
-        {
-          "d": 2,
-          "a": "muzey-izobrazitelnyh-iskusstv.jpg",
-          "b": "taganay-usadba.jpg"
-        },
-        {
-          "d": 2,
-          "a": "muzey-izobrazitelnyh-iskusstv.jpg",
-          "b": "troitskaya-tserkov.jpg"
-        },
-        {
-          "d": 2,
-          "a": "muzey-izobrazitelnyh-iskusstv.jpg",
-          "b": "zyuratkul-gora-lukash.jpg"
-        },
-        {
-          "d": 2,
-          "a": "muzey-yuzhno-uralskoy-zheleznoy-dorogi.jpg",
-          "b": "odigitrievskiy-monastyr.jpg"
-        },
-        {
-          "d": 2,
-          "a": "muzey-yuzhno-uralskoy-zheleznoy-dorogi.jpg",
-          "b": "teatr-opery-glinki.jpg"
-        },
-        {
-          "d": 2,
-          "a": "muzey-yuzhno-uralskoy-zheleznoy-dorogi.jpg",
-          "b": "uvildy-ostrov-vyazovyy.jpg"
-        },
-        {
-          "d": 2,
-          "a": "muzey-yuzhno-uralskoy-zheleznoy-dorogi.jpg",
-          "b": "zyuratkul-skaly-medvedi.jpg"
-        },
-        {
-          "d": 2,
-          "a": "odigitrievskiy-monastyr.jpg",
-          "b": "organnyy-zal-rodina.jpg"
-        },
-        {
-          "d": 2,
-          "a": "odigitrievskiy-monastyr.jpg",
-          "b": "pochtovyy-muzey.jpg"
-        },
-        {
-          "d": 2,
-          "a": "odigitrievskiy-monastyr.jpg",
-          "b": "sobornaya-mechet.jpg"
-        },
-        {
-          "d": 2,
-          "a": "odigitrievskiy-monastyr.jpg",
-          "b": "staryy-kraevedcheskiy.jpg"
-        },
-        {
-          "d": 2,
-          "a": "odigitrievskiy-monastyr.jpg",
-          "b": "taganay-lestnitsa.jpg"
-        },
-        {
-          "d": 2,
-          "a": "odigitrievskiy-monastyr.jpg",
-          "b": "teatr-opery-glinki.jpg"
-        },
-        {
-          "d": 2,
-          "a": "odigitrievskiy-monastyr.jpg",
-          "b": "uvildy-ostrov-golodai.jpg"
-        },
-        {
-          "d": 2,
-          "a": "odigitrievskiy-monastyr.jpg",
-          "b": "zyuratkul-ekotropa-na-hrebet.jpg"
-        },
-        {
-          "d": 2,
-          "a": "odigitrievskiy-monastyr.jpg",
-          "b": "zyuratkul-maralovaya-ferma.jpg"
-        },
-        {
-          "d": 2,
-          "a": "odigitrievskiy-monastyr.jpg",
-          "b": "zyuratkul-skaly-medvedi.jpg"
-        },
-        {
-          "d": 2,
-          "a": "organnyy-zal-rodina.jpg",
-          "b": "teatr-opery-glinki.jpg"
-        },
-        {
-          "d": 2,
-          "a": "organnyy-zal-rodina.jpg",
-          "b": "uvildy-ostrov-vyazovyy.jpg"
-        },
-        {
-          "d": 2,
-          "a": "organnyy-zal-rodina.jpg",
-          "b": "zyuratkul-skaly-medvedi.jpg"
-        },
-        {
-          "d": 2,
-          "a": "pamyatnik-leninu.jpg",
-          "b": "taganay-kamennaya-reka.jpg"
-        },
-        {
-          "d": 2,
-          "a": "pamyatnik-osnovatelyam.jpg",
-          "b": "uvildy-ostrov-golodai.jpg"
-        },
-        {
-          "d": 2,
-          "a": "pamyatnik-osnovatelyam.jpg",
-          "b": "zyuratkul-vysokogornoe-ozero.jpg"
-        },
-        {
-          "d": 2,
-          "a": "ploschad-iskusstv.jpg",
-          "b": "tyuz.jpg"
-        },
-        {
-          "d": 2,
-          "a": "po-chesnoku.jpg",
-          "b": "taganay-perya.jpg"
-        },
-        {
-          "d": 2,
-          "a": "pochtovyy-muzey.jpg",
-          "b": "teatr-opery-glinki.jpg"
-        },
-        {
-          "d": 2,
-          "a": "pochtovyy-muzey.jpg",
-          "b": "uvildy-ostrov-vyazovyy.jpg"
-        },
-        {
-          "d": 2,
-          "a": "pochtovyy-muzey.jpg",
-          "b": "zyuratkul-skaly-medvedi.jpg"
-        },
-        {
-          "d": 2,
-          "a": "restoran-kupecheskiy.jpg",
-          "b": "taganay-perya.jpg"
-        },
-        {
-          "d": 2,
-          "a": "sobornaya-mechet.jpg",
-          "b": "teatr-opery-glinki.jpg"
-        },
-        {
-          "d": 2,
-          "a": "sobornaya-mechet.jpg",
-          "b": "uvildy-ostrov-vyazovyy.jpg"
-        },
-        {
-          "d": 2,
-          "a": "sobornaya-mechet.jpg",
-          "b": "zyuratkul-skaly-medvedi.jpg"
-        },
-        {
-          "d": 2,
-          "a": "staryy-kraevedcheskiy.jpg",
-          "b": "teatr-opery-glinki.jpg"
-        },
-        {
-          "d": 2,
-          "a": "staryy-kraevedcheskiy.jpg",
-          "b": "uvildy-ostrov-vyazovyy.jpg"
-        },
-        {
-          "d": 2,
-          "a": "staryy-kraevedcheskiy.jpg",
-          "b": "zyuratkul-skaly-medvedi.jpg"
-        },
-        {
-          "d": 2,
-          "a": "taganay-kamennaya-reka.jpg",
-          "b": "uvildy-radonovyy-byuvet.jpg"
-        },
-        {
-          "d": 2,
-          "a": "taganay-lestnitsa.jpg",
-          "b": "teatr-opery-glinki.jpg"
-        },
-        {
-          "d": 2,
-          "a": "taganay-lestnitsa.jpg",
-          "b": "uvildy-ostrov-vyazovyy.jpg"
-        },
-        {
-          "d": 2,
-          "a": "taganay-lestnitsa.jpg",
-          "b": "zyuratkul-skaly-medvedi.jpg"
-        },
-        {
-          "d": 2,
-          "a": "taganay-perya.jpg",
-          "b": "turgoyak-buhta-trimaranov.jpg"
-        },
-        {
-          "d": 2,
-          "a": "taganay-perya.jpg",
-          "b": "turgoyak-ekotropa.jpg"
-        },
-        {
-          "d": 2,
-          "a": "taganay-perya.jpg",
-          "b": "uvildy-mys-krasnyy.jpg"
-        },
-        {
-          "d": 2,
-          "a": "taganay-perya.jpg",
-          "b": "uvildy-radonovyy-byuvet.jpg"
-        },
-        {
-          "d": 2,
-          "a": "taganay-perya.jpg",
-          "b": "zyuratkul-kipyashchiy-klyuch.jpg"
-        },
-        {
-          "d": 2,
-          "a": "taganay-perya.jpg",
-          "b": "zyuratkul-reka-bolshaya-satka.jpg"
-        },
-        {
-          "d": 2,
-          "a": "taganay-usadba.jpg",
-          "b": "uvildy-ostrov-golodai.jpg"
-        },
-        {
-          "d": 2,
-          "a": "taganay-usadba.jpg",
-          "b": "zyuratkul-vysokogornoe-ozero.jpg"
-        },
-        {
-          "d": 2,
-          "a": "teatr-kukol-volkhovskiy.jpg",
-          "b": "turgoyak-simvol-very.jpg"
-        },
-        {
-          "d": 2,
-          "a": "teatr-kukol-volkhovskiy.jpg",
-          "b": "zyuratkul-vysokogornoe-ozero.jpg"
-        },
-        {
-          "d": 2,
-          "a": "teatr-opery-glinki.jpg",
-          "b": "uvildy-ostrov-golodai.jpg"
-        },
-        {
-          "d": 2,
-          "a": "teatr-opery-glinki.jpg",
-          "b": "zyuratkul-ekotropa-na-hrebet.jpg"
-        },
-        {
-          "d": 2,
-          "a": "teatr-opery-glinki.jpg",
-          "b": "zyuratkul-maralovaya-ferma.jpg"
-        },
-        {
-          "d": 2,
-          "a": "troitskaya-tserkov.jpg",
-          "b": "uvildy-ostrov-golodai.jpg"
-        },
-        {
-          "d": 2,
-          "a": "troitskaya-tserkov.jpg",
-          "b": "zyuratkul-vysokogornoe-ozero.jpg"
-        },
-        {
-          "d": 2,
-          "a": "uvildy-ostrov-golodai.jpg",
-          "b": "zyuratkul-gora-lukash.jpg"
-        },
-        {
-          "d": 2,
-          "a": "uvildy-ostrov-golodai.jpg",
-          "b": "zyuratkul-skaly-medvedi.jpg"
-        },
-        {
-          "d": 2,
-          "a": "uvildy-ostrov-golodai.jpg",
-          "b": "zyuratkul-vysokogornoe-ozero.jpg"
-        },
-        {
-          "d": 2,
-          "a": "uvildy-ostrov-vyazovyy.jpg",
-          "b": "zyuratkul-ekotropa-na-hrebet.jpg"
-        },
-        {
-          "d": 2,
-          "a": "uvildy-ostrov-vyazovyy.jpg",
-          "b": "zyuratkul-maralovaya-ferma.jpg"
-        },
-        {
-          "d": 2,
-          "a": "zyuratkul-ekotropa-na-hrebet.jpg",
-          "b": "zyuratkul-skaly-medvedi.jpg"
-        },
-        {
-          "d": 2,
-          "a": "zyuratkul-gora-lukash.jpg",
-          "b": "zyuratkul-vysokogornoe-ozero.jpg"
-        },
-        {
-          "d": 2,
-          "a": "zyuratkul-maralovaya-ferma.jpg",
-          "b": "zyuratkul-skaly-medvedi.jpg"
+          "a": "belaya-bashnya.jpg",
+          "b": "mostik-vlyublennyh-bazhovskie.jpg"
         }
       ],
       "clusters": [
         [
-          "arkaim-muzey-prirody-i-cheloveka.jpg",
-          "arkaim-vetryanaya-melnitsa.jpg",
-          "muzey-yuzhno-uralskoy-zheleznoy-dorogi.jpg",
-          "organnyy-zal-rodina.jpg",
-          "pochtovyy-muzey.jpg",
-          "sobornaya-mechet.jpg",
-          "staryy-kraevedcheskiy.jpg",
-          "taganay-lestnitsa.jpg",
-          "zyuratkul-ekotropa-na-hrebet.jpg",
-          "zyuratkul-maralovaya-ferma.jpg",
-          "muzey-istorii-chtz.jpg",
-          "po-chesnoku.jpg",
-          "restoran-kupecheskiy.jpg",
-          "turgoyak-buhta-trimaranov.jpg",
-          "turgoyak-ekotropa.jpg",
-          "uvildy-mys-krasnyy.jpg",
-          "zyuratkul-kipyashchiy-klyuch.jpg",
-          "zyuratkul-reka-bolshaya-satka.jpg",
-          "pamyatnik-osnovatelyam.jpg",
-          "taganay-usadba.jpg",
-          "troitskaya-tserkov.jpg",
-          "zyuratkul-gora-lukash.jpg",
-          "teatr-opery-glinki.jpg",
-          "zyuratkul-skaly-medvedi.jpg",
-          "arkaim-gora-shamanka-lysaya.jpg",
-          "muzey-geologii-garmoniya.jpg",
-          "taganay-perya.jpg",
-          "arkaim-muzey-vosssozdanogo-poseleniya.jpg",
-          "uvildy-ostrov-vyazovyy.jpg",
-          "odigitrievskiy-monastyr.jpg",
-          "pamyatnik-leninu.jpg",
-          "turgoyak-simvol-very.jpg",
-          "uvildy-tsentralnyy-plyazh.jpg",
-          "taganay-belyy-klyuch.jpg",
-          "taganay-kamennaya-reka.jpg",
-          "teatr-kukol-volkhovskiy.jpg",
-          "uvildy-radonovyy-byuvet.jpg",
-          "muzey-izobrazitelnyh-iskusstv.jpg",
-          "uvildy-ostrov-golodai.jpg",
-          "zyuratkul-vysokogornoe-ozero.jpg"
-        ],
+          "belaya-bashnya.jpg",
+          "mostik-vlyublennyh-bazhovskie.jpg"
+        ]
+      ]
+    },
+    "habarovsk": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "irkutsk": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "ivanovo": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "izhevsk": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "kaliningrad": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "kaluga": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "kazan": {
+      "md5Dups": [],
+      "near": [
+        {
+          "d": 1,
+          "a": "azimovskaya-mechet.jpg",
+          "b": "raifa-ekotropa-zapovednika.jpg"
+        }
+      ],
+      "clusters": [
         [
-          "arkaim-gora-razuma.jpg",
-          "arkaim-poselok-mednogo-veka.jpg",
-          "uvildy-ekotropa-uvildinskie-zori.jpg"
-        ],
+          "azimovskaya-mechet.jpg",
+          "raifa-ekotropa-zapovednika.jpg"
+        ]
+      ]
+    },
+    "kemerovo": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "kirov": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "kirov-kirovskaya-oblast": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "kostroma": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "krasnodar": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "krasnoyarsk": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "kurgan": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "kursk": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "lipeck": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "moscow": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "murmansk": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "nizhny-novgorod": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "novosibirsk": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "omsk": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "orel": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "orenburg": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "penza": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "perm": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "place": {
+      "md5Dups": [],
+      "near": [
+        {
+          "d": 2,
+          "a": "korolevskiy-bor.jpg",
+          "b": "ornitologicheskaya-stantsiya-fringilla.jpg"
+        }
+      ],
+      "clusters": [
         [
-          "arkaim-kurgan-temir.jpg",
-          "uvildy-lesnoe-ozero-maloe-uvildy.jpg"
-        ],
+          "korolevskiy-bor.jpg",
+          "ornitologicheskaya-stantsiya-fringilla.jpg"
+        ]
+      ]
+    },
+    "pskov": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "rostov-na-donu": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "ryazan": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "saint-petersburg": {
+      "md5Dups": [],
+      "near": [
+        {
+          "d": 1,
+          "a": "admiralteystvo.jpg",
+          "b": "divo-ostrov.jpg"
+        },
+        {
+          "d": 1,
+          "a": "admiralteystvo.jpg",
+          "b": "yusupovskiy-dvorets.jpg"
+        },
+        {
+          "d": 2,
+          "a": "divo-ostrov.jpg",
+          "b": "kryshi.jpg"
+        },
+        {
+          "d": 2,
+          "a": "divo-ostrov.jpg",
+          "b": "mihaylovskiy-zamok.jpg"
+        },
+        {
+          "d": 2,
+          "a": "divo-ostrov.jpg",
+          "b": "sheremetevskiy-dvorets-fontannyy-dom.jpg"
+        },
+        {
+          "d": 2,
+          "a": "divo-ostrov.jpg",
+          "b": "yusupovskiy-dvorets.jpg"
+        },
+        {
+          "d": 2,
+          "a": "kryshi.jpg",
+          "b": "tsentralnyy-voenno-morskoy-muzey.jpg"
+        },
+        {
+          "d": 2,
+          "a": "mihaylovskiy-zamok.jpg",
+          "b": "sheremetevskiy-dvorets-fontannyy-dom.jpg"
+        }
+      ],
+      "clusters": [
         [
-          "ploschad-iskusstv.jpg",
-          "tyuz.jpg"
+          "admiralteystvo.jpg",
+          "divo-ostrov.jpg",
+          "yusupovskiy-dvorets.jpg",
+          "kryshi.jpg",
+          "mihaylovskiy-zamok.jpg",
+          "sheremetevskiy-dvorets-fontannyy-dom.jpg",
+          "tsentralnyy-voenno-morskoy-muzey.jpg"
         ]
       ]
     },
     "samara": {
       "md5Dups": [],
-      "near": [
-        {
-          "d": 0,
-          "a": "botanicheskiy-sad.jpg",
-          "b": "gryazelechebnitsa-sergiyevsk.jpg"
-        },
-        {
-          "d": 0,
-          "a": "botanicheskiy-sad.jpg",
-          "b": "sergievskie-mineralnye-vody.jpg"
-        },
-        {
-          "d": 0,
-          "a": "botanicheskiy-sad.jpg",
-          "b": "shiryaevskie-shtolni.jpg"
-        },
-        {
-          "d": 0,
-          "a": "botanicheskiy-sad.jpg",
-          "b": "smotrovaya-sernovodsk.jpg"
-        },
-        {
-          "d": 0,
-          "a": "gryazelechebnitsa-sergiyevsk.jpg",
-          "b": "sergievskie-mineralnye-vody.jpg"
-        },
-        {
-          "d": 0,
-          "a": "gryazelechebnitsa-sergiyevsk.jpg",
-          "b": "shiryaevskie-shtolni.jpg"
-        },
-        {
-          "d": 0,
-          "a": "gryazelechebnitsa-sergiyevsk.jpg",
-          "b": "smotrovaya-sernovodsk.jpg"
-        },
-        {
-          "d": 0,
-          "a": "sergievskie-mineralnye-vody.jpg",
-          "b": "shiryaevskie-shtolni.jpg"
-        },
-        {
-          "d": 0,
-          "a": "sergievskie-mineralnye-vody.jpg",
-          "b": "smotrovaya-sernovodsk.jpg"
-        },
-        {
-          "d": 0,
-          "a": "shiryaevskie-shtolni.jpg",
-          "b": "smotrovaya-sernovodsk.jpg"
-        }
-      ],
-      "clusters": [
-        [
-          "botanicheskiy-sad.jpg",
-          "gryazelechebnitsa-sergiyevsk.jpg",
-          "sergievskie-mineralnye-vody.jpg",
-          "shiryaevskie-shtolni.jpg",
-          "smotrovaya-sernovodsk.jpg"
-        ]
-      ]
+      "near": [],
+      "clusters": []
+    },
+    "saransk": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "saratov": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "sevastopol": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "simferopol": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "smolensk": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "sochi": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "sortavala": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "stavropol": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "surgut": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "syktyvkar": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "tambov": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "tolyatti": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "tomsk": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "tula": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "tver": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "tyumen": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "ufa": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "ulan-ude": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "ulyanovsk": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "veliky-novgorod": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "vladikavkaz": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "vladimir": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "vladivostok": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "volgograd": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "vologda": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "voronezh": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "vyborg": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "yaroslavl": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "yoshkar-ola": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
+    },
+    "yuzhno-sahalinsk": {
+      "md5Dups": [],
+      "near": [],
+      "clusters": []
     }
   }
 }

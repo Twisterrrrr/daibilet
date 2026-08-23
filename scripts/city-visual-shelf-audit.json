@@ -3,7 +3,497 @@
   "shelfN": 12,
   "summary": [
     {
+      "city": "abakan",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "arhangelsk",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "astrahan",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
       "city": "barnaul",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "belgorod",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "blagoveschensk-amurskaya-oblast",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "bryansk",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "cheboksary",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "chelyabinsk",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "chita",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "ekaterinburg",
+      "d0": 0,
+      "clusters": 1,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "habarovsk",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "irkutsk",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "ivanovo",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "izhevsk",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "kaliningrad",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "kaluga",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "kazan",
+      "d0": 0,
+      "clusters": 1,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "kemerovo",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "kirov",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "kirov-kirovskaya-oblast",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "kostroma",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "krasnodar",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "krasnoyarsk",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "kurgan",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "kursk",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "lipeck",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "moscow",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "murmansk",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "nizhny-novgorod",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "novosibirsk",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "omsk",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "orel",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "orenburg",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "penza",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "perm",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "pskov",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "rostov-na-donu",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "ryazan",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "saint-petersburg",
+      "d0": 0,
+      "clusters": 1,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "samara",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "saransk",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "saratov",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "sevastopol",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "simferopol",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "smolensk",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "sochi",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "sortavala",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "stavropol",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "surgut",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "syktyvkar",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "tambov",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "tolyatti",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "tomsk",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "tula",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "tver",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "tyumen",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "ufa",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "ulan-ude",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "ulyanovsk",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "veliky-novgorod",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "vladikavkaz",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "vladimir",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "vladivostok",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "volgograd",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "vologda",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "voronezh",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "vyborg",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "yaroslavl",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "yoshkar-ola",
+      "d0": 0,
+      "clusters": 0,
+      "shelfPairs": 0,
+      "regen": 0
+    },
+    {
+      "city": "yuzhno-sahalinsk",
       "d0": 0,
       "clusters": 0,
       "shelfPairs": 0,
@@ -11,9 +501,51 @@
     }
   ],
   "cities": {
+    "abakan": {
+      "city": "abakan",
+      "files": 6,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "arhangelsk": {
+      "city": "arhangelsk",
+      "files": 6,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "astrahan": {
+      "city": "astrahan",
+      "files": 6,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
     "barnaul": {
       "city": "barnaul",
-      "files": 76,
+      "files": 77,
       "d0": 0,
       "pairs": 0,
       "clusters": 0,
@@ -45,6 +577,1436 @@
         "dom-kuptsov-shadrinyh.jpg",
         "malo-tobol-skaya-ulitsa-barnaul-skiy-arbat.jpg"
       ],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "belgorod": {
+      "city": "belgorod",
+      "files": 6,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "blagoveschensk-amurskaya-oblast": {
+      "city": "blagoveschensk-amurskaya-oblast",
+      "files": 6,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "bryansk": {
+      "city": "bryansk",
+      "files": 6,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "cheboksary": {
+      "city": "cheboksary",
+      "files": 6,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "chelyabinsk": {
+      "city": "chelyabinsk",
+      "files": 111,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 65,
+      "shelfFiles": [
+        "skaz-ob-urale.jpg",
+        "pamyatnik-kurchatovu.jpg",
+        "pamyatnik-levshe.jpg",
+        "pamyatnik-nishchemu.jpg",
+        "pamyatnik-tankistam-dobrovoltsam.jpg",
+        "hodok-s-sobakoy.jpg",
+        "roza-vetrov.jpg",
+        "pamyatnik-glinke.jpg",
+        "pamyatnik-izvozchiku.jpg",
+        "pamyatnik-orlenku.jpg",
+        "venskiy-vals.jpg",
+        "pamyatnik-prokofievu.jpg"
+      ],
+      "identity": [
+        "identity-symbol.jpg",
+        "identity-architecture.jpg",
+        "identity-art.jpg",
+        "identity-gastro.jpg"
+      ],
+      "scenarioCovers": [
+        "passage-yaushevyh.jpg",
+        "dom-oblispolkoma.jpg",
+        "osobnyak-arhipova.jpg",
+        "gosudarstvennyy-istoricheskiy-muzey-yuzhnogo-urala.jpg"
+      ],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "chita": {
+      "city": "chita",
+      "files": 6,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "ekaterinburg": {
+      "city": "ekaterinburg",
+      "files": 101,
+      "d0": 0,
+      "pairs": 1,
+      "clusters": 1,
+      "topCluster": 2,
+      "mustSeeCount": 66,
+      "shelfFiles": [
+        "plotinka-istoricheskiy-skver.jpg",
+        "hram-na-krovi.jpg",
+        "el-tsin-tsentr.jpg",
+        "smotrovaya-ploschadka-bts-vysotskiy.jpg",
+        "gorodok-chekistov.jpg",
+        "ulitsa-vaynera.jpg",
+        "pamyatnik-tatischevu-i-de-genninu.jpg",
+        "pamyatnik-popovu.jpg",
+        "byust-mamina-sibiryaka.jpg",
+        "pamyatnik-zhukovu.jpg",
+        "pamyatnik-klaviatura.jpg",
+        "pamyatnik-bazhovu.jpg"
+      ],
+      "identity": [
+        "identity-rock.jpg",
+        "identity-gastro.jpg",
+        "identity-street-art.jpg"
+      ],
+      "scenarioCovers": [
+        "plotinka-istoricheskiy-skver.jpg",
+        "belaya-bashnya.jpg",
+        "identity-street-art.jpg",
+        "oktyabrskaya-ploschad.jpg",
+        "hram-na-krovi.jpg",
+        "mural-uralskiy-bars.jpg"
+      ],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "habarovsk": {
+      "city": "habarovsk",
+      "files": 6,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "irkutsk": {
+      "city": "irkutsk",
+      "files": 6,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "ivanovo": {
+      "city": "ivanovo",
+      "files": 6,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "izhevsk": {
+      "city": "izhevsk",
+      "files": 6,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "kaliningrad": {
+      "city": "kaliningrad",
+      "files": 91,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [
+        "green-line-cover.jpg",
+        "red-line-cover.jpg"
+      ],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "kaluga": {
+      "city": "kaluga",
+      "files": 6,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "kazan": {
+      "city": "kazan",
+      "files": 79,
+      "d0": 0,
+      "pairs": 1,
+      "clusters": 1,
+      "topCluster": 2,
+      "mustSeeCount": 51,
+      "shelfFiles": [
+        "kazanskiy-kreml.jpg",
+        "mechet-kul-sharif.jpg",
+        "ulitsa-baumana.jpg",
+        "bashnya-syuyumbike.jpg",
+        "dvorets-zemledeltsev.jpg",
+        "kremlevskaya-naberezhnaya.jpg",
+        "pamyatnik-kotu-kazanskomu.jpg",
+        "pamyatnik-muse-dzhaliyu.jpg",
+        "pamyatnik-gabdulle-tukayu.jpg",
+        "pamyatnik-fedoru-shalyapinu.jpg",
+        "kareta-ekateriny-ii.jpg",
+        "pamyatnik-drakonu-zilantu.jpg"
+      ],
+      "identity": [
+        "identity-cultures.jpg",
+        "identity-architecture.jpg",
+        "identity-art.jpg",
+        "identity-gastro.jpg"
+      ],
+      "scenarioCovers": [
+        "kazanskiy-kreml.jpg",
+        "park-chernoe-ozero.jpg"
+      ],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "kemerovo": {
+      "city": "kemerovo",
+      "files": 6,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "kirov": {
+      "city": "kirov",
+      "files": 1,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "kirov-kirovskaya-oblast": {
+      "city": "kirov-kirovskaya-oblast",
+      "files": 5,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "kostroma": {
+      "city": "kostroma",
+      "files": 6,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "krasnodar": {
+      "city": "krasnodar",
+      "files": 74,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 52,
+      "shelfFiles": [
+        "park-galitskogo-park-krasnodar.jpg",
+        "ulitsa-krasnaya.jpg",
+        "aleksandrovskaya-triumfal-naya-arka.jpg",
+        "yaponskiy-sad.jpg",
+        "most-potseluev.jpg",
+        "pamyatnik-ekaterine-ii.jpg",
+        "pamyatnik-klare-luchko.jpg",
+        "skulptura-gulyayuschie-sobachki.jpg",
+        "skulptura-lida-i-shurik.jpg",
+        "pamyatnik-kazakam-pismo-sultanu.jpg",
+        "skulptura-gost.jpg",
+        "pamyatnik-koshelku.jpg"
+      ],
+      "identity": [
+        "identity-chill.jpg",
+        "identity-architecture.jpg",
+        "identity-art.jpg",
+        "identity-gastro.jpg"
+      ],
+      "scenarioCovers": [
+        "pamyatnik-ekaterine-ii.jpg",
+        "most-potseluev.jpg",
+        "voyskovoy-sobor-aleksandra-nevskogo.jpg",
+        "literaturnyy-muzey-kubani.jpg"
+      ],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "krasnoyarsk": {
+      "city": "krasnoyarsk",
+      "files": 71,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 49,
+      "shelfFiles": [
+        "natsional-nyy-park-krasnoyarskie-stolby.jpg",
+        "karaul-naya-gora-i-chasovnya-paraskevy-pyatnitsy.jpg",
+        "tsentral-naya-naberezhnaya-eniseya.jpg",
+        "peshehodnyy-most-na-ostrov-tatyshev.jpg",
+        "muzey-usad-ba-v-i-surikova.jpg",
+        "parohod-muzey-svyatitel-nikolay.jpg",
+        "ostrov-tatyshev.jpg",
+        "kommunalnyy-most.jpg",
+        "restoran-tunguska.jpg",
+        "fanpark-bobrovyy-log.jpg",
+        "pamyatnik-andreyu-dubenskomu.jpg",
+        "pamyatnik-surikovu.jpg"
+      ],
+      "identity": [
+        "identity-siberia.jpg",
+        "identity-architecture.jpg",
+        "identity-art.jpg",
+        "identity-gastro.jpg"
+      ],
+      "scenarioCovers": [
+        "karaul-naya-gora-i-chasovnya-paraskevy-pyatnitsy.jpg",
+        "natsional-nyy-park-krasnoyarskie-stolby.jpg",
+        "pamyatnik-andreyu-dubenskomu.jpg",
+        "ostrov-tatyshev.jpg"
+      ],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "kurgan": {
+      "city": "kurgan",
+      "files": 7,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "kursk": {
+      "city": "kursk",
+      "files": 6,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "lipeck": {
+      "city": "lipeck",
+      "files": 6,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "moscow": {
+      "city": "moscow",
+      "files": 243,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "murmansk": {
+      "city": "murmansk",
+      "files": 7,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "nizhny-novgorod": {
+      "city": "nizhny-novgorod",
+      "files": 115,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [
+        "identity-architecture.jpg",
+        "identity-art.jpg",
+        "identity-gastro.jpg",
+        "identity-symbol.jpg"
+      ],
+      "scenarioCovers": [
+        "nn-green-line-cover.jpg",
+        "nn-red-line-cover.jpg"
+      ],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "novosibirsk": {
+      "city": "novosibirsk",
+      "files": 101,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 55,
+      "shelfFiles": [
+        "novosibirskiy-teatr-opery-i-baleta-novat.jpg",
+        "mihaylovskaya-naberezhnaya.jpg",
+        "akademgorodok.jpg",
+        "novosibirskiy-zoopark-imeni-r-a-shilo.jpg",
+        "novosibirskiy-hudozhestvennyy-muzey.jpg",
+        "muzey-mirovoy-pogrebal-noy-kul-tury.jpg",
+        "pamyatnik-leninu.jpg",
+        "pamyatnik-laboratornoy-myshi.jpg",
+        "pamyatnik-svetoforu.jpg",
+        "vovka-v-tridevyatom-tsarstve.jpg",
+        "pamyatnik-tramvayu-13.jpg",
+        "pamyatnik-vysotskomu.jpg"
+      ],
+      "identity": [
+        "identity-symbol.jpg",
+        "identity-architecture.jpg",
+        "identity-art.jpg",
+        "identity-gastro.jpg"
+      ],
+      "scenarioCovers": [
+        "novosibirskiy-teatr-opery-i-baleta-novat.jpg",
+        "novosibirskiy-zoopark-imeni-r-a-shilo.jpg",
+        "akademgorodok.jpg",
+        "green-line-cover.jpg",
+        "red-line-cover.jpg"
+      ],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "omsk": {
+      "city": "omsk",
+      "files": 86,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 65,
+      "shelfFiles": [
+        "pamyatnik-slesar-stepanych.jpg",
+        "pamyatnik-lyubochka.jpg",
+        "pamyatnik-dostoevskomu-nesuschiy-krest.jpg",
+        "pamyatnik-don-kihot.jpg",
+        "pamyatnik-gorodovomu.jpg",
+        "pamyatnik-kolchaku.jpg",
+        "pamyatnik-van-gogu.jpg",
+        "pamyatnik-kniga-lyubvi.jpg",
+        "pamyatnik-petru-i-fevronii.jpg",
+        "pamyatnik-bortsam-revolyutsii.jpg",
+        "pamyatnik-maratonets.jpg",
+        "zakladnoy-kamen-hrama-sergiya-radonezhskogo.jpg"
+      ],
+      "identity": [
+        "identity-symbol.jpg",
+        "identity-architecture.jpg",
+        "identity-art.jpg",
+        "identity-gastro.jpg"
+      ],
+      "scenarioCovers": [
+        "rechnoy-vokzal.jpg",
+        "ermitazh-sibir.jpg",
+        "voskresenskiy-voennyy-sobor.jpg",
+        "moskovskie-torgovye-ryady.jpg"
+      ],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "orel": {
+      "city": "orel",
+      "files": 6,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "orenburg": {
+      "city": "orenburg",
+      "files": 6,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "penza": {
+      "city": "penza",
+      "files": 74,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 53,
+      "shelfFiles": [
+        "pamyatnik-pervoposelentsu.jpg",
+        "pamyatnik-belinskomu.jpg",
+        "pamyatnik-lermontovu.jpg",
+        "pamyatnik-klyuchevskomu.jpg",
+        "byust-denisa-davydova.jpg",
+        "pamyatnik-yuveliru.jpg",
+        "pamyatnik-seme.jpg",
+        "pamyatnik-vrachu.jpg",
+        "pamyatnik-materi.jpg",
+        "pamyatnik-chekanshchiku.jpg",
+        "pamyatnik-meyerholdu.jpg",
+        "byust-radishcheva.jpg"
+      ],
+      "identity": [],
+      "scenarioCovers": [
+        "pamyatnik-pervoposelentsu.jpg",
+        "dom-meyerholda.jpg",
+        "park-imeni-v-g-belinskogo.jpg",
+        "svetozvukovoy-fontan.jpg"
+      ],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "perm": {
+      "city": "perm",
+      "files": 80,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "pskov": {
+      "city": "pskov",
+      "files": 6,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "rostov-na-donu": {
+      "city": "rostov-na-donu",
+      "files": 86,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 50,
+      "shelfFiles": [
+        "tachanka-rostovchanka.jpg",
+        "pamyatnik-stepanu-razinu.jpg",
+        "pamyatnik-sholohovu.jpg",
+        "skulptura-nahalenok-i-ded-shchukar.jpg",
+        "pamyatnik-elizavete-petrovne.jpg",
+        "skulptura-rostovchanka.jpg",
+        "pamyatnik-dimitriyu-rostovskomu.jpg",
+        "pamyatnik-pervokonnikam.jpg",
+        "skulptura-kupec-korobeynik.jpg",
+        "pamyatnik-pushkinu.jpg",
+        "skulptura-cvetochnica.jpg",
+        "pamyatnik-vodoprovodu.jpg"
+      ],
+      "identity": [],
+      "scenarioCovers": [
+        "naberezhnaya-reki-don-beregovaya-ulitsa.jpg",
+        "teatr-dramy-im-gorkogo.jpg",
+        "smotrovaya-na-sedova.jpg",
+        "tsentral-nyy-rynok-staryy-bazar.jpg"
+      ],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "ryazan": {
+      "city": "ryazan",
+      "files": 94,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [
+        "identity-symbol.jpg",
+        "identity-architecture.jpg",
+        "identity-art.jpg",
+        "identity-gastro.jpg"
+      ],
+      "scenarioCovers": [
+        "uspenskiy-sobor.jpg",
+        "muzey-usad-ba-akademika-i-p-pavlova.jpg",
+        "grib-borovik.jpg",
+        "ryazanskiy-kreml.jpg",
+        "tyuz-teatr-na-sobornoy.jpg"
+      ],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "saint-petersburg": {
+      "city": "saint-petersburg",
+      "files": 322,
+      "d0": 0,
+      "pairs": 8,
+      "clusters": 1,
+      "topCluster": 7,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "samara": {
+      "city": "samara",
+      "files": 80,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 51,
+      "shelfFiles": [
+        "samarskaya-naberezhnaya.jpg",
+        "muzey-samara-kosmicheskaya.jpg",
+        "bunker-stalina.jpg",
+        "zhigulevskiy-pivovarennyy-zavod.jpg",
+        "ulitsa-leningradskaya.jpg",
+        "ploschad-slavy.jpg",
+        "monument-slavy.jpg",
+        "pamyatnik-grigoriyu-zasekinu.jpg",
+        "pamyatnik-tovarischu-suhovu.jpg",
+        "skulptura-burlaki-na-volge.jpg",
+        "pamyatnik-kuybyshevu.jpg",
+        "pamyatnik-yuriyu-detochkinu.jpg"
+      ],
+      "identity": [
+        "identity-space.jpg",
+        "identity-architecture.jpg",
+        "identity-art.jpg",
+        "identity-gastro.jpg"
+      ],
+      "scenarioCovers": [
+        "ulitsa-leningradskaya.jpg",
+        "fabrika-kuhnya-zim.jpg",
+        "pamyatnik-dyade-stepe.jpg",
+        "muzey-samara-kosmicheskaya.jpg"
+      ],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "saransk": {
+      "city": "saransk",
+      "files": 6,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "saratov": {
+      "city": "saratov",
+      "files": 77,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 51,
+      "shelfFiles": [
+        "pamyatnik-zhuravli.jpg",
+        "pamyatnik-garmoshke.jpg",
+        "pamyatnik-yuriyu-gagarinu.jpg",
+        "skulptura-ogney-tak-mnogo-zolotyh.jpg",
+        "pamyatnik-chernyshevskomu.jpg",
+        "pamyatnik-petru-stolypinu.jpg",
+        "pamyatnik-odnopolchanam.jpg",
+        "ya-lyublyu-saratov.jpg",
+        "pamyatnik-studentu.jpg",
+        "pamyatnik-olegu-yankovskomu.jpg",
+        "skulptura-hleb-vsemu-golova.jpg",
+        "pamyatnik-serdtsu.jpg"
+      ],
+      "identity": [
+        "identity-architecture.jpg",
+        "identity-art.jpg",
+        "identity-gastro.jpg",
+        "identity-symbol.jpg"
+      ],
+      "scenarioCovers": [
+        "prospekt-stolypina.jpg",
+        "park-pobedy-na-sokolovoy-gore.jpg",
+        "hram-utoli-moya-pechali.jpg",
+        "naberezhnaya-kosmonavtov.jpg"
+      ],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "sevastopol": {
+      "city": "sevastopol",
+      "files": 6,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "simferopol": {
+      "city": "simferopol",
+      "files": 6,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "smolensk": {
+      "city": "smolensk",
+      "files": 96,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 50,
+      "shelfFiles": [
+        "pamyatnik-blagodarnaya-rossiya-geroyam-1812-goda-pamyatnik-s-orlami.jpg",
+        "pamyatnik-mihailu-glinke.jpg",
+        "pamyatnik-tvardovskomu-i-terkinu.jpg",
+        "olen-v-sadu-blone.jpg",
+        "pamyatnik-zodchemu-fedoru-konyu.jpg",
+        "pamyatnik-kutuzovu-u-sobornogo-holma.jpg",
+        "byust-kutuzova-skver-pamyati-geroev.jpg",
+        "pamyatnik-vladimiru-kurilenko.jpg",
+        "pamyatnik-yuriyu-gagarinu.jpg",
+        "skulptura-kot-smolenskiy.jpg",
+        "pamyatnik-voinam-zashchitnikam-osvoboditelyam.jpg",
+        "pamyatnik-knyazyu-vladimiru-monomahu.jpg"
+      ],
+      "identity": [
+        "identity-symbol.jpg",
+        "identity-architecture.jpg",
+        "identity-art.jpg",
+        "identity-gastro.jpg"
+      ],
+      "scenarioCovers": [
+        "gromovaya-bashnya.jpg",
+        "svyato-uspenskiy-kafedralnyy-sobor.jpg",
+        "smolenskaya-krepostnaya-stena.jpg",
+        "lopatinskiy-sad.jpg"
+      ],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "sochi": {
+      "city": "sochi",
+      "files": 98,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 50,
+      "shelfFiles": [
+        "pamyatnik-arhangelu-mihailu.jpg",
+        "brilliantovaya-ruka.jpg",
+        "pamyatnik-neptunu.jpg",
+        "morskie-sezony.jpg",
+        "pamyatnik-petru-i.jpg",
+        "dama-s-popugaem.jpg",
+        "pamyatnik-filinu.jpg",
+        "pamyatnik-sochinskomu-uchitelyu.jpg",
+        "zolotoe-runo.jpg",
+        "uho-zhelaniy.jpg",
+        "skulptura-prometej.jpg",
+        "pamyatnik-matsesta.jpg"
+      ],
+      "identity": [
+        "identity-architecture.jpg",
+        "identity-art.jpg",
+        "identity-gastro.jpg",
+        "identity-symbol.jpg"
+      ],
+      "scenarioCovers": [
+        "morskoy-vokzal-sochi.jpg",
+        "dendrariy.jpg",
+        "zimniy-teatr.jpg",
+        "uho-zhelaniy.jpg"
+      ],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "sortavala": {
+      "city": "sortavala",
+      "files": 6,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "stavropol": {
+      "city": "stavropol",
+      "files": 6,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "surgut": {
+      "city": "surgut",
+      "files": 8,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 8,
+      "shelfFiles": [
+        "surgutskiy-most.jpg",
+        "prospekt-energetikov.jpg",
+        "kraevedcheskiy-muzey.jpg",
+        "etnopark-staryy-surgut.jpg",
+        "naberezhnaya-obi.jpg",
+        "memorial-fakela.jpg",
+        "hram-preobrazheniya.jpg",
+        "park-za-saymoy.jpg"
+      ],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "syktyvkar": {
+      "city": "syktyvkar",
+      "files": 6,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "tambov": {
+      "city": "tambov",
+      "files": 6,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "tolyatti": {
+      "city": "tolyatti",
+      "files": 8,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 8,
+      "shelfFiles": [
+        "tehnicheskiy-muzey-vaz.jpg",
+        "park-pobedy.jpg",
+        "naberezhnaya-volgi.jpg",
+        "skulptura-voskhischenie.jpg",
+        "troitskiy-sobor.jpg",
+        "ploschad-svobody.jpg",
+        "portposelok.jpg",
+        "muzey-istorii-avtovaza.jpg"
+      ],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "tomsk": {
+      "city": "tomsk",
+      "files": 6,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "tula": {
+      "city": "tula",
+      "files": 87,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 50,
+      "shelfFiles": [
+        "pamyatnik-levshe.jpg",
+        "skulptura-tulskiy-pryanik.jpg",
+        "pamyatnik-nikite-demidovu.jpg",
+        "art-tulskoe-chaepitie.jpg",
+        "pamyatnik-svodnomu-otryadu-chekistov.jpg",
+        "skulptura-tulskiy-dinozavr.jpg",
+        "pamyatnik-veresaevu.jpg",
+        "pamyatnik-petru-i.jpg",
+        "pamyatnik-zashchitnikam-tuly.jpg",
+        "art-ezh-patriot.jpg",
+        "pamyatnik-hvostu.jpg",
+        "pamyatnik-rudnevu.jpg"
+      ],
+      "identity": [
+        "identity-symbol.jpg",
+        "identity-architecture.jpg",
+        "identity-art.jpg",
+        "identity-gastro.jpg"
+      ],
+      "scenarioCovers": [
+        "tul-skiy-kreml.jpg",
+        "muzey-oruzhiya-shlem.jpg",
+        "tvorcheskiy-industrial-nyy-klaster-oktava.jpg"
+      ],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "tver": {
+      "city": "tver",
+      "files": 90,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 65,
+      "shelfFiles": [
+        "pamyatnik-afanasiyu-nikitinu.jpg",
+        "pamyatnik-mihailu-krugu.jpg",
+        "pamyatnik-pushkinu.jpg",
+        "pamyatnik-mihailu-yaroslavichu.jpg",
+        "pamyatnik-krylovu.jpg",
+        "pamyatnik-saltykovu-shchedrinu.jpg",
+        "skulptura-rybak.jpg",
+        "obelisk-pobedy.jpg",
+        "pamyatnik-karlu-marksu.jpg",
+        "skulptura-semya.jpg",
+        "pamyatnik-moryakam-podvodnikam.jpg",
+        "pamyatnik-kirillu-i-mefodiyu.jpg"
+      ],
+      "identity": [],
+      "scenarioCovers": [
+        "imperatorskiy-putevoy-dvorets.jpg",
+        "peshehodnaya-trehsvyatskaya-ulitsa.jpg",
+        "spaso-preobrazhenskiy-sobor.jpg",
+        "pamyatnik-mihailu-krugu.jpg"
+      ],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "tyumen": {
+      "city": "tyumen",
+      "files": 102,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 67,
+      "shelfFiles": [
+        "skver-sibirskih-koshek.jpg",
+        "pamyatnik-ermaku.jpg",
+        "pamyatnik-rasputinu.jpg",
+        "pamyatnik-pochtalonke.jpg",
+        "pamyatnik-kuptsu.jpg",
+        "pamyatnik-semechkam.jpg",
+        "pamyatnik-tekutyevu.jpg",
+        "pamyatnik-shkolnikam.jpg",
+        "pamyatnik-dvorniku.jpg",
+        "pamyatnik-bezdomnoy-sobake.jpg",
+        "skulptura-melodiya.jpg",
+        "pamyatnik-ershovu.jpg"
+      ],
+      "identity": [
+        "identity-symbol.jpg",
+        "identity-architecture.jpg",
+        "identity-art.jpg",
+        "identity-gastro.jpg"
+      ],
+      "scenarioCovers": [
+        "usadba-kolokolnikovyh.jpg",
+        "dom-burkova.jpg",
+        "troitskiy-monastyr.jpg",
+        "chaynaya-nalichniki.jpg"
+      ],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "ufa": {
+      "city": "ufa",
+      "files": 85,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 55,
+      "shelfFiles": [
+        "pamyatnik-salavatu-yulaevu.jpg",
+        "monument-druzhby.jpg",
+        "pamyatnik-mustayu-karimu.jpg",
+        "pamyatnik-fedoru-shalyapinu.jpg",
+        "pamyatnik-kunitse.jpg",
+        "pamyatnik-generalu-shaymuratovu.jpg",
+        "art-obyekt-tri-shurupa.jpg",
+        "pamyatnik-dvorniku.jpg",
+        "pamyatnik-geroyam-oktyabrskoy-revolyutsii.jpg",
+        "pamyatnik-leninu.jpg",
+        "skulptura-dom-kunitsy.jpg",
+        "pamyatnik-pushkinu.jpg"
+      ],
+      "identity": [
+        "identity-symbol.jpg",
+        "identity-architecture.jpg",
+        "identity-art.jpg",
+        "identity-gastro.jpg"
+      ],
+      "scenarioCovers": [
+        "pamyatnik-generalu-shaymuratovu.jpg",
+        "pamyatnik-mustayu-karimu.jpg",
+        "zdanie-dvoryanskogo-sobraniya.jpg",
+        "dom-kommuna.jpg"
+      ],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "ulan-ude": {
+      "city": "ulan-ude",
+      "files": 6,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "ulyanovsk": {
+      "city": "ulyanovsk",
+      "files": 6,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "veliky-novgorod": {
+      "city": "veliky-novgorod",
+      "files": 6,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "vladikavkaz": {
+      "city": "vladikavkaz",
+      "files": 8,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 8,
+      "shelfFiles": [
+        "prospekt-mira.jpg",
+        "naberezhnaya-tereka.jpg",
+        "sunnitskaya-mechet.jpg",
+        "armyanskaya-cerkov.jpg",
+        "park-khetagurova.jpg",
+        "alleya-nartov.jpg",
+        "teatr-opery.jpg",
+        "ploschad-svobody.jpg"
+      ],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "vladimir": {
+      "city": "vladimir",
+      "files": 6,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "vladivostok": {
+      "city": "vladivostok",
+      "files": 6,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "volgograd": {
+      "city": "volgograd",
+      "files": 75,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 52,
+      "shelfFiles": [
+        "mamaev-kurgan.jpg",
+        "stoyat-nasmert.jpg",
+        "pamyatnik-panikakhe.jpg",
+        "skorb-materi.jpg",
+        "pamyatnik-holzunovu.jpg",
+        "pamyatnik-mirnym-zhitelyam.jpg",
+        "kleymo-voyny.jpg",
+        "pamyatnik-sobakam-podryvnikam.jpg",
+        "pamyatnik-aleksandru-nevskomu.jpg",
+        "pamyatnik-holzunovu-naberezhnaya.jpg",
+        "znamya-pobedy.jpg",
+        "t-34-chelyabinskiy-kolkhoznik.jpg"
+      ],
+      "identity": [
+        "identity-architecture.jpg",
+        "identity-art.jpg",
+        "identity-gastro.jpg",
+        "identity-symbol.jpg"
+      ],
+      "scenarioCovers": [
+        "muzey-panorama-stalingradskaya-bitva.jpg",
+        "mamaev-kurgan.jpg",
+        "tsentral-naya-naberezhnaya-imeni-62-y-armii.jpg",
+        "volgogradskiy-metrotram.jpg"
+      ],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "vologda": {
+      "city": "vologda",
+      "files": 6,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "voronezh": {
+      "city": "voronezh",
+      "files": 92,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 54,
+      "shelfFiles": [
+        "pamyatnik-petru-i.jpg",
+        "pamyatnik-belomu-bimu.jpg",
+        "pamyatnik-kotenku-s-ulitsy-lizyukova.jpg",
+        "skulptura-neznakomka.jpg",
+        "pamyatnik-eseninu.jpg",
+        "pamyatnik-platonovu.jpg",
+        "maket-korablya-merkuriy.jpg",
+        "pamyatnik-mandelshtamu.jpg",
+        "pamyatnik-vysotskomu.jpg",
+        "pamyatnik-buninu.jpg",
+        "skulptura-prodavets-i-pokupatel.jpg",
+        "pamyatnik-pyatnitskomu.jpg"
+      ],
+      "identity": [
+        "identity-symbol.jpg",
+        "identity-architecture.jpg",
+        "identity-art.jpg",
+        "identity-gastro.jpg"
+      ],
+      "scenarioCovers": [
+        "pamyatnik-petru-i.jpg",
+        "park-orlyonok.jpg",
+        "dom-gubernatora.jpg",
+        "pamyatnik-mandelshtamu.jpg"
+      ],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "vyborg": {
+      "city": "vyborg",
+      "files": 8,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "yaroslavl": {
+      "city": "yaroslavl",
+      "files": 74,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 54,
+      "shelfFiles": [
+        "pamyatnik-yaroslavu-mudromu.jpg",
+        "pamyatnik-rychashemu-medvedyu.jpg",
+        "pamyatnik-fedoru-volkovu.jpg",
+        "skulptura-afonya-i-kolya.jpg",
+        "pamyatnik-nekrasovu.jpg",
+        "skulptura-troitsa.jpg",
+        "pamyatnik-kopeyke-1612.jpg",
+        "skulptura-medved-s-ryboy.jpg",
+        "pamyatnik-sobinovu.jpg",
+        "demidovskiy-stolp.jpg",
+        "stela-strelka-1000.jpg",
+        "pamyatnik-petru-i-fevronii.jpg"
+      ],
+      "identity": [
+        "identity-architecture.jpg",
+        "identity-art.jpg",
+        "identity-gastro.jpg",
+        "identity-symbol.jpg"
+      ],
+      "scenarioCovers": [
+        "strelka-rek-volgi-i-kotorosli.jpg",
+        "tserkov-il-i-proroka.jpg",
+        "volzhskaya-naberezhnaya.jpg"
+      ],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "yoshkar-ola": {
+      "city": "yoshkar-ola",
+      "files": 6,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "yuzhno-sahalinsk": {
+      "city": "yuzhno-sahalinsk",
+      "files": 6,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 0,
+      "shelfFiles": [],
+      "identity": [],
+      "scenarioCovers": [],
       "shelfPairs": 0,
       "regen": []
     }
