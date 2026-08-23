@@ -8,7 +8,6 @@ import { createPortal } from 'react-dom';
 
 import { CatalogAdvancedFiltersInline } from '@/components/CatalogAdvancedFiltersInline.client';
 import { CatalogAdvancedFiltersPanel } from '@/components/CatalogAdvancedFiltersPanel.client';
-import { CatalogDateRail } from '@/components/CatalogDateRail.client';
 import { CatalogDrawerApplyFooter } from '@/components/CatalogDrawerApplyFooter.client';
 import { CatalogPriceRange } from '@/components/CatalogPriceRange.client';
 import { CatalogSidebarLayout } from '@/components/CatalogSidebarLayout.client';
@@ -591,9 +590,6 @@ export function CatalogToolbar({
                 onExactDay={setExactDay}
               />
             </div>
-            <div className="catalog-date-timeline hidden w-full md:block">
-              <CatalogDateRail disabled={disabled} className="min-w-0 w-full" />
-            </div>
             {children}
           </div>
         </CatalogSidebarLayout>
@@ -735,11 +731,8 @@ export function CatalogToolbar({
           </div>
         </form>
 
-        {/* Desktop sticky: date rail, then categories + sort. */}
-        <div className="hidden md:block">
-          <CatalogDateRail disabled={disabled} className="min-w-0 w-full" />
-        </div>
-        {discoveryRow}
+        {/* Desktop sticky: categories + sort (date rail lives in EventsCatalogHero). */}
+        <div className="hidden md:block">{discoveryRow}</div>
       </div>
 
       {advancedPanel}

@@ -26,7 +26,7 @@ import {
   resolveEventCardLocationLabel,
   resolveEventCardPinLines,
 } from '@/lib/event-location';
-import { formatPriceFrom } from '@/lib/format';
+import { formatMoneyRange } from '@/lib/format';
 import { formatAgeLimit } from '@/lib/event-page-utils';
 import { trackProductCardClick } from '@/lib/catalog-analytics';
 import { eventHref, sessionVenueHref } from '@/lib/routes';
@@ -185,7 +185,9 @@ export function EventCardHorizontal({ session }: { session: PublicCatalogListIte
   const pinPrimary = pinLines.primary || locationLabel;
   const durationLabel = extractDurationLabel(session.tags);
   const ageLabel = formatAgeLimit(session.ageLimit);
-  const priceFooterLabel = hasPrice ? formatPriceFrom(session.priceFrom) : null;
+  const priceFooterLabel = hasPrice
+    ? formatMoneyRange(session.priceFrom, 'priceTo' in session ? session.priceTo : null)
+    : null;
   const venueHref = sessionVenueHref(session);
 
   return (
@@ -202,7 +204,7 @@ export function EventCardHorizontal({ session }: { session: PublicCatalogListIte
           })
         }
       />
-      <div className="relative aspect-video w-full shrink-0 overflow-hidden bg-surface-muted sm:min-w-[20rem] sm:w-80 sm:aspect-auto sm:self-stretch">
+      <div className="relative aspect-video w-full shrink-0 overflow-hidden bg-surface-muted sm:min-w-[14rem] sm:w-56 sm:aspect-[4/3] sm:self-stretch lg:w-64">
         <CardSafeImage
           src={imagePrimarySrc}
           alt={session.title}
@@ -275,60 +277,60 @@ export function EventCardHorizontal({ session }: { session: PublicCatalogListIte
           </div>
         )}
 
-        <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-ui-xs text-graphite-muted">
-          {openDate ? (
-            <span className="font-medium text-success">Билет с открытой датой</span>
-          ) : departingSoonMinutes ? (
-            <span className="inline-flex items-center gap-1 font-medium text-urgency">
-              <Clock className="event-card-meta-icon" />
-              Скоро начало · через {departingSoonMinutes} мин
-            </span>
-          ) : sessionMetaLabel ? (
-            <span className="inline-flex items-center gap-1 font-medium text-graphite">
-              <Clock className="event-card-meta-icon" />
-              {sessionMetaLabel}
-            </span>
-          ) : null}
-          {pinPrimary ? (
-            venueHref ? (
-              <Link
-                href={venueHref}
-                className="relative z-[2] min-w-0 hover:text-primary-600"
-                onClick={(event) => event.stopPropagation()}
-              >
-                <span className="line-clamp-1">{pinPrimary}</span>
-                {pinLines.secondary ? (
-                  <span className="mt-0.5 block line-clamp-1">{pinLines.secondary}</span>
-                ) : null}
-              </Link>
-            ) : (
-              <span className="min-w-0">
-                <span className="line-clamp-1">{pinPrimary}</span>
-                {pinLines.secondary ? (
-                  <span className="mt-0.5 block line-clamp-1">{pinLines.secondary}</span>
-                ) : null}
-              </span>
-            )
-          ) : null}
-        </div>
-
         {displaySlotLabels.length > 0 ? <AlsoSlotsRow labels={displaySlotLabels} /> : null}
 
-        <div className="mt-auto flex items-center justify-between gap-2 pt-1">
-          {priceFooterLabel ? (
-            <span className="min-w-0 flex-1 whitespace-nowrap text-ui-sm font-bold text-graphite sm:text-base">
-              {priceFooterLabel}
-            </span>
-          ) : (
-            <span />
-          )}
-          <Link
-            href={href}
-            className="relative z-[2] inline-flex shrink-0 items-center justify-center gap-0.5 whitespace-nowrap rounded-lg bg-primary-600 px-2.5 py-[5px] text-ui-xs font-semibold text-white transition hover:bg-primary-700 sm:text-ui-sm"
-          >
-            <Ticket className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
-            Купить билет
-          </Link>
+        <div className="mt-auto flex flex-col gap-3 border-t border-slate-100 pt-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
+          <div className="min-w-0 flex-1 space-y-0.5 text-ui-xs text-graphite-muted sm:text-ui-sm">
+            {openDate ? (
+              <span className="font-medium text-success">Билет с открытой датой</span>
+            ) : departingSoonMinutes ? (
+              <span className="inline-flex items-center gap-1 font-medium text-urgency">
+                <Clock className="event-card-meta-icon" />
+                Скоро начало · через {departingSoonMinutes} мин
+              </span>
+            ) : sessionMetaLabel ? (
+              <span className="inline-flex items-center gap-1 font-medium text-graphite">
+                <Clock className="event-card-meta-icon" />
+                {sessionMetaLabel}
+              </span>
+            ) : null}
+            {pinPrimary ? (
+              venueHref ? (
+                <Link
+                  href={venueHref}
+                  className="relative z-[2] block min-w-0 hover:text-primary-600"
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  <span className="line-clamp-1">{pinPrimary}</span>
+                  {pinLines.secondary ? (
+                    <span className="mt-0.5 block line-clamp-1">{pinLines.secondary}</span>
+                  ) : null}
+                </Link>
+              ) : (
+                <span className="block min-w-0">
+                  <span className="line-clamp-1">{pinPrimary}</span>
+                  {pinLines.secondary ? (
+                    <span className="mt-0.5 block line-clamp-1">{pinLines.secondary}</span>
+                  ) : null}
+                </span>
+              )
+            ) : null}
+          </div>
+
+          <div className="flex shrink-0 flex-col items-stretch gap-2 sm:items-end">
+            {priceFooterLabel ? (
+              <span className="whitespace-nowrap text-lg font-extrabold tabular-nums tracking-tight text-graphite sm:text-xl">
+                {priceFooterLabel}
+              </span>
+            ) : null}
+            <Link
+              href={href}
+              className="relative z-[2] inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-xl bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-700"
+            >
+              <Ticket className="h-4 w-4 shrink-0" strokeWidth={1.75} />
+              Купить
+            </Link>
+          </div>
         </div>
       </div>
     </article>

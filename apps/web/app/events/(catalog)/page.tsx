@@ -43,12 +43,12 @@ export default async function EventsCatalogPage() {
         fallback={
           <div className="border-b border-slate-100 bg-white">
             <div className="container-page py-3 sm:py-5">
-              <div className="flex flex-col gap-2.5 md:flex-row md:items-end md:justify-between">
+              <div className="flex flex-col gap-3">
                 <div className="min-w-0 flex-1 space-y-1.5">
                   <div className="h-7 w-2/3 max-w-md animate-pulse rounded bg-slate-200 sm:h-8" />
                   <div className="h-3.5 w-1/2 max-w-sm animate-pulse rounded bg-slate-100" />
                 </div>
-                <div className="h-9 w-full max-w-md animate-pulse rounded-full bg-slate-100 md:w-80" />
+                <div className="hidden h-10 w-full animate-pulse rounded-xl bg-slate-100 md:block" />
               </div>
               <p className="sr-only">{EVENTS_SUPPORT}</p>
             </div>

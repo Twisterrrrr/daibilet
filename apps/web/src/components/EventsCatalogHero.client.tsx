@@ -3,14 +3,15 @@
 import { useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 
+import { CatalogDateRail } from '@/components/CatalogDateRail.client';
 import { PageBreadcrumbBar } from '@/components/PageBreadcrumbs';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { catalogFiltersFromQuery, type CatalogFilterValues } from '@/lib/catalog-url';
 import { cityToPrepositional } from '@/lib/city-declension';
 
 /**
- * Compact catalog header: breadcrumbs + H1/subtitle.
- * Date rail lives in sticky CatalogToolbar on desktop; mobile uses date select there.
+ * Catalog header: breadcrumbs + H1/subtitle + date rail (desktop).
+ * Mobile date select stays in CatalogToolbar / drawer flow.
  */
 export function EventsCatalogHero() {
   const searchParams = useSearchParams();
@@ -68,7 +69,7 @@ export function EventsCatalogHero() {
       />
       <header className="border-b border-slate-100 bg-white">
         <div className="container-page py-3 sm:py-5">
-          <div className="min-w-0 md:max-w-2xl">
+          <div className="min-w-0 max-w-3xl">
             <h1 className="font-display text-2xl font-extrabold tracking-tight text-graphite sm:text-3xl">
               {title}
             </h1>
@@ -81,6 +82,9 @@ export function EventsCatalogHero() {
                 </>
               )}
             </p>
+          </div>
+          <div className="catalog-date-timeline mt-4 hidden w-full md:block">
+            <CatalogDateRail className="min-w-0 w-full" />
           </div>
         </div>
       </header>

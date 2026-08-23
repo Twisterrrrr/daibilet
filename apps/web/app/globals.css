@@ -529,37 +529,54 @@ html[data-nav-pending='1'] {
     @apply border-0 bg-primary text-white hover:bg-primary/90 hover:text-white;
   }
 
-  /** Adaptive card grid inside container-page — ~4–5 cols on ultrawide with readable card width. */
+  /** Adaptive card grid — 3–4 cols in the catalog main column on desktop/ultrawide. */
   .catalog-card-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 18.75rem), 1fr));
+    width: 100%;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
     gap: 1rem;
   }
 
   @media (min-width: 640px) {
     .catalog-card-grid {
+      gap: 1.25rem 1rem;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .catalog-card-grid {
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 14.5rem), 1fr));
       gap: 1.5rem 1.25rem;
-      grid-template-columns: repeat(auto-fill, minmax(min(100%, 18.75rem), 1fr));
     }
   }
 
   /** Sidebar + main content (places / events catalogs). */
   .catalog-page-layout {
     display: grid;
+    width: 100%;
     grid-template-columns: minmax(0, 1fr);
     gap: 0;
   }
 
   @media (min-width: 1024px) {
     .catalog-page-layout {
-      grid-template-columns: 18.75rem minmax(0, 1fr);
-      gap: 2.5rem;
+      grid-template-columns: 21rem minmax(0, 1fr);
+      gap: 2rem;
       align-items: start;
     }
   }
 
   @media (min-width: 1280px) {
     .catalog-page-layout {
+      grid-template-columns: 22.5rem minmax(0, 1fr);
+      gap: 2.5rem;
+    }
+  }
+
+  @media (min-width: 1536px) {
+    .catalog-page-layout {
+      grid-template-columns: 24rem minmax(0, 1fr);
       gap: 3rem;
     }
   }
@@ -570,7 +587,13 @@ html[data-nav-pending='1'] {
     width: 100%;
     min-width: 0;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
+  }
+
+  .catalog-main > *,
+  .catalog-content > * {
+    width: 100%;
+    max-width: 100%;
   }
 
   .catalog-sidebar {
