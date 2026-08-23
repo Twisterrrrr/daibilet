@@ -3,49 +3,86 @@
   "shelfN": 12,
   "summary": [
     {
-      "city": "chelyabinsk",
-      "d0": 142,
-      "clusters": 7,
+      "city": "kazan",
+      "d0": 86,
+      "clusters": 1,
       "shelfPairs": 0,
       "regen": 0
     },
     {
-      "city": "volgograd",
-      "d0": 77,
-      "clusters": 16,
+      "city": "omsk",
+      "d0": 2,
+      "clusters": 2,
       "shelfPairs": 0,
       "regen": 0
     },
     {
-      "city": "tula",
-      "d0": 21,
-      "clusters": 3,
+      "city": "ufa",
+      "d0": 0,
+      "clusters": 0,
       "shelfPairs": 0,
       "regen": 0
     }
   ],
   "cities": {
-    "chelyabinsk": {
-      "city": "chelyabinsk",
-      "files": 111,
-      "d0": 142,
-      "pairs": 589,
-      "clusters": 7,
-      "topCluster": 55,
+    "ufa": {
+      "city": "ufa",
+      "files": 85,
+      "d0": 0,
+      "pairs": 0,
+      "clusters": 0,
+      "topCluster": 0,
+      "mustSeeCount": 55,
+      "shelfFiles": [
+        "pamyatnik-salavatu-yulaevu.jpg",
+        "monument-druzhby.jpg",
+        "pamyatnik-mustayu-karimu.jpg",
+        "pamyatnik-fedoru-shalyapinu.jpg",
+        "pamyatnik-kunitse.jpg",
+        "pamyatnik-generalu-shaymuratovu.jpg",
+        "art-obyekt-tri-shurupa.jpg",
+        "pamyatnik-dvorniku.jpg",
+        "pamyatnik-geroyam-oktyabrskoy-revolyutsii.jpg",
+        "pamyatnik-leninu.jpg",
+        "skulptura-dom-kunitsy.jpg",
+        "pamyatnik-pushkinu.jpg"
+      ],
+      "identity": [
+        "identity-symbol.jpg",
+        "identity-architecture.jpg",
+        "identity-art.jpg",
+        "identity-gastro.jpg"
+      ],
+      "scenarioCovers": [
+        "pamyatnik-generalu-shaymuratovu.jpg",
+        "pamyatnik-mustayu-karimu.jpg",
+        "zdanie-dvoryanskogo-sobraniya.jpg",
+        "dom-kommuna.jpg"
+      ],
+      "shelfPairs": 0,
+      "regen": []
+    },
+    "omsk": {
+      "city": "omsk",
+      "files": 86,
+      "d0": 2,
+      "pairs": 4,
+      "clusters": 2,
+      "topCluster": 3,
       "mustSeeCount": 65,
       "shelfFiles": [
-        "skaz-ob-urale.jpg",
-        "pamyatnik-kurchatovu.jpg",
-        "pamyatnik-levshe.jpg",
-        "pamyatnik-nishchemu.jpg",
-        "pamyatnik-tankistam-dobrovoltsam.jpg",
-        "hodok-s-sobakoy.jpg",
-        "roza-vetrov.jpg",
-        "pamyatnik-glinke.jpg",
-        "pamyatnik-izvozchiku.jpg",
-        "pamyatnik-orlenku.jpg",
-        "venskiy-vals.jpg",
-        "pamyatnik-prokofievu.jpg"
+        "pamyatnik-slesar-stepanych.jpg",
+        "pamyatnik-lyubochka.jpg",
+        "pamyatnik-dostoevskomu-nesuschiy-krest.jpg",
+        "pamyatnik-don-kihot.jpg",
+        "pamyatnik-gorodovomu.jpg",
+        "pamyatnik-kolchaku.jpg",
+        "pamyatnik-van-gogu.jpg",
+        "pamyatnik-kniga-lyubvi.jpg",
+        "pamyatnik-petru-i-fevronii.jpg",
+        "pamyatnik-bortsam-revolyutsii.jpg",
+        "pamyatnik-maratonets.jpg",
+        "zakladnoy-kamen-hrama-sergiya-radonezhskogo.jpg"
       ],
       "identity": [
         "identity-symbol.jpg",
@@ -54,83 +91,45 @@
         "identity-gastro.jpg"
       ],
       "scenarioCovers": [
-        "passage-yaushevyh.jpg",
-        "dom-oblispolkoma.jpg",
-        "osobnyak-arhipova.jpg",
-        "gosudarstvennyy-istoricheskiy-muzey-yuzhnogo-urala.jpg"
+        "rechnoy-vokzal.jpg",
+        "ermitazh-sibir.jpg",
+        "voskresenskiy-voennyy-sobor.jpg",
+        "moskovskie-torgovye-ryady.jpg"
       ],
       "shelfPairs": 0,
       "regen": []
     },
-    "volgograd": {
-      "city": "volgograd",
-      "files": 75,
-      "d0": 77,
-      "pairs": 113,
-      "clusters": 16,
-      "topCluster": 7,
-      "mustSeeCount": 52,
+    "kazan": {
+      "city": "kazan",
+      "files": 76,
+      "d0": 86,
+      "pairs": 450,
+      "clusters": 1,
+      "topCluster": 32,
+      "mustSeeCount": 51,
       "shelfFiles": [
-        "mamaev-kurgan.jpg",
-        "stoyat-nasmert.jpg",
-        "pamyatnik-panikakhe.jpg",
-        "skorb-materi.jpg",
-        "pamyatnik-holzunovu.jpg",
-        "pamyatnik-mirnym-zhitelyam.jpg",
-        "kleymo-voyny.jpg",
-        "pamyatnik-sobakam-podryvnikam.jpg",
-        "pamyatnik-aleksandru-nevskomu.jpg",
-        "pamyatnik-holzunovu-naberezhnaya.jpg",
-        "znamya-pobedy.jpg",
-        "t-34-chelyabinskiy-kolkhoznik.jpg"
+        "kazanskiy-kreml.jpg",
+        "mechet-kul-sharif.jpg",
+        "ulitsa-baumana.jpg",
+        "bashnya-syuyumbike.jpg",
+        "dvorets-zemledeltsev.jpg",
+        "kremlevskaya-naberezhnaya.jpg",
+        "pamyatnik-kotu-kazanskomu.jpg",
+        "pamyatnik-muse-dzhaliyu.jpg",
+        "pamyatnik-gabdulle-tukayu.jpg",
+        "pamyatnik-fedoru-shalyapinu.jpg",
+        "kareta-ekateriny-ii.jpg",
+        "pamyatnik-drakonu-zilantu.jpg"
       ],
       "identity": [
-        "identity-architecture.jpg",
-        "identity-art.jpg",
-        "identity-gastro.jpg",
-        "identity-symbol.jpg"
-      ],
-      "scenarioCovers": [
-        "muzey-panorama-stalingradskaya-bitva.jpg",
-        "mamaev-kurgan.jpg",
-        "tsentral-naya-naberezhnaya-imeni-62-y-armii.jpg",
-        "volgogradskiy-metrotram.jpg"
-      ],
-      "shelfPairs": 0,
-      "regen": []
-    },
-    "tula": {
-      "city": "tula",
-      "files": 86,
-      "d0": 21,
-      "pairs": 144,
-      "clusters": 3,
-      "topCluster": 27,
-      "mustSeeCount": 50,
-      "shelfFiles": [
-        "pamyatnik-levshe.jpg",
-        "skulptura-tulskiy-pryanik.jpg",
-        "pamyatnik-nikite-demidovu.jpg",
-        "art-tulskoe-chaepitie.jpg",
-        "pamyatnik-svodnomu-otryadu-chekistov.jpg",
-        "skulptura-tulskiy-dinozavr.jpg",
-        "pamyatnik-veresaevu.jpg",
-        "pamyatnik-petru-i.jpg",
-        "pamyatnik-zashchitnikam-tuly.jpg",
-        "art-ezh-patriot.jpg",
-        "pamyatnik-hvostu.jpg",
-        "pamyatnik-rudnevu.jpg"
-      ],
-      "identity": [
-        "identity-symbol.jpg",
+        "identity-cultures.jpg",
         "identity-architecture.jpg",
         "identity-art.jpg",
         "identity-gastro.jpg"
       ],
       "scenarioCovers": [
-        "tul-skiy-kreml.jpg",
-        "muzey-oruzhiya-shlem.jpg",
-        "tvorcheskiy-industrial-nyy-klaster-oktava.jpg"
+        "kazanskiy-kreml.jpg",
+        "park-chernoe-ozero.jpg"
       ],
       "shelfPairs": 0,
       "regen": []
