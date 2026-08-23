@@ -890,7 +890,7 @@ export const VORONEZH_DAY_ROUTE_PRESETS: any[] = [
       'Классический ознакомительный трек по главной артерии города с плавным спуском к колыбели русского флота у реки.',
     travelVector: 'Парадный пешеходный променад',
     timingNote: 'Около 3 часов пешком: Петр - ЮВЖД - «Промка» - Бим - Успенский - Адмиралтейская.',
-    coverImageUrl: '/images/venues/voronezh/identity-symbol.jpg',
+    coverImageUrl: '/images/venues/voronezh/pamyatnik-petru-i.jpg',
     stops: [
       {
         name: 'Памятник Петру I',

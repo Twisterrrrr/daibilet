@@ -215,4 +215,7 @@ export const CITY_IDENTITY_FALLBACK: Record<string, string> = {
   krasnoyarsk: '/images/venues/krasnoyarsk/identity-siberia.jpg',
   ekaterinburg: '/images/venues/ekaterinburg/identity-rock.jpg',
   'nizhny-novgorod': '/images/venues/nizhny-novgorod/identity-symbol.jpg',
+  tolyatti: '/images/venues/tolyatti/tehnicheskiy-muzey-vaz.jpg',
+  surgut: '/images/venues/surgut/surgutskiy-most.jpg',
+  vladikavkaz: '/images/venues/vladikavkaz/prospekt-mira.jpg',
 };

@@ -6,7 +6,8 @@ import { BlogPostCard } from '@/components/BlogPostCard.client';
 import type { BlogCardDto } from '@/lib/blog-utils';
 
 /**
- * Ultrawide-friendly bento feed: first card spans 2×2 on md+, rest fill evenly.
+ * Ultrawide-friendly bento feed: first card is a full-bleed editorial banner
+ * (span 2×2). Avoid lead flex-row — it collapses into a tall strip + empty text void.
  */
 export function BlogMagazineGrid({
   posts,
@@ -26,7 +27,7 @@ export function BlogMagazineGrid({
     <div className="blog-bento">
       {featured ? (
         <div className="blog-bento__featured">
-          <BlogPostCard post={featured} variant="lead" />
+          <BlogPostCard post={featured} variant="banner" />
         </div>
       ) : null}
 

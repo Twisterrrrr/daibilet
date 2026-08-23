@@ -140,7 +140,7 @@ export const PENZA_SUBURBS: any[] = [
     longitude: 46.061112,
     address: 'Пензенская обл., с. Радищево',
     travelVector: 'Авто ~2 ч',
-    travelVectorBlurb: 'Это спокойный литературный day trip без спешки. Лучше совмещать усадьбу и прогулку по селу в один выезд.',
+    travelVectorBlurb: 'Это спокойный литературный day trip в своём темпе. Лучше совмещать усадьбу и прогулку по селу в один выезд.',
     logisticsExit: 'парковка у музея-заповедника',
     places: [
       place('Барский дом', 'Главный мемориальный корпус и основа рассказа о семье Радищевых.', 52.987112, 46.061112, { address: 'территория музея', locationSlug: 'penza-radishchevo-barskiy-dom', mustSeeFilter: 'museum', visitMinutes: 40 }),
@@ -177,6 +177,7 @@ export const PENZA_DAY_ROUTE_PRESETS: any[] = [
     description: 'Первый день в Пензе: крепостной холм, собор, Московская и музей одной картины.',
     travelVector: 'Пешком по центру',
     timingNote: 'Около 4 часов с одной длинной музейной паузой и фонтанным финалом.',
+    coverImageUrl: '/images/venues/penza/pamyatnik-pervoposelentsu.jpg',
     stops: [
       place('Памятник Первопоселенцу', 'Старт на лучшей исторической смотровой.', 53.195112, 45.019112, { address: 'ул. Кирова', locationSlug: 'penza-pamyatnik-pervoposelentsu', mustSeeFilter: 'monument', visitMinutes: 20, alsoMain: true }),
       place('Спасский собор', 'Полчаса на собор и площадь.', 53.194812, 45.018512, { address: 'Соборная площадь', locationSlug: 'penza-spasskiy-kafedralnyy-sobor', mustSeeFilter: 'temple', visitMinutes: 30, alsoMain: true }),
@@ -188,9 +189,10 @@ export const PENZA_DAY_ROUTE_PRESETS: any[] = [
   {
     id: 'penza-theatre-art',
     title: 'Театр, Мейерхольд и парк',
-    description: 'Культурная Пенза без спешки: Дом Мейерхольда, галерея и зеленый финал в парке Белинского.',
+    description: 'Культурная Пенза без гонки: Дом Мейерхольда, галерея и зеленый финал в парке Белинского.',
     travelVector: 'Пешком по центру и на холм',
     timingNote: 'Около 4-5 часов с галереей и парком.',
+    coverImageUrl: '/images/venues/penza/dom-meyerholda.jpg',
     stops: [
       place('Дом Мейерхольда', 'Старт с театральной биографии города.', 53.196112, 45.020612, { address: 'ул. Володарского, 59', venueSlug: 'penza-dom-meyerholda', mustSeeFilter: 'creative', visitMinutes: 45 }),
       place('Картинная галерея', 'Час-полтора на коллекцию Савицкого.', 53.196612, 45.018212, { address: 'ул. Советская, 3', venueSlug: 'penza-kartinnaya-galereya-im-savickogo', mustSeeFilter: 'museum', visitMinutes: '1-2 ч', alsoMain: true }),

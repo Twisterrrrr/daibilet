@@ -140,7 +140,7 @@ export const PENZA_SUBURBS: any[] = [
     longitude: 46.061112,
     address: 'Пензенская обл., с. Радищево',
     travelVector: 'Авто ~2 ч',
-    travelVectorBlurb: 'Это спокойный литературный day trip без спешки. Лучше совмещать усадьбу и прогулку по селу в один выезд.',
+    travelVectorBlurb: 'Это спокойный литературный day trip в своём темпе. Лучше совмещать усадьбу и прогулку по селу в один выезд.',
     logisticsExit: 'парковка у музея-заповедника',
     places: [
       place('Барский дом', 'Главный мемориальный корпус и основа рассказа о семье Радищевых.', 52.987112, 46.061112, { address: 'территория музея', locationSlug: 'penza-radishchevo-barskiy-dom', mustSeeFilter: 'museum', visitMinutes: 40 }),
@@ -189,7 +189,7 @@ export const PENZA_DAY_ROUTE_PRESETS: any[] = [
   {
     id: 'penza-theatre-art',
     title: 'Театр, Мейерхольд и парк',
-    description: 'Культурная Пенза без спешки: Дом Мейерхольда, галерея и зеленый финал в парке Белинского.',
+    description: 'Культурная Пенза без гонки: Дом Мейерхольда, галерея и зеленый финал в парке Белинского.',
     travelVector: 'Пешком по центру и на холм',
     timingNote: 'Около 4-5 часов с галереей и парком.',
     coverImageUrl: '/images/venues/penza/dom-meyerholda.jpg',

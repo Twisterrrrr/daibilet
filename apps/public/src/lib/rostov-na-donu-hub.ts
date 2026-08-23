@@ -553,6 +553,7 @@ export const ROSTOV_NA_DONU_DAY_ROUTE_PRESETS: any[] = [
       'Классический первый день: парадные фасады Большой Садовой, рынок, набережная и финал у руин Парамоновских складов.',
     travelVector: 'Пешком по центру и к Дону',
     timingNote: 'Около 4 часов без музеев: рынок, набережная, склады и неспешный обед.',
+    coverImageUrl: '/images/venues/rostov-na-donu/naberezhnaya-reki-don-beregovaya-ulitsa.jpg',
     stops: [
       place('Здание Городской думы', '20 минут на фасады и кариатиды Померанцева.', 47.221912, 39.714112, {
         address: 'ул. Большая Садовая, 47',
@@ -603,6 +604,7 @@ export const ROSTOV_NA_DONU_DAY_ROUTE_PRESETS: any[] = [
       'Более молодежный маршрут: художественный музей, Пушкинская, театр-трактор и вечер в двориках Газетного.',
     travelVector: 'Пешком по Пушкинской и Театральной',
     timingNote: 'Около 4 часов с одной музейной паузой и вечерним барным финалом.',
+    coverImageUrl: '/images/venues/rostov-na-donu/teatr-dramy-im-gorkogo.jpg',
     stops: [
       place('Особняк Парамонова', '15 минут на неоклассический фасад и контекст Пушкинской.', 47.227812, 39.728912, {
         address: 'ул. Пушкинская, 148',
@@ -617,7 +619,7 @@ export const ROSTOV_NA_DONU_DAY_ROUTE_PRESETS: any[] = [
         mustSeeFilter: 'museum',
         visitMinutes: 60,
       }),
-      place('Пушкинская улица', 'Полчаса на тенистый бульвар без спешки.', 47.225891, 39.718912, {
+      place('Пушкинская улица', 'Полчаса на тенистый бульвар в спокойном темпе.', 47.225891, 39.718912, {
         address: 'ул. Пушкинская',
         locationSlug: 'rostov-na-donu-pushkinskaya-ulitsa',
         mustSeeFilter: 'street',

@@ -216,7 +216,7 @@ export const RYAZAN_LINE_DAY_ROUTE_PRESETS: any[] = [
       blurb:
         'Каравайцы и кофе на Почтовой, сидр во дворах «Червячка» и фильтр у Гостиного двора - удобные паузы Красной линии.',
     },
-    coverImageUrl: '/images/venues/ryazan/identity-symbol.jpg',
+    coverImageUrl: '/images/venues/ryazan/tyuz-teatr-na-sobornoy.jpg',
     stops: RYAZAN_RED_LINE_STOPS,
   },
 ];

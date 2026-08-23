@@ -139,6 +139,13 @@ import {
   TVER_SUBURBS,
   TVER_TRAVEL,
 } from './tver-hub';
+import { TOLYATTI_FAQ, TOLYATTI_MUST_SEE, TOLYATTI_TRAVEL } from './tolyatti-hub';
+import { SURGUT_FAQ, SURGUT_MUST_SEE, SURGUT_TRAVEL } from './surgut-hub';
+import {
+  VLADIKAVKAZ_FAQ,
+  VLADIKAVKAZ_MUST_SEE,
+  VLADIKAVKAZ_TRAVEL,
+} from './vladikavkaz-hub';
 import {
   VOLGOGRAD_DAY_ROUTE_PRESETS,
   VOLGOGRAD_FAQ,
@@ -5961,6 +5968,33 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     ],
     travel: BARNAUL_TRAVEL,
     faq: BARNAUL_FAQ,
+  },
+  tolyatti: {
+    brief:
+      'Автоград на Волге: Технический музей, набережная и зелёные парки Автозаводского района.',
+    hookFact:
+      'Тольятти вырос вокруг АвтоВАЗа и хранит одну из самых больших открытых коллекций техники в России - Технический музей.',
+    mustSee: TOLYATTI_MUST_SEE as CityMustSeeItem[],
+    travel: TOLYATTI_TRAVEL,
+    faq: TOLYATTI_FAQ,
+  },
+  surgut: {
+    brief:
+      'Нефтяная столица Югры на Оби: этнопарк «Старый Сургут», длинный мост и современный проспект Энергетиков.',
+    hookFact:
+      'Сургутский мост через Обь - один из самых длинных мостов России и главный визуальный символ города.',
+    mustSee: SURGUT_MUST_SEE as CityMustSeeItem[],
+    travel: SURGUT_TRAVEL,
+    faq: SURGUT_FAQ,
+  },
+  vladikavkaz: {
+    brief:
+      'Столица Осетии у Терека: проспект Мира, мечеть у воды, парк Хетагурова и виды на Кавказ.',
+    hookFact:
+      'Владикавказ стоит у ворот Кавказа: с набережной Терека в ясную погоду открываются горные хребты прямо из центра.',
+    mustSee: VLADIKAVKAZ_MUST_SEE as CityMustSeeItem[],
+    travel: VLADIKAVKAZ_TRAVEL,
+    faq: VLADIKAVKAZ_FAQ,
   },
   saransk: {
     brief:

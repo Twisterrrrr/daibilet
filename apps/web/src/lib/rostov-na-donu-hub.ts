@@ -619,7 +619,7 @@ export const ROSTOV_NA_DONU_DAY_ROUTE_PRESETS: any[] = [
         mustSeeFilter: 'museum',
         visitMinutes: 60,
       }),
-      place('Пушкинская улица', 'Полчаса на тенистый бульвар без спешки.', 47.225891, 39.718912, {
+      place('Пушкинская улица', 'Полчаса на тенистый бульвар в спокойном темпе.', 47.225891, 39.718912, {
         address: 'ул. Пушкинская',
         locationSlug: 'rostov-na-donu-pushkinskaya-ulitsa',
         mustSeeFilter: 'street',

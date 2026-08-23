@@ -617,7 +617,7 @@ export const SAMARA_SUBURBS: any[] = [
     longitude: 51.149112,
     address: 'Самарская обл., Сергиевский район',
     travelVector: 'Авто ~2.5-3 ч',
-    travelVectorBlurb: 'Маршрут лучше идет без спешки и не рассчитан на короткое окно.',
+    travelVectorBlurb: 'Маршрут лучше идёт в спокойном темпе и не рассчитан на короткое окно.',
     timingNote: 'Сначала источники и курортный парк, затем прогулочные участки и тихие сельские панорамы.',
     places: [
       { name: 'Минеральные источники', locationSlug: 'samara-mineralnye-istochniki-sergiyevsk', desc: 'Главный смысл маршрута и курортный исторический слой.', visitMinutes: 40 },
@@ -703,7 +703,7 @@ export const SAMARA_DAY_ROUTE_PRESETS: any[] = [
       'От Дома-чемодана и Дома обороны к ракете «Союз», фабрике-кухне ЗИМ и закату на Вертолётке.',
     travelVector: 'Советский авангард и ракета «Союз»',
     timingNote: 'Около 6-7 часов; на Вертолётку лучше на такси или автобусе.',
-    coverImageUrl: '/images/venues/samara/identity-space.jpg',
+    coverImageUrl: '/images/venues/samara/fabrika-kuhnya-zim.jpg',
     stops: [
       {
         name: 'Дом-чемодан СЖД',

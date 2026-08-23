@@ -230,13 +230,15 @@ export function BlogPostCard({
   }
 
   if (isLead) {
-    const primary = clipBlogCardExcerpt(largeCopy?.primary || excerpt, 520);
+    // Stacked editorial card (never side-by-side): flex-row + tall grid cells
+    // produced a portrait image strip and a huge empty text column.
+    const primary = clipBlogCardExcerpt(largeCopy?.primary || excerpt, 360);
     return (
-      <article className={`${cardShell} lg:flex-row`}>
+      <article className={cardShell}>
         <Link
           href={articleHref}
           aria-label={post.title}
-          className="relative block aspect-[16/11] min-h-[12rem] w-full shrink-0 overflow-hidden bg-gradient-to-br from-sky-100 to-primary-50 md:aspect-[2/1] md:min-h-0 lg:aspect-auto lg:min-h-[22rem] lg:w-[58%]"
+          className="relative block aspect-[2/1] min-h-[12rem] w-full shrink-0 overflow-hidden bg-gradient-to-br from-sky-100 to-primary-50 md:min-h-[13rem]"
         >
           {hasCover ? (
             <BlogCardSafeImage
@@ -252,15 +254,15 @@ export function BlogPostCard({
             <CoverFallback large />
           )}
         </Link>
-        <div className="flex min-w-0 flex-1 flex-col justify-center p-7 md:p-7 lg:p-8">
+        <div className="flex min-w-0 flex-1 flex-col p-6 md:p-7">
           <TagChips tag={tag} city={post.city} citySlug={post.citySlug} citySlugs={post.citySlugs} articleType={post.articleType} />
-          <h2 className="font-serif text-[1.85rem] font-semibold leading-[1.12] tracking-tight text-graphite break-words md:text-4xl">
+          <h2 className="break-words font-serif text-[1.65rem] font-semibold leading-[1.15] tracking-tight text-graphite md:text-3xl">
             <Link href={articleHref} className="transition-colors duration-300 hover:text-primary-700">
               {titleText}
             </Link>
           </h2>
           {primary ? (
-            <p className="mt-3 break-words text-base leading-relaxed text-graphite-muted sm:text-lg">
+            <p className="mt-2.5 break-words text-sm leading-relaxed text-graphite-muted sm:text-base">
               {primary}
             </p>
           ) : null}
@@ -288,10 +290,10 @@ export function BlogPostCard({
   if (isBanner) {
     const bannerLead = clipBlogCardExcerpt(
       excerpt || expandLargeListingCopy(post.slug, excerpt, 420).primary,
-      320,
+      280,
     );
     return (
-      <article className="group relative flex min-h-[19rem] overflow-hidden rounded-card bg-slate-900 shadow-card transition-all duration-300 hover:scale-[1.01] hover:shadow-lg md:min-h-[16rem] lg:min-h-[18rem]">
+      <article className="group relative flex h-full min-h-[18rem] overflow-hidden rounded-card bg-slate-900 shadow-card transition-all duration-300 hover:scale-[1.01] hover:shadow-lg md:min-h-[20rem] lg:min-h-[22rem]">
         <Link href={articleHref} aria-label={post.title} className="absolute inset-0 block">
           {hasCover ? (
             <BlogCardSafeImage
@@ -308,23 +310,25 @@ export function BlogPostCard({
           )}
           <span
             aria-hidden
-            className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/50 to-slate-950/10"
+            className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/55 to-slate-950/20"
           />
         </Link>
-        <div className="relative z-10 mt-auto flex w-full max-w-3xl flex-col gap-3 p-7 md:gap-3 md:p-7">
+        <div className="relative z-10 mt-auto flex w-full max-w-3xl flex-col gap-3 p-6 sm:p-7 md:p-8">
           <TagChips tag={tag} city={post.city} citySlug={post.citySlug} citySlugs={post.citySlugs} articleType={post.articleType} />
-          <h2 className="font-serif text-2xl font-semibold leading-[1.15] tracking-tight text-white break-words md:text-2xl lg:text-3xl">
+          <h2 className="break-words font-serif text-2xl font-semibold leading-[1.12] tracking-tight text-white md:text-3xl lg:text-[2.15rem]">
             <Link href={articleHref} className="hover:text-white/90">
               {titleText}
             </Link>
           </h2>
           {bannerLead ? (
-            <p className="break-words text-sm leading-relaxed text-white/80 sm:text-base">
+            <p className="max-w-2xl break-words text-sm leading-relaxed text-white/80 sm:text-base">
               {bannerLead}
             </p>
           ) : null}
-          <ReadMoreCue onDark />
-          <BlogCardMeta post={post} dateLabel={dateLabel} isLarge onDark />
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-1">
+            <ReadMoreCue onDark />
+            <BlogCardMeta post={post} dateLabel={dateLabel} isLarge onDark />
+          </div>
         </div>
       </article>
     );
