@@ -8,7 +8,7 @@ import {
   LocationsCatalogMap,
   type LocationsCatalogMapPin,
 } from '@/components/LocationsCatalogMap.client';
-import { resolveCityMapCoords } from '@/lib/city-map-coords';
+import { MOSCOW_MAP_CENTER, resolveCityMapCoords } from '@/lib/city-map-coords';
 import { pluralEvents } from '@/lib/format';
 import { cityHref, citySlug } from '@/lib/routes';
 
@@ -96,6 +96,8 @@ export function RussiaMap({
               router.push(`/cities/${id}`);
             }}
             layoutKey={`cities-russia-osm-${pins.length}-${useCloser ? 'close' : 'wide'}`}
+            defaultCenter={MOSCOW_MAP_CENTER}
+            defaultZoom={useCloser ? 5.5 : 5}
             fitPadding={useCloser ? [20, 20] : [36, 36]}
             fitMaxZoom={14}
             fitMinZoom={useCloser ? 5.2 : 3.8}

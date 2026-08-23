@@ -252,6 +252,166 @@ const CITY_VIBE_TAGS: Record<string, CityVibeTag[]> = {
     { icon: 'Trees', label: 'Малые Корелы' },
     { icon: 'Snowflake', label: 'Север' },
   ],
+  ryazan: [
+    { icon: 'Landmark', label: 'Кремль' },
+    { icon: 'Ship', label: 'Ока' },
+    { icon: 'Gem', label: 'Золотое кольцо' },
+  ],
+  penza: [
+    { icon: 'Clapperboard', label: 'Театр' },
+    { icon: 'Ship', label: 'Сура' },
+    { icon: 'Palette', label: 'Лермонтов' },
+  ],
+  barnaul: [
+    { icon: 'Mountain', label: 'Алтай' },
+    { icon: 'Trees', label: 'Сибирь' },
+    { icon: 'Building2', label: 'Столица края' },
+  ],
+  lipetsk: [
+    { icon: 'Trees', label: 'Черноземье' },
+    { icon: 'Factory', label: 'Металлургия' },
+    { icon: 'Landmark', label: 'Центр России' },
+  ],
+  lipeck: [
+    { icon: 'Trees', label: 'Черноземье' },
+    { icon: 'Factory', label: 'Металлургия' },
+    { icon: 'Landmark', label: 'Центр России' },
+  ],
+  surgut: [
+    { icon: 'Flame', label: 'Нефть' },
+    { icon: 'Ship', label: 'Обь' },
+    { icon: 'Snowflake', label: 'Север' },
+  ],
+  novokuznetsk: [
+    { icon: 'Factory', label: 'Кузбасс' },
+    { icon: 'Mountain', label: 'Сибирь' },
+    { icon: 'Building2', label: 'Горная столица' },
+  ],
+  tolyatti: [
+    { icon: 'Ship', label: 'Волга' },
+    { icon: 'Factory', label: 'Автоград' },
+    { icon: 'Trees', label: 'Парк' },
+  ],
+  ulyanovsk: [
+    { icon: 'Ship', label: 'Волга' },
+    { icon: 'Landmark', label: 'Симбирск' },
+    { icon: 'Rocket', label: 'Авиация' },
+  ],
+  cheboksary: [
+    { icon: 'Sparkles', label: 'Чувашия' },
+    { icon: 'Ship', label: 'Волга' },
+    { icon: 'Landmark', label: 'Кремль' },
+  ],
+  kemerovo: [
+    { icon: 'Factory', label: 'Кузбасс' },
+    { icon: 'Trees', label: 'Сибирь' },
+    { icon: 'Mountain', label: 'Шория' },
+  ],
+  kirov: [
+    { icon: 'Ship', label: 'Вятка' },
+    { icon: 'Landmark', label: 'Кремль' },
+    { icon: 'Trees', label: 'Центр России' },
+  ],
+  'kirov-kirovskaya-oblast': [
+    { icon: 'Ship', label: 'Вятка' },
+    { icon: 'Landmark', label: 'Кремль' },
+    { icon: 'Trees', label: 'Центр России' },
+  ],
+  kurgan: [
+    { icon: 'Train', label: 'Транссиб' },
+    { icon: 'Mountain', label: 'Урал' },
+    { icon: 'Building2', label: 'Сибирь' },
+  ],
+  izhevsk: [
+    { icon: 'Sparkles', label: 'Удмуртия' },
+    { icon: 'Factory', label: 'Промышленность' },
+    { icon: 'Music', label: 'Оружейная' },
+  ],
+  abakan: [
+    { icon: 'Mountain', label: 'Саяны' },
+    { icon: 'Trees', label: 'Хакасия' },
+    { icon: 'Landmark', label: 'Минусинск' },
+  ],
+  belgorod: [
+    { icon: 'Trees', label: 'Черноземье' },
+    { icon: 'Landmark', label: 'Собор' },
+    { icon: 'Shield', label: 'Пограничье' },
+  ],
+  bryansk: [
+    { icon: 'Trees', label: 'Леса' },
+    { icon: 'Landmark', label: 'Партизаны' },
+    { icon: 'Shield', label: 'Запад' },
+  ],
+  ivanovo: [
+    { icon: 'Factory', label: 'Текстиль' },
+    { icon: 'Ship', label: 'Волга' },
+    { icon: 'Palette', label: 'Иваново' },
+  ],
+  'yoshkar-ola': [
+    { icon: 'Sparkles', label: 'Марий Эл' },
+    { icon: 'Landmark', label: 'Кремль' },
+    { icon: 'Ship', label: 'Кокшага' },
+  ],
+  kursk: [
+    { icon: 'Trees', label: 'Черноземье' },
+    { icon: 'Landmark', label: 'Собор' },
+    { icon: 'Shield', label: 'Курская дуга' },
+  ],
+  orel: [
+    { icon: 'Trees', label: 'Черноземье' },
+    { icon: 'Palette', label: 'Тургенев' },
+    { icon: 'Landmark', label: 'Центр России' },
+  ],
+  orenburg: [
+    { icon: 'Sparkles', label: 'Оренбург' },
+    { icon: 'Bridge', label: 'Мост' },
+    { icon: 'Sun', label: 'Степь' },
+  ],
+  saransk: [
+    { icon: 'Sparkles', label: 'Мордовия' },
+    { icon: 'Clapperboard', label: 'Футбол' },
+    { icon: 'Landmark', label: 'Центр' },
+  ],
+  simferopol: [
+    { icon: 'Sun', label: 'Крым' },
+    { icon: 'Mountain', label: 'Горы рядом' },
+    { icon: 'Landmark', label: 'Центр полуострова' },
+  ],
+  stavropol: [
+    { icon: 'Mountain', label: 'Кавказ' },
+    { icon: 'Sun', label: 'Юг' },
+    { icon: 'Trees', label: 'Курорты' },
+  ],
+  syktyvkar: [
+    { icon: 'Trees', label: 'Коми' },
+    { icon: 'Ship', label: 'Сысола' },
+    { icon: 'Snowflake', label: 'Север' },
+  ],
+  tambov: [
+    { icon: 'Trees', label: 'Черноземье' },
+    { icon: 'Palette', label: 'Платонов' },
+    { icon: 'Landmark', label: 'Центр России' },
+  ],
+  'ulan-ude': [
+    { icon: 'Sparkles', label: 'Бурятия' },
+    { icon: 'Landmark', label: 'Лама' },
+    { icon: 'Mountain', label: 'Байкал' },
+  ],
+  chita: [
+    { icon: 'Train', label: 'Транссиб' },
+    { icon: 'MapPin', label: 'Забайкалье' },
+    { icon: 'Building2', label: 'Восток' },
+  ],
+  'hanty-mansiysk': [
+    { icon: 'Flame', label: 'Нефть' },
+    { icon: 'Snowflake', label: 'Север' },
+    { icon: 'Ship', label: 'Иртыш' },
+  ],
+  'blagoveschensk-amurskaya-oblast': [
+    { icon: 'Ship', label: 'Амур' },
+    { icon: 'MapPin', label: 'Дальний Восток' },
+    { icon: 'Bridge', label: 'Граница' },
+  ],
 };
 
 const ALIAS_TO_CANON: Record<string, string> = {
@@ -261,7 +421,9 @@ const ALIAS_TO_CANON: Record<string, string> = {
   'sankt-peterburg': 'saint-petersburg',
   peterburg: 'saint-petersburg',
   'nizhniy-novgorod': 'nizhny-novgorod',
+  'velikiy-novgorod': 'veliky-novgorod',
   rostov: 'rostov-on-don',
+  lipetsk: 'lipeck',
 };
 
 function resolveVibeKey(slug?: string | null, sourceSlug?: string | null): string | null {
@@ -285,4 +447,26 @@ export function resolveCityVibeTags(
   const key = resolveVibeKey(slug, sourceSlug);
   if (!key) return [];
   return CITY_VIBE_TAGS[key].slice(0, Math.max(2, Math.min(limit, 4)));
+}
+
+/** Static vibes first; hubTags chips as fallback for cities without a curated set. */
+export function resolveCityCardVibeTags(
+  city: {
+    slug?: string | null;
+    sourceSlug?: string | null;
+    hubTags?: { label?: string | null }[] | null;
+  },
+  limit = 4,
+): CityVibeTag[] {
+  const custom = resolveCityVibeTags(city.slug, city.sourceSlug, limit);
+  if (custom.length >= 2) return custom;
+
+  const fromHub = (city.hubTags || [])
+    .map((tag) => String(tag.label || '').trim())
+    .filter(Boolean)
+    .slice(0, limit)
+    .map((label) => ({ icon: 'Sparkles' as CityVibeIconName, label }));
+
+  if (fromHub.length >= 2) return fromHub.slice(0, Math.max(2, Math.min(limit, 4)));
+  return custom;
 }

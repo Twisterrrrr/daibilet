@@ -93,6 +93,9 @@ const CITY_CENTER_BY_SLUG: Record<string, CityMapCoords> = {
   yaroslavl: { latitude: 57.6261, longitude: 39.8845 },
 };
 
+/** Default center for `/cities` overview map. */
+export const MOSCOW_MAP_CENTER: CityMapCoords = CITY_CENTER_BY_SLUG.moscow;
+
 const CITY_CENTER_BY_NAME: Record<string, CityMapCoords> = {
   москва: CITY_CENTER_BY_SLUG.moskva,
   'санкт-петербург': CITY_CENTER_BY_SLUG['sankt-peterburg'],

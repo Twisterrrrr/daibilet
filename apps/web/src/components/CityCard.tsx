@@ -43,7 +43,7 @@ import { CITY_CARD_ASPECT_CLASS, cityCardTitleClass } from '@/lib/city-card-styl
 import { resolveCityImageObjectPosition } from '@/lib/city-image-focus';
 import { resolveCityCardImage } from '@/lib/city-images';
 import type { CityCardRegion } from '@/lib/cityRegionHub';
-import { resolveCityVibeTags, type CityVibeIconName } from '@/lib/city-vibe-tags';
+import { resolveCityCardVibeTags, type CityVibeIconName } from '@/lib/city-vibe-tags';
 import { landingCategoryHref } from '@/lib/landing-routes';
 import { cityHref } from '@/lib/routes';
 import { pluralEvents, pluralVenues } from '@/lib/format';
@@ -148,7 +148,7 @@ function CityHubTags({
 }
 
 function CityVibeRow({ city }: { city: PublicDestinationDto }) {
-  const vibes = resolveCityVibeTags(city.slug, city.sourceSlug, 4);
+  const vibes = resolveCityCardVibeTags(city, 4);
   if (!vibes.length) return null;
 
   return (

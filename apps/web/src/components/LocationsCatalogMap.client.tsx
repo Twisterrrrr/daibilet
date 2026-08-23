@@ -4,6 +4,7 @@ import * as React from 'react';
 import type { Map as LeafletMap, Marker as LeafletMarker } from 'leaflet';
 
 import { loadDaibiletLeaflet } from '@/lib/leaflet-daibilet';
+import type { CityMapCoords } from '@/lib/city-map-coords';
 
 export type LocationsCatalogMapPin = {
   id: string;
@@ -48,6 +49,9 @@ export function LocationsCatalogMap({
    * fitBounds zooms out so far that city dots vanish).
    */
   fitMinZoom,
+  /** When set with defaultZoom, multi-pin maps open here instead of fitBounds. */
+  defaultCenter,
+  defaultZoom,
 }: {
   pins: LocationsCatalogMapPin[];
   className?: string;
@@ -57,6 +61,8 @@ export function LocationsCatalogMap({
   fitPadding?: [number, number];
   fitMaxZoom?: number;
   fitMinZoom?: number;
+  defaultCenter?: CityMapCoords | null;
+  defaultZoom?: number;
 }) {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const mapRef = React.useRef<LeafletMap | null>(null);
@@ -92,8 +98,10 @@ export function LocationsCatalogMap({
       let map = mapRef.current;
       if (!map) {
         map = L.map(node, {
-          center: [pins[0].latitude, pins[0].longitude],
-          zoom: 12,
+          center: defaultCenter
+            ? [defaultCenter.latitude, defaultCenter.longitude]
+            : [pins[0].latitude, pins[0].longitude],
+          zoom: defaultCenter && typeof defaultZoom === 'number' ? defaultZoom : 12,
           minZoom: MIN_ZOOM,
           maxZoom: MAX_ZOOM,
           scrollWheelZoom: true,
@@ -126,17 +134,25 @@ export function LocationsCatalogMap({
         const latLng: [number, number] = [pin.latitude, pin.longitude];
         latLngs.push(latLng);
         const selected = Boolean(selectedId && selectedId === pin.id);
+        const tooltipLabel = pin.typeLabel ? `${pin.title} · ${pin.typeLabel}` : pin.title;
         const icon = L.divIcon({
           className: 'daibilet-locations-catalog-marker',
           html: pinMarkerHtml(selected),
           iconSize: [22, 22],
           iconAnchor: [11, 11],
+          tooltipAnchor: [0, -10],
         });
         const marker = L.marker(latLng, {
           icon,
-          title: pin.typeLabel ? `${pin.title} · ${pin.typeLabel}` : pin.title,
+          title: tooltipLabel,
           keyboard: true,
+          riseOnHover: true,
         }).addTo(map);
+        marker.bindTooltip(tooltipLabel, {
+          direction: 'top',
+          offset: [0, -8],
+          opacity: 0.95,
+        });
         marker.on('click', () => {
           onPinClickRef.current?.(pin.id);
         });
@@ -145,6 +161,8 @@ export function LocationsCatalogMap({
 
       if (latLngs.length === 1) {
         map.setView(latLngs[0], 14);
+      } else if (defaultCenter && typeof defaultZoom === 'number') {
+        map.setView([defaultCenter.latitude, defaultCenter.longitude], defaultZoom);
       } else {
         map.fitBounds(L.latLngBounds(latLngs), {
           padding: fitPadding,
@@ -161,7 +179,7 @@ export function LocationsCatalogMap({
       cancelled = true;
       resizeObserver?.disconnect();
     };
-  }, [pinsKey, pins, selectedId, fitPaddingKey, fitMaxZoom, fitMinZoom]);
+  }, [pinsKey, pins, selectedId, fitPaddingKey, fitMaxZoom, fitMinZoom, defaultCenter, defaultZoom]);
 
   React.useEffect(() => {
     return () => {
