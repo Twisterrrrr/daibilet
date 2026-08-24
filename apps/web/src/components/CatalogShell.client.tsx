@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { CatalogActiveFilters } from '@/components/CatalogActiveFilters';
@@ -10,7 +10,7 @@ import { CatalogResults, ViewModeToggle } from '@/components/CatalogResults.clie
 import { CatalogToolbar } from '@/components/CatalogToolbar.client';
 import { EventsCityGate } from '@/components/EventsCityGate.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
-import type { PublicCatalogDto } from '@daibilet/contracts/public';
+import type { PublicCatalogDto, PublicCatalogListItemDto } from '@daibilet/contracts/public';
 import { CATALOG_PAGE_SIZE_DEFAULT } from '@daibilet/contracts/catalog';
 import {
   buildCatalogHref,
@@ -39,6 +39,25 @@ function parseEventsCatalogPageParam(raw: string | null): number {
   return parsed;
 }
 
+function catalogItemKey(item: PublicCatalogListItemDto): string {
+  return `${item.id}-${item.startsAt}`;
+}
+
+function mergeCatalogItems(
+  existing: PublicCatalogListItemDto[],
+  incoming: PublicCatalogListItemDto[],
+): PublicCatalogListItemDto[] {
+  const seen = new Set(existing.map(catalogItemKey));
+  const merged = [...existing];
+  for (const item of incoming) {
+    const key = catalogItemKey(item);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    merged.push(item);
+  }
+  return merged;
+}
+
 export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: CatalogShellProps) {
   const router = useRouter();
   const urlSearchParams = useSearchParams();
@@ -49,8 +68,12 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
   // Keep SSR catalog visible during city bootstrap; only refetch when injected city differs.
   const [catalog, setCatalog] = useState<PublicCatalogDto | null>(() => initialCatalog);
   const [loading, setLoading] = useState(() => !initialCatalog);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewModeState] = useState<CatalogViewMode>('cards');
+  const pagingModeRef = useRef<'replace' | 'append'>('replace');
+  const catalogRef = useRef<PublicCatalogDto | null>(initialCatalog);
+  catalogRef.current = catalog;
 
   const cityReady = selectedCity?.cityReady ?? true;
   /** Wait for storage resolve when URL has no city — avoids «Все города» then Уфа. */
@@ -77,18 +100,8 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
   // Local page drives the list; soft-nav <Link ?page=> remounts via loading.tsx and feels hung.
   const urlPage = query.page;
   const [listPage, setListPage] = useState(urlPage);
-
-  useEffect(() => {
-    setListPage(urlPage);
-  }, [urlPage]);
-
-  useEffect(() => {
-    const onPopState = () => {
-      setListPage(parseEventsCatalogPageParam(new URLSearchParams(window.location.search).get('page')));
-    };
-    window.addEventListener('popstate', onPopState);
-    return () => window.removeEventListener('popstate', onPopState);
-  }, []);
+  const pendingResultsScrollRef = useRef(false);
+  const prevFiltersKeyRef = useRef<string | null>(null);
 
   const writePageToUrl = useCallback((page: number) => {
     const params = new URLSearchParams(window.location.search);
@@ -99,15 +112,19 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
     window.history.pushState(null, '', href);
   }, []);
 
-  const goToListPage = useCallback(
-    (page: number) => {
-      const next = Math.max(1, page);
-      setListPage(next);
-      writePageToUrl(next);
-      window.scrollTo(0, 0);
-    },
-    [writePageToUrl],
-  );
+  useEffect(() => {
+    pagingModeRef.current = 'replace';
+    setListPage(urlPage);
+  }, [urlPage]);
+
+  useEffect(() => {
+    const onPopState = () => {
+      pagingModeRef.current = 'replace';
+      setListPage(parseEventsCatalogPageParam(new URLSearchParams(window.location.search).get('page')));
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
 
   const filterValues = useMemo(() => {
     const base = catalogFiltersFromQuery({
@@ -130,6 +147,56 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
     if (urlCityIsAll || selectedCity.cityValue === 'all') return { ...base, city: undefined };
     return { ...base, city: selectedCity.cityValue };
   }, [query, cityReady, selectedCity, urlCityIsAll, listPage]);
+
+  const filtersQueryKey = useMemo(
+    () =>
+      catalogQueryCacheKey({
+        ...query,
+        city: filterValues.city,
+        page: 1,
+      }),
+    [query, filterValues.city],
+  );
+
+  useEffect(() => {
+    if (prevFiltersKeyRef.current === null) {
+      prevFiltersKeyRef.current = filtersQueryKey;
+      return;
+    }
+    if (prevFiltersKeyRef.current === filtersQueryKey) return;
+    prevFiltersKeyRef.current = filtersQueryKey;
+    pagingModeRef.current = 'replace';
+    setListPage(1);
+    writePageToUrl(1);
+  }, [filtersQueryKey, writePageToUrl]);
+
+  const goToListPage = useCallback(
+    (page: number) => {
+      pagingModeRef.current = 'replace';
+      const next = Math.max(1, page);
+      setListPage(next);
+      writePageToUrl(next);
+      pendingResultsScrollRef.current = true;
+    },
+    [writePageToUrl],
+  );
+
+  const loadMoreNextPage = useCallback(() => {
+    if (loading || loadingMore || !catalog) return;
+    const limit = Math.max(catalog.limit || CATALOG_PAGE_SIZE_DEFAULT, 1);
+    const totalPages = Math.max(1, Math.ceil(catalog.total / limit));
+    if (listPage >= totalPages) return;
+    pagingModeRef.current = 'append';
+    const next = listPage + 1;
+    setListPage(next);
+    writePageToUrl(next);
+  }, [loading, loadingMore, catalog, listPage, writePageToUrl]);
+
+  useEffect(() => {
+    if (!pendingResultsScrollRef.current || loading || loadingMore || !catalog) return;
+    pendingResultsScrollRef.current = false;
+    document.getElementById('catalog-results')?.scrollIntoView({ behavior: 'auto', block: 'start' });
+  }, [loading, loadingMore, catalog, listPage]);
 
   const hasExtraCatalogFilters = useMemo(() => {
     const dateActive = Boolean(filterValues.date) && filterValues.date !== 'all';
@@ -183,25 +250,32 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
       return;
     }
 
-    // Deep-link or post-replace URL already has city — SSR payload matches.
-    if (initialQueryKey && effectiveQueryKey === initialQueryKey && initialCatalog && urlHasCity) {
-      setCatalog(initialCatalog);
-      setLoading(false);
-      setError(null);
-      return;
-    }
+    const appendMode = pagingModeRef.current === 'append';
 
-    // True «all cities»: URL has no city and header city is all — SSR catalog is correct.
-    if (initialQueryKey && effectiveQueryKey === initialQueryKey && initialCatalog && !filterValues.city) {
-      setCatalog(initialCatalog);
-      setLoading(false);
-      setError(null);
-      return;
+    // Deep-link / SSR shortcuts — skip when appending the next batch.
+    if (!appendMode) {
+      if (initialQueryKey && effectiveQueryKey === initialQueryKey && initialCatalog && urlHasCity) {
+        setCatalog(initialCatalog);
+        setLoading(false);
+        setError(null);
+        return;
+      }
+
+      if (initialQueryKey && effectiveQueryKey === initialQueryKey && initialCatalog && !filterValues.city) {
+        setCatalog(initialCatalog);
+        setLoading(false);
+        setError(null);
+        return;
+      }
     }
 
     const controller = new AbortController();
-    // Stale-first: keep previous cards while page/filter fetch runs (avoid skeleton wipe).
-    setLoading(true);
+    if (appendMode && catalogRef.current) {
+      setLoadingMore(true);
+    } else {
+      // Stale-first: keep previous cards while page/filter fetch runs (avoid skeleton wipe).
+      setLoading(true);
+    }
     setError(null);
 
     const params = new URLSearchParams(urlSearchParams.toString());
@@ -216,14 +290,28 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
         if (!response.ok) throw new Error('catalog_fetch_failed');
         return response.json() as Promise<PublicCatalogDto>;
       })
-      .then((payload) => setCatalog(payload))
+      .then((payload) => {
+        setCatalog((prev) => {
+          if (appendMode && prev) {
+            return {
+              ...payload,
+              items: mergeCatalogItems(prev.items, payload.items),
+            };
+          }
+          return payload;
+        });
+      })
       .catch((fetchError) => {
         if (fetchError instanceof Error && fetchError.name === 'AbortError') return;
         setError('Не удалось загрузить каталог. Попробуйте обновить страницу.');
-        setCatalog(null);
+        if (!appendMode) setCatalog(null);
       })
       .finally(() => {
-        if (!controller.signal.aborted) setLoading(false);
+        if (!controller.signal.aborted) {
+          pagingModeRef.current = 'replace';
+          setLoading(false);
+          setLoadingMore(false);
+        }
       });
 
     return () => controller.abort();
@@ -288,7 +376,10 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
       </div>
 
       {/* Meta слева; sort только mobile; view справа */}
-      <div className="catalog-meta-row mt-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 sm:mt-4">
+      <div
+        id="catalog-results"
+        className="catalog-meta-row mt-3 scroll-mt-[calc(var(--site-header-height)+5.5rem)] flex flex-wrap items-center justify-between gap-x-3 gap-y-2 sm:mt-4"
+      >
         <p className="min-w-0 text-sm text-graphite-muted">
           {loading && !catalog ? 'Загрузка…' : null}
           {/* Event count: sm+ only - mobile keeps the row for sort + view. */}
@@ -364,10 +455,13 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
             listPage,
             Math.max(1, Math.ceil((catalog.total || 0) / Math.max(catalog.limit || CATALOG_PAGE_SIZE_DEFAULT, 1))),
           )}
+          shownCount={catalog.items.length}
           total={catalog.total}
           limit={catalog.limit}
           searchParams={paginationSearchParams}
           onPageChange={goToListPage}
+          onLoadMore={loadMoreNextPage}
+          loadingMore={loadingMore}
         />
       ) : null}
 

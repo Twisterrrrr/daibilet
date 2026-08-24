@@ -85,6 +85,9 @@ export function CatalogPaginationLinks({
   basePath = '/events',
   summarySuffix,
   onPageChange,
+  onLoadMore,
+  loadingMore = false,
+  shownCount,
 }: {
   page: number;
   total: number;
@@ -95,15 +98,19 @@ export function CatalogPaginationLinks({
   /** Extra label after «Показано X из Y», e.g. pluralEvents(total). */
   summarySuffix?: string;
   /**
-   * Client page switch: update list without App Router soft-nav.
-   * Keeps shareable `?page=` via history; omit to fall back to `<Link>`.
+   * Client page switch: replace list with the target page (desktop page strip).
    */
   onPageChange?: (page: number) => void;
+  /** Append the next page below current items (mobile «Показать ещё»). */
+  onLoadMore?: () => void;
+  loadingMore?: boolean;
+  /** Items actually rendered (accumulated load-more count). */
+  shownCount?: number;
 }) {
   const totalPages = Math.max(1, Math.ceil(total / limit));
   if (totalPages <= 1) return null;
 
-  const shown = Math.min(page * limit, total);
+  const shown = shownCount ?? Math.min(page * limit, total);
   const remaining = Math.max(total - shown, 0);
   const suffix =
     summarySuffix ??
@@ -139,29 +146,31 @@ export function CatalogPaginationLinks({
         {suffix ? ` · ${suffix}` : ''}
       </p>
 
-      {/* Mobile: next-page CTA (replaces list; not infinite append) */}
+      {/* Mobile: append next batch */}
       <div className="flex flex-col items-center gap-3 sm:hidden">
-        {nextPage ? (
-          <PaginationNavLink
-            href={buildHref(nextPage)}
-            rel="next"
-            targetPage={nextPage}
-            onPageChange={onPageChange}
-            className="inline-flex min-h-11 w-full max-w-sm items-center justify-center rounded-full bg-primary-600 px-8 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700"
-          >
-            {remaining > 0 ? `Показать ещё ${Math.min(limit, remaining)}` : 'Показать ещё'}
-          </PaginationNavLink>
-        ) : null}
-        {prevPage ? (
-          <PaginationNavLink
-            href={buildHref(prevPage)}
-            rel="prev"
-            targetPage={prevPage}
-            onPageChange={onPageChange}
-            className="text-sm font-medium text-slate-500 hover:text-slate-800"
-          >
-            ← Назад
-          </PaginationNavLink>
+        {nextPage && remaining > 0 ? (
+          onLoadMore ? (
+            <button
+              type="button"
+              disabled={loadingMore}
+              onClick={onLoadMore}
+              className="inline-flex min-h-11 w-full max-w-sm items-center justify-center rounded-full bg-primary-600 px-8 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700 disabled:cursor-wait disabled:opacity-70"
+            >
+              {loadingMore
+                ? 'Загрузка…'
+                : `Показать ещё ${Math.min(limit, remaining)}`}
+            </button>
+          ) : (
+            <PaginationNavLink
+              href={buildHref(nextPage)}
+              rel="next"
+              targetPage={nextPage}
+              onPageChange={onPageChange}
+              className="inline-flex min-h-11 w-full max-w-sm items-center justify-center rounded-full bg-primary-600 px-8 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700"
+            >
+              {`Показать ещё ${Math.min(limit, remaining)}`}
+            </PaginationNavLink>
+          )
         ) : null}
       </div>
 
@@ -216,17 +225,31 @@ export function CatalogPaginationLinks({
           )}
         </ol>
 
-        {nextPage ? (
-          <PaginationNavLink
-            href={buildHref(nextPage)}
-            rel="next"
-            targetPage={nextPage}
-            onPageChange={onPageChange}
-            className={`${navBtn} border-slate-900 bg-slate-900 text-white hover:bg-slate-800`}
-            aria-label="Показать ещё"
-          >
-            {remaining > 0 ? `Показать ещё ${Math.min(limit, remaining)}` : 'Дальше →'}
-          </PaginationNavLink>
+        {nextPage && remaining > 0 ? (
+          onLoadMore ? (
+            <button
+              type="button"
+              disabled={loadingMore}
+              onClick={onLoadMore}
+              className={`${navBtn} border-slate-900 bg-slate-900 text-white hover:bg-slate-800 disabled:cursor-wait disabled:opacity-70`}
+              aria-label="Показать ещё"
+            >
+              {loadingMore
+                ? 'Загрузка…'
+                : `Показать ещё ${Math.min(limit, remaining)}`}
+            </button>
+          ) : (
+            <PaginationNavLink
+              href={buildHref(nextPage)}
+              rel="next"
+              targetPage={nextPage}
+              onPageChange={onPageChange}
+              className={`${navBtn} border-slate-900 bg-slate-900 text-white hover:bg-slate-800`}
+              aria-label="Показать ещё"
+            >
+              {`Показать ещё ${Math.min(limit, remaining)}`}
+            </PaginationNavLink>
+          )
         ) : (
           <span className={navBtn} aria-disabled="true">
             Дальше →

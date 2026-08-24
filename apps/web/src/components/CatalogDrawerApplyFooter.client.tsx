@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 
-import { formatNumber, pluralEvents } from '@/lib/format';
+import { pluralEvents } from '@/lib/format';
 import { buildCatalogPreviewQuery, useCatalogPreviewCount } from '@/lib/catalog-preview';
 import type { CatalogFilterValues } from '@/lib/catalog-url';
 
@@ -25,7 +25,7 @@ export function CatalogDrawerApplyFooter({
     : total === 0
       ? 'Нет событий'
       : total != null
-        ? `Показать ${formatNumber(total)} ${pluralEvents(total)}`
+        ? `Показать ${pluralEvents(total)}`
         : 'Показать события';
 
   return (

@@ -317,7 +317,7 @@ export function EventCard({
           />
         ) : null}
 
-        <div className="mt-auto flex items-center justify-between gap-2 pt-1">
+        <div className="mt-auto flex items-center justify-between gap-2 pt-1 max-sm:justify-end">
           {landingActions ? (
             <LandingPurchaseButton
               session={session}
@@ -327,17 +327,17 @@ export function EventCard({
           ) : (
             <>
               {priceValue != null ? (
-                <span className="relative z-[2] inline-flex min-w-0 flex-1 items-baseline gap-1 whitespace-nowrap font-extrabold tracking-tight text-primary-700">
-                  <span className="text-[11px] font-semibold sm:text-xs">от</span>
-                  <span className="text-[15px] sm:text-lg">{formatNumber(priceValue)}</span>
-                  <span className="text-[11px] font-semibold sm:text-xs">₽</span>
+                <span className="relative z-[2] inline-flex min-w-0 flex-1 items-baseline gap-1 whitespace-nowrap font-extrabold tracking-tight text-primary-700 max-sm:flex-none">
+                  <span className="text-xs font-semibold sm:text-sm">от</span>
+                  <span className="text-base sm:text-xl">{formatNumber(priceValue)}</span>
+                  <span className="text-xs font-semibold sm:text-sm">₽</span>
                 </span>
               ) : (
                 <span />
               )}
               <Link
                 href={href}
-                className={DETAILS_LINK_CLASS}
+                className={`${DETAILS_LINK_CLASS} max-sm:hidden`}
                 onClick={() =>
                   trackProductCardClick({
                     eventId: session.id,

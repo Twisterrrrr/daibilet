@@ -103,7 +103,7 @@ export function CatalogSidebarLayout({
               <X className="h-5 w-5" strokeWidth={1.75} />
             </button>
           </div>
-          {sidebar}
+          <div className="catalog-sidebar-scroll lg:contents">{sidebar}</div>
           {footer ? (
             <div className="catalog-sidebar-mobile-footer lg:hidden">
               {typeof footer === 'function' ? footer({ closeApply, closeDismiss }) : footer}

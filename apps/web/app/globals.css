@@ -529,24 +529,24 @@ html[data-nav-pending='1'] {
     @apply border-0 bg-primary text-white hover:bg-primary/90 hover:text-white;
   }
 
-  /** Adaptive card grid — 3–4 cols in the catalog main column on desktop/ultrawide. */
+  /** Adaptive card grid — 2→3→4 cols in the catalog main column. */
   .catalog-card-grid {
     display: grid;
     width: 100%;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
   }
 
   @media (min-width: 640px) {
     .catalog-card-grid {
       gap: 1.25rem 1rem;
-      grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
 
-  @media (min-width: 1280px) {
+  @media (min-width: 1024px) {
     .catalog-card-grid {
-      grid-template-columns: repeat(auto-fill, minmax(min(100%, 14.5rem), 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 1.5rem 1.25rem;
     }
   }
@@ -621,14 +621,23 @@ html[data-nav-pending='1'] {
       top: 0;
       left: -100%;
       z-index: 1000;
+      display: flex;
       width: min(100vw, 24rem);
       height: 100vh;
-      overflow-y: auto;
+      flex-direction: column;
+      overflow: hidden;
       background: #fff;
-      padding: 1rem 1rem 5.5rem;
+      padding: 1rem 1rem 0;
       border-radius: 0 1rem 1rem 0;
       box-shadow: 1.25rem 0 2.5rem rgba(15, 23, 42, 0.15);
       transition: left 0.28s ease;
+    }
+
+    .catalog-sidebar-scroll {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+      overscroll-behavior: contain;
     }
 
     .catalog-sidebar.is-open {
@@ -672,7 +681,8 @@ html[data-nav-pending='1'] {
   }
 
   .catalog-sidebar-mobile-footer {
-    @apply fixed bottom-0 left-0 z-[1001] w-full max-w-[24rem] border-t border-slate-100 bg-white p-4 shadow-[0_-10px_20px_rgba(0,0,0,0.05)];
+    @apply sticky bottom-0 z-[1] -mx-4 mt-auto shrink-0 border-t border-slate-100 bg-white p-4 shadow-[0_-10px_20px_rgba(0,0,0,0.05)];
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
   }
 
   .catalog-sidebar-section {
