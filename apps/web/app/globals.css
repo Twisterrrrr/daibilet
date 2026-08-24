@@ -1301,6 +1301,51 @@ html[data-nav-pending='1'] {
     color: var(--navy-foreground);
   }
 
+  /**
+   * City hub night hero: navy overlay fades into the photo.
+   * Stops use min(rem, %) so on ultrawide the opaque band stays near the
+   * copy column (~620px) instead of eating 45% of a 3440px viewport.
+   * Mobile: no mask (full overlay + photo opacity-70 in CITY_NIGHT_HERO).
+   */
+  .city-hero-surface-mask {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+  @media (min-width: 768px) {
+    .city-hero-surface-mask {
+      -webkit-mask-image: linear-gradient(
+        90deg,
+        #000 0%,
+        #000 min(34rem, 40%),
+        transparent min(56rem, 86%)
+      );
+      mask-image: linear-gradient(
+        90deg,
+        #000 0%,
+        #000 min(34rem, 40%),
+        transparent min(56rem, 86%)
+      );
+    }
+  }
+
+  @media (min-width: 1536px) {
+    .city-hero-surface-mask {
+      -webkit-mask-image: linear-gradient(
+        90deg,
+        #000 0%,
+        #000 min(36rem, 28%),
+        transparent min(62rem, 72%)
+      );
+      mask-image: linear-gradient(
+        90deg,
+        #000 0%,
+        #000 min(36rem, 28%),
+        transparent min(62rem, 72%)
+      );
+    }
+  }
+
   .gradient-hero-lovable {
     background: var(--gradient-hero);
   }
