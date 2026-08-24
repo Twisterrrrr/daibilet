@@ -577,7 +577,7 @@ function ShowcaseEventCard({
       >
         <h3
           className={`font-display font-bold leading-snug text-graphite ${
-            rail || cityHub ? 'line-clamp-2 text-ui-sm' : 'line-clamp-3 text-ui-sm sm:text-base'
+            rail || cityHub ? 'line-clamp-2 text-ui-sm' : 'line-clamp-2 text-ui-sm sm:text-base'
           }`}
         >
           <Link

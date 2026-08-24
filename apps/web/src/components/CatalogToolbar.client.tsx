@@ -533,15 +533,13 @@ export function CatalogToolbar({
           />
         </div>
 
-        <div className="hidden lg:block">
-          <CatalogAdvancedFiltersInline
-            filters={effectiveFilters}
-            landings={facets.landings}
-            qDraft={effectiveQDraft}
-            disabled={disabled}
-            onNavigate={catalogNavigate}
-          />
-        </div>
+        <CatalogAdvancedFiltersInline
+          filters={effectiveFilters}
+          landings={facets.landings}
+          qDraft={effectiveQDraft}
+          disabled={disabled}
+          onNavigate={catalogNavigate}
+        />
 
       </>
     );

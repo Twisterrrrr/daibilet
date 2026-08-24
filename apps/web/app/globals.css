@@ -565,7 +565,10 @@ html[data-nav-pending='1'] {
     @apply border-0 bg-primary text-white hover:bg-primary/90 hover:text-white;
   }
 
-  /** Adaptive card grid — 2→3→4 cols in the catalog main column. */
+  /**
+   * Catalog cards: never drop below ~16.5rem.
+   * With a 21rem sidebar at 1024px, 4 columns crush titles/categories (ЭКСК…).
+   */
   .catalog-card-grid {
     display: grid;
     width: 100%;
@@ -576,14 +579,26 @@ html[data-nav-pending='1'] {
   @media (min-width: 640px) {
     .catalog-card-grid {
       gap: 1.25rem 1rem;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 768px) {
+    .catalog-card-grid {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
 
   @media (min-width: 1024px) {
     .catalog-card-grid {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 1.5rem 1.25rem;
+    }
+  }
+
+  @media (min-width: 1536px) {
+    .catalog-card-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
     }
   }
 
@@ -640,9 +655,6 @@ html[data-nav-pending='1'] {
     .catalog-sidebar {
       position: sticky;
       top: calc(var(--site-header-height, 4rem) + 1rem);
-      max-height: calc(100vh - var(--site-header-height, 4rem) - 2rem);
-      overflow-y: auto;
-      overscroll-behavior: contain;
       padding: 1.5rem;
       border: 1px solid #f1f5f9;
       border-radius: 1rem;
