@@ -14,14 +14,15 @@ import { MobileNavLayer, MobileNavTrigger, useMobileNavId } from '@/components/M
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
 import { useUserAuthOptional } from '@/hooks/useUserAuth';
-import { catalogHrefWithSelectedCity, placesHubHrefWithSelectedCity } from '@/lib/catalog-url';
+import { catalogHrefWithSelectedCity } from '@/lib/catalog-url';
 import { FAVORITES_CHANGED_EVENT, readFavoriteIds } from '@/lib/favorites';
 import { PLACE_FAVORITES_CHANGED_EVENT, readPlaceFavorites } from '@/lib/place-favorites';
+import { cityHref } from '@/lib/routes';
 
+/** Primary IA: Афиша · Город · Подборки · Блог. Места stay in footer / secondary. */
 const NAV_LINKS = [
-  { label: 'События', href: '/events', catalog: true },
-  { label: 'Города', href: '/cities' },
-  { label: 'Места', href: '/places', placesHub: true },
+  { label: 'Афиша', href: '/events', catalog: true },
+  { label: 'Город', href: '/cities', cityHub: true },
   { label: 'Подборки', href: '/podborki' },
   { label: 'Блог', href: '/blog' },
 ] as const;
@@ -30,15 +31,11 @@ function isNavActive(pathname: string, href: string, label?: string): boolean {
   const path = pathname.replace(/\/$/, '') || '/';
   const normalized = href.replace(/\/$/, '').split('?')[0] || '/';
   if (normalized === '/') return path === '/';
-  if (label === 'Места') {
-    return (
-      path === '/places' ||
-      path.startsWith('/places/') ||
-      path === '/venues' ||
-      path.startsWith('/venues/') ||
-      path === '/locations' ||
-      path.startsWith('/locations/')
-    );
+  if (label === 'Афиша') {
+    return path === '/events' || path.startsWith('/events/');
+  }
+  if (label === 'Город') {
+    return path === '/cities' || path.startsWith('/cities/');
   }
   return path === normalized || path.startsWith(`${normalized}/`);
 }
@@ -118,8 +115,12 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
     if ('catalog' in item && item.catalog) {
       return { ...item, href: catalogHrefWithSelectedCity(cityQuery) };
     }
-    if ('placesHub' in item && item.placesHub) {
-      return { ...item, href: placesHubHrefWithSelectedCity(cityQuery) };
+    if ('cityHub' in item && item.cityHub) {
+      const dest = selectedCity?.selectedDestination;
+      if (cityReady && dest?.slug) {
+        return { ...item, href: cityHref(dest) };
+      }
+      return { ...item, href: '/cities' };
     }
     return { ...item, href: item.href };
   });
@@ -179,15 +180,13 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
           >
             {navLinks.map((item) => {
               const active = isNavActive(pathname, item.href, item.label);
-              const secondary = item.href.startsWith('/blog');
               return (
                 <Link
                   key={item.label}
                   href={item.href}
                   className={
                     [
-                      secondary ? 'hidden xl:inline-flex' : 'inline-flex',
-                      'items-center rounded-lg px-2 py-1.5 text-sm font-medium transition xl:px-2.5',
+                      'inline-flex items-center rounded-lg px-2 py-1.5 text-sm font-medium transition xl:px-2.5',
                       active
                         ? 'text-graphite underline decoration-graphite/70 decoration-2 underline-offset-[6px]'
                         : 'text-graphite-muted hover:bg-surface-muted hover:text-graphite',

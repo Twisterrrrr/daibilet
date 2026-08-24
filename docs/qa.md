@@ -461,8 +461,8 @@ Shell UI есть; hydrate - § Открыто (техника) п.5.
 
 **LOCKED 2026-08-07 (owner OK, option A):** URL-семейство от **kind/role**, не от наличия билетов. Музей/театр/зал без афиши → `/venues`, buy-chrome скрыт до offers/sessions. Достопримечательности / парки / причалы / гастро-как-day-point → `/locations`. Commerce влияет только на UI chrome.
 
-**LOCKED 2026-08-13 (owner):** «Места» = зонтик в IA, не замена entity URL.
-1. Primary nav: **Города • События • Места • Подборки • Блог**.
+**LOCKED 2026-08-13 (owner):** «Места» = зонтик каталога, не замена entity URL.
+1. Primary nav **V1.2 (2026-08-24):** **Афиша · Город · Подборки · Блог**. Места - footer/secondary, не primary.
 2. `/places` - смешанная лента площадок и локаций; канон карточек остаётся `/venues/[slug]` и `/locations/[slug]` (не ломать ссылки).
 3. Поиск в разделе **один** (`/places?q=`): музей и набережная в одном списке с тегом семейства.
 4. `UX.LOC3` («Места и точки сбора») - superseded коротким лейблом «Места».
@@ -487,8 +487,8 @@ Shell UI есть; hydrate - § Открыто (техника) п.5.
 
 Контекст: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brief.md).
 
-1. **Лейбл `/locations`:** ✅ каталог H1 может оставаться «Локации»; primary = «Места» → `/places`.
-2. **Nav:** ✅ **V1.1** - umbrella Места; порядок Города → События → Места.
+1. **Лейбл `/locations`:** ✅ каталог H1 может оставаться «Локации»; hub «Места» → `/places` (footer, не primary).
+2. **Nav:** ✅ **V1.2** - Афиша · Город · Подборки · Блог (Места вне primary).
 3. **Default city / гео suggest:** **DEFERRED D3**.
 4. **Список `/locations`:** ✅ SEO-контентные без афиши **да** (VK.8).
 5. **Единый `/places` mixed grid без запроса:** ✅ 2026-08-13 (owner: два каталога на хабе смотрелись странно).

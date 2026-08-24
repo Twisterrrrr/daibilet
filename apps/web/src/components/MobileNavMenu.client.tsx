@@ -228,17 +228,13 @@ export function MobileNavLayer({
 
 function isNavActive(pathname: string, href: string, label?: string): boolean {
   const path = pathname.replace(/\/$/, '') || '/';
-  const normalized = href.replace(/\/$/, '') || '/';
+  const normalized = href.replace(/\/$/, '').split('?')[0] || '/';
   if (normalized === '/') return path === '/';
-  if (label === 'Места') {
-    return (
-      path === '/places' ||
-      path.startsWith('/places/') ||
-      path === '/venues' ||
-      path.startsWith('/venues/') ||
-      path === '/locations' ||
-      path.startsWith('/locations/')
-    );
+  if (label === 'Афиша') {
+    return path === '/events' || path.startsWith('/events/');
+  }
+  if (label === 'Город') {
+    return path === '/cities' || path.startsWith('/cities/');
   }
   return path === normalized || path.startsWith(`${normalized}/`);
 }

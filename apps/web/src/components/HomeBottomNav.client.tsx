@@ -5,8 +5,9 @@ import { usePathname } from 'next/navigation';
 import { CalendarDays, Compass, MapPin, Route } from 'lucide-react';
 
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
-import { catalogHrefWithSelectedCity, placesHubHrefWithSelectedCity } from '@/lib/catalog-url';
+import { catalogHrefWithSelectedCity } from '@/lib/catalog-url';
 import { buildMyDayHref } from '@/lib/home-guide';
+import { cityHref } from '@/lib/routes';
 
 /**
  * Mobile sticky bottom nav for personal-guide home (and soft-nav siblings).
@@ -47,18 +48,15 @@ export function HomeBottomNav() {
       match: (path: string) => path === '/my-day' || path.startsWith('/my-day'),
     },
     {
-      id: 'places',
-      label: 'Места',
-      href: placesHubHrefWithSelectedCity(cityQuery),
+      id: 'city',
+      label: 'Город',
+      href:
+        cityReady && selectedCity?.selectedDestination?.slug
+          ? cityHref(selectedCity.selectedDestination)
+          : '/cities',
       icon: MapPin,
       accent: false,
-      match: (path: string) =>
-        path === '/places' ||
-        path.startsWith('/places/') ||
-        path === '/locations' ||
-        path.startsWith('/locations/') ||
-        path === '/venues' ||
-        path.startsWith('/venues/'),
+      match: (path: string) => path === '/cities' || path.startsWith('/cities/'),
     },
   ] as const;
 

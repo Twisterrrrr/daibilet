@@ -795,13 +795,19 @@ Live: Deploy MSK web [`32371428354`](https://github.com/Twisterrrrr/daibilet/act
 | UX.MYDAY-SCENARIO-FEED | «Мои сценарии» в ленте маршрута, не только во вкладке подбора | Высокий | ✅ 2026-08-13; live после Deploy MSK web |
 | UX.MYDAY-DROP-GANTT | Убрать блок «График дня»; время только на карточках точек | Высокий | ✅ 2026-08-13 code; live после Deploy MSK web |
 
+## Nav simplify primary (2026-08-24)
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| UX.NAV-PRIMARY-V12 | Primary: Афиша·Город·Подборки·Блог; Места только footer; bottom nav Места→Город | Высокий | ✅ code 2026-08-24; deploy batch / по запросу |
+
 ## Nav «Места» hub (2026-08-13)
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
 | CAT.MONUMENTS-PACK | Пак памятников в каталог `/locations`: СПб 35, Мск 35, НН 16, КГД 15, Пермь 15 | Высокий | ✅ 2026-08-13 MSK DB; hub/My Day mustSee live `31776097211` BUILD_ID=`RQr1vlwv-OuvxsAMcPT3i` |
 | CONT.MYDAY-MONUMENT-THUMBS | Мини-превью памятников пакета 13.08 в My Day (не 2-3MB) | Высокий | ✅ 2026-08-14 GenerateImage x108 + lean JPEG + `MONUMENT_PACK_IMAGES`; 8 старых covers тоже lean; без live deploy |
-| UX.NAV-PLACES-HUB | Primary: Города•События•Места•Подборки•Блог; `/places` chrome как каталог площадок; entity URL без ломки | Высокий | 🔄 code (visual+301 listing); deploy batch / по запросу |
+| UX.NAV-PLACES-HUB | Primary V1.1 superseded V1.2 (`UX.NAV-PRIMARY-V12`); `/places` chrome+entity URL без ломки | Высокий | ✅ chrome/301; primary nav → V1.2 |
 | SEO.PLACES-META-301 | Meta city-aware на `/places`; 301 `/venues` `/locations` листинги; sitemap listing = `/places` | Высокий | ✅ 2026-08-13 code; live после Deploy MSK web |
 | UX.PLACES-UNIFIED-SEARCH | Один поиск на раздел Места: `/places?q=` mixed + тег Площадка/Локация; каталоги не режут q по family | Высокий | ✅ live `31693704581` / `31694312986` |
 | UX.MYDAY-UNIFIED-SEARCH | `/my-day` picker: один поиск места+события с тегом семейства; убрать trio локации/площадки/события | Высокий | ✅ live `31693704581` / `31694312986` |

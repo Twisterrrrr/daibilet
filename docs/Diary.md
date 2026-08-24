@@ -1,3 +1,17 @@
+## 2026-08-24 - Primary nav V1.2 (упрощение меню)
+
+### Наблюдения
+- Primary из 5 пунктов (Города · События · Места · Подборки · Блог) перегружал IA: `/places` полезен для SEO/рефа, но не core ticket UX.
+- Bottom nav и desktop header расходились по лейблам (Афиша vs События).
+
+### Решения
+- Primary: **Афиша · Город · Подборки · Блог**. Город → city hub при выбранном городе, иначе `/cities`.
+- Места оставлены в footer; URL `/places` жив.
+- Синхронизированы header, mobile sheet, bottom nav, desktop category chip на home.
+
+### Проблемы
+- Нет: entity/SEO `/places` не ломались.
+
 ## 2026-08-22 - Smolensk full hub pack
 
 ### Наблюдения

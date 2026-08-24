@@ -37,6 +37,7 @@ import {
   type HomeGuideChip,
   type HomeHeroSlide,
 } from '@/lib/home-guide';
+import { cityHref } from '@/lib/routes';
 import { filterSessionsByCity } from '@/lib/landing-city';
 
 const ICON_MAP: Record<HomeGuideChip['icon'], LucideIcon> = {
@@ -81,6 +82,11 @@ function chipHref(chip: HomeGuideChip, cityValue: string, citySlug?: string | nu
   }
   if (chip.href === '/my-day' || chip.href.startsWith('/my-day')) {
     return buildMyDayHref(citySlug);
+  }
+  if (chip.href === '/cities' || chip.id === 'city') {
+    const slug = String(citySlug || '').trim();
+    if (slug && slug !== 'all') return cityHref({ slug, name: slug });
+    return '/cities';
   }
   return chip.href;
 }

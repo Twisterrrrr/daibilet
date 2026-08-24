@@ -142,9 +142,9 @@ export const HOME_CATEGORY_CHIPS: HomeGuideChip[] = [
     desktopOnly: true,
   },
   {
-    id: 'places',
-    label: 'Места',
-    href: '/places',
+    id: 'city',
+    label: 'Город',
+    href: '/cities',
     icon: 'pin',
     desktopOnly: true,
   },
