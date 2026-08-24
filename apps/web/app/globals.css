@@ -1499,10 +1499,17 @@ body > div:has(iframe[src*='ticketscloud']) {
 }
 
 /* OsmMapEmbed (Leaflet): transparent divIcon + stacking below page chrome */
-[data-osm-map='leaflet'].leaflet-container {
+[data-osm-map='leaflet'].leaflet-container,
+[data-day-route-map='leaflet'].leaflet-container,
+[data-locations-catalog-map='leaflet'].leaflet-container {
   width: 100%;
+  height: 100%;
   z-index: 0;
   font: inherit;
+}
+.leaflet-container img.leaflet-tile {
+  max-width: none !important;
+  max-height: none !important;
 }
 .daibilet-osm-marker {
   background: transparent !important;

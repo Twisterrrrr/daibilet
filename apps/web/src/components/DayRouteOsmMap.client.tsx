@@ -18,6 +18,25 @@ const MAX_ZOOM = 18;
 /** Default bottom reserve for the focus card overlay (px). */
 const DEFAULT_FOCUS_OVERLAY_RESERVE_PX = 180;
 
+/** Wait until the host has a real box - L.map(0×0) leaves gray gutters after grow. */
+async function waitForMapHostSize(
+  node: HTMLElement,
+  isCancelled: () => boolean,
+): Promise<boolean> {
+  for (let i = 0; i < 90; i += 1) {
+    if (isCancelled()) return false;
+    if (node.clientWidth >= 32 && node.clientHeight >= 32) return true;
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => resolve());
+    });
+  }
+  return node.clientWidth > 0 && node.clientHeight > 0;
+}
+
+function syncLeafletSize(map: LeafletMap) {
+  map.invalidateSize({ animate: false, pan: false });
+}
+
 function panStopForFocusOverlay(
   map: LeafletMap,
   latitude: number,
@@ -94,7 +113,7 @@ export function DayRouteOsmMap({
     const map = mapRef.current;
     if (!map) return;
     const id = window.setTimeout(() => {
-      map.invalidateSize({ animate: false });
+      syncLeafletSize(map);
     }, 220);
     return () => window.clearTimeout(id);
   }, [layoutKey]);
@@ -114,6 +133,9 @@ export function DayRouteOsmMap({
     void (async () => {
       const L = await loadDaibiletLeaflet();
       if (cancelled || !node) return;
+
+      const ready = await waitForMapHostSize(node, () => cancelled);
+      if (cancelled || !ready || !node) return;
 
       const initialCenter: [number, number] = stops[0]
         ? [stops[0].latitude, stops[0].longitude]
@@ -146,7 +168,7 @@ export function DayRouteOsmMap({
           maxZoom: MAX_ZOOM,
         }).addTo(map);
         resizeObserver = new ResizeObserver(() => {
-          map?.invalidateSize({ animate: false });
+          if (mapRef.current) syncLeafletSize(mapRef.current);
         });
         resizeObserver.observe(node);
       }
@@ -189,14 +211,17 @@ export function DayRouteOsmMap({
         }).addTo(map);
       }
 
+      syncLeafletSize(map);
       if (latLngs.length === 0 && fallbackCenter) {
-        map.setView([fallbackCenter.latitude, fallbackCenter.longitude], 12);
+        map.setView([fallbackCenter.latitude, fallbackCenter.longitude], 12, { animate: false });
       } else if (latLngs.length === 1) {
-        map.setView(latLngs[0], 14);
+        map.setView(latLngs[0], 14, { animate: false });
       } else {
-        map.fitBounds(L.latLngBounds(latLngs), { padding: [36, 36], maxZoom: 15 });
+        map.fitBounds(L.latLngBounds(latLngs), { padding: [36, 36], maxZoom: 15, animate: false });
       }
-      requestAnimationFrame(() => map?.invalidateSize({ animate: false }));
+      requestAnimationFrame(() => {
+        if (mapRef.current) syncLeafletSize(mapRef.current);
+      });
     })();
 
     return () => {
@@ -212,7 +237,7 @@ export function DayRouteOsmMap({
     if (!stop) return;
 
     const id = window.setTimeout(() => {
-      map.invalidateSize({ animate: false });
+      syncLeafletSize(map);
       panStopForFocusOverlay(map, stop.latitude, stop.longitude, focusOverlayReservePx);
     }, 80);
     return () => window.clearTimeout(id);

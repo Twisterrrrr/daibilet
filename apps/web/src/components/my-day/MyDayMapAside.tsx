@@ -13,6 +13,7 @@ type MyDayMapAsideProps = {
 
 /**
  * Desktop sticky map column with Lovable collapse rail (56px when closed).
+ * Map is edge-to-edge in the column - no padding gutters for Leaflet to mis-size.
  */
 export function MyDayMapAside({
   mapOpen,
@@ -23,7 +24,7 @@ export function MyDayMapAside({
 }: MyDayMapAsideProps) {
   return (
     <div
-      className="relative h-full w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 lg:rounded-none lg:border-0 lg:border-l lg:border-slate-200"
+      className="relative h-full w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 lg:rounded-none lg:border-0 lg:border-l lg:border-slate-200"
       data-my-day-map-aside="1"
       data-day-route-map-wrap
       data-day-route-map-desktop
@@ -67,12 +68,14 @@ export function MyDayMapAside({
       ) : null}
 
       {mapOpen ? (
-        <div className="flex h-full flex-col p-3 pt-12 sm:p-4 sm:pt-12">
-          {toolbar ? <div className="mb-2 shrink-0">{toolbar}</div> : null}
-          <div className="relative min-h-0 flex-1 overflow-hidden rounded-xl bg-slate-100">
-            {children}
-          </div>
-        </div>
+        <>
+          {toolbar ? (
+            <div className="pointer-events-none absolute inset-x-3 top-14 z-[450] sm:inset-x-4">
+              <div className="pointer-events-auto">{toolbar}</div>
+            </div>
+          ) : null}
+          <div className="absolute inset-0 overflow-hidden bg-slate-100">{children}</div>
+        </>
       ) : (
         <div className="h-full w-full bg-slate-100" aria-hidden />
       )}

@@ -14,6 +14,7 @@ import {
   GripVertical,
   Landmark,
   MapPin,
+  Maximize2,
   Navigation,
   PenLine,
   PersonStanding,
@@ -2730,11 +2731,7 @@ function DayRoutePanelInner() {
     const prevCount = prevVenueCountRef.current;
     const prevHas = prevHasMapStopsRef.current;
 
-    if (showEmptyDesktopShell) {
-      myDay.setMapOpen(true);
-      myDay.closeMobileMap();
-      myDay.closeMapFull();
-    } else if (count === 0 || !hasMapStops) {
+    if (count === 0 || !hasMapStops) {
       myDay.setMapOpen(false);
       myDay.closeMobileMap();
       myDay.closeMapFull();
@@ -2748,7 +2745,6 @@ function DayRoutePanelInner() {
     prevVenueCountRef.current = count;
     prevHasMapStopsRef.current = hasMapStops;
   }, [
-    showEmptyDesktopShell,
     route.venues.length,
     hasMapStops,
     myDay.setMapOpen,
@@ -3191,7 +3187,7 @@ function DayRoutePanelInner() {
                 <DayRouteOsmMap
                   stops={[]}
                   fallbackCenter={emptyMapCenter}
-                  className="h-full min-h-[220px] w-full"
+                  className="absolute inset-0 h-full w-full"
                   layoutKey="empty-preview"
                 />
               ) : (
@@ -3467,22 +3463,18 @@ function DayRoutePanelInner() {
     <>
     <div
       className={`${
-        (!isEmptyRoute && hasMapStops) || showEmptyDesktopShell
+        !isEmptyRoute && hasMapStops
           ? 'my-day-desktop-bleed'
           : 'container-page px-4 sm:px-6 lg:px-8'
       } py-5 sm:py-10 print:hidden lg:pb-10 ${
         isEmptyRoute
-          ? showEmptyDesktopShell
-            ? 'pb-[calc(6.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0'
-            : 'pb-[calc(6.5rem+env(safe-area-inset-bottom,0px))]'
+          ? 'pb-[calc(6.5rem+env(safe-area-inset-bottom,0px))]'
           : hasMapStops
             ? 'pb-[calc(8rem+env(safe-area-inset-bottom,0px))] lg:pb-0'
             : 'pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))]'
       }`}
       data-day-mobile-list-first="1"
-      data-day-section-width={
-        (!isEmptyRoute && hasMapStops) || showEmptyDesktopShell ? 'bleed' : 'full'
-      }
+      data-day-section-width={!isEmptyRoute && hasMapStops ? 'bleed' : 'full'}
       data-day-mobile-view={mobileView}
     >
       <div ref={listRootRef} className="min-w-0" data-day-list-root>
@@ -4270,14 +4262,14 @@ function DayRoutePanelInner() {
                 onToggleOpen={myDay.toggleMapOpen}
                 onOpenFull={myDay.openMapFull}
               >
-                <div className="relative isolate h-full min-h-[20rem] w-full">
+                <div className="relative isolate h-full min-h-0 w-full">
                   <DayRouteOsmMap
                     stops={displayMapStops}
                     selectedStopId={mapSelectedStopId}
                     panToStopId={focusedStopId}
                     focusOverlayReservePx={188}
                     onStopClick={(stopId) => focusStopFromMap(stopId, { scrollList: false })}
-                    className="h-full min-h-[20rem] w-full bg-slate-100"
+                    className="absolute inset-0 h-full w-full bg-slate-100"
                   />
                   {renderMapFocusCard('desktop')}
                 </div>
@@ -4324,41 +4316,35 @@ function DayRoutePanelInner() {
                 </div>
                 {renderEmptyStarter()}
               </div>
-              <div className="mt-4 hidden lg:block" data-my-day-empty-shell>
-                <MyDayShell
-                  mapOpen={myDay.mapOpen}
-                  showMapColumn
-                  listSplitKey="daibilet.my-day.empty-list-split"
-                  listSplitDefault={34}
-                  list={
-                    <div className="flex flex-col" data-my-day-picker-host>
-                      <MyDayPickerLaunch
-                        tabs={pickerTabs}
-                        onOpen={openPicker}
-                        layout="rail"
-                        showChips={false}
-                      />
-                      <div className="mt-4">{renderEmptyStarter({ hideMap: true })}</div>
-                      {renderEmptyPickerChips()}
-                    </div>
-                  }
-                  map={
-                    <MyDayMapAside
-                      mapOpen={myDay.mapOpen}
-                      onToggleOpen={myDay.toggleMapOpen}
-                      onOpenFull={myDay.openMapFull}
-                    >
-                      <div className="relative isolate h-full min-h-[20rem] w-full">
-                        <DayRouteOsmMap
-                          stops={[]}
-                          fallbackCenter={emptyMapCenter}
-                          className="h-full min-h-[20rem] w-full bg-slate-100"
-                          layoutKey="empty-shell"
-                        />
-                      </div>
-                    </MyDayMapAside>
-                  }
-                />
+              <div
+                className="mt-4 hidden lg:grid lg:grid-cols-2 lg:items-stretch lg:gap-5"
+                data-my-day-empty-two-blocks
+              >
+                <div className="flex min-w-0 flex-col gap-4" data-my-day-picker-host>
+                  <MyDayPickerLaunch tabs={pickerTabs} onOpen={openPicker} />
+                  {renderEmptyStarter({ hideMap: true })}
+                  {renderEmptyPickerChips()}
+                </div>
+                <div
+                  className="relative min-h-[28rem] overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 lg:min-h-[min(70vh,36rem)]"
+                  data-my-day-empty-map
+                >
+                  <button
+                    type="button"
+                    onClick={myDay.openMapFull}
+                    aria-label="Открыть карту на весь экран"
+                    title="Карта на весь экран"
+                    className="absolute right-3 top-3 z-[500] grid h-9 w-9 place-items-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:bg-slate-50"
+                  >
+                    <Maximize2 className="h-4 w-4" aria-hidden />
+                  </button>
+                  <DayRouteOsmMap
+                    stops={[]}
+                    fallbackCenter={emptyMapCenter}
+                    className="absolute inset-0 h-full w-full bg-slate-100"
+                    layoutKey="empty-two-blocks"
+                  />
+                </div>
               </div>
             </>
           ) : (
