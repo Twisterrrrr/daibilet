@@ -817,10 +817,6 @@ export function PlacesHubView({
                     viewMode === 'cards'
                       ? 'bg-white text-slate-900 shadow-sm'
                       : 'text-slate-500 hover:text-slate-800'
-                  } ${
-                    viewMode === 'list'
-                      ? 'max-sm:bg-white max-sm:text-slate-900 max-sm:shadow-sm'
-                      : ''
                   }`}
                 >
                   <Grid3X3 className="h-4 w-4" strokeWidth={1.75} />
@@ -831,8 +827,10 @@ export function PlacesHubView({
                   aria-checked={viewMode === 'list'}
                   aria-label="Список"
                   onClick={() => setViewModePersisted('list')}
-                  className={`hidden h-9 w-9 place-items-center rounded-lg transition sm:grid ${
-                    viewMode === 'list' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'
+                  className={`grid h-9 w-9 place-items-center rounded-lg transition ${
+                    viewMode === 'list'
+                      ? 'bg-white text-slate-900 shadow-sm'
+                      : 'text-slate-500 hover:text-slate-800'
                   }`}
                 >
                   <List className="h-4 w-4" strokeWidth={1.75} />
@@ -846,12 +844,9 @@ export function PlacesHubView({
           ) : venues.length > 0 ? (
             <>
               {viewMode === 'list' ? (
-                <div className="hidden sm:block">
-                  <InstitutionList venues={venues} hrefFor={venueHref} />
-                </div>
-              ) : null}
-              {viewMode === 'cards' || viewMode === 'list' ? (
-                <div className={`catalog-card-grid ${viewMode === 'list' ? 'sm:hidden' : ''}`}>
+                <InstitutionList venues={venues} hrefFor={venueHref} />
+              ) : (
+                <div className="catalog-card-grid">
                   {venues.map((venue, index) =>
                     venuePageTemplate(venue.type) === 'institution' ? (
                       <InstitutionCard
@@ -874,7 +869,7 @@ export function PlacesHubView({
                     ),
                   )}
                 </div>
-              ) : null}
+              )}
               <CatalogPaginationLinks
                 page={listPage}
                 total={total}
