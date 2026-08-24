@@ -319,8 +319,8 @@ export function DayTripCanonCard({
       <div
         className={`px-3.5 py-4 sm:p-5 md:p-6 ${
           cover ? (editorial ? 'bg-zinc-50' : 'bg-slate-50') : ''
-        } ${HUB_DETAIL_SCROLL}`}
-        data-day-trip-body="scroll"
+        } ${HUB_DETAIL_BODY}`}
+        data-day-trip-body
       >
       {/*
         Title row: same content vertical as logistics box / sights.
