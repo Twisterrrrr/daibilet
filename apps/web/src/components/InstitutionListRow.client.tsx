@@ -34,12 +34,14 @@ export function InstitutionListRow({
         ) : null}
       </div>
 
-      <div className="hidden shrink-0 text-right sm:block">
-        <div className="text-xs text-slate-400">{typeLabel}</div>
+      <div className="shrink-0 text-right">
+        <div className="text-[11px] uppercase tracking-wide text-slate-400 sm:text-xs sm:normal-case sm:tracking-normal">
+          {typeLabel}
+        </div>
         {venue.eventsPending ? (
           <div className="mt-0.5 ml-auto h-4 w-16 animate-pulse rounded bg-slate-100" aria-hidden />
         ) : venue.events > 0 ? (
-          <div className="text-sm font-semibold text-slate-700">{pluralEvents(venue.events)}</div>
+          <div className="text-xs font-semibold text-slate-700 sm:text-sm">{pluralEvents(venue.events)}</div>
         ) : null}
       </div>
 
