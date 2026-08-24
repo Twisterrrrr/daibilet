@@ -197,6 +197,8 @@ export function PlacesHubView({
   const [catalogLoading, setCatalogLoading] = useState(false);
   const catalogRequestId = useRef(0);
   const cityBaseRef = useRef<{ key: string; page: VenueCatalogFeedPage } | null>(null);
+  const pagingModeRef = useRef<'replace' | 'append'>('replace');
+  const [loadingMore, setLoadingMore] = useState(false);
 
   const q = searchParams.get('q')?.trim() || '';
   const family = parseFamilyParam(searchParams.get('family'));
@@ -310,10 +312,21 @@ export function PlacesHubView({
   };
 
   const goToListPage = (page: number) => {
+    pagingModeRef.current = 'replace';
     const next = Math.max(1, page);
     setListPage(next);
     writePageToUrl(next);
     window.scrollTo(0, 0);
+  };
+
+  const loadMoreNextPage = () => {
+    if (catalogLoading || loadingMore) return;
+    const totalPages = Math.max(1, Math.ceil(total / VENUE_CATALOG_PAGE_SIZE));
+    if (listPage >= totalPages) return;
+    pagingModeRef.current = 'append';
+    const next = listPage + 1;
+    setListPage(next);
+    writePageToUrl(next);
   };
 
   const prevFiltersRef = useRef({ sort: sortMode, q, family, hasEvents });
@@ -323,6 +336,7 @@ export function PlacesHubView({
       prev.sort !== sortMode || prev.q !== q || prev.family !== family || prev.hasEvents !== hasEvents;
     prevFiltersRef.current = { sort: sortMode, q, family, hasEvents };
     if (!changed || listPage <= 1) return;
+    pagingModeRef.current = 'replace';
     setListPage(1);
     writePageToUrl(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional filter-drift reset
@@ -398,12 +412,15 @@ export function PlacesHubView({
     const controller = new AbortController();
     const requestId = ++catalogRequestId.current;
     const cachedBase = cityBaseRef.current?.key === scopeKey ? cityBaseRef.current.page : null;
+    const appendMode = pagingModeRef.current === 'append';
 
-    if (listPage === 1 && cachedBase && typeFilter === 'all') {
+    if (!appendMode && listPage === 1 && cachedBase && typeFilter === 'all') {
       setVenues(cachedBase.venues);
       setTotal(cachedBase.total);
       setStats(cachedBase.stats);
       setCatalogLoading(false);
+    } else if (appendMode) {
+      setLoadingMore(true);
     } else {
       setCatalogLoading(true);
     }
@@ -421,6 +438,17 @@ export function PlacesHubView({
         .catch(() => undefined);
     };
 
+    const applySliceVenues = (sliceVenues: VenueCatalogFeedPage['venues']) => {
+      if (appendMode) {
+        setVenues((prev) => {
+          const seen = new Set(prev.map((venue) => venue.id));
+          return [...prev, ...sliceVenues.filter((venue) => !seen.has(venue.id))];
+        });
+        return;
+      }
+      setVenues(sliceVenues);
+    };
+
     const run = async () => {
       try {
         let basePage = cachedBase;
@@ -432,7 +460,7 @@ export function PlacesHubView({
             { signal: controller.signal },
           );
           if (requestId !== catalogRequestId.current) return;
-          setVenues(slice.venues);
+          applySliceVenues(slice.venues);
           setTotal(slice.total);
           if (basePage) {
             setStats({
@@ -447,9 +475,11 @@ export function PlacesHubView({
             setStats(slice.stats);
           }
           setCatalogLoading(false);
+          setLoadingMore(false);
+          pagingModeRef.current = 'replace';
           enrichPage(slice);
 
-          if (!basePage) {
+          if (!basePage && !appendMode) {
             const shellQuery = {
               ...feedQuery,
               type: undefined,
@@ -488,6 +518,8 @@ export function PlacesHubView({
           setVenues(shellPage.venues);
           setTotal(shellPage.total);
           setCatalogLoading(false);
+          setLoadingMore(false);
+          pagingModeRef.current = 'replace';
           enrichPage(shellPage);
           return;
         }
@@ -499,7 +531,11 @@ export function PlacesHubView({
         if (requestId !== catalogRequestId.current) return;
         if (error instanceof DOMException && error.name === 'AbortError') return;
       } finally {
-        if (requestId === catalogRequestId.current) setCatalogLoading(false);
+        if (requestId === catalogRequestId.current) {
+          setCatalogLoading(false);
+          setLoadingMore(false);
+          pagingModeRef.current = 'replace';
+        }
       }
     };
 
@@ -524,6 +560,7 @@ export function PlacesHubView({
     listPage,
     initialQueryKey,
     initialPage,
+    allowShell,
   ]);
 
   const setViewModePersisted = (value: ViewMode) => {
@@ -536,6 +573,7 @@ export function PlacesHubView({
   };
 
   const setCityFilter = (next: string) => {
+    pagingModeRef.current = 'replace';
     setListPage(1);
     if (selectedCity?.setCity) {
       selectedCity.setCity(next === 'all' ? 'all' : next);
@@ -550,6 +588,7 @@ export function PlacesHubView({
   };
 
   const setTypeFilter = (next: string) => {
+    pagingModeRef.current = 'replace';
     setListPage(1);
     replaceCatalogUrl((params) => {
       // Category chip clears family / events scope (types already imply family).
@@ -563,6 +602,7 @@ export function PlacesHubView({
   };
 
   const setScope = (next: PlacesScope) => {
+    pagingModeRef.current = 'replace';
     setListPage(1);
     replaceCatalogUrl((params) => {
       params.delete('family');
@@ -577,6 +617,7 @@ export function PlacesHubView({
   };
 
   const setSortFilter = (next: VenueCatalogSort) => {
+    pagingModeRef.current = 'replace';
     setListPage(1);
     replaceCatalogUrl((params) => {
       if (next === 'events') params.delete('sort');
@@ -625,6 +666,7 @@ export function PlacesHubView({
   const filtersActiveCount = hasEvents || family !== 'all' ? 1 : 0;
 
   const resetPlacesFilters = () => {
+    pagingModeRef.current = 'replace';
     setListPage(1);
     replaceCatalogUrl((params) => {
       params.delete('family');
@@ -840,6 +882,9 @@ export function PlacesHubView({
                 searchParams={paginationParams}
                 basePath="/places"
                 onPageChange={goToListPage}
+                onLoadMore={loadMoreNextPage}
+                loadingMore={loadingMore}
+                shownCount={venues.length}
               />
             </>
           ) : (
@@ -862,4 +907,3 @@ export function PlacesHubView({
       </div>
     </>
   );
-}
