@@ -147,6 +147,7 @@ import { MOSCOW_LINE_DAY_ROUTE_PRESETS } from './moscow-line-presets';
 import { NIZHNY_NOVGOROD_LINE_DAY_ROUTE_PRESETS } from './nizhny-novgorod-line-presets';
 import { SAINT_PETERSBURG_LINE_DAY_ROUTE_PRESETS } from './saint-petersburg-line-presets';
 import { KALININGRAD_LINE_DAY_ROUTE_PRESETS } from './kaliningrad-line-presets';
+import { dayRoutePresetsWithLinesAtTail } from './day-route-preset-order';
 import { MOSCOW_SUBURBS } from './moscow-suburbs';
 import { PERM_SUBURBS } from './perm-hub';
 import { buildSaintPetersburgSuburbs } from './saint-petersburg-suburbs';
@@ -5807,6 +5808,13 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
 
 // Catalog monuments pack (SPB/MSK/NN/KGD/Perm) → hub + My Day mustSee.
 mergeMonumentMustSeeIntoCityInfo(CITY_INFO);
+
+// Painted green/red/blue… lines after editorial day scenarios (hub + /my-day chips).
+for (const entry of Object.values(CITY_INFO)) {
+  if (entry.dayRoutePresets?.length) {
+    entry.dayRoutePresets = dayRoutePresetsWithLinesAtTail(entry.dayRoutePresets);
+  }
+}
 
 function normalizeLookupKey(value?: string | null) {
   return String(value || '').trim().toLowerCase();

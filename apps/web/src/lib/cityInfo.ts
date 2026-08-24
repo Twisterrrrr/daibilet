@@ -181,6 +181,7 @@ import { NIZHNY_NOVGOROD_LINE_DAY_ROUTE_PRESETS } from './nizhny-novgorod-line-p
 import { SAINT_PETERSBURG_LINE_DAY_ROUTE_PRESETS } from './saint-petersburg-line-presets';
 import { buildSaintPetersburgSuburbs } from './saint-petersburg-suburbs';
 import { KALININGRAD_LINE_DAY_ROUTE_PRESETS } from './kaliningrad-line-presets';
+import { dayRoutePresetsWithLinesAtTail } from './day-route-preset-order';
 
 /** Ссылка на venue/location для пункта «Главные места». Без slug - заголовок не линкуем. */
 export type CityPlaceLinkFields = {
@@ -763,7 +764,6 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     ],
     significantSuburbs: buildSaintPetersburgSuburbs(VYBORG_SUBURB_CARD),
     dayRoutePresets: [
-      ...SAINT_PETERSBURG_LINE_DAY_ROUTE_PRESETS,
       {
         id: 'spb-1',
         title: 'Золотой треугольник / парадный центр',
@@ -1254,6 +1254,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           }),
         ]
       },
+      ...SAINT_PETERSBURG_LINE_DAY_ROUTE_PRESETS,
     ],
     travel:
       "Международный аэропорт Пулково принимает сотни рейсов со всей России, а из Москвы до Московского вокзала за рекордные 3,5–4 часа долетают скоростные поезда «Сапсан». Также развито автомобильное сообщение по современной платной трассе М-11 «Нева». Идеальный туристический сезон длится с конца мая по июль, когда в городе наступают знаменитые Белые ночи, открывается навигация по каналам и запускаются грандиозные фонтаны Петергофа. Вторая половина осени и зима с частыми оттепелями и балтийскими ветрами отлично подходят для бюджетного музейного туризма без очередей.",
@@ -2598,7 +2599,6 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
     ],
     significantSuburbs: MOSCOW_SUBURBS,
     dayRoutePresets: [
-      ...MOSCOW_LINE_DAY_ROUTE_PRESETS,
       {
         id: "msk-1",
         title: "Классический парадный центр",
@@ -3145,7 +3145,8 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
             address: "Берсеневская наб., 6, стр. 3",
           }
         ],
-      }
+      },
+      ...MOSCOW_LINE_DAY_ROUTE_PRESETS,
     ],
     travel: "Москва является главным транспортным узлом России, куда ведут четыре международных аэропорта (Шереметьево, Домодедово, Внуково, Жуковский), десять железнодорожных вокзалов и современные скоростные автомагистрали. Столица предлагает колоссальное количество развлечений в любое время года, но идеальными сезонами для классического туризма считаются поздняя весна (май с цветущими парками), лето и начало осени (бабье лето в сентябре). Новогодние праздники - еще один мощный пик сезона, когда центр Москвы превращается в одну из самых красивых праздничных площадок мира.",
     seasonalTip: {
@@ -3420,7 +3421,6 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       YANTARNY_SUBURB_CARD,
     ],
     dayRoutePresets: [
-      ...KALININGRAD_LINE_DAY_ROUTE_PRESETS,
       {
         id: 'kaliningrad-classic-one-day',
         title: 'Классический Калининград за 1 день',
@@ -3462,6 +3462,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
           { name: 'Смотровая площадка Янтарного комбината', desc: 'Авто к открытию', locationSlug: 'kaliningrad-yantarnyy-kombinat' },
         ]
       },
+      ...KALININGRAD_LINE_DAY_ROUTE_PRESETS,
     ],
     travel:
       'Самый быстрый путь - самолет до аэропорта Храброво: из Москвы около 2,5 часов, из Санкт-Петербурга около 2 часов. Поезд через Литву требует документов для транзита, поэтому условия стоит проверить перед покупкой. Для побережья выбирайте июнь-август, а весной и осенью закладывайте запас на ветер, дождь и изменчивую балтийскую погоду.',
@@ -3666,7 +3667,6 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       MAKARYEV_SUBURB_CARD,
     ],
     dayRoutePresets: [
-      ...NIZHNY_NOVGOROD_LINE_DAY_ROUTE_PRESETS,
       {
         id: 'nn-one-day',
         title: 'Нижний за 1 день',
@@ -3974,6 +3974,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         ]
       },
 
+      ...NIZHNY_NOVGOROD_LINE_DAY_ROUTE_PRESETS,
     ],
     travel:
       "Из Москвы в Нижний Новгород удобнее всего добираться на скоростных поездах «Ласточка» и «Сапсан», которые долетают до города всего за 3,5-4 часа. Международный аэропорт имени В. П. Чкалова принимает регулярные авиарейсы со всей России, а автопутешественники могут доехать по федеральной трассе М-7 или скоростной М-12. Идеальный туристический сезон длится с мая по сентябрь, когда город по праву подтверждает статус неофициальной «столицы закатов», а на набережных Волги и Оки кипит фестивальная жизнь. Новогодние праздники - второй пик сезона, когда старинная Большая Покровская улица превращается в сказочный светящийся коридор.",
@@ -6083,6 +6084,13 @@ applyDestinationRegistryToCityInfo(CITY_INFO);
 
 // Catalog monuments pack (SPB/MSK/NN/KGD/Perm) → hub + My Day mustSee.
 mergeMonumentMustSeeIntoCityInfo(CITY_INFO);
+
+// Painted green/red/blue… lines after editorial day scenarios (hub + /my-day chips).
+for (const entry of Object.values(CITY_INFO)) {
+  if (entry.dayRoutePresets?.length) {
+    entry.dayRoutePresets = dayRoutePresetsWithLinesAtTail(entry.dayRoutePresets);
+  }
+}
 
 function normalizeLookupKey(value?: string | null) {
   return String(value || '').trim().toLowerCase();
