@@ -18,7 +18,10 @@ import { LocationCard } from '@/components/LocationCard.client';
 import { MobileStickyActionBar } from '@/components/MobileStickyActionBar';
 import { OsmMapEmbed } from '@/components/OsmMapEmbed';
 import { VenueBreadcrumbsNav } from '@/components/VenueBreadcrumbsNav.client';
-import { VenueLogisticsBlock, hasVenueLogisticsContent } from '@/components/VenueLogisticsBlock';
+import {
+  VenueLogisticsBlock,
+  hasUsefulLocationDirections,
+} from '@/components/VenueLogisticsBlock';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { expandSessionPurchaseVariants, isSessionPurchaseBlocked } from '@/lib/event-purchase';
 import { formatMoney, formatNumber } from '@/lib/format';
@@ -88,11 +91,20 @@ export function LocationVenueLayout({
   const TypeIcon = venueTypeIcon(venue.type);
   const typeLabel = venueTypeLabel(venue.type);
   const routeCount = routeGroups.length || stats.events;
-  const { fullDescription, heroLead } = resolveLocationVenueCopy(venue);
+  const { aboutBody, heroLead } = resolveLocationVenueCopy(venue);
+  const hookFact = String(venue.hookFact || '').replace(/\s+/g, ' ').trim();
   const stopExcursionCount =
     uniqueStopEvents.length > 0 ? uniqueStopEvents.length : Number(venue.stopEventCount ?? 0);
   const hasStopExcursions = stopExcursionCount > 0;
   const hasNearbyExcursions = uniqueNearbyEvents.length > 0;
+  /** Late FAQ only for timed boards / ticketed departures - not static monuments. */
+  const showLateArrivalFaq =
+    isPier ||
+    isBus ||
+    todaySlots.length > 0 ||
+    routeGroups.length > 0 ||
+    sessions.length > 0 ||
+    Number(stats.events || 0) > 0;
 
   return (
     <div className="bg-slate-50 pb-24 lg:pb-0">
@@ -441,22 +453,23 @@ export function LocationVenueLayout({
             </section>
           ) : null}
 
-          {(venue.hookFact || fullDescription) ? (
+          {((hookFact && !isParkLike) || aboutBody) ? (
           <section className="rounded-2xl border border-slate-200 bg-white p-6">
             <h2 className="text-xl font-bold text-slate-900">О локации</h2>
-            {venue.hookFact ? (
-              <p className="mt-2 text-sm font-semibold text-emerald-800">{venue.hookFact}</p>
+            {hookFact && !isParkLike ? (
+              <p className="mt-2 text-sm font-semibold text-emerald-800">{hookFact}</p>
             ) : null}
-            {fullDescription ? (
-            <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-slate-600">{fullDescription}</p>
+            {aboutBody ? (
+            <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-slate-600">{aboutBody}</p>
             ) : null}
           </section>
           ) : null}
 
-          {hasVenueLogisticsContent(venue) ? (
+          {/* Address/metro live in sidebar Contacts; this block only for real directions. */}
+          {hasUsefulLocationDirections(venue) ? (
             <section className="rounded-2xl border border-slate-200 bg-white p-6">
               <h2 className="text-xl font-bold text-slate-900">Как добраться</h2>
-              <VenueLogisticsBlock venue={venue} showName={false} className="mt-4" />
+              <VenueLogisticsBlock venue={venue} showName={false} directionsOnly className="mt-4" />
             </section>
           ) : null}
 
@@ -520,15 +533,17 @@ export function LocationVenueLayout({
 
           {children}
 
-          <details className="group rounded-2xl border border-slate-200 bg-white">
-            <summary className="flex cursor-pointer list-none items-center justify-between p-5">
-              <span className="font-semibold text-slate-900">Что делать, если опаздываю?</span>
-              <ChevronDown className="h-4 w-4 text-slate-400 transition group-open:rotate-180" />
-            </summary>
-            <div className="px-5 pb-5 text-sm text-slate-600">
-              Позвоните организатору по номеру в билете. На причалах и точках сбора обычно ждут 5-10 минут; на автобусных сборах - по расписанию, без задержек.
-            </div>
-          </details>
+          {showLateArrivalFaq ? (
+            <details className="group rounded-2xl border border-slate-200 bg-white">
+              <summary className="flex cursor-pointer list-none items-center justify-between p-5">
+                <span className="font-semibold text-slate-900">Что делать, если опаздываю?</span>
+                <ChevronDown className="h-4 w-4 text-slate-400 transition group-open:rotate-180" />
+              </summary>
+              <div className="px-5 pb-5 text-sm text-slate-600">
+                Позвоните организатору по номеру в билете. На причалах и точках сбора обычно ждут 5-10 минут; на автобусных сборах - по расписанию, без задержек.
+              </div>
+            </details>
+          ) : null}
 
           {relatedVenues.length > 0 && isParkLike ? (
             <section className="rounded-2xl border border-slate-200 bg-white p-6">

@@ -107,6 +107,21 @@ describe('location copy is not a map pin', () => {
     });
     assert.equal(copy.fullDescription, '');
     assert.equal(copy.heroLead, '');
+    assert.equal(copy.aboutBody, '');
     assert.ok(!/точка отправления|время отправления/i.test(copy.howToFind));
+  });
+
+  it('strips hookFact prefix from about body', () => {
+    const hook =
+      'Знаменитые персонажи с чертами Василия Ливанова и Виталия Соломина у британского посольства.';
+    const copy = resolveLocationVenueCopy({
+      name: 'Холмс',
+      city: 'Москва',
+      hookFact: hook,
+      shortDescription: 'Ливанов и Соломин у британского посольства',
+      description: `${hook} Стоит на Смоленской набережной: любимая фототочка.`,
+    });
+    assert.equal(copy.aboutBody, 'Стоит на Смоленской набережной: любимая фототочка.');
+    assert.ok(copy.fullDescription.startsWith(hook));
   });
 });

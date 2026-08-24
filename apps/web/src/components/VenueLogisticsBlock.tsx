@@ -28,22 +28,69 @@ export function hasVenueLogisticsContent(venue: VenueLogisticsSource): boolean {
   );
 }
 
+/** True when wayToFind is just «Ориентир: {address}» / address echo - not real directions. */
+export function isAddressEchoWayToFind(
+  wayToFind: string | null | undefined,
+  address: string | null | undefined,
+  city?: string | null,
+): boolean {
+  const way = nonEmptyLogisticsText(wayToFind);
+  if (!way) return true;
+  const street = formatStreetAddress(address, { city });
+  if (!street) return false;
+  const normalized = way
+    .replace(/^ориентир:\s*/i, '')
+    .replace(/[.…]+$/g, '')
+    .trim()
+    .toLowerCase();
+  const streetNorm = street.trim().toLowerCase();
+  if (!normalized || !streetNorm) return false;
+  if (normalized === streetNorm) return true;
+  if (normalized === `${streetNorm}, ${(city || '').trim().toLowerCase()}`.replace(/,\s*$/, '')) {
+    return true;
+  }
+  // Short echo like «Ориентир: Смоленская набережная, д. 10.»
+  if (normalized.includes(streetNorm) && way.length <= street.length + 24) return true;
+  return false;
+}
+
+/**
+ * Location page «Как добраться»: only real tips (parking / non-echo wayToFind).
+ * Address + metro stay in sidebar Contacts.
+ */
+export function hasUsefulLocationDirections(venue: VenueLogisticsSource): boolean {
+  const parking = nonEmptyLogisticsText(venue.parkingInfo);
+  const way = nonEmptyLogisticsText(venue.wayToFind);
+  if (parking) return true;
+  if (!way) return false;
+  return !isAddressEchoWayToFind(way, venue.address, venue.city);
+}
+
 type VenueLogisticsBlockProps = {
   venue: VenueLogisticsSource;
   /** Show venue name as heading row (modal). Venue page often has name elsewhere. */
   showName?: boolean;
+  /** Skip address/metro (already in Contacts sidebar on location pages). */
+  directionsOnly?: boolean;
   className?: string;
 };
 
-export function VenueLogisticsBlock({ venue, showName = true, className }: VenueLogisticsBlockProps) {
+export function VenueLogisticsBlock({
+  venue,
+  showName = true,
+  directionsOnly = false,
+  className,
+}: VenueLogisticsBlockProps) {
   const name = nonEmptyLogisticsText(venue.name) || nonEmptyLogisticsText(venue.title);
   const streetAddress = formatStreetAddress(venue.address, { city: venue.city });
   const metro = nonEmptyLogisticsText(venue.metroStation);
-  const wayToFind = nonEmptyLogisticsText(venue.wayToFind);
+  const wayRaw = nonEmptyLogisticsText(venue.wayToFind);
+  const wayToFind =
+    wayRaw && !isAddressEchoWayToFind(wayRaw, venue.address, venue.city) ? wayRaw : null;
   const parking = nonEmptyLogisticsText(venue.parkingInfo);
 
   const rows: Array<{ icon: typeof MapPin; label: string; value: string }> = [];
-  if (streetAddress) {
+  if (!directionsOnly && streetAddress) {
     rows.push({
       icon: MapPin,
       label: 'Адрес',
@@ -51,7 +98,7 @@ export function VenueLogisticsBlock({ venue, showName = true, className }: Venue
     });
   }
   // Independent hide: metro / wayToFind / parking never render empty rows.
-  if (metro) rows.push({ icon: Train, label: 'Метро', value: metro });
+  if (!directionsOnly && metro) rows.push({ icon: Train, label: 'Метро', value: metro });
   if (wayToFind) rows.push({ icon: MapPin, label: 'Как найти', value: wayToFind });
   if (parking) rows.push({ icon: Car, label: 'Парковка', value: parking });
 

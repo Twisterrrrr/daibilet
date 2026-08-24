@@ -235,22 +235,50 @@ function isTruncatedVenueLeadText(value?: string | null): boolean {
   return /\.\.\.$/.test(String(value || '').replace(/\s+/g, ' ').trim());
 }
 
+/** Drop hookFact when description already starts with the same sentence (catalog monuments). */
+export function stripLeadingHookFact(
+  description?: string | null,
+  hookFact?: string | null,
+): string {
+  const body = String(description || '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  const hook = String(hookFact || '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (!body) return '';
+  if (!hook) return body;
+  if (body === hook) return '';
+  if (body.startsWith(hook)) {
+    return body
+      .slice(hook.length)
+      .replace(/^[\s.]+/, '')
+      .trim();
+  }
+  return body;
+}
+
 export function resolveLocationVenueCopy(venue: {
   name?: string | null;
   city?: string | null;
   description?: string | null;
   shortDescription?: string | null;
+  hookFact?: string | null;
 }) {
   const description = String(venue.description || '').replace(/\s+/g, ' ').trim();
   const shortDescription = String(venue.shortDescription || '').replace(/\s+/g, ' ').trim();
+  const hookFact = String(venue.hookFact || '').replace(/\s+/g, ' ').trim();
   const strongDescription = !isWeakVenueLeadText(description) ? description : '';
   const strongShort = !isWeakVenueLeadText(shortDescription) ? shortDescription : '';
   const fullDescription = strongDescription || strongShort;
   const heroLead =
     strongShort && !isTruncatedVenueLeadText(shortDescription) ? strongShort : fullDescription;
+  const aboutBody = stripLeadingHookFact(fullDescription, hookFact);
 
   return {
     fullDescription,
+    /** Body for «О локации» without repeating hookFact. */
+    aboutBody,
     heroLead,
     howToFind: fullDescription,
   };
