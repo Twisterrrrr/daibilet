@@ -303,20 +303,20 @@ export function formatPriceFrom(value?: number | null): string {
   return `от ${formatNumber(Math.round(value))} ₽`;
 }
 
-/** Stats / comparison: min-max when different, else «от min». Not for primary buy CTAs. */
+/** Stats / comparison: min-max when different, else exact price (no «от»). Not for primary buy CTAs. */
 export function formatMoneyRange(from?: number | null, to?: number | null): string {
   if (!from || from <= 0) return '—';
   const min = Math.round(from);
   const max = to && to > 0 ? Math.round(to) : min;
   if (max > min) return `${formatNumber(min)}-${formatNumber(max)} ₽`;
-  return `от ${formatNumber(min)} ₽`;
+  return `${formatNumber(min)} ₽`;
 }
 
 export function moneyRangeStatLabel(from?: number | null, to?: number | null): string {
   if (!from || from <= 0) return 'цена';
   const min = Math.round(from);
   const max = to && to > 0 ? Math.round(to) : min;
-  return max > min ? 'диапазон цен' : 'цена от';
+  return max > min ? 'диапазон цен' : 'цена';
 }
 
 export function formatDate(value?: string | null, timeZone = 'Europe/Moscow'): string {

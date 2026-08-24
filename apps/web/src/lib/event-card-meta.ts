@@ -366,7 +366,7 @@ export function formatShowcasePriceLabel(
       ? Math.round(priceTo)
       : min;
   if (max > min) return `${formatPriceRub(min)}-${formatPriceRub(max)} ₽`;
-  return `от ${formatPriceRub(min)} ₽`;
+  return `${formatPriceRub(min)} ₽`;
 }
 
 export function collectSessionPrices(

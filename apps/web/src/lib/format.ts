@@ -4,13 +4,13 @@ export function formatNumber(value: number): string {
   return value.toLocaleString('ru-RU');
 }
 
-/** Stats / comparison: min–max when different, else «от min». Not for primary buy CTAs. */
+/** Stats / comparison: min–max when different, else exact price (no «от»). Not for primary buy CTAs. */
 export function formatMoneyRange(from?: number | null, to?: number | null): string {
   if (!from || from < MIN_DISPLAY_PRICE_RUB) return 'Цена уточняется';
   const min = Math.round(from);
   const max = to && to >= MIN_DISPLAY_PRICE_RUB ? Math.round(to) : min;
   if (max > min) return `${formatNumber(min)}-${formatNumber(max)} ₽`;
-  return `от ${formatNumber(min)} ₽`;
+  return `${formatNumber(min)} ₽`;
 }
 
 /** Hero/stats caption for a value produced by formatMoneyRange. */
@@ -18,7 +18,7 @@ export function moneyRangeStatLabel(from?: number | null, to?: number | null): s
   if (!from || from < MIN_DISPLAY_PRICE_RUB) return 'цена';
   const min = Math.round(from);
   const max = to && to >= MIN_DISPLAY_PRICE_RUB ? Math.round(to) : min;
-  return max > min ? 'диапазон цен' : 'цена от';
+  return max > min ? 'диапазон цен' : 'цена';
 }
 
 /** Primary buy / CTA: always «от min», never min–max. Prefer formatLandingBuyPrice on landings. */
