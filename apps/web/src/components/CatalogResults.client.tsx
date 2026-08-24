@@ -9,7 +9,7 @@ import type { PublicCatalogListItemDto } from '@daibilet/contracts/public';
 import { trackCatalogBannerClick } from '@/lib/catalog-analytics';
 import { catalogItemHasLiveSignal } from '@/lib/event-card-badges';
 import { resolveEventCardFallbackImage, resolveEventCardPrimaryImage } from '@/lib/event-card-image';
-import { formatMoneyRange, formatPriceFrom } from '@/lib/format';
+import { formatMoneyRange } from '@/lib/format';
 import { formatShowcaseSessionDate, MIN_DISPLAY_PRICE_RUB } from '@/lib/event-card-meta';
 import { resolveEventCardDestinationLabel } from '@/lib/event-location';
 import { eventHref, sessionVenueHref } from '@/lib/routes';
@@ -329,7 +329,7 @@ function CatalogLiveRail({
                   </p>
                   {hasPrice ? (
                     <p className="text-[11px] font-bold text-primary-700 sm:text-xs">
-                      {formatPriceFrom(session.priceFrom)}
+                      {formatMoneyRange(session.priceFrom, session.priceTo)}
                     </p>
                   ) : null}
                 </div>

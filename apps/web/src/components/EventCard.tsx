@@ -41,7 +41,7 @@ import {
   resolveHubAfficheLocationLine,
 } from '@/lib/event-location';
 import { dayRouteItemFromEvent } from '@/lib/day-route-from-place';
-import { formatNumber } from '@/lib/format';
+import { formatMoneyRange } from '@/lib/format';
 import { formatAgeLimit } from '@/lib/event-page-utils';
 import { trackProductCardClick } from '@/lib/catalog-analytics';
 import { eventHref } from '@/lib/routes';
@@ -118,6 +118,9 @@ export function EventCard({
       ? session.priceFrom
       : null;
   const hasPrice = priceValue != null;
+  const priceTo =
+    'priceTo' in session && typeof session.priceTo === 'number' ? session.priceTo : null;
+  const priceRangeLabel = hasPrice ? formatMoneyRange(priceValue, priceTo) : null;
   const openDate = isOpenDate(session);
   const departingSoonMinutes = openDate ? null : getDepartingSoonMinutes(session.startsAt);
   const nextSessionLabel = openDate ? null : formatEventNextSession(session);
@@ -215,8 +218,8 @@ export function EventCard({
       </div>
 
       <div className={`flex flex-1 flex-col ${compact ? 'gap-2 p-3.5 sm:gap-2.5 sm:p-4' : 'gap-2.5 p-4'}`}>
-        {/* Grid: category left, age right on one row. No extra line for 16+. */}
-        {showCategory || ageLabel ? (
+        {/* Category left, duration + age right — one row, no extra duration line. */}
+        {showCategory || ageLabel || durationLabel ? (
           <div className="flex w-full items-center justify-between gap-2">
             {showCategory ? (
               <p className="min-w-0 truncate text-[10px] font-semibold uppercase tracking-[0.14em] text-graphite-muted sm:text-[11px]">
@@ -225,22 +228,18 @@ export function EventCard({
             ) : (
               <span className="min-w-0" />
             )}
-            {ageLabel ? (
-              <span
-                className="shrink-0 text-[10px] font-semibold tabular-nums text-graphite-muted sm:text-[11px]"
-                title="Возрастное ограничение"
-              >
-                {ageLabel}
-              </span>
-            ) : null}
+            <span className="inline-flex shrink-0 items-center gap-2 text-[10px] font-semibold tabular-nums text-graphite-muted sm:text-[11px]">
+              {durationLabel ? (
+                <span className="inline-flex items-center gap-1" title="Длительность">
+                  <Clock className="event-card-meta-icon" />
+                  <span>{durationLabel}</span>
+                </span>
+              ) : null}
+              {ageLabel ? (
+                <span title="Возрастное ограничение">{ageLabel}</span>
+              ) : null}
+            </span>
           </div>
-        ) : null}
-
-        {durationLabel ? (
-          <span className="event-card-meta hidden sm:inline-flex">
-            <Clock className="event-card-meta-icon" />
-            <span className="truncate">{durationLabel}</span>
-          </span>
         ) : null}
 
         <h2>
@@ -326,11 +325,9 @@ export function EventCard({
             />
           ) : (
             <>
-              {priceValue != null ? (
-                <span className="relative z-[2] inline-flex min-w-0 flex-1 items-baseline gap-1 whitespace-nowrap font-extrabold tracking-tight text-primary-700 max-sm:flex-none">
-                  <span className="text-xs font-semibold sm:text-sm">от</span>
-                  <span className="text-base sm:text-xl">{formatNumber(priceValue)}</span>
-                  <span className="text-xs font-semibold sm:text-sm">₽</span>
+              {priceRangeLabel ? (
+                <span className="relative z-[2] min-w-0 flex-1 whitespace-nowrap text-base font-extrabold tabular-nums tracking-tight text-primary-700 max-sm:flex-none sm:text-xl">
+                  {priceRangeLabel}
                 </span>
               ) : (
                 <span />
@@ -514,7 +511,9 @@ function ShowcaseEventCard({
     : resolveShowcaseLocationLine(session, cityLabel);
   const categoryLabel = cityHub ? null : session.category?.trim() || null;
   const showCityMeta = !cityHub && Boolean(categoryLabel || cityLabel);
-  const priceLabel = hasPrice ? formatShowcasePriceLabel(session.priceFrom) : null;
+  const priceLabel = hasPrice
+    ? formatShowcasePriceLabel(session.priceFrom, 'priceTo' in session ? session.priceTo : null)
+    : null;
   const coverDateBadge = formatCoverDateBadge(session);
   const imageSizes = cityHub ? IMAGE_SIZES.affichePoster : IMAGE_SIZES.eventCard;
 

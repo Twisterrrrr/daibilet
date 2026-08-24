@@ -355,9 +355,18 @@ export function hasDisplayPrice(priceFrom?: number | null): boolean {
   return typeof priceFrom === 'number' && Number.isFinite(priceFrom) && priceFrom >= MIN_DISPLAY_PRICE_RUB;
 }
 
-export function formatShowcasePriceLabel(priceFrom?: number | null): string {
+export function formatShowcasePriceLabel(
+  priceFrom?: number | null,
+  priceTo?: number | null,
+): string {
   if (!hasDisplayPrice(priceFrom)) return '';
-  return `от ${formatPriceRub(priceFrom)} ₽`;
+  const min = Math.round(priceFrom!);
+  const max =
+    typeof priceTo === 'number' && Number.isFinite(priceTo) && priceTo >= MIN_DISPLAY_PRICE_RUB
+      ? Math.round(priceTo)
+      : min;
+  if (max > min) return `${formatPriceRub(min)}-${formatPriceRub(max)} ₽`;
+  return `от ${formatPriceRub(min)} ₽`;
 }
 
 export function collectSessionPrices(

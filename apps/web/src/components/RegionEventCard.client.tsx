@@ -48,7 +48,9 @@ export function RegionEventCard({
   });
   const dateBadge = formatCoverDateBadge(session);
   const hasPrice = typeof session.priceFrom === 'number' && session.priceFrom >= MIN_DISPLAY_PRICE_RUB;
-  const priceLabel = hasPrice ? formatShowcasePriceLabel(session.priceFrom) : null;
+  const priceLabel = hasPrice
+    ? formatShowcasePriceLabel(session.priceFrom, session.priceTo)
+    : null;
   const category = String(session.category || '').trim();
   const city = String(session.city || '').trim();
   const venue = String(session.venue || '').trim();
