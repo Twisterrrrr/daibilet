@@ -211,11 +211,11 @@ export function MyDayPickerLaunch({ tabs, onOpen, className = '' }: MyDayPickerL
   const first = tabs[0]?.value ?? 'scenarios';
   return (
     <div
-      className={`rounded-2xl border border-slate-200 bg-white p-3 shadow-sm ${className}`.trim()}
+      className={`flex flex-col rounded-2xl border border-slate-200 bg-white p-3 shadow-sm ${className}`.trim()}
       data-my-day-picker-launch="1"
       aria-label="Подбор точек для дня"
     >
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+      <div className="grid grid-cols-1 items-start gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
         <div className="min-w-0">
           <p className="text-sm font-bold text-slate-900">Добавить точки в день</p>
           <p className="text-xs text-slate-500">
@@ -226,12 +226,12 @@ export function MyDayPickerLaunch({ tabs, onOpen, className = '' }: MyDayPickerL
           type="button"
           onClick={() => onOpen(first)}
           data-my-day-picker-open
-          className="inline-flex shrink-0 items-center gap-2 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-700"
+          className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-700 sm:w-auto"
         >
           Открыть подбор
         </button>
       </div>
-      <div className="mt-3 flex gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="mt-3 flex gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mt-auto sm:pt-3">
         {tabs.map((t) => {
           const Icon = t.icon;
           return (

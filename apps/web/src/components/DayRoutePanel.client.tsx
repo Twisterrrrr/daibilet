@@ -3038,8 +3038,9 @@ function DayRoutePanelInner() {
     );
   }
 
-  /** Empty: pre-city «Собери свой день»; post-city Lovable «Шаг 1 из 2» + map (leave as-is). */
-  function renderEmptyStarter() {
+  /** Empty: pre-city «Собери свой день»; post-city Lovable «Шаг 1 из 2» + map. */
+  function renderEmptyStarter(opts?: { paired?: boolean }) {
+    const paired = Boolean(opts?.paired);
     const cityLabel = scopeCityName || pageCityName || '';
     const cityInCase = cityLabel ? inCityPrepositional(cityLabel) : '';
     const firstPreset = dayRoutePresets[0] || null;
@@ -3111,11 +3112,17 @@ function DayRoutePanelInner() {
 
     return (
       <section
-        className="mt-4 grid gap-4 rounded-2xl border border-dashed border-primary-300/70 bg-primary-50/40 p-5 sm:mt-5 sm:p-7 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,300px)]"
+        className={[
+          'grid gap-4 rounded-2xl border border-dashed border-primary-300/70 bg-primary-50/40 p-5 sm:p-7',
+          paired
+            ? 'mt-0 h-full grid-cols-1 xl:content-start'
+            : 'mt-4 sm:mt-5 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,280px)] xl:mx-auto xl:max-w-5xl',
+        ].join(' ')}
         ref={unifiedSearchRef}
         data-day-unified-search
         data-day-starter="1"
         data-day-starter-variant="lovable-step"
+        data-day-starter-paired={paired ? '1' : undefined}
       >
         <div className="min-w-0">
           <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-primary-600">
@@ -3168,8 +3175,15 @@ function DayRoutePanelInner() {
           ) : null}
         </div>
 
-        <div className="relative z-0 min-w-0" data-day-empty-map-preview>
-          <div className="relative z-0 h-[220px] w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-100 isolation-isolate lg:h-[260px]">
+        <div
+          className={`relative z-0 min-w-0 ${paired ? 'max-w-md' : ''}`.trim()}
+          data-day-empty-map-preview
+        >
+          <div
+            className={`relative z-0 h-[220px] w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-100 isolation-isolate ${
+              paired ? '' : 'lg:h-[260px]'
+            }`}
+          >
             {mapCenter ? (
               <DayRouteOsmMap
                 stops={[]}
@@ -3712,7 +3726,7 @@ function DayRoutePanelInner() {
       ) : null}
 
       {hasCatalogCity && pickerTabs.length ? (
-        <div className="mt-4 lg:mt-5" data-my-day-picker-host>
+        <div className="mt-4 lg:mt-5 xl:max-w-3xl" data-my-day-picker-host>
           <MyDayPickerLaunch tabs={pickerTabs} onOpen={openPicker} />
         </div>
       ) : null}
@@ -4272,12 +4286,37 @@ function DayRoutePanelInner() {
               </div>
             </div>
           ) : null}
-          {hasCatalogCity && pickerTabs.length ? (
-            <div className="mt-4 lg:mt-5" data-my-day-picker-host>
-              <MyDayPickerLaunch tabs={pickerTabs} onOpen={openPicker} />
-            </div>
-          ) : null}
-          {isEmptyRoute ? renderEmptyStarter() : null}
+          {(() => {
+            const showEmptyDuo =
+              Boolean(hasCatalogCity && pickerTabs.length && isEmptyRoute && hasPageCity);
+            if (showEmptyDuo) {
+              return (
+                <div
+                  className="mt-4 grid gap-4 lg:mt-5 xl:grid-cols-2 xl:items-stretch xl:gap-5"
+                  data-my-day-empty-duo="1"
+                >
+                  <div className="min-w-0" data-my-day-picker-host>
+                    <MyDayPickerLaunch
+                      tabs={pickerTabs}
+                      onOpen={openPicker}
+                      className="h-full"
+                    />
+                  </div>
+                  {renderEmptyStarter({ paired: true })}
+                </div>
+              );
+            }
+            return (
+              <>
+                {hasCatalogCity && pickerTabs.length ? (
+                  <div className="mt-4 lg:mt-5 xl:max-w-3xl" data-my-day-picker-host>
+                    <MyDayPickerLaunch tabs={pickerTabs} onOpen={openPicker} />
+                  </div>
+                ) : null}
+                {isEmptyRoute ? renderEmptyStarter() : null}
+              </>
+            );
+          })()}
         </>
       )}
 
