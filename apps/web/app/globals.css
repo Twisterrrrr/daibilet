@@ -274,6 +274,81 @@ html[data-nav-pending='1'] {
     gap: 1.5rem;
   }
 
+  .blog-mobile-filters-trigger {
+    display: none;
+  }
+
+  .blog-filters-overlay {
+    display: none;
+  }
+
+  .blog-filters-mobile-header,
+  .blog-filters-mobile-footer {
+    display: none;
+  }
+
+  @media (max-width: 47.99em) {
+    .blog-mobile-filters-trigger {
+      @apply fixed bottom-[calc(1.25rem+env(safe-area-inset-bottom,0px))] left-1/2 z-[99] inline-flex -translate-x-1/2 items-center gap-2 rounded-full border-0 bg-primary px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-primary/30;
+    }
+
+    .blog-filters-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      display: none;
+      background: rgba(15, 23, 42, 0.4);
+    }
+
+    .blog-filters-overlay.is-visible {
+      display: block;
+    }
+
+    .blog-layout__nav {
+      position: fixed;
+      top: 0;
+      left: -100%;
+      z-index: 1000;
+      display: flex;
+      width: min(100vw, 24rem);
+      height: 100vh;
+      flex-direction: column;
+      overflow: hidden;
+      background: #fff;
+      padding: 1rem 1rem 0;
+      border-radius: 0 1rem 1rem 0;
+      box-shadow: 1.25rem 0 2.5rem rgba(15, 23, 42, 0.15);
+      transition: left 0.28s ease;
+    }
+
+    .blog-layout__nav.is-open {
+      left: 0;
+    }
+
+    .blog-filters-scroll {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding-bottom: 1rem;
+    }
+
+    .blog-filters-mobile-header {
+      @apply mb-5 flex items-center justify-between border-b border-slate-100 pb-4;
+      display: flex;
+    }
+
+    .blog-filters-close {
+      @apply grid h-10 w-10 place-items-center rounded-xl text-slate-500 transition hover:bg-slate-100 hover:text-slate-900;
+    }
+
+    .blog-filters-mobile-footer {
+      @apply sticky bottom-0 border-t border-slate-100 bg-white py-3;
+      display: block;
+      padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+    }
+  }
+
   @media (min-width: 48em) {
     .blog-layout {
       grid-template-columns: 15rem minmax(0, 1fr);
