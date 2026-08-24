@@ -3,15 +3,14 @@
 import { useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-import { CatalogDateRail } from '@/components/CatalogDateRail.client';
 import { PageBreadcrumbBar } from '@/components/PageBreadcrumbs';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { catalogFiltersFromQuery, type CatalogFilterValues } from '@/lib/catalog-url';
 import { cityToPrepositional } from '@/lib/city-declension';
 
 /**
- * Catalog header: breadcrumbs + H1/subtitle + date rail (desktop).
- * Mobile date select stays in CatalogToolbar / drawer flow.
+ * Catalog header: breadcrumbs + H1/subtitle.
+ * Date rail lives in catalog-main (same width as the card grid).
  */
 export function EventsCatalogHero() {
   const searchParams = useSearchParams();
@@ -82,9 +81,6 @@ export function EventsCatalogHero() {
                 </>
               )}
             </p>
-          </div>
-          <div className="catalog-date-timeline mt-4 hidden w-full md:block">
-            <CatalogDateRail className="min-w-0 w-full" />
           </div>
         </div>
       </header>

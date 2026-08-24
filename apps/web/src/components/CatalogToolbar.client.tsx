@@ -8,9 +8,13 @@ import { createPortal } from 'react-dom';
 
 import { CatalogAdvancedFiltersInline } from '@/components/CatalogAdvancedFiltersInline.client';
 import { CatalogAdvancedFiltersPanel } from '@/components/CatalogAdvancedFiltersPanel.client';
+import { CatalogDateRail } from '@/components/CatalogDateRail.client';
 import { CatalogDrawerApplyFooter } from '@/components/CatalogDrawerApplyFooter.client';
 import { CatalogPriceRange } from '@/components/CatalogPriceRange.client';
-import { CatalogSidebarLayout } from '@/components/CatalogSidebarLayout.client';
+import {
+  CatalogDesktopFiltersCollapseButton,
+  CatalogSidebarLayout,
+} from '@/components/CatalogSidebarLayout.client';
 import { CategoryTabIcon } from '@/components/CategoryTabIcon';
 import { displayCatalogLabel } from '@/lib/catalog-labels';
 import {
@@ -482,11 +486,14 @@ export function CatalogToolbar({
       <>
         <div className="catalog-sidebar-desktop-header">
           <span className="catalog-sidebar-desktop-title">Фильтры</span>
-          {sidebarActiveCount > 0 ? (
-            <button type="button" className="catalog-sidebar-clear" onClick={resetSidebarFilters}>
-              Сбросить
-            </button>
-          ) : null}
+          <div className="flex items-center gap-0.5">
+            {sidebarActiveCount > 0 ? (
+              <button type="button" className="catalog-sidebar-clear" onClick={resetSidebarFilters}>
+                Сбросить
+              </button>
+            ) : null}
+            <CatalogDesktopFiltersCollapseButton />
+          </div>
         </div>
 
         <form onSubmit={onSubmit} className="catalog-sidebar-section catalog-sidebar-search">
@@ -570,6 +577,9 @@ export function CatalogToolbar({
           )}
         >
           <div className="catalog-content">
+            <div className="catalog-date-timeline hidden w-full md:block">
+              <CatalogDateRail disabled={disabled} className="min-w-0 w-full" />
+            </div>
             <div className="w-full md:hidden">
               <MobileDateSelect
                 chips={dateRailChips}

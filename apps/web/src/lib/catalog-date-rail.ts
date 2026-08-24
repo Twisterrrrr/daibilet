@@ -6,10 +6,10 @@ export type CatalogDateRailChip =
 
 /** Tablet / narrow: keep the current week-long day strip. */
 export const CATALOG_DATE_RAIL_DAYS_TABLET = 7;
-/** Desktop: fill unused rail width (~+5 day chips vs tablet). */
-export const CATALOG_DATE_RAIL_DAYS_DESKTOP = 12;
-/** Upper bound when measuring how many day chips fit on wide screens. */
-export const CATALOG_DATE_RAIL_DAYS_DESKTOP_MAX = 14;
+/** Desktop baseline before measure fills the rail. */
+export const CATALOG_DATE_RAIL_DAYS_DESKTOP = 14;
+/** Upper bound when measuring how many day chips fit across the grid width. */
+export const CATALOG_DATE_RAIL_DAYS_DESKTOP_MAX = 45;
 
 const WEEKDAY_SHORT = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'] as const;
 

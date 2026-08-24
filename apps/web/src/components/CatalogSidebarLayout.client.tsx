@@ -1,7 +1,46 @@
 'use client';
 
-import { SlidersHorizontal, X } from 'lucide-react';
-import { useCallback, useEffect, useId, useState, type ReactNode } from 'react';
+import { ChevronLeft, ChevronRight, SlidersHorizontal, X } from 'lucide-react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useId,
+  useState,
+  type ReactNode,
+} from 'react';
+
+const FILTERS_COLLAPSED_KEY = 'daibilet.catalog.filters-collapsed';
+
+type CatalogFiltersLayoutContextValue = {
+  desktopCollapsed: boolean;
+  collapseDesktop: () => void;
+  expandDesktop: () => void;
+};
+
+const CatalogFiltersLayoutContext = createContext<CatalogFiltersLayoutContextValue | null>(null);
+
+export function useCatalogFiltersLayout() {
+  return useContext(CatalogFiltersLayoutContext);
+}
+
+/** Desktop header control: collapse sticky filters to free the grid. */
+export function CatalogDesktopFiltersCollapseButton() {
+  const layout = useCatalogFiltersLayout();
+  if (!layout) return null;
+  return (
+    <button
+      type="button"
+      className="catalog-sidebar-collapse"
+      aria-label="Свернуть фильтры"
+      title="Свернуть фильтры"
+      onClick={layout.collapseDesktop}
+    >
+      <ChevronLeft className="h-4 w-4" strokeWidth={1.75} aria-hidden />
+    </button>
+  );
+}
 
 type CatalogSidebarLayoutProps = {
   sidebar: ReactNode;
@@ -22,6 +61,7 @@ type CatalogSidebarLayoutProps = {
 
 /**
  * Two-column catalog layout (lg+ sticky sidebar) + mobile slide-in drawer.
+ * Desktop sidebar can collapse to free the full grid width.
  * Single sidebar DOM — no duplicate filter markup.
  */
 export function CatalogSidebarLayout({
@@ -35,7 +75,28 @@ export function CatalogSidebarLayout({
   footer,
 }: CatalogSidebarLayoutProps) {
   const [open, setOpen] = useState(false);
+  const [desktopCollapsed, setDesktopCollapsed] = useState(false);
   const titleId = useId();
+
+  useEffect(() => {
+    try {
+      setDesktopCollapsed(window.localStorage.getItem(FILTERS_COLLAPSED_KEY) === '1');
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  const persistCollapsed = useCallback((next: boolean) => {
+    setDesktopCollapsed(next);
+    try {
+      window.localStorage.setItem(FILTERS_COLLAPSED_KEY, next ? '1' : '0');
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  const collapseDesktop = useCallback(() => persistCollapsed(true), [persistCollapsed]);
+  const expandDesktop = useCallback(() => persistCollapsed(false), [persistCollapsed]);
 
   const closeDismiss = useCallback(() => {
     setOpen(false);
@@ -65,8 +126,14 @@ export function CatalogSidebarLayout({
     };
   }, [open, closeDismiss]);
 
+  const layoutValue: CatalogFiltersLayoutContextValue = {
+    desktopCollapsed,
+    collapseDesktop,
+    expandDesktop,
+  };
+
   return (
-    <>
+    <CatalogFiltersLayoutContext.Provider value={layoutValue}>
       <button
         type="button"
         className="catalog-mobile-filters-trigger"
@@ -84,10 +151,15 @@ export function CatalogSidebarLayout({
         onClick={closeDismiss}
       />
 
-      <div className="catalog-page-layout">
+      <div
+        className={`catalog-page-layout${desktopCollapsed ? ' is-filters-collapsed' : ''}`}
+        data-catalog-filters-collapsed={desktopCollapsed ? '1' : '0'}
+      >
         <aside
           id="catalog-filter-sidebar"
-          className={`catalog-sidebar${open ? ' is-open' : ''}`}
+          className={`catalog-sidebar${open ? ' is-open' : ''}${
+            desktopCollapsed ? ' is-desktop-collapsed' : ''
+          }`}
           aria-labelledby={titleId}
         >
           <div className="catalog-sidebar-mobile-header lg:hidden">
@@ -111,8 +183,22 @@ export function CatalogSidebarLayout({
           ) : null}
         </aside>
 
-        <div className="catalog-main min-w-0">{children}</div>
+        <div className="catalog-main min-w-0">
+          {desktopCollapsed ? (
+            <button
+              type="button"
+              className="catalog-desktop-filters-reopen"
+              onClick={expandDesktop}
+              aria-expanded={false}
+            >
+              <SlidersHorizontal className="h-4 w-4" strokeWidth={1.75} aria-hidden />
+              {activeCount > 0 ? `${title} (${activeCount})` : title}
+              <ChevronRight className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden />
+            </button>
+          ) : null}
+          {children}
+        </div>
       </div>
-    </>
+    </CatalogFiltersLayoutContext.Provider>
   );
 }

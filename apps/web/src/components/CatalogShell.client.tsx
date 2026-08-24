@@ -11,7 +11,7 @@ import { CatalogToolbar } from '@/components/CatalogToolbar.client';
 import { EventsCityGate } from '@/components/EventsCityGate.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import type { PublicCatalogDto, PublicCatalogListItemDto } from '@daibilet/contracts/public';
-import { CATALOG_PAGE_SIZE_DEFAULT } from '@daibilet/contracts/catalog';
+import { CATALOG_PAGE_SIZE_DEFAULT, CATALOG_PAGE_SIZES, isCatalogPageSize, type CatalogPageSize } from '@daibilet/contracts/catalog';
 import {
   buildCatalogHref,
   CATALOG_SORT_OPTIONS,
@@ -144,7 +144,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
       from: query.from,
       to: query.to,
       sort: query.sort,
-      limit: query.limit as 50 | 100 | undefined,
+      limit: query.limit != null && isCatalogPageSize(query.limit) ? query.limit : undefined,
       minPrice: query.minPrice,
       maxPrice: query.maxPrice ?? query.priceMax,
       ageMax: query.ageMax,
@@ -404,6 +404,41 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
         </p>
 
         <div className="ml-auto flex flex-wrap items-center gap-2">
+          <div
+            role="radiogroup"
+            aria-label="Событий на странице"
+            className="hidden items-center gap-0.5 rounded-lg bg-slate-100 p-0.5 sm:inline-flex"
+          >
+            {CATALOG_PAGE_SIZES.map((size) => {
+              const active = (filterValues.limit || CATALOG_PAGE_SIZE_DEFAULT) === size;
+              return (
+                <button
+                  key={size}
+                  type="button"
+                  role="radio"
+                  aria-checked={active}
+                  disabled={(loading && !catalog) || cityBootstrapPending}
+                  onClick={() => {
+                    if (active) return;
+                    router.push(
+                      buildCatalogHref({
+                        ...filterValues,
+                        limit: size as CatalogPageSize,
+                        page: undefined,
+                      }),
+                    );
+                  }}
+                  className={`inline-btn h-7 min-w-[2.5rem] rounded-md px-2 text-xs font-semibold tabular-nums transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 disabled:opacity-60 ${
+                    active
+                      ? 'bg-white text-slate-900 shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  {size}
+                </button>
+              );
+            })}
+          </div>
           <div
             role="radiogroup"
             aria-label="Сортировка"

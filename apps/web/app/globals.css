@@ -696,6 +696,15 @@ html[data-nav-pending='1'] {
       gap: 2rem;
       align-items: start;
     }
+
+    .catalog-page-layout.is-filters-collapsed {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0;
+    }
+
+    .catalog-sidebar.is-desktop-collapsed {
+      display: none;
+    }
   }
 
   @media (min-width: 1280px) {
@@ -703,12 +712,22 @@ html[data-nav-pending='1'] {
       grid-template-columns: 22.5rem minmax(0, 1fr);
       gap: 2.5rem;
     }
+
+    .catalog-page-layout.is-filters-collapsed {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0;
+    }
   }
 
   @media (min-width: 1536px) {
     .catalog-page-layout {
       grid-template-columns: 24rem minmax(0, 1fr);
       gap: 3rem;
+    }
+
+    .catalog-page-layout.is-filters-collapsed {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0;
     }
   }
 
@@ -1004,6 +1023,14 @@ html[data-nav-pending='1'] {
 
   .catalog-sidebar-clear {
     @apply rounded-md px-2 py-1 text-sm font-medium text-slate-500 transition hover:bg-red-50 hover:text-red-600;
+  }
+
+  .catalog-sidebar-collapse {
+    @apply grid h-8 w-8 place-items-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-800;
+  }
+
+  .catalog-desktop-filters-reopen {
+    @apply mb-3 hidden items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 lg:inline-flex;
   }
 
   /** Date rail in main column — full width, left-aligned with card grid */

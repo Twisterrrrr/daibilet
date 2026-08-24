@@ -13,6 +13,7 @@ import {
   toLocalIsoDay,
   type CatalogDateRailChip,
 } from '@/lib/catalog-date-rail';
+import { isCatalogPageSize } from '@daibilet/contracts/catalog';
 import {
   buildCatalogHref,
   catalogFiltersFromQuery,
@@ -61,7 +62,7 @@ export function CatalogDateRail({ disabled = false, className = '' }: CatalogDat
       from: searchParams.get('from') || undefined,
       to: searchParams.get('to') || undefined,
       sort: (searchParams.get('sort') as CatalogFilterValues['sort']) || undefined,
-      limit: limitNum === 50 || limitNum === 100 ? limitNum : undefined,
+      limit: limitNum != null && isCatalogPageSize(limitNum) ? limitNum : undefined,
       minPrice: Number.isFinite(minPrice) ? minPrice : undefined,
       maxPrice: Number.isFinite(maxPrice) ? maxPrice : undefined,
       ageMax: Number.isFinite(ageMax) ? ageMax : undefined,

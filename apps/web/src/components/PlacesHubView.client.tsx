@@ -6,7 +6,10 @@ import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { Grid3X3, List } from 'lucide-react';
 
 import { CatalogPaginationLinks } from '@/components/CatalogPaginationLinks';
-import { CatalogSidebarLayout } from '@/components/CatalogSidebarLayout.client';
+import {
+  CatalogDesktopFiltersCollapseButton,
+  CatalogSidebarLayout,
+} from '@/components/CatalogSidebarLayout.client';
 import { InstitutionCard } from '@/components/InstitutionCard.client';
 import { InstitutionList } from '@/components/InstitutionListRow.client';
 import { LocationCard } from '@/components/LocationCard.client';
@@ -682,11 +685,14 @@ export function PlacesHubView({
     <>
       <div className="catalog-sidebar-desktop-header">
         <span className="catalog-sidebar-desktop-title">Фильтры</span>
-        {filtersActiveCount > 0 || q || typeFilter !== 'all' ? (
-          <button type="button" className="catalog-sidebar-clear" onClick={resetPlacesFilters}>
-            Сбросить
-          </button>
-        ) : null}
+        <div className="flex items-center gap-0.5">
+          {filtersActiveCount > 0 || q || typeFilter !== 'all' ? (
+            <button type="button" className="catalog-sidebar-clear" onClick={resetPlacesFilters}>
+              Сбросить
+            </button>
+          ) : null}
+          <CatalogDesktopFiltersCollapseButton />
+        </div>
       </div>
 
       <div className="catalog-sidebar-section">
