@@ -19,7 +19,7 @@ import { EventCard } from '@/components/EventCard';
 import { LandingDirectionCard } from '@/components/LandingDirectionCard.client';
 import { PageBreadcrumbBar } from '@/components/PageBreadcrumbs';
 import { RegionNearbyStrip } from '@/components/RegionNearbyStrip.client';
-import { IMAGE_SIZES, CardSafeImage, SafeImage } from '@/components/SafeImage.client';
+import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import { useDayRouteState } from '@/hooks/useDayRouteState';
 import { CityDayPresetBlock } from '@/components/CityDayPresetBlock.client';
@@ -1500,9 +1500,15 @@ function CitySightsMustSeeList({
     if (dir > 0) setCanPrev(true);
     if (dir < 0) setCanNext(true);
 
+    const card = el.querySelector<HTMLElement>('[data-city-must-see-card]');
+    const gap = Number.parseFloat(getComputedStyle(el).columnGap || getComputedStyle(el).gap || '0') || 0;
+    const step = card
+      ? Math.max(160, Math.round(card.getBoundingClientRect().width + gap))
+      : Math.max(240, Math.round(clientWidth * 0.82));
+
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     el.scrollBy({
-      left: dir * el.clientWidth,
+      left: dir * step,
       behavior: reduceMotion ? 'auto' : 'smooth',
     });
     requestAnimationFrame(() => {
@@ -1570,8 +1576,8 @@ function CitySightsMustSeeList({
         tabIndex={0}
         trackClassName={
           sparseGrid
-            ? 'horizontal-snap-row flex flex-nowrap gap-2.5 snap-x snap-mandatory py-1 md:block md:overflow-visible md:py-1'
-            : 'horizontal-snap-row flex flex-nowrap gap-2.5 snap-x snap-mandatory py-1 md:gap-6 md:[scrollbar-width:none] md:[-ms-overflow-style:none] md:[&::-webkit-scrollbar]:hidden'
+            ? 'horizontal-snap-row flex flex-nowrap gap-2.5 snap-x snap-mandatory scroll-px-1 py-1 pe-3 md:block md:overflow-visible md:py-1 md:pe-0'
+            : 'horizontal-snap-row flex flex-nowrap gap-2.5 snap-x snap-mandatory scroll-px-1 py-1 pe-4 md:gap-6 md:pe-6 md:[scrollbar-width:none] md:[-ms-overflow-style:none] md:[&::-webkit-scrollbar]:hidden'
         }
         trackProps={{
           'data-city-must-see-rail': '',
@@ -1626,8 +1632,8 @@ function CitySightsMustSeeList({
               key={`${place.name}:${index}`}
               className={
                 sparseGrid
-                  ? 'flex min-w-0 shrink-0 snap-start items-stretch pr-1 [flex:0_0_80%] md:w-auto md:min-w-0 md:max-w-none md:pr-0 md:[flex:none]'
-                  : 'flex min-w-0 shrink-0 snap-start items-stretch pr-1 [flex:0_0_80%] md:pr-0 md:[flex:0_0_min(22rem,calc(50vw-3rem))]'
+                  ? 'flex min-w-0 shrink-0 snap-start items-stretch [flex:0_0_min(85%,22rem)] md:w-auto md:min-w-0 md:max-w-none md:[flex:none]'
+                  : 'flex min-w-0 shrink-0 snap-start items-stretch [flex:0_0_min(85%,22rem)] md:[flex:0_0_min(22rem,calc((100%-3rem)/2.35))]'
               }
               data-city-must-see-card
             >
@@ -1639,11 +1645,12 @@ function CitySightsMustSeeList({
                 }`}
               >
                 <div className="relative aspect-[16/10] shrink-0 overflow-hidden bg-slate-100">
-                  <CardSafeImage
+                  {/* Hub must-see: editorial original, not -card/-thumb (those are 640px Q68 and look soft on retina). */}
+                  <SafeImage
                     src={coverSrc}
                     alt=""
                     fill
-                    sizes={IMAGE_SIZES.placeCard}
+                    sizes="(max-width: 768px) 85vw, 22rem"
                     className="object-cover"
                     fallback={
                       <div
