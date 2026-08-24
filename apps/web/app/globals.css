@@ -357,34 +357,70 @@ html[data-nav-pending='1'] {
   }
 
   .blog-bento {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .blog-bento-group {
     display: grid;
     grid-template-columns: 1fr;
     gap: 1.25rem;
   }
 
+  .blog-bento__break {
+    margin-top: 1.25rem;
+  }
+
   @media (min-width: 640px) {
-    .blog-bento {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+    .blog-bento,
+    .blog-bento-group {
       gap: 1.25rem;
     }
 
-    .blog-bento__featured {
-      grid-column: span 2;
+    .blog-bento-group {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .blog-bento__wide {
+      grid-column: 1 / -1;
+    }
+
+    /* 2+1 on tablet: two smalls, then a full-width banner. */
+    .blog-bento-group--rtl .blog-bento__wide {
+      order: 3;
     }
   }
 
   @media (min-width: 1280px) {
-    .blog-bento {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+    .blog-bento,
+    .blog-bento-group,
+    .blog-bento__break {
       gap: 1.5rem;
     }
 
-    .blog-bento__featured {
-      grid-column: span 2;
-      grid-row: span 2;
+    .blog-bento__break {
+      margin-top: 1.5rem;
     }
 
-    .blog-bento__featured > * {
+    .blog-bento-group {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-auto-rows: minmax(14rem, auto);
+    }
+
+    .blog-bento__wide {
+      grid-column: 1 / 3;
+      grid-row: 1 / 3;
+      order: 0;
+    }
+
+    .blog-bento-group--rtl .blog-bento__wide {
+      grid-column: 2 / 4;
+      grid-row: 1 / 3;
+      order: 0;
+    }
+
+    .blog-bento__wide > * {
       height: 100%;
       min-height: 100%;
     }
@@ -397,7 +433,7 @@ html[data-nav-pending='1'] {
   }
 
   @media (hover: hover) {
-    .blog-bento > div:hover > * {
+    .blog-bento-group > div:hover > * {
       transform: translateY(-6px);
     }
   }
@@ -681,7 +717,7 @@ html[data-nav-pending='1'] {
   }
 
   .catalog-sidebar-mobile-footer {
-    @apply sticky bottom-0 z-[1] -mx-4 mt-auto shrink-0 border-t border-slate-100 bg-white p-4 shadow-[0_-10px_20px_rgba(0,0,0,0.05)];
+    @apply mt-auto -mx-4 shrink-0 border-t border-slate-100 bg-white p-4 shadow-[0_-10px_20px_rgba(0,0,0,0.05)];
     padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
   }
 

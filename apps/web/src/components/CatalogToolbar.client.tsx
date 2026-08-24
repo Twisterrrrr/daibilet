@@ -543,15 +543,6 @@ export function CatalogToolbar({
           />
         </div>
 
-        <div className="catalog-sidebar-section pb-2 lg:hidden">
-          <FiltersButton
-            open={filtersOpen}
-            count={countAdvancedFilters(effectiveFilters)}
-            disabled={disabled}
-            onClick={() => setFiltersOpen(true)}
-            className="w-full justify-center"
-          />
-        </div>
       </>
     );
 
