@@ -3115,7 +3115,7 @@ function DayRoutePanelInner() {
         className={[
           'grid gap-4 rounded-2xl border border-dashed border-primary-300/70 bg-primary-50/40 p-5 sm:p-7',
           paired
-            ? 'mt-0 h-full grid-cols-1 xl:content-start'
+            ? 'mt-0 grid-cols-1 xl:grid-cols-[minmax(0,1fr)_minmax(16rem,40%)] xl:items-stretch'
             : 'mt-4 sm:mt-5 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,280px)] xl:mx-auto xl:max-w-5xl',
         ].join(' ')}
         ref={unifiedSearchRef}
@@ -3175,13 +3175,10 @@ function DayRoutePanelInner() {
           ) : null}
         </div>
 
-        <div
-          className={`relative z-0 min-w-0 ${paired ? 'max-w-md' : ''}`.trim()}
-          data-day-empty-map-preview
-        >
+        <div className="relative z-0 min-w-0 xl:flex xl:h-full xl:flex-col" data-day-empty-map-preview>
           <div
             className={`relative z-0 h-[220px] w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-100 isolation-isolate ${
-              paired ? '' : 'lg:h-[260px]'
+              paired ? 'xl:min-h-[260px] xl:flex-1' : 'lg:h-[260px]'
             }`}
           >
             {mapCenter ? (
@@ -4292,15 +4289,11 @@ function DayRoutePanelInner() {
             if (showEmptyDuo) {
               return (
                 <div
-                  className="mt-4 grid gap-4 lg:mt-5 xl:grid-cols-2 xl:items-stretch xl:gap-5"
+                  className="mt-4 grid gap-4 lg:mt-5 xl:grid-cols-[minmax(18rem,26rem)_minmax(0,1fr)] xl:items-start xl:gap-5"
                   data-my-day-empty-duo="1"
                 >
                   <div className="min-w-0" data-my-day-picker-host>
-                    <MyDayPickerLaunch
-                      tabs={pickerTabs}
-                      onOpen={openPicker}
-                      className="h-full"
-                    />
+                    <MyDayPickerLaunch tabs={pickerTabs} onOpen={openPicker} />
                   </div>
                   {renderEmptyStarter({ paired: true })}
                 </div>

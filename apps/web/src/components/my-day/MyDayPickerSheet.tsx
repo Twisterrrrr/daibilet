@@ -231,7 +231,7 @@ export function MyDayPickerLaunch({ tabs, onOpen, className = '' }: MyDayPickerL
           Открыть подбор
         </button>
       </div>
-      <div className="mt-3 flex gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mt-auto sm:pt-3">
+      <div className="mt-3 flex flex-wrap gap-2">
         {tabs.map((t) => {
           const Icon = t.icon;
           return (
