@@ -2,6 +2,7 @@
 
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import {
@@ -26,10 +27,8 @@ type CatalogDateRailProps = {
 const DESKTOP_DATE_RAIL_MQ = '(min-width: 1024px)';
 
 /**
- * Horizontal date presets + upcoming days + corner calendar (range).
- * Owned by EventsCatalogHero (not CatalogToolbar) so search stays one row below.
- *
- * Tablet / <lg: 7 day chips (as before). Desktop: fill unused width up to MAX.
+ * Horizontal date presets + upcoming days + calendar as the last in-flow chip.
+ * Calendar opens a centered modal (not a right-pinned popover).
  */
 export function CatalogDateRail({ disabled = false, className = '' }: CatalogDateRailProps) {
   const router = useRouter();
@@ -99,11 +98,14 @@ export function CatalogDateRail({ disabled = false, className = '' }: CatalogDat
 
       const gap = 6; // gap-1.5
       const kids = Array.from(measure.children) as HTMLElement[];
-      let used = 0;
+      // Last child is the calendar chip - always reserve it.
+      const calendarEl = kids[kids.length - 1];
+      const calendarW = calendarEl?.offsetWidth ?? 36;
+      let used = calendarW;
       let dayCount = 0;
-      for (let i = 0; i < kids.length; i += 1) {
+      for (let i = 0; i < kids.length - 1; i += 1) {
         const w = kids[i]!.offsetWidth;
-        const next = used === 0 ? w : used + gap + w;
+        const next = used + gap + w;
         if (next > available + 0.5) break;
         used = next;
         if (measurePool[i]?.kind === 'day') dayCount += 1;
@@ -139,10 +141,13 @@ export function CatalogDateRail({ disabled = false, className = '' }: CatalogDat
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') setPickerOpen(false);
     };
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
     document.addEventListener('mousedown', onPointerDown);
     document.addEventListener('touchstart', onPointerDown);
     document.addEventListener('keydown', onKeyDown);
     return () => {
+      document.body.style.overflow = prevOverflow;
       document.removeEventListener('mousedown', onPointerDown);
       document.removeEventListener('touchstart', onPointerDown);
       document.removeEventListener('keydown', onKeyDown);
@@ -232,13 +237,107 @@ export function CatalogDateRail({ disabled = false, className = '' }: CatalogDat
       <span className="whitespace-nowrap">{chip.shortLabel}</span>
     );
 
+  const calendarButton = (
+    <button
+      type="button"
+      disabled={disabled}
+      aria-label="Выбрать даты в календаре"
+      aria-expanded={pickerOpen}
+      aria-haspopup="dialog"
+      aria-pressed={calendarOffRail || pickerOpen}
+      onClick={() => setPickerOpen((open) => !open)}
+      className={`catalog-date-chip inline-flex h-9 w-9 shrink-0 items-center justify-center px-0 py-0 disabled:opacity-60 ${
+        calendarOffRail || pickerOpen ? 'catalog-date-chip-on' : 'catalog-date-chip-idle'
+      }`}
+    >
+      <CalendarIcon className="h-4 w-4" strokeWidth={1.75} aria-hidden />
+    </button>
+  );
+
+  const modal =
+    pickerOpen && typeof document !== 'undefined'
+      ? createPortal(
+          <div
+            className="fixed inset-0 z-[80] flex items-end justify-center bg-slate-900/40 p-4 sm:items-center"
+            role="presentation"
+            data-catalog-date-modal
+          >
+            <div
+              ref={pickerRef}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Период дат"
+              className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-4 shadow-xl sm:p-5"
+            >
+              <p className="text-sm font-semibold text-slate-900">Выбор дат</p>
+              <p className="mt-0.5 text-xs text-slate-500">Укажите день или период</p>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <label className="block min-w-0">
+                  <span className="mb-1 block text-[11px] font-medium text-graphite-muted">Начало</span>
+                  <input
+                    ref={fromInputRef}
+                    type="date"
+                    value={draftFrom}
+                    min={minDay}
+                    aria-label="Дата начала"
+                    onChange={(event) => {
+                      const next = event.target.value;
+                      setDraftFrom(next);
+                      if (draftTo && next && draftTo < next) setDraftTo(next);
+                    }}
+                    className="h-10 w-full rounded-xl border border-transparent bg-[#F5F5F7] px-2.5 text-sm text-graphite outline-none focus:border-primary focus-visible:ring-2 focus-visible:ring-primary/30"
+                  />
+                </label>
+                <label className="block min-w-0">
+                  <span className="mb-1 block text-[11px] font-medium text-graphite-muted">Конец</span>
+                  <input
+                    type="date"
+                    value={draftTo}
+                    min={draftFrom || minDay}
+                    aria-label="Дата конца"
+                    onChange={(event) => setDraftTo(event.target.value)}
+                    className="h-10 w-full rounded-xl border border-transparent bg-[#F5F5F7] px-2.5 text-sm text-graphite outline-none focus:border-primary focus-visible:ring-2 focus-visible:ring-primary/30"
+                  />
+                </label>
+              </div>
+              <div className="mt-3 flex items-center justify-between gap-2">
+                <button
+                  type="button"
+                  onClick={clearRange}
+                  className="text-xs font-medium text-graphite-muted hover:text-graphite hover:underline"
+                >
+                  Сбросить
+                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setPickerOpen(false)}
+                    className="inline-btn h-8 rounded-lg border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                  >
+                    Отмена
+                  </button>
+                  <button
+                    type="button"
+                    onClick={applyRange}
+                    className="inline-btn h-8 rounded-lg bg-primary-600 px-3 text-xs font-semibold text-white hover:bg-primary-700"
+                  >
+                    Применить
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )
+      : null;
+
   return (
-    <div className={`flex min-w-0 items-center gap-2 ${className}`}>
+    <div className={`relative min-w-0 ${className}`}>
       <div
         ref={railRef}
         role="group"
         aria-label="Дата"
-        className="horizontal-snap-row flex min-w-0 flex-1 flex-nowrap items-center gap-1.5 overflow-x-auto pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:overflow-x-hidden"
+        className="horizontal-snap-row flex min-w-0 w-full flex-nowrap items-center gap-1.5 overflow-x-auto pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:overflow-x-hidden"
       >
         {chips.map((chip) => {
           const active = isDateRailChipActive(chip, filters);
@@ -258,9 +357,10 @@ export function CatalogDateRail({ disabled = false, className = '' }: CatalogDat
             </button>
           );
         })}
+        {calendarButton}
       </div>
 
-      {/* Off-screen measure row: full desktop pool so we can count how many day chips fit. */}
+      {/* Off-screen measure: full day pool + trailing calendar chip. */}
       <div
         ref={measureRef}
         aria-hidden
@@ -274,78 +374,12 @@ export function CatalogDateRail({ disabled = false, className = '' }: CatalogDat
             </span>
           );
         })}
-      </div>
-
-      <div ref={pickerRef} className="relative shrink-0 self-center">
-        <button
-          type="button"
-          disabled={disabled}
-          aria-label="Выбрать даты в календаре"
-          aria-expanded={pickerOpen}
-          aria-haspopup="dialog"
-          aria-pressed={calendarOffRail || pickerOpen}
-          onClick={() => setPickerOpen((open) => !open)}
-          className={`catalog-date-chip inline-flex h-9 w-9 shrink-0 items-center justify-center px-0 py-0 disabled:opacity-60 ${
-            calendarOffRail || pickerOpen ? 'catalog-date-chip-on' : 'catalog-date-chip-idle'
-          }`}
-        >
+        <span className="catalog-date-chip catalog-date-chip-idle inline-flex h-9 w-9 shrink-0 items-center justify-center px-0 py-0">
           <CalendarIcon className="h-4 w-4" strokeWidth={1.75} aria-hidden />
-        </button>
-
-        {pickerOpen ? (
-          <div
-            role="dialog"
-            aria-label="Период дат"
-            className="absolute right-0 top-[calc(100%+0.4rem)] z-40 w-[min(18.5rem,calc(100vw-2rem))] rounded-2xl border border-slate-200/80 bg-white p-3 shadow-lg"
-          >
-            <div className="grid grid-cols-2 gap-2">
-              <label className="block min-w-0">
-                <span className="mb-1 block text-[11px] font-medium text-graphite-muted">Начало</span>
-                <input
-                  ref={fromInputRef}
-                  type="date"
-                  value={draftFrom}
-                  min={minDay}
-                  aria-label="Дата начала"
-                  onChange={(event) => {
-                    const next = event.target.value;
-                    setDraftFrom(next);
-                    if (draftTo && next && draftTo < next) setDraftTo(next);
-                  }}
-                  className="h-10 w-full rounded-xl border border-transparent bg-[#F5F5F7] px-2.5 text-sm text-graphite outline-none focus:border-primary focus-visible:ring-2 focus-visible:ring-primary/30"
-                />
-              </label>
-              <label className="block min-w-0">
-                <span className="mb-1 block text-[11px] font-medium text-graphite-muted">Конец</span>
-                <input
-                  type="date"
-                  value={draftTo}
-                  min={draftFrom || minDay}
-                  aria-label="Дата конца"
-                  onChange={(event) => setDraftTo(event.target.value)}
-                  className="h-10 w-full rounded-xl border border-transparent bg-[#F5F5F7] px-2.5 text-sm text-graphite outline-none focus:border-primary focus-visible:ring-2 focus-visible:ring-primary/30"
-                />
-              </label>
-            </div>
-            <div className="mt-2.5 flex items-center justify-between gap-2">
-              <button
-                type="button"
-                onClick={clearRange}
-                className="text-xs font-medium text-graphite-muted hover:text-graphite hover:underline"
-              >
-                Сбросить
-              </button>
-              <button
-                type="button"
-                onClick={applyRange}
-                className="inline-btn h-8 rounded-lg bg-primary-600 px-3 text-xs font-semibold text-white hover:bg-primary-700"
-              >
-                Применить
-              </button>
-            </div>
-          </div>
-        ) : null}
+        </span>
       </div>
+
+      {modal}
     </div>
   );
 }

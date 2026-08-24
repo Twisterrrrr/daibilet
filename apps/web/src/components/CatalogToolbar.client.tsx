@@ -415,7 +415,7 @@ export function CatalogToolbar({
           aria-controls={showSearchHints ? 'catalog-search-hints-sidebar' : undefined}
           disabled={disabled}
           autoComplete="off"
-          className="inline-btn h-11 w-full rounded-xl border-0 bg-transparent pl-10 pr-9 text-sm text-graphite outline-none transition placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-primary/30 disabled:opacity-60"
+          className="inline-btn h-11 w-full rounded-xl border-0 bg-transparent pl-10 pr-9 text-sm text-graphite outline-none transition placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-primary/30 disabled:opacity-60 search-input--custom-clear"
         />
         {effectiveQDraft ? (
           <button
@@ -623,7 +623,7 @@ export function CatalogToolbar({
                   aria-controls={showSearchHints ? 'catalog-search-hints' : undefined}
                   disabled={disabled}
                   autoComplete="off"
-                  className="inline-btn h-11 w-full rounded-xl border-0 bg-transparent pl-10 pr-9 text-sm text-graphite outline-none transition placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-primary/30 disabled:opacity-60 md:h-10 md:pl-11"
+                  className="inline-btn h-11 w-full rounded-xl border-0 bg-transparent pl-10 pr-9 text-sm text-graphite outline-none transition placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-primary/30 disabled:opacity-60 md:h-10 md:pl-11 search-input--custom-clear"
                 />
                 {qDraft ? (
                   <button

@@ -204,18 +204,36 @@ type MyDayPickerLaunchProps = {
   tabs: MyDayPickerTab[];
   onOpen: (section: MyDayPickerSection) => void;
   className?: string;
+  /** Hide chip row when parent places chips elsewhere (e.g. empty shell sidebar). */
+  showChips?: boolean;
+  /** Stack title + CTA for narrow sidebar rails. */
+  layout?: 'bar' | 'rail';
 };
 
 /** Compact bar: chips open the drawer without stacking catalogs on the page. */
-export function MyDayPickerLaunch({ tabs, onOpen, className = '' }: MyDayPickerLaunchProps) {
+export function MyDayPickerLaunch({
+  tabs,
+  onOpen,
+  className = '',
+  showChips = true,
+  layout = 'bar',
+}: MyDayPickerLaunchProps) {
   const first = tabs[0]?.value ?? 'scenarios';
+  const rail = layout === 'rail';
   return (
     <div
       className={`flex flex-col rounded-2xl border border-slate-200 bg-white p-3 shadow-sm ${className}`.trim()}
       data-my-day-picker-launch="1"
+      data-my-day-picker-layout={layout}
       aria-label="Подбор точек для дня"
     >
-      <div className="grid grid-cols-1 items-start gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+      <div
+        className={
+          rail
+            ? 'grid grid-cols-1 gap-3'
+            : 'grid grid-cols-1 items-start gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center'
+        }
+      >
         <div className="min-w-0">
           <p className="text-sm font-bold text-slate-900">Добавить точки в день</p>
           <p className="text-xs text-slate-500">
@@ -226,27 +244,31 @@ export function MyDayPickerLaunch({ tabs, onOpen, className = '' }: MyDayPickerL
           type="button"
           onClick={() => onOpen(first)}
           data-my-day-picker-open
-          className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-700 sm:w-auto"
+          className={`inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-700 ${
+            rail ? 'w-full' : 'w-full sm:w-auto'
+          }`}
         >
           Открыть подбор
         </button>
       </div>
-      <div className="mt-3 flex flex-wrap gap-2">
-        {tabs.map((t) => {
-          const Icon = t.icon;
-          return (
-            <button
-              key={t.value}
-              type="button"
-              onClick={() => onOpen(t.value)}
-              className="inline-flex shrink-0 items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50"
-            >
-              <Icon className="h-3.5 w-3.5" aria-hidden />
-              {t.label}
-            </button>
-          );
-        })}
-      </div>
+      {showChips ? (
+        <div className="mt-3 flex flex-wrap gap-2">
+          {tabs.map((t) => {
+            const Icon = t.icon;
+            return (
+              <button
+                key={t.value}
+                type="button"
+                onClick={() => onOpen(t.value)}
+                className="inline-flex shrink-0 items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50"
+              >
+                <Icon className="h-3.5 w-3.5" aria-hidden />
+                {t.label}
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
     </div>
   );
 }

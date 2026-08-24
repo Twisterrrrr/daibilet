@@ -5,6 +5,12 @@ import { useRef, type ReactNode } from 'react';
 import { MyDayResizeHandle } from '@/components/my-day/MyDayResizeHandle';
 import { usePersistedNumber } from '@/components/my-day/usePersistedNumber';
 
+const LIST_SPLIT_KEY = 'daibilet.my-day.list-split';
+/** Prefer a wider map on desktop; user can still drag the divider. */
+const LIST_SPLIT_DEFAULT = 46;
+const LIST_SPLIT_MIN = 32;
+const LIST_SPLIT_MAX = 72;
+
 type MyDayShellProps = {
   mapOpen: boolean;
   list: ReactNode;
@@ -12,13 +18,9 @@ type MyDayShellProps = {
   /** When false, map column hidden on lg (no coords). */
   showMapColumn?: boolean;
   className?: string;
+  listSplitKey?: string;
+  listSplitDefault?: number;
 };
-
-const LIST_SPLIT_KEY = 'daibilet.my-day.list-split';
-/** Prefer a wider map on desktop; user can still drag the divider. */
-const LIST_SPLIT_DEFAULT = 46;
-const LIST_SPLIT_MIN = 32;
-const LIST_SPLIT_MAX = 72;
 
 /**
  * Desktop split: list column + sticky map.
@@ -30,9 +32,11 @@ export function MyDayShell({
   map,
   showMapColumn = true,
   className = '',
+  listSplitKey = LIST_SPLIT_KEY,
+  listSplitDefault = LIST_SPLIT_DEFAULT,
 }: MyDayShellProps) {
   const shellRef = useRef<HTMLDivElement | null>(null);
-  const [listPct, setListPct] = usePersistedNumber(LIST_SPLIT_KEY, LIST_SPLIT_DEFAULT);
+  const [listPct, setListPct] = usePersistedNumber(listSplitKey, listSplitDefault);
   const splitOn = showMapColumn && mapOpen;
   const gridClass = !showMapColumn
     ? 'lg:grid-cols-1'

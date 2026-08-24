@@ -46,7 +46,7 @@ const KEEP_PRIORITY = [
 const FORCE_UNFLIP = new Set([
   'chelyabinsk/identity-gastro',
   'voronezh/identity-art',
-  'voronezh/pamyatnik-belomu-bimu',
+  // bim: was sideways (90°), not 180 - do not force-unflip here
   'krasnoyarsk/divnogorskaya-naberezhnaya',
   'krasnoyarsk/tsar-ryba-sliznevo',
   'novosibirsk/plyazh-zvezda-obskoe-more',

@@ -2679,6 +2679,37 @@ function DayRoutePanelInner() {
 
   const isEmptyRoute = route.venues.length === 0;
   const hasMapStops = mapStops.length > 0;
+  const emptyMapCenter = useMemo(() => {
+    for (const place of mustSeePlaces) {
+      const lat = Number(place.latitude);
+      const lng = Number(place.longitude);
+      if (Number.isFinite(lat) && Number.isFinite(lng)) {
+        return { latitude: lat, longitude: lng };
+      }
+    }
+    for (const row of mustSeeResolved) {
+      const lat = Number(row.item.latitude);
+      const lng = Number(row.item.longitude);
+      if (Number.isFinite(lat) && Number.isFinite(lng)) {
+        return { latitude: lat, longitude: lng };
+      }
+    }
+    return (
+      lookupCityMapCoords(pageCitySlug) ||
+      lookupCityMapCoords(pageCitySourceSlug) ||
+      lookupCityMapCoords(pageCityName) ||
+      null
+    );
+  }, [
+    mustSeePlaces,
+    mustSeeResolved,
+    pageCitySlug,
+    pageCitySourceSlug,
+    pageCityName,
+  ]);
+  const showEmptyDesktopShell = Boolean(
+    isEmptyRoute && hasPageCity && hasCatalogCity && pickerTabs.length && emptyMapCenter,
+  );
   const mapSelectedStopId = hoverStopId ?? focusedStopId;
   const focusedVenue = focusedStopId
     ? route.venues.find((v) => v.id === focusedStopId) ?? null
@@ -2699,7 +2730,11 @@ function DayRoutePanelInner() {
     const prevCount = prevVenueCountRef.current;
     const prevHas = prevHasMapStopsRef.current;
 
-    if (count === 0 || !hasMapStops) {
+    if (showEmptyDesktopShell) {
+      myDay.setMapOpen(true);
+      myDay.closeMobileMap();
+      myDay.closeMapFull();
+    } else if (count === 0 || !hasMapStops) {
       myDay.setMapOpen(false);
       myDay.closeMobileMap();
       myDay.closeMapFull();
@@ -2713,6 +2748,7 @@ function DayRoutePanelInner() {
     prevVenueCountRef.current = count;
     prevHasMapStopsRef.current = hasMapStops;
   }, [
+    showEmptyDesktopShell,
     route.venues.length,
     hasMapStops,
     myDay.setMapOpen,
@@ -3038,9 +3074,9 @@ function DayRoutePanelInner() {
     );
   }
 
-  /** Empty: pre-city «Собери свой день»; post-city Lovable «Шаг 1 из 2» + map. */
-  function renderEmptyStarter(opts?: { paired?: boolean }) {
-    const paired = Boolean(opts?.paired);
+  /** Empty: pre-city «Собери свой день»; post-city Lovable «Шаг 1 из 2» (+ optional map preview). */
+  function renderEmptyStarter(opts?: { hideMap?: boolean }) {
+    const hideMap = Boolean(opts?.hideMap);
     const cityLabel = scopeCityName || pageCityName || '';
     const cityInCase = cityLabel ? inCityPrepositional(cityLabel) : '';
     const firstPreset = dayRoutePresets[0] || null;
@@ -3050,33 +3086,6 @@ function DayRoutePanelInner() {
     const firstPresetReady =
       Boolean(firstPreset) &&
       cityDayRoutePresetAvailable(firstPreset!.stops, matchSources, dayPresetCityCtx);
-
-    let mapCenter: { latitude: number; longitude: number } | null = null;
-    for (const place of mustSeePlaces) {
-      const lat = Number(place.latitude);
-      const lng = Number(place.longitude);
-      if (Number.isFinite(lat) && Number.isFinite(lng)) {
-        mapCenter = { latitude: lat, longitude: lng };
-        break;
-      }
-    }
-    if (!mapCenter) {
-      for (const row of mustSeeResolved) {
-        const lat = Number(row.item.latitude);
-        const lng = Number(row.item.longitude);
-        if (Number.isFinite(lat) && Number.isFinite(lng)) {
-          mapCenter = { latitude: lat, longitude: lng };
-          break;
-        }
-      }
-    }
-    if (!mapCenter) {
-      mapCenter =
-        lookupCityMapCoords(pageCitySlug) ||
-        lookupCityMapCoords(pageCitySourceSlug) ||
-        lookupCityMapCoords(pageCityName) ||
-        null;
-    }
 
     if (!hasPageCity) {
       if (selectedRegionAlternatives) {
@@ -3113,16 +3122,16 @@ function DayRoutePanelInner() {
     return (
       <section
         className={[
-          'grid gap-4 rounded-2xl border border-dashed border-primary-300/70 bg-primary-50/40 p-5 sm:p-7',
-          paired
-            ? 'mt-0 grid-cols-1 xl:grid-cols-[minmax(0,1fr)_minmax(16rem,40%)] xl:items-stretch'
-            : 'mt-4 sm:mt-5 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,280px)] xl:mx-auto xl:max-w-5xl',
+          'rounded-2xl border border-dashed border-primary-300/70 bg-primary-50/40 p-5 sm:p-6',
+          hideMap
+            ? 'mt-0'
+            : 'mt-4 grid gap-4 sm:mt-5 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,280px)] xl:mx-auto xl:max-w-5xl',
         ].join(' ')}
-        ref={unifiedSearchRef}
-        data-day-unified-search
+        ref={hideMap ? undefined : unifiedSearchRef}
+        data-day-unified-search={hideMap ? undefined : '1'}
         data-day-starter="1"
         data-day-starter-variant="lovable-step"
-        data-day-starter-paired={paired ? '1' : undefined}
+        data-day-starter-shell={hideMap ? '1' : undefined}
       >
         <div className="min-w-0">
           <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-primary-600">
@@ -3135,7 +3144,7 @@ function DayRoutePanelInner() {
             Сценарий сразу добавит 5-7 точек с логистикой и таймингом. Или соберите маршрут вручную
             из главных мест {cityInCase || 'города'} - порядок потом можно менять перетаскиванием.
           </p>
-          <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+          <div className="mt-5 flex flex-col gap-2">
             <button
               type="button"
               data-day-empty-pick-scenario
@@ -3175,30 +3184,50 @@ function DayRoutePanelInner() {
           ) : null}
         </div>
 
-        <div className="relative z-0 min-w-0 xl:flex xl:h-full xl:flex-col" data-day-empty-map-preview>
-          <div
-            className={`relative z-0 h-[220px] w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-100 isolation-isolate ${
-              paired ? 'xl:min-h-[260px] xl:flex-1' : 'lg:h-[260px]'
-            }`}
-          >
-            {mapCenter ? (
-              <DayRouteOsmMap
-                stops={[]}
-                fallbackCenter={mapCenter}
-                className="h-full min-h-[220px] w-full"
-                layoutKey="empty-preview"
-              />
-            ) : (
-              <div className="flex h-full items-center justify-center px-4 text-center text-sm text-slate-500">
-                Карта появится после выбора точек
-              </div>
-            )}
+        {!hideMap ? (
+          <div className="relative z-0 min-w-0" data-day-empty-map-preview>
+            <div className="relative z-0 h-[220px] w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-100 isolation-isolate lg:h-[260px]">
+              {emptyMapCenter ? (
+                <DayRouteOsmMap
+                  stops={[]}
+                  fallbackCenter={emptyMapCenter}
+                  className="h-full min-h-[220px] w-full"
+                  layoutKey="empty-preview"
+                />
+              ) : (
+                <div className="flex h-full items-center justify-center px-4 text-center text-sm text-slate-500">
+                  Карта появится после выбора точек
+                </div>
+              )}
+            </div>
+            <p className="mt-2 text-xs text-slate-500">
+              Превью карты {cityInCase || 'города'}: выбирайте точки - они появятся здесь сразу
+            </p>
           </div>
-          <p className="mt-2 text-xs text-slate-500">
-            Превью карты {cityInCase || 'города'}: выбирайте точки - они появятся здесь сразу
-          </p>
-        </div>
+        ) : null}
       </section>
+    );
+  }
+
+  function renderEmptyPickerChips() {
+    if (!pickerTabs.length) return null;
+    return (
+      <div className="mt-4 flex flex-wrap gap-2" data-my-day-empty-chips>
+        {pickerTabs.map((t) => {
+          const Icon = t.icon;
+          return (
+            <button
+              key={t.value}
+              type="button"
+              onClick={() => openPicker(t.value)}
+              className="inline-flex shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50"
+            >
+              <Icon className="h-3.5 w-3.5" aria-hidden />
+              {t.label}
+            </button>
+          );
+        })}
+      </div>
     );
   }
 
@@ -3438,16 +3467,22 @@ function DayRoutePanelInner() {
     <>
     <div
       className={`${
-        !isEmptyRoute && hasMapStops ? 'my-day-desktop-bleed' : 'container-page px-4 sm:px-6 lg:px-8'
+        (!isEmptyRoute && hasMapStops) || showEmptyDesktopShell
+          ? 'my-day-desktop-bleed'
+          : 'container-page px-4 sm:px-6 lg:px-8'
       } py-5 sm:py-10 print:hidden lg:pb-10 ${
         isEmptyRoute
-          ? 'pb-[calc(6.5rem+env(safe-area-inset-bottom,0px))]'
+          ? showEmptyDesktopShell
+            ? 'pb-[calc(6.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0'
+            : 'pb-[calc(6.5rem+env(safe-area-inset-bottom,0px))]'
           : hasMapStops
             ? 'pb-[calc(8rem+env(safe-area-inset-bottom,0px))] lg:pb-0'
             : 'pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))]'
       }`}
       data-day-mobile-list-first="1"
-      data-day-section-width={!isEmptyRoute && hasMapStops ? 'bleed' : 'full'}
+      data-day-section-width={
+        (!isEmptyRoute && hasMapStops) || showEmptyDesktopShell ? 'bleed' : 'full'
+      }
       data-day-mobile-view={mobileView}
     >
       <div ref={listRootRef} className="min-w-0" data-day-list-root>
@@ -4256,60 +4291,86 @@ function DayRoutePanelInner() {
       ) : (
         <>
           {hasPageCity ? (
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0 flex-1">
-                <h1 className="font-display text-[1.65rem] font-extrabold tracking-tight leading-tight text-slate-900 sm:text-3xl">
-                  {scopeCityName ? `Мой день ${inCityPrepositional(scopeCityName)}` : 'Мой день'}
-                </h1>
-                <div
-                  className="relative z-[1] mt-1.5 flex flex-wrap items-center gap-x-1.5 text-[13px] font-medium text-slate-500"
-                  data-day-route-count-label
-                  data-day-city-scope
-                >
-                  {cityScopeLine ? <span className="leading-5">{cityScopeLine}</span> : null}
-                  {cityScopeLine && scopeCityName ? <span aria-hidden>·</span> : null}
-                  {scopeCityName ? (
-                    <Link
-                      href={cityHubHref}
-                      className={`text-primary-600 transition-colors hover:text-primary-700 ${DAY_TEXT_LINK}`}
-                      data-day-city-hub-link
-                    >
-                      Страница {cityToGenitive(scopeCityName)}
-                    </Link>
-                  ) : null}
-                  {scopeCityName ? <span aria-hidden>·</span> : null}
-                  {renderCityChangeControl()}
-                </div>
-              </div>
-            </div>
-          ) : null}
-          {(() => {
-            const showEmptyDuo =
-              Boolean(hasCatalogCity && pickerTabs.length && isEmptyRoute && hasPageCity);
-            if (showEmptyDuo) {
-              return (
-                <div
-                  className="mt-4 grid gap-4 lg:mt-5 xl:grid-cols-[minmax(18rem,26rem)_minmax(0,1fr)] xl:items-start xl:gap-5"
-                  data-my-day-empty-duo="1"
-                >
-                  <div className="min-w-0" data-my-day-picker-host>
-                    <MyDayPickerLaunch tabs={pickerTabs} onOpen={openPicker} />
-                  </div>
-                  {renderEmptyStarter({ paired: true })}
-                </div>
-              );
-            }
-            return (
-              <>
-                {hasCatalogCity && pickerTabs.length ? (
-                  <div className="mt-4 lg:mt-5 xl:max-w-3xl" data-my-day-picker-host>
-                    <MyDayPickerLaunch tabs={pickerTabs} onOpen={openPicker} />
-                  </div>
+            <header className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-3 lg:pr-4">
+              <h1 className="font-display text-[1.65rem] font-extrabold tracking-tight leading-tight text-slate-900 sm:text-3xl">
+                {scopeCityName ? `Мой день ${inCityPrepositional(scopeCityName)}` : 'Мой день'}
+              </h1>
+              <div
+                className="relative z-[1] flex flex-wrap items-center gap-x-1.5 text-[13px] font-medium text-slate-500"
+                data-day-route-count-label
+                data-day-city-scope
+              >
+                {cityScopeLine ? <span className="leading-5">{cityScopeLine}</span> : null}
+                {cityScopeLine && scopeCityName ? <span aria-hidden>·</span> : null}
+                {scopeCityName ? (
+                  <Link
+                    href={cityHubHref}
+                    className={`text-primary-600 transition-colors hover:text-primary-700 ${DAY_TEXT_LINK}`}
+                    data-day-city-hub-link
+                  >
+                    Страница {cityToGenitive(scopeCityName)}
+                  </Link>
                 ) : null}
-                {isEmptyRoute ? renderEmptyStarter() : null}
-              </>
-            );
-          })()}
+                {scopeCityName ? <span aria-hidden>·</span> : null}
+                {renderCityChangeControl()}
+              </div>
+            </header>
+          ) : null}
+          {showEmptyDesktopShell ? (
+            <>
+              <div className="mt-4 lg:hidden" data-my-day-empty-mobile>
+                <div data-my-day-picker-host>
+                  <MyDayPickerLaunch tabs={pickerTabs} onOpen={openPicker} />
+                </div>
+                {renderEmptyStarter()}
+              </div>
+              <div className="mt-4 hidden lg:block" data-my-day-empty-shell>
+                <MyDayShell
+                  mapOpen={myDay.mapOpen}
+                  showMapColumn
+                  listSplitKey="daibilet.my-day.empty-list-split"
+                  listSplitDefault={34}
+                  list={
+                    <div className="flex flex-col" data-my-day-picker-host>
+                      <MyDayPickerLaunch
+                        tabs={pickerTabs}
+                        onOpen={openPicker}
+                        layout="rail"
+                        showChips={false}
+                      />
+                      <div className="mt-4">{renderEmptyStarter({ hideMap: true })}</div>
+                      {renderEmptyPickerChips()}
+                    </div>
+                  }
+                  map={
+                    <MyDayMapAside
+                      mapOpen={myDay.mapOpen}
+                      onToggleOpen={myDay.toggleMapOpen}
+                      onOpenFull={myDay.openMapFull}
+                    >
+                      <div className="relative isolate h-full min-h-[20rem] w-full">
+                        <DayRouteOsmMap
+                          stops={[]}
+                          fallbackCenter={emptyMapCenter}
+                          className="h-full min-h-[20rem] w-full bg-slate-100"
+                          layoutKey="empty-shell"
+                        />
+                      </div>
+                    </MyDayMapAside>
+                  }
+                />
+              </div>
+            </>
+          ) : (
+            <>
+              {hasCatalogCity && pickerTabs.length ? (
+                <div className="mt-4 lg:mt-5 xl:max-w-3xl" data-my-day-picker-host>
+                  <MyDayPickerLaunch tabs={pickerTabs} onOpen={openPicker} />
+                </div>
+              ) : null}
+              {isEmptyRoute ? renderEmptyStarter() : null}
+            </>
+          )}
         </>
       )}
 
@@ -4851,12 +4912,20 @@ function DayRoutePanelInner() {
         </MyDayMobileMapSheet>
       ) : null}
 
-      <MyDayMapFullScreen open={myDay.mapFull && hasMapStops} onClose={myDay.closeMapFull}>
+      <MyDayMapFullScreen
+        open={myDay.mapFull && (hasMapStops || showEmptyDesktopShell)}
+        onClose={myDay.closeMapFull}
+      >
         <DayRouteOsmMap
-          stops={displayMapStops}
-          selectedStopId={mapSelectedStopId}
-          onStopClick={(stopId) => focusStopFromMap(stopId, { scrollList: false })}
-          layoutKey="desktop-map-full"
+          stops={hasMapStops ? displayMapStops : []}
+          selectedStopId={hasMapStops ? mapSelectedStopId : undefined}
+          fallbackCenter={hasMapStops ? undefined : emptyMapCenter}
+          onStopClick={
+            hasMapStops
+              ? (stopId) => focusStopFromMap(stopId, { scrollList: false })
+              : undefined
+          }
+          layoutKey={hasMapStops ? 'desktop-map-full' : 'empty-map-full'}
           className="h-full w-full"
         />
       </MyDayMapFullScreen>
