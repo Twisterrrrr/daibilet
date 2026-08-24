@@ -23,7 +23,6 @@ if (!city) {
 
 const PACK_PREFIX = {
   ryazan: { pack: 'RYAZAN_IMAGES', file: 'city-place-images.ts' },
-  tula: { pack: 'TULA_IMAGES', file: 'city-place-images.ts' },
   ufa: { pack: 'UFA_HUB_IMAGES', file: 'city-place-images-region-packs.ts' },
   chelyabinsk: { pack: 'CHELYABINSK_IMAGES', file: 'city-place-images.ts' },
   omsk: { pack: 'OMSK_IMAGES', file: 'city-place-images.ts' },
@@ -83,6 +82,7 @@ function buildSvg(seedHex) {
 }
 
 async function ensureVariants(sharp, absBase, { rethumb: force = false } = {}) {
+  const { writeVenueStillVariants } = await import('./lib/venue-still-variants.mjs');
   const stem = path.basename(absBase, '.jpg');
   const dir = path.dirname(absBase);
   const cardPath = path.join(dir, `${stem}-card.jpg`);
@@ -90,25 +90,7 @@ async function ensureVariants(sharp, absBase, { rethumb: force = false } = {}) {
   if (!force && fs.existsSync(cardPath) && fs.existsSync(thumbPath)) {
     return;
   }
-  const tmpBase = `${absBase}.rethumb.tmp.jpg`;
-  const buf = await sharp(absBase).rotate().toBuffer();
-  await sharp(buf)
-    .resize(1600, 1067, { fit: 'cover', position: 'centre' })
-    .jpeg({ quality: 86, mozjpeg: true })
-    .toFile(tmpBase);
-  fs.renameSync(tmpBase, absBase);
-  const tmpCard = `${cardPath}.rethumb.tmp.jpg`;
-  const tmpThumb = `${thumbPath}.rethumb.tmp.jpg`;
-  await sharp(buf)
-    .resize(640, null, { withoutEnlargement: true })
-    .jpeg({ quality: 68 })
-    .toFile(tmpCard);
-  fs.renameSync(tmpCard, cardPath);
-  await sharp(buf)
-    .resize(320, null, { withoutEnlargement: true })
-    .jpeg({ quality: 65 })
-    .toFile(tmpThumb);
-  fs.renameSync(tmpThumb, thumbPath);
+  await writeVenueStillVariants(sharp, absBase, dir, stem);
 }
 
 async function ensureFile(sharp, slug, parentUrl) {
@@ -145,14 +127,8 @@ async function ensureFile(sharp, slug, parentUrl) {
     .toFile(abs);
   const stem = path.basename(abs, '.jpg');
   const dir = path.dirname(abs);
-  await sharp(buf)
-    .resize(640, null, { withoutEnlargement: true })
-    .jpeg({ quality: 68 })
-    .toFile(path.join(dir, `${stem}-card.jpg`));
-  await sharp(buf)
-    .resize(320, null, { withoutEnlargement: true })
-    .jpeg({ quality: 65 })
-    .toFile(path.join(dir, `${stem}-thumb.jpg`));
+  const { writeVenueStillVariants } = await import('./lib/venue-still-variants.mjs');
+  await writeVenueStillVariants(sharp, abs, dir, stem);
   return { slug, url, action: 'created' };
 }
 

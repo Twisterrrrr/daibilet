@@ -104,15 +104,8 @@ function buildSvg(seedHex, title) {
 }
 
 async function writeVariants(dir, stem, buf) {
-  await sharp(buf).jpeg({ quality: 86, mozjpeg: true }).toFile(path.join(dir, `${stem}.jpg`));
-  await sharp(buf)
-    .resize(640, null, { withoutEnlargement: true })
-    .jpeg({ quality: 68 })
-    .toFile(path.join(dir, `${stem}-card.jpg`));
-  await sharp(buf)
-    .resize(320, null, { withoutEnlargement: true })
-    .jpeg({ quality: 65 })
-    .toFile(path.join(dir, `${stem}-thumb.jpg`));
+  const { writeVenueStillVariants } = await import('./lib/venue-still-variants.mjs');
+  await writeVenueStillVariants(sharp, buf, dir, stem);
 }
 
 async function regenStem(city, stem) {

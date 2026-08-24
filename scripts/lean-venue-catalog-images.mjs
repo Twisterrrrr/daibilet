@@ -1,8 +1,9 @@
 /**
- * Fast-loading venue covers: catalog thumbs ~640px + hero cap ~1200px.
+ * Fast-loading venue covers: catalog cards ~960px@q82 + hero cap ~1600px.
  *
  * `/images/*` bypasses `/_next/image` on MSK (nginx alias). Card grids must
- * not fetch 2-4MB GenerateImage originals. Writes sibling `-thumb.jpg` and
+ * not fetch multi-MB GenerateImage originals when a sharp `-card` exists.
+ * Writes sibling `-thumb.jpg` (legacy name; now listing-card sized) and
  * recompresses oversized originals in place.
  *
  *   node scripts/lean-venue-catalog-images.mjs
@@ -17,10 +18,10 @@ const rootDir = path.resolve(__dirname, '..');
 const publicVenues = path.join(rootDir, 'apps/public/public/images/venues');
 const webVenues = path.join(rootDir, 'apps/web/public/images/venues');
 
-const THUMB_WIDTH = 640;
-const HERO_WIDTH = 1200;
-const THUMB_QUALITY = 70;
-const HERO_QUALITY = 76;
+const THUMB_WIDTH = 960;
+const HERO_WIDTH = 1600;
+const THUMB_QUALITY = 82;
+const HERO_QUALITY = 86;
 const LEAN_BYTES = 80 * 1024;
 const HERO_SKIP_BYTES = 250 * 1024;
 const CONCURRENCY = 3;

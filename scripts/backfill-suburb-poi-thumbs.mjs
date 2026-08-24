@@ -1,6 +1,6 @@
 /**
  * Backfill missing `-thumb.jpg` for venue POI cards (suburb nested rail).
- * Source: base `.jpg` or existing `-card.jpg`. Target: 320px wide, q65 (matches NSK pack).
+ * Source: base `.jpg` or existing `-card.jpg`. Target: 480px wide, q78 (sharp nested rails).
  *
  *   node scripts/backfill-suburb-poi-thumbs.mjs
  *   node scripts/backfill-suburb-poi-thumbs.mjs --cities=perm,moscow,ekaterinburg
@@ -19,8 +19,8 @@ const auditPath = path.join(__dirname, 'audit-city-suburbs-output.json');
 
 const sharp = createRequire(path.join(root, 'apps/web/package.json'))('sharp');
 
-const THUMB_WIDTH = 320;
-const THUMB_QUALITY = 65;
+const THUMB_WIDTH = 480;
+const THUMB_QUALITY = 78;
 
 const citiesArg = process.argv.find((a) => a.startsWith('--cities='));
 const cityFilter = citiesArg

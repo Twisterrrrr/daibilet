@@ -3,13 +3,13 @@
  *
  *   node scripts/compress-card-images.mjs [events|venues|blog|blog-inline|landings|all] [--dry-run]
  *
- * P0: events/** → sibling `-card.jpg` (width 640, q 60–70, 40–80KB).
+ * P0: events/** → sibling `-card.jpg` (width 960, q~82, sharp listing).
  *     Does not overwrite originals (PDP keeps image.jpg).
  *     Skips sources already ≤80KB (lean stubs).
  * P0 venues: optional copy/compress from venues/** (places already have `-thumb`).
  * P0b: blog cover `blog/{slug}.jpg` → sibling `-card.jpg` (listing; PDP/cover stay original).
- * P1: blog `*-inline*.jpg` in place, max 1200px, q~75, 120–200KB.
- * P1b: landings PNG→JPEG ~1200px / <150KB (also caps oversized landing JPG).
+ * P1: blog `*-inline*.jpg` in place, max 1400px, q~82.
+ * P1b: landings PNG→JPEG ~1400px (also caps oversized landing JPG).
  *
  * Source of truth: apps/public/public/images/ (mirrors to apps/web/public/images if present).
  *
@@ -32,18 +32,18 @@ const rootDir = path.resolve(__dirname, '..');
 const publicImages = path.join(rootDir, 'apps/public/public/images');
 const webImages = path.join(rootDir, 'apps/web/public/images');
 
-const CARD_WIDTH = 640;
-const CARD_QUALITY = 65;
-const CARD_QUALITY_MIN = 60;
-const CARD_TARGET_MAX = 80 * 1024;
+const CARD_WIDTH = 960;
+const CARD_QUALITY = 82;
+const CARD_QUALITY_MIN = 72;
+const CARD_TARGET_MAX = 180 * 1024;
 const LEAN_BYTES = 80 * 1024;
-const INLINE_MAX_SIDE = 1200;
-const INLINE_QUALITY = 75;
-const INLINE_TARGET_MAX = 200 * 1024;
+const INLINE_MAX_SIDE = 1400;
+const INLINE_QUALITY = 82;
+const INLINE_TARGET_MAX = 280 * 1024;
 const INLINE_TARGET_MIN = 120 * 1024;
-const LANDING_MAX_SIDE = 1200;
-const LANDING_QUALITY = 72;
-const LANDING_TARGET_MAX = 150 * 1024;
+const LANDING_MAX_SIDE = 1400;
+const LANDING_QUALITY = 80;
+const LANDING_TARGET_MAX = 220 * 1024;
 const CONCURRENCY = 4;
 
 const SKIP_NAME =
@@ -115,7 +115,7 @@ async function mapPool(items, limit, fn) {
 function cardOk(file) {
   if (!fs.existsSync(file)) return false;
   const size = fs.statSync(file).size;
-  return size >= 8 * 1024 && size <= 120 * 1024;
+  return size >= 12 * 1024 && size <= 220 * 1024;
 }
 
 async function writeJpeg(sharp, input, output, { width, height, quality }) {

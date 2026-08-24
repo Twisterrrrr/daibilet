@@ -7,6 +7,7 @@ import fs from 'fs';
 import path from 'path';
 import { createRequire } from 'module';
 import { fileURLToPath } from 'url';
+import { writeVenueStillVariants } from './lib/venue-still-variants.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, '..');
@@ -37,21 +38,8 @@ async function install(stem, city) {
   if (!fs.existsSync(src)) return { stem, city, ok: false, reason: 'missing asset' };
   const g = await gate(src, city, stem);
   if (!g?.ok) return { stem, city, ok: false, reason: 'uniqueness_gate', gate: g };
-  const buf = await sharp(src)
-    .rotate()
-    .resize(1600, 1067, { fit: 'cover', position: 'centre' })
-    .jpeg({ quality: 86, mozjpeg: true })
-    .toBuffer();
   fs.mkdirSync(destDir, { recursive: true });
-  await sharp(buf).toFile(path.join(destDir, `${stem}.jpg`));
-  await sharp(buf)
-    .resize(640, null, { withoutEnlargement: true })
-    .jpeg({ quality: 68 })
-    .toFile(path.join(destDir, `${stem}-card.jpg`));
-  await sharp(buf)
-    .resize(320, null, { withoutEnlargement: true })
-    .jpeg({ quality: 65 })
-    .toFile(path.join(destDir, `${stem}-thumb.jpg`));
+  const buf = await writeVenueStillVariants(sharp, src, destDir, stem);
   return { stem, city, ok: true, bytes: buf.length, gate: g };
 }
 
