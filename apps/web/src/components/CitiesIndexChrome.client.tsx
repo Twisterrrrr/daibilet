@@ -259,7 +259,12 @@ export function CitiesIndexChrome({ destinations }: { destinations: PublicDestin
         </div>
 
         {mobileView === 'map' ? (
-          <RussiaMap className="w-full" destinations={allCities} closerZoom />
+          <RussiaMap
+            key="cities-russia-map"
+            className="h-[min(70vh,32rem)] w-full"
+            destinations={allCities}
+            closerZoom
+          />
         ) : !filteredCities.length && !geoHits.length && !orphanRegions.length ? (
           <div className="rounded-xl border border-dashed border-slate-300 py-20 text-center">
             <p className="text-lg text-slate-400">

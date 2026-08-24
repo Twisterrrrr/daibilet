@@ -281,6 +281,11 @@ export function EventCardHorizontal({ session }: { session: PublicCatalogListIte
 
         <div className="mt-auto flex flex-col gap-3 border-t border-slate-100 pt-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
           <div className="min-w-0 flex-1 space-y-0.5 text-ui-xs text-graphite-muted sm:text-ui-sm">
+            {priceFooterLabel ? (
+              <span className="mb-1 block whitespace-nowrap text-left text-lg font-extrabold tabular-nums tracking-tight text-graphite sm:hidden">
+                {priceFooterLabel}
+              </span>
+            ) : null}
             {openDate ? (
               <span className="font-medium text-success">Билет с открытой датой</span>
             ) : departingSoonMinutes ? (
@@ -319,7 +324,7 @@ export function EventCardHorizontal({ session }: { session: PublicCatalogListIte
 
           <div className="flex shrink-0 flex-col items-stretch gap-2 sm:items-end">
             {priceFooterLabel ? (
-              <span className="whitespace-nowrap text-lg font-extrabold tabular-nums tracking-tight text-graphite sm:text-xl">
+              <span className="hidden whitespace-nowrap text-lg font-extrabold tabular-nums tracking-tight text-graphite sm:inline sm:text-xl">
                 {priceFooterLabel}
               </span>
             ) : null}

@@ -316,7 +316,7 @@ export function EventCard({
           />
         ) : null}
 
-        <div className="mt-auto flex items-center justify-between gap-2 pt-1 max-sm:justify-end">
+        <div className="mt-auto flex items-center justify-between gap-2 pt-1">
           {landingActions ? (
             <LandingPurchaseButton
               session={session}
@@ -326,7 +326,7 @@ export function EventCard({
           ) : (
             <>
               {priceRangeLabel ? (
-                <span className="relative z-[2] min-w-0 flex-1 whitespace-nowrap text-base font-extrabold tabular-nums tracking-tight text-primary-700 max-sm:flex-none sm:text-xl">
+                <span className="relative z-[2] min-w-0 flex-1 whitespace-nowrap text-left text-base font-extrabold tabular-nums tracking-tight text-primary-700 sm:text-xl">
                   {priceRangeLabel}
                 </span>
               ) : (

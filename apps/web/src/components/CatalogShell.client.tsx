@@ -103,16 +103,24 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
   const pendingResultsScrollRef = useRef(false);
   const prevFiltersKeyRef = useRef<string | null>(null);
 
+  const ignoreNextUrlPageRef = useRef(false);
+
   const writePageToUrl = useCallback((page: number) => {
     const params = new URLSearchParams(window.location.search);
     if (page <= 1) params.delete('page');
     else params.set('page', String(page));
     const qs = params.toString();
     const href = qs ? `/events?${qs}` : '/events';
+    // Next patches history.pushState and would sync useSearchParams → reset paging to replace.
+    ignoreNextUrlPageRef.current = true;
     window.history.pushState(null, '', href);
   }, []);
 
   useEffect(() => {
+    if (ignoreNextUrlPageRef.current) {
+      ignoreNextUrlPageRef.current = false;
+      return;
+    }
     pagingModeRef.current = 'replace';
     setListPage(urlPage);
   }, [urlPage]);
