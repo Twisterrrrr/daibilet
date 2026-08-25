@@ -9,8 +9,17 @@ export type CatalogInterstitial = {
   cta: string;
 };
 
-/** Editorial breaks for the catalog card grid - every N cards. */
+/** Editorial breaks for the catalog card grid — every N full rows. */
+export const CATALOG_INTERSTITIAL_ROWS = 2;
+
+/** @deprecated Use `catalogInterstitialInterval(columnsPerRow)` — kept for analytics docs. */
 export const CATALOG_INTERSTITIAL_EVERY = 8;
+
+/** Cards between banners; always aligns with complete grid rows. */
+export function catalogInterstitialInterval(columnsPerRow: number): number {
+  const cols = Math.max(1, Math.trunc(columnsPerRow) || 1);
+  return cols * CATALOG_INTERSTITIAL_ROWS;
+}
 
 export function catalogInterstitialsForCity(citySlug?: string | null): CatalogInterstitial[] {
   const city = citySlug?.trim() || undefined;

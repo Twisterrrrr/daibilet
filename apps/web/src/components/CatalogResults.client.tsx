@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { ArrowRight, Grid3X3, List, Table2 } from 'lucide-react';
+import { useMemo, useRef } from 'react';
 
 import { EventCard } from '@/components/EventCard';
 import { EventCardHorizontal } from '@/components/EventCardHorizontal';
@@ -15,10 +16,11 @@ import { resolveEventCardDestinationLabel } from '@/lib/event-location';
 import { eventHref, sessionVenueHref } from '@/lib/routes';
 import type { CatalogViewMode } from '@/lib/catalog-view-mode';
 import {
-  CATALOG_INTERSTITIAL_EVERY,
+  catalogInterstitialInterval,
   catalogInterstitialsForCity,
   type CatalogInterstitial,
 } from '@/lib/catalog-interstitials';
+import { useCatalogGridColumnCount } from '@/lib/catalog-grid-columns';
 import { collapseCatalogComboFamilies } from '@/lib/home-showcase-sections';
 import { IMAGE_SIZES, CardSafeImage } from '@/components/SafeImage.client';
 import { useCatalogFiltersLayout } from '@/components/CatalogSidebarLayout.client';
@@ -69,11 +71,11 @@ type CatalogGridEntry =
 function buildCatalogGridEntries(
   items: PublicCatalogListItemDto[],
   city?: string | null,
-  options?: { embedInterstitials?: boolean },
+  columnsPerRow = 4,
 ): CatalogGridEntry[] {
-  const embedInterstitials = options?.embedInterstitials ?? true;
   const banners = catalogInterstitialsForCity(city);
-  if (!embedInterstitials || !banners.length || items.length < CATALOG_INTERSTITIAL_EVERY) {
+  const every = catalogInterstitialInterval(columnsPerRow);
+  if (!banners.length || items.length < every) {
     return items.map((session) => ({ kind: 'event' as const, session }));
   }
 
@@ -81,7 +83,7 @@ function buildCatalogGridEntries(
   let bannerIndex = 0;
   items.forEach((session, index) => {
     entries.push({ kind: 'event', session });
-    if ((index + 1) % CATALOG_INTERSTITIAL_EVERY === 0 && bannerIndex < banners.length) {
+    if ((index + 1) % every === 0 && bannerIndex < banners.length) {
       entries.push({ kind: 'banner', banner: banners[bannerIndex]! });
       bannerIndex += 1;
     }
@@ -228,10 +230,12 @@ export function CatalogResults({
   const listItems = showLiveRail
     ? catalogItems.filter((item) => !liveRailItems.some((rail) => rail.id === item.id))
     : catalogItems;
-  const gridEntries =
-    viewMode === 'cards'
-      ? buildCatalogGridEntries(listItems, city, { embedInterstitials: !filtersCollapsed })
-      : null;
+  const gridRef = useRef<HTMLUListElement>(null);
+  const columnsPerRow = useCatalogGridColumnCount(gridRef, filtersCollapsed, listItems.length);
+  const gridEntries = useMemo(
+    () => (viewMode === 'cards' ? buildCatalogGridEntries(listItems, city, columnsPerRow) : null),
+    [viewMode, listItems, city, columnsPerRow],
+  );
 
   return (
     <>
@@ -258,7 +262,7 @@ export function CatalogResults({
       ) : viewMode === 'table' ? (
         <CatalogTable items={listItems} />
       ) : (
-        <ul className="catalog-card-grid mt-4">
+        <ul ref={gridRef} className="catalog-card-grid mt-4">
           {gridEntries!.map((entry) =>
             entry.kind === 'banner' ? (
               <CatalogInterstitialBanner key={`banner-${entry.banner.id}`} banner={entry.banner} />
