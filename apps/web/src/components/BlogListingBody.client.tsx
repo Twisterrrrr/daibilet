@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Suspense, useMemo, type ReactNode } from 'react';
+import { Suspense, useEffect, useMemo, useState, type ReactNode } from 'react';
 
 import { BlogFeaturedHero } from '@/components/BlogFeaturedHero';
 import { BlogListingSidebar } from '@/components/BlogListingSidebar';
@@ -9,7 +9,12 @@ import { BlogListFiltered } from '@/components/BlogListFiltered.client';
 import { BlogListHero } from '@/components/BlogListHero';
 import { cityFilterLabel } from '@/lib/blog-meta';
 import type { BlogSidebarPromoDto } from '@/lib/blog-sidebar-promo';
-import { splitBlogListingHero, truncateAtSentence, type BlogCardDto } from '@/lib/blog-utils';
+import {
+  shuffleBlogCards,
+  splitBlogListingHero,
+  truncateAtSentence,
+  type BlogCardDto,
+} from '@/lib/blog-utils';
 import type { BlogListFilters } from '@/components/BlogListView';
 import type { BreadcrumbItem } from '@/components/PageBreadcrumbs';
 
@@ -36,8 +41,20 @@ export function BlogListingBody({
   hotMinPrices = {},
   afishaPromos = {},
 }: BlogListingBodyProps) {
+  // Stable SSR order first; reshuffle once on the client for each visit.
+  const [visitPosts, setVisitPosts] = useState<BlogCardDto[] | null>(null);
+  useEffect(() => {
+    setVisitPosts(shuffleBlogCards(posts));
+  }, [posts]);
+
+  const orderedPosts = visitPosts || posts;
+
   // Cross-city feed by default: header CityPicker must not hard-filter /blog.
-  const { featured, feed, hot } = useMemo(() => splitBlogListingHero(posts), [posts]);
+  // Featured (isFeatured) stays pinned; the rest of the feed is visit-shuffled.
+  const { featured, feed, hot } = useMemo(
+    () => splitBlogListingHero(orderedPosts),
+    [orderedPosts],
+  );
 
   const fallbackCityLabel = featured ? cityFilterLabel(featured.citySlug, featured.city) : null;
   const afishaFallbackCityName =

@@ -472,6 +472,18 @@ export function splitBlogListingHero(
   };
 }
 
+/** Fisher–Yates shuffle (new array). Per-visit blog feed order on the client. */
+export function shuffleBlogCards<T>(items: T[]): T[] {
+  const next = [...items];
+  for (let i = next.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const a = next[i]!;
+    next[i] = next[j]!;
+    next[j] = a;
+  }
+  return next;
+}
+
 export function resolveStaticArticle(slug: string): BlogArticleDto | null {
   const post = BLOG_POSTS.find((item) => item.slug === slug);
   if (!post) return null;
