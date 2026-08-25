@@ -69,7 +69,6 @@ html[data-nav-pending='1'] {
     --font-display: var(--font-manrope), var(--font-inter), system-ui, sans-serif;
     --font-serif: var(--font-source-serif), Georgia, 'Times New Roman', serif;
     --site-header-height: 4rem;
-    --site-header-height-compact: 3.25rem;
     /** Content column max width (header, footer, pages). */
     --container-page-max: 112rem;
     /* Compact equal gaps; ultrawide must not inflate menu into a sparse strip. */
@@ -134,7 +133,6 @@ html[data-nav-pending='1'] {
   @media (min-width: 1024px) {
     :root {
       --site-header-height: 4.5rem;
-      --site-header-height-compact: 3.5rem;
     }
   }
 
@@ -150,14 +148,6 @@ html[data-nav-pending='1'] {
       --header-menu-gap: 1.25rem;
       --header-icons-gap: 0.875rem;
     }
-  }
-
-  /*
-   * Compact header is visual-only (padding / desktop nav). Never shrink
-   * --site-header-height here: spacer + sticky tops would jump on scroll (mobile jitter).
-   */
-  html.site-header-compact {
-    /* reserved for non-layout cues if needed */
   }
 
   * {
@@ -482,7 +472,6 @@ html[data-nav-pending='1'] {
       grid-column: 1 / -1;
     }
 
-    /* Wide on the right: narrow first in DOM order via rtl pair flag. */
     .blog-bento-pair--rtl > .blog-bento__span-1 {
       order: 0;
     }
@@ -492,7 +481,6 @@ html[data-nav-pending='1'] {
     }
   }
 
-  /* Stack below xl: pair keeps wide then narrow vertically. */
   @media (max-width: 1279.98px) {
     .blog-bento-pair {
       display: flex;
@@ -502,19 +490,6 @@ html[data-nav-pending='1'] {
 
     .blog-bento-pair--rtl {
       flex-direction: column;
-    }
-  }
-
-  .blog-bento .group.event-card,
-  .blog-bento article,
-  .blog-bento [class*='rounded-2xl'] {
-    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease;
-  }
-
-  @media (hover: hover) {
-    .blog-bento > div:hover > *,
-    .blog-bento-pair > div:hover > * {
-      transform: translateY(-4px);
     }
   }
 

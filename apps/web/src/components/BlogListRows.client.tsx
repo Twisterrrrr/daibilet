@@ -176,9 +176,7 @@ export function BlogListRows({
       {valid.flatMap((post, index) => {
         const nodes = [
           <li key={post.slug}>
-            {index === 0 ? (
-              <BlogPostCard post={post} variant="lead" />
-            ) : index % 5 === 4 ? (
+            {index % 5 === 4 ? (
               <BlogPostCard post={post} variant="quote" />
             ) : (
               <BlogListRow post={post} />

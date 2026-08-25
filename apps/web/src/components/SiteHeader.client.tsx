@@ -51,7 +51,6 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [authMounted, setAuthMounted] = useState(false);
   const [searchInitialQuery, setSearchInitialQuery] = useState('');
-  const [compactHeader, setCompactHeader] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const auth = useUserAuthOptional();
   const selectedCity = useSelectedCityOptional();
@@ -59,40 +58,6 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
   useEffect(() => {
     setAuthMounted(true);
   }, []);
-
-  useEffect(() => {
-    let lastY = window.scrollY;
-    let ticking = false;
-
-    const apply = (next: boolean) => {
-      setCompactHeader((prev) => (prev === next ? prev : next));
-    };
-
-    const onScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      window.requestAnimationFrame(() => {
-        ticking = false;
-        const y = window.scrollY;
-        if (y < 24) {
-          apply(false);
-          lastY = y;
-          return;
-        }
-        if (y > lastY + 6) apply(true);
-        else if (y < lastY - 6) apply(false);
-        lastY = y;
-      });
-    };
-
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
-  useEffect(() => {
-    document.documentElement.classList.toggle('site-header-compact', compactHeader);
-    return () => document.documentElement.classList.remove('site-header-compact');
-  }, [compactHeader]);
 
   // Avoid useSearchParams here: it CSR-bailouts the whole SiteLayout tree.
   useEffect(() => {
@@ -176,7 +141,7 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
 
           <nav
             aria-label="Основная навигация"
-            className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center gap-[var(--header-menu-gap)] ${compactHeader ? 'hidden' : 'hidden lg:flex'}`}
+            className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-[var(--header-menu-gap)] lg:flex"
           >
             {navLinks.map((item) => {
               const active = isNavActive(pathname, item.href, item.label);

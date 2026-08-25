@@ -1,3 +1,4 @@
+import { cityToAccusative } from '@/lib/city-declension';
 import {
   resolveBlogCityEventsHref,
   resolveBlogCityHref,
@@ -138,15 +139,14 @@ export function resolveBlogListingQuickLinks(input: {
   return links.slice(0, limit);
 }
 
-/** Имя города для CTA «Больше про …» (винительный / каноническая форма). */
-const BLOG_CTA_CITY_SHORT: Record<string, string> = {
-  moscow: 'Москву',
-  'saint-petersburg': 'Санкт-Петербург',
-  kazan: 'Казань',
-  ekaterinburg: 'Екатеринбург',
-  kaliningrad: 'Калининград',
-  'nizhny-novgorod': 'Нижний',
-};
+/** Имя города для CTA «Больше про …» (винительный). */
+function resolveBlogCtaCityLabel(citySlug?: string | null, cityName?: string | null): string | null {
+  const name = String(cityName || '').trim();
+  if (name) return cityToAccusative(name);
+  const slug = String(citySlug || '').trim();
+  if (!slug) return null;
+  return cityToAccusative(slug);
+}
 
 /** Контекстный лейбл по landing slug / теме (без города). */
 const BLOG_CTA_LANDING_LABELS: Record<string, string> = {
@@ -177,13 +177,9 @@ function resolveBlogCtaLabel(input: {
   tag?: string | null;
   title?: string | null;
 }): string {
-  const city = normalizeKnownCitySlug(input.citySlug);
-  if (city && BLOG_CTA_CITY_SHORT[city]) {
-    return `Больше про ${BLOG_CTA_CITY_SHORT[city]}`;
-  }
-  if (city && input.city) {
-    const name = String(input.city).trim();
-    if (name) return `Больше про ${name}`;
+  const cityLabel = resolveBlogCtaCityLabel(input.citySlug, input.city);
+  if (cityLabel) {
+    return `Больше про ${cityLabel}`;
   }
 
   const landing = String(input.landingSlug || '').trim();

@@ -6,9 +6,7 @@ import { BlogPostCard } from '@/components/BlogPostCard.client';
 import type { BlogCardDto } from '@/lib/blog-utils';
 
 /**
- * Content feed (filters/sidebars aside): 3 columns on xl+.
- * Article is either 1-col or 2-col wide → a row fits exactly two cards (2+1).
- * First post can lead full-width; then pairs alternate wide-left / wide-right.
+ * 3-col bento: lead (span-3, portrait+text) then alternating 2+1 / 1+2 pairs.
  */
 export function BlogMagazineGrid({
   posts,
