@@ -4,20 +4,21 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex,nofollow" />
-    <title>Сравнение afisha-баннера блога · 3 версии</title>
+    <title>Промо-баннеры блога · вертикаль + горизонталь</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap"
       rel="stylesheet"
     />
     <style>
       :root {
         color-scheme: light;
-        --bg: #f4f6f8;
+        --bg: #f1f5f9;
         --ink: #0f172a;
         --muted: #64748b;
-        --card: #0f172a;
+        --line: #e2e8f0;
+        --card: #fff;
       }
       * {
         box-sizing: border-box;
@@ -25,9 +26,9 @@
       body {
         margin: 0;
         font-family: Manrope, system-ui, sans-serif;
-        background: linear-gradient(180deg, #eef3f8 0%, var(--bg) 40%, #fff 100%);
+        background: linear-gradient(180deg, #e8eef5 0%, var(--bg) 35%, #fff 100%);
         color: var(--ink);
-        padding: 2rem 1.25rem 4rem;
+        padding: 2rem 1.25rem 5rem;
       }
       .wrap {
         max-width: 1180px;
@@ -40,85 +41,144 @@
       }
       .lead {
         color: var(--muted);
-        margin: 0 0 1.75rem;
-        max-width: 46rem;
+        margin: 0 0 1.5rem;
+        max-width: 48rem;
         line-height: 1.5;
       }
-      .grid {
+      .toc {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin: 0 0 2.5rem;
+      }
+      .toc a {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        border: 1px solid #cbd5e1;
+        background: #fff;
+        padding: 0.4rem 0.85rem;
+        font-size: 0.8rem;
+        font-weight: 650;
+        color: #334155;
+        text-decoration: none;
+      }
+      .toc a:hover {
+        border-color: #94a3b8;
+        color: #0f172a;
+      }
+      .section {
+        margin-bottom: 3.25rem;
+      }
+      .section-head {
+        margin-bottom: 1.15rem;
+      }
+      .section-head h2 {
+        margin: 0 0 0.35rem;
+        font-size: 1.25rem;
+        letter-spacing: -0.01em;
+      }
+      .section-head p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.9rem;
+        line-height: 1.45;
+        max-width: 44rem;
+      }
+      .grid-3 {
         display: grid;
         gap: 1.25rem;
         grid-template-columns: 1fr;
       }
-      @media (min-width: 960px) {
-        .grid {
+      .grid-2 {
+        display: grid;
+        gap: 1.25rem;
+        grid-template-columns: 1fr;
+      }
+      @media (min-width: 860px) {
+        .grid-3 {
           grid-template-columns: repeat(3, minmax(0, 1fr));
           align-items: stretch;
+        }
+        .grid-2 {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
         }
       }
       .col {
         display: flex;
         flex-direction: column;
-        gap: 0.75rem;
+        gap: 0.7rem;
         min-height: 100%;
       }
       .meta {
         display: flex;
         flex-direction: column;
-        gap: 0.35rem;
-        min-height: 5.5rem;
+        gap: 0.3rem;
+        min-height: 4.75rem;
       }
       .badge {
         display: inline-flex;
         width: fit-content;
         align-items: center;
         border-radius: 999px;
-        padding: 0.2rem 0.65rem;
-        font-size: 0.7rem;
-        font-weight: 700;
+        padding: 0.18rem 0.6rem;
+        font-size: 0.68rem;
+        font-weight: 750;
         letter-spacing: 0.04em;
         text-transform: uppercase;
       }
-      .badge-cool {
+      .b-cool {
         background: #dcfce7;
         color: #166534;
       }
-      .badge-bad {
+      .b-bad {
         background: #fee2e2;
         color: #991b1b;
       }
-      .badge-now {
+      .b-now {
         background: #e0e7ff;
         color: #3730a3;
       }
-      .meta h2 {
+      .b-rich {
+        background: #ffedd5;
+        color: #9a3412;
+      }
+      .b-feed {
+        background: #e0f2fe;
+        color: #075985;
+      }
+      .b-event {
+        background: #fce7f3;
+        color: #9d174d;
+      }
+      .b-land {
+        background: #ecfccb;
+        color: #3f6212;
+      }
+      .meta h3 {
         margin: 0;
-        font-size: 1.05rem;
+        font-size: 1rem;
         line-height: 1.25;
       }
       .meta p {
         margin: 0;
         color: var(--muted);
-        font-size: 0.85rem;
+        font-size: 0.82rem;
         line-height: 1.4;
       }
-      .meta a {
-        color: #2563eb;
-        font-size: 0.8rem;
-        text-decoration: none;
-      }
-      .meta a:hover {
-        text-decoration: underline;
-      }
       .stage {
-        /* sidebar-like column width feel */
         flex: 1;
-        min-height: 28rem;
+        min-height: 26rem;
         display: flex;
         flex-direction: column;
         background: #e2e8f0;
-        border-radius: 1.25rem;
-        padding: 0.75rem;
+        border-radius: 1.15rem;
+        padding: 0.7rem;
         border: 1px solid #cbd5e1;
+      }
+      .stage-h {
+        min-height: 0;
+        background: #eef2f7;
       }
       .banner {
         position: relative;
@@ -126,13 +186,13 @@
         border-radius: 1rem;
         background: #0f172a;
         color: #fff;
-        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18);
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.16);
         flex: 1;
         min-height: 18rem;
         display: flex;
         flex-direction: column;
       }
-      .banner img {
+      .banner img.bg {
         position: absolute;
         inset: 0;
         width: 100%;
@@ -140,52 +200,100 @@
         object-fit: cover;
         transition: transform 0.5s ease;
       }
-      .banner:hover img {
-        transform: scale(1.05);
+      .banner:hover img.bg {
+        transform: scale(1.04);
       }
       .cta {
         display: inline-flex;
         width: fit-content;
         align-items: center;
-        gap: 0.4rem;
+        gap: 0.35rem;
         border-radius: 0.75rem;
         background: #fff;
         color: #0f172a;
-        padding: 0.65rem 1rem;
-        font-size: 0.875rem;
+        padding: 0.6rem 0.95rem;
+        font-size: 0.84rem;
         font-weight: 700;
         text-decoration: none;
       }
-
-      /* A) 5ba01f57 — cool tall + strong gradient */
-      .v-cool {
-        min-height: 22rem;
+      .cta-ghost {
+        background: rgba(255, 255, 255, 0.14);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.35);
       }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+      }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        padding: 0.22rem 0.55rem;
+        font-size: 0.72rem;
+        font-weight: 650;
+        background: rgba(255, 255, 255, 0.16);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        color: #fff;
+      }
+      .stat {
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.88);
+      }
+      .titles {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        font-size: 0.78rem;
+        color: rgba(255, 255, 255, 0.9);
+      }
+      .titles li::before {
+        content: '· ';
+        opacity: 0.7;
+      }
+
+      /* —— Vertical: layout history —— */
       .v-cool .scrim {
         position: absolute;
         inset: 0;
-        background: linear-gradient(to top, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.4) 45%, rgba(0, 0, 0, 0.1));
+        background: linear-gradient(
+          to top,
+          rgba(0, 0, 0, 0.85),
+          rgba(0, 0, 0, 0.4) 45%,
+          rgba(0, 0, 0, 0.1)
+        );
       }
-      .v-cool .content {
+      .v-cool .content,
+      .v-now .content,
+      .v-rich .content,
+      .v-titles .content {
         position: relative;
         margin-top: auto;
         display: flex;
         flex-direction: column;
-        gap: 0.75rem;
-        padding: 1.25rem 1.5rem;
+        gap: 0.7rem;
+        padding: 1.15rem 1.25rem;
       }
-      .v-cool h3 {
+      .v-cool h4,
+      .v-now h4,
+      .v-rich h4,
+      .v-titles h4,
+      .v-glass h4 {
         margin: 0;
-        font-size: 1.35rem;
+        font-size: 1.2rem;
         font-weight: 800;
         line-height: 1.25;
         max-width: 16rem;
       }
-      .v-cool img {
+      .v-cool img.bg {
         opacity: 0.8;
       }
 
-      /* B) 4a30763a — square + glass */
       .v-glass {
         aspect-ratio: 4 / 5;
         max-height: 22rem;
@@ -205,7 +313,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        padding: 1rem 1.15rem;
+        padding: 0.9rem 1rem;
       }
       .v-glass .glass {
         border-radius: 0.75rem;
@@ -213,27 +321,16 @@
         background: rgba(2, 6, 23, 0.45);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
-        padding: 0.75rem;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-      }
-      .v-glass h3 {
-        margin: 0;
-        font-size: 1.05rem;
-        font-weight: 800;
-        line-height: 1.25;
+        padding: 0.7rem;
       }
       .v-glass .cta {
-        margin-top: 0.65rem;
-        padding: 0.5rem 0.9rem;
+        margin-top: 0.55rem;
+        padding: 0.45rem 0.85rem;
       }
-      .v-glass img {
-        opacity: 0.9;
+      .v-glass h4 {
+        font-size: 1.02rem;
       }
 
-      /* C) 5f453de0 / current — tall + light bottom scrim */
-      .v-now {
-        min-height: 22rem;
-      }
       .v-now .scrim {
         position: absolute;
         left: 0;
@@ -247,33 +344,219 @@
           transparent
         );
       }
-      .v-now .content {
+
+      .v-rich .scrim {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          to top,
+          rgba(2, 6, 23, 0.92) 0%,
+          rgba(2, 6, 23, 0.55) 42%,
+          rgba(2, 6, 23, 0.12) 70%,
+          transparent 100%
+        );
+      }
+      .v-rich .eyebrow {
+        font-size: 0.68rem;
+        font-weight: 750;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.75);
+      }
+      .v-rich .price {
+        font-size: 0.95rem;
+        font-weight: 750;
+      }
+
+      .v-titles .scrim {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(160deg, rgba(15, 23, 42, 0.25), rgba(15, 23, 42, 0.88));
+      }
+
+      /* —— Horizontal feed slots —— */
+      .h-card {
+        display: grid;
+        grid-template-columns: minmax(7.5rem, 34%) 1fr;
+        min-height: 9.5rem;
+        border-radius: 1rem;
+        overflow: hidden;
+        background: #fff;
+        border: 1px solid var(--line);
+        box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+        text-decoration: none;
+        color: inherit;
+      }
+      .h-card:hover {
+        border-color: #cbd5e1;
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.1);
+      }
+      .h-card .media {
         position: relative;
-        margin-top: auto;
+        min-height: 100%;
+        background: #0f172a;
+      }
+      .h-card .media img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .h-card .body {
         display: flex;
         flex-direction: column;
-        gap: 0.75rem;
-        padding: 1.25rem 1.5rem;
+        gap: 0.45rem;
+        padding: 0.95rem 1.05rem;
+        min-width: 0;
       }
-      .v-now h3 {
+      .h-card .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+      }
+      .h-card .tag {
+        display: inline-flex;
+        border-radius: 0.45rem;
+        padding: 0.18rem 0.45rem;
+        font-size: 0.65rem;
+        font-weight: 750;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .tag-blue {
+        background: #0284c7;
+        color: #fff;
+      }
+      .tag-green {
+        background: #dcfce7;
+        color: #166534;
+      }
+      .tag-rose {
+        background: #f43f5e;
+        color: #fff;
+      }
+      .tag-amber {
+        background: #fef3c7;
+        color: #92400e;
+      }
+      .h-card h4 {
         margin: 0;
-        font-size: 1.35rem;
+        font-size: 0.98rem;
+        font-weight: 800;
+        line-height: 1.3;
+        letter-spacing: -0.01em;
+      }
+      .h-card .excerpt {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.8rem;
+        line-height: 1.4;
+      }
+      .h-card .foot {
+        margin-top: auto;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.65rem;
+        font-size: 0.78rem;
+        color: var(--muted);
+      }
+      .h-card .link {
+        color: #0284c7;
+        font-weight: 700;
+      }
+
+      .h-overlay {
+        position: relative;
+        display: flex;
+        min-height: 10.5rem;
+        border-radius: 1rem;
+        overflow: hidden;
+        background: #0f172a;
+        color: #fff;
+        box-shadow: 0 8px 22px rgba(15, 23, 42, 0.14);
+      }
+      .h-overlay img.bg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .h-overlay .scrim {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, rgba(2, 6, 23, 0.88) 0%, rgba(2, 6, 23, 0.45) 55%, rgba(2, 6, 23, 0.2));
+      }
+      .h-overlay .content {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 0.55rem;
+        padding: 1.15rem 1.35rem;
+        max-width: 28rem;
+      }
+      .h-overlay h4 {
+        margin: 0;
+        font-size: 1.15rem;
         font-weight: 800;
         line-height: 1.25;
-        max-width: 16rem;
       }
-      .v-now img {
-        opacity: 0.9;
+      .h-overlay .meta-line {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.85);
+      }
+
+      .h-split {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        min-height: 11rem;
+        border-radius: 1rem;
+        overflow: hidden;
+        background: #0f172a;
+        color: #fff;
+      }
+      .h-split .copy {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 1.15rem 1.25rem;
+        background: linear-gradient(135deg, #0f172a, #1e293b);
+      }
+      .h-split h4 {
+        margin: 0;
+        font-size: 1.05rem;
+        font-weight: 800;
+        line-height: 1.3;
+      }
+      .h-split p {
+        margin: 0;
+        color: rgba(255, 255, 255, 0.78);
+        font-size: 0.8rem;
+        line-height: 1.4;
+      }
+      .h-split .media {
+        position: relative;
+      }
+      .h-split .media img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
       }
 
       .note {
-        margin-top: 2rem;
+        margin-top: 0.5rem;
         padding: 1rem 1.15rem;
         border-radius: 1rem;
         background: #fff;
-        border: 1px solid #e2e8f0;
+        border: 1px solid var(--line);
         color: var(--muted);
-        font-size: 0.9rem;
+        font-size: 0.88rem;
         line-height: 1.5;
       }
       code {
@@ -286,82 +569,411 @@
   </head>
   <body>
     <div class="wrap">
-      <h1>Afisha-баннер в сайдбаре блога: 3 версии</h1>
+      <h1>Промо-баннеры блога: вертикаль и горизонталь</h1>
       <p class="lead">
-        Один и тот же контент (Москва + «Смотреть афишу») в трёх коммитах. Слева направо: крутая
-        tall с сильным градиентом → сломанная glass → текущий restore.
+        Служебная доска макетов. Вертикаль - сайдбар. Горизонталь - слот вместо strip-карточки
+        статьи в ленте (как место с «Казань на вкус»). Данные Москвы вымышленно-живые: цена, чипы,
+        ближайшие названия - то, что DTO уже умеет считать.
       </p>
+      <nav class="toc" aria-label="Разделы">
+        <a href="#v-layout">V · история layout</a>
+        <a href="#v-rich">V · rich data</a>
+        <a href="#h-feed">H · слот в ленте</a>
+        <a href="#h-types">H · город / подборка / событие</a>
+      </nav>
 
-      <div class="grid">
-        <div class="col">
-          <div class="meta">
-            <span class="badge badge-cool">Крутая</span>
-            <h2>5ba01f57 · tall + сильный градиент</h2>
-            <p>Фото на всю высоту, плотный градиент, текст и CTA без glass.</p>
-            <a href="https://github.com/Twisterrrrr/daibilet/blob/5ba01f57/apps/web/src/components/BlogAfishaPromo.client.tsx"
-              >код на GitHub →</a
-            >
-          </div>
-          <div class="stage">
-            <section class="banner v-cool" aria-label="Версия 5ba01f57">
-              <img src="https://daibilet.ru/images/cities/top/moscow.jpg" alt="" />
-              <div class="scrim" aria-hidden="true"></div>
-              <div class="content">
-                <h3>Гид по лучшим событиям Москвы</h3>
-                <a class="cta" href="https://daibilet.ru/events?city=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0">Смотреть афишу →</a>
-              </div>
-            </section>
-          </div>
+      <!-- ========== VERTICAL LAYOUT HISTORY ========== -->
+      <section class="section" id="v-layout">
+        <div class="section-head">
+          <h2>Вертикаль · история layout (сайдбар)</h2>
+          <p>Три коммита: один и тот же минимальный контент, разный каркас.</p>
         </div>
-
-        <div class="col">
-          <div class="meta">
-            <span class="badge badge-bad">Сломанная</span>
-            <h2>4a30763a · квадрат + glass</h2>
-            <p>aspect 4/5, max-height 22rem, стеклянная панель поверх фото.</p>
-            <a href="https://github.com/Twisterrrrr/daibilet/blob/4a30763a/apps/web/src/components/BlogAfishaPromo.client.tsx"
-              >код на GitHub →</a
-            >
-          </div>
-          <div class="stage">
-            <section class="banner v-glass" aria-label="Версия 4a30763a">
-              <img src="https://daibilet.ru/images/cities/top/moscow.jpg" alt="" />
-              <div class="scrim" aria-hidden="true"></div>
-              <div class="content">
-                <div class="glass">
-                  <h3>Гид по лучшим событиям Москвы</h3>
-                  <a class="cta" href="https://daibilet.ru/events?city=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0">Смотреть афишу →</a>
+        <div class="grid-3">
+          <div class="col">
+            <div class="meta">
+              <span class="badge b-cool">Крутая</span>
+              <h3>tall + сильный градиент</h3>
+              <p>5ba01f57 · фото на всю высоту, без glass.</p>
+            </div>
+            <div class="stage">
+              <section class="banner v-cool" aria-label="tall cool">
+                <img class="bg" src="https://daibilet.ru/images/cities/top/moscow.jpg" alt="" />
+                <div class="scrim" aria-hidden="true"></div>
+                <div class="content">
+                  <h4>Гид по лучшим событиям Москвы</h4>
+                  <a class="cta" href="https://daibilet.ru/events?city=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0"
+                    >Смотреть афишу →</a
+                  >
                 </div>
-              </div>
-            </section>
+              </section>
+            </div>
           </div>
-        </div>
 
-        <div class="col">
-          <div class="meta">
-            <span class="badge badge-now">Сейчас</span>
-            <h2>5f453de0 · tall + лёгкий scrim</h2>
-            <p>Снова tall flex-1, но градиент только на нижние ~32%.</p>
-            <a href="https://github.com/Twisterrrrr/daibilet/blob/5f453de0/apps/web/src/components/BlogAfishaPromo.client.tsx"
-              >код на GitHub →</a
-            >
+          <div class="col">
+            <div class="meta">
+              <span class="badge b-bad">Сломанная</span>
+              <h3>квадрат + glass</h3>
+              <p>4a30763a · aspect 4/5, стеклянная панель.</p>
+            </div>
+            <div class="stage">
+              <section class="banner v-glass" aria-label="glass square">
+                <img class="bg" src="https://daibilet.ru/images/cities/top/moscow.jpg" alt="" />
+                <div class="scrim" aria-hidden="true"></div>
+                <div class="content">
+                  <div class="glass">
+                    <h4>Гид по лучшим событиям Москвы</h4>
+                    <a class="cta" href="https://daibilet.ru/events?city=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0"
+                      >Смотреть афишу →</a
+                    >
+                  </div>
+                </div>
+              </section>
+            </div>
           </div>
-          <div class="stage">
-            <section class="banner v-now" aria-label="Версия 5f453de0">
-              <img src="https://daibilet.ru/images/cities/top/moscow.jpg" alt="" />
-              <div class="scrim" aria-hidden="true"></div>
-              <div class="content">
-                <h3>Гид по лучшим событиям Москвы</h3>
-                <a class="cta" href="https://daibilet.ru/events?city=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0">Смотреть афишу →</a>
-              </div>
-            </section>
+
+          <div class="col">
+            <div class="meta">
+              <span class="badge b-now">Сейчас</span>
+              <h3>tall + лёгкий scrim</h3>
+              <p>5f453de0 · градиент только на нижние ~32%.</p>
+            </div>
+            <div class="stage">
+              <section class="banner v-now" aria-label="current tall">
+                <img class="bg" src="https://daibilet.ru/images/cities/top/moscow.jpg" alt="" />
+                <div class="scrim" aria-hidden="true"></div>
+                <div class="content">
+                  <h4>Гид по лучшим событиям Москвы</h4>
+                  <a class="cta" href="https://daibilet.ru/events?city=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0"
+                    >Смотреть афишу →</a
+                  >
+                </div>
+              </section>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
+
+      <!-- ========== VERTICAL RICH ========== -->
+      <section class="section" id="v-rich">
+        <div class="section-head">
+          <h2>Вертикаль · rich (то, что DTO уже отдаёт)</h2>
+          <p>Цена, выходные, чипы направлений, ближайшие названия. Кандидаты на сайдбар.</p>
+        </div>
+        <div class="grid-3">
+          <div class="col">
+            <div class="meta">
+              <span class="badge b-rich">Rich A</span>
+              <h3>цена + чипы</h3>
+              <p>Минимум шума: от N ₽ и 2 направления.</p>
+            </div>
+            <div class="stage">
+              <section class="banner v-rich" aria-label="rich price chips">
+                <img class="bg" src="https://daibilet.ru/images/cities/top/moscow.jpg" alt="" />
+                <div class="scrim" aria-hidden="true"></div>
+                <div class="content">
+                  <div class="eyebrow">Афиша · Москва</div>
+                  <h4>Гид по лучшим событиям Москвы</h4>
+                  <div class="price">от 900 ₽ · 48 на выходных</div>
+                  <div class="chips">
+                    <span class="chip">Концерты</span>
+                    <span class="chip">Экскурсии</span>
+                  </div>
+                  <a class="cta" href="https://daibilet.ru/events?city=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0"
+                    >Смотреть афишу →</a
+                  >
+                </div>
+              </section>
+            </div>
+          </div>
+
+          <div class="col">
+            <div class="meta">
+              <span class="badge b-rich">Rich B</span>
+              <h3>ближайшие названия</h3>
+              <p>upcomingTitles: 2 живых события поверх города.</p>
+            </div>
+            <div class="stage">
+              <section class="banner v-titles" aria-label="rich titles">
+                <img class="bg" src="https://daibilet.ru/images/cities/top/moscow.jpg" alt="" />
+                <div class="scrim" aria-hidden="true"></div>
+                <div class="content">
+                  <div class="stat">Москва · сегодня и завтра</div>
+                  <h4>Что поймать в афише</h4>
+                  <ul class="titles">
+                    <li>Пианиссимо</li>
+                    <li>Сапрыкин</li>
+                  </ul>
+                  <a class="cta" href="https://daibilet.ru/events?city=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0"
+                    >Открыть афишу →</a
+                  >
+                </div>
+              </section>
+            </div>
+          </div>
+
+          <div class="col">
+            <div class="meta">
+              <span class="badge b-rich">Rich C</span>
+              <h3>glass + цена</h3>
+              <p>Компактный квадрат, но уже с данными.</p>
+            </div>
+            <div class="stage">
+              <section class="banner v-glass" aria-label="glass rich">
+                <img class="bg" src="https://daibilet.ru/images/cities/top/moscow.jpg" alt="" />
+                <div class="scrim" aria-hidden="true"></div>
+                <div class="content">
+                  <div class="glass">
+                    <h4>Афиша Москвы</h4>
+                    <div class="stat" style="margin-top: 0.35rem">от 900 ₽ · 917 событий</div>
+                    <div class="chips" style="margin-top: 0.5rem">
+                      <span class="chip">Стендап</span>
+                      <span class="chip">Музеи</span>
+                    </div>
+                    <a class="cta" href="https://daibilet.ru/events?city=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0"
+                      >Смотреть →</a
+                    >
+                  </div>
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== HORIZONTAL FEED SLOT ========== -->
+      <section class="section" id="h-feed">
+        <div class="section-head">
+          <h2>Горизонталь · слот вместо статьи в ленте</h2>
+          <p>
+            Формат как у strip-карточки («Казань на вкус»): фото слева, текст справа. Сюда можно
+            периодически подмешивать промо вместо N-й статьи.
+          </p>
+        </div>
+        <div class="grid-2">
+          <div class="col">
+            <div class="meta">
+              <span class="badge b-feed">H1</span>
+              <h3>strip · городская афиша</h3>
+              <p>Тот же каркас, что у статьи, но контент - афиша города.</p>
+            </div>
+            <div class="stage stage-h">
+              <a class="h-card" href="https://daibilet.ru/events?city=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0">
+                <div class="media">
+                  <img src="https://daibilet.ru/images/cities/top/moscow.jpg" alt="" />
+                </div>
+                <div class="body">
+                  <div class="tags">
+                    <span class="tag tag-blue">Афиша</span>
+                    <span class="tag tag-green">Москва</span>
+                  </div>
+                  <h4>Гид по лучшим событиям Москвы</h4>
+                  <p class="excerpt">от 900 ₽ · 48 на выходных · концерты и экскурсии без очереди в чатах.</p>
+                  <div class="foot">
+                    <span class="link">Смотреть афишу →</span>
+                    <span>живые даты</span>
+                  </div>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <div class="col">
+            <div class="meta">
+              <span class="badge b-feed">H2</span>
+              <h3>strip · denser meta</h3>
+              <p>Ближайшие названия + цена в футере, как у статьи с датой/минутами.</p>
+            </div>
+            <div class="stage stage-h">
+              <a class="h-card" href="https://daibilet.ru/events?city=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0">
+                <div class="media">
+                  <img src="https://daibilet.ru/images/cities/top/moscow.jpg" alt="" />
+                </div>
+                <div class="body">
+                  <div class="tags">
+                    <span class="tag tag-blue">Промо</span>
+                    <span class="tag tag-green">Москва</span>
+                  </div>
+                  <h4>Что ловить в Москве на выходных</h4>
+                  <p class="excerpt">Пианиссимо · Сапрыкин · ещё 46 дат на субботу и воскресенье.</p>
+                  <div class="foot">
+                    <span class="link">Открыть →</span>
+                    <span>от 900 ₽</span>
+                    <span>48 событий</span>
+                  </div>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <div class="col">
+            <div class="meta">
+              <span class="badge b-feed">H3</span>
+              <h3>full-bleed overlay</h3>
+              <p>На всю ширину колонки ленты, текст слева на фото.</p>
+            </div>
+            <div class="stage stage-h">
+              <section class="h-overlay" aria-label="horizontal overlay">
+                <img class="bg" src="https://daibilet.ru/images/cities/top/moscow.jpg" alt="" />
+                <div class="scrim" aria-hidden="true"></div>
+                <div class="content">
+                  <div class="chips">
+                    <span class="chip">Афиша</span>
+                    <span class="chip">Москва</span>
+                  </div>
+                  <h4>Гид по лучшим событиям Москвы</h4>
+                  <div class="meta-line">от 900 ₽ · концерты · экскурсии</div>
+                  <a class="cta" href="https://daibilet.ru/events?city=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0"
+                    >Смотреть афишу →</a
+                  >
+                </div>
+              </section>
+            </div>
+          </div>
+
+          <div class="col">
+            <div class="meta">
+              <span class="badge b-feed">H4</span>
+              <h3>split panel</h3>
+              <p>Текст на тёмной панели + фото справа (не overlay).</p>
+            </div>
+            <div class="stage stage-h">
+              <section class="h-split" aria-label="horizontal split">
+                <div class="copy">
+                  <div class="chips">
+                    <span class="chip">Афиша города</span>
+                  </div>
+                  <h4>Москва без чата «куда сходить»</h4>
+                  <p>48 дат на выходные, живые цены, билеты в пару кликов.</p>
+                  <a class="cta cta-ghost" href="https://daibilet.ru/events?city=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0"
+                    >Открыть афишу →</a
+                  >
+                </div>
+                <div class="media">
+                  <img src="https://daibilet.ru/images/cities/top/moscow.jpg" alt="" />
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== HORIZONTAL CONTENT TYPES ========== -->
+      <section class="section" id="h-types">
+        <div class="section-head">
+          <h2>Горизонталь · разные типы промо в одном слоте</h2>
+          <p>Один каркас strip, разный смысл: город / подборка / отдельное событие.</p>
+        </div>
+        <div class="grid-2">
+          <div class="col">
+            <div class="meta">
+              <span class="badge b-feed">Город</span>
+              <h3>афиша по выбранному городу</h3>
+              <p>Как сайдбар, но в ленте.</p>
+            </div>
+            <div class="stage stage-h">
+              <a class="h-card" href="https://daibilet.ru/cities/kazan">
+                <div class="media">
+                  <img src="https://daibilet.ru/images/cities/top/kazan.jpg" alt="" />
+                </div>
+                <div class="body">
+                  <div class="tags">
+                    <span class="tag tag-blue">Афиша</span>
+                    <span class="tag tag-green">Казань</span>
+                  </div>
+                  <h4>Гид по лучшим событиям Казани</h4>
+                  <p class="excerpt">от 700 ₽ · стендап, концерты и прогулки без пробок в чате.</p>
+                  <div class="foot">
+                    <span class="link">Смотреть афишу →</span>
+                  </div>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <div class="col">
+            <div class="meta">
+              <span class="badge b-land">Подборка</span>
+              <h3>landing / podborka</h3>
+              <p>Сезонная или тематическая подборка вместо статьи.</p>
+            </div>
+            <div class="stage stage-h">
+              <a class="h-card" href="https://daibilet.ru/podborki">
+                <div class="media">
+                  <img src="https://daibilet.ru/images/cities/top/saint-petersburg.jpg" alt="" />
+                </div>
+                <div class="body">
+                  <div class="tags">
+                    <span class="tag tag-amber">Подборка</span>
+                    <span class="tag tag-green">Санкт-Петербург</span>
+                  </div>
+                  <h4>Выходные в Петербурге: 12 живых сценариев</h4>
+                  <p class="excerpt">От дворцов до стендапа - готовые списки без бесконечного скролла.</p>
+                  <div class="foot">
+                    <span class="link">Открыть подборку →</span>
+                    <span>12 направлений</span>
+                  </div>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <div class="col">
+            <div class="meta">
+              <span class="badge b-event">Событие</span>
+              <h3>одно конкретное событие</h3>
+              <p>Обложка ивента, дата, цена - как карточка каталога в формате блога.</p>
+            </div>
+            <div class="stage stage-h">
+              <a class="h-card" href="https://daibilet.ru/events">
+                <div class="media">
+                  <img src="https://daibilet.ru/images/blog/blog-hero-promo.jpg" alt="" />
+                </div>
+                <div class="body">
+                  <div class="tags">
+                    <span class="tag tag-rose">Событие</span>
+                    <span class="tag tag-green">Москва</span>
+                  </div>
+                  <h4>Пианиссимо: вечер фортепиано в центре</h4>
+                  <p class="excerpt">Суббота, 19:00 · камерный зал · без микрофонной каши.</p>
+                  <div class="foot">
+                    <span class="link">Купить билет →</span>
+                    <span>от 1 500 ₽</span>
+                    <span>19:00</span>
+                  </div>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <div class="col">
+            <div class="meta">
+              <span class="badge b-event">Событие · overlay</span>
+              <h3>событие на full-bleed</h3>
+              <p>Если нужен акцент сильнее обычной strip-статьи.</p>
+            </div>
+            <div class="stage stage-h">
+              <section class="h-overlay" aria-label="event overlay">
+                <img class="bg" src="https://daibilet.ru/images/blog/blog-hero-promo.jpg" alt="" />
+                <div class="scrim" aria-hidden="true"></div>
+                <div class="content">
+                  <div class="chips">
+                    <span class="chip">Сегодня</span>
+                    <span class="chip">от 1 500 ₽</span>
+                  </div>
+                  <h4>Пианиссимо в Москве</h4>
+                  <div class="meta-line">19:00 · камерный зал · осталось мало мест</div>
+                  <a class="cta" href="https://daibilet.ru/events">К билетам →</a>
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <p class="note">
-        Страница служебная (<code>noindex</code>). После выбора версии можно вернуть разметку в
-        <code>BlogAfishaPromo.client.tsx</code>. Скрин с Красной площадью ближе всего к левой колонке.
+        Страница служебная (<code>noindex</code>). URL:
+        <code>https://daibilet.ru/afisha-banner-variants.html</code>. Напиши номера вариантов
+        (например <code>V-Rich A + H1 + событие strip</code>) - вынесем в прод.
       </p>
     </div>
   </body>
