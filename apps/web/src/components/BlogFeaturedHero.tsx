@@ -76,11 +76,12 @@ export function BlogFeaturedHero({
   // When hot/promo live in page sidebar, featured must be a single full-width card —
   // keeping the old 1fr|2fr grid leaves an empty column and squashes the hero.
   const sectionClass = hideAsideOnDesktop
-    ? 'mb-8 w-full'
+    ? 'mb-8 w-full sm:mb-10'
     : 'mb-8 grid w-full items-stretch gap-4 lg:grid-cols-[minmax(16rem,1fr)_minmax(0,2fr)] lg:gap-5';
+  // Same height band as venue/article heroes (~20rem), not magazine full-viewport.
   const articleClass = hideAsideOnDesktop
-    ? 'group relative flex min-h-[22rem] overflow-hidden rounded-2xl bg-slate-900 shadow-md md:min-h-[24rem] lg:min-h-[28rem]'
-    : 'group order-1 relative flex min-h-[24rem] overflow-hidden rounded-2xl bg-slate-900 shadow-md md:min-h-[22rem] lg:order-2 lg:min-h-full';
+    ? 'group relative flex min-h-[14rem] overflow-hidden rounded-2xl bg-slate-900 shadow-md sm:min-h-[16rem] md:min-h-[18rem] lg:min-h-[20rem]'
+    : 'group order-1 relative flex min-h-[16rem] overflow-hidden rounded-2xl bg-slate-900 shadow-md md:min-h-[18rem] lg:order-2 lg:min-h-[20rem]';
   const imageSizes = hideAsideOnDesktop
     ? '(max-width: 1024px) 100vw, 80vw'
     : FEATURED_IMAGE_SIZES;
@@ -111,10 +112,10 @@ export function BlogFeaturedHero({
           />
         </Link>
 
-        <div className="relative z-10 mt-auto flex w-full flex-col gap-4 p-7 md:gap-4 md:p-7 lg:p-8">
+        <div className="relative z-10 mt-auto flex w-full flex-col gap-3 p-5 sm:p-6 md:gap-3 md:p-6 lg:p-7">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-[0.14em] text-white/80 md:text-xs">
-              Материал недели
+            <span className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-white/80 sm:text-xs">
+              Сейчас в ленте
             </span>
             {tag ? (
               <span
@@ -132,7 +133,7 @@ export function BlogFeaturedHero({
             ) : null}
           </div>
 
-          <h2 className="font-serif text-[1.75rem] font-semibold leading-[1.12] tracking-tight text-white md:text-3xl lg:text-4xl">
+          <h2 className="font-serif text-xl font-semibold leading-[1.12] tracking-tight text-white sm:text-2xl md:text-[1.65rem] lg:text-3xl">
             <Link href={articleHref} className="hover:text-white/90">
               {featured.title}
             </Link>

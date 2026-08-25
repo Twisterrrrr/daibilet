@@ -13,6 +13,7 @@ import {
   persistSelectedCity,
   ensureCityInOptions,
   resolveCatalogCityFilter,
+  resolveCatalogFetchCity,
   resolveCityHubDestination,
   resolveCityLabel,
   resolveSectionCityFilter,
@@ -235,6 +236,36 @@ test('catalogCityQueryValue prefers destination slug', () => {
   assert.equal(catalogCityQueryValue([...destinations], 'Уфа'), 'ufa');
   assert.equal(catalogCityQueryValue([...destinations], 'moscow'), 'moscow');
   assert.equal(catalogCityQueryValue([...destinations], 'all'), 'all');
+});
+
+test('resolveCatalogFetchCity prefers explicit URL over header', () => {
+  assert.equal(
+    resolveCatalogFetchCity({
+      urlCity: 'Уфа',
+      cityReady: true,
+      headerCityValue: 'Москва',
+      destinations: [...destinations],
+    }),
+    'ufa',
+  );
+  assert.equal(
+    resolveCatalogFetchCity({
+      urlCity: '',
+      cityReady: true,
+      headerCityValue: 'Уфа',
+      destinations: [...destinations],
+    }),
+    'ufa',
+  );
+  assert.equal(
+    resolveCatalogFetchCity({
+      urlCityAll: true,
+      cityReady: true,
+      headerCityValue: 'Москва',
+      destinations: [...destinations],
+    }),
+    undefined,
+  );
 });
 
 test('resolveSectionCityFilter follows header once ready, URL only while bootstrapping', () => {

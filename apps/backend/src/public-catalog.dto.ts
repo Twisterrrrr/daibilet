@@ -189,7 +189,7 @@ export async function buildPublicCatalogDto(query: PublicCatalogQuery): Promise<
   // Favorites / ids lookup: allow sessions without cover; normal catalog stays cover-gated.
   const sourceSessions = byIds ? sessions : sessions.filter(sessionHasCoverImage);
   const filtered = sourceSessions.filter((session) => matchesCatalogQuery(session, query));
-  const sorted = sortCatalogSessions(filtered, query.sort || 'time');
+  const sorted = sortCatalogSessions(filtered, query.sort || 'random', query);
   const defaultLimit = byIds ? Math.min(Math.max(query.ids!.length, 1), CATALOG_PAGE_SIZE_MAX) : CATALOG_PAGE_SIZE_DEFAULT;
   const limit = clampNumber(query.limit, 1, CATALOG_PAGE_SIZE_MAX, defaultLimit);
   const total = sorted.length;
@@ -962,8 +962,46 @@ function buildCatalogFacets(sessions: PublicSessionDto[]): PublicCatalogDto['fac
   return buildConditionalCatalogFacets(sessions, {});
 }
 
-function sortCatalogSessions(sessions: PublicSessionDto[], sort: NonNullable<PublicCatalogQuery['sort']>): PublicSessionDto[] {
+function catalogRandomSeed(query: PublicCatalogQuery): number {
+  const bucket = new Date().toISOString().slice(0, 10);
+  const parts = [
+    bucket,
+    query.city || '',
+    query.category || '',
+    query.landing || '',
+    query.q || '',
+    query.date || '',
+    query.from || '',
+    query.to || '',
+  ].join('|');
+  let hash = 2166136261;
+  for (let i = 0; i < parts.length; i += 1) {
+    hash ^= parts.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
+}
+
+function seededShuffleSessions<T>(items: T[], seed: number): T[] {
+  const arr = [...items];
+  let state = seed >>> 0;
+  for (let i = arr.length - 1; i > 0; i -= 1) {
+    state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
+    const j = state % (i + 1);
+    [arr[i], arr[j]] = [arr[j]!, arr[i]!];
+  }
+  return arr;
+}
+
+function sortCatalogSessions(
+  sessions: PublicSessionDto[],
+  sort: NonNullable<PublicCatalogQuery['sort']>,
+  query: PublicCatalogQuery,
+): PublicSessionDto[] {
   const sorted = [...sessions];
+  if (sort === 'random') {
+    return seededShuffleSessions(sorted, catalogRandomSeed(query));
+  }
   if (sort === 'price' || sort === 'price_asc') {
     return sorted.sort((left, right) => comparePrice(left, right) || compareSessionTime(left, right));
   }

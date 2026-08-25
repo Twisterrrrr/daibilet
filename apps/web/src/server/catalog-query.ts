@@ -19,7 +19,7 @@ export function catalogQueryCacheKey(query: PublicCatalogQuery): string {
     date: query.date ?? '',
     from: query.from ?? '',
     to: query.to ?? '',
-    sort: query.sort ?? 'time',
+    sort: query.sort ?? 'random',
     limit: query.limit ?? CATALOG_PAGE_SIZE_DEFAULT,
     offset: query.offset ?? 0,
     minPrice: query.minPrice ?? '',

@@ -25,7 +25,12 @@ export type BlogSidebarPromoDto = {
   weekendCount: number;
   eventsCount: number;
   upcomingTitles: string[];
+  /** City card art for sidebar Rich A and feed city promos. */
   imageUrl: string | null;
+  /** First featured session cover (feed event promos only). */
+  featuredEventImageUrl?: string | null;
+  /** Deep link when featured session has slug. */
+  featuredEventHref?: string | null;
   chips: BlogSidebarPromoChip[];
 };
 
@@ -87,7 +92,20 @@ export function buildBlogSidebarPromoFromCityPage(page: PublicCityPageDto): Blog
     const url = String(session.imageUrl || '').trim();
     return sessionHasCoverImage(session) && /^https?:\/\//i.test(url);
   });
-  const imageUrl = cityImage || remoteCoverSession?.imageUrl?.trim() || null;
+  const imageUrl = cityImage || null;
+  const featuredTitle = upcomingTitles[0] || null;
+  const featuredSession =
+    (featuredTitle
+      ? sessions.find((session) => {
+          const title = String(session.title || '').trim();
+          if (title !== featuredTitle) return false;
+          const url = String(session.imageUrl || '').trim();
+          return sessionHasCoverImage(session) && /^https?:\/\//i.test(url);
+        })
+      : null) || remoteCoverSession;
+  const featuredEventImageUrl = featuredSession?.imageUrl?.trim() || null;
+  const featuredSlug = String(featuredSession?.slug || featuredSession?.sourceSlug || '').trim();
+  const featuredEventHref = featuredSlug ? `/events/${featuredSlug}` : null;
 
   const chips: BlogSidebarPromoChip[] = [];
   const landings = [...(page.landings || [])]
@@ -130,6 +148,8 @@ export function buildBlogSidebarPromoFromCityPage(page: PublicCityPageDto): Blog
     eventsCount: page.stats?.events ?? sessions.length,
     upcomingTitles,
     imageUrl,
+    featuredEventImageUrl,
+    featuredEventHref,
     chips,
   };
 }

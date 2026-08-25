@@ -1,6 +1,6 @@
 import { CATALOG_PAGE_SIZE_DEFAULT, CATALOG_PAGE_SIZES, type CatalogPageSize } from '@daibilet/contracts/catalog';
 
-export type CatalogSort = 'time' | 'price' | 'price_asc' | 'price_desc' | 'popular' | 'departing_soon';
+export type CatalogSort = 'time' | 'price' | 'price_asc' | 'price_desc' | 'popular' | 'departing_soon' | 'random';
 
 export interface CatalogFilterValues {
   q?: string;
@@ -52,7 +52,7 @@ export function catalogFiltersFromQuery(query: CatalogFilterValues): CatalogFilt
     date: query.date && query.date !== 'all' ? query.date : undefined,
     from: query.from || undefined,
     to: query.to || undefined,
-    sort: query.sort || 'time',
+    sort: query.sort || 'random',
     limit: query.limit && CATALOG_PAGE_SIZES.includes(query.limit) ? query.limit : CATALOG_PAGE_SIZE_DEFAULT,
     minPrice: query.minPrice,
     maxPrice: query.maxPrice,
@@ -71,7 +71,7 @@ export function buildCatalogHref(values: CatalogFilterValues): string {
   if (values.date) params.set('date', values.date);
   if (values.from) params.set('from', values.from);
   if (values.to) params.set('to', values.to);
-  if (values.sort && values.sort !== 'time') params.set('sort', values.sort);
+  if (values.sort && values.sort !== 'random') params.set('sort', values.sort);
   if (values.limit && values.limit !== CATALOG_PAGE_SIZE_DEFAULT) params.set('limit', String(values.limit));
   if (values.minPrice != null) params.set('minPrice', String(values.minPrice));
   if (values.maxPrice != null) params.set('maxPrice', String(values.maxPrice));

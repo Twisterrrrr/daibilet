@@ -171,6 +171,28 @@ export function pathHrefWithSelectedCity(
   return query ? `${path}?${query}` : path;
 }
 
+/**
+ * City token for catalog API fetch.
+ * Explicit `?city=` deep-links win over header (slug-normalized for stable fetch).
+ */
+export function resolveCatalogFetchCity(input: {
+  urlCity?: string | null;
+  urlCityAll?: boolean;
+  cityReady: boolean;
+  headerCityValue?: string | null;
+  destinations: PublicDestinationDto[];
+}): string | undefined {
+  const url = String(input.urlCity || '').trim();
+  if (url && url.toLowerCase() !== 'all') {
+    return catalogCityQueryValue(input.destinations, url);
+  }
+  if (input.urlCityAll) return undefined;
+  if (!input.cityReady) return undefined;
+  const header = String(input.headerCityValue || '').trim();
+  if (!header || header === 'all') return undefined;
+  return catalogCityQueryValue(input.destinations, header);
+}
+
 /** Resolve `?city=` (title or slug) against catalog option titles. */
 export function resolveCatalogCityFilter(
   urlCity: string,

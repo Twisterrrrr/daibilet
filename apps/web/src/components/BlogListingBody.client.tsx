@@ -92,17 +92,11 @@ export function BlogListingBody({
     <>
       <Suspense
         fallback={
-          <div className="border-b border-slate-200 bg-slate-50">
-            <div className="container-page flex flex-col gap-4 py-5 sm:py-6">
-              <div className="h-10 w-full max-w-3xl animate-pulse rounded-lg bg-slate-200/80" />
-              <div className="h-10 w-full max-w-xl animate-pulse rounded-xl bg-slate-200/70" />
-              <div className="flex flex-wrap gap-1.5">
-                <div className="h-9 w-20 animate-pulse rounded-xl bg-slate-200/60" />
-                <div className="h-9 w-24 animate-pulse rounded-xl bg-slate-200/60" />
-                <div className="h-9 w-16 animate-pulse rounded-xl bg-slate-200/60" />
-                <div className="h-9 w-20 animate-pulse rounded-xl bg-slate-200/60" />
-                <div className="h-9 w-28 animate-pulse rounded-xl bg-slate-200/60" />
-              </div>
+          <div className="border-b border-slate-100 bg-white">
+            <div className="container-page flex flex-col gap-3 py-5 sm:py-6">
+              <div className="h-8 w-full max-w-md animate-pulse rounded-lg bg-slate-200/80" />
+              <div className="h-4 w-full max-w-lg animate-pulse rounded bg-slate-100" />
+              <div className="h-11 w-full max-w-xl animate-pulse rounded-2xl bg-[#F5F5F7]" />
             </div>
           </div>
         }

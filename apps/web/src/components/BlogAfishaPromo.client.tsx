@@ -131,7 +131,7 @@ export function BlogAfishaPromo({
     return (
       <section
         aria-label="Афиша"
-        className="group relative mt-auto flex min-h-[18rem] flex-1 overflow-hidden rounded-2xl bg-slate-900 text-white shadow-sm"
+        className="group relative mt-auto flex min-h-[22rem] flex-1 overflow-hidden rounded-2xl bg-slate-900 text-white shadow-sm sm:min-h-[23rem]"
       >
         <SafeImage
           src={FALLBACK_IMAGE}
@@ -170,7 +170,7 @@ export function BlogAfishaPromo({
   return (
     <section
       aria-label={title}
-      className="group relative mt-auto flex min-h-[18rem] flex-1 overflow-hidden rounded-2xl bg-slate-900 text-white shadow-sm"
+      className="group relative mt-auto flex min-h-[22rem] flex-1 overflow-hidden rounded-2xl bg-slate-900 text-white shadow-sm sm:min-h-[23rem]"
     >
       <SafeImage
         src={imageSrc}

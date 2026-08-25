@@ -4,7 +4,8 @@ import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Search } from 'lucide-react';
 
-import { PageBreadcrumbBar, type BreadcrumbItem } from '@/components/PageBreadcrumbs';
+import { HeroLayout } from '@/components/HeroLayout';
+import type { BreadcrumbItem } from '@/components/PageBreadcrumbs';
 import { cityToPrepositional } from '@/lib/city-declension';
 
 type BlogListHeroProps = {
@@ -16,7 +17,7 @@ type BlogListHeroProps = {
   cityName?: string | null;
 };
 
-/** Compact hero: title + search. Cities/topics live in sticky left nav. */
+/** Catalog-style header (same shell as /events and /cities). Search lives below H1. */
 export function BlogListHero({ breadcrumbs, cityName = null }: BlogListHeroProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -67,39 +68,49 @@ export function BlogListHero({ breadcrumbs, cityName = null }: BlogListHeroProps
     [pathname, router, searchDraft, searchParams, scrollToFeed],
   );
 
-  const title = cityName
-    ? `Статьи, обзоры и советы по событиям в ${cityToPrepositional(cityName)}`
-    : 'Статьи, обзоры и советы по событиям';
+  const cityPrep = cityName ? cityToPrepositional(cityName) : null;
+
+  const title = query
+    ? `Результаты поиска: «${query}»`
+    : cityPrep
+      ? `Статьи и советы в ${cityPrep}`
+      : 'Блог Дайбилет';
+
+  const description = query
+    ? cityPrep
+      ? `Материалы по запросу в ${cityPrep}`
+      : 'Материалы по вашему запросу'
+    : cityPrep
+      ? `Обзоры, маршруты и лайфхаки по событиям в ${cityPrep}`
+      : 'Обзоры, маршруты и лайфхаки по событиям в городах России';
 
   return (
-    <>
-      <PageBreadcrumbBar items={breadcrumbs} />
-      <section className="border-b border-slate-200 bg-slate-50">
-        <div className="container-page py-5 sm:py-7">
-          <div className="flex max-w-3xl flex-col gap-4">
-            <h1 className="font-display text-[clamp(1.75rem,3.5vw,3.25rem)] font-extrabold tracking-tight text-slate-900">
-              {title}
-            </h1>
-            <form className="relative w-full max-w-xl" onSubmit={submitSearch} role="search">
-              <label className="relative block">
-                <span className="sr-only">Поиск по статьям</span>
-                <Search
-                  className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
-                  aria-hidden
-                />
-                <input
-                  type="search"
-                  value={searchDraft}
-                  onChange={(event) => setSearchDraft(event.target.value)}
-                  placeholder="Найти статью: стендап, маршрут, концерт…"
-                  className="h-11 w-full rounded-2xl border border-slate-200 bg-white py-2.5 pl-10 pr-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-200/60"
-                  aria-label="Поиск по статьям блога"
-                />
-              </label>
-            </form>
-          </div>
-        </div>
-      </section>
-    </>
+    <HeroLayout
+      variant="minimal"
+      dense
+      tone="light"
+      className="border-slate-100 bg-white"
+      breadcrumbs={breadcrumbs}
+      title={title}
+      description={description}
+    >
+      <form className="relative mt-4 w-full max-w-xl sm:mt-5" onSubmit={submitSearch} role="search">
+        <label className="relative block">
+          <span className="sr-only">Поиск по статьям</span>
+          <Search
+            className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+            aria-hidden
+          />
+          <input
+            type="search"
+            value={searchDraft}
+            onChange={(event) => setSearchDraft(event.target.value)}
+            placeholder="Найти статью: стендап, маршрут, концерт…"
+            className="h-11 w-full rounded-2xl border border-slate-200 bg-[#F5F5F7] py-2.5 pl-10 pr-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-primary-400 focus:bg-white focus:ring-2 focus:ring-primary-100"
+            aria-label="Поиск по статьям блога"
+          />
+        </label>
+      </form>
+    </HeroLayout>
   );
 }

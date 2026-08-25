@@ -94,7 +94,7 @@ test('static cards expose date + topics + searchText', () => {
   assert.ok(moscow?.searchText?.includes('москв'));
 });
 
-test('splitBlogListingHero: featured out of feed, fallback latest', () => {
+test('splitBlogListingHero: first card is hero, isFeatured ignored', () => {
   const cards = staticBlogCards();
   assert.ok(cards.length >= 3);
 
@@ -107,9 +107,9 @@ test('splitBlogListingHero: featured out of feed, fallback latest', () => {
   const flaggedSlug = cards[2]!.slug;
   const withFlag = cards.map((c, i) => ({ ...c, isFeatured: i === 2 }));
   const split = splitBlogListingHero(withFlag);
-  assert.equal(split.featured?.slug, flaggedSlug);
-  assert.ok(!split.feed.some((p) => p.slug === flaggedSlug));
-  assert.ok(!split.hot.some((p) => p.slug === flaggedSlug));
+  assert.equal(split.featured?.slug, withFlag[0]!.slug);
+  assert.notEqual(split.featured?.slug, flaggedSlug);
+  assert.ok(!split.feed.some((p) => p.slug === split.featured?.slug));
 });
 
 test('stripColumnMetaPrefix removes author column labels', () => {

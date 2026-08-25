@@ -19,7 +19,9 @@ import {
   venueCatalogHrefWithSelectedCity,
   type CatalogFilterValues,
 } from '@/lib/catalog-url';
+import { catalogClientFetchTimeoutMs } from '@/lib/catalog-client-fetch';
 import { pluralEvents } from '@/lib/format';
+import { resolveCatalogFetchCity } from '@/lib/selected-city';
 import {
   parseCatalogViewMode,
   readStoredCatalogViewMode,
@@ -150,11 +152,15 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
       ageMax: query.ageMax,
       page: listPage,
     });
-    // Header city picker is source of truth once resolved — URL catches up via router.replace.
-    if (!cityReady || !selectedCity) return base;
-    if (urlCityIsAll || selectedCity.cityValue === 'all') return { ...base, city: undefined };
-    return { ...base, city: selectedCity.cityValue };
-  }, [query, cityReady, selectedCity, urlCityIsAll, listPage]);
+    const fetchCity = resolveCatalogFetchCity({
+      urlCity: rawUrlCity,
+      urlCityAll: urlCityIsAll,
+      cityReady,
+      headerCityValue: selectedCity?.cityValue,
+      destinations: selectedCity?.destinations || [],
+    });
+    return { ...base, city: fetchCity };
+  }, [query, cityReady, selectedCity, rawUrlCity, urlCityIsAll, listPage]);
 
   const filtersQueryKey = useMemo(
     () =>
@@ -243,6 +249,25 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
     setViewModeState(readStoredCatalogViewMode() || 'cards');
   }, [urlSearchParams]);
 
+  // Cyrillic ?city= names break client refetch — canonicalize to destination slug.
+  useEffect(() => {
+    if (!rawUrlCity || urlCityIsAll) return;
+    const destinations = selectedCity?.destinations || [];
+    if (!destinations.length) return;
+    const normalized = resolveCatalogFetchCity({
+      urlCity: rawUrlCity,
+      urlCityAll: false,
+      cityReady: true,
+      headerCityValue: null,
+      destinations,
+    });
+    if (!normalized || normalized === rawUrlCity) return;
+    const params = new URLSearchParams(window.location.search);
+    params.set('city', normalized);
+    const qs = params.toString();
+    router.replace(qs ? `/events?${qs}` : '/events', { scroll: false });
+  }, [rawUrlCity, urlCityIsAll, router, selectedCity?.destinations]);
+
   useEffect(() => {
     if (cityBootstrapPending) {
       // Keep SSR cards while resolving stored city — only mark loading if we have nothing yet.
@@ -277,7 +302,14 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
       }
     }
 
+    let timedOut = false;
+    let cancelled = false;
     const controller = new AbortController();
+    const timeoutMs = catalogClientFetchTimeoutMs(filterValues.limit);
+    const timeoutId = window.setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+    }, timeoutMs);
     if (appendMode && catalogRef.current) {
       setLoadingMore(true);
     } else {
@@ -310,19 +342,28 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
         });
       })
       .catch((fetchError) => {
-        if (fetchError instanceof Error && fetchError.name === 'AbortError') return;
+        if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+          if (timedOut && !cancelled) {
+            setError('Каталог загружается дольше обычного. Попробуйте уменьшить «На странице» или обновить.');
+          }
+          return;
+        }
         setError('Не удалось загрузить каталог. Попробуйте обновить страницу.');
         if (!appendMode) setCatalog(null);
       })
       .finally(() => {
-        if (!controller.signal.aborted) {
-          pagingModeRef.current = 'replace';
-          setLoading(false);
-          setLoadingMore(false);
-        }
+        window.clearTimeout(timeoutId);
+        if (cancelled) return;
+        pagingModeRef.current = 'replace';
+        setLoading(false);
+        setLoadingMore(false);
       });
 
-    return () => controller.abort();
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeoutId);
+      controller.abort();
+    };
   }, [
     urlSearchParams,
     effectiveQueryKey,
@@ -332,6 +373,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
     needsCityGate,
     urlHasCity,
     filterValues.city,
+    filterValues.limit,
     listPage,
   ]);
 

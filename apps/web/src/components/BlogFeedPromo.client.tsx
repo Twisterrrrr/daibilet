@@ -2,10 +2,15 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useCallback, useEffect, useState, type SyntheticEvent } from 'react';
 
 import {
   blogAfishaGuideTitle,
 } from '@/components/BlogAfishaPromo.client';
+import {
+  HORIZONTAL_PROMO_MIN_RATIO,
+  resolveHorizontalFeedPromoImage,
+} from '@/lib/blog-promo-image';
 import { formatPriceFrom } from '@/lib/format';
 import type { BlogSidebarPromoDto } from '@/lib/blog-sidebar-promo';
 import type { BlogFeedPromoKind, BlogFeedPromoLayout } from '@/lib/blog-feed-promo';
@@ -28,11 +33,19 @@ type ResolvedCopy = {
   href: string;
   cta: string;
   foot: string[];
-  imageUrl: string;
+  imageSrc: string;
+  imageFallback: string;
+  probeEventCover: boolean;
 };
 
 function resolveCopy(promo: BlogSidebarPromoDto, kind: BlogFeedPromoKind): ResolvedCopy {
-  const imageUrl = promo.imageUrl || FALLBACK_IMAGE;
+  const cityImageUrl = promo.imageUrl || FALLBACK_IMAGE;
+  const { src, probeEventCover } = resolveHorizontalFeedPromoImage({
+    kind,
+    cityImageUrl: promo.imageUrl,
+    eventImageUrl: promo.featuredEventImageUrl,
+    fallback: FALLBACK_IMAGE,
+  });
   const price = formatPriceFrom(promo.priceFrom);
   const chip = promo.chips?.[0];
   const eventTitle = String(promo.upcomingTitles?.[0] || '').trim();
@@ -50,7 +63,9 @@ function resolveCopy(promo: BlogSidebarPromoDto, kind: BlogFeedPromoKind): Resol
       foot: [price, promo.weekendCount > 0 ? `${promo.weekendCount} на выходных` : null].filter(
         Boolean,
       ) as string[],
-      imageUrl,
+      imageSrc: src,
+      imageFallback: cityImageUrl,
+      probeEventCover: false,
     };
   }
 
@@ -62,10 +77,12 @@ function resolveCopy(promo: BlogSidebarPromoDto, kind: BlogFeedPromoKind): Resol
       excerpt: price
         ? `${price} · живая дата в афише ${promo.cityName}.`
         : `Живая дата в афише ${promo.cityName}.`,
-      href: promo.href,
+      href: promo.featuredEventHref || promo.href,
       cta: 'К билетам →',
       foot: [price, 'афиша'].filter(Boolean) as string[],
-      imageUrl,
+      imageSrc: src,
+      imageFallback: cityImageUrl,
+      probeEventCover,
     };
   }
 
@@ -86,7 +103,9 @@ function resolveCopy(promo: BlogSidebarPromoDto, kind: BlogFeedPromoKind): Resol
       promo.weekendCount > 0 ? `${promo.weekendCount} на выходных` : null,
       promo.eventsCount > 0 && !promo.weekendCount ? `${promo.eventsCount} событий` : null,
     ].filter(Boolean) as string[],
-    imageUrl,
+    imageSrc: src,
+    imageFallback: cityImageUrl,
+    probeEventCover: false,
   };
 }
 
@@ -108,6 +127,55 @@ function Tag({ label, tone }: { label: string; tone: 'blue' | 'green' | 'rose' |
   );
 }
 
+function FeedPromoImage({
+  src,
+  fallback,
+  probeEventCover,
+  sizes,
+  className = 'object-cover transition duration-500 group-hover:scale-105',
+}: {
+  src: string;
+  fallback: string;
+  probeEventCover: boolean;
+  sizes: string;
+  className?: string;
+}) {
+  const [activeSrc, setActiveSrc] = useState(src);
+
+  useEffect(() => {
+    setActiveSrc(src);
+  }, [src]);
+
+  const handleLoad = useCallback(
+    (event: SyntheticEvent<HTMLImageElement>) => {
+      if (!probeEventCover) return;
+      const img = event.currentTarget;
+      const { naturalWidth, naturalHeight } = img;
+      if (!naturalWidth || !naturalHeight) return;
+      if (naturalWidth / naturalHeight < HORIZONTAL_PROMO_MIN_RATIO) {
+        setActiveSrc(fallback);
+      }
+    },
+    [fallback, probeEventCover],
+  );
+
+  const handleError = useCallback(() => {
+    setActiveSrc((current) => (current === fallback ? current : fallback));
+  }, [fallback]);
+
+  return (
+    <Image
+      src={activeSrc}
+      alt=""
+      fill
+      sizes={sizes}
+      className={className}
+      onLoad={handleLoad}
+      onError={handleError}
+    />
+  );
+}
+
 function StripCard({
   copy,
   kind,
@@ -121,16 +189,15 @@ function StripCard({
   return (
     <Link
       href={copy.href}
-      className="group grid min-h-[9.5rem] overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-sm transition hover:border-slate-300 hover:shadow-md md:grid-cols-[minmax(7.5rem,34%)_1fr]"
+      className="group grid min-h-[11rem] overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-sm transition hover:border-slate-300 hover:shadow-md md:min-h-[12rem] md:grid-cols-[minmax(7.5rem,34%)_1fr]"
       aria-label={copy.title}
     >
-      <div className="relative min-h-[8.5rem] bg-slate-900 md:min-h-full">
-        <Image
-          src={copy.imageUrl}
-          alt=""
-          fill
+      <div className="relative min-h-[9.5rem] bg-slate-900 md:min-h-full">
+        <FeedPromoImage
+          src={copy.imageSrc}
+          fallback={copy.imageFallback}
+          probeEventCover={copy.probeEventCover}
           sizes={FEED_IMAGE_SIZES}
-          className="object-cover transition duration-500 group-hover:scale-105"
         />
       </div>
       <div className="flex min-w-0 flex-col gap-2 p-4 sm:p-5">
@@ -159,21 +226,20 @@ function OverlayCard({ copy, kind }: { copy: ResolvedCopy; kind: BlogFeedPromoKi
   return (
     <Link
       href={copy.href}
-      className="group relative flex min-h-[10.5rem] overflow-hidden rounded-2xl bg-slate-900 text-white shadow-sm"
+      className="group relative flex min-h-[13rem] overflow-hidden rounded-2xl bg-slate-900 text-white shadow-sm sm:min-h-[14rem]"
       aria-label={copy.title}
     >
-      <Image
-        src={copy.imageUrl}
-        alt=""
-        fill
+      <FeedPromoImage
+        src={copy.imageSrc}
+        fallback={copy.imageFallback}
+        probeEventCover={copy.probeEventCover}
         sizes={OVERLAY_IMAGE_SIZES}
-        className="object-cover transition duration-500 group-hover:scale-105"
       />
       <div
         className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/50 to-slate-950/20"
         aria-hidden
       />
-      <div className="relative flex max-w-xl flex-col justify-center gap-2.5 p-5 sm:p-6">
+      <div className="relative flex max-w-xl flex-col justify-center gap-2.5 p-5 sm:p-6 md:py-7">
         <div className="flex flex-wrap gap-1.5">
           <span className="rounded-full border border-white/25 bg-white/15 px-2.5 py-0.5 text-[11px] font-semibold">
             {copy.eyebrow}
@@ -196,7 +262,7 @@ function SplitCard({ copy }: { copy: ResolvedCopy }) {
   return (
     <Link
       href={copy.href}
-      className="group grid min-h-[11rem] overflow-hidden rounded-2xl bg-slate-900 text-white shadow-sm md:grid-cols-[1.15fr_0.85fr]"
+      className="group grid min-h-[12rem] overflow-hidden rounded-2xl bg-slate-900 text-white shadow-sm md:min-h-[13rem] md:grid-cols-[1.15fr_0.85fr]"
       aria-label={copy.title}
     >
       <div className="flex flex-col justify-center gap-2.5 bg-gradient-to-br from-slate-900 to-slate-800 p-5 sm:p-6">
@@ -209,13 +275,12 @@ function SplitCard({ copy }: { copy: ResolvedCopy }) {
           {copy.cta}
         </span>
       </div>
-      <div className="relative min-h-[9rem] md:min-h-full">
-        <Image
-          src={copy.imageUrl}
-          alt=""
-          fill
+      <div className="relative min-h-[10rem] md:min-h-full">
+        <FeedPromoImage
+          src={copy.imageSrc}
+          fallback={copy.imageFallback}
+          probeEventCover={copy.probeEventCover}
           sizes={FEED_IMAGE_SIZES}
-          className="object-cover transition duration-500 group-hover:scale-105"
         />
       </div>
     </Link>

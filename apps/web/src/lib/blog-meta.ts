@@ -36,6 +36,8 @@ export const BLOG_CITY_FILTER_LABELS: Record<string, string> = {
   krasnoyarsk: 'Красноярск',
   samara: 'Самара',
   voronezh: 'Воронеж',
+  'velikiy-novgorod': 'Великий Новгород',
+  'veliky-novgorod': 'Великий Новгород',
   regions: 'Регионы',
   multi: 'Несколько городов',
 };
@@ -549,6 +551,9 @@ export function normalizeBlogCitySlug(
   if (raw === 'msk' || raw === 'moskva') return 'moscow';
   if (raw === 'ekb' || raw === 'yekaterinburg') return 'ekaterinburg';
   if (raw === 'nizhniy-novgorod' || raw === 'nizhny-novgorod') return 'nizhny-novgorod';
+  if (raw === 'veliky-novgorod' || raw === 'velikiy-novgorod' || raw === 'velikiy_novgorod') {
+    return 'velikiy-novgorod';
+  }
   if (raw === 'ufa') return 'ufa';
   if (raw === 'rostov' || raw === 'rostov-na-donu') return 'rostov-on-don';
   if (raw && BLOG_CITY_FILTER_LABELS[raw]) return raw;
@@ -563,8 +568,9 @@ export function normalizeBlogCitySlug(
   if (haystack.includes('казан')) return 'kazan';
   if (haystack.includes('екатеринбург') || haystack.includes('уральск')) return 'ekaterinburg';
   if (haystack.includes('калининград')) return 'kaliningrad';
-  // «Нижний Новгород» vs «Великий Новгород»: нужен маркер «нижн».
+  // «Нижний Новгород» vs «Великий Новгород»: нужен маркер «нижн» / «велик».
   if (haystack.includes('нижн') && haystack.includes('новгород')) return 'nizhny-novgorod';
+  if (haystack.includes('велик') && haystack.includes('новгород')) return 'velikiy-novgorod';
   if (haystack.includes('уфа')) return 'ufa';
   if (haystack.includes('перм')) return 'perm';
   if (haystack.includes('сочи')) return 'sochi';
@@ -640,9 +646,7 @@ export function blogPostFilterCities(post: {
   if (slug && slug !== MULTI_CITY_FILTER_SLUG && slug !== 'regions') add(slug, name);
   else if (name && !BLOG_PSEUDO_CITY_LABELS.has(name)) add(null, name);
 
-  if (!out.length && (slug === 'regions' || name === 'Регионы')) {
-    out.push({ value: 'regions', label: 'Регионы' });
-  }
+  // No bare «Регионы» chip: retag with concrete citySlugs instead.
   return out;
 }
 

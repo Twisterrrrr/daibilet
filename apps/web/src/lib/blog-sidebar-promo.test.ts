@@ -90,6 +90,7 @@ test('buildBlogSidebarPromoFromCityPage: price, titles, chips, image', () => {
   assert.equal(promo!.weekendCount, 1);
   assert.deepEqual(promo!.upcomingTitles, ['Пианиссимо', 'Сапрыкин']);
   assert.equal(promo!.imageUrl, '/images/cities/moscow.png');
+  assert.equal(promo!.featuredEventImageUrl, 'https://cdn.example.com/cover1.jpg');
 });
 
 test('buildBlogSidebarPromoFromCityPage: city image wins over remote event cover', () => {
@@ -109,6 +110,7 @@ test('buildBlogSidebarPromoFromCityPage: city image wins over remote event cover
     sessions: [
       {
         id: 'e1',
+        slug: 'zoo-quest',
         title: 'Пианиссимо',
         city: 'Москва',
         destination: 'Москва',
@@ -133,6 +135,8 @@ test('buildBlogSidebarPromoFromCityPage: city image wins over remote event cover
   const promo = buildBlogSidebarPromoFromCityPage(page);
   assert.ok(promo);
   assert.equal(promo!.imageUrl, '/images/cities/moscow.png');
+  assert.equal(promo!.featuredEventImageUrl, 'https://cdn.example.com/cover1.jpg');
+  assert.equal(promo!.featuredEventHref, '/events/zoo-quest');
 });
 
 test('lookupBlogSidebarPromo: name and slug keys', () => {
