@@ -118,8 +118,8 @@ if [[ -d "${WEB_NEXT_PREV}/static" && -d "${WEB_NEXT_DIR}/static" ]]; then
 fi
 
 if systemctl is-active --quiet "$API_SERVICE" 2>/dev/null; then
-  # Optional: keep API up; only restart if you need code sync in api process.
-  true
+  systemctl restart "$API_SERVICE"
+  echo "Restarted ${API_SERVICE} after git sync (backend TS may have changed)"
 fi
 
 systemctl reset-failed "$WEB_SERVICE" 2>/dev/null || true
