@@ -236,11 +236,11 @@ export function BlogPostCard({
   if (isStrip) {
     return (
       <article className={cardShell}>
-        <div className="flex h-full min-h-[13rem] flex-col md:flex-row">
+        <div className="flex h-full min-h-[13rem] flex-col lg:flex-row">
           <Link
             href={articleHref}
             aria-label={post.title}
-            className="relative block aspect-[16/10] w-full shrink-0 overflow-hidden bg-slate-100 md:aspect-auto md:h-auto md:w-[38%] md:min-w-[11rem] md:max-w-[16rem] md:self-stretch"
+            className="relative block aspect-[16/10] w-full shrink-0 overflow-hidden bg-slate-100 lg:aspect-auto lg:h-auto lg:w-[38%] lg:min-w-[11rem] lg:max-w-[16rem] lg:self-stretch"
           >
             {hasCover ? (
               <BlogCardSafeImage
@@ -258,7 +258,7 @@ export function BlogPostCard({
           </Link>
           <div className="flex min-w-0 flex-1 flex-col justify-center gap-2.5 p-5 sm:p-6">
             <TagChips tag={tag} city={post.city} citySlug={post.citySlug} citySlugs={post.citySlugs} articleType={post.articleType} />
-            <h2 className="break-words text-lg font-semibold leading-snug tracking-tight text-slate-900 transition-colors group-hover:text-primary-700 md:text-xl">
+            <h2 className="break-words text-lg font-semibold leading-snug tracking-tight text-slate-900 transition-colors group-hover:text-primary-700 lg:text-xl">
               <Link href={articleHref}>{titleText}</Link>
             </h2>
             {excerpt ? <p className="break-words text-sm leading-relaxed text-slate-600">{excerpt}</p> : null}

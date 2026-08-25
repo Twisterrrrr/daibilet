@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { ChevronDown, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 
 import { BlogMagazineGrid } from '@/components/BlogMagazineGrid.client';
 import { BlogListingFiltersNav } from '@/components/BlogListingFiltersNav.client';
@@ -10,7 +10,7 @@ import type { BlogListFilters } from '@/components/BlogListView';
 import type { BlogCardDto } from '@/lib/blog-utils';
 import { paginateBlogFeedByCursor } from '@/lib/blog-cursor';
 import { canonicalizeBlogCitySlug, filterBlogFeedByCity } from '@/lib/blog-feed-rank';
-import { authorLabel, buildBlogCityFilterOptions, cityFilterLabel } from '@/lib/blog-meta';
+import { buildBlogCityFilterOptions, cityFilterLabel } from '@/lib/blog-meta';
 import { parseBlogTopicParam, postMatchesTopic } from '@/lib/blog-topics';
 
 const PAGE_SIZE = 12;
@@ -18,23 +18,6 @@ const PAGE_SIZE = 12;
 function paramValue(value: string | null | undefined, fallback = 'all'): string {
   const raw = String(value || '').trim();
   return raw || fallback;
-}
-
-function buildOptions(
-  posts: BlogCardDto[],
-  pick: (post: BlogCardDto) => { value: string; label: string } | null,
-): Array<{ value: string; label: string; count: number }> {
-  const counts = new Map<string, { label: string; count: number }>();
-  for (const post of posts) {
-    const hit = pick(post);
-    if (!hit?.value) continue;
-    const prev = counts.get(hit.value);
-    if (prev) prev.count += 1;
-    else counts.set(hit.value, { label: hit.label, count: 1 });
-  }
-  return [...counts.entries()]
-    .map(([value, meta]) => ({ value, label: meta.label, count: meta.count }))
-    .sort((a, b) => a.label.localeCompare(b.label, 'ru'));
 }
 
 function matchesQuery(post: BlogCardDto, query: string): boolean {
@@ -45,35 +28,6 @@ function matchesQuery(post: BlogCardDto, query: string): boolean {
     post.searchText ||
     [post.slug, post.title, post.excerpt, post.tag, post.city].filter(Boolean).join(' ').toLowerCase();
   return tokens.every((token) => haystack.includes(token));
-}
-
-function SoftSelect({
-  value,
-  onChange,
-  ariaLabel,
-  children,
-}: {
-  value: string;
-  onChange: (value: string) => void;
-  ariaLabel: string;
-  children: ReactNode;
-}) {
-  return (
-    <label className="relative inline-flex min-w-0 shrink-0 items-center">
-      <select
-        className="h-10 appearance-none rounded-xl border border-slate-200 bg-white py-2 pl-3 pr-9 text-sm font-medium text-slate-700 outline-none transition hover:border-slate-300 hover:bg-slate-50 focus-visible:border-primary-400 focus-visible:ring-2 focus-visible:ring-primary-100 md:min-w-[11rem]"
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        aria-label={ariaLabel}
-      >
-        {children}
-      </select>
-      <ChevronDown
-        className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
-        aria-hidden
-      />
-    </label>
-  );
 }
 
 export function BlogListFiltered({
@@ -108,7 +62,6 @@ export function BlogListFiltered({
 
   const urlCityRaw = paramValue(searchParams.get('city') ?? initialFilters?.city);
   const urlCity = urlCityRaw === 'multi' ? 'all' : urlCityRaw;
-  const author = paramValue(searchParams.get('author') ?? initialFilters?.author);
   const topic = parseBlogTopicParam(searchParams.get('topic') ?? initialFilters?.topic);
   const query = String(searchParams.get('q') ?? initialFilters?.q ?? '').trim();
 
@@ -117,19 +70,8 @@ export function BlogListFiltered({
     [cityOptionsSource],
   );
 
-  const authorOptions = useMemo(
-    () =>
-      buildOptions(cityOptionsSource, (post) => {
-        const value = String(post.authorId || 'editorial').trim() || 'editorial';
-        return { value, label: post.authorName || authorLabel(value) };
-      }),
-    [cityOptionsSource],
-  );
-
   const filtered = useMemo(() => {
     let list = posts.filter((post) => {
-      const postAuthor = String(post.authorId || 'editorial');
-      if (author !== 'all' && postAuthor !== author) return false;
       if (!postMatchesTopic(post.topics, topic)) return false;
       if (!matchesQuery(post, query)) return false;
       return true;
@@ -139,7 +81,7 @@ export function BlogListFiltered({
       list = filterBlogFeedByCity(list, urlCity);
     }
     return list;
-  }, [posts, author, topic, query, urlCity]);
+  }, [posts, topic, query, urlCity]);
 
   useEffect(() => {
     const page = paginateBlogFeedByCursor(filtered, { cursor: null, limit: PAGE_SIZE });
@@ -149,10 +91,11 @@ export function BlogListFiltered({
   }, [filtered]);
 
   const setFilter = useCallback(
-    (key: 'city' | 'author', value: string) => {
+    (key: 'city', value: string) => {
       const next = new URLSearchParams(searchParams.toString());
       next.delete('type');
       next.delete('view');
+      next.delete('author');
       if (!value || value === 'all') next.delete(key);
       else next.set(key, value);
       const qs = next.toString();
@@ -176,7 +119,7 @@ export function BlogListFiltered({
     setNextCursor(page.nextCursor);
   }, [filtered, nextCursor]);
 
-  const hasActive = urlCity !== 'all' || author !== 'all' || topic !== 'all' || Boolean(query);
+  const hasActive = urlCity !== 'all' || topic !== 'all' || Boolean(query);
   const hasMore = Boolean(nextCursor);
   /** SSR / first paint: useEffect ещё не заполнил visiblePosts. */
   const displayPosts =
@@ -194,33 +137,6 @@ export function BlogListFiltered({
     : -1;
   const bannerLabel = emptyCheckSlug ? cityFilterLabel(urlCity) : null;
   const showEmptyCityBanner = Boolean(emptyCheckSlug && bannerLabel && emptyCheckCount === 0);
-
-  const filtersBar = (
-    <div className="mb-5 flex flex-wrap items-center gap-2 md:mb-6">
-      <SoftSelect
-        value={author}
-        onChange={(value) => setFilter('author', value)}
-        ariaLabel="Фильтр по автору"
-      >
-        <option value="all">Все авторы</option>
-        {authorOptions.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </SoftSelect>
-
-      {hasActive ? (
-        <button
-          type="button"
-          onClick={resetFilters}
-          className="inline-flex h-10 shrink-0 items-center rounded-xl px-3 text-sm font-medium text-primary-600 transition hover:bg-primary-50 hover:text-primary-700 lg:hidden"
-        >
-          Сбросить
-        </button>
-      ) : null}
-    </div>
-  );
 
   const feedBody = (
     <div id="blog-feed" className="scroll-mt-24">
@@ -281,8 +197,6 @@ export function BlogListFiltered({
       />
 
       <div className="blog-layout__main min-w-0">
-        {filtersBar}
-
         {hasActive ? (
           <>
             <div className="mb-8">{feedBody}</div>
