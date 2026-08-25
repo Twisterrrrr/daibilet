@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>Сравнение afisha-баннера блога · 3 версии</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f4f6f8;
+        --ink: #0f172a;
+        --muted: #64748b;
+        --card: #0f172a;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: Manrope, system-ui, sans-serif;
+        background: linear-gradient(180deg, #eef3f8 0%, var(--bg) 40%, #fff 100%);
+        color: var(--ink);
+        padding: 2rem 1.25rem 4rem;
+      }
+      .wrap {
+        max-width: 1180px;
+        margin: 0 auto;
+      }
+      h1 {
+        font-size: clamp(1.5rem, 3vw, 2rem);
+        margin: 0 0 0.4rem;
+        letter-spacing: -0.02em;
+      }
+      .lead {
+        color: var(--muted);
+        margin: 0 0 1.75rem;
+        max-width: 46rem;
+        line-height: 1.5;
+      }
+      .grid {
+        display: grid;
+        gap: 1.25rem;
+        grid-template-columns: 1fr;
+      }
+      @media (min-width: 960px) {
+        .grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          align-items: stretch;
+        }
+      }
+      .col {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        min-height: 100%;
+      }
+      .meta {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        min-height: 5.5rem;
+      }
+      .badge {
+        display: inline-flex;
+        width: fit-content;
+        align-items: center;
+        border-radius: 999px;
+        padding: 0.2rem 0.65rem;
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .badge-cool {
+        background: #dcfce7;
+        color: #166534;
+      }
+      .badge-bad {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+      .badge-now {
+        background: #e0e7ff;
+        color: #3730a3;
+      }
+      .meta h2 {
+        margin: 0;
+        font-size: 1.05rem;
+        line-height: 1.25;
+      }
+      .meta p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.85rem;
+        line-height: 1.4;
+      }
+      .meta a {
+        color: #2563eb;
+        font-size: 0.8rem;
+        text-decoration: none;
+      }
+      .meta a:hover {
+        text-decoration: underline;
+      }
+      .stage {
+        /* sidebar-like column width feel */
+        flex: 1;
+        min-height: 28rem;
+        display: flex;
+        flex-direction: column;
+        background: #e2e8f0;
+        border-radius: 1.25rem;
+        padding: 0.75rem;
+        border: 1px solid #cbd5e1;
+      }
+      .banner {
+        position: relative;
+        overflow: hidden;
+        border-radius: 1rem;
+        background: #0f172a;
+        color: #fff;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18);
+        flex: 1;
+        min-height: 18rem;
+        display: flex;
+        flex-direction: column;
+      }
+      .banner img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+      }
+      .banner:hover img {
+        transform: scale(1.05);
+      }
+      .cta {
+        display: inline-flex;
+        width: fit-content;
+        align-items: center;
+        gap: 0.4rem;
+        border-radius: 0.75rem;
+        background: #fff;
+        color: #0f172a;
+        padding: 0.65rem 1rem;
+        font-size: 0.875rem;
+        font-weight: 700;
+        text-decoration: none;
+      }
+
+      /* A) 5ba01f57 — cool tall + strong gradient */
+      .v-cool {
+        min-height: 22rem;
+      }
+      .v-cool .scrim {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.4) 45%, rgba(0, 0, 0, 0.1));
+      }
+      .v-cool .content {
+        position: relative;
+        margin-top: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        padding: 1.25rem 1.5rem;
+      }
+      .v-cool h3 {
+        margin: 0;
+        font-size: 1.35rem;
+        font-weight: 800;
+        line-height: 1.25;
+        max-width: 16rem;
+      }
+      .v-cool img {
+        opacity: 0.8;
+      }
+
+      /* B) 4a30763a — square + glass */
+      .v-glass {
+        aspect-ratio: 4 / 5;
+        max-height: 22rem;
+        flex: 0 0 auto;
+        min-height: 0;
+      }
+      .v-glass .scrim {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 28%;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+      }
+      .v-glass .content {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: 1rem 1.15rem;
+      }
+      .v-glass .glass {
+        border-radius: 0.75rem;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(2, 6, 23, 0.45);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        padding: 0.75rem;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+      }
+      .v-glass h3 {
+        margin: 0;
+        font-size: 1.05rem;
+        font-weight: 800;
+        line-height: 1.25;
+      }
+      .v-glass .cta {
+        margin-top: 0.65rem;
+        padding: 0.5rem 0.9rem;
+      }
+      .v-glass img {
+        opacity: 0.9;
+      }
+
+      /* C) 5f453de0 / current — tall + light bottom scrim */
+      .v-now {
+        min-height: 22rem;
+      }
+      .v-now .scrim {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 32%;
+        background: linear-gradient(
+          to top,
+          rgba(0, 0, 0, 0.75),
+          rgba(0, 0, 0, 0.35),
+          transparent
+        );
+      }
+      .v-now .content {
+        position: relative;
+        margin-top: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        padding: 1.25rem 1.5rem;
+      }
+      .v-now h3 {
+        margin: 0;
+        font-size: 1.35rem;
+        font-weight: 800;
+        line-height: 1.25;
+        max-width: 16rem;
+      }
+      .v-now img {
+        opacity: 0.9;
+      }
+
+      .note {
+        margin-top: 2rem;
+        padding: 1rem 1.15rem;
+        border-radius: 1rem;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        color: var(--muted);
+        font-size: 0.9rem;
+        line-height: 1.5;
+      }
+      code {
+        font-size: 0.85em;
+        background: #f1f5f9;
+        padding: 0.1rem 0.35rem;
+        border-radius: 0.35rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>Afisha-баннер в сайдбаре блога: 3 версии</h1>
+      <p class="lead">
+        Один и тот же контент (Москва + «Смотреть афишу») в трёх коммитах. Слева направо: крутая
+        tall с сильным градиентом → сломанная glass → текущий restore.
+      </p>
+
+      <div class="grid">
+        <div class="col">
+          <div class="meta">
+            <span class="badge badge-cool">Крутая</span>
+            <h2>5ba01f57 · tall + сильный градиент</h2>
+            <p>Фото на всю высоту, плотный градиент, текст и CTA без glass.</p>
+            <a href="https://github.com/Twisterrrrr/daibilet/blob/5ba01f57/apps/web/src/components/BlogAfishaPromo.client.tsx"
+              >код на GitHub →</a
+            >
+          </div>
+          <div class="stage">
+            <section class="banner v-cool" aria-label="Версия 5ba01f57">
+              <img src="https://daibilet.ru/images/cities/top/moscow.jpg" alt="" />
+              <div class="scrim" aria-hidden="true"></div>
+              <div class="content">
+                <h3>Гид по лучшим событиям Москвы</h3>
+                <a class="cta" href="https://daibilet.ru/events?city=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0">Смотреть афишу →</a>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="meta">
+            <span class="badge badge-bad">Сломанная</span>
+            <h2>4a30763a · квадрат + glass</h2>
+            <p>aspect 4/5, max-height 22rem, стеклянная панель поверх фото.</p>
+            <a href="https://github.com/Twisterrrrr/daibilet/blob/4a30763a/apps/web/src/components/BlogAfishaPromo.client.tsx"
+              >код на GitHub →</a
+            >
+          </div>
+          <div class="stage">
+            <section class="banner v-glass" aria-label="Версия 4a30763a">
+              <img src="https://daibilet.ru/images/cities/top/moscow.jpg" alt="" />
+              <div class="scrim" aria-hidden="true"></div>
+              <div class="content">
+                <div class="glass">
+                  <h3>Гид по лучшим событиям Москвы</h3>
+                  <a class="cta" href="https://daibilet.ru/events?city=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0">Смотреть афишу →</a>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="meta">
+            <span class="badge badge-now">Сейчас</span>
+            <h2>5f453de0 · tall + лёгкий scrim</h2>
+            <p>Снова tall flex-1, но градиент только на нижние ~32%.</p>
+            <a href="https://github.com/Twisterrrrr/daibilet/blob/5f453de0/apps/web/src/components/BlogAfishaPromo.client.tsx"
+              >код на GitHub →</a
+            >
+          </div>
+          <div class="stage">
+            <section class="banner v-now" aria-label="Версия 5f453de0">
+              <img src="https://daibilet.ru/images/cities/top/moscow.jpg" alt="" />
+              <div class="scrim" aria-hidden="true"></div>
+              <div class="content">
+                <h3>Гид по лучшим событиям Москвы</h3>
+                <a class="cta" href="https://daibilet.ru/events?city=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0">Смотреть афишу →</a>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+
+      <p class="note">
+        Страница служебная (<code>noindex</code>). После выбора версии можно вернуть разметку в
+        <code>BlogAfishaPromo.client.tsx</code>. Скрин с Красной площадью ближе всего к левой колонке.
+      </p>
+    </div>
+  </body>
+</html>
