@@ -254,7 +254,7 @@ function NavLink({
     <Link
       href={href}
       onClick={onClick}
-      className={`block w-full rounded-lg px-4 py-3 text-left text-base font-semibold uppercase tracking-[0.06em] transition ${
+      className={`block w-full rounded-lg px-4 py-3 text-left text-base font-medium transition ${
         active
           ? 'bg-surface-muted text-graphite'
           : 'text-graphite-muted hover:bg-surface-muted hover:text-graphite'

@@ -773,6 +773,39 @@ html[data-nav-pending='1'] {
     }
   }
 
+  /** Event PDP: related cards — up to 5 per row on ultrawide. */
+  .event-related-grid {
+    display: grid;
+    width: 100%;
+    gap: 1.25rem;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  @media (min-width: 640px) {
+    .event-related-grid {
+      gap: 1.5rem;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .event-related-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1536px) {
+    .event-related-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1920px) {
+    .event-related-grid {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+  }
+
   /** Sidebar + main content (places / events catalogs). */
   .catalog-page-layout {
     display: grid;

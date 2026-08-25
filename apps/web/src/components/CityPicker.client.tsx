@@ -133,7 +133,7 @@ export function CityPicker({
       : variant === 'compact'
         ? 'relative flex w-full items-center gap-2 rounded-lg py-3 pl-10 pr-10 text-left text-base font-medium text-slate-700 hover:bg-slate-100'
         : // Header: mobile = MapPin icon (same chrome as search/heart); lg+ named chip.
-          'inline-flex h-10 w-10 items-center justify-center rounded-lg text-graphite-muted outline-none transition hover:bg-surface-muted hover:text-graphite focus-visible:ring-2 focus-visible:ring-primary/25 lg:w-full lg:min-w-10 lg:justify-start lg:gap-1.5 lg:rounded-full lg:border lg:border-slate-200/90 lg:bg-slate-50/90 lg:px-3 lg:text-sm lg:font-medium lg:text-slate-700 lg:hover:border-slate-300 lg:hover:bg-white lg:hover:text-slate-900';
+          'inline-flex h-10 w-10 items-center justify-center rounded-lg text-graphite-muted outline-none transition hover:bg-surface-muted hover:text-graphite focus-visible:ring-2 focus-visible:ring-primary/25 lg:w-full lg:min-w-10 lg:justify-start lg:gap-2 lg:rounded-full lg:border lg:border-primary-200/80 lg:bg-primary-50/70 lg:px-3.5 lg:text-sm lg:font-semibold lg:text-primary-900 lg:hover:border-primary-300 lg:hover:bg-primary-50 lg:hover:text-primary-950';
 
   const menu = open
     ? createPortal(

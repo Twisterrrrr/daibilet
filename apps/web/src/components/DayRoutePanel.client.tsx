@@ -4317,7 +4317,7 @@ function DayRoutePanelInner() {
                 {renderEmptyStarter()}
               </div>
               <div
-                className="mt-4 hidden lg:grid lg:grid-cols-2 lg:items-stretch lg:gap-5"
+                className="mt-4 hidden lg:grid lg:grid-cols-[minmax(0,35fr)_minmax(0,65fr)] lg:items-stretch lg:gap-5"
                 data-my-day-empty-two-blocks
               >
                 <div className="flex min-w-0 flex-col gap-4" data-my-day-picker-host>

@@ -27,6 +27,7 @@ import {
   shouldSynthesizeWidgetOnlySession,
 } from './public-event-widget-fallback.js';
 import { pickCatalogSubcategories } from './public-catalog.mapper.js';
+import { spreadCatalogSessionsByCoverImage } from './public-catalog-spread.js';
 import { formatPublicEventTitle } from './event-title-normalize.ts';
 import type {
   PublicEventDto,
@@ -1263,7 +1264,7 @@ async function loadRelatedSessionsFromDb(
     });
     if (related.length >= limit) break;
   }
-  return related;
+  return spreadCatalogSessionsByCoverImage(related).slice(0, limit);
 }
 
 function eventDestination(event: EventRecord): {

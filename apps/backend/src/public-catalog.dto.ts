@@ -28,6 +28,12 @@ import {
 import { formatDate, formatTime, normalizeStartsAt, timeBucket } from './public-datetime.js';
 import { mapGroupedPublicSession, collectSeparateCityHubNames, pickCatalogSubcategories } from './public-catalog.mapper.js';
 import { findLandingRule } from './landing-rules.js';
+import {
+  isOpenDateCatalogSession,
+  sessionMatchesCatalogDayRange,
+  sessionMatchesCatalogPresetDate,
+} from './public-catalog-date-filter.js';
+import { spreadCatalogSessionsByCoverImage } from './public-catalog-spread.js';
 import { LIST_SLOT_PREVIEW_LIMIT, toPublicCatalogListItem } from './public-catalog-list-item.js';
 import { providerForSource } from './provider-purchase.js';
 import type { PublicCatalogMappingRow } from './public-catalog.mapper.js';
@@ -908,14 +914,16 @@ function matchesCatalogQuery(
   ) {
     return false;
   }
-  if (!ignore.date && query.date && query.date !== 'all' && !matchesCatalogDate(session, query.date)) return false;
+  if (!ignore.date && query.date && query.date !== 'all' && !sessionMatchesCatalogPresetDate(session, query.date)) {
+    return false;
+  }
 
   const maxPrice = query.maxPrice ?? query.priceMax;
   if (!ignore.price && !matchesCatalogPrice(session, query.minPrice, maxPrice)) return false;
   if (!ignore.age && query.ageMax != null && query.ageMax >= 0 && !matchesCatalogAgeLimit(session, query.ageMax)) {
     return false;
   }
-  if (!ignore.date && !matchesDateRange(session.startsAt, query.from, query.to, session)) return false;
+  if (!ignore.date && !sessionMatchesCatalogDayRange(session, query.from, query.to)) return false;
 
   if (ignore.q) return true;
   const search = query.q?.trim().toLowerCase();
@@ -999,19 +1007,21 @@ function sortCatalogSessions(
   query: PublicCatalogQuery,
 ): PublicSessionDto[] {
   const sorted = [...sessions];
+  let result: PublicSessionDto[];
   if (sort === 'random') {
-    return seededShuffleSessions(sorted, catalogRandomSeed(query));
+    result = seededShuffleSessions(sorted, catalogRandomSeed(query));
+  } else if (sort === 'price' || sort === 'price_asc') {
+    result = sorted.sort((left, right) => comparePrice(left, right) || compareSessionTime(left, right));
+  } else if (sort === 'price_desc') {
+    result = sorted.sort((left, right) => comparePrice(right, left) || compareSessionTime(left, right));
+  } else if (sort === 'popular') {
+    result = sorted.sort((left, right) => (right.sessionCount || 1) - (left.sessionCount || 1) || compareSessionTime(left, right));
+  } else {
+    result = sorted.sort(compareSessionTime);
   }
-  if (sort === 'price' || sort === 'price_asc') {
-    return sorted.sort((left, right) => comparePrice(left, right) || compareSessionTime(left, right));
-  }
-  if (sort === 'price_desc') {
-    return sorted.sort((left, right) => comparePrice(right, left) || compareSessionTime(left, right));
-  }
-  if (sort === 'popular') {
-    return sorted.sort((left, right) => (right.sessionCount || 1) - (left.sessionCount || 1) || compareSessionTime(left, right));
-  }
-  return sorted.sort(compareSessionTime);
+
+  if (sort === 'price' || sort === 'price_asc' || sort === 'price_desc') return result;
+  return spreadCatalogSessionsByCoverImage(result);
 }
 
 function comparePrice(left: PublicSessionDto, right: PublicSessionDto): number {
@@ -1021,8 +1031,8 @@ function comparePrice(left: PublicSessionDto, right: PublicSessionDto): number {
 }
 
 function compareSessionTime(left: PublicSessionDto, right: PublicSessionDto): number {
-  const leftOpen = isOpenDateSession(left) && !left.startsAt;
-  const rightOpen = isOpenDateSession(right) && !right.startsAt;
+  const leftOpen = isOpenDateCatalogSession(left) && !left.startsAt;
+  const rightOpen = isOpenDateCatalogSession(right) && !right.startsAt;
   const leftTime = leftOpen ? Number.MAX_SAFE_INTEGER - 1 : left.startsAt ? new Date(left.startsAt).getTime() : Number.POSITIVE_INFINITY;
   const rightTime = rightOpen ? Number.MAX_SAFE_INTEGER - 1 : right.startsAt ? new Date(right.startsAt).getTime() : Number.POSITIVE_INFINITY;
   return leftTime - rightTime || left.title.localeCompare(right.title, 'ru');
@@ -1045,25 +1055,6 @@ function buildCatalogPriceSteps(sessions: PublicSessionDto[]): number[] {
   const maxPrice = prices.at(-1);
   const candidates = [500, 1000, 1500, 2000, 3000, 5000].filter((price) => maxPrice != null && price <= maxPrice);
   return candidates.length ? candidates : [1000, 2000, 3000];
-}
-
-function matchesCatalogDate(session: PublicSessionDto, dateFilter: string): boolean {
-  if (dateFilter === 'all') return true;
-  if (isOpenDateSession(session)) {
-    return dateFilter === 'today' || dateFilter === 'tomorrow' || dateFilter === 'weekend';
-  }
-  const startsAt = new Date(session.startsAt);
-  if (!Number.isFinite(startsAt.getTime())) return false;
-
-  const today = startOfLocalDay(new Date());
-  const eventDay = startOfLocalDay(startsAt);
-  const diffDays = Math.round((eventDay.getTime() - today.getTime()) / 86400000);
-
-  if (dateFilter === 'today') return diffDays === 0;
-  if (dateFilter === 'tomorrow') return diffDays === 1;
-  if (dateFilter === 'weekend') return startsAt.getDay() === 0 || startsAt.getDay() === 6;
-  if (dateFilter === 'evening') return session.timeBucket === 'evening' || session.timeBucket === 'night';
-  return true;
 }
 
 function matchesCatalogPrice(
@@ -1091,30 +1082,6 @@ function matchesCatalogAgeLimit(session: PublicSessionDto, ageMax: number): bool
   const limit = parseCatalogAgeLimit(session.ageLimit);
   if (limit == null) return true;
   return limit <= ageMax;
-}
-
-function matchesDateRange(
-  startsAt: string,
-  from?: string,
-  to?: string,
-  session?: PublicSessionDto,
-): boolean {
-  if (session && isOpenDateSession(session)) return true;
-  const timestamp = new Date(startsAt).getTime();
-  if (!Number.isFinite(timestamp)) return !from && !to;
-
-  const fromTime = from ? new Date(from).getTime() : Number.NEGATIVE_INFINITY;
-  const toTime = to ? new Date(to).getTime() : Number.POSITIVE_INFINITY;
-  return (!Number.isFinite(fromTime) || timestamp >= fromTime) && (!Number.isFinite(toTime) || timestamp <= toTime);
-}
-
-function isOpenDateSession(session: PublicSessionDto): boolean {
-  return String(session.kind || '').toUpperCase() === 'OPEN_DATE' ||
-    String(session.sourceStatus || '').toLowerCase() === 'open_date';
-}
-
-function startOfLocalDay(date: Date): Date {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }
 
 function humanizeSlug(slug: string): string {

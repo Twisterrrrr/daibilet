@@ -7,7 +7,7 @@ import { usePersistedNumber } from '@/components/my-day/usePersistedNumber';
 
 const LIST_SPLIT_KEY = 'daibilet.my-day.list-split';
 /** Prefer a wider map on desktop; user can still drag the divider. */
-const LIST_SPLIT_DEFAULT = 46;
+const LIST_SPLIT_DEFAULT = 35;
 const LIST_SPLIT_MIN = 32;
 const LIST_SPLIT_MAX = 72;
 

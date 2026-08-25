@@ -177,7 +177,7 @@ export default async function EventDetailPage({ params }: PageProps) {
           <section className="border-t border-slate-200/80 bg-surface-muted section-y">
             <div className="container-page">
               <h2 className="text-2xl font-bold text-graphite">Похожие события</h2>
-              <ul className="mt-8 grid gap-5 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
+              <ul className="event-related-grid mt-8">
                 {related.slice(0, 6).map((session) => (
                   <li key={`${session.id}-${session.startsAt}`}>
                     <EventCard session={session} suppressPurchaseAnchors />

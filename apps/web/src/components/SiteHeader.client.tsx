@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Heart, HelpCircle, LogIn, User } from 'lucide-react';
+import { Heart, HelpCircle, LogIn, MoreHorizontal, Route, User } from 'lucide-react';
 import { forwardRef, useEffect, useRef, useState } from 'react';
 
 import { CityPicker } from '@/components/CityPicker.client';
@@ -135,7 +135,7 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
               onChange={onCityChange}
               allLabel="Фильтр по городу"
               variant="header"
-              className="hidden shrink-0 lg:block lg:min-w-0 lg:max-w-[12rem] xl:max-w-[14rem]"
+              className="hidden shrink-0 lg:block lg:min-w-0 lg:max-w-[13rem] xl:max-w-[15rem]"
             />
           </div>
 
@@ -151,10 +151,10 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
                   href={item.href}
                   className={
                     [
-                      'inline-flex items-center rounded-lg px-2 py-1.5 text-sm font-semibold uppercase tracking-[0.06em] transition xl:px-2.5',
+                      'inline-flex items-center rounded-full px-3 py-1.5 text-sm font-medium transition xl:px-3.5',
                       active
-                        ? 'text-graphite underline decoration-graphite/70 decoration-2 underline-offset-[6px]'
-                        : 'text-graphite-muted hover:bg-surface-muted hover:text-graphite',
+                        ? 'bg-surface-muted text-graphite shadow-[inset_0_0_0_1px_hsl(210_9%_11%/0.08)]'
+                        : 'text-graphite-muted hover:bg-surface-muted/70 hover:text-graphite',
                     ].join(' ')
                   }
                 >
@@ -181,19 +181,12 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
               initialQuery={searchInitialQuery}
             />
 
-            <DayRouteBadge />
+            <DayRouteBadge className="lg:hidden" />
             <FavoritesHeaderButton onClick={() => setFavoritesOpen(true)} />
 
-            <div className="hidden items-center gap-[var(--header-icons-gap)] lg:flex">
-              <Link
-                href="/help"
-                title="Помощь и FAQ"
-                aria-label="Помощь и FAQ"
-                className="site-header-icon-link h-10 w-10"
-              >
-                <HelpCircle className="h-5 w-5" strokeWidth={1.75} />
-              </Link>
+            <HeaderOverflowMenu className="hidden lg:block" />
 
+            <div className="hidden items-center gap-[var(--header-icons-gap)] lg:flex">
               <HeaderAuthControls
                 ref={userMenuRef}
                 auth={auth}
@@ -225,6 +218,62 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
 
       {favoritesOpen ? <FavoritesPanel onClose={() => setFavoritesOpen(false)} /> : null}
     </>
+  );
+}
+
+function HeaderOverflowMenu({ className = '' }: { className?: string }) {
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const close = (event: MouseEvent) => {
+      if (rootRef.current && !rootRef.current.contains(event.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', close);
+    return () => document.removeEventListener('mousedown', close);
+  }, [open]);
+
+  return (
+    <div ref={rootRef} className={`relative ${className}`.trim()}>
+      <button
+        type="button"
+        aria-label="Ещё"
+        aria-expanded={open}
+        aria-haspopup="menu"
+        title="Ещё"
+        onClick={() => setOpen((value) => !value)}
+        className="site-header-icon-link h-10 w-10"
+      >
+        <MoreHorizontal className="h-5 w-5" strokeWidth={1.75} />
+      </button>
+      {open ? (
+        <div
+          role="menu"
+          aria-label="Дополнительные действия"
+          className="absolute right-0 z-50 mt-1.5 w-52 overflow-hidden rounded-card bg-white py-1 shadow-card-hover"
+        >
+          <Link
+            href="/my-day"
+            role="menuitem"
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium text-graphite-muted transition hover:bg-surface-muted hover:text-graphite"
+          >
+            <Route className="h-4 w-4 shrink-0" strokeWidth={1.75} />
+            Мой день
+          </Link>
+          <Link
+            href="/help"
+            role="menuitem"
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium text-graphite-muted transition hover:bg-surface-muted hover:text-graphite"
+          >
+            <HelpCircle className="h-4 w-4 shrink-0" strokeWidth={1.75} />
+            Помощь и FAQ
+          </Link>
+        </div>
+      ) : null}
+    </div>
   );
 }
 
