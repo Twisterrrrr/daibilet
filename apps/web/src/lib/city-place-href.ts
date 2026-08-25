@@ -1,5 +1,4 @@
 import {
-  lookupEditorialPlaceImage,
   resolveEditorialPlaceSlugAlias,
 } from './city-place-images';
 import { resolveCityPlaceHref, type CityPlaceLinkFields } from './cityInfo';
@@ -164,8 +163,9 @@ export type ResolveCityPlaceTitleHrefOptions = {
 };
 
 /**
- * Href для заголовка «Главные места»:
- * 1) явные cityInfo fields
+ * Href для заголовка «Главные места» / suburb POI / my-day:
+ * 1) явные cityInfo fields, но только если slug есть в каталоге города
+ *    (editorial cover ≠ живая /locations|/venues страница - иначе prefetch 404)
  * 2) совпадение по имени с venue города (published/candidate), если разрешено
  */
 export function resolveCityPlaceTitleHref(
@@ -177,23 +177,20 @@ export function resolveCityPlaceTitleHref(
   const explicit = resolveCityPlaceHref(place);
   if (explicit) {
     const slug = String(place.venueSlug || place.locationSlug || '').trim();
-    if (slug && venues.length) {
-      const found = findLinkableVenueBySlug(slug, venues);
-      if (found) {
-        return venueHref({
-          id: found.id || found.slug || found.name,
-          slug: found.slug,
-          name: found.name,
-          type: found.type,
-        });
-      }
-      // Suburb POI: link when editorial still is shipped (NN suburbs, Vyborg via alias map).
-      if (!allowNameMatch) {
-        if (lookupEditorialPlaceImage(slug)) return explicit;
-        return null;
-      }
+    // Raw `href` without venue/location slug - trust editorial path.
+    if (!slug) return explicit;
+    // Catalog not loaded yet: do not invent links that may 404 (Perm suburb POIs etc.).
+    if (!venues.length) return null;
+    const found = findLinkableVenueBySlug(slug, venues);
+    if (found) {
+      return venueHref({
+        id: found.id || found.slug || found.name,
+        slug: found.slug,
+        name: found.name,
+        type: found.type,
+      });
     }
-    return explicit;
+    return null;
   }
 
   if (!allowNameMatch) return null;

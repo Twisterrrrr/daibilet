@@ -2,7 +2,7 @@
  * Resolve city must-see / event → DayRouteVenueItem for localStorage bucket.
  */
 
-import { resolveCityPlaceHref, type CityMustSeeItem, type CityPlaceLinkFields } from './cityInfo';
+import { type CityMustSeeItem, type CityPlaceLinkFields } from './cityInfo';
 import { namesLooselyMatch } from './city-place-href';
 import { lookupEditorialPlaceCoords, pickEditorialPlaceCoordsIfStale } from './city-place-coords.ts'
 import { resolveVenueHeroImage } from './city-place-images.ts'
@@ -260,20 +260,17 @@ export function dayRouteItemFromMustSee(
   const id = String(matched?.id || slug || editorialId || suburbStubId).trim();
   if (!id) return null;
 
-  const catalogHref =
-    resolveCityPlaceHref(place) ||
-    (matched
-      ? venueHref({
-          id: matched.id || slug || matched.name,
-          slug: matched.slug || slug,
-          name: matched.title || matched.name,
-          type: matched.type,
-        })
-      : slug
-        ? `/locations/${slug}`
-        : null);
-  // Suburb POI without a hub venue: keep the pin, do not link to a missing / parent-city page.
-  const href = options.isSuburb && !matched ? null : catalogHref;
+  // Never invent `/locations/{slug}` for unpublished editorial seeds (Perm suburb POIs etc.).
+  // Pin stays; title link only when the venue is in the city catalog.
+  const catalogHref = matched
+    ? venueHref({
+        id: matched.id || slug || matched.name,
+        slug: matched.slug || slug,
+        name: matched.title || matched.name,
+        type: matched.type,
+      })
+    : null;
+  const href = catalogHref;
 
   // Hub often stores dark /venues/generated stubs; curated /images/venues/{city}/ wins.
   const imageUrl = resolveVenueHeroImage(slug, matched?.heroImageUrl);

@@ -7,7 +7,7 @@ export const CHUNK_RELOAD_FLAG = 'daibilet-chunk-reload';
 const CLEAR_AFTER_MS = 15_000;
 
 const CHUNK_FAILURE_RE =
-  /ChunkLoadError|Loading chunk [\d]+ failed|Failed to fetch dynamically imported module|error loading dynamically imported module|CSS_CHUNK_LOAD_FAILED|Loading CSS chunk/i;
+  /ChunkLoadError|Loading chunk [\d]+ failed|Failed to fetch dynamically imported module|error loading dynamically imported module|CSS_CHUNK_LOAD_FAILED|Loading CSS chunk|Cannot read properties of undefined \(reading 'call'\)/i;
 
 export function isChunkLoadFailure(message: string): boolean {
   return CHUNK_FAILURE_RE.test(String(message || ''));

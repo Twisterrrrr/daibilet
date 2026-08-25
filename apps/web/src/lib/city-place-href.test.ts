@@ -98,7 +98,7 @@ describe('resolveCityPlaceTitleHref', () => {
     assert.equal(href, '/locations/saint-petersburg-skalnyy-park-monrepo');
   });
 
-  it('links suburb POI by explicit slug when editorial still exists but slug is off-hub', () => {
+  it('does not invent /locations link for suburb POI with cover but no catalog page', () => {
     const href = resolveCityPlaceTitleHref(
       {
         name: 'Феодоровский монастырь',
@@ -115,10 +115,10 @@ describe('resolveCityPlaceTitleHref', () => {
       ],
       { allowNameMatch: false },
     );
-    assert.equal(href, '/locations/nizhny-novgorod-gorodets-feodorovskiy-monastyr');
+    assert.equal(href, null);
   });
 
-  it('keeps explicit locationSlug when the city payload omits outdoor pages', () => {
+  it('does not invent /locations when hub payload omits the outdoor page', () => {
     const href = resolveCityPlaceTitleHref(
       { name: 'Парк Горького', locationSlug: 'moscow-park-gorkogo' },
       [
@@ -131,7 +131,15 @@ describe('resolveCityPlaceTitleHref', () => {
         },
       ],
     );
-    assert.equal(href, '/locations/moscow-park-gorkogo');
+    assert.equal(href, null);
+  });
+
+  it('waits for catalog before linking explicit slug', () => {
+    const href = resolveCityPlaceTitleHref(
+      { name: 'Парк Горького', locationSlug: 'moscow-park-gorkogo' },
+      [],
+    );
+    assert.equal(href, null);
   });
 
   it('uses hub venue family when locationSlug is on the payload', () => {

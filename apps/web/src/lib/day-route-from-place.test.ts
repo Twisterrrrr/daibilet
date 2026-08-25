@@ -237,6 +237,7 @@ test('dayRouteItemFromMustSee resolves locationSlug without hub venue match', ()
   assert.ok(item);
   assert.equal(item!.id, 'saint-petersburg-unknown-church');
   assert.equal(item!.slug, 'saint-petersburg-unknown-church');
+  assert.equal(item!.href, null);
   assert.equal(item!.latitude ?? null, null);
   assert.equal(item!.address ?? null, null);
 });

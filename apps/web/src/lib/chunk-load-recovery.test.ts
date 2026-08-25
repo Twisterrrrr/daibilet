@@ -8,6 +8,10 @@ test('isChunkLoadFailure matches webpack / Next import failures', () => {
   assert.equal(isChunkLoadFailure('Failed to fetch dynamically imported module: /_next/static/chunks/app.js'), true);
   assert.equal(isChunkLoadFailure('error loading dynamically imported module'), true);
   assert.equal(isChunkLoadFailure('Loading CSS chunk 4 failed'), true);
+  assert.equal(
+    isChunkLoadFailure("TypeError: Cannot read properties of undefined (reading 'call')"),
+    true,
+  );
   assert.equal(isChunkLoadFailure('Hydration failed because the initial UI does not match'), false);
   assert.equal(isChunkLoadFailure('Application error: a client-side exception has occurred'), false);
 });
