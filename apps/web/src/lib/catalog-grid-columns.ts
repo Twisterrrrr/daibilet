@@ -2,8 +2,9 @@
 
 import { useLayoutEffect, useState, type RefObject } from 'react';
 
-/** Match `.catalog-card-grid` + collapsed auto-fill track max (~18.5rem). */
-const COLLAPSED_TRACK_MAX_PX = 18.5 * 16;
+/** Match `.catalog-card-grid` collapsed auto-fit track min (~16.5rem). */
+const COLLAPSED_TRACK_MIN_PX = 16.5 * 16;
+const COLLAPSED_FILTERS_RAIL_PX = 3.25 * 16 + 12;
 const COLLAPSED_GRID_GAP_PX = 20;
 
 export function estimateCatalogGridColumns(
@@ -13,10 +14,13 @@ export function estimateCatalogGridColumns(
   if (viewportWidth < 768) return 2;
   if (viewportWidth < 1024) return 3;
   if (filtersCollapsed) {
-    const contentWidth = Math.max(viewportWidth - 48, COLLAPSED_TRACK_MAX_PX);
+    const contentWidth = Math.max(
+      viewportWidth - 48 - COLLAPSED_FILTERS_RAIL_PX,
+      COLLAPSED_TRACK_MIN_PX,
+    );
     return Math.max(
       3,
-      Math.floor((contentWidth + COLLAPSED_GRID_GAP_PX) / (COLLAPSED_TRACK_MAX_PX + COLLAPSED_GRID_GAP_PX)),
+      Math.floor((contentWidth + COLLAPSED_GRID_GAP_PX) / (COLLAPSED_TRACK_MIN_PX + COLLAPSED_GRID_GAP_PX)),
     );
   }
   if (viewportWidth < 1536) return 3;

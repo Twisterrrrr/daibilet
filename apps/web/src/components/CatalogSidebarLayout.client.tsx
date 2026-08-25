@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronLeft, ChevronRight, SlidersHorizontal, X } from 'lucide-react';
+import { ChevronLeft, SlidersHorizontal, X } from 'lucide-react';
 import {
   createContext,
   useCallback,
@@ -155,47 +155,83 @@ export function CatalogSidebarLayout({
         className={`catalog-page-layout${desktopCollapsed ? ' is-filters-collapsed' : ''}`}
         data-catalog-filters-collapsed={desktopCollapsed ? '1' : '0'}
       >
-        <aside
-          id="catalog-filter-sidebar"
-          className={`catalog-sidebar${open ? ' is-open' : ''}${
-            desktopCollapsed ? ' is-desktop-collapsed' : ''
-          }`}
-          aria-labelledby={titleId}
-        >
-          <div className="catalog-sidebar-mobile-header lg:hidden">
-            <h2 id={titleId} className="text-base font-bold text-slate-900">
-              {title}
-            </h2>
-            <button
-              type="button"
-              className="catalog-sidebar-close"
-              aria-label="Закрыть фильтры"
-              onClick={closeDismiss}
-            >
-              <X className="h-5 w-5" strokeWidth={1.75} />
-            </button>
-          </div>
-          <div className="catalog-sidebar-scroll lg:contents">{sidebar}</div>
-          {footer ? (
-            <div className="catalog-sidebar-mobile-footer lg:hidden">
-              {typeof footer === 'function' ? footer({ closeApply, closeDismiss }) : footer}
-            </div>
-          ) : null}
-        </aside>
-
-        <div className="catalog-main min-w-0">
-          {desktopCollapsed ? (
+        {desktopCollapsed ? (
+          <div className="catalog-filters-rail">
             <button
               type="button"
               className="catalog-desktop-filters-reopen"
               onClick={expandDesktop}
               aria-expanded={false}
+              aria-controls="catalog-filter-sidebar"
+              title={activeCount > 0 ? `${title} (${activeCount})` : title}
             >
-              <SlidersHorizontal className="h-4 w-4" strokeWidth={1.75} aria-hidden />
-              {activeCount > 0 ? `${title} (${activeCount})` : title}
-              <ChevronRight className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden />
+              <SlidersHorizontal className="h-4 w-4 shrink-0" strokeWidth={1.75} aria-hidden />
+              {activeCount > 0 ? (
+                <span className="catalog-filters-rail__badge" aria-hidden>
+                  {activeCount}
+                </span>
+              ) : null}
+              <span className="sr-only">{activeCount > 0 ? `${title} (${activeCount})` : title}</span>
             </button>
-          ) : null}
+          </div>
+        ) : (
+          <aside
+            id="catalog-filter-sidebar"
+            className={`catalog-sidebar${open ? ' is-open' : ''}`}
+            aria-labelledby={titleId}
+          >
+            <div className="catalog-sidebar-mobile-header lg:hidden">
+              <h2 id={titleId} className="text-base font-bold text-slate-900">
+                {title}
+              </h2>
+              <button
+                type="button"
+                className="catalog-sidebar-close"
+                aria-label="Закрыть фильтры"
+                onClick={closeDismiss}
+              >
+                <X className="h-5 w-5" strokeWidth={1.75} />
+              </button>
+            </div>
+            <div className="catalog-sidebar-scroll lg:contents">{sidebar}</div>
+            {footer ? (
+              <div className="catalog-sidebar-mobile-footer lg:hidden">
+                {typeof footer === 'function' ? footer({ closeApply, closeDismiss }) : footer}
+              </div>
+            ) : null}
+          </aside>
+        )}
+
+        {/* Mobile drawer sidebar — same DOM, off-canvas when desktop rail is shown */}
+        {desktopCollapsed ? (
+          <aside
+            id="catalog-filter-sidebar"
+            className={`catalog-sidebar lg:hidden${open ? ' is-open' : ''}`}
+            aria-labelledby={titleId}
+          >
+            <div className="catalog-sidebar-mobile-header">
+              <h2 id={titleId} className="text-base font-bold text-slate-900">
+                {title}
+              </h2>
+              <button
+                type="button"
+                className="catalog-sidebar-close"
+                aria-label="Закрыть фильтры"
+                onClick={closeDismiss}
+              >
+                <X className="h-5 w-5" strokeWidth={1.75} />
+              </button>
+            </div>
+            <div className="catalog-sidebar-scroll">{sidebar}</div>
+            {footer ? (
+              <div className="catalog-sidebar-mobile-footer">
+                {typeof footer === 'function' ? footer({ closeApply, closeDismiss }) : footer}
+              </div>
+            ) : null}
+          </aside>
+        ) : null}
+
+        <div className="catalog-main min-w-0">
           {children}
         </div>
       </div>
