@@ -12,6 +12,7 @@ import {
   blogQuoteSurfaceClassName,
   blogSurfaceMeta,
   blogTagBadgeClassName,
+  glueRubNbsp,
   normalizeBlogTagLabel,
   stripColumnMetaPrefix,
 } from '@/lib/blog-meta';
@@ -26,9 +27,12 @@ export type BlogPostCardVariant =
   | 'lead'
   | 'quote';
 
-/** Full listing teaser — never clip / ellipsis. */
+/** Full listing teaser — never clip / ellipsis; keep ₽ glued to the number. */
 function fullListingExcerpt(excerpt: string): string {
-  return stripColumnMetaPrefix(excerpt).replace(/\s+/g, ' ').trim();
+  const plain = stripColumnMetaPrefix(excerpt)
+    .replace(/[^\S\u00a0]+/g, ' ')
+    .trim();
+  return glueRubNbsp(plain);
 }
 
 function CoverFallback({ large = false }: { large?: boolean }) {

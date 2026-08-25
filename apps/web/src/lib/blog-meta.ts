@@ -355,8 +355,17 @@ export function stripColumnMetaPrefix(text?: string | null): string {
   const stripped = raw
     .replace(/^(?:Авторская\s+)?[Кк]олонка\s+\p{Lu}[^:]{0,80}:\s*/u, '')
     .trim();
-  if (!stripped || stripped === raw) return raw;
-  return stripped.charAt(0).toLocaleUpperCase('ru-RU') + stripped.slice(1);
+  const base = !stripped || stripped === raw
+    ? raw
+    : stripped.charAt(0).toLocaleUpperCase('ru-RU') + stripped.slice(1);
+  return glueRubNbsp(base);
+}
+
+/** Не отрывать ₽ / «руб.» от числа при переносе строки. */
+export function glueRubNbsp(text: string): string {
+  return String(text || '')
+    .replace(/(\d)[\s\u00a0]+(₽)/g, '$1\u00a0$2')
+    .replace(/(\d)[\s\u00a0]+(руб(?:\.|ля|лей|ль)?)/gi, '$1\u00a0$2');
 }
 
 /** Имя автора колонки - brand blue; «Редакция» и прочие - нейтральный slate. */
