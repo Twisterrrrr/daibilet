@@ -427,69 +427,72 @@ html[data-nav-pending='1'] {
     opacity: 0.65;
   }
 
+  /* Blog magazine bento: one flat 3-col puzzle, equal-height rows */
   .blog-bento {
     display: grid;
     grid-template-columns: 1fr;
     gap: 1.25rem;
-  }
-
-  .blog-bento-pair {
-    display: contents;
+    align-items: stretch;
   }
 
   .blog-bento__break {
     margin: 0;
+    grid-column: 1 / -1;
   }
 
-  .blog-bento__span-1,
-  .blog-bento__span-2,
-  .blog-bento__span-3 {
+  .blog-bento__lead {
+    grid-column: 1 / -1;
     min-width: 0;
   }
 
-  @media (min-width: 640px) {
-    .blog-bento {
-      gap: 1.25rem;
-    }
+  .blog-bento__wide,
+  .blog-bento__tall {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
   }
 
-  @media (min-width: 1280px) {
+  .blog-bento__wide > *,
+  .blog-bento__tall > *,
+  .blog-bento__lead > * {
+    flex: 1 1 auto;
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+  }
+
+  @media (min-width: 768px) {
     .blog-bento {
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 1.5rem;
-      align-items: stretch;
     }
 
-    .blog-bento__span-1 {
-      grid-column: span 1;
-    }
-
-    .blog-bento__span-2 {
+    .blog-bento__wide {
       grid-column: span 2;
     }
 
-    .blog-bento__span-3 {
+    .blog-bento__tall {
+      grid-column: span 1;
+    }
+
+    /* Odd leftover wide without a tall partner: full row */
+    .blog-bento__wide:last-child:not(.blog-bento__wide--end) {
       grid-column: 1 / -1;
-    }
-
-    .blog-bento-pair--rtl > .blog-bento__span-1 {
-      order: 0;
-    }
-
-    .blog-bento-pair--rtl > .blog-bento__span-2 {
-      order: 1;
     }
   }
 
-  @media (max-width: 1279.98px) {
-    .blog-bento-pair {
-      display: flex;
-      flex-direction: column;
-      gap: 1.25rem;
-    }
+  .blog-bento article,
+  .blog-bento a.group {
+    transition:
+      transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+      box-shadow 0.35s ease;
+  }
 
-    .blog-bento-pair--rtl {
-      flex-direction: column;
+  @media (hover: hover) {
+    .blog-bento__wide:hover > *,
+    .blog-bento__tall:hover > *,
+    .blog-bento__lead:hover > * {
+      transform: translateY(-4px);
     }
   }
 

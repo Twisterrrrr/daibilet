@@ -6,7 +6,9 @@ import { BlogPostCard } from '@/components/BlogPostCard.client';
 import type { BlogCardDto } from '@/lib/blog-utils';
 
 /**
- * 3-col bento: lead (span-3, portrait+text) then alternating 2+1 / 1+2 pairs.
+ * Flat 3-col bento (puzzle):
+ * lead full width → [wide|tall] → [tall|wide] → …
+ * Same CSS grid row = equal height; photo fills extra space, no white holes.
  */
 export function BlogMagazineGrid({
   posts,
@@ -21,22 +23,28 @@ export function BlogMagazineGrid({
   if (!valid.length) return null;
 
   const [lead, ...rest] = valid;
-  const pairs: Array<{ wide: BlogCardDto; narrow: BlogCardDto; wideOnRight: boolean }> = [];
-  const tail: BlogCardDto[] = [];
+  const tiles: Array<
+    | { kind: 'wide'; post: BlogCardDto; mirror: boolean }
+    | { kind: 'tall'; post: BlogCardDto; mirror: boolean }
+  > = [];
 
   for (let i = 0; i < rest.length; ) {
     if (i + 1 < rest.length) {
-      const wideOnRight = pairs.length % 2 === 1;
+      const mirror = Math.floor(i / 2) % 2 === 1;
       const a = rest[i]!;
       const b = rest[i + 1]!;
-      pairs.push(
-        wideOnRight
-          ? { wide: b, narrow: a, wideOnRight: true }
-          : { wide: a, narrow: b, wideOnRight: false },
-      );
+      if (mirror) {
+        // [tall | wide]
+        tiles.push({ kind: 'tall', post: a, mirror: true });
+        tiles.push({ kind: 'wide', post: b, mirror: true });
+      } else {
+        // [wide | tall]
+        tiles.push({ kind: 'wide', post: a, mirror: false });
+        tiles.push({ kind: 'tall', post: b, mirror: false });
+      }
       i += 2;
     } else {
-      tail.push(rest[i]!);
+      tiles.push({ kind: 'wide', post: rest[i]!, mirror: false });
       i += 1;
     }
   }
@@ -44,30 +52,25 @@ export function BlogMagazineGrid({
   return (
     <div className="blog-bento" data-blog-bento="2-1">
       {lead ? (
-        <div className="blog-bento__span-3">
-          <BlogPostCard post={lead} variant="lead" />
+        <div className="blog-bento__lead">
+          <BlogPostCard post={lead} variant="banner" />
         </div>
       ) : null}
 
-      {afterFirstBlock ? <div className="blog-bento__span-3 blog-bento__break">{afterFirstBlock}</div> : null}
+      {afterFirstBlock ? <div className="blog-bento__break">{afterFirstBlock}</div> : null}
 
-      {pairs.map(({ wide, narrow, wideOnRight }) => (
+      {tiles.map((tile) => (
         <div
-          key={`${wide.slug}-${narrow.slug}`}
-          className={`blog-bento-pair${wideOnRight ? ' blog-bento-pair--rtl' : ''}`}
+          key={`${tile.kind}-${tile.post.slug}`}
+          className={
+            tile.kind === 'wide'
+              ? tile.mirror
+                ? 'blog-bento__wide blog-bento__wide--end'
+                : 'blog-bento__wide'
+              : 'blog-bento__tall'
+          }
         >
-          <div className="blog-bento__span-2">
-            <BlogPostCard post={wide} variant="strip" />
-          </div>
-          <div className="blog-bento__span-1">
-            <BlogPostCard post={narrow} variant="small" />
-          </div>
-        </div>
-      ))}
-
-      {tail.map((post) => (
-        <div key={post.slug} className="blog-bento__span-2">
-          <BlogPostCard post={post} variant="strip" />
+          <BlogPostCard post={tile.post} variant={tile.kind === 'wide' ? 'strip' : 'small'} />
         </div>
       ))}
     </div>

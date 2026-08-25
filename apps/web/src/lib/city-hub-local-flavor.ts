@@ -1196,7 +1196,7 @@ const KRASNODAR_SLIDES: CityIdentitySlide[] = [
   {
     id: 'southern-chill',
     title: 'Южная столица чилла',
-    text: 'Абсолютно расслабленный, гедонистический характер южного мегаполиса. Неспешные прогулки, кофейный культ и футуристический парк «Краснодар» - феномен парка Галицкого, одно из лучших современных пространств страны.',
+    text: 'Абсолютно расслабленный, гедонистический характер южного мегаполиса. Прогулки без спешки, кофейный культ и футуристический парк «Краснодар» - феномен парка Галицкого, одно из лучших современных пространств страны.',
     imageSrc: '/images/venues/krasnodar/identity-chill.jpg',
     imageAlt: 'Парк Галицкого и атмосфера южного чилла',
     slugs: [
@@ -1925,7 +1925,7 @@ const PENZA_SLIDES: CityIdentitySlide[] = [
   },
   {
     id: 'quiet-moscow',
-    title: 'Московская в своём темпе',
+    title: 'Московская без спешки',
     text: 'Пешеходная Московская, кофейни, фонтан и размеренный провинциальный темп - одна из главных причин, почему Пенза ощущается человеческой и удобной.',
     imageSrc: '/images/venues/penza/penzenskaya-peshehodnaya-ulitsa-moskovskaya.jpg',
     imageAlt: 'Пешеходная улица Московская в Пензе',
@@ -2276,7 +2276,7 @@ const TULA_SLIDES: CityIdentitySlide[] = [
     id: 'tula-weapons',
     title: 'Оружейное мастерство и стальной характер',
     text: 'ДНК Тулы ковалось веками у раскаленных горнов. Город возвел оборонное дело в культ: от кремлевских башен до футуристического Музея оружия в форме шлема.',
-    imageSrc: '/images/venues/tula/identity-symbol.jpg',
+    imageSrc: '/images/venues/tula/muzey-oruzhiya-shlem.jpg',
     imageAlt: 'Тульский музей оружия в форме богатырского шлема',
     slugs: ['tula-muzey-oruzhiya-shlem', 'tula-pamyatnik-levshe', 'tula-pamyatnik-petru-i'],
     target: 'places',
@@ -2286,8 +2286,8 @@ const TULA_SLIDES: CityIdentitySlide[] = [
     id: 'tula-tolstoy',
     title: 'Лев Толстой и вселенская философия',
     text: 'Тульская земля - колыбель великой русской литературы. Дух Ясной Поляны формирует культуру созерцания, поиска правды и близости к корням.',
-    imageSrc: '/images/venues/tula/identity-art.jpg',
-    imageAlt: 'Аллея Прешпект в усадьбе Ясная Поляна',
+    imageSrc: '/images/venues/tula/muzey-usad-ba-l-n-tolstogo-yasnaya-polyana.jpg',
+    imageAlt: 'Усадьба Льва Толстого в Ясной Поляне',
     slugs: [
       'tula-muzey-usad-ba-l-n-tolstogo-yasnaya-polyana',
       'tula-yasnaya-polyana-dom-muzey',
@@ -2314,8 +2314,8 @@ const TULA_SLIDES: CityIdentitySlide[] = [
     id: 'tula-kreml-oktava',
     title: 'Краснокирпичный Кремль и «Октава»',
     text: 'Архитектурный код города - стык древней истории и постиндустриального урбанизма. Оборонительные стены соседствуют с креативными пространствами из стекла и бетона.',
-    imageSrc: '/images/venues/tula/identity-architecture.jpg',
-    imageAlt: 'Стены Тульского кремля и современный кластер Октава',
+    imageSrc: '/images/venues/tula/tul-skiy-kreml.jpg',
+    imageAlt: 'Стены Тульского кремля с Успенским собором',
     slugs: [
       'tula-tul-skiy-kreml',
       'tula-tvorcheskiy-industrial-nyy-klaster-oktava',

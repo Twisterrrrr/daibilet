@@ -111,67 +111,65 @@ export function BlogFeaturedHero({
           />
         </Link>
 
-        <div className="relative z-10 mt-auto w-full p-4 sm:p-5 md:p-6 lg:p-7">
-          <div className="max-w-3xl rounded-2xl border border-white/20 bg-slate-950/45 p-5 shadow-[0_8px_32px_-12px_rgba(0,0,0,0.55)] backdrop-blur-md supports-[backdrop-filter]:bg-slate-950/35 sm:p-6 md:p-7">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-bold uppercase tracking-[0.14em] text-white/80 md:text-xs">
-                Материал недели
-              </span>
-              {tag ? (
-                <span
-                  className={`inline-flex max-w-full truncate rounded-md px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ring-1 backdrop-blur-sm md:text-[11px] ${blogTagBadgeClassName(tag)}`}
-                >
-                  {tag}
-                </span>
-              ) : null}
-              {cityLabel ? (
-                <span
-                  className={`inline-flex max-w-full truncate rounded-md px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ring-1 backdrop-blur-sm md:text-[11px] ${blogCityBadgeClassName(featured.citySlug)}`}
-                >
-                  {cityLabel}
-                </span>
-              ) : null}
-            </div>
-
-            <h2 className="mt-3 font-serif text-[1.75rem] font-semibold leading-[1.12] tracking-tight text-white md:text-3xl lg:text-4xl">
-              <Link href={articleHref} className="hover:text-white/90">
-                {featured.title}
-              </Link>
-            </h2>
-
-            {lead ? (
-              <p className="mt-3 max-w-2xl break-words text-base leading-relaxed text-white/80 md:text-base md:leading-[1.5]">
-                {lead}
-              </p>
-            ) : null}
-
-            <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-white/65 md:text-sm">
-              {featured.authorName || featured.authorId ? (
-                <span className="font-medium text-white/85">
-                  {featured.authorName || authorLabel(featured.authorId)}
-                </span>
-              ) : null}
-              {dateLabel ? <time dateTime={featured.publishedAt || undefined}>{dateLabel}</time> : null}
-              {featured.readMin ? <span>{featured.readMin} мин</span> : null}
-            </div>
-
-            <div className="mt-4 flex flex-wrap gap-2">
-              <Link
-                href={articleHref}
-                className="group/cta inline-flex items-center gap-2 rounded-xl bg-primary-600 px-5 py-3 text-base font-semibold text-white shadow-sm transition-all duration-300 hover:bg-primary-500 md:px-4 md:py-2.5 md:text-sm"
+        <div className="relative z-10 mt-auto flex w-full flex-col gap-4 p-7 md:gap-4 md:p-7 lg:p-8">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-bold uppercase tracking-[0.14em] text-white/80 md:text-xs">
+              Материал недели
+            </span>
+            {tag ? (
+              <span
+                className={`inline-flex max-w-full truncate rounded-md px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ring-1 backdrop-blur-sm md:text-[11px] ${blogTagBadgeClassName(tag)}`}
               >
-                Читать
-                <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/cta:translate-x-1" aria-hidden />
+                {tag}
+              </span>
+            ) : null}
+            {cityLabel ? (
+              <span
+                className={`inline-flex max-w-full truncate rounded-md px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ring-1 backdrop-blur-sm md:text-[11px] ${blogCityBadgeClassName(featured.citySlug)}`}
+              >
+                {cityLabel}
+              </span>
+            ) : null}
+          </div>
+
+          <h2 className="font-serif text-[1.75rem] font-semibold leading-[1.12] tracking-tight text-white md:text-3xl lg:text-4xl">
+            <Link href={articleHref} className="hover:text-white/90">
+              {featured.title}
+            </Link>
+          </h2>
+
+          {lead ? (
+            <p className="max-w-2xl break-words text-base leading-relaxed text-white/80 md:text-base md:leading-[1.5]">
+              {lead}
+            </p>
+          ) : null}
+
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-white/65 md:text-sm">
+            {featured.authorName || featured.authorId ? (
+              <span className="font-medium text-white/85">
+                {featured.authorName || authorLabel(featured.authorId)}
+              </span>
+            ) : null}
+            {dateLabel ? <time dateTime={featured.publishedAt || undefined}>{dateLabel}</time> : null}
+            {featured.readMin ? <span>{featured.readMin} мин</span> : null}
+          </div>
+
+          <div className="flex flex-wrap gap-2 pt-1">
+            <Link
+              href={articleHref}
+              className="group/cta inline-flex items-center gap-2 rounded-xl bg-primary-600 px-5 py-3 text-base font-semibold text-white shadow-sm transition-all duration-300 hover:bg-primary-500 md:px-4 md:py-2.5 md:text-sm"
+            >
+              Читать
+              <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/cta:translate-x-1" aria-hidden />
+            </Link>
+            {scheduleCta ? (
+              <Link
+                href={scheduleCta.href}
+                className="inline-flex items-center justify-center rounded-xl border border-white/35 bg-white/10 px-5 py-3 text-base font-semibold text-white backdrop-blur-sm transition-all duration-300 hover:translate-x-0.5 hover:bg-white/20 md:px-4 md:py-2.5 md:text-sm"
+              >
+                {scheduleCta.label}
               </Link>
-              {scheduleCta ? (
-                <Link
-                  href={scheduleCta.href}
-                  className="inline-flex items-center justify-center rounded-xl border border-white/35 bg-white/10 px-5 py-3 text-base font-semibold text-white backdrop-blur-sm transition-all duration-300 hover:translate-x-0.5 hover:bg-white/20 md:px-4 md:py-2.5 md:text-sm"
-                >
-                  {scheduleCta.label}
-                </Link>
-              ) : null}
-            </div>
+            ) : null}
           </div>
         </div>
       </article>
