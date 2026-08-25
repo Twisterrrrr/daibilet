@@ -682,6 +682,14 @@ html[data-nav-pending='1'] {
     }
   }
 
+  /* Collapsed filters: add columns on ultrawide instead of stretching cards. */
+  @media (min-width: 1024px) {
+    .catalog-page-layout.is-filters-collapsed .catalog-card-grid {
+      grid-template-columns: repeat(auto-fill, minmax(16.5rem, 18.5rem));
+      justify-content: start;
+    }
+  }
+
   /** Sidebar + main content (places / events catalogs). */
   .catalog-page-layout {
     display: grid;

@@ -21,6 +21,7 @@ import {
 } from '@/lib/catalog-interstitials';
 import { collapseCatalogComboFamilies } from '@/lib/home-showcase-sections';
 import { IMAGE_SIZES, CardSafeImage } from '@/components/SafeImage.client';
+import { useCatalogFiltersLayout } from '@/components/CatalogSidebarLayout.client';
 
 type CatalogResultsProps = {
   items: PublicCatalogListItemDto[];
@@ -68,9 +69,11 @@ type CatalogGridEntry =
 function buildCatalogGridEntries(
   items: PublicCatalogListItemDto[],
   city?: string | null,
+  options?: { embedInterstitials?: boolean },
 ): CatalogGridEntry[] {
+  const embedInterstitials = options?.embedInterstitials ?? true;
   const banners = catalogInterstitialsForCity(city);
-  if (!banners.length || items.length < CATALOG_INTERSTITIAL_EVERY) {
+  if (!embedInterstitials || !banners.length || items.length < CATALOG_INTERSTITIAL_EVERY) {
     return items.map((session) => ({ kind: 'event' as const, session }));
   }
 
@@ -123,6 +126,8 @@ export function CatalogResults({
   sort,
   hasExtraFilters = false,
 }: CatalogResultsProps) {
+  const filtersLayout = useCatalogFiltersLayout();
+  const filtersCollapsed = filtersLayout?.desktopCollapsed ?? false;
   const catalogItems = collapseCatalogComboFamilies(items);
   if (!catalogItems.length) {
     const cityName = String(city || '').trim();
@@ -223,7 +228,10 @@ export function CatalogResults({
   const listItems = showLiveRail
     ? catalogItems.filter((item) => !liveRailItems.some((rail) => rail.id === item.id))
     : catalogItems;
-  const gridEntries = viewMode === 'cards' ? buildCatalogGridEntries(listItems, city) : null;
+  const gridEntries =
+    viewMode === 'cards'
+      ? buildCatalogGridEntries(listItems, city, { embedInterstitials: !filtersCollapsed })
+      : null;
 
   return (
     <>
