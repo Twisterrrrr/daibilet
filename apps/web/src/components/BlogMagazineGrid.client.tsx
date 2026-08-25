@@ -5,14 +5,6 @@ import type { ReactNode } from 'react';
 import { BlogPostCard } from '@/components/BlogPostCard.client';
 import type { BlogCardDto } from '@/lib/blog-utils';
 
-function isUfaPost(post: BlogCardDto): boolean {
-  const slugs = [post.citySlug, ...(post.citySlugs || [])]
-    .map((s) => String(s || '').trim().toLowerCase())
-    .filter(Boolean);
-  if (slugs.includes('ufa') || slugs.includes('уфа')) return true;
-  return /уф[аыуе]/i.test(String(post.city || ''));
-}
-
 type BentoBlock = {
   horizontals: [BlogCardDto, BlogCardDto];
   vertical: BlogCardDto;
@@ -23,8 +15,7 @@ type BentoBlock = {
  * Magazine bento blocks:
  *   [ horizontal ] [          ]
  *   [ horizontal ] [ vertical ]   ← tall spans both rows
- * then mirrored, and so on.
- * Ufa in the vertical slot → text-filled quote card.
+ * then mirrored. Same card types everywhere — fill the 3-col slot with content.
  */
 export function BlogMagazineGrid({
   posts,
@@ -67,25 +58,22 @@ export function BlogMagazineGrid({
 
       {afterFirstBlock ? <div className="blog-bento__break">{afterFirstBlock}</div> : null}
 
-      {blocks.map((block) => {
-        const tallVariant = isUfaPost(block.vertical) ? 'quote' : 'small';
-        return (
-          <div
-            key={`${block.horizontals[0].slug}-${block.vertical.slug}`}
-            className={`blog-bento-block${block.mirror ? ' blog-bento-block--mirror' : ''}`}
-          >
-            <div className="blog-bento-block__h1">
-              <BlogPostCard post={block.horizontals[0]} variant="strip" />
-            </div>
-            <div className="blog-bento-block__v">
-              <BlogPostCard post={block.vertical} variant={tallVariant} />
-            </div>
-            <div className="blog-bento-block__h2">
-              <BlogPostCard post={block.horizontals[1]} variant="strip" />
-            </div>
+      {blocks.map((block) => (
+        <div
+          key={`${block.horizontals[0].slug}-${block.vertical.slug}`}
+          className={`blog-bento-block${block.mirror ? ' blog-bento-block--mirror' : ''}`}
+        >
+          <div className="blog-bento-block__h1">
+            <BlogPostCard post={block.horizontals[0]} variant="strip" />
           </div>
-        );
-      })}
+          <div className="blog-bento-block__v">
+            <BlogPostCard post={block.vertical} variant="small" />
+          </div>
+          <div className="blog-bento-block__h2">
+            <BlogPostCard post={block.horizontals[1]} variant="strip" />
+          </div>
+        </div>
+      ))}
 
       {leftovers.length ? (
         <div className="blog-bento__leftovers">
