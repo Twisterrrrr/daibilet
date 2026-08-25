@@ -5,10 +5,26 @@ import type { ReactNode } from 'react';
 import { BlogPostCard } from '@/components/BlogPostCard.client';
 import type { BlogCardDto } from '@/lib/blog-utils';
 
+function isUfaPost(post: BlogCardDto): boolean {
+  const slugs = [post.citySlug, ...(post.citySlugs || [])]
+    .map((s) => String(s || '').trim().toLowerCase())
+    .filter(Boolean);
+  if (slugs.includes('ufa') || slugs.includes('уфа')) return true;
+  return /уф[аыуе]/i.test(String(post.city || ''));
+}
+
+type BentoBlock = {
+  horizontals: [BlogCardDto, BlogCardDto];
+  vertical: BlogCardDto;
+  mirror: boolean;
+};
+
 /**
- * Flat 3-col bento (puzzle):
- * lead full width → [wide|tall] → [tall|wide] → …
- * Same CSS grid row = equal height; photo fills extra space, no white holes.
+ * Magazine bento blocks:
+ *   [ horizontal ] [          ]
+ *   [ horizontal ] [ vertical ]   ← tall spans both rows
+ * then mirrored, and so on.
+ * Ufa in the vertical slot → text-filled quote card.
  */
 export function BlogMagazineGrid({
   posts,
@@ -23,34 +39,26 @@ export function BlogMagazineGrid({
   if (!valid.length) return null;
 
   const [lead, ...rest] = valid;
-  const tiles: Array<
-    | { kind: 'wide'; post: BlogCardDto; mirror: boolean }
-    | { kind: 'tall'; post: BlogCardDto; mirror: boolean }
-  > = [];
+  const blocks: BentoBlock[] = [];
+  const leftovers: BlogCardDto[] = [];
 
   for (let i = 0; i < rest.length; ) {
-    if (i + 1 < rest.length) {
-      const mirror = Math.floor(i / 2) % 2 === 1;
-      const a = rest[i]!;
-      const b = rest[i + 1]!;
-      if (mirror) {
-        // [tall | wide]
-        tiles.push({ kind: 'tall', post: a, mirror: true });
-        tiles.push({ kind: 'wide', post: b, mirror: true });
-      } else {
-        // [wide | tall]
-        tiles.push({ kind: 'wide', post: a, mirror: false });
-        tiles.push({ kind: 'tall', post: b, mirror: false });
-      }
-      i += 2;
+    if (i + 2 < rest.length) {
+      const mirror = blocks.length % 2 === 1;
+      blocks.push({
+        horizontals: [rest[i]!, rest[i + 1]!],
+        vertical: rest[i + 2]!,
+        mirror,
+      });
+      i += 3;
     } else {
-      tiles.push({ kind: 'wide', post: rest[i]!, mirror: false });
+      leftovers.push(rest[i]!);
       i += 1;
     }
   }
 
   return (
-    <div className="blog-bento" data-blog-bento="2-1">
+    <div className="blog-bento" data-blog-bento="2h-1v">
       {lead ? (
         <div className="blog-bento__lead">
           <BlogPostCard post={lead} variant="banner" />
@@ -59,20 +67,35 @@ export function BlogMagazineGrid({
 
       {afterFirstBlock ? <div className="blog-bento__break">{afterFirstBlock}</div> : null}
 
-      {tiles.map((tile) => (
-        <div
-          key={`${tile.kind}-${tile.post.slug}`}
-          className={
-            tile.kind === 'wide'
-              ? tile.mirror
-                ? 'blog-bento__wide blog-bento__wide--end'
-                : 'blog-bento__wide'
-              : 'blog-bento__tall'
-          }
-        >
-          <BlogPostCard post={tile.post} variant={tile.kind === 'wide' ? 'strip' : 'small'} />
+      {blocks.map((block) => {
+        const tallVariant = isUfaPost(block.vertical) ? 'quote' : 'small';
+        return (
+          <div
+            key={`${block.horizontals[0].slug}-${block.vertical.slug}`}
+            className={`blog-bento-block${block.mirror ? ' blog-bento-block--mirror' : ''}`}
+          >
+            <div className="blog-bento-block__h1">
+              <BlogPostCard post={block.horizontals[0]} variant="strip" />
+            </div>
+            <div className="blog-bento-block__v">
+              <BlogPostCard post={block.vertical} variant={tallVariant} />
+            </div>
+            <div className="blog-bento-block__h2">
+              <BlogPostCard post={block.horizontals[1]} variant="strip" />
+            </div>
+          </div>
+        );
+      })}
+
+      {leftovers.length ? (
+        <div className="blog-bento__leftovers">
+          {leftovers.map((post) => (
+            <div key={post.slug} className="blog-bento__leftover">
+              <BlogPostCard post={post} variant="strip" />
+            </div>
+          ))}
         </div>
-      ))}
+      ) : null}
     </div>
   );
 }

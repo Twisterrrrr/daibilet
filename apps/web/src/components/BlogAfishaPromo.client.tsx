@@ -116,28 +116,31 @@ export function BlogAfishaPromo({
     return (
       <section
         aria-label="Афиша"
-        className="group relative mt-auto flex min-h-[14rem] flex-1 overflow-hidden rounded-2xl bg-slate-900 text-white shadow-sm"
+        className="group relative mt-auto overflow-hidden rounded-2xl bg-slate-900 text-white shadow-sm aspect-[4/5] max-h-[22rem]"
       >
         <SafeImage
           src={FALLBACK_IMAGE}
           alt=""
           fill
           sizes={SIDEBAR_IMAGE_SIZES}
-          className="object-cover opacity-80 transition duration-500 group-hover:scale-105"
+          className="object-cover opacity-90 transition duration-500 group-hover:scale-105"
           fallback={<div className="absolute inset-0 bg-slate-800" aria-hidden />}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/10" />
-        <div className="relative mt-auto flex w-full flex-col gap-3 p-5 sm:p-6">
-          <h2 className="font-display text-xl font-bold leading-snug text-white sm:text-2xl">
-            Гид по лучшим событиям
-          </h2>
-          <Link
-            href="/events"
-            className="inline-flex w-fit items-center justify-center gap-1.5 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-slate-100"
-          >
-            Смотреть афишу
-            <ArrowRight className="h-4 w-4" aria-hidden />
-          </Link>
+        {/* Scrim ~1/4 снизу — фото остаётся видимым */}
+        <div className="absolute inset-x-0 bottom-0 h-[28%] bg-gradient-to-t from-black/80 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5">
+          <div className="rounded-xl border border-white/20 bg-slate-950/45 p-3 shadow-sm backdrop-blur-md supports-[backdrop-filter]:bg-slate-950/35">
+            <h2 className="font-display text-base font-bold leading-snug text-white sm:text-lg">
+              Гид по лучшим событиям
+            </h2>
+            <Link
+              href="/events"
+              className="mt-2.5 inline-flex w-fit items-center justify-center gap-1.5 rounded-xl bg-white px-3.5 py-2 text-sm font-semibold text-slate-900 transition hover:bg-slate-100"
+            >
+              Смотреть афишу
+              <ArrowRight className="h-4 w-4" aria-hidden />
+            </Link>
+          </div>
         </div>
       </section>
     );
@@ -149,7 +152,7 @@ export function BlogAfishaPromo({
   return (
     <section
       aria-label={title}
-      className="group relative mt-auto flex min-h-[14rem] flex-1 overflow-hidden rounded-2xl bg-slate-900 text-white shadow-sm"
+      className="group relative mt-auto overflow-hidden rounded-2xl bg-slate-900 text-white shadow-sm aspect-[4/5] max-h-[22rem]"
     >
       <SafeImage
         src={imageSrc}
@@ -168,20 +171,22 @@ export function BlogAfishaPromo({
           />
         }
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/10" />
-      <div className="relative mt-auto flex w-full flex-col gap-3 p-5 sm:p-6">
-        <h2 className="font-display text-xl font-bold leading-snug text-white sm:text-2xl">
-          <Link href={promo.href} className="hover:text-white/95">
-            {title}
+      <div className="absolute inset-x-0 bottom-0 h-[28%] bg-gradient-to-t from-black/80 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5">
+        <div className="rounded-xl border border-white/20 bg-slate-950/45 p-3 shadow-sm backdrop-blur-md supports-[backdrop-filter]:bg-slate-950/35">
+          <h2 className="font-display text-base font-bold leading-snug text-white sm:text-lg">
+            <Link href={promo.href} className="hover:text-white/95">
+              {title}
+            </Link>
+          </h2>
+          <Link
+            href={promo.href}
+            className="mt-2.5 inline-flex w-fit items-center justify-center gap-1.5 rounded-xl bg-white px-3.5 py-2 text-sm font-semibold text-slate-900 transition hover:bg-slate-100"
+          >
+            Смотреть афишу
+            <ArrowRight className="h-4 w-4" aria-hidden />
           </Link>
-        </h2>
-        <Link
-          href={promo.href}
-          className="inline-flex w-fit items-center justify-center gap-1.5 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-slate-100"
-        >
-          Смотреть афишу
-          <ArrowRight className="h-4 w-4" aria-hidden />
-        </Link>
+        </div>
       </div>
     </section>
   );
