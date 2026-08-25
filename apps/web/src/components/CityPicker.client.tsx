@@ -129,7 +129,7 @@ export function CityPicker({
 
   const buttonClassName =
     variant === 'hero'
-      ? 'relative flex h-11 w-full items-center gap-2 rounded-xl bg-slate-50 px-3 pr-9 text-left text-sm font-medium text-slate-800 outline-none transition hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-primary/25'
+      ? 'relative flex h-11 w-full items-center gap-2 rounded-xl border border-slate-300/90 bg-white px-3 pr-9 text-left text-sm font-medium text-slate-800 outline-none transition hover:border-slate-400 hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-primary/25'
       : variant === 'compact'
         ? 'relative flex w-full items-center gap-2 rounded-lg py-3 pl-10 pr-10 text-left text-base font-medium text-slate-700 hover:bg-slate-100'
         : // Header: mobile = MapPin icon (same chrome as search/heart); lg+ named chip.
