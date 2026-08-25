@@ -4,13 +4,20 @@ import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Search } from 'lucide-react';
 
+import {
+  resolveActiveBlogAfishaPromo,
+} from '@/components/BlogAfishaPromo.client';
+import { BlogFeedPromo } from '@/components/BlogFeedPromo.client';
 import { BlogMagazineGrid } from '@/components/BlogMagazineGrid.client';
 import { BlogListingFiltersNav } from '@/components/BlogListingFiltersNav.client';
+import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import type { BlogListFilters } from '@/components/BlogListView';
 import type { BlogCardDto } from '@/lib/blog-utils';
 import { paginateBlogFeedByCursor } from '@/lib/blog-cursor';
+import { planBlogFeedPromos } from '@/lib/blog-feed-promo';
 import { canonicalizeBlogCitySlug, filterBlogFeedByCity } from '@/lib/blog-feed-rank';
 import { buildBlogCityFilterOptions, cityFilterLabel } from '@/lib/blog-meta';
+import type { BlogSidebarPromoDto } from '@/lib/blog-sidebar-promo';
 import { parseBlogTopicParam, postMatchesTopic } from '@/lib/blog-topics';
 
 const PAGE_SIZE = 12;
@@ -37,6 +44,9 @@ export function BlogListFiltered({
   featuredSlot = null,
   editorialQuote = null,
   sidebarSlot = null,
+  afishaPromos = {},
+  afishaFallbackCityName = null,
+  afishaFallbackCitySlug = null,
 }: {
   posts: BlogCardDto[];
   /** Full blog list for city filter dropdown counts (without hero split). */
@@ -51,14 +61,22 @@ export function BlogListFiltered({
   editorialQuote?: string | null;
   /** Desktop sidebar: popular posts, promos, Telegram. */
   sidebarSlot?: ReactNode;
+  afishaPromos?: Record<string, BlogSidebarPromoDto>;
+  afishaFallbackCityName?: string | null;
+  afishaFallbackCitySlug?: string | null;
 }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const selectedCity = useSelectedCityOptional();
   const cityOptionsSource = allPosts?.length ? allPosts : posts;
   const [cursor, setCursor] = useState<string | null>(null);
   const [visiblePosts, setVisiblePosts] = useState<BlogCardDto[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [promoSeed, setPromoSeed] = useState(1);
+  useEffect(() => {
+    setPromoSeed(Math.floor(Math.random() * 10_000) + 1);
+  }, []);
 
   const urlCityRaw = paramValue(searchParams.get('city') ?? initialFilters?.city);
   const urlCity = urlCityRaw === 'multi' ? 'all' : urlCityRaw;
@@ -138,6 +156,38 @@ export function BlogListFiltered({
   const bannerLabel = emptyCheckSlug ? cityFilterLabel(urlCity) : null;
   const showEmptyCityBanner = Boolean(emptyCheckSlug && bannerLabel && emptyCheckCount === 0);
 
+  const activePromo = useMemo(
+    () =>
+      resolveActiveBlogAfishaPromo(
+        afishaPromos,
+        selectedCity,
+        afishaFallbackCityName,
+        afishaFallbackCitySlug,
+      ),
+    [afishaPromos, selectedCity, afishaFallbackCityName, afishaFallbackCitySlug],
+  );
+
+  const feedPromoSlots = useMemo(() => {
+    const articleCount = displayPosts.filter((post) => Boolean(post?.slug && post?.title)).length;
+    const blockCount = Math.floor(articleCount / 3);
+    const plans = planBlogFeedPromos({
+      blockCount,
+      promo: activePromo,
+      seed: promoSeed,
+    });
+    return plans.map((plan) => ({
+      afterBlockIndex: plan.afterBlockIndex,
+      node: (
+        <BlogFeedPromo
+          key={`feed-promo-${plan.afterBlockIndex}-${plan.kind}-${plan.layout}`}
+          promo={activePromo!}
+          kind={plan.kind}
+          layout={plan.layout}
+        />
+      ),
+    }));
+  }, [displayPosts, activePromo, promoSeed]);
+
   const feedBody = (
     <div id="blog-feed" className="scroll-mt-24">
       {showEmptyCityBanner ? (
@@ -155,6 +205,7 @@ export function BlogListFiltered({
             posts={displayPosts}
             editorialQuote={editorialQuote}
             leadBanner={hasActive || !featuredSlot}
+            feedPromoSlots={feedPromoSlots}
           />
           {hasMore ? (
             <div className="mt-8 flex justify-center">
@@ -203,13 +254,13 @@ export function BlogListFiltered({
       <div className="blog-layout__main min-w-0">
         {hasActive ? (
           <>
-            <div className="mb-8">{feedBody}</div>
+            <div className="mb-12 sm:mb-14">{feedBody}</div>
             {featuredSlot}
           </>
         ) : (
           <>
             {featuredSlot}
-            {feedBody}
+            <div className={featuredSlot ? 'mt-2 sm:mt-4' : undefined}>{feedBody}</div>
           </>
         )}
       </div>

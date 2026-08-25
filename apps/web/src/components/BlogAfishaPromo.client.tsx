@@ -8,6 +8,7 @@ import { SafeImage } from '@/components/SafeImage.client';
 import { catalogHrefWithSelectedCity } from '@/lib/catalog-url';
 import { resolveCityCardImage } from '@/lib/city-images';
 import { cityToGenitive } from '@/lib/city-declension';
+import { formatPriceFrom } from '@/lib/format';
 import { landingCategoryHref, normalizeKnownCitySlug } from '@/lib/landing-routes';
 import {
   lookupBlogSidebarPromo,
@@ -61,7 +62,7 @@ function litePromoFromDestination(input: {
   };
 }
 
-function resolveActivePromo(
+export function resolveActiveBlogAfishaPromo(
   promos: Record<string, BlogSidebarPromoDto>,
   selected: ReturnType<typeof useSelectedCityOptional>,
   fallbackCityName?: string | null,
@@ -99,9 +100,18 @@ function resolveActivePromo(
   );
 }
 
-function guideTitleFor(cityName: string): string {
+export function blogAfishaGuideTitle(cityName: string): string {
   const genitive = cityToGenitive(cityName);
   return `Гид по лучшим событиям ${genitive}`;
+}
+
+function richMetaLine(promo: BlogSidebarPromoDto): string | null {
+  const parts: string[] = [];
+  const price = formatPriceFrom(promo.priceFrom);
+  if (price) parts.push(price);
+  if (promo.weekendCount > 0) parts.push(`${promo.weekendCount} на выходных`);
+  else if (promo.eventsCount > 0) parts.push(`${promo.eventsCount} событий`);
+  return parts.length ? parts.join(' · ') : null;
 }
 
 export function BlogAfishaPromo({
@@ -110,7 +120,12 @@ export function BlogAfishaPromo({
   fallbackCitySlug,
 }: BlogAfishaPromoProps) {
   const selectedCity = useSelectedCityOptional();
-  const promo = resolveActivePromo(promos, selectedCity, fallbackCityName, fallbackCitySlug);
+  const promo = resolveActiveBlogAfishaPromo(
+    promos,
+    selectedCity,
+    fallbackCityName,
+    fallbackCitySlug,
+  );
 
   if (!promo) {
     return (
@@ -123,12 +138,15 @@ export function BlogAfishaPromo({
           alt=""
           fill
           sizes={SIDEBAR_IMAGE_SIZES}
-          className="object-cover opacity-90 transition duration-500 group-hover:scale-105"
+          className="object-cover opacity-80 transition duration-500 group-hover:scale-105"
           fallback={<div className="absolute inset-0 bg-slate-800" aria-hidden />}
         />
-        {/* Лёгкий scrim только снизу (~1/4) — без glass на всё поле */}
-        <div className="absolute inset-x-0 bottom-0 h-[32%] bg-gradient-to-t from-black/75 via-black/35 to-transparent" />
+        <div
+          className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/10"
+          aria-hidden
+        />
         <div className="relative mt-auto flex w-full flex-col gap-3 p-5 sm:p-6">
+          <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-white/75">Афиша</p>
           <h2 className="font-display text-xl font-bold leading-snug text-white sm:text-2xl">
             Гид по лучшим событиям
           </h2>
@@ -145,7 +163,9 @@ export function BlogAfishaPromo({
   }
 
   const imageSrc = promo.imageUrl || FALLBACK_IMAGE;
-  const title = guideTitleFor(promo.cityName);
+  const title = blogAfishaGuideTitle(promo.cityName);
+  const meta = richMetaLine(promo);
+  const chips = (promo.chips || []).slice(0, 2);
 
   return (
     <section
@@ -157,25 +177,46 @@ export function BlogAfishaPromo({
         alt=""
         fill
         sizes={SIDEBAR_IMAGE_SIZES}
-        className="object-cover transition duration-500 group-hover:scale-105"
+        className="object-cover opacity-80 transition duration-500 group-hover:scale-105"
         fallback={
           <SafeImage
             src={FALLBACK_IMAGE}
             alt=""
             fill
             sizes={SIDEBAR_IMAGE_SIZES}
-            className="object-cover"
+            className="object-cover opacity-80"
             fallback={<div className="absolute inset-0 bg-slate-800" aria-hidden />}
           />
         }
       />
-      <div className="absolute inset-x-0 bottom-0 h-[32%] bg-gradient-to-t from-black/75 via-black/35 to-transparent" />
+      {/* Rich A: dense full-height gradient, no glass */}
+      <div
+        className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/10"
+        aria-hidden
+      />
       <div className="relative mt-auto flex w-full flex-col gap-3 p-5 sm:p-6">
+        <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-white/75">
+          Афиша · {promo.cityName}
+        </p>
         <h2 className="font-display text-xl font-bold leading-snug text-white sm:text-2xl">
           <Link href={promo.href} className="hover:text-white/95">
             {title}
           </Link>
         </h2>
+        {meta ? <p className="text-sm font-semibold text-white/90">{meta}</p> : null}
+        {chips.length ? (
+          <div className="flex flex-wrap gap-1.5">
+            {chips.map((chip) => (
+              <Link
+                key={`${chip.href}-${chip.label}`}
+                href={chip.href}
+                className="inline-flex rounded-full border border-white/25 bg-white/15 px-2.5 py-1 text-[11px] font-semibold text-white transition hover:bg-white/25"
+              >
+                {chip.label}
+              </Link>
+            ))}
+          </div>
+        ) : null}
         <Link
           href={promo.href}
           className="inline-flex w-fit items-center justify-center gap-1.5 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-slate-100"

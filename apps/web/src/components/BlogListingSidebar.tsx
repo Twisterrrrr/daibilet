@@ -48,7 +48,7 @@ function BlogTelegramPromo() {
         <div className="min-w-0">
           <h2 className="font-display text-base font-bold leading-snug">Для тех, кто путешествует</h2>
           <p className="mt-1.5 text-sm leading-relaxed text-white/85">
-            Подборки выходных, новые статьи и горячие билеты — в Telegram-канале Дайбилет.
+            Подборки выходных, новые статьи и горячие билеты - в Telegram-канале Дайбилет.
           </p>
           <Link
             href={TELEGRAM_HREF}

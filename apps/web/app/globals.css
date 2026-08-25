@@ -431,15 +431,37 @@ html[data-nav-pending='1'] {
   .blog-bento {
     display: flex;
     flex-direction: column;
-    gap: 1.25rem;
+    gap: 1.75rem;
   }
 
   .blog-bento__break {
+    margin: 0.75rem 0 0.25rem;
+    padding: 0.25rem 0;
+  }
+
+  .blog-bento__promo {
+    margin: 0.5rem 0 0.25rem;
+  }
+
+  .blog-bento__quote {
+    margin: 0;
+    max-width: 42rem;
+    border-left: 3px solid #0f172a;
+    padding: 0.35rem 0 0.35rem 1.25rem;
+    color: #334155;
+    font-size: 1.05rem;
+    font-weight: 600;
+    line-height: 1.45;
+    letter-spacing: -0.01em;
+  }
+
+  .blog-bento__quote p {
     margin: 0;
   }
 
   .blog-bento__lead {
     min-width: 0;
+    margin-bottom: 1.25rem;
   }
 
   .blog-bento__lead > * {
@@ -473,7 +495,19 @@ html[data-nav-pending='1'] {
   /* ~1024px+: feed column usually wide enough for 2+1 without crushing cards */
   @media (min-width: 64em) {
     .blog-bento {
-      gap: 1.5rem;
+      gap: 2.25rem;
+    }
+
+    .blog-bento__lead {
+      margin-bottom: 1.75rem;
+    }
+
+    .blog-bento__break {
+      margin: 1.25rem 0 0.5rem;
+    }
+
+    .blog-bento__promo {
+      margin: 0.75rem 0 0.5rem;
     }
 
     .blog-bento-block {
@@ -543,7 +577,11 @@ html[data-nav-pending='1'] {
     .blog-bento,
     .blog-bento-block,
     .blog-bento__leftovers {
-      gap: 1.75rem;
+      gap: 2.5rem;
+    }
+
+    .blog-bento__lead {
+      margin-bottom: 2rem;
     }
   }
 

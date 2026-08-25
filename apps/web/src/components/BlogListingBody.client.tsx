@@ -50,7 +50,7 @@ export function BlogListingBody({
   const orderedPosts = visitPosts || posts;
 
   // Cross-city feed by default: header CityPicker must not hard-filter /blog.
-  // Featured (isFeatured) stays pinned; the rest of the feed is visit-shuffled.
+  // Whole list is visit-shuffled; hero takes the first card (no isFeatured pin).
   const { featured, feed, hot } = useMemo(
     () => splitBlogListingHero(orderedPosts),
     [orderedPosts],
@@ -134,6 +134,9 @@ export function BlogListingBody({
             featuredSlot={featuredSlot}
             editorialQuote={editorialQuote}
             sidebarSlot={sidebarSlot}
+            afishaPromos={afishaPromos}
+            afishaFallbackCityName={afishaFallbackCityName}
+            afishaFallbackCitySlug={featured?.citySlug}
           />
         </Suspense>
 

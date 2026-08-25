@@ -11,6 +11,12 @@ type BentoBlock = {
   mirror: boolean;
 };
 
+export type BlogFeedPromoSlot = {
+  /** Insert after this 0-based bento block index. */
+  afterBlockIndex: number;
+  node: ReactNode;
+};
+
 /**
  * Magazine bento blocks:
  *   [ horizontal ] [          ]
@@ -18,19 +24,23 @@ type BentoBlock = {
  * then mirrored.
  *
  * Full-bleed `banner` lead is optional: skip when FeaturedHero already owns
- * that surface (otherwise two identical full-width blocks stack).
+ * that surface. Sparse promo slots (city / podborka / event) can sit between
+ * blocks without crowding the feed.
  */
 export function BlogMagazineGrid({
   posts,
   afterFirstBlock,
-  editorialQuote: _editorialQuote,
+  editorialQuote = null,
   leadBanner = false,
+  feedPromoSlots = [],
 }: {
   posts: BlogCardDto[];
   afterFirstBlock?: ReactNode;
   editorialQuote?: string | null;
   /** One full-width banner at the top of the feed. Default off under FeaturedHero. */
   leadBanner?: boolean;
+  /** Sparse promo inserts between bento blocks (max 1–2). */
+  feedPromoSlots?: BlogFeedPromoSlot[];
 }) {
   const valid = posts.filter((post) => Boolean(post?.slug && post?.title));
   if (!valid.length) return null;
@@ -55,6 +65,29 @@ export function BlogMagazineGrid({
     }
   }
 
+  const quote =
+    typeof editorialQuote === 'string' && editorialQuote.trim()
+      ? editorialQuote.trim()
+      : null;
+
+  const promoByBlock = new Map<number, ReactNode>();
+  for (const slot of feedPromoSlots) {
+    if (slot.afterBlockIndex < 0 || !slot.node) continue;
+    if (!promoByBlock.has(slot.afterBlockIndex)) {
+      promoByBlock.set(slot.afterBlockIndex, slot.node);
+    }
+  }
+
+  const firstPromo = promoByBlock.get(0);
+  const breakNode =
+    firstPromo ??
+    afterFirstBlock ??
+    (quote ? (
+      <blockquote className="blog-bento__quote">
+        <p>{quote}</p>
+      </blockquote>
+    ) : null);
+
   return (
     <div className="blog-bento" data-blog-bento="2h-1v">
       {lead ? (
@@ -63,24 +96,33 @@ export function BlogMagazineGrid({
         </div>
       ) : null}
 
-      {afterFirstBlock ? <div className="blog-bento__break">{afterFirstBlock}</div> : null}
-
-      {blocks.map((block) => (
-        <div
-          key={`${block.horizontals[0].slug}-${block.vertical.slug}`}
-          className={`blog-bento-block${block.mirror ? ' blog-bento-block--mirror' : ''}`}
-        >
-          <div className="blog-bento-block__h1">
-            <BlogPostCard post={block.horizontals[0]} variant="strip" />
+      {blocks.map((block, blockIndex) => {
+        const promo =
+          blockIndex === 0
+            ? null
+            : promoByBlock.get(blockIndex);
+        return (
+          <div key={`${block.horizontals[0].slug}-${block.vertical.slug}-wrap`}>
+            <div
+              className={`blog-bento-block${block.mirror ? ' blog-bento-block--mirror' : ''}`}
+            >
+              <div className="blog-bento-block__h1">
+                <BlogPostCard post={block.horizontals[0]} variant="strip" />
+              </div>
+              <div className="blog-bento-block__v">
+                <BlogPostCard post={block.vertical} variant="small" />
+              </div>
+              <div className="blog-bento-block__h2">
+                <BlogPostCard post={block.horizontals[1]} variant="strip" />
+              </div>
+            </div>
+            {blockIndex === 0 && breakNode ? (
+              <div className="blog-bento__break">{breakNode}</div>
+            ) : null}
+            {promo ? <div className="blog-bento__promo">{promo}</div> : null}
           </div>
-          <div className="blog-bento-block__v">
-            <BlogPostCard post={block.vertical} variant="small" />
-          </div>
-          <div className="blog-bento-block__h2">
-            <BlogPostCard post={block.horizontals[1]} variant="strip" />
-          </div>
-        </div>
-      ))}
+        );
+      })}
 
       {leftovers.length ? (
         <div className="blog-bento__leftovers">
