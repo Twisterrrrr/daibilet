@@ -15,21 +15,28 @@ type BentoBlock = {
  * Magazine bento blocks:
  *   [ horizontal ] [          ]
  *   [ horizontal ] [ vertical ]   ← tall spans both rows
- * then mirrored. Same card types everywhere — fill the 3-col slot with content.
+ * then mirrored.
+ *
+ * Full-bleed `banner` lead is optional: skip when FeaturedHero already owns
+ * that surface (otherwise two identical full-width blocks stack).
  */
 export function BlogMagazineGrid({
   posts,
   afterFirstBlock,
   editorialQuote: _editorialQuote,
+  leadBanner = false,
 }: {
   posts: BlogCardDto[];
   afterFirstBlock?: ReactNode;
   editorialQuote?: string | null;
+  /** One full-width banner at the top of the feed. Default off under FeaturedHero. */
+  leadBanner?: boolean;
 }) {
   const valid = posts.filter((post) => Boolean(post?.slug && post?.title));
   if (!valid.length) return null;
 
-  const [lead, ...rest] = valid;
+  const lead = leadBanner ? valid[0] : null;
+  const rest = leadBanner ? valid.slice(1) : valid;
   const blocks: BentoBlock[] = [];
   const leftovers: BlogCardDto[] = [];
 

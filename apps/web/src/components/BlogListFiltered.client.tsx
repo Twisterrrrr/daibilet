@@ -151,7 +151,11 @@ export function BlogListFiltered({
 
       {filtered.length > 0 ? (
         <>
-          <BlogMagazineGrid posts={displayPosts} editorialQuote={editorialQuote} />
+          <BlogMagazineGrid
+            posts={displayPosts}
+            editorialQuote={editorialQuote}
+            leadBanner={hasActive || !featuredSlot}
+          />
           {hasMore ? (
             <div className="mt-8 flex justify-center">
               <button
