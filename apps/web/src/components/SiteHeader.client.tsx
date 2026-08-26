@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Heart, HelpCircle, LogIn, MoreHorizontal, Route, User } from 'lucide-react';
+import { Heart, HelpCircle, LogIn, User } from 'lucide-react';
 import { forwardRef, useEffect, useRef, useState } from 'react';
 
 import { CityPicker } from '@/components/CityPicker.client';
@@ -181,12 +181,19 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
               initialQuery={searchInitialQuery}
             />
 
-            <DayRouteBadge className="lg:hidden" />
+            <DayRouteBadge />
             <FavoritesHeaderButton onClick={() => setFavoritesOpen(true)} />
 
-            <HeaderOverflowMenu className="hidden lg:block" />
-
             <div className="hidden items-center gap-[var(--header-icons-gap)] lg:flex">
+              <Link
+                href="/help"
+                title="Помощь и FAQ"
+                aria-label="Помощь и FAQ"
+                className="site-header-icon-link h-10 w-10"
+              >
+                <HelpCircle className="h-5 w-5" strokeWidth={1.75} />
+              </Link>
+
               <HeaderAuthControls
                 ref={userMenuRef}
                 auth={auth}
@@ -218,62 +225,6 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
 
       {favoritesOpen ? <FavoritesPanel onClose={() => setFavoritesOpen(false)} /> : null}
     </>
-  );
-}
-
-function HeaderOverflowMenu({ className = '' }: { className?: string }) {
-  const [open, setOpen] = useState(false);
-  const rootRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const close = (event: MouseEvent) => {
-      if (rootRef.current && !rootRef.current.contains(event.target as Node)) setOpen(false);
-    };
-    document.addEventListener('mousedown', close);
-    return () => document.removeEventListener('mousedown', close);
-  }, [open]);
-
-  return (
-    <div ref={rootRef} className={`relative ${className}`.trim()}>
-      <button
-        type="button"
-        aria-label="Ещё"
-        aria-expanded={open}
-        aria-haspopup="menu"
-        title="Ещё"
-        onClick={() => setOpen((value) => !value)}
-        className="site-header-icon-link h-10 w-10"
-      >
-        <MoreHorizontal className="h-5 w-5" strokeWidth={1.75} />
-      </button>
-      {open ? (
-        <div
-          role="menu"
-          aria-label="Дополнительные действия"
-          className="absolute right-0 z-50 mt-1.5 w-52 overflow-hidden rounded-card bg-white py-1 shadow-card-hover"
-        >
-          <Link
-            href="/my-day"
-            role="menuitem"
-            onClick={() => setOpen(false)}
-            className="flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium text-graphite-muted transition hover:bg-surface-muted hover:text-graphite"
-          >
-            <Route className="h-4 w-4 shrink-0" strokeWidth={1.75} />
-            Мой день
-          </Link>
-          <Link
-            href="/help"
-            role="menuitem"
-            onClick={() => setOpen(false)}
-            className="flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium text-graphite-muted transition hover:bg-surface-muted hover:text-graphite"
-          >
-            <HelpCircle className="h-4 w-4 shrink-0" strokeWidth={1.75} />
-            Помощь и FAQ
-          </Link>
-        </div>
-      ) : null}
-    </div>
   );
 }
 

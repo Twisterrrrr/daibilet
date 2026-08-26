@@ -33,7 +33,11 @@ import {
   sessionMatchesCatalogDayRange,
   sessionMatchesCatalogPresetDate,
 } from './public-catalog-date-filter.js';
-import { spreadCatalogSessionsByCoverImage } from './public-catalog-spread.js';
+import {
+  dedupeCatalogNearDuplicates,
+  seededNearBiasedShuffleSessions,
+  spreadCatalogSessionsByCoverImage,
+} from './public-catalog-spread.js';
 import { LIST_SLOT_PREVIEW_LIMIT, toPublicCatalogListItem } from './public-catalog-list-item.js';
 import { providerForSource } from './provider-purchase.js';
 import type { PublicCatalogMappingRow } from './public-catalog.mapper.js';
@@ -990,17 +994,6 @@ function catalogRandomSeed(query: PublicCatalogQuery): number {
   return hash >>> 0;
 }
 
-function seededShuffleSessions<T>(items: T[], seed: number): T[] {
-  const arr = [...items];
-  let state = seed >>> 0;
-  for (let i = arr.length - 1; i > 0; i -= 1) {
-    state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
-    const j = state % (i + 1);
-    [arr[i], arr[j]] = [arr[j]!, arr[i]!];
-  }
-  return arr;
-}
-
 function sortCatalogSessions(
   sessions: PublicSessionDto[],
   sort: NonNullable<PublicCatalogQuery['sort']>,
@@ -1009,7 +1002,7 @@ function sortCatalogSessions(
   const sorted = [...sessions];
   let result: PublicSessionDto[];
   if (sort === 'random') {
-    result = seededShuffleSessions(sorted, catalogRandomSeed(query));
+    result = seededNearBiasedShuffleSessions(sorted, catalogRandomSeed(query));
   } else if (sort === 'price' || sort === 'price_asc') {
     result = sorted.sort((left, right) => comparePrice(left, right) || compareSessionTime(left, right));
   } else if (sort === 'price_desc') {
@@ -1018,6 +1011,13 @@ function sortCatalogSessions(
     result = sorted.sort((left, right) => (right.sessionCount || 1) - (left.sessionCount || 1) || compareSessionTime(left, right));
   } else {
     result = sorted.sort(compareSessionTime);
+  }
+
+  // Default / popular feed: hide same-cover + near-duplicate titles (search & price keep full set).
+  const isDefaultFeed = sort === 'random' || sort === 'popular';
+  const hasSearch = Boolean(String(query.q || '').trim());
+  if (isDefaultFeed && !hasSearch && !query.ids?.length) {
+    result = dedupeCatalogNearDuplicates(result);
   }
 
   if (sort === 'price' || sort === 'price_asc' || sort === 'price_desc') return result;
