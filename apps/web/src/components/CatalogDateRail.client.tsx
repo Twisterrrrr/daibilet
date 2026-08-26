@@ -99,7 +99,7 @@ export function CatalogDateRail({ disabled = false, className = '' }: CatalogDat
       const available = rail.clientWidth;
       if (available <= 0) return;
 
-      const gap = 6;
+      const gap = 8;
       const kids = Array.from(measure.children) as HTMLElement[];
       const calendarEl = kids[kids.length - 1];
       const calendarW = calendarEl?.offsetWidth ?? 44;
@@ -226,10 +226,12 @@ export function CatalogDateRail({ disabled = false, className = '' }: CatalogDat
       <button
         key={opts?.measure ? `m-${chip.iso}` : chip.iso}
         type="button"
+        data-day={chip.iso}
         disabled={disabled || opts?.measure}
         tabIndex={opts?.measure ? -1 : undefined}
         aria-pressed={opts?.measure ? undefined : active}
-        aria-label={chip.label}
+        aria-label={`Выбрать ${chip.dayNum} ${chip.monthShort}`}
+        title={`${chip.dayNum} ${chip.monthShort}`}
         onClick={opts?.measure ? undefined : () => onSelectDay(chip.iso)}
         className={[
           'catalog-date-day-card snap-start',
@@ -251,7 +253,8 @@ export function CatalogDateRail({ disabled = false, className = '' }: CatalogDat
     <button
       type="button"
       disabled={disabled}
-      aria-label={rangeLabel ? `Календарь: ${rangeLabel}` : 'Выбрать даты в календаре'}
+      aria-label={rangeLabel ? `Выбрать даты: ${rangeLabel}` : 'Выбрать даты: Календарь'}
+      title="Календарь"
       aria-expanded={pickerOpen}
       aria-haspopup="dialog"
       aria-pressed={dateFilterOn || pickerOpen}
@@ -260,8 +263,8 @@ export function CatalogDateRail({ disabled = false, className = '' }: CatalogDat
         dateFilterOn || pickerOpen ? 'catalog-date-day-card-on' : ''
       }`}
     >
-      <CalendarIcon className="h-4 w-4" strokeWidth={1.75} aria-hidden />
-      <span className="catalog-date-day-card-dates-label">Даты</span>
+      <CalendarIcon className="size-[1.15rem]" strokeWidth={2.25} aria-hidden />
+      <span className="catalog-date-day-card-dates-label">даты</span>
     </button>
   );
 
@@ -348,7 +351,7 @@ export function CatalogDateRail({ disabled = false, className = '' }: CatalogDat
         ref={railRef}
         role="group"
         aria-label="Дата"
-        className="horizontal-snap-row flex min-w-0 w-full flex-nowrap items-center gap-1.5 overflow-x-auto pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:overflow-x-hidden"
+        className="horizontal-snap-row flex min-w-0 w-full flex-nowrap items-center gap-2 overflow-x-auto pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:overflow-x-hidden"
       >
         {chips.map((chip) => renderDayCard(chip))}
         {calendarButton}
@@ -357,12 +360,12 @@ export function CatalogDateRail({ disabled = false, className = '' }: CatalogDat
       <div
         ref={measureRef}
         aria-hidden
-        className="pointer-events-none absolute -left-[9999px] top-0 flex flex-nowrap items-center gap-1.5 opacity-0"
+        className="pointer-events-none absolute -left-[9999px] top-0 flex flex-nowrap items-center gap-2 opacity-0"
       >
         {measurePool.map((chip) => renderDayCard(chip, { measure: true }))}
         <span className="catalog-date-day-card catalog-date-day-card-dates">
-          <CalendarIcon className="h-4 w-4" strokeWidth={1.75} aria-hidden />
-          <span className="catalog-date-day-card-dates-label">Даты</span>
+          <CalendarIcon className="size-[1.15rem]" strokeWidth={2.25} aria-hidden />
+          <span className="catalog-date-day-card-dates-label">даты</span>
         </span>
       </div>
 
