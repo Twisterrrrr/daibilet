@@ -1,3 +1,34 @@
+## 2026-08-26 — Local finance Docker smoke
+
+### Наблюдения
+
+- Docker daemon был запущен, но `daibilet-tours-postgres` существовал в stopped state; данные/volume не удалялись.
+- Root `pnpm db:validate` блокируется вложенным pnpm из-за локального Node `v24.19.0` при ожидаемом `>=22.13.0 <23`, поэтому Prisma команды запускались напрямую из `packages/db`.
+
+### Решения
+
+- Поднят существующий `daibilet-tours-postgres` на `127.0.0.1:5437`.
+- Prisma validate/deploy/generate прошли на локальной БД; pending миграций нет.
+- Seed `checkout:seed-stub-admission` обновил тестовый контур `phase-g-test-museum`.
+- Локальный backend поднят на `4000` с `DAIBILET_STUB_CHECKOUT=1` и dev query fallback.
+- Supplier UI доступен на `5179`; тестовый логин `supplier-test@daibilet.ru` возвращает текущего поставщика.
+
+### Проверки
+
+- `node ./node_modules/prisma/build/index.js validate --config prisma.config.ts` из `packages/db` — OK.
+- `node ./node_modules/prisma/build/index.js migrate deploy --config prisma.config.ts` — OK, no pending migrations.
+- `node ./node_modules/prisma/build/index.js generate` — OK.
+- `pnpm --config.engine-strict=false --filter @daibilet/backend exec tsx --test src/supplier-change-requests-handler.test.ts` — OK.
+- `pnpm --config.engine-strict=false --filter @daibilet/backend exec tsx --test src/supplier-admission-stub-purchase-handler.test.ts src/supplier-profile-write-handler.test.ts src/admin-supplier-legal-review.test.ts` — OK.
+- `pnpm --config.engine-strict=false --filter @daibilet/supplier typecheck` — OK.
+- `pnpm --config.engine-strict=false --filter @daibilet/supplier build` — OK.
+
+### Техдолг
+
+- В DB-aware тестах остается warning `pg`: `Calling client.query() when the client is already executing a query is deprecated`; нужно отдельно пройтись по test helpers / transaction flow перед обновлением `pg@9`.
+
+---
+
 ## 2026-08-26 — Supplier LC workbench v2
 
 ### Наблюдения
