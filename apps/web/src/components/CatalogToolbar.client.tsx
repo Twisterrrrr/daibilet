@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Baby, ChevronDown, Gift, Moon, MoreHorizontal, Search, SlidersHorizontal, X } from 'lucide-react';
+import { Baby, Gift, Moon, MoreHorizontal, Search, SlidersHorizontal, X } from 'lucide-react';
 import { FormEvent, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -22,10 +22,6 @@ import {
   splitCatalogCategories,
   type CatalogCategoryFacet,
 } from '@/lib/catalog-category-rail';
-import {
-  buildCatalogDateRailChips,
-  type CatalogDateRailChip,
-} from '@/lib/catalog-date-rail';
 
 import type { PublicCatalogDto } from '@daibilet/contracts/public';
 import {
@@ -79,7 +75,6 @@ export function CatalogToolbar({
   const searchInputRef = useRef<HTMLInputElement>(null);
   const searchWrapRef = useRef<HTMLDivElement>(null);
   const advancedCount = countAdvancedFilters(filters);
-  const dateRailChips = useMemo(() => buildCatalogDateRailChips(), []);
   const categorySplit = useMemo(
     () => splitCatalogCategories(facets.categories, filters.category),
     [facets.categories, filters.category],
@@ -201,44 +196,6 @@ export function CatalogToolbar({
       ...effectiveFilters,
       q: effectiveQDraft.trim() || undefined,
       page: undefined,
-    });
-  };
-
-  const setDatePreset = (nextDate: 'all' | 'today' | 'tomorrow' | 'weekend' | 'evening') => {
-    navigate({
-      ...filters,
-      q: qDraft.trim() || undefined,
-      date: nextDate === 'all' ? undefined : nextDate,
-      from: undefined,
-      to: undefined,
-      page: undefined,
-      sort:
-        nextDate === 'today' || nextDate === 'tomorrow' || nextDate === 'evening'
-          ? 'time'
-          : filters.sort,
-    });
-  };
-
-  const setExactDay = (isoDay: string) => {
-    if (!isoDay) {
-      navigate({
-        ...filters,
-        q: qDraft.trim() || undefined,
-        date: undefined,
-        from: undefined,
-        to: undefined,
-        page: undefined,
-      });
-      return;
-    }
-    navigate({
-      ...filters,
-      q: qDraft.trim() || undefined,
-      date: undefined,
-      from: isoDay,
-      to: isoDay,
-      page: undefined,
-      sort: 'time',
     });
   };
 
@@ -577,17 +534,8 @@ export function CatalogToolbar({
           )}
         >
           <div className="catalog-content">
-            <div className="catalog-date-timeline hidden w-full md:block">
+            <div className="catalog-date-timeline w-full">
               <CatalogDateRail disabled={disabled} className="min-w-0 w-full" />
-            </div>
-            <div className="w-full md:hidden">
-              <MobileDateSelect
-                chips={dateRailChips}
-                filters={filters}
-                disabled={disabled}
-                onPreset={setDatePreset}
-                onExactDay={setExactDay}
-              />
             </div>
             {children}
           </div>
@@ -712,15 +660,11 @@ export function CatalogToolbar({
             />
           </div>
 
-          {/* Mobile: дата select + горизонтальный icon rail категорий. */}
+          {/* Mobile: date carousel (Lovable) + category icon rail. */}
           <div className="space-y-2 md:hidden">
-            <MobileDateSelect
-              chips={dateRailChips}
-              filters={filters}
-              disabled={disabled}
-              onPreset={setDatePreset}
-              onExactDay={setExactDay}
-            />
+            <div className="catalog-date-timeline w-full">
+              <CatalogDateRail disabled={disabled} className="min-w-0 w-full" />
+            </div>
             <MobileCategoryIconRail
               filters={filters}
               categories={facets.categories}
@@ -764,93 +708,6 @@ export function CatalogToolbar({
           </button>
         </div>
       </div>
-    </div>
-  );
-}
-
-const mobileSelectCls =
-  'h-10 w-full appearance-none truncate rounded-xl border-0 bg-[#F5F5F7] py-2 pl-3 pr-8 text-sm font-medium text-[#1A1A1A] outline-none transition hover:bg-[#EBEBED] focus-visible:ring-2 focus-visible:ring-primary/40 disabled:opacity-60';
-
-function formatSelectDay(iso: string): string {
-  const day = Number(iso.slice(8));
-  const date = new Date(`${iso}T12:00:00`);
-  const weekday = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'][date.getDay()] || '';
-  return `${weekday} ${day}`;
-}
-
-function resolveMobileDateValue(filters: CatalogFilterValues): string {
-  if (filters.date) return filters.date;
-  if (filters.from && filters.to === filters.from) return `day:${filters.from}`;
-  if (filters.from || filters.to) return 'custom';
-  return 'all';
-}
-
-function MobileDateSelect({
-  chips,
-  filters,
-  disabled,
-  onPreset,
-  onExactDay,
-}: {
-  chips: CatalogDateRailChip[];
-  filters: CatalogFilterValues;
-  disabled?: boolean;
-  onPreset: (value: 'all' | 'today' | 'tomorrow' | 'weekend' | 'evening') => void;
-  onExactDay: (iso: string) => void;
-}) {
-  const value = resolveMobileDateValue(filters);
-  const customLabel =
-    filters.from && filters.to && filters.from !== filters.to
-      ? `${filters.from.slice(8)}.${filters.from.slice(5, 7)} - ${filters.to.slice(8)}.${filters.to.slice(5, 7)}`
-      : filters.from
-        ? formatSelectDay(filters.from)
-        : 'Диапазон дат';
-
-  return (
-    <div className="relative min-w-0">
-      <label className="sr-only" htmlFor="catalog-mobile-date">
-        Дата
-      </label>
-      <select
-        id="catalog-mobile-date"
-        disabled={disabled}
-        value={value === 'custom' ? 'custom' : value}
-        onChange={(event) => {
-          const next = event.target.value;
-          if (next === 'custom') return;
-          if (
-            next === 'all' ||
-            next === 'today' ||
-            next === 'tomorrow' ||
-            next === 'weekend' ||
-            next === 'evening'
-          ) {
-            onPreset(next);
-            return;
-          }
-          if (next.startsWith('day:')) onExactDay(next.slice(4));
-        }}
-        className={mobileSelectCls}
-      >
-        <option value="all">Любая дата</option>
-        <option value="today">Сегодня</option>
-        <option value="tomorrow">Завтра</option>
-        <option value="weekend">Выходные</option>
-        <option value="evening">Сегодня вечером</option>
-        {chips
-          .filter((chip): chip is Extract<CatalogDateRailChip, { kind: 'day' }> => chip.kind === 'day')
-          .map((chip) => (
-            <option key={chip.iso} value={`day:${chip.iso}`}>
-              {formatSelectDay(chip.iso)}
-            </option>
-          ))}
-        {value === 'custom' ? <option value="custom">{customLabel}</option> : null}
-      </select>
-      <ChevronDown
-        aria-hidden
-        className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6E6E73]"
-        strokeWidth={1.75}
-      />
     </div>
   );
 }

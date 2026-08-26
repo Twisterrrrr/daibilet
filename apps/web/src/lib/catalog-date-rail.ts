@@ -22,8 +22,8 @@ export type CatalogDateRailPresetChip = {
 
 export type CatalogDateRailChip = CatalogDateRailDayChip | CatalogDateRailPresetChip;
 
-/** Mobile / tablet: scrollable day strip length. */
-export const CATALOG_DATE_RAIL_DAYS_TABLET = 14;
+/** Mobile / tablet: scrollable day strip length (carousel, Lovable-style). */
+export const CATALOG_DATE_RAIL_DAYS_TABLET = 35;
 /** Desktop baseline before measure fills the rail. */
 export const CATALOG_DATE_RAIL_DAYS_DESKTOP = 14;
 /** Upper bound when measuring how many day chips fit across the grid width. */
