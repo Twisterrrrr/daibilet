@@ -42,7 +42,7 @@ export const publicCatalogQuerySchema = paginationQuerySchema.extend({
   ageMax: z.coerce.number().int().min(-1).max(99).optional(),
   refresh: optionalFlag,
   ids: csvIdList,
-  limit: z.coerce.number().int().min(1).max(200).optional(),
+  limit: z.coerce.number().int().min(1).max(100).optional(),
 });
 
 export const adminEventsQuerySchema = paginationQuerySchema.extend({
