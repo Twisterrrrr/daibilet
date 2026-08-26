@@ -1,3 +1,27 @@
+## 2026-08-26 — Supplier LC workbench v2
+
+### Наблюдения
+
+- `apps/supplier` уже работал на живых supplier API, но визуально оставался ближе к технической оболочке: оператору/поставщику не хватало первого рабочего экрана "что делать сейчас".
+- Replit-референс полезен как UX-направление: темная B2B-навигация, плотные таблицы, финансовые KPI и ясная очередь действий. Архитектуру, shadcn/Tailwind и mock-data переносить не нужно.
+- В UX brief для ЛК уже зафиксированы обязательные паттерны: topbar с контекстом, таблицы с pagination, honest backend errors, readiness без технических кодов.
+
+### Решения
+
+- Supplier shell получил более рабочий topbar: активный поставщик, роль, статус и сессия.
+- Dashboard получил `DashboardLaunchPanel`: readiness headline, следующий CTA, метрики "готовы к продаже", "блокеры", "к выплате".
+- Табличные разделы получили pagination поверх существующих `limit/offset`: события, входные билеты, заявки, заказы и отзывы.
+- Sidebar переведен в более строгий B2B SaaS стиль: темная навигация, спокойные акценты, без маркетинговой витринности.
+- Таблицы получили sticky header, hover, list meta и pager; живые API и DTO не менялись.
+
+### Проверки
+
+- `pnpm --config.engine-strict=false --filter @daibilet/supplier typecheck` — OK.
+- `pnpm --config.engine-strict=false --filter @daibilet/supplier build` — OK.
+- Остается только warning pnpm про локальный Node `v24.19.0` при ожидаемом диапазоне `>=22.13.0 <23`; сборку не блокирует.
+
+---
+
 ## 2026-08-07 — YooKassa Idempotence-Key ≤64
 
 ### Наблюдения

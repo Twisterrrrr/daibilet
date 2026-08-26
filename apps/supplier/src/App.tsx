@@ -31,12 +31,12 @@ const NAV_SECTIONS = [
   {
     title: 'Работа',
     items: [
-      { to: '/', label: 'Главная', icon: '⌂' },
-      { to: '/readiness', label: 'Готовность', icon: '✓' },
-      { to: '/admissions', label: 'Входные билеты', icon: 'Б' },
+      { to: '/', label: 'Дашборд', icon: 'Д' },
+      { to: '/readiness', label: 'Готовность', icon: 'Г' },
+      { to: '/admissions', label: 'Входные билеты', icon: 'В' },
       { to: '/events', label: 'События', icon: 'С' },
       { to: '/requests', label: 'Заявки', icon: 'З' },
-      { to: '/orders', label: 'Заказы', icon: 'З' },
+      { to: '/orders', label: 'Заказы', icon: '№' },
       { to: '/reviews', label: 'Отзывы', icon: 'О' },
     ],
   },
@@ -56,6 +56,8 @@ const NAV_SECTIONS = [
     ],
   },
 ];
+
+const PAGE_SIZE = 50;
 
 type ResourceState<T> = {
   data: T | null;
@@ -145,6 +147,7 @@ export function App() {
   }, [accessToken, clearAuthSession, setSupplierKey]);
 
   const hasSupplierAccess = Boolean(accessToken && authSession && supplierKey.trim());
+  const activeSupplier = authSession?.suppliers.find((supplier) => supplier.id === supplierKey) || authSession?.currentSupplier || null;
 
   return (
     <div className="app-shell">
@@ -179,9 +182,14 @@ export function App() {
 
       <div className="workspace">
         <header className="topbar">
-          <div>
-            <div className="eyebrow">Финконтур · Поставщик</div>
-            <h1>Личный кабинет поставщика</h1>
+          <div className="topbar-heading">
+            <div className="eyebrow">Finance SPB · Supplier workspace</div>
+            <h1>{activeSupplier?.title || 'Личный кабинет поставщика'}</h1>
+            <div className="topbar-meta" aria-label="Контекст кабинета">
+              <span>ЛК поставщика</span>
+              {activeSupplier ? <span>{roleLabel(activeSupplier.role)}</span> : null}
+              {activeSupplier ? <span>{statusLabel(activeSupplier.status)}</span> : null}
+            </div>
           </div>
           <div className="topbar-actions">
             <span className="session-pill">{authSession ? authSession.user.email : 'Сеанс'}</span>
@@ -358,6 +366,8 @@ function DashboardPage({ supplierKey }: { supplierKey: string }) {
         action={<RefreshButton onClick={reload} />}
       />
 
+      <DashboardLaunchPanel data={data} />
+
       <div className="stats-grid">
         <StatCard label="Событий" value={events.total} hint={`${events.published} опубликовано`} />
         <StatCard label="Входных билетов" value={admissions.total} hint={`${admissions.canSell} готовы к продаже`} />
@@ -435,6 +445,61 @@ function DashboardPage({ supplierKey }: { supplierKey: string }) {
   );
 }
 
+function DashboardLaunchPanel({ data }: { data: SupplierPortalDashboardDto }) {
+  const readinessToneValue = readinessTone(data.readiness.status);
+  const blockerCount = data.readiness.blockers.length;
+  const warningCount = data.readiness.warnings.length;
+  const netKopecks = Math.max(0, data.summary.orders.grossKopecks - data.summary.orders.commissionKopecks);
+  const nextAction = dashboardNextAction(data.readiness);
+
+  return (
+    <section className={`launch-panel ${readinessToneValue}`}>
+      <div className="launch-copy">
+        <span className="eyebrow">Запуск внутренних продаж</span>
+        <h2>{readinessHeadline(data.readiness)}</h2>
+        <p>{readinessNextStep(data.readiness)}</p>
+        <div className="launch-actions">
+          <Link to={nextAction.href} className="link-button compact">{nextAction.label}</Link>
+          <Link to="/orders" className="ghost-link-button">Открыть заказы</Link>
+        </div>
+      </div>
+      <div className="launch-scoreboard">
+        <MiniMetric label="Готовы к продаже" value={data.summary.admissions.canSell} hint="входные билеты" tone="success" />
+        <MiniMetric label="Блокеры" value={blockerCount} hint={warningCount ? `${warningCount} предупреждений` : 'предупреждений нет'} tone={blockerCount ? 'danger' : 'success'} />
+        <MiniMetric label="К выплате" value={formatMoney(netKopecks)} hint={`${data.summary.orders.totalItems} позиций`} tone="neutral" />
+      </div>
+    </section>
+  );
+}
+
+function dashboardNextAction(readiness: SupplierPortalDashboardDto['readiness']): { href: string; label: string } {
+  const firstIssue = readiness.blockers[0] || readiness.warnings[0] || null;
+  const meta = firstIssue ? READINESS_ACTIONS[firstIssue.code] : null;
+  if (meta) return { href: meta.href, label: meta.cta };
+  if (readiness.canEnableInternalCheckout) return { href: '/admissions', label: 'Провести smoke-продажу' };
+  return { href: '/readiness', label: 'Открыть чеклист' };
+}
+
+function MiniMetric({
+  label,
+  value,
+  hint,
+  tone,
+}: {
+  label: string;
+  value: React.ReactNode;
+  hint: string;
+  tone: 'success' | 'warning' | 'danger' | 'neutral';
+}) {
+  return (
+    <div className={`mini-metric ${tone}`}>
+      <span>{label}</span>
+      <strong>{value}</strong>
+      <small>{hint}</small>
+    </div>
+  );
+}
+
 function ReadinessPage({ supplierKey }: { supplierKey: string }) {
   const { data, loading, error, reload } = useSupplierResource<SupplierPortalDashboardDto>('/api/supplier/dashboard', supplierKey);
 
@@ -508,24 +573,31 @@ function ReadinessPage({ supplierKey }: { supplierKey: string }) {
 }
 
 function EventsPage({ supplierKey }: { supplierKey: string }) {
-  const { data, loading, error, reload } = useSupplierResource<SupplierPortalEventsListDto>('/api/supplier/events?limit=50', supplierKey);
+  const [offset, setOffset] = React.useState(0);
+  React.useEffect(() => setOffset(0), [supplierKey]);
+  const eventsPath = React.useMemo(() => `/api/supplier/events?${new URLSearchParams({ limit: String(PAGE_SIZE), offset: String(offset) }).toString()}`, [offset]);
+  const { data, loading, error, reload } = useSupplierResource<SupplierPortalEventsListDto>(eventsPath, supplierKey);
 
   return (
     <div className="page-stack">
       <PageTitle title="События" description="Все карточки, привязанные к поставщику. Редактирование будет через заявки или администратора." action={<RefreshButton onClick={reload} />} />
+      {data ? <ListMeta total={data.total} limit={data.limit} offset={data.offset} label="событий" /> : null}
       <DataState loading={loading} error={error} onRetry={reload} hasData={Boolean(data?.items.length)}>
         {data ? (
-          <Table
-            columns={['Событие', 'Статус', 'Город / площадка', 'Расписание', 'Цена', 'Готовность']}
-            rows={data.items.map((event) => [
-              <div key="event"><strong>{event.title}</strong><small>{managementModeLabel(event.managementMode)} · {catalogModeLabel(event.catalogMode)}</small></div>,
-              <StatusPill key="status" tone={event.status === 'PUBLISHED' ? 'success' : 'neutral'}>{statusLabel(event.status)}</StatusPill>,
-              <div key="place"><span>{event.city.title || '-'}</span><small>{event.venue.title || '-'}</small></div>,
-              <div key="schedule"><span>{event.kind === 'OPEN_DATE' ? 'Открытая дата' : formatDateTime(event.nextSessionAt)}</span><small>{event.activeSessions} слотов</small></div>,
-              formatRub(event.priceFromRub),
-              <IssueList key="issues" compact issues={event.readinessIssues} empty="готово" />,
-            ])}
-          />
+          <>
+            <Table
+              columns={['Событие', 'Статус', 'Город / площадка', 'Расписание', 'Цена', 'Готовность']}
+              rows={data.items.map((event) => [
+                <div key="event"><strong>{event.title}</strong><small>{managementModeLabel(event.managementMode)} · {catalogModeLabel(event.catalogMode)}</small></div>,
+                <StatusPill key="status" tone={event.status === 'PUBLISHED' ? 'success' : 'neutral'}>{statusLabel(event.status)}</StatusPill>,
+                <div key="place"><span>{event.city.title || '-'}</span><small>{event.venue.title || '-'}</small></div>,
+                <div key="schedule"><span>{event.kind === 'OPEN_DATE' ? 'Открытая дата' : formatDateTime(event.nextSessionAt)}</span><small>{event.activeSessions} слотов</small></div>,
+                formatRub(event.priceFromRub),
+                <IssueList key="issues" compact issues={event.readinessIssues} empty="готово" />,
+              ])}
+            />
+            <Pager total={data.total} limit={data.limit} offset={data.offset} hasMore={data.hasMore} onPageChange={setOffset} />
+          </>
         ) : null}
       </DataState>
     </div>
@@ -533,7 +605,10 @@ function EventsPage({ supplierKey }: { supplierKey: string }) {
 }
 
 function AdmissionsPage({ supplierKey }: { supplierKey: string }) {
-  const { data, loading, error, reload } = useSupplierResource<SupplierPortalAdmissionsListDto>('/api/supplier/admissions?limit=50', supplierKey);
+  const [offset, setOffset] = React.useState(0);
+  React.useEffect(() => setOffset(0), [supplierKey]);
+  const admissionsPath = React.useMemo(() => `/api/supplier/admissions?${new URLSearchParams({ limit: String(PAGE_SIZE), offset: String(offset) }).toString()}`, [offset]);
+  const { data, loading, error, reload } = useSupplierResource<SupplierPortalAdmissionsListDto>(admissionsPath, supplierKey);
   const [smokeBusyProductId, setSmokeBusyProductId] = React.useState<string | null>(null);
   const [smokeResult, setSmokeResult] = React.useState<SupplierPortalAdmissionStubPurchaseResultDto | null>(null);
   const [smokeError, setSmokeError] = React.useState<string | null>(null);
@@ -658,39 +733,43 @@ function AdmissionsPage({ supplierKey }: { supplierKey: string }) {
           <StatCard label="Требуют внимания" value={data.metrics.needsAttention} hint={`${data.metrics.blocked} заблокированы`} />
         </div>
       ) : null}
+      {data ? <ListMeta total={data.total} limit={data.limit} offset={data.offset} label="входных билетов" /> : null}
       <DataState loading={loading} error={error} onRetry={reload} hasData={Boolean(data?.items.length)}>
         {data ? (
-          <Table
-            columns={['Билет', 'Площадка', 'Срок действия', 'Категории', 'Цена', 'Готовность', 'Действия']}
-            rows={data.items.map((product) => [
-              <div key="product"><strong>{product.title}</strong><small>{product.purchaseFlow === 'PLATFORM' ? 'внутренние продажи' : 'витрина'}</small></div>,
-              <div key="venue"><span>{product.venue.title}</span><small>{product.city.title || '-'}</small></div>,
-              <div key="validity"><span>{validityLabel(product.validityMode)}</span><small>{validityPeriod(product)}</small></div>,
-              <div key="offers"><span>{product.offers.filter((offer) => offer.active).length} активных</span><small>{product.offers.map((offer) => offer.title || 'билет').join(', ') || '-'}</small></div>,
-              formatRub(product.priceFromRub),
-              <IssueList key="health" compact issues={[...product.health.blockers, ...product.health.warnings]} empty="готово" />,
-              <div key="action" className="table-actions">
-                <button
-                  type="button"
-                  className="table-action-button"
-                  disabled={!product.readiness.canSell || smokeBusyProductId === product.id}
-                  onClick={() => void createSmokePurchase(product)}
-                  title={product.readiness.canSell ? 'Создать STUB-заказ без реальной оплаты' : 'Сначала закройте блокеры готовности'}
-                >
-                  {smokeBusyProductId === product.id ? 'Создаем...' : 'STUB'}
-                </button>
-                <button
-                  type="button"
-                  className="table-action-button secondary"
-                  disabled={!product.readiness.canSell || yooKassaBusyProductId === product.id}
-                  onClick={() => void createYooKassaSmokePurchase(product)}
-                  title={product.readiness.canSell ? 'Создать sandbox-платеж YooKassa' : 'Сначала закройте блокеры готовности'}
-                >
-                  {yooKassaBusyProductId === product.id ? 'Создаем...' : 'YooKassa'}
-                </button>
-              </div>,
-            ])}
-          />
+          <>
+            <Table
+              columns={['Билет', 'Площадка', 'Срок действия', 'Категории', 'Цена', 'Готовность', 'Действия']}
+              rows={data.items.map((product) => [
+                <div key="product"><strong>{product.title}</strong><small>{product.purchaseFlow === 'PLATFORM' ? 'внутренние продажи' : 'витрина'}</small></div>,
+                <div key="venue"><span>{product.venue.title}</span><small>{product.city.title || '-'}</small></div>,
+                <div key="validity"><span>{validityLabel(product.validityMode)}</span><small>{validityPeriod(product)}</small></div>,
+                <div key="offers"><span>{product.offers.filter((offer) => offer.active).length} активных</span><small>{product.offers.map((offer) => offer.title || 'билет').join(', ') || '-'}</small></div>,
+                formatRub(product.priceFromRub),
+                <IssueList key="health" compact issues={[...product.health.blockers, ...product.health.warnings]} empty="готово" />,
+                <div key="action" className="table-actions">
+                  <button
+                    type="button"
+                    className="table-action-button"
+                    disabled={!product.readiness.canSell || smokeBusyProductId === product.id}
+                    onClick={() => void createSmokePurchase(product)}
+                    title={product.readiness.canSell ? 'Создать STUB-заказ без реальной оплаты' : 'Сначала закройте блокеры готовности'}
+                  >
+                    {smokeBusyProductId === product.id ? 'Создаем...' : 'STUB'}
+                  </button>
+                  <button
+                    type="button"
+                    className="table-action-button secondary"
+                    disabled={!product.readiness.canSell || yooKassaBusyProductId === product.id}
+                    onClick={() => void createYooKassaSmokePurchase(product)}
+                    title={product.readiness.canSell ? 'Создать sandbox-платеж YooKassa' : 'Сначала закройте блокеры готовности'}
+                  >
+                    {yooKassaBusyProductId === product.id ? 'Создаем...' : 'YooKassa'}
+                  </button>
+                </div>,
+              ])}
+            />
+            <Pager total={data.total} limit={data.limit} offset={data.offset} hasMore={data.hasMore} onPageChange={setOffset} />
+          </>
         ) : null}
       </DataState>
     </div>
@@ -698,7 +777,10 @@ function AdmissionsPage({ supplierKey }: { supplierKey: string }) {
 }
 
 function RequestsPage({ supplierKey }: { supplierKey: string }) {
-  const requests = useSupplierResource<SupplierPortalChangeRequestsListDto>('/api/supplier/change-requests?limit=50', supplierKey);
+  const [offset, setOffset] = React.useState(0);
+  React.useEffect(() => setOffset(0), [supplierKey]);
+  const requestsPath = React.useMemo(() => `/api/supplier/change-requests?${new URLSearchParams({ limit: String(PAGE_SIZE), offset: String(offset) }).toString()}`, [offset]);
+  const requests = useSupplierResource<SupplierPortalChangeRequestsListDto>(requestsPath, supplierKey);
   const profile = useSupplierResource<SupplierPortalProfileDto>('/api/supplier/profile', supplierKey);
   const [notice, setNotice] = React.useState<{ tone: 'success' | 'error'; title: string; text: string } | null>(null);
 
@@ -736,20 +818,24 @@ function RequestsPage({ supplierKey }: { supplierKey: string }) {
         <AdmissionRequestForm supplierKey={supplierKey} profile={profile.data} onCreated={handleCreated} onError={handleError} />
         <EventRequestForm supplierKey={supplierKey} profile={profile.data} onCreated={handleCreated} onError={handleError} />
       </div>
+      {requests.data ? <ListMeta total={requests.data.total} limit={requests.data.limit} offset={requests.data.offset} label="заявок" /> : null}
       <DataState loading={requests.loading} error={requests.error} onRetry={requests.reload} hasData={Boolean(requests.data?.items.length)}>
         {requests.data ? (
-          <Table
-            columns={['Заявка', 'Что меняем', 'Статус', 'Комментарий']}
-            rows={requests.data.items.map((request) => [
-              <div key="request"><strong>{request.title || `Заявка ${request.id.slice(-7)}`}</strong><small>{formatDateTime(request.createdAt)}</small></div>,
-              <div key="subject"><span>{changeRequestSubjectLabel(request.subject)}</span><small>{request.event?.title || request.admissionProduct?.title || request.summary || '-'}</small></div>,
-              <div key="status" className="order-status-cell">
-                <StatusPill tone={changeRequestStatusTone(request.status)}>{changeRequestStatusLabel(request.status)}</StatusPill>
-                <small>{changeRequestTypeLabel(request.type)}</small>
-              </div>,
-              <div key="comment"><span>{request.adminComment || '-'}</span><small>{request.reviewedAt ? `проверено ${formatDateTime(request.reviewedAt)}` : 'ожидает проверки'}</small></div>,
-            ])}
-          />
+          <>
+            <Table
+              columns={['Заявка', 'Что меняем', 'Статус', 'Комментарий']}
+              rows={requests.data.items.map((request) => [
+                <div key="request"><strong>{request.title || `Заявка ${request.id.slice(-7)}`}</strong><small>{formatDateTime(request.createdAt)}</small></div>,
+                <div key="subject"><span>{changeRequestSubjectLabel(request.subject)}</span><small>{request.event?.title || request.admissionProduct?.title || request.summary || '-'}</small></div>,
+                <div key="status" className="order-status-cell">
+                  <StatusPill tone={changeRequestStatusTone(request.status)}>{changeRequestStatusLabel(request.status)}</StatusPill>
+                  <small>{changeRequestTypeLabel(request.type)}</small>
+                </div>,
+                <div key="comment"><span>{request.adminComment || '-'}</span><small>{request.reviewedAt ? `проверено ${formatDateTime(request.reviewedAt)}` : 'ожидает проверки'}</small></div>,
+              ])}
+            />
+            <Pager total={requests.data.total} limit={requests.data.limit} offset={requests.data.offset} hasMore={requests.data.hasMore} onPageChange={setOffset} />
+          </>
         ) : null}
       </DataState>
     </div>
@@ -1022,11 +1108,13 @@ function EventRequestForm({
 
 function OrdersPage({ supplierKey }: { supplierKey: string }) {
   const [statusFilter, setStatusFilter] = React.useState('ALL');
+  const [offset, setOffset] = React.useState(0);
+  React.useEffect(() => setOffset(0), [statusFilter, supplierKey]);
   const ordersPath = React.useMemo(() => {
-    const params = new URLSearchParams({ limit: '50' });
+    const params = new URLSearchParams({ limit: String(PAGE_SIZE), offset: String(offset) });
     if (statusFilter !== 'ALL') params.set('status', statusFilter);
     return `/api/supplier/orders?${params.toString()}`;
-  }, [statusFilter]);
+  }, [offset, statusFilter]);
   const { data, loading, error, reload } = useSupplierResource<SupplierPortalOrdersListDto>(ordersPath, supplierKey);
   const paidItems = data?.items.filter((order) => ['PAID', 'CONFIRMED', 'FULFILLED'].includes(order.status)).length ?? 0;
   const pendingItems = data?.items.filter((order) => ['PENDING_PAYMENT', 'RESERVED'].includes(order.status)).length ?? 0;
@@ -1045,6 +1133,7 @@ function OrdersPage({ supplierKey }: { supplierKey: string }) {
         </div>
       ) : null}
       <OrderStatusFilters value={statusFilter} onChange={setStatusFilter} />
+      {data ? <ListMeta total={data.total} limit={data.limit} offset={data.offset} label="позиций заказа" /> : null}
       <DataState loading={loading} error={error} onRetry={reload} hasData={Boolean(data?.items.length)}>
         {data ? (
           <>
@@ -1065,6 +1154,7 @@ function OrdersPage({ supplierKey }: { supplierKey: string }) {
                 </div>,
               ])}
             />
+            <Pager total={data.total} limit={data.limit} offset={data.offset} hasMore={data.hasMore} onPageChange={setOffset} />
           </>
         ) : null}
       </DataState>
@@ -1271,23 +1361,30 @@ function DocumentsPage({ supplierKey }: { supplierKey: string }) {
 }
 
 function ReviewsPage({ supplierKey }: { supplierKey: string }) {
-  const { data, loading, error, reload } = useSupplierResource<SupplierPortalReviewsListDto>('/api/supplier/reviews?limit=50', supplierKey);
+  const [offset, setOffset] = React.useState(0);
+  React.useEffect(() => setOffset(0), [supplierKey]);
+  const reviewsPath = React.useMemo(() => `/api/supplier/reviews?${new URLSearchParams({ limit: String(PAGE_SIZE), offset: String(offset) }).toString()}`, [offset]);
+  const { data, loading, error, reload } = useSupplierResource<SupplierPortalReviewsListDto>(reviewsPath, supplierKey);
 
   return (
     <div className="page-stack">
       <PageTitle title="Отзывы" description="Отзывы и ответы поставщика. На первом этапе только чтение и контроль очереди." action={<RefreshButton onClick={reload} />} />
+      {data ? <ListMeta total={data.total} limit={data.limit} offset={data.offset} label="отзывов" /> : null}
       <DataState loading={loading} error={error} onRetry={reload} hasData={Boolean(data?.items.length)}>
         {data ? (
-          <Table
-            columns={['Оценка', 'Отзыв', 'Событие', 'Ответ', 'Статус']}
-            rows={data.items.map((review) => [
-              `${review.rating}/5`,
-              <div key="text"><strong>{review.authorName}</strong><small>{review.text}</small></div>,
-              review.eventTitle || '-',
-              review.supplierResponseStatus ? responseStatusLabel(review.supplierResponseStatus) : 'нет',
-              <StatusPill key="status" tone={review.status === 'APPROVED' ? 'success' : 'neutral'}>{reviewStatusLabel(review.status)}</StatusPill>,
-            ])}
-          />
+          <>
+            <Table
+              columns={['Оценка', 'Отзыв', 'Событие', 'Ответ', 'Статус']}
+              rows={data.items.map((review) => [
+                `${review.rating}/5`,
+                <div key="text"><strong>{review.authorName}</strong><small>{review.text}</small></div>,
+                review.eventTitle || '-',
+                review.supplierResponseStatus ? responseStatusLabel(review.supplierResponseStatus) : 'нет',
+                <StatusPill key="status" tone={review.status === 'APPROVED' ? 'success' : 'neutral'}>{reviewStatusLabel(review.status)}</StatusPill>,
+              ])}
+            />
+            <Pager total={data.total} limit={data.limit} offset={data.offset} hasMore={data.hasMore} onPageChange={setOffset} />
+          </>
         ) : null}
       </DataState>
     </div>
@@ -1702,6 +1799,62 @@ function RefreshButton({ onClick }: { onClick: () => void }) {
       <span className="refresh-mark">↻</span>
       Обновить
     </button>
+  );
+}
+
+function ListMeta({ total, limit, offset, label }: { total: number; limit: number; offset: number; label: string }) {
+  const start = total > 0 ? offset + 1 : 0;
+  const end = Math.min(total, offset + limit);
+  return (
+    <div className="list-meta">
+      <span>{total.toLocaleString('ru-RU')} {label}</span>
+      <small>Показаны {start.toLocaleString('ru-RU')}-{end.toLocaleString('ru-RU')}</small>
+    </div>
+  );
+}
+
+function Pager({
+  total,
+  limit,
+  offset,
+  hasMore,
+  onPageChange,
+}: {
+  total: number;
+  limit: number;
+  offset: number;
+  hasMore: boolean;
+  onPageChange: (offset: number) => void;
+}) {
+  if (total <= limit && offset === 0) return null;
+
+  const currentPage = Math.floor(offset / limit) + 1;
+  const totalPages = Math.max(1, Math.ceil(total / limit));
+  const canPrev = offset > 0;
+  const canNext = hasMore && offset + limit < total;
+
+  return (
+    <div className="pager" aria-label="Пагинация">
+      <button
+        type="button"
+        className="ghost-button"
+        disabled={!canPrev}
+        onClick={() => onPageChange(Math.max(0, offset - limit))}
+      >
+        Назад
+      </button>
+      <span>
+        Страница {currentPage.toLocaleString('ru-RU')} из {totalPages.toLocaleString('ru-RU')}
+      </span>
+      <button
+        type="button"
+        className="ghost-button"
+        disabled={!canNext}
+        onClick={() => onPageChange(offset + limit)}
+      >
+        Далее
+      </button>
+    </div>
   );
 }
 
