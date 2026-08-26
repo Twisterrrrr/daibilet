@@ -5,20 +5,35 @@ import {
   buildCatalogDateRailChips,
   CATALOG_DATE_RAIL_DAYS_DESKTOP,
   CATALOG_DATE_RAIL_DAYS_TABLET,
+  formatCatalogDateRangeLabel,
   isDateRailChipActive,
+  nextCatalogDateRailSelection,
   toLocalIsoDay,
 } from './catalog-date-rail';
 
 describe('catalog-date-rail', () => {
-  it('builds presets plus upcoming calendar days (tablet default)', () => {
-    const now = new Date(2026, 7, 9); // Sun Aug 9 local
+  it('builds day cards from today (СЕГ / ЗАВ)', () => {
+    const now = new Date(2026, 7, 26); // Wed Aug 26
     const chips = buildCatalogDateRailChips(now, CATALOG_DATE_RAIL_DAYS_TABLET);
+    expect(chips).toHaveLength(CATALOG_DATE_RAIL_DAYS_TABLET);
+    expect(chips[0]).toMatchObject({
+      kind: 'day',
+      iso: toLocalIsoDay(now),
+      weekday: 'сег',
+      dayNum: 26,
+      monthShort: 'авг',
+    });
+    expect(chips[1]).toMatchObject({ kind: 'day', weekday: 'зав', dayNum: 27 });
+    expect(chips[3]).toMatchObject({ kind: 'day', weekday: 'сб', isWeekend: true });
+  });
+
+  it('can build legacy presets for region pages', () => {
+    const now = new Date(2026, 7, 9);
+    const chips = buildCatalogDateRailChips(now, 7, { includePresets: true });
     expect(chips[0]).toMatchObject({ kind: 'preset', value: 'all' });
     expect(chips[1]).toMatchObject({ kind: 'preset', value: 'today' });
-    expect(chips[2]).toMatchObject({ kind: 'preset', value: 'tomorrow' });
-    expect(chips[3]).toMatchObject({ kind: 'preset', value: 'weekend' });
     const days = chips.filter((c) => c.kind === 'day');
-    expect(days).toHaveLength(CATALOG_DATE_RAIL_DAYS_TABLET);
+    expect(days).toHaveLength(7);
     expect(days[0]?.kind === 'day' && days[0].iso).toBe(toLocalIsoDay(new Date(2026, 7, 11)));
   });
 
@@ -28,10 +43,41 @@ describe('catalog-date-rail', () => {
     expect(days).toHaveLength(CATALOG_DATE_RAIL_DAYS_DESKTOP);
   });
 
-  it('marks exact day active', () => {
-    const chip = { kind: 'day' as const, iso: '2026-08-12', label: 'ср 12', shortLabel: 'ср 12', weekday: 'ср' };
-    expect(isDateRailChipActive(chip, { from: '2026-08-12', to: '2026-08-12' })).toBe(true);
+  it('marks days inside from–to range active', () => {
+    const chip = {
+      kind: 'day' as const,
+      iso: '2026-08-28',
+      label: 'пт 28 авг',
+      shortLabel: 'пт 28',
+      weekday: 'пт',
+      dayNum: 28,
+      monthShort: 'авг',
+      isWeekend: false,
+    };
+    expect(isDateRailChipActive(chip, { from: '2026-08-26', to: '2026-09-03' })).toBe(true);
+    expect(isDateRailChipActive(chip, { from: '2026-08-12', to: '2026-08-12' })).toBe(false);
     expect(isDateRailChipActive(chip, { date: 'today' })).toBe(false);
+  });
+
+  it('nextCatalogDateRailSelection: single → range → collapse → clear', () => {
+    expect(nextCatalogDateRailSelection({}, '2026-08-26')).toEqual({
+      from: '2026-08-26',
+      to: '2026-08-26',
+    });
+    expect(
+      nextCatalogDateRailSelection({ from: '2026-08-26', to: '2026-08-26' }, '2026-09-03'),
+    ).toEqual({ from: '2026-08-26', to: '2026-09-03' });
+    expect(
+      nextCatalogDateRailSelection({ from: '2026-08-26', to: '2026-09-03' }, '2026-08-29'),
+    ).toEqual({ from: '2026-08-29', to: '2026-08-29' });
+    expect(
+      nextCatalogDateRailSelection({ from: '2026-08-29', to: '2026-08-29' }, '2026-08-29'),
+    ).toEqual({});
+  });
+
+  it('formats range labels in Russian', () => {
+    expect(formatCatalogDateRangeLabel('2026-08-26', '2026-08-26')).toBe('26 августа');
+    expect(formatCatalogDateRangeLabel('2026-08-26', '2026-09-03')).toBe('26 августа — 3 сентября');
   });
 });
 

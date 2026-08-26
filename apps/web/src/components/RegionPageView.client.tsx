@@ -78,7 +78,10 @@ export function RegionPageView({
   const [showAllCities, setShowAllCities] = React.useState(false);
   const [mapOpen, setMapOpen] = React.useState(true);
 
-  const dateChips = React.useMemo(() => buildCatalogDateRailChips(new Date(), 10), []);
+  const dateChips = React.useMemo(
+    () => buildCatalogDateRailChips(new Date(), 10, { includePresets: true }),
+    [],
+  );
   const hasBelts = regionHasBeltData(slug);
   const beltConfig = getRegionBeltConfig(slug);
 

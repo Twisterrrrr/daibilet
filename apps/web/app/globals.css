@@ -1334,6 +1334,43 @@ html[data-nav-pending='1'] {
     @apply border-0 bg-primary text-white hover:bg-primary/90 hover:text-white;
   }
 
+  /** Catalog date rail: vertical day cards (СЕГ / 26 / авг). */
+  .catalog-date-day-card {
+    @apply inline-flex h-[3.85rem] w-[2.85rem] shrink-0 flex-col items-center justify-center gap-0.5 rounded-2xl px-1 py-1.5 text-center transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50;
+  }
+
+  .catalog-date-day-card-idle {
+    @apply bg-[#F0F1F3] text-graphite hover:bg-[#E6E8EC];
+  }
+
+  .catalog-date-day-card-weekend {
+    @apply bg-[#F0F1F3] text-[#E85D04] hover:bg-[#FFE8D6];
+  }
+
+  .catalog-date-day-card-on {
+    @apply bg-primary text-white hover:bg-primary/90 hover:text-white;
+  }
+
+  .catalog-date-day-card-weekday {
+    @apply text-[0.625rem] font-bold uppercase leading-none tracking-wide;
+  }
+
+  .catalog-date-day-card-num {
+    @apply text-[0.95rem] font-bold leading-none tabular-nums;
+  }
+
+  .catalog-date-day-card-month {
+    @apply text-[0.625rem] font-medium leading-none opacity-80;
+  }
+
+  .catalog-date-day-card-dates {
+    @apply gap-1 bg-primary text-white hover:bg-primary/90;
+  }
+
+  .catalog-date-day-card-dates-label {
+    @apply text-[0.575rem] font-bold uppercase leading-none tracking-wide;
+  }
+
   .horizontal-snap-row {
     @apply w-full min-w-0 max-w-full overflow-x-auto overscroll-x-contain scroll-smooth pb-2;
     -webkit-overflow-scrolling: touch;

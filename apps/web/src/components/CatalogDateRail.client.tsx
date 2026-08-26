@@ -9,9 +9,11 @@ import {
   buildCatalogDateRailChips,
   CATALOG_DATE_RAIL_DAYS_DESKTOP_MAX,
   CATALOG_DATE_RAIL_DAYS_TABLET,
+  formatCatalogDateRangeLabel,
   isDateRailChipActive,
+  nextCatalogDateRailSelection,
   toLocalIsoDay,
-  type CatalogDateRailChip,
+  type CatalogDateRailDayChip,
 } from '@/lib/catalog-date-rail';
 import { isCatalogPageSize } from '@daibilet/contracts/catalog';
 import {
@@ -28,14 +30,17 @@ type CatalogDateRailProps = {
 const DESKTOP_DATE_RAIL_MQ = '(min-width: 1024px)';
 
 /**
- * Horizontal date presets + upcoming days + calendar as the last in-flow chip.
- * Calendar opens a centered modal (not a right-pinned popover).
+ * Vertical day cards (СЕГ/ЗАВ + number + month) with range selection:
+ * click A → day; click B → range A–B; click inside range → that day; click same day again → clear.
  */
 export function CatalogDateRail({ disabled = false, className = '' }: CatalogDateRailProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [upcomingDays, setUpcomingDays] = useState(CATALOG_DATE_RAIL_DAYS_TABLET);
-  const chips = useMemo(() => buildCatalogDateRailChips(new Date(), upcomingDays), [upcomingDays]);
+  const chips = useMemo(
+    () => buildCatalogDateRailChips(new Date(), upcomingDays) as CatalogDateRailDayChip[],
+    [upcomingDays],
+  );
   const [pickerOpen, setPickerOpen] = useState(false);
   const [draftFrom, setDraftFrom] = useState('');
   const [draftTo, setDraftTo] = useState('');
@@ -69,14 +74,11 @@ export function CatalogDateRail({ disabled = false, className = '' }: CatalogDat
     });
   }, [searchParams]);
 
-  const calendarActive = Boolean(filters.from || filters.to) && !filters.date;
-  const calendarOffRail =
-    calendarActive &&
-    Boolean(filters.from) &&
-    !chips.some((chip) => chip.kind === 'day' && chip.iso === filters.from && filters.to === filters.from);
+  const rangeLabel = formatCatalogDateRangeLabel(filters.from, filters.to || filters.from);
+  const dateFilterOn = Boolean(filters.from || filters.to) && !filters.date;
 
   const measurePool = useMemo(
-    () => buildCatalogDateRailChips(new Date(), CATALOG_DATE_RAIL_DAYS_DESKTOP_MAX),
+    () => buildCatalogDateRailChips(new Date(), CATALOG_DATE_RAIL_DAYS_DESKTOP_MAX) as CatalogDateRailDayChip[],
     [],
   );
 
@@ -97,11 +99,10 @@ export function CatalogDateRail({ disabled = false, className = '' }: CatalogDat
       const available = rail.clientWidth;
       if (available <= 0) return;
 
-      const gap = 6; // gap-1.5
+      const gap = 6;
       const kids = Array.from(measure.children) as HTMLElement[];
-      // Last child is the calendar chip - always reserve it.
       const calendarEl = kids[kids.length - 1];
-      const calendarW = calendarEl?.offsetWidth ?? 36;
+      const calendarW = calendarEl?.offsetWidth ?? 44;
       let used = calendarW;
       let dayCount = 0;
       for (let i = 0; i < kids.length - 1; i += 1) {
@@ -109,7 +110,7 @@ export function CatalogDateRail({ disabled = false, className = '' }: CatalogDat
         const next = used + gap + w;
         if (next > available + 0.5) break;
         used = next;
-        if (measurePool[i]?.kind === 'day') dayCount += 1;
+        dayCount += 1;
       }
       setUpcomingDays(Math.max(CATALOG_DATE_RAIL_DAYS_TABLET, dayCount));
     };
@@ -159,30 +160,20 @@ export function CatalogDateRail({ disabled = false, className = '' }: CatalogDat
     router.push(buildCatalogHref(next));
   };
 
-  const onSelect = (chip: CatalogDateRailChip) => {
+  const onSelectDay = (iso: string) => {
     setPickerOpen(false);
-    if (chip.kind === 'preset') {
-      const nextDate = chip.value;
-      navigate({
-        ...filters,
-        date: nextDate === 'all' ? undefined : nextDate,
-        from: undefined,
-        to: undefined,
-        page: undefined,
-        sort:
-          nextDate === 'today' || nextDate === 'tomorrow' || nextDate === 'evening'
-            ? 'time'
-            : filters.sort,
-      });
-      return;
-    }
+    const nextRange = nextCatalogDateRailSelection(
+      { from: filters.from, to: filters.to },
+      iso,
+    );
+    const single = Boolean(nextRange.from && nextRange.from === nextRange.to);
     navigate({
       ...filters,
       date: undefined,
-      from: chip.iso,
-      to: chip.iso,
+      from: nextRange.from,
+      to: nextRange.to,
       page: undefined,
-      sort: 'time',
+      sort: single ? 'time' : nextRange.from ? filters.sort : filters.sort,
     });
   };
 
@@ -228,30 +219,49 @@ export function CatalogDateRail({ disabled = false, className = '' }: CatalogDat
 
   const minDay = toLocalIsoDay(new Date());
 
-  const renderChipLabel = (chip: CatalogDateRailChip) =>
-    chip.kind === 'day' ? (
-      <span className="whitespace-nowrap">
-        <span className="text-[11px] font-semibold uppercase tracking-wide opacity-80">{chip.weekday}</span>
-        <span className="ml-1 font-semibold">{chip.iso.slice(8)}</span>
-      </span>
-    ) : (
-      <span className="whitespace-nowrap">{chip.shortLabel}</span>
+  const renderDayCard = (chip: CatalogDateRailDayChip, opts?: { measure?: boolean }) => {
+    const active = isDateRailChipActive(chip, filters);
+    const idleWeekend = !active && chip.isWeekend;
+    return (
+      <button
+        key={opts?.measure ? `m-${chip.iso}` : chip.iso}
+        type="button"
+        disabled={disabled || opts?.measure}
+        tabIndex={opts?.measure ? -1 : undefined}
+        aria-pressed={opts?.measure ? undefined : active}
+        aria-label={chip.label}
+        onClick={opts?.measure ? undefined : () => onSelectDay(chip.iso)}
+        className={[
+          'catalog-date-day-card snap-start',
+          active ? 'catalog-date-day-card-on' : idleWeekend ? 'catalog-date-day-card-weekend' : 'catalog-date-day-card-idle',
+          disabled || opts?.measure ? 'opacity-60' : '',
+          opts?.measure ? 'pointer-events-none' : '',
+        ]
+          .filter(Boolean)
+          .join(' ')}
+      >
+        <span className="catalog-date-day-card-weekday">{chip.weekday}</span>
+        <span className="catalog-date-day-card-num">{chip.dayNum}</span>
+        <span className="catalog-date-day-card-month">{chip.monthShort}</span>
+      </button>
     );
+  };
 
   const calendarButton = (
     <button
       type="button"
       disabled={disabled}
-      aria-label="Выбрать даты в календаре"
+      aria-label={rangeLabel ? `Календарь: ${rangeLabel}` : 'Выбрать даты в календаре'}
       aria-expanded={pickerOpen}
       aria-haspopup="dialog"
-      aria-pressed={calendarOffRail || pickerOpen}
+      aria-pressed={dateFilterOn || pickerOpen}
       onClick={() => setPickerOpen((open) => !open)}
-      className={`catalog-date-chip inline-flex h-9 w-9 shrink-0 items-center justify-center px-0 py-0 disabled:opacity-60 ${
-        calendarOffRail || pickerOpen ? 'catalog-date-chip-on' : 'catalog-date-chip-idle'
+      className={`catalog-date-day-card catalog-date-day-card-dates shrink-0 disabled:opacity-60 ${
+        dateFilterOn || pickerOpen ? 'catalog-date-day-card-on' : ''
       }`}
     >
       <CalendarIcon className="h-4 w-4" strokeWidth={1.75} aria-hidden />
+      <span className="catalog-date-day-card-dates-label">Даты</span>
     </button>
   );
 
@@ -333,50 +343,26 @@ export function CatalogDateRail({ disabled = false, className = '' }: CatalogDat
       : null;
 
   return (
-    <div className={`relative min-w-0 ${className}`}>
+    <div className={`relative min-w-0 ${className}`} data-catalog-date-rail="cards">
       <div
         ref={railRef}
         role="group"
         aria-label="Дата"
         className="horizontal-snap-row flex min-w-0 w-full flex-nowrap items-center gap-1.5 overflow-x-auto pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:overflow-x-hidden"
       >
-        {chips.map((chip) => {
-          const active = isDateRailChipActive(chip, filters);
-          const key = chip.kind === 'preset' ? chip.value : chip.iso;
-          return (
-            <button
-              key={key}
-              type="button"
-              disabled={disabled}
-              aria-pressed={active}
-              onClick={() => onSelect(chip)}
-              className={`catalog-date-chip h-9 snap-start disabled:opacity-60 ${
-                active ? 'catalog-date-chip-on' : 'catalog-date-chip-idle'
-              }`}
-            >
-              {renderChipLabel(chip)}
-            </button>
-          );
-        })}
+        {chips.map((chip) => renderDayCard(chip))}
         {calendarButton}
       </div>
 
-      {/* Off-screen measure: full day pool + trailing calendar chip. */}
       <div
         ref={measureRef}
         aria-hidden
         className="pointer-events-none absolute -left-[9999px] top-0 flex flex-nowrap items-center gap-1.5 opacity-0"
       >
-        {measurePool.map((chip) => {
-          const key = chip.kind === 'preset' ? `m-${chip.value}` : `m-${chip.iso}`;
-          return (
-            <span key={key} className="catalog-date-chip catalog-date-chip-idle h-9">
-              {renderChipLabel(chip)}
-            </span>
-          );
-        })}
-        <span className="catalog-date-chip catalog-date-chip-idle inline-flex h-9 w-9 shrink-0 items-center justify-center px-0 py-0">
+        {measurePool.map((chip) => renderDayCard(chip, { measure: true }))}
+        <span className="catalog-date-day-card catalog-date-day-card-dates">
           <CalendarIcon className="h-4 w-4" strokeWidth={1.75} aria-hidden />
+          <span className="catalog-date-day-card-dates-label">Даты</span>
         </span>
       </div>
 
