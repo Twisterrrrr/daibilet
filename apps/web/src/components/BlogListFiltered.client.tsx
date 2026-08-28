@@ -174,6 +174,7 @@ export function BlogListFiltered({
       blockCount,
       promo: activePromo,
       seed: promoSeed,
+      hasSidebar: Boolean(sidebarSlot),
     });
     return plans.map((plan) => ({
       afterBlockIndex: plan.afterBlockIndex,

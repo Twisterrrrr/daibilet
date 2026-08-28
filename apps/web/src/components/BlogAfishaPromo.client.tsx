@@ -131,33 +131,30 @@ export function BlogAfishaPromo({
     return (
       <section
         aria-label="Афиша"
-        className="group relative mt-auto flex min-h-[22rem] flex-1 overflow-hidden rounded-2xl bg-slate-900 text-white shadow-sm sm:min-h-[23rem]"
+        className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm"
       >
-        <SafeImage
-          src={FALLBACK_IMAGE}
-          alt=""
-          fill
-          sizes={SIDEBAR_IMAGE_SIZES}
-          className="object-cover opacity-80 transition duration-500 group-hover:scale-105"
-          fallback={<div className="absolute inset-0 bg-slate-800" aria-hidden />}
-        />
-        <div
-          className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/10"
-          aria-hidden
-        />
-        <div className="relative mt-auto flex w-full flex-col gap-3 p-5 sm:p-6">
-          <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-white/75">Афиша</p>
-          <h2 className="font-display text-xl font-bold leading-snug text-white sm:text-2xl">
-            Гид по лучшим событиям
-          </h2>
-          <Link
-            href="/events"
-            className="inline-flex w-fit items-center justify-center gap-1.5 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-slate-100"
-          >
-            Смотреть афишу
-            <ArrowRight className="h-4 w-4" aria-hidden />
-          </Link>
-        </div>
+        <Link href="/events" className="group flex flex-col">
+          <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
+            <SafeImage
+              src={FALLBACK_IMAGE}
+              alt=""
+              fill
+              sizes={SIDEBAR_IMAGE_SIZES}
+              className="object-cover transition duration-500 group-hover:scale-[1.02]"
+              fallback={<div className="absolute inset-0 bg-slate-200" aria-hidden />}
+            />
+          </div>
+          <div className="flex flex-col gap-2.5 p-5">
+            <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-slate-500">Афиша</p>
+            <h2 className="font-display text-lg font-bold leading-snug text-slate-900">
+              Гид по лучшим событиям
+            </h2>
+            <span className="inline-flex w-fit items-center gap-1.5 text-sm font-semibold text-primary-700">
+              Смотреть афишу
+              <ArrowRight className="h-4 w-4" aria-hidden />
+            </span>
+          </div>
+        </Link>
       </section>
     );
   }
@@ -170,47 +167,44 @@ export function BlogAfishaPromo({
   return (
     <section
       aria-label={title}
-      className="group relative mt-auto flex min-h-[22rem] flex-1 overflow-hidden rounded-2xl bg-slate-900 text-white shadow-sm sm:min-h-[23rem]"
+      className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm"
     >
-      <SafeImage
-        src={imageSrc}
-        alt=""
-        fill
-        sizes={SIDEBAR_IMAGE_SIZES}
-        className="object-cover opacity-80 transition duration-500 group-hover:scale-105"
-        fallback={
-          <SafeImage
-            src={FALLBACK_IMAGE}
-            alt=""
-            fill
-            sizes={SIDEBAR_IMAGE_SIZES}
-            className="object-cover opacity-80"
-            fallback={<div className="absolute inset-0 bg-slate-800" aria-hidden />}
-          />
-        }
-      />
-      {/* Rich A: dense full-height gradient, no glass */}
-      <div
-        className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/10"
-        aria-hidden
-      />
-      <div className="relative mt-auto flex w-full flex-col gap-3 p-5 sm:p-6">
-        <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-white/75">
+      <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
+        <SafeImage
+          src={imageSrc}
+          alt=""
+          fill
+          sizes={SIDEBAR_IMAGE_SIZES}
+          className="object-cover"
+          fallback={
+            <SafeImage
+              src={FALLBACK_IMAGE}
+              alt=""
+              fill
+              sizes={SIDEBAR_IMAGE_SIZES}
+              className="object-cover"
+              fallback={<div className="absolute inset-0 bg-slate-200" aria-hidden />}
+            />
+          }
+        />
+      </div>
+      <div className="flex flex-col gap-2.5 p-5">
+        <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-slate-500">
           Афиша · {promo.cityName}
         </p>
-        <h2 className="font-display text-xl font-bold leading-snug text-white sm:text-2xl">
-          <Link href={promo.href} className="hover:text-white/95">
+        <h2 className="font-display text-lg font-bold leading-snug text-slate-900">
+          <Link href={promo.href} className="hover:text-primary-700">
             {title}
           </Link>
         </h2>
-        {meta ? <p className="text-sm font-semibold text-white/90">{meta}</p> : null}
+        {meta ? <p className="text-sm font-medium text-slate-600">{meta}</p> : null}
         {chips.length ? (
           <div className="flex flex-wrap gap-1.5">
             {chips.map((chip) => (
               <Link
                 key={`${chip.href}-${chip.label}`}
                 href={chip.href}
-                className="inline-flex rounded-full border border-white/25 bg-white/15 px-2.5 py-1 text-[11px] font-semibold text-white transition hover:bg-white/25"
+                className="inline-flex rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-700 transition hover:border-primary/25 hover:bg-primary-50/50"
               >
                 {chip.label}
               </Link>
@@ -219,7 +213,7 @@ export function BlogAfishaPromo({
         ) : null}
         <Link
           href={promo.href}
-          className="inline-flex w-fit items-center justify-center gap-1.5 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-slate-100"
+          className="inline-flex w-fit items-center gap-1.5 rounded-xl bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-500"
         >
           Смотреть афишу
           <ArrowRight className="h-4 w-4" aria-hidden />

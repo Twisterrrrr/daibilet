@@ -29,7 +29,17 @@ test('planBlogFeedPromos: usually one slot after first block', () => {
   assert.equal(plans.length, 1);
   assert.equal(plans[0]?.afterBlockIndex, 0);
   assert.ok(['city', 'landing', 'event'].includes(plans[0]!.kind));
-  assert.ok(['strip', 'strip-dense', 'overlay', 'split'].includes(plans[0]!.layout));
+  assert.ok(['strip', 'strip-dense', 'split'].includes(plans[0]!.layout));
+});
+
+test('planBlogFeedPromos: skips city promo when sidebar already shows afisha', () => {
+  const plans = planBlogFeedPromos({
+    blockCount: 3,
+    promo: basePromo,
+    seed: 3,
+    hasSidebar: true,
+  });
+  assert.ok(plans.every((plan) => plan.kind !== 'city'));
 });
 
 test('planBlogFeedPromos: second slot only with enough blocks and seed%4===0', () => {

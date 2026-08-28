@@ -10,13 +10,15 @@ export type BlogFeedPromoPlan = {
   layout: BlogFeedPromoLayout;
 };
 
-const LAYOUTS: BlogFeedPromoLayout[] = ['strip', 'strip-dense', 'overlay', 'split'];
+const LAYOUTS: BlogFeedPromoLayout[] = ['strip', 'strip-dense', 'split'];
 
-function availableKinds(promo: BlogSidebarPromoDto): BlogFeedPromoKind[] {
+function availableKinds(promo: BlogSidebarPromoDto, hasSidebar: boolean): BlogFeedPromoKind[] {
   const kinds: BlogFeedPromoKind[] = ['city'];
   if (promo.chips?.some((chip) => chip.label && chip.href)) kinds.push('landing');
   if (promo.upcomingTitles?.some((title) => String(title || '').trim())) kinds.push('event');
-  return kinds;
+  if (!hasSidebar) return kinds;
+  // Sidebar already shows the city afisha guide — avoid duplicate banners in the feed.
+  return kinds.filter((kind) => kind !== 'city');
 }
 
 /**
@@ -27,11 +29,16 @@ export function planBlogFeedPromos(input: {
   blockCount: number;
   promo: BlogSidebarPromoDto | null | undefined;
   seed: number;
+  /** Desktop sidebar already shows the city afisha promo. */
+  hasSidebar?: boolean;
 }): BlogFeedPromoPlan[] {
   const promo = input.promo;
   if (!promo || input.blockCount < 1) return [];
 
-  const kinds = availableKinds(promo);
+  const hasSidebar = Boolean(input.hasSidebar);
+  const kinds = availableKinds(promo, hasSidebar);
+  if (!kinds.length) return [];
+
   const seed = Math.abs(Math.floor(input.seed)) || 1;
   const kind = kinds[seed % kinds.length]!;
   const layout = LAYOUTS[seed % LAYOUTS.length]!;

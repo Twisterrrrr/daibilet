@@ -78,12 +78,11 @@ export function BlogFeaturedHero({
   const sectionClass = hideAsideOnDesktop
     ? 'mb-8 w-full sm:mb-10'
     : 'mb-8 grid w-full items-stretch gap-4 lg:grid-cols-[minmax(16rem,1fr)_minmax(0,2fr)] lg:gap-5';
-  // Same height band as venue/article heroes (~20rem), not magazine full-viewport.
   const articleClass = hideAsideOnDesktop
-    ? 'group relative flex min-h-[14rem] overflow-hidden rounded-2xl bg-slate-900 shadow-md sm:min-h-[16rem] md:min-h-[18rem] lg:min-h-[20rem]'
-    : 'group order-1 relative flex min-h-[16rem] overflow-hidden rounded-2xl bg-slate-900 shadow-md md:min-h-[18rem] lg:order-2 lg:min-h-[20rem]';
+    ? 'group flex w-full flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-md transition hover:shadow-lg'
+    : 'group order-1 flex w-full flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-md transition hover:shadow-lg lg:order-2';
   const imageSizes = hideAsideOnDesktop
-    ? '(max-width: 1024px) 100vw, 80vw'
+    ? '(max-width: 1024px) 100vw, 56vw'
     : FEATURED_IMAGE_SIZES;
 
   return (
@@ -92,7 +91,7 @@ export function BlogFeaturedHero({
         <Link
           href={articleHref}
           aria-label={featured.title}
-          className="absolute inset-0 block"
+          className="relative block aspect-[16/10] w-full shrink-0 overflow-hidden bg-slate-100 sm:aspect-[21/9]"
         >
           <Image
             src={featured.coverImageUrl}
@@ -100,54 +99,46 @@ export function BlogFeaturedHero({
             fill
             priority
             sizes={imageSizes}
-            className="object-cover transition-transform duration-700 group-hover:scale-105"
-          />
-          <span
-            aria-hidden
-            className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/55 to-slate-950/15"
-          />
-          <span
-            aria-hidden
-            className="absolute inset-0 bg-gradient-to-r from-slate-950/50 via-transparent to-transparent"
+            className="object-cover transition-transform duration-700 group-hover:scale-[1.02]"
           />
         </Link>
 
-        <div className="relative z-10 mt-auto flex w-full flex-col gap-3 p-5 sm:p-6 md:gap-3 md:p-6 lg:p-7">
+        <div className="flex w-full flex-col gap-3 p-5 sm:p-6 md:gap-3.5 md:p-7">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-white/80 sm:text-xs">
+            <span className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-slate-500 sm:text-xs">
               Сейчас в ленте
             </span>
             {tag ? (
               <span
-                className={`inline-flex max-w-full truncate rounded-md px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ring-1 backdrop-blur-sm md:text-[11px] ${blogTagBadgeClassName(tag)}`}
+                className={`inline-flex max-w-full truncate rounded-md px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ring-1 md:text-[11px] ${blogTagBadgeClassName(tag)}`}
               >
                 {tag}
               </span>
             ) : null}
             {cityLabel ? (
               <span
-                className={`inline-flex max-w-full truncate rounded-md px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ring-1 backdrop-blur-sm md:text-[11px] ${blogCityBadgeClassName(featured.citySlug)}`}
+                className={`inline-flex max-w-full truncate rounded-md px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ring-1 md:text-[11px] ${blogCityBadgeClassName(featured.citySlug)}`}
               >
                 {cityLabel}
               </span>
             ) : null}
           </div>
 
-          <h2 className="font-serif text-xl font-semibold leading-[1.12] tracking-tight text-white sm:text-2xl md:text-[1.65rem] lg:text-3xl">
-            <Link href={articleHref} className="hover:text-white/90">
+          <h2 className="font-serif text-xl font-semibold leading-[1.12] tracking-tight text-slate-900 sm:text-2xl md:text-[1.65rem] lg:text-3xl">
+            <Link href={articleHref} className="hover:text-primary-700">
               {featured.title}
             </Link>
           </h2>
 
           {lead ? (
-            <p className="max-w-2xl break-words text-base leading-relaxed text-white/80 md:text-base md:leading-[1.5]">
+            <p className="max-w-3xl break-words text-base leading-relaxed text-slate-600 md:text-base md:leading-[1.55]">
               {lead}
             </p>
           ) : null}
 
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-white/65 md:text-sm">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-500 md:text-sm">
             {featured.authorName || featured.authorId ? (
-              <span className="font-medium text-white/85">
+              <span className="font-medium text-slate-700">
                 {featured.authorName || authorLabel(featured.authorId)}
               </span>
             ) : null}
@@ -166,7 +157,7 @@ export function BlogFeaturedHero({
             {scheduleCta ? (
               <Link
                 href={scheduleCta.href}
-                className="inline-flex items-center justify-center rounded-xl border border-white/35 bg-white/10 px-5 py-3 text-base font-semibold text-white backdrop-blur-sm transition-all duration-300 hover:translate-x-0.5 hover:bg-white/20 md:px-4 md:py-2.5 md:text-sm"
+                className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-5 py-3 text-base font-semibold text-slate-800 transition-all duration-300 hover:border-primary/30 hover:bg-primary-50/40 md:px-4 md:py-2.5 md:text-sm"
               >
                 {scheduleCta.label}
               </Link>

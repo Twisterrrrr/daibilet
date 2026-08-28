@@ -492,8 +492,8 @@ html[data-nav-pending='1'] {
     gap: 1.25rem;
   }
 
-  /* ~1024px+: feed column usually wide enough for 2+1 without crushing cards */
-  @media (min-width: 64em) {
+  /* ~1360px+: 3-col blog layout — room for 2 horizontal + 1 vertical bento */
+  @media (min-width: 85em) {
     .blog-bento {
       gap: 2.25rem;
     }
