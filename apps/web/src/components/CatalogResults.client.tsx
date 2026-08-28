@@ -6,6 +6,7 @@ import { useMemo, useRef } from 'react';
 
 import { EventCard } from '@/components/EventCard';
 import { EventCardHorizontal } from '@/components/EventCardHorizontal';
+import { CatalogListRow } from '@/components/CatalogListRow.client';
 import type { PublicCatalogListItemDto } from '@daibilet/contracts/public';
 import { trackCatalogBannerClick } from '@/lib/catalog-analytics';
 import { catalogItemHasLiveSignal } from '@/lib/event-card-badges';
@@ -244,10 +245,10 @@ export function CatalogResults({
       ) : null}
       {viewMode === 'list' ? (
         <>
-          <ul className="mt-4 grid grid-cols-1 gap-4 sm:hidden">
+          <ul className="mt-4 space-y-2 sm:hidden">
             {listItems.map((session) => (
               <li key={`${session.id}-${session.startsAt}`}>
-                <EventCard session={session} compact />
+                <CatalogListRow session={session} />
               </li>
             ))}
           </ul>
@@ -369,21 +370,20 @@ export function ViewModeToggle({
     >
       <ViewModeButton
         active={mode === 'cards'}
-        mobileActive={mode === 'list'}
         label="Карточки"
         onClick={() => onChange('cards')}
+        className="sm:grid"
       >
         <Grid3X3 className="h-5 w-5" aria-hidden />
       </ViewModeButton>
       <ViewModeButton
         active={mode === 'list'}
-        label="Список"
+        label="В линию"
         onClick={() => onChange('list')}
-        className="hidden sm:grid"
       >
         <List className="h-5 w-5" aria-hidden />
       </ViewModeButton>
-      <ViewModeButton active={mode === 'table'} label="Таблица" onClick={() => onChange('table')}>
+      <ViewModeButton active={mode === 'table'} label="Таблица" onClick={() => onChange('table')} className="hidden md:grid">
         <Table2 className="h-5 w-5" aria-hidden />
       </ViewModeButton>
     </div>
@@ -392,14 +392,12 @@ export function ViewModeToggle({
 
 function ViewModeButton({
   active,
-  mobileActive = false,
   label,
   onClick,
   className = '',
   children,
 }: {
   active: boolean;
-  mobileActive?: boolean;
   label: string;
   onClick: () => void;
   className?: string;
@@ -417,10 +415,6 @@ function ViewModeButton({
         active
           ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200'
           : 'text-slate-500 hover:bg-white/70 hover:text-slate-800'
-      } ${
-        mobileActive && !active
-          ? 'max-sm:bg-white max-sm:text-slate-900 max-sm:shadow-sm max-sm:ring-1 max-sm:ring-slate-200'
-          : ''
       } ${className}`}
     >
       {children}

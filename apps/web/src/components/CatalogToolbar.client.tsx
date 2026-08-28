@@ -10,6 +10,7 @@ import { CatalogAdvancedFiltersInline } from '@/components/CatalogAdvancedFilter
 import { CatalogAdvancedFiltersPanel } from '@/components/CatalogAdvancedFiltersPanel.client';
 import { CatalogDateRail } from '@/components/CatalogDateRail.client';
 import { CatalogDrawerApplyFooter } from '@/components/CatalogDrawerApplyFooter.client';
+import { CatalogMobileQuickFilters } from '@/components/CatalogMobileQuickFilters.client';
 import { CatalogPriceRange } from '@/components/CatalogPriceRange.client';
 import {
   CatalogDesktopFiltersCollapseButton,
@@ -74,6 +75,7 @@ export function CatalogToolbar({
   const [searchFocused, setSearchFocused] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const searchWrapRef = useRef<HTMLDivElement>(null);
+  const openSidebarDrawerRef = useRef<(() => void) | null>(null);
   const advancedCount = countAdvancedFilters(filters);
   const categorySplit = useMemo(
     () => splitCatalogCategories(facets.categories, filters.category),
@@ -520,6 +522,10 @@ export function CatalogToolbar({
           title="Фильтры"
           triggerLabel="Фильтры и поиск"
           activeCount={sidebarActiveCount}
+          hideMobileTrigger
+          onRegisterOpenDrawer={(open) => {
+            openSidebarDrawerRef.current = open;
+          }}
           onDrawerOpen={openMobileDrawer}
           onDrawerDismiss={dismissMobileDrawer}
           footer={({ closeApply }) => (
@@ -537,6 +543,14 @@ export function CatalogToolbar({
             <div className="catalog-date-timeline w-full">
               <CatalogDateRail disabled={disabled} className="min-w-0 w-full" />
             </div>
+            <CatalogMobileQuickFilters
+              filters={filters}
+              categories={facets.categories}
+              disabled={disabled}
+              activeCount={sidebarActiveCount}
+              onNavigate={navigate}
+              onOpenAllFilters={() => openSidebarDrawerRef.current?.()}
+            />
             {children}
           </div>
         </CatalogSidebarLayout>

@@ -50,6 +50,10 @@ type CatalogSidebarLayoutProps = {
   triggerLabel?: string;
   /** Active filter count badge on mobile trigger */
   activeCount?: number;
+  /** Hide legacy floating trigger when Lovable sticky bar is used */
+  hideMobileTrigger?: boolean;
+  /** Expose drawer open for external sticky bar */
+  onRegisterOpenDrawer?: (open: () => void) => void;
   /** Overlay / X / Escape — rollback draft without applying. */
   onDrawerDismiss?: () => void;
   /** Called when drawer opens — use to snapshot filter state for reset-on-dismiss */
@@ -70,6 +74,8 @@ export function CatalogSidebarLayout({
   title = 'Фильтры',
   triggerLabel = 'Фильтры и поиск',
   activeCount = 0,
+  hideMobileTrigger = false,
+  onRegisterOpenDrawer,
   onDrawerDismiss,
   onDrawerOpen,
   footer,
@@ -113,6 +119,10 @@ export function CatalogSidebarLayout({
   }, [onDrawerOpen]);
 
   useEffect(() => {
+    onRegisterOpenDrawer?.(openDrawer);
+  }, [onRegisterOpenDrawer, openDrawer]);
+
+  useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
@@ -134,16 +144,18 @@ export function CatalogSidebarLayout({
 
   return (
     <CatalogFiltersLayoutContext.Provider value={layoutValue}>
-      <button
-        type="button"
-        className="catalog-mobile-filters-trigger"
-        aria-expanded={open}
-        aria-controls="catalog-filter-sidebar"
-        onClick={openDrawer}
-      >
-        <SlidersHorizontal className="h-4 w-4" strokeWidth={1.75} aria-hidden />
-        {activeCount > 0 ? `${title} (${activeCount})` : triggerLabel}
-      </button>
+      {!hideMobileTrigger ? (
+        <button
+          type="button"
+          className="catalog-mobile-filters-trigger"
+          aria-expanded={open}
+          aria-controls="catalog-filter-sidebar"
+          onClick={openDrawer}
+        >
+          <SlidersHorizontal className="h-4 w-4" strokeWidth={1.75} aria-hidden />
+          {activeCount > 0 ? `${title} (${activeCount})` : triggerLabel}
+        </button>
+      ) : null}
 
       <div
         className={`catalog-sidebar-overlay${open ? ' is-visible' : ''}`}

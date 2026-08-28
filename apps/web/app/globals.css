@@ -934,6 +934,18 @@ html[data-nav-pending='1'] {
     display: none;
   }
 
+  .catalog-mobile-quick-chips {
+    margin-bottom: 0.75rem;
+  }
+
+  .catalog-mobile-sticky-filters__icon {
+    @apply inline-btn grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#F5F5F7] text-graphite transition hover:bg-slate-200/70 disabled:opacity-60;
+  }
+
+  .catalog-mobile-sticky-filters__icon.is-active {
+    @apply bg-primary/10 text-primary-700 ring-1 ring-primary/25;
+  }
+
   @media (max-width: 1023px) {
     .catalog-mobile-filters-trigger {
       @apply fixed bottom-[calc(1.25rem+env(safe-area-inset-bottom,0px))] left-1/2 z-[99] inline-flex -translate-x-1/2 items-center gap-2 rounded-full border-0 bg-primary px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-primary/30;
