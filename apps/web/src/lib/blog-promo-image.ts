@@ -39,7 +39,7 @@ export function isLandscapePromoImageUrl(imageUrl?: string | null): boolean | nu
 
 /**
  * Pick image for a horizontal feed promo.
- * Event covers are used only when landscape (or unknown → client validates).
+ * Event promos always use the event cover when available — object-cover crops portrait art.
  */
 export function resolveHorizontalFeedPromoImage(input: {
   kind: 'city' | 'landing' | 'event';
@@ -54,8 +54,5 @@ export function resolveHorizontalFeedPromoImage(input: {
 
   const eventUrl = input.eventImageUrl?.trim();
   if (!eventUrl) return { src: city, probeEventCover: false };
-
-  const landscape = isLandscapePromoImageUrl(eventUrl);
-  if (landscape === false) return { src: city, probeEventCover: false };
-  return { src: eventUrl, probeEventCover: landscape === null };
+  return { src: eventUrl, probeEventCover: false };
 }

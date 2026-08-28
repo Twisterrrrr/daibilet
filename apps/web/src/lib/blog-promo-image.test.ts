@@ -21,14 +21,14 @@ test('isLandscapePromoImageUrl rejects portrait covers', () => {
   assert.equal(isLandscapePromoImageUrl('https://cdn.example.com/no-dims.jpg'), null);
 });
 
-test('resolveHorizontalFeedPromoImage uses event cover only when landscape', () => {
+test('resolveHorizontalFeedPromoImage prefers event cover for event promos', () => {
   const portrait = resolveHorizontalFeedPromoImage({
     kind: 'event',
     cityImageUrl: '/images/cities/moscow.png',
     eventImageUrl: 'https://cdn.example.com/poster-800x1200.jpg',
     fallback: '/fallback.jpg',
   });
-  assert.equal(portrait.src, '/images/cities/moscow.png');
+  assert.equal(portrait.src, 'https://cdn.example.com/poster-800x1200.jpg');
   assert.equal(portrait.probeEventCover, false);
 
   const landscape = resolveHorizontalFeedPromoImage({
@@ -40,12 +40,12 @@ test('resolveHorizontalFeedPromoImage uses event cover only when landscape', () 
   assert.equal(landscape.src, 'https://cdn.example.com/banner-1600x900.jpg');
   assert.equal(landscape.probeEventCover, false);
 
-  const unknown = resolveHorizontalFeedPromoImage({
+  const missing = resolveHorizontalFeedPromoImage({
     kind: 'event',
     cityImageUrl: '/images/cities/moscow.png',
-    eventImageUrl: 'https://cdn.example.com/cover.jpg',
+    eventImageUrl: null,
     fallback: '/fallback.jpg',
   });
-  assert.equal(unknown.src, 'https://cdn.example.com/cover.jpg');
-  assert.equal(unknown.probeEventCover, true);
+  assert.equal(missing.src, '/images/cities/moscow.png');
+  assert.equal(missing.probeEventCover, false);
 });
