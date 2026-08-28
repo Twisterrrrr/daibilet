@@ -8,9 +8,8 @@ import {
   formatShowcasePriceLabel,
   isOpenDate,
   MIN_DISPLAY_PRICE_RUB,
-  resolveSessionTimeZoneForSession,
 } from '@/lib/event-card-meta';
-import { formatSessionTime, parseSessionStartsAt } from '@/lib/datetime';
+import { formatSessionTime, parseSessionStartsAt, resolveSessionTimeZoneForSession } from '@/lib/datetime';
 import { eventHref } from '@/lib/routes';
 
 function formatListRowSchedule(session: PublicCatalogListItemDto): string {

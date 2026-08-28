@@ -39,7 +39,7 @@ import { CountUp } from '@/components/CountUp.client';
 import { RegionDestinationLink } from '@/components/RegionDestinationLink';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
-import { CITY_CARD_ASPECT_CLASS, cityCardTitleClass } from '@/lib/city-card-styles';
+import { CITY_CARD_ASPECT_CLASS, CITY_CARD_DARK_SCRIM_CLASS, cityCardTitleClass } from '@/lib/city-card-styles';
 import { resolveCityImageObjectPosition } from '@/lib/city-image-focus';
 import { resolveCityCardImage } from '@/lib/city-images';
 import type { CityCardRegion } from '@/lib/cityRegionHub';
@@ -225,11 +225,8 @@ export function CityCard({
               aria-hidden
             />
           ) : (
-            /* Owner: semi-circle under title/stats, black @ 30% opacity - no glass, no full-card wash. */
-            <div
-              className="pointer-events-none absolute -bottom-[18%] -left-[22%] h-[78%] w-[78%] rounded-full bg-black/30"
-              aria-hidden
-            />
+            /* Owner: semi-circle under title/stats — compact on desktop grids. */
+            <div className={CITY_CARD_DARK_SCRIM_CLASS} aria-hidden />
           )}
           <div
             className={`absolute inset-x-0 bottom-0 z-[1] ${compact ? 'p-2 sm:p-2.5' : 'p-2.5 sm:p-3'}`}
