@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import Link from 'next/link';
 import { createPortal } from 'react-dom';
 import { Check, ChevronDown, MapPin } from 'lucide-react';
 
@@ -191,6 +192,17 @@ export function CityPicker({
                 </li>
               );
             })}
+            <li className="mt-1 border-t border-slate-100 pt-1">
+              <Link
+                href="/cities"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => setOpen(false)}
+                className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold text-primary-700 hover:bg-primary-50"
+              >
+                <MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                Все города
+              </Link>
+            </li>
           </ul>
         </div>,
         document.body,

@@ -11,6 +11,7 @@ import {
 import {
   hasCompletedCityPrompt,
   hasExplicitCityChoice,
+  isHomePath,
   markCityPromptCompleted,
   shouldOfferFirstVisitCityPrompt,
   suggestNearestCity,

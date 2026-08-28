@@ -61,26 +61,26 @@ export function suggestNearestCity(
 }
 
 /**
- * Soft GPS: only if the browser already granted geolocation.
- * Never call getCurrentPosition while permission is `prompt` - that would surprise-ask.
+ * Request browser position. May show the OS permission prompt unless `grantedOnly`.
  */
-export async function readGrantedBrowserPosition(): Promise<{
-  latitude: number;
-  longitude: number;
-} | null> {
+export async function readBrowserPosition(options?: {
+  grantedOnly?: boolean;
+}): Promise<{ latitude: number; longitude: number } | null> {
   if (typeof navigator === 'undefined' || !navigator.geolocation) return null;
 
-  try {
-    const permissions = navigator.permissions;
-    if (!permissions?.query) return null;
-    const status = await permissions.query({ name: 'geolocation' });
-    if (status.state !== 'granted') return null;
-  } catch {
-    return null;
+  if (options?.grantedOnly) {
+    try {
+      const permissions = navigator.permissions;
+      if (!permissions?.query) return null;
+      const status = await permissions.query({ name: 'geolocation' });
+      if (status.state !== 'granted') return null;
+    } catch {
+      return null;
+    }
   }
 
   return new Promise((resolve) => {
-    const timer = window.setTimeout(() => resolve(null), 3500);
+    const timer = window.setTimeout(() => resolve(null), options?.grantedOnly ? 3500 : 8000);
     navigator.geolocation.getCurrentPosition(
       (position) => {
         window.clearTimeout(timer);
@@ -96,9 +96,34 @@ export async function readGrantedBrowserPosition(): Promise<{
         window.clearTimeout(timer);
         resolve(null);
       },
-      { enableHighAccuracy: false, maximumAge: 300000, timeout: 3000 },
+      {
+        enableHighAccuracy: false,
+        maximumAge: 300000,
+        timeout: options?.grantedOnly ? 3000 : 7000,
+      },
     );
   });
+}
+
+/**
+ * Soft GPS: only if the browser already granted geolocation.
+ * Never call getCurrentPosition while permission is `prompt` - that would surprise-ask.
+ */
+export async function readGrantedBrowserPosition(): Promise<{
+  latitude: number;
+  longitude: number;
+} | null> {
+  return readBrowserPosition({ grantedOnly: true });
+}
+
+export function isMobileViewport(): boolean {
+  if (typeof window === 'undefined') return false;
+  return window.matchMedia('(max-width: 1023px)').matches;
+}
+
+export function isHomePath(pathname: string | null | undefined): boolean {
+  const path = String(pathname || '').replace(/\/$/, '') || '/';
+  return path === '/';
 }
 
 export function dispatchOpenHeaderCityPicker() {
