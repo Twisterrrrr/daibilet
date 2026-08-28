@@ -256,6 +256,11 @@ html[data-nav-pending='1'] {
     @apply inline-flex items-center justify-center rounded-full p-2.5 text-graphite-muted transition hover:bg-surface-muted hover:text-graphite;
   }
 
+  /** Marker: opts buttons out of globals 44px min-height; pair with layout utilities. */
+  .inline-btn {
+    @apply inline-flex min-h-0 appearance-none;
+  }
+
   /** Blog listing: filters | bento feed | widgets (ultrawide 3-col). */
   .blog-layout {
     @apply w-full;
