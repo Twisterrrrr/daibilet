@@ -9,6 +9,9 @@ import {
 } from '@/lib/datetime';
 import type { PublicSessionDto } from '@daibilet/contracts/public';
 
+/** Re-export for catalog row/components that historically imported from here. */
+export { resolveSessionTimeZoneForSession } from '@/lib/datetime';
+
 export const LOW_TICKETS_THRESHOLD = 20;
 export const MIN_DISPLAY_PRICE_RUB = 100;
 /** Узкая/catalog карточка: сетка 2×2. */
