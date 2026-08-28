@@ -6,6 +6,7 @@ import { Baby, Gift, Moon, MoreHorizontal, Search, SlidersHorizontal, X } from '
 import { FormEvent, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 
+import { CatalogSidebarDateFilters } from '@/components/CatalogSidebarDateFilters.client';
 import { CatalogAdvancedFiltersInline } from '@/components/CatalogAdvancedFiltersInline.client';
 import { CatalogAdvancedFiltersPanel } from '@/components/CatalogAdvancedFiltersPanel.client';
 import { CatalogDateRail } from '@/components/CatalogDateRail.client';
@@ -477,6 +478,13 @@ export function CatalogToolbar({
             onChange={setPriceRange}
           />
         </div>
+
+        <CatalogSidebarDateFilters
+          filters={effectiveFilters}
+          qDraft={effectiveQDraft}
+          disabled={disabled}
+          onNavigate={catalogNavigate}
+        />
 
         <div className="catalog-sidebar-section">
           <p className="catalog-sidebar-section__title">Категории</p>

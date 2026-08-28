@@ -1182,7 +1182,7 @@ html[data-nav-pending='1'] {
     }
   }
 
-  /** Date rail in main column — full width, left-aligned with card grid */
+  /** Date rail in main column — full width; sticky on desktop while scrolling cards */
   .catalog-date-timeline {
     width: 100%;
     max-width: 100%;
@@ -1190,6 +1190,26 @@ html[data-nav-pending='1'] {
     overflow-x: auto;
     padding-bottom: 0.25rem;
     scrollbar-width: thin;
+  }
+
+  @media (min-width: 1024px) {
+    .catalog-date-timeline {
+      position: sticky;
+      top: calc(var(--site-header-height, 4rem) + 0.75rem);
+      z-index: 25;
+      margin-bottom: 1rem;
+      padding-top: 0.35rem;
+      padding-bottom: 0.65rem;
+      border-bottom: 1px solid rgb(241 245 249 / 0.9);
+      background: rgb(255 255 255 / 0.92);
+      backdrop-filter: blur(10px);
+    }
+
+    @supports (backdrop-filter: blur(1px)) {
+      .catalog-date-timeline {
+        background: rgb(255 255 255 / 0.85);
+      }
+    }
   }
 
   .catalog-meta-row {
