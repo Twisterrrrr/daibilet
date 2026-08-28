@@ -123,9 +123,6 @@ export function MobileNavLayer({
           </div>
           <nav aria-label="Мобильная навигация" className="flex-1 overflow-y-auto p-2">
             <div className="px-2 py-1">
-              <p className="mb-1 px-2 text-xs font-medium uppercase tracking-wide text-graphite-muted">
-                Фильтр по городу
-              </p>
               <CityPicker
                 cities={destinations}
                 value={cityValue}
@@ -133,11 +130,7 @@ export function MobileNavLayer({
                   onCityChange(name);
                   close();
                 }}
-                allLabel={
-                  cityLabel === 'Все города' || cityLabel === 'Фильтр по городу'
-                    ? 'Фильтр по городу'
-                    : cityLabel
-                }
+                allLabel={cityLabel === 'Все города' ? 'Город' : cityLabel}
                 variant="compact"
                 className="w-full"
               />
