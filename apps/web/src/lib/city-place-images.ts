@@ -4272,6 +4272,114 @@ const IDENTITY_CITY_PREFIXES = Object.keys(CITY_IDENTITY_FALLBACK).sort(
   (a, b) => b.length - a.length,
 );
 
+/** Cities with `/images/venues/{city}/{stem}.jpg` on disk (longest match first). */
+const CONVENTIONAL_VENUE_CITY_PREFIXES = [
+  ...new Set([
+    ...IDENTITY_CITY_PREFIXES,
+    'blagoveschensk-amurskaya-oblast',
+    'kirov-kirovskaya-oblast',
+    'nizhny-novgorod',
+    'rostov-na-donu',
+    'saint-petersburg',
+    'veliky-novgorod',
+    'yuzhno-sahalinsk',
+    'yoshkar-ola',
+    'abakan',
+    'arhangelsk',
+    'astrahan',
+    'barnaul',
+    'belgorod',
+    'bryansk',
+    'cheboksary',
+    'chita',
+    'habarovsk',
+    'irkutsk',
+    'ivanovo',
+    'izhevsk',
+    'kaliningrad',
+    'kaluga',
+    'kemerovo',
+    'kirov',
+    'kostroma',
+    'krasnodar',
+    'kurgan',
+    'kursk',
+    'lipeck',
+    'moscow',
+    'murmansk',
+    'orel',
+    'orenburg',
+    'perm',
+    'pskov',
+    'saransk',
+    'saratov',
+    'sevastopol',
+    'simferopol',
+    'sochi',
+    'sortavala',
+    'stavropol',
+    'syktyvkar',
+    'tambov',
+    'tomsk',
+    'ulan-ude',
+    'ulyanovsk',
+    'vladimir',
+    'vladivostok',
+    'volgograd',
+    'vologda',
+    'vyborg',
+    'yaroslavl',
+  ]),
+].sort((a, b) => b.length - a.length);
+
+function editorialImageBasename(url: string): string {
+  return String(url || '')
+    .split('/')
+    .pop()
+    ?.replace(/\.jpe?g$/i, '') || '';
+}
+
+/**
+ * True when an editorial still belongs to another POI in the same city
+ * (e.g. kazanskiy-kreml.jpg reused for kazan-pamyatnik-* slugs).
+ */
+function isSharedVenueFallback(
+  editorial: string | null | undefined,
+  slug: string | null | undefined,
+): boolean {
+  const url = String(editorial || '').trim();
+  const key = normalizePlaceImageKey(slug);
+  if (!url || !key || editorialVenueImageMatchesSlug(url, slug)) return false;
+
+  const base = editorialImageBasename(url);
+  if (!base) return false;
+
+  for (const city of CONVENTIONAL_VENUE_CITY_PREFIXES) {
+    if (!key.startsWith(`${city}-`)) continue;
+    const stem = key.slice(city.length + 1);
+    if (!stem || base === stem) return false;
+
+    const donorKey = `${city}-${base}`;
+    if (donorKey !== key && EDITORIAL_IMAGES_BY_SLUG[donorKey] === url) {
+      return true;
+    }
+  }
+  return false;
+}
+
+const IDENTITY_CITY_SET = new Set<string>(IDENTITY_CITY_PREFIXES);
+
+/** Conventional `{city}/{stem}.jpg` when the city has no identity pack (e.g. Kaliningrad). */
+function shouldPreferConventionalWithoutEditorial(slug: string | null | undefined): boolean {
+  const key = normalizePlaceImageKey(slug);
+  if (!key) return false;
+  for (const city of CONVENTIONAL_VENUE_CITY_PREFIXES) {
+    if (!key.startsWith(`${city}-`)) continue;
+    return !IDENTITY_CITY_SET.has(city);
+  }
+  return false;
+}
+
 export function isCityPlaceholderImage(url: string | null | undefined): boolean {
   const value = String(url || '').trim().toLowerCase();
   return value.startsWith('/images/cities/');
@@ -4302,7 +4410,7 @@ export function inferCityIdentityImage(slug: string | null | undefined): string 
 export function inferConventionalVenueImage(slug: string | null | undefined): string | null {
   const key = normalizePlaceImageKey(slug);
   if (!key) return null;
-  for (const city of IDENTITY_CITY_PREFIXES) {
+  for (const city of CONVENTIONAL_VENUE_CITY_PREFIXES) {
     if (key === city) continue;
     if (!key.startsWith(`${city}-`)) continue;
     const stem = key.slice(city.length + 1);
@@ -4321,11 +4429,11 @@ export function editorialVenueImageMatchesSlug(
   const key = normalizePlaceImageKey(slug);
   if (!url || !key) return false;
   if (url.includes('/identity-')) return true;
-  for (const city of IDENTITY_CITY_PREFIXES) {
+  for (const city of CONVENTIONAL_VENUE_CITY_PREFIXES) {
     if (!key.startsWith(`${city}-`)) continue;
     const stem = key.slice(city.length + 1);
     if (!stem) return false;
-    const base = url.split('/').pop()?.replace(/\.jpe?g$/i, '') || '';
+    const base = editorialImageBasename(url);
     return base === stem || base.startsWith(`${stem}-`);
   }
   return false;
@@ -4336,11 +4444,27 @@ export function editorialVenueImageMatchesSlug(
  * fallbacks (e.g. kreml for every kremlin POI) cannot override unique files.
  */
 export function resolveEditorialVenueCover(slug: string | null | undefined): string | null {
+  const key = normalizePlaceImageKey(slug);
+  const direct = key ? EDITORIAL_IMAGES_BY_SLUG[key] : null;
+
+  if (direct && editorialVenueImageMatchesSlug(direct, slug)) return direct;
+
+  const conventional = inferConventionalVenueImage(slug);
+  if (direct && isSharedVenueFallback(direct, slug)) {
+    if (conventional) return conventional;
+    return direct;
+  }
+  if (direct) return direct;
+
   const editorial = lookupEditorialPlaceImage(slug);
   if (editorial && editorialVenueImageMatchesSlug(editorial, slug)) return editorial;
-  const conventional = inferConventionalVenueImage(slug);
-  if (conventional) return conventional;
-  return editorial;
+  if (editorial && isSharedVenueFallback(editorial, slug)) {
+    if (conventional) return conventional;
+    return editorial;
+  }
+  if (editorial) return editorial;
+  if (conventional && shouldPreferConventionalWithoutEditorial(slug)) return conventional;
+  return null;
 }
 
 export function resolveVenueHeroImage(

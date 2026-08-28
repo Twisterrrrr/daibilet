@@ -19,7 +19,7 @@ import { EventCard } from '@/components/EventCard';
 import { LandingDirectionCard } from '@/components/LandingDirectionCard.client';
 import { PageBreadcrumbBar } from '@/components/PageBreadcrumbs';
 import { RegionNearbyStrip } from '@/components/RegionNearbyStrip.client';
-import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
+import { CardSafeImage, IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import { useDayRouteState } from '@/hooks/useDayRouteState';
 import { CityDayPresetBlock } from '@/components/CityDayPresetBlock.client';
@@ -1645,8 +1645,8 @@ function CitySightsMustSeeList({
                 }`}
               >
                 <div className="relative aspect-[16/10] shrink-0 overflow-hidden bg-slate-100">
-                  {/* Hub must-see: editorial original, not -card/-thumb (those are 640px Q68 and look soft on retina). */}
-                  <SafeImage
+                  {/* Horizontal hub cards: prefer `-card.jpg` (landscape crop), then original, then thumb. */}
+                  <CardSafeImage
                     src={coverSrc}
                     alt=""
                     fill

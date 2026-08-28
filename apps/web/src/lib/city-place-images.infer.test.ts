@@ -10,11 +10,11 @@ test('Ufa hub slugs resolve to real venue stills, not cities placeholders', () =
   );
   assert.equal(
     lookupEditorialPlaceImage('ufa-park-pobedy'),
-    '/images/venues/ufa/identity-symbol.jpg',
+    '/images/venues/ufa/park-pobedy.jpg',
   );
   assert.equal(
     resolveVenueHeroImage('ufa-aibat-hallyar', '/images/cities/ufa.png'),
-    '/images/venues/ufa/identity-gastro.jpg',
+    '/images/venues/ufa/aibat-hallyar.jpg',
   );
 });
 
@@ -25,7 +25,7 @@ test('Novosibirsk hub slugs resolve unique stills and identity fallbacks', () =>
   );
   assert.equal(
     lookupEditorialPlaceImage('novosibirsk-pamyatnik-leninu'),
-    '/images/venues/novosibirsk/identity-symbol.jpg',
+    '/images/venues/novosibirsk/pamyatnik-leninu.jpg',
   );
 });
 
@@ -64,5 +64,27 @@ test('resolveVenueHeroImage drops city placeholders and generated stubs', () => 
   assert.equal(
     resolveVenueHeroImage('some-unmapped-park', '/images/venues/generated/venue-auto-abc.jpg'),
     null,
+  );
+});
+
+test('resolveVenueHeroImage keeps curated non-stem editorial filenames (NN must-see)', () => {
+  assert.equal(
+    resolveVenueHeroImage('nizhny-novgorod-gosudarstvennyy-bank', null),
+    '/images/venues/nizhny-novgorod/gosbank-nnov.jpg',
+  );
+  assert.equal(
+    resolveVenueHeroImage('nizhny-novgorod-ploschad-minina-i-pozharskogo', null),
+    '/images/venues/nizhny-novgorod/ploshchad-minina.jpg',
+  );
+});
+
+test('resolveVenueHeroImage uses conventional on-disk still for kaliningrad hub slugs', () => {
+  assert.equal(
+    resolveVenueHeroImage('kaliningrad-kafedral-nyy-sobor', null),
+    '/images/venues/kaliningrad/kafedral-nyy-sobor.jpg',
+  );
+  assert.equal(
+    resolveVenueHeroImage('kaliningrad-korolevskie-vorota', null),
+    '/images/venues/kaliningrad/korolevskie-vorota.jpg',
   );
 });
