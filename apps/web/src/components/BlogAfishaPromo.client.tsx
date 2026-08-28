@@ -8,7 +8,7 @@ import { SafeImage } from '@/components/SafeImage.client';
 import { catalogHrefWithSelectedCity } from '@/lib/catalog-url';
 import { resolveCityCardImage } from '@/lib/city-images';
 import { cityToGenitive } from '@/lib/city-declension';
-import { formatPriceFrom } from '@/lib/format';
+import { formatPriceFrom, pluralEvents } from '@/lib/format';
 import { landingCategoryHref, normalizeKnownCitySlug } from '@/lib/landing-routes';
 import {
   lookupBlogSidebarPromo,
@@ -109,8 +109,7 @@ function richMetaLine(promo: BlogSidebarPromoDto): string | null {
   const parts: string[] = [];
   const price = formatPriceFrom(promo.priceFrom);
   if (price) parts.push(price);
-  if (promo.weekendCount > 0) parts.push(`${promo.weekendCount} на выходных`);
-  else if (promo.eventsCount > 0) parts.push(`${promo.eventsCount} событий`);
+  if (promo.eventsCount > 0) parts.push(pluralEvents(promo.eventsCount));
   return parts.length ? parts.join(' · ') : null;
 }
 

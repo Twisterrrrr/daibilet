@@ -11,7 +11,7 @@ import {
   HORIZONTAL_PROMO_MIN_RATIO,
   resolveHorizontalFeedPromoImage,
 } from '@/lib/blog-promo-image';
-import { formatPriceFrom } from '@/lib/format';
+import { formatPriceFrom, pluralEvents } from '@/lib/format';
 import type { BlogSidebarPromoDto } from '@/lib/blog-sidebar-promo';
 import type { BlogFeedPromoKind, BlogFeedPromoLayout } from '@/lib/blog-feed-promo';
 
@@ -60,7 +60,7 @@ function resolveCopy(promo: BlogSidebarPromoDto, kind: BlogFeedPromoKind): Resol
         : `Готовый список в ${promo.cityName} без бесконечного скролла.`,
       href: chip.href,
       cta: 'Открыть подборку →',
-      foot: [price, promo.weekendCount > 0 ? `${promo.weekendCount} на выходных` : null].filter(
+      foot: [price, promo.eventsCount > 0 ? pluralEvents(promo.eventsCount) : null].filter(
         Boolean,
       ) as string[],
       imageSrc: src,
@@ -92,17 +92,15 @@ function resolveCopy(promo: BlogSidebarPromoDto, kind: BlogFeedPromoKind): Resol
     cityTag: promo.cityName,
     title: blogAfishaGuideTitle(promo.cityName),
     excerpt: titles.length
-      ? `${titles.join(' · ')}${promo.weekendCount > 0 ? ` · ещё даты на выходные` : ''}.`
+      ? `${titles.join(' · ')}.`
       : price
         ? `${price} · концерты и прогулки без очереди в чатах.`
         : `Живые даты в ${promo.cityName} без очереди в чатах.`,
     href: promo.href,
     cta: 'Смотреть афишу →',
-    foot: [
-      price,
-      promo.weekendCount > 0 ? `${promo.weekendCount} на выходных` : null,
-      promo.eventsCount > 0 && !promo.weekendCount ? `${promo.eventsCount} событий` : null,
-    ].filter(Boolean) as string[],
+    foot: [price, promo.eventsCount > 0 ? pluralEvents(promo.eventsCount) : null].filter(
+      Boolean,
+    ) as string[],
     imageSrc: src,
     imageFallback: cityImageUrl,
     probeEventCover: false,
