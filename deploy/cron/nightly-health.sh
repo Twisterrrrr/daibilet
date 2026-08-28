@@ -13,8 +13,10 @@ cd "$APP_DIR"
 {
   echo "=== $(date -Is) nightly health ==="
   POST_DEPLOY_PUBLIC_BASE="$PUBLIC_BASE" \
+  POST_DEPLOY_WEB_BASE="${POST_DEPLOY_WEB_BASE:-http://127.0.0.1:${DAIBILET_WEB_PORT:-3001}}" \
   POST_DEPLOY_INVARIANTS=1 \
   POST_DEPLOY_WIDGETS=1 \
-  PORT="${PORT:-4001}" \
+  POST_DEPLOY_CHECK_WEB=1 \
+  PORT="${PORT:-4000}" \
   bash scripts/post-deploy-check.sh
 } >>"$LOG_FILE" 2>&1

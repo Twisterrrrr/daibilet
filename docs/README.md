@@ -13,6 +13,14 @@
 4. **[deploy-timeweb.md](./deploy-timeweb.md)** — prod на Timeweb
 5. **[deploy-staging.md](./deploy-staging.md)** — staging `/opt/daibilet-staging`
 
+## Ops / production readiness
+
+| Документ | Описание |
+|----------|----------|
+| **[production-readiness-checklist.md](./production-readiness-checklist.md)** | Чеклист «демо vs prod» (Habr), owners, ROI |
+| **[incident-runbook.md](./incident-runbook.md)** | Быстрая диагностика и rollback MSK |
+| **[codex-prod-readiness-handoff.md](./codex-prod-readiness-handoff.md)** | CODEX: cron на prod, auth audit, backup drill |
+
 ## Checkpoint / аудит
 
 | Документ | Описание |

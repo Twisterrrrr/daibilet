@@ -1,3 +1,16 @@
+## 2026-08-28 - Production readiness (Habr checklist + ROI top-5)
+
+| ID | Задача | Приоритет | Owner | Статус |
+|---|---|---|---|---|
+| PROD.CHECKLIST | `docs/production-readiness-checklist.md` — owners + gaps | Высокий | Agent | ✅ |
+| PROD.RUNBOOK | `docs/incident-runbook.md` — MSK rollback/smoke | Высокий | Agent | ✅ |
+| PROD.WEB-TEST-CI | `pnpm web:test:ci` в CI (16 stable lib tests); full `web:test` — tech debt hub packs | Высокий | Agent | ✅ code |
+| PROD.POST-DEPLOY-WEB | post-deploy + nightly-health: Next :3001 smoke | Высокий | Agent | ✅ code |
+| PROD.GHA-SMOKE | deploy-msk-web: curl https://daibilet.ru после swap | Высокий | Agent | ✅ code |
+| PROD.NIGHTLY-CRON | Prod nightly health cron на MSK | Средний | CODEX | ⏳ [handoff](./codex-prod-readiness-handoff.md) §1 |
+| PROD.OPS-VERIFY | Verify daibilet-tasks + healthcheck scripts 755 | Средний | CODEX | ⏳ handoff §2 |
+| PROD.AUTH-AUDIT | User/account API IDOR review | Средний | CODEX | ⏳ handoff §3 |
+
 ## 2026-08-22 - Smolensk tourist hub pack
 
 | ID | Задача | Приоритет | Статус |

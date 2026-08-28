@@ -1,16 +1,15 @@
-import { describe, expect, it } from 'vitest';
+import assert from 'node:assert/strict';
+import test from 'node:test';
 
-import { catalogInterstitialInterval } from '@/lib/catalog-interstitials';
+import { catalogInterstitialInterval } from './catalog-interstitials.ts';
 
-describe('catalogInterstitialInterval', () => {
-  it('inserts after full rows (2 rows × columns)', () => {
-    expect(catalogInterstitialInterval(4)).toBe(8);
-    expect(catalogInterstitialInterval(6)).toBe(12);
-    expect(catalogInterstitialInterval(3)).toBe(6);
-  });
+test('inserts after full rows (2 rows × columns)', () => {
+  assert.equal(catalogInterstitialInterval(4), 8);
+  assert.equal(catalogInterstitialInterval(6), 12);
+  assert.equal(catalogInterstitialInterval(3), 6);
+});
 
-  it('never returns less than one row', () => {
-    expect(catalogInterstitialInterval(0)).toBe(2);
-    expect(catalogInterstitialInterval(-1)).toBe(2);
-  });
+test('never returns less than one row', () => {
+  assert.equal(catalogInterstitialInterval(0), 2);
+  assert.equal(catalogInterstitialInterval(-1), 2);
 });

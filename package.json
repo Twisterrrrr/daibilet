@@ -17,6 +17,8 @@
     "web:dev": "pnpm --filter @daibilet/web dev",
     "web:build": "pnpm generate && pnpm --filter @daibilet/web build",
     "web:typecheck": "pnpm --filter @daibilet/web typecheck",
+    "web:test": "pnpm --filter @daibilet/web test",
+    "web:test:ci": "pnpm --filter @daibilet/web test:ci",
     "typecheck": "pnpm -r --if-present typecheck",
     "build": "pnpm generate && pnpm typecheck && pnpm build:web",
     "backend:serve": "pnpm --filter @daibilet/backend dev",

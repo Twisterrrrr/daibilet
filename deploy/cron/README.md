@@ -83,11 +83,16 @@ crontab -e
 
 Лог: `/var/log/daibilet/nightly-health.log`
 
-## Prod (опционально: nightly health)
+## Prod (nightly health)
+
+Рекомендуется на prod (не только staging): API + widgets + **Next :3001** smoke.
 
 ```
-15 5 * * * APP_DIR=/opt/daibilet PUBLIC_BASE=https://daibilet.ru PORT=4000 /opt/daibilet/deploy/cron/nightly-health.sh
+15 5 * * * APP_DIR=/opt/daibilet PUBLIC_BASE=https://daibilet.ru PORT=4000 POST_DEPLOY_WEB_BASE=http://127.0.0.1:3001 /opt/daibilet/deploy/cron/nightly-health.sh
 ```
+
+Лог: `/var/log/daibilet/nightly-health.log`  
+CODEX: см. [codex-prod-readiness-handoff.md](../docs/codex-prod-readiness-handoff.md) §1.
 
 ## Parity (раз в неделю, только staging с typed stack)
 

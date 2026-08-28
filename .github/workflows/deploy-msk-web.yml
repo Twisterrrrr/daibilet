@@ -156,3 +156,14 @@ jobs:
              git checkout feat/next-monorepo && git reset --hard origin/feat/next-monorepo && \
              ARTIFACT=${REMOTE_TGZ} GIT_SHA=${DEPLOY_SHA} BRANCH=feat/next-monorepo \
              bash ./deploy/scripts/swap-web-next-artifact.sh && rm -f ${REMOTE_TGZ}"
+
+      - name: Public smoke (prod URL)
+        if: ${{ inputs.skip_swap != true }}
+        run: |
+          set -euo pipefail
+          for path in / /events /cities; do
+            code="$(curl -fsS -o /dev/null -w '%{http_code}' -H 'Cache-Control: no-cache' "https://daibilet.ru${path}")"
+            echo "${path} → ${code}"
+            test "$code" = "200"
+          done
+          curl -fsS -o /dev/null -w "api health %{http_code}\n" https://daibilet.ru/api/health
