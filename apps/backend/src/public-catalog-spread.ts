@@ -51,9 +51,9 @@ export function normalizePublicSessionImageKey(imageUrl?: string | null): string
   if (file && /\.(jpe?g|png|webp|gif|avif|bmp|svg)$/i.test(file)) {
     const stripped = file.replace(sizeSuffixRe, '');
     const oid = stripped.match(/^([a-f0-9]{24})\.(jpe?g|png|webp|gif|avif)$/i);
-    if (oid) return `tc-asset:${oid[1].toLowerCase()}`;
+    if (oid?.[1]) return `tc-asset:${oid[1].toLowerCase()}`;
     const teploVariant = stripped.match(/^([a-f0-9]{8,})-\d+\.(jpe?g|png|webp|gif|avif|bmp|svg)$/i);
-    if (teploVariant) return `stem:${teploVariant[1].toLowerCase()}`;
+    if (teploVariant?.[1]) return `stem:${teploVariant[1].toLowerCase()}`;
     return `img:${stripped}`;
   }
 
