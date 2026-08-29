@@ -41,6 +41,15 @@ elif command -v bc >/dev/null && [ -n "$TTFB" ] && (( $(echo "$TTFB > $TTFB_LIMI
 fi
 
 if [ "$BAD" -ne 1 ]; then
+  OK_HEARTBEAT_INTERVAL="${DAIBILET_API_HEALTH_OK_INTERVAL_SEC:-3600}"
+  NOW_EPOCH="$(date +%s)"
+  LOG_MTIME="$(stat -c %Y "$LOG" 2>/dev/null || echo 0)"
+  if [[ ! "$LOG_MTIME" =~ ^[0-9]+$ ]]; then
+    LOG_MTIME=0
+  fi
+  if [[ "$OK_HEARTBEAT_INTERVAL" =~ ^[0-9]+$ ]] && (( NOW_EPOCH - LOG_MTIME >= OK_HEARTBEAT_INTERVAL )); then
+    log_msg "OK heartbeat: TTFB=${TTFB:-na} curl=${CODE}"
+  fi
   exit 0
 fi
 

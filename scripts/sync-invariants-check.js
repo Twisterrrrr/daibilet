@@ -11,9 +11,18 @@ const connectionString = process.env.DATABASE_URL || "postgresql://daibilet:daib
 const TC_SOURCE = "src_ticketscloud";
 const TEP_SOURCE = "src_teplohod";
 const MISSING_FROM_CATALOG_WARN = Number(process.env.SYNC_MISSING_WARN_THRESHOLD || 50);
+const STATEMENT_TIMEOUT_MS = Number(process.env.SYNC_INVARIANTS_STATEMENT_TIMEOUT_MS || 8000);
+const QUERY_TIMEOUT_MS = Number(process.env.SYNC_INVARIANTS_QUERY_TIMEOUT_MS || STATEMENT_TIMEOUT_MS + 2000);
 
 async function main() {
-  const pool = new Pool({ connectionString, max: 2 });
+  const pool = new Pool({
+    connectionString,
+    max: 2,
+    connectionTimeoutMillis: 5000,
+    statement_timeout: STATEMENT_TIMEOUT_MS,
+    query_timeout: QUERY_TIMEOUT_MS,
+    application_name: "daibilet_sync_invariants_check",
+  });
   const client = await pool.connect();
   const checks = [];
 

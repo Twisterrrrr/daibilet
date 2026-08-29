@@ -22,7 +22,7 @@ const ETALON_SLUGS = [
     note: "TC, Санкт-Петербург",
   },
   {
-    slug: "progulka-ot-prichala-kitai-gorod-do-prichala-kievskii-826",
+    slug: "marshrut-zolotoi-ostrov-ot-prichala-tretyakovskii-298",
     provider: "TEPLOHOD",
     note: "TEP, сеансы",
   },

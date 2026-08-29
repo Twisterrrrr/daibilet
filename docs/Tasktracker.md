@@ -7,9 +7,11 @@
 | PROD.WEB-TEST-CI | `pnpm web:test:ci` в CI (16 stable lib tests); full `web:test` — tech debt hub packs | Высокий | Agent | ✅ code |
 | PROD.POST-DEPLOY-WEB | post-deploy + nightly-health: Next :3001 smoke | Высокий | Agent | ✅ code |
 | PROD.GHA-SMOKE | deploy-msk-web: curl https://daibilet.ru после swap | Высокий | Agent | ✅ code |
-| PROD.NIGHTLY-CRON | Prod nightly health cron на MSK | Средний | CODEX | ⏳ [handoff](./codex-prod-readiness-handoff.md) §1 |
-| PROD.OPS-VERIFY | Verify daibilet-tasks + healthcheck scripts 755 | Средний | CODEX | ⏳ handoff §2 |
-| PROD.AUTH-AUDIT | User/account API IDOR review | Средний | CODEX | ⏳ handoff §3 |
+| PROD.NIGHTLY-CRON | Prod nightly health cron на MSK | Средний | CODEX | ✅ 2026-08-29: cron installed, manual run `Post-deploy check OK` |
+| PROD.OPS-VERIFY | Verify daibilet-tasks + healthcheck scripts 755 | Средний | CODEX | ✅ 2026-08-29: scripts 755, cron 644+newline, SSR/API OK heartbeat |
+| PROD.AUTH-AUDIT | User/account API IDOR review | Средний | CODEX | ✅ 2026-08-29: no Critical/High; SQL-filter hardening later |
+| PROD.PARITY-CRON | Staging parity cron/log freshness | Низкий | CODEX | 🟡 2026-08-29: staging off, `/opt/daibilet-staging` missing |
+| PROD.POSTGRES-BACKUP | Draft Postgres backup/restore runbook, no restore drill | Средний | CODEX | 🟡 2026-08-29: [postgres-backup.md](./postgres-backup.md), DB cron not installed |
 
 ## 2026-08-22 - Smolensk tourist hub pack
 
