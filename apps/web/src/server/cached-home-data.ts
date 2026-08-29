@@ -23,7 +23,7 @@ type HomePageData = {
   landingsCatalog: { generatedAt?: string; city?: string; items: PublicLandingDto[] };
 };
 
-type HomeArticlesPayload = { articles?: unknown };
+type HomeArticlesPayload = { articles?: unknown } | null;
 
 function emptyHomePageData(): HomePageData {
   const generatedAt = new Date().toISOString();
@@ -99,11 +99,17 @@ export const getHomeLandings = unstable_cache(
  * route to private/no-store and disables nginx ISR HIT for Yandex/crawlers.
  */
 export const getHomeArticles = unstable_cache(
-  () =>
-    fetchPublicApiJson<HomeArticlesPayload>('/api/public/articles', {
-      timeoutMs: 1_200,
-    }),
-  ['home-articles-v1-http'],
+  async () => {
+    try {
+      return await fetchPublicApiJson<Exclude<HomeArticlesPayload, null>>('/api/public/articles', {
+        searchParams: { limit: 20 },
+        timeoutMs: 1_200,
+      });
+    } catch {
+      return null;
+    }
+  },
+  ['home-articles-v2-http'],
   homeCacheOptions,
 );
 
