@@ -2870,6 +2870,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | O.1 | `qa.md` — открытые архитектурные вопросы | Низкий | ⏳ |
 | O.2 | Staging DB отдельно от prod | Средний | ⏳ |
 | O.3 | Automated browser smoke (Playwright) для 0.2 | Средний | ⏳ |
+| O.4 | MSK SSH hardening: deploy-only login, fail2ban ssh.service, GitHub deploy key | Высокий | 🟡 root closed; GitHub key pending owner |
 
 ---
 
@@ -2878,6 +2879,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | Дата | Изменение |
 |------|-----------|
 | 2026-08-09 | **Finance contour status (owner):** Stage 0 code **live on `.159`**; единственный runtime gate = sandbox pay → CONFIRMED + ticketNumbers; webhook canon URL LOCKED, register/verify cabinet reopen (свёртка «cabinet DONE»); roadmap buyer/operator/supplier/refunds light/live gates в qa; M1.*/FIN.W1/MIG.9.5 sync; **без** finance/MSK deploy |
+| 2026-08-30 | **MSK SSH hardening:** `deploy` alias works with sudo; `PermitRootLogin no`; password/kbdinteractive auth off; fail2ban sshd jail now reads `ssh.service`; deploy GitHub host key added; repo deploy key generated and waits for owner to add it to GitHub Deploy keys; residual banner-exchange timeout likely provider/network noise |
 | 2026-08-09 | **QA locks docs:** editorial/route/finance/publicCode/CI secrets; Catalog Worker 504.5c canon in deploy/ + Redis 504.5d deferred (MSK Redis нет); Buyer refunds Stage 2+ LOCKED out of Stage 0; nginx split example + yookassa e2e checklist; FIN.W1/M1.WH e2e ⏳; **без** MSK/finance/Redis deploy |
 | 2026-08-08 | **M1 taxonomy ✅ docs** - owner lock: Supplier ≠ museum-only; Stage 0 = OPEN_DATE (музей/арт); Stage 1 = events/sessions; readiness + M1.* + qa + Diary + Project one-liner; Codex brief updated; docs-only no web deploy |
 | 2026-08-07 | **M1.* epic ✅ docs** - [museum-contract-readiness.md](./museum-contract-readiness.md): роли/функции, Stage 0 Codex brief (pay/webhook/reconcile/ticket issuance/supplier LC), Stage 1 schedule + Stage 2 full LK outlines; Tasktracker M1.*; qa Museum-1 questions; docs-only no web deploy |

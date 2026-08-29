@@ -19720,3 +19720,26 @@ evalidateNextBlogArticle (/blog, slug, city hub).
 - ╨Я╨╛╨╗╨╜╤Л╨╣ typecheck/build ╨▓ ╤Н╤В╨╛╨╝ workspace ╨╜╨╡ ╨┐╤А╨╛╨│╨╛╨╜╤П╨╗╨╕ (╨╗╨╛╨║╨░╨╗╤М╨╜╤Л╨╣ pnpm/node_modules ╨╝╨╛╨╢╨╡╤В ╨▒╤Л╤В╤М ╨▒╨╕╤В╤Л╨╣). Smoke `region-hub.test.ts` ╨╕ MSK deploy - ╨┐╨╛╤Б╨╗╨╡ commit.
 
 
+
+---
+
+## 2026-08-30 - MSK SSH hardening and prod health follow-up
+
+### Observations
+- `daibilet-msk` connects as `deploy`; `sudo -n true` passes.
+- Effective SSH config: `PermitRootLogin no`, password auth off, keyboard-interactive auth off, public key auth on, `UseDNS no`, `MaxStartups 30:30:100`, `MaxSessions 20`.
+- Root login probes now return `Permission denied (publickey)` when SSH banner is served. Intermittent `banner exchange timeout` still appears and looks like provider/network noise under unsolicited SSH traffic.
+- `fail2ban` was active but initially watched `sshd.service`; on this host SSH logs are under `ssh.service`.
+- Prod health cron is installed; SSR/API hourly heartbeats are fresh. Nightly health exits with `Post-deploy check OK`, with known non-strict invariant debt.
+- `daibilet-web` runs close to `MemoryHigh=1500Mi`; swap alerts still appear, so Next memory pressure remains a watch item.
+
+### Decisions
+- Added `/etc/ssh/sshd_config.d/99-daibilet-hardening.conf` and normalized active `PermitRootLogin` entries to `no` after backup files were created.
+- Added `/etc/fail2ban/jail.d/daibilet-sshd.local` with `journalmatch = _SYSTEMD_UNIT=ssh.service + _COMM=sshd`.
+- Added GitHub ED25519 host key to deploy user's `known_hosts` after fingerprint verification.
+- Generated a dedicated read-only GitHub deploy key candidate for `deploy@MSK`; owner must add the public key in GitHub repository Deploy keys before `deploy` can `git fetch`.
+
+### Follow-ups
+- Add the generated public deploy key to GitHub Deploy keys for `Twisterrrrr/daibilet` with read-only access.
+- Ask Timeweb if banner exchange timeouts persist after root closure/fail2ban: include timestamps and note that application HTTP is healthy while TCP/SSH banner intermittently times out.
+- Do not align `/opt/daibilet` with GitHub using `reset --hard` until generated files/dirty server worktree are explicitly reviewed or deployment procedure owns the cleanup.
