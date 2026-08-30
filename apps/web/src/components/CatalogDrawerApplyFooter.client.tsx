@@ -33,7 +33,7 @@ export function CatalogDrawerApplyFooter({
       type="button"
       disabled={disabled || loading || total === 0}
       onClick={onApply}
-      className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-primary text-sm font-semibold text-white transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+      className="inline-btn inline-flex h-12 w-full items-center justify-center rounded-xl bg-primary text-sm font-semibold text-white transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
     >
       {label}
     </button>

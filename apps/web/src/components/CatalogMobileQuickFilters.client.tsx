@@ -285,7 +285,7 @@ export function CatalogMobileQuickFilters({
         <button
           type="submit"
           disabled={disabled}
-          className="inline-btn h-10 w-full rounded-xl bg-primary-600 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-60"
+          className="inline-btn inline-flex h-11 w-full items-center justify-center rounded-xl bg-primary-600 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-60"
         >
           Применить
         </button>

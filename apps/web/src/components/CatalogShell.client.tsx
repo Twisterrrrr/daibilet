@@ -449,7 +449,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
           <div
             role="radiogroup"
             aria-label="Событий на странице"
-            className="hidden items-center gap-0.5 rounded-lg bg-slate-100 p-0.5 sm:inline-flex"
+            className="catalog-page-size-toggle hidden items-center gap-0.5 rounded-lg bg-slate-100 p-0.5 sm:inline-flex"
           >
             {CATALOG_PAGE_SIZES.map((size) => {
               const active = (filterValues.limit || CATALOG_PAGE_SIZE_DEFAULT) === size;
@@ -470,7 +470,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
                       }),
                     );
                   }}
-                  className={`inline-btn h-7 min-w-[2.5rem] rounded-md px-2 text-xs font-semibold tabular-nums transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 disabled:opacity-60 ${
+                  className={`inline-btn inline-flex h-7 min-w-[2.75rem] items-center justify-center rounded-md px-2 text-xs font-semibold tabular-nums leading-none transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 disabled:opacity-60 ${
                     active
                       ? 'bg-white text-slate-900 shadow-sm'
                       : 'text-slate-600 hover:text-slate-900'

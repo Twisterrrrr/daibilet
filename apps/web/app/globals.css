@@ -1221,6 +1221,10 @@ html[data-nav-pending='1'] {
     width: 100%;
   }
 
+  .catalog-page-size-toggle button {
+    min-height: 0;
+  }
+
   .catalog-price-range__inputs {
     @apply mb-4 flex items-center gap-3;
   }

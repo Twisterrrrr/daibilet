@@ -66,22 +66,22 @@ export function EventsCatalogHero() {
           ...(category ? [{ label: category }] : []),
         ]}
       />
-      <h1 className="sr-only">{title}</h1>
-      <header className="hidden border-b border-slate-100 bg-white sm:block">
-        <div className="container-page py-2 sm:py-5">
-          <div className="min-w-0 max-w-3xl">
-            <p className="text-sm leading-snug text-graphite-muted sm:mt-1 sm:text-[15px]">
-              {subtitle ?? (
-                <>
-                  Билеты на экскурсии, концерты и музеи
-                  <br />
-                  более чем в 100 городах России.
-                </>
-              )}
-            </p>
-          </div>
+      <div className="border-b border-slate-100 bg-white max-sm:border-0 max-sm:bg-transparent">
+        <div className="container-page sm:py-5">
+          <h1 className="max-sm:sr-only font-display text-2xl font-bold tracking-tight text-graphite sm:text-3xl">
+            {title}
+          </h1>
+          <p className="hidden text-sm leading-snug text-graphite-muted sm:mt-1 sm:block sm:text-[15px]">
+            {subtitle ?? (
+              <>
+                Билеты на экскурсии, концерты и музеи
+                <br />
+                более чем в 100 городах России.
+              </>
+            )}
+          </p>
         </div>
-      </header>
+      </div>
     </>
   );
 }
