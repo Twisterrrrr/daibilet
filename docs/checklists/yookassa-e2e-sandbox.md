@@ -4,7 +4,7 @@
 
 **Статус Tasktracker:** чек-лист готов; прогон трёх сценариев - ⏳ (FIN.W1 / MIG.9.5 / M1.WH).
 
-**Жёстко:** не трогать live secrets; не apply nginx на finance `.159` без явного запроса owner. Webhook canon: `https://finance-api.daibilet.ru/api/checkout/yookassa/webhook`. Path A result: `?order={publicCode}` (см. [qa.md](../qa.md)).
+**Жёстко:** не трогать live secrets; не apply nginx на finance `.159` без явного запроса owner. Webhook canon: `https://finance-api.daibilet.ru/api/checkout/yookassa/webhook`. Path A result: `?order={publicCode}` (см. [qa.md](../qa.md)). **Пошаговый owner runbook:** [finance-stage0-owner-runbook.md](../finance-stage0-owner-runbook.md).
 
 ---
 

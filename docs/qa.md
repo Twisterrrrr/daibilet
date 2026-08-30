@@ -153,7 +153,7 @@ Finance PR-ветка `codex/stage0-admission-ticket-core` может держа
 
 **Блокер:** ручная sandbox-оплата / доставка confirm (агент **не** трогает `.159` / secrets). Wide CTA и Path B calc **не** входят в closeout.
 
-**Следующий техшаг:** завершить sandbox payment на уже задеплоенном коде → подтвердить `CONFIRMED` + ticketNumbers + reopen buyer card без localStorage → закрыть Stage 0 closeout в Tasktracker/Diary.
+**Следующий техшаг:** завершить sandbox payment на уже задеплоенном коде → подтвердить `CONFIRMED` + ticketNumbers + reopen buyer card без localStorage → закрыть Stage 0 closeout в Tasktracker/Diary. **Owner runbook:** [finance-stage0-owner-runbook.md](./finance-stage0-owner-runbook.md).
 
 ### 2. YooKassa webhook canon - register / verify (owner gate)
 
