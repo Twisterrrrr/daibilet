@@ -35,7 +35,7 @@ import { buildCityPageJsonLd } from '@/lib/structured-data';
 import {
   getCachedCityHubArticles,
   listTopCitySlugsForSsg,
-  loadCityDtoOrNull,
+  loadCityDto,
 } from '@/server/cached-city-data';
 import { loadCityAdmissionBlock } from '@/server/finance-projection-client';
 
@@ -88,17 +88,18 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  let payload: Awaited<ReturnType<typeof loadCityDtoOrNull>> = null;
-  try {
-    payload = await loadCityDtoOrNull(decodeURIComponent(slug));
-  } catch {
-    payload = null;
-  }
-  if (!payload?.city) {
-    // noStore()+notFound() on ISR → DYNAMIC_SERVER_USAGE HTTP 500. Null DTO uncached (v5).
+  const loaded = await loadCityDto(decodeURIComponent(slug));
+  if (loaded.kind === 'miss') {
     safeNotFound();
   }
+  if (loaded.kind === 'unavailable') {
+    return {
+      title: pageTitle('Город временно недоступен'),
+      robots: { index: false, follow: false },
+    };
+  }
 
+  const payload = loaded.payload;
   const city = payload.city;
   const path = city.canonicalPath || `/cities/${city.slug}`;
 
@@ -184,22 +185,21 @@ export default async function CityPage({ params }: PageProps) {
   const decodedSlug = decodeURIComponent(slug);
 
   const cityStartedAt = Date.now();
-  // City DTO first - never start no-store secondary fetches before miss→notFound
-  // (static-to-dynamic + notFound → HTTP 500 on ISR).
-  let payload: Awaited<ReturnType<typeof loadCityDtoOrNull>> = null;
-  try {
-    payload = await loadCityDtoOrNull(decodedSlug);
-  } catch {
-    payload = null;
-  }
+  const loaded = await loadCityDto(decodedSlug);
   cityPerfMark('city-dto', cityStartedAt, {
-    sessions: payload?.sessions?.length ?? 0,
-    venues: payload?.venues?.length ?? 0,
-    landings: payload?.landings?.length ?? 0,
+    kind: loaded.kind,
+    sessions: loaded.kind === 'ok' ? loaded.payload.sessions?.length ?? 0 : 0,
+    venues: loaded.kind === 'ok' ? loaded.payload.venues?.length ?? 0 : 0,
+    landings: loaded.kind === 'ok' ? loaded.payload.landings?.length ?? 0 : 0,
   });
-  if (!payload?.city) {
+  if (loaded.kind === 'miss') {
     safeNotFound();
   }
+  if (loaded.kind === 'unavailable') {
+    return <CityUnavailablePage slug={decodedSlug} />;
+  }
+
+  const payload = loaded.payload;
 
   if (payload.city.type === 'region') {
     const jsonLdBlocks = buildCityPageJsonLd(payload);
@@ -281,6 +281,23 @@ export default async function CityPage({ params }: PageProps) {
         />
       </SiteLayout>
     </>
+  );
+}
+
+function CityUnavailablePage({ slug }: { slug: string }) {
+  return (
+    <SiteLayout>
+      <main className="container-page py-16">
+        <h1 className="font-display text-2xl font-bold text-slate-900 sm:text-3xl">
+          Город временно недоступен
+        </h1>
+        <p className="mt-3 max-w-xl text-sm leading-relaxed text-slate-600 sm:text-base">
+          Не удалось загрузить афишу для <span className="font-medium text-slate-800">{slug}</span>.
+          Обновите страницу через минуту — данные могли не успеть подгрузиться после перезапуска
+          сервиса.
+        </p>
+      </main>
+    </SiteLayout>
   );
 }
 

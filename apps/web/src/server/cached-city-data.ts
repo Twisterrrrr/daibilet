@@ -20,6 +20,11 @@ type PublicCityPagePayload = PublicCityPageDto & {
   };
 };
 
+export type CityDtoLoad =
+  | { kind: 'ok'; payload: PublicCityPagePayload }
+  | { kind: 'miss' }
+  | { kind: 'unavailable' };
+
 type PublicArticlesListPayload = {
   generatedAt?: string;
   articles?: BlogCardDto[];
@@ -59,7 +64,8 @@ export async function getCachedPublicCityDto(slug: string) {
       const payload = await fetchPublicApiJson<PublicCityPagePayload | null>(
         `/api/public/cities/${encodeURIComponent(key)}`,
         {
-          timeoutMs: 5_000,
+          // Cold city DTO (SPB) can exceed 5s after API restart; align with venue hub.
+          timeoutMs: 8_000,
           notFoundAsNull: true,
           revalidateSeconds: PUBLIC_PAGE_REVALIDATE,
         },
@@ -67,7 +73,7 @@ export async function getCachedPublicCityDto(slug: string) {
       if (!payload?.city) throw new CityDtoMissError(key);
       return payload;
     },
-    ['public-city-dto-v6-isr-fetch', key],
+    ['public-city-dto-v7-isr-fetch', key],
     cityCacheOptions,
   );
 
@@ -76,7 +82,7 @@ export async function getCachedPublicCityDto(slug: string) {
   } catch (error) {
     // Soft-miss must NEVER become HTTP 500. Next unstable_cache often wraps the throw so
     // instanceof / exact message checks fail - treat any cache-fn failure as miss and let
-    // loadCityDtoOrNull retry uncached once.
+    // loadCityDto map transient throws to unavailable (not notFound HTML poison).
     const msg = error instanceof Error ? error.message : String(error);
     if (error instanceof CityDtoMissError || msg.includes('city_dto_miss:')) return null;
     // Transient errors must not become null→notFound HTML poison (same class as venues).
@@ -89,17 +95,25 @@ export async function getCachedPublicCityDto(slug: string) {
  * Prefer cached DTO. Do not uncached-fetch on miss during ISR:
  * `fetchPublicApiJson` uses `cache: 'no-store'` and outside `unstable_cache` that throws
  * DYNAMIC_SERVER_USAGE → HTTP 500 on revalidate routes.
- * Callers must safeNotFound() on null (never noStore()+notFound() on ISR).
+ * True miss → safeNotFound(); transient API errors → soft unavailable UI (venues parity).
  */
-export async function loadCityDtoOrNull(slug: string): Promise<PublicCityPagePayload | null> {
+export async function loadCityDto(slug: string): Promise<CityDtoLoad> {
   const key = normalizeCitySlug(slug);
-  if (!key) return null;
+  if (!key) return { kind: 'miss' };
+
   try {
     const cached = await getCachedPublicCityDto(key);
-    return cached?.city ? cached : null;
+    if (cached?.city) return { kind: 'ok', payload: cached };
+    return { kind: 'miss' };
   } catch {
-    return null;
+    return { kind: 'unavailable' };
   }
+}
+
+/** @deprecated Use loadCityDto — null conflated miss with transient errors. */
+export async function loadCityDtoOrNull(slug: string): Promise<PublicCityPagePayload | null> {
+  const loaded = await loadCityDto(slug);
+  return loaded.kind === 'ok' ? loaded.payload : null;
 }
 
 /** City-hub related articles; same TTL/tag as city DTO. */
