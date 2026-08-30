@@ -221,7 +221,7 @@ WEB_NEXT_DIR="apps/web/.next"
 WEB_NEXT_PREV="apps/web/.next.prev"
 # Keep last healthy build for rollback if web:build fails mid-SSG.
 if [[ -f "${WEB_NEXT_DIR}/prerender-manifest.json" && -f "${WEB_NEXT_DIR}/BUILD_ID" ]]; then
-  rm -rf "${WEB_NEXT_PREV}"
+  rm_rf_deploy "${WEB_NEXT_PREV}"
   cp -a "${WEB_NEXT_DIR}" "${WEB_NEXT_PREV}"
   echo "Saved healthy .next → .next.prev (BUILD_ID=$(cat "${WEB_NEXT_DIR}/BUILD_ID"))"
 fi
@@ -241,7 +241,7 @@ set -e
 if [[ "${BUILD_RC}" -ne 0 ]]; then
   echo "web:build FAILED (rc=${BUILD_RC}) — attempting restore from .next.prev"
   if [[ -f "${WEB_NEXT_PREV}/prerender-manifest.json" && -f "${WEB_NEXT_PREV}/BUILD_ID" ]]; then
-    rm -rf "${WEB_NEXT_DIR}"
+    rm_rf_deploy "${WEB_NEXT_DIR}"
     cp -a "${WEB_NEXT_PREV}" "${WEB_NEXT_DIR}"
     echo "Restored .next from .next.prev (BUILD_ID=$(cat "${WEB_NEXT_DIR}/BUILD_ID"))"
     if systemctl_deploy is-enabled --quiet "$WEB_SERVICE" 2>/dev/null; then
@@ -256,13 +256,13 @@ fi
 
 reap_orphan_next_build_workers "post-build"
 
-rm -rf apps/web/.next/cache
+rm_rf_deploy apps/web/.next/cache
 echo "Cleared apps/web/.next/cache"
 
 if [[ ! -f "${WEB_NEXT_DIR}/prerender-manifest.json" || ! -f "${WEB_NEXT_DIR}/BUILD_ID" ]]; then
   echo "ERROR: post-build .next incomplete (missing prerender-manifest or BUILD_ID)"
   if [[ -f "${WEB_NEXT_PREV}/prerender-manifest.json" && -f "${WEB_NEXT_PREV}/BUILD_ID" ]]; then
-    rm -rf "${WEB_NEXT_DIR}"
+    rm_rf_deploy "${WEB_NEXT_DIR}"
     cp -a "${WEB_NEXT_PREV}" "${WEB_NEXT_DIR}"
     echo "Restored .next from .next.prev (BUILD_ID=$(cat "${WEB_NEXT_DIR}/BUILD_ID"))"
   else
@@ -301,8 +301,8 @@ fi
 # F4.6 nginx: admin.daibilet.ru → Next only (no /legacy)
 if [[ "$APPLY_ADMIN_NGINX_PATCH" == "1" && -f "$APP_DIR/deploy/nginx/patch-prod-admin-next.py" ]]; then
   if python3 "$APP_DIR/deploy/nginx/patch-prod-admin-next.py"; then
-    if nginx -t 2>/dev/null; then
-      systemctl reload nginx && echo "nginx reloaded (admin Next-only, no /legacy)"
+    if nginx_deploy -t 2>/dev/null; then
+      systemctl_deploy reload nginx && echo "nginx reloaded (admin Next-only, no /legacy)"
     else
       echo "Warning: nginx -t failed after admin patch — not reloading"
     fi
@@ -324,8 +324,8 @@ for _patch in patch-prod-nginx-images-static.py patch-prod-nginx-next-static.py;
   fi
 done
 if [[ "$NGINX_STATIC_PATCHED" == "1" ]]; then
-  if nginx -t 2>/dev/null; then
-    systemctl reload nginx && echo "nginx reloaded (/images + /_next/static alias)"
+  if nginx_deploy -t 2>/dev/null; then
+    systemctl_deploy reload nginx && echo "nginx reloaded (/images + /_next/static alias)"
   else
     echo "Warning: nginx -t failed after static alias patch — not reloading"
   fi
@@ -354,16 +354,13 @@ fi
 # Drop nginx HTML proxy cache so browsers don't get pre-deploy RSC/HTML pointing at deleted chunks.
 # Reload first so old workers stop writing to cache paths, then clear, then reload again.
 # Clearing cache while workers are active causes mkdir/unlink crit errors and HTTP/2 protocol errors.
-mkdir -p /var/cache/nginx/daibilet
-chown www-data:www-data /var/cache/nginx/daibilet
 if [[ -d /var/cache/nginx/daibilet ]]; then
-  if nginx -t 2>/dev/null; then
-    systemctl reload nginx && sleep 1
+  if nginx_deploy -t 2>/dev/null; then
+    systemctl_deploy reload nginx && sleep 1
   fi
-  rm -rf /var/cache/nginx/daibilet/* || true
-  echo "Cleared nginx proxy cache /var/cache/nginx/daibilet"
-  if nginx -t 2>/dev/null; then
-    systemctl reload nginx && echo "nginx reloaded after proxy cache clear"
+  purge_nginx_proxy_cache
+  if nginx_deploy -t 2>/dev/null; then
+    systemctl_deploy reload nginx && echo "nginx reloaded after proxy cache clear"
   fi
 fi
 

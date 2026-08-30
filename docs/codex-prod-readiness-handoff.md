@@ -30,12 +30,20 @@ Owner мог не установить cron после drill.
 ssh deploy@201.24.125.184
 cd /opt/daibilet && git pull origin feat/next-monorepo
 
-# если нет — установить
+# Если cron не установлен, owner/root запускает one-time install.
+# Не расширять sudoers ради ls/tail/cat.
 sudo bash deploy/scripts/install-postgres-backup-cron.sh
 
-cat /etc/cron.d/daibilet-postgres-backup
-ls -lh /var/backups/daibilet/postgres/LATEST.dump
-tail -5 /var/log/daibilet/postgres-backup.log 2>/dev/null || echo "log after first cron run"
+test -r /etc/cron.d/daibilet-postgres-backup \
+  && sed -n '1,80p' /etc/cron.d/daibilet-postgres-backup \
+  || echo "cron file is missing or not readable by deploy"
+
+readlink -f /var/backups/daibilet/postgres/LATEST.dump 2>/dev/null \
+  || echo "LATEST.dump is missing or not readable by deploy"
+
+test -r /var/log/daibilet/postgres-backup.log \
+  && awk 'END { print }' /var/log/daibilet/postgres-backup.log \
+  || sudo journalctl -u cron --since "24 hours ago" --no-pager | grep -E "postgres-backup|daibilet" || true
 ```
 
 **Acceptance:**
@@ -51,7 +59,8 @@ tail -5 /var/log/daibilet/postgres-backup.log 2>/dev/null || echo "log after fir
 
 ```bash
 # на MSK
-ls -la /opt/daibilet/var/lock/
+stat -c '%A %U:%G %n' /opt/daibilet/var /opt/daibilet/var/lock
+touch /opt/daibilet/var/lock/.deploy-write-test && rm -f /opt/daibilet/var/lock/.deploy-write-test
 # deploy user must write here (not /var/lock/)
 
 # trigger или проверить последний run
@@ -139,8 +148,8 @@ Handoff: docs/codex-prod-readiness-handoff.md
 
 1) POSTGRES CRON VERIFY
    - git pull feat/next-monorepo
-   - если нет /etc/cron.d/daibilet-postgres-backup → sudo bash deploy/scripts/install-postgres-backup-cron.sh
-   - проверь LATEST.dump, залогируй в Diary
+   - если нет /etc/cron.d/daibilet-postgres-backup → owner/root запускает deploy/scripts/install-postgres-backup-cron.sh
+   - проверь cron/LATEST.dump через sed/readlink/stat без sudo ls/tail, залогируй в Diary
 
 2) GHA DEPLOY MSK WEB
    - проверь последний workflow deploy-msk-web.yml (swap lock в /opt/daibilet/var/lock/)

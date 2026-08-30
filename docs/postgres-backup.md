@@ -36,8 +36,8 @@ sudo bash deploy/scripts/install-postgres-backup-cron.sh
 
 ```bash
 sudo APP_DIR=/opt/daibilet /opt/daibilet/deploy/cron/postgres-backup.sh
-ls -lh /var/backups/daibilet/postgres/
 readlink -f /var/backups/daibilet/postgres/LATEST.dump
+find /var/backups/daibilet/postgres -maxdepth 1 -type f -name 'daibilet-*.dump' -printf '%TY-%Tm-%Td %TH:%TM %s %p\n' | sort
 ```
 
 Expected dump size: tens to low hundreds of MB (DB ~2.3G on disk includes indexes/WAL overhead; logical dump is smaller).
@@ -51,7 +51,7 @@ Does **not** stop prod API. Creates/uses staging container only.
 ```bash
 cd /opt/daibilet
 sudo CONFIRM=restore-drill deploy/scripts/postgres-restore-drill.sh
-tail -20 /var/log/daibilet/postgres-restore-drill.log
+awk '/DRILL OK/ { line = $0 } END { print line }' /var/log/daibilet/postgres-restore-drill.log
 ```
 
 Success line: `DRILL OK` and matching `events,venues,orders` vs prod.

@@ -24,7 +24,7 @@ curl -fsS http://127.0.0.1:4000/api/health && echo OK api
 curl -fsS -o /dev/null -w "home %{http_code} ttfb=%{time_starttransfer}\n" https://daibilet.ru/
 
 # Ошибки за час
-journalctl -u daibilet-web -u daibilet-api -p err --since '1 hour ago' --no-pager | tail -80
+journalctl -u daibilet-web -u daibilet-api -p err --since '1 hour ago' --no-pager -n 80
 
 # Deploy marker (mid-deploy — не рестартить вручную)
 cat /var/lock/daibilet-web-deploy.active 2>/dev/null || echo "no active deploy"
@@ -56,12 +56,13 @@ curl -fsS http://127.0.0.1:3001/api/health
 
 ```bash
 cd /opt/daibilet
-sudo systemctl stop daibilet-web
+source deploy/scripts/deploy-runtime.sh
+systemctl_deploy stop daibilet-web
 if [[ -d apps/web/.next.prev ]]; then
-  rm -rf apps/web/.next
+  rm_rf_deploy apps/web/.next
   mv apps/web/.next.prev apps/web/.next
 fi
-sudo systemctl start daibilet-web
+systemctl_deploy start daibilet-web
 ```
 
 Или redeploy предыдущего SHA через GitHub Actions → Deploy MSK web → ref = `<short-sha>`.
@@ -119,8 +120,11 @@ Verify: `bash deploy/scripts/verify-tc-catalog-sync.sh`
 После bad deploy swap script чистит `/var/cache/nginx/daibilet/*`. Вручную:
 
 ```bash
-sudo rm -rf /var/cache/nginx/daibilet/*
-sudo systemctl reload nginx
+cd /opt/daibilet
+source deploy/scripts/deploy-runtime.sh
+nginx_deploy -t && systemctl_deploy reload nginx && sleep 1
+purge_nginx_proxy_cache
+nginx_deploy -t && systemctl_deploy reload nginx
 ```
 
 ---

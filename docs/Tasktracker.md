@@ -8,7 +8,7 @@
 | PROD.POST-DEPLOY-WEB | post-deploy + nightly-health: Next :3001 smoke | Высокий | Agent | ✅ code |
 | PROD.GHA-SMOKE | deploy-msk-web: curl https://daibilet.ru после swap | Высокий | Agent | ✅ code |
 | PROD.NIGHTLY-CRON | Prod nightly health cron на MSK | Средний | CODEX | ✅ 2026-08-29: cron installed, manual run `Post-deploy check OK` |
-| PROD.OPS-VERIFY | Verify daibilet-tasks + healthcheck scripts 755 | Средний | CODEX | ✅ 2026-08-29: scripts 755, cron 644+newline, SSR/API OK heartbeat |
+| PROD.OPS-VERIFY | Verify daibilet-tasks + healthcheck scripts 755 | Средний | CODEX | ✅ 2026-08-29: scripts 755, cron 644+newline, SSR/API OK heartbeat; 2026-08-30: deploy helpers aligned with restricted sudo |
 | PROD.AUTH-AUDIT | User/account API IDOR review | Средний | CODEX | ✅ 2026-08-29: no Critical/High; SQL-filter hardening later |
 | PROD.PARITY-CRON | Staging parity cron/log freshness | Низкий | CODEX | 🟡 2026-08-29: staging off, `/opt/daibilet-staging` missing |
 | PROD.POSTGRES-BACKUP | Postgres pg_dump cron + restore drill on MSK | Средний | CODEX | ✅ 2026-08-30: drill OK 62M dump; cron install via `install-postgres-backup-cron.sh` pending verify |

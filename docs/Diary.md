@@ -1,3 +1,27 @@
+## 2026-08-30 - MSK prod readiness: restricted sudo deploy hardening
+
+### Наблюдения
+- Cursor закрыл большой хвост prod readiness: city unavailable soft-state, widget smoke fallback, GHA artifact swap, Postgres backup/drill и handoff.
+- В `deploy/scripts/deploy-runtime.sh` оставался хрупкий паттерн `sudo -n true` перед `sudo systemctl`: при узком sudoers `true` может быть запрещён, хотя `systemctl` разрешён.
+- В `deploy/scripts/deploy-prod-next.sh` часть nginx reload/cache purge шла прямыми `nginx -t`, `systemctl reload nginx`, `chown`, `rm -rf`, что расходилось с моделью `deploy@` + least privilege.
+- В handoff/runbook были команды `ls/tail` там, где для `deploy` лучше использовать `sed/readlink/stat/journalctl`.
+
+### Решения
+- `systemctl_deploy` теперь вызывает разрешённый `systemctl` напрямую через `sudo -n <absolute-bin>`, без проверки через `sudo -n true`.
+- Добавлен `nginx_deploy` и переведены nginx reload/test участки deploy script на общие helpers.
+- In-place cleanup `.next` / `.next.prev` / `.next/cache` переведён на `rm_rf_deploy`; nginx proxy cache purge оставлен как best-effort fallback.
+- `codex-prod-readiness-handoff`, `incident-runbook`, `postgres-backup` очищены от небезопасных диагностических паттернов `sudo tail/ls`.
+
+### Проверки
+- `bash -n` через Git Bash: deploy runtime/prod/swap + Postgres backup/drill scripts OK.
+- `git diff --check` OK.
+- `node --check scripts/widget-readiness-check.mjs` OK.
+
+### Проблемы
+- `sudo rm` остаётся fallback только для удаления service-owned cache; идеальный следующий шаг — отдельный узкий cleanup unit или права на app/cache через группу, без выдачи широкого `rm` в sudoers.
+
+---
+
 ## 2026-08-29 - MSK prod readiness: nightly health, recovery, auth audit
 
 ### Наблюдения
