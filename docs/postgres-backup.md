@@ -1,112 +1,109 @@
 # Postgres backup and restore runbook
 
-Date: 2026-08-29
+Date: 2026-08-30
 
 ## Scope
 
-This runbook covers the MSK catalog production host `201.24.125.184` only.
-Do not run destructive restore commands on production. Restore drills must target
-staging or a disposable database/container.
+MSK catalog production host `201.24.125.184` only.
+**Never** restore a dump into prod `daibilet-tours-postgres` / `:5437`.
+Restore drills use isolated staging Postgres on `127.0.0.1:5438`.
 
-## Current production state
+## Scripts (repo)
 
-- App directory: `/opt/daibilet`.
-- Postgres runs in Docker container `daibilet-tours-postgres`.
-- Image: `postgres:17-alpine`.
-- Host port: `5437`.
-- Database/user from compose: `daibilet` / `daibilet`.
-- Docker volume: `daibilet_daibilet-postgres-data` mounted to `/var/lib/postgresql/data`.
-- Existing app backup artifact found: `/var/backups/daibilet/next-backup-20260730-162111.tgz`.
-- No active `pg_dump` cron was found in `/etc/cron.d/` or root crontab during the 2026-08-29 audit.
-- `/opt/daibilet-staging` is currently absent, so staging restore parity is not active.
+| Script | Purpose |
+|--------|---------|
+| [deploy/cron/postgres-backup.sh](../deploy/cron/postgres-backup.sh) | Daily `pg_dump` (custom format), verify, retention |
+| [deploy/scripts/postgres-restore-drill.sh](../deploy/scripts/postgres-restore-drill.sh) | Restore latest dump → staging + count parity |
+| [deploy/scripts/install-postgres-backup-cron.sh](../deploy/scripts/install-postgres-backup-cron.sh) | One-time install `/etc/cron.d/daibilet-postgres-backup` |
+| [deploy/scripts/restore-staging-db.sh](../deploy/scripts/restore-staging-db.sh) | Full prod→staging when `/opt/daibilet-staging` exists |
 
-## Current risk
+## Production state
 
-Until a regular DB dump or verified external snapshot policy exists, DB-level RPO
-is not guaranteed from inside the server. If Timeweb VM/disk snapshots are enabled,
-their schedule and retention should be treated as the temporary RPO/RTO contract
-only after owner verification in the Timeweb panel.
+- Postgres: Docker `daibilet-tours-postgres`, port `5437`, DB/user `daibilet`.
+- Backups dir: `/var/backups/daibilet/postgres/`.
+- Staging drill DB: Docker `daibilet-staging-postgres`, port `5438`, DB `daibilet_staging`.
+- Staging password: `/opt/daibilet/var/secrets/staging-postgres.password` (auto-created on first drill).
 
-Recommended launch minimum:
-
-- RPO: 24 hours or better.
-- RTO: 2 hours to restore staging and validate API/public smoke.
-- Retention: 7 daily dumps plus 4 weekly dumps.
-- At least one off-host copy: S3-compatible storage, Timeweb Object Storage, or another locked server.
-
-## Manual backup command
-
-Run as root on `201.24.125.184`:
+## One-time install (MSK, root)
 
 ```bash
-mkdir -p /var/backups/daibilet/postgres
-stamp="$(date -u +%Y%m%dT%H%M%SZ)"
-docker exec daibilet-tours-postgres pg_dump \
-  -U daibilet \
-  -d daibilet \
-  --format=custom \
-  --no-owner \
-  --no-acl \
-  > "/var/backups/daibilet/postgres/daibilet-${stamp}.dump"
-pg_restore --list "/var/backups/daibilet/postgres/daibilet-${stamp}.dump" >/dev/null
-ls -lh "/var/backups/daibilet/postgres/daibilet-${stamp}.dump"
+cd /opt/daibilet
+git pull origin feat/next-monorepo
+sudo bash deploy/scripts/install-postgres-backup-cron.sh
 ```
 
-## Suggested cron
-
-Create `/etc/cron.d/daibilet-postgres-backup` after owner approval:
-
-```cron
-SHELL=/bin/bash
-PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-
-35 4 * * * root /opt/daibilet/deploy/cron/postgres-backup.sh >> /var/log/daibilet/postgres-backup.log 2>&1
-```
-
-The script should:
-
-- create a custom-format `pg_dump`;
-- verify it with `pg_restore --list`;
-- keep daily/weekly retention;
-- optionally upload the dump off-host;
-- never print `DATABASE_URL` or secrets.
-
-## Restore drill outline
-
-Do not restore into production.
-
-Preferred target:
-
-1. Prepare `/opt/daibilet-staging`.
-2. Start a separate staging Postgres container, for example `daibilet-staging-postgres` on port `5438`.
-3. Restore a recent production dump into the staging database.
-4. Run Prisma migrations against staging.
-5. Smoke counts and public/admin API against staging.
-
-Existing helper:
+## Manual backup now
 
 ```bash
-/opt/daibilet/deploy/scripts/restore-staging-db.sh
+sudo APP_DIR=/opt/daibilet /opt/daibilet/deploy/cron/postgres-backup.sh
+ls -lh /var/backups/daibilet/postgres/
+readlink -f /var/backups/daibilet/postgres/LATEST.dump
 ```
 
-Important: this helper drops and recreates the staging database. Run it only when
-the owner explicitly approves a restore drill and the staging target is confirmed.
+Expected dump size: tens to low hundreds of MB (DB ~2.3G on disk includes indexes/WAL overhead; logical dump is smaller).
 
-## Smoke after restore
+Retention defaults: **7 daily** + **4 weekly** markers (symlinks).
 
-Minimum checks:
+## Restore drill (safe)
+
+Does **not** stop prod API. Creates/uses staging container only.
+
+```bash
+cd /opt/daibilet
+sudo CONFIRM=restore-drill deploy/scripts/postgres-restore-drill.sh
+tail -20 /var/log/daibilet/postgres-restore-drill.log
+```
+
+Success line: `DRILL OK` and matching `events,venues,orders` vs prod.
+
+Optional explicit dump:
+
+```bash
+sudo CONFIRM=restore-drill DUMP=/var/backups/daibilet/postgres/daibilet-20260830T120000Z.dump \
+  deploy/scripts/postgres-restore-drill.sh
+```
+
+## Cron
+
+File: `/etc/cron.d/daibilet-postgres-backup` — daily **04:35 UTC**.
+Log: `/var/log/daibilet/postgres-backup.log`.
+
+## Smoke after drill
 
 ```bash
 docker exec daibilet-staging-postgres psql -U daibilet -d daibilet_staging -c \
-  'select (select count(*)::int from "Event") as events, (select count(*)::int from "Venue") as venues, (select count(*)::int from "ExternalOrder") as orders;'
+  'SELECT (SELECT count(*)::int FROM "Event") AS events,
+          (SELECT count(*)::int FROM "Venue") AS venues,
+          (SELECT count(*)::int FROM "ExternalOrder") AS orders;'
+```
 
+Prod health (unchanged):
+
+```bash
 curl -fsS http://127.0.0.1:4000/api/health
 curl -fsS http://127.0.0.1:4000/api/public/stats
 ```
 
-## Open follow-ups
+## RPO / RTO (target)
 
-- Confirm Timeweb snapshot schedule and retention for `201.24.125.184`.
-- Add a real `deploy/cron/postgres-backup.sh`.
-- Add an off-host copy target.
-- Recreate staging catalog host or document that staging parity is intentionally off.
+| Metric | Target | Current after install |
+|--------|--------|------------------------|
+| RPO | ≤ 24h | Daily 04:35 UTC dump |
+| RTO | ≤ 2h staging smoke | Drill script ~5–15 min |
+| Retention | 7d + 4w | Script defaults |
+
+Off-host copy (Timeweb Object Storage / second VM) — follow-up, not blocking drill.
+
+## Timeweb VM snapshots
+
+Optional layer: whole-disk autobackup in Timeweb panel (billed per **80 GB disk**, not used %).
+Complements but does not replace logical `pg_dump` (granular restore, staging parity).
+
+## Checklist closeout
+
+After first successful backup + drill on MSK, update:
+
+- [production-readiness-checklist.md](./production-readiness-checklist.md) §7
+- [Tasktracker.md](./Tasktracker.md) `PROD.POSTGRES-BACKUP`
+
+Record in Diary: dump filename, size, drill timestamp, prod/staging counts.

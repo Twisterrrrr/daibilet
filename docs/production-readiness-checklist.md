@@ -103,8 +103,8 @@
 | - [x] | Web rollback: `.next.prev` + restore in swap script | Agent | ✅ | swap script |
 | - [x] | Pre-next snapshot (nginx + static) | Agent | ✅ | [snapshot-prod-rollback.sh](../deploy/scripts/snapshot-prod-rollback.sh) |
 | - [x] | Vite rollback script (legacy) | Agent | ✅ | [rollback-prod-vite.sh](../deploy/scripts/rollback-prod-vite.sh) |
-| - [ ] | Postgres backup cadence / restore drill (документирован) | CODEX | 🔴 | Docker PG on MSK |
-| - [ ] | Restore drill проведён за последние 6 мес | Owner | 🔴 | — |
+| - [ ] | Postgres backup cadence / restore drill (документирован) | CODEX | 🟡 | [postgres-backup.md](./postgres-backup.md) + scripts; install on MSK pending |
+| - [ ] | Restore drill проведён за последние 6 мес | Owner | ⏳ | `postgres-restore-drill.sh` ready |
 | - [x] | Incident runbook | Agent | ✅ | [incident-runbook.md](./incident-runbook.md) |
 
 ---

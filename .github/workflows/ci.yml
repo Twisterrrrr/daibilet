@@ -65,5 +65,8 @@ jobs:
           bash -n deploy/scripts/deploy-staging.sh
           bash -n deploy/scripts/deploy-prod-next.sh
           bash -n deploy/scripts/swap-web-next-artifact.sh
+          bash -n deploy/cron/postgres-backup.sh
+          bash -n deploy/scripts/postgres-restore-drill.sh
+          bash -n deploy/scripts/install-postgres-backup-cron.sh
           bash -n scripts/post-deploy-check.sh
           bash -n scripts/run-parity-check.sh

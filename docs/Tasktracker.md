@@ -11,7 +11,7 @@
 | PROD.OPS-VERIFY | Verify daibilet-tasks + healthcheck scripts 755 | Средний | CODEX | ✅ 2026-08-29: scripts 755, cron 644+newline, SSR/API OK heartbeat |
 | PROD.AUTH-AUDIT | User/account API IDOR review | Средний | CODEX | ✅ 2026-08-29: no Critical/High; SQL-filter hardening later |
 | PROD.PARITY-CRON | Staging parity cron/log freshness | Низкий | CODEX | 🟡 2026-08-29: staging off, `/opt/daibilet-staging` missing |
-| PROD.POSTGRES-BACKUP | Draft Postgres backup/restore runbook, no restore drill | Средний | CODEX | 🟡 2026-08-29: [postgres-backup.md](./postgres-backup.md), DB cron not installed |
+| PROD.POSTGRES-BACKUP | Postgres pg_dump cron + restore drill scripts | Средний | CODEX | 🟡 2026-08-30: scripts in repo; run install + drill on MSK |
 
 ## 2026-08-22 - Smolensk tourist hub pack
 

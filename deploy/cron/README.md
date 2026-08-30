@@ -268,3 +268,26 @@ APP_DIR=/opt/daibilet DURATION_SEC=600 /opt/daibilet/deploy/scripts/watch-tep-sy
 Prod PG stays in Docker (daibilet-tours-postgres:5437). Moving PG to host is optional capacity work; risk of data loss if rushed. Periodically docker system prune (already cron weekly) is enough to keep idle image/build cache from growing; do not stop the prod postgres container.
 
 OOM checklist: journalctl -u daibilet-web -u daibilet-api -p err --since '24 hours ago'
+
+## Prod: Postgres backup (daily pg_dump)
+
+Logical backup of catalog DB — complements Timeweb VM snapshots.
+
+```bash
+cd /opt/daibilet
+git pull origin feat/next-monorepo
+sudo bash deploy/scripts/install-postgres-backup-cron.sh
+sudo deploy/cron/postgres-backup.sh   # test now
+sudo CONFIRM=restore-drill deploy/scripts/postgres-restore-drill.sh
+```
+
+| Setting | Value |
+|---------|-------|
+| Schedule | daily 04:35 UTC (`/etc/cron.d/daibilet-postgres-backup`) |
+| Script | `deploy/cron/postgres-backup.sh` |
+| Dumps | `/var/backups/daibilet/postgres/daibilet-*.dump` |
+| Retention | 7 daily + 4 weekly markers |
+| Drill | `CONFIRM=restore-drill deploy/scripts/postgres-restore-drill.sh` → `:5438/daibilet_staging` |
+| Log | `/var/log/daibilet/postgres-backup.log`, drill: `postgres-restore-drill.log` |
+
+Runbook: [docs/postgres-backup.md](../../docs/postgres-backup.md).
