@@ -14,6 +14,9 @@ PROD_USER="${PROD_DB_USER:-daibilet}"
 KEEP_DAILY="${PG_BACKUP_KEEP_DAILY:-7}"
 KEEP_WEEKLY="${PG_BACKUP_KEEP_WEEKLY:-4}"
 
+# shellcheck source=../scripts/postgres-backup-common.sh
+source "${APP_DIR}/deploy/scripts/postgres-backup-common.sh"
+
 log() {
   echo "$(date -u +%Y-%m-%dT%H:%M:%SZ): $*"
 }
@@ -31,23 +34,11 @@ dump_path="${BACKUP_DIR}/daibilet-${stamp}.dump"
 tmp_path="${dump_path}.partial"
 
 log "pg_dump start → ${dump_path}"
-docker exec "$PROD_CONTAINER" pg_dump \
-  -U "$PROD_USER" \
-  -d "$PROD_DB" \
-  --format=custom \
-  --no-owner \
-  --no-acl \
-  >"$tmp_path"
+pg_dump_to_host "$PROD_CONTAINER" "$PROD_USER" "$PROD_DB" "$tmp_path"
 
 if [[ ! -s "$tmp_path" ]]; then
   rm -f "$tmp_path"
   log "ERROR: dump file empty"
-  exit 1
-fi
-
-if ! cat "$tmp_path" | docker exec -i "$PROD_CONTAINER" pg_restore --list >/dev/null 2>&1; then
-  rm -f "$tmp_path"
-  log "ERROR: pg_restore --list verification failed"
   exit 1
 fi
 

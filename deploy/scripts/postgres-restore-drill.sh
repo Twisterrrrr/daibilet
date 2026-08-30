@@ -35,6 +35,9 @@ cd "$APP_DIR"
 mkdir -p "$(dirname "$LOG")" "$SECRETS_DIR"
 chmod 700 "$SECRETS_DIR"
 
+# shellcheck source=postgres-backup-common.sh
+source "${APP_DIR}/deploy/scripts/postgres-backup-common.sh"
+
 if [[ -z "$DUMP" ]]; then
   if [[ -L "${BACKUP_DIR}/LATEST.dump" ]]; then
     DUMP="$(readlink -f "${BACKUP_DIR}/LATEST.dump")"
@@ -75,10 +78,7 @@ if ! docker ps --format '{{.Names}}' | grep -qx "$STAGING_CONTAINER"; then
 fi
 
 log "verify dump $(basename "$DUMP")"
-if ! cat "$DUMP" | docker exec -i "$PROD_CONTAINER" pg_restore --list >/dev/null 2>&1; then
-  log "ERROR: pg_restore --list failed for $DUMP"
-  exit 1
-fi
+pg_verify_custom_dump "$PROD_CONTAINER" "$DUMP"
 
 log "prod counts (read-only)"
 prod_counts="$(docker exec "$PROD_CONTAINER" psql -U "$PROD_USER" -d "$PROD_DB" -At -F, -c \
@@ -95,12 +95,7 @@ docker exec "$STAGING_CONTAINER" psql -U "$STAGING_USER" -d postgres -v ON_ERROR
   "CREATE DATABASE ${STAGING_DB} OWNER ${STAGING_USER};"
 
 log "pg_restore into staging"
-cat "$DUMP" | docker exec -i "$STAGING_CONTAINER" pg_restore \
-  -U "$STAGING_USER" \
-  -d "$STAGING_DB" \
-  --no-owner \
-  --no-acl \
-  --single-transaction
+pg_restore_custom_dump "$STAGING_CONTAINER" "$STAGING_USER" "$STAGING_DB" "$DUMP"
 
 staging_counts="$(docker exec "$STAGING_CONTAINER" psql -U "$STAGING_USER" -d "$STAGING_DB" -At -F, -c \
   'SELECT (SELECT count(*)::int FROM "Event"), (SELECT count(*)::int FROM "Venue"), (SELECT count(*)::int FROM "ExternalOrder");')"
