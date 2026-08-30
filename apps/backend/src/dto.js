@@ -5245,15 +5245,17 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
     if (overlap > 0) value += 3 + Math.min(overlap, 2);
     return value;
   };
-  relatedCandidates.sort((left, right) => {
-    const byScore = relatedScore(right) - relatedScore(left);
+  const relatedScored = relatedCandidates
+    .map((session) => ({ session, score: relatedScore(session) }))
+    .filter(({ score }) => score > 0);
+  relatedScored.sort((left, right) => {
+    const byScore = right.score - left.score;
     if (byScore !== 0) return byScore;
-    return String(left.startsAt || '').localeCompare(String(right.startsAt || ''));
+    return String(left.session.startsAt || '').localeCompare(String(right.session.startsAt || ''));
   });
   const relatedSeen = new Set();
   const related = [];
-  for (const session of relatedCandidates) {
-    if (relatedScore(session) <= 0) continue;
+  for (const { session } of relatedScored) {
     const key = session.groupKey || [session.title, session.city, session.venue]
       .map((value) => String(value || '').trim().toLowerCase().replace(/\s+/g, ' '))
       .join('|');

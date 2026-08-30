@@ -11,6 +11,7 @@
 - Добавлен `nginx_deploy` и переведены nginx reload/test участки deploy script на общие helpers.
 - In-place cleanup `.next` / `.next.prev` / `.next/cache` переведён на `rm_rf_deploy`; nginx proxy cache purge оставлен как best-effort fallback.
 - `codex-prod-readiness-handoff`, `incident-runbook`, `postgres-backup` очищены от небезопасных диагностических паттернов `sudo tail/ls`.
+- `buildPublicEventPage` теперь precomputes related event score один раз на кандидата, без повторного пересчёта внутри sort/loop.
 
 ### Проверки
 - `bash -n` через Git Bash: deploy runtime/prod/swap + Postgres backup/drill scripts OK.
