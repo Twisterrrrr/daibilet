@@ -19743,3 +19743,31 @@ evalidateNextBlogArticle (/blog, slug, city hub).
 - Add the generated public deploy key to GitHub Deploy keys for `Twisterrrrr/daibilet` with read-only access.
 - Ask Timeweb if banner exchange timeouts persist after root closure/fail2ban: include timestamps and note that application HTTP is healthy while TCP/SSH banner intermittently times out.
 - Do not align `/opt/daibilet` with GitHub using `reset --hard` until generated files/dirty server worktree are explicitly reviewed or deployment procedure owns the cleanup.
+
+---
+
+## 2026-08-30 - MSK prod readiness: memory, Git, nightly health
+
+### Observations
+- Owner added the GitHub deploy key; `deploy@MSK` can fetch `Twisterrrrr/daibilet`.
+- `/opt/daibilet` was aligned with `origin/feat/next-monorepo` after preserving tracked dirty media in stash and keeping generated server files intact.
+- `daibilet-web` now runs with `MemoryHigh=2200M`, `MemoryMax=3G`, `NODE_OPTIONS=--max-old-space-size=1280`.
+- Server-local smoke is fast: `/`, `/events`, `/cities/moscow`, `/cities/sankt-peterburg`, `/blog` all return 200; `/cities/saint-petersburg` returns 308 to `/cities/sankt-peterburg`.
+- External probes from Codex still show intermittent TCP/TLS/SSH stalls before the request reaches nginx; loopback nginx/Next stays healthy.
+
+### Decisions
+- `deploy/systemd/daibilet-web.service.d/memory.conf` is the canonical memory drop-in for MSK 8G.
+- City hub loading now separates true miss from API unavailable, avoiding transient timeout -> ISR HTML 404 poison.
+- `scripts/widget-readiness-check.mjs` now retries short network failures and falls back from stale etalon slugs to a live event from the same provider.
+- Added `.node-version` and `.nvmrc` with Node `22.23.1`; `engineStrict` remains in `pnpm-workspace.yaml`.
+- Health scripts are executable; `/var/log/daibilet/nightly-health.log` is writable by `deploy` for manual acceptance runs.
+
+### Proof
+- Prod HEAD: `80ed44e`.
+- Manual nightly health: `Post-deploy check OK`.
+- `daibilet-web`: active, memory about 816M, high 2.1G, max 3.0G.
+- Known non-strict invariant debt remains: `tep_events_without_sessions=40`.
+
+### Follow-ups
+- Ask Timeweb about intermittent SSH banner/TLS connect stalls with timestamps; app loopback is healthy while outside connections sometimes do not reach nginx.
+- Decide later whether to clean archived `.next.bak-*` and generated media on prod; no cleanup was done in this pass.
