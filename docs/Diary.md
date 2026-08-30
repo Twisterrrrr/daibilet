@@ -16,9 +16,11 @@
 - `bash -n` через Git Bash: deploy runtime/prod/swap + Postgres backup/drill scripts OK.
 - `git diff --check` OK.
 - `node --check scripts/widget-readiness-check.mjs` OK.
+- MSK SSH safe probe: `daibilet-web`/`daibilet-api` active; `MemoryHigh=2306867200`, `MemoryMax=3221225472`; nightly health cron and `daibilet-tasks` cron readable; `LATEST.dump` points to `/var/backups/daibilet/postgres/daibilet-20260830T150848Z.dump`; `/opt/daibilet/var/lock` writable by `deploy`.
 
 ### Проблемы
 - `sudo rm` остаётся fallback только для удаления service-owned cache; идеальный следующий шаг — отдельный узкий cleanup unit или права на app/cache через группу, без выдачи широкого `rm` в sudoers.
+- Live MSK checkout was still on `575e9471` during the probe, while origin moved to this hardening commit; next GHA/web deploy should bring scripts/app files forward.
 
 ---
 
