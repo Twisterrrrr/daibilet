@@ -23,6 +23,9 @@ APPLY_ADMIN_NGINX_PATCH="${APPLY_ADMIN_NGINX_PATCH:-1}"
 
 cd "$APP_DIR"
 
+# shellcheck source=deploy-runtime.sh
+source "${APP_DIR}/deploy/scripts/deploy-runtime.sh"
+
 # 4GB VPS: prefer cache reclaim over aggressive swap (idempotent; no-op without root).
 apply_vm_swappiness() {
   local target=10
@@ -67,9 +70,9 @@ fi
 
 # INC.504.23: exclusive deploy lock + active marker so minutely SSR healthcheck
 # does not SIGKILL+start mid-build (ENOENT prerender-manifest → crash-loop 502).
-mkdir -p /var/lock
-DEPLOY_LOCK="${DAIBILET_WEB_DEPLOY_LOCK:-/var/lock/daibilet-web-deploy.lock}"
-DEPLOY_ACTIVE="${DAIBILET_WEB_DEPLOY_ACTIVE:-/var/lock/daibilet-web-deploy.active}"
+ensure_deploy_lock_dir
+DEPLOY_LOCK="${DAIBILET_WEB_DEPLOY_LOCK:-$(deploy_lock_dir)/daibilet-web-deploy.lock}"
+DEPLOY_ACTIVE="${DAIBILET_WEB_DEPLOY_ACTIVE:-$(deploy_lock_dir)/daibilet-web-deploy.active}"
 exec 9>"$DEPLOY_LOCK"
 if ! flock -n 9; then
   echo "ERROR: another deploy holds ${DEPLOY_LOCK} (owner: $(cat "${DEPLOY_ACTIVE}" 2>/dev/null || echo unknown))"
@@ -207,8 +210,8 @@ reap_orphan_next_build_workers() {
 # Stop web BEFORE build. In-place `next build` rewrites apps/web/.next while
 # `next start` is still up → clients see 400/ChunkLoadError on /_next/static
 # (CSS + cities/%5Bslug%5D/page-*.js) until restart finishes.
-if systemctl is-active --quiet "$WEB_SERVICE" 2>/dev/null; then
-  systemctl stop "$WEB_SERVICE"
+if systemctl_deploy is-active --quiet "$WEB_SERVICE" 2>/dev/null; then
+  systemctl_deploy stop "$WEB_SERVICE"
   echo "Stopped $WEB_SERVICE before web:build (avoid mid-build static 400s)"
 fi
 
@@ -241,8 +244,8 @@ if [[ "${BUILD_RC}" -ne 0 ]]; then
     rm -rf "${WEB_NEXT_DIR}"
     cp -a "${WEB_NEXT_PREV}" "${WEB_NEXT_DIR}"
     echo "Restored .next from .next.prev (BUILD_ID=$(cat "${WEB_NEXT_DIR}/BUILD_ID"))"
-    if systemctl is-enabled --quiet "$WEB_SERVICE" 2>/dev/null; then
-      systemctl start "$WEB_SERVICE" || true
+    if systemctl_deploy is-enabled --quiet "$WEB_SERVICE" 2>/dev/null; then
+      systemctl_deploy start "$WEB_SERVICE" || true
       echo "Started ${WEB_SERVICE} on restored .next"
     fi
   else
@@ -268,13 +271,13 @@ if [[ ! -f "${WEB_NEXT_DIR}/prerender-manifest.json" || ! -f "${WEB_NEXT_DIR}/BU
   fi
 fi
 
-if systemctl is-active --quiet "$API_SERVICE"; then
-  systemctl restart "$API_SERVICE"
+if systemctl_deploy is-active --quiet "$API_SERVICE"; then
+  systemctl_deploy restart "$API_SERVICE"
 fi
 
-if systemctl is-enabled --quiet "$WEB_SERVICE" 2>/dev/null; then
-  systemctl reset-failed "$WEB_SERVICE" 2>/dev/null || true
-  systemctl start "$WEB_SERVICE"
+if systemctl_deploy is-enabled --quiet "$WEB_SERVICE" 2>/dev/null; then
+  systemctl_deploy reset-failed "$WEB_SERVICE" 2>/dev/null || true
+  systemctl_deploy start "$WEB_SERVICE"
 else
   echo "Warning: enable $WEB_SERVICE after first install"
 fi

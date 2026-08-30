@@ -60,6 +60,7 @@ jobs:
           node --check scripts/sync-invariants-check.js
           node --check scripts/lib/provider-link-sync.js
           node --check scripts/lib/event-import-guard.js
+          bash -n deploy/scripts/deploy-runtime.sh
           bash -n deploy/scripts/deploy-from-git.sh
           bash -n deploy/scripts/deploy-staging.sh
           bash -n deploy/scripts/deploy-prod-next.sh

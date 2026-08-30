@@ -12,7 +12,15 @@ TTFB_LIMIT="${DAIBILET_SSR_TTFB_LIMIT:-5}"
 LOG="${DAIBILET_SSR_HEALTH_LOG:-/var/log/daibilet/ssr-health.log}"
 WEB_SERVICE="${DAIBILET_WEB_SERVICE:-daibilet-web}"
 APP_DIR="${APP_DIR:-/opt/daibilet}"
-DEPLOY_ACTIVE="${DAIBILET_WEB_DEPLOY_ACTIVE:-/var/lock/daibilet-web-deploy.active}"
+APP_DIR="${APP_DIR:-/opt/daibilet}"
+_deploy_active_default="${APP_DIR}/var/lock/daibilet-web-deploy.active"
+if [[ -f "$_deploy_active_default" ]]; then
+  DEPLOY_ACTIVE="${DAIBILET_WEB_DEPLOY_ACTIVE:-$_deploy_active_default}"
+elif [[ -f /var/lock/daibilet-web-deploy.active ]]; then
+  DEPLOY_ACTIVE="${DAIBILET_WEB_DEPLOY_ACTIVE:-/var/lock/daibilet-web-deploy.active}"
+else
+  DEPLOY_ACTIVE="${DAIBILET_WEB_DEPLOY_ACTIVE:-$_deploy_active_default}"
+fi
 DEPLOY_ACTIVE_MAX_AGE_SEC="${DAIBILET_WEB_DEPLOY_ACTIVE_MAX_AGE_SEC:-2700}"
 COLD_START_GRACE_SEC="${DAIBILET_SSR_COLD_START_GRACE_SEC:-90}"
 PRERENDER_MANIFEST="${APP_DIR}/apps/web/.next/prerender-manifest.json"

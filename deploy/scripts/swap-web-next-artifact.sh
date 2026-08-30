@@ -18,14 +18,17 @@ GIT_SHA="${GIT_SHA:-}"
 
 cd "$APP_DIR"
 
+# shellcheck source=deploy-runtime.sh
+source "${APP_DIR}/deploy/scripts/deploy-runtime.sh"
+
 if [[ -z "$ARTIFACT" || ! -f "$ARTIFACT" ]]; then
   echo "ERROR: ARTIFACT path required (readable .tgz of apps/web/.next)" >&2
   exit 2
 fi
 
-mkdir -p /var/lock
-DEPLOY_LOCK="${DAIBILET_WEB_DEPLOY_LOCK:-/var/lock/daibilet-web-deploy.lock}"
-DEPLOY_ACTIVE="${DAIBILET_WEB_DEPLOY_ACTIVE:-/var/lock/daibilet-web-deploy.active}"
+ensure_deploy_lock_dir
+DEPLOY_LOCK="${DAIBILET_WEB_DEPLOY_LOCK:-$(deploy_lock_dir)/daibilet-web-deploy.lock}"
+DEPLOY_ACTIVE="${DAIBILET_WEB_DEPLOY_ACTIVE:-$(deploy_lock_dir)/daibilet-web-deploy.active}"
 exec 9>"$DEPLOY_LOCK"
 if ! flock -n 9; then
   echo "ERROR: another deploy holds ${DEPLOY_LOCK} (owner: $(cat "${DEPLOY_ACTIVE}" 2>/dev/null || echo unknown))"
@@ -86,8 +89,8 @@ fi
 INCOMING_BUILD_ID="$(cat "${WEB_NEXT_STAGE}/BUILD_ID")"
 echo "Incoming BUILD_ID=${INCOMING_BUILD_ID}"
 
-if systemctl is-active --quiet "$WEB_SERVICE" 2>/dev/null; then
-  systemctl stop "$WEB_SERVICE"
+if systemctl_deploy is-active --quiet "$WEB_SERVICE" 2>/dev/null; then
+  systemctl_deploy stop "$WEB_SERVICE"
   echo "Stopped ${WEB_SERVICE} for atomic swap"
 fi
 
@@ -117,13 +120,13 @@ if [[ -d "${WEB_NEXT_PREV}/static" && -d "${WEB_NEXT_DIR}/static" ]]; then
   echo "Merged previous hashed static from .next.prev (css/chunks/media compat)"
 fi
 
-if systemctl is-active --quiet "$API_SERVICE" 2>/dev/null; then
-  systemctl restart "$API_SERVICE"
+if systemctl_deploy is-active --quiet "$API_SERVICE" 2>/dev/null; then
+  systemctl_deploy restart "$API_SERVICE"
   echo "Restarted ${API_SERVICE} after git sync (backend TS may have changed)"
 fi
 
-systemctl reset-failed "$WEB_SERVICE" 2>/dev/null || true
-systemctl start "$WEB_SERVICE"
+systemctl_deploy reset-failed "$WEB_SERVICE" 2>/dev/null || true
+systemctl_deploy start "$WEB_SERVICE"
 
 WEB_READY=0
 for _i in 1 2 3 4 5 6 7 8 9 10; do
@@ -137,10 +140,10 @@ done
 if [[ "$WEB_READY" -ne 1 ]]; then
   echo "ERROR: health not OK after swap — restoring .next.prev if present"
   if [[ -f "${WEB_NEXT_PREV}/prerender-manifest.json" && -f "${WEB_NEXT_PREV}/BUILD_ID" ]]; then
-    systemctl stop "$WEB_SERVICE" 2>/dev/null || true
+    systemctl_deploy stop "$WEB_SERVICE" 2>/dev/null || true
     rm -rf "${WEB_NEXT_DIR}"
     mv "${WEB_NEXT_PREV}" "${WEB_NEXT_DIR}"
-    systemctl start "$WEB_SERVICE" || true
+    systemctl_deploy start "$WEB_SERVICE" || true
     echo "Restored BUILD_ID=$(cat "${WEB_NEXT_DIR}/BUILD_ID")"
   fi
   exit 1
@@ -149,10 +152,6 @@ fi
 curl -fsS -o /dev/null -w "smoke / =%{http_code}\n" -H "Cache-Control: no-cache" "http://127.0.0.1:${WEB_PORT}/" || true
 
 # Drop HTML soft-404 / ISR poison from nginx proxy_cache (only caches 200).
-# Without this, Yandex/crawlers keep seeing HTTP 200 for missing URLs for up to 30m.
-if [[ -d /var/cache/nginx/daibilet ]]; then
-  rm -rf /var/cache/nginx/daibilet/* || true
-  echo "Purged nginx proxy_cache /var/cache/nginx/daibilet"
-fi
+purge_nginx_proxy_cache
 
 echo "Artifact swap complete → BUILD_ID=$(cat "${WEB_NEXT_DIR}/BUILD_ID") HEAD=$(git rev-parse --short HEAD)"
