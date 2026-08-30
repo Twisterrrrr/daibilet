@@ -39,8 +39,8 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
-      // Legacy-транслитерация не должна вызывать city DTO с неканоническим slug.
-      { source: '/cities/sankt-peterburg', destination: '/cities/saint-petersburg', permanent: true },
+      // English alias should resolve to the imported/canonical city slug used by catalog DTOs.
+      { source: '/cities/saint-petersburg', destination: '/cities/sankt-peterburg', permanent: true },
       { source: '/my-orders', destination: '/account/purchases', permanent: true },
       { source: '/river-cruises', destination: '/rechnye-progulki', permanent: true },
       { source: '/river-cruises/:city', destination: '/rechnye-progulki/:city', permanent: true },
