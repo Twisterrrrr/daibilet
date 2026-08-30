@@ -4,6 +4,8 @@
  * Does not invent secrets; uses FINANCE_API_BASE_URL (+ optional projection token / Host).
  */
 
+import { randomUUID } from 'node:crypto';
+
 import {
   amountRubFromKopecks,
   mapFinanceOrderStatus,
@@ -96,6 +98,7 @@ function pickConfirmationUrl(payload: Record<string, unknown>): string | null {
   const direct =
     asString(payload.confirmationUrl) ||
     asString(payload.confirmation_url) ||
+    asString(payload.checkoutUrl) ||
     asString(payload.paymentUrl);
   if (direct) return direct;
   const payment = asRecord(payload.payment);
@@ -227,6 +230,7 @@ async function financePostJson(
   apiPath: string,
   body: unknown,
   env: FinanceProjectionEnv = process.env,
+  options?: { idempotencyKey?: string },
 ): Promise<{ ok: true; status: number; json: unknown } | { ok: false; status: number; error: string; detail?: string }> {
   const base = resolveFinanceApiBaseUrl(env);
   if (!base) {
@@ -235,11 +239,13 @@ async function financePostJson(
 
   const path = apiPath.startsWith('/') ? apiPath : `/${apiPath}`;
   const url = `${base}${path}`;
+  const headers = buildHeaders(env);
+  headers.set('Idempotency-Key', options?.idempotencyKey || randomUUID());
 
   try {
     const response = await fetch(url, {
       method: 'POST',
-      headers: buildHeaders(env),
+      headers,
       body: JSON.stringify(body),
       signal: AbortSignal.timeout(FINANCE_CHECKOUT_TIMEOUT_MS),
       cache: 'no-store',
@@ -324,14 +330,15 @@ export async function submitAdmissionCheckout(
   }
 
   const mode = input.mode || resolveBuyerCheckoutMode(env);
+  const isProduction = String(env.NODE_ENV || '').trim().toLowerCase() === 'production';
   const attempts: Array<{ label: string; path: string; body: unknown }> = [];
 
   if (mode === 'yookassa' || mode === 'auto') {
     // Prefer public create-payment; supplier authenticated path is out of catalog buyer scope.
     attempts.push({ label: 'YOOKASSA', path: '/api/checkout/yookassa', body: buildYookassaBody(input) });
   }
-  // STUB only when explicitly requested or as auto soft-fallback (Codex admission YooKassa gap).
-  if (mode === 'stub' || mode === 'auto') {
+  // STUB: dev/staging auto-fallback only. Production auto must not silently skip card payment.
+  if (mode === 'stub' || (mode === 'auto' && !isProduction)) {
     attempts.push({ label: 'STUB', path: '/api/checkout/stub', body: buildStubBody(input) });
   }
 
