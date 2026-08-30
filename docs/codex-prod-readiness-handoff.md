@@ -1,101 +1,165 @@
-# CODEX handoff — prod readiness (остаток после ROI batch)
+# CODEX handoff — prod readiness (хвост 2026-08-30)
 
-**Дата:** 2026-08-28  
-**Источник:** [production-readiness-checklist.md](./production-readiness-checklist.md) топ-5  
+**Дата:** 2026-08-30  
+**Источник:** [production-readiness-checklist.md](./production-readiness-checklist.md)  
 **Ветка:** `feat/next-monorepo`  
-**Нужен:** SSH на MSK (`201.24.125.184`), read-only + systemd/cron где указано
-
-Agent уже закрыл в репо: web tests CI, post-deploy web smoke, incident runbook, GHA public smoke step.
+**SSH:** `deploy@201.24.125.184` (root закрыт; `sudo -n systemctl` где нужно)  
+**Finance `.159`:** secrets / env **не трогать** без owner
 
 ---
 
-## Задача 1 — Prod nightly health cron (P1)
+## Уже закрыто (не повторять)
 
-**Цель:** каждую ночь widgets + DB invariants на prod без ручного grep.
+| ID | Что | Когда |
+|----|-----|-------|
+| PROD.NIGHTLY-CRON | nightly health на MSK | 2026-08-29 |
+| PROD.OPS-VERIFY | daibilet-tasks + healthcheck 755 | 2026-08-29 |
+| PROD.AUTH-AUDIT | IDOR review — no Critical/High | 2026-08-29 |
+| PROD.POSTGRES-BACKUP | pg_dump 62M + restore drill `DRILL OK` | 2026-08-30 |
+| SSH/VPN | Медленный SSH / banner timeout — **VPN**, не Timeweb | 2026-08-30 |
 
-**Steps:**
+Commits: `72ba00a0` (pg scripts), `6c63caeb` (docker cp verify fix).
+
+---
+
+## Задача 1 — Postgres cron verify (P1, ~5 мин)
+
+Owner мог не установить cron после drill.
 
 ```bash
 ssh deploy@201.24.125.184
-chmod +x /opt/daibilet/deploy/cron/nightly-health.sh
-chmod +x /opt/daibilet/scripts/post-deploy-check.sh
+cd /opt/daibilet && git pull origin feat/next-monorepo
 
-# Проверить, нет ли уже строки в crontab / /etc/cron.d/
-grep -r nightly-health /etc/cron.d/ /var/spool/cron/ 2>/dev/null || true
+# если нет — установить
+sudo bash deploy/scripts/install-postgres-backup-cron.sh
 
-# Добавить (если нет):
-# 15 5 * * * APP_DIR=/opt/daibilet PUBLIC_BASE=https://daibilet.ru PORT=4000 POST_DEPLOY_WEB_BASE=http://127.0.0.1:3001 /opt/daibilet/deploy/cron/nightly-health.sh
+cat /etc/cron.d/daibilet-postgres-backup
+ls -lh /var/backups/daibilet/postgres/LATEST.dump
+tail -5 /var/log/daibilet/postgres-backup.log 2>/dev/null || echo "log after first cron run"
 ```
 
 **Acceptance:**
-- [ ] `/var/log/daibilet/nightly-health.log` появляется после 05:15 MSK
-- [ ] В логе `Post-deploy check OK` или явная ошибка (не пустой файл)
-- [ ] Owner notified если 2 ночи подряд fail
+- [ ] `/etc/cron.d/daibilet-postgres-backup` exists, `644`
+- [ ] `LATEST.dump` symlink → свежий `daibilet-*.dump`
+- [ ] Diary: cron verified / installed
 
 ---
 
-## Задача 2 — Verify ops cron installed (P1)
+## Задача 2 — GHA Deploy MSK web green (P1)
 
-**Цель:** убедиться, что auto-recovery реально работает (INC.504).
+Проверить workflow `Deploy MSK web (CI build + atomic swap)` после hardening `deploy@`:
 
 ```bash
-ls -la /opt/daibilet/deploy/cron/ssr-healthcheck.sh
-ls -la /opt/daibilet/deploy/cron/api-healthcheck.sh
-cat /etc/cron.d/daibilet-tasks
-# Scripts MUST be 755; cron invokes via /bin/bash
+# на MSK
+ls -la /opt/daibilet/var/lock/
+# deploy user must write here (not /var/lock/)
+
+# trigger или проверить последний run
+gh run list --workflow=deploy-msk-web.yml --limit 3
 ```
 
 **Acceptance:**
-- [ ] `/etc/cron.d/daibilet-tasks` на месте, `644`, trailing newline
-- [ ] `ssr-healthcheck.sh` + `api-healthcheck.sh` executable (`755`)
-- [ ] `/var/log/daibilet/ssr-health.log` обновлялся за последний час
-- [ ] Отчёт в Diary: что было сломано / OK
+- [ ] Swap step OK (no `Permission denied` on deploy lock)
+- [ ] GHA smoke: `https://daibilet.ru` 200, `limit=200` API 200
+- [ ] Diary: BUILD_ID + HEAD после swap
 
 ---
 
-## Задача 3 — User/account API auth audit (P2)
+## Задача 3 — Staging parity decision (P2)
 
-**Цель:** закрыть класс ошибок из Habr §3 — «login есть, authorization дырявая».
+`/opt/daibilet-staging` **отсутствует**. Restore drill использует `:5438/daibilet_staging` in-docker — достаточно для PG drill, **не** для full app parity.
 
-**Scope (read-only code review + curl probes на staging/prod):**
+**Варианты (owner choice):**
+- A) Recreate `/opt/daibilet-staging` + weekly parity cron
+- B) Document «staging off by design» + parity только через drill DB
 
-| Route | Проверить |
-|-------|-----------|
-| `POST /api/user/auth/*` | rate limit, no user enum |
-| `GET /api/user/auth/me` | только свой профиль |
-| Любые `/api/account/*` | bearer required, no IDOR по id |
-| Favorites / orders mirror | только свои записи |
-
-**Files:** `apps/backend/src/server.js`, `user-auth.js`, handlers account.*
-
-**Deliverable:** markdown § в Diary или коммент в Tasktracker `PROD.AUTH-AUDIT` — findings + PR fixes if any.
+**Acceptance:**
+- [ ] Decision recorded in Diary + Tasktracker `PROD.PARITY-CRON`
+- [ ] If A: parity cron + log `< 8 days`
 
 ---
 
-## Задача 4 — Staging parity weekly (P3)
+## Задача 4 — Threat model diagram (P2)
 
-Убедиться, что cron parity на staging включён:
+Deliverable: 1 страница markdown или mermaid в `docs/threat-model.md`:
+
+- Public read (catalog SSR, public API)
+- User auth (JWT, favorites, account)
+- Admin (Basic, admin API)
+- Finance boundary (`.159`, m2m, no shared DB)
+- Trust boundaries: browser ↔ nginx ↔ Next ↔ API ↔ PG ↔ finance-api
+
+**Acceptance:**
+- [ ] File in repo, linked from checklist §1
+
+---
+
+## Задача 5 — Load smoke catalog (P3)
+
+Из [inc-504-ssr-hardening.md](./inc-504-ssr-hardening.md): 20 parallel requests home + `/events` + city hub.
+
+```bash
+# с MSK localhost или external
+for url in http://127.0.0.1:3001/ http://127.0.0.1:3001/events http://127.0.0.1:3001/cities/saint-petersburg; do
+  seq 1 20 | xargs -P20 -I{} curl -o /dev/null -s -w "%{http_code} ttfb=%{time_starttransfer}s\n" -H "Cache-Control: no-cache" "$url"
+done
+```
+
+**Acceptance:**
+- [ ] All 200, no 502 burst; p95 TTFB noted in Diary
+
+---
+
+## Не в scope CODEX (Owner)
+
+| Item | Owner action |
+|------|----------------|
+| Sentry / APM | Подключить DSN |
+| Timeweb VM autobackup 80GB | Панель ~480₽/мес × copies |
+| Off-host PG dump copy | Object Storage / second VM |
+| Finance Stage 0 | Webhook ЮKassa + sandbox e2e ([checklist](./checklists/yookassa-e2e-sandbox.md)) |
+| m2m token catalog↔finance | Env на MSK + `.159` |
+| Dependabot / npm audit CI | Agent PR |
+| CODEOWNERS / on-call | Process |
+
+---
+
+## Prompt для Codex (copy-paste)
 
 ```
-0 3 * * 0 cd /opt/daibilet-staging && bash scripts/run-parity-check.sh >> /var/log/daibilet/parity.log 2>&1
+Контекст: Daibilet catalog prod MSK 201.24.125.184, ветка feat/next-monorepo.
+SSH: deploy@ (root off, sudo -n systemctl). Finance 85.193.80.159 — secrets не трогать.
+
+Уже закрыто 2026-08-29/30: nightly cron, ops verify, AUTH audit (no Critical/High),
+pg_dump 62M + restore drill DRILL OK (71672/3630/44 → :5438), VPN=причина медленного SSH.
+
+Handoff: docs/codex-prod-readiness-handoff.md
+
+Сделай по порядку:
+
+1) POSTGRES CRON VERIFY
+   - git pull feat/next-monorepo
+   - если нет /etc/cron.d/daibilet-postgres-backup → sudo bash deploy/scripts/install-postgres-backup-cron.sh
+   - проверь LATEST.dump, залогируй в Diary
+
+2) GHA DEPLOY MSK WEB
+   - проверь последний workflow deploy-msk-web.yml (swap lock в /opt/daibilet/var/lock/)
+   - если fail — почини на MSK или в скрипте, добейся green swap + smoke daibilet.ru
+
+3) STAGING PARITY DECISION
+   - /opt/daibilet-staging отсутствует
+   - зафиксируй в Diary: восстанавливать staging или «off by design»
+   - обнови Tasktracker PROD.PARITY-CRON
+
+4) THREAT MODEL
+   - создай docs/threat-model.md (mermaid): public/user/admin/finance boundaries
+   - ссылка из production-readiness-checklist.md §1
+
+5) LOAD SMOKE (optional)
+   - 20 parallel curl home/events/spb hub с localhost :3001
+   - p95 TTFB в Diary
+
+Не делать: Sentry, finance .159 env, YooKassa webhook, destructive prod DB ops.
+
+Deliverables: Diary entries с датами, Tasktracker updates, PR только если нужен код.
 ```
-
-**Acceptance:** [ ] последний `parity.log` < 8 дней или объяснение почему off
-
----
-
-## Задача 5 — Postgres backup / restore drill (P3, owner approval)
-
-**Не выполнять destructive ops без owner.**
-
-Документировать текущий backup (Timeweb snapshot? manual pg_dump?) и один dry-run restore на staging.
-
-**Deliverable:** 1 страница в `docs/deploy-timeweb.md` § Backup или отдельный `docs/postgres-backup.md`.
-
----
-
-## Не в scope CODEX (Owner / позже)
-
-- Sentry / centralized APM
-- Dependabot policy
-- Paid acquisition go-live

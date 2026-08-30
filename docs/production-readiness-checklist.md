@@ -1,6 +1,6 @@
 # Production readiness — чеклист Дайбилет
 
-**Обновлено:** 2026-08-28  
+**Обновлено:** 2026-08-30  
 **Контекст:** сравнение с [«вайбкодинг в проде»](https://habr.com/ru/articles/1075256/) — демо ≠ система.  
 **Prod:** MSK `201.24.125.184` · Next `:3001` + API `:4000` · ветка `feat/next-monorepo`  
 **Легенда:** ✅ готово · 🟡 частично · 🔴 gap · ⏳ owner/CODEX
@@ -34,7 +34,7 @@
 | - [x] | Rate limit на auth endpoints (in-memory) | Agent | 🟡 | `assertAuthRateLimit` — не Redis, сброс при restart |
 | - [x] | Секреты только в `.env` / GitHub Secrets, не в git | Owner | ✅ | deploy docs |
 | - [x] | Postgres не открыт наружу (CI tunnel только к API) | Owner | ✅ | [deploy-msk-web.yml](../.github/workflows/deploy-msk-web.yml) |
-| - [ ] | AppSec review user/account API (IDOR, favorites, orders) | CODEX | 🔴 | см. [codex-prod-readiness-handoff.md](./codex-prod-readiness-handoff.md) |
+| - [x] | AppSec review user/account API (IDOR, favorites, orders) | CODEX | ✅ | 2026-08-29: no Critical/High ([Tasktracker](./Tasktracker.md) PROD.AUTH-AUDIT) |
 | - [ ] | Dependency audit в CI (`npm audit` / Dependabot) | Agent | 🔴 | — |
 | - [ ] | Security headers audit (nginx + Next) | CODEX | 🟡 | частично на nginx |
 | - [x] | Widget-first: нет своего checkout / PCI scope | Owner | ✅ | [mvp-spec.md](./mvp-spec.md) |
@@ -103,8 +103,8 @@
 | - [x] | Web rollback: `.next.prev` + restore in swap script | Agent | ✅ | swap script |
 | - [x] | Pre-next snapshot (nginx + static) | Agent | ✅ | [snapshot-prod-rollback.sh](../deploy/scripts/snapshot-prod-rollback.sh) |
 | - [x] | Vite rollback script (legacy) | Agent | ✅ | [rollback-prod-vite.sh](../deploy/scripts/rollback-prod-vite.sh) |
-| - [ ] | Postgres backup cadence / restore drill (документирован) | CODEX | 🟡 | [postgres-backup.md](./postgres-backup.md) + scripts; install on MSK pending |
-| - [ ] | Restore drill проведён за последние 6 мес | Owner | ⏳ | `postgres-restore-drill.sh` ready |
+| - [x] | Postgres backup cadence / restore drill (документирован) | CODEX | ✅ | [postgres-backup.md](./postgres-backup.md); dump 62M; verify cron installed |
+| - [x] | Restore drill проведён за последние 6 мес | Owner | ✅ | 2026-08-30 MSK: `DRILL OK` counts 71672/3630/44 → `:5438/daibilet_staging` |
 | - [x] | Incident runbook | Agent | ✅ | [incident-runbook.md](./incident-runbook.md) |
 
 ---
@@ -139,7 +139,7 @@
 | 2 | **Post-deploy + GHA public smoke** — ловит «swap прошёл, сайт 502» | высокий | Agent | ✅ post-deploy + deploy-msk-web |
 | 3 | **Incident runbook** — один экран для 03:00 | высокий | Agent | ✅ [incident-runbook.md](./incident-runbook.md) |
 | 4 | **Prod nightly health cron** — widgets/invariants без ручного grep | средний | CODEX | ⏳ [codex-prod-readiness-handoff.md](./codex-prod-readiness-handoff.md) |
-| 5 | **User/account API auth audit** — IDOR до роста ЛК | средний | CODEX | ⏳ handoff § Security |
+| 5 | **User/account API auth audit** — IDOR до роста ЛК | средний | CODEX | ✅ 2026-08-29 |
 
 ---
 
