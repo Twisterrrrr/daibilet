@@ -67,22 +67,22 @@ WEB_NEXT_DIR="apps/web/.next"
 WEB_NEXT_PREV="apps/web/.next.prev"
 WEB_NEXT_STAGE="apps/web/.next.incoming"
 
-rm -rf "$WEB_NEXT_STAGE"
+rm_rf_deploy "$WEB_NEXT_STAGE"
 mkdir -p "$WEB_NEXT_STAGE"
 
 # Accept either tarball of .next/* or a top-level .next/ directory.
 tar -xzf "$ARTIFACT" -C "$WEB_NEXT_STAGE"
 if [[ -d "${WEB_NEXT_STAGE}/.next" ]]; then
   # tarball contained a .next folder
-  rm -rf "${WEB_NEXT_STAGE}.tmp"
+  rm_rf_deploy "${WEB_NEXT_STAGE}.tmp"
   mv "${WEB_NEXT_STAGE}/.next" "${WEB_NEXT_STAGE}.tmp"
-  rm -rf "$WEB_NEXT_STAGE"
+  rm_rf_deploy "$WEB_NEXT_STAGE"
   mv "${WEB_NEXT_STAGE}.tmp" "$WEB_NEXT_STAGE"
 fi
 
 if [[ ! -f "${WEB_NEXT_STAGE}/prerender-manifest.json" || ! -f "${WEB_NEXT_STAGE}/BUILD_ID" ]]; then
   echo "ERROR: artifact .next incomplete (need prerender-manifest.json + BUILD_ID)" >&2
-  rm -rf "$WEB_NEXT_STAGE"
+  rm_rf_deploy "$WEB_NEXT_STAGE"
   exit 1
 fi
 
@@ -95,15 +95,15 @@ if systemctl_deploy is-active --quiet "$WEB_SERVICE" 2>/dev/null; then
 fi
 
 if [[ -f "${WEB_NEXT_DIR}/prerender-manifest.json" && -f "${WEB_NEXT_DIR}/BUILD_ID" ]]; then
-  rm -rf "${WEB_NEXT_PREV}"
+  rm_rf_deploy "${WEB_NEXT_PREV}"
   mv "${WEB_NEXT_DIR}" "${WEB_NEXT_PREV}"
   echo "Saved previous .next → .next.prev (BUILD_ID=$(cat "${WEB_NEXT_PREV}/BUILD_ID"))"
 else
-  rm -rf "${WEB_NEXT_DIR}"
+  rm_rf_deploy "${WEB_NEXT_DIR}"
 fi
 
 mv "$WEB_NEXT_STAGE" "$WEB_NEXT_DIR"
-rm -rf "${WEB_NEXT_DIR}/cache" 2>/dev/null || true
+rm_rf_deploy "${WEB_NEXT_DIR}/cache" || true
 echo "Swapped .next (BUILD_ID=$(cat "${WEB_NEXT_DIR}/BUILD_ID"))"
 
 # Soft-compat window: cached HTML (s-maxage / open tabs / SWR) still references
@@ -141,7 +141,7 @@ if [[ "$WEB_READY" -ne 1 ]]; then
   echo "ERROR: health not OK after swap — restoring .next.prev if present"
   if [[ -f "${WEB_NEXT_PREV}/prerender-manifest.json" && -f "${WEB_NEXT_PREV}/BUILD_ID" ]]; then
     systemctl_deploy stop "$WEB_SERVICE" 2>/dev/null || true
-    rm -rf "${WEB_NEXT_DIR}"
+    rm_rf_deploy "${WEB_NEXT_DIR}"
     mv "${WEB_NEXT_PREV}" "${WEB_NEXT_DIR}"
     systemctl_deploy start "$WEB_SERVICE" || true
     echo "Restored BUILD_ID=$(cat "${WEB_NEXT_DIR}/BUILD_ID")"
