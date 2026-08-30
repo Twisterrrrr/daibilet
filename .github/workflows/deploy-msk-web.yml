@@ -83,7 +83,8 @@ jobs:
           printf '%s\n' "$MSK_SSH_KEY" > "$HOME/.ssh/msk_key"
           # Local-forward only (not reverse): GH runner :4000 → MSK loopback API.
           # Do not forward Postgres; EVENT_SSG_TOP_N=0 skips Prisma SSG.
-          ssh -fN -i "$HOME/.ssh/msk_key" \
+          # Soft-fail: tunnel is optional for CI build (EVENT_SSG_TOP_N=0 + soft SSG).
+          if ! ssh -fN -i "$HOME/.ssh/msk_key" \
             -o IdentitiesOnly=yes \
             -o StrictHostKeyChecking=accept-new \
             -o BatchMode=yes \
@@ -91,7 +92,11 @@ jobs:
             -o ServerAliveInterval=30 \
             -o ServerAliveCountMax=3 \
             -L 4000:127.0.0.1:4000 \
-            "${MSK_SSH_USER}@${MSK_SSH_HOST}"
+            "${MSK_SSH_USER}@${MSK_SSH_HOST}"; then
+            echo "WARN: SSH tunnel connect failed — build will soft-fail SSG without live API"
+            echo "tunnel=0" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           for _i in 1 2 3 4 5 6 7 8 9 10; do
             if curl -fsS --max-time 3 "http://127.0.0.1:4000/api/health" >/dev/null 2>&1 \
               || curl -fsS --max-time 3 "http://127.0.0.1:4000/api/public/stats" >/dev/null 2>&1; then
@@ -101,8 +106,8 @@ jobs:
             fi
             sleep 1
           done
-          echo "ERROR: SSH tunnel up but MSK API :4000 not healthy"
-          exit 1
+          echo "WARN: SSH tunnel up but MSK API :4000 not healthy — build without live API"
+          echo "tunnel=0" >> "$GITHUB_OUTPUT"
 
       - name: Build web
         env:
