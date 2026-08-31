@@ -60,3 +60,24 @@ purge_nginx_proxy_cache() {
     echo "WARN: nginx proxy_cache purge skipped (no permission on ${cache_dir})"
   fi
 }
+
+# nginx serves /images/ from apps/web/public/images; files may be root-owned after web runs.
+sync_public_assets_deploy() {
+  local app_dir="${APP_DIR:-/opt/daibilet}"
+  local sync_script="${app_dir}/apps/web/scripts/sync-public-assets.mjs"
+  local images_dir="${app_dir}/apps/web/public/images"
+  if [[ ! -f "$sync_script" ]]; then
+    echo "WARN: sync-public-assets.mjs missing — static /images/ may be stale"
+    return 0
+  fi
+  if node "$sync_script"; then
+    return 0
+  fi
+  echo "WARN: sync-public-assets failed — fixing ownership on ${images_dir}"
+  if [[ "$(id -u)" -eq 0 ]]; then
+    chown -R "$(stat -c '%U:%G' "${app_dir}/apps/web" 2>/dev/null || echo deploy:deploy)" "$images_dir" 2>/dev/null || true
+  elif sudo -n chown -R "$(whoami):$(id -gn)" "$images_dir" 2>/dev/null; then
+    echo "chown ${images_dir} (sudo)"
+  fi
+  node "$sync_script"
+}

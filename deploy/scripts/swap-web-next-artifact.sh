@@ -57,11 +57,7 @@ echo "HEAD=$(git rev-parse --short HEAD) ($(git rev-parse HEAD))"
 
 # nginx serves /images/ from apps/web/public/images (gitignored); GHA only swaps .next.
 # Sync etalon apps/public/public/images → web public after git reset.
-if [[ -f apps/web/scripts/sync-public-assets.mjs ]]; then
-  node apps/web/scripts/sync-public-assets.mjs
-else
-  echo "WARN: sync-public-assets.mjs missing — static /images/ may be stale"
-fi
+sync_public_assets_deploy
 
 WEB_NEXT_DIR="apps/web/.next"
 WEB_NEXT_PREV="apps/web/.next.prev"
