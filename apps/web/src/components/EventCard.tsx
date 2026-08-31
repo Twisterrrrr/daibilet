@@ -41,7 +41,7 @@ import {
   resolveHubAfficheLocationLine,
 } from '@/lib/event-location';
 import { dayRouteItemFromEvent } from '@/lib/day-route-from-place';
-import { formatMoneyRange } from '@/lib/format';
+import { formatMoneyRange, formatPriceFrom } from '@/lib/format';
 import { formatAgeLimit } from '@/lib/event-page-utils';
 import { trackProductCardClick } from '@/lib/catalog-analytics';
 import { eventHref } from '@/lib/routes';
@@ -74,6 +74,8 @@ type EventCardProps = {
   cityHub?: boolean;
   editorsPickBadge?: boolean;
   landingActions?: boolean;
+  /** LCP: eager load + priority for first visible catalog cards. */
+  imagePriority?: boolean;
   /** Скрыть скрытые anchor-виджеты (каталог-слоты) — на странице события в related. */
   suppressPurchaseAnchors?: boolean;
 };
@@ -86,6 +88,7 @@ export function EventCard({
   editorsPickBadge = false,
   landingActions = false,
   suppressPurchaseAnchors = true,
+  imagePriority = false,
 }: EventCardProps) {
   if (showcaseRail || editorsPickBadge) {
     return (
@@ -94,6 +97,7 @@ export function EventCard({
         rail={showcaseRail}
         cityHub={cityHub}
         editorsPickBadge={editorsPickBadge}
+        imagePriority={imagePriority}
       />
     );
   }
@@ -186,6 +190,8 @@ export function EventCard({
           alt={session.title}
           fill
           sizes={IMAGE_SIZES.eventCard}
+          priority={imagePriority}
+          loading={imagePriority ? undefined : 'lazy'}
           style={{ objectPosition: imageObjectPosition }}
           className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
           fallback={
@@ -484,11 +490,13 @@ function ShowcaseEventCard({
   rail = false,
   cityHub = false,
   editorsPickBadge = false,
+  imagePriority = false,
 }: {
   session: CatalogCardSession;
   rail?: boolean;
   cityHub?: boolean;
   editorsPickBadge?: boolean;
+  imagePriority?: boolean;
 }) {
   const href = eventHref(session);
   const imageObjectPosition = resolveEventCardObjectPosition({
@@ -512,7 +520,9 @@ function ShowcaseEventCard({
   const categoryLabel = cityHub ? null : session.category?.trim() || null;
   const showCityMeta = !cityHub && Boolean(categoryLabel || cityLabel);
   const priceLabel = hasPrice
-    ? formatShowcasePriceLabel(session.priceFrom, 'priceTo' in session ? session.priceTo : null)
+    ? cityHub
+      ? formatPriceFrom(session.priceFrom)
+      : formatShowcasePriceLabel(session.priceFrom, 'priceTo' in session ? session.priceTo : null)
     : null;
   const coverDateBadge = formatCoverDateBadge(session);
   const imageSizes = cityHub ? IMAGE_SIZES.affichePoster : IMAGE_SIZES.eventCard;
@@ -541,6 +551,8 @@ function ShowcaseEventCard({
           alt={session.title}
           fill
           sizes={imageSizes}
+          priority={imagePriority}
+          loading={imagePriority ? undefined : 'lazy'}
           style={{ objectPosition: imageObjectPosition }}
           className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
           fallback={

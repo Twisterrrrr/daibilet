@@ -135,25 +135,29 @@ export function SiteFooter({ destinations, variant = 'default' }: SiteFooterProp
   const cities = destinations.filter((item) => item.type === 'city');
   const cityLinks = (() => {
     const ranked = [...cities].sort((a, b) => b.events - a.events);
-    if (!citySlug) {
-      return ranked.slice(0, 8).map((city) => ({
-        label: city.name,
-        href: cityHref(city),
-      }));
-    }
-    // Narrow foreign city SEO when a city is selected: current hub + escape hatch.
-    const current =
-      ranked.find(
-        (city) =>
-          city.slug === citySlug ||
-          city.sourceSlug === citySlug ||
-          normalizeFooterCitySlug(city.slug) === normalizeFooterCitySlug(citySlug),
-      ) || null;
-    const links: Array<{ label: string; href: string }> = [];
-    if (current) {
-      links.push({ label: current.name, href: cityHref(current) });
-    } else if (cityName) {
-      links.push({ label: cityName, href: `/cities/${encodeURIComponent(citySlug)}` });
+    const top = ranked.slice(0, 8);
+    const links: Array<{ label: string; href: string }> = top.map((city) => ({
+      label: city.name,
+      href: cityHref(city),
+    }));
+    if (citySlug) {
+      const current =
+        ranked.find(
+          (city) =>
+            city.slug === citySlug ||
+            city.sourceSlug === citySlug ||
+            normalizeFooterCitySlug(city.slug) === normalizeFooterCitySlug(citySlug),
+        ) || null;
+      if (current && !top.some((city) => city.slug === current.slug)) {
+        links.unshift({ label: current.name, href: cityHref(current) });
+        if (links.length > 9) links.pop();
+      } else if (!current && cityName) {
+        links.unshift({
+          label: cityName,
+          href: `/cities/${encodeURIComponent(citySlug)}`,
+        });
+        if (links.length > 9) links.pop();
+      }
     }
     links.push({ label: 'Все города', href: '/cities' });
     return links;

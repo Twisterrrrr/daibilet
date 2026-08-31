@@ -35,7 +35,7 @@ export function catalogInterstitialsForCity(citySlug?: string | null): CatalogIn
           : 'Посмотреть на город с высоты',
       description: 'Подборка прогулок по крышам и смотровым площадкам в разных городах России',
       href: landingCategoryHref('rooftops', city),
-      cta: 'Смотреть гид',
+      cta: 'Перейти',
     },
     {
       id: 'river',

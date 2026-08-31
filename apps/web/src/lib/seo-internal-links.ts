@@ -284,9 +284,9 @@ export function getFooterPopularDirections(citySlug?: string | null): FooterPopu
     preferredAliases.add('sankt-peterburg');
   }
 
-  // With a city selected: only that city's SEO block (hide foreign MSK/SPB noise).
+  // Prefer the selected city's block; if none (e.g. NN), keep both MSK/SPB rails.
   const matched = blocks.filter((block) => preferredAliases.has(block.citySlug));
-  return matched;
+  return matched.length ? matched : blocks;
 }
 
 export function landingBreadcrumbLabel(landingSlug: string, fallbackTitle?: string | null): string {

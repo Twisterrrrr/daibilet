@@ -24,7 +24,7 @@ export function MyDayMapAside({
 }: MyDayMapAsideProps) {
   return (
     <div
-      className="relative h-full w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 lg:rounded-none lg:border-0 lg:border-l lg:border-slate-200"
+      className="relative h-full w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 lg:rounded-2xl lg:border lg:border-slate-200"
       data-my-day-map-aside="1"
       data-day-route-map-wrap
       data-day-route-map-desktop

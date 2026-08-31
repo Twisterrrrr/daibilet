@@ -88,6 +88,7 @@ export function CatalogPaginationLinks({
   onLoadMore,
   loadingMore = false,
   shownCount,
+  nextFetchPage,
 }: {
   page: number;
   total: number;
@@ -106,12 +107,18 @@ export function CatalogPaginationLinks({
   loadingMore?: boolean;
   /** Items actually rendered (accumulated load-more count). */
   shownCount?: number;
+  /** Next API page for append (from catalog.offset); keeps button aligned with fetch. */
+  nextFetchPage?: number | null;
 }) {
   const totalPages = Math.max(1, Math.ceil(total / limit));
   if (totalPages <= 1) return null;
 
   const shown = shownCount ?? Math.min(page * limit, total);
   const remaining = Math.max(total - shown, 0);
+  const stripNextPage = page < totalPages ? page + 1 : null;
+  const loadMorePage =
+    nextFetchPage != null && nextFetchPage > 0 && remaining > 0 ? nextFetchPage : null;
+  const nextPage = onLoadMore ? loadMorePage : stripNextPage;
   const suffix =
     summarySuffix ??
     (basePath === '/events' ? pluralEvents(total) : undefined);
@@ -129,7 +136,6 @@ export function CatalogPaginationLinks({
   };
 
   const prevPage = page > 1 ? page - 1 : null;
-  const nextPage = page < totalPages ? page + 1 : null;
   const desktopItems = buildPaginationItems(page, totalPages, 1);
 
   const pageBtn =
@@ -148,7 +154,7 @@ export function CatalogPaginationLinks({
 
       {/* Mobile: append next batch */}
       <div className="flex flex-col items-center gap-3 sm:hidden">
-        {nextPage && remaining > 0 ? (
+        {nextPage ? (
           onLoadMore ? (
             <button
               type="button"
@@ -225,7 +231,7 @@ export function CatalogPaginationLinks({
           )}
         </ol>
 
-        {nextPage && remaining > 0 ? (
+        {nextPage ? (
           onLoadMore ? (
             <button
               type="button"

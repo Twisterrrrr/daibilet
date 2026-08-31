@@ -33,6 +33,7 @@ import {
 import {
   MyDayCityPickStarter,
   MyDayRegionCityPrompt,
+  MyDayFloatingPickerDock,
   MyDayPickerLaunch,
   MyDayPickerSheet,
   MyDayItinerary,
@@ -2796,6 +2797,7 @@ function DayRoutePanelInner() {
   }
 
   function renderMapFocusCard(placement: 'desktop' | 'mobile' = 'mobile') {
+    if (placement === 'mobile') return null;
     if (!focusedVenue) return null;
     // Same hint chain as must-see / catalog cards: hookFact → shortDescription → editorial desc.
     const matchedSource =
@@ -3459,14 +3461,41 @@ function DayRoutePanelInner() {
     );
   }
 
+  function onMyDayListKeyDownCapture(event: React.KeyboardEvent) {
+    const target = event.target as HTMLElement;
+    if (target.closest('[data-day-stop-grip]')) return;
+    const tag = target.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || target.isContentEditable) return;
+
+    if (event.key === ' ') {
+      if (!target.closest('button, a[href], [role="button"], [role="tab"]')) {
+        event.preventDefault();
+      }
+      return;
+    }
+
+    if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return;
+    const root = listRootRef.current;
+    if (!root) return;
+    const rows = Array.from(root.querySelectorAll<HTMLElement>('[data-day-plan-stop]'));
+    if (!rows.length) return;
+    const active = document.activeElement;
+    let index = rows.findIndex((row) => row.contains(active));
+    if (index < 0) index = event.key === 'ArrowDown' ? -1 : rows.length;
+    const nextIndex =
+      event.key === 'ArrowDown'
+        ? Math.min(rows.length - 1, index + 1)
+        : Math.max(0, index - 1);
+    const grip = rows[nextIndex]?.querySelector<HTMLElement>('[data-day-stop-grip]');
+    if (!grip) return;
+    event.preventDefault();
+    grip.focus({ preventScroll: true });
+  }
+
   return (
     <>
     <div
-      className={`${
-        !isEmptyRoute && hasMapStops
-          ? 'my-day-desktop-bleed'
-          : 'container-page px-4 sm:px-6 lg:px-8'
-      } py-5 sm:py-10 print:hidden lg:pb-10 ${
+      className={`container-page px-4 sm:px-6 lg:px-8 py-5 sm:py-10 print:hidden lg:pb-10 ${
         isEmptyRoute
           ? 'pb-[calc(6.5rem+env(safe-area-inset-bottom,0px))]'
           : hasMapStops
@@ -3474,8 +3503,9 @@ function DayRoutePanelInner() {
             : 'pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))]'
       }`}
       data-day-mobile-list-first="1"
-      data-day-section-width={!isEmptyRoute && hasMapStops ? 'bleed' : 'full'}
+      data-day-section-width="full"
       data-day-mobile-view={mobileView}
+      onKeyDownCapture={onMyDayListKeyDownCapture}
     >
       <div ref={listRootRef} className="min-w-0" data-day-list-root>
       {!isEmptyRoute ? (
@@ -3750,9 +3780,16 @@ function DayRoutePanelInner() {
       ) : null}
 
       {hasCatalogCity && pickerTabs.length ? (
-        <div className="mt-4 lg:mt-5 xl:max-w-3xl" data-my-day-picker-host>
+        <div
+          className={`mt-4 lg:mt-5 ${route.venues.length ? 'lg:hidden' : 'xl:max-w-3xl'}`}
+          data-my-day-picker-host
+        >
           <MyDayPickerLaunch tabs={pickerTabs} onOpen={openPicker} />
         </div>
+      ) : null}
+
+      {!isEmptyRoute && hasCatalogCity && pickerTabs.length ? (
+        <MyDayFloatingPickerDock tabs={pickerTabs} onOpen={openPicker} />
       ) : null}
 
       {cityScenarios.length ? (
@@ -4311,10 +4348,10 @@ function DayRoutePanelInner() {
           {showEmptyDesktopShell ? (
             <>
               <div className="mt-4 lg:hidden" data-my-day-empty-mobile>
-                <div data-my-day-picker-host>
+                {renderEmptyStarter()}
+                <div className="mt-4" data-my-day-picker-host>
                   <MyDayPickerLaunch tabs={pickerTabs} onOpen={openPicker} />
                 </div>
-                {renderEmptyStarter()}
               </div>
               <div
                 className="mt-4 hidden lg:grid lg:grid-cols-[minmax(0,35fr)_minmax(0,65fr)] lg:items-stretch lg:gap-5"
@@ -4841,7 +4878,6 @@ function DayRoutePanelInner() {
           yandexUrl={yandexUrl}
           footer={
             <>
-              {renderMapFocusCard('mobile')}
               {route.venues.length > 0 ? (
                 <div
                   className="absolute inset-x-0 bottom-0 z-[1000] border-t border-slate-200/80 bg-white/95 backdrop-blur"
@@ -5328,7 +5364,10 @@ function DayRouteBetweenInsert({
               </span>
             ) : null}
             {transitTip ? (
-              <span className="line-clamp-1 min-w-0 flex-1 text-[11px] text-slate-400" data-day-transit-between>
+              <span
+                className="hidden min-w-0 flex-1 text-[11px] text-slate-400 line-clamp-1 sm:inline"
+                data-day-transit-between
+              >
                 {transitTip}
               </span>
             ) : null}
@@ -6222,7 +6261,7 @@ function DayRouteVenueCard({
             {/* Segment distance/time lives in between-leg row in list; in grid show once as text line only. */}
             {segmentLine ? (
               <p
-                className="mt-0.5 mb-0 line-clamp-2 text-[11px] leading-snug text-slate-500"
+                className="mt-0.5 mb-0 hidden line-clamp-2 text-[11px] leading-snug text-slate-500 sm:block"
                 data-day-segment-hint="1"
               >
                 {segmentLine}

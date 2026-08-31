@@ -26,6 +26,9 @@ import { collapseCatalogComboFamilies } from '@/lib/home-showcase-sections';
 import { IMAGE_SIZES, CardSafeImage } from '@/components/SafeImage.client';
 import { useCatalogFiltersLayout } from '@/components/CatalogSidebarLayout.client';
 
+/** First N catalog cards load images eagerly (LCP / perceived speed). */
+const CATALOG_IMAGE_PRIORITY_COUNT = 9;
+
 type CatalogResultsProps = {
   items: PublicCatalogListItemDto[];
   viewMode: CatalogViewMode;
@@ -253,9 +256,9 @@ export function CatalogResults({
             ))}
           </ul>
           <ul className="mt-4 hidden space-y-4 sm:block sm:space-y-5">
-            {listItems.map((session) => (
+            {listItems.map((session, index) => (
               <li key={`${session.id}-${session.startsAt}`}>
-                <EventCardHorizontal session={session} />
+                <EventCardHorizontal session={session} imagePriority={index < CATALOG_IMAGE_PRIORITY_COUNT} />
               </li>
             ))}
           </ul>
@@ -264,15 +267,23 @@ export function CatalogResults({
         <CatalogTable items={listItems} />
       ) : (
         <ul ref={gridRef} className="catalog-card-grid mt-4">
-          {gridEntries!.map((entry) =>
-            entry.kind === 'banner' ? (
-              <CatalogInterstitialBanner key={`banner-${entry.banner.id}`} banner={entry.banner} />
-            ) : (
-              <li key={`${entry.session.id}-${entry.session.startsAt}`}>
-                <EventCard session={entry.session} compact />
-              </li>
-            ),
-          )}
+          {(() => {
+            let eventOrdinal = 0;
+            return gridEntries!.map((entry) => {
+              if (entry.kind === 'banner') {
+                return (
+                  <CatalogInterstitialBanner key={`banner-${entry.banner.id}`} banner={entry.banner} />
+                );
+              }
+              const priority = eventOrdinal < CATALOG_IMAGE_PRIORITY_COUNT;
+              eventOrdinal += 1;
+              return (
+                <li key={`${entry.session.id}-${entry.session.startsAt}`}>
+                  <EventCard session={entry.session} compact imagePriority={priority} />
+                </li>
+              );
+            });
+          })()}
         </ul>
       )}
     </>
@@ -305,7 +316,7 @@ function CatalogLiveRail({
         <p className="text-[11px] text-graphite-muted sm:text-xs">По афише города</p>
       </div>
       <ul className="flex w-full gap-3 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:gap-3.5 md:overflow-visible">
-        {items.map((session) => {
+        {items.map((session, index) => {
           const href = eventHref(session);
           const coverSrc =
             resolveEventCardPrimaryImage(session) ||
@@ -328,6 +339,8 @@ function CatalogLiveRail({
                     alt={session.title}
                     fill
                     sizes={IMAGE_SIZES.eventCard}
+                    priority={index < CATALOG_IMAGE_PRIORITY_COUNT}
+                    loading={index < CATALOG_IMAGE_PRIORITY_COUNT ? undefined : 'lazy'}
                     className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                     fallback={
                       <div className="flex h-full w-full items-center justify-center bg-surface-muted text-graphite-muted">

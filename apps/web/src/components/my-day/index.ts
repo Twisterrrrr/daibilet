@@ -7,6 +7,8 @@ export { MyDayMobileMapSheet, MyDayMapFullScreen } from './MyDayMobileMapSheet';
 export { MyDayItinerary, MyDayScheduleBanner } from './MyDayItinerary';
 export { MyDayAddShelf } from './MyDayAddShelf';
 export { MyDayPickerSheet, MyDayPickerLaunch } from './MyDayPickerSheet';
+export { MyDayFloatingPickerDock } from './MyDayFloatingPickerDock';
+export { MyDayFloatingPickerDock } from './MyDayFloatingPickerDock';
 export type { MyDayPickerSection, MyDayPickerTab } from './MyDayPickerSheet';
 export { MyDaySaveScenarioDialog } from './MyDaySaveScenarioDialog';
 export { MyDaySavedScenariosRail } from './MyDaySavedScenariosRail';

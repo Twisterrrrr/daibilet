@@ -3,6 +3,7 @@ import test from 'node:test';
 
 import {
   formatAdmissionPriceFrom,
+  isHiddenAdmissionProduct,
   isOpenDateValidity,
   mapAdmissionListPayload,
   mapAdmissionProduct,
@@ -143,9 +144,15 @@ test('mapAdmissionListPayload: summary + items', () => {
     summary: { published: 1, canSell: 1, priceFromRub: 350, venues: 1, suppliers: 1 },
     items: [sampleProduct],
   });
-  assert.equal(list.total, 1);
-  assert.equal(list.summary.published, 1);
-  assert.equal(list.items[0]?.canSell, true);
+  assert.equal(list.total, 0);
+  assert.equal(list.summary.published, 0);
+  assert.equal(list.items.length, 0);
+});
+
+test('isHiddenAdmissionProduct: dev test museum excluded from hub lists', () => {
+  const mapped = mapAdmissionProduct(sampleProduct);
+  assert.ok(mapped);
+  assert.equal(isHiddenAdmissionProduct(mapped), true);
 });
 
 test('formatAdmissionPriceFrom + open date badge helpers', () => {

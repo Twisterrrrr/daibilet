@@ -28,7 +28,13 @@ import {
   storeCatalogViewMode,
   type CatalogViewMode,
 } from '@/lib/catalog-view-mode';
-import { parseCatalogPageQuery, searchParamsToRecord, catalogQueryCacheKey } from '@/server/catalog-query';
+import {
+  buildCatalogApiSearchParams,
+  catalogFiltersCacheKey,
+  parseCatalogPageQuery,
+  resolveCatalogNextFetchPage,
+  searchParamsToRecord,
+} from '@/server/catalog-query';
 
 type CatalogShellProps = {
   initialCatalog?: PublicCatalogDto | null;
@@ -74,6 +80,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
   const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewModeState] = useState<CatalogViewMode>('cards');
   const pagingModeRef = useRef<'replace' | 'append'>('replace');
+  const fetchedQueryKeyRef = useRef('');
   const catalogRef = useRef<PublicCatalogDto | null>(initialCatalog);
   catalogRef.current = catalog;
 
@@ -163,13 +170,8 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
   }, [query, cityReady, selectedCity, rawUrlCity, urlCityIsAll, listPage]);
 
   const filtersQueryKey = useMemo(
-    () =>
-      catalogQueryCacheKey({
-        ...query,
-        city: filterValues.city,
-        page: 1,
-      }),
-    [query, filterValues.city],
+    () => catalogFiltersCacheKey(filterValues, 1),
+    [filterValues],
   );
 
   useEffect(() => {
@@ -180,6 +182,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
     if (prevFiltersKeyRef.current === filtersQueryKey) return;
     prevFiltersKeyRef.current = filtersQueryKey;
     pagingModeRef.current = 'replace';
+    fetchedQueryKeyRef.current = '';
     setListPage(1);
     writePageToUrl(1);
   }, [filtersQueryKey, writePageToUrl]);
@@ -198,13 +201,12 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
   const loadMoreNextPage = useCallback(() => {
     if (loading || loadingMore || !catalog) return;
     const limit = Math.max(catalog.limit || CATALOG_PAGE_SIZE_DEFAULT, 1);
-    const totalPages = Math.max(1, Math.ceil(catalog.total / limit));
-    if (listPage >= totalPages) return;
+    const next = resolveCatalogNextFetchPage(catalog, limit);
+    if (!next) return;
     pagingModeRef.current = 'append';
-    const next = listPage + 1;
     setListPage(next);
     writePageToUrl(next);
-  }, [loading, loadingMore, catalog, listPage, writePageToUrl]);
+  }, [loading, loadingMore, catalog, writePageToUrl]);
 
   useEffect(() => {
     if (!pendingResultsScrollRef.current || loading || loadingMore || !catalog) return;
@@ -229,16 +231,19 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
 
   /** Effective query key from resolved filters (header city may lead URL by one frame). */
   const effectiveQueryKey = useMemo(
-    () => catalogQueryCacheKey({ ...query, city: filterValues.city, page: listPage }),
-    [query, filterValues.city, listPage],
+    () => catalogFiltersCacheKey(filterValues, listPage),
+    [filterValues, listPage],
   );
 
   const paginationSearchParams = useMemo(() => {
     const next = { ...searchParamsRecord };
+    const limit = filterValues.limit;
+    if (limit && limit !== CATALOG_PAGE_SIZE_DEFAULT) next.limit = String(limit);
+    else delete next.limit;
     if (listPage > 1) next.page = String(listPage);
     else delete next.page;
     return next;
-  }, [searchParamsRecord, listPage]);
+  }, [searchParamsRecord, listPage, filterValues.limit]);
 
   useEffect(() => {
     const fromUrl = urlSearchParams.get('view');
@@ -285,12 +290,17 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
 
     const appendMode = pagingModeRef.current === 'append';
 
+    if (!appendMode && fetchedQueryKeyRef.current === effectiveQueryKey && catalogRef.current) {
+      return;
+    }
+
     // Deep-link / SSR shortcuts — skip when appending the next batch.
     if (!appendMode) {
       if (initialQueryKey && effectiveQueryKey === initialQueryKey && initialCatalog && urlHasCity) {
         setCatalog(initialCatalog);
         setLoading(false);
         setError(null);
+        fetchedQueryKeyRef.current = effectiveQueryKey;
         return;
       }
 
@@ -298,6 +308,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
         setCatalog(initialCatalog);
         setLoading(false);
         setError(null);
+        fetchedQueryKeyRef.current = effectiveQueryKey;
         return;
       }
     }
@@ -318,12 +329,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
     }
     setError(null);
 
-    const params = new URLSearchParams(urlSearchParams.toString());
-    if (filterValues.city) params.set('city', filterValues.city);
-    else params.delete('city');
-    // pushState does not update Next searchParams — listPage is source of truth for paging.
-    if (listPage <= 1) params.delete('page');
-    else params.set('page', String(listPage));
+    const params = buildCatalogApiSearchParams(filterValues, listPage);
     const qs = params.toString();
     fetch(`/api/public/events${qs ? `?${qs}` : ''}`, { signal: controller.signal })
       .then(async (response) => {
@@ -340,6 +346,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
           }
           return payload;
         });
+        fetchedQueryKeyRef.current = effectiveQueryKey;
       })
       .catch((fetchError) => {
         if (fetchError instanceof Error && fetchError.name === 'AbortError') {
@@ -365,16 +372,13 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
       controller.abort();
     };
   }, [
-    urlSearchParams,
     effectiveQueryKey,
     initialQueryKey,
     initialCatalog,
     cityBootstrapPending,
     needsCityGate,
     urlHasCity,
-    filterValues.city,
-    filterValues.limit,
-    listPage,
+    filterValues,
   ]);
 
   const setViewMode = useCallback(
@@ -543,6 +547,10 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
           shownCount={catalog.items.length}
           total={catalog.total}
           limit={catalog.limit}
+          nextFetchPage={resolveCatalogNextFetchPage(
+            catalog,
+            Math.max(catalog.limit || CATALOG_PAGE_SIZE_DEFAULT, 1),
+          )}
           searchParams={paginationSearchParams}
           onPageChange={goToListPage}
           onLoadMore={loadMoreNextPage}

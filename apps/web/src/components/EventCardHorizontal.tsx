@@ -157,7 +157,13 @@ function AlsoSlotsRow({ labels }: { labels: string[] }) {
   );
 }
 
-export function EventCardHorizontal({ session }: { session: PublicCatalogListItemDto | PublicSessionDto }) {
+export function EventCardHorizontal({
+  session,
+  imagePriority = false,
+}: {
+  session: PublicCatalogListItemDto | PublicSessionDto;
+  imagePriority?: boolean;
+}) {
   const href = eventHref(session);
   const imageObjectPosition = resolveEventCardObjectPosition({
     slug: session.slug,
@@ -210,6 +216,8 @@ export function EventCardHorizontal({ session }: { session: PublicCatalogListIte
           alt={session.title}
           fill
           sizes={IMAGE_SIZES.eventCardHorizontal}
+          priority={imagePriority}
+          loading={imagePriority ? undefined : 'lazy'}
           style={{ objectPosition: imageObjectPosition }}
           className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
           fallback={

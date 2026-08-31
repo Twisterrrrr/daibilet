@@ -60,11 +60,15 @@ export function flashDayRouteFeedback(message: string, options: DayRouteFeedback
 
   const host = ensureHost();
   const showClear = Boolean(options.showClear);
+  const mapFabVisible = Boolean(document.querySelector('[data-my-day-map-fab]'));
+  const bottomOffset = mapFabVisible
+    ? 'calc(5.75rem + env(safe-area-inset-bottom, 0px))'
+    : '1.25rem';
 
   host.style.cssText = [
     'position:fixed',
     'left:50%',
-    'bottom:1.25rem',
+    `bottom:${bottomOffset}`,
     'transform:translateX(-50%)',
     'z-index:99999',
     'max-width:min(18rem,calc(100vw - 2rem))',

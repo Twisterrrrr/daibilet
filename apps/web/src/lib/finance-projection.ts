@@ -210,6 +210,16 @@ export function mapAdmissionProduct(raw: unknown): FinanceAdmissionProduct | nul
   };
 }
 
+/** Dev/stage admission products hidden from public city hubs until launch. */
+export function isHiddenAdmissionProduct(product: FinanceAdmissionProduct): boolean {
+  const slug = String(product.slug || '').toLowerCase();
+  const venueSlug = String(product.venue?.slug || '').toLowerCase();
+  const title = `${product.title || ''} ${product.venue?.title || ''}`.toLowerCase();
+  if (slug.includes('test_museum') || venueSlug.includes('test_museum')) return true;
+  if (title.includes('тестовый музей')) return true;
+  return false;
+}
+
 export function mapAdmissionListPayload(raw: unknown): FinanceAdmissionListResult {
   const row = asRecord(raw);
   if (!row) {
@@ -219,13 +229,20 @@ export function mapAdmissionListPayload(raw: unknown): FinanceAdmissionListResul
   const itemsRaw = Array.isArray(row.items) ? row.items : [];
   const items = itemsRaw
     .map(mapAdmissionProduct)
-    .filter((item): item is FinanceAdmissionProduct => Boolean(item));
+    .filter((item): item is FinanceAdmissionProduct => Boolean(item))
+    .filter((item) => !isHiddenAdmissionProduct(item));
 
   const summaryRaw = asRecord(row.summary) || {};
+  const priceFromValues = items
+    .map((item) => item.priceFromRub)
+    .filter((value): value is number => typeof value === 'number' && value > 0);
   const summary: FinanceAdmissionSummary = {
-    published: asNumber(summaryRaw.published) ?? items.length,
-    canSell: asNumber(summaryRaw.canSell) ?? items.filter((i) => i.canSell).length,
-    priceFromRub: asNumber(summaryRaw.priceFromRub),
+    published: items.length,
+    canSell: items.filter((i) => i.canSell).length,
+    priceFromRub:
+      priceFromValues.length > 0
+        ? Math.min(...priceFromValues)
+        : asNumber(summaryRaw.priceFromRub),
     venues: asNumber(summaryRaw.venues) ?? undefined,
     suppliers: asNumber(summaryRaw.suppliers) ?? undefined,
   };
@@ -233,7 +250,7 @@ export function mapAdmissionListPayload(raw: unknown): FinanceAdmissionListResul
   return {
     items,
     summary,
-    total: asNumber(row.total) ?? items.length,
+    total: items.length,
   };
 }
 

@@ -83,17 +83,19 @@ export function CatalogCityGate({
             <p className="text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400 sm:text-center">
               Популярные города
             </p>
-            <ul className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8">
+            <ul className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5">
               {popular.map((city) => (
                 <li key={city.slug || city.name} className="min-w-0">
                   <button
                     type="button"
                     onClick={() => selectedCity?.setCity(city.name)}
-                    className="inline-flex h-full min-h-11 w-full items-center justify-between gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-left text-sm font-semibold text-slate-700 transition hover:border-primary-300 hover:bg-primary-50 hover:text-primary-800"
+                    className="inline-flex h-full min-h-[3.25rem] w-full flex-col items-start justify-center gap-0.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-left transition hover:border-primary-300 hover:bg-primary-50"
                   >
-                    <span className="min-w-0 truncate">{chipLabel(city)}</span>
+                    <span className="w-full text-sm font-semibold leading-tight text-slate-800">
+                      {chipLabel(city)}
+                    </span>
                     {city.events > 0 ? (
-                      <span className="shrink-0 text-xs font-medium text-slate-400 tabular-nums">
+                      <span className="text-xs font-medium text-slate-400 tabular-nums">
                         {pluralEvents(city.events)}
                       </span>
                     ) : null}

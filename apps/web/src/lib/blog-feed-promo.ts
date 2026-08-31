@@ -13,12 +13,13 @@ export type BlogFeedPromoPlan = {
 const LAYOUTS: BlogFeedPromoLayout[] = ['strip', 'strip-dense', 'split'];
 
 function availableKinds(promo: BlogSidebarPromoDto, hasSidebar: boolean): BlogFeedPromoKind[] {
-  const kinds: BlogFeedPromoKind[] = ['city'];
+  const kinds: BlogFeedPromoKind[] = [];
   if (promo.chips?.some((chip) => chip.label && chip.href)) kinds.push('landing');
   if (promo.upcomingTitles?.some((title) => String(title || '').trim())) kinds.push('event');
-  if (!hasSidebar) return kinds;
-  // Sidebar already shows the city afisha guide — avoid duplicate banners in the feed.
-  return kinds.filter((kind) => kind !== 'city');
+  // City afisha lives in sidebar (desktop) or featured hero - never a full-width feed strip
+  // (duplicate Moscow/SPB cover in bento).
+  void hasSidebar;
+  return kinds;
 }
 
 /**

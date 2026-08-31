@@ -1,3 +1,22 @@
+## 2026-08-30 - Live smoke audit (batch «code vs live»)
+
+| ID | Задача | Было | Smoke 2026-08-30 | Статус |
+|----|--------|------|------------------|--------|
+| FIX.PUBLIC-ERROR-UI | RU error.tsx + global-error | 🔄 | chunks `error-7c23c8cc` + `global-error-b357d14a` на `/`, `/my-day`, hub | ✅ live |
+| UX.MYDAY-LOVABLE-W1 | MyDayShell + map sheet | 🔄 | RSC `DayRoutePanel` + `page-5f292c7b` на `https://daibilet.ru/my-day` 200 | ✅ live |
+| UX.MYDAY-LOVABLE-W1.5 | Lovable stop cards | 🔄 | тот же live bundle | ✅ live |
+| UX.MYDAY-PICKER-SHEET | side drawer picker | 🔄 in progress | `DayRoutePanel` live; визуально: кнопка подбора точек на `/my-day?city=saint-petersburg` | ✅ live (visual spot-check) |
+| UX.MYDAY-LIST-WANDERLOG | pin+thumb list, DnD | 🔄 | live chunk `page-5f292c7b`: `draggable`/`onDragStart`, «пешком», «Заметка», «Своё место» | ✅ live (visual spot-check hover `+`) |
+| UX.HUB-CAROUSEL-ARROWS-OUT | arrows outside track | 🔄 | client `ScrollRail` `arrowAlign=center` в prod bundle (Aug deploy wave) | ✅ live (visual desktop) |
+| UX.HUB-EVENTS-COLLECTIONS-MERGE | collections в «События» | 🔄 | shipped в CityPageView Aug batch | ✅ live |
+| UX.HUB-COLLECTION-PHOTO-TILES | photo covers подборок | 🔄 | shipped Aug batch | ✅ live (visual) |
+| UX.HUB-FAQ-BLOG-SPLIT | FAQ\|блог 2 col | 🔄 | `CityFaqBlogSplit` в bundle | ✅ live (visual desktop lg+) |
+| CAT.FORTRESS-ONE-MUSEUM | одна карточка крепости | 🔄 | 308 → `/venues/saint-petersburg-petropavlovskaya-krepost` 200 | ✅ live |
+| BLOG.RESTORE-SPB-BARS | owner-текст барного гида | 🔄 | `/blog/spb-barnyy-peterburg-ryumochnye-spikizi` 200, лид «интеллигентно» | ✅ live (CMS body ok) |
+| FIX.TC-CANCELLED-MISSING | `tc:reconcile-missing` на MSK | 🔄 | script в repo; **runtime reconcile на MSK не подтверждён** | 🔄 code; MSK cron/run pending |
+| PERF.WM2 / WEB.LIGHT.A5 | blog `[slug]` ISR | 🔄 / ⏳ | live `Cache-Control: private, no-store` на article | 🔄 code; live gap |
+| SEO.PODBOKI-PILOT-2 | NN+Perm после Вебмастер 1-2 нед | ⏳ | пилот KGD+SPB locked **2026-08-11** → **~19 дней**; окно вышло | 🟡 owner: проверить индекс пилота → старт PILOT-2 |
+
 ## 2026-08-28 - Production readiness (Habr checklist + ROI top-5)
 
 | ID | Задача | Приоритет | Owner | Статус |
@@ -110,7 +129,7 @@ Live: Deploy MSK web [`32371428354`](https://github.com/Twisterrrrr/daibilet/act
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| CAT.FORTRESS-ONE-MUSEUM | Одна public-карточка Музей «Петропавловская крепость»: trim равелин/pickup, merge museum+sight, search без дубля | Высокий | 🔄 code; commit+push+Deploy MSK web |
+| CAT.FORTRESS-ONE-MUSEUM | Одна public-карточка Музей «Петропавловская крепость»: trim равелин/pickup, merge museum+sight, search без дубля | Высокий | ✅ live smoke 2026-08-30 `/locations/saint-petersburg-petropavlovskaya-krepost` |
 
 ## 2026-08-18 - Live LO child + header search
 
@@ -177,7 +196,7 @@ Live: Deploy MSK web [`32371428354`](https://github.com/Twisterrrrr/daibilet/act
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| GEO.VYBORG-OBLAST-CHILD | Канон событий/search/H1: `/cities/leningradskaya-oblast?city=vyborg` (формула A); карточка СПб suburbs остаётся tourist; не standalone | Высокий | 🔄 H1 ок; live crash title/meta + header geo 2026-08-18 |
+| GEO.VYBORG-OBLAST-CHILD | Канон событий/search/H1: `/cities/leningradskaya-oblast?city=vyborg` (формула A); карточка СПб suburbs остаётся tourist; не standalone | Высокий | ✅ live 200 `?city=vyborg` (crash fix 2026-08-18; smoke 2026-08-30) |
 
 ## 2026-08-16 - Новосибирск tourist hub
 
@@ -298,10 +317,10 @@ Live: Deploy MSK web [`32371428354`](https://github.com/Twisterrrrr/daibilet/act
 
 | ID | Задача | Приоритет | Статус |
 |---|---|---|---|
-| UX.HUB-CAROUSEL-ARROWS-OUT | Prev/next хаб-каруселей вне колонки (рядом с треком) | Высокий | 🔄 ship+Deploy MSK web |
-| UX.HUB-EVENTS-COLLECTIONS-MERGE | Подборки в зоне «События»; убрать sticky «Подборки» | Высокий | 🔄 Deploy MSK web (в batch) |
-| UX.HUB-COLLECTION-PHOTO-TILES | Плитки подборок: juicy photo covers из landings | Высокий | 🔄 Deploy MSK web (в batch) |
-| UX.HUB-FAQ-BLOG-SPLIT | Desktop FAQ\|блог 2 col; sticky FAQ / Ещё → `#faq` | Высокий | 🔄 Deploy MSK web (в batch) |
+| UX.HUB-CAROUSEL-ARROWS-OUT | Prev/next хаб-каруселей вне колонки (рядом с треком) | Высокий | ✅ live Aug deploy wave; visual spot-check 2026-08-30 |
+| UX.HUB-EVENTS-COLLECTIONS-MERGE | Подборки в зоне «События»; убрать sticky «Подборки» | Высокий | ✅ live Aug deploy wave |
+| UX.HUB-COLLECTION-PHOTO-TILES | Плитки подборок: juicy photo covers из landings | Высокий | ✅ live Aug deploy wave; visual spot-check |
+| UX.HUB-FAQ-BLOG-SPLIT | Desktop FAQ\|блог 2 col; sticky FAQ / Ещё → `#faq` | Высокий | ✅ live Aug deploy wave; visual desktop lg+ |
 
 ## 2026-08-14 - Live: Deploy MSK web `31839365845`
 
@@ -777,7 +796,7 @@ Live: Deploy MSK web [`32371428354`](https://github.com/Twisterrrrr/daibilet/act
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| FIX.PUBLIC-ERROR-UI | Убрать английский Next fallback «Application error…» с public: error.tsx + global-error.tsx + ранний chunk reload | Критический | 🔄 code; live после Deploy MSK web |
+| FIX.PUBLIC-ERROR-UI | Убрать английский Next fallback «Application error…» с public: error.tsx + global-error.tsx + ранний chunk reload | Критический | ✅ live smoke 2026-08-30 (`error-7c23c8cc` + `global-error-b357d14a` chunks) |
 
 ## My Day toggle from catalogs (2026-08-13)
 
@@ -861,7 +880,7 @@ Live: Deploy MSK web [`32371428354`](https://github.com/Twisterrrrr/daibilet/act
 | SEO.PODBORKI-CITY-META | Пилот Title/Desc/H1 + self-canonical `?city=` (active: kgd/spb; msk leftover) | Высокий | ✅ code live; smoke OK |
 | SEO.PODBORKI-STABLE | Stable index/sitemap пилот × (C MULTI + E) + salute D year-round index | Критический | ✅ `028e24b1` Deploy MSK web `31535631523` |
 | SEO.PODBORKI-OVERRIDE | SeoOverride + templates + Stage-1 HTML (5 пар) + intent meta; self-canonical smoke | Критический | ✅ `f8217d70` migrate+upsert MSK; fallback deploy-prod-next; smoke PASS |
-| SEO.PODBORKI-PILOT-2 | Пилот-2: расширить `PODBORKI_SEO_PILOT_CITY_SLUGS` на `nizhny-novgorod` + `perm` (meta/self-canonical/index + intents); SeoOverride только 1–2 ключа/город, не пачкой. **Не внедрять сейчас** | Высокий | ⏳ Запланировано / waiting: после закрепления КГД+СПб в Вебмастере (1–2 нед.); критерий старта - qa/plan |
+| SEO.PODBORKI-PILOT-2 | Пилот-2: расширить `PODBORKI_SEO_PILOT_CITY_SLUGS` на `nizhny-novgorod` + `perm` (meta/self-canonical/index + intents); SeoOverride только 1–2 ключа/город, не пачкой. **Не внедрять сейчас** | Высокий | 🟡 waiting elapsed: пилот KGD+SPB locked **2026-08-11** → **~19 дней** (2026-08-30); owner: Вебмастер index check → старт PILOT-2 |
 | SEO.PODBORKI-CITY-1 | Phase 1: маркер `/podborki/c/{city}` + 301 | Высокий | ⏳ следующий спринт после индексации пилота |
 | SEO.PODBORKI-CITY-3 | Phase 3: card SEO blurbs + «N • от X» | Средний | ⏳ |
 | SEO.PODBORKI-CITY-4 | Phase 4: blog banners → подборка → события | Средний | ⏳ after marker URL lock |
@@ -889,15 +908,15 @@ Live: Deploy MSK web [`32371428354`](https://github.com/Twisterrrrr/daibilet/act
 | B.ARTUR-VII-CHEL | Колонка Артура: гастроспектакль «Вий» в Челябинске (Horse Head) | Высокий | ✅ `8c77f77f` Deploy MSK web `31528362734` |
 | B.MAX-MSK-CIRCLE | Колонка Макса «Как перестать гулять по кругу» + `isFeatured` материал недели | Высокий | ✅ `5e703d2c` upsert+featured; Deploy `31525508276` |
 | UX.MUSTSEE-DROP-BULK | my-day «Главные места»: убрать bulk «Добавить главные места»; chips + list остаются | Высокий | ✅ `8b889e85` Deploy MSK web `31473922071` BUILD_ID=`FZI5gnbEMamJmDZd6NqvN` |
-| UX.MYDAY-LOVABLE-W1 | `/my-day` Wave 1 Lovable shell: MyDayShell split+collapse map, sticky toolbar, mobile map sheet 85vh, schedule banner, default Список | Критический | 🔄 `9fff7e7e` Deploy `31480928724` |
-| UX.MYDAY-LOVABLE-W1.5 | `/my-day` visual parity: Lovable stop cards + dense toolbar; list-only; commerce secondary | Критический | 🔄 `9fb3754f` Deploy `31482332163` |
+| UX.MYDAY-LOVABLE-W1 | `/my-day` Wave 1 Lovable shell: MyDayShell split+collapse map, sticky toolbar, mobile map sheet 85vh, schedule banner, default Список | Критический | ✅ live smoke 2026-08-30 (`DayRoutePanel` on `/my-day`) |
+| UX.MYDAY-LOVABLE-W1.5 | `/my-day` visual parity: Lovable stop cards + dense toolbar; list-only; commerce secondary | Критический | ✅ live smoke 2026-08-30 |
 | UX.MYDAY-STEP2-CARD | `/my-day` Lovable «Шаг 2 из 2» при 1-2 stops; hour plan с 1+; supersede belowMin alert | Критический | ✅ `1ab6f261` Deploy `31517699206` |
-| UX.MYDAY-PICKER-SHEET | `/my-day` подбор точек: side drawer (сценарии/места/пригороды/picks/своё), launch bar | Критический | 🔄 in progress |
+| UX.MYDAY-PICKER-SHEET | `/my-day` подбор точек: side drawer (сценарии/места/пригороды/picks/своё), launch bar | Критический | ✅ live smoke 2026-08-30; visual spot-check picker open |
 | UX.MYDAY-MUSTSEE-HROW | Picker «Главные места»: горизонтальные row-cards (thumb left + desc), не 2-col portrait | Критический | ✅ `6b816690` |
 | UX.MYDAY-STOP-LOVABLE | Stop cards 1:1 Lovable + types/Gantt/kbd DnD/PDF map/save scenario | Критический | ✅ `6b816690` (GPX/KML deferred) |
 
-| UX.MYDAY-NOTES-NIKOLSKY | `/my-day`: between-stop notes; drop list insert; Kryukov Nikolo (not Kronstadt); Berthold coords; heading «Маршрут из N точек» | Критический | 🔄 `d9f25963` Deploy `31462262773` (prev `31461921550` build fail JSX) |
-| UX.MYDAY-LIST-WANDERLOG | `/my-day` Список: pin+thumb cards, between-leg `пешком • м` + «Маршруты», hover `+` insert (место/заметка/список), HTML5 DnD | Критический | 🔄 `e82aaf0e` push; deploy по «выкатывай» |
+| UX.MYDAY-NOTES-NIKOLSKY | `/my-day`: between-stop notes; drop list insert; Kryukov Nikolo (not Kronstadt); Berthold coords; heading «Маршрут из N точек» | Критический | ✅ live Aug deploy `31462262773`; bundle на `/my-day` 200 smoke 2026-08-30 |
+| UX.MYDAY-LIST-WANDERLOG | `/my-day` Список: pin+thumb cards, between-leg `пешком • м` + «Маршруты», hover `+` insert (место/заметка/список), HTML5 DnD | Критический | ✅ live smoke 2026-08-30 (chunk DnD+insert strings); visual hover `+` spot-check |
 | UX.MYDAY-HIDE-STEPS | `/my-day`: временно скрыть «Шаги» timeline (`SHOW_DAY_ROUTE_STEPS=false`); dismiss X на «Свободное окно» (session state) | Критический | 🔄 `de54fbc6` Deploy `31430742242` |
 | UX.MYDAY-STOPS-GRID | `/my-day`: Шаги timeline always on; toggle Сетка\|Список (restore fence) | Критический | ✅ `77debf04` tip `502dcace` Deploy `31429446266` BUILD_ID=`CbfydAWBpi_OYVn2yFIJt` |
 | FIX.EVENT-STANDBY-TEP-TWIN | `/events/…-6a1ef2c…` 404: STAND_BY TC → soft title-twin TEP + permanentRedirect | Критический | ✅ `71a0ccaa` API restart + Deploy `31428772500` |
@@ -941,7 +960,7 @@ Live: Deploy MSK web [`32371428354`](https://github.com/Twisterrrrr/daibilet/act
 | UX.EVENTS-CATALOG-REDESIGN | `/events` mobile-first: compact hero, filters FAB, modern cards 1/2/3/4 | Высокий | ✅ `d51eb4a2` / live `910faa55` |
 | FIX.CANON-PATH-FAMILY | Venue canonicalPath locations↔venues mismatch bulk fix (796) | Высокий | ✅ MSK apply 796; dry-run 0 |
 | FIX.LOC-REDIR-LOOP | location↔venues permanentRedirect loop via mismatched canonicalPath (Yaani Kirik) | Критический | ✅ `f3885fe2` Deploy `31317278952`; DB ATTRACTION; smoke 200 |
-| FIX.TC-CANCELLED-MISSING | TC: deactivate events missing from PUBLIC∪STAND_BY; block widget on cancelled; `tc:reconcile-missing` | Критический | 🔄 ship + MSK reconcile |
+| FIX.TC-CANCELLED-MISSING | TC: deactivate events missing from PUBLIC∪STAND_BY; block widget on cancelled; `tc:reconcile-missing` | Критический | 🔄 code in repo (`tc:reconcile-missing`); **MSK cron/run не подтверждён** (см. smoke audit 2026-08-30) |
 | FIX.TC-STANDBY-RECONCILE | TC sync: fetch STAND_BY + reconcile; hide sales-stopped cards catalog-wide | Критический | ✅ `11af2419` MSK reconcile 7658 STAND_BY; API restart + catalog rebuild |
 | UX.CANON-PANEL-INSET | DayTripCanonCard: logistics bg extend left; gastro pl same inset; keep text vertical | Высокий | ✅ `73509693` Deploy MSK web `31308732076` BUILD_ID=`SH7xtIXBki0ZEfrBkwYe3` |
 | CONT.PERM-GUBAHA-USVA | Perm: одна chip «Губаха / Усьва» с День 1/2 внутри; не две карточки | Высокий | ✅ `0f7363b9` Deploy MSK web `31308285355` BUILD_ID=`rcEaipEqElKkWcTQI1VD2` |
@@ -1328,7 +1347,7 @@ Alias `museum-1` = первый open-date контракт (не «музеи fo
 | BLOG.HIDE-AUG5-EXCEPT-BARS | Скрыть все статьи от 2026-08-05 кроме «Барный Петербург»; постепенная публикация | Критический | ✅ `be2f075` + MSK upsert DRAFT ×5; public only `spb-barnyy-peterburg-ryumochnye-spikizi`; soft-404 / article:null; web deploy n/a |
 | BLOG.FUTURE-TO-DRAFT | PUBLISHED+future `publishedAt` → DRAFT (×8 regional; KGD live ×3 остаются PUBLISHED) | Высокий | ✅ `2ebe56cc` + MSK upsert ×8 DRAFT/`isIndexable=false`; web deploy n/a |
 | BLOG.HERO-SERIES-BR | Hero H1: перенос после точки перед «Часть N» для Top-100 / Beyond-Top-100 | Высокий | ✅ `07c4fc7`, MSK BUILD_ID=`tU2lr7PmZB4kN1JCHGX_V` |
-| BLOG.RESTORE-SPB-BARS | Вернуть owner-текст статьи «Барный Петербург» без SEO-переписывания, проверить реальные адреса, venue links, изображения и production Article | Критический | 🔄 локальный текст восстановлен, ожидаются sync, upsert и MSK deploy |
+| BLOG.RESTORE-SPB-BARS | Вернуть owner-текст статьи «Барный Петербург» без SEO-переписывания, проверить реальные адреса, venue links, изображения и production Article | Критический | ✅ live `/blog/spb-barnyy-peterburg-ryumochnye-spikizi` 200 smoke 2026-08-30 |
 
 ---
 
@@ -2460,7 +2479,7 @@ Owner-locked порядок: Hero → Советы → Расписание → 
 | Контур | Ближайшее | Средний горизонт |
 |--------|-----------|------------------|
 | **Geo / хабы** | Destination registry 86/86; hub seed +80 Venue; public cityInfo DEPRECATED mirror | Region child guides для satellite-city; editorial coords для ~359 thin hubs |
-| **Catalog / SEO** | Standalone cards events>5 live; podborki pilot KGD+SPB ждать Вебмастер | Allowlist consistency; `/cities` map; ЧПУ `/podborki/c/{city}` после индексации |
+| **Catalog / SEO** | podborki pilot KGD+SPB locked 2026-08-11 → **~19 дней**; owner: index check → PILOT-2 (NN+Perm) | ЧПУ `/podborki/c/{city}` после gate; PERF.WM2 blog ISR gap |
 | **Контент** | Blog inline UI deploy; city hub lifehacks | Региональные статьи под новые destination pages |
 | **Finance / LC** | Stage 0 sandbox pay → CONFIRMED (`.159`) | Supplier LK M1, operator reconcile (qa.md § Roadmap) |
 | **Perf / ops** | MSK web batch deploy; не гонять build на каждый UI-фикс | TC sync timer; image remotePatterns follow-ups |
@@ -2880,6 +2899,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 |------|-----------|
 | 2026-08-09 | **Finance contour status (owner):** Stage 0 code **live on `.159`**; единственный runtime gate = sandbox pay → CONFIRMED + ticketNumbers; webhook canon URL LOCKED, register/verify cabinet reopen (свёртка «cabinet DONE»); roadmap buyer/operator/supplier/refunds light/live gates в qa; M1.*/FIN.W1/MIG.9.5 sync; **без** finance/MSK deploy |
 | 2026-08-30 | **MSK prod readiness ✅** - memory drop-in `2200M/3G` live; GitHub deploy key works; `/opt/daibilet` fast-forwarded to `80ed44e`; city hub miss/unavailable fix live; widget smoke retry+fallback live; manual nightly health `Post-deploy check OK`; residual external SSH/TLS stalls look provider/network-level |
+| 2026-08-30 | **Live smoke audit:** batch «code vs live» - PUBLIC-ERROR, My Day W1/W1.5/picker/**WANDERLOG**, hub UX Aug batch, fortress merge, SPB bars blog → ✅ live; TC reconcile + blog ISR no-store → open; podborki PILOT-2 wait ~19d elapsed → owner Webmaster gate |
 | 2026-08-30 | **MSK SSH hardening:** `deploy` alias works with sudo; `PermitRootLogin no`; password/kbdinteractive auth off; fail2ban sshd jail now reads `ssh.service`; deploy GitHub host key added; repo deploy key generated and waits for owner to add it to GitHub Deploy keys; residual banner-exchange timeout likely provider/network noise |
 | 2026-08-09 | **QA locks docs:** editorial/route/finance/publicCode/CI secrets; Catalog Worker 504.5c canon in deploy/ + Redis 504.5d deferred (MSK Redis нет); Buyer refunds Stage 2+ LOCKED out of Stage 0; nginx split example + yookassa e2e checklist; FIN.W1/M1.WH e2e ⏳; **без** MSK/finance/Redis deploy |
 | 2026-08-08 | **M1 taxonomy ✅ docs** - owner lock: Supplier ≠ museum-only; Stage 0 = OPEN_DATE (музей/арт); Stage 1 = events/sessions; readiness + M1.* + qa + Diary + Project one-liner; Codex brief updated; docs-only no web deploy |
