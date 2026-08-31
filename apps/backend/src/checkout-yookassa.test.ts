@@ -5,6 +5,7 @@ import {
   applyYooKassaWebhookPayload,
   buildYooKassaAdmissionPaymentCreatePayload,
   buildYooKassaPaymentCreatePayload,
+  buildYooKassaReturnUrl,
   classifyYooKassaReconcileAction,
   createYooKassaCheckoutOrder,
   formatKopecksForYooKassa,
@@ -96,13 +97,13 @@ test('builds redirect payment payload without leaking internal raw objects', () 
       commissionKopecks: 7000,
       netKopecks: 63000,
     },
-    returnUrl: 'https://daibilet.ru/purchases/1234567?payment=yookassa',
+    returnUrl: 'https://daibilet.ru/checkout/result?order=1234567',
   });
 
   assert.deepEqual(payload.amount, { value: '700.00', currency: 'RUB' });
   assert.deepEqual(payload.confirmation, {
     type: 'redirect',
-    return_url: 'https://daibilet.ru/purchases/1234567?payment=yookassa',
+    return_url: 'https://daibilet.ru/checkout/result?order=1234567',
   });
   assert.deepEqual(payload.metadata, {
     source: 'daibilet',
@@ -143,7 +144,7 @@ test('builds admission redirect payment payload with venue admission metadata', 
       commissionKopecks: 7000,
       netKopecks: 63000,
     },
-    returnUrl: 'https://daibilet.ru/purchases/7654321?payment=yookassa',
+    returnUrl: 'https://daibilet.ru/checkout/result?order=7654321',
   });
 
   assert.deepEqual(payload.amount, { value: '700.00', currency: 'RUB' });
@@ -158,6 +159,29 @@ test('builds admission redirect payment payload with venue admission metadata', 
     venueId: 'venue_1',
     cityId: 'city_1',
   });
+});
+
+test('builds canonical YooKassa return_url with publicCode', () => {
+  assert.equal(
+    buildYooKassaReturnUrl('https://daibilet.ru/checkout/result', '4717674'),
+    'https://daibilet.ru/checkout/result?order=4717674',
+  );
+  assert.equal(
+    buildYooKassaReturnUrl('https://daibilet.ru/checkout/result/?utm=ad', '4717674'),
+    'https://daibilet.ru/checkout/result?utm=ad&order=4717674',
+  );
+  assert.equal(
+    buildYooKassaReturnUrl('https://daibilet.ru/checkout/result?order=1111111', '4717674'),
+    'https://daibilet.ru/checkout/result?order=1111111',
+  );
+  assert.equal(
+    buildYooKassaReturnUrl('https://pay.daibilet.ru/checkout/result', '4717674'),
+    'https://daibilet.ru/checkout/result?order=4717674',
+  );
+  assert.equal(
+    buildYooKassaReturnUrl(null, '4717674'),
+    'https://daibilet.ru/checkout/result?order=4717674',
+  );
 });
 
 test('maps YooKassa statuses into local payment statuses', () => {
@@ -404,18 +428,22 @@ test('YooKassa admission checkout creates pending payment and preserves idempote
       },
     });
 
-    const fakeFetch = async () => new Response(JSON.stringify({
-      id: `pay_${suffix}`,
-      status: 'pending',
-      amount: { value: '700.00', currency: 'RUB' },
-      confirmation: {
-        type: 'redirect',
-        confirmation_url: `https://yookassa.test/pay/${suffix}`,
-      },
-    }), {
-      status: 200,
-      headers: { 'content-type': 'application/json' },
-    });
+    const capturedPaymentPayload: { value: Record<string, unknown> | null } = { value: null };
+    const fakeFetch = async (_input: string, init?: RequestInit) => {
+      capturedPaymentPayload.value = JSON.parse(String(init?.body || '{}')) as Record<string, unknown>;
+      return new Response(JSON.stringify({
+        id: `pay_${suffix}`,
+        status: 'pending',
+        amount: { value: '700.00', currency: 'RUB' },
+        confirmation: {
+          type: 'redirect',
+          confirmation_url: `https://yookassa.test/pay/${suffix}`,
+        },
+      }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      });
+    };
 
     const result = await createYooKassaCheckoutOrder({
       subjectType: 'VENUE_ADMISSION',
@@ -427,6 +455,7 @@ test('YooKassa admission checkout creates pending payment and preserves idempote
         name: 'Buyer',
         phone: '+79990000000',
       },
+      returnUrl: 'https://daibilet.ru/checkout/result',
       idempotencyKey,
     }, {
       config: readYooKassaRuntimeConfig({
@@ -447,6 +476,25 @@ test('YooKassa admission checkout creates pending payment and preserves idempote
     assert.equal(result.order.payment.status, 'PENDING');
     assert.equal(result.order.payment.providerPaymentId, `pay_${suffix}`);
     assert.equal(result.order.payment.confirmationUrl, `https://yookassa.test/pay/${suffix}`);
+    const expectedReturnUrl = `https://daibilet.ru/checkout/result?order=${result.order.publicCode}`;
+    const confirmationPayload = capturedPaymentPayload.value?.confirmation as { return_url?: string } | undefined;
+    assert.equal(confirmationPayload?.return_url, expectedReturnUrl);
+
+    const createdOrder = await prisma.checkoutOrder.findUnique({
+      where: { id: result.order.id },
+      select: { buyerSnapshot: true },
+    });
+    const buyerSnapshot = createdOrder?.buyerSnapshot as Record<string, unknown> | null;
+    assert.equal(buyerSnapshot?.returnUrl, expectedReturnUrl);
+    assert.equal(buyerSnapshot?.requestedReturnUrl, 'https://daibilet.ru/checkout/result');
+
+    const createdPayment = await prisma.payment.findUnique({
+      where: { id: result.order.payment.id },
+      select: { rawPayload: true },
+    });
+    const rawPayload = createdPayment?.rawPayload as Record<string, unknown> | null;
+    const daibiletPayload = rawPayload?.daibilet as Record<string, unknown> | undefined;
+    assert.equal(daibiletPayload?.returnUrl, expectedReturnUrl);
 
     const afterFirst = await prisma.admissionProduct.findUnique({
       where: { id: productId },
@@ -464,6 +512,7 @@ test('YooKassa admission checkout creates pending payment and preserves idempote
         name: 'Buyer',
         phone: '+79990000000',
       },
+      returnUrl: 'https://daibilet.ru/checkout/result',
       idempotencyKey,
     }, {
       config: readYooKassaRuntimeConfig({

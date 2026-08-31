@@ -1,3 +1,31 @@
+## 2026-08-31 - FIN.RETURN-1 YooKassa return_url
+
+### Наблюдения
+
+- Catalog по канону передает в finance базовый `returnUrl` без номера заказа: `https://daibilet.ru/checkout/result`.
+- Finance уже создает `publicCode` в момент `CheckoutOrder`, но раньше YooKassa `confirmation.return_url` строился как `/purchases/{publicCode}?payment=yookassa`; после оплаты пользователь мог возвращаться не на catalog result/ticket path.
+- Ветка остается изолированной: TC/TEP/widgets/catalog secrets не трогались, webhook URL не менялся.
+
+### Решения
+
+- `buildYooKassaReturnUrl` теперь канонизирует возврат в `https://daibilet.ru/checkout/result?order={publicCode}`.
+- Если входной URL уже содержит `order`, параметр не дублируется; trailing slash убирается; finance/pay hosts принудительно переводятся на catalog path.
+- Финальный `returnUrl` сохраняется в `buyerSnapshot`, `CheckoutItem.providerPayload`, `FulfillmentItem.providerData` и `Payment.rawPayload.daibilet.returnUrl` для аудита.
+- Хеш YooKassa idempotency теперь учитывает `returnUrl`, чтобы повтор с другой точкой возврата не склеивался молча.
+
+### Проверки
+
+- `pnpm --config.engine-strict=false --filter @daibilet/backend typecheck` - OK.
+- `DATABASE_URL=postgresql://daibilet:daibilet@127.0.0.1:5437/daibilet pnpm --config.engine-strict=false --filter @daibilet/backend exec tsx --test src/checkout-yookassa.test.ts` - OK, 15/15 including DB admission checkout.
+- `DATABASE_URL=postgresql://daibilet:daibilet@127.0.0.1:5437/daibilet pnpm --config.engine-strict=false --filter @daibilet/backend exec tsx --test src/supplier-admission-yookassa-purchase-handler.test.ts` - OK.
+
+### Дальше
+
+- После deploy на `.159`: повторить sandbox payment и проверить кнопку "Вернуться на сайт" -> `https://daibilet.ru/checkout/result?order={publicCode}`.
+- Не включать широкий catalog CTA до подтвержденного sandbox smoke и сохранения `canSell && checkoutPath` gate.
+
+---
+
 ## 2026-08-26 — Local finance Docker smoke
 
 ### Наблюдения
@@ -12,6 +40,8 @@
 - Seed `checkout:seed-stub-admission` обновил тестовый контур `phase-g-test-museum`.
 - Локальный backend поднят на `4000` с `DAIBILET_STUB_CHECKOUT=1` и dev query fallback.
 - Supplier UI доступен на `5179`; тестовый логин `supplier-test@daibilet.ru` возвращает текущего поставщика.
+- Supplier write smoke через query fallback корректно не проходит: для `POST /api/supplier/admissions/:id/stub-purchase` нужен Bearer token поставщика.
+- После логина supplier auth HTTP STUB smoke создал заказ `5256629` (`VENUE_ADMISSION`, `CONFIRMED`, `700 ₽`); заказ виден в `GET /api/supplier/orders`.
 
 ### Проверки
 
@@ -22,6 +52,7 @@
 - `pnpm --config.engine-strict=false --filter @daibilet/backend exec tsx --test src/supplier-admission-stub-purchase-handler.test.ts src/supplier-profile-write-handler.test.ts src/admin-supplier-legal-review.test.ts` — OK.
 - `pnpm --config.engine-strict=false --filter @daibilet/supplier typecheck` — OK.
 - `pnpm --config.engine-strict=false --filter @daibilet/supplier build` — OK.
+- HTTP smoke: login `supplier-test@daibilet.ru` → `POST /api/supplier/admissions/adp_phase_g_test_museum_entry/stub-purchase` → `GET /api/supplier/orders` — OK.
 
 ### Техдолг
 

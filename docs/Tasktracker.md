@@ -1,6 +1,6 @@
 # Tasktracker — Daibilet
 
-**Обновлено:** 2026-08-07
+**Обновлено:** 2026-08-31
 **Источники:** [Project.md](./Project.md), [current-state.md](./current-state.md), [widget-etalon-slugs.md](./widget-etalon-slugs.md), [content-blog-plan.md](./content-blog-plan.md)
 
 **Легенда:** ✅ done · 🔄 in progress · ⏳ todo · 🚫 blocked · ⚠️ deferred
@@ -54,7 +54,7 @@
 | P.3e5 | **Supplier LC shell v1** — legacy-v2 inspired light shell: grouped nav, readiness, admissions/events/orders, finance/docs/settings | Высокий | ✅ `apps/supplier` UI shell |
 | P.3e6 | **Supplier LC auth bridge** — `SiteUser` + active `SupplierUser`, login/me/logout, dev-only supplier query fallback | Высокий | ✅ auth API + supplier login UI |
 | P.3e7 | **Supplier LC admission smoke** — тестовая продажа `AdmissionProduct` из ЛК поставщика → `CheckoutOrder`/ledger/orders projection | Высокий | ✅ supplier-scoped endpoint + UI action |
-| P.3f | **YooKassa: venue admission** | Высокий | 🔄 Idempotence-Key ≤64 fixed; sandbox smoke on `.159` next |
+| P.3f | **YooKassa: venue admission** | Высокий | 🔄 FIN.RETURN-1 fixed locally; deploy + sandbox return smoke on `.159` next |
 | P.3f1 | **Supplier onboarding write-flow** — юрпрофиль + основной счет из ЛК, статус реквизитов на проверку | Высокий | ✅ backend PATCH + supplier UI forms |
 | P.3f2 | **YooKassa webhook hardening** — provider event id, replay dedupe, payment id mismatch guard | Высокий | ✅ backend + DB tests |
 | P.3f3 | **Admin legal approve/reject + Supplier LC polish** — модерация реквизитов, readiness callout, лаконичные заказы | Высокий | ✅ backend route + admin/supplier UI + tests |
@@ -485,6 +485,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | G.6 | YooKassa sandbox smoke on finance server | High | partial 2026-07-31: create-payment OK, confirmation page manual |
 | G.7 | Unified purchase projection for CheckoutOrder + ExternalOrder | High | done 2026-07-31: admin + supplier verified for checkout order |
 | G.8 | YooKassa webhook hardening: provider event id dedupe + payment id guard | High | done 2026-07-31, deployed on .159 |
+| G.9 | FIN.RETURN-1: YooKassa `return_url` includes catalog `?order={publicCode}` | High | done 2026-08-31 locally; deploy + sandbox return smoke pending |
 
 Seed command: `pnpm backend:checkout:seed-stub-admission`.
 Smoke order command: `pnpm backend:checkout:seed-stub-admission -- --order`.

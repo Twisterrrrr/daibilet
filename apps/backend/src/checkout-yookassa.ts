@@ -45,7 +45,8 @@ import {
 
 const YOOKASSA_CREATE_SCOPE = 'PAYMENT_CREATE';
 const DEFAULT_YOOKASSA_API_URL = 'https://api.yookassa.ru/v3';
-const DEFAULT_RETURN_BASE_URL = 'http://localhost:5178';
+const DEFAULT_RETURN_BASE_URL = 'https://daibilet.ru';
+const CHECKOUT_RESULT_PATH = '/checkout/result';
 const PAYMENT_CONFIRMATION_TTL_MINUTES = 30;
 
 export interface YooKassaRuntimeConfig {
@@ -162,7 +163,10 @@ export async function createYooKassaCheckoutOrder(
     throw new YooKassaCheckoutError('IDEMPOTENCY_REQUIRED', 400, [], 'Idempotency-Key is required');
   }
 
-  const normalizedPayload = normalizeStubCheckoutPayload(payload);
+  const normalizedPayload: YooKassaCheckoutCreateDto = {
+    ...normalizeStubCheckoutPayload(payload),
+    returnUrl: cleanString(payload.returnUrl),
+  };
   if (isAdmissionCheckoutPayload(normalizedPayload)) {
     return createYooKassaAdmissionCheckoutOrder(normalizedPayload, {
       idempotencyKey,
@@ -226,6 +230,10 @@ export async function createYooKassaCheckoutOrder(
       created = await prisma.$transaction(async (tx) => {
         await decrementCapacity(tx, event, session, normalizedPayload.quantity);
         const publicCode = await createUniquePublicCode(tx);
+        const returnUrl = buildYooKassaReturnUrl(
+          normalizedPayload.returnUrl || config.returnBaseUrl,
+          publicCode,
+        );
         const order = await tx.checkoutOrder.create({
           data: {
             publicCode,
@@ -246,6 +254,8 @@ export async function createYooKassaCheckoutOrder(
                 phone: normalizedPayload.buyer.phone,
               },
               subjectType,
+              requestedReturnUrl: cleanString(normalizedPayload.returnUrl),
+              returnUrl,
             } satisfies Prisma.InputJsonObject,
             expiresAt,
           },
@@ -276,6 +286,7 @@ export async function createYooKassaCheckoutOrder(
               admissionOfferId: null,
               offerId: offer.id,
               sessionId: session?.id || null,
+              returnUrl,
             },
           },
           select: yookassaItemResultSelect,
@@ -288,6 +299,11 @@ export async function createYooKassaCheckoutOrder(
             amountKopecks: totals.totalKopecks,
             currency: 'RUB',
             idempotenceKey: idempotencyKey,
+            rawPayload: {
+              mode: 'YOOKASSA',
+              requestedReturnUrl: cleanString(normalizedPayload.returnUrl),
+              returnUrl,
+            } satisfies Prisma.InputJsonObject,
           },
           select: yookassaPaymentResultSelect,
         });
@@ -305,6 +321,7 @@ export async function createYooKassaCheckoutOrder(
               mode: 'YOOKASSA',
               publicCode,
               subjectType,
+              returnUrl,
             },
           },
           select: yookassaFulfillmentResultSelect,
@@ -327,6 +344,10 @@ export async function createYooKassaCheckoutOrder(
       await markYooKassaIdempotencySucceeded(idempotencyKey, created.order.id, result);
       return result;
     }
+    const returnUrl = buildYooKassaReturnUrl(
+      normalizedPayload.returnUrl || config.returnBaseUrl,
+      created.order.publicCode,
+    );
     const paymentObject = await createYooKassaPayment({
       config,
       ...(options.fetchImpl ? { fetchImpl: options.fetchImpl } : {}),
@@ -337,7 +358,7 @@ export async function createYooKassaCheckoutOrder(
         offer,
         session,
         totals,
-        returnUrl: buildYooKassaReturnUrl(config.returnBaseUrl, created.order.publicCode),
+        returnUrl,
       }),
     });
     const persisted = await persistCreatedYooKassaPayment({
@@ -349,6 +370,7 @@ export async function createYooKassaCheckoutOrder(
       supplier,
       subjectType,
       totals,
+      returnUrl,
     });
     const result = mapYooKassaCheckoutResult({
       created: persisted,
@@ -423,6 +445,10 @@ async function createYooKassaAdmissionCheckoutOrder(
       created = await prisma.$transaction(async (tx) => {
         await decrementAdmissionCapacity(tx, product, normalizedPayload.quantity);
         const publicCode = await createUniquePublicCode(tx);
+        const returnUrl = buildYooKassaReturnUrl(
+          normalizedPayload.returnUrl || config.returnBaseUrl,
+          publicCode,
+        );
         const order = await tx.checkoutOrder.create({
           data: {
             publicCode,
@@ -443,6 +469,8 @@ async function createYooKassaAdmissionCheckoutOrder(
                 phone: normalizedPayload.buyer.phone,
               },
               subjectType: 'VENUE_ADMISSION',
+              requestedReturnUrl: cleanString(normalizedPayload.returnUrl),
+              returnUrl,
             } satisfies Prisma.InputJsonObject,
             expiresAt,
           },
@@ -470,6 +498,7 @@ async function createYooKassaAdmissionCheckoutOrder(
               admissionProductId: product.id,
               admissionProductSlug: product.slug,
               admissionOfferId: offer.id,
+              returnUrl,
             },
           },
           select: yookassaItemResultSelect,
@@ -482,6 +511,11 @@ async function createYooKassaAdmissionCheckoutOrder(
             amountKopecks: totals.totalKopecks,
             currency: 'RUB',
             idempotenceKey: idempotencyKey,
+            rawPayload: {
+              mode: 'YOOKASSA',
+              requestedReturnUrl: cleanString(normalizedPayload.returnUrl),
+              returnUrl,
+            } satisfies Prisma.InputJsonObject,
           },
           select: yookassaPaymentResultSelect,
         });
@@ -500,6 +534,7 @@ async function createYooKassaAdmissionCheckoutOrder(
               publicCode,
               subjectType: 'VENUE_ADMISSION',
               admissionProductId: product.id,
+              returnUrl,
             },
           },
           select: yookassaFulfillmentResultSelect,
@@ -520,6 +555,10 @@ async function createYooKassaAdmissionCheckoutOrder(
       await markYooKassaIdempotencySucceeded(idempotencyKey, created.order.id, result);
       return result;
     }
+    const returnUrl = buildYooKassaReturnUrl(
+      normalizedPayload.returnUrl || config.returnBaseUrl,
+      created.order.publicCode,
+    );
     const paymentObject = await createYooKassaPayment({
       config,
       ...(options.fetchImpl ? { fetchImpl: options.fetchImpl } : {}),
@@ -529,7 +568,7 @@ async function createYooKassaAdmissionCheckoutOrder(
         product,
         offer,
         totals,
-        returnUrl: buildYooKassaReturnUrl(config.returnBaseUrl, created.order.publicCode),
+        returnUrl,
       }),
     });
     const persisted = await persistCreatedYooKassaAdmissionPayment({
@@ -537,6 +576,7 @@ async function createYooKassaAdmissionCheckoutOrder(
       paymentObject,
       supplier,
       totals,
+      returnUrl,
     });
     const result = mapYooKassaAdmissionCheckoutResult({
       created: persisted,
@@ -1161,6 +1201,7 @@ async function persistCreatedYooKassaPayment(input: {
   supplier: StubCheckoutSupplierRow;
   subjectType: CheckoutSubjectType;
   totals: StubCheckoutTotalsDto;
+  returnUrl: string;
 }): Promise<CreatedYooKassaCheckoutRows> {
   const providerStatus = mapYooKassaPaymentStatus(input.paymentObject.status);
   const confirmationUrl = input.paymentObject.confirmation?.confirmation_url || null;
@@ -1170,7 +1211,7 @@ async function persistCreatedYooKassaPayment(input: {
       status: providerStatus,
       providerPaymentId: input.paymentObject.id,
       confirmationUrl,
-      rawPayload: input.paymentObject as unknown as Prisma.InputJsonValue,
+      rawPayload: buildYooKassaPaymentRawPayload(input.paymentObject, input.returnUrl),
       ...(providerStatus === 'SUCCEEDED'
         ? { paidAt: new Date(), capturedAt: new Date() }
         : {}),
@@ -1221,6 +1262,7 @@ async function persistCreatedYooKassaAdmissionPayment(input: {
   paymentObject: YooKassaPaymentObject;
   supplier: StubCheckoutSupplierRow;
   totals: StubCheckoutTotalsDto;
+  returnUrl: string;
 }): Promise<CreatedYooKassaCheckoutRows> {
   const providerStatus = mapYooKassaPaymentStatus(input.paymentObject.status);
   const confirmationUrl = input.paymentObject.confirmation?.confirmation_url || null;
@@ -1230,7 +1272,7 @@ async function persistCreatedYooKassaAdmissionPayment(input: {
       status: providerStatus,
       providerPaymentId: input.paymentObject.id,
       confirmationUrl,
-      rawPayload: input.paymentObject as unknown as Prisma.InputJsonValue,
+      rawPayload: buildYooKassaPaymentRawPayload(input.paymentObject, input.returnUrl),
       ...(providerStatus === 'SUCCEEDED'
         ? { paidAt: new Date(), capturedAt: new Date() }
         : {}),
@@ -1818,9 +1860,44 @@ function assertYooKassaWebhookPaymentMatches(
   }
 }
 
-function buildYooKassaReturnUrl(baseUrl: string, publicCode: string | null): string {
-  const code = encodeURIComponent(publicCode || '');
-  return `${baseUrl}/purchases/${code}?payment=yookassa`;
+export function buildYooKassaReturnUrl(baseUrl: string | null | undefined, publicCode: string | null): string {
+  const rawBase = cleanString(baseUrl) || `${DEFAULT_RETURN_BASE_URL}${CHECKOUT_RESULT_PATH}`;
+  const code = cleanString(publicCode);
+  const fallback = new URL(`${DEFAULT_RETURN_BASE_URL}${CHECKOUT_RESULT_PATH}`);
+  let url: URL;
+  try {
+    url = new URL(rawBase);
+  } catch {
+    url = fallback;
+  }
+
+  const host = url.hostname.toLowerCase();
+  if (host === 'pay.daibilet.ru' || host === 'checkout.daibilet.ru' || host === 'finance-api.daibilet.ru') {
+    url = fallback;
+  }
+
+  if (!url.pathname || url.pathname === '/') {
+    url.pathname = CHECKOUT_RESULT_PATH;
+  } else {
+    url.pathname = url.pathname.replace(/\/+$/, '') || CHECKOUT_RESULT_PATH;
+  }
+
+  if (code && !url.searchParams.has('order')) {
+    url.searchParams.set('order', code);
+  }
+  return url.toString();
+}
+
+function buildYooKassaPaymentRawPayload(
+  paymentObject: YooKassaPaymentObject,
+  returnUrl: string,
+): Prisma.InputJsonValue {
+  return {
+    ...(paymentObject as unknown as Record<string, unknown>),
+    daibilet: {
+      returnUrl,
+    },
+  } satisfies Prisma.InputJsonObject;
 }
 
 function hashYooKassaCheckoutPayload(payload: YooKassaCheckoutCreateDto): string {
@@ -1838,6 +1915,7 @@ function hashYooKassaCheckoutPayload(payload: YooKassaCheckoutCreateDto): string
     buyerPhone: cleanString(payload.buyer?.phone),
     attendeeName: cleanString(payload.attendee?.name),
     attendeePhone: cleanString(payload.attendee?.phone),
+    returnUrl: cleanString(payload.returnUrl),
   };
   return createHash('sha256').update(JSON.stringify(stablePayload)).digest('hex');
 }
