@@ -277,12 +277,12 @@ Product targets (~200 MSK/SPB, ~50 other top-8) **LOCKED**. **Открыто:** 
 - Порог city hub: сколько published AdmissionProduct / venues, чтобы показывать блок museums/admission на `/cities/[slug]` (например ≥3)?
 - Карточка в `/events`: отдельная вкладка «Входные билеты» vs mixed feed с `cardType=ADMISSION`?
 
-### D3. Locations UX: «Все города» vs gate; geo confirm vs silent — DEFERRED
+### D3. Locations UX: «Все города» vs gate; geo confirm vs silent — LOCKED (ADR)
 
-Из UX.LOC brief (остальное по locations IA LOCKED):
+См. [adr-geo-city-first-visit.md](./adr-geo-city-first-visit.md):
 
-- Default city: «Все города» ok vs first-visit city gate.
-- Гео suggest (IP/GPS): confirm UI vs silent apply.
+- **Mobile:** silent GPS apply на первом визите (включая `/events`, `/podborki`).
+- **Desktop:** confirm-модалка только при уже выданном geolocation permission; иначе gate / picker.
 
 ### D4. Park admission product — DEFERRED
 

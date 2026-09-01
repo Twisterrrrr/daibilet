@@ -24,11 +24,11 @@ import { canonicalLandingSlug } from '@/lib/landing-constants';
 import {
   dispatchOpenHeaderCityPicker,
   hasExplicitCityChoice,
-  isHomePath,
   isMobileViewport,
   markCityPromptCompleted,
   readBrowserPosition,
   readGrantedBrowserPosition,
+  shouldAttemptMobileSilentGeo,
   shouldOfferFirstVisitCityPrompt,
   suggestNearestCity,
 } from '@/lib/first-visit-city';
@@ -66,6 +66,8 @@ type SelectedCityContextValue = {
   cityLabel: string;
   /** False until client has read storage / URL — avoid flashing «Все города». */
   cityReady: boolean;
+  /** Mobile first-visit GPS in flight — catalog gates wait to avoid flash. */
+  geoBootstrapPending: boolean;
   selectedDestination: PublicDestinationDto | null;
   /** Full destinations list (city picker on /my-day and chrome). */
   destinations: PublicDestinationDto[];
@@ -124,6 +126,7 @@ export function SelectedCityProvider({
   const [searchParamsKey, setSearchParamsKey] = useState('');
   const [cityLabel, setCityLabel] = useState('Все города');
   const [cityReady, setCityReady] = useState(false);
+  const [geoBootstrapPending, setGeoBootstrapPending] = useState(false);
   const [pendingConfirm, setPendingConfirm] = useState<PendingConfirm | null>(null);
   const pendingConfirmRef = useRef<PendingConfirm | null>(null);
   /** First-visit CityConfirmModal: suggested catalog city or null = pick yourself. */
@@ -134,7 +137,7 @@ export function SelectedCityProvider({
   const pendingCityRef = useRef<string | null>(null);
   const cityLabelRef = useRef(cityLabel);
   cityLabelRef.current = cityLabel;
-  const mobileHomeGeoAttemptedRef = useRef(false);
+  const mobileGeoAttemptedRef = useRef(false);
 
   const onParams = useCallback((params: URLSearchParams) => {
     setUrlCity(params.get('city'));
@@ -293,48 +296,53 @@ export function SelectedCityProvider({
     if (openPicker) dispatchOpenHeaderCityPicker();
   }, []);
 
-  // Mobile home: request geolocation once and apply nearest catalog city silently.
+  // Mobile first visit: silent GPS on any browsing page (incl. /events, /podborki).
   useEffect(() => {
     if (!cityReady || pendingConfirm) return;
     if (cityLabel !== 'Все города') return;
-    if (!isHomePath(pathname)) return;
     if (!isMobileViewport()) return;
+    if (!shouldAttemptMobileSilentGeo(pathname)) return;
     if (hasExplicitCityChoice(destinations)) return;
-    if (mobileHomeGeoAttemptedRef.current) return;
-    mobileHomeGeoAttemptedRef.current = true;
+    if (mobileGeoAttemptedRef.current) return;
+    mobileGeoAttemptedRef.current = true;
 
     const cities = destinations.filter((item) => item.type === 'city');
     if (cities.length === 0) return;
 
+    setGeoBootstrapPending(true);
     let cancelled = false;
     void (async () => {
-      const position = await readBrowserPosition();
-      if (cancelled) return;
-      if (cityLabelRef.current !== 'Все города') return;
-      if (hasExplicitCityChoice(destinations)) return;
-      const suggested = position
-        ? suggestNearestCity(cities, position.latitude, position.longitude)
-        : null;
-      markCityPromptCompleted();
-      if (suggested?.name) {
-        persistSelectedCity(suggested.name);
-        setCityLabel(suggested.name);
+      try {
+        const position = await readBrowserPosition();
+        if (cancelled) return;
+        if (cityLabelRef.current !== 'Все города') return;
+        if (hasExplicitCityChoice(destinations)) return;
+        const suggested = position
+          ? suggestNearestCity(cities, position.latitude, position.longitude)
+          : null;
+        markCityPromptCompleted();
+        if (suggested?.name) {
+          persistSelectedCity(suggested.name);
+          setCityLabel(suggested.name);
+        }
+      } finally {
+        if (!cancelled) setGeoBootstrapPending(false);
       }
     })();
 
     return () => {
       cancelled = true;
+      setGeoBootstrapPending(false);
     };
   }, [cityLabel, cityReady, destinations, pathname, pendingConfirm]);
 
-  // Soft first-visit confirm. Never overwrite a stored / URL / hub city.
-  // Desktop + non-home: GPS only if permission is already granted.
+  // Desktop first-visit confirm. Never overwrite a stored / URL / hub city.
+  // GPS only if permission is already granted.
   useEffect(() => {
     if (!cityReady || firstVisitPrompt || pendingConfirm) return;
     if (cityLabel !== 'Все города') return;
+    if (isMobileViewport()) return;
     if (!shouldOfferFirstVisitCityPrompt(pathname)) return;
-    if (hasExplicitCityChoice(destinations)) return;
-    if (isHomePath(pathname) && isMobileViewport()) return;
     const cities = destinations.filter((item) => item.type === 'city');
     if (cities.length === 0) return;
 
@@ -453,8 +461,16 @@ export function SelectedCityProvider({
   );
 
   const value = useMemo(
-    () => ({ cityValue, cityLabel, cityReady, selectedDestination, destinations, setCity }),
-    [cityValue, cityLabel, cityReady, selectedDestination, destinations, setCity],
+    () => ({
+      cityValue,
+      cityLabel,
+      cityReady,
+      geoBootstrapPending,
+      selectedDestination,
+      destinations,
+      setCity,
+    }),
+    [cityValue, cityLabel, cityReady, geoBootstrapPending, selectedDestination, destinations, setCity],
   );
 
   const confirmMessage = pendingConfirm?.message || '';

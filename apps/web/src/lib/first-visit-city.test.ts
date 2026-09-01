@@ -11,8 +11,8 @@ import {
 import {
   hasCompletedCityPrompt,
   hasExplicitCityChoice,
-  isHomePath,
   markCityPromptCompleted,
+  shouldAttemptMobileSilentGeo,
   shouldOfferFirstVisitCityPrompt,
   suggestNearestCity,
 } from './first-visit-city.ts';
@@ -58,6 +58,16 @@ test('shouldOfferFirstVisitCityPrompt skips catalog gates and account', () => {
   assert.equal(shouldOfferFirstVisitCityPrompt('/checkout/ticket/abc'), false);
   assert.equal(shouldOfferFirstVisitCityPrompt('/login'), false);
   assert.equal(shouldOfferFirstVisitCityPrompt('/admin/events'), false);
+});
+
+test('shouldAttemptMobileSilentGeo includes catalog gates', () => {
+  assert.equal(shouldAttemptMobileSilentGeo('/'), true);
+  assert.equal(shouldAttemptMobileSilentGeo('/events'), true);
+  assert.equal(shouldAttemptMobileSilentGeo('/podborki'), true);
+  assert.equal(shouldAttemptMobileSilentGeo('/events/some-slug'), true);
+  assert.equal(shouldAttemptMobileSilentGeo('/checkout/ticket/abc'), false);
+  assert.equal(shouldAttemptMobileSilentGeo('/login'), false);
+  assert.equal(shouldAttemptMobileSilentGeo('/admin/events'), false);
 });
 
 test('suggestNearestCity maps GPS to catalog city and refuses far points', () => {

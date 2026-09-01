@@ -112,6 +112,7 @@ export function LandingsCatalogView({
   const urlCity = urlSearchParams.get('city')?.trim() || '';
   const urlCityIsAll = urlCity.toLowerCase() === 'all';
   const cityReady = selectedCity?.cityReady ?? true;
+  const geoBootstrapPending = selectedCity?.geoBootstrapPending ?? false;
   /** Wait for storage resolve when URL has no city - avoids national flash then city. */
   const cityBootstrapPending = !urlCity && Boolean(selectedCity) && !cityReady;
 
@@ -127,7 +128,7 @@ export function LandingsCatalogView({
   const cityName = resolveCityName(cities, cityRaw === 'all' ? 'all' : cityRaw);
   const citySelected = citySlug !== 'all';
   const needsCityGate =
-    !cityBootstrapPending && cityReady && (urlCityIsAll || !citySelected);
+    !cityBootstrapPending && !geoBootstrapPending && cityReady && (urlCityIsAll || !citySelected);
   const apiCityParam = citySelected
     ? (cityName !== 'all' ? cityName : citySlug)
     : '';

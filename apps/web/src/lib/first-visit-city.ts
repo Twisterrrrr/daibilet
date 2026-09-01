@@ -1,7 +1,8 @@
 /**
- * First-visit city confirm (header). GPS is matched to catalog city centers.
+ * First-visit city (header). GPS is matched to catalog city centers.
  * Nominatim / soft-geocode.ts stays address → coords for My Day - not reverse-city.
- * Never silent-apply: UI must confirm via CityConfirmModal.
+ * Mobile: silent apply on first visit (ADR docs/adr-geo-city-first-visit.md).
+ * Desktop: confirm modal when geolocation permission is already granted.
  */
 
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
@@ -29,12 +30,23 @@ export function hasExplicitCityChoice(destinations: PublicDestinationDto[]): boo
   return Boolean(readStoredSelectedCity(destinations));
 }
 
-/** Skip surfaces that already gate city (/events, /podborki) or are not browsing. */
-export function shouldOfferFirstVisitCityPrompt(pathname: string | null | undefined): boolean {
+function isBrowsingPath(pathname: string | null | undefined): boolean {
   const path = String(pathname || '').replace(/\/$/, '') || '/';
   if (path.startsWith('/admin')) return false;
   if (path.startsWith('/checkout')) return false;
   if (path.startsWith('/login') || path.startsWith('/account')) return false;
+  return true;
+}
+
+/** Mobile first visit: silent GPS apply (incl. /events, /podborki). */
+export function shouldAttemptMobileSilentGeo(pathname: string | null | undefined): boolean {
+  return isBrowsingPath(pathname);
+}
+
+/** Desktop first visit: confirm modal; skip catalog gates (they have their own UI). */
+export function shouldOfferFirstVisitCityPrompt(pathname: string | null | undefined): boolean {
+  if (!isBrowsingPath(pathname)) return false;
+  const path = String(pathname || '').replace(/\/$/, '') || '/';
   if (path === '/events' || path.startsWith('/events/')) return false;
   if (path === '/podborki' || path.startsWith('/podborki/')) return false;
   return true;

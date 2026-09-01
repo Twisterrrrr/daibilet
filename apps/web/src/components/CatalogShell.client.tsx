@@ -85,11 +85,13 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
   catalogRef.current = catalog;
 
   const cityReady = selectedCity?.cityReady ?? true;
+  const geoBootstrapPending = selectedCity?.geoBootstrapPending ?? false;
   /** Wait for storage resolve when URL has no city — avoids «Все города» then Уфа. */
   const cityBootstrapPending = !rawUrlCity && Boolean(selectedCity) && !cityReady;
   /** Hard geo: no mixed national feed until the user picks a city. */
   const needsCityGate =
     !cityBootstrapPending &&
+    !geoBootstrapPending &&
     cityReady &&
     (urlCityIsAll || (!urlHasCity && (!selectedCity || selectedCity.cityValue === 'all')));
 
