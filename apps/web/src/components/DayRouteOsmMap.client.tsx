@@ -60,14 +60,26 @@ function panStopForFocusOverlay(
   }
 }
 
-function numberedMarkerHtml(n: number, selected: boolean): string {
+function numberedMarkerHtml(n: number, selected: boolean, title: string): string {
   const label = String(n);
   const active = selected ? ' is-active' : '';
+  const safeTitle = String(title || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+  const titleAttr = safeTitle ? ` title="${safeTitle}"` : '';
+  const caption = safeTitle
+    ? `<span class="daibilet-day-pin-label"${titleAttr}>${safeTitle}</span>`
+    : '';
   return (
+    '<div class="daibilet-day-pin-wrap">' +
     '<div class="daibilet-day-pin' +
     active +
     '" data-day-map-pin>' +
     label +
+    '</div>' +
+    caption +
     '</div>'
   );
 }
@@ -106,7 +118,7 @@ export function DayRouteOsmMap({
   onStopClickRef.current = onStopClick;
 
   const stopsKey = stops
-    .map((s) => `${s.id}:${s.index}:${s.latitude.toFixed(5)},${s.longitude.toFixed(5)}`)
+    .map((s) => `${s.id}:${s.index}:${s.title}:${s.latitude.toFixed(5)},${s.longitude.toFixed(5)}`)
     .join('|');
 
   React.useEffect(() => {
@@ -187,7 +199,7 @@ export function DayRouteOsmMap({
         const selected = Boolean(selectedStopId && selectedStopId === stop.id);
         const icon = L.divIcon({
           className: 'daibilet-day-route-marker',
-          html: numberedMarkerHtml(stop.index + 1, selected),
+          html: numberedMarkerHtml(stop.index + 1, selected, stop.title),
           iconSize: [40, 40],
           iconAnchor: [20, 20],
         });

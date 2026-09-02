@@ -16,6 +16,21 @@ const MARKER_HTML =
   '<circle cx="14" cy="14" r="5" fill="#ffffff"/>' +
   '</svg>';
 
+/** Wait until the host has a real box - L.map(0×0) leaves a blank white pane after accordion open. */
+async function waitForMapHostSize(
+  node: HTMLElement,
+  isCancelled: () => boolean,
+): Promise<boolean> {
+  for (let i = 0; i < 90; i += 1) {
+    if (isCancelled()) return false;
+    if (node.clientWidth >= 32 && node.clientHeight >= 32) return true;
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => resolve());
+    });
+  }
+  return node.clientWidth > 0 && node.clientHeight > 0;
+}
+
 /**
  * Interactive OSM map (Leaflet). Replaces openstreetmap.org/export/embed.html:
  * upstream MapLibre embed effectively floors zoom at fitBounds, so native "-" often no-ops.
@@ -48,6 +63,7 @@ export function OsmMapEmbed({
     let cancelled = false;
     let map: LeafletMap | null = null;
     let resizeObserver: ResizeObserver | null = null;
+    let sizeTimers: number[] = [];
     let unlocked = false;
 
     const setLockedChrome = (locked: boolean) => {
@@ -58,6 +74,9 @@ export function OsmMapEmbed({
     void (async () => {
       const L = await loadDaibiletLeaflet();
       if (cancelled || !node) return;
+
+      const ready = await waitForMapHostSize(node, () => cancelled);
+      if (cancelled || !ready || !node) return;
 
       map = L.map(node, {
         center: [lat, lng],
@@ -107,7 +126,6 @@ export function OsmMapEmbed({
           map.off('click', unlock);
           map.off('focus', unlock);
         };
-        // click/tap only (not pointerdown) so a vertical page-scroll gesture stays page scroll
         map.on('click', unlock);
         map.on('focus', unlock);
       } else {
@@ -117,13 +135,18 @@ export function OsmMapEmbed({
       const syncSize = () => {
         map?.invalidateSize({ animate: false });
       };
-      requestAnimationFrame(syncSize);
+      requestAnimationFrame(() => {
+        syncSize();
+        requestAnimationFrame(syncSize);
+      });
+      sizeTimers = [50, 200, 500, 1000].map((ms) => window.setTimeout(syncSize, ms));
       resizeObserver = new ResizeObserver(syncSize);
       resizeObserver.observe(node);
     })();
 
     return () => {
       cancelled = true;
+      for (const id of sizeTimers) window.clearTimeout(id);
       resizeObserver?.disconnect();
       map?.remove();
       mapRef.current = null;

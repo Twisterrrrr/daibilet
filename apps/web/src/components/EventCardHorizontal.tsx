@@ -29,6 +29,7 @@ import {
 import { formatMoneyRange } from '@/lib/format';
 import { formatAgeLimit } from '@/lib/event-page-utils';
 import { trackProductCardClick } from '@/lib/catalog-analytics';
+import { formatPublicTitle } from '@/lib/format-public-title';
 import { eventHref, sessionVenueHref } from '@/lib/routes';
 
 const SLOT_CHIP_CLASS =
@@ -195,13 +196,14 @@ export function EventCardHorizontal({
     ? formatMoneyRange(session.priceFrom, 'priceTo' in session ? session.priceTo : null)
     : null;
   const venueHref = sessionVenueHref(session);
+  const displayTitle = formatPublicTitle(session.title);
 
   return (
     <article className="group relative flex flex-col overflow-hidden rounded-card bg-white shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:shadow-card-hover sm:flex-row">
       <Link
         href={href}
         className="absolute inset-0 z-[1] rounded-card"
-        aria-label={`Событие: ${session.title}`}
+        aria-label={`Событие: ${displayTitle}`}
         onClick={() =>
           trackProductCardClick({
             eventId: session.id,
@@ -213,7 +215,7 @@ export function EventCardHorizontal({
       <div className="relative aspect-video w-full shrink-0 overflow-hidden bg-surface-muted sm:min-w-[14rem] sm:w-56 sm:aspect-[4/3] sm:self-stretch lg:w-64">
         <CardSafeImage
           src={imagePrimarySrc}
-          alt={session.title}
+          alt={displayTitle}
           fill
           sizes={IMAGE_SIZES.eventCardHorizontal}
           priority={imagePriority}
@@ -224,7 +226,7 @@ export function EventCardHorizontal({
             imageFallbackSrc && imageFallbackSrc !== imagePrimarySrc ? (
               <CardSafeImage
                 src={imageFallbackSrc}
-                alt={session.title}
+                alt={displayTitle}
                 fill
                 sizes={IMAGE_SIZES.eventCardHorizontal}
                 className="object-cover"
@@ -262,7 +264,7 @@ export function EventCardHorizontal({
 
         <h3 className="font-display text-ui-sm font-bold leading-snug text-graphite sm:text-lg">
           <Link href={href} className="relative z-[2] transition-colors hover:text-primary-600">
-            {session.title}
+            {displayTitle}
           </Link>
         </h3>
 

@@ -33,6 +33,7 @@ import {
   scrollToBuyCard,
 } from '@/lib/event-page-utils';
 import { dayRouteItemFromEvent } from '@/lib/day-route-from-place';
+import { formatPublicTitle } from '@/lib/format-public-title';
 import { splitLongTitleAtBreak } from '@/lib/split-long-title';
 import { buildEventBreadcrumbs } from '@/lib/structured-data';
 import { resolveEventHeroObjectPosition } from '@/lib/event-image-focus';
@@ -601,7 +602,7 @@ export function EventHero({
     'inline-flex max-w-full items-center gap-1 rounded-full bg-slate-950/75 px-2.5 py-1 text-[11px] font-medium text-white';
   const solidChipLinkClassName = `${solidChipClassName} cursor-pointer transition hover:bg-slate-950/90 hover:underline hover:decoration-white/50 hover:underline-offset-2`;
 
-  const heroTitle = String(event.seoH1 || event.title || '').trim();
+  const heroTitle = formatPublicTitle(String(event.seoH1 || event.title || '').trim());
   const titleSplit = splitLongTitleAtBreak(heroTitle);
   const longHeroTitle = Boolean(titleSplit) || heroTitle.length > 48;
   const nearestLabel = nextSession
@@ -623,7 +624,7 @@ export function EventHero({
       <EventPageCitySync city={event.city} />
       <SafeImage
         src={heroImage || null}
-        alt={event.title}
+        alt={formatPublicTitle(event.title)}
         fill
         priority
         sizes={IMAGE_SIZES.eventHero}

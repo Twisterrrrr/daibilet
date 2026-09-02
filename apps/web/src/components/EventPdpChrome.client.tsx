@@ -52,7 +52,8 @@ export function EventExpandableMap({
   title: string;
   address?: string | null;
 }) {
-  const [open, setOpen] = React.useState(false);
+  // Open by default: accordion mount + Leaflet 0×0 init was leaving a blank pane.
+  const [open, setOpen] = React.useState(true);
   const mapsUrl = buildYandexMapsExternalUrl({
     latitude: lat,
     longitude: lng,
@@ -85,7 +86,13 @@ export function EventExpandableMap({
       </button>
       {open ? (
         <div className="border-t border-slate-100">
-          <OsmMapEmbed lat={lat} lng={lng} title={`Карта: ${title}`} className="h-56 w-full sm:h-72" />
+          {/* Explicit height on the Leaflet host (not only parent) - avoids blank tiles. */}
+          <OsmMapEmbed
+            lat={lat}
+            lng={lng}
+            title={`Карта: ${title}`}
+            className="h-56 w-full sm:h-72"
+          />
           {mapsUrl ? (
             <div className="flex justify-end border-t border-slate-100 px-3 py-2">
               <a

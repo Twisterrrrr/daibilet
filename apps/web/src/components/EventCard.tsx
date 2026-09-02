@@ -44,6 +44,7 @@ import { dayRouteItemFromEvent } from '@/lib/day-route-from-place';
 import { formatMoneyRange, formatPriceFrom } from '@/lib/format';
 import { formatAgeLimit } from '@/lib/event-page-utils';
 import { trackProductCardClick } from '@/lib/catalog-analytics';
+import { formatPublicTitle } from '@/lib/format-public-title';
 import { eventHref } from '@/lib/routes';
 
 const SLOT_CHIP_CLASS =
@@ -145,7 +146,7 @@ export function EventCard({
   // Missing display price (<100 / null) is not "soon" - event can still be on sale.
   const showSoonBadge = false;
   const purchase = useCatalogPurchase(session);
-  // Catalog list: no hidden widget DOM. Purchase UX lives on event page / landing CTA.
+  const displayTitle = formatPublicTitle(session.title);
   const showPurchaseWidgets = landingActions && !suppressPurchaseAnchors && purchase.purchaseEnabled;
   const dayRouteVenue = dayRouteItemFromEvent({
     id: session.id,
@@ -175,7 +176,7 @@ export function EventCard({
           <Link
             href={href}
             className="absolute inset-0 z-[1]"
-            aria-label={`Страница события: ${session.title}`}
+            aria-label={`Страница события: ${displayTitle}`}
             onClick={() =>
               trackProductCardClick({
                 eventId: session.id,
@@ -187,7 +188,7 @@ export function EventCard({
         ) : null}
         <CardSafeImage
           src={imagePrimarySrc}
-          alt={session.title}
+          alt={displayTitle}
           fill
           sizes={IMAGE_SIZES.eventCard}
           priority={imagePriority}
@@ -198,7 +199,7 @@ export function EventCard({
             imageFallbackSrc && imageFallbackSrc !== imagePrimarySrc ? (
               <CardSafeImage
                 src={imageFallbackSrc}
-                alt={session.title}
+                alt={displayTitle}
                 fill
                 sizes={IMAGE_SIZES.eventCard}
                 className="object-cover"
@@ -260,7 +261,7 @@ export function EventCard({
               })
             }
           >
-            {session.title}
+            {displayTitle}
           </Link>
         </h2>
 
@@ -376,7 +377,7 @@ export function EventCard({
       <Link
         href={href}
         className="absolute inset-0 z-[1] rounded-2xl"
-        aria-label={`Событие: ${session.title}`}
+        aria-label={`Событие: ${displayTitle}`}
         onClick={onCardNavigate}
       />
       {cardBody}
@@ -526,13 +527,14 @@ function ShowcaseEventCard({
     : null;
   const coverDateBadge = formatCoverDateBadge(session);
   const imageSizes = cityHub ? IMAGE_SIZES.affichePoster : IMAGE_SIZES.eventCard;
+  const displayTitle = formatPublicTitle(session.title);
 
   return (
     <article className="group event-card">
       <Link
         href={href}
         className="absolute inset-0 z-[1] rounded-2xl"
-        aria-label={`Событие: ${session.title}`}
+        aria-label={`Событие: ${displayTitle}`}
         onClick={() =>
           trackProductCardClick({
             eventId: session.id,
@@ -548,7 +550,7 @@ function ShowcaseEventCard({
       >
         <CardSafeImage
           src={imagePrimarySrc}
-          alt={session.title}
+          alt={displayTitle}
           fill
           sizes={imageSizes}
           priority={imagePriority}
@@ -559,7 +561,7 @@ function ShowcaseEventCard({
             imageFallbackSrc && imageFallbackSrc !== imagePrimarySrc ? (
               <CardSafeImage
                 src={imageFallbackSrc}
-                alt={session.title}
+                alt={displayTitle}
                 fill
                 sizes={imageSizes}
                 className="object-cover"
@@ -596,7 +598,7 @@ function ShowcaseEventCard({
             href={href}
             className="relative z-[2] transition-colors hover:text-primary-600"
           >
-            {session.title}
+            {displayTitle}
           </Link>
         </h3>
 
