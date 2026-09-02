@@ -4,8 +4,7 @@ import * as React from 'react';
 import { ChevronDown, MapPin, Star } from 'lucide-react';
 
 import { MobileStickyActionBar } from '@/components/MobileStickyActionBar';
-import { OsmMapEmbed } from '@/components/OsmMapEmbed';
-import { buildYandexMapsExternalUrl } from '@/components/YandexMapEmbed';
+import { YandexMapEmbed, buildYandexMapsExternalUrl } from '@/components/YandexMapEmbed';
 import { scrollToBuyCard } from '@/lib/event-page-utils';
 
 /** Mobile sticky: primary «Выбрать билеты» + от X ₽. Hidden lg+. */
@@ -86,8 +85,8 @@ export function EventExpandableMap({
       </button>
       {open ? (
         <div className="border-t border-slate-100">
-          {/* Explicit height on the Leaflet host (not only parent) - avoids blank tiles. */}
-          <OsmMapEmbed
+          {/* Yandex iframe: Leaflet OSM often left a blank pane after accordion/layout. */}
+          <YandexMapEmbed
             lat={lat}
             lng={lng}
             title={`Карта: ${title}`}

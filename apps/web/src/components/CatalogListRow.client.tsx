@@ -10,6 +10,7 @@ import {
   MIN_DISPLAY_PRICE_RUB,
 } from '@/lib/event-card-meta';
 import { formatSessionTime, parseSessionStartsAt, resolveSessionTimeZoneForSession } from '@/lib/datetime';
+import { formatPublicTitle } from '@/lib/format-public-title';
 import { eventHref } from '@/lib/routes';
 
 function formatListRowSchedule(session: PublicCatalogListItemDto): string {
@@ -46,7 +47,7 @@ export function CatalogListRow({ session }: { session: PublicCatalogListItemDto 
     >
       <div className="min-w-0 flex-1">
         <p className="line-clamp-2 font-display text-[15px] font-bold leading-snug text-graphite group-hover:text-primary-700">
-          {session.title}
+          {formatPublicTitle(session.title)}
         </p>
         <p className="mt-1 line-clamp-2 text-xs leading-snug text-graphite-muted">{formatListRowSchedule(session)}</p>
       </div>

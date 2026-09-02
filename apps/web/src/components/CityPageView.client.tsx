@@ -35,6 +35,7 @@ import { SuburbsCarousel } from '@/components/SuburbsCarousel.client';
 import { formatStreetAddress } from '@/lib/address';
 import { placesHubHrefWithSelectedCity } from '@/lib/catalog-url';
 import { formatNumber, formatPriceFrom, pluralEvents, pluralVenues } from '@/lib/format';
+import { formatPublicTitle } from '@/lib/format-public-title';
 import type { CityFaqItem } from '@/lib/city-faq';
 import type { CityHubArticlesBuckets } from '@/lib/city-hub-articles';
 import type { CityHubTemplate } from '@/lib/city-hub-template';
@@ -2074,7 +2075,7 @@ function AffichePosterCard({ session }: { session: PublicSessionDto }) {
 
   return (
     <article className="group relative flex h-full flex-col">
-      <Link href={href} className="absolute inset-0 z-[1] rounded-xl" aria-label={`Событие: ${session.title}`} />
+      <Link href={href} className="absolute inset-0 z-[1] rounded-xl" aria-label={`Событие: ${formatPublicTitle(session.title)}`} />
       <div className="relative mb-4 aspect-[4/5] overflow-hidden rounded-xl bg-zinc-100">
         <SafeImage
           src={session.imageUrl}
@@ -2098,7 +2099,7 @@ function AffichePosterCard({ session }: { session: PublicSessionDto }) {
       </div>
       <div className="flex min-h-0 flex-1 flex-col">
         <h3 className="mb-1 line-clamp-2 text-lg font-medium leading-tight text-balance text-zinc-900">
-          {session.title}
+          {formatPublicTitle(session.title)}
         </h3>
         {session.venue ? <p className="mb-3 line-clamp-1 text-sm text-zinc-500">{session.venue}</p> : null}
         <div className="mt-auto flex items-center justify-between gap-3 pt-1">

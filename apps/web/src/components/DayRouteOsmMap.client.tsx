@@ -4,6 +4,7 @@ import * as React from 'react';
 import type { Map as LeafletMap, Marker as LeafletMarker, Polyline as LeafletPolyline } from 'leaflet';
 
 import { loadDaibiletLeaflet } from '@/lib/leaflet-daibilet';
+import { formatPublicTitle } from '@/lib/format-public-title';
 
 export type DayRouteMapStop = {
   id: string;
@@ -200,13 +201,17 @@ export function DayRouteOsmMap({
         // Wide box so the caption right of the pin is not clipped by Leaflet iconSize.
         const icon = L.divIcon({
           className: 'daibilet-day-route-marker',
-          html: numberedMarkerHtml(stop.index + 1, selected, stop.title),
+          html: numberedMarkerHtml(
+            stop.index + 1,
+            selected,
+            formatPublicTitle(stop.title) || stop.title,
+          ),
           iconSize: [200, 40],
           iconAnchor: [20, 20],
         });
         const marker = L.marker(latLng, {
           icon,
-          title: `${stop.index + 1}. ${stop.title}`,
+          title: `${stop.index + 1}. ${formatPublicTitle(stop.title) || stop.title}`,
           keyboard: true,
         }).addTo(map);
         marker.on('click', () => {

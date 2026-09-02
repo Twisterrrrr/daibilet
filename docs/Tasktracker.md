@@ -1,3 +1,12 @@
+## 2026-09-02 - Event map + My Day pins + CAPS + SEO audit
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| FIX.EVENT-MAP-YANDEX | PDP карта: Yandex iframe вместо blank Leaflet | Критический | 🔄 commit+Deploy MSK web |
+| FIX.MYDAY-PIN-LABELS | CSS подписи пинов (`left:100%` клипал caption) | Высокий | 🔄 |
+| UX.TITLE-CAPS | `formatPublicTitle` на list/table/hub/affiche + map labels | Высокий | 🔄 |
+| SEO.AUDIT-0902 | `docs/seo-audit-2026-09-02.md` вердикт + чеклист | Высокий | ✅ docs |
+
 ## 2026-08-30 - Live smoke audit (batch «code vs live»)
 
 | ID | Задача | Было | Smoke 2026-08-30 | Статус |

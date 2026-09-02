@@ -1849,10 +1849,11 @@ body > div:has(iframe[src*='ticketscloud']) {
     border-color 0.15s ease;
 }
 .daibilet-day-pin-label {
-  position: absolute;
-  left: calc(100% + 6px);
-  top: 50%;
-  transform: translateY(-50%);
+  /* Flex sibling of the pin - do NOT use left:100% (that parks the caption
+     outside the 200px icon box and Leaflet clips it). */
+  position: static;
+  flex: 0 1 auto;
+  margin-left: 6px;
   max-width: 9.5rem;
   padding: 0.2rem 0.45rem;
   border-radius: 0.4rem;

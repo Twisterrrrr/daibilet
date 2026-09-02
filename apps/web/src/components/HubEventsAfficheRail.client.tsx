@@ -10,6 +10,7 @@ import {
   rankCityHubSessions,
 } from '@/lib/city-hub-affiche';
 import { formatCoverDateBadge } from '@/lib/event-card-meta';
+import { formatPublicTitle } from '@/lib/format-public-title';
 import { eventHref, venueHref } from '@/lib/routes';
 import type { PublicSessionDto } from '@daibilet/contracts/public';
 
@@ -100,7 +101,7 @@ function HubStandupSeriesCard({
                 {formatCoverDateBadge(session) || 'Дата'}
               </span>
               <span className="mt-0.5 line-clamp-2 block text-sm font-medium text-slate-900">
-                {session.title || session.eventTitle}
+                {formatPublicTitle(session.title || session.eventTitle)}
               </span>
             </Link>
           </li>

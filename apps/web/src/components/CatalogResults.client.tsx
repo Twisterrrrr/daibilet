@@ -12,6 +12,7 @@ import { trackCatalogBannerClick } from '@/lib/catalog-analytics';
 import { catalogItemHasLiveSignal } from '@/lib/event-card-badges';
 import { resolveEventCardFallbackImage, resolveEventCardPrimaryImage } from '@/lib/event-card-image';
 import { formatMoneyRange } from '@/lib/format';
+import { formatPublicTitle } from '@/lib/format-public-title';
 import { formatShowcaseSessionDate, MIN_DISPLAY_PRICE_RUB } from '@/lib/event-card-meta';
 import { resolveEventCardDestinationLabel } from '@/lib/event-location';
 import { eventHref, sessionVenueHref } from '@/lib/routes';
@@ -336,7 +337,7 @@ function CatalogLiveRail({
                 <div className="relative aspect-[16/10] overflow-hidden bg-surface-muted">
                   <CardSafeImage
                     src={coverSrc}
-                    alt={session.title}
+                    alt={formatPublicTitle(session.title)}
                     fill
                     sizes={IMAGE_SIZES.eventCard}
                     priority={index < CATALOG_IMAGE_PRIORITY_COUNT}
@@ -351,7 +352,7 @@ function CatalogLiveRail({
                 </div>
                 <div className="space-y-1 p-2.5">
                   <p className="line-clamp-2 text-xs font-semibold leading-snug text-graphite sm:text-sm">
-                    {session.title}
+                    {formatPublicTitle(session.title)}
                   </p>
                   {hasPrice ? (
                     <p className="text-[11px] font-bold text-primary-700 sm:text-xs">
@@ -457,7 +458,7 @@ function CatalogTable({ items }: { items: PublicCatalogListItemDto[] }) {
               <tr key={`${session.id}-${session.startsAt}`} className="border-b border-slate-100 last:border-0 hover:bg-slate-50">
                 <td className="min-w-[280px] px-4 py-3 align-top">
                   <Link href={eventHref(session)} className="font-semibold text-slate-950 hover:text-primary-700">
-                    {session.title}
+                    {formatPublicTitle(session.title)}
                   </Link>
                   {session.venue ? (
                     venueLink ? (
