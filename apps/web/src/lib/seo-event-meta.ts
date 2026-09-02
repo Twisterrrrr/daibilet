@@ -1,4 +1,5 @@
 import { cityToPrepositional, isSeoExpansionCity } from '@/lib/city-declension';
+import { formatPublicTitle } from '@/lib/format-public-title';
 import { listingSeoYear } from '@/lib/seo-listing-meta';
 import { pageTitle } from '@/lib/seo-meta';
 
@@ -21,7 +22,7 @@ export function buildEventCityMetaTitle(input: {
   cityName: string;
   priceFrom?: number | null;
 }): string {
-  const title = String(input.eventTitle || '').trim() || 'событие';
+  const title = formatPublicTitle(input.eventTitle) || 'событие';
   const cityPrep = cityToPrepositional(String(input.cityName || '').trim() || 'городе');
   const price = resolveEventMetaMinPrice(input.priceFrom);
   if (price != null) {
@@ -38,7 +39,7 @@ export function buildEventCityMetaDescription(input: {
   cityName: string;
   year?: number;
 }): string {
-  const title = String(input.eventTitle || '').trim() || 'событие';
+  const title = formatPublicTitle(input.eventTitle) || 'событие';
   const cityPrep = cityToPrepositional(String(input.cityName || '').trim() || 'городе');
   const year = input.year ?? listingSeoYear();
   return (
@@ -98,8 +99,9 @@ export function buildEventPageMetaTitle(input: {
   dateLabel?: string | null;
   timeLabel?: string | null;
 }): string {
-  const eventTitle = String(input.eventTitle || '').trim() || 'Событие';
-  const custom = pageTitle(String(input.seoTitle || '').trim());
+  const eventTitle = formatPublicTitle(input.eventTitle) || 'Событие';
+  const customRaw = pageTitle(String(input.seoTitle || '').trim());
+  const custom = customRaw ? formatPublicTitle(customRaw) || customRaw : '';
   const dateLabel = String(input.dateLabel || '').trim();
   const timeLabel = String(input.timeLabel || '').trim();
   const venueName = String(input.venueName || '').trim();

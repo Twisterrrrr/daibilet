@@ -86,3 +86,18 @@ test('event page title adds date disambiguator for twin sessions', () => {
   assert.match(titleB, /12 июл/);
   assert.ok(!titleA.includes('\u2014') && !titleA.includes('\u2013'));
 });
+
+test('event meta soft-cases ALL CAPS supplier titles', () => {
+  const title = buildEventCityMetaTitle({
+    eventTitle: 'КОНЦЕРТ ГРУППЫ SAHALIN',
+    cityName: 'Казань',
+    priceFrom: null,
+  });
+  assert.equal(title, 'Билеты на Концерт Группы Sahalin в Казани - расписание и цены');
+
+  const page = buildEventPageMetaTitle({
+    eventTitle: 'КОНЦЕРТ ГРУППЫ SAHALIN',
+    cityName: 'Москва',
+  });
+  assert.match(page, /^Концерт Группы Sahalin/);
+});

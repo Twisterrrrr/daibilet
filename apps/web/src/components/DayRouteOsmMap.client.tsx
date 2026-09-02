@@ -197,10 +197,11 @@ export function DayRouteOsmMap({
         const latLng: [number, number] = [stop.latitude, stop.longitude];
         latLngs.push(latLng);
         const selected = Boolean(selectedStopId && selectedStopId === stop.id);
+        // Wide box so the caption right of the pin is not clipped by Leaflet iconSize.
         const icon = L.divIcon({
           className: 'daibilet-day-route-marker',
           html: numberedMarkerHtml(stop.index + 1, selected, stop.title),
-          iconSize: [40, 40],
+          iconSize: [200, 40],
           iconAnchor: [20, 20],
         });
         const marker = L.marker(latLng, {

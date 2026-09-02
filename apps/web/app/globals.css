@@ -1808,19 +1808,26 @@ body > div:has(iframe[src*='ticketscloud']) {
 }
 
 /* My Day map pins: Lovable scale on active; owner hover = white invert */
+.leaflet-marker-pane,
+.leaflet-marker-icon {
+  overflow: visible !important;
+}
 .daibilet-day-route-marker {
   background: transparent !important;
   border: 0 !important;
   display: flex !important;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   overflow: visible !important;
 }
 .daibilet-day-pin-wrap {
   position: relative;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  width: 200px;
+  height: 40px;
+  padding-left: 6px;
 }
 .daibilet-day-pin {
   width: 28px;
