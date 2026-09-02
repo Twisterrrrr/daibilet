@@ -16,18 +16,42 @@ import {
 
 export const OPEN_HEADER_CITY_PICKER_EVENT = 'daibilet:open-header-city-picker';
 
+/** One GPS attempt per browser tab session (overrides stale storage from another city). */
+export const GEO_SESSION_ATTEMPT_KEY = 'daibilet:geo-session-attempt';
+
 /** City + inner suburbs. Beyond this we ask without a guess. */
 export const MAX_CITY_SUGGEST_METERS = 80_000;
 
 export { hasCompletedCityPrompt, markCityPromptCompleted } from './selected-city.ts';
 
 /**
- * True when the visitor already has a city (storage) or already answered the prompt.
- * `city=all` clears the city key but keeps the prompted flag so we do not nag again.
+ * True when the visitor already picked a city (storage) or dismissed the legacy prompt.
+ * Does not block session geo - stale Moscow in storage must not win over GPS in SPB.
  */
 export function hasExplicitCityChoice(destinations: PublicDestinationDto[]): boolean {
   if (hasCompletedCityPrompt()) return true;
   return Boolean(readStoredSelectedCity(destinations));
+}
+
+export function hasGeoSessionAttempt(): boolean {
+  try {
+    return sessionStorage.getItem(GEO_SESSION_ATTEMPT_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+export function markGeoSessionAttempt() {
+  try {
+    sessionStorage.setItem(GEO_SESSION_ATTEMPT_KEY, '1');
+  } catch {
+    // ignore storage errors
+  }
+}
+
+/** Defer localStorage city until the first session geo attempt finishes. */
+export function shouldDeferStorageCityForGeo(pathname: string | null | undefined): boolean {
+  return shouldAttemptSilentGeo(pathname) && !hasGeoSessionAttempt();
 }
 
 function isBrowsingPath(pathname: string | null | undefined): boolean {
@@ -38,18 +62,17 @@ function isBrowsingPath(pathname: string | null | undefined): boolean {
   return true;
 }
 
-/** Mobile first visit: silent GPS apply (incl. /events, /podborki). */
-export function shouldAttemptMobileSilentGeo(pathname: string | null | undefined): boolean {
+/** First session visit: silent GPS apply on all viewports (incl. /events, /podborki). */
+export function shouldAttemptSilentGeo(pathname: string | null | undefined): boolean {
   return isBrowsingPath(pathname);
 }
 
-/** Desktop first visit: confirm modal; skip catalog gates (they have their own UI). */
+/** @deprecated Use shouldAttemptSilentGeo */
+export const shouldAttemptMobileSilentGeo = shouldAttemptSilentGeo;
+
+/** Legacy desktop modal - unused after ADR 2026-09-02 (silent geo all viewports). */
 export function shouldOfferFirstVisitCityPrompt(pathname: string | null | undefined): boolean {
-  if (!isBrowsingPath(pathname)) return false;
-  const path = String(pathname || '').replace(/\/$/, '') || '/';
-  if (path === '/events' || path.startsWith('/events/')) return false;
-  if (path === '/podborki' || path.startsWith('/podborki/')) return false;
-  return true;
+  return false;
 }
 
 export function suggestNearestCity(

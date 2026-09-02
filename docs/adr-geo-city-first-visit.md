@@ -1,43 +1,44 @@
-# ADR: город по геолокации на первом визите
+# ADR: город по геолокации на визит
 
-**Статус:** принято (2026-09-01)  
+**Статус:** принято (обновлено 2026-09-02)  
 **Контекст:** UX.LOC D3, city gate на `/events` и `/podborki`
 
 ## Решение
 
-На **первом визите** без сохранённого города в storage:
+На **каждом визите в новой вкладке** (один раз за session), если нет явного `?city=` / хаб-роута / лендинга с городом:
 
-### Mobile (viewport ≤ 1023px)
-
-1. Один раз запрашиваем `navigator.geolocation` (системный prompt ОС) на **любой** странице каталога, включая `/events` и `/podborki`.
+1. Запрашиваем `navigator.geolocation` на **всех** viewport (mobile + desktop).
 2. Ближайший каталожный город в радиусе **80 км** применяем **молча** в шапку и `localStorage`.
-3. Модалку «Ваш город?» не показываем - смена в шапке.
+3. **GPS перебивает stale storage** (например Москва в localStorage при фактическом визите в СПб).
+4. До завершения geo-попытки storage **не** подмешиваем в шапку и `?city=` на `/events`.
+5. Модалку «Ваш город?» не показываем - смена в шапке.
 
-### Desktop
+### Fallback
 
-1. Модалку confirm только если geolocation **уже разрешён** (без surprise-prompt).
-2. Иначе - «Выберите город» / picker в шапке; на `/events` и `/podborki` - city gate.
-
-### Общее
-
-- Отказ / нет GPS / далеко от хаба → «Все города»; повторно не спрашиваем (`markCityPromptCompleted`).
-- Повторные визиты: только storage / URL / хаб-роут.
+- Отказ / нет GPS / далеко от хаба → город из `localStorage`, иначе «Все города».
+- Повтор в той же вкладке: только storage / URL / хаб (session flag `daibilet:geo-session-attempt`).
 
 ## Исключения
 
 Не запускаем гео на: `/admin`, `/checkout`, `/login`, `/account`.
 
-## Поведение каталога (mobile)
+## Поведение каталога
 
-Пока идёт первая geo-попытка, city gate на `/events` и `/podborki` **не показываем** (`geoBootstrapPending`).
+Пока идёт session geo-попытка, city gate на `/events` и `/podborki` **не показываем** (`geoBootstrapPending`).
+
+## Мобильная адаптация (Вебмастер)
+
+Явный `viewport` в `app/layout.tsx` (`width=device-width`, `initialScale: 1`). После правок - переобход в Вебмастере.
 
 ## Ограничения
 
 - Точность: центры городов в `city-map-coords`.
 - VPN / неточный GPS → неверный город; пользователь меняет в шапке.
+- Desktop: системный prompt геолокации при первом визите в вкладке.
 
 ## Файлы
 
 - `apps/web/src/lib/first-visit-city.ts`
 - `apps/web/src/components/SelectedCityProvider.client.tsx`
 - `CatalogShell.client.tsx`, `LandingsCatalogView.client.tsx`
+- `apps/web/app/layout.tsx`

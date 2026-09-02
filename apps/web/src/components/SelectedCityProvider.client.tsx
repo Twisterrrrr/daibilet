@@ -22,14 +22,11 @@ import {
 import { resolveLandingCityName } from '@/lib/landing-city';
 import { canonicalLandingSlug } from '@/lib/landing-constants';
 import {
-  dispatchOpenHeaderCityPicker,
-  hasExplicitCityChoice,
-  isMobileViewport,
-  markCityPromptCompleted,
+  hasGeoSessionAttempt,
+  markGeoSessionAttempt,
   readBrowserPosition,
-  readGrantedBrowserPosition,
-  shouldAttemptMobileSilentGeo,
-  shouldOfferFirstVisitCityPrompt,
+  shouldAttemptSilentGeo,
+  shouldDeferStorageCityForGeo,
   suggestNearestCity,
 } from '@/lib/first-visit-city';
 import {
@@ -38,6 +35,7 @@ import {
   matchDestination,
   mergeStoredCityIntoSearchParams,
   persistSelectedCity,
+  readStoredSelectedCity,
   readsCityQueryParam,
   resolveCityHubDestination,
   resolveCityLabel,
@@ -66,7 +64,7 @@ type SelectedCityContextValue = {
   cityLabel: string;
   /** False until client has read storage / URL — avoid flashing «Все города». */
   cityReady: boolean;
-  /** Mobile first-visit GPS in flight — catalog gates wait to avoid flash. */
+  /** Session GPS in flight — catalog gates wait to avoid flash. */
   geoBootstrapPending: boolean;
   selectedDestination: PublicDestinationDto | null;
   /** Full destinations list (city picker on /my-day and chrome). */
@@ -129,15 +127,9 @@ export function SelectedCityProvider({
   const [geoBootstrapPending, setGeoBootstrapPending] = useState(false);
   const [pendingConfirm, setPendingConfirm] = useState<PendingConfirm | null>(null);
   const pendingConfirmRef = useRef<PendingConfirm | null>(null);
-  /** First-visit CityConfirmModal: suggested catalog city or null = pick yourself. */
-  const [firstVisitPrompt, setFirstVisitPrompt] = useState<{ suggestedName: string | null } | null>(
-    null,
-  );
   /** Picker choice that must not be overwritten by a stale `?city=` / hub slug. */
   const pendingCityRef = useRef<string | null>(null);
-  const cityLabelRef = useRef(cityLabel);
-  cityLabelRef.current = cityLabel;
-  const mobileGeoAttemptedRef = useRef(false);
+  const geoAttemptedRef = useRef(false);
 
   const onParams = useCallback((params: URLSearchParams) => {
     setUrlCity(params.get('city'));
@@ -189,7 +181,11 @@ export function SelectedCityProvider({
           resolveCityLabel(destinations, readsCityQueryParam(pathname) ? urlCity : null);
       } else {
         const fromUrl = readsCityQueryParam(pathname) ? urlCity : null;
-        nextLabel = resolveCityLabel(destinations, fromUrl);
+        if (!fromUrl && shouldDeferStorageCityForGeo(pathname)) {
+          nextLabel = 'Все города';
+        } else {
+          nextLabel = resolveCityLabel(destinations, fromUrl);
+        }
       }
     }
 
@@ -217,6 +213,7 @@ export function SelectedCityProvider({
   // Index pages without explicit city= — inject header city into URL (deep-links untouched).
   useLayoutEffect(() => {
     if (!isCityFilterPath(pathname)) return;
+    if (shouldDeferStorageCityForGeo(pathname)) return;
     const base = catalogPathBase(pathname);
     const path = pathname.replace(/\/$/, '') || '/';
     if (path !== base) return;
@@ -290,24 +287,26 @@ export function SelectedCityProvider({
     if (matched?.name) persistSelectedCity(matched.name);
   }, [destinations, pathname]);
 
-  const closeFirstVisit = useCallback((openPicker: boolean) => {
-    markCityPromptCompleted();
-    setFirstVisitPrompt(null);
-    if (openPicker) dispatchOpenHeaderCityPicker();
-  }, []);
+  }, [destinations, pathname]);
 
-  // Mobile first visit: silent GPS on any browsing page (incl. /events, /podborki).
+  // Session geo: all viewports, once per tab. GPS wins over stale storage (e.g. Moscow while in SPB).
   useEffect(() => {
     if (!cityReady || pendingConfirm) return;
-    if (cityLabel !== 'Все города') return;
-    if (!isMobileViewport()) return;
-    if (!shouldAttemptMobileSilentGeo(pathname)) return;
-    if (hasExplicitCityChoice(destinations)) return;
-    if (mobileGeoAttemptedRef.current) return;
-    mobileGeoAttemptedRef.current = true;
+    if (!shouldAttemptSilentGeo(pathname)) return;
+    if (hasGeoSessionAttempt()) return;
+    if (resolveCityHubDestination(destinations, pathname)) return;
+    if (resolveLandingRouteFromLocation(pathname)?.citySlug) return;
+    if (readsCityQueryParam(pathname) && urlCity) return;
+    if (geoAttemptedRef.current) return;
+    geoAttemptedRef.current = true;
 
     const cities = destinations.filter((item) => item.type === 'city');
-    if (cities.length === 0) return;
+    if (cities.length === 0) {
+      markGeoSessionAttempt();
+      const stored = readStoredSelectedCity(destinations);
+      if (stored) setCityLabel(stored);
+      return;
+    }
 
     setGeoBootstrapPending(true);
     let cancelled = false;
@@ -315,18 +314,21 @@ export function SelectedCityProvider({
       try {
         const position = await readBrowserPosition();
         if (cancelled) return;
-        if (cityLabelRef.current !== 'Все города') return;
-        if (hasExplicitCityChoice(destinations)) return;
         const suggested = position
           ? suggestNearestCity(cities, position.latitude, position.longitude)
           : null;
-        markCityPromptCompleted();
         if (suggested?.name) {
           persistSelectedCity(suggested.name);
           setCityLabel(suggested.name);
+        } else {
+          const stored = readStoredSelectedCity(destinations);
+          if (stored) setCityLabel(stored);
         }
       } finally {
-        if (!cancelled) setGeoBootstrapPending(false);
+        if (!cancelled) {
+          markGeoSessionAttempt();
+          setGeoBootstrapPending(false);
+        }
       }
     })();
 
@@ -334,40 +336,7 @@ export function SelectedCityProvider({
       cancelled = true;
       setGeoBootstrapPending(false);
     };
-  }, [cityLabel, cityReady, destinations, pathname, pendingConfirm]);
-
-  // Desktop first-visit confirm. Never overwrite a stored / URL / hub city.
-  // GPS only if permission is already granted.
-  useEffect(() => {
-    if (!cityReady || firstVisitPrompt || pendingConfirm) return;
-    if (cityLabel !== 'Все города') return;
-    if (isMobileViewport()) return;
-    if (!shouldOfferFirstVisitCityPrompt(pathname)) return;
-    const cities = destinations.filter((item) => item.type === 'city');
-    if (cities.length === 0) return;
-
-    let cancelled = false;
-    void (async () => {
-      const position = await readGrantedBrowserPosition();
-      if (cancelled) return;
-      if (cityLabelRef.current !== 'Все города') return;
-      if (hasExplicitCityChoice(destinations)) return;
-      const suggested = position
-        ? suggestNearestCity(cities, position.latitude, position.longitude)
-        : null;
-      setFirstVisitPrompt({ suggestedName: suggested?.name ?? null });
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [cityLabel, cityReady, destinations, firstVisitPrompt, pathname, pendingConfirm]);
-
-  useEffect(() => {
-    if (!firstVisitPrompt) return;
-    if (cityLabel === 'Все города') return;
-    markCityPromptCompleted();
-    setFirstVisitPrompt(null);
-  }, [cityLabel, firstVisitPrompt]);
+  }, [cityReady, destinations, pathname, pendingConfirm, urlCity]);
 
   const cityValue = cityLabel === 'Все города' ? 'all' : cityLabel;
   const selectedDestination = useMemo(
@@ -475,14 +444,6 @@ export function SelectedCityProvider({
 
   const confirmMessage = pendingConfirm?.message || '';
   const routeConfirmOpen = Boolean(pendingConfirm);
-  const firstVisitOpen = Boolean(firstVisitPrompt) && !routeConfirmOpen;
-  const suggestedName = firstVisitPrompt?.suggestedName || '';
-  const firstVisitTitle = suggestedName ? 'Ваш город?' : 'Выберите город';
-  const firstVisitMessage = suggestedName
-    ? `Похоже, вы в ${suggestedName}. Показать афишу этого города?`
-    : 'Укажите город, чтобы видеть события и места рядом. Его всегда можно сменить в шапке.';
-  const firstVisitConfirmLabel = suggestedName ? 'Да, это мой город' : 'Выбрать город';
-  const firstVisitCancelLabel = suggestedName ? 'Другой город' : 'Позже';
 
   return (
     <SelectedCityContext.Provider value={value}>
@@ -491,31 +452,13 @@ export function SelectedCityProvider({
       </Suspense>
       {children}
       <CityConfirmModal
-        open={routeConfirmOpen || firstVisitOpen}
-        title={routeConfirmOpen ? 'Переключить город?' : firstVisitTitle}
-        message={routeConfirmOpen ? confirmMessage : firstVisitMessage}
-        confirmLabel={routeConfirmOpen ? 'Очистить и перейти' : firstVisitConfirmLabel}
-        cancelLabel={routeConfirmOpen ? 'Отмена' : firstVisitCancelLabel}
-        onConfirm={() => {
-          if (routeConfirmOpen) {
-            closeConfirm(true);
-            return;
-          }
-          if (suggestedName) {
-            markCityPromptCompleted();
-            setFirstVisitPrompt(null);
-            void setCity(suggestedName, { skipRouteConfirm: true });
-            return;
-          }
-          closeFirstVisit(true);
-        }}
-        onCancel={() => {
-          if (routeConfirmOpen) {
-            closeConfirm(false);
-            return;
-          }
-          closeFirstVisit(Boolean(suggestedName));
-        }}
+        open={routeConfirmOpen}
+        title="Переключить город?"
+        message={confirmMessage}
+        confirmLabel="Очистить и перейти"
+        cancelLabel="Отмена"
+        onConfirm={() => closeConfirm(true)}
+        onCancel={() => closeConfirm(false)}
       />
     </SelectedCityContext.Provider>
   );

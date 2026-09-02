@@ -11,8 +11,11 @@ import {
 import {
   hasCompletedCityPrompt,
   hasExplicitCityChoice,
+  hasGeoSessionAttempt,
   markCityPromptCompleted,
-  shouldAttemptMobileSilentGeo,
+  markGeoSessionAttempt,
+  shouldAttemptSilentGeo,
+  shouldDeferStorageCityForGeo,
   shouldOfferFirstVisitCityPrompt,
   suggestNearestCity,
 } from './first-visit-city.ts';
@@ -48,26 +51,40 @@ const cities = [
   },
 ] satisfies PublicDestinationDto[];
 
-test('shouldOfferFirstVisitCityPrompt skips catalog gates and account', () => {
-  assert.equal(shouldOfferFirstVisitCityPrompt('/'), true);
-  assert.equal(shouldOfferFirstVisitCityPrompt('/cities'), true);
-  assert.equal(shouldOfferFirstVisitCityPrompt('/places'), true);
-  assert.equal(shouldOfferFirstVisitCityPrompt('/events'), false);
-  assert.equal(shouldOfferFirstVisitCityPrompt('/events/some-slug'), false);
-  assert.equal(shouldOfferFirstVisitCityPrompt('/podborki'), false);
-  assert.equal(shouldOfferFirstVisitCityPrompt('/checkout/ticket/abc'), false);
-  assert.equal(shouldOfferFirstVisitCityPrompt('/login'), false);
-  assert.equal(shouldOfferFirstVisitCityPrompt('/admin/events'), false);
+test('shouldOfferFirstVisitCityPrompt is disabled (silent geo on all viewports)', () => {
+  assert.equal(shouldOfferFirstVisitCityPrompt('/'), false);
+  assert.equal(shouldOfferFirstVisitCityPrompt('/cities'), false);
 });
 
-test('shouldAttemptMobileSilentGeo includes catalog gates', () => {
-  assert.equal(shouldAttemptMobileSilentGeo('/'), true);
-  assert.equal(shouldAttemptMobileSilentGeo('/events'), true);
-  assert.equal(shouldAttemptMobileSilentGeo('/podborki'), true);
-  assert.equal(shouldAttemptMobileSilentGeo('/events/some-slug'), true);
-  assert.equal(shouldAttemptMobileSilentGeo('/checkout/ticket/abc'), false);
-  assert.equal(shouldAttemptMobileSilentGeo('/login'), false);
-  assert.equal(shouldAttemptMobileSilentGeo('/admin/events'), false);
+test('shouldAttemptSilentGeo includes catalog gates and account exclusions', () => {
+  assert.equal(shouldAttemptSilentGeo('/'), true);
+  assert.equal(shouldAttemptSilentGeo('/events'), true);
+  assert.equal(shouldAttemptSilentGeo('/podborki'), true);
+  assert.equal(shouldAttemptSilentGeo('/events/some-slug'), true);
+  assert.equal(shouldAttemptSilentGeo('/checkout/ticket/abc'), false);
+  assert.equal(shouldAttemptSilentGeo('/login'), false);
+  assert.equal(shouldAttemptSilentGeo('/admin/events'), false);
+});
+
+test('shouldDeferStorageCityForGeo waits for session geo attempt', () => {
+  const storage = new Map<string, string>();
+  const original = globalThis.sessionStorage;
+  Object.defineProperty(globalThis, 'sessionStorage', {
+    configurable: true,
+    value: {
+      getItem: (key: string) => storage.get(key) ?? null,
+      setItem: (key: string, value: string) => storage.set(key, value),
+      removeItem: (key: string) => storage.delete(key),
+    },
+  });
+  try {
+    assert.equal(shouldDeferStorageCityForGeo('/events'), true);
+    markGeoSessionAttempt();
+    assert.equal(hasGeoSessionAttempt(), true);
+    assert.equal(shouldDeferStorageCityForGeo('/events'), false);
+  } finally {
+    Object.defineProperty(globalThis, 'sessionStorage', { configurable: true, value: original });
+  }
 });
 
 test('suggestNearestCity maps GPS to catalog city and refuses far points', () => {

@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Suspense } from 'react';
 
 import { ChunkLoadRecovery } from '@/components/ChunkLoadRecovery';
@@ -63,6 +63,12 @@ export const metadata: Metadata = {
   other: {
     'apple-mobile-web-app-title': SITE_NAME,
   },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
 };
 
 const siteJsonLd = {
