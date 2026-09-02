@@ -287,8 +287,6 @@ export function SelectedCityProvider({
     if (matched?.name) persistSelectedCity(matched.name);
   }, [destinations, pathname]);
 
-  }, [destinations, pathname]);
-
   // Session geo: all viewports, once per tab. GPS wins over stale storage (e.g. Moscow while in SPB).
   useEffect(() => {
     if (!cityReady || pendingConfirm) return;
