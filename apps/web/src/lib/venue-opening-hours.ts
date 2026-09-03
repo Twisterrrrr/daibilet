@@ -26,6 +26,16 @@ export function formatVenueOpeningHoursLines(info: VenueOpeningHoursInfo | null 
  * holiday caveat stays on the ticket UI.
  */
 const EDITORIAL_OPENING_HOURS_BY_SLUG: Record<string, string[]> = {
+  "dzhaz-klub-igorya-butmana": [
+    "Вс-Пн: 18:00-00:00",
+    "Вт-Сб: 18:00-01:00",
+    "Бронь по телефону: ежедневно 14:00-22:00",
+  ],
+  "dzhaz-klub-igorya-butmana-spb": [
+    "Вс-Пн: 18:00-00:00",
+    "Вт-Сб: 18:00-01:00",
+    "Бронь по телефону: ежедневно 14:00-22:00",
+  ],
   "государственныи-геологическии-музеи-им-вернадского-58d0097cd352860017f35db4": [
     "Вт-Пт: 11:00-19:00",
     "Сб, Вс: 12:00-19:00",

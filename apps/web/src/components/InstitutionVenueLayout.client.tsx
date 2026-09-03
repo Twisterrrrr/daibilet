@@ -36,8 +36,8 @@ import { resolveNearestMetroStationName } from '@/lib/nearest-metro';
 import {
   applyVenueEditorialOverlay,
   formatVenueMetroLabel,
+  resolveVenueCuratedFaqItems,
   resolveVenueEditorialContent,
-  resolveVenueFaqItems,
   resolveVenueGalleryImages,
   venueFeatureChips,
 } from '@/lib/venue-editorial-content';
@@ -48,6 +48,7 @@ import {
 } from '@/lib/venue-opening-hours';
 import {
   filterSimilarInstitutionVenues,
+  institutionTypeEmoji,
   normalizeVenueKind,
   resolvePublicVenueType,
   resolveVenueAboutHeading,
@@ -95,7 +96,11 @@ export function InstitutionVenueLayout({
   const publicType = resolvePublicVenueType(venue.type, venue.name);
   const isMuseumOrArt = MUSEUM_ART_KINDS.has(publicType);
   const typeLabel = venueTypeLabel(venue.type, venue.name);
-  const aboutHeading = resolveVenueAboutHeading(venue.type, venue.name);
+  const aboutHeading = React.useMemo(() => {
+    const label = resolveVenueAboutHeading(venue.type, venue.name);
+    const emoji = institutionTypeEmoji(venue.type);
+    return emoji ? `${emoji} ${label}` : label;
+  }, [venue.type, venue.name]);
   const editorial = React.useMemo(
     () => resolveVenueEditorialContent(venue.slug),
     [venue.slug],
@@ -126,7 +131,7 @@ export function InstitutionVenueLayout({
     () => formatVenueMetroLabel(resolvedMetroName),
     [resolvedMetroName],
   );
-  const faqItems = React.useMemo(() => resolveVenueFaqItems(venue.slug), [venue.slug]);
+  const faqItems = React.useMemo(() => resolveVenueCuratedFaqItems(venue.slug), [venue.slug]);
   const featureChips = React.useMemo(
     () => venueFeatureChips(editorial?.features),
     [editorial?.features],
@@ -141,7 +146,7 @@ export function InstitutionVenueLayout({
   const hasAfisha = sessions.length > 0;
   /** Same rail density as city hub «Ближайшие события» (poster cards). */
   const nextSessions = sessions.slice(0, 24);
-  const showFaq = true;
+  const showFaq = faqItems.length > 0;
   const showVisitSection = Boolean(openingHours?.lines?.length);
   const similarVenues = React.useMemo(
     () => filterSimilarInstitutionVenues(venue, relatedVenues, 4),
@@ -161,6 +166,7 @@ export function InstitutionVenueLayout({
   const phone = nonEmptyLogisticsText(editorial?.phone);
   const website = nonEmptyLogisticsText(editorial?.website);
   const websiteLabel = editorial?.websiteLabel || 'Официальный сайт';
+  const showHoursOrContacts = Boolean(openingHours?.lines?.length || phone || website);
   const heroAddressLine = [streetAddress || venue.city, metroLabel].filter(Boolean).join(' • ');
   const wayTipRaw =
     nonEmptyLogisticsText(venue.wayToFind) || nonEmptyLogisticsText(editorial?.wayToFind);
@@ -408,27 +414,30 @@ export function InstitutionVenueLayout({
               {aboutHeading}
             </h2>
             {editorial?.highlights?.length ? (
-              <ul className="mt-6 space-y-2" data-venue-highlights>
+              <ul className="mt-6 space-y-3" data-venue-highlights>
                 {editorial.highlights.map((item) => (
-                  <li key={item} className="flex items-start gap-2 text-sm leading-6 text-slate-800">
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
+                  <li key={item} className="flex items-start gap-2.5 text-sm leading-7 text-slate-800">
+                    <CheckCircle2 className="mt-1 h-4 w-4 shrink-0 text-emerald-500" />
                     <span>{item}</span>
                   </li>
                 ))}
               </ul>
             ) : categories.length > 0 ? (
-              <ul className="mt-6 space-y-2">
+              <ul className="mt-6 space-y-3">
                 {categories.slice(0, 6).map(([name]) => (
-                  <li key={name} className="flex items-start gap-2 text-sm leading-6 text-slate-800">
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
+                  <li key={name} className="flex items-start gap-2.5 text-sm leading-7 text-slate-800">
+                    <CheckCircle2 className="mt-1 h-4 w-4 shrink-0 text-emerald-500" />
                     <span>{name}</span>
                   </li>
                 ))}
               </ul>
             ) : null}
             {venue.description && venue.description !== intro
-              ? splitVenueProseParagraphs(venue.description).map((paragraph) => (
-                  <p key={paragraph.slice(0, 48)} className="mt-5 text-sm leading-7 text-slate-600">
+              ? splitVenueProseParagraphs(venue.description).map((paragraph, index) => (
+                  <p
+                    key={paragraph.slice(0, 48)}
+                    className={`${index === 0 ? 'mt-8' : 'mt-5'} text-sm leading-7 text-slate-600`}
+                  >
                     {paragraph}
                   </p>
                 ))
@@ -438,16 +447,16 @@ export function InstitutionVenueLayout({
           {seoSections.length > 0 ? (
             <section
               id="venue-guide"
-              className="scroll-mt-24 space-y-12"
+              className="scroll-mt-24 space-y-14"
               data-venue-seo-sections
             >
               {seoSections.map((section) => (
-                <div key={section.h2}>
+                <div key={section.h2} className="space-y-5">
                   <h2 className="font-display text-xl font-bold tracking-tight text-zinc-950 sm:text-2xl">
                     {section.h2}
                   </h2>
                   {splitVenueProseParagraphs(section.body).map((paragraph) => (
-                    <p key={paragraph.slice(0, 48)} className="mt-5 text-sm leading-7 text-zinc-600">
+                    <p key={paragraph.slice(0, 48)} className="text-sm leading-7 text-zinc-600">
                       {paragraph}
                     </p>
                   ))}
@@ -594,51 +603,52 @@ export function InstitutionVenueLayout({
               ) : null}
             </div>
 
-            <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
-              <div className="text-sm font-semibold text-zinc-950">Режим и контакты</div>
-              {openingHours?.lines?.length ? (
-                <div className="mt-3" data-venue-opening-hours-sidebar>
-                  <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">
-                    <Clock className="h-3.5 w-3.5 text-primary-600" />
-                    Часы работы
+            {showHoursOrContacts ? (
+              <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
+                {openingHours?.lines?.length ? (
+                  <div data-venue-opening-hours-sidebar>
+                    <div className="flex items-center gap-2 text-sm font-semibold text-zinc-950">
+                      <Clock className="h-4 w-4 text-primary-600" />
+                      Часы работы
+                    </div>
+                    <ul className="mt-3 space-y-1 text-sm leading-6 text-zinc-700">
+                      {openingHours.lines.map((line) => (
+                        <li key={line}>{line}</li>
+                      ))}
+                    </ul>
+                    <p className="mt-3 text-xs leading-5 text-zinc-500">{OPEN_DATE_HOURS_HOLIDAY_NOTE}</p>
                   </div>
-                  <ul className="mt-2 space-y-1 text-sm text-zinc-700">
-                    {openingHours.lines.map((line) => (
-                      <li key={line}>{line}</li>
-                    ))}
+                ) : null}
+                {phone || website ? (
+                  <ul
+                    className={`space-y-2 text-sm text-zinc-700 ${
+                      openingHours?.lines?.length ? 'mt-4 border-t border-zinc-100 pt-4' : ''
+                    }`}
+                  >
+                    {phone ? (
+                      <li>
+                        <a href={`tel:${phone.replace(/[^\d+]/g, '')}`} className="hover:text-primary-700">
+                          {phone}
+                        </a>
+                      </li>
+                    ) : null}
+                    {website ? (
+                      <li>
+                        <a
+                          href={website}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1 font-medium text-primary-700 hover:underline"
+                        >
+                          {websiteLabel}
+                          <ExternalLink className="h-3.5 w-3.5" />
+                        </a>
+                      </li>
+                    ) : null}
                   </ul>
-                  <p className="mt-2 text-xs leading-5 text-zinc-500">{OPEN_DATE_HOURS_HOLIDAY_NOTE}</p>
-                </div>
-              ) : (
-                <p className="mt-3 text-sm text-zinc-600">
-                  Режим работы уточняйте на официальном сайте площадки, особенно в праздники.
-                </p>
-              )}
-              {(phone || website) ? (
-                <ul className="mt-4 space-y-2 border-t border-zinc-100 pt-4 text-sm text-zinc-700">
-                  {phone ? (
-                    <li>
-                      <a href={`tel:${phone.replace(/[^\d+]/g, '')}`} className="hover:text-primary-700">
-                        {phone}
-                      </a>
-                    </li>
-                  ) : null}
-                  {website ? (
-                    <li>
-                      <a
-                        href={website}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-1 font-medium text-primary-700 hover:underline"
-                      >
-                        {websiteLabel}
-                        <ExternalLink className="h-3.5 w-3.5" />
-                      </a>
-                    </li>
-                  ) : null}
-                </ul>
-              ) : null}
-            </div>
+                ) : null}
+              </div>
+            ) : null}
 
             {similarVenues.length > 0 ? (
               <VenueNearbyMiniGrid venues={similarVenues} limit={4} />

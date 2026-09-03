@@ -431,7 +431,8 @@ function VenuePlaybillRow({ group }: { group: VenueEventGroup }) {
       : typeof session.priceFrom === 'number' && session.priceFrom >= 100
         ? session.priceFrom
         : null;
-  const price = rawPrice != null ? formatMoney(rawPrice) : null;
+  const priceLabel =
+    rawPrice != null ? `от ${formatNumber(rawPrice)}\u00a0₽` : null;
   const vacant =
     typeof group.vacant === 'number' && group.vacant > 0 && group.vacant <= 40
       ? `${group.vacant} мест`
@@ -444,7 +445,7 @@ function VenuePlaybillRow({ group }: { group: VenueEventGroup }) {
         href={href}
         className="flex flex-col gap-2 py-3.5 transition hover:bg-zinc-50/80 sm:flex-row sm:items-center sm:gap-4 sm:px-1"
       >
-        <div className="w-[6.5rem] shrink-0 sm:w-28" data-venue-playbill-when>
+        <div className="w-[7.5rem] shrink-0 sm:w-32" data-venue-playbill-when>
           <p
             className={`text-sm font-semibold tabular-nums ${
               when.weekend ? 'text-rose-600' : 'text-zinc-950'
@@ -479,8 +480,8 @@ function VenuePlaybillRow({ group }: { group: VenueEventGroup }) {
         </div>
         <div className="flex shrink-0 items-center justify-end gap-3">
           <div className="text-right">
-            {price ? (
-              <div className="text-sm font-bold tabular-nums text-zinc-950">{price}</div>
+            {priceLabel ? (
+              <div className="text-sm font-bold tabular-nums text-zinc-950">{priceLabel}</div>
             ) : (
               <div className="text-sm font-medium text-zinc-500">Смотреть</div>
             )}
@@ -495,19 +496,19 @@ function VenuePlaybillRow({ group }: { group: VenueEventGroup }) {
   );
 }
 
-const PLAYBILL_MONTH_SHORT_RU = [
-  'янв',
-  'фев',
-  'мар',
-  'апр',
+const PLAYBILL_MONTH_GENITIVE_RU = [
+  'января',
+  'февраля',
+  'марта',
+  'апреля',
   'мая',
-  'июн',
-  'июл',
-  'авг',
-  'сент',
-  'окт',
-  'ноя',
-  'дек',
+  'июня',
+  'июля',
+  'августа',
+  'сентября',
+  'октября',
+  'ноября',
+  'декабря',
 ] as const;
 
 function playbillSessionDate(session: PublicSessionDto): Date | null {
@@ -531,10 +532,9 @@ function playbillWhenLabel(
     null;
   if (date) {
     const day = date.getDate();
-    const month = PLAYBILL_MONTH_SHORT_RU[date.getMonth()] || '';
+    const month = PLAYBILL_MONTH_GENITIVE_RU[date.getMonth()] || '';
     const dow = date.getDay();
     const weekend = dow === 0 || dow === 6;
-    // «Сегодня» / «Завтра» keep readable; still attach month for theatre sheet clarity.
     const badge = formatCoverDateBadge(session);
     if (badge === 'Сегодня' || badge === 'Завтра') {
       return { primary: `${badge}, ${day} ${month}`, secondary: time, weekend };

@@ -337,7 +337,8 @@ export function institutionTypeEmoji(type?: string | null): string {
     theater: '🎭',
     concert_hall: '🎼',
     bar: '🍸',
-    club_bar_restaurant: '🎧',
+    club_bar_restaurant: '🎷',
+    temple: '⛪',
   };
   return map[key] || '✨';
 }

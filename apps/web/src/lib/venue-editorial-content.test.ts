@@ -150,8 +150,27 @@ test('formatVenueMetroLabel prefixes м.', () => {
   assert.equal(formatVenueMetroLabel(''), null);
 });
 
+test('butman jazz club pack resolves catalog + spb alias', () => {
+  const pack = resolveVenueEditorialContent('dzhaz-klub-igorya-butmana');
+  const alias = resolveVenueEditorialContent('dzhaz-klub-igorya-butmana-spb');
+  assert.ok(pack);
+  assert.equal(pack, alias);
+  assert.equal(pack!.displayTitle, 'Джаз-клуб Игоря Бутмана');
+  assert.ok(pack!.faq.length >= 5);
+  assert.ok(pack!.seoSections?.length);
+  assert.ok(pack!.phone);
+  assert.equal(pack!.website, 'https://butmanclub.ru');
+  const blob = [
+    pack!.heroLead || '',
+    pack!.seoDescription || '',
+    ...(pack!.seoSections || []).flatMap((s) => [s.h2, s.body]),
+    ...pack!.faq.flatMap((f) => [f.question, f.answer]),
+  ].join('\n');
+  assertNoLongDash(blob);
+});
+
 test('unknown slug has no editorial overlay', () => {
   assert.equal(resolveVenueEditorialContent('erarta'), null);
   assert.equal(resolveVenueEditorialContent(''), null);
-  assert.equal(__editorialVenueContentSlugCountForTests(), 10);
+  assert.equal(__editorialVenueContentSlugCountForTests(), 11);
 });

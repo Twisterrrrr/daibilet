@@ -91,6 +91,11 @@ const FEATURE_CHIPS: Record<VenueFeatureCode, VenueFeatureChip> = {
 
 const EDITORIAL_BY_SLUG: Record<string, VenueEditorialContent> = VENUE_EDITORIAL_PACKS;
 
+/** Owner/YAML drafts sometimes add city suffix; map to catalog slug. */
+const EDITORIAL_SLUG_ALIASES: Record<string, string> = {
+  'dzhaz-klub-igorya-butmana-spb': 'dzhaz-klub-igorya-butmana',
+};
+
 function normalizeVenueSlug(slug: string | null | undefined): string {
   return String(slug || '')
     .trim()
@@ -101,9 +106,18 @@ function normalizeVenueSlug(slug: string | null | undefined): string {
 export function resolveVenueEditorialContent(
   venueSlug: string | null | undefined,
 ): VenueEditorialContent | null {
-  const key = normalizeVenueSlug(venueSlug);
-  if (!key) return null;
+  const raw = normalizeVenueSlug(venueSlug);
+  if (!raw) return null;
+  const key = EDITORIAL_SLUG_ALIASES[raw] || raw;
   return EDITORIAL_BY_SLUG[key] ?? null;
+}
+
+/** Curated FAQ only - never fall back to generic template on glossy PDP. */
+export function resolveVenueCuratedFaqItems(
+  venueSlug: string | null | undefined,
+): VenueEditorialFaqItem[] {
+  const curated = resolveVenueEditorialContent(venueSlug)?.faq;
+  return curated?.length ? curated : [];
 }
 
 /** Generic FAQ when venue has no curated overlay (shared SSR + client). */

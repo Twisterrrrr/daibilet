@@ -11,6 +11,16 @@ import {
   resolveVenueOpeningHours,
 } from './venue-opening-hours.ts';
 
+test('resolveVenueOpeningHours: butman club has curated evening hours', () => {
+  const hours = resolveVenueOpeningHours('dzhaz-klub-igorya-butmana');
+  assert.ok(hours);
+  assert.ok(hours!.lines.some((line) => /18:00-00:00/.test(line)));
+  assert.equal(
+    resolveVenueOpeningHours('dzhaz-klub-igorya-butmana-spb')?.lines[0],
+    hours!.lines[0],
+  );
+});
+
 test('resolveVenueOpeningHours: known seed museums', () => {
   const hermitage = resolveVenueOpeningHours('ermitazh');
   assert.ok(hermitage);

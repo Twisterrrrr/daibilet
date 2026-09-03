@@ -31,7 +31,7 @@ import {
   formatVenueMetroLabel,
   resolveVenueEditorialContent,
 } from '@/lib/venue-editorial-content';
-import { normalizeVenueKind, resolveLocationVenueCopy, resolveVenueAboutHeading, splitVenueProseParagraphs, venueTypeIcon, venueTypeLabel } from '@/lib/venue-meta';
+import { normalizeVenueKind, resolveLocationVenueCopy, resolveVenueAboutHeading, institutionTypeEmoji, splitVenueProseParagraphs, venueTypeIcon, venueTypeLabel } from '@/lib/venue-meta';
 import { eventHref, venueHref } from '@/lib/routes';
 import type {
   PublicSessionDto,
@@ -468,25 +468,30 @@ export function LocationVenueLayout({
 
           {((hookFact && !isParkLike) || aboutBody || editorial?.highlights?.length) ? (
           <section className="scroll-mt-24">
-            <h2 className="text-xl font-bold text-slate-900">
-              {resolveVenueAboutHeading(venue.type, venue.name)}
+            <h2 className="font-display text-xl font-bold tracking-tight text-zinc-950 sm:text-2xl">
+              {[institutionTypeEmoji(venue.type), resolveVenueAboutHeading(venue.type, venue.name)]
+                .filter(Boolean)
+                .join(' ')}
             </h2>
             {hookFact && !isParkLike ? (
-              <p className="mt-5 text-sm font-semibold leading-7 text-slate-800">{hookFact}</p>
+              <p className="mt-6 text-sm font-semibold leading-7 text-slate-800">{hookFact}</p>
             ) : null}
             {editorial?.highlights?.length ? (
-              <ul className="mt-6 space-y-2" data-venue-highlights>
+              <ul className="mt-6 space-y-3" data-venue-highlights>
                 {editorial.highlights.map((item) => (
-                  <li key={item} className="flex items-start gap-2 text-sm leading-6 text-slate-800">
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
+                  <li key={item} className="flex items-start gap-2.5 text-sm leading-7 text-slate-800">
+                    <CheckCircle2 className="mt-1 h-4 w-4 shrink-0 text-emerald-500" />
                     <span>{item}</span>
                   </li>
                 ))}
               </ul>
             ) : null}
             {aboutBody
-              ? splitVenueProseParagraphs(aboutBody).map((paragraph) => (
-                  <p key={paragraph.slice(0, 48)} className="mt-5 whitespace-pre-line text-sm leading-7 text-slate-600">
+              ? splitVenueProseParagraphs(aboutBody).map((paragraph, index) => (
+                  <p
+                    key={paragraph.slice(0, 48)}
+                    className={`${index === 0 ? 'mt-8' : 'mt-5'} whitespace-pre-line text-sm leading-7 text-slate-600`}
+                  >
                     {paragraph}
                   </p>
                 ))
@@ -497,16 +502,16 @@ export function LocationVenueLayout({
           {seoSections.length > 0 ? (
             <section
               id="venue-guide"
-              className="scroll-mt-24 space-y-12"
+              className="scroll-mt-24 space-y-14"
               data-venue-seo-sections
             >
               {seoSections.map((section) => (
-                <div key={section.h2}>
+                <div key={section.h2} className="space-y-5">
                   <h2 className="font-display text-xl font-bold tracking-tight text-zinc-950 sm:text-2xl">
                     {section.h2}
                   </h2>
                   {splitVenueProseParagraphs(section.body).map((paragraph) => (
-                    <p key={paragraph.slice(0, 48)} className="mt-5 text-sm leading-7 text-zinc-600">
+                    <p key={paragraph.slice(0, 48)} className="text-sm leading-7 text-zinc-600">
                       {paragraph}
                     </p>
                   ))}
