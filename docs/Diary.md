@@ -1,3 +1,18 @@
+## 2026-09-03 - Cyrillic event PDP HTTP 500
+
+### Наблюдения
+- `https://daibilet.ru/events/зимнии-фестиваль-pianissimo-…` отдавал HTTP 500 с `Location` на латинский slug. Латинский канон открывался.
+- ISR-страница звала `permanentRedirect()`: Next превращает NEXT_REDIRECT в 500, а не в 308.
+
+### Решения
+- 308 кириллицы `/events/{slug}` в middleware (`cyrillicEventRedirectPath`).
+- Редирект из ISR PDP убран; canonical в metadata остаётся.
+
+### Проблемы
+- После swap проверить Pianissimo по кириллической ссылке (должен быть 308 → 200).
+
+---
+
 ## 2026-09-03 - Live ISR 500 after SiteLayout cookies()
 
 ### Наблюдения

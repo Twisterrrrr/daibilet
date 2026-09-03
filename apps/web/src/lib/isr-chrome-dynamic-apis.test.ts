@@ -37,4 +37,9 @@ test('event PDP page uses loadEventDto + safeNotFound, not getCached + notFound 
   assert.match(source, /safeNotFound/);
   assert.equal(source.includes('getCachedPublicEventDto'), false);
   assert.equal(/\bnotFound\s*\(/.test(source), false);
+  assert.equal(
+    /from ['"]next\/navigation['"]/.test(source) && source.includes('permanentRedirect'),
+    false,
+    'ISR event PDP must not import permanentRedirect',
+  );
 });

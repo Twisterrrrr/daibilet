@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { permanentRedirect } from 'next/navigation';
 
 import { EventCard } from '@/components/EventCard';
 import { EventBuyCard, EventHero } from '@/components/EventPage.client';
@@ -142,16 +141,8 @@ export default async function EventDetailPage({ params }: PageProps) {
 
   const payload = loaded.payload;
   const { event, related } = payload;
-  // Soft-404 recovery (STAND_BY TC → live TEP twin etc.): land on canonical slug.
-  const canonicalPath = String(event.canonicalPath || '').trim();
-  const canonicalSlug = String(event.slug || '').trim();
-  if (
-    canonicalSlug &&
-    canonicalSlug !== decodedSlug &&
-    canonicalPath.startsWith('/events/')
-  ) {
-    permanentRedirect(canonicalPath);
-  }
+  // Alias slugs stay on this ISR page. NEXT_REDIRECT during static gen becomes HTTP 500.
+  // Cyrillic URLs 308 in middleware; metadata canonical covers SEO.
   const clientPayload = toEventPageClientPayload(payload);
   let aggregate = null;
   try {
