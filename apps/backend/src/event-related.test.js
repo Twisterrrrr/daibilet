@@ -57,6 +57,24 @@ test('kids river drops concerts and keeps river peers', () => {
     venueKind: 'PIER',
   };
   assert.ok(scoreRelatedSession(event, river) > 0);
+
+  const combo = {
+    title: 'Комбо 1',
+    category: 'Мероприятия',
+    city: 'Санкт-Петербург',
+    cityId: 'city_spb',
+    tags: [],
+  };
+  assert.equal(scoreRelatedSession(event, combo), 0);
+
+  const kpop = {
+    title: 'Фестиваль K-SHTORM (K-POP)',
+    category: 'Мероприятия',
+    city: 'Санкт-Петербург',
+    cityId: 'city_spb',
+    tags: [],
+  };
+  assert.equal(scoreRelatedSession(event, kpop), 0);
 });
 
 test('pickRelatedSessions dedupes title and keeps city', () => {

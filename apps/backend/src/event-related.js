@@ -114,9 +114,16 @@ export function scoreRelatedSession(event, session) {
   // Hard filters for kids / river PDPs.
   if (eventKids && sessionConcert && !sessionKids) return 0;
   if (eventRiver && sessionConcert && !sessionRiver) return 0;
-  if (eventKids && !sessionKids && !sessionRiver && !isExcursionLike(session)) {
-    // Generic «Мероприятия» bucket must not pull adult nightlife.
-    if (/мероприяти/i.test(String(session.category || '')) && !sessionKids) return 0;
+  if (eventKids && !sessionKids) {
+    // Kids PDP: only kids peers, river/boat, or excursions - never generic «Мероприятия»/festivals.
+    if (!sessionRiver && !isExcursionLike(session)) return 0;
+  }
+  if (
+    eventKids &&
+    !sessionKids &&
+    /фестиваль|festival|k-?pop|клуб|бар\b/i.test(haystackOf(session))
+  ) {
+    return 0;
   }
 
   if (event.category && session.category === event.category) value += 4;
