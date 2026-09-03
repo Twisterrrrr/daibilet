@@ -48,7 +48,6 @@ import {
 } from '@/lib/venue-opening-hours';
 import {
   filterSimilarInstitutionVenues,
-  institutionTypeEmoji,
   normalizeVenueKind,
   resolvePublicVenueType,
   resolveVenueAboutHeading,
@@ -96,11 +95,10 @@ export function InstitutionVenueLayout({
   const publicType = resolvePublicVenueType(venue.type, venue.name);
   const isMuseumOrArt = MUSEUM_ART_KINDS.has(publicType);
   const typeLabel = venueTypeLabel(venue.type, venue.name);
-  const aboutHeading = React.useMemo(() => {
-    const label = resolveVenueAboutHeading(venue.type, venue.name);
-    const emoji = institutionTypeEmoji(venue.type);
-    return emoji ? `${emoji} ${label}` : label;
-  }, [venue.type, venue.name]);
+  const aboutHeading = React.useMemo(
+    () => resolveVenueAboutHeading(venue.type, venue.name),
+    [venue.type, venue.name],
+  );
   const editorial = React.useMemo(
     () => resolveVenueEditorialContent(venue.slug),
     [venue.slug],
@@ -174,10 +172,14 @@ export function InstitutionVenueLayout({
     wayTipRaw && !isAddressEchoWayToFind(wayTipRaw, venue.address, venue.city) ? wayTipRaw : null;
   const visitTips = nonEmptyLogisticsText(editorial?.visitTips);
   const seoSections = editorial?.seoSections || [];
-  /** Only real admission CTA - no «Выбрать событие» scroll bait in hero/sidebar. */
+  const aboutProse = String(editorial?.aboutBody || '').trim()
+    || (venue.description && venue.description !== intro ? venue.description : '');
+  /** Admission when LC inventory exists; otherwise jump to live playbill. */
   const admissionCta = hasInternalLcTickets
     ? ({ href: '#venue-admission', label: 'К билетам' } as const)
-    : null;
+    : hasAfisha
+      ? ({ href: '#venue-program', label: 'Афиша' } as const)
+      : null;
   const heroBadges = React.useMemo(() => {
     if (editorial?.badges?.length) return editorial.badges.slice(0, 5);
     const badges: string[] = [];
@@ -213,7 +215,6 @@ export function InstitutionVenueLayout({
 
   const stickyTabs = React.useMemo(() => {
     const tabs: Array<readonly [string, string]> = [['#about', aboutHeading]];
-    if (seoSections.length > 0) tabs.push(['#venue-guide', 'Гид']);
     if (hasInternalLcTickets) tabs.push(['#venue-admission', 'Билеты']);
     if (hasAfisha) tabs.push(['#venue-program', 'Афиша']);
     if (showVisitSection) tabs.push(['#visit', 'Как посетить']);
@@ -221,15 +222,7 @@ export function InstitutionVenueLayout({
     tabs.push(['#reviews', 'Отзывы']);
     if (showSimilarTab) tabs.push(['#similar', 'Экскурсии']);
     return tabs;
-  }, [
-    aboutHeading,
-    seoSections.length,
-    hasInternalLcTickets,
-    hasAfisha,
-    showVisitSection,
-    showFaq,
-    showSimilarTab,
-  ]);
+  }, [aboutHeading, hasInternalLcTickets, hasAfisha, showVisitSection, showFaq, showSimilarTab]);
 
   const share = () => {
     if (navigator.share) {
@@ -379,8 +372,7 @@ export function InstitutionVenueLayout({
               className="rounded-2xl bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 px-5 py-4 ring-1 ring-amber-200/70 sm:px-6 sm:py-5"
               data-venue-hook-fact
             >
-              <p className="text-xs font-semibold uppercase tracking-wide text-amber-800">Факт</p>
-              <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">{hookFactText}</p>
+              <p className="max-w-3xl text-sm leading-6 text-slate-700">{hookFactText}</p>
             </div>
           ) : null}
 
@@ -432,8 +424,8 @@ export function InstitutionVenueLayout({
                 ))}
               </ul>
             ) : null}
-            {venue.description && venue.description !== intro
-              ? splitVenueProseParagraphs(venue.description).map((paragraph, index) => (
+            {aboutProse
+              ? splitVenueProseParagraphs(aboutProse).map((paragraph, index) => (
                   <p
                     key={paragraph.slice(0, 48)}
                     className={`${index === 0 ? 'mt-8' : 'mt-5'} text-sm leading-7 text-slate-600`}

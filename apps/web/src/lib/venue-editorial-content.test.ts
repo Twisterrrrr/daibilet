@@ -156,12 +156,16 @@ test('butman jazz club pack resolves catalog + spb alias', () => {
   assert.ok(pack);
   assert.equal(pack, alias);
   assert.equal(pack!.displayTitle, 'Джаз-клуб Игоря Бутмана');
-  assert.ok(pack!.faq.length >= 5);
-  assert.ok(pack!.seoSections?.length);
+  assert.ok(pack!.aboutBody);
+  assert.match(pack!.hookFact || '', /канале Грибоедова/);
+  assert.ok(pack!.seoSections?.some((s) => s.h2 === 'Пространство и атмосфера'));
+  assert.ok(pack!.faq.some((f) => /дресс-код/i.test(f.question)));
   assert.ok(pack!.phone);
   assert.equal(pack!.website, 'https://butmanclub.ru');
   const blob = [
     pack!.heroLead || '',
+    pack!.hookFact || '',
+    pack!.aboutBody || '',
     pack!.seoDescription || '',
     ...(pack!.seoSections || []).flatMap((s) => [s.h2, s.body]),
     ...pack!.faq.flatMap((f) => [f.question, f.answer]),

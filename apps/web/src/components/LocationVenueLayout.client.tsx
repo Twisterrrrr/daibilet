@@ -31,7 +31,7 @@ import {
   formatVenueMetroLabel,
   resolveVenueEditorialContent,
 } from '@/lib/venue-editorial-content';
-import { normalizeVenueKind, resolveLocationVenueCopy, resolveVenueAboutHeading, institutionTypeEmoji, splitVenueProseParagraphs, venueTypeIcon, venueTypeLabel } from '@/lib/venue-meta';
+import { normalizeVenueKind, resolveLocationVenueCopy, resolveVenueAboutHeading, splitVenueProseParagraphs, venueTypeIcon, venueTypeLabel } from '@/lib/venue-meta';
 import { eventHref, venueHref } from '@/lib/routes';
 import type {
   PublicSessionDto,
@@ -469,9 +469,7 @@ export function LocationVenueLayout({
           {((hookFact && !isParkLike) || aboutBody || editorial?.highlights?.length) ? (
           <section className="scroll-mt-24">
             <h2 className="font-display text-xl font-bold tracking-tight text-zinc-950 sm:text-2xl">
-              {[institutionTypeEmoji(venue.type), resolveVenueAboutHeading(venue.type, venue.name)]
-                .filter(Boolean)
-                .join(' ')}
+              {resolveVenueAboutHeading(venue.type, venue.name)}
             </h2>
             {hookFact && !isParkLike ? (
               <p className="mt-6 text-sm font-semibold leading-7 text-slate-800">{hookFact}</p>

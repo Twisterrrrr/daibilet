@@ -57,6 +57,8 @@ export type VenueEditorialContent = {
   badges?: string[];
   /** Interesting fact above «О месте» (city-hub style). */
   hookFact?: string;
+  /** Long «О клубе / О месте» prose under highlights (prefer over DB description). */
+  aboutBody?: string;
   /**
    * Extra gallery URLs (real assets only). Combined with hero when ≥2 unique images.
    */
