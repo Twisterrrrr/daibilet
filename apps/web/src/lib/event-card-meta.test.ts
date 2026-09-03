@@ -6,6 +6,7 @@ import {
   collectDisplaySlotPreview,
   formatCardScheduleLine,
   formatCatalogSlotChipLabel,
+  formatMagazineCatalogDate,
   formatShowcaseSessionDate,
   formatShowcaseSessionDateCompact,
 } from './event-card-meta.ts';
@@ -38,6 +39,12 @@ test('formatShowcaseSessionDate: human mask with full month and weekday', () => 
 test('formatShowcaseSessionDateCompact: day month time without weekday', () => {
   const label = formatShowcaseSessionDateCompact(session({ startsAt: '2026-07-25T04:15:00Z' }));
   assert.equal(label, '25 июля в 07:15');
+});
+
+test('formatMagazineCatalogDate: uppercase day month + time, no сегодня', () => {
+  const label = formatMagazineCatalogDate(session({ startsAt: '2026-08-26T16:00:00Z' }));
+  assert.match(label, /^26 АВГУСТА, \d{2}:\d{2}$/);
+  assert.equal(label.includes('сегодня'), false);
 });
 
 test('formatShowcaseSessionDate: open-date label without clock', () => {

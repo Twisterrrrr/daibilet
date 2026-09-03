@@ -39,19 +39,20 @@ import { filterVenuePageSessionsByCity } from '@/lib/venue-page-sessions';
 import { venuePageTemplate } from '@/lib/venue-meta';
 
 const PLAYBILL_WEEKDAY_SHORT = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'] as const;
-const PLAYBILL_MONTH_GENITIVE_RU = [
-  'января',
-  'февраля',
-  'марта',
-  'апреля',
+/** Three-letter month for playbill date block (upper row next to day number). */
+const PLAYBILL_MONTH_SHORT_RU = [
+  'янв',
+  'фев',
+  'мар',
+  'апр',
   'мая',
-  'июня',
-  'июля',
-  'августа',
-  'сентября',
-  'октября',
-  'ноября',
-  'декабря',
+  'июн',
+  'июл',
+  'авг',
+  'сен',
+  'окт',
+  'ноя',
+  'дек',
 ] as const;
 
 /** Match SSR VenueDetailPage: curated cover + title/metro overlays. */
@@ -329,12 +330,9 @@ function VenueProgramBlock({
       id="venue-program"
       className={`scroll-mt-24 ${framed ? 'rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6' : ''}`}
     >
-      <h2 className="mb-1 font-display text-xl font-extrabold tracking-tight text-zinc-950 sm:text-2xl">
+      <h2 className="mb-3 font-display text-xl font-extrabold tracking-tight text-zinc-950 sm:text-2xl">
         {title}
       </h2>
-      <p className="mb-4 text-sm text-zinc-500">
-        Выберите месяц. Ниже - текстовое расписание в стиле театральной афиши.
-      </p>
       <VenueMonthRail selected={selected} availableMonths={availableMonths} onChange={onMonthChange} />
       <VenuePlaybillList monthView={monthView} />
     </section>
@@ -452,52 +450,51 @@ function VenuePlaybillRow({ entry }: { entry: VenuePlaybillEntry }) {
     <li className="group">
       <a
         href={href}
-        className="flex flex-col gap-2 py-3.5 transition hover:bg-zinc-50/80 sm:flex-row sm:items-center sm:gap-4 sm:px-1"
+        className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-x-3 gap-y-1 py-3.5 transition hover:bg-zinc-50/80 sm:items-center sm:gap-x-4 sm:px-1"
       >
-        <div className="w-[8.5rem] shrink-0 sm:w-36" data-venue-playbill-when>
+        <div className="shrink-0 self-center" data-venue-playbill-when>
           {when.kind === 'open' ? (
             <p className="text-sm font-semibold text-zinc-950">{when.label}</p>
           ) : when.kind === 'dated' ? (
-            <>
-              <p
-                className={`flex flex-wrap items-baseline gap-x-1.5 ${
-                  when.weekend ? 'text-rose-600' : 'text-zinc-950'
+            <div
+              className={`grid grid-cols-[auto_auto] grid-rows-2 items-center gap-x-2 ${
+                when.weekend ? 'text-rose-600' : 'text-zinc-950'
+              }`}
+            >
+              <span className="row-span-2 text-[1.75rem] font-extrabold leading-none tabular-nums tracking-tight sm:text-[2rem]">
+                {when.dayNum}
+              </span>
+              <span
+                className={`self-end text-[11px] font-semibold uppercase leading-none tracking-wide ${
+                  when.weekend ? 'text-rose-500' : 'text-zinc-600'
                 }`}
               >
-                <span className="text-lg font-bold tabular-nums leading-none">{when.dayNum}</span>
-                <span className="text-sm font-semibold">{when.month}</span>
-                <span
-                  className={`text-[11px] font-semibold uppercase tracking-wide ${
-                    when.weekend ? 'text-rose-500' : 'text-zinc-500'
-                  }`}
-                >
-                  {when.weekday}
-                </span>
-              </p>
-              {when.time ? (
-                <p className="mt-1 text-xs tabular-nums text-zinc-500">{when.time}</p>
-              ) : null}
-            </>
+                {when.month} {when.weekday}
+              </span>
+              <span className="self-start text-xs tabular-nums leading-none text-zinc-500">
+                {when.time || '\u00a0'}
+              </span>
+            </div>
           ) : (
-            <>
+            <div>
               <p className="text-sm font-semibold text-zinc-950">{when.primary}</p>
               {when.secondary ? (
                 <p className="mt-0.5 text-xs tabular-nums text-zinc-500">{when.secondary}</p>
               ) : null}
-            </>
+            </div>
           )}
         </div>
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 self-center">
           <p className="text-base font-semibold leading-snug text-zinc-950 group-hover:text-primary-800">
             {title}
           </p>
           {meta ? <p className="mt-0.5 text-xs text-zinc-500">{meta}</p> : null}
         </div>
-        {/* Mobile: price above CTA; desktop: price left of button */}
-        <div className="flex shrink-0 flex-col items-end gap-1.5 sm:flex-row sm:items-center sm:gap-3">
+        {/* Mobile + desktop: price sits top-right; CTA under it */}
+        <div className="flex shrink-0 flex-col items-end gap-1.5 self-start sm:self-center">
           <div className="text-right">
             {priceLabel ? (
-              <div className="text-base font-bold tabular-nums text-zinc-950 sm:text-sm">{priceLabel}</div>
+              <div className="text-sm font-bold tabular-nums text-zinc-950 sm:text-base">{priceLabel}</div>
             ) : (
               <div className="text-sm font-medium text-zinc-500">Смотреть</div>
             )}
@@ -541,7 +538,7 @@ function playbillWhenParts(
     .replace(/^в\s+/i, '') || null;
   if (date) {
     const dayNum = String(date.getDate());
-    const month = PLAYBILL_MONTH_GENITIVE_RU[date.getMonth()] || '';
+    const month = PLAYBILL_MONTH_SHORT_RU[date.getMonth()] || '';
     const dow = date.getDay();
     const weekday = PLAYBILL_WEEKDAY_SHORT[dow] || '';
     const weekend = dow === 0 || dow === 6;

@@ -2,12 +2,10 @@ import type { PublicCatalogListItemDto, PublicSessionDto } from '@daibilet/contr
 
 /** Chip slots for catalog cards (2×2 after primary). Cap keeps list payloads small. */
 export const LIST_SLOT_PREVIEW_LIMIT = 4;
-/** line-clamp-2 cards: short plain excerpt only (full body stays on event page). */
-const LIST_DESCRIPTION_MAX_CHARS = 200;
 /** Homepage /home card sessions: nearest slots without per-slot widget URLs. */
 export const HOME_SLOT_PREVIEW_LIMIT = 3;
 
-/** Lean catalog card DTO: truncated slots + description; top-level purchase URLs for CTA. */
+/** Lean catalog card DTO: capped slots; full plain description (owner: no mid-word ellipsis). */
 export function toPublicCatalogListItem(session: PublicSessionDto): PublicCatalogListItemDto {
   const item: PublicCatalogListItemDto = {
     id: session.id,
@@ -55,7 +53,7 @@ export function toPublicCatalogListItem(session: PublicSessionDto): PublicCatalo
   if (session.widgetUrl != null) item.widgetUrl = session.widgetUrl;
   if (session.deeplinkUrl != null) item.deeplinkUrl = session.deeplinkUrl;
 
-  const description = toListDescriptionExcerpt(session.description);
+  const description = toListDescriptionPlain(session.description);
   if (description) item.description = description;
 
   return item;
@@ -105,7 +103,7 @@ export function toPublicHomeCardSession(session: PublicSessionDto): PublicCatalo
   };
 }
 
-function toListDescriptionExcerpt(value?: string | null): string | null {
+function toListDescriptionPlain(value?: string | null): string | null {
   if (!value) return null;
   const plain = value
     .replace(/<script[\s\S]*?<\/script>/gi, ' ')
@@ -119,7 +117,5 @@ function toListDescriptionExcerpt(value?: string | null): string | null {
     .replace(/&gt;/gi, '>')
     .replace(/\s+/g, ' ')
     .trim();
-  if (!plain) return null;
-  if (plain.length <= LIST_DESCRIPTION_MAX_CHARS) return plain;
-  return `${plain.slice(0, LIST_DESCRIPTION_MAX_CHARS - 1).trimEnd()}…`;
+  return plain || null;
 }

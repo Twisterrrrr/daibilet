@@ -354,6 +354,27 @@ export function formatShowcaseSessionDateCompact(event: PublicSessionDto): strin
   return `${dayMonth} в ${time}`;
 }
 
+/**
+ * Magazine `/events` card date line: «26 АВГУСТА, 19:00» (no «сегодня»).
+ * Clock lives here so cover stays clean (age + favorites only).
+ */
+export function formatMagazineCatalogDate(event: PublicSessionDto): string {
+  if (isOpenDate(event)) return 'ОТКРЫТАЯ ДАТА';
+  const timeZone = resolveSessionTimeZoneForSession(event);
+  const d = parseSessionStartsAt(event.startsAt);
+  if (Number.isNaN(d.getTime())) {
+    const fallback = [event.dateLabel, event.timeLabel].filter(Boolean).join(', ');
+    return (fallback || 'Дата уточняется').toLocaleUpperCase('ru-RU');
+  }
+  const day = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', timeZone }).format(d);
+  const month = new Intl.DateTimeFormat('ru-RU', { month: 'long', timeZone })
+    .format(d)
+    .toLocaleUpperCase('ru-RU');
+  const time = formatSessionTime(event.startsAt, event.timeLabel, timeZone);
+  if (!time || time === '—') return `${day} ${month}`;
+  return `${day} ${month}, ${time}`;
+}
+
 export function hasDisplayPrice(priceFrom?: number | null): boolean {
   return typeof priceFrom === 'number' && Number.isFinite(priceFrom) && priceFrom >= MIN_DISPLAY_PRICE_RUB;
 }

@@ -133,8 +133,12 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
       ignoreNextUrlPageRef.current = false;
       return;
     }
-    pagingModeRef.current = 'replace';
-    setListPage(urlPage);
+    // Echo of our own pushState (or same page) must not flip append → replace mid-load.
+    setListPage((prev) => {
+      if (prev === urlPage) return prev;
+      pagingModeRef.current = 'replace';
+      return urlPage;
+    });
   }, [urlPage]);
 
   useEffect(() => {
