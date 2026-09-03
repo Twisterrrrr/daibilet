@@ -1,6 +1,10 @@
 /**
  * Политика индексации hub-страниц (city / region / venue).
  *
+ * City: index только при стабильном предложении (≥ MIN_CITY_EVENTS_FOR_INDEX)
+ * или strong-city allowlist. Owner 2026-09-03: не плодить thin city hubs /
+ * editorial landings без спроса и стабильных офферов.
+ *
  * Region live tier (без ручного вмешательства):
  * - C: <3 child-events → noindex,nofollow + strip на центре
  * - B: 3-9 → index,follow + программный Region Hub
@@ -12,7 +16,8 @@ import {
   resolveRegionLiveTier,
 } from '@daibilet/contracts/common';
 
-export const MIN_CITY_EVENTS_FOR_INDEX = 3;
+/** Align with commercial listing gate (`MIN_LISTING_OFFERS_FOR_INDEX`). */
+export const MIN_CITY_EVENTS_FOR_INDEX = 6;
 export const MIN_REGION_CHILD_EVENTS_FOR_INDEX = REGION_TIER_B_MIN_EVENTS;
 export const MIN_VENUE_EVENTS_FOR_INDEX = 1;
 
@@ -33,6 +38,7 @@ export const STRONG_CITY_SLUGS = new Set([
   'kaliningrad',
   'yaroslavl',
   'vladimir',
+  'perm',
 ]);
 
 export type HubIndexDecision = {

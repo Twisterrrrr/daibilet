@@ -8,7 +8,7 @@ import {
   toCatalogSsrItem,
   toHomeSsrSession,
   toSlimCityDestination,
-} from './ssr-lean-payloads';
+} from './ssr-lean-payloads.ts';
 
 function sampleSession(overrides: Partial<PublicCatalogListItemDto> = {}): PublicCatalogListItemDto {
   return {
@@ -51,17 +51,20 @@ describe('ssr-lean-payloads', () => {
     assert.equal(lean.tags.length, 4);
   });
 
-  it('toCatalogSsrItem strips blurb but keeps purchase CTA', () => {
+  it('toCatalogSsrItem clips blurb but keeps purchase CTA', () => {
     const lean = toCatalogSsrItem(sampleSession());
-    assert.equal(lean.description, undefined);
+    assert.ok(lean.description);
+    assert.ok((lean.description?.length || 0) <= 120);
+    assert.equal(lean.deeplinkUrl, undefined);
     assert.equal(lean.purchaseUrl, 'https://example.com/buy');
     assert.ok((lean.upcomingSlots?.length || 0) <= 4);
   });
 
-  it('leanCatalogForSsr maps items', () => {
+  it('leanCatalogForSsr maps items and drops sessions mirror', () => {
     const catalog = leanCatalogForSsr({
       generatedAt: new Date().toISOString(),
       items: [sampleSession()],
+      sessions: [sampleSession({ id: 'dup' })],
       total: 1,
       limit: 50,
       offset: 0,
@@ -74,21 +77,29 @@ describe('ssr-lean-payloads', () => {
         priceSteps: [],
       },
     });
-    assert.equal(catalog.items[0]?.description, undefined);
-    assert.equal(catalog.facets.cities.length, 80);
+    assert.ok(catalog.items[0]?.description);
+    assert.equal(catalog.sessions, undefined);
+    assert.equal(catalog.facets.cities.length, 60);
   });
 
-  it('toSlimCityDestination clears category trees', () => {
+  it('toSlimCityDestination clears category trees but keeps hubTags', () => {
     const slim = toSlimCityDestination({
       name: 'Казань',
       type: 'city',
       events: 12,
       venues: 3,
       slug: 'kazan',
-      categories: [{ name: 'Музеи', count: 4 }],
+      categories: [{ name: 'Музеи', events: 4 }],
+      hubTags: [
+        { label: 'Музеи', kind: 'category', events: 4 },
+        { label: 'Река', kind: 'landing', slug: 'river', events: 2 },
+        { label: 'Extra', kind: 'category', events: 1 },
+        { label: 'Drop', kind: 'category', events: 1 },
+      ],
     });
     assert.deepEqual(slim.categories, []);
     assert.equal(slim.slug, 'kazan');
+    assert.equal(slim.hubTags?.length, 3);
   });
 
   it('filterFingerprintsForSessions keeps only used urls', () => {

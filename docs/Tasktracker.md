@@ -1,3 +1,15 @@
+## 2026-09-03 - Related / filters / blog flash / SEO P0-P2
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| FIX.RELATED-QUALITY | PDP related: same-city + score + title dedupe (`public-event.dto` → `pickRelatedSessions`) | Критический | 🔄 |
+| FIX.CATALOG-FILTER-SCROLL | Desktop sidebar: definite `height` + inner overflow | Высокий | 🔄 |
+| FIX.BLOG-HERO-FLASH | Убран client shuffle + stable promo seed | Высокий | 🔄 |
+| SEO.PODBORKI-PILOT-2 | NN+Perm в allowlist + маркер CHPU | Высокий | ✅ code |
+| SEO.PODBORKI-CITY-1 | `/podborki/c/{city}` + 301 | Высокий | ✅ |
+| PERF.HOME-EVENTS-SSR | Lean destinations/catalog/home articles | Высокий | 🔄 |
+| SEO.HUB-CONTENT-GATE | City index ≥6 офферов (strong cities bypass) | Средний | 🔄 |
+
 ## 2026-09-02 - Event map + My Day pins + CAPS + SEO audit
 
 | ID | Задача | Приоритет | Статус |

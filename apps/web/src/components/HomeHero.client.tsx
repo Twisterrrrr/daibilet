@@ -39,7 +39,7 @@ type HomeHeroProps = {
    * sent one frame (WEB.LIGHT.A2 - keep residual frames out of RSC HTML).
    */
   expandStaticRotator?: boolean;
-  landings?: Array<Pick<PublicLandingDto, 'slug' | 'title' | 'subtitle' | 'events' | 'priceFrom'>>;
+  landings?: Array<Pick<PublicLandingDto, 'slug' | 'title' | 'events' | 'priceFrom'> & { subtitle?: string }>;
   videoSrc?: string | null;
 };
 
@@ -86,12 +86,13 @@ export function HomeHero({
         ...rest,
       ]);
     };
-    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
-      const id = window.requestIdleCallback(expand, { timeout: 2500 });
-      return () => window.cancelIdleCallback(id);
+    const idleWindow = typeof window !== 'undefined' ? window : null;
+    if (idleWindow && 'requestIdleCallback' in idleWindow) {
+      const id = idleWindow.requestIdleCallback(expand, { timeout: 2500 });
+      return () => idleWindow.cancelIdleCallback(id);
     }
-    const timer = window.setTimeout(expand, 400);
-    return () => window.clearTimeout(timer);
+    const timer = globalThis.setTimeout(expand, 400);
+    return () => globalThis.clearTimeout(timer);
   }, [expandStaticRotator, frames, videoSrc]);
 
   const selectedCityName = selectedDestination?.name || null;

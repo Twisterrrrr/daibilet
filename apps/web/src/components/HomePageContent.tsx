@@ -1,9 +1,14 @@
 import Link from 'next/link';
-import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 import { ArrowRight, Dices } from 'lucide-react';
 
 import { HomeCityAwareSections } from '@/components/HomeCityAwareSections.client';
+import {
+  HomeBottomNav,
+  HomeCategoryStack,
+  HomeMyDayBanner,
+  LuckyCityButton,
+} from '@/components/HomeDeferredIslands.client';
 import { HomeHero } from '@/components/HomeHero.client';
 import { HomePageSkeleton } from '@/components/HomePageSkeleton';
 import { HomePopularCitiesRail } from '@/components/HomePopularCitiesRail.client';
@@ -27,24 +32,6 @@ import {
 } from '@/lib/ssr-lean-payloads';
 import { getHomeArticles, getHomeCoverFingerprints, getHomePageData } from '@/server/cached-home-data';
 import { getActiveHeroBanners, heroFramesFromBanners } from '@/server/hero-banners';
-
-/** Below-fold / mobile chrome - keep out of critical JS + skip their SSR flight. */
-const HomeBottomNav = dynamic(
-  () => import('@/components/HomeBottomNav.client').then((m) => m.HomeBottomNav),
-  { ssr: false },
-);
-const HomeCategoryStack = dynamic(
-  () => import('@/components/HomeCategoryStack.client').then((m) => m.HomeCategoryStack),
-  { ssr: false },
-);
-const HomeMyDayBanner = dynamic(
-  () => import('@/components/HomeMyDayBanner.client').then((m) => m.HomeMyDayBanner),
-  { ssr: false },
-);
-const LuckyCityButton = dynamic(
-  () => import('@/components/LuckyCityButton.client').then((m) => m.LuckyCityButton),
-  { ssr: false },
-);
 
 /** External CDN HEAD fingerprints must not stall home TTFB on bad egress/DNS. */
 const HOME_FINGERPRINTS_TIMEOUT_MS = 800;
@@ -74,7 +61,12 @@ async function HomePageBody() {
   const cities = destinations.filter((item) => item.type === 'city');
   // Top by events, then pin Moscow + SPB first so the rail can center that pair on load.
   const topCities = orderPopularRailCities(cities, 12).map(toSlimCityDestination);
-  const luckyCities = cities.filter((c) => c.events > 0).map(toSlimCityDestination);
+  // Roulette does not need the full destination tree - top live cities are enough.
+  const luckyCities = [...cities]
+    .filter((c) => c.events > 0)
+    .sort((a, b) => b.events - a.events || a.name.localeCompare(b.name, 'ru'))
+    .slice(0, 40)
+    .map(toSlimCityDestination);
   // Same canon as SiteFooter (not catalogPayload.total - that under/over-counts vs destinations).
   const { places: liveCities, events: liveEvents } = catalogSocialStats(destinations);
 

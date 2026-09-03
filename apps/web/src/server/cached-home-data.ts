@@ -102,15 +102,16 @@ export const getHomeLandings = unstable_cache(
 export const getHomeArticles = unstable_cache(
   async () => {
     try {
+      // Home UI only renders 4 cards - avoid a 20-article JSON blob in Data Cache/RSC.
       return await fetchPublicApiJson<Exclude<HomeArticlesPayload, null>>('/api/public/articles', {
-        searchParams: { limit: 20 },
+        searchParams: { limit: 8 },
         timeoutMs: 1_200,
       });
     } catch {
       return null;
     }
   },
-  ['home-articles-v2-http'],
+  ['home-articles-v3-http'],
   homeCacheOptions,
 );
 

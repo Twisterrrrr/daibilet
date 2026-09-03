@@ -88,25 +88,22 @@ Finance PR-ветка `codex/stage0-admission-ticket-core` может держа
 
 **LOCKED ответы (финал):**
 1. **Slug:** SEO path-канон (`saint-petersburg` / `kaliningrad` via `normalizeKnownCitySlug`). DB translit - алиасы входа.
-2. **Роут:** маркер `/podborki/c/{city}` **не сейчас**; intents не ломаем.
-3. **Охват пилота:** **только** `kaliningrad` + `saint-petersburg`. Москва в Meta - harmless leftover, не расширять.
+2. **Роут:** маркер `/podborki/c/{city}` **✅ Phase 1 (2026-09-03)**; soft `?city=` meta-pilot → 301; intents не ломаем.
+3. **Охват пилота:** `kaliningrad` + `saint-petersburg` (+ PILOT-2 `nizhny-novgorod` + `perm`). Москва в Meta - harmless leftover, не расширять SEO-пилот.
 4. **vs `/cities`:** подборки = идейный хаб; city = афиша. Бренд Дайбилет.
-5. **Порядок:** Meta на soft `?city=` + self-canonical; ЧПУ+301 - следующий спринт.
+5. **Порядок:** Meta → маркерный ЧПУ + 301 (**✅**); дальше card blurbs / blog banners.
 6. **Groups:** A/B не ломать (soft `?city=` избыточен); C hub unique meta; C MULTI + E - stable index (не мигать ≥6); D `salute-9-may` - 200 + index круглый год (не 404/noindex); E canonical строго self ЧПУ.
-7. **Sitemap:** пилотные city-variants не выкидывать из-за порога 6 при events>0.
+7. **Sitemap:** пилотные city-variants не выкидывать из-за порога 6 при events>0; Group C marker `/podborki/c/{seoPilot}` в static sitemap.
 
 **Ещё открыто (не блокер):**
 - Blog banners / card blurbs после маркера ЧПУ.
 - Финальная вычитка Title/H1 copy после SERP smoke.
 
-### Пилот-2 (owner 2026-08-12: «ок. ставим в план» - код НЕ сейчас)
+### Пилот-2 (owner 2026-09-03: старт; slug'и в allowlist)
 
-**План:** `SEO.PODBORKI-PILOT-2` - после пилота-1 добавить в allowlist `nizhny-novgorod` + `perm` (тот же контур: meta/self-canonical/index + intents; кастом `SeoOverride` только 1–2 ключа на город).
+**План:** `SEO.PODBORKI-PILOT-2` - `nizhny-novgorod` + `perm` в `PODBORKI_SEO_PILOT_CITY_SLUGS` (тот же контур: meta/self-canonical/index + intents + маркер CHPU/301); кастом `SeoOverride` только 1–2 ключа на город.
 
-**Критерий старта (gate):**
-1. В Вебмастере/поиске у пилот-1 (КГД+СПб) нет склейки `/podborki?city=` с `/cities/{slug}`.
-2. Статус в поиске у пилот-1 приемлемый (страницы в индексе, без массового вылета / мигания).
-3. Окно наблюдения ~1–2 недели после live Stage-1; только потом трогать `PODBORKI_SEO_PILOT_CITY_SLUGS`.
+**Критерий старта (gate):** owner подтвердил индекс podborki KGD/SPB (2026-09-03). См. [seo-podborki-chpu-plan.md](./seo-podborki-chpu-plan.md).
 
 ---
 

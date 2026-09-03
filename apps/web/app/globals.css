@@ -878,8 +878,11 @@ html[data-nav-pending='1'] {
 
   @media (min-width: 1024px) {
     .catalog-sidebar {
+      /* Definite height (not only max-height): flex child overflow-y needs a bound. */
       position: sticky;
       top: calc(var(--site-header-height, 4rem) + 1rem);
+      align-self: start;
+      height: calc(100vh - var(--site-header-height, 4rem) - 2rem);
       max-height: calc(100vh - var(--site-header-height, 4rem) - 2rem);
       display: flex;
       flex-direction: column;
@@ -895,6 +898,7 @@ html[data-nav-pending='1'] {
       flex: 1 1 auto;
       min-height: 0;
       overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
       overscroll-behavior: contain;
       margin-right: -0.35rem;
       padding-right: 0.35rem;

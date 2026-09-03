@@ -8,17 +8,18 @@
 - Venue «Ближайшие события» - 56px thumbs; catalog quality=65 ошибочно разъехался на все EventCard.
 
 ### Решения
-- Related: `event-related.js` - title dedupe, kids/river affinity, hard drop concerts для детских/речных.
-- Catalog sidebar: desktop `max-height` + `overflow-y` на `.catalog-sidebar-scroll` (убран `lg:contents`).
-- Blog: убран client reshuffle featured.
+- Related: `event-related.js` scoring + **wire into `public-event.dto.ts` `loadRelatedSessionsFromDb`** (live path): same city only, wide candidate pool, product-title dedupe. `dto.js` already used pickRelated; PERF.E5 path did not.
+- Catalog sidebar: sticky `height` (не только max-height) + `align-self:start` + inner `overflow-y` - flex child иначе не получает bound.
+- Blog: убран client reshuffle featured; stable promo seed (без Math.random после paint).
+- Home build: `ssr:false` dynamic вынесен в `HomeDeferredIslands.client.tsx` (RSC нельзя).
 - PDF: same-origin `/api/osm-tile/...` → OSM tiles; attribution без Carto.
 - Убран блок «Как добраться» с event PDP и venue/location (карта + контакты остаются).
 - Venue upcoming: крупные 16/10 карточки + CTA.
 - Image: `CARD_IMAGE_QUALITY=80` вне каталога; `/events` grid `catalogDense` + quality 65.
-- SEO: PILOT-2 NN+Perm; маркер `/podborki/c/{city}` + 301; lean SSR payloads / deferred home islands.
+- SEO: PILOT-2 NN+Perm; маркер `/podborki/c/{city}` + 301; lean SSR payloads; city hub index ≥6 (`MIN_CITY_EVENTS_FOR_INDEX`).
 
 ### Проблемы
-- Backend related на live обновится только после API deploy (не только web artifact).
+- Live related/фильтры/blog flash требуют **web deploy + `systemctl restart daibilet-api`** (related = API).
 - OSM tile proxy: соблюдать usage policy (UA уже задан); при росте PDF-экспортов - rate/cache.
 
 ---

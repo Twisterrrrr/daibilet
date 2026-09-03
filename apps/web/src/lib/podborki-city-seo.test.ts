@@ -33,6 +33,14 @@ test('pilot resolves destination translit and SEO aliases to path canon', () => 
     citySlug: 'moscow',
     cityName: 'Москва',
   });
+  assert.deepEqual(resolvePodborkiCityMetaPilot('nizhny-novgorod'), {
+    citySlug: 'nizhny-novgorod',
+    cityName: 'Нижний Новгород',
+  });
+  assert.deepEqual(resolvePodborkiCityMetaPilot('perm'), {
+    citySlug: 'perm',
+    cityName: 'Пермь',
+  });
 });
 
 test('active SEO pilot is KGD+SPB+NN+Perm; moscow meta leftover only', () => {
@@ -57,6 +65,8 @@ test('canonical is marker CHPU on SEO slug, not soft query', () => {
     buildPodborkiCityCanonicalPath('saint-petersburg'),
     '/podborki/c/saint-petersburg',
   );
+  assert.equal(buildPodborkiCityCanonicalPath('nizhny-novgorod'), '/podborki/c/nizhny-novgorod');
+  assert.equal(buildPodborkiCityCanonicalPath('perm'), '/podborki/c/perm');
   assert.equal(buildPodborkiCityCanonicalPath('moscow'), '/podborki/c/moscow');
 });
 
@@ -77,6 +87,8 @@ test('soft query redirect consolidates meta-pilot onto CHPU', () => {
     resolvePodborkiCityQueryRedirect('sankt-peterburg'),
     '/podborki/c/saint-petersburg',
   );
+  assert.equal(resolvePodborkiCityQueryRedirect('nizhny-novgorod'), '/podborki/c/nizhny-novgorod');
+  assert.equal(resolvePodborkiCityQueryRedirect('perm'), '/podborki/c/perm');
   assert.equal(resolvePodborkiCityQueryRedirect('moscow'), '/podborki/c/moscow');
   assert.equal(resolvePodborkiCityQueryRedirect('kazan'), null);
   assert.equal(resolvePodborkiCityQueryRedirect('all'), null);

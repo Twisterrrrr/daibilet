@@ -73,10 +73,17 @@ export function BlogListFiltered({
   const [cursor, setCursor] = useState<string | null>(null);
   const [visiblePosts, setVisiblePosts] = useState<BlogCardDto[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
-  const [promoSeed, setPromoSeed] = useState(1);
-  useEffect(() => {
-    setPromoSeed(Math.floor(Math.random() * 10_000) + 1);
-  }, []);
+  // Stable seed from SSR order - Math.random in useEffect reshuffled promo slots after paint.
+  const promoSeed = useMemo(() => {
+    let hash = 0;
+    for (const post of posts.slice(0, 8)) {
+      const slug = String(post.slug || '');
+      for (let i = 0; i < slug.length; i += 1) {
+        hash = (hash * 31 + slug.charCodeAt(i)) >>> 0;
+      }
+    }
+    return (hash % 10_000) + 1;
+  }, [posts]);
 
   const urlCityRaw = paramValue(searchParams.get('city') ?? initialFilters?.city);
   const urlCity = urlCityRaw === 'multi' ? 'all' : urlCityRaw;

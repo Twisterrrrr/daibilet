@@ -28,6 +28,7 @@ import {
 } from './public-event-widget-fallback.js';
 import { pickCatalogSubcategories } from './public-catalog.mapper.js';
 import { spreadCatalogSessionsByCoverImage } from './public-catalog-spread.js';
+import { pickRelatedSessions } from './event-related.js';
 import { formatPublicEventTitle } from './event-title-normalize.ts';
 import type {
   PublicEventDto,
@@ -1172,24 +1173,26 @@ function buildTicketPrices(
   }).slice(0, 32);
 }
 
-/** PERF.E5: related cards without full catalog - same city or category, upcoming only. */
+/**
+ * PERF.E5 related: same city only (no cross-city OR category bleed), scored +
+ * product-title dedupe via pickRelatedSessions. Fetch a wide pool - dated twin
+ * events share a title and must collapse before fill.
+ */
 async function loadRelatedSessionsFromDb(
   event: EventRecord,
   excludeEventIds: string[],
   limit: number,
 ): Promise<PublicSessionDto[]> {
-  const exclude = new Set(excludeEventIds);
+  const exclude = new Set(excludeEventIds.map(String));
   const now = new Date();
-  const cityOrCategory: Prisma.EventWhereInput[] = [];
-  if (event.primaryCityId) cityOrCategory.push({ primaryCityId: event.primaryCityId });
-  if (event.categoryId) cityOrCategory.push({ categoryId: event.categoryId });
-  if (!cityOrCategory.length) return [];
+  if (!event.primaryCityId) return [];
 
+  const candidateTake = Math.max(limit * 24, 96);
   const rows = await prisma.event.findMany({
     where: {
       id: { notIn: [...exclude] },
       status: { in: ['READY', 'PUBLISHED'] },
-      OR: cityOrCategory,
+      primaryCityId: event.primaryCityId,
       sessions: {
         some: {
           OR: [{ startsAt: { gte: now } }, { endsAt: { gte: now } }],
@@ -1200,6 +1203,9 @@ async function loadRelatedSessionsFromDb(
       primaryCity: { include: { region: true } },
       venue: true,
       category: true,
+      primarySubcategory: true,
+      subcategories: { include: { subcategory: true } },
+      tags: { include: { tag: true } },
       override: true,
       sessions: {
         where: {
@@ -1210,12 +1216,12 @@ async function loadRelatedSessionsFromDb(
       },
     },
     orderBy: { updatedAt: 'desc' },
-    take: limit * 3,
+    take: candidateTake,
   });
 
-  const related: PublicSessionDto[] = [];
+  const catalogSessions: PublicSessionDto[] = [];
   for (const row of rows) {
-    if (exclude.has(row.id)) continue;
+    if (exclude.has(String(row.id))) continue;
     const next = row.sessions[0];
     if (!next) continue;
     const city = row.primaryCity;
@@ -1232,7 +1238,16 @@ async function loadRelatedSessionsFromDb(
       city?.isDestination === false && city.region ? 'region' : 'city';
     const timeZone = resolveCityTimeZone(city?.title, destName);
     const startsAt = normalizeStartsAt(next.startsAt) || '';
-    related.push({
+    const tags = row.tags.map((entry) => entry.tag.title).filter(Boolean);
+    const subcategories = [
+      ...new Set(
+        [
+          row.primarySubcategory?.title,
+          ...row.subcategories.map((entry) => entry.subcategory.title),
+        ].filter((value): value is string => Boolean(value)),
+      ),
+    ];
+    catalogSessions.push({
       id: row.id,
       slug: publicSlug(row.slug),
       sourceSlug: row.slug,
@@ -1248,7 +1263,9 @@ async function loadRelatedSessionsFromDb(
       venue: row.venue?.title || 'Не указано',
       venueKind: row.venue?.kind || 'OTHER',
       category: row.category?.title || 'События',
-      tags: [],
+      tags,
+      subcategories,
+      ageLimit: row.ageLimit ?? undefined,
       kind: row.kind.toLowerCase(),
       startsAt,
       dateLabel: formatDate(next.startsAt, timeZone),
@@ -1262,8 +1279,28 @@ async function loadRelatedSessionsFromDb(
         pickFirstUsableEventImageUrl(row.override?.imageUrl, row.imageUrl, row.venue?.heroImageUrl),
       purchaseReady: true,
     });
-    if (related.length >= limit) break;
   }
+
+  const subject = {
+    cityId: event.primaryCityId,
+    city: event.primaryCity?.title || '',
+    category: event.category?.title || '',
+    title: formatPublicEventTitle(event.override?.title || event.title),
+    tags: event.tags.map((entry) => entry.tag.title).filter(Boolean),
+    subcategories: eventSubcategories(event),
+    venueKind: event.venue?.kind || 'OTHER',
+    venueId: event.venueId,
+    ageLimit: event.ageLimit ?? undefined,
+  };
+
+  const related = pickRelatedSessions(
+    subject,
+    catalogSessions,
+    excludeEventIds,
+    () => [],
+    limit,
+  ) as PublicSessionDto[];
+
   return spreadCatalogSessionsByCoverImage(related).slice(0, limit);
 }
 

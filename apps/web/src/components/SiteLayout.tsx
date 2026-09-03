@@ -8,6 +8,7 @@ import { SiteFooter } from '@/components/SiteFooter';
 import { SiteHeader } from '@/components/SiteHeader.client';
 import { SelectedCityProvider } from '@/components/SelectedCityProvider.client';
 import { SiteProviders } from '@/components/SiteProviders.client';
+import { slimDestinationsForLayout } from '@/lib/ssr-lean-payloads';
 import { withSoftTimeout } from '@/lib/soft-timeout';
 import { getCachedDestinations } from '@/server/cached-public-surfaces';
 
@@ -37,7 +38,9 @@ export async function SiteLayout({
       EMPTY_DESTINATIONS,
       'site-layout-destinations',
     );
-    destinations = payload?.destinations ?? [];
+    // Drop per-city category facet trees before they enter every page RSC flight
+    // (SelectedCityProvider + header + footer). hubTags stay for chips/cards.
+    destinations = slimDestinationsForLayout(payload?.destinations ?? []);
   } catch {
     // SSR/build without DB — footer city links stay empty until runtime with DB.
   }
