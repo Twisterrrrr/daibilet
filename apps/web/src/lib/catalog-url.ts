@@ -2,6 +2,9 @@ import { CATALOG_PAGE_SIZE_DEFAULT, CATALOG_PAGE_SIZES, type CatalogPageSize } f
 
 export type CatalogSort = 'time' | 'price' | 'price_asc' | 'price_desc' | 'popular' | 'departing_soon' | 'random';
 
+/** Default `/events` order: nearest session first. Matches the sort select. */
+export const CATALOG_SORT_DEFAULT: CatalogSort = 'time';
+
 export interface CatalogFilterValues {
   q?: string;
   city?: string;
@@ -25,6 +28,15 @@ export const CATALOG_SORT_OPTIONS: Array<{ value: CatalogSort; label: string }> 
   { value: 'price_desc', label: 'Сначала дороже' },
   { value: 'departing_soon', label: 'Скоро начало' },
 ];
+
+/** Resolve which option to show when URL has no sort (server default = time). */
+export function resolveCatalogSortSelectValue(
+  sort: CatalogSort | string | null | undefined,
+): CatalogSort {
+  const value = String(sort || '').trim() as CatalogSort;
+  if (CATALOG_SORT_OPTIONS.some((option) => option.value === value)) return value;
+  return CATALOG_SORT_DEFAULT;
+}
 
 export const CATALOG_DATE_OPTIONS = [
   /** Short label: mobile select truncates «Любая дата» to «Люб». */
@@ -53,7 +65,7 @@ export function catalogFiltersFromQuery(query: CatalogFilterValues): CatalogFilt
     date: query.date && query.date !== 'all' ? query.date : undefined,
     from: query.from || undefined,
     to: query.to || undefined,
-    sort: query.sort || 'random',
+    sort: query.sort || CATALOG_SORT_DEFAULT,
     limit: query.limit && CATALOG_PAGE_SIZES.includes(query.limit) ? query.limit : CATALOG_PAGE_SIZE_DEFAULT,
     minPrice: query.minPrice,
     maxPrice: query.maxPrice,
@@ -72,7 +84,7 @@ export function buildCatalogHref(values: CatalogFilterValues): string {
   if (values.date) params.set('date', values.date);
   if (values.from) params.set('from', values.from);
   if (values.to) params.set('to', values.to);
-  if (values.sort && values.sort !== 'random') params.set('sort', values.sort);
+  if (values.sort && values.sort !== CATALOG_SORT_DEFAULT) params.set('sort', values.sort);
   if (values.limit && values.limit !== CATALOG_PAGE_SIZE_DEFAULT) params.set('limit', String(values.limit));
   if (values.minPrice != null) params.set('minPrice', String(values.minPrice));
   if (values.maxPrice != null) params.set('maxPrice', String(values.maxPrice));

@@ -460,7 +460,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
           {error ? error : null}
         </p>
 
-        <div className="ml-auto flex flex-wrap items-center gap-2">
+        <div className="ml-auto flex w-full min-w-0 flex-nowrap items-center gap-2 sm:w-auto sm:flex-wrap">
           <div
             role="radiogroup"
             aria-label="Событий на странице"
@@ -500,7 +500,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
           <CatalogSortSelect
             value={filterValues.sort}
             disabled={(loading && !catalog) || cityBootstrapPending}
-            className="w-[min(100%,15.5rem)] md:hidden"
+            className="min-w-0 flex-1 md:hidden md:flex-none"
             onChange={(sort: CatalogSort) => {
               router.push(
                 buildCatalogHref({

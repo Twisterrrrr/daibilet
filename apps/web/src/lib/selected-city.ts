@@ -3,6 +3,8 @@ import type { PublicDestinationDto } from '@daibilet/contracts/public';
 import { resolveLandingCityName } from './landing-city.ts';
 
 export const SELECTED_CITY_STORAGE_KEY = 'daibilet:selected-city';
+/** Cookie mirror of storage so home SSR can paint the last city without a client swap. */
+export const SELECTED_CITY_COOKIE = 'daibilet-city';
 /** Set after first-visit confirm, picker choice, or «Позже» - do not nag again. */
 export const CITY_PROMPT_STORAGE_KEY = 'daibilet:city-prompted';
 
@@ -108,10 +110,30 @@ export function persistSelectedCity(name: string) {
   try {
     if (name === 'all') localStorage.removeItem(SELECTED_CITY_STORAGE_KEY);
     else localStorage.setItem(SELECTED_CITY_STORAGE_KEY, name);
+    writeSelectedCityCookie(name);
     markCityPromptCompleted();
   } catch {
     // ignore storage errors
   }
+}
+
+export function decodeSelectedCityCookie(raw?: string | null): string | null {
+  const value = String(raw || '').trim();
+  if (!value || value.toLowerCase() === 'all') return null;
+  try {
+    return decodeURIComponent(value).trim() || null;
+  } catch {
+    return value;
+  }
+}
+
+function writeSelectedCityCookie(name: string) {
+  if (typeof document === 'undefined') return;
+  if (name === 'all') {
+    document.cookie = `${SELECTED_CITY_COOKIE}=; Path=/; Max-Age=0; SameSite=Lax`;
+    return;
+  }
+  document.cookie = `${SELECTED_CITY_COOKIE}=${encodeURIComponent(name)}; Path=/; Max-Age=31536000; SameSite=Lax`;
 }
 
 /**

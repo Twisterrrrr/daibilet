@@ -66,7 +66,7 @@ test('shouldAttemptSilentGeo includes catalog gates and account exclusions', () 
   assert.equal(shouldAttemptSilentGeo('/admin/events'), false);
 });
 
-test('shouldDeferStorageCityForGeo waits for session geo attempt', () => {
+test('shouldDeferStorageCityForGeo waits for session geo on catalog indexes only', () => {
   const storage = new Map<string, string>();
   const original = globalThis.sessionStorage;
   Object.defineProperty(globalThis, 'sessionStorage', {
@@ -79,6 +79,9 @@ test('shouldDeferStorageCityForGeo waits for session geo attempt', () => {
   });
   try {
     assert.equal(shouldDeferStorageCityForGeo('/events'), true);
+    assert.equal(shouldDeferStorageCityForGeo('/podborki'), true);
+    assert.equal(shouldDeferStorageCityForGeo('/'), false);
+    assert.equal(shouldDeferStorageCityForGeo('/cities'), false);
     markGeoSessionAttempt();
     assert.equal(hasGeoSessionAttempt(), true);
     assert.equal(shouldDeferStorageCityForGeo('/events'), false);

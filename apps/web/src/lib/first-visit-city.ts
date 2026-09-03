@@ -49,9 +49,20 @@ export function markGeoSessionAttempt() {
   }
 }
 
-/** Defer localStorage city until the first session geo attempt finishes. */
+/**
+ * Catalog indexes wait for session GPS before injecting storage city (city gate).
+ * Home uses storage/cookie immediately so rails do not flash «все города» → GPS city.
+ */
 export function shouldDeferStorageCityForGeo(pathname: string | null | undefined): boolean {
-  return shouldAttemptSilentGeo(pathname) && !hasGeoSessionAttempt();
+  if (!shouldAttemptSilentGeo(pathname) || hasGeoSessionAttempt()) return false;
+  const path = String(pathname || '').replace(/\/$/, '') || '/';
+  return (
+    path === '/events' ||
+    path === '/podborki' ||
+    path === '/places' ||
+    path === '/venues' ||
+    path === '/locations'
+  );
 }
 
 function isBrowsingPath(pathname: string | null | undefined): boolean {

@@ -199,7 +199,7 @@ export async function buildPublicCatalogDto(query: PublicCatalogQuery): Promise<
   // Favorites / ids lookup: allow sessions without cover; normal catalog stays cover-gated.
   const sourceSessions = byIds ? sessions : sessions.filter(sessionHasCoverImage);
   const filtered = sourceSessions.filter((session) => matchesCatalogQuery(session, query));
-  const sorted = sortCatalogSessions(filtered, query.sort || 'random', query);
+  const sorted = sortCatalogSessions(filtered, query.sort || 'time', query);
   const defaultLimit = byIds ? Math.min(Math.max(query.ids!.length, 1), CATALOG_PAGE_SIZE_MAX) : CATALOG_PAGE_SIZE_DEFAULT;
   const limit = clampNumber(query.limit, 1, CATALOG_PAGE_SIZE_MAX, defaultLimit);
   const total = sorted.length;
@@ -1001,6 +1001,14 @@ function catalogRandomSeed(query: PublicCatalogQuery): number {
   return hash >>> 0;
 }
 
+function isDepartingSoonSession(session: PublicSessionDto, now = Date.now()): boolean {
+  if (!session.startsAt) return false;
+  const startsAt = new Date(session.startsAt).getTime();
+  if (!Number.isFinite(startsAt)) return false;
+  const diffMs = startsAt - now;
+  return diffMs > 0 && diffMs <= 120 * 60 * 1000;
+}
+
 function sortCatalogSessions(
   sessions: PublicSessionDto[],
   sort: NonNullable<PublicCatalogQuery['sort']>,
@@ -1016,18 +1024,33 @@ function sortCatalogSessions(
     result = sorted.sort((left, right) => comparePrice(right, left) || compareSessionTime(left, right));
   } else if (sort === 'popular') {
     result = sorted.sort((left, right) => (right.sessionCount || 1) - (left.sessionCount || 1) || compareSessionTime(left, right));
+  } else if (sort === 'departing_soon') {
+    result = sorted.sort((left, right) => {
+      const leftSoon = isDepartingSoonSession(left) ? 0 : 1;
+      const rightSoon = isDepartingSoonSession(right) ? 0 : 1;
+      return leftSoon - rightSoon || compareSessionTime(left, right);
+    });
   } else {
     result = sorted.sort(compareSessionTime);
   }
 
-  // Default / popular feed: hide same-cover + near-duplicate titles (search & price keep full set).
+  // Popular / random feed: hide same-cover + near-duplicate titles (search & price keep full set).
   const isDefaultFeed = sort === 'random' || sort === 'popular';
   const hasSearch = Boolean(String(query.q || '').trim());
   if (isDefaultFeed && !hasSearch && !query.ids?.length) {
     result = dedupeCatalogNearDuplicates(result);
   }
 
-  if (sort === 'price' || sort === 'price_asc' || sort === 'price_desc') return result;
+  // Chronological and price sorts must keep order. Cover-spread was shuffling «ближайшие».
+  if (
+    sort === 'price' ||
+    sort === 'price_asc' ||
+    sort === 'price_desc' ||
+    sort === 'time' ||
+    sort === 'departing_soon'
+  ) {
+    return result;
+  }
   return spreadCatalogSessionsByCoverImage(result);
 }
 

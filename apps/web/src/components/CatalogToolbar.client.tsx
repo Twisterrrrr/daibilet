@@ -237,7 +237,7 @@ export function CatalogToolbar({
           disabled={disabled}
           onChange={setSort}
           size="sm"
-          className="w-[min(100%,16.5rem)] shrink-0"
+          className="max-w-[13.5rem] shrink-0"
         />
       </div>
     </div>

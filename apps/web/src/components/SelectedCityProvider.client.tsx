@@ -114,17 +114,26 @@ type PendingConfirm = {
 
 export function SelectedCityProvider({
   destinations,
+  initialCity = null,
   children,
 }: {
   destinations: PublicDestinationDto[];
+  /** Cookie city from RSC so home SSR matches the last selected city. */
+  initialCity?: string | null;
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
   const router = useRouter();
   const [urlCity, setUrlCity] = useState<string | null>(null);
   const [searchParamsKey, setSearchParamsKey] = useState('');
-  const [cityLabel, setCityLabel] = useState('Все города');
-  const [cityReady, setCityReady] = useState(false);
+  const seedCity = (() => {
+    if (!initialCity || shouldDeferStorageCityForGeo(pathname)) {
+      return { label: 'Все города', ready: false };
+    }
+    return { label: initialCity, ready: true };
+  })();
+  const [cityLabel, setCityLabel] = useState(seedCity.label);
+  const [cityReady, setCityReady] = useState(seedCity.ready);
   const [geoBootstrapPending, setGeoBootstrapPending] = useState(false);
   const [pendingConfirm, setPendingConfirm] = useState<PendingConfirm | null>(null);
   const pendingConfirmRef = useRef<PendingConfirm | null>(null);

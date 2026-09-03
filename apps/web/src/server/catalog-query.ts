@@ -64,7 +64,7 @@ export function catalogQueryCacheKey(query: PublicCatalogQuery & { page?: number
     date: query.date ?? '',
     from: query.from ?? '',
     to: query.to ?? '',
-    sort: query.sort ?? 'random',
+    sort: query.sort ?? 'time',
     limit,
     offset: resolveCatalogOffset(query, limit),
     minPrice: query.minPrice ?? '',
@@ -180,7 +180,7 @@ export function buildCatalogApiSearchParams(
   if (filters.date && filters.date !== 'all') params.set('date', filters.date);
   if (filters.from) params.set('from', filters.from);
   if (filters.to) params.set('to', filters.to);
-  if (filters.sort && filters.sort !== 'random') params.set('sort', filters.sort);
+  if (filters.sort && filters.sort !== 'time') params.set('sort', filters.sort);
   const limit = filters.limit && filters.limit > 0 ? filters.limit : CATALOG_PAGE_SIZE_DEFAULT;
   if (limit !== CATALOG_PAGE_SIZE_DEFAULT) {
     params.set('limit', String(limit));

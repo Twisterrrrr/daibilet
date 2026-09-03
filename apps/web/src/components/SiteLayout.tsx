@@ -1,5 +1,6 @@
 import '@/lib/env';
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
+import { cookies } from 'next/headers';
 import { Suspense } from 'react';
 
 import { ScrollToTopButton } from '@/components/ScrollToTop.client';
@@ -9,6 +10,11 @@ import { SiteHeader } from '@/components/SiteHeader.client';
 import { SelectedCityProvider } from '@/components/SelectedCityProvider.client';
 import { SiteProviders } from '@/components/SiteProviders.client';
 import { slimDestinationsForLayout } from '@/lib/ssr-lean-payloads';
+import {
+  SELECTED_CITY_COOKIE,
+  decodeSelectedCityCookie,
+  matchDestination,
+} from '@/lib/selected-city';
 import { withSoftTimeout } from '@/lib/soft-timeout';
 import { getCachedDestinations } from '@/server/cached-public-surfaces';
 
@@ -45,12 +51,15 @@ export async function SiteLayout({
     // SSR/build without DB — footer city links stay empty until runtime with DB.
   }
 
+  const cityCookie = decodeSelectedCityCookie((await cookies()).get(SELECTED_CITY_COOKIE)?.value);
+  const initialCity = matchDestination(destinations, cityCookie)?.name || null;
+
   // SelectedCityProvider isolates useSearchParams in an inner Suspense hole so
   // header + page can SSR. Header stays outside the content Suspense so the
   // hamburger (checkbox disclosure) is never replaced by a dead skeleton span.
   return (
     <SiteProviders>
-      <SelectedCityProvider destinations={destinations}>
+      <SelectedCityProvider destinations={destinations} initialCity={initialCity}>
         <div className="flex min-h-screen flex-col bg-background">
           <div className="print:hidden">
             <SiteHeader destinations={destinations} />

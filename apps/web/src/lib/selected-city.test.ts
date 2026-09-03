@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { buildCatalogHref, catalogHrefWithSelectedCity, isPlacesSectionPath, placesSearchHref, venueCatalogHrefWithSelectedCity } from './catalog-url.ts';
+import { buildCatalogHref, catalogHrefWithSelectedCity, isPlacesSectionPath, placesSearchHref, resolveCatalogSortSelectValue, venueCatalogHrefWithSelectedCity } from './catalog-url.ts';
 import {
   catalogCityQueryValue,
   isAllCitiesQuery,
@@ -11,6 +11,7 @@ import {
   mergeStoredCityIntoSearchParams,
   pathHrefWithSelectedCity,
   persistSelectedCity,
+  decodeSelectedCityCookie,
   ensureCityInOptions,
   resolveCatalogCityFilter,
   resolveCatalogFetchCity,
@@ -44,6 +45,18 @@ test('catalogHrefWithSelectedCity keeps explicit city over header', () => {
 test('catalogHrefWithSelectedCity skips all', () => {
   assert.equal(catalogHrefWithSelectedCity('all', { date: 'weekend' }), '/events?date=weekend');
   assert.equal(buildCatalogHref({ date: 'weekend' }), '/events?date=weekend');
+});
+
+test('buildCatalogHref omits default time sort and keeps explicit popular', () => {
+  assert.equal(buildCatalogHref({ sort: 'time' }), '/events');
+  assert.equal(buildCatalogHref({ sort: 'popular' }), '/events?sort=popular');
+  assert.equal(buildCatalogHref({ sort: 'price_asc' }), '/events?sort=price_asc');
+});
+
+test('resolveCatalogSortSelectValue defaults unknown/random to nearest-first', () => {
+  assert.equal(resolveCatalogSortSelectValue('price_asc'), 'price_asc');
+  assert.equal(resolveCatalogSortSelectValue(''), 'time');
+  assert.equal(resolveCatalogSortSelectValue('random'), 'time');
 });
 
 test('placesSearchHref is one mixed Places search URL', () => {
@@ -321,4 +334,11 @@ test('ensureCityInOptions prepends the selected city when stats list is filtered
   ]);
   assert.equal(ensureCityInOptions(options, 'Москва'), options);
   assert.equal(ensureCityInOptions(options, 'all'), options);
+});
+
+test('decodeSelectedCityCookie reads encoded city names', () => {
+  assert.equal(decodeSelectedCityCookie('Москва'), 'Москва');
+  assert.equal(decodeSelectedCityCookie(encodeURIComponent('Санкт-Петербург')), 'Санкт-Петербург');
+  assert.equal(decodeSelectedCityCookie('all'), null);
+  assert.equal(decodeSelectedCityCookie(''), null);
 });

@@ -35,13 +35,11 @@ export function HeroMedia({
 }: HeroMediaProps) {
   const valid = frames.filter((frame) => Boolean(frame.src?.trim()));
   const [index, setIndex] = React.useState(0);
-  const [loaded, setLoaded] = React.useState(false);
 
   React.useEffect(() => {
     if (videoSrc || valid.length <= 1) return;
     const id = window.setInterval(() => {
       setIndex((prev) => (prev + 1) % valid.length);
-      setLoaded(false);
     }, intervalMs);
     return () => window.clearInterval(id);
   }, [videoSrc, valid.length, intervalMs]);
@@ -69,10 +67,7 @@ export function HeroMedia({
           fill
           priority
           sizes={IMAGE_SIZES.homeHero}
-          onLoad={() => setLoaded(true)}
-          className={`object-cover transition-opacity duration-700 ${objectPosition} ${
-            loaded ? 'opacity-100' : 'opacity-0'
-          }`}
+          className={`object-cover ${objectPosition}`}
         />
       ) : (
         <div className="absolute inset-0 bg-slate-900" />

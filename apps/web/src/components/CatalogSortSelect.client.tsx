@@ -4,23 +4,9 @@ import { ChevronDown } from 'lucide-react';
 
 import {
   CATALOG_SORT_OPTIONS,
+  resolveCatalogSortSelectValue,
   type CatalogSort,
 } from '@/lib/catalog-url';
-
-/** Resolve which option to show when URL has no sort (server default = random). */
-export function resolveCatalogSortSelectValue(
-  sort: CatalogSort | string | null | undefined,
-): CatalogSort {
-  const value = String(sort || '').trim() as CatalogSort;
-  if (CATALOG_SORT_OPTIONS.some((option) => option.value === value)) return value;
-  // Random / missing: show «Сначала ближайшие» as the practical default choice.
-  return 'time';
-}
-
-export function catalogSortOptionLabel(sort: CatalogSort | string | null | undefined): string {
-  const value = resolveCatalogSortSelectValue(sort);
-  return CATALOG_SORT_OPTIONS.find((option) => option.value === value)?.label || 'Сначала ближайшие';
-}
 
 type CatalogSortSelectProps = {
   value?: CatalogSort | string | null;
@@ -33,7 +19,7 @@ type CatalogSortSelectProps = {
 
 /**
  * Single select for `/events` sort (replaces chip radiogroup).
- * Label format matches catalog chrome: «Сортировка: …».
+ * Visible label is the option itself - no «Сортировка по:» prefix.
  */
 export function CatalogSortSelect({
   value,
@@ -46,7 +32,7 @@ export function CatalogSortSelect({
   const pad = size === 'md' ? 'h-9 pl-3 pr-9 text-sm' : 'h-8 pl-2.5 pr-8 text-xs';
 
   return (
-    <div className={`relative inline-flex min-w-0 max-w-full ${className}`}>
+    <div className={`relative inline-flex min-w-0 ${className}`}>
       <label className="sr-only" htmlFor="catalog-sort-select">
         Сортировка
       </label>
@@ -56,11 +42,11 @@ export function CatalogSortSelect({
         disabled={disabled}
         aria-label="Сортировка"
         onChange={(event) => onChange(event.target.value as CatalogSort)}
-        className={`w-full appearance-none truncate rounded-full border-0 bg-[#F5F5F7] font-medium text-slate-800 outline-none transition hover:bg-slate-200/70 focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-60 ${pad}`}
+        className={`w-full min-w-0 appearance-none truncate rounded-full border-0 bg-[#F5F5F7] font-medium text-slate-800 outline-none transition hover:bg-slate-200/70 focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-60 ${pad}`}
       >
         {CATALOG_SORT_OPTIONS.map((option) => (
           <option key={option.value} value={option.value}>
-            Сортировка: {option.label}
+            {option.label}
           </option>
         ))}
       </select>
