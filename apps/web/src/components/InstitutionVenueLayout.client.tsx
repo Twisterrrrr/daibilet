@@ -233,7 +233,7 @@ export function InstitutionVenueLayout({
   };
 
   return (
-    <div className="bg-white pb-24 lg:pb-0" data-venue-pdp-editorial>
+    <div className="bg-white pb-24 lg:pb-0" data-venue-pdp-editorial data-venue-pdp-md>
       <div className="border-b border-zinc-200/80 bg-white">
         <VenueBreadcrumbsNav payload={pagePayload} />
       </div>
@@ -428,7 +428,8 @@ export function InstitutionVenueLayout({
               ? splitVenueProseParagraphs(aboutProse).map((paragraph, index) => (
                   <p
                     key={paragraph.slice(0, 48)}
-                    className={`${index === 0 ? 'mt-8' : 'mt-5'} text-sm leading-7 text-slate-600`}
+                    data-venue-md-prose
+                    className={`${index === 0 ? 'mt-8' : 'mt-5'} text-base leading-7 text-slate-600`}
                   >
                     {paragraph}
                   </p>
@@ -448,7 +449,11 @@ export function InstitutionVenueLayout({
                     {section.h2}
                   </h2>
                   {splitVenueProseParagraphs(section.body).map((paragraph) => (
-                    <p key={paragraph.slice(0, 48)} className="text-sm leading-7 text-zinc-600">
+                    <p
+                      key={paragraph.slice(0, 48)}
+                      data-venue-md-prose
+                      className="text-base leading-7 text-zinc-600"
+                    >
                       {paragraph}
                     </p>
                   ))}

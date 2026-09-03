@@ -68,6 +68,9 @@ html[data-nav-pending='1'] {
     --font-body: var(--font-manrope), var(--font-inter), system-ui, sans-serif;
     --font-display: var(--font-manrope), var(--font-inter), system-ui, sans-serif;
     --font-serif: var(--font-source-serif), Georgia, 'Times New Roman', serif;
+    /* Venue PDP trial: system UI like Cursor chat / GitHub markdown (Segoe UI on Win). */
+    --font-md: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+      'Noto Sans', 'Liberation Sans', sans-serif;
     --site-header-height: 4rem;
     /** Content column max width (header, footer, pages). */
     --container-page-max: 112rem;
@@ -196,6 +199,29 @@ html[data-nav-pending='1'] {
 
   .font-display {
     font-family: var(--font-display);
+  }
+
+  .font-md {
+    font-family: var(--font-md);
+  }
+
+  /**
+   * Venue PDP: try native system stack for all copy (descriptions, playbill, FAQ).
+   * Headings also inherit so the page reads like a markdown document, not Manrope UI.
+   */
+  [data-venue-pdp-md] {
+    font-family: var(--font-md);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  [data-venue-pdp-md] :is(h1, h2, h3, h4),
+  [data-venue-pdp-md] .font-display {
+    font-family: var(--font-md);
+  }
+
+  [data-venue-pdp-md] [data-venue-md-prose] {
+    font-size: 1rem;
+    line-height: 1.7;
   }
 
   /* /my-day: Lovable parity - Manrope for UI + titles (not Inter body). */

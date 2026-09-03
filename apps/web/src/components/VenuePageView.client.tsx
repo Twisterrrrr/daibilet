@@ -442,11 +442,11 @@ function VenuePlaybillRow({ entry }: { entry: VenuePlaybillEntry }) {
             <p className="text-sm font-semibold text-zinc-950">{when.label}</p>
           ) : when.kind === 'dated' ? (
             <div
-              className={`grid grid-cols-[2.25rem_auto] grid-rows-2 items-center gap-x-2 ${
+              className={`grid grid-cols-[2.5rem_auto] grid-rows-2 items-center gap-x-2 ${
                 when.weekend ? 'text-rose-600' : 'text-zinc-950'
               }`}
             >
-              {/* Fixed day column + right align so «3» lines up with «13». */}
+              {/* Always 2 digits (03 / 13) so month/weekday/time columns stay aligned. */}
               <span className="row-span-2 w-full text-right text-[1.75rem] font-extrabold leading-none tabular-nums tracking-tight sm:text-[2rem]">
                 {when.dayNum}
               </span>
@@ -522,7 +522,7 @@ function playbillWhenParts(
     .trim()
     .replace(/^в\s+/i, '') || null;
   if (date) {
-    const dayNum = String(date.getDate());
+    const dayNum = String(date.getDate()).padStart(2, '0');
     const dow = date.getDay();
     const weekday = PLAYBILL_WEEKDAY_SHORT[dow] || '';
     const weekend = dow === 0 || dow === 6;

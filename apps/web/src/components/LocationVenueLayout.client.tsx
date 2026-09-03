@@ -124,7 +124,7 @@ export function LocationVenueLayout({
       Number(stats.events || 0) > 0);
 
   return (
-    <div className="bg-white pb-24 lg:pb-0">
+    <div className="bg-white pb-24 lg:pb-0" data-venue-pdp-md>
       <div className="border-b border-slate-200 bg-white">
         <VenueBreadcrumbsNav payload={pagePayload} />
       </div>
@@ -488,7 +488,8 @@ export function LocationVenueLayout({
               ? splitVenueProseParagraphs(aboutBody).map((paragraph, index) => (
                   <p
                     key={paragraph.slice(0, 48)}
-                    className={`${index === 0 ? 'mt-8' : 'mt-5'} whitespace-pre-line text-sm leading-7 text-slate-600`}
+                    data-venue-md-prose
+                    className={`${index === 0 ? 'mt-8' : 'mt-5'} whitespace-pre-line text-base leading-7 text-slate-600`}
                   >
                     {paragraph}
                   </p>
@@ -509,7 +510,11 @@ export function LocationVenueLayout({
                     {section.h2}
                   </h2>
                   {splitVenueProseParagraphs(section.body).map((paragraph) => (
-                    <p key={paragraph.slice(0, 48)} className="text-sm leading-7 text-zinc-600">
+                    <p
+                      key={paragraph.slice(0, 48)}
+                      data-venue-md-prose
+                      className="text-base leading-7 text-zinc-600"
+                    >
                       {paragraph}
                     </p>
                   ))}
@@ -520,7 +525,8 @@ export function LocationVenueLayout({
 
           {visitTips ? (
             <p
-              className="text-sm leading-7 text-slate-700"
+              className="text-base leading-7 text-slate-700"
+              data-venue-md-prose
               data-venue-visit-tips
             >
               {visitTips}
