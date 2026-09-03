@@ -5,9 +5,7 @@ import {
   Anchor,
   Car,
   CheckCircle2,
-  ChevronDown,
   Clock,
-  HelpCircle,
   MapPin,
   Navigation as NavigationIcon,
   Share2,
@@ -18,6 +16,7 @@ import {
 import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import { MobileStickyActionBar } from '@/components/MobileStickyActionBar';
 import { YandexMapEmbed } from '@/components/YandexMapEmbed';
+import { VenueNearbyMiniGrid } from '@/components/VenueNearbyMiniGrid.client';
 import { VenueBreadcrumbsNav } from '@/components/VenueBreadcrumbsNav.client';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { expandSessionPurchaseVariants, isSessionPurchaseBlocked } from '@/lib/event-purchase';
@@ -32,7 +31,7 @@ import {
   formatVenueMetroLabel,
   resolveVenueEditorialContent,
 } from '@/lib/venue-editorial-content';
-import { normalizeVenueKind, resolveLocationVenueCopy, venueTypeIcon, venueTypeLabel } from '@/lib/venue-meta';
+import { normalizeVenueKind, resolveLocationVenueCopy, resolveVenueAboutHeading, splitVenueProseParagraphs, venueTypeIcon, venueTypeLabel } from '@/lib/venue-meta';
 import { eventHref, venueHref } from '@/lib/routes';
 import type {
   PublicSessionDto,
@@ -48,7 +47,7 @@ export function LocationVenueLayout({
   routeGroups = [],
   relatedVenues,
   stopEvents = [],
-  nearbyEvents = [],
+  nearbyEvents: _nearbyEvents = [],
   pagePayload,
   children,
 }: {
@@ -62,6 +61,7 @@ export function LocationVenueLayout({
   pagePayload: PublicVenuePageDto;
   children?: React.ReactNode;
 }) {
+  void _nearbyEvents;
   const venue = React.useMemo(() => applyVenueEditorialOverlay(venueProp), [venueProp]);
   const editorial = React.useMemo(
     () => resolveVenueEditorialContent(venue.slug),
@@ -98,10 +98,6 @@ export function LocationVenueLayout({
     normalizeVenueKind(venue.type) === 'temple';
   const todaySlots = React.useMemo(() => collectTodayTimeSlots(sessions), [sessions]);
   const uniqueStopEvents = React.useMemo(() => dedupeVenueLinkedEvents(stopEvents), [stopEvents]);
-  const uniqueNearbyEvents = React.useMemo(
-    () => dedupeVenueLinkedEvents(nearbyEvents),
-    [nearbyEvents],
-  );
   const TypeIcon = venueTypeIcon(venue.type);
   const typeLabel = venueTypeLabel(venue.type, venue.name);
   const routeCount = routeGroups.length || stats.events;
@@ -117,7 +113,6 @@ export function LocationVenueLayout({
   const stopExcursionCount =
     uniqueStopEvents.length > 0 ? uniqueStopEvents.length : Number(venue.stopEventCount ?? 0);
   const hasStopExcursions = stopExcursionCount > 0;
-  const hasNearbyExcursions = uniqueNearbyEvents.length > 0;
   /** Late FAQ only for timed boards / ticketed departures - not static monuments. */
   const showLateArrivalFaq =
     !curatedFaq.length &&
@@ -149,7 +144,7 @@ export function LocationVenueLayout({
               ) : (
                 <div className="h-full w-full bg-gradient-to-br from-sky-800 to-slate-950" />
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-sky-950/90 via-slate-900/50 to-slate-900/20" />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/45 to-slate-900/15" />
             </div>
             <div className="container-page absolute inset-0 z-10 flex flex-col justify-end pb-5 pt-20 md:pb-12 md:pt-24">
               {/* Type pills fight H1 on mobile - desktop only, solid chips */}
@@ -168,15 +163,9 @@ export function LocationVenueLayout({
                   <span>{heroAddressLine}</span>
                 </p>
               ) : null}
-              {/* Mobile: one meta line; sticky has CTA */}
-              <p className="mt-1.5 text-sm font-medium text-white/80 md:hidden">
-                {[
-                  `${formatNumber(routeCount)} ${routeCount === 1 ? 'маршрут' : routeCount >= 2 && routeCount <= 4 ? 'маршрута' : 'маршрутов'}`,
-                  formatMoney(stats.priceFrom),
-                ]
-                  .filter(Boolean)
-                  .join(' · ')}
-              </p>
+              {venue.city ? (
+                <p className="mt-1.5 text-sm font-medium text-white/80 md:hidden">{venue.city}</p>
+              ) : null}
               {heroLead ? (
                 <p className="mt-3 hidden max-w-3xl text-sm text-white/85 sm:text-base md:block">{heroLead}</p>
               ) : null}
@@ -479,33 +468,36 @@ export function LocationVenueLayout({
 
           {((hookFact && !isParkLike) || aboutBody || editorial?.highlights?.length) ? (
           <section className="scroll-mt-24">
-            <h2 className="text-xl font-bold text-slate-900">О локации</h2>
+            <h2 className="text-xl font-bold text-slate-900">
+              {resolveVenueAboutHeading(venue.type, venue.name)}
+            </h2>
             {hookFact && !isParkLike ? (
-              <p className="mt-4 text-sm font-semibold leading-6 text-slate-800">{hookFact}</p>
+              <p className="mt-5 text-sm font-semibold leading-7 text-slate-800">{hookFact}</p>
             ) : null}
             {editorial?.highlights?.length ? (
-              <ul className="mt-5 grid gap-2 sm:grid-cols-2" data-venue-highlights>
+              <ul className="mt-6 space-y-2" data-venue-highlights>
                 {editorial.highlights.map((item) => (
-                  <li
-                    key={item}
-                    className="flex items-start gap-2 rounded-xl bg-slate-50 p-3"
-                  >
+                  <li key={item} className="flex items-start gap-2 text-sm leading-6 text-slate-800">
                     <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
-                    <span className="text-sm text-slate-800">{item}</span>
+                    <span>{item}</span>
                   </li>
                 ))}
               </ul>
             ) : null}
-            {aboutBody ? (
-            <p className="mt-6 whitespace-pre-line text-sm leading-7 text-slate-600">{aboutBody}</p>
-            ) : null}
+            {aboutBody
+              ? splitVenueProseParagraphs(aboutBody).map((paragraph) => (
+                  <p key={paragraph.slice(0, 48)} className="mt-5 whitespace-pre-line text-sm leading-7 text-slate-600">
+                    {paragraph}
+                  </p>
+                ))
+              : null}
           </section>
           ) : null}
 
           {seoSections.length > 0 ? (
             <section
               id="venue-guide"
-              className="scroll-mt-24 space-y-10"
+              className="scroll-mt-24 space-y-12"
               data-venue-seo-sections
             >
               {seoSections.map((section) => (
@@ -513,7 +505,11 @@ export function LocationVenueLayout({
                   <h2 className="font-display text-xl font-bold tracking-tight text-zinc-950 sm:text-2xl">
                     {section.h2}
                   </h2>
-                  <p className="mt-4 text-sm leading-7 text-zinc-600">{section.body}</p>
+                  {splitVenueProseParagraphs(section.body).map((paragraph) => (
+                    <p key={paragraph.slice(0, 48)} className="mt-5 text-sm leading-7 text-zinc-600">
+                      {paragraph}
+                    </p>
+                  ))}
                 </div>
               ))}
             </section>
@@ -521,7 +517,7 @@ export function LocationVenueLayout({
 
           {visitTips ? (
             <p
-              className="rounded-2xl bg-slate-50 p-4 text-sm leading-6 text-slate-700"
+              className="text-sm leading-7 text-slate-700"
               data-venue-visit-tips
             >
               {visitTips}
@@ -533,21 +529,12 @@ export function LocationVenueLayout({
               <h2 className="font-display text-xl font-bold tracking-tight text-zinc-950 sm:text-2xl">
                 Вопросы
               </h2>
-              <div className="mt-4 space-y-2">
+              <div className="mt-8 space-y-8">
                 {curatedFaq.map((item) => (
-                  <details
-                    key={item.question}
-                    className="group rounded-xl bg-slate-50"
-                  >
-                    <summary className="flex cursor-pointer list-none items-center justify-between p-4">
-                      <span className="flex items-center gap-2 font-medium text-zinc-900">
-                        <HelpCircle className="h-4 w-4 shrink-0 text-primary-600" />
-                        {item.question}
-                      </span>
-                      <ChevronDown className="h-4 w-4 text-slate-400 transition group-open:rotate-180" />
-                    </summary>
-                    <div className="px-4 pb-4 text-sm leading-6 text-slate-700">{item.answer}</div>
-                  </details>
+                  <div key={item.question}>
+                    <h3 className="text-base font-bold leading-snug text-zinc-950">{item.question}</h3>
+                    <p className="mt-3 text-sm leading-7 text-slate-700">{item.answer}</p>
+                  </div>
                 ))}
               </div>
             </section>
@@ -555,31 +542,22 @@ export function LocationVenueLayout({
 
           {/* Address / metro / directions live in sidebar Contacts + Map. */}
 
-          {isParkLike && (hasStopExcursions || hasNearbyExcursions) ? (
+          {isParkLike && hasStopExcursions ? (
             <section id="venue-stop-events" className="scroll-mt-24">
               <h2 className="text-xl font-bold text-slate-900">
-                {hasStopExcursions
-                  ? 'Экскурсии, которые включают это место'
-                  : 'Рядом'}
+                Экскурсии, которые включают это место
               </h2>
               <p className="mt-3 text-sm leading-6 text-slate-500">
-                {hasStopExcursions
-                  ? 'Маршруты с явной остановкой у этой локации.'
-                  : 'События в радиусе 300 м. Это не афиша площадки!'}
+                Маршруты с явной остановкой у этой локации.
               </p>
               <ul className="mt-5 divide-y divide-slate-100" data-venue-linked-events-deduped>
-                {(hasStopExcursions ? uniqueStopEvents : uniqueNearbyEvents).slice(0, 5).map((event) => (
+                {uniqueStopEvents.slice(0, 5).map((event) => (
                   <li key={event.id}>
                     <a
                       href={`/events/${encodeURIComponent(event.slug)}`}
-                      className="flex items-baseline justify-between gap-3 py-2.5 text-sm transition hover:text-primary-700"
+                      className="block truncate py-2.5 text-sm font-medium text-slate-900 transition hover:text-primary-700"
                     >
-                      <span className="min-w-0 font-medium text-slate-900">
-                        {event.title}
-                      </span>
-                      <span className="shrink-0 tabular-nums text-slate-500">
-                        {event.priceFrom != null ? formatMoney(event.priceFrom) : '→'}
-                      </span>
+                      {event.title}
                     </a>
                   </li>
                 ))}
@@ -613,15 +591,12 @@ export function LocationVenueLayout({
           {children}
 
           {showLateArrivalFaq ? (
-            <details className="group rounded-2xl bg-slate-50">
-              <summary className="flex cursor-pointer list-none items-center justify-between p-5">
-                <span className="font-semibold text-slate-900">Что делать, если опаздываю?</span>
-                <ChevronDown className="h-4 w-4 text-slate-400 transition group-open:rotate-180" />
-              </summary>
-              <div className="px-5 pb-5 text-sm leading-6 text-slate-600">
+            <div className="scroll-mt-24">
+              <h3 className="text-base font-bold text-slate-900">Что делать, если опаздываю?</h3>
+              <p className="mt-3 text-sm leading-7 text-slate-600">
                 Позвоните организатору по номеру в билете. На причалах и точках сбора обычно ждут 5-10 минут; на автобусных сборах - по расписанию, без задержек.
-              </div>
-            </details>
+              </p>
+            </div>
           ) : null}
         </div>
 
@@ -761,23 +736,7 @@ function LocationVenueSidebar({
           <Share2 className="h-4 w-4" /> Поделиться точкой
         </button>
 
-        {relatedVenues.length > 0 ? (
-          <div className="space-y-2" data-location-nearby-mini>
-            <div className="text-sm font-semibold text-slate-900">Рядом</div>
-            <ul className="space-y-0.5">
-              {relatedVenues.slice(0, 5).map((related) => (
-                <li key={related.id}>
-                  <a
-                    href={venueHref(related)}
-                    className="block truncate py-1.5 text-sm font-medium text-slate-800 hover:text-primary-700"
-                  >
-                    {related.name || related.title}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : null}
+        {relatedVenues.length > 0 ? <VenueNearbyMiniGrid venues={relatedVenues} limit={4} /> : null}
       </div>
     </aside>
   );

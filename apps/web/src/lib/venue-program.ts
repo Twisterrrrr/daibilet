@@ -9,9 +9,16 @@ import type { PublicSessionDto } from '@daibilet/contracts/public';
 /** `'all'` or local calendar day `YYYY-MM-DD`. */
 export type VenueDateFilter = 'all' | (string & {});
 
+/** `'all'` or local calendar month `YYYY-MM` (venue playbill rail). */
+export type VenueMonthFilter = 'all' | (string & {});
+
 export type VenueDateRailChip =
   | { kind: 'all'; label: string; shortLabel: string }
   | { kind: 'day'; iso: string; weekday: string; dayNum: string; label: string };
+
+export type VenueMonthRailChip =
+  | { kind: 'all'; label: string; shortLabel: string }
+  | { kind: 'month'; iso: string; label: string; shortLabel: string };
 
 export type VenueEventGroup = {
   key: string;
@@ -85,6 +92,161 @@ export function buildVenueDateRailChips(
     });
   }
   return chips;
+}
+
+const MONTH_LABELS_RU = [
+  'Январь',
+  'Февраль',
+  'Март',
+  'Апрель',
+  'Май',
+  'Июнь',
+  'Июль',
+  'Август',
+  'Сентябрь',
+  'Октябрь',
+  'Ноябрь',
+  'Декабрь',
+] as const;
+
+/** Unique `YYYY-MM` keys from day ISO list, chronological. */
+export function buildVenueAvailableMonths(availableDates: string[]): string[] {
+  const months: string[] = [];
+  const seen = new Set<string>();
+  for (const iso of availableDates) {
+    const month = iso.slice(0, 7);
+    if (!/^\d{4}-\d{2}$/.test(month) || seen.has(month)) continue;
+    seen.add(month);
+    months.push(month);
+  }
+  return months;
+}
+
+/**
+ * Default month for venue playbill: current calendar month if it has tickets,
+ * else the nearest upcoming month with tickets.
+ */
+export function resolveVenueSmartMonth(availableMonths: string[], now = new Date()): string | null {
+  if (!availableMonths.length) return null;
+  const current = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  if (availableMonths.includes(current)) return current;
+  const upcoming = availableMonths.find((month) => month >= current);
+  return upcoming || availableMonths[0] || null;
+}
+
+/** Month chips for venue playbill (not used on /events). */
+export function buildVenueMonthRailChips(
+  availableMonths: string[],
+  options?: { includeAll?: boolean },
+): VenueMonthRailChip[] {
+  const includeAll = options?.includeAll === true;
+  const chips: VenueMonthRailChip[] = [];
+  if (includeAll) {
+    chips.push({ kind: 'all', label: 'Любой месяц', shortLabel: 'Любой' });
+  }
+  for (const iso of availableMonths) {
+    const [y, m] = iso.split('-').map(Number);
+    if (!y || !m) continue;
+    const label = MONTH_LABELS_RU[m - 1] || iso;
+    chips.push({
+      kind: 'month',
+      iso,
+      label,
+      shortLabel: label,
+    });
+  }
+  return chips;
+}
+
+export function sessionMonthKey(session: Pick<PublicSessionDto, 'startsAt'>): string | null {
+  const date = new Date(session.startsAt || '');
+  if (!Number.isFinite(date.getTime())) return null;
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+}
+
+function nextMonthKey(monthKey: string): string | null {
+  const match = /^(\d{4})-(\d{2})$/.exec(monthKey);
+  if (!match) return null;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  if (!year || !month) return null;
+  const next = month === 12 ? { y: year + 1, m: 1 } : { y: year, m: month + 1 };
+  return `${next.y}-${String(next.m).padStart(2, '0')}`;
+}
+
+function applyMonthFilterToGroup(group: VenueEventGroup, monthKey: string): VenueEventGroup {
+  const variants = listPurchasableSessionVariants(group.sessions);
+  const matchingSlots = variants.filter((session) => sessionMonthKey(session) === monthKey);
+  if (matchingSlots.length) {
+    const representative = pickPurchasableTcSession(matchingSlots) || matchingSlots[0]!;
+    return {
+      ...group,
+      representative,
+      visibleSlots: matchingSlots.slice(0, 4),
+      firstStartsAt: representative.startsAt,
+      hasSlotsOnSelectedDate: true,
+    };
+  }
+  return {
+    ...group,
+    visibleSlots: [],
+    hasSlotsOnSelectedDate: false,
+  };
+}
+
+/**
+ * Month playbill: events of selected month; if fewer than `minPrimary`,
+ * append the next month's events as spillover (separate section in UI).
+ */
+export function buildVenueProgramMonthView(
+  sessions: PublicSessionDto[],
+  monthFilter: VenueMonthFilter,
+  options?: { minPrimary?: number },
+): {
+  primaryMonth: string | null;
+  spilloverMonth: string | null;
+  primary: VenueEventGroup[];
+  spillover: VenueEventGroup[];
+} {
+  const minPrimary = options?.minPrimary ?? 5;
+  const allGroups = groupVenueSessions(sessions);
+
+  if (monthFilter === 'all') {
+    return {
+      primaryMonth: null,
+      spilloverMonth: null,
+      primary: allGroups.map((group) => applyDateFilterToGroup(group, null)),
+      spillover: [],
+    };
+  }
+
+  const primary = allGroups
+    .map((group) => applyMonthFilterToGroup(group, monthFilter))
+    .filter((group) => group.hasSlotsOnSelectedDate);
+
+  let spillover: VenueEventGroup[] = [];
+  let spilloverMonth: string | null = null;
+  if (primary.length < minPrimary) {
+    spilloverMonth = nextMonthKey(monthFilter);
+    if (spilloverMonth) {
+      spillover = allGroups
+        .map((group) => applyMonthFilterToGroup(group, spilloverMonth!))
+        .filter((group) => group.hasSlotsOnSelectedDate);
+    }
+  }
+
+  return {
+    primaryMonth: monthFilter,
+    spilloverMonth: spillover.length ? spilloverMonth : null,
+    primary,
+    spillover,
+  };
+}
+
+export function formatVenueMonthLabel(monthKey: string | null | undefined): string {
+  if (!monthKey || !/^\d{4}-\d{2}$/.test(monthKey)) return '';
+  const m = Number(monthKey.slice(5, 7));
+  return MONTH_LABELS_RU[m - 1] || monthKey;
 }
 
 export function buildVenueProgramGroups(

@@ -284,6 +284,50 @@ export function resolveLocationVenueCopy(venue: {
   };
 }
 
+/**
+ * PDP «about» H2: О музее / О клубе / …; fallback «О месте» when kind is ambiguous.
+ */
+export function resolveVenueAboutHeading(type?: string | null, name?: string | null): string {
+  const key = resolvePublicVenueType(type, name);
+  switch (key) {
+    case 'museum':
+    case 'museum_art_space':
+      return 'О музее';
+    case 'art_space':
+      return 'О галерее';
+    case 'theater':
+      return 'О театре';
+    case 'concert_hall':
+      return 'О зале';
+    case 'bar':
+      return 'О баре';
+    case 'club_bar_restaurant':
+      return 'О клубе';
+    case 'temple':
+      return 'О храме';
+    case 'pier':
+    case 'pier_water':
+      return 'О причале';
+    case 'park':
+      return 'О парке';
+    case 'bus':
+      return 'О точке сбора';
+    case 'gastro':
+      return 'О месте';
+    default:
+      return 'О месте';
+  }
+}
+
+/** Split editorial SEO body into markdown-like paragraphs. */
+export function splitVenueProseParagraphs(body: string | null | undefined): string[] {
+  return String(body || '')
+    .replace(/\r\n/g, '\n')
+    .split(/\n{2,}/)
+    .map((part) => part.replace(/\s+/g, ' ').trim())
+    .filter(Boolean);
+}
+
 export function institutionTypeEmoji(type?: string | null): string {
   const key = resolvePublicVenueType(type);
   const map: Record<string, string> = {

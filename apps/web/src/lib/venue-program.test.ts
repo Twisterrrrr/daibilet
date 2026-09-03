@@ -4,7 +4,10 @@ import test from 'node:test';
 import {
   buildVenueDateOptions,
   buildVenueDateRailChips,
+  buildVenueAvailableMonths,
+  buildVenueMonthRailChips,
   buildVenueProgramGroups,
+  buildVenueProgramMonthView,
 } from './venue-program.ts';
 
 test('lists every upcoming day from expanded upcomingSlots', () => {
@@ -14,13 +17,13 @@ test('lists every upcoming day from expanded upcomingSlots', () => {
       title: 'Речная прогулка',
       category: 'Экскурсии',
       venue: 'Адмиралтейская наб. 10',
-      startsAt: '2026-08-10T10:00:00Z',
+      startsAt: '2026-09-10T10:00:00Z',
       purchaseReady: true,
       upcomingSlots: [
-        { eventId: 'evt_pier_1', startsAt: '2026-08-10T10:00:00Z', purchaseUrl: 'https://example.test/1' },
-        { eventId: 'evt_pier_1', startsAt: '2026-08-11T10:00:00Z', purchaseUrl: 'https://example.test/2' },
-        { eventId: 'evt_pier_1', startsAt: '2026-08-12T10:00:00Z', purchaseUrl: 'https://example.test/3' },
-        { eventId: 'evt_pier_1', startsAt: '2026-08-14T10:00:00Z', purchaseUrl: 'https://example.test/4' },
+        { eventId: 'evt_pier_1', startsAt: '2026-09-10T10:00:00Z', purchaseUrl: 'https://example.test/1' },
+        { eventId: 'evt_pier_1', startsAt: '2026-09-11T10:00:00Z', purchaseUrl: 'https://example.test/2' },
+        { eventId: 'evt_pier_1', startsAt: '2026-09-12T10:00:00Z', purchaseUrl: 'https://example.test/3' },
+        { eventId: 'evt_pier_1', startsAt: '2026-09-14T10:00:00Z', purchaseUrl: 'https://example.test/4' },
       ],
     },
   ];
@@ -45,11 +48,11 @@ test('keeps groups for a later selected day when slots exist on that day', () =>
       category: 'Экскурсии',
       venue: 'Адмиралтейская наб. 10',
       groupKey: 'pier|walk',
-      startsAt: '2026-08-10T10:00:00Z',
+      startsAt: '2026-09-10T10:00:00Z',
       purchaseReady: true,
       upcomingSlots: [
-        { eventId: 'evt_pier_1', startsAt: '2026-08-10T10:00:00Z', purchaseUrl: 'https://example.test/1' },
-        { eventId: 'evt_pier_1', startsAt: '2026-08-12T12:00:00Z', purchaseUrl: 'https://example.test/2' },
+        { eventId: 'evt_pier_1', startsAt: '2026-09-10T10:00:00Z', purchaseUrl: 'https://example.test/1' },
+        { eventId: 'evt_pier_1', startsAt: '2026-09-12T12:00:00Z', purchaseUrl: 'https://example.test/2' },
       ],
     },
   ];
@@ -60,4 +63,53 @@ test('keeps groups for a later selected day when slots exist on that day', () =>
 
   const groups = buildVenueProgramGroups(sessions as never, laterDay!, options.smartDate);
   assert.ok(groups.some((group) => group.hasSlotsOnSelectedDate));
+});
+
+test('month rail defaults to current month and spills next month when sparse', () => {
+  const sessions = [
+    {
+      id: 'a',
+      title: 'Сет 1',
+      category: 'Джаз',
+      venue: 'Клуб',
+      groupKey: 'a',
+      startsAt: '2026-09-03T16:30:00Z',
+      purchaseReady: true,
+      priceFrom: 2500,
+    },
+    {
+      id: 'b',
+      title: 'Сет 2',
+      category: 'Джаз',
+      venue: 'Клуб',
+      groupKey: 'b',
+      startsAt: '2026-09-05T16:30:00Z',
+      purchaseReady: true,
+      priceFrom: 2500,
+    },
+    {
+      id: 'c',
+      title: 'Сет 3',
+      category: 'Джаз',
+      venue: 'Клуб',
+      groupKey: 'c',
+      startsAt: '2026-10-01T16:30:00Z',
+      purchaseReady: true,
+      priceFrom: 2500,
+    },
+  ];
+
+  const options = buildVenueDateOptions(sessions as never);
+  const months = buildVenueAvailableMonths(options.availableDates);
+  assert.ok(months.includes('2026-09'));
+  assert.ok(months.includes('2026-10'));
+
+  const chips = buildVenueMonthRailChips(months);
+  assert.equal(chips[0]?.kind, 'month');
+  assert.equal(chips[0]?.kind === 'month' ? chips[0].iso : '', '2026-09');
+
+  const view = buildVenueProgramMonthView(sessions as never, '2026-09', { minPrimary: 5 });
+  assert.equal(view.primary.length, 2);
+  assert.equal(view.spilloverMonth, '2026-10');
+  assert.equal(view.spillover.length, 1);
 });

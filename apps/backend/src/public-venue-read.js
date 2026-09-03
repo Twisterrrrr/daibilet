@@ -2535,15 +2535,49 @@ function venueCityKey(row) {
 export function samePublicVenueCity(a, b) {
   const left = venueCityKey(a);
   const right = venueCityKey(b);
-  if (!left || !right) return true;
-  return left === right;
+  if (left && right && left !== right) return false;
+  return true;
+}
+
+const TITLE_FOREIGN_CITY_MARKERS = [
+  { re: /\bкрасноярск\w*/iu, key: 'krasnoyarsk' },
+  { re: /\bkrasnoyarsk\b/iu, key: 'krasnoyarsk' },
+  { re: /\bекатеринбург\w*/iu, key: 'ekaterinburg' },
+  { re: /\bekaterinburg\b/iu, key: 'ekaterinburg' },
+  { re: /\bказан[ьи]\w*/iu, key: 'kazan' },
+  { re: /\bновосибирск\w*/iu, key: 'novosibirsk' },
+  { re: /\bсамар[аеы]\b/iu, key: 'samara' },
+  { re: /\bуф[аеы]\b/iu, key: 'ufa' },
+  { re: /\bперм[ьи]\w*/iu, key: 'perm' },
+  { re: /\bсочи\b/iu, key: 'sochi' },
+  { re: /\bкалининград\w*/iu, key: 'kaliningrad' },
+  { re: /\bмоскв[аеыу]\b/iu, key: 'moscow' },
+  { re: /\bmoscow\b/iu, key: 'moscow' },
+];
+
+function sessionTitleImpliesForeignCity(session, venueKey) {
+  if (!venueKey) return false;
+  const title = String(session?.title || session?.eventTitle || '');
+  if (!title) return false;
+  for (const marker of TITLE_FOREIGN_CITY_MARKERS) {
+    if (!marker.re.test(title)) continue;
+    // canonicalCitySlug folds aliases; compare folded marker keys loosely.
+    const markerKey = canonicalCitySlug(marker.key) || marker.key;
+    const venueCanon = canonicalCitySlug(venueKey) || venueKey;
+    if (markerKey && venueCanon && markerKey !== venueCanon) return true;
+  }
+  return false;
 }
 
 /** Drop foreign-city sessions that leaked via fuzzy venue-name attach. */
 export function filterSessionsToVenueCity(sessions, venueCityHint) {
   const venueKey = venueCityKey(venueCityHint);
   if (!venueKey || !Array.isArray(sessions) || !sessions.length) return sessions || [];
-  return sessions.filter((session) => samePublicVenueCity(venueCityHint, session));
+  return sessions.filter((session) => {
+    if (!samePublicVenueCity(venueCityHint, session)) return false;
+    if (sessionTitleImpliesForeignCity(session, venueKey)) return false;
+    return true;
+  });
 }
 
 function lookupVenueCatalogSessions(venueIds, catalogSessions, venueContexts = []) {

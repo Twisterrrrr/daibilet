@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { useParams, usePathname } from 'next/navigation';
-import { ArrowLeft, Calendar as CalendarIcon } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 
 import { InstitutionVenueLayout } from '@/components/InstitutionVenueLayout.client';
 import { LocationVenueLayout } from '@/components/LocationVenueLayout.client';
@@ -25,11 +25,15 @@ import type { FinanceAdmissionProduct } from '@/lib/finance-projection';
 import { eventHref } from '@/lib/routes';
 import {
   buildVenueDateOptions,
-  buildVenueDateRailChips,
+  buildVenueAvailableMonths,
+  buildVenueMonthRailChips,
   buildVenueProgramGroups,
-  type VenueDateFilter,
-  type VenueDateRailChip,
+  buildVenueProgramMonthView,
+  formatVenueMonthLabel,
+  resolveVenueSmartMonth,
   type VenueEventGroup,
+  type VenueMonthFilter,
+  type VenueMonthRailChip,
 } from '@/lib/venue-program';
 import { filterVenuePageSessionsByCity } from '@/lib/venue-page-sessions';
 import { venuePageTemplate } from '@/lib/venue-meta';
@@ -103,8 +107,8 @@ export function VenuePageView({
   const [payload, setPayload] = React.useState<PublicVenuePageDto | null>(matchedInitial);
   const [contentReady, setContentReady] = React.useState(() => Boolean(matchedInitial?.venue));
   const [error, setError] = React.useState<string | null>(null);
-  /** null = follow smartDate until user picks a chip/calendar day. */
-  const [dateFilter, setDateFilter] = React.useState<VenueDateFilter | null>(null);
+  /** null = follow smartMonth until user picks a month chip. */
+  const [monthFilter, setMonthFilter] = React.useState<VenueMonthFilter | null>(null);
   const [activeSlug, setActiveSlug] = React.useState(routeSlug);
 
   // Soft-nav can keep this client tree without remounting. Prefer pathname slug over lagging
@@ -114,7 +118,7 @@ export function VenuePageView({
     setPayload(matchedInitial);
     setContentReady(Boolean(matchedInitial?.venue));
     setError(null);
-    setDateFilter(null);
+    setMonthFilter(null);
   }
 
   React.useEffect(() => {
@@ -157,12 +161,19 @@ export function VenuePageView({
     [payload?.sessions, venue],
   );
   const dateOptions = React.useMemo(() => buildVenueDateOptions(baseSessions), [baseSessions]);
-  const resolvedDateFilter: VenueDateFilter = dateFilter ?? dateOptions.smartDate ?? 'all';
-  const groups = React.useMemo(() => {
-    const built = buildVenueProgramGroups(baseSessions, resolvedDateFilter, dateOptions.smartDate);
-    if (resolvedDateFilter === 'all') return built;
-    return built.filter((group) => group.hasSlotsOnSelectedDate);
-  }, [baseSessions, resolvedDateFilter, dateOptions.smartDate]);
+  const availableMonths = React.useMemo(
+    () => buildVenueAvailableMonths(dateOptions.availableDates),
+    [dateOptions.availableDates],
+  );
+  const smartMonth = React.useMemo(
+    () => resolveVenueSmartMonth(availableMonths),
+    [availableMonths],
+  );
+  const resolvedMonthFilter: VenueMonthFilter = monthFilter ?? smartMonth ?? 'all';
+  const monthView = React.useMemo(
+    () => buildVenueProgramMonthView(baseSessions, resolvedMonthFilter),
+    [baseSessions, resolvedMonthFilter],
+  );
   const allRouteGroups = React.useMemo(
     () => buildVenueProgramGroups(baseSessions, 'all', null),
     [baseSessions],
@@ -218,10 +229,10 @@ export function VenuePageView({
                 {baseSessions.length > 0 ? (
                   <VenueProgramBlock
                     title="Расписание и билеты"
-                    selected={resolvedDateFilter}
-                    availableDates={dateOptions.availableDates}
-                    onDateChange={setDateFilter}
-                    groups={groups}
+                    selected={resolvedMonthFilter}
+                    availableMonths={availableMonths}
+                    onMonthChange={setMonthFilter}
+                    monthView={monthView}
                   />
                 ) : null}
               </LocationVenueLayout>
@@ -240,10 +251,10 @@ export function VenuePageView({
                 {baseSessions.length > 0 ? (
                   <VenueProgramBlock
                     title="Афиша"
-                    selected={resolvedDateFilter}
-                    availableDates={dateOptions.availableDates}
-                    onDateChange={setDateFilter}
-                    groups={groups}
+                    selected={resolvedMonthFilter}
+                    availableMonths={availableMonths}
+                    onMonthChange={setMonthFilter}
+                    monthView={monthView}
                   />
                 ) : null}
               </InstitutionVenueLayout>
@@ -257,10 +268,10 @@ export function VenuePageView({
               <section className="container-page grid gap-6 py-8 lg:grid-cols-[minmax(0,1fr)_320px]">
                 <VenueProgramBlock
                   title="Расписание и билеты"
-                  selected={resolvedDateFilter}
-                  availableDates={dateOptions.availableDates}
-                  onDateChange={setDateFilter}
-                  groups={groups}
+                  selected={resolvedMonthFilter}
+                  availableMonths={availableMonths}
+                  onMonthChange={setMonthFilter}
+                  monthView={monthView}
                 />
                 <aside className="space-y-4">
                   <section className="rounded-xl bg-white p-4 shadow-[0_10px_28px_rgba(15,23,42,0.06)]">
@@ -285,16 +296,16 @@ export function VenuePageView({
 function VenueProgramBlock({
   title,
   selected,
-  availableDates,
-  onDateChange,
-  groups,
+  availableMonths,
+  onMonthChange,
+  monthView,
   framed = false,
 }: {
   title: string;
-  selected: VenueDateFilter;
-  availableDates: string[];
-  onDateChange: (value: VenueDateFilter) => void;
-  groups: VenueEventGroup[];
+  selected: VenueMonthFilter;
+  availableMonths: string[];
+  onMonthChange: (value: VenueMonthFilter) => void;
+  monthView: ReturnType<typeof buildVenueProgramMonthView>;
   framed?: boolean;
 }) {
   return (
@@ -306,111 +317,52 @@ function VenueProgramBlock({
         {title}
       </h2>
       <p className="mb-4 text-sm text-zinc-500">
-        Выберите дату. Ниже - текстовое расписание в стиле театральной афиши.
+        Выберите месяц. Ниже - текстовое расписание в стиле театральной афиши.
       </p>
-      <VenueDateRail selected={selected} availableDates={availableDates} onChange={onDateChange} />
-      <VenuePlaybillList groups={groups} />
+      <VenueMonthRail selected={selected} availableMonths={availableMonths} onChange={onMonthChange} />
+      <VenuePlaybillList monthView={monthView} />
     </section>
   );
 }
 
-function VenueDateRail({
+function VenueMonthRail({
   selected,
-  availableDates,
+  availableMonths,
   onChange,
 }: {
-  selected: VenueDateFilter;
-  availableDates: string[];
-  onChange: (value: VenueDateFilter) => void;
+  selected: VenueMonthFilter;
+  availableMonths: string[];
+  onChange: (value: VenueMonthFilter) => void;
 }) {
-  const calendarRef = React.useRef<HTMLInputElement>(null);
-  const chips = React.useMemo(() => buildVenueDateRailChips(availableDates), [availableDates]);
-  const minDate = availableDates[0] || undefined;
-  const maxDate = availableDates[availableDates.length - 1] || undefined;
-  const calendarValue = selected !== 'all' && /^\d{4}-\d{2}-\d{2}$/.test(selected) ? selected : '';
-  const calendarOffRail =
-    Boolean(calendarValue) && !availableDates.slice(0, 21).includes(calendarValue);
-
-  const openCalendar = () => {
-    const input = calendarRef.current;
-    if (!input) return;
-    try {
-      if (typeof input.showPicker === 'function') {
-        input.showPicker();
-        return;
-      }
-    } catch {
-      // fall through to click
-    }
-    input.click();
-  };
+  const chips = React.useMemo(() => buildVenueMonthRailChips(availableMonths), [availableMonths]);
+  if (!chips.length) return null;
 
   return (
-    <div className="mb-4 flex items-center gap-2">
-      <div
-        role="group"
-        aria-label="Дата"
-        className="horizontal-snap-row flex min-w-0 flex-1 flex-nowrap gap-1.5 overflow-x-auto pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-      >
-        {chips.map((chip) => {
-          const active = isVenueDateRailChipActive(chip, selected);
-          const key = chip.kind === 'all' ? 'all' : chip.iso;
-          return (
-            <button
-              key={key}
-              type="button"
-              aria-pressed={active}
-              onClick={() => onChange(chip.kind === 'all' ? 'all' : chip.iso)}
-              className={`catalog-date-chip snap-start ${active ? 'catalog-date-chip-on' : 'catalog-date-chip-idle'}`}
-            >
-              {chip.kind === 'day' ? (
-                <span className="flex flex-col items-center leading-none">
-                  <span className="text-[10px] font-semibold uppercase tracking-wide opacity-80">{chip.weekday}</span>
-                  <span className="mt-0.5 text-sm font-bold">{chip.dayNum}</span>
-                </span>
-              ) : (
-                <span className="whitespace-nowrap">{chip.shortLabel}</span>
-              )}
-            </button>
-          );
-        })}
-      </div>
-
-      {availableDates.length > 0 ? (
-        <div className="relative shrink-0">
+    <div
+      role="group"
+      aria-label="Месяц"
+      className="mb-4 horizontal-snap-row flex min-w-0 flex-nowrap gap-1.5 overflow-x-auto pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+    >
+      {chips.map((chip) => {
+        const active = isVenueMonthRailChipActive(chip, selected);
+        const key = chip.kind === 'all' ? 'all' : chip.iso;
+        return (
           <button
+            key={key}
             type="button"
-            onClick={openCalendar}
-            aria-label="Выбрать другую дату"
-            aria-pressed={calendarOffRail}
-            className={`catalog-date-chip inline-flex h-9 w-9 shrink-0 items-center justify-center self-center px-0 py-0 ${
-              calendarOffRail ? 'catalog-date-chip-on' : 'catalog-date-chip-idle'
-            }`}
+            aria-pressed={active}
+            onClick={() => onChange(chip.kind === 'all' ? 'all' : chip.iso)}
+            className={`catalog-date-chip snap-start ${active ? 'catalog-date-chip-on' : 'catalog-date-chip-idle'}`}
           >
-            <CalendarIcon className="h-4 w-4" strokeWidth={1.75} aria-hidden />
+            <span className="whitespace-nowrap">{chip.shortLabel}</span>
           </button>
-          <input
-            ref={calendarRef}
-            type="date"
-            value={calendarValue}
-            min={minDate}
-            max={maxDate}
-            onChange={(event) => {
-              const next = event.target.value;
-              if (!next) return;
-              onChange(next);
-            }}
-            aria-label="Календарь дат с билетами"
-            className="pointer-events-none absolute inset-0 h-full w-full opacity-0"
-            tabIndex={-1}
-          />
-        </div>
-      ) : null}
+        );
+      })}
     </div>
   );
 }
 
-function isVenueDateRailChipActive(chip: VenueDateRailChip, selected: VenueDateFilter): boolean {
+function isVenueMonthRailChipActive(chip: VenueMonthRailChip, selected: VenueMonthFilter): boolean {
   if (chip.kind === 'all') return selected === 'all';
   return selected === chip.iso;
 }
@@ -418,61 +370,68 @@ function isVenueDateRailChipActive(chip: VenueDateRailChip, selected: VenueDateF
 /**
  * Theater playbill rows - date/time + title + price + buy.
  * Poster cards stay in «Ближайшие события» rail above; this block is schedule density.
- * Sparse schedule (≤2 shows/day) → month section headers like a paper playbill.
  */
-function VenuePlaybillList({ groups }: { groups: VenueEventGroup[] }) {
-  const rows = groups.slice(0, 48);
-  if (!rows.length) return <EmptyState />;
+function VenuePlaybillList({
+  monthView,
+}: {
+  monthView: ReturnType<typeof buildVenueProgramMonthView>;
+}) {
+  const primary = monthView.primary.slice(0, 48);
+  const spillover = monthView.spillover.slice(0, 24);
+  if (!primary.length && !spillover.length) return <EmptyState />;
 
-  const monthMode = shouldUseMonthPlaybill(rows);
-  if (!monthMode) {
-    return (
-      <ul className="divide-y divide-zinc-100 border-t border-zinc-100" data-venue-playbill>
-        {rows.map((group) => (
-          <VenuePlaybillRow key={group.key} group={group} layout="day" />
-        ))}
-      </ul>
-    );
-  }
+  const showPrimaryHeading = Boolean(monthView.primaryMonth) && (spillover.length > 0 || primary.length > 0);
+  const primaryLabel = formatVenueMonthLabel(monthView.primaryMonth);
+  const spilloverLabel = formatVenueMonthLabel(monthView.spilloverMonth);
 
-  const sections = groupPlaybillByMonth(rows);
   return (
     <div className="space-y-8 border-t border-zinc-100 pt-2" data-venue-playbill data-venue-playbill-month>
-      {sections.map((section) => (
-        <section key={section.key} aria-label={section.label}>
-          <h3 className="mb-1 text-[11px] font-bold uppercase tracking-[0.16em] text-zinc-500">
-            {section.label}
-          </h3>
+      {primary.length ? (
+        <section aria-label={primaryLabel || 'Афиша'}>
+          {showPrimaryHeading && primaryLabel ? (
+            <h3 className="mb-1 text-[11px] font-bold uppercase tracking-[0.16em] text-zinc-500">
+              {primaryLabel}
+            </h3>
+          ) : null}
           <ul className="divide-y divide-zinc-100">
-            {section.groups.map((group) => (
-              <VenuePlaybillRow key={group.key} group={group} layout="month" />
+            {primary.map((group) => (
+              <VenuePlaybillRow key={group.key} group={group} />
             ))}
           </ul>
         </section>
-      ))}
+      ) : null}
+      {spillover.length ? (
+        <section aria-label={spilloverLabel || 'Следующий месяц'}>
+          {spilloverLabel ? (
+            <h3 className="mb-1 text-[11px] font-bold uppercase tracking-[0.16em] text-zinc-500">
+              {spilloverLabel}
+            </h3>
+          ) : null}
+          <ul className="divide-y divide-zinc-100">
+            {spillover.map((group) => (
+              <VenuePlaybillRow key={`spill:${group.key}`} group={group} />
+            ))}
+          </ul>
+        </section>
+      ) : null}
     </div>
   );
 }
 
-function VenuePlaybillRow({
-  group,
-  layout,
-}: {
-  group: VenueEventGroup;
-  layout: 'day' | 'month';
-}) {
+function VenuePlaybillRow({ group }: { group: VenueEventGroup }) {
   const session = group.representative;
   const href = eventHref(session);
   const title = formatPublicTitle(group.title || session.title || session.eventTitle);
-  const when = layout === 'month' ? playbillMonthWhenLabel(session, group) : playbillWhenLabel(session, group);
+  const when = playbillWhenLabel(session, group);
   const age = formatAgeLimit(session.ageLimit);
   const meta = [group.category, age].filter(Boolean).join(' · ');
-  const price =
+  const rawPrice =
     typeof group.priceFrom === 'number' && group.priceFrom >= 100
-      ? `от ${formatMoney(group.priceFrom)}`
+      ? group.priceFrom
       : typeof session.priceFrom === 'number' && session.priceFrom >= 100
-        ? `от ${formatMoney(session.priceFrom)}`
+        ? session.priceFrom
         : null;
+  const price = rawPrice != null ? formatMoney(rawPrice) : null;
   const vacant =
     typeof group.vacant === 'number' && group.vacant > 0 && group.vacant <= 40
       ? `${group.vacant} мест`
@@ -485,8 +444,14 @@ function VenuePlaybillRow({
         href={href}
         className="flex flex-col gap-2 py-3.5 transition hover:bg-zinc-50/80 sm:flex-row sm:items-center sm:gap-4 sm:px-1"
       >
-        <div className="w-[5.5rem] shrink-0 sm:w-24" data-venue-playbill-when>
-          <p className="text-sm font-semibold tabular-nums text-zinc-950">{when.primary}</p>
+        <div className="w-[6.5rem] shrink-0 sm:w-28" data-venue-playbill-when>
+          <p
+            className={`text-sm font-semibold tabular-nums ${
+              when.weekend ? 'text-rose-600' : 'text-zinc-950'
+            }`}
+          >
+            {when.primary}
+          </p>
           {when.secondary ? (
             <p className="mt-0.5 text-xs tabular-nums text-zinc-500">{when.secondary}</p>
           ) : null}
@@ -512,13 +477,15 @@ function VenuePlaybillRow({
             </p>
           ) : null}
         </div>
-        <div className="flex shrink-0 flex-wrap items-center justify-end gap-x-3 gap-y-1">
-          {price ? (
-            <span className="text-sm font-bold tabular-nums text-zinc-950">{price}</span>
-          ) : (
-            <span className="text-sm font-medium text-zinc-500">Смотреть</span>
-          )}
-          {vacant ? <span className="text-xs tabular-nums text-amber-700">{vacant}</span> : null}
+        <div className="flex shrink-0 items-center justify-end gap-3">
+          <div className="text-right">
+            {price ? (
+              <div className="text-sm font-bold tabular-nums text-zinc-950">{price}</div>
+            ) : (
+              <div className="text-sm font-medium text-zinc-500">Смотреть</div>
+            )}
+            {vacant ? <div className="mt-0.5 text-xs tabular-nums text-amber-700">{vacant}</div> : null}
+          </div>
           <span className="inline-flex min-h-8 items-center rounded-full bg-graphite px-3.5 text-xs font-semibold text-white">
             Купить
           </span>
@@ -528,19 +495,19 @@ function VenuePlaybillRow({
   );
 }
 
-const PLAYBILL_MONTHS_RU = [
-  'январь',
-  'февраль',
-  'март',
-  'апрель',
-  'май',
-  'июнь',
-  'июль',
-  'август',
-  'сентябрь',
-  'октябрь',
-  'ноябрь',
-  'декабрь',
+const PLAYBILL_MONTH_SHORT_RU = [
+  'янв',
+  'фев',
+  'мар',
+  'апр',
+  'мая',
+  'июн',
+  'июл',
+  'авг',
+  'сент',
+  'окт',
+  'ноя',
+  'дек',
 ] as const;
 
 function playbillSessionDate(session: PublicSessionDto): Date | null {
@@ -550,60 +517,12 @@ function playbillSessionDate(session: PublicSessionDto): Date | null {
   return Number.isFinite(date.getTime()) ? date : null;
 }
 
-function playbillDayKey(group: VenueEventGroup): string {
-  const slot = group.visibleSlots[0] || group.sessions[0] || group.representative;
-  const date = playbillSessionDate(slot);
-  if (!date) return 'open';
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, '0');
-  const d = String(date.getDate()).padStart(2, '0');
-  return `${y}-${m}-${d}`;
-}
-
-function shouldUseMonthPlaybill(groups: VenueEventGroup[]): boolean {
-  const byDay = new Map<string, number>();
-  for (const group of groups) {
-    if (isOpenDate(group.representative)) continue;
-    const key = playbillDayKey(group);
-    if (key === 'open') continue;
-    byDay.set(key, (byDay.get(key) || 0) + 1);
-  }
-  if (byDay.size < 2) return false;
-  let max = 0;
-  for (const count of byDay.values()) max = Math.max(max, count);
-  return max <= 2;
-}
-
-function groupPlaybillByMonth(
-  groups: VenueEventGroup[],
-): Array<{ key: string; label: string; groups: VenueEventGroup[] }> {
-  const sections: Array<{ key: string; label: string; groups: VenueEventGroup[] }> = [];
-  const index = new Map<string, number>();
-  for (const group of groups) {
-    const date = playbillSessionDate(group.visibleSlots[0] || group.representative);
-    const key = date
-      ? `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
-      : 'open';
-    const label = date
-      ? PLAYBILL_MONTHS_RU[date.getMonth()] || 'афиша'
-      : 'Открытая дата';
-    let at = index.get(key);
-    if (at == null) {
-      at = sections.length;
-      index.set(key, at);
-      sections.push({ key, label, groups: [] });
-    }
-    sections[at]!.groups.push(group);
-  }
-  return sections;
-}
-
-function playbillMonthWhenLabel(
+function playbillWhenLabel(
   session: PublicSessionDto,
   group: VenueEventGroup,
-): { primary: string; secondary: string | null } {
+): { primary: string; secondary: string | null; weekend: boolean } {
   if (isOpenDate(session)) {
-    return { primary: 'Открытая дата', secondary: null };
+    return { primary: 'Открытая дата', secondary: null, weekend: false };
   }
   const date = playbillSessionDate(session);
   const time =
@@ -611,39 +530,29 @@ function playbillMonthWhenLabel(
     collectPlaybillSlotTimes(group)[0] ||
     null;
   if (date) {
-    return { primary: String(date.getDate()), secondary: time };
-  }
-  return playbillWhenLabel(session, group);
-}
-
-function playbillWhenLabel(
-  session: PublicSessionDto,
-  group: VenueEventGroup,
-): { primary: string; secondary: string | null } {
-  if (isOpenDate(session)) {
-    return { primary: 'Открытая дата', secondary: null };
+    const day = date.getDate();
+    const month = PLAYBILL_MONTH_SHORT_RU[date.getMonth()] || '';
+    const dow = date.getDay();
+    const weekend = dow === 0 || dow === 6;
+    // «Сегодня» / «Завтра» keep readable; still attach month for theatre sheet clarity.
+    const badge = formatCoverDateBadge(session);
+    if (badge === 'Сегодня' || badge === 'Завтра') {
+      return { primary: `${badge}, ${day} ${month}`, secondary: time, weekend };
+    }
+    return { primary: `${day} ${month}`, secondary: time, weekend };
   }
   const badge = formatCoverDateBadge(session);
   const schedule = formatCardScheduleLine(session);
-  if (badge && schedule) {
-    // schedule may already be "19:30" when badge is Сегодня
-    if (/^\d{1,2}:\d{2}/.test(schedule)) {
-      return { primary: badge, secondary: schedule };
-    }
-    const timeMatch = schedule.match(/(\d{1,2}:\d{2})\s*$/);
-    if (timeMatch) {
-      return { primary: badge, secondary: timeMatch[1]! };
-    }
-    return { primary: badge, secondary: schedule };
-  }
-  if (badge) return { primary: badge, secondary: null };
-  if (schedule) {
-    const parts = schedule.split(',').map((part) => part.trim()).filter(Boolean);
-    return { primary: parts[0] || schedule, secondary: parts[1] || null };
+  if (badge) {
+    return {
+      primary: badge,
+      secondary: time || schedule || null,
+      weekend: false,
+    };
   }
   const firstSlot = group.visibleSlots[0] || group.sessions[0];
   const fallback = [firstSlot?.dateLabel, firstSlot?.timeLabel].filter(Boolean).join(', ');
-  return { primary: fallback || 'Дата', secondary: null };
+  return { primary: fallback || 'Дата', secondary: null, weekend: false };
 }
 
 function collectPlaybillSlotTimes(group: VenueEventGroup): string[] {
