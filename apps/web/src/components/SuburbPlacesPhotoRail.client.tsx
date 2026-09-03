@@ -27,6 +27,15 @@ function formatTransitTip(raw: string): string {
   return `↓ ${tip}`;
 }
 
+/** Suburb seed `desc` often starts lowercase; show as a proper sentence. */
+function formatPlaceDesc(raw: string): string {
+  const text = raw.trim();
+  if (!text) return '';
+  const first = text.charAt(0);
+  const upper = first.toLocaleUpperCase('ru-RU');
+  return upper === first ? text : `${upper}${text.slice(1)}`;
+}
+
 /**
  * Nested POI rail must stay unique per card.
  * Do NOT use resolveVenueHeroImage here: city-identity fallback paints every
@@ -128,7 +137,9 @@ export function SuburbPlacesPhotoRail({
                   title
                 )}
                 {place.desc ? (
-                  <p className="mt-1.5 line-clamp-3 text-sm leading-6 text-slate-600">{place.desc}</p>
+                  <p className="mt-1.5 line-clamp-3 text-sm leading-6 text-slate-600">
+                    {formatPlaceDesc(place.desc)}
+                  </p>
                 ) : null}
                 {visitLabel ? (
                   <p className="mt-3 text-xs font-medium text-slate-500">{visitLabel}</p>

@@ -132,6 +132,23 @@ export function HomeHero({
     openCatalog();
   };
 
+  const resolveChipHref = (chipHref: string) => {
+    if (!chipHref.startsWith('/events')) return chipHref;
+    const params = new URLSearchParams(
+      chipHref.includes('?') ? chipHref.slice(chipHref.indexOf('?') + 1) : '',
+    );
+    return catalogHrefWithSelectedCity(destination, {
+      q: params.get('q') || undefined,
+      city: params.get('city') || undefined,
+      category: params.get('category') || undefined,
+      date: heroDate !== 'all' ? heroDate : params.get('date') || undefined,
+      sort: (params.get('sort') as 'popular' | 'time' | undefined) || undefined,
+    });
+  };
+
+  const chipClassName =
+    'inline-flex h-8 items-center rounded-full border border-white/20 bg-white/15 px-3.5 text-xs font-semibold text-white backdrop-blur-[10px] transition hover:bg-white/25';
+
   // City and national share the same lead line so «музеи» does not disappear when a city is selected.
   const title = selectedCityName ? (
     <>
@@ -198,46 +215,39 @@ export function HomeHero({
         </div>
       </form>
 
-      {/* Soft chip rail: md+ hub discs outside the track; mobile = swipe only. */}
-      <ScrollRail
-        className="mt-4 w-full max-w-5xl"
-        viewportClassName="!overflow-x-auto overscroll-x-contain !pb-0.5"
-        hideScrollbar
-        arrowAlign="center"
-        edgeFade
-        aria-label="Быстрые подборки"
-      >
-        <div
-          className="flex w-max flex-nowrap items-center gap-2 px-1 pb-0.5"
-          data-home-hero-chips
+      {/* Mobile: swipe rail. Desktop: wrap up to ~2 rows, no side arrows. */}
+      <div className="mt-4 w-full max-w-5xl" data-home-hero-chips>
+        <ScrollRail
+          className="md:hidden"
+          viewportClassName="!overflow-x-auto overscroll-x-contain !pb-0.5"
+          hideScrollbar
+          edgeFade
+          aria-label="Быстрые подборки"
         >
-          {quickChips.map((chip) => {
-            let href = chip.href;
-            if (chip.href.startsWith('/events')) {
-              const params = new URLSearchParams(
-                chip.href.includes('?') ? chip.href.slice(chip.href.indexOf('?') + 1) : '',
-              );
-              href = catalogHrefWithSelectedCity(destination, {
-                q: params.get('q') || undefined,
-                city: params.get('city') || undefined,
-                category: params.get('category') || undefined,
-                date: heroDate !== 'all' ? heroDate : params.get('date') || undefined,
-                sort: (params.get('sort') as 'popular' | 'time' | undefined) || undefined,
-              });
-            }
-            return (
+          <div className="flex w-max flex-nowrap items-center gap-2 px-1 pb-0.5">
+            {quickChips.map((chip) => (
               <a
                 key={chip.label}
-                href={href}
+                href={resolveChipHref(chip.href)}
                 data-rail-item
-                className="inline-flex h-8 shrink-0 items-center rounded-full bg-white/20 px-3.5 text-xs font-semibold text-white/95 ring-1 ring-white/35 backdrop-blur-sm transition hover:bg-white/35"
+                className={`${chipClassName} shrink-0`}
               >
                 {chip.label}
               </a>
-            );
-          })}
+            ))}
+          </div>
+        </ScrollRail>
+        <div
+          className="hidden flex-wrap justify-center gap-2 md:flex"
+          aria-label="Быстрые подборки"
+        >
+          {quickChips.map((chip) => (
+            <a key={chip.label} href={resolveChipHref(chip.href)} className={chipClassName}>
+              {chip.label}
+            </a>
+          ))}
         </div>
-      </ScrollRail>
+      </div>
     </HeroLayout>
   );
 }

@@ -99,7 +99,7 @@ describe('structured-data landing/event', () => {
     assert.equal((blocks[1] as any).numberOfItems, 1);
   });
 
-  it('venue JSON-LD includes Place with address and geo', () => {
+  it('venue JSON-LD includes EventVenue with address, geo, FAQ', () => {
     const blocks = buildVenuePageJsonLd({
       ok: true,
       venue: {
@@ -120,14 +120,15 @@ describe('structured-data landing/event', () => {
       relatedVenues: [],
       stats: { events: 12, categories: 1 },
     } as any);
-    assert.equal(blocks.length, 2);
-    assert.equal(blocks[0]['@type'], 'Place');
+    assert.ok(blocks.length >= 3);
+    assert.deepEqual(blocks[0]['@type'], ['EventVenue', 'Place']);
     assert.equal(blocks[0].url, 'https://daibilet.ru/venues/ermitage');
     assert.equal((blocks[0].address as any).streetAddress, 'Дворцовая наб., 34');
     assert.equal((blocks[0].geo as any).latitude, 59.9398);
     assert.equal(blocks[1]['@type'], 'BreadcrumbList');
     const crumbNames = ((blocks[1] as any).itemListElement || []).map((item: any) => item.name);
     assert.deepEqual(crumbNames, ['Главная', 'Санкт-Петербург', 'Музеи', 'Эрмитаж']);
+    assert.equal(blocks[2]['@type'], 'FAQPage');
   });
 
   it('location venue breadcrumbs are city-first with type plural', () => {
@@ -147,7 +148,7 @@ describe('structured-data landing/event', () => {
       relatedVenues: [],
       stats: { events: 5, categories: 1 },
     } as any);
-    assert.equal(blocks[0]['@type'], 'Place');
+    assert.deepEqual(blocks[0]['@type'], ['EventVenue', 'Place']);
     assert.equal(blocks[0].url, 'https://daibilet.ru/locations/prichal-admiralteyskaya');
     const crumbNames = ((blocks[1] as any).itemListElement || []).map((item: any) => item.name);
     assert.deepEqual(crumbNames, ['Главная', 'Санкт-Петербург', 'Причалы', 'Причал Адмиралтейская']);

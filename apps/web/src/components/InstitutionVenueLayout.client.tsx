@@ -20,10 +20,13 @@ import { CityHubSectionHeading } from '@/components/CityHubSectionHeading';
 import { HubEventsAfficheRail } from '@/components/HubEventsAfficheRail.client';
 import { InstitutionCard } from '@/components/InstitutionCard.client';
 import { MobileStickyActionBar } from '@/components/MobileStickyActionBar';
-import { OsmMapEmbed } from '@/components/OsmMapEmbed';
+import { YandexMapEmbed } from '@/components/YandexMapEmbed';
 import { VenueAdmissionBlock } from '@/components/VenueAdmissionBlock';
 import { VenueBreadcrumbsNav } from '@/components/VenueBreadcrumbsNav.client';
-import { nonEmptyLogisticsText } from '@/components/VenueLogisticsBlock';
+import {
+  isAddressEchoWayToFind,
+  nonEmptyLogisticsText,
+} from '@/components/VenueLogisticsBlock';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { resolveCityTimeZone } from '@/lib/city-timezone';
 import { resolveVenueHeroImage } from '@/lib/city-place-images';
@@ -37,7 +40,9 @@ import {
   applyVenueEditorialOverlay,
   formatVenueMetroLabel,
   resolveVenueEditorialContent,
+  resolveVenueFaqItems,
   resolveVenueGalleryImages,
+  venueFeatureChips,
 } from '@/lib/venue-editorial-content';
 import {
   OPEN_DATE_HOURS_HOLIDAY_NOTE,
@@ -57,22 +62,6 @@ import type {
   PublicVenueLinkedEventDto,
   PublicVenuePageDto,
 } from '@daibilet/contracts/public';
-
-const GENERIC_FAQ_ITEMS = [
-  {
-    question: 'Есть ли билеты с открытой датой?',
-    answer: 'У многих музеев и выставок бывают билеты без фиксированного сеанса. Это будет указано в карточке события.',
-  },
-  {
-    question: 'Где проходит оплата?',
-    answer:
-      'Покупка - в виджете билетной системы или на сайте организатора. Дайбилет помогает выбрать событие и хранит статус заказа.',
-  },
-  {
-    question: 'Актуальны ли часы работы?',
-    answer: 'Мы показываем афишу событий; режим работы учреждения лучше проверить на его официальном сайте.',
-  },
-];
 
 const MUSEUM_ART_KINDS = new Set(['museum', 'art_space', 'museum_art_space']);
 
@@ -135,7 +124,11 @@ export function InstitutionVenueLayout({
     () => formatVenueMetroLabel(resolvedMetroName),
     [resolvedMetroName],
   );
-  const faqItems = editorial?.faq?.length ? editorial.faq : GENERIC_FAQ_ITEMS;
+  const faqItems = React.useMemo(() => resolveVenueFaqItems(venue.slug), [venue.slug]);
+  const featureChips = React.useMemo(
+    () => venueFeatureChips(editorial?.features),
+    [editorial?.features],
+  );
   const uniqueStopEvents = React.useMemo(() => dedupeVenueLinkedEvents(stopEvents), [stopEvents]);
   const uniqueNearbyEvents = React.useMemo(
     () => dedupeVenueLinkedEvents(nearbyEvents),
@@ -170,6 +163,23 @@ export function InstitutionVenueLayout({
   const website = nonEmptyLogisticsText(editorial?.website);
   const websiteLabel = editorial?.websiteLabel || 'Официальный сайт';
   const heroAddressLine = [streetAddress || venue.city, metroLabel].filter(Boolean).join(' • ');
+  const wayTipRaw = nonEmptyLogisticsText(venue.wayToFind);
+  const wayTip =
+    wayTipRaw && !isAddressEchoWayToFind(wayTipRaw, venue.address, venue.city) ? wayTipRaw : null;
+  const primaryCta = hasInternalLcTickets
+    ? ({ href: '#venue-admission', label: 'К билетам' } as const)
+    : hasAfisha
+      ? ({ href: '#venue-program', label: 'Выбрать событие' } as const)
+      : null;
+  const heroBadges = React.useMemo(() => {
+    const badges: string[] = [];
+    if (typeLabel) badges.push(typeLabel);
+    for (const chip of featureChips.slice(0, 3)) badges.push(chip.label);
+    for (const [name] of categories.slice(0, 2)) {
+      if (!badges.includes(name)) badges.push(name);
+    }
+    return badges.slice(0, 5);
+  }, [typeLabel, featureChips, categories]);
 
   const cityTz = React.useMemo(
     () => resolveCityTimeZone(venue.city, venue.citySlug),
@@ -213,20 +223,21 @@ export function InstitutionVenueLayout({
   };
 
   return (
-    <div className="bg-[#f6f3ee] pb-24 lg:pb-0" data-venue-pdp-editorial>
+    <div className="bg-white pb-24 lg:pb-0" data-venue-pdp-editorial>
       <div className="border-b border-zinc-200/80 bg-white">
         <VenueBreadcrumbsNav payload={pagePayload} />
       </div>
 
-      <section className="relative isolate grid w-full overflow-hidden bg-slate-900 text-white aspect-square md:aspect-auto md:min-h-80 lg:min-h-[28rem]">
+      <section className="relative isolate grid w-full overflow-hidden bg-slate-900 text-white aspect-square md:aspect-auto md:min-h-80 lg:min-h-[30rem]">
         <div className="absolute inset-0">
           {heroImage ? (
             <SafeImage
               src={heroImage}
               alt=""
               fill
+              priority
               sizes={IMAGE_SIZES.eventHero}
-              className="object-cover object-[center_20%] opacity-80"
+              className="object-cover object-[center_20%] opacity-85"
             />
           ) : (
             <div className={`h-full w-full ${isTheatre ? 'bg-gradient-to-br from-rose-800 to-slate-950' : 'bg-gradient-to-br from-indigo-800 to-slate-950'}`} />
@@ -237,14 +248,25 @@ export function InstitutionVenueLayout({
         <div className="container-page absolute inset-0 z-10 flex flex-col justify-end pb-5 pt-20 md:pb-14 md:pt-24">
           <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-end">
             <div className="max-w-2xl">
-              {openNowStatus === 'open' ? (
-                <div className="mb-3" data-venue-open-now>
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-600 px-3 py-1 text-xs font-semibold text-white shadow-sm">
+              <div className="mb-3 flex flex-wrap items-center gap-2">
+                {openNowStatus === 'open' ? (
+                  <span
+                    className="inline-flex items-center gap-1.5 rounded-full bg-emerald-600 px-3 py-1 text-xs font-semibold text-white shadow-sm"
+                    data-venue-open-now
+                  >
                     <span className="h-1.5 w-1.5 rounded-full bg-white" aria-hidden="true" />
                     Открыто сейчас
                   </span>
-                </div>
-              ) : null}
+                ) : null}
+                {heroBadges.map((badge) => (
+                  <span
+                    key={badge}
+                    className="inline-flex items-center rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-white ring-1 ring-white/25 backdrop-blur-sm"
+                  >
+                    {badge}
+                  </span>
+                ))}
+              </div>
 
               <h1 className="font-display text-2xl font-extrabold leading-tight text-white sm:text-4xl md:text-5xl">{title}</h1>
 
@@ -260,20 +282,20 @@ export function InstitutionVenueLayout({
                 </div>
               ) : null}
 
-              <p className="mt-4 hidden max-w-xl text-white/90 md:block">{intro}</p>
+              <p className="mt-4 hidden max-w-xl text-base leading-relaxed text-white/90 md:block">{intro}</p>
             </div>
 
             {/* Sticky footer covers mobile CTA */}
             <div className="hidden flex-col items-start gap-2 md:flex md:items-end">
-              {hasInternalLcTickets ? (
+              {primaryCta ? (
                 <a
-                  href="#venue-admission"
+                  href={primaryCta.href}
                   className={`inline-flex items-center gap-2 rounded-full px-6 py-3 font-bold shadow-lg transition hover:opacity-95 ${
                     isTheatre ? 'bg-rose-500 text-white hover:bg-rose-600' : 'bg-white text-slate-900 hover:bg-slate-100'
                   }`}
                 >
                   <Ticket className="h-4 w-4" />
-                  К билетам
+                  {primaryCta.label}
                 </a>
               ) : null}
               <AddToDayRouteButton
@@ -370,8 +392,8 @@ export function InstitutionVenueLayout({
             </section>
           ) : null}
 
-          <section id="about" className="scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-6">
-            <h2 className="text-xl font-bold text-slate-900">О месте</h2>
+          <section id="about" className="scroll-mt-24 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+            <h2 className="font-display text-xl font-bold tracking-tight text-zinc-950 sm:text-2xl">О месте</h2>
             {editorial?.highlights?.length ? (
               <ul className="mt-4 grid gap-2 sm:grid-cols-2" data-venue-highlights>
                 {editorial.highlights.map((item) => (
@@ -442,201 +464,236 @@ export function InstitutionVenueLayout({
 
           {showFaq ? (
             <section id="faq" className="scroll-mt-24">
-              <h2 className="text-xl font-bold text-slate-900">Вопросы</h2>
+              <h2 className="font-display text-xl font-bold tracking-tight text-zinc-950 sm:text-2xl">Вопросы</h2>
               <div className="mt-4 space-y-2">
                 {faqItems.map((item) => (
-                  <details key={item.question} className="group rounded-xl border border-slate-200 bg-white">
+                  <details key={item.question} className="group rounded-xl border border-zinc-200 bg-white shadow-sm">
                     <summary className="flex cursor-pointer list-none items-center justify-between p-4">
-                      <span className="flex items-center gap-2 font-medium text-slate-900">
+                      <span className="flex items-center gap-2 font-medium text-zinc-900">
                         <HelpCircle className="h-4 w-4 text-primary-600" />
                         {item.question}
                       </span>
-                      <ChevronDown className="h-4 w-4 text-slate-400 transition group-open:rotate-180" />
+                      <ChevronDown className="h-4 w-4 text-zinc-400 transition group-open:rotate-180" />
                     </summary>
-                    <div className="px-4 pb-4 text-sm text-slate-700">{item.answer}</div>
+                    <div className="px-4 pb-4 text-sm text-zinc-700">{item.answer}</div>
                   </details>
                 ))}
               </div>
             </section>
           ) : null}
 
-          <section id="reviews" className="scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-6">
-            <h2 className="text-xl font-bold text-slate-900">Отзывы</h2>
-            <div className="mt-4 flex items-start gap-3 rounded-xl border border-dashed border-slate-200 bg-slate-50 p-4">
-              <MessageSquareQuote className="mt-0.5 h-5 w-5 shrink-0 text-slate-400" />
-              <p className="text-sm leading-6 text-slate-600">
-                Отзывы о площадке скоро появятся здесь. Пока можно опираться на описание, часы работы и маршруты рядом.
+          <section id="reviews" className="scroll-mt-24 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+            <h2 className="font-display text-xl font-bold tracking-tight text-zinc-950 sm:text-2xl">Отзывы</h2>
+            <div className="mt-4 flex items-start gap-3 rounded-xl border border-dashed border-zinc-200 bg-zinc-50 p-4">
+              <MessageSquareQuote className="mt-0.5 h-5 w-5 shrink-0 text-zinc-400" />
+              <p className="text-sm leading-6 text-zinc-600">
+                Отзывы о площадке скоро появятся здесь. Пока можно опираться на описание, часы работы и карту рядом.
               </p>
             </div>
           </section>
-
-          {showSimilar ? (
-            <section id="similar" className="scroll-mt-24 space-y-8">
-              <h2 className="text-xl font-bold text-slate-900">Похожие</h2>
-              {linkedExcursions.length > 0 ? (
-                <div data-venue-linked-events-deduped>
-                  <h3 className="text-sm font-semibold text-slate-800">Также можно посетить</h3>
-                  {!hasStopExcursions ? (
-                    <p className="mt-1 text-sm text-slate-500">
-                      События в радиусе 300 м. Это не афиша площадки!
-                    </p>
-                  ) : null}
-                  <ul className="mt-4 space-y-3">
-                    {linkedExcursions.map((event) => (
-                      <li key={event.id}>
-                        <a
-                          href={`/events/${encodeURIComponent(event.slug)}`}
-                          className="flex flex-col gap-1 rounded-xl border border-slate-100 bg-white px-4 py-3 transition hover:border-primary/30 hover:bg-slate-50 sm:flex-row sm:items-center sm:justify-between"
-                        >
-                          <span className="min-w-0">
-                            <span className="font-semibold text-slate-900 hover:text-primary-700">
-                              {event.title}
-                            </span>
-                            {!hasStopExcursions && event.venue ? (
-                              <span className="mt-0.5 block text-xs text-slate-500">{event.venue}</span>
-                            ) : null}
-                          </span>
-                          <span className="text-sm font-medium text-slate-600">
-                            {event.priceFrom != null ? formatMoney(event.priceFrom) : 'Смотреть'}
-                          </span>
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
-              {similarVenues.length > 0 ? (
-                <div>
-                  <h3 className="text-sm font-semibold text-slate-800">Похожие площадки</h3>
-                  <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    {similarVenues.map((related) => (
-                      <InstitutionCard key={related.id} venue={related} href={venueHref(related)} />
-                    ))}
-                  </div>
-                </div>
-              ) : null}
-            </section>
-          ) : null}
         </div>
 
-        <aside className="scroll-mt-24 lg:sticky lg:top-32 lg:self-start">
+        <aside className="scroll-mt-24 lg:sticky lg:top-[calc(var(--site-header-height)+3.5rem)] lg:self-start">
           <div className="space-y-4">
-            <div id="contacts" className="scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-5">
-              <div className="text-sm font-semibold text-slate-900">Контакты</div>
-              <ul className="mt-3 space-y-3 text-sm text-slate-700">
-                {streetAddress || venue.city ? (
-                  <li className="flex items-start gap-2">
-                    <span className="shrink-0" aria-hidden="true">
-                      📍
-                    </span>
-                    <span>
-                      {streetAddress || venue.city}
-                      {streetAddress && venue.city && !streetAddress.includes(venue.city)
-                        ? `, ${venue.city}`
-                        : ''}
-                    </span>
-                  </li>
+            {primaryCta ? (
+              <div
+                className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm"
+                data-venue-quick-action
+              >
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
+                  Быстрое действие
+                </p>
+                <a
+                  href={primaryCta.href}
+                  className={`mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-bold text-white shadow-md transition hover:opacity-95 ${
+                    isTheatre ? 'bg-rose-600 hover:bg-rose-700' : 'bg-primary-600 hover:bg-primary-700'
+                  }`}
+                >
+                  <Ticket className="h-4 w-4" />
+                  {primaryCta.label}
+                </a>
+                {hasAfisha ? (
+                  <p className="mt-2 text-center text-xs text-zinc-500">
+                    {sessions.length} {sessions.length === 1 ? 'событие' : 'событий'} в афише
+                  </p>
                 ) : null}
-                {metroLabel ? (
-                  <li className="flex items-start gap-2">
-                    <span className="shrink-0" aria-hidden="true">
-                      🚇
-                    </span>
-                    <span>{metroLabel}</span>
-                  </li>
-                ) : null}
-                {phone ? (
-                  <li className="flex items-start gap-2">
-                    <span className="shrink-0" aria-hidden="true">
-                      ☎
-                    </span>
-                    <a href={`tel:${phone.replace(/[^\d+]/g, '')}`} className="hover:text-primary-700">
-                      {phone}
-                    </a>
-                  </li>
-                ) : null}
-                {website ? (
-                  <li className="flex items-start gap-2">
-                    <span className="shrink-0" aria-hidden="true">
-                      🌐
-                    </span>
-                    <a
-                      href={website}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-1 font-medium text-primary-700 hover:underline"
-                    >
-                      {websiteLabel}
-                      <ExternalLink className="h-3.5 w-3.5" />
-                    </a>
-                  </li>
-                ) : null}
-              </ul>
-            </div>
-
-            {openingHours?.lines?.length ? (
-              <div className="rounded-2xl border border-slate-200 bg-white p-5" data-venue-opening-hours-sidebar>
-                <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
-                  <Clock className="h-4 w-4 text-primary-600" />
-                  Часы работы
-                </div>
-                <ul className="mt-3 space-y-1 text-sm text-slate-700">
-                  {openingHours.lines.map((line) => (
-                    <li key={line}>{line}</li>
-                  ))}
-                </ul>
-                <p className="mt-3 text-xs leading-5 text-slate-500">{OPEN_DATE_HOURS_HOLIDAY_NOTE}</p>
-              </div>
-            ) : (
-              <div className="rounded-2xl border border-sky-100 bg-sky-50 p-5 text-sm text-slate-700">
-                Режим работы учреждения и правила посещения уточняйте на официальном сайте площадки, особенно в праздники.
-              </div>
-            )}
-
-            {hasMap ? (
-              <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-                <OsmMapEmbed
-                  lat={venue.latitude!}
-                  lng={venue.longitude!}
-                  title={`Карта: ${venue.name}`}
-                  className="relative h-48 w-full"
-                />
-                <div className="flex flex-wrap gap-2 p-3">
-                  <a
-                    href={`https://yandex.ru/maps/?pt=${venue.longitude},${venue.latitude}&z=17&l=map`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-xs font-semibold text-white hover:bg-primary-600"
-                  >
-                    <NavigationIcon className="h-3.5 w-3.5" />
-                    Яндекс.Карты
-                  </a>
-                  <a
-                    href={build2gisRouteUrl(venue.latitude!, venue.longitude!)}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
-                  >
-                    <Car className="h-3.5 w-3.5" />
-                    Маршрут в 2ГИС
-                  </a>
-                </div>
               </div>
             ) : null}
+
+            <div id="contacts" className="scroll-mt-24 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm">
+              <div className="space-y-3 p-5">
+                <div className="text-sm font-semibold text-zinc-950">Где находится</div>
+                <ul className="space-y-3 text-sm text-zinc-700">
+                  {streetAddress || venue.city ? (
+                    <li className="flex items-start gap-2">
+                      <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary-600" />
+                      <span>
+                        {streetAddress || venue.city}
+                        {streetAddress && venue.city && !streetAddress.includes(venue.city)
+                          ? `, ${venue.city}`
+                          : ''}
+                      </span>
+                    </li>
+                  ) : null}
+                  {metroLabel ? (
+                    <li className="flex items-start gap-2">
+                      <span className="shrink-0" aria-hidden="true">
+                        🚇
+                      </span>
+                      <span>{metroLabel}</span>
+                    </li>
+                  ) : null}
+                  {wayTip ? (
+                    <li className="flex items-start gap-2" data-venue-way-tip>
+                      <NavigationIcon className="mt-0.5 h-4 w-4 shrink-0 text-primary-600" />
+                      <span className="leading-relaxed text-zinc-600">{wayTip}</span>
+                    </li>
+                  ) : null}
+                </ul>
+              </div>
+              {hasMap ? (
+                <>
+                  <YandexMapEmbed
+                    lat={venue.latitude!}
+                    lng={venue.longitude!}
+                    title={`Карта: ${venue.name}`}
+                    className="h-44 w-full border-t border-zinc-100"
+                  />
+                  <div className="flex flex-wrap gap-2 border-t border-zinc-100 p-3">
+                    <a
+                      href={`https://yandex.ru/maps/?pt=${venue.longitude},${venue.latitude}&z=17&l=map`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-2 rounded-full bg-zinc-900 px-4 py-2 text-xs font-semibold text-white hover:bg-primary-600"
+                    >
+                      <NavigationIcon className="h-3.5 w-3.5" />
+                      Яндекс.Карты
+                    </a>
+                    <a
+                      href={build2gisRouteUrl(venue.latitude!, venue.longitude!)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-2 rounded-full border border-zinc-200 px-4 py-2 text-xs font-semibold text-zinc-700 hover:bg-zinc-50"
+                    >
+                      <Car className="h-3.5 w-3.5" />
+                      Маршрут в 2ГИС
+                    </a>
+                  </div>
+                </>
+              ) : null}
+            </div>
+
+            <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
+              <div className="text-sm font-semibold text-zinc-950">Режим и контакты</div>
+              {openingHours?.lines?.length ? (
+                <div className="mt-3" data-venue-opening-hours-sidebar>
+                  <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">
+                    <Clock className="h-3.5 w-3.5 text-primary-600" />
+                    Часы работы
+                  </div>
+                  <ul className="mt-2 space-y-1 text-sm text-zinc-700">
+                    {openingHours.lines.map((line) => (
+                      <li key={line}>{line}</li>
+                    ))}
+                  </ul>
+                  <p className="mt-2 text-xs leading-5 text-zinc-500">{OPEN_DATE_HOURS_HOLIDAY_NOTE}</p>
+                </div>
+              ) : (
+                <p className="mt-3 text-sm text-zinc-600">
+                  Режим работы уточняйте на официальном сайте площадки, особенно в праздники.
+                </p>
+              )}
+              {(phone || website) ? (
+                <ul className="mt-4 space-y-2 border-t border-zinc-100 pt-4 text-sm text-zinc-700">
+                  {phone ? (
+                    <li>
+                      <a href={`tel:${phone.replace(/[^\d+]/g, '')}`} className="hover:text-primary-700">
+                        {phone}
+                      </a>
+                    </li>
+                  ) : null}
+                  {website ? (
+                    <li>
+                      <a
+                        href={website}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1 font-medium text-primary-700 hover:underline"
+                      >
+                        {websiteLabel}
+                        <ExternalLink className="h-3.5 w-3.5" />
+                      </a>
+                    </li>
+                  ) : null}
+                </ul>
+              ) : null}
+            </div>
           </div>
         </aside>
       </div>
 
+      {showSimilar ? (
+        <div className="border-t border-zinc-200 bg-white">
+          <div className="container-page space-y-8 py-10 sm:py-12" id="similar">
+            <h2 className="font-display text-2xl font-extrabold tracking-tight text-zinc-950 sm:text-3xl">
+              Похожие
+            </h2>
+            {linkedExcursions.length > 0 ? (
+              <div data-venue-linked-events-deduped>
+                <h3 className="text-sm font-semibold text-zinc-800">Также можно посетить</h3>
+                {!hasStopExcursions ? (
+                  <p className="mt-1 text-sm text-zinc-500">
+                    События в радиусе 300 м. Это не афиша площадки!
+                  </p>
+                ) : null}
+                <ul className="mt-4 space-y-3">
+                  {linkedExcursions.map((event) => (
+                    <li key={event.id}>
+                      <a
+                        href={`/events/${encodeURIComponent(event.slug)}`}
+                        className="flex flex-col gap-1 rounded-xl border border-zinc-100 bg-zinc-50 px-4 py-3 transition hover:border-primary/30 hover:bg-white sm:flex-row sm:items-center sm:justify-between"
+                      >
+                        <span className="min-w-0">
+                          <span className="font-semibold text-zinc-900 hover:text-primary-700">
+                            {event.title}
+                          </span>
+                          {!hasStopExcursions && event.venue ? (
+                            <span className="mt-0.5 block text-xs text-zinc-500">{event.venue}</span>
+                          ) : null}
+                        </span>
+                        <span className="text-sm font-medium text-zinc-600">
+                          {event.priceFrom != null ? formatMoney(event.priceFrom) : 'Смотреть'}
+                        </span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+            {similarVenues.length > 0 ? (
+              <div>
+                <h3 className="text-sm font-semibold text-zinc-800">Похожие площадки</h3>
+                <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                  {similarVenues.map((related) => (
+                    <InstitutionCard key={related.id} venue={related} href={venueHref(related)} />
+                  ))}
+                </div>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
+
       <MobileStickyActionBar>
-        {hasInternalLcTickets ? (
+        {primaryCta ? (
           <a
-            href="#venue-admission"
+            href={primaryCta.href}
             className={`inline-flex h-11 w-full items-center justify-center gap-2 rounded-full px-5 text-sm font-bold text-white shadow-lg ${
               isTheatre ? 'bg-rose-600 hover:bg-rose-700' : 'bg-primary-600 hover:bg-primary-700'
             }`}
           >
             <Ticket className="h-4 w-4" />
-            К билетам
+            {primaryCta.label}
           </a>
         ) : (
           <AddToDayRouteButton

@@ -181,7 +181,7 @@ export function DayTripCanonCard({
                 alt=""
                 fill
                 sizes="(max-width: 640px) 100vw, 240px"
-                className="object-cover"
+                className="object-cover object-[center_35%]"
                 unoptimized
                 fallback={<div className="h-full w-full bg-slate-200" />}
               />
@@ -270,64 +270,8 @@ export function DayTripCanonCard({
     );
   }
 
-  return (
-    <article
-      id={id}
-      role={role}
-      aria-label={
-        ariaLabel ||
-        (total != null ? `${index + 1} из ${total}` : undefined)
-      }
-      className={`mt-4 w-full rounded-2xl border bg-white shadow-sm ${
-        editorial ? 'border-zinc-200' : 'border-slate-200'
-      } ${className}`}
-      data-day-trip-canon="1"
-      data-day-trip-align="gutter-text"
-      data-day-trip-has-cover={cover ? '1' : '0'}
-      {...dataProps}
-    >
-      <div
-        className={
-          cover
-            ? 'flex flex-col sm:grid sm:min-h-0 sm:grid-cols-[minmax(15rem,40%)_minmax(0,1fr)] sm:items-stretch'
-            : undefined
-        }
-      >
-      {cover ? (
-        <div
-          className="relative h-44 w-full self-stretch overflow-hidden rounded-t-2xl bg-[#F5F5F7] sm:h-full sm:min-h-[18rem] sm:rounded-l-2xl sm:rounded-tr-none"
-          data-day-trip-cover
-        >
-          <SafeImage
-            src={cover}
-            alt=""
-            fill
-            sizes="(max-width: 640px) 100vw, 40vw"
-            className="object-cover"
-            unoptimized
-            fallback={<div className="h-full w-full bg-slate-200" />}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/25 via-transparent to-transparent sm:bg-gradient-to-r sm:from-transparent sm:to-slate-950/10" />
-          <span
-            className="absolute left-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/95 text-sm font-bold tabular-nums text-slate-900 shadow-sm"
-            data-day-trip-badge
-          >
-            {index + 1}
-          </span>
-        </div>
-      ) : null}
-      <div
-        className={`px-3.5 py-4 sm:p-5 md:p-6 ${
-          cover ? (editorial ? 'bg-zinc-50' : 'bg-slate-50') : ''
-        } ${HUB_DETAIL_BODY}`}
-        data-day-trip-body
-      >
-      {/*
-        Title row: same content vertical as logistics box / sights.
-        Cover: badge lives on the photo - keep an empty sm gutter so H2
-        matches body section headers (no hanging left of content).
-        No cover: badge sits in the gutter column.
-      */}
+  const headAndMeta = (
+    <>
       <div
         className={
           cover
@@ -379,28 +323,28 @@ export function DayTripCanonCard({
           >
             {hasLogistics ? (
               <section data-day-trip-logistics>
-                {/* No section label - box alone is enough (owner). */}
-                {/* Desktop: bg bleeds left; copy stays on title vertical. */}
+                {/* Same structure as gastro: label + panel; keep slate panel (no amber). */}
+                <h4 className={`text-sm font-semibold ${inkClass}`}>{resolvedExitLabel}</h4>
                 <div
-                  className={`${panelClass} px-2.5 py-2.5 sm:py-3.5 sm:pr-4 ${PANEL_INSET_SM} ${LOGISTICS_BG_EXTEND_SM}`}
+                  className={`mt-1.5 ${panelClass} px-2.5 py-2.5 sm:mt-2 sm:py-3.5 sm:pr-4 ${PANEL_INSET_SM} ${LOGISTICS_BG_EXTEND_SM}`}
                 >
-                  {logisticsExit ? (
-                    <p className={`text-sm leading-snug ${softClass}`} data-day-trip-exit>
-                      <span className={`font-semibold ${inkClass}`}>{resolvedExitLabel}</span>
-                      <span className={mutedClass}>: {logisticsExit}</span>
+                  {exitHint ? (
+                    <p
+                      className={`text-sm font-semibold leading-snug ${inkClass}`}
+                      data-day-trip-exit
+                    >
+                      {exitHint}
                     </p>
                   ) : null}
-                  {logisticsText ? (
+                  {logisticsCopy ? (
                     <p
-                      className={`${logisticsExit ? 'mt-1.5' : ''} text-sm leading-relaxed ${mutedClass}`}
+                      className={`${exitHint ? 'mt-1' : ''} text-sm leading-relaxed ${softClass}`}
                     >
-                      {logisticsText}
+                      {logisticsCopy}
                     </p>
                   ) : null}
                   {logisticsExtra ? (
-                    <p className={`mt-1.5 text-sm leading-relaxed ${mutedClass}`}>
-                      {logisticsExtra}
-                    </p>
+                    <p className={`mt-1 text-sm leading-relaxed ${softClass}`}>{logisticsExtra}</p>
                   ) : null}
                 </div>
               </section>
@@ -422,9 +366,76 @@ export function DayTripCanonCard({
           </div>
         </div>
       ) : null}
+    </>
+  );
+
+  return (
+    <article
+      id={id}
+      role={role}
+      aria-label={
+        ariaLabel ||
+        (total != null ? `${index + 1} из ${total}` : undefined)
+      }
+      className={`mt-4 w-full rounded-2xl border bg-white shadow-sm ${
+        editorial ? 'border-zinc-200' : 'border-slate-200'
+      } ${className}`}
+      data-day-trip-canon="1"
+      data-day-trip-align="gutter-text"
+      data-day-trip-has-cover={cover ? '1' : '0'}
+      {...dataProps}
+    >
+      {/*
+        Desktop: cover only as tall as title + logistics/gastro (owner crop line),
+        not stretched past «Что посмотреть».
+      */}
+      <div
+        className={
+          cover
+            ? 'flex flex-col sm:grid sm:grid-cols-[minmax(15rem,40%)_minmax(0,1fr)] sm:items-stretch'
+            : undefined
+        }
+      >
+        {cover ? (
+          <div
+            className="relative h-44 w-full overflow-hidden rounded-t-2xl bg-[#F5F5F7] sm:h-full sm:min-h-0 sm:rounded-l-2xl sm:rounded-tr-none"
+            data-day-trip-cover
+          >
+            <SafeImage
+              src={cover}
+              alt=""
+              fill
+              sizes="(max-width: 640px) 100vw, 40vw"
+              className="object-cover object-[center_35%]"
+              unoptimized
+              fallback={<div className="h-full w-full bg-slate-200" />}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/25 via-transparent to-transparent sm:bg-gradient-to-r sm:from-transparent sm:to-slate-950/10" />
+            <span
+              className="absolute left-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/95 text-sm font-bold tabular-nums text-slate-900 shadow-sm"
+              data-day-trip-badge
+            >
+              {index + 1}
+            </span>
+          </div>
+        ) : null}
+        <div
+          className={`px-3.5 py-4 sm:p-5 md:p-6 ${
+            cover ? (editorial ? 'bg-zinc-50' : 'bg-slate-50') : ''
+          } ${HUB_DETAIL_BODY}`}
+          data-day-trip-body
+        >
+          {headAndMeta}
+        </div>
+      </div>
 
       {nested.length ? (
-        <section className={`mt-4 border-t pt-3.5 sm:mt-5 sm:pt-4 ${borderSoft}`} data-day-trip-sights>
+        <section
+          className={`border-t px-3.5 py-3.5 sm:px-5 sm:py-4 md:px-6 ${borderSoft} ${
+            cover ? (editorial ? 'bg-zinc-50' : 'bg-slate-50') : ''
+          }`}
+          data-day-trip-sights
+        >
           <div className="sm:grid sm:grid-cols-[2.25rem_minmax(0,1fr)] sm:gap-x-3">
             <div aria-hidden className="hidden sm:block" />
             <h4 className={`text-sm font-semibold ${inkClass}`}>Что посмотреть</h4>
@@ -449,15 +460,18 @@ export function DayTripCanonCard({
       ) : null}
 
       {cta ? (
-        <div className={`relative z-10 mt-5 overflow-visible border-t pt-4 ${borderSoft}`} data-day-trip-cta>
+        <div
+          className={`relative z-10 overflow-visible border-t px-3.5 py-4 sm:px-5 md:px-6 ${borderSoft} ${
+            cover ? (editorial ? 'bg-zinc-50' : 'bg-slate-50') : ''
+          }`}
+          data-day-trip-cta
+        >
           <div className="sm:grid sm:grid-cols-[2.25rem_minmax(0,1fr)] sm:gap-x-3">
             <div aria-hidden className="hidden sm:block" />
             <div className="min-w-0">{cta}</div>
           </div>
         </div>
       ) : null}
-      </div>
-      </div>
     </article>
   );
 }

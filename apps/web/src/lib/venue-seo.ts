@@ -2,18 +2,32 @@ import { formatLandingTodayParts } from '@/lib/datetime';
 import { pageTitle } from '@/lib/seo-meta';
 
 /**
- * SEO title venue/location: «{Площадка}: афиша и билеты на сегодня, {date} | Дайбилет».
- * Живая дата (MSK), как у city hubs.
+ * SEO title venue/location:
+ * «{Площадка} в {Город}: афиша и билеты на сегодня, {date} | Дайбилет».
+ * Живая дата (MSK), как у city hubs. City adds local commercial intent.
  */
-export function buildVenueSeoTitle(venueName: string, reference: Date = new Date()): string {
+export function buildVenueSeoTitle(
+  venueName: string,
+  reference: Date = new Date(),
+  city?: string | null,
+): string {
   const name = pageTitle(String(venueName || '').trim() || 'Площадка');
+  const cityLabel = String(city || '').trim();
+  const withGeo =
+    cityLabel && cityLabel !== 'Не указан' && !name.toLowerCase().includes(cityLabel.toLowerCase())
+      ? `${name} в ${cityLabel}`
+      : name;
   const { short } = formatLandingTodayParts(reference);
-  return `${name}: афиша и билеты на сегодня, ${short} | Дайбилет`;
+  return `${withGeo}: афиша и билеты на сегодня, ${short} | Дайбилет`;
 }
 
 /** Без суффикса бренда - для layout title template `%s | Дайбилет`. */
-export function buildVenueSeoTitleCore(venueName: string, reference: Date = new Date()): string {
-  return buildVenueSeoTitle(venueName, reference).replace(/\s*\|\s*Дайбилет\s*$/i, '');
+export function buildVenueSeoTitleCore(
+  venueName: string,
+  reference: Date = new Date(),
+  city?: string | null,
+): string {
+  return buildVenueSeoTitle(venueName, reference, city).replace(/\s*\|\s*Дайбилет\s*$/i, '');
 }
 
 /**
@@ -21,7 +35,12 @@ export function buildVenueSeoTitleCore(venueName: string, reference: Date = new 
  * (редактор явно задал freshness). Иначе - живой шаблон.
  */
 export function resolveVenueSeoTitle(
-  venue: { name?: string | null; title?: string | null; seoTitle?: string | null },
+  venue: {
+    name?: string | null;
+    title?: string | null;
+    seoTitle?: string | null;
+    city?: string | null;
+  },
   reference: Date = new Date(),
 ): { core: string; full: string } {
   const displayName = String(venue.name || venue.title || 'Площадка').trim() || 'Площадка';
@@ -31,7 +50,7 @@ export function resolveVenueSeoTitle(
     return { core: pageTitle(full), full };
   }
   return {
-    core: buildVenueSeoTitleCore(displayName, reference),
-    full: buildVenueSeoTitle(displayName, reference),
+    core: buildVenueSeoTitleCore(displayName, reference, venue.city),
+    full: buildVenueSeoTitle(displayName, reference, venue.city),
   };
 }

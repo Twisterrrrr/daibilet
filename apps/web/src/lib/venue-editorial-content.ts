@@ -142,6 +142,33 @@ export function resolveVenueEditorialContent(
   return EDITORIAL_BY_SLUG[key] ?? null;
 }
 
+/** Generic FAQ when venue has no curated overlay (shared SSR + client). */
+export const VENUE_GENERIC_FAQ: VenueEditorialFaqItem[] = [
+  {
+    question: 'Есть ли билеты с открытой датой?',
+    answer:
+      'У многих музеев и выставок бывают билеты без фиксированного сеанса. Это будет указано в карточке события.',
+  },
+  {
+    question: 'Где проходит оплата?',
+    answer:
+      'Покупка - в виджете билетной системы или на сайте организатора. Дайбилет помогает выбрать событие и хранит статус заказа.',
+  },
+  {
+    question: 'Актуальны ли часы работы?',
+    answer:
+      'Мы показываем афишу событий; режим работы учреждения лучше проверить на его официальном сайте.',
+  },
+];
+
+/** Curated FAQ if present, otherwise generic venue FAQ. */
+export function resolveVenueFaqItems(
+  venueSlug: string | null | undefined,
+): VenueEditorialFaqItem[] {
+  const curated = resolveVenueEditorialContent(venueSlug)?.faq;
+  return curated?.length ? curated : VENUE_GENERIC_FAQ;
+}
+
 /**
  * Patch public venue DTO with curated title / metro when DB lags.
  * Used by venue PDP SSR + client so H1 and SEO stay aligned.

@@ -24,6 +24,8 @@ import {
   venueTypeBreadcrumbPlural,
   venueTypeCatalogHref,
 } from '@/lib/venue-meta';
+import { resolveVenueFaqItems } from '@/lib/venue-editorial-content';
+import { formatPublicTitle } from '@/lib/format-public-title';
 
 const SITE_URL = (process.env.DAIBILET_SITE_URL || 'https://daibilet.ru').replace(/\/$/, '');
 const SITE_NAME = 'Дайбилет';
@@ -439,7 +441,7 @@ export function buildVenueBreadcrumbs(payload: PublicVenuePageDto): StructuredBr
   return crumbs;
 }
 
-/** Schema.org Place (+ GeoCoordinates) для страницы площадки / локации. */
+/** Schema.org EventVenue / Place (+ GeoCoordinates) для страницы площадки / локации. */
 export function buildVenuePlaceJsonLd(payload: PublicVenuePageDto): Record<string, unknown> {
   const venue = payload.venue;
   const path = venue.canonicalPath || venueHref(venue);
@@ -449,7 +451,7 @@ export function buildVenuePlaceJsonLd(payload: PublicVenuePageDto): Record<strin
 
   const block: Record<string, unknown> = {
     '@context': 'https://schema.org',
-    '@type': 'Place',
+    '@type': ['EventVenue', 'Place'],
     name: venue.seoH1 || venue.title || venue.name,
     description,
     url: canonical,
@@ -478,7 +480,66 @@ export function buildVenuePlaceJsonLd(payload: PublicVenuePageDto): Record<strin
   return block;
 }
 
-/** SSR blocks для venue/location: Place (+ geo) и BreadcrumbList. */
+/** Upcoming venue sessions as Event nodes (schedule in SERP). Cap keeps payload lean. */
+export function buildVenueEventListJsonLd(
+  payload: PublicVenuePageDto,
+  limit = 12,
+): Record<string, unknown> | null {
+  const venue = payload.venue;
+  const venueName = venue.seoH1 || venue.title || venue.name;
+  const venueUrl = toAbsoluteUrl(venue.canonicalPath || venueHref(venue));
+  const sessions = (payload.sessions || []).slice(0, limit).filter((s) => s.slug || s.id);
+  if (!sessions.length) return null;
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: `Афиша: ${venueName}`,
+    numberOfItems: sessions.length,
+    itemListElement: sessions.map((session, index) => {
+      const path = eventHref(session);
+      const title = formatPublicTitle(session.title || session.eventTitle || 'Событие');
+      const eventBlock: Record<string, unknown> = {
+        '@type': 'Event',
+        name: title,
+        url: toAbsoluteUrl(path),
+        eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+        eventStatus: 'https://schema.org/EventScheduled',
+        location: {
+          '@type': 'Place',
+          name: venueName,
+          url: venueUrl,
+        },
+      };
+      if (session.startsAt) eventBlock.startDate = session.startsAt;
+      if (session.imageUrl) eventBlock.image = [toAbsoluteUrl(session.imageUrl)];
+      if (typeof session.priceFrom === 'number' && Number.isFinite(session.priceFrom)) {
+        eventBlock.offers = {
+          '@type': 'Offer',
+          url: toAbsoluteUrl(path),
+          price: String(Math.round(session.priceFrom)),
+          priceCurrency: 'RUB',
+          availability: 'https://schema.org/InStock',
+        };
+      }
+      return {
+        '@type': 'ListItem',
+        position: index + 1,
+        item: eventBlock,
+      };
+    }),
+  };
+}
+
+/** SSR blocks для venue/location: EventVenue, FAQ, upcoming Events, BreadcrumbList. */
 export function buildVenuePageJsonLd(payload: PublicVenuePageDto): Array<Record<string, unknown>> {
-  return [buildVenuePlaceJsonLd(payload), buildBreadcrumbListJsonLd(buildVenueBreadcrumbs(payload))];
+  const blocks: Array<Record<string, unknown>> = [
+    buildVenuePlaceJsonLd(payload),
+    buildBreadcrumbListJsonLd(buildVenueBreadcrumbs(payload)),
+  ];
+  const faq = buildFaqPageJsonLd(resolveVenueFaqItems(payload.venue.slug));
+  if (faq) blocks.push(faq);
+  const events = buildVenueEventListJsonLd(payload);
+  if (events) blocks.push(events);
+  return blocks;
 }

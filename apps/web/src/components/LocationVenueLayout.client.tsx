@@ -16,7 +16,7 @@ import {
 import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import { LocationCard } from '@/components/LocationCard.client';
 import { MobileStickyActionBar } from '@/components/MobileStickyActionBar';
-import { OsmMapEmbed } from '@/components/OsmMapEmbed';
+import { YandexMapEmbed } from '@/components/YandexMapEmbed';
 import { VenueBreadcrumbsNav } from '@/components/VenueBreadcrumbsNav.client';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { expandSessionPurchaseVariants, isSessionPurchaseBlocked } from '@/lib/event-purchase';
@@ -103,7 +103,7 @@ export function LocationVenueLayout({
     Number(stats.events || 0) > 0;
 
   return (
-    <div className="bg-slate-50 pb-24 lg:pb-0">
+    <div className="bg-white pb-24 lg:pb-0">
       <div className="border-b border-slate-200 bg-white">
         <VenueBreadcrumbsNav payload={pagePayload} />
       </div>
@@ -368,7 +368,7 @@ export function LocationVenueLayout({
               <div className="relative overflow-hidden bg-slate-100 lg:rounded-r-3xl">
                 <div className="relative aspect-[16/10] lg:aspect-auto lg:h-[520px]">
                   {hasMap ? (
-                    <OsmMapEmbed
+                    <YandexMapEmbed
                       lat={venue.latitude!}
                       lng={venue.longitude!}
                       title={`Карта: ${venue.name}`}
@@ -718,11 +718,11 @@ function LocationMapStrip({ venue }: { venue: PublicVenueDto }) {
     <section className="border-b border-slate-200 bg-white">
       <div className="container-page py-0">
         <div className="overflow-hidden rounded-none border-y border-slate-200 sm:rounded-2xl sm:border sm:my-4">
-          <OsmMapEmbed
+          <YandexMapEmbed
             lat={venue.latitude}
             lng={venue.longitude}
             title={`Карта: ${venue.name}`}
-            className="relative h-64 w-full sm:h-80"
+            className="h-64 w-full sm:h-80"
           />
           <div className="flex flex-wrap gap-2 p-4">
             <a

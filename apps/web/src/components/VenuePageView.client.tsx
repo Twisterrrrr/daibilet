@@ -172,7 +172,7 @@ export function VenuePageView({
   }, [selectedCity, venue?.city]);
 
   return (
-    <div className={`min-h-screen text-slate-900 ${useLovableLayout ? 'bg-slate-50' : 'bg-white'}`}>
+    <div className="min-h-screen bg-white text-slate-900">
       <div>
         {!venue && !error ? (
           <div className="container-page py-16 text-sm text-slate-500">Загружаем страницу...</div>
@@ -291,9 +291,12 @@ function VenueProgramBlock({
   return (
     <section
       id="venue-program"
-      className={`scroll-mt-24 ${framed ? 'rounded-2xl border border-slate-200 bg-white p-5 sm:p-6' : ''}`}
+      className={`scroll-mt-24 ${framed ? 'rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6' : ''}`}
     >
-      <h2 className="mb-3 text-xl font-bold tracking-tight text-slate-950 sm:text-2xl">{title}</h2>
+      <h2 className="mb-1 font-display text-xl font-extrabold tracking-tight text-zinc-950 sm:text-2xl">
+        {title}
+      </h2>
+      <p className="mb-4 text-sm text-zinc-500">Выберите дату и купите билет на площадке</p>
       <VenueDateRail selected={selected} availableDates={availableDates} onChange={onDateChange} />
       <VenueEventsGrid groups={groups} />
     </section>

@@ -4451,7 +4451,9 @@ export function resolveEditorialVenueCover(slug: string | null | undefined): str
 
   const conventional = inferConventionalVenueImage(slug);
   if (direct && isSharedVenueFallback(direct, slug)) {
-    if (conventional) return conventional;
+    // Explicit map for this slug may intentionally reuse a suburb hero
+    // (e.g. Большой дворец → petergof.jpg). Prefer that over a guessed
+    // `{stem}.jpg` that often 404s and greys out the rail card.
     return direct;
   }
   if (direct) return direct;
