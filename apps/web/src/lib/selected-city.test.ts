@@ -53,8 +53,9 @@ test('buildCatalogHref omits default time sort and keeps explicit popular', () =
   assert.equal(buildCatalogHref({ sort: 'price_asc' }), '/events?sort=price_asc');
 });
 
-test('resolveCatalogSortSelectValue defaults unknown/random to nearest-first', () => {
+test('resolveCatalogSortSelectValue maps legacy price to cheapest-first', () => {
   assert.equal(resolveCatalogSortSelectValue('price_asc'), 'price_asc');
+  assert.equal(resolveCatalogSortSelectValue('price'), 'price_asc');
   assert.equal(resolveCatalogSortSelectValue(''), 'time');
   assert.equal(resolveCatalogSortSelectValue('random'), 'time');
 });

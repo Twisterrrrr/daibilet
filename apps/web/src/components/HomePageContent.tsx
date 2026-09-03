@@ -1,3 +1,4 @@
+import { cookies } from 'next/headers';
 import Link from 'next/link';
 import { Suspense } from 'react';
 import { ArrowRight, Dices } from 'lucide-react';
@@ -32,6 +33,7 @@ import {
 } from '@/lib/ssr-lean-payloads';
 import { getHomeArticles, getHomeCoverFingerprints, getHomePageData } from '@/server/cached-home-data';
 import { getActiveHeroBanners, heroFramesFromBanners } from '@/server/hero-banners';
+import { decodeSelectedCityCookie, SELECTED_CITY_COOKIE } from '@/lib/selected-city';
 
 /** External CDN HEAD fingerprints must not stall home TTFB on bad egress/DNS. */
 const HOME_FINGERPRINTS_TIMEOUT_MS = 800;
@@ -40,9 +42,10 @@ const HOME_ARTICLES_TIMEOUT_MS = 1_200;
 type BlogApiArticles = NonNullable<Parameters<typeof mergeBlogCards>[0]>;
 
 async function HomePageBody() {
+  const cityCookie = decodeSelectedCityCookie((await cookies()).get(SELECTED_CITY_COOKIE)?.value);
   const [{ destinationsPayload, catalogPayload, landingsCatalog }, fingerprintsRecord, articlesPayload] =
     await Promise.all([
-      getHomePageData(),
+      getHomePageData(cityCookie),
       withSoftTimeout(
         getHomeCoverFingerprints(),
         HOME_FINGERPRINTS_TIMEOUT_MS,

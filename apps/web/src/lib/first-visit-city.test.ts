@@ -17,6 +17,7 @@ import {
   shouldAttemptSilentGeo,
   shouldDeferStorageCityForGeo,
   shouldOfferFirstVisitCityPrompt,
+  shouldSkipSilentGeoOnHome,
   suggestNearestCity,
 } from './first-visit-city.ts';
 
@@ -54,6 +55,13 @@ const cities = [
 test('shouldOfferFirstVisitCityPrompt is disabled (silent geo on all viewports)', () => {
   assert.equal(shouldOfferFirstVisitCityPrompt('/'), false);
   assert.equal(shouldOfferFirstVisitCityPrompt('/cities'), false);
+});
+
+test('shouldSkipSilentGeoOnHome keeps cookie city on home and still allows catalog GPS', () => {
+  assert.equal(shouldSkipSilentGeoOnHome('/', true), true);
+  assert.equal(shouldSkipSilentGeoOnHome('/', false), false);
+  assert.equal(shouldSkipSilentGeoOnHome('/events', true), false);
+  assert.equal(shouldSkipSilentGeoOnHome('/podborki', true), false);
 });
 
 test('shouldAttemptSilentGeo includes catalog gates and account exclusions', () => {

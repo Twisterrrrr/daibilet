@@ -1286,6 +1286,11 @@ html[data-nav-pending='1'] {
     width: 100%;
   }
 
+  .catalog-meta-row select {
+    min-width: 0;
+    max-width: 100%;
+  }
+
   .catalog-page-size-toggle button {
     min-height: 0;
   }

@@ -1402,7 +1402,14 @@ function filterSessions(sessions, searchParams) {
   });
 
   const sorted = sortPublicSessions(rows, sort);
-  const arranged = sort === 'price' || sort === 'time' ? sorted : spreadCatalogSessionsByCoverImage(sorted);
+  const arranged =
+    sort === 'price' ||
+    sort === 'price_asc' ||
+    sort === 'price_desc' ||
+    sort === 'time' ||
+    sort === 'departing_soon'
+      ? sorted
+      : spreadCatalogSessionsByCoverImage(sorted);
   return {
     total: arranged.length,
     offset,
@@ -1428,11 +1435,18 @@ function buildFallbackFacets(sessions) {
 
 function sortPublicSessions(sessions, sort) {
   const sorted = [...sessions];
-  if (sort === 'price') {
+  if (sort === 'price' || sort === 'price_asc') {
     return sorted.sort((a, b) => {
       const aPrice = Number.isFinite(a.priceFrom) ? a.priceFrom : Number.POSITIVE_INFINITY;
       const bPrice = Number.isFinite(b.priceFrom) ? b.priceFrom : Number.POSITIVE_INFINITY;
       return aPrice - bPrice || comparePublicSessionTime(a, b);
+    });
+  }
+  if (sort === 'price_desc') {
+    return sorted.sort((a, b) => {
+      const aPrice = Number.isFinite(a.priceFrom) ? a.priceFrom : Number.POSITIVE_INFINITY;
+      const bPrice = Number.isFinite(b.priceFrom) ? b.priceFrom : Number.POSITIVE_INFINITY;
+      return bPrice - aPrice || comparePublicSessionTime(a, b);
     });
   }
   if (sort === 'popular') {

@@ -4396,7 +4396,14 @@ export async function buildCatalogSessions(db, searchParams) {
     });
 
   const sorted = sortCatalogSessions(rows, sort);
-  const arranged = sort === 'price' || sort === 'time' ? sorted : spreadCatalogSessionsByCoverImage(sorted);
+  const arranged =
+    sort === 'price' ||
+    sort === 'price_asc' ||
+    sort === 'price_desc' ||
+    sort === 'time' ||
+    sort === 'departing_soon'
+      ? sorted
+      : spreadCatalogSessionsByCoverImage(sorted);
   return { total: arranged.length, offset, limit, items: arranged.slice(offset, offset + limit), facets };
 }
 
@@ -4520,11 +4527,18 @@ export function spreadCatalogSessionsByCoverImage(sessions) {
 
 function sortCatalogSessions(sessions, sort) {
   const sorted = [...sessions];
-  if (sort === 'price') {
+  if (sort === 'price' || sort === 'price_asc') {
     return sorted.sort((a, b) => {
       const aPrice = Number.isFinite(a.priceFrom) ? a.priceFrom : Number.POSITIVE_INFINITY;
       const bPrice = Number.isFinite(b.priceFrom) ? b.priceFrom : Number.POSITIVE_INFINITY;
       return aPrice - bPrice || compareSessionTime(a, b);
+    });
+  }
+  if (sort === 'price_desc') {
+    return sorted.sort((a, b) => {
+      const aPrice = Number.isFinite(a.priceFrom) ? a.priceFrom : Number.POSITIVE_INFINITY;
+      const bPrice = Number.isFinite(b.priceFrom) ? b.priceFrom : Number.POSITIVE_INFINITY;
+      return bPrice - aPrice || compareSessionTime(a, b);
     });
   }
   if (sort === 'popular') {

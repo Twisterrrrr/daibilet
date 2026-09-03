@@ -440,27 +440,25 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
         <CatalogActiveFilters values={filterValues} />
       </div>
 
-      {/* Meta слева; sort только mobile; view справа */}
+      {/* Mobile: sort + view on one row. Count lives on sm+. */}
       <div
         id="catalog-results"
-        className="catalog-meta-row mt-3 scroll-mt-[calc(var(--site-header-height)+5.5rem)] flex flex-wrap items-center justify-between gap-x-3 gap-y-2 sm:mt-4"
+        className="catalog-meta-row mt-3 scroll-mt-[calc(var(--site-header-height)+5.5rem)] flex flex-col gap-2 sm:mt-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between"
       >
-        <p className="min-w-0 text-sm text-graphite-muted">
+        <p className="hidden min-w-0 text-sm text-graphite-muted sm:block">
           {loading && !catalog ? 'Загрузка…' : null}
-          {/* Event count: sm+ only - mobile keeps the row for sort + view. */}
-          <span className="hidden sm:inline">
-            {loading && catalog ? 'Обновляем… · ' : null}
-            {catalog ? (
-              <>
-                {pluralEvents(catalog.total)}
-                {catalog.items.length < catalog.total ? ` · показано ${catalog.items.length}` : ''}
-              </>
-            ) : null}
-          </span>
+          {loading && catalog ? 'Обновляем… · ' : null}
+          {catalog ? (
+            <>
+              {pluralEvents(catalog.total)}
+              {catalog.items.length < catalog.total ? ` · показано ${catalog.items.length}` : ''}
+            </>
+          ) : null}
           {error ? error : null}
         </p>
+        {error ? <p className="text-sm text-rose-600 sm:hidden">{error}</p> : null}
 
-        <div className="ml-auto flex w-full min-w-0 flex-nowrap items-center gap-2 sm:w-auto sm:flex-wrap">
+        <div className="grid w-full min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 sm:ml-auto sm:flex sm:w-auto sm:flex-nowrap">
           <div
             role="radiogroup"
             aria-label="Событий на странице"
@@ -500,7 +498,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
           <CatalogSortSelect
             value={filterValues.sort}
             disabled={(loading && !catalog) || cityBootstrapPending}
-            className="min-w-0 flex-1 md:hidden md:flex-none"
+            className="min-w-0 w-full max-w-full md:hidden"
             onChange={(sort: CatalogSort) => {
               router.push(
                 buildCatalogHref({

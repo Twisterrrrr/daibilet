@@ -78,6 +78,17 @@ export function shouldAttemptSilentGeo(pathname: string | null | undefined): boo
   return isBrowsingPath(pathname);
 }
 
+/**
+ * Home already paints cookie/storage city in SSR. Applying GPS afterwards
+ * swaps rails and looks like a glitch. Catalog indexes still override stale storage.
+ */
+export function shouldSkipSilentGeoOnHome(
+  pathname: string | null | undefined,
+  hasDisplayedCity: boolean,
+): boolean {
+  return isHomePath(pathname) && hasDisplayedCity;
+}
+
 /** @deprecated Use shouldAttemptSilentGeo */
 export const shouldAttemptMobileSilentGeo = shouldAttemptSilentGeo;
 

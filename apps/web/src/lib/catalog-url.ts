@@ -22,20 +22,28 @@ export interface CatalogFilterValues {
 }
 
 export const CATALOG_SORT_OPTIONS: Array<{ value: CatalogSort; label: string }> = [
-  { value: 'time', label: 'Сначала ближайшие' },
-  { value: 'popular', label: 'Сначала популярные' },
-  { value: 'price_asc', label: 'Сначала дешевле' },
-  { value: 'price_desc', label: 'Сначала дороже' },
+  { value: 'time', label: 'Ближайшие' },
+  { value: 'popular', label: 'Популярные' },
+  { value: 'price_asc', label: 'Дешевле' },
+  { value: 'price_desc', label: 'Дороже' },
   { value: 'departing_soon', label: 'Скоро начало' },
 ];
+
+/** Legacy `price` is cheapest-first. */
+export function normalizeCatalogSort(
+  sort: CatalogSort | string | null | undefined,
+): CatalogSort {
+  const value = String(sort || '').trim();
+  if (value === 'price') return 'price_asc';
+  if (CATALOG_SORT_OPTIONS.some((option) => option.value === value)) return value as CatalogSort;
+  return CATALOG_SORT_DEFAULT;
+}
 
 /** Resolve which option to show when URL has no sort (server default = time). */
 export function resolveCatalogSortSelectValue(
   sort: CatalogSort | string | null | undefined,
 ): CatalogSort {
-  const value = String(sort || '').trim() as CatalogSort;
-  if (CATALOG_SORT_OPTIONS.some((option) => option.value === value)) return value;
-  return CATALOG_SORT_DEFAULT;
+  return normalizeCatalogSort(sort);
 }
 
 export const CATALOG_DATE_OPTIONS = [
@@ -65,7 +73,7 @@ export function catalogFiltersFromQuery(query: CatalogFilterValues): CatalogFilt
     date: query.date && query.date !== 'all' ? query.date : undefined,
     from: query.from || undefined,
     to: query.to || undefined,
-    sort: query.sort || CATALOG_SORT_DEFAULT,
+    sort: normalizeCatalogSort(query.sort),
     limit: query.limit && CATALOG_PAGE_SIZES.includes(query.limit) ? query.limit : CATALOG_PAGE_SIZE_DEFAULT,
     minPrice: query.minPrice,
     maxPrice: query.maxPrice,

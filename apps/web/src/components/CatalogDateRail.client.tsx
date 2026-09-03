@@ -166,14 +166,12 @@ export function CatalogDateRail({ disabled = false, className = '' }: CatalogDat
       { from: filters.from, to: filters.to },
       iso,
     );
-    const single = Boolean(nextRange.from && nextRange.from === nextRange.to);
     navigate({
       ...filters,
       date: undefined,
       from: nextRange.from,
       to: nextRange.to,
       page: undefined,
-      sort: single ? 'time' : nextRange.from ? filters.sort : filters.sort,
     });
   };
 
@@ -199,7 +197,6 @@ export function CatalogDateRail({ disabled = false, className = '' }: CatalogDat
       from: orderedFrom,
       to: orderedTo,
       page: undefined,
-      sort: orderedFrom === orderedTo ? 'time' : filters.sort,
     });
     setPickerOpen(false);
   };

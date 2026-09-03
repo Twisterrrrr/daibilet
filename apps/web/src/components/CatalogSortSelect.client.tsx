@@ -42,7 +42,7 @@ export function CatalogSortSelect({
         disabled={disabled}
         aria-label="Сортировка"
         onChange={(event) => onChange(event.target.value as CatalogSort)}
-        className={`w-full min-w-0 appearance-none truncate rounded-full border-0 bg-[#F5F5F7] font-medium text-slate-800 outline-none transition hover:bg-slate-200/70 focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-60 ${pad}`}
+        className={`w-full min-w-0 max-w-full appearance-none truncate rounded-full border-0 bg-[#F5F5F7] font-medium text-slate-800 outline-none transition hover:bg-slate-200/70 focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-60 ${pad}`}
       >
         {CATALOG_SORT_OPTIONS.map((option) => (
           <option key={option.value} value={option.value}>

@@ -9,6 +9,7 @@ import type {
 import { HOME_PAGE_CACHE_TAG, PUBLIC_PAGE_REVALIDATE } from '@/server/cache-config';
 import { resolveCoverContentFingerprints } from '@/server/cover-image-fingerprint';
 import { fetchPublicApiJson } from '@/server/public-api-client';
+import { matchDestination } from '@/lib/selected-city';
 
 export { HOME_PAGE_CACHE_TAG };
 
@@ -54,17 +55,39 @@ export const getHomeDestinations = unstable_cache(
   homeCacheOptions,
 );
 
+function homeCatalogSearchParams(citySlug?: string | null) {
+  const city = String(citySlug || '').trim();
+  return city
+    ? { limit: 56, sort: 'popular' as const, city }
+    : { limit: 56, sort: 'popular' as const };
+}
+
 export const getHomeCatalog = unstable_cache(
   // Wider pool so cover-content dedupe can refill rails after skipping identical binaries.
   // 56 is enough for editors + now-tabs + popular after city filter; keeps RSC flight smaller.
   () =>
     fetchPublicApiJson<PublicCatalogDto>('/api/public/events', {
-      searchParams: { limit: 56, sort: 'popular' },
+      searchParams: homeCatalogSearchParams(),
       timeoutMs: 5_000,
     }),
-  ['home-catalog-v8-http'],
+  ['home-catalog-v9-http'],
   homeCacheOptions,
 );
+
+export async function getHomeCatalogForCity(citySlug?: string | null): Promise<PublicCatalogDto> {
+  const city = String(citySlug || '').trim();
+  if (!city) return getHomeCatalog();
+  const cached = unstable_cache(
+    () =>
+      fetchPublicApiJson<PublicCatalogDto>('/api/public/events', {
+        searchParams: homeCatalogSearchParams(city),
+        timeoutMs: 5_000,
+      }),
+    ['home-catalog-v9-http', city],
+    homeCacheOptions,
+  );
+  return cached();
+}
 
 /**
  * S3 HEAD ETag fingerprints for home rails dedupe.
@@ -116,19 +139,21 @@ export const getHomeArticles = unstable_cache(
 );
 
 /** Partial failure must not wipe the whole home — use allSettled + empty fallbacks. */
-export async function getHomePageData(): Promise<HomePageData> {
+export async function getHomePageData(cityHint?: string | null): Promise<HomePageData> {
   const empty = emptyHomePageData();
-  // Home UI only needs destinations + catalog + landings. Venues/stats were fetched
-  // but unused (and venues?limit=200 often hit 5s API timeouts under load).
-  const [destinationsResult, catalogResult, landingsResult] = await Promise.allSettled([
-    getHomeDestinations(),
-    getHomeCatalog(),
+  const destinationsResult = await Promise.allSettled([getHomeDestinations()]);
+  const destinationsPayload =
+    destinationsResult[0]?.status === 'fulfilled' ? destinationsResult[0].value : empty.destinationsPayload;
+  const matched = matchDestination(destinationsPayload.destinations, cityHint);
+  const citySlug = matched?.slug || matched?.sourceSlug || null;
+
+  const [catalogResult, landingsResult] = await Promise.allSettled([
+    getHomeCatalogForCity(citySlug),
     getHomeLandings(),
   ]);
 
   return {
-    destinationsPayload:
-      destinationsResult.status === 'fulfilled' ? destinationsResult.value : empty.destinationsPayload,
+    destinationsPayload,
     catalogPayload: catalogResult.status === 'fulfilled' ? catalogResult.value : empty.catalogPayload,
     landingsCatalog: landingsResult.status === 'fulfilled' ? landingsResult.value : empty.landingsCatalog,
   };

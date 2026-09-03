@@ -27,6 +27,7 @@ import {
   readBrowserPosition,
   shouldAttemptSilentGeo,
   shouldDeferStorageCityForGeo,
+  shouldSkipSilentGeoOnHome,
   suggestNearestCity,
 } from '@/lib/first-visit-city';
 import {
@@ -316,7 +317,8 @@ export function SelectedCityProvider({
     if (matched?.name) persistSelectedCity(matched.name);
   }, [destinations, pathname]);
 
-  // Session geo: all viewports, once per tab. GPS wins over stale storage (e.g. Moscow while in SPB).
+  // Session geo: all viewports, once per tab. GPS wins over stale storage on catalog
+  // indexes. Home keeps cookie/storage city so rails do not swap after first paint.
   useEffect(() => {
     if (!cityReady || pendingConfirm) return;
     if (!shouldAttemptSilentGeo(pathname)) return;
@@ -325,6 +327,8 @@ export function SelectedCityProvider({
     if (parsePodborkiCityHubPath(pathname)) return;
     if (resolveLandingRouteFromLocation(pathname)?.citySlug) return;
     if (readsCityQueryParam(pathname) && urlCity) return;
+    const displayedCity = cityLabel !== 'Все города' || Boolean(readStoredSelectedCity(destinations));
+    if (shouldSkipSilentGeoOnHome(pathname, displayedCity)) return;
     if (geoAttemptedRef.current) return;
     geoAttemptedRef.current = true;
 
@@ -364,7 +368,7 @@ export function SelectedCityProvider({
       cancelled = true;
       setGeoBootstrapPending(false);
     };
-  }, [cityReady, destinations, pathname, pendingConfirm, urlCity]);
+  }, [cityLabel, cityReady, destinations, pathname, pendingConfirm, urlCity]);
 
   const cityValue = cityLabel === 'Все города' ? 'all' : cityLabel;
   const selectedDestination = useMemo(
