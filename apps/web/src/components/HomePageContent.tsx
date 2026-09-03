@@ -33,7 +33,7 @@ import {
 } from '@/lib/ssr-lean-payloads';
 import { getHomeArticles, getHomeCoverFingerprints, getHomePageData } from '@/server/cached-home-data';
 import { getActiveHeroBanners, heroFramesFromBanners } from '@/server/hero-banners';
-import { decodeSelectedCityCookie, SELECTED_CITY_COOKIE } from '@/lib/selected-city';
+import { decodeSelectedCityCookie, matchDestination, SELECTED_CITY_COOKIE } from '@/lib/selected-city';
 
 /** External CDN HEAD fingerprints must not stall home TTFB on bad egress/DNS. */
 const HOME_FINGERPRINTS_TIMEOUT_MS = 800;
@@ -61,6 +61,9 @@ async function HomePageBody() {
     ]);
 
   const destinations = destinationsPayload?.destinations ?? [];
+  const ssrCity = matchDestination(destinations, cityCookie);
+  const ssrCityName = ssrCity?.name || null;
+  const ssrCitySlug = ssrCity?.slug || ssrCity?.sourceSlug || null;
   const cities = destinations.filter((item) => item.type === 'city');
   // Top by events, then pin Moscow + SPB first so the rail can center that pair on load.
   const topCities = orderPopularRailCities(cities, 12).map(toSlimCityDestination);
@@ -124,6 +127,8 @@ async function HomePageBody() {
         frames={heroFrames}
         expandStaticRotator={useStaticPoolRotator}
         landings={heroLandings}
+        ssrCityName={ssrCityName}
+        ssrCitySlug={ssrCitySlug}
       />
 
       {/* Rhythm: editors → cities → My Day */}
@@ -131,6 +136,7 @@ async function HomePageBody() {
         sessions={sessions}
         fingerprints={fingerprints}
         sparseCatalog={sparseCatalog}
+        ssrCityName={ssrCityName}
       >
         <>
           {topCities.length ? (

@@ -69,9 +69,9 @@ export function CatalogSortSelect({
         disabled={disabled}
         aria-haspopup="listbox"
         aria-expanded={open}
-        aria-label={`Сортировка: ${selectedLabel}`}
+        className={`inline-flex max-w-full items-center gap-1 truncate rounded-full border-0 bg-[#F5F5F7] font-medium text-slate-800 outline-none transition hover:bg-slate-200/70 focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-60 ${pad}`}
+        aria-label="Сортировка"
         onClick={() => setOpen((prev) => !prev)}
-        className={`inline-flex max-w-full items-center gap-1 truncate rounded-full border-0 bg-[#F5F5F7] font-medium text-slate-800 outline-none transition hover:bg-slate-200/70 focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-60 ${pad} w-full justify-between`}
       >
         <span className="min-w-0 truncate">{selectedLabel}</span>
         <ChevronDown
@@ -86,7 +86,7 @@ export function CatalogSortSelect({
         <ul
           role="listbox"
           aria-labelledby={selectId}
-          className="absolute left-0 right-0 z-40 mt-1 overflow-hidden rounded-2xl border border-slate-200 bg-white py-1 shadow-lg"
+          className="absolute left-0 z-40 mt-1 min-w-[12.5rem] overflow-hidden rounded-2xl border border-slate-200 bg-white py-1 shadow-lg"
         >
           {CATALOG_SORT_OPTIONS.map((option) => {
             const active = option.value === selected;

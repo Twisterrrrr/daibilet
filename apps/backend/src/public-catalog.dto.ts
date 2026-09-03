@@ -199,7 +199,14 @@ export async function buildPublicCatalogDto(query: PublicCatalogQuery): Promise<
   // Favorites / ids lookup: allow sessions without cover; normal catalog stays cover-gated.
   const sourceSessions = byIds ? sessions : sessions.filter(sessionHasCoverImage);
   const filtered = sourceSessions.filter((session) => matchesCatalogQuery(session, query));
-  const sorted = sortCatalogSessions(filtered, query.sort || 'time', query);
+  const sortKey = query.sort || 'time';
+  // City/scoped lists are small enough to hydrate next-session times before sort.
+  // National dumps stay page-hydrated so we do not Prisma-scan thousands of rows.
+  const hydrateAllForSort = Boolean(query.city) || filtered.length <= 600;
+  const ranked = hydrateAllForSort
+    ? await hydrateCatalogUpcomingSlots(filtered, LIST_SLOT_PREVIEW_LIMIT)
+    : filtered;
+  const sorted = sortCatalogSessions(ranked, sortKey, query);
   const defaultLimit = byIds ? Math.min(Math.max(query.ids!.length, 1), CATALOG_PAGE_SIZE_MAX) : CATALOG_PAGE_SIZE_DEFAULT;
   const limit = clampNumber(query.limit, 1, CATALOG_PAGE_SIZE_MAX, defaultLimit);
   const total = sorted.length;
@@ -213,10 +220,10 @@ export async function buildPublicCatalogDto(query: PublicCatalogQuery): Promise<
         : 0;
   const offset = Math.min(rawOffset, maxOffset);
   const pageRows = sorted.slice(offset, offset + limit);
-  const hydratedPage = await hydrateCatalogUpcomingSlots(pageRows, LIST_SLOT_PREVIEW_LIMIT);
-  // Slot hydrate can replace startsAt with the real next session - re-order the page
-  // so «Ближайшие» / price match the dates on the cards.
-  const orderedPage = orderHydratedCatalogPage(hydratedPage, query.sort || 'time');
+  const hydratedPage = hydrateAllForSort
+    ? pageRows
+    : await hydrateCatalogUpcomingSlots(pageRows, LIST_SLOT_PREVIEW_LIMIT);
+  const orderedPage = orderHydratedCatalogPage(hydratedPage, sortKey);
   const items = orderedPage.map(toPublicCatalogListItem);
   // Facets are conditional: each dimension counts against sibling filters (not the full catalog).
   const facets = buildConditionalCatalogFacets(sourceSessions, query);
@@ -1032,13 +1039,14 @@ function sortCatalogSessions(
     result = dedupeCatalogNearDuplicates(result);
   }
 
-  // Chronological and price sorts must keep order. Cover-spread was shuffling «ближайшие».
+  // Chronological, price and popular must keep order. Cover-spread was shuffling «ближайшие» / «популярные».
   if (
     sort === 'price' ||
     sort === 'price_asc' ||
     sort === 'price_desc' ||
     sort === 'time' ||
-    sort === 'departing_soon'
+    sort === 'departing_soon' ||
+    sort === 'popular'
   ) {
     return result;
   }
@@ -1081,7 +1089,7 @@ function compareCatalogOrder(
 }
 
 /** Re-order a hydrated page so card dates match the selected sort (no spread/dedupe). */
-function orderHydratedCatalogPage(
+export function orderHydratedCatalogPage(
   sessions: PublicSessionDto[],
   sort: NonNullable<PublicCatalogQuery['sort']>,
 ): PublicSessionDto[] {

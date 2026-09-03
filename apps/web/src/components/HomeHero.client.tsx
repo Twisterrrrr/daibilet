@@ -40,6 +40,9 @@ type HomeHeroProps = {
   expandStaticRotator?: boolean;
   landings?: Array<Pick<PublicLandingDto, 'slug' | 'title' | 'events' | 'priceFrom'> & { subtitle?: string }>;
   videoSrc?: string | null;
+  /** Cookie city so H1 / chips match SSR and do not jump after hydrate. */
+  ssrCityName?: string | null;
+  ssrCitySlug?: string | null;
 };
 
 export function HomeHero({
@@ -48,6 +51,8 @@ export function HomeHero({
   expandStaticRotator = true,
   landings = [],
   videoSrc,
+  ssrCityName = null,
+  ssrCitySlug = null,
 }: HomeHeroProps) {
   const router = useRouter();
   const selectedCity = useSelectedCityOptional();
@@ -83,23 +88,23 @@ export function HomeHero({
       ]);
     };
     if (typeof window === 'undefined') return;
-    const win = window as Window & {
-      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
-      cancelIdleCallback?: (id: number) => void;
-    };
-    if (typeof win.requestIdleCallback === 'function') {
-      const id = win.requestIdleCallback(expand, { timeout: 2500 });
-      return () => win.cancelIdleCallback?.(id);
-    }
-    const timer = window.setTimeout(expand, 400);
+    // Keep the LCP photo on screen; expanding the pool immediately looks like a glitch.
+    const timer = window.setTimeout(expand, 8000);
     return () => window.clearTimeout(timer);
   }, [expandStaticRotator, frames, videoSrc]);
 
-  const selectedCityName = selectedDestination?.name || null;
+  const selectedCityName =
+    selectedDestination?.name ||
+    (destination !== 'all' && selectedCity?.cityLabel && selectedCity.cityLabel !== 'Все города'
+      ? selectedCity.cityLabel
+      : null) ||
+    (selectedCity?.cityReady === false ? ssrCityName : null) ||
+    (!selectedCity ? ssrCityName : null);
   const citySlug =
     normalizeKnownCitySlug(selectedDestination?.slug) ||
     normalizeKnownCitySlug(selectedDestination?.sourceSlug) ||
-    (destination !== 'all' ? normalizeKnownCitySlug(destination) || destination : null);
+    (destination !== 'all' ? normalizeKnownCitySlug(destination) || destination : null) ||
+    (selectedCity?.cityReady === false || !selectedCity ? ssrCitySlug : null);
 
   const quickChips = useMemo(
     () =>

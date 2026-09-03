@@ -61,7 +61,6 @@ export function HeroMedia({
         />
       ) : active ? (
         <SafeImage
-          key={active.src}
           src={active.src}
           alt={active.alt || ''}
           fill

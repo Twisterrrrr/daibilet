@@ -16,11 +16,14 @@ export function HomeCityAwareSections({
   sessions,
   fingerprints,
   sparseCatalog,
+  ssrCityName = null,
   children,
 }: {
   sessions: PublicSession[];
   fingerprints: Record<string, string>;
   sparseCatalog: boolean;
+  /** Cookie city used for the SSR catalog - keep rails stable until header catches up. */
+  ssrCityName?: string | null;
   /** Inserted after «Выбор редакции» (e.g. popular cities). Must be ReactNode - not a render prop (RSC). */
   children?: ReactNode;
 }) {
@@ -32,15 +35,20 @@ export function HomeCityAwareSections({
       ? null
       : selectedCity?.selectedDestination?.name ||
         (selectedCity?.cityLabel !== 'Все города' ? selectedCity?.cityLabel : null) ||
+        ssrCityName ||
         null;
   const citySlug = selectedCity?.selectedDestination?.slug || null;
 
   const fingerprintMap = useMemo(() => new Map(Object.entries(fingerprints || {})), [fingerprints]);
 
   const scopedSessions = useMemo(() => {
-    if (!cityReady || !cityName || cityValue === 'all') return sessions;
+    // SSR payload is already city-scoped when the cookie matched. Re-filtering
+    // on hydrate drops rows with messy citySlug and looks like a city swap.
+    if (!cityReady) return sessions;
+    if (!cityName || cityValue === 'all') return sessions;
+    if (ssrCityName && ssrCityName === cityName) return sessions;
     return filterSessionsByCity(sessions as PublicSessionDto[], cityName, citySlug) as PublicSession[];
-  }, [sessions, cityReady, cityName, citySlug, cityValue]);
+  }, [sessions, cityReady, cityName, citySlug, cityValue, ssrCityName]);
 
   const { editorsPick, homeNowTabs, popular } = useMemo(
     () =>

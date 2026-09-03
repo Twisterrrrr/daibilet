@@ -458,7 +458,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
         </p>
         {error ? <p className="text-sm text-rose-600 sm:hidden">{error}</p> : null}
 
-        <div className="grid w-full min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 sm:ml-auto sm:flex sm:w-auto sm:flex-nowrap">
+        <div className="flex w-full min-w-0 flex-nowrap items-center justify-end gap-2 sm:ml-auto sm:w-auto">
           <div
             role="radiogroup"
             aria-label="Событий на странице"
@@ -499,7 +499,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
             id="catalog-sort-mobile"
             value={filterValues.sort}
             disabled={(loading && !catalog) || cityBootstrapPending}
-            className="min-w-0 w-full max-w-full md:hidden"
+            className="min-w-0 shrink md:hidden"
             onChange={(sort: CatalogSort) => {
               router.push(
                 buildCatalogHref({
