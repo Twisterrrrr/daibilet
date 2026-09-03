@@ -4,14 +4,19 @@ import Image, { type ImageProps } from 'next/image';
 import * as React from 'react';
 
 import { blogListingImageFallbacks, listingImageFallbacks } from '@/lib/card-image';
+import {
+  CATALOG_EVENT_CARD_HORIZONTAL_SIZES,
+  CATALOG_EVENT_CARD_SIZES,
+  CATALOG_IMAGE_QUALITY,
+} from '@/lib/catalog-image-sizes';
 import { shouldBypassNextImageOptimizer } from '@/lib/remote-image-bypass';
 import { venueCardImageFallbacks } from '@/lib/venue-card-image';
 
+export { CATALOG_IMAGE_QUALITY } from '@/lib/catalog-image-sizes';
+
 export const IMAGE_SIZES = {
-  /** Catalog / home event cards in grids */
-  eventCard: '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw',
-  /** Horizontal list thumb (sm:w-80) */
-  eventCardHorizontal: '(max-width: 640px) 100vw, 20rem',
+  eventCard: CATALOG_EVENT_CARD_SIZES,
+  eventCardHorizontal: CATALOG_EVENT_CARD_HORIZONTAL_SIZES,
   /** Editorial city hub poster 4:5 */
   affichePoster: '(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw',
   cityCard: '(max-width: 640px) 68vw, (max-width: 1024px) 218px, 229px',

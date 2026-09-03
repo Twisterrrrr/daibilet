@@ -24,7 +24,7 @@ import {
 } from '@/lib/catalog-interstitials';
 import { useCatalogGridColumnCount } from '@/lib/catalog-grid-columns';
 import { collapseCatalogComboFamilies } from '@/lib/home-showcase-sections';
-import { IMAGE_SIZES, CardSafeImage } from '@/components/SafeImage.client';
+import { CATALOG_IMAGE_QUALITY, IMAGE_SIZES, CardSafeImage } from '@/components/SafeImage.client';
 import { useCatalogFiltersLayout } from '@/components/CatalogSidebarLayout.client';
 
 /** First N catalog cards load images eagerly (LCP / perceived speed). */
@@ -340,6 +340,7 @@ function CatalogLiveRail({
                     alt={formatPublicTitle(session.title)}
                     fill
                     sizes={IMAGE_SIZES.eventCard}
+                    quality={CATALOG_IMAGE_QUALITY}
                     priority={index < CATALOG_IMAGE_PRIORITY_COUNT}
                     loading={index < CATALOG_IMAGE_PRIORITY_COUNT ? undefined : 'lazy'}
                     className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
