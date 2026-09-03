@@ -166,11 +166,10 @@ export function InstitutionVenueLayout({
   const wayTipRaw = nonEmptyLogisticsText(venue.wayToFind);
   const wayTip =
     wayTipRaw && !isAddressEchoWayToFind(wayTipRaw, venue.address, venue.city) ? wayTipRaw : null;
-  const primaryCta = hasInternalLcTickets
+  /** Only real admission CTA - no «Выбрать событие» scroll bait in hero/sidebar. */
+  const admissionCta = hasInternalLcTickets
     ? ({ href: '#venue-admission', label: 'К билетам' } as const)
-    : hasAfisha
-      ? ({ href: '#venue-program', label: 'Выбрать событие' } as const)
-      : null;
+    : null;
   const heroBadges = React.useMemo(() => {
     const badges: string[] = [];
     if (typeLabel) badges.push(typeLabel);
@@ -287,15 +286,15 @@ export function InstitutionVenueLayout({
 
             {/* Sticky footer covers mobile CTA */}
             <div className="hidden flex-col items-start gap-2 md:flex md:items-end">
-              {primaryCta ? (
+              {admissionCta ? (
                 <a
-                  href={primaryCta.href}
+                  href={admissionCta.href}
                   className={`inline-flex items-center gap-2 rounded-full px-6 py-3 font-bold shadow-lg transition hover:opacity-95 ${
                     isTheatre ? 'bg-rose-500 text-white hover:bg-rose-600' : 'bg-white text-slate-900 hover:bg-slate-100'
                   }`}
                 >
                   <Ticket className="h-4 w-4" />
-                  {primaryCta.label}
+                  {admissionCta.label}
                 </a>
               ) : null}
               <AddToDayRouteButton
@@ -495,31 +494,6 @@ export function InstitutionVenueLayout({
 
         <aside className="scroll-mt-24 lg:sticky lg:top-[calc(var(--site-header-height)+3.5rem)] lg:self-start">
           <div className="space-y-4">
-            {primaryCta ? (
-              <div
-                className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm"
-                data-venue-quick-action
-              >
-                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
-                  Быстрое действие
-                </p>
-                <a
-                  href={primaryCta.href}
-                  className={`mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-bold text-white shadow-md transition hover:opacity-95 ${
-                    isTheatre ? 'bg-rose-600 hover:bg-rose-700' : 'bg-primary-600 hover:bg-primary-700'
-                  }`}
-                >
-                  <Ticket className="h-4 w-4" />
-                  {primaryCta.label}
-                </a>
-                {hasAfisha ? (
-                  <p className="mt-2 text-center text-xs text-zinc-500">
-                    {sessions.length} {sessions.length === 1 ? 'событие' : 'событий'} в афише
-                  </p>
-                ) : null}
-              </div>
-            ) : null}
-
             <div id="contacts" className="scroll-mt-24 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm">
               <div className="space-y-3 p-5">
                 <div className="text-sm font-semibold text-zinc-950">Где находится</div>
@@ -685,15 +659,15 @@ export function InstitutionVenueLayout({
       ) : null}
 
       <MobileStickyActionBar>
-        {primaryCta ? (
+        {admissionCta ? (
           <a
-            href={primaryCta.href}
+            href={admissionCta.href}
             className={`inline-flex h-11 w-full items-center justify-center gap-2 rounded-full px-5 text-sm font-bold text-white shadow-lg ${
               isTheatre ? 'bg-rose-600 hover:bg-rose-700' : 'bg-primary-600 hover:bg-primary-700'
             }`}
           >
             <Ticket className="h-4 w-4" />
-            {primaryCta.label}
+            {admissionCta.label}
           </a>
         ) : (
           <AddToDayRouteButton
