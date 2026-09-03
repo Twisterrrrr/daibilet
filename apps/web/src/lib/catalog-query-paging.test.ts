@@ -50,12 +50,18 @@ test('buildCatalogApiSearchParams maps page + limit for load-more (50/100/200)',
   for (const limit of [50, 100, 200] as const) {
     const page1 = buildCatalogApiSearchParams({ city: 'moscow', limit }, 1);
     assert.equal(page1.get('page'), null);
+    assert.equal(page1.get('offset'), null);
     assert.equal(page1.get('limit'), limit === 50 ? null : String(limit));
 
     const page2 = buildCatalogApiSearchParams({ city: 'moscow', limit }, 2);
     assert.equal(page2.get('page'), '2');
+    assert.equal(page2.get('offset'), String(limit));
     assert.equal(parseCatalogApiQuery(page2).offset, limit);
     assert.equal(parseCatalogApiQuery(page2).limit, limit);
+
+    const page3 = buildCatalogApiSearchParams({ city: 'moscow', limit }, 3);
+    assert.equal(page3.get('offset'), String(limit * 2));
+    assert.equal(parseCatalogApiQuery(page3).offset, limit * 2);
   }
 });
 

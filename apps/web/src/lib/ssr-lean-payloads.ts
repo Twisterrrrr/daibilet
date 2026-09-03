@@ -8,20 +8,16 @@ import type {
 
 /** Nearest slots on home rails - enough for «сегодня/завтра» tabs. */
 const HOME_SLOT_LIMIT = 3;
-/** Catalog SSR: keep CTA purchase URLs, drop blurb (grid cards ignore it). */
+/** Catalog SSR: keep CTA purchase URLs. Description stays full for list view (owner: no ellipsis). */
 const CATALOG_SLOT_LIMIT = 4;
-/** List/horizontal cards may show a short excerpt; keep far under API 200-char blurbs. */
-const CATALOG_SSR_DESCRIPTION_MAX = 120;
 
 type CatalogCardSession = PublicSessionDto | PublicCatalogListItemDto;
 
-function clipSsrDescription(value?: string | null): string | undefined {
+function normalizeSsrDescription(value?: string | null): string | undefined {
   const plain = String(value || '')
     .replace(/\s+/g, ' ')
     .trim();
-  if (!plain) return undefined;
-  if (plain.length <= CATALOG_SSR_DESCRIPTION_MAX) return plain;
-  return `${plain.slice(0, CATALOG_SSR_DESCRIPTION_MAX - 1).trimEnd()}…`;
+  return plain || undefined;
 }
 
 /**
@@ -133,7 +129,7 @@ export function toCatalogSsrItem(session: PublicCatalogListItemDto): PublicCatal
   if (session.purchaseProvider != null) item.purchaseProvider = session.purchaseProvider;
   if (session.purchaseUrl != null) item.purchaseUrl = session.purchaseUrl;
   if (session.widgetUrl != null) item.widgetUrl = session.widgetUrl;
-  const description = clipSsrDescription(session.description);
+  const description = normalizeSsrDescription(session.description);
   if (description) item.description = description;
 
   return item;

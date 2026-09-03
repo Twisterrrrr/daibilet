@@ -19,10 +19,11 @@ export interface CatalogFilterValues {
 }
 
 export const CATALOG_SORT_OPTIONS: Array<{ value: CatalogSort; label: string }> = [
-  { value: 'time', label: 'По времени' },
+  { value: 'time', label: 'Сначала ближайшие' },
+  { value: 'popular', label: 'Сначала популярные' },
+  { value: 'price_asc', label: 'Сначала дешевле' },
+  { value: 'price_desc', label: 'Сначала дороже' },
   { value: 'departing_soon', label: 'Скоро начало' },
-  { value: 'price_asc', label: 'Дешевле' },
-  { value: 'popular', label: 'Популярное' },
 ];
 
 export const CATALOG_DATE_OPTIONS = [

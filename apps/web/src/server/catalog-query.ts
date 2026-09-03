@@ -181,13 +181,19 @@ export function buildCatalogApiSearchParams(
   if (filters.from) params.set('from', filters.from);
   if (filters.to) params.set('to', filters.to);
   if (filters.sort && filters.sort !== 'random') params.set('sort', filters.sort);
-  if (filters.limit && filters.limit !== CATALOG_PAGE_SIZE_DEFAULT) {
-    params.set('limit', String(filters.limit));
+  const limit = filters.limit && filters.limit > 0 ? filters.limit : CATALOG_PAGE_SIZE_DEFAULT;
+  if (limit !== CATALOG_PAGE_SIZE_DEFAULT) {
+    params.set('limit', String(limit));
   }
   if (filters.minPrice != null) params.set('minPrice', String(filters.minPrice));
   if (filters.maxPrice != null) params.set('maxPrice', String(filters.maxPrice));
   if (filters.ageMax != null && filters.ageMax >= 0) params.set('ageMax', String(filters.ageMax));
-  if (page > 1) params.set('page', String(page));
+  const safePage = Math.max(1, page);
+  // Nginx often proxies `/api/public/events` straight to backend, which pages by `offset`
+  // (not `page`). Always send offset so «Показать ещё» does not re-fetch page 1.
+  const offset = safePage > 1 ? (safePage - 1) * limit : 0;
+  if (offset > 0) params.set('offset', String(offset));
+  if (safePage > 1) params.set('page', String(safePage));
   return params;
 }
 

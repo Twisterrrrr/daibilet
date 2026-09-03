@@ -204,7 +204,14 @@ export async function buildPublicCatalogDto(query: PublicCatalogQuery): Promise<
   const limit = clampNumber(query.limit, 1, CATALOG_PAGE_SIZE_MAX, defaultLimit);
   const total = sorted.length;
   const maxOffset = total > 0 ? Math.floor((total - 1) / limit) * limit : 0;
-  const offset = Math.min(clampNumber(query.offset, 0, 100000, 0), maxOffset);
+  // Prefer explicit offset; otherwise map `page` (catalog UI «Показать ещё»).
+  const rawOffset =
+    query.offset != null
+      ? clampNumber(query.offset, 0, 100000, 0)
+      : query.page != null && query.page > 1
+        ? (Math.max(1, query.page) - 1) * limit
+        : 0;
+  const offset = Math.min(rawOffset, maxOffset);
   const pageRows = sorted.slice(offset, offset + limit);
   const hydratedPage = await hydrateCatalogUpcomingSlots(pageRows, LIST_SLOT_PREVIEW_LIMIT);
   const items = hydratedPage.map(toPublicCatalogListItem);

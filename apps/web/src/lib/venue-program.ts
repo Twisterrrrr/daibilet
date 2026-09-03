@@ -182,7 +182,8 @@ function applyMonthFilterToGroup(group: VenueEventGroup, monthKey: string): Venu
     return {
       ...group,
       representative,
-      visibleSlots: matchingSlots.slice(0, 4),
+      // Keep every slot - playbill renders one row per session (18:00 and 21:00 separately).
+      visibleSlots: matchingSlots,
       firstStartsAt: representative.startsAt,
       hasSlotsOnSelectedDate: true,
     };
@@ -192,6 +193,43 @@ function applyMonthFilterToGroup(group: VenueEventGroup, monthKey: string): Venu
     visibleSlots: [],
     hasSlotsOnSelectedDate: false,
   };
+}
+
+export type VenuePlaybillEntry = {
+  key: string;
+  title: string;
+  category: string;
+  session: PublicSessionDto;
+};
+
+/** Flatten grouped program into one playbill row per purchasable time slot. */
+export function expandVenuePlaybillEntries(groups: VenueEventGroup[]): VenuePlaybillEntry[] {
+  const entries: VenuePlaybillEntry[] = [];
+  const seen = new Set<string>();
+
+  for (const group of groups) {
+    const slots =
+      group.visibleSlots.length > 0
+        ? group.visibleSlots
+        : listPurchasableSessionVariants(group.sessions);
+    const list = slots.length ? slots : [group.representative];
+    for (const session of list) {
+      const dedupe = `${session.id}|${session.startsAt || ''}|${String(session.timeLabel || '').trim()}`;
+      if (seen.has(dedupe)) continue;
+      seen.add(dedupe);
+      entries.push({
+        key: `${group.key}:${dedupe}`,
+        title: group.title || session.title || session.eventTitle || '',
+        category: group.category || session.category || '',
+        session,
+      });
+    }
+  }
+
+  return entries.sort(
+    (a, b) =>
+      new Date(a.session.startsAt || 0).getTime() - new Date(b.session.startsAt || 0).getTime(),
+  );
 }
 
 /**
@@ -291,7 +329,7 @@ function groupVenueSessions(sessions: PublicSessionDto[]): VenueEventGroup[] {
         tags: representative.tags || [],
         representative,
         sessions: groupSessions,
-        visibleSlots: variants.slice(0, 4),
+        visibleSlots: variants,
         priceFrom: prices.length ? Math.min(...prices) : null,
         vacant: Number.isFinite(representative.vacant) ? representative.vacant : vacantValues.length ? Math.min(...vacantValues) : null,
         firstStartsAt: representative.startsAt,
@@ -309,7 +347,7 @@ function applyDateFilterToGroup(group: VenueEventGroup, targetDate: string | nul
     return {
       ...group,
       representative,
-      visibleSlots: variants.slice(0, 4),
+      visibleSlots: variants,
       firstStartsAt: representative.startsAt,
       hasSlotsOnSelectedDate: true,
     };
@@ -317,11 +355,11 @@ function applyDateFilterToGroup(group: VenueEventGroup, targetDate: string | nul
 
   const matchingSlots = variants.filter((session) => sessionDateKey(session) === targetDate);
   if (matchingSlots.length) {
-    const representative = pickPurchasableTcSession(matchingSlots) || matchingSlots[0];
+    const representative = pickPurchasableTcSession(matchingSlots) || matchingSlots[0]!;
     return {
       ...group,
       representative,
-      visibleSlots: matchingSlots.slice(0, 4),
+      visibleSlots: matchingSlots,
       firstStartsAt: representative.startsAt,
       hasSlotsOnSelectedDate: true,
     };
@@ -337,7 +375,7 @@ function applyDateFilterToGroup(group: VenueEventGroup, targetDate: string | nul
   return {
     ...group,
     representative: nextSlot,
-    visibleSlots: nextVariants.length ? nextVariants.slice(0, 4) : variants.slice(0, 1),
+    visibleSlots: nextVariants.length ? nextVariants : variants.slice(0, 1),
     firstStartsAt: nextSlot.startsAt,
     hasSlotsOnSelectedDate: false,
   };

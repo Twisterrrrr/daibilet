@@ -4346,7 +4346,14 @@ function resolveCityCardImageFromSlug(slug) {
 
 export async function buildCatalogSessions(db, searchParams) {
   const limit = clampNumber(searchParams.get('limit'), 1, 300, 100);
-  const offset = clampNumber(searchParams.get('offset'), 0, 100000, 0);
+  const page = clampNumber(searchParams.get('page'), 1, 100000, 1);
+  const offsetRaw = searchParams.get('offset');
+  const offset =
+    offsetRaw != null && String(offsetRaw).trim() !== ''
+      ? clampNumber(offsetRaw, 0, 100000, 0)
+      : page > 1
+        ? (page - 1) * limit
+        : 0;
   const query = String(searchParams.get('q') || '').trim().toLowerCase();
   const destination = searchParams.get('destination');
   const city = searchParams.get('city');

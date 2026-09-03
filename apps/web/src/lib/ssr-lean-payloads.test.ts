@@ -51,10 +51,11 @@ describe('ssr-lean-payloads', () => {
     assert.equal(lean.tags.length, 4);
   });
 
-  it('toCatalogSsrItem clips blurb but keeps purchase CTA', () => {
-    const lean = toCatalogSsrItem(sampleSession());
-    assert.ok(lean.description);
-    assert.ok((lean.description?.length || 0) <= 120);
+  it('toCatalogSsrItem keeps full blurb and purchase CTA', () => {
+    const long =
+      'Три опытных комика проверят свои шутки. Состав: Глеб Капелюх, Влад Васильев, Юля Чеснокова. Приобретая билет и посещая мероприятие, вы даете согласие на осуществление организатором и третьими лицами фото- и видеосъемки.';
+    const lean = toCatalogSsrItem(sampleSession({ description: long }));
+    assert.equal(lean.description, long);
     assert.equal(lean.deeplinkUrl, undefined);
     assert.equal(lean.purchaseUrl, 'https://example.com/buy');
     assert.ok((lean.upcomingSlots?.length || 0) <= 4);

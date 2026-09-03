@@ -271,7 +271,7 @@ export function EventCardHorizontal({
         </h3>
 
         {descriptionText ? (
-          <p className="line-clamp-2 text-ui-xs text-graphite-muted sm:text-ui-sm">{descriptionText}</p>
+          <p className="text-ui-xs leading-relaxed text-graphite-muted sm:text-ui-sm">{descriptionText}</p>
         ) : null}
 
         {(session.category || highlights.length > 0) && (

@@ -26,9 +26,9 @@ import {
 } from '@/lib/catalog-category-rail';
 
 import type { PublicCatalogDto } from '@daibilet/contracts/public';
+import { CatalogSortSelect } from '@/components/CatalogSortSelect.client';
 import {
   buildCatalogHref,
-  CATALOG_SORT_OPTIONS,
   catalogFiltersFromQuery,
   countAdvancedFilters,
   type CatalogFilterValues,
@@ -232,29 +232,13 @@ export function CatalogToolbar({
       />
       <div className="catalog-discovery-row__actions">
         <QuickFilterToggles filters={filters} qDraft={qDraft} disabled={disabled} onNavigate={navigate} />
-        <div
-          role="radiogroup"
-          aria-label="Сортировка"
-          className="flex shrink-0 gap-0.5 rounded-lg bg-slate-100 p-0.5"
-        >
-          {CATALOG_SORT_OPTIONS.map((option) => (
-            <button
-              key={option.value}
-              type="button"
-              role="radio"
-              aria-checked={(filters.sort || 'time') === option.value}
-              disabled={disabled}
-              onClick={() => setSort(option.value)}
-              className={`inline-btn h-7 shrink-0 rounded-md px-2.5 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 disabled:opacity-60 ${
-                (filters.sort || 'time') === option.value
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
+        <CatalogSortSelect
+          value={filters.sort}
+          disabled={disabled}
+          onChange={setSort}
+          size="sm"
+          className="w-[min(100%,16.5rem)] shrink-0"
+        />
       </div>
     </div>
   );

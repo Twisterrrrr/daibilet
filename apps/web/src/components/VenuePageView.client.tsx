@@ -12,7 +12,6 @@ import type { PublicSessionDto, PublicVenueDto, PublicVenuePageDto } from '@daib
 import { resolveVenueHeroImage } from '@/lib/city-place-images';
 import {
   formatCardScheduleLine,
-  formatCoverDateBadge,
   isOpenDate,
 } from '@/lib/event-card-meta';
 import { formatAgeLimit } from '@/lib/event-page-utils';
@@ -29,14 +28,31 @@ import {
   buildVenueMonthRailChips,
   buildVenueProgramGroups,
   buildVenueProgramMonthView,
+  expandVenuePlaybillEntries,
   formatVenueMonthLabel,
   resolveVenueSmartMonth,
-  type VenueEventGroup,
   type VenueMonthFilter,
   type VenueMonthRailChip,
+  type VenuePlaybillEntry,
 } from '@/lib/venue-program';
 import { filterVenuePageSessionsByCity } from '@/lib/venue-page-sessions';
 import { venuePageTemplate } from '@/lib/venue-meta';
+
+const PLAYBILL_WEEKDAY_SHORT = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'] as const;
+const PLAYBILL_MONTH_GENITIVE_RU = [
+  'января',
+  'февраля',
+  'марта',
+  'апреля',
+  'мая',
+  'июня',
+  'июля',
+  'августа',
+  'сентября',
+  'октября',
+  'ноября',
+  'декабря',
+] as const;
 
 /** Match SSR VenueDetailPage: curated cover + title/metro overlays. */
 function withEditorialVenue(payload: PublicVenuePageDto): PublicVenuePageDto {
@@ -368,16 +384,15 @@ function isVenueMonthRailChipActive(chip: VenueMonthRailChip, selected: VenueMon
 }
 
 /**
- * Theater playbill rows - date/time + title + price + buy.
- * Poster cards stay in «Ближайшие события» rail above; this block is schedule density.
+ * Theater playbill rows - one row per session/time (18:00 and 21:00 are separate).
  */
 function VenuePlaybillList({
   monthView,
 }: {
   monthView: ReturnType<typeof buildVenueProgramMonthView>;
 }) {
-  const primary = monthView.primary.slice(0, 48);
-  const spillover = monthView.spillover.slice(0, 24);
+  const primary = expandVenuePlaybillEntries(monthView.primary).slice(0, 80);
+  const spillover = expandVenuePlaybillEntries(monthView.spillover).slice(0, 40);
   if (!primary.length && !spillover.length) return <EmptyState />;
 
   const showPrimaryHeading = Boolean(monthView.primaryMonth) && (spillover.length > 0 || primary.length > 0);
@@ -394,8 +409,8 @@ function VenuePlaybillList({
             </h3>
           ) : null}
           <ul className="divide-y divide-zinc-100">
-            {primary.map((group) => (
-              <VenuePlaybillRow key={group.key} group={group} />
+            {primary.map((entry) => (
+              <VenuePlaybillRow key={entry.key} entry={entry} />
             ))}
           </ul>
         </section>
@@ -408,8 +423,8 @@ function VenuePlaybillList({
             </h3>
           ) : null}
           <ul className="divide-y divide-zinc-100">
-            {spillover.map((group) => (
-              <VenuePlaybillRow key={`spill:${group.key}`} group={group} />
+            {spillover.map((entry) => (
+              <VenuePlaybillRow key={`spill:${entry.key}`} entry={entry} />
             ))}
           </ul>
         </section>
@@ -418,26 +433,20 @@ function VenuePlaybillList({
   );
 }
 
-function VenuePlaybillRow({ group }: { group: VenueEventGroup }) {
-  const session = group.representative;
+function VenuePlaybillRow({ entry }: { entry: VenuePlaybillEntry }) {
+  const session = entry.session;
   const href = eventHref(session);
-  const title = formatPublicTitle(group.title || session.title || session.eventTitle);
-  const when = playbillWhenLabel(session, group);
+  const title = formatPublicTitle(entry.title || session.title || session.eventTitle);
+  const when = playbillWhenParts(session);
   const age = formatAgeLimit(session.ageLimit);
-  const meta = [group.category, age].filter(Boolean).join(' · ');
+  const meta = [entry.category, age].filter(Boolean).join(' · ');
   const rawPrice =
-    typeof group.priceFrom === 'number' && group.priceFrom >= 100
-      ? group.priceFrom
-      : typeof session.priceFrom === 'number' && session.priceFrom >= 100
-        ? session.priceFrom
-        : null;
-  const priceLabel =
-    rawPrice != null ? `от ${formatNumber(rawPrice)}\u00a0₽` : null;
+    typeof session.priceFrom === 'number' && session.priceFrom >= 100 ? session.priceFrom : null;
+  const priceLabel = rawPrice != null ? `от ${formatNumber(rawPrice)}\u00a0₽` : null;
   const vacant =
-    typeof group.vacant === 'number' && group.vacant > 0 && group.vacant <= 40
-      ? `${group.vacant} мест`
+    typeof session.vacant === 'number' && session.vacant > 0 && session.vacant <= 40
+      ? `${session.vacant} мест`
       : null;
-  const slotTimes = collectPlaybillSlotTimes(group);
 
   return (
     <li className="group">
@@ -445,43 +454,50 @@ function VenuePlaybillRow({ group }: { group: VenueEventGroup }) {
         href={href}
         className="flex flex-col gap-2 py-3.5 transition hover:bg-zinc-50/80 sm:flex-row sm:items-center sm:gap-4 sm:px-1"
       >
-        <div className="w-[7.5rem] shrink-0 sm:w-32" data-venue-playbill-when>
-          <p
-            className={`text-sm font-semibold tabular-nums ${
-              when.weekend ? 'text-rose-600' : 'text-zinc-950'
-            }`}
-          >
-            {when.primary}
-          </p>
-          {when.secondary ? (
-            <p className="mt-0.5 text-xs tabular-nums text-zinc-500">{when.secondary}</p>
-          ) : null}
+        <div className="w-[8.5rem] shrink-0 sm:w-36" data-venue-playbill-when>
+          {when.kind === 'open' ? (
+            <p className="text-sm font-semibold text-zinc-950">{when.label}</p>
+          ) : when.kind === 'dated' ? (
+            <>
+              <p
+                className={`flex flex-wrap items-baseline gap-x-1.5 ${
+                  when.weekend ? 'text-rose-600' : 'text-zinc-950'
+                }`}
+              >
+                <span className="text-lg font-bold tabular-nums leading-none">{when.dayNum}</span>
+                <span className="text-sm font-semibold">{when.month}</span>
+                <span
+                  className={`text-[11px] font-semibold uppercase tracking-wide ${
+                    when.weekend ? 'text-rose-500' : 'text-zinc-500'
+                  }`}
+                >
+                  {when.weekday}
+                </span>
+              </p>
+              {when.time ? (
+                <p className="mt-1 text-xs tabular-nums text-zinc-500">{when.time}</p>
+              ) : null}
+            </>
+          ) : (
+            <>
+              <p className="text-sm font-semibold text-zinc-950">{when.primary}</p>
+              {when.secondary ? (
+                <p className="mt-0.5 text-xs tabular-nums text-zinc-500">{when.secondary}</p>
+              ) : null}
+            </>
+          )}
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-base font-semibold leading-snug text-zinc-950 group-hover:text-primary-800">
             {title}
           </p>
           {meta ? <p className="mt-0.5 text-xs text-zinc-500">{meta}</p> : null}
-          {slotTimes.length > 1 ? (
-            <p className="mt-1.5 flex flex-wrap gap-1.5" data-venue-playbill-slots>
-              {slotTimes.slice(0, 8).map((time) => (
-                <span
-                  key={time}
-                  className="rounded border border-zinc-200 bg-white px-1.5 py-0.5 text-[11px] font-medium tabular-nums text-zinc-700"
-                >
-                  {time}
-                </span>
-              ))}
-              {slotTimes.length > 8 ? (
-                <span className="text-[11px] text-zinc-400">+{slotTimes.length - 8}</span>
-              ) : null}
-            </p>
-          ) : null}
         </div>
-        <div className="flex shrink-0 items-center justify-end gap-3">
+        {/* Mobile: price above CTA; desktop: price left of button */}
+        <div className="flex shrink-0 flex-col items-end gap-1.5 sm:flex-row sm:items-center sm:gap-3">
           <div className="text-right">
             {priceLabel ? (
-              <div className="text-sm font-bold tabular-nums text-zinc-950">{priceLabel}</div>
+              <div className="text-base font-bold tabular-nums text-zinc-950 sm:text-sm">{priceLabel}</div>
             ) : (
               <div className="text-sm font-medium text-zinc-500">Смотреть</div>
             )}
@@ -496,21 +512,6 @@ function VenuePlaybillRow({ group }: { group: VenueEventGroup }) {
   );
 }
 
-const PLAYBILL_MONTH_GENITIVE_RU = [
-  'января',
-  'февраля',
-  'марта',
-  'апреля',
-  'мая',
-  'июня',
-  'июля',
-  'августа',
-  'сентября',
-  'октября',
-  'ноября',
-  'декабря',
-] as const;
-
 function playbillSessionDate(session: PublicSessionDto): Date | null {
   const raw = session.startsAt;
   if (!raw) return null;
@@ -518,55 +519,40 @@ function playbillSessionDate(session: PublicSessionDto): Date | null {
   return Number.isFinite(date.getTime()) ? date : null;
 }
 
-function playbillWhenLabel(
+function playbillWhenParts(
   session: PublicSessionDto,
-  group: VenueEventGroup,
-): { primary: string; secondary: string | null; weekend: boolean } {
+):
+  | { kind: 'open'; label: string }
+  | {
+      kind: 'dated';
+      dayNum: string;
+      month: string;
+      weekday: string;
+      time: string | null;
+      weekend: boolean;
+    }
+  | { kind: 'fallback'; primary: string; secondary: string | null } {
   if (isOpenDate(session)) {
-    return { primary: 'Открытая дата', secondary: null, weekend: false };
+    return { kind: 'open', label: 'Открытая дата' };
   }
   const date = playbillSessionDate(session);
-  const time =
-    String(session.timeLabel || '').trim().replace(/^в\s+/i, '') ||
-    collectPlaybillSlotTimes(group)[0] ||
-    null;
+  const time = String(session.timeLabel || '')
+    .trim()
+    .replace(/^в\s+/i, '') || null;
   if (date) {
-    const day = date.getDate();
+    const dayNum = String(date.getDate());
     const month = PLAYBILL_MONTH_GENITIVE_RU[date.getMonth()] || '';
     const dow = date.getDay();
+    const weekday = PLAYBILL_WEEKDAY_SHORT[dow] || '';
     const weekend = dow === 0 || dow === 6;
-    const badge = formatCoverDateBadge(session);
-    if (badge === 'Сегодня' || badge === 'Завтра') {
-      return { primary: `${badge}, ${day} ${month}`, secondary: time, weekend };
-    }
-    return { primary: `${day} ${month}`, secondary: time, weekend };
+    return { kind: 'dated', dayNum, month, weekday, time, weekend };
   }
-  const badge = formatCoverDateBadge(session);
   const schedule = formatCardScheduleLine(session);
-  if (badge) {
-    return {
-      primary: badge,
-      secondary: time || schedule || null,
-      weekend: false,
-    };
-  }
-  const firstSlot = group.visibleSlots[0] || group.sessions[0];
-  const fallback = [firstSlot?.dateLabel, firstSlot?.timeLabel].filter(Boolean).join(', ');
-  return { primary: fallback || 'Дата', secondary: null, weekend: false };
-}
-
-function collectPlaybillSlotTimes(group: VenueEventGroup): string[] {
-  const seen = new Set<string>();
-  const out: string[] = [];
-  for (const slot of group.visibleSlots.length ? group.visibleSlots : group.sessions) {
-    const time = String(slot.timeLabel || '')
-      .trim()
-      .replace(/^в\s+/i, '');
-    if (!time || seen.has(time)) continue;
-    seen.add(time);
-    out.push(time);
-  }
-  return out;
+  return {
+    kind: 'fallback',
+    primary: schedule || 'Дата',
+    secondary: time,
+  };
 }
 
 function EmptyState() {

@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { CatalogActiveFilters } from '@/components/CatalogActiveFilters';
 import { CatalogPaginationLinks } from '@/components/CatalogPaginationLinks';
 import { CatalogResults, ViewModeToggle } from '@/components/CatalogResults.client';
+import { CatalogSortSelect } from '@/components/CatalogSortSelect.client';
 import { CatalogToolbar } from '@/components/CatalogToolbar.client';
 import { EventsCityGate } from '@/components/EventsCityGate.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
@@ -14,10 +15,10 @@ import type { PublicCatalogDto, PublicCatalogListItemDto } from '@daibilet/contr
 import { CATALOG_PAGE_SIZE_DEFAULT, CATALOG_PAGE_SIZES, isCatalogPageSize, type CatalogPageSize } from '@daibilet/contracts/catalog';
 import {
   buildCatalogHref,
-  CATALOG_SORT_OPTIONS,
   catalogFiltersFromQuery,
   venueCatalogHrefWithSelectedCity,
   type CatalogFilterValues,
+  type CatalogSort,
 } from '@/lib/catalog-url';
 import { catalogClientFetchTimeoutMs } from '@/lib/catalog-client-fetch';
 import { pluralEvents } from '@/lib/format';
@@ -341,9 +342,13 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
       .then((payload) => {
         setCatalog((prev) => {
           if (appendMode && prev) {
+            const items = mergeCatalogItems(prev.items, payload.items);
             return {
               ...payload,
-              items: mergeCatalogItems(prev.items, payload.items),
+              items,
+              // Keep paging cursor on the farthest loaded window (append may no-op on dupes).
+              offset: Math.max(prev.offset ?? 0, payload.offset ?? 0),
+              hasMore: items.length < (payload.total ?? prev.total),
             };
           }
           return payload;
@@ -455,8 +460,9 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
           <div
             role="radiogroup"
             aria-label="Событий на странице"
-            className="catalog-page-size-toggle hidden items-center gap-0.5 rounded-lg bg-slate-100 p-0.5 sm:inline-flex"
+            className="catalog-page-size-toggle hidden items-center gap-1 rounded-full bg-[#F5F5F7] px-2 py-0.5 sm:inline-flex"
           >
+            <span className="pl-1 text-xs font-medium text-slate-500">Показывать</span>
             {CATALOG_PAGE_SIZES.map((size) => {
               const active = (filterValues.limit || CATALOG_PAGE_SIZE_DEFAULT) === size;
               return (
@@ -476,10 +482,10 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
                       }),
                     );
                   }}
-                  className={`inline-btn inline-flex h-7 min-w-[2.75rem] items-center justify-center rounded-md px-2 text-xs font-semibold tabular-nums leading-none transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 disabled:opacity-60 ${
+                  className={`inline-btn inline-flex h-7 min-w-[2.5rem] items-center justify-center rounded-lg px-2 text-xs font-semibold tabular-nums leading-none transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 disabled:opacity-60 ${
                     active
-                      ? 'bg-white text-slate-900 shadow-sm'
-                      : 'text-slate-600 hover:text-slate-900'
+                      ? 'bg-white text-primary-700 shadow-sm'
+                      : 'text-slate-500 hover:text-slate-800'
                   }`}
                 >
                   {size}
@@ -487,37 +493,20 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
               );
             })}
           </div>
-          <div
-            role="radiogroup"
-            aria-label="Сортировка"
-            className="flex gap-0.5 overflow-x-auto rounded-lg bg-slate-100 p-0.5 [scrollbar-width:none] md:hidden [&::-webkit-scrollbar]:hidden"
-          >
-            {CATALOG_SORT_OPTIONS.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                role="radio"
-                aria-checked={filterValues.sort === option.value}
-                disabled={(loading && !catalog) || cityBootstrapPending}
-                onClick={() => {
-                  router.push(
-                    buildCatalogHref({
-                      ...filterValues,
-                      sort: option.value,
-                      page: undefined,
-                    }),
-                  );
-                }}
-                className={`inline-btn h-7 shrink-0 rounded-md px-2.5 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 disabled:opacity-60 ${
-                  filterValues.sort === option.value
-                    ? 'bg-white text-slate-900 shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
+          <CatalogSortSelect
+            value={filterValues.sort}
+            disabled={(loading && !catalog) || cityBootstrapPending}
+            className="w-[min(100%,15.5rem)] md:hidden"
+            onChange={(sort: CatalogSort) => {
+              router.push(
+                buildCatalogHref({
+                  ...filterValues,
+                  sort,
+                  page: undefined,
+                }),
+              );
+            }}
+          />
           <ViewModeToggle mode={viewMode} onChange={setViewMode} />
         </div>
       </div>
