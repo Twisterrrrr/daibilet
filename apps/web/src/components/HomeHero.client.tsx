@@ -15,7 +15,6 @@ import { cityToPrepositional } from '@/lib/city-declension';
 import {
   HOME_HERO_IMAGES,
   homeHeroObjectPositionClass,
-  objectPositionForHeroSrc,
 } from '@/lib/home-hero-images';
 import { buildHomeHeroQuickChips } from '@/lib/home-scenarios';
 import { normalizeKnownCitySlug } from '@/lib/landing-routes';
@@ -79,10 +78,7 @@ export function HomeHero({
       const rest = poolFrames.filter((frame) => frame.src !== lcpSrc);
       if (!rest.length) return;
       setMediaFrames([
-        {
-          ...frames[0]!,
-          objectPosition: frames[0]!.objectPosition || objectPositionForHeroSrc(lcpSrc),
-        },
+        frames[0]!,
         ...rest,
       ]);
     };

@@ -57,11 +57,10 @@ test('shouldOfferFirstVisitCityPrompt is disabled (silent geo on all viewports)'
   assert.equal(shouldOfferFirstVisitCityPrompt('/cities'), false);
 });
 
-test('shouldSkipSilentGeoOnHome keeps cookie city on home and still allows catalog GPS', () => {
-  assert.equal(shouldSkipSilentGeoOnHome('/', true), true);
-  assert.equal(shouldSkipSilentGeoOnHome('/', false), false);
-  assert.equal(shouldSkipSilentGeoOnHome('/events', true), false);
-  assert.equal(shouldSkipSilentGeoOnHome('/podborki', true), false);
+test('shouldSkipSilentGeoOnHome skips GPS on home even without a displayed city', () => {
+  assert.equal(shouldSkipSilentGeoOnHome('/'), true);
+  assert.equal(shouldSkipSilentGeoOnHome('/events'), false);
+  assert.equal(shouldSkipSilentGeoOnHome('/podborki'), false);
 });
 
 test('shouldAttemptSilentGeo includes catalog gates and account exclusions', () => {

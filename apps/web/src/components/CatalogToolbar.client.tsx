@@ -233,6 +233,7 @@ export function CatalogToolbar({
       <div className="catalog-discovery-row__actions">
         <QuickFilterToggles filters={filters} qDraft={qDraft} disabled={disabled} onNavigate={navigate} />
         <CatalogSortSelect
+          id="catalog-sort-desktop"
           value={filters.sort}
           disabled={disabled}
           onChange={setSort}

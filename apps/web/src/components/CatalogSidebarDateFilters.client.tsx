@@ -58,10 +58,6 @@ export function CatalogSidebarDateFilters({
                     date: item.date,
                     from: undefined,
                     to: undefined,
-                    sort:
-                      item.date === 'today' || item.date === 'tomorrow' || item.date === 'evening'
-                        ? 'time'
-                        : filters.sort,
                   }),
                 )
               }

@@ -79,14 +79,12 @@ export function shouldAttemptSilentGeo(pathname: string | null | undefined): boo
 }
 
 /**
- * Home already paints cookie/storage city in SSR. Applying GPS afterwards
- * swaps rails and looks like a glitch. Catalog indexes still override stale storage.
+ * Home already paints cookie/storage city in SSR. GPS afterwards swaps rails
+ * (title, chips, editors-pick) and looks like a glitch. Catalog indexes still
+ * override stale storage on `/events` and friends.
  */
-export function shouldSkipSilentGeoOnHome(
-  pathname: string | null | undefined,
-  hasDisplayedCity: boolean,
-): boolean {
-  return isHomePath(pathname) && hasDisplayedCity;
+export function shouldSkipSilentGeoOnHome(pathname: string | null | undefined): boolean {
+  return isHomePath(pathname);
 }
 
 /** @deprecated Use shouldAttemptSilentGeo */

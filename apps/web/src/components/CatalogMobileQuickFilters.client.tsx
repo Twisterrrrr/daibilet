@@ -186,10 +186,6 @@ export function CatalogMobileQuickFilters({
                     from: undefined,
                     to: undefined,
                     page: undefined,
-                    sort:
-                      item.date === 'today' || item.date === 'tomorrow' || item.date === 'evening'
-                        ? 'time'
-                        : filters.sort,
                   }),
                 );
                 setSheet(null);

@@ -81,8 +81,7 @@ export function HomeCityAwareSections({
     sort: 'popular',
   });
 
-  const cityHint =
-    cityReady && cityName ? ` · ${cityName}` : !cityReady ? '' : ' · все города';
+  const cityHint = cityReady && cityName ? ` · ${cityName}` : '';
 
   const showEditorsPick = editorsPick.length > 0;
 

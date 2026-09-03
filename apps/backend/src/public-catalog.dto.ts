@@ -214,7 +214,10 @@ export async function buildPublicCatalogDto(query: PublicCatalogQuery): Promise<
   const offset = Math.min(rawOffset, maxOffset);
   const pageRows = sorted.slice(offset, offset + limit);
   const hydratedPage = await hydrateCatalogUpcomingSlots(pageRows, LIST_SLOT_PREVIEW_LIMIT);
-  const items = hydratedPage.map(toPublicCatalogListItem);
+  // Slot hydrate can replace startsAt with the real next session - re-order the page
+  // so «Ближайшие» / price match the dates on the cards.
+  const orderedPage = orderHydratedCatalogPage(hydratedPage, query.sort || 'time');
+  const items = orderedPage.map(toPublicCatalogListItem);
   // Facets are conditional: each dimension counts against sibling filters (not the full catalog).
   const facets = buildConditionalCatalogFacets(sourceSessions, query);
 
@@ -1018,20 +1021,8 @@ function sortCatalogSessions(
   let result: PublicSessionDto[];
   if (sort === 'random') {
     result = seededNearBiasedShuffleSessions(sorted, catalogRandomSeed(query));
-  } else if (sort === 'price' || sort === 'price_asc') {
-    result = sorted.sort((left, right) => comparePrice(left, right) || compareSessionTime(left, right));
-  } else if (sort === 'price_desc') {
-    result = sorted.sort((left, right) => comparePrice(right, left) || compareSessionTime(left, right));
-  } else if (sort === 'popular') {
-    result = sorted.sort((left, right) => (right.sessionCount || 1) - (left.sessionCount || 1) || compareSessionTime(left, right));
-  } else if (sort === 'departing_soon') {
-    result = sorted.sort((left, right) => {
-      const leftSoon = isDepartingSoonSession(left) ? 0 : 1;
-      const rightSoon = isDepartingSoonSession(right) ? 0 : 1;
-      return leftSoon - rightSoon || compareSessionTime(left, right);
-    });
   } else {
-    result = sorted.sort(compareSessionTime);
+    result = sorted.sort((left, right) => compareCatalogOrder(left, right, sort));
   }
 
   // Popular / random feed: hide same-cover + near-duplicate titles (search & price keep full set).
@@ -1058,6 +1049,44 @@ function comparePrice(left: PublicSessionDto, right: PublicSessionDto): number {
   const leftPrice = Number.isFinite(left.priceFrom) ? Number(left.priceFrom) : Number.POSITIVE_INFINITY;
   const rightPrice = Number.isFinite(right.priceFrom) ? Number(right.priceFrom) : Number.POSITIVE_INFINITY;
   return leftPrice - rightPrice;
+}
+
+function catalogPopularScore(session: PublicSessionDto): number {
+  let score = (session.sessionCount || 1) * 1000;
+  if (String(session.manualLandingStatus || '').toUpperCase() === 'PINNED') score += 1_000_000;
+  score += (session.landingSlugs?.length || 0) * 500;
+  return score;
+}
+
+function compareCatalogOrder(
+  left: PublicSessionDto,
+  right: PublicSessionDto,
+  sort: NonNullable<PublicCatalogQuery['sort']>,
+): number {
+  if (sort === 'price' || sort === 'price_asc') {
+    return comparePrice(left, right) || compareSessionTime(left, right);
+  }
+  if (sort === 'price_desc') {
+    return comparePrice(right, left) || compareSessionTime(left, right);
+  }
+  if (sort === 'popular') {
+    return catalogPopularScore(right) - catalogPopularScore(left) || compareSessionTime(left, right);
+  }
+  if (sort === 'departing_soon') {
+    const leftSoon = isDepartingSoonSession(left) ? 0 : 1;
+    const rightSoon = isDepartingSoonSession(right) ? 0 : 1;
+    return leftSoon - rightSoon || compareSessionTime(left, right);
+  }
+  return compareSessionTime(left, right);
+}
+
+/** Re-order a hydrated page so card dates match the selected sort (no spread/dedupe). */
+function orderHydratedCatalogPage(
+  sessions: PublicSessionDto[],
+  sort: NonNullable<PublicCatalogQuery['sort']>,
+): PublicSessionDto[] {
+  if (sort === 'random') return sessions;
+  return [...sessions].sort((left, right) => compareCatalogOrder(left, right, sort));
 }
 
 function compareSessionTime(left: PublicSessionDto, right: PublicSessionDto): number {

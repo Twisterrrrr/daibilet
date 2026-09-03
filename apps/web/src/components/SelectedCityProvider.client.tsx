@@ -327,8 +327,7 @@ export function SelectedCityProvider({
     if (parsePodborkiCityHubPath(pathname)) return;
     if (resolveLandingRouteFromLocation(pathname)?.citySlug) return;
     if (readsCityQueryParam(pathname) && urlCity) return;
-    const displayedCity = cityLabel !== 'Все города' || Boolean(readStoredSelectedCity(destinations));
-    if (shouldSkipSilentGeoOnHome(pathname, displayedCity)) return;
+    if (shouldSkipSilentGeoOnHome(pathname)) return;
     if (geoAttemptedRef.current) return;
     geoAttemptedRef.current = true;
 
@@ -410,6 +409,8 @@ export function SelectedCityProvider({
 
       if (nav.action === 'persist') {
         pendingCityRef.current = null;
+        const path = pathname.replace(/\/$/, '') || '/';
+        if (path === '/') router.refresh();
         return true;
       }
 

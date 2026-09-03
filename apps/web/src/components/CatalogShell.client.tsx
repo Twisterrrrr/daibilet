@@ -496,6 +496,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
             })}
           </div>
           <CatalogSortSelect
+            id="catalog-sort-mobile"
             value={filterValues.sort}
             disabled={(loading && !catalog) || cityBootstrapPending}
             className="min-w-0 w-full max-w-full md:hidden"
