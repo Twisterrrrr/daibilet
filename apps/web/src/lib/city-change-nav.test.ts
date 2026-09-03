@@ -150,6 +150,62 @@ test('podborki intent keeps intent and swaps city segment', () => {
   );
 });
 
+test('podborki city hub marker CHPU swaps city / all → hub', () => {
+  const withPilot = [
+    ...destinations,
+    {
+      id: 'spb',
+      name: 'Санкт-Петербург',
+      slug: 'sankt-peterburg',
+      type: 'city' as const,
+      events: 80,
+      venues: 15,
+      categories: [],
+    },
+    {
+      id: 'kgd',
+      name: 'Калининград',
+      slug: 'kaliningrad',
+      type: 'city' as const,
+      events: 20,
+      venues: 4,
+      categories: [],
+    },
+  ];
+  assert.equal(
+    resolveCityChangeHref({
+      pathname: '/podborki/c/kaliningrad',
+      cityName: 'Санкт-Петербург',
+      destinations: withPilot,
+    }),
+    '/podborki/c/saint-petersburg',
+  );
+  assert.equal(
+    resolveCityChangeHref({
+      pathname: '/podborki/c/kaliningrad',
+      cityName: 'Казань',
+      destinations: withPilot,
+    }),
+    '/podborki?city=kazan',
+  );
+  assert.equal(
+    resolveCityChangeHref({
+      pathname: '/podborki/c/moscow',
+      cityName: 'all',
+      destinations: withPilot,
+    }),
+    '/podborki',
+  );
+  assert.equal(
+    resolveCityChangeHref({
+      pathname: '/podborki',
+      cityName: 'Калининград',
+      destinations: withPilot,
+    }),
+    '/podborki/c/kaliningrad',
+  );
+});
+
 test('blog header city change persists without ?city=', () => {
   assert.equal(
     resolveCityChangeHref({ pathname: '/blog', cityName: 'Москва', destinations }),

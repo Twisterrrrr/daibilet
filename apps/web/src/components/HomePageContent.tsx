@@ -1,15 +1,12 @@
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 import { ArrowRight, Dices } from 'lucide-react';
 
-import { HomeBottomNav } from '@/components/HomeBottomNav.client';
-import { HomeCategoryStack } from '@/components/HomeCategoryStack.client';
 import { HomeCityAwareSections } from '@/components/HomeCityAwareSections.client';
 import { HomeHero } from '@/components/HomeHero.client';
-import { HomeMyDayBanner } from '@/components/HomeMyDayBanner.client';
 import { HomePageSkeleton } from '@/components/HomePageSkeleton';
 import { HomePopularCitiesRail } from '@/components/HomePopularCitiesRail.client';
-import { LuckyCityButton } from '@/components/LuckyCityButton.client';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { ScrollRail } from '@/components/ScrollRail.client';
 import { blogSurfaceMeta, blogSurfaceMetaLine } from '@/lib/blog-meta';
@@ -21,8 +18,33 @@ import { resolveHomePromoImage } from '@/lib/home-scenarios';
 import { landingCategoryHref } from '@/lib/landing-routes';
 import { orderPopularRailCities } from '@/lib/popular-cities-rail';
 import { withSoftTimeout } from '@/lib/soft-timeout';
+import {
+  filterFingerprintsForSessions,
+  toHomeSsrSession,
+  toSlimCityDestination,
+  toSlimLandingHeroChip,
+  toSlimLandingPromo,
+} from '@/lib/ssr-lean-payloads';
 import { getHomeArticles, getHomeCoverFingerprints, getHomePageData } from '@/server/cached-home-data';
 import { getActiveHeroBanners, heroFramesFromBanners } from '@/server/hero-banners';
+
+/** Below-fold / mobile chrome - keep out of critical JS + skip their SSR flight. */
+const HomeBottomNav = dynamic(
+  () => import('@/components/HomeBottomNav.client').then((m) => m.HomeBottomNav),
+  { ssr: false },
+);
+const HomeCategoryStack = dynamic(
+  () => import('@/components/HomeCategoryStack.client').then((m) => m.HomeCategoryStack),
+  { ssr: false },
+);
+const HomeMyDayBanner = dynamic(
+  () => import('@/components/HomeMyDayBanner.client').then((m) => m.HomeMyDayBanner),
+  { ssr: false },
+);
+const LuckyCityButton = dynamic(
+  () => import('@/components/LuckyCityButton.client').then((m) => m.LuckyCityButton),
+  { ssr: false },
+);
 
 /** External CDN HEAD fingerprints must not stall home TTFB on bad egress/DNS. */
 const HOME_FINGERPRINTS_TIMEOUT_MS = 800;
@@ -51,14 +73,23 @@ async function HomePageBody() {
   const destinations = destinationsPayload?.destinations ?? [];
   const cities = destinations.filter((item) => item.type === 'city');
   // Top by events, then pin Moscow + SPB first so the rail can center that pair on load.
-  const topCities = orderPopularRailCities(cities, 12);
-  // Same canon as SiteFooter (not catalogPayload.total — that under/over-counts vs destinations).
+  const topCities = orderPopularRailCities(cities, 12).map(toSlimCityDestination);
+  const luckyCities = cities.filter((c) => c.events > 0).map(toSlimCityDestination);
+  // Same canon as SiteFooter (not catalogPayload.total - that under/over-counts vs destinations).
   const { places: liveCities, events: liveEvents } = catalogSocialStats(destinations);
 
-  const sessions = catalogPayload?.items ?? [];
+  const sessions = (catalogPayload?.items ?? []).map(toHomeSsrSession);
   const sparseCatalog = sessions.length < 12;
+  const fingerprints = filterFingerprintsForSessions(fingerprintsRecord, sessions);
 
-  const promoLandings = (landingsCatalog?.items || []).filter((item) => item.events > 0).slice(0, 8);
+  const promoLandings = (landingsCatalog?.items || [])
+    .filter((item) => item.events > 0)
+    .slice(0, 8)
+    .map(toSlimLandingPromo);
+  const heroLandings = (landingsCatalog?.items || [])
+    .filter((item) => item.events > 0)
+    .slice(0, 24)
+    .map(toSlimLandingHeroChip);
   const blogCards = mergeBlogCards(
     (articlesPayload?.articles as BlogApiArticles | undefined) ?? null,
   );
@@ -85,21 +116,25 @@ async function HomePageBody() {
     [],
     'home-hero-banners',
   );
-  const heroFrames = heroFramesFromBanners(heroBanners);
+  const allHeroFrames = heroFramesFromBanners(heroBanners);
+  // WEB.LIGHT.A2: one LCP frame in RSC; static-pool rotator expands client-side after idle.
+  // CMS banners keep all frames (usually few) so marketing rotation still works.
+  const useStaticPoolRotator = heroBanners.length === 0;
+  const heroFrames = useStaticPoolRotator ? allHeroFrames.slice(0, 1) : allHeroFrames;
 
   return (
     <div className="overflow-x-hidden bg-neutral-50 pb-24 lg:pb-0">
       {/* Classic search-hero: rotating emotion photos + city/date/category find form */}
       <HomeHero
-        destinations={destinations}
         frames={heroFrames}
-        landings={landingsCatalog?.items || []}
+        expandStaticRotator={useStaticPoolRotator}
+        landings={heroLandings}
       />
 
       {/* Rhythm: editors → cities → My Day */}
       <HomeCityAwareSections
         sessions={sessions}
-        fingerprints={fingerprintsRecord}
+        fingerprints={fingerprints}
         sparseCatalog={sparseCatalog}
       >
         <>
@@ -136,7 +171,7 @@ async function HomePageBody() {
       <HomeCategoryStack />
 
       {/* 4. Lucky city - soft trips map-band (distinct motif from cities) */}
-      {cities.some((c) => c.events > 0) ? (
+      {luckyCities.length ? (
         <section className="home-trips-map-band section-y" data-home-band="full-bleed">
           <div className="container-page">
             <div className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-primary-100/80 bg-white/95 p-5 shadow-card backdrop-blur-[2px] sm:flex-row sm:items-center sm:py-6 sm:pl-6 sm:pr-3">
@@ -153,7 +188,7 @@ async function HomePageBody() {
                   </p>
                 </div>
               </div>
-              <LuckyCityButton cities={cities} variant="toolbar" />
+              <LuckyCityButton cities={luckyCities} variant="toolbar" />
             </div>
           </div>
         </section>

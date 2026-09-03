@@ -48,6 +48,7 @@ import {
   normalizeKnownCitySlug,
   resolveLandingRouteFromLocation,
 } from '@/lib/landing-routes';
+import { parsePodborkiCityHubPath } from '@/lib/podborki-city-seo';
 
 export type SetCityOptions = {
   /** Share hydrate already replaced the route - do not confirm/clear again. */
@@ -154,6 +155,7 @@ export function SelectedCityProvider({
   // Sync before paint so the first meaningful filter render already has the stored city.
   useLayoutEffect(() => {
     const fromCityHub = resolveCityHubDestination(destinations, pathname);
+    const fromPodborkiCityHub = parsePodborkiCityHubPath(pathname);
     let nextLabel: string;
     if (fromCityHub) {
       if (fromCityHub.type === 'region') {
@@ -168,6 +170,14 @@ export function SelectedCityProvider({
       } else {
         nextLabel = fromCityHub.name;
       }
+    } else if (fromPodborkiCityHub) {
+      const fromPath =
+        matchDestination(destinations, fromPodborkiCityHub) ||
+        matchDestination(destinations, resolveLandingCityName(fromPodborkiCityHub));
+      nextLabel =
+        fromPath?.name ||
+        resolveLandingCityName(fromPodborkiCityHub) ||
+        resolveCityLabel(destinations, fromPodborkiCityHub);
     } else {
       const landingRoute = resolveLandingRouteFromLocation(pathname);
       // Any landing path that already carries a city (MULTI + city-scoped) write-through to header.
@@ -259,22 +269,32 @@ export function SelectedCityProvider({
     }
 
     const hub = resolveCityHubDestination(destinations, pathname);
-    if (!hub) return;
-    if (hub.type === 'region') {
-      const child = resolveRegionChildCityScope({
-        search: searchParamsKey,
-        regionName: hub.name,
-        regionSlug: hub.slug || '',
-        centerSlug: getRegionCenterCityName(hub),
-        childCities: [],
-      });
-      if (child?.name) {
-        persistSelectedCity(child.name);
-        return;
+    if (hub) {
+      if (hub.type === 'region') {
+        const child = resolveRegionChildCityScope({
+          search: searchParamsKey,
+          regionName: hub.name,
+          regionSlug: hub.slug || '',
+          centerSlug: getRegionCenterCityName(hub),
+          childCities: [],
+        });
+        if (child?.name) {
+          persistSelectedCity(child.name);
+          return;
+        }
+        // Bare region hub: keep region in chrome for catalog, My Day will redirect UI.
       }
-      // Bare region hub: keep region in chrome for catalog, My Day will redirect UI.
+      persistSelectedCity(hub.name);
+      return;
     }
-    persistSelectedCity(hub.name);
+
+    const podborkiCity = parsePodborkiCityHubPath(pathname);
+    if (podborkiCity) {
+      const matched =
+        matchDestination(destinations, podborkiCity) ||
+        matchDestination(destinations, resolveLandingCityName(podborkiCity));
+      if (matched?.name) persistSelectedCity(matched.name);
+    }
   }, [destinations, pathname, urlCity, searchParamsKey]);
 
   // Persist city from any landing path that already carries a city segment.
@@ -293,6 +313,7 @@ export function SelectedCityProvider({
     if (!shouldAttemptSilentGeo(pathname)) return;
     if (hasGeoSessionAttempt()) return;
     if (resolveCityHubDestination(destinations, pathname)) return;
+    if (parsePodborkiCityHubPath(pathname)) return;
     if (resolveLandingRouteFromLocation(pathname)?.citySlug) return;
     if (readsCityQueryParam(pathname) && urlCity) return;
     if (geoAttemptedRef.current) return;

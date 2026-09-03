@@ -1,5 +1,6 @@
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
 
+import { buildPodborkiCityHref } from './podborki-city-seo.ts';
 import { matchDestination } from './selected-city.ts';
 
 const QUERY_CITY_SECTION_ROOTS = ['/events', '/places', '/podborki'] as const;
@@ -130,6 +131,14 @@ export function resolveCityChangeNav(input: CityChangeNavInput): CityChangeNavRe
       // Intent collections use path city segment, not ?city=.
       if (root === '/podborki' && path.startsWith('/podborki/')) {
         const segments = path.split('/').filter(Boolean);
+        // Marker city hub `/podborki/c/{city}` - swap city via CHPU / soft href helper.
+        if (segments[1] === 'c') {
+          if (name === 'all') return { action: 'navigate', href: '/podborki' };
+          return {
+            action: 'navigate',
+            href: buildPodborkiCityHref(citySlug || name),
+          };
+        }
         const intent = resolvePodborkiIntentSlug(segments[1]);
         if (intent) {
           return {
@@ -137,6 +146,21 @@ export function resolveCityChangeNav(input: CityChangeNavInput): CityChangeNavRe
             href: catalogIntentHref(intent, name === 'all' ? null : citySlug),
           };
         }
+      }
+
+      // Podborki index: meta-pilot → marker CHPU; others soft ?city=.
+      if (root === '/podborki' && path === '/podborki') {
+        if (name === 'all') {
+          const params = new URLSearchParams(input.searchParams?.toString() || '');
+          params.set('city', 'all');
+          params.delete('page');
+          const query = params.toString();
+          return { action: 'navigate', href: query ? `/podborki?${query}` : '/podborki' };
+        }
+        return {
+          action: 'navigate',
+          href: buildPodborkiCityHref(citySlug || name),
+        };
       }
 
       // Leaving a PDP: drop deep-link noise; keep filters when already on the index.

@@ -12,7 +12,7 @@ import {
   useCatalogPurchase,
 } from '@/components/CatalogPurchaseTrigger.client';
 import { LandingPurchaseButton } from '@/components/landing/LandingPurchaseButton.client';
-import { CATALOG_IMAGE_QUALITY, IMAGE_SIZES, CardSafeImage } from '@/components/SafeImage.client';
+import { CARD_IMAGE_QUALITY, CATALOG_IMAGE_QUALITY, IMAGE_SIZES, CardSafeImage } from '@/components/SafeImage.client';
 import type { PublicCatalogListItemDto, PublicSessionDto } from '@daibilet/contracts/public';
 import { extractDurationLabel } from '@/lib/catalog-labels';
 import { LandingCardBadgeRow } from '@/components/landing/LandingCardBadgeRow';
@@ -77,6 +77,8 @@ type EventCardProps = {
   landingActions?: boolean;
   /** LCP: eager load + priority for first visible catalog cards. */
   imagePriority?: boolean;
+  /** Dense `/events` grid: tighter sizes + lower quality. */
+  catalogDense?: boolean;
   /** Скрыть скрытые anchor-виджеты (каталог-слоты) — на странице события в related. */
   suppressPurchaseAnchors?: boolean;
 };
@@ -90,6 +92,7 @@ export function EventCard({
   landingActions = false,
   suppressPurchaseAnchors = true,
   imagePriority = false,
+  catalogDense = false,
 }: EventCardProps) {
   if (showcaseRail || editorsPickBadge) {
     return (
@@ -111,6 +114,8 @@ export function EventCard({
   });
   const imagePrimarySrc = resolveEventCardPrimaryImage(session);
   const imageFallbackSrc = resolveEventCardFallbackImage(session);
+  const cardImageSizes = catalogDense ? IMAGE_SIZES.eventCardCatalog : IMAGE_SIZES.eventCard;
+  const cardImageQuality = catalogDense ? CATALOG_IMAGE_QUALITY : CARD_IMAGE_QUALITY;
   const emptyImageFallback = (
     <div className="flex h-full w-full items-center justify-center bg-surface-muted">
       <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/70 shadow-sm">
@@ -190,8 +195,8 @@ export function EventCard({
           src={imagePrimarySrc}
           alt={displayTitle}
           fill
-          sizes={IMAGE_SIZES.eventCard}
-          quality={CATALOG_IMAGE_QUALITY}
+          sizes={cardImageSizes}
+          quality={cardImageQuality}
           priority={imagePriority}
           loading={imagePriority ? undefined : 'lazy'}
           style={{ objectPosition: imageObjectPosition }}
@@ -202,8 +207,8 @@ export function EventCard({
                 src={imageFallbackSrc}
                 alt={displayTitle}
                 fill
-                sizes={IMAGE_SIZES.eventCard}
-                quality={CATALOG_IMAGE_QUALITY}
+                sizes={cardImageSizes}
+                quality={cardImageQuality}
                 className="object-cover"
                 fallback={emptyImageFallback}
               />
@@ -555,7 +560,7 @@ function ShowcaseEventCard({
           alt={displayTitle}
           fill
           sizes={imageSizes}
-          quality={CATALOG_IMAGE_QUALITY}
+          quality={CARD_IMAGE_QUALITY}
           priority={imagePriority}
           loading={imagePriority ? undefined : 'lazy'}
           style={{ objectPosition: imageObjectPosition }}
@@ -567,7 +572,7 @@ function ShowcaseEventCard({
                 alt={displayTitle}
                 fill
                 sizes={imageSizes}
-                quality={CATALOG_IMAGE_QUALITY}
+                quality={CARD_IMAGE_QUALITY}
                 className="object-cover"
                 fallback={emptyImageFallback}
               />

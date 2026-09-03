@@ -56,12 +56,13 @@ export const getHomeDestinations = unstable_cache(
 
 export const getHomeCatalog = unstable_cache(
   // Wider pool so cover-content dedupe can refill rails after skipping identical binaries.
+  // 56 is enough for editors + now-tabs + popular after city filter; keeps RSC flight smaller.
   () =>
     fetchPublicApiJson<PublicCatalogDto>('/api/public/events', {
-      searchParams: { limit: 80, sort: 'popular' },
+      searchParams: { limit: 56, sort: 'popular' },
       timeoutMs: 5_000,
     }),
-  ['home-catalog-v7-http'],
+  ['home-catalog-v8-http'],
   homeCacheOptions,
 );
 

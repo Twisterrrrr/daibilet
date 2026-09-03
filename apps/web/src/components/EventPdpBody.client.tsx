@@ -9,7 +9,6 @@ import {
 } from '@/components/EventPdpChrome.client';
 import {
   EventDescriptionBody,
-  EventHowToGet,
   EventTicketTips,
   EventVenueStops,
 } from '@/components/EventPageSections';
@@ -19,15 +18,6 @@ import {
   formatPriceRub,
   getTicketPriceRange,
 } from '@/lib/event-page-utils';
-
-function hasHowToGet(event: PublicEventDto) {
-  return Boolean(
-    String(event.venueWayToFind || '').trim() ||
-      String(event.venueMetroStation || '').trim() ||
-      String(event.venueParkingInfo || '').trim() ||
-      String(event.venueAddress || '').trim(),
-  );
-}
 
 function hasCoords(event: PublicEventDto) {
   const lat = Number(event.venueLatitude);
@@ -51,7 +41,6 @@ export function EventPdpBody({
       : '';
   const hasDescription = Boolean(String(event.description || '').trim());
   const stops = Array.isArray(event.venueStops) ? event.venueStops : [];
-  const howTo = hasHowToGet(event);
   const coords = hasCoords(event);
 
   return (
@@ -71,11 +60,6 @@ export function EventPdpBody({
               id: 'route',
               title: 'Маршрут',
               content: stops.length ? <EventVenueStops event={event} hideTitle /> : null,
-            },
-            {
-              id: 'howto',
-              title: 'Как добраться',
-              content: howTo ? <EventHowToGet event={event} /> : null,
             },
           ]}
         />

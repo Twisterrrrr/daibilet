@@ -1,7 +1,7 @@
 'use client';
 
 import { CalendarDays, Search } from 'lucide-react';
-import { FormEvent, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { CityPicker } from '@/components/CityPicker.client';
@@ -12,6 +12,11 @@ import { useSelectedCityOptional } from '@/components/SelectedCityProvider.clien
 import type { PublicDestinationDto, PublicLandingDto } from '@daibilet/contracts/public';
 import { buildCatalogHref, catalogHrefWithSelectedCity } from '@/lib/catalog-url';
 import { cityToPrepositional } from '@/lib/city-declension';
+import {
+  HOME_HERO_IMAGES,
+  homeHeroObjectPositionClass,
+  objectPositionForHeroSrc,
+} from '@/lib/home-hero-images';
 import { buildHomeHeroQuickChips } from '@/lib/home-scenarios';
 import { normalizeKnownCitySlug } from '@/lib/landing-routes';
 
@@ -25,19 +30,69 @@ const HERO_DATE_OPTIONS = [
 export type HomeHeroFrame = { src: string; alt: string; objectPosition?: string };
 
 type HomeHeroProps = {
-  destinations: PublicDestinationDto[];
+  /** Prefer SelectedCityProvider destinations to avoid duplicating the layout payload. */
+  destinations?: PublicDestinationDto[];
+  /** LCP frame(s) for SSR; rotator may expand client-side from the static pool. */
   frames: HomeHeroFrame[];
+  /**
+   * When true (default), after mount append the static emotion pool if SSR only
+   * sent one frame (WEB.LIGHT.A2 - keep residual frames out of RSC HTML).
+   */
+  expandStaticRotator?: boolean;
   landings?: Array<Pick<PublicLandingDto, 'slug' | 'title' | 'subtitle' | 'events' | 'priceFrom'>>;
   videoSrc?: string | null;
 };
 
-export function HomeHero({ destinations, frames, landings = [], videoSrc }: HomeHeroProps) {
+export function HomeHero({
+  destinations,
+  frames,
+  expandStaticRotator = true,
+  landings = [],
+  videoSrc,
+}: HomeHeroProps) {
   const router = useRouter();
   const selectedCity = useSelectedCityOptional();
   const destination = selectedCity?.cityValue ?? 'all';
   const setDestination = selectedCity?.setCity ?? (() => {});
   const selectedDestination = selectedCity?.selectedDestination ?? null;
+  const pickerDestinations = destinations?.length
+    ? destinations
+    : selectedCity?.destinations ?? [];
   const [heroDate, setHeroDate] = useState('all');
+  const [mediaFrames, setMediaFrames] = useState(frames);
+
+  useEffect(() => {
+    setMediaFrames(frames);
+  }, [frames]);
+
+  useEffect(() => {
+    if (!expandStaticRotator || videoSrc || frames.length !== 1) return;
+    const lcpSrc = frames[0]?.src?.trim();
+    if (!lcpSrc) return;
+    // Idle: grow rotator from the static pool without bloating SSR flight.
+    const expand = () => {
+      const poolFrames: HomeHeroFrame[] = HOME_HERO_IMAGES.map((image) => ({
+        src: image.landscape,
+        alt: image.alt,
+        objectPosition: homeHeroObjectPositionClass(image),
+      }));
+      const rest = poolFrames.filter((frame) => frame.src !== lcpSrc);
+      if (!rest.length) return;
+      setMediaFrames([
+        {
+          ...frames[0]!,
+          objectPosition: frames[0]!.objectPosition || objectPositionForHeroSrc(lcpSrc),
+        },
+        ...rest,
+      ]);
+    };
+    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      const id = window.requestIdleCallback(expand, { timeout: 2500 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const timer = window.setTimeout(expand, 400);
+    return () => window.clearTimeout(timer);
+  }, [expandStaticRotator, frames, videoSrc]);
 
   const selectedCityName = selectedDestination?.name || null;
   const citySlug =
@@ -97,7 +152,7 @@ export function HomeHero({ destinations, frames, landings = [], videoSrc }: Home
       tone="dark"
       // Base layer under images (legacy navy placeholder while frames load) - not a blue wash on top of photos.
       className="!bg-[#122868]"
-      media={<HeroMedia frames={frames} videoSrc={videoSrc} />}
+      media={<HeroMedia frames={mediaFrames} videoSrc={videoSrc} />}
     >
       <form
         onSubmit={onSubmit}
@@ -107,7 +162,7 @@ export function HomeHero({ destinations, frames, landings = [], videoSrc }: Home
         {/* City + date + find on all breakpoints. Category lives in soft chip rail. */}
         <div className="grid w-full grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1.4fr)_minmax(120px,0.9fr)_auto]">
           <CityPicker
-            cities={destinations}
+            cities={pickerDestinations}
             value={destination}
             onChange={setDestination}
             allLabel="Город"

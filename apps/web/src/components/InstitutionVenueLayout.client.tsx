@@ -21,7 +21,7 @@ import { MobileStickyActionBar } from '@/components/MobileStickyActionBar';
 import { OsmMapEmbed } from '@/components/OsmMapEmbed';
 import { VenueAdmissionBlock } from '@/components/VenueAdmissionBlock';
 import { VenueBreadcrumbsNav } from '@/components/VenueBreadcrumbsNav.client';
-import { VenueLogisticsBlock, hasVenueLogisticsContent, nonEmptyLogisticsText } from '@/components/VenueLogisticsBlock';
+import { nonEmptyLogisticsText } from '@/components/VenueLogisticsBlock';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { resolveCityTimeZone } from '@/lib/city-timezone';
 import { resolveVenueHeroImage } from '@/lib/city-place-images';
@@ -137,13 +137,6 @@ export function InstitutionVenueLayout({
     () => formatVenueMetroLabel(resolvedMetroName),
     [resolvedMetroName],
   );
-  const logisticsVenue = React.useMemo(
-    () =>
-      resolvedMetroName && !nonEmptyLogisticsText(venue.metroStation)
-        ? { ...venue, metroStation: resolvedMetroName }
-        : venue,
-    [venue, resolvedMetroName],
-  );
   const faqItems = editorial?.faq?.length ? editorial.faq : GENERIC_FAQ_ITEMS;
   const uniqueStopEvents = React.useMemo(() => dedupeVenueLinkedEvents(stopEvents), [stopEvents]);
   const uniqueNearbyEvents = React.useMemo(
@@ -158,8 +151,7 @@ export function InstitutionVenueLayout({
   const hasAfisha = sessions.length > 0;
   const nextSessions = sessions.slice(0, 4);
   const showFaq = true;
-  const showVisitSection =
-    Boolean(openingHours?.lines?.length) || hasVenueLogisticsContent(logisticsVenue);
+  const showVisitSection = Boolean(openingHours?.lines?.length);
   const similarVenues = React.useMemo(
     () => filterSimilarInstitutionVenues(venue, relatedVenues, 4),
     [venue, relatedVenues],
@@ -418,34 +410,48 @@ export function InstitutionVenueLayout({
                   Вся афиша →
                 </a>
               </div>
-              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <div className="mt-5 grid gap-4 sm:grid-cols-2">
                 {nextSessions.map((session) => {
                   const thumb =
                     resolveEventCardPrimaryImage(session) || resolveEventCardFallbackImage(session);
+                  const price =
+                    typeof session.priceFrom === 'number' ? formatMoney(session.priceFrom) : null;
                   return (
                     <a
                       key={session.id}
                       href={eventHref(session)}
-                      className="flex items-start gap-3 rounded-xl border border-slate-100 bg-slate-50 p-3 transition hover:border-primary/30 hover:bg-primary-50/30"
+                      className="group overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition hover:border-primary/25 hover:shadow-md"
                     >
-                      <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-slate-200">
+                      <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-200">
                         {thumb ? (
                           <SafeImage
                             src={thumb}
                             alt=""
                             fill
-                            sizes="56px"
-                            className="object-cover"
+                            sizes="(max-width: 639px) 100vw, 50vw"
+                            quality={82}
+                            className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                             fallback={<div className="h-full w-full bg-slate-200" />}
                           />
                         ) : (
                           <div className="h-full w-full bg-slate-200" aria-hidden="true" />
                         )}
                       </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="font-semibold text-slate-900">{session.title}</div>
-                        <div className="mt-1 text-xs text-slate-500">
-                          {session.dateLabel} · {session.timeLabel} · {formatMoney(session.priceFrom)}
+                      <div className="space-y-2 p-4">
+                        <div className="line-clamp-2 text-base font-semibold leading-snug text-slate-900">
+                          {session.title}
+                        </div>
+                        <div className="text-sm text-slate-500">
+                          {[session.dateLabel, session.timeLabel].filter(Boolean).join(' · ')}
+                        </div>
+                        <div className="flex items-center justify-between gap-3 pt-1">
+                          <span className="text-base font-bold text-primary-700">
+                            {price ? `от ${price}` : 'Смотреть'}
+                          </span>
+                          <span className="inline-flex items-center gap-1 rounded-lg bg-graphite px-3 py-1.5 text-xs font-semibold text-white">
+                            <Ticket className="h-3.5 w-3.5" strokeWidth={1.75} />
+                            Билеты
+                          </span>
                         </div>
                       </div>
                     </a>
@@ -460,34 +466,17 @@ export function InstitutionVenueLayout({
           {showVisitSection ? (
             <section id="visit" className="scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-6">
               <h2 className="text-xl font-bold text-slate-900">Как посетить</h2>
-              <div className="mt-4 grid gap-6 sm:grid-cols-2">
-                {openingHours?.lines?.length ? (
-                  <div data-venue-opening-hours>
-                    <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
-                      <Clock className="h-4 w-4 text-primary-600" />
-                      Часы работы
-                    </div>
-                    <ul className="mt-3 space-y-1 text-sm text-slate-700">
-                      {openingHours.lines.map((line) => (
-                        <li key={line}>{line}</li>
-                      ))}
-                    </ul>
-                    <p className="mt-3 text-xs leading-5 text-slate-500">{OPEN_DATE_HOURS_HOLIDAY_NOTE}</p>
-                  </div>
-                ) : null}
-                <div>
-                  <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
-                    <MapPin className="h-4 w-4 text-primary-600" />
-                    Как добраться
-                  </div>
-                  {hasVenueLogisticsContent(logisticsVenue) ? (
-                    <VenueLogisticsBlock venue={logisticsVenue} showName={false} className="mt-3" />
-                  ) : (
-                    <div className="mt-3 text-sm text-slate-700">
-                      {streetAddress || `${venue.city} - адрес уточняется`}
-                    </div>
-                  )}
+              <div className="mt-4" data-venue-opening-hours>
+                <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
+                  <Clock className="h-4 w-4 text-primary-600" />
+                  Часы работы
                 </div>
+                <ul className="mt-3 space-y-1 text-sm text-slate-700">
+                  {openingHours?.lines?.map((line) => (
+                    <li key={line}>{line}</li>
+                  ))}
+                </ul>
+                <p className="mt-3 text-xs leading-5 text-slate-500">{OPEN_DATE_HOURS_HOLIDAY_NOTE}</p>
               </div>
             </section>
           ) : null}

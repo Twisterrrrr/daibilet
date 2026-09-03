@@ -23,7 +23,7 @@ import {
 } from '@/lib/catalog-intent-routes';
 import { hasSeoListingEditorial } from '@/data/seo-listing-texts';
 import { evaluateListingIndexability, MIN_LISTING_OFFERS_FOR_INDEX } from '@/lib/seo-listing-meta';
-import { isPodborkiSeoPilotCitySlug, PODBORKI_SEO_PILOT_CITY_SLUGS } from '@/lib/podborki-city-seo';
+import { buildPodborkiCityCanonicalPath, isPodborkiSeoPilotCitySlug, PODBORKI_SEO_PILOT_CITY_SLUGS } from '@/lib/podborki-city-seo';
 import { venueHref } from '@/lib/routes';
 import { getCachedCatalog } from '@/server/cached-catalog-data';
 import { parseCatalogPageQuery } from '@/server/catalog-query';
@@ -150,12 +150,16 @@ export async function buildIndexableIntentSitemapPaths(): Promise<string[]> {
 
 export async function buildStaticSitemapEntries(now = new Date()): Promise<SitemapEntry[]> {
   const intentPaths = await buildIndexableIntentSitemapPaths();
+  const podborkiCityHubPaths = PODBORKI_SEO_PILOT_CITY_SLUGS.map((city) =>
+    buildPodborkiCityCanonicalPath(city),
+  );
   return [
     entry('/', now, 'hourly', 1),
     entry('/events', now, 'hourly', 0.8),
     entry('/cities', now, 'daily', 0.8),
     entry('/places', now, 'daily', 0.85),
     entry('/podborki', now, 'daily', 0.8),
+    ...podborkiCityHubPaths.map((path) => entry(path, now, 'daily', 0.75)),
     ...intentPaths.map((path) => entry(path, now, 'daily', 0.7)),
     entry('/blog', now, 'daily', 0.8),
     entry('/help', now, 'monthly', 0.5),

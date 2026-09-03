@@ -1,4 +1,5 @@
 import { landingCategoryHref } from '@/lib/landing-routes';
+import { buildPodborkiCityHref } from '@/lib/podborki-city-seo';
 
 export type CatalogInterstitial = {
   id: string;
@@ -23,7 +24,7 @@ export function catalogInterstitialInterval(columnsPerRow: number): number {
 
 export function catalogInterstitialsForCity(citySlug?: string | null): CatalogInterstitial[] {
   const city = citySlug?.trim() || undefined;
-  const cityQs = city ? `?city=${encodeURIComponent(city)}` : '';
+  const podborkiHref = buildPodborkiCityHref(city);
 
   return [
     {
@@ -50,7 +51,7 @@ export function catalogInterstitialsForCity(citySlug?: string | null): CatalogIn
       eyebrow: 'Подборка',
       title: 'Что посмотреть на выходных',
       description: 'Готовые сценарии под настроение: с детьми, для двоих или большой компанией.',
-      href: `/podborki${cityQs}`,
+      href: podborkiHref,
       cta: 'Открыть подборки',
     },
     {

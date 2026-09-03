@@ -3,12 +3,12 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Baby, Gift, Moon, MoreHorizontal, Search, SlidersHorizontal, X } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import { FormEvent, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 
 import { CatalogSidebarDateFilters } from '@/components/CatalogSidebarDateFilters.client';
 import { CatalogAdvancedFiltersInline } from '@/components/CatalogAdvancedFiltersInline.client';
-import { CatalogAdvancedFiltersPanel } from '@/components/CatalogAdvancedFiltersPanel.client';
 import { CatalogDateRail } from '@/components/CatalogDateRail.client';
 import { CatalogDrawerApplyFooter } from '@/components/CatalogDrawerApplyFooter.client';
 import { CatalogMobileQuickFilters } from '@/components/CatalogMobileQuickFilters.client';
@@ -34,6 +34,13 @@ import {
   type CatalogFilterValues,
   type CatalogSort,
 } from '@/lib/catalog-url';
+
+/** Heavy filter sheet - load only when drawer opens (keeps /events first JS lighter). */
+const CatalogAdvancedFiltersPanel = dynamic(
+  () =>
+    import('@/components/CatalogAdvancedFiltersPanel.client').then((m) => m.CatalogAdvancedFiltersPanel),
+  { ssr: false },
+);
 
 type CatalogToolbarProps = {
   facets: PublicCatalogDto['facets'];
@@ -252,7 +259,7 @@ export function CatalogToolbar({
     </div>
   );
 
-  const advancedPanel = (
+  const advancedPanel = filtersOpen ? (
     <CatalogAdvancedFiltersPanel
       open={filtersOpen}
       filters={{
@@ -294,7 +301,7 @@ export function CatalogToolbar({
         });
       }}
     />
-  );
+  ) : null;
 
   if (compact) {
     return (

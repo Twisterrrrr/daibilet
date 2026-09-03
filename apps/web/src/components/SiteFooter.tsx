@@ -12,6 +12,7 @@ import { landingCategoryHref } from '@/lib/landing-routes';
 import { CANONICAL_LANDING_SLUGS } from '@/lib/landing-constants';
 import { getFooterPopularDirections } from '@/lib/seo-internal-links';
 import { catalogCityQueryValue } from '@/lib/selected-city';
+import { buildPodborkiCityHref } from '@/lib/podborki-city-seo';
 
 function normalizeFooterCitySlug(value: string): string {
   return String(value || '')
@@ -89,7 +90,7 @@ function placesHrefWithCity(citySlug?: string) {
 
 function podborkiHrefWithCity(citySlug?: string) {
   if (!citySlug) return '/podborki';
-  return `/podborki?city=${encodeURIComponent(citySlug)}`;
+  return buildPodborkiCityHref(citySlug);
 }
 
 export function SiteFooter({ destinations, variant = 'default' }: SiteFooterProps) {

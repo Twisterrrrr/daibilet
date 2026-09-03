@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
 
 import { CatalogCityGate } from '@/components/EventsCityGate.client';
@@ -31,6 +31,7 @@ import {
   type PodborkiCategoryMeta,
   type PodborkiCategorySlug,
 } from '@/lib/podborki-categories';
+import { parsePodborkiCityHubPath } from '@/lib/podborki-city-seo';
 import { pickPodborkiFeatured, pickPodborkiTrending } from '@/lib/podborki-hero';
 import {
   filterPodborkiByTag,
@@ -108,13 +109,15 @@ export function LandingsCatalogView({
   heroDescription?: string;
 }) {
   const urlSearchParams = useSearchParams();
+  const pathname = usePathname();
   const selectedCity = useSelectedCityOptional();
+  const pathCity = parsePodborkiCityHubPath(pathname)?.trim() || '';
   const urlCity = urlSearchParams.get('city')?.trim() || '';
-  const urlCityIsAll = urlCity.toLowerCase() === 'all';
+  const urlCityIsAll = !pathCity && urlCity.toLowerCase() === 'all';
   const cityReady = selectedCity?.cityReady ?? true;
   const geoBootstrapPending = selectedCity?.geoBootstrapPending ?? false;
   /** Wait for storage resolve when URL has no city - avoids national flash then city. */
-  const cityBootstrapPending = !urlCity && Boolean(selectedCity) && !cityReady;
+  const cityBootstrapPending = !pathCity && !urlCity && Boolean(selectedCity) && !cityReady;
 
   const headerCityFilter =
     cityReady && selectedCity && selectedCity.cityValue !== 'all'
@@ -123,12 +126,21 @@ export function LandingsCatalogView({
         selectedCity.cityValue
       : '';
 
-  const cityRaw = urlCity && !urlCityIsAll ? urlCity : headerCityFilter || initialCity || 'all';
+  // Marker CHPU path wins; then soft ?city=; then header / SSR initial.
+  const cityRaw = pathCity
+    ? pathCity
+    : urlCity && !urlCityIsAll
+      ? urlCity
+      : headerCityFilter || initialCity || 'all';
   const citySlug = resolveCitySlug(cities, cityRaw === 'all' ? 'all' : cityRaw);
   const cityName = resolveCityName(cities, cityRaw === 'all' ? 'all' : cityRaw);
   const citySelected = citySlug !== 'all';
   const needsCityGate =
-    !cityBootstrapPending && !geoBootstrapPending && cityReady && (urlCityIsAll || !citySelected);
+    !cityBootstrapPending &&
+    !geoBootstrapPending &&
+    cityReady &&
+    !pathCity &&
+    (urlCityIsAll || !citySelected);
   const apiCityParam = citySelected
     ? (cityName !== 'all' ? cityName : citySlug)
     : '';

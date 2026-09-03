@@ -8,6 +8,7 @@ import {
 } from '@/lib/admin-basic-auth';
 import { isAdminHost, rewriteAdminHostPathname } from '@/lib/admin-host';
 import { resolveLegacyLandingRedirect } from '@/lib/landing-routes';
+import { resolvePodborkiCityQueryRedirect } from '@/lib/podborki-city-seo';
 import { canonicalizeRegionChildCitySearch } from '../backend/src/search-geo-match.ts';
 
 function unauthorizedAdminResponse(realm: string) {
@@ -88,11 +89,28 @@ export async function middleware(request: NextRequest) {
   const cityQueryRedirect = redirectBrokenRegionChildCityQuery(request);
   if (cityQueryRedirect) return cityQueryRedirect;
 
+  const podborkiCityRedirect = redirectPodborkiCityQueryToMarker(request);
+  if (podborkiCityRedirect) return podborkiCityRedirect;
+
   const redirectTarget = resolveLegacyLandingRedirect(pathname);
   if (!redirectTarget) return NextResponse.next();
 
   const url = request.nextUrl.clone();
   url.pathname = redirectTarget.replace(/\/+$/, '') || '/';
+  return NextResponse.redirect(url, 301);
+}
+
+/** Soft `/podborki?city=` → marker CHPU `/podborki/c/{city}` for meta-pilot cities. */
+function redirectPodborkiCityQueryToMarker(request: NextRequest): NextResponse | null {
+  const { pathname } = request.nextUrl;
+  if (pathname.replace(/\/+$/, '') !== '/podborki') return null;
+  const rawCity = request.nextUrl.searchParams.get('city');
+  const targetPath = resolvePodborkiCityQueryRedirect(rawCity);
+  if (!targetPath) return null;
+  const url = request.nextUrl.clone();
+  url.pathname = targetPath;
+  // Drop city= after consolidation; keep other query keys (landing, utm, …).
+  url.searchParams.delete('city');
   return NextResponse.redirect(url, 301);
 }
 
@@ -130,6 +148,7 @@ export const config = {
     '/venues/:path*',
     '/cities',
     '/cities/:path*',
+    '/podborki',
     '/sync-health',
     '/sync-health/:path*',
     '/reviews',

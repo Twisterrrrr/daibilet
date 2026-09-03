@@ -1,17 +1,23 @@
 import { cityToGenitive, cityToPrepositional } from './city-declension';
-import { resolveLandingCityName } from './landing-city';
+import { LANDING_CITY_SLUGS, resolveLandingCityName } from './landing-city';
 import { normalizeKnownCitySlug } from './landing-routes';
 
 /**
- * Active SEO pilot cities (owner 2026-08-11 final): Kaliningrad + SPb only.
+ * Active SEO pilot cities (owner 2026-09-03): KGD + SPB + PILOT-2 NN + Perm.
  * Used for: soft `?city=` Meta primary scope, intent×city stable index, sitemap city-variants.
  * Slugs = SEO path canon (`normalizeKnownCitySlug`), NOT DB translit (`moskva` / `sankt-peterburg`).
  */
-export const PODBORKI_SEO_PILOT_CITY_SLUGS = ['kaliningrad', 'saint-petersburg'] as const;
+export const PODBORKI_SEO_PILOT_CITY_SLUGS = [
+  'kaliningrad',
+  'saint-petersburg',
+  'nizhny-novgorod',
+  'perm',
+] as const;
 
 /**
- * Meta Title/Desc/H1 + self-canonical on `/podborki?city=`.
+ * Meta Title/Desc/H1 + self-canonical on marker CHPU `/podborki/c/{city}`.
  * Includes legacy `moscow` as harmless leftover (не расширяем пилот; не ломаем уже залитый meta).
+ * Soft `/podborki?city=` for these slugs 301 → marker CHPU.
  */
 export const PODBORKI_CITY_META_PILOT_SLUGS = [
   ...PODBORKI_SEO_PILOT_CITY_SLUGS,
@@ -24,6 +30,9 @@ export type PodborkiCityMetaPilotSlug = (typeof PODBORKI_CITY_META_PILOT_SLUGS)[
 const SEO_PILOT_SET = new Set<string>(PODBORKI_SEO_PILOT_CITY_SLUGS);
 const PILOT_SET = new Set<string>(PODBORKI_CITY_META_PILOT_SLUGS);
 
+/** Marker segment for city-scoped podborki hub (`/podborki/c/{city}`). */
+export const PODBORKI_CITY_HUB_MARKER = 'c' as const;
+
 export function isPodborkiSeoPilotCitySlug(
   slug: string | null | undefined,
 ): slug is PodborkiSeoPilotCitySlug {
@@ -34,7 +43,7 @@ export function isPodborkiSeoPilotCitySlug(
 export type PodborkiCitySeoPackage = {
   citySlug: PodborkiCityMetaPilotSlug;
   cityName: string;
-  /** Absolute-path canonical including query - self, not bare `/podborki`. */
+  /** Absolute-path canonical marker CHPU - self, not bare `/podborki` or soft `?city=`. */
   canonicalPath: string;
   title: string;
   description: string;
@@ -58,22 +67,73 @@ export function isPodborkiCityMetaPilotSlug(slug: string | null | undefined): sl
 }
 
 /**
- * Resolve raw `?city=` (destination slug, SEO slug, or alias) to pilot SEO canon.
- * Returns null for all / missing / non-pilot.
+ * Resolve raw `?city=` / picker label (destination slug, SEO slug, alias, or display name)
+ * to meta-pilot SEO canon. Returns null for all / missing / non-pilot.
  */
 export function resolvePodborkiCityMetaPilot(
   rawCity: string | null | undefined,
 ): { citySlug: PodborkiCityMetaPilotSlug; cityName: string } | null {
   const raw = String(rawCity || '').trim();
   if (!raw || raw.toLowerCase() === 'all') return null;
-  const canon = normalizeKnownCitySlug(raw);
-  if (!isPodborkiCityMetaPilotSlug(canon)) return null;
-  const cityName = resolveLandingCityName(canon) || resolveLandingCityName(raw) || canon;
-  return { citySlug: canon, cityName };
+
+  const fromSlug = normalizeKnownCitySlug(raw);
+  if (isPodborkiCityMetaPilotSlug(fromSlug)) {
+    const cityName = resolveLandingCityName(fromSlug) || resolveLandingCityName(raw) || fromSlug;
+    return { citySlug: fromSlug, cityName };
+  }
+
+  // Header picker may pass display name when destination list lacks the city.
+  const needle = raw.toLowerCase();
+  for (const [slug, name] of Object.entries(LANDING_CITY_SLUGS)) {
+    if (name !== raw && name.toLowerCase() !== needle) continue;
+    const canon = normalizeKnownCitySlug(slug);
+    if (!isPodborkiCityMetaPilotSlug(canon)) continue;
+    return { citySlug: canon, cityName: name };
+  }
+
+  return null;
 }
 
 export function buildPodborkiCityCanonicalPath(citySlug: PodborkiCityMetaPilotSlug): string {
-  return `/podborki?city=${encodeURIComponent(citySlug)}`;
+  return `/podborki/${PODBORKI_CITY_HUB_MARKER}/${encodeURIComponent(citySlug)}`;
+}
+
+/**
+ * Public href for city-scoped podborki hub.
+ * Meta-pilot (incl. moscow leftover + future SEO pilot expansions) → marker CHPU;
+ * other known cities stay on soft `?city=`; missing/all → hub root.
+ */
+export function buildPodborkiCityHref(rawCity: string | null | undefined): string {
+  const raw = String(rawCity || '').trim();
+  if (!raw || raw.toLowerCase() === 'all') return PODBORKI_HUB_SEO.canonicalPath;
+  const resolved = resolvePodborkiCityMetaPilot(raw);
+  if (resolved) return buildPodborkiCityCanonicalPath(resolved.citySlug);
+  const canon = normalizeKnownCitySlug(raw) || raw;
+  return `/podborki?city=${encodeURIComponent(canon)}`;
+}
+
+/** Parse `/podborki/c/{city}` (optional trailing slash). Returns raw path segment or null. */
+export function parsePodborkiCityHubPath(pathname: string | null | undefined): string | null {
+  const path = String(pathname || '').replace(/\/+$/, '') || '/';
+  const match = path.match(new RegExp(`^/podborki/${PODBORKI_CITY_HUB_MARKER}/([^/?#]+)$`, 'i'));
+  if (!match?.[1]) return null;
+  try {
+    return decodeURIComponent(match[1]).trim() || null;
+  } catch {
+    return String(match[1]).trim() || null;
+  }
+}
+
+/**
+ * Soft `/podborki?city=` → marker CHPU when city resolves to meta-pilot canon.
+ * Returns destination path or null (no redirect).
+ */
+export function resolvePodborkiCityQueryRedirect(
+  rawCity: string | null | undefined,
+): string | null {
+  const resolved = resolvePodborkiCityMetaPilot(rawCity);
+  if (!resolved) return null;
+  return buildPodborkiCityCanonicalPath(resolved.citySlug);
 }
 
 /**

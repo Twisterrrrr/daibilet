@@ -45,6 +45,7 @@ import {
   fetchVenueEventFacetCounts,
   fetchVenueHeroImageFallbacks,
 } from './public-venue-lean.ts';
+import { pickRelatedSessions } from './event-related.js';
 import {
   isContentPlaceHubEligible,
   isContentPlaceKind,
@@ -5208,62 +5209,13 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
   }
   applyEventPrimaryPurchase(baseEvent, publicSessions, event.sourceCode || primaryOffer?.sourceCode);
   const ticketPrices = buildPublicTicketPrices(publicOffers, publicSessions, baseEvent);
-  const relatedCandidates = catalogSessions.filter((session) => {
-    if (sessionGroupIds(session).some((id) => groupEventIds.includes(id))) return false;
-    if (event.cityId && session.cityId) return session.cityId === event.cityId;
-    return normalizeGroupPart(session.city) === normalizeGroupPart(event.city);
-  });
-  const eventTokens = new Set(
-    [...(event.subcategories || []), ...(event.tags || [])]
-      .filter(Boolean)
-      .map((value) => String(value).trim().toLowerCase()),
+  const related = pickRelatedSessions(
+    event,
+    catalogSessions,
+    groupEventIds,
+    sessionGroupIds,
+    12,
   );
-  const institutionKinds = new Set(['THEATER', 'CONCERT_HALL', 'MUSEUM_ART_SPACE', 'CLUB_BAR_RESTAURANT', 'BAR']);
-  const normalizeKind = (value) => String(value || 'OTHER').trim().toUpperCase().replace(/-/g, '_');
-  const kindFamily = (kind) => {
-    const normalized = normalizeKind(kind);
-    if (institutionKinds.has(normalized)) return 'institution';
-    if (normalized === 'PIER') return 'pier';
-    if (normalized === 'BUS') return 'bus';
-    return normalized || 'other';
-  };
-  const relatedScore = (session) => {
-    let value = 0;
-    if (event.category && session.category === event.category) value += 4;
-    const eventKind = normalizeKind(event.venueKind);
-    const sessionKind = normalizeKind(session.venueKind);
-    if (eventKind !== 'OTHER' && sessionKind === eventKind) value += 5;
-    else if (eventKind !== 'OTHER' && kindFamily(eventKind) === kindFamily(sessionKind)) value += 2;
-    if (event.venueId && session.venueId === event.venueId) value += 3;
-    const sessionTokens = [...(session.subcategories || []), ...(session.tags || [])]
-      .filter(Boolean)
-      .map((token) => String(token).trim().toLowerCase());
-    let overlap = 0;
-    for (const token of sessionTokens) {
-      if (eventTokens.has(token)) overlap += 1;
-    }
-    if (overlap > 0) value += 3 + Math.min(overlap, 2);
-    return value;
-  };
-  const relatedScored = relatedCandidates
-    .map((session) => ({ session, score: relatedScore(session) }))
-    .filter(({ score }) => score > 0);
-  relatedScored.sort((left, right) => {
-    const byScore = right.score - left.score;
-    if (byScore !== 0) return byScore;
-    return String(left.session.startsAt || '').localeCompare(String(right.session.startsAt || ''));
-  });
-  const relatedSeen = new Set();
-  const related = [];
-  for (const { session } of relatedScored) {
-    const key = session.groupKey || [session.title, session.city, session.venue]
-      .map((value) => String(value || '').trim().toLowerCase().replace(/\s+/g, ' '))
-      .join('|');
-    if (relatedSeen.has(key)) continue;
-    relatedSeen.add(key);
-    related.push(session);
-    if (related.length >= 12) break;
-  }
   const priceValues = [baseEvent.priceFrom, ...publicSessions.map((session) => session.priceFrom)].filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
   const vacantValues = publicSessions.map((session) => session.vacant).filter((value) => Number.isFinite(value));
 

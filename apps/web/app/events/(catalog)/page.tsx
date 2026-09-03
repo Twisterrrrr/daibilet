@@ -5,6 +5,7 @@ import { CatalogShell } from '@/components/CatalogShell.client';
 import { EventsCatalogHero } from '@/components/EventsCatalogHero.client';
 import { SiteLayout } from '@/components/SiteLayout';
 import { buildEventsCatalogMetadata } from '@/lib/seo-events-catalog-meta';
+import { leanCatalogForSsr } from '@/lib/ssr-lean-payloads';
 import { catalogQueryCacheKey, parseCatalogPageQuery } from '@/server/catalog-query';
 import { getCachedCatalog } from '@/server/cached-catalog-data';
 
@@ -30,7 +31,9 @@ export default async function EventsCatalogPage() {
   let initialCatalog: Awaited<ReturnType<typeof getCachedCatalog>> | null = null;
 
   try {
-    initialCatalog = await getCachedCatalog(pageQuery);
+    const raw = await getCachedCatalog(pageQuery);
+    // Strip list blurbs / cap facets before they enter the CatalogShell client flight.
+    initialCatalog = leanCatalogForSsr(raw);
   } catch {
     initialCatalog = null;
   }

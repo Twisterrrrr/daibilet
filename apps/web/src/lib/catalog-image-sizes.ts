@@ -1,10 +1,16 @@
 /**
  * Catalog listing image budget: small `/_next/image` widths + moderate quality.
- * Supplier covers (esp. TC PNG) are often 1–3MB; cards only need ~280–384px.
+ * Supplier covers (esp. TC PNG) are often 1–3MB; catalog grid cards only need ~280–384px.
+ *
+ * Keep CATALOG_IMAGE_QUALITY scoped to `/events` catalog grids.
+ * Home / related / venue / hub cards use CARD_IMAGE_QUALITY so they stay sharp.
  */
 
-/** Catalog card preview quality for `/_next/image`. */
+/** Catalog grid (`/events`) preview quality for `/_next/image`. */
 export const CATALOG_IMAGE_QUALITY = 65;
+
+/** Default card quality outside the dense catalog grid. */
+export const CARD_IMAGE_QUALITY = 80;
 
 /**
  * Match `.catalog-card-grid` (2 / 3 / 4 cols).
@@ -15,3 +21,7 @@ export const CATALOG_EVENT_CARD_SIZES =
 
 /** Horizontal list thumb (~14–16rem). */
 export const CATALOG_EVENT_CARD_HORIZONTAL_SIZES = '(max-width: 639px) 100vw, 16rem';
+
+/** Home / related / showcase cards: allow a larger decode than dense catalog. */
+export const CARD_EVENT_SIZES =
+  '(max-width: 639px) 92vw, (max-width: 1023px) 45vw, (max-width: 1535px) 30vw, 360px';

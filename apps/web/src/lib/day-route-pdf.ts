@@ -1,7 +1,7 @@
 /**
  * Client-side «PDF с картой» for My Day.
- * Draws OSM/Carto static map + itinerary on canvas, wraps JPEG pages in a
- * real PDF blob and downloads `.pdf`. No jspdf dependency.
+ * Draws OSM static map (same-origin tile proxy) + itinerary on canvas, wraps
+ * JPEG pages in a real PDF blob and downloads `.pdf`. No jspdf dependency.
  *
  * Do not `window.open(..., 'noopener')` then print: browsers return `null`
  * for that features string, and the old fallback saved `moi-den-karta.jpg`.
@@ -101,7 +101,8 @@ async function drawMap(
   for (let tx = first; tx <= last; tx++) {
     for (let ty = top; ty <= bottom; ty++) {
       const wrapped = ((tx % 2 ** zoom) + 2 ** zoom) % 2 ** zoom;
-      const url = `https://a.basemaps.cartocdn.com/rastertiles/voyager/${zoom}/${wrapped}/${ty}@2x.png`;
+      // Same-origin proxy: OSM tiles without Carto «API KEY REQUIRED» watermark.
+      const url = `/api/osm-tile/${zoom}/${wrapped}/${ty}`;
       jobs.push(
         loadImage(url).then((img) => {
           if (!img) return;
@@ -147,7 +148,7 @@ async function drawMap(
   ctx.fillRect(x, y + h - 20, 230, 20);
   ctx.fillStyle = '#4b5563';
   ctx.font = '12px Arial, sans-serif';
-  ctx.fillText('© OpenStreetMap, © CARTO', x + 6, y + h - 6);
+  ctx.fillText('© OpenStreetMap contributors', x + 6, y + h - 6);
   ctx.restore();
 }
 

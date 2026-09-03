@@ -46,6 +46,7 @@ import { eventHref, venueHref } from '@/lib/routes';
 import { inCityAccusative, inCityPrepositional, cityToGenitive } from '@/lib/city-declension';
 import { buildCatalogHref } from '@/lib/catalog-url';
 import { buildCityHubSeoPhrase } from '@/lib/city-hub-seo';
+import { buildPodborkiCityHref } from '@/lib/podborki-city-seo';
 import {
   isCityHubSectionHidden,
   normalizeCityHubSlug,
@@ -1108,7 +1109,7 @@ function PopularDirections({
         Подборки
       </p>
       <Link
-        href={citySlug ? `/podborki?city=${encodeURIComponent(citySlug)}` : '/podborki'}
+        href={citySlug ? buildPodborkiCityHref(citySlug) : '/podborki'}
         className={`text-sm font-semibold ${
           editorial ? 'text-zinc-700 hover:text-zinc-950' : 'text-primary-700 hover:text-primary-800'
         }`}
@@ -1133,7 +1134,7 @@ function PopularDirections({
         </p>
       </div>
       <Link
-        href={citySlug ? `/podborki?city=${encodeURIComponent(citySlug)}` : '/podborki'}
+        href={citySlug ? buildPodborkiCityHref(citySlug) : '/podborki'}
         className={`text-sm font-semibold ${
           editorial ? 'text-zinc-700 hover:text-zinc-950' : 'text-primary-700 hover:text-primary-800'
         }`}

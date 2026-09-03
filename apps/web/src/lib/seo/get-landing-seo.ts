@@ -32,7 +32,7 @@ export type LandingSeoResult = {
  * Brand: Дайбилет. Hyphen `-` only. No emoji.
  */
 export const SEO_TEMPLATES: Record<string, LandingSeoTemplate> = {
-  // City hub soft `/podborki?city=`
+  // City hub marker CHPU `/podborki/c/{city}` (soft `?city=` 301 → here)
   podborki: {
     title: 'Подборки событий {in_city} - готовые идеи куда сходить | Дайбилет',
     description:

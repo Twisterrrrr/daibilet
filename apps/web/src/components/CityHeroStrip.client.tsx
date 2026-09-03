@@ -13,6 +13,7 @@ import { resolveCityImage } from '@/lib/city-images';
 import { CITY_NIGHT_HERO } from '@/lib/city-night-hero';
 import { inCityPrepositional } from '@/lib/city-declension';
 import { pluralEvents, pluralPoints, pluralVenues } from '@/lib/format';
+import { buildPodborkiCityHref } from '@/lib/podborki-city-seo';
 import type { CityInfoEntry } from '@/lib/cityInfo';
 import type { resolveCityHubConfig } from '@/lib/city-hub-config';
 import type { PublicCityDto, PublicCityPageDto } from '@daibilet/contracts/public';
@@ -51,9 +52,7 @@ export function CityHeroStrip({
   const afficheHref = citySlug
     ? buildCatalogHref({ city: citySlug, sort: 'popular' })
     : '#affiche';
-  const collectionsHref = citySlug
-    ? `/podborki?city=${encodeURIComponent(citySlug)}`
-    : '/podborki';
+  const collectionsHref = citySlug ? buildPodborkiCityHref(citySlug) : '/podborki';
   const seasonChip = hubConfig?.highlightSeason;
   const regionBadge = resolveCityHeroRegionBadge(city);
   const guidePlaces = guide?.mustSee?.length || 0;

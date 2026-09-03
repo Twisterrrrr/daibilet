@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { MapPin } from 'lucide-react';
 
-import { CATALOG_IMAGE_QUALITY, IMAGE_SIZES, CardSafeImage } from '@/components/SafeImage.client';
+import { CARD_IMAGE_QUALITY, IMAGE_SIZES, CardSafeImage } from '@/components/SafeImage.client';
 import type { PublicSessionDto } from '@daibilet/contracts/public';
 import {
   formatCoverDateBadge,
@@ -69,7 +69,7 @@ export function RegionEventCard({
                   alt=""
                   fill
                   sizes={IMAGE_SIZES.eventCard}
-                  quality={CATALOG_IMAGE_QUALITY}
+                  quality={CARD_IMAGE_QUALITY}
                   className="object-cover"
                   style={{ objectPosition: imageObjectPosition }}
                 />
@@ -82,7 +82,7 @@ export function RegionEventCard({
             alt=""
             fill
             sizes={IMAGE_SIZES.eventCard}
-            quality={CATALOG_IMAGE_QUALITY}
+            quality={CARD_IMAGE_QUALITY}
             className="object-cover transition duration-300 group-hover:scale-[1.03]"
             style={{ objectPosition: imageObjectPosition }}
           />

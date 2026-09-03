@@ -280,7 +280,7 @@ export function CatalogResults({
               eventOrdinal += 1;
               return (
                 <li key={`${entry.session.id}-${entry.session.startsAt}`}>
-                  <EventCard session={entry.session} compact imagePriority={priority} />
+                  <EventCard session={entry.session} compact catalogDense imagePriority={priority} />
                 </li>
               );
             });
@@ -339,7 +339,7 @@ function CatalogLiveRail({
                     src={coverSrc}
                     alt={formatPublicTitle(session.title)}
                     fill
-                    sizes={IMAGE_SIZES.eventCard}
+                    sizes={IMAGE_SIZES.eventCardCatalog}
                     quality={CATALOG_IMAGE_QUALITY}
                     priority={index < CATALOG_IMAGE_PRIORITY_COUNT}
                     loading={index < CATALOG_IMAGE_PRIORITY_COUNT ? undefined : 'lazy'}

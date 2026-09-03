@@ -5,6 +5,8 @@ import * as React from 'react';
 
 import { blogListingImageFallbacks, listingImageFallbacks } from '@/lib/card-image';
 import {
+  CARD_EVENT_SIZES,
+  CARD_IMAGE_QUALITY,
   CATALOG_EVENT_CARD_HORIZONTAL_SIZES,
   CATALOG_EVENT_CARD_SIZES,
   CATALOG_IMAGE_QUALITY,
@@ -12,10 +14,15 @@ import {
 import { shouldBypassNextImageOptimizer } from '@/lib/remote-image-bypass';
 import { venueCardImageFallbacks } from '@/lib/venue-card-image';
 
-export { CATALOG_IMAGE_QUALITY } from '@/lib/catalog-image-sizes';
+export {
+  CARD_IMAGE_QUALITY,
+  CATALOG_IMAGE_QUALITY,
+} from '@/lib/catalog-image-sizes';
 
 export const IMAGE_SIZES = {
-  eventCard: CATALOG_EVENT_CARD_SIZES,
+  eventCard: CARD_EVENT_SIZES,
+  /** Dense `/events` catalog grid only - prefer with CATALOG_IMAGE_QUALITY. */
+  eventCardCatalog: CATALOG_EVENT_CARD_SIZES,
   eventCardHorizontal: CATALOG_EVENT_CARD_HORIZONTAL_SIZES,
   /** Editorial city hub poster 4:5 */
   affichePoster: '(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw',

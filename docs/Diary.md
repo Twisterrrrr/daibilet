@@ -1,3 +1,28 @@
+## 2026-09-03 - Related / filters / blog flash / MyDay PDF / venue UX / SEO P0-P2
+
+### Наблюдения
+- «Похожие события» на детском круизе: дубли одного title с разными датами, чужие категории через bucket «Мероприятия», иногда чужой город в UI.
+- Desktop sidebar фильтров sticky без собственного scroll - нижние фильтры только после полной прокрутки страницы.
+- `/blog` client reshuffle featured после SSR давал видимое «перещелкивание» статьи.
+- My Day PDF тянул Carto voyager tiles → watermark `API KEY REQUIRED`.
+- Venue «Ближайшие события» - 56px thumbs; catalog quality=65 ошибочно разъехался на все EventCard.
+
+### Решения
+- Related: `event-related.js` - title dedupe, kids/river affinity, hard drop concerts для детских/речных.
+- Catalog sidebar: desktop `max-height` + `overflow-y` на `.catalog-sidebar-scroll` (убран `lg:contents`).
+- Blog: убран client reshuffle featured.
+- PDF: same-origin `/api/osm-tile/...` → OSM tiles; attribution без Carto.
+- Убран блок «Как добраться» с event PDP и venue/location (карта + контакты остаются).
+- Venue upcoming: крупные 16/10 карточки + CTA.
+- Image: `CARD_IMAGE_QUALITY=80` вне каталога; `/events` grid `catalogDense` + quality 65.
+- SEO: PILOT-2 NN+Perm; маркер `/podborki/c/{city}` + 301; lean SSR payloads / deferred home islands.
+
+### Проблемы
+- Backend related на live обновится только после API deploy (не только web artifact).
+- OSM tile proxy: соблюдать usage policy (UA уже задан); при росте PDF-экспортов - rate/cache.
+
+---
+
 ## 2026-08-30 - MSK prod readiness: restricted sudo deploy hardening
 
 ### Наблюдения

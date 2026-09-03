@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Suspense, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { Suspense, useMemo, type ReactNode } from 'react';
 
 import { BlogFeaturedHero } from '@/components/BlogFeaturedHero';
 import { BlogListingSidebar } from '@/components/BlogListingSidebar';
@@ -10,7 +10,6 @@ import { BlogListHero } from '@/components/BlogListHero';
 import { cityFilterLabel } from '@/lib/blog-meta';
 import type { BlogSidebarPromoDto } from '@/lib/blog-sidebar-promo';
 import {
-  shuffleBlogCards,
   splitBlogListingHero,
   truncateAtSentence,
   type BlogCardDto,
@@ -41,16 +40,11 @@ export function BlogListingBody({
   hotMinPrices = {},
   afishaPromos = {},
 }: BlogListingBodyProps) {
-  // Stable SSR order first; reshuffle once on the client for each visit.
-  const [visitPosts, setVisitPosts] = useState<BlogCardDto[] | null>(null);
-  useEffect(() => {
-    setVisitPosts(shuffleBlogCards(posts));
-  }, [posts]);
-
-  const orderedPosts = visitPosts || posts;
+  // Keep SSR/order stable: client reshuffle of the featured hero caused a visible swap.
+  const orderedPosts = posts;
 
   // Cross-city feed by default: header CityPicker must not hard-filter /blog.
-  // Whole list is visit-shuffled; hero takes the first card (no isFeatured pin).
+  // Featured = first card from SSR order (no visit reshuffle).
   const { featured, feed, hot } = useMemo(
     () => splitBlogListingHero(orderedPosts),
     [orderedPosts],
