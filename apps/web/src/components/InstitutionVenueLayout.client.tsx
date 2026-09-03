@@ -372,7 +372,7 @@ export function InstitutionVenueLayout({
               className="rounded-2xl bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 px-5 py-4 ring-1 ring-amber-200/70 sm:px-6 sm:py-5"
               data-venue-hook-fact
             >
-              <p className="max-w-3xl text-sm leading-6 text-slate-700">{hookFactText}</p>
+              <p className="max-w-3xl text-base leading-7 text-zinc-600">{hookFactText}</p>
             </div>
           ) : null}
 
@@ -408,16 +408,16 @@ export function InstitutionVenueLayout({
             {editorial?.highlights?.length ? (
               <ul className="mt-6 space-y-3" data-venue-highlights>
                 {editorial.highlights.map((item) => (
-                  <li key={item} className="flex items-start gap-2.5 text-sm leading-7 text-slate-800">
+                  <li key={item} className="flex items-start gap-2.5 text-base leading-7 text-zinc-600">
                     <CheckCircle2 className="mt-1 h-4 w-4 shrink-0 text-emerald-500" />
                     <span>{item}</span>
                   </li>
                 ))}
               </ul>
             ) : categories.length > 0 ? (
-              <ul className="mt-6 space-y-3">
+              <ul className="mt-6 space-y-3" data-venue-highlights>
                 {categories.slice(0, 6).map(([name]) => (
-                  <li key={name} className="flex items-start gap-2.5 text-sm leading-7 text-slate-800">
+                  <li key={name} className="flex items-start gap-2.5 text-base leading-7 text-zinc-600">
                     <CheckCircle2 className="mt-1 h-4 w-4 shrink-0 text-emerald-500" />
                     <span>{name}</span>
                   </li>
@@ -429,7 +429,7 @@ export function InstitutionVenueLayout({
                   <p
                     key={paragraph.slice(0, 48)}
                     data-venue-md-prose
-                    className={`${index === 0 ? 'mt-8' : 'mt-5'} text-base leading-7 text-slate-600`}
+                    className={`${index === 0 ? 'mt-8' : 'mt-5'} text-base leading-7 text-zinc-600`}
                   >
                     {paragraph}
                   </p>
@@ -501,7 +501,7 @@ export function InstitutionVenueLayout({
                 <p className="mt-4 text-xs leading-5 text-slate-500">{OPEN_DATE_HOURS_HOLIDAY_NOTE}</p>
               </div>
               {visitTips ? (
-                <p className="mt-6 rounded-xl bg-slate-50 p-4 text-sm leading-6 text-slate-700" data-venue-visit-tips>
+                <p className="mt-6 rounded-xl bg-slate-50 p-4 text-base leading-7 text-zinc-600" data-venue-visit-tips>
                   {visitTips}
                 </p>
               ) : null}
@@ -517,7 +517,9 @@ export function InstitutionVenueLayout({
                 {faqItems.map((item) => (
                   <div key={item.question}>
                     <h3 className="text-base font-bold leading-snug text-zinc-950">{item.question}</h3>
-                    <p className="mt-3 text-sm leading-7 text-zinc-600">{item.answer}</p>
+                    <p className="mt-3 text-base leading-7 text-zinc-600" data-venue-faq-answer>
+                      {item.answer}
+                    </p>
                   </div>
                 ))}
               </div>

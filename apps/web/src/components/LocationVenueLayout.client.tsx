@@ -472,12 +472,14 @@ export function LocationVenueLayout({
               {resolveVenueAboutHeading(venue.type, venue.name)}
             </h2>
             {hookFact && !isParkLike ? (
-              <p className="mt-6 text-sm font-semibold leading-7 text-slate-800">{hookFact}</p>
+              <p className="mt-6 text-base leading-7 text-zinc-600" data-venue-hook-fact>
+                {hookFact}
+              </p>
             ) : null}
             {editorial?.highlights?.length ? (
               <ul className="mt-6 space-y-3" data-venue-highlights>
                 {editorial.highlights.map((item) => (
-                  <li key={item} className="flex items-start gap-2.5 text-sm leading-7 text-slate-800">
+                  <li key={item} className="flex items-start gap-2.5 text-base leading-7 text-zinc-600">
                     <CheckCircle2 className="mt-1 h-4 w-4 shrink-0 text-emerald-500" />
                     <span>{item}</span>
                   </li>
@@ -489,7 +491,7 @@ export function LocationVenueLayout({
                   <p
                     key={paragraph.slice(0, 48)}
                     data-venue-md-prose
-                    className={`${index === 0 ? 'mt-8' : 'mt-5'} whitespace-pre-line text-base leading-7 text-slate-600`}
+                    className={`${index === 0 ? 'mt-8' : 'mt-5'} whitespace-pre-line text-base leading-7 text-zinc-600`}
                   >
                     {paragraph}
                   </p>
@@ -542,7 +544,9 @@ export function LocationVenueLayout({
                 {curatedFaq.map((item) => (
                   <div key={item.question}>
                     <h3 className="text-base font-bold leading-snug text-zinc-950">{item.question}</h3>
-                    <p className="mt-3 text-sm leading-7 text-slate-700">{item.answer}</p>
+                    <p className="mt-3 text-base leading-7 text-zinc-600" data-venue-faq-answer>
+                      {item.answer}
+                    </p>
                   </div>
                 ))}
               </div>

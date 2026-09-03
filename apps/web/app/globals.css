@@ -219,7 +219,12 @@ html[data-nav-pending='1'] {
     font-family: var(--font-md);
   }
 
-  [data-venue-pdp-md] [data-venue-md-prose] {
+  /* One body size for venue PDP copy (fact / UL / prose / FAQ answers). */
+  [data-venue-pdp-md] [data-venue-md-prose],
+  [data-venue-pdp-md] [data-venue-hook-fact] p,
+  [data-venue-pdp-md] [data-venue-highlights] li,
+  [data-venue-pdp-md] [data-venue-faq-answer],
+  [data-venue-pdp-md] [data-venue-visit-tips] {
     font-size: 1rem;
     line-height: 1.7;
   }
