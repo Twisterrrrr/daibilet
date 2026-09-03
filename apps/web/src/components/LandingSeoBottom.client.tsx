@@ -6,6 +6,7 @@ import {
 } from '@/data/seo-listing-texts';
 import { buildLandingOnPageSeoText, type LandingSeoInput } from '@/lib/landing-seo';
 import { canonicalLandingSlug } from '@/lib/landing-constants';
+import { sanitizeEventHtml } from '@/lib/event-description-format';
 
 type LandingSeoBottomProps = {
   landingSlug: string;
@@ -32,7 +33,7 @@ export function LandingSeoBottom({
   overrideHtml,
   overrideHeading,
 }: LandingSeoBottomProps) {
-  const html = String(overrideHtml || '').trim();
+  const html = sanitizeEventHtml(String(overrideHtml || '').trim());
   if (html) {
     return (
       <section id="seo" className="w-full border-t border-slate-100 py-12">

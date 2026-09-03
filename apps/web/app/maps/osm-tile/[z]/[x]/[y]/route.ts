@@ -23,7 +23,9 @@ export async function GET(
     zi < 0 ||
     zi > 19 ||
     xi < 0 ||
-    yi < 0
+    yi < 0 ||
+    xi >= 2 ** zi ||
+    yi >= 2 ** zi
   ) {
     return new NextResponse('Bad tile', { status: 400 });
   }

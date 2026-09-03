@@ -74,6 +74,21 @@ test('existing HTML is sanitized and not re-parsed into lists', () => {
   assert.equal(formatEventDescriptionHtml(withScript), '<p>Ok</p><ul><li>A</li></ul>');
 });
 
+test('sanitizeEventHtml strips XSS vectors that old regex missed', () => {
+  const html = formatEventDescriptionHtml('<p>Ok</p><img src=x onerror=alert(1)><iframe src="javascript:alert(1)"></iframe>');
+  assert.doesNotMatch(html, /onerror/i);
+  assert.doesNotMatch(html, /<iframe/i);
+  assert.doesNotMatch(html, /<img/i);
+  assert.match(html, /<p>Ok<\/p>/);
+
+  const jsLink = formatEventDescriptionHtml('<p><a href="javascript:alert(1)">x</a></p>');
+  assert.doesNotMatch(jsLink, /javascript:/i);
+
+  const svg = formatEventDescriptionHtml('<p>Hi</p><svg/onload=alert(1)>');
+  assert.doesNotMatch(svg, /<svg/i);
+  assert.doesNotMatch(svg, /onload/i);
+});
+
 /** Teplohod-style: landmark lines without bullet markers + paragraph breaks via single newlines. */
 const KREMLIN_CRUISE_SAMPLE = `Обзорная речная прогулка от Новоспасского моста – это не просто способ увидеть Москву. За 2 час 30 минут прогулки вы сможете дважды увидеть лучшие достопримечательности Москвы:
  Парящий мост парка Зарядье

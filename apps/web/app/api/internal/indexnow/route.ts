@@ -6,6 +6,7 @@ import {
   INDEXNOW_DEPLOY_PATHS,
   submitIndexNow,
 } from '@/lib/indexnow';
+import { isAuthorizedInternalRequest } from '@/lib/internal-route-auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,13 +19,7 @@ type IndexNowBody = {
 };
 
 function isAuthorized(request: Request): boolean {
-  const secret = process.env.DAIBILET_NEXT_REVALIDATE_SECRET?.trim();
-  if (!secret) return false;
-
-  const authHeader = request.headers.get('authorization') || '';
-  const bearer = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : '';
-  const headerSecret = request.headers.get('x-revalidate-secret')?.trim() || '';
-  return bearer === secret || headerSecret === secret;
+  return isAuthorizedInternalRequest(request);
 }
 
 export async function POST(request: Request) {

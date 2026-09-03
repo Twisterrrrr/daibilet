@@ -12,6 +12,7 @@ import {
   resolvePodborkiCityMetaPilot,
 } from '@/lib/podborki-city-seo';
 import { getLandingSeo } from '@/lib/seo/get-landing-seo';
+import { sanitizeEventHtml } from '@/lib/event-description-format';
 import {
   getCachedDestinations,
   getCachedLandingsCatalog,
@@ -187,7 +188,7 @@ export async function PodborkiCatalogSurface({
           <section className="container-page border-t border-slate-200 py-10">
             <div
               className="prose prose-slate max-w-3xl text-sm leading-relaxed text-slate-600"
-              dangerouslySetInnerHTML={{ __html: seo.seoText }}
+              dangerouslySetInnerHTML={{ __html: sanitizeEventHtml(seo.seoText) }}
             />
           </section>
         ) : null}

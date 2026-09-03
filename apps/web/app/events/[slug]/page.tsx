@@ -14,7 +14,7 @@ import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
 import { buildEventListingMeta, buildEventPageMetaTitle } from '@/lib/seo-event-meta';
 import { buildEventPageJsonLd } from '@/lib/structured-data';
 import { pickRepresentativeSession } from '@/lib/event-purchase';
-import { safeNotFound } from '@/lib/safe-not-found';
+import { safeNotFound, isNextControlFlowError } from '@/lib/safe-not-found';
 import {
   getCachedEventAggregateRating,
   loadEventDto,
@@ -122,6 +122,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       }),
     };
   } catch (error) {
+    if (isNextControlFlowError(error)) throw error;
     console.warn(
       `[event-metadata] fallback for ${decodedSlug}:`,
       error instanceof Error ? error.message : error,

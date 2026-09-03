@@ -2,6 +2,7 @@ import { revalidatePath, revalidateTag } from 'next/cache';
 import { NextResponse } from 'next/server';
 
 import { notifyIndexNowForPaths } from '@/lib/indexnow';
+import { isAuthorizedInternalRequest, isSafeRevalidatePath } from '@/lib/internal-route-auth';
 import { EVENT_PAGE_CACHE_TAG, HOME_PAGE_CACHE_TAG, eventPageCacheTag } from '@/server/cache-config';
 import {
   clearPublicArticlesDtoCache,
@@ -22,13 +23,7 @@ type RevalidateBody = {
 };
 
 function isAuthorized(request: Request): boolean {
-  const secret = process.env.DAIBILET_NEXT_REVALIDATE_SECRET?.trim();
-  if (!secret) return false;
-
-  const authHeader = request.headers.get('authorization') || '';
-  const bearer = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : '';
-  const headerSecret = request.headers.get('x-revalidate-secret')?.trim() || '';
-  return bearer === secret || headerSecret === secret;
+  return isAuthorizedInternalRequest(request);
 }
 
 function normalizeEventSlug(raw: unknown): string {
@@ -75,8 +70,10 @@ export async function POST(request: Request) {
     /* ignore if module unavailable in this runtime */
   }
 
-  const tags = new Set<string>(body.tags?.length ? body.tags : []);
-  const paths = new Set<string>(body.paths?.length ? body.paths : []);
+  const tags = new Set<string>(body.tags?.length ? body.tags.filter((tag) => /^[\w:.-]{1,120}$/.test(String(tag))) : []);
+  const paths = new Set<string>(
+    (body.paths || []).filter((item) => isSafeRevalidatePath(String(item))),
+  );
 
   const slug = normalizeEventSlug(body.slug);
   if (slug) {

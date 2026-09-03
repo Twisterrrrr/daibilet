@@ -43,3 +43,48 @@ test('event PDP page uses loadEventDto + safeNotFound, not getCached + notFound 
     'ISR event PDP must not import permanentRedirect',
   );
 });
+
+/**
+ * New ISR pages must not call redirect()/permanentRedirect().
+ * NEXT_REDIRECT during static gen becomes HTTP 500 (Pianissimo 2026-09-03).
+ * Known hubs that still redirect are allowlisted until moved to middleware.
+ */
+const ISR_NAV_REDIRECT_ALLOWLIST = new Set([
+  'app/blog/[slug]/page.tsx',
+  'app/podborki/(catalog)/page.tsx',
+  'app/podborki/c/[city]/page.tsx',
+  'app/podborki/[intent]/page.tsx',
+  'app/podborki/[intent]/[city]/page.tsx',
+]);
+
+function listPageFiles(dir: string, acc: string[] = []): string[] {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) listPageFiles(full, acc);
+    else if (entry.name === 'page.tsx') acc.push(full);
+  }
+  return acc;
+}
+
+test('ISR pages do not gain new next/navigation redirects', () => {
+  const appRoot = path.join(WEB_ROOT, 'app');
+  const offenders: string[] = [];
+  for (const file of listPageFiles(appRoot)) {
+    const source = fs.readFileSync(file, 'utf8');
+    if (!/export const revalidate\s*=/.test(source)) continue;
+    const usesRedirect =
+      /\bpermanentRedirect\s*\(/.test(source) ||
+      (/\bredirect\s*\(/.test(source) && /from ['"]next\/navigation['"]/.test(source));
+    if (!usesRedirect) continue;
+    const rel = path.relative(WEB_ROOT, file).replace(/\\/g, '/');
+    if (ISR_NAV_REDIRECT_ALLOWLIST.has(rel)) continue;
+    offenders.push(rel);
+  }
+  assert.deepEqual(offenders, [], `ISR navigation redirect not allowlisted: ${offenders.join(', ')}`);
+});
+
+test('middleware owns Cyrillic event slug 308', () => {
+  const middleware = fs.readFileSync(path.join(WEB_ROOT, 'middleware.ts'), 'utf8');
+  assert.match(middleware, /cyrillicEventRedirectPath/);
+  assert.match(middleware, /redirectCyrillicEventSlug/);
+});

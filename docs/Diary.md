@@ -1,4 +1,22 @@
-## 2026-09-03 - Cyrillic event PDP HTTP 500
+## 2026-09-04 - Security audit + ISR Cyrillic 500
+
+### Наблюдения
+- Кириллический `/events/{slug}` на ISR звал `permanentRedirect()` → HTTP 500 + Location.
+- Partner HTML в описании события фильтровал только `<script>` и quoted `on*=` - обход через `onerror=alert(1)`, iframe, `javascript:`.
+- SEO HTML с админки шёл в `dangerouslySetInnerHTML` без санитайза.
+- `/api/internal/*` сравнивал секреты через `===`. Revalidate принимал любой path.
+
+### Решения
+- 308 кириллицы в middleware; ISR PDP без `permanentRedirect`; тест-allowlist на новые ISR-редиректы.
+- Allowlist-санитайз HTML описаний и SEO-блоков.
+- Timing-safe auth internal API; path allowlist для revalidate; OSM tile z/x/y bounds; geocode length cap.
+
+### Проблемы
+- Blog/podborki ISR ещё зовут `permanentRedirect` (в allowlist). Venue family mismatch тоже. Вынести в middleware отдельным проходом.
+
+---
+
+
 
 ### Наблюдения
 - `https://daibilet.ru/events/зимнии-фестиваль-pianissimo-…` отдавал HTTP 500 с `Location` на латинский slug. Латинский канон открывался.

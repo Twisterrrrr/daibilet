@@ -5,6 +5,7 @@ import { CatalogShell } from '@/components/CatalogShell.client';
 import { SectionPageHero } from '@/components/PageBreadcrumbs';
 import type { CatalogIntentDefinition } from '@/lib/catalog-intent-routes';
 import { catalogIntentPath, formatIntentSeoBody, listCatalogIntents } from '@/lib/catalog-intent-routes';
+import { sanitizeEventHtml } from '@/lib/event-description-format';
 import type { CatalogPageQuery } from '@/server/catalog-query';
 import { catalogQueryCacheKey } from '@/server/catalog-query';
 import { getCachedCatalog } from '@/server/cached-catalog-data';
@@ -90,7 +91,7 @@ export async function IntentCollectionView({
           {seoText ? (
             <div
               className="prose prose-slate mt-6 max-w-none text-sm leading-relaxed text-slate-600"
-              dangerouslySetInnerHTML={{ __html: seoText }}
+              dangerouslySetInnerHTML={{ __html: sanitizeEventHtml(seoText) }}
             />
           ) : null}
           <p className="mt-4 text-sm text-slate-500">

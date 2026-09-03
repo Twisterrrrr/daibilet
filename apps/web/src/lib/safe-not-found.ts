@@ -20,3 +20,16 @@ import { notFound } from 'next/navigation';
 export function safeNotFound(): never {
   notFound();
 }
+
+/** notFound / redirect / DYNAMIC_SERVER_USAGE - never swallow in generateMetadata catch. */
+export function isNextControlFlowError(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false;
+  const digest = 'digest' in error ? String((error as { digest?: unknown }).digest || '') : '';
+  return (
+    digest.startsWith('NEXT_NOT_FOUND') ||
+    digest.startsWith('NEXT_HTTP_ERROR_FALLBACK') ||
+    digest.startsWith('NEXT_REDIRECT') ||
+    digest.startsWith('NEXT_DYNAMIC') ||
+    digest === 'DYNAMIC_SERVER_USAGE'
+  );
+}

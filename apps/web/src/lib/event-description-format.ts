@@ -13,12 +13,93 @@ export function cleanDisplayText(value?: string | null): string {
     .trim();
 }
 
+const HTML_ALLOWED_TAGS = new Set([
+  'p',
+  'br',
+  'ul',
+  'ol',
+  'li',
+  'h2',
+  'h3',
+  'h4',
+  'strong',
+  'em',
+  'b',
+  'i',
+  'a',
+  'blockquote',
+]);
+
+const HTML_VOID_TAGS = new Set(['br']);
+
+const HTML_DANGEROUS_BLOCKS =
+  /<(script|style|iframe|object|embed|form|link|meta|base|svg|math|noscript|template|video|audio|source|track)(\s[^>]*)?>[\s\S]*?<\/\1>/gi;
+
+function escapeHtmlAttr(value: string): string {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+function safeHtmlHref(raw: string): string | null {
+  const href = String(raw || '').trim();
+  if (!href) return null;
+  const lower = href.toLowerCase();
+  if (
+    lower.startsWith('javascript:') ||
+    lower.startsWith('data:') ||
+    lower.startsWith('vbscript:') ||
+    lower.startsWith('file:')
+  ) {
+    return null;
+  }
+  if (
+    href.startsWith('/') ||
+    href.startsWith('#') ||
+    href.startsWith('https://') ||
+    href.startsWith('http://') ||
+    href.startsWith('mailto:') ||
+    href.startsWith('tel:')
+  ) {
+    return href;
+  }
+  return null;
+}
+
+function extractHtmlAttr(attrs: string, name: string): string | null {
+  const match = String(attrs || '').match(
+    new RegExp(`(?:^|\\s)${name}\\s*=\\s*(?:"([^"]*)"|'([^']*)'|([^\\s>]+))`, 'i'),
+  );
+  if (!match) return null;
+  return match[1] ?? match[2] ?? match[3] ?? null;
+}
+
+/**
+ * Allowlisted markup for partner HTML descriptions.
+ * Strips script/iframe/svg, event handlers, and javascript: URLs.
+ * Unquoted onerror= and similar must not survive.
+ */
 export function sanitizeEventHtml(html: string): string {
-  return html
-    .replace(/<script[\s\S]*?<\/script>/gi, '')
-    .replace(/<style[\s\S]*?<\/style>/gi, '')
-    .replace(/\son\w+="[^"]*"/gi, '')
-    .replace(/\son\w+='[^']*'/gi, '');
+  let out = String(html || '');
+  out = out.replace(/<!--[\s\S]*?-->/g, '');
+  out = out.replace(HTML_DANGEROUS_BLOCKS, '');
+  out = out.replace(/<(script|iframe|object|embed|form|link|meta|base|svg)\b[^>]*>/gi, '');
+  out = out.replace(/<\/?([a-z][a-z0-9]*)\b([^>]*)>/gi, (full, tag: string, attrs: string) => {
+    const name = tag.toLowerCase();
+    const closing = full.startsWith('</');
+    if (!HTML_ALLOWED_TAGS.has(name)) return '';
+    if (closing) return HTML_VOID_TAGS.has(name) ? '' : `</${name}>`;
+    if (HTML_VOID_TAGS.has(name)) return `<${name}>`;
+    if (name === 'a') {
+      const href = safeHtmlHref(extractHtmlAttr(attrs, 'href') || '');
+      if (!href) return '<a>';
+      return `<a href="${escapeHtmlAttr(href)}" rel="nofollow noopener noreferrer">`;
+    }
+    return `<${name}>`;
+  });
+  return out;
 }
 
 export function escapeEventHtml(text: string): string {

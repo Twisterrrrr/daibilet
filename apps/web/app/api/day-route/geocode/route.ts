@@ -24,11 +24,14 @@ export async function GET(request: Request) {
   const city = String(url.searchParams.get('city') || '').trim();
   const citySlug = String(url.searchParams.get('citySlug') || '').trim();
 
-  if (address.length < 3) {
+  if (address.length < 3 || address.length > 180) {
     return publicJsonResponse(
       { error: 'empty_query', message: 'Address too short' },
       { status: 400 },
     );
+  }
+  if (/https?:\/\//i.test(address)) {
+    return publicJsonResponse({ error: 'invalid_query' }, { status: 400 });
   }
 
   const q = buildSoftGeocodeQuery(address, city || null);
