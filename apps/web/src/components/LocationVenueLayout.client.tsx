@@ -469,7 +469,7 @@ export function LocationVenueLayout({
           {((hookFact && !isParkLike) || aboutBody || editorial?.highlights?.length) ? (
           <section className="scroll-mt-24">
             <h2 className="font-display text-xl font-bold tracking-tight text-zinc-950 sm:text-2xl">
-              {resolveVenueAboutHeading(venue.type, venue.name)}
+              {resolveVenueAboutHeading(venue.type, venue.title || venue.name)}
             </h2>
             {hookFact && !isParkLike ? (
               <p className="mt-6 text-base leading-7 text-zinc-600" data-venue-hook-fact>

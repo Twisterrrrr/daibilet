@@ -285,9 +285,15 @@ export function resolveLocationVenueCopy(venue: {
 }
 
 /**
- * PDP «about» H2: О музее / О клубе / …; fallback «О месте» when kind is ambiguous.
+ * PDP «about» H2: О музее / О клубе / … by public type.
+ * Name hints (джаз-клуб, театр, …) override weak/wrong catalog types.
+ * Never hardcode «О месте» for typed clubs - mock copy is not the source of truth.
  */
 export function resolveVenueAboutHeading(type?: string | null, name?: string | null): string {
+  const nameHint = resolveAboutHeadingFromName(name);
+  // Explicit «клуб» in the title wins over bar / other misc types.
+  if (nameHint === 'О клубе') return 'О клубе';
+
   const key = resolvePublicVenueType(type, name);
   switch (key) {
     case 'museum':
@@ -313,10 +319,22 @@ export function resolveVenueAboutHeading(type?: string | null, name?: string | n
     case 'bus':
       return 'О точке сбора';
     case 'gastro':
-      return 'О месте';
+      return nameHint || 'О месте';
     default:
-      return 'О месте';
+      return nameHint || 'О месте';
   }
+}
+
+function resolveAboutHeadingFromName(name?: string | null): string | null {
+  const n = String(name || '');
+  if (!n.trim()) return null;
+  if (/(?:джаз[-\s]?клуб|\bклуб\b)/iu.test(n)) return 'О клубе';
+  if (/\bтеатр\b/iu.test(n)) return 'О театре';
+  if (/\bбар\b/iu.test(n)) return 'О баре';
+  if (/(?:музей|эрмитаж)/iu.test(n)) return 'О музее';
+  if (/(?:галере|выстав)/iu.test(n)) return 'О галерее';
+  if (/(?:филармон|консерватор|концертн)/iu.test(n)) return 'О зале';
+  return null;
 }
 
 /** Split editorial SEO body into markdown-like paragraphs. */
@@ -326,6 +344,24 @@ export function splitVenueProseParagraphs(body: string | null | undefined): stri
     .split(/\n{2,}/)
     .map((part) => part.replace(/\s+/g, ' ').trim())
     .filter(Boolean);
+}
+
+/**
+ * «Label: rest» lines in SEO body - bold label, no checklist chrome.
+ * Keep short labels only so URLs / times do not get mis-split.
+ */
+export function splitVenueLabeledProse(
+  paragraph: string,
+): { label: string; rest: string } | null {
+  const text = String(paragraph || '').trim();
+  const match = text.match(/^([^:]{2,48}):\s+(.+)$/s);
+  if (!match) return null;
+  const label = match[1].trim();
+  const rest = match[2].trim();
+  if (!label || !rest) return null;
+  // Skip address-like «Санкт-Петербург, …» false positives without a topical label.
+  if (/^[А-ЯA-Z][^а-яa-z]*$/.test(label) && label.length < 4) return null;
+  return { label, rest };
 }
 
 export function institutionTypeEmoji(type?: string | null): string {

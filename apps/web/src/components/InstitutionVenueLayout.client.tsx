@@ -51,6 +51,7 @@ import {
   normalizeVenueKind,
   resolvePublicVenueType,
   resolveVenueAboutHeading,
+  splitVenueLabeledProse,
   splitVenueProseParagraphs,
   venueTypeLabel,
 } from '@/lib/venue-meta';
@@ -96,8 +97,8 @@ export function InstitutionVenueLayout({
   const isMuseumOrArt = MUSEUM_ART_KINDS.has(publicType);
   const typeLabel = venueTypeLabel(venue.type, venue.name);
   const aboutHeading = React.useMemo(
-    () => resolveVenueAboutHeading(venue.type, venue.name),
-    [venue.type, venue.name],
+    () => resolveVenueAboutHeading(venue.type, venue.title || venue.name),
+    [venue.type, venue.title, venue.name],
   );
   const editorial = React.useMemo(
     () => resolveVenueEditorialContent(venue.slug),
@@ -367,15 +368,6 @@ export function InstitutionVenueLayout({
 
       <div className="container-page grid grid-cols-[minmax(0,1fr)] gap-8 py-8 lg:grid-cols-3">
         <div className="space-y-8 lg:col-span-2">
-          {hookFactText ? (
-            <div
-              className="rounded-2xl bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 px-5 py-4 ring-1 ring-amber-200/70 sm:px-6 sm:py-5"
-              data-venue-hook-fact
-            >
-              <p className="max-w-3xl text-base leading-7 text-zinc-600">{hookFactText}</p>
-            </div>
-          ) : null}
-
           {galleryImages.length >= 2 ? (
             <section
               className="scroll-mt-24"
@@ -405,8 +397,14 @@ export function InstitutionVenueLayout({
             <h2 className="font-display text-xl font-bold tracking-tight text-zinc-950 sm:text-2xl">
               {aboutHeading}
             </h2>
+            {editorial?.heroLead ? (
+              <p className="mt-5 text-base leading-7 text-zinc-600" data-venue-md-prose>
+                {editorial.heroLead}
+              </p>
+            ) : null}
+            {/* Checkmarks only in this top «about» block - SEO sections stay plain prose. */}
             {editorial?.highlights?.length ? (
-              <ul className="mt-6 space-y-3" data-venue-highlights>
+              <ul className="mt-5 space-y-2.5" data-venue-highlights>
                 {editorial.highlights.map((item) => (
                   <li key={item} className="flex items-start gap-2.5 text-base leading-7 text-zinc-600">
                     <CheckCircle2 className="mt-1 h-4 w-4 shrink-0 text-emerald-500" />
@@ -415,7 +413,7 @@ export function InstitutionVenueLayout({
                 ))}
               </ul>
             ) : categories.length > 0 ? (
-              <ul className="mt-6 space-y-3" data-venue-highlights>
+              <ul className="mt-5 space-y-2.5" data-venue-highlights>
                 {categories.slice(0, 6).map(([name]) => (
                   <li key={name} className="flex items-start gap-2.5 text-base leading-7 text-zinc-600">
                     <CheckCircle2 className="mt-1 h-4 w-4 shrink-0 text-emerald-500" />
@@ -429,7 +427,7 @@ export function InstitutionVenueLayout({
                   <p
                     key={paragraph.slice(0, 48)}
                     data-venue-md-prose
-                    className={`${index === 0 ? 'mt-8' : 'mt-5'} text-base leading-7 text-zinc-600`}
+                    className={`${index === 0 ? 'mt-5' : 'mt-3'} text-base leading-7 text-zinc-600`}
                   >
                     {paragraph}
                   </p>
@@ -437,26 +435,42 @@ export function InstitutionVenueLayout({
               : null}
           </section>
 
+          {hookFactText ? (
+            <p className="text-base leading-7 text-zinc-600" data-venue-hook-fact data-venue-md-prose>
+              {hookFactText}
+            </p>
+          ) : null}
+
           {seoSections.length > 0 ? (
             <section
               id="venue-guide"
-              className="scroll-mt-24 space-y-14"
+              className="scroll-mt-24 space-y-8"
               data-venue-seo-sections
             >
               {seoSections.map((section) => (
-                <div key={section.h2} className="space-y-5">
+                <div key={section.h2} className="space-y-3">
                   <h2 className="font-display text-xl font-bold tracking-tight text-zinc-950 sm:text-2xl">
                     {section.h2}
                   </h2>
-                  {splitVenueProseParagraphs(section.body).map((paragraph) => (
-                    <p
-                      key={paragraph.slice(0, 48)}
-                      data-venue-md-prose
-                      className="text-base leading-7 text-zinc-600"
-                    >
-                      {paragraph}
-                    </p>
-                  ))}
+                  {splitVenueProseParagraphs(section.body).map((paragraph) => {
+                    const labeled = splitVenueLabeledProse(paragraph);
+                    return (
+                      <p
+                        key={paragraph.slice(0, 48)}
+                        data-venue-md-prose
+                        className="text-base leading-7 text-zinc-600"
+                      >
+                        {labeled ? (
+                          <>
+                            <strong className="font-semibold text-zinc-800">{labeled.label}:</strong>{' '}
+                            {labeled.rest}
+                          </>
+                        ) : (
+                          paragraph
+                        )}
+                      </p>
+                    );
+                  })}
                 </div>
               ))}
             </section>
