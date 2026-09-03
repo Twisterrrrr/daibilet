@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { notFound, permanentRedirect } from 'next/navigation';
+import { permanentRedirect } from 'next/navigation';
 
 import { EventCard } from '@/components/EventCard';
 import { EventBuyCard, EventHero } from '@/components/EventPage.client';
@@ -15,11 +15,11 @@ import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
 import { buildEventListingMeta, buildEventPageMetaTitle } from '@/lib/seo-event-meta';
 import { buildEventPageJsonLd } from '@/lib/structured-data';
 import { pickRepresentativeSession } from '@/lib/event-purchase';
+import { safeNotFound } from '@/lib/safe-not-found';
 import {
   getCachedEventAggregateRating,
-  getCachedPublicEventDto,
+  loadEventDto,
 } from '@/server/cached-event-data';
-import { isTimeoutError } from '@/server/public-api-client';
 import { listTopEventSlugsForSsg } from '@/server/top-event-slugs';
 
 /** ISR: regenerate HTML in background at most every 2h (matches EVENT_PAGE_REVALIDATE). */
@@ -31,21 +31,28 @@ type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
-function isProductionBuildPhase(): boolean {
-  return process.env.NEXT_PHASE === 'phase-production-build';
+function decodeEventParamSlug(slug: string): string {
+  try {
+    return decodeURIComponent(String(slug || '').trim());
+  } catch {
+    return String(slug || '').trim();
+  }
 }
 
-/**
- * Soft-fail SSG timeouts so one slow event does not abort `next build`.
- * Page may be recorded as not-found for this build; runtime + dynamicParams
- * + revalidate refill it on demand / next revalidation.
- */
-function softFailSsgTimeout(slug: string, error: unknown): never {
-  console.warn(
-    `[SSG Warning] Soft timeout on /events/${slug} — postponing to runtime.`,
-    error instanceof Error ? error.message : error,
+function EventUnavailablePage({ slug }: { slug: string }) {
+  return (
+    <SiteLayout>
+      <main className="container-page py-16">
+        <h1 className="font-display text-2xl font-bold text-slate-900 sm:text-3xl">
+          Событие временно недоступно
+        </h1>
+        <p className="mt-3 max-w-xl text-sm leading-relaxed text-slate-600 sm:text-base">
+          Не удалось загрузить карточку. Обновите страницу через минуту.
+        </p>
+        <p className="mt-2 text-xs text-slate-400">{slug}</p>
+      </main>
+    </SiteLayout>
   );
-  notFound();
 }
 
 /**
@@ -64,21 +71,28 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  try {
-    const payload = await getCachedPublicEventDto(slug);
-    if (!payload?.event) notFound();
+  const decodedSlug = decodeEventParamSlug(slug);
+  const loaded = await loadEventDto(decodedSlug);
+  if (loaded.kind === 'miss') safeNotFound();
+  if (loaded.kind === 'unavailable') {
+    return {
+      title: pageTitle('Событие временно недоступно'),
+      robots: { index: false, follow: false },
+    };
+  }
 
-    const event = payload.event;
+  try {
+    const event = loaded.payload.event;
     const path = event.canonicalPath || eventHref(event);
-    const priceRange = getTicketPriceRange(payload);
+    const priceRange = getTicketPriceRange(loaded.payload);
     const expansionMeta = buildEventListingMeta({
       eventTitle: event.title,
       cityName: event.city,
       citySlug: event.citySlug,
       sourceCitySlug: event.sourceCitySlug,
-      priceFrom: priceRange?.min ?? event.priceFrom ?? payload.stats?.priceFrom,
+      priceFrom: priceRange?.min ?? event.priceFrom ?? loaded.payload.stats?.priceFrom,
     });
-    const nextSession = pickRepresentativeSession(payload.sessions ?? []);
+    const nextSession = pickRepresentativeSession(loaded.payload.sessions ?? []);
     const disambiguatedTitle = buildEventPageMetaTitle({
       eventTitle: event.title,
       seoTitle: event.seoTitle,
@@ -109,34 +123,31 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       }),
     };
   } catch (error) {
-    if (isProductionBuildPhase() && isTimeoutError(error)) {
-      console.warn(`[SSG Warning] Soft timeout in metadata /events/${slug}`);
-      return { title: pageTitle('Событие') };
-    }
-    throw error;
+    console.warn(
+      `[event-metadata] fallback for ${decodedSlug}:`,
+      error instanceof Error ? error.message : error,
+    );
+    return { title: pageTitle('Событие') };
   }
 }
 
 export default async function EventDetailPage({ params }: PageProps) {
   const { slug } = await params;
-  let payload;
-  try {
-    payload = await getCachedPublicEventDto(slug);
-  } catch (error) {
-    if (isProductionBuildPhase() && isTimeoutError(error)) {
-      softFailSsgTimeout(slug, error);
-    }
-    throw error;
+  const decodedSlug = decodeEventParamSlug(slug);
+  const loaded = await loadEventDto(decodedSlug);
+  if (loaded.kind === 'miss') safeNotFound();
+  if (loaded.kind === 'unavailable') {
+    return <EventUnavailablePage slug={decodedSlug} />;
   }
-  if (!payload?.event) notFound();
 
+  const payload = loaded.payload;
   const { event, related } = payload;
   // Soft-404 recovery (STAND_BY TC → live TEP twin etc.): land on canonical slug.
   const canonicalPath = String(event.canonicalPath || '').trim();
   const canonicalSlug = String(event.slug || '').trim();
   if (
     canonicalSlug &&
-    canonicalSlug !== slug &&
+    canonicalSlug !== decodedSlug &&
     canonicalPath.startsWith('/events/')
   ) {
     permanentRedirect(canonicalPath);
@@ -148,7 +159,15 @@ export default async function EventDetailPage({ params }: PageProps) {
   } catch {
     aggregate = null;
   }
-  const jsonLdBlocks = buildEventPageJsonLd(payload, { aggregateRating: aggregate });
+  let jsonLdBlocks: Array<Record<string, unknown>> = [];
+  try {
+    jsonLdBlocks = buildEventPageJsonLd(payload, { aggregateRating: aggregate });
+  } catch (error) {
+    console.warn(
+      `[event-jsonld] skip for ${decodedSlug}:`,
+      error instanceof Error ? error.message : error,
+    );
+  }
 
   return (
     <>

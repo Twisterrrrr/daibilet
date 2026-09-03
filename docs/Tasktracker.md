@@ -1,3 +1,9 @@
+## 2026-09-03 - Live ISR 500 (SiteLayout cookies)
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| INC.ISR500.COOKIES | `cookies()` в SiteLayout → DYNAMIC_SERVER_USAGE 500 на event/city/venue PDP | Критический | 🔄 commit + Deploy MSK web |
+
 ## 2026-09-03 - Related / filters / blog flash / SEO P0-P2
 
 | ID | Задача | Приоритет | Статус |

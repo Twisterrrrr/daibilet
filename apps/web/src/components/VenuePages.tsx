@@ -128,19 +128,23 @@ export async function generateVenueListMetadata(
 }
 
 export async function generateVenueDetailMetadata(slug: string): Promise<Metadata> {
-  const loaded = await loadVenueDto(decodeURIComponent(slug));
+  let decoded = slug;
+  try {
+    decoded = decodeURIComponent(slug);
+  } catch {
+    decoded = slug;
+  }
+  const loaded = await loadVenueDto(decoded);
   if (loaded.kind === 'miss') safeNotFound();
   if (loaded.kind === 'unavailable') {
-    // Do NOT await connection()/noStore() here: on ISR (`revalidate`) that digest
-    // DYNAMIC_SERVER_USAGE surfaces as HTTP 500 (2026-08-09 bar-hroniki / gastro PDP).
-    // Soft metadata may live ≤ revalidate (300s) - acceptable vs crashing the PDP.
     return {
       title: pageTitle('Площадка временно недоступна'),
       robots: { index: false, follow: false },
     };
   }
-  const payload = loaded.payload;
-  const venue = applyVenueEditorialOverlay(payload.venue);
+  try {
+    const payload = loaded.payload;
+    const venue = applyVenueEditorialOverlay(payload.venue);
   const heroForShare =
     resolveVenueHeroImage(venue.slug || slug, venue.heroImageUrl) || venue.heroImageUrl;
   const decision = evaluateVenueIndexability({
@@ -152,18 +156,28 @@ export async function generateVenueDetailMetadata(slug: string): Promise<Metadat
     venue.seoDescription || venue.shortDescription || venue.description || undefined;
   const canonicalPath = venueCanonicalPath(venue);
 
-  return {
-    title: pageTitle(title),
-    description,
-    alternates: { canonical: canonicalPath },
-    robots: robotsForIndexability(decision.indexable),
-    ...buildShareMetadata({
-      title: shareTitle,
+    return {
+      title: pageTitle(title),
       description,
-      path: canonicalPath,
-      image: heroForShare,
-    }),
-  };
+      alternates: { canonical: canonicalPath },
+      robots: robotsForIndexability(decision.indexable),
+      ...buildShareMetadata({
+        title: shareTitle,
+        description,
+        path: canonicalPath,
+        image: heroForShare,
+      }),
+    };
+  } catch (error) {
+    console.warn(
+      `[venue-metadata] fallback for ${slug}:`,
+      error instanceof Error ? error.message : error,
+    );
+    return {
+      title: pageTitle('Площадка'),
+      robots: { index: false, follow: false },
+    };
+  }
 }
 
 export async function VenueListPage({ family }: Pick<PageProps, 'family'>) {

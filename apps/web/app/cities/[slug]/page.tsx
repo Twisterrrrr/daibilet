@@ -88,7 +88,14 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const loaded = await loadCityDto(decodeURIComponent(slug));
+  let decodedSlug = slug;
+  try {
+    decodedSlug = decodeURIComponent(slug);
+  } catch {
+    decodedSlug = slug;
+  }
+
+  const loaded = await loadCityDto(decodedSlug);
   if (loaded.kind === 'miss') {
     safeNotFound();
   }
@@ -99,9 +106,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
-  const payload = loaded.payload;
-  const city = payload.city;
-  const path = city.canonicalPath || `/cities/${city.slug}`;
+  try {
+    const payload = loaded.payload;
+    const city = payload.city;
+    const path = city.canonicalPath || `/cities/${city.slug}`;
 
   if (city.type === 'region') {
     const childEventTotal = (payload.childCities || []).reduce(
@@ -159,18 +167,28 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     sourceSlug: city.sourceSlug,
   });
 
-  return {
-    title: expansionAbsolute ? { absolute: hubTitle } : pageTitle(hubTitle),
-    description,
-    alternates: { canonical: path },
-    robots: robotsForIndexability(decision.indexable),
-    ...buildShareMetadata({
-      title: hubTitleFull,
+    return {
+      title: expansionAbsolute ? { absolute: hubTitle } : pageTitle(hubTitle),
       description,
-      path,
-      image: imagePath,
-    }),
-  };
+      alternates: { canonical: path },
+      robots: robotsForIndexability(decision.indexable),
+      ...buildShareMetadata({
+        title: hubTitleFull,
+        description,
+        path,
+        image: imagePath,
+      }),
+    };
+  } catch (error) {
+    console.warn(
+      `[city-metadata] fallback for ${decodedSlug}:`,
+      error instanceof Error ? error.message : error,
+    );
+    return {
+      title: pageTitle('Город'),
+      robots: { index: false, follow: false },
+    };
+  }
 }
 
 /**
@@ -182,7 +200,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function CityPage({ params }: PageProps) {
   const pageStartedAt = Date.now();
   const { slug } = await params;
-  const decodedSlug = decodeURIComponent(slug);
+  let decodedSlug = slug;
+  try {
+    decodedSlug = decodeURIComponent(slug);
+  } catch {
+    decodedSlug = slug;
+  }
 
   const cityStartedAt = Date.now();
   const loaded = await loadCityDto(decodedSlug);
@@ -202,7 +225,15 @@ export default async function CityPage({ params }: PageProps) {
   const payload = loaded.payload;
 
   if (payload.city.type === 'region') {
-    const jsonLdBlocks = buildCityPageJsonLd(payload);
+    let jsonLdBlocks: Array<Record<string, unknown>> = [];
+    try {
+      jsonLdBlocks = buildCityPageJsonLd(payload);
+    } catch (error) {
+      console.warn(
+        `[city-jsonld] skip region ${decodedSlug}:`,
+        error instanceof Error ? error.message : error,
+      );
+    }
     cityPerfMark('page-total', pageStartedAt, { slug: decodedSlug, region: true });
     return (
       <>
@@ -245,7 +276,15 @@ export default async function CityPage({ params }: PageProps) {
   const faqStartedAt = Date.now();
   const faqItems = buildCityFaqItems(payload);
   const seoText = buildCitySeoText(payload);
-  const jsonLdBlocks = buildCityPageJsonLd(payload);
+  let jsonLdBlocks: Array<Record<string, unknown>> = [];
+  try {
+    jsonLdBlocks = buildCityPageJsonLd(payload);
+  } catch (error) {
+    console.warn(
+      `[city-jsonld] skip ${decodedSlug}:`,
+      error instanceof Error ? error.message : error,
+    );
+  }
   cityPerfMark('faq-seo-jsonld', faqStartedAt, { jsonLd: jsonLdBlocks.length });
 
   const hubTemplate = resolveCityHubTemplate({ slug: decodedSlug });

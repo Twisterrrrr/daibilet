@@ -1,3 +1,19 @@
+## 2026-09-03 - Live ISR 500 after SiteLayout cookies()
+
+### Наблюдения
+- Live HTTP 500 на `/events/[slug]`, `/cities/*`, `/venues/*`, `/locations/*`. Живые: `/`, `/events`, `/blog`.
+- API DTO события 200. HTML Next - `pages/_error`.
+- Регресс с `b16b4595` (выкат SHA `78e069a5`): `cookies()` в общем `SiteLayout`.
+
+### Решения
+- `SiteLayout` больше не читает cookies. Home передаёт `initialCity` из `app/page.tsx`.
+- Event PDP: `loadEventDto` + ISR `revalidateSeconds` (как city/venue), miss не кэшируется.
+
+### Проблемы
+- После swap проверить Pianissimo, `/cities/moscow`, venue PDP. Header city на ISR гидрируется клиентом.
+
+---
+
 ## 2026-09-03 - Home jerk + catalog sort row
 
 ### Наблюдения

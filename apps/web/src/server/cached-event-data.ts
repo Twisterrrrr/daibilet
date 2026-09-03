@@ -22,29 +22,73 @@ function normalizeEventSlug(slug: string): string {
   }
 }
 
+class EventDtoMissError extends Error {
+  constructor(slug: string) {
+    super(`event_dto_miss:${slug}`);
+    this.name = 'EventDtoMissError';
+  }
+}
+
+export type EventDtoLoad =
+  | { kind: 'ok'; payload: PublicEventPageDto }
+  | { kind: 'miss' }
+  | { kind: 'unavailable' };
+
 /**
  * Shared cached event DTO for generateMetadata + page (avoids double cold fetch).
  * React `cache` = request memoization; `unstable_cache` = cross-request Data Cache (ISR HIT).
+ *
+ * Same contract as city/venue: do not cache JSON-null misses (ISR + notFound → HTTP 500),
+ * and do not use bare `cache: 'no-store'` inside this cache fn on `revalidate` routes.
  */
-export const getCachedPublicEventDto = cache(async (slug: string) => {
+export async function getCachedPublicEventDto(slug: string) {
   const key = normalizeEventSlug(slug);
   if (!key) return null;
 
   const cached = unstable_cache(
-    () =>
-      fetchPublicApiJson<PublicEventPageDto | null>(`/api/public/events/${encodeURIComponent(key)}`, {
-        timeoutMs: 5_000,
-        notFoundAsNull: true,
-      }),
-    // v4: 7200s TTL + per-slug tag for on-demand revalidate
-    ['public-event-dto-v4-http', key],
+    async () => {
+      const payload = await fetchPublicApiJson<PublicEventPageDto | null>(
+        `/api/public/events/${encodeURIComponent(key)}`,
+        {
+          timeoutMs: 8_000,
+          notFoundAsNull: true,
+          revalidateSeconds: EVENT_PAGE_REVALIDATE,
+        },
+      );
+      if (!payload?.event) throw new EventDtoMissError(key);
+      return payload;
+    },
+    // v5: ISR fetch + miss-throw (v4 cached null / no-store and poisoned live PDPs).
+    ['public-event-dto-v5-isr-fetch', key],
     {
       revalidate: EVENT_PAGE_REVALIDATE,
       tags: [EVENT_PAGE_CACHE_TAG, eventPageCacheTag(key)],
     },
   );
-  return cached();
-});
+
+  try {
+    return await cached();
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    if (error instanceof EventDtoMissError || msg.includes('event_dto_miss:')) return null;
+    console.warn(`[event-dto-cache] unavailable after cache error for ${key}:`, msg);
+    throw error instanceof Error ? error : new Error(msg);
+  }
+}
+
+/** Prefer cached DTO. True miss → 404; transient API errors → soft unavailable (not HTTP 500). */
+export async function loadEventDto(slug: string): Promise<EventDtoLoad> {
+  const key = normalizeEventSlug(slug);
+  if (!key) return { kind: 'miss' };
+
+  try {
+    const cached = await getCachedPublicEventDto(key);
+    if (cached?.event) return { kind: 'ok', payload: cached };
+    return { kind: 'miss' };
+  } catch {
+    return { kind: 'unavailable' };
+  }
+}
 
 export type EventAggregateRating = {
   ratingValue: number;
