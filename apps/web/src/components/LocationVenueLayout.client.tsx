@@ -4,8 +4,10 @@ import * as React from 'react';
 import {
   Anchor,
   Car,
+  CheckCircle2,
   ChevronDown,
   Clock,
+  HelpCircle,
   MapPin,
   Navigation as NavigationIcon,
   Share2,
@@ -26,7 +28,11 @@ import { build2gisRouteUrl } from '@/lib/maps';
 import { dedupeVenueLinkedEvents } from '@/lib/day-route-score';
 import { resolveNearestMetroStationName } from '@/lib/nearest-metro';
 import type { VenueEventGroup } from '@/lib/venue-program';
-import { formatVenueMetroLabel } from '@/lib/venue-editorial-content';
+import {
+  applyVenueEditorialOverlay,
+  formatVenueMetroLabel,
+  resolveVenueEditorialContent,
+} from '@/lib/venue-editorial-content';
 import { normalizeVenueKind, resolveLocationVenueCopy, venueTypeIcon, venueTypeLabel } from '@/lib/venue-meta';
 import { eventHref, venueHref } from '@/lib/routes';
 import type {
@@ -37,7 +43,7 @@ import type {
 } from '@daibilet/contracts/public';
 
 export function LocationVenueLayout({
-  venue,
+  venue: venueProp,
   stats,
   sessions,
   routeGroups = [],
@@ -57,6 +63,11 @@ export function LocationVenueLayout({
   pagePayload: PublicVenuePageDto;
   children?: React.ReactNode;
 }) {
+  const venue = React.useMemo(() => applyVenueEditorialOverlay(venueProp), [venueProp]);
+  const editorial = React.useMemo(
+    () => resolveVenueEditorialContent(venue.slug),
+    [venue.slug],
+  );
   const title = venue.seoH1 || venue.title || venue.name;
   const streetAddress = formatStreetAddress(venue.address, { city: venue.city });
   const metroLabel = React.useMemo(() => {
@@ -65,10 +76,17 @@ export function LocationVenueLayout({
       longitude: venue.longitude,
       city: venue.city,
       citySlug: venue.citySlug,
-      metroStation: venue.metroStation,
+      metroStation: venue.metroStation || editorial?.metroStation || null,
     });
     return formatVenueMetroLabel(name);
-  }, [venue.latitude, venue.longitude, venue.city, venue.citySlug, venue.metroStation]);
+  }, [
+    venue.latitude,
+    venue.longitude,
+    venue.city,
+    venue.citySlug,
+    venue.metroStation,
+    editorial?.metroStation,
+  ]);
   const heroAddressLine = [streetAddress, metroLabel].filter(Boolean).join(' • ');
   const hasMap = Boolean(venue.latitude && venue.longitude);
   const isPier = normalizeVenueKind(venue.type) === 'pier' || normalizeVenueKind(venue.type) === 'pier_water';
@@ -77,7 +95,8 @@ export function LocationVenueLayout({
     normalizeVenueKind(venue.type) === 'park' ||
     normalizeVenueKind(venue.type) === 'monument' ||
     normalizeVenueKind(venue.type) === 'outdoor_location' ||
-    normalizeVenueKind(venue.type) === 'attraction';
+    normalizeVenueKind(venue.type) === 'attraction' ||
+    normalizeVenueKind(venue.type) === 'temple';
   const todaySlots = React.useMemo(() => collectTodayTimeSlots(sessions), [sessions]);
   const uniqueStopEvents = React.useMemo(() => dedupeVenueLinkedEvents(stopEvents), [stopEvents]);
   const uniqueNearbyEvents = React.useMemo(
@@ -85,22 +104,30 @@ export function LocationVenueLayout({
     [nearbyEvents],
   );
   const TypeIcon = venueTypeIcon(venue.type);
-  const typeLabel = venueTypeLabel(venue.type);
+  const typeLabel = venueTypeLabel(venue.type, venue.name);
   const routeCount = routeGroups.length || stats.events;
-  const { aboutBody, heroLead } = resolveLocationVenueCopy(venue);
-  const hookFact = String(venue.hookFact || '').replace(/\s+/g, ' ').trim();
+  const { aboutBody, heroLead: copyLead } = resolveLocationVenueCopy(venue);
+  const heroLead = editorial?.heroLead || copyLead;
+  const hookFact = String(venue.hookFact || editorial?.hookFact || '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  const seoSections = editorial?.seoSections || [];
+  const curatedFaq = editorial?.faq || [];
+  const visitTips = String(editorial?.visitTips || '').trim();
+  const heroBadges = editorial?.badges?.slice(0, 5) || [];
   const stopExcursionCount =
     uniqueStopEvents.length > 0 ? uniqueStopEvents.length : Number(venue.stopEventCount ?? 0);
   const hasStopExcursions = stopExcursionCount > 0;
   const hasNearbyExcursions = uniqueNearbyEvents.length > 0;
   /** Late FAQ only for timed boards / ticketed departures - not static monuments. */
   const showLateArrivalFaq =
-    isPier ||
-    isBus ||
-    todaySlots.length > 0 ||
-    routeGroups.length > 0 ||
-    sessions.length > 0 ||
-    Number(stats.events || 0) > 0;
+    !curatedFaq.length &&
+    (isPier ||
+      isBus ||
+      todaySlots.length > 0 ||
+      routeGroups.length > 0 ||
+      sessions.length > 0 ||
+      Number(stats.events || 0) > 0);
 
   return (
     <div className="bg-white pb-24 lg:pb-0">
@@ -242,10 +269,25 @@ export function LocationVenueLayout({
           </div>
           <div className="container-page absolute inset-0 z-10 flex flex-col justify-end pb-5 pt-20 md:pb-14 md:pt-24 lg:pb-20">
             <div className="mb-3 hidden flex-wrap gap-2 md:flex">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-950/75 px-3 py-1 text-xs font-semibold">
-                <TypeIcon className="h-3.5 w-3.5" /> {typeLabel}
-              </span>
-              <span className="rounded-full bg-slate-950/75 px-3 py-1 text-xs font-semibold">{venue.city}</span>
+              {heroBadges.length > 0 ? (
+                heroBadges.map((badge) => (
+                  <span
+                    key={badge}
+                    className="rounded-full bg-slate-950/75 px-3 py-1 text-xs font-semibold"
+                  >
+                    {badge}
+                  </span>
+                ))
+              ) : (
+                <>
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-950/75 px-3 py-1 text-xs font-semibold">
+                    <TypeIcon className="h-3.5 w-3.5" /> {typeLabel}
+                  </span>
+                  <span className="rounded-full bg-slate-950/75 px-3 py-1 text-xs font-semibold">
+                    {venue.city}
+                  </span>
+                </>
+              )}
             </div>
             <h1 className="font-display text-2xl font-extrabold text-white sm:text-4xl md:text-5xl">{title}</h1>
             <p className="mt-2 text-sm font-medium text-white/90 md:hidden">
@@ -449,16 +491,80 @@ export function LocationVenueLayout({
             </section>
           ) : null}
 
-          {((hookFact && !isParkLike) || aboutBody) ? (
+          {((hookFact && !isParkLike) || aboutBody || editorial?.highlights?.length) ? (
           <section className="rounded-2xl border border-slate-200 bg-white p-6">
             <h2 className="text-xl font-bold text-slate-900">О локации</h2>
             {hookFact && !isParkLike ? (
               <p className="mt-2 text-sm font-semibold text-emerald-800">{hookFact}</p>
             ) : null}
+            {editorial?.highlights?.length ? (
+              <ul className="mt-4 grid gap-2 sm:grid-cols-2" data-venue-highlights>
+                {editorial.highlights.map((item) => (
+                  <li
+                    key={item}
+                    className="flex items-start gap-2 rounded-xl border border-slate-100 bg-slate-50 p-3"
+                  >
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
+                    <span className="text-sm text-slate-800">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
             {aboutBody ? (
             <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-slate-600">{aboutBody}</p>
             ) : null}
           </section>
+          ) : null}
+
+          {seoSections.length > 0 ? (
+            <section
+              id="venue-guide"
+              className="scroll-mt-24 space-y-6 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm"
+              data-venue-seo-sections
+            >
+              {seoSections.map((section) => (
+                <div key={section.h2}>
+                  <h2 className="font-display text-xl font-bold tracking-tight text-zinc-950 sm:text-2xl">
+                    {section.h2}
+                  </h2>
+                  <p className="mt-3 text-sm leading-7 text-zinc-600">{section.body}</p>
+                </div>
+              ))}
+            </section>
+          ) : null}
+
+          {visitTips ? (
+            <p
+              className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm leading-6 text-slate-700"
+              data-venue-visit-tips
+            >
+              {visitTips}
+            </p>
+          ) : null}
+
+          {curatedFaq.length > 0 ? (
+            <section id="faq" className="scroll-mt-24">
+              <h2 className="font-display text-xl font-bold tracking-tight text-zinc-950 sm:text-2xl">
+                Вопросы
+              </h2>
+              <div className="mt-4 space-y-2">
+                {curatedFaq.map((item) => (
+                  <details
+                    key={item.question}
+                    className="group rounded-xl border border-zinc-200 bg-white shadow-sm"
+                  >
+                    <summary className="flex cursor-pointer list-none items-center justify-between p-4">
+                      <span className="flex items-center gap-2 font-medium text-zinc-900">
+                        <HelpCircle className="h-4 w-4 shrink-0 text-primary-600" />
+                        {item.question}
+                      </span>
+                      <ChevronDown className="h-4 w-4 text-slate-400 transition group-open:rotate-180" />
+                    </summary>
+                    <div className="px-4 pb-4 text-sm text-slate-700">{item.answer}</div>
+                  </details>
+                ))}
+              </div>
+            </section>
           ) : null}
 
           {/* Address / metro / directions live in sidebar Contacts + Map. */}

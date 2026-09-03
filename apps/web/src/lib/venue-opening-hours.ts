@@ -277,6 +277,11 @@ const EDITORIAL_OPENING_HOURS_BY_SLUG: Record<string, string[]> = {
     "Чт: 14:00-21:00",
     "Пн - выходной",
   ],
+  "moscow-gmii-imeni-pushkina": [
+    "Вт-Ср, Вс: 10:00-20:00",
+    "Чт-Сб: 10:00-21:00",
+    "Пн - выходной",
+  ],
   "moscow-muzey-garazh": [
     "Ежедневно: 11:00-22:00",
   ],
@@ -294,7 +299,8 @@ const EDITORIAL_OPENING_HOURS_BY_SLUG: Record<string, string[]> = {
     "Ср-Чт: 12:00-21:00",
   ],
   "moscow-novaya-tretyakovka": [
-    "Вт-Вс: 10:00-21:00",
+    "Вт, Ср, Вс: 10:00-18:00",
+    "Чт-Сб: 10:00-21:00",
     "Пн - выходной",
   ],
   "moscow-politehnicheskiy-muzey": [

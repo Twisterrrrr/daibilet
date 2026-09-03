@@ -1,20 +1,26 @@
 /**
- * Per-venue editorial content overlay (highlights / FAQ / feature chips / contacts).
+ * Per-venue editorial content overlay (highlights / FAQ / feature chips / contacts / SEO).
  *
  * Catalog Venue has no highlights/faq/features columns yet. Until CMS ships them,
- * keep a curated slug map so institution PDP can show SPBBOATS-class content
- * without a prod DB write. Other venues stay on generic FAQ / no chips.
+ * keep curated packs in venue-editorial-packs.ts so institution PDP can show
+ * glossy + commercially honest content without a prod DB write.
  *
- * Source for ermitazh: docs/research/venue-seeds-hermitage-garage/ermitazh.venue-seed.json
- * (hyphen-only copy). Hours live in venue-opening-hours.ts (official hermitagemuseum.org
- * Main Museum Complex: 11:00 starts - SPBBOATS seed 10:30 is superseded).
+ * Workflow: owner sends draft YAML base → agent edits (hyphens, URLs, honesty,
+ * venue-specific H2) → lands in VENUE_EDITORIAL_PACKS.
  */
 
 import type { PublicVenueDto } from '@daibilet/contracts/public';
 
+import { VENUE_EDITORIAL_PACKS } from './venue-editorial-packs';
+
 export type VenueEditorialFaqItem = {
   question: string;
   answer: string;
+};
+
+export type VenueEditorialSeoSection = {
+  h2: string;
+  body: string;
 };
 
 export type VenueFeatureCode =
@@ -43,6 +49,12 @@ export type VenueEditorialTickets = {
 export type VenueEditorialContent = {
   /** Overrides H1 / name / seoH1 when DB still has legacy title. */
   displayTitle?: string;
+  /** Hero lead under H1 (also fills shortDescription when DB empty). */
+  heroLead?: string;
+  /** Meta description overlay. */
+  seoDescription?: string;
+  /** Hero chips (prefer over auto type/category chips when set). */
+  badges?: string[];
   /** Interesting fact above «О месте» (city-hub style). */
   hookFact?: string;
   /**
@@ -52,11 +64,15 @@ export type VenueEditorialContent = {
   highlights: string[];
   features: VenueFeatureCode[];
   faq: VenueEditorialFaqItem[];
+  /** Structured SEO body sections (unique H2 per venue type). */
+  seoSections?: VenueEditorialSeoSection[];
   /** Hero/logistics fallback when Venue.metroStation is empty in DB. */
   metroStation?: string;
   phone?: string;
   website?: string;
   websiteLabel?: string;
+  wayToFind?: string;
+  visitTips?: string;
   /**
    * External official tickets CTA (not internal LC inventory).
    * Kept in overlay for future use; institution PDP hides commercial blocks for now.
@@ -73,59 +89,7 @@ const FEATURE_CHIPS: Record<VenueFeatureCode, VenueFeatureChip> = {
   gift_shop: { code: 'gift_shop', label: 'Магазин', icon: '🎁' },
 };
 
-const EDITORIAL_BY_SLUG: Record<string, VenueEditorialContent> = {
-  ermitazh: {
-    displayTitle: 'Государственный Эрмитаж (Зимний дворец)',
-    hookFact:
-      'Если вы решите задержаться у каждого экспоната музея хотя бы на одну минуту, вам придется провести здесь без сна и еды целых 8 лет.',
-    // Real local covers only (main complex + General Staff) - no stock Unsplash fillers.
-    galleryUrls: [
-      '/images/venues/saint-petersburg/ermitazh.jpg',
-      '/images/venues/saint-petersburg/glavnyy-shtab-ermitazh.jpg',
-    ],
-    highlights: [
-      '3 миллиона экспонатов',
-      'Зимний дворец - объект ЮНЕСКО',
-      'Импрессионисты, Рембрандт, Леонардо да Винчи',
-      'Рыцарский зал, Египетский зал, Малахитовая гостиная',
-      'Входит в топ-5 музеев мира',
-    ],
-    features: ['no_queue', 'audio_guide', 'kids_friendly', 'wheelchair', 'cafe', 'gift_shop'],
-    metroStation: 'Адмиралтейская',
-    phone: '+7 (812) 710-90-79',
-    website: 'https://hermitagemuseum.org',
-    websiteLabel: 'Официальный сайт',
-    tickets: {
-      priceFromRub: 500,
-      href: 'https://www.hermitagemuseum.org/wps/portal/hermitage/tickets',
-      badge: 'Официальный сайт',
-    },
-    faq: [
-      {
-        question: 'Можно ли вернуть билет?',
-        answer: 'Да, возврат возможен не позднее чем за 2 часа до визита.',
-      },
-      {
-        question: 'Есть ли льготные билеты?',
-        answer:
-          'Бесплатно для детей до 14 лет и студентов РФ. Первый четверг месяца - бесплатный вход (условия уточняйте на сайте музея).',
-      },
-      {
-        question: 'Можно ли без очереди?',
-        answer: 'Да, при покупке электронного билета проход через отдельный вход без очереди.',
-      },
-      {
-        question: 'Сколько времени нужно на осмотр?',
-        answer: 'Минимум 2-3 часа для основных залов, полный обход - 4-5 часов.',
-      },
-      {
-        question: 'Актуальны ли часы работы?',
-        answer:
-          'На странице показываем официальный график главного комплекса (hermitagemuseum.org / visitus): вход с 11:00. В праздники и при сеансовой системе сверяйте с сайтом музея.',
-      },
-    ],
-  },
-};
+const EDITORIAL_BY_SLUG: Record<string, VenueEditorialContent> = VENUE_EDITORIAL_PACKS;
 
 function normalizeVenueSlug(slug: string | null | undefined): string {
   return String(slug || '')
@@ -170,7 +134,7 @@ export function resolveVenueFaqItems(
 }
 
 /**
- * Patch public venue DTO with curated title / metro when DB lags.
+ * Patch public venue DTO with curated title / metro / SEO when DB lags.
  * Used by venue PDP SSR + client so H1 and SEO stay aligned.
  */
 export function applyVenueEditorialOverlay<T extends PublicVenueDto>(venue: T): T {
@@ -192,6 +156,18 @@ export function applyVenueEditorialOverlay<T extends PublicVenueDto>(venue: T): 
   const existingHook = String(next.hookFact || '').trim();
   if (!existingHook && editorial.hookFact) {
     next = { ...next, hookFact: editorial.hookFact };
+  }
+  const existingSeo = String(next.seoDescription || '').trim();
+  if (!existingSeo && editorial.seoDescription) {
+    next = { ...next, seoDescription: editorial.seoDescription };
+  }
+  const existingShort = String(next.shortDescription || '').trim();
+  if (!existingShort && editorial.heroLead) {
+    next = { ...next, shortDescription: editorial.heroLead };
+  }
+  const existingWay = String(next.wayToFind || '').trim();
+  if ((!existingWay || existingWay === '-' || existingWay === '—') && editorial.wayToFind) {
+    next = { ...next, wayToFind: editorial.wayToFind };
   }
   return next;
 }

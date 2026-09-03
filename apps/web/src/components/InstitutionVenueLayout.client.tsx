@@ -95,15 +95,16 @@ export function InstitutionVenueLayout({
   const publicType = resolvePublicVenueType(venue.type, venue.name);
   const isMuseumOrArt = MUSEUM_ART_KINDS.has(publicType);
   const typeLabel = venueTypeLabel(venue.type, venue.name);
-  const intro =
-    venue.shortDescription ||
-    venue.description ||
-    `${venue.name} - ${typeLabel.toLowerCase()} в ${venue.city}. Афиша, билеты и ближайшие сеансы.`;
-  const categories = Object.entries(venue.categories || {}).sort((a, b) => b[1] - a[1]);
   const editorial = React.useMemo(
     () => resolveVenueEditorialContent(venue.slug),
     [venue.slug],
   );
+  const intro =
+    editorial?.heroLead ||
+    venue.shortDescription ||
+    venue.description ||
+    `${venue.name} - ${typeLabel.toLowerCase()} в ${venue.city}. Афиша, билеты и ближайшие сеансы.`;
+  const categories = Object.entries(venue.categories || {}).sort((a, b) => b[1] - a[1]);
   const openingHours = React.useMemo(
     () => resolveVenueOpeningHours(venue.slug),
     [venue.slug],
@@ -163,14 +164,18 @@ export function InstitutionVenueLayout({
   const website = nonEmptyLogisticsText(editorial?.website);
   const websiteLabel = editorial?.websiteLabel || 'Официальный сайт';
   const heroAddressLine = [streetAddress || venue.city, metroLabel].filter(Boolean).join(' • ');
-  const wayTipRaw = nonEmptyLogisticsText(venue.wayToFind);
+  const wayTipRaw =
+    nonEmptyLogisticsText(venue.wayToFind) || nonEmptyLogisticsText(editorial?.wayToFind);
   const wayTip =
     wayTipRaw && !isAddressEchoWayToFind(wayTipRaw, venue.address, venue.city) ? wayTipRaw : null;
+  const visitTips = nonEmptyLogisticsText(editorial?.visitTips);
+  const seoSections = editorial?.seoSections || [];
   /** Only real admission CTA - no «Выбрать событие» scroll bait in hero/sidebar. */
   const admissionCta = hasInternalLcTickets
     ? ({ href: '#venue-admission', label: 'К билетам' } as const)
     : null;
   const heroBadges = React.useMemo(() => {
+    if (editorial?.badges?.length) return editorial.badges.slice(0, 5);
     const badges: string[] = [];
     if (typeLabel) badges.push(typeLabel);
     for (const chip of featureChips.slice(0, 3)) badges.push(chip.label);
@@ -178,7 +183,7 @@ export function InstitutionVenueLayout({
       if (!badges.includes(name)) badges.push(name);
     }
     return badges.slice(0, 5);
-  }, [typeLabel, featureChips, categories]);
+  }, [editorial?.badges, typeLabel, featureChips, categories]);
 
   const cityTz = React.useMemo(
     () => resolveCityTimeZone(venue.city, venue.citySlug),
@@ -204,6 +209,7 @@ export function InstitutionVenueLayout({
 
   const stickyTabs = React.useMemo(() => {
     const tabs: Array<readonly [string, string]> = [['#about', 'О месте']];
+    if (seoSections.length > 0) tabs.push(['#venue-guide', 'Гид']);
     if (hasInternalLcTickets) tabs.push(['#venue-admission', 'Билеты']);
     if (hasAfisha) tabs.push(['#venue-program', 'Афиша']);
     if (showVisitSection) tabs.push(['#visit', 'Как посетить']);
@@ -211,7 +217,7 @@ export function InstitutionVenueLayout({
     tabs.push(['#reviews', 'Отзывы']);
     if (showSimilar) tabs.push(['#similar', 'Похожие']);
     return tabs;
-  }, [hasInternalLcTickets, hasAfisha, showVisitSection, showFaq, showSimilar]);
+  }, [seoSections.length, hasInternalLcTickets, hasAfisha, showVisitSection, showFaq, showSimilar]);
 
   const share = () => {
     if (navigator.share) {
@@ -420,6 +426,23 @@ export function InstitutionVenueLayout({
             ) : null}
           </section>
 
+          {seoSections.length > 0 ? (
+            <section
+              id="venue-guide"
+              className="scroll-mt-24 space-y-6 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm"
+              data-venue-seo-sections
+            >
+              {seoSections.map((section) => (
+                <div key={section.h2}>
+                  <h2 className="font-display text-xl font-bold tracking-tight text-zinc-950 sm:text-2xl">
+                    {section.h2}
+                  </h2>
+                  <p className="mt-3 text-sm leading-7 text-zinc-600">{section.body}</p>
+                </div>
+              ))}
+            </section>
+          ) : null}
+
           {hasInternalLcTickets ? <VenueAdmissionBlock products={admissionProducts} /> : null}
 
           {nextSessions.length > 0 ? (
@@ -458,6 +481,11 @@ export function InstitutionVenueLayout({
                 </ul>
                 <p className="mt-3 text-xs leading-5 text-slate-500">{OPEN_DATE_HOURS_HOLIDAY_NOTE}</p>
               </div>
+              {visitTips ? (
+                <p className="mt-4 rounded-xl bg-slate-50 p-3 text-sm leading-6 text-slate-700" data-venue-visit-tips>
+                  {visitTips}
+                </p>
+              ) : null}
             </section>
           ) : null}
 
