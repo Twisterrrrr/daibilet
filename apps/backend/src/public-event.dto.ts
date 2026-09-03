@@ -1265,7 +1265,7 @@ async function loadRelatedSessionsFromDb(
       category: row.category?.title || 'События',
       tags,
       subcategories,
-      ageLimit: row.ageLimit ?? undefined,
+      ageLimit: row.ageLimit ?? null,
       kind: row.kind.toLowerCase(),
       startsAt,
       dateLabel: formatDate(next.startsAt, timeZone),
@@ -1290,7 +1290,7 @@ async function loadRelatedSessionsFromDb(
     subcategories: eventSubcategories(event),
     venueKind: event.venue?.kind || 'OTHER',
     venueId: event.venueId,
-    ageLimit: event.ageLimit ?? undefined,
+    ageLimit: event.ageLimit ?? null,
   };
 
   const related = pickRelatedSessions(
