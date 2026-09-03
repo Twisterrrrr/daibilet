@@ -86,13 +86,17 @@ export function HomeHero({
         ...rest,
       ]);
     };
-    const idleWindow = typeof window !== 'undefined' ? window : null;
-    if (idleWindow && 'requestIdleCallback' in idleWindow) {
-      const id = idleWindow.requestIdleCallback(expand, { timeout: 2500 });
-      return () => idleWindow.cancelIdleCallback(id);
+    if (typeof window === 'undefined') return;
+    const win = window as Window & {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+      cancelIdleCallback?: (id: number) => void;
+    };
+    if (typeof win.requestIdleCallback === 'function') {
+      const id = win.requestIdleCallback(expand, { timeout: 2500 });
+      return () => win.cancelIdleCallback?.(id);
     }
-    const timer = globalThis.setTimeout(expand, 400);
-    return () => globalThis.clearTimeout(timer);
+    const timer = window.setTimeout(expand, 400);
+    return () => window.clearTimeout(timer);
   }, [expandStaticRotator, frames, videoSrc]);
 
   const selectedCityName = selectedDestination?.name || null;

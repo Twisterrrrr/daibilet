@@ -15,6 +15,7 @@ import { shouldBypassNextImageOptimizer } from '@/lib/remote-image-bypass';
 import { venueCardImageFallbacks } from '@/lib/venue-card-image';
 
 export {
+  AFFICHE_IMAGE_QUALITY,
   CARD_IMAGE_QUALITY,
   CATALOG_IMAGE_QUALITY,
 } from '@/lib/catalog-image-sizes';

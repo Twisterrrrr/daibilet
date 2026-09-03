@@ -1,4 +1,23 @@
+## 2026-09-03 - Venue PDP glossy rail + MyDay OSM path fix
+
+### Наблюдения
+- Venue «Ближайшие события» всё ещё отличался от city hub (сетка 2×2 вместо poster rail).
+- `/api/osm-tile` на live уходил в Express (`not_found`) из-за nginx `location /api/` → PDF снова без OSM / ранее Carto watermark.
+- Catalog quality=65 не должен трогать hub/venue poster; подняли CARD/AFFICHE.
+
+### Решения
+- Venue PDP: `HubEventsAfficheRail` + `CityHubSectionHeading` (как хаб города), фон editorial `#f6f3ee`.
+- PDF tiles: Next route `/maps/osm-tile/{z}/{x}/{y}` (вне `/api`).
+- `CARD_IMAGE_QUALITY=85`, `AFFICHE_IMAGE_QUALITY=88` для cityHub/venue posters; catalog остаётся 65.
+- Buyer ticket map eyebrow: «Место» вместо «Как добраться».
+
+### Проблемы
+- Нужен web deploy; после выката проверить `https://daibilet.ru/maps/osm-tile/14/9900/5120` → PNG 200.
+
+---
+
 ## 2026-09-03 - Related / filters / blog flash / MyDay PDF / venue UX / SEO P0-P2
+
 
 ### Наблюдения
 - «Похожие события» на детском круизе: дубли одного title с разными датами, чужие категории через bucket «Мероприятия», иногда чужой город в UI.
@@ -12,7 +31,7 @@
 - Catalog sidebar: sticky `height` (не только max-height) + `align-self:start` + inner `overflow-y` - flex child иначе не получает bound.
 - Blog: убран client reshuffle featured; stable promo seed (без Math.random после paint).
 - Home build: `ssr:false` dynamic вынесен в `HomeDeferredIslands.client.tsx` (RSC нельзя).
-- PDF: same-origin `/api/osm-tile/...` → OSM tiles; attribution без Carto.
+- PDF: same-origin `/maps/osm-tile/...` → OSM tiles (не `/api/*` - nginx); attribution без Carto.
 - Убран блок «Как добраться» с event PDP и venue/location (карта + контакты остаются).
 - Venue upcoming: крупные 16/10 карточки + CTA.
 - Image: `CARD_IMAGE_QUALITY=80` вне каталога; `/events` grid `catalogDense` + quality 65.

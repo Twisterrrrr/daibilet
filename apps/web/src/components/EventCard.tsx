@@ -12,7 +12,7 @@ import {
   useCatalogPurchase,
 } from '@/components/CatalogPurchaseTrigger.client';
 import { LandingPurchaseButton } from '@/components/landing/LandingPurchaseButton.client';
-import { CARD_IMAGE_QUALITY, CATALOG_IMAGE_QUALITY, IMAGE_SIZES, CardSafeImage } from '@/components/SafeImage.client';
+import { AFFICHE_IMAGE_QUALITY, CARD_IMAGE_QUALITY, CATALOG_IMAGE_QUALITY, IMAGE_SIZES, CardSafeImage } from '@/components/SafeImage.client';
 import type { PublicCatalogListItemDto, PublicSessionDto } from '@daibilet/contracts/public';
 import { extractDurationLabel } from '@/lib/catalog-labels';
 import { LandingCardBadgeRow } from '@/components/landing/LandingCardBadgeRow';
@@ -534,6 +534,7 @@ function ShowcaseEventCard({
     : null;
   const coverDateBadge = formatCoverDateBadge(session);
   const imageSizes = cityHub ? IMAGE_SIZES.affichePoster : IMAGE_SIZES.eventCard;
+  const imageQuality = cityHub ? AFFICHE_IMAGE_QUALITY : CARD_IMAGE_QUALITY;
   const displayTitle = formatPublicTitle(session.title);
 
   return (
@@ -560,7 +561,7 @@ function ShowcaseEventCard({
           alt={displayTitle}
           fill
           sizes={imageSizes}
-          quality={CARD_IMAGE_QUALITY}
+          quality={imageQuality}
           priority={imagePriority}
           loading={imagePriority ? undefined : 'lazy'}
           style={{ objectPosition: imageObjectPosition }}
@@ -572,7 +573,7 @@ function ShowcaseEventCard({
                 alt={displayTitle}
                 fill
                 sizes={imageSizes}
-                quality={CARD_IMAGE_QUALITY}
+                quality={imageQuality}
                 className="object-cover"
                 fallback={emptyImageFallback}
               />

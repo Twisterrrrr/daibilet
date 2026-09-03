@@ -9,8 +9,11 @@
 /** Catalog grid (`/events`) preview quality for `/_next/image`. */
 export const CATALOG_IMAGE_QUALITY = 65;
 
-/** Default card quality outside the dense catalog grid. */
-export const CARD_IMAGE_QUALITY = 80;
+/** Default card quality outside the dense catalog grid (hub / PDP / home / related). */
+export const CARD_IMAGE_QUALITY = 85;
+
+/** City-hub / venue poster rail: slightly sharper than generic cards. */
+export const AFFICHE_IMAGE_QUALITY = 88;
 
 /**
  * Match `.catalog-card-grid` (2 / 3 / 4 cols).
@@ -24,4 +27,4 @@ export const CATALOG_EVENT_CARD_HORIZONTAL_SIZES = '(max-width: 639px) 100vw, 16
 
 /** Home / related / showcase cards: allow a larger decode than dense catalog. */
 export const CARD_EVENT_SIZES =
-  '(max-width: 639px) 92vw, (max-width: 1023px) 45vw, (max-width: 1535px) 30vw, 360px';
+  '(max-width: 639px) 92vw, (max-width: 1023px) 45vw, (max-width: 1535px) 30vw, 420px';

@@ -101,8 +101,9 @@ async function drawMap(
   for (let tx = first; tx <= last; tx++) {
     for (let ty = top; ty <= bottom; ty++) {
       const wrapped = ((tx % 2 ** zoom) + 2 ** zoom) % 2 ** zoom;
-      // Same-origin proxy: OSM tiles without Carto «API KEY REQUIRED» watermark.
-      const url = `/api/osm-tile/${zoom}/${wrapped}/${ty}`;
+      // Same-origin Next route (NOT /api/* - nginx sends /api to Express).
+      // OSM tiles without Carto «API KEY REQUIRED» watermark.
+      const url = `/maps/osm-tile/${zoom}/${wrapped}/${ty}`;
       jobs.push(
         loadImage(url).then((img) => {
           if (!img) return;

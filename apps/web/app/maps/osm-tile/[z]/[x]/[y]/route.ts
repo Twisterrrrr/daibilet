@@ -4,8 +4,9 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 /**
- * Same-origin OSM tile proxy for My Day PDF canvas (avoids Carto API-key watermarks
- * and cross-origin canvas taint when drawing map tiles).
+ * Same-origin OSM tile proxy for My Day PDF canvas.
+ * Path must NOT be under `/api/*` - nginx on MSK proxies `/api/` to Express.
+ * Avoids Carto «API KEY REQUIRED» watermarks and canvas cross-origin taint.
  */
 export async function GET(
   _request: Request,

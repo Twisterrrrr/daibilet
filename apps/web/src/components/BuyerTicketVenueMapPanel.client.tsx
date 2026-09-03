@@ -34,7 +34,7 @@ export function BuyerTicketVenueMapPanel({
       data-buyer-ticket-map
     >
       <div className="shrink-0 border-b border-slate-100 px-4 py-3.5 sm:px-5">
-        <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Как добраться</p>
+        <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Место</p>
         <div className="mt-1.5 flex items-start gap-2">
           <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary-600" />
           <div className="min-w-0">

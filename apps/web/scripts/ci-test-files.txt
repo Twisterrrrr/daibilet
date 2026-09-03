@@ -13,6 +13,7 @@ src/lib/format-money-range.test.ts
 src/lib/must-see-filters.test.ts
 src/lib/my-day-region-scope.test.ts
 src/lib/place-slug-aliases.test.ts
+src/lib/podborki-city-seo.test.ts
 src/lib/region-child-city-scope.test.ts
 src/lib/remote-image-bypass.test.ts
 src/lib/selected-city-alias.test.ts

@@ -16,6 +16,8 @@ import {
 } from 'lucide-react';
 
 import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
+import { CityHubSectionHeading } from '@/components/CityHubSectionHeading';
+import { HubEventsAfficheRail } from '@/components/HubEventsAfficheRail.client';
 import { InstitutionCard } from '@/components/InstitutionCard.client';
 import { MobileStickyActionBar } from '@/components/MobileStickyActionBar';
 import { OsmMapEmbed } from '@/components/OsmMapEmbed';
@@ -26,10 +28,6 @@ import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { resolveCityTimeZone } from '@/lib/city-timezone';
 import { resolveVenueHeroImage } from '@/lib/city-place-images';
 import { dedupeVenueLinkedEvents } from '@/lib/day-route-score';
-import {
-  resolveEventCardFallbackImage,
-  resolveEventCardPrimaryImage,
-} from '@/lib/event-card-image';
 import { formatMoney } from '@/lib/format';
 import { formatStreetAddress } from '@/lib/address';
 import type { FinanceAdmissionProduct } from '@/lib/finance-projection';
@@ -149,7 +147,8 @@ export function InstitutionVenueLayout({
   const linkedExcursions = hasStopExcursions ? uniqueStopEvents : uniqueNearbyEvents;
   const hasInternalLcTickets = admissionProducts.length > 0;
   const hasAfisha = sessions.length > 0;
-  const nextSessions = sessions.slice(0, 4);
+  /** Same rail density as city hub «Ближайшие события» (poster cards). */
+  const nextSessions = sessions.slice(0, 24);
   const showFaq = true;
   const showVisitSection = Boolean(openingHours?.lines?.length);
   const similarVenues = React.useMemo(
@@ -214,8 +213,8 @@ export function InstitutionVenueLayout({
   };
 
   return (
-    <div className="bg-slate-50 pb-24 lg:pb-0">
-      <div className="border-b border-slate-200 bg-white">
+    <div className="bg-[#f6f3ee] pb-24 lg:pb-0" data-venue-pdp-editorial>
+      <div className="border-b border-zinc-200/80 bg-white">
         <VenueBreadcrumbsNav payload={pagePayload} />
       </div>
 
@@ -403,61 +402,21 @@ export function InstitutionVenueLayout({
           {hasInternalLcTickets ? <VenueAdmissionBlock products={admissionProducts} /> : null}
 
           {nextSessions.length > 0 ? (
-            <section className="rounded-2xl border border-slate-200 bg-white p-6" data-venue-upcoming-events>
-              <div className="flex items-baseline justify-between gap-3">
-                <h2 className="text-xl font-bold text-slate-900">Ближайшие события</h2>
-                <a href="#venue-program" className="text-sm font-semibold text-primary-600 hover:underline">
-                  Вся афиша →
-                </a>
-              </div>
-              <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                {nextSessions.map((session) => {
-                  const thumb =
-                    resolveEventCardPrimaryImage(session) || resolveEventCardFallbackImage(session);
-                  const price =
-                    typeof session.priceFrom === 'number' ? formatMoney(session.priceFrom) : null;
-                  return (
-                    <a
-                      key={session.id}
-                      href={eventHref(session)}
-                      className="group overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition hover:border-primary/25 hover:shadow-md"
-                    >
-                      <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-200">
-                        {thumb ? (
-                          <SafeImage
-                            src={thumb}
-                            alt=""
-                            fill
-                            sizes="(max-width: 639px) 100vw, 50vw"
-                            quality={82}
-                            className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                            fallback={<div className="h-full w-full bg-slate-200" />}
-                          />
-                        ) : (
-                          <div className="h-full w-full bg-slate-200" aria-hidden="true" />
-                        )}
-                      </div>
-                      <div className="space-y-2 p-4">
-                        <div className="line-clamp-2 text-base font-semibold leading-snug text-slate-900">
-                          {session.title}
-                        </div>
-                        <div className="text-sm text-slate-500">
-                          {[session.dateLabel, session.timeLabel].filter(Boolean).join(' · ')}
-                        </div>
-                        <div className="flex items-center justify-between gap-3 pt-1">
-                          <span className="text-base font-bold text-primary-700">
-                            {price ? `от ${price}` : 'Смотреть'}
-                          </span>
-                          <span className="inline-flex items-center gap-1 rounded-lg bg-graphite px-3 py-1.5 text-xs font-semibold text-white">
-                            <Ticket className="h-3.5 w-3.5" strokeWidth={1.75} />
-                            Билеты
-                          </span>
-                        </div>
-                      </div>
-                    </a>
-                  );
-                })}
-              </div>
+            <section className="space-y-5" data-venue-upcoming-events>
+              <CityHubSectionHeading
+                title="Ближайшие события"
+                description="Афиша площадки на ближайшие дни"
+                editorial
+                actions={
+                  <a
+                    href="#venue-program"
+                    className="shrink-0 text-sm font-semibold text-primary-700 hover:underline"
+                  >
+                    Вся афиша →
+                  </a>
+                }
+              />
+              <HubEventsAfficheRail sessions={nextSessions} ariaLabel="Ближайшие события площадки" />
             </section>
           ) : null}
 
