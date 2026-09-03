@@ -39,21 +39,6 @@ import { filterVenuePageSessionsByCity } from '@/lib/venue-page-sessions';
 import { venuePageTemplate } from '@/lib/venue-meta';
 
 const PLAYBILL_WEEKDAY_SHORT = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'] as const;
-/** Three-letter month for playbill date block (upper row next to day number). */
-const PLAYBILL_MONTH_SHORT_RU = [
-  'янв',
-  'фев',
-  'мар',
-  'апр',
-  'мая',
-  'июн',
-  'июл',
-  'авг',
-  'сен',
-  'окт',
-  'ноя',
-  'дек',
-] as const;
 
 /** Match SSR VenueDetailPage: curated cover + title/metro overlays. */
 function withEditorialVenue(payload: PublicVenuePageDto): PublicVenuePageDto {
@@ -457,11 +442,12 @@ function VenuePlaybillRow({ entry }: { entry: VenuePlaybillEntry }) {
             <p className="text-sm font-semibold text-zinc-950">{when.label}</p>
           ) : when.kind === 'dated' ? (
             <div
-              className={`grid grid-cols-[auto_auto] grid-rows-2 items-center gap-x-2 ${
+              className={`grid grid-cols-[2.25rem_auto] grid-rows-2 items-center gap-x-2 ${
                 when.weekend ? 'text-rose-600' : 'text-zinc-950'
               }`}
             >
-              <span className="row-span-2 text-[1.75rem] font-extrabold leading-none tabular-nums tracking-tight sm:text-[2rem]">
+              {/* Fixed day column + right align so «3» lines up with «13». */}
+              <span className="row-span-2 w-full text-right text-[1.75rem] font-extrabold leading-none tabular-nums tracking-tight sm:text-[2rem]">
                 {when.dayNum}
               </span>
               <span
@@ -469,7 +455,7 @@ function VenuePlaybillRow({ entry }: { entry: VenuePlaybillEntry }) {
                   when.weekend ? 'text-rose-500' : 'text-zinc-600'
                 }`}
               >
-                {when.month} {when.weekday}
+                {when.weekday}
               </span>
               <span className="self-start text-xs tabular-nums leading-none text-zinc-500">
                 {when.time || '\u00a0'}
@@ -490,9 +476,9 @@ function VenuePlaybillRow({ entry }: { entry: VenuePlaybillEntry }) {
           </p>
           {meta ? <p className="mt-0.5 text-xs text-zinc-500">{meta}</p> : null}
         </div>
-        {/* Mobile + desktop: price sits top-right; CTA under it */}
-        <div className="flex shrink-0 flex-col items-end gap-1.5 self-start sm:self-center">
-          <div className="text-right">
+        {/* Mobile: price above CTA (top-right). Desktop: price left of button - less empty air. */}
+        <div className="flex shrink-0 flex-col items-end gap-1.5 self-start sm:flex-row sm:items-center sm:gap-3 sm:self-center">
+          <div className="text-right sm:text-right">
             {priceLabel ? (
               <div className="text-sm font-bold tabular-nums text-zinc-950 sm:text-base">{priceLabel}</div>
             ) : (
@@ -523,7 +509,6 @@ function playbillWhenParts(
   | {
       kind: 'dated';
       dayNum: string;
-      month: string;
       weekday: string;
       time: string | null;
       weekend: boolean;
@@ -538,11 +523,11 @@ function playbillWhenParts(
     .replace(/^в\s+/i, '') || null;
   if (date) {
     const dayNum = String(date.getDate());
-    const month = PLAYBILL_MONTH_SHORT_RU[date.getMonth()] || '';
     const dow = date.getDay();
     const weekday = PLAYBILL_WEEKDAY_SHORT[dow] || '';
     const weekend = dow === 0 || dow === 6;
-    return { kind: 'dated', dayNum, month, weekday, time, weekend };
+    // Month lives in section headers (ОКТЯБРЬ / НОЯБРЬ) - date cell keeps weekday + time only.
+    return { kind: 'dated', dayNum, weekday, time, weekend };
   }
   const schedule = formatCardScheduleLine(session);
   return {

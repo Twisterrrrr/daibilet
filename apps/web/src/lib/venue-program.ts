@@ -1,10 +1,24 @@
 import {
+  compareSessionsByStartsAt,
   expandSessionPurchaseVariants,
+  isSessionPurchaseBlocked,
   listPurchasableSessionVariants,
   pickPurchasableTcSession,
   pickRepresentativeSession,
 } from '@/lib/event-purchase';
 import type { PublicSessionDto } from '@daibilet/contracts/public';
+
+/**
+ * Venue playbill rows = catalog sessions on the page, not TC upcomingSlots siblings.
+ * Expanding slots invents ghost evenings (e.g. Syutkin 21:00) that are not venue sessions.
+ */
+function listVenuePlaybillCatalogSessions(
+  sessions: PublicSessionDto[],
+): PublicSessionDto[] {
+  return [...sessions]
+    .filter((session) => !isSessionPurchaseBlocked(session))
+    .sort(compareSessionsByStartsAt);
+}
 
 /** `'all'` or local calendar day `YYYY-MM-DD`. */
 export type VenueDateFilter = 'all' | (string & {});
@@ -175,14 +189,14 @@ function nextMonthKey(monthKey: string): string | null {
 }
 
 function applyMonthFilterToGroup(group: VenueEventGroup, monthKey: string): VenueEventGroup {
-  const variants = listPurchasableSessionVariants(group.sessions);
+  const variants = listVenuePlaybillCatalogSessions(group.sessions);
   const matchingSlots = variants.filter((session) => sessionMonthKey(session) === monthKey);
   if (matchingSlots.length) {
     const representative = pickPurchasableTcSession(matchingSlots) || matchingSlots[0]!;
     return {
       ...group,
       representative,
-      // Keep every slot - playbill renders one row per session (18:00 and 21:00 separately).
+      // One playbill row per catalog session (distinct TC events already on the venue page).
       visibleSlots: matchingSlots,
       firstStartsAt: representative.startsAt,
       hasSlotsOnSelectedDate: true,
@@ -202,7 +216,7 @@ export type VenuePlaybillEntry = {
   session: PublicSessionDto;
 };
 
-/** Flatten grouped program into one playbill row per purchasable time slot. */
+/** Flatten grouped program into one playbill row per catalog session. */
 export function expandVenuePlaybillEntries(groups: VenueEventGroup[]): VenuePlaybillEntry[] {
   const entries: VenuePlaybillEntry[] = [];
   const seen = new Set<string>();
@@ -211,7 +225,7 @@ export function expandVenuePlaybillEntries(groups: VenueEventGroup[]): VenuePlay
     const slots =
       group.visibleSlots.length > 0
         ? group.visibleSlots
-        : listPurchasableSessionVariants(group.sessions);
+        : listVenuePlaybillCatalogSessions(group.sessions);
     const list = slots.length ? slots : [group.representative];
     for (const session of list) {
       const dedupe = `${session.id}|${session.startsAt || ''}|${String(session.timeLabel || '').trim()}`;
@@ -317,8 +331,11 @@ function groupVenueSessions(sessions: PublicSessionDto[]): VenueEventGroup[] {
 
   return Array.from(groups.entries())
     .map(([key, groupSessions]) => {
-      const variants = listPurchasableSessionVariants(groupSessions);
-      const representative = pickRepresentativeSession(groupSessions) || groupSessions[0];
+      const variants = listVenuePlaybillCatalogSessions(groupSessions);
+      const representative =
+        pickPurchasableTcSession(groupSessions) ||
+        pickRepresentativeSession(groupSessions) ||
+        groupSessions[0];
       const prices = variants.map((session) => session.priceFrom).filter((price): price is number => Number.isFinite(price));
       const vacantValues = variants.map((session) => session.vacant).filter((vacant): vacant is number => Number.isFinite(vacant));
 
@@ -340,6 +357,7 @@ function groupVenueSessions(sessions: PublicSessionDto[]): VenueEventGroup[] {
 }
 
 function applyDateFilterToGroup(group: VenueEventGroup, targetDate: string | null): VenueEventGroup {
+  // Day rail (piers / multi-departure): still expand upcomingSlots on the same event.
   const variants = listPurchasableSessionVariants(group.sessions);
 
   if (!targetDate) {

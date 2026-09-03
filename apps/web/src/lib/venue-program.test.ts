@@ -115,7 +115,7 @@ test('month rail defaults to current month and spills next month when sparse', (
   assert.equal(view.spillover.length, 1);
 });
 
-test('expandVenuePlaybillEntries splits same-title slots into separate rows', () => {
+test('expandVenuePlaybillEntries splits distinct catalog sessions into separate rows', () => {
   const sessions = [
     {
       id: 'syutkin_a',
@@ -147,4 +147,38 @@ test('expandVenuePlaybillEntries splits same-title slots into separate rows', ()
   assert.equal(rows.length, 2);
   assert.equal(rows[0]?.session.timeLabel, '18:00');
   assert.equal(rows[1]?.session.timeLabel, '21:00');
+});
+
+test('expandVenuePlaybillEntries ignores ghost upcomingSlots not on the venue page', () => {
+  const sessions = [
+    {
+      id: 'evt_syutkin_18',
+      title: 'Валерий Сюткин и ансамбль S.O.S',
+      category: 'Мероприятия',
+      venue: 'Бутман',
+      groupKey: 'syutkin-sos',
+      startsAt: '2026-09-14T15:00:00Z',
+      timeLabel: '18:00',
+      purchaseReady: true,
+      priceFrom: 2500,
+      ageLimit: 6,
+      upcomingSlots: [
+        {
+          eventId: 'evt_syutkin_18',
+          startsAt: '2026-09-14T15:00:00Z',
+          timeLabel: '18:00',
+        },
+        {
+          eventId: 'evt_syutkin_21_ghost',
+          startsAt: '2026-09-14T18:00:00Z',
+          timeLabel: '21:00',
+        },
+      ],
+    },
+  ];
+  const view = buildVenueProgramMonthView(sessions as never, '2026-09', { minPrimary: 1 });
+  const rows = expandVenuePlaybillEntries(view.primary);
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0]?.session.timeLabel, '18:00');
+  assert.equal(rows[0]?.session.id, 'evt_syutkin_18');
 });
