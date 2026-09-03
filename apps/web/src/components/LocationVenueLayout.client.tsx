@@ -16,7 +16,6 @@ import {
 } from 'lucide-react';
 
 import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
-import { LocationCard } from '@/components/LocationCard.client';
 import { MobileStickyActionBar } from '@/components/MobileStickyActionBar';
 import { YandexMapEmbed } from '@/components/YandexMapEmbed';
 import { VenueBreadcrumbsNav } from '@/components/VenueBreadcrumbsNav.client';
@@ -163,8 +162,14 @@ export function LocationVenueLayout({
                 </span>
               </div>
               <h1 className="font-display text-2xl font-extrabold text-white sm:text-4xl md:text-5xl">{title}</h1>
+              {heroAddressLine ? (
+                <p className="mt-2 flex items-start gap-1.5 text-sm text-white/90 md:hidden">
+                  <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
+                  <span>{heroAddressLine}</span>
+                </p>
+              ) : null}
               {/* Mobile: one meta line; sticky has CTA */}
-              <p className="mt-2 text-sm font-medium text-white/90 md:hidden">
+              <p className="mt-1.5 text-sm font-medium text-white/80 md:hidden">
                 {[
                   `${formatNumber(routeCount)} ${routeCount === 1 ? 'маршрут' : routeCount >= 2 && routeCount <= 4 ? 'маршрута' : 'маршрутов'}`,
                   formatMoney(stats.priceFrom),
@@ -187,16 +192,10 @@ export function LocationVenueLayout({
               </div>
             </div>
           </section>
-          {(heroLead || heroAddressLine) ? (
+          {(heroLead) ? (
             <div className="border-b border-slate-200 bg-white md:hidden">
               <div className="container-page space-y-2 py-4 text-sm text-slate-700">
                 {heroLead ? <p className="leading-relaxed text-slate-600">{heroLead}</p> : null}
-                {heroAddressLine ? (
-                  <p className="flex items-start gap-1.5">
-                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary-600" />
-                    <span>{heroAddressLine}</span>
-                  </p>
-                ) : null}
               </div>
             </div>
           ) : null}
@@ -221,7 +220,13 @@ export function LocationVenueLayout({
               <span className="rounded-full bg-slate-950/75 px-3 py-1 text-xs font-semibold">{venue.city}</span>
             </div>
             <h1 className="font-display text-2xl font-extrabold text-white sm:text-4xl md:text-5xl">{title}</h1>
-            <p className="mt-2 text-sm font-medium text-white/90 md:hidden">
+            {heroAddressLine ? (
+              <p className="mt-2 flex items-start gap-1.5 text-sm text-white/90 md:hidden">
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
+                <span>{heroAddressLine}</span>
+              </p>
+            ) : null}
+            <p className="mt-1.5 text-sm font-medium text-white/80 md:hidden">
               {[
                 `${formatNumber(stats.events)} ${isBus ? 'рейсов' : 'событий'}`,
                 venue.city,
@@ -242,30 +247,24 @@ export function LocationVenueLayout({
             </div>
           </div>
         </section>
-        {(heroLead || heroAddressLine) ? (
+        {(heroLead) ? (
           <div className="border-b border-slate-200 bg-white md:hidden">
             <div className="container-page space-y-2 py-4 text-sm text-slate-700">
               {heroLead ? <p className="leading-relaxed text-slate-600">{heroLead}</p> : null}
-              {heroAddressLine ? (
-                <p className="flex items-start gap-1.5">
-                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary-600" />
-                  <span>{heroAddressLine}</span>
-                </p>
-              ) : null}
             </div>
           </div>
         ) : null}
         </>
       ) : isParkLike ? (
         <>
-          <section className="relative isolate grid w-full overflow-hidden bg-emerald-900 text-white aspect-square md:aspect-auto md:min-h-80 lg:min-h-[28rem]">
+          <section className="relative isolate grid w-full overflow-hidden bg-slate-900 text-white aspect-square md:aspect-auto md:min-h-80 lg:min-h-[28rem]">
           <div className="absolute inset-0">
             {venue.heroImageUrl ? (
-              <SafeImage src={venue.heroImageUrl} alt="" fill sizes={IMAGE_SIZES.eventHero} className="object-cover object-[center_20%] opacity-80" />
+              <SafeImage src={venue.heroImageUrl} alt="" fill sizes={IMAGE_SIZES.eventHero} className="object-cover object-[center_20%] opacity-85" />
             ) : (
-              <div className="h-full w-full bg-gradient-to-br from-emerald-700 to-emerald-950" />
+              <div className="h-full w-full bg-gradient-to-br from-slate-700 to-slate-950" />
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/90 via-emerald-950/55 to-emerald-950/15" />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/40 to-slate-950/10" />
           </div>
           <div className="container-page absolute inset-0 z-10 flex flex-col justify-end pb-5 pt-20 md:pb-14 md:pt-24 lg:pb-20">
             <div className="mb-3 hidden flex-wrap gap-2 md:flex">
@@ -290,24 +289,17 @@ export function LocationVenueLayout({
               )}
             </div>
             <h1 className="font-display text-2xl font-extrabold text-white sm:text-4xl md:text-5xl">{title}</h1>
-            <p className="mt-2 text-sm font-medium text-white/90 md:hidden">
-              {[
-                hasStopExcursions
-                  ? `${formatNumber(stopExcursionCount)} ${
-                      stopExcursionCount === 1
-                        ? 'экскурсия'
-                        : stopExcursionCount >= 2 && stopExcursionCount <= 4
-                          ? 'экскурсии'
-                          : 'экскурсий'
-                    }`
-                  : null,
-                venue.city,
-              ]
-                .filter(Boolean)
-                .join(' · ')}
-            </p>
+            {heroAddressLine ? (
+              <p className="mt-2 flex items-start gap-1.5 text-sm text-white/90 md:hidden">
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
+                <span>{heroAddressLine}</span>
+              </p>
+            ) : null}
+            {venue.city ? (
+              <p className="mt-1.5 text-sm font-medium text-white/80 md:hidden">{venue.city}</p>
+            ) : null}
             <p className="mt-3 hidden max-w-2xl text-white/85 md:block">{heroLead}</p>
-            {venue.hookFact ? <p className="mt-2 hidden max-w-2xl text-sm text-emerald-100/95 md:block">{venue.hookFact}</p> : null}
+            {venue.hookFact ? <p className="mt-2 hidden max-w-2xl text-sm text-white/75 md:block">{venue.hookFact}</p> : null}
             {hasStopExcursions || heroAddressLine ? (
               <div className="mt-5 hidden flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/85 md:flex">
                 {hasStopExcursions ? (
@@ -333,7 +325,7 @@ export function LocationVenueLayout({
               {hasStopExcursions ? (
                 <a
                   href="#venue-stop-events"
-                  className="inline-flex min-h-11 items-center justify-center rounded-full bg-white px-6 py-2.5 text-sm font-bold text-emerald-950 hover:bg-emerald-50"
+                  className="inline-flex min-h-11 items-center justify-center rounded-full bg-white px-6 py-2.5 text-sm font-bold text-slate-950 hover:bg-slate-100"
                 >
                   Посмотреть экскурсии
                 </a>
@@ -357,17 +349,11 @@ export function LocationVenueLayout({
             </div>
           </div>
         </section>
-          {(heroLead || venue.hookFact || heroAddressLine) ? (
+          {(heroLead || venue.hookFact) ? (
             <div className="border-b border-slate-200 bg-white md:hidden">
               <div className="container-page space-y-2 py-4 text-sm text-slate-700">
                 {heroLead ? <p className="leading-relaxed text-slate-600">{heroLead}</p> : null}
-                {venue.hookFact ? <p className="font-medium text-emerald-800">{venue.hookFact}</p> : null}
-                {heroAddressLine ? (
-                  <p className="flex items-start gap-1.5">
-                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary-600" />
-                    <span>{heroAddressLine}</span>
-                  </p>
-                ) : null}
+                {venue.hookFact ? <p className="font-medium text-slate-800">{venue.hookFact}</p> : null}
               </div>
             </div>
           ) : null}
@@ -452,14 +438,14 @@ export function LocationVenueLayout({
       <div className="container-page grid grid-cols-[minmax(0,1fr)] gap-8 py-8 lg:grid-cols-3">
         <div className="space-y-8 lg:col-span-2">
           {isPier && routeGroups.length > 0 ? (
-            <section id="location-routes" className="rounded-2xl border border-slate-200 bg-white p-6">
+            <section id="location-routes" className="scroll-mt-24">
               <h2 className="text-xl font-bold text-slate-900">Маршруты с этого причала</h2>
-              <p className="mt-1 text-sm text-slate-500">Купите билет онлайн - приходите за 15 минут до отправления.</p>
-              <div className="mt-4 space-y-3">
+              <p className="mt-3 text-sm leading-6 text-slate-500">Купите билет онлайн - приходите за 15 минут до отправления.</p>
+              <div className="mt-6 space-y-3">
                 {routeGroups.map((group) => {
                   const nextSlot = group.visibleSlots[0] || group.representative;
                   return (
-                    <div key={group.key} className="flex flex-col gap-4 rounded-xl border border-slate-100 bg-slate-50 p-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div key={group.key} className="flex flex-col gap-4 rounded-xl bg-slate-50 p-4 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0 flex-1">
                         <a href={eventHref(group.representative)} className="font-semibold text-slate-900 hover:text-primary-700">
                           {group.title}
@@ -492,17 +478,17 @@ export function LocationVenueLayout({
           ) : null}
 
           {((hookFact && !isParkLike) || aboutBody || editorial?.highlights?.length) ? (
-          <section className="rounded-2xl border border-slate-200 bg-white p-6">
+          <section className="scroll-mt-24">
             <h2 className="text-xl font-bold text-slate-900">О локации</h2>
             {hookFact && !isParkLike ? (
-              <p className="mt-2 text-sm font-semibold text-emerald-800">{hookFact}</p>
+              <p className="mt-4 text-sm font-semibold leading-6 text-slate-800">{hookFact}</p>
             ) : null}
             {editorial?.highlights?.length ? (
-              <ul className="mt-4 grid gap-2 sm:grid-cols-2" data-venue-highlights>
+              <ul className="mt-5 grid gap-2 sm:grid-cols-2" data-venue-highlights>
                 {editorial.highlights.map((item) => (
                   <li
                     key={item}
-                    className="flex items-start gap-2 rounded-xl border border-slate-100 bg-slate-50 p-3"
+                    className="flex items-start gap-2 rounded-xl bg-slate-50 p-3"
                   >
                     <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
                     <span className="text-sm text-slate-800">{item}</span>
@@ -511,7 +497,7 @@ export function LocationVenueLayout({
               </ul>
             ) : null}
             {aboutBody ? (
-            <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-slate-600">{aboutBody}</p>
+            <p className="mt-6 whitespace-pre-line text-sm leading-7 text-slate-600">{aboutBody}</p>
             ) : null}
           </section>
           ) : null}
@@ -519,7 +505,7 @@ export function LocationVenueLayout({
           {seoSections.length > 0 ? (
             <section
               id="venue-guide"
-              className="scroll-mt-24 space-y-6 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm"
+              className="scroll-mt-24 space-y-10"
               data-venue-seo-sections
             >
               {seoSections.map((section) => (
@@ -527,7 +513,7 @@ export function LocationVenueLayout({
                   <h2 className="font-display text-xl font-bold tracking-tight text-zinc-950 sm:text-2xl">
                     {section.h2}
                   </h2>
-                  <p className="mt-3 text-sm leading-7 text-zinc-600">{section.body}</p>
+                  <p className="mt-4 text-sm leading-7 text-zinc-600">{section.body}</p>
                 </div>
               ))}
             </section>
@@ -535,7 +521,7 @@ export function LocationVenueLayout({
 
           {visitTips ? (
             <p
-              className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm leading-6 text-slate-700"
+              className="rounded-2xl bg-slate-50 p-4 text-sm leading-6 text-slate-700"
               data-venue-visit-tips
             >
               {visitTips}
@@ -551,7 +537,7 @@ export function LocationVenueLayout({
                 {curatedFaq.map((item) => (
                   <details
                     key={item.question}
-                    className="group rounded-xl border border-zinc-200 bg-white shadow-sm"
+                    className="group rounded-xl bg-slate-50"
                   >
                     <summary className="flex cursor-pointer list-none items-center justify-between p-4">
                       <span className="flex items-center gap-2 font-medium text-zinc-900">
@@ -560,7 +546,7 @@ export function LocationVenueLayout({
                       </span>
                       <ChevronDown className="h-4 w-4 text-slate-400 transition group-open:rotate-180" />
                     </summary>
-                    <div className="px-4 pb-4 text-sm text-slate-700">{item.answer}</div>
+                    <div className="px-4 pb-4 text-sm leading-6 text-slate-700">{item.answer}</div>
                   </details>
                 ))}
               </div>
@@ -570,32 +556,29 @@ export function LocationVenueLayout({
           {/* Address / metro / directions live in sidebar Contacts + Map. */}
 
           {isParkLike && (hasStopExcursions || hasNearbyExcursions) ? (
-            <section id="venue-stop-events" className="scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-6">
+            <section id="venue-stop-events" className="scroll-mt-24">
               <h2 className="text-xl font-bold text-slate-900">
                 {hasStopExcursions
                   ? 'Экскурсии, которые включают это место'
                   : 'Рядом'}
               </h2>
-              <p className="mt-1 text-sm text-slate-500">
+              <p className="mt-3 text-sm leading-6 text-slate-500">
                 {hasStopExcursions
                   ? 'Маршруты с явной остановкой у этой локации.'
                   : 'События в радиусе 300 м. Это не афиша площадки!'}
               </p>
-              <ul className="mt-4 space-y-3" data-venue-linked-events-deduped>
-                {(hasStopExcursions ? uniqueStopEvents : uniqueNearbyEvents).map((event) => (
+              <ul className="mt-5 divide-y divide-slate-100" data-venue-linked-events-deduped>
+                {(hasStopExcursions ? uniqueStopEvents : uniqueNearbyEvents).slice(0, 5).map((event) => (
                   <li key={event.id}>
                     <a
                       href={`/events/${encodeURIComponent(event.slug)}`}
-                      className="flex flex-col gap-1 rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 transition hover:border-primary/30 hover:bg-white sm:flex-row sm:items-center sm:justify-between"
+                      className="flex items-baseline justify-between gap-3 py-2.5 text-sm transition hover:text-primary-700"
                     >
-                      <span className="min-w-0">
-                        <span className="font-semibold text-slate-900 hover:text-primary-700">{event.title}</span>
-                        {event.venue && !hasStopExcursions ? (
-                          <span className="mt-0.5 block text-xs text-slate-500">{event.venue}</span>
-                        ) : null}
+                      <span className="min-w-0 font-medium text-slate-900">
+                        {event.title}
                       </span>
-                      <span className="text-sm font-medium text-slate-600">
-                        {event.priceFrom != null ? formatMoney(event.priceFrom) : 'Смотреть'}
+                      <span className="shrink-0 tabular-nums text-slate-500">
+                        {event.priceFrom != null ? formatMoney(event.priceFrom) : '→'}
                       </span>
                     </a>
                   </li>
@@ -605,14 +588,14 @@ export function LocationVenueLayout({
           ) : null}
 
           {todaySlots.length > 0 ? (
-            <section className="rounded-2xl border border-slate-200 bg-white p-6">
-              <div className="flex items-baseline justify-between">
+            <section className="scroll-mt-24">
+              <div className="flex items-baseline justify-between gap-3">
                 <h2 className="text-xl font-bold text-slate-900">
                   {isPier ? 'Отправления сегодня' : isBus ? 'Отправления автобуса сегодня' : 'Ближайшие сборы сегодня'}
                 </h2>
                 <span className="text-sm text-slate-500">{formatNumber(routeCount)} маршрутов отсюда</span>
               </div>
-              <div className="mt-4 flex flex-wrap gap-2">
+              <div className="mt-5 flex flex-wrap gap-2">
                 {todaySlots.map((time) => (
                   <a
                     key={time}
@@ -630,26 +613,15 @@ export function LocationVenueLayout({
           {children}
 
           {showLateArrivalFaq ? (
-            <details className="group rounded-2xl border border-slate-200 bg-white">
+            <details className="group rounded-2xl bg-slate-50">
               <summary className="flex cursor-pointer list-none items-center justify-between p-5">
                 <span className="font-semibold text-slate-900">Что делать, если опаздываю?</span>
                 <ChevronDown className="h-4 w-4 text-slate-400 transition group-open:rotate-180" />
               </summary>
-              <div className="px-5 pb-5 text-sm text-slate-600">
+              <div className="px-5 pb-5 text-sm leading-6 text-slate-600">
                 Позвоните организатору по номеру в билете. На причалах и точках сбора обычно ждут 5-10 минут; на автобусных сборах - по расписанию, без задержек.
               </div>
             </details>
-          ) : null}
-
-          {relatedVenues.length > 0 && isParkLike ? (
-            <section className="rounded-2xl border border-slate-200 bg-white p-6">
-              <h2 className="text-xl font-bold text-slate-900">Рядом</h2>
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                {relatedVenues.slice(0, 4).map((related) => (
-                  <LocationCard key={related.id} venue={related} href={venueHref(related)} />
-                ))}
-              </div>
-            </section>
           ) : null}
         </div>
 
@@ -790,11 +762,20 @@ function LocationVenueSidebar({
         </button>
 
         {relatedVenues.length > 0 ? (
-          <div className="space-y-3">
-            <div className="text-sm font-semibold text-slate-900">Рядом ещё точки</div>
-            {relatedVenues.slice(0, 3).map((related) => (
-              <LocationCard key={related.id} venue={related} href={venueHref(related)} />
-            ))}
+          <div className="space-y-2" data-location-nearby-mini>
+            <div className="text-sm font-semibold text-slate-900">Рядом</div>
+            <ul className="space-y-0.5">
+              {relatedVenues.slice(0, 5).map((related) => (
+                <li key={related.id}>
+                  <a
+                    href={venueHref(related)}
+                    className="block truncate py-1.5 text-sm font-medium text-slate-800 hover:text-primary-700"
+                  >
+                    {related.name || related.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
         ) : null}
       </div>

@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
+  filterSessionsToVenueCity,
   isPublicVenueHub,
   lookupVenueCatalogSessionsForTest,
   mergeCityPageVenues,
@@ -208,10 +209,57 @@ test('scoreRelatedVenueCandidate keeps museums away from standup clubs', () => {
 });
 
 test('resolvePublicVenueKind maps cathedrals to temple public kind', () => {
-  assert.equal(resolvePublicVenueKind('ATTRACTION', 'Исаакиевский собор', 'СПб'), 'temple');
+  assert.equal(resolvePublicVenueKind('ATTRACTION', 'Исаакиевский собор', 'СПб'), 'museum');
+  assert.equal(resolvePublicVenueKind('ATTRACTION', 'Спас на Крови', 'СПб'), 'museum');
   assert.equal(resolvePublicVenueKind('OUTDOOR_LOCATION', 'Знаменский кафедральный собор', null), 'temple');
   assert.equal(resolvePublicVenueKind('ATTRACTION', 'Петропавловская крепость', 'СПб'), 'attraction');
   assert.equal(resolvePublicVenueKind('ATTRACTION', 'Бункер-42 на Таганке', 'Москва'), 'attraction');
+});
+
+test('lookupVenueCatalogSessions drops foreign-city name twins', () => {
+  const krasnoyarskHermitage = {
+    id: 'sess-krsk',
+    title: 'CALL ME KARIZMA / КРАСНОЯРСК',
+    venue: 'Государственный Эрмитаж (Зимний дворец)',
+    venueSlug: 'эрмитаж-60019685bed87cd0f9ee6310',
+    venueId: 'venue_krsk_hermitage',
+    city: 'Красноярск',
+    citySlug: 'krasnoyarsk',
+    startsAt: '2027-04-18T13:00:00.000Z',
+  };
+  const spbLocal = {
+    id: 'sess-spb',
+    title: 'Вечер в Эрмитаже',
+    venue: 'Государственный Эрмитаж (Зимний дворец)',
+    venueSlug: 'ermitazh',
+    venueId: 'ven_spbboats_ermitazh',
+    city: 'Санкт-Петербург',
+    citySlug: 'санкт-петербург',
+    startsAt: '2026-09-10T16:00:00.000Z',
+  };
+  const matched = lookupVenueCatalogSessionsForTest(
+    ['ven_spbboats_ermitazh'],
+    [krasnoyarskHermitage, spbLocal],
+    [
+      {
+        id: 'ven_spbboats_ermitazh',
+        slug: 'ermitazh',
+        title: 'Государственный Эрмитаж (Зимний дворец)',
+        name: 'Государственный Эрмитаж (Зимний дворец)',
+        city: 'Санкт-Петербург',
+        citySlug: 'санкт-петербург',
+      },
+    ],
+  );
+  assert.equal(matched.some((s: { id: string }) => s.id === 'sess-krsk'), false);
+  assert.equal(matched.some((s: { id: string }) => s.id === 'sess-spb'), true);
+
+  const filtered = filterSessionsToVenueCity([krasnoyarskHermitage, spbLocal], {
+    city: 'Санкт-Петербург',
+    citySlug: 'санкт-петербург',
+  });
+  assert.equal(filtered.length, 1);
+  assert.equal(filtered[0].id, 'sess-spb');
 });
 
 test('saleable fortress is one museum card, not a parallel sight', () => {
@@ -269,8 +317,13 @@ test('saleable museum-like attraction moves to museum, plain sight stays attract
     resolvePublicVenueKind('ATTRACTION', 'Дворцовая площадь', 'Санкт-Петербург', { totalEvents: 3 }),
     'attraction',
   );
+  // Ticketable palace-museum → /venues even before our own offers appear.
   assert.equal(
     resolvePublicVenueKind('ATTRACTION', 'Екатерининский дворец', 'Пушкин, Садовая ул., 7', { totalEvents: 0 }),
-    'attraction',
+    'museum',
+  );
+  assert.equal(
+    resolvePublicVenueKind('ATTRACTION', 'Исаакиевский собор', 'СПб', { totalEvents: 0 }),
+    'museum',
   );
 });

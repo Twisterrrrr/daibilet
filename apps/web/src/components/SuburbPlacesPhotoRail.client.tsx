@@ -98,7 +98,7 @@ export function SuburbPlacesPhotoRail({
           <div
             key={`${place.name}:${index}`}
             data-rail-item
-            className="flex w-[min(80%,18.5rem)] shrink-0 snap-start flex-col sm:w-[20rem]"
+            className="flex w-[min(80%,18.5rem)] shrink-0 snap-start flex-col self-start sm:w-[20rem]"
           >
             {dayLabel ? (
               <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500">
@@ -110,7 +110,7 @@ export function SuburbPlacesPhotoRail({
             ) : null}
             <article
               data-day-trip-place
-              className="flex flex-1 flex-col overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_rgba(15,23,42,0.06)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_28px_-10px_hsl(221_83%_53%_/_0.28)]"
+              className="flex flex-col overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_rgba(15,23,42,0.06)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_28px_-10px_hsl(221_83%_53%_/_0.28)]"
             >
               <div className="relative aspect-[16/10] shrink-0 overflow-hidden bg-slate-100">
                 <CardSafeImage
@@ -128,7 +128,7 @@ export function SuburbPlacesPhotoRail({
                   {index + 1}
                 </span>
               </div>
-              <div className="flex min-h-0 flex-1 flex-col p-4 sm:p-5">
+              <div className="flex flex-col p-4 sm:p-5">
                 {place.href ? (
                   <Link href={place.href} className="hover:text-primary-700">
                     {title}

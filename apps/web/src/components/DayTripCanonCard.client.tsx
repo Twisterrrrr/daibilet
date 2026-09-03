@@ -227,7 +227,7 @@ export function DayTripCanonCard({
               ) : null}
               {titleExtra ? <div className="mt-1.5">{titleExtra}</div> : null}
               {logisticsOneLiner ? (
-                <p className={`mt-2 text-xs leading-snug ${mutedClass}`} data-day-trip-logistics-line>
+                <p className={`mt-1 text-xs leading-snug ${mutedClass}`} data-day-trip-logistics-line>
                   {resolvedExitLabel}: {logisticsOneLiner}
                 </p>
               ) : null}
@@ -326,7 +326,7 @@ export function DayTripCanonCard({
                 {/* Same structure as gastro: label + panel; keep slate panel (no amber). */}
                 <h4 className={`text-sm font-semibold ${inkClass}`}>{resolvedExitLabel}</h4>
                 <div
-                  className={`mt-1.5 ${panelClass} px-2.5 py-2.5 sm:mt-2 sm:py-3.5 sm:pr-4 ${PANEL_INSET_SM} ${LOGISTICS_BG_EXTEND_SM}`}
+                  className={`mt-1 ${panelClass} px-2.5 py-2 sm:mt-1.5 sm:py-2.5 sm:pr-4 ${PANEL_INSET_SM} ${LOGISTICS_BG_EXTEND_SM}`}
                 >
                   {exitHint ? (
                     <p

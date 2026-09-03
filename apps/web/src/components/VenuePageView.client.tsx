@@ -31,6 +31,7 @@ import {
   type VenueDateRailChip,
   type VenueEventGroup,
 } from '@/lib/venue-program';
+import { filterVenuePageSessionsByCity } from '@/lib/venue-page-sessions';
 import { venuePageTemplate } from '@/lib/venue-meta';
 
 /** Match SSR VenueDetailPage: curated cover + title/metro overlays. */
@@ -150,7 +151,11 @@ export function VenuePageView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [routeSlug, matchedInitialVenueId]);
 
-  const baseSessions = payload?.sessions ?? [];
+  const venue = resolveVenueForRouteSlug(routeSlug, initialPayload, payload);
+  const baseSessions = React.useMemo(
+    () => filterVenuePageSessionsByCity(payload?.sessions ?? [], venue),
+    [payload?.sessions, venue],
+  );
   const dateOptions = React.useMemo(() => buildVenueDateOptions(baseSessions), [baseSessions]);
   const resolvedDateFilter: VenueDateFilter = dateFilter ?? dateOptions.smartDate ?? 'all';
   const groups = React.useMemo(() => {
@@ -162,7 +167,6 @@ export function VenuePageView({
     () => buildVenueProgramGroups(baseSessions, 'all', null),
     [baseSessions],
   );
-  const venue = resolveVenueForRouteSlug(routeSlug, initialPayload, payload);
   const matchedPayload =
     payload?.venue && venueMatchesRouteSlug(payload.venue, routeSlug) ? payload : matchedInitial;
   const pageTemplate = venue ? venuePageTemplate(venue.type) : 'location';
@@ -203,7 +207,7 @@ export function VenuePageView({
                 key={venue.id}
                 venue={venue}
                 stats={matchedPayload.stats}
-                sessions={contentReady ? matchedPayload.sessions : []}
+                sessions={contentReady ? baseSessions : []}
                 routeGroups={contentReady ? allRouteGroups : []}
                 relatedVenues={contentReady ? matchedPayload.relatedVenues : []}
                 stopEvents={contentReady ? matchedPayload.stopEvents || [] : []}
@@ -218,7 +222,6 @@ export function VenuePageView({
                     availableDates={dateOptions.availableDates}
                     onDateChange={setDateFilter}
                     groups={groups}
-                    framed
                   />
                 ) : null}
               </LocationVenueLayout>
@@ -227,7 +230,7 @@ export function VenuePageView({
                 key={venue.id}
                 venue={venue}
                 stats={matchedPayload.stats}
-                sessions={contentReady ? matchedPayload.sessions : []}
+                sessions={contentReady ? baseSessions : []}
                 relatedVenues={contentReady ? matchedPayload.relatedVenues : []}
                 stopEvents={contentReady ? matchedPayload.stopEvents || [] : []}
                 nearbyEvents={contentReady ? matchedPayload.nearbyEvents || [] : []}
@@ -241,7 +244,6 @@ export function VenuePageView({
                     availableDates={dateOptions.availableDates}
                     onDateChange={setDateFilter}
                     groups={groups}
-                    framed
                   />
                 ) : null}
               </InstitutionVenueLayout>
@@ -416,25 +418,53 @@ function isVenueDateRailChipActive(chip: VenueDateRailChip, selected: VenueDateF
 /**
  * Theater playbill rows - date/time + title + price + buy.
  * Poster cards stay in «Ближайшие события» rail above; this block is schedule density.
+ * Sparse schedule (≤2 shows/day) → month section headers like a paper playbill.
  */
 function VenuePlaybillList({ groups }: { groups: VenueEventGroup[] }) {
   const rows = groups.slice(0, 48);
   if (!rows.length) return <EmptyState />;
 
+  const monthMode = shouldUseMonthPlaybill(rows);
+  if (!monthMode) {
+    return (
+      <ul className="divide-y divide-zinc-100 border-t border-zinc-100" data-venue-playbill>
+        {rows.map((group) => (
+          <VenuePlaybillRow key={group.key} group={group} layout="day" />
+        ))}
+      </ul>
+    );
+  }
+
+  const sections = groupPlaybillByMonth(rows);
   return (
-    <ul className="divide-y divide-zinc-100 border-t border-zinc-100" data-venue-playbill>
-      {rows.map((group) => (
-        <VenuePlaybillRow key={group.key} group={group} />
+    <div className="space-y-8 border-t border-zinc-100 pt-2" data-venue-playbill data-venue-playbill-month>
+      {sections.map((section) => (
+        <section key={section.key} aria-label={section.label}>
+          <h3 className="mb-1 text-[11px] font-bold uppercase tracking-[0.16em] text-zinc-500">
+            {section.label}
+          </h3>
+          <ul className="divide-y divide-zinc-100">
+            {section.groups.map((group) => (
+              <VenuePlaybillRow key={group.key} group={group} layout="month" />
+            ))}
+          </ul>
+        </section>
       ))}
-    </ul>
+    </div>
   );
 }
 
-function VenuePlaybillRow({ group }: { group: VenueEventGroup }) {
+function VenuePlaybillRow({
+  group,
+  layout,
+}: {
+  group: VenueEventGroup;
+  layout: 'day' | 'month';
+}) {
   const session = group.representative;
   const href = eventHref(session);
   const title = formatPublicTitle(group.title || session.title || session.eventTitle);
-  const when = playbillWhenLabel(session, group);
+  const when = layout === 'month' ? playbillMonthWhenLabel(session, group) : playbillWhenLabel(session, group);
   const age = formatAgeLimit(session.ageLimit);
   const meta = [group.category, age].filter(Boolean).join(' · ');
   const price =
@@ -455,7 +485,7 @@ function VenuePlaybillRow({ group }: { group: VenueEventGroup }) {
         href={href}
         className="flex flex-col gap-2 py-3.5 transition hover:bg-zinc-50/80 sm:flex-row sm:items-center sm:gap-4 sm:px-1"
       >
-        <div className="w-[6.5rem] shrink-0 sm:w-28" data-venue-playbill-when>
+        <div className="w-[5.5rem] shrink-0 sm:w-24" data-venue-playbill-when>
           <p className="text-sm font-semibold tabular-nums text-zinc-950">{when.primary}</p>
           {when.secondary ? (
             <p className="mt-0.5 text-xs tabular-nums text-zinc-500">{when.secondary}</p>
@@ -482,22 +512,108 @@ function VenuePlaybillRow({ group }: { group: VenueEventGroup }) {
             </p>
           ) : null}
         </div>
-        <div className="flex shrink-0 items-center gap-3 sm:flex-col sm:items-end sm:gap-1">
-          <div className="text-right">
-            {price ? (
-              <p className="text-sm font-bold tabular-nums text-zinc-950">{price}</p>
-            ) : (
-              <p className="text-sm font-medium text-zinc-500">Смотреть</p>
-            )}
-            {vacant ? <p className="text-[11px] text-amber-700">{vacant}</p> : null}
-          </div>
-          <span className="inline-flex min-h-8 items-center rounded-full bg-graphite px-3.5 text-xs font-semibold text-white sm:mt-1">
+        <div className="flex shrink-0 flex-wrap items-center justify-end gap-x-3 gap-y-1">
+          {price ? (
+            <span className="text-sm font-bold tabular-nums text-zinc-950">{price}</span>
+          ) : (
+            <span className="text-sm font-medium text-zinc-500">Смотреть</span>
+          )}
+          {vacant ? <span className="text-xs tabular-nums text-amber-700">{vacant}</span> : null}
+          <span className="inline-flex min-h-8 items-center rounded-full bg-graphite px-3.5 text-xs font-semibold text-white">
             Купить
           </span>
         </div>
       </a>
     </li>
   );
+}
+
+const PLAYBILL_MONTHS_RU = [
+  'январь',
+  'февраль',
+  'март',
+  'апрель',
+  'май',
+  'июнь',
+  'июль',
+  'август',
+  'сентябрь',
+  'октябрь',
+  'ноябрь',
+  'декабрь',
+] as const;
+
+function playbillSessionDate(session: PublicSessionDto): Date | null {
+  const raw = session.startsAt;
+  if (!raw) return null;
+  const date = new Date(raw);
+  return Number.isFinite(date.getTime()) ? date : null;
+}
+
+function playbillDayKey(group: VenueEventGroup): string {
+  const slot = group.visibleSlots[0] || group.sessions[0] || group.representative;
+  const date = playbillSessionDate(slot);
+  if (!date) return 'open';
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+function shouldUseMonthPlaybill(groups: VenueEventGroup[]): boolean {
+  const byDay = new Map<string, number>();
+  for (const group of groups) {
+    if (isOpenDate(group.representative)) continue;
+    const key = playbillDayKey(group);
+    if (key === 'open') continue;
+    byDay.set(key, (byDay.get(key) || 0) + 1);
+  }
+  if (byDay.size < 2) return false;
+  let max = 0;
+  for (const count of byDay.values()) max = Math.max(max, count);
+  return max <= 2;
+}
+
+function groupPlaybillByMonth(
+  groups: VenueEventGroup[],
+): Array<{ key: string; label: string; groups: VenueEventGroup[] }> {
+  const sections: Array<{ key: string; label: string; groups: VenueEventGroup[] }> = [];
+  const index = new Map<string, number>();
+  for (const group of groups) {
+    const date = playbillSessionDate(group.visibleSlots[0] || group.representative);
+    const key = date
+      ? `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
+      : 'open';
+    const label = date
+      ? PLAYBILL_MONTHS_RU[date.getMonth()] || 'афиша'
+      : 'Открытая дата';
+    let at = index.get(key);
+    if (at == null) {
+      at = sections.length;
+      index.set(key, at);
+      sections.push({ key, label, groups: [] });
+    }
+    sections[at]!.groups.push(group);
+  }
+  return sections;
+}
+
+function playbillMonthWhenLabel(
+  session: PublicSessionDto,
+  group: VenueEventGroup,
+): { primary: string; secondary: string | null } {
+  if (isOpenDate(session)) {
+    return { primary: 'Открытая дата', secondary: null };
+  }
+  const date = playbillSessionDate(session);
+  const time =
+    String(session.timeLabel || '').trim().replace(/^в\s+/i, '') ||
+    collectPlaybillSlotTimes(group)[0] ||
+    null;
+  if (date) {
+    return { primary: String(date.getDate()), secondary: time };
+  }
+  return playbillWhenLabel(session, group);
 }
 
 function playbillWhenLabel(

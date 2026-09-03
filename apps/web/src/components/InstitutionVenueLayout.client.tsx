@@ -18,7 +18,6 @@ import {
 import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import { CityHubSectionHeading } from '@/components/CityHubSectionHeading';
 import { HubEventsAfficheRail } from '@/components/HubEventsAfficheRail.client';
-import { InstitutionCard } from '@/components/InstitutionCard.client';
 import { MobileStickyActionBar } from '@/components/MobileStickyActionBar';
 import { YandexMapEmbed } from '@/components/YandexMapEmbed';
 import { VenueAdmissionBlock } from '@/components/VenueAdmissionBlock';
@@ -149,7 +148,7 @@ export function InstitutionVenueLayout({
     () => filterSimilarInstitutionVenues(venue, relatedVenues, 4),
     [venue, relatedVenues],
   );
-  const showSimilar = linkedExcursions.length > 0 || similarVenues.length > 0;
+  const showSimilarTab = linkedExcursions.length > 0;
   const hookFactText = String(venue.hookFact || editorial?.hookFact || '').trim();
   const heroImage = resolveVenueHeroImage(venue.slug, venue.heroImageUrl) || venue.heroImageUrl;
   const galleryImages = React.useMemo(
@@ -215,9 +214,9 @@ export function InstitutionVenueLayout({
     if (showVisitSection) tabs.push(['#visit', 'Как посетить']);
     if (showFaq) tabs.push(['#faq', 'Вопросы']);
     tabs.push(['#reviews', 'Отзывы']);
-    if (showSimilar) tabs.push(['#similar', 'Похожие']);
+    if (showSimilarTab) tabs.push(['#similar', 'Похожие']);
     return tabs;
-  }, [seoSections.length, hasInternalLcTickets, hasAfisha, showVisitSection, showFaq, showSimilar]);
+  }, [seoSections.length, hasInternalLcTickets, hasAfisha, showVisitSection, showFaq, showSimilarTab]);
 
   const share = () => {
     if (navigator.share) {
@@ -275,9 +274,15 @@ export function InstitutionVenueLayout({
 
               <h1 className="font-display text-2xl font-extrabold leading-tight text-white sm:text-4xl md:text-5xl">{title}</h1>
 
-              {/* Mobile: short city meta; full address moves below the photo */}
+              {heroAddressLine ? (
+                <p className="mt-2 flex items-start gap-1.5 text-sm text-white/90 md:hidden">
+                  <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
+                  <span>{heroAddressLine}</span>
+                </p>
+              ) : null}
+
               {venue.city ? (
-                <p className="mt-2 text-sm font-medium text-white/90 md:hidden">{venue.city}</p>
+                <p className="mt-1.5 text-sm font-medium text-white/80 md:hidden">{venue.city}</p>
               ) : null}
 
               {heroAddressLine ? (
@@ -332,16 +337,10 @@ export function InstitutionVenueLayout({
         </div>
       </section>
 
-      {(heroAddressLine || intro) ? (
+      {intro ? (
         <div className="border-b border-slate-200 bg-white md:hidden">
-          <div className="container-page space-y-2 py-4 text-sm text-slate-700">
-            {heroAddressLine ? (
-              <p className="flex items-start gap-1.5">
-                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary-600" />
-                <span>{heroAddressLine}</span>
-              </p>
-            ) : null}
-            {intro ? <p className="leading-relaxed text-slate-600">{intro}</p> : null}
+          <div className="container-page py-4 text-sm text-slate-700">
+            <p className="leading-relaxed text-slate-600">{intro}</p>
           </div>
         </div>
       ) : null}
@@ -374,7 +373,7 @@ export function InstitutionVenueLayout({
 
           {galleryImages.length >= 2 ? (
             <section
-              className="scroll-mt-24 overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 sm:p-5"
+              className="scroll-mt-24"
               data-venue-gallery
               aria-label="Фотогалерея"
             >
@@ -397,14 +396,14 @@ export function InstitutionVenueLayout({
             </section>
           ) : null}
 
-          <section id="about" className="scroll-mt-24 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+          <section id="about" className="scroll-mt-24">
             <h2 className="font-display text-xl font-bold tracking-tight text-zinc-950 sm:text-2xl">О месте</h2>
             {editorial?.highlights?.length ? (
-              <ul className="mt-4 grid gap-2 sm:grid-cols-2" data-venue-highlights>
+              <ul className="mt-5 grid gap-2 sm:grid-cols-2" data-venue-highlights>
                 {editorial.highlights.map((item) => (
                   <li
                     key={item}
-                    className="flex items-start gap-2 rounded-xl border border-slate-100 bg-slate-50 p-3"
+                    className="flex items-start gap-2 rounded-xl bg-slate-50 p-3"
                   >
                     <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
                     <span className="text-sm text-slate-800">{item}</span>
@@ -412,9 +411,9 @@ export function InstitutionVenueLayout({
                 ))}
               </ul>
             ) : categories.length > 0 ? (
-              <div className="mt-4 grid gap-2 sm:grid-cols-2">
+              <div className="mt-5 grid gap-2 sm:grid-cols-2">
                 {categories.slice(0, 6).map(([name]) => (
-                  <div key={name} className="flex items-start gap-2 rounded-xl border border-slate-100 bg-slate-50 p-3">
+                  <div key={name} className="flex items-start gap-2 rounded-xl bg-slate-50 p-3">
                     <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
                     <span className="text-sm text-slate-800">{name}</span>
                   </div>
@@ -422,14 +421,14 @@ export function InstitutionVenueLayout({
               </div>
             ) : null}
             {venue.description && venue.description !== intro ? (
-              <p className="mt-4 text-sm leading-7 text-slate-600">{venue.description}</p>
+              <p className="mt-6 text-sm leading-7 text-slate-600">{venue.description}</p>
             ) : null}
           </section>
 
           {seoSections.length > 0 ? (
             <section
               id="venue-guide"
-              className="scroll-mt-24 space-y-6 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm"
+              className="scroll-mt-24 space-y-10"
               data-venue-seo-sections
             >
               {seoSections.map((section) => (
@@ -437,7 +436,7 @@ export function InstitutionVenueLayout({
                   <h2 className="font-display text-xl font-bold tracking-tight text-zinc-950 sm:text-2xl">
                     {section.h2}
                   </h2>
-                  <p className="mt-3 text-sm leading-7 text-zinc-600">{section.body}</p>
+                  <p className="mt-4 text-sm leading-7 text-zinc-600">{section.body}</p>
                 </div>
               ))}
             </section>
@@ -467,22 +466,22 @@ export function InstitutionVenueLayout({
           {children}
 
           {showVisitSection ? (
-            <section id="visit" className="scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-6">
+            <section id="visit" className="scroll-mt-24">
               <h2 className="text-xl font-bold text-slate-900">Как посетить</h2>
-              <div className="mt-4" data-venue-opening-hours>
+              <div className="mt-5" data-venue-opening-hours>
                 <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
                   <Clock className="h-4 w-4 text-primary-600" />
                   Часы работы
                 </div>
-                <ul className="mt-3 space-y-1 text-sm text-slate-700">
+                <ul className="mt-3 space-y-1 text-sm leading-6 text-slate-700">
                   {openingHours?.lines?.map((line) => (
                     <li key={line}>{line}</li>
                   ))}
                 </ul>
-                <p className="mt-3 text-xs leading-5 text-slate-500">{OPEN_DATE_HOURS_HOLIDAY_NOTE}</p>
+                <p className="mt-4 text-xs leading-5 text-slate-500">{OPEN_DATE_HOURS_HOLIDAY_NOTE}</p>
               </div>
               {visitTips ? (
-                <p className="mt-4 rounded-xl bg-slate-50 p-3 text-sm leading-6 text-slate-700" data-venue-visit-tips>
+                <p className="mt-6 rounded-xl bg-slate-50 p-4 text-sm leading-6 text-slate-700" data-venue-visit-tips>
                   {visitTips}
                 </p>
               ) : null}
@@ -492,9 +491,9 @@ export function InstitutionVenueLayout({
           {showFaq ? (
             <section id="faq" className="scroll-mt-24">
               <h2 className="font-display text-xl font-bold tracking-tight text-zinc-950 sm:text-2xl">Вопросы</h2>
-              <div className="mt-4 space-y-2">
+              <div className="mt-5 space-y-2">
                 {faqItems.map((item) => (
-                  <details key={item.question} className="group rounded-xl border border-zinc-200 bg-white shadow-sm">
+                  <details key={item.question} className="group rounded-xl bg-slate-50">
                     <summary className="flex cursor-pointer list-none items-center justify-between p-4">
                       <span className="flex items-center gap-2 font-medium text-zinc-900">
                         <HelpCircle className="h-4 w-4 text-primary-600" />
@@ -502,16 +501,16 @@ export function InstitutionVenueLayout({
                       </span>
                       <ChevronDown className="h-4 w-4 text-zinc-400 transition group-open:rotate-180" />
                     </summary>
-                    <div className="px-4 pb-4 text-sm text-zinc-700">{item.answer}</div>
+                    <div className="px-4 pb-4 text-sm leading-6 text-zinc-700">{item.answer}</div>
                   </details>
                 ))}
               </div>
             </section>
           ) : null}
 
-          <section id="reviews" className="scroll-mt-24 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+          <section id="reviews" className="scroll-mt-24">
             <h2 className="font-display text-xl font-bold tracking-tight text-zinc-950 sm:text-2xl">Отзывы</h2>
-            <div className="mt-4 flex items-start gap-3 rounded-xl border border-dashed border-zinc-200 bg-zinc-50 p-4">
+            <div className="mt-5 flex items-start gap-3 rounded-xl bg-zinc-50 p-4">
               <MessageSquareQuote className="mt-0.5 h-5 w-5 shrink-0 text-zinc-400" />
               <p className="text-sm leading-6 text-zinc-600">
                 Отзывы о площадке скоро появятся здесь. Пока можно опираться на описание, часы работы и карту рядом.
@@ -630,58 +629,54 @@ export function InstitutionVenueLayout({
                 </ul>
               ) : null}
             </div>
-          </div>
-        </aside>
-      </div>
 
-      {showSimilar ? (
-        <div className="border-t border-zinc-200 bg-white">
-          <div className="container-page space-y-8 py-10 sm:py-12" id="similar">
-            <h2 className="font-display text-2xl font-extrabold tracking-tight text-zinc-950 sm:text-3xl">
-              Похожие
-            </h2>
-            {linkedExcursions.length > 0 ? (
-              <div data-venue-linked-events-deduped>
-                <h3 className="text-sm font-semibold text-zinc-800">Также можно посетить</h3>
-                {!hasStopExcursions ? (
-                  <p className="mt-1 text-sm text-zinc-500">
-                    События в радиусе 300 м. Это не афиша площадки!
-                  </p>
-                ) : null}
-                <ul className="mt-4 space-y-3">
-                  {linkedExcursions.map((event) => (
-                    <li key={event.id}>
+            {similarVenues.length > 0 ? (
+              <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm" data-venue-similar-mini>
+                <div className="text-sm font-semibold text-zinc-950">Рядом</div>
+                <ul className="mt-2 space-y-0.5">
+                  {similarVenues.slice(0, 5).map((related) => (
+                    <li key={related.id}>
                       <a
-                        href={`/events/${encodeURIComponent(event.slug)}`}
-                        className="flex flex-col gap-1 rounded-xl border border-zinc-100 bg-zinc-50 px-4 py-3 transition hover:border-primary/30 hover:bg-white sm:flex-row sm:items-center sm:justify-between"
+                        href={venueHref(related)}
+                        className="block truncate py-1.5 text-sm font-medium text-zinc-800 hover:text-primary-700"
                       >
-                        <span className="min-w-0">
-                          <span className="font-semibold text-zinc-900 hover:text-primary-700">
-                            {event.title}
-                          </span>
-                          {!hasStopExcursions && event.venue ? (
-                            <span className="mt-0.5 block text-xs text-zinc-500">{event.venue}</span>
-                          ) : null}
-                        </span>
-                        <span className="text-sm font-medium text-zinc-600">
-                          {event.priceFrom != null ? formatMoney(event.priceFrom) : 'Смотреть'}
-                        </span>
+                        {related.name || related.title}
                       </a>
                     </li>
                   ))}
                 </ul>
               </div>
             ) : null}
-            {similarVenues.length > 0 ? (
-              <div>
-                <h3 className="text-sm font-semibold text-zinc-800">Похожие площадки</h3>
-                <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                  {similarVenues.map((related) => (
-                    <InstitutionCard key={related.id} venue={related} href={venueHref(related)} />
-                  ))}
-                </div>
-              </div>
+          </div>
+        </aside>
+      </div>
+
+      {linkedExcursions.length > 0 ? (
+        <div className="border-t border-zinc-200 bg-white">
+          <div className="container-page space-y-4 py-10 sm:py-12" id="similar">
+            <h2 className="font-display text-2xl font-extrabold tracking-tight text-zinc-950 sm:text-3xl">
+              {hasStopExcursions ? 'Также можно посетить' : 'Рядом'}
+            </h2>
+            {!hasStopExcursions ? (
+              <p className="text-sm leading-6 text-zinc-500">
+                События в радиусе 300 м. Это не афиша площадки!
+              </p>
             ) : null}
+            <ul className="divide-y divide-zinc-100" data-venue-linked-events-deduped>
+              {linkedExcursions.slice(0, 5).map((event) => (
+                <li key={event.id}>
+                  <a
+                    href={`/events/${encodeURIComponent(event.slug)}`}
+                    className="flex items-baseline justify-between gap-3 py-2.5 text-sm transition hover:text-primary-700"
+                  >
+                    <span className="min-w-0 font-medium text-zinc-900">{event.title}</span>
+                    <span className="shrink-0 tabular-nums text-zinc-500">
+                      {event.priceFrom != null ? formatMoney(event.priceFrom) : '→'}
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       ) : null}

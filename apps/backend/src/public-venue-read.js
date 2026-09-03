@@ -114,7 +114,7 @@ async function getCatalogSessions(db) {
  */
 const VENUE_PAGE_CATALOG_SOFT_MS = Number(process.env.DAIBILET_VENUE_PAGE_CATALOG_SOFT_MS || 2_500);
 
-async function loadVenuePageCatalogSessions(venueIds, venueContexts = []) {
+async function loadVenuePageCatalogSessions(venueIds, venueContexts = [], venueCityHint = null) {
   const keys = new Set();
   for (const id of venueIds || []) {
     const key = String(id || '').trim().toLowerCase();
@@ -136,10 +136,11 @@ async function loadVenuePageCatalogSessions(venueIds, venueContexts = []) {
     if (!soft?.length) return [];
 
     const indexed = catalog.resolveCatalogSessionsByVenueKeys([...keys]);
-    const scoped = indexed.length
+    const scopedRaw = indexed.length
       ? sortVenueCatalogSessions(indexed).slice(0, 120)
       : // Index miss (v1 disk / name-only fuzzy): fall back to scoped filter, still no extra promote.
         lookupVenueCatalogSessions(venueIds, soft, venueContexts).slice(0, 120);
+    const scoped = filterSessionsToVenueCity(scopedRaw, venueCityHint);
     if (!scoped.length) return [];
 
     try {
@@ -464,10 +465,14 @@ export async function buildPublicVenuePage(db, venueSlugOrId) {
       ...venueContexts.map((row) => row.id).filter(Boolean),
     ]),
   ];
+  const venueCityHint = {
+    city: venue.city,
+    citySlug: venue.citySlug,
+  };
 
   const [venueHeroImageFallbacks, sessions] = await Promise.all([
     fetchVenueHeroImageFallbacks(venueIds),
-    loadVenuePageCatalogSessions(venueIds, venueContexts),
+    loadVenuePageCatalogSessions(venueIds, venueContexts, venueCityHint),
   ]);
   if (!sessions.length) {
     const status = String(venue.pageStatus || '').toUpperCase();
@@ -1778,6 +1783,30 @@ function isTempleLikeVenueName(name) {
   );
 }
 
+/**
+ * Paid cathedral-museums / palace interiors: ticket to enter → /venues (museum),
+ * not the «Храмы» location chip. Canon: docs/catalog-location-venue-canon.md.
+ */
+const TICKETABLE_MUSEUM_TEMPLE_RE = new RegExp(
+  [
+    'исаакиевск',
+    'спас\\s+на\\s+крови',
+    'юсуповск',
+    'екатерининск\\p{L}*\\s+дворец',
+    'павловск\\p{L}*\\s+дворец',
+    'гатчинск\\p{L}*\\s+дворец',
+    'мраморн\\p{L}*\\s+дворец',
+    'михайловск\\p{L}*\\s+замок',
+    'петергофск\\p{L}*\\s+дворец',
+    'больш\\p{L}*\\s+дворец\\s+петергоф',
+  ].join('|'),
+  'iu',
+);
+
+function isTicketableMuseumTemple(name, slug = '') {
+  return TICKETABLE_MUSEUM_TEMPLE_RE.test(`${name || ''} ${slug || ''}`);
+}
+
 function isViewingPlatformLikeVenue(name, address, shortDescription, description) {
   const text = [name, address, shortDescription, description].filter(Boolean).join(' ');
   return /смотров(?:ая|ой|ую|ые)\s+площадк|smotrovaya|viewing platform|observation deck/i.test(text);
@@ -1883,6 +1912,10 @@ export function resolvePublicVenueKind(storedKind, name, address, options = {}) 
   // must not turn concert halls / clubs into pier pages).
   if (stored === 'park') return 'park';
   if (stored === 'monument') return 'monument';
+  // Paid cathedral-museums / palace interiors → institution even if CMS still says ATTRACTION.
+  if (isTicketableMuseumTemple(name, slug) && stored !== 'park' && stored !== 'monument') {
+    return 'museum';
+  }
   // Соборы / церкви / монастыри: отдельный public kind для чипа «Храмы» на /places.
   if (
     (stored === 'attraction' || stored === 'outdoor_location' || stored === 'temple') &&
@@ -2456,8 +2489,11 @@ function collectVenueSessionLookupContexts(venue, mergedGroup, hubRows = []) {
 
   const baseSlug = normalizePublicVenueSlugKey(venue?.slug || '');
   const baseName = normalizeVenueTextKey(formatPublicVenueTitle(venue?.name || venue?.title || ''));
+  const baseCity = venueCityKey(venue);
   if (baseSlug || baseName) {
     for (const row of hubRows || []) {
+      // Never attach another city's twin («Эрмитаж» Красноярск → SPB Hermitage).
+      if (baseCity && !samePublicVenueCity(venue, row)) continue;
       const rowSlug = normalizePublicVenueSlugKey(row?.slug || '');
       const rowName = normalizeVenueTextKey(formatPublicVenueTitle(row?.name || row?.title || ''));
       const slugHit =
@@ -2486,6 +2522,30 @@ function sortVenueCatalogSessions(sessions) {
   });
 }
 
+function venueCityKey(row) {
+  return (
+    canonicalCitySlug(row?.citySlug || '') ||
+    canonicalCitySlug(row?.sourceCitySlug || '') ||
+    canonicalCitySlug(row?.city || '') ||
+    ''
+  );
+}
+
+/** True when both sides have a city and they match (aliases collapsed). Missing city → not a conflict. */
+export function samePublicVenueCity(a, b) {
+  const left = venueCityKey(a);
+  const right = venueCityKey(b);
+  if (!left || !right) return true;
+  return left === right;
+}
+
+/** Drop foreign-city sessions that leaked via fuzzy venue-name attach. */
+export function filterSessionsToVenueCity(sessions, venueCityHint) {
+  const venueKey = venueCityKey(venueCityHint);
+  if (!venueKey || !Array.isArray(sessions) || !sessions.length) return sessions || [];
+  return sessions.filter((session) => samePublicVenueCity(venueCityHint, session));
+}
+
 function lookupVenueCatalogSessions(venueIds, catalogSessions, venueContexts = []) {
   if (!venueIds?.length && !venueContexts.length) return [];
 
@@ -2493,17 +2553,25 @@ function lookupVenueCatalogSessions(venueIds, catalogSessions, venueContexts = [
   const idSet = new Set(venueIds || []);
   const slugPrefixes = new Set();
   const nameKeys = new Set();
+  const contextCities = new Set();
   for (const ctx of venueContexts || []) {
     const slug = normalizePublicVenueSlugKey(ctx?.slug || '');
     if (slug) slugPrefixes.add(slug);
     const nameKey = normalizeVenueTextKey(formatPublicVenueTitle(ctx?.name || ctx?.title || ''));
     if (nameKey.length >= MIN_FUZZY_VENUE_NAME_LEN) nameKeys.add(nameKey);
+    const city = venueCityKey(ctx);
+    if (city) contextCities.add(city);
   }
 
   const matched = catalogSessions.filter((session) => {
     if (idSet.has(session.venueId)) return true;
     const pierKey = canonicalSessionPierKey(session);
     if (pierKey && pierKeys.has(pierKey)) return true;
+
+    const sessionCity = venueCityKey(session);
+    if (contextCities.size && sessionCity && !contextCities.has(sessionCity)) {
+      return false;
+    }
 
     // TC often links tickets to a hall child slug (muzei-…-hogvarts-holl-…) while the
     // public card is the parent muzei-…. Match prefix / shared title so afisha returns.
