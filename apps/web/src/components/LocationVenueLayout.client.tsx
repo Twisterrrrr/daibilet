@@ -472,14 +472,14 @@ export function LocationVenueLayout({
               {resolveVenueAboutHeading(venue.type, venue.title || venue.name)}
             </h2>
             {hookFact && !isParkLike ? (
-              <p className="mt-6 text-base leading-7 text-zinc-600" data-venue-hook-fact>
+              <p className="venue-md-body mt-5" data-venue-hook-fact data-venue-md-prose>
                 {hookFact}
               </p>
             ) : null}
             {editorial?.highlights?.length ? (
-              <ul className="mt-6 space-y-3" data-venue-highlights>
+              <ul className="mt-5 space-y-2.5" data-venue-highlights>
                 {editorial.highlights.map((item) => (
-                  <li key={item} className="flex items-start gap-2.5 text-base leading-7 text-zinc-600">
+                  <li key={item} className="venue-md-body flex items-start gap-2.5">
                     <CheckCircle2 className="mt-1 h-4 w-4 shrink-0 text-emerald-500" />
                     <span>{item}</span>
                   </li>
@@ -491,7 +491,7 @@ export function LocationVenueLayout({
                   <p
                     key={paragraph.slice(0, 48)}
                     data-venue-md-prose
-                    className={`${index === 0 ? 'mt-8' : 'mt-5'} whitespace-pre-line text-base leading-7 text-zinc-600`}
+                    className={`venue-md-body whitespace-pre-line ${index === 0 ? 'mt-5' : 'mt-3'}`}
                   >
                     {paragraph}
                   </p>
@@ -503,11 +503,11 @@ export function LocationVenueLayout({
           {seoSections.length > 0 ? (
             <section
               id="venue-guide"
-              className="scroll-mt-24 space-y-14"
+              className="scroll-mt-24 space-y-8"
               data-venue-seo-sections
             >
               {seoSections.map((section) => (
-                <div key={section.h2} className="space-y-5">
+                <div key={section.h2} className="space-y-3">
                   <h2 className="font-display text-xl font-bold tracking-tight text-zinc-950 sm:text-2xl">
                     {section.h2}
                   </h2>
@@ -515,7 +515,7 @@ export function LocationVenueLayout({
                     <p
                       key={paragraph.slice(0, 48)}
                       data-venue-md-prose
-                      className="text-base leading-7 text-zinc-600"
+                      className="venue-md-body"
                     >
                       {paragraph}
                     </p>
@@ -527,7 +527,7 @@ export function LocationVenueLayout({
 
           {visitTips ? (
             <p
-              className="text-base leading-7 text-slate-700"
+              className="venue-md-body"
               data-venue-md-prose
               data-venue-visit-tips
             >
@@ -544,7 +544,7 @@ export function LocationVenueLayout({
                 {curatedFaq.map((item) => (
                   <div key={item.question}>
                     <h3 className="text-base font-bold leading-snug text-zinc-950">{item.question}</h3>
-                    <p className="mt-3 text-base leading-7 text-zinc-600" data-venue-faq-answer>
+                    <p className="venue-md-body mt-3" data-venue-faq-answer>
                       {item.answer}
                     </p>
                   </div>

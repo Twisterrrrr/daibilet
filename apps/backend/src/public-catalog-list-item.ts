@@ -5,7 +5,7 @@ export const LIST_SLOT_PREVIEW_LIMIT = 4;
 /** Homepage /home card sessions: nearest slots without per-slot widget URLs. */
 export const HOME_SLOT_PREVIEW_LIMIT = 3;
 
-/** Lean catalog card DTO: capped slots; full plain description (owner: no mid-word ellipsis). */
+/** Lean catalog card DTO: capped slots; description clipped to 3 sentences for card teaser. */
 export function toPublicCatalogListItem(session: PublicSessionDto): PublicCatalogListItemDto {
   const item: PublicCatalogListItemDto = {
     id: session.id,
@@ -117,5 +117,44 @@ function toListDescriptionPlain(value?: string | null): string | null {
     .replace(/&gt;/gi, '>')
     .replace(/\s+/g, ' ')
     .trim();
-  return plain || null;
+  if (!plain) return null;
+  return clipToSentences(plain, 3);
+}
+
+/** Soft ceiling when supplier text has almost no sentence punctuation. */
+const LIST_DESCRIPTION_MAX_CHARS = 320;
+
+/** Catalog card teaser: first N complete sentences (ignore short abbr like г. ул. ст.). */
+function clipToSentences(
+  text: string,
+  maxSentences: number,
+  maxChars = LIST_DESCRIPTION_MAX_CHARS,
+): string {
+  if (maxSentences < 1) return text;
+  const ends: number[] = [];
+  for (let i = 0; i < text.length; i += 1) {
+    const ch = text[i];
+    if (ch !== '.' && ch !== '!' && ch !== '?' && ch !== '…') continue;
+    const before = text.slice(Math.max(0, i - 4), i);
+    if (ch === '.' && /(?:^|[\s(,])[а-яёa-z]{1,3}$/iu.test(before)) continue;
+    const rest = text.slice(i + 1);
+    if (!rest.trim()) {
+      ends.push(i + 1);
+      continue;
+    }
+    // Any next token after whitespace - RU marketing often continues lowercase.
+    if (/^\s+\S/.test(rest)) ends.push(i + 1);
+  }
+  if (ends.length >= maxSentences) {
+    return text.slice(0, ends[maxSentences - 1]!).trim();
+  }
+  if (text.length <= maxChars) return text;
+  const withinBudget = ends.filter((end) => end <= maxChars);
+  if (withinBudget.length > 0) {
+    return text.slice(0, withinBudget[withinBudget.length - 1]!).trim();
+  }
+  let cut = text.slice(0, maxChars);
+  const space = cut.lastIndexOf(' ');
+  if (space > Math.floor(maxChars * 0.55)) cut = cut.slice(0, space);
+  return `${cut.trim().replace(/[,:;·•\-–—]+$/u, '')}…`;
 }

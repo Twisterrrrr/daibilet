@@ -266,7 +266,84 @@ export function formatListDescription(value?: string | null): string {
     )
     .replace(/^адрес\s*[•·|:：\-–—]?\s*/iu, '')
     .trim();
-  return text;
+  // Catalog cards: teaser only - first 3 sentences (full text stays on PDP).
+  return clipListDescriptionSentences(text, 3);
+}
+
+/** List mode desktop: same teaser as formatListDescription, one sentence per line. */
+export function splitListDescriptionSentences(value?: string | null, maxSentences = 3): string[] {
+  const formatted = formatListDescription(value);
+  if (!formatted) return [];
+  const lines = splitTeaserSentences(formatted, maxSentences);
+  return lines.length ? lines : [formatted];
+}
+
+function isSentenceEnd(value: string, index: number): boolean {
+  const ch = value[index];
+  if (ch !== '.' && ch !== '!' && ch !== '?' && ch !== '…') return false;
+  const before = value.slice(Math.max(0, index - 4), index);
+  if (ch === '.' && /(?:^|[\s(,])[а-яёa-z]{1,3}$/iu.test(before)) return false;
+  const rest = value.slice(index + 1);
+  if (!rest.trim()) return true;
+  return /^\s+\S/.test(rest);
+}
+
+function splitTeaserSentences(text: string, maxSentences = 3): string[] {
+  const value = String(text || '').replace(/\s+/g, ' ').trim();
+  if (!value || maxSentences < 1) return [];
+
+  const lines: string[] = [];
+  let start = 0;
+
+  for (let i = 0; i < value.length; i += 1) {
+    if (!isSentenceEnd(value, i)) continue;
+    lines.push(value.slice(start, i + 1).trim());
+    start = i + 1;
+    while (start < value.length && /\s/.test(value[start]!)) start += 1;
+    if (lines.length >= maxSentences) break;
+  }
+
+  const tail = value.slice(start).trim();
+  if (tail && lines.length < maxSentences) lines.push(tail);
+  return lines.filter(Boolean);
+}
+
+/** Soft ceiling when supplier text has almost no sentence punctuation. */
+export const LIST_DESCRIPTION_MAX_CHARS = 320;
+
+/**
+ * Keep complete marketing sentences; ignore short RU abbreviations (г. ул. ст. м.).
+ * Falls back to a char budget when punctuation is sparse (TC dumps often omit periods).
+ * Does not force a trailing period on address-only logistics lines.
+ */
+export function clipListDescriptionSentences(
+  text: string,
+  maxSentences = 3,
+  maxChars = LIST_DESCRIPTION_MAX_CHARS,
+): string {
+  const value = String(text || '').replace(/\s+/g, ' ').trim();
+  if (!value || maxSentences < 1) return value;
+
+  const ends: number[] = [];
+  for (let i = 0; i < value.length; i += 1) {
+    if (!isSentenceEnd(value, i)) continue;
+    ends.push(i + 1);
+  }
+
+  if (ends.length >= maxSentences) {
+    return value.slice(0, ends[maxSentences - 1]!).trim();
+  }
+  if (value.length <= maxChars) return value;
+
+  const withinBudget = ends.filter((end) => end <= maxChars);
+  if (withinBudget.length > 0) {
+    return value.slice(0, withinBudget[withinBudget.length - 1]!).trim();
+  }
+
+  let cut = value.slice(0, maxChars);
+  const space = cut.lastIndexOf(' ');
+  if (space > Math.floor(maxChars * 0.55)) cut = cut.slice(0, space);
+  return `${cut.trim().replace(/[,:;·•\-–—]+$/u, '')}…`;
 }
 
 /**
@@ -279,17 +356,21 @@ export function isLogisticsListDescription(value?: string | null): boolean {
     .replace(/\s+/g, ' ')
     .trim();
   if (!raw) return false;
+  // Cyrillic is not a JS `\w` char - do not use `\b` after RU words.
   if (
-    /^(?:место(?:\s+и\s+время)?\s+встречи|точка\s+(?:сбора|встречи)|место\s+сбора)\b/iu.test(raw)
+    /^(?:место(?:\s+и\s+время)?\s+встречи|точка\s+(?:сбора|встречи)|место\s+сбора)(?:\s*[•·|:：\-–—]|\s|$)/iu.test(
+      raw,
+    )
   ) {
     return true;
   }
   const cleaned = formatListDescription(raw);
   if (!cleaned) return true;
-  // Address-like after strip, without a real sentence.
+  // Address-like after strip, without a real sentence (ignore abbr dots like г. ул.).
+  const withoutAbbrDots = cleaned.replace(/(?:^|[\s(,])[а-яёa-z]{1,3}\./giu, ' ');
   if (
     /(?:\bг\.|\bст\.?\s*м\.|\bул\.|\bпр\.|\bпер\.|наб\.|просп|площад|причал\b)/iu.test(cleaned) &&
-    !/[.!?…]/.test(cleaned) &&
+    !/[.!?…]/.test(withoutAbbrDots) &&
     cleaned.length < 160
   ) {
     return true;

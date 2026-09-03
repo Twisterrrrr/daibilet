@@ -219,14 +219,31 @@ html[data-nav-pending='1'] {
     font-family: var(--font-md);
   }
 
-  /* One body size for venue PDP copy (fact / UL / prose / FAQ answers). */
+  /**
+   * Venue PDP body canon: one size/weight/color for all non-heading copy
+   * (fact, UL highlights, about prose, SEO sections, FAQ answers, visit tips).
+   * !important beats leftover Tailwind text-sm / prose utilities.
+   */
+  [data-venue-pdp-md] .venue-md-body,
   [data-venue-pdp-md] [data-venue-md-prose],
+  [data-venue-pdp-md] [data-venue-hook-fact],
   [data-venue-pdp-md] [data-venue-hook-fact] p,
   [data-venue-pdp-md] [data-venue-highlights] li,
+  [data-venue-pdp-md] [data-venue-highlights] li span,
   [data-venue-pdp-md] [data-venue-faq-answer],
   [data-venue-pdp-md] [data-venue-visit-tips] {
-    font-size: 1rem;
-    line-height: 1.7;
+    font-size: 1rem !important;
+    line-height: 1.7 !important;
+    font-weight: 400 !important;
+    color: #52525b !important; /* zinc-600 */
+  }
+
+  [data-venue-pdp-md] .venue-md-body strong,
+  [data-venue-pdp-md] [data-venue-md-prose] strong {
+    font-size: inherit !important;
+    line-height: inherit !important;
+    font-weight: 600 !important;
+    color: #27272a !important; /* zinc-800 */
   }
 
   /* /my-day: Lovable parity - Manrope for UI + titles (not Inter body). */

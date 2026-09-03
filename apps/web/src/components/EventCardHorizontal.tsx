@@ -14,6 +14,7 @@ import {
   extractAddressFromListDescription,
   formatCardScheduleLine,
   formatListDescription,
+  splitListDescriptionSentences,
   getDepartingSoonMinutes,
   isLogisticsListDescription,
   isOpenDate,
@@ -184,6 +185,10 @@ export function EventCardHorizontal({
   const descriptionText = isLogisticsListDescription(session.description)
     ? ''
     : formatListDescription(session.description);
+  const descriptionLines =
+    descriptionText && !isLogisticsListDescription(session.description)
+      ? splitListDescriptionSentences(session.description)
+      : [];
   const destinationLabel = resolveEventCardDestinationLabel(session);
   const locationLabel =
     resolveEventCardLocationLabel(session) ||
@@ -271,7 +276,16 @@ export function EventCardHorizontal({
         </h3>
 
         {descriptionText ? (
-          <p className="text-ui-xs leading-relaxed text-graphite-muted sm:text-ui-sm">{descriptionText}</p>
+          <div className="text-ui-xs leading-relaxed text-graphite-muted sm:text-ui-sm" data-list-description>
+            <p className="line-clamp-3 sm:hidden">{descriptionText}</p>
+            <div className="hidden flex-col gap-1 sm:flex">
+              {descriptionLines.map((line) => (
+                <p key={line} className="leading-relaxed">
+                  {line}
+                </p>
+              ))}
+            </div>
+          </div>
         ) : null}
 
         {(session.category || highlights.length > 0) && (
