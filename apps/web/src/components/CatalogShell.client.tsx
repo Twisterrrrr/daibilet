@@ -463,7 +463,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
             id="catalog-sort"
             value={filterValues.sort}
             disabled={(loading && !catalog) || cityBootstrapPending}
-            className="min-w-0 shrink"
+            className="shrink-0"
             onChange={(sort: CatalogSort) => {
               router.push(
                 buildCatalogHref({
