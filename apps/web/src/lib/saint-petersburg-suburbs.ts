@@ -5,11 +5,13 @@ export const PETERHOF_SUBURB_CARD: CitySuburbItem = {
     name: 'Петергоф',
     desc: 'Парадная резиденция Петра I на заливе: фонтаны без насосов, Большой каскад и Нижний парк.',
     mustSeeFilter: 'main',
+    // Hub cover = Lower Park cascade axis (petergof.jpg); palace POI uses bolshoy-dvorets-*.
+    locationSlug: 'saint-petersburg-petergof',
     places: [
       { name: 'Нижний парк Петергофа', seasonLabel: 'Летняя навигация - май-октябрь', desc: 'регулярный парадный сад Петра I на берегу Финского залива со знаменитой системой фонтанов, работающей вообще без насосов.', locationSlug: 'saint-petersburg-nizhniy-park-petergofa', latitude: 59.885112, longitude: 29.908214, transitTip: 'От ст. Новый Петергоф автобус' },
       { name: 'Большой каскад', seasonLabel: 'Летняя навигация - май-октябрь', desc: 'монументальное фонтанное сооружение с гротами и позолоченной фигурой Самсона, разрывающего пасть льва, символизирующей победу над Швецией.', locationSlug: 'saint-petersburg-bolshoy-kaskad-petergofa', latitude: 59.88935, longitude: 29.90855},
       { name: 'Большой дворец Петергофа', desc: 'парадная барочная резиденция Петра I и Елизаветы над каскадом, с тронным залом и анфиладой парадных покоев.', locationSlug: 'saint-petersburg-bolshoy-dvorets-petergofa', latitude: 59.89055, longitude: 29.90785},
-      { name: 'Верхний сад', desc: 'регулярный партер перед фасадом Большого дворца с тремя главными фонтанами и видом на Морской канал.', locationSlug: 'saint-petersburg-verkhniy-sad-petergofa', latitude: 59.89185, longitude: 29.90845},
+      { name: 'Верхний сад', desc: 'регулярный партер перед южным фасадом Большого дворца с фонтаном Нептун и парадным въездом со стороны города.', locationSlug: 'saint-petersburg-verkhniy-sad-petergofa', latitude: 59.89185, longitude: 29.90845},
       { name: 'Дворец Монплезир', desc: 'любимый приморский дворец Петра Великого со старинной голландской плиткой, где царь лично принимал иностранных послов.', locationSlug: 'saint-petersburg-dvorets-monplezir', latitude: 59.8879, longitude: 29.9184},
       { name: 'Павильон Марли', desc: 'камерный голландский павильон Петра I у прудов западной части Нижнего парка, любимое место уединения царя.', locationSlug: 'saint-petersburg-pavilion-marli', latitude: 59.88685, longitude: 29.89655},
       { name: 'Парк Александрия', desc: 'уединенная пейзажная резиденция четырех поколений Романовых, оформленная в стиле романтической английской неоготики.', locationSlug: 'saint-petersburg-park-aleksandriya', latitude: 59.8808, longitude: 29.9212, transitTip: '~10-15 мин переход в Александрию' },

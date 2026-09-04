@@ -440,7 +440,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
         <CatalogActiveFilters values={filterValues} />
       </div>
 
-      {/* Mobile: sort + view on one row. Count lives on sm+. */}
+      {/* Count on sm+; sort + page size + view stay on one row. */}
       <div
         id="catalog-results"
         className="catalog-meta-row mt-3 scroll-mt-[calc(var(--site-header-height)+5.5rem)] flex flex-col gap-2 sm:mt-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between"
@@ -459,12 +459,26 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
         {error ? <p className="text-sm text-rose-600 sm:hidden">{error}</p> : null}
 
         <div className="flex w-full min-w-0 flex-nowrap items-center justify-end gap-2 sm:ml-auto sm:w-auto">
+          <CatalogSortSelect
+            id="catalog-sort"
+            value={filterValues.sort}
+            disabled={(loading && !catalog) || cityBootstrapPending}
+            className="min-w-0 shrink"
+            onChange={(sort: CatalogSort) => {
+              router.push(
+                buildCatalogHref({
+                  ...filterValues,
+                  sort,
+                  page: undefined,
+                }),
+              );
+            }}
+          />
           <div
             role="radiogroup"
             aria-label="Событий на странице"
             className="catalog-page-size-toggle hidden items-center gap-1 rounded-full bg-[#F5F5F7] px-2 py-0.5 sm:inline-flex"
           >
-            <span className="pl-1 text-xs font-medium text-slate-500">Показывать</span>
             {CATALOG_PAGE_SIZES.map((size) => {
               const active = (filterValues.limit || CATALOG_PAGE_SIZE_DEFAULT) === size;
               return (
@@ -495,21 +509,6 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
               );
             })}
           </div>
-          <CatalogSortSelect
-            id="catalog-sort-mobile"
-            value={filterValues.sort}
-            disabled={(loading && !catalog) || cityBootstrapPending}
-            className="min-w-0 shrink md:hidden"
-            onChange={(sort: CatalogSort) => {
-              router.push(
-                buildCatalogHref({
-                  ...filterValues,
-                  sort,
-                  page: undefined,
-                }),
-              );
-            }}
-          />
           <ViewModeToggle mode={viewMode} onChange={setViewMode} />
         </div>
       </div>

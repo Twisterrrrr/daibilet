@@ -26,13 +26,11 @@ import {
 } from '@/lib/catalog-category-rail';
 
 import type { PublicCatalogDto } from '@daibilet/contracts/public';
-import { CatalogSortSelect } from '@/components/CatalogSortSelect.client';
 import {
   buildCatalogHref,
   catalogFiltersFromQuery,
   countAdvancedFilters,
   type CatalogFilterValues,
-  type CatalogSort,
 } from '@/lib/catalog-url';
 
 /** Heavy filter sheet - load only when drawer opens (keeps /events first JS lighter). */
@@ -209,15 +207,6 @@ export function CatalogToolbar({
     });
   };
 
-  const setSort = (sort: CatalogSort) => {
-    navigate({
-      ...filters,
-      q: qDraft.trim() || undefined,
-      sort,
-      page: undefined,
-    });
-  };
-
   const discoveryRow = (
     <div
       role="group"
@@ -232,14 +221,6 @@ export function CatalogToolbar({
       />
       <div className="catalog-discovery-row__actions">
         <QuickFilterToggles filters={filters} qDraft={qDraft} disabled={disabled} onNavigate={navigate} />
-        <CatalogSortSelect
-          id="catalog-sort-desktop"
-          value={filters.sort}
-          disabled={disabled}
-          onChange={setSort}
-          size="sm"
-          className="max-w-[11.5rem] min-w-0 shrink-0"
-        />
       </div>
     </div>
   );

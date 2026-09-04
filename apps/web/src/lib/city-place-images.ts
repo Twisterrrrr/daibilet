@@ -599,11 +599,12 @@ const SAINT_PETERSBURG_IMAGES: Record<string, string> = {
     '/images/venues/saint-petersburg/divo-ostrov.jpg',
   'saint-petersburg-ekaterininskiy-dvorets':
     '/images/venues/saint-petersburg/ekaterininskiy-dvorets.jpg',
-  'bolshoi-petergofskii-dvorec': '/images/venues/saint-petersburg/petergof.jpg',
+  'bolshoi-petergofskii-dvorec':
+    '/images/venues/saint-petersburg/bolshoy-dvorets-petergofa.jpg',
   'bolshoi-petergofskii-dvorec-68c6ae79d5b98d58ded70411':
-    '/images/venues/saint-petersburg/petergof.jpg',
+    '/images/venues/saint-petersburg/bolshoy-dvorets-petergofa.jpg',
   'saint-petersburg-bolshoy-dvorets-petergofa':
-    '/images/venues/saint-petersburg/petergof.jpg',
+    '/images/venues/saint-petersburg/bolshoy-dvorets-petergofa.jpg',
   'saint-petersburg-kolonnada-isaakiya':
     '/images/venues/saint-petersburg/kolonnada-isaakiya.jpg',
   'saint-petersburg-aleksandro-nevskaya-lavra':
