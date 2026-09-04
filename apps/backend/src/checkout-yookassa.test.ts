@@ -97,13 +97,13 @@ test('builds redirect payment payload without leaking internal raw objects', () 
       commissionKopecks: 7000,
       netKopecks: 63000,
     },
-    returnUrl: 'https://daibilet.ru/purchases/1234567?payment=yookassa',
+    returnUrl: 'https://daibilet.ru/checkout/result?order=1234567',
   });
 
   assert.deepEqual(payload.amount, { value: '700.00', currency: 'RUB' });
   assert.deepEqual(payload.confirmation, {
     type: 'redirect',
-    return_url: 'https://daibilet.ru/purchases/1234567?payment=yookassa',
+    return_url: 'https://daibilet.ru/checkout/result?order=1234567',
   });
   assert.deepEqual(payload.metadata, {
     source: 'daibilet',
@@ -144,7 +144,7 @@ test('builds admission redirect payment payload with venue admission metadata', 
       commissionKopecks: 7000,
       netKopecks: 63000,
     },
-    returnUrl: 'https://daibilet.ru/purchases/7654321?payment=yookassa',
+    returnUrl: 'https://daibilet.ru/checkout/result?order=7654321',
   });
 
   assert.deepEqual(payload.amount, { value: '700.00', currency: 'RUB' });
@@ -172,7 +172,19 @@ test('builds catalog result return_url with assigned publicCode', () => {
   );
   assert.equal(
     buildYooKassaCatalogResultReturnUrl('', '7654321'),
-    'http://localhost:5178/checkout/result?order=7654321',
+    'https://daibilet.ru/checkout/result?order=7654321',
+  );
+  assert.equal(
+    buildYooKassaCatalogResultReturnUrl('https://pay.daibilet.ru/checkout/result', '7654321'),
+    'https://daibilet.ru/checkout/result?order=7654321',
+  );
+  assert.equal(
+    buildYooKassaCatalogResultReturnUrl('https://finance-api.daibilet.ru/checkout/result', '7654321'),
+    'https://daibilet.ru/checkout/result?order=7654321',
+  );
+  assert.equal(
+    buildYooKassaCatalogResultReturnUrl('https://daibilet.ru/checkout/result?order=1111111', '7654321'),
+    'https://daibilet.ru/checkout/result?order=1111111',
   );
 });
 
@@ -469,12 +481,29 @@ test('YooKassa admission checkout creates pending payment and preserves idempote
     assert.equal(result.order.payment.providerPaymentId, `pay_${suffix}`);
     assert.equal(result.order.payment.confirmationUrl, `https://yookassa.test/pay/${suffix}`);
     assert.ok(createPaymentRequestBody);
+    const expectedReturnUrl = `https://daibilet.ru/checkout/result?order=${result.order.publicCode}`;
     assert.deepEqual((createPaymentRequestBody as Record<string, unknown>).confirmation, {
       type: 'redirect',
-      return_url: `https://daibilet.ru/checkout/result?order=${result.order.publicCode}`,
+      return_url: expectedReturnUrl,
     });
     assert.equal(result.order.ticketNumber, null);
     assert.deepEqual(result.order.ticketNumbers, []);
+
+    const createdOrder = await prisma.checkoutOrder.findUnique({
+      where: { id: result.order.id },
+      select: { buyerSnapshot: true },
+    });
+    const buyerSnapshot = createdOrder?.buyerSnapshot as Record<string, unknown> | null;
+    assert.equal(buyerSnapshot?.returnUrl, expectedReturnUrl);
+    assert.equal(buyerSnapshot?.requestedReturnUrl, 'https://daibilet.ru/checkout/result');
+
+    const createdPayment = await prisma.payment.findUnique({
+      where: { id: result.order.payment.id },
+      select: { rawPayload: true },
+    });
+    const rawPayload = createdPayment?.rawPayload as Record<string, unknown> | null;
+    const daibiletPayload = rawPayload?.daibilet as Record<string, unknown> | undefined;
+    assert.equal(daibiletPayload?.returnUrl, expectedReturnUrl);
 
     const afterFirst = await prisma.admissionProduct.findUnique({
       where: { id: productId },

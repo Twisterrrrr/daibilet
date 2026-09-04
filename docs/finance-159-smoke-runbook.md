@@ -126,6 +126,18 @@ DAIBILET_YOOKASSA_CHECKOUT=1
 - catalog CTA всё ещё gated по `canSell && checkoutPath`;
 - владелец подтверждает тестовый платеж и отмену/возврат.
 
+FIN.RETURN-1 acceptance после deploy на `.159`:
+
+```bash
+curl -fsS "https://finance-api.daibilet.ru/api/public/checkout/orders/{publicCode}"
+```
+
+- YooKassa create-payment должен отправлять `confirmation.return_url` на catalog, а не на pay/finance host:
+  `https://daibilet.ru/checkout/result?order={publicCode}`;
+- если catalog передал только базу `https://daibilet.ru/checkout/result`, finance добавляет `order` сам после генерации `publicCode`;
+- если `order` уже есть в query, finance не дублирует параметр;
+- webhook URL остается `https://finance-api.daibilet.ru/api/checkout/yookassa/webhook`.
+
 ## YooKassa reconcile / reaper
 
 Назначение: не держать зависшие `CheckoutOrder(PENDING_PAYMENT)` и зарезервированную вместимость, если webhook не пришел или платеж завис.

@@ -1,3 +1,31 @@
+## 2026-09-04 - FIN.RETURN-1 on finance stage0
+
+### Наблюдения
+
+- На `.159` live branch - `codex/stage0-admission-ticket-core`, не старая `codex/phase2-finance-supplier`.
+- Stage0 уже имел buyer checkout/result и частичный admission `return_url`, но event YooKassa path всё ещё строил `/purchases/{publicCode}?payment=yookassa`, а default base оставался `localhost`.
+- Для sandbox Path A канон остается catalog result: `https://daibilet.ru/checkout/result?order={publicCode}`.
+
+### Решения
+
+- FIN.RETURN-1 перенесен поверх актуального stage0-кода без переключения prod на другую ветку.
+- YooKassa create-payment теперь использует единый catalog result return URL для event и admission checkout.
+- `pay.daibilet.ru`, `checkout.daibilet.ru` и `finance-api.daibilet.ru` не допускаются как final return host.
+- Финальный return URL сохраняется в `buyerSnapshot`, item/fulfillment provider payload и `Payment.rawPayload.daibilet.returnUrl`.
+- `returnUrl` добавлен в payload-bound idempotency hash.
+
+### Проверки
+
+- `pnpm --config.engine-strict=false --filter @daibilet/backend typecheck` - OK.
+- `DATABASE_URL=postgresql://daibilet:daibilet@127.0.0.1:5437/daibilet pnpm --config.engine-strict=false --filter @daibilet/backend exec tsx --test src/checkout-yookassa.test.ts` - OK.
+- `DATABASE_URL=postgresql://daibilet:daibilet@127.0.0.1:5437/daibilet pnpm --config.engine-strict=false --filter @daibilet/backend exec tsx --test src/supplier-admission-yookassa-purchase-handler.test.ts` - OK.
+
+### Дальше
+
+- Deploy на `.159`, restart finance API, затем sandbox payment smoke с проверкой кнопки "Вернуться на сайт".
+
+---
+
 ## 2026-08-09 - Finance E2E foundation: close period mutation
 
 ### Наблюдения

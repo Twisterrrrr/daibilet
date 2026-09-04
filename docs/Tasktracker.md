@@ -1,6 +1,6 @@
 # Tasktracker — Daibilet
 
-**Обновлено:** 2026-08-09
+**Обновлено:** 2026-09-04
 **Источники:** [Project.md](./Project.md), [current-state.md](./current-state.md), [widget-etalon-slugs.md](./widget-etalon-slugs.md), [content-blog-plan.md](./content-blog-plan.md)
 
 **Легенда:** ✅ done · 🔄 in progress · ⏳ todo · 🚫 blocked · ⚠️ deferred
@@ -59,7 +59,7 @@
 | P.3e10 | **Admission buyer checkout page** - `/checkout/admissions/:slug` reads finance admission projection, creates YooKassa payment through web proxy, redirects to result page | High | 🔄 code done; pilot-only, wide catalog CTA still off |
 | P.3e11 | **Admin finance order detail foundation** - typed internal order detail with payments, fulfillment ticketNumbers, supplier ledger, refunds, fiscal receipts and operation blockers | High | 🔄 code done; backend/admin typecheck + projection test green |
 | P.3e12 | **Admin refund foundation** - create `RefundRequest` from order detail with hard payment/fulfillment/ledger blockers | High | 🔄 code done; projection test + admin build green |
-| P.3f | **YooKassa: venue admission** | Высокий | 🔄 в PR `codex/stage0-admission-ticket-core` (admission schema + Path A return_url + ticketNumber issuance; code done); ждёт smoke `.159` |
+| P.3f | **YooKassa: venue admission** | Высокий | 🔄 FIN.RETURN-1 fixed on `codex/stage0-admission-ticket-core`; ждёт deploy/sandbox return smoke `.159` |
 | P.3f1 | **Supplier onboarding write-flow** — юрпрофиль + основной счет из ЛК, статус реквизитов на проверку | Высокий | ✅ backend PATCH + supplier UI forms |
 | P.3f2 | **YooKassa webhook hardening** — provider event id, replay dedupe, payment id mismatch guard | Высокий | ✅ backend + DB tests |
 | P.3f3 | **Admin legal approve/reject + Supplier LC polish** — модерация реквизитов, readiness callout, лаконичные заказы | Высокий | ✅ backend route + admin/supplier UI + tests |
@@ -491,6 +491,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | G.6 | YooKassa sandbox smoke on finance server | High | partial 2026-07-31: create-payment OK, confirmation page manual |
 | G.7 | Unified purchase projection for CheckoutOrder + ExternalOrder | High | done 2026-07-31: admin + supplier verified for checkout order |
 | G.8 | YooKassa webhook hardening: provider event id dedupe + payment id guard | High | done 2026-07-31, deployed on .159 |
+| G.9 | FIN.RETURN-1: YooKassa return_url goes to catalog result with `?order={publicCode}` | High | code done 2026-09-04; deploy + sandbox return smoke pending |
 
 Seed command: `pnpm backend:checkout:seed-stub-admission`.
 Smoke order command: `pnpm backend:checkout:seed-stub-admission -- --order`.
