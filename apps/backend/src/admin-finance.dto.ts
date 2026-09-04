@@ -362,11 +362,12 @@ export async function closeAdminFinancePeriod(input: AdminFinanceClosePeriodInpu
       where: ledgerWhere,
       _sum: { amountKopecks: true },
     }),
+    // Open refunds block period close regardless of request createdAt:
+    // a refund opened after the period still leaves money unsettled for the supplier.
     prisma.refundRequest.count({
       where: {
         supplierId,
         status: { in: ['CREATED', 'APPROVED', 'PROCESSING'] },
-        createdAt: { gte: periodStart, lte: periodEnd },
       },
     }),
     prisma.fiscalReceipt.count({

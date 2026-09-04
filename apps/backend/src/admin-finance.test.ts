@@ -120,12 +120,14 @@ test('blocks finance period close while refund request is open', async () => {
         createdAt: new Date('2026-08-10T12:00:00.000Z'),
       },
     });
+    // createdAt outside the closed period on purpose: open refunds still block.
     await prisma.refundRequest.create({
       data: {
         supplierId,
         amountKopecks: 10_000,
         reason: 'USER_REQUEST',
         status: 'CREATED',
+        createdAt: new Date('2026-09-05T12:00:00.000Z'),
       },
     });
 
